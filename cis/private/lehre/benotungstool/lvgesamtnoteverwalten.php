@@ -50,7 +50,7 @@ $summe_stud = 0;
 $summe_t2 = 0;
 $summe_komm = 0;
 $summe_ng = 0;
-
+$grades = array();
 $sprache = getSprache();
 $p = new phrasen($sprache);
 

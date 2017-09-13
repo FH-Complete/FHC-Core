@@ -13,15 +13,14 @@ class Studiengang_model extends DB_Model
 	}
 
 	/**
-	 *
+	 * getAllForBewerbung
 	 */
 	public function getAllForBewerbung()
 	{
 		// Checks if the operation is permitted by the API caller
-		if (($isEntitled = $this->isEntitled('lehre.vw_studienplan', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)) !== true)
-			return $isEntitled;
-		if (($isEntitled = $this->isEntitled('bis.tbl_lgartcode', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)) !== true)
-			return $isEntitled;
+		if (isError($ent = $this->isEntitled($this->dbTable, PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR))) return $ent;
+		if (isError($ent = $this->isEntitled('bis.tbl_lgartcode', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR))) return $ent;
+		if (isError($ent = $this->isEntitled('lehre.vw_studienplan', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR))) return $ent;
 
 		$allForBewerbungQuery = 'SELECT DISTINCT studiengang_kz,
 										typ,
@@ -100,10 +99,12 @@ class Studiengang_model extends DB_Model
 	}
 
 	/**
-	 *
+	 * getStudienplan
 	 */
 	public function getStudienplan($studiensemester_kurzbz, $ausbildungssemester, $aktiv, $onlinebewerbung)
 	{
+		if (isError($ent = $this->isEntitled($this->dbTable, PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR))) return $ent;
+		
 		// Join table public.tbl_studiengang with table lehre.tbl_studienordnung on column studiengang_kz
 		$this->addJoin('lehre.tbl_studienordnung', 'studiengang_kz');
 		// Then join with table lehre.tbl_studienplan on column studienordnung_id
@@ -135,10 +136,12 @@ class Studiengang_model extends DB_Model
 	}
 
 	/**
-	 *
+	 * getStudiengangBewerbung
 	 */
 	public function getStudiengangBewerbung()
 	{
+		if (isError($ent = $this->isEntitled($this->dbTable, PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR))) return $ent;
+		
 		// Join table public.tbl_studiengang with table lehre.tbl_studienordnung on column studiengang_kz
 		$this->addJoin('lehre.tbl_studienordnung', 'studiengang_kz');
 		// Join table lehre.tbl_studienordnung with table lehre.tbl_akadgrad on column akadgrad_id
@@ -150,7 +153,8 @@ class Studiengang_model extends DB_Model
 		// Then join with table lehre.tbl_bewerbungsfrist on column studiensemester_kurzbz
 		$this->addJoin(
 			'public.tbl_bewerbungstermine',
-			'tbl_bewerbungstermine.studiensemester_kurzbz = ss.studiensemester_kurzbz AND tbl_bewerbungstermine.studienplan_id = ss.studienplan_id',
+			'tbl_bewerbungstermine.studiensemester_kurzbz = ss.studiensemester_kurzbz
+			AND tbl_bewerbungstermine.studienplan_id = ss.studienplan_id',
 			'LEFT'
 		);
 		// Ordering by studiengang_kz and studienplan_id
@@ -166,7 +170,9 @@ class Studiengang_model extends DB_Model
 			'public.tbl_studiengang.aktiv = TRUE
 			AND public.tbl_studiengang.onlinebewerbung = TRUE
 			AND ((tbl_bewerbungstermine.beginn <= NOW() AND tbl_bewerbungstermine.ende >= NOW()) OR tbl_bewerbungstermine.beginn IS NULL)
-			AND ss.studiensemester_kurzbz IN (SELECT DISTINCT studiensemester_kurzbz FROM public.tbl_bewerbungstermine WHERE beginn <= NOW() AND ende >= NOW())
+			AND ss.studiensemester_kurzbz IN (
+				SELECT DISTINCT studiensemester_kurzbz FROM public.tbl_bewerbungstermine WHERE beginn <= NOW() AND ende >= NOW()
+			)
 			AND ss.semester = 1
 			AND lehre.tbl_studienplan.aktiv = TRUE'
 			,
@@ -180,10 +186,12 @@ class Studiengang_model extends DB_Model
 	}
 
 	/**
-	 *
+	 * getAppliedStudiengang
 	 */
 	public function getAppliedStudiengang($person_id, $studiensemester_kurzbz, $titel)
 	{
+		if (isError($ent = $this->isEntitled($this->dbTable, PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR))) return $ent;
+		
 		// Then join with table public.tbl_prestudent
 		$this->addJoin('public.tbl_prestudent', 'studiengang_kz');
 		// Join table public.tbl_prestudentstatus
@@ -227,10 +235,12 @@ class Studiengang_model extends DB_Model
 	}
 	
 	/**
-	 *
+	 * getAppliedStudiengangFromNow
 	 */
 	public function getAppliedStudiengangFromNow($person_id, $titel)
 	{
+		if (isError($ent = $this->isEntitled($this->dbTable, PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR))) return $ent;
+		
 		// Then join with table public.tbl_prestudent
 		$this->addJoin('public.tbl_prestudent', 'studiengang_kz');
 		// Join table public.tbl_prestudentstatus
@@ -278,20 +288,20 @@ class Studiengang_model extends DB_Model
 	}
 
 	/**
-	 *
+	 * getAvailableReihungstestByPersonId
 	 */
 	public function getAvailableReihungstestByPersonId($person_id)
 	{
-		if (($isEntitled = $this->isEntitled('lehre.tbl_studienordnung', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)) !== true)
-			return $isEntitled;
-		if (($isEntitled = $this->isEntitled('lehre.tbl_studienplan', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)) !== true)
-			return $isEntitled;
-		if (($isEntitled = $this->isEntitled('public.tbl_reihungstest', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)) !== true)
-			return $isEntitled;
-		if (($isEntitled = $this->isEntitled('public.tbl_prestudentstatus', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)) !== true)
-			return $isEntitled;
-		if (($isEntitled = $this->isEntitled('public.tbl_prestudent', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)) !== true)
-			return $isEntitled;
+		if (isError($ent = $this->isEntitled('lehre.tbl_studienplan', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)))
+			return $ent;
+		if (isError($ent = $this->isEntitled('public.tbl_prestudent', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)))
+			return $ent;
+		if (isError($ent = $this->isEntitled('public.tbl_reihungstest', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)))
+			return $ent;
+		if (isError($ent = $this->isEntitled('lehre.tbl_studienordnung', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)))
+			return $ent;
+		if (isError($ent = $this->isEntitled('public.tbl_prestudentstatus', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)))
+			return $ent;
 
 		$this->addJoin('lehre.tbl_studienordnung', 'studiengang_kz');
 

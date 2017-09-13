@@ -12,28 +12,31 @@ class Person_model extends DB_Model
 		$this->pk = 'person_id';
 	}
 
+	/**
+	 * getPersonKontaktByZugangscode
+	 */
 	public function getPersonKontaktByZugangscode($zugangscode, $email)
 	{
 		$this->addJoin('public.tbl_kontakt', 'person_id');
-
+		
 		return $this->loadWhere(array('zugangscode' => $zugangscode, 'kontakt' => $email));
 	}
 
 	/**
-	 *
+	 * checkBewerbung
 	 */
 	public function checkBewerbung($email, $studiensemester_kurzbz = null)
 	{
-		if (($isEntitled = $this->isEntitled('public.tbl_person', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)) !== true)
-			return $isEntitled;
-		if (($isEntitled = $this->isEntitled('public.tbl_kontakt', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)) !== true)
-			return $isEntitled;
-		if (($isEntitled = $this->isEntitled('public.tbl_benutzer', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)) !== true)
-			return $isEntitled;
-		if (($isEntitled = $this->isEntitled('public.tbl_prestudent', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)) !== true)
-			return $isEntitled;
-		if (($isEntitled = $this->isEntitled('public.tbl_prestudentstatus', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)) !== true)
-			return $isEntitled;
+		if (isError($ent = $this->isEntitled('public.tbl_person', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)))
+			return $ent;
+		if (isError($ent = $this->isEntitled('public.tbl_kontakt', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)))
+			return $ent;
+		if (isError($ent = $this->isEntitled('public.tbl_benutzer', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)))
+			return $ent;
+		if (isError($ent = $this->isEntitled('public.tbl_prestudent', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)))
+			return $ent;
+		if (isError($ent = $this->isEntitled('public.tbl_prestudentstatus', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)))
+			return $ent;
 
 		$checkBewerbungQuery = '';
 		$parametersArray = array($email, $email, $email);
@@ -67,6 +70,9 @@ class Person_model extends DB_Model
 		return $this->execQuery($checkBewerbungQuery, $parametersArray);
 	}
 
+	/**
+	 * updatePerson
+	 */
 	public function updatePerson($person)
 	{
 		if (isset($person['svnr']) && $person['svnr'] != '')
@@ -93,15 +99,15 @@ class Person_model extends DB_Model
 	}
 
 	/**
-	 * @return void
+	 * getPersonFromStatus
 	 */
 	public function getPersonFromStatus($status_kurzbz, $von, $bis)
 	{
 		// Checks if the operation is permitted by the API caller
-		if (($isEntitled = $this->isEntitled('public.tbl_prestudent', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)) !== true)
-			return $isEntitled;
-		if (($isEntitled = $this->isEntitled('public.tbl_prestudentstatus', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)) !== true)
-			return $isEntitled;
+		if (isError($ent = $this->isEntitled('public.tbl_prestudent', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)))
+			return $ent;
+		if (isError($ent = $this->isEntitled('public.tbl_prestudentstatus', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)))
+			return $ent;
 
 		$this->addJoin('public.tbl_prestudent', 'person_id');
 
@@ -129,5 +135,4 @@ class Person_model extends DB_Model
 
 		return $result;
 	}
-
 }

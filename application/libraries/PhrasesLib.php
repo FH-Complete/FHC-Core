@@ -1,15 +1,11 @@
 <?php
 
 if (! defined('BASEPATH')) exit('No direct script access allowed');
-/**
-* Name:        Messaging Library for FH-Complete
-*
-*
-*/
+
 class PhrasesLib
 {
-	/*
-	 *
+	/**
+	 * Loads parser library
 	 */
     public function __construct()
     {
@@ -28,17 +24,12 @@ class PhrasesLib
         $this->ci->load->helper('language');
 		// Loads helper message to manage returning messages
 		$this->ci->load->helper('message');
-		
-        //$this->ci->lang->load('fhcomplete');
     }
 
    	/**
      * getPhrase() - will load a spezific Phrase
-     *
-     * @param   integer  $vorlage_kurzbz    REQUIRED
-     * @return  struct
      */
-    function getPhrase($phrase_id)
+    public function getPhrase($phrase_id)
     {
         if (empty($phrase_id))
         	return error(MSG_ERR_INVALID_MSG_ID);
@@ -49,17 +40,17 @@ class PhrasesLib
 
     /**
      * getSubMessages() - will return all Messages subordinated from a specified message.
-     *
-     * @param   integer  $msg_id    REQUIRED
-     * @return  array
      */
-    function getPhraseByApp($app = null)
+    public function getPhraseByApp($app = null)
     {
 	    $phrases = $this->ci->PhraseModel->loadWhere(array('app' => $app));
         return $phrases;
     }
 
-	function getPhraseInhalt($phrase_id)
+    /**
+     * getPhraseInhalt
+     */
+	public function getPhraseInhalt($phrase_id)
     {
         if (empty($phrase_id))
         	return error(MSG_ERR_INVALID_MSG_ID);
@@ -68,7 +59,10 @@ class PhrasesLib
         return $phrasentext;
     }
 
-    function delPhrasentext($phrasentext_id)
+    /**
+     * delPhrasentext
+     */
+    public function delPhrasentext($phrasentext_id)
     {
         if (empty($phrasentext_id))
         	return error(MSG_ERR_INVALID_MSG_ID);
@@ -79,11 +73,8 @@ class PhrasesLib
 
 	/**
      * savePhrase() - will save a spezific Phrase.
-     *
-     * @param   array  $data    REQUIRED
-     * @return  array
      */
-    function savePhrase($phrase_id, $data)
+    public function savePhrase($phrase_id, $data)
     {
         if (empty($data))
         	return error(MSG_ERR_INVALID_MSG_ID);
@@ -95,11 +86,8 @@ class PhrasesLib
 
 	/**
      * getVorlagetextByVorlage() - will load tbl_vorlagestudiengang for a spezific Template.
-     *
-     * @param   string  $vorlage_kurzbz    REQUIRED
-     * @return  array
      */
-    function getPhrasentextById($phrasentext_id)
+    public function getPhrasentextById($phrasentext_id)
 	{
         if (empty($phrasentext_id))
         	return error($this->ci->lang->line('fhc_'.FHC_INVALIDID, false));
@@ -109,11 +97,9 @@ class PhrasesLib
     }
 
 	/**
-     * getPhrases() -
-     *
-     * @return  struct
+     * getPhrases()
      */
-    function getPhrases($app, $sprache, $phrase = null, $orgeinheit_kurzbz = null, $orgform_kurzbz = null, $blockTags = null)
+    public function getPhrases($app, $sprache, $phrase = null, $orgeinheit_kurzbz = null, $orgform_kurzbz = null, $blockTags = null)
     {
 		if (isset($app) && isset($sprache))
 		{
@@ -163,11 +149,8 @@ class PhrasesLib
 
 	/**
      * insertPhraseinhalt() - will load tbl_vorlagestudiengang for a spezific Template.
-     *
-     * @param   string  $vorlage_kurzbz    REQUIRED
-     * @return  array
      */
-    function insertPhraseinhalt($data)
+    public function insertPhraseinhalt($data)
 	{
         $phrasentext = $this->ci->PhrasentextModel->insert($data);
         return $phrasentext;
@@ -175,11 +158,8 @@ class PhrasesLib
 
 	/**
      * getVorlagetextById() - will load tbl_vorlagestudiengang for a spezific Template.
-     *
-     * @param   string  $vorlage_kurzbz    REQUIRED
-     * @return  array
      */
-    function getVorlagetextById($vorlagestudiengang_id)
+    public function getVorlagetextById($vorlagestudiengang_id)
 	{
         $vorlagetext = $this->ci->VorlageStudiengangModel->load($vorlagestudiengang_id);
         return $vorlagetext;
@@ -187,11 +167,8 @@ class PhrasesLib
 
 	/**
      * saveVorlagetext() - will load tbl_vorlagestudiengang for a spezific Template.
-     *
-     * @param   string  $vorlage_kurzbz    REQUIRED
-     * @return  array
      */
-    function updatePhraseInhalt($phrasentext_id, $data)
+    public function updatePhraseInhalt($phrasentext_id, $data)
 	{
         $phrasentext = $this->ci->PhrasentextModel->update($phrasentext_id, $data);
         return $phrasentext;
@@ -199,16 +176,12 @@ class PhrasesLib
 
 	/**
      * parseVorlagetext() - will parse a Vorlagetext.
-     *
-     * @param   string  $text    REQUIRED
-     * @param   array  $data    REQUIRED
-     * @return  string
      */
-    function parseVorlagetext($text, $data = array())
+    public function parseVorlagetext($text, $data = array())
 	{
         if (empty($text))
         	return error($this->ci->lang->line('fhc_'.FHC_INVALIDID, false));
-		$text = $this->ci->parser->parse_string($text, $data, TRUE);
+		$text = $this->ci->parser->parse_string($text, $data, true);
 		return $text;
     }
 }

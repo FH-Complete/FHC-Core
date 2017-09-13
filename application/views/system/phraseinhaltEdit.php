@@ -91,12 +91,12 @@ function initTextile() {
 
     // use a simple timer to check if the textarea content has changed
     var value = $content.val();
-	$preview.html(textile.convert(value));
+	$preview.html(textile.parse(value));
     setInterval(function () {
         var newValue = $content.val();
         if (value != newValue) {
             value = newValue;
-            $preview.html(textile.convert(newValue)); // convert the textile to html
+            $preview.html(textile.parse(newValue)); // convert the textile to html
         }
     }, 500);
 };

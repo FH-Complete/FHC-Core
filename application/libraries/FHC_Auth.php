@@ -10,10 +10,6 @@
  * @since	Version 1.0.0
  * @filesource
  */
-if (! defined('BASEPATH')) exit('No direct script access allowed');
-
-require_once FHCPATH.'include/authentication.class.php';
-require_once FHCPATH.'include/AddonAuthentication.php';
 
 /**
  * FHC-Auth Helpers
@@ -25,7 +21,10 @@ require_once FHCPATH.'include/AddonAuthentication.php';
  * @link		http://fhcomplete.org/user_guide/helpers/fhcauth_helper.html
  */
 
-// ------------------------------------------------------------------------
+if (! defined('BASEPATH')) exit('No direct script access allowed');
+
+require_once FHCPATH.'include/authentication.class.php';
+require_once FHCPATH.'include/AddonAuthentication.php';
 
 class FHC_Auth extends authentication
 {
@@ -39,10 +38,6 @@ class FHC_Auth extends authentication
 	
 	/**
 	 * Auth Username, Password over FH-Complete
-	 *
-	 * @param	string	$username
-	 * @param	string	$password
-	 * @return	bool	
 	 */
 	public function basicAuthentication($username, $password)
 	{
@@ -57,9 +52,9 @@ class FHC_Auth extends authentication
 	}
 	
 	/**
-	 * 
+	 *
 	 * TO BE UPDATED
-	 * 
+	 *
 	 * Get the md5 hashed password by the addon username
 	 *
 	 * @param	string	$username addon username

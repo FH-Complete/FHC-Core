@@ -17,24 +17,25 @@ class LogLib
 	const LINE_SEPARATOR = ':';
 	
 	/**
-	 * Object initialization
+	 * format
 	 */
-	public function __construct() {}
-	
 	private function format($class, $function, $line)
 	{
 		$formatted = LogLib::CALLER_PREFIX;
 		
 		if (!is_null($class) && $class != '')
 		{
-			$formatted .= $class . LogLib::CLASS_POSTFIX;
+			$formatted .= $class.LogLib::CLASS_POSTFIX;
 		}
 		
-		$formatted .= $function . LogLib::LINE_SEPARATOR . $line . LogLib::CALLER_POSTFIX . ' ';
+		$formatted .= $function.LogLib::LINE_SEPARATOR.$line.LogLib::CALLER_POSTFIX.' ';
 		
 		return $formatted;
 	}
 	
+	/**
+	 * getCaller
+	 */
 	private function getCaller()
 	{
 		$classIndex = 3;
@@ -62,13 +63,16 @@ class LogLib
 		return $this->format($class, $function, $line);
 	}
 
+	/**
+	 * log
+	 */
 	private function log($level, $message)
 	{
-		log_message($level, $this->getCaller() . $message);
+		log_message($level, $this->getCaller().$message);
 	}
 
 	/**
-	 * 
+	 * logDebug
 	 */
 	public function logDebug($message)
 	{
@@ -76,7 +80,7 @@ class LogLib
 	}
 
 	/**
-	 * 
+	 * logInfo
 	 */
 	public function logInfo($message)
 	{
@@ -84,7 +88,7 @@ class LogLib
 	}
 
 	/**
-	 * 
+	 * logError
 	 */
 	public function logError($message)
 	{

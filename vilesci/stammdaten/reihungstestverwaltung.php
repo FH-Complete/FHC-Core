@@ -521,7 +521,7 @@ if(isset($_GET['excel']))
 		<link rel="stylesheet" href="../../skin/tablesort.css" type="text/css"/>
 		<link href="../../skin/jquery-ui-1.9.2.custom.min.css" rel="stylesheet" type="text/css">
 		<script src="../../include/js/jquery1.9.min.js" type="text/javascript"></script>
-		<script src="../../include/js/jquery.checkboxes-1.0.7.min.js" type="text/javascript"></script>
+		<script src="../../vendor/rmariuzzo/jquery-checkboxes/dist/jquery.checkboxes-1.0.7.min.js" type="text/javascript"></script>
 
 		<link href="../../skin/jquery.ui.timepicker.css" rel="stylesheet" type="text/css"/>
 		<script src="../../include/js/jquery.ui.timepicker.js" type="text/javascript" ></script>

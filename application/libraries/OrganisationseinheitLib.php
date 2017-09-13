@@ -4,6 +4,9 @@ if (! defined("BASEPATH")) exit("No direct script access allowed");
 
 class OrganisationseinheitLib
 {
+	/**
+	 * Loads model OrganisationseinheitModel
+	 */
 	public function __construct()
 	{
 		$this->ci =& get_instance();
@@ -22,7 +25,7 @@ class OrganisationseinheitLib
 	 * to the top, starting from the given oe_kurzbz. It stops when it finds a
 	 * match with the other table, which attributes are passed as parameters:
 	 * schema name, table name, fields to be selected, where conditions, orderby clause
-	 * 
+	 *
      * @param	string	$schema		REQUIRED
      * @param	string	$table		REQUIRED
 	 * @param	mixed	$fields		REQUIRED
@@ -63,6 +66,9 @@ class OrganisationseinheitLib
 		return $result;
 	}
 	
+	/**
+	 * treeSearchEntire
+	 */
 	public function treeSearchEntire($table, $alias, $fields, $where, $orderby, $oe_kurzbz)
 	{
 		$select = "";
@@ -90,12 +96,15 @@ class OrganisationseinheitLib
 			{
 				$tmpResult = $this->treeSearchEntire($table, $alias, $select, $where, $orderby, $result->retval[0]->_ppk);
 				
-				if (hasData($tmpResult) && $tmpResult->retval[0]->_pk != null && $tmpResult->retval[0]->_ppk != null && $tmpResult->retval[0]->_jtpk != null)
+				if (hasData($tmpResult)
+					&& $tmpResult->retval[0]->_pk != null
+					&& $tmpResult->retval[0]->_ppk != null
+					&& $tmpResult->retval[0]->_jtpk != null)
 				{
 					$result->retval = array_merge($result->retval, $tmpResult->retval);
 				}
 			}
-			else if ($result->retval[0]->_ppk != null)
+			elseif ($result->retval[0]->_ppk != null)
 			{
 				$result = $this->treeSearchEntire($table, $alias, $select, $where, $orderby, $result->retval[0]->_ppk);
 			}

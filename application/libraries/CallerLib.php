@@ -79,7 +79,7 @@ class CallerLib
 				}
 			}
 			// If the given resource is a library
-			else if (strpos($parameters->resourceName, CallerLib::LIB_PREFIX) !== false)
+			elseif (strpos($parameters->resourceName, CallerLib::LIB_PREFIX) !== false)
 			{
 				// Check if the resource is already loaded, it works only with libraries and drivers
 				$isLoaded = $this->ci->load->is_loaded($parameters->resourceName);
@@ -89,10 +89,10 @@ class CallerLib
 					// Checks if the operation is permitted by the API caller
 					// Only for libraries, permissions are automatically handled by models
 					$result = $this->checkLibraryPermission(
-							$parameters->resourcePath,
-							$parameters->resourceName,
-							$parameters->function,
-							$permissionType
+						$parameters->resourcePath,
+						$parameters->resourceName,
+						$parameters->function,
+						$permissionType
 					);
 					if (isError($result))
 					{
@@ -117,7 +117,7 @@ class CallerLib
 			// Wrong selection!
 			else
 			{
-				$result = error('Neither a lib nor model: ' . $parameters->resourcePath . $parameters->resourceName);
+				$result = error('Neither a lib nor model: '.$parameters->resourcePath.$parameters->resourceName);
 			}
 			
 			// If the resource was found and loaded
@@ -166,7 +166,7 @@ class CallerLib
 				$parameters->resourcePath = str_replace($parameters->resourceName, '', $parameterValue);
 			}
 			// The name of the function
-			else if ($parameterName == CallerLib::FUNCTION_PARAMETER)
+			elseif ($parameterName == CallerLib::FUNCTION_PARAMETER)
 			{
 				$parameters->function = $parameterValue;
 			}
@@ -217,7 +217,7 @@ class CallerLib
 
 	/**
 	 * Loads a model using the given path and name
-	 * 
+	 *
 	 * NOTE: the models automatically handle the permissions
 	 */
 	private function _loadModel($resourcePath, $resourceName)
@@ -227,12 +227,12 @@ class CallerLib
 		
 		try
 		{
-			$loaded = $this->ci->load->model($resourcePath . $resourceName);
+			$loaded = $this->ci->load->model($resourcePath.$resourceName);
 		}
 		catch (Exception $e)
 		{
 			// Errors while loading the model
-			$result = error('Errors while loading the model: ' . $e->getMessage());
+			$result = error('Errors while loading the model: '.$e->getMessage());
 		}
 		
 		if (!is_null($loaded))
@@ -257,7 +257,7 @@ class CallerLib
 			$permissionPath = $resourcePath;
 		}
 		
-		$permissionPath .= $resourceName . '.' . $function;
+		$permissionPath .= $resourceName.'.'.$function;
 		
 		if ($this->ci->permissionlib->isEntitled($permissionPath, $permissionType) === false)
 		{
@@ -273,14 +273,14 @@ class CallerLib
 	
 	/**
 	 * Loads a library using the given path and name
-	 * 
+	 *
 	 * The method 'library' of the class CI_Loader provided by CI has some limitations,
 	 * so to be able to check errors was used a workaround.
 	 * It consists in:
 	 * - Checking if the file (identified by parameters $resourcePath and $resourceName) exists
 	 * - If exists it will be loaded using the method 'file' from CI_Loader
 	 * - Checks if the loaded file contains a class identified by parameter $resourceName
-	 * 
+	 *
 	 * If one of the previous tests fails, it will be returned a null value
 	 */
 	private function _loadLibrary($resourcePath, $resourceName)
@@ -295,8 +295,8 @@ class CallerLib
 			$found = null;
 			for ($i = 0; $i < count($packagePaths) && is_null($found); $i++)
 			{
-				$file = $packagePaths[$i] . CallerLib::LIBS_PATH . DIRECTORY_SEPARATOR .
-						$resourcePath . $resourceName . CallerLib::LIB_FILE_EXTENSION;
+				$file = $packagePaths[$i].CallerLib::LIBS_PATH.DIRECTORY_SEPARATOR.
+						$resourcePath.$resourceName.CallerLib::LIB_FILE_EXTENSION;
 				if (file_exists($file))
 				{
 					$found = $file;
@@ -313,20 +313,20 @@ class CallerLib
 				{
 					$loaded = null;
 					// Same phrase error as load->model() provided by CI
-					$result = error($found . ' exists, but doesn\'t declare class ' . $resourceName);
+					$result = error($found.' exists, but doesn\'t declare class '.$resourceName);
 				}
 			}
 			else
 			{
 				$loaded = null;
 				// Same phrase error as load->model() provided by CI
-				$result = error('Unable to load the requested class: ' . $resourceName);
+				$result = error('Unable to load the requested class: '.$resourceName);
 			}
 		}
 		catch (Exception $e)
 		{
 			// Errors while loading the library
-			$result = error('Errors while loading the library: ' . $e->getMessage());
+			$result = error('Errors while loading the library: '.$e->getMessage());
 		}
 		
 		if (!is_null($loaded))
@@ -339,7 +339,7 @@ class CallerLib
 	
 	/**
 	 * Calls a method of a class with the given parameters and returns its result
-	 * 
+	 *
 	 * @param string $resourceName identifies the class name
 	 * @param string $function identifies the method name
 	 * @param array $parameters contains the parameters to be passed to the method
@@ -359,7 +359,7 @@ class CallerLib
 				// If the function is static
 				if ($reflectionMethod->isStatic() === true)
 				{
-					$classMethod = $resourceName . '::' . $function;
+					$classMethod = $resourceName.'::'.$function;
 				}
 				// If the function is not static
 				else
@@ -370,7 +370,6 @@ class CallerLib
 				// If the resource's function is callable
 				if (is_callable($classMethod))
 				{
-					
 					// Call resource->function()
 					// @ was applied to prevent really ugly and unmanageable errors
 					$resultCall = @call_user_func_array($classMethod, $parameters);
@@ -379,7 +378,7 @@ class CallerLib
 					// it will be recognized like a running error. A little bit tricky ;)
 					if ($resultCall === false)
 					{
-						$result = error('Error running ' . $resourceName . '->' . $function . '()');
+						$result = error('Error running '.$resourceName.'->'.$function.'()');
 					}
 					// Returns the result of resource->function()
 					else
@@ -389,14 +388,13 @@ class CallerLib
 				}
 				else
 				{
-					$result = error($resourceName . '->' . $function . '() is not callable!');
+					$result = error($resourceName.'->'.$function.'() is not callable!');
 				}
 			}
 			else
 			{
 				$result = error(
-					'Number of required parameters: ' . $reflectionMethod->getNumberOfRequiredParameters() .
-					'. Given: ' . count($parameters)
+					'Number of required parameters: '.$reflectionMethod->getNumberOfRequiredParameters().'. Given: '.count($parameters)
 				);
 			}
 		}

@@ -36,59 +36,13 @@ $db = new basis_db();
 $user = get_uid();
 loadVariables($user);
 
-//Parameter holen
-
-if (isset($_GET['fix']))
-	$fix = $_GET['fix'];
-else
-	$fix=null;
-
-if (isset($_GET['stgl']))
-	$stgl = ($_GET['stgl'] == 'true' ? true : false);
-else
-	$stgl=null;
-
-if (isset($_GET['fbl']))
-	$fbl = $_GET['fbl'];
-else
-	$fbl=null;
-
-if (isset($_GET['aktiv']))
-	$aktiv = $_GET['aktiv'];
-else
-	$aktiv=null;
-
-if (isset($_GET['karenziert']))
-	$karenziert = $_GET['karenziert'];
-else
-	$karenziert=null;
-
-if (isset($_GET['ausgeschieden']))
-	$ausgeschieden = $_GET['ausgeschieden'];
-else
-	$ausgeschieden=null;
-
-if (isset($_GET['zustelladresse']))
-	$zustelladresse = $_GET['zustelladresse'];
-else
-	$zustelladresse = null;
-
-// Die Spalten die Exportiert werden sollen, werden per GET uebergeben
-// spalte1=nachname, spalte2=vorname, spalte3=gebdatum, ...
-$anzSpalten = 0;
-$varname = 'spalte'.(string)$anzSpalten;
-while (isset($_GET[$varname]))
-{
-	$spalte[$anzSpalten] = $_GET[$varname];
-	$anzSpalten++;
-	$varname = 'spalte'.(string)$anzSpalten;
-}
-
-$zustelladresse = true;
+$data = $_POST['data'];
+$uids= explode(';',$data);
 
 // Mitarbeiter holen
 $mitarbeiterDAO = new mitarbeiter();
-$mitarbeiterDAO->getPersonal($fix, $stgl, $fbl, $aktiv, $karenziert, $ausgeschieden, $semester_aktuell);
+//$mitarbeiterDAO->getPersonal($fix, $stgl, $fbl, $aktiv, $karenziert, $ausgeschieden, $semester_aktuell);
+$mitarbeiterDAO->getMitarbeiterArray($uids);
 
 //Sortieren der Eintraege nach Nachname, Vorname
 //Umlaute werden ersetzt damit diese nicht unten angereiht werden
@@ -105,6 +59,10 @@ foreach ($mitarbeiterDAO->result as $key => $foo)
 }
 
 array_multisort($nachname, SORT_ASC, $vorname, SORT_ASC, $mitarbeiterDAO->result);
+
+$spalte = array('titelpre', 'vorname', 'vornamen', 'nachname', 'titelpost','gebdatum','svnr','ersatzkennzeichen',
+	'aktiv','personalnummer', 'kurzbz','fixangestellt','lektor');
+$anzSpalten = count($spalte);
 
 // Creating a workbook
 $workbook = new Spreadsheet_Excel_Writer();
@@ -193,7 +151,7 @@ foreach ($mitarbeiterDAO->result as $mitarbeiter)
 			if (mb_strlen($row->ort) > $maxlength[$col])
 				$maxlength[$col] = mb_strlen($row->ort);
 			$worksheet->write($zeile, $col, $row->ort);
-			
+
 			$col++;
 			if ($row->firma_id != '')
 			{
@@ -210,38 +168,26 @@ foreach ($mitarbeiterDAO->result as $mitarbeiter)
 			}
 		}
 	}
-	
+
 	$col++;
-	
+
 	// UDF
 	if (isset($mitarbeiter->p_udf_values))
 	{
 		$udfPerson = json_decode($mitarbeiter->p_udf_values);
 		if (is_object($udfPerson)) $udfPerson = (array)$udfPerson;
-		
+
 		foreach($udfTitlesPerson as $udfTitle)
 		{
-			if (isset($udfPerson[$udfTitle['name']]))
+			$toWrite = $udf->encodeToString($udfPerson, $udfTitle);
+
+			if (mb_strlen($toWrite) > $maxlength[$col])
 			{
-				if (is_string($udfPerson[$udfTitle['name']]) || is_numeric($udfPerson[$udfTitle['name']]))
-				{
-					if (mb_strlen($udfPerson[$udfTitle['name']]) > $maxlength[$col])
-					{
-						$maxlength[$col] = mb_strlen($udfPerson[$udfTitle['name']]);
-					}
-					$worksheet->write($zeile, $col, $udfPerson[$udfTitle['name']]);
-				}
-				else if(is_array($udfPerson[$udfTitle['name']]) && isset($udfTitle['enum']))
-				{
-					$toWrite = $udf->dropdownListValuesToString($udfPerson[$udfTitle['name']], $udfTitle['enum']);
-					
-					if (mb_strlen($toWrite) > $maxlength[$col])
-					{
-						$maxlength[$col] = mb_strlen($toWrite);
-					}
-					$worksheet->write($zeile, $col, $toWrite);
-				}
+				$maxlength[$col] = mb_strlen($toWrite);
 			}
+
+			$worksheet->write($zeile, $col, $toWrite);
+
 			$col++;
 		}
 	}

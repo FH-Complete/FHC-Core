@@ -1,4 +1,4 @@
-<?php $this->load->view("templates/header", array("title" => "Users manager", "jquery" => true, "tablesort" => true, "jquery_checkboxes" => true, "jquery_custom" => true)); ?>
+<?php $this->load->view("templates/header", array("title" => "Users manager", "jquery19" => true, "tablesort" => true, "jquery_checkboxes" => true, "jquery_custom" => true)); ?>
 
 	<body>
 		<form id="usersFiltersForm" action="" method="post">

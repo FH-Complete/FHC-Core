@@ -13,13 +13,12 @@ class Vorlagedokument_model extends DB_Model
 	}
 
 	/**
-	 *
+	 * loadDokumenteFromVorlagestudiengang
 	 */
 	public function loadDokumenteFromVorlagestudiengang($vorlagestudiengang_id)
 	{
 		// Checks rights
-		if (($isEntitled = $this->isEntitled($this->dbTable, PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)) !== true)
-			return $isEntitled;
+		if (isError($ent = $this->isEntitled($this->dbTable, PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR))) return $ent;
 		
 		$qry = 'SELECT vorlagedokument_id,
 						sort,

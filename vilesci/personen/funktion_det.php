@@ -233,7 +233,7 @@ if (! $funktion->load ( $kurzbz )) {
 <link rel="stylesheet" href="../../include/js/tablesort/table.css"
 	type="text/css">
 <script src="../../include/js/tablesort/table.js" type="text/javascript"></script>
-<script src="../../include/js/jquery.checkboxes-1.0.7.min.js" type="text/javascript"></script>
+<script src="../../vendor/rmariuzzo/jquery-checkboxes/dist/jquery.checkboxes-1.0.7.min.js" type="text/javascript"></script>
 
 <!-- modified 20160707 -->
 <link href="../../skin/tablesort.css" rel="stylesheet" type="text/css" />

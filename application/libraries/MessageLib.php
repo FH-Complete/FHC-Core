@@ -3,12 +3,15 @@
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
 /**
-* Messaging Library for FH-Complete
-*/
+ * Messaging Library for FH-Complete
+ */
 class MessageLib
 {
 	const MSG_INDX_PREFIX = 'message_';
 
+	/**
+	 * Constructor
+	 */
 	public function __construct()
 	{
 		// Get code igniter instance
@@ -43,10 +46,6 @@ class MessageLib
 
     /**
      * getMessage() - returns the spicified received message for a specified person
-     *
-     * @param	string	$msg_id		REQUIRED
-     * @param	string	$person_id	REQUIRED
-     * @return	object
      */
     public function getMessage($msg_id, $person_id)
     {
@@ -62,9 +61,6 @@ class MessageLib
 
 	/**
      * getMessagesByUID() - will return all messages, including the latest status for specified user. It don´t returns Attachments.
-     *
-     * @param   string  $uid   REQUIRED
-     * @return  array
      */
     public function getMessagesByUID($uid, $all = false)
     {
@@ -78,9 +74,6 @@ class MessageLib
 
 	/**
      * getMessagesByPerson() - will return all messages, including the latest status for specified user. It don´t returns Attachments.
-     *
-     * @param   bigint  $person_id   REQUIRED
-     * @return  array
      */
     public function getMessagesByPerson($person_id, $all = false)
     {
@@ -94,9 +87,6 @@ class MessageLib
 
 	/**
      * getSentMessagesByPerson() - Get all sent messages from a person identified by person_id
-     *
-     * @param   bigint  $person_id   REQUIRED
-     * @return  array
      */
     public function getSentMessagesByPerson($person_id, $all = false)
     {
@@ -110,9 +100,6 @@ class MessageLib
 
 	/**
      * getMessageByToken
-     *
-     * @param	token string
-     * @return	array
      */
     public function getMessageByToken($token)
     {
@@ -156,9 +143,6 @@ class MessageLib
 
     /**
      * getCountUnreadMessages
-     *
-     * @param   bigint  $person_id   REQUIRED
-     * @return  array
      */
     public function getCountUnreadMessages($person_id)
     {
@@ -172,11 +156,6 @@ class MessageLib
 
     /**
      * updateMessageStatus() - will change status on message for particular user
-     *
-     * @param   integer  $msg_id     REQUIRED
-     * @param   integer  $user_id    REQUIRED
-     * @param   integer  $status_id  REQUIRED - should come from config/message.php list of constants
-     * @return  array
      */
     public function updateMessageStatus($message_id, $person_id, $status)
     {
@@ -219,7 +198,6 @@ class MessageLib
 
     /**
      * sendMessage() - sends new internal message. This function will create a new thread
-     *
      */
     public function sendMessage($sender_id, $receiver_id, $subject, $body, $priority = PRIORITY_NORMAL, $relationmessage_id = null, $oe_kurzbz = null, $multiPartMime = true)
     {
@@ -270,7 +248,7 @@ class MessageLib
 							$result = $this->_error('', MSG_ERR_SUBJECT_EMPTY);
 							break;
 						}
-						else if (empty($body))
+						elseif (empty($body))
 						{
 							$result = $this->_error('', MSG_ERR_BODY_EMPTY);
 							break;
@@ -295,13 +273,6 @@ class MessageLib
 
 	/**
      * sendMessageVorlage() - sends new internal message using a template
-     *
-     * @param   integer  $sender_id   REQUIRED
-     * @param   mixed    $recipients  REQUIRED - a single integer or an array of integers, representing user_ids
-     * @param   string   $subject
-     * @param   string   $body
-     * @param   integer  $priority
-     * @return  array
      */
     public function sendMessageVorlage($sender_id, $receiver_id, $vorlage_kurzbz, $oe_kurzbz, $data, $relationmessage_id = null, $orgform_kurzbz = null, $multiPartMime = true)
     {
@@ -375,19 +346,19 @@ class MessageLib
 								$result = $this->_error('', MSG_ERR_TEMPLATE_NOT_FOUND);
 								break;
 							}
-							else if (is_array($result->retval) && count($result->retval) > 0)
+							elseif (is_array($result->retval) && count($result->retval) > 0)
 							{
 								if (is_null($result->retval[0]->oe_kurzbz))
 								{
 									$result = $this->_error('', MSG_ERR_TEMPLATE_NOT_FOUND);
 									break;
 								}
-								else if (empty($result->retval[0]->text))
+								elseif (empty($result->retval[0]->text))
 								{
 									$result = $this->_error('', MSG_ERR_INVALID_TEMPLATE);
 									break;
 								}
-								else if (empty($result->retval[0]->subject))
+								elseif (empty($result->retval[0]->subject))
 								{
 									$result = $this->_error('', MSG_ERR_INVALID_TEMPLATE);
 									break;
@@ -451,9 +422,10 @@ class MessageLib
 				for ($i = 0; $i < count($result->retval) && $sent; $i++)
 				{
 					// If the person has an email account
-					if (!is_null($result->retval[$i]->receiver) && $result->retval[$i]->receiver != '')
+					if ((!is_null($result->retval[$i]->receiver) && $result->retval[$i]->receiver != '')
+						|| (!is_null($result->retval[$i]->employeecontact) && $result->retval[$i]->employeecontact != ''))
 					{
-						$href = $this->ci->config->item('message_server') . $this->ci->config->item('message_html_view_url') . $result->retval[0]->token;
+						$href = $this->ci->config->item('message_server').$this->ci->config->item('message_html_view_url').$result->retval[0]->token;
 						// Using a template for the html email body
 						$body = $this->ci->parser->parse(
 							'templates/mailHTML',
@@ -490,10 +462,17 @@ class MessageLib
 						{
 							$sender = $result->retval[0]->sender;
 						}
+
+						$receiverContanct = $result->retval[$i]->receiver;
+						if (!is_null($result->retval[$i]->employeecontact) && $result->retval[$i]->employeecontact != '')
+						{
+							$receiverContanct = $result->retval[$i]->employeecontact.'@'.DOMAIN;
+						}
+
 						// Sending email
 						$sent = $this->ci->maillib->send(
 							$sender,
-							$result->retval[$i]->receiver,
+							$receiverContanct,
 							$result->retval[$i]->subject,
 							$body,
 							null,
@@ -533,10 +512,10 @@ class MessageLib
 						$this->ci->loglib->logError('This person does not have an email account');
 						// Writing errors in tbl_message_recipient
 						$sme = $this->setMessageError(
-								$result->retval[$i]->message_id,
-								$result->retval[$i]->receiver_id,
-								'This person does not have an email account',
-								$result->retval[$i]->sentinfo
+							$result->retval[$i]->message_id,
+							$result->retval[$i]->receiver_id,
+							'This person does not have an email account',
+							$result->retval[$i]->sentinfo
 						);
 						if (!$sme)
 						{
@@ -570,11 +549,12 @@ class MessageLib
 
 		// Get a specific message from DB having EMAIL_KONTAKT_TYPE as relative contact type
 		$result = $this->ci->RecipientModel->getMessages(
-				EMAIL_KONTAKT_TYPE,
-				null,
-				null,
-				$message_id
+			EMAIL_KONTAKT_TYPE,
+			null,
+			null,
+			$message_id
 		);
+
 		// Checks if errors were occurred
 		if (isSuccess($result))
 		{
@@ -582,13 +562,14 @@ class MessageLib
 			if (is_array($result->retval) && count($result->retval) > 0)
 			{
 				// If the person has an email account
-				if (!is_null($result->retval[0]->receiver) && $result->retval[0]->receiver != '')
+				if ((!is_null($result->retval[0]->receiver) && $result->retval[0]->receiver != '')
+					|| (!is_null($result->retval[0]->employeecontact) && $result->retval[0]->employeecontact != ''))
 				{
 					// If it is required use a multi-part message in MIME format
 					if ($multiPartMime === true)
 					{
 						// Using a template for the html email body
-						$href = $this->ci->config->item('message_server') . $this->ci->config->item('message_html_view_url') . $result->retval[0]->token;
+						$href = $this->ci->config->item('message_server').$this->ci->config->item('message_html_view_url').$result->retval[0]->token;
 						$bodyMsg = $this->ci->parser->parse(
 							'templates/mailHTML',
 							array(
@@ -631,10 +612,16 @@ class MessageLib
 						$sender = $result->retval[0]->sender;
 					}
 
+					$receiverContanct = $result->retval[0]->receiver;
+					if (!is_null($result->retval[0]->employeecontact) && $result->retval[0]->employeecontact != '')
+					{
+						$receiverContanct = $result->retval[0]->employeecontact.'@'.DOMAIN;
+					}
+
 					// Sending email
 					$sent = $this->ci->maillib->send(
 						$sender,
-						$result->retval[0]->receiver,
+						$receiverContanct,
 						is_null($subject) ? $result->retval[0]->subject : $subject, // if parameter subject is not null, use it!
 						$bodyMsg,
 						null,
@@ -648,10 +635,10 @@ class MessageLib
 						$this->ci->loglib->logError('Error while sending an email');
 						// Writing errors in tbl_message_status
 						$sme = $this->setMessageError(
-								$result->retval[0]->message_id,
-								$result->retval[0]->receiver_id,
-								'Error while sending an email',
-								$result->retval[0]->sentinfo
+							$result->retval[0]->message_id,
+							$result->retval[0]->receiver_id,
+							'Error while sending an email',
+							$result->retval[0]->sentinfo
 						);
 						if (!$sme)
 						{
@@ -674,10 +661,10 @@ class MessageLib
 					$this->ci->loglib->logError('This person does not have an email account');
 					// Writing errors in tbl_message_status
 					$sme = $this->setMessageError(
-							$result->retval[0]->message_id,
-							$result->retval[0]->receiver_id,
-							'This person does not have an email account',
-							$result->retval[0]->sentinfo
+						$result->retval[0]->message_id,
+						$result->retval[0]->receiver_id,
+						'This person does not have an email account',
+						$result->retval[0]->sentinfo
 					);
 					if (!$sme)
 					{
@@ -702,8 +689,7 @@ class MessageLib
 	}
 
     // ------------------------------------------------------------------------
-    // Private Functions from here out!
-    // ------------------------------------------------------------------------
+    // Private methods
 
 	/**
 	 * Update the table tbl_message_recipient
@@ -740,7 +726,7 @@ class MessageLib
 	{
 		if (!is_null($prevSentInfo) && $prevSentInfo != '')
 		{
-			$sentInfo = $prevSentInfo . SENT_INFO_NEWLINE . $sentInfo;
+			$sentInfo = $prevSentInfo.SENT_INFO_NEWLINE.$sentInfo;
 		}
 
 		$parameters = array('sent' => null, 'sentinfo' => $sentInfo);
@@ -759,8 +745,8 @@ class MessageLib
 		$this->ci->BenutzerfunktionModel->addJoin('public.tbl_benutzer', 'uid');
 		// Get all the valid receivers id using the oe_kurzbz
 		$receivers = $this->ci->BenutzerfunktionModel->loadWhere(
-			'oe_kurzbz = \'' . $oe_kurzbz . '\''.
-			' AND funktion_kurzbz = \'' . $this->ci->config->item('assistent_function') . '\'' .
+			'oe_kurzbz = \''.$oe_kurzbz.'\''.
+			' AND funktion_kurzbz = \''.$this->ci->config->item('assistent_function').'\''.
 			' AND (NOW() BETWEEN COALESCE(datum_von, NOW()) AND COALESCE(datum_bis, NOW()))'
 		);
 

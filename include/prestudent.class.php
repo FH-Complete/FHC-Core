@@ -386,7 +386,7 @@ class prestudent extends person
 						tbl_reihungstest.datum='.$this->db_add_param($datum).'
 						AND tbl_rt_person.studienplan_id IN (SELECT studienplan_id FROM public.tbl_prestudentstatus WHERE prestudent_id=tbl_prestudent.prestudent_id)
 						AND EXISTS(SELECT * FROM public.tbl_prestudentstatus JOIN public.tbl_studiensemester USING(studiensemester_kurzbz)
-							WHERE prestudent_id=tbl_prestudent.prestudent_id AND tbl_studiensemester.start>'.$this->db_add_param($datum).')
+							WHERE prestudent_id=tbl_prestudent.prestudent_id AND tbl_studiensemester.ende>'.$this->db_add_param($datum).')
 					) a
 					ORDER BY nachname,vorname';
 
@@ -969,7 +969,9 @@ class prestudent extends person
 
 	$qry = 'UPDATE public.tbl_prestudentstatus SET'.
 				' bestaetigtam='.$this->db_add_param(date('Y-m-d')).','.
-				' bestaetigtvon='.$this->db_add_param($user)." ".
+				' bestaetigtvon='.$this->db_add_param($user).", ".
+				' updateamum='.$this->db_add_param(date('Y-m-d H:i:s')).','.
+				' updatevon='.$this->db_add_param($user)." ".
 				' WHERE
 					prestudent_id='.$this->db_add_param($prestudent_id, FHC_INTEGER).'
 					AND status_kurzbz='.$this->db_add_param($status_kurzbz).'

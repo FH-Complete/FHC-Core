@@ -26,7 +26,7 @@ class DB_Model extends FHC_Model
 	/**
 	 * Constructor
 	 */
-	function __construct($dbTable = null, $pk = null, $hasSequence = true)
+	public function __construct($dbTable = null, $pk = null, $hasSequence = true)
 	{
 		// Call parent constructor
 		parent::__construct();
@@ -54,15 +54,14 @@ class DB_Model extends FHC_Model
 	 */
 	public function insert($data)
 	{
-		// Check Class-Attributes
-		if (is_null($this->dbTable))
-			return error(FHC_MODEL_ERROR, FHC_NODBTABLE);
+		// Check class properties
+		if (is_null($this->dbTable)) return error(FHC_MODEL_ERROR, FHC_NODBTABLE);
 		
 		// Checks rights
-		if ($isEntitled = $this->_isEntitled(PermissionLib::INSERT_RIGHT)) return $isEntitled;
+		if (isError($ent = $this->_isEntitled(PermissionLib::INSERT_RIGHT))) return $ent;
 		
 		// If this table has UDF and the validation of them is ok
-		if ($this->hasUDF() && isError($validate = $this->udflib->manageUDFs($data, $this->dbTable))) return $validate;
+		if (isError($validate = $this->_manageUDFs($data, $this->dbTable))) return $validate;
 		
 		// DB-INSERT
 		if ($this->db->insert($this->dbTable, $data))
@@ -90,32 +89,9 @@ class DB_Model extends FHC_Model
 			}
 		}
 		else
+		{
 			return error($this->db->error(), FHC_DB_ERROR);
-	}
-
-	/**
-	 * Replace Data in DB-Table
-	 *
-	 * @param   array $data  DataArray for Replacement
-	 * @return  array
-	 *
-	 * DEPRECATED: to be updated, not maintained
-	 *
-	 */
-	public function replace($data)
-	{
-		// Check Class-Attributes
-		if (is_null($this->dbTable))
-			return error(FHC_MODEL_ERROR, FHC_NODBTABLE);
-		
-		// Checks rights
-		if ($isEntitled = $this->_isEntitled(PermissionLib::REPLACE_RIGHT)) return $isEntitled;
-		
-		// DB-REPLACE
-		if ($this->db->replace($this->dbTable, $data))
-			return success($this->db->insert_id());
-		else
-			return error($this->db->error(), FHC_DB_ERROR);
+		}
 	}
 	
 	/**
@@ -127,36 +103,42 @@ class DB_Model extends FHC_Model
 	 */
 	public function update($id, $data)
 	{
-		// Check Class-Attributes
-		if (is_null($this->dbTable))
-			return error(FHC_MODEL_ERROR, FHC_NODBTABLE);
-		if (is_null($this->pk))
-			return error(FHC_MODEL_ERROR, FHC_NOPK);
+		// Check class properties
+		if (is_null($this->pk)) return error(FHC_MODEL_ERROR, FHC_NOPK);
+		if (is_null($this->dbTable)) return error(FHC_MODEL_ERROR, FHC_NODBTABLE);
 		
 		// Checks rights
-		if ($isEntitled = $this->_isEntitled(PermissionLib::UPDATE_RIGHT)) return $isEntitled;
+		if (isError($ent = $this->_isEntitled(PermissionLib::UPDATE_RIGHT))) return $ent;
 		
 		// If this table has UDF and the validation of them is ok
-		if ($this->hasUDF() && isError($validate = $this->udflib->manageUDFs($data, $this->dbTable, $this->getUDFs($id))))
-		{
-			return $validate;
-		}
+		if (isError($validate = $this->_manageUDFs($data, $this->dbTable, $id))) return $validate;
 		
-		// DB-UPDATE
-		// Check for composite Primary Key
+		$tmpId = $id;
+		
+		// Check for composite Primary Key, prepare the where clause
 		if (is_array($id))
 		{
 			if (isset($id[0]))
-				$this->db->where($this->arrayMergeIndex($this->pk, $id));
-			else
-				$this->db->where($id);
+			{
+				$tmpId = $this->_arrayCombine($this->pk, $id);
+			}
 		}
 		else
-			$this->db->where($this->pk, $id);
+		{
+			$tmpId = array($this->pk => $id);
+		}
+		
+		$this->db->where($tmpId);
+		
+		// DB-UPDATE
 		if ($this->db->update($this->dbTable, $data))
+		{
 			return success($id);
+		}
 		else
+		{
 			return error($this->db->error(), FHC_DB_ERROR);
+		}
 	}
 	
 	/**
@@ -167,30 +149,37 @@ class DB_Model extends FHC_Model
 	 */
 	public function delete($id)
 	{
-		// Check Class-Attributes
-		if (is_null($this->dbTable))
-			return error(FHC_MODEL_ERROR, FHC_NODBTABLE);
-		if (is_null($this->pk))
-			return error(FHC_MODEL_ERROR, FHC_NOPK);
+		// Check class properties
+		if (is_null($this->dbTable)) return error(FHC_MODEL_ERROR, FHC_NODBTABLE);
+		if (is_null($this->pk)) return error(FHC_MODEL_ERROR, FHC_NOPK);
 		
 		// Checks rights
-		if ($isEntitled = $this->_isEntitled(PermissionLib::DELETE_RIGHT)) return $isEntitled;
-
-		// DB-DELETE
+		if (isError($ent = $this->_isEntitled(PermissionLib::DELETE_RIGHT))) return $ent;
+		
+		$tmpId = $id;
+		
 		// Check for composite Primary Key
 		if (is_array($id))
 		{
 			if (isset($id[0]))
-				$result = $this->db->delete($this->dbTable, $this->arrayMergeIndex($this->pk, $id));
-			else
-				$result = $this->db->delete($this->dbTable, $id);
+			{
+				$tmpId = $this->_arrayCombine($this->pk, $id);
+			}
 		}
 		else
-			$result = $this->db->delete($this->dbTable, array($this->pk => $id));
-		if ($result)
+		{
+			$tmpId = array($this->pk => $id);
+		}
+		
+		// DB-DELETE
+		if ($this->db->delete($this->dbTable, $tmpId))
+		{
 			return success($id);
+		}
 		else
+		{
 			return error($this->db->error(), FHC_DB_ERROR);
+		}
 	}
 
 	/**
@@ -201,33 +190,37 @@ class DB_Model extends FHC_Model
 	 */
 	public function load($id = null)
 	{
-		// Check Class-Attributes
-		if (is_null($this->dbTable))
-			return error(FHC_MODEL_ERROR, FHC_NODBTABLE);
-		if (is_null($this->pk))
-			return error(FHC_MODEL_ERROR, FHC_NOPK);
+		// Check class properties
+		if (is_null($this->pk)) return error(FHC_MODEL_ERROR, FHC_NOPK);
+		if (is_null($this->dbTable)) return error(FHC_MODEL_ERROR, FHC_NODBTABLE);
 		
 		// Checks rights
-		if ($isEntitled = $this->_isEntitled(PermissionLib::SELECT_RIGHT)) return $isEntitled;
+		if (isError($ent = $this->_isEntitled(PermissionLib::SELECT_RIGHT))) return $ent;
 		
-		// DB-SELECT
+		$tmpId = $id;
+		
 		// Check for composite Primary Key
 		if (is_array($id))
 		{
 			if (isset($id[0]))
-				$result = $this->db->get_where($this->dbTable, $this->arrayMergeIndex($this->pk, $id));
-			else
-				$result = $this->db->get_where($this->dbTable, $id);
+			{
+				$tmpId = $this->_arrayCombine($this->pk, $id);
+			}
 		}
-		elseif (empty($id))
-			$result = $this->db->get($this->dbTable);
-		else
-			$result = $this->db->get_where($this->dbTable, array($this->pk => $id));
+		elseif ($id != null)
+		{
+			$tmpId = array($this->pk => $id);
+		}
 		
-		if ($result)
+		// DB-SELECT
+		if ($result = $this->db->get_where($this->dbTable, $tmpId))
+		{
 			return success($this->_toPhp($result));
+		}
 		else
+		{
 			return error($this->db->error(), FHC_DB_ERROR);
+		}
 	}
 
 	/**
@@ -237,20 +230,21 @@ class DB_Model extends FHC_Model
 	 */
 	public function loadWhere($where = null)
 	{
-		// Check Class-Attributes
-		if (is_null($this->dbTable))
-			return error(FHC_MODEL_ERROR, FHC_NODBTABLE);
+		// Check class properties
+		if (is_null($this->dbTable)) return error(FHC_MODEL_ERROR, FHC_NODBTABLE);
 		
 		// Checks rights
-		if ($isEntitled = $this->_isEntitled(PermissionLib::SELECT_RIGHT)) return $isEntitled;
+		if (isError($ent = $this->_isEntitled(PermissionLib::SELECT_RIGHT))) return $ent;
 		
 		// Execute query
-		$result = $this->db->get_where($this->dbTable, $where);
-		
-		if ($result)
+		if ($result = $this->db->get_where($this->dbTable, $where))
+		{
 			return success($this->_toPhp($result));
+		}
 		else
+		{
 			return error($this->db->error(), FHC_DB_ERROR);
+		}
 	}
 	
 	/**
@@ -267,12 +261,11 @@ class DB_Model extends FHC_Model
 	 */
 	public function loadTree($mainTable, $sideTables, $where = null, $sideTablesAliases = null)
 	{
-		// Check Class-Attributes
-		if (is_null($this->dbTable))
-			return error(FHC_MODEL_ERROR, FHC_NODBTABLE);
+		// Check class properties
+		if (is_null($this->dbTable)) return error(FHC_MODEL_ERROR, FHC_NODBTABLE);
 		
 		// Checks rights
-		if ($isEntitled = $this->_isEntitled(PermissionLib::SELECT_RIGHT)) return $isEntitled;
+		if (isError($ent = $this->_isEntitled(PermissionLib::SELECT_RIGHT))) return $ent;
 		
 		// List of tables on which it will work
 		$tables = array_merge(array($mainTable), $sideTables);
@@ -302,7 +295,7 @@ class DB_Model extends FHC_Model
 				// To avoid overwriting of the properties within the object returned by CI
 				// will be given an alias to every column, that will be composed with the following schema
 				// <table name>.<column name> AS <table_name>_<column name>
-				$select .= $tables[$t] . '.' . $fields[$f]->column_name . ' AS ' . $tables[$t] . '_' . $fields[$f]->column_name;
+				$select .= $tables[$t].'.'.$fields[$f]->column_name.' AS '.$tables[$t].'_'.$fields[$f]->column_name;
 				if ($f < count($fields) - 1) $select .= ', ';
 			}
 			
@@ -343,7 +336,7 @@ class DB_Model extends FHC_Model
 					
 					foreach (array_slice($objectVars, $tableColumnsCountArrayOffset, $tableColumnsCountArray[$f]) as $key => $value)
 					{
-						$objTmpArray[$f]->{str_replace($tables[$f] . '_', '', $key)} = $value;
+						$objTmpArray[$f]->{str_replace($tables[$f].'_', '', $key)} = $value;
 					}
 					
 					$tableColumnsCountArrayOffset += $tableColumnsCountArray[$f]; // Increasing the offset
@@ -378,7 +371,7 @@ class DB_Model extends FHC_Model
 							{
 								$returnArray[$k]->{$sideTableProperty} = array($sideTableObj);
 							}
-							else if (array_search($sideTableObj, $returnArray[$k]->{$sideTableProperty}) === false)
+							elseif (array_search($sideTableObj, $returnArray[$k]->{$sideTableProperty}) === false)
 							{
 								array_push($returnArray[$k]->{$sideTableProperty}, $sideTableObj);
 							}
@@ -425,9 +418,8 @@ class DB_Model extends FHC_Model
 	 */
 	public function addOrder($field = null, $type = 'ASC')
 	{
-		// Check Class-Attributes and parameters
-		if (is_null($field) || !in_array($type, array('ASC', 'DESC')))
-			return error(FHC_MODEL_ERROR, FHC_MODEL_ERROR);
+		// Check class properties and parameters
+		if (is_null($field) || !in_array($type, array('ASC', 'DESC'))) return error(FHC_MODEL_ERROR, FHC_MODEL_ERROR);
 		
 		$this->db->order_by($field, $type);
 		
@@ -441,9 +433,8 @@ class DB_Model extends FHC_Model
 	 */
 	public function addSelect($select, $escape = true)
 	{
-		// Check Class-Attributes and parameters
-		if (is_null($select) || $select == '')
-			return error(FHC_MODEL_ERROR, FHC_MODEL_ERROR);
+		// Check class properties and parameters
+		if (is_null($select) || $select == '') return error(FHC_MODEL_ERROR, FHC_MODEL_ERROR);
 		
 		$this->db->select($select, $escape);
 		
@@ -467,9 +458,8 @@ class DB_Model extends FHC_Model
 	 */
 	public function addLimit($start = null, $end = null)
 	{
-		// Check Class-Attributes and parameters
-		if (!is_numeric($start) || (is_numeric($start) && $start <= 0))
-			return error(FHC_MODEL_ERROR, FHC_MODEL_ERROR);
+		// Check class properties and parameters
+		if (!is_numeric($start) || (is_numeric($start) && $start <= 0)) return error(FHC_MODEL_ERROR, FHC_MODEL_ERROR);
 		
 		if (is_numeric($end) && $end > $start)
 		{
@@ -493,12 +483,11 @@ class DB_Model extends FHC_Model
 		$tmpTable = trim($table);
 		
 		// Check parameters
-		if (empty($tmpTable))
-			return error(FHC_MODEL_ERROR, FHC_MODEL_ERROR);
+		if (empty($tmpTable)) return error(FHC_MODEL_ERROR, FHC_MODEL_ERROR);
 		
 		if (!empty($alias))
 		{
-			$tmpTable .= ' AS ' . $alias;
+			$tmpTable .= ' AS '.$alias;
 		}
 		
 		$this->db->from($tmpTable);
@@ -562,7 +551,7 @@ class DB_Model extends FHC_Model
 			return true;
 		}
 		// If false
-		else if ($val == DB_Model::PGSQL_BOOLEAN_FALSE)
+		elseif ($val == DB_Model::PGSQL_BOOLEAN_FALSE)
 		{
 			return false;
 		}
@@ -570,65 +559,11 @@ class DB_Model extends FHC_Model
 		// If it is null, let it be null
 		return $val;
 	}
-
-	/**
-	 * Convert PG-Array to PHP-Array
-	 *
-	 * @param   string	$s		PG-String to convert
-	 * @param   string	$start	start-point for recursive iterations
-	 * @param   string	$end	end-point for recursive iterations
-	 * @return  array
-	 */
-	public function pgArrayPhp($s, $start=0, &$end=NULL)
-	{
-		if (empty($s) || $s[0]!='{') return NULL;
-		$return = array();
-		$br = 0;
-		$string = false;
-		$quote='';
-		$len = strlen($s);
-		$v = '';
-		for ($i=$start+1; $i<$len;$i++)
-		{
-		    $ch = $s[$i];
-		    if (!$string && $ch=='}')
-			{
-		        if ($v!=='' || !empty($return))
-					$return[] = $v;
-		        $end = $i;
-		        break;
-		    }
-			else
-				if (!$string && $ch=='{')
-				    $v = $this->pgArrayPhp($s,$i,$i);
-				else
-					if (!$string && $ch==',')
-					{
-				    	$return[] = $v;
-				    	$v = '';
-					}
-					else
-						if (!$string && ($ch=='\'' || $ch=='\''))
-						{
-							$string = true;
-							$quote = $ch;
-						}
-						else
-							if ($string && $ch==$quote && $s[$i-1]=='\\')
-								$v = substr($v,0,-1).$ch;
-							else
-								if ($string && $ch==$quote && $s[$i-1]!='\\')
-									$string = FALSE;
-								else
-									$v .= $ch;
-		}
-		return $return;
-	}
 	
 	/**
-	* Converts from PostgreSQL array to php array
-	* It also takes care about array of booleans
-	*/
+	 * Converts from PostgreSQL array to php array
+	 * It also takes care about array of booleans
+	 */
 	public function pgsqlArrayToPhpArray($string, $booleans = false)
 	{
 		// At least returns an empty array
@@ -696,13 +631,14 @@ class DB_Model extends FHC_Model
 	}
 	
 	/**
-	 * 
+	 * Returns all the UDF contained in this table ($dbTable)
+	 * If no UDF are present, an empty array will be returned
 	 */
 	public function getUDFs($id, $udfName = null)
 	{
 		$udfs = array();
 		
-		$this->addSelect(UDFLib::COLUMN_NAME);
+		$this->addSelect(UDFLib::COLUMN_NAME); // select only the column with UDF
 		
 		$result = $this->load($id);
 		if (hasData($result))
@@ -713,12 +649,12 @@ class DB_Model extends FHC_Model
 			{
 				if ($udfName != null && $udfName == $key)
 				{
-					$udfs[$key] = $value; // 
+					$udfs[$key] = $value;
 					break;
 				}
 				else
 				{
-					$udfs[$key] = $value; // 
+					$udfs[$key] = $value;
 				}
 			}
 		}
@@ -736,22 +672,6 @@ class DB_Model extends FHC_Model
 	
 	// ------------------------------------------------------------------------------------------
 	// Protected methods
-	
-	/**
-	 * Invalid ID
-	 *
-	 * @param   array $i	Array with indexes.
-	 * @param   array $v	Array with values.
-	 * @return  array
-	 */
-	protected function arrayMergeIndex($idexes, $values)
-	{
-		if (count($idexes) != count($values))
-			return false;
-		for ($j = 0; $j < count($idexes); $j++)
-			$a[$idexes[$j]] = $values[$j];
-		return $a;
-	}
 	
 	/**
 	 * Executes a query and converts array and boolean data types from PgSql to php
@@ -803,8 +723,8 @@ class DB_Model extends FHC_Model
 	protected function getSchemaAndTable($schemaAndTable)
 	{
 		$result = new stdClass();
-		$result->schema = DB_Model::DEFAULT_SCHEMA;
 		$result->table = $schemaAndTable;
+		$result->schema = DB_Model::DEFAULT_SCHEMA;
 		
 		// If a schema is specified
 		if (($pos = strpos($schemaAndTable, '.')) !==  false)
@@ -820,26 +740,65 @@ class DB_Model extends FHC_Model
 	// Private methods
 	
 	/**
+	 * Invalid ID
+	 *
+	 * @param   array $i	Array with indexes.
+	 * @param   array $v	Array with values.
+	 * @return  array
+	 */
+	private function _arrayCombine($idexes, $values)
+	{
+		if (count($idexes) != count($values)) return null;
+		
+		return array_combine($idexes, $values);
+	}
+	
+	/**
 	 * Checks if the caller is entitled to perform this operation with this right
 	 */
 	private function _isEntitled($permission)
 	{
+		$ent = success(true);
+		
 		// If the caller is _not_ a model _and_ tries to read data, then avoids to check permissions
 		// Otherwise checks always the permissions
-		if (($permission == PermissionLib::SELECT_RIGHT &&
-			substr(get_called_class(), -6) == DB_Model::MODEL_POSTFIX) ||
-			$permission != PermissionLib::SELECT_RIGHT)
+		if (($permission == PermissionLib::SELECT_RIGHT
+			&& substr(get_called_class(), -6) == DB_Model::MODEL_POSTFIX)
+			|| $permission != PermissionLib::SELECT_RIGHT)
 		{
+			$ent = $this->isEntitled($this->dbTable, $permission, FHC_NORIGHT, FHC_MODEL_ERROR);
 			// If true is not returned, then an error has occurred
-			if (($isEntitled = $this->isEntitled($this->dbTable, $permission, FHC_NORIGHT, FHC_MODEL_ERROR)) !== true)
+			if (isError($ent))
 			{
 				// Before returning the object containing the error, reset the build query
 				// This is for preventing that other parts of the query will be built before of the next execution
 				$this->resetQuery();
-				
-				return $isEntitled;
 			}
 		}
+		
+		return $ent;
+	}
+	
+	/**
+	 * Wrapper method for UDFLib->manageUDFs
+	 */
+	private function _manageUDFs(&$data, $schemaAndTable, $id = null)
+	{
+		$manageUDFs = success(true);
+		
+		if ($this->hasUDF())
+		{
+			if ($id != null)
+			{
+				$manageUDFs = $this->udflib->manageUDFs($data, $this->dbTable, $this->getUDFs($id));
+			}
+			else
+			{
+				$manageUDFs = $this->udflib->manageUDFs($data, $this->dbTable);
+			}
+		}
+		
+		return $manageUDFs;
 	}
 	
 	/**
@@ -858,7 +817,7 @@ class DB_Model extends FHC_Model
 		{
 			$toBeConverterdArray = array(); // Fields to be converted
 			$metaDataArray = $result->field_data(); // Fields information
-			for($i = 0; $i < count($metaDataArray); $i++) // Looking for booleans and arrays
+			for ($i = 0; $i < count($metaDataArray); $i++) // Looking for booleans and arrays
 			{
 				// If array type, boolean type OR a UDF
 				if (strpos($metaDataArray[$i]->type, DB_Model::PGSQL_ARRAY_TYPE) !== false
@@ -882,12 +841,12 @@ class DB_Model extends FHC_Model
 				// Returns the array of objects, each of them represents a DB record
 				$resultsArray = $result->result();
 				// Looping on results
-				for($i = 0; $i < count($resultsArray); $i++)
+				for ($i = 0; $i < count($resultsArray); $i++)
 				{
 					// Single element
 					$resultElement = $resultsArray[$i];
 					// Looping on fields to be converted
-					for($j = 0; $j < count($toBeConverterdArray); $j++)
+					for ($j = 0; $j < count($toBeConverterdArray); $j++)
 					{
 						// Single element
 						$toBeConverted = $toBeConverterdArray[$j];
@@ -901,12 +860,12 @@ class DB_Model extends FHC_Model
 							);
 						}
 						// Boolean type
-						else if ($toBeConverted->type == DB_Model::PGSQL_BOOLEAN_TYPE)
+						elseif ($toBeConverted->type == DB_Model::PGSQL_BOOLEAN_TYPE)
 						{
 							$resultElement->{$toBeConverted->name} = $this->pgBoolPhp($resultElement->{$toBeConverted->name});
 						}
 						// UDF
-						else if ($this->udflib->isUDFColumn($toBeConverted->name, $toBeConverted->type))
+						elseif ($this->udflib->isUDFColumn($toBeConverted->name, $toBeConverted->type))
 						{
 							$jsonValues = json_decode($resultElement->{$toBeConverted->name}); // decode UDFs values
 							if ($jsonValues != null) // if decode is ok

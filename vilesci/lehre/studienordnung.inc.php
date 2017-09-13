@@ -153,7 +153,7 @@ switch($method)
 		$studienordnungstatus->getstatus();
 		foreach($studienordnungstatus->result as $row_status)
 		{
-			if($row_status->status_kurzbz==$studienordnung->status_kurzbz)
+			if($row_status->status_kurzbz==$studienordnung->status_kurzbz || ($new && $row_status->status_kurzbz == "development"))
 				$selected = 'selected';
 			else
 				$selected = '';

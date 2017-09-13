@@ -1,6 +1,6 @@
 <?php
 
-if (! defined("BASEPATH")) exit("No direct script access allowed");
+if (! defined('BASEPATH')) exit('No direct script access allowed');
 
 /**
  * Library to manage the sending of the email
@@ -27,33 +27,33 @@ class MailLib
 		$this->ci =& get_instance();
 
 		// The second parameter is used to avoiding name collisions in the config array
-		$this->ci->config->load("mail", true);
+		$this->ci->config->load('mail', true);
 
 		// CI Email library
-		$this->ci->load->library("email");
+		$this->ci->load->library('email');
 
 		// Initializing email library with the loaded configurations
-		$this->ci->email->initialize($this->ci->config->config["mail"]);
+		$this->ci->email->initialize($this->ci->config->config['mail']);
 
 		// Set the configuration properties with the standard configuration values
-		$this->email_number_to_sent = $this->getEmailCfgItem("email_number_to_sent");
-		$this->email_number_per_time_range = $this->getEmailCfgItem("email_number_per_time_range");
-		$this->email_time_range = $this->getEmailCfgItem("email_time_range");
-		$this->email_from_system = $this->getEmailCfgItem("email_from_system");
-		$this->alias_from_system = $this->getEmailCfgItem("alias_from_system");
+		$this->email_number_to_sent = $this->getEmailCfgItem('email_number_to_sent');
+		$this->email_number_per_time_range = $this->getEmailCfgItem('email_number_per_time_range');
+		$this->email_time_range = $this->getEmailCfgItem('email_time_range');
+		$this->email_from_system = $this->getEmailCfgItem('email_from_system');
+		$this->alias_from_system = $this->getEmailCfgItem('alias_from_system');
 	}
 
 	/**
 	 * Sends a single email
 	 */
-	public function send($from, $to, $subject, $message, $alias = "", $cc = null, $bcc = null, $altMessage = '')
+	public function send($from, $to, $subject, $message, $alias = '', $cc = null, $bcc = null, $altMessage = '')
 	{
 		// If from is not specified then use the standard one
-		if (is_null($from) || $from == "")
+		if (is_null($from) || $from == '')
 		{
 			$from = $this->email_from_system;
 			// If alias is not specified then use the standard one
-			if (is_null($alias) || $alias == "")
+			if (is_null($alias) || $alias == '')
 			{
 				$alias = $this->alias_from_system;
 			}

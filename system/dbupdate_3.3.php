@@ -282,25 +282,25 @@ if(!$result = @$db->db_query("SELECT 1 FROM system.tbl_udf LIMIT 1"))
 		echo '<strong>system.tbl_udf: '.$db->db_last_error().'</strong><br>';
 	else
 		echo '<br>system.tbl_udf table created';
-	
+
 	$qry = 'COMMENT ON COLUMN system.tbl_udf.schema IS \'Schema of the table\';';
 	if(!$db->db_query($qry))
 		echo '<strong>Adding comment to system.tbl_udf.schema: '.$db->db_last_error().'</strong><br>';
 	else
 		echo '<br>Added comment to system.tbl_udf.schema';
-	
+
 	$qry = 'COMMENT ON COLUMN system.tbl_udf.table IS \'Table name\';';
 	if(!$db->db_query($qry))
 		echo '<strong>Adding comment to system.tbl_udf.table: '.$db->db_last_error().'</strong><br>';
 	else
 		echo '<br>Added comment to system.tbl_udf.table';
-	
+
 	$qry = 'COMMENT ON COLUMN system.tbl_udf.jsons IS \'JSON schema\';';
 	if(!$db->db_query($qry))
 		echo '<strong>Adding comment to system.tbl_udf.jsons: '.$db->db_last_error().'</strong><br>';
 	else
 		echo '<br>Added comment to system.tbl_udf.jsons';
-	
+
 	$qry = 'GRANT SELECT ON TABLE system.tbl_udf TO web;';
 	if(!$db->db_query($qry))
 		echo '<strong>system.tbl_udf: '.$db->db_last_error().'</strong><br>';
@@ -381,11 +381,53 @@ if(!$result = @$db->db_query("SELECT design_uid FROM public.tbl_service LIMIT 1;
 			ALTER TABLE public.tbl_service ADD CONSTRAINT fk_tbl_service_design_uid FOREIGN KEY (design_uid) REFERENCES public.tbl_benutzer (uid) ON DELETE RESTRICT ON UPDATE CASCADE;
 			ALTER TABLE public.tbl_service ADD CONSTRAINT fk_tbl_service_betrieb_uid FOREIGN KEY (betrieb_uid) REFERENCES public.tbl_benutzer (uid) ON DELETE RESTRICT ON UPDATE CASCADE;
 			ALTER TABLE public.tbl_service ADD CONSTRAINT fk_tbl_service_operativ_uid FOREIGN KEY (operativ_uid) REFERENCES public.tbl_benutzer (uid) ON DELETE RESTRICT ON UPDATE CASCADE;";
-	
+
 	if(!$db->db_query($qry))
 		echo '<strong>public.tbl_service: '.$db->db_last_error().'</strong><br>';
 		else
 			echo '<br>public.tbl_service: Spalten design_uid,betrieb_uid,operativ_uid hinzugefuegt!<br>';
+}
+
+// FOREIGN KEY tbl_phrasentext_sprache_fkey: system.tbl_phrasentext.sprache references public.tbl_sprache.sprache
+if ($result = @$db->db_query("SELECT conname FROM pg_constraint WHERE conname = 'tbl_phrasentext_sprache_fkey'"))
+{
+	if ($db->db_num_rows($result) == 0)
+	{
+		$qry = "ALTER TABLE system.tbl_phrasentext ADD CONSTRAINT tbl_phrasentext_sprache_fkey FOREIGN KEY (sprache) REFERENCES public.tbl_sprache(sprache) ON UPDATE CASCADE ON DELETE RESTRICT;";
+
+		if (!$db->db_query($qry))
+			echo '<strong>system.tbl_phrasentext: '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>system.tbl_phrasentext: added foreign key on column sprache referenced to public.tbl_sprache(sprache)';
+	}
+}
+
+// FOREIGN KEY tbl_phrasentext_orgeinheit_kurzbz_fkey: system.tbl_phrasentext.orgeinheit_kurzbz references public.tbl_organisationseinheit.orgeinheit_kurzbz
+if ($result = @$db->db_query("SELECT conname FROM pg_constraint WHERE conname = 'tbl_phrasentext_orgeinheit_kurzbz_fkey'"))
+{
+	if ($db->db_num_rows($result) == 0)
+	{
+		$qry = "ALTER TABLE system.tbl_phrasentext ADD CONSTRAINT tbl_phrasentext_orgeinheit_kurzbz_fkey FOREIGN KEY (orgeinheit_kurzbz) REFERENCES public.tbl_organisationseinheit(oe_kurzbz) ON UPDATE CASCADE ON DELETE RESTRICT;";
+
+		if (!$db->db_query($qry))
+			echo '<strong>system.tbl_phrasentext: '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>system.tbl_phrasentext: added foreign key on column orgeinheit_kurzbz referenced to public.tbl_organisationseinheit(orgeinheit_kurzbz)';
+	}
+}
+
+// FOREIGN KEY tbl_phrasentext_orgform_kurzbz_fkey: system.tbl_phrasentext.orgform_kurzbz references bis.tbl_orgform.orgform_kurzbz
+if ($result = @$db->db_query("SELECT conname FROM pg_constraint WHERE conname = 'tbl_phrasentext_orgform_kurzbz_fkey'"))
+{
+	if ($db->db_num_rows($result) == 0)
+	{
+		$qry = "ALTER TABLE system.tbl_phrasentext ADD CONSTRAINT tbl_phrasentext_orgform_kurzbz_fkey FOREIGN KEY (orgform_kurzbz) REFERENCES bis.tbl_orgform(orgform_kurzbz) ON UPDATE CASCADE ON DELETE RESTRICT;";
+
+		if (!$db->db_query($qry))
+			echo '<strong>system.tbl_phrasentext: '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>system.tbl_phrasentext: added foreign key on column orgform_kurzbz referenced to bis.tbl_orgform(orgform_kurzbz)';
+	}
 }
 
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen

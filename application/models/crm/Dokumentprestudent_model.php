@@ -12,10 +12,13 @@ class Dokumentprestudent_model extends DB_Model
 		$this->pk = array('prestudent_id', 'dokument_kurzbz');
 	}
 	
+	/**
+	 * setAccepted
+	 */
 	public function setAccepted($prestudent_id, $studiengang_kz)
 	{
-		if (($isEntitled = $this->isEntitled('public.tbl_dokumentprestudent', PermissionLib::INSERT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)) !== true)
-			return $isEntitled;
+		if (isError($ent = $this->isEntitled('public.tbl_dokumentprestudent', PermissionLib::INSERT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)))
+			return $ent;
 		
 		$result = null;
 		
@@ -41,10 +44,13 @@ class Dokumentprestudent_model extends DB_Model
 		return $result;
 	}
 	
+	/**
+	 * setAcceptedDocuments
+	 */
 	public function setAcceptedDocuments($prestudent_id, $dokument_kurzbz)
 	{
-		if (($isEntitled = $this->isEntitled('public.tbl_dokumentprestudent', PermissionLib::INSERT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)) !== true)
-			return $isEntitled;
+		if (isError($ent = $this->isEntitled('public.tbl_dokumentprestudent', PermissionLib::INSERT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)))
+			return $ent;
 		
 		$result = null;
 		

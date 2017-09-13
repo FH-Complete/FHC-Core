@@ -1,5 +1,5 @@
 <?php
-/**
+/***
  * FH-Complete
  *
  * @package		FHC-API
@@ -10,19 +10,13 @@
  * @since		Version 1.0
  * @filesource
  */
-// ------------------------------------------------------------------------
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class FilesystemLib
 {
-	/*
-	 * 
-	 */
-	public function __construct() {}
-	
-	/*
-	 * 
+	/**
+	 * checkParameters
 	 */
 	private function checkParameters($filepath, $filename)
 	{
@@ -37,8 +31,8 @@ class FilesystemLib
 		}
 	}
 	
-	/*
-	 * 
+	/**
+	 * read
 	 */
 	public function read($filepath, $filename)
 	{
@@ -46,7 +40,7 @@ class FilesystemLib
 		
 		if ($this->checkParameters($filepath, $filename))
 		{
-			$resource = $filepath . DIRECTORY_SEPARATOR . $filename;
+			$resource = $filepath.DIRECTORY_SEPARATOR.$filename;
 			if (file_exists($resource) && $fileHandle = fopen($resource, 'r'))
 			{
 				$result = '';
@@ -61,8 +55,8 @@ class FilesystemLib
 		return $result;
 	}
 	
-	/*
-	 * 
+	/**
+	 * write
 	 */
 	public function write($filepath, $filename, $content)
 	{
@@ -70,7 +64,7 @@ class FilesystemLib
 
 		if ($this->checkParameters($filepath, $filename) && isset($content))
 		{
-			$resource = $filepath . DIRECTORY_SEPARATOR . $filename;
+			$resource = $filepath.DIRECTORY_SEPARATOR.$filename;
 			if (is_writable($filepath) && $fileHandle = fopen($resource, 'w'))
 			{
 				if (fwrite($fileHandle, $content) !== false)
@@ -84,8 +78,8 @@ class FilesystemLib
 		return $result;
 	}
 	
-	/*
-	 * 
+	/**
+	 * append
 	 */
 	public function append($filepath, $filename, $content)
 	{
@@ -93,7 +87,7 @@ class FilesystemLib
 
 		if ($this->checkParameters($filepath, $filename) && isset($content))
 		{
-			$resource = $filepath . DIRECTORY_SEPARATOR . $filename;
+			$resource = $filepath.DIRECTORY_SEPARATOR.$filename;
 			if (is_writable($resource) && $fileHandle = fopen($resource, 'a'))
 			{
 				if (fwrite($fileHandle, $content) !== false)
@@ -107,8 +101,8 @@ class FilesystemLib
 		return $result;
 	}
 	
-	/*
-	 * 
+	/**
+	 * remove
 	 */
 	public function remove($filepath, $filename)
 	{
@@ -118,7 +112,7 @@ class FilesystemLib
 		{
 			if (is_writable($filepath))
 			{
-				$resource = $filepath . DIRECTORY_SEPARATOR . $filename;
+				$resource = $filepath.DIRECTORY_SEPARATOR.$filename;
 				$result = unlink($resource);
 			}
 		}
@@ -126,8 +120,8 @@ class FilesystemLib
 		return $result;
 	}
 	
-	/*
-	 * 
+	/**
+	 * rename
 	 */
 	public function rename($filepath, $filename, $newFilepath, $newFilename)
 	{
@@ -135,10 +129,10 @@ class FilesystemLib
 
 		if ($this->checkParameters($filepath, $filename) && $this->checkParameters($newFilepath, $newFilename))
 		{
-			$resource = $filepath . DIRECTORY_SEPARATOR . $filename;
+			$resource = $filepath.DIRECTORY_SEPARATOR.$filename;
 			if (is_writable($filepath) && is_writable($newFilepath) && file_exists($resource))
 			{
-				$destination = $newFilepath . DIRECTORY_SEPARATOR . $newFilename;
+				$destination = $newFilepath.DIRECTORY_SEPARATOR.$newFilename;
 				$result = rename($resource, $destination);
 			}
 		}

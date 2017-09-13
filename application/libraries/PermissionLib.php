@@ -37,7 +37,7 @@ class PermissionLib
 	 * PermissionLib's constructor
 	 * Here is initialized the static property bb with all the rights of the user (API caller)
 	 */
-	function __construct()
+	public function __construct()
 	{
 		// Loads CI instance
 		$this->ci =& get_instance();
@@ -64,17 +64,16 @@ class PermissionLib
 	 */
 	public function isEntitled($sourceName, $permissionType)
 	{
+		$isEntitled = false;
+		
 		// If the resource exists
 		if (isset($this->acl[$sourceName]))
 		{
 			// Checks permission
-			return $this->_isBerechtigt($this->acl[$sourceName], $permissionType);
+			$isEntitled = $this->_isBerechtigt($this->acl[$sourceName], $permissionType);
 		}
-		// if the resource does not exist, do not lose useful clock cycles
-		else
-		{
-			return false;
-		}
+		
+		return $isEntitled;
 	}
 
 	/**
@@ -82,26 +81,26 @@ class PermissionLib
 	 */
 	public function getBerechtigungKurzbz($sourceName)
 	{
+		$returnValue = null;
+		
 		if (isset($this->acl[$sourceName]))
 		{
-			return $this->acl[$sourceName];
+			$returnValue = $this->acl[$sourceName];
 		}
-		else
-		{
-			return null;
-		}
+		
+		return $returnValue;
 	}
 
 	/**
 	 * Checks user's (API caller) rights
 	 */
-	private function _isBerechtigt($berechtigung_kurzbz, $art = null,  $oe_kurzbz = null,  $kostenstelle_id = null)
+	private function _isBerechtigt($berechtigung_kurzbz, $art = null, $oe_kurzbz = null, $kostenstelle_id = null)
 	{
 		$isBerechtigt = false;
 		
 		if (!is_null($berechtigung_kurzbz))
 		{
-			if(self::$bb->isBerechtigt($berechtigung_kurzbz, $oe_kurzbz, $art, $kostenstelle_id))
+			if (self::$bb->isBerechtigt($berechtigung_kurzbz, $oe_kurzbz, $art, $kostenstelle_id))
 			{
 				$isBerechtigt = true;
 			}
