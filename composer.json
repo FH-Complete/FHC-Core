@@ -109,18 +109,6 @@
 		{
 			"type": "package",
 			"package": {
-				"name": "edweezy/bootstrap-colorpicker",
-				"version": "1.0",
-				"source": {
-					"url": "https://github.com/edweezy/bootstrap-colorpicker.git",
-					"type": "git",
-					"reference": "600e960b13aa395e2f6783e0a10f97d4b0f0c33f"
-				}
-			}
-		},
-		{
-			"type": "package",
-			"package": {
 				"name": "alvaro-prieto/colResizable",
 				"version": "1.6",
 				"dist": {
@@ -220,7 +208,8 @@
 		"alvaro-prieto/colResizable": "^1.6",
 		"tapmodo/Jcrop": "^2.0",
 		"joeldbirch/superfish": "^1.7",
-		"jquery/sizzle": "^1.0"
+		"jquery/sizzle": "^1.0",
+		"tomazdragar/SimpleCropper": "^1.0"
 	},
 	"require-dev": {
 		"squizlabs/php_codesniffer": "2.*"

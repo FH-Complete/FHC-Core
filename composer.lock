@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "103a2e39e5cecacf7f2a7188ba9a3c7b",
-    "content-hash": "3925c56e7a33930a684da03e85cae6e5",
+    "hash": "79a093497d04fa084ff4dece7cd1be4b",
+    "content-hash": "991e0fcfbc30ca3d04fd35eb36206c1e",
     "packages": [
         {
             "name": "alvaro-prieto/colResizable",
@@ -2226,6 +2226,16 @@
             "time": "2017-08-30 12:11:58"
         },
         {
+            "name": "tomazdragar/SimpleCropper",
+            "version": "1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/tomazdragar/SimpleCropper.git",
+                "reference": "9750b81fa55ed07b3b429297d18ffbeac07a2cde"
+            },
+            "type": "library"
+        },
+        {
             "name": "twig/twig",
             "version": "v1.28.2",
             "source": {
@@ -2720,16 +2730,6 @@
     ],
     "packages-dev": [
         {
-            "name": "edweezy/bootstrap-colorpicker",
-            "version": "1.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/edweezy/bootstrap-colorpicker.git",
-                "reference": "600e960b13aa395e2f6783e0a10f97d4b0f0c33f"
-            },
-            "type": "library"
-        },
-        {
             "name": "jquery-archive/jquery-metadata",
             "version": "1.0",
             "source": {
@@ -2816,16 +2816,6 @@
                 "standards"
             ],
             "time": "2016-11-30 04:02:31"
-        },
-        {
-            "name": "tomazdragar/SimpleCropper",
-            "version": "1.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/tomazdragar/SimpleCropper.git",
-                "reference": "9750b81fa55ed07b3b429297d18ffbeac07a2cde"
-            },
-            "type": "library"
         }
     ],
     "aliases": [],
