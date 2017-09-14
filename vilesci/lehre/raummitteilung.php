@@ -21,10 +21,10 @@
  */
 /*
  * Raummitteilung
- * 
- * Oeffnet ein E-Mail Fenster mit allen Personen die in einem bestimmten 
+ *
+ * Oeffnet ein E-Mail Fenster mit allen Personen die in einem bestimmten
  * Zeitraum einem Raum zugeteilt sind. (Reservierung und LV-Plan)
- * 
+ *
  * Dies dient dazu, die Personen im Falle eines Problemes in diesem Raum zu informieren
  */
 require_once('../../config/vilesci.config.inc.php');
@@ -48,7 +48,6 @@ require_once('../../include/variable.class.php');
 <script type="text/javascript" src="../../include/js/jquery.ui.datepicker.translation.js"></script>
 <script type="text/javascript" src="../../vendor/jquery/sizzle/sizzle.js"></script>
 	<script type="text/javascript" src="../../vendor/components/jqueryui/jquery-ui.min.js"></script>
-	<script type="text/javascript" src="../../include/js/jquery.ui.datepicker-de.js"></script> 
 </head>
 <body>
 	<h2>Raummitteilung</h2>
@@ -81,7 +80,7 @@ foreach($orte->result as $row)
 			$selected='selected';
 		else
 			$selected='';
-		
+
 		echo '<OPTION value="'.$row->ort_kurzbz.'" '.$selected.'>'.$row->ort_kurzbz.'</OPTION>';
 	}
 }
@@ -114,7 +113,7 @@ for($i=1;$i<15;$i++)
 		$selected='';
 	echo '<OPTION value="'.$i.'" '.$selected.'>'.$i.'</OPTION>';
 }
-			
+
 echo '</SELECT>';
 echo ' inklusive Studenten<input type="checkbox" name="inkl_studenten" '.($inkl_studenten?'checked':'').'>';
 echo ' <input type="submit" name="show" value="Anzeigen"/>';
@@ -125,30 +124,30 @@ if(isset($_POST['show']))
 	$mails = array();
 	$von = $datum_obj->formatDatum($von, 'Y-m-d');
 	$bis = $datum_obj->formatDatum($bis, 'Y-m-d');
-	
+
 	if($von===false || $von=='')
 		die('Das Von Datum ist ungueltig');
 	if($bis===false || $bis=='')
 		die('Das Bis Datum ist ungueltig');
-		
+
 	if(!is_numeric($von_stunde) || $von_stunde=='')
 		die('Von Stunde ist ungueltig');
 	if(!is_numeric($bis_stunde) || $bis_stunde=='')
 		die('Bis Stunde ist ungueltig');
-	
+
 	if(!check_ort($ort_kurzbz))
 		die('Ort ist ungueltig');
-	
+
 	//LV-Plan
-	$qry = "SELECT distinct lehreinheit_id FROM 
-				lehre.tbl_stundenplan 
+	$qry = "SELECT distinct lehreinheit_id FROM
+				lehre.tbl_stundenplan
 			WHERE
 				tbl_stundenplan.datum>='".addslashes($von)."' AND tbl_stundenplan.datum<='".addslashes($bis)."'
 				AND NOT (tbl_stundenplan.datum='".addslashes($von)."' AND tbl_stundenplan.stunde<'".addslashes($von_stunde)."')
 				AND NOT (tbl_stundenplan.datum='".addslashes($bis)."' AND tbl_stundenplan.stunde>'".addslashes($bis_stunde)."')
 				AND tbl_stundenplan.ort_kurzbz='".addslashes($ort_kurzbz)."'
 			";
-	
+
 	if($result = $db->db_query($qry))
 	{
 		$lehreinheiten=array();
@@ -168,7 +167,7 @@ if(isset($_POST['show']))
 						$mails[]=$row->uid.'@'.DOMAIN;
 				}
 			}
-			
+
 			//Lektoren aus dem LV-Plan
 			$qry = "SELECT distinct mitarbeiter_uid as uid FROM lehre.tbl_lehreinheitmitarbeiter WHERE lehreinheit_id IN($les)";
 			if($result = $db->db_query($qry))
@@ -178,11 +177,11 @@ if(isset($_POST['show']))
 			}
 		}
 	}
-	
+
 	//Reservierung
-	$qry = "SELECT * 
-			FROM 
-				campus.tbl_reservierung 
+	$qry = "SELECT *
+			FROM
+				campus.tbl_reservierung
 			WHERE
 				datum>='$von' AND datum<='$bis'
 				AND NOT (datum='$von' AND stunde<'$von_stunde')
@@ -213,22 +212,22 @@ if(isset($_POST['show']))
 						$qry.=" AND verband='".$row->verband."'";
 					if($row->gruppe!='')
 						$qry.=" AND gruppe='".$row->gruppe."'";
-						
+
 					if($result_gruppe = $db->db_query($qry))
 					{
 						while($row_gruppe = $db->db_fetch_object($result_gruppe))
 							$mails[] = $row_gruppe->uid.'@'.DOMAIN;
-					}		
+					}
 				}
 				elseif($row->gruppe_kurzbz!='')
 				{
 					//Studierende aus den Spezialgruppen
-					$qry = "SELECT 
-								uid 
-							FROM 
-								public.tbl_benutzergruppe 
-							WHERE 
-								gruppe_kurzbz='".addslashes($row->gruppe_kurzbz)."' 
+					$qry = "SELECT
+								uid
+							FROM
+								public.tbl_benutzergruppe
+							WHERE
+								gruppe_kurzbz='".addslashes($row->gruppe_kurzbz)."'
 								AND studiensemester_kurzbz='".$stsem."'";
 					if($result_gruppe = $db->db_query($qry))
 					{
@@ -239,7 +238,7 @@ if(isset($_POST['show']))
 			}
 		}
 	}
-	
+
 	//Zusammenfassen
 	$mails = array_unique($mails);
 	echo '<br>Anzahl der Empfänger: ',count($mails);
@@ -248,7 +247,7 @@ if(isset($_POST['show']))
 	echo "
 		<script type=\"text/Javascript\">
 		var mails = '".implode($variable->variable->emailadressentrennzeichen,$mails)."';
-		
+
 		// ****
 		// * Teilt die Mailto Links auf kleinere Brocken auf, da der
 		// * Link nicht funktioniert wenn er zu lange ist
@@ -262,7 +261,7 @@ if(isset($_POST['show']))
 			var loop=true;
 			if(mails.length>2048)
 				alert('Aufgrund der großen Anzahl an Empfängern, muss die Nachricht auf mehrere E-Mails aufgeteilt werden!');
-			
+
 			while(loop)
 			{
 				if(mails.length>2048)
@@ -276,21 +275,21 @@ if(isset($_POST['show']))
 					loop=false;
 					mailto=mails;
 				}
-				
+
 				if(art=='to')
 					window.location.href='mailto:'+mailto;
 				else
-					window.location.href='mailto:?'+art+'='+mailto;					
+					window.location.href='mailto:?'+art+'='+mailto;
 			}
 		}
 		</script>";
-	
+
 	echo '<hr>enthaltene Personen:<br />';
 	//Liste der Personen anzeigen
 	foreach($mails as $row)
 		echo "<br />$row";
-	
-	
+
+
 }
 ?>
 </body>
