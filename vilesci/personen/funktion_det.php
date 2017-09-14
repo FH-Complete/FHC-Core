@@ -229,20 +229,19 @@ if (! $funktion->load ( $kurzbz )) {
 <head>
 <title>Funktion Details</title>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
-<link rel="stylesheet" href="../../include/js/tablesort/table.css"
-	type="text/css">
-<script src="../../include/js/tablesort/table.js" type="text/javascript"></script>
-<script src="../../vendor/rmariuzzo/jquery-checkboxes/dist/jquery.checkboxes-1.0.7.min.js" type="text/javascript"></script>
 
-<!-- modified 20160707 -->
+<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
+<link rel="stylesheet" href="../../include/js/tablesort/table.css" type="text/css">
 <link href="../../skin/tablesort.css" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" href="../../skin/jquery-ui-1.9.2.custom.min.css" type="text/css">
+
 <script type="text/javascript" src="../../vendor/jquery/jqueryV1/jquery-1.12.4.min.js"></script>
 <script type="text/javascript" src="../../vendor/christianbach/tablesorter/jquery.tablesorter.min.js"></script>
 <script type="text/javascript" src="../../vendor/components/jqueryui/jquery-ui.min.js"></script>
+
 <script type="text/javascript" src="../../include/js/jquery.ui.datepicker.translation.js"></script>
-<link rel="stylesheet" href="../../skin/jquery-ui-1.9.2.custom.min.css"
-	type="text/css">
+<script src="../../include/js/tablesort/table.js" type="text/javascript"></script>
+<script src="../../vendor/rmariuzzo/jquery-checkboxes/dist/jquery.checkboxes-1.0.7.min.js" type="text/javascript"></script>
 
 <script language="Javascript">
 	$(document).ready(function() {
@@ -285,7 +284,6 @@ if (! $funktion->load ( $kurzbz )) {
 		});
 	});
 </script>
-<script type="text/javascript" src="../../include/js/jquery.checkboxes-1.0.7.js"></script>
 </head>
 <body>
 	<form id="tableform" action="<?php echo "".$_SERVER['PHP_SELF']."?kurzbz=$kurzbz&bn_funktion_id=$bn_funktion_id&type=edit&multiple=true"; ?>" method="post"><input type="hidden" name="editordelete" class="editordelete" value="" /></form>
