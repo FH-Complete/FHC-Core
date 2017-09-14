@@ -116,7 +116,7 @@ if ($firma->getFirmenTypen())
 					{
 						var output=show_firmen_search(wohin,json);
 						$('td#'+wohin).html(output);
-						$('td#'+wohin).result(function(event, data, formatted) {}).focus();
+						$('td#'+wohin).focus();
 					}
 				}
 			);
