@@ -1,13 +1,13 @@
-<?php $this->load->view("templates/header", array("title" => "MessageReply", "jquery19" => true, "tinymce" => true)); ?>
+<?php $this->load->view("templates/header", array("title" => "MessageReply", "jqueryV1" => true, "tinymce" => true)); ?>
 
 	<body>
-	
+
 		<?php
 			$href = str_replace("/system/Messages/write", "/system/Messages/send", $_SERVER["REQUEST_URI"]);
 		?>
-		
+
 		<form id="sendForm" method="post" action="<?php echo $href; ?>">
-		
+
 			<table>
 				<tr>
 					<td>
@@ -47,7 +47,7 @@
 					</td>
 				</tr>
 			</table>
-			
+
 			<table width="100%">
 				<tr>
 					<td width="80%">
@@ -86,7 +86,7 @@
 					</td>
 				</tr>
 			</table>
-			
+
 			<table>
 				<tr>
 					<td>
@@ -106,9 +106,9 @@
 					</td>
 				</tr>
 			</table>
-			
+
 			<br>
-			
+
 			<?php
 				if (isset($receivers) && count($receivers) > 0)
 				{
@@ -130,7 +130,7 @@
 									<option value="<?php echo $receiver->prestudent_id; ?>"><?php echo $receiver->Nachname . " " . $receiver->Vorname; ?></option>
 								<?php
 									}
-								?>	
+								?>
 								</select>
 								&nbsp;
 								<strong><a href="#" id="refresh">Refresh</a></strong>
@@ -151,7 +151,7 @@
 			<?php
 				}
 			?>
-			
+
 			<?php
 				for($i = 0; $i < count($receivers); $i++)
 				{
@@ -159,7 +159,7 @@
 					echo '<input type="hidden" name="prestudents[]" value="' . $receiver->prestudent_id . '">' . "\n";
 				}
 			?>
-			
+
 			<?php
 				if (isset($message))
 				{
@@ -168,14 +168,14 @@
 			<?php
 				}
 			?>
-			
+
 		</form>
-	
+
 	<script>
 		tinymce.init({
 			selector:  "#bodyTextArea"
 		});
-		
+
 		tinymce.init({
 			menubar: false,
 			toolbar: false,
@@ -183,7 +183,7 @@
 			selector: "#tinymcePreview",
 			statusbar: true
 		});
-		
+
 		$(document).ready(function() {
 			if ($("#variables"))
 			{
@@ -194,17 +194,17 @@
 					}
 				});
 			}
-			
+
 			if ($("#recipients"))
 			{
 				$("#recipients").change(tinymcePreviewSetContent);
 			}
-			
+
 			if ($("#refresh"))
 			{
 				$("#refresh").click(tinymcePreviewSetContent);
 			}
-			
+
 			if ($("#sendButton") && $("#sendForm"))
 			{
 				$("#sendButton").click(function() {
@@ -218,7 +218,7 @@
 					}
 				});
 			}
-			
+
 			if ($("#vorlageDnD"))
 			{
 				$("#vorlageDnD").change(function() {
@@ -227,7 +227,7 @@
 						<?php
 							$url = str_replace("/system/Messages/write", "/system/Messages/getVorlage", $_SERVER["REQUEST_URI"]);
 						?>
-						
+
 						$.ajax({
 							dataType: "json",
 							url: "<?php echo $url; ?>",
@@ -244,7 +244,7 @@
 				});
 			}
 		});
-		
+
 		function tinymcePreviewSetContent()
 		{
 			if ($("#tinymcePreview"))
@@ -259,14 +259,14 @@
 				}
 			}
 		}
-		
+
 		function parseMessageText(prestudent_id, text)
 		{
 			<?php
 				$url = str_replace("/system/Messages/write", "/system/Messages/parseMessageText", $_SERVER["REQUEST_URI"]);
 				$url = substr($url, 0, strrpos($url, '/'));
 			?>
-			
+
 			$.ajax({
 				dataType: "json",
 				url: "<?php echo $url; ?>",
@@ -280,7 +280,7 @@
 			});
 		}
 	</script>
-	
+
 	</body>
-	
+
 <?php $this->load->view("templates/footer"); ?>

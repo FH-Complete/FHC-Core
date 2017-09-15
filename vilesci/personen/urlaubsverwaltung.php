@@ -35,7 +35,7 @@ require_once('../../include/benutzerberechtigung.class.php');
 
 if (!$db = new basis_db())
 	die('Es konnte keine Verbindung zum Server aufgebaut werden.');
-			
+
 $user = get_uid();
 $datum = new datum();
 
@@ -67,13 +67,16 @@ echo '<html>
 		<link rel="stylesheet" href="../../skin/tablesort.css" type="text/css">
 		<link rel="stylesheet" href="../../skin/jquery-ui-1.9.2.custom.min.css" type="text/css">
 		<script src="../../include/js/tablesort/table.js" type="text/javascript"></script>
-		<script type="text/javascript" src="../../include/js/jquery1.9.min.js"></script>
+		<script type="text/javascript" src="../../vendor/jquery/jqueryV1/jquery-1.12.4.min.js"></script>
+		<script type="text/javascript" src="../../vendor/christianbach/tablesorter/jquery.tablesorter.min.js"></script>
+		<script type="text/javascript" src="../../vendor/components/jqueryui/jquery-ui.min.js"></script>
+		<script type="text/javascript" src="../../include/js/jquery.ui.datepicker.translation.js"></script>
 		<script language="Javascript">
 		function confdel(val)
 		{
 			return confirm("Wollen Sie diesen Eintrag wirklich loeschen: "+val);
 		}
-		$(document).ready(function() 
+		$(document).ready(function()
 		{
 			$("#ma_name").autocomplete({
 			source: "../../cis/private/tools/zeitaufzeichnung_autocomplete.php?autocomplete=kunde",
@@ -97,10 +100,10 @@ echo '<html>
 			{
 				sortList: [[3,1]],
 				widgets: [\'zebra\']
-			}); 
+			});
 			$( ".datepicker_datum" ).datepicker({
 					 changeMonth: true,
-					 changeYear: true, 
+					 changeYear: true,
 					 dateFormat: "dd.mm.yy",
 			});
 		})
@@ -129,16 +132,16 @@ if($action=='delete')
 {
 	if(!$rechte->isBerechtigt('mitarbeiter/zeitsperre', null, 'suid'))
 		die('Sie haben keine Berechtigung für diese Aktion');
-	
+
 	if($zeitsperre_id!='' && is_numeric($zeitsperre_id))
 	{
 		$zeitsperre = new zeitsperre();
 		if($zeitsperre->delete($zeitsperre_id))
 			$message='Zeitsperre wurde geloescht';
-		else 
+		else
 			$errormsg='Fehler beim Loeschen der Zeitsperre';
 	}
-	else 
+	else
 		$errormsg='Zeitsperre_id ist ungueltig';
 }
 
@@ -146,10 +149,10 @@ if(isset($_POST['save']))
 {
 	if(!$rechte->isBerechtigt('mitarbeiter/zeitsperre', null, 'suid'))
 		die('Sie haben keine Berechtigung für diese Aktion');
-	
+
 	//Speichern der Daten
 	$zeitsperre = new zeitsperre();
-	
+
 	if($zeitsperre_id!='')
 	{
 		if(!$zeitsperre->load($zeitsperre_id))
@@ -159,14 +162,14 @@ if(isset($_POST['save']))
 		}
 		$zeitsperre->new = false;
 	}
-	else 
+	else
 	{
 		$zeitsperre->insertamum=date('Y-m-d H:i:s');
 		$zeitsperre->insertvon = $user;
 		$zeitsperre->new=true;
 		$zeitsperre->mitarbeiter_uid=$uid;
 	}
-	
+
 	if(!$error)
 	{
 		$zeitsperre->zeitsperretyp_kurzbz=$zeitsperretyp_kurzbz;
@@ -181,12 +184,12 @@ if(isset($_POST['save']))
 		$zeitsperre->updatevon = $user;
 		$zeitsperre->freigabeamum = $datum->formatDatum($freigabeamum);
 		$zeitsperre->freigabevon = $freigabevon;
-		
+
 		if($zeitsperre->save())
 		{
 			$message = 'Daten wurden erfolgreich gespeichert';
 		}
-		else 
+		else
 		{
 			$errormsg = "Fehler beim Speichern der Daten: $zeitsperre->errormsg";
 		}
@@ -206,7 +209,7 @@ if($uid!='')
 		die('Mitarbeiter wurde nicht gefunden');
 
 	$zeitsperre = new zeitsperre();
-	
+
 	$zeitsperre->getzeitsperren($uid);
 	echo '<h3>Zeitsperren von <b>'.$mitarbeiter->titelpre.' '.$mitarbeiter->vorname.' '.$mitarbeiter->nachname.' '.$mitarbeiter->titelpost.'</b></h3>';
 	echo "<table id='t1' class='tablesorter'>";
@@ -227,7 +230,7 @@ if($uid!='')
 		</tr>
 	</thead>
 	<tbody>';
-	foreach ($zeitsperre->result as $row) 
+	foreach ($zeitsperre->result as $row)
 	{
 		echo '<tr>';
 		echo "<td>$row->zeitsperre_id</td>";
@@ -249,16 +252,16 @@ if($uid!='')
 	//Editieren und Neu anlegen von Zeitsperren
 	$zeitsperre = new zeitsperre();
 	if($action=='edit')
-	{	
+	{
 		if(!$zeitsperre->load($zeitsperre_id))
 			die('Zeitsperre wurde nicht gefunden');
 		if($zeitsperre->mitarbeiter_uid!=$uid)
 			die('Zeitsperre und Mitarbeiter passen nicht zusammen');
 		echo "<h3>Bearbeiten der Zeitsperre $zeitsperre->zeitsperre_id:</h3>";
 	}
-	else 
+	else
 		echo "<h3>Neue Zeitsperre:</h3>";
-	
+
 	echo '<form accept-charset="UTF-8" action="'.$_SERVER['PHP_SELF'].'?uid='.$uid.'" method="POST">';
 	echo '<input type="hidden" name="zeitsperre_id" value="'.$zeitsperre->zeitsperre_id.'">';
 	echo '<table>';
@@ -276,7 +279,7 @@ if($uid!='')
 	echo '</tr>';
 	echo '<tr>';
 	echo '<td>Bezeichnung:</td><td><input type="text" name="bezeichnung" value="'.$zeitsperre->bezeichnung.'"></td>';
-	
+
 	echo '</tr><tr>';
 	$qry = "SELECT * FROM lehre.tbl_stunde ORDER BY stunde";
 	if($result = $db->db_query($qry))
@@ -286,7 +289,7 @@ if($uid!='')
 			$std_arr[$row->stunde]="$row->stunde (".date('H:i',strtotime($row->beginn)).' - '.date('H:i',strtotime($row->ende))." Uhr)";
 		}
 	}
-	
+
 	echo '<td>Von</td><td><input class="datepicker_datum" type="text" name="von" value="'.$datum->formatDatum($zeitsperre->vondatum,'d.m.Y').'">';
 	echo ' Stunde (inklusive)';
 	echo '<SELECT name="vonstunde">';
@@ -294,18 +297,18 @@ if($uid!='')
 		echo "<OPTION value='' selected>*</OPTION>\n";
 	else
 		echo "<OPTION value=''>*</OPTION>\n";
-		
+
 	foreach ($std_arr as $std=>$val)
 	{
 		if($std==$zeitsperre->vonstunde)
 			$selected='selected';
-		else 
+		else
 			$selected='';
 		echo "<OPTION value='$std' $selected>$val</OPTION>";
 	}
 	echo '</SELECT></td>';
 	echo '</tr><tr>';
-	
+
 	echo '<td>Bis</td><td><input class="datepicker_datum" type="text" name="bis" value="'.$datum->formatDatum($zeitsperre->bisdatum,'d.m.Y').'">';
 	echo ' Stunde (inklusive)';
 	echo '<SELECT name="bisstunde">';
@@ -313,18 +316,18 @@ if($uid!='')
 		echo "<OPTION value='' selected>*</OPTION>\n";
 	else
 		echo "<OPTION value=''>*</OPTION>\n";
-		
+
 	foreach ($std_arr as $std=>$val)
 	{
 		if($std==$zeitsperre->bisstunde)
 			$selected='selected';
-		else 
+		else
 			$selected='';
 		echo "<OPTION value='$std' $selected>$val</OPTION>";
 	}
 	echo '</SELECT></td>';
 	echo '</tr><tr>';
-	
+
 	echo '<td>Erreichbarkeit</td>';
 	$qry = "SELECT * FROM campus.tbl_erreichbarkeit";
 	$erreichbarkeit_arr=array();
@@ -340,31 +343,31 @@ if($uid!='')
 	{
 		if($zeitsperre->erreichbarkeit_kurzbz == $erreichbarkeit_key)+
 			$selected='selected';
-		else 
+		else
 			$selected='';
-		
+
 		echo "<OPTION value='$erreichbarkeit_key' ".$selected.">$erreichbarkeit_beschreibung</OPTION>\n";
 	}
-	
+
 	echo '</SELECT></td>';
 	echo '</tr><tr>';
-	
+
 	echo '<td>Vertretung</td>';
 	echo "<td><SELECT name='vertretung_uid' id='vertretung_uid'>";
 	//dropdown fuer vertretung
-	$qry = "SELECT DISTINCT uid,vorname,nachname FROM campus.vw_mitarbeiter WHERE uid not LIKE '\\\_%' AND aktiv=true 
+	$qry = "SELECT DISTINCT uid,vorname,nachname FROM campus.vw_mitarbeiter WHERE uid not LIKE '\\\_%' AND aktiv=true
 			UNION SELECT uid,vorname,nachname FROM campus.vw_mitarbeiter WHERE uid=".$db->db_add_param($zeitsperre->vertretung_uid)."
 			ORDER BY nachname, vorname";
-	
+
 	echo "<OPTION value=''>-- Auswahl --</OPTION>\n";
-	
+
 	if($result = $db->db_query($qry))
 	{
 		while($row = $db->db_fetch_object($result))
 		{
 			if($zeitsperre->vertretung_uid == $row->uid)
 				$selected='selected';
-			else 
+			else
 				$selected='';
 			echo "<OPTION value='$row->uid' ".$selected.">$row->nachname $row->vorname ($row->uid)</OPTION>\n";
 		}
@@ -374,27 +377,27 @@ if($uid!='')
 	echo '<td>Freigegeben von</td>';
 	echo "<td><SELECT name='freigabe_von' id='freigabe_von'>";
 	//dropdown fuer freigabe
-	$qry = "SELECT DISTINCT uid,vorname,nachname FROM campus.vw_mitarbeiter WHERE uid not LIKE '\\\_%' AND aktiv=true 
+	$qry = "SELECT DISTINCT uid,vorname,nachname FROM campus.vw_mitarbeiter WHERE uid not LIKE '\\\_%' AND aktiv=true
 			UNION SELECT uid,vorname,nachname FROM campus.vw_mitarbeiter WHERE uid=".$db->db_add_param($zeitsperre->vertretung_uid)."
 			ORDER BY nachname, vorname";
-	
+
 	echo "<OPTION value=''>-- Keine Auswahl --</OPTION>\n";
-	
+
 	if($result = $db->db_query($qry))
 	{
 		while($row = $db->db_fetch_object($result))
 		{
 			if($zeitsperre->freigabevon == $row->uid)
 				$selected='selected';
-			else 
+			else
 				$selected='';
 			echo "<OPTION value='$row->uid' ".$selected.">$row->nachname $row->vorname ($row->uid)</OPTION>\n";
 		}
 	}
 	echo '</SELECT></td><tr>';
-	
+
 	//input fuer freigabeamum
-	echo '<td>Freigegeben am</td>';	
+	echo '<td>Freigegeben am</td>';
 	echo '<td><input class="datepicker_datum" type="text" name="freigabe_amum" value="'.$datum->formatDatum($zeitsperre->freigabeamum,'d.m.Y').'">';
 	echo '</tr><tr><td></td><td>';
 	echo '<input type="submit" value="Speichern" name="save">';

@@ -30,7 +30,7 @@ require_once('../../include/gruppe.class.php');
 
 if (!$db = new basis_db())
 	die('Es konnte keine Verbindung zum Server aufgebaut werden.');
-	
+
 $user = get_uid();
 $reloadstr = '';  // neuladen der liste im oberen frame
 $errorstr='';
@@ -77,7 +77,7 @@ if(!$rechte->isBerechtigt('lehre/lehrveranstaltung', $oe_studiengang, 's'))
 
 if($rechte->isBerechtigt('lehre/lehrveranstaltung', $oe_studiengang, 'suid'))
 	$write_admin=true;
-	
+
 if($action=='delete')
 {
 	if($write_admin)
@@ -172,16 +172,19 @@ if(isset($_POST["schick"]))
 	<title>Lehrveranstaltung - Details</title>
 	<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
 	<script type="text/javascript" src="../../include/js/datecheck.js"></script>
-	<script type="text/javascript" src="../../include/js/jquery1.9.min.js"></script>	
+	<script type="text/javascript" src="../../vendor/jquery/jqueryV1/jquery-1.12.4.min.js"></script>
+	<script type="text/javascript" src="../../vendor/christianbach/tablesorter/jquery.tablesorter.min.js"></script>
+	<script type="text/javascript" src="../../vendor/components/jqueryui/jquery-ui.min.js"></script>
+	<script type="text/javascript" src="../../include/js/jquery.ui.datepicker.translation.js"></script>
 	<link rel="stylesheet" type="text/css" href="../../skin/jquery-ui-1.9.2.custom.min.css"/>
 	<link rel="stylesheet" href="../../skin/tablesort.css" type="text/css"/>
 	<script type="text/javascript">
 		$(function() {
 			$("#anmeldefenster_start,#anmeldefenster_ende").datepicker();
 		});
-		
-		$(document).ready(function() 
-		{ 
+
+		$(document).ready(function()
+		{
 			$("#t1").tablesorter(
 			{
 				widgets: ["zebra"]
@@ -205,12 +208,12 @@ if(isset($_POST["schick"]))
 				}
 			});
 		});
-		
+
 		function submitable()
 		{
 			document.getElementById("submsg").style.visibility="visible";
 		}
-		
+
 		function confdel()
 		{
 			return confirm("Wollen Sie diesen Eintrag wirklich löschen?");
@@ -220,11 +223,11 @@ if(isset($_POST["schick"]))
 		{
 			if($('#cboxNeueGruppe').prop('checked'))
 			{
-				$('#gruppe_kurzbz').attr("disabled", "disabled"); 
+				$('#gruppe_kurzbz').attr("disabled", "disabled");
 			}
 			else
 			{
-				$('#gruppe_kurzbz').removeAttr("disabled"); 
+				$('#gruppe_kurzbz').removeAttr("disabled");
 			}
 		}
 	</script>
@@ -324,7 +327,7 @@ if(isset($_POST["schick"]))
 	</tfoot>
 	</table>
 	</form>';
-	echo '<span id="submsg" style="color:red; visibility:hidden;">Datensatz ge&auml;ndert!&nbsp;&nbsp;</span>';	
+	echo '<span id="submsg" style="color:red; visibility:hidden;">Datensatz ge&auml;ndert!&nbsp;&nbsp;</span>';
 	echo "<div class='inserterror'>".$errorstr."</div>\n";
 	echo '<a href="lehrveranstaltung_lvangebot.php?lehrveranstaltung_id='.$lv_id.'">Neuen Eintrag anlegen</a>';
 ?>

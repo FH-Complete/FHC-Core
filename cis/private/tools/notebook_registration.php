@@ -15,17 +15,17 @@ require_once('../../../include/basis_db.class.php');
 require_once('../../../include/functions.inc.php');
 require_once('../../../include/File/SearchReplace.php');
 require_once('../../../include/File/Match.php');
-require_once('../../../include/phrasen.class.php'); 
+require_once('../../../include/phrasen.class.php');
 require_once('../../../include/authentication.class.php');
 
-$sprache = getSprache(); 
-$p=new phrasen($sprache); 
+$sprache = getSprache();
+$p=new phrasen($sprache);
 
 if (!$db = new basis_db())
 	die($p->t("global/fehlerBeimOeffnenDerDatenbankverbindung"));
 if (!$user=get_uid())
 	die($p->t("global/nichtAngemeldet").'! <a href="javascript:history.back()">'.$p->t("global/zurueck").'</a>');
-	
+
 $mac_result = trim((isset($_REQUEST['mac_result']) ? $_REQUEST['mac_result']:''));
 $txtUID = trim((isset($_REQUEST['txtUID']) ? $_REQUEST['txtUID']:''));
 $txtPassword = trim((isset($_REQUEST['txtPassword']) ? $_REQUEST['txtPassword']:''));
@@ -35,7 +35,7 @@ if(check_lektor($user))
 	$is_lector=true;
 else
 	$is_lector=false;
-		 
+
 function ip_increment($ip = "")
 {
 	$ip = split("\.", $ip);
@@ -58,7 +58,6 @@ function ip_increment($ip = "")
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <link href="../../../skin/style.css.php" rel="stylesheet" type="text/css">
 <link href="../../../skin/flexcrollstyles.css" rel="stylesheet" type="text/css" />
-<script type="text/javascript" src="../../../include/js/flexcroll.js"></script>
 </head>
 
 <body onLoad="document.regMAC.txtMAC.focus();">
@@ -97,9 +96,9 @@ function ip_increment($ip = "")
 			{
 				if(isset($txtMAC) && $txtMAC != "")
 				{
-					$sql_query = "SELECT DISTINCT vorname, nachname 
+					$sql_query = "SELECT DISTINCT vorname, nachname
 					FROM campus.vw_benutzer WHERE uid=".$db->db_add_param($txtUID)." LIMIT 1";
-	
+
 					if($result = $db->db_query($sql_query))
 					{
 						if($row = $db->db_fetch_object($result))
@@ -111,14 +110,14 @@ function ip_increment($ip = "")
 					}
 					else
 						die($p->t("global/fehlerBeimErmittelnDerUID"));
-	
+
 					$mac = mb_eregi_replace(":", "", mb_eregi_replace("-", "", mb_strtoupper($txtMAC)));
-		
+
 					$filename_dat = '../../../../system/dhcp.dat';
 					$filename_ip  = '../../../../system/dhcp.ip';
-		
+
 					copy($filename_dat, '../../../../system/backup/dhcp_'.date('j-m-Y_H-i-s').'.dat');
-		
+
 					unset($mfiles);
 					// leich gepfuscht aber funktioniert
 					$mfiles = new File_Match("/$mac?\s(.{1}) (.*)\s?/", $filename_dat, '', 0, array('#',';'));
@@ -135,12 +134,12 @@ function ip_increment($ip = "")
 						if ($fuser != $txtUID)
 							$error = 3;
 					}
-		
+
 					unset($mfiles);
-	
-			     	if(!$VLAN) 
+
+			     	if(!$VLAN)
 			     		$VLAN = 'S';
-	
+
 					if (!$error)
 					{
 						if($VLAN != 'S')
@@ -150,32 +149,32 @@ function ip_increment($ip = "")
 						else if ($VLAN == 'S')
 						{
 							$mfiles = new File_SearchReplace("/.*?\sS\s$txtUID\s(.*)?\snb-$txtUID\s(.*)/", "$mac S $txtUID $1 nb-$txtUID $name", $filename_dat, '', 0, array("#", ";"));
-			
+
 							$mfiles->setSearchFunction('preg');
-			
+
 							if(preg_match("/[A-Fa-f0-9]{12}/", $mac) && $mac != '' && mb_strlen($mac) == 12)
 							{
 								$mfiles->doSearch();
-			
+
 								// neuen eintrag erzeugen und ip hochzählen
 								if($mfiles->occurences == 0)
 								{
 									//$content = file($filename_dat, "r");
 									//$content = implode('', $content);
 									$content = file_get_contents($filename_dat);
-			
+
 									//$ip = file($filename_ip);
 									//$ip = trim($ip[0]);
 									$ip = file_get_contents($filename_ip);
-			
+
 									$ip = trim($ip);
 									$ip = ip_increment($ip);
-			
+
 									// nachschauen ob, die mac adresse schon
 									// einmal gespeichert wurde
 									$sfiles = new File_Match("/$mac?\s/", $filename_dat, '', 0, array('#',';'));
 									$sfiles->doFind();
-			
+
 									if($sfiles->occurences)
 									{
 										echo 'MAC IN USE';
@@ -189,12 +188,12 @@ function ip_increment($ip = "")
 										unset($txtMAC);
 									}
 									unset($sfiles);
-			
+
 								}
 								else if($mfiles->occurences > 0)
 								{
 									$mac_result = 1;
-			
+
 									unset($txtMAC);
 								}
 							}

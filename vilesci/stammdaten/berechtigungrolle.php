@@ -42,7 +42,10 @@ $delete = filter_input(INPUT_GET, 'delete', FILTER_VALIDATE_BOOLEAN);
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 		<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
 		<link href="../../skin/tablesort.css" rel="stylesheet" type="text/css"/>
-		<script src="../../include/js/jquery1.9.min.js" type="text/javascript"></script>
+		<script type="text/javascript" src="../../vendor/jquery/jqueryV1/jquery-1.12.4.min.js"></script>
+		<script type="text/javascript" src="../../vendor/christianbach/tablesorter/jquery.tablesorter.min.js"></script>
+		<script type="text/javascript" src="../../vendor/components/jqueryui/jquery-ui.min.js"></script>
+		<script type="text/javascript" src="../../include/js/jquery.ui.datepicker.translation.js"></script>
 		<script language="Javascript">
 			$(document).ready(function()
 					{

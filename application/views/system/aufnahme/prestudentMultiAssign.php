@@ -1,4 +1,4 @@
-<?php $this->load->view("templates/header", array("title" => "Users manager", "jquery19" => true, "tablesort" => true, "jquery_checkboxes" => true, "jquery_custom" => true)); ?>
+<?php $this->load->view("templates/header", array("title" => "Users manager", "jqueryV1" => true, "tablesort" => true, "jquery_checkboxes" => true, "jquery_custom" => true)); ?>
 
 	<body>
 		<form id="usersFiltersForm" action="" method="post">
@@ -56,9 +56,9 @@
 				</tr>
 			</table>
 		</form>
-		
+
 		<br>
-		
+
 		<form id="linkUsersForm" action="" method="post">
 			<?php
 				if ($users != null)
@@ -197,14 +197,14 @@
 				?>
 			</div>
 		</form>
-		
+
 		<?php
 			$hrefLinkToStufe = str_replace("/system/aufnahme/PrestudentMultiAssign", "/system/aufnahme/PrestudentMultiAssign/linkToStufe", $_SERVER["REQUEST_URI"]);
 			$hrefLinkToAufnahmegruppe = str_replace("/system/aufnahme/PrestudentMultiAssign", "/system/aufnahme/PrestudentMultiAssign/linkToAufnahmegruppe", $_SERVER["REQUEST_URI"]);
 		?>
-		
+
 		<script>
-		
+
 			$(document).ready(function() {
 				if ($("#linkToStufe"))
 				{
@@ -243,42 +243,42 @@
 						});
 					});
 				}
-				
+
 				if ($('#studiengangFilter'))
 				{
 					$('#studiengangFilter').change(function() {
 						$('#usersFiltersForm').submit();
 					});
 				}
-				
+
 				if ($('#studiensemesterFilter'))
 				{
 					$('#studiensemesterFilter').change(function() {
 						$('#usersFiltersForm').submit();
 					});
 				}
-				
+
 				if ($('#aufnahmegruppeFilter'))
 				{
 					$('#aufnahmegruppeFilter').change(function() {
 						$('#usersFiltersForm').submit();
 					});
 				}
-				
+
 				if ($('#stufeFilter'))
 				{
 					$('#stufeFilter').change(function() {
 						$('#usersFiltersForm').submit();
 					});
 				}
-				
+
 				if ($('#reihungstestFilter'))
 				{
 					$('#reihungstestFilter').change(function() {
 						$('#usersFiltersForm').submit();
 					});
 				}
-				
+
 				$(".tablesorter").each(function(i, v) {
 					$("#"+v.id).tablesorter(
 					{
@@ -316,8 +316,8 @@
 						$("#mailSendButton").html('Mail an alle senden');
 				});
 			});
-		
+
 		</script>
-		
+
 	</body>
 <?php $this->load->view("templates/footer"); ?>

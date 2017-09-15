@@ -23,7 +23,7 @@
 /**
  * Seite zur Wartung der Studiengaenge
  */
-require_once('../../config/vilesci.config.inc.php');		
+require_once('../../config/vilesci.config.inc.php');
 require_once('../../include/globals.inc.php');
 require_once('../../include/functions.inc.php');
 require_once('../../include/studiengang.class.php');
@@ -241,7 +241,7 @@ if ((isset($_REQUEST['studiengang_kz'])) && ((!isset($_REQUEST['neu'])) || ($_RE
 	$studiengang_kz = $_REQUEST['studiengang_kz'];
 
 	$sg = new studiengang($studiengang_kz);
-	
+
 	if ($sg->errormsg!='')
 	{
 		die($sg->errormsg);
@@ -296,7 +296,10 @@ if (!$erh->getAll('kurzbz'))
 		<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
 		<script src="../../include/js/mailcheck.js"></script>
 		<script src="../../include/js/datecheck.js"></script>
-		<script type="text/javascript" src="../../include/js/jquery1.9.min.js"></script>
+		<script type="text/javascript" src="../../vendor/jquery/jqueryV1/jquery-1.12.4.min.js"></script>
+		<script type="text/javascript" src="../../vendor/christianbach/tablesorter/jquery.tablesorter.min.js"></script>
+		<script type="text/javascript" src="../../vendor/components/jqueryui/jquery-ui.min.js"></script>
+		<script type="text/javascript" src="../../include/js/jquery.ui.datepicker.translation.js"></script>
 		<link rel="stylesheet" type="text/css" href="../../skin/jquery-ui-1.9.2.custom.min.css"/>
 		<script type="text/javascript" src="../../include/tiny_mce/tiny_mce.js"></script>
 		<script type="text/javascript" src="studiengang_details.js"></script>

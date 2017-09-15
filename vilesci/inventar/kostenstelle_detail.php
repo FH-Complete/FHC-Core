@@ -24,13 +24,13 @@
 
 // ---------------- Vilesci Include Dateien einbinden
 	$path='../../';
-	
+
 	require_once($path.'config/vilesci.config.inc.php');
   	require_once($path.'include/functions.inc.php');
 	require_once($path.'include/benutzerberechtigung.class.php');
 	require_once($path.'include/mitarbeiter.class.php');
   	require_once($path.'include/wawi.class.php');
-  	
+
 	if (!$uid = get_uid())
 		die('Keine UID gefunden !  <a href="javascript:history.back()">Zur&uuml;ck</a>');
 // ------------------------------------------------------------------------------------------
@@ -42,7 +42,7 @@
 	$user_id=trim((isset($_REQUEST['user_id']) ? $_REQUEST['user_id']:''));
 	$studiengang_id=trim((isset($_REQUEST['studiengang_id']) ? $_REQUEST['studiengang_id']:''));
  	$debug=trim((isset($_REQUEST['debug']) ? $_REQUEST['debug']:false));
-	
+
 // ------------------------------------------------------------------------------------------
 // Variable Initialisieren
 // ------------------------------------------------------------------------------------------
@@ -65,7 +65,7 @@
 		$recht=true;
 	if (!$recht)
 		die('Sie haben keine Berechtigung f&uuml;r diese Seite !  <a href="javascript:history.back()">Zur&uuml;ck</a>');
-	
+
 // ------------------------------------------------------------------------------------------
 //	Datenbankanbindung - Classe
 // ------------------------------------------------------------------------------------------
@@ -74,7 +74,7 @@
 	$oWAWI->debug=$debug;
 	$oWAWI->result=array();
 	$oWAWI->errormsg='';
-	
+
 // ------------------------------------------------------------------------------------------
 // HTML Output
 // ------------------------------------------------------------------------------------------
@@ -88,9 +88,12 @@
 		<link rel="stylesheet" href="<?php echo $path;?>include/js/jquery.css" rel="stylesheet" type="text/css">
 		<link rel="stylesheet" href="<?php echo $path;?>include/js/tablesort/table.css" type="text/css">
 		<script src="<?php echo $path;?>include/js/tablesort/table.js" type="text/javascript"></script>
-		<script src="<?php echo $path;?>include/js/jquery.js" type="text/javascript"></script>
-		<script src="<?php echo $path;?>include/js/jquery.autocomplete.js" type="text/javascript"></script>
-		<script src="<?php echo $path;?>include/js/jquery.autocomplete.min.js" type="text/javascript"></script>				
+
+		<link rel="stylesheet" href="../../skin/jquery-ui-1.9.2.custom.min.css" type="text/css">
+        <script type="text/javascript" src="../../vendor/jquery/jqueryV1/jquery-1.12.4.min.js"></script>
+		<script type="text/javascript" src="../../vendor/components/jqueryui/jquery-ui.min.js"></script>
+		<script type="text/javascript" src="../../vendor/christianbach/tablesorter/jquery.tablesorter.min.js"></script>
+
 	</head>
 	<body>
 		<h1 title="Anwender:<?php echo $uid ?>">&nbsp;WAWI Kostenstellen - Suche&nbsp;</h1>
@@ -102,14 +105,33 @@
 					<label for="kostenstelle_id">Kostenstelle ID</label>&nbsp;
 					<input id="kostenstelle_id" name="kostenstelle_id" size="5" maxlength="10" value="<?php echo $kostenstelle_id; ?>" >&nbsp;
 						<script type="text/javascript">
-							function selectItem(li) 
+							function selectItem(li)
 							{
 							   return false;
 							}
-							function formatItem(row) 
+							function formatItem(row)
 							{
 							    return row[0] + " <i>" + row[1] + "</i> ";
 							}
+
+							// $('#kostenstelle_id').autocomplete({
+							// 	source: "inventar_autocomplete.php",
+							// 	minLength:1,
+							// 	response: function(event, ui)
+							// 	{
+							// 		//Value und Label fuer die Anzeige setzen
+							// 		for(i in ui.content)
+							// 		{
+							// 			ui.content[i].value = ui.content[i].nachname + " " + ui.content[i].vorname;
+							// 			ui.content[i].label = ui.content[i].nachname + " " + ui.content[i].vorname;
+							// 		}
+							// 	},
+							// 	select: function(event, ui)
+							// 	{
+							// 		$('#ansprechperson_uid').val(ui.item.uid);
+							// 	}
+							// });
+
 							$(document).ready(function() {
 								  $('#kostenstelle_id').autocomplete('inventar_autocomplete.php', {
 									minChars:1,
@@ -129,11 +151,11 @@
 					<label for="kostenstelle_nr">Nummer</label>&nbsp;
 					<input id="kostenstelle_nr" name="kostenstelle_nr" size="5" maxlength="10" value="<?php echo $kostenstelle_nr; ?>" >&nbsp;
 					<script type="text/javascript">
-							function selectItem(li) 
+							function selectItem(li)
 							{
 							   return false;
 							}
-							function formatItem(row) 
+							function formatItem(row)
 							{
 							    return row[0] + " <i>" + row[1] + "</i> ";
 							}

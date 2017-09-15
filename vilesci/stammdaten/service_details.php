@@ -20,7 +20,7 @@
 /**
  * Seite zur Wartung der Services
  */
-require_once('../../config/vilesci.config.inc.php');		
+require_once('../../config/vilesci.config.inc.php');
 require_once('../../include/service.class.php');
 require_once('../../include/benutzerberechtigung.class.php');
 require_once('../../include/datum.class.php');
@@ -29,15 +29,15 @@ require_once('../../include/benutzer.class.php');
 
 if (!$db = new basis_db())
 	die('Es konnte keine Verbindung zum Server aufgebaut werden.');
-		
+
 $user = get_uid();
-	
+
 $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($user);
-	
+
 if(!$rechte->isBerechtigt('basis/service'))
 	die($rechte->errormsg);
-	
+
 $datum_obj = new datum();
 ?><!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 <html>
@@ -47,11 +47,14 @@ $datum_obj = new datum();
 	<link rel="stylesheet" href="../../skin/fhcomplete.css" type="text/css">
 	<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
 	<link href="../../skin/jquery-ui-1.9.2.custom.min.css" rel="stylesheet" type="text/css">
-	<script src="../../include/js/jquery1.9.min.js" type="text/javascript"></script>
-	
-	
+	<script type="text/javascript" src="../../vendor/jquery/jqueryV1/jquery-1.12.4.min.js"></script>
+	<script type="text/javascript" src="../../vendor/christianbach/tablesorter/jquery.tablesorter.min.js"></script>
+	<script type="text/javascript" src="../../vendor/components/jqueryui/jquery-ui.min.js"></script>
+	<script type="text/javascript" src="../../include/js/jquery.ui.datepicker.translation.js"></script>
+
+
 	<?php //echo include('../../include/meta/jquery.php'); ?>
-	
+
 	<script type="text/javascript">
 	$(document).ready(function()
 	{
@@ -83,7 +86,7 @@ $datum_obj = new datum();
 	$action = (isset($_GET['action'])?$_GET['action']:'new');
 	$service_id = (isset($_REQUEST['service_id'])?$_REQUEST['service_id']:'');
 	$service = new service();
-	
+
 	if($action=='save')
 	{
 		$error = false;
@@ -104,16 +107,16 @@ $datum_obj = new datum();
 		{
 			if(!$service->load($service_id))
 				die($service->errormsg);
-				
+
 			$service->new = false;
 		}
-		
+
 		$service->bezeichnung = $bezeichnung;
 		$service->beschreibung = $beschreibung;
 		$service->ext_id = $ext_id;
 		$service->oe_kurzbz = $oe_kurzbz;
 		$service->content_id = $content_id;
-		
+
 		if ($design_uid != '' || $betrieb_uid != '' || $operativ_uid != '')
 		{
 			$benutzer = new benutzer();
@@ -133,7 +136,7 @@ $datum_obj = new datum();
 				$error = true;
 			}
 		}
-		
+
 		$service->design_uid = $design_uid;
 		$service->betrieb_uid = $betrieb_uid;
 		$service->operativ_uid = $operativ_uid;
@@ -141,7 +144,7 @@ $datum_obj = new datum();
 		if ($error == false)
 		{
 			if($service->save())
-			{		
+			{
 				echo '<span class="ok">Daten erfolgreich gespeichert</span>';
 				echo "<script type='text/javascript'>\n";
 				echo "	parent.uebersicht_service.location.href='service_uebersicht.php?oe_kurzbz=$oe_kurzbz';";
@@ -155,7 +158,7 @@ $datum_obj = new datum();
 				echo '<span class="error">'.$service->errormsg.'</span>';
 			}
 		}
-		else 
+		else
 		{
 			$action='update';
 		}
@@ -178,7 +181,7 @@ $datum_obj = new datum();
 			die('Invalid Action');
 			break;
 	}
-	
+
 	echo '<form action="'.$_SERVER['PHP_SELF'].'?action=save" method="POST">';
 	echo '<input type="hidden" name="new" value="'.htmlspecialchars($new).'">';
 	echo '<input type="hidden" name="service_id" value="'.htmlspecialchars($service->service_id).'">';
@@ -195,15 +198,15 @@ $datum_obj = new datum();
 			$selected='selected';
 		else
 			$selected='';
-			
+
 		echo '<OPTION value="'.$row->oe_kurzbz.'" '.$selected.'>'.$row->organisationseinheittyp_kurzbz.' '.$row->bezeichnung.'</OPTION>';
 	}
-	
+
 	echo '</SELECT>';
 	echo ' </td>';
 	echo '</tr>';
 	echo '<tr>';
-	echo '   <td>Bezeichnung</td>';	
+	echo '   <td>Bezeichnung</td>';
 	echo '   <td><input type="text" name="bezeichnung" size="30" maxlength="64" value="'.htmlspecialchars($service->bezeichnung).'"></td>';
 	echo '</tr>';
 	echo '<tr valign="top">';
@@ -229,14 +232,14 @@ $datum_obj = new datum();
 	echo '<tr valign="top">';
 	echo '   <td>Externe ID</td>';
 	echo '   <td><input type="text" name="ext_id" size="4" maxlength="10" value="'.htmlspecialchars($service->ext_id).'"></td>';
-	echo '</tr>';	
+	echo '</tr>';
 	echo '<tr><td></td><td>&nbsp;</td></tr>';
 	echo '<tr valign="bottom">';
 	echo '   <td></td>';
 	echo '   <td><input type="submit" value="Speichern" name="save"></td>';
 	echo '</table>';
 	echo '</form>';
-	
+
 	echo '</fieldset>';
 ?>
 </body>

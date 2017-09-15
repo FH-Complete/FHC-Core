@@ -4,7 +4,12 @@ require_once('../config/vilesci.config.inc.php');
 <html>
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-		<script type="text/javascript" language="JavaScript" src="../include/js/jquery.js"></script>
+		<link rel="stylesheet" type="text/css" href="../skin/jquery-ui-1.9.2.custom.min.css">
+<script type="text/javascript" src="../vendor/jquery/jqueryV1/jquery-1.12.4.min.js"></script>
+<script type="text/javascript" src="../vendor/christianbach/tablesorter/jquery.tablesorter.min.js"></script>
+<script type="text/javascript" src="../vendor/components/jqueryui/jquery-ui.min.js"></script>
+<script type="text/javascript" src="../include/js/jquery.ui.datepicker.translation.js"></script>
+<script type="text/javascript" src="../vendor/jquery/sizzle/sizzle.js"></script>
 		<script type="text/javascript" language="JavaScript" src="../include/js/jqXMLUtils.js"></script>
 		<script type="text/javascript" language="JavaScript" src="../include/js/jqSOAPClient.js"></script>
 
@@ -34,7 +39,7 @@ require_once('../config/vilesci.config.inc.php');
 				var fehler = respObj.Body[0].Fault[0].faultstring[0].Text;
 				alert('Fehler: '+fehler);
 			}
-			
+
 		}
 		</script>
 	</head>

@@ -517,14 +517,22 @@ if(isset($_GET['excel']))
 		<title>Reihungstest</title>
 		<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
 		<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
-		<script type="text/javascript" src="../../include/js/jquery.js"></script>
+		<link rel="stylesheet" type="text/css" href="../../skin/jquery-ui-1.9.2.custom.min.css">
+<script type="text/javascript" src="../../vendor/jquery/jqueryV1/jquery-1.12.4.min.js"></script>
+<script type="text/javascript" src="../../vendor/christianbach/tablesorter/jquery.tablesorter.min.js"></script>
+<script type="text/javascript" src="../../vendor/components/jqueryui/jquery-ui.min.js"></script>
+<script type="text/javascript" src="../../include/js/jquery.ui.datepicker.translation.js"></script>
+<script type="text/javascript" src="../../vendor/jquery/sizzle/sizzle.js"></script>
 		<link rel="stylesheet" href="../../skin/tablesort.css" type="text/css"/>
 		<link href="../../skin/jquery-ui-1.9.2.custom.min.css" rel="stylesheet" type="text/css">
-		<script src="../../include/js/jquery1.9.min.js" type="text/javascript"></script>
+		<script type="text/javascript" src="../../vendor/jquery/jqueryV1/jquery-1.12.4.min.js"></script>
+		<script type="text/javascript" src="../../vendor/christianbach/tablesorter/jquery.tablesorter.min.js"></script>
+		<script type="text/javascript" src="../../include/js/jquery.ui.datepicker.translation.js"></script>
+		<script type="text/javascript" src="../../vendor/components/jqueryui/jquery-ui.min.js"></script>
 		<script src="../../vendor/rmariuzzo/jquery-checkboxes/dist/jquery.checkboxes-1.0.7.min.js" type="text/javascript"></script>
 
-		<link href="../../skin/jquery.ui.timepicker.css" rel="stylesheet" type="text/css"/>
-		<script src="../../include/js/jquery.ui.timepicker.js" type="text/javascript" ></script>
+		<link href="../../vendor/fgelinas/timepicker/jquery.ui.timepicker.css" rel="stylesheet" type="text/css"/>
+		<script src="../../vendor/fgelinas/timepicker/jquery.ui.timepicker.js" type="text/javascript" ></script>
 
 		<script type="text/javascript">
 			$(document).ready(function()
@@ -1862,10 +1870,10 @@ $studienplaene_list = implode(',', array_keys($studienplaene_arr));
 			<td></td>
 			<td>
 				<button type="submit" name="speichern"><?php echo $val ?></button>
-				<?php 
+				<?php
 					if(!$neu)
 						echo '<button type="submit" name="kopieren" onclick="return confirm (\'Eine Kopie dieses Tests (ohne Raumzuordnung) erstellen?\')">Kopie erstellen</button>';
-					
+
 					if($rechte->isBerechtigt('lehre/reihungstest', null, 'suid'))
 					{
 						$anzahl_teilnehmer = new reihungstest();
@@ -1873,9 +1881,9 @@ $studienplaene_list = implode(',', array_keys($studienplaene_arr));
 
 						if (isset($orte) && count($orte->result) == 0 && isset($studienplaene) && count($studienplaene->result) == 0 && $anzahl_teilnehmer == 0 && $reihungstest_id != '')
 							echo '<button type="submit" name="deleteReihungstest" onclick="return confirm (\'Diesen Reihungstesttermin löschen?\')">Termin löschen</button>';
-						else 
+						else
 							echo '<button type="submit" name="" disabled="disabled" title="Entfernen Sie zuerst alle Raumzuteilungen, Studienpläne und TeilnehmerInnen">Termin löschen</button>';
-					} 
+					}
 				?>
 			</td>
 		</tr>

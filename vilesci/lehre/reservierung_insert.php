@@ -27,10 +27,10 @@ require_once('../../include/functions.inc.php');
 require_once('../../include/datum.class.php');
 require_once('../../include/benutzerberechtigung.class.php');
 require_once('../../include/reservierung.class.php');
-		
+
 if (!$db = new basis_db())
 		die('Es konnte keine Verbindung zum Server aufgebaut werden.');
-			
+
 $uid=get_uid();
 $datum_obj = new datum();
 
@@ -38,17 +38,17 @@ $rechte =  new benutzerberechtigung();
 $rechte->getBerechtigungen($uid);
 
 if(!$rechte->isBerechtigt('lehre/reservierung', null, 'sui'))
-	die('<span class="error">Sie haben keine Berechtigung für diese Seite</span>');	
-	
-$stgid=(isset($_REQUEST['stgid'])?$_REQUEST['stgid']:0);	
+	die('<span class="error">Sie haben keine Berechtigung für diese Seite</span>');
+
+$stgid=(isset($_REQUEST['stgid'])?$_REQUEST['stgid']:0);
 $lektorid=(isset($_REQUEST['lektorid'])?$_REQUEST['lektorid']:$uid);
 $ortid=(isset($_REQUEST['ortid'])?$_REQUEST['ortid']:'');
-$semester=(isset($_REQUEST['semester'])?$_REQUEST['semester']:'');	
-$verband=(isset($_REQUEST['verband'])?$_REQUEST['verband']:'');	
-$gruppe=(isset($_REQUEST['gruppe'])?$_REQUEST['gruppe']:'');	
+$semester=(isset($_REQUEST['semester'])?$_REQUEST['semester']:'');
+$verband=(isset($_REQUEST['verband'])?$_REQUEST['verband']:'');
+$gruppe=(isset($_REQUEST['gruppe'])?$_REQUEST['gruppe']:'');
 $gruppe_kurzbz=(isset($_REQUEST['gruppe_kurzbz'])?$_REQUEST['gruppe_kurzbz']:'');
 $datum=(isset($_REQUEST['datum'])?$_REQUEST['datum']:date('d.m.Y'));
-$titel=(isset($_REQUEST['titel'])?$_REQUEST['titel']:'');	
+$titel=(isset($_REQUEST['titel'])?$_REQUEST['titel']:'');
 $beschreibung=(isset($_REQUEST['beschreibung'])?$_REQUEST['beschreibung']:'');
 $type=(isset($_REQUEST['type'])?$_REQUEST['type']:'');
 $stdbegin=(isset($_REQUEST['stdbegin'])?$_REQUEST['stdbegin']:1);
@@ -62,10 +62,13 @@ echo '
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
 <link href="../../skin/jquery-ui-1.9.2.custom.min.css" rel="stylesheet" type="text/css">
-<script src="../../include/js/jquery1.9.min.js" type="text/javascript"></script> 
+<script type="text/javascript" src="../../vendor/jquery/jqueryV1/jquery-1.12.4.min.js"></script>
+<script type="text/javascript" src="../../vendor/christianbach/tablesorter/jquery.tablesorter.min.js"></script>
+<script type="text/javascript" src="../../vendor/components/jqueryui/jquery-ui.min.js"></script>
+<script type="text/javascript" src="../../include/js/jquery.ui.datepicker.translation.js"></script>
 <script type="text/javascript">
-$(document).ready(function() 
-	{ 
+$(document).ready(function()
+	{
 	    $( "#datepicker_datum" ).datepicker($.datepicker.regional[\'de\']);
 
 	    $("#ort").autocomplete({
@@ -193,7 +196,7 @@ echo '    </select>
     <input type="text" name="titel" size="10" maxlength="10" value="'.$db->convert_html_chars($titel).'">
     Beschreibung
     <input type="text" name="beschreibung" size="32" maxlength="32" value="'.$db->convert_html_chars($beschreibung).'">
-    	
+
     LektorIn
     <SELECT name="lektorid">';
 
@@ -216,7 +219,7 @@ for ($i=0;$i<$num_rows;$i++)
 }
 
 echo '    </SELECT>
-    
+
   </p>
 	<p>
 	Ort';
@@ -282,18 +285,18 @@ if($rechte->isBerechtigt('lehre/reservierung', null, 'sui'))
 				else
 				{
 					echo "<div style='font-size:small;'>
-					<strong>Ort:</strong> ".$db->convert_html_chars($_POST['ortid'])." - 
-					<strong>Studiengang_Kz:</strong> ".$db->convert_html_chars($_POST['stgid'])." - 
-					<srong>Semester:</strong> ".$db->convert_html_chars($_POST['semester'])." - 
-					<strong>Verband:</strong> ".$db->convert_html_chars($_POST['verband'])." - 
-					<strong>Gruppe:</strong> ".$db->convert_html_chars($_POST['gruppe'])." - 
-					<strong>Spezialgruppe:</strong> ".$db->convert_html_chars($_POST['gruppe_kurzbz'])." - 
-					<strong>Lektor:</strong> ".$db->convert_html_chars($_POST['lektorid'])." - 
-					<strong>Titel:</strong> ".$db->convert_html_chars($_POST['titel'])." - 
-					<strong>Beschreibung:</strong> ".$db->convert_html_chars($_POST['beschreibung'])." - 
-					<strong>Datum:</strong>".$db->convert_html_chars($datum)." - 
+					<strong>Ort:</strong> ".$db->convert_html_chars($_POST['ortid'])." -
+					<strong>Studiengang_Kz:</strong> ".$db->convert_html_chars($_POST['stgid'])." -
+					<srong>Semester:</strong> ".$db->convert_html_chars($_POST['semester'])." -
+					<strong>Verband:</strong> ".$db->convert_html_chars($_POST['verband'])." -
+					<strong>Gruppe:</strong> ".$db->convert_html_chars($_POST['gruppe'])." -
+					<strong>Spezialgruppe:</strong> ".$db->convert_html_chars($_POST['gruppe_kurzbz'])." -
+					<strong>Lektor:</strong> ".$db->convert_html_chars($_POST['lektorid'])." -
+					<strong>Titel:</strong> ".$db->convert_html_chars($_POST['titel'])." -
+					<strong>Beschreibung:</strong> ".$db->convert_html_chars($_POST['beschreibung'])." -
+					<strong>Datum:</strong>".$db->convert_html_chars($datum)." -
 					<strong>Stunde:</strong>".$db->convert_html_chars($std)." -- <strong>Eingefügt!</strong></div>";
-				}	
+				}
 			}
 			if (!$error)
 				echo '<br><span class="ok">Einfügen erfolgreich abgeschlossen!</span><br>';

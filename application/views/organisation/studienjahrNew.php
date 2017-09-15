@@ -1,5 +1,5 @@
 <?php
-$this->load->view('templates/header', array('title' => 'StudienjahrNew', 'jqueryComposer' => true));
+$this->load->view('templates/header', array('title' => 'StudienjahrNew', 'jqueryCurrent' => true));
 ?>
 <body>
 

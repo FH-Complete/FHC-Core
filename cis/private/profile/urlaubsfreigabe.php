@@ -40,19 +40,19 @@ $rechte->getBerechtigungen($user);
 
 if(isset($_GET['year']) && is_numeric($_GET['year']))
 	$year = $_GET['year'];
-else 
+else
 {
 	//Bis August das aktuelle Jahr anzeigen
 	//Ab September das naechste
 	if(date('m')<9)
 		$year = date('Y');
-	else 
+	else
 		$year = date('Y')+1;
 }
 
 if(isset($_GET['uid']))
 	$uid=$_GET['uid'];
-else 
+else
 	$uid='';
 
 $datum_obj = new datum();
@@ -62,7 +62,11 @@ echo '<html>
 	<title>Urlaubsfreigabe</title>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<link rel="stylesheet" href="../../../skin/style.css.php" type="text/css">
-	<script src="../../../include/js/jquery1.9.min.js" type="text/javascript"></script>';
+	<script type="text/javascript" src="../../../vendor/jquery/jqueryV1/jquery-1.12.4.min.js"></script>
+	<script type="text/javascript" src="../../../vendor/christianbach/tablesorter/jquery.tablesorter.min.js"></script>
+	<script type="text/javascript" src="../../../vendor/components/jqueryui/jquery-ui.min.js"></script>
+	<script type="text/javascript" src="../../../include/js/jquery.ui.datepicker.translation.js"></script>
+	';
 
 // ADDONS laden
 $addon_obj = new addon();
@@ -76,7 +80,7 @@ foreach($addon_obj->result as $addon)
 // Wenn Seite fertig geladen ist Addons aufrufen
 echo '
 <script>
-$( document ).ready(function() 
+$( document ).ready(function()
 {
 	for(i in addon)
 	{
@@ -140,16 +144,16 @@ if(isset($_GET['action']) && $_GET['action']=='freigabe')
 			if(!$zeitsperre->save(false))
 				echo "<b>Fehler bei der Freigabe: $zeitsperre->errormsg</b>";
 		}
-		else 
+		else
 		{
 			echo '<b>Sie haben keine Berechtigung den Urlaub für diesen Mitarbeiter freizugeben</b>';
 		}
 	}
-	else 
+	else
 	{
 		echo '<b>Die Zeitsperre konnte nicht geladen werden</b>';
 	}
-	
+
 }
 
 //Speichern der Resturlaubstage
@@ -159,16 +163,16 @@ if(isset($_POST['saveresturlaub']))
 	{
 		$resturlaub = new resturlaub();
 		$resturlaub->load($uid);
-		
+
 		$resturlaub->resturlaubstage=$_POST['resturlaubstage'];
 		$resturlaub->updateamum=date('Y-m-d H:i:s');
 		$resturlaub->updatevon = $user;
 		if($resturlaub->save())
 			echo 'Resturlaubstage wurden erfolgreich gespeichert';
-		else 
+		else
 			echo '<span class="error">Fehler beim Speichern der Resturlaubstage: '.$resturlaub->errormsg.'</span>';
 	}
-	else 
+	else
 		echo '<span class="error">Fehler beim Speichern der Resturlaubstage: Resturlaub muss eine gueltige Zahl sein</span>';
 }
 
@@ -176,30 +180,30 @@ if(isset($_POST['saveresturlaub']))
 function draw_monat($monat)
 {
 	global $untergebene, $mitarbeiter, $year, $datum_obj, $uid;
-	
+
   if (!$db = new basis_db())
       die('Fehler beim Oeffnen der Datenbankverbindung');
 
-  
+
 	echo '<td style="border: 1px solid black; height:100px; width: 30%" valign="top">';
 	echo '<center><b>';
 	echo date('F',mktime(0,0,0,$monat,1,date('Y')));
 	echo " ".($monat>8?$year-1:$year);
 	echo '</b></center>';
 	//Alle Anzeigen bei denen das von- oder bisdatum in dieses monat fallen
-	$qry = "SELECT * FROM campus.tbl_zeitsperre WHERE zeitsperretyp_kurzbz='Urlaub' 
-			AND 
+	$qry = "SELECT * FROM campus.tbl_zeitsperre WHERE zeitsperretyp_kurzbz='Urlaub'
+			AND
 			(
-				(date_part('month', vondatum)='$monat' AND date_part('year', vondatum)='".($monat>8?$year-1:$year)."') 
-				OR 
+				(date_part('month', vondatum)='$monat' AND date_part('year', vondatum)='".($monat>8?$year-1:$year)."')
+				OR
 				(date_part('month', bisdatum)='$monat' AND date_part('year', bisdatum)='".($monat>8?$year-1:$year)."')
 			)";
 	if($uid=='')
 		$qry.=" AND mitarbeiter_uid in($untergebene)";
-	else 
+	else
 		$qry.=" AND mitarbeiter_uid='".addslashes($uid)."'";
 	$qry.="ORDER BY vondatum, mitarbeiter_uid";
-	
+
 	if($result = $db->db_query($qry))
 	{
 		while($row = $db->db_fetch_object($result))
@@ -230,9 +234,9 @@ if($uid!='')
 	echo '</td><td style="width:33%">';
 	//echo '<div id="resturlaub"></div>';
 	//echo '</td></tr></table>';
-	
+
 	//Anzeige Resturlaubsberechnung
-	
+
 	$resturlaub = new resturlaub();
 
 	if($resturlaub->load($uid))
@@ -241,17 +245,17 @@ if($uid!='')
 		$mehrarbeitsstunden = $resturlaub->mehrarbeitsstunden;
 		$anspruch = $resturlaub->urlaubstageprojahr;
 	}
-	else 
+	else
 	{
 		$resturlaubstage=0;
 		$mehrarbeitsstunden=0;
 		// wenn mitarbeiter ist kein fixangestellter --> kein urlaubsanspruch
-		$mitarbeiter_anspruch = new mitarbeiter(); 
+		$mitarbeiter_anspruch = new mitarbeiter();
 		$mitarbeiter_anspruch->load($uid);
 		if($mitarbeiter_anspruch->fixangestellt == true)
 			$anspruch=25;
-		else 
-			$anspruch = 0; 
+		else
+			$anspruch = 0;
 	}
 
 	$jahr=date('Y');
@@ -296,7 +300,7 @@ if($uid!='')
 		echo "<input type='submit' value='OK' name='saveresturlaub'>";
 		echo "</form>";
 	}
-	else 
+	else
 	{
 		echo "$resturlaubstage Tage";
 	}
@@ -305,9 +309,9 @@ if($uid!='')
 	echo "<tr><td style='border-top: 1px solid black;'  nowrap>aktueller Stand</td><td style='border-top: 1px solid black;' align='right' nowrap>".($anspruch+$resturlaubstage-$gebuchterurlaub)." Tage</td><td class='grey'  nowrap>&nbsp;&nbsp;&nbsp;( Stichtag: $datum_ende )</td></tr>";
 	echo "</table>";
 	echo '</div>';
-	
+
 	echo '</td></tr></table>';
-	
+
 }
 
 echo '<br><center>';

@@ -35,12 +35,12 @@ require_once('../../../include/mail.class.php');
 require_once('../../../include/benutzerberechtigung.class.php');
 require_once('../../../include/phrasen.class.php');
 
-$sprache = getSprache(); 
-$p = new phrasen($sprache); 
+$sprache = getSprache();
+$p = new phrasen($sprache);
 
 if (!$db = new basis_db())
 	die($p->t('global/fehlerBeimOeffnenDerDatenbankverbindung'));
-  
+
 $uid = get_uid();
 
 $PHP_SELF = $_SERVER['PHP_SELF'];
@@ -48,7 +48,7 @@ $PHP_SELF = $_SERVER['PHP_SELF'];
 if(isset($_GET['type']))
 	$type=$_GET['type'];
 
-//Wenn User Administrator ist und UID uebergeben wurde, dann die Zeitsperren 
+//Wenn User Administrator ist und UID uebergeben wurde, dann die Zeitsperren
 //des uebergebenen Users anzeigen
 if(isset($_GET['uid']))
 {
@@ -58,7 +58,7 @@ if(isset($_GET['uid']))
 	{
 		$uid = $_GET['uid'];
 	}
-	else 
+	else
 	{
 		die($p->t('global/FuerDieseAktionBenoetigenSieAdministrationsrechte'));
 	}
@@ -78,10 +78,13 @@ $num_rows_stunde=$db->db_num_rows($result_stunde);
 <title><?php echo $p->t('zeitsperre/zeitsperre');?></title>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <link rel="stylesheet" href="../../../skin/style.css.php" type="text/css">
-<script src="../../../include/js/jquery1.9.min.js" type="text/javascript"></script>
-<script src="../../../include/js/jquery.ui.timepicker.js" type="text/javascript" ></script>
+<script type="text/javascript" src="../../../vendor/jquery/jqueryV1/jquery-1.12.4.min.js"></script>
+<script type="text/javascript" src="../../../vendor/christianbach/tablesorter/jquery.tablesorter.min.js"></script>
+<script type="text/javascript" src="../../../vendor/components/jqueryui/jquery-ui.min.js"></script>
+<script type="text/javascript" src="../../../include/js/jquery.ui.datepicker.translation.js"></script>
+<script src="../../../vendor/fgelinas/timepicker/jquery.ui.timepicker.js" type="text/javascript" ></script>
 <link href="../../../skin/jquery.css" rel="stylesheet" type="text/css"/>
-<link href="../../../skin/jquery.ui.timepicker.css" rel="stylesheet" type="text/css"/>
+<link href="../../../vendor/fgelinas/timepicker/jquery.ui.timepicker.css" rel="stylesheet" type="text/css"/>
 <link href="../../../skin/jquery-ui-1.9.2.custom.min.css" rel="stylesheet"  type="text/css">
 <?php
 // ADDONS laden
@@ -96,7 +99,7 @@ foreach($addon_obj->result as $addon)
 // Wenn Seite fertig geladen ist Addons aufrufen
 echo '
 <script>
-$( document ).ready(function() 
+$( document ).ready(function()
 {
 	if(typeof addon  !== \'undefined\')
 	{
@@ -105,14 +108,14 @@ $( document ).ready(function()
 			addon[i].init("cis/private/profile/urlaubstool.php", {uid:\''.$uid.'\'});
 		}
 	}
-	
+
 
 		    $( ".datepicker_datum" ).datepicker({
 					 changeMonth: true,
-					 changeYear: true, 
+					 changeYear: true,
 					 dateFormat: "dd.mm.yy",
 					 });
-			
+
 			$( ".timepicker" ).timepicker({
 					showPeriodLabels: false,
 					hourText: "'.$p->t("global/stunde").'",
@@ -165,43 +168,43 @@ function checkdatum()
 		return false;
 	}
 
-      var Datum, Tag, Monat,Jahr,vonDatum,bisDatum; 
-	  
+      var Datum, Tag, Monat,Jahr,vonDatum,bisDatum;
+
 	  Datum=document.getElementById('vondatum').value;
-      Tag=Datum.substring(0,2); 
-      Monat=Datum.substring(3,5); 
+      Tag=Datum.substring(0,2);
+      Monat=Datum.substring(3,5);
 	  if (parseInt(Monat,10)<1 || parseInt(Monat,10)>12)
-	  {	
+	  {
 		alert('<?php echo $p->t('zeitsperre/vonDatumMonat');?>'+ document.getElementById('vondatum').value+ ' <?php echo $p->t('zeitsperre/istNichtRichtig');?>.');
 		document.getElementById('vondatum').focus();
 	  	return false;
 	  }
 
-      Jahr=Datum.substring(6,10); 
-	  
+      Jahr=Datum.substring(6,10);
+
 	  vonDatum=Jahr+''+Monat+''+Tag;
-	  
+
 	  Datum=document.getElementById('bisdatum').value;
-      Tag=Datum.substring(0,2); 
-      Monat=Datum.substring(3,5); 
+      Tag=Datum.substring(0,2);
+      Monat=Datum.substring(3,5);
 	  if (parseInt(Monat,10)<1 || parseInt(Monat,10)>12)
-	  {	
+	  {
 		alert('<?php echo $p->t('zeitsperre/bisDatumMonat');?>'+ document.getElementById('bisdatum').value+ ' <?php echo $p->t('zeitsperre/istNichtRichtig');?>.');
 		document.getElementById('bisdatum').focus();
 	  	return false;
 	  }
-	  	
-      Jahr=Datum.substring(6,10); 
-	  
-	  bisDatum=Jahr+''+Monat+''+Tag;	  	
-	
-	  if (vonDatum>bisDatum)  
+
+      Jahr=Datum.substring(6,10);
+
+	  bisDatum=Jahr+''+Monat+''+Tag;
+
+	  if (vonDatum>bisDatum)
 	  {
 		alert('<?php echo $p->t('zeitsperre/vonDatum');?> '+ document.getElementById('vondatum').value+ ' <?php echo $p->t('zeitsperre/istGroesserAlsBisDatum');?> '+document.getElementById('bisdatum').value);
 		document.getElementById('vondatum').focus();
 	  	return false;
 	  }
-	
+
 	return true;
 }
 
@@ -222,13 +225,13 @@ function showHideBezeichnungDropDown()
 		str += '<option value="Wohnungswechsel">h) Wohnungswechsel in eigenen Haushalt</option>';
 		str += '<option value="Bundesheer">i) Einberufung Bundesheer</option>';
 		str += '</select>';
-				
+
 		sp.innerHTML = str;
-			
+
 	}
 	else
 	{
-		
+
 		sp.innerHTML = '<input type="text" name="bezeichnung" maxlength="32" size="32" value="">';
 	}
 	if (dd.options[dd.selectedIndex].value == 'Urlaub')
@@ -267,7 +270,7 @@ function setBisDatum()
 
 <?php
 
- 
+
 //Zeitsperre Speichern
 if(isset($_GET['type']) && ($_GET['type']=='edit_sperre' || $_GET['type']=='new_sperre'))
 {
@@ -294,27 +297,27 @@ if(isset($_GET['type']) && ($_GET['type']=='edit_sperre' || $_GET['type']=='new_
 		$date=explode('.',$_POST['vondatum']);
 		if (@checkdate($date[1], $date[0], $date[2]))
 		{
-			 $vondatum=$date[2].$date[1].$date[0];	
-		}	 
+			 $vondatum=$date[2].$date[1].$date[0];
+		}
 		else
 		{
 			$error=true;
 			$error_msg .= $p->t('zeitsperre/vonDatumUngueltig').' ';
-		}			 	
+		}
 	}
 	else
 	{
 		$error=true;
-	}		
-	
+	}
+
 	$bisdatum=0;
 	if(isset($_POST['bisdatum']))
 	{
 		$date=explode('.',$_POST['bisdatum']);
 		if (@checkdate($date[1], $date[0], $date[2]))
 		{
-			 $bisdatum=$date[2].$date[1].$date[0];		
-		}	 
+			 $bisdatum=$date[2].$date[1].$date[0];
+		}
 		else
 		{
 			$error=true;
@@ -324,16 +327,16 @@ if(isset($_GET['type']) && ($_GET['type']=='edit_sperre' || $_GET['type']=='new_
 	else
 	{
 		$error=true;
-	}	
-	
+	}
+
 	if($vondatum > $bisdatum)
 	{
 		$error=true;
 		$error_msg .= $p->t('zeitsperre/vonDatumGroesserAlsBisDatum').'! ';
 	}
-	
-	
-	
+
+
+
 	$zeitsperre = new zeitsperre();
 
 	if($_GET['type']=='edit_sperre')
@@ -418,9 +421,9 @@ if(isset($_GET['type']) && ($_GET['type']=='edit_sperre' || $_GET['type']=='new_
 						$benutzer->load($uid);
 						if($datum_obj->formatDatum($zeitsperre->vondatum, 'm')>=9)
 							$jahr = $datum_obj->formatDatum($zeitsperre->vondatum, 'Y')+1;
-						else 
+						else
 							$jahr = $datum_obj->formatDatum($zeitsperre->vondatum, 'Y');
-						
+
 						$message = "Dies ist eine automatische Mail! \n".
 								   "$benutzer->nachname $benutzer->vorname hat einen neuen Urlaub eingetragen:\n".
 								   "$zeitsperre->bezeichnung von ".$datum_obj->formatDatum($zeitsperre->vondatum,'d.m.Y')." bis ".$datum_obj->formatDatum($zeitsperre->bisdatum,'d.m.Y')."\n\n".
@@ -494,9 +497,9 @@ if(count($zeit->result)>0)
 	{
 		$i++;
 		//name der vertretung holen
-		$qry = "SELECT vorname || ' ' || nachname as kurzbz FROM public.tbl_mitarbeiter, public.tbl_benutzer, public.tbl_person 
-				WHERE tbl_benutzer.uid=tbl_mitarbeiter.mitarbeiter_uid 
-					AND tbl_benutzer.person_id=tbl_person.person_id 
+		$qry = "SELECT vorname || ' ' || nachname as kurzbz FROM public.tbl_mitarbeiter, public.tbl_benutzer, public.tbl_person
+				WHERE tbl_benutzer.uid=tbl_mitarbeiter.mitarbeiter_uid
+					AND tbl_benutzer.person_id=tbl_person.person_id
 					AND mitarbeiter_uid=".$db->db_add_param($row->vertretung_uid);
 
 		$result_vertretung = $db->db_query($qry);
@@ -511,13 +514,13 @@ if(count($zeit->result)>0)
 							<td align='center'>".($row->freigabeamum!=''?'Ja':'')."</td>";
 		if ($row->zeitsperretyp_kurzbz == 'DienstV')
 			$content_table .= '<td>&nbsp;</td>';
-		else		
+		else
 			$content_table.="<td><a href='$PHP_SELF?type=edit&id=$row->zeitsperre_id' class='Item'>".$p->t('zeitsperre/edit')."</a></td>";
 		if($row->freigabeamum=='' || $row->zeitsperretyp_kurzbz!='Urlaub')
 		{
 			$content_table.="\n<td><a href='$PHP_SELF?type=delete_sperre&id=$row->zeitsperre_id' onclick='return conf_del()' class='Item'>".$p->t('zeitsperre/loeschen')."</a></td>";
 		}
-		else 
+		else
 			$content_table .= '<td>&nbsp;</td>';
 		$content_table.="</tr>";
 	}
@@ -679,15 +682,15 @@ $anspruch = '25';
 		$resturlaubstage = $resturlaub->resturlaubstage;
 		$mehrarbeitsstunden = $resturlaub->mehrarbeitsstunden;
 		$anspruch = $resturlaub->urlaubstageprojahr;
-	}else 
+	}else
 	{
 		// wenn mitarbeiter ist kein fixangestellter --> kein urlaubsanspruch
-		$mitarbeiter_anspruch = new mitarbeiter(); 
+		$mitarbeiter_anspruch = new mitarbeiter();
 		$mitarbeiter_anspruch->load($uid);
 		if($mitarbeiter_anspruch->fixangestellt == true)
 			$anspruch=25;
-		else 
-			$anspruch = 0; 
+		else
+			$anspruch = 0;
 	}
 //Den Bereich fuer die Resturlaubstage nur anzeigen wenn dies
 //im config angegeben ist

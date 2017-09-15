@@ -22,18 +22,18 @@
  *          Manfred Kindl <manfred.kindl@technikum-wien.at>
  *          Alexander Nimmervoll <alexander.nimmervoll@technikum-wien.at>
  */
- 
+
 require_once('../../../config/cis.config.inc.php');
 require_once('../../../config/global.config.inc.php');
 require_once('../../../include/basis_db.class.php');
 require_once('../../../include/functions.inc.php');
 require_once('../../../include/phrasen.class.php');
-require_once('../../../include/studiensemester.class.php'); 
+require_once('../../../include/studiensemester.class.php');
 require_once('../../../include/benutzer.class.php');
 require_once('../../../include/benutzerberechtigung.class.php');
-  	  	
-$sprache = getSprache(); 
-$p=new phrasen($sprache); 
+
+$sprache = getSprache();
+$p=new phrasen($sprache);
 
 $uid=get_uid();
 $berechtigung=new benutzerberechtigung();
@@ -43,7 +43,7 @@ if ($berechtigung->isBerechtigt('lehre/reservierung:begrenzt', null, 'sui'))
 else
 	$raumres=false;
 
-/*$benutzer = new benutzer(); 
+/*$benutzer = new benutzer();
 
 foreach($benutzer->result as $row)
 {
@@ -59,10 +59,10 @@ echo $benutzer;*/
 
 if (!$db = new basis_db())
 	die($p->t('global/fehlerBeimOeffnenDerDatenbankverbindung'));
-  
+
 if (!$uid=get_uid())
 	die('Sie sind nicht angemeldet. Es wurde keine Benutzer UID gefunden ! <a href="javascript:history.back()">Zur&uuml;ck</a>');
-	
+
 
 $sql_query="SELECT titelpre, titelpost, uid, nachname, vorname FROM campus.vw_benutzer WHERE uid LIKE '$uid'";
 	//echo $sql_query;
@@ -89,20 +89,20 @@ else
 $sql_query="SELECT studiengang_kz, kurzbz, kurzbzlang, bezeichnung, typ, english FROM public.tbl_studiengang WHERE aktiv ORDER BY typ, kurzbz";
 $result_stg=$db->db_query($sql_query);
 if(!$result_stg)
-	die ("Studiengang not found!");	
+	die ("Studiengang not found!");
 $num_rows_stg=$db->db_num_rows($result_stg);
 
 $sql_query="SELECT ort_kurzbz, bezeichnung FROM public.tbl_ort WHERE aktiv AND lehre ORDER BY ort_kurzbz";
 $result_ort=$db->db_query($sql_query);
 if(!$result_ort)
-  	die("ort not found!");  	
+  	die("ort not found!");
 $num_rows_ort=$db->db_num_rows($result_ort);
 
 /*$sql_query="SELECT student_uid FROM public.tbl_student ORDER BY student_uid";
 $result_lektor=$db->db_query($sql_query);
 if(!$result_lektor)
 	die("lektor not found!");
-	
+
 $num_rows_lektor=$db->db_num_rows($result_lektor);*/
 
 
@@ -114,7 +114,10 @@ $num_rows_lektor=$db->db_num_rows($result_lektor);*/
 <title>Lehrveranstaltungsplan</title>
 <link href="../../../skin/style.css.php" rel="stylesheet" type="text/css">
 <link href="../../../skin/jquery-ui-1.9.2.custom.min.css" rel="stylesheet" type="text/css">
-<script src="../../../include/js/jquery1.9.min.js" type="text/javascript"></script>
+<script type="text/javascript" src="../../../vendor/jquery/jqueryV1/jquery-1.12.4.min.js"></script>
+<script type="text/javascript" src="../../../vendor/christianbach/tablesorter/jquery.tablesorter.min.js"></script>
+<script type="text/javascript" src="../../../vendor/components/jqueryui/jquery-ui.min.js"></script>
+<script type="text/javascript" src="../../../include/js/jquery.ui.datepicker.translation.js"></script>
 <script type="text/javascript" language="JavaScript">
 
 function MM_jumpMenu(targ,selObj,restore){ //v3.0
@@ -127,7 +130,7 @@ function jumpKalender(){
 	  }
 	else if (document.getElementById('studiensemester').value == '') {
 	    alert("<?php echo $p->t('lvplan/bitteEinStudiensemesterAuswaehlen');?>");
-	  } 
+	  }
 	  else {window.open ('stpl_kalender.php?type=verband&stg_kz='+document.getElementById('stg_kz_semplan').value+'&sem='+document.getElementById('sem_semplan').value
 			+'&ver='+document.getElementById('ver_semplan').value+'&grp='+document.getElementById('grp_semplan').value+'&begin='+document.getElementById('studiensemester').value+'&format=html', '_blank');
 	  }
@@ -149,8 +152,8 @@ function checkSetBenutzer(){
 		return true;
 }
 
-$(document).ready(function() 
-	{ 
+$(document).ready(function()
+	{
 	    $("#benutzer").autocomplete({
 			source: "lvplan_autocomplete.php?autocomplete=benutzer",
 			minLength:2,
@@ -193,7 +196,7 @@ function LoadSemester(type)
 			 },
 		type: "POST",
 		dataType: "json",
-		success: function(data) 
+		success: function(data)
 		{
 			$("#sem"+type).empty();
 			$("#sem"+type).append('<option value=""><?php echo $p->t('lvplan/sem'); ?></option>');
@@ -201,7 +204,7 @@ function LoadSemester(type)
 				$("#sem"+type).append('<option value="'+data+'">'+data+'</option>');
 			});
 		},
-		error: function(data) 
+		error: function(data)
 		{
 			alert("Fehler beim Laden der Daten");
 		}
@@ -222,7 +225,7 @@ function LoadVerband(type)
 			 },
 		type: "POST",
 		dataType: "json",
-		success: function(data) 
+		success: function(data)
 		{
 			$("#ver"+type).empty();
 			$("#ver"+type).append('<option value=""><?php echo $p->t('lvplan/ver'); ?></option>');
@@ -230,7 +233,7 @@ function LoadVerband(type)
 				$("#ver"+type).append('<option value="'+data+'">'+data+'</option>');
 			});
 		},
-		error: function(data) 
+		error: function(data)
 		{
 			alert("Fehler beim Laden der Daten");
 		}
@@ -253,7 +256,7 @@ function LoadGruppe(type)
 			 },
 		type: "POST",
 		dataType: "json",
-		success: function(data) 
+		success: function(data)
 		{
 			$("#grp"+type).empty();
 			$("#grp"+type).append('<option value=""><?php echo $p->t('lvplan/grp'); ?></option>');
@@ -261,7 +264,7 @@ function LoadGruppe(type)
 				$("#grp"+type).append('<option value="'+data+'">'+data+'</option>');
 			});
 		},
-		error: function(data) 
+		error: function(data)
 		{
 			alert("Fehler beim Laden der Daten");
 		}
@@ -279,7 +282,7 @@ function LoadGruppe(type)
 <td class="cmscontent" rowspan="3" valign="top">
 
 <FORM name="Auswahl" action="stpl_week.php">
-		
+
 	<table class="tabcontent"><tr><td valign="top"  width="30%">
 	<?php
 		if (isset($uid))
@@ -288,13 +291,13 @@ function LoadGruppe(type)
 			echo $p->t('lvplan/nichtVorhanden').' '.$p->t('lvplan/bitteWendenSieSichAn').'<A href="mailto:'.MAIL_ADMIN.'">Admin</A>!';
 	?>
   	<a class="Item" href="stpl_week.php?pers_uid=<?php echo $uid; ?>"><?php echo $p->t("lvplan/persoenlicherLvPlan");?></a><br><br>
-	</td><td valign="top">	
+	</td><td valign="top">
 	<?php
 	if(!defined('CIS_LVPLAN_EXPORT_ANZEIGEN') || CIS_LVPLAN_EXPORT_ANZEIGEN)
 	{
-		echo' 
+		echo'
 		<h2>'.$p->t('lvplan/persoenlichenAbonnieren').'</h2>
-		<div>	
+		<div>
 		<a class="Item" href="../../../cms/content.php?content_id='.$p->t('dms_link/lvplanSyncFAQ').'" target="_blank">'.$p->t('lvplan/anleitungLVPlanSync').'</a>
 		<br>';
 
@@ -309,13 +312,13 @@ function LoadGruppe(type)
 
 	echo '
   	</td></tr>
-	
+
 		<tr>
 			<td width="30%">
 				<h2>'.$p->t("lvplan/saalplan").'</h2>
 			</td>
 			<td>';
-			
+
 		if(!defined('CIS_LVPLAN_PERSONENAUSWAHL_ANZEIGEN') || CIS_LVPLAN_PERSONENAUSWAHL_ANZEIGEN)
 		{
 			echo '<h2>'.$p->t("lvplan/lektorInStudentIn").'</h2>';
@@ -330,21 +333,21 @@ function LoadGruppe(type)
         		<option value="stpl_week.php" selected>'.$p->t('lvplan/raumAuswaehlen').'</option>';
 		if(defined('CIS_SAALPLAN_ALLERAEUME_OPTION') && CIS_SAALPLAN_ALLERAEUME_OPTION)
 		    echo '<option value="stpl_week.php?type=ort&amp;ort_kurzbz=all" value="all">'.$p->t('lvplan/alleRaeume').'</option>';
-		
-		
-		    
+
+
+
         for ($i=0;$i<$num_rows_ort;$i++)
 		{
 			$row=$db->db_fetch_object ($result_ort, $i);
 			echo "<option value=\"stpl_week.php?type=ort&amp;ort_kurzbz=$row->ort_kurzbz\">$row->ort_kurzbz ($row->bezeichnung)</option>";
 		}
-				
+
 		echo '</select>';
-			 
+
 		if ($raumres)
 		{
 			echo '<BR><BR><A class="Item" href="stpl_reserve_list.php">'.$p->t("lvplan/reservierungenLoeschen").'</A><BR>';
-		}			
+		}
 
 		echo'</td>
 			<td valign="top">';
@@ -353,10 +356,10 @@ function LoadGruppe(type)
 		{
 			echo "<input class='search' placeholder='".$p->t('lvplan/nameEingeben')."' type='text' id='benutzer' size='32' value=''>";
 			echo "<input type='hidden' id='mitarbeiter_uid' name='pers_uid'>";
-			echo "<input type='hidden' id='uid' name='type' value='student'>";			
+			echo "<input type='hidden' id='uid' name='type' value='student'>";
 			echo "<input type='submit' value='Go' onclick='return checkSetBenutzer();'>";
 		}
-			
+
 		echo '
 			</td>
 		</tr>
@@ -373,14 +376,14 @@ function LoadGruppe(type)
 			<td width="20%" valign="middle">
 				<select style="width:200px;" id="stg_kz" name="stg_kz" onchange="LoadSemester()">
 					<option value="" selected>'.$p->t('lvplan/studiengangAuswaehlen').'</option>';
-				
+
 			$num_rows=$db->db_num_rows($result_stg);
 			for ($i=0;$i<$num_rows;$i++)
 			{
 				$row=$db->db_fetch_object ($result_stg, $i);
 				echo '<option value="'.$row->studiengang_kz.'">'.strtoupper($row->typ.$row->kurzbz).' ('.($sprache=='English' && $row->english!=''?$row->english:$row->bezeichnung).')</option>';
 			}
-				
+
 			echo '
 				</select>
 			</td>
@@ -441,14 +444,14 @@ if(!defined('CIS_LVPLAN_ARCHIVAUSWAHL_ANZEIGEN') || CIS_LVPLAN_ARCHIVAUSWAHL_ANZ
 		<td valign="bottom">
 			<select style="width:200px;" name="stg_kz_semplan" id="stg_kz_semplan" onchange="LoadSemester(\'_semplan\')">
 				<option value="" selected>'.$p->t('lvplan/studiengangAuswaehlen').'</option>';
-				
+
 	$num_rows=$db->db_num_rows($result_stg);
 	for ($i=0;$i<$num_rows;$i++)
 	{
 		$row=$db->db_fetch_object ($result_stg, $i);
 		echo '<option value="'.$row->studiengang_kz.'">'.strtoupper($row->typ.$row->kurzbz).' ('.($sprache=='English' && $row->english!=''?$row->english:$row->bezeichnung).')</option>';
 	}
-	
+
 	echo '
 			</select>
 		</td>
@@ -489,10 +492,10 @@ if(!defined('CIS_LVPLAN_ARCHIVAUSWAHL_ANZEIGEN') || CIS_LVPLAN_ARCHIVAUSWAHL_ANZ
 			</select>
 		</td></tr><tr>
 		<td valign="middle" >';
-		
+
 		$studiensemester = new studiensemester();
-		$studiensemester->getFinished();	
-				
+		$studiensemester->getFinished();
+
 		echo '<SELECT style="width:200px;" name="begin" id="studiensemester">';
 		echo '<OPTION value="" selected>'.$p->t('lvplan/studiensemesterAuswaehlen').'</OPTION>';
 		foreach($studiensemester->studiensemester as $row)
@@ -500,9 +503,9 @@ if(!defined('CIS_LVPLAN_ARCHIVAUSWAHL_ANZEIGEN') || CIS_LVPLAN_ARCHIVAUSWAHL_ANZ
 			$studiensemester->getTimestamp($row->studiensemester_kurzbz);
 			echo '<OPTION value="'.$studiensemester->begin->start.'&amp;ende='.$studiensemester->ende->ende.'">'.$row->studiensemester_kurzbz.'</OPTION>';
 		}
-				
+
 		echo '</SELECT>';
-		
+
 		echo '</td>
 		<td colspan="3" valign="bottom">
 			<input type="button" name="Abschicken" value="'.$p->t('lvplan/semesterplanLaden').'" onClick="jumpKalender()">

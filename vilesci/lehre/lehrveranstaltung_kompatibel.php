@@ -39,7 +39,10 @@ if (!$db = new basis_db())
 	<link rel="stylesheet" href="../../skin/fhcomplete.css" type="text/css">
 	<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
 	<link rel="stylesheet" href="../../skin/jquery.css" type="text/css"/>
-	<script src="../../include/js/jquery1.9.min.js" type="text/javascript"></script>
+	<script type="text/javascript" src="../../vendor/jquery/jqueryV1/jquery-1.12.4.min.js"></script>
+	<script type="text/javascript" src="../../vendor/christianbach/tablesorter/jquery.tablesorter.min.js"></script>
+	<script type="text/javascript" src="../../vendor/components/jqueryui/jquery-ui.min.js"></script>
+	<script type="text/javascript" src="../../include/js/jquery.ui.datepicker.translation.js"></script>
 	<link rel="stylesheet" href="../../skin/tablesort.css" type="text/css"/>
 	<script>
 		$(document).ready(function () {
@@ -49,7 +52,7 @@ if (!$db = new basis_db())
 			});
 			loadSemester();
 		});
-		
+
 		function loadSemester()
 		{
 			var studiengang_kz = $("#stgDropdown").val();
@@ -72,7 +75,7 @@ if (!$db = new basis_db())
 				loadLehrveranstaltungen();
 			});
 		}
-		
+
 		function loadLehrveranstaltungen()
 		{
 			var studiengang_kz = $("#stgDropdown").val();
@@ -133,9 +136,9 @@ if (!$db = new basis_db())
 					$("#lvDropdown").html(html);
 				});
 			}
-			
+
 		}
-		
+
 		function loadOrganisationseinheiten()
 		{
 			$.ajax(
@@ -163,7 +166,7 @@ if (!$db = new basis_db())
 				$("#lvDropdown").html(html);
 			});
 		}
-		
+
 		function saveKompatibleLv(lehrveranstaltung_id)
 		{
 			$.ajax(
@@ -184,14 +187,14 @@ if (!$db = new basis_db())
 				{
 					alert(data.errormsg);
 				}
-				
+
 				location.reload();
 			}).error(function(data)
 			{
 				alert(data.responseText);
 			});
 		}
-		
+
 		function deleteKompatibleLv(lehrveranstaltung_id, lehrveranstaltung_id_kompatibel)
 		{
 			$.ajax(
@@ -212,7 +215,7 @@ if (!$db = new basis_db())
 				{
 					alert(data.errormsg);
 				}
-				
+
 				location.reload();
 			}).error(function(data)
 			{
@@ -222,7 +225,7 @@ if (!$db = new basis_db())
 	</script>
 </head>
 <body>
-	
+
 <?php
 $user = get_uid();
 $rechte = new benutzerberechtigung();
@@ -277,7 +280,7 @@ if(count($kompatibleLvs)>0)
 				{
 					echo "<td><a href='#' onclick='javascript:deleteKompatibleLv(\"".$lehrveranstaltung_id."\",\"".$lv->lehrveranstaltung_id."\")'><img height='20' src='../../skin/images/false.png'></a></td>";
 				}
-				else 
+				else
 				{
 					echo "<td>&nbsp;</td>";
 				}
@@ -286,7 +289,7 @@ if(count($kompatibleLvs)>0)
 	echo "</tbody>
 		</table>";
 }
- else 
+ else
 {
 	echo "Derzeit sind keine kompatiblen Lehrveranstaltungen eingetragen.</br>";
 }

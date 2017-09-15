@@ -18,7 +18,7 @@
  * Authors: Andreas Oesterreicher 	<andreas.oesterreicher@technikum-wien.at>
  */
 /**
- * Diese Seite dient zum Anlegen und aendern von Newseintraegen 
+ * Diese Seite dient zum Anlegen und aendern von Newseintraegen
  */
 require_once('../config/cis.config.inc.php');
 require_once('../include/functions.inc.php');
@@ -43,7 +43,7 @@ if(isset($_REQUEST['studiengang_kz']))
 	$studiengang_kz=$_REQUEST['studiengang_kz'];
 else
 	$studiengang_kz='0';
-	
+
 if(isset($_REQUEST['semester']))
 	$semester = $_REQUEST['semester'];
 else
@@ -53,7 +53,7 @@ if(check_lektor($uid))
 	$is_lector=true;
 else
 	$is_lector=false;
-	
+
 if(!$rechte->isBerechtigt('basis/news'))
 	$berechtigt=false;
 else
@@ -69,7 +69,7 @@ $news_id = (isset($_REQUEST['news_id'])?$_REQUEST['news_id']:null);
 if($studiengang_kz=='0' && is_null($semester) && $news_id=='')
 {
 	if(!$berechtigt)
-		die('Sie haben keine Berechtigung zum Eintragen/Bearbeiten von allgemeinen News');	
+		die('Sie haben keine Berechtigung zum Eintragen/Bearbeiten von allgemeinen News');
 }
 
 $datum_obj = new datum();
@@ -84,16 +84,21 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<link href="../skin/style.css.php" rel="stylesheet" type="text/css">
 	<link rel="stylesheet" href="../skin/styles/jquery.css" type="text/css">
-	<link rel="stylesheet" href="../skin/styles/jquery-ui.css" type="text/css">
+	<link rel="stylesheet" href="../vendor/components/jqueryui/themes/base/jquery-ui.min.css" type="text/css">
 
-	<script src="../include/js/jquery.js" type="text/javascript"></script>
-	<script src="../include/js/jquery-ui.js" type="text/javascript"></script>
+	<link rel="stylesheet" type="text/css" href="../skin/jquery-ui-1.9.2.custom.min.css">
+<script type="text/javascript" src="../vendor/jquery/jqueryV1/jquery-1.12.4.min.js"></script>
+<script type="text/javascript" src="../vendor/christianbach/tablesorter/jquery.tablesorter.min.js"></script>
+<script type="text/javascript" src="../vendor/components/jqueryui/jquery-ui.min.js"></script>
+<script type="text/javascript" src="../include/js/jquery.ui.datepicker.translation.js"></script>
+<script type="text/javascript" src="../vendor/jquery/sizzle/sizzle.js"></script>
+	<script src="../vendor/components/jqueryui/jquery-ui.min.js" type="text/javascript"></script>
 	<script type="text/javascript" src="../include/tiny_mce/tiny_mce.js"></script>
-	
+
 	<title>'.$p->t('news/newsverwaltung').'</title>
 	<script type="text/javascript">
-	$(document).ready(function() 
-		{ 
+	$(document).ready(function()
+		{
 			$( ".datepicker_datum" ).datepicker({
 				 changeMonth: true,
 				 dateFormat: "dd.mm.yy",
@@ -109,12 +114,12 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
 		theme : "advanced",
 		language : "de",
 		file_browser_callback: "FHCFileBrowser",
-		
+
 		plugins : "spellchecker,pagebreak,style,layer,table,advhr,advimage,advlink,inlinepopups,searchreplace,print,contextmenu,paste,directionality,fullscreen,noneditable,visualchars,nonbreaking,xhtmlxtras",
-			
+
 		// Theme options
-		theme_advanced_buttons1 : "bold,italic,underline,|,justifyleft,justifycenter,justifyright,justifyfull,|,link,unlink,image,|,bullist,formatselect,fontsizeselect,pastetext", 
-    	theme_advanced_buttons2 : "", 
+		theme_advanced_buttons1 : "bold,italic,underline,|,justifyleft,justifycenter,justifyright,justifyfull,|,link,unlink,image,|,bullist,formatselect,fontsizeselect,pastetext",
+    	theme_advanced_buttons2 : "",
     	theme_advanced_buttons3 : "",
 	    theme_advanced_toolbar_location : "top",
         theme_advanced_toolbar_align : "center",
@@ -130,17 +135,17 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
         paste_strip_class_attributes: true,
         paste_retain_style_properties: "",
         paste_text_sticky: true,
-        setup : function(ed) 
-        {    
+        setup : function(ed)
+        {
         	ed.onInit.add(function(ed)
             {    ed.pasteAsPlainText = true;
                 ed.controlManager.setActive("pastetext", true);
             });
            }
-		
+
 		}
 	);
-	function FHCFileBrowser(field_name, url, type, win) 
+	function FHCFileBrowser(field_name, url, type, win)
 	{
 		cmsURL = "'.APP_ROOT.'cms/tinymce_dms.php?type="+type;
 		tinyMCE.activeEditor.windowManager.open({
@@ -158,7 +163,7 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
 		});
 		return false;
 	}
-	
+
 	</script>
 </head>
 <body>';
@@ -168,10 +173,10 @@ if(isset($_GET['action']) && $_GET['action']=='add_uebersetzung')
 {
 	$news = new news();
 	$news->load($_GET['news_id']);
-	
+
 	$content = new content();
 	$content->getContent($news->content_id);
-	
+
 	$content->new = true;
 	$content->sichtbar=false;
 	$content->sprache=$_GET['lang'];
@@ -182,7 +187,7 @@ if(isset($_GET['action']) && $_GET['action']=='add_uebersetzung')
 	$content->reviewvon='';
 	$content->reviewamum='';
 	$content->gesperrt_uid='';
-	
+
 	if($content->saveContentSprache())
 		$message.= '<span class="ok">'.$p->t('global/erfolgreichgespeichert').'</span>';
 	else
@@ -194,7 +199,7 @@ if(isset($_GET['action']) && $_GET['action']=='delete')
 {
 	if(!$rechte->isBerechtigt('basis/news',null, 'suid') && !$is_lector)
 		die($p->t('global/keineBerechtigungFuerDieseSeite'));
-		
+
 	if(isset($_GET['news_id']) && is_numeric($_GET['news_id']))
 	{
 		$news_id = $_GET['news_id'];
@@ -203,7 +208,7 @@ if(isset($_GET['action']) && $_GET['action']=='delete')
 		{
 			$studiengang_kz=$news->studiengang_kz;
 			$semester = $news->semester;
-		
+
 			if($news->delete($news_id))
 			{
 				$message.= '<span class="ok">'.$p->t('global/erfolgreichgelöscht').'</span>';
@@ -212,7 +217,7 @@ if(isset($_GET['action']) && $_GET['action']=='delete')
 			else
 			{
 				$message.= '<span class="error">'.$news->errormsg.'</span>';
-			}		
+			}
 		}
 		else
 		{
@@ -221,8 +226,8 @@ if(isset($_GET['action']) && $_GET['action']=='delete')
 	}
 	else
 		die($p->t('global/fehlerBeiDerParameteruebergabe'));
-	
-	
+
+
 }
 
 //Speichern eines Eintrags
@@ -231,9 +236,9 @@ if(isset($_POST['save']))
 	$save_error=false;
 	$news_id = $_POST['news_id'];
 	$mail = false;
-	
+
 	$news = new news();
-	
+
 	if($news_id!='')
 	{
 		$news->load($news_id);
@@ -253,12 +258,12 @@ if(isset($_POST['save']))
 	$news->updatevon = $uid;
 	$news->datum = $datum_obj->formatDatum($_POST['datum'],'Y-m-d');
 	$news->datum_bis = $datum_obj->formatDatum($_POST['datum_bis'],'Y-m-d');
-	
+
 	if($news->content_id=='')
 	{
 		$studiengang = new studiengang();
 		$studiengang->load($_POST['studiengang_kz']);
-		
+
 		$content = new content();
 		$content->template_kurzbz='news';
 		$content->oe_kurzbz=$studiengang->oe_kurzbz;
@@ -268,10 +273,10 @@ if(isset($_POST['save']))
 		$content->insertvon = $uid;
 		if(!$content->save(true))
 			die($content->errormsg);
-		
+
 		$news->content_id = $content->content_id;
 	}
-		
+
 	if(!$news->save())
 		die($news->errormsg);
 	$news_id = $news->news_id;
@@ -281,7 +286,7 @@ if(isset($_POST['save']))
 	foreach($_POST as $key=>$value)
 		if(mb_strstr($key,'contentsprache_id_'))
 			$sprachen[] = mb_substr($key, strlen('contentsprache_id_'));
-	
+
 	$sprachen = array_unique($sprachen);
 
 	foreach($sprachen as $lang)
@@ -289,7 +294,7 @@ if(isset($_POST['save']))
 		$content = new content();
 		if (isset($_POST['sichtbar_'.$lang]))
 			$sichtbar = true;
-		else 
+		else
 			$sichtbar = false;
 
 		if(isset($_POST['contentsprache_id_'.$lang]) && $_POST['contentsprache_id_'.$lang]!='')
@@ -307,13 +312,13 @@ if(isset($_POST['save']))
 			$content->new = true;
 			$content->sprache = $lang;
 		}
-		
+
 		$xml = '<news>';
 		$xml.='<verfasser><![CDATA['.$_POST['verfasser_'.$lang].']]></verfasser>';
 		$xml.='<betreff><![CDATA['.$_POST['betreff_'.$lang].']]></betreff>';
 		$xml.='<text><![CDATA['.$_POST['text_'.$lang].']]></text>';
 		$xml.='</news>';
-		
+
 		$content->content = $xml;
 		$content->sichtbar = $sichtbar;
 		$content->updateamum = date('Y-m-d H:i:s');
@@ -326,23 +331,23 @@ if(isset($_POST['save']))
 		}
 		if ($sichtbar == true)
 			$message.='<span class="ok">'.$p->t('news/eintragVeroeffentlicht',array($lang)).'</span><br/>';
-		else 
+		else
 			$message.='<span class="error">'.$p->t('news/eintragNochNichtVeroeffentlicht',array($lang)).'</span><br/>';
 	}
 	if(!$save_error)
 	{
 		$message.= '<span class="ok">'.$p->t('global/erfolgreichgespeichert').'</span>';
 	}
-	
+
 	if ($mail && $_POST['studiengang_kz']=='0' && $_POST['semester']==NULL)
 	{
 		$oe = new studiengang();
 		$oe->load($_POST['studiengang_kz']);
 		$oe_translate = $oe->oe_kurzbz;
-		
+
 		$translate = new benutzerfunktion();
 		$translate->getBenutzerFunktionen('translate', $oe_translate);
-		
+
 		if(count($translate->result)==0)
 			$translate->getBenutzerFunktionen('translate');
 		$to='';
@@ -358,7 +363,7 @@ if(isset($_POST['save']))
 			$subject = $p->t('news/neuerNewseintrag');
 			$text = $p->t('news/mailtext');
 			$texthtml = $p->t('news/mailtextHTML',array(APP_ROOT."cms/newsverwaltung.php?news_id=".$news_id,$content->titel,$_POST['text_'.DEFAULT_LANGUAGE])) ;
-		
+
 			$mail = new mail($to, $from, $subject, $text);
 			$mail->setHTMLContent($texthtml);
 			if($mail->send())
@@ -382,16 +387,16 @@ $sprachen = array(DEFAULT_LANGUAGE);
 $news = new news();
 if($news_id!='')
 {
-	$news->load($news_id);	
+	$news->load($news_id);
 	$sprachen = $content->getLanguages($news->content_id);
 	$studiengang_kz = $news->studiengang_kz;
 	$semester = $news->semester;
-	
+
 	if($studiengang_kz=='0' && $semester=='' && !$berechtigt)
 	{
-		die($p->t('global/keineBerechtigungFuerDieseSeite'));	
+		die($p->t('global/keineBerechtigungFuerDieseSeite'));
 	}
-		
+
 }
 if($studiengang_kz=='0' && $semester=='')
 	$type=$p->t('news/allgemein');
@@ -424,7 +429,7 @@ if($studiengang_kz!='')
 {
 	$studiengang = new studiengang();
 	$studiengang->getAll('typ, kurzbz', false);
-	
+
 	echo '<table>
 			<tr>
 				<td>'.$p->t('global/studiengang').'</td>
@@ -441,20 +446,20 @@ if($studiengang_kz!='')
 	echo '		</SELECT>
 				</td>
 			</tr>';
-	
+
 	echo '<tr>
 			<td>'.$p->t('global/semester').'</td>
 			<td>
 			<SELECT name="semester">';
 	echo '<OPTION value="">'.$p->t('news/allesemester').'</OPTION>';
-	
+
 	for($i=0;$i<=8;$i++)
 	{
 		if($semester!='' && $i==$semester)
 			$selected='selected';
 		else
 			$selected='';
-		
+
 		echo '<OPTION value="'.$i.'" '.$selected.'>'.$p->t('news/xsemester',array($i)).'</OPTION>';
 	}
 	if($studiengang_kz=='10006')
@@ -478,7 +483,7 @@ echo '</td><td align="right" valign="top">'.$message.'</td></tr></table>';
 //Tabs fuer alle vorhandenen Sprachen anlegen
 echo '<div id="tabs" style="font-size:80%;">
 		<ul class="css-tabs">';
-	
+
 foreach($sprachen as $lang)
 {
 	$sprache_obj = new sprache();
@@ -495,7 +500,7 @@ foreach($sprachen as $lang)
 {
 	$sprachindex[$lang]=$idx;
 	$idx++;
-	
+
 	$verfasser='';
 	$betreff='';
 	$text='';
@@ -503,7 +508,7 @@ foreach($sprachen as $lang)
 	if($news->content_id!='')
 	{
 		$content->getContent($news->content_id, $lang, null, null, false);
-	
+
 		$xml_inhalt = new DOMDocument();
 		if($content->content!='')
 		{
@@ -516,7 +521,7 @@ foreach($sprachen as $lang)
 			$betreff = $xml_inhalt->getElementsByTagName('betreff')->item(0)->nodeValue;
 		if($xml_inhalt->getElementsByTagName('text')->item(0))
 			$text = $xml_inhalt->getElementsByTagName('text')->item(0)->nodeValue;
-			
+
 		$sichtbar = $content->sichtbar;
 	}
 	echo '<div id="'.$lang.'">';
@@ -539,7 +544,7 @@ foreach($sprachen as $lang)
 				<td><input type="checkbox" name="sichtbar_'.$lang.'" '.($sichtbar==true?'checked':'').'></td>
 			</tr>
 		</table>';
-	
+
 	echo '</div>';
 }
 
@@ -552,8 +557,8 @@ if($news->content_id!='')
 		die($content->errormsg);
 	$sprache_obj = new sprache();
 	$sprache_obj->getAll(true);
-	
-	//Wenn noch nicht alle Uebersetzungen vorhanden sind, 
+
+	//Wenn noch nicht alle Uebersetzungen vorhanden sind,
 	//wird ein Link zum Erstellen der Uebersetzung angezeigt.
 	if(count($vorhandene_sprachen)<count($sprache_obj->result))
 	{
@@ -562,7 +567,7 @@ if($news->content_id!='')
 		foreach($sprache_obj->result as $row)
 		{
 			if(!in_array($row->sprache, $vorhandene_sprachen))
-				echo '<br /><a style="color:#008381" href="'.$_SERVER['PHP_SELF'].'?news_id='.$news_id.'&action=add_uebersetzung&lang='.$row->sprache.'">'.$row->bezeichnung_arr[$sprache].'</a>';		
+				echo '<br /><a style="color:#008381" href="'.$_SERVER['PHP_SELF'].'?news_id='.$news_id.'&action=add_uebersetzung&lang='.$row->sprache.'">'.$row->bezeichnung_arr[$sprache].'</a>';
 		}
 	}
 	else
@@ -576,20 +581,28 @@ echo '</div><br />';
 echo '<input type="hidden" id="tabselect" name="tabselect" value="">';
 echo '<input type="submit" name="save" value="'.$p->t('global/speichern').'" onclick="var idx=$( \'#tabs\').tabs(\'option\',\'selected\');$(\'#tabselect\').val(idx);">';
 echo '</form>';
-if(isset($_POST['tabselect']) && $_POST['tabselect']!='')
-	$tabselect=$_POST['tabselect'];
+if (isset($_POST['tabselect']) && $_POST['tabselect'] != '')
+{
+	$tabselect = $_POST['tabselect'];
+}
 else
 {
-	if(isset($_GET['lang']))
+	if (isset($_GET['lang']))
+	{
 		$tabselect = $sprachindex[$_GET['lang']];
+	}
 	else
+	{
 		$tabselect = $sprachindex[DEFAULT_LANGUAGE];
+	}
 }
 echo '<script type="text/javascript">
-	$(document).ready(function() {
-		$("#tabs").tabs();
-		$( "#tabs").tabs( "select", '.$tabselect.');
-	})
+		$(document).ready(function() {
+			$("#tabs").tabs({
+				active: 1
+			});
+			$("#tabs").tabs("option", "active", '.$tabselect.');
+		});
 	</script>
 ';
 

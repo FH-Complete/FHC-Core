@@ -42,13 +42,18 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<link href="../../skin/style.css.php" rel="stylesheet" type="text/css">
-	<link rel="stylesheet" type="text/css" href="../../skin/jquery-ui.css">
+	<link rel="stylesheet" type="text/css" href="../../vendor/components/jqueryui/themes/base/jquery-ui.min.css">
 	<link rel="stylesheet" type="text/css" href="../../skin/simplecropper.css">'.
 	cropCss().'
-	<script type="text/javascript" src="../../include/js/jquery.js"></script>
-	<script type="text/javascript" src="../../include/js/jquery.min.1.11.1.js"></script>
-	<script type="text/javascript" src="../../include/js/jquery.Jcrop.js"></script>
-	<script type="text/javascript" src="../../include/js/jquery.SimpleCropper.js"></script>
+	<link rel="stylesheet" type="text/css" href="../../skin/jquery-ui-1.9.2.custom.min.css">
+<script type="text/javascript" src="../../vendor/jquery/jqueryV1/jquery-1.12.4.min.js"></script>
+<script type="text/javascript" src="../../vendor/christianbach/tablesorter/jquery.tablesorter.min.js"></script>
+<script type="text/javascript" src="../../vendor/components/jqueryui/jquery-ui.min.js"></script>
+<script type="text/javascript" src="../../include/js/jquery.ui.datepicker.translation.js"></script>
+<script type="text/javascript" src="../../vendor/jquery/sizzle/sizzle.js"></script>
+	<script type="text/javascript" src="../../vendor/jquery/jqueryV1/jquery-1.12.4.min.js"></script>
+	<script type="text/javascript" src="../../vendor/tapmodo/Jcrop/js/Jcrop.min.js"></script>
+	<script type="text/javascript" src="../../vendor/tomazdragar/SimpleCropper/scripts/jquery.SimpleCropper.js"></script>
 	<script type="text/javascript" src="../../include/js/cropper.js"></script>
 	<title>'.$p->t('profil/Bildupload').'</title>
 </head>
@@ -59,11 +64,11 @@ function resize($filename, $width, $height)
 {
 		$ext = explode('.',$_FILES['bild']['name']);
 		$ext = strtolower($ext[count($ext)-1]);
-	
+
 		// Hoehe und Breite neu berechnen
 		list($width_orig, $height_orig) = getimagesize($filename);
-	
-		if ($width && ($width_orig < $height_orig)) 
+
+		if ($width && ($width_orig < $height_orig))
 		{
 		   $width = ($height / $height_orig) * $width_orig;
 		}
@@ -71,19 +76,19 @@ function resize($filename, $width, $height)
 		{
 		   $height = ($width / $width_orig) * $height_orig;
 		}
-		
-		$image_p = imagecreatetruecolor($width, $height);                       
-				
+
+		$image_p = imagecreatetruecolor($width, $height);
+
 		$image = imagecreatefromjpeg($filename);
-		
+
 		//Bild nur verkleinern aber nicht vergroessern
 		if($width_orig>$width || $height_orig>$height)
 			imagecopyresampled($image_p, $image, 0, 0, 0, 0, $width, $height, $width_orig, $height_orig);
-		else 
+		else
 			$image_p = $image;
-			
+
 		imagejpeg($image_p, $filename, 80);
-			
+
 		@imagedestroy($image_p);
 		@imagedestroy($image);
 }
@@ -93,15 +98,15 @@ if(isset($_GET['person_id']))
 {
 	$benutzer = new benutzer();
 	$benutzer->load($user);
-		
+
 	if($benutzer->person_id!=$_GET['person_id'])
 		die($p->t('global/keineBerechtigungFuerDieseSeite'));
-		
+
 	$fs = new fotostatus();
 	if($fs->akzeptiert($benutzer->person_id))
 		die($p->t('profil/profilfotoUploadGesperrt'));
 }
-else 
+else
 	die($p->t('global/fehlerBeiDerParameteruebergabe'));
 
 echo '<br>';
@@ -130,7 +135,7 @@ function cropCss() {
 		  The outer-most container in a typical Jcrop instance
 		  If you are having difficulty with formatting related to styles
 		  on a parent element, place any fixes here or in a like selector
-		
+
 		  You can also style this element if you want to add a border, etc
 		  A better method for styling can be seen below with .jcrop-light
 		  (Add a class to the holder and style elements for that extended class)
@@ -301,24 +306,24 @@ function cropCss() {
 		.simple-cropper-images{
 		  width: 820px;
 		  margin: 0 auto 20px;
-		  
+
 		}
-		
+
 		.cropme{
 		  background-image: url(../../skin/images/photoupload.png);
 		}
-		
+
 		.cropme:hover{
-			
+
 		}
-		
+
 		.text{
 		  font-family: arial;
 		  font-size: 14px;
 		  color: #4e4e4e;
 		  margin-bottom: 20px;
 		}
-		
+
 		.code{
 		  font-family: arial;
 		  font-size: 14px;
@@ -332,7 +337,7 @@ function cropCss() {
 		  height:0;
 		  overflow:hidden;
 		}
-		
+
 		#modal{
 		  z-index: 10;
 		  position: fixed;
@@ -344,7 +349,7 @@ function cropCss() {
 		  opacity: 0.95;
 		  display: none;
 		}
-		
+
 		#preview{
 		  z-index: 11;
 		  position: fixed;
@@ -357,7 +362,7 @@ function cropCss() {
 		  font-size: 0px;
 		  line-height: 0px;
 		}
-		
+
 		#preview .buttons{
 		  width: 36px;
 		  position: absolute;

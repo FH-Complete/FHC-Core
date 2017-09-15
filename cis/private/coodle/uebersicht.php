@@ -23,16 +23,16 @@
  */
 require_once('../../../config/cis.config.inc.php');
 require_once('../../../include/coodle.class.php');
-require_once('../../../include/functions.inc.php'); 
+require_once('../../../include/functions.inc.php');
 require_once('../../../include/phrasen.class.php');
-require_once('../../../include/datum.class.php'); 
+require_once('../../../include/datum.class.php');
 require_once('../../../include/benutzer.class.php');
 
-$lang = getSprache(); 
+$lang = getSprache();
 
-$p = new phrasen($lang); 
+$p = new phrasen($lang);
 
-$uid = get_uid(); 
+$uid = get_uid();
 $message = '';
 
 echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
@@ -45,31 +45,34 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
 		<link href="../../../skin/style.css.php" rel="stylesheet" type="text/css">
 		<link href="../../../skin/tablesort.css" rel="stylesheet" type="text/css">
 		<link href="../../../skin/jquery.css" rel="stylesheet"  type="text/css"/>
-		<script src="../../../include/js/jquery1.9.min.js" type="text/javascript"></script> 
+		<script type="text/javascript" src="../../../vendor/jquery/jqueryV1/jquery-1.12.4.min.js"></script>
+		<script type="text/javascript" src="../../../vendor/christianbach/tablesorter/jquery.tablesorter.min.js"></script>
+		<script type="text/javascript" src="../../../vendor/components/jqueryui/jquery-ui.min.js"></script>
+		<script type="text/javascript" src="../../../include/js/jquery.ui.datepicker.translation.js"></script>
 		<script type="text/javascript">
-		$(document).ready(function() 
+		$(document).ready(function()
 		{
 			$("#myTableFiles").tablesorter(
 			{
 				sortList: [[3,0]],
 				widgets: ["zebra"]
-			}); 
-		  
-		}); 
+			});
 
-		$(document).ready(function() 
+		});
+
+		$(document).ready(function()
 		{
 			$("#myTableFiles2").tablesorter(
 			{
 				sortList: [[3,1]],
 				widgets: ["zebra"]
-			}); 
-		  
-		}); 
-	   
+			});
+
+		});
+
 		</script>
 		<style>
-			.wrapper h4 
+			.wrapper h4
 			{
 				font-size: 17px;
 				margin-top: 0;
@@ -93,9 +96,9 @@ $method = isset($_GET['method'])?$_GET['method']:'';
 // coodle umfrage löschen
 if($method=='delete')
 {
-	$coodle= new coodle(); 
+	$coodle= new coodle();
 	$coodle_id = isset($_GET['coodle_id'])?$_GET['coodle_id']:'';
-	
+
 	if($coodle->load($coodle_id))
 	{
 		// löschen nur von eigenen Umfragen möglich
@@ -142,8 +145,8 @@ echo '
 	</thead><tbody>';
 
 $beendeteUmfragen='';
-$datum = new datum(); 
-$coodle = new coodle(); 
+$datum = new datum();
+$coodle = new coodle();
 $coodle->loadStatus();
 $coodle->getCoodleFromUser($uid);
 foreach($coodle->result as $c)
@@ -158,7 +161,7 @@ foreach($coodle->result as $c)
 			<td>'.$coodle->convert_html_chars($datum->formatDatum($c->endedatum, 'd.m.Y')).'</td>
 			<td nowrap>
 			';
-	
+
 	// Bearbeiten Button
 	if((($c->coodle_status_kurzbz=='neu')||($c->coodle_status_kurzbz=='laufend')) && $uid==$c->ersteller_uid)
 	{
@@ -166,7 +169,7 @@ foreach($coodle->result as $c)
 			$title=$p->t('coodle/umfrageWurdeBereitsGestartet');
 		else
 			$title=$p->t('coodle/bearbeiten');
-		
+
 		$row.= '&nbsp;<a href="stammdaten.php?coodle_id='.$c->coodle_id.'">
 					<img src="../../../skin/images/edit.png" title="'.$title.'">
 				</a>';
@@ -174,10 +177,10 @@ foreach($coodle->result as $c)
 	else
 	{
 		$title=$p->t('global/keineBerechtigung');
-		
-		$row.= '&nbsp;<img src="../../../skin/images/edit_grau.png" title="'.$title.'">';		
+
+		$row.= '&nbsp;<img src="../../../skin/images/edit_grau.png" title="'.$title.'">';
 	}
-	
+
 	// Storno Button
 	if($uid==$c->ersteller_uid && $c->coodle_status_kurzbz!='storniert' && $c->coodle_status_kurzbz!='abgeschlossen')
 	{
@@ -193,7 +196,7 @@ foreach($coodle->result as $c)
 	// Umfrage Button
 	if($c->coodle_status_kurzbz=='laufend' || $c->coodle_status_kurzbz=='abgeschlossen')
 	{
-		$row.= '&nbsp; <a href="../../public/coodle.php?coodle_id='.$c->coodle_id.'"> 
+		$row.= '&nbsp; <a href="../../public/coodle.php?coodle_id='.$c->coodle_id.'">
 					<img src="../../../skin/images/date_go.png" title="'.$p->t('coodle/zurUmfrage').'">
 				</a>';
 	}
@@ -203,14 +206,14 @@ foreach($coodle->result as $c)
 			$title=$p->t('coodle/umfrageNochNichtGestartet');
 		else
 			$title=$p->t('global/keineBerechtigung');
-		
+
 		$row.=' &nbsp; <img src="../../../skin/images/date_go_grau.png" title="'.$title.'">';
 	}
-		
-	$row.='  
+
+	$row.='
 			</td>
 		</tr>';
-	
+
 	if($c->coodle_status_kurzbz=='laufend' || $c->coodle_status_kurzbz=='neu')
 		echo $row;
 	else
@@ -221,10 +224,10 @@ echo '</tbody></table></div>';
 if($beendeteUmfragen!='')
 {
 	echo '<br>
-	
+
 	<div class="wrapper">
 	<h4>'.$p->t('coodle/beendeteUmfragen').'</h4>
-	
+
 	<table id="myTableFiles2" class="tablesorter">
 		<thead>
 			<tr>

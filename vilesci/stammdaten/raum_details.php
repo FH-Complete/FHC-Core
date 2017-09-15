@@ -28,17 +28,17 @@
 	require_once('../../include/ortraumtyp.class.php');
 	require_once('../../include/raumtyp.class.php');
 	require_once('../../include/standort.class.php');
-	
+
 	if (!$db = new basis_db())
 		die('Es konnte keine Verbindung zum Server aufgebaut werden.');
-	
+
 	$user = get_uid();
 	$rechte = new benutzerberechtigung();
 	$rechte->getBerechtigungen($user);
-	
+
 	if(!$rechte->isBerechtigt('basis/ort',null,'s'))
 		die('Sie haben keine Berechtigung fuer diese Seite');
-	
+
 	$reloadstr = '';  // neuladen der liste im oberen frame
 	$htmlstr = '';
 	$errorstr = ''; //fehler beim insert
@@ -46,7 +46,7 @@
 	$chk = '';
 
 	$sg_var = new ort();
-		
+
 	$ort_kurzbz = '';
 	$bezeichnung = '';
 	$planbezeichnung = '';
@@ -67,14 +67,14 @@
 	$gebteil='';
 	$m2='';
 	$arbeitsplaetze='';
-	
+
 	$neu = "true";
-	
+
 	if(isset($_POST["schick"]))
 	{
 		if(!$rechte->isBerechtigt('basis/ort', null, 'suid'))
 			die('Sie haben keine Berechtigung fuer diese Aktion');
-	
+
 		$ort_kurzbz = $_POST["ort_kurzbz"];
 		$bezeichnung = $_POST["bezeichnung"];
 		$planbezeichnung = $_POST["planbezeichnung"];
@@ -88,12 +88,12 @@
 		$telefonklappe = $_POST["telefonklappe"];
 		$content_id = $_POST['content_id'];
 		$ort_kurzbz_old = $_POST["ort_kurzbz_old"];
-		
+
 		$m2 = str_replace(',','.',$_POST["m2"]);
 		$oe_kurzbz = $_POST["oe_kurzbz"];
 		$gebteil = $_POST["gebteil"];
 		$arbeitsplaetze = $_POST["arbeitsplaetze"];
-		
+
 		$sg_update = new ort();
 		$sg_update->ort_kurzbz = $ort_kurzbz;
 		$sg_update->bezeichnung = $bezeichnung;
@@ -115,7 +115,7 @@
 		$sg_update->gebteil = $gebteil;
 		$sg_update->oe_kurzbz = $oe_kurzbz;
 		$sg_update->arbeitsplaetze = $arbeitsplaetze;
-		
+
 		if ($_POST["neu"] == "true")
 			$sg_update->new = 1;
 
@@ -207,13 +207,13 @@
 		{
 			$htmlstr.='
 				<script>
-				$(document).ready(function() 
-				{ 
+				$(document).ready(function()
+				{
 					$("#raumtyptable").tablesorter(
 					{
 						sortList: [[2,0]],
 						widgets: ["zebra"]
-					}); 
+					});
 				});
 				</script>
 				<table class="tablesorter" id="raumtyptable">
@@ -258,15 +258,15 @@
 				Kurzbz: <input type="text" name="raumtyp_kurzbz" size="16" maxlength="16">
 				<input type="submit" value="Neuen Raumtyp anlegen">
 			</form>';
-		
+
 		}
 	}
 	else
-	{	
+	{
 		if($ort_kurzbz != '')
 		    $htmlstr .= '<br><div class="kopf">Raum <b>'.$ort_kurzbz.'</b></div>';
 		else
-		    $htmlstr .='<br><div class="kopf">Neuer Raum</div>'; 
+		    $htmlstr .='<br><div class="kopf">Neuer Raum</div>';
 		$htmlstr .= '
 			<form action="raum_details.php" method="POST" name="raumform">
 				<table class="detail">
@@ -306,9 +306,9 @@
 			{
 				if($row->standort_id==$standort_id)
 					$selected='selected';
-				else 
+				else
 					$selected='';
-			
+
 				$htmlstr.='<OPTION value="'.$row->standort_id.'" '.$selected.'>'.$row->kurzbz.'</OPTION>';
 			}
 		}
@@ -317,7 +317,7 @@
 							</SELECT>
 						</td>
 						<td>Gebäudeteil</td>
-						<td><input class="detail" type="text" name="gebteil" size="5" maxlength="32" value="'.$gebteil.'" onchange="submitable()"></td>					
+						<td><input class="detail" type="text" name="gebteil" size="5" maxlength="32" value="'.$gebteil.'" onchange="submitable()"></td>
 					</tr>
 					<tr>
 						<td valign="top">Lehre</td>
@@ -373,7 +373,7 @@
 		}
 		$htmlstr.='</select>';
 		$htmlstr.='
-						</td>						
+						</td>
 					</tr>
 					<tr>
 						<td>Telefonklappe</td>
@@ -410,7 +410,10 @@
 	<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
 	<link rel="stylesheet" href="../../skin/jquery.css" type="text/css">
 	<link rel="stylesheet" href="../../skin/tablesort.css" type="text/css"/>
-	<script src="../../include/js/jquery1.9.min.js"></script>
+	<script type="text/javascript" src="../../vendor/jquery/jqueryV1/jquery-1.12.4.min.js"></script>
+	<script type="text/javascript" src="../../vendor/christianbach/tablesorter/jquery.tablesorter.min.js"></script>
+	<script type="text/javascript" src="../../vendor/components/jqueryui/jquery-ui.min.js"></script>
+	<script type="text/javascript" src="../../include/js/jquery.ui.datepicker.translation.js"></script>
 
 <script type="text/javascript">
 function unchanged()
