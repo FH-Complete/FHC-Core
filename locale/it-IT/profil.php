@@ -1,6 +1,6 @@
 <?php
 $this->phrasen['profil/AccountInaktiv']='Attenzione: questo account non è più attivo';
-$this->phrasen['profil/adminstration']='Amministrazione';
+$this->phrasen['profil/adminstration']='Gestione notizie';
 $this->phrasen['profil/alias']='alias';
 $this->phrasen['profil/alleStudentenVon']='Tutti gli studenti di';
 $this->phrasen['profil/ausgegebenAm']='';
