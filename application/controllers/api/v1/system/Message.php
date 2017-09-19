@@ -27,17 +27,17 @@ class Message extends APIv1_Controller
 	}
 
 	/**
-	 * @return void
+	 * getMessagesByPersonID
 	 */
 	public function getMessagesByPersonID()
 	{
 		$person_id = $this->get('person_id');
 		$all = $this->get('all');
-		
+
 		if (isset($person_id))
 		{
 			$result = $this->messagelib->getMessagesByPerson($person_id, $all);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -45,19 +45,19 @@ class Message extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	/**
-	 * @return void
+	 * getMessagesByUID
 	 */
 	public function getMessagesByUID()
 	{
 		$uid = $this->get('uid');
 		$all = $this->get('all');
-		
+
 		if (isset($uid))
 		{
 			$result = $this->messagelib->getMessagesByUID($uid, $all);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -65,18 +65,18 @@ class Message extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	/**
-	 * @return void
+	 * getMessagesByToken
 	 */
 	public function getMessagesByToken()
 	{
 		$token = $this->get('token');
-		
+
 		if (isset($token))
 		{
 			$result = $this->messagelib->getMessageByToken($token);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -84,19 +84,19 @@ class Message extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	/**
-	 * @return void
+	 * getSentMessagesByPerson
 	 */
 	public function getSentMessagesByPerson()
 	{
 		$person_id = $this->get('person_id');
 		$all = $this->get('all');
-		
+
 		if (isset($person_id))
 		{
 			$result = $this->messagelib->getSentMessagesByPerson($person_id, $all);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -104,18 +104,18 @@ class Message extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	/**
-	 * @return void
+	 * getCountUnreadMessages
 	 */
 	public function getCountUnreadMessages()
 	{
 		$person_id = $this->get('person_id');
-		
+
 		if (isset($person_id))
 		{
 			$result = $this->messagelib->getCountUnreadMessages($person_id);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -123,14 +123,14 @@ class Message extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	/**
-	 * @return void
+	 * postMessage
 	 */
 	public function postMessage()
 	{
 		$validation = $this->_validatePostMessage($this->post());
-		
+
 		if (isSuccess($validation))
 		{
 			$result = $this->messagelib->sendMessage(
@@ -140,10 +140,10 @@ class Message extends APIv1_Controller
 				$this->post()['body'],
 				PRIORITY_NORMAL,
 				isset($this->post()['relationmessage_id']) ? $this->post()['relationmessage_id'] : null,
-				isset($this->post()['oe_kurzbz']) ? $this->post()['oe_kurzbz'] : null,
+				isset($this->post()['oe_kurzbz']) ? $this->post()['oe_kurzbz'] : null, // Sender organisation unit
 				isset($this->post()['multiPartMime']) ? $this->post()['multiPartMime'] : true
 			);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -151,27 +151,27 @@ class Message extends APIv1_Controller
 			$this->response($validation, REST_Controller::HTTP_OK);
 		}
 	}
-	
+
 	/**
-	 * @return void
+	 * postMessageVorlage
 	 */
 	public function postMessageVorlage()
 	{
 		$validation = $this->_validatePostMessageVorlage($this->post());
-		
+
 		if (isSuccess($validation))
 		{
 			$result = $this->messagelib->sendMessageVorlage(
 				isset($this->post()['sender_id']) ? $this->post()['sender_id'] : null,
 				isset($this->post()['receiver_id']) ? $this->post()['receiver_id'] : null,
 				$this->post()['vorlage_kurzbz'],
-				isset($this->post()['oe_kurzbz']) ? $this->post()['oe_kurzbz'] : null,
+				isset($this->post()['oe_kurzbz']) ? $this->post()['oe_kurzbz'] : null, // Sender organisation unit
 				$this->post()['data'],
 				isset($this->post()['relationmessage_id']) ? $this->post()['relationmessage_id'] : null,
 				isset($this->post()['orgform_kurzbz']) ? $this->post()['orgform_kurzbz'] : null,
 				isset($this->post()['multiPartMime']) ? $this->post()['multiPartMime'] : true
 			);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -179,16 +179,16 @@ class Message extends APIv1_Controller
 			$this->response($validation, REST_Controller::HTTP_OK);
 		}
 	}
-	
+
 	/**
-	 * @return void
+	 * postChangeStatus
 	 */
 	public function postChangeStatus()
 	{
 		$person_id = $this->post()['person_id'];
 		$message_id = $this->post()['message_id'];
 		$status = $this->post()['status'];
-		
+
 		if (isset($person_id) && isset($message_id) && isset($status) &&
 			in_array($status, array(MSG_STATUS_UNREAD, MSG_STATUS_READ, MSG_STATUS_ARCHIVED, MSG_STATUS_DELETED)))
 		{
@@ -201,7 +201,10 @@ class Message extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
+	/**
+	 * _validatePostMessage
+	 */
 	private function _validatePostMessage($message = null)
 	{
 		if (!isset($message))
@@ -220,10 +223,13 @@ class Message extends APIv1_Controller
 		{
 			return error('If a receiver_id is not given a oe_kurzbz must be specified');
 		}
-		
+
 		return success('Input data are valid');
 	}
-	
+
+	/**
+	 * _validatePostMessageVorlage
+	 */
 	private function _validatePostMessageVorlage($message = null)
 	{
 		if (!isset($message))
@@ -242,7 +248,7 @@ class Message extends APIv1_Controller
 		{
 			return error('If a receiver_id is not given a oe_kurzbz must be specified');
 		}
-		
+
 		return success('Input data are valid');
 	}
 }

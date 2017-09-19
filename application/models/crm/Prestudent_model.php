@@ -88,7 +88,7 @@ class Prestudent_model extends DB_Model
 	)
 	{
 		if (isError($ent = $this->isEntitled($this->dbTable, PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR))) return $ent;
-		
+
 		$this->addSelect(
 			'p.person_id,
 			prestudent_id,
@@ -178,5 +178,18 @@ class Prestudent_model extends DB_Model
 		);
 
 		return $this->loadWhere($parametersArray);
+	}
+
+	/**
+	 * getOrganisationunits
+	 */
+	public function getOrganisationunits($prestudent_id)
+	{
+		$query = 'SELECT p.prestudent_id, s.oe_kurzbz
+					FROM public.tbl_prestudent p
+			  INNER JOIN public.tbl_studiengang s USING(studiengang_kz)
+				   WHERE prestudent_id %s ?';
+
+		return $this->execQuery(sprintf($query, is_array($prestudent_id) ? 'IN' : '='), array($prestudent_id));
 	}
 }
