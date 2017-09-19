@@ -87,7 +87,7 @@ class Recipient_model extends DB_Model
 	/**
 	 * Get all received messages for a person identified by person_id
 	 */
-	public function getMessagesByPerson($person_id, $all)
+	public function getMessagesByPerson($person_id, $oe_kurzbz, $all)
 	{
 		// Checks if the operation is permitted by the API caller
 		if (isError($ent = $this->isEntitled('public.tbl_msg_recipient', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)))
@@ -124,8 +124,7 @@ class Recipient_model extends DB_Model
 							 %s
 						  ORDER BY insertamum DESC
 						) s ON (m.message_id = s.message_id AND r.person_id = s.person_id)
-				 WHERE r.person_id = ?
-			  ORDER BY r.message_id DESC, s.status DESC';
+				 WHERE r.person_id = ?';
 
 		$parametersArray = array($person_id);
 
@@ -139,16 +138,24 @@ class Recipient_model extends DB_Model
 			$sql = sprintf($sql, 'WHERE person_id = ? AND message_id NOT IN (SELECT message_id FROM public.tbl_msg_status WHERE status >= 3 AND person_id = ?)');
 		}
 
+		if ($oe_kurzbz != null)
+		{
+			array_push($parametersArray, $oe_kurzbz);
+			$sql .= ' AND m.oe_kurzbz = ?';
+		}
+
+		$sql .= ' ORDER BY r.message_id DESC, s.status DESC';
+
 		return $this->execQuery($sql, $parametersArray);
 	}
 
 	/**
 	 * Get all received messages for a person identified by uid
 	 */
-	public function getMessagesByUID($uid, $all)
+	public function getMessagesByUID($uid, $oe_kurzbz, $all)
 	{
 		// Checks if the operation is permitted by the API caller
-		// @ToDo: Define the special right for reading own messages 'basis/message:own'
+		// TODO: Define the special right for reading own messages 'basis/message:own'
 		// if same user
 		if ($uid === getAuthUID())
 		{
@@ -163,15 +170,14 @@ class Recipient_model extends DB_Model
 		}
 
 		// get Data
-		$sql = 'SELECT b.uid,
+		$sql = 'SELECT DISTINCT ON (r.message_id) r.message_id,
 						m.person_id,
-						m.message_id,
 						m.subject,
 						m.body,
 						m.priority,
+						m.insertamum,
 						m.relationmessage_id,
 						m.oe_kurzbz,
-						m.insertamum,
 						p.anrede,
 						p.titelpost,
 						p.titelpre,
@@ -185,14 +191,26 @@ class Recipient_model extends DB_Model
 						JOIN public.tbl_person p ON (r.person_id = p.person_id)
 						JOIN public.tbl_benutzer b ON (r.person_id = b.person_id)
 						JOIN (
-							SELECT * FROM public.tbl_msg_status ORDER BY insertamum DESC LIMIT 1
-						) s ON (r.message_id = s.message_id AND r.person_id = s.person_id)
+							SELECT message_id, person_id, status, statusinfo, insertamum
+							  FROM public.tbl_msg_status
+						  ORDER BY insertamum DESC
+						) s ON (m.message_id = s.message_id AND r.person_id = s.person_id)
 				 WHERE b.uid = ?';
 
-		if (! $all)
-			$sql .= ' AND (status < 3 OR status IS NULL)';
+		$parametersArray = array($uid);
 
-		return $this->execQuery($sql, array($uid));
+		if ($all == 'true')
+		{
+			$sql .= ' AND (status < 3 OR status IS NULL)';
+		}
+
+		if ($oe_kurzbz != null)
+		{
+			array_push($parametersArray, $oe_kurzbz);
+			$sql .= ' AND m.oe_kurzbz = ?';
+		}
+
+		return $this->execQuery($sql, $parametersArray);
 	}
 
 	/**
@@ -270,7 +288,7 @@ class Recipient_model extends DB_Model
 	/**
 	 * Get all unread messages for a person identified by person_id
 	 */
-	public function getCountUnreadMessages($person_id)
+	public function getCountUnreadMessages($person_id, $oe_kurzbz)
 	{
 		// Checks if the operation is permitted by the API caller
 		if (isError($ent = $this->isEntitled('public.tbl_msg_recipient', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)))
@@ -279,8 +297,9 @@ class Recipient_model extends DB_Model
 			return $ent;
 
 		$sql = 'SELECT COUNT(r.message_id) AS unreadMessages
-				  FROM public.tbl_msg_recipient r JOIN public.tbl_msg_status s
-					ON (r.message_id = s.message_id AND r.person_id = s.person_id)
+				  FROM public.tbl_msg_recipient r
+				  JOIN public.tbl_msg_status s ON (r.message_id = s.message_id AND r.person_id = s.person_id)
+				  JOIN public.tbl_msg_message m ON (r.message_id = m.message_id)
 				 WHERE r.person_id = ?
 				   AND s.status = ?
 				   AND r.message_id NOT IN (
@@ -292,6 +311,12 @@ class Recipient_model extends DB_Model
 						)';
 
 		$parametersArray = array($person_id, MSG_STATUS_UNREAD, $person_id, MSG_STATUS_UNREAD);
+
+		if ($oe_kurzbz != null)
+		{
+			array_push($parametersArray, $oe_kurzbz);
+			$sql .= ' AND m.oe_kurzbz = ?';
+		}
 
 		return $this->execQuery($sql, $parametersArray);
 	}

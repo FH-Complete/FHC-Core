@@ -32,11 +32,12 @@ class Message extends APIv1_Controller
 	public function getMessagesByPersonID()
 	{
 		$person_id = $this->get('person_id');
+		$oe_kurzbz = $this->get('oe_kurzbz'); // prestudent organisation unit
 		$all = $this->get('all');
 
 		if (isset($person_id))
 		{
-			$result = $this->messagelib->getMessagesByPerson($person_id, $all);
+			$result = $this->messagelib->getMessagesByPerson($person_id, $oe_kurzbz, $all);
 
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
@@ -52,11 +53,12 @@ class Message extends APIv1_Controller
 	public function getMessagesByUID()
 	{
 		$uid = $this->get('uid');
+		$oe_kurzbz = $this->get('oe_kurzbz'); // prestudent organisation unit
 		$all = $this->get('all');
 
 		if (isset($uid))
 		{
-			$result = $this->messagelib->getMessagesByUID($uid, $all);
+			$result = $this->messagelib->getMessagesByUID($uid, $oe_kurzbz, $all);
 
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
@@ -91,11 +93,12 @@ class Message extends APIv1_Controller
 	public function getSentMessagesByPerson()
 	{
 		$person_id = $this->get('person_id');
+		$oe_kurzbz = $this->get('oe_kurzbz'); // prestudent organisation unit
 		$all = $this->get('all');
 
 		if (isset($person_id))
 		{
-			$result = $this->messagelib->getSentMessagesByPerson($person_id, $all);
+			$result = $this->messagelib->getSentMessagesByPerson($person_id, $oe_kurzbz, $all);
 
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
@@ -111,10 +114,11 @@ class Message extends APIv1_Controller
 	public function getCountUnreadMessages()
 	{
 		$person_id = $this->get('person_id');
+		$oe_kurzbz = $this->get('oe_kurzbz'); // prestudent organisation unit
 
 		if (isset($person_id))
 		{
-			$result = $this->messagelib->getCountUnreadMessages($person_id);
+			$result = $this->messagelib->getCountUnreadMessages($person_id, $oe_kurzbz);
 
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
