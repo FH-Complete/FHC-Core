@@ -138,7 +138,7 @@ class Studiengang_model extends DB_Model
 	/**
 	 * getStudiengangBewerbung
 	 */
-	public function getStudiengangBewerbung()
+	public function getStudiengangBewerbung($oe_kurzbz = null)
 	{
 		if (isError($ent = $this->isEntitled($this->dbTable, PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR))) return $ent;
 
@@ -161,21 +161,45 @@ class Studiengang_model extends DB_Model
 		$this->addOrder('public.tbl_studiengang.bezeichnung');
 		$this->addOrder('lehre.tbl_studienplan.studienplan_id');
 
+		$where = 'public.tbl_studiengang.aktiv = TRUE
+					AND public.tbl_studiengang.onlinebewerbung = TRUE
+					AND (
+						(tbl_bewerbungstermine.beginn <= NOW() AND tbl_bewerbungstermine.ende >= NOW())
+						OR tbl_bewerbungstermine.beginn IS NULL
+					)
+					AND ss.studiensemester_kurzbz IN (
+						SELECT DISTINCT studiensemester_kurzbz
+						  FROM public.tbl_bewerbungstermine
+						 WHERE beginn <= NOW() AND ende >= NOW()
+					)
+					AND ss.semester = 1
+					AND lehre.tbl_studienplan.aktiv = TRUE';
+
+		if ($oe_kurzbz != null)
+		{
+			$where .= ' AND public.tbl_studiengang.oe_kurzbz IN (
+							WITH RECURSIVE organizations(_pk, _ppk) AS
+								(
+									SELECT o.oe_kurzbz, o.oe_parent_kurzbz
+									  FROM public.tbl_organisationseinheit o
+									 WHERE o.oe_parent_kurzbz IS NULL
+									   AND o.oe_kurzbz = '.$this->escape($oe_kurzbz).'
+								 UNION ALL
+									SELECT o.oe_kurzbz, o.oe_parent_kurzbz
+									  FROM public.tbl_organisationseinheit o INNER JOIN organizations orgs ON (o.oe_parent_kurzbz = orgs._pk)
+								)
+								SELECT orgs._pk
+								FROM organizations orgs
+							)';
+		}
+
 		$result = $this->loadTree(
 			'public.tbl_studiengang',
 			array(
 				'lehre.tbl_studienplan',
 				'lehre.tbl_akadgrad'
 			),
-			'public.tbl_studiengang.aktiv = TRUE
-			AND public.tbl_studiengang.onlinebewerbung = TRUE
-			AND ((tbl_bewerbungstermine.beginn <= NOW() AND tbl_bewerbungstermine.ende >= NOW()) OR tbl_bewerbungstermine.beginn IS NULL)
-			AND ss.studiensemester_kurzbz IN (
-				SELECT DISTINCT studiensemester_kurzbz FROM public.tbl_bewerbungstermine WHERE beginn <= NOW() AND ende >= NOW()
-			)
-			AND ss.semester = 1
-			AND lehre.tbl_studienplan.aktiv = TRUE'
-			,
+			$where,
 			array(
 				'studienplaene',
 				'akadgrad'
