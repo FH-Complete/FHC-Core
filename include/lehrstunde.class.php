@@ -516,7 +516,7 @@ class lehrstunde extends basis_db
 		}
 
 		// Reservierungsdaten ermitteln
-		if ($type!='idList' && $type!='fachbereich')
+		if ($type!='idList' && $type!='fachbereich' && $type!='lva')
 		{
 			// Datenbankabfrage generieren
 			$sql_query_reservierung='SELECT * FROM campus.vw_reservierung';

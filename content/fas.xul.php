@@ -686,7 +686,7 @@ foreach($addon_obj->result as $addon)
                label     = "&menu-dokumente-pruefungsprotokoll2_englisch.label;"
                command   =  "menu-dokumente-pruefungsprotokoll2_englisch:command"
                accesskey = "&menu-dokumente-pruefungsprotokoll2_englisch.accesskey;"/>
-            <menuitem
+            <!--<menuitem
                id        =  "menu-dokumente-pruefungszeugnis"
                key       =  "menu-dokumente-pruefungszeugnis:key"
                label     = "&menu-dokumente-pruefungszeugnis.label;"
@@ -697,7 +697,7 @@ foreach($addon_obj->result as $addon)
                key       =  "menu-dokumente-pruefungszeugnis_englisch:key"
                label     = "&menu-dokumente-pruefungszeugnis_englisch.label;"
                command   =  "menu-dokumente-pruefungszeugnis_englisch:command"
-               accesskey = "&menu-dokumente-pruefungszeugnis_englisch.accesskey;"/>
+               accesskey = "&menu-dokumente-pruefungszeugnis_englisch.accesskey;"/>-->
 			<menuitem
                id        =  "menu-dokumente-urkunde_deutsch"
                key       =  "menu-dokumente-urkunde_deutsch:key"

@@ -167,9 +167,9 @@ $config['auth_library_function'] = 'basicAuthentication';
 |           $config['auth_override_class_method']['accounts']['user'] = 'basic';
 |           $config['auth_override_class_method']['dashboard']['*'] = 'none|digest|basic';
 |
-| Here 'deals', 'accounts' and 'dashboard' are controller names, 'view', 'insert' and 'user' are methods within. 
- * An asterisk may also be used to specify an authentication method for an entire classes methods. 
- * Ex: $config['auth_override_class_method']['dashboard']['*'] = 'basic'; (NOTE: leave off the '_get' or '_post' from the end 
+| Here 'deals', 'accounts' and 'dashboard' are controller names, 'view', 'insert' and 'user' are methods within.
+ * An asterisk may also be used to specify an authentication method for an entire classes methods.
+ * Ex: $config['auth_override_class_method']['dashboard']['*'] = 'basic'; (NOTE: leave off the '_get' or '_post' from the end
  * of the method name)
 | Acceptable values are; 'none', 'digest' and 'basic'.
 |
@@ -223,7 +223,7 @@ $config['auth_library_function'] = 'basicAuthentication';
 |    restrict certain methods to IPs in your whitelist
 |
 */
-$config['rest_ip_whitelist_enabled'] = FALSE;
+$config['rest_ip_whitelist_enabled'] = TRUE;
 
 /*
 |--------------------------------------------------------------------------
@@ -238,7 +238,7 @@ $config['rest_ip_whitelist_enabled'] = FALSE;
 | 127.0.0.1 and 0.0.0.0 are allowed by default
 |
 */
-$config['rest_ip_whitelist'] = '';
+$config['rest_ip_whitelist'] = '127.0.0.1';
 
 /*
 |--------------------------------------------------------------------------

@@ -27,14 +27,14 @@
 $inventarnummer=trim((isset($_REQUEST['inventarnummer']) ? str_replace(array('`','�','*','~'),'+',$_REQUEST['inventarnummer']):''));
 
 // Formel: Groesse in cm * 72 dpi / 2,54 = Masse in Pixel; Masse in Pixel * 2,54 / 72 dpi = Groesse in cm
-$dpiDefault=96;	
-	
+$dpiDefault=96;
+
 $dpi=trim((isset($_REQUEST['dpi']) ? $_REQUEST['dpi']:$dpiDefault));
 if (!is_numeric($dpi))
 	$dpi=$dpiDefault;
 $dpi=(int)$dpi;
 
-// GesamtEtikette	
+// GesamtEtikette
 $etikette_druck_height=(int)(2.54 * ($dpi/2.54));		// 2.54 - '72'
 $etikette_druck_width=(int)(5 * ($dpi/2.54));			// 5cm - '142'
 // Logo 4cm * 1cm
@@ -47,7 +47,7 @@ $etikette_width=(int)((int)(4 * ($dpi/2.54))/100);				// 4cm - '113'
 $browser=strtolower($_SERVER['HTTP_USER_AGENT']);
 $output='css';
 if (!strstr($browser,'msie'))
-	$output='svg';	
+	$output='svg';
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
@@ -58,21 +58,19 @@ if (!strstr($browser,'msie'))
 	<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
 <!--	<link rel="stylesheet" href="../../include/js/jquery.css" rel="stylesheet" type="text/css"> -->
 
-	<script type="text/javascript" src="../../include/js/jquery1.9.min.js"></script>	
+	<script type="text/javascript" src="../../vendor/jquery/jqueryV1/jquery-1.12.4.min.js"></script>
+	<script type="text/javascript" src="../../vendor/christianbach/tablesorter/jquery.tablesorter.min.js"></script>
+	<script type="text/javascript" src="../../vendor/components/jqueryui/jquery-ui.min.js"></script>
+	<script type="text/javascript" src="../../include/js/jquery.ui.datepicker.translation.js"></script>
 	<link rel="stylesheet" type="text/css" href="../../skin/jquery-ui-1.9.2.custom.min.css"/>
-<!--	<script src="../../include/js/jquery.js" type="text/javascript"></script>
-	<script src="../../include/js/jquery-ui.js" type="text/javascript"></script>
-	<script src="../../include/js/jquery.autocomplete.js" type="text/javascript"></script>
-	<script src="../../include/js/jquery.autocomplete.min.js" type="text/javascript"></script>
-	<script src="../../include/js/jquery-barcode-1.3.3.js" type="text/javascript"></script>	-->
 
 	<title>Etiketten</title>
-	
+
 <?php
 	if (empty($inventarnummer))
-	{ 
+	{
 	//onchange="if (this.value.length>0) {setTimeout('document.sendform.submit()',1500);}"
-?>	
+?>
 	</head>
 		<body>
 			<h1>Etiketten</h1>
@@ -80,7 +78,7 @@ if (!strstr($browser,'msie'))
 				<label for="inventarnummer">Inventarnummer :</label>&nbsp;
 					<input id="inventarnummer" name="inventarnummer" type="text" size="10" maxlength="30" value="">&nbsp;
 					<script type="text/javascript">
-						function selectItem(li) 
+						function selectItem(li)
 						{
 							//	onItemSelect (default value: none)
 							//	  A JavaScript function that will be called when an item is selected. The
@@ -88,16 +86,16 @@ if (!strstr($browser,'msie'))
 							//	  This LI element will have an attribute "extra" that contains an array of all
 							//	  cells that the backend specified. See the source code of
 							// --------------------------------------------------------------------------------
-							if ((li.extra != null) && (li.extra != "")) 
+							if ((li.extra != null) && (li.extra != ""))
 							{
-								if ((li.extra[0] != null) && (li.extra[0] != "")) 
+								if ((li.extra[0] != null) && (li.extra[0] != ""))
 									alert(li.extra[0]);
-								if ((li.extra[1] != null) && (li.extra[1] != "")) 
+								if ((li.extra[1] != null) && (li.extra[1] != ""))
 									alert(li.extra[1]);
 							}
 						   return false;
 						}
-						function formatItem(row) 
+						function formatItem(row)
 						{
 							//	  formatItem (default value: none)
 							//	    A JavaScript funcion that can provide advanced markup for an item. For each
@@ -106,28 +104,28 @@ if (!strstr($browser,'msie'))
 							//	    provide 3 parameters: the results row, the position of the row in the list
 							//	    of results, and the number of items in the list of results. See the source
 							//	    code of http://www.dyve.net/jquery?autocomplete for an example.
-							// --------------------------------------------------------------------------------						
+							// --------------------------------------------------------------------------------
 							row[0] = row[0].replace('`', '+');
 							row[0] = row[0].replace('`', '+');
 							row[0] = row[0].replace('�', '+');
 							row[0] = row[0].replace('�', '+');
 							row[0] = row[0].replace('*', '+');
 							row[0] = row[0].replace('*', '+');
-							row[0] = row[0].replace('-', '+');							
-							row[0] = row[0].replace('-', '+');							
+							row[0] = row[0].replace('-', '+');
+							row[0] = row[0].replace('-', '+');
 						    return row[0] + " <i>" + row[1] + "</i> ";
 						}
 
-						function findValue(li) 
-						{  
-						     if( li == null ) return alert("No match!");  
-								 // if coming from an AJAX call, let's use the product id as the value  
-						     if( !!li.extra ) var sValue = li.extra[0];  
-							    // otherwise, let's just display the value in the text box  
-							 else var sValue = li.selectValue;  
-								 alert("The value you selected was: " + sValue);  
-						 }  
-						
+						function findValue(li)
+						{
+						     if( li == null ) return alert("No match!");
+								 // if coming from an AJAX call, let's use the product id as the value
+						     if( !!li.extra ) var sValue = li.extra[0];
+							    // otherwise, let's just display the value in the text box
+							 else var sValue = li.selectValue;
+								 alert("The value you selected was: " + sValue);
+						 }
+
 						// http://www.pengoworks.com/workshop/jquery/autocomplete_docs.txt
 						$(document).ready(function() {
 							$('#inventarnummer').autocomplete({
@@ -150,16 +148,16 @@ if (!strstr($browser,'msie'))
 							});
 							/*  $('#inventarnummer').autocomplete('inventar_autocomplete.php',{
 								minChars:2,
-								scroll: true, 
-						        scrollHeight: 200, 
+								scroll: true,
+						        scrollHeight: 200,
 								width:350,
 								onItemSelect:selectItem,
 								formatItem:formatItem,
-								onFindValue: findValue, 
+								onFindValue: findValue,
 								extraParams:{'work':'inventarnummer'}
 							  }); */
 					  });
-					</script>						
+					</script>
 					<input type="Submit">
 			</form>
 			<noscript>
@@ -169,16 +167,16 @@ if (!strstr($browser,'msie'))
 </html>
 <?php
 exit;
-}	
+}
 /*
-Parameter Type Default value Detail 
-barWidth int 1 width of a bar 
-barHeight int 50 container height 
-showHRI bool true display text (HRI : Human readable Interpretation) 
-bgColor text #FFFFFF background color 
-color text #000000 barcode color 
-fontSize text 10px font size of the HRI 
-output text css output type : css, svg or bmp 
+Parameter Type Default value Detail
+barWidth int 1 width of a bar
+barHeight int 50 container height
+showHRI bool true display text (HRI : Human readable Interpretation)
+bgColor text #FFFFFF background color
+color text #000000 barcode color
+fontSize text 10px font size of the HRI
+output text css output type : css, svg or bmp
 */
 ?>
 	<style type="text/css" >
@@ -195,7 +193,7 @@ output text css output type : css, svg or bmp
 <body onload="window.print();">
 	<div>
 		<table class="etikette_kpl">
-			<tr> 
+			<tr>
 				<td>
 					<img class="etikette_logo" src="../../skin/images/TWLogo_klein.gif">
 				</td>
@@ -203,11 +201,11 @@ output text css output type : css, svg or bmp
 			<tr>
 				<td>
 					<div id="bcTarget"></div>
-					<script type="text/javascript" language="JavaScript1.2">	
-						if ('<?php echo $inventarnummer;?>' != '') 	
-						{		
-							$("#bcTarget").barcode('<?php echo $inventarnummer;?>', 'code128',{output: "<?php echo $output; ?>",barWidth:<?php echo $etikette_width;?>, barHeight:<?php echo $etikette_height;?>}); 
-						}	
+					<script type="text/javascript" language="JavaScript1.2">
+						if ('<?php echo $inventarnummer;?>' != '')
+						{
+							$("#bcTarget").barcode('<?php echo $inventarnummer;?>', 'code128',{output: "<?php echo $output; ?>",barWidth:<?php echo $etikette_width;?>, barHeight:<?php echo $etikette_height;?>});
+						}
 					</script>
 				</td>
 			</tr>

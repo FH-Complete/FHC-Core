@@ -13,14 +13,17 @@
 - **[FAS]** Bei Statuswechsel von Studierenden können Gründe für den Statuswechsel angegeben werden
 - **[ADDONS]** Addons können Menüpunkte im Vilesci anpassen
 - **[ADDONS]** Addons können Noten für die Gesamtnote vorschlagen
+- **[CORE]** UserDefinedFields
 
 ### CHANGED
 - **[CORE]** Berechtigungsprüfung wurde angepasst damit deaktivierte Benutzer keine Berechtigungen mehr haben
 - **[FAS]** Mitarbeiterexport exportiert jetzt nur noch die markierten Personen
+- **[CORE]** Has many as possible javascripts and css present in the repository were removed. Their lack is overcome by the packages in the composer. In the meanwhile also the versions were updated
 
 ### Updateinfo
 - **[CORE]** Infoscreen wurde umbenannt (informationsbildschirm.php)
 - **[CORE]** Moodle Schnittstelle wurde aus dem Core entfernt und in ein eigenes Addon verschoben. Moodle Versionen < 2.4 werden nicht mehr unterstützt
+- **[CORE]** Update campus.tbl_templates (contentmittitel and contentohnetitel) with system/templates/contentmittitel_xslt_xhtml.xslt andsystem/templates/contentohnetitel_xslt_xhtml.xslt
 
 ## [3.2]
 

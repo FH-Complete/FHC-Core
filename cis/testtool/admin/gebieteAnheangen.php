@@ -57,7 +57,10 @@ echo '
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<link href="../../../skin/style.css.php" rel="stylesheet" type="text/css">
 	<link href="../../../skin/tablesort.css" rel="stylesheet" type="text/css">
-	<script type="text/javascript" src="../../../include/js/jquery1.9.min.js" ></script>
+	<script type="text/javascript" src="../../../vendor/jquery/jqueryV1/jquery-1.12.4.min.js"></script>
+	<script type="text/javascript" src="../../../vendor/christianbach/tablesorter/jquery.tablesorter.min.js"></script>
+	<script type="text/javascript" src="../../../vendor/components/jqueryui/jquery-ui.min.js"></script>
+	<script type="text/javascript" src="../../../include/js/jquery.ui.datepicker.translation.js"></script>
 	<script type="text/javascript">
 	$(document).ready(function()
 	{
@@ -158,7 +161,7 @@ if (isset($_GET['action']) && $_GET['action'] == 'save')
 			{
 				$vorgaben_id = $ablauf_vorgaben->ablauf_vorgaben_id;
 			}
-			else 
+			else
 				echo $ablauf_vorgaben->errormsg;
 		}
 		elseif (isset($_POST['ablauf_vorgaben_id']) && $_POST['ablauf_vorgaben_id'] != '')
@@ -191,7 +194,7 @@ if (isset($_GET['action']) && $_GET['action'] == 'delete')
 		$ablauf = new ablauf($_POST['ablauf_id']);
 		if ($ablauf->delete($_POST['ablauf_id']))
 			echo $ablauf->errormsg;
-		
+
 		// Wenn der Ablauf-Eintrag der letzte war, und die Ablauf-Vorgaben-ID nicht woanders verwendet wird, dann auch diesen löschen
 		if (isset($_POST['ablauf_vorgaben_id']) && $_POST['ablauf_vorgaben_id'] != '')
 		{
@@ -203,7 +206,7 @@ if (isset($_GET['action']) && $_GET['action'] == 'delete')
 				if (!$abl_vorgabe->deleteAblaufVorgabe($_POST['ablauf_vorgaben_id']))
 					echo $abl_vorgabe->errormsg;
 			}
-		}	
+		}
 	}
 }
 // Gebiet bearbeiten
@@ -225,7 +228,7 @@ if (isset($_GET['action']) && $_GET['action'] == 'edit')
 				<tr><td>Studienplan: </td><td>';
 				drawStudienplanDropdown($stg_kz, $db, $name = 'studienplan_id', null, 'width:100%', $ablauf->result[0]->studienplan_id);
 				echo '</td></tr>
-				<tr><td>Sprache*: </td><td><select name="sprache">';	
+				<tr><td>Sprache*: </td><td><select name="sprache">';
 				foreach ($sprache->result as $row)
 				{
 					if ($ablauf->result[0]->sprache == $row->sprache)
@@ -259,7 +262,7 @@ if (isset($_GET['action']) && $_GET['action'] == 'editsave')
 		$ablauf->reihung = $_POST['reihung'];
 		$ablauf->gewicht = $_POST['gewicht'];
 		$ablauf->semester = $_POST['semester'];
-		
+
 		if (isset($_POST['studienplan_id'])) // && $_POST['studienplan_id'] != ''
 			$ablauf->studienplan_id = $_POST['studienplan_id'];
 
@@ -289,12 +292,12 @@ if (isset($_GET['action']) && $_GET['action'] == 'editsave')
 			$ablauf_vorgaben->content_id = $content_id;
 			$ablauf_vorgaben->updateamum = date('Y-m-d H:i:s');
 			$ablauf_vorgaben->updatevon = $user;
-			
+
 			if (!$ablauf_vorgaben->saveAblaufVorgabe(false))
 			{
 				echo $ablauf_vorgaben->errormsg;
 			}
-			
+
 		}
 		else
 			echo $ablauf->errormsg;
@@ -339,7 +342,7 @@ if ($stg_kz != -1)
 		$studienplan->loadStudienplan($row->studienplan_id);
 		$gebiet = new gebiet($row->gebiet_id);
 		array_push($gebieteangehaengt, $gebiet->gebiet_id);
-		
+
 		if ($ablauf_vorgaben_id == '' && $row->ablauf_vorgaben_id != '')
 			$ablauf_vorgaben_id = $row->ablauf_vorgaben_id;
 		echo '<tr>
@@ -390,7 +393,7 @@ if ($stg_kz != -1)
 	// Ablauf-Vorgaben können nur beim ersten Eintrag gespeichert werden. Ansonsten werden sie über EDIT geändert.
 	if (count($gebieteangehaengt) == 0)
 	{
-		echo '<td><select name="sprache">';	
+		echo '<td><select name="sprache">';
 		foreach ($sprache->result as $row)
 		{
 			echo '<OPTION value="'.$row->sprache.'" '.$selected.'>'.$row->sprache.'</OPTION>';
@@ -399,7 +402,7 @@ if ($stg_kz != -1)
 		echo '<td><input type="checkbox" name="sprachwahl" /></td>';
 		echo '<td><input type="text" name="content_id" /></td>';
 	}
-	else 
+	else
 		echo '<td></td><td></td><td></td>';
 	echo '<input type="hidden" name="ablauf_vorgaben_id" value="'.$ablauf_vorgaben_id.'" />';
 	echo '<td><input type="submit" value="Speichern"/></td></form></tr></tfoot></table>';

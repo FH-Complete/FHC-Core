@@ -20,22 +20,22 @@
 /**
  * Seite zur Wartung der Ampeln
  */
-require_once('../../config/vilesci.config.inc.php');		
+require_once('../../config/vilesci.config.inc.php');
 require_once('../../include/ampel.class.php');
 require_once('../../include/benutzerberechtigung.class.php');
 require_once('../../include/datum.class.php');
 
 if (!$db = new basis_db())
 	die('Es konnte keine Verbindung zum Server aufgebaut werden.');
-		
+
 $user = get_uid();
-	
+
 $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($user);
-	
+
 if(!$rechte->isBerechtigt('basis/ampel'))
 	die($rechte->errormsg);
-	
+
 $datum_obj = new datum();
 ?><!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 <html>
@@ -45,13 +45,16 @@ $datum_obj = new datum();
 	<link rel="stylesheet" href="../../skin/fhcomplete.css" type="text/css">
 	<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
 	<link rel="stylesheet" href="../../skin/jquery-ui-1.9.2.custom.min.css" type="text/css">
-	<script src="../../include/js/jquery1.9.min.js" type="text/javascript"></script>
+	<script type="text/javascript" src="../../vendor/jquery/jqueryV1/jquery-1.12.4.min.js"></script>
+	<script type="text/javascript" src="../../vendor/christianbach/tablesorter/jquery.tablesorter.min.js"></script>
+	<script type="text/javascript" src="../../vendor/components/jqueryui/jquery-ui.min.js"></script>
+	<script type="text/javascript" src="../../include/js/jquery.ui.datepicker.translation.js"></script>
 	<script type="text/javascript">
-		$(document).ready(function() 
-			{ 
+		$(document).ready(function()
+			{
 				$( ".datepicker_datum" ).datepicker({
 					 changeMonth: true,
-					 changeYear: true, 
+					 changeYear: true,
 					 dateFormat: 'dd.mm.yy',
 					 });
 			});
@@ -63,7 +66,7 @@ $datum_obj = new datum();
 	$action = (isset($_GET['action'])?$_GET['action']:'new');
 	$ampel_id = (isset($_REQUEST['ampel_id'])?$_REQUEST['ampel_id']:'');
 	$ampel = new ampel();
-	
+
 	if($action=='save')
 	{
 		$kurzbz = (isset($_POST['kurzbz'])?$_POST['kurzbz']:die('Kurzbz fehlt'));
@@ -99,10 +102,10 @@ $datum_obj = new datum();
 		{
 			if(!$ampel->load($ampel_id))
 				die($ampel->errormsg);
-				
+
 			$ampel->new=false;
 		}
-		
+
 		$ampel->kurzbz=$kurzbz;
 		$ampel->beschreibung = $beschreibung;
 		$ampel->benutzer_select = $benutzer_select;
@@ -114,9 +117,9 @@ $datum_obj = new datum();
 		$ampel->buttontext = $buttontext;
 		$ampel->updateamum = date('Y-m-d H:i:s');
 		$ampel->updatevon = $user;
-		
+
 		if($ampel->save())
-		{		
+		{
 			echo '<span class="ok">Daten erfolgreich gespeichert</span>';
 			echo "<script type='text/javascript'>\n";
 			echo "	parent.uebersicht_ampel.location.href='ampel_uebersicht.php';";
@@ -155,7 +158,7 @@ $datum_obj = new datum();
 			die('Invalid Action');
 			break;
 	}
-	
+
 	echo '<form action="'.$_SERVER['PHP_SELF'].'?action=save" method="POST">
 		<input type="hidden" name="new" value="'.htmlspecialchars($new).'">
 		<input type="hidden" name="ampel_id" value="'.htmlspecialchars($ampel->ampel_id).'">
@@ -201,8 +204,8 @@ $datum_obj = new datum();
 				<td>Buttonbeschriftung (64)</td>
 				<td>&nbsp;</td>
 			</tr>';
-	
-	
+
+
 	$sprache = new sprache();
 	$sprache->getAll(null, 'index');
 	foreach($sprache->result as $lang)
@@ -220,7 +223,7 @@ $datum_obj = new datum();
 			<td colspan="5"><input type="submit" value="Speichern" name="save"></td>
 		</tr>
 	</table></form>';
-	
+
 	echo '</fieldset>';
 ?>
 </body>

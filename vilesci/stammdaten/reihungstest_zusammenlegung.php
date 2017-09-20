@@ -19,7 +19,7 @@
  */
 /**
  * Script zum Zusammenlegen mehrfacher Anmeldungen zu einem Reihungstestmodul in einem Studiensemester.
- * Es werden zwei Listen mit Bewerbungen eines Studiensemesters angezeigt, die sich für ein Modul mehrfach angemeldet haben 
+ * Es werden zwei Listen mit Bewerbungen eines Studiensemesters angezeigt, die sich für ein Modul mehrfach angemeldet haben
  * Links wird die Bewerberbung markiert, der rechts markierten zusammengelegt werden soll.
  * Die linke Bewerbung wird danach entfernt und eine Mail an den/die BewerberIn verschickt
  */
@@ -64,7 +64,7 @@ $studienplan_id = (isset($_REQUEST['studienplan_id']) ? $_REQUEST['studienplan_i
 
 $studienplan = new studienplan();
 $studienplan->loadStudienplan($studienplan_id);
-	
+
 $sprache = getSprache();
 $p = new phrasen($sprache);
 //var_dump($_POST);
@@ -118,7 +118,7 @@ if(isset($_POST['zusammenlegen']))
 				elseif ($kontakt->zustellung == false)
 					$mailadresse = $kontakt->kontakt;
 				else
-					echo '<span class="input_error">Es ist keine gueltige Zustelladresse für diese Person hinterlegt</span>'; 
+					echo '<span class="input_error">Es ist keine gueltige Zustelladresse für diese Person hinterlegt</span>';
 			}
 			else
 				echo '<span class="input_error">Es ist keine Mailadresse für diese Person hinterlegt</span>';
@@ -127,7 +127,7 @@ if(isset($_POST['zusammenlegen']))
 			$person->load($neuzuteilung->person_id);
 			if($person->geschlecht=='m')
 				$anrede=$p->t('reihungstest/anredeMaennlich');
-			else 
+			else
 				$anrede=$p->t('reihungstest/anredeWeiblich');
 
 			$mail = new mail($mailadresse, 'no-reply', $p->t('reihungstest/betreff'), $p->t('reihungstest/mailtextHtml'));
@@ -136,7 +136,7 @@ if(isset($_POST['zusammenlegen']))
 			if(!$mail->send())
 				echo '<span class="input_error">Fehler beim senden der E-Mail: '.$db->convert_html_chars($mail->errormsg).'</span>';
 		}
-		else 
+		else
 			echo '<span class="input_error">Fehler beim Laden der Daten: '.$db->convert_html_chars($load_rt_person->errormsg).'</span>';
 	}
 }
@@ -149,10 +149,12 @@ if(isset($_POST['zusammenlegen']))
 	<link href="../../skin/fhcomplete.css" rel="stylesheet" type="text/css">
 	<link href="../../skin/vilesci.css" rel="stylesheet" type="text/css">
 	<link href="../../skin/jquery.css" rel="stylesheet" type="text/css"/>
-	<script type="text/javascript" src="../../include/js/jquery1.9.min.js"></script>
+	<script type="text/javascript" src="../../vendor/jquery/jqueryV1/jquery-1.12.4.min.js"></script>
+	<script type="text/javascript" src="../../vendor/christianbach/tablesorter/jquery.tablesorter.min.js"></script>
+	<script type="text/javascript" src="../../vendor/components/jqueryui/jquery-ui.min.js"></script>
+	<script type="text/javascript" src="../../include/js/jquery.ui.datepicker.translation.js"></script>
 	<link href="../../skin/tablesort.css" rel="stylesheet" type="text/css"/>
 	<link href="../../skin/jquery-ui-1.9.2.custom.min.css" rel="stylesheet" type="text/css">
-	<script src="../../include/js/jquery1.9.min.js" type="text/javascript"></script>
 	<script type="text/javascript">
 
 	$(document).ready(function()
@@ -192,7 +194,7 @@ if(isset($_POST['zusammenlegen']))
 		if (document.getElementById('radio_'+id).checked == true)
 		{
 			document.getElementsByClassName('checkbox_'+person).disabled = false;
-			for (var i=0, iLen=checkboxes.length; i<iLen; i++) 
+			for (var i=0, iLen=checkboxes.length; i<iLen; i++)
 			{
 				checkboxes[i].disabled = false;
 			}
@@ -292,7 +294,7 @@ if($result = $db->db_query($qry))
 				$gebietbezeichnungen[$row_gebiete->gebiet_id] = $row_gebiete->bezeichnung;
 			}
 		}
-		
+
 		$result_arr[$row->person_id]['nachname'] = $row->nachname;
 		$result_arr[$row->person_id]['vorname'] = $row->vorname;
 		$result_arr[$row->person_id]['data'][$i] = $row;
@@ -330,14 +332,14 @@ foreach ($result_arr as $key=>$value)
 		echo "<th>Studienplan</th>";
 		echo "<th>Teilgenommen</th>";
 		echo "</tr></thead><tbody>";
-		
+
 		foreach ($result_arr[$key]['data'] as $keyrow=>$row)
 		{
 			$studienplan = new studienplan();
 			$studienplan->loadStudienplan($row->studienplan_id);
 
 			echo "<tr>";
-			
+
 			echo '<td style="text-align: center"><input type="radio" name="radio" value="'.$row->rt_person_id.'" onclick="disable(\''.$row->rt_person_id.'\',\''.$row->person_id.'\')" id="radio_'.$row->rt_person_id.'"></td>';
 			echo '<td style="text-align: center"><input type="checkbox" class="checkbox_'.$row->person_id.'" name="checkbox[]" value="'.$row->rt_person_id.'" id="checkbox_'.$row->rt_person_id.'" disabled></td>';
 			echo '<td title="'.$row->datum.'"><b>#'.$row->rt_id.'</b> - <i>'.$datum_obj->formatDatum($row->datum,'d.m.Y').', '.$datum_obj->formatDatum($row->uhrzeit,'H:i').'</i> - '.$studiengang->kuerzel_arr[$row->studiengang_kz].' '.$db->convert_html_chars($row->anmerkung).'</td>';

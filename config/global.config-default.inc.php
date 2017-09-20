@@ -186,6 +186,7 @@ define('VILESCI_PERSON_NEU_STUDIENSEMESTER_WINTERONLY',false);
 
 // Anzeigeoptionen für den Studienplan im CIS
 define('CIS_STUDIENPLAN_SEMESTER_ANZEIGEN', false);
+define('CIS_STUDIENPLAN_LVPLANLINK_ANZEIGEN',true);
 
 //Legt fest ob ein User zu einer LV angemeldet sein muss um Detailinformationen abrufen zu können. (true|false)
 define('CIS_LEHRVERANSTALTUNG_WENNANGEMELDET_DETAILS_ANZEIGEN', false);

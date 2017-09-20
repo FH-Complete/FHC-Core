@@ -40,7 +40,7 @@ if(isset($_GET['getfirma']))
 {
 	$firma = new firma();
 	$firma->searchFirma($_GET['q']);
-	
+
 	foreach ($firma->result as $row)
 	{
 		echo $row->name.'|'.$row->firma_id."\n";
@@ -70,58 +70,62 @@ if(isset($_GET['getstandort']))
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<link href="../../skin/vilesci.css" rel="stylesheet" type="text/css">
 	<link rel="stylesheet" href="../../skin/styles/jquery.css" rel="stylesheet" type="text/css">
-	<script type="text/javascript" src="../../include/js/jquery.js"></script>
-	<script type="text/javascript" src="../../include/js/jquery-ui.js" ></script>
-	<script type="text/javascript" src="../../include/js/jquery.autocomplete.js"></script>
-	
+	<link rel="stylesheet" type="text/css" href="../../skin/jquery-ui-1.9.2.custom.min.css">
+<script type="text/javascript" src="../../vendor/jquery/jqueryV1/jquery-1.12.4.min.js"></script>
+<script type="text/javascript" src="../../vendor/christianbach/tablesorter/jquery.tablesorter.min.js"></script>
+<script type="text/javascript" src="../../vendor/components/jqueryui/jquery-ui.min.js"></script>
+<script type="text/javascript" src="../../include/js/jquery.ui.datepicker.translation.js"></script>
+<script type="text/javascript" src="../../vendor/jquery/sizzle/sizzle.js"></script>
+	<script type="text/javascript" src="../../vendor/components/jqueryui/jquery-ui.min.js" ></script>
+
 	<script language="Javascript">
 		function confdel()
 		{
 			return confirm('Wollen Sie diesen Datensatz wirklich loeschen?');
 		}
-		$(document).ready(function() 
+		$(document).ready(function()
 		{
-			$("#firma_ac").autocomplete("kontaktdaten_edit.php?getfirma=true", 
+			$("#firma_ac").autocomplete("kontaktdaten_edit.php?getfirma=true",
 			{
 				width: 500,
 				minChars:2,
 				matchSubset:1,matchContains:1,
 				highlight: false,
 				scroll: true,
-				formatItem: function(row) 
+				formatItem: function(row)
 				{
 					return row[0];
 				},
-				formatResult: function(row) 
+				formatResult: function(row)
 				{
 					return row[0];
 				}
-			}).result(function(event,row) 
+			}).result(function(event,row)
 			{
 				$("#firma").val(row[1]);
 			});
-			
-			$("#firma_kontakt_ac").autocomplete("kontaktdaten_edit.php?getfirma=true", 
+
+			$("#firma_kontakt_ac").autocomplete("kontaktdaten_edit.php?getfirma=true",
 			{
 				width: 500,
 				minChars:2,
 				matchSubset:1,matchContains:1,
 				highlight: false,
 				scroll: true,
-				formatItem: function(row) 
+				formatItem: function(row)
 				{
 					return row[0];
 				},
-				formatResult: function(row) 
+				formatResult: function(row)
 				{
 					return row[0];
 				}
-			}).result(function(event,row) 
+			}).result(function(event,row)
 			{
 				$("#firma_kontakt").val(row[1]);
 				setstandort();
 			});
-			
+
 			function setstandort()
 			{
 				$('#standort_kontakt').children().remove().end();
@@ -135,7 +139,7 @@ if(isset($_GET['getstandort']))
 						success: function(json)
 						{
 							var output = '';
-							for (p in json) 
+							for (p in json)
 							{
 								output += '<option value=\"' + json[p].standort_id + '\">' + json[p].kurzbz + '</option>\n';
 							}
@@ -527,9 +531,9 @@ else
 		{
 			if($row->standort_id==$standort_id)
 				$selected='selected="true"';
-			else 
+			else
 				$selected='';
-				
+
 			echo '<OPTION value="'.$row->standort_id.'" '.$selected.'>'.$row->kurzbz.'</OPTION>';
 		}
 	}

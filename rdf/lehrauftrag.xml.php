@@ -356,7 +356,7 @@ function drawLehrauftrag($uid)
 				,nachname
 				,vw_student.studiengang_kz
 				,projekttyp_kurzbz
-				,tbl_organisationseinheit.oe_kurzbz
+				,lehrfach.oe_kurzbz
 			FROM lehre.tbl_projektbetreuer
 				,lehre.tbl_lehreinheit
 				,lehre.tbl_lehrveranstaltung AS lehrfach

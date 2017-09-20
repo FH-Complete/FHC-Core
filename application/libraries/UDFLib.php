@@ -46,6 +46,7 @@ class UDFLib
 	const PHRASES_APP_NAME = 'core'; // Name of the app parameter used to retrive phrases
 
 	private $_ci; // Code igniter instance
+	private $UDFs; // Associative array containing names and values of the given UDF parameters
 
 	/**
 	 * Loads fhc helper
@@ -55,6 +56,8 @@ class UDFLib
 		$this->_ci =& get_instance();
 
 		$this->_ci->load->helper('fhc');
+
+		$this->UDFs = array(); // by default is an empty array
 	}
 
 	// -------------------------------------------------------------------------------------------------

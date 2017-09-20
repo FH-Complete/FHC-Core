@@ -402,6 +402,34 @@ if ($result = @$db->db_query("SELECT conname FROM pg_constraint WHERE conname = 
 	}
 }
 
+// FOREIGN KEY tbl_phrasentext_orgeinheit_kurzbz_fkey: system.tbl_phrasentext.orgeinheit_kurzbz references public.tbl_organisationseinheit.orgeinheit_kurzbz
+if ($result = @$db->db_query("SELECT conname FROM pg_constraint WHERE conname = 'tbl_phrasentext_orgeinheit_kurzbz_fkey'"))
+{
+	if ($db->db_num_rows($result) == 0)
+	{
+		$qry = "ALTER TABLE system.tbl_phrasentext ADD CONSTRAINT tbl_phrasentext_orgeinheit_kurzbz_fkey FOREIGN KEY (orgeinheit_kurzbz) REFERENCES public.tbl_organisationseinheit(oe_kurzbz) ON UPDATE CASCADE ON DELETE RESTRICT;";
+
+		if (!$db->db_query($qry))
+			echo '<strong>system.tbl_phrasentext: '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>system.tbl_phrasentext: added foreign key on column orgeinheit_kurzbz referenced to public.tbl_organisationseinheit(orgeinheit_kurzbz)';
+	}
+}
+
+// FOREIGN KEY tbl_phrasentext_orgform_kurzbz_fkey: system.tbl_phrasentext.orgform_kurzbz references bis.tbl_orgform.orgform_kurzbz
+if ($result = @$db->db_query("SELECT conname FROM pg_constraint WHERE conname = 'tbl_phrasentext_orgform_kurzbz_fkey'"))
+{
+	if ($db->db_num_rows($result) == 0)
+	{
+		$qry = "ALTER TABLE system.tbl_phrasentext ADD CONSTRAINT tbl_phrasentext_orgform_kurzbz_fkey FOREIGN KEY (orgform_kurzbz) REFERENCES bis.tbl_orgform(orgform_kurzbz) ON UPDATE CASCADE ON DELETE RESTRICT;";
+
+		if (!$db->db_query($qry))
+			echo '<strong>system.tbl_phrasentext: '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>system.tbl_phrasentext: added foreign key on column orgform_kurzbz referenced to bis.tbl_orgform(orgform_kurzbz)';
+	}
+}
+
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
 

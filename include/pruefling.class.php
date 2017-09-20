@@ -110,7 +110,7 @@ class pruefling extends basis_db
 			       $this->db_add_param($this->idnachweis).",".
 			       $this->db_add_param($this->registriert).",".
 			       $this->db_add_param($this->prestudent_id).",".
-			       $this->db_add_param($this->semester).");";
+			       $this->db_add_param($this->semester).");";                    
 		}
 		else
 		{
@@ -318,17 +318,21 @@ class pruefling extends basis_db
 	{
 		$qry = "SELECT * FROM testtool.vw_auswertung
 				WHERE person_id=".$this->db_add_param($person_id, FHC_INTEGER);
+            $ergebnis=0;
+            
 
 		if(!is_null($reihungstest_id))
 			$qry.=" AND reihungstest_id=".$this->db_add_param($reihungstest_id, FHC_INTEGER);
 
-		$ergebnis=0;
+	
 
 		if($result = $this->db_query($qry))
 		{
 			// Wenn keine Eintraege vorhanden dann false
 			if($this->db_num_rows($result)==0)
 				return false;
+                        
+                    
 
 			while($row = $this->db_fetch_object($result))
 			{
@@ -342,7 +346,10 @@ class pruefling extends basis_db
 					$prozent = ($row->punkte/$row->maxpunkte)*100;
 
 				if($punkte)
+                                {
 					$ergebnis +=$row->punkte;
+                                }
+                                        
 				else
 					$ergebnis+=$prozent*$row->gewicht;
 			}

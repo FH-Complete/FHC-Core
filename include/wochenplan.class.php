@@ -43,6 +43,7 @@ require_once(dirname(__FILE__).'/globals.inc.php');
 require_once(dirname(__FILE__).'/sprache.class.php');
 require_once(dirname(__FILE__).'/functions.inc.php');
 require_once(dirname(__FILE__).'/betriebsmittel.class.php');
+require_once(dirname(__FILE__).'/lehrveranstaltung.class.php');
 
 class wochenplan extends basis_db
 {
@@ -490,7 +491,14 @@ class wochenplan extends basis_db
 			echo '<br>'.$this->ort_ausstattung;
 		}
 		if ($this->type=='lva')
+		{
 			$this->link.='&lva='.$this->lva;
+			$lehrveranstaltung = new lehrveranstaltung();
+			$lehrveranstaltung->load($this->lva);
+			$studiengang = new studiengang();
+			$studiengang->load($lehrveranstaltung->studiengang_kz);
+			echo '<strong>'.$p->t('global/lehrveranstaltung').': </strong>'.$lehrveranstaltung->bezeichnung_arr[$sprache].' / '.$studiengang->kuerzel.'-'.$lehrveranstaltung->semester.'<br>';
+		}
 		echo '</P>'.$this->crlf;
 		echo '			<table class="stdplan" style="width: auto; margin: auto;" valign="bottom" align="center">';
 		echo '			<tr><td  style="padding:3px 15px 0px 15px; margin: 0,0,20px,0;" align="center">'.$this->crlf;
@@ -909,7 +917,7 @@ class wochenplan extends basis_db
 								echo '<img src="../../../skin/images/sticky.png" tooltip="'.$this->convert_html_chars($uEinheit['titel'][0]).'"/>';
 							}
 							echo '<BR />';
-							if ($this->type=='ort' || $this->type=='lektor' || $this->type=='verband')
+							if ($this->type=='ort' || $this->type=='lektor' || $this->type=='verband' || $this->type=='lva')
 							{
 								$uEinheit['lehrverband']=array_unique($uEinheit['lehrverband']);
 								foreach($uEinheit['lehrverband'] as $ueLehrverband)

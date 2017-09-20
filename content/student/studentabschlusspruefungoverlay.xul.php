@@ -44,13 +44,12 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 		<menuitem label="Entfernen" oncommand="StudentAbschlusspruefungLoeschen();" id="student-abschlusspruefung-tree-popup-delete" hidden="false"/>
 		<menu id="student-abschlusspruefung-tree-popup-dokumente" label="Dokumente">
 	      <menupopup id="menu-file-popup">
-	        <menuitem label="Pruefungsprotokoll (Alte Version)" oncommand="StudentAbschlusspruefungPrintPruefungsprotokoll('de')"/>
-	        <menuitem label="Pruefungsprotokoll Englisch (Alte Version)" oncommand="StudentAbschlusspruefungPrintPruefungsprotokoll('en')"/>
-	        <menuitem label="Pruefungsprotokoll 2 (Neue Version)" oncommand="StudentAbschlusspruefungPrintPruefungsprotokoll('de2')"/>
-	        <menuitem label="Pruefungsprotokoll Englisch 2 (Neue Version)" oncommand="StudentAbschlusspruefungPrintPruefungsprotokoll('en2')"/>
-	        <menuitem label="Pruefungszeugnis" oncommand="StudentAbschlusspruefungPrintPruefungszeugnis()"/>
-	        <menuitem label="Urkunde" oncommand="StudentAbschlusspruefungPrintUrkunde('deutsch')"/>
-	        <menuitem label="Urkunde Englisch" oncommand="StudentAbschlusspruefungPrintUrkunde('englisch')"/>
+	        <menuitem label="Pruefungsprotokoll Deutsch" oncommand="StudentAbschlusspruefungPrintPruefungsprotokollMultiple(event,'de2')"/>
+	        <menuitem label="Pruefungsprotokoll Englisch" oncommand="StudentAbschlusspruefungPrintPruefungsprotokollMultiple(event,'en2')"/>
+	        <menuitem label="Pruefungszeugnis Deutsch" oncommand="StudentAbschlusspruefungPrintPruefungszeugnisMultiple(event,'deutsch')"/>
+	        <menuitem label="Pruefungszeugnis Englisch" oncommand="StudentAbschlusspruefungPrintPruefungszeugnisMultiple(event,'englisch')"/>
+	        <menuitem label="Urkunde Deutsch" oncommand="StudentAbschlusspruefungPrintUrkundeMultiple(event, 'deutsch')"/>
+	        <menuitem label="Urkunde Englisch" oncommand="StudentAbschlusspruefungPrintUrkundeMultiple(event, 'englisch')"/>
 	      </menupopup>
 	    </menu>
 	</menupopup>

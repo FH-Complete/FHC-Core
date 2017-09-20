@@ -1,5 +1,5 @@
 <?php
-$this->load->view('templates/header', array('title' => 'StudiensemesterNew', 'jqueryComposer' => true, 'datepicker' => true, 'datepickerclass' => 'dateinput'));
+$this->load->view('templates/header', array('title' => 'StudiensemesterNew', 'jqueryCurrent' => true, 'datepicker' => true, 'datepickerclass' => 'dateinput'));
 ?>
 <body>
 
