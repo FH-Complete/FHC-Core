@@ -32,7 +32,7 @@ class Message extends APIv1_Controller
 	public function getMessagesByPersonID()
 	{
 		$person_id = $this->get('person_id');
-		$oe_kurzbz = $this->get('oe_kurzbz'); // prestudent organisation unit
+		$oe_kurzbz = $this->get('oe_kurzbz'); // root organisation unit
 		$all = $this->get('all');
 
 		if (isset($person_id))
@@ -53,7 +53,7 @@ class Message extends APIv1_Controller
 	public function getMessagesByUID()
 	{
 		$uid = $this->get('uid');
-		$oe_kurzbz = $this->get('oe_kurzbz'); // prestudent organisation unit
+		$oe_kurzbz = $this->get('oe_kurzbz'); // root organisation unit
 		$all = $this->get('all');
 
 		if (isset($uid))
@@ -93,7 +93,7 @@ class Message extends APIv1_Controller
 	public function getSentMessagesByPerson()
 	{
 		$person_id = $this->get('person_id');
-		$oe_kurzbz = $this->get('oe_kurzbz'); // prestudent organisation unit
+		$oe_kurzbz = $this->get('oe_kurzbz'); // root organisation unit
 		$all = $this->get('all');
 
 		if (isset($person_id))
@@ -114,7 +114,7 @@ class Message extends APIv1_Controller
 	public function getCountUnreadMessages()
 	{
 		$person_id = $this->get('person_id');
-		$oe_kurzbz = $this->get('oe_kurzbz'); // prestudent organisation unit
+		$oe_kurzbz = $this->get('oe_kurzbz'); // root organisation unit
 
 		if (isset($person_id))
 		{

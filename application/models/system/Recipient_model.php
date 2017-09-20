@@ -141,7 +141,20 @@ class Recipient_model extends DB_Model
 		if ($oe_kurzbz != null)
 		{
 			array_push($parametersArray, $oe_kurzbz);
-			$sql .= ' AND m.oe_kurzbz = ?';
+			$sql .= ' AND m.oe_kurzbz IN (
+						WITH RECURSIVE organizations(_pk, _ppk) AS
+							(
+								SELECT o.oe_kurzbz, o.oe_parent_kurzbz
+								  FROM public.tbl_organisationseinheit o
+								 WHERE o.oe_parent_kurzbz IS NULL
+								   AND o.oe_kurzbz = ?
+							 UNION ALL
+								SELECT o.oe_kurzbz, o.oe_parent_kurzbz
+								  FROM public.tbl_organisationseinheit o INNER JOIN organizations orgs ON (o.oe_parent_kurzbz = orgs._pk)
+							)
+							SELECT orgs._pk
+							FROM organizations orgs
+						)';
 		}
 
 		$sql .= ' ORDER BY r.message_id DESC, s.status DESC';
@@ -207,7 +220,20 @@ class Recipient_model extends DB_Model
 		if ($oe_kurzbz != null)
 		{
 			array_push($parametersArray, $oe_kurzbz);
-			$sql .= ' AND m.oe_kurzbz = ?';
+			$sql .= ' AND m.oe_kurzbz IN (
+						WITH RECURSIVE organizations(_pk, _ppk) AS
+							(
+								SELECT o.oe_kurzbz, o.oe_parent_kurzbz
+								  FROM public.tbl_organisationseinheit o
+								 WHERE o.oe_parent_kurzbz IS NULL
+								   AND o.oe_kurzbz = ?
+							 UNION ALL
+								SELECT o.oe_kurzbz, o.oe_parent_kurzbz
+								  FROM public.tbl_organisationseinheit o INNER JOIN organizations orgs ON (o.oe_parent_kurzbz = orgs._pk)
+							)
+							SELECT orgs._pk
+							FROM organizations orgs
+						)';
 		}
 
 		return $this->execQuery($sql, $parametersArray);
@@ -315,7 +341,20 @@ class Recipient_model extends DB_Model
 		if ($oe_kurzbz != null)
 		{
 			array_push($parametersArray, $oe_kurzbz);
-			$sql .= ' AND m.oe_kurzbz = ?';
+			$sql .= ' AND m.oe_kurzbz IN (
+						WITH RECURSIVE organizations(_pk, _ppk) AS
+							(
+								SELECT o.oe_kurzbz, o.oe_parent_kurzbz
+								  FROM public.tbl_organisationseinheit o
+								 WHERE o.oe_parent_kurzbz IS NULL
+								   AND o.oe_kurzbz = ?
+							 UNION ALL
+								SELECT o.oe_kurzbz, o.oe_parent_kurzbz
+								  FROM public.tbl_organisationseinheit o INNER JOIN organizations orgs ON (o.oe_parent_kurzbz = orgs._pk)
+							)
+							SELECT orgs._pk
+							FROM organizations orgs
+						)';
 		}
 
 		return $this->execQuery($sql, $parametersArray);
