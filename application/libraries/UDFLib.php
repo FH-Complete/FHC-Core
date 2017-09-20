@@ -46,7 +46,6 @@ class UDFLib
 	const PHRASES_APP_NAME = 'core'; // Name of the app parameter used to retrive phrases
 
 	private $_ci; // Code igniter instance
-	private $UDFs; // Associative array containing names and values of the given UDF parameters
 
 	/**
 	 * Loads fhc helper
@@ -56,8 +55,6 @@ class UDFLib
 		$this->_ci =& get_instance();
 
 		$this->_ci->load->helper('fhc');
-
-		$this->UDFs = array(); // by default is an empty array
 	}
 
 	// -------------------------------------------------------------------------------------------------
@@ -213,7 +210,7 @@ class UDFLib
 		{
 			// Get udf values from $data & clean udf values from $data
 			// NOTE: Must be performed here because the load method populates the property UDFs too
-			$this->_popUDFParameters($data);
+			$udfsParameters = $this->_popUDFParameters($data);
 
 			$requiredUDFsArray = array(); // contains a list of required UDFs
 			// Contains the UDFs values to be stored
@@ -231,7 +228,7 @@ class UDFLib
 				$decodedUDFDefinition = $decodedUDFDefinitions[$i]; // Definition of a single UDF
 
 				// Loops through the UDFs values that should be stored
-				foreach ($this->UDFs as $key => $val)
+				foreach ($udfsParameters as $key => $val)
 				{
 					$tmpValidate = success(true); // temporary variable used to store the returned value from _validateUDFs
 
@@ -381,14 +378,18 @@ class UDFLib
 	 */
 	private function _popUDFParameters(&$data)
 	{
+		$udfsParameters = array();
+
 		foreach ($data as $key => $val)
 		{
 			if (substr($key, 0, 4) == UDFLib::COLUMN_PREFIX)
 			{
-				$this->UDFs[$key] = $val; // stores UDF value into property UDFs
+				$udfsParameters[$key] = $val; // stores UDF value into property UDFs
 				unset($data[$key]); // remove from data
 			}
 		}
+
+		return $udfsParameters;
 	}
 
 	/**
