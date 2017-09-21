@@ -1,4 +1,5 @@
 <?php
+
 class Organisationseinheit_model extends DB_Model
 {
 	/**
@@ -11,6 +12,9 @@ class Organisationseinheit_model extends DB_Model
 		$this->pk = 'oe_kurzbz';
 	}
 
+	/**
+	 * getRecursiveList
+	 */
 	public function getRecursiveList($typ = null)
 	{
 		$qry = "WITH RECURSIVE tree (oe_kurzbz, bezeichnung, path, organisationseinheittyp_kurzbz) AS (
@@ -31,17 +35,17 @@ class Organisationseinheit_model extends DB_Model
 				SELECT oe_kurzbz AS id,
 						SUBSTRING(REGEXP_REPLACE(path, '[A-z]+\|', '-', 'g') || bezeichnung, 2) AS description
 				  FROM tree";
-		
+
 		$parametersArray = array();
-		
+
 		if (is_array($typ) && count($typ) > 0)
 		{
 			$parametersArray[] = $typ;
 			$qry .= ' WHERE organisationseinheittyp_kurzbz IN ?';
 		}
-		
+
 		$qry .= ' ORDER BY path';
-		
+
 		return $this->execQuery($qry, $parametersArray);
 	}
 
@@ -78,12 +82,15 @@ class Organisationseinheit_model extends DB_Model
 					) _joined_table ON (orgs._pk = _joined_table._pk)
 					WHERE orgs._pk = ?
 					ORDER BY %s";
-		
+
 		$query = sprintf($query, $table, $fields, $schema, $table, $where, $orderby);
-		
+
 		return $this->execQuery($query, array($oe_kurzbz));
 	}
-	
+
+	/**
+     * getOneLevelAlias
+     */
 	public function getOneLevelAlias($table, $alias, $fields, $where, $orderby, $oe_kurzbz)
 	{
 		$query = "WITH RECURSIVE organizations(_pk, _ppk) AS
@@ -103,9 +110,9 @@ class Organisationseinheit_model extends DB_Model
 						) _joined_table ON (orgs._pk = _joined_table._jtpk)
 					 WHERE orgs._pk = ?
 				  ORDER BY %s";
-		
+
 		$query = sprintf($query, $alias, $fields, $table, $where, $orderby);
-		
+
 		return $this->execQuery($query, array($oe_kurzbz));
 	}
 }

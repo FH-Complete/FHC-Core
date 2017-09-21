@@ -62,12 +62,12 @@ class MessageLib
 	/**
      * getMessagesByUID() - will return all messages, including the latest status for specified user. It don´t returns Attachments.
      */
-    public function getMessagesByUID($uid, $all = false)
+    public function getMessagesByUID($uid, $oe_kurzbz = null, $all = false)
     {
         if (empty($uid))
         	return $this->_error('', MSG_ERR_INVALID_MSG_ID);
 
-		$msg = $this->ci->RecipientModel->getMessagesByUID($uid, $all);
+		$msg = $this->ci->RecipientModel->getMessagesByUID($uid, $oe_kurzbz, $all);
 
         return $msg;
     }
@@ -75,12 +75,12 @@ class MessageLib
 	/**
      * getMessagesByPerson() - will return all messages, including the latest status for specified user. It don´t returns Attachments.
      */
-    public function getMessagesByPerson($person_id, $all = false)
+    public function getMessagesByPerson($person_id, $oe_kurzbz = null, $all = false)
     {
         if (empty($person_id))
         	return $this->_error('', MSG_ERR_INVALID_MSG_ID);
 
-		$msg = $this->ci->RecipientModel->getMessagesByPerson($person_id, $all);
+		$msg = $this->ci->RecipientModel->getMessagesByPerson($person_id, $oe_kurzbz, $all);
 
         return $msg;
     }
@@ -88,12 +88,12 @@ class MessageLib
 	/**
      * getSentMessagesByPerson() - Get all sent messages from a person identified by person_id
      */
-    public function getSentMessagesByPerson($person_id, $all = false)
+    public function getSentMessagesByPerson($person_id, $oe_kurzbz = null, $all = false)
     {
         if (empty($person_id))
         	return $this->_error('', MSG_ERR_INVALID_MSG_ID);
 
-		$msg = $this->ci->MessageModel->getMessagesByPerson($person_id, $all);
+		$msg = $this->ci->MessageModel->getMessagesByPerson($person_id, $oe_kurzbz, $all);
 
         return $msg;
     }
@@ -144,12 +144,12 @@ class MessageLib
     /**
      * getCountUnreadMessages
      */
-    public function getCountUnreadMessages($person_id)
+    public function getCountUnreadMessages($person_id, $oe_kurzbz = null)
     {
         if (!is_numeric($person_id))
         	return $this->_error('', MSG_ERR_INVALID_RECIPIENTS);
 
-		$msg = $this->ci->RecipientModel->getCountUnreadMessages($person_id);
+		$msg = $this->ci->RecipientModel->getCountUnreadMessages($person_id, $oe_kurzbz);
 
         return $msg;
     }

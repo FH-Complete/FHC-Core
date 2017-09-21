@@ -2,29 +2,32 @@
 
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
-class Messages extends VileSci_Controller 
+class Messages extends VileSci_Controller
 {
+	/**
+	 *
+	 */
 	public function __construct()
     {
         parent::__construct();
-        
+
         // Loads the message library
         $this->load->library('MessageLib');
-        
+
         // Loads the widget library
 		$this->load->library('WidgetLib');
-		
+
 		$this->load->model('person/Person_model', 'PersonModel');
     }
-	
+
 	/**
-	 * 
+	 * write
 	 */
 	public function write($sender_id, $msg_id = null, $receiver_id = null)
 	{
 		$prestudent_id = $this->input->post('prestudent_id');
 		$msg = null;
-		
+
 		// Get message data if possible
 		if (is_numeric($msg_id) && is_numeric($receiver_id))
 		{
@@ -38,7 +41,7 @@ class Messages extends VileSci_Controller
 				$msg = $msg->retval[0];
 			}
 		}
-		
+
 		// Get variables
 		$this->load->model('system/Message_model', 'MessageModel');
 		$msgVarsDataByPrestudentId = $this->MessageModel->getMsgVarsDataByPrestudentId($prestudent_id);
@@ -46,7 +49,7 @@ class Messages extends VileSci_Controller
 		{
 			show_error($msgVarsDataByPrestudentId->retval);
 		}
-		
+
 		if (!hasData($variables = $this->MessageModel->getMessageVars()))
 		{
 			unset($variables);
@@ -60,11 +63,11 @@ class Messages extends VileSci_Controller
 				$variablesArray['{'.str_replace(" ", "_", strtolower($variables->retval[$i])).'}'] = $variables->retval[$i];
 			}
 		}
-		
+
 		array_shift($variables->retval); // Remove person_id
 		array_shift($variables->retval); // Remove prestudent_id
-		
-		// Organisation units
+
+		// Organisation units used to get the templates
 		$oe_kurzbz = array(); // A person can have more organisation units
 		$this->load->model('person/Benutzerfunktion_model', 'BenutzerfunktionModel');
 		$benutzerResult = $this->BenutzerfunktionModel->getByPersonId($sender_id);
@@ -75,7 +78,7 @@ class Messages extends VileSci_Controller
 				$oe_kurzbz[] = $val->oe_kurzbz;
 			}
 		}
-		
+
 		// Admin or commoner?
 		$this->load->model('system/Benutzerrolle_model', 'BenutzerrolleModel');
 		$isAdmin = $this->BenutzerrolleModel->isAdminByPersonId($sender_id);
@@ -83,38 +86,45 @@ class Messages extends VileSci_Controller
 		{
 			show_error($isAdmin->retval);
 		}
-		
+
 		$data = array (
 			'sender_id' => $sender_id,
 			'receivers' => $msgVarsDataByPrestudentId->retval,
 			'message' => $msg,
 			'variables' => $variablesArray,
-			'oe_kurzbz' => $oe_kurzbz,
+			'oe_kurzbz' => $oe_kurzbz, // used to get the templates
 			'isAdmin' => $isAdmin->retval
 		);
-		
+
 		$v = $this->load->view('system/messageWrite', $data);
 	}
-	
+
 	/**
-	 * 
+	 * send
 	 */
 	public function send($sender_id)
 	{
 		$error = false;
-		
+
 		$subject = $this->input->post('subject');
 		$body = $this->input->post('body');
 		$prestudents = $this->input->post('prestudents');
 		$relationmessage_id = $this->input->post('relationmessage_id');
-		
+
 		if (!isset($relationmessage_id) || $relationmessage_id == '')
 		{
 			$relationmessage_id = null;
 		}
-		
+
+		//
 		$data = $this->MessageModel->getMsgVarsDataByPrestudentId($prestudents);
-		if (hasData($data))
+
+		//
+		$this->load->model('crm/Prestudent_model', 'PrestudentModel');
+		$prestudentsData = $this->PrestudentModel->getOrganisationunits($prestudents);
+
+		//
+		if (hasData($data) && hasData($prestudentsData))
 		{
 			for ($i = 0; $i < count($data->retval); $i++)
 			{
@@ -125,10 +135,19 @@ class Messages extends VileSci_Controller
 					$newKey = str_replace(" ", "_", strtolower($key));
 					$dataArray[$newKey] = $dataArray[$key];
 				}
-				
+
 				$parsedText = $this->messagelib->parseMessageText($body, $dataArray);
-				
-				$msg = $this->messagelib->sendMessage($sender_id, $dataArray['person_id'], $subject, $parsedText, PRIORITY_NORMAL, $relationmessage_id);
+
+				$oe_kurzbz = '';
+				for ($p = 0; $p < count($prestudentsData->retval); $p++)
+				{
+					if ($prestudentsData->retval[$p]->prestudent_id == $data->retval[$i]->prestudent_id)
+					{
+						$oe_kurzbz = $prestudentsData->retval[$p]->oe_kurzbz;
+					}
+				}
+
+				$msg = $this->messagelib->sendMessage($sender_id, $dataArray['person_id'], $subject, $parsedText, PRIORITY_NORMAL, $relationmessage_id, $oe_kurzbz);
 				if ($msg->error)
 				{
 					show_error($msg->retval);
@@ -137,20 +156,20 @@ class Messages extends VileSci_Controller
 				}
 			}
 		}
-		
+
 		if (!$error)
 		{
 			echo "Messages sent successfully";
 		}
 	}
-	
+
 	/**
-	 * 
+	 * getPersonId
 	 */
 	private function getPersonId()
 	{
 		$person_id = null;
-		
+
 		if ($this->input->get('person_id') !== null)
 		{
 			$person_id = $this->input->get('person_id');
@@ -159,45 +178,45 @@ class Messages extends VileSci_Controller
 		{
 			$person_id = $this->input->get('person_id');
 		}
-		
+
 		if (!is_numeric($person_id))
 		{
 			show_error('Person_id is not numeric');
 		}
-		
+
 		return $person_id;
 	}
-	
+
 	/**
-	 * 
+	 * getVorlage
 	 */
 	public function getVorlage()
 	{
 		$vorlage_kurzbz = $this->input->get('vorlage_kurzbz');
-		
+
 		if (isset($vorlage_kurzbz))
 		{
 			$this->load->model('system/Vorlagestudiengang_model', 'VorlagestudiengangModel');
 			$result = $this->VorlagestudiengangModel->loadWhere(array('vorlage_kurzbz' => $vorlage_kurzbz));
-			
+
 			$this->output
 				->set_content_type('application/json')
 				->set_output(json_encode($result));
 		}
 	}
-	
+
 	/**
-	 * 
+	 * parseMessageText
 	 */
 	public function parseMessageText()
 	{
 		$prestudent_id = $this->input->get('prestudent_id');
 		$text = $this->input->get('text');
-		
+
 		if (isset($prestudent_id))
 		{
 			$data = $this->MessageModel->getMsgVarsDataByPrestudentId($prestudent_id);
-			
+
 			$parsedText = "";
 			if (hasData($data))
 			{
@@ -207,10 +226,10 @@ class Messages extends VileSci_Controller
 					$newKey = str_replace(" ", "_", strtolower($key));
 					$dataArray[$newKey] = $dataArray[$key];
 				}
-				
+
 				$parsedText = $this->messagelib->parseMessageText($text, $dataArray);
 			}
-			
+
 			$this->output
 				->set_content_type('application/json')
 				->set_output(json_encode($parsedText));

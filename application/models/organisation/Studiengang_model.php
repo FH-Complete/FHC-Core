@@ -104,7 +104,7 @@ class Studiengang_model extends DB_Model
 	public function getStudienplan($studiensemester_kurzbz, $ausbildungssemester, $aktiv, $onlinebewerbung)
 	{
 		if (isError($ent = $this->isEntitled($this->dbTable, PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR))) return $ent;
-		
+
 		// Join table public.tbl_studiengang with table lehre.tbl_studienordnung on column studiengang_kz
 		$this->addJoin('lehre.tbl_studienordnung', 'studiengang_kz');
 		// Then join with table lehre.tbl_studienplan on column studienordnung_id
@@ -138,10 +138,10 @@ class Studiengang_model extends DB_Model
 	/**
 	 * getStudiengangBewerbung
 	 */
-	public function getStudiengangBewerbung()
+	public function getStudiengangBewerbung($oe_kurzbz = null)
 	{
 		if (isError($ent = $this->isEntitled($this->dbTable, PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR))) return $ent;
-		
+
 		// Join table public.tbl_studiengang with table lehre.tbl_studienordnung on column studiengang_kz
 		$this->addJoin('lehre.tbl_studienordnung', 'studiengang_kz');
 		// Join table lehre.tbl_studienordnung with table lehre.tbl_akadgrad on column akadgrad_id
@@ -161,21 +161,45 @@ class Studiengang_model extends DB_Model
 		$this->addOrder('public.tbl_studiengang.bezeichnung');
 		$this->addOrder('lehre.tbl_studienplan.studienplan_id');
 
+		$where = 'public.tbl_studiengang.aktiv = TRUE
+					AND public.tbl_studiengang.onlinebewerbung = TRUE
+					AND (
+						(tbl_bewerbungstermine.beginn <= NOW() AND tbl_bewerbungstermine.ende >= NOW())
+						OR tbl_bewerbungstermine.beginn IS NULL
+					)
+					AND ss.studiensemester_kurzbz IN (
+						SELECT DISTINCT studiensemester_kurzbz
+						  FROM public.tbl_bewerbungstermine
+						 WHERE beginn <= NOW() AND ende >= NOW()
+					)
+					AND ss.semester = 1
+					AND lehre.tbl_studienplan.aktiv = TRUE';
+
+		if ($oe_kurzbz != null)
+		{
+			$where .= ' AND public.tbl_studiengang.oe_kurzbz IN (
+							WITH RECURSIVE organizations(_pk, _ppk) AS
+								(
+									SELECT o.oe_kurzbz, o.oe_parent_kurzbz
+									  FROM public.tbl_organisationseinheit o
+									 WHERE o.oe_parent_kurzbz IS NULL
+									   AND o.oe_kurzbz = '.$this->escape($oe_kurzbz).'
+								 UNION ALL
+									SELECT o.oe_kurzbz, o.oe_parent_kurzbz
+									  FROM public.tbl_organisationseinheit o INNER JOIN organizations orgs ON (o.oe_parent_kurzbz = orgs._pk)
+								)
+								SELECT orgs._pk
+								FROM organizations orgs
+							)';
+		}
+
 		$result = $this->loadTree(
 			'public.tbl_studiengang',
 			array(
 				'lehre.tbl_studienplan',
 				'lehre.tbl_akadgrad'
 			),
-			'public.tbl_studiengang.aktiv = TRUE
-			AND public.tbl_studiengang.onlinebewerbung = TRUE
-			AND ((tbl_bewerbungstermine.beginn <= NOW() AND tbl_bewerbungstermine.ende >= NOW()) OR tbl_bewerbungstermine.beginn IS NULL)
-			AND ss.studiensemester_kurzbz IN (
-				SELECT DISTINCT studiensemester_kurzbz FROM public.tbl_bewerbungstermine WHERE beginn <= NOW() AND ende >= NOW()
-			)
-			AND ss.semester = 1
-			AND lehre.tbl_studienplan.aktiv = TRUE'
-			,
+			$where,
 			array(
 				'studienplaene',
 				'akadgrad'
@@ -191,7 +215,7 @@ class Studiengang_model extends DB_Model
 	public function getAppliedStudiengang($person_id, $studiensemester_kurzbz, $titel)
 	{
 		if (isError($ent = $this->isEntitled($this->dbTable, PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR))) return $ent;
-		
+
 		// Then join with table public.tbl_prestudent
 		$this->addJoin('public.tbl_prestudent', 'studiengang_kz');
 		// Join table public.tbl_prestudentstatus
@@ -233,14 +257,14 @@ class Studiengang_model extends DB_Model
 
 		return $result;
 	}
-	
+
 	/**
 	 * getAppliedStudiengangFromNow
 	 */
 	public function getAppliedStudiengangFromNow($person_id, $titel)
 	{
 		if (isError($ent = $this->isEntitled($this->dbTable, PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR))) return $ent;
-		
+
 		// Then join with table public.tbl_prestudent
 		$this->addJoin('public.tbl_prestudent', 'studiengang_kz');
 		// Join table public.tbl_prestudentstatus
@@ -257,10 +281,10 @@ class Studiengang_model extends DB_Model
 			'prestudent_id',
 			'LEFT'
 		);
-		
+
 		// Ordering by studiengang_kz and studienplan_id
 		$this->addOrder('public.tbl_studiengang.bezeichnung');
-		
+
 		$result = $this->loadTree(
 			'public.tbl_studiengang',
 			array(
@@ -283,7 +307,74 @@ class Studiengang_model extends DB_Model
 				'notizen'
 			)
 		);
-		
+
+		return $result;
+	}
+
+	/**
+	 * getAppliedStudiengangFromNowOE
+	 */
+	public function getAppliedStudiengangFromNowOE($person_id, $titel, $oe_kurzbz)
+	{
+		if (isError($ent = $this->isEntitled($this->dbTable, PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR))) return $ent;
+
+		// Then join with table public.tbl_prestudent
+		$this->addJoin('public.tbl_prestudent', 'studiengang_kz');
+		// Join table public.tbl_prestudentstatus
+		$this->addJoin('public.tbl_prestudentstatus', 'prestudent_id');
+		// Then join with table lehre.tbl_studienplan
+		$this->addJoin('lehre.tbl_studienplan', 'studienplan_id');
+		// Then join with table public.tbl_notizzuordnung + public.tbl_notiz
+		$this->addJoin(
+			'(
+				SELECT public.tbl_notiz.*, public.tbl_notizzuordnung.prestudent_id
+				  FROM public.tbl_notiz JOIN public.tbl_notizzuordnung USING(notiz_id)
+				 WHERE titel = '.$this->escape($titel).
+			') tbl_notiz',
+			'prestudent_id',
+			'LEFT'
+		);
+
+		// Ordering by studiengang_kz and studienplan_id
+		$this->addOrder('public.tbl_studiengang.bezeichnung');
+
+		$result = $this->loadTree(
+			'public.tbl_studiengang',
+			array(
+				'public.tbl_prestudent',
+				'public.tbl_prestudentstatus',
+				'lehre.tbl_studienplan',
+				'public.tbl_notiz'
+			),
+			'public.tbl_prestudent.person_id = '.$this->escape($person_id).
+			' AND public.tbl_prestudentstatus.studiensemester_kurzbz IN (
+				SELECT studiensemester_kurzbz
+				  FROM public.tbl_studiensemester
+				 WHERE ende >= NOW()
+			)
+			AND (public.tbl_prestudentstatus.status_kurzbz = \'Interessent\')
+			AND public.tbl_studiengang.oe_kurzbz IN (
+				WITH RECURSIVE organizations(_pk, _ppk) AS
+					(
+						SELECT o.oe_kurzbz, o.oe_parent_kurzbz
+						  FROM public.tbl_organisationseinheit o
+						 WHERE o.oe_parent_kurzbz IS NULL
+						   AND o.oe_kurzbz = '.$this->escape($oe_kurzbz).'
+					 UNION ALL
+						SELECT o.oe_kurzbz, o.oe_parent_kurzbz
+						  FROM public.tbl_organisationseinheit o INNER JOIN organizations orgs ON (o.oe_parent_kurzbz = orgs._pk)
+					)
+					SELECT orgs._pk
+					FROM organizations orgs
+				)',
+			array(
+				'prestudenten',
+				'prestudentstatus',
+				'studienplaene',
+				'notizen'
+			)
+		);
+
 		return $result;
 	}
 

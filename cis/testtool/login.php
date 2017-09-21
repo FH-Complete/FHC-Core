@@ -210,10 +210,12 @@ if(isset($_SESSION['prestudent_id']) && !isset($_SESSION['pruefling_id']))
 {
 	$pruefling = new pruefling();
 
+        //wenn kein Prüfling geladen werden kann
 	if(!$pruefling->getPruefling($_SESSION['prestudent_id']))
-	{
 		$pruefling->new = true;
-
+        else
+            $pruefling->new = false; 
+   
 		$pruefling->studiengang_kz = $_SESSION['studiengang_kz'];
 		$pruefling->semester = $_SESSION['semester'];
 
@@ -225,9 +227,8 @@ if(isset($_SESSION['prestudent_id']) && !isset($_SESSION['pruefling_id']))
 			$_SESSION['pruefling_id']=$pruefling->pruefling_id;
 			$reload_parent=true;
 		}
-	}
 }
-
+                 
 if(isset($_POST['save']) && isset($_SESSION['prestudent_id']))
 {
 	$pruefling = new pruefling();
@@ -238,7 +239,7 @@ if(isset($_POST['save']) && isset($_SESSION['prestudent_id']))
 			$pruefling->new=false;
 	else
 		$pruefling->new=true;
-
+        
 	$pruefling->studiengang_kz = $_SESSION['studiengang_kz'];
 	$pruefling->idnachweis = isset($_POST['idnachweis'])?$_POST['idnachweis']:'';
 	$pruefling->registriert = date('Y-m-d H:i:s');
@@ -257,10 +258,7 @@ if(isset($_POST['save']) && isset($_SESSION['prestudent_id']))
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<link href="../../skin/style.css.php" rel="stylesheet" type="text/css">
 	<link rel="stylesheet" href="../../skin/jquery.css" type="text/css"/>
-	<script type="text/javascript" src="../../vendor/jquery/jqueryV1/jquery-1.12.4.min.js"></script>
-	<script type="text/javascript" src="../../vendor/christianbach/tablesorter/jquery.tablesorter.min.js"></script>
-	<script type="text/javascript" src="../../vendor/components/jqueryui/jquery-ui.min.js"></script>
-	<script type="text/javascript" src="../../include/js/jquery.ui.datepicker.translation.js"></script>
+	<script type="text/javascript" src="../../include/js/jquery1.9.min.js"></script>
 	<link rel="stylesheet" type="text/css" href="../../skin/jquery-ui-1.9.2.custom.min.css"/>
 	<script type="text/javascript">
 	$(document).ready(function()
@@ -286,14 +284,15 @@ if(isset($_POST['save']) && isset($_SESSION['prestudent_id']))
 				defaultDate: "-6570",
 				maxDate: -5110,
 				yearRange: "-60:+00",
-				});';
+				});';                              
 		?>
 
 	});
 	</script>
 <?php
 	if($reload_parent)
-		echo '<script language="Javascript">parent.menu.location.reload()</script>';
+		echo '<script language="Javascript">parent.menu.location.reload();</script>';  //CRIS:  nach reload()ein ; ergänzt
+         
 	if($reload)
 		echo "<script language=\"Javascript\">parent.location.reload();</script>";
 ?>
@@ -301,7 +300,8 @@ if(isset($_POST['save']) && isset($_SESSION['prestudent_id']))
 
 <body>
 <?php	echo '<h1>'.$p->t('testtool/startseite').'</h1>';
-
+        
+//REIHUNGSTEST STARTSEITE (nach Login)                              
 	if (isset($prestudent_id))
 	{
 
@@ -316,7 +316,8 @@ if(isset($_POST['save']) && isset($_SESSION['prestudent_id']))
 		$result = $db->db_query($qry);
 		$sprachwahl = $db->db_fetch_object($result);
 		$sprachwahl = $db->db_parse_bool($sprachwahl->sprachwahl);
-
+                
+                //Prestudent Informationen und Logout 
 		echo '<form method="GET">';
 		echo '<br>'.$p->t('testtool/begruessungstext').' <br/><br/>';
 		echo '<b>'.$p->t('zeitaufzeichnung/id').'</b>: '.$_SESSION['prestudent_id'].'<br/>';
@@ -326,10 +327,9 @@ if(isset($_POST['save']) && isset($_SESSION['prestudent_id']))
 		echo '<INPUT type="submit" value="Logout" name="logout" />';
 		echo '</form>';
 		echo '<br><br>';
-
+                            
 		if($pruefling->getPruefling($prestudent_id))
 		{
-
 			echo '<FORM accept-charset="UTF-8"   action="'. $_SERVER['PHP_SELF'].'"  method="post" enctype="multipart/form-data">';
 			echo '<input type="hidden" name="pruefling_id" value="'.$pruefling->pruefling_id.'">';
 			echo '<table>';
@@ -379,6 +379,7 @@ if(isset($_POST['save']) && isset($_SESSION['prestudent_id']))
 	}
 	else
 	{
+            //LOGIN FORM (Startseite vor Login)
 		$prestudent_id_dummy_student = (defined('PRESTUDENT_ID_DUMMY_STUDENT')?PRESTUDENT_ID_DUMMY_STUDENT:'');
 
 		echo '<form method="post">
@@ -397,8 +398,8 @@ if(isset($_POST['save']) && isset($_SESSION['prestudent_id']))
 		echo '</SELECT>';
 		echo '&nbsp; '.$p->t('global/geburtsdatum').': ';
 		echo '<input type="text" id="datepicker" size="12" name="gebdatum" value="'.$date->formatDatum($gebdatum,'d.m.Y').'">';
-		echo '&nbsp; <INPUT type="submit" value="'.$p->t('testtool/login').'" />';
-		echo '</form>';
+		echo '&nbsp; <INPUT type="submit" value="'.$p->t('testtool/login').'" />';   
+		echo '</form>';  
 
 		echo '<br /><br /><br />
 		<center>

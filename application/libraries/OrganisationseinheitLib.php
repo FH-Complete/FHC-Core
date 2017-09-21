@@ -10,14 +10,14 @@ class OrganisationseinheitLib
 	public function __construct()
 	{
 		$this->ci =& get_instance();
-		
+
 		// Loads model Organisationseinheit_model
 		$this->ci->load->model('organisation/Organisationseinheit_model', 'OrganisationseinheitModel');
-		
+
 		// Loads helper message to manage returning messages
 		$this->ci->load->helper('Message');
 	}
-	
+
 	/**
      * treeSearch
      *
@@ -54,7 +54,7 @@ class OrganisationseinheitLib
 		}
 
 		$result = $this->ci->OrganisationseinheitModel->getOneLevel($schema, $table, $select, $where, $orderby, $oe_kurzbz);
-		
+
 		if (hasData($result))
 		{
 			if ($result->retval[0]->_ppk != null && $result->retval[0]->oe_kurzbz == null)
@@ -62,12 +62,14 @@ class OrganisationseinheitLib
 				return $this->treeSearch($schema, $table, $select, $where, $orderby, $result->retval[0]->_ppk);
 			}
 		}
-		
+
 		return $result;
 	}
-	
+
 	/**
 	 * treeSearchEntire
+	 *
+	 * Like tree search, but it returns all the results found while travelling through the tree structure
 	 */
 	public function treeSearchEntire($table, $alias, $fields, $where, $orderby, $oe_kurzbz)
 	{
@@ -89,13 +91,13 @@ class OrganisationseinheitLib
 		}
 
 		$result = $this->ci->OrganisationseinheitModel->getOneLevelAlias($table, $alias, $select, $where, $orderby, $oe_kurzbz);
-		
+
 		if (hasData($result))
 		{
 			if ($result->retval[0]->_pk != null && $result->retval[0]->_ppk != null && $result->retval[0]->_jtpk != null)
 			{
 				$tmpResult = $this->treeSearchEntire($table, $alias, $select, $where, $orderby, $result->retval[0]->_ppk);
-				
+
 				if (hasData($tmpResult)
 					&& $tmpResult->retval[0]->_pk != null
 					&& $tmpResult->retval[0]->_ppk != null
@@ -109,7 +111,25 @@ class OrganisationseinheitLib
 				$result = $this->treeSearchEntire($table, $alias, $select, $where, $orderby, $result->retval[0]->_ppk);
 			}
 		}
-		
+
+		return $result;
+	}
+
+	/**
+	 * getRoot - Get the root of the organisation unit tree which belongs the given organisation unit parameter
+	 */
+	public function getRoot($oe_kurzbz)
+	{
+		$result = $this->ci->OrganisationseinheitModel->load($oe_kurzbz);
+
+		if (hasData($result))
+		{
+			if ($result->retval[0]->oe_parent_kurzbz != null)
+			{
+				$result = $this->getRoot($result->retval[0]->oe_parent_kurzbz);
+			}
+		}
+
 		return $result;
 	}
 }

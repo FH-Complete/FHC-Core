@@ -243,4 +243,6 @@ $config['fhc_acl'] = array
 	'PhrasesLib.getPhrase' => 'system/PhrasesLib'
 );
 
-$config['addons_aufnahme_url'] = 'http://debian.dev/build/addons/aufnahme/cis/index.php';
+//
+$config['addons_aufnahme_url'] = array();
+$config['addons_aufnahme_url']['OE_ROOT'] = 'http://debian.dev/addons/aufnahme/OE_ROOT/cis/index.php';
