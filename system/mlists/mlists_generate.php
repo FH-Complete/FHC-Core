@@ -80,8 +80,8 @@ $error_msg='';
 	/**
 	 * Einfache Verteiler, deren Erstellung ohne Schleifen-Logik moeglich ist, werden ueber dieses Array erstellt
 	 * Benoetigt werden die 3 Attribute:
-	 * $verteilerArray['name_des_verteilers']['bezeichnung'] = 'Bezeichnung des Verteilers';
-	 * $verteilerArray['name_des_verteilers']['beschreibung'] = 'Beschreibung des Verteilers (Anzeige im CIS)';
+	 * $verteilerArray['name_des_verteilers']['bezeichnung'] = 'Bezeichnung des Verteilers (32 Zeichen)';
+	 * $verteilerArray['name_des_verteilers']['beschreibung'] = 'Beschreibung des Verteilers (Anzeige im CIS)(128 Zeichen)';
 	 * $verteilerArray['name_des_verteilers']['sql'] = 'UIDs, die im Verteiler enthalten sein sollen (kein Semikolon am Ende)';
 	 * 
 	 * Die Verteiler werden dann alle gleich erstellt:
@@ -396,20 +396,46 @@ $error_msg='';
 												AND tbl_benutzer.aktiv
 												AND (tbl_benutzerfunktion.datum_von<=now() OR tbl_benutzerfunktion.datum_von is null)
 												AND (tbl_benutzerfunktion.datum_bis>=now() OR tbl_benutzerfunktion.datum_bis is null)";
+	//Alle aktiven Studierenden in Academy-Lehrgaengen
+	//Abbrecher bleiben noch 3 Wochen im Verteiler andere inaktive noch fuer 20 Wochen
+	$verteilerArray['tw_academy_std']['bezeichnung'] = 'Alle Studierenden der Academy';
+	$verteilerArray['tw_academy_std']['beschreibung'] = 'Alle Studierenden der TW-Academy (LehrgangsteilnehmerInnen)';
+	$verteilerArray['tw_academy_std']['sql'] = "	SELECT DISTINCT uid AS uid
+													FROM campus.vw_student
+													JOIN public.tbl_studiengang USING (studiengang_kz)
+													JOIN public.tbl_organisationseinheit USING (oe_kurzbz)
+													WHERE (
+														vw_student.aktiv
+														OR
+														(vw_student.aktiv=false AND get_rolle_prestudent(vw_student.prestudent_id, null)='Abbrecher' AND vw_student.updateaktivam>now()-'3 weeks'::interval)
+														OR
+														(vw_student.aktiv=false AND get_rolle_prestudent(vw_student.prestudent_id, null)!='Abbrecher' AND vw_student.updateaktivam>now()-'20 weeks'::interval))
+													AND tbl_organisationseinheit.oe_parent_kurzbz='lehrgang'
+													AND organisationseinheittyp_kurzbz='Lehrgang'";
 
+	$bezeichnung = '';
+	$beschreibung = '';
 	foreach ($verteilerArray AS $listname => $data)
 	{
 		$grp = new gruppe();
 		// Pruefen, ob die Gruppe existert, wenn nicht, anlegen
 		if(!$grp->exists($listname))
 		{
-			//$error_msg .= 'Die Gruppe '.$listname.' existiert nicht<br><br>';
+			if (strlen($data['bezeichnung']) > 32)
+				$bezeichnung = substr($data['bezeichnung'], 0, 32);
+			else 
+				$bezeichnung = $data['bezeichnung'];
+			
+			if (strlen($data['beschreibung']) > 128)
+				$beschreibung = substr($data['beschreibung'], 0, 128);
+			else
+				$beschreibung = $data['beschreibung'];
 			
 			$grp->gruppe_kurzbz = $listname;
 			$grp->studiengang_kz = '0';
 			$grp->semester = '0';
-			$grp->bezeichnung = $data['bezeichnung'];
-			$grp->beschreibung = $data['beschreibung'];
+			$grp->bezeichnung = $bezeichnung;
+			$grp->beschreibung = $beschreibung;
 			$grp->mailgrp = true;
 			$grp->sichtbar = true;
 			$grp->generiert = true;
@@ -470,7 +496,7 @@ $error_msg='';
 		
 		flush();
 	}
-	
+
 // **************************************************************
 // Erstellen der Mailinglisten mit Schleifen-Logik
 // **************************************************************
