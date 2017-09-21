@@ -291,9 +291,9 @@ if(isset($_GET['excel']))
                     // Wenn Daten vorhanden
                     if ($db->db_num_rows($result) > 0)
                     {
-                        while($row = $db->db_fetch_object($result))                                   
-                        {                                       
-                                if ($ort_kurzbz == '0' || $ort_kurzbz != $row->ort_kurzbz)                                            
+                        while($row = $db->db_fetch_object($result))
+                        {
+                                if ($ort_kurzbz == '0' || $ort_kurzbz != $row->ort_kurzbz)
                                 {
                                         // Creating a worksheet
                                         if ($row->ort_kurzbz=='')
@@ -363,34 +363,34 @@ if(isset($_GET['excel']))
                                 $rt_prestudent_arr = array();
 
                                 //Daten ermitteln für Spalte absolvierte Verfahren
-                                $qry_absolvierte_Verfahren = "SELECT 
-                                    distinct tbl_reihungstest.reihungstest_id,  
+                                $qry_absolvierte_Verfahren = "SELECT
+                                    distinct tbl_reihungstest.reihungstest_id,
                                     tbl_pruefling.pruefling_id,
                                     tbl_prestudent.prestudent_id,
                                     tbl_rt_person.person_id
-                                    FROM 
-                                    public.tbl_rt_person 
-                                    JOIN lehre.tbl_studienplan USING(studienplan_id) 
-                                    JOIN lehre.tbl_studienordnung USING(studienordnung_id) 
-                                    JOIN public.tbl_prestudent USING(person_id) 
-                                    JOIN public.tbl_prestudentstatus USING(studienplan_id, prestudent_id) 
-                                    JOIN public.tbl_reihungstest ON(tbl_reihungstest.reihungstest_id=tbl_rt_person.rt_id) 
-                                    LEFT JOIN testtool.tbl_pruefling using(prestudent_id) WHERE 
+                                    FROM
+                                    public.tbl_rt_person
+                                    JOIN lehre.tbl_studienplan USING(studienplan_id)
+                                    JOIN lehre.tbl_studienordnung USING(studienordnung_id)
+                                    JOIN public.tbl_prestudent USING(person_id)
+                                    JOIN public.tbl_prestudentstatus USING(studienplan_id, prestudent_id)
+                                    JOIN public.tbl_reihungstest ON(tbl_reihungstest.reihungstest_id=tbl_rt_person.rt_id)
+                                    LEFT JOIN testtool.tbl_pruefling using(prestudent_id) WHERE
                                     (tbl_rt_person.anmeldedatum is null OR tbl_rt_person.anmeldedatum<=tbl_reihungstest.datum)
                                     AND tbl_reihungstest.datum >=(SELECT min(begintime)::date FROM testtool.tbl_pruefling_frage WHERE pruefling_id=tbl_pruefling.pruefling_id AND tbl_reihungstest.datum>=begintime-'1 days'::interval)                                    AND (tbl_reihungstest.stufe is null or tbl_reihungstest.stufe=1)
                                     AND person_id=".$db->db_add_param($row->person_id, FHC_INTEGER);
-                          
+
                                 if($result_rt_prestudent = $db->db_query($qry_absolvierte_Verfahren))
-                                { 
+                                {
                                     while($obj = $db->db_fetch_object($result_rt_prestudent))
-                                    {    
-                                        array_push($rt_prestudent_arr, $obj);   
+                                    {
+                                        array_push($rt_prestudent_arr, $obj);
                                     }
                                 }
 
                                 foreach($rt_prestudent_arr as $item)
                                 {
-                                    $pruefling->getPruefling($item->prestudent_id);  
+                                    $pruefling->getPruefling($item->prestudent_id);
                                     $rt = new Reihungstest();
                                     $rt->load($item->reihungstest_id);
                                     $rt_letztes_login = $datum_obj->formatDatum($pruefling->registriert, 'Y-m-d');
@@ -413,7 +413,7 @@ if(isset($_GET['excel']))
                                                         }
                                                 }
                                         }
-                                }  
+                                }
 
                                 $weitere_zuteilungen = array();
                                 $qry_zuteilungen = "
@@ -553,14 +553,20 @@ if(isset($_GET['excel']))
 		<title>Reihungstest</title>
 		<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
 		<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
-		<script type="text/javascript" src="../../include/js/jquery.js"></script>
+
+		<script type="text/javascript" src="../../vendor/jquery/jqueryV1/jquery-1.12.4.min.js"></script>
+
+		<script type="text/javascript" src="../../include/js/jquery.ui.datepicker.translation.js"></script>
+		<script type="text/javascript" src="../../vendor/jquery/sizzle/sizzle.js"></script>
+
+		<script type="text/javascript" src="../../vendor/christianbach/tablesorter/jquery.tablesorter.min.js"></script>
 		<link rel="stylesheet" href="../../skin/tablesort.css" type="text/css"/>
 		<link href="../../skin/jquery-ui-1.9.2.custom.min.css" rel="stylesheet" type="text/css">
-		<script src="../../include/js/jquery1.9.min.js" type="text/javascript"></script>
-		<script src="../../vendor/rmariuzzo/jquery-checkboxes/dist/jquery.checkboxes-1.0.7.min.js" type="text/javascript"></script>
+		<script type="text/javascript" src="../../vendor/components/jqueryui/jquery-ui.min.js"></script>
+ 		<script src="../../vendor/rmariuzzo/jquery-checkboxes/dist/jquery.checkboxes-1.0.7.min.js" type="text/javascript"></script>
 
-		<link href="../../skin/jquery.ui.timepicker.css" rel="stylesheet" type="text/css"/>
-		<script src="../../include/js/jquery.ui.timepicker.js" type="text/javascript" ></script>
+		<link href="../../vendor/fgelinas/timepicker/jquery.ui.timepicker.css" rel="stylesheet" type="text/css"/>
+		<script src="../../vendor/fgelinas/timepicker/jquery.ui.timepicker.js" type="text/javascript" ></script>
 
 		<script type="text/javascript">
 			$(document).ready(function()
@@ -1759,7 +1765,7 @@ $studienplaene_list = implode(',', array_keys($studienplaene_arr));
 		}
 		else
 		{
-			echo '<td class="feldtitel">Studienpläne</td>';
+			echo '<tr><td class="feldtitel">Studienpläne</td>';
 
 			if(!$neu)
 			{
@@ -1881,12 +1887,6 @@ $studienplaene_list = implode(',', array_keys($studienplaene_arr));
 				(Kurz vor Testbeginn aktivieren)
 			</td>
 		</tr>
-		<!--<tr>
-			<td>Plätze</td>
-			<td>
-				<?php echo $arbeitsplaetze_sum ?> (inkl. Schwund)
-			</td>
-		</tr>-->
 		<tr>
 			<td>&nbsp;</td>
 		</tr>
@@ -1898,10 +1898,10 @@ $studienplaene_list = implode(',', array_keys($studienplaene_arr));
 			<td></td>
 			<td>
 				<button type="submit" name="speichern"><?php echo $val ?></button>
-				<?php 
+				<?php
 					if(!$neu)
 						echo '<button type="submit" name="kopieren" onclick="return confirm (\'Eine Kopie dieses Tests (ohne Raumzuordnung) erstellen?\')">Kopie erstellen</button>';
-					
+
 					if($rechte->isBerechtigt('lehre/reihungstest', null, 'suid'))
 					{
 						$anzahl_teilnehmer = new reihungstest();
@@ -1909,9 +1909,9 @@ $studienplaene_list = implode(',', array_keys($studienplaene_arr));
 
 						if (isset($orte) && count($orte->result) == 0 && isset($studienplaene) && count($studienplaene->result) == 0 && $anzahl_teilnehmer == 0 && $reihungstest_id != '')
 							echo '<button type="submit" name="deleteReihungstest" onclick="return confirm (\'Diesen Reihungstesttermin löschen?\')">Termin löschen</button>';
-						else 
+						else
 							echo '<button type="submit" name="" disabled="disabled" title="Entfernen Sie zuerst alle Raumzuteilungen, Studienpläne und TeilnehmerInnen">Termin löschen</button>';
-					} 
+					}
 				?>
 			</td>
 		</tr>
@@ -2007,7 +2007,7 @@ if($reihungstest_id!='')
 	if($result = $db->db_query($qry))
 	{
 		while($row = $db->db_fetch_object($result))
-		{                  
+		{
 			$result_arr[] = $row;
 
 			if (is_null($row->ort_kurzbz))
@@ -2042,8 +2042,8 @@ if($reihungstest_id!='')
 	echo '</td></tr></table>';
     echo '</div>';
 	echo '<br>';
-	
-    
+
+
 	$pruefling = new pruefling();
 
 	$cnt = 0;
@@ -2083,29 +2083,29 @@ if($reihungstest_id!='')
 				</tr>
 				</thead>
 				<tbody>';
-                
+
 		foreach ($result_arr AS $row)
 		{
                     $rt_in_anderen_stg='';
                     $rtergebnis = '';
                     $rt_prestudent_arr = array();
-                    
+
                     if($punkteberechnung == 'true')
-                    {     
+                    {
                       //Daten für Spalte bereits absolvierte Verfahren
-                      $qry = "SELECT 
-                                distinct tbl_reihungstest.reihungstest_id,  
+                      $qry = "SELECT
+                                distinct tbl_reihungstest.reihungstest_id,
                                 tbl_pruefling.pruefling_id,
                                 tbl_prestudent.prestudent_id,
                                 tbl_rt_person.person_id
-                                FROM 
-                                public.tbl_rt_person 
-                                JOIN lehre.tbl_studienplan USING(studienplan_id) 
-                                JOIN lehre.tbl_studienordnung USING(studienordnung_id) 
-                                JOIN public.tbl_prestudent USING(person_id) 
-                                JOIN public.tbl_prestudentstatus USING(studienplan_id, prestudent_id) 
-                                JOIN public.tbl_reihungstest ON(tbl_reihungstest.reihungstest_id=tbl_rt_person.rt_id) 
-                                LEFT JOIN testtool.tbl_pruefling using(prestudent_id) WHERE 
+                                FROM
+                                public.tbl_rt_person
+                                JOIN lehre.tbl_studienplan USING(studienplan_id)
+                                JOIN lehre.tbl_studienordnung USING(studienordnung_id)
+                                JOIN public.tbl_prestudent USING(person_id)
+                                JOIN public.tbl_prestudentstatus USING(studienplan_id, prestudent_id)
+                                JOIN public.tbl_reihungstest ON(tbl_reihungstest.reihungstest_id=tbl_rt_person.rt_id)
+                                LEFT JOIN testtool.tbl_pruefling using(prestudent_id) WHERE
                                 (tbl_rt_person.anmeldedatum is null OR tbl_rt_person.anmeldedatum<=tbl_reihungstest.datum)
                                 AND tbl_reihungstest.datum >=(SELECT min(begintime)::date FROM testtool.tbl_pruefling_frage WHERE pruefling_id=tbl_pruefling.pruefling_id AND tbl_reihungstest.datum>=begintime-'1 days'::interval)                                    AND (tbl_reihungstest.stufe is null or tbl_reihungstest.stufe=1)
                                 AND person_id=".$db->db_add_param($row->person_id, FHC_INTEGER);
@@ -2113,8 +2113,8 @@ if($reihungstest_id!='')
                         if($result = $db->db_query($qry))
                         {
                             while($obj = $db->db_fetch_object($result))
-                            {    
-                                array_push($rt_prestudent_arr, $obj);                                                                   
+                            {
+                                array_push($rt_prestudent_arr, $obj);
                             }
                         }
 
@@ -2122,13 +2122,13 @@ if($reihungstest_id!='')
                         if(defined('FAS_REIHUNGSTEST_PUNKTE') && FAS_REIHUNGSTEST_PUNKTE)
                                 $rtergebnis = $pruefling->getReihungstestErgebnisPrestudent($row->prestudent_id, true, $reihungstest->reihungstest_id);
                         else
-                                $rtergebnis = $pruefling->getReihungstestErgebnisPrestudent($row->prestudent_id, false, $reihungstest->reihungstest_id);                                
+                                $rtergebnis = $pruefling->getReihungstestErgebnisPrestudent($row->prestudent_id, false, $reihungstest->reihungstest_id);
 
 
-                        //Ausgabe für bereits absolvierte Verfahren  
-                        foreach($rt_prestudent_arr as $item)                                  
-                        { 
-                            $pruefling->getPruefling($item->prestudent_id);  
+                        //Ausgabe für bereits absolvierte Verfahren
+                        foreach($rt_prestudent_arr as $item)
+                        {
+                            $pruefling->getPruefling($item->prestudent_id);
                             $rt = new Reihungstest();
                             $rt->load($item->reihungstest_id);
                             $rt_letztes_login = $datum_obj->formatDatum($pruefling->registriert, 'Y-m-d');
@@ -2136,15 +2136,15 @@ if($reihungstest_id!='')
 
                           //Wenn bereits absolvierte Verfahren vorhanden
                             if($item->prestudent_id != $row->prestudent_id || $rt_letztes_login < $rt_antrittstermin)
-                            {                                           
+                            {
                                 if(defined('FAS_REIHUNGSTEST_PUNKTE') && FAS_REIHUNGSTEST_PUNKTE)
-                                    $erg = $pruefling->getReihungstestErgebnisPrestudent($item->prestudent_id, true, $item->reihungstest_id);                                                                                              
+                                    $erg = $pruefling->getReihungstestErgebnisPrestudent($item->prestudent_id, true, $item->reihungstest_id);
                                 else
                                     $erg = $pruefling->getReihungstestErgebnisPrestudent($item->prestudent_id, false, $item->reihungstest_id);
 
                                 if($erg !== false)
-                                {    
-                                    $rt_in_anderen_stg .= number_format($erg, 2).((FAS_REIHUNGSTEST_PUNKTE) ? ' Punkte' : ' %').' im Studiengang '.$studiengang->kuerzel_arr[$pruefling->studiengang_kz].'<br>';     
+                                {
+                                    $rt_in_anderen_stg .= number_format($erg, 2).((FAS_REIHUNGSTEST_PUNKTE) ? ' Punkte' : ' %').' im Studiengang '.$studiengang->kuerzel_arr[$pruefling->studiengang_kz].'<br>';
 
                                     if ($item->prestudent_id == $row->prestudent_id && $rt_letztes_login < $rt_antrittstermin)
                                     {
@@ -2152,10 +2152,10 @@ if($reihungstest_id!='')
                                         $rt_in_anderen_stg .= '<a href="reihungstest_administration.php">absolvierte RT-Gebiete entsperren</a>)<br>';
                                     }
                                 }
-                            }                                      
+                            }
                         }
                     }
-                                       
+
                     if ($row->ort_kurzbz == '')
                     {
                             if(isset($studienplaene_arr[$row->studienplan_id]))
@@ -2182,7 +2182,7 @@ if($reihungstest_id!='')
                                             <td style="display: table-cell" class="clm_geburtsdatum">'.$db->convert_html_chars($row->gebdatum!=''?$datum_obj->convertISODate($row->gebdatum):' ').'</td>
                                             <td style="display: table-cell; text-align: center" class="clm_email"><a href="mailto:'.$db->convert_html_chars($row->email).'"><img src="../../skin/images/button_mail.gif" name="mail"></a></td>
                                             <td style="display: table-cell" class="clm_absolviert">'.$rt_in_anderen_stg.'</td>
-                                            <td style="display: table-cell; align: right" class="clm_ergebnis"">'.($rtergebnis == '' || $rtergebnis===false?'-':number_format($rtergebnis,2,'.','')).' %</td>
+                                            <td style="display: table-cell; align: right" class="clm_ergebnis">'.($rtergebnis == '' || $rtergebnis===false?'-':number_format($rtergebnis,2,'.','')).' %</td>
                                             <td style="display: table-cell; align: right" class="clm_fas">';
                                             if($rtergebnis!==false && $rtergebnis != '' && $row->punkte=='')
                                                     echo '<a href="'.$_SERVER['PHP_SELF'].'?reihungstest_id='.$reihungstest_id.'&stg_kz='.$stg_kz.'&type=savertpunkte&rt_person_id='.$row->rt_person_id.'&rtpunkte='.$rtergebnis.'" >&uuml;bertragen</a>';
@@ -2211,13 +2211,13 @@ if($reihungstest_id!='')
 		}
 		echo '</select>';
 		echo '<button type="submit" name="raumzuteilung_speichern">Speichern</button>';
-        
-		echo '</form>';       
+
+		echo '</form>';
         echo '</div>';
-        
+
         echo '<br>';
 	}
-	
+
         foreach ($orte->result AS $ort)
         {
             $cnt++;
@@ -2225,10 +2225,10 @@ if($reihungstest_id!='')
                 $style = 'text-align: center; margin: 0 5px 0 5px; color: red';
             else
                 $style = 'text-align: center; margin: 0 5px 0 5px;';
-            
+
             //TABLE MIT RAUMZUTEILUNG
             if ($orte_zuteilung_array[$ort->ort_kurzbz] > 0)
-            {             
+            {
                 echo '<div style="vertical-align: top">';
                 echo '<div style="'.$style.'"><b>Mit Raumzuteilung in '.$ort->ort_kurzbz.' ('.$orte_zuteilung_array[$ort->ort_kurzbz].'/'.$orte_array[$ort->ort_kurzbz].')</b></div>';
                 echo '<form id="raumzuteilung_form['.$ort->ort_kurzbz.']" method="POST" action="'.$_SERVER['PHP_SELF'].'?stg_kz='.$stg_kz.'&reihungstest_id='.$reihungstest->reihungstest_id.'&studiensemester_kurzbz='.$studiensemester_kurzbz.'">';
@@ -2259,9 +2259,9 @@ if($reihungstest_id!='')
                         </tr>
                     </thead>
                 <tbody>';
-                   
+
                 $cnt_personen = 0;
-                    
+
                 foreach ($result_arr AS $row)
                 {
                     $rt_in_anderen_stg='';
@@ -2271,19 +2271,19 @@ if($reihungstest_id!='')
                     if($punkteberechnung == 'true')
                     {
                         //Daten für Spalte bereits absolvierte Verfahren
-                        $qry = "SELECT 
-                        distinct tbl_reihungstest.reihungstest_id,  
+                        $qry = "SELECT
+                        distinct tbl_reihungstest.reihungstest_id,
                         tbl_pruefling.pruefling_id,
                         tbl_prestudent.prestudent_id,
                         tbl_rt_person.person_id
-                        FROM 
-                        public.tbl_rt_person 
-                        JOIN lehre.tbl_studienplan USING(studienplan_id) 
-                        JOIN lehre.tbl_studienordnung USING(studienordnung_id) 
-                        JOIN public.tbl_prestudent USING(person_id) 
-                        JOIN public.tbl_prestudentstatus USING(studienplan_id, prestudent_id) 
-                        JOIN public.tbl_reihungstest ON(tbl_reihungstest.reihungstest_id=tbl_rt_person.rt_id) 
-                        LEFT JOIN testtool.tbl_pruefling using(prestudent_id) WHERE 
+                        FROM
+                        public.tbl_rt_person
+                        JOIN lehre.tbl_studienplan USING(studienplan_id)
+                        JOIN lehre.tbl_studienordnung USING(studienordnung_id)
+                        JOIN public.tbl_prestudent USING(person_id)
+                        JOIN public.tbl_prestudentstatus USING(studienplan_id, prestudent_id)
+                        JOIN public.tbl_reihungstest ON(tbl_reihungstest.reihungstest_id=tbl_rt_person.rt_id)
+                        LEFT JOIN testtool.tbl_pruefling using(prestudent_id) WHERE
                         (tbl_rt_person.anmeldedatum is null OR tbl_rt_person.anmeldedatum<=tbl_reihungstest.datum)
                         AND tbl_reihungstest.datum >=(SELECT min(begintime)::date FROM testtool.tbl_pruefling_frage WHERE pruefling_id=tbl_pruefling.pruefling_id AND tbl_reihungstest.datum>=begintime-'1 days'::interval)                                    AND (tbl_reihungstest.stufe is null or tbl_reihungstest.stufe=1)
                         AND person_id=".$db->db_add_param($row->person_id, FHC_INTEGER);
@@ -2291,8 +2291,8 @@ if($reihungstest_id!='')
                         if($result = $db->db_query($qry))
                         {
                             while($obj = $db->db_fetch_object($result))
-                            {    
-                                array_push($rt_prestudent_arr, $obj);                                                                   
+                            {
+                                array_push($rt_prestudent_arr, $obj);
                             }
                         }
 
@@ -2300,12 +2300,12 @@ if($reihungstest_id!='')
                         if(defined('FAS_REIHUNGSTEST_PUNKTE') && FAS_REIHUNGSTEST_PUNKTE)
                             $rtergebnis = $pruefling->getReihungstestErgebnisPrestudent($row->prestudent_id, true, $reihungstest->reihungstest_id);
                         else
-                            $rtergebnis = $pruefling->getReihungstestErgebnisPrestudent($row->prestudent_id, false, $reihungstest->reihungstest_id);  				
-					
-                         //Ausgabe für bereits absolvierte Verfahren  
-                        foreach($rt_prestudent_arr as $item)                                  
-                        { 
-                            $pruefling->getPruefling($item->prestudent_id);  
+                            $rtergebnis = $pruefling->getReihungstestErgebnisPrestudent($row->prestudent_id, false, $reihungstest->reihungstest_id);
+
+                         //Ausgabe für bereits absolvierte Verfahren
+                        foreach($rt_prestudent_arr as $item)
+                        {
+                            $pruefling->getPruefling($item->prestudent_id);
                             $rt = new Reihungstest();
                             $rt->load($item->reihungstest_id);
                             $rt_letztes_login = $datum_obj->formatDatum($pruefling->registriert, 'Y-m-d');
@@ -2315,19 +2315,19 @@ if($reihungstest_id!='')
                             if($item->prestudent_id != $row->prestudent_id || $rt_letztes_login < $rt_antrittstermin)
                             {
                                 if(defined('FAS_REIHUNGSTEST_PUNKTE') && FAS_REIHUNGSTEST_PUNKTE)
-                                    $erg = $pruefling->getReihungstestErgebnisPrestudent($item->prestudent_id, true, $item->reihungstest_id);                                                                                              
+                                    $erg = $pruefling->getReihungstestErgebnisPrestudent($item->prestudent_id, true, $item->reihungstest_id);
                                 else
                                     $erg = $pruefling->getReihungstestErgebnisPrestudent($item->prestudent_id, false, $item->reihungstest_id);
 
                                 if($erg!==false)
                                 {
-                                    $rt_in_anderen_stg .= number_format($erg, 2).((FAS_REIHUNGSTEST_PUNKTE) ? ' Punkte' : ' %').' im Studiengang '.$studiengang->kuerzel_arr[$pruefling->studiengang_kz].'<br>';     
+                                    $rt_in_anderen_stg .= number_format($erg, 2).((FAS_REIHUNGSTEST_PUNKTE) ? ' Punkte' : ' %').' im Studiengang '.$studiengang->kuerzel_arr[$pruefling->studiengang_kz].'<br>';
 
                                     if ($item->prestudent_id == $row->prestudent_id && $rt_letztes_login < $rt_antrittstermin)
                                     {
                                         $rt_in_anderen_stg .= '(Letzter '.$studiengang->kuerzel_arr[$pruefling->studiengang_kz].'-Antritt: '.$datum_obj->formatDatum($rt_letztes_login, 'd.m.Y').',<br>';
                                         $rt_in_anderen_stg .= '<a href="reihungstest_administration.php">absolvierte RT-Gebiete entsperren</a>)<br>';
-                                    }							
+                                    }
                                 }
                             }
                         }
@@ -2359,8 +2359,8 @@ if($reihungstest_id!='')
                                     <td style="display: table-cell" class="clm_einstiegssemester">'.$db->convert_html_chars($row->ausbildungssemester).'</td>
                                     <td style="display: table-cell" class="clm_geburtsdatum">'.$db->convert_html_chars($row->gebdatum!=''?$datum_obj->convertISODate($row->gebdatum):' ').'</td>
                                     <td style="display: table-cell; text-align: center" class="clm_email"><a href="mailto:'.$db->convert_html_chars($row->email).'"><img src="../../skin/images/button_mail.gif" name="mail"></a></td>
-                                    <td style="display: table-cell; class="clm_absolviert">'.$rt_in_anderen_stg.'</td>
-                                    <td style="display: table-cell; align: right" class="clm_ergebnis"">'.($rtergebnis==0?'-':number_format($rtergebnis,2,'.','')).' %</td>
+                                    <td style="display: table-cell;" class="clm_absolviert">'.$rt_in_anderen_stg.'</td>
+                                    <td style="display: table-cell; align: right" class="clm_ergebnis">'.($rtergebnis==0?'-':number_format($rtergebnis,2,'.','')).' %</td>
                                     <td style="display: table-cell; align: right" class="clm_fas">';
                                     if($rtergebnis!==false && $rtergebnis != '' && $row->punkte=='')
                                         echo '<a href="'.$_SERVER['PHP_SELF'].'?reihungstest_id='.$reihungstest_id.'&stg_kz='.$stg_kz.'&type=savertpunkte&rt_person_id='.$row->rt_person_id.'&rtpunkte='.$rtergebnis.'" >&uuml;bertragen</a>';
@@ -2389,10 +2389,10 @@ if($reihungstest_id!='')
                     }
                     echo '</select>';
                     echo '<button type="submit" name="raumzuteilung_speichern">Speichern</button>';
-                    
+
                     echo '</form>';
                     echo '</div>';
-            }          
+            }
         }
 } ?>
 
