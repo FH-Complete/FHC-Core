@@ -320,6 +320,12 @@ function getStgContent($studiengang_kz, $semester, $sprache)
 	//Assistenz
 	$benutzerfkt = new benutzerfunktion();
 	$benutzerfkt->getBenutzerFunktionen('ass', $studiengang->oe_kurzbz);
+	//Sortiert die Funktionen alphabetisch nach uid
+	function sortBenutzer($a, $b)
+	{
+		return strcmp(strtolower($a->uid), strtolower($b->uid));
+	}
+	usort($benutzerfkt->result, "sortBenutzer");
 	$xml.='<ass_name><![CDATA['.$p->t('global/sekretariat').']]></ass_name>';
 	foreach($benutzerfkt->result as $row)
 	{
