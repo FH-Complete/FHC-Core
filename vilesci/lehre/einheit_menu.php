@@ -83,12 +83,22 @@ if(!$rechte->isBerechtigt('lehre/gruppe'))
 				widgets: ["zebra", "filter", "stickyHeaders"],
 				headers: { 12: { filter: false,  sorter: false }}
 			});
+
+			$( "#mailgrp" ).click(function() {
+				$( "#domain_text" ).toggle();
+				$('#gesperrt').prop('disabled', function(i, v) { return !v; });
+			});
+	
 		});
 		</script>
 		<style>
 		.tablesorter-default input.tablesorter-filter
 		{
 			padding: 0 4px;
+		}
+		#newFormTable tr:hover
+		{
+			background-color: #d1d1d1;
 		}
 		</style>
 	</head>
@@ -128,6 +138,9 @@ function printDropDown()
 {
 	global $rechte, $studiengang_kz;
 	//Studiengang Drop Down anzeigen
+	$types = new studiengang();
+	$types->getAllTypes();
+	$typ = '';
 	$stud = new studiengang();
 	if(!$stud->getAll('typ, kurzbz'))
 		echo 'Fehler beim Laden der Studiengaenge:'.$stud->errormsg;
@@ -140,10 +153,17 @@ function printDropDown()
 	{
 		if($rechte->isBerechtigt('lehre/gruppe', $row->oe_kurzbz, 'suid'))
 		{
+			if ($typ != $row->typ || $typ=='')
+			{
+				if ($typ!='')
+					echo '</optgroup>';
+					echo '<optgroup label="'.($types->studiengang_typ_arr[$row->typ]!=''?$types->studiengang_typ_arr[$row->typ]:$row->typ).'">';
+			}
 			if($studiengang_kz=='')
 				$studiengang_kz=$row->studiengang_kz;
 
 			echo '<OPTION value="'.$row->studiengang_kz.'"'.($studiengang_kz==$row->studiengang_kz?'selected':'').'>'.$row->kuerzel.' - '.$row->bezeichnung.'</OPTION>';
+			$typ = $row->typ;
 		}
 	}
 
@@ -191,72 +211,139 @@ function doSave()
 
 function doEdit($kurzbz,$new=false)
 {
+	global $db;
 	if (!$new)
 		$e=new gruppe($kurzbz);
 	else
 		$e = new gruppe();
 	?>
 	<form name="gruppe" method="post" action="<?php echo $_SERVER['PHP_SELF'] ?>">
-			<p><b>Gruppe <?php echo ($new?'hinzufügen':'bearbeiten'); ?></b>:
-				<table border="0">
-				<tr>
-					<td><i>Kurzbezeichnung</i></td>
-					<td>
-						<input type="text" name="kurzbz" size="16" maxlength="32" value="<?php echo $e->gruppe_kurzbz; ?>">
+		<p><b>Gruppe <?php echo ($new?'hinzufügen':'bearbeiten'); ?></b><br>
+		<table id="newFormTable" border="0">
+		<tbody>
+			<tr>
+				<td>Kurzbezeichnung</td>
+				<td>
+					<input type="text" name="kurzbz" size="45" maxlength="32" value="<?php echo $e->gruppe_kurzbz; ?>" style="text-transform: uppercase" required="required">
+					<span id="domain_text" <?php echo ($e->mailgrp?'style="display: inline"':'style="display: none"');?>>@<?php echo DOMAIN;?></span>
 				</td>
-			</tr>
-				<tr>
-					<td><i>Bezeichnung</i></td>
-					<td>
-					<input type="text" name="bezeichnung" size="20" maxlength="32" value="<?php echo $e->bezeichnung; ?>">
-				</td>
+				<td><i>Name der Gruppe im System bzw. Name des Verteilers</i></td>
 			</tr>
 			<tr>
-					<td><i>Beschreibung</i></td>
-					<td>
-					<input type="text" name="beschreibung" size="20" maxlength="128" value="<?php echo $e->beschreibung; ?>">
+				<td>Bezeichnung</td>
+				<td>
+					<input type="text" name="bezeichnung" size="45" maxlength="32" value="<?php echo $e->bezeichnung; ?>">
 				</td>
+				<td><i>Bezeichnung</i></td>
 			</tr>
 			<tr>
-				<td><i>Studiengang</i></td>
+				<td>Beschreibung</td>
+				<td>
+					<input type="text" name="beschreibung" size="80" maxlength="128" value="<?php echo $e->beschreibung; ?>">
+				</td>
+				<td><i>Beschreibungstext im CIS</i></td>
+			</tr>
+			<tr>
+				<td>Studiengang</td>
 				<td>
 					<SELECT name="studiengang_kz">
 							<option value="-1">- auswählen -</option>
 						<?php
 							// Auswahl des Studiengangs
-							$stg=new studiengang();
-							$stg->getAll();
+							$types = new studiengang();
+							$types->getAllTypes();
+							$typ = '';
+							$stg = new studiengang();
+							$stg->getAll('typ, kurzbz');
 							foreach($stg->result as $studiengang)
 							{
-								echo "<option value=\"$studiengang->studiengang_kz\" ";
-								if ($studiengang->studiengang_kz==$e->studiengang_kz)
-								echo "selected";
-								echo " >$studiengang->kuerzel ($studiengang->bezeichnung)</option>\n";
+								if ($typ != $studiengang->typ || $typ=='')
+								{
+									if ($typ!='')
+										echo '</optgroup>';
+										echo '<optgroup label="'.($types->studiengang_typ_arr[$studiengang->typ]!=''?$types->studiengang_typ_arr[$studiengang->typ]:$studiengang->typ).'">';
+								}
+								if($studiengang->studiengang_kz == $e->studiengang_kz)
+									$selected = 'selected="selected"';
+								else
+									$selected='';
+
+								echo '<option value="'.$studiengang->studiengang_kz.'" '.$selected.'>'.$db->convert_html_chars($studiengang->kuerzel.' - '.$studiengang->bezeichnung).'</option>';
+								$typ = $studiengang->typ;
 							}
 						?>
 					</SELECT>
 				</td>
+				<td></td>
 			</tr>
-			<tr><td><i>Semester</i></td><td><input type="text" name="semester" size="2" maxlength="1" value="<?php echo $e->semester ?>"></td></tr>
-			<tr><td><i>Mailgrp</i></td><td><input type='checkbox' name='mailgrp' <?php echo ($e->mailgrp?'checked':'');?>>
-			<tr><td><i>Sichtbar</i></td><td><input type='checkbox' name='sichtbar' <?php echo ($e->sichtbar?'checked':'');?>>
-			<tr><td><i>Generiert</i></td><td><input type='checkbox' name='generiert' <?php echo ($e->generiert?'checked':'');?>>
-			<tr><td><i>Aktiv</i></td><td><input type='checkbox' name='aktiv' <?php echo ($e->aktiv?'checked':'');?>>
-			<tr><td><i>ContentVisible</i></td><td><input type='checkbox' name='content_visible' <?php echo ($e->content_visible?'checked':'');?>>
-			<tr><td><i>Gesperrt</i></td><td><input type='checkbox' name='gesperrt' <?php echo ($e->gesperrt?'checked':'');?>>
-			<tr><td><i>Zutrittssystem</i></td><td><input type='checkbox' name='zutrittssystem' <?php echo ($e->zutrittssystem?'checked':'');?>>
-			<tr><td><i>Aufnahmegruppe</i></td><td><input type='checkbox' name='aufnahmegruppe' <?php echo ($e->aufnahmegruppe?'checked':'');?>>
 			<tr>
-				<td><i>Sort</i></td><td><input type='text' name='sort' maxlength="4" value="<?php echo $e->sort;?>">
-				</td>
+				<td>Semester</td>
+				<td><input type="text" name="semester" size="2" maxlength="1" value="<?php echo $e->semester ?>"></td>
+				<td><i>Optional</i></td>
 			</tr>
+			<tr>
+				<td>Aktiv</td>
+				<td><input type='checkbox' name='aktiv' <?php echo ($e->aktiv?'checked':'');?>></td>
+				<td><i>Aktiviert die Gruppe in allen Systemen</i></td>
+			</tr>
+			<tr>
+				<td>Sichtbar</td>
+				<td><input type='checkbox' name='sichtbar' <?php echo ($e->sichtbar?'checked':'');?>></td>
+				<td><i>Soll die Gruppe im CIS sichtbar sein?</i></td>
+			</tr>
+			<tr>
+				<td>ContentVisible</td>
+				<td><input type='checkbox' name='content_visible' id='content_visible' <?php echo ($e->content_visible?'checked':'');?>></td>
+				<td><i>Soll die Gruppe verwendet werden, um im CMS Zugriffsberechtigungen zu steuern?</i></td>
+			</tr>
+			<tr>
+				<td>Generiert</td>
+				<td><input type='checkbox' name='generiert' id='generiert' <?php echo ($e->generiert?'checked':'');?>></td>
+				<td><i>Wenn gesetzt, können keine Personen manuell hinzugefügt werden. Generierte Gruppen werden meist von Sync-scripten befüllt</i></td>
+			</tr>
+			<tr>
+				<td>&nbsp;</td>
+				<td>&nbsp;</td>
+				<td>&nbsp;</td>
+			</tr>
+			<tr style="padding-top: 50px;">
+				<td>Mailgrp</td>
+				<td><input type='checkbox' name='mailgrp' id='mailgrp' <?php echo ($e->mailgrp?'checked':'');?>></td>
+				<td><i>Soll die Gruppe auch ein Mailverteiler sein?</i></td>
+			</tr>
+			<tr>
+				<td>Gesperrt</td>
+				<td><input type='checkbox' name='gesperrt' id='gesperrt' <?php echo ($e->gesperrt?'checked':''); echo ($e->mailgrp?'':'disabled="disabled"');?>></td>
+				<td><i>Gesperrte Verteiler können nicht von allen Personen beschickt werden</i></td>
+			</tr>
+			<tr>
+				<td>Zutrittssystem</td>
+				<td><input type='checkbox' name='zutrittssystem' <?php echo ($e->zutrittssystem?'checked':'');?>></td>
+				<td><i>Wird die Gruppe für die Zutrittssteuerung im Gebäude verwendet?</i></td>
+			</tr>
+			<tr>
+				<td>Aufnahmegruppe</td>
+				<td><input type='checkbox' name='aufnahmegruppe' <?php echo ($e->aufnahmegruppe?'checked':'');?>></td>
+				<td><i>Wird die Gruppe als Aufnahmegruppe im Bewerbungsverfahren und beim Reihungstest verwendet?</i></td>
+			</tr>
+			<tr>
+				<td>Sort</td>
+				<td><input type='number' name='sort' maxlength="5" min="-32768" max="32767" size="5" value="<?php echo $e->sort;?>"></td>
+				<td><i>Positive oder Negative ganze Zahl zw. -32768 und 32767 zur relativen Sortierung</i></td>
+			</tr>
+			<tr>
+				<td>&nbsp;</td>
+				<td>&nbsp;</td>
+				<td>&nbsp;</td>
+			</tr>
+			</tbody>
 		</table>
-		<input type="hidden" name="pk" value="<?php echo $e->gruppe_kurzbz ?>" />
-		<input type="hidden" name="new" value="<?php echo ($new?'true':'false') ?>" />
-		<input type="hidden" name="type" value="save">
-		<input type="submit" name="save" value="Speichern">
-		</p>
-		<hr>
+	<input type="hidden" name="pk" value="<?php echo $e->gruppe_kurzbz ?>" />
+	<input type="hidden" name="new" value="<?php echo ($new?'true':'false') ?>" />
+	<input type="hidden" name="type" value="save">
+	<input type="submit" name="save" value="Speichern">
+	</p>
+	<hr>
 </form>
 <?php
 }
@@ -281,11 +368,11 @@ function getUebersicht()
 				<th>Beschreibung</th>
 				<!--<th>Stg.</th>-->
 				<th>Sem.</th>
-				<th data-placeholder='t or f'>Mailgrp</th>
-				<th data-placeholder='t or f'>Sichtbar</th>
-				<th data-placeholder='t or f'>Generiert</th>
 				<th data-placeholder='t or f'>Aktiv</th>
+				<th data-placeholder='t or f'>Sichtbar</th>
 				<th data-placeholder='t or f'>ContentVisible</th>
+				<th data-placeholder='t or f'>Generiert</th>
+				<th data-placeholder='t or f'>Mailgrp</th>
 				<th data-placeholder='t or f'>Gesperrt</th>
 				<th data-placeholder='t or f'>Zutrittssystem</th>
 				<th data-placeholder='t or f'>Aufnahmegruppe</th>
@@ -306,11 +393,11 @@ function getUebersicht()
 		echo "<td>$e->beschreibung </td>";
 		//echo "<td>".$stg->kuerzel_arr[$e->studiengang_kz]."</td>";
 		echo "<td>$e->semester </td>";
-		echo "<td><img title='Mailgrp' height='16px' src='../../skin/images/".($e->mailgrp?"true.png":"false.png")."' alt='".($e->mailgrp?"true.png":"false.png")."'></td>";
-		echo "<td><img title='Sichtbar' height='16px' src='../../skin/images/".($e->sichtbar?"true.png":"false.png")."' alt='".($e->sichtbar?"true.png":"false.png")."'></td>";
-		echo "<td><img title='Generiert' height='16px' src='../../skin/images/".($e->generiert?"true.png":"false.png")."' alt='".($e->generiert?"true.png":"false.png")."'></td>";
 		echo "<td><img title='Aktiv' height='16px' src='../../skin/images/".($e->aktiv?"true.png":"false.png")."' alt='".($e->aktiv?"true.png":"false.png")."'></td>";
+		echo "<td><img title='Sichtbar' height='16px' src='../../skin/images/".($e->sichtbar?"true.png":"false.png")."' alt='".($e->sichtbar?"true.png":"false.png")."'></td>";
 		echo "<td><img title='ContentVisible' height='16px' src='../../skin/images/".($e->content_visible?"true.png":"false.png")."' alt='".($e->content_visible?"true.png":"false.png")."'></td>";
+		echo "<td><img title='Generiert' height='16px' src='../../skin/images/".($e->generiert?"true.png":"false.png")."' alt='".($e->generiert?"true.png":"false.png")."'></td>";
+		echo "<td><img title='Mailgrp' height='16px' src='../../skin/images/".($e->mailgrp?"true.png":"false.png")."' alt='".($e->mailgrp?"true.png":"false.png")."'></td>";
 		echo "<td><img title='Gesperrt' height='16px' src='../../skin/images/".($e->gesperrt?"true.png":"false.png")."' alt='".($e->gesperrt?"true.png":"false.png")."'></td>";
 		echo "<td><img title='Zutrittssystem' height='16px' src='../../skin/images/".($e->zutrittssystem?"true.png":"false.png")."' alt='".($e->zutrittssystem?"true.png":"false.png")."'></td>";
 		echo "<td><img title='Aufnahmegruppe' height='16px' src='../../skin/images/".($e->aufnahmegruppe?"true.png":"false.png")."' alt='".($e->aufnahmegruppe?"true.png":"false.png")."'></td>";
