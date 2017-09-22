@@ -43,12 +43,11 @@ echo '
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 		<link href="../../skin/vilesci.css" rel="stylesheet" type="text/css">
 		<link rel="stylesheet" type="text/css" href="../../skin/jquery-ui-1.9.2.custom.min.css">
-<script type="text/javascript" src="../../vendor/jquery/jqueryV1/jquery-1.12.4.min.js"></script>
-<script type="text/javascript" src="../../vendor/christianbach/tablesorter/jquery.tablesorter.min.js"></script>
-<script type="text/javascript" src="../../vendor/components/jqueryui/jquery-ui.min.js"></script>
-<script type="text/javascript" src="../../include/js/jquery.ui.datepicker.translation.js"></script>
-<script type="text/javascript" src="../../vendor/jquery/sizzle/sizzle.js"></script>
-		<script src="../../vendor/components/jqueryui/jquery-ui.min.js" language="Javascript"></script>
+		<script type="text/javascript" src="../../vendor/jquery/jqueryV1/jquery-1.12.4.min.js"></script>
+		<script type="text/javascript" src="../../vendor/christianbach/tablesorter/jquery.tablesorter.min.js"></script>
+		<script type="text/javascript" src="../../vendor/components/jqueryui/jquery-ui.min.js"></script>
+		<script type="text/javascript" src="../../include/js/jquery.ui.datepicker.translation.js"></script>
+		<script type="text/javascript" src="../../vendor/jquery/sizzle/sizzle.js"></script>
 
 		<script language="Javascript">
 			$(function() {
@@ -62,7 +61,7 @@ echo '
 					},
 					drop: function(event, ui) {
 						$(this).css("color","#0086cc");
-						var kurzbz = encodeURIComponent(ui.helper[0].id);
+						var kurzbz = encodeURIComponent(ui.helper.context.id);
 						var parent_kurzbz = encodeURIComponent(this.id);
 						window.location.href="'.$_SERVER['PHP_SELF'].'?action=updateparent&kurzbz="+kurzbz+"&parent_kurzbz="+parent_kurzbz;
 					}
@@ -78,6 +77,11 @@ echo '
 			padding: 2px;
 		}
 
+		a.Item
+		{
+			background: none;
+			border: none;
+		}
 		a.Item:hover
 		{
 			color:#0086cc;
