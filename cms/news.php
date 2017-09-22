@@ -179,7 +179,7 @@ function getStgContent($studiengang_kz, $semester, $sprache)
 	$p = new phrasen($sprache);
 	
 	$xml = '<stg_extras>';
-	
+	$xml .= '<stg_kz>'.$studiengang_kz.'</stg_kz>';
 	$studiengang = new studiengang();
 	$studiengang->load($studiengang_kz);
 	

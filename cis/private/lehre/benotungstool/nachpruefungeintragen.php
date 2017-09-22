@@ -139,7 +139,7 @@ if (isset($_REQUEST["submit"]) && ($_REQUEST["student_uid"] != '')  )
 	// Die Pruefung muss einer Lehreinheit zugeordnet werden
 	// deshalb wird hier versucht eine passende Lehreinheit zu ermitteln.
 	$le_arr = array();
-	$qry_stud = "SELECT DISTINCT lehreinheit_id, lehrform_kurzbz
+	$qry_stud = "SELECT lehreinheit_id, lehrform_kurzbz
 		FROM
 			campus.vw_student_lehrveranstaltung
 			JOIN campus.vw_student using(uid)
@@ -147,7 +147,7 @@ if (isset($_REQUEST["submit"]) && ($_REQUEST["student_uid"] != '')  )
 			studiensemester_kurzbz = ".$db->db_add_param($stsem)."
 			AND lehrveranstaltung_id = ".$db->db_add_param($lvid, FHC_INTEGER)."
 			AND uid=".$db->db_add_param($student_uid)."
-		ORDER BY lehrform_kurzbz DESC";
+		ORDER BY CASE WHEN lehrform_kurzbz='PRF' THEN '0' ELSE lehrform_kurzbz END";
 
 	if($result_stud = $db->db_query($qry_stud))
 	{
