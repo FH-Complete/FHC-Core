@@ -35,7 +35,7 @@ if(!$rechte->isBerechtigt('system/developer',null,'suid'))
 $anzahl_neu=0;
 $anzahl_vorhanden=0;
 $qry = "SELECT filename FROM campus.tbl_dms_version";
-$path = '/var/fhcomplete/dms/';
+$path = DMS_PATH;
 chdir($path);
 if($result = $db->db_query($qry))
 {
