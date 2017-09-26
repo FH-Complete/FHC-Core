@@ -139,7 +139,7 @@ echo ']>
 							<splitter class="tree-splitter"/>
 							<treecol id="aufnahmetermine-tree-anmeldedatum" label="Anmeldedatum" flex="2" hidden="true"
 								class="sortDirectionIndicator"
-								sort="rdf:http://www.technikum-wien.at/aufnahmetermine/rdf#anmeldedatum"/>
+								sort="rdf:http://www.technikum-wien.at/aufnahmetermine/rdf#anmeldedatum_iso"/>
 							<splitter class="tree-splitter"/>
 							<treecol id="aufnahmetermine-tree-ort" label="Ort" flex="2" hidden="true"
 								class="sortDirectionIndicator"
@@ -181,6 +181,14 @@ echo ']>
 								class="sortDirectionIndicator"
 								sort="rdf:http://www.technikum-wien.at/aufnahmetermine/rdf#studienplan_studiengang" />
 							<splitter class="tree-splitter"/>
+							<treecol id="aufnahmetermine-tree-datum_iso" label="DatumISO" flex="2" hidden="true"
+								class="sortDirectionIndicator"
+								sort="rdf:http://www.technikum-wien.at/aufnahmetermine/rdf#datum_iso"/>
+							<splitter class="tree-splitter"/>
+							<treecol id="aufnahmetermine-tree-anmeldedatum_iso" label="AnmeldedatumISO" flex="2" hidden="true"
+								class="sortDirectionIndicator"
+								sort="rdf:http://www.technikum-wien.at/aufnahmetermine/rdf#anmeldedatum_iso"/>
+							<splitter class="tree-splitter"/>
 						</treecols>
 
 						<template>
@@ -202,6 +210,8 @@ echo ']>
 										<treecell label="rdf:http://www.technikum-wien.at/aufnahmetermine/rdf#studienplan_bezeichnung"/>
 										<treecell label="rdf:http://www.technikum-wien.at/aufnahmetermine/rdf#studienplan_id"/>
 										<treecell label="rdf:http://www.technikum-wien.at/aufnahmetermine/rdf#studienplan_studiengang"/>
+										<treecell label="rdf:http://www.technikum-wien.at/aufnahmetermine/rdf#datum_iso"/>
+										<treecell label="rdf:http://www.technikum-wien.at/aufnahmetermine/rdf#anmeldedatum_iso"/>
 									</treerow>
 								</treeitem>
 							</treechildren>
