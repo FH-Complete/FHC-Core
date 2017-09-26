@@ -138,7 +138,7 @@ $rdf_url='http://www.technikum-wien.at/lehrstunde';
 
 <?php
 $db = new basis_db();
-function getAnzahl($studiengang_kz, $semester, $verband, $gruppe, $gruppe_kurzbz, $studiensemester_kurzbz)
+function getAnzahl($studiengang_kz, $semester, $verband, $gruppe, $gruppe_kurzbz, $studiensemester_kurzbz, $lehreinheit_id, $mitschwund)
 {
 	global $db;
 
@@ -147,20 +147,49 @@ function getAnzahl($studiengang_kz, $semester, $verband, $gruppe, $gruppe_kurzbz
 	if($gruppe_kurzbz=='')
 	{
 		$qry = "SELECT count(*) as anzahl FROM public.tbl_studentlehrverband
-				WHERE studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."'
-				AND studiengang_kz='".addslashes($studiengang_kz)."' AND
-				semester='".addslashes($semester)."'";
+				WHERE studiensemester_kurzbz=".$db->db_add_param($studiensemester_kurzbz)."
+				AND studiengang_kz=".$db->db_add_param($studiengang_kz)." AND
+				semester=".$db->db_add_param($semester);
 		if(trim($verband)!='')
-			$qry.=" AND trim(verband)=trim('".addslashes($verband)."')";
+			$qry.=" AND trim(verband)=trim(".$db->db_add_param($verband).")";
 		if(trim($gruppe)!='')
-			$qry.=" AND trim(gruppe)=trim('".addslashes($gruppe)."')";
+			$qry.=" AND trim(gruppe)=trim(".$db->db_add_param($gruppe).")";
 
+		if($mitschwund)
+		{
+			// Studierende mit Anrechnungen herausnehmen
+			$qry.=" AND NOT EXISTS(
+						SELECT 1 FROM lehre.tbl_zeugnisnote
+						WHERE student_uid=tbl_studentlehrverband.student_uid
+						AND lehrveranstaltung_id=(SELECT lehrveranstaltung_id FROM lehre.tbl_lehreinheit
+										WHERE lehreinheit_id=".$db->db_add_param($lehreinheit_id, FHC_INTEGER).")
+						AND studiensemester_kurzbz=".$db->db_add_param($studiensemester_kurzbz)."
+						AND note=6)";
+			// Abbrecher und Unterbrecher herausnehmen
+			$qry.=" AND get_rolle_prestudent((SELECT prestudent_id FROM public.tbl_student
+						WHERE student_uid=tbl_studentlehrverband.student_uid),null) NOT IN('Abbrecher','Unterbrecher') ";
+		}
 	}
 	else
 	{
 		$qry = "SELECT count(*) as anzahl FROM public.tbl_benutzergruppe
-				WHERE studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."'
-				AND gruppe_kurzbz='".addslashes($gruppe_kurzbz)."'";
+				WHERE studiensemester_kurzbz=".$db->db_add_param($studiensemester_kurzbz)."
+				AND gruppe_kurzbz=".$db->db_add_param($gruppe_kurzbz);
+
+		if($mitschwund)
+		{
+			// Studierende mit Anrechnungen herausnehmen
+			$qry.=" AND NOT EXISTS(
+						SELECT 1 FROM lehre.tbl_zeugnisnote
+						WHERE student_uid=tbl_benutzergruppe.uid
+						AND lehrveranstaltung_id=(SELECT lehrveranstaltung_id FROM lehre.tbl_lehreinheit
+										WHERE lehreinheit_id=".$db->db_add_param($lehreinheit_id, FHC_INTEGER).")
+						AND studiensemester_kurzbz=".$db->db_add_param($studiensemester_kurzbz)."
+						AND note=6)";
+			// Abbrecher und Unterbrecher herausnehmen
+			$qry.=" AND get_rolle_prestudent((SELECT prestudent_id FROM public.tbl_student
+						WHERE student_uid=tbl_benutzergruppe.uid),null) NOT IN('Abbrecher','Unterbrecher') ";
+		}
 	}
 
 	if($res_anz = $db->db_query($qry))
@@ -180,7 +209,8 @@ if (is_array($lehrstunden->lehrstunden))
 		{
 			//Anzahl der Studenten in der Gruppe ermitteln
 			$stsem = getStudiensemesterFromDatum($ls->datum);
-			$anzahl = getAnzahl($ls->studiengang_kz, $ls->sem, $ls->ver, $ls->grp, $ls->gruppe_kurzbz, $stsem);
+			$anzahl = getAnzahl($ls->studiengang_kz, $ls->sem, $ls->ver, $ls->grp, $ls->gruppe_kurzbz, $stsem, $ls->lehreinheit_id, false);
+			$anzahl_mitschwund = getAnzahl($ls->studiengang_kz, $ls->sem, $ls->ver, $ls->grp, $ls->gruppe_kurzbz, $stsem, $ls->lehreinheit_id, true);
 			$gruppenbezeichnung = '';
 			$gruppenbeschreibung = '';
 
@@ -225,7 +255,7 @@ if (is_array($lehrstunden->lehrstunden))
 				<LEHRSTUNDE:anmerkung><![CDATA[<?php echo $ls->anmerkung;  ?>]]></LEHRSTUNDE:anmerkung>
 				<LEHRSTUNDE:anmerkung_lehreinheit><![CDATA[<?php echo $ls->anmerkung_lehreinheit;  ?>]]></LEHRSTUNDE:anmerkung_lehreinheit>
 				<LEHRSTUNDE:titel><![CDATA[<?php echo $ls->titel;  ?>]]></LEHRSTUNDE:titel>
-				<LEHRSTUNDE:anzahlstudenten><![CDATA[<?php echo $anzahl;  ?>]]></LEHRSTUNDE:anzahlstudenten>
+				<LEHRSTUNDE:anzahlstudenten><![CDATA[<?php echo $anzahl_mitschwund.' ('.$anzahl.')';  ?>]]></LEHRSTUNDE:anzahlstudenten>
 				<LEHRSTUNDE:gruppe_bezeichnung><![CDATA[<?php echo $gruppenbezeichnung;  ?>]]></LEHRSTUNDE:gruppe_bezeichnung>
 				<LEHRSTUNDE:gruppe_beschreibung><![CDATA[<?php echo $gruppenbeschreibung;  ?>]]></LEHRSTUNDE:gruppe_beschreibung>
   	    	</RDF:Description>
