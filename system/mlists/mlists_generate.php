@@ -76,55 +76,55 @@ $error_msg='';
 		$qry = "UPDATE public.tbl_gruppe SET generiert=true WHERE UPPER(gruppe_kurzbz)=UPPER('".addslashes($gruppe)."')";
 		$db->db_query($qry);
 	}
-	
+
 	/**
 	 * Einfache Verteiler, deren Erstellung ohne Schleifen-Logik moeglich ist, werden ueber dieses Array erstellt
 	 * Benoetigt werden die 3 Attribute:
 	 * $verteilerArray['name_des_verteilers']['bezeichnung'] = 'Bezeichnung des Verteilers (32 Zeichen)';
 	 * $verteilerArray['name_des_verteilers']['beschreibung'] = 'Beschreibung des Verteilers (Anzeige im CIS)(128 Zeichen)';
 	 * $verteilerArray['name_des_verteilers']['sql'] = 'UIDs, die im Verteiler enthalten sein sollen (kein Semikolon am Ende)';
-	 * 
+	 *
 	 * Die Verteiler werden dann alle gleich erstellt:
 	 * - Pruefen, ob Gruppe existiert, wenn nicht, anlegen mit Default-Werten
 	 * - Gruppe auf generiert setzen
 	 * - UIDs loeschen, die nicht mehr in den Verteiler gehoeren
 	 * - UIDs hinzufuegen, die im Verteiler fehlen
 	 */
-	
+
 	$verteilerArray = array();
-	
+
 	// Sql-Schema: SELECT foo AS uid FROM bar WHERE foobar
-	
+
 	//Aktive MitarbeiterInnen mit Personalnummer > 0
 	$verteilerArray['tw_ma']['bezeichnung'] = 'Alle aktiven MitarbeiterInnen';
 	$verteilerArray['tw_ma']['beschreibung'] = 'Alle aktiven MitarbeiterInnen';
-	$verteilerArray['tw_ma']['sql'] = "	SELECT DISTINCT mitarbeiter_uid AS uid 
-										FROM public.tbl_mitarbeiter 
-										JOIN public.tbl_benutzer ON (mitarbeiter_uid=uid) 
-										WHERE aktiv 
+	$verteilerArray['tw_ma']['sql'] = "	SELECT DISTINCT mitarbeiter_uid AS uid
+										FROM public.tbl_mitarbeiter
+										JOIN public.tbl_benutzer ON (mitarbeiter_uid=uid)
+										WHERE aktiv
 										AND personalnummer >= 0";
 	//Aktive weibliche MitarbeiterInnen mit Personalnummer > 0
 	$verteilerArray['tw_ma_w']['bezeichnung'] = 'Weibliche Mitarbeiterinnen';
 	$verteilerArray['tw_ma_w']['beschreibung'] = 'Weibliche Mitarbeiterinnen';
-	$verteilerArray['tw_ma_w']['sql'] = "	SELECT DISTINCT mitarbeiter_uid AS uid 
-											FROM public.tbl_mitarbeiter 
-											JOIN public.tbl_benutzer ON (mitarbeiter_uid=uid) 
-											JOIN public.tbl_person USING(person_id) 
-											WHERE tbl_benutzer.aktiv 
-											AND geschlecht='w' 
+	$verteilerArray['tw_ma_w']['sql'] = "	SELECT DISTINCT mitarbeiter_uid AS uid
+											FROM public.tbl_mitarbeiter
+											JOIN public.tbl_benutzer ON (mitarbeiter_uid=uid)
+											JOIN public.tbl_person USING(person_id)
+											WHERE tbl_benutzer.aktiv
+											AND geschlecht='w'
 											AND personalnummer >=0";
 	//Alle aktiven MitarbeiterInnen mit Attribut lektor=true
 	$verteilerArray['tw_lkt']['bezeichnung'] = 'Alle LektorInnen';
 	$verteilerArray['tw_lkt']['beschreibung'] = 'Alle LektorInnen an der FH Technikum Wien';
-	$verteilerArray['tw_lkt']['sql'] = "	SELECT mitarbeiter_uid AS uid 
-											FROM public.tbl_mitarbeiter 
-											JOIN public.tbl_benutzer ON (mitarbeiter_uid=uid) 
-											WHERE lektor 
+	$verteilerArray['tw_lkt']['sql'] = "	SELECT DISTINCT mitarbeiter_uid AS uid
+											FROM public.tbl_mitarbeiter
+											JOIN public.tbl_benutzer ON (mitarbeiter_uid=uid)
+											WHERE lektor
 											AND aktiv";
 	//MitarbeiterInnen mit gueltiger Funktion "ass" (assistenz)
 	$verteilerArray['tw_sek']['bezeichnung'] = 'Alle Sekretariate';
 	$verteilerArray['tw_sek']['beschreibung'] = 'Alle Sekretariate an der FH Technikum Wien';
-	$verteilerArray['tw_sek']['sql'] = "	SELECT mitarbeiter_uid AS uid
+	$verteilerArray['tw_sek']['sql'] = "	SELECT DISTINCT mitarbeiter_uid AS uid
 											FROM
 											public.tbl_mitarbeiter
 											JOIN public.tbl_benutzer ON (mitarbeiter_uid=uid)
@@ -147,7 +147,7 @@ $error_msg='';
 												AND (tbl_benutzerfunktion.funktion_kurzbz='Leitung' OR funktion_kurzbz='gLtg' OR funktion_kurzbz='stvLtg')
 												AND (tbl_benutzerfunktion.datum_von is null OR tbl_benutzerfunktion.datum_von<=now())
 												AND (tbl_benutzerfunktion.datum_bis is null OR tbl_benutzerfunktion.datum_bis>=now())
-												AND mitarbeiter_uid NOT LIKE '\\\\_%' 
+												AND mitarbeiter_uid NOT LIKE '\\\\_%'
 												AND tbl_studiengang.aktiv=true";
 	//Aktive MitarbeiterInnen mit gueltiger Funktion "Leitung", "gLtg" oder "stvLtg" in aktiven Bachelor- oder Master-Studiengaengen mit Kennzahl>0 und Kennzahl<10000
 	$verteilerArray['tw_stgl_bama']['bezeichnung'] = 'Studiengangsleitung BAMA';
@@ -171,36 +171,36 @@ $error_msg='';
 	//Alle aktiven MitarbeiterInnen mit Attribut fixangestellt=true
 	$verteilerArray['tw_fix']['bezeichnung'] = 'Alle Fix-Angestellten';
 	$verteilerArray['tw_fix']['beschreibung'] = 'Alle Fix-Angestellten an der FH Technikum Wien';
-	$verteilerArray['tw_fix']['sql'] = "	SELECT mitarbeiter_uid AS uid 
-											FROM public.tbl_mitarbeiter 
-											JOIN public.tbl_benutzer ON(uid=mitarbeiter_uid) 
-											WHERE fixangestellt 
-											AND aktiv 
+	$verteilerArray['tw_fix']['sql'] = "	SELECT DISTINCT mitarbeiter_uid AS uid
+											FROM public.tbl_mitarbeiter
+											JOIN public.tbl_benutzer ON(uid=mitarbeiter_uid)
+											WHERE fixangestellt
+											AND aktiv
 											AND mitarbeiter_uid NOT LIKE '\\\\_%'";
 	//Alle aktiven MitarbeiterInnen mit Attribut fixangestellt=true und lektor=true
 	$verteilerArray['tw_fix_lkt']['bezeichnung'] = 'Alle fixangestellten LektorInnen';
 	$verteilerArray['tw_fix_lkt']['beschreibung'] = 'Alle fixangestellten LektorInnen an der FH Technikum Wien';
-	$verteilerArray['tw_fix_lkt']['sql'] = "	SELECT mitarbeiter_uid AS uid 
-												FROM public.tbl_mitarbeiter 
-												JOIN public.tbl_benutzer ON(uid=mitarbeiter_uid) 
-												WHERE fixangestellt 
-												AND lektor 
-												AND aktiv 
+	$verteilerArray['tw_fix_lkt']['sql'] = "	SELECT DISTINCT mitarbeiter_uid AS uid
+												FROM public.tbl_mitarbeiter
+												JOIN public.tbl_benutzer ON(uid=mitarbeiter_uid)
+												WHERE fixangestellt
+												AND lektor
+												AND aktiv
 												AND mitarbeiter_uid NOT LIKE '\\\\_%'";
 	//Alle aktiven MitarbeiterInnen mit Attribut fixangestellt=false und lektor=true
 	$verteilerArray['tw_ext_lkt']['bezeichnung'] = 'Externe LektorInnen';
 	$verteilerArray['tw_ext_lkt']['beschreibung'] = 'Alle externen LektorInnen an der FH Technikum Wien';
-	$verteilerArray['tw_ext_lkt']['sql'] = "	SELECT mitarbeiter_uid AS uid 
-												FROM public.tbl_mitarbeiter 
-												JOIN public.tbl_benutzer ON(uid=mitarbeiter_uid) 
-												WHERE NOT fixangestellt 
-												AND lektor 
-												AND aktiv 
+	$verteilerArray['tw_ext_lkt']['sql'] = "	SELECT DISTINCT mitarbeiter_uid AS uid
+												FROM public.tbl_mitarbeiter
+												JOIN public.tbl_benutzer ON(uid=mitarbeiter_uid)
+												WHERE NOT fixangestellt
+												AND lektor
+												AND aktiv
 												AND mitarbeiter_uid NOT LIKE '\\\\_%'";
 	//Hochschulvertretung. Studierende mit gueltiger Funktion 'hsv'.
 	$verteilerArray['tw_hsv']['bezeichnung'] = 'Hochschulvertretung FHTW';
 	$verteilerArray['tw_hsv']['beschreibung'] = 'Hochschulvertretung FHTW';
-	$verteilerArray['tw_hsv']['sql'] = "	SELECT uid
+	$verteilerArray['tw_hsv']['sql'] = "	SELECT DISTINCT uid
 											FROM
 												public.tbl_benutzerfunktion
 											JOIN public.tbl_benutzer USING(uid)
@@ -212,7 +212,7 @@ $error_msg='';
 	//Studienvertretung. Studierende mit gueltiger Funktion 'stdv'.
 	$verteilerArray['tw_stdv']['bezeichnung'] = 'Alle StudierendenvertreterInnen';
 	$verteilerArray['tw_stdv']['beschreibung'] = 'Alle StudierendenvertreterInnen';
-	$verteilerArray['tw_stdv']['sql'] = "	SELECT uid
+	$verteilerArray['tw_stdv']['sql'] = "	SELECT DISTINCT uid
 											FROM
 												public.tbl_benutzerfunktion
 											JOIN public.tbl_benutzer USING(uid)
@@ -224,7 +224,7 @@ $error_msg='';
 	//Jahrgangsvertretung. Studierende mit gueltiger Funktion 'jgv'.
 	$verteilerArray['tw_jgv']['bezeichnung'] = 'Alle JahrgangsvertreterInnen';
 	$verteilerArray['tw_jgv']['beschreibung'] = 'Alle JahrgangsvertreterInnen';
-	$verteilerArray['tw_jgv']['sql'] = "	SELECT uid
+	$verteilerArray['tw_jgv']['sql'] = "	SELECT DISTINCT uid
 											FROM
 												public.tbl_benutzerfunktion
 											JOIN public.tbl_benutzer USING(uid)
@@ -233,12 +233,12 @@ $error_msg='';
 												AND tbl_benutzer.aktiv AND
 												(tbl_benutzerfunktion.datum_von IS NULL OR tbl_benutzerfunktion.datum_von<=now()) AND
 												(tbl_benutzerfunktion.datum_bis IS NULL OR tbl_benutzerfunktion.datum_bis>=now())";
-	//Alle aktiven Studierenden 
+	//Alle aktiven Studierenden
 	//Abbrecher bleiben noch 3 Wochen im Verteiler andere inaktive noch fuer 20 Wochen
 	//damit im CIS die Menuepunkte fuer Studierende richtig angezeigt werden
 	$verteilerArray['tw_std']['bezeichnung'] = 'Alle Studierenden';
 	$verteilerArray['tw_std']['beschreibung'] = 'Alle ordentlichen, außerordentlichen und fiktiven Studierenden';
-	$verteilerArray['tw_std']['sql'] = "	SELECT uid
+	$verteilerArray['tw_std']['sql'] = "	SELECT DISTINCT uid
 											FROM campus.vw_student
 											WHERE (
 												aktiv
@@ -251,7 +251,7 @@ $error_msg='';
 	//Abbrecher bleiben noch 3 Wochen im Verteiler andere inaktive noch fuer 20 Wochen
 	$verteilerArray['tw_std_m']['bezeichnung'] = 'Alle männlichen Studenten';
 	$verteilerArray['tw_std_m']['beschreibung'] = 'Alle männlichen Studenten an der FHTW';
-	$verteilerArray['tw_std_m']['sql'] = "	SELECT uid
+	$verteilerArray['tw_std_m']['sql'] = "	SELECT DISTINCT uid
 											FROM campus.vw_student
 											WHERE (
 												aktiv
@@ -265,7 +265,7 @@ $error_msg='';
 	//Abbrecher bleiben noch 3 Wochen im Verteiler andere inaktive noch fuer 20 Wochen
 	$verteilerArray['tw_std_w']['bezeichnung'] = 'Alle weiblichen Studentinnen';
 	$verteilerArray['tw_std_w']['beschreibung'] = 'Alle weiblichen Studentinnen an der FHTW';
-	$verteilerArray['tw_std_w']['sql'] = "	SELECT uid
+	$verteilerArray['tw_std_w']['sql'] = "	SELECT DISTINCT uid
 											FROM campus.vw_student
 											WHERE (
 												aktiv
@@ -279,7 +279,7 @@ $error_msg='';
 	//Absolventen bleiben noch  20 Wochen im Verteiler
 	$verteilerArray['tw_bama']['bezeichnung'] = 'Alle BaMa-Studierenden';
 	$verteilerArray['tw_bama']['beschreibung'] = 'Alle ordentlichen Bachelor- und Master-Studierenden';
-	$verteilerArray['tw_bama']['sql'] = "	SELECT uid
+	$verteilerArray['tw_bama']['sql'] = "	SELECT DISTINCT uid
 											FROM campus.vw_student
 											WHERE (
 												aktiv
@@ -287,7 +287,7 @@ $error_msg='';
 												(aktiv=false AND get_rolle_prestudent(vw_student.prestudent_id, null)='Absolvent' AND updateaktivam>now()-'20 weeks'::interval)
 												AND studiengang_kz IN (SELECT studiengang_kz FROM public.tbl_studiengang WHERE typ IN ('b','m'))
 											)";
-	//Moodle-LektorenVerteiler 
+	//Moodle-LektorenVerteiler
 	$verteilerArray['moodle_lkt']['bezeichnung'] = 'Moodle Lektoren';
 	$verteilerArray['moodle_lkt']['beschreibung'] = 'Moodle Lektoren';
 	$verteilerArray['moodle_lkt']['sql'] = "	SELECT distinct mitarbeiter_uid AS uid
@@ -310,7 +310,7 @@ $error_msg='';
 														JOIN public.tbl_benutzer ON (mitarbeiter_uid=uid)
 														JOIN public.tbl_benutzerfunktion USING(uid)
 														JOIN public.tbl_organisationseinheit USING(oe_kurzbz)
-														WHERE tbl_benutzer.aktiv AND (funktion_kurzbz='Leitung') 
+														WHERE tbl_benutzer.aktiv AND (funktion_kurzbz='Leitung')
 														AND (tbl_benutzerfunktion.datum_von is null OR tbl_benutzerfunktion.datum_von<=now())
 														AND (tbl_benutzerfunktion.datum_bis is null OR tbl_benutzerfunktion.datum_bis>=now())
 														AND tbl_organisationseinheit.organisationseinheittyp_kurzbz='Abteilung'";
@@ -387,10 +387,10 @@ $error_msg='';
 	//Alle aktiven MitarbeiterInnen mit Funktion Leitung oder stvLeitung oder gfLtg
 	$verteilerArray['tw_leitung']['bezeichnung'] = 'Alle MA mit Leitungsfunktion';
 	$verteilerArray['tw_leitung']['beschreibung'] = 'Alle MA mit Funktion Leitung, stellvertretende Leitung oder geschäftsführende Leitung';
-	$verteilerArray['tw_leitung']['sql'] = "	SELECT DISTINCT uid 
-												FROM 
-													public.tbl_person 
-												JOIN public.tbl_benutzer USING (person_id) 
+	$verteilerArray['tw_leitung']['sql'] = "	SELECT DISTINCT uid
+												FROM
+													public.tbl_person
+												JOIN public.tbl_benutzer USING (person_id)
 												JOIN tbl_benutzerfunktion USING (uid)
 												WHERE funktion_kurzbz IN('Leitung','stvLtg','gLtg')
 												AND tbl_benutzer.aktiv
@@ -412,7 +412,21 @@ $error_msg='';
 														(vw_student.aktiv=false AND get_rolle_prestudent(vw_student.prestudent_id, null)!='Abbrecher' AND vw_student.updateaktivam>now()-'20 weeks'::interval))
 													AND tbl_organisationseinheit.oe_parent_kurzbz='lehrgang'
 													AND organisationseinheittyp_kurzbz='Lehrgang'";
-
+	//Alle aktiven Lektoren von BIF DUA
+	$verteilerArray['bif_lkt_dua']['bezeichnung'] = 'Alle Lektoren von BIF DUAL';
+	$verteilerArray['bif_lkt_dua']['beschreibung'] = 'Alle Lektoren von BIF DUAL';
+	$verteilerArray['bif_lkt_dua']['sql'] = "SELECT distinct mitarbeiter_uid as uid
+											FROM
+												lehre.tbl_lehrveranstaltung
+												JOIN lehre.tbl_lehreinheit USING(lehrveranstaltung_id)
+												JOIN lehre.tbl_lehreinheitmitarbeiter USING(lehreinheit_id)
+											WHERE
+												(studiensemester_kurzbz='$studiensemester' OR
+												 studiensemester_kurzbz='$stsem2')
+												AND mitarbeiter_uid NOT LIKE '\\\\_%'
+												AND tbl_lehrveranstaltung.studiengang_kz=257
+												AND tbl_lehrveranstaltung.orgform_kurzbz='DUA'
+											";
 	$bezeichnung = '';
 	$beschreibung = '';
 	foreach ($verteilerArray AS $listname => $data)
@@ -423,14 +437,14 @@ $error_msg='';
 		{
 			if (strlen($data['bezeichnung']) > 32)
 				$bezeichnung = substr($data['bezeichnung'], 0, 32);
-			else 
+			else
 				$bezeichnung = $data['bezeichnung'];
-			
+
 			if (strlen($data['beschreibung']) > 128)
 				$beschreibung = substr($data['beschreibung'], 0, 128);
 			else
 				$beschreibung = $data['beschreibung'];
-			
+
 			$grp->gruppe_kurzbz = $listname;
 			$grp->studiengang_kz = '0';
 			$grp->semester = '0';
@@ -447,7 +461,7 @@ $error_msg='';
 			$grp->aufnahmegruppe = false;
 			$grp->insertamum = date('Y-m-d H:i:s');
 			$grp->insertvon = 'mlists_generate';
-			
+
 			if(!$grp->save(true, true))
 			{
 				$error_msg .= 'Fehler beim Anlegen der Gruppe '.$listname.': '.$grp->errormsg;
@@ -464,36 +478,36 @@ $error_msg='';
 		if (substr($data['sql'], -1) == ';')
 			$data['sql'] = substr($data['sql'], 0, strlen($data['sql'])-1);
 
-		$qry_delete = "	DELETE FROM 
-							public.tbl_benutzergruppe 
-						WHERE 
-							UPPER(gruppe_kurzbz)=UPPER(".$db->db_add_param($listname).") 
-						AND 
+		$qry_delete = "	DELETE FROM
+							public.tbl_benutzergruppe
+						WHERE
+							UPPER(gruppe_kurzbz)=UPPER(".$db->db_add_param($listname).")
+						AND
 							uid NOT IN (".$data['sql'].");";
 
 		if(!($result = $db->db_query($qry_delete)))
 			$error_msg .= $db->db_last_error().$qry_delete.'<br><br>';
-		
+
 		echo strtoupper($listname).' '.$db->db_affected_rows($result).' Einträge gelöscht<BR>';
-		
+
 		flush();
 
-		$qry_insert = "	WITH 
+		$qry_insert = "	WITH
 							uids AS (".$data['sql'].")
-						INSERT INTO 
-							public.tbl_benutzergruppe(uid, gruppe_kurzbz, insertamum, insertvon) 
-						SELECT 
-							*, UPPER(".$db->db_add_param($listname)."), now(), 'mlists_generate' 
-						FROM 
-							uids 
-						WHERE 
+						INSERT INTO
+							public.tbl_benutzergruppe(uid, gruppe_kurzbz, insertamum, insertvon)
+						SELECT
+							*, UPPER(".$db->db_add_param($listname)."), now(), 'mlists_generate'
+						FROM
+							uids
+						WHERE
 							uid NOT IN (SELECT uid FROM public.tbl_benutzergruppe WHERE UPPER(gruppe_kurzbz)=UPPER(".$db->db_add_param($listname)."));";
 
 		if(!($result = $db->db_query($qry_insert)))
 			$error_msg .= $db->db_last_error().$qry_insert.'<br><br>';
-		
+
 		echo strtoupper($listname).' '.$db->db_affected_rows($result).' Einträge hinzugefügt<BR><BR>';
-		
+
 		flush();
 	}
 
@@ -501,7 +515,7 @@ $error_msg='';
 // Erstellen der Mailinglisten mit Schleifen-Logik
 // **************************************************************
 
-	
+
 	// **************************************************************
 	// Lektoren-Verteiler innerhalb der Studiengaenge abgleichen
 	// Lektoren holen die nicht mehr in den Verteiler gehoeren
@@ -998,7 +1012,7 @@ $error_msg='';
 		}
 	}
 	echo '<br>';
-	
+
 	// **************************************************************
 	// Studierendenverteiler fuer die einzelnen Organisationseinheiten bei Mischformen
 	echo '<br>Abgleich der Mischformverteiler';
@@ -1103,7 +1117,7 @@ $error_msg='';
 		$error_msg.=$db->db_last_error().' '.$sql_query;
 
 	echo $error_msg;
-	
+
 	// Send Mail to admin if error occurs
 	if ($error_msg != '')
 	{
