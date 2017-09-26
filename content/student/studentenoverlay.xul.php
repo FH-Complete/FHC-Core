@@ -383,6 +383,9 @@ else
 						class="sortDirectionIndicator"
 	    					sort="rdf:http://www.technikum-wien.at/student/rdf#aktiv" onclick="StudentTreeSort()"/>
 	    				<splitter class="tree-splitter"/>
+						<treecol id="student-treecol-geburtsdatum_iso" label="GeburtsdatumISO" flex="1" hidden="false" persist="hidden, width, ordinal"
+	    					class="sortDirectionIndicator"
+	    					sort="rdf:http://www.technikum-wien.at/student/rdf#geburtsdatum_iso" onclick="StudentTreeSort()"/>
 					</treecols>
 
 					<template>
@@ -433,6 +436,7 @@ else
 									<treecell label="rdf:http://www.technikum-wien.at/student/rdf#studienplan_bezeichnung" />
 									<treecell label="rdf:http://www.technikum-wien.at/student/rdf#mentor" />
 									<treecell label="rdf:http://www.technikum-wien.at/student/rdf#aktiv" />
+									<treecell label="rdf:http://www.technikum-wien.at/student/rdf#geburtsdatum_iso" />
 	         						</treerow>
 	       						</treeitem>
 	      					</treechildren>
@@ -484,7 +488,7 @@ else
 							if(!defined('FAS_MESSAGES') || FAS_MESSAGES==true)
 								echo '<tab id="student-tab-messages" label="Messages" onclick="StudentMessagesIFrameLoad();"/>';
 							?>
-							
+
 							<?php
 							if (!defined('FAS_UDF') || FAS_UDF == true)
 								echo '<tab id="student-tab-udf" label="Zusatzfelder" onclick="StudentUDFIFrameLoad();"/>';
@@ -523,11 +527,11 @@ else
 							<?php
 								if(!defined('FAS_MESSAGES') || FAS_MESSAGES==true)
 									echo '<iframe id="student-messages" style="margin: 0px;" src="" />';
-								
+
 								if (!defined('FAS_UDF') || FAS_UDF == true)
 									echo '<iframe id="student-udf" style="margin: 0px;" src="" />';
 							?>
-							
+
 						</tabpanels>
 					</tabbox>
 				</vbox>
