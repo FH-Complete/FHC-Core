@@ -39,6 +39,15 @@ else if(isset($_POST['studiengang_kz']))
 else
 	$studiengang_kz='';
 
+if ($studiengang_kz != '')
+{
+	$studiengang_oe = new studiengang($studiengang_kz);
+	if ($studiengang_oe->oe_kurzbz != '')
+		$oe_studiengang = $studiengang_oe->oe_kurzbz;
+	else
+		$oe_studiengang = '';
+}
+
 if (isset($_GET['sem']))
 
 	$sem=$_GET['sem'];
@@ -55,8 +64,8 @@ $uid = get_uid();
 
 $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($uid);
-if(!$rechte->isBerechtigt('lehre/gruppe'))
-	die('Sie haben keine Berechtigung fuer diese Seite');
+if(!$rechte->isBerechtigt('lehre/gruppe', null, 's'))
+	die($rechte->errormsg);
 
 ?>
 <html>
@@ -80,8 +89,16 @@ if(!$rechte->isBerechtigt('lehre/gruppe'))
 			$("#t1").tablesorter(
 			{
 				sortList: [[0,0]],
-				widgets: ["zebra", "filter", "stickyHeaders"],
-				headers: { 12: { filter: false,  sorter: false }}
+				widgets: ["saveSort", "zebra", "filter", "stickyHeaders"],
+				headers: { 12: { filter: false,  sorter: false }},
+				widgetOptions : {filter_saveFilters : true}
+			});
+
+			$('.resetsaved').click(function()
+			{
+				$("#t1").trigger("filterReset");
+				location.reload(forceGet);
+				return false;
 			});
 
 			$( "#mailgrp" ).click(function() {
@@ -108,11 +125,17 @@ if(!$rechte->isBerechtigt('lehre/gruppe'))
 
 if (isset($_POST['newFrm']) || isset($_GET['newFrm']))
 {
-	doEdit(null,true);
+	if($rechte->isBerechtigt('lehre/gruppe', null, 'sui'))
+		doEdit(null,true);
+	else
+		echo '<span class="error">'.$rechte->errormsg.'</span>';
 }
 else if (isset($_GET['edit']))
 {
-	doEdit(addslashes($_GET['kurzbz']),false);
+	if($rechte->isBerechtigt('lehre/gruppe', null, 'sui'))
+		doEdit(addslashes($_GET['kurzbz']),false);
+	else
+		echo '<span class="error">'.$rechte->errormsg.'</span>';
 }
 else if (isset($_POST['type']) && $_POST['type']=='save')
 {
@@ -123,15 +146,23 @@ else if (isset($_POST['type']) && $_POST['type']=='save')
 else if (isset($_GET['type']) && $_GET['type']=='delete')
 {
 	printDropDown();
-	$e=new gruppe();
-	if(!$e->delete($_GET['einheit_id']))
-		echo $e->errormsg;
+	
+	if($rechte->isBerechtigt('lehre/gruppe', $oe_studiengang, 'suid'))
+	{
+		$e=new gruppe();
+		if(!$e->delete($_GET['einheit_id']))
+			echo $e->errormsg;
+	}
+	else 
+		echo '<span class="error">'.$rechte->errormsg.'</span>';
+	
 	getUebersicht();
 }
 else
 {
 	printDropDown();
-	getUebersicht();
+	if ($studiengang_kz != '')
+		getUebersicht();
 }
 
 function printDropDown()
@@ -148,10 +179,11 @@ function printDropDown()
 	// Studiengang AuswahlFilter
 	echo '<form accept-charset="UTF-8" name="frm_studiengang" action="'.$_SERVER['PHP_SELF'].'" method="GET">';
 	echo 'Studiengang: <SELECT name="studiengang_kz" onchange="document.frm_studiengang.submit()">';
+	echo '<OPTION value="">-- PLEASE SELECT --</OPTION>';
 
 	foreach($stud->result as $row)
 	{
-		if($rechte->isBerechtigt('lehre/gruppe', $row->oe_kurzbz, 'suid'))
+		if($rechte->isBerechtigt('lehre/gruppe', $row->oe_kurzbz, 's'))
 		{
 			if ($typ != $row->typ || $typ=='')
 			{
@@ -159,8 +191,8 @@ function printDropDown()
 					echo '</optgroup>';
 					echo '<optgroup label="'.($types->studiengang_typ_arr[$row->typ]!=''?$types->studiengang_typ_arr[$row->typ]:$row->typ).'">';
 			}
-			if($studiengang_kz=='')
-				$studiengang_kz=$row->studiengang_kz;
+			/*if($studiengang_kz=='')
+				$studiengang_kz=$row->studiengang_kz;*/
 
 			echo '<OPTION value="'.$row->studiengang_kz.'"'.($studiengang_kz==$row->studiengang_kz?'selected':'').'>'.$row->kuerzel.' - '.$row->bezeichnung.'</OPTION>';
 			$typ = $row->typ;
@@ -172,50 +204,68 @@ function printDropDown()
 }
 function doSave()
 {
-	$e = new gruppe();
-
-	if ($_POST['new']=='true')
-	{
-		$e->new = true;
-		$e->gruppe_kurzbz=$_POST['kurzbz'];
-		$e->insertamum = date('Y-m-d H:i:s');
-		$e->insertvon = get_uid();
-	}
+	global $rechte;
+	
+	$studiengang = new studiengang($_POST['studiengang_kz']);
+	if ($studiengang->oe_kurzbz != '')
+		$oe_studiengang = $studiengang->oe_kurzbz;
 	else
+		$oe_studiengang = '';
+	
+	if($rechte->isBerechtigt('lehre/gruppe', $oe_studiengang, 'sui'))
 	{
-		$e->load($_POST['kurzbz']);
-		$e->new=false;
+		$e = new gruppe();
+	
+		if ($_POST['new']=='true')
+		{
+			$e->new = true;
+			$e->gruppe_kurzbz = $_POST['kurzbz'];
+			$e->insertamum = date('Y-m-d H:i:s');
+			$e->insertvon = get_uid();
+		}
+		else
+		{
+			$e->load($_POST['kurzbz']);
+			$e->new = false;
+		}
+	
+		$e->updateamum = date('Y-m-d H:i:s');
+		$e->updatevon = get_uid();
+		$e->bezeichnung = $_POST['bezeichnung'];
+		$e->beschreibung = $_POST['beschreibung'];
+		$e->studiengang_kz = $_POST['studiengang_kz'];
+		$e->semester = $_POST['semester'];
+		$e->mailgrp = isset($_POST['mailgrp']);
+		$e->sichtbar = isset($_POST['sichtbar']);
+		$e->lehre = isset($_POST['lehre']);
+		$e->generiert = isset($_POST['generiert']);
+		$e->aktiv = isset($_POST['aktiv']);
+		$e->gesperrt = isset($_POST['gesperrt']);
+		$e->zutrittssystem = isset($_POST['zutrittssystem']);
+		$e->aufnahmegruppe = isset($_POST['aufnahmegruppe']);
+		$e->sort = $_POST['sort'];
+		$e->content_visible = isset($_POST['content_visible']);
+	
+		if(!$e->save())
+			echo $e->errormsg;
 	}
-
-	$e->updateamum = date('Y-m-d H:i:s');
-	$e->updatevon = get_uid();
-	$e->bezeichnung=$_POST['bezeichnung'];
-	$e->beschreibung=$_POST['beschreibung'];
-	$e->studiengang_kz=$_POST['studiengang_kz'];
-	$e->semester=$_POST['semester'];
-	$e->mailgrp=isset($_POST['mailgrp']);
-	$e->sichtbar=isset($_POST['sichtbar']);
-	$e->generiert=isset($_POST['generiert']);
-	$e->aktiv=isset($_POST['aktiv']);
-	$e->gesperrt = isset($_POST['gesperrt']);
-	$e->zutrittssystem = isset($_POST['zutrittssystem']);
-	$e->aufnahmegruppe = isset($_POST['aufnahmegruppe']);
-	$e->sort=$_POST['sort'];
-	$e->content_visible=isset($_POST['content_visible']);
-
-	if(!$e->save())
-		echo $e->errormsg;
 }
 
 
 
 function doEdit($kurzbz,$new=false)
 {
-	global $db;
+	global $db, $rechte, $studiengang;
 	if (!$new)
-		$e=new gruppe($kurzbz);
+	{
+		$e = new gruppe($kurzbz);
+		echo '<a href="einheit_menu.php?studiengang_kz='.$e->studiengang_kz.'">Zurück zur &Uuml;bersicht</a><br>';
+	}
 	else
+	{
 		$e = new gruppe();
+		$e->lehre = false;
+	}
 	?>
 	<form name="gruppe" method="post" action="<?php echo $_SERVER['PHP_SELF'] ?>">
 		<p><b>Gruppe <?php echo ($new?'hinzufügen':'bearbeiten'); ?></b><br>
@@ -247,7 +297,7 @@ function doEdit($kurzbz,$new=false)
 				<td>Studiengang</td>
 				<td>
 					<SELECT name="studiengang_kz">
-							<option value="-1">- auswählen -</option>
+							<option value="">- auswählen -</option>
 						<?php
 							// Auswahl des Studiengangs
 							$types = new studiengang();
@@ -257,19 +307,22 @@ function doEdit($kurzbz,$new=false)
 							$stg->getAll('typ, kurzbz');
 							foreach($stg->result as $studiengang)
 							{
-								if ($typ != $studiengang->typ || $typ=='')
+								if($rechte->isBerechtigt('lehre/gruppe', $studiengang->oe_kurzbz, 'sui'))
 								{
-									if ($typ!='')
-										echo '</optgroup>';
-										echo '<optgroup label="'.($types->studiengang_typ_arr[$studiengang->typ]!=''?$types->studiengang_typ_arr[$studiengang->typ]:$studiengang->typ).'">';
+									if ($typ != $studiengang->typ || $typ=='')
+									{
+										if ($typ!='')
+											echo '</optgroup>';
+											echo '<optgroup label="'.($types->studiengang_typ_arr[$studiengang->typ]!=''?$types->studiengang_typ_arr[$studiengang->typ]:$studiengang->typ).'">';
+									}
+									if($studiengang->studiengang_kz == $e->studiengang_kz)
+										$selected = 'selected="selected"';
+									else
+										$selected='';
+	
+									echo '<option value="'.$studiengang->studiengang_kz.'" '.$selected.'>'.$db->convert_html_chars($studiengang->kuerzel.' - '.$studiengang->bezeichnung).'</option>';
+									$typ = $studiengang->typ;
 								}
-								if($studiengang->studiengang_kz == $e->studiengang_kz)
-									$selected = 'selected="selected"';
-								else
-									$selected='';
-
-								echo '<option value="'.$studiengang->studiengang_kz.'" '.$selected.'>'.$db->convert_html_chars($studiengang->kuerzel.' - '.$studiengang->bezeichnung).'</option>';
-								$typ = $studiengang->typ;
 							}
 						?>
 					</SELECT>
@@ -290,6 +343,11 @@ function doEdit($kurzbz,$new=false)
 				<td>Sichtbar</td>
 				<td><input type='checkbox' name='sichtbar' <?php echo ($e->sichtbar?'checked':'');?>></td>
 				<td><i>Soll die Gruppe im CIS sichtbar sein?</i></td>
+			</tr>
+			<tr>
+				<td>Lehre</td>
+				<td><input type='checkbox' name='lehre' id='lehre' <?php echo ($e->lehre?'checked':'');?>></td>
+				<td><i>Wird die Gruppe in der Lehre als Unterrichtsgruppe verwendet?</i></td>
 			</tr>
 			<tr>
 				<td>ContentVisible</td>
@@ -350,7 +408,7 @@ function doEdit($kurzbz,$new=false)
 
 function getUebersicht()
 {
-	global $studiengang_kz,$semester;
+	global $studiengang_kz, $semester, $rechte;
 	if (!$db = new basis_db())
 			die('Es konnte keine Verbindung zum Server aufgebaut werden.');
 
@@ -359,6 +417,7 @@ function getUebersicht()
 	$gruppe->getgruppe($studiengang_kz,$semester);
 
 	echo '<h3>&Uuml;bersicht</h3>';
+	echo '<button type="button" class="resetsaved" title="Reset Filter">Reset Filter</button>';
 
 	echo "<table id='t1' class='tablesorter'>";
 	echo "<thead>
@@ -370,6 +429,7 @@ function getUebersicht()
 				<th>Sem.</th>
 				<th data-placeholder='t or f'>Aktiv</th>
 				<th data-placeholder='t or f'>Sichtbar</th>
+				<th data-placeholder='t or f'>Lehre</th>
 				<th data-placeholder='t or f'>ContentVisible</th>
 				<th data-placeholder='t or f'>Generiert</th>
 				<th data-placeholder='t or f'>Mailgrp</th>
@@ -381,8 +441,11 @@ function getUebersicht()
 			</thead><tbody>";
 
 	$i=0;
-	$stg = new studiengang();
-	$stg->getAll(null, false);
+	$studiengang = new studiengang($studiengang_kz);
+	if ($studiengang->oe_kurzbz != '')
+		$oe_studiengang = $studiengang->oe_kurzbz;
+	else
+		$oe_studiengang = '';
 
 	foreach ($gruppe->result as $e)
 	{
@@ -395,6 +458,7 @@ function getUebersicht()
 		echo "<td>$e->semester </td>";
 		echo "<td><img title='Aktiv' height='16px' src='../../skin/images/".($e->aktiv?"true.png":"false.png")."' alt='".($e->aktiv?"true.png":"false.png")."'></td>";
 		echo "<td><img title='Sichtbar' height='16px' src='../../skin/images/".($e->sichtbar?"true.png":"false.png")."' alt='".($e->sichtbar?"true.png":"false.png")."'></td>";
+		echo "<td><img title='Lehre' height='16px' src='../../skin/images/".($e->lehre?"true.png":"false.png")."' alt='".($e->lehre?"true.png":"false.png")."'></td>";
 		echo "<td><img title='ContentVisible' height='16px' src='../../skin/images/".($e->content_visible?"true.png":"false.png")."' alt='".($e->content_visible?"true.png":"false.png")."'></td>";
 		echo "<td><img title='Generiert' height='16px' src='../../skin/images/".($e->generiert?"true.png":"false.png")."' alt='".($e->generiert?"true.png":"false.png")."'></td>";
 		echo "<td><img title='Mailgrp' height='16px' src='../../skin/images/".($e->mailgrp?"true.png":"false.png")."' alt='".($e->mailgrp?"true.png":"false.png")."'></td>";
@@ -403,9 +467,14 @@ function getUebersicht()
 		echo "<td><img title='Aufnahmegruppe' height='16px' src='../../skin/images/".($e->aufnahmegruppe?"true.png":"false.png")."' alt='".($e->aufnahmegruppe?"true.png":"false.png")."'></td>";
 		// src="../../skin/images/'.($row->projektarbeit=='t'?'true.png':'false.png').'"
 		//echo "<td>".$gruppe->countStudenten($e->gruppe_kurzbz)."</td>"; Auskommentiert, da sonst die Ladezeit der Seite zu lange ist
-		echo "<td style='padding-right: 5px'><a href='einheit_det.php?kurzbz=$e->gruppe_kurzbz'>Details</a></td>";
-		echo "<td style='padding-right: 5px'><a href=\"einheit_menu.php?edit=1&kurzbz=$e->gruppe_kurzbz\">Edit</a></td>";
-		echo "<td><a href=\"einheit_menu.php?einheit_id=$e->gruppe_kurzbz&studiengang_kz=$e->studiengang_kz&type=delete\" onclick='return conf_del()'>Delete</a></td>";
+		echo "<td style='padding-right: 5px'><a href='einheit_det.php?kurzbz=$e->gruppe_kurzbz'>Personen</a></td>";
+		
+		if($rechte->isBerechtigt('lehre/gruppe', $oe_studiengang, 'su'))
+			echo "<td style='padding-right: 5px'><a href=\"einheit_menu.php?edit=1&kurzbz=$e->gruppe_kurzbz\">Edit</a></td>";
+		
+		if($rechte->isBerechtigt('lehre/gruppe', $oe_studiengang, 'suid'))
+			echo "<td><a href=\"einheit_menu.php?einheit_id=$e->gruppe_kurzbz&studiengang_kz=$e->studiengang_kz&type=delete\" onclick='return conf_del()'>Delete</a></td>";
+		
 		echo "</tr>\n";
 	}
 

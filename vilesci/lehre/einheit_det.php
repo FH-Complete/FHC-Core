@@ -38,7 +38,7 @@ $user=get_uid();
 $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($user);
 if(!$rechte->isBerechtigt('lehre/gruppe:begrenzt',null,'s'))
-	die('Sie haben keine Berechtigung für diese Seite');
+	die($rechte->errormsg);
 
 $kurzbz=(isset($_GET['kurzbz'])?$_GET['kurzbz']:(isset($_POST['kurzbz'])?$_POST['kurzbz']:''));
 if(empty($kurzbz))
@@ -47,7 +47,7 @@ if(empty($kurzbz))
 if (isset($_POST['new']))
 {
 	if(!$rechte->isBerechtigt('lehre/gruppe',null,'sui'))
-		die('Sie haben keine Berechtigung für diese Seite');
+		die($rechte->errormsg);
 
 	$e=new benutzergruppe();
 	$e->new=true;
@@ -63,7 +63,7 @@ if (isset($_POST['new']))
 else if (isset($_GET['type']) && $_GET['type']=='delete')
 {
 	if(!$rechte->isBerechtigt('lehre/gruppe',null,'suid'))
-		die('Sie haben keine Berechtigung für diese Seite');
+		die($rechte->errormsg);
 
 	$e=new benutzergruppe();
 	$e->delete($_GET['uid'], $kurzbz);
@@ -129,6 +129,13 @@ if(!$gruppe->generiert)
 	<HR>
 		';
 }
+else 
+{
+	echo '	Name: <input type="text" name="uid" id="uid" disabled="disabled"/>
+			<INPUT type="submit" name="new" value="Hinzuf&uuml;gen"  disabled="disabled">
+			<span>Bei generierten Gruppen können keine Personen manuell hinzugefügt werden.</span>
+			<HR>';
+}
 
 	$gruppe = new gruppe();
 
@@ -141,7 +148,7 @@ if(!$gruppe->generiert)
 		{
 			$("#usertabelle").tablesorter(
 			{
-				sortList: [[2,0]],
+				sortList: [[0,0],[1,0]],
 				widgets: ["zebra"]
 			});
 		});
@@ -149,9 +156,9 @@ if(!$gruppe->generiert)
 		echo '<table id="usertabelle" class="tablesorter">
 				<thead>
 				<tr>
-					<th>UID</th>
-					<th>Vornamen</th>
 					<th>Nachname</th>
+					<th>Vornamen</th>
+					<th>UID</th>
 				</tr>
 				</thead>
 				<tbody>';
@@ -159,12 +166,12 @@ if(!$gruppe->generiert)
 		foreach($gruppe->result as $row)
 		{
 			echo "<tr>";
-		    echo "<td>".$row->uid."</td>";
-			echo "<td>".$row->vorname."</td>";
 			echo "<td>".$row->nachname."</td>";
-			if(!$gruppe->generiert)
+			echo "<td>".$row->vorname."</td>";
+			echo "<td>".$row->uid."</td>";
+			if(!$gruppe->generiert && $rechte->isBerechtigt('lehre/gruppe',null,'suid'))
 				echo '<td class="button"><a href="einheit_det.php?uid='.$row->uid.'&type=delete&kurzbz='.$kurzbz.'">Delete</a></td>';
-		    echo "</tr>\n";
+			echo "</tr>\n";
 		}
 		echo '</tbody>
 		</table>';
