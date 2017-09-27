@@ -406,7 +406,8 @@ class basis_db extends db
 
 		foreach ($matches as $mk => $match)
 		{
-			$values[$languages[$mk+1]] = $match[3] != '' ? stripcslashes($match[3]) : (strtolower($match[2]) == 'null' ? null : $match[2]);
+			if(isset($languages[$mk+1]))
+				$values[$languages[$mk+1]] = $match[3] != '' ? stripcslashes($match[3]) : (strtolower($match[2]) == 'null' ? null : $match[2]);
 		}
 		return $values;
 	}

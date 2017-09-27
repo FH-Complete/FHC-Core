@@ -803,6 +803,7 @@ function GenerateXMLStudentBlock($row)
 				AND studiensemester_kurzbz=".$db->db_add_param($aktstatus_stsem)."
 			ORDER BY tbl_mobilitaet.insertamum DESC limit 1;";
 
+	$studtyp = '';
 	if($resultgs = $db->db_query($qrygs))
 	{
 		while($rowgs = $db->db_fetch_object($resultgs))
@@ -1021,7 +1022,7 @@ function GenerateXMLStudentBlock($row)
 			}
 		}
 
-		if($beginndatum!='' && !$ausserordentlich)
+		if($beginndatum!='' && !$ausserordentlich && $studtyp!='E')
 		{
 			$datei.="
 			<BeginnDatum>".date("dmY", $datumobj->mktime_fromdate($beginndatum))."</BeginnDatum>";
@@ -1037,14 +1038,17 @@ function GenerateXMLStudentBlock($row)
 			Incoming
 			Ausserordentlich Studierender
 		*/
-		if($aktstatus!='Incoming' && !$ausserordentlich)
+		if($aktstatus!='Incoming' && !$ausserordentlich  && $studtyp!='E')
 		{
 			$datei.="
 			<Ausbildungssemester>".$sem."</Ausbildungssemester>";
 		}
 
-		$datei.="
-			<StudStatusCode>".$status."</StudStatusCode>";
+		if($studtyp!='E')
+		{
+			$datei.="
+				<StudStatusCode>".$status."</StudStatusCode>";
+		}
 
 		if($orgform_code_array[$storgform]!=1 && !$ausserordentlich) // Wenn nicht Vollzeit und nicht Ausserordentlich
 		{

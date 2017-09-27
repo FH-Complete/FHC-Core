@@ -143,7 +143,7 @@ $config['auth_source'] = 'library';
 | password for that username, even if it is hashed
 |
 */
-$config['auth_library_class'] = 'FHC_Auth';
+$config['auth_library_class'] = 'AuthLib';
 
 // rest_auth is basic
 $config['auth_library_function'] = 'basicAuthentication';
