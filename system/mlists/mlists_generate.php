@@ -76,7 +76,21 @@ $error_msg='';
 		$qry = "UPDATE public.tbl_gruppe SET generiert=true WHERE UPPER(gruppe_kurzbz)=UPPER('".addslashes($gruppe)."')";
 		$db->db_query($qry);
 	}
-
+	
+	/**
+	 * Löscht alle BenutzerInnen aus NICHT-generierten Verteilern im Studiengang 0 (Erhalter), deren Account vor mehr als 3 Wochen deaktiviert wurde
+	 */
+	
+	$qry_delete = "	DELETE FROM public.tbl_benutzergruppe
+					WHERE tbl_benutzergruppe.studiensemester_kurzbz IS NULL
+					AND gruppe_kurzbz IN (SELECT gruppe_kurzbz FROM public.tbl_gruppe WHERE generiert=false AND studiengang_kz=0)
+					AND uid IN (SELECT uid FROM public.tbl_benutzer WHERE aktiv=false AND updateaktivam<now()-'3 weeks'::interval);";
+	
+	if(!($result = $db->db_query($qry_delete)))
+		$error_msg .= $db->db_last_error().$qry_delete.'<br><br>';
+	
+	echo $db->db_affected_rows($result).' inaktive BenutzerInnen wurden aus statischen Verteilern gelöscht<BR><BR>';
+	
 	/**
 	 * Einfache Verteiler, deren Erstellung ohne Schleifen-Logik moeglich ist, werden ueber dieses Array erstellt
 	 * Benoetigt werden die 3 Attribute:
@@ -288,6 +302,7 @@ $error_msg='';
 												AND studiengang_kz IN (SELECT studiengang_kz FROM public.tbl_studiengang WHERE typ IN ('b','m'))
 											)";
 	//Moodle-LektorenVerteiler
+	/* Von kindlm auskommentiert am 27.09.2017. Verteiler wird vermutlich nicht mehr benötigt. Wenn ein Jahr lang kein Problem, dann bitte löschen.
 	$verteilerArray['moodle_lkt']['bezeichnung'] = 'Moodle Lektoren';
 	$verteilerArray['moodle_lkt']['beschreibung'] = 'Moodle Lektoren';
 	$verteilerArray['moodle_lkt']['sql'] = "	SELECT distinct mitarbeiter_uid AS uid
@@ -300,7 +315,7 @@ $error_msg='';
 												AND vw_lehreinheit.studiensemester_kurzbz=tbl_lehreinheit.studiensemester_kurzbz
 												AND ((tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_moodle.lehrveranstaltung_id
 												AND tbl_moodle.studiensemester_kurzbz=tbl_lehreinheit.studiensemester_kurzbz)
-												OR 	(tbl_lehreinheit.lehreinheit_id=tbl_moodle.lehreinheit_id))";
+												OR 	(tbl_lehreinheit.lehreinheit_id=tbl_moodle.lehreinheit_id))";*/
 	//Serviceabteilungen. Aktive MitarbeiterInnen mit gueltiger Leitungsfunktion in einer Abteilung
 	$verteilerArray['serviceabteilungen']['bezeichnung'] = 'LeiterInnen sonst. OEen';
 	$verteilerArray['serviceabteilungen']['beschreibung'] = 'LeiterInnen der Abteilungen und Gruppen';
