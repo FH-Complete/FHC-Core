@@ -18,6 +18,7 @@ $this->phrasen['lehre/anwesenheitsUndNotenlisten']='Attendance and grade list';
 $this->phrasen['lehre/leistungsuebersicht']='Performance List';
 $this->phrasen['lehre/newsgroups']='Newsgroups';
 $this->phrasen['lehre/feedback']='Feedback';
+$this->phrasen['lehre/termineImLvPlan']='Dates in schedule';
 
 $this->phrasen['lehre/benotungstoolHandbuch']='Manual';
 $this->phrasen['lehre/kreuzerltool']='Assignment tool<br>("Checkbox"-Tool)';

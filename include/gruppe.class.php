@@ -287,7 +287,7 @@ class gruppe extends basis_db
 				$grp_obj->insertvon = $row->insertvon;
 				$grp_obj->orgform_kurzbz = $row->orgform_kurzbz;
 				$grp_obj->gesperrt = $this->db_parse_bool($row->gesperrt);
-				$grp_obj->zutrittsssystem = $this->db_parse_bool($row->zutrittssystem);
+				$grp_obj->zutrittssystem = $this->db_parse_bool($row->zutrittssystem);
 				$grp_obj->aufnahmegruppe = $this->db_parse_bool($row->aufnahmegruppe);
 
 				$this->result[] = $grp_obj;
