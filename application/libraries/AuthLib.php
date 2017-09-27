@@ -130,7 +130,7 @@ class AuthLib extends authentication
 
 		if (hasData($benutzer))
 		{
-			$finalUserBasicDataByUID = $this->_getFinalUserBasicDataByPersonID($benutzer->retval[0]->person_id, $uid);
+			$finalUserBasicDataByUID = $this->_getFinalUserBasicDataByPersonID($benutzer->retval[0]->person_id);
 		}
 
 		return $finalUserBasicDataByUID;
@@ -138,52 +138,14 @@ class AuthLib extends authentication
 
 	/**
 	 * Returns all the keys with which is possible to obtain personal data about a final user
-	 * using the given person_id. The uid is optional
+	 * using the given person_id
 	 */
-	private function _getFinalUserBasicDataByPersonID($person_id, $uid = null)
+	private function _getFinalUserBasicDataByPersonID($person_id)
 	{
 		$finalUserBasicDataByPersonID = new stdClass(); // returned object
 
-		// Store the person_id and eventually all the uids and prestudent_ids related to this final user
+		// Store the person_id and eventually all the uid and prestudent_id related to this final user
 		$finalUserBasicDataByPersonID->person_id = $person_id;
-		$finalUserBasicDataByPersonID->uids = array();
-		$finalUserBasicDataByPersonID->prestudent_ids = array();
-
-		// If the UID has not been given as a parameter
-		if ($uid != null)
-		{
-			$finalUserBasicDataByPersonID->uid[0] = $uid;
-		}
-		else
-		{
-			// Load model BenutzerModel
-			$this->ci->load->model('person/Benutzer_model', 'BenutzerModel');
-
-			// Loads all the benutzer whith that person_id
-			$benutzer = $this->ci->BenutzerModel->loadWhere(array('person_id' => $person_id));
-
-			if (hasData($benutzer)) // store all the uids
-			{
-				foreach ($benutzer->retval as $rownum => $rowdata)
-				{
-					$finalUserBasicDataByPersonID->uids[$rownum] = $rowdata->uid;
-				}
-			}
-		}
-
-		// Load model PrestudentModel
-		$this->ci->load->model('crm/Prestudent_model', 'PrestudentModel');
-
-		// Loads all the prestudent whith that person_id
-		$prestudent = $this->ci->PrestudentModel->loadWhere(array('person_id' => $person_id));
-
-		if (hasData($prestudent)) // store all the prestudent_ids
-		{
-			foreach ($prestudent->retval as $rownum => $rowdata)
-			{
-				$finalUserBasicDataByPersonID->prestudent_ids[$rownum] = $rowdata->prestudent_id;
-			}
-		}
 
 		return success($finalUserBasicDataByPersonID);
 	}
