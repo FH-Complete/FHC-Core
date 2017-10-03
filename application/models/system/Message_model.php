@@ -72,8 +72,7 @@ class Message_model extends DB_Model
 							(
 								SELECT o.oe_kurzbz, o.oe_parent_kurzbz
 								  FROM public.tbl_organisationseinheit o
-								 WHERE o.oe_parent_kurzbz IS NULL
-								   AND o.oe_kurzbz = ?
+								 WHERE o.oe_kurzbz = ?
 							 UNION ALL
 								SELECT o.oe_kurzbz, o.oe_parent_kurzbz
 								  FROM public.tbl_organisationseinheit o INNER JOIN organizations orgs ON (o.oe_parent_kurzbz = orgs._pk)
