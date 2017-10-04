@@ -1,5 +1,5 @@
-<!ENTITY window.title			"FAS"> 
-<!ENTITY window.version			"3.0"> 
+<!ENTITY window.title			"FAS">
+<!ENTITY window.version			"3.0">
 
 <!-- MENUE -->
 
@@ -362,9 +362,13 @@
 <!ENTITY menu-bis-mitarbeiter-checkverwendung.label		"checkVerwendung">
 <!ENTITY menu-bis-mitarbeiter-checkverwendung.accesskey	"V">
 
-<!ENTITY menu-bis-mitarbeiter-checkfunktion.key			"F">
-<!ENTITY menu-bis-mitarbeiter-checkfunktion.label		"checkFunktion">
-<!ENTITY menu-bis-mitarbeiter-checkfunktion.accesskey	"F">
+<!ENTITY menu-bis-mitarbeiter-uebersicht.key		"B">
+<!ENTITY menu-bis-mitarbeiter-ueberischt.label		"Übersicht">
+<!ENTITY menu-bis-mitarbeiter-uebersicht.accesskey	"B">
+
+<!ENTITY menu-bis-mitarbeiter-uebersicht.key		"U">
+<!ENTITY menu-bis-mitarbeiter-uebersicht.label		"Übersicht">
+<!ENTITY menu-bis-mitarbeiter-uebersicht.accesskey	"U">
 
 <!ENTITY menu-bis-studenten.key		"S">
 <!ENTITY menu-bis-studenten.label		"Studenten">
