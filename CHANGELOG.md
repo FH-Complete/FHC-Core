@@ -24,6 +24,7 @@
 - **[CORE]** Infoscreen wurde umbenannt (informationsbildschirm.php)
 - **[CORE]** Moodle Schnittstelle wurde aus dem Core entfernt und in ein eigenes Addon verschoben. Moodle Versionen < 2.4 werden nicht mehr unterstützt
 - **[CORE]** Update campus.tbl_templates (contentmittitel and contentohnetitel) with system/templates/contentmittitel_xslt_xhtml.xslt andsystem/templates/contentohnetitel_xslt_xhtml.xslt
+- **[CORE]** Neue Style Anweisungen (div.header_logo, td.headerbar, div.cis_logo) müssen in Custom Stylesheet hinzugefügt werden
 
 ## [3.2]
 
