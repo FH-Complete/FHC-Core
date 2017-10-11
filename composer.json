@@ -173,6 +173,18 @@
 					"type": "zip"
 				}
 			}
+		},
+		{
+			"type": "package",
+			"package": {
+				"name": "nicolaskruchten/pivottable",
+				"version": "2.15.0",
+				"source": {
+					"url": "https://github.com/nicolaskruchten/pivottable.git",
+					"type": "git",
+					"reference": "b15ea33268b587d986371c0b6f215c36ffbb860c"
+				}
+			}
 		}
 	],
 	"require": {
@@ -208,7 +220,8 @@
 		"tapmodo/Jcrop": "^2.0",
 		"joeldbirch/superfish": "^1.7",
 		"jquery/sizzle": "^1.0",
-		"tomazdragar/SimpleCropper": "^1.0"
+		"tomazdragar/SimpleCropper": "^1.0",
+		"nicolaskruchten/pivottable": "^2.15.0"
 	},
 	"require-dev": {
 		"squizlabs/php_codesniffer": "2.*"

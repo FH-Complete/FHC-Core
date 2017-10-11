@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "d7b7c2de327697d4e0fb3bbb392b0a72",
-    "content-hash": "8759335901f4b67264f86b53ae54f18e",
+    "hash": "4bd3b8eecbbafb2eed0a3b9de7bc768f",
+    "content-hash": "9e02197b0ff844cd9193a88ce17811d4",
     "packages": [
         {
             "name": "alvaro-prieto/colResizable",
@@ -17,56 +17,6 @@
                 "shasum": null
             },
             "type": "library"
-        },
-        {
-            "name": "blueimp/jquery-file-upload",
-            "version": "v9.19.1",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/vkhramtsov/jQuery-File-Upload.git",
-                "reference": "88fabe7bb9bb99ee8be332546f953adf2ed9ed57"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/vkhramtsov/jQuery-File-Upload/zipball/88fabe7bb9bb99ee8be332546f953adf2ed9ed57",
-                "reference": "88fabe7bb9bb99ee8be332546f953adf2ed9ed57",
-                "shasum": ""
-            },
-            "type": "library",
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Sebastian Tschan",
-                    "homepage": "https://blueimp.net"
-                }
-            ],
-            "description": "File Upload widget for jQuery.",
-            "homepage": "https://github.com/blueimp/jQuery-File-Upload",
-            "keywords": [
-                "bootstrap",
-                "chunk",
-                "cross-domain",
-                "cross-site",
-                "drag",
-                "drop",
-                "file",
-                "gae",
-                "go",
-                "jquery",
-                "multiple",
-                "php",
-                "preview",
-                "progress",
-                "python",
-                "resume",
-                "selection",
-                "upload",
-                "widget"
-            ],
-            "time": "2017-09-05 05:45:32"
         },
         {
             "name": "borgar/textile-js",
@@ -513,41 +463,6 @@
             "time": "2015-06-17 06:08:09"
         },
         {
-            "name": "components/font-awesome",
-            "version": "4.7.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/components/font-awesome.git",
-                "reference": "885308b939369d147bec93174722786bc2c4eedd"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/components/font-awesome/zipball/885308b939369d147bec93174722786bc2c4eedd",
-                "reference": "885308b939369d147bec93174722786bc2c4eedd",
-                "shasum": ""
-            },
-            "type": "component",
-            "extra": {
-                "component": {
-                    "styles": [
-                        "css/font-awesome.css"
-                    ],
-                    "files": [
-                        "css/font-awesome.min.css",
-                        "css/font-awesome.css.map",
-                        "fonts/*"
-                    ]
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT",
-                "OFL-1.1"
-            ],
-            "description": "The iconic font designed for use with Twitter Bootstrap.",
-            "time": "2016-10-25 10:56:23"
-        },
-        {
             "name": "components/jquery",
             "version": "2.1.4",
             "source": {
@@ -719,60 +634,6 @@
             ],
             "description": "jQuery UI is a curated set of user interface interactions, effects, widgets, and themes built on top of the jQuery JavaScript Library. Whether you're building highly interactive web applications or you just need to add a date picker to a form control, jQuery UI is the perfect choice.",
             "time": "2016-09-16 05:47:55"
-        },
-        {
-            "name": "compwright/codeigniter-installers",
-            "version": "1.1.4",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/compwright/codeigniter-installers.git",
-                "reference": "adbbd5ae2cbf5a24a39931235b1ac7dab56abb4f"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/compwright/codeigniter-installers/zipball/adbbd5ae2cbf5a24a39931235b1ac7dab56abb4f",
-                "reference": "adbbd5ae2cbf5a24a39931235b1ac7dab56abb4f",
-                "shasum": ""
-            },
-            "require-dev": {
-                "composer/composer": "1.0.*@dev"
-            },
-            "type": "composer-installer",
-            "extra": {
-                "class": "Composer\\Installer\\CodeigniterInstaller"
-            },
-            "autoload": {
-                "psr-0": {
-                    "Composer\\Installer": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Jonathon Hill",
-                    "email": "jhill9693@gmail.com",
-                    "homepage": "http://jonathonhill.net",
-                    "role": "Developer"
-                }
-            ],
-            "description": "Composer installers for CodeIgniter",
-            "homepage": "https://github.com/compwright/codeigniter-installers",
-            "keywords": [
-                "MX",
-                "codeigniter",
-                "composer",
-                "core",
-                "hmvc",
-                "installer",
-                "library",
-                "module",
-                "spark",
-                "sparks"
-            ],
-            "time": "2012-11-12 16:11:38"
         },
         {
             "name": "easyrdf/easyrdf",
@@ -1381,6 +1242,16 @@
             "time": "2016-11-17 14:18:12"
         },
         {
+            "name": "nicolaskruchten/pivottable",
+            "version": "2.15.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/nicolaskruchten/pivottable.git",
+                "reference": "b15ea33268b587d986371c0b6f215c36ffbb860c"
+            },
+            "type": "library"
+        },
+        {
             "name": "psr/log",
             "version": "1.0.2",
             "source": {
@@ -1545,63 +1416,6 @@
             ],
             "description": "Allows installation of Components via Composer.",
             "time": "2015-08-10 12:35:38"
-        },
-        {
-            "name": "rogeriopradoj/codeigniter-curl",
-            "version": "1.2.2",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/rogeriopradoj/codeigniter-curl.git",
-                "reference": "eb954890e242a5e80812006e60b07f1ce29b7e7a"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/rogeriopradoj/codeigniter-curl/zipball/eb954890e242a5e80812006e60b07f1ce29b7e7a",
-                "reference": "eb954890e242a5e80812006e60b07f1ce29b7e7a",
-                "shasum": ""
-            },
-            "require": {
-                "compwright/codeigniter-installers": "*"
-            },
-            "type": "codeigniter-spark",
-            "notification-url": "https://packagist.org/downloads/",
-            "authors": [
-                {
-                    "name": "Rogerio Prado de Jesus",
-                    "email": "rogeriopradoj@gmail.com"
-                }
-            ],
-            "description": "codeigniter-curl philsturgeon's library via composer",
-            "time": "2013-05-27 21:19:21"
-        },
-        {
-            "name": "rogeriopradoj/codeigniter-restclient",
-            "version": "2.1.1",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/rogeriopradoj/codeigniter-restclient.git",
-                "reference": "64991a0105c3cd891a64e1d35e497270ca2b0d78"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/rogeriopradoj/codeigniter-restclient/zipball/64991a0105c3cd891a64e1d35e497270ca2b0d78",
-                "reference": "64991a0105c3cd891a64e1d35e497270ca2b0d78",
-                "shasum": ""
-            },
-            "require": {
-                "compwright/codeigniter-installers": "*",
-                "rogeriopradoj/codeigniter-curl": "*"
-            },
-            "type": "codeigniter-spark",
-            "notification-url": "https://packagist.org/downloads/",
-            "authors": [
-                {
-                    "name": "Rogerio Prado de Jesus",
-                    "email": "rogeriopradoj@gmail.com"
-                }
-            ],
-            "description": "codeigniter-restclient philsturgeon's library via composer",
-            "time": "2013-05-27 21:23:54"
         },
         {
             "name": "rougin/blueprint",
