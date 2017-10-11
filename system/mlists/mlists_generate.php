@@ -661,7 +661,7 @@ $error_msg='';
 	ob_flush();
 	// Studierende holen, die nicht im Verteiler sind
 	echo '<BR>';
-	$sql_query="SELECT uid, tbl_gruppe.gruppe_kurzbz
+	$sql_query="SELECT DISTINCT uid, tbl_gruppe.gruppe_kurzbz
 				FROM
 					public.tbl_benutzerfunktion
 					JOIN public.tbl_benutzer USING(uid)
@@ -749,7 +749,7 @@ $error_msg='';
 
 	// Studierende holen, die noch nicht im Verteiler sind
 	echo '<BR>';
-	$sql_query="SELECT uid, tbl_gruppe.gruppe_kurzbz
+	$sql_query="SELECT DISTINCT uid, tbl_gruppe.gruppe_kurzbz
 				FROM
 					public.tbl_benutzerfunktion
 					JOIN public.tbl_benutzer USING(uid)
