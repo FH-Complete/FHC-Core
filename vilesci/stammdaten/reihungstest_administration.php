@@ -122,23 +122,27 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//DE" "http://www
 						headers: {5:{sorter:false}}
 					});
 
-				$(".prestudent_option").click(function ()
-				{
-					var elementExists = document.getElementById("input_prestudent");
-					var e = document.getElementById("pruefling_select");
-					var strUser = e.options[e.selectedIndex].value;
-					if (elementExists != null)
+				if($("#pruefling_select").value == -1)
+					$("#pruefling_select").after(" <input id=\'input_prestudent\' type=\'text\' name=\'prestudent\'></input>");
+				
+				$("#pruefling_select").change(
+					function()
 					{
-						elementExists.value=strUser;
+						console.log(this.value);
+						if(this.value == -1)//-1 - Option Prestudent ID eingeben
+						{
+							//eingabefeld für prestudent id anzeigen wenn nicht vorhanden
+							if(!$("#input_prestudent").length)
+								$("#pruefling_select").after(" <input id=\'input_prestudent\' type=\'text\' name=\'prestudent\'></input>");
+						}
+						else
+						{
+							//eingabefeld für prestudent id entfernen wenn vorhanden
+							if($("#input_prestudent").length)
+								$("#input_prestudent").remove();
+						}
 					}
-					$(this).closest("form").submit();
-				});
-
-				$("#prestudent_input").click(function ()
-				{
-					$(this).closest("form").submit();
-				});
-
+				);								
 			});
 		</script>
 
@@ -288,7 +292,7 @@ foreach($ps->result as $prestd)
 	echo '<OPTION class="prestudent_option" value="'.$prestd->prestudent_id.'" '.$selected.'>'.$prestd->nachname.' '.$prestd->vorname.', '.(strtoupper($stg->typ.$stg->kurzbz)).'; ID='.$prestd->prestudent_id.'; '.$prestd->gebdatum."</OPTION>\n";
 }
 echo '</SELECT>';
-if($prestudent_id!='' && !in_array($prestudent_id, $prestudent_arr))
+if($prestudent_id != '' && !in_array($prestudent_id, $prestudent_arr))
 {
 	echo ' <INPUT id="input_prestudent" type="text" name="prestudent" value="'.($prestudent_id!='-1'?$prestudent_id:'').'">';
 }
@@ -323,7 +327,7 @@ if($result = $db->db_query($qry))
 	echo '</SELECT>';
 }
 
-echo '<input type="submit" value="Dieses Teilgebiet l&ouml;schen" name="deleteteilgebiet" onclick="return confirm(\'Antworten dieses Gebietes wirklich löschen?\')">&nbsp;&nbsp;&nbsp;&nbsp;';
+echo '&nbsp;&nbsp;&nbsp;&nbsp;<input type="submit" value="Dieses Teilgebiet l&ouml;schen" name="deleteteilgebiet" onclick="return confirm(\'Antworten dieses Gebietes wirklich löschen?\')">&nbsp;&nbsp;&nbsp;&nbsp;';
 if(isset($_POST['deleteteilgebiet']))
 {
 	if(!$rechte->isBerechtigt('basis/testtool', null, 'suid'))
@@ -428,7 +432,7 @@ if(isset($_POST['deleteteilgebiet']))
 		echo '<span class="error">Wählen Sie bitte ein Gebiet, dessen Antworten Sie löschen wollen</span>';
 }
 
-echo '<input type="submit" value="! Alle Teilgebiete l&ouml;schen !" name="delete_all" onclick="return confirm(\'Wollen Sie wirklich ALLE Antworten des Prüflings löschen?\')"></form>';
+echo '&nbsp;&nbsp;&nbsp;&nbsp;<input type="submit" value="! Alle Teilgebiete l&ouml;schen !" name="delete_all" onclick="return confirm(\'Wollen Sie wirklich ALLE Antworten des Prüflings löschen?\')"></form>';
 
 // Alle Antworten aller Gebiete einer Person löschen und einen Logfile-Eintrag mit Undo-Befehl erstellen
 if(isset($_POST['delete_all']))

@@ -122,16 +122,16 @@ if($resultall = $db->db_query($qryall))
 		}
 	}
 }
-//2 - aktive mitarbeiter mit keiner aktuellen verwendung
+//2 - aktive fixe mitarbeiter mit keiner aktuellen verwendung
 $qryall='SELECT uid,nachname,vorname, count(bisverwendung_id)
 	FROM campus.vw_mitarbeiter LEFT OUTER JOIN bis.tbl_bisverwendung ON (uid=mitarbeiter_uid)
-	WHERE aktiv AND NOT ende>now() AND NOT ende IS NULL
+	WHERE aktiv AND fixangestellt AND NOT ende>now() AND NOT ende IS NULL
 	AND uid NOT IN (SELECT uid FROM campus.vw_mitarbeiter LEFT OUTER JOIN bis.tbl_bisverwendung ON (uid=mitarbeiter_uid)
-	WHERE aktiv AND (ende>now() OR ende IS NULL)) GROUP BY uid,nachname,vorname ORDER by nachname,vorname;';
+	WHERE aktiv AND fixangestellt AND (ende>now() OR ende IS NULL)) GROUP BY uid,nachname,vorname ORDER by nachname,vorname;';
 if($resultall = $db->db_query($qryall))
 {
 	$num_rows_all=$db->db_num_rows($resultall);
-	echo "<br><br><H2>Bei $num_rows_all aktiven Mitarbeitern sind keine aktuellen Verwendungen eingetragen</H2>";
+	echo "<br><br><H2>Bei $num_rows_all aktiven Fixangestellten Mitarbeitern sind keine aktuellen Verwendungen eingetragen</H2>";
 	while($rowall=$db->db_fetch_object($resultall))
 	{
 		$i=0;
@@ -293,10 +293,10 @@ if($resultall = $db->db_query($qryall))
 $i=0;
 $qryall="SELECT DISTINCT lehre.tbl_lehreinheitmitarbeiter.mitarbeiter_uid, nachname, vorname
 	FROM lehre.tbl_lehreinheitmitarbeiter join lehre.tbl_lehreinheit USING (lehreinheit_id)
-	JOIN 
+	JOIN
 		lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id)
        	JOIN campus.vw_mitarbeiter ON (tbl_lehreinheitmitarbeiter.mitarbeiter_uid=uid)
-	WHERE 
+	WHERE
 		(lehre.tbl_lehreinheit.studiensemester_kurzbz='$lastss' OR lehre.tbl_lehreinheit.studiensemester_kurzbz='$lastws')
 		AND tbl_lehreinheitmitarbeiter.stundensatz!=0 AND tbl_lehreinheitmitarbeiter.semesterstunden!=0
        	AND NOT EXISTS (SELECT * FROM bis.tbl_bisverwendung
@@ -374,7 +374,7 @@ if($resultall = $db->db_query($qryall))
 	{
 		$i++;
 		echo "<br><u>Mitarbeiter(in) ".$rowall->nachname." ".$rowall->vorname.":</u><br>";
-		echo "(ba1code: $rowall->ba1code, ba2code: $rowall->ba2code)";		
+		echo "(ba1code: $rowall->ba1code, ba2code: $rowall->ba2code)";
 	}
 }
 echo '<br>';

@@ -55,10 +55,9 @@ if(isset($_GET['login']))
 		<td class="boxshadow">
 		<table cellspacing="0" cellpadding="0" class="header">
 			<tr>
-				<td align="center" valign="middle" style="background-image: url(../skin/styles/default/header.png); background-position: top; background-repeat: repeat-x;">
-					<img class="header_logo" src="../skin/styles/default/logo_250x130.png" alt="logo">
-					<center>
-					<img src="../skin/styles/default/cis_logo_text_400x78.png" width="400px" />
+				<td align="center" valign="middle"  class="headerbar">
+					<div class="header_logo"></div>
+					<div class="cis_logo"></div>
 					<br><br><br>
 					<br>
 					<br>

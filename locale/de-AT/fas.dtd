@@ -387,6 +387,10 @@
 <!ENTITY menu-bis-mitarbeiter-checkfunktion.label		"checkFunktion">
 <!ENTITY menu-bis-mitarbeiter-checkfunktion.accesskey	"F">
 
+<!ENTITY menu-bis-mitarbeiter-uebersicht.key		"B">
+<!ENTITY menu-bis-mitarbeiter-uebersicht.label		"Übersicht">
+<!ENTITY menu-bis-mitarbeiter-uebersicht.accesskey	"B">
+
 <!ENTITY menu-bis-studenten.key		"S">
 <!ENTITY menu-bis-studenten.label		"Studenten">
 <!ENTITY menu-bis-studenten.accesskey	"S">

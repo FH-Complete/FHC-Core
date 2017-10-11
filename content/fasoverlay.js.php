@@ -1203,9 +1203,9 @@ function MessageNew()
 	else
 	{
 		var prestudentIdArray = getMultipleTreeCellText(tree, 'student-treecol-prestudent_id');
-		
+
 		var action = '<?php echo APP_ROOT ?>index.ci.php/system/Messages/write/' + <?php echo $benutzer->person_id; ?>;
-		
+
 		openWindowPostArray(action, 'prestudent_id', prestudentIdArray);
 	}
 }
@@ -1396,19 +1396,11 @@ function BISMitarbeiterExport()
 }
 
 // ****
-// * Oeffnet Script zum Checken der Verwendung
+// * oeffnet Uebersichtsseite fuer Mitarbeiter BIS Meldung
 // ****
-function BISMitarbeiterCheckVerwendung()
+function BISMitarbeiterUebersicht()
 {
-	window.open('<?php echo APP_ROOT ?>vilesci/bis/checkverwendung.php','CheckVerwendung','');
-}
-
-// ****
-// * oeffnet Script zum Checken der Funktion
-// ****
-function BISMitarbeiterCheckFunktion()
-{
-	window.open('<?php echo APP_ROOT ?>vilesci/bis/checkfunktion.php','CheckFunktion','');
+	window.open('<?php echo APP_ROOT ?>vilesci/bis/personalmeldung_uebersicht.php','Uebersicht','');
 }
 
 // ****
@@ -2054,9 +2046,9 @@ function OrganisationseinheitTreeRefresh()
 function variableChangeValue(variable)
 {
 	var variablevalue = getvariable(variable);
-	
+
 	if(variablevalue = prompt('Bitte geben Sie den neuen Wert fuer '+variable+' ein', variablevalue))
-	{	
+	{
 		variableChange(variable, '', variablevalue);
 	}
 }
@@ -2068,7 +2060,7 @@ function variableChange(variable, id, wert)
 {
 	if(id!=null)
 		item = document.getElementById(id);
-	
+
 	if(typeof(wert)==='undefined')
 	{
 		if(item.getAttribute('checked')=='true')
@@ -2078,11 +2070,11 @@ function variableChange(variable, id, wert)
 	}
 	else
 		checked=wert;
-	
+
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 
 	// Request absetzen
-	
+
 	var url = '<?php echo APP_ROOT ?>content/fasDBDML.php';
 
 	var req = new phpRequest(url,'','');
@@ -2090,7 +2082,7 @@ function variableChange(variable, id, wert)
 	req.add('type', 'variablechange');
 	req.add('name', variable);
 	req.add('wert', checked);
-	
+
 	var response = req.executePOST();
 
 	var val =  new ParseReturnValue(response)

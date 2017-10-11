@@ -164,10 +164,8 @@ foreach($addon_obj->result as $addon)
   <command id="menu-extras-preinteressentenuebernahme:command" oncommand="ExtrasShowPreinteressentenuebernahme();"/>
   <command id="menu-extras-projektarbeitsabgaben:command" oncommand="ExtrasShowProjektarbeitsabgaben();"/>
   <command id="menu-extras-aliquote_reduktion:command" oncommand="ExtrasShowAliquote_reduktion();"/>
-  <command id="menu-bis-mitarbeiter-import:command" oncommand="BISMitarbeiterImport();"/>
   <command id="menu-bis-mitarbeiter-export:command" oncommand="BISMitarbeiterExport();"/>
-  <command id="menu-bis-mitarbeiter-checkverwendung:command" oncommand="BISMitarbeiterCheckVerwendung();"/>
-  <command id="menu-bis-mitarbeiter-checkfunktion:command" oncommand="BISMitarbeiterCheckFunktion();"/>
+  <command id="menu-bis-mitarbeiter-uebersicht:command" oncommand="BISMitarbeiterUebersicht();"/>
   <command id="menu-bis-studenten-export:command" oncommand="BISStudentenExport();"/>
   <command id="menu-bis-studenten-checkstudent:command" oncommand="BISStudentenPlausicheck();"/>
   <command id="menu-help-about:command" oncommand="OpenAboutDialog()"/>
@@ -272,7 +270,7 @@ foreach($addon_obj->result as $addon)
  			 key       	="menu-prefs-number_displayed_past_studiensemester:key"
 			 label     	="&menu-prefs-number_displayed_past_studiensemester.label;"
 			 command   	="menu-prefs-number_displayed_past_studiensemester:command"
-			 accesskey 	="&menu-prefs-number_displayed_past_studiensemester.accesskey;" 			
+			 accesskey 	="&menu-prefs-number_displayed_past_studiensemester.accesskey;"
 			 value    	="<?php echo (isset($variable->variable->number_displayed_past_studiensemester)?$variable->variable->number_displayed_past_studiensemester:'');?>"
 			 />
 	    </menupopup>
@@ -859,30 +857,18 @@ foreach($addon_obj->result as $addon)
 		<menupopup id="menu-bis-popup">
             <menu id="menu-bis-mitarbeiter" label="&menu-bis-mitarbeiter.label;" accesskey="&menu-bis-mitarbeiter.accesskey;">
          		<menupopup id="menu-bis-mitarbeiter-popup">
-         			<menuitem
-		               id        =  "menu-bis-mitarbeiter-checkverwendung"
-		               key       =  "menu-bis-mitarbeiter-checkverwendung:key"
-		               label     = "&menu-bis-mitarbeiter-checkverwendung.label;"
-		               command   =  "menu-bis-mitarbeiter-checkverwendung:command"
-		               accesskey = "&menu-bis-mitarbeiter-checkverwendung.accesskey;"/>
-		            <menuitem
-		               id        =  "menu-bis-mitarbeiter-checkfunktion"
-		               key       =  "menu-bis-mitarbeiter-checkfunktion:key"
-		               label     = "&menu-bis-mitarbeiter-checkfunktion.label;"
-		               command   =  "menu-bis-mitarbeiter-checkfunktion:command"
-		               accesskey = "&menu-bis-mitarbeiter-checkfunktion.accesskey;"/>
+					<menuitem
+		               id        =  "menu-bis-mitarbeiter-uebersicht"
+		               key       =  "menu-bis-mitarbeiter-uebersicht:key"
+		               label     = "&menu-bis-mitarbeiter-uebersicht.label;"
+		               command   =  "menu-bis-mitarbeiter-uebersicht:command"
+		               accesskey = "&menu-bis-mitarbeiter-uebersicht.accesskey;"/>
          			<menuitem
 		               id        =  "menu-bis-mitarbeiter-export"
 		               key       =  "menu-bis-mitarbeiter-export:key"
 		               label     = "&menu-bis-mitarbeiter-export.label;"
 		               command   =  "menu-bis-mitarbeiter-export:command"
 		               accesskey = "&menu-bis-mitarbeiter-export.accesskey;"/>
-		            <menuitem
-		               id        =  "menu-bis-mitarbeiter-import"
-		               key       =  "menu-bis-mitarbeiter-import:key"
-		               label     = "&menu-bis-mitarbeiter-import.label;"
-		               command   =  "menu-bis-mitarbeiter-import:command"
-		               accesskey = "&menu-bis-mitarbeiter-import.accesskey;"/>
 				</menupopup>
 			</menu>
 			<menu id="menu-bis-studenten" label="&menu-bis-studenten.label;" accesskey="&menu-bis-studenten.accesskey;">

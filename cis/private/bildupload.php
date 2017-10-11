@@ -46,12 +46,11 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www
 	<link rel="stylesheet" type="text/css" href="../../skin/simplecropper.css">'.
 	cropCss().'
 	<link rel="stylesheet" type="text/css" href="../../skin/jquery-ui-1.9.2.custom.min.css">
-<script type="text/javascript" src="../../vendor/jquery/jqueryV1/jquery-1.12.4.min.js"></script>
-<script type="text/javascript" src="../../vendor/christianbach/tablesorter/jquery.tablesorter.min.js"></script>
-<script type="text/javascript" src="../../vendor/components/jqueryui/jquery-ui.min.js"></script>
-<script type="text/javascript" src="../../include/js/jquery.ui.datepicker.translation.js"></script>
-<script type="text/javascript" src="../../vendor/jquery/sizzle/sizzle.js"></script>
 	<script type="text/javascript" src="../../vendor/jquery/jqueryV1/jquery-1.12.4.min.js"></script>
+	<script type="text/javascript" src="../../vendor/christianbach/tablesorter/jquery.tablesorter.min.js"></script>
+	<script type="text/javascript" src="../../vendor/components/jqueryui/jquery-ui.min.js"></script>
+	<script type="text/javascript" src="../../include/js/jquery.ui.datepicker.translation.js"></script>
+	<script type="text/javascript" src="../../vendor/jquery/sizzle/sizzle.js"></script>
 	<script type="text/javascript" src="../../vendor/tapmodo/Jcrop/js/Jcrop.min.js"></script>
 	<script type="text/javascript" src="../../vendor/tomazdragar/SimpleCropper/scripts/jquery.SimpleCropper.js"></script>
 	<script type="text/javascript" src="../../include/js/cropper.js"></script>

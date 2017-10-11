@@ -176,6 +176,7 @@ input.cis_login
 	width:170px;
 	height:53px;
 }
+
 div.tip
 {
 	position: absolute;
@@ -474,9 +475,9 @@ td:hover.ItemTesttoolBeendet
 }
 div.TesttoolTitle /* Ueberschrift auf den Titelfolien */
 {
-	font-size: 400%; 
-	font-family: Helvetica, Arial, sans-serif; 
-	text-transform: uppercase; 
+	font-size: 400%;
+	font-family: Helvetica, Arial, sans-serif;
+	text-transform: uppercase;
 	color: #FFFFFF;
 	display: table;
 	white-space: nowrap;
@@ -1100,4 +1101,33 @@ body.anwesenheit table {
 
 body.anwesenheit form {
 	margin: 10px;
+}
+
+div.header_logo
+{
+	position: absolute;
+	left: 16px;
+	top: 3%;
+	z-index: 5000;
+
+	background-image:url(styles/tw/logo_250x130.png);
+	background-repeat: no-repeat;
+	width:170px;
+	height:51px;
+	background-size: contain;
+}
+
+td.headerbar
+{
+	background-image: url(styles/tw/header.png);
+	background-position: top;
+	background-repeat: repeat-x;"
+}
+
+div.cis_logo
+{
+	background-image:url(styles/tw/cis_logo_text_400x78.png);
+	background-repeat: no-repeat;
+	width: 400px;
+	height: 78px;
 }

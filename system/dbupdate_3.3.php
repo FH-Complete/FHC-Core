@@ -430,6 +430,38 @@ if ($result = @$db->db_query("SELECT conname FROM pg_constraint WHERE conname = 
 	}
 }
 
+// Add FOREIGN KEY testtool.tbl_pruefling.prestudent_id
+if ($result = @$db->db_query("SELECT conname FROM pg_constraint WHERE conname = 'fk_pruefling_prestudent'"))
+{
+	if ($db->db_num_rows($result) == 0)
+	{
+		$qry = "SELECT * FROM testtool.tbl_pruefling WHERE prestudent_id is not null AND  NOT EXISTS(SELECT 1 FROM public.tbl_prestudent WHERE prestudent_id=tbl_pruefling.prestudent_id)";
+		if($result = $db->db_query($qry))
+		{
+			if($db->db_num_rows($result) == 0)
+			{
+				$qry = "ALTER TABLE testtool.tbl_pruefling ADD CONSTRAINT fk_pruefling_prestudent FOREIGN KEY (prestudent_id) REFERENCES public.tbl_prestudent(prestudent_id) ON UPDATE CASCADE ON DELETE RESTRICT;";
+
+				if (!$db->db_query($qry))
+					echo '<strong>testtool.tbl_pruefling: '.$db->db_last_error().'</strong><br>';
+				else
+					echo '<br>testtool.tbl_pruefling: added foreign key on column prestudent_id referenced to public.tbl_prestudent(prestudent_id)';
+			}
+			else
+			{
+				echo '<strong>
+				Foreign Key für testtool.tbl_pruefling.prestudent_id kann nicht erstellt werden da in tbl_pruefling
+				'.$db->db_num_rows($result).' Prestudenten eingetragen sind die nicht in tbl_prestudent vorhanden sind.<br>
+				<br>
+				Bitte korrigieren Sie die fehlenden Zuordnungen damit der FK erstellt werden kann.
+				Mit folgendem Befehl können die falschen Zuordnungen entfernt werden:<br>
+				UPDATE testtool.tbl_pruefling SET prestudent_id=null WHERE NOT EXISTS(SELECT 1 FROM public.tbl_prestudent WHERE prestudent_id=tbl_pruefling.prestudent_id)
+				</strong>';
+			}
+		}
+	}
+}
+
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
 
@@ -693,14 +725,15 @@ $tabellen=array(
 	"wawi.tbl_betriebsmittelstatus"  => array("betriebsmittelstatus_kurzbz","beschreibung"),
 	"wawi.tbl_betriebsmitteltyp"  => array("betriebsmitteltyp","beschreibung","anzahl","kaution","typ_code","mastershapename"),
 	"wawi.tbl_budget"  => array("geschaeftsjahr_kurzbz","kostenstelle_id","budget"),
-	"wawi.tbl_zahlungstyp"  => array("zahlungstyp_kurzbz","bezeichnung"),
-	"wawi.tbl_konto"  => array("konto_id","kontonr","beschreibung","kurzbz","aktiv","person_id","insertamum","insertvon","updateamum","updatevon","ext_id","person_id"),
+	"wawi.tbl_zahlungstyp"  => array("zahlungstyp_kurzbz","bezeichnung","reihenfolge"),
+	"wawi.tbl_konto"  => array("konto_id","kontonr","beschreibung","kurzbz","aktiv","person_id","insertamum","insertvon","updateamum","updatevon","ext_id","person_id","hilfe"),
 	"wawi.tbl_konto_kostenstelle"  => array("konto_id","kostenstelle_id","insertamum","insertvon"),
 	"wawi.tbl_kostenstelle"  => array("kostenstelle_id","oe_kurzbz","bezeichnung","kurzbz","aktiv","insertamum","insertvon","updateamum","updatevon","ext_id","kostenstelle_nr","deaktiviertvon","deaktiviertamum"),
 	"wawi.tbl_bestellungtag"  => array("tag","bestellung_id","insertamum","insertvon"),
 	"wawi.tbl_bestelldetailtag"  => array("tag","bestelldetail_id","insertamum","insertvon"),
 	"wawi.tbl_projekt_bestellung"  => array("projekt_kurzbz","bestellung_id","anteil"),
-	"wawi.tbl_bestellung"  => array("bestellung_id","besteller_uid","kostenstelle_id","konto_id","firma_id","lieferadresse","rechnungsadresse","freigegeben","bestell_nr","titel","bemerkung","liefertermin","updateamum","updatevon","insertamum","insertvon","ext_id","zahlungstyp_kurzbz"),
+	"wawi.tbl_bestellung"  => array("bestellung_id","besteller_uid","kostenstelle_id","konto_id","firma_id","lieferadresse","rechnungsadresse","freigegeben","bestell_nr","titel","bemerkung","liefertermin","updateamum","updatevon","insertamum","insertvon","ext_id","zahlungstyp_kurzbz","zuordnung_uid","zuordnung_raum","zuordnung","auftragsbestaetigung","auslagenersatz","iban","wird_geleast","nicht_bestellen","empfehlung_leasing"),
+	"wawi.tbl_bestellung_angebot" => array("angebot_id","bestellung_id","dms_id"),
 	"wawi.tbl_bestelldetail"  => array("bestelldetail_id","bestellung_id","position","menge","verpackungseinheit","beschreibung","artikelnummer","preisprove","mwst","erhalten","sort","text","updateamum","updatevon","insertamum","insertvon"),
 	"wawi.tbl_bestellung_bestellstatus"  => array("bestellung_bestellstatus_id","bestellung_id","bestellstatus_kurzbz","uid","oe_kurzbz","datum","insertamum","insertvon","updateamum","updatevon"),
 	"wawi.tbl_bestellstatus"  => array("bestellstatus_kurzbz","beschreibung"),
