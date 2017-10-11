@@ -196,7 +196,6 @@
 		"zetacomponents/workflow-database-tiein": "1.*",
 		"zetacomponents/workflow-event-log-tiein": "1.*",
 		"json-forms": "1.4.0",
-		"wikimedia/composer-merge-plugin": "^1.3",
 		"fzaninotto/faker": "1.*",
 		"netcarver/textile": "^3.5",
 		"borgar/textile-js": "1.0",
