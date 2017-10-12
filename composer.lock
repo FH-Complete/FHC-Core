@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "4bd3b8eecbbafb2eed0a3b9de7bc768f",
-    "content-hash": "9e02197b0ff844cd9193a88ce17811d4",
+    "hash": "e528bc5e31312080d7db9b1b3ae4033b",
+    "content-hash": "69612123f7b612e61cf1e0368e01ee27",
     "packages": [
         {
             "name": "alvaro-prieto/colResizable",
@@ -766,6 +766,16 @@
                 "url": "https://github.com/joeldbirch/superfish/archive/v1.7.9.zip",
                 "reference": null,
                 "shasum": null
+            },
+            "type": "library"
+        },
+        {
+            "name": "jquery-archive/jquery-metadata",
+            "version": "1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/jquery-archive/jquery-metadata.git",
+                "reference": "e5a9e4315675bf4d68716872ca754e858088f8ab"
             },
             "type": "library"
         },

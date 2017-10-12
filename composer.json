@@ -221,7 +221,8 @@
 		"joeldbirch/superfish": "^1.7",
 		"jquery/sizzle": "^1.0",
 		"tomazdragar/SimpleCropper": "^1.0",
-		"nicolaskruchten/pivottable": "^2.15.0"
+		"nicolaskruchten/pivottable": "^2.15.0",
+		"jquery-archive/jquery-metadata": "^1.0"
 	},
 	"require-dev": {
 		"squizlabs/php_codesniffer": "2.*"
