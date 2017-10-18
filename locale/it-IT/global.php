@@ -1,7 +1,7 @@
 <?php
 $this->phrasen['global/abbrechen']='annulla';
 $this->phrasen['global/abmelden']='esci';
-$this->phrasen['global/abschicken']='spedisci ';
+$this->phrasen['global/abschicken']='Invia ';
 $this->phrasen['global/adresse']='indirizzo';
 $this->phrasen['global/aendern']='modifica';
 $this->phrasen['global/aktion']='azione';

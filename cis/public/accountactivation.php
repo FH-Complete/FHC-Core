@@ -204,7 +204,7 @@ else
 	</tr>
 	<tr>
 		<td></td>
-		<td><input type="submit" name="submit" value="Absenden" /></td>
+		<td><input type="submit" name="submit" value="'.$p->t('global/abschicken').'" /></td>
 	</tr>
 	</table>
 	</form>';
