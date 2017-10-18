@@ -156,6 +156,7 @@ class MessageLib
 
     /**
      * updateMessageStatus() - will change status on message for particular user
+	 * NOTE: it performs an insert, NOT an update
      */
     public function updateMessageStatus($message_id, $person_id, $status)
     {
@@ -169,7 +170,7 @@ class MessageLib
             return $this->_error('', MSG_ERR_INVALID_USER_ID);
         }
 
-		// Not use empty otherwise if status is 0 it returns an error
+		// NOTE: Not use empty otherwise if status is 0 it returns an error
         if (!isset($status))
         {
             return $this->_error('', MSG_ERR_INVALID_STATUS_ID);
@@ -484,7 +485,7 @@ class MessageLib
 						if (!$sent)
 						{
 							$this->ci->loglib->logError('Error while sending an email');
-							// Writing errors in tbl_message_recipient
+							// Writing errors in tbl_msg_recipient
 							$sme = $this->setMessageError(
 								$result->retval[$i]->message_id,
 								$result->retval[$i]->receiver_id,
@@ -510,7 +511,7 @@ class MessageLib
 					else
 					{
 						$this->ci->loglib->logError('This person does not have an email account');
-						// Writing errors in tbl_message_recipient
+						// Writing errors in tbl_msg_recipient
 						$sme = $this->setMessageError(
 							$result->retval[$i]->message_id,
 							$result->retval[$i]->receiver_id,
@@ -633,7 +634,7 @@ class MessageLib
 					if (!$sent)
 					{
 						$this->ci->loglib->logError('Error while sending an email');
-						// Writing errors in tbl_message_status
+						// Writing errors in tbl_msg_recipient
 						$sme = $this->setMessageError(
 							$result->retval[0]->message_id,
 							$result->retval[0]->receiver_id,
@@ -659,7 +660,7 @@ class MessageLib
 				else
 				{
 					$this->ci->loglib->logError('This person does not have an email account');
-					// Writing errors in tbl_message_status
+					// Writing errors in tbl_msg_recipient
 					$sme = $this->setMessageError(
 						$result->retval[0]->message_id,
 						$result->retval[0]->receiver_id,
@@ -692,13 +693,13 @@ class MessageLib
     // Private methods
 
 	/**
-	 * Update the table tbl_message_recipient
+	 * Update the table tbl_msg_recipient
 	 */
 	private function _updateMessageRecipient($message_id, $receiver_id, $parameters)
 	{
 		$updated = false;
 
-		// Changes the status of the message from unread to read
+		// Updates table tbl_msg_recipient
 		$resultUpdate = $this->ci->RecipientModel->update(array($receiver_id, $message_id), $parameters);
 		// Checks if errors were occurred
 		if (isSuccess($resultUpdate) && is_array($resultUpdate->retval))
