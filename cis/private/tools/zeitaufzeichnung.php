@@ -50,7 +50,7 @@ if (!$db = new basis_db())
 
 $user = get_uid();
 
-//Wenn User Administrator ist und UID uebergeben wurde, dann die Zeiaufzeichnung
+//Wenn User Administrator ist und UID uebergeben wurde, dann die Zeitaufzeichnung
 //des uebergebenen Users anzeigen
 if(isset($_GET['uid']))
 {
@@ -119,6 +119,22 @@ else
 	$zs->getZeitsperrenForZeitaufzeichnung($user,$angezeigte_tage);
 
 $zeitsperren = $zs->result;
+
+$bn = new benutzer();
+if(!$bn->load($user))
+	die($p->t("zeitaufzeichnung/benutzerWurdeNichtGefunden",array($user)));
+
+//CSV export - Konflikt mit normalen HTML headern deshalb weiter vorne
+if(isset($_POST['export']))
+{
+	if(isset($_POST['exp_von_datum']) && isset($_POST['exp_bis_datum']))
+	{
+		$datevon = $datum->formatDatum($_POST['exp_von_datum'], 'Y-m-d');
+		$datebis = $datum->formatDatum($_POST['exp_bis_datum'], 'Y-m-d');
+		$ztauf = getZeitaufzeichnung( $user, $datevon, $datebis);
+		exportAsCSV($ztauf->result, ',', $za_simple, $user);
+	}
+}
 
 echo '<!DOCTYPE HTML>
 <html>
@@ -402,13 +418,55 @@ echo '
 			}
 			return true;
 		}
+				
+		/**
+		* kontrolliert Start- und Enddatum für CSV Export - 
+		* ob Startdatum nicht größer als Enddatum ist und ob die Zeitspanne nicht größer als 1000 Tage ist
+		*/
+		function checkdatumCSVExp(vondatumid, bisdatumid)
+		{
+			var Datum,Tag,Monat,Jahr,vonDatum,bisDatum,diff;
+
+			Datum=document.getElementById(vondatumid).value;
+		    Tag=Datum.substring(0,2);
+		    Monat=Datum.substring(3,5);
+		    Jahr=Datum.substring(6,10);
+		    vonDatum=Jahr+\'\'+Monat+\'\'+Tag;
+
+		    Datum=document.getElementById(bisdatumid).value;
+		    Tag=Datum.substring(0,2);
+		    Monat=Datum.substring(3,5);
+		    Jahr=Datum.substring(6,10);
+		    bisDatum=Jahr+\'\'+Monat+\'\'+Tag;
+		    diff=bisDatum-vonDatum;
+			
+			if (bisDatum>=vonDatum)
+			{
+				if (diff>2000 && bisDatum != "" && vonDatum != "")
+				{
+					Check = confirm("'.$p->t("zeitaufzeichnung/zeitraumAuffallendHoch").'");
+					document.getElementById(bisdatumid).focus();
+					if (Check == false)
+				  		return false;
+				  	else
+				  		return true;
+				}
+			}
+			else
+			{
+				if(bisDatum != "")
+				{
+					alert("'.$p->t("zeitaufzeichnung/bisDatumKleinerAlsVonDatum").'");
+					document.getElementById(bisdatumid).focus();
+					return false;
+				}
+			}
+			return true;
+		}
 		</script>
 	</head>
 <body>
 ';
-$bn = new benutzer();
-		if(!$bn->load($user))
-			die($p->t("zeitaufzeichnung/benutzerWurdeNichtGefunden",array($user)));
 
 echo '<h1>'.$p->t("zeitaufzeichnung/zeitaufzeichnungVon").' '.$db->convert_html_chars($bn->vorname).' '.$db->convert_html_chars($bn->nachname).'</h1>';
 
@@ -461,8 +519,6 @@ if(isset($_POST['save']) || isset($_POST['edit']) || isset($_POST['import']))
 								$zeit->ende = $datum->formatDatum($data[3], $format='Y-m-d H:i:s');
 								$zeit->beschreibung = $data[4];
 								$tag = $datum->formatDatum($data[2], $format='Y-m-d');
-
-
 
 								if(!in_array($tag, $importtage_array))
 								{
@@ -647,18 +703,19 @@ if(isset($_GET['type']) && $_GET['type']=='edit')
 //Projekte holen zu denen der Benutzer zugeteilt ist
 $projekt = new projekt();
 
-
 if($projekt->getProjekteMitarbeiter($user, true))
 {
 	//if(count($projekt->result)>0)
 	//{
-
+		$anzprojekte = count($projekt->result);
 		echo "<table width='100%'>
 				<tr>
 		      		<td>
 		      			<a href='".$_SERVER['PHP_SELF']."' style='font-size: larger;'>".$p->t("zeitaufzeichnung/neu")."</a>
 		      			&nbsp;
-		      			<a href='".$_SERVER['PHP_SELF']."?csvimport=1' style='font-size: larger;'>CSV Import</a>
+		      			<a href='".$_SERVER['PHP_SELF']."?csvimport=1' style='font-size: larger;'>CSV Import</a>&nbsp;
+		      			
+		      			<a href='".$_SERVER['PHP_SELF']."?csvexport=1' style='font-size: larger;'>CSV Export</a>
 		      		</td>
 		      		<td class='menubox' height='10px'>";
 		if ($p->t("dms_link/handbuchZeitaufzeichnung")!='')
@@ -681,28 +738,32 @@ if($projekt->getProjekteMitarbeiter($user, true))
 			<tr>
 				<td rowspan="2">';
 		echo '<table>';
-		if($za_simple == 0)
+		//Projekte werden nicht angezeigt wenn es keine gibt
+		if($anzprojekte > 0)
 		{
-		//Projekt
-		echo '<tr>
+			//Projekt
+			echo '<tr>
 				<td>'.$p->t("zeitaufzeichnung/projekt").'</td>
 				<td colspan="4"><SELECT name="projekt" id="projekt">
 					<OPTION value="">-- '.$p->t('zeitaufzeichnung/keineAuswahl').' --</OPTION>';
 
-		sort($projekt->result);
-		foreach($projekt->result as $row_projekt)
-		{
-			if($projekt_kurzbz == $row_projekt->projekt_kurzbz || $filter == $row_projekt->projekt_kurzbz)
-				$selected = 'selected';
-			else
-				$selected = '';
+			sort($projekt->result);
+			foreach ($projekt->result as $row_projekt)
+			{
+				if ($projekt_kurzbz == $row_projekt->projekt_kurzbz || $filter == $row_projekt->projekt_kurzbz)
+					$selected = 'selected';
+				else
+					$selected = '';
 
-			echo '<option value="'.$db->convert_html_chars($row_projekt->projekt_kurzbz).'" '.$selected.'>'.$db->convert_html_chars($row_projekt->titel).'</option>';
+				echo '<option value="'.$db->convert_html_chars($row_projekt->projekt_kurzbz).'" '.$selected.'>'.$db->convert_html_chars($row_projekt->titel).'</option>';
+			}
+			echo '</SELECT><!--<input type="button" value="'.$p->t("zeitaufzeichnung/uebersicht").'" onclick="loaduebersicht();">--></td>';
+			echo '</tr>';
 		}
-		echo '</SELECT><!--<input type="button" value="'.$p->t("zeitaufzeichnung/uebersicht").'" onclick="loaduebersicht();">--></td>';
-		echo '</tr><tr>';
+		if($za_simple == 0)
+		{
 		//OE_KURZBZ_1
-		echo '<td nowrap>'.$p->t("zeitaufzeichnung/organisationseinheiten").'</td>
+		echo '<tr><td nowrap>'.$p->t("zeitaufzeichnung/organisationseinheiten").'</td>
 			<td colspan="3"><SELECT style="width:200px;" name="oe_kurzbz_1">';
 		$oe = new organisationseinheit();
 		$oe->getFrequent($user,'180','3',true);
@@ -885,7 +946,7 @@ if($projekt->getProjekteMitarbeiter($user, true))
 			echo '<tr><td></td><td colspan="3">Informationen zum Format der CSV-Datei s. Leitfaden Arbeitszeitaufzeichnung</td></tr>';
 		}
 		else
-			echo '<input type="file" name="csv" value="" style="visibility:hidden">';
+			echo '<input type="file" name="csv" value="" style="display:none">';
 		echo '</table>';
 
 		echo '</td><td valign="top"><span id="zeitsaldo"></span><br><br><div id="monatsliste"></span></td></tr>';
@@ -927,7 +988,21 @@ if($projekt->getProjekteMitarbeiter($user, true))
 		}
 		echo '</td></tr>';
 		echo '</table>';
-
+		echo '</form>';
+		if (isset($_GET['csvexport']))
+		{
+			echo '<form action="'.$_SERVER['PHP_SELF'].'" method="POST" onsubmit="return checkdatumCSVExp(\'exp_von_datum\', \'exp_bis_datum\')">';
+			echo '<table>';
+			echo '<tr><td colspan="5"><hr></td></tr>';
+			echo '<tr><td width = "18%">CSV-Export</td>';
+			echo '<td>Startdatum: <input class="datepicker_datum" id="exp_von_datum" name="exp_von_datum" size="9" type="text" value="'.date('d.m.Y', strtotime('first day of previous month')).'" /></td>';
+			echo '<td width = "8%">&nbsp;</td>';
+			echo '<td>Enddatum: <input class="datepicker_datum" id="exp_bis_datum" name="exp_bis_datum" size="9" type="text"  value="'.date('d.m.Y', strtotime('last day of previous month')).'" /></td>';
+			echo '<td align="right" width="23%"><input type="submit" value="Export" name="export"></td></tr>';
+			echo '<tr><td></td><td colspan="3"></td></tr>';
+			echo '</table>';
+			echo '</form>';
+		}
 		echo '<hr>';
 		echo '<h3>'.($alle===true?$p->t('zeitaufzeichnung/alleEintraege'):$p->t('zeitaufzeichnung/xTageAnsicht', array($angezeigte_tage))).'</h3>';
 		if ($alle===true)
@@ -935,8 +1010,6 @@ if($projekt->getProjekteMitarbeiter($user, true))
 		else
 			echo '<a href="?alle" style="text-decoration:none"><input type="button" value="'.$p->t('zeitaufzeichnung/alleAnzeigen').'"></a>';
 		//echo '<input type="submit" value="'.($alle===true?$p->t('zeitaufzeichnung/xTageAnsicht', array($angezeigte_tage)):$p->t('zeitaufzeichnung/alleAnzeigen')).'" name="'.($alle===true?'normal':'alle').'">';
-
-		echo '</form>';
 
 		$za = new zeitaufzeichnung();
 	    if(isset($_GET['filter']))
@@ -1221,4 +1294,78 @@ echo '
 <span id="globalmessages"></span>
 </body>
 </html>';
+
+/**
+ * Exportiert Zeitaufzeichnungsdaten als CSV
+ * @param $data Zeitaufzeichnungsdaten
+ * @param string $delimiter CSV-Trennzeichen
+ * @param bool $za_simple Zeitaufzeichnung lang (für Infrastrukturmitarbeiter) oder kurz (simple)
+ */
+function exportAsCSV($data, $delimiter = ',', $za_simple = false, $uid)
+{
+	$filename = "zeitaufzeichnung_".$uid.".csv";
+	$file = fopen('php://output', 'w');
+	$towrite = getDataForCSV($data, $za_simple);
+	foreach ($towrite as $row)
+	{
+		fputcsv($file, $row, $delimiter);
+	}
+	header('Content-type: text/csv; charset=utf-8');
+	header('Content-Disposition: attachment; filename='.$filename);
+	fclose($file);
+	//Abbruch damit HTML markup danach nicht mit exportiert wird
+	exit();
+}
+
+/**
+ * Liefert Daten für CSV-Export basierend auf erhaltenen Zeitaufzeichnungsdaten
+ * @param $rawdata zu exportierenden Rohdaten aus der Datenbank
+ * @param bool $za_simple Zeitaufzeichnung lang (für Infrastrukturmitarbeiter) oder kurz (simple). Wenn true, werden Spalten wie Service, OE ausgelassen
+ * @return array Daten wie sie als CSV exportiert werden können
+ */
+function getDataForCSV($rawdata, $za_simple = false)
+{
+	if(!$za_simple)
+		$service = new service();
+	$datum = new datum();
+	$csvData = array();
+	//headers schreiben
+	$csvData[] = ($za_simple) ? array("User", "Datum", "Start", "Ende", "Projekt", "Aktivität", "Beschreibung") : array("User", "Datum", "Start", "Ende", "Projekt", "OE 1", "OE 2", "Aktivität", "Service", "Beschreibung");
+	foreach ($rawdata as $zeitauf)
+	{
+		//Newline characters bei Beschreibung ersetzen
+		$beschreibung = str_replace(array("\r\n", "\r", "\n"), " | ", $zeitauf->beschreibung);
+		$hauptdatum = $datum->formatDatum($zeitauf->datum, "d.m.Y");
+		$bisdatum = $datum->formatDatum($zeitauf->ende, "d.m.Y");
+		//wenn Zeitspanne länger als ein Tag (kommt selten vor) dann Tag des Bisdatums dazuschreiben
+		$bisdatum = ($hauptdatum == $bisdatum)?$datum->formatDatum($zeitauf->ende, 'H:i'):$datum->formatDatum($zeitauf->ende, 'd.m.Y H:i');
+
+		if($za_simple)
+		{
+			$csvData[] = array($zeitauf->uid, $hauptdatum, $datum->formatDatum($zeitauf->start, 'H:i'),
+				$bisdatum, $zeitauf->projekt_kurzbz, $zeitauf->aktivitaet_kurzbz, $beschreibung);
+		}
+		else
+		{
+			$servicebez = ($service->load($zeitauf->service_id))?$service->bezeichnung:"";
+			$csvData[] = array($zeitauf->uid, $hauptdatum, $datum->formatDatum($zeitauf->start, 'H:i'), $bisdatum,
+				$zeitauf->projekt_kurzbz, $zeitauf->oe_kurzbz_1, $zeitauf->oe_kurzbz_2, $zeitauf->aktivitaet_kurzbz, $servicebez, $beschreibung);
+		}
+	}
+	return $csvData;
+}
+
+/**
+ * Liefert Zeitaufzeichnungsdaten zwischen zwei Datumswerten
+ * @param $user - user für den Zeitaufzeichnungsdaten geholt werden
+ * @param $von - Startdatum
+ * @param $bis - Enddatum
+ * @return zeitaufzeichnung - die Zeitaufzeichnungsdaten
+ */
+function getZeitaufzeichnung($user, $von, $bis)
+{
+	$za = new zeitaufzeichnung();
+	$za->getListeUserFromTo($user, $von, $bis);
+	return $za;
+}
 ?>

@@ -313,10 +313,84 @@ class zeitaufzeichnung extends basis_db
 	    }
 	}
 
+
+	/**
+	 * Laedt die Zeitaufzeichnungen eines Users in einer festgelegten Zeitspanne
+	 * @param $user
+	 * @param $from startdatum als String in Form Y-m-d
+	 * @param $to enddatum als String in Form Y-m-d
+	 * @return bool
+	 */
+	public function getListeUserFromTo($user, $from = null, $to = null)
+	{
+		$where = "uid=".$this->db_add_param($user);
+
+		//standard wenn kein Datum gegeben - letzter Monat
+		if(empty($from) && empty($to))
+		{
+			$from = date('Y-m-d', strtotime('first day of previous month'));
+			$to = date('Y-m-d', strtotime('last day of previous month'));
+		}
+		else if(empty($to))//standard wenn ein Datum gegeben - datum +/- 40 tage
+			$to = date('Y-m-d', strtotime($from. ' + 40 days'));
+		else if(empty($from))
+			$from = date('Y-m-d', strtotime($to. ' - 40 days'));
+
+		//zusätzlicher Tag - SQL rechnet letzten Tag nicht hinein
+		$to = date('Y-m-d', strtotime($to. ' + 1 days'));
+
+		$where.= " AND ((start >= ".$this->db_add_param($from)."::DATE AND start <= ".$this->db_add_param($to)."::DATE) 
+		OR (ende >= ".$this->db_add_param($from)."::DATE AND ende <= ".$this->db_add_param($to)."::DATE))";
+
+		$qry = "SELECT
+	    			*, to_char ((ende-start),'HH24:MI') as diff,
+	    			(SELECT (to_char(sum(ende-start),'DD')::integer)*24+to_char(sum(ende-start),'HH24')::integer || ':' || to_char(sum(ende-start),'MI')
+	    			 FROM campus.tbl_zeitaufzeichnung
+	    			 WHERE $where ) as summe
+	    		FROM campus.tbl_zeitaufzeichnung WHERE $where
+	    		ORDER BY start DESC";
+
+		if($result = $this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object($result))
+			{
+				$obj = new zeitaufzeichnung();
+
+				$obj->zeitaufzeichnung_id = $row->zeitaufzeichnung_id;
+				$obj->uid = $row->uid;
+				$obj->aktivitaet_kurzbz = $row->aktivitaet_kurzbz;
+				$obj->start = $row->start;
+				$obj->ende = $row->ende;
+				$obj->beschreibung = $row->beschreibung;
+				$obj->oe_kurzbz_1 = $row->oe_kurzbz_1;
+				$obj->oe_kurzbz_2 = $row->oe_kurzbz_2;
+				$obj->insertamum = $row->insertamum;
+				$obj->insertvon = $row->insertvon;
+				$obj->updateamum = $row->updateamum;
+				$obj->updatevon = $row->updatevon;
+				$obj->projekt_kurzbz = $row->projekt_kurzbz;
+				$obj->ext_id = $row->ext_id;
+				$obj->service_id = $row->service_id;
+				$obj->kunde_uid = $row->kunde_uid;
+				$obj->summe = $row->summe;
+				$obj->diff = $row->diff;
+				$obj->datum = $row->start;
+
+				$this->result[] = $obj;
+			}
+			return true;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+	}
+
 	/**
 	 * Laedt die Zeitaufzeichnungen eines Users. Default: Die letzten 40 Tage
 	 * @param string $user
-	 * @param integer $days deafult: 40 Tage
+	 * @param integer $days default: 40 Tage
 	 */
 	public function getListeUser($user, $days='40')
 	{
