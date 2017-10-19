@@ -167,6 +167,14 @@ foreach ($mitarbeiterDAO->result as $mitarbeiter)
 				}
 			}
 		}
+		else // if the address is not present for this user
+		{
+			$col += 3;
+		}
+	}
+	else // if the address is not present for this user
+	{
+		$col += 3;
 	}
 
 	$col++;
