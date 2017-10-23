@@ -239,7 +239,7 @@ FROM
 WHERE
 	status.studiensemester_kurzbz = ".$db->db_add_param($aktSem)."
 	AND lv.studiensemester_kurzbz = ".$db->db_add_param($aktSem)."
-	AND status.status_kurzbz NOT IN ('Interessent','Bewerber')
+	AND status.status_kurzbz NOT IN ('Interessent','Bewerber','Aufgenommener','Wartender','Abgewiesener')
 	AND get_rolle_prestudent (prestudent_id, ".$db->db_add_param($aktSem).")='Student'";
 
 if ($studiengang_kz != '')
