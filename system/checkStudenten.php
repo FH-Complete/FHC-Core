@@ -149,7 +149,12 @@ WHERE
 	benutzer.aktiv = true
 	AND prestudentstatus.status_kurzbz='Student'
 	AND studiengang.studiengang_kz < 10000
-	AND prestudentstatus.studiensemester_kurzbz = ".$db->db_add_param($aktSem);
+	AND prestudentstatus.studiensemester_kurzbz = ".$db->db_add_param($aktSem)."
+	AND NOT EXISTS(
+		SELECT 1 FROM lehre.tbl_studienplan JOIN lehre.tbl_studienordnung USING(studienordnung_id)
+		WHERE
+			tbl_studienordnung.studiengang_kz = prestudent.studiengang_kz
+			AND tbl_studienplan.orgform_kurzbz = prestudentstatus.orgform_kurzbz)";
 
 if ($studiengang_kz != '')
 	$qry .= " AND prestudent.studiengang_kz=".$db->db_add_param($studiengang_kz, FHC_INTEGER);
