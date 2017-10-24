@@ -12,18 +12,18 @@ class FHC_Model extends CI_Model
 	public function __construct()
 	{
 		parent::__construct();
-		
+
 		// Load languages files
 		$this->lang->load('fhc_model');
 		$this->lang->load('fhcomplete');
-		
+
 		// Load return message helper
 		$this->load->helper('message');
-		
+
 		// Loads the permission library
 		$this->load->library('PermissionLib');
 	}
-	
+
 	/**
 	 * Check if the user is entitled to get access to a source with the given access type
 	 * This is a wrapper for the same method present in the PermissionLib
@@ -31,19 +31,28 @@ class FHC_Model extends CI_Model
 	public function isEntitled($sourceName, $accessType, $languageMessageCode, $msgErrorCode)
 	{
 		$isEntitled = success(true);
-		
-		if ($this->permissionlib->isEntitled($sourceName, $accessType) === false)
+
+		// If script is not called from Commandline
+		// or the caller is _not_ a model _and_ tries to read data, then avoids to check permissions
+		// Otherwise checks always the permissions
+		if (!is_cli() ||
+			($accessType == PermissionLib::SELECT_RIGHT
+			&& substr(get_called_class(), -6) == DB_Model::MODEL_POSTFIX)
+			|| $accessType != PermissionLib::SELECT_RIGHT)
 		{
-			$retval = sprintf(
-				'%s -> %s:%s',
-				lang('fhc_'.$languageMessageCode),
-				$this->permissionlib->getBerechtigungKurzbz($sourceName),
-				$accessType
-			);
-			
-			$isEntitled = error($retval, $msgErrorCode);
+			if ($this->permissionlib->isEntitled($sourceName, $accessType) === false)
+			{
+				$retval = sprintf(
+					'%s -> %s:%s',
+					lang('fhc_'.$languageMessageCode),
+					$this->permissionlib->getBerechtigungKurzbz($sourceName),
+					$accessType
+				);
+
+				$isEntitled = error($retval, $msgErrorCode);
+			}
 		}
-		
+
 		return $isEntitled;
 	}
 }
