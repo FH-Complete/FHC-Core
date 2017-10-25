@@ -4,25 +4,25 @@ class DB_Model extends FHC_Model
 {
 	// Default schema used by the models
 	const DEFAULT_SCHEMA = 'public';
-	
+
 	// Default model class name postfix
 	const MODEL_POSTFIX = '_model';
-	
+
 	// Query used to get the list of columns from a table
 	const QUERY_LIST_FIELDS = 'SELECT * FROM %s WHERE 0 = 1';
-	
+
 	// Constants used to convert postgresql arrays and booleans to the php equivalent
 	const PGSQL_ARRAY_TYPE = '_';
 	const PGSQL_BOOLEAN_TRUE = 't';
 	const PGSQL_BOOLEAN_FALSE = 'f';
 	const PGSQL_BOOLEAN_TYPE = 'bool';
 	const PGSQL_BOOLEAN_ARRAY_TYPE = '_bool';
-	
+
 	protected $dbTable;  	// Name of the DB-Table for CI-Insert, -Update, ...
 	protected $pk;  		// Name of the PrimaryKey for DB-Update, Load, ...
 	protected $hasSequence;	// False if this table has a composite primary key that is not using a sequence
 							// True if this table has a primary key that uses a sequence
-	
+
 	/**
 	 * Constructor
 	 */
@@ -30,22 +30,22 @@ class DB_Model extends FHC_Model
 	{
 		// Call parent constructor
 		parent::__construct();
-		
+
 		// Set properties
 		$this->pk = $pk;
 		$this->dbTable = $dbTable;
 		$this->hasSequence = $hasSequence;
-		
+
 		// Loads DB conns and confs
 		$this->load->database();
-		
+
 		// Loads the UDF library
 		$this->load->library('UDFLib');
 	}
-	
+
 	// ------------------------------------------------------------------------------------------
 	// Public methods
-	
+
 	/**
 	 * Insert Data into DB-Table
 	 *
@@ -56,13 +56,13 @@ class DB_Model extends FHC_Model
 	{
 		// Check class properties
 		if (is_null($this->dbTable)) return error(FHC_MODEL_ERROR, FHC_NODBTABLE);
-		
+
 		// Checks rights
 		if (isError($ent = $this->_isEntitled(PermissionLib::INSERT_RIGHT))) return $ent;
-		
+
 		// If this table has UDF and the validation of them is ok
 		if (isError($validate = $this->_manageUDFs($data, $this->dbTable))) return $validate;
-		
+
 		// DB-INSERT
 		if ($this->db->insert($this->dbTable, $data))
 		{
@@ -93,7 +93,7 @@ class DB_Model extends FHC_Model
 			return error($this->db->error(), FHC_DB_ERROR);
 		}
 	}
-	
+
 	/**
 	 * Update Data in DB-Table
 	 *
@@ -106,15 +106,15 @@ class DB_Model extends FHC_Model
 		// Check class properties
 		if (is_null($this->pk)) return error(FHC_MODEL_ERROR, FHC_NOPK);
 		if (is_null($this->dbTable)) return error(FHC_MODEL_ERROR, FHC_NODBTABLE);
-		
+
 		// Checks rights
 		if (isError($ent = $this->_isEntitled(PermissionLib::UPDATE_RIGHT))) return $ent;
-		
+
 		// If this table has UDF and the validation of them is ok
 		if (isError($validate = $this->_manageUDFs($data, $this->dbTable, $id))) return $validate;
-		
+
 		$tmpId = $id;
-		
+
 		// Check for composite Primary Key, prepare the where clause
 		if (is_array($id))
 		{
@@ -127,9 +127,9 @@ class DB_Model extends FHC_Model
 		{
 			$tmpId = array($this->pk => $id);
 		}
-		
+
 		$this->db->where($tmpId);
-		
+
 		// DB-UPDATE
 		if ($this->db->update($this->dbTable, $data))
 		{
@@ -140,7 +140,7 @@ class DB_Model extends FHC_Model
 			return error($this->db->error(), FHC_DB_ERROR);
 		}
 	}
-	
+
 	/**
 	 * Delete data from DB-Table
 	 *
@@ -152,12 +152,12 @@ class DB_Model extends FHC_Model
 		// Check class properties
 		if (is_null($this->dbTable)) return error(FHC_MODEL_ERROR, FHC_NODBTABLE);
 		if (is_null($this->pk)) return error(FHC_MODEL_ERROR, FHC_NOPK);
-		
+
 		// Checks rights
 		if (isError($ent = $this->_isEntitled(PermissionLib::DELETE_RIGHT))) return $ent;
-		
+
 		$tmpId = $id;
-		
+
 		// Check for composite Primary Key
 		if (is_array($id))
 		{
@@ -170,7 +170,7 @@ class DB_Model extends FHC_Model
 		{
 			$tmpId = array($this->pk => $id);
 		}
-		
+
 		// DB-DELETE
 		if ($this->db->delete($this->dbTable, $tmpId))
 		{
@@ -193,12 +193,12 @@ class DB_Model extends FHC_Model
 		// Check class properties
 		if (is_null($this->pk)) return error(FHC_MODEL_ERROR, FHC_NOPK);
 		if (is_null($this->dbTable)) return error(FHC_MODEL_ERROR, FHC_NODBTABLE);
-		
+
 		// Checks rights
 		if (isError($ent = $this->_isEntitled(PermissionLib::SELECT_RIGHT))) return $ent;
-		
+
 		$tmpId = $id;
-		
+
 		// Check for composite Primary Key
 		if (is_array($id))
 		{
@@ -211,7 +211,7 @@ class DB_Model extends FHC_Model
 		{
 			$tmpId = array($this->pk => $id);
 		}
-		
+
 		// DB-SELECT
 		if ($result = $this->db->get_where($this->dbTable, $tmpId))
 		{
@@ -232,10 +232,10 @@ class DB_Model extends FHC_Model
 	{
 		// Check class properties
 		if (is_null($this->dbTable)) return error(FHC_MODEL_ERROR, FHC_NODBTABLE);
-		
+
 		// Checks rights
 		if (isError($ent = $this->_isEntitled(PermissionLib::SELECT_RIGHT))) return $ent;
-		
+
 		// Execute query
 		if ($result = $this->db->get_where($this->dbTable, $where))
 		{
@@ -246,7 +246,7 @@ class DB_Model extends FHC_Model
 			return error($this->db->error(), FHC_DB_ERROR);
 		}
 	}
-	
+
 	/**
 	 * Load data and convert a record into a list of data from the main table,
 	 * and linked to every element, the data from the side tables
@@ -263,15 +263,15 @@ class DB_Model extends FHC_Model
 	{
 		// Check class properties
 		if (is_null($this->dbTable)) return error(FHC_MODEL_ERROR, FHC_NODBTABLE);
-		
+
 		// Checks rights
 		if (isError($ent = $this->_isEntitled(PermissionLib::SELECT_RIGHT))) return $ent;
-		
+
 		// List of tables on which it will work
 		$tables = array_merge(array($mainTable), $sideTables);
 		// Array that will contain the number of columns of each table
 		$tableColumnsCountArray = array();
-		
+
 		// Generates the select clause based on the columns of each table
 		$select = '';
 		for ($t = 0; $t < count($tables); $t++)
@@ -280,7 +280,7 @@ class DB_Model extends FHC_Model
 			$schemaAndTable = $this->getSchemaAndTable($tables[$t]);
 			// Discard the schema, not needed in the next steps
 			$tables[$t] = $schemaAndTable->table;
-			
+
 			// List of the columns of the current table
 			// NOTE: $this->db->list_fields($tables[$t]) doesn't work if there are two tables with
 			// the same name in two different schemas, use this workaround
@@ -289,7 +289,7 @@ class DB_Model extends FHC_Model
 			{
 				$fields = $lstColumns->retval;
 			}
-			
+
 			for ($f = 0; $f < count($fields); $f++)
 			{
 				// To avoid overwriting of the properties within the object returned by CI
@@ -298,15 +298,15 @@ class DB_Model extends FHC_Model
 				$select .= $tables[$t].'.'.$fields[$f]->column_name.' AS '.$tables[$t].'_'.$fields[$f]->column_name;
 				if ($f < count($fields) - 1) $select .= ', ';
 			}
-			
+
 			if ($t < count($tables) - 1) $select .= ', ';
-			
+
 			$tableColumnsCountArray[$t] = count($fields);
 		}
-		
+
 		// Adds the select clause
 		$this->addSelect($select);
-		
+
 		// Execute the query
 		$resultDB = $this->db->get_where($this->dbTable, $where);
 		// If everything went ok...
@@ -319,7 +319,7 @@ class DB_Model extends FHC_Model
 			// of a side table
 			$returnArray = array();
 			$returnArrayCounter = 0;	// Array counter
-			
+
 			// Iterates the array that contains data from DB
 			for ($i = 0; $i < count($resultArray); $i++)
 			{
@@ -333,15 +333,15 @@ class DB_Model extends FHC_Model
 				for ($f = 0; $f < count($tableColumnsCountArray); $f++)
 				{
 					$objTmpArray[$f] = new stdClass(); // Object that will represent a data set of a table
-					
+
 					foreach (array_slice($objectVars, $tableColumnsCountArrayOffset, $tableColumnsCountArray[$f]) as $key => $value)
 					{
 						$objTmpArray[$f]->{str_replace($tables[$f].'_', '', $key)} = $value;
 					}
-					
+
 					$tableColumnsCountArrayOffset += $tableColumnsCountArray[$f]; // Increasing the offset
 				}
-				
+
 				// Object that represents data of the main table
 				$mainTableObj = $objTmpArray[0];
 				// Fill $returnArray with all data from mainTable, and for each element will link the data from the side tables
@@ -354,7 +354,7 @@ class DB_Model extends FHC_Model
 					{
 						$sideTableProperty = $sideTablesAliases[$t - 1];
 					}
-					
+
 					// If the side table has data. If it was used a left join all the properties could be null
 					// NOTE: Keep this way to be compatible with a php version older than 5.5
 					$tmpFilteredArray = array_filter(get_object_vars($sideTableObj));
@@ -379,7 +379,7 @@ class DB_Model extends FHC_Model
 					}
 				}
 			}
-			
+
 			// Sets result with the standard success object that contains all the studiengang
 			$result = success($returnArray);
 		}
@@ -387,10 +387,10 @@ class DB_Model extends FHC_Model
 		{
 			$result = error($resultDB);
 		}
-		
+
 		return $result;
 	}
-	
+
 	/**
 	 * Add a table to join with
 	 *
@@ -405,12 +405,12 @@ class DB_Model extends FHC_Model
 		{
 			return error(FHC_MODEL_ERROR, FHC_MODEL_ERROR);
 		}
-		
+
 		$this->db->join($joinTable, $cond, $type);
-		
+
 		return success(true);
 	}
-	
+
 	/**
 	 * Add order clause
 	 *
@@ -420,12 +420,12 @@ class DB_Model extends FHC_Model
 	{
 		// Check class properties and parameters
 		if (is_null($field) || !in_array($type, array('ASC', 'DESC'))) return error(FHC_MODEL_ERROR, FHC_MODEL_ERROR);
-		
+
 		$this->db->order_by($field, $type);
-		
+
 		return success(true);
 	}
-	
+
 	/**
 	 * Add select clause
 	 *
@@ -435,12 +435,12 @@ class DB_Model extends FHC_Model
 	{
 		// Check class properties and parameters
 		if (is_null($select) || $select == '') return error(FHC_MODEL_ERROR, FHC_MODEL_ERROR);
-		
+
 		$this->db->select($select, $escape);
-		
+
 		return success(true);
 	}
-	
+
 	/**
 	 * Add distinct clause
 	 *
@@ -450,7 +450,7 @@ class DB_Model extends FHC_Model
 	{
 		$this->db->distinct();
 	}
-	
+
 	/**
 	 * Add limit clause
 	 *
@@ -460,7 +460,7 @@ class DB_Model extends FHC_Model
 	{
 		// Check class properties and parameters
 		if (!is_numeric($start) || (is_numeric($start) && $start <= 0)) return error(FHC_MODEL_ERROR, FHC_MODEL_ERROR);
-		
+
 		if (is_numeric($end) && $end > $start)
 		{
 			$this->db->limit($start, $end);
@@ -469,10 +469,10 @@ class DB_Model extends FHC_Model
 		{
 			$this->db->limit($start);
 		}
-		
+
 		return success(true);
 	}
-	
+
 	/**
 	 * Add a table in the from clause
 	 *
@@ -481,20 +481,20 @@ class DB_Model extends FHC_Model
 	public function addFrom($table, $alias = null)
 	{
 		$tmpTable = trim($table);
-		
+
 		// Check parameters
 		if (empty($tmpTable)) return error(FHC_MODEL_ERROR, FHC_MODEL_ERROR);
-		
+
 		if (!empty($alias))
 		{
 			$tmpTable .= ' AS '.$alias;
 		}
-		
+
 		$this->db->from($tmpTable);
-		
+
 		return success(true);
 	}
-	
+
 	/**
 	 * Add one or more fields in the group by clause
 	 *
@@ -509,12 +509,12 @@ class DB_Model extends FHC_Model
 		{
 			return error(FHC_MODEL_ERROR, FHC_MODEL_ERROR);
 		}
-		
+
 		$this->db->group_by($fields);
-		
+
 		return success(true);
 	}
-	
+
 	/**
 	 * Reset the query builder state
 	 *
@@ -524,7 +524,7 @@ class DB_Model extends FHC_Model
 	{
 		$this->db->reset_query();
 	}
-	
+
 	/**
 	 * This method call the method escape from class CI_DB_driver, therefore:
 	 * this method determines the data type so that it can escape only string data.
@@ -555,11 +555,11 @@ class DB_Model extends FHC_Model
 		{
 			return false;
 		}
-		
+
 		// If it is null, let it be null
 		return $val;
 	}
-	
+
 	/**
 	 * Converts from PostgreSQL array to php array
 	 * It also takes care about array of booleans
@@ -568,7 +568,7 @@ class DB_Model extends FHC_Model
 	{
 		// At least returns an empty array
 		$result = array();
-		
+
 		// String that represents the pgsql array, better if not empty
 		if (!empty($string))
 		{
@@ -592,44 +592,44 @@ class DB_Model extends FHC_Model
 				$result[] = $tmp;
 			}
 		}
-		
+
 		return $result;
 	}
-	
+
 	/**
 	 * Returns an array that contains a list of columns names of this table
 	 */
 	public function listFields()
 	{
 		$listFields = array();
-		
+
 		// Workaround to get metadata from this table
 		$result = $this->db->query(sprintf(DB_Model::QUERY_LIST_FIELDS, $this->dbTable));
-		
+
 		if (is_object($result))
 		{
 			$listFields = $result->list_fields();
 		}
-		
+
 		return $listFields;
 	}
-	
+
 	/**
 	 * Checks if this table has a field == $field
 	 */
 	public function fieldExists($field)
 	{
 		$exists = true;
-		
+
 		// If $field is not found in the list of fields of this table
 		if (array_search($field, $this->listFields()) === false)
 		{
 			$exists = false;
 		}
-		
+
 		return $exists;
 	}
-	
+
 	/**
 	 * Returns all the UDF contained in this table ($dbTable)
 	 * If no UDF are present, an empty array will be returned
@@ -637,9 +637,9 @@ class DB_Model extends FHC_Model
 	public function getUDFs($id, $udfName = null)
 	{
 		$udfs = array();
-		
+
 		$this->addSelect(UDFLib::COLUMN_NAME); // select only the column with UDF
-		
+
 		$result = $this->load($id);
 		if (hasData($result))
 		{
@@ -658,10 +658,10 @@ class DB_Model extends FHC_Model
 				}
 			}
 		}
-		
+
 		return $udfs;
 	}
-	
+
 	/**
 	 * Checks if this table has the field udf_values
 	 */
@@ -669,10 +669,10 @@ class DB_Model extends FHC_Model
 	{
 		return $this->fieldExists(UDFLib::COLUMN_NAME);
 	}
-	
+
 	// ------------------------------------------------------------------------------------------
 	// Protected methods
-	
+
 	/**
 	 * Executes a query and converts array and boolean data types from PgSql to php
 	 * @return: boolean false on failure
@@ -682,7 +682,7 @@ class DB_Model extends FHC_Model
 	protected function execQuery($query, $parametersArray = null)
 	{
 		$result = null;
-		
+
 		// If the query is empty don't lose time
 		if (!empty($query))
 		{
@@ -695,7 +695,7 @@ class DB_Model extends FHC_Model
 			{
 				$resultDB = $this->db->query($query);
 			}
-			
+
 			// If no errors occurred
 			if ($resultDB)
 			{
@@ -706,10 +706,10 @@ class DB_Model extends FHC_Model
 				$result = error($this->db->error(), FHC_DB_ERROR);
 			}
 		}
-		
+
 		return $result;
 	}
-	
+
 	/**
 	 * Get schema and table name from the parameter
 	 * If no schema are specified it will returns the parameter as table name,
@@ -725,20 +725,20 @@ class DB_Model extends FHC_Model
 		$result = new stdClass();
 		$result->table = $schemaAndTable;
 		$result->schema = DB_Model::DEFAULT_SCHEMA;
-		
+
 		// If a schema is specified
 		if (($pos = strpos($schemaAndTable, '.')) !==  false)
 		{
 			$result->schema = substr($schemaAndTable, 0, $pos);
 			$result->table = substr($schemaAndTable, $pos + 1);
 		}
-		
+
 		return $result;
 	}
-	
+
 	// ------------------------------------------------------------------------------------------
 	// Private methods
-	
+
 	/**
 	 * Invalid ID
 	 *
@@ -749,43 +749,36 @@ class DB_Model extends FHC_Model
 	private function _arrayCombine($idexes, $values)
 	{
 		if (count($idexes) != count($values)) return null;
-		
+
 		return array_combine($idexes, $values);
 	}
-	
+
 	/**
 	 * Checks if the caller is entitled to perform this operation with this right
 	 */
 	private function _isEntitled($permission)
 	{
 		$ent = success(true);
-		
-		// If the caller is _not_ a model _and_ tries to read data, then avoids to check permissions
-		// Otherwise checks always the permissions
-		if (($permission == PermissionLib::SELECT_RIGHT
-			&& substr(get_called_class(), -6) == DB_Model::MODEL_POSTFIX)
-			|| $permission != PermissionLib::SELECT_RIGHT)
+
+		$ent = $this->isEntitled($this->dbTable, $permission, FHC_NORIGHT, FHC_MODEL_ERROR);
+		// If true is not returned, then an error has occurred
+		if (isError($ent))
 		{
-			$ent = $this->isEntitled($this->dbTable, $permission, FHC_NORIGHT, FHC_MODEL_ERROR);
-			// If true is not returned, then an error has occurred
-			if (isError($ent))
-			{
-				// Before returning the object containing the error, reset the build query
-				// This is for preventing that other parts of the query will be built before of the next execution
-				$this->resetQuery();
-			}
+			// Before returning the object containing the error, reset the build query
+			// This is for preventing that other parts of the query will be built before of the next execution
+			$this->resetQuery();
 		}
-		
+
 		return $ent;
 	}
-	
+
 	/**
 	 * Wrapper method for UDFLib->manageUDFs
 	 */
 	private function _manageUDFs(&$data, $schemaAndTable, $id = null)
 	{
 		$manageUDFs = success(true);
-		
+
 		if ($this->hasUDF())
 		{
 			if ($id != null)
@@ -797,10 +790,10 @@ class DB_Model extends FHC_Model
 				$manageUDFs = $this->udflib->manageUDFs($data, $this->dbTable);
 			}
 		}
-		
+
 		return $manageUDFs;
 	}
-	
+
 	/**
 	 * Converts array and boolean data types from PgSql to php
 	 * NOTE: PostgreSQL php drivers returns:
@@ -811,7 +804,7 @@ class DB_Model extends FHC_Model
 	private function _toPhp($result)
 	{
 		$toPhp = $result; // if there is nothing to convert then return the result from DB
-		
+
 		// If it's an object its fields will be parsed to find booleans and arrays types
 		if (is_object($result))
 		{
@@ -834,7 +827,7 @@ class DB_Model extends FHC_Model
 					array_push($toBeConverterdArray, $toBeConverted);
 				}
 			}
-			
+
 			// If there is something to convert, otherwhise don't lose time
 			if (count($toBeConverterdArray) > 0)
 			{
@@ -850,7 +843,7 @@ class DB_Model extends FHC_Model
 					{
 						// Single element
 						$toBeConverted = $toBeConverterdArray[$j];
-						
+
 						// Array type
 						if (strpos($toBeConverted->type, DB_Model::PGSQL_ARRAY_TYPE) !== false)
 						{
@@ -889,10 +882,10 @@ class DB_Model extends FHC_Model
 				$toPhp = $result->result();
 			}
 		}
-		
+
 		return $toPhp;
 	}
-	
+
 	/**
 	 * Used in loadTree to find the main tables
 	 */
@@ -905,10 +898,10 @@ class DB_Model extends FHC_Model
 				return $i;
 			}
 		}
-		
+
 		return false;
 	}
-	
+
 	/**
 	 * Workaround of CI_DB_driver->_list_columns
 	 * CI_DB_driver->list_fields($tableName), that calls CI_DB_postgre_driver->_list_columns,
@@ -920,7 +913,7 @@ class DB_Model extends FHC_Model
 					FROM information_schema.columns
 				   WHERE LOWER(table_schema) = ?
 					 AND LOWER(table_name) = ?';
-		
+
 		return $this->execQuery($query, array(strtolower($schema), strtolower($table)));
 	}
 }

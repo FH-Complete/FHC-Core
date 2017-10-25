@@ -26,7 +26,7 @@
 require_once(dirname(__FILE__).'/basis_db.class.php');
 require_once(dirname(__FILE__).'/datum.class.php');
 
-class cronjob extends basis_db 
+class cronjob extends basis_db
 {
 	public $new;
 	public $result = array();
@@ -54,7 +54,7 @@ class cronjob extends basis_db
 	public $insertamum;
 	public $insertvon;
 	public $variablen;
-	
+
 	/**
 	 * Konstruktor
 	 * @param $cronjob_id ID des Cronjobs der geladen werden soll (Default=null)
@@ -62,7 +62,7 @@ class cronjob extends basis_db
 	public function __construct($cronjob_id=null)
 	{
 		parent::__construct();
-		
+
 		if(!is_null($cronjob_id))
 			$this->load($cronjob_id);
 	}
@@ -79,9 +79,9 @@ class cronjob extends basis_db
 			$this->errormsg = 'id ist ungueltig';
 			return false;
 		}
-		
+
 		$qry = "SELECT * FROM system.tbl_cronjob WHERE cronjob_id=".$this->db_add_param($cronjob_id, FHC_INTEGER);
-		
+
 		if($this->db_query($qry))
 		{
 			if($row = $this->db_fetch_object())
@@ -109,13 +109,13 @@ class cronjob extends basis_db
 				$this->variablen = $row->variablen;
 				return true;
 			}
-			else 
+			else
 			{
 				$this->errormsg = 'Datensatz wurde nicht gefunden';
 				return false;
 			}
 		}
-		else 
+		else
 		{
 			$this->errormsg = 'Fehler beim Laden der Daten';
 			return false;
@@ -163,7 +163,7 @@ class cronjob extends basis_db
 		$this->errormsg = '';
 		return true;
 	}
-		
+
 	/**
 	 * Speichert den aktuellen Datensatz in die Datenbank
 	 * Wenn $neu auf true gesetzt ist wird ein neuer Datensatz angelegt
@@ -184,7 +184,7 @@ class cronjob extends basis_db
 			//Neuen Datensatz einfuegen
 
 			$qry = 'BEGIN;INSERT INTO system.tbl_cronjob (server_kurzbz, titel, beschreibung, file, last_execute, aktiv,
-					running, jahr, monat, tag, wochentag, stunde, minute, standalone, reihenfolge, updateamum, updatevon, 
+					running, jahr, monat, tag, wochentag, stunde, minute, standalone, reihenfolge, updateamum, updatevon,
 					insertamum, insertvon, variablen) VALUES('.
 			       $this->db_add_param($this->server_kurzbz).', '.
 			       $this->db_add_param($this->titel).', '.
@@ -217,7 +217,7 @@ class cronjob extends basis_db
 				$this->errormsg = 'cronjob_id muss eine gueltige Zahl sein';
 				return false;
 			}
-			
+
 			$qry='UPDATE system.tbl_cronjob SET '.
 			'server_kurzbz='.$this->db_add_param($this->server_kurzbz).', '.
 			'titel='.$this->db_add_param($this->titel).', '.
@@ -254,14 +254,14 @@ class cronjob extends basis_db
 						$this->db_query('COMMIT');
 						return true;
 					}
-					else 
+					else
 					{
 						$this->errormsg = 'Fehler beim Auslesen der Sequence';
 						$this->db_query('ROLLBACK');
 						return false;
 					}
 				}
-				else 
+				else
 				{
 					$this->errormsg = 'Fehler beim Auslesen der Sequence';
 					$this->db_query('ROLLBACK');
@@ -289,18 +289,18 @@ class cronjob extends basis_db
 			$this->errormsg = 'Id ist ungueltig';
 			return false;
 		}
-		
+
 		$qry = "DELETE FROM system.tbl_cronjob WHERE cronjob_id=".$this->db_add_param($cronjob_id, FHC_INTEGER);
-		
+
 		if($this->db_query($qry))
 			return true;
-		else 
+		else
 		{
 			$this->errormsg = 'Fehler beim Loeschen des Datensatzes';
 			return false;
 		}
 	}
-	
+
 	/**
 	 * Liefert alle Cronjobs
 	 * @param $server
@@ -328,7 +328,7 @@ class cronjob extends basis_db
 		while($row = $this->db_fetch_object($result))
 		{
 			$obj = new cronjob();
-			
+
 			$obj->cronjob_id = $row->cronjob_id;
 			$obj->server_kurzbz = $row->server_kurzbz;
 			$obj->titel = $row->titel;
@@ -350,60 +350,78 @@ class cronjob extends basis_db
 			$obj->insertamum = $row->insertamum;
 			$obj->insertvon = $row->insertvon;
 			$obj->variablen = $row->variablen;
-			
+
 			$this->result[] = $obj;
 		}
 		return true;
 	}
-	
+
 	/**
 	 * Startet einen geladenen Cronjob
 	 *
 	 * @return true wenn ok, false im Fehlerfall
 	 */
 	public function execute()
-	{		
+	{
 		$return = true;
 		if($this->standalone && $this->isJobRunning())
 		{
 			$this->errormsg = 'Job kann nicht ausgefuehrt werden, da noch ein anderer Job laeuft';
 			return false;
 		}
-		
+
 		if($this->server_kurzbz!=SERVER_NAME)
 		{
 			$this->errormsg = 'Fehler: Dieses Script kann nur am Server '.$this->server_kurzbz.' gestartet werden. (aktueller Server laut config: '.SERVER_NAME.')';
 			return false;
 		}
-		
+
 		$this->running = true;
 		if(!$this->save())
 			return false;
-		
+
 		unset($this->output);
-		$path = dirname($this->file);
-		$file = basename($this->file);
-		$file .= ' id='.$this->cronjob_id;
+
+		/**
+		 * If CI cronjobs are used, the parameters needs to be handled separately otherwise the
+		 * paramters are recognized as part of the original path if they contain slashes
+		 *
+		 * /var/www/index.ci.php jobs/foo method
+		 */
+		if(mb_strpos($this->file,' ') !== false)
+		{
+			$path = dirname(mb_substr($this->file,0, mb_strpos($this->file,' ')));
+			$file = basename(mb_substr($this->file,0, mb_strpos($this->file,' ')));
+			$parameter = mb_substr($this->file, mb_strpos($this->file,' '));
+		}
+		else
+		{
+			$path = dirname($this->file);
+			$file = basename($this->file);
+			$parameter = ' id='.$this->cronjob_id;
+		}
+
+		$file .= $parameter;
 		if(chdir($path))
 		{
 			exec("php $file", $this->output);
 			//echo "Execute: php $file";
-			$this->last_execute = date('Y-m-d H:i:s');	
+			$this->last_execute = date('Y-m-d H:i:s');
 		}
-		else 
+		else
 		{
 			$this->errormsg = 'Fehler: Falscher Verzeichnisname';
 			$return = false;
 		}
-		
+
 		$this->running = false;
-		
+
 		if(!$this->save())
 			return false;
-		
+
 		return $return;
 	}
-	
+
 	/**
 	 * Startet einen geladenen Cronjob mit Initialisierungsparameter
 	 * Der Job setzt dann die Standardwerte fuer die Variablen
@@ -411,9 +429,9 @@ class cronjob extends basis_db
 	 * @return true wenn ok, false im Fehlerfall
 	 */
 	public function init()
-	{		
+	{
 		$return = true;
-		
+
 		unset($this->output);
 		$path = dirname($this->file);
 		$file = basename($this->file);
@@ -425,13 +443,13 @@ class cronjob extends basis_db
 			//echo "Execute: php $file";
 			return true;
 		}
-		else 
+		else
 		{
 			$this->errormsg = 'Fehler: Falscher Verzeichnisname';
 			return false;
 		}
 	}
-	
+
 	/**
 	 * Prueft ob zur Zeit ein Cronjob laeuft
 	 *
@@ -440,23 +458,23 @@ class cronjob extends basis_db
 	public function isJobRunning()
 	{
 		$qry = 'SELECT count(*) as anzahl FROM system.tbl_cronjob WHERE running=true';
-		
+
 		if($result = $this->db_query($qry))
 		{
 			if($row = $this->db_fetch_object($result))
 			{
 				if($row->anzahl>0)
 					return true;
-				else 
+				else
 					return false;
 			}
-			else 
+			else
 			{
 				$this->errormsg = 'Fehler beim Ermitteln der Daten';
 				return false;
 			}
 		}
-		else 
+		else
 		{
 			$this->errormsg = 'Fehler beim Ermitteln der Daten';
 			return false;
@@ -479,7 +497,7 @@ class cronjob extends basis_db
 		else
 			return false;
 	}
-	
+
 	/**
 	 * Prueft, ob der Wert ein Fixdatum ist
 	 *
@@ -492,10 +510,10 @@ class cronjob extends basis_db
 			return false;
 		if($this->parseSchrittweite($value))
 			return false;
-		
+
 		return true;
 	}
-	
+
 	/**
 	 * Liefert die naechste Ausfuehrungszeit des aktuell geladenen Cronjobs
 	 *
@@ -512,7 +530,7 @@ class cronjob extends basis_db
 		$stunde = date('H', $last_execute);
 		$stunde_last = date('H', $last_execute);
 		$minute = date('i', $last_execute);
-		
+
 		// wenn ein wochentag gewaehlt wird, dann wird jahr, monat und tag
 		// nicht beruecksichtigt
 		if($this->wochentag!='')
@@ -522,14 +540,14 @@ class cronjob extends basis_db
 			$monat = date('m',$stamp);
 			$tag = date('d',$stamp);
 		}
-		else 
+		else
 		{
 			//jahr
 			if(!$jahr_schritt = $this->parseSchrittweite($this->jahr))
 				$jahr = ($this->jahr!=''?$this->jahr:$jahr);
-			else 
+			else
 				$jahr+= $jahr_schritt;
-			
+
 			//monat
 			if(!$monat_schritt = $this->parseSchrittweite($this->monat))
 			{
@@ -540,13 +558,13 @@ class cronjob extends basis_db
 						$jahr++;
 					}
 				}
-					
+
 				$monat = ($this->monat!=''?$this->monat:$monat);
-				
+
 			}
-			else 
+			else
 				$monat+= $monat_schritt;
-				
+
 			//tag
 			if(!$tag_schritt = $this->parseSchrittweite($this->tag))
 			{
@@ -563,10 +581,10 @@ class cronjob extends basis_db
 				}
 				$tag = ($this->tag!=''?$this->tag:$tag);
 			}
-			else 
+			else
 				$tag+= $tag_schritt;
 		}
-		
+
 		//Stunde
 		if(!$stunde_schritt = $this->parseSchrittweite($this->stunde))
 		{
@@ -587,9 +605,9 @@ class cronjob extends basis_db
 			}
 			$stunde = ($this->stunde!=''?$this->stunde:$stunde);
 		}
-		else 
+		else
 			$stunde+= $stunde_schritt;
-			
+
 		//Minute
 		if(!$minute_schritt = $this->parseSchrittweite($this->minute))
 		{
@@ -617,17 +635,17 @@ class cronjob extends basis_db
 			}
 			$minute = ($this->minute!=''?$this->minute:$minute);
 		}
-		else 
+		else
 			$minute+= $minute_schritt;
 
 		$next = mktime($stunde, $minute, 0, $monat, $tag, $jahr);
-		
+
 		//Cronjobs die nicht mehr ausgefuehrt werden (Datum vor der letzten Ausfuehrung)
 		if($next<$last_execute)
 			$next=false;
 		return $next;
 	}
-	
+
 	/**
 	 * Parst die Cronjob ID aus den Kommandozeilenparametern
 	 *
@@ -642,10 +660,10 @@ class cronjob extends basis_db
 				return substr($row,strlen('id='));
 			}
 		}
-			
+
 		return false;
 	}
-	
+
 	/**
 	 * Prueft ob der Script-Aufruf ein Inistialisierungsaufruf ist
 	 *
@@ -660,7 +678,7 @@ class cronjob extends basis_db
 				return true;
 			}
 		}
-			
+
 		return false;
 	}
 }

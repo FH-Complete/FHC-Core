@@ -50,10 +50,13 @@ class PermissionLib
 
 		// Loads the array of resources
 		$this->acl = $this->ci->config->item('fhc_acl');
-		
-		// API Caller rights initialization
-		self::$bb = new benutzerberechtigung();
-		self::$bb->getBerechtigungen(getAuthUID());
+
+		if (!is_cli())
+		{
+			// API Caller rights initialization
+			self::$bb = new benutzerberechtigung();
+			self::$bb->getBerechtigungen(getAuthUID());
+		}
 	}
 
 	/**
@@ -65,14 +68,21 @@ class PermissionLib
 	public function isEntitled($sourceName, $permissionType)
 	{
 		$isEntitled = false;
-		
-		// If the resource exists
-		if (isset($this->acl[$sourceName]))
+
+		if(!is_cli())
 		{
-			// Checks permission
-			$isEntitled = $this->_isBerechtigt($this->acl[$sourceName], $permissionType);
+			// If the resource exists
+			if (isset($this->acl[$sourceName]))
+			{
+				// Checks permission
+				$isEntitled = $this->_isBerechtigt($this->acl[$sourceName], $permissionType);
+			}
 		}
-		
+		else
+		{
+			$isEntitled	= true;
+		}
+
 		return $isEntitled;
 	}
 
@@ -82,12 +92,12 @@ class PermissionLib
 	public function getBerechtigungKurzbz($sourceName)
 	{
 		$returnValue = null;
-		
+
 		if (isset($this->acl[$sourceName]))
 		{
 			$returnValue = $this->acl[$sourceName];
 		}
-		
+
 		return $returnValue;
 	}
 
@@ -97,7 +107,7 @@ class PermissionLib
 	private function _isBerechtigt($berechtigung_kurzbz, $art = null, $oe_kurzbz = null, $kostenstelle_id = null)
 	{
 		$isBerechtigt = false;
-		
+
 		if (!is_null($berechtigung_kurzbz))
 		{
 			if (self::$bb->isBerechtigt($berechtigung_kurzbz, $oe_kurzbz, $art, $kostenstelle_id))
@@ -105,7 +115,7 @@ class PermissionLib
 				$isBerechtigt = true;
 			}
 		}
-		
+
 		return $isBerechtigt;
 	}
 }
