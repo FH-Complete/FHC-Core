@@ -76,21 +76,21 @@ $error_msg='';
 		$qry = "UPDATE public.tbl_gruppe SET generiert=true WHERE UPPER(gruppe_kurzbz)=UPPER('".addslashes($gruppe)."')";
 		$db->db_query($qry);
 	}
-	
+
 	/**
 	 * Löscht alle BenutzerInnen aus NICHT-generierten Verteilern im Studiengang 0 (Erhalter), deren Account vor mehr als 3 Wochen deaktiviert wurde
 	 */
-	
+
 	$qry_delete = "	DELETE FROM public.tbl_benutzergruppe
 					WHERE tbl_benutzergruppe.studiensemester_kurzbz IS NULL
 					AND gruppe_kurzbz IN (SELECT gruppe_kurzbz FROM public.tbl_gruppe WHERE generiert=false AND studiengang_kz=0)
 					AND uid IN (SELECT uid FROM public.tbl_benutzer WHERE aktiv=false AND updateaktivam<now()-'3 weeks'::interval);";
-	
+
 	if(!($result = $db->db_query($qry_delete)))
 		$error_msg .= $db->db_last_error().$qry_delete.'<br><br>';
-	
+
 	echo $db->db_affected_rows($result).' inaktive BenutzerInnen wurden aus statischen Verteilern gelöscht<BR><BR>';
-	
+
 	/**
 	 * Einfache Verteiler, deren Erstellung ohne Schleifen-Logik moeglich ist, werden ueber dieses Array erstellt
 	 * Benoetigt werden die 3 Attribute:
@@ -190,7 +190,8 @@ $error_msg='';
 											JOIN public.tbl_benutzer ON(uid=mitarbeiter_uid)
 											WHERE fixangestellt
 											AND aktiv
-											AND mitarbeiter_uid NOT LIKE '\\\\_%'";
+											AND mitarbeiter_uid NOT LIKE '\\\\_%'
+											AND NOT EXISTS(SELECT 1 FROM public.tbl_benutzerfunktion WHERE funktion_kurzbz='hilfskraft' AND uid=mitarbeiter_uid AND (datum_bis>=now() or datum_bis is null))";
 	//Alle aktiven MitarbeiterInnen mit Attribut fixangestellt=true und lektor=true
 	$verteilerArray['tw_fix_lkt']['bezeichnung'] = 'Alle fixangestellten LektorInnen';
 	$verteilerArray['tw_fix_lkt']['beschreibung'] = 'Alle fixangestellten LektorInnen an der FH Technikum Wien';
