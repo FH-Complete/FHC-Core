@@ -156,7 +156,7 @@ else
 								printStatuswechselMenuitem($gruende, 'Aufgenommener', 'interessent-toolbar-aufgenommener', 'Aufgenommener', "InteressentAddRolle('Aufgenommener','STATUSGRUNDID')");
 								printStatuswechselMenuitem($gruende, 'Student', 'interessent-toolbar-zustudent', 'Student', "InteressentzuStudent('STATUSGRUNDID')");
 								printStatuswechselMenuitem($gruende, 'Warteliste', 'interessent-toolbar-warteliste', 'Wartender', "InteressentAddRolle('Wartender','STATUSGRUNDID')");
-								printStatuswechselMenuitem($gruende, 'Absage', 'interessent-toolbar-absage', 'Abgewiesener', "InteressentAddRolle('Abgewiesener','STATUSGRUNDID')");
+								printStatuswechselMenuitem($gruende, 'Abgewiesener', 'interessent-toolbar-absage', 'Absage', "InteressentAddRolle('Abgewiesener','STATUSGRUNDID')");
 
 								?>
 								</menupopup>
