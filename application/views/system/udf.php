@@ -1,7 +1,7 @@
 <?php $this->load->view("templates/header", array("title" => "UDF", "widgetsCSS" => true)); ?>
-	
+
 	<body style="background-color: #eff0f1;">
-	
+
 <?php
 	if ($result != null)
 	{
@@ -11,7 +11,7 @@
 		<div style="color: black;">
 			Saved!
 		</div>
-		
+
 		<br>
 <?php
 		}
@@ -25,16 +25,21 @@
 		<div style="color: red;">
 <?php
 		$errors = $result->retval;
-		foreach ($errors as $error)
+		if(is_array($errors))
 		{
-			foreach ($error as $fieldError)
+			foreach ($errors as $error)
 			{
-				echo $fieldError->msg . ' -> ' . $fieldError->retval . '<br>';
+				foreach ($error as $fieldError)
+				{
+					echo $fieldError->msg . ' -> ' . $fieldError->retval . '<br>';
+				}
 			}
 		}
+		else
+			echo $result->retval;
 ?>
 		</div>
-		
+
 		<br>
 		<br>
 		<br>
@@ -43,7 +48,7 @@
 	}
 ?>
 		<form action="<?php echo APP_ROOT; ?>index.ci.php/system/UDF/saveUDF" method="POST">
-		
+
 			<div class="div-table">
 				<div class="div-row">
 					<div class="div-cell" style="font-size: 20px; font-weight: bold;">
@@ -120,7 +125,7 @@
 					</div>
 				</div>
 			</div>
-			
+
 		<?php
 			if (isset($personUdfs))
 			{
@@ -137,9 +142,9 @@
 		<?php
 			}
 		?>
-		
+
 		</form>
-		
+
 	</body>
-	
+
 <?php $this->load->view("templates/footer"); ?>
