@@ -23,6 +23,7 @@
  * Authors: Andreas Österreicher <andreas.oesterreicher@technikum-wien.at>
  * 			Stefan Puraner	<puraner@technikum-wien.at>
  * 			Andreas Moik	<moik@technikum-wien.at>
+ *          Cristina Hainberger <hainberg@technikum-wien.at>
  */
 
 require_once(dirname(__FILE__).'/basis_db.class.php');
@@ -792,12 +793,12 @@ class studienplan extends basis_db
 			    FROM
 				    lehre.tbl_studienplan
 				    JOIN lehre.tbl_studienordnung USING(studienordnung_id)
-				    JOIN lehre.tbl_studienordnung_semester USING(studienordnung_id)
+				    JOIN lehre.tbl_studienplan_semester USING (studienplan_id)
 			    WHERE
 				    tbl_studienplan.aktiv
 				    AND tbl_studienordnung.studiengang_kz=".$this->db_add_param($studiengang_kz, FHC_INTEGER)."
-				    AND tbl_studienordnung_semester.studiensemester_kurzbz = ".$this->db_add_param($studiensemester_kurzbz)."
-				    AND tbl_studienordnung_semester.semester=".$this->db_add_param($ausbildungssemester);
+				    AND tbl_studienplan_semester.studiensemester_kurzbz = ".$this->db_add_param($studiensemester_kurzbz)."
+				    AND tbl_studienplan_semester.semester=".$this->db_add_param($ausbildungssemester);
 
 	    if($orgform_kurzbz!='')
 	    {
@@ -1094,40 +1095,6 @@ class studienplan extends basis_db
 			return false;
 		}
 		return false;
-	}
-
-	public function deleteSemesterZuordnung($studienplan_id, $studiensemester_kurzbz, $ausbildungssemester = NULL)
-	{
-		if (!is_numeric($studienplan_id))
-		{
-			$this->errormsg = 'studienplan_id muss eine gueltige Zahl sein';
-			return false;
-		}
-
-		if (!is_string($studiensemester_kurzbz) || strlen($studiensemester_kurzbz) != 6)
-		{
-			$this->errormsg = 'studiensemester_kurzbz muss ein String mit 6 Zeichen sein';
-			return false;
-		}
-
-		$qry = 'DELETE FROM lehre.tbl_studienplan_semester
-			WHERE studienplan_id=' . $this->db_add_param($studienplan_id) . ' AND
-			studiensemester_kurzbz=' . $this->db_add_param($studiensemester_kurzbz) . '';
-
-		if ($ausbildungssemester !== null)
-			$qry.=' AND semester=' . $this->db_add_param($ausbildungssemester) . '';
-
-		$qry.=';';
-
-		if ($this->db_query($qry))
-		{
-			return true;
-		}
-		else
-		{
-			$this->errormsg = 'Fehler beim Löschen der Zuordnung' . "\n";
-			return false;
-		}
 	}
 
 	/**

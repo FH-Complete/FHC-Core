@@ -159,11 +159,16 @@ if((!$rechte->isBerechtigt('lehre/studienordnung')) && (!$rechte->isBerechtigt('
 
 if(($rechte->isBerechtigt('lehre/studienordnungInaktiv')) && (!$rechte->isBerechtigt('lehre/studienordnung')))
     echo "<script type='text/javascript'>var initSTOs = 'inaktiv';</script>";
+
 $stg_arr = $rechte->getStgKz('lehre/studienordnung');
 if(empty($stg_arr))
     $stg_arr = $rechte->getStgKz('lehre/studienordnungInaktiv');
+
 $studiengang = new studiengang();
 $studiengang->loadArray($stg_arr,'typ,kurzbz');
+$types = new studiengang();
+$types->getAllTypes();
+$typ = '';
 
 echo '
 <table id="layoutTable" width="100%">
@@ -173,38 +178,40 @@ echo '
 				<h3>Studiengang</h3>
 				<div style="margin:0px;padding:5px;">
 					<p>
-					<select id="studiengang" name="studiengang_kz" onchange="loadStudienordnung()">
-<option value="">-- Bitte auswählen --</option>';
+					<SELECT id="studiengang" name="studiengang_kz" onchange="loadStudienordnung()" style="width: 100%;">
+                    <OPTION value="">-- Bitte auswählen --</option>';
+                    foreach($studiengang->result as $row)
+                    {
+                        if ($typ != $row->typ || $typ == '')
+                        {
+                            if ($typ != '')
+                                echo '</optgroup>';
+                            
+                            echo '<optgroup label = "'.($types->studiengang_typ_arr[$row->typ] != '' ? $types->studiengang_typ_arr[$row->typ] : $row->typ).'">';
+                        }
+                        echo '<OPTION value="'.$row->studiengang_kz.'"'.($studiengang_kz==$row->studiengang_kz?'selected':'').'>'.$row->kuerzel.' - '.$row->bezeichnung.'</OPTION>';
+                        $typ = $row->typ;
+                    }
+                    echo '</SELECT><br>
+                    <input type="button" value="Daten laden" onclick="loadStudienordnung()" style="margin-top: 5px" />
+                    </p>
+                    </div>
+                  
+                    <h3>Studienordnung</h3>
+                    <div style="margin:0px;padding:5px;">
+                    <p id="studienordnung" >
+                    Bitte wählen Sie einen Studiengang aus!
+                    </p>
+                    </div>
 
-foreach($studiengang->result as $row)
-{
-	if($studiengang_kz==$row->studiengang_kz)
-		$selected='selected';
-	else
-		$selected='';
-
-	echo '<option value="'.$row->studiengang_kz.'" '.$selected.'>'.$db->convert_html_chars($row->kuerzel.' - '.$row->kurzbzlang).'</option>';
-}
-echo '
-					</select>
-					<br><input type="button" value="Daten laden" onclick="loadStudienordnung()" style="margin-top: 5px" />
-					</p>
-				</div>
-				<h3>Studienordnung</h3>
-				<div style="margin:0px;padding:5px;">
-					<p id="studienordnung" >
-					Bitte wählen Sie einen Studiengang aus!
-					</p>
-				</div>
-
-				<h3>Studienplan</h3>
-				<div style="margin:0px;padding:5px;">
-					<p id="studienplan" style="margin:0;padding:0;">
-					Bitte wählen Sie zuerst eine Studienordnung aus!
-					</p>
-				</div>
-			</div>
-	</td>
+                    <h3>Studienplan</h3>
+                    <div style="margin:0px;padding:5px;">
+                    <p id="studienplan" style="margin:0;padding:0;">
+                    Bitte wählen Sie zuerst eine Studienordnung aus!
+                    </p>
+                    </div>
+                    </div>
+                    </td>
 	<td valign="top" style="max-width:900px">
 			<div id="header">
 			&nbsp;

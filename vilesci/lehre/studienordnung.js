@@ -17,6 +17,7 @@
  * Authors: Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>,
  *			Stefan Puraner	<puraner@technikum-wien.at>
  *			Andreas Moik	<moik@technikum-wien.at>
+ *			Cristina Hainberger <hainberg@technikum-wien.at>
  */
 var global_studiengang_kz='';
 var global_studiengang_bezeichnung='';
@@ -124,7 +125,8 @@ function loadStudienordnung()
 			$("#studienplan").html("Bitte wählen Sie zuerst eine Studienordnung aus!");
 			drawStudienordnungen(data.result);
 			//jqUi( "#menueLinks" ).accordion("option","active",1);
-		}
+		}                
+           neueStudienordnung();            
 	});
 }
 
@@ -140,11 +142,13 @@ function drawStudienordnungen(data)
 	{
 		if(data[i].studienordnung_id !== null)
 		{
-			obj=obj+'<li><a style="white-space:nowrap" href="#Load'+data[i].studienordnung_id+'" onclick="loadStudienplanSTO('+data[i].studienordnung_id+','+data[i].studienplan_id+',\''+data[i].bezeichnung+'\', semesterStoZuordnung);return false;">'+data[i].bezeichnung+'</a>'
-				+' <a href="#Edit'+data[i].studienordnung_id+'" onclick="editStudienordnung('+data[i].studienordnung_id+');return false;"><img title="Bearbeiten" src="../../skin/images/edit.png"></a>'
-				+' <a href="#Copy'+data[i].studienordnung_id+'" onclick="copyStudienordnung('+data[i].studienordnung_id+');return false;"><img title="Studienordnung kopieren" src="../../skin/images/copy.png"></a>&nbsp;&nbsp;&nbsp;'
-				+' <a href="../../content/pdfExport.php?xml=studienordnung.rdf.php&xsl=Studienordnung&studienordnung_id='+data[i].studienordnung_id+'&stg_kz=0&output=doc"><img style="cursor:pointer; height: 16px;" title="Studienordnung als Word-Dokument exportieren" src="../../skin/images/doc_icon.png"></a>'
-				+' <a href="../../content/pdfExport.php?xml=studienordnung.rdf.php&xsl=Studienordnung&studienordnung_id='+data[i].studienordnung_id+'&stg_kz=0&output=pdf"><img style="cursor:pointer; height: 16px;" title="Studienordnung als PDF-Dokument exportieren" src="../../skin/images/pdf_icon.png"></a></li>';
+                    obj = obj + '<li>'
+                            +' <a style="white-space:nowrap" href="#Load'+data[i].studienordnung_id+'" onclick="loadStudienplanSTO('+data[i].studienordnung_id+','+data[i].studienplan_id+',\''+data[i].bezeichnung+'\',);return false;">'+data[i].bezeichnung+'</a>'
+                            +' <a href="#Edit'+data[i].studienordnung_id+'" onclick="editStudienordnung('+data[i].studienordnung_id+');return false;"><img title="Bearbeiten" src="../../skin/images/edit.png"></a>'
+                            +' <a href="#Copy'+data[i].studienordnung_id+'" onclick="copyStudienordnung('+data[i].studienordnung_id+');return false;"><img title="Studienordnung kopieren" src="../../skin/images/copy.png"></a>&nbsp;&nbsp;&nbsp;'
+                            +' <a href="../../content/pdfExport.php?xml=studienordnung.rdf.php&xsl=Studienordnung&studienordnung_id='+data[i].studienordnung_id+'&stg_kz=0&output=doc"><img style="cursor:pointer; height: 16px;" title="Studienordnung als Word-Dokument exportieren" src="../../skin/images/doc_icon.png"></a>'
+                            +' <a href="../../content/pdfExport.php?xml=studienordnung.rdf.php&xsl=Studienordnung&studienordnung_id='+data[i].studienordnung_id+'&stg_kz=0&output=pdf"><img style="cursor:pointer; height: 16px;" title="Studienordnung als PDF-Dokument exportieren" src="../../skin/images/pdf_icon.png"></a>'
+                            +' </li>';
 		}
 	}
 	obj=obj+'</ul>';
@@ -156,7 +160,7 @@ function drawStudienordnungen(data)
 /**
  * Laedt die Studienplaene zu einer Studienordnung
  */
-function loadStudienplanSTO(neue_studienordnung_id, studienplan_id,bezeichnung, callback)
+function loadStudienplanSTO(neue_studienordnung_id, studienplan_id,bezeichnung)
 {
 	global_studienordnung_bezeichnung=bezeichnung;
 	global_studienordnung_id=neue_studienordnung_id;
@@ -171,7 +175,7 @@ function loadStudienplanSTO(neue_studienordnung_id, studienplan_id,bezeichnung, 
 				"typ": "json",
 				"class": "studienplan",
 				"method":	"loadStudienplanSTO",
-				"parameter_0": global_studienordnung_id
+				"parameter_0": global_studienordnung_id                            
 			},
 		error: loadError
 	}).success(function(data)
@@ -185,7 +189,7 @@ function loadStudienplanSTO(neue_studienordnung_id, studienplan_id,bezeichnung, 
 			drawStudienplan(data.result);
 			//jqUi( "#menueLinks" ).accordion("option","active",2);
 		}
-		callback();
+                editStudienordnung(global_studienordnung_id);
 	});
 	$.ajax({
 		dataType: "json",
@@ -212,16 +216,18 @@ function loadStudienplanSTO(neue_studienordnung_id, studienplan_id,bezeichnung, 
  */
 function drawStudienplan(data)
 {
-	var obj ='<a href="#Neu" onclick="neuerStudienplan();return false;">Neuer Studienplan</a><ul  style="padding-left: 15px">';
+	var obj ='<a href="#Neu" onclick="neuerStudienplan();return false;">Neuer Studienplan</a>\n\
+    <ul  style="padding-left: 15px">';
 
 	for(i in data)
 	{
 		if(data[i].studienplan_id !== null)
 		{
+                        global_studienplan_id = data[i].studienplan_id;
 			obj=obj+'<li>'
 			+' <a href="#Load'+data[i].studienplan_id+'" onclick="loadLehrveranstaltungSTPL('+data[i].studienplan_id+',\''+data[i].bezeichnung+'\',\''+data[i].regelstudiendauer+'\');return false;">'+data[i].bezeichnung+'</a>'
 			+' <a href="#Edit'+data[i].studienplan_id+'" onclick="editStudienplan('+data[i].studienplan_id+');return false;"><img title="edit" src="../../skin/images/edit.png"></a>'
-			+' <a href="#Load'+data[i].studienordnung_id+'" onclick="loadStudienplanSTO('+data[i].studienordnung_id+','+data[i].studienplan_id+',\''+data[i].bezeichnung+'\',semesterSTPLZuordnung);return false;"><img title="Semesterzuordnung" src="../../skin/images/split-arrows.png"></a>'
+			+' <a href="#Load'+data[i].studienplan_id+'" onclick="semesterSTPLZuordnung();return false;"><img title="Semesterzuordnung" src="../../skin/images/split-arrows.png"></a>'
 			+'</li>';
 		}
 	}
@@ -1296,7 +1302,6 @@ function saveStudienordnung()
 		"standort_id":standort_id
 	};
 
-
 	$.ajax(
 	{
 		dataType: "json",
@@ -1316,7 +1321,7 @@ function saveStudienordnung()
 			{
 				$("#submsg").css("visibility", "visible");
 				window.setTimeout(function(){$("#submsg").css("visibility", "hidden");}, 1500);
-				loadStudienordnung();
+                        loadStudienordnung();
 			}
 		},
 		error: loadError
@@ -1388,7 +1393,7 @@ function saveStudienplan()
 			{
 				$("#submsg").css("visibility", "visible");
 				window.setTimeout(function(){$("#submsg").css("visibility", "hidden");}, 1500);
-				loadStudienplanSTO(global_studienordnung_id, studienplan_id, global_studienordnung_bezeichnung, semesterStoZuordnung);
+				loadStudienplanSTO(global_studienordnung_id, studienplan_id, global_studienordnung_bezeichnung);
 			}
 		},
 		error: loadError
@@ -1445,89 +1450,14 @@ function writeOverallSum(root)
 	$("#stplDetails").show();
 }
 
-/**
- * Laedt die Daten zum Eintragen der Studienordnung/Semester zuordnung
- */
-function semesterStoZuordnung()
-{
-	drawHeader('Neue Semester Zuordnung');
-	$("#data").load('studienordnung.inc.php?method=semesterStoZuordnung&studienordnung_id='+global_studienordnung_id);
-}
 
 /**
  * Laedt die Daten zum Eintragen der Studienplan/Semester zuordnung
  */
 function semesterSTPLZuordnung()
 {
-	drawHeader('Neue Studienplan Zuordnung');
+	drawHeader('Neue Studienplan Zuordnung');     
 	$("#data").load('studienordnung.inc.php?method=semesterSTPLZuordnung&studienplan_id='+global_studienplan_id);
-}
-
-/**
- * Speichert die Studienordnung/Semester zuordnung
- */
-function saveSemesterStoZuordnung(studiensemester, ausbildungssemester)
-{
-	if(studiensemester == undefined &&  ausbildungssemester == undefined)
-	{
-		var sem = $("#studiensemester").val();
-		var cells = $("#studiensemester").parents().closest("tr").find("input[type=checkbox]");
-		var semester = new Array();
-		var semesterKurzbz = "";
-
-		for(var i = 0; i < cells.length; i++)
-		{
-			//semester[cells[i].getAttribute("semester")] = cells[i].checked;
-			semester.push(cells[i].checked);
-		}
-
-		var studiensemester = $("#studiensemester").val();
-		for(var j=0; j<semester.length; j++)
-		{
-			if(semester[j] === true)
-			{
-				$.ajax({
-					dataType: "json",
-					url: "../../soap/studienordnung.json.php",
-					type: "POST",
-					data: {
-						"method": "saveSemesterZuordnung",
-						"studienordnung_id": global_studienordnung_id,
-						"studiensemester_kurzbz" : studiensemester,
-						"ausbildungssemester": j+1
-					}
-				}).success(function(data)
-				{
-					if(data.error === "true")
-					{
-						alert(data.errormsg);
-					}
-					semesterStoZuordnung();
-				});
-			}
-		}
-	}
-	else
-	{
-		$.ajax({
-			dataType: "json",
-			url: "../../soap/studienordnung.json.php",
-			type: "POST",
-			data: {
-				"method": "saveSemesterZuordnung",
-				"studienordnung_id": global_studienordnung_id,
-				"studiensemester_kurzbz" : studiensemester,
-				"ausbildungssemester": ausbildungssemester
-			}
-		}).success(function(data)
-		{
-			if(data.error === "true")
-			{
-				alert(data.errormsg);
-			}
-			semesterStoZuordnung();
-		});
-	}
 }
 
 
@@ -1598,50 +1528,6 @@ function saveSemesterSTPLZuordnung(studiensemester, ausbildungssemester)
 			semesterSTPLZuordnung();
 		});
 	}
-}
-
-
-function deleteSemesterZuordnung(ausbildungssemester_kurzbz, studiensemester)
-{
-	if(studiensemester == undefined)
-	{
-		var row = $("#row_"+ausbildungssemester_kurzbz);
-		$.ajax({
-			dataType: "json",
-			url: "./saveStudienordnung.php",
-			type: "POST",
-			data: {
-				"typ": "json",
-				"class" : "studienordnung",
-				"method": "deleteSemesterZuordnung",
-				"parameter_0": global_studienordnung_id,
-				"parameter_1" : ausbildungssemester_kurzbz
-			}
-		}).success(function(data)
-		{
-			semesterStoZuordnung();
-		});
-	}
-	else
-	{
-		$.ajax({
-			dataType: "json",
-			url: "./saveStudienordnung.php",
-			type: "POST",
-			data: {
-				"typ": "json",
-				"class" : "studienordnung",
-				"method": "deleteSemesterZuordnung",
-				"parameter_0": global_studienordnung_id,
-				"parameter_1" : ausbildungssemester_kurzbz,
-				"parameter_2" : studiensemester
-			}
-		}).success(function(data)
-		{
-			semesterStoZuordnung();
-		});
-	}
-
 }
 
 

@@ -22,6 +22,7 @@
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>
  *			Andreas Österreicher <andreas.oesterreicher@technikum-wien.at>
+ *          Cristina Hainberger <hainberg@technikum-wien.at>
  */
 
 require_once(dirname(__FILE__).'/basis_db.class.php');
@@ -413,7 +414,7 @@ class studienordnung extends basis_db
 			{
 				$obj = new stdClass();
 
-				$obj->studienordnung_id= $row->studienordnung_id;
+				$obj->studienordnung_id = $row->studienordnung_id;
 				$obj->studiengang_kz	= $row->studiengang_kz;
 				$obj->version			= $row->version;
 				$obj->bezeichnung		= $row->bezeichnung;
@@ -461,113 +462,6 @@ class studienordnung extends basis_db
 	}
 
 	/**
-	 * speichert die Semesterzuordnung für die Studieordnung
-	 * @param int $studienordnung_id Die ID der Studienordnung
-	 * @param string $studiensemester_kurzbz Kurzbezeichnung des Studiensemesters
-	 * @param int $ausbildungssemester Ausbildungssemester als Zahl
-	 */
-	public function saveSemesterZuordnung($studienordnung_id, $studiensemester_kurzbz, $ausbildungssemester)
-	{
-		if(!is_numeric($studienordnung_id))
-		{
-			$this->errormsg = 'studienordnung_id muss eine gueltige Zahl sein';
-			return false;
-		}
-
-		if(!is_string($studiensemester_kurzbz) || strlen($studiensemester_kurzbz)!=6)
-		{
-			$this->errormsg = 'studiensemester_kurzbz muss ein String mit 6 Zeichen sein';
-			return false;
-		}
-
-		if(!is_numeric($ausbildungssemester))
-		{
-			$this->errormsg = 'ausbildungssemester muss eine gueltige Zahl sein';
-			return false;
-		}
-
-		//lvar_dump($this->isZuordnungGuelitg($studiensemester_kurzbz));
-
-		//Prüfung ob Zuordnung im Gültigkeitszeitraum der Studienordnung
-		//if(($studiensemester_kurzbz >= $this->gueltigvon && $studiensemester_kurzbz <= $this->gueltigbis) || ($studiensemester_kurzbz >= $this->gueltigvon && $this->gueltigbis == null))
-		if($this->isZuordnungGuelitg($studiensemester_kurzbz))
-		{
-			//im gültigen Bereich
-			//Prüfung ob Semester schon zugeordnet wurde
-			if(!$this->isSemesterZugeordnet($studienordnung_id, $studiensemester_kurzbz, $ausbildungssemester))
-			{
-				$qry = 'INSERT INTO lehre.tbl_studienordnung_semester (studienordnung_id, studiensemester_kurzbz, semester) VALUES ('.
-					$this->db_add_param($studienordnung_id).', '.
-					$this->db_add_param($studiensemester_kurzbz).', '.
-					$this->db_add_param($ausbildungssemester).');';
-
-				if(!$this->db_query($qry))
-				{
-					$this->errormsg = 'Fehler beim Speichern des Datensatzes';
-					return false;
-				}
-			}
-			else {
-				$this->errormsg = $ausbildungssemester.'. Semester ist bereits zurgeordnet!';
-				return false;
-			}
-		}
-		else
-		{
-			//im ungültigen Bereich
-			$this->errormsg = 'Studiensemester ist nicht im Gültigkeitsbereich der Studienordnung!';
-			return false;
-		}
-		return true;
-	}
-
-	/**
-	 * prüft ob die Semesterzuordnung für die Studieordnung bereits vorhanden ist
-	 * @param int $studienordnung_id Die ID der Studienordnung
-	 * @param string $studiensemester_kurzbz Kurzbezeichnung des Studiensemesters
-	 * @param int $ausbildungssemester Ausbildungssemester als Zahl
-	 */
-	protected function isSemesterZugeordnet($studienordnung_id, $studiensemester_kurzbz, $ausbildungssemester)
-	{
-		if(!is_numeric($studienordnung_id))
-		{
-			$this->errormsg = 'studienordnung_id muss eine gueltige Zahl sein';
-			return false;
-		}
-
-		if(!is_string($studiensemester_kurzbz) || strlen($studiensemester_kurzbz)!=6)
-		{
-			$this->errormsg = 'studiensemester_kurzbz muss ein String mit 6 Zeichen sein';
-			return false;
-		}
-
-		if(!is_numeric($ausbildungssemester))
-		{
-			$this->errormsg = 'ausbildungssemester muss eine gueltige Zahl sein';
-			return false;
-		}
-
-		$qry = 'SELECT * FROM lehre.tbl_studienordnung_semester WHERE
-			studienordnung_id='.$this->db_add_param($studienordnung_id).' AND
-			studiensemester_kurzbz='.$this->db_add_param($studiensemester_kurzbz).' AND
-			semester='.$this->db_add_param($ausbildungssemester).';';
-
-		if($this->db_query($qry))
-		{
-			if($this->db_num_rows() == 1)
-			{
-				return true;
-			}
-			if($this->db_num_rows() == 0)
-			{
-				return false;
-			}
-			return false;
-		}
-		return false;
-	}
-
-	/**
 	 * prüft ob die Studienordnung aktiv ist
 	 * @param int $studienordnung_id Die ID der Studienordnung
 	 * @param string $studiensemester_kurzbz Kurzbezeichnung des Studiensemesters
@@ -581,8 +475,10 @@ class studienordnung extends basis_db
 			return false;
 		}
 
-		$qry = 'SELECT * FROM lehre.tbl_studienordnung_semester WHERE
-			studienordnung_id='.$this->db_add_param($studienordnung_id).';';
+        $qry = 'SELECT 1 FROM lehre.tbl_studienplan_semester 
+            WHERE studienplan_id 
+            IN (SELECT studienplan_id FROM lehre.tbl_studienplan
+                WHERE studienordnung_id ='.$this->db_add_param($studienordnung_id).';'; 
 
 		if($this->db_query($qry))
 		{
@@ -593,98 +489,6 @@ class studienordnung extends basis_db
 			return false;
 		}
 		return false;
-	}
-
-	/**
-	 * lädt alle zugeordneten Semester einer Studienordnung
-	 * @param int $studienordnung_id ID der Studienordnung
-	 */
-	public function loadStudiensemesterFromStudienordnung($studienordnung_id)
-	{
-		if(!is_numeric($studienordnung_id))
-		{
-			$this->errormsg = 'studienordnung_id muss eine gueltige Zahl sein';
-			return false;
-		}
-
-/*		$qry = 'SELECT DISTINCT studiensemester_kurzbz, MAX(semester)
-					FROM lehre.tbl_studienordnung_semester
-					WHERE studienordnung_id='.$this->db_add_param($studienordnung_id).' GROUP BY studiensemester_kurzbz ORDER BY MAX(semester);';
-*/
-		$qry = 'SELECT DISTINCT studiensemester_kurzbz, tbl_studiensemester.start
-				FROM
-					lehre.tbl_studienordnung_semester
-					JOIN public.tbl_studiensemester USING(studiensemester_kurzbz)
-				WHERE studienordnung_id='.$this->db_add_param($studienordnung_id).'
-				ORDER BY tbl_studiensemester.start, studiensemester_kurzbz';
-
-		if(!$this->db_query($qry))
-		{
-			$this->errormsg = 'Fehler bei einer Datenbankabfrage';
-			return false;
-		}
-
-		$data = array();
-		while($row = $this->db_fetch_object())
-		{
-			$obj = new stdClass();
-			$data[] = $row->studiensemester_kurzbz;
-		}
-		return $data;
-	}
-
-	public function loadAusbildungsemesterFromStudiensemester($studienordnung_id, $studiensemester_kurzbz)
-	{
-		$qry = 'SELECT semester
-					FROM lehre.tbl_studienordnung_semester
-					WHERE studienordnung_id='.$this->db_add_param($studienordnung_id).' AND
-						studiensemester_kurzbz='.$this->db_add_param($studiensemester_kurzbz).'
-					ORDER BY semester;';
-
-		if(!$this->db_query($qry))
-		{
-			return false;
-		}
-
-		$data = array();
-		while($row = $this->db_fetch_object())
-		{
-			$data[] = $row->semester;
-		}
-		return $data;
-	}
-
-	public function deleteSemesterZuordnung($studienordnung_id, $studiensemester_kurzbz, $studiensemester=NULL)
-	{
-		if(!is_numeric($studienordnung_id))
-		{
-			$this->errormsg = 'studienordnung_id muss eine gueltige Zahl sein';
-			return false;
-		}
-
-		if(!is_string($studiensemester_kurzbz) || strlen($studiensemester_kurzbz)!=6)
-		{
-			$this->errormsg = 'studiensemester_kurzbz muss ein String mit 6 Zeichen sein';
-			return false;
-		}
-
-		$qry = 'DELETE FROM lehre.tbl_studienordnung_semester
-					WHERE studienordnung_id='.$this->db_add_param($studienordnung_id).' AND
-						studiensemester_kurzbz='.$this->db_add_param($studiensemester_kurzbz).'';
-		if($studiensemester !== null)
-			$qry.=' AND semester='.$this->db_add_param ($studiensemester).'';
-
-		$qry.=';';
-
-		if($this->db_query($qry))
-		{
-			return true;
-		}
-		else
-		{
-			$this->errormsg = 'Fehler beim Löschen der Daten'."\n";
-			return false;
-		}
 	}
 
 	protected function isZuordnungGuelitg($studiensemester_kurzbz)

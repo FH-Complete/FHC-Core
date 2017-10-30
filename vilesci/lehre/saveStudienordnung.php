@@ -77,7 +77,6 @@ $error=false;
 // Bei Save Funktionen werden alle Parameter zugewiesen
 if(mb_stristr($method,'save'))
 {
-
 	$loaddata=json_decode($_REQUEST['loaddata'], true);
 	$savedata=json_decode($_REQUEST['savedata'], true);
 	if(!$rechte->isBerechtigt('lehre/studienordnung'))
@@ -158,7 +157,6 @@ elseif(mb_stristr($method,'delete'))
 	    $studienplan->loadStudienplanLehrveranstaltung($_REQUEST['parameter_0']);
 	    $studienordnung = new studienordnung();
 	    $studienordnung->getStudienordnungFromStudienplan($studienplan->studienplan_id);
-
 	    if($studienordnung->isAktiv($studienordnung->studienordnung_id))
 		die('Sie haben keine Berechtigung fuer diesen Vorgang. Studienordnung ist aktiv.');
 	}

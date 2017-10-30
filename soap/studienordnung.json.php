@@ -38,25 +38,6 @@ switch($method)
 			$data['errormsg']=$studienordnung->errormsg;
 		}
 		break;
-	case 'saveSemesterZuordnung':
-		$studienordnung_id=$_REQUEST['studienordnung_id'];
-		$studiensemester_kurzbz=$_REQUEST['studiensemester_kurzbz'];
-		$ausbildungssemester=$_REQUEST['ausbildungssemester'];
-
-		$studienordnung = new studienordnung();
-		$studienordnung->loadStudienordnung($studienordnung_id);
-		if($result = $studienordnung->saveSemesterZuordnung($studienordnung_id, $studiensemester_kurzbz, $ausbildungssemester))
-		{
-			$data['result']=$result;
-			$data['error']='false';
-			$data['errormsg']='';
-		}
-		else
-		{
-			$data['error']='true';
-			$data['errormsg']=$studienordnung->errormsg;
-		}
-		break;
 	case 'copyStudienordnung':
 			$studienordnung_id=$_REQUEST['studienordnung_id'];
 
