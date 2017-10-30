@@ -47,7 +47,7 @@ switch($work)
 		if(isset($_POST['id']))
 			$id=$_POST['id'];
 		else
-			die('RessourceID Missing');
+			die('RessourceID Missing');      
 		if(isset($_POST['typ']))
 			$typ=$_POST['typ'];
 		else
@@ -62,7 +62,7 @@ switch($work)
 	
 		if($coodle->ersteller_uid!=$user)
 			die('Diese Aktion ist nur durch den Ersteller der Umfrage möglich');
-
+        
 		$uid='';
 		$ort='';
 		$email='';
@@ -74,7 +74,7 @@ switch($work)
 			case 'Person': $uid = $id; break;
 			case 'Extern': 
 				$email = $id; 
-				$name=$bezeichnung; 
+				$name = $bezeichnung; 
 				break;
 			case 'Gruppe': $gruppe_kurzbz = $id; break;
 			default: die('Ungueltiger Typ:'.$typ); break;
@@ -85,14 +85,14 @@ switch($work)
 			$gruppe = new gruppe();
 			if(!$gruppe->loadUser($gruppe_kurzbz))
 				die('Fehler: '.$gruppe->errormsg);
-			
+            	
 			foreach($gruppe->result as $row)
 			{
 				$coodle->coodle_id = $coodle_id;
 				$coodle->uid = $row->uid;
 				$coodle->ort_kurzbz = $ort;
-				$coodle->email = $email;
-				$coodle->name = $name;
+				$coodle->email = $row->uid .'@'.DOMAIN;
+				$coodle->name = $row->vorname . ' ' . $row->nachname;
 				$coodle->zugangscode = uniqid();
 				$coodle->insertamum = date('Y-m-d H:i:s');
 				$coodle->insertvon = $user;
@@ -114,18 +114,26 @@ switch($work)
 		{
 			if($coodle->RessourceExists($coodle_id, $uid, $ort, $email))
 				die('Ressource ist bereits zugeteilt');
-	
+                 
 			$coodle->coodle_id = $coodle_id;
 			$coodle->uid = $uid;
-			$coodle->ort_kurzbz = $ort;
-			$coodle->email = $email;
-			$coodle->name = $name;
+			$coodle->ort_kurzbz = $ort;  
+            if ($typ == 'Person')
+            {
+                $coodle->email = $uid.'@'.DOMAIN;
+                $coodle->name = implode(' ', array_reverse(explode(' ', $bezeichnung)));
+            }
+            if ($typ == 'Extern')
+            {
+                $coodle->email = $email;
+                $coodle->name = $bezeichnung;
+            }
 			$coodle->zugangscode = uniqid();
 			$coodle->insertamum = date('Y-m-d H:i:s');
 			$coodle->insertvon = $user;
 			$coodle->updateamum = date('Y-m-d H:i:s');
 			$coodle->updatevon = $user;
-	
+            
 			if($coodle->saveRessource(true))
 				echo 'true';
 			else

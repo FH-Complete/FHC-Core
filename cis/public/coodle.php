@@ -121,9 +121,9 @@ if(isset ($_POST['save']))
 	{
 		$coodle_help->load($coodle_id);
 		// email an ersteller senden wenn option aktiviert
-		if ($coodle_help->mailversand)
+		if ($coodle_help->mailversand && (!isset($_POST['auswahl_termin'])))
 			sendBenachrichtigung($coodle_id,$teilnehmer_uid);
-			
+		
 		$saveOk=true;
 	}
 }
@@ -665,7 +665,10 @@ echo '<br><br>
  */
 function sendBenachrichtigung($coodle_id,$teilnehmer_id)
 {
+    global $uid;
+    global $coodle;
 	$coodle_send = new coodle(); 
+    
 	if(!$coodle_send->load($coodle_id))
 	{
 		die("Fehler beim senden aufgetreten");
@@ -686,7 +689,7 @@ function sendBenachrichtigung($coodle_id,$teilnehmer_id)
 	}
 	$mitarbeiter->load($coodle_send->ersteller_uid); 
 	$person->load($mitarbeiter->person_id);
-	
+    	
 	$email = '';
 	
 	$name = ''; 
@@ -699,13 +702,14 @@ function sendBenachrichtigung($coodle_id,$teilnehmer_id)
 		$email.= 'Sehr geehrte Frau '.$name."!<br><br>";
 	else
 		$email.="Sehr geehrter Herr ".$name."!<br><br>";
-	
-	$email.= $tn." hat einen Termin Ihrer Coodle-Umfrage ausgewählt<br><a href='".APP_ROOT."cis/private/coodle/uebersicht.php'>Link zu Ihrer Coodle Übersicht</a><br><br>Mit freundlichen Grüßen <br><br>
+
+    $link = APP_ROOT.'cis/public/coodle.php?coodle_id='.urlencode($coodle_id).'&uid='.urlencode($uid);     
+	$email.= $tn.' hat einen Termin zu Ihrer Coodle-Umfrage mit dem Thema "'.$coodle->titel.'" ausgewählt.<br><a href="'.$link.'">Link zu Ihrer Coodle Umfrage</a><br><br>Mit freundlichen Grüßen <br><br>
 		Fachhochschule Technikum Wien<br>
 		Höchstädtplatz 6<br>
-		1200 Wien"; 
+		1200 Wien'; 
 	
-	$mail = new mail($coodle_send->ersteller_uid.'@'.DOMAIN, 'no-reply', 'Coodle Umfrage', 'Bitte sehen Sie sich die Nachricht in HTML Sicht an, um den Link vollständig darzustellen.');
+	$mail = new mail($coodle_send->ersteller_uid.'@'.DOMAIN, 'no-reply', 'Feedback zu Ihrer Coodle Umfrage "' . $coodle->titel . '"', 'Bitte sehen Sie sich die Nachricht in HTML Sicht an, um den Link vollständig darzustellen.');
 	$mail->setHTMLContent($email); 
 	if(!$mail->send())
 		die("Fehler beim senden des Mails aufgetreten");	

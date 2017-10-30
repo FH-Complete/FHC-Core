@@ -567,6 +567,7 @@ class coodle extends basis_db
      */
     public function getRessourceFromUser($coodle_id, $uid='', $zugangscode='')
     {
+
         $qry ="SELECT * FROM campus.tbl_coodle_ressource
             WHERE coodle_id =".$this->db_add_param($coodle_id, FHC_INTEGER, false); 
         
@@ -575,36 +576,34 @@ class coodle extends basis_db
         
         if ($zugangscode != '')
             $qry.= " AND zugangscode = ".$this->db_add_param($zugangscode, FHC_STRING, false);
-
         $qry.= ';';
 
-        if($result = $this->db_query($qry))
+        if(!$this->db_query($qry))
         {
-            if($row = $this->db_fetch_object($result))
-            {
-                $this->coodle_ressource_id =  $row->coodle_ressource_id;
-                $this->coodle_id = $row->coodle_id; 
-                $this->uid = $row->uid; 
-                $this->ort_kurzbz = $row->ort_kurzbz; 
-                $this->email = $row->email; 
-                $this->name = $row->name; 
-                $this->zugangscode = $row->zugangscode; 
-                $this->insertamum = $row->insertamum; 
-                $this->insertvon = $row->insertvon; 
-                $this->updateamum = $row->updateamum; 
-                $this->updatevon = $row->updatevon; 
-            }
-            else
-            {
-                return false; 
-            }
-            return true; 
+          $this->errormsg = 'Fehler bei einer Datenbankabfrage';
+            return false;  
+        }  
+           
+        if ($row = $this->db_fetch_object())
+        {
+            $this->coodle_ressource_id  = $row->coodle_ressource_id;
+            $this->coodle_id            = $row->coodle_id; 
+            $this->uid                  = $row->uid; 
+            $this->ort_kurzbz           = $row->ort_kurzbz; 
+            $this->email                = $row->email; 
+            $this->name                 = $row->name; 
+            $this->zugangscode          = $row->zugangscode; 
+            $this->insertamum           = $row->insertamum; 
+            $this->insertvon            = $row->insertvon; 
+            $this->updateamum           = $row->updateamum; 
+            $this->updatevon            = $row->updatevon; 
         }
         else
         {
             $this->errormsg = "Fehler bei der Abfrage aufgetreten";
             return false; 
-        }
+        }       
+        return true;             
     }
     
     /**
