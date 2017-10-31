@@ -3923,6 +3923,8 @@ if(!$error)
 			$errormsg  = 'Fehlerhafte Parameteruebergabe';
 		}
 	}
+    
+    //******** AUFNAHMETERMINE *****
 	elseif(isset($_POST['type']) && $_POST['type']=='AufnahmeTermineSave')  // **** AufnahmeTermine **** //
 	{
 		//Speichert einen Aufnahmetermin einer Person
@@ -3956,6 +3958,9 @@ if(!$error)
 					$studienplan_id = $_POST['studienplan_id'];
 
 					$reihungstest = new reihungstest();
+                    
+                    echo 'CRIS: date: ' . date('Y-m-d H:i:s');
+                    echo 'CRIS: now(): ' . now();
 					if($rt_person_id!='')
 					{
 						$reihungstest->loadReihungstestPerson($rt_person_id);
@@ -3989,7 +3994,9 @@ if(!$error)
 					$reihungstest->teilgenommen = $teilgenommen;
 					$reihungstest->anmeldedatum = $anmeldedatum;
 					$reihungstest->studienplan_id = $studienplan_id;
-
+                    ($reihungstest->new) ? $reihungstest->insertamum = date('Y-m-d H:i:s'): $reihungstest->updateamum = date('Y-m-d H:i:s');
+                    ($reihungstest->new) ? $reihungstest->insertvon = $user : $reihungstest->updatevon = $user;
+                    
 					if($reihungstest->savePersonReihungstest())
 					{
 						$return = true;
