@@ -3959,11 +3959,9 @@ if(!$error)
 
 					$reihungstest = new reihungstest();
                     
-                    echo 'CRIS: date: ' . date('Y-m-d H:i:s');
-                    echo 'CRIS: now(): ' . now();
 					if($rt_person_id!='')
 					{
-						$reihungstest->loadReihungstestPerson($rt_person_id);
+						$reihungstest->loadReihungstestPerson($rt_person_id);                     
 					}
 					else
 					{
@@ -3996,7 +3994,7 @@ if(!$error)
 					$reihungstest->studienplan_id = $studienplan_id;
                     ($reihungstest->new) ? $reihungstest->insertamum = date('Y-m-d H:i:s'): $reihungstest->updateamum = date('Y-m-d H:i:s');
                     ($reihungstest->new) ? $reihungstest->insertvon = $user : $reihungstest->updatevon = $user;
-                    
+                                                      
 					if($reihungstest->savePersonReihungstest())
 					{
 						$return = true;
@@ -4141,7 +4139,7 @@ if(!$error)
 			$return = false;
 			$errormsg  = 'Fehlerhafte Parameteruebergabe';
 		}
-	}
+	}    
 	elseif(isset($_POST['type']) && $_POST['type']=='AufnahmeTermineBerechneGesamtpunkte')
 	{
 		//Speichert einen Aufnahmetermin einer Person

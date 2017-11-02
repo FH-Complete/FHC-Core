@@ -19,6 +19,7 @@
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>
  *          Manfred Kindl		< manfred.kindl@technikum-wien.at >
+ *          Cristina Hainberger <hainberg@technikum-wien.at>
  */
 /**
  * Klasse Reihungstest
@@ -557,6 +558,10 @@ class reihungstest extends basis_db
 				$this->teilgenommen = $this->db_parse_bool($row->teilgenommen);
 				$this->ort_kurzbz = $row->ort_kurzbz;
 				$this->punkte = $row->punkte;
+                $this->insertamum = $row->insertamum;
+                $this->insertvon = $row->insertvon;
+                $this->updateamum =$row->updateamum;
+                $this->updatevon = $row->updatevon;
 				$this->new = false;
 				return true;
 			}
@@ -600,6 +605,10 @@ class reihungstest extends basis_db
 				$obj->teilgenommen = $this->db_parse_bool($row->teilgenommen);
 				$obj->ort_kurzbz = $row->ort_kurzbz;
 				$obj->punkte = $row->punkte;
+                $obj->insertamum = $row->insertamum;
+                $obj->insertvon = $row->insertvon;
+                $obj->updateamum =$row->updateamum;
+                $obj->updatevon = $row->updatevon;
 
 				$this->result[] = $obj;
 			}
@@ -639,6 +648,11 @@ class reihungstest extends basis_db
 				$this->teilgenommen = $this->db_parse_bool($row->teilgenommen);
 				$this->ort_kurzbz = $row->ort_kurzbz;
 				$this->punkte = $row->punkte;
+                $this->insertamum = $row->insertamum;
+                $this->insertvon = $row->insertvon;
+                $this->updateamum =$row->updateamum;
+                $this->updatevon = $row->updatevon;
+                
 				return true;
 			}
 			else
@@ -683,6 +697,10 @@ class reihungstest extends basis_db
 				$obj->teilgenommen = $this->db_parse_bool($row->teilgenommen);
 				$obj->ort_kurzbz = $row->ort_kurzbz;
 				$obj->punkte = $row->punkte;
+                $obj->insertamum = $row->insertamum;
+                $obj->insertvon = $row->insertvon;
+                $obj->updateamum =$row->updateamum;
+                $obj->updatevon = $row->updatevon;
 
 				$this->result[] = $obj;
 			}
@@ -704,14 +722,16 @@ class reihungstest extends basis_db
 		if ($this->new)
 		{
 			$qry = "BEGIN;INSERT INTO public.tbl_rt_person(person_id, rt_id, studienplan_id, anmeldedatum,
-				teilgenommen, ort_kurzbz, punkte) VALUES(".
+				teilgenommen, ort_kurzbz, punkte, insertamum, insertvon) VALUES(".
 				$this->db_add_param($this->person_id, FHC_INTEGER).','.
 				$this->db_add_param($this->reihungstest_id, FHC_INTEGER).','.
 				$this->db_add_param($this->studienplan_id, FHC_INTEGER).','.
 				$this->db_add_param($this->anmeldedatum).','.
 				$this->db_add_param($this->teilgenommen, FHC_BOOLEAN).','.
 				$this->db_add_param($this->ort_kurzbz).','.
-				$this->db_add_param($this->punkte).');';
+				$this->db_add_param($this->punkte).','.
+                $this->db_add_param($this->insertamum).','.
+                $this->db_add_param($this->insertvon).');';
 		}
 		else
 		{
@@ -721,8 +741,10 @@ class reihungstest extends basis_db
 			' anmeldedatum='.$this->db_add_param($this->anmeldedatum).','.
 			' teilgenommen='.$this->db_add_param($this->teilgenommen, FHC_BOOLEAN).','.
 			' ort_kurzbz='.$this->db_add_param($this->ort_kurzbz).','.
-			' punkte='.$this->db_add_param($this->punkte).' '.
-			' WHERE rt_person_id='.$this->db_add_param($this->rt_person_id, FHC_INTEGER);
+			' punkte='.$this->db_add_param($this->punkte).','.
+            ' updateamum='.$this->db_add_param($this->updateamum).','.
+            ' updatevon='.$this->db_add_param($this->updatevon).' '.
+			' WHERE rt_person_id='.$this->db_add_param($this->rt_person_id, FHC_INTEGER).';';
 		}
 
 		if ($this->db_query($qry))
@@ -1119,6 +1141,10 @@ class reihungstest extends basis_db
 				$obj->teilgenommen = $this->db_parse_bool($row->teilgenommen);
 				$obj->ort_kurzbz = $row->ort_kurzbz;
 				$obj->punkte = $row->punkte;
+                $obj->insertamum = $row->insertamum;
+                $obj->insertvon = $row->insertvon;
+                $obj->updateamum =$row->updateamum;
+                $obj->updatevon = $row->updatevon;
 
 				$this->result[] = $obj;
 

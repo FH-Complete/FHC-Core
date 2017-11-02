@@ -96,6 +96,8 @@ if(isset($_POST['zusammenlegen']))
 					$neuzuteilung->rt_id = $load_rt_person->rt_id;
 					$neuzuteilung->person_id = $neuzuteilung->person_id;
 					$neuzuteilung->ort_kurzbz = $neuzuteilung->ort_kurzbz;
+                    $neuzuteilung->updateamum = date('Y-m-d H:i:s');
+                    $neuzuteilung->updatevon = $uid;
 
 					if (!$neuzuteilung->savePersonReihungstest())
 					{

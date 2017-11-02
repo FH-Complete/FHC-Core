@@ -261,6 +261,9 @@ function addReihungstestPerson($row, $reihungstest_id, $punkte, $studienplan_id)
 		$rt_obj->teilgenommen = ($row->reihungstestangetreten == 't'?true:false);
 		$rt_obj->punkte = $punkte;
 		$rt_obj->new = true;
+        $rt_obj->insertamum = date('Y-m-d H:i:s');
+        $rt_obj->insertvon = $uid;
+        
 		if (!$rt_obj->savePersonReihungstest())
 		{
 			return 'Fehler beim Eintragen der RT-Zuordnung'.$rt_obj->errormsg;

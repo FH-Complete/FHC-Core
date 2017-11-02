@@ -16,6 +16,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
  * Authors: Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>,
+ *          Cristina Hainberger <hainberg@technikum-wien.at>
  *
  * Beschreibung:
  * Dieses Skript prueft die Datenbank auf aktualitaet, dabei werden fehlende Attribute angelegt.
@@ -462,6 +463,51 @@ if ($result = @$db->db_query("SELECT conname FROM pg_constraint WHERE conname = 
 	}
 }
 
+// ADD COLUMN insertamum to public.tbl_rt_person
+if(!@$db->db_query("SELECT insertamum FROM public.tbl_rt_person LIMIT 1"))
+{
+	$qry = "ALTER TABLE public.tbl_rt_person ADD COLUMN insertamum timestamp DEFAULT now();";
+
+	if(!$db->db_query($qry))
+		echo '<strong>public.tbl_rt_person '.$db->db_last_error().'</strong><br>';
+    else
+        echo '<br>Spalte insertamum in public.tbl_rt_person hinzugefügt';
+}
+
+// ADD COLUMN insertvon to public.tbl_rt_person
+if(!@$db->db_query("SELECT insertvon FROM public.tbl_rt_person LIMIT 1"))
+{
+	$qry = "ALTER TABLE public.tbl_rt_person ADD COLUMN insertvon varchar(32);";
+
+	if(!$db->db_query($qry))
+		echo '<strong>public.tbl_rt_person '.$db->db_last_error().'</strong><br>';
+    else
+        echo '<br>Spalte insertvon in public.tbl_rt_person hinzugefügt';
+}
+
+// ADD COLUMN updateamum to public.tbl_rt_person
+if(!@$db->db_query("SELECT updateamum FROM public.tbl_rt_person LIMIT 1"))
+{
+	$qry = "ALTER TABLE public.tbl_rt_person ADD COLUMN updateamum timestamp DEFAULT now();";
+
+	if(!$db->db_query($qry))
+		echo '<strong>public.tbl_rt_person '.$db->db_last_error().'</strong><br>';
+    else
+        echo '<br>Spalte updateamum in public.tbl_rt_person hinzugefügt';
+}
+
+// ADD COLUMN updatevon to public.tbl_rt_person
+if(!@$db->db_query("SELECT updatevon FROM public.tbl_rt_person LIMIT 1"))
+{
+	$qry = "ALTER TABLE public.tbl_rt_person ADD COLUMN updatevon varchar(32);";
+       
+	if(!$db->db_query($qry))
+		echo '<strong>public.tbl_rt_person '.$db->db_last_error().'</strong><br>';
+    else
+        echo '<br>Spalte updatevon in public.tbl_rt_person hinzugefügt';
+}
+
+
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
 
@@ -673,7 +719,7 @@ $tabellen=array(
 	"public.tbl_raumtyp"  => array("raumtyp_kurzbz","beschreibung","kosten"),
 	"public.tbl_reihungstest"  => array("reihungstest_id","studiengang_kz","ort_kurzbz","anmerkung","datum","uhrzeit","updateamum","updatevon","insertamum","insertvon","ext_id","freigeschaltet","max_teilnehmer","oeffentlich","studiensemester_kurzbz","aufnahmegruppe_kurzbz","stufe","anmeldefrist"),
 	"public.tbl_rt_ort" => array("rt_id","ort_kurzbz","uid"),
-	"public.tbl_rt_person" => array("rt_person_id","person_id","rt_id","studienplan_id","anmeldedatum","teilgenommen","ort_kurzbz","punkte"),
+	"public.tbl_rt_person" => array("rt_person_id","person_id","rt_id","studienplan_id","anmeldedatum","teilgenommen","ort_kurzbz","punkte","insertamum","insertvon","updateamum","updatevon"),
 	"public.tbl_rt_studienplan" => array("reihungstest_id","studienplan_id"),
 	"public.tbl_status"  => array("status_kurzbz","beschreibung","anmerkung","ext_id","bezeichnung_mehrsprachig"),
 	"public.tbl_status_grund" => array("statusgrund_id","status_kurzbz","aktiv","bezeichnung_mehrsprachig","beschreibung"),

@@ -177,6 +177,8 @@ if(isset($_POST['personzuteilen']))
 				$rt_obj->teilgenommen = false;
 				$rt_obj->ort_kurzbz = null;
 				$rt_obj->punkte = null;
+                ($rt_obj->new) ? $rt_obj->insertamum = date('Y-m-d H:i:s'): $rt_obj->updateamum = date('Y-m-d H:i:s');
+                ($rt_obj->new) ? $rt_obj->insertvon = $user : $rt_obj->updatevon = $user;
 
 				if($rt_obj->savePersonReihungstest())
 					echo '<span class="ok">Zuteilung gespeichert</span>';

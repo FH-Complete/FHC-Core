@@ -1093,6 +1093,8 @@ if(isset($_POST['raumzuteilung_speichern']))
 					$raumzuteilung->reihungstest_id = $load_person->reihungstest_id;
 					$raumzuteilung->person_id = $key;
 					$raumzuteilung->ort_kurzbz = $_POST['raumzuteilung'];
+                    $raumzuteilung->updateamum = date('Y-m-d H:i:s');
+                    $raumzuteilung->updatevon = $user;
 				}
 				else
 					die('PersonID '.$key.' hat keine korrekte Zuordnung -> Abbruch');
@@ -1121,6 +1123,8 @@ if(isset($_GET['type']) && $_GET['type']=='savertpunkte')
 		$rtperson->punkte = str_replace(',','.',$rtpunkte);
 		$rtperson->new = false;
 		$rtperson->teilgenommen = true;
+        $rtperson->updateamum = date('Y-m-d H:i:s');
+        $rtperson->updatevon = $user;
 		if(!$rtperson->savePersonReihungstest())
 		{
 			echo '<span class="error">Fehler:'.$rtperson->errormsg.'</span>';
@@ -1179,6 +1183,8 @@ if(isset($_GET['type']) && $_GET['type']=='saveallrtpunkte')
 						$reihungstest->teilgenommen = true;
 						$reihungstest->save(false);
 						$reihungstest->new = false;
+                        $reihungstest->updateamum = date('Y-m-d H:i:s');
+                        $reihungstest->updatevon = $user;
 
 						if(!$reihungstest->savePersonReihungstest())
 						{
@@ -1263,6 +1269,8 @@ if(isset($_GET['type']) && $_GET['type']=='verteilen')
 								$raumzuteilung->reihungstest_id = $load_person->reihungstest_id;
 								$raumzuteilung->person_id = $row->person_id;
 								$raumzuteilung->ort_kurzbz = $ort->ort_kurzbz;
+                                $raumzuteilung->updateamum = date('Y-m-d H:i:s');
+                                $raumzuteilung->updatevon = $user;
 							}
 							else
 							{
@@ -1352,6 +1360,8 @@ if(isset($_GET['type']) && $_GET['type']=='auffuellen')
 						$raumzuteilung->reihungstest_id = $load_person->reihungstest_id;
 						$raumzuteilung->person_id = $row->person_id;
 						$raumzuteilung->ort_kurzbz = $ort->ort_kurzbz;
+                        $raumzuteilung->updateamum = date('Y-m-d H:i:s');
+                        $raumzuteilung->updatevon = $user;
 					}
 					else
 						die('Personen zuteilung nicht gefunden');
