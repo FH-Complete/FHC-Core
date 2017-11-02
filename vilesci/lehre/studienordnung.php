@@ -52,7 +52,6 @@ echo '<!DOCTYPE html>
 	<script type="text/javascript" src="../../vendor/jquery/jqueryV1/jquery-1.12.4.min.js"></script>
 	<script type="text/javascript" src="../../vendor/christianbach/tablesorter/jquery.tablesorter.min.js"></script>
 	<script type="text/javascript" src="../../vendor/components/jqueryui/jquery-ui.min.js"></script>
-	<script type="text/javascript" src="../../include/js/jquery.ui.datepicker.translation.js"></script>
 	<script>var jqUi = jQuery.noConflict(true);</script>
 	<script type="text/javascript" src="../../include/js/jstree/_lib/jquery.js"></script>
 	<!-- Script zum erstellen des Trees-->
