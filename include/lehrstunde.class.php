@@ -360,6 +360,36 @@ class lehrstunde extends basis_db
 			else
 				$num_rows_einheit=$this->db_num_rows($result_einheit);
 		}
+		// Bei Lektoren auch Spezialgruppen wegen Reservierungen abfragen
+		if ($type == 'lektor')
+		{
+			if (is_null($this->ss))
+			{
+				$studiensemester_obj = new studiensemester();
+				$this->ss = $studiensemester_obj->getSemesterFromDatum($datum_von,true);
+				$this->ssnext = $studiensemester_obj->getNearestTo($this->ss,$datum_von);
+			}
+			if(!isset($this->ssnext))
+				$this->ssnext = $this->ss;
+			// Spezialgruppen ermitteln zu denen die Person zugeteilt ist
+			$sql_query="SELECT
+							gruppe_kurzbz
+						FROM
+							public.tbl_benutzergruppe
+						WHERE
+							uid=".$this->db_add_param($uid)."
+							AND (studiensemester_kurzbz=".$this->db_add_param($this->ss)."
+								OR studiensemester_kurzbz=".$this->db_add_param($this->ssnext)."
+								OR studiensemester_kurzbz IS NULL)";
+			
+			if (!$result_einheit=$this->db_query($sql_query))
+			{
+				$this->errormsg=$this->db_last_error($this->conn);
+				return false;
+			}
+			else
+				$num_rows_einheit=$this->db_num_rows($result_einheit);
+		}
 
 		// Stundenplandaten ermitteln
 		// Abfrage generieren
@@ -375,7 +405,17 @@ class lehrstunde extends basis_db
 			if ($type == 'lva')
 				$sql_query_lva=" AND lehrveranstaltung_id=".$this->db_add_param($lva);
 			elseif ($type=='lektor')
-				$sql_query.=" AND uid=".$this->db_add_param($uid);
+			{
+				$sql_query.=" AND (";
+				$sql_query.=" uid=".$this->db_add_param($uid);
+				//Reservierungen mit Spezialgruppen laden
+				for ($i=0;$i<$num_rows_einheit;$i++)
+				{
+					$row=$this->db_fetch_object($result_einheit,$i);
+					$sql_query.=" OR gruppe_kurzbz=".$this->db_add_param($row->gruppe_kurzbz);
+				}
+				$sql_query.=')';
+			}
 			elseif ($type=='ort' && $ort_kurzbz != 'all')
 				$sql_query.=" AND ort_kurzbz=".$this->db_add_param($ort_kurzbz);
 			elseif ($type=='ort' && $ort_kurzbz == 'all')
