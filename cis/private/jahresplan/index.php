@@ -274,7 +274,7 @@ if (!$veranstaltungskategorie=$Jahresplan->loadVeranstaltungskategorie())
 			{
 				echo '
 				<td style="width:100%; text-align:right">
-					<a href="../../../cms/content.php?content_id='.$p->t("dms_link/veranstaltungsleitfaden").'">'.$p->t("eventkalender/veranstaltungsleitfaden").'</a>
+					<a href="../../../cms/dms.php?id='.$p->t("dms_link/eventanfrage").'">'.$p->t("eventkalender/eventanfrage").'</a>
 				</td>';
 			}
 			?>

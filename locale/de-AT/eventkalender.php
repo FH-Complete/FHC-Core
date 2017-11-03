@@ -12,6 +12,7 @@ $this->phrasen['eventkalender/alleKategorien']='alle Kategorien';
 $this->phrasen['eventkalender/ID']='ID';
 $this->phrasen['eventkalender/suche']='Suche';
 $this->phrasen['eventkalender/veranstaltungsleitfaden']='Veranstaltungsleitfaden';
+$this->phrasen['eventkalender/eventanfrage']='Formular Eventanfrage';
 $this->phrasen['eventkalender/uhrzeit']='Uhrzeit';
 $this->phrasen['eventkalender/veranstaltungsdetailID']='Veranstaltungsdetail ID';
 $this->phrasen['eventkalender/veranstaltungsID']='Veranstaltungs ID';

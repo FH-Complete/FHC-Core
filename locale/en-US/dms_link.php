@@ -16,12 +16,13 @@ $this->phrasen['dms_link/berechtigungskonzeptMailverteiler']='1475'; //Berechtig
 $this->phrasen['dms_link/handbuchUrlaubsverwaltung']='759'; //Handbuch Urlaubsverwaltung
 $this->phrasen['dms_link/handbuchZeitaufzeichnung']='1545'; //Handbuch Zeitaufzeichnung -> Leer lassen, falls es keines gibt
 $this->phrasen['dms_link/fiktiveNormalarbeitszeit']='2512'; //fiktive Normalarbeitszeit -> Leer lassen, falls es keines gibt
-$this->phrasen['dms_link/learningAgreementErasmus']='38935'; //Learning Agreement Incomings Erasmus
+$this->phrasen['dms_link/learningAgreementErasmus']='29266'; //Learning Agreement Incomings Erasmus
 $this->phrasen['dms_link/learningAgreement']='38866'; //Learning Agreement Incomings NICHT Erasmus
 
 // Content IDs (=Deutsch)
 $this->phrasen['dms_link/lvPlanFAQ']='6887'; //Hilfe-Link aus dem LV-Plan in die LV-Plan FAQ auf der CIS (CMS-ID)
 $this->phrasen['dms_link/veranstaltungsleitfaden']='133'; //Link zum Veranstaltungsleitfaden aus dem Eventkalender (CMS-ID)
+$this->phrasen['dms_link/eventanfrage']='29253'; //Link zum Formular fuer Eventanfragen
 $this->phrasen['dms_link/bildRichtlinien']='6174'; //Link zu den Bild Richtlinen zB bei Bildupload im Profil (CMS-ID)
 $this->phrasen['dms_link/sicherheitAnDerFHTW']='6765'; //Link zum Hauptpunkt "Sicherheit an der FHTW" aus dem Ersthelfer-Skript
 $this->phrasen['dms_link/lvplanSyncFAQ']='7188'; //Link zur Anleitung zur Kalender Abbonierung
