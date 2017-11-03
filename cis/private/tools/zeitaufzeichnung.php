@@ -50,12 +50,13 @@ if (!$db = new basis_db())
 
 $user = get_uid();
 
+$rechte = new benutzerberechtigung();
+$rechte->getBerechtigungen($user);
+
 //Wenn User Administrator ist und UID uebergeben wurde, dann die Zeitaufzeichnung
 //des uebergebenen Users anzeigen
 if(isset($_GET['uid']))
 {
-	$rechte = new benutzerberechtigung();
-	$rechte->getBerechtigungen($user);
 	if($rechte->isBerechtigt('admin') || $rechte->isBerechtigt('mitarbeiter/urlaube', null, 'suid'))
 	{
 		$user = $_GET['uid'];
@@ -65,9 +66,7 @@ if(isset($_GET['uid']))
 		die($p->t('global/FuerDieseAktionBenoetigenSieAdministrationsrechte'));
 	}
 }
-$rechteexport = new benutzerberechtigung();
-$rechteexport->getBerechtigungen($user);
-if($rechteexport->isBerechtigt('addon/casetimeGenerateXLS'))
+if($rechte->isBerechtigt('addon/casetimeGenerateXLS'))
 	$export_xls = 'true';
 else {
 	$export_xls = 'false';
@@ -75,7 +74,15 @@ else {
 
 $datum = new datum();
 
-if (check_infrastruktur($user))
+$fieldheadings = array(
+	'id' => $p->t("zeitaufzeichnung/id"), 'user' => $p->t("zeitaufzeichnung/user"), 'projekt' => $p->t("zeitaufzeichnung/projekt"),
+	'oe1' => $p->t("zeitaufzeichnung/oe").'1', 'oe2' => $p->t("zeitaufzeichnung/oe").'2', 'aktivitaet' => $p->t("zeitaufzeichnung/aktivitaet"),
+	'service' => $p->t("zeitaufzeichnung/service"), 'start' => $p->t("zeitaufzeichnung/start"), 'ende' => $p->t("zeitaufzeichnung/ende"),
+	'dauer' => $p->t("zeitaufzeichnung/dauer"), 'kunde' => $p->t("zeitaufzeichnung/kunde"), 'beschreibung' => $p->t("global/beschreibung"), 'aktion' => $p->t("global/aktion"),
+	'datum' => $p->t("global/datum")
+);
+
+if ($rechte->isBerechtigt('basis/servicezeitaufzeichnung'))
 {
 	$za_simple = 0;
 	$activities = 	array('Design', 'Operativ', 'Betrieb',  'Pause', 'LehreIntern', 'LehreExtern', 'Arztbesuch', 'Dienstreise', 'Behoerde');
@@ -132,7 +139,7 @@ if(isset($_POST['export']))
 		$datevon = $datum->formatDatum($_POST['exp_von_datum'], 'Y-m-d');
 		$datebis = $datum->formatDatum($_POST['exp_bis_datum'], 'Y-m-d');
 		$ztauf = getZeitaufzeichnung( $user, $datevon, $datebis);
-		exportAsCSV($ztauf->result, ',', $za_simple, $user);
+		exportAsCSV($ztauf->result, ',', $fieldheadings, $za_simple, $user);
 	}
 }
 
@@ -1028,28 +1035,15 @@ if($projekt->getProjekteMitarbeiter($user, true))
 		{
 			//Uebersichtstabelle
 			$woche=date('W');
+			$colspan=($za_simple)?10:13;
 			echo '
 			<table id="t1" class="" style="width:100%">
 
 					<tr>
-						<th style="background-color: #8DBDD8;" align="center" class="{sorter: false}" colspan="13">'.$p->t("eventkalender/kw").' '.$woche.'</th>
-					</tr>
-					<tr>
-						<th style="background-color:#DCE4EF" align="center">'.$p->t("zeitaufzeichnung/id").'</th>
-						<th style="background-color:#DCE4EF" align="center">'.$p->t("zeitaufzeichnung/user").'</th>
-						<th style="background-color:#DCE4EF" align="center">'.$p->t("zeitaufzeichnung/projekt").'</th>
-						<th style="background-color:#DCE4EF" align="center">'.$p->t("zeitaufzeichnung/oe").' 1</th>
-						<th style="background-color:#DCE4EF" align="center">'.$p->t("zeitaufzeichnung/oe").' 2</th>
-						<th style="background-color:#DCE4EF" align="center">'.$p->t("zeitaufzeichnung/aktivitaet").'</th>
-						<th style="background-color:#DCE4EF" align="center">'.$p->t("zeitaufzeichnung/service").'</th>
-						<th style="background-color:#DCE4EF" align="center">'.$p->t("zeitaufzeichnung/start").'</th>
-						<th style="background-color:#DCE4EF" align="center">'.$p->t("zeitaufzeichnung/ende").'</th>
-						<th style="background-color:#DCE4EF" align="center">'.$p->t("zeitaufzeichnung/dauer").'</th>
-						<th style="background-color:#DCE4EF" align="center">'.$p->t("global/beschreibung").'</th>
-						<th style="background-color:#DCE4EF" align="center" colspan="2">'.$p->t("global/aktion").'</th>
-		    		</tr>
+						<th style="background-color: #8DBDD8;" align="center" class="{sorter: false}" colspan="'.$colspan.'">'.$p->t("eventkalender/kw").' '.$woche.'</th>
+					</tr>';
+					printTableHeadings($fieldheadings, $za_simple);
 
-		    ';
 
 		    $tag=null;
 		   $woche=date('W');
@@ -1120,7 +1114,8 @@ if($projekt->getProjekteMitarbeiter($user, true))
 
 						$tagessaldo = $tagessaldo-$pausesumme;
 						$tagessaldo = date('H:i', ($tagessaldo));
-						echo '<tr id="tag_row_'.$datum->formatDatum($tag,'d_m_Y').'"><td '.$style.' colspan="7">';
+						$colspan = ($za_simple)?4:7;
+						echo '<tr id="tag_row_'.$datum->formatDatum($tag,'d_m_Y').'"><td '.$style.' colspan="'.$colspan.'")>';
 
 						// Zusaetzlicher span fuer Addon Informationen
 
@@ -1168,7 +1163,7 @@ if($projekt->getProjekteMitarbeiter($user, true))
 
 
 							<tr>
-								<th colspan="7" style="background-color: #8DBDD8;"></th>
+								<th  colspan="'.$colspan.'" style="background-color: #8DBDD8;"></th>
 								<th style="background-color: #8DBDD8;" align="right" colspan="2" style="font-weight: normal;"><b>'.$p->t("zeitaufzeichnung/wochensummeArbeitszeit").':</b></th>
 								<th style="background-color: #8DBDD8;" align="right" style="font-weight: normal;"><b>'.$wochensaldo.'</b></th>
 								<th style="background-color: #8DBDD8;" colspan="3"></th>
@@ -1177,30 +1172,15 @@ if($projekt->getProjekteMitarbeiter($user, true))
 
 					<!--</table>-->';
 
+					$colspan=($za_simple)?10:13;
 					echo '
 					<!--<table id="t'.$datumwoche.'" class="tablesorter">-->
-					<tr><th colspan="13">&nbsp;</th></tr>
+					<tr><th colspan="'.$colspan.'">&nbsp;</th></tr>
 
 							<tr>
-								<th style="background-color: #8DBDD8;" align="center" class="{sorter: false}" colspan="13">'.$p->t("eventkalender/kw").' '.$datumwoche.'</th>
-							</tr>
-							<tr>
-								<th style="background-color:#DCE4EF" align="center">'.$p->t("zeitaufzeichnung/id").'</th>
-								<th style="background-color:#DCE4EF" align="center">'.$p->t("zeitaufzeichnung/user").'</th>
-								<th style="background-color:#DCE4EF" align="center">'.$p->t("zeitaufzeichnung/projekt").'</th>
-								<th style="background-color:#DCE4EF" align="center">'.$p->t("zeitaufzeichnung/oe").' 1</th>
-								<th style="background-color:#DCE4EF" align="center">'.$p->t("zeitaufzeichnung/oe").' 2</th>
-								<th style="background-color:#DCE4EF" align="center">'.$p->t("zeitaufzeichnung/aktivitaet").'</th>
-								<th style="background-color:#DCE4EF" align="center">'.$p->t("zeitaufzeichnung/service").'</th>
-								<th style="background-color:#DCE4EF" align="center">'.$p->t("zeitaufzeichnung/start").'</th>
-								<th style="background-color:#DCE4EF" align="center">'.$p->t("zeitaufzeichnung/ende").'</th>
-								<th style="background-color:#DCE4EF" align="center">'.$p->t("zeitaufzeichnung/dauer").'</th>
-								<th style="background-color:#DCE4EF" align="center">'.$p->t("global/beschreibung").'</th>
-								<th style="background-color:#DCE4EF" align="center" colspan="2">'.$p->t("global/aktion").'</th>
-							</tr>
-
-					';
-
+								<th style="background-color: #8DBDD8;" align="center" class="{sorter: false}" colspan="'.$colspan.'">'.$p->t("eventkalender/kw").' '.$datumwoche.'</th>
+							</tr>';
+					printTableHeadings($fieldheadings, $za_simple);
 
 					$woche=$datumwoche;
 					$wochensumme='00:00';
@@ -1233,12 +1213,18 @@ if($projekt->getProjekteMitarbeiter($user, true))
 				echo '<tr>
 					<td '.$style.'>'.$db->convert_html_chars($row->zeitaufzeichnung_id).'</td>
 					<td '.$style.'>'.$db->convert_html_chars($row->uid).'</td>
-					<td '.$style.'>'.$db->convert_html_chars($row->projekt_kurzbz).'</td>
-					<td '.$style.'>'.$db->convert_html_chars($row->oe_kurzbz_1).'</td>
-			        <td '.$style.'>'.$db->convert_html_chars($row->oe_kurzbz_2).'</td>
-			        <td '.$style.'>'.$db->convert_html_chars($row->aktivitaet_kurzbz).'</td>
-			        <td '.$style.' title="'.$service->bezeichnung.'">'.StringCut($db->convert_html_chars($service->bezeichnung),20,null,'...').'</td>
-			        <td '.$style.' nowrap>'.date('H:i', $datum->mktime_fromtimestamp($row->start)).'</td>
+					<td '.$style.'>'.$db->convert_html_chars($row->projekt_kurzbz).'</td>';
+				if(!$za_simple)
+				{
+					echo '<td '.$style.' > '.$db->convert_html_chars($row->oe_kurzbz_1).'</td>
+			        <td '.$style.' > '.$db->convert_html_chars($row->oe_kurzbz_2).'</td>';
+				}
+			    echo '<td '.$style.'>'.$db->convert_html_chars($row->aktivitaet_kurzbz).'</td>';
+				if(!$za_simple)
+				{
+					echo '<td '.$style.' title = "'.$service->bezeichnung.'" > '.StringCut($db->convert_html_chars($service->bezeichnung),20,null,'...').' </td>';
+			    }    
+					echo '<td '.$style.' nowrap>'.date('H:i', $datum->mktime_fromtimestamp($row->start)).'</td>
 			        <td '.$style.' nowrap>'.date('H:i', $datum->mktime_fromtimestamp($row->ende)).'</td>
 			        <td '.$style.' align="right">'.$db->convert_html_chars($row->diff).'</td>
 			        <td '.$style.' title="'.$db->convert_html_chars(mb_eregi_replace("\r\n",' ',$row->beschreibung)).'">'.StringCut($db->convert_html_chars($row->beschreibung),20,null,'...').'</td>
@@ -1266,11 +1252,10 @@ if($projekt->getProjekteMitarbeiter($user, true))
 			{
 				echo	'
 								<tr>
-									<th align="center" colspan="13">'.$p->t('zeitaufzeichnung/endeXTageAnsicht', array($angezeigte_tage)).'</th>
+									<th align="center" colspan="'.$colspan.'">'.$p->t('zeitaufzeichnung/endeXTageAnsicht', array($angezeigte_tage)).'</th>
 								</tr>
 						';
 			}
-			//echo '</table>';
 
 	    //echo $p->t("zeitaufzeichnung/gesamtdauer").": ".$db->convert_html_chars($summe); Aukommentiert. Irrelevant
 		}
@@ -1296,16 +1281,47 @@ echo '
 </html>';
 
 /**
+ * Gibt Tabellenüberschriften für Übersichtstabelle aus
+ * @param $fieldheadings Namen der Tabellenüberschriften
+ * @param bool $za_simple Zeitaufzeichnung lang (für Infrastrukturmitarbeiter) oder kurz (simple)
+ */
+function printTableHeadings($fieldheadings, $za_simple = false){
+	echo '<tr>
+						<th style="background-color:#DCE4EF" align="center">'.$fieldheadings['id'].'</th>
+						<th style="background-color:#DCE4EF" align="center">'.$fieldheadings['user'].'</th>
+						<th style="background-color:#DCE4EF" align="center">'.$fieldheadings['projekt'].'</th>';
+			if (!$za_simple)
+			{
+				echo '<th style="background-color:#DCE4EF" align="center">'.$fieldheadings['oe1'].'</th>
+						<th style="background-color:#DCE4EF" align="center">'.$fieldheadings['oe2'].'</th>';
+			}
+			echo '<th style="background-color:#DCE4EF" align="center">'.$fieldheadings['aktivitaet'].'</th>';
+			if (!$za_simple)
+			{
+				echo '
+						<th style = "background-color:#DCE4EF" align = "center" > '.$fieldheadings['service'].'</th >';
+			}
+			echo '<th style="background-color:#DCE4EF" align="center">'.$fieldheadings['start'].'</th>
+						<th style="background-color:#DCE4EF" align="center">'.$fieldheadings['ende'].'</th>
+						<th style="background-color:#DCE4EF" align="center">'.$fieldheadings['dauer'].'</th>
+						<th style="background-color:#DCE4EF" align="center">'.$fieldheadings['beschreibung'].'</th>
+						<th style="background-color:#DCE4EF" align="center" colspan="2">'.$fieldheadings['aktion'].'</th>
+		    		</tr>';
+}
+
+/**
  * Exportiert Zeitaufzeichnungsdaten als CSV
  * @param $data Zeitaufzeichnungsdaten
  * @param string $delimiter CSV-Trennzeichen
+ * @param $fieldheadings Namen der Spaltenüberschriften
  * @param bool $za_simple Zeitaufzeichnung lang (für Infrastrukturmitarbeiter) oder kurz (simple)
+ * @param $uid Id des Users für CSV-Filenamen "zeitaufzeichnung_uid"
  */
-function exportAsCSV($data, $delimiter = ',', $za_simple = false, $uid)
+function exportAsCSV($data, $delimiter = ',', $fieldheadings, $za_simple = false, $uid)
 {
 	$filename = "zeitaufzeichnung_".$uid.".csv";
 	$file = fopen('php://output', 'w');
-	$towrite = getDataForCSV($data, $za_simple);
+	$towrite = getDataForCSV($data, $fieldheadings, $za_simple);
 	foreach ($towrite as $row)
 	{
 		fputcsv($file, $row, $delimiter);
@@ -1320,17 +1336,19 @@ function exportAsCSV($data, $delimiter = ',', $za_simple = false, $uid)
 /**
  * Liefert Daten für CSV-Export basierend auf erhaltenen Zeitaufzeichnungsdaten
  * @param $rawdata zu exportierenden Rohdaten aus der Datenbank
+ * @param $fieldheadings Namen der Spaltenüberschriften
  * @param bool $za_simple Zeitaufzeichnung lang (für Infrastrukturmitarbeiter) oder kurz (simple). Wenn true, werden Spalten wie Service, OE ausgelassen
  * @return array Daten wie sie als CSV exportiert werden können
  */
-function getDataForCSV($rawdata, $za_simple = false)
+function getDataForCSV($rawdata, $fieldheadings, $za_simple = false)
 {
 	if(!$za_simple)
 		$service = new service();
 	$datum = new datum();
 	$csvData = array();
 	//headers schreiben
-	$csvData[] = ($za_simple) ? array("User", "Datum", "Start", "Ende", "Projekt", "Aktivität", "Beschreibung") : array("User", "Datum", "Start", "Ende", "Projekt", "OE 1", "OE 2", "Aktivität", "Service", "Beschreibung");
+	$csvData[] = ($za_simple) ? array($fieldheadings['user'], $fieldheadings['datum'], $fieldheadings['start'], $fieldheadings['ende'], $fieldheadings['projekt'], $fieldheadings['aktivitaet'], $fieldheadings['beschreibung'])
+		: array($fieldheadings['user'], $fieldheadings['datum'], $fieldheadings['start'], $fieldheadings['ende'], $fieldheadings['projekt'], $fieldheadings['oe1'], $fieldheadings['oe2'], $fieldheadings['aktivitaet'], $fieldheadings['service'], $fieldheadings['kunde'], $fieldheadings['beschreibung']);
 	foreach ($rawdata as $zeitauf)
 	{
 		//Newline characters bei Beschreibung ersetzen
@@ -1349,7 +1367,7 @@ function getDataForCSV($rawdata, $za_simple = false)
 		{
 			$servicebez = ($service->load($zeitauf->service_id))?$service->bezeichnung:"";
 			$csvData[] = array($zeitauf->uid, $hauptdatum, $datum->formatDatum($zeitauf->start, 'H:i'), $bisdatum,
-				$zeitauf->projekt_kurzbz, $zeitauf->oe_kurzbz_1, $zeitauf->oe_kurzbz_2, $zeitauf->aktivitaet_kurzbz, $servicebez, $beschreibung);
+				$zeitauf->projekt_kurzbz, $zeitauf->oe_kurzbz_1, $zeitauf->oe_kurzbz_2, $zeitauf->aktivitaet_kurzbz, $servicebez, $zeitauf->kunde_uid, $beschreibung);
 		}
 	}
 	return $csvData;

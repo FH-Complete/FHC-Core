@@ -103,6 +103,7 @@ $berechtigungen = array(
 	array('basis/testtool','Administrationseite, Gebiete löschen/zurücksetzen'),
 	array('basis/variable','Variablenverwaltung'),
 	array('basis/vilesci','Grundrecht, um in VileSci irgendwelche Menüpunkte zu sehen'),
+	array('basis/servicezeitaufzeichnung','Erlaubt Erfassung von servicebezogenen (Service, OE, Kunde) Daten in der Zeitaufzeichnung'),
 	array('buchung/typen','Verwaltung von Buchungstypen'),
 	array('buchung/mitarbeiter','Verwaltung von Buchungen fuer Mitarbeiter'),
 	array('inout/incoming','Incomingverwaltung'),
