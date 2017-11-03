@@ -1319,15 +1319,17 @@ function printTableHeadings($fieldheadings, $za_simple = false){
  */
 function exportAsCSV($data, $delimiter = ',', $fieldheadings, $za_simple = false, $uid)
 {
+
 	$filename = "zeitaufzeichnung_".$uid.".csv";
+	header('Content-type: text/csv; charset=utf-8');
+	header('Content-Disposition: attachment; filename='.$filename);
+
 	$file = fopen('php://output', 'w');
 	$towrite = getDataForCSV($data, $fieldheadings, $za_simple);
 	foreach ($towrite as $row)
 	{
 		fputcsv($file, $row, $delimiter);
 	}
-	header('Content-type: text/csv; charset=utf-8');
-	header('Content-Disposition: attachment; filename='.$filename);
 	fclose($file);
 	//Abbruch damit HTML markup danach nicht mit exportiert wird
 	exit();
