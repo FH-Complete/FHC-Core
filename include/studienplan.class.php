@@ -137,6 +137,40 @@ class studienplan extends basis_db
 		}
 	}
 
+	public function deleteSemesterZuordnung($studienplan_id, $studiensemester_kurzbz, $ausbildungssemester = NULL)
+	{
+		if (!is_numeric($studienplan_id))
+		{
+			$this->errormsg = 'studienplan_id muss eine gueltige Zahl sein';
+			return false;
+		}
+
+		if (!is_string($studiensemester_kurzbz) || strlen($studiensemester_kurzbz) != 6)
+		{
+			$this->errormsg = 'studiensemester_kurzbz muss ein String mit 6 Zeichen sein';
+			return false;
+		}
+
+		$qry = 'DELETE FROM lehre.tbl_studienplan_semester
+				WHERE studienplan_id=' . $this->db_add_param($studienplan_id) . ' AND
+					studiensemester_kurzbz=' . $this->db_add_param($studiensemester_kurzbz) . '';
+
+		if ($ausbildungssemester !== null)
+			$qry.=' AND semester=' . $this->db_add_param($ausbildungssemester) . '';
+
+		$qry.=';';
+
+		if ($this->db_query($qry))
+		{
+			return true;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Löschen der Zuordnung' . "\n";
+			return false;
+		}
+	}
+
 	/**
 	 * Laedt die Studienplaene einer Studienordnung und Optional einer Organisationsform
 	 *
