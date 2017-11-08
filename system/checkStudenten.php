@@ -748,7 +748,7 @@ foreach ($ausgabe as $stg_kz => $value)
 						<td>&nbsp;</td>
 					</tr>
 					<tr>
-						<td colspan='4'><b>Studienplan ist in diesem Semester nicht gültig</b></td>
+						<td colspan='4'><b>Studienplan ist in diesem Semester nicht gültig (nicht BIS relevant)</b></td>
 					</tr>";
 				break;
 			default:
