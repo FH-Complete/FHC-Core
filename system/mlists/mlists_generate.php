@@ -191,7 +191,7 @@ $error_msg='';
 											WHERE fixangestellt
 											AND aktiv
 											AND mitarbeiter_uid NOT LIKE '\\\\_%'
-											AND NOT EXISTS(SELECT 1 FROM public.tbl_benutzerfunktion WHERE funktion_kurzbz='hilfskraft' AND uid=mitarbeiter_uid AND (datum_bis>=now() or datum_bis is null))";
+											AND NOT EXISTS(SELECT 1 FROM public.tbl_benutzerfunktion WHERE funktion_kurzbz in('hilfskraft','praktikum') AND uid=mitarbeiter_uid AND (datum_bis>=now() or datum_bis is null))";
 	//Alle aktiven MitarbeiterInnen mit Attribut fixangestellt=true und lektor=true
 	$verteilerArray['tw_fix_lkt']['bezeichnung'] = 'Alle fixangestellten LektorInnen';
 	$verteilerArray['tw_fix_lkt']['beschreibung'] = 'Alle fixangestellten LektorInnen an der FH Technikum Wien';
