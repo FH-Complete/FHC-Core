@@ -254,41 +254,41 @@ if (isset($_GET['sendform']))
 	
 	foreach ($sg->result as $twraum)
 	{
-		$htmlstr .= "   <tr>\n";
+		$htmlstr .= "	<tr>\n";
 		$htmlstr .= '		<td><a href="raum_details.php?type=raumtyp&ort_kurzbz='.$twraum->ort_kurzbz.'" target="detail_raum" title="Raumtyp zuteilen" ><img src="../../skin/images/entitlement-pot.png" height="20px"/></a></td>';
-		$htmlstr .= "       <td><a href='raum_details.php?ort_kurzbz=".$twraum->ort_kurzbz."' target='detail_raum'>".$twraum->ort_kurzbz."</a></td>\n";
-		$htmlstr .= "       <td>".$twraum->bezeichnung."</td>\n";
-		$htmlstr .= "       <td>".$twraum->planbezeichnung."</td>\n";
-		$htmlstr .= "       <td>".$twraum->max_person."</td>\n";
-		$htmlstr .= "       <td>".$twraum->arbeitsplaetze."</td>\n";
-		$htmlstr .= "       <td>".$twraum->m2."</td>\n";
-		$htmlstr .= "       <td>".(isset($oe_arr[$twraum->oe_kurzbz])?$oe_arr[$twraum->oe_kurzbz]:'')."</td>\n";
+		$htmlstr .= "		<td><a href='raum_details.php?ort_kurzbz=".$twraum->ort_kurzbz."' target='detail_raum'>".$twraum->ort_kurzbz."</a></td>\n";
+		$htmlstr .= "		<td>".$twraum->bezeichnung."</td>\n";
+		$htmlstr .= "		<td>".$twraum->planbezeichnung."</td>\n";
+		$htmlstr .= "		<td>".$twraum->max_person."</td>\n";
+		$htmlstr .= "		<td>".$twraum->arbeitsplaetze."</td>\n";
+		$htmlstr .= "		<td>".$twraum->m2."</td>\n";
+		$htmlstr .= "		<td>".(isset($oe_arr[$twraum->oe_kurzbz])?$oe_arr[$twraum->oe_kurzbz]:'')."</td>\n";
 		
 		// Lehre boolean setzen
 		
-		$htmlstr .= "       <div style='display: none'>".$db->convert_html_chars($twraum->lehre)."</div> <td align='center'><a href='#Lehre' onclick='changeboolean(\"".$twraum->ort_kurzbz."\",\"lehre\"); return false'>";
-		$htmlstr .= "       <input type='hidden' id='lehre".$twraum->ort_kurzbz."' value='".($twraum->lehre=="t"?"true":"false")."'>";
-		$htmlstr .= "       <img id='lehreimg".$twraum->ort_kurzbz."' alt='Lehre' title='Lehre' src='../../skin/images/".($twraum->lehre=="t"?"true.png":"false.png")."' height='20'>";
-		$htmlstr .= "       </a></td>";
+		$htmlstr .= "		<td style='white-space:nowrap;' align='center'><div style='display: none'>".($twraum->lehre==true?"t":"f")."</div> <a href='#Lehre' onclick='changeboolean(\"".$twraum->ort_kurzbz."\",\"lehre\"); return false'>";
+		$htmlstr .= "		<input type='hidden' id='lehre".$twraum->ort_kurzbz."' value='".($twraum->lehre==true?"true":"false")."'>";
+		$htmlstr .= "		<img id='lehreimg".$twraum->ort_kurzbz."' title='Lehre' src='../../skin/images/".($twraum->lehre==true?"true.png":"false.png")."' height='20'>";
+		$htmlstr .= "		</a></td>";
 		
 		// Reservieren boolean setzen
 		
-		$htmlstr .= "       <div style='display: none'>".$db->convert_html_chars($twraum->reservieren)."</div> <td align='center'><a href='#Reservieren' onclick='changeboolean(\"".$twraum->ort_kurzbz."\",\"reservieren\"); return false'>";
-		$htmlstr .= "       <input type='hidden' id='reservieren".$twraum->ort_kurzbz."' value='".($twraum->reservieren=="t"?"true":"false")."'>";
-		$htmlstr .= "       <img id='reservierenimg".$twraum->ort_kurzbz."' alt='Reservieren' title='Reservieren' src='../../skin/images/".($twraum->reservieren=="t"?"true.png":"false.png")."' style='margin:0;' height='20'>";
-		$htmlstr .= "       </a></td>";
+		$htmlstr .= "		<td style='white-space:nowrap;' align='center'><div style='display: none'>".($twraum->reservieren==true?"t":"f")."</div> <a href='#Reservieren' onclick='changeboolean(\"".$twraum->ort_kurzbz."\",\"reservieren\"); return false'>";
+		$htmlstr .= "		<input type='hidden' id='reservieren".$twraum->ort_kurzbz."' value='".($twraum->reservieren==true?"true":"false")."'>";
+		$htmlstr .= "		<img id='reservierenimg".$twraum->ort_kurzbz."' title='Reservieren' src='../../skin/images/".($twraum->reservieren==true?"true.png":"false.png")."' style='margin:0;' height='20'>";
+		$htmlstr .= "		</a></td>";
 		
 		// Aktiv boolean setzen
 		
-		$htmlstr .= "       <div style='display: none'>".$db->convert_html_chars($twraum->aktiv)."</div> <td align='center'><a href='#Aktiv' onclick='changeboolean(\"".$twraum->ort_kurzbz."\",\"aktiv\"); return false'>";
-		$htmlstr .= "       <input type='hidden' id='aktiv".$twraum->ort_kurzbz."' value='".($twraum->aktiv=="t"?"true":"false")."'>";
-		$htmlstr .= "       <img id='aktivimg".$twraum->ort_kurzbz."' alt='Aktiv' title='Aktiv' src='../../skin/images/".($twraum->aktiv=="t"?"true.png":"false.png")."' style='margin:0;' height='20'>";
-		$htmlstr .= "       </a></td>";
+		$htmlstr .= "		<td style='white-space:nowrap;' align='center'><div style='display: none'>".($twraum->aktiv==true?"t":"f")."</div> <a href='#Aktiv' onclick='changeboolean(\"".$twraum->ort_kurzbz."\",\"aktiv\"); return false'>";
+		$htmlstr .= "		<input type='hidden' id='aktiv".$twraum->ort_kurzbz."' value='".($twraum->aktiv==true?"true":"false")."'>";
+		$htmlstr .= "		<img id='aktivimg".$twraum->ort_kurzbz."' title='Aktiv' src='../../skin/images/".($twraum->aktiv==true?"true.png":"false.png")."' style='margin:0;' height='20'>";
+		$htmlstr .= "		</a></td>";
 		
-		$htmlstr .= "       <td>".$twraum->kosten."</td>\n";
-		$htmlstr .= "       <td>".$twraum->stockwerk."</td>\n";
+		$htmlstr .= "		<td>".$twraum->kosten."</td>\n";
+		$htmlstr .= "		<td>".$twraum->stockwerk."</td>\n";
 	
-		$htmlstr .= "   </tr>\n";
+		$htmlstr .= "	</tr>\n";
 	}
 	$htmlstr .= "</tbody></table>\n";
 }
