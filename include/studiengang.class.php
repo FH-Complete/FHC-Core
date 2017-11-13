@@ -211,7 +211,8 @@ class studiengang extends basis_db
 		return true;
 	}
 
-	// DEPRECATED! SIEHE NAECHSTE FUNKTION
+	// DEPRECATED! WENN SICH DER NAME EINES STUDIENGANGS AENDERT GIBT DIESE FUNKTION DOPPELTE DATENSAETZE ZURUECK
+	// BESSER DIE FUNKTION getAllForOnlinebewerbung VERWENDEN
 	/**
 	 * Gibt alle Studiengaenge zurueck, fuer die man sich online bewerben kann
 	 *
@@ -242,46 +243,47 @@ class studiengang extends basis_db
 		return true;
 	}
 
-	// DIESE FUNKTION WARE BESSER GEEIGNET, DA DIE ALTE NOCH AUF DIE vw_studienplan ZUGREIFT
-	// IN DER DIE GUELTIGEN SEMESTER NOCH VON DEN STUDIENORDNUNGEN ERMITTELT WERDEN ANSTATT VON DEN STUDIENPLAENEN
-	// IN DIESER WERDEN AUCH DIE STUDIENSEMESTER ABGEFRAGT
 	/**
-	 * Gibt alle Studiengaenge zurueck, fuer die man sich online bewerben kann
+	 * Gibt alle aktiven Studiengaenge und Lehrgaenge (mit Typ) zurueck, bei denen das Attribut onlinebewerbung true ist. 
 	 *
-	 * @param string $order Default: typ, studiengangbezeichnung, tbl_lgartcode.bezeichnung ASC. Spalten, nach denen Sortiert werden soll.
-	 * @param array $studiensemester_kurzbz Array von Studiensemestern, in deren Gueltigkeit die Studienplaene liegen
+	 * @param string $order Spalten, nach denen Sortiert werden soll.<br>Default: tbl_studiengang.typ, tbl_lgartcode.bezeichnung ASC, tbl_studiengang.bezeichnung. 
 	 * @return boolean
 	 */
-	/*public function getAllForBewerbung($order = 'typ, studiengangbezeichnung, tbl_lgartcode.bezeichnung ASC', $studiensemester_kurzbz = '')
+	public function getAllForOnlinebewerbung($order = 'tbl_studiengang.typ, tbl_lgartcode.bezeichnung ASC, tbl_studiengang.bezeichnung')
 	{
-		$qry = "SELECT DISTINCT studiengang_kz, typ, organisationseinheittyp_kurzbz, studiengangbezeichnung, standort, studiengangbezeichnung_englisch, lgartcode, tbl_lgartcode.bezeichnung "
-				. "FROM lehre.tbl_studienplan "
-				. "JOIN lehre.tbl_studienordnung USING (studienordnung_id) "
-				. "JOIN public.tbl_studiengang USING (studiengang_kz) "
-				. "JOIN public.tbl_organisationseinheit USING (oe_kurzbz) "
-				. "JOIN public.tbl_organisationseinheittyp USING (organisationseinheittyp_kurzbz) "
-				. "LEFT JOIN lehre.tbl_studienplan_semester USING (studienplan_id) "
-				. "LEFT JOIN bis.tbl_lgartcode USING (lgartcode) "
-				. "WHERE onlinebewerbung IS TRUE "
-				. "AND tbl_studienplan.aktiv IS TRUE "
-				. "AND tbl_studienplan_semester.semester=1 "
-				. "AND tbl_studienplan_semester.studiensemester_kurzbz IN (".$this->implode4SQL($studiensemester_kurzbz).") ";
+		$qry = "SELECT DISTINCT 
+					tbl_studiengang.studiengang_kz, 
+					tbl_studiengang.typ, 
+					tbl_studiengangstyp.bezeichnung AS typ_bezeichnung,
+					tbl_studiengang.lgartcode,
+					tbl_studiengang.bezeichnung AS studiengangbezeichnung,
+					tbl_studiengang.english AS studiengangbezeichnung_englisch,
+					tbl_organisationseinheit.organisationseinheittyp_kurzbz, 
+					tbl_organisationseinheit.standort,
+					tbl_lgartcode.bezeichnung AS lehrgangsart
+				FROM public.tbl_studiengang 
+				LEFT JOIN bis.tbl_lgartcode USING (lgartcode) 
+				LEFT JOIN public.tbl_organisationseinheit USING (oe_kurzbz)
+				JOIN public.tbl_organisationseinheittyp USING (organisationseinheittyp_kurzbz)
+				JOIN public.tbl_studiengangstyp USING (typ)
+				WHERE tbl_studiengang.onlinebewerbung IS TRUE 
+				AND tbl_studiengang.aktiv IS TRUE";
+						
+		$qry .= ' ORDER BY '.$order;
 
-				$qry .= " ORDER BY ".$order;
-
-				if(!$result = $this->db_query($qry))
-				{
-					$this->errormsg = 'Datensatz konnte nicht geladen werden';
-					return false;
-				}
-
-				while($row = $this->db_fetch_object($result))
-				{
-					$this->result[] = $row;
-				}
-
-				return true;
-	}*/
+		if(!$result = $this->db_query($qry))
+		{
+			$this->errormsg = 'Datensatz konnte nicht geladen werden';
+			return false;
+		}
+		
+		while($row = $this->db_fetch_object($result))
+		{
+			$this->result[] = $row;
+		}
+		
+		return true;
+	}
 
 	/**
 	 * Laedt alle Studientypen in das Attribut studiengang_typ_array
