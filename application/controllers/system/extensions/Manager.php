@@ -30,7 +30,7 @@ class Manager extends VileSci_Controller
 			'extensions' => $this->extensionslib->getInstalledExtensions()
 		);
 
-		$this->load->view('core/system/extensions/manager.php', $viewData);
+		$this->load->view('system/extensions/manager.php', $viewData);
 	}
 
 	/**

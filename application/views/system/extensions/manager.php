@@ -1,4 +1,4 @@
-<?php $this->load->view('core/templates/header', array('title' => 'Extensions manager', 'jqueryV1' => true, 'tablesort' => true)); ?>
+<?php $this->load->view('templates/header', array('title' => 'Extensions manager', 'jqueryV1' => true, 'tablesort' => true)); ?>
 
 	<script type="text/javascript">
 
@@ -165,4 +165,4 @@
 
 	</body>
 
-<?php $this->load->view('core/templates/footer'); ?>
+<?php $this->load->view('templates/footer'); ?>

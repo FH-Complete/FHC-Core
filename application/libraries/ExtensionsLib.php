@@ -35,7 +35,7 @@ class ExtensionsLib
 		$this->ci->load->library('EPrintfLib');
 
 		// Loading models
-		$this->ci->load->model('core/system/Extensions_model', 'ExtensionsModel');
+		$this->ci->load->model('system/Extensions_model', 'ExtensionsModel');
 
 		//
 		$this->_errorOccurred = false;
