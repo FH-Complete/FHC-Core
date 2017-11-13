@@ -39,7 +39,7 @@ class Prestudentstatus extends FHC_Controller
 	public function index()
 	{
 		$result = "The following are the available command line interface commands\n\n";
-		$result .= "php index.ci.php jobs/Studienplan CorrectStudienplan";
+		$result .= "php index.ci.php jobs/Prestudentstatus CorrectStudienplan";
 
 		echo $result.PHP_EOL;
 	}

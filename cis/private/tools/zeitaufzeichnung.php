@@ -60,6 +60,8 @@ if(isset($_GET['uid']))
 	if($rechte->isBerechtigt('admin') || $rechte->isBerechtigt('mitarbeiter/urlaube', null, 'suid'))
 	{
 		$user = $_GET['uid'];
+		$rechte = new benutzerberechtigung();
+		$rechte->getBerechtigungen($user);
 	}
 	else
 	{

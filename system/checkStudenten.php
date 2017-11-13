@@ -596,9 +596,9 @@ if ($result = $db->db_query($qry))
 	while ($row = $db->db_fetch_object($result))
 	{
 		$ausgabe[$row->studiengang][13][] = $row->vorname.' '.$row->nachname.
-			' ('.$row->studiensemester_kurzbz.' '.$row->status_kurzbz.' '.$row->ausbildungssemester.'.Sem)';
+			' ('.$row->studiensemester_kurzbz.' '.$row->status_kurzbz.' '.$row->ausbildungssemester.'.Sem) Studienplan:'.$row->bezeichnung;
 		$text .= $row->vorname.' '.$row->nachname.
-			' ('.$row->studiensemester_kurzbz.' '.$row->status_kurzbz.' '.$row->ausbildungssemester.".Sem)<br>";
+			' ('.$row->studiensemester_kurzbz.' '.$row->status_kurzbz.' '.$row->ausbildungssemester.".Sem) Studienplan:'.$row->bezeichnung.'<br>";
 	}
 }
 
@@ -634,7 +634,7 @@ foreach ($ausgabe as $stg_kz => $value)
 						<td>&nbsp;</td>
 					</tr>
 					<tr>
-						<td colspan='4'><b>Abrecher die noch aktiv sind</b></td>
+						<td colspan='4'><b>Abbrecher die noch aktiv sind</b></td>
 					</tr>";
 				break;
 			case 3:
@@ -698,7 +698,7 @@ foreach ($ausgabe as $stg_kz => $value)
 					</tr>
 					<tr>
 						<td colspan='4'>
-							<b>Studenten die Datum und Studiensemestern in deren Stati
+							<b>Studenten die Datum und Studiensemester in deren Status
 							in falscher Reihenfolge haben</b>
 						</td>
 					</tr>";
@@ -748,7 +748,7 @@ foreach ($ausgabe as $stg_kz => $value)
 						<td>&nbsp;</td>
 					</tr>
 					<tr>
-						<td colspan='4'><b>Studienplan ist in diesem Semester nicht gültig</b></td>
+						<td colspan='4'><b>Studienplan ist in diesem Semester nicht gültig (nicht BIS relevant)</b></td>
 					</tr>";
 				break;
 			default:
