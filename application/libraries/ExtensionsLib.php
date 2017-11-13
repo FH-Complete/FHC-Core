@@ -605,13 +605,9 @@ class ExtensionsLib
 
 		foreach (ExtensionsLib::SOFTLINK_TARGET_DIRECTORIES as $key => $targetDirectory)
 		{
-			if (file_exists(APPPATH.$targetDirectory.'/'.$extensionName))
+			if (file_exists(APPPATH.$targetDirectory.'/'.ExtensionsLib::EXTENSIONS_DIR_NAME.'/'.$extensionName))
 			{
-				$_delSoftLinks = unlink(APPPATH.$targetDirectory.'/'.$extensionName);
-				if (!$_delSoftLinks)
-				{
-					break;
-				}
+				$_delSoftLinks = unlink(APPPATH.$targetDirectory.'/'.ExtensionsLib::EXTENSIONS_DIR_NAME.'/'.$extensionName);
 			}
 		}
 
