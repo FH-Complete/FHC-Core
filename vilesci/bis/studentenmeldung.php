@@ -1028,7 +1028,7 @@ function GenerateXMLStudentBlock($row)
 			<BeginnDatum>".date("dmY", $datumobj->mktime_fromdate($beginndatum))."</BeginnDatum>";
 		}
 
-		if($aktstatus=='Absolvent' || $aktstatus=='Abbrecher')
+		if(($aktstatus=='Absolvent' || $aktstatus=='Abbrecher') && $studtyp!='E')
 		{
 			$datei.="
 			<BeendigungsDatum>".date("dmY", $datumobj->mktime_fromdate($aktstatus_datum))."</BeendigungsDatum>";
