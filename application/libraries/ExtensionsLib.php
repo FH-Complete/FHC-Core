@@ -589,6 +589,7 @@ class ExtensionsLib
 					else
 					{
 						$this->_printMessage('Query result:');
+						var_dump($result->retval); // KEEP IT!!!
 						$this->ci->eprintflib->printEOL();
 					}
 	            }
