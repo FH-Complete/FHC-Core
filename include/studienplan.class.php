@@ -705,7 +705,7 @@ class studienplan extends basis_db
 	 * @param integer $ausbildungssemester Optional. Ausbildungssemester in dem der Studienplan liegen soll
 	 * @param string $orgform_kurzbz. Optional. Organisationsform des Studienplans
 	 */
-	function getStudienplaeneFromSem($studiengang_kz, $studiensemester_kurzbz="", $ausbildungssemester="", $orgform_kurzbz = "")
+	function getStudienplaeneFromSem($studiengang_kz, $studiensemester_kurzbz="", $ausbildungssemester="", $orgform_kurzbz = "", $sprache = "")
 	{
 		$qry = "SELECT
 					studienplan_id,
@@ -759,9 +759,10 @@ class studienplan extends basis_db
 			$qry.=" AND tbl_studienplan_semester.semester=".$this->db_add_param($ausbildungssemester);
 
 		if($orgform_kurzbz!='')
-		{
 			$qry.=" AND orgform_kurzbz=".$this->db_add_param($orgform_kurzbz);
-		}
+
+		if($sprache != '')
+			$qry.=" AND tbl_studienplan.sprache=".$this->db_add_param($sprache);
 
 		$res = array();
 
