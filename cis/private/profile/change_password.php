@@ -61,7 +61,13 @@ if(isset($_GET['requiredtochange']))
 {
 	echo '<span class="error">'.$p->t('passwort/RequiredToChangeInfo').'</span><br><br>';
 }
-echo $p->t('passwort/InfotextPolicy').'
+echo $p->t('passwort/InfotextPolicy');
+
+if($p->t('dms_link/passwortpolicy')!='')
+{
+	echo '<br><br>'.$p->t('passwort/weitereInfos',array($p->t('dms_link/passwortpolicy')));
+}
+echo '
 <br>
 <br>
 <form action="'.$_SERVER['PHP_SELF'].'" method="POST">
