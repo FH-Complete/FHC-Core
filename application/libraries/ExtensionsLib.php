@@ -12,10 +12,10 @@ class ExtensionsLib
 	const FILE_INPUT_NAME = 'extension';
 	const ARCHIVE_EXTENSIONS = array('.tgz', '.tbz2');
 	const EXTENSION_JSON_NAME = 'extension.json';
+	const UPLOAD_PATH = APPPATH.'tmp/';
 	const EXTENSIONS_PATH = APPPATH.'extensions/';
-	const UPLOAD_PATH = ExtensionsLib::EXTENSIONS_PATH.'tmp/';
-	const DIRECTORIES_BLACKLIST = array('api', 'bo', 'core', 'errors', 'jobs', 'html', 'ms', 'tmp', 'udf');
-	const SOFTLINK_TARGET_DIRECTORIES = array('config', 'controllers', 'helpers', 'libraries', 'models', 'views', 'widgets');
+	const EXTENSIONS_DIR_NAME = 'extensions';
+	const SOFTLINK_TARGET_DIRECTORIES = array('config', 'controllers', 'helpers', 'hooks', 'libraries', 'models', 'views', 'widgets');
 
 	private $_errorOccurred; //
 	private $_currentInstalledExtensionVersion; //
@@ -293,6 +293,7 @@ class ExtensionsLib
 		{
 			$this->_errorOccurred = true;
 			$this->_printFailure('data base error');
+			var_dump($result);
 		}
 		else
 		{
@@ -658,14 +659,17 @@ class ExtensionsLib
 
 		foreach (ExtensionsLib::SOFTLINK_TARGET_DIRECTORIES as $key => $targetDirectory)
 		{
-			if (!file_exists(APPPATH.$targetDirectory.'/'.$extensionName))
+			if (!file_exists(APPPATH.$targetDirectory.'/'.ExtensionsLib::EXTENSIONS_DIR_NAME.'/'.$extensionName))
 			{
 				if (!is_dir($extensionPath.$targetDirectory))
 				{
 					mkdir($extensionPath.$targetDirectory);
 				}
 
-				$_addSoftLinks = symlink($extensionPath.$targetDirectory, APPPATH.$targetDirectory.'/'.$extensionName);
+				$_addSoftLinks = symlink(
+					$extensionPath.$targetDirectory,
+					APPPATH.$targetDirectory.'/'.ExtensionsLib::EXTENSIONS_DIR_NAME.'/'.$extensionName
+				);
 				if (!$_addSoftLinks)
 				{
 					break;
@@ -733,28 +737,25 @@ class ExtensionsLib
 		{
 			$extensionName = $result->retval[0]->name;
 
-			if (!in_array($extensionName, ExtensionsLib::DIRECTORIES_BLACKLIST))
+			if ($enabled === true)
 			{
-				if ($enabled === true)
+				$_toggleExtension = $this->_addSoftLinks($extensionName);
+			}
+			else
+			{
+				$_toggleExtension = $this->_delSoftLinks($extensionName);
+			}
+
+			if ($_toggleExtension)
+			{
+				$result = $this->ci->ExtensionsModel->update($extensionId, array('enabled' => $enabled));
+				if (isSuccess($result))
 				{
-					$_toggleExtension = $this->_addSoftLinks($extensionName);
+					$_toggleExtension = true;
 				}
 				else
 				{
-					$_toggleExtension = $this->_delSoftLinks($extensionName);
-				}
-
-				if ($_toggleExtension)
-				{
-					$result = $this->ci->ExtensionsModel->update($extensionId, array('enabled' => $enabled));
-					if (isSuccess($result))
-					{
-						$_toggleExtension = true;
-					}
-					else
-					{
-						$this->_delSoftLinks($extensionName);
-					}
+					$this->_delSoftLinks($extensionName);
 				}
 			}
 		}
