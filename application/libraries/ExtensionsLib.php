@@ -497,7 +497,7 @@ class ExtensionsLib
 				'license' => isset($extensionJson->license) ? $extensionJson->license : null,
 				'url' => isset($extensionJson->url) ? $extensionJson->url : null,
 				'core_version' => $extensionJson->core_version,
-				'dependencies' => $extensionJson->dependencies
+				'dependencies' => isset($extensionJson->dependencies) ? $extensionJson->dependencies : null
 			)
 		);
 		if (isSuccess($result))
@@ -519,8 +519,17 @@ class ExtensionsLib
 	private function _loadSQLs($pkgSQLsPath, $extensionJson)
 	{
 		$this->_printStart('Loading and executing SQL files');
+		$this->_printInfo('WARNING: if this step will fail, the database and all the directories');
+		$this->_printInfo('have to be clean manually before install again this extension');
 
-		for ($sqlDir = $extensionJson->currentInstalledVersion; $sqlDir <= $extensionJson->version; $sqlDir++)
+		$startVersion = $extensionJson->currentInstalledVersion;
+
+		if ($extensionJson->currentInstalledVersion < $extensionJson->version)
+		{
+			$startVersion++;
+		}
+
+		for ($sqlDir = $startVersion; $sqlDir <= $extensionJson->version; $sqlDir++)
 		{
 			if (($files = glob($pkgSQLsPath.'/'.$sqlDir.'/*'.ExtensionsLib::SQL_FILE_EXTENSION)) != false)
 	        {
