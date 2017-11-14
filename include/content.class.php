@@ -1268,39 +1268,57 @@ class content extends basis_db
 	}
 	
 	/**
-	 * Durchsucht den Content. Limit optional.
+	 * Durchsucht den CIS-Content nach Uebereinstimmung mit den Suchbegriffen. 
+	 * Erst werden Uebereinstimmungen mit dem Titel geliefert (aus den templates contentmittitel, contentohnetitel und redirect)
+	 * und danach solche mit dem Content selbst (aus den templates contentmittitel und contentohnetitel).
+	 * Limit optional.
 	 * 
-	 * @param array $searchItems
-	 * @param $limit (optional)
+	 * @param array $searchItems Array mit Suchbegriffen
+	 * @param integer $limit (optional) Anzahl an Datensaetzen, die zurueckgegeben werden sollen
 	 */
 	public function search($searchItems, $limit=null)
 	{
 		$qry = "SELECT 
-					distinct on(content_id,sprache,version) *
+					distinct on(content_id,sprache,version) content_id, content::text, titel, sprache, version, 1 AS sort
 				FROM 
 					campus.tbl_contentsprache
 					JOIN campus.tbl_content USING(content_id)
 				WHERE 
 					sichtbar=true
 					AND aktiv=true
+					AND version = (SELECT campus.get_highest_content_version (content_id))
 					AND template_kurzbz IN('contentmittitel','contentohnetitel','redirect')";
 		foreach($searchItems as $value)
-			$qry.=" AND 
+		{
+			$qry .= " AND 
+						(
+							lower(titel::text) like lower('%".$this->db_escape($value)."%') 
+							OR lower(titel::text) like lower('%".$this->db_escape(htmlentities($value,ENT_NOQUOTES,'UTF-8'))."%')
+						)
+					";
+		}
+		$qry .= " UNION SELECT
+					distinct on(content_id,sprache,version) content_id, content::text, titel, sprache, version, 2 AS sort
+				FROM
+					campus.tbl_contentsprache
+					JOIN campus.tbl_content USING(content_id)
+				WHERE
+					sichtbar=true
+					AND aktiv=true
+					AND version = (SELECT campus.get_highest_content_version (content_id))";
+		foreach($searchItems as $value)
+		{
+			$qry .= " AND
 						(template_kurzbz IN('contentmittitel','contentohnetitel')
 							AND
 							(
-							     lower(content::text) like lower('%".$this->db_escape($value)."%') 
-							     OR lower(content::text) like lower('%".$this->db_escape(htmlentities($value,ENT_NOQUOTES,'UTF-8'))."%')
-							)
-						OR template_kurzbz IN('redirect')
-							AND
-							(
-							    lower(titel::text) like lower('%".$this->db_escape($value)."%') 
-					     		OR lower(titel::text) like lower('%".$this->db_escape(htmlentities($value,ENT_NOQUOTES,'UTF-8'))."%')
+								lower(content::text) like lower('%".$this->db_escape($value)."%')
+								OR lower(content::text) like lower('%".$this->db_escape(htmlentities($value,ENT_NOQUOTES,'UTF-8'))."%')
 							)
 						)
 					";
-		$qry.=" ORDER BY sprache,content_id DESC";
+		}
+		$qry .= " ORDER BY sort,sprache,content_id DESC";
 
 		if(!is_null($limit) && is_numeric($limit))
 			$qry.=" LIMIT ".$limit;

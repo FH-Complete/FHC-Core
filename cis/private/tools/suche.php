@@ -46,19 +46,18 @@ $sprache = getSprache();
 $p = new phrasen($sprache);
 
 echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
-        "http://www.w3.org/TR/html4/strict.dtd">
+		"http://www.w3.org/TR/html4/strict.dtd">
 <html>
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<link rel="stylesheet" href="../../../skin/tablesort.css" type="text/css"/>
 	<link rel="stylesheet" href="../../../skin/style.css.php" type="text/css">
-	<link rel="stylesheet" type="text/css" href="../../../skin/jquery-ui-1.9.2.custom.min.css">
-<script type="text/javascript" src="../../../vendor/jquery/jqueryV1/jquery-1.12.4.min.js"></script>
-<script type="text/javascript" src="../../../vendor/christianbach/tablesorter/jquery.tablesorter.min.js"></script>
-<script type="text/javascript" src="../../../vendor/components/jqueryui/jquery-ui.min.js"></script>
-<script type="text/javascript" src="../../../include/js/jquery.ui.datepicker.translation.js"></script>
-<script type="text/javascript" src="../../../vendor/jquery/sizzle/sizzle.js"></script>
-	<title>Globale Suche</title>
+	<link rel="stylesheet" type="text/css" href="../../../skin/jquery-ui-1.9.2.custom.min.css">';
+
+	include('../../../include/meta/jquery.php');
+	include('../../../include/meta/jquery-tablesorter.php');
+	
+echo '<title>Globale Suche</title>
 </head>
 <body>';
 
@@ -74,14 +73,22 @@ echo '<form action="',$self,'" name="searchform" method="GET">
 	<img src="../../../skin/images/search.png" onclick="document.searchform.submit()" height="15px" class="suchicon"/>
 	</form><br>';
 
-if($search=='')
+if($search == '')
 	exit;
 
 // String aufsplitten und Sonderzeichen entfernen
 $searchItems = explode(' ',TRIM(str_replace(',', '', $search),'!.?'));
 
+// Leerzeichen und Whitespaces entfernen
+$searchItems = preg_replace("/\s/", '', $searchItems);
+
+
+// Leere Strings aus Array entfernen
+while ($array_key = array_search("", $searchItems))
+	unset ($searchItems[$array_key]);
+
 // Wenn nach dem TRIM keine Zeichen uebrig bleiben, dann abbrechen
-if(implode(',', $searchItems)=='')
+if(implode(',', $searchItems) == '')
 	exit;
 
 //Easter Egg
@@ -228,55 +235,56 @@ function searchOE($searchItems)
 				$benutzerfunktion->getOeFunktionen($row->oe_kurzbz,'ass,Leitung,stvLtg,oezuordnung','now()','now()');
 				$oebezeichnung = new organisationseinheit();
 				$oebezeichnung->load($row->oe_kurzbz);
-				echo '<h3>',$row->organisationseinheittyp_kurzbz,' ',$oebezeichnung->bezeichnung,'</h3>';
-				echo '<table class="tablesorter" id="t'.$row->oe_kurzbz.'">
-				<thead>
-					<tr>
-						<th>',$p->t('global/vorname'),'</th>
-						<th>',$p->t('global/nachname'),'</th>
-						<th>',$p->t('global/funktion'),'</th>
-						<th>',$p->t('global/telefonnummer'),'</th>
-						<th>',$p->t('lvplan/raum'),'</th>
-						<th>',$p->t('global/mail'),'</th>
-					</tr>
-				</thead>
-				<tbody>
-				';
-				foreach($benutzerfunktion->result as $bf)
+				if (count($benutzerfunktion->result) > 0)
 				{
-					$person = new person();
-					$person->getPersonFromBenutzer($bf->uid);
-					$mitarbeiter = new mitarbeiter();
-					$mitarbeiter->load($bf->uid);
-					$kontakt = new kontakt();
-					$kontakt->loadFirmaKontakttyp($mitarbeiter->standort_id,'telefon');
-					$bisverwendung = new bisverwendung();
-					$bisverwendung->getLastAktVerwendung($bf->uid);
-					echo '<tr>';
-					echo '<td>'.$person->vorname.'</td>';
-					echo '<td><a href="../profile/index.php?uid=',$person->uid,'" title="',$person->titelpre,' ',$person->vorname,' ',$person->nachname,' ',$person->titelpost,'">',$person->nachname,'</a></td>';
-					echo '<td>'.$bf->bezeichnung;
-						if($person->aktiv==false)
-							echo '<span style="color: red"> (ausgeschieden)</span>';
-						elseif($bisverwendung->beschausmasscode=='5')
-							echo '<span style="color: orange"> (karenziert)</span>';
-						echo '</td>';
-					
-					echo '<td>',($mitarbeiter->telefonklappe!=''?$kontakt->kontakt.'-'.$mitarbeiter->telefonklappe:'-'),'</td>';
-					echo '<td>',($mitarbeiter->ort_kurzbz!=''?$mitarbeiter->ort_kurzbz:'-'),'</td>';
-					//if($row->alias!='' && !in_array($row->studiengang_kz, $noalias)) ??? Was macht $noalias?
-					if($person->alias!='')
-						$mail = $person->alias.'@'.DOMAIN;
-					else
-						$mail = $person->uid.'@'.DOMAIN;
-					echo '<td><a href="mailto:',$mail,'">',$mail,'</a></td>';
-					//if(!defined('CIS_SUCHE_LVPLAN_ANZEIGEN') || CIS_SUCHE_LVPLAN_ANZEIGEN)
-						//echo '<td><a href="../../../cis/private/lvplan/stpl_week.php?pers_uid='.$person->uid.($person->mitarbeiter_uid==NULL?'&type=student':'&type=lektor').'">'.$p->t('lvplan/lvPlan').'</a></td>';
-					echo '</tr>';
+					echo '<h3>',$row->organisationseinheittyp_kurzbz,' ',$oebezeichnung->bezeichnung,'</h3>';
+					echo '<table class="tablesorter" id="t'.$row->oe_kurzbz.'">
+					<thead>
+						<tr>
+							<th>',$p->t('global/vorname'),'</th>
+							<th>',$p->t('global/nachname'),'</th>
+							<th>',$p->t('global/funktion'),'</th>
+							<th>',$p->t('global/telefonnummer'),'</th>
+							<th>',$p->t('lvplan/raum'),'</th>
+							<th>',$p->t('global/mail'),'</th>
+						</tr>
+					</thead>
+					<tbody>
+					';
+					foreach($benutzerfunktion->result as $bf)
+					{
+						$person = new person();
+						$person->getPersonFromBenutzer($bf->uid);
+						$mitarbeiter = new mitarbeiter();
+						$mitarbeiter->load($bf->uid);
+						$kontakt = new kontakt();
+						$kontakt->loadFirmaKontakttyp($mitarbeiter->standort_id,'telefon');
+						$bisverwendung = new bisverwendung();
+						$bisverwendung->getLastAktVerwendung($bf->uid);
+						echo '<tr>';
+						echo '<td>'.$person->vorname.'</td>';
+						echo '<td><a href="../profile/index.php?uid=',$person->uid,'" title="',$person->titelpre,' ',$person->vorname,' ',$person->nachname,' ',$person->titelpost,'">',$person->nachname,'</a></td>';
+						echo '<td>'.$bf->bezeichnung;
+							if($bisverwendung->beschausmasscode=='5')
+								echo '<span style="color: orange"> (karenziert)</span>';
+							echo '</td>';
+						
+						echo '<td>',($mitarbeiter->telefonklappe!=''?$kontakt->kontakt.'-'.$mitarbeiter->telefonklappe:'-'),'</td>';
+						echo '<td>',($mitarbeiter->ort_kurzbz!=''?$mitarbeiter->ort_kurzbz:'-'),'</td>';
+						//if($row->alias!='' && !in_array($row->studiengang_kz, $noalias)) ??? Was macht $noalias?
+						if($person->alias!='')
+							$mail = $person->alias.'@'.DOMAIN;
+						else
+							$mail = $person->uid.'@'.DOMAIN;
+						echo '<td><a href="mailto:',$mail,'">',$mail,'</a></td>';
+						//if(!defined('CIS_SUCHE_LVPLAN_ANZEIGEN') || CIS_SUCHE_LVPLAN_ANZEIGEN)
+							//echo '<td><a href="../../../cis/private/lvplan/stpl_week.php?pers_uid='.$person->uid.($person->mitarbeiter_uid==NULL?'&type=student':'&type=lektor').'">'.$p->t('lvplan/lvPlan').'</a></td>';
+						echo '</tr>';
+						echo "\n";
+					}
 					echo "\n";
+					echo '</tbody></table><br>';
 				}
-				echo "\n";
-				echo '</tbody></table><br>';
 			}
 		}
 		return true;
@@ -443,10 +451,10 @@ function searchContent($searchItems)
 	$cms = new content();
 	$cms->search($searchItems, 21);
 
-	if(count($cms->result)>0)
+	if(count($cms->result) > 0)
 	{
 		echo '<h2 style="padding-bottom: 10px;">',$p->t('tools/content'),'</h2>';
-		if(count($cms->result)>20)
+		if(count($cms->result) > 20)
 		{
 			echo '<p style="color:red;">'.$p->t("tools/esWurdenMehrAlsXInhalteGefunden").'</p>';
 		}
@@ -454,30 +462,25 @@ function searchContent($searchItems)
 		$anzeigesprache='';
 		foreach($cms->result as $row)
 		{
-			if ($sprache==$row->sprache)
+			if ($sprache == $row->sprache)
 			{
-				if ($anzeigesprache!=$row->sprache)
+				if ($anzeigesprache != $row->sprache)
 				{
-					$anzeigesprache=$row->sprache;
+					$anzeigesprache = $row->sprache;
 					echo '<h3>',$row->sprache,'</h3>';
 					echo '<ul>';
 				}
-				// Nur die hoechste Version des Contents anzeigen
-				$version = new content();
-				$maxversion = $version->getMaxVersion($row->content_id, $row->sprache);
-				if ($row->version == $maxversion)
+
+				$berechtigt = new content();
+				$berechtigt = $berechtigt->berechtigt($row->content_id, $uid);
+				if ($berechtigt)
 				{
-					$berechtigt = new content();
-					$berechtigt = $berechtigt->berechtigt($row->content_id, $uid);
-					if ($berechtigt)
-					{
-						echo '<li><div class="suchergebnis">';
-						echo '<a href="../../../cms/content.php?content_id=',$db->convert_html_chars($row->content_id),'&sprache=',$db->convert_html_chars($row->sprache),'">',$db->convert_html_chars($row->titel),'</a><br>';
-						$preview = findAndMark($row->content, $searchItems);
-						
-						echo $preview;
-						echo '<br /><br /></div></li>';
-					}
+					echo '<li><div class="suchergebnis">';
+					echo '<a href="../../../cms/content.php?content_id=',$db->convert_html_chars($row->content_id),'&sprache=',$db->convert_html_chars($row->sprache),'">',$db->convert_html_chars($row->titel),'</a><br>';
+					$preview = findAndMark($row->content, $searchItems);
+					
+					echo $preview;
+					echo '<br /><br /></div></li>';
 				}
 			}
 		}
@@ -485,11 +488,11 @@ function searchContent($searchItems)
 		$anzeigesprache='';
 		foreach($cms->result as $row)
 		{
-			if ($sprache!=$row->sprache)
+			if ($sprache != $row->sprache)
 			{
-				if ($anzeigesprache!=$row->sprache)
+				if ($anzeigesprache != $row->sprache)
 				{
-					$anzeigesprache=$row->sprache;
+					$anzeigesprache = $row->sprache;
 					echo '</ul>';
 					echo '<h3>',$row->sprache,'</h3>';
 					echo '<ul>';
