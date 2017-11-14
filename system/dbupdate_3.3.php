@@ -507,6 +507,35 @@ if(!@$db->db_query("SELECT updatevon FROM public.tbl_rt_person LIMIT 1"))
         echo '<br>Spalte updatevon in public.tbl_rt_person hinzugefügt';
 }
 
+// Neue Funktion get_highest_content_version
+if(!@$db->db_query("SELECT campus.get_highest_content_version(0)"))
+{
+	$qry = "CREATE FUNCTION campus.get_highest_content_version(bigint) RETURNS smallint
+			LANGUAGE plpgsql
+			AS $_$
+					DECLARE i_content_id ALIAS FOR $1;
+					DECLARE rec RECORD;
+					BEGIN
+					SELECT INTO rec version
+					FROM campus.tbl_contentsprache
+					WHERE content_id=i_content_id
+					ORDER BY version desc
+					LIMIT 1;
+			
+			RETURN rec.version;
+			END;
+			$_$;
+			
+			ALTER FUNCTION campus.get_highest_content_version(bigint) OWNER TO fhcomplete;";
+	
+	if(!$db->db_query($qry))
+		echo '<strong>campus.get_highest_content_version(content_id): '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Funktion get_highest_content_version(content_id) hinzugefügt';
+}
+
+
+
 
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
