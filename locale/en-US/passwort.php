@@ -33,4 +33,5 @@ $this->phrasen['passwort/WeiterZumLogin']='Proceed to Login';
 $this->phrasen['passwort/RequiredToChangeInfo']='You have not changed your password for over a year.
 Please change your password immediately';
 $this->phrasen['passwort/nichtGleich']='The new password must be different from the old password.';
+$this->phrasen['passwort/weitereInfos']='More information about the Password Policy can be found at <a href="../../../cms/dms.php?id=%s">this link</a>';
 ?>

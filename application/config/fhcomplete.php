@@ -208,6 +208,7 @@ $config['fhc_acl'] = array
 	'system.tbl_webservicerecht' => 'basis/webservicerecht',
 	'system.tbl_webservicetyp' => 'basis/webservicetyp',
 	'system.tbl_udf' => 'system/udf',
+	'system.tbl_extensions' => 'system/extensions',
 	'testtool.tbl_ablauf' => 'basis/ablauf',
 	'testtool.tbl_antwort' => 'basis/antwort',
 	'testtool.tbl_frage' => 'basis/frage',

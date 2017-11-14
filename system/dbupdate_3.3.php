@@ -500,7 +500,7 @@ if(!@$db->db_query("SELECT updateamum FROM public.tbl_rt_person LIMIT 1"))
 if(!@$db->db_query("SELECT updatevon FROM public.tbl_rt_person LIMIT 1"))
 {
 	$qry = "ALTER TABLE public.tbl_rt_person ADD COLUMN updatevon varchar(32);";
-       
+
 	if(!$db->db_query($qry))
 		echo '<strong>public.tbl_rt_person '.$db->db_last_error().'</strong><br>';
     else
@@ -535,6 +535,143 @@ if(!@$db->db_query("SELECT campus.get_highest_content_version(0)"))
 }
 
 
+
+
+//---------------------------------------------------------------------------------------------------------------------
+// Start extensions
+
+// SEQUENCE tbl_extensions_id_seq
+if ($result = $db->db_query("SELECT 0 FROM pg_class WHERE relname = 'tbl_extensions_id_seq'"))
+{
+	if ($db->db_num_rows($result) == 0)
+	{
+		$qry = '
+			CREATE SEQUENCE system.tbl_extensions_id_seq
+			    START WITH 1
+			    INCREMENT BY 1
+			    NO MAXVALUE
+			    NO MINVALUE
+			    CACHE 1;
+			';
+		if(!$db->db_query($qry))
+			echo '<strong>system.tbl_extensions_id_seq '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>Created sequence: system.tbl_extensions_id_seq';
+
+		// ALTER SEQUENCE system.tbl_extensions_id_seq
+		$qry = 'ALTER SEQUENCE system.tbl_extensions_id_seq OWNED BY system.tbl_extensions.extension_id;';
+		if (!$db->db_query($qry))
+			echo '<strong>system.tbl_extensions_id_seq '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>Altered sequence system.tbl_extensions_id_seq';
+
+		// GRANT SELECT, UPDATE ON SEQUENCE system.tbl_extensions_id_seq TO vilesci;
+		$qry = 'GRANT SELECT, UPDATE ON SEQUENCE system.tbl_extensions_id_seq TO vilesci;';
+		if (!$db->db_query($qry))
+			echo '<strong>system.tbl_extensions_id_seq '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>Granted privileges to <strong>vilesci</strong> on system.tbl_extensions_id_seq';
+
+		// GRANT SELECT, UPDATE ON SEQUENCE system.tbl_extensions_id_seq TO fhcomplete;
+		$qry = 'GRANT SELECT, UPDATE ON SEQUENCE system.tbl_extensions_id_seq TO fhcomplete;';
+		if (!$db->db_query($qry))
+			echo '<strong>system.tbl_extensions_id_seq '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>Granted privileges to <strong>vilesci</strong> on system.tbl_extensions_id_seq';
+	}
+}
+
+// TABLE system.tbl_extensions
+if(!@$db->db_query("SELECT 0 FROM system.tbl_extensions WHERE 0 = 1"))
+{
+	$qry = '
+		CREATE TABLE system.tbl_extensions (
+			extension_id integer NOT NULL DEFAULT nextval(\'tbl_extensions_id_seq\'::regclass),
+		    name character varying(128) NOT NULL,
+		    version integer NOT NULL,
+		    description text,
+		    license character varying(256),
+		    url character varying(256),
+		    core_version character varying(48) NOT NULL,
+		    dependencies character varying(128)[],
+		    enabled boolean NOT NULL DEFAULT true
+		);';
+	if (!$db->db_query($qry))
+		echo '<strong>system.tbl_extensions '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Created table system.tbl_extensions';
+
+	// GRANT SELECT ON TABLE system.tbl_extensions TO web;
+	$qry = 'GRANT SELECT ON TABLE system.tbl_extensions TO web;';
+	if (!$db->db_query($qry))
+		echo '<strong>system.tbl_extensions '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Granted privileges to <strong>web</strong> on system.tbl_extensions';
+
+	// GRANT SELECT, UPDATE, INSERT, DELETE ON TABLE system.tbl_extensions TO vilesci;
+	$qry = 'GRANT SELECT, UPDATE, INSERT, DELETE ON TABLE system.tbl_extensions TO vilesci;';
+	if (!$db->db_query($qry))
+		echo '<strong>system.tbl_extensions '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Granted privileges to <strong>vilesci</strong> on system.tbl_extensions';
+
+	// COMMENT ON TABLE system.tbl_extensions
+	$qry = 'COMMENT ON TABLE system.tbl_extensions IS \'Table to manage extensions\';';
+	if (!$db->db_query($qry))
+		echo '<strong>Adding comment to system.tbl_extensions: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Added comment to system.tbl_extensions';
+
+	// COMMENT ON COLUMN system.tbl_extensions.name
+	$qry = 'COMMENT ON COLUMN system.tbl_extensions.name IS \'Extension unique name\';';
+	if (!$db->db_query($qry))
+		echo '<strong>Adding comment to system.tbl_extensions.name: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Added comment to system.tbl_extensions.name';
+
+	// COMMENT ON COLUMN system.tbl_extensions.core_version
+	$qry = 'COMMENT ON COLUMN system.tbl_extensions.core_version IS \'Minimum required core version\';';
+	if (!$db->db_query($qry))
+		echo '<strong>Adding comment to system.tbl_extensions.core_version: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Added comment to system.tbl_extensions.core_version';
+
+	// COMMENT ON COLUMN system.tbl_extensions.dependencies
+	$qry = 'COMMENT ON COLUMN system.tbl_extensions.dependencies IS \'Required extensions\';';
+	if (!$db->db_query($qry))
+		echo '<strong>Adding comment to system.tbl_extensions.dependencies: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Added comment to system.tbl_extensions.dependencies';
+}
+
+// UNIQUE INDEX uidx_extensions_name_version
+if ($result = $db->db_query("SELECT 0 FROM pg_class WHERE relname = 'uidx_extensions_name_version'"))
+{
+	if ($db->db_num_rows($result) == 0)
+	{
+		$qry = 'CREATE UNIQUE INDEX uidx_extensions_name_version ON system.tbl_extensions USING btree (name, version);';
+		if (!$db->db_query($qry))
+			echo '<strong>uidx_extensions_name_version '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>Created unique uidx_extensions_name_version';
+	}
+}
+
+// Add permission for extensions
+if ($result = @$db->db_query("SELECT 1 FROM system.tbl_berechtigung WHERE berechtigung_kurzbz = 'system/extensions';"))
+{
+	if ($db->db_num_rows($result) == 0)
+	{
+		$qry = "INSERT INTO system.tbl_berechtigung (berechtigung_kurzbz, beschreibung) VALUES('system/extensions', 'To manage core extensions');";
+		if (!$db->db_query($qry))
+			echo '<strong>system.tbl_berechtigung '.$db->db_last_error().'</strong><br>';
+		else
+			echo ' system.tbl_berechtigung: Added permission for extensions<br>';
+	}
+}
+
+// End extensions
+//---------------------------------------------------------------------------------------------------------------------
 
 
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen

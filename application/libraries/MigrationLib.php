@@ -7,173 +7,72 @@ if (! defined("BASEPATH")) exit("No direct script access allowed");
  */
 class MigrationLib extends CI_Migration
 {
-	// Prefixes and separator for messages
-	const MSG_PREFIX = "[-]";
-	const INFO_PREFIX = "[I]";
-	const ERROR_PREFIX = "[E]";
-	const SEPARATOR = "------------------------------";
-	// Console colors codes
-	const ERROR_COLOR = 31;
-	const INFO_COLOR = 33;
-	
-	const PRINT_QUERY_LEN = 60;
-	
-	// HTML colors names
-	private $HTML_COLORS = array(31 => "red", 33 => "orange");
-	// Used to set if the migration process is called via command line or via browser
-	private $cli;
-	
 	/**
 	 * Object initialization
 	 */
 	public function __construct()
 	{
 		parent::__construct();
-		$this->setCli();
+
+		// Loads EPrintfLib
+		$this->load->library('EPrintfLib');
 	}
-	
-	/**
-	 * Set property cli to false if the migration process is called via command line
-	 * otherwise to false if it's called via browser
-	 */
-	private function setCli()
-	{
-		if ($this->input->is_cli_request())
-		{
-			$this->cli = true;
-		}
-		else
-		{
-			$this->cli = false;
-		}
-	}
-	
-	/**
-	 * Returns the character of end of line
-	 * PHP_EOL platform dependent if cli is true
-	 * Tag <br> if cli is false
-	 */
-	private function getEOL()
-	{
-		if ($this->cli === true)
-		{
-			return PHP_EOL;
-		}
-		else
-		{
-			return "<br>";
-		}
-	}
-	
-	/**
-	 * Returns the string needed to color the output
-	 */
-	private function getColored($color)
-	{
-		$colored = "%s";
-		
-		if (!is_null($color))
-		{
-			if ($this->cli === true)
-			{
-				$colored = "\033[".$color."m%s\033[37m";
-			}
-			else
-			{
-				$colored = "<font color=\"".$this->HTML_COLORS[$color]."\">%s</font>";
-			}
-		}
-		
-		return $colored;
-	}
-	
-	/**
-	 * Print a message, even colored if specified
-	 */
-	private function _print($prefix, $text, $color = null)
-	{
-		printf($this->getColored($color), sprintf("%s %s".$this->getEOL(), $prefix, $text));
-	}
-	
-	/**
-	 * Prints a formatted message
-	 */
-	private function printMessage($message)
-	{
-		$this->_print(MigrationLib::MSG_PREFIX, $message);
-	}
-	
-	/**
-	 * Prints a formatted info
-	 */
-	private function printInfo($info)
-	{
-		$this->_print(MigrationLib::INFO_PREFIX, $info, MigrationLib::INFO_COLOR);
-	}
-	
-	/**
-	 * Prints a formatted error
-	 */
-	private function printError($error)
-	{
-		$this->_print(MigrationLib::ERROR_PREFIX, $error, MigrationLib::ERROR_COLOR);
-	}
-	
+
 	/**
 	 * Check if a column exists in a table and schema
 	 */
 	private function columnExists($name, $schema, $table)
 	{
 		$query = sprintf("SELECT %s FROM %s.%s LIMIT 1", $name, $schema, $table);
-		
+
 		if (@$this->db->simple_query($query))
 		{
 			return true;
 		}
-		
+
 		return false;
 	}
-	
+
 	/**
 	 * Print an info about the starting of method up
 	 */
 	protected function startUP()
 	{
-		$this->printInfo(
-			sprintf("%s Start method up of class %s %s", MigrationLib::SEPARATOR, get_called_class(), MigrationLib::SEPARATOR)
+		$this->eprintflib->printInfo(
+			sprintf("%s Start method up of class %s %s", EPrintfLib::SEPARATOR, get_called_class(), EPrintfLib::SEPARATOR)
 		);
 	}
-	
+
 	/**
 	 * Print an info about the ending of method up
 	 */
 	protected function endUP()
 	{
-		$this->printInfo(
-			sprintf("%s End method up of class %s %s", MigrationLib::SEPARATOR, get_called_class(), MigrationLib::SEPARATOR)
+		$this->eprintflib->printInfo(
+			sprintf("%s End method up of class %s %s", EPrintfLib::SEPARATOR, get_called_class(), EPrintfLib::SEPARATOR)
 		);
 	}
-	
+
 	/**
 	 * Print an info about the starting of method down
 	 */
 	protected function startDown()
 	{
-		$this->printInfo(
-			sprintf("%s Start method down of class %s %s", MigrationLib::SEPARATOR, get_called_class(), MigrationLib::SEPARATOR)
+		$this->eprintflib->printInfo(
+			sprintf("%s Start method down of class %s %s", EPrintfLib::SEPARATOR, get_called_class(), EPrintfLib::SEPARATOR)
 		);
 	}
-	
+
 	/**
 	 * Print an info about the ending of method down
 	 */
 	protected function endDown()
 	{
-		$this->printInfo(
-			sprintf("%s End method down of class %s %s", MigrationLib::SEPARATOR, get_called_class(), MigrationLib::SEPARATOR)
+		$this->eprintflib->printInfo(
+			sprintf("%s End method down of class %s %s", EPrintfLib::SEPARATOR, get_called_class(), EPrintfLib::SEPARATOR)
 		);
 	}
-	
+
 	/**
 	 * Adds a column, with attributes, to a table and schema
 	 */
@@ -185,20 +84,20 @@ class MigrationLib extends CI_Migration
 			{
 				if ($this->dbforge->add_column($schema.'.'.$table, array($name => $definition)))
 				{
-					$this->printMessage(sprintf("Column %s.%s.%s of type %s added", $schema, $table, $name, $definition["type"]));
+					$this->eprintflib->printMessage(sprintf("Column %s.%s.%s of type %s added", $schema, $table, $name, $definition["type"]));
 				}
 				else
 				{
-					$this->printError(sprintf("Error while adding column %s.%s.%s of type %s", $schema, $table, $name, $definition["type"]));
+					$this->eprintflib->printError(sprintf("Error while adding column %s.%s.%s of type %s", $schema, $table, $name, $definition["type"]));
 				}
 			}
 			else
 			{
-				$this->printInfo(sprintf("Column %s.%s.%s already exists", $schema, $table, $name));
+				$this->eprintflib->printInfo(sprintf("Column %s.%s.%s already exists", $schema, $table, $name));
 			}
 		}
 	}
-	
+
 	/**
 	 * Modifies a column, and its attributes, of a table and schema
 	 */
@@ -210,20 +109,20 @@ class MigrationLib extends CI_Migration
 			{
 				if ($this->dbforge->modify_column($schema.'.'.$table, array($name => $definition)))
 				{
-					$this->printMessage(sprintf("Column %s.%s.%s has been modified", $schema, $table, $name));
+					$this->eprintflib->printMessage(sprintf("Column %s.%s.%s has been modified", $schema, $table, $name));
 				}
 				else
 				{
-					$this->printError(sprintf("Error while modifying column %s.%s.%s", $schema, $table, $name));
+					$this->eprintflib->printError(sprintf("Error while modifying column %s.%s.%s", $schema, $table, $name));
 				}
 			}
 			else
 			{
-				$this->printInfo(sprintf("Column %s.%s.%s doesn't exist", $schema, $table, $name));
+				$this->eprintflib->printInfo(sprintf("Column %s.%s.%s doesn't exist", $schema, $table, $name));
 			}
 		}
 	}
-	
+
 	/**
 	 * Drops a column from a table and schema
 	 */
@@ -233,19 +132,19 @@ class MigrationLib extends CI_Migration
 		{
 			if ($this->dbforge->drop_column($schema.'.'.$table, $field))
 			{
-				$this->printMessage(sprintf("Column %s.%s.%s has been dropped", $schema, $table, $field));
+				$this->eprintflib->printMessage(sprintf("Column %s.%s.%s has been dropped", $schema, $table, $field));
 			}
 			else
 			{
-				$this->printError(sprintf("Error while dropping column %s.%s.%s", $schema, $table, $field));
+				$this->eprintflib->printError(sprintf("Error while dropping column %s.%s.%s", $schema, $table, $field));
 			}
 		}
 		else
 		{
-			$this->printInfo(sprintf("Column %s.%s.%s doesn't exist", $schema, $table, $field));
+			$this->eprintflib->printInfo(sprintf("Column %s.%s.%s doesn't exist", $schema, $table, $field));
 		}
 	}
-	
+
 	/**
 	 * Sets a column as primary key of a table and schema
 	 */
@@ -273,17 +172,17 @@ class MigrationLib extends CI_Migration
 		{
 			$query = sprintf("ALTER TABLE %s.%s ADD CONSTRAINT %s PRIMARY KEY (%s)", $schema, $table, $name, $fields);
 		}
-		
+
 		if (@$this->db->simple_query($query))
 		{
-			$this->printMessage(sprintf("Added primary key %s on table %s.%s", $name, $schema, $table));
+			$this->eprintflib->printMessage(sprintf("Added primary key %s on table %s.%s", $name, $schema, $table));
 		}
 		else
 		{
-			$this->printError(sprintf("Adding primary key %s on table %s.%s", $name, $schema, $table));
+			$this->eprintflib->printError(sprintf("Adding primary key %s on table %s.%s", $name, $schema, $table));
 		}
 	}
-	
+
 	/**
 	 * Sets a column as foreign key of a table and schema
 	 */
@@ -300,17 +199,17 @@ class MigrationLib extends CI_Migration
 			$fieldDest,
 			$attributes
 		);
-		
+
 		if (@$this->db->simple_query($query))
 		{
-			$this->printMessage(sprintf("Added foreign key %s on table %s.%s", $name, $schema, $table));
+			$this->eprintflib->printMessage(sprintf("Added foreign key %s on table %s.%s", $name, $schema, $table));
 		}
 		else
 		{
-			$this->printError(sprintf("Adding foreign key %s on table %s.%s", $name, $schema, $table));
+			$this->eprintflib->printError(sprintf("Adding foreign key %s on table %s.%s", $name, $schema, $table));
 		}
 	}
-	
+
 	/**
 	 * Sets a column as unique key of a table and schema
 	 */
@@ -338,17 +237,17 @@ class MigrationLib extends CI_Migration
 		{
 			$query = sprintf("CREATE UNIQUE INDEX %s ON %s.%s (%s)", $name, $schema, $table, $fields);
 		}
-		
+
 		if (@$this->db->simple_query($query))
 		{
-			$this->printMessage(sprintf("Added unique key %s on table %s.%s", $name, $schema, $table));
+			$this->eprintflib->printMessage(sprintf("Added unique key %s on table %s.%s", $name, $schema, $table));
 		}
 		else
 		{
-			$this->printError(sprintf("Adding unique key %s on table %s.%s", $name, $schema, $table));
+			$this->eprintflib->printError(sprintf("Adding unique key %s on table %s.%s", $name, $schema, $table));
 		}
 	}
-	
+
 	/**
 	 * Grants permissions to a user on a table and schema
 	 */
@@ -379,7 +278,7 @@ class MigrationLib extends CI_Migration
 
 		if (@$this->db->simple_query($query))
 		{
-			$this->printMessage(
+			$this->eprintflib->printMessage(
 				sprintf(
 					"Granted permissions %s on table %s.%s to user %s",
 					is_null($stringPermission) ? $permissions : $stringPermission,
@@ -391,7 +290,7 @@ class MigrationLib extends CI_Migration
 		}
 		else
 		{
-			$this->printError(
+			$this->eprintflib->printError(
 				sprintf(
 					"Granting permissions %s on table %s.%s to user %s",
 					is_null($stringPermission) ? $permissions : $stringPermission,
@@ -402,24 +301,24 @@ class MigrationLib extends CI_Migration
 			);
 		}
 	}
-	
+
 	/**
 	 * Creates a table in a schema with columns
 	 */
 	protected function createTable($schema, $table, $fields)
 	{
 		$this->dbforge->add_field($fields);
-		
+
 		if ($this->dbforge->create_table($schema.'.'.$table, true))
 		{
-			$this->printMessage(sprintf("Table %s.%s created or existing", $schema, $table));
+			$this->eprintflib->printMessage(sprintf("Table %s.%s created or existing", $schema, $table));
 		}
 		else
 		{
-			$this->printError(sprintf("Creating table %s.%s", $schema, $table));
+			$this->eprintflib->printError(sprintf("Creating table %s.%s", $schema, $table));
 		}
 	}
-	
+
 	/**
 	 * Drops a table from a schema
 	 */
@@ -427,62 +326,62 @@ class MigrationLib extends CI_Migration
 	{
 		if ($this->dbforge->drop_table($schema.".".$table))
 		{
-			$this->printMessage(sprintf("Table %s.%s has been dropped", $schema, $table));
+			$this->eprintflib->printMessage(sprintf("Table %s.%s has been dropped", $schema, $table));
 		}
 		else
 		{
-			$this->printError(sprintf("Dropping table %s.%s", $schema, $table));
+			$this->eprintflib->printError(sprintf("Dropping table %s.%s", $schema, $table));
 		}
 	}
-	
+
 	/**
 	 * Initializes a sequence with the max value of a column
 	 */
 	protected function initializeSequence($schemaSrc, $sequence, $schemaDst, $table, $field)
 	{
 		$query = sprintf("SELECT SETVAL('%s.%s', (SELECT MAX(%s) FROM %s.%s))", $schemaSrc, $sequence, $field, $schemaDst, $table);
-		
+
 		if (@$this->db->simple_query($query))
 		{
-			$this->printMessage(sprintf("Sequence %s.%s has been initialized", $schemaSrc, $sequence));
+			$this->eprintflib->printMessage(sprintf("Sequence %s.%s has been initialized", $schemaSrc, $sequence));
 		}
 		else
 		{
-			$this->printError(sprintf("Initializing sequence %s.%s", $schemaSrc, $sequence));
+			$this->eprintflib->printError(sprintf("Initializing sequence %s.%s", $schemaSrc, $sequence));
 		}
 	}
-	
+
 	/**
 	 * Add comment to a column
 	 */
 	protected function addCommentToColumn($schema, $table, $field, $comment)
 	{
 		$query = sprintf("COMMENT ON COLUMN %s.%s.%s IS ?", $schema, $table, $field);
-		
+
 		if (@$this->db->query($query, array($comment)))
 		{
-			$this->printMessage(sprintf("Comment added to %s.%s.%s", $schema, $table, $field));
+			$this->eprintflib->printMessage(sprintf("Comment added to %s.%s.%s", $schema, $table, $field));
 		}
 		else
 		{
-			$this->printError(sprintf("Error while adding comment to %s.%s.%s", $schema, $table, $field));
+			$this->eprintflib->printError(sprintf("Error while adding comment to %s.%s.%s", $schema, $table, $field));
 		}
 	}
-	
+
 	/**
 	 * Add comment to a table
 	 */
 	protected function addCommentToTable($schema, $table, $comment)
 	{
 		$query = sprintf("COMMENT ON TABLE %s.%s IS ?", $schema, $table, $field);
-		
+
 		if (@$this->db->query($query, array($comment)))
 		{
-			$this->printMessage(sprintf("Comment added to %s.%s", $schema, $table));
+			$this->eprintflib->printMessage(sprintf("Comment added to %s.%s", $schema, $table));
 		}
 		else
 		{
-			$this->printError(sprintf("Error while adding comment to %s.%s", $schema, $table));
+			$this->eprintflib->printError(sprintf("Error while adding comment to %s.%s", $schema, $table));
 		}
 	}
 	/**
@@ -515,7 +414,7 @@ class MigrationLib extends CI_Migration
 
 		if (@$this->db->simple_query($query))
 		{
-			$this->printMessage(
+			$this->eprintflib->printMessage(
 				sprintf(
 					"Granted permissions %s on sequence %s.%s to user %s",
 					is_null($stringPermission) ? $permissions : $stringPermission,
@@ -527,7 +426,7 @@ class MigrationLib extends CI_Migration
 		}
 		else
 		{
-			$this->printError(
+			$this->eprintflib->printError(
 				sprintf(
 					"Granting permissions %s on sequence %s.%s to user %s",
 					is_null($stringPermission) ? $permissions : $stringPermission,
@@ -538,7 +437,7 @@ class MigrationLib extends CI_Migration
 			);
 		}
 	}
-	
+
 	/**
 	 * Executes the given query
 	 */
@@ -547,21 +446,21 @@ class MigrationLib extends CI_Migration
 		if (! @$this->db->simple_query($query))
 		{
 			$error = $this->db->error();
-			
+
 			if (is_array($error) && isset($error["message"]))
 			{
-				$this->printError($error["message"]);
+				$this->eprintflib->printError($error["message"]);
 			}
 			else
 			{
-				$this->printError("Error while executing a query");
+				$this->eprintflib->printError("Error while executing a query");
 			}
 		}
-		
-		$this->printInfo(
+
+		$this->eprintflib->printInfo(
 			"Query correctly executed: ".
-			substr(preg_replace("/\s+/", " ", trim($query)), 0, MigrationLib::PRINT_QUERY_LEN).
-			(strlen($query) > MigrationLib::PRINT_QUERY_LEN ? "..." : "")
+			substr(preg_replace("/\s+/", " ", trim($query)), 0, EPrintfLib::PRINT_QUERY_LEN).
+			(strlen($query) > EPrintfLib::PRINT_QUERY_LEN ? "..." : "")
 		);
 	}
 }
