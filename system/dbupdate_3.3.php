@@ -521,13 +521,13 @@ if(!@$db->db_query("SELECT campus.get_highest_content_version(0)"))
 					WHERE content_id=i_content_id
 					ORDER BY version desc
 					LIMIT 1;
-			
+
 			RETURN rec.version;
 			END;
 			$_$;
-			
+
 			ALTER FUNCTION campus.get_highest_content_version(bigint) OWNER TO fhcomplete;";
-	
+
 	if(!$db->db_query($qry))
 		echo '<strong>campus.get_highest_content_version(content_id): '.$db->db_last_error().'</strong><br>';
 	else
@@ -557,13 +557,6 @@ if ($result = $db->db_query("SELECT 0 FROM pg_class WHERE relname = 'tbl_extensi
 			echo '<strong>system.tbl_extensions_id_seq '.$db->db_last_error().'</strong><br>';
 		else
 			echo '<br>Created sequence: system.tbl_extensions_id_seq';
-
-		// ALTER SEQUENCE system.tbl_extensions_id_seq
-		$qry = 'ALTER SEQUENCE system.tbl_extensions_id_seq OWNED BY system.tbl_extensions.extension_id;';
-		if (!$db->db_query($qry))
-			echo '<strong>system.tbl_extensions_id_seq '.$db->db_last_error().'</strong><br>';
-		else
-			echo '<br>Altered sequence system.tbl_extensions_id_seq';
 
 		// GRANT SELECT, UPDATE ON SEQUENCE system.tbl_extensions_id_seq TO vilesci;
 		$qry = 'GRANT SELECT, UPDATE ON SEQUENCE system.tbl_extensions_id_seq TO vilesci;';
@@ -642,6 +635,13 @@ if(!@$db->db_query("SELECT 0 FROM system.tbl_extensions WHERE 0 = 1"))
 		echo '<strong>Adding comment to system.tbl_extensions.dependencies: '.$db->db_last_error().'</strong><br>';
 	else
 		echo '<br>Added comment to system.tbl_extensions.dependencies';
+
+	// ALTER SEQUENCE system.tbl_extensions_id_seq
+	$qry = 'ALTER SEQUENCE system.tbl_extensions_id_seq OWNED BY system.tbl_extensions.extension_id;';
+	if (!$db->db_query($qry))
+		echo '<strong>system.tbl_extensions_id_seq '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Altered sequence system.tbl_extensions_id_seq';
 }
 
 // UNIQUE INDEX uidx_extensions_name_version
