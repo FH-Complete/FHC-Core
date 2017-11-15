@@ -579,7 +579,7 @@ if(!@$db->db_query("SELECT 0 FROM system.tbl_extensions WHERE 0 = 1"))
 {
 	$qry = '
 		CREATE TABLE system.tbl_extensions (
-			extension_id integer NOT NULL DEFAULT nextval(\'tbl_extensions_id_seq\'::regclass),
+			extension_id integer NOT NULL DEFAULT NEXTVAL(\'system.tbl_extensions_id_seq\'),
 		    name character varying(128) NOT NULL,
 		    version integer NOT NULL,
 		    description text,
