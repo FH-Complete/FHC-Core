@@ -163,7 +163,7 @@ $qryall='SELECT uid,nachname,vorname FROM campus.vw_mitarbeiter
 if($resultall = $db->db_query($qryall))
 {
 	$num_rows_all=$db->db_num_rows($resultall);
-	echo "<br><br><H2>Bei $num_rows_all nicht aktiven Mitarbeitern sind die aktuellen Verwendungen nicht plausibel</H2>";
+	echo "<br><br><H2>Bei $num_rows_all nicht aktiven Mitarbeitern sind die aktuellen Verwendungen nicht plausibel (inaktiv aber aktuelle Verwendung)</H2>";
 	while($rowall=$db->db_fetch_object($resultall))
 	{
 		$i=0;
@@ -267,7 +267,7 @@ $qryall="SELECT uid,nachname,vorname FROM campus.vw_mitarbeiter
 if($resultall = $db->db_query($qryall))
 {
 	$num_rows_all=$db->db_num_rows($resultall);
-	echo "<br><br><H2>Bei $num_rows_all aktiven, freien Lektoren ist die Verwendung nicht plausibel</H2>";
+	echo "<br><br><H2>Bei $num_rows_all aktiven, freien Lektoren ist die Verwendung nicht plausibel - Verwendung darf nur 'Lehr- unf Forschungspersonal' oder 'Lehr- und Forschungshilfspersonal' sein</H2>";
 	while($rowall=$db->db_fetch_object($resultall))
 	{
 		$i=0;
@@ -306,7 +306,7 @@ $qryall="SELECT DISTINCT lehre.tbl_lehreinheitmitarbeiter.mitarbeiter_uid, nachn
 if($resultall = $db->db_query($qryall))
 {
 	$num_rows_all=$db->db_num_rows($resultall);
-	echo "<br><br><H2>Bei $num_rows_all Lektoren <u>mit Lehrauftrag</u> sind die Verwendungen nicht plausibel</H2>";
+	echo "<br><br><H2>Bei $num_rows_all Lektoren <u>mit Lehrauftrag</u> sind die Verwendungen nicht plausibel (Lehrauftrag aber keine aktuelle Verwendung)</H2>";
 	while($rowall=$db->db_fetch_object($resultall))
 	{
 		$i++;
