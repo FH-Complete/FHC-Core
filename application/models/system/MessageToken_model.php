@@ -215,7 +215,23 @@ class MessageToken_model extends CI_Model
 	 */
 	public function getOERoot($oe_kurzbz)
 	{
-		$sql = 'SELECT oe_kurzbz, oe_parent_kurzbz FROM public.tbl_organisationseinheit WHERE oe_kurzbz = ?';
+		$sql = '
+			WITH RECURSIVE organizations(rid, oe_kurzbz, oe_parent_kurzbz) AS
+			(
+				SELECT 1 AS rid, o.oe_kurzbz, o.oe_parent_kurzbz
+	  			  FROM public.tbl_organisationseinheit o
+				 WHERE o.oe_kurzbz = ?
+				UNION ALL
+				SELECT rid + 1 AS rid, oe.oe_kurzbz, oe.oe_parent_kurzbz
+	  			  FROM organizations org, public.tbl_organisationseinheit oe
+				 WHERE oe.oe_kurzbz = org.oe_parent_kurzbz
+          		   AND oe.aktiv = TRUE
+			)
+			SELECT oe_kurzbz
+			  FROM organizations orgs
+		  ORDER BY rid DESC
+		     LIMIT 1
+		';
 
 		$result = $this->db->query($sql, array($oe_kurzbz));
 		if ($result) // If no errors occurred
