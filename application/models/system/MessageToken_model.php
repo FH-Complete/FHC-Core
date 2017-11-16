@@ -237,17 +237,21 @@ class MessageToken_model extends CI_Model
 		if ($result) // If no errors occurred
 		{
 			// If data are present
-			if (is_array($result->result()) && count($result->result()) > 0)
+			if (is_array($result->result())
+				&& count($result->result()) > 0
+				&& is_object($result->result()[0])
+				&& isset($result->result()[0]->oe_kurzbz))
 			{
-				$organisationseinheit = $result->result()[0];
-
-				// If this organisationseinheit has a parent
-				if ($organisationseinheit->oe_parent_kurzbz != null)
-				{
-					// looks for the parent
-					$result = $this->getOERoot($organisationseinheit->oe_parent_kurzbz);
-				}
+				return success($result->result()[0]->oe_kurzbz);
 			}
+			else
+			{
+				return error();
+			}
+		}
+		else
+		{
+			return error($this->db->error());
 		}
 
 		return $result;
