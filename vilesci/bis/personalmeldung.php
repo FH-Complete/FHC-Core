@@ -61,7 +61,7 @@ $mitarbeiterzahl=0;
 $echt=0;
 $frei=0;
 
-$nichtmelden = array(11,91,92,94,999,203,145,204, 308, 182, 222);
+$nichtmelden = array(11,91,92,94,999,203,145,204,308,182,222);
 
 $datumobj=new datum();
 
@@ -328,7 +328,7 @@ if($result = $db->db_query($qry))
               <BeschaeftigungsAusmass>".$row_verwendung['beschausmasscode']."</BeschaeftigungsAusmass>
               <VerwendungsCode>".$row_verwendung['verwendung_code']."</VerwendungsCode>";
 
-					if(isset($row_verwendung['stgltg']))
+					if(isset($row_verwendung['stgltg']) && isset($row_verwendung['verwendung_code']) && $row_verwendung['verwendung_code']==5)
 					{
 						foreach($row_verwendung['stgltg'] as $row_stgl)
 						{
@@ -345,7 +345,7 @@ if($result = $db->db_query($qry))
 							$person_content.="
 		                    <Funktion>
 		                       <StgKz>".sprintf("%04s",$row_fkt['stgkz'])."</StgKz>
-		                       <SWS>".$row_fkt['sws']."</SWS>";
+		                       <SWS>".number_format($row_fkt['sws'])."</SWS>";
 								if($row_fkt['hauptberuflich']=='t')
 								{
 									$person_content.="
