@@ -510,7 +510,7 @@ if(!@$db->db_query("SELECT updatevon FROM public.tbl_rt_person LIMIT 1"))
 // Neue Funktion get_highest_content_version
 if(!@$db->db_query("SELECT campus.get_highest_content_version(0)"))
 {
-	$qry = "CREATE FUNCTION campus.get_highest_content_version(bigint) RETURNS smallint
+	$qry = 'CREATE FUNCTION campus.get_highest_content_version(bigint) RETURNS smallint
 			LANGUAGE plpgsql
 			AS $_$
 					DECLARE i_content_id ALIAS FOR $1;
@@ -526,7 +526,7 @@ if(!@$db->db_query("SELECT campus.get_highest_content_version(0)"))
 			END;
 			$_$;
 
-			ALTER FUNCTION campus.get_highest_content_version(bigint) OWNER TO fhcomplete;";
+			ALTER FUNCTION campus.get_highest_content_version(bigint) OWNER TO fhcomplete;';
 
 	if(!$db->db_query($qry))
 		echo '<strong>campus.get_highest_content_version(content_id): '.$db->db_last_error().'</strong><br>';
