@@ -1062,6 +1062,10 @@ function cutString($string, $limit, $placeholderSign = '', $keepFilextension = f
 		$extension = '.'.pathinfo($string, PATHINFO_EXTENSION);
 		$offset = $offset + strlen($extension);
 	}
+	if(($limit - $offset) < 0)
+	{
+		return '<span class="error">$placeholderSign must not be shorter than $limit</span>';
+	}
 	
 	if(strlen($string) > ($limit - $offset))
 	{
@@ -1069,7 +1073,7 @@ function cutString($string, $limit, $placeholderSign = '', $keepFilextension = f
 	}
 	else
 	{
-		return false;
+		return $string;
 	}
 }
 ?>
