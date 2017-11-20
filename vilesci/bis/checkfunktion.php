@@ -115,6 +115,7 @@ if(isset($_POST['action']) && $_POST['action'] == 'run')
 								(ende>now() OR ende is null OR ende>".$db->db_add_param($lastbismeldung).")
 								AND (beginn<".$db->db_add_param($aktbismeldung)." OR beginn is null)
 								AND mitarbeiter_uid=".$db->db_add_param($row->mitarbeiter_uid)."
+								AND tbl_bisverwendung.beschausmasscode!=5
 							ORDER BY beginn DESC";
 				if($result_verw = $db->db_query($qry_verw))
 				{

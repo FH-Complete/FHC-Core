@@ -18,7 +18,7 @@ class Person_model extends DB_Model
 	public function getPersonKontaktByZugangscode($zugangscode, $email)
 	{
 		$this->addJoin('public.tbl_kontakt', 'person_id');
-		
+
 		return $this->loadWhere(array('zugangscode' => $zugangscode, 'kontakt' => $email));
 	}
 
@@ -132,6 +132,23 @@ class Person_model extends DB_Model
 				'prestudenten'
 			)
 		);
+
+		return $result;
+	}
+
+	/**
+	 * Searches a Person
+	 * @param $filter Term to search for.
+	 * @return DB-result
+	 */
+	public function searchPerson($filter)
+	{
+		$this->addSelect('vorname, nachname, gebdatum, person_id');
+		$result = $this->loadWhere(
+			'lower(nachname) like '.$this->db->escape('%'.$filter.'%')."
+			OR lower(vorname) like ".$this->db->escape('%'.$filter.'%')."
+			OR lower(nachname || ' ' || vorname) like ".$this->db->escape('%'.$filter.'%')."
+			OR lower(vorname || ' ' || nachname) like ".$this->db->escape('%'.$filter.'%'));
 
 		return $result;
 	}
