@@ -551,16 +551,16 @@ if(!@$db->db_query("SELECT ausstellungsnation FROM public.tbl_akte LIMIT 1"))
 }
 
 // ADD COLUMN ausstellungsdetails (boolean) to public.tbl_dokument
-if(!@$db->db_query("SELECT ausstellungsdetails FROM public.tbl_akte LIMIT 1"))
+if(!@$db->db_query("SELECT ausstellungsdetails FROM public.tbl_dokument LIMIT 1"))
 {
 	$qry = "ALTER TABLE public.tbl_dokument ADD COLUMN ausstellungsdetails boolean NOT NULL DEFAULT false;
 			COMMENT ON COLUMN public.tbl_dokument.ausstellungsdetails IS 'Sollen beim Dokument weitere Felder (zB Ausstellungsnation) angezeigt werden?';
 			";
 	
 	if(!$db->db_query($qry))
-		echo '<strong>public.tbl_rt_person '.$db->db_last_error().'</strong><br>';
+		echo '<strong>public.tbl_dokument '.$db->db_last_error().'</strong><br>';
 		else
-			echo '<br>Spalte updatevon in public.tbl_rt_person hinzugefügt';
+			echo '<br>Spalte ausstellungsdetails in public.tbl_dokument hinzugefügt';
 }
 
 
