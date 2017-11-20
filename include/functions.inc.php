@@ -1043,4 +1043,33 @@ function generateSpecialCharacterString($inputString, $punctuationMark = false)
 
 	return $inputString;
 }
+
+/**
+ * Cuts the string to the given limit minus the stringlength of the placeholderSign and adds the placeholderSign at the end of the string
+ * If $keepFilextension is true, the string is checked for a PATHINFO_EXTENSION and the extension is added to the returned string.
+ * @param string $string The input string to be cutted
+ * @param integer $limit The length of the returned string (including the placeholderSigns)
+ * @param string $placeholderSign Optional. Default null. The string to be added at the end of the cutted string.
+ * @param bool $keepFilextension. Default false. When set to true the
+ * @return string The cutted string with the placeholderSign at the end
+ */
+function cutString($string, $limit, $placeholderSign = '', $keepFilextension = false)
+{
+	$offset = strlen($placeholderSign);
+	$extension = '';
+	if ($keepFilextension)
+	{
+		$extension = '.'.pathinfo($string, PATHINFO_EXTENSION);
+		$offset = $offset + strlen($extension);
+	}
+	
+	if(strlen($string) > ($limit - $offset))
+	{
+		return substr($string, 0, ($limit - $offset)).$placeholderSign.$extension;
+	}
+	else
+	{
+		return false;
+	}
+}
 ?>
