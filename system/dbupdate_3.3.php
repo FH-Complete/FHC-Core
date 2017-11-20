@@ -481,8 +481,8 @@ if(!@$db->db_query("SELECT insertvon FROM public.tbl_rt_person LIMIT 1"))
 
 	if(!$db->db_query($qry))
 		echo '<strong>public.tbl_rt_person '.$db->db_last_error().'</strong><br>';
-    else
-        echo '<br>Spalte insertvon in public.tbl_rt_person hinzugefügt';
+	else
+		echo '<br>Spalte insertvon in public.tbl_rt_person hinzugefügt';
 }
 
 // ADD COLUMN updateamum to public.tbl_rt_person
@@ -492,8 +492,8 @@ if(!@$db->db_query("SELECT updateamum FROM public.tbl_rt_person LIMIT 1"))
 
 	if(!$db->db_query($qry))
 		echo '<strong>public.tbl_rt_person '.$db->db_last_error().'</strong><br>';
-    else
-        echo '<br>Spalte updateamum in public.tbl_rt_person hinzugefügt';
+	else
+		echo '<br>Spalte updateamum in public.tbl_rt_person hinzugefügt';
 }
 
 // ADD COLUMN updatevon to public.tbl_rt_person
@@ -503,14 +503,14 @@ if(!@$db->db_query("SELECT updatevon FROM public.tbl_rt_person LIMIT 1"))
 
 	if(!$db->db_query($qry))
 		echo '<strong>public.tbl_rt_person '.$db->db_last_error().'</strong><br>';
-    else
-        echo '<br>Spalte updatevon in public.tbl_rt_person hinzugefügt';
+	else
+		echo '<br>Spalte updatevon in public.tbl_rt_person hinzugefügt';
 }
 
 // Neue Funktion get_highest_content_version
 if(!@$db->db_query("SELECT campus.get_highest_content_version(0)"))
 {
-	$qry = "CREATE FUNCTION campus.get_highest_content_version(bigint) RETURNS smallint
+	$qry = 'CREATE FUNCTION campus.get_highest_content_version(bigint) RETURNS smallint
 			LANGUAGE plpgsql
 			AS $_$
 					DECLARE i_content_id ALIAS FOR $1;
@@ -526,7 +526,7 @@ if(!@$db->db_query("SELECT campus.get_highest_content_version(0)"))
 			END;
 			$_$;
 			
-			ALTER FUNCTION campus.get_highest_content_version(bigint) OWNER TO fhcomplete;";
+			ALTER FUNCTION campus.get_highest_content_version(bigint) OWNER TO fhcomplete;';
 	
 	if(!$db->db_query($qry))
 		echo '<strong>campus.get_highest_content_version(content_id): '.$db->db_last_error().'</strong><br>';
@@ -534,7 +534,34 @@ if(!@$db->db_query("SELECT campus.get_highest_content_version(0)"))
 		echo '<br>Funktion get_highest_content_version(content_id) hinzugefügt';
 }
 
+// ADD COLUMN ausstellungsnation and formal_geprueft_amum to public.tbl_akte
+if(!@$db->db_query("SELECT ausstellungsnation FROM public.tbl_akte LIMIT 1"))
+{
+	$qry = "ALTER TABLE public.tbl_akte ADD COLUMN ausstellungsnation varchar(3);
+			ALTER TABLE public.tbl_akte ADD CONSTRAINT fk_tbl_akte_ausstellungsnation FOREIGN KEY (ausstellungsnation) REFERENCES bis.tbl_nation(nation_code) ON DELETE RESTRICT ON UPDATE CASCADE;
+			ALTER TABLE public.tbl_akte ADD COLUMN formal_geprueft_amum timestamp;
+			COMMENT ON COLUMN public.tbl_akte.ausstellungsnation IS 'Nation-Code des Landes, in dem das Dokument ausgestellt wurde';
+			COMMENT ON COLUMN public.tbl_akte.formal_geprueft_amum IS 'Bestaetigungsdatum, an dem das Dokument inhaltlich auf Formalkriterien (Leserlichkeit, Vollständigkeit, etc) geprueft wurde';
+			";
+	
+	if(!$db->db_query($qry))
+		echo '<strong>public.tbl_rt_person '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>Spalte updatevon in public.tbl_rt_person hinzugefügt';
+}
 
+// ADD COLUMN ausstellungsdetails (boolean) to public.tbl_dokument
+if(!@$db->db_query("SELECT ausstellungsdetails FROM public.tbl_akte LIMIT 1"))
+{
+	$qry = "ALTER TABLE public.tbl_dokument ADD COLUMN ausstellungsdetails boolean NOT NULL DEFAULT false;
+			COMMENT ON COLUMN public.tbl_dokument.ausstellungsdetails IS 'Sollen beim Dokument weitere Felder (zB Ausstellungsnation) angezeigt werden?';
+			";
+	
+	if(!$db->db_query($qry))
+		echo '<strong>public.tbl_rt_person '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>Spalte updatevon in public.tbl_rt_person hinzugefügt';
+}
 
 
 //---------------------------------------------------------------------------------------------------------------------
