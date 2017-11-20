@@ -219,9 +219,9 @@ class studiengang extends basis_db
 	 * @param string $order Default: typ, studiengangbezeichnung, tbl_lgartcode.bezeichnung ASC. Spalten, nach denen Sortiert werden soll.
 	 * @return boolean
 	 */
-	public function getAllForBewerbung($order = 'typ, tbl_lgartcode.bezeichnung ASC')
+	public function getAllForBewerbung($order = 'typ, studiengangbezeichnung, tbl_lgartcode.bezeichnung ASC')
 	{
-		$qry = 'SELECT DISTINCT studiengang_kz, typ, organisationseinheittyp_kurzbz, standort, lgartcode, tbl_lgartcode.bezeichnung '
+		$qry = 'SELECT DISTINCT studiengang_kz, typ, organisationseinheittyp_kurzbz, studiengangbezeichnung, standort, studiengangbezeichnung_englisch, lgartcode, tbl_lgartcode.bezeichnung '
 				. 'FROM lehre.vw_studienplan '
 				. 'LEFT JOIN bis.tbl_lgartcode USING (lgartcode) '
 				. 'WHERE onlinebewerbung IS TRUE '
