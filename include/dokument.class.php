@@ -35,6 +35,7 @@ class dokument extends basis_db
 	public $nachreichbar;
 	public $bezeichnung_mehrsprachig;
 	public $dokumentbeschreibung_mehrsprachig;
+	public $ausstellungsdetails = false;
 
 	public $prestudent_id;
 	public $mitarbeiter_uid;
@@ -232,18 +233,20 @@ class dokument extends basis_db
 				$idx = sprache::$index_arr[$key];
 				$qry.=" dokumentbeschreibung_mehrsprachig[$idx],";
 			}
-			$qry.='bezeichnung) VALUES('.
+			$qry.='bezeichnung, ausstellungsdetails) VALUES('.
 			$this->db_add_param($this->dokument_kurzbz).',';
 			foreach($this->bezeichnung_mehrsprachig as $key=>$value)
 				$qry.=$this->db_add_param($value).',';
 			foreach($this->dokumentbeschreibung_mehrsprachig as $key=>$value)
 				$qry.=$this->db_add_param($value).',';
-			$qry.= $this->db_add_param($this->bezeichnung).');';
+			$qry.= $this->db_add_param($this->bezeichnung).',';
+			$qry.= $this->db_add_param($this->ausstellungsdetails, FHC_BOOLEAN).');';
 		}
 		else
 		{
 			$qry = 'UPDATE public.tbl_dokument SET '.
-					'bezeichnung = '.$this->db_add_param($this->bezeichnung).',';
+					'bezeichnung = '.$this->db_add_param($this->bezeichnung).', '.
+					'ausstellungsdetails = '.$this->db_add_param($this->ausstellungsdetails, FHC_BOOLEAN).',';
 			foreach($this->bezeichnung_mehrsprachig as $key=>$value)
 			{
 				$idx = sprache::$index_arr[$key];
@@ -406,6 +409,7 @@ class dokument extends basis_db
 				$dok->pflicht = $this->db_parse_bool($row->pflicht);
 				$dok->nachreichbar = $this->db_parse_bool($row->nachreichbar);
 				$dok->onlinebewerbung = $this->db_parse_bool($row->onlinebewerbung);
+				$dok->ausstellungsdetails = $this->db_parse_bool($row->ausstellungsdetails);
 				$this->result[] = $dok;
 			}
 			return true;
@@ -444,6 +448,7 @@ class dokument extends basis_db
 				$dok->pflicht = $this->db_parse_bool($row->pflicht);
 				$dok->nachreichbar = $this->db_parse_bool($row->nachreichbar);
 				$dok->onlinebewerbung = $this->db_parse_bool($row->onlinebewerbung);
+				$dok->ausstellungsdetails = $this->db_parse_bool($row->ausstellungsdetails);
 
 				$this->result[] = $dok;
 			}
@@ -466,7 +471,7 @@ class dokument extends basis_db
 		$sprache = new sprache();
 		$bezeichnung_mehrsprachig = $sprache->getSprachQuery('bezeichnung_mehrsprachig');
 		$dokumentbeschreibung_mehrsprachig = $sprache->getSprachQuery('dokumentbeschreibung_mehrsprachig');
-		$qry = "SELECT dokument_kurzbz, bezeichnung, $bezeichnung_mehrsprachig, $dokumentbeschreibung_mehrsprachig FROM public.tbl_dokument ";
+		$qry = "SELECT dokument_kurzbz, bezeichnung, ausstellungsdetails, $bezeichnung_mehrsprachig, $dokumentbeschreibung_mehrsprachig FROM public.tbl_dokument ";
 
 		if($not_in!='')
 		{
@@ -484,6 +489,7 @@ class dokument extends basis_db
 				$dok->bezeichnung = $row->bezeichnung;
 				$dok->bezeichnung_mehrsprachig = $sprache->parseSprachResult('bezeichnung_mehrsprachig', $row);
 				$dok->dokumentbeschreibung_mehrsprachig = $sprache->parseSprachResult('dokumentbeschreibung_mehrsprachig', $row);
+				$dok->ausstellungsdetails = $this->db_parse_bool($row->ausstellungsdetails);
 
 				$this->result[] = $dok;
 			}
@@ -641,6 +647,7 @@ class dokument extends basis_db
 				$this->bezeichnung = $row->bezeichnung;
 				$this->bezeichnung_mehrsprachig = $sprache->parseSprachResult('bezeichnung_mehrsprachig', $row);
 				$this->dokumentbeschreibung_mehrsprachig =  $sprache->parseSprachResult('dokumentbeschreibung_mehrsprachig', $row);
+				$this->ausstellungsdetails = $this->db_parse_bool($row->ausstellungsdetails);
 				return true;
 			}
 		}
@@ -688,6 +695,7 @@ class dokument extends basis_db
 				$dok->bezeichnung_mehrsprachig = $sprache->parseSprachResult('bezeichnung_mehrsprachig', $row);
 				$dok->dokumentbeschreibung_mehrsprachig = $sprache->parseSprachResult('dokumentbeschreibung_mehrsprachig', $row);
 				$dok->beschreibung_mehrsprachig = $sprache->parseSprachResult('beschreibung_mehrsprachig', $row);
+				$dok->ausstellungsdetails = $this->db_parse_bool($row->ausstellungsdetails);
 
 				$this->result[] = $dok;
 			}
@@ -714,7 +722,7 @@ class dokument extends basis_db
 		$dokumentbeschreibung_mehrsprachig = $sprache->getSprachQuery('dokumentbeschreibung_mehrsprachig');
 		$beschreibung_mehrsprachig = $sprache->getSprachQuery('beschreibung_mehrsprachig');
 
-		$qry = "	SELECT DISTINCT dokument_kurzbz, studiengang_kz,
+		$qry = "	SELECT DISTINCT dokument_kurzbz, studiengang_kz, ausstellungsdetails, 
 					$dokumentbeschreibung_mehrsprachig, $beschreibung_mehrsprachig
 					FROM public.tbl_dokumentstudiengang
 					JOIN public.tbl_dokument using (dokument_kurzbz)
@@ -732,6 +740,7 @@ class dokument extends basis_db
 				$dok->studiengang_kz = $row->studiengang_kz;
 				$dok->dokumentbeschreibung_mehrsprachig = $sprache->parseSprachResult('dokumentbeschreibung_mehrsprachig', $row);
 				$dok->beschreibung_mehrsprachig = $sprache->parseSprachResult('beschreibung_mehrsprachig', $row);
+				$dok->ausstellungsdetails = $this->db_parse_bool($row->ausstellungsdetails);
 
 				$this->result[] = $dok;
 			}
