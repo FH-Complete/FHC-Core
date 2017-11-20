@@ -1,6 +1,4 @@
 <?php
-use Sabre\DAV\Exception\NotImplemented;
-
 /* Copyright (C) 2016 Technikum-Wien
  *
  * This program is free software; you can redistribute it and/or modify
@@ -135,7 +133,7 @@ foreach($prestudent_ids as $pid)
 
 		$preDocs = array();
 		$result = $db->db_query($query);
-		
+
 		while($row = $db->db_fetch_object($result))
 		{
 			$docErrors = array();
@@ -237,7 +235,7 @@ foreach($prestudent_ids as $pid)
 															"filename" => $row->titel,
 															"nachgereicht" => ($row->nachgereicht == 't'?'true':'false'),
 															"anmerkung" => $row->anmerkung);
-							else 
+							else
 								$dokumente[]['dokument'] = array(
 															"name" => $row->bezeichnung,
 															"filename" => $row->aktbezeichnung,
@@ -286,7 +284,7 @@ foreach($prestudent_ids as $pid)
 			{
 				if(!isset($errors[$pid]))
 					$errors[$pid] = array();
-				
+
 				$errors[$pid] = array_merge($errors[$pid], $docErrors);
 			}
 		}
@@ -301,14 +299,14 @@ foreach($prestudent_ids as $pid)
 		$bundesland = '';
 		$heimatBundesland = '';
 		$zustellBundesland = '';
-	
+
 		$nation = new nation($prestudent->geburtsnation);
 		$geburtsnation = $nation->kurztext;
 		$nation->load($prestudent->staatsbuergerschaft);
 		$staatsbuergerschaft = $nation->kurztext;
 		$nation->load($prestudent->zgvnation);
 		$zgvnation = $nation->kurztext;
-		
+
 		$svnr = ($prestudent->svnr == '')?($prestudent->ersatzkennzeichen != ''?'Ersatzkennzeichen: '.$prestudent->ersatzkennzeichen:''):$prestudent->svnr;
 
 		foreach($adresse->result as $row_adresse)
@@ -342,7 +340,7 @@ foreach($prestudent_ids as $pid)
 					else
 						$errors[$pid][] = "Es ist ein Fehler bei der Ermittlung des Bundeslandes der Heimatadresse aufgetreten";
 				}
-				else 
+				else
 					$errors[$pid][] = "Heimat-Bundesland kann nicht ermittelt werden, da keine Gemeinde eingetragen ist";
 			}
 			if($row_adresse->zustelladresse)
@@ -394,22 +392,22 @@ foreach($prestudent_ids as $pid)
 				{
 					$telefonnummer = $row->kontakt;
 				}
-				
+
 				if ($row->kontakttyp == 'email')
 				{
 					$mailadresse = $row->kontakt;
 				}
 			}
-			
+
 		}
 		// Studiengang der Bewerbung
 		$studiengang = new studiengang();
 		$studiengang->load($prestudent->studiengang_kz);
-		
+
 		// Datum Bewerbungabgschickt
 		$prestudentstatus = new prestudent();
 		$prestudentstatus->getLastStatus($pid, '', 'Interessent');
-		
+
 		// Spezielle Notizen auslesen und aufbereiten
 		$notiz = new notiz();
 		$notiz->getNotiz('','','','','','',$pid,'','','','','','aufnahme/spezialisierung');
@@ -490,7 +488,7 @@ if(count($errors) == 0 || $force)
 		echo fread($handle, 8192);
 	}
 	fclose($handle);
-	
+
 }
 else
 {
