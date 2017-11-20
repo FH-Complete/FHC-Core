@@ -94,6 +94,11 @@ define('LDAP2_USER_SEARCH_FILTER','sAMAccountName');
 // LDAP MASTER SERVER fuer Passwort Aenderungen
 define('LDAP_SERVER_MASTER',LDAP_SERVER);
 
+// Default Password fuer neue Accounts
+// Hier sollte ein langes geheimes Passwort gesetzt werden!
+define('ACCOUNT_ACTIVATION_PASSWORD','');
+
+
 // Attribut fuer Zutrittskartennummer im LDAP
 define("LDAP_CARD_NUMBER","twHitagCardNumber");
 // Attribut fuer Zutrittskartennummer2 im LDAP
