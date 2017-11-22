@@ -625,7 +625,7 @@ class UDFLib
 		elseif (isset($jsonSchema->{UDFLib::LIST_VALUES}->sql))
 		{
 			// UDFModel is loaded in method _loadUDF that is called before the current method
-			$queryResult = $this->_ci->UDFModel->execQuery($jsonSchema->{UDFLib::LIST_VALUES}->sql);
+			$queryResult = $this->_ci->UDFModel->execReadOnlyQuery($jsonSchema->{UDFLib::LIST_VALUES}->sql);
 			if (hasData($queryResult))
 			{
 				$parameters = $queryResult->retval;

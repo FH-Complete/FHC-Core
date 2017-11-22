@@ -674,6 +674,225 @@ if ($result = @$db->db_query("SELECT 1 FROM system.tbl_berechtigung WHERE berech
 //---------------------------------------------------------------------------------------------------------------------
 
 
+//---------------------------------------------------------------------------------------------------------------------
+// Start filters
+
+// SEQUENCE tbl_filters_id_seq
+if ($result = $db->db_query("SELECT 0 FROM pg_class WHERE relname = 'tbl_filters_id_seq'"))
+{
+	if ($db->db_num_rows($result) == 0)
+	{
+		$qry = '
+			CREATE SEQUENCE system.tbl_filters_id_seq
+				START WITH 1
+				INCREMENT BY 1
+				NO MAXVALUE
+				NO MINVALUE
+				CACHE 1;
+			';
+		if(!$db->db_query($qry))
+			echo '<strong>system.tbl_filters_id_seq '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>Created sequence: system.tbl_filters_id_seq';
+
+		// GRANT SELECT, UPDATE ON SEQUENCE system.tbl_filters_id_seq TO vilesci;
+		$qry = 'GRANT SELECT, UPDATE ON SEQUENCE system.tbl_filters_id_seq TO vilesci;';
+		if (!$db->db_query($qry))
+			echo '<strong>system.tbl_filters_id_seq '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>Granted privileges to <strong>vilesci</strong> on system.tbl_filters_id_seq';
+
+		// GRANT SELECT, UPDATE ON SEQUENCE system.tbl_filters_id_seq TO fhcomplete;
+		$qry = 'GRANT SELECT, UPDATE ON SEQUENCE system.tbl_filters_id_seq TO fhcomplete;';
+		if (!$db->db_query($qry))
+			echo '<strong>system.tbl_filters_id_seq '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>Granted privileges to <strong>vilesci</strong> on system.tbl_filters_id_seq';
+	}
+}
+
+// TABLE system.tbl_filters
+if (!@$db->db_query("SELECT 0 FROM system.tbl_filters WHERE 0 = 1"))
+{
+	$qry = '
+		CREATE TABLE system.tbl_filters (
+			filter_id integer NOT NULL DEFAULT nextval(\'system.tbl_filters_id_seq\'::regclass),
+			app character varying(32) NOT NULL,
+			dataset_name character varying(128) NOT NULL,
+			filter_kurzbz character varying(64) NOT NULL,
+			person_id integer,
+			description character varying(128)[] NOT NULL,
+			sort integer,
+			default_filter boolean DEFAULT FALSE,
+			filter jsonb NOT NULL,
+			oe_kurzbz character varying(16)
+		);';
+	if (!$db->db_query($qry))
+		echo '<strong>system.tbl_filters '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Created table system.tbl_filters';
+
+	// GRANT SELECT ON TABLE system.tbl_filters TO web;
+	$qry = 'GRANT SELECT ON TABLE system.tbl_filters TO web;';
+	if (!$db->db_query($qry))
+		echo '<strong>system.tbl_filters '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Granted privileges to <strong>web</strong> on system.tbl_filters';
+
+	// GRANT SELECT, UPDATE, INSERT, DELETE ON TABLE system.tbl_filters TO vilesci;
+	$qry = 'GRANT SELECT, UPDATE, INSERT, DELETE ON TABLE system.tbl_filters TO vilesci;';
+	if (!$db->db_query($qry))
+		echo '<strong>system.tbl_filters '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Granted privileges to <strong>vilesci</strong> on system.tbl_filters';
+
+	// COMMENT ON TABLE system.tbl_filters
+	$qry = 'COMMENT ON TABLE system.tbl_filters IS \'Table to manage filters\';';
+	if (!$db->db_query($qry))
+		echo '<strong>Adding comment to system.tbl_filters: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Added comment to system.tbl_filters';
+
+	// COMMENT ON TABLE system.tbl_filters.app
+	$qry = 'COMMENT ON COLUMN system.tbl_filters.app IS \'Application which this filter belongs to\';';
+	if (!$db->db_query($qry))
+		echo '<strong>Adding comment to system.tbl_filters.app: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Added comment to system.tbl_filters.app';
+
+	// COMMENT ON TABLE system.tbl_filters.dataset_name
+	$qry = 'COMMENT ON COLUMN system.tbl_filters.dataset_name IS \'Name that identifies the data set to be filtered\';';
+	if (!$db->db_query($qry))
+		echo '<strong>Adding comment to system.tbl_filters.dataset_name: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Added comment to system.tbl_filters.dataset_name';
+
+	// COMMENT ON TABLE system.tbl_filters.filter_kurzbz
+	$qry = 'COMMENT ON COLUMN system.tbl_filters.filter_kurzbz IS \'Short description of the filter, unique for this application and this data set\';';
+	if (!$db->db_query($qry))
+		echo '<strong>Adding comment to system.tbl_filters.filter_kurzbz: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Added comment to system.tbl_filters.filter_kurzbz';
+
+	// COMMENT ON TABLE system.tbl_filters.person_id
+	$qry = 'COMMENT ON COLUMN system.tbl_filters.person_id IS \'Person identifier which this filter belongs to. If null it is global\';';
+	if (!$db->db_query($qry))
+		echo '<strong>Adding comment to system.tbl_filters.person_id: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Added comment to system.tbl_filters.person_id';
+
+	// COMMENT ON TABLE system.tbl_filters.description
+	$qry = 'COMMENT ON COLUMN system.tbl_filters.description IS \'Long description for this filter\';';
+	if (!$db->db_query($qry))
+		echo '<strong>Adding comment to system.tbl_filters.description: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Added comment to system.tbl_filters.description';
+
+	// COMMENT ON TABLE system.tbl_filters.sort
+	$qry = 'COMMENT ON COLUMN system.tbl_filters.sort IS \'Indicates the order in which the filters appear in a list\';';
+	if (!$db->db_query($qry))
+		echo '<strong>Adding comment to system.tbl_filters.sort: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Added comment to system.tbl_filters.sort';
+
+	// COMMENT ON TABLE system.tbl_filters.default_filter
+	$qry = 'COMMENT ON COLUMN system.tbl_filters.default_filter IS \'If it is the default filter for that data set\';';
+	if (!$db->db_query($qry))
+		echo '<strong>Adding comment to system.tbl_filters.default_filter: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Added comment to system.tbl_filters.default_filter';
+
+	// COMMENT ON TABLE system.tbl_filters.filter
+	$qry = 'COMMENT ON COLUMN system.tbl_filters.filter IS \'Cointains json that define the filter\';';
+	if (!$db->db_query($qry))
+		echo '<strong>Adding comment to system.tbl_filters.filter: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Added comment to system.tbl_filters.filter';
+
+	// COMMENT ON TABLE system.tbl_filters.oe_kurzbz
+	$qry = 'COMMENT ON COLUMN system.tbl_filters.oe_kurzbz IS \'Organisation unit which this filter belongs to. If null it is for all the organisation units\';';
+	if (!$db->db_query($qry))
+		echo '<strong>Adding comment to system.tbl_filters.oe_kurzbz: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Added comment to system.tbl_filters.oe_kurzbz';
+
+	// ALTER SEQUENCE system.tbl_filters_id_seq OWNED BY system.tbl_filters.filter_id;
+	$qry = 'ALTER SEQUENCE system.tbl_filters_id_seq OWNED BY system.tbl_filters.filter_id;';
+	if (!$db->db_query($qry))
+		echo '<strong>system.tbl_filters_id_seq '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Altered sequence system.tbl_filters_id_seq';
+}
+
+// UNIQUE INDEX uidx_filters_app_dataset_name_filter_kurzbz
+if ($result = $db->db_query("SELECT 0 FROM pg_class WHERE relname = 'uidx_filters_app_dataset_name_filter_kurzbz'"))
+{
+	if ($db->db_num_rows($result) == 0)
+	{
+		$qry = 'CREATE UNIQUE INDEX uidx_filters_app_dataset_name_filter_kurzbz ON system.tbl_filters USING btree (app, dataset_name, filter_kurzbz);';
+		if (!$db->db_query($qry))
+			echo '<strong>uidx_filters_app_dataset_name_filter_kurzbz '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>Created unique uidx_filters_app_dataset_name_filter_kurzbz';
+	}
+}
+
+// Add permission for filters
+if ($result = @$db->db_query("SELECT 1 FROM system.tbl_berechtigung WHERE berechtigung_kurzbz = 'system/filters';"))
+{
+	if ($db->db_num_rows($result) == 0)
+	{
+		$qry = "INSERT INTO system.tbl_berechtigung (berechtigung_kurzbz, beschreibung) VALUES('system/filters', 'To manage core filters');";
+		if (!$db->db_query($qry))
+			echo '<strong>system.tbl_berechtigung '.$db->db_last_error().'</strong><br>';
+		else
+			echo ' system.tbl_berechtigung: Added permission for filters<br>';
+	}
+}
+
+// FOREIGN KEY tbl_filters_app_fkey
+if ($result = $db->db_query("SELECT conname FROM pg_constraint WHERE conname = 'tbl_filters_app_fkey'"))
+{
+	if ($db->db_num_rows($result) == 0)
+	{
+		$qry = 'ALTER TABLE system.tbl_filters ADD CONSTRAINT tbl_filters_app_fkey FOREIGN KEY (app) REFERENCES system.tbl_app(app) ON UPDATE CASCADE ON DELETE RESTRICT;';
+		if (!$db->db_query($qry))
+			echo '<strong>tbl_filters_app_fkey '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>Created foreign key tbl_filters_app_fkey';
+	}
+}
+
+// FOREIGN KEY tbl_filters_person_id_fkey
+if ($result = $db->db_query("SELECT conname FROM pg_constraint WHERE conname = 'tbl_filters_person_id_fkey'"))
+{
+	if ($db->db_num_rows($result) == 0)
+	{
+		$qry = 'ALTER TABLE system.tbl_filters ADD CONSTRAINT tbl_filters_person_id_fkey FOREIGN KEY (person_id) REFERENCES public.tbl_person(person_id) ON UPDATE CASCADE ON DELETE RESTRICT;';
+		if (!$db->db_query($qry))
+			echo '<strong>tbl_filters_person_id_fkey '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>Created foreign key tbl_filters_person_id_fkey';
+	}
+}
+
+// FOREIGN KEY tbl_filters_oe_kurzbz_fkey
+if ($result = $db->db_query("SELECT conname FROM pg_constraint WHERE conname = 'tbl_filters_oe_kurzbz_fkey'"))
+{
+	if ($db->db_num_rows($result) == 0)
+	{
+		$qry = 'ALTER TABLE system.tbl_filters ADD CONSTRAINT tbl_filters_oe_kurzbz_fkey FOREIGN KEY (oe_kurzbz) REFERENCES public.tbl_organisationseinheit(oe_kurzbz) ON UPDATE CASCADE ON DELETE RESTRICT;';
+		if (!$db->db_query($qry))
+			echo '<strong>tbl_filters_oe_kurzbz_fkey '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>Created foreign key tbl_filters_oe_kurzbz_fkey';
+	}
+}
+
+// End filters
+//---------------------------------------------------------------------------------------------------------------------
+
+
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
 
@@ -923,6 +1142,7 @@ $tabellen=array(
 	"system.tbl_benutzerrolle"  => array("benutzerberechtigung_id","rolle_kurzbz","berechtigung_kurzbz","uid","funktion_kurzbz","oe_kurzbz","art","studiensemester_kurzbz","start","ende","negativ","updateamum", "updatevon","insertamum","insertvon","kostenstelle_id","anmerkung"),
 	"system.tbl_berechtigung"  => array("berechtigung_kurzbz","beschreibung"),
 	"system.tbl_extensions" => array("extension_id","name","version","description","license","url","core_version","dependencies","enabled"),
+	"system.tbl_filters" => array("filter_id","app","dataset_name","filter_kurzbz","person_id","description","sort","default_filter","filter","oe_kurzbz"),
 	"system.tbl_phrase" => array("phrase_id","app","phrase","insertamum","insertvon"),
 	"system.tbl_phrasentext" => array("phrasentext_id","phrase_id","sprache","orgeinheit_kurzbz","orgform_kurzbz","text","description","insertamum","insertvon"),
 	"system.tbl_rolle"  => array("rolle_kurzbz","beschreibung"),

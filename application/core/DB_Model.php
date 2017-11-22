@@ -23,6 +23,9 @@ class DB_Model extends FHC_Model
 	protected $hasSequence;	// False if this table has a composite primary key that is not using a sequence
 							// True if this table has a primary key that uses a sequence
 
+	private $executedQueryMetaData;
+	private $executedQueryListFields;
+
 	/**
 	 * Constructor
 	 */
@@ -670,6 +673,44 @@ class DB_Model extends FHC_Model
 		return $this->fieldExists(UDFLib::COLUMN_NAME);
 	}
 
+	/**
+	 * Get the list of the fields after having executed a query
+	 */
+	public function getExecutedQueryListFields()
+	{
+		return $this->executedQueryListFields;
+	}
+
+	/**
+	 * Get meda data info about the retrived fields after having executed a query
+	 */
+	public function getExecutedQueryMetaData()
+	{
+		return $this->executedQueryMetaData;
+	}
+
+	/**
+	 * Like execQuery, but it allows only to perform queries to read data
+	 */
+	public function execReadOnlyQuery($query, $parametersArray = null)
+	{
+		//
+		if (!stripos($query, 'INSERT')
+			&& !stripos($query, 'UPDATE')
+			&& !stripos($query, 'DELETE')
+			&& !stripos($query, 'CREATE')
+			&& !stripos($query, 'ALTER')
+			&& !stripos($query, 'GRANT')
+			&& !stripos($query, 'DROP'))
+		{
+			return $this->execQuery($query, $parametersArray);
+		}
+		else
+		{
+			return error('You are allowed to run only query for reading data');
+		}
+	}
+
 	// ------------------------------------------------------------------------------------------
 	// Protected methods
 
@@ -809,20 +850,23 @@ class DB_Model extends FHC_Model
 		if (is_object($result))
 		{
 			$toBeConverterdArray = array(); // Fields to be converted
-			$metaDataArray = $result->field_data(); // Fields information
-			for ($i = 0; $i < count($metaDataArray); $i++) // Looking for booleans and arrays
+
+			$this->executedQueryMetaData = $result->field_data(); // Fields information
+			$this->executedQueryListFields = $result->list_fields(); // List of the retrived fields
+
+			for ($i = 0; $i < count($this->executedQueryMetaData); $i++) // Looking for booleans and arrays
 			{
 				// If array type, boolean type OR a UDF
-				if (strpos($metaDataArray[$i]->type, DB_Model::PGSQL_ARRAY_TYPE) !== false
-					|| $metaDataArray[$i]->type == DB_Model::PGSQL_BOOLEAN_TYPE
-					|| $this->udflib->isUDFColumn($metaDataArray[$i]->name, $metaDataArray[$i]->type))
+				if (strpos($this->executedQueryMetaData[$i]->type, DB_Model::PGSQL_ARRAY_TYPE) !== false
+					|| $this->executedQueryMetaData[$i]->type == DB_Model::PGSQL_BOOLEAN_TYPE
+					|| $this->udflib->isUDFColumn($this->executedQueryMetaData[$i]->name, $this->executedQueryMetaData[$i]->type))
 				{
 					// Name and type of the field to be converted
 					$toBeConverted = new stdClass();
 					// Set the type of the field to be converted
-					$toBeConverted->type = $metaDataArray[$i]->type;
+					$toBeConverted->type = $this->executedQueryMetaData[$i]->type;
 					// Set the name of the field to be converted
-					$toBeConverted->name = $metaDataArray[$i]->name;
+					$toBeConverted->name = $this->executedQueryMetaData[$i]->name;
 					// Add the field to be converted to $toBeConverterdArray
 					array_push($toBeConverterdArray, $toBeConverted);
 				}
