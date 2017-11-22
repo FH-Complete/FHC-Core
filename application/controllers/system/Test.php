@@ -22,10 +22,11 @@ class Test extends VileSci_Controller
 				'app' => 'OpenProject',
 				'datasetName' => 'Arbeitspakete',
 				'query' => '
-					SELECT p.person_id AS PersonId,
-							p.nachname AS Nachname,
-							p.vorname AS Vorname,
-							k.kontakt AS Email
+					SELECT p.person_id AS "PersonId",
+							p.nachname AS "Nachname",
+							p.vorname AS "Vorname",
+							k.kontakt AS "Email",
+							p.aktiv AS "Aktiv"
 					  FROM public.tbl_person p INNER JOIN public.tbl_kontakt k USING(person_id)
 					 WHERE p.aktiv = TRUE
 					   AND p.person_id = k.person_id

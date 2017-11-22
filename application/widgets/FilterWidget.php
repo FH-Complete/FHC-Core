@@ -28,11 +28,22 @@ class FilterWidget extends Widget
 
 		$dataset = $this->FiltersModel->execReadOnlyQuery($widgetData['query']);
 
-		$this->loadViewSelectFields($this->FiltersModel->getExecutedQueryListFields());
+		$listFields = $this->FiltersModel->getExecutedQueryListFields();
 
-		$this->loadViewSelectFilters($this->FiltersModel->getExecutedQueryMetaData());
+		$metaData = $this->FiltersModel->getExecutedQueryMetaData();
 
-		$this->loadViewTableDataset($dataset);
+		$this->loadViewFilters($listFields, $metaData, $dataset);
+	}
+
+	/**
+	 *
+	 */
+	private function loadViewFilters($listFields, $metaData, $dataset)
+	{
+		$this->view(
+			'widgets/filter/filter',
+			array('listFields' => $listFields, 'metaData' => $metaData, 'dataset' => $dataset)
+		);
 	}
 
 	/**
@@ -54,8 +65,8 @@ class FilterWidget extends Widget
 	/**
 	 *
 	 */
-	private function loadViewTableDataset($result)
+	private function loadViewTableDataset($dataset)
 	{
-		$this->view('widgets/filter/tableDataset', array('dataset' => $result));
+		$this->view('widgets/filter/tableDataset', array('dataset' => $dataset));
 	}
 }
