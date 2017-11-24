@@ -106,6 +106,10 @@
 <!ENTITY menu-statistic-notenspiegel-excel.label		"Notenspiegel EXCEL">
 <!ENTITY menu-statistic-notenspiegel-excel.accesskey	"E">
 
+<!ENTITY menu-statistic-notenspiegel-excel-erweitert.key			"R">
+<!ENTITY menu-statistic-notenspiegel-excel-erweitert.label		"Notenspiegel erweitert EXCEL">
+<!ENTITY menu-statistic-notenspiegel-excel-erweitert.accesskey	"R">
+
 <!ENTITY menu-statistic-notenspiegel.key		"H">
 <!ENTITY menu-statistic-notenspiegel.label		"Notenspiegel HTML">
 <!ENTITY menu-statistic-notenspiegel.accesskey	"H">

@@ -133,7 +133,7 @@ class note extends basis_db
 				 $this->db_add_param($this->positiv, FHC_BOOLEAN).','.
 				 $this->db_add_param($this->notenwert).','.
 				 $this->db_add_parma($this->aktiv, FHC_BOOLEAN).','.
-				 $this->db_add_param($htis->lehre, FHC_BOOLEAN).');';
+				 $this->db_add_param($this->lehre, FHC_BOOLEAN).');';
 		}
 		else
 		{
@@ -167,6 +167,40 @@ class note extends basis_db
 	{
 		$qry = "SELECT * FROM lehre.tbl_note ORDER BY note";
 		
+		if($this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object())
+			{
+				$n = new note();
+
+				$n->note = $row->note;
+				$n->bezeichnung = $row->bezeichnung;
+				$n->anmerkung = $row->anmerkung;
+				$n->farbe = $row->farbe;
+				$n->positiv = $this->db_parse_bool($row->positiv);
+				$n->notenwert = $row->notenwert;
+				$n->aktiv = $this->db_parse_bool($row->aktiv);
+				$n->lehre = $this->db_parse_bool($row->lehre);
+
+				$this->result[] = $n;
+			}
+			return true;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+	}
+
+	/**
+	 * Laedt alle aktive Noten
+	 * @return true wenn ok, false wenn Fehler
+	 */
+	public function getActive()
+	{
+		$qry = "SELECT * FROM lehre.tbl_note WHERE aktiv = TRUE ORDER BY note";
+
 		if($this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object())

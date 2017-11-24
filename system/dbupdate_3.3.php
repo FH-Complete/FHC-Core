@@ -358,8 +358,8 @@ if(!$result = @$db->db_query("SELECT mailversand FROM campus.tbl_coodle LIMIT 1;
 
 	if(!$db->db_query($qry))
 		echo '<strong>campus.tbl_coodle: '.$db->db_last_error().'</strong><br>';
-		else
-			echo '<br>campus.tbl_coodle: Spalten mailversand, teilnehmer_anonym und termine_anonym hinzugefuegt!<br>';
+	else
+		echo '<br>campus.tbl_coodle: Spalten mailversand, teilnehmer_anonym und termine_anonym hinzugefuegt!<br>';
 }
 
 // Spalte onlinebewerbung_studienplan in lehre.tbl_studienplan
@@ -369,8 +369,61 @@ if(!$result = @$db->db_query("SELECT onlinebewerbung_studienplan FROM lehre.tbl_
 
 	if(!$db->db_query($qry))
 		echo '<strong>lehre.tbl_studienplan: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>lehre.tbl_studienplan: Spalte onlinebewerbung_studienplan hinzugefuegt!<br>';
+}
+
+// Spalte sort in lehre.tbl_pruefungstyp (gibt Reihenfolge der Prüfungsantritte an)
+if(!$result = @$db->db_query("SELECT sort FROM lehre.tbl_pruefungstyp LIMIT 1;"))
+{
+	$qry = "ALTER TABLE lehre.tbl_pruefungstyp ADD COLUMN sort smallint;";
+
+	if(!$db->db_query($qry))
+		echo '<strong>lehre.tbl_pruefungstyp: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>lehre.tbl_pruefungstyp: Spalte sort hinzugefuegt!<br>';
+}
+
+// zusätzliche kommissionelle Prüfung (4.Termin) als Zeile hinzufügen
+if($result = @$db->db_query("SELECT 1 FROM lehre.tbl_pruefungstyp WHERE pruefungstyp_kurzbz= 'zusKommPruef';"))
+{
+	if($db->db_num_rows($result) == 0)
+	{
+		$qry = "INSERT INTO lehre.tbl_pruefungstyp(pruefungstyp_kurzbz, beschreibung, abschluss) VALUES ('zusKommPruef', 'zusätzliche kommissionelle Prüfung', FALSE);";
+
+		if(!$db->db_query($qry))
+			echo '<strong>lehre.tbl_pruefungstyp: '.$db->db_last_error().'</strong><br>';
 		else
-			echo '<br>lehre.tbl_studienplan: Spalte onlinebewerbung_studienplan hinzugefuegt!<br>';
+			echo '<br>lehre.tbl_pruefungstyp: Zeile zusKommPruef hinzugefuegt!<br>';
+	}
+}
+
+// Note "entschuldigt" hinzufügen
+if($result = @$db->db_query("SELECT 1 FROM lehre.tbl_note WHERE anmerkung = 'en' AND bezeichnung = 'entschuldigt' OR bezeichnung = 'Entschuldigt';"))
+{
+	if($db->db_num_rows($result) == 0)
+	{
+		$qry = "INSERT INTO lehre.tbl_note(note, bezeichnung, anmerkung, farbe, positiv, notenwert, aktiv, lehre) VALUES(17, 'entschuldigt', 'en', NULL, TRUE, NULL, TRUE, TRUE);";
+
+		if(!$db->db_query($qry))
+			echo '<strong>lehre.tbl_note: '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>lehre.tbl_note: Zeile entschuldigt hinzugefuegt!<br>';
+	}
+}
+
+// Note "unentschuldigt" hinzufügen
+if($result = @$db->db_query("SELECT 1 FROM lehre.tbl_note WHERE anmerkung = 'ue' AND bezeichnung = 'unentschuldigt' OR bezeichnung = 'Unentschuldigt';"))
+{
+	if($db->db_num_rows($result) == 0)
+	{
+		$qry = "INSERT INTO lehre.tbl_note(note, bezeichnung, anmerkung, farbe, positiv, notenwert, aktiv, lehre) VALUES(18, 'unentschuldigt', 'ue', NULL, FALSE, NULL, TRUE, TRUE);";
+
+		if(!$db->db_query($qry))
+			echo '<strong>lehre.tbl_note: '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>lehre.tbl_note: Zeile unentschuldigt hinzugefuegt!<br>';
+	}
 }
 
 // Column design_uid, betrieb_uid and operativ_uid to tbl_service
@@ -385,8 +438,8 @@ if(!$result = @$db->db_query("SELECT design_uid FROM public.tbl_service LIMIT 1;
 
 	if(!$db->db_query($qry))
 		echo '<strong>public.tbl_service: '.$db->db_last_error().'</strong><br>';
-		else
-			echo '<br>public.tbl_service: Spalten design_uid,betrieb_uid,operativ_uid hinzugefuegt!<br>';
+	else
+		echo '<br>public.tbl_service: Spalten design_uid,betrieb_uid,operativ_uid hinzugefuegt!<br>';
 }
 
 // FOREIGN KEY tbl_phrasentext_sprache_fkey: system.tbl_phrasentext.sprache references public.tbl_sprache.sprache
@@ -527,7 +580,7 @@ if(!@$db->db_query("SELECT campus.get_highest_content_version(0)"))
 			$_$;
 			
 			ALTER FUNCTION campus.get_highest_content_version(bigint) OWNER TO fhcomplete;';
-	
+
 	if(!$db->db_query($qry))
 		echo '<strong>campus.get_highest_content_version(content_id): '.$db->db_last_error().'</strong><br>';
 	else
@@ -543,7 +596,7 @@ if(!@$db->db_query("SELECT ausstellungsnation FROM public.tbl_akte LIMIT 1"))
 			COMMENT ON COLUMN public.tbl_akte.ausstellungsnation IS 'Nation-Code des Landes, in dem das Dokument ausgestellt wurde';
 			COMMENT ON COLUMN public.tbl_akte.formal_geprueft_amum IS 'Bestaetigungsdatum, an dem das Dokument inhaltlich auf Formalkriterien (Leserlichkeit, Vollständigkeit, etc) geprueft wurde';
 			";
-	
+
 	if(!$db->db_query($qry))
 		echo '<strong>public.tbl_rt_person '.$db->db_last_error().'</strong><br>';
 		else
@@ -556,7 +609,7 @@ if(!@$db->db_query("SELECT ausstellungsdetails FROM public.tbl_dokument LIMIT 1"
 	$qry = "ALTER TABLE public.tbl_dokument ADD COLUMN ausstellungsdetails boolean NOT NULL DEFAULT false;
 			COMMENT ON COLUMN public.tbl_dokument.ausstellungsdetails IS 'Sollen beim Dokument weitere Felder (zB Ausstellungsnation) angezeigt werden?';
 			";
-	
+
 	if(!$db->db_query($qry))
 		echo '<strong>public.tbl_dokument '.$db->db_last_error().'</strong><br>';
 		else
