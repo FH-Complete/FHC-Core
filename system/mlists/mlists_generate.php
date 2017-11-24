@@ -134,7 +134,8 @@ $error_msg='';
 											FROM public.tbl_mitarbeiter
 											JOIN public.tbl_benutzer ON (mitarbeiter_uid=uid)
 											WHERE lektor
-											AND aktiv";
+											AND aktiv
+											AND personalnummer >=0";
 	//MitarbeiterInnen mit gueltiger Funktion "ass" (assistenz)
 	$verteilerArray['tw_sek']['bezeichnung'] = 'Alle Sekretariate';
 	$verteilerArray['tw_sek']['beschreibung'] = 'Alle Sekretariate an der FH Technikum Wien';
