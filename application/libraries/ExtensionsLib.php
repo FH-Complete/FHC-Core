@@ -313,7 +313,7 @@ class ExtensionsLib
 		if (isError($result))
 		{
 			$this->_errorOccurred = true;
-			$this->_printFailure('data base error');
+			$this->_printFailure('data base error: '.$result->retval);
 		}
 		else
 		{
