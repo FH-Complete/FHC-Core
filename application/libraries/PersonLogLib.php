@@ -1,0 +1,47 @@
+<?php
+
+if (! defined('BASEPATH')) exit('No direct script access allowed');
+
+/**
+ * Logging Actions of Persons
+ */
+class PersonLogLib
+{
+	/**
+	 * Constructor
+	 */
+	public function __construct()
+	{
+		$this->ci =& get_instance();
+		$this->ci->load->model('system/PersonLog_model', 'PersonLogModel');
+	}
+
+	/**
+	 * Writes a Log for a Person
+	 * @param int $person_id ID of the Person.
+	 * @param string $logtype_kurzbz Type of Log.
+	 * @param array $logdata Array of the JSON Data to save.
+	 * @param string $app Application that log belongs to.
+	 * @param string $oe_kurzbz Organisation Unit the Log belongs to.
+	 * @param string $user User who created the log.
+	 * @return boolean true if success
+	 */
+	public function log($person_id, $logtype_kurzbz, $logdata, $app = 'core', $oe_kurzbz = null, $user = null)
+	{
+		$data = array(
+			'person_id' => $person_id,
+			'zeitpunkt' => date('Y-m-d H:i:s'),
+			'app' => $app,
+			'oe_kurzbz' => $oe_kurzbz,
+			'logtype_kurzbz' => $logtype_kurzbz,
+			'logdata' => json_encode($logdata),
+			'insertvon' => $user
+		);
+
+		$result = $this->ci->PersonLogModel->insert($data);
+		if (isSuccess($result))
+			return true;
+		else
+			show_error($result->retval);
+	}
+}

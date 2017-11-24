@@ -14,16 +14,17 @@ class CallerLib
 	const LIB_FILE_EXTENSION = '.php';
 	const LIBS_PATH = 'libraries';
 	const MODEL_PREFIX = '_model';
-	
+
 	// Black list of resources that are no allowed to be used
 	private static $RESOURCES_BLACK_LIST = array(
 		'CallerLib', // disabled self loading
 		'LogLib', // hardly usefull and virtually dangerous
 		'MigrationLib', // virtually dangerous, DB manipulation
 		'FilesystemLib', // virtually dangerous, direct access to file system
-		'PermissionLib' // usefull?
+		'PermissionLib', // usefull?
+		'PersonLogLib'
 	);
-	
+
 	/**
 	 * Object initialization
 	 */
@@ -31,14 +32,14 @@ class CallerLib
 	{
 		// Gets CI instance
 		$this->ci =& get_instance();
-		
+
 		// Loads helper message to manage returning messages
 		$this->ci->load->helper('Message');
-		
+
 		// Loads permission library
 		$this->ci->load->library('PermissionLib');
 	}
-	
+
 	/**
 	 * Wrapper method for _call
 	 */
@@ -46,7 +47,7 @@ class CallerLib
 	{
 		return $this->_call($callParameters, $permissionType);
 	}
-	
+
 	/**
 	 * Wrapper method for _call
 	 */
@@ -54,7 +55,7 @@ class CallerLib
 	{
 		return $this->_call($callParameters, $permissionType);
 	}
-	
+
 	/**
 	 * Everything starts here...
 	 */
@@ -63,7 +64,7 @@ class CallerLib
 		$result = null;
 		$parameters = $this->_getParameters($callParameters);
 		$validation = $this->_validateCall($parameters);
-		
+
 		// If the validation was passed
 		if (isSuccess($validation))
 		{
@@ -119,7 +120,7 @@ class CallerLib
 			{
 				$result = error('Neither a lib nor model: '.$parameters->resourcePath.$parameters->resourceName);
 			}
-			
+
 			// If the resource was found and loaded
 			if (!is_null($loaded))
 			{
@@ -134,10 +135,10 @@ class CallerLib
 		{
 			$result = $validation;
 		}
-		
+
 		return $result;
 	}
-	
+
 	/**
 	 * Gets the parameters from the http call
 	 * Search for parameters <RESOURCE_PARAMETER> and <FUNCTION_PARAMETER>
@@ -181,7 +182,7 @@ class CallerLib
 
 		return $parameters;
 	}
-	
+
 	/**
 	 * Validate the given parameters
 	 */
@@ -224,7 +225,7 @@ class CallerLib
 	{
 		$loaded = null;
 		$result = null;
-		
+
 		try
 		{
 			$loaded = $this->ci->load->model($resourcePath.$resourceName);
@@ -234,15 +235,15 @@ class CallerLib
 			// Errors while loading the model
 			$result = error('Errors while loading the model: '.$e->getMessage());
 		}
-		
+
 		if (!is_null($loaded))
 		{
 			$result = success($loaded);
 		}
-		
+
 		return $result;
 	}
-	
+
 	/**
 	 * Search for a valid permission for this library that should be present with this format:
 	 * '<library path>.<library name>.<library method name>' => '<permission>'
@@ -251,14 +252,14 @@ class CallerLib
 	{
 		$result = null;
 		$permissionPath = '';
-		
+
 		if ($resourcePath != '')
 		{
 			$permissionPath = $resourcePath;
 		}
-		
+
 		$permissionPath .= $resourceName.'.'.$function;
-		
+
 		if ($this->ci->permissionlib->isEntitled($permissionPath, $permissionType) === false)
 		{
 			$result = error(FHC_NORIGHT, FHC_NORIGHT);
@@ -267,10 +268,10 @@ class CallerLib
 		{
 			$result = success('Has permission');
 		}
-		
+
 		return $result;
 	}
-	
+
 	/**
 	 * Loads a library using the given path and name
 	 *
@@ -286,7 +287,7 @@ class CallerLib
 	private function _loadLibrary($resourcePath, $resourceName)
 	{
 		$loaded = null;
-		
+
 		try
 		{
 			// Gets all the configured resources paths
@@ -328,15 +329,15 @@ class CallerLib
 			// Errors while loading the library
 			$result = error('Errors while loading the library: '.$e->getMessage());
 		}
-		
+
 		if (!is_null($loaded))
 		{
 			$result = success($loaded);
 		}
-		
+
 		return $result;
 	}
-	
+
 	/**
 	 * Calls a method of a class with the given parameters and returns its result
 	 *
@@ -347,7 +348,7 @@ class CallerLib
 	private function _callThis($resourceName, $function, $parameters)
 	{
 		$result = null;
-		
+
 		try
 		{
 			// Get informations about the function
@@ -402,7 +403,7 @@ class CallerLib
 		{
 			$result = error($e->getMessage());
 		}
-		
+
 		return $result;
 	}
 }

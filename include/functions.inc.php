@@ -1079,4 +1079,10 @@ function cutString($string, $limit, $placeholderSign = '', $keepFilextension = f
 		return $string;
 	}
 }
+
+function PersonLog($ci, $person_id, $logtype_kurzbz, $logdata, $app, $oe_kurzbz = null, $user=null)
+{
+	$ci->load->library('PersonLogLib');
+	$ci->personloglib->log($person_id, $logtype_kurzbz, $logdata, $app, $oe_kurzbz, $user);
+}
 ?>
