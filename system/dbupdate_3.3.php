@@ -403,7 +403,7 @@ if($result = @$db->db_query("SELECT 1 FROM lehre.tbl_note WHERE anmerkung = 'en'
 {
 	if($db->db_num_rows($result) == 0)
 	{
-		$qry = "INSERT INTO lehre.tbl_note(note, bezeichnung, anmerkung, farbe, positiv, notenwert, aktiv, lehre) VALUES(17, 'entschuldigt', 'en', NULL, TRUE, NULL, TRUE, TRUE);";
+		$qry = "INSERT INTO lehre.tbl_note(bezeichnung, anmerkung, farbe, positiv, notenwert, aktiv, lehre) VALUES('entschuldigt', 'en', NULL, TRUE, NULL, TRUE, TRUE);";
 
 		if(!$db->db_query($qry))
 			echo '<strong>lehre.tbl_note: '.$db->db_last_error().'</strong><br>';
@@ -417,7 +417,7 @@ if($result = @$db->db_query("SELECT 1 FROM lehre.tbl_note WHERE anmerkung = 'ue'
 {
 	if($db->db_num_rows($result) == 0)
 	{
-		$qry = "INSERT INTO lehre.tbl_note(note, bezeichnung, anmerkung, farbe, positiv, notenwert, aktiv, lehre) VALUES(18, 'unentschuldigt', 'ue', NULL, FALSE, NULL, TRUE, TRUE);";
+		$qry = "INSERT INTO lehre.tbl_note(bezeichnung, anmerkung, farbe, positiv, notenwert, aktiv, lehre) VALUES('unentschuldigt', 'ue', NULL, FALSE, NULL, TRUE, TRUE);";
 
 		if(!$db->db_query($qry))
 			echo '<strong>lehre.tbl_note: '.$db->db_last_error().'</strong><br>';
@@ -1069,15 +1069,14 @@ $tabellen=array(
 	"wawi.tbl_betriebsmittelstatus"  => array("betriebsmittelstatus_kurzbz","beschreibung"),
 	"wawi.tbl_betriebsmitteltyp"  => array("betriebsmitteltyp","beschreibung","anzahl","kaution","typ_code","mastershapename"),
 	"wawi.tbl_budget"  => array("geschaeftsjahr_kurzbz","kostenstelle_id","budget"),
-	"wawi.tbl_zahlungstyp"  => array("zahlungstyp_kurzbz","bezeichnung","reihenfolge"),
-	"wawi.tbl_konto"  => array("konto_id","kontonr","beschreibung","kurzbz","aktiv","person_id","insertamum","insertvon","updateamum","updatevon","ext_id","person_id","hilfe"),
+	"wawi.tbl_zahlungstyp"  => array("zahlungstyp_kurzbz","bezeichnung"),
+	"wawi.tbl_konto"  => array("konto_id","kontonr","beschreibung","kurzbz","aktiv","person_id","insertamum","insertvon","updateamum","updatevon","ext_id","person_id"),
 	"wawi.tbl_konto_kostenstelle"  => array("konto_id","kostenstelle_id","insertamum","insertvon"),
 	"wawi.tbl_kostenstelle"  => array("kostenstelle_id","oe_kurzbz","bezeichnung","kurzbz","aktiv","insertamum","insertvon","updateamum","updatevon","ext_id","kostenstelle_nr","deaktiviertvon","deaktiviertamum"),
 	"wawi.tbl_bestellungtag"  => array("tag","bestellung_id","insertamum","insertvon"),
 	"wawi.tbl_bestelldetailtag"  => array("tag","bestelldetail_id","insertamum","insertvon"),
 	"wawi.tbl_projekt_bestellung"  => array("projekt_kurzbz","bestellung_id","anteil"),
 	"wawi.tbl_bestellung"  => array("bestellung_id","besteller_uid","kostenstelle_id","konto_id","firma_id","lieferadresse","rechnungsadresse","freigegeben","bestell_nr","titel","bemerkung","liefertermin","updateamum","updatevon","insertamum","insertvon","ext_id","zahlungstyp_kurzbz","zuordnung_uid","zuordnung_raum","zuordnung","auftragsbestaetigung","auslagenersatz","iban","wird_geleast","nicht_bestellen","empfehlung_leasing"),
-	"wawi.tbl_bestellung_angebot" => array("angebot_id","bestellung_id","dms_id"),
 	"wawi.tbl_bestelldetail"  => array("bestelldetail_id","bestellung_id","position","menge","verpackungseinheit","beschreibung","artikelnummer","preisprove","mwst","erhalten","sort","text","updateamum","updatevon","insertamum","insertvon"),
 	"wawi.tbl_bestellung_bestellstatus"  => array("bestellung_bestellstatus_id","bestellung_id","bestellstatus_kurzbz","uid","oe_kurzbz","datum","insertamum","insertvon","updateamum","updatevon"),
 	"wawi.tbl_bestellstatus"  => array("bestellstatus_kurzbz","beschreibung"),
