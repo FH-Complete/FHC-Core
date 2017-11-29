@@ -1,48 +1,43 @@
-<script type="text/javascript" src="../../vendor/jquery/jqueryV1/jquery-1.12.4.min.js"></script>
+<?php
+	$result = $dataset->retval;
 
-<script type="text/javascript" src="../../include/js/jquery.ui.datepicker.translation.js"></script>
-<script type="text/javascript" src="../../vendor/jquery/sizzle/sizzle.js"></script>
-
-<script type="text/javascript" src="../../vendor/christianbach/tablesorter/jquery.tablesorter.min.js"></script>
-<link rel="stylesheet" href="../../skin/tablesort.css" type="text/css"/>
-<link href="../../skin/jquery-ui-1.9.2.custom.min.css" rel="stylesheet" type="text/css">
-<script type="text/javascript" src="../../vendor/components/jqueryui/jquery-ui.min.js"></script>
-
-<script>
-	$(document).ready(function() {
-
-		$("#t0").tablesorter({
-			widgets: ["zebra"]
-		});
-
-	});
-</script>
+	$selectedFields = FilterWidget::getSelectedFields();
+?>
 
 <div>
-	<table class="tablesorter" id="t0">
+	<table class="tablesorter" id="tableDataset">
 		<thead>
 			<tr>
-				<th title="PersonId">PersonId</th>
-				<th title="Nachname">Nachname</th>
-				<th title="Vorname">Vorname</th>
-				<th title="Email">Email</th>
-				<th title="Aktiv">Aktiv</th>
+			<?php
+				foreach ($selectedFields as $key => $value)
+				{
+					if (array_key_exists($value, $result[0]))
+					{
+			?>
+					<th title="<?php echo $value; ?>"><?php echo $value; ?></th>
+			<?php
+					}
+				}
+			?>
 			</tr>
 		</thead>
 		<tbody>
 			<?php
-				$result = $dataset->retval;
 				foreach ($result as $key => $value)
 				{
+					echo "<tr>";
+
+					foreach ($selectedFields as $key2 => $value2)
+					{
+						if (array_key_exists($value2, $value))
+						{
 			?>
-					<tr>
-						<td><?php echo $value->PersonId; ?></td>
-						<td><?php echo $value->Nachname; ?></td>
-						<td><?php echo $value->Vorname; ?></td>
-						<td><?php echo $value->Email; ?></td>
-						<td><?php echo $value->Aktiv === true ? 'True' : 'False'; ?></td>
-					</tr>
+						<td><?php echo $value->{$value2}; ?></td>
 			<?php
+						}
+					}
+
+					echo "</tr>";
 				}
 			?>
 		</tbody>

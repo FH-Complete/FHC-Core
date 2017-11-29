@@ -1,59 +1,47 @@
 <div>
-	<?php
-		foreach ($metaData as $key => $value)
-		{
-			echo '<div>';
-			echo $value->name;
+<?php
+	$selectedFilters = FilterWidget::getSelectedFilters();
 
-			if ($value->type == 'int4')
-			{
-	?>
-				<select>
-					<option value="">=</option>
-					<option value="">!=</option>
-					<option value="">>=</option>
-					<option value=""><=</option>
-				</select>
-				<input type="number" value="" name="">
-				<input type="button" value="X" name="">
+	for ($filtersCounter = 0; $filtersCounter < count($selectedFilters); $filtersCounter++)
+	{
+		$selectedFilter = $selectedFilters[$filtersCounter];
 
-	<?php
-			}
-			elseif ($value->type == 'varchar')
-			{
-	?>
-				<select>
-					<option value="">contains</option>
-					<option value="">does not contain</option>
-				</select>
-				<input type="text" value="" name="">
-				<input type="button" value="X" name="">
-	<?php
-			}
-			elseif ($value->type == 'bool')
-			{
-	?>
-				<select>
-					<option value="">is true</option>
-					<option value="">is false</option>
-				</select>
-				<input type="button" value="X" name="">
-	<?php
-			}
+		$md = FilterWidget::getFilterMetaData($selectedFilter, $metaData);
+?>
+		<div>
 
-			echo '</div>';
-		}
-	?>
+			<span>
+				<?php echo $md->name; ?>
+			</span>
+
+			<?php echo FilterWidget::renderFilterType($md); ?>
+
+			<span>
+				<input type="submit" value="X" class="remove-filter" filterToRemove="<?php echo $md->name; ?>">
+			</span>
+
+		</div>
+<?php
+	}
+?>
+	<input type="hidden" id="rmFilter" name="rmFilter" value="">
 </div>
 <div>
-	Add filter:
-	<select>
-		<option value="">Select a field to add..</option>
-		<?php
-			foreach ($metaData as $key => $value)
-			{
-				echo '<option value="'.$value->name.'">'.$value->name.'</option>';
-			}
-		?>
-	</select>
+	<span>
+		Add filter:
+	</span>
+	<span>
+		<select id="addFilter" name="addFilter">
+			<option value="">Select a field to add...</option>
+	<?php
+		for ($listFieldsCounter = 0; $listFieldsCounter < count($listFields); $listFieldsCounter++)
+		{
+			$field = $listFields[$listFieldsCounter];
+	?>
+			<option value="<?php echo $field; ?>"><?php echo $field; ?></option>
+	<?php
+		}
+	?>
+		</select>
+	</span>
 </div>
