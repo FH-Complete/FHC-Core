@@ -12,18 +12,21 @@ class DmsLib
 	public function __construct()
 	{
 		$this->ci =& get_instance();
-		
+
 		$this->ci->load->model('crm/Akte_model', 'AkteModel');
 		$this->ci->load->model('content/Dms_model', 'DmsModel');
 		$this->ci->load->model('content/DmsVersion_model', 'DmsVersionModel');
 		$this->ci->load->model('content/DmsFS_model', 'DmsFSModel');
-		
+
 		// Loads helper message to manage returning messages
 		$this->ci->load->helper('message');
 	}
 
 	/**
-	 * read
+	 * Read a DMS Document from the Filesystem
+	 * @param int $dms_id ID of the Document.
+	 * @param int $version The version of the Document (latest if null).
+	 * @return object success or error
 	 */
 	public function read($dms_id, $version = null)
 	{
@@ -44,7 +47,7 @@ class DmsLib
 				$result = $this->ci->DmsModel->loadWhere(array('dms_id' => $dms_id, 'version' => $version));
 			}
 		}
-		
+
 		if (hasData($result))
 		{
 			$resultFS = $this->ci->DmsFSModel->read($result->retval[0]->filename);
@@ -57,20 +60,26 @@ class DmsLib
 				$result = $resultFS;
 			}
 		}
-		
+
 		return $result;
 	}
-	
+
 	/**
-	 * getAktenAcceptedDms
+	 * Get all accepted Documents of a Person
+	 *
+	 * @param int $person_id ID of the person.
+	 * @param string $dokument_kurzbz Type of document.
+	 * @param bool $no_file If null then loads also the content.
+	 * @return object success or error
 	 */
 	public function getAktenAcceptedDms($person_id, $dokument_kurzbz = null, $no_file = null)
 	{
 		$result = $this->ci->AkteModel->getAktenAcceptedDms($person_id, $dokument_kurzbz);
-		
+
 		if (hasData($result) && $no_file == null)
 		{
-			for ($i = 0; $i < count($result->retval); $i++)
+			$cnt = count($result->retval);
+			for ($i = 0; $i < $cnt; $i++)
 			{
 				$resultFS = $this->ci->DmsFSModel->read($result->retval[$i]->filename);
 				if (isSuccess($resultFS))
@@ -83,12 +92,14 @@ class DmsLib
 				}
 			}
 		}
-		
+
 		return $result;
 	}
 
 	/**
-	 * save
+	 * Saves a Document
+	 * @param object $dms DMS Object ot be saved.
+	 * @return object
 	 */
 	public function save($dms)
 	{
@@ -142,30 +153,34 @@ class DmsLib
 
 		return $result;
 	}
-	
+
 	/**
-	 * delete
+	 * Deletes a Akte of a Person
+	 * @param int $person_id ID of the person.
+	 * @param int $dms_id Id of the Document.
+	 * @return object
 	 */
 	public function delete($person_id, $dms_id)
 	{
 		$result = null;
-		
+
 		// If the parameters are valid
 		if (is_numeric($person_id) && is_numeric($dms_id))
 		{
 			// Start DB transaction
 			$this->ci->db->trans_start(false);
-			
+
 			// Get akte_id from table tbl_akte
 			$result = $this->ci->AkteModel->loadWhere(array('person_id' => $person_id, 'dms_id' => $dms_id));
 			if (isSuccess($result))
 			{
 				// Delete all entries in tbl_akte
-				for ($i = 0; $i < count($result->retval); $i++)
+				$cnt = count($result->retval);
+				for ($i = 0; $i < $cnt; $i++)
 				{
 					$this->ci->AkteModel->delete($result->retval[$i]->akte_id);
 				}
-				
+
 				// Get all filenames related to this dms
 				$resultFileNames = $this->ci->DmsVersionModel->loadWhere(array('dms_id' => $dms_id));
 				if (isSuccess($resultFileNames))
@@ -179,10 +194,10 @@ class DmsLib
 					}
 				}
 			}
-			
+
 			// Transaction complete!
 			$this->ci->db->trans_complete();
-			
+
 			// Check if everything went ok during the transaction
 			if ($this->ci->db->trans_status() === false || isError($result))
 			{
@@ -194,12 +209,13 @@ class DmsLib
 				$this->ci->db->trans_commit();
 				$result = success('Dms successfully removed from DB');
 			}
-			
+
 			// If everything is ok
 			if (isSuccess($result))
 			{
+				$cnt = count($resultFileNames->retval);
 				// Remove all files related to this person and dms
-				for ($i = 0; $i < count($resultFileNames->retval); $i++)
+				for ($i = 0; $i < $cnt; $i++)
 				{
 					$this->ci->DmsFSModel->remove($resultFileNames->retval[$i]->filename);
 				}
@@ -209,17 +225,52 @@ class DmsLib
 		{
 			$result = error('Invalid parameters');
 		}
-		
+
 		return $result;
 	}
-	
+
 	/**
-	 * _saveFileOnInsert
+	 * Loads the Content of an akte
+	 * @param int $akte_id Id of the akte.
+	 * @return object with document content or error
+	 */
+	public function getAkteContent($akte_id)
+	{
+		$akte = $this->ci->AkteModel->load($akte_id);
+		if (hasData($akte))
+		{
+			if ($akte->retval[0]->inhalt != '')
+			{
+				return success(base64_decode($akte->retval[0]->inhalt));
+			}
+			elseif ($akte->retval[0]->dms_id != '')
+			{
+				$dmscontent = $this->read($akte->retval[0]->dms_id);
+				if (isSuccess($dmscontent))
+				{
+					return success(base64_decode($dmscontent->retval[0]->file_content));
+				}
+			}
+			else
+			{
+				return error('No Content available');
+			}
+		}
+		else
+		{
+			return error($akte->retval);
+		}
+	}
+
+	/**
+	 * Saves the Content of a DMS in the Filesystem
+	 * @param object $dms DMS object to be saved.
+	 * @return object
 	 */
 	private function _saveFileOnInsert($dms)
 	{
 		$filename = uniqid().'.'.pathinfo($dms['name'], PATHINFO_EXTENSION);
-		
+
 		$result = $this->ci->DmsFSModel->write($filename, $dms['file_content']);
 		if (isSuccess($result))
 		{
@@ -230,7 +281,9 @@ class DmsLib
 	}
 
 	/**
-	 * _saveFileOnUpdate
+	 * Updates the File in the Filesystem
+	 * @param object $dms DMS object to update.
+	 * @return object
 	 */
 	private function _saveFileOnUpdate($dms)
 	{
