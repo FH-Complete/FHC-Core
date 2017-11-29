@@ -240,26 +240,31 @@ class datum
 	/**
 	 * Subtrahiert 2 Zeiten ($zeit1-$zeit2) Stunde:Minute
 	 * Es liefert keine Uhrzeit zurueck sondern Stunden und Minuten
-	 * zB 12:10 + 23:15 = 35:25
+	 * zB 23:15 - 12:10 = 11:05
 	 *
 	 * @param $zeit1
 	 * @param $zeit2
-	 * @return subtraktion der beiden zeiten im Format Stunden:Minuten
+	 * @return subtraktion der beiden zeiten im Format Stunden:Minuten, null wenn zeit 1 kleiner als zeit2 ist
 	 */
 	public function subZeit($zeit1, $zeit2)
 	{
 		list($h1, $m1) = explode(':', $zeit1);
 		list($h2, $m2) = explode(':', $zeit2);
 
+		if($h1<$h2)
+			return null;
+		else if($h1 == $h2 && $m1<$m2)
+			return null;
+
 		$m1 -=$m2;
 //echo $h1.','.$m1.','.$h2.','.$m2;
-		if($m1>=60)
+		if($m1<0)
 		{
-			$uebertrag = (int)($m1/60);
-			$h1+= $uebertrag;
+			$m1 = $m1 + 60;
+			$h1 = (int)$h1-1;
 		}
 		$m1=$m1%60;
-		$h1+=-$h2;
+		$h1-=$h2;
 		if($m1<10)
 			$m1='0'.$m1;
 		if($h1<10)
@@ -379,6 +384,16 @@ class datum
 			return date($format, $ts);
 
 		return false;
+	}
+
+	/**
+	 * konvertiert Zeit in format stunden:minuten in Stunden als Dezimalahl
+	 * @param $timestring in Form stunden:minuten
+	 * @return int Stundenzahl als Dezimalzahl
+	 */
+	public function convertTimeStringToHours($timestring)
+	{
+		return intval(substr($timestring, 0, 2)) + intval(substr($timestring, 3, 2)) / 60;
 	}
 
 }

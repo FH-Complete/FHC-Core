@@ -19,8 +19,9 @@
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>
  *          Karl Burkhart <burkhart@technikum-wien.at>
- *          Manfred Kindl <kindlm@technikum.wien.at>.
+ *          Manfred Kindl <kindlm@technikum.wien.at>
  *          Gerald Raab <raab@technikum-wien.at>
+ * 			Alexei Karpenko <karpenko@technikum-wien.at>
  */
 require_once('../../../config/cis.config.inc.php');
 require_once('../../../include/functions.inc.php');
@@ -648,7 +649,6 @@ if(isset($_POST['save']) || isset($_POST['edit']) || isset($_POST['import']))
 			$service_id = '';
 			$kunde_uid = '';
 		}
-
 	}
 }
 
@@ -719,13 +719,15 @@ if($projekt->getProjekteMitarbeiter($user, true))
 		$anzprojekte = count($projekt->result);
 		echo "<table width='100%'>
 				<tr>
-		      		<td>
-		      			<a href='".$_SERVER['PHP_SELF']."' style='font-size: larger;'>".$p->t("zeitaufzeichnung/neu")."</a>
-		      			&nbsp;
-		      			<a href='".$_SERVER['PHP_SELF']."?csvimport=1' style='font-size: larger;'>CSV Import</a>&nbsp;
+					<td>
+						<a href='".$_SERVER['PHP_SELF']."' style='font-size: larger;'>".$p->t("zeitaufzeichnung/neu")." |</a>
+								      			
+						<a href='".$_SERVER['PHP_SELF']."?csvimport=1' style='font-size: larger;'> CSV Import |</a>
 		      			
-		      			<a href='".$_SERVER['PHP_SELF']."?csvexport=1' style='font-size: larger;'>CSV Export</a>
-		      		</td>
+		      			<a href='".$_SERVER['PHP_SELF']."?csvexport=1' style='font-size: larger;'> CSV Export</a>";
+		      			if($anzprojekte > 0)
+		      				echo "<a href='".$_SERVER['PHP_SELF']."?projektexport=1' style='font-size: larger;'> | Projektexport</a>";
+				echo "</td>
 		      		<td class='menubox' height='10px'>";
 		if ($p->t("dms_link/handbuchZeitaufzeichnung")!='')
 		{
@@ -739,14 +741,68 @@ if($projekt->getProjekteMitarbeiter($user, true))
 		echo "</td>
 		      	</tr>
 		      </table>";
+			echo '<table>
+			<tr>
+				<td rowspan="2">';
+		echo '<table>';
+		if (isset($_GET['projektexport']))
+		{
+			$projektexpurl = dirname($_SERVER["PHP_SELF"]) .'/zeitaufzeichnung_projektliste.php';
+			$aktjahr = intval(date("Y"));
+			$aktmonat = intval(date("m")) - 1;
+			$jahreanz = 3;
+			echo '<form action="'.$projektexpurl.'" method="GET">';
+			echo '<tr><td colspan="4"><hr></td></tr>';
+			echo '<tr><td>Projektexport</td>';
+			echo '<td align="center">Monat: <select id="projexpmonat" name="projexpmonat">';
+			for($i=1;$i<13;$i++)
+			{
+				$selected = ($i == $aktmonat)?'selected = "selected"':'';
+				echo '<option value="'.$i.'" '.$selected.'>'.$monatsname[1][$i - 1].'</option>';
+			}
+			echo '</select></td>';
+			echo '<td align="center">Jahr: <select id="projexpjahr" name="projexpjahr">';
+			for(;$jahreanz>0;$jahreanz--)
+			{
+				echo '<option value="'.$aktjahr.'">'.$aktjahr.'</option>';
+				$aktjahr--;
+			}
+			echo '</select></td>';
+			echo '<td align="right"><input type="submit" value="Export" name="projexport"></td></tr>';
+			echo '<tr><td colspan="4"><hr></td></tr>';
+			echo '</form>';
+		}
 
 		//Formular
 		echo '<br><form action="'.$_SERVER['PHP_SELF'].'?zeitaufzeichnung_id='.$zeitaufzeichnung_id.'" method="POST" onsubmit="return checkdatum()" enctype="multipart/form-data">';
 
-		echo '<table>
+/*		echo '<table>
 			<tr>
 				<td rowspan="2">';
-		echo '<table>';
+		echo '<table>';*/
+		if (isset($_GET['csvimport']))
+		{
+			echo '<tr><td colspan="4"><hr></td></tr>';
+			echo '<tr><td>CSV-Import</td><td colspan="2"><input type="file" name="csv" value="" /></td><td align="right"><input type="submit" value="Import" name="import"></td></tr>';
+			echo '<tr><td></td><td colspan="3">Informationen zum Format der CSV-Datei s. Leitfaden Arbeitszeitaufzeichnung</td></tr>';
+			echo '<tr><td colspan="4"><hr></td></tr>';
+		}
+		else
+			echo '<input type="file" name="csv" value="" style="display:none">';
+
+		if (isset($_GET['csvexport']))
+		{
+			echo '<form action="'.$_SERVER['PHP_SELF'].'" method="POST" onsubmit="return checkdatumCSVExp(\'exp_von_datum\', \'exp_bis_datum\')">';
+			echo '<tr><td colspan="4"><hr></td></tr>';
+			echo '<tr><td>CSV-Export</td>';
+			echo '<td>Startdatum: <input class="datepicker_datum" id="exp_von_datum" name="exp_von_datum" size="9" type="text" value="'.date('d.m.Y', strtotime('first day of previous month')).'" /></td>';
+			echo '<td align="right">Enddatum: <input class="datepicker_datum" id="exp_bis_datum" name="exp_bis_datum" size="9" type="text"  value="'.date('d.m.Y', strtotime('last day of previous month')).'" /></td>';
+			echo '<td align="right"><input type="submit" value="Export" name="export"></td></tr>';
+			echo '<tr><td></td><td colspan="3"></td></tr>';
+			echo '<tr><td colspan="4"><hr></td></tr>';
+			echo '</form>';
+		}
+
 		//Projekte werden nicht angezeigt wenn es keine gibt
 		if($anzprojekte > 0)
 		{
@@ -948,14 +1004,6 @@ if($projekt->getProjekteMitarbeiter($user, true))
 			echo '<input type="submit" value="'.$p->t("global/aendern").'" name="edit">&nbsp;&nbsp;';
 			echo '<input type="submit" value="'.$p->t("zeitaufzeichnung/alsNeuenEintragSpeichern").'" name="save"></td></tr>';
 		}
-		if (isset($_GET['csvimport']))
-		{
-			echo '<tr><td colspan="4"><hr></td></tr>';
-			echo '<tr><td>CSV-Import</td><td colspan="2"><input type="file" name="csv" value="" /></td><td align="right"><input type="submit" value="Import" name="import"></td></tr>';
-			echo '<tr><td></td><td colspan="3">Informationen zum Format der CSV-Datei s. Leitfaden Arbeitszeitaufzeichnung</td></tr>';
-		}
-		else
-			echo '<input type="file" name="csv" value="" style="display:none">';
 		echo '</table>';
 
 		echo '</td><td valign="top"><span id="zeitsaldo"></span><br><br><div id="monatsliste"></span></td></tr>';
@@ -998,20 +1046,6 @@ if($projekt->getProjekteMitarbeiter($user, true))
 		echo '</td></tr>';
 		echo '</table>';
 		echo '</form>';
-		if (isset($_GET['csvexport']))
-		{
-			echo '<form action="'.$_SERVER['PHP_SELF'].'" method="POST" onsubmit="return checkdatumCSVExp(\'exp_von_datum\', \'exp_bis_datum\')">';
-			echo '<table>';
-			echo '<tr><td colspan="5"><hr></td></tr>';
-			echo '<tr><td width = "18%">CSV-Export</td>';
-			echo '<td>Startdatum: <input class="datepicker_datum" id="exp_von_datum" name="exp_von_datum" size="9" type="text" value="'.date('d.m.Y', strtotime('first day of previous month')).'" /></td>';
-			echo '<td width = "8%">&nbsp;</td>';
-			echo '<td>Enddatum: <input class="datepicker_datum" id="exp_bis_datum" name="exp_bis_datum" size="9" type="text"  value="'.date('d.m.Y', strtotime('last day of previous month')).'" /></td>';
-			echo '<td align="right" width="23%"><input type="submit" value="Export" name="export"></td></tr>';
-			echo '<tr><td></td><td colspan="3"></td></tr>';
-			echo '</table>';
-			echo '</form>';
-		}
 		echo '<hr>';
 		echo '<h3>'.($alle===true?$p->t('zeitaufzeichnung/alleEintraege'):$p->t('zeitaufzeichnung/xTageAnsicht', array($angezeigte_tage))).'</h3>';
 		if ($alle===true)
