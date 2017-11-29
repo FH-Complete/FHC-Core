@@ -69,12 +69,17 @@ if($jqueryV1 && $jqueryCurrent)
 	<script language="Javascript" type="text/javascript">
 		$(document).ready(function()
 		{
-			$("#<?php echo $tableid; ?>").tablesorter(
+			//
+			if(!$('#<?php echo $tableid; ?>').find('tbody:empty').length
+				&& !$('#<?php echo $tableid; ?>').find('tr:empty').length)
 			{
-				sortList: [[<?php echo $sortList; ?>]],
-				widgets: ["<?php echo $widgets; ?>"],
-				headers: {<?php echo $headers; ?>}
-			});
+				$("#<?php echo $tableid; ?>").tablesorter(
+				{
+					sortList: [[<?php echo $sortList; ?>]],
+					widgets: ["<?php echo $widgets; ?>"],
+					headers: {<?php echo $headers; ?>}
+				});
+			}
 		});
 	</script>
 <?php endif ?>
@@ -108,4 +113,5 @@ if($jqueryV1 && $jqueryCurrent)
 <?php if($widgetsCSS) : ?>
 	<link rel="stylesheet" type="text/css" href="<?php echo base_url('skin/widgets.css'); ?>" />
 <?php endif ?>
+
 </head>
