@@ -200,11 +200,11 @@ class service extends basis_db
 					WHERE tbl_zeitaufzeichnung.uid=".$this->db_add_param($user)."
 					$zeit
 					GROUP BY tbl_service.service_id HAVING COUNT(*) > $anzahl_ereignisse
-					
+
 					UNION
 					SELECT tbl_service.*, '0' AS anzahl
 					FROM public.tbl_service
-					
+
 					ORDER BY count DESC,bezeichnung,oe_kurzbz";
 
 		if($result = $this->db_query($qry))
@@ -363,12 +363,13 @@ class service extends basis_db
 
 		if($new)
 		{
-			$qry = "BEGIN;INSERT INTO public.tbl_service (bezeichnung, beschreibung, oe_kurzbz, content_id, design_uid, betrieb_uid, operativ_uid)
+			$qry = "BEGIN;INSERT INTO public.tbl_service (bezeichnung, beschreibung, oe_kurzbz, content_id, ext_id, design_uid, betrieb_uid, operativ_uid)
 					VALUES(".
 				$this->db_add_param($this->bezeichnung).','.
 				$this->db_add_param($this->beschreibung).','.
 				$this->db_add_param($this->oe_kurzbz).','.
 				$this->db_add_param($this->content_id).','.
+				$this->db_add_param($this->ext_id).','.
 				$this->db_add_param($this->design_uid).','.
 				$this->db_add_param($this->betrieb_uid).','.
 				$this->db_add_param($this->operativ_uid).');';
@@ -380,6 +381,7 @@ class service extends basis_db
 				' beschreibung = '.$this->db_add_param($this->beschreibung).','.
 				' oe_kurzbz = '.$this->db_add_param($this->oe_kurzbz).','.
 				' content_id = '.$this->db_add_param($this->content_id).','.
+				' ext_id = '.$this->db_add_param($this->ext_id).','.
 				' design_uid = '.$this->db_add_param($this->design_uid).','.
 				' betrieb_uid = '.$this->db_add_param($this->betrieb_uid).','.
 				' operativ_uid = '.$this->db_add_param($this->operativ_uid).
