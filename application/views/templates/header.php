@@ -69,9 +69,9 @@ if($jqueryV1 && $jqueryCurrent)
 	<script language="Javascript" type="text/javascript">
 		$(document).ready(function()
 		{
-			//
-			if(!$('#<?php echo $tableid; ?>').find('tbody:empty').length
-				&& !$('#<?php echo $tableid; ?>').find('tr:empty').length)
+			// Checks if the table contains data (rows)
+			if ($('#<?php echo $tableid; ?>').find('tbody:empty').length > 0
+				&& $('#<?php echo $tableid; ?>').find('tr:empty').length > 0)
 			{
 				$("#<?php echo $tableid; ?>").tablesorter(
 				{
