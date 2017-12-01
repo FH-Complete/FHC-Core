@@ -23,12 +23,23 @@ class FilterWidget extends Widget
 	const SELECTED_FIELDS = 'selectedFields';
 	const SELECTED_FILTERS = 'selectedFilters';
 	const ACTIVE_FILTERS = 'activeFilters';
+	const ACTIVE_FILTERS_OPERATION = 'activeFiltersOperation';
+
+	const ACTIVE_FILTER_OPERATION_POSTFIX = '-operation';
 
 	const CMD_ADD_FILTER = 'addFilter';
 	const CMD_REMOVE_FILTER = 'rmFilter';
 	const CMD_ADD_FIELD = 'addField';
 	const CMD_REMOVE_FIELD = 'rmField';
-	const CMD_APPLY_FILTERS = 'applyFilters';
+
+	const OP_EQUAL = 'A';
+	const OP_NOT_EQUAL = 'B';
+	const OP_GREATER_THAN = 'C';
+	const OP_LESS_THAN = 'D';
+	const OP_IS_TRUE = 'E';
+	const OP_IS_FALSE = 'F';
+	const OP_CONTAINS = 'G';
+	const OP_NOT_CONTAIN = 'H';
 
 	private $app;
 	private $query;
@@ -58,7 +69,7 @@ class FilterWidget extends Widget
 		$this->_setSessionFilterData();
 
 		//
-		$dataset = $this->FiltersModel->execReadOnlyQuery($this->_generateQuery());
+		$dataset = @$this->FiltersModel->execReadOnlyQuery($this->_generateQuery());
 
 		//
 		$listFields = $this->FiltersModel->getExecutedQueryListFields();
@@ -142,10 +153,10 @@ class FilterWidget extends Widget
 			$html = '
 				<span>
 					<select name="%s" class="select-filter-operation">
-						<option value="A">equal</option>
-						<option value="B">not equal</option>
-						<option value="C">greater than</option>
-						<option value="D">less than</option>
+						<option value="'.self::OP_EQUAL.'">equal</option>
+						<option value="'.self::OP_NOT_EQUAL.'">not equal</option>
+						<option value="'.self::OP_GREATER_THAN.'">greater than</option>
+						<option value="'.self::OP_LESS_THAN.'">less than</option>
 					</select>
 				</span>
 				<span>
@@ -158,8 +169,8 @@ class FilterWidget extends Widget
 			$html = '
 				<span>
 					<select name="%s" class="select-filter-operation">
-						<option value="A">contains</option>
-						<option value="B">does not contain</option>
+						<option value="'.self::OP_CONTAINS.'">contains</option>
+						<option value="'.self::OP_NOT_CONTAIN.'">does not contain</option>
 					</select>
 				</span>
 				<span>
@@ -172,8 +183,8 @@ class FilterWidget extends Widget
 			$html = '
 				<span>
 					<select name="%s" class="select-filter-operation">
-						<option value="true">is true</option>
-						<option value="false">is false</option>
+						<option value="'.self::OP_IS_TRUE.'">is true</option>
+						<option value="'.self::OP_IS_FALSE.'">is false</option>
 					</select>
 				</span>
 				<span>
@@ -271,6 +282,11 @@ class FilterWidget extends Widget
 			$filterSessionArray[self::ACTIVE_FILTERS] = array();
 		}
 
+		if (!isset($filterSessionArray[self::ACTIVE_FILTERS_OPERATION]))
+		{
+			$filterSessionArray[self::ACTIVE_FILTERS_OPERATION] = array();
+		}
+
 		$this->session->set_userdata(self::SESSION_NAME, $filterSessionArray);
 	}
 
@@ -340,16 +356,7 @@ class FilterWidget extends Widget
 
 			if (array_key_exists(self::CMD_REMOVE_FIELD, $_POST) && trim($_POST[self::CMD_REMOVE_FIELD]) != '')
 			{
-				$tmpArray = array();
-				foreach ($selectedFields as $key => $value)
-				{
-					if ($_POST[self::CMD_REMOVE_FIELD] != $value)
-					{
-						$tmpArray[] = $value;
-					}
-				}
-
-				$selectedFields = $tmpArray;
+				$selectedFields = $this->_removeElementFromArray($selectedFields, $_POST[self::CMD_REMOVE_FIELD]);
 			}
 		}
 
@@ -363,18 +370,11 @@ class FilterWidget extends Widget
 	{
 		// Selected filters
 		$selectedFilters = array();
-		$activeFilters = array();
 
 		$filterSessionArray = $this->session->userdata(self::SESSION_NAME);
-
 		if (isset($filterSessionArray[self::SELECTED_FILTERS]))
 		{
 			$selectedFilters = $filterSessionArray[self::SELECTED_FILTERS];
-		}
-
-		if (isset($filterSessionArray[self::ACTIVE_FILTERS]))
-		{
-			$activeFilters = $filterSessionArray[self::ACTIVE_FILTERS];
 		}
 
 		if (is_array($_POST))
@@ -389,21 +389,7 @@ class FilterWidget extends Widget
 
 			if (array_key_exists(self::CMD_REMOVE_FILTER, $_POST) && trim($_POST[self::CMD_REMOVE_FILTER]) != '')
 			{
-				$tmpArray = array();
-				foreach ($selectedFilters as $key => $value)
-				{
-					if ($_POST[self::CMD_REMOVE_FILTER] != $value)
-					{
-						$tmpArray[] = $value;
-					}
-				}
-
-				$selectedFilters = $tmpArray;
-
-				if (isset($activeFilters[$_POST[self::CMD_REMOVE_FILTER]]))
-				{
-
-				}
+				$selectedFilters = $this->_removeElementFromArray($selectedFilters, $_POST[self::CMD_REMOVE_FILTER]);
 			}
 		}
 
@@ -413,17 +399,19 @@ class FilterWidget extends Widget
 	/**
 	 *
 	 */
-	private function _getActiveFiltersFromPost()
+	private function _setActiveFiltersFromPost(&$activeFilters, &$activeFiltersOperation)
 	{
-		// Selected fields
-		$activeFilters = array();
 		$selectedFilters = array();
-
 		$filterSessionArray = $this->session->userdata(self::SESSION_NAME);
 
 		if (isset($filterSessionArray[self::ACTIVE_FILTERS]))
 		{
 			$activeFilters = $filterSessionArray[self::ACTIVE_FILTERS];
+		}
+
+		if (isset($filterSessionArray[self::ACTIVE_FILTERS_OPERATION]))
+		{
+			$activeFiltersOperation = $filterSessionArray[self::ACTIVE_FILTERS_OPERATION];
 		}
 
 		if (isset($filterSessionArray[self::SELECTED_FILTERS]))
@@ -433,18 +421,36 @@ class FilterWidget extends Widget
 
 		if (is_array($_POST))
 		{
-			for ($selectedFiltersCounter = 0; $selectedFiltersCounter < count($selectedFilters); $selectedFiltersCounter++)
+			if (array_key_exists(self::CMD_REMOVE_FILTER, $_POST) && trim($_POST[self::CMD_REMOVE_FILTER]) != '')
 			{
-				$selectedFilter = $selectedFilters[$selectedFiltersCounter];
-
-				if (isset($_POST[$selectedFilter]))
+				if (isset($activeFilters[$_POST[self::CMD_REMOVE_FILTER]]))
 				{
-					$activeFilters[$selectedFilter] = $_POST[$selectedFilter];
+					unset($activeFilters[$_POST[self::CMD_REMOVE_FILTER]]);
+				}
+
+				if (isset($activeFiltersOperation[$_POST[self::CMD_REMOVE_FILTER]]))
+				{
+					unset($activeFiltersOperation[$_POST[self::CMD_REMOVE_FILTER]]);
+				}
+			}
+			else
+			{
+				for ($selectedFiltersCounter = 0; $selectedFiltersCounter < count($selectedFilters); $selectedFiltersCounter++)
+				{
+					$selectedFilter = $selectedFilters[$selectedFiltersCounter];
+
+					if (isset($_POST[$selectedFilter]))
+					{
+						$activeFilters[$selectedFilter] = $_POST[$selectedFilter];
+					}
+
+					if (isset($_POST[$selectedFilter.self::ACTIVE_FILTER_OPERATION_POSTFIX]))
+					{
+						$activeFiltersOperation[$selectedFilter] = $_POST[$selectedFilter.self::ACTIVE_FILTER_OPERATION_POSTFIX];
+					}
 				}
 			}
 		}
-
-		return $activeFilters;
 	}
 
 	/**
@@ -454,8 +460,15 @@ class FilterWidget extends Widget
 	{
 		$filterSessionArray = array(
 			self::SELECTED_FIELDS => $this->_getSelectedFieldsFromPost(),
-			self::SELECTED_FILTERS => $this->_getSelectedFiltersFromPost(),
-			self::ACTIVE_FILTERS => $this->_getActiveFiltersFromPost(),
+			self::SELECTED_FILTERS => $this->_getSelectedFiltersFromPost()
+		);
+
+		$filterSessionArray[self::ACTIVE_FILTERS] = array();
+		$filterSessionArray[self::ACTIVE_FILTERS_OPERATION] = array();
+
+		$this->_setActiveFiltersFromPost(
+			$filterSessionArray[self::ACTIVE_FILTERS],
+			$filterSessionArray[self::ACTIVE_FILTERS_OPERATION]
 		);
 
 		$this->session->set_userdata(self::SESSION_NAME, $filterSessionArray);
@@ -467,28 +480,98 @@ class FilterWidget extends Widget
 	private function _generateQuery()
 	{
 		$query = $this->query;
-		// Filters dataset
-		if (is_array($_POST)
-			&& array_key_exists(self::CMD_APPLY_FILTERS, $_POST)
-			&& $_POST[self::CMD_APPLY_FILTERS] == 'true')
+
+		$filterSessionArray = $this->session->userdata(self::SESSION_NAME);
+
+		if (isset($filterSessionArray[self::ACTIVE_FILTERS]))
 		{
-			if (is_array($_POST) && array_key_exists(self::SELECTED_FILTERS, $_POST))
-			{
-				$selectedFilters = $_POST[self::SELECTED_FILTERS];
-			}
+			$activeFilters = $filterSessionArray[self::ACTIVE_FILTERS];
+		}
 
-			for ($filtersCounter = 0; $filtersCounter < count($selectedFilters); $filtersCounter++)
-			{
-				$selectedFilter = $selectedFilters[$filtersCounter];
+		if (isset($filterSessionArray[self::ACTIVE_FILTERS_OPERATION]))
+		{
+			$activeFiltersOperation = $filterSessionArray[self::ACTIVE_FILTERS_OPERATION];
+		}
 
-				if (isset($_POST[$selectedFilter]))
+		//
+		if (count($activeFilters) > 0)
+		{
+			$where = '';
+			$first = true;
+
+			foreach ($activeFilters as $field => $activeFilterValue)
+			{
+				if ($first)
 				{
+					$first = false;
+				}
+				else
+				{
+					$where .= ' AND ';
+				}
+
+				if (isset($activeFiltersOperation[$field]))
+				{
+					$where .= '"'.$field.'"';
+					$condition = '';
+
+					switch ($activeFiltersOperation[$field])
+					{
+						case self::OP_EQUAL:
+							$condition = ' = '.$activeFilterValue;
+							break;
+						case self::OP_NOT_EQUAL:
+							$condition = ' != '.$activeFilterValue;
+							break;
+						case self::OP_GREATER_THAN:
+							$condition = ' > '.$activeFilterValue;
+							break;
+						case self::OP_LESS_THAN:
+							$condition = ' < '.$activeFilterValue;
+							break;
+						case self::OP_CONTAINS:
+							$condition = ' ILIKE \'%'.$activeFilterValue.'%\'';
+							break;
+						case self::OP_NOT_CONTAIN:
+							$condition = ' NOT ILIKE \'%'.$activeFilterValue.'%\'';
+							break;
+						case self::OP_IS_TRUE:
+							$condition = ' IS TRUE';
+							break;
+						case self::OP_IS_FALSE:
+							$condition = ' IS FALSE';
+							break;
+					}
+
+					$where .= $condition;
 				}
 			}
 
-			$query = 'SELECT * FROM ('.$this->query.') tableFilters WHERE "Vorname" ILIKE \'%Oliver%\'';
+			if ($where != '')
+			{
+				$query = 'SELECT * FROM ('.$this->query.') tableFilters WHERE '.$where;
+			}
 		}
 
 		return $query;
+	}
+
+	/**
+	 *
+	 */
+	private function _removeElementFromArray($array, $element)
+	{
+		$_removeElementFromArray = array();
+
+		for ($arrayCounter = 0; $arrayCounter < count($array); $arrayCounter++)
+		{
+			$arrayElement = $array[$arrayCounter];
+			if ($arrayElement != $element)
+			{
+				$_removeElementFromArray[] = $arrayElement;
+			}
+		}
+
+		return $_removeElementFromArray;
 	}
 }

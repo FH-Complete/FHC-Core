@@ -24,15 +24,15 @@
 <?php
 	}
 ?>
-	<input type="hidden" id="rmFilter" name="rmFilter" value="">
+	<input type="hidden" id="<?php echo FilterWidget::CMD_REMOVE_FILTER; ?>" name="<?php echo FilterWidget::CMD_REMOVE_FILTER; ?>" value="">
 </div>
 <div>
 	<span>
 		Add filter:
 	</span>
 	<span>
-		<select id="addFilter" name="addFilter">
-			<option value="">Select a field to add...</option>
+		<select id="<?php echo FilterWidget::CMD_ADD_FILTER; ?>" name="<?php echo FilterWidget::CMD_ADD_FILTER; ?>">
+			<option value="">Select a filter to add...</option>
 	<?php
 		for ($listFieldsCounter = 0; $listFieldsCounter < count($listFields); $listFieldsCounter++)
 		{

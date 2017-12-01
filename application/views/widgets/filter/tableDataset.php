@@ -1,5 +1,5 @@
 <?php
-	$result = $dataset->retval;
+	$results = $dataset->retval;
 
 	$selectedFields = FilterWidget::getSelectedFields();
 ?>
@@ -9,35 +9,50 @@
 		<thead>
 			<tr>
 			<?php
-				foreach ($selectedFields as $key => $value)
+				for ($selectedFieldsCounter = 0; $selectedFieldsCounter < count($selectedFields); $selectedFieldsCounter++)
 				{
-					if (array_key_exists($value, $result[0]))
-					{
+					$selectedFilter = $selectedFields[$selectedFieldsCounter];
 			?>
-					<th title="<?php echo $value; ?>"><?php echo $value; ?></th>
+					<th title="<?php echo $selectedFilter; ?>"><?php echo $selectedFilter; ?></th>
 			<?php
-					}
 				}
 			?>
 			</tr>
 		</thead>
 		<tbody>
 			<?php
-				foreach ($result as $key => $value)
+				for ($resultsCounter = 0; $resultsCounter < count($results); $resultsCounter++)
 				{
-					echo "<tr>";
-
-					foreach ($selectedFields as $key2 => $value2)
+					$result = $results[$resultsCounter];
+			?>
+					<tr>
+			<?php
+					for ($selectedFieldsCounter = 0; $selectedFieldsCounter < count($selectedFields); $selectedFieldsCounter++)
 					{
-						if (array_key_exists($value2, $value))
+						$selectedFilter = $selectedFields[$selectedFieldsCounter];
+
+						if (array_key_exists($selectedFilter, $result))
 						{
 			?>
-						<td><?php echo $value->{$value2}; ?></td>
+						<td>
+							<?php
+
+								if (is_bool($result->{$selectedFilter}))
+								{
+									echo $result->{$selectedFilter} === true ? 'true' : 'false';
+								}
+								else
+								{
+									echo $result->{$selectedFilter};
+								}
+							?>
+						</td>
 			<?php
 						}
 					}
-
-					echo "</tr>";
+			?>
+					</tr>
+			<?php
 				}
 			?>
 		</tbody>

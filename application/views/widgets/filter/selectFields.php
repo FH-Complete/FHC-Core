@@ -1,23 +1,33 @@
 <div>
-	<?php
-		$selectedFields = FilterWidget::getSelectedFields();
+<?php
+	$selectedFields = FilterWidget::getSelectedFields();
 
-		foreach ($selectedFields as $key => $value)
-		{
-			echo '<input type="submit" value="'.$value.'" onClick="document.getElementById(\'rmField\').value=\''.$value.'\'">';
-		}
-	?>
-	<input type="hidden" id="rmField" name="rmField" value="">
+	for ($selectedFieldsCounter = 0; $selectedFieldsCounter < count($selectedFields); $selectedFieldsCounter++)
+	{
+		$selectedField = $selectedFields[$selectedFieldsCounter];
+?>
+		<input type="submit" value="<?php echo $selectedField; ?> X" class="remove-field" fieldToRemove="<?php echo $selectedField; ?>">
+<?php
+	}
+?>
+	<input type="hidden" id="<?php echo FilterWidget::CMD_REMOVE_FIELD; ?>" name="<?php echo FilterWidget::CMD_REMOVE_FIELD; ?>" value="">
 </div>
 <div>
-	Add:
-	<select name="addField" onChange="document.getElementById('filterForm').submit()">
-		<option value="">Select a field to add..</option>
+	<span>
+		Add field:
+	</span>
+	<span>
+		<select id="<?php echo FilterWidget::CMD_ADD_FIELD; ?>" name="<?php echo FilterWidget::CMD_ADD_FIELD; ?>">
+			<option value="">Select a field to add..</option>
 		<?php
-			foreach ($listFields as $key => $value)
+			for ($listFieldsCounter = 0; $listFieldsCounter < count($listFields); $listFieldsCounter++)
 			{
-				echo '<option value="'.$value.'">'.$value.'</option>';
+				$listField = $listFields[$listFieldsCounter];
+		?>
+			<option value="<?php echo $listField; ?>"><?php echo $listField; ?></option>
+		<?php
 			}
 		?>
-	</select>
+		</select>
+	</span>
 </div>

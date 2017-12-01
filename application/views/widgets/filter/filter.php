@@ -7,6 +7,16 @@
 <script language="Javascript" type="text/javascript">
 	$(document).ready(function() {
 
+		$("#addField").change(function() {
+			$("#filterForm").submit();
+		});
+
+		$(".remove-field").each(function() {
+			$(this).click(function() {
+				$("#rmField").val($(this).attr('fieldToRemove'));
+			});
+		});
+
 		$("#addFilter").change(function() {
 			$("#filterForm").submit();
 		});
