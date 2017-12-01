@@ -17,7 +17,7 @@
 			<?php echo FilterWidget::renderFilterType($md); ?>
 
 			<span>
-				<input type="submit" value="X" class="remove-filter" filterToRemove="<?php echo $md->name; ?>">
+				<input type="button" value="X" class="remove-filter" filterToRemove="<?php echo $md->name; ?>">
 			</span>
 
 		</div>

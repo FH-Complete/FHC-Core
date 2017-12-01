@@ -146,17 +146,18 @@ class FilterWidget extends Widget
 	public static function renderFilterType($filterMetaData)
 	{
 		$html = '';
-		$value = self::_getActiveFilterValue($filterMetaData->name);
+		$activeFilterValue = self::_getActiveFilterValue($filterMetaData->name);
+		$activeFilterOperationValue = self::_getActiveFilterOperationValue($filterMetaData->name);
 
 		if ($filterMetaData->type == 'int4')
 		{
 			$html = '
 				<span>
 					<select name="%s" class="select-filter-operation">
-						<option value="'.self::OP_EQUAL.'">equal</option>
-						<option value="'.self::OP_NOT_EQUAL.'">not equal</option>
-						<option value="'.self::OP_GREATER_THAN.'">greater than</option>
-						<option value="'.self::OP_LESS_THAN.'">less than</option>
+						<option value="'.self::OP_EQUAL.'" '.($activeFilterOperationValue == self::OP_EQUAL ? 'selected' : '').'>equal</option>
+						<option value="'.self::OP_NOT_EQUAL.'" '.($activeFilterOperationValue == self::OP_NOT_EQUAL ? 'selected' : '').'>not equal</option>
+						<option value="'.self::OP_GREATER_THAN.'" '.($activeFilterOperationValue == self::OP_GREATER_THAN ? 'selected' : '').'>greater than</option>
+						<option value="'.self::OP_LESS_THAN.'" '.($activeFilterOperationValue == self::OP_LESS_THAN ? 'selected' : '').'>less than</option>
 					</select>
 				</span>
 				<span>
@@ -169,8 +170,8 @@ class FilterWidget extends Widget
 			$html = '
 				<span>
 					<select name="%s" class="select-filter-operation">
-						<option value="'.self::OP_CONTAINS.'">contains</option>
-						<option value="'.self::OP_NOT_CONTAIN.'">does not contain</option>
+						<option value="'.self::OP_CONTAINS.'" '.($activeFilterOperationValue == self::OP_CONTAINS ? 'selected' : '').'>contains</option>
+						<option value="'.self::OP_NOT_CONTAIN.'" '.($activeFilterOperationValue == self::OP_NOT_CONTAIN ? 'selected' : '').'>does not contain</option>
 					</select>
 				</span>
 				<span>
@@ -183,8 +184,8 @@ class FilterWidget extends Widget
 			$html = '
 				<span>
 					<select name="%s" class="select-filter-operation">
-						<option value="'.self::OP_IS_TRUE.'">is true</option>
-						<option value="'.self::OP_IS_FALSE.'">is false</option>
+						<option value="'.self::OP_IS_TRUE.'" '.($activeFilterOperationValue == self::OP_IS_TRUE ? 'selected' : '').'>is true</option>
+						<option value="'.self::OP_IS_FALSE.'" '.($activeFilterOperationValue == self::OP_IS_FALSE ? 'selected' : '').'>is false</option>
 					</select>
 				</span>
 				<span>
@@ -193,7 +194,7 @@ class FilterWidget extends Widget
 			';
 		}
 
-		return sprintf($html, $filterMetaData->name.'-operation', $filterMetaData->name, $value);
+		return sprintf($html, $filterMetaData->name.'-operation', $filterMetaData->name, $activeFilterValue);
 	}
 
 	/**
@@ -244,6 +245,23 @@ class FilterWidget extends Widget
 		}
 
 		return $getActiveFilterValue;
+	}
+
+	/**
+	 *
+	 */
+	private static function _getActiveFilterOperationValue($filterName)
+	{
+		$getActiveFilterOperationValue = '';
+
+		$activeFieldsOperation = self::_getFromSession(self::ACTIVE_FILTERS_OPERATION);
+
+		if (isset($activeFieldsOperation[$filterName]))
+		{
+			$getActiveFilterOperationValue = $activeFieldsOperation[$filterName];
+		}
+
+		return $getActiveFilterOperationValue;
 	}
 
 	/**

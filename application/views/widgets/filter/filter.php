@@ -14,6 +14,7 @@
 		$(".remove-field").each(function() {
 			$(this).click(function() {
 				$("#rmField").val($(this).attr('fieldToRemove'));
+				$("#filterForm").submit();
 			});
 		});
 
@@ -24,6 +25,7 @@
 		$(".remove-filter").each(function() {
 			$(this).click(function() {
 				$("#rmFilter").val($(this).attr('filterToRemove'));
+				$("#filterForm").submit();
 			});
 		});
 
@@ -31,8 +33,11 @@
 			$("#filterForm").submit();
 		});
 
-		$(".select-filter-operation-value").keyup(function() {
-			$("#filterForm").submit();
+		$(".select-filter-operation-value").keydown(function(event) {
+			if (event.which == 13)
+			{
+				$("#filterForm").submit();
+			}
 		});
 
 	});

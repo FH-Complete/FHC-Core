@@ -6,7 +6,7 @@
 	{
 		$selectedField = $selectedFields[$selectedFieldsCounter];
 ?>
-		<input type="submit" value="<?php echo $selectedField; ?> X" class="remove-field" fieldToRemove="<?php echo $selectedField; ?>">
+		<input type="button" value="<?php echo $selectedField; ?> X" class="remove-field" fieldToRemove="<?php echo $selectedField; ?>">
 <?php
 	}
 ?>
