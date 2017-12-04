@@ -720,13 +720,13 @@ if($projekt->getProjekteMitarbeiter($user, true))
 		echo "<table width='100%'>
 				<tr>
 					<td>
-						<a href='".$_SERVER['PHP_SELF']."' style='font-size: larger;'>".$p->t("zeitaufzeichnung/neu")." |</a>
+						<a href='".$_SERVER['PHP_SELF']."' style='font-size: larger;'>".$p->t("zeitaufzeichnung/neu")."</a><a style='font-size: larger; text-decoration: none; cursor: default'> | </a>
 								      			
-						<a href='".$_SERVER['PHP_SELF']."?csvimport=1' style='font-size: larger;'> CSV Import |</a>
+						<a href='".$_SERVER['PHP_SELF']."?csvimport=1' style='font-size: larger;'>CSV Import</a><a style='font-size: larger; text-decoration: none; cursor: default'> | </a>
 		      			
-		      			<a href='".$_SERVER['PHP_SELF']."?csvexport=1' style='font-size: larger;'> CSV Export</a>";
+		      			<a href='".$_SERVER['PHP_SELF']."?csvexport=1' style='font-size: larger;'>CSV Export</a>";
 		      			if($anzprojekte > 0)
-		      				echo "<a href='".$_SERVER['PHP_SELF']."?projektexport=1' style='font-size: larger;'> | Projektexport</a>";
+		      				echo "<a style='font-size: larger; text-decoration: none; cursor: default'> | </a><a href='".$_SERVER['PHP_SELF']."?projektexport=1' style='font-size: larger;'>Projektexport</a>";
 				echo "</td>
 		      		<td class='menubox' height='10px'>";
 		if ($p->t("dms_link/handbuchZeitaufzeichnung")!='')
