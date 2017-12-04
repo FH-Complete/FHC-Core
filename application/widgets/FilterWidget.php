@@ -8,6 +8,8 @@ class FilterWidget extends Widget
 	const APP_PARAMETER = 'app';
 	const QUERY_PARAMETER = 'query';
 	const DATASET_NAME_PARAMETER = 'datasetName';
+	const FILTER_KURZBZ = 'filterKurzbz';
+	const FILTER_ID = 'filterId';
 
 	const DATASET_PARAMETER = 'dataset';
 	const METADATA_PARAMETER = 'metaData';
@@ -32,18 +34,20 @@ class FilterWidget extends Widget
 	const CMD_ADD_FIELD = 'addField';
 	const CMD_REMOVE_FIELD = 'rmField';
 
-	const OP_EQUAL = 'A';
-	const OP_NOT_EQUAL = 'B';
-	const OP_GREATER_THAN = 'C';
-	const OP_LESS_THAN = 'D';
-	const OP_IS_TRUE = 'E';
-	const OP_IS_FALSE = 'F';
-	const OP_CONTAINS = 'G';
-	const OP_NOT_CONTAIN = 'H';
+	const OP_EQUAL = 'equal';
+	const OP_NOT_EQUAL = 'nequal';
+	const OP_GREATER_THAN = 'gt';
+	const OP_LESS_THAN = 'ld';
+	const OP_IS_TRUE = 'true';
+	const OP_IS_FALSE = 'false';
+	const OP_CONTAINS = 'contains';
+	const OP_NOT_CONTAINS = 'ncontains';
 
 	private $app;
 	private $query;
 	private $datasetName;
+	private $filterKurzbz;
+	private $filterId;
 
 	/**
 	 *
@@ -66,7 +70,13 @@ class FilterWidget extends Widget
 	public function display($widgetData)
 	{
 		//
+		$this->_loadFilter();
+
+		//
 		$this->_setSessionFilterData();
+
+		//
+		$this->FiltersModel->resetQuery();
 
 		//
 		$dataset = @$this->FiltersModel->execReadOnlyQuery($this->_generateQuery());
@@ -171,7 +181,7 @@ class FilterWidget extends Widget
 				<span>
 					<select name="%s" class="select-filter-operation">
 						<option value="'.self::OP_CONTAINS.'" '.($activeFilterOperationValue == self::OP_CONTAINS ? 'selected' : '').'>contains</option>
-						<option value="'.self::OP_NOT_CONTAIN.'" '.($activeFilterOperationValue == self::OP_NOT_CONTAIN ? 'selected' : '').'>does not contain</option>
+						<option value="'.self::OP_NOT_CONTAINS.'" '.($activeFilterOperationValue == self::OP_NOT_CONTAINS ? 'selected' : '').'>does not contain</option>
 					</select>
 				</span>
 				<span>
@@ -341,10 +351,107 @@ class FilterWidget extends Widget
 			{
 				show_error('The "'.self::QUERY_PARAMETER.'" parameter must be specified');
 			}
+
+			if (isset($args[self::FILTER_KURZBZ]))
+			{
+				$this->filterKurzbz = $args[self::FILTER_KURZBZ];
+			}
+
+			if (isset($args[self::FILTER_ID]))
+			{
+				$this->filterId = $args[self::FILTER_ID];
+			}
 		}
 		else
 		{
 			show_error('Second parameter must be an associative array');
+		}
+	}
+
+	/**
+	 *
+	 */
+	private function _loadFilter()
+	{
+		//
+		$this->FiltersModel->resetQuery();
+
+		//
+		$this->FiltersModel->addJoin('public.tbl_benutzer', 'person_id');
+
+		//
+		$this->FiltersModel->addSelect('system.tbl_filters.*');
+
+		//
+		$this->FiltersModel->addOrder('sort', 'ASC');
+
+		//
+		$this->FiltersModel->addLimit(1);
+
+		//
+		$filter = $this->FiltersModel->loadWhere(
+			array(
+				'app' => $this->app,
+				'dataset_name' => $this->datasetName,
+				'uid' => getAuthUID(),
+				'default_filter' => true
+			)
+		);
+
+		$jsonEncodedFilter = null;
+
+		if (hasData($filter))
+		{
+			if (isset($filter->retval[0]->filter) && trim($filter->retval[0]->filter) != '')
+			{
+				$jsonEncodedFilter = json_decode($filter->retval[0]->filter);
+
+			}
+		}
+
+		if ($jsonEncodedFilter != null)
+		{
+			$selectedFields = array();
+			$selectedFilters = array();
+			$activeFilters = array();
+			$activeFiltersOperation = array();
+
+			if (isset($jsonEncodedFilter->columns))
+			{
+				$columns = $jsonEncodedFilter->columns;
+
+				for($columnsCounter = 0; $columnsCounter < count($columns); $columnsCounter++)
+				{
+					if (isset($columns[$columnsCounter]->name))
+					{
+						$selectedFields[] = $columns[$columnsCounter]->name;
+					}
+				}
+			}
+
+			if (isset($jsonEncodedFilter->filters))
+			{
+				$filters = $jsonEncodedFilter->filters;
+
+				for($filtersCounter = 0; $filtersCounter < count($filters); $filtersCounter++)
+				{
+					if (isset($filters[$filtersCounter]->name))
+					{
+						$selectedFilters[] = $filters[$filtersCounter]->name;
+						$activeFilters[$filters[$filtersCounter]->name] = $filters[$filtersCounter]->condition;
+						$activeFiltersOperation[$filters[$filtersCounter]->name] = $filters[$filtersCounter]->operation;
+					}
+				}
+			}
+
+			$filterSessionArray = array(
+				self::SELECTED_FIELDS => $selectedFields,
+				self::SELECTED_FILTERS => $selectedFilters,
+				self::ACTIVE_FILTERS => $activeFilters,
+				self::ACTIVE_FILTERS_OPERATION => $activeFiltersOperation
+			);
+
+			$this->session->set_userdata(self::SESSION_NAME, $filterSessionArray);
 		}
 	}
 
@@ -550,7 +657,7 @@ class FilterWidget extends Widget
 						case self::OP_CONTAINS:
 							$condition = ' ILIKE \'%'.$activeFilterValue.'%\'';
 							break;
-						case self::OP_NOT_CONTAIN:
+						case self::OP_NOT_CONTAINS:
 							$condition = ' NOT ILIKE \'%'.$activeFilterValue.'%\'';
 							break;
 						case self::OP_IS_TRUE:

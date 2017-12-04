@@ -198,6 +198,7 @@ $config['fhc_acl'] = array
 	'system.tbl_appdaten' => 'system/appdaten',
 	'system.tbl_benutzerrolle' => 'basis/benutzerrolle',
 	'system.tbl_berechtigung' => 'basis/berechtigung',
+	'system.tbl_filters' => 'system/filters',
 	'system.tbl_cronjob' => 'basis/cronjob',
 	'system.tbl_phrase' => 'system/phrase',
 	'system.tbl_phrasentext' => 'system/phrase',
