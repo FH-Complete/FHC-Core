@@ -70,8 +70,8 @@ if($jqueryV1 && $jqueryCurrent)
 		$(document).ready(function()
 		{
 			// Checks if the table contains data (rows)
-			if ($('#<?php echo $tableid; ?>').find('tbody:empty').length > 0
-				&& $('#<?php echo $tableid; ?>').find('tr:empty').length > 0)
+			if ($('#<?php echo $tableid; ?>').find('tbody:empty').length == 0
+				&& $('#<?php echo $tableid; ?>').find('tr:empty').length == 0)
 			{
 				$("#<?php echo $tableid; ?>").tablesorter(
 				{

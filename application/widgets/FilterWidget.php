@@ -6,10 +6,14 @@
 class FilterWidget extends Widget
 {
 	const APP_PARAMETER = 'app';
-	const QUERY_PARAMETER = 'query';
 	const DATASET_NAME_PARAMETER = 'datasetName';
 	const FILTER_KURZBZ = 'filterKurzbz';
 	const FILTER_ID = 'filterId';
+	const QUERY_PARAMETER = 'query';
+	const DB_RESULT = 'dbResult';
+	const ADDITIONAL_COLUMNS = 'additionalColumns';
+	const FORMAT_RAW = 'formatRaw';
+	const CHECKBOXES = 'checkboxes';
 
 	const DATASET_PARAMETER = 'dataset';
 	const METADATA_PARAMETER = 'metaData';
@@ -48,6 +52,11 @@ class FilterWidget extends Widget
 	private $datasetName;
 	private $filterKurzbz;
 	private $filterId;
+	private $additionalColumns;
+	private $formatRaw;
+	private $checkboxes;
+
+	private static $FilterWidgetInstance;
 
 	/**
 	 *
@@ -62,6 +71,8 @@ class FilterWidget extends Widget
 
 		//
 		$this->load->model('system/Filters_model', 'FiltersModel');
+
+		self::$FilterWidgetInstance = $this;
 	}
 
 	/**
@@ -110,9 +121,22 @@ class FilterWidget extends Widget
 	/**
 	 *
 	 */
+	public static function getAdditionalColumns()
+	{
+		return self::_getFromSession(self::ADDITIONAL_COLUMNS);
+	}
+
+	/**
+	 *
+	 */
 	public static function loadViewTableDataset($dataset)
 	{
-		self::_loadView(self::WIDGET_URL_TABLE_DATASET, array(self::DATASET_PARAMETER => $dataset));
+		self::_loadView(
+			self::WIDGET_URL_TABLE_DATASET,
+			array(
+				self::DATASET_PARAMETER => $dataset
+			)
+		);
 	}
 
 	/**
@@ -210,6 +234,39 @@ class FilterWidget extends Widget
 	/**
 	 *
 	 */
+	public static function formatRaw($fieldName, $fieldValue, $datasetRaw)
+	{
+		$tmpDatasetRaw = clone $datasetRaw;
+
+		if (is_bool($fieldValue))
+		{
+			$tmpDatasetRaw->{$fieldName} = $fieldValue === true ? 'true' : 'false';
+		}
+
+		$formatRaw = self::$FilterWidgetInstance->getFormatRaw();
+
+		if ($formatRaw != null)
+		{
+			$tmpDatasetRaw = $formatRaw($fieldName, $fieldValue, $tmpDatasetRaw);
+		}
+
+		return $tmpDatasetRaw;
+	}
+
+	/**
+	 *
+	 */
+	public static function getCheckboxes()
+	{
+		return self::$FilterWidgetInstance->_getCheckboxes();
+	}
+
+	//------------------------------------------------------------------------------------------------------------------
+	// Protected
+
+	/**
+	 *
+	 */
 	protected function loadViewFilters($listFields, $metaData, $dataset)
 	{
 		// Loads views
@@ -222,6 +279,25 @@ class FilterWidget extends Widget
 			)
 		);
 	}
+
+	/**
+	 *
+	 */
+	protected function getFormatRaw()
+	{
+		return $this->formatRaw;
+	}
+
+	/**
+	 *
+	 */
+	protected function _getCheckboxes()
+	{
+		return $this->checkboxes;
+	}
+
+	//------------------------------------------------------------------------------------------------------------------
+	// Private
 
 	/**
 	 *
@@ -315,6 +391,11 @@ class FilterWidget extends Widget
 			$filterSessionArray[self::ACTIVE_FILTERS_OPERATION] = array();
 		}
 
+		if (!isset($filterSessionArray[self::ADDITIONAL_COLUMNS]))
+		{
+			$filterSessionArray[self::ADDITIONAL_COLUMNS] = array();
+		}
+
 		$this->session->set_userdata(self::SESSION_NAME, $filterSessionArray);
 	}
 
@@ -323,48 +404,80 @@ class FilterWidget extends Widget
 	 */
 	private function _initFilterWidget($args)
 	{
-		if (is_array($args) && count($args) > 0)
+		$this->app = null;
+		$this->query = null;
+		$this->datasetName = null;
+		$this->filterKurzbz = null;
+		$this->filterId = null;
+		$this->additionalColumns = null;
+		$this->formatRaw = null;
+		$this->checkboxes = null;
+
+		if (!is_array($args) || (is_array($args) && count($args) == 0))
 		{
-			if (isset($args[self::APP_PARAMETER]))
-			{
-				$this->app = $args[self::APP_PARAMETER];
-			}
-			else
-			{
-				show_error('The "'.self::APP_PARAMETER.'" parameter must be specified');
-			}
-
-			if (isset($args[self::DATASET_NAME_PARAMETER]))
-			{
-				$this->datasetName = $args[self::DATASET_NAME_PARAMETER];
-			}
-			else
-			{
-				show_error('The "'.self::DATASET_NAME_PARAMETER.'" parameter must be specified');
-			}
-
-			if (isset($args[self::QUERY_PARAMETER]))
-			{
-				$this->query = $args[self::QUERY_PARAMETER];
-			}
-			else
-			{
-				show_error('The "'.self::QUERY_PARAMETER.'" parameter must be specified');
-			}
-
-			if (isset($args[self::FILTER_KURZBZ]))
-			{
-				$this->filterKurzbz = $args[self::FILTER_KURZBZ];
-			}
-
-			if (isset($args[self::FILTER_ID]))
-			{
-				$this->filterId = $args[self::FILTER_ID];
-			}
+			show_error('Second parameter must be a not empty associative array');
 		}
 		else
 		{
-			show_error('Second parameter must be an associative array');
+			if ((
+					!isset($args[self::APP_PARAMETER])
+					&& !isset($args[self::DATASET_NAME_PARAMETER])
+					&& !isset($args[self::FILTER_KURZBZ])
+				)
+				&& !isset($args[self::FILTER_ID]))
+			{
+				show_error('At least one parameters must be specified 1');
+			}
+			else
+			{
+				if (!isset($args[self::QUERY_PARAMETER]) && !isset($args[self::DB_RESULT]))
+				{
+					show_error('At least one parameters must be specified 2');
+				}
+				else
+				{
+					if (isset($args[self::APP_PARAMETER])
+						&& isset($args[self::DATASET_NAME_PARAMETER])
+						&& isset($args[self::FILTER_KURZBZ]))
+					{
+						$this->app = $args[self::APP_PARAMETER];
+						$this->datasetName = $args[self::DATASET_NAME_PARAMETER];
+						$this->filterKurzbz = $args[self::FILTER_KURZBZ];
+					}
+					else
+					{
+						$this->filterId = $args[self::FILTER_ID];
+					}
+
+					if (isset($args[self::QUERY_PARAMETER]))
+					{
+						$this->query = $args[self::QUERY_PARAMETER];
+					}
+					elseif (isset($args[self::DB_RESULT]))
+					{
+						$this->query = $args[self::DB_RESULT];
+					}
+				}
+			}
+
+			if (isset($args[self::ADDITIONAL_COLUMNS])
+				&& is_array($args[self::ADDITIONAL_COLUMNS])
+				&& count($args[self::ADDITIONAL_COLUMNS]) > 0)
+			{
+				$this->additionalColumns = $args[self::ADDITIONAL_COLUMNS];
+			}
+
+			if (isset($args[self::FORMAT_RAW]) && is_callable($args[self::FORMAT_RAW]))
+			{
+				$this->formatRaw = $args[self::FORMAT_RAW];
+			}
+
+			if (isset($args[self::CHECKBOXES])
+				&& is_array($args[self::CHECKBOXES])
+				&& count($args[self::CHECKBOXES]) > 0)
+			{
+				$this->checkboxes = $args[self::CHECKBOXES];
+			}
 		}
 	}
 
@@ -388,15 +501,29 @@ class FilterWidget extends Widget
 		//
 		$this->FiltersModel->addLimit(1);
 
-		//
-		$filter = $this->FiltersModel->loadWhere(
-			array(
+		$whereParameters = null;
+
+		if ($this->filterId == null)
+		{
+			$whereParameters = array(
 				'app' => $this->app,
 				'dataset_name' => $this->datasetName,
+				'filter_kurzbz' => $this->filterKurzbz,
 				'uid' => getAuthUID(),
 				'default_filter' => true
-			)
-		);
+			);
+		}
+		else
+		{
+			$whereParameters = array(
+				'filter_id' => $this->filter_id,
+				'uid' => getAuthUID(),
+				'default_filter' => true
+			);
+		}
+
+		//
+		$filter = $this->FiltersModel->loadWhere($whereParameters);
 
 		$jsonEncodedFilter = null;
 
@@ -585,7 +712,8 @@ class FilterWidget extends Widget
 	{
 		$filterSessionArray = array(
 			self::SELECTED_FIELDS => $this->_getSelectedFieldsFromPost(),
-			self::SELECTED_FILTERS => $this->_getSelectedFiltersFromPost()
+			self::SELECTED_FILTERS => $this->_getSelectedFiltersFromPost(),
+			self::ADDITIONAL_COLUMNS => $this->additionalColumns
 		);
 
 		$filterSessionArray[self::ACTIVE_FILTERS] = array();
@@ -626,49 +754,52 @@ class FilterWidget extends Widget
 
 			foreach ($activeFilters as $field => $activeFilterValue)
 			{
-				if ($first)
+				if (trim($activeFilterValue) != '')
 				{
-					$first = false;
-				}
-				else
-				{
-					$where .= ' AND ';
-				}
-
-				if (isset($activeFiltersOperation[$field]))
-				{
-					$where .= '"'.$field.'"';
-					$condition = '';
-
-					switch ($activeFiltersOperation[$field])
+					if ($first)
 					{
-						case self::OP_EQUAL:
-							$condition = ' = '.$activeFilterValue;
-							break;
-						case self::OP_NOT_EQUAL:
-							$condition = ' != '.$activeFilterValue;
-							break;
-						case self::OP_GREATER_THAN:
-							$condition = ' > '.$activeFilterValue;
-							break;
-						case self::OP_LESS_THAN:
-							$condition = ' < '.$activeFilterValue;
-							break;
-						case self::OP_CONTAINS:
-							$condition = ' ILIKE \'%'.$activeFilterValue.'%\'';
-							break;
-						case self::OP_NOT_CONTAINS:
-							$condition = ' NOT ILIKE \'%'.$activeFilterValue.'%\'';
-							break;
-						case self::OP_IS_TRUE:
-							$condition = ' IS TRUE';
-							break;
-						case self::OP_IS_FALSE:
-							$condition = ' IS FALSE';
-							break;
+						$first = false;
+					}
+					else
+					{
+						$where .= ' AND ';
 					}
 
-					$where .= $condition;
+					if (isset($activeFiltersOperation[$field]))
+					{
+						$where .= '"'.$field.'"';
+						$condition = '';
+
+						switch ($activeFiltersOperation[$field])
+						{
+							case self::OP_EQUAL:
+								$condition = ' = '.$activeFilterValue;
+								break;
+							case self::OP_NOT_EQUAL:
+								$condition = ' != '.$activeFilterValue;
+								break;
+							case self::OP_GREATER_THAN:
+								$condition = ' > '.$activeFilterValue;
+								break;
+							case self::OP_LESS_THAN:
+								$condition = ' < '.$activeFilterValue;
+								break;
+							case self::OP_CONTAINS:
+								$condition = ' ILIKE \'%'.$activeFilterValue.'%\'';
+								break;
+							case self::OP_NOT_CONTAINS:
+								$condition = ' NOT ILIKE \'%'.$activeFilterValue.'%\'';
+								break;
+							case self::OP_IS_TRUE:
+								$condition = ' IS TRUE';
+								break;
+							case self::OP_IS_FALSE:
+								$condition = ' IS FALSE';
+								break;
+						}
+
+						$where .= $condition;
+					}
 				}
 			}
 
