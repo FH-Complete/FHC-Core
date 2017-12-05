@@ -104,8 +104,8 @@ if(isset($_REQUEST['token']) && isset($_REQUEST['grp']))
 	/* Generate an random String  */
 	$mail_id=mail_id_generator();
 
-	/* call the shellpart at polyxena */
-	$command = "ssh -p 22022 root@polyxena sudo /root/bin/mlistin.sh " . $_REQUEST['grp'] . " " . $mail_id . " 2>&1";
+	/* Command to unlock Mailgroup */
+	$command = "ssh -i /etc/apache2/id_mail_provisioning mailadmins@bifrost2 ".$_REQUEST['grp'] . " " . $mail_id;
 	exec($command);
 
 	/* ffe, 20051020 - do a little logging */
