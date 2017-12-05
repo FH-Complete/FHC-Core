@@ -254,7 +254,7 @@ class service extends basis_db
 		if (!is_null($content_id) && is_numeric($content_id))
 			$qry.= ' AND content_id='.$this->db_add_param($content_id);
 		elseif ($content_id==true)
-			$qry.= ' AND content_id IS NOT NULL';
+			$qry.= ' AND (content_id IS NOT NULL OR ext_id IS NOT NULL)';
 		else
 			$qry.= '';
 
