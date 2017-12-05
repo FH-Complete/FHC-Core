@@ -81,7 +81,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 
 	$note_arr = array();
 	$note = new note();
-	$note->getAll();
+	$note->getAll($offiziell = true);
 	foreach ($note->result as $n)
 		$note_arr[$n->note] = $n->anmerkung;
 
@@ -257,7 +257,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 				{
 					if($row->zeugnis)
 					{
-						if (trim($row->note)!=='')
+						if (trim($row->note)!=='' && isset($note_arr[$row->note]))
 							$note = $note_arr[$row->note];
 						else
 							$note = "";
@@ -323,7 +323,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 							//$note = $note_arr[$projektarbeit[$row->lehrveranstaltung_id]['note']];
 							$note = $projektarbeit[$row->lehrveranstaltung_id]['note'];
 							//$nl = str_repeat('\n',($anzahl_nl));
-							$xml_fussnote .='      <note>'.(isset($note_arr[$note])?$note_arr[$note]:$note).$nl.'</note>';
+							$xml_fussnote .='      <note>'.(isset($note_arr[$note])?$note_arr[$note]:"").$nl.'</note>';
 							$xml_fussnote .='      <sws>'.$nl.'</sws>';
 							$xml_fussnote .='      <sws_lv>'.$nl.'</sws_lv>';
 							$xml_fussnote .='      <ects>'.$nl.'</ects>';
