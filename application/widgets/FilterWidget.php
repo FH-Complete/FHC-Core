@@ -47,6 +47,8 @@ class FilterWidget extends Widget
 	const OP_CONTAINS = 'contains';
 	const OP_NOT_CONTAINS = 'ncontains';
 
+	const DEFAULT_DATE_FORMAT = 'd.m.Y H:i:s';
+
 	private $app;
 	private $query;
 	private $datasetName;
@@ -55,6 +57,8 @@ class FilterWidget extends Widget
 	private $additionalColumns;
 	private $formatRaw;
 	private $checkboxes;
+
+	private $metaData;
 
 	private static $FilterWidgetInstance;
 
@@ -96,10 +100,10 @@ class FilterWidget extends Widget
 		$listFields = $this->FiltersModel->getExecutedQueryListFields();
 
 		//
-		$metaData = $this->FiltersModel->getExecutedQueryMetaData();
+		$this->metaData = $this->FiltersModel->getExecutedQueryMetaData();
 
 		//
-		$this->loadViewFilters($listFields, $metaData, $dataset);
+		$this->loadViewFilters($listFields, $this->metaData, $dataset);
 	}
 
 	/**
@@ -227,6 +231,23 @@ class FilterWidget extends Widget
 				</span>
 			';
 		}
+		elseif ($filterMetaData->type == 'timestamp')
+		{
+			$html = '
+				<span>
+					<select name="%s" class="select-filter-operation">
+						<option value="'.self::OP_LESS_THAN.'" '.($activeFilterOperationValue == self::OP_LESS_THAN ? 'selected' : '').'>less than</option>
+					</select>
+				</span>
+				<span>
+					<input type="text" name="%s" value="%s" class="select-filter-operation-value">
+				</span>
+				<select name="" class="select-filter-">
+					<option value="">Days</option>
+					<option value="">Months</option>
+				</select>
+			';
+		}
 
 		return sprintf($html, $filterMetaData->name.'-operation', $filterMetaData->name, $activeFilterValue);
 	}
@@ -236,18 +257,28 @@ class FilterWidget extends Widget
 	 */
 	public static function formatRaw($fieldName, $fieldValue, $datasetRaw)
 	{
-		$tmpDatasetRaw = clone $datasetRaw;
+		$tmpDatasetRaw = null;
 
-		if (is_bool($fieldValue))
+		if (is_object($datasetRaw))
 		{
-			$tmpDatasetRaw->{$fieldName} = $fieldValue === true ? 'true' : 'false';
-		}
+			$tmpDatasetRaw = clone $datasetRaw;
+			$tmpMetaData = self::getFilterMetaData($fieldName, self::$FilterWidgetInstance->metaData);
 
-		$formatRaw = self::$FilterWidgetInstance->getFormatRaw();
+			if (is_bool($fieldValue))
+			{
+				$tmpDatasetRaw->{$fieldName} = $fieldValue === true ? 'true' : 'false';
+			}
+			elseif ($tmpMetaData != null && $tmpMetaData->type == 'timestamp')
+			{
+				$tmpDatasetRaw->{$fieldName} = date(self::DEFAULT_DATE_FORMAT, strtotime($fieldValue));
+			}
 
-		if ($formatRaw != null)
-		{
-			$tmpDatasetRaw = $formatRaw($fieldName, $fieldValue, $tmpDatasetRaw);
+			$formatRaw = self::$FilterWidgetInstance->getFormatRaw();
+
+			if ($formatRaw != null)
+			{
+				$tmpDatasetRaw = $formatRaw($fieldName, $fieldValue, $tmpDatasetRaw);
+			}
 		}
 
 		return $tmpDatasetRaw;

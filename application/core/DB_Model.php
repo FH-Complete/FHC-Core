@@ -694,21 +694,25 @@ class DB_Model extends FHC_Model
 	 */
 	public function execReadOnlyQuery($query, $parametersArray = null)
 	{
+		$result = error('You are allowed to run only query for reading data'); //
+		$cleanedQuery = trim(preg_replace('/\t|\n|\r|;/', '', $query)); //
+
 		//
-		if (!stripos($query, 'INSERT')
-			&& !stripos($query, 'UPDATE')
-			&& !stripos($query, 'DELETE')
-			&& !stripos($query, 'CREATE')
-			&& !stripos($query, 'ALTER')
-			&& !stripos($query, 'GRANT')
-			&& !stripos($query, 'DROP'))
+		if (stripos($cleanedQuery, 'SELECT') == 0
+			&& (stripos($cleanedQuery, 'INSERT') > 0 || stripos($cleanedQuery, 'INSERT') == false)
+			&& (stripos($cleanedQuery, 'UPDATE') > 0 || stripos($cleanedQuery, 'UPDATE') == false)
+			&& (stripos($cleanedQuery, 'CREATE') > 0 || stripos($cleanedQuery, 'CREATE') == false)
+			&& (stripos($cleanedQuery, 'DELETE') > 0 || stripos($cleanedQuery, 'DELETE') == false)
+			&& (stripos($cleanedQuery, 'ALTER') > 0 || stripos($cleanedQuery, 'ALTER') == false)
+			&& (stripos($cleanedQuery, 'GRANT') > 0 || stripos($cleanedQuery, 'GRANT') == false)
+			&& (stripos($cleanedQuery, 'DROP') > 0 || stripos($cleanedQuery, 'DROP') == false))
 		{
-			return $this->execQuery($query, $parametersArray);
+			$queryToExec = str_replace(';', '', $query); //
+
+			$result = $this->execQuery($queryToExec, $parametersArray);
 		}
-		else
-		{
-			return error('You are allowed to run only query for reading data');
-		}
+
+		return $result;
 	}
 
 	// ------------------------------------------------------------------------------------------
