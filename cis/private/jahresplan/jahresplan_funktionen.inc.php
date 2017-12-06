@@ -1100,6 +1100,7 @@ function jahresplan_date_to_timestamp($string="")
 
 function printlinks($text)
 {
+	// Volle Links
 	$pattern = '~[a-z]+://\S+~';
 
 	if($num_found = preg_match_all($pattern, $text, $out))
@@ -1107,6 +1108,22 @@ function printlinks($text)
 		foreach($out[0] as $link)
 		{
 			echo '<a href="'.$link.'" target="_blank">'.$link.'</a><br>';
+		}
+	}
+
+	if(defined('JAHRESPLAN_TICKET_LINK'))
+	{
+		// TicketsIds mit #1234
+		$pattern = '~\#[0-9]+~';
+
+		if($num_found = preg_match_all($pattern, $text, $out))
+		{
+			foreach($out[0] as $ticketnr)
+			{
+				$id = mb_substr($ticketnr,1);
+				$link = JAHRESPLAN_TICKET_LINK.$id;
+				echo '<a href="'.$link.'" target="_blank">'.$link.'</a><br>';
+			}
 		}
 	}
 }
