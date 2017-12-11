@@ -538,9 +538,9 @@ class studienplan extends basis_db
 					$this->db_add_param($this->studienplan_lehrveranstaltung_id_parent, FHC_INTEGER) . ', ' .
 					$this->db_add_param($this->pflicht, FHC_BOOLEAN) . ', ' .
 					$this->db_add_param($this->koordinator) . ', ' .
-					$this->db_add_param($this->curriculum) . ', ' .
-					$this->db_add_param($this->export) . ', ' .
-					$this->db_add_param($this->genehmigung) . ', ' .
+					$this->db_add_param($this->curriculum, FHC_BOOLEAN) . ', ' .
+					$this->db_add_param($this->export, FHC_BOOLEAN) . ', ' .
+					$this->db_add_param($this->genehmigung, FHC_BOOLEAN) . ', ' .
 					'now(), ' .
 					$this->db_add_param($this->insertvon) . ');';
 		}
