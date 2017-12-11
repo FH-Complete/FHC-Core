@@ -411,7 +411,11 @@ class dokument_export
 				}
 			}
 			else
+			{
+				// Remove UTF8 Control Characters (breaking XML)
+				$value = preg_replace('/[\x00-\x1F\x7F]/u', '', $value);
 				$_xml_data->addChild("$key",htmlspecialchars("$value"));
+			}
 		}
 		return $_xml_data->asXML();
 	}
