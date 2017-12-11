@@ -14,6 +14,7 @@ class FilterWidget extends Widget
 	const ADDITIONAL_COLUMNS = 'additionalColumns';
 	const FORMAT_RAW = 'formatRaw';
 	const CHECKBOXES = 'checkboxes';
+	const HIDE_HEADER = 'hideHeader';
 
 	const DATASET_PARAMETER = 'dataset';
 	const METADATA_PARAMETER = 'metaData';
@@ -29,8 +30,10 @@ class FilterWidget extends Widget
 	const SELECTED_FIELDS = 'selectedFields';
 	const SELECTED_FILTERS = 'selectedFilters';
 	const ACTIVE_FILTERS = 'activeFilters';
+	const ACTIVE_FILTERS_OPTION = 'activeFiltersOption';
 	const ACTIVE_FILTERS_OPERATION = 'activeFiltersOperation';
 
+	const ACTIVE_FILTER_OPTION_POSTFIX = '-option';
 	const ACTIVE_FILTER_OPERATION_POSTFIX = '-operation';
 
 	const CMD_ADD_FILTER = 'addFilter';
@@ -41,13 +44,16 @@ class FilterWidget extends Widget
 	const OP_EQUAL = 'equal';
 	const OP_NOT_EQUAL = 'nequal';
 	const OP_GREATER_THAN = 'gt';
-	const OP_LESS_THAN = 'ld';
+	const OP_LESS_THAN = 'lt';
 	const OP_IS_TRUE = 'true';
 	const OP_IS_FALSE = 'false';
 	const OP_CONTAINS = 'contains';
 	const OP_NOT_CONTAINS = 'ncontains';
 
-	const DEFAULT_DATE_FORMAT = 'd.m.Y H:i:s';
+	const OPT_DAYS = 'days';
+	const OPT_MONTHS = 'months';
+
+	const DEFAULT_DATE_FORMAT = 'Y.m.d H:i:s';
 
 	private $app;
 	private $query;
@@ -58,7 +64,9 @@ class FilterWidget extends Widget
 	private $formatRaw;
 	private $checkboxes;
 
+	private $dataset;
 	private $metaData;
+	private $listFields;
 
 	private static $FilterWidgetInstance;
 
@@ -94,16 +102,16 @@ class FilterWidget extends Widget
 		$this->FiltersModel->resetQuery();
 
 		//
-		$dataset = @$this->FiltersModel->execReadOnlyQuery($this->_generateQuery());
+		$this->dataset = @$this->FiltersModel->execReadOnlyQuery($this->_generateQuery());
 
 		//
-		$listFields = $this->FiltersModel->getExecutedQueryListFields();
+		$this->listFields = $this->FiltersModel->getExecutedQueryListFields();
 
 		//
 		$this->metaData = $this->FiltersModel->getExecutedQueryMetaData();
 
 		//
-		$this->loadViewFilters($listFields, $this->metaData, $dataset);
+		$this->loadViewFilters();
 	}
 
 	/**
@@ -133,30 +141,31 @@ class FilterWidget extends Widget
 	/**
 	 *
 	 */
-	public static function loadViewTableDataset($dataset)
+	public static function loadViewSelectFields()
 	{
-		self::_loadView(
-			self::WIDGET_URL_TABLE_DATASET,
-			array(
-				self::DATASET_PARAMETER => $dataset
-			)
-		);
+		if (self::$FilterWidgetInstance->hideHeader != true)
+		{
+			self::_loadView(self::WIDGET_URL_SELECT_FIELDS, array(self::LIST_FIELDS_PARAMETER => self::$FilterWidgetInstance->listFields));
+		}
 	}
 
 	/**
 	 *
 	 */
-	public static function loadViewSelectFilters($metaData)
+	public static function loadViewSelectFilters()
 	{
-		self::_loadView(self::WIDGET_URL_SELECT_FILTERS, array(self::METADATA_PARAMETER => $metaData));
+		if (self::$FilterWidgetInstance->hideHeader != true)
+		{
+			self::_loadView(self::WIDGET_URL_SELECT_FILTERS, array(self::METADATA_PARAMETER => self::$FilterWidgetInstance->metaData));
+		}
 	}
 
 	/**
 	 *
 	 */
-	public static function loadViewSelectFields($listFields)
+	public static function loadViewTableDataset()
 	{
-		self::_loadView(self::WIDGET_URL_SELECT_FIELDS, array(self::LIST_FIELDS_PARAMETER => $listFields));
+		self::_loadView(self::WIDGET_URL_TABLE_DATASET, array(self::DATASET_PARAMETER => self::$FilterWidgetInstance->dataset));
 	}
 
 	/**
@@ -186,6 +195,7 @@ class FilterWidget extends Widget
 		$html = '';
 		$activeFilterValue = self::_getActiveFilterValue($filterMetaData->name);
 		$activeFilterOperationValue = self::_getActiveFilterOperationValue($filterMetaData->name);
+		$activeFilterOptionValue = self::_getActiveFilterOptionValue($filterMetaData->name);
 
 		if ($filterMetaData->type == 'int4')
 		{
@@ -242,14 +252,14 @@ class FilterWidget extends Widget
 				<span>
 					<input type="text" name="%s" value="%s" class="select-filter-operation-value">
 				</span>
-				<select name="" class="select-filter-">
-					<option value="">Days</option>
-					<option value="">Months</option>
+				<select name="%s" class="select-filter-option">
+					<option value="'.self::OPT_DAYS.'" '.($activeFilterOptionValue == self::OPT_DAYS ? 'selected' : '').'>Days</option>
+					<option value="'.self::OPT_MONTHS.'" '.($activeFilterOptionValue == self::OPT_MONTHS ? 'selected' : '').'>Months</option>
 				</select>
 			';
 		}
 
-		return sprintf($html, $filterMetaData->name.'-operation', $filterMetaData->name, $activeFilterValue);
+		return sprintf($html, $filterMetaData->name.'-operation', $filterMetaData->name, $activeFilterValue, $filterMetaData->name.'-option');
 	}
 
 	/**
@@ -298,15 +308,14 @@ class FilterWidget extends Widget
 	/**
 	 *
 	 */
-	protected function loadViewFilters($listFields, $metaData, $dataset)
+	protected function loadViewFilters()
 	{
 		// Loads views
-		$this->view(
-			self::WIDGET_URL_FILTER,
+		$this->view(self::WIDGET_URL_FILTER,
 			array(
-				self::DATASET_PARAMETER => $dataset,
-				self::METADATA_PARAMETER => $metaData,
-				self::LIST_FIELDS_PARAMETER => $listFields
+				self::DATASET_PARAMETER => $this->dataset,
+				self::METADATA_PARAMETER => $this->metaData,
+				self::LIST_FIELDS_PARAMETER => $this->listFields
 			)
 		);
 	}
@@ -384,6 +393,23 @@ class FilterWidget extends Widget
 	/**
 	 *
 	 */
+	private static function _getActiveFilterOptionValue($filterName)
+	{
+		$getActiveFilterOptionValue = '';
+
+		$activeFieldsOption = self::_getFromSession(self::ACTIVE_FILTERS_OPTION);
+
+		if (isset($activeFieldsOption[$filterName]))
+		{
+			$getActiveFilterOptionValue = $activeFieldsOption[$filterName];
+		}
+
+		return $getActiveFilterOptionValue;
+	}
+
+	/**
+	 *
+	 */
 	private static function _loadView($viewName, $parameters)
 	{
 		$ci =& get_instance();
@@ -422,6 +448,11 @@ class FilterWidget extends Widget
 			$filterSessionArray[self::ACTIVE_FILTERS_OPERATION] = array();
 		}
 
+		if (!isset($filterSessionArray[self::ACTIVE_FILTERS_OPTION]))
+		{
+			$filterSessionArray[self::ACTIVE_FILTERS_OPTION] = array();
+		}
+
 		if (!isset($filterSessionArray[self::ADDITIONAL_COLUMNS]))
 		{
 			$filterSessionArray[self::ADDITIONAL_COLUMNS] = array();
@@ -443,6 +474,7 @@ class FilterWidget extends Widget
 		$this->additionalColumns = null;
 		$this->formatRaw = null;
 		$this->checkboxes = null;
+		$this->hideHeader = false;
 
 		if (!is_array($args) || (is_array($args) && count($args) == 0))
 		{
@@ -509,6 +541,11 @@ class FilterWidget extends Widget
 			{
 				$this->checkboxes = $args[self::CHECKBOXES];
 			}
+
+			if (isset($args[self::HIDE_HEADER]) && is_bool($args[self::HIDE_HEADER]))
+			{
+				$this->hideHeader = $args[self::HIDE_HEADER];
+			}
 		}
 	}
 
@@ -573,6 +610,7 @@ class FilterWidget extends Widget
 			$selectedFilters = array();
 			$activeFilters = array();
 			$activeFiltersOperation = array();
+			$activeFiltersOption = array();
 
 			if (isset($jsonEncodedFilter->columns))
 			{
@@ -598,6 +636,10 @@ class FilterWidget extends Widget
 						$selectedFilters[] = $filters[$filtersCounter]->name;
 						$activeFilters[$filters[$filtersCounter]->name] = $filters[$filtersCounter]->condition;
 						$activeFiltersOperation[$filters[$filtersCounter]->name] = $filters[$filtersCounter]->operation;
+						if (isset($filters[$filtersCounter]->option))
+						{
+							$activeFiltersOption[$filters[$filtersCounter]->name] = $filters[$filtersCounter]->option;
+						}
 					}
 				}
 			}
@@ -606,7 +648,8 @@ class FilterWidget extends Widget
 				self::SELECTED_FIELDS => $selectedFields,
 				self::SELECTED_FILTERS => $selectedFilters,
 				self::ACTIVE_FILTERS => $activeFilters,
-				self::ACTIVE_FILTERS_OPERATION => $activeFiltersOperation
+				self::ACTIVE_FILTERS_OPERATION => $activeFiltersOperation,
+				self::ACTIVE_FILTERS_OPTION => $activeFiltersOption
 			);
 
 			$this->session->set_userdata(self::SESSION_NAME, $filterSessionArray);
@@ -682,7 +725,7 @@ class FilterWidget extends Widget
 	/**
 	 *
 	 */
-	private function _setActiveFiltersFromPost(&$activeFilters, &$activeFiltersOperation)
+	private function _setActiveFiltersFromPost(&$activeFilters, &$activeFiltersOperation, &$activeFiltersOption)
 	{
 		$selectedFilters = array();
 		$filterSessionArray = $this->session->userdata(self::SESSION_NAME);
@@ -695,6 +738,11 @@ class FilterWidget extends Widget
 		if (isset($filterSessionArray[self::ACTIVE_FILTERS_OPERATION]))
 		{
 			$activeFiltersOperation = $filterSessionArray[self::ACTIVE_FILTERS_OPERATION];
+		}
+
+		if (isset($filterSessionArray[self::ACTIVE_FILTERS_OPTION]))
+		{
+			$activeFiltersOption = $filterSessionArray[self::ACTIVE_FILTERS_OPTION];
 		}
 
 		if (isset($filterSessionArray[self::SELECTED_FILTERS]))
@@ -715,6 +763,11 @@ class FilterWidget extends Widget
 				{
 					unset($activeFiltersOperation[$_POST[self::CMD_REMOVE_FILTER]]);
 				}
+
+				if (isset($activeFiltersOption[$_POST[self::CMD_REMOVE_FILTER]]))
+				{
+					unset($activeFiltersOption[$_POST[self::CMD_REMOVE_FILTER]]);
+				}
 			}
 			else
 			{
@@ -730,6 +783,11 @@ class FilterWidget extends Widget
 					if (isset($_POST[$selectedFilter.self::ACTIVE_FILTER_OPERATION_POSTFIX]))
 					{
 						$activeFiltersOperation[$selectedFilter] = $_POST[$selectedFilter.self::ACTIVE_FILTER_OPERATION_POSTFIX];
+					}
+
+					if (isset($_POST[$selectedFilter.self::ACTIVE_FILTER_OPTION_POSTFIX]))
+					{
+						$activeFiltersOption[$selectedFilter] = $_POST[$selectedFilter.self::ACTIVE_FILTER_OPTION_POSTFIX];
 					}
 				}
 			}
@@ -749,10 +807,12 @@ class FilterWidget extends Widget
 
 		$filterSessionArray[self::ACTIVE_FILTERS] = array();
 		$filterSessionArray[self::ACTIVE_FILTERS_OPERATION] = array();
+		$filterSessionArray[self::ACTIVE_FILTERS_OPTION] = array();
 
 		$this->_setActiveFiltersFromPost(
 			$filterSessionArray[self::ACTIVE_FILTERS],
-			$filterSessionArray[self::ACTIVE_FILTERS_OPERATION]
+			$filterSessionArray[self::ACTIVE_FILTERS_OPERATION],
+			$filterSessionArray[self::ACTIVE_FILTERS_OPTION]
 		);
 
 		$this->session->set_userdata(self::SESSION_NAME, $filterSessionArray);
@@ -765,6 +825,10 @@ class FilterWidget extends Widget
 	{
 		$query = $this->query;
 
+		$activeFilters = array();
+		$activeFiltersOperation = array();
+		$activeFiltersOption = array();
+
 		$filterSessionArray = $this->session->userdata(self::SESSION_NAME);
 
 		if (isset($filterSessionArray[self::ACTIVE_FILTERS]))
@@ -775,6 +839,11 @@ class FilterWidget extends Widget
 		if (isset($filterSessionArray[self::ACTIVE_FILTERS_OPERATION]))
 		{
 			$activeFiltersOperation = $filterSessionArray[self::ACTIVE_FILTERS_OPERATION];
+		}
+
+		if (isset($filterSessionArray[self::ACTIVE_FILTERS_OPTION]))
+		{
+			$activeFiltersOption = $filterSessionArray[self::ACTIVE_FILTERS_OPTION];
 		}
 
 		//
@@ -813,7 +882,16 @@ class FilterWidget extends Widget
 								$condition = ' > '.$activeFilterValue;
 								break;
 							case self::OP_LESS_THAN:
-								$condition = ' < '.$activeFilterValue;
+								if (isset($activeFiltersOption[$field])
+									&& ($activeFiltersOption[$field] == self::OPT_DAYS
+									|| $activeFiltersOption[$field] == self::OPT_MONTHS))
+								{
+									$condition = ' < (NOW() - \''.$activeFilterValue.' '.$activeFiltersOption[$field].'\'::interval)';
+								}
+								else
+								{
+									$condition = ' < '.$activeFilterValue;
+								}
 								break;
 							case self::OP_CONTAINS:
 								$condition = ' ILIKE \'%'.$activeFilterValue.'%\'';
