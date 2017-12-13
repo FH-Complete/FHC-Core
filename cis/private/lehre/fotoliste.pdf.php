@@ -17,12 +17,12 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
  * Authors: Cristina Hainberger <hainberg@technikum-wien.at>
- * 
+ *
  * Description: This file creates a studentlist with students' profile fotos
  * by a given studiengangs- and lehrveranstaltungs ID (and eventually a given lehreinheit ID).
  * If fotos are locked by student, a dummy picture is inserted instead of the students foto.
  * EXCEPTION: if user has admins or assitents rights, ALL students' fotos are iserted (even locked ones)
- * 
+ *
  */
 
 require_once('../../../config/cis.config.inc.php');
@@ -60,7 +60,7 @@ $lv->load($lvid);
 
 $berechtigung = new benutzerberechtigung();
 $berechtigung->getBerechtigungen($user);
-    
+
 if (!$berechtigung->isBerechtigt('admin') && !$berechtigung->isBerechtigt('assistenz') && !$berechtigung->isBerechtigt('lehre', $lv->oe_kurzbz, 's') && !check_lektor_lehrveranstaltung($user, $lvid, $studiensemester))
     die('Sie muessen LektorIn der LV sein oder das Recht "ADMIN", "ASSISTENZ" oder "LEHRE" haben, um diese Seite aufrufen zu koennen');
 
@@ -85,11 +85,11 @@ $qry = "SELECT DISTINCT ON
 			gruppe,
 			gruppe_kurzbz,
             stg_typ
-		FROM 
+		FROM
             campus.vw_lehreinheit
-		WHERE 
+		WHERE
             lehrveranstaltung_id=" . $db->db_add_param($lvid, FHC_INTEGER) . "
-		AND 
+		AND
             studiensemester_kurzbz=" . $db->db_add_param($studiensemester);
 if ($lehreinheit != '')
     $qry .= " AND lehreinheit_id=" . $db->db_add_param($lehreinheit, FHC_INTEGER);
@@ -111,8 +111,8 @@ if ($result = $db->db_query($qry)) {
         if ($row->gruppe_kurzbz == '')
             $gruppen_string = trim($row->kuerzel . '-' . $row->semester);
         else
-            $gruppen_string = $row->gruppe_kurzbz;    
-        
+            $gruppen_string = $row->gruppe_kurzbz;
+
         $gruppen_string_arr[] = $gruppen_string;
     }
 }
@@ -122,10 +122,10 @@ $studiengruppe = implode(", ", array_unique($gruppen_string_arr));
 
 //get studiengangstyp-bezeichnung
 $qry = "SELECT
-            bezeichnung 
-        FROM 
-            public.tbl_studiengangstyp 
-        WHERE 
+            bezeichnung
+        FROM
+            public.tbl_studiengangstyp
+        WHERE
             typ =" . $db->db_add_param($stg_typ);
 
 if ($result = $db->db_query($qry)) {
@@ -148,43 +148,43 @@ $data = array(
 //****************************   students data   *******************************
 //load students-data
 $qry = 'SELECT DISTINCT ON
-			(nachname, vorname, person_id) 
-            vorname, 
-            nachname, 
+			(nachname, vorname, person_id)
+            vorname,
+            nachname,
             matrikelnr,
-			tbl_studentlehrverband.semester, 
-            tbl_studentlehrverband.verband, 
+			tbl_studentlehrverband.semester,
+            tbl_studentlehrverband.verband,
             tbl_studentlehrverband.gruppe,
-			(SELECT 
-                status_kurzbz 
-            FROM 
-                public.tbl_prestudentstatus 
-            WHERE 
-                prestudent_id=tbl_student.prestudent_id 
-            ORDER BY 
+			(SELECT
+                status_kurzbz
+            FROM
+                public.tbl_prestudentstatus
+            WHERE
+                prestudent_id=tbl_student.prestudent_id
+            ORDER BY
                 datum DESC, insertamum DESC, ext_id DESC LIMIT 1) as status,
             tbl_studiengang.kurzbz,
             tbl_studiengang.typ,
-            tbl_bisio.bisio_id, 
-            tbl_bisio.von, 
-            tbl_bisio.bis, 
+            tbl_bisio.bisio_id,
+            tbl_bisio.von,
+            tbl_bisio.bis,
             tbl_student.studiengang_kz AS stg_kz_student,
-            tbl_zeugnisnote.note, 
-            tbl_mitarbeiter.mitarbeiter_uid, 
-            tbl_person.matr_nr, 
-            tbl_person.geschlecht, 
-            tbl_person.foto, 
+            tbl_zeugnisnote.note,
+            tbl_mitarbeiter.mitarbeiter_uid,
+            tbl_person.matr_nr,
+            tbl_person.geschlecht,
+            tbl_person.foto,
             tbl_person.foto_sperre
 		FROM
-			campus.vw_student_lehrveranstaltung 
+			campus.vw_student_lehrveranstaltung
             JOIN public.tbl_benutzer USING(uid)
-			JOIN public.tbl_person USING(person_id) 
+			JOIN public.tbl_person USING(person_id)
             LEFT JOIN public.tbl_student ON(uid=student_uid)
             LEFT JOIN public.tbl_studiengang ON(tbl_studiengang.studiengang_kz=tbl_student.studiengang_kz)
 			LEFT JOIN public.tbl_mitarbeiter ON(uid=mitarbeiter_uid)
 			LEFT JOIN public.tbl_studentlehrverband USING(student_uid,studiensemester_kurzbz)
-			LEFT JOIN lehre.tbl_zeugnisnote ON(vw_student_lehrveranstaltung.lehrveranstaltung_id=tbl_zeugnisnote.lehrveranstaltung_id 
-                AND tbl_zeugnisnote.student_uid=tbl_student.student_uid 
+			LEFT JOIN lehre.tbl_zeugnisnote ON(vw_student_lehrveranstaltung.lehrveranstaltung_id=tbl_zeugnisnote.lehrveranstaltung_id
+                AND tbl_zeugnisnote.student_uid=tbl_student.student_uid
                 AND tbl_zeugnisnote.studiensemester_kurzbz=tbl_studentlehrverband.studiensemester_kurzbz)
             LEFT JOIN bis.tbl_bisio ON(uid=tbl_bisio.student_uid)
 		WHERE
@@ -214,7 +214,7 @@ if ($result = $db->db_query($qry)) {
     while ($row = $db->db_fetch_object($result)) {
         if ($row->status != 'Abbrecher' && $row->status != 'Unterbrecher') {
             $anzahl_studierende++;
-            
+
             if ($row->status == 'Incoming') //Incoming
                 $zusatz = '(i)';
             else
@@ -231,9 +231,9 @@ if ($result = $db->db_query($qry)) {
 
             if ($row->stg_kz_student == $a_o_kz) //Außerordentliche Studierende
                 $zusatz .= '(a.o.)';
-          
+
             //allow admin and assistenz to see ALL fotos (even if locked by user)
-            if ($show_all_fotos)              
+            if ($show_all_fotos)
                 $row->foto_sperre = 'f';
 
             //create foto (if not locked by student OR if fotolist is created by admin or assistenz)
@@ -241,7 +241,7 @@ if ($result = $db->db_query($qry)) {
                 $foto_src = $row->foto;
                 $foto_url = sys_get_temp_dir() . '/foto' . trim($row->matrikelnr) . '.jpg';
                 $foto_url_arr[] = $foto_url;
-                
+
                 //create writeable file
                 if (!$foto = fopen($foto_url, 'w'))
                     die("Das Bild konnte nicht erstellt werden");
@@ -250,15 +250,19 @@ if ($result = $db->db_query($qry)) {
                 {
                     die("Das Bild konnte nicht erstellt werden");
                 }
-                
+
                 //add foto to document
                 $doc->addImage($foto_url, trim($row->matrikelnr) . '.jpg', 'image/jpg');
             }
             elseif ($row->foto == '')
-                {
+            {
                 $foto_url = '';
-                }
-                
+            }
+            else
+            {
+                $foto_url = '';
+            }
+
             //create studiengruppe
             $student_studiengruppe = strtoupper($row->typ.$row->kurzbz.'-'.$row->semester);
 
@@ -268,7 +272,7 @@ if ($result = $db->db_query($qry)) {
                     'nachname' => mb_strtoupper($row->nachname, 'UTF-8'),
                     'personenkennzeichen' => trim($row->matrikelnr),
                     'geschlecht' => $row->geschlecht,
-                    'foto_gesperrt' => $row->foto_sperre, // f/t 
+                    'foto_gesperrt' => $row->foto_sperre, // f/t
                     'foto_url' => $foto_url,
                     'studiengruppe' => $student_studiengruppe,
                     'verband' => trim($row->verband),
@@ -289,7 +293,7 @@ $doc->addDataArray($data, 'fotoliste');
 //set doc name
 $doc->setFilename('Fotoliste_'.$stg_bezeichnung.'_'.$studiensemester.'_'.$lv_bezeichnung);
 
-//create doc in format required 
+//create doc in format required
 if (!$doc->create($output))
     die($doc->errormsg);
 
