@@ -364,6 +364,11 @@ class cronjob extends basis_db
 	public function execute()
 	{
 		$return = true;
+		if($this->running)
+		{
+			$this->errormsg = 'Job kann nicht ausgefuehrt werden, da er bereits laeuft';
+			return false;
+		}
 		if($this->standalone && $this->isJobRunning())
 		{
 			$this->errormsg = 'Job kann nicht ausgefuehrt werden, da noch ein anderer Job laeuft';
