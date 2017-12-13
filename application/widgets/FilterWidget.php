@@ -15,6 +15,7 @@ class FilterWidget extends Widget
 	const FORMAT_RAW = 'formatRaw';
 	const CHECKBOXES = 'checkboxes';
 	const HIDE_HEADER = 'hideHeader';
+	const HIDE_SAVE = 'hideSave';
 
 	const DATASET_PARAMETER = 'dataset';
 	const METADATA_PARAMETER = 'metaData';
@@ -24,6 +25,7 @@ class FilterWidget extends Widget
 	const WIDGET_URL_SELECT_FIELDS = 'widgets/filter/selectFields';
 	const WIDGET_URL_TABLE_DATASET = 'widgets/filter/tableDataset';
 	const WIDGET_URL_SELECT_FILTERS = 'widgets/filter/selectFilters';
+	const WIDGET_URL_SAVE_FILTER = 'widgets/filter/saveFilter';
 
 	const SESSION_NAME = 'FILTER';
 
@@ -83,6 +85,7 @@ class FilterWidget extends Widget
 
 		//
 		$this->load->model('system/Filters_model', 'FiltersModel');
+		$this->load->model('person/Benutzer_model', 'BenutzerModel');
 
 		self::$FilterWidgetInstance = $this;
 	}
@@ -97,6 +100,9 @@ class FilterWidget extends Widget
 
 		//
 		$this->_setSessionFilterData();
+
+		//
+		$this->_saveFilter();
 
 		//
 		$this->FiltersModel->resetQuery();
@@ -169,6 +175,17 @@ class FilterWidget extends Widget
 		if (self::$FilterWidgetInstance->hideHeader != true)
 		{
 			self::_loadView(self::WIDGET_URL_SELECT_FILTERS, array(self::METADATA_PARAMETER => self::$FilterWidgetInstance->metaData));
+		}
+	}
+
+	/**
+	 *
+	 */
+	public static function loadViewSaveFilter()
+	{
+		if (self::$FilterWidgetInstance->hideSave != true)
+		{
+			self::_loadView(self::WIDGET_URL_SAVE_FILTER);
 		}
 	}
 
@@ -422,7 +439,7 @@ class FilterWidget extends Widget
 	/**
 	 *
 	 */
-	private static function _loadView($viewName, $parameters)
+	private static function _loadView($viewName, $parameters = null)
 	{
 		$ci =& get_instance();
 		$ci->load->view($viewName, $parameters);
@@ -487,6 +504,7 @@ class FilterWidget extends Widget
 		$this->formatRaw = null;
 		$this->checkboxes = null;
 		$this->hideHeader = false;
+		$this->hideSave = false;
 
 		if (!is_array($args) || (is_array($args) && count($args) == 0))
 		{
@@ -557,6 +575,11 @@ class FilterWidget extends Widget
 			if (isset($args[self::HIDE_HEADER]) && is_bool($args[self::HIDE_HEADER]))
 			{
 				$this->hideHeader = $args[self::HIDE_HEADER];
+			}
+
+			if (isset($args[self::HIDE_SAVE]) && is_bool($args[self::HIDE_SAVE]))
+			{
+				$this->hideSave = $args[self::HIDE_SAVE];
 			}
 		}
 	}
@@ -665,6 +688,104 @@ class FilterWidget extends Widget
 			);
 
 			$this->session->set_userdata(self::SESSION_NAME, $filterSessionArray);
+		}
+	}
+
+	/**
+	 *
+	 */
+	private function _saveFilter()
+	{
+		if (isset($_POST['saveCustomFilter']) && $_POST['saveCustomFilter'] == 'true')
+		{
+			$objToBeSaved = new stdClass();
+
+			$filterSessionArray = $this->session->userdata(self::SESSION_NAME);
+
+			if (isset($filterSessionArray[self::SELECTED_FIELDS]))
+			{
+				$selectedFields = $filterSessionArray[self::SELECTED_FIELDS];
+				$objToBeSaved->columns = array();
+
+				for ($selectedFieldsCounter = 0; $selectedFieldsCounter < count($selectedFields); $selectedFieldsCounter++)
+				{
+					$objToBeSaved->columns[$selectedFieldsCounter] = new stdClass();
+					$objToBeSaved->columns[$selectedFieldsCounter]->name = $selectedFields[$selectedFieldsCounter];
+				}
+			}
+
+			if (isset($filterSessionArray[self::SELECTED_FILTERS]))
+			{
+				$selectedFilters = $filterSessionArray[self::SELECTED_FILTERS];
+				$objToBeSaved->filters = array();
+
+				for ($selectedFiltersCounter = 0; $selectedFiltersCounter < count($selectedFilters); $selectedFiltersCounter++)
+				{
+					$objToBeSaved->filters[$selectedFiltersCounter] = new stdClass();
+					$objToBeSaved->filters[$selectedFiltersCounter]->name = $selectedFilters[$selectedFiltersCounter];
+
+					if (isset($filterSessionArray[self::ACTIVE_FILTERS])
+						&& isset($filterSessionArray[self::ACTIVE_FILTERS][$selectedFilters[$selectedFiltersCounter]]))
+					{
+						$objToBeSaved->filters[$selectedFiltersCounter]->condition = $filterSessionArray[self::ACTIVE_FILTERS][$selectedFilters[$selectedFiltersCounter]];
+					}
+
+					if (isset($filterSessionArray[self::ACTIVE_FILTERS_OPERATION])
+						&& isset($filterSessionArray[self::ACTIVE_FILTERS_OPERATION][$selectedFilters[$selectedFiltersCounter]]))
+					{
+						$objToBeSaved->filters[$selectedFiltersCounter]->operation = $filterSessionArray[self::ACTIVE_FILTERS_OPERATION][$selectedFilters[$selectedFiltersCounter]];
+					}
+
+					if (isset($filterSessionArray[self::ACTIVE_FILTERS_OPTION])
+						&& isset($filterSessionArray[self::ACTIVE_FILTERS_OPTION][$selectedFilters[$selectedFiltersCounter]]))
+					{
+						$objToBeSaved->filters[$selectedFiltersCounter]->option = $filterSessionArray[self::ACTIVE_FILTERS_OPTION][$selectedFilters[$selectedFiltersCounter]];
+					}
+				}
+			}
+
+			$result = $this->FiltersModel->loadWhere(array(
+				'app' => $this->app,
+				'dataset_name' => $this->datasetName,
+				'filter_kurzbz' => $_POST['customFilterKurzbz']
+			));
+
+			if (hasData($result))
+			{
+				$this->FiltersModel->update(
+					array(
+						'app' => $this->app,
+						'dataset_name' => $this->datasetName,
+						'filter_kurzbz' => $_POST['customFilterKurzbz']
+					),
+					array(
+						'description' => '{}',
+						'sort' => null,
+						'default_filter' => false,
+						'filter' => json_encode($objToBeSaved),
+						'oe_kurzbz' => null
+					)
+				);
+			}
+			else
+			{
+				$result = $this->BenutzerModel->load(getAuthUID());
+
+				if (hasData($result))
+				{
+					$this->FiltersModel->insert(array(
+						'app' => $this->app,
+						'dataset_name' => $this->datasetName,
+						'filter_kurzbz' => $_POST['customFilterKurzbz'],
+						'person_id' => $result->retval[0]->person_id,
+						'description' => '{}',
+						'sort' => null,
+						'default_filter' => false,
+						'filter' => json_encode($objToBeSaved),
+						'oe_kurzbz' => null
+					));
+				}
+			}
 		}
 	}
 

@@ -36,6 +36,7 @@ class TestFilterWidget extends VileSci_Controller
 					   AND p.person_id < 1000
 				',
 				'hideHeader' => false,
+				'hideSave' => false,
 				'checkboxes' => array('PersonId'),
 				'additionalColumns' => array('Delete', 'Edit'),
 				'formatRaw' => function($fieldName, $fieldValue, $datasetRaw) {

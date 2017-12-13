@@ -40,6 +40,11 @@
 			}
 		});
 
+		$("#saveCustomFilterButton").click(function() {
+			$("#saveCustomFilter").val(true);
+			$("#filterForm").submit();
+		});
+
 	});
 </script>
 <body>
@@ -52,6 +57,12 @@
 
 		<div>
 			<?php FilterWidget::loadViewSelectFilters($metaData); ?>
+		</div>
+
+		<br>
+
+		<div>
+			<?php FilterWidget::loadViewSaveFilter(); ?>
 		</div>
 
 		<br>
