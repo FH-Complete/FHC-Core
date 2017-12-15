@@ -345,7 +345,7 @@ if($result = $db->db_query($qry))
 							$person_content.="
 		                    <Funktion>
 		                       <StgKz>".sprintf("%04s",$row_fkt['stgkz'])."</StgKz>
-		                       <SWS>".number_format($row_fkt['sws'])."</SWS>";
+		                       <SWS>".number_format($row_fkt['sws'],2)."</SWS>";
 								if($row_fkt['hauptberuflich']=='t')
 								{
 									$person_content.="
