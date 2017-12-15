@@ -184,8 +184,8 @@ usort($nulltermine, function ($termina, $terminb)
 $termine = array_merge($termineWithSort, $nulltermine);
 
 //Farben für Prüfungsantritte (1. Termin, 2., kommissionelle...)
-$colors = array('ffff00', 'fa9200', 'ff1500', '800000', '9400D3', '1500ff', '305041', '00fff2', '00ff2b');
-$colorsForPositiv = array('ffffff', 'ffdfb3', 'ffb9b3', 'ff9494', 'ddb3ff', '7366ff', '80b39b', 'b3fffb', 'b3ffbf');
+$colors = array('ffff00', 'fa9200', 'ff1500', '9400D3', '0000FF', '800000', '305041', '00fff2', '00ff2b');
+$colorsForPositiv = array('ffffff', 'ffdfb3', 'ffb9b3', 'ddb3ff', '7366ff', 'ff9494', '80b39b', 'b3fffb', 'b3ffbf');
 
 $counter = 0;
 foreach ($termine as $termin)
@@ -230,6 +230,7 @@ if ($typ == 'xls')
 	$format_rotate =& $workbook->addFormat();
 	$format_rotate->setTextRotation(270);
 	$format_rotate->setAlign('center');
+	$format_rotate->setBorder(1);
 
 	$format_bold_center =& $workbook->addFormat();
 	$format_bold_center->setBold();
@@ -306,7 +307,7 @@ if ($typ == 'xls')
 	$worksheet->write($zeile, ++$spalte, 'Vorname', $format_bold);
 	$maxlength[$spalte] = 10;
 	$worksheet->write($zeile, ++$spalte, 'Personenkennzeichen', $format_bold);
-	$maxlength[$spalte] = 30;
+	$maxlength[$spalte] = 32;
 	$maxheaderheight = 20;
 
 	while ($row_lva = $db->db_fetch_object($result_lva))
@@ -419,12 +420,12 @@ if ($typ == 'xls')
 					}
 				}
 				//keine Nachprüfung aber negativ - 1. Antritt Farbe wenn es eine Notenanmerkung gibt
-				else if (!$noten_positiv[$note] && $noten_arr[$note] != '' && isset($noten_arr[$note]))
+				elseif (!$noten_positiv[$note] && $noten_arr[$note] != '' && isset($noten_arr[$note]))
 				{
 					reset($pruefungsart_farben);
 					$format = $format_colored[key($pruefungsart_farben)];
 				}
-				else if (isset($format_colored[$note]))
+				elseif (isset($format_colored[$note]))
 					$format = $format_colored[$note];
 
 				$worksheet->write($zeile, ++$spalte, $noten_arr[$note], $format);
@@ -523,13 +524,18 @@ if ($typ == 'xls')
 	foreach ($termine as $termin)
 		$bezeichnungen[$termin->pruefungstyp_kurzbz] = $termin->beschreibung;
 
-	$worksheet->setMerge($legendzeile, $startcolumn, $legendzeile, $startcolumn + 4);
+	$totalmergefarb = 4;
+
 	$worksheet->write($legendzeile, $startcolumn, "Farblegende Prüfungsantritte", $format_bold_center);
-	$worksheet->write($legendzeile, $startcolumn + 4, "", $format_bold_center);
+	$worksheet->setMerge($legendzeile, $startcolumn, $legendzeile, $startcolumn + $totalmergefarb);
+	//In manchen Excelversionen wird border nicht dargestellt -> alle verbundenen zellen nachformatieren
+	for($i = 1; $i <= $totalmergefarb; $i++)
+		$worksheet->write($legendzeile, $startcolumn + $i, "", $format_bold_center);
 	$legendzeile++;
 	$worksheet->write($legendzeile, $startcolumn, "Termin", $format_bold_center);
 	$worksheet->setMerge($legendzeile, $startcolumn + 1, $legendzeile, $startcolumn + 2);
 	$worksheet->write($legendzeile, $startcolumn + 1, "positiv", $format_bold_center);
+	$worksheet->write($legendzeile, $startcolumn + 2, "", $format_bold_center);
 	$worksheet->setMerge($legendzeile, $startcolumn + 3, $legendzeile, $startcolumn + 4);
 	$worksheet->write($legendzeile, $startcolumn + 3, "negativ", $format_bold_center);
 	$worksheet->write($legendzeile, $startcolumn + 4, "", $format_bold_center);
@@ -541,6 +547,7 @@ if ($typ == 'xls')
 		$worksheet->write($legendzeile, $startcolumn, $bezeichnung, $format_bold);
 		$worksheet->setMerge($legendzeile, $startcolumn + 1, $legendzeile, $startcolumn + 2);
 		$worksheet->write($legendzeile, $startcolumn + 1, "", $format_colored[$name.'Pos']);
+		$worksheet->write($legendzeile, $startcolumn + 2, "", $format_colored[$name.'Pos']);
 		$worksheet->setMerge($legendzeile, $startcolumn + 3, $legendzeile, $startcolumn + 4);
 		$worksheet->write($legendzeile, $startcolumn + 3, "", $format_colored[$name]);
 		$worksheet->write($legendzeile, $startcolumn + 4, "", $format_colored[$name]);
@@ -548,13 +555,13 @@ if ($typ == 'xls')
 	}
 	$worksheet->write($legendzeile, $startcolumn, "nicht eingetragen", $format_bold);
 	$worksheet->setMerge($legendzeile, $startcolumn + 1, $legendzeile, $startcolumn + 4);
-	$worksheet->write($legendzeile, $startcolumn + 1, "", $format_colored_nichteingetragen);
-	$worksheet->write($legendzeile, $startcolumn + 4, "", $format_colored_nichteingetragen);
+	for($i = 1; $i <= $totalmergefarb; $i++)
+		$worksheet->write($legendzeile, $startcolumn + $i, "", $format_colored_nichteingetragen);
 	$legendzeile++;
 	$worksheet->write($legendzeile, $startcolumn, "nicht zugeteilt", $format_bold);
 	$worksheet->setMerge($legendzeile, $startcolumn + 1, $legendzeile, $startcolumn + 4);
-	$worksheet->write($legendzeile, $startcolumn + 1, "", $format_colored_nichtzugeteilt);
-	$worksheet->write($legendzeile, $startcolumn + 4, "", $format_colored_nichtzugeteilt);
+	for($i = 1; $i <= $totalmergefarb; $i++)
+		$worksheet->write($legendzeile, $startcolumn + $i, "", $format_colored_nichtzugeteilt);
 
 	$startcolumn = $currentcolumn = 9;
 
@@ -574,7 +581,7 @@ if ($typ == 'xls')
 			{
 				$groesse++;
 			}
-			else if ($currentcolumn < 3 + $anzahl_lvspalten + 2)
+			elseif ($currentcolumn < 3 + $anzahl_lvspalten + 2)
 			{
 				$groesse += 4;
 			}
@@ -589,6 +596,7 @@ if ($typ == 'xls')
 		$index++;
 	}
 
+	// all merges for 4 columns of Notenlegende
 	$allmerges = array($beschrColumnMerges[0], 1, $beschrColumnMerges[1], 1);
 	$headingmerge = array_sum($allmerges) - 1;
 	$positivmerge = $allmerges[0] + $allmerges[1] - 1;
@@ -596,12 +604,18 @@ if ($typ == 'xls')
 
 	$worksheet->setMerge($zeile, $startcolumn, $zeile, $startcolumn + $headingmerge);
 	$worksheet->write($zeile, $startcolumn, "Notenlegende", $format_bold_center);
+	for($i = 1; $i < $headingmerge; $i++)
+		$worksheet->write($zeile, $startcolumn + $i, "", $format_bold_center);
 	$worksheet->write($zeile++, $startcolumn + $headingmerge, "", $format_bold_center);
 	$worksheet->setMerge($zeile, $startcolumn, $zeile, $startcolumn + $positivmerge);
 	$worksheet->write($zeile, $startcolumn, "positiv", $format_bold_center);
+	for($i = 1; $i <= $positivmerge; $i++)
+		$worksheet->write($zeile, $startcolumn + $i, "", $format_bold_center);
 	$worksheet->setMerge($zeile, $startcolumn + $positivmerge + 1, $zeile, $startcolumn + $headingmerge);
-	$worksheet->write($zeile, $startcolumn + $headingmerge, "", $format_bold_center);
-	$worksheet->write($zeile++, $startcolumn + $positivmerge + 1, "negativ", $format_bold_center);
+	$worksheet->write($zeile, $startcolumn + $positivmerge + 1, "negativ", $format_bold_center);
+	for($i = 1; $i <= $negativmerge; $i++)
+		$worksheet->write($zeile, $startcolumn + $positivmerge + $i + 1, "", $format_bold_center);
+	$worksheet->write($zeile++, $startcolumn + $headingmerge, "", $format_bold_center);
 	$tempzeile = $zeile;
 	foreach ($noten_arr as $note => $anmerkung)
 	{
@@ -611,12 +625,16 @@ if ($typ == 'xls')
 		{
 			$worksheet->setMerge($zeile, $startcolumn, $zeile, $startcolumn + $positivmerge - 1);
 			$worksheet->write($zeile, $startcolumn, $noten_bezeichnungen[$note], $format_bold);
+			for($i = 1; $i <= $positivmerge; $i++)
+				$worksheet->write($zeile, $startcolumn + $i, "", $format_bold_center);
 			$worksheet->write($zeile++, $startcolumn + $positivmerge, $anmerkung, $format_bold_center);
 		}
 		else
 		{
 			$worksheet->setMerge($tempzeile, $startcolumn + $positivmerge + 1, $tempzeile, $startcolumn + $headingmerge - 1);
 			$worksheet->write($tempzeile, $startcolumn + $positivmerge + 1, $noten_bezeichnungen[$note], $format_bold);
+			for($i = 1; $i <= $negativmerge; $i++)
+				$worksheet->write($tempzeile, $startcolumn + $positivmerge + $i + 1, "", $format_bold_center);
 			$worksheet->write($tempzeile++, $startcolumn + $headingmerge, $anmerkung, $format_bold_center);
 		}
 	}
@@ -628,6 +646,10 @@ if ($typ == 'xls')
 	$worksheet->write(0, 0, $semester_aktuell." ".$stg->kuerzel.($semester != '' ? ' '.$semester.'. Semester' : '').' Stand: '.date('d.m.Y'), $format_bold_center);
 	//Zellen der 1. Zeile verbinden
 	$worksheet->setMerge(0, 0, 0, $spalte);
+
+	//Alle verbundenen Zellen formatieren - in best. Excelversionen border sonst falsch
+	for($i = 1; $i <= $spalte; $i++)
+		$worksheet->write(0, $i, "", $format_bold_center);
 
 	//Hoehe der 2. Zeile anpassen damit die LVs alle sichtbar sind
 	$worksheet->setRow(1, $maxheaderheight * 5);
