@@ -250,6 +250,10 @@ class DmsLib
 				{
 					return success(base64_decode($dmscontent->retval[0]->file_content));
 				}
+				else
+				{
+					return error($dmscontent->retval);
+				}
 			}
 			else
 			{

@@ -44,4 +44,20 @@ class PersonLogLib
 		else
 			show_error($result->retval);
 	}
+
+	/**
+	 * Gets Logs for a Person, filtered by Parameters
+	 * @param int $person_id ID of the Person.
+	 * @param string $app Name of the App.
+	 * @param string $oe_kurzbz Organisations Unit.
+	 * @return object $result
+	 */
+	public function getLogs($person_id, $app = null, $oe_kurzbz = null)
+	{
+		$result = $this->ci->PersonLogModel->filterLog($person_id, $app, $oe_kurzbz);
+		if (isSuccess($result))
+			return $result->retval;
+		else
+			show_error($result->retval);
+	}
 }

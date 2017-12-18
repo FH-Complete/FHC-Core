@@ -58,4 +58,30 @@ class PersonLog_model extends CI_Model
 
 		return success($result->result());
 	}
+
+	/**
+	 * Load logs for a person, filtered by parameters
+	 * @param int $person_id ID of the Person.
+	 * @param string $app Name of the App.
+	 * @param string $oe_kurzbz Organisations Unit.
+	 * @return object $result
+	 */
+	public function filterLog($person_id, $app = null, $oe_kurzbz = null)
+	{
+		// Check Permissions
+		$this->load->library('PermissionLib');
+		if(!$this->permissionlib->isEntitled('system.tbl_log',PermissionLib::SELECT_RIGHT))
+			show_error('Permission denied - You need Access to system.tbl_log');
+
+		$this->db->order_by('zeitpunkt', 'DESC');
+		$this->db->order_by('log_id', 'DESC');
+		if (!is_null($app))
+			$this->db->where('app='.$this->db->escape($app));
+		if (!is_null($oe_kurzbz))
+			$this->db->where('oe_kurzbz='.$this->db->escape($oe_kurzbz));
+
+		$result = $this->db->get_where($this->dbTable, "person_id=".$this->db->escape($person_id));
+
+		return success($result->result());
+	}
 }
