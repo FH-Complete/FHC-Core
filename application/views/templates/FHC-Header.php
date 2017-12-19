@@ -9,6 +9,7 @@ $customJSs = isset($customJSs) ? $customJSs : null;
 
 // By default set the parameters to false
 $jquery3 = isset($jquery3) ? $jquery3 : false;
+$tablesorter = isset($tablesorter) ? $tablesorter : false;
 
 /**
  * Print the given title of the page
@@ -89,11 +90,16 @@ function _generateJSsInclude($JSs)
 			// Eventually required CSS
 			_generateCSSsInclude($customCSSs); // Eventually required CSS
 
+			// Table sorter CSS
+			if ($tablesorter === true) _generateCSSsInclude('skin/tablesort.css');
+
 			// --------------------------------------------------------------------------------------------------------
 			// Javascripts
 
 			// JQuery V3
 			if ($jquery3 === true) _generateJSsInclude('vendor/components/jquery/jquery.min.js');
+			// Table sorter JS
+			if ($tablesorter === true) _generateJSsInclude('vendor/christianbach/tablesorter/jquery.tablesorter.min.js');
 
 			// Eventually required JS
 			_generateJSsInclude($customJSs);

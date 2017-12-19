@@ -1,14 +1,6 @@
-<?php $this->load->view('templates/FHC-Header', array('title' => 'Info Center', 'jquery3' => true)); ?>
-
-<?php $iFrameSrc = base_url('index.ci.php/system/infocenter/InfoCenter/filter'); ?>
-
-<script language="Javascript" type="text/javascript">
-	$(document).ready(function() {
-
-		// $("#iFrameFilter").attr('width', $(window).width());
-
-	});
-</script>
+<?php
+	$this->load->view('templates/FHC-Header', array('title' => 'Info Center', 'jquery3' => true, 'tablesorter' => true));
+?>
 
 	<body>
 
@@ -25,9 +17,9 @@
 		</span>
 
 		<span>
-			<iframe id="iFrameFilter" name="iFrameFilter" src="<?php echo $iFrameSrc; ?>" width="800" height="700" frameborder="0">
-				Your browser does not support iframes, please update it
-			</iframe>
+			<?php
+				$this->load->view('system/infocenter/infocenterData.php');
+			?>
 		</span>
 
 	</body>

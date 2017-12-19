@@ -593,7 +593,7 @@ class FilterWidget extends Widget
 		$this->FiltersModel->resetQuery();
 
 		//
-		$this->FiltersModel->addJoin('public.tbl_benutzer', 'person_id');
+		$this->FiltersModel->addJoin('public.tbl_benutzer', 'person_id', 'LEFT');
 
 		//
 		$this->FiltersModel->addSelect('system.tbl_filters.*');
@@ -619,9 +619,7 @@ class FilterWidget extends Widget
 		else
 		{
 			$whereParameters = array(
-				'filter_id' => $this->filter_id,
-				'uid' => getAuthUID(),
-				'default_filter' => true
+				'filter_id' => $this->filterId
 			);
 		}
 
@@ -635,7 +633,6 @@ class FilterWidget extends Widget
 			if (isset($filter->retval[0]->filter) && trim($filter->retval[0]->filter) != '')
 			{
 				$jsonEncodedFilter = json_decode($filter->retval[0]->filter);
-
 			}
 		}
 
@@ -685,6 +682,18 @@ class FilterWidget extends Widget
 				self::ACTIVE_FILTERS => $activeFilters,
 				self::ACTIVE_FILTERS_OPERATION => $activeFiltersOperation,
 				self::ACTIVE_FILTERS_OPTION => $activeFiltersOption
+			);
+
+			$this->session->set_userdata(self::SESSION_NAME, $filterSessionArray);
+		}
+		else
+		{
+			$filterSessionArray = array(
+				self::SELECTED_FIELDS => array(),
+				self::SELECTED_FILTERS => array(),
+				self::ACTIVE_FILTERS => array(),
+				self::ACTIVE_FILTERS_OPERATION => array(),
+				self::ACTIVE_FILTERS_OPTION => array()
 			);
 
 			$this->session->set_userdata(self::SESSION_NAME, $filterSessionArray);

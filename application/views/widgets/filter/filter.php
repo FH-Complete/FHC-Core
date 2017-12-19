@@ -1,11 +1,15 @@
-<?php
-	$this->load->view(
-		'templates/header',
-		array('title' => 'Filters', 'tablesort' => true, 'tableid' => 'tableDataset', 'widgets' => 'zebra')
-	);
-?>
 <script language="Javascript" type="text/javascript">
 	$(document).ready(function() {
+
+		// Checks if the table contains data (rows)
+		if ($('#tableDataset').find('tbody:empty').length == 0
+			&& $('#tableDataset').find('tr:empty').length == 0)
+		{
+			$("#tableDataset").tablesorter(
+			{
+				widgets: ["zebra"]
+			});
+		}
 
 		$("#addField").change(function() {
 			$("#filterForm").submit();
@@ -47,7 +51,7 @@
 
 	});
 </script>
-<body>
+<div>
 	<form id="filterForm" method="POST" action="<?php echo current_url(); ?>">
 		<div>
 			<?php FilterWidget::loadViewSelectFields($listFields); ?>
@@ -71,7 +75,4 @@
 			<?php FilterWidget::loadViewTableDataset($dataset); ?>
 		</div>
 	</form>
-</body>
-<?php
-	$this->load->view('templates/footer');
-?>
+</div>

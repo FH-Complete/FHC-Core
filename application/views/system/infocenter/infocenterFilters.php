@@ -3,9 +3,9 @@
 	{
 		foreach ($listFilters as $name => $filterId)
 		{
-			$toPrint = '<div><a href="%s/%s" target="iFrameFilter">%s</a></div>';
+			$toPrint = '<div><a href="%s=%s">%s</a></div>';
 
-			echo sprintf($toPrint, base_url('index.ci.php/system/infocenter/InfoCenter/filter'), $filterId, $name).PHP_EOL;
+			echo sprintf($toPrint, base_url('index.ci.php/system/infocenter/InfoCenter?filterId'), $filterId, $name).PHP_EOL;
 		}
 	}
 
