@@ -98,7 +98,7 @@ class menu_addon_meinelvkompatibel extends menu_addon
 								$stsementry[] = array('title'=>$lv_obj->bezeichnung_arr[$sprache],
 								 'target'=>'content',
 								 'link'=>'private/freifaecher/lesson.php?lvid='.$row->lehrveranstaltung_id.'&studiensemester_kurzbz='.$stsem,
-								 'name'=>'FF '.$this->CutString($lv_obj->bezeichnung_arr[$sprache], $cutlength)
+								 'name'=>'FF '.$this->CutString($lv_obj->bezeichnung_arr[$sprache], $cutlength, '...')
 								);
 							}
 							else
@@ -106,7 +106,7 @@ class menu_addon_meinelvkompatibel extends menu_addon
 								$stsementry[] = array('title'=>$lv_obj->bezeichnung_arr[$sprache],
 								 'target'=>'content',
 								 'link'=>'private/lehre/lesson.php?lvid='.$row->lehrveranstaltung_id.'&studiensemester_kurzbz='.$stsem,
-								 'name'=>$this->CutString($lv_obj->bezeichnung_arr[$sprache], $cutlength)
+								 'name'=>$this->CutString($lv_obj->bezeichnung_arr[$sprache], $cutlength, '...')
 								);
 							}
 						}
@@ -178,7 +178,7 @@ class menu_addon_meinelvkompatibel extends menu_addon
 								$stsementry[] = array('title'=>$lv_obj->bezeichnung_arr[$sprache],
 								 'target'=>'content',
 								 'link'=>'private/freifaecher/lesson.php?lvid='.$row->lehrveranstaltung_id.'&studiensemester_kurzbz='.$stsem,
-								 'name'=>'FF '.$this->CutString($row->lehreverzeichnis, $cutlength)
+								 'name'=>'FF '.$this->CutString($row->lehreverzeichnis, $cutlength, '...')
 								);
 							}	
 							else
@@ -190,7 +190,7 @@ class menu_addon_meinelvkompatibel extends menu_addon
 								$stsementry[] = array('title'=>$lv_obj->bezeichnung_arr[$sprache],
 								 'target'=>'content',
 								 'link'=>'private/lehre/lesson.php?lvid='.$row->lehrveranstaltung_id.'&studiensemester_kurzbz='.$stsem,
-								 'name'=>$this->CutString($lv_obj->bezeichnung_arr[$sprache], $cutlength)
+								 'name'=>$this->CutString($lv_obj->bezeichnung_arr[$sprache], $cutlength, '...')
 								);
 							}	
 						}
@@ -215,18 +215,6 @@ class menu_addon_meinelvkompatibel extends menu_addon
 			}
 		}
 		$this->output();
-	}
-	
-	private function CutString($strVal, $limit)
-	{
-		if(mb_strlen($strVal) > $limit+3)
-		{
-			return mb_substr($strVal, 0, $limit) . "...";
-		}
-		else
-		{
-			return $strVal;
-		}
 	}
 } 
 

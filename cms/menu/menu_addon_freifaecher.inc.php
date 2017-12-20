@@ -48,7 +48,7 @@ class menu_addon_freifaecher extends menu_addon
 			$this->items[] = array('title'=>$row->bezeichnung_arr[$sprache],
 						 'target'=>'content',
 						 'link'=>'private/lehre/lesson.php?lvid='.$row->lehrveranstaltung_id.'&studiensemester_kurzbz='.$stsem,
-						 'name'=>'<span '.(!$row->aktiv?' style="" ':' style=""').'>'.(!$row->aktiv?' <img src="../skin/images/ampel_rot.png" height="8px" height="8px"> ':' <img src="../skin/images/ampel_gruen.png" height="8px"> ').' '.$this->CutString($row->bezeichnung_arr[$sprache], 21).'</span>'
+						 'name'=>'<span '.(!$row->aktiv?' style="" ':' style=""').'>'.(!$row->aktiv?' <img src="../skin/images/ampel_rot.png" height="8px" height="8px"> ':' <img src="../skin/images/ampel_gruen.png" height="8px"> ').' '.$this->CutString($row->bezeichnung_arr[$sprache], 21, '...').'</span>'
 						);
 		}
 		
@@ -57,18 +57,6 @@ class menu_addon_freifaecher extends menu_addon
 		$this->block.= '</script>';
 		
 		$this->output();
-	}
-	
-	private function CutString($strVal, $limit)
-	{
-		if(mb_strlen($strVal) > $limit+3)
-		{
-			return mb_substr($strVal, 0, $limit) . "...";
-		}
-		else
-		{
-			return $strVal;
-		}
 	}
 }
 

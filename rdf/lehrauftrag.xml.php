@@ -64,16 +64,6 @@ if(isset($_GET['ss']))
 else
 	die('Fehlerhafte Parameteruebergabe');
 
-//String der laenger als limit ist wird
-//abgeschnitten und '...' angehaengt
-function CutString($strVal, $limit)
-{
-	if(mb_strlen($strVal) > $limit+3)
-		return mb_substr($strVal, 0, $limit) . "...";
-	else
-		return $strVal;
-}
-
 // GENERATE XML
 $xml = '<?xml version="1.0" encoding="UTF-8" ?><lehrauftraege>';
 $stg_arr = array();
@@ -307,7 +297,7 @@ function drawLehrauftrag($uid)
 			}
 
 			$lehreinheit_id=$row->lehreinheit_id;
-			$lehrveranstaltung = CutString($row->lv_bezeichnung,30).' '.$row->lehrform_kurzbz.' '.$row->lv_semester.'. Semester';
+			$lehrveranstaltung = CutString($row->lv_bezeichnung, 30, '...').' '.$row->lehrform_kurzbz.' '.$row->lv_semester.'. Semester';
 			$fachbereich = $row->fachbereich_kurzbz;
 
 			if($row->gruppe_kurzbz!='')

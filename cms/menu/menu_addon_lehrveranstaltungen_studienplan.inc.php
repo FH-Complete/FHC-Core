@@ -331,26 +331,14 @@ class menu_addon_lehrveranstaltungen_studienplan extends menu_addon
 			else
 				$bold='';
 			if(!$row->lehrauftrag && defined('CIS_LEHRVERANSTALTUNG_MODULE_LINK') && !CIS_LEHRVERANSTALTUNG_MODULE_LINK)
-				$this->block.= "<li style='display:inline-block;white-space: nowrap;padding: 0px; margin:0px; color:#b2b2b2; $bold'>".$this->CutString($row->bezeichnung_arr[$sprache], 21).' '.$row->lehrform_kurzbz."</li>";
+				$this->block.= "<li style='display:inline-block;white-space: nowrap;padding: 0px; margin:0px; color:#b2b2b2; $bold'>".$this->CutString($row->bezeichnung_arr[$sprache], 21, '...').' '.$row->lehrform_kurzbz."</li>";
 			else
-				$this->block.= "<li style='display:inline-block;white-space: nowrap;padding: 0px; margin:0px; $bold'><a title=\"".$row->bezeichnung_arr[$sprache]."\" href=\"private/lehre/lesson.php?lvid=$row->lehrveranstaltung_id&studiensemester_kurzbz=$studiensemester_kurzbz\" target=\"content\">".$this->CutString($row->bezeichnung_arr[$sprache], 21).' '.$row->lehrform_kurzbz."</a></li>";
+				$this->block.= "<li style='display:inline-block;white-space: nowrap;padding: 0px; margin:0px; $bold'><a title=\"".$row->bezeichnung_arr[$sprache]."\" href=\"private/lehre/lesson.php?lvid=$row->lehrveranstaltung_id&studiensemester_kurzbz=$studiensemester_kurzbz\" target=\"content\">".$this->CutString($row->bezeichnung_arr[$sprache], 21, '...').' '.$row->lehrform_kurzbz."</a></li>";
 
 			if(isset($row->childs))
 				$this->printTree($row->childs, $sprache, $studiensemester_kurzbz);
 		}
 		$this->block.="</ul>";
-	}
-
-	private function CutString($strVal, $limit)
-	{
-		if(mb_strlen($strVal) > $limit+3)
-		{
-			return mb_substr($strVal, 0, $limit) . "...";
-		}
-		else
-		{
-			return $strVal;
-		}
 	}
 }
 new menu_addon_lehrveranstaltungen_studienplan();
