@@ -1,4 +1,6 @@
 <?php
+$this->phrasen['incoming/vorname']='Name';
+$this->phrasen['incoming/nachname']='Surname (Family Name)';
 $this->phrasen['incoming/persönlichedateneditieren']='Profile';
 $this->phrasen['incoming/lehrveranstaltungenauswählen']='Course Registration';
 $this->phrasen['incoming/learningagreementerstellen']='Create Learning Agreement (print)';
