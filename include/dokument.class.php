@@ -670,7 +670,7 @@ class dokument extends basis_db
 		$bezeichnung_mehrsprachig = $sprache->getSprachQuery('bezeichnung_mehrsprachig');
 		$dokumentbeschreibung_mehrsprachig = $sprache->getSprachQuery('dokumentbeschreibung_mehrsprachig');
 		$beschreibung_mehrsprachig = $sprache->getSprachQuery('beschreibung_mehrsprachig');
-		$qry = "SELECT distinct on (dokument_kurzbz) dokument_kurzbz, bezeichnung, pflicht, nachreichbar,
+		$qry = "SELECT distinct on (dokument_kurzbz) dokument_kurzbz, bezeichnung, pflicht, nachreichbar, ausstellungsdetails, 
 			$bezeichnung_mehrsprachig, $dokumentbeschreibung_mehrsprachig, $beschreibung_mehrsprachig
 			FROM public.tbl_dokumentstudiengang
 			JOIN public.tbl_prestudent using (studiengang_kz)
@@ -722,7 +722,7 @@ class dokument extends basis_db
 		$dokumentbeschreibung_mehrsprachig = $sprache->getSprachQuery('dokumentbeschreibung_mehrsprachig');
 		$beschreibung_mehrsprachig = $sprache->getSprachQuery('beschreibung_mehrsprachig');
 
-		$qry = "	SELECT DISTINCT dokument_kurzbz, studiengang_kz, ausstellungsdetails, 
+		$qry = "	SELECT DISTINCT dokument_kurzbz, studiengang_kz, ausstellungsdetails,
 					$dokumentbeschreibung_mehrsprachig, $beschreibung_mehrsprachig
 					FROM public.tbl_dokumentstudiengang
 					JOIN public.tbl_dokument using (dokument_kurzbz)
