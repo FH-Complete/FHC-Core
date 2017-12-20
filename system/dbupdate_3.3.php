@@ -358,8 +358,8 @@ if(!$result = @$db->db_query("SELECT mailversand FROM campus.tbl_coodle LIMIT 1;
 
 	if(!$db->db_query($qry))
 		echo '<strong>campus.tbl_coodle: '.$db->db_last_error().'</strong><br>';
-		else
-			echo '<br>campus.tbl_coodle: Spalten mailversand, teilnehmer_anonym und termine_anonym hinzugefuegt!<br>';
+	else
+		echo '<br>campus.tbl_coodle: Spalten mailversand, teilnehmer_anonym und termine_anonym hinzugefuegt!<br>';
 }
 
 // Spalte onlinebewerbung_studienplan in lehre.tbl_studienplan
@@ -369,8 +369,99 @@ if(!$result = @$db->db_query("SELECT onlinebewerbung_studienplan FROM lehre.tbl_
 
 	if(!$db->db_query($qry))
 		echo '<strong>lehre.tbl_studienplan: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>lehre.tbl_studienplan: Spalte onlinebewerbung_studienplan hinzugefuegt!<br>';
+}
+
+// Spalte sort in lehre.tbl_pruefungstyp (gibt Reihenfolge der Prüfungsantritte an)
+if(!$result = @$db->db_query("SELECT sort FROM lehre.tbl_pruefungstyp LIMIT 1;"))
+{
+	$qry = "ALTER TABLE lehre.tbl_pruefungstyp ADD COLUMN sort smallint;";
+
+	if(!$db->db_query($qry))
+		echo '<strong>lehre.tbl_pruefungstyp: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>lehre.tbl_pruefungstyp: Spalte sort hinzugefuegt!<br>';
+}
+
+// zusätzliche kommissionelle Prüfung (4.Termin) als Zeile hinzufügen
+if($result = @$db->db_query("SELECT 1 FROM lehre.tbl_pruefungstyp WHERE pruefungstyp_kurzbz= 'zusKommPruef';"))
+{
+	if($db->db_num_rows($result) == 0)
+	{
+		$qry = "INSERT INTO lehre.tbl_pruefungstyp(pruefungstyp_kurzbz, beschreibung, abschluss) VALUES ('zusKommPruef', 'zusätzliche kommissionelle Prüfung', FALSE);";
+
+		if(!$db->db_query($qry))
+			echo '<strong>lehre.tbl_pruefungstyp: '.$db->db_last_error().'</strong><br>';
 		else
-			echo '<br>lehre.tbl_studienplan: Spalte onlinebewerbung_studienplan hinzugefuegt!<br>';
+			echo '<br>lehre.tbl_pruefungstyp: Zeile zusKommPruef hinzugefuegt!<br>';
+	}
+}
+
+// Note "entschuldigt" hinzufügen
+if($result = @$db->db_query("SELECT 1 FROM lehre.tbl_note WHERE anmerkung = 'en' AND (bezeichnung = 'entschuldigt' OR bezeichnung = 'Entschuldigt');"))
+{
+	if($db->db_num_rows($result) == 0)
+	{
+		$qry = "INSERT INTO lehre.tbl_note(note, bezeichnung, anmerkung, farbe, positiv, notenwert, aktiv, lehre) VALUES((SELECT max(note)+1 FROM lehre.tbl_note),'entschuldigt', 'en', NULL, TRUE, NULL, TRUE, TRUE);";
+
+		if(!$db->db_query($qry))
+			echo '<strong>lehre.tbl_note: '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>lehre.tbl_note: Zeile entschuldigt hinzugefuegt!<br>';
+	}
+}
+
+// Note "unentschuldigt" hinzufügen
+if($result = @$db->db_query("SELECT 1 FROM lehre.tbl_note WHERE anmerkung = 'ue' AND (bezeichnung = 'unentschuldigt' OR bezeichnung = 'Unentschuldigt');"))
+{
+	if($db->db_num_rows($result) == 0)
+	{
+		$qry = "INSERT INTO lehre.tbl_note(note, bezeichnung, anmerkung, farbe, positiv, notenwert, aktiv, lehre) VALUES((SELECT max(note)+1 FROM lehre.tbl_note),'unentschuldigt', 'ue', NULL, FALSE, NULL, TRUE, TRUE);";
+
+		if(!$db->db_query($qry))
+			echo '<strong>lehre.tbl_note: '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>lehre.tbl_note: Zeile unentschuldigt hinzugefuegt!<br>';
+	}
+}
+
+// Spalte offiziell in lehre.tbl_note
+if(!$result = @$db->db_query("SELECT offiziell FROM lehre.tbl_note LIMIT 1;"))
+{
+	$qry = "ALTER TABLE lehre.tbl_note ADD COLUMN offiziell boolean NOT NULL DEFAULT true;";
+
+	if(!$db->db_query($qry))
+		echo '<strong>lehre.tbl_note: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>lehre.tbl_note: Spalte offiziell hinzugefuegt!<br>';
+}
+
+// Spalte bezeichnung_mehrsprachig in lehre.tbl_note
+if(!$result = @$db->db_query("SELECT bezeichnung_mehrsprachig FROM lehre.tbl_note LIMIT 1"))
+{
+	$qry = "ALTER TABLE lehre.tbl_note ADD COLUMN bezeichnung_mehrsprachig varchar(64)[];";
+
+	if(!$db->db_query($qry))
+		echo '<strong>lehre.tbl_note '.$db->db_last_error().'</strong><br>';
+	else
+		echo 'lehre.tbl_note: Spalte bezeichnung_mehrsprachig hinzugefuegt!<br>';
+
+	// Bezeichnung_mehrsprachig aus existierender Bezeichnung vorausfuellen. Ein Eintrag fuer jede Sprache mit Content aktiv.
+	$qry_help = "SELECT index FROM public.tbl_sprache WHERE content=TRUE;";
+	if(!$result = $db->db_query($qry_help))
+		echo '<strong>tbl_note bezeichnung_mehrsprachig: Fehler beim ermitteln der Sprachen: '.$db->db_last_error().'</strong>';
+	else
+	{
+		$qry='';
+		while($row = $db->db_fetch_object($result))
+			$qry.= "UPDATE lehre.tbl_note set bezeichnung_mehrsprachig[".$row->index."] = bezeichnung;";
+
+		if(!$db->db_query($qry))
+			echo '<strong>Setzen der bezeichnung_mehrsprachig fehlgeschlagen: '.$db->db_last_error().'</strong><br>';
+		else
+			echo 'lehre.tbl_note: bezeichnung_mehrprachig automatisch aus existierender Bezeichnung uebernommen<br>';
+	}
 }
 
 // Column design_uid, betrieb_uid and operativ_uid to tbl_service
@@ -385,8 +476,8 @@ if(!$result = @$db->db_query("SELECT design_uid FROM public.tbl_service LIMIT 1;
 
 	if(!$db->db_query($qry))
 		echo '<strong>public.tbl_service: '.$db->db_last_error().'</strong><br>';
-		else
-			echo '<br>public.tbl_service: Spalten design_uid,betrieb_uid,operativ_uid hinzugefuegt!<br>';
+	else
+		echo '<br>public.tbl_service: Spalten design_uid,betrieb_uid,operativ_uid hinzugefuegt!<br>';
 }
 
 // FOREIGN KEY tbl_phrasentext_sprache_fkey: system.tbl_phrasentext.sprache references public.tbl_sprache.sprache
@@ -525,9 +616,9 @@ if(!@$db->db_query("SELECT campus.get_highest_content_version(0)"))
 			RETURN rec.version;
 			END;
 			$_$;
-			
+
 			ALTER FUNCTION campus.get_highest_content_version(bigint) OWNER TO fhcomplete;';
-	
+
 	if(!$db->db_query($qry))
 		echo '<strong>campus.get_highest_content_version(content_id): '.$db->db_last_error().'</strong><br>';
 	else
@@ -543,7 +634,7 @@ if(!@$db->db_query("SELECT ausstellungsnation FROM public.tbl_akte LIMIT 1"))
 			COMMENT ON COLUMN public.tbl_akte.ausstellungsnation IS 'Nation-Code des Landes, in dem das Dokument ausgestellt wurde';
 			COMMENT ON COLUMN public.tbl_akte.formal_geprueft_amum IS 'Bestaetigungsdatum, an dem das Dokument inhaltlich auf Formalkriterien (Leserlichkeit, Vollständigkeit, etc) geprueft wurde';
 			";
-	
+
 	if(!$db->db_query($qry))
 		echo '<strong>public.tbl_rt_person '.$db->db_last_error().'</strong><br>';
 		else
@@ -556,7 +647,7 @@ if(!@$db->db_query("SELECT ausstellungsdetails FROM public.tbl_dokument LIMIT 1"
 	$qry = "ALTER TABLE public.tbl_dokument ADD COLUMN ausstellungsdetails boolean NOT NULL DEFAULT false;
 			COMMENT ON COLUMN public.tbl_dokument.ausstellungsdetails IS 'Sollen beim Dokument weitere Felder (zB Ausstellungsnation) angezeigt werden?';
 			";
-	
+
 	if(!$db->db_query($qry))
 		echo '<strong>public.tbl_dokument '.$db->db_last_error().'</strong><br>';
 		else
@@ -700,6 +791,274 @@ if ($result = @$db->db_query("SELECT 1 FROM system.tbl_berechtigung WHERE berech
 // End extensions
 //---------------------------------------------------------------------------------------------------------------------
 
+if (!$result = @$db->db_query("SELECT 1 FROM system.tbl_log LIMIT 1"))
+{
+	$qry = "CREATE TABLE system.tbl_log
+			(
+				log_id bigint NOT NULL,
+				person_id integer,
+				zeitpunkt timestamp NOT NULL DEFAULT now(),
+				app varchar(32) NOT NULL,
+				oe_kurzbz varchar(32),
+				logtype_kurzbz varchar(32) NOT NULL,
+				logdata jsonb NOT NULL,
+				insertvon varchar(32)
+			);
+			ALTER TABLE system.tbl_log ADD CONSTRAINT pk_log PRIMARY KEY (log_id);
+
+			CREATE SEQUENCE system.tbl_log_log_id_seq
+			 INCREMENT BY 1
+			 NO MAXVALUE
+			 NO MINVALUE
+			 CACHE 1;
+			ALTER TABLE system.tbl_log ALTER COLUMN log_id SET DEFAULT nextval('system.tbl_log_log_id_seq');
+
+			GRANT SELECT, INSERT ON system.tbl_log TO vilesci;
+			GRANT SELECT, INSERT ON system.tbl_log TO web;
+			GRANT SELECT, UPDATE ON system.tbl_log_log_id_seq TO vilesci;
+			GRANT SELECT, UPDATE ON system.tbl_log_log_id_seq TO web;
+
+			CREATE TABLE system.tbl_logtype
+			(
+				logtype_kurzbz varchar(32),
+				data_schema jsonb NOT NULL
+			);
+			ALTER TABLE system.tbl_logtype ADD CONSTRAINT pk_logtype PRIMARY KEY (logtype_kurzbz);
+			GRANT SELECT ON system.tbl_logtype TO vilesci;
+			GRANT SELECT ON system.tbl_logtype TO web;
+
+			ALTER TABLE system.tbl_log ADD CONSTRAINT fk_log_person_id FOREIGN KEY (person_id) REFERENCES public.tbl_person(person_id) ON UPDATE CASCADE ON DELETE RESTRICT;
+			ALTER TABLE system.tbl_log ADD CONSTRAINT fk_log_app FOREIGN KEY (app) REFERENCES system.tbl_app(app) ON UPDATE CASCADE ON DELETE RESTRICT;
+			ALTER TABLE system.tbl_log ADD CONSTRAINT fk_log_oe_kurzbz FOREIGN KEY (oe_kurzbz) REFERENCES public.tbl_organisationseinheit(oe_kurzbz) ON UPDATE CASCADE ON DELETE RESTRICT;
+			ALTER TABLE system.tbl_log ADD CONSTRAINT fk_log_logtype_kurzbz FOREIGN KEY (logtype_kurzbz) REFERENCES system.tbl_logtype(logtype_kurzbz) ON UPDATE CASCADE ON DELETE RESTRICT;
+
+			INSERT INTO system.tbl_logtype VALUES ('Action', '{\"type\": \"object\", \"title\": \"Action\", \"required\": [\"name\", \"success\", \"message\"], \"properties\": {\"name\": {\"type\": \"string\"}, \"message\": {\"type\": \"string\"}, \"success\": {\"type\": \"string\"}}}');
+			INSERT INTO system.tbl_logtype VALUES ('Processstate', '{\"type\": \"object\", \"title\": \"Processstate\", \"required\": [\"name\"], \"properties\": {\"name\": {\"type\": \"string\"}}}');
+			";
+	if (!$db->db_query($qry))
+		echo '<strong>system.tbl_log '.$db->db_last_error().'</strong><br>';
+	else
+		echo ' system.tbl_log hinzugefügt<br>';
+}
+
+//---------------------------------------------------------------------------------------------------------------------
+// Start filters
+
+// SEQUENCE tbl_filters_id_seq
+if ($result = $db->db_query("SELECT 0 FROM pg_class WHERE relname = 'tbl_filters_id_seq'"))
+{
+	if ($db->db_num_rows($result) == 0)
+	{
+		$qry = '
+			CREATE SEQUENCE system.tbl_filters_id_seq
+				START WITH 1
+				INCREMENT BY 1
+				NO MAXVALUE
+				NO MINVALUE
+				CACHE 1;
+			';
+		if(!$db->db_query($qry))
+			echo '<strong>system.tbl_filters_id_seq '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>Created sequence: system.tbl_filters_id_seq';
+
+		// GRANT SELECT, UPDATE ON SEQUENCE system.tbl_filters_id_seq TO vilesci;
+		$qry = 'GRANT SELECT, UPDATE ON SEQUENCE system.tbl_filters_id_seq TO vilesci;';
+		if (!$db->db_query($qry))
+			echo '<strong>system.tbl_filters_id_seq '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>Granted privileges to <strong>vilesci</strong> on system.tbl_filters_id_seq';
+
+		// GRANT SELECT, UPDATE ON SEQUENCE system.tbl_filters_id_seq TO fhcomplete;
+		$qry = 'GRANT SELECT, UPDATE ON SEQUENCE system.tbl_filters_id_seq TO fhcomplete;';
+		if (!$db->db_query($qry))
+			echo '<strong>system.tbl_filters_id_seq '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>Granted privileges to <strong>vilesci</strong> on system.tbl_filters_id_seq';
+	}
+}
+
+// TABLE system.tbl_filters
+if (!@$db->db_query("SELECT 0 FROM system.tbl_filters WHERE 0 = 1"))
+{
+	$qry = '
+		CREATE TABLE system.tbl_filters (
+			filter_id integer NOT NULL DEFAULT nextval(\'system.tbl_filters_id_seq\'::regclass),
+			app character varying(32) NOT NULL,
+			dataset_name character varying(128) NOT NULL,
+			filter_kurzbz character varying(64) NOT NULL,
+			person_id integer,
+			description character varying(128)[] NOT NULL,
+			sort integer,
+			default_filter boolean DEFAULT FALSE,
+			filter jsonb NOT NULL,
+			oe_kurzbz character varying(16)
+		);';
+	if (!$db->db_query($qry))
+		echo '<strong>system.tbl_filters '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Created table system.tbl_filters';
+
+	// GRANT SELECT ON TABLE system.tbl_filters TO web;
+	$qry = 'GRANT SELECT ON TABLE system.tbl_filters TO web;';
+	if (!$db->db_query($qry))
+		echo '<strong>system.tbl_filters '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Granted privileges to <strong>web</strong> on system.tbl_filters';
+
+	// GRANT SELECT, UPDATE, INSERT, DELETE ON TABLE system.tbl_filters TO vilesci;
+	$qry = 'GRANT SELECT, UPDATE, INSERT, DELETE ON TABLE system.tbl_filters TO vilesci;';
+	if (!$db->db_query($qry))
+		echo '<strong>system.tbl_filters '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Granted privileges to <strong>vilesci</strong> on system.tbl_filters';
+
+	// COMMENT ON TABLE system.tbl_filters
+	$qry = 'COMMENT ON TABLE system.tbl_filters IS \'Table to manage filters\';';
+	if (!$db->db_query($qry))
+		echo '<strong>Adding comment to system.tbl_filters: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Added comment to system.tbl_filters';
+
+	// COMMENT ON TABLE system.tbl_filters.app
+	$qry = 'COMMENT ON COLUMN system.tbl_filters.app IS \'Application which this filter belongs to\';';
+	if (!$db->db_query($qry))
+		echo '<strong>Adding comment to system.tbl_filters.app: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Added comment to system.tbl_filters.app';
+
+	// COMMENT ON TABLE system.tbl_filters.dataset_name
+	$qry = 'COMMENT ON COLUMN system.tbl_filters.dataset_name IS \'Name that identifies the data set to be filtered\';';
+	if (!$db->db_query($qry))
+		echo '<strong>Adding comment to system.tbl_filters.dataset_name: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Added comment to system.tbl_filters.dataset_name';
+
+	// COMMENT ON TABLE system.tbl_filters.filter_kurzbz
+	$qry = 'COMMENT ON COLUMN system.tbl_filters.filter_kurzbz IS \'Short description of the filter, unique for this application and this data set\';';
+	if (!$db->db_query($qry))
+		echo '<strong>Adding comment to system.tbl_filters.filter_kurzbz: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Added comment to system.tbl_filters.filter_kurzbz';
+
+	// COMMENT ON TABLE system.tbl_filters.person_id
+	$qry = 'COMMENT ON COLUMN system.tbl_filters.person_id IS \'Person identifier which this filter belongs to. If null it is global\';';
+	if (!$db->db_query($qry))
+		echo '<strong>Adding comment to system.tbl_filters.person_id: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Added comment to system.tbl_filters.person_id';
+
+	// COMMENT ON TABLE system.tbl_filters.description
+	$qry = 'COMMENT ON COLUMN system.tbl_filters.description IS \'Long description for this filter\';';
+	if (!$db->db_query($qry))
+		echo '<strong>Adding comment to system.tbl_filters.description: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Added comment to system.tbl_filters.description';
+
+	// COMMENT ON TABLE system.tbl_filters.sort
+	$qry = 'COMMENT ON COLUMN system.tbl_filters.sort IS \'Indicates the order in which the filters appear in a list\';';
+	if (!$db->db_query($qry))
+		echo '<strong>Adding comment to system.tbl_filters.sort: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Added comment to system.tbl_filters.sort';
+
+	// COMMENT ON TABLE system.tbl_filters.default_filter
+	$qry = 'COMMENT ON COLUMN system.tbl_filters.default_filter IS \'If it is the default filter for that data set\';';
+	if (!$db->db_query($qry))
+		echo '<strong>Adding comment to system.tbl_filters.default_filter: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Added comment to system.tbl_filters.default_filter';
+
+	// COMMENT ON TABLE system.tbl_filters.filter
+	$qry = 'COMMENT ON COLUMN system.tbl_filters.filter IS \'Cointains json that define the filter\';';
+	if (!$db->db_query($qry))
+		echo '<strong>Adding comment to system.tbl_filters.filter: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Added comment to system.tbl_filters.filter';
+
+	// COMMENT ON TABLE system.tbl_filters.oe_kurzbz
+	$qry = 'COMMENT ON COLUMN system.tbl_filters.oe_kurzbz IS \'Organisation unit which this filter belongs to. If null it is for all the organisation units\';';
+	if (!$db->db_query($qry))
+		echo '<strong>Adding comment to system.tbl_filters.oe_kurzbz: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Added comment to system.tbl_filters.oe_kurzbz';
+
+	// ALTER SEQUENCE system.tbl_filters_id_seq OWNED BY system.tbl_filters.filter_id;
+	$qry = 'ALTER SEQUENCE system.tbl_filters_id_seq OWNED BY system.tbl_filters.filter_id;';
+	if (!$db->db_query($qry))
+		echo '<strong>system.tbl_filters_id_seq '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Altered sequence system.tbl_filters_id_seq';
+}
+
+// UNIQUE INDEX uidx_filters_app_dataset_name_filter_kurzbz
+if ($result = $db->db_query("SELECT 0 FROM pg_class WHERE relname = 'uidx_filters_app_dataset_name_filter_kurzbz'"))
+{
+	if ($db->db_num_rows($result) == 0)
+	{
+		$qry = 'CREATE UNIQUE INDEX uidx_filters_app_dataset_name_filter_kurzbz ON system.tbl_filters USING btree (app, dataset_name, filter_kurzbz);';
+		if (!$db->db_query($qry))
+			echo '<strong>uidx_filters_app_dataset_name_filter_kurzbz '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>Created unique uidx_filters_app_dataset_name_filter_kurzbz';
+	}
+}
+
+// Add permission for filters
+if ($result = @$db->db_query("SELECT 1 FROM system.tbl_berechtigung WHERE berechtigung_kurzbz = 'system/filters';"))
+{
+	if ($db->db_num_rows($result) == 0)
+	{
+		$qry = "INSERT INTO system.tbl_berechtigung (berechtigung_kurzbz, beschreibung) VALUES('system/filters', 'To manage core filters');";
+		if (!$db->db_query($qry))
+			echo '<strong>system.tbl_berechtigung '.$db->db_last_error().'</strong><br>';
+		else
+			echo ' system.tbl_berechtigung: Added permission for filters<br>';
+	}
+}
+
+// FOREIGN KEY tbl_filters_app_fkey
+if ($result = $db->db_query("SELECT conname FROM pg_constraint WHERE conname = 'tbl_filters_app_fkey'"))
+{
+	if ($db->db_num_rows($result) == 0)
+	{
+		$qry = 'ALTER TABLE system.tbl_filters ADD CONSTRAINT tbl_filters_app_fkey FOREIGN KEY (app) REFERENCES system.tbl_app(app) ON UPDATE CASCADE ON DELETE RESTRICT;';
+		if (!$db->db_query($qry))
+			echo '<strong>tbl_filters_app_fkey '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>Created foreign key tbl_filters_app_fkey';
+	}
+}
+
+// FOREIGN KEY tbl_filters_person_id_fkey
+if ($result = $db->db_query("SELECT conname FROM pg_constraint WHERE conname = 'tbl_filters_person_id_fkey'"))
+{
+	if ($db->db_num_rows($result) == 0)
+	{
+		$qry = 'ALTER TABLE system.tbl_filters ADD CONSTRAINT tbl_filters_person_id_fkey FOREIGN KEY (person_id) REFERENCES public.tbl_person(person_id) ON UPDATE CASCADE ON DELETE RESTRICT;';
+		if (!$db->db_query($qry))
+			echo '<strong>tbl_filters_person_id_fkey '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>Created foreign key tbl_filters_person_id_fkey';
+	}
+}
+
+// FOREIGN KEY tbl_filters_oe_kurzbz_fkey
+if ($result = $db->db_query("SELECT conname FROM pg_constraint WHERE conname = 'tbl_filters_oe_kurzbz_fkey'"))
+{
+	if ($db->db_num_rows($result) == 0)
+	{
+		$qry = 'ALTER TABLE system.tbl_filters ADD CONSTRAINT tbl_filters_oe_kurzbz_fkey FOREIGN KEY (oe_kurzbz) REFERENCES public.tbl_organisationseinheit(oe_kurzbz) ON UPDATE CASCADE ON DELETE RESTRICT;';
+		if (!$db->db_query($qry))
+			echo '<strong>tbl_filters_oe_kurzbz_fkey '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>Created foreign key tbl_filters_oe_kurzbz_fkey';
+	}
+}
+
+// End filters
+//---------------------------------------------------------------------------------------------------------------------
+
 
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
@@ -823,12 +1182,12 @@ $tabellen=array(
 	"lehre.tbl_notenschluessel" => array("notenschluessel_kurzbz","bezeichnung"),
 	"lehre.tbl_notenschluesselaufteilung" => array("notenschluesselaufteilung_id","notenschluessel_kurzbz","note","punkte"),
 	"lehre.tbl_notenschluesselzuordnung" => array("notenschluesselzuordnung_id","notenschluessel_kurzbz","lehrveranstaltung_id","studienplan_id","oe_kurzbz","studiensemester_kurzbz"),
-	"lehre.tbl_note"  => array("note","bezeichnung","anmerkung","farbe","positiv","notenwert","aktiv","lehre"),
+	"lehre.tbl_note"  => array("note","bezeichnung","anmerkung","farbe","positiv","notenwert","aktiv","lehre","offiziell","bezeichnung_mehrsprachig"),
 	"lehre.tbl_projektarbeit"  => array("projektarbeit_id","projekttyp_kurzbz","titel","lehreinheit_id","student_uid","firma_id","note","punkte","beginn","ende","faktor","freigegeben","gesperrtbis","stundensatz","gesamtstunden","themenbereich","anmerkung","updateamum","updatevon","insertamum","insertvon","ext_id","titel_english","seitenanzahl","abgabedatum","kontrollschlagwoerter","schlagwoerter","schlagwoerter_en","abstract", "abstract_en", "sprache","final"),
 	"lehre.tbl_projektbetreuer"  => array("person_id","projektarbeit_id","betreuerart_kurzbz","note","faktor","name","punkte","stunden","stundensatz","updateamum","updatevon","insertamum","insertvon","ext_id","vertrag_id"),
 	"lehre.tbl_projekttyp"  => array("projekttyp_kurzbz","bezeichnung"),
 	"lehre.tbl_pruefung"  => array("pruefung_id","lehreinheit_id","student_uid","mitarbeiter_uid","note","pruefungstyp_kurzbz","datum","anmerkung","insertamum","insertvon","updateamum","updatevon","ext_id","pruefungsanmeldung_id","vertrag_id", "punkte"),
-	"lehre.tbl_pruefungstyp"  => array("pruefungstyp_kurzbz","beschreibung","abschluss"),
+	"lehre.tbl_pruefungstyp"  => array("pruefungstyp_kurzbz","beschreibung","abschluss","sort"),
 	"lehre.tbl_studienordnung"  => array("studienordnung_id","studiengang_kz","version","gueltigvon","gueltigbis","bezeichnung","ects","studiengangbezeichnung","studiengangbezeichnung_englisch","studiengangkurzbzlang","akadgrad_id","insertamum","insertvon","updateamum","updatevon","ext_id", "status_kurzbz", "standort_id"),
 	"lehre.tbl_studienordnungstatus" => array("status_kurzbz","bezeichnung","reihenfolge"),
 	"lehre.tbl_studienordnung_semester"  => array("studienordnung_semester_id","studienordnung_id","studiensemester_kurzbz","semester"),
@@ -849,7 +1208,7 @@ $tabellen=array(
 	"lehre.tbl_zeugnisnote"  => array("lehrveranstaltung_id","student_uid","studiensemester_kurzbz","note","uebernahmedatum","benotungsdatum","bemerkung","updateamum","updatevon","insertamum","insertvon","ext_id","punkte"),
 	"public.ci_apikey" => array("apikey_id","key","level","ignore_limits","date_created"),
 	"public.tbl_adresse"  => array("adresse_id","person_id","name","strasse","plz","ort","gemeinde","nation","typ","heimatadresse","zustelladresse","firma_id","updateamum","updatevon","insertamum","insertvon","ext_id","rechnungsadresse","anmerkung"),
-	"public.tbl_akte"  => array("akte_id","person_id","dokument_kurzbz","uid","inhalt","mimetype","erstelltam","gedruckt","titel","bezeichnung","updateamum","updatevon","insertamum","insertvon","ext_id","dms_id","nachgereicht","anmerkung","titel_intern","anmerkung_intern","nachgereicht_am"),
+	"public.tbl_akte"  => array("akte_id","person_id","dokument_kurzbz","uid","inhalt","mimetype","erstelltam","gedruckt","titel","bezeichnung","updateamum","updatevon","insertamum","insertvon","ext_id","dms_id","nachgereicht","anmerkung","titel_intern","anmerkung_intern","nachgereicht_am","ausstellungsnation","formal_geprueft_amum"),
 	"public.tbl_ampel"  => array("ampel_id","kurzbz","beschreibung","benutzer_select","deadline","vorlaufzeit","verfallszeit","insertamum","insertvon","updateamum","updatevon","email","verpflichtend","buttontext"),
 	"public.tbl_ampel_benutzer_bestaetigt"  => array("ampel_benutzer_bestaetigt_id","ampel_id","uid","insertamum","insertvon"),
 	"public.tbl_aufmerksamdurch"  => array("aufmerksamdurch_kurzbz","beschreibung","ext_id","bezeichnung", "aktiv"),
@@ -862,7 +1221,7 @@ $tabellen=array(
 	"public.tbl_benutzergruppe"  => array("uid","gruppe_kurzbz","studiensemester_kurzbz","updateamum","updatevon","insertamum","insertvon","ext_id"),
 	"public.tbl_bewerbungstermine" => array("bewerbungstermin_id","studiengang_kz","studiensemester_kurzbz","beginn","ende","nachfrist","nachfrist_ende","anmerkung", "insertamum", "insertvon", "updateamum", "updatevon","studienplan_id"),
 	"public.tbl_buchungstyp"  => array("buchungstyp_kurzbz","beschreibung","standardbetrag","standardtext","aktiv","credit_points"),
-	"public.tbl_dokument"  => array("dokument_kurzbz","bezeichnung","ext_id","bezeichnung_mehrsprachig","dokumentbeschreibung_mehrsprachig"),
+	"public.tbl_dokument"  => array("dokument_kurzbz","bezeichnung","ext_id","bezeichnung_mehrsprachig","dokumentbeschreibung_mehrsprachig","ausstellungsdetails"),
 	"public.tbl_dokumentprestudent"  => array("dokument_kurzbz","prestudent_id","mitarbeiter_uid","datum","updateamum","updatevon","insertamum","insertvon","ext_id"),
 	"public.tbl_dokumentstudiengang"  => array("dokument_kurzbz","studiengang_kz","ext_id", "onlinebewerbung", "pflicht","beschreibung_mehrsprachig","nachreichbar"),
 	"public.tbl_erhalter"  => array("erhalter_kz","kurzbz","bezeichnung","dvr","logo","zvr"),
@@ -950,6 +1309,9 @@ $tabellen=array(
 	"system.tbl_benutzerrolle"  => array("benutzerberechtigung_id","rolle_kurzbz","berechtigung_kurzbz","uid","funktion_kurzbz","oe_kurzbz","art","studiensemester_kurzbz","start","ende","negativ","updateamum", "updatevon","insertamum","insertvon","kostenstelle_id","anmerkung"),
 	"system.tbl_berechtigung"  => array("berechtigung_kurzbz","beschreibung"),
 	"system.tbl_extensions" => array("extension_id","name","version","description","license","url","core_version","dependencies","enabled"),
+	"system.tbl_log" => array("log_id","person_id","zeitpunkt","app","oe_kurzbz","logtype_kurzbz","logdata","insertvon"),
+	"system.tbl_logtype" => array("logtype_kurzbz", "data_schema"),
+	"system.tbl_filters" => array("filter_id","app","dataset_name","filter_kurzbz","person_id","description","sort","default_filter","filter","oe_kurzbz"),
 	"system.tbl_phrase" => array("phrase_id","app","phrase","insertamum","insertvon"),
 	"system.tbl_phrasentext" => array("phrasentext_id","phrase_id","sprache","orgeinheit_kurzbz","orgform_kurzbz","text","description","insertamum","insertvon"),
 	"system.tbl_rolle"  => array("rolle_kurzbz","beschreibung"),
@@ -965,15 +1327,14 @@ $tabellen=array(
 	"wawi.tbl_betriebsmittelstatus"  => array("betriebsmittelstatus_kurzbz","beschreibung"),
 	"wawi.tbl_betriebsmitteltyp"  => array("betriebsmitteltyp","beschreibung","anzahl","kaution","typ_code","mastershapename"),
 	"wawi.tbl_budget"  => array("geschaeftsjahr_kurzbz","kostenstelle_id","budget"),
-	"wawi.tbl_zahlungstyp"  => array("zahlungstyp_kurzbz","bezeichnung","reihenfolge"),
-	"wawi.tbl_konto"  => array("konto_id","kontonr","beschreibung","kurzbz","aktiv","person_id","insertamum","insertvon","updateamum","updatevon","ext_id","person_id","hilfe"),
+	"wawi.tbl_zahlungstyp"  => array("zahlungstyp_kurzbz","bezeichnung"),
+	"wawi.tbl_konto"  => array("konto_id","kontonr","beschreibung","kurzbz","aktiv","person_id","insertamum","insertvon","updateamum","updatevon","ext_id","person_id"),
 	"wawi.tbl_konto_kostenstelle"  => array("konto_id","kostenstelle_id","insertamum","insertvon"),
 	"wawi.tbl_kostenstelle"  => array("kostenstelle_id","oe_kurzbz","bezeichnung","kurzbz","aktiv","insertamum","insertvon","updateamum","updatevon","ext_id","kostenstelle_nr","deaktiviertvon","deaktiviertamum"),
 	"wawi.tbl_bestellungtag"  => array("tag","bestellung_id","insertamum","insertvon"),
 	"wawi.tbl_bestelldetailtag"  => array("tag","bestelldetail_id","insertamum","insertvon"),
 	"wawi.tbl_projekt_bestellung"  => array("projekt_kurzbz","bestellung_id","anteil"),
 	"wawi.tbl_bestellung"  => array("bestellung_id","besteller_uid","kostenstelle_id","konto_id","firma_id","lieferadresse","rechnungsadresse","freigegeben","bestell_nr","titel","bemerkung","liefertermin","updateamum","updatevon","insertamum","insertvon","ext_id","zahlungstyp_kurzbz","zuordnung_uid","zuordnung_raum","zuordnung","auftragsbestaetigung","auslagenersatz","iban","wird_geleast","nicht_bestellen","empfehlung_leasing"),
-	"wawi.tbl_bestellung_angebot" => array("angebot_id","bestellung_id","dms_id"),
 	"wawi.tbl_bestelldetail"  => array("bestelldetail_id","bestellung_id","position","menge","verpackungseinheit","beschreibung","artikelnummer","preisprove","mwst","erhalten","sort","text","updateamum","updatevon","insertamum","insertvon"),
 	"wawi.tbl_bestellung_bestellstatus"  => array("bestellung_bestellstatus_id","bestellung_id","bestellstatus_kurzbz","uid","oe_kurzbz","datum","insertamum","insertvon","updateamum","updatevon"),
 	"wawi.tbl_bestellstatus"  => array("bestellstatus_kurzbz","beschreibung"),

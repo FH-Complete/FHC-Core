@@ -320,7 +320,10 @@ function loadVariables($user)
 	if (!isset($emailadressentrennzeichen))
 	{
 		global $emailadressentrennzeichen;
-		$emailadressentrennzeichen=',';
+		if(defined('DEFAULT_EMAILADRESSENTRENNZEICHEN'))
+			$emailadressentrennzeichen = DEFAULT_EMAILADRESSENTRENNZEICHEN;
+		else
+			$emailadressentrennzeichen=',';
 	}
 
 	if(!isset($alle_unr_mitladen))
@@ -1066,7 +1069,7 @@ function cutString($string, $limit, $placeholderSign = '', $keepFilextension = f
 	{
 		return '<span class="error">$placeholderSign must not be shorter than $limit</span>';
 	}
-	
+
 	if(strlen($string) > ($limit - $offset))
 	{
 		return substr($string, 0, ($limit - $offset)).$placeholderSign.$extension;
@@ -1075,5 +1078,11 @@ function cutString($string, $limit, $placeholderSign = '', $keepFilextension = f
 	{
 		return $string;
 	}
+}
+
+function PersonLog($ci, $person_id, $logtype_kurzbz, $logdata, $app, $oe_kurzbz = null, $user=null)
+{
+	$ci->load->library('PersonLogLib');
+	$ci->personloglib->log($person_id, $logtype_kurzbz, $logdata, $app, $oe_kurzbz, $user);
 }
 ?>

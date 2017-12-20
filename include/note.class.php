@@ -132,8 +132,8 @@ class note extends basis_db
 			     $this->db_add_param($this->anmerkung).', '.
 				 $this->db_add_param($this->positiv, FHC_BOOLEAN).','.
 				 $this->db_add_param($this->notenwert).','.
-				 $this->db_add_parma($this->aktiv, FHC_BOOLEAN).','.
-				 $this->db_add_param($htis->lehre, FHC_BOOLEAN).');';
+				 $this->db_add_param($this->aktiv, FHC_BOOLEAN).','.
+				 $this->db_add_param($this->lehre, FHC_BOOLEAN).');';
 		}
 		else
 		{
@@ -158,15 +158,62 @@ class note extends basis_db
 			return false;
 		}
 	}
-	
+
 	/**
-	 * Laedt alle Noten
+	 * Laedt alle Noten, inklusive inaktiven Noten
+	 * @param null $offiziell wenn true, werden nur Noten, die auf offiziellen Dokumenten gedruckt weden können, geladen
 	 * @return true wenn ok, false wenn Fehler
-	 */	
-	public function getAll()
+	 */
+	public function getAll($offiziell = null)
 	{
-		$qry = "SELECT * FROM lehre.tbl_note ORDER BY note";
-		
+		$qry = "SELECT * FROM lehre.tbl_note";
+
+		if(is_bool($offiziell))
+			$qry .= " WHERE offiziell = ".$this->db_add_param($offiziell, FHC_BOOLEAN);
+
+		$qry .= " ORDER BY note";
+
+		if($this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object())
+			{
+				$n = new note();
+
+				$n->note = $row->note;
+				$n->bezeichnung = $row->bezeichnung;
+				$n->anmerkung = $row->anmerkung;
+				$n->farbe = $row->farbe;
+				$n->positiv = $this->db_parse_bool($row->positiv);
+				$n->notenwert = $row->notenwert;
+				$n->aktiv = $this->db_parse_bool($row->aktiv);
+				$n->lehre = $this->db_parse_bool($row->lehre);
+
+				$this->result[] = $n;
+			}
+			return true;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+	}
+
+	/**
+	 * Laedt alle aktive Noten
+	 * @param null $offiziell wenn true, werden nur Noten, die auf offiziellen Dokumenten gedruckt weden können, geladen
+	 * @return true wenn ok, false wenn Fehler
+	 */
+	public function getActive($offiziell = null)
+	{
+		$qry = "SELECT * FROM lehre.tbl_note WHERE aktiv = TRUE";
+
+
+		if(is_bool($offiziell))
+			$qry .= " AND offiziell = ".$this->db_add_param($offiziell, FHC_BOOLEAN);
+
+		$qry .= " ORDER BY note";
+
 		if($this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object())

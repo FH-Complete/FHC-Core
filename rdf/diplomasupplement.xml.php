@@ -622,7 +622,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 				tbl_lehrveranstaltung.bezeichnung, COALESCE(tbl_lehrveranstaltung.bezeichnung_english,
 				tbl_lehrveranstaltung.bezeichnung) as bezeichnung_english, tbl_lehrveranstaltung.semester,
 				tbl_lehrveranstaltung.semesterstunden, tbl_lehrveranstaltung.ects, zeugnis.studiensemester_kurzbz,
-				zeugnis.note, note.bezeichnung note_bezeichnung, note.anmerkung, sort, tbl_lehrveranstaltung.sws
+				zeugnis.note, note.bezeichnung note_bezeichnung, note.anmerkung, note.offiziell, sort, tbl_lehrveranstaltung.sws
 			FROM
 				lehre.tbl_zeugnisnote zeugnis
 				JOIN lehre.tbl_note note USING(note)
@@ -654,7 +654,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 						$arrayLvAusbildungssemester[$row_stud->lehrveranstaltung_id]['ects'] = $row_stud->ects;
 						$arrayLvAusbildungssemester[$row_stud->lehrveranstaltung_id]['sws_lv'] = $row_stud->sws;
 						$arrayLvAusbildungssemester[$row_stud->lehrveranstaltung_id]['studiensemester_kurzbz'] = $row_stud->studiensemester_kurzbz;
-						$arrayLvAusbildungssemester[$row_stud->lehrveranstaltung_id]['note'] = $row_stud->anmerkung;
+						$arrayLvAusbildungssemester[$row_stud->lehrveranstaltung_id]['note'] = $db->db_parse_bool($row_stud->offiziell) ?  $row_stud->anmerkung : "";
 						$arrayLvAusbildungssemester[$row_stud->lehrveranstaltung_id]['sort'] = $row_stud->sort;
 						$ects_total += $row_stud->ects;
 						$semester_ects +=$row_stud->ects;
@@ -677,7 +677,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 							$arrayLvAusbildungssemester[$row_stud->lehrveranstaltung_id]['ects'] = $row_stud->ects;
 							$arrayLvAusbildungssemester[$row_stud->lehrveranstaltung_id]['sws_lv'] = $row_stud->sws;
 							$arrayLvAusbildungssemester[$row_stud->lehrveranstaltung_id]['studiensemester_kurzbz'] = $row_stud->studiensemester_kurzbz;
-							$arrayLvAusbildungssemester[$row_stud->lehrveranstaltung_id]['note'] = $row_stud->anmerkung;
+							$arrayLvAusbildungssemester[$row_stud->lehrveranstaltung_id]['note'] = $db->db_parse_bool($row_stud->offiziell) ?  $row_stud->anmerkung : "";
 							$arrayLvAusbildungssemester[$row_stud->lehrveranstaltung_id]['sort'] = $row_stud->sort;
 						}
 					}
@@ -857,7 +857,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 
 							$qry_outgoing_note = "
 								SELECT
-									anmerkung, benotungsdatum, lehrform_kurzbz
+									anmerkung, offiziell, benotungsdatum, lehrform_kurzbz
 								FROM
 									lehre.tbl_zeugnisnote
 									JOIN tbl_lehrveranstaltung using(lehrveranstaltung_id)
@@ -870,7 +870,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 							{
 								if($row_outgoing_note = $db->db_fetch_object($result_outgoing_note))
 								{
-									$note_outgoing = $row_outgoing_note->anmerkung;
+									$note_outgoing = $db->db_parse_bool($row_outgoing_note->offiziell) ? $row_outgoing_note->anmerkung : "";
 									$benotungsdatum_outgoing = $datum->formatDatum($row_outgoing_note->benotungsdatum,'d/m/Y');
 									$lehrform_kurzbz_outgoing = $row_outgoing_note->lehrform_kurzbz;
 								}

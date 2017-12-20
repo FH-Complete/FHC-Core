@@ -24,4 +24,5 @@ $this->phrasen['mailverteiler/infoBenutzung']='You can use the Mailinglist durin
 $this->phrasen['mailverteiler/bestaetigeOeffnen']='Please confirm to unlock the Mailing list %1$s';
 $this->phrasen['mailverteiler/bestaetige']='Confirm';
 $this->phrasen['mailverteiler/personenImVerteiler']='People in this mailing list';
+$this->phrasen['mailverteiler/oeffnenFehlgeschlagen']='Failed to open mailing list. Please inform your administrator.';
 ?>
