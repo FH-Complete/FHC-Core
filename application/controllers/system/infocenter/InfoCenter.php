@@ -8,6 +8,10 @@ class InfoCenter extends VileSci_Controller
     {
         parent::__construct();
 
+		//
+		$this->load->model('system/Filters_model', 'FiltersModel');
+
+		//
         $this->load->library('WidgetLib');
     }
 
@@ -16,17 +20,20 @@ class InfoCenter extends VileSci_Controller
 	 */
 	public function index()
 	{
-		$listFiltersSent = array(
-			'Sent 1' => 100,
-			'Sent 2' => 200,
-			'Sent 3' => 300
+		$listFiltersSent = array();
+		$listFiltersNotSent = array();
+
+		$personActionsArray = array(
+			'app' => 'aufnahme',
+			'dataset_name' => 'PersonActions',
+			'person_id' => null,
+			'default_filter' => false,
+			'array_length(description, 1) >' => 0
 		);
 
-		$listFiltersNotSent = array(
-			'Not Sent 1' => 400,
-			'Not Sent 2' => 500,
-			'Not Sent 3' => 600
-		);
+		$listFiltersSent = $this->_getFilterList($personActionsArray, '%InfoCenterSentApplication%');
+
+		$listFiltersNotSent = $this->_getFilterList($personActionsArray, '%InfoCenterNotSentApplication%');
 
 		$this->load->view(
 			'system/infocenter/infocenter.php',
@@ -35,5 +42,31 @@ class InfoCenter extends VileSci_Controller
 				'listFiltersNotSent' => $listFiltersNotSent
 			)
 		);
+	}
+
+	/**
+	 *
+	 */
+	private function _getFilterList($personActionsArray, $filter_kurzbz)
+	{
+		$listFilters = array();
+
+		$this->FiltersModel->resetQuery();
+		$this->FiltersModel->addSelect('filter_id, description');
+		$this->FiltersModel->addOrder('sort', 'ASC');
+
+		$personActionsArray['filter_kurzbz ILIKE'] = $filter_kurzbz;
+		$filters = $this->FiltersModel->loadWhere($personActionsArray);
+		if (hasData($filters))
+		{
+			for ($filtersCounter = 0; $filtersCounter < count($filters->retval); $filtersCounter++)
+			{
+				$filter = $filters->retval[$filtersCounter];
+
+				$listFilters[$filter->filter_id] = $filter->description[0];
+			}
+		}
+
+		return $listFilters;
 	}
 }
