@@ -251,7 +251,7 @@ class studiengang extends basis_db
 	 */
 	public function getAllForOnlinebewerbung($order = 'tbl_studiengang.typ, tbl_lgartcode.bezeichnung ASC, tbl_studiengang.bezeichnung')
 	{
-		$qry = "SELECT DISTINCT 
+		$qry = "SELECT  
 					tbl_studiengang.studiengang_kz, 
 					tbl_studiengang.typ, 
 					tbl_studiengangstyp.bezeichnung AS typ_bezeichnung,
@@ -269,7 +269,7 @@ class studiengang extends basis_db
 				WHERE tbl_studiengang.onlinebewerbung IS TRUE 
 				AND tbl_studiengang.aktiv IS TRUE";
 						
-		$qry .= ' ORDER BY '.$order;
+		$qry .= " ORDER BY ".$order;
 
 		if(!$result = $this->db_query($qry))
 		{
