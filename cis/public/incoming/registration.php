@@ -83,11 +83,11 @@ echo '	<form action="registration.php" method="POST" name="RegistrationForm">
 					<td><input type="text" size="20" maxlength="64" name="titel_pre"></td>
 				</tr>
 				<tr>
-					<td>'.$p->t('global/vorname').'*</td>
+					<td>'.$p->t('incoming/vorname').'*</td>
 					<td><input type="text" size="40" maxlength="32" name="vorname"></td>
 				</tr>
 				<tr>
-					<td>'.$p->t('global/nachname').'*</td>
+					<td>'.$p->t('incoming/nachname').'*</td>
 					<td><input type="text" size="40" maxlength="64" name="nachname"></td>
 				</tr>
 				<tr>

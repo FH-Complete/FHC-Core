@@ -303,9 +303,10 @@ if(isset($_GET['action']) && $_GET['action'] == 'dokumenttypen')
 		<tr>
 			<td>Kurzbezeichnung</td>
 			<td>
-				<input typ="text" id="dokument_kurzbz" name="dokument_kurzbz" maxlength="8" size="8" '.($dokument->dokument_kurzbz != ''?'disabled':'').' value="'.$dokument->dokument_kurzbz.'"/>
-				<input type="hidden" id="dokument_kurzbz_hidden" name="dokument_kurzbz" value="'.$dokument->dokument_kurzbz.'" />
-				<input type="hidden" id="neu" name="neu" value="'.($dokument->dokument_kurzbz == ''?'true':'false').'" />
+				<input typ="text" id="dokument_kurzbz" name="dokument_kurzbz" maxlength="8" size="8" '.($dokument->dokument_kurzbz != ''?'disabled':'').' value="'.$dokument->dokument_kurzbz.'"/>';
+				if ($dokument->dokument_kurzbz != '')
+					echo '<input type="hidden" id="dokument_kurzbz_hidden" name="dokument_kurzbz" value="'.$dokument->dokument_kurzbz.'" />';
+				echo '<input type="hidden" id="neu" name="neu" value="'.($dokument->dokument_kurzbz == ''?'true':'false').'" />
 			</td>
 		</tr>
 		<tr>

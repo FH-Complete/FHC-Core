@@ -399,11 +399,11 @@ if($result = @$db->db_query("SELECT 1 FROM lehre.tbl_pruefungstyp WHERE pruefung
 }
 
 // Note "entschuldigt" hinzufügen
-if($result = @$db->db_query("SELECT 1 FROM lehre.tbl_note WHERE anmerkung = 'en' AND bezeichnung = 'entschuldigt' OR bezeichnung = 'Entschuldigt';"))
+if($result = @$db->db_query("SELECT 1 FROM lehre.tbl_note WHERE anmerkung = 'en' AND (bezeichnung = 'entschuldigt' OR bezeichnung = 'Entschuldigt');"))
 {
 	if($db->db_num_rows($result) == 0)
 	{
-		$qry = "INSERT INTO lehre.tbl_note(bezeichnung, anmerkung, farbe, positiv, notenwert, aktiv, lehre) VALUES('entschuldigt', 'en', NULL, TRUE, NULL, TRUE, TRUE);";
+		$qry = "INSERT INTO lehre.tbl_note(note, bezeichnung, anmerkung, farbe, positiv, notenwert, aktiv, lehre) VALUES((SELECT max(note)+1 FROM lehre.tbl_note),'entschuldigt', 'en', NULL, TRUE, NULL, TRUE, TRUE);";
 
 		if(!$db->db_query($qry))
 			echo '<strong>lehre.tbl_note: '.$db->db_last_error().'</strong><br>';
@@ -413,11 +413,11 @@ if($result = @$db->db_query("SELECT 1 FROM lehre.tbl_note WHERE anmerkung = 'en'
 }
 
 // Note "unentschuldigt" hinzufügen
-if($result = @$db->db_query("SELECT 1 FROM lehre.tbl_note WHERE anmerkung = 'ue' AND bezeichnung = 'unentschuldigt' OR bezeichnung = 'Unentschuldigt';"))
+if($result = @$db->db_query("SELECT 1 FROM lehre.tbl_note WHERE anmerkung = 'ue' AND (bezeichnung = 'unentschuldigt' OR bezeichnung = 'Unentschuldigt');"))
 {
 	if($db->db_num_rows($result) == 0)
 	{
-		$qry = "INSERT INTO lehre.tbl_note(bezeichnung, anmerkung, farbe, positiv, notenwert, aktiv, lehre) VALUES('unentschuldigt', 'ue', NULL, FALSE, NULL, TRUE, TRUE);";
+		$qry = "INSERT INTO lehre.tbl_note(note, bezeichnung, anmerkung, farbe, positiv, notenwert, aktiv, lehre) VALUES((SELECT max(note)+1 FROM lehre.tbl_note),'unentschuldigt', 'ue', NULL, FALSE, NULL, TRUE, TRUE);";
 
 		if(!$db->db_query($qry))
 			echo '<strong>lehre.tbl_note: '.$db->db_last_error().'</strong><br>';

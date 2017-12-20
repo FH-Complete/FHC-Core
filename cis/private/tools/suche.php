@@ -261,26 +261,30 @@ function searchOE($searchItems)
 						$kontakt->loadFirmaKontakttyp($mitarbeiter->standort_id,'telefon');
 						$bisverwendung = new bisverwendung();
 						$bisverwendung->getLastAktVerwendung($bf->uid);
-						echo '<tr>';
-						echo '<td>'.$person->vorname.'</td>';
-						echo '<td><a href="../profile/index.php?uid=',$person->uid,'" title="',$person->titelpre,' ',$person->vorname,' ',$person->nachname,' ',$person->titelpost,'">',$person->nachname,'</a></td>';
-						echo '<td>'.$bf->bezeichnung;
-							if($bisverwendung->beschausmasscode=='5')
-								echo '<span style="color: orange"> (karenziert)</span>';
-							echo '</td>';
-						
-						echo '<td>',($mitarbeiter->telefonklappe!=''?$kontakt->kontakt.'-'.$mitarbeiter->telefonklappe:'-'),'</td>';
-						echo '<td>',($mitarbeiter->ort_kurzbz!=''?$mitarbeiter->ort_kurzbz:'-'),'</td>';
-						//if($row->alias!='' && !in_array($row->studiengang_kz, $noalias)) ??? Was macht $noalias?
-						if($person->alias!='')
-							$mail = $person->alias.'@'.DOMAIN;
-						else
-							$mail = $person->uid.'@'.DOMAIN;
-						echo '<td><a href="mailto:',$mail,'">',$mail,'</a></td>';
-						//if(!defined('CIS_SUCHE_LVPLAN_ANZEIGEN') || CIS_SUCHE_LVPLAN_ANZEIGEN)
-							//echo '<td><a href="../../../cis/private/lvplan/stpl_week.php?pers_uid='.$person->uid.($person->mitarbeiter_uid==NULL?'&type=student':'&type=lektor').'">'.$p->t('lvplan/lvPlan').'</a></td>';
-						echo '</tr>';
-						echo "\n";
+						$benutzer = new benutzer($bf->uid);
+						if ($benutzer->bnaktiv)
+						{
+							echo '<tr>';
+							echo '<td>'.$person->vorname.'</td>';
+							echo '<td><a href="../profile/index.php?uid=',$person->uid,'" title="',$person->titelpre,' ',$person->vorname,' ',$person->nachname,' ',$person->titelpost,'">',$person->nachname,'</a></td>';
+							echo '<td>'.$bf->bezeichnung;
+								if($bisverwendung->beschausmasscode=='5')
+									echo '<span style="color: orange"> (karenziert)</span>';
+								echo '</td>';
+							
+							echo '<td>',($mitarbeiter->telefonklappe!=''?$kontakt->kontakt.'-'.$mitarbeiter->telefonklappe:'-'),'</td>';
+							echo '<td>',($mitarbeiter->ort_kurzbz!=''?$mitarbeiter->ort_kurzbz:'-'),'</td>';
+							//if($row->alias!='' && !in_array($row->studiengang_kz, $noalias)) ??? Was macht $noalias?
+							if($person->alias!='')
+								$mail = $person->alias.'@'.DOMAIN;
+							else
+								$mail = $person->uid.'@'.DOMAIN;
+							echo '<td><a href="mailto:',$mail,'">',$mail,'</a></td>';
+							//if(!defined('CIS_SUCHE_LVPLAN_ANZEIGEN') || CIS_SUCHE_LVPLAN_ANZEIGEN)
+								//echo '<td><a href="../../../cis/private/lvplan/stpl_week.php?pers_uid='.$person->uid.($person->mitarbeiter_uid==NULL?'&type=student':'&type=lektor').'">'.$p->t('lvplan/lvPlan').'</a></td>';
+							echo '</tr>';
+							echo "\n";
+						}
 					}
 					echo "\n";
 					echo '</tbody></table><br>';

@@ -364,17 +364,6 @@ if(!empty ($_GET))
 $stg_obj = new studiengang();
 $stg_obj->getAll('typ, kurzbz', false);
 
-function CutString($strVal, $limit)
-{
-	if(strlen($strVal) > $limit+3)
-	{
-		return substr($strVal, 0, $limit) . "...";
-	}
-	else
-	{
-		return $strVal;
-	}
-}
 echo 'Anzahl: '.(!empty($_GET)?count($preinteressent->result):'0');
 echo '</div>'; // Fixiertes Div mit den Filtern
 echo '<br><br><br><br><br><br><br>';
@@ -483,7 +472,7 @@ if(!empty ($_GET))
 		
 		echo "<td>$freigabe</td>";
 		echo "<td>$uebernahme</td>";
-		echo "<td title='".$row->anmerkung."'>".CutString($row->anmerkung, 20)."</td>";
+		echo "<td title='".$row->anmerkung."'>".CutString($row->anmerkung, 20, '...')."</td>";
 		echo '<td>';
 		echo " <input style='padding:0px;' type='button' onclick=\"window.open('personendetails.php?id=$row->person_id','_blank')\" value='Gesamtübersicht' title='Zeigt die Details dieser Person an'>";
 		echo " <input style='padding:0px;' type='button' onclick='parent.preinteressent_detail.location.href = \"preinteressent_detail.php?id=$row->preinteressent_id&selection=\"+parent.preinteressent_detail.selection; return false;' value='Bearbeiten' title='Zeigt die Details dieser Person an'>";

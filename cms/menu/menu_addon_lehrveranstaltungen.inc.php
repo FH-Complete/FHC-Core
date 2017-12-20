@@ -235,25 +235,13 @@ class menu_addon_lehrveranstaltungen extends menu_addon
 				}
 				$this->block.= '<tr>';
 				$this->block.= '	<td class="tdwrap"><ul style="margin: 0px; padding: 0px; ">';
-				$this->block.= "<li style='padding: 0px;'><a title=\"".$row->bezeichnung_arr[$sprache]."\" href=\"private/lehre/lesson.php?lvid=$row->lehrveranstaltung_id\" target=\"content\">".$this->CutString($row->bezeichnung_arr[$sprache], $cutlength).' '.$row->lehrform_kurzbz."</a></li>";
+				$this->block.= "<li style='padding: 0px;'><a title=\"".$row->bezeichnung_arr[$sprache]."\" href=\"private/lehre/lesson.php?lvid=$row->lehrveranstaltung_id\" target=\"content\">".$this->CutString($row->bezeichnung_arr[$sprache], $cutlength, '...').' '.$row->lehrform_kurzbz."</a></li>";
 				$this->block.= '	</ul></td>';
 				$this->block.= '</tr>';
 			}
 		}
 		$this->block.='</table>';
 		$this->output();
-	}
-
-	private function CutString($strVal, $limit)
-	{
-		if(mb_strlen($strVal) > $limit+3)
-		{
-			return mb_substr($strVal, 0, $limit) . "...";
-		}
-		else
-		{
-			return $strVal;
-		}
 	}
 }
 

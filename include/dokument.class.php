@@ -661,8 +661,8 @@ class dokument extends basis_db
 	/**
 	 * Liefert alle Dokumente die eine Person abzugeben hat.
 	 * Ist notwendig, um bei einer Bewerbung mit mehreren Studiengängen zu wissen, was der Student im Gesamten abzugeben hat
-	 * @param $person_id
-	 * @param onlinebewerbung
+	 * @param integer $person_id
+	 * @param boolean $onlinebewerbung Default false. Wenn true, werden nur Dokumente zurueckgegeben, bei denen das Attribut "Onlinebewerbung" true ist
 	 */
 	public function getAllDokumenteForPerson($person_id, $onlinebewerbung= false)
 	{
@@ -670,7 +670,7 @@ class dokument extends basis_db
 		$bezeichnung_mehrsprachig = $sprache->getSprachQuery('bezeichnung_mehrsprachig');
 		$dokumentbeschreibung_mehrsprachig = $sprache->getSprachQuery('dokumentbeschreibung_mehrsprachig');
 		$beschreibung_mehrsprachig = $sprache->getSprachQuery('beschreibung_mehrsprachig');
-		$qry = "SELECT distinct on (dokument_kurzbz) dokument_kurzbz, bezeichnung, pflicht, nachreichbar,
+		$qry = "SELECT distinct on (dokument_kurzbz) dokument_kurzbz, bezeichnung, pflicht, nachreichbar, ausstellungsdetails, 
 			$bezeichnung_mehrsprachig, $dokumentbeschreibung_mehrsprachig, $beschreibung_mehrsprachig
 			FROM public.tbl_dokumentstudiengang
 			JOIN public.tbl_prestudent using (studiengang_kz)
@@ -722,7 +722,7 @@ class dokument extends basis_db
 		$dokumentbeschreibung_mehrsprachig = $sprache->getSprachQuery('dokumentbeschreibung_mehrsprachig');
 		$beschreibung_mehrsprachig = $sprache->getSprachQuery('beschreibung_mehrsprachig');
 
-		$qry = "	SELECT DISTINCT dokument_kurzbz, studiengang_kz, ausstellungsdetails, 
+		$qry = "	SELECT DISTINCT dokument_kurzbz, studiengang_kz, ausstellungsdetails,
 					$dokumentbeschreibung_mehrsprachig, $beschreibung_mehrsprachig
 					FROM public.tbl_dokumentstudiengang
 					JOIN public.tbl_dokument using (dokument_kurzbz)
@@ -809,5 +809,44 @@ class dokument extends basis_db
 				return true;
 			}
 		}
+	}
+	
+	/**
+	 * Liefert die Studiengänge bei denen das übergebene Dokument benötigt wird
+	 * @param string $dokument_kurzbz Kurzbz des Dokuments
+	 * @param integer $person_id Optional. Die Dokumente werden zusätzlich auf die Studiengänge eingeschränkt für die sich eine Person beworben hat. 
+	 * @return object Objekt mit den Studiengängen oder false.
+	 */
+	public function getStudiengaengeDokument($dokument_kurzbz, $person_id = null)
+	{
+		$qry = "	SELECT DISTINCT studiengang_kz,typ||kurzbz AS kuerzel, bezeichnung, english FROM public.tbl_dokumentstudiengang
+					JOIN public.tbl_prestudent USING (studiengang_kz)
+					JOIN public.tbl_prestudentstatus USING (prestudent_id)
+					JOIN public.tbl_studiengang USING (studiengang_kz)
+					WHERE dokument_kurzbz = ".$this->db_add_param($dokument_kurzbz)."
+					AND person_id =".$this->db_add_param($person_id, FHC_INTEGER)."
+					AND tbl_prestudentstatus.status_kurzbz = 'Interessent'
+	
+					ORDER BY kuerzel";
+
+		if($result = $this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object($result))
+			{
+				$stg_obj = new basis_db();
+				$stg_obj->kuerzel = $row->kuerzel;
+				$stg_obj->bezeichnung = $row->bezeichnung;
+				$stg_obj->studiengang_kz = $row->studiengang_kz;
+
+				$this->result[] = $stg_obj;
+			}
+			return $stg_obj;
+		}
+		else
+		{
+			$this->errormsg="Fehler bei der Abfrage aufgetreten";
+			return false;
+		}
+
 	}
 }
