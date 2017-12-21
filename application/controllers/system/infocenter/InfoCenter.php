@@ -23,17 +23,9 @@ class InfoCenter extends VileSci_Controller
 		$listFiltersSent = array();
 		$listFiltersNotSent = array();
 
-		$personActionsArray = array(
-			'app' => 'aufnahme',
-			'dataset_name' => 'PersonActions',
-			'person_id' => null,
-			'default_filter' => false,
-			'array_length(description, 1) >' => 0
-		);
+		$listFiltersSent = $this->_getFilterList('%InfoCenterSentApplication%');
 
-		$listFiltersSent = $this->_getFilterList($personActionsArray, '%InfoCenterSentApplication%');
-
-		$listFiltersNotSent = $this->_getFilterList($personActionsArray, '%InfoCenterNotSentApplication%');
+		$listFiltersNotSent = $this->_getFilterList('%InfoCenterNotSentApplication%');
 
 		$this->load->view(
 			'system/infocenter/infocenter.php',
@@ -47,9 +39,17 @@ class InfoCenter extends VileSci_Controller
 	/**
 	 *
 	 */
-	private function _getFilterList($personActionsArray, $filter_kurzbz)
+	private function _getFilterList($filter_kurzbz)
 	{
 		$listFilters = array();
+
+		$personActionsArray = array(
+			'app' => 'aufnahme',
+			'dataset_name' => 'PersonActions',
+			'person_id' => null,
+			'default_filter' => false,
+			'array_length(description, 1) >' => 0
+		);
 
 		$this->FiltersModel->resetQuery();
 		$this->FiltersModel->addSelect('filter_id, description');

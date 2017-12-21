@@ -95,8 +95,13 @@ class FilterWidget extends Widget
 	 */
 	public function display($widgetData)
 	{
-		//
-		$this->_loadFilter();
+		$filterSessionArray = $this->session->userdata(self::SESSION_NAME);
+		if ((isset($filterSessionArray[self::SELECTED_FIELDS]) && count($filterSessionArray[self::SELECTED_FIELDS]) == 0)
+			&& (isset($filterSessionArray[self::SELECTED_FILTERS]) && count($filterSessionArray[self::SELECTED_FILTERS]) == 0))
+		{
+			//
+			$this->_loadFilter();
+		}
 
 		//
 		$this->_setSessionFilterData();
