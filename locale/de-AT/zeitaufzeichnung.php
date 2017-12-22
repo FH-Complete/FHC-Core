@@ -44,4 +44,17 @@ $this->phrasen['zeitaufzeichnung/pause']='Pausen';'inkl. 30 min. Pflichtpause';
 $this->phrasen['zeitaufzeichnung/inklusivePflichtpause']='inkl. 30 min. Pflichtpause';
 $this->phrasen['zeitaufzeichnung/handbuchZeitaufzeichnung']='Arbeitszeitaufzeichnung Leitfaden';
 $this->phrasen['zeitaufzeichnung/fiktiveNormalarbeitszeit']='Vereinbarung der fiktiven Normalarbeitszeit';
+$this->phrasen['zeitaufzeichnung/projektexport']='Projektexport';
+$this->phrasen['zeitaufzeichnung/projektliste']='Projektliste';
+$this->phrasen['zeitaufzeichnung/projektlistegedruckt']='Projektliste gedruckt am:';
+$this->phrasen['zeitaufzeichnung/personalnr']='Personal-Nr.:';
+$this->phrasen['zeitaufzeichnung/jahr']='Jahr:';
+$this->phrasen['zeitaufzeichnung/monat']='Monat:';
+$this->phrasen['zeitaufzeichnung/tag']='Tag';
+$this->phrasen['zeitaufzeichnung/startdatum']='Startdatum:';
+$this->phrasen['zeitaufzeichnung/enddatum']='Enddatum:';
+$this->phrasen['zeitaufzeichnung/stunden']='Stunden';
+$this->phrasen['zeitaufzeichnung/taetigkeit']='Tätigkeit';
+$this->phrasen['zeitaufzeichnung/keineprojekte']='keine Projekte vorhanden';
+$this->phrasen['zeitaufzeichnung/summe']='Summe:';
 ?>

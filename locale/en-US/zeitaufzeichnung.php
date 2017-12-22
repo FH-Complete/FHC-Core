@@ -44,4 +44,17 @@ $this->phrasen['zeitaufzeichnung/pause']='Breaks';
 $this->phrasen['zeitaufzeichnung/inklusicePlichtpause']='incl. 30 min. lunch break';
 $this->phrasen['zeitaufzeichnung/handbuchZeitaufzeichnung']='Timesheet howto';
 $this->phrasen['zeitaufzeichnung/fiktiveNormalarbeitszeit']='Vereinbarung der fiktiven Normalarbeitszeit';
+$this->phrasen['zeitaufzeichnung/projektexport']='Projectexport';
+$this->phrasen['zeitaufzeichnung/projektliste']='Projectlist';
+$this->phrasen['zeitaufzeichnung/projektlistegedruckt']='Projectlist printed on:';
+$this->phrasen['zeitaufzeichnung/personalnr']='staff number ';
+$this->phrasen['zeitaufzeichnung/jahr']='Year:';
+$this->phrasen['zeitaufzeichnung/monat']='Month:';
+$this->phrasen['zeitaufzeichnung/tag']='Day';
+$this->phrasen['zeitaufzeichnung/startdatum']='Startdate:';
+$this->phrasen['zeitaufzeichnung/enddatum']='Enddate:';
+$this->phrasen['zeitaufzeichnung/stunden']='Hours';
+$this->phrasen['zeitaufzeichnung/taetigkeit']='Activity';
+$this->phrasen['zeitaufzeichnung/keineprojekte']='no projects exist';
+$this->phrasen['zeitaufzeichnung/summe']='Sum:';
 ?>
