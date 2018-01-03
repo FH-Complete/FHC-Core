@@ -87,11 +87,11 @@ function _generateJSsInclude($JSs)
 			// --------------------------------------------------------------------------------------------------------
 			// CSS
 
-			// Eventually required CSS
-			_generateCSSsInclude($customCSSs); // Eventually required CSS
-
 			// Table sorter CSS
 			if ($tablesorter === true) _generateCSSsInclude('skin/tablesort.css');
+
+			// Eventually required CSS
+			_generateCSSsInclude($customCSSs); // Eventually required CSS
 
 			// --------------------------------------------------------------------------------------------------------
 			// Javascripts
