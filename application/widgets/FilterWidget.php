@@ -51,6 +51,8 @@ class FilterWidget extends Widget
 	const OP_IS_FALSE = 'false';
 	const OP_CONTAINS = 'contains';
 	const OP_NOT_CONTAINS = 'ncontains';
+	const OP_SET = 'set';
+	const OP_NOT_SET = 'nset';
 
 	const OPT_DAYS = 'days';
 	const OPT_MONTHS = 'months';
@@ -95,9 +97,17 @@ class FilterWidget extends Widget
 	 */
 	public function display($widgetData)
 	{
+		//
 		$filterSessionArray = $this->session->userdata(self::SESSION_NAME);
-		if ((isset($filterSessionArray[self::SELECTED_FIELDS]) && count($filterSessionArray[self::SELECTED_FIELDS]) == 0)
-			&& (isset($filterSessionArray[self::SELECTED_FILTERS]) && count($filterSessionArray[self::SELECTED_FILTERS]) == 0))
+
+		//
+		if ($this->filterId == null && isset($filterSessionArray[self::FILTER_ID]))
+		{
+			$this->filterId = $filterSessionArray[self::FILTER_ID];
+		}
+
+		//
+		if ($filterSessionArray[self::FILTER_ID] != $this->filterId)
 		{
 			//
 			$this->_loadFilter();
@@ -281,6 +291,8 @@ class FilterWidget extends Widget
 				<span>
 					<select name="%s" class="select-filter-operation">
 						<option value="'.self::OP_LESS_THAN.'" '.($activeFilterOperationValue == self::OP_LESS_THAN ? 'selected' : '').'>less than</option>
+						<option value="'.self::OP_SET.'" '.($activeFilterOperationValue == self::OP_SET ? 'selected' : '').'>is set</option>
+						<option value="'.self::OP_NOT_SET.'" '.($activeFilterOperationValue == self::OP_NOT_SET ? 'selected' : '').'>is not set</option>
 					</select>
 				</span>
 				<span>
@@ -490,6 +502,11 @@ class FilterWidget extends Widget
 		if (!isset($filterSessionArray[self::ADDITIONAL_COLUMNS]))
 		{
 			$filterSessionArray[self::ADDITIONAL_COLUMNS] = array();
+		}
+
+		if (!isset($filterSessionArray[self::FILTER_ID]))
+		{
+			$filterSessionArray[self::FILTER_ID] = -1;
 		}
 
 		$this->session->set_userdata(self::SESSION_NAME, $filterSessionArray);
@@ -962,6 +979,8 @@ class FilterWidget extends Widget
 			$filterSessionArray[self::ACTIVE_FILTERS_OPTION]
 		);
 
+		$filterSessionArray[self::FILTER_ID] = $this->filterId;
+
 		$this->session->set_userdata(self::SESSION_NAME, $filterSessionArray);
 	}
 
@@ -1001,61 +1020,68 @@ class FilterWidget extends Widget
 
 			foreach ($activeFilters as $field => $activeFilterValue)
 			{
-				if (trim($activeFilterValue) != '')
+				if ($first)
 				{
-					if ($first)
+					$first = false;
+				}
+				else
+				{
+					$where .= ' AND ';
+				}
+
+				if (isset($activeFiltersOperation[$field]))
+				{
+					$where .= '"'.$field.'"';
+					$condition = '';
+
+					switch ($activeFiltersOperation[$field])
 					{
-						$first = false;
-					}
-					else
-					{
-						$where .= ' AND ';
+						case self::OP_EQUAL:
+							if (!is_numeric($activeFilterValue)) $activeFilterValue = 0;
+							$condition = ' = '.$activeFilterValue;
+							break;
+						case self::OP_NOT_EQUAL:
+							if (!is_numeric($activeFilterValue)) $activeFilterValue = 0;
+							$condition = ' != '.$activeFilterValue;
+							break;
+						case self::OP_GREATER_THAN:
+							if (!is_numeric($activeFilterValue)) $activeFilterValue = 0;
+							$condition = ' > '.$activeFilterValue;
+							break;
+						case self::OP_LESS_THAN:
+							if (!is_numeric($activeFilterValue)) $activeFilterValue = 0;
+							if (isset($activeFiltersOption[$field])
+								&& ($activeFiltersOption[$field] == self::OPT_DAYS
+								|| $activeFiltersOption[$field] == self::OPT_MONTHS))
+							{
+								$condition = ' < (NOW() - \''.$activeFilterValue.' '.$activeFiltersOption[$field].'\'::interval)';
+							}
+							else
+							{
+								$condition = ' < '.$activeFilterValue;
+							}
+							break;
+						case self::OP_CONTAINS:
+							$condition = ' ILIKE \'%'.$activeFilterValue.'%\'';
+							break;
+						case self::OP_NOT_CONTAINS:
+							$condition = ' NOT ILIKE \'%'.$activeFilterValue.'%\'';
+							break;
+						case self::OP_IS_TRUE:
+							$condition = ' IS TRUE';
+							break;
+						case self::OP_IS_FALSE:
+							$condition = ' IS FALSE';
+							break;
+						case self::OP_SET:
+							$condition = ' IS NOT NULL';
+							break;
+						case self::OP_NOT_SET:
+							$condition = ' IS NULL';
+							break;
 					}
 
-					if (isset($activeFiltersOperation[$field]))
-					{
-						$where .= '"'.$field.'"';
-						$condition = '';
-
-						switch ($activeFiltersOperation[$field])
-						{
-							case self::OP_EQUAL:
-								$condition = ' = '.$activeFilterValue;
-								break;
-							case self::OP_NOT_EQUAL:
-								$condition = ' != '.$activeFilterValue;
-								break;
-							case self::OP_GREATER_THAN:
-								$condition = ' > '.$activeFilterValue;
-								break;
-							case self::OP_LESS_THAN:
-								if (isset($activeFiltersOption[$field])
-									&& ($activeFiltersOption[$field] == self::OPT_DAYS
-									|| $activeFiltersOption[$field] == self::OPT_MONTHS))
-								{
-									$condition = ' < (NOW() - \''.$activeFilterValue.' '.$activeFiltersOption[$field].'\'::interval)';
-								}
-								else
-								{
-									$condition = ' < '.$activeFilterValue;
-								}
-								break;
-							case self::OP_CONTAINS:
-								$condition = ' ILIKE \'%'.$activeFilterValue.'%\'';
-								break;
-							case self::OP_NOT_CONTAINS:
-								$condition = ' NOT ILIKE \'%'.$activeFilterValue.'%\'';
-								break;
-							case self::OP_IS_TRUE:
-								$condition = ' IS TRUE';
-								break;
-							case self::OP_IS_FALSE:
-								$condition = ' IS FALSE';
-								break;
-						}
-
-						$where .= $condition;
-					}
+					$where .= $condition;
 				}
 			}
 
