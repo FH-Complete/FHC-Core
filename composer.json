@@ -185,6 +185,30 @@
 					"reference": "b15ea33268b587d986371c0b6f215c36ffbb860c"
 				}
 			}
+		},
+		{
+			"type": "package",
+			"package": {
+				"name": "datatables/plugins",
+				"version": "3.3.7",
+				"source": {
+					"url": "https://github.com/DataTables/Plugins.git",
+					"type": "git",
+					"reference": "master"
+				}
+			}
+		},
+		{
+			"type": "package",
+			"package": {
+				"name": "BlackrockDigital/startbootstrap-sb-admin-2",
+				"version": "3.3.7",
+				"source": {
+					"url": "https://github.com/BlackrockDigital/startbootstrap-sb-admin-2.git",
+					"type": "git",
+					"reference": "master"
+				}
+			}
 		}
 	],
 	"require": {
@@ -222,7 +246,12 @@
 		"jquery/sizzle": "^1.0",
 		"tomazdragar/SimpleCropper": "^1.0",
 		"nicolaskruchten/pivottable": "^2.15.0",
-		"jquery-archive/jquery-metadata": "^1.0"
+		"jquery-archive/jquery-metadata": "^1.0",
+		"BlackrockDigital/startbootstrap-sb-admin-2": "^3.3",
+		"components/font-awesome": "^4.7",
+		"moment/moment": "^2.20",
+		"datatables/datatables": "^1.10",
+		"datatables/plugins": "^3.3"
 	},
 	"require-dev": {
 		"squizlabs/php_codesniffer": "2.*"
