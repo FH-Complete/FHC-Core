@@ -38,6 +38,12 @@ if (!isset($_GET['projexpmonat']))
 if (!isset($_GET['projexpjahr']))
 	die("Parameter jahr fehlt");
 
+$sprache = getSprache();
+$p = new phrasen($sprache);
+$sprache_obj = new sprache();
+$sprache_obj->load($sprache);
+$sprache_index = $sprache_obj->index;
+
 $uid = get_uid();
 $benutzer = new benutzer();
 if (!$benutzer->load($uid))
@@ -46,7 +52,7 @@ if (!$benutzer->load($uid))
 $month = $_GET['projexpmonat'];
 $year = $_GET['projexpjahr'];
 
-$monthtext = $monatsname[1][$month - 1];
+$monthtext = $monatsname[$sprache_index][$month - 1];
 $username = $benutzer->vorname." ".$benutzer->nachname;
 $mitarbeiter = new mitarbeiter();
 $mitarbeiter->load($uid);
@@ -66,7 +72,7 @@ $toignore = ['Pause', 'LehreExtern'];
 $ztaufdata = $ztauf->result;
 $monthsums = [0 => 0.00];
 
-//sprt list by startdate ascending (if not already done in zeitaufzeichnung class)
+//sort list by startdate ascending (if not already done in zeitaufzeichnung class)
 usort($ztaufdata, function ($ztaufa, $ztaufb)
 {
 	$date = new datum();
@@ -75,9 +81,12 @@ usort($ztaufdata, function ($ztaufa, $ztaufb)
 );
 
 //fill projectlines with data
-for ($i = 0; $i < sizeof($ztaufdata); $i++)
+for ($i = 0; $i < count($ztaufdata); $i++)
 {
 	$ztaufrow = $ztaufdata[$i];
+	//make sure dates are in correct format
+	$ztaufrow->start = $date->formatDatum($ztaufrow->start, $format = 'Y-m-d H:i:s');
+	$ztaufrow->ende = $date->formatDatum($ztaufrow->ende, $format = 'Y-m-d H:i:s');
 	$day = intval($date->formatDatum($ztaufrow->ende, 'd'));
 	//first  entry for a day
 	$isFirstEntry = !isset($projectlines[$day]);
@@ -95,16 +104,16 @@ for ($i = 0; $i < sizeof($ztaufdata); $i++)
 		$tosubtract[] = $subtraction;
 
 		//save all pause ranges
-		if($ztaufrow->aktivitaet_kurzbz == $toignore[0])
+		if ($ztaufrow->aktivitaet_kurzbz == $toignore[0])
 		{
 			$prevpause = null;
-			if(sizeof($allpauseranges)>0)
+			if (count($allpauseranges) > 0)
 			{
-				$prevpause = $allpauseranges[sizeof($allpauseranges) - 1];
+				$prevpause = $allpauseranges[count($allpauseranges) - 1];
 			}
 
 			//first pause or no overlap to previous pause - add pauserange
-			if( is_null($prevpause ) || $prevpause->ende <= $ztaufrow->start )
+			if (is_null($prevpause) || $prevpause->ende <= $ztaufrow->start)
 			{
 				$pauserange = new stdClass();
 				$pauserange->start = $ztaufrow->start;
@@ -112,16 +121,17 @@ for ($i = 0; $i < sizeof($ztaufdata); $i++)
 				$allpauseranges[] = $pauserange;
 			}
 			//pause overlap - change pause ende
-			elseif($prevpause->ende > $ztaufrow->start )
+			elseif ($prevpause->ende > $ztaufrow->start)
 			{
-				$allpauseranges[sizeof($allpauseranges) - 1]->ende = $ztaufrow->ende;
+				$allpauseranges[count($allpauseranges) - 1]->ende = $ztaufrow->ende;
 			}
 		}
 	}
 
-	if (($dayStart == '' || $date->mktime_fromtimestamp($date->formatDatum($dayStart, $format = 'Y-m-d H:i:s')) > $date->mktime_fromtimestamp($date->formatDatum($ztaufrow->start, $format = 'Y-m-d H:i:s'))) && $ztaufrow->aktivitaet_kurzbz != $toignore[1])
+	//save new dayStart (if earlier) or dayEnd (if later)
+	if (($dayStart == '' || $dayStart > $ztaufrow->start) && $ztaufrow->aktivitaet_kurzbz != $toignore[1])
 		$dayStart = $ztaufrow->start;
-	if (($dayEnd == '' || $date->mktime_fromtimestamp($date->formatDatum($dayEnd, $format = 'Y-m-d H:i:s')) < $date->mktime_fromtimestamp($date->formatDatum($ztaufrow->ende, $format = 'Y-m-d H:i:s'))) && $ztaufrow->aktivitaet_kurzbz != $toignore[1])
+	if (($dayEnd == '' || $dayEnd < $ztaufrow->ende) && $ztaufrow->aktivitaet_kurzbz != $toignore[1])
 		$dayEnd = $ztaufrow->ende;
 
 	if ($isFirstEntry)
@@ -141,7 +151,7 @@ for ($i = 0; $i < sizeof($ztaufdata); $i++)
 
 			$toadd = 0.00;
 			//case 1: there is no overlap, just add project time difference
-			if ($date->mktime_fromtimestamp($ztaufrow->start) > $date->mktime_fromtimestamp($lastende))
+			if ($ztaufrow->start >= $lastende)
 			{
 				$toadd = $date->convertTimeStringToHours($ztaufrow->diff);
 				$laststart = $ztaufrow->start;
@@ -152,13 +162,13 @@ for ($i = 0; $i < sizeof($ztaufdata); $i++)
 				$projectlines[$day]->projekte[$ztaufrow->projekt_kurzbz]->alleZeiten[] = $newprojecttime;
 			}
 			//case 2: overlap - add only part of the time
-			elseif ($date->mktime_fromtimestamp($ztaufrow->start) < $date->mktime_fromtimestamp($lastende) && $date->mktime_fromtimestamp($ztaufrow->ende) > $date->mktime_fromtimestamp($lastende))
+			elseif ($ztaufrow->start < $lastende && $ztaufrow->ende > $lastende)
 			{
 				$toadd = ($date->mktime_fromtimestamp($ztaufrow->ende) - $date->mktime_fromtimestamp($lastende)) / 3600;
 				$lastende = $ztaufrow->ende;
 				$alleZeiten =& $projectlines[$day]->projekte[$ztaufrow->projekt_kurzbz]->alleZeiten;
 				$index = count($alleZeiten);
-				$alleZeiten[$index-1]->ende = $ztaufrow->ende;
+				$alleZeiten[$index - 1]->ende = $ztaufrow->ende;
 			}
 			$projectlines[$day]->projekte[$ztaufrow->projekt_kurzbz]->stunden += $toadd;
 
@@ -201,14 +211,14 @@ for ($i = 0; $i < sizeof($ztaufdata); $i++)
 
 	if ($isLastEntry)
 	{
-		$worktime_unix = $date->mktime_fromtimestamp($date->formatDatum($dayEnd, $format = 'Y-m-d H:i:s')) - $date->mktime_fromtimestamp($date->formatDatum($dayStart, $format = 'Y-m-d H:i:s'));
+		$worktime_unix = $date->mktime_fromtimestamp($dayEnd) - $date->mktime_fromtimestamp($dayStart);
 		$worktimehours = $worktime_unix / 3600;
 
 		$projectlines[$day]->arbeitszeit = $worktimehours;
 		$pauseSubtracted = 0.00;
 		$lehreExternExists = false;
 
-		//subtract Pauses and LehreExtern
+		//subtract pauses and LehreExtern from total worktime
 		foreach ($tosubtract as $subtraction)
 		{
 			if ($subtraction->typ == $toignore[0])
@@ -223,32 +233,33 @@ for ($i = 0; $i < sizeof($ztaufdata); $i++)
 			}
 		}
 
-		//subtract pauses from Project worktimes
-		foreach($allpauseranges as $pauserange)
+		//subtract pauses from project worktimes
+		foreach ($allpauseranges as $pauserange)
 		{
-			foreach($projectlines[$day]->projekte as $name => $project)
+			foreach ($projectlines[$day]->projekte as $name => $project)
 			{
-				foreach($projectlines[$day]->projekte[$name]->alleZeiten as $zeit)
+				foreach ($projectlines[$day]->projekte[$name]->alleZeiten as $zeit)
 				{
-					if($pauserange->start >= $zeit->start && $pauserange->ende <= $zeit->ende)
+					//pause between project start and end
+					if ($pauserange->start >= $zeit->start && $pauserange->ende <= $zeit->ende)
 					{
 						$projectlines[$day]->projekte[$name]->stunden -= ($date->mktime_fromtimestamp($pauserange->ende) - $date->mktime_fromtimestamp($pauserange->start)) / 3600;
 						break;
 					}
-					elseif($pauserange->start < $zeit->ende && $pauserange->start > $zeit->start)
+					//pause and project time overlap at project time end
+					elseif ($pauserange->start < $zeit->ende && $pauserange->start > $zeit->start)
 					{
 						$projectlines[$day]->projekte[$name]->stunden -= ($date->mktime_fromtimestamp($zeit->ende) - $date->mktime_fromtimestamp($pauserange->start)) / 3600;
-						//break;
 					}
-					elseif($pauserange->ende > $zeit->start && $pauserange->ende< $zeit->ende)
+					//pause and project time overlap at project time start
+					elseif ($pauserange->ende > $zeit->start && $pauserange->ende < $zeit->ende)
 					{
 						$projectlines[$day]->projekte[$name]->stunden -= ($date->mktime_fromtimestamp($pauserange->ende) - $date->mktime_fromtimestamp($zeit->start)) / 3600;
-						//break;
 					}
 				}
 			}
 		}
-		
+
 		//worktime with no break greater 6 -> compulsory break of half an hour
 		if ($pauseSubtracted < 0.5 && !$lehreExternExists)
 		{
@@ -262,7 +273,7 @@ for ($i = 0; $i < sizeof($ztaufdata); $i++)
 
 		$projectlines[$day]->arbeitszeit = floor($projectlines[$day]->arbeitszeit * 100) / 100;
 
-		foreach($projectlines[$day]->projekte as $name => $project)
+		foreach ($projectlines[$day]->projekte as $name => $project)
 		{
 			$projecthours =& $projectlines[$day]->projekte[$name]->stunden;
 			$projecthours = floor($projecthours * 100) / 100;
@@ -283,10 +294,10 @@ $workbook = new Spreadsheet_Excel_Writer();
 $workbook->setVersion(8);
 
 // sending HTTP headers
-$workbook->send("Projektliste_".$month."_".$year.".xls");
+$workbook->send('Projektliste_'.$month.'_'.$year.'.xls');
 
 // Creating a worksheet
-$worksheet =& $workbook->addWorksheet("Projektliste");
+$worksheet =& $workbook->addWorksheet($p->t('zeitaufzeichnung/projektliste'));
 $worksheet->setInputEncoding('utf-8');
 
 // Define formats
@@ -308,6 +319,12 @@ $format_heading_right_bottomline =& $workbook->addFormat();
 $format_heading_right_bottomline->setAlign('right');
 $format_heading_right_bottomline->setRight(2);
 $format_heading_right_bottomline->setBottom(2);
+
+$format_heading_bottomline =& $workbook->addFormat();
+$format_heading_bottomline->setBottom(2);
+
+$format_heading_topline =& $workbook->addFormat();
+$format_heading_topline->setTop(2);
 
 $format_bold_centered_toprightline =& $workbook->addFormat();
 $format_bold_centered_toprightline->setBorder(1);
@@ -349,7 +366,9 @@ $format_cell_centered->setAlign('center');
 $format_cell_centered->setVAlign('vcenter');
 
 $format_cell_centered_leftline =& $workbook->addFormat();
-$format_cell_centered_leftline->setBorder(1);
+$format_cell_centered_leftline->setRight(1);
+$format_cell_centered_leftline->setLeft(1);
+$format_cell_centered_leftline->setBottom(1);
 $format_cell_centered_leftline->setAlign('center');
 $format_cell_centered_leftline->setVAlign('vcenter');
 $format_cell_centered_leftline->setLeft(2);
@@ -382,9 +401,9 @@ $format_cell_centered_alllines->setAlign('center');
 $format_cell_centered_alllines->setVAlign('vcenter');
 
 //define column widths
-$nrProjects = sizeof($projectnames);
+$nrProjects = count($projectnames);
 $daywidth = 4;
-$totalworktimewidth = 10;
+$totalworktimewidth = 13;
 $worktimewidth = 8;
 $worksheet->setColumn(0, 1, $daywidth);
 $worksheet->setColumn(2, 2, $totalworktimewidth);
@@ -412,35 +431,48 @@ foreach ($projectcolumnwidths as $projectname => $width)
 
 //calculating spaces for centering global header texts
 $numberspaces = ($maxwidthprojects - 10 - strlen($username));
-$spacesstringFirst = "";
+$spacesstringFirst = '';
 
 while ($numberspaces > 0)
 {
-	$spacesstringFirst .= " ";
+	$spacesstringFirst .= ' ';
 	$numberspaces--;
 }
 
 $numberspaces = ($maxwidthprojects - 14 - strlen($persnr));
-$spacesstringSecond = "";
+$spacesstringSecond = '';
 while ($numberspaces > 0)
 {
-	$spacesstringSecond .= " ";
+	$spacesstringSecond .= ' ';
 	$numberspaces--;
 }
 
 $spalte = $zeile = 0;
 
-//write global header
-$lastspalte = ($nrProjects > 0) ? 2 + sizeof($projectnames) * 2 : 14;
-$worksheet->setMerge($zeile, $spalte, $zeile + 1, $spalte + 2);
-$worksheet->write($zeile, $spalte, $monthtext." ".$year, $format_heading_left);
-$worksheet->write($zeile + 1, $spalte, "", $format_heading_left);
+//set language options
+$decpoint = $sprache_index === '2' ? '.' : ',';
+$thousandsep = $sprache_index === '2' ? ',' : '.';
 
+//write global header
+$lastspalte = ($nrProjects > 0) ? 2 + count($projectnames) * 2 : 14;
+$worksheet->setMerge($zeile, $spalte, $zeile + 1, $spalte + 2);
+$worksheet->write($zeile, $spalte, $monthtext.' '.$year, $format_heading_left);
+$worksheet->write($zeile + 1, $spalte, $monthtext.' '.$year, $format_heading_left);
+for ($i = 1; $i < 3; $i++)
+{
+	$worksheet->write($zeile, $spalte + $i, '', $format_heading_topline);
+	$worksheet->write($zeile + 1, $spalte + $i, '', $format_heading_bottomline);
+}
 $worksheet->setMerge($zeile, $spalte + 3, $zeile, $lastspalte);
 $worksheet->setMerge($zeile + 1, $spalte + 3, $zeile + 1, $lastspalte);
-$worksheet->write($zeile, $spalte + 3, "Projektliste gedruckt am:".$spacesstringFirst.$username, $format_heading_right);
+$worksheet->write($zeile, $spalte + 3, $p->t('zeitaufzeichnung/projektlistegedruckt').$spacesstringFirst.$username, $format_heading_right);
+for ($i = 4; $i < $lastspalte; $i++)
+{
+	$worksheet->write($zeile, $i, '', $format_heading_topline);
+	$worksheet->write($zeile + 1, $i, '', $format_heading_bottomline);
+}
 $worksheet->write($zeile, $lastspalte, '', $format_heading_right);
-$worksheet->write($zeile + 1, $spalte + 3, date('d.m.Y H:i').$spacesstringSecond.'Personal-Nr.:'.$persnr, $format_heading_right_bottomline);
+$worksheet->write($zeile + 1, $spalte + 3, date('d.m.Y H:i').$spacesstringSecond.$p->t('zeitaufzeichnung/personalnr').$persnr, $format_heading_right_bottomline);
 $worksheet->write($zeile + 1, $lastspalte, '', $format_heading_right_bottomline);
 $zeile += 3;
 
@@ -451,20 +483,22 @@ $worksheet->hideScreenGridlines();
 
 //write table header
 $worksheet->setMerge($zeile, $spalte, $zeile + 1, $spalte + 1);
-$worksheet->write($zeile, $spalte, "Tag", $format_bold_centered_alllines);
-$worksheet->write($zeile + 1, $spalte++, "", $format_bold_centered_alllines);
+$worksheet->write($zeile, $spalte, $p->t('zeitaufzeichnung/tag'), $format_bold_centered_alllines);
+$worksheet->write($zeile + 1, $spalte, '', $format_bold_centered_alllines);
+$worksheet->write($zeile, $spalte + 1, $p->t('zeitaufzeichnung/tag'), $format_bold_centered_alllines);
+$worksheet->write($zeile + 1, ++$spalte, '', $format_bold_centered_alllines);
 $worksheet->setMerge($zeile, ++$spalte, $zeile + 1, $spalte);
-$worksheet->write($zeile, $spalte, "Arbeitszeit", $format_bold_centered_alllines);
-$worksheet->write($zeile + 1, $spalte, "", $format_bold_centered_alllines);
+$worksheet->write($zeile, $spalte, $p->t('zeitaufzeichnung/arbeitszeit'), $format_bold_centered_alllines);
+$worksheet->write($zeile + 1, $spalte, '', $format_bold_centered_alllines);
 $spalte++;
 
 foreach ($projectnames as $project)
 {
 	$worksheet->setMerge($zeile, $spalte, $zeile, $spalte + 1);
 	$worksheet->write($zeile, $spalte, $project, $format_bold_centered_toprightline);
-	$worksheet->write($zeile, $spalte + 1, "", $format_bold_centered_toprightline);
-	$worksheet->write($zeile + 1, $spalte, "Stunden", $format_bold_centered_bottomline);
-	$worksheet->write($zeile + 1, $spalte + 1, "Tätigkeit", $format_bold_centered_bottomrightline);
+	$worksheet->write($zeile, $spalte + 1, '', $format_bold_centered_toprightline);
+	$worksheet->write($zeile + 1, $spalte, $p->t('zeitaufzeichnung/stunden'), $format_bold_centered_bottomline);
+	$worksheet->write($zeile + 1, $spalte + 1, $p->t('zeitaufzeichnung/taetigkeit'), $format_bold_centered_bottomrightline);
 	$spalte += 2;
 }
 $zeile += 2;
@@ -477,14 +511,14 @@ for ($daysnmbr = 1; $daysnmbr <= $daysinmonth; $daysnmbr++)
 	$monthstr = ($month < 10) ? '0'.$month : $month;
 	$daystr = ($daysnmbr < 10) ? '0'.$daysnmbr : $daysnmbr;
 	$datestring = $year.'-'.$monthstr.'-'.$daystr;
-	$weekday = substr($tagbez[1][$date->formatDatum($datestring, 'N')], 0, 2);
+	$weekday = substr($tagbez[$sprache_index][$date->formatDatum($datestring, 'N')], 0, 2);
 	$worksheet->write($zeile, $spalte++, $weekday, $format_cell_centered_leftline);
 	$worksheet->write($zeile, $spalte++, $daysnmbr, $format_cell_centered_rightline);
 
 	if (array_key_exists($daysnmbr, $projectlines))
 	{
 		//write worktime
-		$worksheet->write($zeile, $spalte++, number_format($projectlines[$daysnmbr]->arbeitszeit, 2, ",", "."), $format_cell_centered_rightline);
+		$worksheet->writeString($zeile, $spalte++, number_format($projectlines[$daysnmbr]->arbeitszeit, 2, $decpoint, $thousandsep), $format_cell_centered_rightline);
 		$spaltetemp = $spalte;
 		//write projects
 		foreach ($projectnames as $project)
@@ -492,7 +526,7 @@ for ($daysnmbr = 1; $daysnmbr <= $daysinmonth; $daysnmbr++)
 			if (array_key_exists($project, $projectlines[$daysnmbr]->projekte))
 			{
 				$worksheet->setColumn($spalte, $spalte, $worktimewidth);
-				$worksheet->write($zeile, $spalte++, number_format($projectlines[$daysnmbr]->projekte[$project]->stunden, 2, ",", "."), $format_cell_centered_leftline);
+				$worksheet->writeString($zeile, $spalte++, number_format($projectlines[$daysnmbr]->projekte[$project]->stunden, 2, $decpoint, $thousandsep), $format_cell_centered_leftline);
 				$worksheet->setColumn($spalte, $spalte, $projectcolumnwidths[$project]);
 				$worksheet->write($zeile, $spalte++, $projectlines[$daysnmbr]->projekte[$project]->beschreibung, $format_cell_rightline);
 			}
@@ -505,15 +539,16 @@ for ($daysnmbr = 1; $daysnmbr <= $daysinmonth; $daysnmbr++)
 	}
 	else
 	{
-		//write empty cells
-		$worksheet->write($zeile, $spalte, '0,00', $format_cell_centered_rightline);
-		$toskip = sizeof($projectnames) * 2;
+		//write empty cells until end of table
+		$worksheet->writeString($zeile, $spalte, number_format(0, 2, $decpoint, $thousandsep), $format_cell_centered_leftline);
+		$toskip = count($projectnames) * 2;
 		for ($i = 0; $i <= $toskip; $i++)
 		{
 			if ($i % 2 == 0)
-				$worksheet->write($zeile, $spalte++, '', $format_cell_centered_rightline);
+				$worksheet->write($zeile, $spalte, '', $format_cell_centered_rightline);
 			else
-				$worksheet->write($zeile, $spalte++, '', $format_cell_centered);
+				$worksheet->write($zeile, $spalte, '', $format_cell_centered);
+			$spalte++;
 		}
 	}
 	$zeile++;
@@ -523,22 +558,21 @@ if ($nrProjects < 1)
 	//no projects - merge all cells and write notice
 {
 	$worksheet->setMerge(3, 3, 4 + $daysinmonth, $lastspalte);
-	$worksheet->write(3, 3, "keine Projekte vorhanden", $format_bold_centered_alllines);
-	$worksheet->write(3, $lastspalte, "", $format_bold_centered_alllines);
+	$worksheet->write(3, 3, $p->t('zeitaufzeichnung/keineprojekte'), $format_bold_centered_alllines);
+	$worksheet->write(3, $lastspalte, '', $format_bold_centered_alllines);
 }
 
 //write monthly sums
 $spalte = 0;
 $worksheet->setMerge($zeile, $spalte, $zeile, $spalte + 1);
-$worksheet->write($zeile, $spalte, 'Summe:', $format_bold_centered_alllines);
+$worksheet->write($zeile, $spalte, $p->t('zeitaufzeichnung/summe'), $format_bold_centered_alllines);
+$worksheet->write($zeile, $spalte + 1, '', $format_bold_centered_alllines);
 $spalte += 2;
-$worksheet->write($zeile, $spalte++, number_format($monthsums[0], 2, ",", "."), $format_cell_centered_alllines);
+$worksheet->writeString($zeile, $spalte++, number_format($monthsums[0], 2, $decpoint, $thousandsep), $format_cell_centered_alllines);
 foreach ($projectnames as $project)
 {
-	$worksheet->write($zeile, $spalte++, number_format($monthsums[$project], 2, ",", "."), $format_cell_centered_topbottomleftline);
-	$worksheet->write($zeile, $spalte++, "", $format_cell_centered_topbottomrightline);
+	$worksheet->writeString($zeile, $spalte++, number_format($monthsums[$project], 2, $decpoint, $thousandsep), $format_cell_centered_topbottomleftline);
+	$worksheet->write($zeile, $spalte++, '', $format_cell_centered_topbottomrightline);
 }
-
 $worksheet->fitToPages(1, 1);
 $workbook->close();
-

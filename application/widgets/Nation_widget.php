@@ -13,8 +13,8 @@ class Nation_widget extends DropdownWidget
 		$this->setElementsArray(
 			$this->NationModel->load(),
 			true,
-			'Select a nation...',
-			'No nation found'
+			'Nation wählen...',
+			'keine Nation gefunden'
 		);
 
 		$this->loadDropDownView($widgetData);

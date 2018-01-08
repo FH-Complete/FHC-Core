@@ -45,6 +45,9 @@ require_once('../../../include/benutzerberechtigung.class.php');
 
 $sprache = getSprache();
 $p=new phrasen($sprache);
+$sprache_obj = new sprache();
+$sprache_obj->load($sprache);
+$sprache_index=$sprache_obj->index;
 
 if (!$db = new basis_db())
 	die($p->t("global/fehlerBeimOeffnenDerDatenbankverbindung"));
@@ -726,7 +729,7 @@ if($projekt->getProjekteMitarbeiter($user, true))
 		      			
 		      			<a href='".$_SERVER['PHP_SELF']."?csvexport=1' style='font-size: larger;'>CSV Export</a>";
 		      			if($anzprojekte > 0)
-		      				echo "<a style='font-size: larger; text-decoration: none; cursor: default'> | </a><a href='".$_SERVER['PHP_SELF']."?projektexport=1' style='font-size: larger;'>Projektexport</a>";
+		      				echo "<a style='font-size: larger; text-decoration: none; cursor: default'> | </a><a href='".$_SERVER['PHP_SELF']."?projektexport=1' style='font-size: larger;'>".$p->t("zeitaufzeichnung/projektexport")."</a>";
 				echo "</td>
 		      		<td class='menubox' height='10px'>";
 		if ($p->t("dms_link/handbuchZeitaufzeichnung")!='')
@@ -753,15 +756,15 @@ if($projekt->getProjekteMitarbeiter($user, true))
 			$jahreanz = 3;
 			echo '<form action="'.$projektexpurl.'" method="GET">';
 			echo '<tr><td colspan="4"><hr></td></tr>';
-			echo '<tr><td>Projektexport</td>';
-			echo '<td align="center">Monat: <select id="projexpmonat" name="projexpmonat">';
+			echo '<tr><td>'.$p->t('zeitaufzeichnung/projektexport').'</td>';
+			echo '<td align="center">'.$p->t('zeitaufzeichnung/monat').' <select id="projexpmonat" name="projexpmonat">';
 			for($i=1;$i<13;$i++)
 			{
 				$selected = ($i == $aktmonat)?'selected = "selected"':'';
-				echo '<option value="'.$i.'" '.$selected.'>'.$monatsname[1][$i - 1].'</option>';
+				echo '<option value="'.$i.'" '.$selected.'>'.$monatsname[$sprache_index][$i - 1].'</option>';
 			}
 			echo '</select></td>';
-			echo '<td align="center">Jahr: <select id="projexpjahr" name="projexpjahr">';
+			echo '<td align="center">'.$p->t('zeitaufzeichnung/jahr').' <select id="projexpjahr" name="projexpjahr">';
 			for(;$jahreanz>0;$jahreanz--)
 			{
 				echo '<option value="'.$aktjahr.'">'.$aktjahr.'</option>';
@@ -795,8 +798,8 @@ if($projekt->getProjekteMitarbeiter($user, true))
 			echo '<form action="'.$_SERVER['PHP_SELF'].'" method="POST" onsubmit="return checkdatumCSVExp(\'exp_von_datum\', \'exp_bis_datum\')">';
 			echo '<tr><td colspan="4"><hr></td></tr>';
 			echo '<tr><td>CSV-Export</td>';
-			echo '<td>Startdatum: <input class="datepicker_datum" id="exp_von_datum" name="exp_von_datum" size="9" type="text" value="'.date('d.m.Y', strtotime('first day of previous month')).'" /></td>';
-			echo '<td align="right">Enddatum: <input class="datepicker_datum" id="exp_bis_datum" name="exp_bis_datum" size="9" type="text"  value="'.date('d.m.Y', strtotime('last day of previous month')).'" /></td>';
+			echo '<td>'.$p->t('zeitaufzeichnung/startdatum').' <input class="datepicker_datum" id="exp_von_datum" name="exp_von_datum" size="9" type="text" value="'.date('d.m.Y', strtotime('first day of previous month')).'" /></td>';
+			echo '<td align="right">'.$p->t('zeitaufzeichnung/enddatum').' <input class="datepicker_datum" id="exp_bis_datum" name="exp_bis_datum" size="9" type="text"  value="'.date('d.m.Y', strtotime('last day of previous month')).'" /></td>';
 			echo '<td align="right"><input type="submit" value="Export" name="export"></td></tr>';
 			echo '<tr><td></td><td colspan="3"></td></tr>';
 			echo '<tr><td colspan="4"><hr></td></tr>';

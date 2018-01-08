@@ -46,7 +46,8 @@ class PersonLogLib
 	}
 
 	/**
-	 * Gets Logs for a Person, filtered by Parameters
+	 * Gets Logs for a Person, filtered by parameters.
+	 * Requirements for retrieving log: name is set
 	 * @param int $person_id ID of the Person.
 	 * @param string $app Name of the App.
 	 * @param string $oe_kurzbz Organisations Unit.
@@ -55,8 +56,23 @@ class PersonLogLib
 	public function getLogs($person_id, $app = null, $oe_kurzbz = null)
 	{
 		$result = $this->ci->PersonLogModel->filterLog($person_id, $app, $oe_kurzbz);
+
 		if (isSuccess($result))
-			return $result->retval;
+		{
+			$decoded_logs = array();
+			//decode logs
+			foreach ($result->retval as $log)
+			{
+				$log->logdata = json_decode($log->logdata);
+				//requirement - logname not null
+				if (isset($log->logdata->name))
+				{
+					$decoded_logs[] = $log;
+				}
+			}
+
+			return $decoded_logs;
+		}
 		else
 			show_error($result->retval);
 	}

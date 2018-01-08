@@ -1,11 +1,11 @@
 <?php
 	function _printLists($listFilters)
 	{
-		foreach ($listFilters as $name => $filterId)
+		foreach ($listFilters as $filterId => $description)
 		{
 			$toPrint = '<div><a href="%s=%s">%s</a></div>';
 
-			echo sprintf($toPrint, base_url('index.ci.php/system/infocenter/InfoCenter?filterId'), $filterId, $name).PHP_EOL;
+			echo sprintf($toPrint, base_url('index.ci.php/system/infocenter/InfoCenter?filterId'), $filterId, $description).PHP_EOL;
 		}
 	}
 

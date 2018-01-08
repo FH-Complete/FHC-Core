@@ -9,6 +9,10 @@ $customJSs = isset($customJSs) ? $customJSs : null;
 
 // By default set the parameters to false
 $jquery3 = isset($jquery3) ? $jquery3 : false;
+$jqueryui = isset($jqueryui) ? $jqueryui : false;
+$bootstrap = isset($bootstrap) ? $bootstrap : false;
+$fontawesome = isset($fontawesome) ? $fontawesome : false;
+$datatables = isset($datatables) ? $datatables : false;
 $tablesorter = isset($tablesorter) ? $tablesorter : false;
 
 /**
@@ -80,24 +84,44 @@ function _generateJSsInclude($JSs)
 
 		<meta charset="UTF-8">
 
-		<link rel="shortcut icon" type="image/x-icon" href="<?php echo base_url('skin/images/Vilesci.ico'); ?>" />
-		<link rel="stylesheet"    type="text/css"     href="<?php echo base_url('skin/vilesci.css'); ?>" />
-
 		<?php
 			// --------------------------------------------------------------------------------------------------------
 			// CSS
 
-			// Eventually required CSS
-			_generateCSSsInclude($customCSSs); // Eventually required CSS
-
+			// jQuery UI CSS
+			if ($jqueryui === true) _generateCSSsInclude('vendor/components/jqueryui/themes/base/jquery-ui.min.css');
+			// bootstrap CSS
+			if ($bootstrap === true) _generateCSSsInclude('vendor/components/bootstrap/css/bootstrap.min.css');
+			// font awesome CSS
+			if ($fontawesome === true) _generateCSSsInclude('vendor/components/font-awesome/css/font-awesome.min.css');
+			// datatables CSS
+			if ($datatables === true)
+			{
+				_generateCSSsInclude('vendor/datatables/datatables/media/css/dataTables.bootstrap.min.css');
+			}
 			// Table sorter CSS
 			if ($tablesorter === true) _generateCSSsInclude('skin/tablesort.css');
+
+			// Eventually required CSS
+			_generateCSSsInclude($customCSSs); // Eventually required CSS
 
 			// --------------------------------------------------------------------------------------------------------
 			// Javascripts
 
 			// JQuery V3
 			if ($jquery3 === true) _generateJSsInclude('vendor/components/jquery/jquery.min.js');
+			// JQuery UI
+			if ($jqueryui === true) _generateJSsInclude('vendor/components/jqueryui/jquery-ui.min.js');
+			// bootstrap JS
+			if ($bootstrap === true) _generateJSsInclude('vendor/components/bootstrap/js/bootstrap.min.js');
+			// datatables JS
+			if ($datatables === true)
+			{
+			 	_generateJSsInclude('vendor/datatables/datatables/media/js/jquery.dataTables.js');
+				_generateJSsInclude('vendor/datatables/datatables/media/js/dataTables.bootstrap.min.js');
+				_generateJSsInclude('vendor/moment/moment/min/moment.min.js');
+				_generateJSsInclude('vendor/datatables/plugins/sorting/datetime-moment.js');
+			}
 			// Table sorter JS
 			if ($tablesorter === true) _generateJSsInclude('vendor/christianbach/tablesorter/jquery.tablesorter.min.js');
 

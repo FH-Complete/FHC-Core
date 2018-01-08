@@ -4,9 +4,19 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "e528bc5e31312080d7db9b1b3ae4033b",
-    "content-hash": "69612123f7b612e61cf1e0368e01ee27",
+    "hash": "28942746c1b00b590a3d3cb43cd21606",
+    "content-hash": "2c99452d2bf338a1d1e3462197ab25b7",
     "packages": [
+        {
+            "name": "BlackrockDigital/startbootstrap-sb-admin-2",
+            "version": "3.3.7",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/BlackrockDigital/startbootstrap-sb-admin-2.git",
+                "reference": "master"
+            },
+            "type": "library"
+        },
         {
             "name": "alvaro-prieto/colResizable",
             "version": "1.6",
@@ -463,6 +473,41 @@
             "time": "2015-06-17 06:08:09"
         },
         {
+            "name": "components/font-awesome",
+            "version": "4.7.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/components/font-awesome.git",
+                "reference": "885308b939369d147bec93174722786bc2c4eedd"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/components/font-awesome/zipball/885308b939369d147bec93174722786bc2c4eedd",
+                "reference": "885308b939369d147bec93174722786bc2c4eedd",
+                "shasum": ""
+            },
+            "type": "component",
+            "extra": {
+                "component": {
+                    "styles": [
+                        "css/font-awesome.css"
+                    ],
+                    "files": [
+                        "css/font-awesome.min.css",
+                        "css/font-awesome.css.map",
+                        "fonts/*"
+                    ]
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT",
+                "OFL-1.1"
+            ],
+            "description": "The iconic font designed for use with Twitter Bootstrap.",
+            "time": "2016-10-25 10:56:23"
+        },
+        {
             "name": "components/jquery",
             "version": "2.1.4",
             "source": {
@@ -634,6 +679,39 @@
             ],
             "description": "jQuery UI is a curated set of user interface interactions, effects, widgets, and themes built on top of the jQuery JavaScript Library. Whether you're building highly interactive web applications or you just need to add a date picker to a form control, jQuery UI is the perfect choice.",
             "time": "2016-09-16 05:47:55"
+        },
+        {
+            "name": "datatables/datatables",
+            "version": "1.10.16",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/DataTables/DataTables.git",
+                "reference": "75a665f64f02982c0f4666b15a25c4670e5e6b18"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/DataTables/DataTables/zipball/75a665f64f02982c0f4666b15a25c4670e5e6b18",
+                "reference": "75a665f64f02982c0f4666b15a25c4670e5e6b18",
+                "shasum": ""
+            },
+            "type": "library",
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "description": "DataTables is a plug-in for the jQuery Javascript library. It is a highly flexible tool, based upon the foundations of progressive enhancement, which will add advanced interaction controls to any HTML table.",
+            "homepage": "http://www.datatables.net/",
+            "time": "2017-08-31 13:52:17"
+        },
+        {
+            "name": "datatables/plugins",
+            "version": "3.3.7",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/DataTables/Plugins.git",
+                "reference": "master"
+            },
+            "type": "library"
         },
         {
             "name": "easyrdf/easyrdf",
@@ -1197,6 +1275,60 @@
                 "jsonld"
             ],
             "time": "2016-10-10 08:57:56"
+        },
+        {
+            "name": "moment/moment",
+            "version": "2.20.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/moment/moment.git",
+                "reference": "03073778ec18ee38e179208cd1af899e8d1848dc"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/moment/moment/zipball/03073778ec18ee38e179208cd1af899e8d1848dc",
+                "reference": "03073778ec18ee38e179208cd1af899e8d1848dc",
+                "shasum": ""
+            },
+            "require": {
+                "robloach/component-installer": "*"
+            },
+            "type": "component",
+            "extra": {
+                "component": {
+                    "scripts": [
+                        "moment.js"
+                    ],
+                    "files": [
+                        "min/*.js",
+                        "locale/*.js"
+                    ]
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Tim Wood",
+                    "email": "washwithcare@gmail.com"
+                }
+            ],
+            "description": "Parse, validate, manipulate, and display dates in JavaScript.",
+            "homepage": "https://github.com/moment/moment",
+            "keywords": [
+                "date",
+                "ender",
+                "format",
+                "i18n",
+                "l10n",
+                "moment",
+                "parse",
+                "time",
+                "validate"
+            ],
+            "time": "2017-12-19 04:36:30"
         },
         {
             "name": "netcarver/textile",
@@ -1840,16 +1972,16 @@
         },
         {
             "name": "symfony/polyfill-mbstring",
-            "version": "v1.5.0",
+            "version": "v1.6.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/polyfill-mbstring.git",
-                "reference": "7c8fae0ac1d216eb54349e6a8baa57d515fe8803"
+                "reference": "2ec8b39c38cb16674bbf3fea2b6ce5bf117e1296"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/polyfill-mbstring/zipball/7c8fae0ac1d216eb54349e6a8baa57d515fe8803",
-                "reference": "7c8fae0ac1d216eb54349e6a8baa57d515fe8803",
+                "url": "https://api.github.com/repos/symfony/polyfill-mbstring/zipball/2ec8b39c38cb16674bbf3fea2b6ce5bf117e1296",
+                "reference": "2ec8b39c38cb16674bbf3fea2b6ce5bf117e1296",
                 "shasum": ""
             },
             "require": {
@@ -1861,7 +1993,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "1.5-dev"
+                    "dev-master": "1.6-dev"
                 }
             },
             "autoload": {
@@ -1895,7 +2027,7 @@
                 "portable",
                 "shim"
             ],
-            "time": "2017-06-14 15:44:48"
+            "time": "2017-10-11 12:05:26"
         },
         {
             "name": "symfony/process",
@@ -2008,16 +2140,16 @@
         },
         {
             "name": "tinymce/tinymce",
-            "version": "4.7.1",
+            "version": "4.7.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/tinymce/tinymce-dist.git",
-                "reference": "4fd91026d3765fee9b148b5e684b014a8e18ead1"
+                "reference": "2639396a6d5eb8db7457ed4f6de6f5d15303ef52"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/tinymce/tinymce-dist/zipball/4fd91026d3765fee9b148b5e684b014a8e18ead1",
-                "reference": "4fd91026d3765fee9b148b5e684b014a8e18ead1",
+                "url": "https://api.github.com/repos/tinymce/tinymce-dist/zipball/2639396a6d5eb8db7457ed4f6de6f5d15303ef52",
+                "reference": "2639396a6d5eb8db7457ed4f6de6f5d15303ef52",
                 "shasum": ""
             },
             "type": "component",
@@ -2050,7 +2182,7 @@
                 "tinymce",
                 "wysiwyg"
             ],
-            "time": "2017-10-09 13:17:31"
+            "time": "2017-11-07 12:44:31"
         },
         {
             "name": "tomazdragar/SimpleCropper",

@@ -125,8 +125,8 @@ function loadStudienordnung()
 			$("#studienplan").html("Bitte wählen Sie zuerst eine Studienordnung aus!");
 			drawStudienordnungen(data.result);
 			//jqUi( "#menueLinks" ).accordion("option","active",1);
-		}                
-           neueStudienordnung();            
+		}
+           neueStudienordnung();
 	});
 }
 
@@ -138,12 +138,12 @@ function drawStudienordnungen(data)
 {
 	var obj='<a href="#Neu" onclick="neueStudienordnung();return false;">Neue Studienordnung</a><ul style="padding-left: 15px">';
 
-	for(i in data)      
+	for(i in data)
 	{
 		if(data[i].studienordnung_id !== null)
 		{
                     obj = obj + '<li>'
-                            +' <a style="white-space:nowrap" href="#Load'+data[i].studienordnung_id+'" onclick="loadStudienplanSTO('+data[i].studienordnung_id+','+data[i].studienplan_id+',\''+data[i].bezeichnung+'\',);return false;">'+data[i].bezeichnung+'</a>&nbsp;'
+                            +' <a style="white-space:nowrap" href="#Load'+data[i].studienordnung_id+'" onclick="loadStudienplanSTO('+data[i].studienordnung_id+','+data[i].studienplan_id+',\''+data[i].bezeichnung+'\');return false;">'+data[i].bezeichnung+'</a>&nbsp;'
                             +' <a href="#Copy'+data[i].studienordnung_id+'" onclick="copyStudienordnung('+data[i].studienordnung_id+');return false;"><img title="Studienordnung kopieren" src="../../skin/images/copy.png"></a>&nbsp;&nbsp;&nbsp;'
                             +' <a href="../../content/pdfExport.php?xml=studienordnung.rdf.php&xsl=Studienordnung&studienordnung_id='+data[i].studienordnung_id+'&stg_kz=0&output=doc"><img style="cursor:pointer; height: 16px;" title="Studienordnung als Word-Dokument exportieren" src="../../skin/images/doc_icon.png"></a>'
                             +' <a href="../../content/pdfExport.php?xml=studienordnung.rdf.php&xsl=Studienordnung&studienordnung_id='+data[i].studienordnung_id+'&stg_kz=0&output=pdf"><img style="cursor:pointer; height: 16px;" title="Studienordnung als PDF-Dokument exportieren" src="../../skin/images/pdf_icon.png"></a>'
@@ -174,7 +174,7 @@ function loadStudienplanSTO(neue_studienordnung_id, studienplan_id,bezeichnung)
 				"typ": "json",
 				"class": "studienplan",
 				"method":	"loadStudienplanSTO",
-				"parameter_0": global_studienordnung_id                            
+				"parameter_0": global_studienordnung_id
 			},
 		error: loadError
 	}).success(function(data)
@@ -1455,7 +1455,7 @@ function writeOverallSum(root)
  */
 function semesterSTPLZuordnung()
 {
-	drawHeader('Neue Studienplan Zuordnung');     
+	drawHeader('Neue Studienplan Zuordnung');
 	$("#data").load('studienordnung.inc.php?method=semesterSTPLZuordnung&studienplan_id='+global_studienplan_id);
 }
 

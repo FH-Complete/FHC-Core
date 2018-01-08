@@ -131,5 +131,18 @@ class Notiz_model extends DB_Model
 
 		return $result;
 	}
+
+	/**
+	 * gets all Notizen for a person
+	 * @param $person_id
+	 */
+	public function getNotiz($person_id)
+	{
+		// Join with the table public.tbl_notizzuordnung using notiz_id
+		$this->addJoin('public.tbl_notizzuordnung', 'notiz_id');
+
+		return $this->loadWhere(array('person_id' => $person_id));
+	}
 	// ------------------------------------------------------------------------------------------------------
+
 }
