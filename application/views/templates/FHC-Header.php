@@ -11,8 +11,8 @@ $customJSs = isset($customJSs) ? $customJSs : null;
 $jquery3 = isset($jquery3) ? $jquery3 : false;
 $jqueryui = isset($jqueryui) ? $jqueryui : false;
 $bootstrap = isset($bootstrap) ? $bootstrap : false;
-$fontawesome= isset($fontawesome) ? $fontawesome : false;
-$datatables= isset($datatables) ? $datatables : false;
+$fontawesome = isset($fontawesome) ? $fontawesome : false;
+$datatables = isset($datatables) ? $datatables : false;
 $tablesorter = isset($tablesorter) ? $tablesorter : false;
 
 /**
@@ -97,7 +97,6 @@ function _generateJSsInclude($JSs)
 			// datatables CSS
 			if ($datatables === true)
 			{
-				_generateCSSsInclude('vendor/datatables/datatables/media/css/jquery.dataTables.min.css');
 				_generateCSSsInclude('vendor/datatables/datatables/media/css/dataTables.bootstrap.min.css');
 			}
 			// Table sorter CSS
@@ -122,7 +121,6 @@ function _generateJSsInclude($JSs)
 				_generateJSsInclude('vendor/datatables/datatables/media/js/dataTables.bootstrap.min.js');
 				_generateJSsInclude('vendor/moment/moment/min/moment.min.js');
 				_generateJSsInclude('vendor/datatables/plugins/sorting/datetime-moment.js');
-
 			}
 			// Table sorter JS
 			if ($tablesorter === true) _generateJSsInclude('vendor/christianbach/tablesorter/jquery.tablesorter.min.js');

@@ -13,8 +13,8 @@ class Zgvmaster_widget extends DropdownWidget
 		$this->setElementsArray(
 			$this->ZgvmasterModel->load(),
 			true,
-			'Select a zgv...',
-			'No zgv found'
+			'Zgv wählen...',
+			'keine Zgv gefunden'
 		);
 
 		$this->loadDropDownView($widgetData);
