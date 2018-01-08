@@ -1064,7 +1064,7 @@ function cutString($string, $limit, $placeholderSign = '', $keepFileextension = 
 	if ($keepFileextension)
 	{
 		$extension = '.'.pathinfo($string, PATHINFO_EXTENSION);
-		$offset = $offset + strlen($extension);
+		$offset = $offset + mb_strlen($extension);
 	}
 	if(($limit - $offset) < 0)
 	{
@@ -1073,7 +1073,7 @@ function cutString($string, $limit, $placeholderSign = '', $keepFileextension = 
 
 	if(strlen($string) > ($limit - $offset))
 	{
-		return substr($string, 0, ($limit - $offset)).$placeholderSign.$extension;
+		return mb_substr($string, 0, ($limit - $offset)).$placeholderSign.$extension;
 	}
 	else
 	{
