@@ -251,7 +251,8 @@
 		"components/font-awesome": "^4.7",
 		"moment/moment": "^2.20",
 		"datatables/datatables": "^1.10",
-		"datatables/plugins": "^3.3"
+		"datatables/plugins": "^3.3",
+		"eternicode/bootstrap-datepicker": "^1.7"
 	},
 	"require-dev": {
 		"squizlabs/php_codesniffer": "2.*"

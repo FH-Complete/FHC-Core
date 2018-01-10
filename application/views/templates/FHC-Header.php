@@ -12,6 +12,7 @@ $jquery3 = isset($jquery3) ? $jquery3 : false;
 $jqueryui = isset($jqueryui) ? $jqueryui : false;
 $bootstrap = isset($bootstrap) ? $bootstrap : false;
 $fontawesome = isset($fontawesome) ? $fontawesome : false;
+$bootstrapdatepicker = isset($bootstrapdatepicker) ? $bootstrapdatepicker : false;
 $datatables = isset($datatables) ? $datatables : false;
 $tablesorter = isset($tablesorter) ? $tablesorter : false;
 
@@ -94,6 +95,8 @@ function _generateJSsInclude($JSs)
 			if ($bootstrap === true) _generateCSSsInclude('vendor/components/bootstrap/css/bootstrap.min.css');
 			// font awesome CSS
 			if ($fontawesome === true) _generateCSSsInclude('vendor/components/font-awesome/css/font-awesome.min.css');
+			// bootstrap datepicker CSS
+			if ($bootstrapdatepicker === true) _generateCSSsInclude('vendor/eternicode/bootstrap-datepicker/dist/css/bootstrap-datepicker3.min.css');
 			// datatables CSS
 			if ($datatables === true)
 			{
@@ -114,6 +117,11 @@ function _generateJSsInclude($JSs)
 			if ($jqueryui === true) _generateJSsInclude('vendor/components/jqueryui/jquery-ui.min.js');
 			// bootstrap JS
 			if ($bootstrap === true) _generateJSsInclude('vendor/components/bootstrap/js/bootstrap.min.js');
+			// bootstrap datepicker JS
+			if ($bootstrapdatepicker === true){
+				_generateJSsInclude('vendor/eternicode/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js');
+				_generateJSsInclude('vendor/eternicode/bootstrap-datepicker/dist/locales/bootstrap-datepicker.de.min.js');
+			}
 			// datatables JS
 			if ($datatables === true)
 			{
