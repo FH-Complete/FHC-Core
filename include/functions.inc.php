@@ -22,6 +22,7 @@
 require_once(dirname(__FILE__).'/basis_db.class.php');
 require_once(dirname(__FILE__).'/authentication.class.php');
 require_once(dirname(__FILE__).'/betriebsmittelperson.class.php');
+require_once(dirname(__FILE__).'/personlog.class.php');
 
 // Auth: Benutzer des Webportals
 /**
@@ -1081,9 +1082,9 @@ function cutString($string, $limit, $placeholderSign = '', $keepFileextension = 
 	}
 }
 
-function PersonLog($ci, $person_id, $logtype_kurzbz, $logdata, $app, $oe_kurzbz = null, $user=null)
+function PersonLog($person_id, $logtype_kurzbz, $logdata, $app, $oe_kurzbz = null, $user=null)
 {
-	$ci->load->library('PersonLogLib');
-	$ci->personloglib->log($person_id, $logtype_kurzbz, $logdata, $app, $oe_kurzbz, $user);
+	$personlog = new personlog();
+	$personlog->log($person_id, $logtype_kurzbz, $logdata, $app, $oe_kurzbz, $user);
 }
 ?>
