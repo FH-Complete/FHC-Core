@@ -234,5 +234,5 @@ define('CIS_DOKUMENTE_STUDIENBEITRAG_TYPEN', serialize(array("Studiengebuehr")))
 define('CIS_LVMENUE_CUTLENGTH', 21);
 
 // Gibt an, auf welche Seite TicketIds ala #1234 im Jahresplan verlinkt werden zB zur Verlinkung in Bugtracker
-define('JAHRESPLAN_TICKET_LINK','https://bug.technikum-wien.at/otrs/index.pl?Action=AgentTicketZoom;TicketID=');
+define('JAHRESPLAN_TICKET_LINK','https://bug.technikum-wien.at/otrs/index.pl?Action=AgentTicketZoom;TicketNumber=');
 ?>
