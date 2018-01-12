@@ -1,5 +1,5 @@
 ﻿<?php
-$this->phrasen['mailverteiler/titel']='Mailverteiler/Gruppen';
+$this->phrasen['mailverteiler/titel']='E-Mail Verteiler';
 $this->phrasen['mailverteiler/absatz1']='<strong><font class="error">Hinweis:&nbsp;</font></strong>Diese Verteiler dürfen nur für Fachhochschul-relevante Zwecke verwendet werden!';
 $this->phrasen['mailverteiler/absatz2']='<strong><font class="error">Info:&nbsp;</font></strong>Infos bez&uuml;glich  <a class="Item" href="../cisdocs/Mailverteiler.pdf" target="_blank">Berechtigungskonzept</a> Mailverteiler, <a class="Item" href="../cisdocs/bedienung_mailverteiler.pdf" target="_blank">Bedienungsanleitung</a> Mailverteiler';
 $this->phrasen['mailverteiler/berechtigungskonzept']='Berechtigungskonzept';
