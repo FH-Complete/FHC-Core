@@ -23,8 +23,8 @@ class InfocenterDetails extends VileSci_Controller
 		$this->load->model('person/notiz_model', 'NotizModel');
 		$this->load->model('crm/prestudent_model', 'PrestudentModel');
 		$this->load->model('crm/prestudentstatus_model', 'PrestudentstatusModel');
-		$this->load->model('crm/akte_model', 'AkteModel');
 		$this->load->model('crm/statusgrund_model', 'StatusgrundModel');
+		$this->load->model('crm/akte_model', 'AkteModel');
 
 		$this->load->library('DmsLib');
 		$this->load->library('WidgetLib');
@@ -55,12 +55,30 @@ class InfocenterDetails extends VileSci_Controller
 		if(!isset($stammdaten->retval))
 			return null;
 
-		$dokumente = $this->AkteModel->loadWhere(array('person_id' => $person_id));
+/*		$dokumente = $this->AkteModel->loadWhere(array('person_id' => $person_id));
 
 		if ($dokumente->error)
 		{
 			show_error($dokumente->retval);
 		}
+
+		var_dump($dokumente->retval);*/
+
+		$dokumente = $this->AkteModel->getAktenWithDokInfo($person_id, null, false);
+
+		if ($dokumente->error)
+		{
+			show_error($dokumente->retval);
+		}
+
+		$dokumente_nachgereicht = $this->AkteModel->getAktenWithDokInfo($person_id, null, true);
+
+		if ($dokumente_nachgereicht->error)
+		{
+			show_error($dokumente->retval);
+		}
+
+		//var_dump($dokumente->retval);die();
 
 		$logs = $this->personloglib->getLogs($person_id, $this::APP);
 
@@ -74,6 +92,7 @@ class InfocenterDetails extends VileSci_Controller
 		$data = array (
 			'stammdaten' => $stammdaten->retval,
 			'dokumente' => $dokumente->retval,
+			'dokumente_nachgereicht' => $dokumente_nachgereicht->retval,
 			'logs' => $logs,
 			'notizen' => $notizen->retval
 		);
@@ -108,6 +127,16 @@ class InfocenterDetails extends VileSci_Controller
 
 			$zgvpruefungen[] = $prestudent->retval[0];
 		}
+
+		//Interessenten come first
+		usort($zgvpruefungen, function ($a, $b){
+			if($a->prestudentstatus->status_kurzbz === 'Interessent')
+				return -1;
+			else if($b->prestudentstatus->status_kurzbz === 'Interessent')
+				return 1;
+			else
+				return 0;
+		});
 
 		//TODO replace with widget
 		$statusgruende = $this->StatusgrundModel->load()->retval;
