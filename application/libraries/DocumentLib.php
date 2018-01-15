@@ -15,8 +15,17 @@ class DocumentLib
 		$this->ci =& get_instance();
 
 		exec('unoconv --version', $ret_arr);
+
 		if(isset($ret_arr[0]))
-			$this->unoconv_version = explode(' ', $ret_arr[0])[1];
+		{
+			$hlp = explode(' ', $ret_arr[0]);
+			if(isset($hlp[1]))
+			{
+				$this->unoconv_version = $hlp[1];
+			}
+			else
+				show_error('Could not get Unoconv Version');
+		}
 		else
 			show_error('Unoconv not found - Please install Unoconv');
 	}

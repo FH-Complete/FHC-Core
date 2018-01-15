@@ -11,16 +11,16 @@ class ExtensionsLib
 	const SQL_FILE_EXTENSION = '.sql'; // SQL scripts file extension
 
 	const FILE_INPUT_NAME = 'extension'; // name of the HTTP parameter containing the archive data
-	const ARCHIVE_EXTENSIONS = array('.tgz', '.tbz2'); // accepted file extensions for an uploaded extension
 
 	const EXTENSION_JSON_NAME = 'extension.json'; // file that contains extension data
-
-	const UPLOAD_PATH = APPPATH.'tmp/'; // temporary directory to store the upload file and checks the archive
-	const EXTENSIONS_PATH = APPPATH.'extensions/'; // directory where all the extensions are
 	const EXTENSIONS_DIR_NAME = 'extensions'; // name of the directories where will be created the symlinks
 
+	private $ARCHIVE_EXTENSIONS = array('.tgz', '.tbz2'); // accepted file extensions for an uploaded extension
+	private $UPLOAD_PATH; // temporary directory to store the upload file and checks the archive
+	private $EXTENSIONS_PATH; // directory where all the extensions are
+
 	// Directories that are part of the extension archive
-	const SOFTLINK_TARGET_DIRECTORIES = array('config', 'controllers', 'helpers', 'hooks', 'libraries', 'models', 'views', 'widgets');
+	private $SOFTLINK_TARGET_DIRECTORIES = array('config', 'controllers', 'helpers', 'hooks', 'libraries', 'models', 'views', 'widgets');
 
 	private $_errorOccurred; // boolean, true if an error occurred while installing an extension
 	private $_currentInstalledExtensionVersion; // contains the version of the current installation of an extension
@@ -29,9 +29,11 @@ class ExtensionsLib
 	 * Class constructor
 	 */
 	public function __construct()
-    {
+	{
+		$this->UPLOAD_PATH = APPPATH.'tmp/';
+		$this->EXTENSIONS_PATH = APPPATH.'extensions/';
 		// Get code igniter instance
-        $this->ci =& get_instance();
+		$this->ci =& get_instance();
 
 		// Loads message configurationx
 		$this->ci->config->load('message');
@@ -60,7 +62,7 @@ class ExtensionsLib
 
 		$this->_printInfo('WARNING!!! Please do not change page or stop this procedure before it is finished');
 
-        $this->_loadUploadLibrary(); // loads CI upload library
+		$this->_loadUploadLibrary(); // loads CI upload library
 
 		$uploadData = $this->_uploadExtension(); // perform the upload of the file and returns info about it
 
@@ -99,7 +101,7 @@ class ExtensionsLib
 				{
 					// Loads and executes neede SQL scripts
 					$this->_loadSQLs(
-						ExtensionsLib::UPLOAD_PATH.$extensionJson->name.'/'.ExtensionsLib::SQL_DIRECTORY,
+						$this->UPLOAD_PATH.$extensionJson->name.'/'.ExtensionsLib::SQL_DIRECTORY,
 						$extensionJson
 					);
 				}
@@ -157,7 +159,7 @@ class ExtensionsLib
 			$extensionName = $result->retval[0]->name; // extension name
 			$this->_delSoftLinks($extensionName); // not to be checked, could fail if the extension is disabled
 			// remove the extension from the extensions installation directory
-			$delExtension = $this->_rrm(ExtensionsLib::EXTENSIONS_PATH.$extensionName);
+			$delExtension = $this->_rrm($this->EXTENSIONS_PATH.$extensionName);
 
 			// Select all the version of this extension
 			$this->ci->ExtensionsModel->addSelect('extension_id');
@@ -215,7 +217,7 @@ class ExtensionsLib
 		$this->ci->load->library(
 			'upload',
 			array(
-				'upload_path' => ExtensionsLib::UPLOAD_PATH,
+				'upload_path' => $this->UPLOAD_PATH,
 				'allowed_types' => '*',
 				'overwrite' => true
 			)
@@ -237,7 +239,7 @@ class ExtensionsLib
 			$uploadData = $this->ci->upload->data(); // retrives data about the uploaded file
 			// Checks the file extension
 			$uploadedFileExtension = '.'.pathinfo($uploadData['full_path'], PATHINFO_EXTENSION);
-			if (!in_array($uploadedFileExtension, ExtensionsLib::ARCHIVE_EXTENSIONS))
+			if (!in_array($uploadedFileExtension, $this->ARCHIVE_EXTENSIONS))
 			{
 				$this->_printFailure('file extension must be tgz OR tbz2');
 
@@ -251,7 +253,7 @@ class ExtensionsLib
 			{
 				// Returns the extension name and the full path of the uploaded file
 				$_uploadExtension = new stdClass();
-				$_uploadExtension->extensionName = str_replace(ExtensionsLib::ARCHIVE_EXTENSIONS, '', $uploadData['file_name']);
+				$_uploadExtension->extensionName = str_replace($this->ARCHIVE_EXTENSIONS, '', $uploadData['file_name']);
 				$_uploadExtension->fullPath = $uploadData['full_path'];
 			}
 		}
@@ -279,7 +281,7 @@ class ExtensionsLib
 			// Extracts the uploaded file
 			$pd = new PharData($uploadPath);
 
-			$pd->extractTo(ExtensionsLib::UPLOAD_PATH, null, true);
+			$pd->extractTo($this->UPLOAD_PATH, null, true);
 		}
 		catch (UnexpectedValueException $uva)
 		{
@@ -342,10 +344,10 @@ class ExtensionsLib
 		$this->_printStart('Checking extension file system structure');
 
 		// Checks if the root directory of this archive has the same name of the extension
-		if (is_dir(ExtensionsLib::UPLOAD_PATH.$extensionName))
+		if (is_dir($this->UPLOAD_PATH.$extensionName))
 		{
 			// Checks if file extension.json exists inside the uploaded archive
-			if (!file_exists(ExtensionsLib::UPLOAD_PATH.$extensionName.'/'.ExtensionsLib::EXTENSION_JSON_NAME))
+			if (!file_exists($this->UPLOAD_PATH.$extensionName.'/'.ExtensionsLib::EXTENSION_JSON_NAME))
 			{
 				$this->_errorOccurred = true;
 				$this->_printFailure('missing extension.json');
@@ -371,7 +373,7 @@ class ExtensionsLib
 
 		// Decodes extension.json
 		$extensionJson = json_decode(
-			file_get_contents(ExtensionsLib::UPLOAD_PATH.$extensionName.'/'.ExtensionsLib::EXTENSION_JSON_NAME)
+			file_get_contents($this->UPLOAD_PATH.$extensionName.'/'.ExtensionsLib::EXTENSION_JSON_NAME)
 		);
 
 		// Checks if the parameter name of the extension.json has the same value of the extension name
@@ -608,10 +610,10 @@ class ExtensionsLib
 	{
 		$this->_printStart('Moving the upload extension from upload folder to extension folder');
 
-		$this->_printMessage('Current extension directory: '.ExtensionsLib::UPLOAD_PATH.$extensionName);
-		$this->_printMessage('Directory where it will be moved: '.ExtensionsLib::EXTENSIONS_PATH.$extensionName);
+		$this->_printMessage('Current extension directory: '.$this->UPLOAD_PATH.$extensionName);
+		$this->_printMessage('Directory where it will be moved: '.$this->EXTENSIONS_PATH.$extensionName);
 
-		if (rename(ExtensionsLib::UPLOAD_PATH.$extensionName.'/', ExtensionsLib::EXTENSIONS_PATH.$extensionName))
+		if (rename($this->UPLOAD_PATH.$extensionName.'/', $this->EXTENSIONS_PATH.$extensionName))
 		{
 			$this->_printSuccess(true);
 		}
@@ -652,7 +654,7 @@ class ExtensionsLib
 	{
 		$_delSoftLinks = false;
 
-		foreach (ExtensionsLib::SOFTLINK_TARGET_DIRECTORIES as $key => $targetDirectory)
+		foreach ($this->SOFTLINK_TARGET_DIRECTORIES as $key => $targetDirectory)
 		{
 			if (file_exists(APPPATH.$targetDirectory.'/'.ExtensionsLib::EXTENSIONS_DIR_NAME.'/'.$extensionName))
 			{
@@ -700,10 +702,10 @@ class ExtensionsLib
 	private function _addSoftLinks($extensionName)
 	{
 		$_addSoftLinks = false;
-		$extensionPath = ExtensionsLib::EXTENSIONS_PATH.$extensionName.'/';
+		$extensionPath = $this->EXTENSIONS_PATH.$extensionName.'/';
 
 		// For every target directory
-		foreach (ExtensionsLib::SOFTLINK_TARGET_DIRECTORIES as $key => $targetDirectory)
+		foreach ($this->SOFTLINK_TARGET_DIRECTORIES as $key => $targetDirectory)
 		{
 			// If destination of the symlink does not exist
 			if (!file_exists(APPPATH.$targetDirectory.'/'.ExtensionsLib::EXTENSIONS_DIR_NAME.'/'.$extensionName))
@@ -746,9 +748,9 @@ class ExtensionsLib
 		$this->_printMessage('Removing the extracted data from the upload directory');
 		if ($uploadData != null
 			&& isset($uploadData->extensionName)
-			&& file_exists(ExtensionsLib::UPLOAD_PATH.$uploadData->extensionName))
+			&& file_exists($this->UPLOAD_PATH.$uploadData->extensionName))
 		{
-			$this->_rrm(ExtensionsLib::UPLOAD_PATH.$uploadData->extensionName);
+			$this->_rrm($this->UPLOAD_PATH.$uploadData->extensionName);
 		}
 
 		// If the upload of the file is a success and the extension name is present and no previous installation were found

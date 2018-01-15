@@ -88,10 +88,11 @@ class MessageToken_model extends CI_Model
 		// If no errors occurred
 		if ($msgs)
 		{
+			$msgs_result = $msgs->result();
 			// If at least a record is present
-			if (count($msgs->result()) > 0)
+			if (count($msgs_result) > 0)
 			{
-				$msg = $msgs->result()[0];
+				$msg = $msgs_result[0];
 
 				$msgStatusResult = false; // pessimistic expectation
 
@@ -133,7 +134,7 @@ class MessageToken_model extends CI_Model
 				}
 			}
 
-			return success($msgs->result());
+			return success($msgs_result);
 		}
 		else
 		{
@@ -193,7 +194,8 @@ class MessageToken_model extends CI_Model
 			// If data are present
 			if (is_array($result->result()) && count($result->result()) > 0)
 			{
-				$person = $result->result()[0];
+				$personresults = $result->result();
+				$person = $personresults[0];
 
 				// If it is an employee
 				if ($person->mitarbeiter_uid != null)
@@ -236,13 +238,14 @@ class MessageToken_model extends CI_Model
 		$result = $this->db->query($sql, array($oe_kurzbz));
 		if ($result) // If no errors occurred
 		{
+			$result_arr = $result->result();
 			// If data are present
-			if (is_array($result->result())
-				&& count($result->result()) > 0
-				&& is_object($result->result()[0])
-				&& isset($result->result()[0]->oe_kurzbz))
+			if (is_array($result_arr)
+				&& count($result_arr) > 0
+				&& is_object($result_arr[0])
+				&& isset($result_arr[0]->oe_kurzbz))
 			{
-				return success($result->result()[0]->oe_kurzbz);
+				return success($result_arr[0]->oe_kurzbz);
 			}
 			else
 			{
