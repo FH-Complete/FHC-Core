@@ -42,7 +42,7 @@ class personlog extends basis_db
 		parent::__construct();
 	}
 
-	public function log($person_id, $logtype_kurzbz, $logdata, $app='core', $oe_kurzbz='null', $user=null)
+	public function log($person_id, $logtype_kurzbz, $logdata, $app='core', $oe_kurzbz=null, $user=null)
 	{
 		$qry = "INSERT INTO system.tbl_log(person_id, zeitpunkt, app, oe_kurzbz,
 			logtype_kurzbz, logdata, insertvon)	VALUES(".
