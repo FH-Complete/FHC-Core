@@ -1055,10 +1055,53 @@ if ($result = $db->db_query("SELECT conname FROM pg_constraint WHERE conname = '
 			echo '<br>Created foreign key tbl_filters_oe_kurzbz_fkey';
 	}
 }
-
 // End filters
 //---------------------------------------------------------------------------------------------------------------------
 
+// system.tbl_verarbeitungstaetigkeit
+if (!$result = @$db->db_query("SELECT 1 FROM system.tbl_verarbeitungstaetigkeit"))
+{
+	$qry = "
+	CREATE TABLE system.tbl_verarbeitungstaetigkeit
+	(
+		taetigkeit_kurzbz varchar(32) NOT NULL,
+		bezeichnung varchar(255),
+		bezeichnung_mehrsprachig varchar(255)[],
+		aktiv boolean DEFAULT true
+	);
+
+	ALTER TABLE system.tbl_verarbeitungstaetigkeit ADD CONSTRAINT pk_verarbeitungstaetigkeit PRIMARY KEY (taetigkeit_kurzbz);
+
+	INSERT INTO system.tbl_verarbeitungstaetigkeit(taetigkeit_kurzbz, bezeichnung, bezeichnung_mehrsprachig, aktiv)
+	VALUES('bewerbung','Bewerbung','{\'Bewerbung\',\'Bewerbung\'}', true);
+	INSERT INTO system.tbl_verarbeitungstaetigkeit(taetigkeit_kurzbz, bezeichnung, bezeichnung_mehrsprachig, aktiv)
+	VALUES('aufnahme','Reihungs-/Aufnahmeverfahren','{\'Reihungs-/Aufnahmeverfahren\',\'Reihungs-/Aufnahmeverfahren\'}', true);
+	INSERT INTO system.tbl_verarbeitungstaetigkeit(taetigkeit_kurzbz, bezeichnung, bezeichnung_mehrsprachig, aktiv)
+	VALUES('bewertung','Bewertung/Benotung','{\'Bewertung/Benotung\',\'Bewertung/Benotung\'}', true);
+	INSERT INTO system.tbl_verarbeitungstaetigkeit(taetigkeit_kurzbz, bezeichnung, bezeichnung_mehrsprachig, aktiv)
+	VALUES('lehrauftraege','Lehraufträge','{\'Lehraufträge\',\'Lehraufträge\'}', true);
+
+	GRANT SELECT, UPDATE, INSERT, DELETE ON system.tbl_verarbeitungstaetigkeit TO vilesci;
+	GRANT SELECT ON system.tbl_verarbeitungstaetigkeit TO web;
+	";
+	if (!$db->db_query($qry))
+		echo '<strong>tbl_verarbeitungstaetigkeit '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Created new table system.tbl_verarbeitungstaetigkeit';
+}
+
+// system.tbl_log.taetigkeit_kurzbz
+if (!$result = @$db->db_query("SELECT taetigkeit_kurzbz FROM system.tbl_log"))
+{
+	$qry = "
+	ALTER TABLE system.tbl_log ADD COLUMN taetigkeit_kurzbz varchar(32);
+	ALTER TABLE system.tbl_log ADD CONSTRAINT fk_log_taetigkeit FOREIGN KEY (taetigkeit_kurzbz) REFERENCES system.tbl_verarbeitungstaetigkeit(taetigkeit_kurzbz) ON UPDATE CASCADE ON DELETE RESTRICT;
+	";
+	if (!$db->db_query($qry))
+		echo '<strong>system.tbl_log.taetigkeit_kurzbz '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Added Column taetigkeit_kurzbz to system.tbl_log';
+}
 
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
@@ -1309,13 +1352,14 @@ $tabellen=array(
 	"system.tbl_benutzerrolle"  => array("benutzerberechtigung_id","rolle_kurzbz","berechtigung_kurzbz","uid","funktion_kurzbz","oe_kurzbz","art","studiensemester_kurzbz","start","ende","negativ","updateamum", "updatevon","insertamum","insertvon","kostenstelle_id","anmerkung"),
 	"system.tbl_berechtigung"  => array("berechtigung_kurzbz","beschreibung"),
 	"system.tbl_extensions" => array("extension_id","name","version","description","license","url","core_version","dependencies","enabled"),
-	"system.tbl_log" => array("log_id","person_id","zeitpunkt","app","oe_kurzbz","logtype_kurzbz","logdata","insertvon"),
+	"system.tbl_log" => array("log_id","person_id","zeitpunkt","app","oe_kurzbz","logtype_kurzbz","logdata","insertvon","taetigkeit_kurzbz"),
 	"system.tbl_logtype" => array("logtype_kurzbz", "data_schema"),
 	"system.tbl_filters" => array("filter_id","app","dataset_name","filter_kurzbz","person_id","description","sort","default_filter","filter","oe_kurzbz"),
 	"system.tbl_phrase" => array("phrase_id","app","phrase","insertamum","insertvon"),
 	"system.tbl_phrasentext" => array("phrasentext_id","phrase_id","sprache","orgeinheit_kurzbz","orgform_kurzbz","text","description","insertamum","insertvon"),
 	"system.tbl_rolle"  => array("rolle_kurzbz","beschreibung"),
 	"system.tbl_rolleberechtigung"  => array("berechtigung_kurzbz","rolle_kurzbz","art"),
+	"system.tbl_verarbeitungstaetigkeit" => array("taetigkeit_kurzbz", "bezeichnung", "bezeichnung_mehrsprachig","aktiv"),
 	"system.tbl_webservicelog"  => array("webservicelog_id","webservicetyp_kurzbz","request_id","beschreibung","request_data","execute_time","execute_user"),
 	"system.tbl_webservicerecht" => array("webservicerecht_id","berechtigung_kurzbz","methode","attribut","insertamum","insertvon","updateamum","updatevon","klasse"),
 	"system.tbl_webservicetyp"  => array("webservicetyp_kurzbz","beschreibung"),

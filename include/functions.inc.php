@@ -1082,9 +1082,19 @@ function cutString($string, $limit, $placeholderSign = '', $keepFileextension = 
 	}
 }
 
-function PersonLog($person_id, $logtype_kurzbz, $logdata, $app, $oe_kurzbz = null, $user=null)
+/**
+ * Erstellt einen Log Eintrag zu einer Person
+ * @param $person_id ID der Person.
+ * @param $logtype_kurzbz Typ des Logeintrages
+ * @param $logdata Array mit den zusaetzlichen Logdaten zu diesem Typ.
+ * @param $taetigkeit_kurzbz Kurzbz der Verarbeitungstaetigkeit.
+ * @param $app Applikation von der dieser Logeintrag stammt. (optional)
+ * @param $oe_kurzbz Kurzbz der Organisationseinheit. (optional)
+ * @param $user User der die Aktion durchgefuehrt hat. (optional)
+ */
+function PersonLog($person_id, $logtype_kurzbz, $logdata, $taetigkeit_kurzbz, $app = 'core', $oe_kurzbz = null, $user = null)
 {
 	$personlog = new personlog();
-	$personlog->log($person_id, $logtype_kurzbz, $logdata, $app, $oe_kurzbz, $user);
+	$personlog->log($person_id, $logtype_kurzbz, $logdata, $taetigkeit_kurzbz, $app, $oe_kurzbz, $user);
 }
 ?>

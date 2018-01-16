@@ -10,7 +10,7 @@
 				(
 					SELECT zeitpunkt
 					FROM system.tbl_log
-					WHERE app = \'aufnahme\'
+					WHERE taetigkeit_kurzbz = \'bewerbung\'
 					AND person_id = p.person_id
 					ORDER BY zeitpunkt DESC
 					LIMIT 1
@@ -18,7 +18,7 @@
 				(
 					SELECT insertvon
 					FROM system.tbl_log
-					WHERE app = \'aufnahme\'
+					WHERE taetigkeit_kurzbz = \'bewerbung\'
 					AND person_id = p.person_id
 					ORDER BY zeitpunkt DESC
 					LIMIT 1
