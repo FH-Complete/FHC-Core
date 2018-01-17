@@ -108,9 +108,10 @@ class Notiz_model extends DB_Model
 
 		$result = $this->insert(array('titel' => $titel, 'text' => $text, 'erledigt' => $erledigt, 'verfasser_uid' => $verfasser_uid,
 			"insertvon" => $verfasser_uid));
-		$notiz_id = $result->retval;
+
 		if (isSuccess($result))
 		{
+			$notiz_id = $result->retval;
 			$result = $this->NotizzuordnungModel->insert(array('notiz_id' => $notiz_id, 'person_id' => $person_id));
 		}
 

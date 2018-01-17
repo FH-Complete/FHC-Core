@@ -125,21 +125,36 @@ class InfocenterDetails extends VileSci_Controller
 				show_error($prestudent->retval);
 			}
 
-			$zgvpruefungen[] = $prestudent->retval[0];
+			$zgvpruefung = $prestudent->retval[0];
+
+			//if prestudent is not interessent or is already bestaetigt, then show only as information, non-editable
+			$zgvpruefung->infoonly = !isset($zgvpruefung->prestudentstatus) || isset($zgvpruefung->prestudentstatus->bestaetigtam) || $zgvpruefung->prestudentstatus->status_kurzbz != 'Interessent';
+
+			$zgvpruefungen[] = $zgvpruefung;
 		}
 
 		//Interessenten come first
-		usort($zgvpruefungen, function ($a, $b){
-			if($a->prestudentstatus->status_kurzbz === 'Interessent')
+		usort($zgvpruefungen, function ($a, $b)
+		{
+			if(!isset($a->prestudentstatus->status_kurzbz) || !isset($b->prestudentstatus->status_kurzbz))
+				return 0;
+			elseif($a->prestudentstatus->status_kurzbz === 'Interessent' && $b->prestudentstatus->status_kurzbz === 'Interessent')
+			{
+				//infoonly Interessenten are behind new Interessenten
+				if($a->infoonly)
+					return 1;
+				elseif($b->infoonly)
+					return -1;
+			}
+			elseif($a->prestudentstatus->status_kurzbz === 'Interessent')
 				return -1;
-			else if($b->prestudentstatus->status_kurzbz === 'Interessent')
+			elseif($b->prestudentstatus->status_kurzbz === 'Interessent')
 				return 1;
 			else
 				return 0;
 		});
 
-		//TODO replace with widget
-		$statusgruende = $this->StatusgrundModel->load()->retval;
+		$statusgruende = $this->StatusgrundModel->loadWhere(array('status_kurzbz' => 'Abgewiesener'))->retval;
 
 		$data = array (
 			'zgvpruefungen' => $zgvpruefungen,
@@ -303,7 +318,12 @@ class InfocenterDetails extends VileSci_Controller
 		$text = $this->input->post('notiz');
 		$erledigt = false;
 
-		$this->NotizModel->addNotizForPerson($person_id, $titel, $text, $erledigt, $this->uid);
+		$result = $this->NotizModel->addNotizForPerson($person_id, $titel, $text, $erledigt, $this->uid);
+
+		if ($result->error)
+		{
+			show_error($result->retval);
+		}
 
 		$this->personloglib->log($person_id, 'Action', array('name' => 'Notiz hinzugefügt', 'message' => 'Notiz mit Titel '.$titel.' wurde hinzugefügt', 'success' => 'true'), $this::APP, null, $this->uid);
 

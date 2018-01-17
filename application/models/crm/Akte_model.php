@@ -175,7 +175,7 @@ class Akte_model extends DB_Model
 	}
 
 	/**
-	 * gets Akten together with Documenttype info, mainly bezeichnung fields
+	 * gets Akten together with documenttype info, mainly bezeichnung fields
 	 * @param $person_id
 	 * @param null $dokument_kurzbz
 	 * @param bool $nachgereicht if true, retrieves only nachgereichte Dokumente. if false, only not nachgereichte. default: null, all Dokumente
@@ -185,8 +185,9 @@ class Akte_model extends DB_Model
 	{
 		if (isError($ent = $this->isEntitled($this->dbTable, PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR))) return $ent;
 
-		$this->addSelect('public.tbl_akte.*, bezeichnung_mehrsprachig, dokumentbeschreibung_mehrsprachig, public.tbl_dokument.bezeichnung as dokument_bezeichnung', 'ausstellungsdetails');
+		$this->addSelect('public.tbl_akte.*, bezeichnung_mehrsprachig, dokumentbeschreibung_mehrsprachig, public.tbl_dokument.bezeichnung as dokument_bezeichnung, bis.tbl_nation.*, ausstellungsdetails');
 		$this->addJoin('public.tbl_dokument', 'dokument_kurzbz');
+		$this->addJoin('bis.tbl_nation', 'ausstellungsnation = nation_code', 'LEFT');
 
 		$where = array();
 		$where['person_id'] = $person_id;
