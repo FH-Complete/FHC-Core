@@ -18,7 +18,7 @@ class Person_model extends DB_Model
 	public function getPersonKontaktByZugangscode($zugangscode, $email)
 	{
 		$this->addJoin('public.tbl_kontakt', 'person_id');
-		
+
 		return $this->loadWhere(array('zugangscode' => $zugangscode, 'kontakt' => $email));
 	}
 
@@ -134,5 +134,64 @@ class Person_model extends DB_Model
 		);
 
 		return $result;
+	}
+
+	/**
+	 * Searches a Person
+	 * @param $filter Term to search for.
+	 * @return DB-result
+	 */
+	public function searchPerson($filter)
+	{
+		$this->addSelect('vorname, nachname, gebdatum, person_id');
+		$result = $this->loadWhere(
+			'lower(nachname) like '.$this->db->escape('%'.$filter.'%')."
+			OR lower(vorname) like ".$this->db->escape('%'.$filter.'%')."
+			OR lower(nachname || ' ' || vorname) like ".$this->db->escape('%'.$filter.'%')."
+			OR lower(vorname || ' ' || nachname) like ".$this->db->escape('%'.$filter.'%'));
+
+		return $result;
+	}
+
+	/**
+	 * gets Stammdaten for a person, including contactdata in textform from other tables
+	 * nation, kontakt, adresse
+	 * @param $person_id
+	 * @return array
+	 */
+	public function getPersonStammdaten($person_id)
+	{
+		$this->addSelect('tbl_person.*, s.kurztext as staatsbuergerschaft, g.kurztext as geburtsnation');
+		$this->addJoin('bis.tbl_nation s', 'tbl_person.staatsbuergerschaft = s.nation_code', 'LEFT');
+		$this->addJoin('bis.tbl_nation g', 'tbl_person.geburtsnation = g.nation_code', 'LEFT');
+
+		$person = $this->load($person_id);
+
+		if($person->error)
+			return error($person->retval);
+
+		//return null if not found
+		if(count($person->retval) < 1)
+			return success(null);
+
+		$this->load->model('person/kontakt_model', 'KontaktModel');
+		$this->load->model('person/adresse_model', 'AdresseModel');
+
+		$this->KontaktModel->addDistinct();
+		$this->KontaktModel->addSelect('kontakttyp, anmerkung, kontakt, zustellung');
+		$this->KontaktModel->addOrder('kontakttyp');
+		$kontakte = $this->KontaktModel->loadWhere(array('person_id' => $person_id));
+		if($kontakte->error)
+			return error($kontakte->retval);
+
+		$adressen = $this->AdresseModel->loadWhere(array('person_id' => $person_id));
+		if($adressen->error)
+			return error($adressen->retval);
+
+		$stammdaten = $person->retval[0];
+		$stammdaten->kontakte = $kontakte->retval;
+		$stammdaten->adressen = $adressen->retval;
+
+		return success($stammdaten);
 	}
 }

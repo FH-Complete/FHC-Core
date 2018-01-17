@@ -1052,6 +1052,32 @@ function StatistikPrintNotenspiegel(typ)
 }
 
 // ****
+// * Liefert eine HTML Liste mit Uebersicht ueber die eingetragenen Noten
+// * Studiengang und optional Semester muss gewaehlt sein.
+// ****
+function StatistikPrintNotenspiegelErweitert(typ)
+{
+	tree = document.getElementById('tree-verband');
+
+	if(tree.currentIndex==-1)
+	{
+		alert('Bitte zuerst einen Studiengang auswaehlen');
+		return;
+	}
+
+	//Studiengang und Semester holen
+	var col;
+	col = tree.columns ? tree.columns["stg_kz"] : "stg_kz";
+	var studiengang_kz=tree.view.getCellText(tree.currentIndex,col);
+	col = tree.columns ? tree.columns["sem"] : "sem";
+	var semester=tree.view.getCellText(tree.currentIndex,col);
+	col = tree.columns ? tree.columns["tree-verband-col-orgform"] : "tree-verband-col-orgform";
+	var orgform=tree.view.getCellText(tree.currentIndex,col);
+
+	window.open('<?php echo APP_ROOT ?>content/statistik/notenspiegel_erweitert.php?studiengang_kz='+studiengang_kz+'&semester='+semester+'&typ='+typ+'&orgform='+orgform,'Notenspiegel');
+}
+
+// ****
 // * Liefert eine statistik ueber die Anzahl der Interessenten/Bewerber Studenten
 // ****
 function StatistikPrintBewerberstatistik(typ)

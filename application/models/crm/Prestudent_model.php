@@ -192,4 +192,41 @@ class Prestudent_model extends DB_Model
 
 		return $this->execQuery(sprintf($query, is_array($prestudent_id) ? 'IN' : '='), array($prestudent_id));
 	}
+
+
+	/**
+	 * gets extended zgv data (with zgv bezeichnung) for a prestudent
+	 * includes last status, Studiengang, zgv, zgv master
+	 * @param $prestudent_id
+	 */
+	public function getPrestudentWithZgv($prestudent_id)
+	{
+		$this->addSelect('tbl_prestudent.*, tbl_studiengang.kurzbzlang as studiengang, tbl_studiengang.typ as studiengangtyp, tbl_zgv.zgv_code, tbl_zgv.zgv_bez, 
+		tbl_prestudent.zgvort, tbl_prestudent.zgvdatum, tbl_prestudent.zgvnation as zgvnation_code, zgvnat.kurztext as zgvnation_kurzbez, zgvnat.langtext as zgvnation_bez, zgvnat.engltext as zgvnation_englbez,
+		tbl_zgvmaster.zgvmas_code, tbl_zgvmaster.zgvmas_bez, tbl_prestudent.zgvmaort, tbl_prestudent.zgvmadatum, tbl_prestudent.zgvmanation as zgvmanation_code, zgvmanat.kurztext as zgvmanation_kurzbez, zgvmanat.langtext as zgvmanation_bez, zgvmanat.engltext as zgvmanation_englbez');
+		$this->addJoin('public.tbl_studiengang', 'studiengang_kz', 'LEFT');
+		$this->addJoin('bis.tbl_zgv', 'zgv_code', 'LEFT');
+		$this->addJoin('bis.tbl_zgvmaster', 'zgvmas_code', 'LEFT');
+		$this->addJoin('bis.tbl_nation zgvnat', 'zgvnation = zgvnat.nation_code', 'LEFT');
+		$this->addJoin('bis.tbl_nation zgvmanat', 'zgvmanation = zgvmanat.nation_code', 'LEFT');
+
+		$prestudent = $this->load($prestudent_id);
+		if($prestudent->error)
+			return error($prestudent->retval);
+
+		//Prestudentstatus
+		$this->load->model('crm/prestudentstatus_model', 'PrestudentstatusModel');
+		$lastStatus = $this->PrestudentstatusModel->getLastStatus($prestudent_id);
+
+		if ($lastStatus->error)
+		{
+			return error($lastStatus->retval);
+		}
+
+		if(count($lastStatus->retval) > 0)
+			$prestudent->retval[0]->prestudentstatus = $lastStatus->retval[0];
+
+		return success($prestudent->retval);
+	}
+
 }

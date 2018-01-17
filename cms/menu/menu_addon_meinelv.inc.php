@@ -101,7 +101,7 @@ class menu_addon_meinelv extends menu_addon
 								$this->items[] = array('title'=>$lv_obj->bezeichnung_arr[$sprache],
 								 'target'=>'content',
 								 'link'=>'private/freifaecher/lesson.php?lvid='.$row->lehrveranstaltung_id.'&studiensemester_kurzbz='.$row->studiensemester_kurzbz,
-								 'name'=>'FF '.$this->CutString($lv_obj->bezeichnung_arr[$sprache], $cutlength)
+								 'name'=>'FF '.CutString($lv_obj->bezeichnung_arr[$sprache], $cutlength, '...')
 								);
 							}
 							else
@@ -109,7 +109,7 @@ class menu_addon_meinelv extends menu_addon
 								$this->items[] = array('title'=>$lv_obj->bezeichnung_arr[$sprache],
 								 'target'=>'content',
 								 'link'=>'private/lehre/lesson.php?lvid='.$row->lehrveranstaltung_id.'&studiensemester_kurzbz='.$row->studiensemester_kurzbz,
-								 'name'=>strtoupper($row->typ.$row->kurzbz).$row->semester.' '.$this->CutString($lv_obj->bezeichnung_arr[$sprache], $cutlength)
+								 'name'=>strtoupper($row->typ.$row->kurzbz).$row->semester.' '.CutString($lv_obj->bezeichnung_arr[$sprache], $cutlength, '...')
 								);
 							}
 						}
@@ -192,7 +192,7 @@ class menu_addon_meinelv extends menu_addon
 									$this->items[] = array('title'=>$lv_obj->bezeichnung_arr[$sprache],
 									 'target'=>'content',
 									 'link'=>'private/freifaecher/lesson.php?lvid='.$row->lehrveranstaltung_id,
-									 'name'=>'FF '.$this->CutString($row->lehreverzeichnis, $cutlength)
+									 'name'=>'FF '.CutString($row->lehreverzeichnis, $cutlength, '...')
 									);
 								}
 								else
@@ -203,7 +203,7 @@ class menu_addon_meinelv extends menu_addon
 									$this->items[] = array('title'=>$titel,
 									 'target'=>'content',
 									 'link'=>'private/lehre/lesson.php?lvid='.$row->lehrveranstaltung_id.'&studiensemester_kurzbz='.$row->studiensemester_kurzbz,
-									 'name'=>$kurzbz.' '.$this->CutString($lv_obj->bezeichnung_arr[$sprache], $cutlength)
+									 'name'=>$kurzbz.' '.CutString($lv_obj->bezeichnung_arr[$sprache], $cutlength, '...')
 									);
 								}
 							}
@@ -219,18 +219,6 @@ class menu_addon_meinelv extends menu_addon
 			}
 		}
 		$this->output();
-	}
-
-	private function CutString($strVal, $limit)
-	{
-		if(mb_strlen($strVal) > $limit+3)
-		{
-			return mb_substr($strVal, 0, $limit) . "...";
-		}
-		else
-		{
-			return $strVal;
-		}
 	}
 }
 

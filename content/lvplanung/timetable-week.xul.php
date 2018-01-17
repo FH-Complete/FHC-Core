@@ -29,8 +29,8 @@ require_once('../../include/benutzerberechtigung.class.php');
 require_once('../../include/lehreinheit.class.php');
 require_once('../../include/zeitwunsch.class.php');
 require_once('../../include/wochenplan.class.php');
-require_once('../../include/reservierung.class.php'); 
-require_once('../../include/log.class.php'); 
+require_once('../../include/reservierung.class.php');
+require_once('../../include/log.class.php');
 
 echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 echo '<?xml-stylesheet href="chrome://global/skin/" type="text/css"?>';
@@ -93,7 +93,7 @@ if (isset($_GET['new_ort']))
 	$new_ort=$_GET['new_ort'];
 if (isset($_GET['kollisionsanzahl']))
 	$kollisionsanzahl=$_GET['kollisionsanzahl'];
-else 
+else
 	$kollisionsanzahl=0;
 if (isset($_GET['ort']))
 	$ort=$_GET['ort'];
@@ -224,7 +224,7 @@ if ($aktion=='stpl_move' || $aktion=='stpl_single_search' || $aktion=='stpl_set'
 		}
 		$name_stpl_idx='x'.++$j.'stundenplan_id0';
 	}
-	
+
 	//ReservierungsIDs
 	$i=0;
 	$name_res_id='reservierung_id'.$i;
@@ -233,7 +233,7 @@ if ($aktion=='stpl_move' || $aktion=='stpl_single_search' || $aktion=='stpl_set'
 		$res_id[]=$_GET[$name_res_id];
 		$name_res_id='reservierung_id'.++$i;
 	}
-	
+
 	// Mehrfachauswahl uebernehmen
 	$j=0;
 	$name_res_idx='x'.$j.'reservierung_id0';
@@ -259,7 +259,7 @@ if ($aktion=='stpl_move' || $aktion=='stpl_set')
 	$undo='';
 	$sql='';
 	$moved=array();
-	
+
 	foreach ($stpl_id as $stundenplan_id)
 	{
 		$moved[]=$stundenplan_id;
@@ -332,9 +332,9 @@ if ($aktion=='stpl_move' || $aktion=='stpl_set')
 			}
 		}
 	}
-	
+
 	//UNDO Befehl schreiben
-	if($undo!='' && $error_msg=='' && $sql!='')
+	if($undo!='' && $error_msg=='' && $sql!='' && $kollision_msg=='')
 	{
 		$log = new log();
 		$log->executetime = date('Y-m-d H:i:s');
@@ -344,14 +344,14 @@ if ($aktion=='stpl_move' || $aktion=='stpl_set')
 		$log->mitarbeiter_uid = $uid;
 		if(!$log->save(true))
 			$error_msg.='Fehler: '.$log->errormsg;
-		
+
 	}
 }
 // ****************** STPL Delete *******************************
 elseif ($aktion=='stpl_delete_single' || $aktion=='stpl_delete_block')
 {
 	$lehrstunde=new lehrstunde();
-	
+
 	if($rechte->isBerechtigt('lehre/lvplan',null,'uid'))
 	{
 		//Einzelne Stunden entfernen
@@ -363,7 +363,7 @@ elseif ($aktion=='stpl_delete_single' || $aktion=='stpl_delete_block')
 				$error_msg.=$lehrstunde->errormsg;
 			}
 		}
-		
+
 		//Loeschen von mehreren Stunden
 		if(isset($stpl_idx))
 		{
@@ -373,7 +373,7 @@ elseif ($aktion=='stpl_delete_single' || $aktion=='stpl_delete_block')
 				$error_msg.=$lehrstunde->errormsg;
 			}
 		}
-		
+
 		if(isset($res_id))
 		{
 			foreach ($res_id as $reservierung_id)
@@ -397,7 +397,7 @@ elseif ($aktion=='stpl_delete_single' || $aktion=='stpl_delete_block')
 				}
 			}
 		}
-		
+
 		//Loeschen von mehreren Reservierungen
 		if(isset($res_idx))
 		{
@@ -459,7 +459,7 @@ elseif ($aktion=='lva_single_set')
 
 			for ($j=0;$j<$lva[$i]->stundenblockung;$j++)
 			{
-				
+
 				if (!$lva[$i]->save_stpl($new_datum,$new_stunde+$j,$new_ort,$db_stpl_table,$uid))
 					$error_msg.='Error: '.$lva[$i]->errormsg;
 			}
@@ -481,18 +481,18 @@ elseif ($aktion=='lva_multi_set')
 			$ferien->getAll($stg_kz);
 		else
 			$ferien->getAll(0);
-	
+
 		// Ende holen
 		if (!$result_semester=$db->db_query("SELECT * FROM public.tbl_studiensemester WHERE studiensemester_kurzbz=".$db->db_add_param($semester_aktuell).";"))
 			die ($db->db_last_error());
 		if ($db->db_num_rows()>0)
 		{
-			$row = $db->db_fetch_object(); 
+			$row = $db->db_fetch_object();
 			$ende = $row->ende;
 		}
 		else
 			$error_msg.="Fatal Error: Ende Datum ist nicht gesetzt ($semester_aktuell)!";
-		
+
 		$ende=mktime(0,0,1,substr($ende,5,2),substr($ende,8,2),substr($ende,0,4));
 		$anz_lvas=count($lva_id);
 		// Arrays intitialisieren
@@ -510,7 +510,7 @@ elseif ($aktion=='lva_multi_set')
 			$lvas.=' OR lehreinheit_id='.$id;
 		$lvas=substr($lvas,3);
 		$sql_query.=$lvas;
-	
+
 		if(!$result_lva = $db->db_query($sql_query))
 			$error_msg.=$db->db_last_error();
 		$num_rows_lva=$db->db_num_rows($result_lva);
@@ -533,7 +533,7 @@ elseif ($aktion=='lva_multi_set')
 			$offenestunden=$os;
 		else
 			$error_msg.='Offene Stunden sind nicht eindeutig!';
-		
+
 		//Blockung
 		$blk=$block[0];
 		$block=array_unique($block);
@@ -630,7 +630,7 @@ if ($error_msg=='' && ($kollision_msg=='' || $kollisionsanzahl>0))
 }
 else
 	$db->db_query('ROLLBACK;');
-	
+
 $error_msg.=$kollision_msg;
 
 // Stundenplan erstellen
@@ -686,17 +686,17 @@ while ($begin<=$ende)
 			else
 				$error_msg.=$wunsch->errormsg;
 	}
-	
+
 	// Stundenplan einer Woche laden
 	if (! $stdplan->load_week($datum,$db_stpl_table, $alle_unr_mitladen))
 		$error_msg.=$stdplan->errormsg;
-	
+
 	//Raumvorschlag setzen
-	
+
 	if ($aktion=='lva_single_search' || $aktion=='lva_multi_search')
 		if (! $stdplan->load_lva_search($datum,$lva_id,$db_stpl_table, $aktion))
 			$error_msg.=$stdplan->errormsg;
-	
+
 	if ($aktion=='stpl_single_search')
 	{
 		if(isset($stpl_id))
@@ -704,13 +704,13 @@ while ($begin<=$ende)
 			if (! $stdplan->load_stpl_search($datum,$stpl_id,$db_stpl_table))
 				$error_msg.=$stdplan->errormsg;
 		}
-		else 
+		else
 			$error_msg.='Derzeit gibt es keinen Raumvorschlag fuer Reservierungen';
 	}
 
 	// Stundenplan der Woche drucken
 	$stdplan->draw_week_xul($semesterplan,$uid,$zeitwunsch, $ignore_kollision, $kollision_student, $max_kollision);
-	
+
 }
 
 ?>
@@ -724,7 +724,7 @@ while ($begin<=$ende)
 		if ($error_msg!='')
 			echo "alert('".str_replace("'",'"',str_replace(chr(10),'\n',htmlspecialchars($error_msg)))."');";
 	?>
-	
+
 	top.document.getElementById("statusbarpanel-text").setAttribute("label","<?php echo str_replace(chr(10),' ',htmlspecialchars($PHP_SELF.$error_msg)); ?>");
 </script>
 </window>

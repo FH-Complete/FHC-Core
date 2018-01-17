@@ -48,7 +48,13 @@ class dokument_export
 
 		exec('unoconv --version',$ret_arr);
 		if(isset($ret_arr[0]))
-			$this->unoconv_version = explode(' ',$ret_arr[0])[1];
+		{
+			$hlp = explode(' ',$ret_arr[0]);
+			if(isset($hlp[1]))
+				$this->unoconv_version = $hlp[1];
+			else
+				die('Could not get Unoconv Version');
+		}
 		else
 			die('Unoconv not found');
 
@@ -411,7 +417,11 @@ class dokument_export
 				}
 			}
 			else
+			{
+				// Remove UTF8 Control Characters (breaking XML)
+				$value = preg_replace('/[\x00-\x1F\x7F]/u', '', $value);
 				$_xml_data->addChild("$key",htmlspecialchars("$value"));
+			}
 		}
 		return $_xml_data->asXML();
 	}

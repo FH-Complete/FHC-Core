@@ -22,6 +22,7 @@
 require_once(dirname(__FILE__).'/basis_db.class.php');
 require_once(dirname(__FILE__).'/authentication.class.php');
 require_once(dirname(__FILE__).'/betriebsmittelperson.class.php');
+require_once(dirname(__FILE__).'/personlog.class.php');
 
 // Auth: Benutzer des Webportals
 /**
@@ -320,7 +321,10 @@ function loadVariables($user)
 	if (!isset($emailadressentrennzeichen))
 	{
 		global $emailadressentrennzeichen;
-		$emailadressentrennzeichen=',';
+		if(defined('DEFAULT_EMAILADRESSENTRENNZEICHEN'))
+			$emailadressentrennzeichen = DEFAULT_EMAILADRESSENTRENNZEICHEN;
+		else
+			$emailadressentrennzeichen=',';
 	}
 
 	if(!isset($alle_unr_mitladen))
@@ -1042,5 +1046,55 @@ function generateSpecialCharacterString($inputString, $punctuationMark = false)
 	$inputString = implode('', $inputStringSplitted);
 
 	return $inputString;
+}
+
+/**
+ * Cuts the string to the given limit minus the stringlength of the placeholderSign and adds the placeholderSign at the end of the string
+ * If $keepFilextension is true, the string is checked for a PATHINFO_EXTENSION and the extension is added to the returned string.
+ * The returned stringlength includes the fileextension.
+ * @param string $string The input string to be cutted
+ * @param integer $limit The length of the returned string (including the placeholderSigns)
+ * @param string $placeholderSign Optional. Default null. The string to be added at the end of the cutted string.
+ * @param bool $keepFilextension. Default false. When set to true the
+ * @return string The cutted string with the placeholderSign at the end and the optional fileextension
+ */
+function cutString($string, $limit, $placeholderSign = '', $keepFileextension = false)
+{
+	$offset = strlen($placeholderSign);
+	$extension = '';
+	if ($keepFileextension)
+	{
+		$extension = '.'.pathinfo($string, PATHINFO_EXTENSION);
+		$offset = $offset + mb_strlen($extension);
+	}
+	if(($limit - $offset) < 0)
+	{
+		return '<span class="error">$placeholderSign must not be shorter than $limit</span>';
+	}
+
+	if(strlen($string) > ($limit - $offset))
+	{
+		return mb_substr($string, 0, ($limit - $offset)).$placeholderSign.$extension;
+	}
+	else
+	{
+		return $string;
+	}
+}
+
+/**
+ * Erstellt einen Log Eintrag zu einer Person
+ * @param $person_id ID der Person.
+ * @param $logtype_kurzbz Typ des Logeintrages
+ * @param $logdata Array mit den zusaetzlichen Logdaten zu diesem Typ.
+ * @param $taetigkeit_kurzbz Kurzbz der Verarbeitungstaetigkeit.
+ * @param $app Applikation von der dieser Logeintrag stammt. (optional)
+ * @param $oe_kurzbz Kurzbz der Organisationseinheit. (optional)
+ * @param $user User der die Aktion durchgefuehrt hat. (optional)
+ */
+function PersonLog($person_id, $logtype_kurzbz, $logdata, $taetigkeit_kurzbz, $app = 'core', $oe_kurzbz = null, $user = null)
+{
+	$personlog = new personlog();
+	$personlog->log($person_id, $logtype_kurzbz, $logdata, $taetigkeit_kurzbz, $app, $oe_kurzbz, $user);
 }
 ?>

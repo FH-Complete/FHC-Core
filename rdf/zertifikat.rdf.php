@@ -77,11 +77,10 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 
 	$note_arr = array();
 	$note = new note();
-	$note->getAll();
+	$note->getAll($offiziell = true);
 	foreach ($note->result as $n){
 		$note_arr[$n->note] = $n->anmerkung;
 		$note_bezeichnung_arr[$n->note] = $n->bezeichnung;
-
 	}
 	if(isset($_GET['ss']))
 		$studiensemester_kurzbz = $_GET['ss'];
@@ -221,7 +220,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		$obj = new zeugnisnote();
 		$obj->load($lehrveranstaltung_id, $uid_arr[$i], $studiensemester_kurzbz);
 
-		if ($obj->note)
+		if ($obj->note && isset($note_arr[$obj->note]))
 		{
 			$note = $note_arr[$obj->note];
 			$note_bezeichnung = $note_bezeichnung_arr[$obj->note];

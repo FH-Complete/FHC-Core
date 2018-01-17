@@ -455,21 +455,6 @@ if(isset($_GET['kopieren']))
 		return ($var!=''?"'".addslashes($var)."'":'null');
 	}
 
-	// ***********************************************************************************************
-	//      String auf Laenge abschneiden
-	// ***********************************************************************************************
-    function CutString($strVal, $limit)
-    {
-          if(strlen($strVal) > $limit+3)
-          {
-                  return substr($strVal, 0, $limit) . "...";
-          }
-          else
-          {
-                  return $strVal;
-          }
-    }
-
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
@@ -587,7 +572,7 @@ if(isset($_GET['kopieren']))
 	                        {
 									if (empty($lehrveranstaltung_id))
 										$lehrveranstaltung_id=$row->lehrveranstaltung_id;
-	                                $content.='<option value="'.$row->lehrveranstaltung_id.'" '.(("$lehrveranstaltung_id"=="$row->lehrveranstaltung_id")?' selected="selected" ':'').'>&nbsp;'.CutString($row->bezeichnung, 30).' '.$row->lehrform_kurzbz.'&nbsp;('.$row->lehrveranstaltung_id.')</option>';
+	                                $content.='<option value="'.$row->lehrveranstaltung_id.'" '.(("$lehrveranstaltung_id"=="$row->lehrveranstaltung_id")?' selected="selected" ':'').'>&nbsp;'.CutString($row->bezeichnung, 30, '...').' '.$row->lehrform_kurzbz.'&nbsp;('.$row->lehrveranstaltung_id.')</option>';
 	                        }
 	                }
 	                else
@@ -634,7 +619,7 @@ if(isset($_GET['kopieren']))
 								{
 									$lektoren.= ($lektoren?',':'').'&nbsp;'.$ma->mitarbeiter_uid;
 								}
-								$lektoren=CutString($lektoren, 30);
+								$lektoren=CutString($lektoren, 30, '...');
                                 $content.='<option value="'.$row->lehreinheit_id.'" '.($lehreinheit_id==$row->lehreinheit_id?' selected="selected" ':'').'>&nbsp;'.$row->lehrform_kurzbz.' '.$gruppen.'&nbsp;'.$lektoren.'&nbsp;('.$row->lehreinheit_id.')</option>';
                         }
                 }
@@ -786,7 +771,7 @@ if(isset($_GET['kopieren']))
 	                        {
 									if (empty($lehrveranstaltung_id_target))
 										$lehrveranstaltung_id_target=$row->lehrveranstaltung_id;
-	                                $content.='<option value="'.$row->lehrveranstaltung_id.'" '.(("$lehrveranstaltung_id_target"=="$row->lehrveranstaltung_id")?' selected="selected" ':'').'>&nbsp;'.CutString($row->bezeichnung, 30).' '.$row->lehrform_kurzbz.'&nbsp;('.$row->lehrveranstaltung_id.')</option>';
+	                                $content.='<option value="'.$row->lehrveranstaltung_id.'" '.(("$lehrveranstaltung_id_target"=="$row->lehrveranstaltung_id")?' selected="selected" ':'').'>&nbsp;'.CutString($row->bezeichnung, 30, '...').' '.$row->lehrform_kurzbz.'&nbsp;('.$row->lehrveranstaltung_id.')</option>';
 	                        }
 	                }
 	                else
@@ -835,7 +820,7 @@ if(isset($_GET['kopieren']))
 								{
 									$lektoren.= ($lektoren?',':'').'&nbsp;'.$ma->mitarbeiter_uid;
 								}
-								$lektoren=CutString($lektoren, 30);									
+								$lektoren=CutString($lektoren, 30, '...');									
                                 $content.='<option value="'.$row->lehreinheit_id.'" '.($lehreinheit_id_target==$row->lehreinheit_id?' selected="selected" ':'').'>&nbsp;'.$row->lehrform_kurzbz.' '.$gruppen.'&nbsp;'.$lektoren.'&nbsp;('.$row->lehreinheit_id.')</option>';
                         }
                 }

@@ -26,7 +26,7 @@ $user = get_uid();
 
 $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($user);
-	
+
 if(!$rechte->isBerechtigt('basis/service'))
 	die('Sie haben keine Berechtigung fuer diese Seite');
 
@@ -37,27 +37,27 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 <head>
 	<title>Service</title>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-	
+
 	<link rel="stylesheet" href="../../skin/fhcomplete.css" type="text/css">
 	<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">';
-	
+
 	include('../../include/meta/jquery.php');
 	include('../../include/meta/jquery-tablesorter.php');
-	
+
 	echo'
 	<script type="text/javascript">
-	
-		$(document).ready(function() 
-			{ 
+
+		$(document).ready(function()
+			{
 			    $("#myTable").tablesorter(
 				{
 					sortList: [[3,0],[2,0]],
 					widgets: [\'zebra\'],
 					headers: {8:{sorter:false}}
-				}); 
-			} 
+				});
+			}
 		);
-		
+
 		function confdel()
 		{
 			return confirm("Wollen Sie diesen Eintrag wirklich löschen?");
@@ -73,10 +73,10 @@ if(isset($_GET['action']) && $_GET['action']=='delete')
 {
 	if(!$rechte->isBerechtigt('basis/service', null, 'suid'))
 		die('Sie haben keine Berechtigung fuer diese Seite');
-	
+
 	if(!isset($_GET['service_id']))
 		die('Fehlender Parameter ServiceID');
-	
+
 	$service = new service();
 	if($service->delete($_GET['service_id']))
 		echo '<span class="ok">Eintrag wurde erfolgreich gelöscht</span>';
@@ -100,7 +100,7 @@ foreach($oe->result as $row)
 		$selected='selected';
 	else
 		$selected='';
-		
+
 	echo '<OPTION value="'.$row->oe_kurzbz.'" '.$selected.'>'.$row->organisationseinheittyp_kurzbz.' '.$row->bezeichnung.'</OPTION>';
 }
 echo '</SELECT>
@@ -125,6 +125,7 @@ echo '<table class="tablesorter" id="myTable">
 			<th>Beschreibung</th>
 			<th>Organisationseinheit</th>
 			<th>Content_ID</th>
+			<th>Ext_ID</th>
 			<th>Design</th>
 			<th>Betrieb</th>
 			<th>Operativ</th>
@@ -141,6 +142,7 @@ foreach($service->result as $row)
 	echo '<td>',$row->beschreibung,'</td>';
 	echo '<td>',$row->oe_kurzbz,'</td>';
 	echo '<td>',$row->content_id,'</td>';
+	echo '<td>',$row->ext_id,'</td>';
 	echo '<td>',$row->design_uid,'</td>';
 	echo '<td>',$row->betrieb_uid,'</td>';
 	echo '<td>',$row->operativ_uid,'</td>';

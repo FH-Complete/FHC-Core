@@ -1,12 +1,12 @@
 <?php
-if (! defined('BASEPATH')) 
+if (! defined('BASEPATH'))
 	exit('No direct script access allowed');
 
 /*
 | -------------------------------------------------------------------------
 | Standard ROLES in FH-Complete and their persmissions
 | -------------------------------------------------------------------------
-| 
+|
 */
 $config['roles'] = array
 (
@@ -46,6 +46,16 @@ $config['roles'] = array
 			'wawi/freigabe_advanced', 'wawi/inventar', 'wawi/konto', 'wawi/kostenstelle',
 			'wawi/rechnung', 'wawi/rechnung_freigeben',	'wawi/rechnung_transfer',
 			'wawi/storno'
+		)
+	),
+	array
+	(
+		'rolle_kurzbz' => 'infocenter',
+		'berechtigung' => array
+		(
+			'basis/adresse','basis/akte','basis/kontakt','basis/log','basis/nation','basis/notiz','basis/notizzuordnung',
+			'basis/person','basis/prestudent','basis/prestudentstatus','basis/status','basis/zgv','basis/zgvmaster',
+			'lehre/studienplan','system/filters'
 		)
 	)
 );

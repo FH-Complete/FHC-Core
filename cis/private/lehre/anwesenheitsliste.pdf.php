@@ -44,15 +44,15 @@ else
 
 $lv = new lehrveranstaltung();
 $lv->load($lvid);
-	
+
 if(isset($_GET['stsem']))
 	$studiensemester = $_GET['stsem'];
 else
 	die('Eine Studiensemester muss uebergeben werden');
 
-if(	!$berechtigung->isBerechtigt('admin') 
-	&& !$berechtigung->isBerechtigt('assistenz') 
-	&& !$berechtigung->isBerechtigt('lehre', $lv->oe_kurzbz, 's') 
+if(	!$berechtigung->isBerechtigt('admin')
+	&& !$berechtigung->isBerechtigt('assistenz')
+	&& !$berechtigung->isBerechtigt('lehre', $lv->oe_kurzbz, 's')
 	&& !check_lektor_lehrveranstaltung($user,$lvid,$studiensemester))
 	die('Sie muessen LektorIn der LV sein oder das Recht "ADMIN", "ASSISTENZ" oder "LEHRE" haben, um diese Seite aufrufen zu koennen');
 
@@ -95,6 +95,34 @@ if($result = $db->db_query($qry))
 	}
 }
 
+
+// Verplante Räume laden
+$qry = "SELECT distinct(ort_kurzbz)
+        FROM lehre.tbl_stundenplan
+		WHERE lehreinheit_id in
+			(
+				SELECT lehreinheit_id
+				FROM campus.vw_lehreinheit
+				WHERE lehrveranstaltung_id = ".$db->db_add_param($lvid, FHC_INTEGER)."
+ 				AND studiensemester_kurzbz = ".$db->db_add_param($studiensemester)."
+			)";
+if($lehreinheit!='')
+	$qry.= " AND tbl_stundenplan.lehreinheit_id = ".$db->db_add_param($lehreinheit, FHC_INTEGER);
+
+
+$raum_string = '';
+if($result = $db->db_query($qry))
+{
+	while($row = $db->db_fetch_object($result))
+	{
+		if($raum_string!='')
+			$raum_string.=', ';
+		if($row->ort_kurzbz!='')
+			$raum_string.=$row->ort_kurzbz;
+	}
+}
+
+
 $stg = new studiengang();
 $stg->load($lv->studiengang_kz);
 
@@ -114,6 +142,7 @@ $data = array(
 	'studiensemester'=>$studiensemester,
 	'semester'=>$lv->semester,
 	'orgform'=>$lv->orgform_kurzbz,
+	'raum'=>$raum_string,
 );
 
 //Lehrende der LV laden und in ein Array schreiben

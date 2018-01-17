@@ -109,6 +109,7 @@ foreach($addon_obj->result as $addon)
   <command id="menu-statistic-fehlendedokumente:command" oncommand="StatistikPrintFehlendeDokumente();"/>
   <command id="menu-statistic-notenspiegel:command" oncommand="StatistikPrintNotenspiegel('html');"/>
   <command id="menu-statistic-notenspiegel-excel:command" oncommand="StatistikPrintNotenspiegel('xls');"/>
+  <command id="menu-statistic-notenspiegel-excel-erweitert:command" oncommand="StatistikPrintNotenspiegelErweitert('xls');"/>
   <command id="menu-statistic-substatistik-studentenprosemester-excel:command" oncommand="StatistikPrintStudentenProSemester('xls');"/>
   <command id="menu-statistic-substatistik-studentenprosemester-html:command" oncommand="StatistikPrintStudentenProSemester('');"/>
   <command id="menu-statistic-substatistik-alvsstatistik-excel:command" oncommand="StatistikPrintALVSStatistik('xls');"/>
@@ -357,6 +358,12 @@ foreach($addon_obj->result as $addon)
 			               label     = "&menu-statistic-notenspiegel-excel.label;"
 			               command   =  "menu-statistic-notenspiegel-excel:command"
 			               accesskey = "&menu-statistic-notenspiegel-excel.accesskey;"/>
+                        <menuitem
+                                id        =  "menu-statistic-notenspiegel-excel-erweitert"
+                                key       =  "menu-statistic-notenspiegel-excel-erweitert:key"
+                                label     = "&menu-statistic-notenspiegel-excel-erweitert.label;"
+                                command   =  "menu-statistic-notenspiegel-excel-erweitert:command"
+                                accesskey = "&menu-statistic-notenspiegel-excel-erweitert.accesskey;"/>
 						<menuitem
 			               id        =  "menu-statistic-notenspiegel"
 			               key       =  "menu-statistic-notenspiegel:key"

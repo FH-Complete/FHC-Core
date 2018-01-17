@@ -47,7 +47,7 @@ class MessageToken_model extends CI_Model
 				 LIMIT 1';
 
 		$result = $this->db->query($sql, array(MSG_STATUS_DELETED, $token));
-		
+
 		// If no errors occurred
 		if ($result)
 		{
@@ -58,7 +58,7 @@ class MessageToken_model extends CI_Model
 			return error($this->db->error());
 		}
 	}
-	
+
 	/**
 	 * Set the status of a message to read. If the status of the message
 	 * is already read then update updateamum
@@ -82,19 +82,20 @@ class MessageToken_model extends CI_Model
 						) s ON (r.message_id = s.message_id AND r.person_id = s.person_id)
 				 WHERE r.token = ?
 				 LIMIT 1';
-		
+
 		$msgs = $this->db->query($sql, array(MSG_STATUS_ARCHIVED, $token));
-		
+
 		// If no errors occurred
 		if ($msgs)
 		{
+			$msgs_result = $msgs->result();
 			// If at least a record is present
-			if (count($msgs->result()) > 0)
+			if (count($msgs_result) > 0)
 			{
-				$msg = $msgs->result()[0];
-				
+				$msg = $msgs_result[0];
+
 				$msgStatusResult = false; // pessimistic expectation
-				
+
 				// If the status of the message is unread
 				if ($msg->status == MSG_STATUS_UNREAD)
 				{
@@ -118,31 +119,31 @@ class MessageToken_model extends CI_Model
 				{
 					// Update updateamum to current date
 					$this->db->set('updateamum', 'NOW()');
-					
+
 					$this->db->where('message_id', $msg->message_id);
 					$this->db->where('person_id', $msg->receiver_id);
 					$this->db->where('status', MSG_STATUS_READ);
-					
+
 					$msgStatusResult = $this->db->update('public.tbl_msg_status');
 				}
-				
+
 				// If some of the previous DB manipulation (update or insert) has failed
 				if (!$msgStatusResult)
 				{
 					return error($this->db->error());
 				}
 			}
-			
-			return success($msgs->result());
+
+			return success($msgs_result);
 		}
 		else
 		{
 			return error($this->db->error());
 		}
-		
+
 		return success($result->result());
 	}
-	
+
 	/**
 	 * Get data of the message sender
 	 */
@@ -159,9 +160,9 @@ class MessageToken_model extends CI_Model
 			 LEFT JOIN public.tbl_benutzer b USING(person_id)
 			 LEFT JOIN public.tbl_mitarbeiter m ON(b.uid = m.mitarbeiter_uid)
 				 WHERE p.person_id = ?';
-		
+
 		$result = $this->db->query($sql, array($person_id));
-		
+
 		// If no errors occurred
 		if ($result)
 		{
@@ -172,9 +173,9 @@ class MessageToken_model extends CI_Model
 			return error($this->db->error());
 		}
 	}
-	
+
 	/**
-	 * 
+	 *
 	 */
 	public function isEmployee($person_id)
 	{
@@ -184,29 +185,78 @@ class MessageToken_model extends CI_Model
 			 LEFT JOIN public.tbl_mitarbeiter m ON(b.uid = m.mitarbeiter_uid)
 				 WHERE p.person_id = ?
 				   AND b.aktiv = TRUE';
-		
+
 		$result = $this->db->query($sql, array($person_id));
-		
+
 		// If no errors occurred
 		if ($result)
 		{
 			// If data are present
 			if (is_array($result->result()) && count($result->result()) > 0)
 			{
-				$person = $result->result()[0];
-				
+				$personresults = $result->result();
+				$person = $personresults[0];
+
 				// If it is an employee
 				if ($person->mitarbeiter_uid != null)
 				{
 					return true;
 				}
 			}
-			
+
 			return false;
 		}
 		else
 		{
 			return error($this->db->error());
 		}
+	}
+
+	/**
+	 * getRoot - Get the root of the organisation unit tree which belongs the given organisation unit parameter
+	 */
+	public function getOERoot($oe_kurzbz)
+	{
+		$sql = '
+			WITH RECURSIVE organizations(rid, oe_kurzbz, oe_parent_kurzbz) AS
+			(
+				SELECT 1 AS rid, o.oe_kurzbz, o.oe_parent_kurzbz
+	  			  FROM public.tbl_organisationseinheit o
+				 WHERE o.oe_kurzbz = ?
+				UNION ALL
+				SELECT rid + 1 AS rid, oe.oe_kurzbz, oe.oe_parent_kurzbz
+	  			  FROM organizations org, public.tbl_organisationseinheit oe
+				 WHERE oe.oe_kurzbz = org.oe_parent_kurzbz
+          		   AND oe.aktiv = TRUE
+			)
+			SELECT oe_kurzbz
+			  FROM organizations orgs
+		  ORDER BY rid DESC
+		     LIMIT 1
+		';
+
+		$result = $this->db->query($sql, array($oe_kurzbz));
+		if ($result) // If no errors occurred
+		{
+			$result_arr = $result->result();
+			// If data are present
+			if (is_array($result_arr)
+				&& count($result_arr) > 0
+				&& is_object($result_arr[0])
+				&& isset($result_arr[0]->oe_kurzbz))
+			{
+				return success($result_arr[0]->oe_kurzbz);
+			}
+			else
+			{
+				return error();
+			}
+		}
+		else
+		{
+			return error($this->db->error());
+		}
+
+		return $result;
 	}
 }

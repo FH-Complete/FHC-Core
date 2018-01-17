@@ -218,7 +218,7 @@ function draw_studienerfolg($uid, $studiensemester_kurzbz)
 	{
 		if($row->zeugnis)
 		{
-			if (trim($row->note)!=='')
+			if (trim($row->note)!=='' && isset($note_arr[$row->note]))
 				$note = $note_arr[$row->note];
 			else
 				$note = "";
@@ -297,7 +297,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 	$note_arr = array();
 	$note_wert = array();
 	$note = new note();
-	$note->getAll();
+	$note->getAll($offiziell = true);
 	foreach ($note->result as $n)
 	{
 		$note_arr[$n->note] = $n->anmerkung;

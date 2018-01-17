@@ -129,30 +129,15 @@ if(isset($_POST['submitbild']))
 		$dokument->loadDokumenttyp($_REQUEST['dokumenttyp']);
 
 		$extension = end(explode(".",strtolower($_FILES['file']['name'])));
-		$titel = $_REQUEST['dokumenttyp'];
-		
-		// da nur 32 zeichen gespeichert werden dürfen, muss anhand vom typ gekürzt werden
-		if($_REQUEST['dokumenttyp']=='Lebenslf')
-			$titel = $p->t('incoming/lebenslauf').".".$extension;
-		if($_REQUEST['dokumenttyp']=='LearnAgr')
-			$titel = $p->t('incoming/learningAgreement').".".$extension;
-		if($_REQUEST['dokumenttyp']=='Motivat')
-			$titel = $p->t('incoming/motivationsschreiben').".".$extension;
-		if($_REQUEST['dokumenttyp']=='Zeugnis')
-			$titel = $p->t('incoming/zeugnis').".".$extension;			
-		if($_REQUEST['dokumenttyp']=='Lichtbil')
-			$titel = $p->t('incoming/lichtbild').".".$extension;					
-		// alle auf 32
 			
 		$akte->dokument_kurzbz = $_REQUEST['dokumenttyp'];
-        $akte->bezeichnung = substr($_FILES['file']['name'],0,32); // auf 32
 		$akte->person_id = $_GET['person_id'];
 		//$akte->inhalt = base64_encode($content);
 		$akte->mimetype = $_FILES['file']['type'];
 		$akte->erstelltam = date('Y-m-d H:i:s');
 		$akte->gedruckt = false;
-		$akte->titel = $titel; 
-		//$akte->bezeichnung = $dokument->bezeichnung;
+		$akte->titel = $akte->titel = cutString($_FILES['file']['name'], 32, '~', true); // Filename gekuerzt auf 32 Zeichen; 
+		$akte->bezeichnung = cutString($dokument->bezeichnung_mehrsprachig[DEFAULT_LANGUAGE], 32);
 		$akte->updateamum = date('Y-m-d H:i:s');
 		$akte->updatevon = $user;
 		$akte->insertamum = date('Y-m-d H:i:s');

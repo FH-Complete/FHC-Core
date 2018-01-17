@@ -351,7 +351,7 @@ abstract class REST_Controller extends CI_Controller {
         self::HTTP_INTERNAL_SERVER_ERROR => 'INTERNAL SERVER ERROR',
         self::HTTP_NOT_IMPLEMENTED => 'NOT IMPLEMENTED'
     ];
-	
+
 	/**
      * Extend this function to apply additional checking early on in the process
      *
@@ -361,7 +361,7 @@ abstract class REST_Controller extends CI_Controller {
     protected function early_checks()
     {
     }
-	
+
     /**
      * Constructor for the REST API
      *
@@ -385,7 +385,8 @@ abstract class REST_Controller extends CI_Controller {
         }
 
         // Check to see if this is CI 3.x
-        if (explode('.', CI_VERSION, 2)[0] < 3)
+		$ci_version_number = explode('.', CI_VERSION, 2);
+        if ($ci_version_number[0] < 3)
         {
             throw new Exception('REST Server requires CodeIgniter 3.x');
         }
@@ -528,7 +529,7 @@ abstract class REST_Controller extends CI_Controller {
         {
             $this->_allow = $this->_detect_api_key();
         }
-		
+
         // Only allow ajax requests
         if ($this->input->is_ajax_request() === FALSE && $this->config->item('rest_ajax_only'))
         {
@@ -607,7 +608,7 @@ abstract class REST_Controller extends CI_Controller {
         //$controller_method = $object_called . '_' . $this->request->method;
 		// CamelCase compliant
 		$controller_method = $this->request->method.ucfirst($object_called);
-		
+
         // Do we want to log this method (if allowed by config)?
         $log_method = !(isset($this->methods[$controller_method]['log']) && $this->methods[$controller_method]['log'] === FALSE);
 
@@ -737,7 +738,7 @@ abstract class REST_Controller extends CI_Controller {
                 // Set the format header
                 $this->output->set_content_type($this->_supported_formats[$this->response->format], strtolower($this->config->item('charset')));
                 $output = $this->format->factory($data)->{'to_' . $this->response->format}();
-				
+
                 // An array must be parsed as a string, so as not to cause an array to string error
                 // Json is the most appropriate form for such a datatype
                 if ($this->response->format === 'array')
@@ -967,7 +968,7 @@ abstract class REST_Controller extends CI_Controller {
         $this->rest->level = NULL;
         $this->rest->user_id = NULL;
         $this->rest->ignore_limits = FALSE;
-		
+
         // Find the key from server or arguments
         if (($key = isset($this->_args[$api_key_variable]) ? $this->_args[$api_key_variable] : $this->input->server($key_name)))
         {
@@ -1899,7 +1900,7 @@ abstract class REST_Controller extends CI_Controller {
                 ], self::HTTP_UNAUTHORIZED);
         }
     }
-	
+
     /**
      * Prepares for basic authentication
      *
@@ -1977,7 +1978,7 @@ abstract class REST_Controller extends CI_Controller {
         preg_match_all('@(username|nonce|uri|nc|cnonce|qop|response)=[\'"]?([^\'",]+)@', $digest_string, $matches);
         $digest = (empty($matches[1]) || empty($matches[2])) ? [] : array_combine($matches[1], $matches[2]);
 
-        // For digest authentication the library function should return 
+        // For digest authentication the library function should return
 		// already stored password for that username, even if it is hashed
         $username = $this->_check_login($digest['username'], TRUE);
 		// If there no password

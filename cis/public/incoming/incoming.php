@@ -1535,17 +1535,17 @@ echo'					<td>'.$p->t('incoming/masterstudiengang').'</td>
 						<td colspan="2"><b>Department Coordinator</b></td>
 						<td colspan="2"><b>International Coordinator</b></td></tr>
 					<tr>
-						<td width="25%">'.$p->t('global/vorname').' </td>
+						<td width="25%">'.$p->t('incoming/vorname').' </td>
 						<td width="25%"><input type="text" name="vorname_coordinator" size="20" maxlength="256" value="'.$depCoordinator->vorname.'">
 						<input type="hidden" name = "dep_coordinator_id" id="dep_coordinator_id" value="'.$preincoming->person_id_coordinator_dep.'"></td>
-						<td width="25%">'.$p->t('global/vorname').' </td>
+						<td width="25%">'.$p->t('incoming/vorname').' </td>
 						<td width="25%"><input type="text" name="vorname_intcoordinator" size="20" maxlength="256" value="'.$intCoordinator->vorname.'">
 						<input type="hidden" name = "int_coordinator_id" id="int_coordinator_id" value="'.$preincoming->person_id_coordinator_int.'"></td>
 					</tr>
 					<tr>
-						<td width="25%">'.$p->t('global/nachname').' </td>
+						<td width="25%">'.$p->t('incoming/nachname').' </td>
 						<td width="25%"><input type="text" name="nachname_coordinator" size="20"  value="'.$depCoordinator->nachname.'"></td>
-						<td width="25%">'.$p->t('global/nachname').' </td>
+						<td width="25%">'.$p->t('incoming/nachname').' </td>
 						<td width="25%"><input type="text" name="nachname_intcoordinator" size="20"  value="'.$intCoordinator->nachname.'"></td>
 					</tr>
 					<tr>
@@ -1868,13 +1868,13 @@ else if ($method == "profil")
 				<td><input type="text" name="zgv_master" value="'.$preincoming->zgvmaster.'" size=40></td>
             </tr>
 			<tr>
-				<td>'.$p->t('global/vorname').'</td>
+				<td>'.$p->t('incoming/vorname').'</td>
 				<td><input type="text" size="20" maxlength="32" name="vorname" value="'.$person->vorname.'"></td>
                 <td>'.$p->t('incoming/abgelegtin').'</td>
 				<td><input type="text" name="zgv_master_name" size=40 value="'.$preincoming->zgvmaster_name.'"></td>
             </tr>
 			<tr>
-                <td>'.$p->t('global/nachname').'</td>
+                <td>'.$p->t('incoming/nachname').'</td>
 				<td><input type="text" size="20" maxlength="64" name="nachname" value="'.$person->nachname.'" required></td>
 				<td>'.$p->t('incoming/abgelegtinort').'</td>
 				<td><input type="text" name="zgv_master_ort" size=40 value="'.$preincoming->zgvmaster_ort.'"></td>
@@ -1923,14 +1923,14 @@ echo'			</SELECT></td>
     					<input type="radio" name="geschlecht" value="w" checked>'.$p->t('global/frau').'
     			</td>';
 
-        echo    '<td>'.$p->t('global/vorname').'</td>
+        echo    '<td>'.$p->t('incoming/vorname').'</td>
 				<td><input type="text" size="40" name="emergency_vorname" value="'.$personEmergency->vorname.'">
 				<input type="hidden" name="emergency_name_id" id="emergency_name_id" value="'.$preincoming->person_id_emergency.'"></td>
             </tr>
 			<tr>
 				<td></td>
                 <td></td>
-				<td>'.$p->t('global/nachname').'</td>
+				<td>'.$p->t('incoming/nachname').'</td>
 				<td><input type="text" size="40" name="emergency_nachname" value="'.$personEmergency->nachname.'"></td>
 			</tr>
 			<tr>

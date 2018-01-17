@@ -104,19 +104,22 @@ class pruefungstermin extends basis_db{
         }
         
     }
-    
-    /**
-     * Lädt alle Prüfungstypen aus der Datenbank
-     * @return Array/Boolean Ein Array mit den Daten, wenn ok; ansonsten false
-     */
-    public function getAllPruefungstypen($abschluss = null)
+
+	/**
+	 * Lädt alle Prüfungstypen aus der Datenbank
+	 * @param null $abschluss gibt an, ob Abschlussprüfungen ausgegeben werden sollen. default: Abschlussprüfungen und andere Prüfungen
+	 * @return array /Boolean Ein Array mit den Daten, wenn ok; ansonsten false
+	 */
+    public function getAllPruefungstypen($abschluss = null, $sort = false)
     {
         $qry = 'SELECT * FROM lehre.tbl_pruefungstyp';
 	
-	if(!is_null($abschluss))
+	if(is_bool($abschluss))
 	{
-	    $qry .= ' WHERE abschluss='.$this->db_add_param($abschluss);
+	    $qry .= ' WHERE abschluss='.$this->db_add_param($abschluss, FHC_BOOLEAN);
 	}
+	if($sort)
+		$qry .= ' ORDER BY (sort IS NULL), sort, pruefungstyp_kurzbz';
 	$qry .=';';
         
         if($this->db_query($qry))
@@ -128,6 +131,7 @@ class pruefungstermin extends basis_db{
                 $obj->pruefungstyp_kurzbz = $row->pruefungstyp_kurzbz;
                 $obj->beschreibung = $row->beschreibung;
                 $obj->abschluss = $row->abschluss;
+                $obj->sort = $row->sort;
                 array_push($result, $obj);
             }
         }
@@ -137,7 +141,6 @@ class pruefungstermin extends basis_db{
             return false;
         }
         return $result;
-        
     }
     
     /**

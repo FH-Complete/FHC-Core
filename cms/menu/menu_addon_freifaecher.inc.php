@@ -19,8 +19,8 @@
  */
 /**
  * Menue Addon fuer die Darstellung der Freifaecher
- * 
- * Es wird eine Link-Liste mit allen aktuellen Freifaechern erstellt 
+ *
+ * Es wird eine Link-Liste mit allen aktuellen Freifaechern erstellt
  */
 require_once(dirname(__FILE__).'/menu_addon.class.php');
 require_once(dirname(__FILE__).'/../../include/functions.inc.php');
@@ -32,9 +32,9 @@ class menu_addon_freifaecher extends menu_addon
 	public function __construct()
 	{
 		parent::__construct();
-		
+
 		$this->link=false;
-		
+
 		$sprache = getSprache();
 		$stsem = new studiensemester();
 		$stsem = $stsem->getAktOrNext();
@@ -48,27 +48,15 @@ class menu_addon_freifaecher extends menu_addon
 			$this->items[] = array('title'=>$row->bezeichnung_arr[$sprache],
 						 'target'=>'content',
 						 'link'=>'private/lehre/lesson.php?lvid='.$row->lehrveranstaltung_id.'&studiensemester_kurzbz='.$stsem,
-						 'name'=>'<span '.(!$row->aktiv?' style="" ':' style=""').'>'.(!$row->aktiv?' <img src="../skin/images/ampel_rot.png" height="8px" height="8px"> ':' <img src="../skin/images/ampel_gruen.png" height="8px"> ').' '.$this->CutString($row->bezeichnung_arr[$sprache], 21).'</span>'
+						 'name'=>'<span '.(!$row->aktiv?' style="" ':' style=""').'>'.(!$row->aktiv?' <img src="../skin/images/ampel_rot.png" height="8px" height="8px"> ':' <img src="../skin/images/ampel_gruen.png" height="8px"> ').' '.CutString($row->bezeichnung_arr[$sprache], 21, '...').'</span>'
 						);
 		}
-		
+
 		$this->block.= '<script language="JavaScript" type="text/javascript">';
 		$this->block.= '	parent.content.location.href="../cms/news.php?studiengang_kz=0&semester=0"';
 		$this->block.= '</script>';
-		
+
 		$this->output();
-	}
-	
-	private function CutString($strVal, $limit)
-	{
-		if(mb_strlen($strVal) > $limit+3)
-		{
-			return mb_substr($strVal, 0, $limit) . "...";
-		}
-		else
-		{
-			return $strVal;
-		}
 	}
 }
 

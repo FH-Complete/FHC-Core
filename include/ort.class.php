@@ -121,6 +121,74 @@ class ort extends basis_db
 		}
 		return true;
 	}
+	
+	/**
+	 * Laedt alle Orte die den Parametern entsprechen
+	 * @param boolean $lehre Optional.
+	 * @param boolean $reservieren Optional.
+	 * @param boolean $aktiv Optional.
+	 * @param int $standort_id Optional.
+	 * @param string $gebaeudeteil Optional.
+	 * @param string $oe_kurzbz Optional.
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	public function getOrte($lehre = null, $reservieren = null, $aktiv = null, $standort_id = '', $gebaeudeteil = '', $oe_kurzbz = '')
+	{
+		$qry = 'SELECT * FROM public.tbl_ort WHERE 1=1 ';
+		
+		if (!is_null($lehre) && is_bool($lehre))
+			$qry .= ' AND lehre = '.$this->db_add_param($lehre, FHC_BOOLEAN);
+		
+		if (!is_null($reservieren) && is_bool($reservieren))
+			$qry .= ' AND reservieren = '.$this->db_add_param($reservieren, FHC_BOOLEAN);
+		
+		if (!is_null($aktiv) && is_bool($aktiv))
+			$qry .= ' AND aktiv = '.$this->db_add_param($aktiv, FHC_BOOLEAN);
+		
+		if ($standort_id != '' && is_numeric($standort_id))
+			$qry .= ' AND standort_id = '.$this->db_add_param($standort_id, FHC_INTEGER);
+			
+		if ($gebaeudeteil != '')
+			$qry .= ' AND gebteil = '.$this->db_add_param($gebaeudeteil);
+			
+		if ($oe_kurzbz != '')
+			$qry .= ' AND oe_kurzbz = '.$this->db_add_param($oe_kurzbz);
+		
+		$qry .= ' ORDER BY ort_kurzbz;'; 
+
+		if (!$this->db_query($qry))
+		{
+			$this->errormsg = 'Fehler beim Laden der Datensaetze';
+			return false;
+		}
+		
+		while ($row = $this->db_fetch_object())
+		{
+			$ort_obj = new ort();
+			
+			$ort_obj->ort_kurzbz 		= $row->ort_kurzbz;
+			$ort_obj->bezeichnung 		= $row->bezeichnung;
+			$ort_obj->planbezeichnung 	= $row->planbezeichnung;
+			$ort_obj->max_person 		= $row->max_person;
+			$ort_obj->aktiv 			= $this->db_parse_bool($row->aktiv);
+			$ort_obj->lehre 			= $this->db_parse_bool($row->lehre);
+			$ort_obj->lageplan 			= $row->lageplan;
+			$ort_obj->dislozierung 		= $row->dislozierung;
+			$ort_obj->kosten 			= $row->kosten;
+			$ort_obj->reservieren		= $this->db_parse_bool($row->reservieren);
+			$ort_obj->ausstattung		= $row->ausstattung;
+			$ort_obj->stockwerk			= $row->stockwerk;
+			$ort_obj->standort_id		= $row->standort_id;
+			$ort_obj->telefonklappe		= $row->telefonklappe;
+			$ort_obj->content_id		= $row->content_id;
+			$ort_obj->m2				= $row->m2;
+			$ort_obj->oe_kurzbz			= $row->oe_kurzbz;
+			$ort_obj->gebteil			= $row->gebteil;
+			$ort_obj->arbeitsplaetze	= $row->arbeitsplaetze;
+			$this->result[] = $ort_obj;
+		}
+		return true;
+	}
 
 	/**
 	 * Laedt einen Ort

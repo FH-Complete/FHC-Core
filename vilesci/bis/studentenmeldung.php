@@ -670,6 +670,7 @@ function GenerateXMLStudentBlock($row)
 	$qrystatus="SELECT * FROM public.tbl_prestudentstatus
 		WHERE prestudent_id=".$db->db_add_param($row->prestudent_id)." AND studiensemester_kurzbz=".$db->db_add_param($ssem)." AND (tbl_prestudentstatus.datum<=".$db->db_add_param($bisdatum).")
 		ORDER BY datum desc, insertamum desc, ext_id desc;";
+
 	if($resultstatus = $db->db_query($qrystatus))
 	{
 		if($db->db_num_rows($resultstatus)>0)
@@ -779,6 +780,26 @@ function GenerateXMLStudentBlock($row)
 					$storgform=$rowstatus->orgform_kurzbz;
 					$aktstatus_stsem = $rowstatus->studiensemester_kurzbz;
 				}
+				else
+				{
+					$aktstatus='';
+					$storgform='';
+					$aktstatus_datum='';
+					$aktstatus_stsem='';
+					$sem='';
+					$error_log.= "kein gueltiger Status vorhanden";
+
+				}
+			}
+			else
+			{
+				$aktstatus='';
+				$storgform='';
+				$aktstatus_datum='';
+				$aktstatus_stsem='';
+				$sem='';
+				$error_log.= "kein gueltiger Status vorhanden";
+
 			}
 		}
 	}
@@ -1028,7 +1049,7 @@ function GenerateXMLStudentBlock($row)
 			<BeginnDatum>".date("dmY", $datumobj->mktime_fromdate($beginndatum))."</BeginnDatum>";
 		}
 
-		if($aktstatus=='Absolvent' || $aktstatus=='Abbrecher')
+		if(($aktstatus=='Absolvent' || $aktstatus=='Abbrecher') && $studtyp!='E')
 		{
 			$datei.="
 			<BeendigungsDatum>".date("dmY", $datumobj->mktime_fromdate($aktstatus_datum))."</BeendigungsDatum>";

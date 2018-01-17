@@ -56,7 +56,7 @@ echo '
 			ret = ret + now.getMilliseconds();
 			return ret;
 		}
-		
+
 		function RefreshImage()
 		{
 			path=document.getElementById("personimage").src;
@@ -130,7 +130,7 @@ if($uid!='')
 	$qry = "SELECT person_id, true as mitarbeiter FROM campus.vw_mitarbeiter WHERE uid='".addslashes($uid)."'
 			UNION
 			SELECT person_id, false as mitarbeiter FROM campus.vw_student WHERE uid='".addslashes($uid)."'";
-	
+
 	if($result = $db->db_query($qry))
 	{
 		if($row = $db->db_fetch_object($result))
@@ -138,10 +138,10 @@ if($uid!='')
 			$is_mitarbeiter = ($row->mitarbeiter=='t'?true:false);
 			$person_id = $row->person_id;
 		}
-		else 
+		else
 			die('UID wurde nicht gefunden');
 	}
-	else 
+	else
 		die('Fehler beim Ermitteln der UID');
 }
 
@@ -153,7 +153,7 @@ if(isset($_POST['saveperson']))
 	$person = new person();
 	if(!$person->load($person_id))
 		die('Person konnte nicht geladen werden');
-		
+
 	$person->anrede = $anrede;
 	$person->titelpre = $titelpre;
 	$person->titelpost = $titelpost;
@@ -177,32 +177,32 @@ if(isset($_POST['saveperson']))
 	$person->updatevon = $user;
 	$person->kurzbeschreibung = $kurzbeschreibung;
 	$person->new = false;
-	
+
 	if($person->save())
 	{
 		$msg = '<h3>Personendaten wurden erfolgreich gespeichert</h3>';
 	}
-	else 
+	else
 	{
 		$msg = "<h3>Fehler beim Speichern der Personendaten: $person->errormsg</h3>";
 		$error_person_save=true;
 	}
-	
+
 }
 
 if(isset($_GET['deleteimage']))
 {
 	if(!$rechte->isBerechtigt('student/stammdaten', null, 'su') && !$rechte->isBerechtigt('mitarbeiter/stammdaten', null, 'su'))
 		die('Sie haben keine Berechtigung fuer diese Aktion');
-	
+
 	$person = new person();
 	if(!$person->load($person_id))
 		die('Person konnte nicht geladen werden');
-	
+
 	$person->foto='';
 	if(!$person->save())
 		die('Fehler beim Speichern:'.$person->errormsg);
-	
+
 	$akte = new akte();
 	if($akte->getAkten($person_id, 'Lichtbil'))
 	{
@@ -213,21 +213,21 @@ if(isset($_GET['deleteimage']))
 				echo 'Fehler beim Löschen des Bildes: '.$hlp->errormsg;
 		}
 	}
-	else 
+	else
 	{
 		die('Fehler beim Laden der Akten:'.$akte->errormsg);
 	}
-	
+
 	$msg = '<h3>Bild wurde erfolgreich entfernt</h3>';
 }
 if(isset($_POST['savebenutzer']))
 {
 	if(!$rechte->isBerechtigt('student/stammdaten', null, 'su') && !$rechte->isBerechtigt('mitarbeiter/stammdaten', null, 'su'))
 		die('Sie haben keine Berechtigung fuer diese Aktion');
-	
+
 	$benutzer = new benutzer();
 	$benutzer->load($uid);
-	
+
 	if(checkalias($alias) || $alias=='')
 	{
 		$benutzer->alias = $alias;
@@ -235,17 +235,17 @@ if(isset($_POST['savebenutzer']))
 		$benutzer->new = false;
 		$benutzer->updateamum = date('Y-m-d H:i:s');
 		$benutzer->updatevon = $user;
-		
+
 		if($benutzer->save())
 		{
 			$msg = '<h3>Daten wurden erfolgreich gespeichert</h3>';
 		}
-		else 
+		else
 		{
 			$msg = "<h3>Fehler beim Speichern: $benutzer->errormsg";
 		}
 	}
-	else 
+	else
 	{
 		$msg = "<h3>Alias ist ungueltig $alias</h3>";
 		$error_benutzer_save=true;
@@ -256,11 +256,11 @@ if(isset($_POST['savemitarbeiter']))
 {
 	if(!$rechte->isBerechtigt('mitarbeiter/stammdaten', null, 'su'))
 		die('Sie haben keine Berechtigung fuer diese Aktion');
-	
+
 	$mitarbeiter = new mitarbeiter();
 	if(!$mitarbeiter->load($uid))
 		die('Mitarbeiter konnte nicht geladen werden');
-	
+
 	$mitarbeiter->personalnummer = $personalnummer;
 	$mitarbeiter->telefonklappe = $telefonklappe;
 	$mitarbeiter->kurzbz = $kurzbz;
@@ -275,10 +275,10 @@ if(isset($_POST['savemitarbeiter']))
 	$mitarbeiter->new = false;
 	$mitarbeiter->updateamum = date('Y-m-d H:i:s');
 	$mitarbeiter->updatevon = $user;
-	
+
 	if($mitarbeiter->save())
 		$msg = '<h3>Daten wurden erfolgreich gespeichert</h3>';
-	else 
+	else
 	{
 		$msg = "<h3>Fehler beim Speichern der Daten: $mitarbeiter->errormsg</h3>";
 		$error_mitarbeiter_save = true;
@@ -294,10 +294,10 @@ if(isset($_POST['savestudent']))
 	$studiengang = new studiengang();
 	if(!$studiengang->load($student->studiengang_kz))
 		die('Fehler beim Laden des Studienganges');
-		
+
 	if(!$rechte->isBerechtigt('student/stammdaten', $studiengang->oe_kurzbz, 'su'))
 		die('Sie haben keine Berechtigung fuer diese Aktion');
-	
+
 	$student->matrikelnr = $matrikelnummer;
 	$student->semester = $semester;
 	$student->verband = $verband;
@@ -305,14 +305,14 @@ if(isset($_POST['savestudent']))
 	$student->updateamum = date('Y-m-d H:i:s');
 	$student->updatevon = $user;
 	$student->new = false;
-	
+
 	if($student->save(null, false))
 		$msg = '<h3>Daten wurden erfolgreich gespeichert</h3>';
-	else 
+	else
 	{
 		$msg = "<h3>Fehler beim Speichern der Daten: $student->errormsg</h3>";
 		$error_student_save = true;
-	}	
+	}
 }
 
 $person = new person();
@@ -348,7 +348,12 @@ if(!$error_person_save)
 
 $akte = new akte();
 if($akte->getAkten($person_id, 'Lichtbil'))
-	$dms_id_lichtbild = $akte->result[0]->dms_id;
+{
+	if(isset($akte->result[0]))
+	{
+		$dms_id_lichtbild = $akte->result[0]->dms_id;
+	}
+}
 
 // PERSON
 echo "<table><tr><td>
@@ -387,9 +392,9 @@ foreach ($nation->nation as $row_nation)
 {
 	if($row_nation->code == $geburtsnation)
 		$selected = 'selected';
-	else 
+	else
 		$selected = '';
-		
+
 	echo "<option value='$row_nation->code' $selected>$row_nation->kurztext</option>";
 }
 echo "</SELECT>
@@ -413,9 +418,9 @@ foreach ($nation->nation as $row_nation)
 {
 	if($row_nation->code == $staatsbuergerschaft)
 		$selected = 'selected';
-	else 
+	else
 		$selected = '';
-		
+
 	echo "<option value='$row_nation->code' $selected>$row_nation->kurztext</option>";
 }
 echo "
@@ -432,9 +437,9 @@ if($result_sprache = $db->db_query($qry))
 	{
 		if($row_sprache->sprache == $sprache)
 			$selected = 'selected';
-		else 
+		else
 			$selected = '';
-		
+
 		echo "<option value='$row_sprache->sprache' $selected>$row_sprache->sprache</option>";
 	}
 }
@@ -518,10 +523,10 @@ if(isset($uid) && $uid!='')
 	$qry = "SELECT * FROM public.tbl_benutzer WHERE uid='".addslashes($uid)."'";
 	if(!$result_benutzer = $db->db_query($qry))
 		die('Fehler beim Auslesen der Benutzerdaten');
-	
+
 	if(!$row_benutzer = $db->db_fetch_object($result_benutzer))
 		die('Fehler beim Auslesen der Benutzerdaten');
-	
+
 	echo "
 	<form action='".$_SERVER['PHP_SELF']."?person_id=$person_id&uid=$uid' method='POST'>
 	<table>
@@ -534,20 +539,20 @@ if(isset($uid) && $uid!='')
 	</tr>
 	</table>
 	</form>";
-	
-	
+
+
 	echo '<br><a href="../../content/pdfExport.php?xsl=AccountInfo&xml=accountinfoblatt.xml.php&uid='.$uid.'" >AccountInfoBlatt erstellen</a>';
 	echo '<br><a href="../stammdaten/betriebsmittel_frameset.php?searchstr='.$uid.'" >Betriebsmittel verwalten</a>';
-	
+
 
 	echo "</fieldset></td></tr>";
-	
+
 	if($is_mitarbeiter)
 	{
 		$mitarbeiter = new mitarbeiter();
 		if(!$mitarbeiter->load($uid))
 			die('Mitarbeiter konnte nicht geladen werden');
-		
+
 		if(!$error_mitarbeiter_save)
 		{
 			$personalnummer = $mitarbeiter->personalnummer;
@@ -562,7 +567,7 @@ if(isset($uid) && $uid!='')
 			$anmerkung = $mitarbeiter->anmerkung;
 			$bismelden = $mitarbeiter->bismelden;
 		}
-			
+
 		//MITARBEITER
 		echo "<tr><td>
 			<fieldset>
@@ -588,7 +593,7 @@ if(isset($uid) && $uid!='')
 			<tr>
 				<td>Buero</td>
 				<td><SELECT name='ort_kurzbz'><option value=''>-- keine Auswahl --</option>";
-		
+
 		$ort = new ort();
 		$ort->getAll();
 		foreach ($ort->result as $row_ort)
@@ -596,11 +601,11 @@ if(isset($uid) && $uid!='')
 			if($row_ort->ort_kurzbz==$ort_kurzbz)
 				$selected = 'selected';
 			else
-				$selected = '';				
-				
+				$selected = '';
+
 			echo "<option value='$row_ort->ort_kurzbz' $selected>$row_ort->ort_kurzbz</option>";
 		}
-		
+
 		echo "</SELECT></td>
 				<td>Standort</td>
 				<td><SELECT name='standort_id'><option value=''>-- keine Auswahl --</option>";
@@ -611,9 +616,9 @@ if(isset($uid) && $uid!='')
 			{
 				if($row_standort->standort_id == $standort_id)
 					$selected = 'selected';
-				else 
+				else
 					$selected = '';
-					
+
 				echo "<option value='$row_standort->standort_id' $selected>$row_standort->kurzbz</option>";
 			}
 		}
@@ -635,9 +640,9 @@ if(isset($uid) && $uid!='')
 			{
 				if($row_ausbildung->ausbildungcode == $ausbildungcode)
 					$selected = 'selected';
-				else 
+				else
 					$selected = '';
-					
+
 				echo "<option value='$row_ausbildung->ausbildungcode' $selected>$row_ausbildung->ausbildungbez</option>";
 			}
 		}
@@ -651,12 +656,12 @@ if(isset($uid) && $uid!='')
 			</td></tr>
 			";
 	}
-	else 
+	else
 	{
 		$student = new student();
 		if(!$student->load($uid))
 			die('Fehler beim Laden des Studenten');
-			
+
 		if(!$error_student_save)
 		{
 			$semester = $student->semester;
@@ -664,7 +669,7 @@ if(isset($uid) && $uid!='')
 			$gruppe = $student->gruppe;
 			$matrikelnummer = $student->matrikelnr;
 		}
-		
+
 		//STUDENT
 		echo "<tr><td>
 			<fieldset>

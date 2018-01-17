@@ -104,6 +104,10 @@ define('LDAP2_USER_SEARCH_FILTER','sAMAccountName');
 // LDAP MASTER SERVER fuer Passwort Aenderungen
 define('LDAP_SERVER_MASTER',LDAP_SERVER);
 
+// Default Password fuer neue Accounts
+// Hier sollte ein langes geheimes Passwort gesetzt werden!
+define('ACCOUNT_ACTIVATION_PASSWORD','');
+
 // Attribut fuer Zutrittskartennummer im LDAP
 define("LDAP_CARD_NUMBER","twHitagCardNumber");
 // Attribut fuer Zutrittskartennummer2 im LDAP
@@ -228,4 +232,7 @@ define('CIS_DOKUMENTE_STUDIENBEITRAG_TYPEN', serialize(array("Studiengebuehr")))
 
 //Gibt an bei welcher Länge die LV-Bezeichnungen im Menü abgeschnitten werden. Default: 21
 define('CIS_LVMENUE_CUTLENGTH', 21);
+
+// Gibt an, auf welche Seite TicketIds ala #1234 im Jahresplan verlinkt werden zB zur Verlinkung in Bugtracker
+define('JAHRESPLAN_TICKET_LINK','https://bug.technikum-wien.at/otrs/index.pl?Action=AgentTicketZoom;TicketNumber=');
 ?>

@@ -70,7 +70,7 @@ class Akte_model extends DB_Model
 		
 		return $this->execQuery($query, $parametersArray);
 	}
-	
+
 	/**
 	 * getAktenAccepted
 	 */
@@ -116,7 +116,7 @@ class Akte_model extends DB_Model
 		
 		return $this->execQuery($query, $parametersArray);
 	}
-	
+
 	/**
 	 * getAktenAcceptedDms
 	 */
@@ -173,4 +173,35 @@ class Akte_model extends DB_Model
 		
 		return $this->execQuery($query, $parametersArray);
 	}
+
+	/**
+	 * gets Akten together with documenttype info, mainly bezeichnung fields
+	 * @param $person_id
+	 * @param null $dokument_kurzbz
+	 * @param bool $nachgereicht if true, retrieves only nachgereichte Dokumente. if false, only not nachgereichte. default: null, all Dokumente
+	 * @return array
+	 */
+	public function getAktenWithDokInfo($person_id, $dokument_kurzbz = null, $nachgereicht = null)
+	{
+		if (isError($ent = $this->isEntitled($this->dbTable, PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR))) return $ent;
+
+		$this->addSelect('public.tbl_akte.*, bezeichnung_mehrsprachig, dokumentbeschreibung_mehrsprachig, public.tbl_dokument.bezeichnung as dokument_bezeichnung, bis.tbl_nation.*, ausstellungsdetails');
+		$this->addJoin('public.tbl_dokument', 'dokument_kurzbz');
+		$this->addJoin('bis.tbl_nation', 'ausstellungsnation = nation_code', 'LEFT');
+
+		$where = array();
+		$where['person_id'] = $person_id;
+		if(isset($dokument_kurzbz))
+			$where['dokument_kurzbz'] = $dokument_kurzbz;
+		if(is_bool($nachgereicht))
+			$where['nachgereicht'] = $nachgereicht;
+
+		$dokumente = $this->loadWhere($where);
+
+		if($dokumente->error)
+			return error($dokumente->retval);
+
+		return success($dokumente->retval);
+	}
+
 }

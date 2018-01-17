@@ -10,29 +10,29 @@ class LogLib
 	const DEBUG = 'debug';
 	const ERROR = 'error';
 	const INFO = 'info';
-	
+
 	const CALLER_PREFIX = '[';
 	const CALLER_POSTFIX = ']';
 	const CLASS_POSTFIX = '->';
 	const LINE_SEPARATOR = ':';
-	
+
 	/**
 	 * format
 	 */
 	private function format($class, $function, $line)
 	{
 		$formatted = LogLib::CALLER_PREFIX;
-		
+
 		if (!is_null($class) && $class != '')
 		{
 			$formatted .= $class.LogLib::CLASS_POSTFIX;
 		}
-		
+
 		$formatted .= $function.LogLib::LINE_SEPARATOR.$line.LogLib::CALLER_POSTFIX.' ';
-		
+
 		return $formatted;
 	}
-	
+
 	/**
 	 * getCaller
 	 */
@@ -44,20 +44,20 @@ class LogLib
 		$class = '';
 		$function = '';
 		$line = '';
-
-		if (isset(debug_backtrace()[$classIndex]['class']) && debug_backtrace()[$classIndex]['class'] != '')
+		$backtrace_arr = debug_backtrace();
+		if (isset($backtrace_arr[$classIndex]['class']) && $backtrace_arr[$classIndex]['class'] != '')
 		{
-			$class = debug_backtrace()[$classIndex]['class'];
+			$class = $backtrace_arr[$classIndex]['class'];
 		}
 
-		if (isset(debug_backtrace()[$functionIndex]['function']) && debug_backtrace()[$functionIndex]['function'] != '')
+		if (isset($backtrace_arr[$functionIndex]['function']) && $backtrace_arr[$functionIndex]['function'] != '')
 		{
-			$function = debug_backtrace()[$functionIndex]['function'];
+			$function = $backtrace_arr[$functionIndex]['function'];
 		}
 
-		if (isset(debug_backtrace()[$lineIndex]['line']) && debug_backtrace()[$lineIndex]['line'] != '')
+		if (isset($backtrace_arr[$lineIndex]['line']) && $backgrace_arr[$lineIndex]['line'] != '')
 		{
-			$line = debug_backtrace()[$lineIndex]['line'];
+			$line = $backtrace_arr[$lineIndex]['line'];
 		}
 
 		return $this->format($class, $function, $line);

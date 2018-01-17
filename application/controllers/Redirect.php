@@ -31,9 +31,6 @@ class Redirect extends FHC_Controller
 
 		// Loads model MessageTokenModel
 		$this->load->model('system/MessageToken_model', 'MessageTokenModel');
-
-		// Loads library OrganisationseinheitLib
-		$this->load->library('OrganisationseinheitLib');
 	}
 
 	/**
@@ -55,10 +52,16 @@ class Redirect extends FHC_Controller
 
 		if ($oe_kurzbz != null && $oe_kurzbz != '')
 		{
-			$rootOE = $this->organisationseinheitlib->getRoot($oe_kurzbz);
-			if ($rootOE->error)
+			$organisationRoot = null;
+
+			$getOERoot = $this->MessageTokenModel->getOERoot($oe_kurzbz);
+			if (isSuccess($getOERoot)) // If no errors occurred
 			{
-				show_error($rootOE->retval);
+				$organisationRoot = $getOERoot->retval;
+			}
+			else
+			{
+				show_error('No organisation unit present in the message');
 			}
 
 			$addonAufnahmeUrls = $this->config->item('addons_aufnahme_url');
@@ -66,10 +69,10 @@ class Redirect extends FHC_Controller
 			if (isset($token)
 				&& hasData($msg)
 				&& is_array($addonAufnahmeUrls)
-				&& hasData($rootOE)
-				&& isset($addonAufnahmeUrls[$rootOE->retval[0]->oe_kurzbz]))
+				&& $organisationRoot != null
+				&& isset($addonAufnahmeUrls[$organisationRoot]))
 			{
-				redirect($addonAufnahmeUrls[$rootOE->retval[0]->oe_kurzbz] . '?token=' . $token);
+				redirect($addonAufnahmeUrls[$organisationRoot] . '?token=' . $token);
 			}
 		}
 	}

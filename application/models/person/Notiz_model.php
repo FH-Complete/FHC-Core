@@ -94,5 +94,56 @@ class Notiz_model extends DB_Model
 		
 		return $result;
 	}
+
+	/**
+	 * Add a Notiz for a given person
+	 */
+	public function addNotizForPerson($person_id, $titel, $text, $erledigt, $verfasser_uid)
+	{
+		// Loads model Notizzuordnung_model
+		$this->load->model('person/Notizzuordnung_model', 'NotizzuordnungModel');
+
+		// Start DB transaction
+		$this->db->trans_start(false);
+
+		$result = $this->insert(array('titel' => $titel, 'text' => $text, 'erledigt' => $erledigt, 'verfasser_uid' => $verfasser_uid,
+			"insertvon" => $verfasser_uid));
+
+		if (isSuccess($result))
+		{
+			$notiz_id = $result->retval;
+			$result = $this->NotizzuordnungModel->insert(array('notiz_id' => $notiz_id, 'person_id' => $person_id));
+		}
+
+		// Transaction complete!
+		$this->db->trans_complete();
+
+		// Check if everything went ok during the transaction
+		if ($this->db->trans_status() === false || isError($result))
+		{
+			$this->db->trans_rollback();
+			$result = error($result->msg, EXIT_ERROR);
+		}
+		else
+		{
+			$this->db->trans_commit();
+			$result = success($notiz_id);
+		}
+
+		return $result;
+	}
+
+	/**
+	 * gets all Notizen for a person
+	 * @param $person_id
+	 */
+	public function getNotiz($person_id)
+	{
+		// Join with the table public.tbl_notizzuordnung using notiz_id
+		$this->addJoin('public.tbl_notizzuordnung', 'notiz_id');
+
+		return $this->loadWhere(array('person_id' => $person_id));
+	}
 	// ------------------------------------------------------------------------------------------------------
+
 }

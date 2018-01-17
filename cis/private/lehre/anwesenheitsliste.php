@@ -33,15 +33,15 @@
 	require_once('../../../include/studiengang.class.php');
 	require_once('../../../include/lehrveranstaltung.class.php');
 	require_once('../../../include/phrasen.class.php');
-	
-	
-	$sprache = getSprache(); 
-	$p=new phrasen($sprache); 
-	
+
+
+	$sprache = getSprache();
+	$p=new phrasen($sprache);
+
 	if (!$db = new basis_db())
 			die($p->t('global/fehlerBeimOeffnenDerDatenbankverbindung'));
-			
-  	$error=0;	
+
+  	$error=0;
     if(isset($_GET['stg_kz']) && is_numeric($_GET['stg_kz']))
     	$stg_kz=$_GET['stg_kz'];
     else
@@ -56,10 +56,10 @@
     	$lvid=$_GET['lvid'];
     else
     	$error=2;
-    	
+
     if(isset($_GET['stsem']) && check_stsem($_GET['stsem']))
     	$stsem = $_GET['stsem'];
-    else 
+    else
     	die($p->t('anwesenheitsliste/studiensemesterIstUngueltig'));
 
 ?>
@@ -92,28 +92,28 @@
 	  	$stg_arr = array();
 	  	$stg_obj = new studiengang();
 	  	$stg_obj->getAll();
-	  	
+
 	  	foreach ($stg_obj->result as $row)
 	  		$stg_arr[$row->studiengang_kz]=$row->kuerzel;
-	  	
+
 	  	$lv = new lehrveranstaltung($lvid);
-	  	  	
+
 	  	$aw_content .= "<tr><td><a class='Item' href='anwesenheitsliste.pdf.php?stg=$stg_kz&sem=$sem&lvid=$lvid&stsem=$stsem'>".$p->t('anwesenheitsliste/gesamtliste')." $lv->bezeichnung</a></td></tr>";
 	  	$awbild_content .= "<tr><td><a class='Item' href='fotoliste.pdf.php?stg=$stg_kz&sem=$sem&lvid=$lvid&stsem=$stsem'>".$p->t('anwesenheitsliste/gesamtliste')." $lv->bezeichnung</a></td></tr>";
 	  	$nt_content .= "<tr><td><a class='Item' href='notenliste.xls.php?stg=$stg_kz&sem=$sem&lvid=$lvid&stsem=$stsem'>".$p->t('anwesenheitsliste/gesamtliste')." $lv->bezeichnung</a></td></tr>";
-	  	
+
 
 	  	echo "</table>";
 
-	  	$qry = "SELECT *, tbl_lehreinheitgruppe.studiengang_kz, tbl_lehreinheitgruppe.semester FROM lehre.tbl_lehreinheit JOIN lehre.tbl_lehreinheitgruppe USING(lehreinheit_id) JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id) 
+	  	$qry = "SELECT *, tbl_lehreinheitgruppe.studiengang_kz, tbl_lehreinheitgruppe.semester FROM lehre.tbl_lehreinheit JOIN lehre.tbl_lehreinheitgruppe USING(lehreinheit_id) JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id)
 	  			WHERE lehrveranstaltung_id='$lvid' AND studiensemester_kurzbz=".$db->db_add_param($stsem);
 
 	  	$qry = "SELECT *, tbl_lehreinheitgruppe.studiengang_kz, tbl_lehreinheitgruppe.semester ,tbl_lehreinheit.lehrform_kurzbz
-				 FROM lehre.tbl_lehreinheit 
-				JOIN lehre.tbl_lehreinheitgruppe USING(lehreinheit_id) 
-				JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id) 
+				 FROM lehre.tbl_lehreinheit
+				JOIN lehre.tbl_lehreinheitgruppe USING(lehreinheit_id)
+				JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id)
 	  			WHERE lehrveranstaltung_id='$lvid' AND studiensemester_kurzbz=".$db->db_add_param($stsem);
-					  		  	
+
 	  	if($result = $db->db_query($qry))
 	  	{
 	  		if($db->db_num_rows($result)>0)
@@ -129,7 +129,7 @@
 			  				$qry = "SELECT * FROM lehre.tbl_lehreinheitmitarbeiter JOIN public.tbl_mitarbeiter USING(mitarbeiter_uid)
 			  						WHERE lehreinheit_id=".$db->db_add_param($lastlehreinheit);
 			  				$lektoren = '';
-			  				
+
 			  				if($result_lkt = $db->db_query($qry))
 			  				{
 			  					while($row_lkt = $db->db_fetch_object($result_lkt))
@@ -139,26 +139,26 @@
 			  						$lektoren .= $row_lkt->kurzbz;
 			  					}
 			  				}
-			  				
+
 			  				$aw_content .= "<tr><td><a class='Item' href='anwesenheitsliste.pdf.php?stg=$stg_kz&sem=$sem&lvid=$lvid&lehreinheit_id=$lastlehreinheit&stsem=$stsem'>&nbsp;&nbsp;&nbsp;<img src='../../../skin/images/haken.gif' />$kurzbz - $lehrform - $gruppen ($lektoren)</a></td></tr>";
 			  				$awbild_content .= "<tr><td><a class='Item' href='fotoliste.pdf.php?stg=$stg_kz&sem=$sem&lvid=$lvid&lehreinheit_id=$lastlehreinheit&stsem=$stsem'>&nbsp;&nbsp;&nbsp;<img src='../../../skin/images/haken.gif' />$kurzbz - $lehrform - $gruppen ($lektoren)</a></td></tr>";
 			  				$nt_content .= "<tr><td><a class='Item' href='notenliste.xls.php?stg=$stg_kz&sem=$sem&lvid=$lvid&lehreinheit_id=$lastlehreinheit&stsem=$stsem'>&nbsp;&nbsp;&nbsp;<img src='../../../skin/images/haken.gif' />$kurzbz - $lehrform - $gruppen ($lektoren)</a></td></tr>";
-			  
+
 			  				$lastlehreinheit = $row->lehreinheit_id;
 			  				$gruppen='';
 		  				}
-		  				else 
+		  				else
 		  					$lastlehreinheit = $row->lehreinheit_id;
 		  			}
-		  			
+
 		  			if($gruppen!='')
 		  				$gruppen.= ', ';
-		  				  			
+
 		  			if($row->gruppe_kurzbz!='')
 		  				$gruppen .= $row->gruppe_kurzbz;
-		  			else 
+		  			else
 		  				$gruppen .= trim($stg_arr[$row->studiengang_kz].'-'.$row->semester.$row->verband.$row->gruppe);
-		  				
+
 		  			$lehrform = $row->lehrform_kurzbz;
 		  			$kurzbz = $row->kurzbz;
 		  		}
@@ -174,7 +174,7 @@
 						$lektoren .= $row_lkt->kurzbz;
 					}
 				}
-				
+
 				$aw_content .= "<tr><td><a class='Item' href='anwesenheitsliste.pdf.php?stg=$stg_kz&sem=$sem&lvid=$lvid&lehreinheit_id=$lastlehreinheit&stsem=$stsem'>&nbsp;&nbsp;&nbsp;<img src='../../../skin/images/haken.gif' />$kurzbz - $lehrform - $gruppen ($lektoren)</a></td></tr>";
 				$awbild_content .= "<tr><td><a class='Item' href='fotoliste.pdf.php?stg=$stg_kz&sem=$sem&lvid=$lvid&lehreinheit_id=$lastlehreinheit&stsem=$stsem'>&nbsp;&nbsp;&nbsp;<img src='../../../skin/images/haken.gif' />$kurzbz - $lehrform - $gruppen ($lektoren)</a></td></tr>";
 				$nt_content .= "<tr><td><a class='Item' href='notenliste.xls.php?stg=$stg_kz&sem=$sem&lvid=$lvid&lehreinheit_id=$lastlehreinheit&stsem=$stsem'>&nbsp;&nbsp;&nbsp;<img src='../../../skin/images/haken.gif' />$kurzbz - $lehrform - $gruppen ($lektoren)</a></td></tr>";
@@ -191,7 +191,7 @@
 				$aw_content = "<table border='0' cellspacing='0'><tr><td><h3>".$p->t('anwesenheitsliste/anwesenheitslisten')."</h3></td></tr>".$aw_content."</table>";
 		  	else
 		  		$aw_content = $p->t('anwesenheitsliste/keineStudentenVorhanden');
-		  	
+
 		  	if($awbild_content!='')
 				$awbild_content = "<table border='0' cellspacing='0'><tr><td><h3>".$p->t('anwesenheitsliste/anwesenheitslistenMitBildern')."</h3></td></tr>".$awbild_content."</table>";
 		  	else
@@ -208,9 +208,11 @@
 				$nt_content='';
 			if(defined('CIS_ANWESENHEITSLISTE_ANWESENHEITSLISTE_ANZEIGEN') && !CIS_ANWESENHEITSLISTE_ANWESENHEITSLISTE_ANZEIGEN)
 				$aw_content='';
+			if(defined('CIS_ANWESENHEITSLISTE_ANWESENHEITSLISTE_BILD_ANZEIGEN') && !CIS_ANWESENHEITSLISTE_ANWESENHEITSLISTE_BILD_ANZEIGEN)
+				$awbild_content='';
 
 		  	echo "<table cellpadding='0' cellspacing='0'>
-		  		
+
 		  		<tr>
 		  		   <td>$aw_content</td>
 		  		</tr>
@@ -220,7 +222,7 @@
 				<tr>
 		  		   <td>$nt_content</td>
 		  		</tr>
-		  		
+
 		  		</table>";
 	  	}
 	}

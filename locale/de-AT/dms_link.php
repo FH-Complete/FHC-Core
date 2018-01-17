@@ -18,6 +18,7 @@ $this->phrasen['dms_link/handbuchZeitaufzeichnung']='1545'; //Handbuch Zeitaufze
 $this->phrasen['dms_link/fiktiveNormalarbeitszeit']='2512'; //fiktive Normalarbeitszeit -> Leer lassen, falls es keines gibt
 $this->phrasen['dms_link/learningAgreementErasmus']='29266'; //Learning Agreement Incomings Erasmus
 $this->phrasen['dms_link/learningAgreement']='38866'; //Learning Agreement Incomings NICHT Erasmus
+$this->phrasen['dms_link/passwortpolicy']='57972'; //Passwortpolicy
 
 // Content IDs (=Englisch)
 $this->phrasen['dms_link/lvPlanFAQ']='6887'; //Hilfe-Link aus dem LV-Plan in die LV-Plan FAQ auf der CIS (CMS-ID)

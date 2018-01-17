@@ -34,6 +34,7 @@ if (!$db = new basis_db())
 	die('Es konnte keine Verbindung zum Server aufgebaut werden.');
 
 $user=get_uid();
+$errormsg = '';
 
 $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($user);
@@ -49,16 +50,24 @@ if (isset($_POST['new']))
 	if(!$rechte->isBerechtigt('lehre/gruppe',null,'sui'))
 		die($rechte->errormsg);
 
-	$e=new benutzergruppe();
-	$e->new=true;
-	$e->gruppe_kurzbz=$kurzbz;
-	$e->updateamum = date('Y-m-d H:i:s');
-	$e->updatevon = $user;
-	$e->insertamum = date('Y-m-d H:i:s');
-	$e->insertvon = $user;
-	$e->uid = $_POST['uid'];
-	if(!$e->save())
-		die($e->errormsg);
+	$e = new benutzergruppe();
+	$uid = $_POST['uid'];
+	if (!$e->load($uid, $kurzbz))
+	{	
+		$e->new=true;
+		$e->gruppe_kurzbz = $kurzbz;
+		$e->updateamum = date('Y-m-d H:i:s');
+		$e->updatevon = $user;
+		$e->insertamum = date('Y-m-d H:i:s');
+		$e->insertvon = $user;
+		$e->uid = $uid;
+		if(!$e->save())
+			die($e->errormsg);
+	}
+	else 
+	{
+		$errormsg = '<span class="error">Diese Person ist bereits der Gruppe zugeteilt</span>';
+	}
 }
 else if (isset($_GET['type']) && $_GET['type']=='delete')
 {
@@ -94,7 +103,7 @@ if(!$gruppe->load($kurzbz))
 
 <?php
 echo "<a href='einheit_menu.php?studiengang_kz=$gruppe->studiengang_kz'>Zurück zur &Uuml;bersicht</a><br><br>";
-
+echo $errormsg;
 if(!$gruppe->generiert)
 {
 	echo '

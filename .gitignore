@@ -10,6 +10,15 @@ documents/
 .project
 .buildpath
 application/config/development/
+application/extensions/
+application/controllers/extensions/
+application/config/extensions/
+application/helpers/extensions/
+application/hooks/extensions/
+application/libraries/extensions/
+application/models/extensions/
+application/views/extensions/
+application/widgets/extensions/
 tests/codeception/_output/*
 !/tests/codeception/_output/.placeholder
 tests/codeception/codeception.yml

@@ -54,7 +54,7 @@
  * NOTE: If you change these, also change the error_reporting() code below
  *
  */
-	
+
 define('ENVIRONMENT', isset($_SERVER['CI_ENV']) ? $_SERVER['CI_ENV'] : 'development');
 
 /*
@@ -102,7 +102,7 @@ switch (ENVIRONMENT)
  * as this file.
  *
  */
-	$system_path = 'vendor/codeigniter/framework/system';
+	$system_path = dirname(__FILE__).'/vendor/codeigniter/framework/system';
 
 /*
  *---------------------------------------------------------------
@@ -118,7 +118,7 @@ switch (ENVIRONMENT)
  * NO TRAILING SLASH!
  *
  */
-	$application_folder = 'application';
+	$application_folder = dirname(__FILE__).'/application';
 
 /*
  *---------------------------------------------------------------
@@ -308,4 +308,3 @@ include_once 'vendor/autoload.php';
 
 // Now the bootstrap file
 require_once BASEPATH.'core/CodeIgniter.php';
-

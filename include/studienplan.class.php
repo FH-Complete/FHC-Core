@@ -137,6 +137,40 @@ class studienplan extends basis_db
 		}
 	}
 
+	public function deleteSemesterZuordnung($studienplan_id, $studiensemester_kurzbz, $ausbildungssemester = NULL)
+	{
+		if (!is_numeric($studienplan_id))
+		{
+			$this->errormsg = 'studienplan_id muss eine gueltige Zahl sein';
+			return false;
+		}
+
+		if (!is_string($studiensemester_kurzbz) || strlen($studiensemester_kurzbz) != 6)
+		{
+			$this->errormsg = 'studiensemester_kurzbz muss ein String mit 6 Zeichen sein';
+			return false;
+		}
+
+		$qry = 'DELETE FROM lehre.tbl_studienplan_semester
+				WHERE studienplan_id=' . $this->db_add_param($studienplan_id) . ' AND
+					studiensemester_kurzbz=' . $this->db_add_param($studiensemester_kurzbz) . '';
+
+		if ($ausbildungssemester !== null)
+			$qry.=' AND semester=' . $this->db_add_param($ausbildungssemester) . '';
+
+		$qry.=';';
+
+		if ($this->db_query($qry))
+		{
+			return true;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Löschen der Zuordnung' . "\n";
+			return false;
+		}
+	}
+
 	/**
 	 * Laedt die Studienplaene einer Studienordnung und Optional einer Organisationsform
 	 *
@@ -504,9 +538,9 @@ class studienplan extends basis_db
 					$this->db_add_param($this->studienplan_lehrveranstaltung_id_parent, FHC_INTEGER) . ', ' .
 					$this->db_add_param($this->pflicht, FHC_BOOLEAN) . ', ' .
 					$this->db_add_param($this->koordinator) . ', ' .
-					$this->db_add_param($this->curriculum) . ', ' .
-					$this->db_add_param($this->export) . ', ' .
-					$this->db_add_param($this->genehmigung) . ', ' .
+					$this->db_add_param($this->curriculum, FHC_BOOLEAN) . ', ' .
+					$this->db_add_param($this->export, FHC_BOOLEAN) . ', ' .
+					$this->db_add_param($this->genehmigung, FHC_BOOLEAN) . ', ' .
 					'now(), ' .
 					$this->db_add_param($this->insertvon) . ');';
 		}
@@ -705,7 +739,7 @@ class studienplan extends basis_db
 	 * @param integer $ausbildungssemester Optional. Ausbildungssemester in dem der Studienplan liegen soll
 	 * @param string $orgform_kurzbz. Optional. Organisationsform des Studienplans
 	 */
-	function getStudienplaeneFromSem($studiengang_kz, $studiensemester_kurzbz="", $ausbildungssemester="", $orgform_kurzbz = "")
+	function getStudienplaeneFromSem($studiengang_kz, $studiensemester_kurzbz="", $ausbildungssemester="", $orgform_kurzbz = "", $sprache = "")
 	{
 		$qry = "SELECT
 					studienplan_id,
@@ -759,9 +793,10 @@ class studienplan extends basis_db
 			$qry.=" AND tbl_studienplan_semester.semester=".$this->db_add_param($ausbildungssemester);
 
 		if($orgform_kurzbz!='')
-		{
 			$qry.=" AND orgform_kurzbz=".$this->db_add_param($orgform_kurzbz);
-		}
+
+		if($sprache != '')
+			$qry.=" AND tbl_studienplan.sprache=".$this->db_add_param($sprache);
 
 		$res = array();
 

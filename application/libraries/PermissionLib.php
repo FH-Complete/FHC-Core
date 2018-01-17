@@ -75,7 +75,7 @@ class PermissionLib
 			if (isset($this->acl[$sourceName]))
 			{
 				// Checks permission
-				$isEntitled = $this->_isBerechtigt($this->acl[$sourceName], $permissionType);
+				$isEntitled = $this->isBerechtigt($this->acl[$sourceName], $permissionType);
 			}
 		}
 		else
@@ -104,7 +104,7 @@ class PermissionLib
 	/**
 	 * Checks user's (API caller) rights
 	 */
-	private function _isBerechtigt($berechtigung_kurzbz, $art = null, $oe_kurzbz = null, $kostenstelle_id = null)
+	public function isBerechtigt($berechtigung_kurzbz, $art = null, $oe_kurzbz = null, $kostenstelle_id = null)
 	{
 		$isBerechtigt = false;
 

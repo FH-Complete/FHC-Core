@@ -40,15 +40,19 @@ foreach ($cj->result as $cronjob)
 	$timestamp = $cronjob->getNextExecutionTime();
 	if($timestamp && time()>=$timestamp)
 	{
-		//Starten des Jobs
-		if($cronjob->execute())
+		if(!$cronjob->running)
 		{
-			echo "\n".date('d.m.Y H:i:s').' '.$cronjob->titel.'('.$cronjob->cronjob_id.') executed<br>'."\n";
-			echo implode($cronjob->output,"\n");
-		}
-		else
-		{
-			echo "\n".date('d.m.Y H:i:s').' '.$cronjob->titel.'('.$cronjob->cronjob_id.') <b>failed</b><br>'."\n";
+			echo "\n".date('d.m.Y H:i:s').' '.$cronjob->titel.'('.$cronjob->cronjob_id.') execute...<br>'."\n";
+			//Starten des Jobs
+			if($cronjob->execute())
+			{
+				echo "\n".date('d.m.Y H:i:s').' '.$cronjob->titel.'('.$cronjob->cronjob_id.') executed<br>'."\n";
+				echo implode($cronjob->output,"\n");
+			}
+			else
+			{
+				echo "\n".date('d.m.Y H:i:s').' '.$cronjob->titel.'('.$cronjob->cronjob_id.') <b>failed:'.$cronjob->errormsg.'</b><br>'."\n";
+			}
 		}
 	}
 }

@@ -20,7 +20,7 @@
  *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
  *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
-require_once('../../config/vilesci.config.inc.php');			
+require_once('../../config/vilesci.config.inc.php');
 require_once('../../include/functions.inc.php');
 require_once('../../include/benutzerberechtigung.class.php');
 require_once('../../include/studiengang.class.php');
@@ -38,7 +38,7 @@ $user = get_uid();
 
 if (!$db = new basis_db())
 	die('Es konnte keine Verbindung zum Server aufgebaut werden.');
-		
+
 $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($user);
 
@@ -58,21 +58,21 @@ echo '<html>
 	<body class="Background_main">
 	';
 
-if(!$rechte->isBerechtigt('admin') && 
+if(!$rechte->isBerechtigt('admin') &&
    !$rechte->isBerechtigt('preinteressent') &&
    !$rechte->isBerechtigt('assistenz'))
 	die('Sie haben keine Berechtigung fuer diese Seite');
 
 if(isset($_GET['id']) && is_numeric($_GET['id']))
 	$id = $_GET['id'];
-else 
+else
 	die('der Parameter id mit der Person_id muss uebergeben werden');
 
 $person = new person();
 
 if(!$person->load($id))
 	die('Person wurde nicht gefunden');
-	
+
 //PERSON
 echo '<h2>Person</h2>';
 echo '<table cellspacing="3px">';
@@ -117,7 +117,7 @@ $nation->getAll();
 $nation_arr['']='';
 foreach($nation->nation as $row)
 	$nation_arr[$row->code]=$row->kurztext;
-	
+
 $adresstyp_arr = array(''=>'','h'=>'Hauptwohnsitz','n'=>'Nebenwohnsitz','f'=>'Firma');
 
 // *** ADRESSEN ***
@@ -144,18 +144,6 @@ foreach ($adresse_obj->result as $row)
 	echo "<td>".$firma->name."</td>";
 }
 echo '</table>';
-//PREINTERESSENT
-function CutString($strVal, $limit)
-{
-	if(strlen($strVal) > $limit+3)
-	{
-		return substr($strVal, 0, $limit) . "...";
-	}
-	else
-	{
-		return $strVal;
-	}
-}
 
 $preinteressent = new preinteressent();
 $preinteressent->getPreinteressenten($person->person_id);
@@ -188,7 +176,7 @@ if(count($preinteressent->result)>0)
 		echo '<td>';
 		$preinteressent1 = new preinteressent();
 		$preinteressent1->loadZuordnungen($row->preinteressent_id);
-		
+
 		$stgs='';
 		foreach ($preinteressent1->result as $row_zuordnung)
 		{
@@ -210,12 +198,12 @@ if(count($preinteressent->result)>0)
 				$plz = $adresse->result[0]->plz;
 				$ort = $adresse->result[0]->ort;
 			}
-			else 
+			else
 			{
 				$plz='';
 				$ort='';
 			}
-				
+
 			echo $plz.' '.$ort.' '.$firma->name." ($firma->firmentyp_kurzbz)";
 		}
 		echo '</td>';
@@ -283,7 +271,7 @@ if(count($prestudent->result)>0)
 			{
 				$uid='ACHTUNG: Es gibt mehrere Studenteneinträge die auf diesen Prestudenten zeigen!';
 			}
-			else 
+			else
 			{
 				if($row_std = $db->db_fetch_object($result))
 				{
@@ -295,7 +283,7 @@ if(count($prestudent->result)>0)
 		echo "<td>$uid</td>";
 		echo "<td>$gruppe</td>";
 		$prestudent1 = new prestudent();
-		$prestudent1->getLastStatus($row->prestudent_id);	
+		$prestudent1->getLastStatus($row->prestudent_id);
 		echo "<td>$prestudent1->status_kurzbz ".($prestudent1->ausbildungssemester!=''?"($prestudent1->ausbildungssemester. Semester)":'')."</td>";
 		echo '</tr>';
 	}
@@ -307,7 +295,7 @@ if($result = $db->db_query($qry))
 {
 	if($db->db_num_rows($result)>0)
 	{
-		echo '<br><h2>Mitarbeiter</h2>';		
+		echo '<br><h2>Mitarbeiter</h2>';
 		echo '<table class="liste table-autosort:0 table-stripeclass:alternate table-autostripe">
 			<thead>
 				<tr>
