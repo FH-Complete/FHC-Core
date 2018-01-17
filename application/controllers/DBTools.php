@@ -426,6 +426,29 @@ class DBTools extends FHC_Controller
 				foreach ($this->config->item('roles') as $role)
 				{
 					echo "\n\n".'Check role '.$role['rolle_kurzbz'];
+					$qry = "SELECT * FROM system.tbl_rolle
+							WHERE rolle_kurzbz='".$role['rolle_kurzbz']."';";
+
+					if($result = $this->db->query($qry))
+					{
+						if($result->num_rows($result)==0)
+						{
+							// Nicht vorhanden -> anlegen
+							$qry_insert="INSERT INTO system.tbl_rolle(rolle_kurzbz, beschreibung) VALUES ('".$role['rolle_kurzbz']."','".$role['rolle_kurzbz']."');";
+
+							if($this->db->query($qry_insert))
+							{
+								echo "\nRolle ".$role['rolle_kurzbz'].' hinzugefügt';
+								$neue=true;
+							}
+							else
+							{
+								echo "\nFehler: ".$role['rolle_kurzbz'].' Rolle hinzufügen nicht möglich';
+								continue;
+							}
+						}
+					}
+
 					foreach ($role['berechtigung'] as $b)
 					{
 						$qry = "SELECT * FROM system.tbl_rolleberechtigung
