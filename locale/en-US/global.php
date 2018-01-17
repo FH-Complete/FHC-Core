@@ -13,6 +13,9 @@ $this->phrasen['global/lehreinheit']='Teaching unit';
 $this->phrasen['global/organisationseinheit']='Organisation Unit';
 $this->phrasen['global/organisationseinheiten']='Organisation Units';
 $this->phrasen['global/organisationsform']='Organisational form';
+$this->phrasen['global/studienjahr']='Academic year';
+$this->phrasen['global/lektorIn']='Lector';
+$this->phrasen['global/lektorInnen']='Lectors';
 
 $this->phrasen['global/ects']='ECTS';
 $this->phrasen['global/semesterstunden']='Units per semester';
@@ -54,6 +57,9 @@ $this->phrasen['global/nein']='No';
 $this->phrasen['global/download']='Download';
 $this->phrasen['global/auswahl']='Select';
 $this->phrasen['global/hinzufuegen']='Add';
+$this->phrasen['global/drucken']='Print';
+$this->phrasen['global/und']='and';
+$this->phrasen['global/oder']='or';
 
 $this->phrasen['global/username']='Username';
 $this->phrasen['global/vorname']='First Name';
@@ -131,6 +137,7 @@ $this->phrasen['global/handbuch']='Manual';
 $this->phrasen['global/hilfe']='Help';
 $this->phrasen['global/benutzer']='User';
 $this->phrasen['global/anleitung']='Manual';
+$this->phrasen['global/bericht']='Report';
 
 // Statusmeldungen
 $this->phrasen['global/erfolgreichgespeichert']='Successfully saved';
@@ -144,6 +151,7 @@ $this->phrasen['global/userNichtGefunden']='No user found';
 $this->phrasen['global/datumNichtGesetzt']='Date is missing';
 $this->phrasen['global/studiensemesterKonnteNichtGefundenWerden'] = 'No semester found';
 $this->phrasen['global/studiengangKonnteNichtGefundenWerden'] = 'Program not found';
+$this->phrasen['global/studienjahrKonnteNichtGefundenWerden'] = 'Academic year not found';
 $this->phrasen['global/fehlerBeimErmittelnDerUID'] = 'Error finding the UID';
 $this->phrasen['global/nichtAngemeldet'] = 'You are not logged in. No UID found';
 $this->phrasen['global/LDAPserverNichtErreichbar']='Error connecting to LDAP-Server';
@@ -165,6 +173,8 @@ $this->phrasen['global/datensatzWurdeNichtGefunden']='Data not found';
 $this->phrasen['global/keineBerechtigungZumAendernDesDatensatzes']='You dont have the authority to change to data';
 $this->phrasen['global/keineDatenGefunden']='No data found';
 $this->phrasen['global/erfolgreichAngelegt']='Created successfully';
+$this->phrasen['global/keineSuchergebnisse']='No matches found';
+$this->phrasen['global/bitteWaehlen']='Please select';
 
 //infrastruktur
 

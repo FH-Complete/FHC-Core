@@ -1020,6 +1020,72 @@ class studiensemester extends basis_db
 			$this->errormsg = 'Fehler beim Ermitteln des Studiensemesters';
 			return false;
 		}
-	}
+	}    
+    
+    /**
+	 * Gibt das Wintersemester eines Studienjahres zurück (zb WS2017)
+	 * @param $studienjahr_kurzbz
+	 * @return boolean true, wenn ein Studiensemester gefunden wurde, sonst false
+	 */
+    public function getWSFromStudienjahr($studienjahr_kurzbz)
+    {       
+         $qry = "
+          SELECT studiensemester_kurzbz
+          FROM tbl_studiensemester 
+          WHERE studienjahr_kurzbz LIKE " . $this->db_add_param($studienjahr_kurzbz) . "
+          AND studiensemester_kurzbz LIKE 'WS%';";
+
+        if ($result = $this->db_query($qry)) 
+        {
+            if($row = $this->db_fetch_object())
+			{
+                $this->result = $row->studiensemester_kurzbz;
+                return true;
+            }
+            else
+            {
+                $this->errormsg = 'Es wurde kein Wintersemester in diesem Studienjahr gefunden';
+                return false;  
+            }
+        }
+        else
+        {
+            $this->errormsg = 'Fehler beim Laden der Daten';
+            return false;  
+        }
+    }
+    
+     /**
+	 * Gibt das Sommersemester eines Studienjahres zurück (zb SS2018)
+	 * @param $studienjahr_kurzbz
+	 * @return boolean true, wenn ein Studiensemester gefunden wurde, sonst false
+	 */
+     public function getSSFromStudienjahr($studienjahr_kurzbz)
+    {       
+         $qry = "
+          SELECT studiensemester_kurzbz
+          FROM tbl_studiensemester 
+          WHERE studienjahr_kurzbz LIKE " . $this->db_add_param($studienjahr_kurzbz) . "
+          AND studiensemester_kurzbz LIKE 'SS%';";
+
+        if ($result = $this->db_query($qry)) 
+        {
+            if($row = $this->db_fetch_object())
+			{
+                $this->result = $row->studiensemester_kurzbz;
+                return true;
+            }
+            else
+            {
+                $this->errormsg = 'Es wurde kein Sommersemester in diesem Studienjahr gefunden';
+                return false;  
+            }
+        }
+        else
+        {
+            $this->errormsg = 'Fehler beim Laden der Daten';
+            return false;  
+        }
+    }
 }
 ?>

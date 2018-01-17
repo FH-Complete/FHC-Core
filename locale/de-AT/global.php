@@ -13,6 +13,9 @@ $this->phrasen['global/lehreinheit']='Lehreinheit';
 $this->phrasen['global/organisationseinheit']='Organisationseinheit';
 $this->phrasen['global/organisationseinheiten']='Organisationseinheiten';
 $this->phrasen['global/organisationsform']='Organisationsform';
+$this->phrasen['global/studienjahr']='Studienjahr';
+$this->phrasen['global/lektorIn']='LektorIn';
+$this->phrasen['global/lektorInnen']='LektorInnen';
 
 $this->phrasen['global/ects']='ECTS';
 $this->phrasen['global/semesterstunden']='Semesterstunden';
@@ -54,6 +57,10 @@ $this->phrasen['global/nein']='Nein';
 $this->phrasen['global/download']='Download';
 $this->phrasen['global/auswahl']='Auswahl';
 $this->phrasen['global/hinzufuegen']='Hinzufügen';
+$this->phrasen['global/drucken']='Drucken';
+$this->phrasen['global/pdfExport']='PDF Export';
+$this->phrasen['global/und']='und';
+$this->phrasen['global/oder']='oder';
 
 $this->phrasen['global/username']='Username';
 $this->phrasen['global/vorname']='Vorname';
@@ -131,12 +138,14 @@ $this->phrasen['global/handbuch']='Handbuch';
 $this->phrasen['global/hilfe']='Hilfe';
 $this->phrasen['global/benutzer']='Benutzer';
 $this->phrasen['global/anleitung']='Anleitung';
+$this->phrasen['global/bericht']='Bericht';
 
 // Statusmeldungen
 $this->phrasen['global/erfolgreichgespeichert']='Erfolgreich gespeichert';
 $this->phrasen['global/erfolgreichgelöscht']='Erfolgreich gelöscht';
 $this->phrasen['global/fehleraufgetreten']='Es ist ein Fehler aufgetreten';
 $this->phrasen['global/emailgesendetan']='E-Mail gesendet an';
+$this->phrasen['global/emailNichtVersendet']='E-Mail konnte nicht versendet werden';
 $this->phrasen['global/keineBerechtigungFuerDieseSeite']='Sie haben keine Berechtigung für diese Seite';
 $this->phrasen['global/fehlerBeimOeffnenDerDatenbankverbindung']='Fehler beim Öffnen der Datenbankverbindung';
 $this->phrasen['global/fehlerBeimLesenAusDatenbank']='Fehler beim Lesen aus der Datenbank';
@@ -144,6 +153,7 @@ $this->phrasen['global/userNichtGefunden']='Es wurde kein User gefunden';
 $this->phrasen['global/datumNichtGesetzt']='Datum ist nicht gesetzt';
 $this->phrasen['global/studiensemesterKonnteNichtGefundenWerden'] = 'Studiensemester konnte nicht gefunden werden';
 $this->phrasen['global/studiengangKonnteNichtGefundenWerden'] = 'Studiengang konnte nicht gefunden werden';
+$this->phrasen['global/studienjahrKonnteNichtGefundenWerden'] = 'Studienjahr konnte nicht gefunden werden';
 $this->phrasen['global/fehlerBeimErmittelnDerUID'] = 'Fehler beim ermitteln der UID';
 $this->phrasen['global/nichtAngemeldet'] = 'Sie sind nicht angemeldet. Es wurde keine Benutzer UID gefunden';
 $this->phrasen['global/LDAPserverNichtErreichbar']='Der LDAP-Server ist nicht erreichbar';
@@ -165,6 +175,9 @@ $this->phrasen['global/datensatzWurdeNichtGefunden']='Datensatz wurde nicht gefu
 $this->phrasen['global/keineBerechtigungZumAendernDesDatensatzes']='Keine Berechtigung zum Ändern des Datensatzes';
 $this->phrasen['global/keineDatenGefunden']='Keine Daten gefunden';
 $this->phrasen['global/erfolgreichAngelegt']='Erfolgreich angelegt';
+$this->phrasen['global/keineSuchergebnisse']='Es liegen keine Daten zu Ihrer Suchanfrage vor';
+$this->phrasen['global/bitteWaehlen']='Bitte wählen Sie';
+
 
 //infrastruktur
 
