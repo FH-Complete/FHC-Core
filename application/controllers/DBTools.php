@@ -424,6 +424,8 @@ class DBTools extends FHC_Controller
 				echo ' Roles!';
 				$this->config->load('roles');
 				foreach ($this->config->item('roles') as $role)
+				{
+					echo "\n\n".'Check role '.$role['rolle_kurzbz'];
 					foreach ($role['berechtigung'] as $b)
 					{
 						$qry = "SELECT * FROM system.tbl_rolleberechtigung
@@ -439,16 +441,17 @@ class DBTools extends FHC_Controller
 
 								if($this->db->query($qry_insert))
 								{
-									echo '<br>'.$role['rolle_kurzbz'].' -> '.$b.' <b>hinzugefügt</b>';
+									echo "\n".$role['rolle_kurzbz'].' -> '.$b.' hinzugefügt';
 									$neue=true;
 								}
 								else
-									echo '<br><span class="error">Fehler: '.$role['rolle_kurzbz'].' -> '.$b.' hinzufügen nicht möglich</span>';
+									echo "\nFehler: ".$role['rolle_kurzbz'].' -> '.$b.' hinzufügen nicht möglich';
 							}
 							else
-								echo "- $b -";
+								echo "\n- $b -";
 						}
 					}
+				}
 				break;
 			// **** Default ****
 			default: echo ' what? roles or permisssions?';
