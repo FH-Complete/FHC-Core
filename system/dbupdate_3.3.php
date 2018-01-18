@@ -1103,6 +1103,20 @@ if (!$result = @$db->db_query("SELECT taetigkeit_kurzbz FROM system.tbl_log"))
 		echo '<br>Added Column taetigkeit_kurzbz to system.tbl_log';
 }
 
+// Add missing primary Key to system.tbl_filters.filter_id
+if ($result = @$db->db_query("SELECT conname FROM pg_constraint WHERE conname = 'pk_filters_filter_id'"))
+{
+	if ($db->db_num_rows($result) == 0)
+	{
+		$qry = "ALTER TABLE system.tbl_filters ADD CONSTRAINT pk_filters_filter_id PRIMARY KEY (filter_id);";
+
+		if (!$db->db_query($qry))
+			echo '<strong>system.tbl_filters '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>system.tbl_filters: added primary key on column filter_id';
+	}
+}
+
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
 
