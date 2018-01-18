@@ -7,7 +7,7 @@
 		{
 			$("#tableDataset").tablesorter(
 			{
-				widgets: ["zebra"]
+				widgets: ["zebra", "filter"]
 			});
 		}
 
@@ -51,28 +51,30 @@
 
 	});
 </script>
-<div>
-	<form id="filterForm" method="POST" action="<?php echo current_url(); ?>">
-		<div>
-			<?php FilterWidget::loadViewSelectFields($listFields); ?>
-		</div>
+<div class="row">
+	<div class="col-lg-12">
+		<form class="form-inline" id="filterForm" method="POST" action="<?php echo current_url(); ?>">
+			<div>
+				<?php FilterWidget::loadViewSelectFields($listFields); ?>
+			</div>
 
-		<br>
+			<br>
 
-		<div>
-			<?php FilterWidget::loadViewSelectFilters($metaData); ?>
-		</div>
+			<div>
+				<?php FilterWidget::loadViewSelectFilters($metaData); ?>
+			</div>
 
-		<br>
+			<br>
 
-		<div>
-			<?php FilterWidget::loadViewSaveFilter(); ?>
-		</div>
+			<div>
+				<?php FilterWidget::loadViewSaveFilter(); ?>
+			</div>
 
-		<br>
+			<br>
 
-		<div>
-			<?php FilterWidget::loadViewTableDataset($dataset); ?>
-		</div>
-	</form>
+			<div>
+				<?php FilterWidget::loadViewTableDataset($dataset); ?>
+			</div>
+		</form>
+	</div>
 </div>
