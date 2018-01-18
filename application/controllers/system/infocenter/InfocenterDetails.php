@@ -55,15 +55,6 @@ class InfocenterDetails extends VileSci_Controller
 		if(!isset($stammdaten->retval))
 			return null;
 
-/*		$dokumente = $this->AkteModel->loadWhere(array('person_id' => $person_id));
-
-		if ($dokumente->error)
-		{
-			show_error($dokumente->retval);
-		}
-
-		var_dump($dokumente->retval);*/
-
 		$dokumente = $this->AkteModel->getAktenWithDokInfo($person_id, null, false);
 
 		if ($dokumente->error)
@@ -77,8 +68,6 @@ class InfocenterDetails extends VileSci_Controller
 		{
 			show_error($dokumente->retval);
 		}
-
-		//var_dump($dokumente->retval);die();
 
 		$logs = $this->personloglib->getLogs($person_id, $this::APP);
 
@@ -107,7 +96,7 @@ class InfocenterDetails extends VileSci_Controller
 	 */
 	private function __loadPrestudentData($person_id)
 	{
-		$zgvpruefungen = [];
+		$zgvpruefungen = array();
 
 		$prestudenten = $this->PrestudentModel->loadWhere(array('person_id' => $person_id));
 
