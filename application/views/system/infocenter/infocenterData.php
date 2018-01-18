@@ -65,15 +65,14 @@
 					AND studiensemester_kurzbz IN (
 						SELECT studiensemester_kurzbz
 						FROM public.tbl_studiensemester
-						WHERE (NOW() >= start AND NOW() <= ende)
-							OR start > NOW()
+						WHERE ende >= NOW()
 						)
 					)
 				)
 			ORDER BY "LastAction" DESC
 		',
-		'hideHeader' => false,
-		'hideSave' => false,
+		'hideHeader' => true,
+		'hideSave' => true,
 		'additionalColumns' => array('Details'),
 		'formatRaw' => function($fieldName, $fieldValue, $datasetRaw) {
 
