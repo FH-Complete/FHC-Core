@@ -20,6 +20,7 @@
 - **[FAS]** Mitarbeiterexport exportiert jetzt nur noch die markierten Personen
 - **[CORE]** Has many as possible javascripts and css present in the repository were removed. Their lack is overcome by the packages in the composer. In the meanwhile also the versions were updated
 - **[CIS]** Die Fotoliste wird jetzt mit unoconv erstellt. Die bestehende Vorlage für den Dokumentenexport muss hier angepasst werden
+- **[CORE]** Resturlaubstage und Mehrarbeitsstunden wurden aus dem Core entfernt und können nicht mehr mit FH-Complete verwaltet werden.
 
 ### Updateinfo
 - **[CORE]** Infoscreen wurde umbenannt (informationsbildschirm.php)

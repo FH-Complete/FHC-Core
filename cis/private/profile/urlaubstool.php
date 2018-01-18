@@ -26,7 +26,6 @@ require_once('../../../config/cis.config.inc.php');
 require_once('../../../include/functions.inc.php');
 require_once('../../../include/zeitsperre.class.php');
 require_once('../../../include/datum.class.php');
-require_once('../../../include/resturlaub.class.php');
 require_once('../../../include/person.class.php');
 require_once('../../../include/benutzer.class.php');
 require_once('../../../include/mitarbeiter.class.php');
@@ -34,7 +33,6 @@ require_once('../../../include/mail.class.php');
 require_once('../../../include/phrasen.class.php');
 require_once('../../../include/globals.inc.php');
 require_once('../../../include/sprache.class.php');
-
 
 $sprache = getSprache();
 $lang = new sprache();
@@ -503,77 +501,17 @@ echo '
 	</head>
 <body>
 <?php
-	echo "<H1>".$p->t('urlaubstool/urlaubstool')." (".$uid.")</H1>";
-	//Anzeige Resturlaubsberechnung
-	echo '<table width="100%">';
-	echo '<tr><td colspan=2>';
-	$resturlaub = new resturlaub();
+echo "<H1>".$p->t('urlaubstool/urlaubstool')." (".$uid.")</H1>";
 
-	if($resturlaub->load($uid))
-	{
-		$resturlaubstage = $resturlaub->resturlaubstage;
-		$mehrarbeitsstunden = $resturlaub->mehrarbeitsstunden;
-		$anspruch = $resturlaub->urlaubstageprojahr;
-	}
-	else
-	{
-		$resturlaubstage=0;
-		$mehrarbeitsstunden=0;
-		// wenn mitarbeiter ist kein fixangestellter --> kein urlaubsanspruch
-		$mitarbeiter_anspruch = new mitarbeiter();
-		$mitarbeiter_anspruch->load($uid);
-		if($mitarbeiter_anspruch->fixangestellt == true)
-			$anspruch = 25;
-		else
-			$anspruch = 0;
-	}
-
-	$jahr=date('Y');
-	if (date('m')>8)
-	{
-		$datum_beginn_iso=$jahr.'-09-01';
-		$datum_beginn='1.Sept.'.$jahr;
-		$datum_ende_iso=($jahr+1).'-08-31';
-		$datum_ende='31.Aug.'.($jahr+1);
-		$geschaeftsjahr=$jahr.'/'.($jahr+1);
-	}
-	else
-	{
-		$datum_beginn_iso=($jahr-1).'-09-01';
-		$datum_beginn='1.Sept.'.($jahr-1);
-		$datum_ende_iso=$jahr.'-08-31';
-		$datum_ende='31.Aug.'.$jahr;
-		$geschaeftsjahr=($jahr-1).'/'.$jahr;
-	}
-
-	//Urlaub berechnen
-	$gebuchterurlaub=0;
-	$qry = "SELECT sum(bisdatum-vondatum+1) as anzahltage FROM campus.tbl_zeitsperre
-				WHERE zeitsperretyp_kurzbz='Urlaub' AND mitarbeiter_uid='$uid' AND
-				(
-					vondatum>='$datum_beginn_iso' AND bisdatum<='$datum_ende_iso'
-				)";
-	$result = $db->db_query($qry);
-	$row = $db->db_fetch_object($result);
-	$gebuchterurlaub = $row->anzahltage;
-	if($gebuchterurlaub=='')
-		$gebuchterurlaub=0;
-
-$content_resturlaub .= '<div id="resturlaub">';
-$content_resturlaub .= "<table><tr><td   nowrap><h3>".$p->t('urlaubstool/urlaubImGeschaeftsjahr')." $geschaeftsjahr</h3></td><td></td></tr>";
-$content_resturlaub .= "<tr><td nowrap>".$p->t('urlaubstool/anspruch')."</td><td align='right'  nowrap>$anspruch ".$p->t('urlaubstool/tage')."</td><td class='grey'   nowrap>&nbsp;&nbsp;&nbsp;( ".$p->t('urlaubstool/jaehrlich')." )</td></tr>";
-$content_resturlaub .= "<tr><td nowrap>+ ".$p->t('urlaubstool/resturlaub')."</td><td align='right'  nowrap>$resturlaubstage ".$p->t('urlaubstool/tage')."</td><td class='grey'   nowrap>&nbsp;&nbsp;&nbsp;( ".$p->t('urlaubstool/stichtag').": $datum_beginn )</td>";
-$content_resturlaub .= "<tr><td nowrap>- ".$p->t('urlaubstool/aktuellGebuchterUrlaub')."&nbsp;</td><td align='right'  nowrap>$gebuchterurlaub ".$p->t('urlaubstool/tage')."</td><td class='grey'  nowrap>&nbsp;&nbsp;&nbsp;( $datum_beginn - $datum_ende )</td>";
-$content_resturlaub .= "</tr>";
-$content_resturlaub .= "<tr><td style='border-top: 1px solid black;'  nowrap>".$p->t('urlaubstool/aktuellerStand')."</td><td style='border-top: 1px solid black;' align='right' nowrap>".($anspruch+$resturlaubstage-$gebuchterurlaub)." ".$p->t('urlaubstool/tage')."</td><td class='grey'  nowrap>&nbsp;&nbsp;&nbsp;( ".$p->t('urlaubstool/stichtag').": $datum_ende )</td></tr>";
-$content_resturlaub .= "</table>";
-$content_resturlaub .= '</div>';
+//Anzeige Resturlaubsberechnung
+echo '<table width="100%">';
+echo '<tr><td colspan=2>';
 
 //Formular Auswahl Monat und Jahr für Kalender
 echo '
 <table width="95%" align="left">
 	<tr>
-		<td class="tdvertical" align="left" colspan="2">'.$content_resturlaub.'</td>
+		<td class="tdvertical" align="left" colspan="2"><div id="resturlaub"></div></td>
 		<td style="vertical-align:top; width: 20%;">
 			<table cellspacing="0" cellpadding="0">
 				<tr>

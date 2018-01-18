@@ -70,7 +70,7 @@ class mitarbeiter extends benutzer
 		if(!benutzer::load($uid))
 			return false;
 
-		$qry = "SELECT * FROM public.tbl_mitarbeiter LEFT JOIN campus.tbl_resturlaub USING(mitarbeiter_uid)
+		$qry = "SELECT * FROM public.tbl_mitarbeiter
 				WHERE mitarbeiter_uid=".$this->db_add_param($uid).";";
 
 		if($this->db_query($qry))
@@ -90,9 +90,6 @@ class mitarbeiter extends benutzer
 				$this->ext_id_mitarbeiter = $row->ext_id;
 				$this->bismelden = $this->db_parse_bool($row->bismelden);
 				$this->kleriker = $this->db_parse_bool($row->kleriker);
-
-				$this->urlaubstageprojahr = $row->urlaubstageprojahr;
-				$this->resturlaubstage = $row->resturlaubstage;
 				return true;
 			}
 			else
@@ -663,7 +660,6 @@ class mitarbeiter extends benutzer
 		$qry .= " FROM ((public.tbl_mitarbeiter JOIN public.tbl_benutzer ON(mitarbeiter_uid=uid))
 					JOIN public.tbl_person USING(person_id))
 			   LEFT JOIN public.tbl_benutzerfunktion USING(uid)
-			   LEFT JOIN campus.tbl_resturlaub USING(mitarbeiter_uid)
 				   WHERE true";
 
 		if($fix=='true')
@@ -785,9 +781,6 @@ class mitarbeiter extends benutzer
 				$obj->insertvon = $row->insertvon;
 				$obj->updateamum = $row->updateamum;
 				$obj->updatevon = $row->updatevon;
-
-				$obj->urlaubstageprojahr = $row->urlaubstageprojahr;
-				$obj->resturlaubstage = $row->resturlaubstage;
 
 				if ($hasUDF)
 				{
@@ -925,7 +918,10 @@ class mitarbeiter extends benutzer
 		$qry = "SELECT
 					distinct on(mitarbeiter_uid) *, tbl_benutzer.aktiv as aktiv, tbl_mitarbeiter.insertamum,
 					tbl_mitarbeiter.insertvon, tbl_mitarbeiter.updateamum, tbl_mitarbeiter.updatevon, tbl_person.svnr
-				FROM ((public.tbl_mitarbeiter JOIN public.tbl_benutzer ON(mitarbeiter_uid=uid)) JOIN public.tbl_person USING(person_id))  LEFT JOIN campus.tbl_resturlaub USING(mitarbeiter_uid)
+				FROM
+					public.tbl_mitarbeiter
+					JOIN public.tbl_benutzer ON(mitarbeiter_uid=uid)
+					JOIN public.tbl_person USING(person_id)
 				WHERE lower(COALESCE(nachname,'') ||' '|| COALESCE(vorname,'')) ~* lower(".$this->db_add_param($filter).") OR
 				      lower(COALESCE(vorname,'') ||' '|| COALESCE(nachname,'')) ~* lower(".$this->db_add_param($filter).") OR
 				      uid ~* ".$this->db_add_param($filter)." ";
@@ -976,9 +972,6 @@ class mitarbeiter extends benutzer
 				$obj->insertvon = $row->insertvon;
 				$obj->updateamum = $row->updateamum;
 				$obj->updatevon = $row->updatevon;
-
-				$obj->urlaubstageprojahr = $row->urlaubstageprojahr;
-				$obj->resturlaubstage = $row->resturlaubstage;
 
 				$this->result[] = $obj;
 			}
@@ -1353,9 +1346,8 @@ class mitarbeiter extends benutzer
 
 		$qry .= " FROM ((public.tbl_mitarbeiter JOIN public.tbl_benutzer ON(mitarbeiter_uid=uid))
 					JOIN public.tbl_person USING(person_id))
-			   LEFT JOIN public.tbl_benutzerfunktion USING(uid)
-			   LEFT JOIN campus.tbl_resturlaub USING(mitarbeiter_uid)
-				   WHERE uid in(".$this->db_implode4SQL($uid_arr).")";;
+					LEFT JOIN public.tbl_benutzerfunktion USING(uid)
+				WHERE uid in(".$this->db_implode4SQL($uid_arr).")";;
 
 		if($this->db_query($qry))
 		{
@@ -1401,9 +1393,6 @@ class mitarbeiter extends benutzer
 				$obj->insertvon = $row->insertvon;
 				$obj->updateamum = $row->updateamum;
 				$obj->updatevon = $row->updatevon;
-
-				$obj->urlaubstageprojahr = $row->urlaubstageprojahr;
-				$obj->resturlaubstage = $row->resturlaubstage;
 
 				if ($hasUDF)
 				{

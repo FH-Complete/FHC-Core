@@ -33,7 +33,6 @@ require_once('../../include/mitarbeiter.class.php');
 require_once('../../include/bisverwendung.class.php');
 require_once('../../include/bisfunktion.class.php');
 require_once('../../include/entwicklungsteam.class.php');
-require_once('../../include/resturlaub.class.php');
 require_once('../../include/buchung.class.php');
 require_once('../../include/pruefung.class.php');
 require_once('../../include/projektbetreuer.class.php');
@@ -108,37 +107,11 @@ if(!$error)
 			$mitarbeiter->kleriker = ($_POST['kleriker'] == 'true'?true:false);
 			if($rechte->isBerechtigt('mitarbeiter/personalnummer'))
 			{
-			    $mitarbeiter->personalnummer = $_POST['personalnummer'];
+				$mitarbeiter->personalnummer = $_POST['personalnummer'];
 			}
 			if($mitarbeiter->save())
 			{
-				$resturlaub = new resturlaub();
-				if($resturlaub->load($_POST['uid']))
-				{
-					$resturlaub->new = false;
-				}
-				else
-				{
-					$resturlaub->new = true;
-					$resturlaub->insertamum = date('Y-m-d H:i:s');
-					$resturlaub->insertvon = $user;
-					$resturlaub->mitarbeiter_uid = $_POST['uid'];
-				}
-
-				$resturlaub->updateamum = date('Y-m-d H:i:s');
-				$resturlaub->updatevon = $user;
-				$resturlaub->urlaubstageprojahr = $_POST['urlaubsanspruch'];
-				$resturlaub->resturlaubstage = $_POST['resturlaubstage'];
-
-				if($resturlaub->save())
-				{
-					$return = true;
-				}
-				else
-				{
-					$return = false;
-					$errormsg = 'Fehler beim Speichern der Resturlaubstage/Urlaubsanspruch'.$resturlaub->errormsg;
-				}
+				$return = true;
 			}
 			else
 			{

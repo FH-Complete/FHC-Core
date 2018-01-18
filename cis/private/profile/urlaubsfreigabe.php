@@ -26,7 +26,6 @@ require_once('../../../include/zeitsperre.class.php');
 require_once('../../../include/person.class.php');
 require_once('../../../include/benutzer.class.php');
 require_once('../../../include/mitarbeiter.class.php');
-require_once('../../../include/resturlaub.class.php');
 require_once('../../../include/benutzerberechtigung.class.php');
 require_once('../../../include/addon.class.php');
 
@@ -156,26 +155,6 @@ if(isset($_GET['action']) && $_GET['action']=='freigabe')
 
 }
 
-//Speichern der Resturlaubstage
-if(isset($_POST['saveresturlaub']))
-{
-	if(isset($_POST['resturlaubstage']) && is_numeric($_POST['resturlaubstage']))
-	{
-		$resturlaub = new resturlaub();
-		$resturlaub->load($uid);
-
-		$resturlaub->resturlaubstage=$_POST['resturlaubstage'];
-		$resturlaub->updateamum=date('Y-m-d H:i:s');
-		$resturlaub->updatevon = $user;
-		if($resturlaub->save())
-			echo 'Resturlaubstage wurden erfolgreich gespeichert';
-		else
-			echo '<span class="error">Fehler beim Speichern der Resturlaubstage: '.$resturlaub->errormsg.'</span>';
-	}
-	else
-		echo '<span class="error">Fehler beim Speichern der Resturlaubstage: Resturlaub muss eine gueltige Zahl sein</span>';
-}
-
 //Monat zeichenen
 function draw_monat($monat)
 {
@@ -225,93 +204,17 @@ function draw_monat($monat)
 }
 
 //Jahr mit Pfeilen zum blaettern anzeigen
-
 if($uid!='')
 {
 	echo '<table width="100%"><tr><td style="width:33%">';
 	echo "<a href='".$_SERVER['PHP_SELF']."?year=$year' class='Item'>Alle Mitarbeiter anzeigen</a><br></td>";
 	echo '<td style="width:33%">';
 	echo '</td><td style="width:33%">';
-	//echo '<div id="resturlaub"></div>';
-	//echo '</td></tr></table>';
-
-	//Anzeige Resturlaubsberechnung
-
-	$resturlaub = new resturlaub();
-
-	if($resturlaub->load($uid))
-	{
-		$resturlaubstage = $resturlaub->resturlaubstage;
-		$mehrarbeitsstunden = $resturlaub->mehrarbeitsstunden;
-		$anspruch = $resturlaub->urlaubstageprojahr;
-	}
-	else
-	{
-		$resturlaubstage=0;
-		$mehrarbeitsstunden=0;
-		// wenn mitarbeiter ist kein fixangestellter --> kein urlaubsanspruch
-		$mitarbeiter_anspruch = new mitarbeiter();
-		$mitarbeiter_anspruch->load($uid);
-		if($mitarbeiter_anspruch->fixangestellt == true)
-			$anspruch=25;
-		else
-			$anspruch = 0;
-	}
-
-	$jahr=date('Y');
-	if (date('m')>8)
-	{
-		$datum_beginn_iso=$jahr.'-09-01';
-		$datum_beginn='1.Sept.'.$jahr;
-		$datum_ende_iso=($jahr+1).'-08-31';
-		$datum_ende='31.Aug.'.($jahr+1);
-		$geschaeftsjahr=$jahr.'/'.($jahr+1);
-	}
-	else
-	{
-		$datum_beginn_iso=($jahr-1).'-09-01';
-		$datum_beginn='1.Sept.'.($jahr-1);
-		$datum_ende_iso=$jahr.'-08-31';
-		$datum_ende='31.Aug.'.$jahr;
-		$geschaeftsjahr=($jahr-1).'/'.$jahr;
-	}
-
-	//Urlaub berechnen
-	$gebuchterurlaub=0;
-	$qry = "SELECT sum(bisdatum-vondatum+1) as anzahltage FROM campus.tbl_zeitsperre
-				WHERE zeitsperretyp_kurzbz='Urlaub' AND mitarbeiter_uid='$uid' AND
-				(
-					vondatum>='$datum_beginn_iso' AND bisdatum<='$datum_ende_iso'
-				)";
-	$result = $db->db_query($qry);
-	$row = $db->db_fetch_object($result);
-	$gebuchterurlaub = $row->anzahltage;
-	if($gebuchterurlaub=='')
-		$gebuchterurlaub=0;
 
 	echo '<div id="resturlaub">';
-	echo "<table ><tr><td   nowrap><h3>Urlaub im Gesch&auml;ftsjahr $geschaeftsjahr</h3></td></tr>";
-	echo "<tr><td nowrap>Anspruch</td><td align='right'  nowrap>$anspruch Tage</td><td class='grey'   nowrap>&nbsp;&nbsp;&nbsp( j&auml;hrlich )</td></tr>";
-	echo "<tr><td nowrap>+ Resturlaub</td><td align='right'  nowrap>";
-	if(date('m')>8 && date('m')<11)
-	{
-		echo "<form action='".$_SERVER['PHP_SELF']."?uid=$uid' method='POST' style='margin:0px'>";
-		echo "<input type='text' size='2' value='$resturlaubstage' name='resturlaubstage'> Tage";
-		echo "<input type='submit' value='OK' name='saveresturlaub'>";
-		echo "</form>";
-	}
-	else
-	{
-		echo "$resturlaubstage Tage";
-	}
-	echo "</td><td class='grey'   nowrap>&nbsp;&nbsp;&nbsp;( Stichtag: $datum_beginn )</td>";
-	echo "<tr><td nowrap>- aktuell gebuchter Urlaub&nbsp;</td><td align='right'  nowrap>$gebuchterurlaub Tage</td><td class='grey'  nowrap>&nbsp;&nbsp;&nbsp;( $datum_beginn - $datum_ende )</td></tr>";
-	echo "<tr><td style='border-top: 1px solid black;'  nowrap>aktueller Stand</td><td style='border-top: 1px solid black;' align='right' nowrap>".($anspruch+$resturlaubstage-$gebuchterurlaub)." Tage</td><td class='grey'  nowrap>&nbsp;&nbsp;&nbsp;( Stichtag: $datum_ende )</td></tr>";
-	echo "</table>";
 	echo '</div>';
 
 	echo '</td></tr></table>';
-
 }
 
 echo '<br><center>';

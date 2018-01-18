@@ -190,8 +190,6 @@ function draw_row($mitarbeiter)
     		<MITARBEITER:updateamum><![CDATA['.date('d.m.Y H:i:s',$datum->mktime_fromtimestamp($mitarbeiter->updateamum)).']]></MITARBEITER:updateamum>
     		<MITARBEITER:updateamum_iso><![CDATA['.$mitarbeiter->updateamum.']]></MITARBEITER:updateamum_iso>
     		<MITARBEITER:updatevon><![CDATA['.$mitarbeiter->updatevon.']]></MITARBEITER:updatevon>
-    		<MITARBEITER:resturlaubstage><![CDATA['.$mitarbeiter->resturlaubstage.']]></MITARBEITER:resturlaubstage>
-    		<MITARBEITER:urlaubstageprojahr><![CDATA['.$mitarbeiter->urlaubstageprojahr.']]></MITARBEITER:urlaubstageprojahr>
 			<MITARBEITER:kleriker><![CDATA['.($mitarbeiter->kleriker?'Ja':'Nein').']]></MITARBEITER:kleriker>
       	</RDF:Description>
       </RDF:li>

@@ -59,7 +59,6 @@ $config['fhc_acl'] = array
 	'campus.tbl_pruefungsstatus' => 'basis/pruefungsstatus',
 	'campus.tbl_pruefungstermin' => 'basis/pruefungstermin',
 	'campus.tbl_reservierung' => 'basis/reservierung',
-	'campus.tbl_resturlaub' => 'basis/resturlaub',
 	'campus.tbl_studentbeispiel' => 'basis/studentbeispiel',
 	'campus.tbl_studentuebung' => 'basis/studentuebung',
 	'campus.tbl_template' => 'basis/template',

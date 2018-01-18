@@ -27,7 +27,6 @@ require_once('../../../config/cis.config.inc.php');
 require_once('../../../include/functions.inc.php');
 require_once('../../../include/zeitsperre.class.php');
 require_once('../../../include/datum.class.php');
-require_once('../../../include/resturlaub.class.php');
 require_once('../../../include/person.class.php');
 require_once('../../../include/benutzer.class.php');
 require_once('../../../include/mitarbeiter.class.php');
@@ -109,20 +108,19 @@ $( document ).ready(function()
 		}
 	}
 
+	$( ".datepicker_datum" ).datepicker({
+		 changeMonth: true,
+		 changeYear: true,
+		 dateFormat: "dd.mm.yy",
+		 });
 
-		    $( ".datepicker_datum" ).datepicker({
-					 changeMonth: true,
-					 changeYear: true,
-					 dateFormat: "dd.mm.yy",
-					 });
-
-			$( ".timepicker" ).timepicker({
-					showPeriodLabels: false,
-					hourText: "'.$p->t("global/stunde").'",
-					minuteText: "'.$p->t("global/minute").'",
-					hours: {starts: 7,ends: 22},
-					rows: 4,
-					});
+	$( ".timepicker" ).timepicker({
+			showPeriodLabels: false,
+			hourText: "'.$p->t("global/stunde").'",
+			minuteText: "'.$p->t("global/minute").'",
+			hours: {starts: 7,ends: 22},
+			rows: 4,
+			});
 
 });
 </script>';
@@ -250,16 +248,6 @@ function setBisDatum()
 
 <body id="inhalt">
 <div class="flexcroll" style="outline: none;">
-<!--<H2><table class="tabcontent">
-	<tr>
-	<td>
-		&nbsp;<a class="Item" href="index.php">Userprofil</a> &gt;&gt;
-		&nbsp;Zeitsperren
-	</td>
-	<td align="right"></td>
-	</tr>
-	</table>
-</H2>-->
 <table id="inhalt">
   <tr>
     <td>
@@ -365,11 +353,6 @@ if(isset($_GET['type']) && ($_GET['type']=='edit_sperre' || $_GET['type']=='new_
 		$zeitsperre->insertvon = $uid;
 	}
 
-/*	if(!$error && $zeitsperre->freigabeamum!='')
-	{
-		$error = true;
-		$error_msg.=$p->t('zeitsperre/urlaubKannNichtMehrEditiertWerden');
-	} */
 	if(!$error && $_POST['zeitsperretyp_kurzbz']=='Urlaub')
 	{
 		if($zeitsperre->zeitsperre_id!='')
@@ -414,9 +397,7 @@ if(isset($_GET['type']) && ($_GET['type']=='edit_sperre' || $_GET['type']=='new_
 								$to.=',';
 							$to.=trim($vg.'@'.DOMAIN);
 						}
-#						$to_len=mb_strlen($to)-1;
-#						$to = mb_substr($to, 0,$to_len);
-						//$to = 'oesi@technikum-wien.at';
+
 						$benutzer = new benutzer();
 						$benutzer->load($uid);
 						if($datum_obj->formatDatum($zeitsperre->vondatum, 'm')>=9)
@@ -627,8 +608,6 @@ for($i=0;$i<$num_rows_stunde;$i++)
 
 $content_form.= "</SELECT></td></tr>";
 
-
-
 $content_form.= "<tr><td>".$p->t('urlaubstool/vertretung')."</td><td colspan='2'><SELECT name='vertretung_uid' id='vertretung_uid' class='dd_breit'>";
 //dropdown fuer vertretung
 $qry = "SELECT * FROM campus.vw_mitarbeiter WHERE uid not LIKE '\\\_%' ORDER BY nachname, vorname";
@@ -670,86 +649,12 @@ $content_form .= '<tr><td colspan="3">&nbsp;</td></tr>';
 $content_form.= "<tr><td colspan='3' style='color:red'>".$p->t('zeitsperre/achtungEsWerdenAlleEingegebenenTage')."</td></tr>";
 $content_form.= '</table></form>';
 
-// ******* RESTURLAUB ******** //
-$content_resturlaub = '';
-$resturlaubstage = '0';
-$mehrarbeitsstunden = '0';
-$anspruch = '25';
-	$resturlaub = new resturlaub();
-
-	if($resturlaub->load($uid))
-	{
-		$resturlaubstage = $resturlaub->resturlaubstage;
-		$mehrarbeitsstunden = $resturlaub->mehrarbeitsstunden;
-		$anspruch = $resturlaub->urlaubstageprojahr;
-	}else
-	{
-		// wenn mitarbeiter ist kein fixangestellter --> kein urlaubsanspruch
-		$mitarbeiter_anspruch = new mitarbeiter();
-		$mitarbeiter_anspruch->load($uid);
-		if($mitarbeiter_anspruch->fixangestellt == true)
-			$anspruch=25;
-		else
-			$anspruch = 0;
-	}
-//Den Bereich fuer die Resturlaubstage nur anzeigen wenn dies
-//im config angegeben ist
-if(URLAUB_TOOLS)
-{
-	$jahr=date('Y');
-	if (date('m')>8)
-	{
-		$datum_beginn_iso=$jahr.'-09-01';
-		$datum_beginn='1.Sept.'.$jahr;
-		$datum_ende_iso=($jahr+1).'-08-31';
-		$datum_ende='31.Aug.'.($jahr+1);
-		$geschaeftsjahr=$jahr.'/'.($jahr+1);
-	}
-	else
-	{
-		$datum_beginn_iso=($jahr-1).'-09-01';
-		$datum_beginn='1.Sept.'.($jahr-1);
-		$datum_ende_iso=$jahr.'-08-31';
-		$datum_ende='31.Aug.'.$jahr;
-		$geschaeftsjahr=($jahr-1).'/'.$jahr;
-	}
-	$content_resturlaub.="<h3>".$p->t('zeitsperre/urlaubImGeschaeftsjahr')." $geschaeftsjahr</h3>";
-	/*
-	$content_resturlaub.='<form method="POST" action="'.$PHP_SELF.'?type=save_resturlaub"><table>';
-	$content_resturlaub.='<tr><td>Resturlaubstage (31.08.)</td><td><input type="text" size="6" '.$disabled.' id="resturlaubstage" name="resturlaubstage" value="'.$resturlaubstage.'" oninput="berechnen()"/></td></tr>';
-	$content_resturlaub.='<tr><td>Anspruch (01.09.)</td><td><input type="text" size="6" '.$disabled.' id="anspruch" name="anspruch" value="'.$anspruch.'" oninput="berechnen()"/></td></tr>';
-	$content_resturlaub.='<tr><td>Gesamturlaub</td><td><input type="text" disabled="true" size="6" name="summe" id="summe" value="'.($anspruch+$resturlaubstage).'" /></td></tr>';
-	$content_resturlaub.='<tr><td>&nbsp;</td></tr>';
-	$content_resturlaub.='<tr><td>Aktuelle Mehrarbeitsstunden:</td><td><input type="text" size="6" name="mehrarbeitsstunden" value="'.$mehrarbeitsstunden.'" /></td></tr>';
-	$content_resturlaub.='<tr><td></td><td><input type="submit" name="save_resturlaub" value="Speichern" /></td></tr></table>';
-	*/
-	$gebuchterurlaub=0;
-	//Urlaub berechnen (date_part('month', vondatum)>9 AND date_part('year', vondatum)='".(date('Y')-1)."') OR (date_part('month', vondatum)<9 AND date_part('year', vondatum)='".date('Y')."')
-	$qry = "SELECT sum(bisdatum-vondatum+1) as anzahltage FROM campus.tbl_zeitsperre
-				WHERE zeitsperretyp_kurzbz='Urlaub' AND mitarbeiter_uid=".$db->db_add_param($uid)." AND
-				(
-					vondatum>=".$db->db_add_param($datum_beginn_iso)." AND bisdatum<=".$db->db_add_param($datum_ende_iso)."
-				)";
-	$tttt="\n";
-	$result = $db->db_query($qry);
-	$row = $db->db_fetch_object($result);
-	$gebuchterurlaub = $row->anzahltage;
-	if($gebuchterurlaub=='')
-		$gebuchterurlaub=0;
-	$content_resturlaub.="<table><tr><td nowrap>".$p->t('urlaubstool/anspruch')."</td><td align='right'  nowrap>$anspruch ".$p->t('urlaubstool/tage')."</td><td nowrap class='grey'>&nbsp;&nbsp;&nbsp( ".$p->t('urlaubstool/jaehrlich')." )</td></tr>";
-	$content_resturlaub.="<tr><td nowrap>+ ".$p->t('urlaubstool/resturlaub')."</td><td align='right'  nowrap>$resturlaubstage ".$p->t('urlaubstool/tage')."</td><td nowrap class='grey'>&nbsp;&nbsp;&nbsp;( ".$p->t('urlaubstool/stichtag').": $datum_beginn )</td></tr>";
-	$content_resturlaub.="<tr><td nowrap>- ".$p->t('urlaubstool/aktuellGebuchterUrlaub')."&nbsp;</td><td align='right'  nowrap>$gebuchterurlaub ".$p->t('urlaubstool/tage')."</td><td nowrap class='grey'>&nbsp;&nbsp;&nbsp;( $datum_beginn - $datum_ende )</td></tr>";
-	$content_resturlaub.="<tr><td style='border-top: 1px solid black;'  nowrap>".$p->t('urlaubstool/aktuellerStand')."</td><td style='border-top: 1px solid black;' align='right' nowrap>".($anspruch+$resturlaubstage-$gebuchterurlaub)." ".$p->t('urlaubstool/tage')."</td><td nowrap class='grey'>&nbsp;&nbsp;&nbsp;( ".$p->t('urlaubstool/stichtag').": $datum_ende )</td></tr>";
-	$content_resturlaub .="<tr></tr><tr><td><a href='../../../cms/dms.php?id=".$p->t('dms_link/cisHandbuch')."'> ".$p->t('zeitsperre/beschreibungSieheCisHandbuch')." </a></td><td><button type='button' name='hilfe' value='Hilfe' onclick='alert(\"".$p->t('urlaubstool/anspruchAnzahlDerUrlaubstage')."\");'>".$p->t('global/hilfe')."</button></td></tr>";
-	$content_resturlaub .='<tr><td></td></tr>';
-	$content_resturlaub.="</table>";
-}
 echo '<table width="100%">';
 echo '<tr>';
 echo "<td class='tdvertical'>";
 echo $content_form;
 echo '</td>';
-echo "<td class='tdvertical'><div id='resturlaub' style='visibility:hidden;'>$content_resturlaub</div></td>";
+echo "<td class='tdvertical'><div id='resturlaub' style='visibility:hidden;'></div></td>";
 echo '</tr><tr><td colspan=2>';
 echo $content_table;
 echo '</td>';
