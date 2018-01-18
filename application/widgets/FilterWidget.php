@@ -291,6 +291,7 @@ class FilterWidget extends Widget
 				<span>
 					<select name="%s" class="select-filter-operation">
 						<option value="'.self::OP_LESS_THAN.'" '.($activeFilterOperationValue == self::OP_LESS_THAN ? 'selected' : '').'>less than</option>
+						<option value="'.self::OP_GREATER_THAN.'" '.($activeFilterOperationValue == self::OP_GREATER_THAN ? 'selected' : '').'>greater than</option>
 						<option value="'.self::OP_SET.'" '.($activeFilterOperationValue == self::OP_SET ? 'selected' : '').'>is set</option>
 						<option value="'.self::OP_NOT_SET.'" '.($activeFilterOperationValue == self::OP_NOT_SET ? 'selected' : '').'>is not set</option>
 					</select>
@@ -1046,7 +1047,17 @@ class FilterWidget extends Widget
 							break;
 						case self::OP_GREATER_THAN:
 							if (!is_numeric($activeFilterValue)) $activeFilterValue = 0;
-							$condition = ' > '.$activeFilterValue;
+							if (isset($activeFiltersOption[$field])
+								&& ($activeFiltersOption[$field] == self::OPT_DAYS
+								|| $activeFiltersOption[$field] == self::OPT_MONTHS))
+							{
+								$condition = ' > (NOW() - \''.$activeFilterValue.' '.$activeFiltersOption[$field].'\'::interval)';
+							}
+							else
+							{
+								$condition = ' > '.$activeFilterValue;
+							}
+
 							break;
 						case self::OP_LESS_THAN:
 							if (!is_numeric($activeFilterValue)) $activeFilterValue = 0;
