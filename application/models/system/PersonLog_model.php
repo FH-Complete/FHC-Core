@@ -35,11 +35,12 @@ class PersonLog_model extends CI_Model
 	/**
 	 * Loads the last Log Entry of a Person
 	 * @param int $person_id ID of the Person.
+	 * @param string $taetigkeit_kurzbz Verarbeitungstätigkeit
 	 * @param string $app Name of the App.
 	 * @param string $oe_kurzbz Organisations Unit.
 	 * @return object $result
 	 */
-	public function getLastLog($person_id, $app = null, $oe_kurzbz = null)
+	public function getLastLog($person_id, $taetigkeit_kurzbz = null, $app = null, $oe_kurzbz = null)
 	{
 		// Check Permissions
 		$this->load->library('PermissionLib');
@@ -49,6 +50,8 @@ class PersonLog_model extends CI_Model
 		$this->db->order_by('zeitpunkt', 'DESC');
 		$this->db->order_by('log_id', 'DESC');
 		$this->db->limit(1);
+		if (!is_null($taetigkeit_kurzbz))
+			$this->db->where('taetigkeit_kurzbz='.$this->db->escape($oe_kurzbz));
 		if (!is_null($app))
 			$this->db->where('app='.$this->db->escape($app));
 		if (!is_null($oe_kurzbz))
@@ -62,11 +65,12 @@ class PersonLog_model extends CI_Model
 	/**
 	 * Load logs for a person, filtered by parameters
 	 * @param int $person_id ID of the Person.
+	 * @param string $taetigkeit_kurzbz Verarbeitungstätigkeit
 	 * @param string $app Name of the App.
 	 * @param string $oe_kurzbz Organisations Unit.
 	 * @return object $result
 	 */
-	public function filterLog($person_id, $app = null, $oe_kurzbz = null)
+	public function filterLog($person_id, $taetigkeit_kurzbz = null, $app = null, $oe_kurzbz = null)
 	{
 		// Check Permissions
 		$this->load->library('PermissionLib');
@@ -75,6 +79,8 @@ class PersonLog_model extends CI_Model
 
 		$this->db->order_by('zeitpunkt', 'DESC');
 		$this->db->order_by('log_id', 'DESC');
+		if (!is_null($taetigkeit_kurzbz))
+			$this->db->where('taetigkeit_kurzbz='.$this->db->escape($taetigkeit_kurzbz));
 		if (!is_null($app))
 			$this->db->where('app='.$this->db->escape($app));
 		if (!is_null($oe_kurzbz))
