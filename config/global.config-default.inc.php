@@ -41,6 +41,9 @@ define('CIS_PROFIL_FUNKTIONEN_ANZEIGEN',true);
 define('CIS_PROFIL_BETRIEBSMITTEL_ANZEIGEN',true);
 define('CIS_PROFIL_STUDIENINFORMATION_ANZEIGEN',true);
 
+// Zeitaufzeichnung gesperrt_bis Datum YYYY-MM-DD
+define('CIS_ZEITAUFZEICHNUNG_GESPERRT_BIS','');
+
 // Anzeige des Links zur Noteneingabe in der LVA Uebersicht
 define('CIS_LVALISTE_NOTENEINGABE_ANZEIGEN',true);
 
