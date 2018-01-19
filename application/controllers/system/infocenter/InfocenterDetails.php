@@ -9,8 +9,16 @@ if (! defined("BASEPATH")) exit("No direct script access allowed");
  */
 class InfocenterDetails extends VileSci_Controller
 {
-	//app name for logging
+	//app and Verarbeitungstaetigkeit name for logging
 	const APP = 'aufnahme';
+	const TAETIGKEIT = 'bewerbung';
+	const LOGPARAMS = array(
+		'saveformalgep' => array('logtype' => 'Action', 'name' => 'document formally checked', 'message' => 'document %s formally checked, set to %s'),
+		'savezgv' => array('logtype' => 'Action', 'name' => 'ZGV saved', 'message' => 'ZGV saved for degree program %s, prestudentid %s'),
+		'abgewiesen' => array('logtype' => 'Processstate', 'name' => 'Interessent rejected', 'message' => 'Interessent with prestudentid %s was rejected for degree program %s'),
+		'freigegeben' => array('logtype' => 'Processstate', 'name' => 'Interessent confirmed', 'message' => 'status Interessent for prestudentid %s was confirmed for degree program %s'),
+		'savenotiz' => array('logtype' => 'Action', 'name' => 'note added', 'message' => 'note with title %s was added')
+	);
 
 	/**
 	 * constructor
@@ -69,7 +77,7 @@ class InfocenterDetails extends VileSci_Controller
 			show_error($dokumente->retval);
 		}
 
-		$logs = $this->personloglib->getLogs($person_id, $this::APP);
+		$logs = $this->personloglib->getLogs($person_id);
 
 		$notizen = $this->NotizModel->getNotiz($person_id);
 
@@ -129,7 +137,7 @@ class InfocenterDetails extends VileSci_Controller
 				return 0;
 			elseif($a->prestudentstatus->status_kurzbz === 'Interessent' && $b->prestudentstatus->status_kurzbz === 'Interessent')
 			{
-				//infoonly Interessenten are behind new Interessenten
+				//infoonly Interessenten come after new Interessenten
 				if($a->infoonly)
 					return 1;
 				elseif($b->infoonly)
@@ -196,8 +204,8 @@ class InfocenterDetails extends VileSci_Controller
 		}
 
 		//write person log
-		$this->personloglib->log($person_id, 'Action', array('name' => 'Dokument formal geprüft', 'message' => 'Dokument '.$akte->titel.' formal geprüft, gesetzt auf '.(is_null($timestamp) ? 'NULL' : $timestamp), 'success' => 'true'), $this::APP, null, $this->uid);
-		//redirect to start page
+		$this->__log($person_id, 'saveformalgep', array(empty($akte->retval[0]->titel) ? $akte->retval[0]->bezeichnung : $akte->retval[0]->titel, is_null($timestamp) ? 'NULL' : $timestamp));
+
 		redirect('/system/infocenter/InfocenterDetails/showDetails/'.$person_id.'#DokPruef');
 	}
 
@@ -232,7 +240,7 @@ class InfocenterDetails extends VileSci_Controller
 		//get extended Prestudent data for logging
 		$logdata = $this->__getPersonAndStudiengangFromPrestudent($prestudent_id);
 
-		$this->personloglib->log($logdata['person_id'], 'Action', array('name' => 'Zgv gespeichert', 'message' => 'Zgv für Studiengang '.$logdata['studiengang_kurzbz'].' wurde gespeichert', 'success' => 'true'), $this::APP, null, $this->uid);
+		$this->__log($logdata['person_id'], 'savezgv', array($logdata['studiengang_kurzbz'], $prestudent_id));
 
 		$this->__redirectToStart($prestudent_id, 'ZgvPruef');
 	}
@@ -263,7 +271,7 @@ class InfocenterDetails extends VileSci_Controller
 
 		$logdata = $this->__getPersonAndStudiengangFromPrestudent($prestudent_id);
 
-		$this->personloglib->log($logdata['person_id'], 'Processstate', array('name' => 'Interessent abgewiesen', 'message' => 'Interessent wurde für Studiengang '.$logdata['studiengang_kurzbz'].' abgewiesen', 'success' => 'true'), $this::APP, null, $this->uid);
+		$this->__log($logdata['person_id'], 'abgewiesen', array($prestudent_id, $logdata['studiengang_kurzbz']));
 
 		$this->__redirectToStart($prestudent_id, 'ZgvPruef');
 	}
@@ -292,7 +300,7 @@ class InfocenterDetails extends VileSci_Controller
 
 		$logdata = $this->__getPersonAndStudiengangFromPrestudent($prestudent_id);
 
-		$this->personloglib->log($logdata['person_id'], 'Processstate', array('name' => 'Interessent freigegeben', 'message' => 'Interessent wurde für Studiengang '.$logdata['studiengang_kurzbz'].' freigegeben', 'success' => 'true'), $this::APP, null, $this->uid);
+		$this->__log($logdata['person_id'], 'freigegeben', array($prestudent_id, $logdata['studiengang_kurzbz']));
 
 		$this->__redirectToStart($prestudent_id, 'ZgvPruef');
 	}
@@ -314,7 +322,7 @@ class InfocenterDetails extends VileSci_Controller
 			show_error($result->retval);
 		}
 
-		$this->personloglib->log($person_id, 'Action', array('name' => 'Notiz hinzugefügt', 'message' => 'Notiz mit Titel '.$titel.' wurde hinzugefügt', 'success' => 'true'), $this::APP, null, $this->uid);
+		$this->__log($person_id, 'savenotiz', array($titel));
 
 		redirect('/system/infocenter/InfocenterDetails/showDetails/'.$person_id.'#NotizAkt');
 	}
@@ -377,6 +385,20 @@ class InfocenterDetails extends VileSci_Controller
 		$studiengang_kurzbz = $prestudent->retval[0]->studiengang;
 
 		return array('person_id' => $person_id, 'studiengang_kurzbz' => $studiengang_kurzbz);
+	}
+
+	/**
+	 * helper function for logging
+	 * @param $person_id
+	 * @param $logname
+	 * @param $messageparams
+	 */
+	private function __log($person_id, $logname, $messageparams)
+	{
+		$logparams = $this::LOGPARAMS[$logname];
+		$this->personloglib->log($person_id, $logparams['logtype'],
+			array('name' => $logparams['name'], 'message' => vsprintf($logparams['message'], $messageparams), 'success' => 'true'),
+			$this::TAETIGKEIT, $this::APP, null, $this->uid);
 	}
 
 }
