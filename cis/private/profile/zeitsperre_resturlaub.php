@@ -227,6 +227,10 @@ function showHideBezeichnungDropDown()
 		sp.innerHTML = str;
 
 	}
+	else if (dd.options[dd.selectedIndex].value == 'DienstF')
+	{
+		sp.innerHTML = '<font color="red"><b>Dienstfreistellungen</b> nur in Absprache mit Personalservice eintragen!</font><br><input type="text" name="bezeichnung" maxlength="32" size="32" value="">';
+	}
 	else
 	{
 
