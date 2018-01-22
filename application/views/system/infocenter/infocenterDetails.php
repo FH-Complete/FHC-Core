@@ -137,7 +137,7 @@ $this->load->view('templates/FHC-Header', array('title' => 'InfocenterDetails', 
 							<a name="DokPruef"></a><!-- anchor for jumping to the section -->
 							<div class="panel-heading text-center"><h4>Dokumentenpr&uuml;fung</h4></div>
 							<div class="panel-body">
-								<table id="doctable" class="table table-striped table-bordered">
+								<table id="doctable" class="table table-striped table-bordered table-condensed">
 									<thead>
 									<th>Name</th>
 									<th>Typ</th>
@@ -222,13 +222,27 @@ $this->load->view('templates/FHC-Header', array('title' => 'InfocenterDetails', 
 							</div>
 							<div class="panel-body">
 								<div class="panel-group">
-									<?php foreach ($zgvpruefungen as $zgvpruefung):
-										$infoonly = $zgvpruefung->infoonly; ?>
+									<?php
+									foreach ($zgvpruefungen as $zgvpruefung):
+										$infoonly = $zgvpruefung->infoonly;
+										//set bootstrap columns
+										if($infoonly)
+										{
+											$firstcolumns = array(3, 2, 2, 2, 3);
+											$columns = array(3, 2, 2, 2);
+										}
+										else
+										{
+											$firstcolumns = array(3, 2, 2, 2, 3);
+											$columns = array(4, 3, 2, 3);
+										}
+
+									?>
 										<div class="panel panel-default">
 											<div class="panel-heading">
 												<h4 class="panel-title">
 													<a data-toggle="collapse"
-													   href="#collapse<?php echo $zgvpruefung->prestudent_id ?>">Studiengang <?php echo $zgvpruefung->studiengang ?></a>
+													   href="#collapse<?php echo $zgvpruefung->prestudent_id ?>"><?php echo $zgvpruefung->studiengang.' - '.$zgvpruefung->studiengangbezeichnung ?></a>
 												</h4>
 											</div>
 											<div id="collapse<?php echo $zgvpruefung->prestudent_id ?>"
@@ -237,33 +251,50 @@ $this->load->view('templates/FHC-Header', array('title' => 'InfocenterDetails', 
 													<form method="post"
 														  action="../saveZgvPruefung/<?php echo $zgvpruefung->prestudent_id ?>">
 														<div class="row">
-															<div class="col-lg-4">
+															<div class="col-lg-<?php echo $firstcolumns[0] ?>">
 																<div class="form-group">
 																	<label>Freigegeben an Studiengang: </label>
 																	<?php echo isset($zgvpruefung->prestudentstatus->bestaetigtam) ? "ja" : "nein" ?>
 																</div>
 															</div>
-															<div class="col-lg-3">
+															<div class="col-lg-<?php echo $firstcolumns[1] ?>">
 																<div class="form-group">
 																	<label>Letzter Status: </label>
-																	<?php echo isset($zgvpruefung->prestudentstatus->status_kurzbz) ? $zgvpruefung->prestudentstatus->status_kurzbz : '' ?>
+																	<?php
+																	if(isset($zgvpruefung->prestudentstatus->status_kurzbz))
+																	{
+																		echo $zgvpruefung->prestudentstatus->status_kurzbz.($zgvpruefung->prestudentstatus->status_kurzbz === 'Abgewiesener' ? ' ('.$zgvpruefung->prestudentstatus->bezeichnung_statusgrund[0].')' : '');
+																	}
+																	?>
 																</div>
 															</div>
-															<div class="col-lg-2">
+															<div class="col-lg-<?php echo $firstcolumns[2] ?>">
 																<div class="form-group">
 																	<label>Studiensemester: </label>
 																	<?php echo isset($zgvpruefung->prestudentstatus->studiensemester_kurzbz) ? $zgvpruefung->prestudentstatus->studiensemester_kurzbz : '' ?>
 																</div>
 															</div>
-															<div class="col-lg-3">
+															<div class="col-lg-<?php echo $firstcolumns[3] ?>">
 																<div class="form-group">
-																	<label>Ausbildungssemester: </label>
+																	<label><span style="display: inline-block">Ausbildungs</span><span style="display: inline-block">semester: </span></label>
 																	<?php echo isset($zgvpruefung->prestudentstatus->ausbildungssemester) ? $zgvpruefung->prestudentstatus->ausbildungssemester : '' ?>
+																</div>
+															</div>
+															<div class="col-lg-<?php echo $firstcolumns[4] ?>">
+																<div class="form-group">
+																	<label>Orgform: </label>
+																	<span style="display: inline-block">
+																	<?php
+																	$separator = (isset($zgvpruefung->prestudentstatus->orgform)) ? ', ' : '';
+																	echo (isset($zgvpruefung->prestudentstatus->orgform) ? $zgvpruefung->prestudentstatus->orgform : '')
+																	.(isset($zgvpruefung->prestudentstatus->sprachedetails->bezeichnung) ? $separator.$zgvpruefung->prestudentstatus->sprachedetails->bezeichnung[0] : '')
+																	.(isset($zgvpruefung->prestudentstatus->alternative) ? ' ('.$zgvpruefung->prestudentstatus->alternative.')' : '') ?>
+																	</span>
 																</div>
 															</div>
 														</div>
 														<div class="row">
-															<div class="col-lg-4">
+															<div class="col-lg-<?php echo $columns[0] ?>">
 																<div class="form-group">
 																	<label>ZGV: </label>
 																	<?php if ($infoonly)
@@ -276,7 +307,7 @@ $this->load->view('templates/FHC-Header', array('title' => 'InfocenterDetails', 
 																		); ?>
 																</div>
 															</div>
-															<div class="col-lg-3">
+															<div class="col-lg-<?php echo $columns[1] ?>">
 																<div class="form-group">
 																	<label>ZGV Ort: </label>
 																	<?php if ($infoonly):
@@ -289,7 +320,7 @@ $this->load->view('templates/FHC-Header', array('title' => 'InfocenterDetails', 
 																	<?php endif; ?>
 																</div>
 															</div>
-															<div class="col-lg-2">
+															<div class="col-lg-<?php echo $columns[2] ?>">
 																<div class="form-group">
 																	<label>ZGV Datum: </label>
 																	<?php if ($infoonly):
@@ -303,7 +334,7 @@ $this->load->view('templates/FHC-Header', array('title' => 'InfocenterDetails', 
 																	<?php endif; ?>
 																</div>
 															</div>
-															<div class="col-lg-3">
+															<div class="col-lg-<?php echo $columns[3] ?>">
 																<div class="form-group">
 																	<label>ZGV Nation: </label>
 																	<?php if ($infoonly)
@@ -320,7 +351,7 @@ $this->load->view('templates/FHC-Header', array('title' => 'InfocenterDetails', 
 														<!-- show only master zgv if master studiengang - start -->
 														<?php if ($zgvpruefung->studiengangtyp === 'm') : ?>
 															<div class="row">
-																<div class="col-lg-4">
+																<div class="col-lg-<?php echo $columns[0] ?>">
 																	<div class="form-group"><label>ZGV Master: </label>
 																		<?php
 																		if ($infoonly)
@@ -333,7 +364,7 @@ $this->load->view('templates/FHC-Header', array('title' => 'InfocenterDetails', 
 																			); ?>
 																	</div>
 																</div>
-																<div class="col-lg-3">
+																<div class="col-lg-<?php echo $columns[1] ?>">
 																	<div class="form-group">
 																		<label>ZGV Master Ort: </label>
 																		<?php if ($infoonly):
@@ -346,7 +377,7 @@ $this->load->view('templates/FHC-Header', array('title' => 'InfocenterDetails', 
 																		<?php endif; ?>
 																	</div>
 																</div>
-																<div class="col-lg-2">
+																<div class="col-lg-<?php echo $columns[2] ?>">
 																	<div class="form-group">
 																		<label>ZGV Master Datum: </label>
 																		<?php if ($infoonly):
@@ -360,7 +391,7 @@ $this->load->view('templates/FHC-Header', array('title' => 'InfocenterDetails', 
 																		<?php endif; ?>
 																	</div>
 																</div>
-																<div class="col-lg-3">
+																<div class="col-lg-<?php echo $columns[3] ?>">
 																	<div class="form-group"><label>ZGV Master
 																			Nation: </label>
 																		<?php

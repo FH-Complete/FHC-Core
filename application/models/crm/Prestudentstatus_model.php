@@ -26,9 +26,13 @@ class Prestudentstatus_model extends DB_Model
 
 		$query = 'SELECT tbl_prestudentstatus.*,
 						 bezeichnung AS studienplan_bezeichnung,
-						 tbl_status.bezeichnung_mehrsprachig
+						 tbl_studienplan.orgform_kurzbz as orgform,
+						 sprache,
+						 tbl_status.bezeichnung_mehrsprachig,
+						 tbl_status_grund.bezeichnung_mehrsprachig as bezeichnung_statusgrund
 					FROM public.tbl_prestudentstatus LEFT JOIN lehre.tbl_studienplan USING (studienplan_id)
 						 JOIN public.tbl_status USING (status_kurzbz)
+						 LEFT JOIN public.tbl_status_grund USING (statusgrund_id)
 				   WHERE tbl_status.status_kurzbz = tbl_prestudentstatus.status_kurzbz
 					 AND prestudent_id = ?';
 

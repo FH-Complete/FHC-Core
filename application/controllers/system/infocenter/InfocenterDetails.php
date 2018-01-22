@@ -124,6 +124,11 @@ class InfocenterDetails extends VileSci_Controller
 
 			$zgvpruefung = $prestudent->retval[0];
 
+			$position = strpos($zgvpruefung->prestudentstatus->anmerkung, 'Alt:');
+
+			//parse Anmerkung for Alternative (Prio is given in orgform and sprache anyway)
+			$zgvpruefung->prestudentstatus->alternative = is_numeric($position) ? substr($zgvpruefung->prestudentstatus->anmerkung, $position) : null;
+
 			//if prestudent is not interessent or is already bestaetigt, then show only as information, non-editable
 			$zgvpruefung->infoonly = !isset($zgvpruefung->prestudentstatus) || isset($zgvpruefung->prestudentstatus->bestaetigtam) || $zgvpruefung->prestudentstatus->status_kurzbz != 'Interessent';
 
