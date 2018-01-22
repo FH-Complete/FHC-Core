@@ -225,18 +225,12 @@ $this->load->view('templates/FHC-Header', array('title' => 'InfocenterDetails', 
 									<?php
 									foreach ($zgvpruefungen as $zgvpruefung):
 										$infoonly = $zgvpruefung->infoonly;
+										$firstcolumns = array(3, 2, 2, 2, 3);
 										//set bootstrap columns
 										if($infoonly)
-										{
-											$firstcolumns = array(3, 2, 2, 2, 3);
-											$columns = array(3, 2, 2, 2);
-										}
+											$columns = array(3, 2, 2, 5);
 										else
-										{
-											$firstcolumns = array(3, 2, 2, 2, 3);
 											$columns = array(4, 3, 2, 3);
-										}
-
 									?>
 										<div class="panel panel-default">
 											<div class="panel-heading">
@@ -263,7 +257,7 @@ $this->load->view('templates/FHC-Header', array('title' => 'InfocenterDetails', 
 																	<?php
 																	if(isset($zgvpruefung->prestudentstatus->status_kurzbz))
 																	{
-																		echo $zgvpruefung->prestudentstatus->status_kurzbz.($zgvpruefung->prestudentstatus->status_kurzbz === 'Abgewiesener' ? ' ('.$zgvpruefung->prestudentstatus->bezeichnung_statusgrund[0].')' : '');
+																		echo $zgvpruefung->prestudentstatus->status_kurzbz.(isset($zgvpruefung->prestudentstatus->bezeichnung_statusgrund[0]) && $zgvpruefung->prestudentstatus->status_kurzbz === 'Abgewiesener' ? ' ('.$zgvpruefung->prestudentstatus->bezeichnung_statusgrund[0].')' : '');
 																	}
 																	?>
 																</div>
