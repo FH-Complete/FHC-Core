@@ -92,7 +92,7 @@
 
 			if ($fieldName == 'Details')
 			{
-				$link = '<a href="%s%s" target="_blank">Details</a>';
+				$link = '<a href="%s%s">Details</a>';
 
 				$datasetRaw->{$fieldName} = sprintf(
 					$link,
