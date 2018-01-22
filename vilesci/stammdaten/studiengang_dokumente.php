@@ -398,8 +398,8 @@ else
 	<table width="100%">
 	<tr>
 	<td>
-	<form action='.$_SERVER['PHP_SELF'].' method="post">
-		<select name="stg_kz">';
+	<form action='.$_SERVER['PHP_SELF'].' method="post" name="dokumente_zuteilung">
+		<select name="stg_kz" onchange="document.dokumente_zuteilung.submit()">';
 	echo '<option value="">-- Studiengang auswählen --</option>';
 	foreach ($studiengang->result as $stg)
 	{
