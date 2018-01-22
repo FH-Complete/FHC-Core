@@ -50,7 +50,7 @@ rter/css/theme.default.css', 'customJSs' => array('vendor/FHC-vendor/jquery-tabl
 	$("select").addClass("form-control");
 	$("input[type=text]").addClass("form-control");
 	$("input[type=button]").addClass("btn btn-default");
-	$("#tableDataset").addClass('table-bordered');
+	$("#tableDataset").addClass('table table-bordered table-responsive table-condensed');
 </script>
 </body>
 <?php $this->load->view('templates/FHC-Footer'); ?>
