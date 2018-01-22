@@ -44,6 +44,13 @@ $sprache->getAll(true, 'index');
 
 $sprache_user = getSprache();
 
+if (isset($_GET['gebiet_id']))
+	$gebiet_id = $_GET['gebiet_id'];
+else
+	$gebiet_id = '';
+
+$stg_kz = (isset($_GET['stg_kz'])?$_GET['stg_kz']:'-1');
+
 echo '
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
@@ -60,7 +67,7 @@ echo '
     {
         $("#t1").tablesorter(
         {
-            sortList: [[0,0]],
+            sortList: [[0,0],[1,0]],
             widgets: ["zebra"]
         });
     });
@@ -69,7 +76,7 @@ echo '
 	{
 		if (confirm("Wollen Sie dieses Zuordnung wirklich entfernen?"))
         {
-            $("#data").html(\'<form action="edit_gebiet.php" name="sendform" id="sendform" method="POST"><input type="hidden" name="action" value="deleteZuordnung" /><input type="hidden" name="ablauf_id" value="\'+ablauf_id+\'" /></form>\');
+            $("#data").html(\'<form action="edit_gebiet.php?gebiet_id='.$gebiet_id.'" name="sendform" id="sendform" method="POST"><input type="hidden" name="action" value="deleteZuordnung" /><input type="hidden" name="ablauf_id" value="\'+ablauf_id+\'" /></form>\');
 			document.sendform.submit();
         }
         return false;
@@ -80,13 +87,6 @@ echo '
 <body>
 <div id="data"></div>
 ';
-
-if (isset($_GET['gebiet_id']))
-	$gebiet_id = $_GET['gebiet_id'];
-else
-	$gebiet_id = '';
-
-$stg_kz = (isset($_GET['stg_kz'])?$_GET['stg_kz']:'-1');
 
 echo '<h1>&nbsp;Gebiet bearbeiten</h1>';
 
@@ -285,9 +285,9 @@ if ($gebiet_id != '')
 	<thead>
 	<tr>
 		<th>Studiengang</th>
+		<th>Semester</th>
 		<th>Reihung</th>
 		<th>Gewicht</th>
-		<th>Semester</th>
 		<th>Vorgaben</th>
 		<th>Aktion</th>
 	</tr>
@@ -297,9 +297,9 @@ if ($gebiet_id != '')
 	{
 		echo '<tr>
 		<td>'.$studiengang->kuerzel_arr[$row->studiengang_kz].'</td>
+		<td>'.$row->semester.'</td>
 		<td>'.$row->reihung.'</td>
 		<td>'.$row->gewicht.'</td>
-		<td>'.$row->semester.'</td>
 		<td>'.$row->ablauf_vorgaben_id.'</td>
 		<td><a href="#loeschen" onclick="return deleteZuordnung(\''.$row->ablauf_id.'\');" ><img src="../../../skin/images/delete.png" height="15px" /></a></td>
 		</tr>';
