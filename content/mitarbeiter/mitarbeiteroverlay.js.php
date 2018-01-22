@@ -445,8 +445,6 @@ function MitarbeiterDetailDisableFields(val)
 	document.getElementById('mitarbeiter-detail-menulist-ausbildung').disabled=val;
 	document.getElementById('mitarbeiter-detail-button-speichern').disabled=val;
 	document.getElementById('mitarbeiter-detail-textbox-alias').disabled=val;
-	document.getElementById('mitarbeiter-detail-textbox-urlaubsanspruch').disabled=val;
-	document.getElementById('mitarbeiter-detail-textbox-resturlaubstage').disabled=val;
 	document.getElementById('mitarbeiter-detail-checkbox-kleriker').disabled=val;
 }
 
@@ -545,7 +543,6 @@ function MitarbeiterAuswahl()
 	standort_id=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#standort_id" ));
 	alias=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#alias" ));
 	urlaubstageprojahr=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#urlaubstageprojahr" ));
-	resturlaubstage=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#resturlaubstage" ));
 	kleriker=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#kleriker" ));
 
 	//Daten den Feldern zuweisen
@@ -609,8 +606,7 @@ function MitarbeiterAuswahl()
 	document.getElementById('mitarbeiter-detail-menulist-ort_kurzbz').value=ort_kurzbz;
 	document.getElementById('mitarbeiter-detail-menulist-standort').value=standort_id;
 	document.getElementById('mitarbeiter-detail-textbox-alias').value=alias;
-	document.getElementById('mitarbeiter-detail-textbox-urlaubsanspruch').value=urlaubstageprojahr;
-	document.getElementById('mitarbeiter-detail-textbox-resturlaubstage').value=resturlaubstage;
+
 	// ***** KONTAKTE *****
 	document.getElementById('mitarbeiter-kontakt').setAttribute('src','kontakt.xul.php?person_id='+person_id);
 
@@ -832,9 +828,6 @@ function MitarbeiterSave()
 	alias = document.getElementById('mitarbeiter-detail-textbox-alias').value;
 	kleriker = document.getElementById('mitarbeiter-detail-checkbox-kleriker').checked;
 
-	urlaubsanspruch = document.getElementById('mitarbeiter-detail-textbox-urlaubsanspruch').value;
-	resturlaubstage = document.getElementById('mitarbeiter-detail-textbox-resturlaubstage').value;
-
 	if(geburtsdatum!='' && !CheckDatum(geburtsdatum))
 	{
 		alert('Geburtsdatum ist ungueltig');
@@ -878,8 +871,6 @@ function MitarbeiterSave()
 	req.add('ort_kurzbz', ort_kurzbz);
 	req.add('standort_id', standort_id);
 	req.add('alias', alias);
-	req.add('urlaubsanspruch', urlaubsanspruch);
-	req.add('resturlaubstage', resturlaubstage);
 	req.add('kleriker', kleriker);
 	req.add('personalnummer', personalnummer);
 

@@ -1080,6 +1080,8 @@ if (!$result = @$db->db_query("SELECT 1 FROM system.tbl_verarbeitungstaetigkeit"
 	VALUES('bewertung','Bewertung/Benotung','{\'Bewertung/Benotung\',\'Bewertung/Benotung\'}', true);
 	INSERT INTO system.tbl_verarbeitungstaetigkeit(taetigkeit_kurzbz, bezeichnung, bezeichnung_mehrsprachig, aktiv)
 	VALUES('lehrauftraege','Lehraufträge','{\'Lehraufträge\',\'Lehraufträge\'}', true);
+	INSERT INTO system.tbl_verarbeitungstaetigkeit(taetigkeit_kurzbz, bezeichnung, bezeichnung_mehrsprachig, aktiv)
+	VALUES('datenwartung','Datenwartung','{\'Datenwartung\',\'Datenwartung\'}', true);
 
 	GRANT SELECT, UPDATE, INSERT, DELETE ON system.tbl_verarbeitungstaetigkeit TO vilesci;
 	GRANT SELECT ON system.tbl_verarbeitungstaetigkeit TO web;
@@ -1101,6 +1103,20 @@ if (!$result = @$db->db_query("SELECT taetigkeit_kurzbz FROM system.tbl_log"))
 		echo '<strong>system.tbl_log.taetigkeit_kurzbz '.$db->db_last_error().'</strong><br>';
 	else
 		echo '<br>Added Column taetigkeit_kurzbz to system.tbl_log';
+}
+
+// Add missing primary Key to system.tbl_filters.filter_id
+if ($result = @$db->db_query("SELECT conname FROM pg_constraint WHERE conname = 'pk_filters_filter_id'"))
+{
+	if ($db->db_num_rows($result) == 0)
+	{
+		$qry = "ALTER TABLE system.tbl_filters ADD CONSTRAINT pk_filters_filter_id PRIMARY KEY (filter_id);";
+
+		if (!$db->db_query($qry))
+			echo '<strong>system.tbl_filters '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>system.tbl_filters: added primary key on column filter_id';
+	}
 }
 
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
@@ -1181,7 +1197,6 @@ $tabellen=array(
 	"campus.tbl_pruefungsanmeldung" => array("pruefungsanmeldung_id","uid","pruefungstermin_id","lehrveranstaltung_id","status_kurzbz","wuensche","reihung","kommentar","statusupdatevon","statusupdateamum","anrechnung_id","pruefungstyp_kurzbz","insertamum"),
 	"campus.tbl_pruefungsstatus" => array("status_kurzbz","bezeichnung"),
 	"campus.tbl_reservierung"  => array("reservierung_id","ort_kurzbz","studiengang_kz","uid","stunde","datum","titel","beschreibung","semester","verband","gruppe","gruppe_kurzbz","veranstaltung_id","insertamum","insertvon"),
-	"campus.tbl_resturlaub"  => array("mitarbeiter_uid","resturlaubstage","mehrarbeitsstunden","updateamum","updatevon","insertamum","insertvon","urlaubstageprojahr"),
 	"campus.tbl_studentbeispiel"  => array("student_uid","beispiel_id","vorbereitet","probleme","updateamum","updatevon","insertamum","insertvon"),
 	"campus.tbl_studentuebung"  => array("student_uid","mitarbeiter_uid","abgabe_id","uebung_id","note","mitarbeitspunkte","punkte","anmerkung","benotungsdatum","updateamum","updatevon","insertamum","insertvon"),
 	"campus.tbl_template"  => array("template_kurzbz","bezeichnung","xsd","xslt_xhtml","xslfo_pdf"),

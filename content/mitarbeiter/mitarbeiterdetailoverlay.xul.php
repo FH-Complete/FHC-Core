@@ -265,15 +265,12 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
       				<textbox id="mitarbeiter-detail-textbox-mitarbeiteranmerkung" disabled="true" multiline="true" oninput="MitarbeiterDetailValueChange()"/>
       				<vbox>
       					<label value="Alias" control="mitarbeiter-detail-textbox-alias"/>
-      					<label value="Urlaubsanspruch" control="mitarbeiter-detail-textbox-urlaubsanspruch" style="margin-top: 10px;" />
       				</vbox>
       				<vbox>
       					<textbox id="mitarbeiter-detail-textbox-alias" disabled="true" oninput="MitarbeiterDetailValueChange()"/>
-      					<textbox id="mitarbeiter-detail-textbox-urlaubsanspruch" disabled="true" oninput="MitarbeiterDetailValueChange()" />
       				</vbox>
       				<vbox>
       					<label align="end" control="mitarbeiter-detail-menulist-ausbildung" value="Ausbildung"/>
-      					<label control="mitarbeiter-detail-textbox-resturlaubstage" value="Resturlaubstage" style="margin-top: 10px;"/>
       				</vbox>
       				<vbox>
 				 	<menulist id="mitarbeiter-detail-menulist-ausbildung" disabled="true"
@@ -286,14 +283,13 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 						      </menupopup>
 						</template>
 					</menulist>
-					<textbox id="mitarbeiter-detail-textbox-resturlaubstage" disabled="true" oninput="MitarbeiterDetailValueChange()" />
 				</vbox>
-		    	</row>
-		  	</rows>
-		 </grid>
-		 <hbox class="style-groupbox">
+			</row>
+			</rows>
+		</grid>
+		<hbox class="style-groupbox">
 
-		 </hbox>
+		</hbox>
 		</groupbox>
 	</hbox>
 	<hbox>

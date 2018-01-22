@@ -102,7 +102,11 @@ else
 $activities_str = "'".implode("','", $activities)."'";
 
 // definiert bis zu welchem Datum die Eintragung nicht mehr möglich ist
-$gesperrt_bis = '2015-08-31';
+if (defined('CIS_ZEITAUFZEICHNUNG_GESPERRT_BIS') && CIS_ZEITAUFZEICHNUNG_GESPERRT_BIS != '')
+	$gesperrt_bis = CIS_ZEITAUFZEICHNUNG_GESPERRT_BIS;
+else
+	$gesperrt_bis = '2015-08-31';
+
 $sperrdatum = date('c', strtotime($gesperrt_bis));
 
 // Uses urlencode to avoid XSS issues
@@ -431,9 +435,9 @@ echo '
 			}
 			return true;
 		}
-				
+
 		/**
-		* kontrolliert Start- und Enddatum für CSV Export - 
+		* kontrolliert Start- und Enddatum für CSV Export -
 		* ob Startdatum nicht größer als Enddatum ist und ob die Zeitspanne nicht größer als 1000 Tage ist
 		*/
 		function checkdatumCSVExp(vondatumid, bisdatumid)
@@ -452,7 +456,7 @@ echo '
 		    Jahr=Datum.substring(6,10);
 		    bisDatum=Jahr+\'\'+Monat+\'\'+Tag;
 		    diff=bisDatum-vonDatum;
-			
+
 			if (bisDatum>=vonDatum)
 			{
 				if (diff>2000 && bisDatum != "" && vonDatum != "")
@@ -724,9 +728,9 @@ if($projekt->getProjekteMitarbeiter($user, true))
 				<tr>
 					<td>
 						<a href='".$_SERVER['PHP_SELF']."' style='font-size: larger;'>".$p->t("zeitaufzeichnung/neu")."</a><a style='font-size: larger; text-decoration: none; cursor: default'> | </a>
-								      			
+
 						<a href='".$_SERVER['PHP_SELF']."?csvimport=1' style='font-size: larger;'>CSV Import</a><a style='font-size: larger; text-decoration: none; cursor: default'> | </a>
-		      			
+
 		      			<a href='".$_SERVER['PHP_SELF']."?csvexport=1' style='font-size: larger;'>CSV Export</a>";
 		      			if($anzprojekte > 0)
 		      				echo "<a style='font-size: larger; text-decoration: none; cursor: default'> | </a><a href='".$_SERVER['PHP_SELF']."?projektexport=1' style='font-size: larger;'>".$p->t("zeitaufzeichnung/projektexport")."</a>";
@@ -1262,7 +1266,7 @@ if($projekt->getProjekteMitarbeiter($user, true))
 				if(!$za_simple)
 				{
 					echo '<td '.$style.' title = "'.$service->bezeichnung.'" > '.StringCut($db->convert_html_chars($service->bezeichnung),20,null,'...').' </td>';
-			    }    
+			    }
 					echo '<td '.$style.' nowrap>'.date('H:i', $datum->mktime_fromtimestamp($row->start)).'</td>
 			        <td '.$style.' nowrap>'.date('H:i', $datum->mktime_fromtimestamp($row->ende)).'</td>
 			        <td '.$style.' align="right">'.$db->convert_html_chars($row->diff).'</td>

@@ -127,6 +127,8 @@ if(isset($radio_1) && isset($radio_2) && $radio_1>=0 && $radio_2>=0)
 				$msg = "Daten erfolgreich gespeichert<br>";
 				$msg .= "<br>".mb_eregi_replace(';',';<br>',$sql_query_upd1);
 				$db->db_query("COMMIT;");
+				//Logeintrag schreiben
+				PersonLog($radio_2, 'Action', array('name' => 'Persons merged', 'message' => 'person with id '.$radio_1.' merged into person with id '.$radio_2, 'success' => 'true'), 'datenwartung', 'core', null, $uid);
 			}
 			else
 			{

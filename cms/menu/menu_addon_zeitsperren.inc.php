@@ -51,17 +51,6 @@ class menu_addon_zeitsperren extends menu_addon
 								'name'  => $p->t('menu/zeitsperren')
 								);
 
-			/*
-			if ($rechte->isBerechtigt('admin',0) || $rechte->isBerechtigt('mitarbeiter'))
-			{
-				$this->items[] = array('title' => $p->t('menu/resturlaub'),
-								   'target'=> 'content',
-								   'link'  => 'private/profile/resturlaub.php',
-								   'name'  => $p->t('menu/resturlaub')
-								  );
-			}
-			*/
-
 			if ($rechte->isBerechtigt('admin',0) || $rechte->isBerechtigt('mitarbeiter')
 			    || $fkt->checkFunktion('stvLtg')|| $fkt->checkFunktion('gLtg')
 			    || $fkt->checkFunktion('Leitung') || $fkt->checkFunktion('ass'))

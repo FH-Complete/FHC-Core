@@ -21,16 +21,18 @@ class PersonLogLib
 	 * @param int $person_id ID of the Person.
 	 * @param string $logtype_kurzbz Type of Log.
 	 * @param array $logdata Array of the JSON Data to save.
+	 * @param string $taetigkeit_kurzbz
 	 * @param string $app Application that log belongs to.
 	 * @param string $oe_kurzbz Organisation Unit the Log belongs to.
 	 * @param string $user User who created the log.
-	 * @return boolean true if success
+	 * @return bool true if success
 	 */
-	public function log($person_id, $logtype_kurzbz, $logdata, $app = 'core', $oe_kurzbz = null, $user = null)
+	public function log($person_id, $logtype_kurzbz, $logdata, $taetigkeit_kurzbz, $app = 'core',  $oe_kurzbz = null, $user = null)
 	{
 		$data = array(
 			'person_id' => $person_id,
 			'zeitpunkt' => date('Y-m-d H:i:s'),
+			'taetigkeit_kurzbz' => $taetigkeit_kurzbz,
 			'app' => $app,
 			'oe_kurzbz' => $oe_kurzbz,
 			'logtype_kurzbz' => $logtype_kurzbz,
@@ -49,13 +51,14 @@ class PersonLogLib
 	 * Gets Logs for a Person, filtered by parameters.
 	 * Requirements for retrieving log: name is set
 	 * @param int $person_id ID of the Person.
+	 * @param string $taetigkeit_kurzbz Verarbeitungstätigkeit
 	 * @param string $app Name of the App.
-	 * @param string $oe_kurzbz Organisations Unit.
-	 * @return object $result
+	 * @param string $oe_kurzbz Organisation Unit.
+	 * @return array
 	 */
-	public function getLogs($person_id, $app = null, $oe_kurzbz = null)
+	public function getLogs($person_id, $taetigkeit_kurzbz = null, $app = null, $oe_kurzbz = null)
 	{
-		$result = $this->ci->PersonLogModel->filterLog($person_id, $app, $oe_kurzbz);
+		$result = $this->ci->PersonLogModel->filterLog($person_id, $taetigkeit_kurzbz, $app, $oe_kurzbz);
 
 		if (isSuccess($result))
 		{

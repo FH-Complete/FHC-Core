@@ -61,7 +61,6 @@ DELETE FROM system.tbl_rolleberechtigung WHERE berechtigung_kurzbz IN (
 	'basis/pruefungsstatus', 
 	'basis/pruefungstermin', 
 	'basis/reservierung', 
-	'basis/resturlaub', 
 	'basis/studentbeispiel', 
 	'basis/studentuebung', 
 	'basis/template', 
@@ -293,7 +292,6 @@ DELETE FROM system.tbl_berechtigung WHERE berechtigung_kurzbz IN (
 	'basis/pruefungsstatus', 
 	'basis/pruefungstermin', 
 	'basis/reservierung', 
-	'basis/resturlaub', 
 	'basis/studentbeispiel', 
 	'basis/studentuebung', 
 	'basis/template', 
@@ -524,7 +522,6 @@ INSERT INTO system.tbl_berechtigung (berechtigung_kurzbz, beschreibung) VALUES('
 INSERT INTO system.tbl_berechtigung (berechtigung_kurzbz, beschreibung) VALUES('basis/pruefungsstatus', 'Tbl_pruefungsstatus');
 INSERT INTO system.tbl_berechtigung (berechtigung_kurzbz, beschreibung) VALUES('basis/pruefungstermin', 'Tbl_pruefungstermin');
 INSERT INTO system.tbl_berechtigung (berechtigung_kurzbz, beschreibung) VALUES('basis/reservierung', 'Tbl_reservierung');
-INSERT INTO system.tbl_berechtigung (berechtigung_kurzbz, beschreibung) VALUES('basis/resturlaub', 'Tbl_resturlaub');
 INSERT INTO system.tbl_berechtigung (berechtigung_kurzbz, beschreibung) VALUES('basis/studentbeispiel', 'Tbl_studentbeispiel');
 INSERT INTO system.tbl_berechtigung (berechtigung_kurzbz, beschreibung) VALUES('basis/studentuebung', 'Tbl_studentuebung');
 INSERT INTO system.tbl_berechtigung (berechtigung_kurzbz, beschreibung) VALUES('basis/template', 'Tbl_template');
@@ -754,7 +751,6 @@ INSERT INTO system.tbl_rolleberechtigung (berechtigung_kurzbz, rolle_kurzbz, art
 INSERT INTO system.tbl_rolleberechtigung (berechtigung_kurzbz, rolle_kurzbz, art) VALUES('basis/pruefungsstatus', 'admin', 'suid');
 INSERT INTO system.tbl_rolleberechtigung (berechtigung_kurzbz, rolle_kurzbz, art) VALUES('basis/pruefungstermin', 'admin', 'suid');
 INSERT INTO system.tbl_rolleberechtigung (berechtigung_kurzbz, rolle_kurzbz, art) VALUES('basis/reservierung', 'admin', 'suid');
-INSERT INTO system.tbl_rolleberechtigung (berechtigung_kurzbz, rolle_kurzbz, art) VALUES('basis/resturlaub', 'admin', 'suid');
 INSERT INTO system.tbl_rolleberechtigung (berechtigung_kurzbz, rolle_kurzbz, art) VALUES('basis/studentbeispiel', 'admin', 'suid');
 INSERT INTO system.tbl_rolleberechtigung (berechtigung_kurzbz, rolle_kurzbz, art) VALUES('basis/studentuebung', 'admin', 'suid');
 INSERT INTO system.tbl_rolleberechtigung (berechtigung_kurzbz, rolle_kurzbz, art) VALUES('basis/template', 'admin', 'suid');
