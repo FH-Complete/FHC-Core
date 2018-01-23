@@ -12,10 +12,10 @@ class InfocenterDetails extends VileSci_Controller
 	//app and Verarbeitungstaetigkeit name for logging
 	const APP = 'aufnahme';
 	const TAETIGKEIT = 'bewerbung';
-	const LOGPARAMS = array(
+	private $logparams = array(
 		'saveformalgep' => array('logtype' => 'Action', 'name' => 'document formally checked', 'message' => 'document %s formally checked, set to %s'),
 		'savezgv' => array('logtype' => 'Action', 'name' => 'ZGV saved', 'message' => 'ZGV saved for degree program %s, prestudentid %s'),
-		'abgewiesen' => array('logtype' => 'Processstate', 'name' => 'Interessent rejected', 'message' => 'Interessent with prestudentid %s was rejected for degree program %s'),
+		'abgewiesen' => array('logtype' => 'Processstate', 'name' => 'Interessent rejected', 'message' => 'Interessent with prestudentid %s was rejected for degree program %s, reason: %s'),
 		'freigegeben' => array('logtype' => 'Processstate', 'name' => 'Interessent confirmed', 'message' => 'status Interessent for prestudentid %s was confirmed for degree program %s'),
 		'savenotiz' => array('logtype' => 'Action', 'name' => 'note added', 'message' => 'note with title %s was added')
 	);
@@ -276,7 +276,17 @@ class InfocenterDetails extends VileSci_Controller
 
 		$logdata = $this->__getPersonAndStudiengangFromPrestudent($prestudent_id);
 
-		$this->__log($logdata['person_id'], 'abgewiesen', array($prestudent_id, $logdata['studiengang_kurzbz']));
+		//statusgrund bezeichnung for logging
+		$this->StatusgrundModel->addSelect('bezeichnung_mehrsprachig');
+		$result = $this->StatusgrundModel->load($statusgrund);
+		if ($result->error)
+		{
+			show_error($result->retval);
+		}
+
+		$statusgrund_bez = $result->retval[0]->bezeichnung_mehrsprachig[1];
+
+		$this->__log($logdata['person_id'], 'abgewiesen', array($prestudent_id, $logdata['studiengang_kurzbz'], $statusgrund_bez));
 
 		$this->__redirectToStart($prestudent_id, 'ZgvPruef');
 	}
@@ -400,9 +410,9 @@ class InfocenterDetails extends VileSci_Controller
 	 */
 	private function __log($person_id, $logname, $messageparams)
 	{
-		$logparams = $this::LOGPARAMS[$logname];
-		$this->personloglib->log($person_id, $logparams['logtype'],
-			array('name' => $logparams['name'], 'message' => vsprintf($logparams['message'], $messageparams), 'success' => 'true'),
+		$logdata = $this->logparams[$logname];
+		$this->personloglib->log($person_id, $logdata['logtype'],
+			array('name' => $logdata['name'], 'message' => vsprintf($logdata['message'], $messageparams), 'success' => 'true'),
 			$this::TAETIGKEIT, $this::APP, null, $this->uid);
 	}
 
