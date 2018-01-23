@@ -1118,6 +1118,22 @@ if ($result = @$db->db_query("SELECT conname FROM pg_constraint WHERE conname = 
 			echo '<br>system.tbl_filters: added primary key on column filter_id';
 	}
 }
+	
+// Add index to tbl_akte
+if ($result = $db->db_query("SELECT * FROM pg_class WHERE relname='idx_tbl_akte_dokument_kurzbz'"))
+{
+	if ($db->db_num_rows($result) == 0)
+	{
+		$qry = " 	CREATE INDEX idx_tbl_akte_dokument_kurzbz ON tbl_akte USING btree (dokument_kurzbz);
+					CREATE INDEX idx_tbl_akte_person_id ON tbl_akte USING btree (person_id);
+					CREATE INDEX idx_tbl_akte_person_id_dokument_kurzbz ON tbl_akte USING btree (person_id, dokument_kurzbz)";
+		
+		if (! $db->db_query($qry))
+			echo '<strong>Indizes: ' . $db->db_last_error() . '</strong><br>';
+		else
+			echo 'Diverse Indizes fuer tbl_akte hinzugefuegt';
+	}
+}
 
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
