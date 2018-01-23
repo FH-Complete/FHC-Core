@@ -19,6 +19,7 @@ application/libraries/extensions/
 application/models/extensions/
 application/views/extensions/
 application/widgets/extensions/
+application/logs/
 tests/codeception/_output/*
 !/tests/codeception/_output/.placeholder
 tests/codeception/codeception.yml
@@ -26,8 +27,5 @@ tests/codeception/tests/api.suite.yml
 tests/codeception/tests/functional.suite.yml
 tests/codeception/tests/acceptance.suite.yml
 tests/codeception/tests/unit.suite.yml
-/submodules/d3
-bin
-/application/logs/
 /sparks/*
 /webdav/google.php
