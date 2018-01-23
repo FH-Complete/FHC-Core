@@ -1,75 +1,58 @@
 <?php
 
-
+/**
+ *
+ */
 class FHC_navigation extends Widget
 {
-	public function display($data)
+	const NAVIGATION_MENU = 'navigationMenu'; //
+
+	private $navigationMenu;
+
+	private static $FHC_navigationInstance;
+
+	/**
+	 *
+	 */
+	public function display($widgetData)
 	{
-		if (!isset($data['items']))
-		{
-			//default menu with filters abgeschickt/not abgeschickt
-			$listFiltersSent = array();
-			$listFiltersNotSent = array();
+		$this->navigationMenu = $widgetData;
 
-			$listFiltersSent = $this->_getFilterList('%InfoCenterSentApplication%');
+		self::$FHC_navigationInstance = $this;
 
-			$listFiltersNotSent = $this->_getFilterList('%InfoCenterNotSentApplication%');
-
-			$filtersarray = array('abgeschickt' => array('link' => '#', 'description' => 'Abgeschickt', 'expand' => true, 'children' => array()),
-				'nichtabgeschickt' => array('link' => '#', 'description' => 'Nicht abgeschickt','expand' => true,'children' => array()));
-
-			$this->_fillFilters($listFiltersSent, $filtersarray['abgeschickt']);
-			$this->_fillFilters($listFiltersNotSent, $filtersarray['nichtabgeschickt']);
-
-			$data = array();
-			$data['items'] = array('dashboard' => array('link' => '#', 'description' => 'Dashboard', 'icon' => 'dashboard'),
-				'filters' => array('link' => '#', 'description' => 'Filter', 'icon' => 'filter','expand' => true, 'children' =>
-					$filtersarray
-				));
-		}
-
-		$this->view('widgets/fhcnavigation', $data);
+		$this->view('widgets/fhcnavigation');
 	}
 
-	private function _getFilterList($filter_kurzbz)
+	/**
+	 *
+	 */
+	public static function printNavigationMenu()
 	{
-		$this->load->model('system/Filters_model', 'FiltersModel');
-
-		$listFilters = array();
-
-		$personActionsArray = array(
-			'app' => 'aufnahme',
-			'dataset_name' => 'PersonActions',
-			'person_id' => null,
-			'default_filter' => false,
-			'array_length(description, 1) >' => 0
-		);
-
-		$this->FiltersModel->resetQuery();
-		$this->FiltersModel->addSelect('filter_id, description');
-		$this->FiltersModel->addOrder('sort', 'ASC');
-
-		$personActionsArray['filter_kurzbz ILIKE'] = $filter_kurzbz;
-		$filters = $this->FiltersModel->loadWhere($personActionsArray);
-		if (hasData($filters))
-		{
-			for ($filtersCounter = 0; $filtersCounter < count($filters->retval); $filtersCounter++)
-			{
-				$filter = $filters->retval[$filtersCounter];
-
-				$listFilters[$filter->filter_id] = $filter->description[0];
-			}
-		}
-
-		return $listFilters;
+		foreach (self::$FHC_navigationInstance->navigationMenu as $item)
+			self::printNavItem($item);
 	}
 
-	private function _fillFilters($filters, &$tofill)
+	/**
+	 *
+	 */
+	public static function printNavItem($item, $depth = 1)
 	{
-		foreach ($filters as $filterId => $description)
+		$expanded = isset($item['expand']) && $item['expand'] === true ? ' active' : '';
+		echo '<li class="'.$expanded.'">
+					<a href="'.$item['link'].'"'.$expanded.'>'.(isset($item['icon']) ? '<i class="fa fa-'.$item['icon'].' fa-fw"></i> ' : '').$item['description'].(!empty($item['children']) ? '<span class="fa arrow"></span>':'').'</a>';
+		if (!empty($item['children']))
 		{
-			$toPrint = "%s=%s";
-			$tofill['children'][] = array('link' => sprintf($toPrint, base_url('index.ci.php/system/infocenter/InfoCenter?filterId'), $filterId), 'description' => $description);
+			$level = '';
+			if ($depth === 1)
+				$level = 'second';
+			elseif ($depth > 1)
+				$level = 'third';
+
+			echo '<ul class="nav nav-'.$level.'-level" '.$expanded.'>';
+			foreach ($item['children'] as $child)
+				self::printNavItem($child, ++$depth);
+			echo '</ul>';
 		}
+		echo '</li>';
 	}
 }

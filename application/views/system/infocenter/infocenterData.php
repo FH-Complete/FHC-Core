@@ -33,7 +33,7 @@
 					AND pss.bestaetigtam IS NULL
 					AND pss.bestaetigtvon IS NULL
 					AND ps.person_id = p.person_id
-					AND tbl_studiengang.typ in(\'b\',\'m\')
+					AND tbl_studiengang.typ in(\'b\', \'m\')
 					ORDER BY pss.datum DESC, pss.insertamum DESC, pss.ext_id DESC
 					LIMIT 1
 				) AS "Studiensemester",
@@ -47,7 +47,7 @@
 						AND pss.bestaetigtam IS NULL
 						AND pss.bestaetigtvon IS NULL
 						AND ps.person_id = p.person_id
-						AND tbl_studiengang.typ in(\'b\',\'m\')
+						AND tbl_studiengang.typ in(\'b\', \'m\')
 					ORDER BY pss.datum DESC, pss.insertamum DESC, pss.ext_id DESC
 					LIMIT 1
 				) AS "SendDate"
@@ -60,7 +60,7 @@
 						JOIN public.tbl_studiengang USING(studiengang_kz)
 					WHERE
 						person_id=p.person_id
-						AND tbl_studiengang.typ in(\'b\',\'m\')
+						AND tbl_studiengang.typ in(\'b\', \'m\')
 						AND \'Interessent\' = (SELECT status_kurzbz FROM public.tbl_prestudentstatus
 												WHERE prestudent_id=tbl_prestudent.prestudent_id
 												ORDER BY datum DESC, insertamum DESC, ext_id DESC
@@ -72,8 +72,8 @@
 							FROM
 								public.tbl_prestudentstatus
 							WHERE
-								prestudent_id=tbl_prestudent.prestudent_id
-								AND status_kurzbz=\'Interessent\'
+								prestudent_id = tbl_prestudent.prestudent_id
+								AND status_kurzbz = \'Interessent\'
 								AND bestaetigtam IS NULL
 								AND bestaetigtvon IS NULL
 								AND studiensemester_kurzbz IN (
@@ -96,7 +96,7 @@
 
 				$datasetRaw->{$fieldName} = sprintf(
 					$link,
-					base_url('index.ci.php/system/infocenter/infocenterDetails/showDetails/'),
+					base_url('index.ci.php/system/infocenter/InfoCenter/showDetails/'),
 					$datasetRaw->PersonId
 				);
 			}

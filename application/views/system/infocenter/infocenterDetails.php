@@ -11,7 +11,8 @@ $this->load->view('templates/FHC-Header', array('title' => 'InfocenterDetails', 
 		);
 
 		echo $this->widgetlib->widget(
-			'FHC_navigation'
+			'FHC_navigation',
+			$navigationMenuArray
 		);
 		?>
 	</nav>
