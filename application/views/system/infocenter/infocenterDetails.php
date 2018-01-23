@@ -305,7 +305,7 @@ $this->load->view('templates/FHC-Header', array('title' => 'InfocenterDetails', 
 																<div class="form-group">
 																	<label>ZGV Ort: </label>
 																	<?php if ($infoonly):
-																		echo $zgvpruefung->zgvort;
+																		echo html_escape($zgvpruefung->zgvort);
 																	else:
 																		?>
 																		<input type="text" class="form-control"
@@ -589,7 +589,7 @@ $this->load->view('templates/FHC-Header', array('title' => 'InfocenterDetails', 
 												<tr data-toggle="tooltip"
 													title="<?php echo isset($notiz->text) ? $notiz->text : '' ?>">
 													<td><?php echo date_format(date_create($notiz->insertamum), 'd.m.Y H:i:s') ?></td>
-													<td><?php echo $notiz->titel ?></td>
+													<td><?php echo html_escape($notiz->titel) ?></td>
 													<td><?php echo $notiz->verfasser_uid ?></td>
 												</tr>
 											<?php endforeach ?>
