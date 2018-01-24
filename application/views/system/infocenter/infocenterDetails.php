@@ -6,9 +6,10 @@
 			'jquery' => true,
 			'bootstrap' => true,
 			'fontawesome' => true,
-			'bootstrapdatepicker' => true,
-			'datatables' => true,
-			'sbadmintemplate' => true
+			'jqueryui' => true,
+			'tablesorter' => true,
+			'sbadmintemplate' => true,
+			'customCSSs' => 'skin/tablesort_bootstrap.css'
 		)
 	);
 ?>
@@ -38,7 +39,7 @@
 							<div class="panel-heading text-center"><h4>Stammdaten</h4></div>
 							<div class="panel-body">
 								<div class="row">
-									<div class="col-lg-6">
+									<div class="col-lg-6 table-responsive">
 										<table class="table">
 											<tr>
 												<td><strong>Vorname</strong></td>
@@ -80,7 +81,7 @@
 											</tr>
 										</table>
 									</div>
-									<div class="col-lg-6">
+									<div class="col-lg-6 table-responsive">
 										<table class="table table-bordered">
 											<thead>
 											<tr>
@@ -131,12 +132,12 @@
 											<?php endforeach; ?>
 											</tbody>
 										</table>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
+									</div> <!-- ./row -->
+								</div> <!-- ./column -->
+							</div> <!-- ./panel-body -->
+						</div> <!-- ./panel -->
+					</div> <!-- ./main column -->
+				</div> <!-- ./main row -->
 			</section>
 			<section>
 				<div class="row">
@@ -145,45 +146,37 @@
 							<a name="DokPruef"></a><!-- anchor for jumping to the section -->
 							<div class="panel-heading text-center"><h4>Dokumentenpr&uuml;fung</h4></div>
 							<div class="panel-body">
-								<table id="doctable" class="table table-striped table-bordered table-condensed">
-									<thead>
-									<th>Name</th>
-									<th>Typ</th>
-									<th>Uploaddatum</th>
-									<th>Ausstellungsnation</th>
-									<th>Formal gepr&uuml;ft</th>
-									<!--							<th>nachzureichen</th>
-																<th>nachgereicht am</th>-->
-									</thead>
-									<tbody>
-									<?php
-									foreach ($dokumente as $dokument):
-										$geprueft = isset($dokument->formal_geprueft_amum) ? "checked" : "";
-										?>
-										<tr>
-											<td>
-												<a href="../outputAkteContent/<?php echo $dokument->akte_id ?>"><?php echo empty($dokument->titel) ? $dokument->bezeichnung : $dokument->titel ?></a>
-											</td>
-											<td><?php echo $dokument->dokument_bezeichnung ?></td>
-											<td><?php echo date_format(date_create($dokument->erstelltam), 'd.m.Y') ?></td>
-											<td><?php echo $dokument->langtext ?></td>
-											<td>
-												<input type="checkbox" class="form-check-input"
-													   id="prchkbx<?php echo $dokument->akte_id ?>" <?php echo $geprueft ?> />
-												<?php echo isset($dokument->formal_geprueft_amum) ? date_format(date_create($dokument->formal_geprueft_amum), 'd.m.Y') : ''; ?>
-											</td>
-											<!--									<td class="text-center">
-										<?php /*echo $dokument->nachgereicht === true ? 'X' : ''; */
+								<div class="table-responsive">
+									<table id="doctable" class="table table-striped table-bordered">
+										<thead>
+										<th>Name</th>
+										<th>Typ</th>
+										<th>Uploaddatum</th>
+										<th>Ausstellungsnation</th>
+										<th>Formal gepr&uuml;ft</th>
+										</thead>
+										<tbody>
+										<?php
+										foreach ($dokumente as $dokument):
+											$geprueft = isset($dokument->formal_geprueft_amum) ? "checked" : "";
 											?>
-									</td>
-									<td>
-										<?php /*echo isset($dokument->nachgereicht_am) ? date_format(date_create($dokument->nachgereicht_am), 'd.m.Y') : ''; */
-											?>
-									</td>-->
-										</tr>
-									<?php endforeach ?>
-									</tbody>
-								</table>
+											<tr>
+												<td>
+													<a href="../outputAkteContent/<?php echo $dokument->akte_id ?>"><?php echo empty($dokument->titel) ? $dokument->bezeichnung : $dokument->titel ?></a>
+												</td>
+												<td><?php echo $dokument->dokument_bezeichnung ?></td>
+												<td><?php echo date_format(date_create($dokument->erstelltam), 'd.m.Y') ?></td>
+												<td><?php echo $dokument->langtext ?></td>
+												<td>
+													<input type="checkbox" class="form-check-input"
+														   id="prchkbx<?php echo $dokument->akte_id ?>" <?php echo $geprueft ?> />
+													<?php echo isset($dokument->formal_geprueft_amum) ? date_format(date_create($dokument->formal_geprueft_amum), 'd.m.Y') : ''; ?>
+												</td>
+											</tr>
+										<?php endforeach ?>
+										</tbody>
+									</table>
+								</div>
 								<?php if (count($dokumente_nachgereicht) > 0): ?>
 									<br/>
 									<p>Nachzureichende Dokumente:</p>
@@ -206,7 +199,6 @@
 												<td>
 													<?php echo $dokument->langtext ?>
 												</td>
-												</td>
 												<td>
 													<?php echo $dokument->anmerkung; ?>
 												</td>
@@ -215,10 +207,10 @@
 										</tbody>
 									</table>
 								<?php endif; ?>
-							</div>
-						</div>
-					</div>
-				</div>
+							</div> <!-- ./panel-body -->
+						</div> <!-- ./panel -->
+					</div> <!-- ./column -->
+				</div> <!-- ./row -->
 			</section>
 			<section>
 				<div class="row">
@@ -235,11 +227,11 @@
 										$infoonly = $zgvpruefung->infoonly;
 										$firstcolumns = array(3, 2, 2, 2, 3);
 										//set bootstrap columns
-										if($infoonly)
+										if ($infoonly)
 											$columns = array(3, 2, 2, 5);
 										else
 											$columns = array(4, 3, 2, 3);
-									?>
+										?>
 										<div class="panel panel-default">
 											<div class="panel-heading">
 												<h4 class="panel-title">
@@ -263,7 +255,7 @@
 																<div class="form-group">
 																	<label>Letzter Status: </label>
 																	<?php
-																	if(isset($zgvpruefung->prestudentstatus->status_kurzbz))
+																	if (isset($zgvpruefung->prestudentstatus->status_kurzbz))
 																	{
 																		echo $zgvpruefung->prestudentstatus->status_kurzbz.(isset($zgvpruefung->prestudentstatus->bezeichnung_statusgrund[0]) && $zgvpruefung->prestudentstatus->status_kurzbz === 'Abgewiesener' ? ' ('.$zgvpruefung->prestudentstatus->bezeichnung_statusgrund[0].')' : '');
 																	}
@@ -278,7 +270,8 @@
 															</div>
 															<div class="col-lg-<?php echo $firstcolumns[3] ?>">
 																<div class="form-group">
-																	<label><span style="display: inline-block">Ausbildungs</span><span style="display: inline-block">semester: </span></label>
+																	<label><span style="display: inline-block">Ausbildungs</span><span
+																				style="display: inline-block">semester: </span></label>
 																	<?php echo isset($zgvpruefung->prestudentstatus->ausbildungssemester) ? $zgvpruefung->prestudentstatus->ausbildungssemester : '' ?>
 																</div>
 															</div>
@@ -289,8 +282,8 @@
 																	<?php
 																	$separator = (isset($zgvpruefung->prestudentstatus->orgform)) ? ', ' : '';
 																	echo (isset($zgvpruefung->prestudentstatus->orgform) ? $zgvpruefung->prestudentstatus->orgform : '')
-																	.(isset($zgvpruefung->prestudentstatus->sprachedetails->bezeichnung) ? $separator.$zgvpruefung->prestudentstatus->sprachedetails->bezeichnung[0] : '')
-																	.(isset($zgvpruefung->prestudentstatus->alternative) ? ' ('.$zgvpruefung->prestudentstatus->alternative.')' : '') ?>
+																		.(isset($zgvpruefung->prestudentstatus->sprachedetails->bezeichnung) ? $separator.$zgvpruefung->prestudentstatus->sprachedetails->bezeichnung[0] : '')
+																		.(isset($zgvpruefung->prestudentstatus->alternative) ? ' ('.$zgvpruefung->prestudentstatus->alternative.')' : '') ?>
 																	</span>
 																</div>
 															</div>
@@ -603,6 +596,15 @@
 											<?php endforeach ?>
 											</tbody>
 										</table>
+										<div id="notizpager" class="pager">
+											<form class="form-inline">
+												<i class="fa fa-step-backward first" style="cursor:pointer"></i>
+												<i class="fa fa-backward prev"></i>
+												<span class="pagedisplay"></span>
+												<i class="fa fa-forward next"></i>
+												<i class="fa fa-step-forward last"></i>
+											</form>
+										</div>
 									</div>
 									<div class="col-lg-6">
 										<table id="logtable" class="table table-bordered table-hover">
@@ -622,105 +624,84 @@
 											<?php endforeach ?>
 											</tbody>
 										</table>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
+										<div id="logpager" class="pager">
+											<form class="form-inline">
+												<i class="fa fa-step-backward first"></i>
+												<i class="fa fa-backward prev"></i>
+												<span class="pagedisplay"></span>
+												<i class="fa fa-forward next"></i>
+												<i class="fa fa-step-forward last"></i>
+											</form>
+										</div>
+									</div> <!-- ./column -->
+								</div> <!-- ./row -->
+							</div> <!-- ./panel-body -->
+						</div> <!-- ./panel -->
+					</div> <!-- ./main column -->
+				</div> <!-- ./main row -->
 			</section>
 		</div>
 	</div>
 </div>
+
 <script>
 
 	$(document).ready(function ()
 		{
-			//language for datatables
-			/*			var german =
-			 {
-			 "sEmptyTable":      "Keine Daten in der Tabelle vorhanden",
-			 "sInfo":            "_START_ bis _END_ von _TOTAL_ Einträgen",
-			 "sInfoEmpty":       "0 bis 0 von 0 Einträgen",
-			 "sInfoFiltered":    "(gefiltert von _MAX_ Einträgen)",
-			 "sInfoPostFix":     "",
-			 "sInfoThousands":   ".",
-			 "sLengthMenu":      "_MENU_ Einträge anzeigen",
-			 "sLoadingRecords":  "Wird geladen...",
-			 "sProcessing":      "Bitte warten...",
-			 "sSearch":          "Suchen",
-			 "sZeroRecords":     "Keine Einträge vorhanden.",
-			 "oPaginate": {
-			 "sFirst":       "Erste",
-			 "sPrevious":    "Zurück",
-			 "sNext":        "Nächste",
-			 "sLast":        "Letzte"
-			 },
-			 "oAria": {
-			 "sSortAscending":  ": aktivieren, um Spalte aufsteigend zu sortieren",
-			 "sSortDescending": ": aktivieren, um Spalte absteigend zu sortieren"
-			 },
-			 select: {
-			 rows: {
-			 _: '%d Zeilen ausgewählt',
-			 0: 'Zum Auswählen auf eine Zeile klicken',
-			 1: '1 Zeile ausgewählt'
-			 }
-			 }
-			 };*/
-			var german = "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/German.json";
-			//hack for disabling table pagination if only one page
-			var drawCallback = function (settings)
+			//initialise table sorter
+			addTablesorter("doctable", [[2, 1], [1, 0]]);
+			addTablesorter("nachgdoctable", [[2, 0], [1, 1]]);
+			addTablesorter("logtable", [[0, 1]], ["filter"]);
+			addTablesorter("notiztable", [[0, 1]], ["filter"]);
+
+			//add pager
+			togglePager(23, "logtable", "logpager");
+			togglePager(10, "notiztable", "notizpager");
+
+			function addTablesorter(tableid, sortList, widgets)
 			{
-				var pagination = $(this).closest('.dataTables_wrapper').find('.dataTables_paginate');
-				pagination.toggle(this.api().page.info().pages > 1);
-			};
+				$("#"+tableid).tablesorter(
+					{
+						theme: "default",
+						dateFormat: "ddmmyyyy",
+						sortList: sortList,
+						widgets: widgets
+					}
+				);
+			}
 
-			//format for sorting dates in tables
-			$.fn.dataTable.moment("DD.MM.YYYY");
-			$.fn.dataTable.moment("DD.MM.YYYY HH:mm:ss");
+			//not show pager if on first table page
+			function togglePager(size, tableid, pagerid)
+			{
+				var rowcount = $("#"+tableid+" tr").length;
 
-			//initialise datatables and datepicker
-			$("#doctable").DataTable({
-				"language": {"url": german},
-				"responsive": true,
-				"paging": false,
-				"searching": false,
-				"info": false,
-				"order": [[2, "desc"], [1, "asc"]]
-			});
-			$("#nachgdoctable").DataTable({
-				"language": {"url": german},
-				"responsive": true,
-				"paging": false,
-				"searching": false,
-				"info": false,
-				"order": [[2, "asc"], [1, "desc"]]
-			});
-			$("#logtable").DataTable({
-				"language": {"url": german},
-				"responsive": false,
-				"lengthChange": false,
-				"info": false,
-				"pageLength": 25,
-				"order": [[0, "desc"]],
-				"drawCallback": drawCallback
-			});
-			$("#notiztable").DataTable({
-				"language": {"url": german},
-				"responsive": false,
-				"lengthChange": false,
-				"info": false,
-				"pageLength": 13,
-				"order": [[0, "desc"], [2, "asc"]],
-				"drawCallback": drawCallback
-			});
+				if (rowcount > size)
+				{
+					$("#"+tableid).tablesorterPager(
+						{
+							container: $("#"+pagerid),
+							size: size,
+							cssDisabled: 'disabled',
+							savePages: false
+						}
+					);
+				}
+				else
+				{
+					$("#"+pagerid).remove();
+				}
+			}
+
+			//initialise datepicker
+			$.datepicker.setDefaults($.datepicker.regional['de']);
 			$(".dateinput").datepicker({
-				"language": "de",
-				"format": "dd.mm.yyyy"
+				"dateFormat": "dd.mm.yy"
 			});
+
 			//javascript hack - not nice!
 			$("select").addClass('form-control');
+			$("table").addClass('table-condensed');
+			$("#logtable, #notiztable").addClass('table-hover');
 
 			//add click events to "formal geprüft" checkboxes
 			<?php foreach($dokumente as $dokument): ?>
@@ -737,4 +718,5 @@
 	);
 </script>
 </body>
+
 <?php $this->load->view('templates/FHC-Footer'); ?>

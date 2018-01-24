@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "3fb66aad75872c21f728348036efedcb",
-    "content-hash": "c2a0c9055aa589c5ec2d8a85eaaa1483",
+    "hash": "329973fd68eea79f7c67464cbd121d58",
+    "content-hash": "bf03cef0846a79959456abfccf90730e",
     "packages": [
         {
             "name": "BlackrockDigital/startbootstrap-sb-admin-2",
@@ -1062,6 +1062,57 @@
                 "jsonld"
             ],
             "time": "2016-10-10 08:57:56"
+        },
+        {
+            "name": "mottie/tablesorter",
+            "version": "v2.29.4",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Mottie/tablesorter.git",
+                "reference": "bf7339036ce11c91f55281825b1b601d18b67ed8"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Mottie/tablesorter/zipball/bf7339036ce11c91f55281825b1b601d18b67ed8",
+                "reference": "bf7339036ce11c91f55281825b1b601d18b67ed8",
+                "shasum": ""
+            },
+            "require": {
+                "components/jquery": ">=1.2.6"
+            },
+            "type": "component",
+            "extra": {
+                "component": {
+                    "scripts": [
+                        "dist/js/jquery.tablesorter.combined.js"
+                    ],
+                    "files": "dist/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "(MIT OR GPL-2.0)"
+            ],
+            "authors": [
+                {
+                    "name": "Rob Garrison",
+                    "email": "wowmotty@gmail.com"
+                },
+                {
+                    "name": "Christian Bach"
+                }
+            ],
+            "description": "tablesorter (FORK) is a jQuery plugin for turning a standard HTML table with THEAD and TBODY tags into a sortable table without page refreshes. tablesorter can successfully parse and sort many types of data including linked data in a cell.",
+            "homepage": "https://mottie.github.io/tablesorter/",
+            "keywords": [
+                "alphanumeric",
+                "jquery-plugin",
+                "natural",
+                "sort",
+                "sorting",
+                "table"
+            ],
+            "time": "2018-01-18 23:30:03"
         },
         {
             "name": "netcarver/textile",

@@ -200,18 +200,6 @@
 		{
 			"type": "package",
 			"package": {
-				"name": "datatables/plugins",
-				"version": "3.3.7",
-				"source": {
-					"url": "https://github.com/DataTables/Plugins.git",
-					"type": "git",
-					"reference": "master"
-				}
-			}
-		},
-		{
-			"type": "package",
-			"package": {
 				"name": "BlackrockDigital/startbootstrap-sb-admin-2",
 				"version": "3.3.7",
 				"source": {
@@ -254,6 +242,7 @@
 		"kingsquare/json-schema-form": "*",
 		"michelf/php-markdown": "1.5.0",
 		"ml/json-ld": "1.*",
+		"mottie/tablesorter": "^2.29",
 		"netcarver/textile": "^3.5",
 		"nicolaskruchten/pivottable": "^2.15.0",
 		"rmariuzzo/jquery-checkboxes": "1.0.7",
