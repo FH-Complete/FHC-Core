@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "b386e8ea62cfd8c96c6697729860cc5a",
-    "content-hash": "65e7f00446fd7f602e914089cedaa931",
+    "hash": "25135351fcaa90fd7d838614ceb47d37",
+    "content-hash": "702a9ad9bfca6802a7cd586e0d002002",
     "packages": [
         {
             "name": "BlackrockDigital/startbootstrap-sb-admin-2",
@@ -681,39 +681,6 @@
             "time": "2016-09-16 05:47:55"
         },
         {
-            "name": "datatables/datatables",
-            "version": "1.10.16",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/DataTables/DataTables.git",
-                "reference": "75a665f64f02982c0f4666b15a25c4670e5e6b18"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/DataTables/DataTables/zipball/75a665f64f02982c0f4666b15a25c4670e5e6b18",
-                "reference": "75a665f64f02982c0f4666b15a25c4670e5e6b18",
-                "shasum": ""
-            },
-            "type": "library",
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "description": "DataTables is a plug-in for the jQuery Javascript library. It is a highly flexible tool, based upon the foundations of progressive enhancement, which will add advanced interaction controls to any HTML table.",
-            "homepage": "http://www.datatables.net/",
-            "time": "2017-08-31 13:52:17"
-        },
-        {
-            "name": "datatables/plugins",
-            "version": "3.3.7",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/DataTables/Plugins.git",
-                "reference": "master"
-            },
-            "type": "library"
-        },
-        {
             "name": "easyrdf/easyrdf",
             "version": "0.9.1",
             "source": {
@@ -774,61 +741,6 @@
                 "sparql"
             ],
             "time": "2015-02-27 09:45:49"
-        },
-        {
-            "name": "eternicode/bootstrap-datepicker",
-            "version": "v1.7.1",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/uxsolutions/bootstrap-datepicker.git",
-                "reference": "4c12834aae54782ca41d9409d6334193f200124d"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/uxsolutions/bootstrap-datepicker/zipball/4c12834aae54782ca41d9409d6334193f200124d",
-                "reference": "4c12834aae54782ca41d9409d6334193f200124d",
-                "shasum": ""
-            },
-            "require": {
-                "components/bootstrap": ">=2.0, <4.0",
-                "components/jquery": ">=1.7.1, <4.0.0",
-                "robloach/component-installer": "*"
-            },
-            "type": "component",
-            "extra": {
-                "component": {
-                    "scripts": [
-                        "js/bootstrap-datepicker.js"
-                    ],
-                    "styles": [
-                        "dist/css/bootstrap-datepicker.css",
-                        "dist/css/bootstrap-datepicker3.css"
-                    ],
-                    "files": [
-                        "js/locales/bootstrap-datepicker.*.js"
-                    ]
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "Apache-2.0"
-            ],
-            "authors": [
-                {
-                    "name": "Andrew Rowls",
-                    "email": "eternicode@gmail.com"
-                },
-                {
-                    "name": "Community",
-                    "homepage": "https://github.com/uxsolutions/bootstrap-datepicker/contributors"
-                }
-            ],
-            "description": "A datepicker for Bootstrap",
-            "keywords": [
-                "bootstrap",
-                "datepicker"
-            ],
-            "time": "2017-07-06 12:14:34"
         },
         {
             "name": "fgelinas/timepicker",
@@ -1332,58 +1244,55 @@
             "time": "2016-10-10 08:57:56"
         },
         {
-            "name": "moment/moment",
-            "version": "2.20.1",
+            "name": "mottie/tablesorter",
+            "version": "v2.29.4",
             "source": {
                 "type": "git",
-                "url": "https://github.com/moment/moment.git",
-                "reference": "03073778ec18ee38e179208cd1af899e8d1848dc"
+                "url": "https://github.com/Mottie/tablesorter.git",
+                "reference": "bf7339036ce11c91f55281825b1b601d18b67ed8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/moment/moment/zipball/03073778ec18ee38e179208cd1af899e8d1848dc",
-                "reference": "03073778ec18ee38e179208cd1af899e8d1848dc",
+                "url": "https://api.github.com/repos/Mottie/tablesorter/zipball/bf7339036ce11c91f55281825b1b601d18b67ed8",
+                "reference": "bf7339036ce11c91f55281825b1b601d18b67ed8",
                 "shasum": ""
             },
             "require": {
-                "robloach/component-installer": "*"
+                "components/jquery": ">=1.2.6"
             },
             "type": "component",
             "extra": {
                 "component": {
                     "scripts": [
-                        "moment.js"
+                        "dist/js/jquery.tablesorter.combined.js"
                     ],
-                    "files": [
-                        "min/*.js",
-                        "locale/*.js"
-                    ]
+                    "files": "dist/"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
-                "MIT"
+                "(MIT OR GPL-2.0)"
             ],
             "authors": [
                 {
-                    "name": "Tim Wood",
-                    "email": "washwithcare@gmail.com"
+                    "name": "Rob Garrison",
+                    "email": "wowmotty@gmail.com"
+                },
+                {
+                    "name": "Christian Bach"
                 }
             ],
-            "description": "Parse, validate, manipulate, and display dates in JavaScript.",
-            "homepage": "https://github.com/moment/moment",
+            "description": "tablesorter (FORK) is a jQuery plugin for turning a standard HTML table with THEAD and TBODY tags into a sortable table without page refreshes. tablesorter can successfully parse and sort many types of data including linked data in a cell.",
+            "homepage": "https://mottie.github.io/tablesorter/",
             "keywords": [
-                "date",
-                "ender",
-                "format",
-                "i18n",
-                "l10n",
-                "moment",
-                "parse",
-                "time",
-                "validate"
+                "alphanumeric",
+                "jquery-plugin",
+                "natural",
+                "sort",
+                "sorting",
+                "table"
             ],
-            "time": "2017-12-19 04:36:30"
+            "time": "2018-01-18 23:30:03"
         },
         {
             "name": "netcarver/textile",
@@ -2086,16 +1995,16 @@
         },
         {
             "name": "symfony/process",
-            "version": "v3.3.10",
+            "version": "v3.4.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/process.git",
-                "reference": "fdf89e57a723a29baf536e288d6e232c059697b1"
+                "reference": "ff69f110c6b33fd33cd2089ba97d6112f44ef0ba"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/process/zipball/fdf89e57a723a29baf536e288d6e232c059697b1",
-                "reference": "fdf89e57a723a29baf536e288d6e232c059697b1",
+                "url": "https://api.github.com/repos/symfony/process/zipball/ff69f110c6b33fd33cd2089ba97d6112f44ef0ba",
+                "reference": "ff69f110c6b33fd33cd2089ba97d6112f44ef0ba",
                 "shasum": ""
             },
             "require": {
@@ -2104,7 +2013,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "3.3-dev"
+                    "dev-master": "3.4-dev"
                 }
             },
             "autoload": {
@@ -2131,7 +2040,7 @@
             ],
             "description": "Symfony Process Component",
             "homepage": "https://symfony.com",
-            "time": "2017-10-02 06:42:24"
+            "time": "2018-01-03 07:37:34"
         },
         {
             "name": "symfony/yaml",

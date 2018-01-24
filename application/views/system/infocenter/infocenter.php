@@ -7,12 +7,8 @@
 			'bootstrap' => true,
 			'fontawesome' => true,
 			'sbadmintemplate' => true,
-			'tablesorter' => false,
-			'customCSSs' => 'vendor/FHC-vendor/jquery-tablesorter/css/theme.default.css',
-			'customJSs' => array(
-				'vendor/FHC-vendor/jquery-tablesorter/js/jquery.tablesorter.js',
-				'vendor/FHC-vendor/jquery-tablesorter/js/jquery.tablesorter.widgets.js'
-			)
+			'tablesorter' => true,
+			'customCSSs' => 'skin/tablesort_bootstrap.css'
 		)
 	);
 ?>
@@ -48,7 +44,7 @@
 		$("select").addClass("form-control");
 		$("input[type=text]").addClass("form-control");
 		$("input[type=button]").addClass("btn btn-default");
-		$("#tableDataset").addClass('table table-bordered table-responsive table-condensed');
+		$("#tableDataset").addClass('table table-bordered table-striped table-responsive table-condensed');
 	</script>
 </body>
 

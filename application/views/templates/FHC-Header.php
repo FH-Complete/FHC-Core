@@ -12,8 +12,6 @@ $jquery3 = isset($jquery3) ? $jquery3 : false;
 $jqueryui = isset($jqueryui) ? $jqueryui : false;
 $bootstrap = isset($bootstrap) ? $bootstrap : false;
 $fontawesome = isset($fontawesome) ? $fontawesome : false;
-$bootstrapdatepicker = isset($bootstrapdatepicker) ? $bootstrapdatepicker : false;
-$datatables = isset($datatables) ? $datatables : false;
 $tablesorter = isset($tablesorter) ? $tablesorter : false;
 $sbadmintemplate = isset($sbadmintemplate) ? $sbadmintemplate : false;
 
@@ -96,14 +94,15 @@ function _generateJSsInclude($JSs)
 			if ($bootstrap === true) _generateCSSsInclude('vendor/components/bootstrap/css/bootstrap.min.css');
 			// font awesome CSS
 			if ($fontawesome === true) _generateCSSsInclude('vendor/components/font-awesome/css/font-awesome.min.css');
-			// bootstrap datepicker CSS
-			if ($bootstrapdatepicker === true) _generateCSSsInclude('vendor/eternicode/bootstrap-datepicker/dist/css/bootstrap-datepicker3.min.css');
-			// datatables CSS
-			if ($datatables === true) _generateCSSsInclude('vendor/datatables/datatables/media/css/dataTables.bootstrap.min.css');
 			// Table sorter CSS
-			if ($tablesorter === true) _generateCSSsInclude('skin/tablesort.css');
+			if ($tablesorter === true)
+			{
+				_generateCSSsInclude('vendor/mottie/tablesorter/css/theme.default.css');
+				_generateCSSsInclude('vendor/mottie/tablesorter/addons/pager/jquery.tablesorter.pager.css');
+			}
 			// sb admin template CSS
-			if ($sbadmintemplate === true){
+			if ($sbadmintemplate === true)
+			{
 				_generateCSSsInclude('vendor/BlackrockDigital/startbootstrap-sb-admin-2/vendor/metisMenu/metisMenu.min.css');
 				_generateCSSsInclude('vendor/BlackrockDigital/startbootstrap-sb-admin-2/dist/css/sb-admin-2.min.css');
 			}
@@ -117,26 +116,24 @@ function _generateJSsInclude($JSs)
 			// JQuery V3
 			if ($jquery3 === true) _generateJSsInclude('vendor/components/jquery/jquery.min.js');
 			// JQuery UI
-			if ($jqueryui === true) _generateJSsInclude('vendor/components/jqueryui/jquery-ui.min.js');
+			if ($jqueryui === true)
+			{
+				_generateJSsInclude('vendor/components/jqueryui/jquery-ui.min.js');
+				//datepicker german language file
+				_generateJSsInclude('vendor/components/jqueryui/ui/i18n/datepicker-de.js');
+			}
 			// bootstrap JS
 			if ($bootstrap === true) _generateJSsInclude('vendor/components/bootstrap/js/bootstrap.min.js');
-			// bootstrap datepicker JS
-			if ($bootstrapdatepicker === true){
-				_generateJSsInclude('vendor/eternicode/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js');
-				_generateJSsInclude('vendor/eternicode/bootstrap-datepicker/dist/locales/bootstrap-datepicker.de.min.js');
-			}
-			// datatables JS
-			if ($datatables === true)
-			{
-			 	_generateJSsInclude('vendor/datatables/datatables/media/js/jquery.dataTables.js');
-				_generateJSsInclude('vendor/datatables/datatables/media/js/dataTables.bootstrap.min.js');
-				_generateJSsInclude('vendor/moment/moment/min/moment.min.js');
-				_generateJSsInclude('vendor/datatables/plugins/sorting/datetime-moment.js');
-			}
 			// Table sorter JS
-			if ($tablesorter === true) _generateJSsInclude('vendor/christianbach/tablesorter/jquery.tablesorter.min.js');
+			if ($tablesorter === true)
+			{
+				_generateJSsInclude('vendor/mottie/tablesorter/js/jquery.tablesorter.js');
+				_generateJSsInclude('vendor/mottie/tablesorter/js/jquery.tablesorter.widgets.js');
+				_generateJSsInclude('vendor/mottie/tablesorter/addons/pager/jquery.tablesorter.pager.js');
+			}
 			// sb admin template JS
-			if ($sbadmintemplate === true){
+			if ($sbadmintemplate === true)
+			{
 				_generateJSsInclude('vendor/BlackrockDigital/startbootstrap-sb-admin-2/vendor/metisMenu/metisMenu.min.js');
 				_generateJSsInclude('vendor/BlackrockDigital/startbootstrap-sb-admin-2/dist/js/sb-admin-2.js');
 			}
