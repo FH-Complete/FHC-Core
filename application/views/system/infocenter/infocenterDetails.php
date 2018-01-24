@@ -1,5 +1,16 @@
 <?php
-$this->load->view('templates/FHC-Header', array('title' => 'InfocenterDetails', 'jquery3' => true, 'bootstrap' => true, 'fontawesome' => true, 'bootstrapdatepicker' => true, 'datatables' => true, 'sbadmintemplate' => true));
+	$this->load->view(
+		'templates/FHC-Header',
+		array(
+			'title' => 'InfocenterDetails',
+			'jquery' => true,
+			'bootstrap' => true,
+			'fontawesome' => true,
+			'bootstrapdatepicker' => true,
+			'datatables' => true,
+			'sbadmintemplate' => true
+		)
+	);
 ?>
 <body>
 <div id="wrapper">

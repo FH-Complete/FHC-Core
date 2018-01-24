@@ -25,7 +25,7 @@ if($dr=='')
 	$dr='/';
 
 //Originaldateien des Herstellers
-echo '<script src="'.$dr.'vendor/components/jquery/jquery.min.js"></script>';
+echo '<script src="'.$dr.'vendor/jquery/jqueryV2/jquery-2.2.4.min.js"></script>';
 
 
 ?>

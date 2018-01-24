@@ -8,7 +8,7 @@ $customCSSs = isset($customCSSs) ? $customCSSs : null;
 $customJSs = isset($customJSs) ? $customJSs : null;
 
 // By default set the parameters to false
-$jquery3 = isset($jquery3) ? $jquery3 : false;
+$jquery = isset($jquery) ? $jquery : false;
 $jqueryui = isset($jqueryui) ? $jqueryui : false;
 $bootstrap = isset($bootstrap) ? $bootstrap : false;
 $fontawesome = isset($fontawesome) ? $fontawesome : false;
@@ -93,7 +93,7 @@ function _generateJSsInclude($JSs)
 			// jQuery UI CSS
 			if ($jqueryui === true) _generateCSSsInclude('vendor/components/jqueryui/themes/base/jquery-ui.min.css');
 			// bootstrap CSS
-			if ($bootstrap === true) _generateCSSsInclude('vendor/components/bootstrap/css/bootstrap.min.css');
+			if ($bootstrap === true) _generateCSSsInclude('vendor/twbs/bootstrap/dist/css/bootstrap.min.css');
 			// font awesome CSS
 			if ($fontawesome === true) _generateCSSsInclude('vendor/components/font-awesome/css/font-awesome.min.css');
 			// bootstrap datepicker CSS
@@ -103,7 +103,8 @@ function _generateJSsInclude($JSs)
 			// Table sorter CSS
 			if ($tablesorter === true) _generateCSSsInclude('skin/tablesort.css');
 			// sb admin template CSS
-			if ($sbadmintemplate === true){
+			if ($sbadmintemplate === true)
+			{
 				_generateCSSsInclude('vendor/BlackrockDigital/startbootstrap-sb-admin-2/vendor/metisMenu/metisMenu.min.css');
 				_generateCSSsInclude('vendor/BlackrockDigital/startbootstrap-sb-admin-2/dist/css/sb-admin-2.min.css');
 			}
@@ -115,13 +116,14 @@ function _generateJSsInclude($JSs)
 			// Javascripts
 
 			// JQuery V3
-			if ($jquery3 === true) _generateJSsInclude('vendor/components/jquery/jquery.min.js');
+			if ($jquery === true) _generateJSsInclude('vendor/components/jquery/jquery.min.js');
 			// JQuery UI
 			if ($jqueryui === true) _generateJSsInclude('vendor/components/jqueryui/jquery-ui.min.js');
 			// bootstrap JS
-			if ($bootstrap === true) _generateJSsInclude('vendor/components/bootstrap/js/bootstrap.min.js');
+			if ($bootstrap === true) _generateJSsInclude('vendor/twbs/bootstrap/dist/js/bootstrap.min.js');
 			// bootstrap datepicker JS
-			if ($bootstrapdatepicker === true){
+			if ($bootstrapdatepicker === true)
+			{
 				_generateJSsInclude('vendor/eternicode/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js');
 				_generateJSsInclude('vendor/eternicode/bootstrap-datepicker/dist/locales/bootstrap-datepicker.de.min.js');
 			}

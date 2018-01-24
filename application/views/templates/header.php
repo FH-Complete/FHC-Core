@@ -3,7 +3,7 @@ if (! defined('BASEPATH')) exit('No direct script access allowed');
 
 isset($title) ? $title = 'VileSci - '.$title : $title = 'VileSci';
 !isset($jqueryV1) ? $jqueryV1 = false : $jqueryV1 = $jqueryV1;
-!isset($jqueryCurrent) ? $jqueryCurrent = false : $jqueryCurrent = $jqueryCurrent;
+!isset($jqueryV2) ? $jqueryV2 = false : $jqueryV2 = $jqueryV2;
 !isset($jqueryui) ? $jqueryui = false : $jqueryui = $jqueryui;
 !isset($jquery_checkboxes) ? $jquery_checkboxes = false : $jquery_checkboxes = $jquery_checkboxes;
 !isset($jquery_custom) ? $jquery_custom = false : $jquery_custom = $jquery_custom;
@@ -25,9 +25,9 @@ if($datepicker)
 	$jqueryui = true;
 
 if($jqueryui)
-	$jqueryCurrent = true;
+	$jqueryV2 = true;
 
-if($jqueryV1 && $jqueryCurrent)
+if($jqueryV1 && $jqueryV2)
 	show_error("Two JQuery versions used: composer and include folder version");
 
 ?>
@@ -47,8 +47,8 @@ if($jqueryV1 && $jqueryCurrent)
 	<script type="text/javascript" src="<?php echo base_url('vendor/christianbach/tablesorter/jquery.tablesorter.min.js'); ?>"></script>
 <?php endif ?>
 
-<?php if($jqueryCurrent) : ?>
-	<script type="text/javascript" src="<?php echo base_url('vendor/components/jquery/jquery.min.js'); ?>"></script>
+<?php if($jqueryV2) : ?>
+	<script type="text/javascript" src="<?php echo base_url('vendor/jquery/jqueryV2/jquery-2.2.4.min.js'); ?>"></script>
 <?php endif ?>
 
 <?php if($jqueryui) : ?>

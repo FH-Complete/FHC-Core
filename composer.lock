@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "b386e8ea62cfd8c96c6697729860cc5a",
-    "content-hash": "65e7f00446fd7f602e914089cedaa931",
+    "hash": "3fb66aad75872c21f728348036efedcb",
+    "content-hash": "c2a0c9055aa589c5ec2d8a85eaaa1483",
     "packages": [
         {
             "name": "BlackrockDigital/startbootstrap-sb-admin-2",
@@ -69,16 +69,16 @@
         },
         {
             "name": "codeigniter/framework",
-            "version": "3.1.6",
+            "version": "3.1.7",
             "source": {
                 "type": "git",
                 "url": "https://github.com/bcit-ci/CodeIgniter.git",
-                "reference": "7e4f63cd4b792e7dc2dc4b8b0183a6072a3f9462"
+                "reference": "02a0518e1c56ba3506f370362ac5ebdb8a138312"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/bcit-ci/CodeIgniter/zipball/7e4f63cd4b792e7dc2dc4b8b0183a6072a3f9462",
-                "reference": "7e4f63cd4b792e7dc2dc4b8b0183a6072a3f9462",
+                "url": "https://api.github.com/repos/bcit-ci/CodeIgniter/zipball/02a0518e1c56ba3506f370362ac5ebdb8a138312",
+                "reference": "02a0518e1c56ba3506f370362ac5ebdb8a138312",
                 "shasum": ""
             },
             "require": {
@@ -98,7 +98,7 @@
             ],
             "description": "The CodeIgniter framework",
             "homepage": "https://codeigniter.com",
-            "time": "2017-09-25 16:43:58"
+            "time": "2018-01-13 11:57:11"
         },
         {
             "name": "components/angular.js",
@@ -405,74 +405,6 @@
             "time": "2015-06-07 20:10:38"
         },
         {
-            "name": "components/bootstrap",
-            "version": "3.3.5",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/components/bootstrap.git",
-                "reference": "d71c2a234c61f53f1109a26ba8155902a51f8ca5"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/components/bootstrap/zipball/d71c2a234c61f53f1109a26ba8155902a51f8ca5",
-                "reference": "d71c2a234c61f53f1109a26ba8155902a51f8ca5",
-                "shasum": ""
-            },
-            "require": {
-                "components/jquery": ">=1.9.1 <3.0"
-            },
-            "suggest": {
-                "components/bootstrap-default": "Provide a theme for Bootstrap as components/bootstrap only provides the CSS as file assets"
-            },
-            "type": "component",
-            "extra": {
-                "component": {
-                    "scripts": [
-                        "js/bootstrap.js"
-                    ],
-                    "files": [
-                        "js/*.js",
-                        "css/*.css",
-                        "css/*.map",
-                        "fonts/*",
-                        "less/mixins/*.less",
-                        "less/*.less"
-                    ],
-                    "shim": {
-                        "deps": [
-                            "jquery"
-                        ]
-                    }
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Jacob Thornton",
-                    "email": "jacobthornton@gmail.com"
-                },
-                {
-                    "name": "Mark Otto",
-                    "email": "markdotto@gmail.com"
-                }
-            ],
-            "description": "The most popular front-end framework for developing responsive, mobile first projects on the web.",
-            "homepage": "http://getbootstrap.com",
-            "keywords": [
-                "css",
-                "framework",
-                "front-end",
-                "less",
-                "mobile-first",
-                "responsive",
-                "web"
-            ],
-            "time": "2015-06-17 06:08:09"
-        },
-        {
             "name": "components/font-awesome",
             "version": "4.7.0",
             "source": {
@@ -509,16 +441,16 @@
         },
         {
             "name": "components/jquery",
-            "version": "2.1.4",
+            "version": "3.2.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/components/jquery.git",
-                "reference": "7b1d1104656a092423fbfba13c5920e9bbba290c"
+                "reference": "e5534d4ab8e80c159553d507e358ed20a806d3bf"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/components/jquery/zipball/7b1d1104656a092423fbfba13c5920e9bbba290c",
-                "reference": "7b1d1104656a092423fbfba13c5920e9bbba290c",
+                "url": "https://api.github.com/repos/components/jquery/zipball/e5534d4ab8e80c159553d507e358ed20a806d3bf",
+                "reference": "e5534d4ab8e80c159553d507e358ed20a806d3bf",
                 "shasum": ""
             },
             "type": "component",
@@ -530,8 +462,9 @@
                     "files": [
                         "jquery.min.js",
                         "jquery.min.map",
-                        "jquery-migrate.js",
-                        "jquery-migrate.min.js"
+                        "jquery.slim.js",
+                        "jquery.slim.min.js",
+                        "jquery.slim.min.map"
                     ]
                 }
             },
@@ -541,59 +474,12 @@
             ],
             "authors": [
                 {
-                    "name": "John Resig",
-                    "email": "jeresig@gmail.com"
+                    "name": "JS Foundation and other contributors"
                 }
             ],
             "description": "jQuery JavaScript Library",
             "homepage": "http://jquery.com",
-            "time": "2015-05-08 05:04:47"
-        },
-        {
-            "name": "components/jquery-cookie",
-            "version": "1.4.1.2",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/Gta-Cool/jquery-cookie.git",
-                "reference": "0a10666155fd3aab9be5735b0ba83a4dccf59d78"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/Gta-Cool/jquery-cookie/zipball/0a10666155fd3aab9be5735b0ba83a4dccf59d78",
-                "reference": "0a10666155fd3aab9be5735b0ba83a4dccf59d78",
-                "shasum": ""
-            },
-            "require": {
-                "components/jquery": "*",
-                "robloach/component-installer": "*"
-            },
-            "type": "component",
-            "extra": {
-                "component": {
-                    "scripts": [
-                        "jquery.cookie.js"
-                    ]
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Klaus Hartl",
-                    "homepage": "https://github.com/carhartl"
-                }
-            ],
-            "description": "A simple, lightweight jQuery plugin for reading, writing and deleting cookies",
-            "homepage": "https://github.com/carhartl/jquery-cookie",
-            "keywords": [
-                "JS",
-                "cookie",
-                "javascript",
-                "jquery"
-            ],
-            "time": "2014-07-02 18:35:35"
+            "time": "2017-03-21 07:01:49"
         },
         {
             "name": "components/jqueryui",
@@ -681,39 +567,6 @@
             "time": "2016-09-16 05:47:55"
         },
         {
-            "name": "datatables/datatables",
-            "version": "1.10.16",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/DataTables/DataTables.git",
-                "reference": "75a665f64f02982c0f4666b15a25c4670e5e6b18"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/DataTables/DataTables/zipball/75a665f64f02982c0f4666b15a25c4670e5e6b18",
-                "reference": "75a665f64f02982c0f4666b15a25c4670e5e6b18",
-                "shasum": ""
-            },
-            "type": "library",
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "description": "DataTables is a plug-in for the jQuery Javascript library. It is a highly flexible tool, based upon the foundations of progressive enhancement, which will add advanced interaction controls to any HTML table.",
-            "homepage": "http://www.datatables.net/",
-            "time": "2017-08-31 13:52:17"
-        },
-        {
-            "name": "datatables/plugins",
-            "version": "3.3.7",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/DataTables/Plugins.git",
-                "reference": "master"
-            },
-            "type": "library"
-        },
-        {
             "name": "easyrdf/easyrdf",
             "version": "0.9.1",
             "source": {
@@ -774,61 +627,6 @@
                 "sparql"
             ],
             "time": "2015-02-27 09:45:49"
-        },
-        {
-            "name": "eternicode/bootstrap-datepicker",
-            "version": "v1.7.1",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/uxsolutions/bootstrap-datepicker.git",
-                "reference": "4c12834aae54782ca41d9409d6334193f200124d"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/uxsolutions/bootstrap-datepicker/zipball/4c12834aae54782ca41d9409d6334193f200124d",
-                "reference": "4c12834aae54782ca41d9409d6334193f200124d",
-                "shasum": ""
-            },
-            "require": {
-                "components/bootstrap": ">=2.0, <4.0",
-                "components/jquery": ">=1.7.1, <4.0.0",
-                "robloach/component-installer": "*"
-            },
-            "type": "component",
-            "extra": {
-                "component": {
-                    "scripts": [
-                        "js/bootstrap-datepicker.js"
-                    ],
-                    "styles": [
-                        "dist/css/bootstrap-datepicker.css",
-                        "dist/css/bootstrap-datepicker3.css"
-                    ],
-                    "files": [
-                        "js/locales/bootstrap-datepicker.*.js"
-                    ]
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "Apache-2.0"
-            ],
-            "authors": [
-                {
-                    "name": "Andrew Rowls",
-                    "email": "eternicode@gmail.com"
-                },
-                {
-                    "name": "Community",
-                    "homepage": "https://github.com/uxsolutions/bootstrap-datepicker/contributors"
-                }
-            ],
-            "description": "A datepicker for Bootstrap",
-            "keywords": [
-                "bootstrap",
-                "datepicker"
-            ],
-            "time": "2017-07-06 12:14:34"
         },
         {
             "name": "fgelinas/timepicker",
@@ -918,6 +716,17 @@
             "dist": {
                 "type": "file",
                 "url": "https://code.jquery.com/jquery-1.12.4.min.js",
+                "reference": null,
+                "shasum": null
+            },
+            "type": "library"
+        },
+        {
+            "name": "jquery/jqueryV2",
+            "version": "2.2.4",
+            "dist": {
+                "type": "file",
+                "url": "https://code.jquery.com/jquery-2.2.4.min.js",
                 "reference": null,
                 "shasum": null
             },
@@ -1108,83 +917,6 @@
             "time": "2014-07-10 12:27:19"
         },
         {
-            "name": "kriswallsmith/assetic",
-            "version": "v1.4.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/kriswallsmith/assetic.git",
-                "reference": "e911c437dbdf006a8f62c2f59b15b2d69a5e0aa1"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/kriswallsmith/assetic/zipball/e911c437dbdf006a8f62c2f59b15b2d69a5e0aa1",
-                "reference": "e911c437dbdf006a8f62c2f59b15b2d69a5e0aa1",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.3.1",
-                "symfony/process": "~2.1|~3.0"
-            },
-            "conflict": {
-                "twig/twig": "<1.27"
-            },
-            "require-dev": {
-                "leafo/lessphp": "^0.3.7",
-                "leafo/scssphp": "~0.1",
-                "meenie/javascript-packer": "^1.1",
-                "mrclay/minify": "<2.3",
-                "natxet/cssmin": "3.0.4",
-                "patchwork/jsqueeze": "~1.0|~2.0",
-                "phpunit/phpunit": "~4.8 || ^5.6",
-                "psr/log": "~1.0",
-                "ptachoire/cssembed": "~1.0",
-                "symfony/phpunit-bridge": "~2.7|~3.0",
-                "twig/twig": "~1.23|~2.0",
-                "yfix/packager": "dev-master"
-            },
-            "suggest": {
-                "leafo/lessphp": "Assetic provides the integration with the lessphp LESS compiler",
-                "leafo/scssphp": "Assetic provides the integration with the scssphp SCSS compiler",
-                "leafo/scssphp-compass": "Assetic provides the integration with the SCSS compass plugin",
-                "patchwork/jsqueeze": "Assetic provides the integration with the JSqueeze JavaScript compressor",
-                "ptachoire/cssembed": "Assetic provides the integration with phpcssembed to embed data uris",
-                "twig/twig": "Assetic provides the integration with the Twig templating engine"
-            },
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "1.4-dev"
-                }
-            },
-            "autoload": {
-                "psr-0": {
-                    "Assetic": "src/"
-                },
-                "files": [
-                    "src/functions.php"
-                ]
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Kris Wallsmith",
-                    "email": "kris.wallsmith@gmail.com",
-                    "homepage": "http://kriswallsmith.net/"
-                }
-            ],
-            "description": "Asset Management for PHP",
-            "homepage": "https://github.com/kriswallsmith/assetic",
-            "keywords": [
-                "assets",
-                "compression",
-                "minification"
-            ],
-            "time": "2016-11-11 18:43:20"
-        },
-        {
             "name": "michelf/php-markdown",
             "version": "1.5.0",
             "source": {
@@ -1330,60 +1062,6 @@
                 "jsonld"
             ],
             "time": "2016-10-10 08:57:56"
-        },
-        {
-            "name": "moment/moment",
-            "version": "2.20.1",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/moment/moment.git",
-                "reference": "03073778ec18ee38e179208cd1af899e8d1848dc"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/moment/moment/zipball/03073778ec18ee38e179208cd1af899e8d1848dc",
-                "reference": "03073778ec18ee38e179208cd1af899e8d1848dc",
-                "shasum": ""
-            },
-            "require": {
-                "robloach/component-installer": "*"
-            },
-            "type": "component",
-            "extra": {
-                "component": {
-                    "scripts": [
-                        "moment.js"
-                    ],
-                    "files": [
-                        "min/*.js",
-                        "locale/*.js"
-                    ]
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Tim Wood",
-                    "email": "washwithcare@gmail.com"
-                }
-            ],
-            "description": "Parse, validate, manipulate, and display dates in JavaScript.",
-            "homepage": "https://github.com/moment/moment",
-            "keywords": [
-                "date",
-                "ender",
-                "format",
-                "i18n",
-                "l10n",
-                "moment",
-                "parse",
-                "time",
-                "validate"
-            ],
-            "time": "2017-12-19 04:36:30"
         },
         {
             "name": "netcarver/textile",
@@ -1565,54 +1243,6 @@
                 "reference": "081cac1eb9b504dc32be27b57f32f6d1d29a5253"
             },
             "type": "library"
-        },
-        {
-            "name": "robloach/component-installer",
-            "version": "0.2.3",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/RobLoach/component-installer.git",
-                "reference": "908a859aa7c4949ba9ad67091e67bac10b66d3d7"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/RobLoach/component-installer/zipball/908a859aa7c4949ba9ad67091e67bac10b66d3d7",
-                "reference": "908a859aa7c4949ba9ad67091e67bac10b66d3d7",
-                "shasum": ""
-            },
-            "require": {
-                "composer-plugin-api": "^1.0",
-                "kriswallsmith/assetic": "1.*",
-                "php": ">=5.3.2"
-            },
-            "require-dev": {
-                "composer/composer": "1.*@alpha",
-                "phpunit/phpunit": "4.*"
-            },
-            "type": "composer-plugin",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "1.0.x-dev"
-                },
-                "class": "ComponentInstaller\\ComponentInstallerPlugin"
-            },
-            "autoload": {
-                "psr-0": {
-                    "ComponentInstaller": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Rob Loach",
-                    "homepage": "http://robloach.net"
-                }
-            ],
-            "description": "Allows installation of Components via Composer.",
-            "time": "2015-08-10 12:35:38"
         },
         {
             "name": "rougin/blueprint",
@@ -1909,16 +1539,16 @@
         },
         {
             "name": "symfony/console",
-            "version": "v2.8.28",
+            "version": "v2.8.33",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/console.git",
-                "reference": "f81549d2c5fdee8d711c9ab3c7e7362353ea5853"
+                "reference": "a4bd0f02ea156cf7b5138774a7ba0ab44d8da4fe"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/console/zipball/f81549d2c5fdee8d711c9ab3c7e7362353ea5853",
-                "reference": "f81549d2c5fdee8d711c9ab3c7e7362353ea5853",
+                "url": "https://api.github.com/repos/symfony/console/zipball/a4bd0f02ea156cf7b5138774a7ba0ab44d8da4fe",
+                "reference": "a4bd0f02ea156cf7b5138774a7ba0ab44d8da4fe",
                 "shasum": ""
             },
             "require": {
@@ -1966,7 +1596,7 @@
             ],
             "description": "Symfony Console Component",
             "homepage": "https://symfony.com",
-            "time": "2017-10-01 21:00:16"
+            "time": "2018-01-03 07:36:31"
         },
         {
             "name": "symfony/debug",
@@ -2085,66 +1715,17 @@
             "time": "2017-10-11 12:05:26"
         },
         {
-            "name": "symfony/process",
-            "version": "v3.3.10",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/symfony/process.git",
-                "reference": "fdf89e57a723a29baf536e288d6e232c059697b1"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/symfony/process/zipball/fdf89e57a723a29baf536e288d6e232c059697b1",
-                "reference": "fdf89e57a723a29baf536e288d6e232c059697b1",
-                "shasum": ""
-            },
-            "require": {
-                "php": "^5.5.9|>=7.0.8"
-            },
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "3.3-dev"
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "Symfony\\Component\\Process\\": ""
-                },
-                "exclude-from-classmap": [
-                    "/Tests/"
-                ]
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Fabien Potencier",
-                    "email": "fabien@symfony.com"
-                },
-                {
-                    "name": "Symfony Community",
-                    "homepage": "https://symfony.com/contributors"
-                }
-            ],
-            "description": "Symfony Process Component",
-            "homepage": "https://symfony.com",
-            "time": "2017-10-02 06:42:24"
-        },
-        {
             "name": "symfony/yaml",
-            "version": "v2.8.28",
+            "version": "v2.8.33",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/yaml.git",
-                "reference": "842fb6df22180244b4c65935ce1a88d324e5ff9e"
+                "reference": "be720fcfae4614df204190d57795351059946a77"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/yaml/zipball/842fb6df22180244b4c65935ce1a88d324e5ff9e",
-                "reference": "842fb6df22180244b4c65935ce1a88d324e5ff9e",
+                "url": "https://api.github.com/repos/symfony/yaml/zipball/be720fcfae4614df204190d57795351059946a77",
+                "reference": "be720fcfae4614df204190d57795351059946a77",
                 "shasum": ""
             },
             "require": {
@@ -2180,7 +1761,7 @@
             ],
             "description": "Symfony Yaml Component",
             "homepage": "https://symfony.com",
-            "time": "2017-10-05 14:38:30"
+            "time": "2018-01-03 07:36:31"
         },
         {
             "name": "tapmodo/Jcrop",
@@ -2195,16 +1776,16 @@
         },
         {
             "name": "tinymce/tinymce",
-            "version": "4.7.2",
+            "version": "4.7.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/tinymce/tinymce-dist.git",
-                "reference": "2639396a6d5eb8db7457ed4f6de6f5d15303ef52"
+                "reference": "256a571d890d4e15da618019994f072cd43209bc"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/tinymce/tinymce-dist/zipball/2639396a6d5eb8db7457ed4f6de6f5d15303ef52",
-                "reference": "2639396a6d5eb8db7457ed4f6de6f5d15303ef52",
+                "url": "https://api.github.com/repos/tinymce/tinymce-dist/zipball/256a571d890d4e15da618019994f072cd43209bc",
+                "reference": "256a571d890d4e15da618019994f072cd43209bc",
                 "shasum": ""
             },
             "type": "component",
@@ -2237,7 +1818,7 @@
                 "tinymce",
                 "wysiwyg"
             ],
-            "time": "2017-11-07 12:44:31"
+            "time": "2018-01-22 13:09:23"
         },
         {
             "name": "tomazdragar/SimpleCropper",
@@ -2248,6 +1829,57 @@
                 "reference": "9750b81fa55ed07b3b429297d18ffbeac07a2cde"
             },
             "type": "library"
+        },
+        {
+            "name": "twbs/bootstrap",
+            "version": "v3.3.7",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/twbs/bootstrap.git",
+                "reference": "0b9c4a4007c44201dce9a6cc1a38407005c26c86"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/twbs/bootstrap/zipball/0b9c4a4007c44201dce9a6cc1a38407005c26c86",
+                "reference": "0b9c4a4007c44201dce9a6cc1a38407005c26c86",
+                "shasum": ""
+            },
+            "replace": {
+                "twitter/bootstrap": "self.version"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "3.3.x-dev"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Jacob Thornton",
+                    "email": "jacobthornton@gmail.com"
+                },
+                {
+                    "name": "Mark Otto",
+                    "email": "markdotto@gmail.com"
+                }
+            ],
+            "description": "The most popular front-end framework for developing responsive, mobile first projects on the web.",
+            "homepage": "http://getbootstrap.com",
+            "keywords": [
+                "JS",
+                "css",
+                "framework",
+                "front-end",
+                "less",
+                "mobile-first",
+                "responsive",
+                "web"
+            ],
+            "time": "2016-07-25 15:51:55"
         },
         {
             "name": "twig/twig",
@@ -2316,19 +1948,20 @@
         },
         {
             "name": "zetacomponents/base",
-            "version": "1.9",
+            "version": "1.9.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/zetacomponents/Base.git",
-                "reference": "f20df24e8de3e48b6b69b2503f917e457281e687"
+                "reference": "489e20235989ddc97fdd793af31ac803972454f1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/zetacomponents/Base/zipball/f20df24e8de3e48b6b69b2503f917e457281e687",
-                "reference": "f20df24e8de3e48b6b69b2503f917e457281e687",
+                "url": "https://api.github.com/repos/zetacomponents/Base/zipball/489e20235989ddc97fdd793af31ac803972454f1",
+                "reference": "489e20235989ddc97fdd793af31ac803972454f1",
                 "shasum": ""
             },
             "require-dev": {
+                "phpunit/phpunit": "~5.7",
                 "zetacomponents/unit-test": "*"
             },
             "type": "library",
@@ -2375,26 +2008,28 @@
             ],
             "description": "The Base package provides the basic infrastructure that all packages rely on. Therefore every component relies on this package.",
             "homepage": "https://github.com/zetacomponents",
-            "time": "2014-09-19 03:28:34"
+            "time": "2017-11-28 11:30:00"
         },
         {
             "name": "zetacomponents/database",
-            "version": "1.5",
+            "version": "1.5.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/zetacomponents/Database.git",
-                "reference": "8072af0ae88506dcffc8c8a161a5ebed9890d6c3"
+                "reference": "1750d34bf64b62f064c5b1aeb5374fbd06400904"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/zetacomponents/Database/zipball/8072af0ae88506dcffc8c8a161a5ebed9890d6c3",
-                "reference": "8072af0ae88506dcffc8c8a161a5ebed9890d6c3",
+                "url": "https://api.github.com/repos/zetacomponents/Database/zipball/1750d34bf64b62f064c5b1aeb5374fbd06400904",
+                "reference": "1750d34bf64b62f064c5b1aeb5374fbd06400904",
                 "shasum": ""
             },
             "require": {
                 "zetacomponents/base": "~1.8"
             },
             "require-dev": {
+                "phpunit/phpunit": "~5.7",
+                "zetacomponents/database-schema": "~1.5",
                 "zetacomponents/unit-test": "*"
             },
             "type": "library",
@@ -2450,7 +2085,7 @@
             ],
             "description": "A lightweight database layer on top of PHP's PDO that allows you to utilize a database without having to take care of differences in SQL dialects.",
             "homepage": "https://github.com/zetacomponents",
-            "time": "2014-09-27 19:26:09"
+            "time": "2017-11-28 10:55:26"
         },
         {
             "name": "zetacomponents/document",

@@ -3,7 +3,7 @@
 		'templates/FHC-Header',
 		array(
 			'title' => 'Info Center',
-			'jquery3' => true,
+			'jquery' => true,
 			'bootstrap' => true,
 			'fontawesome' => true,
 			'sbadmintemplate' => true,
