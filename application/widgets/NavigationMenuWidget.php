@@ -3,13 +3,11 @@
 /**
  *
  */
-class FHC_navigation extends Widget
+class NavigationMenuWidget extends Widget
 {
-	const NAVIGATION_MENU = 'navigationMenu'; //
-
 	private $navigationMenu;
 
-	private static $FHC_navigationInstance;
+	private static $NavigationMenuWidgetInstance;
 
 	/**
 	 *
@@ -18,9 +16,9 @@ class FHC_navigation extends Widget
 	{
 		$this->navigationMenu = $widgetData;
 
-		self::$FHC_navigationInstance = $this;
+		self::$NavigationMenuWidgetInstance = $this;
 
-		$this->view('widgets/fhcnavigation');
+		$this->view('widgets/navigationMenu');
 	}
 
 	/**
@@ -28,8 +26,10 @@ class FHC_navigation extends Widget
 	 */
 	public static function printNavigationMenu()
 	{
-		foreach (self::$FHC_navigationInstance->navigationMenu as $item)
+		foreach (self::$NavigationMenuWidgetInstance->navigationMenu as $item)
+		{
 			self::printNavItem($item);
+		}
 	}
 
 	/**

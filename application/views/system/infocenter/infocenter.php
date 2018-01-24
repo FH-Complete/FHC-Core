@@ -19,19 +19,15 @@
 
 <body>
 	<div id="wrapper">
-		<nav class="navbar navbar-default navbar-static-top" role="navigation" style="margin-bottom: 0">
-			<?php
-
+		<?php
 			echo $this->widgetlib->widget(
-				'FHC_navheader'
+				'NavigationWidget',
+				array(
+					'navigationHeader' => $navigationHeaderArray,
+					'navigationMenu' => $navigationMenuArray
+				)
 			);
-
-			echo $this->widgetlib->widget(
-				'FHC_navigation',
-				$navigationMenuArray
-			);
-			?>
-		</nav>
+		?>
 		<div id="page-wrapper">
 			<div class="container-fluid">
 				<div class="row">
