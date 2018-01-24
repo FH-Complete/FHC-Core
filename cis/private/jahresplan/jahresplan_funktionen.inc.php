@@ -517,7 +517,20 @@ function jahresplan_veranstaltungskategorie_kalenderanzeige($veranstaltung,$wart
 
 					if (!$wartungsberechtigt)
 						$showHTML.=$cTmpJavaWartungInfo;
-					$showHTML.=' title="'.$p->t("eventkalender/veranstaltung").' '.$iTmpStartTagErgebniss[$iTmpVeranstaltung]->bezeichnung." ID ".$iTmpStartTagErgebniss[$iTmpVeranstaltung]->veranstaltung_id." \n".htmlspecialchars($iTmpStartTagErgebniss[$iTmpVeranstaltung]->beschreibung)." \n".htmlspecialchars($iTmpStartTagErgebniss[$iTmpVeranstaltung]->inhalt)." \n ".strftime(constKalenderDetailDatumZeit,$iTmpStartTagErgebniss[$iTmpVeranstaltung]->start_timestamp)." Uhr \n - ". ($iTmpStartTagErgebniss[$iTmpVeranstaltung]->start_datum==$iTmpStartTagErgebniss[$iTmpVeranstaltung]->ende_datum?strftime(constKalenderZeit,$iTmpStartTagErgebniss[$iTmpVeranstaltung]->ende_timestamp) : strftime(constKalenderDetailDatumZeit,$iTmpStartTagErgebniss[$iTmpVeranstaltung]->ende_timestamp) ).' Uhr">';
+					$showHTML.=' title="'.$p->t("eventkalender/veranstaltung").' '.
+					$iTmpStartTagErgebniss[$iTmpVeranstaltung]->bezeichnung.
+					" ID ".$iTmpStartTagErgebniss[$iTmpVeranstaltung]->veranstaltung_id.
+					" \n".htmlspecialchars($iTmpStartTagErgebniss[$iTmpVeranstaltung]->beschreibung).
+					" \n".htmlspecialchars($iTmpStartTagErgebniss[$iTmpVeranstaltung]->inhalt).
+					" \n ".$iTmpStartTagErgebniss[$iTmpVeranstaltung]->start_datum." ".
+					$iTmpStartTagErgebniss[$iTmpVeranstaltung]->start_zeit." Uhr - ";
+					if($iTmpStartTagErgebniss[$iTmpVeranstaltung]->start_datum == $iTmpStartTagErgebniss[$iTmpVeranstaltung]->ende_datum)
+					{
+						$showHTML .= $iTmpStartTagErgebniss[$iTmpVeranstaltung]->ende_zeit;
+					}
+					else
+						$showHTML .= $iTmpStartTagErgebniss[$iTmpVeranstaltung]->ende_datum.' '.$iTmpStartTagErgebniss[$iTmpVeranstaltung]->ende_zeit;
+					$showHTML.=' Uhr">';
 
 						$showHTML.='<td class="kalender_tages_info">
 								<table summary="blank'.$iTmpMonat.$iTmpWoche.$iTmpTag.'" style="border:0px;vertical-align:top;text-align:left;" cellpadding="0" cellspacing="0">
