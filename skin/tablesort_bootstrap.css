@@ -1,52 +1,40 @@
-/*reset font of tables*/
-.tablesorter-default
-{
+/* Reset font of tables */
+.tablesorter-default {
     font: unset !important;
 }
 
-/*reset background color of tables*/
-.tablesorter-default td
-{
+/* Reset background color of tables */
+.tablesorter-default td {
     background-color: unset !important;
 }
 
-/*reset table colors and backgrounds on hover*/
-.tablesorter-default tbody > tr:hover > td
-{
+/* Reset table colors and backgrounds on hover */
+.tablesorter-default tbody > tr:hover > td {
     color: unset !important;
 }
 
-/*remove black border at bottom of table header*/
-.tablesorter-header
-{
+/* Remove black border at bottom of table header */
+.tablesorter-header {
     border-bottom: #ccc 2px solid !important;
 }
 
-/*remove background color from filter row*/
-.tablesorter-default .tablesorter-filter-row td
-{
+/* Remove background color from filter row */
+.tablesorter-default .tablesorter-filter-row td {
     background-color: white !important;
 }
 
-/*make filter row more condensed*/
-.tablesorter-default input.tablesorter-filter, .tablesorter-default select.tablesorter-filter
-{
+/* Make filter row more condensed */
+.tablesorter-default input.tablesorter-filter, .tablesorter-default select.tablesorter-filter {
     margin: 0px auto;
     padding: 0px;
 }
 
-/*add cursor pointer for pager icons*/
-.pager i
-{
+/* Add cursor pointer for pager icons */
+.pager i {
     cursor: pointer;
 }
 
-/*	.tablesorter-default tr.even > td
-	{
-		background-color: #f9f9f9;
-	}
-
-	.tablesorter-default tr.odd > td
-	{
-		background-color: unset;
-	}*/
+/* Stripes color of table */
+.table-striped > tbody > tr:nth-of-type(odd) {
+	background-color: #d1d1d1;
+}
