@@ -45,6 +45,7 @@ class InfoCenter extends VileSci_Controller
 	);
 	private $uid; // contains the UID of the logged user
 	private $navigationMenuArray; // contains all the voices for the navigation menu
+	private $navigationHeaderArray;
 
 	/**
 	 * Constructor
@@ -70,6 +71,11 @@ class InfoCenter extends VileSci_Controller
 		$this->_setAuthUID(); // sets property uid
 
 		$this->_setNavigationMenuArray(); // sets property navigationMenuArray
+
+		$this->navigationHeaderArray = array(
+			'headertext' => 'Infocenter',
+			'headertextlink' => base_url('index.ci.php/system/infocenter/InfoCenter')
+		);
     }
 
 	// -----------------------------------------------------------------------------------------------------------------
@@ -80,7 +86,13 @@ class InfoCenter extends VileSci_Controller
 	 */
 	public function index()
 	{
-		$this->load->view('system/infocenter/infocenter.php', array('navigationMenuArray' => $this->navigationMenuArray));
+		$this->load->view(
+			'system/infocenter/infocenter.php',
+			array(
+				'navigationHeaderArray' => $this->navigationHeaderArray,
+				'navigationMenuArray' => $this->navigationMenuArray
+			)
+		);
 	}
 
 	/**
@@ -98,7 +110,17 @@ class InfoCenter extends VileSci_Controller
 
 		$prestudentdata = $this->_loadPrestudentData($person_id);
 
-		$this->load->view('system/infocenter/infocenterDetails.php', array_merge($persondata, $prestudentdata, array('navigationMenuArray' => $this->navigationMenuArray)));
+		$this->load->view(
+			'system/infocenter/infocenterDetails.php',
+			array_merge(
+				$persondata,
+				$prestudentdata,
+				array(
+					'navigationHeaderArray' => $this->navigationHeaderArray,
+					'navigationMenuArray' => $this->navigationMenuArray
+				)
+			)
+		);
 	}
 
 	/**
