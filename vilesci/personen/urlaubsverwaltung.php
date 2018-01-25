@@ -63,12 +63,14 @@ echo '<html>
 	<head>
 		<title>Zeitsperren (Urlaube) der MitarbeiterInnen</title>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<link rel="stylesheet" href="../../vendor/mottie/tablesorter/dist/css/theme.default.min.css" type="text/css">
 		<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
 		<link rel="stylesheet" href="../../skin/tablesort.css" type="text/css">
 		<link rel="stylesheet" href="../../skin/jquery-ui-1.9.2.custom.min.css" type="text/css">
 		<script src="../../include/js/tablesort/table.js" type="text/javascript"></script>
 		<script type="text/javascript" src="../../vendor/jquery/jqueryV1/jquery-1.12.4.min.js"></script>
-		<script type="text/javascript" src="../../vendor/christianbach/tablesorter/jquery.tablesorter.min.js"></script>
+		<script type="text/javascript" src="../../vendor/mottie/tablesorter/dist/js/jquery.tablesorter.min.js"></script>
+		<script type="text/javascript" src="../../vendor/mottie/tablesorter/dist/js/jquery.tablesorter.widgets.min.js"></script>
 		<script type="text/javascript" src="../../vendor/components/jqueryui/jquery-ui.min.js"></script>
 		<script type="text/javascript" src="../../include/js/jquery.ui.datepicker.translation.js"></script>
 		<script language="Javascript">
@@ -99,7 +101,7 @@ echo '<html>
 			$("#t1").tablesorter(
 			{
 				sortList: [[3,1]],
-				widgets: [\'zebra\']
+				widgets: [\'zebra\', \'filter\']
 			});
 			$( ".datepicker_datum" ).datepicker({
 					 changeMonth: true,
