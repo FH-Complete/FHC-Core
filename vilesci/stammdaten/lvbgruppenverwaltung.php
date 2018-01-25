@@ -41,7 +41,7 @@ if (!$db = new basis_db())
 		<!-- Script zum erstellen des Trees-->
 		<script type="text/javascript" src="../../include/js/jstree/jquery.jstree.js"></script>
 		<!-- Script zum speichern der geöffneten Tree-Nodes-->
-		<script type="text/javascript" src="../../vendor/components/jquery-cookie/jquery.cookie.js"></script>
+		<script type="text/javascript" src="../../include/js/jstree/_lib/jquery.cookie.js"></script>
 		<!-- Script zum Laden der Baumdaten per AJAX-Request-->
 		<script type="text/javascript" src="lvbgruppenverwaltung.js"></script>
 
