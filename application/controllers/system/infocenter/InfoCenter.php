@@ -3,13 +3,13 @@
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
 /**
- * Also shows aufnahme-related data for a person and its prestudents, enables document and zgv checks,
- * displays and saves Notizen for a person, logs aufnahme-related actions for a person
+ * Also shows infocenter-related data for a person and its prestudents, enables document and zgv checks,
+ * displays and saves Notizen for a person, logs infocenter-related actions for a person
  */
 class InfoCenter extends VileSci_Controller
 {
 	// App and Verarbeitungstaetigkeit name for logging
-	const APP = 'aufnahme';
+	const APP = 'infocenter';
 	const TAETIGKEIT = 'bewerbung';
 
 	// URL prefix for this controller
@@ -374,7 +374,7 @@ class InfoCenter extends VileSci_Controller
 	 */
 	private function _setNavigationMenuArray()
 	{
-		$filtersSent = $this->FiltersModel->getFilterList('aufnahme', 'PersonActions', '%InfoCenterSentApplication%');
+		$filtersSent = $this->FiltersModel->getFilterList('infocenter', 'PersonActions', '%InfoCenterSentApplication%');
 		if (hasData($filtersSent))
 		{
 			for ($filtersCounter = 0; $filtersCounter < count($filtersSent->retval); $filtersCounter++)
@@ -385,7 +385,7 @@ class InfoCenter extends VileSci_Controller
 			}
 		}
 
-		$filtersNotSent = $this->FiltersModel->getFilterList('aufnahme', 'PersonActions', '%InfoCenterNotSentApplication%');
+		$filtersNotSent = $this->FiltersModel->getFilterList('infocenter', 'PersonActions', '%InfoCenterNotSentApplication%');
 		if (hasData($filtersNotSent))
 		{
 			for ($filtersCounter = 0; $filtersCounter < count($filtersNotSent->retval); $filtersCounter++)

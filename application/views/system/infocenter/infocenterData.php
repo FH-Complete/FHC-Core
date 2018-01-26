@@ -31,9 +31,8 @@
 						JOIN public.tbl_studiengang USING(studiengang_kz)
 					WHERE pss.status_kurzbz = \'Interessent\'
 					AND pss.bestaetigtam IS NULL
-					AND pss.bestaetigtvon IS NULL
 					AND ps.person_id = p.person_id
-					AND tbl_studiengang.typ in(\'b\', \'m\')
+					AND tbl_studiengang.typ in(\'b\')
 					ORDER BY pss.datum DESC, pss.insertamum DESC, pss.ext_id DESC
 					LIMIT 1
 				) AS "Studiensemester",
@@ -44,13 +43,24 @@
 						INNER JOIN public.tbl_prestudent ps USING(prestudent_id)
 						JOIN public.tbl_studiengang USING(studiengang_kz)
 					WHERE pss.status_kurzbz = \'Interessent\'
-						AND pss.bestaetigtam IS NULL
-						AND pss.bestaetigtvon IS NULL
+						AND pss.bewerbung_abgeschicktamum IS NOT NULL
 						AND ps.person_id = p.person_id
-						AND tbl_studiengang.typ in(\'b\', \'m\')
+						AND tbl_studiengang.typ in(\'b\')
 					ORDER BY pss.datum DESC, pss.insertamum DESC, pss.ext_id DESC
 					LIMIT 1
-				) AS "SendDate"
+				) AS "SendDate",
+				(
+					SELECT count(*)
+					FROM
+						public.tbl_prestudentstatus pss
+						INNER JOIN public.tbl_prestudent ps USING(prestudent_id)
+						JOIN public.tbl_studiengang USING(studiengang_kz)
+					WHERE pss.status_kurzbz = \'Interessent\'
+						AND pss.bewerbung_abgeschicktamum IS NOT NULL
+						AND ps.person_id = p.person_id
+						AND tbl_studiengang.typ in(\'b\')
+					LIMIT 1
+				) AS "AnzahlAbgeschickt"
 			FROM public.tbl_person p
 			WHERE
 				EXISTS(
@@ -60,7 +70,7 @@
 						JOIN public.tbl_studiengang USING(studiengang_kz)
 					WHERE
 						person_id=p.person_id
-						AND tbl_studiengang.typ in(\'b\', \'m\')
+						AND tbl_studiengang.typ in(\'b\')
 						AND \'Interessent\' = (SELECT status_kurzbz FROM public.tbl_prestudentstatus
 												WHERE prestudent_id=tbl_prestudent.prestudent_id
 												ORDER BY datum DESC, insertamum DESC, ext_id DESC
@@ -75,7 +85,6 @@
 								prestudent_id = tbl_prestudent.prestudent_id
 								AND status_kurzbz = \'Interessent\'
 								AND bestaetigtam IS NULL
-								AND bestaetigtvon IS NULL
 								AND studiensemester_kurzbz IN (
 									SELECT studiensemester_kurzbz
 									FROM public.tbl_studiensemester
@@ -87,6 +96,7 @@
 		',
 		'hideHeader' => true,
 		'hideSave' => true,
+		'checkboxes' => array('PersonId'),
 		'additionalColumns' => array('Details'),
 		'formatRaw' => function($fieldName, $fieldValue, $datasetRaw) {
 
@@ -103,7 +113,7 @@
 
 			if ($fieldName == 'SendDate')
 			{
-				if ($datasetRaw->{$fieldName} == '1970.01.01 01:00:00')
+				if ($datasetRaw->{$fieldName} == '01.01.1970 01:00:00')
 				{
 					$datasetRaw->{$fieldName} = 'Not sent';
 				}
@@ -111,7 +121,7 @@
 
 			if ($fieldName == 'LastAction')
 			{
-				if ($datasetRaw->{$fieldName} == '1970.01.01 01:00:00')
+				if ($datasetRaw->{$fieldName} == '01.01.1970 01:00:00')
 				{
 					$datasetRaw->{$fieldName} = 'Not logged';
 				}
@@ -137,7 +147,7 @@
 	}
 	else
 	{
-		$filterWidgetArray['app'] = 'aufnahme';
+		$filterWidgetArray['app'] = 'infocenter';
 		$filterWidgetArray['datasetName'] = 'PersonActions';
 		$filterWidgetArray['filterKurzbz'] = 'InfoCenterNotSentApplicationAll';
 	}
