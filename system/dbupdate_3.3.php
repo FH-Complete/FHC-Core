@@ -810,7 +810,7 @@ if (!$result = @$db->db_query("SELECT 1 FROM system.tbl_log LIMIT 1"))
 			 INCREMENT BY 1
 			 NO MAXVALUE
 			 NO MINVALUE
-			 CACHE 1;
+			 CACHE 1;system.tbl_log
 			ALTER TABLE system.tbl_log ALTER COLUMN log_id SET DEFAULT nextval('system.tbl_log_log_id_seq');
 
 			GRANT SELECT, INSERT ON system.tbl_log TO vilesci;
@@ -1118,7 +1118,7 @@ if ($result = @$db->db_query("SELECT conname FROM pg_constraint WHERE conname = 
 			echo '<br>system.tbl_filters: added primary key on column filter_id';
 	}
 }
-	
+
 // Add index to tbl_akte
 if ($result = $db->db_query("SELECT * FROM pg_class WHERE relname='idx_tbl_akte_dokument_kurzbz'"))
 {
@@ -1127,13 +1127,73 @@ if ($result = $db->db_query("SELECT * FROM pg_class WHERE relname='idx_tbl_akte_
 		$qry = " 	CREATE INDEX idx_tbl_akte_dokument_kurzbz ON tbl_akte USING btree (dokument_kurzbz);
 					CREATE INDEX idx_tbl_akte_person_id ON tbl_akte USING btree (person_id);
 					CREATE INDEX idx_tbl_akte_person_id_dokument_kurzbz ON tbl_akte USING btree (person_id, dokument_kurzbz)";
-		
+
 		if (! $db->db_query($qry))
 			echo '<strong>Indizes: ' . $db->db_last_error() . '</strong><br>';
 		else
 			echo 'Diverse Indizes fuer tbl_akte hinzugefuegt';
 	}
 }
+
+// Berechtigungen fuer vilesci User erteilen auf system.tbl_log
+if($result = @$db->db_query("SELECT * FROM information_schema.role_table_grants WHERE table_name='tbl_log' AND table_schema='system' AND grantee='vilesci' AND privilege_type='UPDATE'"))
+{
+	if($db->db_num_rows($result)==0)
+	{
+
+		$qry = "GRANT UPDATE ON system.tbl_log TO vilesci;";
+
+		if(!$db->db_query($qry))
+			echo '<strong>Permission Log: '.$db->db_last_error().'</strong><br>';
+		else
+			echo 'Updaterechte auf system.tbl_log für Vilesci User hinzugefügt';
+	}
+}
+
+// App 'core' hinzufügen
+if($result = $db->db_query("SELECT 1 FROM system.tbl_app WHERE app='core'"))
+{
+	if($db->db_num_rows($result)==0)
+	{
+
+		$qry = "INSERT INTO system.tbl_app(app) VALUES('core');";
+
+		if(!$db->db_query($qry))
+			echo '<strong>App: '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>Neue App core in system.tbl_app hinzugefügt';
+	}
+}
+
+// App 'infocenter' hinzufügen
+if($result = $db->db_query("SELECT 1 FROM system.tbl_app WHERE app='infocenter'"))
+{
+	if($db->db_num_rows($result)==0)
+	{
+
+		$qry = "INSERT INTO system.tbl_app(app) VALUES('infocenter');";
+
+		if(!$db->db_query($qry))
+			echo '<strong>App: '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>Neue App infocenter in system.tbl_app hinzugefügt';
+	}
+}
+// App 'bewerbung' hinzufügen
+if($result = $db->db_query("SELECT 1 FROM system.tbl_app WHERE app='bewerbung'"))
+{
+	if($db->db_num_rows($result)==0)
+	{
+
+		$qry = "INSERT INTO system.tbl_app(app) VALUES('bewerbung');";
+
+		if(!$db->db_query($qry))
+			echo '<strong>App: '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>Neue App bewerbung in system.tbl_app hinzugefügt';
+	}
+}
+
 
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
