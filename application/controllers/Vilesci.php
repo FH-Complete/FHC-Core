@@ -1,8 +1,15 @@
-<?php
+	<?php
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
 class Vilesci extends FHC_Controller
 {
+
+	public function __construct()
+	{
+		parent::__construct();
+
+		$this->load->library('WidgetLib');
+	}
 
 	/**
 	 * Index Page for this controller.
@@ -22,8 +29,6 @@ class Vilesci extends FHC_Controller
 	 */
 	public function index()
 	{
-		$this->load->view('templates/header');
-		$this->load->view('vilesci_frameset');
-		$this->load->view('templates/footer');
+		$this->load->view('home');
 	}
 }
