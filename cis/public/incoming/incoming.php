@@ -2123,8 +2123,6 @@ else if($method == 'files')
 		}
 		echo '</tbody></table></center>';
 	}
-	else
-		echo 'foo';
 }
 else if($method == 'ende')
 {
