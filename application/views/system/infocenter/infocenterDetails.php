@@ -1,28 +1,28 @@
 <?php
-	$this->load->view(
-		'templates/FHC-Header',
-		array(
-			'title' => 'InfocenterDetails',
-			'jquery' => true,
-			'bootstrap' => true,
-			'fontawesome' => true,
-			'jqueryui' => true,
-			'tablesorter' => true,
-			'sbadmintemplate' => true,
-			'customCSSs' => 'skin/tablesort_bootstrap.css'
-		)
-	);
+$this->load->view(
+	'templates/FHC-Header',
+	array(
+		'title' => 'InfocenterDetails',
+		'jquery' => true,
+		'bootstrap' => true,
+		'fontawesome' => true,
+		'jqueryui' => true,
+		'tablesorter' => true,
+		'sbadmintemplate' => true,
+		'customCSSs' => array('skin/admintemplate.css', 'skin/tablesort_bootstrap.css')
+	)
+);
 ?>
 <body>
 <div id="wrapper">
 	<?php
-		echo $this->widgetlib->widget(
-			'NavigationWidget',
-			array(
-				'navigationHeader' => $navigationHeaderArray,
-				'navigationMenu' => $navigationMenuArray
-			)
-		);
+	echo $this->widgetlib->widget(
+		'NavigationWidget',
+		array(
+			'navigationHeader' => $navigationHeaderArray,
+			'navigationMenu' => $navigationMenuArray
+		)
+	);
 	?>
 	<div id="page-wrapper">
 		<div class="container-fluid">
@@ -35,7 +35,7 @@
 			<section>
 				<div class="row">
 					<div class="col-lg-12">
-						<div class="panel panel-default">
+						<div class="panel panel-primary">
 							<div class="panel-heading text-center"><h4>Stammdaten</h4></div>
 							<div class="panel-body">
 								<div class="row">
@@ -128,12 +128,17 @@
 													<td>
 														<?php echo ($adresse->heimatadresse === true ? 'Heimatadresse' : '').($adresse->heimatadresse === true && $adresse->rechnungsadresse === true ? ', ' : '').($adresse->rechnungsadresse === true ? 'Rechnungsadresse' : ''); ?>
 													</td>
-												<tr/>
+												</tr>
 											<?php endforeach; ?>
 											</tbody>
 										</table>
-									</div> <!-- ./row -->
-								</div> <!-- ./column -->
+										<?php if (isset($stammdaten->zugangscode)): ?>
+											Zugang Bewerbung: <a
+													href="<?php echo base_url('addons/bewerbung/cis/registration.php?code='.html_escape($stammdaten->zugangscode)) ?>"
+													target='_blank'><?php echo html_escape($stammdaten->zugangscode) ?></a>
+										<?php endif; ?>
+									</div> <!-- ./column -->
+								</div> <!-- ./row -->
 							</div> <!-- ./panel-body -->
 						</div> <!-- ./panel -->
 					</div> <!-- ./main column -->
@@ -142,12 +147,12 @@
 			<section>
 				<div class="row">
 					<div class="col-lg-12">
-						<div class="panel panel-default">
+						<div class="panel panel-primary">
 							<a name="DokPruef"></a><!-- anchor for jumping to the section -->
 							<div class="panel-heading text-center"><h4>Dokumentenpr&uuml;fung</h4></div>
 							<div class="panel-body">
 								<div class="table-responsive">
-									<table id="doctable" class="table table-striped table-bordered">
+									<table id="doctable" class="table table-bordered">
 										<thead>
 										<th>Name</th>
 										<th>Typ</th>
@@ -180,7 +185,7 @@
 								<?php if (count($dokumente_nachgereicht) > 0): ?>
 									<br/>
 									<p>Nachzureichende Dokumente:</p>
-									<table id="nachgdoctable" class="table table-striped table-bordered">
+									<table id="nachgdoctable" class="table table-bordered">
 										<thead>
 										<th>Typ</th>
 										<th>Nachzureichen am</th>
@@ -215,7 +220,7 @@
 			<section>
 				<div class="row">
 					<div class="col-md-12">
-						<div class="panel panel-default">
+						<div class="panel panel-primary">
 							<div class="panel-heading text-center">
 								<a name="ZgvPruef"></a>
 								<h4>ZGV-Pr&uuml;fung</h4>
@@ -225,19 +230,26 @@
 									<?php
 									foreach ($zgvpruefungen as $zgvpruefung):
 										$infoonly = $zgvpruefung->infoonly;
-										$firstcolumns = array(3, 2, 2, 2, 3);
 										//set bootstrap columns
-										if ($infoonly)
-											$columns = array(3, 2, 2, 5);
-										else
-											$columns = array(4, 3, 2, 3);
+										$columns = array(4, 3, 2, 3);
 										?>
+										<br/>
 										<div class="panel panel-default">
 											<div class="panel-heading">
-												<h4 class="panel-title">
-													<a data-toggle="collapse"
-													   href="#collapse<?php echo $zgvpruefung->prestudent_id ?>"><?php echo $zgvpruefung->studiengang.' - '.$zgvpruefung->studiengangbezeichnung ?></a>
-												</h4>
+												<div class="row">
+													<div class="col-lg-8">
+														<h4 class="panel-title">
+															<a data-toggle="collapse"
+															   href="#collapse<?php echo $zgvpruefung->prestudent_id ?>"><?php echo $zgvpruefung->studiengang.' - '.$zgvpruefung->studiengangbezeichnung.' | '.(isset($zgvpruefung->prestudentstatus->status_kurzbz) ? $zgvpruefung->prestudentstatus->status_kurzbz : '');
+																?></a>
+														</h4>
+													</div>
+													<?php if (isset($zgvpruefung->prestudentstatus->status_kurzbz) && $zgvpruefung->prestudentstatus->status_kurzbz === 'Interessent' && !$infoonly): ?>
+														<div class="col-lg-4 text-right">
+															<?php echo 'Bewerbung abgeschickt: '.(isset($zgvpruefung->prestudentstatus->bewerbung_abgeschicktamum) ? '<i class="fa fa-check" style="color:green"></i>' : '<i class="fa fa-times" style="color:red"></i>'); ?>
+														</div>
+													<?php endif ?>
+												</div>
 											</div>
 											<div id="collapse<?php echo $zgvpruefung->prestudent_id ?>"
 												 class="panel-collapse collapse<?php echo $infoonly ? '' : ' in' ?>">
@@ -245,13 +257,7 @@
 													<form method="post"
 														  action="../saveZgvPruefung/<?php echo $zgvpruefung->prestudent_id ?>">
 														<div class="row">
-															<div class="col-lg-<?php echo $firstcolumns[0] ?>">
-																<div class="form-group">
-																	<label>Freigegeben an Studiengang: </label>
-																	<?php echo isset($zgvpruefung->prestudentstatus->bestaetigtam) ? "ja" : "nein" ?>
-																</div>
-															</div>
-															<div class="col-lg-<?php echo $firstcolumns[1] ?>">
+															<div class="col-lg-<?php echo $columns[0] ?>">
 																<div class="form-group">
 																	<label>Letzter Status: </label>
 																	<?php
@@ -262,20 +268,20 @@
 																	?>
 																</div>
 															</div>
-															<div class="col-lg-<?php echo $firstcolumns[2] ?>">
+															<div class="col-lg-<?php echo $columns[1] ?>">
 																<div class="form-group">
 																	<label>Studiensemester: </label>
 																	<?php echo isset($zgvpruefung->prestudentstatus->studiensemester_kurzbz) ? $zgvpruefung->prestudentstatus->studiensemester_kurzbz : '' ?>
 																</div>
 															</div>
-															<div class="col-lg-<?php echo $firstcolumns[3] ?>">
+															<div class="col-lg-<?php echo $columns[2] ?>">
 																<div class="form-group">
 																	<label><span style="display: inline-block">Ausbildungs</span><span
 																				style="display: inline-block">semester: </span></label>
 																	<?php echo isset($zgvpruefung->prestudentstatus->ausbildungssemester) ? $zgvpruefung->prestudentstatus->ausbildungssemester : '' ?>
 																</div>
 															</div>
-															<div class="col-lg-<?php echo $firstcolumns[4] ?>">
+															<div class="col-lg-<?php echo $columns[3] ?>">
 																<div class="form-group">
 																	<label>Orgform: </label>
 																	<span style="display: inline-block">
@@ -405,7 +411,7 @@
 														<?php endif; ?>
 														<?php if (!$infoonly): ?>
 															<div class="row">
-																<div class="col-lg-12">
+																<div class="col-lg-12 text-right">
 																	<button type="submit" class="btn btn-default">
 																		Speichern
 																	</button>
@@ -413,147 +419,169 @@
 															</div>
 														<?php endif; ?>
 													</form>
+												</div>
 
-													<?php
-													//Prestudenten cannot be abgewiesen or freigegeben if already done
-													if (!$infoonly) :
-														?>
-														<hr>
+												<?php
+												//Prestudenten cannot be abgewiesen or freigegeben if already done
+												if (!$infoonly) :
+													?>
+													<div class="panel-footer" style="border-top: 1px solid #ddd">
 														<div class="row">
-															<div class="col-lg-12">
-																<form method="post"
-																	  action="../saveAbsage/<?php echo $zgvpruefung->prestudent_id ?>">
-																	<div class="form-group">
-																		<label class="d-inline float-left">Absagegrund:</label>
-																		<select name="statusgrund"
-																				class="d-inline float-right">
-																			<?php foreach ($statusgruende as $statusgrund): ?>
-																				<option value="<?php echo $statusgrund->statusgrund_id ?>"><?php echo $statusgrund->bezeichnung_mehrsprachig[0] ?></option>
-																			<?php endforeach ?>
-																		</select>
-																	</div>
+															<div class="col-lg-6 text-left">
+																<div class="form-inline">
+																	<form method="post"
+																		  action="../saveAbsage/<?php echo $zgvpruefung->prestudent_id ?>">
+																		<div class="input-group" id="statusgrselect">
+																			<select name="statusgrund"
+																					class="d-inline float-right"
+																					required>
+																				<option value="null"
+																						selected="selected">Absagegrund
+																					w&auml;hlen...
+																				</option>
+																				<?php foreach ($statusgruende as $statusgrund): ?>
+																					<option value="<?php echo $statusgrund->statusgrund_id ?>"><?php echo $statusgrund->bezeichnung_mehrsprachig[0] ?></option>
+																				<?php endforeach ?>
+																			</select>
+																			<span class="input-group-btn">
+																				<button id="absageBtn" type="button"
+																						class="btn btn-default"
+																						data-toggle="modal"
+																						data-target="#absageModal">
+																					Absage
+																				</button>
+																			</span>
+																		</div>
+																		<div class="modal fade" id="absageModal"
+																			 tabindex="-1"
+																			 role="dialog"
+																			 aria-labelledby="absageModalLabel"
+																			 aria-hidden="true">
+																			<div class="modal-dialog">
+																				<div class="modal-content">
+																					<div class="modal-header">
+																						<button type="button"
+																								class="close"
+																								data-dismiss="modal"
+																								aria-hidden="true">
+																							&times;
+																						</button>
+																						<h4 class="modal-title"
+																							id="absageModalLabel">Absage
+																							best&auml;tigen</h4>
+																					</div>
+																					<div class="modal-body">
+																						Bei Absage von InteressentInnen
+																						erhalten
+																						diese den Status "Abgewiesener"
+																						und<br/>deren
+																						Zgvdaten können
+																						im Infocenter nicht mehr
+																						bearbeitet
+																						oder
+																						freigegeben werden.
+																						<br/>Alle nicht gespeicherten
+																						Zgvdaten
+																						gehen
+																						verloren. Fortfahren?
+																					</div>
+																					<div class="modal-footer">
+																						<button type="button"
+																								class="btn btn-default"
+																								data-dismiss="modal">
+																							Abbrechen
+																						</button>
+																						<button type="submit"
+																								class="btn btn-primary">
+																							InteressentIn abweisen
+																						</button>
+																					</div>
+																				</div>
+																				<!-- /.modal-content -->
+																			</div>
+																			<!-- /.modal-dialog -->
+																		</div>
+																	</form>
+																</div>
+															</div><!-- /.column-absage -->
+															<div class="col-lg-6 text-right">
+																<div>
 																	<button type="button" class="btn btn-default"
 																			data-toggle="modal"
-																			data-target="#absageModal">
-																		Absage
+																			data-target="#freigabeModal">
+																		Freigabe an Studiengang
 																	</button>
-																	<div class="modal fade" id="absageModal"
-																		 tabindex="-1"
-																		 role="dialog"
-																		 aria-labelledby="absageModalLabel"
-																		 aria-hidden="true">
-																		<div class="modal-dialog">
-																			<div class="modal-content">
-																				<div class="modal-header">
-																					<button type="button" class="close"
-																							data-dismiss="modal"
-																							aria-hidden="true">&times;
-																					</button>
-																					<h4 class="modal-title"
-																						id="absageModalLabel">Absage
-																						best&auml;tigen</h4>
-																				</div>
-																				<div class="modal-body">
-																					Bei Absage von InteressentInnen
-																					erhalten
-																					diese den Status "Abgewiesener"
-																					und<br/>deren
-																					Zgvdaten können
-																					im Infocenter nicht mehr bearbeitet
-																					oder
-																					freigegeben werden.
-																					<br/>Alle nicht gespeicherten
-																					Zgvdaten
-																					gehen
-																					verloren. Fortfahren?
-																				</div>
-																				<div class="modal-footer">
-																					<button type="button"
-																							class="btn btn-default"
-																							data-dismiss="modal">
-																						Abbrechen
-																					</button>
-																					<button type="submit"
-																							class="btn btn-primary">
-																						InteressentIn abweisen
-																					</button>
-																				</div>
-																			</div>
-																			<!-- /.modal-content -->
-																		</div>
-																		<!-- /.modal-dialog -->
-																	</div>
-																</form>
-															</div>
-														</div>
-														<hr>
-														<div class="row">
-															<div class="col-lg-12">
-																<button type="button" class="btn btn-default"
-																		data-toggle="modal"
-																		data-target="#freigabeModal">
-																	Freigabe an Studiengang
-																</button>
-															</div>
-														</div>
-														<div class="modal fade" id="freigabeModal" tabindex="-1"
-															 role="dialog"
-															 aria-labelledby="freigabeModalLabel" aria-hidden="true">
-															<div class="modal-dialog">
-																<div class="modal-content">
-																	<div class="modal-header">
-																		<button type="button" class="close"
-																				data-dismiss="modal"
-																				aria-hidden="true">&times;
-																		</button>
-																		<h4 class="modal-title" id="freigabeModalLabel">
-																			Freigabe
-																			best&auml;tigen</h4>
-																	</div>
-																	<div class="modal-body">
-																		Bei Freigabe von InteressentInnen wird deren
-																		Interessentenstatus bestätigt und<br/>deren
-																		Zgvdaten
-																		können im
-																		Infocenter nicht mehr bearbeitet oder
-																		freigegeben
-																		werden.
-																		<br/>Alle nicht gespeicherten Zgvdaten gehen
-																		verloren.
-																		Fortfahren?
-																	</div>
-																	<div class="modal-footer">
-																		<button type="button" class="btn btn-default"
-																				data-dismiss="modal">Abbrechen
-																		</button>
-																		<a href="../saveFreigabe/<?php echo $zgvpruefung->prestudent_id ?>">
-																			<button type="button"
-																					class="btn btn-primary">
-																				InteressentIn freigeben
-																			</button>
-																		</a>
-																	</div>
 																</div>
-																<!-- /.modal-content -->
 															</div>
-															<!-- /.modal-dialog -->
-														</div>
-													<?php endif; //end if infoonly
-													?>
-												</div>
-											</div>
-										</div>
+															<div class="modal fade" id="freigabeModal" tabindex="-1"
+																 role="dialog"
+																 aria-labelledby="freigabeModalLabel"
+																 aria-hidden="true">
+																<div class="modal-dialog">
+																	<div class="modal-content">
+																		<div class="modal-header">
+																			<button type="button" class="close"
+																					data-dismiss="modal"
+																					aria-hidden="true">&times;
+																			</button>
+																			<h4 class="modal-title"
+																				id="freigabeModalLabel">
+																				Freigabe
+																				best&auml;tigen</h4>
+																		</div>
+																		<div class="modal-body">
+																			Bei Freigabe von InteressentInnen wird deren
+																			Interessentenstatus bestätigt und<br/>deren
+																			Zgvdaten
+																			können im
+																			Infocenter nicht mehr bearbeitet oder
+																			freigegeben
+																			werden.
+																			<br/>Alle nicht gespeicherten Zgvdaten gehen
+																			verloren.
+																			Fortfahren?
+																		</div>
+																		<div class="modal-footer">
+																			<button type="button"
+																					class="btn btn-default"
+																					data-dismiss="modal">Abbrechen
+																			</button>
+																			<a href="../saveFreigabe/<?php echo $zgvpruefung->prestudent_id ?>">
+																				<button type="button"
+																						class="btn btn-primary">
+																					InteressentIn freigeben
+																				</button>
+																			</a>
+																		</div>
+																	</div><!-- /.modal-content -->
+																</div><!-- /.modal-dialog -->
+															</div><!-- /.modal-fade -->
+														</div><!-- /.row -->
+													</div><!-- /.panel-footer -->
+												<?php elseif (isset($zgvpruefung->prestudentstatus->status_kurzbz) && $zgvpruefung->prestudentstatus->status_kurzbz === 'Interessent'): ?>
+													<div class="panel-footer" style="border-top: 1px solid #ddd">
+														<div class="row">
+															<div class="col-lg-12 text-left">
+																<?php echo isset($zgvpruefung->prestudentstatus->bestaetigtam) ? '<i class="fa fa-check" style="color: green"></i>' : '<i class="fa fa-check" style="color: red"></i>' ?>
+																<label>An Studiengang freigegeben</label>
+															</div>
+														</div><!-- /.row -->
+													</div><!-- /.panel-footer -->
+												<?php endif; //end if infoonly
+												?>
+											</div><!-- /.div collapse -->
+										</div><!-- /.panel -->
 									<?php endforeach; // end foreach zgvpruefungen?>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
+								</div><!-- /.panel-group -->
+							</div><!-- /.main panel body -->
+						</div> <!-- /.main panel-->
+					</div> <!-- /.column freigabe-->
+				</div> <!-- /.row freigabe-->
 			</section>
 			<section>
 				<div class="row">
 					<div class="col-lg-12">
-						<div class="panel panel-default">
+						<div class="panel panel-primary">
 							<div class="panel-heading text-center">
 								<a name="NotizAkt"></a>
 								<h4 class="text-center">Notizen &amp; Aktivit&auml;ten</h4>
@@ -575,7 +603,9 @@
 																				   rows="10"
 																				   cols="32"></textarea>
 												</div>
-												<button type="submit" class="btn btn-default">Speichern</button>
+												<div class="text-right">
+													<button type="submit" class="btn btn-default">Speichern</button>
+												</div>
 											</div>
 										</form>
 										<table id="notiztable" class="table table-bordered table-hover">
@@ -596,15 +626,6 @@
 											<?php endforeach ?>
 											</tbody>
 										</table>
-										<div id="notizpager" class="pager">
-											<form class="form-inline">
-												<i class="fa fa-step-backward first" style="cursor:pointer"></i>
-												<i class="fa fa-backward prev"></i>
-												<span class="pagedisplay"></span>
-												<i class="fa fa-forward next"></i>
-												<i class="fa fa-step-forward last"></i>
-											</form>
-										</div>
 									</div>
 									<div class="col-lg-6">
 										<table id="logtable" class="table table-bordered table-hover">
@@ -624,15 +645,6 @@
 											<?php endforeach ?>
 											</tbody>
 										</table>
-										<div id="logpager" class="pager">
-											<form class="form-inline">
-												<i class="fa fa-step-backward first"></i>
-												<i class="fa fa-backward prev"></i>
-												<span class="pagedisplay"></span>
-												<i class="fa fa-forward next"></i>
-												<i class="fa fa-step-forward last"></i>
-											</form>
-										</div>
 									</div> <!-- ./column -->
 								</div> <!-- ./row -->
 							</div> <!-- ./panel-body -->
@@ -640,17 +652,17 @@
 					</div> <!-- ./main column -->
 				</div> <!-- ./main row -->
 			</section>
-		</div>
-	</div>
-</div>
+		</div> <!-- ./container-fluid-->
+	</div> <!-- ./page-wrapper-->
+</div> <!-- ./wrapper -->
 
 <script>
 
 	$(document).ready(function ()
 		{
 			//initialise table sorter
-			addTablesorter("doctable", [[2, 1], [1, 0]]);
-			addTablesorter("nachgdoctable", [[2, 0], [1, 1]]);
+			addTablesorter("doctable", [[2, 1], [1, 0]], ["zebra"]);
+			addTablesorter("nachgdoctable", [[2, 0], [1, 1]], ["zebra"]);
 			addTablesorter("logtable", [[0, 1]], ["filter"]);
 			addTablesorter("notiztable", [[0, 1]], ["filter"]);
 
@@ -660,7 +672,7 @@
 
 			function addTablesorter(tableid, sortList, widgets)
 			{
-				$("#"+tableid).tablesorter(
+				$("#" + tableid).tablesorter(
 					{
 						theme: "default",
 						dateFormat: "ddmmyyyy",
@@ -668,27 +680,44 @@
 						widgets: widgets
 					}
 				);
+
+				//hide filters if less than 2 datarows (+ 2 for headings and filter row itself)
+				if ($("#" + tableid + " tr").length < 4)
+				{
+					$("#" + tableid + " tr.tablesorter-filter-row").hide();
+				}
 			}
 
-			//not show pager if on first table page
 			function togglePager(size, tableid, pagerid)
 			{
-				var rowcount = $("#"+tableid+" tr").length;
+				var html =
+					'<div id="' + pagerid + '" class="pager"> ' +
+					'<form class="form-inline">' +
+					'<i class="fa fa-step-backward first"></i>&nbsp;' +
+					'<i class="fa fa-backward prev"></i>' +
+					'<span class="pagedisplay"></span>' +
+					'<i class="fa fa-forward next"></i>&nbsp;' +
+					'<i class="fa fa-step-forward last"></i>' +
+					'</form>' +
+					'</div>';
 
+				var rowcount = $("#" + tableid + " tr").length;
+
+				//not show pager if on first table page
 				if (rowcount > size)
 				{
-					$("#"+tableid).tablesorterPager(
+					var table = $("#" + tableid);
+					table.after(html);
+
+					table.tablesorterPager(
 						{
-							container: $("#"+pagerid),
+							container: $("#" + pagerid),
 							size: size,
 							cssDisabled: 'disabled',
-							savePages: false
+							savePages: false,
+							output: '{startRow} – {endRow} / {totalRows} Zeilen'
 						}
 					);
-				}
-				else
-				{
-					$("#"+pagerid).remove();
 				}
 			}
 
@@ -714,6 +743,23 @@
 				});
 			}
 			<?php endforeach ?>
+
+			//prevent opening modal when Statusgrund not chosen
+			$("#absageModal").on('show.bs.modal', function (e)
+				{
+					if ($("[name=statusgrund]").val() === "null")
+					{
+						$("#statusgrselect").addClass("has-error");
+						return e.preventDefault();
+					}
+				}
+			);
+
+			$("[name=statusgrund]").change(function ()
+				{
+					$("#statusgrselect").removeClass("has-error");
+				}
+			);
 		}
 	);
 </script>

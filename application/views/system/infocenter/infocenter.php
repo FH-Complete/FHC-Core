@@ -44,7 +44,7 @@
 		$("select").addClass("form-control");
 		$("input[type=text]").addClass("form-control");
 		$("input[type=button]").addClass("btn btn-default");
-		$("#tableDataset").addClass('table table-bordered table-striped table-responsive table-condensed');
+		$("#tableDataset").addClass('table table-bordered table-responsive table-condensed');
 	</script>
 </body>
 
