@@ -1055,7 +1055,7 @@ class FilterWidget extends Widget
 							}
 							else
 							{
-								$condition = ' < '.$activeFilterValue;
+								$condition = ' > '.$activeFilterValue;
 							}
 
 							break;
@@ -1069,7 +1069,7 @@ class FilterWidget extends Widget
 							}
 							else
 							{
-								$condition = ' > '.$activeFilterValue;
+								$condition = ' < '.$activeFilterValue;
 							}
 							break;
 						case self::OP_CONTAINS:
