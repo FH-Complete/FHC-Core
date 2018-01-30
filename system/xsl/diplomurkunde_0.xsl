@@ -103,7 +103,16 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
 					<xsl:text>die/der</xsl:text>
 				</xsl:otherwise>
 			</xsl:choose>
-						den Fachhochschul-<xsl:value-of select="stg_art" /></text:p>
+			<xsl:if test="stg_art != 'k'"> den</xsl:if>
+			<xsl:if test="stg_art = 'k'"> das</xsl:if> 
+			Fachhochschul-<xsl:choose>
+				<xsl:when test="stg_art='b'">Bachelor</xsl:when>					
+				<xsl:when test="stg_art='m'">Master</xsl:when>					
+				<xsl:when test="stg_art='d'">Diplom</xsl:when>					
+				<xsl:when test="stg_art='l'">Lehrgang</xsl:when>				
+				<xsl:when test="stg_art='k'">Kurzstudium</xsl:when>								
+			</xsl:choose>
+			<xsl:if test="stg_art != 'k' or 'l'">-Studiengang</xsl:if></text:p>
 			<text:p text:style-name="P1"/>
 			<text:p text:style-name="P3"><xsl:value-of select="stg_bezeichnung" /></text:p>
 			<text:p text:style-name="P1">(Studiengangskennzahl <xsl:value-of select="studiengang_kz" />)</text:p>

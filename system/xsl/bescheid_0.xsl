@@ -69,7 +69,7 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
 				<text:sequence-decl text:display-outline-level="0" text:name="Drawing"/>
 			</text:sequence-decls>
 			
-			<text:p text:style-name="Seitenumbruch">Diplom-Urkunde</text:p>
+			<text:p text:style-name="Seitenumbruch">Bescheid</text:p>
 				<!-- Ueberprueft ob benoetigte Datenfelder leer sind -->
 				<xsl:if test="staatsbuergerschaft = ''"><text:p text:style-name="P4">Staatsbürgerschaft nicht angegeben</text:p></xsl:if>
 				<xsl:if test="datum = ''"><text:p text:style-name="P4">Datum der Abschlussprüfung nicht gesetzt</text:p></xsl:if>
@@ -79,9 +79,7 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
 			<text:p text:style-name="P1"/>
 			<text:p text:style-name="P1"/>
 			<text:p text:style-name="P1"/>
-			<text:p text:style-name="P1">Gemäß § 6 Abs. 1 des Bundesgesetzes über Fachhochschul-Studiengänge</text:p>
-			<text:p text:style-name="P1">(Fachhochschul-Studiengesetz - FHStG), BGBl. Nr. <xsl:value-of select="bescheidbgbl1" /> idgF,</text:p>
-			<text:p text:style-name="P1">verleiht das Fachhochschulkollegium</text:p>
+			<text:p text:style-name="P1">Das Kollegium der Fachhochschule Technikum Wien verleiht</text:p>
 			<text:p text:style-name="P1"/>
 			<text:p text:style-name="P3"><xsl:value-of select="anrede" /><xsl:text> </xsl:text><xsl:value-of select="name" /></text:p>
 			<text:p text:style-name="P1"/>
@@ -90,7 +88,7 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
 				<xsl:value-of select="gebort" />
 				<xsl:text>, </xsl:text>
 			</xsl:if>
-			<xsl:value-of select="geburtsnation" />, Staatsbürgerschaft <xsl:value-of select="staatsbuergerschaft" />,</text:p>
+			<xsl:value-of select="geburtsnation" /></text:p>
 			<text:p text:style-name="P1">
 			<xsl:choose>
 				<xsl:when test="contains(anrede, 'err')">
@@ -102,30 +100,41 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
 				<xsl:otherwise>
 					<xsl:text>die/der</xsl:text>
 				</xsl:otherwise>
-			</xsl:choose>					
-			<xsl:if test="stg_art != 'k'"> den</xsl:if>
-			<xsl:if test="stg_art = 'k'"> das</xsl:if> 
-			Fachhochschul-<xsl:choose>
+			</xsl:choose>
+			durch Ablegung der 
+			<xsl:choose>
 				<xsl:when test="stg_art='b'">Bachelor</xsl:when>					
 				<xsl:when test="stg_art='m'">Master</xsl:when>					
 				<xsl:when test="stg_art='d'">Diplom</xsl:when>					
 				<xsl:when test="stg_art='l'">Lehrgang</xsl:when>				
 				<xsl:when test="stg_art='k'">Kurzstudium</xsl:when>								
-			</xsl:choose>
-			<xsl:if test="stg_art != 'k' or 'l'">-Studiengang</xsl:if></text:p>
+			</xsl:choose>prüfung am  			
+			<xsl:value-of select="datum" /> den</text:p>
+			<text:p text:style-name="P1">
+			<xsl:choose>
+				<xsl:when test="stg_art='b'">Bachelor</xsl:when>					
+				<xsl:when test="stg_art='m'">Master</xsl:when>					
+				<xsl:when test="stg_art='d'">Diplom</xsl:when>					
+				<xsl:when test="stg_art='l'">Lehrgang</xsl:when>				
+				<xsl:when test="stg_art='k'">Kurzstudium</xsl:when>								
+			</xsl:choose>studiengang</text:p>
 			<text:p text:style-name="P1"/>
 			<text:p text:style-name="P3"><xsl:value-of select="stg_bezeichnung" /></text:p>
 			<text:p text:style-name="P1">(Studiengangskennzahl <xsl:value-of select="studiengang_kz" />)</text:p>
 			<text:p text:style-name="P1"/>
-			<text:p text:style-name="P1">an der Fachhochschule Technikum Wien</text:p>
-			<text:p text:style-name="P1">durch Ablegung der Bachelor-Prüfung am <xsl:value-of select="datum" /> ordnungsgemäß abgeschlossen hat,</text:p>
-			<text:p text:style-name="P1">den mit Bescheid des Board der Agentur für Qualitätssicherung und Akkreditierung Austria vom 9.5.2012,</text:p>
-			<text:p text:style-name="P1">GZ FH12020016 idgF, gemäß § 6 Abs. 2 FHStG</text:p>
-			<text:p text:style-name="P1">festgesetzten akademischen Grad</text:p>
+			<text:p text:style-name="P1">ordnungsgemäß abgeschlossen hat,</text:p>
+			<text:p text:style-name="P1">gemäß § 6 Abs 1 FHStG, BGBl. Nr. 340/1993, idgF,</text:p>
+			<text:p text:style-name="P1">den akademischen Grad</text:p>
 			<text:p text:style-name="P1"/>
 			<text:p text:style-name="P3"><xsl:value-of select="titel" /></text:p>
 			<text:p text:style-name="P1">abgekürzt</text:p>
-			<text:p text:style-name="P3"><xsl:value-of select="akadgrad_kurzbz" /></text:p>
+			<text:p text:style-name="P3"><xsl:value-of select="akadgrad_kurzbz" />.</text:p>
+			<text:p text:style-name="P1"/>
+			<text:p text:style-name="P1"/>
+			<text:p text:style-name="P1">Rechtsmittelbelehrung: Gegen diesen Bescheid ist gemäß § 10 Abs 6 FHStG, BGBl. Nr.</text:p>
+			<text:p text:style-name="P1">340/1993, idgF, eine Beschwerde beim Bundesverwaltungsgericht zulässig. Sie ist innerhalb</text:p>
+			<text:p text:style-name="P1">von vier Wochen ab Zustellung bei der belangten Behörde (Kollegium der Fachhochschule</text:p>
+			<text:p text:style-name="P1">Technikum Wien) einzubringen.</text:p>
 			<text:p text:style-name="P1"/>
 			<text:p text:style-name="P1">Wien, <xsl:value-of select="sponsion" /></text:p>
 			<text:p text:style-name="P1"/>

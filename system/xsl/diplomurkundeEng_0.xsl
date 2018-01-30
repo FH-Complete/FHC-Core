@@ -89,7 +89,15 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
 				<xsl:text>, </xsl:text>
 			</xsl:if>
 			<xsl:value-of select="geburtsnation_engl" />, citizen of <xsl:value-of select="staatsbuergerschaft_engl" />,</text:p>
-			<text:p text:style-name="P1">student of the university of applied sciences <xsl:value-of select="stg_art_engl" />'s degree program</text:p>
+			<text:p text:style-name="P1">student of the university of applied sciences 
+				<xsl:choose>
+					<xsl:when test="stg_art='b'">Bachelor</xsl:when>					
+					<xsl:when test="stg_art='m'">Master</xsl:when>					
+					<xsl:when test="stg_art='d'">Diploma</xsl:when>					
+					<xsl:when test="stg_art='l'">Course</xsl:when>				
+					<xsl:when test="stg_art='k'">Short study</xsl:when>											
+				</xsl:choose>
+				<xsl:if test="stg_art != 'l' or 'k'" >'s</xsl:if> degree program</text:p>
 			<text:p text:style-name="P1"/>
 			<text:p text:style-name="P3"><xsl:value-of select="stg_bezeichnung_engl" /></text:p>
 			<text:p text:style-name="P1">(program classification number <xsl:value-of select="studiengang_kz" />)</text:p>

@@ -68,70 +68,66 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
 				<text:sequence-decl text:display-outline-level="0" text:name="Text"/>
 				<text:sequence-decl text:display-outline-level="0" text:name="Drawing"/>
 			</text:sequence-decls>
-			
-			<text:p text:style-name="Seitenumbruch">Diplom-Urkunde</text:p>
+			<text:p text:style-name="Seitenumbruch"><xsl:value-of select="titel" /></text:p>
 				<!-- Ueberprueft ob benoetigte Datenfelder leer sind -->
 				<xsl:if test="staatsbuergerschaft = ''"><text:p text:style-name="P4">Staatsbürgerschaft nicht angegeben</text:p></xsl:if>
 				<xsl:if test="datum = ''"><text:p text:style-name="P4">Datum der Abschlussprüfung nicht gesetzt</text:p></xsl:if>
 				<xsl:if test="titel = ''"><text:p text:style-name="P4">Kein akademischer Grad ausgewählt</text:p></xsl:if>
 				<xsl:if test="sponsion = ''"><text:p text:style-name="P4">Sponsionsdatum nicht gesetzt</text:p></xsl:if>
-			
 			<text:p text:style-name="P1"/>
 			<text:p text:style-name="P1"/>
 			<text:p text:style-name="P1"/>
-			<text:p text:style-name="P1">Gemäß § 6 Abs. 1 des Bundesgesetzes über Fachhochschul-Studiengänge</text:p>
-			<text:p text:style-name="P1">(Fachhochschul-Studiengesetz - FHStG), BGBl. Nr. <xsl:value-of select="bescheidbgbl1" /> idgF,</text:p>
-			<text:p text:style-name="P1">verleiht das Fachhochschulkollegium</text:p>
+			<text:p text:style-name="P1">The Council of the University of Applied Sciences Technikum Wien hereby awards</text:p>
 			<text:p text:style-name="P1"/>
-			<text:p text:style-name="P3"><xsl:value-of select="anrede" /><xsl:text> </xsl:text><xsl:value-of select="name" /></text:p>
+			<text:p text:style-name="P3"><xsl:value-of select="anrede_engl" /><xsl:text> </xsl:text><xsl:value-of select="name" /></text:p>
 			<text:p text:style-name="P1"/>
-			<text:p text:style-name="P1">geboren am <xsl:value-of select="gebdatum" /> in 
+			<text:p text:style-name="P1">born on <xsl:value-of select="gebdatum" /> in 
 			<xsl:if test="string-length(gebort)!=0">
 				<xsl:value-of select="gebort" />
 				<xsl:text>, </xsl:text>
 			</xsl:if>
-			<xsl:value-of select="geburtsnation" />, Staatsbürgerschaft <xsl:value-of select="staatsbuergerschaft" />,</text:p>
-			<text:p text:style-name="P1">
+			<xsl:value-of select="geburtsnation_engl" /></text:p>
+			<text:p text:style-name="P1">who, by taking the 
 			<xsl:choose>
-				<xsl:when test="contains(anrede, 'err')">
-					<xsl:text>der</xsl:text>
-				</xsl:when>
-				<xsl:when test="contains(anrede, 'rau')">
-					<xsl:text>die</xsl:text>
-				</xsl:when>
-				<xsl:otherwise>
-					<xsl:text>die/der</xsl:text>
-				</xsl:otherwise>
-			</xsl:choose>					
-			<xsl:if test="stg_art != 'k'"> den</xsl:if>
-			<xsl:if test="stg_art = 'k'"> das</xsl:if> 
-			Fachhochschul-<xsl:choose>
 				<xsl:when test="stg_art='b'">Bachelor</xsl:when>					
 				<xsl:when test="stg_art='m'">Master</xsl:when>					
-				<xsl:when test="stg_art='d'">Diplom</xsl:when>					
-				<xsl:when test="stg_art='l'">Lehrgang</xsl:when>				
-				<xsl:when test="stg_art='k'">Kurzstudium</xsl:when>								
-			</xsl:choose>
-			<xsl:if test="stg_art != 'k' or 'l'">-Studiengang</xsl:if></text:p>
+				<xsl:when test="stg_art='d'">Diploma</xsl:when>					
+				<xsl:when test="stg_art='l'">Course</xsl:when>				
+				<xsl:when test="stg_art='k'">Short study</xsl:when>											
+			</xsl:choose> examination on 
+			<xsl:value-of select="datum" />, has duly completed the</text:p>
+			<text:p text:style-name="P1">
+			<xsl:choose>
+				<xsl:when test="stg_art='b'">Bachelor</xsl:when>					
+				<xsl:when test="stg_art='m'">Master</xsl:when>					
+				<xsl:when test="stg_art='d'">Diploma</xsl:when>					
+				<xsl:when test="stg_art='l'">Course</xsl:when>				
+				<xsl:when test="stg_art='k'">Short study</xsl:when>											
+			</xsl:choose><xsl:if test="stg_art != 'l' or 'k'" >'s</xsl:if> degree program</text:p>
 			<text:p text:style-name="P1"/>
-			<text:p text:style-name="P3"><xsl:value-of select="stg_bezeichnung" /></text:p>
-			<text:p text:style-name="P1">(Studiengangskennzahl <xsl:value-of select="studiengang_kz" />)</text:p>
+			<text:p text:style-name="P3"><xsl:value-of select="stg_bezeichnung_engl" /></text:p>
+			<text:p text:style-name="P1">(Degree Program Code <xsl:value-of select="studiengang_kz" />)</text:p>
 			<text:p text:style-name="P1"/>
-			<text:p text:style-name="P1">an der Fachhochschule Technikum Wien</text:p>
-			<text:p text:style-name="P1">durch Ablegung der Bachelor-Prüfung am <xsl:value-of select="datum" /> ordnungsgemäß abgeschlossen hat,</text:p>
-			<text:p text:style-name="P1">den mit Bescheid des Board der Agentur für Qualitätssicherung und Akkreditierung Austria vom 9.5.2012,</text:p>
-			<text:p text:style-name="P1">GZ FH12020016 idgF, gemäß § 6 Abs. 2 FHStG</text:p>
-			<text:p text:style-name="P1">festgesetzten akademischen Grad</text:p>
+			<text:p text:style-name="P1">according to § 6 Abs 1 FHStG, BGBl. No. 340/1993, as amended,</text:p>
+			<text:p text:style-name="P1">the academic degree of</text:p>
 			<text:p text:style-name="P1"/>
-			<text:p text:style-name="P3"><xsl:value-of select="titel" /></text:p>
-			<text:p text:style-name="P1">abgekürzt</text:p>
-			<text:p text:style-name="P3"><xsl:value-of select="akadgrad_kurzbz" /></text:p>
 			<text:p text:style-name="P1"/>
-			<text:p text:style-name="P1">Wien, <xsl:value-of select="sponsion" /></text:p>
+			<text:p text:style-name="P3"><xsl:value-of select="titel" /> (<xsl:value-of select="akadgrad_kurzbz" />)</text:p>
 			<text:p text:style-name="P1"/>
-			<text:p text:style-name="P1">Für das Fachhochschulkollegium</text:p>
-			<text:p text:style-name="P1">Der Rektor</text:p>
 			<text:p text:style-name="P1"/>
+			<text:p text:style-name="P1">Appeal notice: An appeal against this decision may be lodged with the Federal Administrative</text:p>
+			<text:p text:style-name="P1">Court (Bundesverwaltungsgericht) in accordance with Section 10 (6) of the FHStG, Federal</text:p>
+			<text:p text:style-name="P1">Law Gazette no. 340/1993, as amended. It must be submitted to the relevant authority</text:p>
+			<text:p text:style-name="P1">(Council of the University of Applied Sciences Technikum Wien) within four weeks of</text:p>
+			<text:p text:style-name="P1">notification.</text:p>
+			<text:p text:style-name="P1"/>
+			<text:p text:style-name="P1"/>
+			<text:p text:style-name="P1"/>
+			<text:p text:style-name="P1">Vienna, <xsl:value-of select="sponsion" /></text:p>
+			<text:p text:style-name="P1"/>
+			<text:p text:style-name="P1"/>
+			<text:p text:style-name="P1">For the UAS Council</text:p>
+			<text:p text:style-name="P1">The Rector</text:p>
 			<text:p text:style-name="P1"/>
 			<text:p text:style-name="P1"/>
 			<text:p text:style-name="P1"/>

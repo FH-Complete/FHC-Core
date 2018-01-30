@@ -183,22 +183,6 @@ if($db->db_query($qry))
 		if($row->sponsion=='')
 			$row->sponsion=$row->datum;
 
-		if($studiengang->typ=='m')
-		{
-			$stg_art='Master-Studiengang';
-			$stg_art_engl='master';
-		}
-		elseif($studiengang->typ=='b')
-		{
-			$stg_art='Bachelor-Studiengang';
-			$stg_art_engl='bachelor';
-		}
-		else
-		{
-			$stg_art='Diplom-Studiengang';
-			$stg_art_engl='diploma';
-		}
-
 		$oe = new organisationseinheit();
 		$parents = $oe->getParents($studiengang->oe_kurzbz);
 		$oe_parent = "";
@@ -271,9 +255,8 @@ if($db->db_query($qry))
 		<stg_bezeichnung><![CDATA['.$studiengang->bezeichnung.']]></stg_bezeichnung>
 		<stg_bezeichnung2><![CDATA['.$studiengang_bezeichnung2[1].']]></stg_bezeichnung2>
 		<stg_bezeichnung_engl><![CDATA['.$studiengang->english.']]></stg_bezeichnung_engl>
-		<stg_oe_parent><![CDATA['.$oe_parent.']]></stg_oe_parent>
-		<stg_art><![CDATA['.$stg_art.']]></stg_art>
-		<stg_art_engl><![CDATA['.$stg_art_engl.']]></stg_art_engl>
+		<stg_oe_parent><![CDATA['.$oe_parent.']]></stg_oe_parent>		
+		<stg_art><![CDATA['.$studiengang->typ.']]></stg_art>	
 		<akadgrad_kurzbz><![CDATA['.$akadgrad->akadgrad_kurzbz.']]></akadgrad_kurzbz>
 		<titel><![CDATA['.$akadgrad->titel.']]></titel>
 		<datum_aktuell><![CDATA['.date('d.m.Y').']]></datum_aktuell>
