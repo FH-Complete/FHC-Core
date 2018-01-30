@@ -1051,11 +1051,11 @@ class FilterWidget extends Widget
 								&& ($activeFiltersOption[$field] == self::OPT_DAYS
 								|| $activeFiltersOption[$field] == self::OPT_MONTHS))
 							{
-								$condition = ' > (NOW() - \''.$activeFilterValue.' '.$activeFiltersOption[$field].'\'::interval)';
+								$condition = ' < (NOW() - \''.$activeFilterValue.' '.$activeFiltersOption[$field].'\'::interval)';
 							}
 							else
 							{
-								$condition = ' > '.$activeFilterValue;
+								$condition = ' < '.$activeFilterValue;
 							}
 
 							break;
@@ -1065,11 +1065,11 @@ class FilterWidget extends Widget
 								&& ($activeFiltersOption[$field] == self::OPT_DAYS
 								|| $activeFiltersOption[$field] == self::OPT_MONTHS))
 							{
-								$condition = ' < (NOW() - \''.$activeFilterValue.' '.$activeFiltersOption[$field].'\'::interval)';
+								$condition = ' > (NOW() - \''.$activeFilterValue.' '.$activeFiltersOption[$field].'\'::interval)';
 							}
 							else
 							{
-								$condition = ' < '.$activeFilterValue;
+								$condition = ' > '.$activeFilterValue;
 							}
 							break;
 						case self::OP_CONTAINS:
