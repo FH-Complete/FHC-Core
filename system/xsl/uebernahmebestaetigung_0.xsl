@@ -218,6 +218,25 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
 				</table:table-row>
 				</xsl:if>
 				<table:table-row>
+					<table:table-cell table:style-name="Tabelle2.A1" office:value-type="string">
+						<text:p text:style-name="P18">Bestellnummer</text:p>
+					</table:table-cell>
+					<table:table-cell table:style-name="Tabelle2.B1" office:value-type="string">
+						<text:p text:style-name="P17"><xsl:value-of select="bestellnummer" /></text:p>
+					</table:table-cell>
+				</table:table-row>
+				<!--add line "firma" only if hersteller is not null-->
+				<xsl:if test="hersteller != ''">
+					<table:table-row>
+						<table:table-cell table:style-name="Tabelle2.A1" office:value-type="string">
+							<text:p text:style-name="P18">Firma</text:p>
+						</table:table-cell>
+						<table:table-cell table:style-name="Tabelle2.B1" office:value-type="string">
+							<text:p text:style-name="P17"><xsl:value-of select="hersteller" /></text:p>
+						</table:table-cell>
+					</table:table-row>
+				</xsl:if>
+				<table:table-row>
 					<table:table-cell table:style-name="Tabelle2.A2" office:value-type="string">
 						<text:p text:style-name="P18">Inventarnummer</text:p>
 					</table:table-cell>

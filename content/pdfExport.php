@@ -45,6 +45,7 @@ require_once('../include/addon.class.php');
 require_once('../include/studiengang.class.php');
 require_once('../include/studiensemester.class.php');
 require_once('../include/studienordnung.class.php');
+//require_once('../include/betriebsmittel.class.php');
 
 $user = get_uid();
 $db = new basis_db();
@@ -363,6 +364,7 @@ if(!$xml_found)
 // Load the XML source
 $xml_doc = new DOMDocument;
 
+//echo $xml_url;
 if(!$xml_doc->load($xml_url))
 	die('unable to load xml: '.$xml_url);
 

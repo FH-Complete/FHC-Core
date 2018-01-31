@@ -34,6 +34,7 @@ require_once('../include/datum.class.php');
 require_once('../include/organisationseinheit.class.php');
 require_once('../include/person.class.php');
 require_once('../include/betriebsmitteltyp.class.php');
+require_once('../include/betriebsmittel.class.php');
 
 if(isset($_GET['person_id']))
 	$person_id = $_GET['person_id'];
@@ -109,6 +110,9 @@ else
 	$bmt = new betriebsmitteltyp();
 	$bmt->load($bmp->betriebsmitteltyp);
 	$typ = $bmt->result[0]->beschreibung;
+	
+	$bm = new betriebsmittel($bmp->betriebsmittel_id);
+
 	echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 	echo '
 	<betriebsmittelperson>
@@ -129,6 +133,8 @@ else
 		<nummer><![CDATA['.$bmp->nummer.']]></nummer>
 		<nummer2><![CDATA['.$bmp->nummer2.']]></nummer2>
 		<betriebsmitteltyp><![CDATA['.$bmp->betriebsmitteltyp.']]></betriebsmitteltyp>
+		<bestellnummer><![CDATA['.$bm->bestellung_id.']]></bestellnummer>
+		<hersteller><![CDATA['.$bm->hersteller.']]></hersteller>
 		<typ><![CDATA['.$typ.']]></typ>
 		<datum><![CDATA['.date("d.m.Y").']]></datum>
 	</betriebsmittelperson>
