@@ -1124,6 +1124,7 @@ function StudentAuswahl()
 		document.getElementById('student-tab-zeugnis').collapsed=true;
 		document.getElementById('student-tab-betriebsmittel').collapsed=true;
 		document.getElementById('student-tab-io').collapsed=true;
+		document.getElementById('student-tab-mobilitaet').hidden=true;		
 		document.getElementById('student-tab-noten').collapsed=true;
 		document.getElementById('student-tab-pruefung').collapsed=true;
 		document.getElementById('student-tab-abschlusspruefung').collapsed=true;
