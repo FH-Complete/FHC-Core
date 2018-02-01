@@ -11,4 +11,11 @@ class Benutzer_model extends DB_Model
 		$this->dbTable = 'public.tbl_benutzer';
 		$this->pk = 'uid';
 	}
+
+	public function getFromPersonId($person_id)
+	{
+		/*$this->addSelect('uid, aktiv, alias');*/
+		$this->loadWhere(array('person_id' => $person_id));
+	}
+
 }

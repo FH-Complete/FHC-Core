@@ -4,6 +4,8 @@ if (! defined('BASEPATH')) exit('No direct script access allowed');
 
 class Messages extends VileSci_Controller
 {
+	private $uid; // contains the UID of the logged user
+
 	/**
 	 *
 	 */
@@ -17,7 +19,12 @@ class Messages extends VileSci_Controller
         // Loads the widget library
 		$this->load->library('WidgetLib');
 
+		// Loads the person log library
+		$this->load->library('PersonLogLib');
+
 		$this->load->model('person/Person_model', 'PersonModel');
+
+		$this->_setAuthUID(); // sets property uid
     }
 
 	/**
@@ -76,7 +83,7 @@ class Messages extends VileSci_Controller
 
 		$data = array (
 			'sender_id' => $sender_id,
-			'receivers' => $msgVarsData->retval,
+			'receivers' => isset($msgVarsData->retval) ? $msgVarsData->retval : $msgVarsData,
 			'message' => $msg,
 			'variables' => $variablesArray,
 			'oe_kurzbz' => $oe_kurzbz, // used to get the templates
@@ -200,6 +207,21 @@ class Messages extends VileSci_Controller
 					$error = true;
 					break;
 				}
+
+				//write log entry
+				$this->personloglib->log(
+					$dataArray['person_id'],
+					'Action',
+					array(
+						'name' => 'Message sent',
+						'message' => 'Message sent from person '.$sender_id.' to '.$dataArray['person_id'].', messageid '.$msg->retval,
+						'success' => 'true'
+					),
+					'kommunikation',
+					'core',
+					null,
+					$this->uid
+				);
 			}
 		}
 
@@ -231,6 +253,16 @@ class Messages extends VileSci_Controller
 		}
 
 		return $person_id;
+	}
+
+	/**
+	 * Retrieve the UID of the logged user and checks if it is valid
+	 */
+	private function _setAuthUID()
+	{
+		$this->uid = getAuthUID();
+
+		if (!$this->uid) show_error('User authentification failed');
 	}
 
 	/**
