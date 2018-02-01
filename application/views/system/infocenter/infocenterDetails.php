@@ -91,7 +91,6 @@ $this->load->view(
 											<tr>
 												<th class="text-center">Typ</th>
 												<th class="text-center">Kontakt</th>
-												<th class="text-center">Zustellung</th>
 												<th class="text-center">Anmerkung</th>
 											</tr>
 											</thead>
@@ -111,7 +110,6 @@ $this->load->view(
 														</a>
 													<?php endif; ?>
 													</td>
-													<td class="text-center"><?php echo $kontakt->zustellung === true ? '<span class="glyphicon glyphicon-ok"></span>' : ''; ?></td>
 													<td><?php echo $kontakt->anmerkung; ?></td>
 												</tr>
 											<?php endforeach; ?>
@@ -122,9 +120,6 @@ $this->load->view(
 													</td>
 													<td>
 														<?php echo isset($adresse) ? $adresse->strasse.', '.$adresse->plz.' '.$adresse->ort : '' ?>
-													</td>
-													<td class="text-center">
-														<?php echo $adresse->zustelladresse === true ? '<span class="glyphicon glyphicon-ok"></span>' : '' ?>
 													</td>
 													<td>
 														<?php echo ($adresse->heimatadresse === true ? 'Heimatadresse' : '').($adresse->heimatadresse === true && $adresse->rechnungsadresse === true ? ', ' : '').($adresse->rechnungsadresse === true ? 'Rechnungsadresse' : ''); ?>
@@ -148,7 +143,7 @@ $this->load->view(
 													<a
 															href="<?php echo base_url('addons/bewerbung/cis/registration.php?code='.html_escape($stammdaten->zugangscode)) ?>"
 															target='_blank'><i
-																class="glyphicon glyphicon-new-window"></i>&nbspZugang
+																class="glyphicon glyphicon-new-window"></i>&nbsp;Zugang
 														Bewerbung</a>
 												</div>
 											<?php endif; ?>

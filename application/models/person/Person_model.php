@@ -157,9 +157,10 @@ class Person_model extends DB_Model
 	 * gets Stammdaten for a person, including contactdata in textform from other tables
 	 * nation, kontakt, adresse
 	 * @param $person_id
+	 * @param bool $zustellung_only, when true, retrieve only Zustellkontakte
 	 * @return array, null when no person found
 	 */
-	public function getPersonStammdaten($person_id)
+	public function getPersonStammdaten($person_id, $zustellung_only = false)
 	{
 		$this->addSelect('public.tbl_person.*, s.kurztext as staatsbuergerschaft, g.kurztext as geburtsnation');
 		$this->addJoin('bis.tbl_nation s', 'public.tbl_person.staatsbuergerschaft = s.nation_code', 'LEFT');
@@ -180,11 +181,12 @@ class Person_model extends DB_Model
 		$this->KontaktModel->addDistinct();
 		$this->KontaktModel->addSelect('kontakttyp, anmerkung, kontakt, zustellung');
 		$this->KontaktModel->addOrder('kontakttyp');
-		$kontakte = $this->KontaktModel->loadWhere(array('person_id' => $person_id));
+		$where = $zustellung_only === true ? array('person_id' => $person_id, 'zustellung' => true) : array('person_id' => $person_id);
+		$kontakte = $this->KontaktModel->loadWhere($where);
 		if($kontakte->error)
 			return error($kontakte->retval);
-
-		$adressen = $this->AdresseModel->loadWhere(array('person_id' => $person_id));
+		$where = $zustellung_only === true ? array('person_id' => $person_id, 'zustelladresse' => true) : array('person_id' => $person_id);
+		$adressen = $this->AdresseModel->loadWhere($where);
 		if($adressen->error)
 			return error($adressen->retval);
 
