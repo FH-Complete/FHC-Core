@@ -474,7 +474,7 @@ class InfoCenter extends VileSci_Controller
 
 		if (isError($dokumente_nachgereicht))
 		{
-			show_error($dokumente->retval);
+			show_error($dokumente_nachgereicht->retval);
 		}
 
 		$logs = $this->personloglib->getLogs($person_id);
@@ -486,12 +486,22 @@ class InfoCenter extends VileSci_Controller
 			show_error($notizen->retval);
 		}
 
+		$user_person = $this->PersonModel->getByUid($this->uid);
+
+		if (isError($user_person))
+		{
+			show_error($user_person->retval);
+		}
+
+		$messagelink = base_url('/index.ci.php/system/Messages/write/'.$user_person->retval[0]->person_id);
+
 		$data = array (
 			'stammdaten' => $stammdaten->retval,
 			'dokumente' => $dokumente->retval,
 			'dokumente_nachgereicht' => $dokumente_nachgereicht->retval,
 			'logs' => $logs,
-			'notizen' => $notizen->retval
+			'notizen' => $notizen->retval,
+			'messagelink' => $messagelink
 		);
 
 		return $data;

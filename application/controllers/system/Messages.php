@@ -26,6 +26,8 @@ class Messages extends VileSci_Controller
 	public function write($sender_id, $msg_id = null, $receiver_id = null)
 	{
 		$prestudent_id = $this->input->post('prestudent_id');
+		$person_id = $this->input->post('person_id');
+
 		$msg = null;
 
 		// Get message data if possible
@@ -42,30 +44,15 @@ class Messages extends VileSci_Controller
 			}
 		}
 
+		$variablesArray = array();
+		$msgVarsData = array();
+
 		// Get variables
 		$this->load->model('system/Message_model', 'MessageModel');
-		$msgVarsDataByPrestudentId = $this->MessageModel->getMsgVarsDataByPrestudentId($prestudent_id);
-		if ($msgVarsDataByPrestudentId->error)
-		{
-			show_error($msgVarsDataByPrestudentId->retval);
-		}
-
-		if (!hasData($variables = $this->MessageModel->getMessageVars()))
-		{
-			unset($variables);
-		}
-		else
-		{
-			$variablesArray = array();
-			// Skip person_id and prestudent_id
-			for($i = 2; $i < count($variables->retval); $i++)
-			{
-				$variablesArray['{'.str_replace(" ", "_", strtolower($variables->retval[$i])).'}'] = $variables->retval[$i];
-			}
-		}
-
-		array_shift($variables->retval); // Remove person_id
-		array_shift($variables->retval); // Remove prestudent_id
+		if($prestudent_id !== null)
+			$this->getPrestudentMsgData($prestudent_id, $variablesArray, $msgVarsData);
+		elseif($person_id !== null)
+			$this->getPersonMsgData($person_id, $variablesArray, $msgVarsData);
 
 		// Organisation units used to get the templates
 		$oe_kurzbz = array(); // A person can have more organisation units
@@ -89,7 +76,7 @@ class Messages extends VileSci_Controller
 
 		$data = array (
 			'sender_id' => $sender_id,
-			'receivers' => $msgVarsDataByPrestudentId->retval,
+			'receivers' => $msgVarsData->retval,
 			'message' => $msg,
 			'variables' => $variablesArray,
 			'oe_kurzbz' => $oe_kurzbz, // used to get the templates
@@ -97,6 +84,56 @@ class Messages extends VileSci_Controller
 		);
 
 		$v = $this->load->view('system/messageWrite', $data);
+	}
+
+	private function getPrestudentMsgData($prestudent_id, &$variablesArray, &$msgVarsData)
+	{
+		$msgVarsData = $this->MessageModel->getMsgVarsDataByPrestudentId($prestudent_id);
+		if ($msgVarsData->error)
+		{
+			show_error($msgVarsData->retval);
+		}
+
+		if (!hasData($variables = $this->MessageModel->getMessageVars()))
+		{
+			unset($variables);
+		}
+		else
+		{
+			$variablesArray = array();
+			// Skip person_id and prestudent_id
+			for($i = 2; $i < count($variables->retval); $i++)
+			{
+				$variablesArray['{'.str_replace(" ", "_", strtolower($variables->retval[$i])).'}'] = $variables->retval[$i];
+			}
+		}
+
+		array_shift($variables->retval); // Remove person_id
+		array_shift($variables->retval); // Remove prestudent_id
+	}
+
+	private function getPersonMsgData($person_id, &$variablesArray, &$msgVarsData)
+	{
+		$msgVarsData = $this->MessageModel->getMsgVarsDataByPersonId($person_id);
+		if ($msgVarsData->error)
+		{
+			show_error($msgVarsData->retval);
+		}
+
+		if (!hasData($variables = $this->MessageModel->getMessageVarsPerson()))
+		{
+			unset($variables);
+		}
+		else
+		{
+			$variablesArray = array();
+			// Skip person_id
+			for($i = 1; $i < count($variables->retval); $i++)
+			{
+				$variablesArray['{'.str_replace(" ", "_", strtolower($variables->retval[$i])).'}'] = $variables->retval[$i];
+			}
+			array_shift($variables->retval); // Remove person_id
+		}
 	}
 
 	/**
@@ -109,6 +146,7 @@ class Messages extends VileSci_Controller
 		$subject = $this->input->post('subject');
 		$body = $this->input->post('body');
 		$prestudents = $this->input->post('prestudents');
+		$persons = $this->input->post('persons');
 		$relationmessage_id = $this->input->post('relationmessage_id');
 
 		if (!isset($relationmessage_id) || $relationmessage_id == '')
@@ -116,15 +154,20 @@ class Messages extends VileSci_Controller
 			$relationmessage_id = null;
 		}
 
-		//
-		$data = $this->MessageModel->getMsgVarsDataByPrestudentId($prestudents);
+		// get message data of prestudents or persons
+		$prestudentsData = array();
+		if($prestudents !== null)
+		{
+			$data = $this->MessageModel->getMsgVarsDataByPrestudentId($prestudents);
+			//
+			$this->load->model('crm/Prestudent_model', 'PrestudentModel');
+			$prestudentsData = $this->PrestudentModel->getOrganisationunits($prestudents);
+		}
+		else
+			$data = $this->MessageModel->getMsgVarsDataByPersonId($persons);
 
-		//
-		$this->load->model('crm/Prestudent_model', 'PrestudentModel');
-		$prestudentsData = $this->PrestudentModel->getOrganisationunits($prestudents);
-
-		//
-		if (hasData($data) && hasData($prestudentsData))
+		// send message(s)
+		if (hasData($data))
 		{
 			for ($i = 0; $i < count($data->retval); $i++)
 			{
@@ -138,12 +181,15 @@ class Messages extends VileSci_Controller
 
 				$parsedText = $this->messagelib->parseMessageText($body, $dataArray);
 
-				$oe_kurzbz = '';
-				for ($p = 0; $p < count($prestudentsData->retval); $p++)
+				$oe_kurzbz = null;
+				if(hasData($prestudentsData))
 				{
-					if ($prestudentsData->retval[$p]->prestudent_id == $data->retval[$i]->prestudent_id)
+					for ($p = 0; $p < count($prestudentsData->retval); $p++)
 					{
-						$oe_kurzbz = $prestudentsData->retval[$p]->oe_kurzbz;
+						if ($prestudentsData->retval[$p]->prestudent_id == $data->retval[$i]->prestudent_id)
+						{
+							$oe_kurzbz = $prestudentsData->retval[$p]->oe_kurzbz;
+						}
 					}
 				}
 

@@ -157,13 +157,13 @@ class Person_model extends DB_Model
 	 * gets Stammdaten for a person, including contactdata in textform from other tables
 	 * nation, kontakt, adresse
 	 * @param $person_id
-	 * @return array
+	 * @return array, null when no person found
 	 */
 	public function getPersonStammdaten($person_id)
 	{
-		$this->addSelect('tbl_person.*, s.kurztext as staatsbuergerschaft, g.kurztext as geburtsnation');
-		$this->addJoin('bis.tbl_nation s', 'tbl_person.staatsbuergerschaft = s.nation_code', 'LEFT');
-		$this->addJoin('bis.tbl_nation g', 'tbl_person.geburtsnation = g.nation_code', 'LEFT');
+		$this->addSelect('public.tbl_person.*, s.kurztext as staatsbuergerschaft, g.kurztext as geburtsnation');
+		$this->addJoin('bis.tbl_nation s', 'public.tbl_person.staatsbuergerschaft = s.nation_code', 'LEFT');
+		$this->addJoin('bis.tbl_nation g', 'public.tbl_person.geburtsnation = g.nation_code', 'LEFT');
 
 		$person = $this->load($person_id);
 
@@ -194,4 +194,18 @@ class Person_model extends DB_Model
 
 		return success($stammdaten);
 	}
+
+	/**
+	 * gets person data from uid
+	 * @param $uid
+	 * @return array
+	 */
+	public function getByUid($uid)
+	{
+		$this->addSelect('vorname, nachname, gebdatum, person_id');
+		$this->addJoin('tbl_benutzer', 'person_id');
+
+		return $this->loadWhere(array('uid' => $uid));
+	}
+
 }

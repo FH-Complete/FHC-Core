@@ -103,6 +103,23 @@ class Message_model extends DB_Model
 	}
 
 	/**
+	 * getMessageVars for person
+	 */
+	public function getMessageVarsPerson()
+	{
+		$result = $this->db->query('SELECT * FROM public.vw_msg_vars_person WHERE 0 = 1');
+
+		if ($result)
+		{
+			return success($result->list_fields());
+		}
+		else
+		{
+			return error($this->db->error(), FHC_DB_ERROR);
+		}
+	}
+
+	/**
 	 * getMsgVarsDataByPrestudentId
 	 */
 	public function getMsgVarsDataByPrestudentId($prestudent_id)
@@ -110,5 +127,15 @@ class Message_model extends DB_Model
 		$query = 'SELECT * FROM public.vw_msg_vars WHERE prestudent_id %s ?';
 
 		return $this->execQuery(sprintf($query, is_array($prestudent_id) ? 'IN' : '='), array($prestudent_id));
+	}
+
+	/**
+	 * getMsgVarsDataByPersonId
+	 */
+	public function getMsgVarsDataByPersonId($person_id)
+	{
+		$query = 'SELECT * FROM public.vw_msg_vars_person WHERE person_id %s ?';
+
+		return $this->execQuery(sprintf($query, is_array($person_id) ? 'IN' : '='), array($person_id));
 	}
 }

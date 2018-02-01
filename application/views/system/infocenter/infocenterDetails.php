@@ -29,7 +29,8 @@ $this->load->view(
 			<div class="row">
 				<div class="col-lg-12">
 					<h3 class="page-header">Infocenter
-						Details: <?php echo $stammdaten->vorname.' '.$stammdaten->nachname ?></h3>
+						Details: <?php echo $stammdaten->vorname.' '.$stammdaten->nachname ?>
+					</h3>
 				</div>
 			</div>
 			<section>
@@ -132,11 +133,26 @@ $this->load->view(
 											<?php endforeach; ?>
 											</tbody>
 										</table>
-										<?php if (isset($stammdaten->zugangscode)): ?>
-											Zugang Bewerbung: <a
-													href="<?php echo base_url('addons/bewerbung/cis/registration.php?code='.html_escape($stammdaten->zugangscode)) ?>"
-													target='_blank'><?php echo html_escape($stammdaten->zugangscode) ?></a>
-										<?php endif; ?>
+										<div class="row">
+											<div class="col-lg-6">
+												<form id="sendmsgform" method="post" action="<?php echo $messagelink ?>"
+													  target="_blank">
+													<input type="hidden" name="person_id"
+														   value="<?php echo $stammdaten->person_id ?>">
+													<a id="sendmsglink" href="javascript:void(0);"><i
+																class="fa fa-envelope"></i>&nbsp;Nachricht senden</a>
+												</form>
+											</div>
+											<?php if (isset($stammdaten->zugangscode)): ?>
+												<div class="col-lg-6 text-right">
+													<a
+															href="<?php echo base_url('addons/bewerbung/cis/registration.php?code='.html_escape($stammdaten->zugangscode)) ?>"
+															target='_blank'><i
+																class="glyphicon glyphicon-new-window"></i>&nbspZugang
+														Bewerbung</a>
+												</div>
+											<?php endif; ?>
+										</div>
 									</div> <!-- ./column -->
 								</div> <!-- ./row -->
 							</div> <!-- ./panel-body -->
@@ -727,10 +743,18 @@ $this->load->view(
 				"dateFormat": "dd.mm.yy"
 			});
 
-			//javascript hack - not nice!
+			//javascript bootstrap hack - not nice!
 			$("select").addClass('form-control');
 			$("table").addClass('table-condensed');
 			$("#logtable, #notiztable").addClass('table-hover');
+
+			//add submit event to message send link
+			$("#sendmsglink").click(
+				function()
+				{
+					$("#sendmsgform").submit();
+				}
+			);
 
 			//add click events to "formal geprüft" checkboxes
 			<?php foreach($dokumente as $dokument): ?>
