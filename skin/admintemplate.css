@@ -1,0 +1,9 @@
+.panel-primary > .panel-heading{
+    color: black;
+    background-color: #dfdfdf;
+    border-color: #dfdfdf;
+}
+
+.panel-primary{
+    border-color: #dfdfdf;
+}

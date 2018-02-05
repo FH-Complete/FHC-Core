@@ -126,8 +126,9 @@
 								<?php
 									foreach($receivers as $receiver)
 									{
+										$receiverid = isset($receiver->prestudent_id) ? $receiver->prestudent_id : $receiver->person_id;
 								?>
-									<option value="<?php echo $receiver->prestudent_id; ?>"><?php echo $receiver->Nachname . " " . $receiver->Vorname; ?></option>
+									<option value="<?php echo $receiverid; ?>"><?php echo $receiver->Vorname . " " . $receiver->Nachname; ?></option>
 								<?php
 									}
 								?>
@@ -156,7 +157,17 @@
 				for($i = 0; $i < count($receivers); $i++)
 				{
 					$receiver = $receivers[$i];
-					echo '<input type="hidden" name="prestudents[]" value="' . $receiver->prestudent_id . '">' . "\n";
+					if (isset($receiver->prestudent_id))
+					{
+						$receiverid = $receiver->prestudent_id;
+						$fieldname= 'prestudents[]';
+					}
+					else
+					{
+						$receiverid = $receiver->person_id;
+						$fieldname= 'persons[]';
+					}
+					echo '<input type="hidden" name="' . $fieldname . '" value="' . $receiverid . '">' . "\n";
 				}
 			?>
 

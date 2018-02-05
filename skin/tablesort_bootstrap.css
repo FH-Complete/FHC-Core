@@ -1,21 +1,35 @@
+/**
+    restyling mottie tablesorter default theme to fit with bootstrap sb admin template
+    PLEASE DO ONLY INCLUDE WHEN USING MOTTIE TABLESORTER DEFAULT THEME AND BOOTSTRAP SB ADMIN 2 TEMPLATE
+**/
+
 /* Reset font of tables */
 .tablesorter-default {
     font: unset !important;
 }
 
-/* Reset background color of tables */
-.tablesorter-default td {
-    background-color: unset !important;
-}
-
 /* Reset table colors and backgrounds on hover */
 .tablesorter-default tbody > tr:hover > td {
     color: unset !important;
+    background-color: unset !important;
 }
 
 /* Remove black border at bottom of table header */
 .tablesorter-header {
     border-bottom: #ccc 2px solid !important;
+}
+
+/* set colors of zebra widget */
+table.tablesorter tbody tr.even td{
+    background-color: #ffff !important;
+}
+
+table.tablesorter tbody tr.odd td{
+    background-color: #f5f5f5 !important;
+}
+
+table.tablesorter tbody tr.odd:hover{
+    background-color: #f5f5f5 !important;
 }
 
 /* Remove background color from filter row */
@@ -37,4 +51,9 @@
 /* Stripes color of table */
 .table-striped > tbody > tr:nth-of-type(odd) {
 	background-color: #d1d1d1;
+}
+
+/* bring datepicker to front */
+#ui-datepicker-div{
+    z-index: 9999 !important;
 }

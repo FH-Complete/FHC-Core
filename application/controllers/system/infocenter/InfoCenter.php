@@ -3,13 +3,13 @@
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
 /**
- * Also shows aufnahme-related data for a person and its prestudents, enables document and zgv checks,
- * displays and saves Notizen for a person, logs aufnahme-related actions for a person
+ * Also shows infocenter-related data for a person and its prestudents, enables document and zgv checks,
+ * displays and saves Notizen for a person, logs infocenter-related actions for a person
  */
 class InfoCenter extends VileSci_Controller
 {
 	// App and Verarbeitungstaetigkeit name for logging
-	const APP = 'aufnahme';
+	const APP = 'infocenter';
 	const TAETIGKEIT = 'bewerbung';
 
 	// URL prefix for this controller
@@ -19,8 +19,8 @@ class InfoCenter extends VileSci_Controller
 	private $logparams = array(
 		'saveformalgep' => array(
 			'logtype' => 'Action',
-			'name' => 'document formally checked',
-			'message' => 'document %s formally checked, set to %s'
+			'name' => 'Document formally checked',
+			'message' => 'Document %s formally checked, set to %s'
 		),
 		'savezgv' => array(
 			'logtype' => 'Action',
@@ -35,12 +35,12 @@ class InfoCenter extends VileSci_Controller
 		'freigegeben' => array(
 			'logtype' => 'Processstate',
 			'name' => 'Interessent confirmed',
-			'message' => 'status Interessent for prestudentid %s was confirmed for degree program %s'
+			'message' => 'Status Interessent for prestudentid %s was confirmed for degree program %s'
 		),
 		'savenotiz' => array(
 			'logtype' => 'Action',
-			'name' => 'note added',
-			'message' => 'note with title %s was added'
+			'name' => 'Note added',
+			'message' => 'Note with title %s was added'
 		)
 	);
 	private $uid; // contains the UID of the logged user
@@ -69,6 +69,10 @@ class InfoCenter extends VileSci_Controller
 		$this->load->library('WidgetLib');
 
 		$this->_setAuthUID(); // sets property uid
+
+		$this->load->library('PermissionLib');
+		if(!$this->permissionlib->isBerechtigt('basis/person'))
+			show_error('You have no Permission! You need Infocenter Role');
 
 		$this->_setNavigationMenuArray(); // sets property navigationMenuArray
 
@@ -228,40 +232,43 @@ class InfoCenter extends VileSci_Controller
 			show_error($lastStatus->retval);
 		}
 
-		$result = $this->PrestudentstatusModel->insert(
-			array(
-				'prestudent_id' => $prestudent_id,
-				'studiensemester_kurzbz' => $lastStatus->retval[0]->studiensemester_kurzbz,
-				'ausbildungssemester' => $lastStatus->retval[0]->ausbildungssemester,
-				'datum' => date('Y-m-d'),
-				'orgform_kurzbz' => $lastStatus->retval[0]->orgform_kurzbz,
-				'studienplan_id' => $lastStatus->retval[0]->studienplan_id,
-				'status_kurzbz' => 'Abgewiesener',
-				'statusgrund_id' => $statusgrund,
-				'insertvon' => $this->uid,
-				'insertamum' => date('Y-m-d H:i:s')
-			)
-		);
-
-		if (isError($result))
+		//check if still Interessent and not freigegeben yet
+		if($lastStatus->retval[0]->status_kurzbz === 'Interessent' && !isset($lastStatus->retval[0]->bestaetigtam))
 		{
-			show_error($result->retval);
+			$result = $this->PrestudentstatusModel->insert(
+				array(
+					'prestudent_id' => $prestudent_id,
+					'studiensemester_kurzbz' => $lastStatus->retval[0]->studiensemester_kurzbz,
+					'ausbildungssemester' => $lastStatus->retval[0]->ausbildungssemester,
+					'datum' => date('Y-m-d'),
+					'orgform_kurzbz' => $lastStatus->retval[0]->orgform_kurzbz,
+					'studienplan_id' => $lastStatus->retval[0]->studienplan_id,
+					'status_kurzbz' => 'Abgewiesener',
+					'statusgrund_id' => $statusgrund,
+					'insertvon' => $this->uid,
+					'insertamum' => date('Y-m-d H:i:s')
+				)
+			);
+
+			if (isError($result))
+			{
+				show_error($result->retval);
+			}
+
+			$logdata = $this->_getPersonAndStudiengangFromPrestudent($prestudent_id);
+
+			//statusgrund bezeichnung for logging
+			$this->StatusgrundModel->addSelect('bezeichnung_mehrsprachig');
+			$result = $this->StatusgrundModel->load($statusgrund);
+			if (isError($result))
+			{
+				show_error($result->retval);
+			}
+
+			$statusgrund_bez = $result->retval[0]->bezeichnung_mehrsprachig[1];
+
+			$this->_log($logdata['person_id'], 'abgewiesen', array($prestudent_id, $logdata['studiengang_kurzbz'], $statusgrund_bez));
 		}
-
-		$logdata = $this->_getPersonAndStudiengangFromPrestudent($prestudent_id);
-
-		//statusgrund bezeichnung for logging
-		$this->StatusgrundModel->addSelect('bezeichnung_mehrsprachig');
-		$result = $this->StatusgrundModel->load($statusgrund);
-		if (isError($result))
-		{
-			show_error($result->retval);
-		}
-
-		$statusgrund_bez = $result->retval[0]->bezeichnung_mehrsprachig[1];
-
-		$this->_log($logdata['person_id'], 'abgewiesen', array($prestudent_id, $logdata['studiengang_kurzbz'], $statusgrund_bez));
-
 		$this->_redirectToStart($prestudent_id, 'ZgvPruef');
 	}
 
@@ -278,30 +285,34 @@ class InfoCenter extends VileSci_Controller
 		{
 			$lastStatus = $lastStatus->retval[0];
 
-			$result = $this->PrestudentstatusModel->update(
-				array(
-					'prestudent_id' => $prestudent_id,
-					'status_kurzbz' => $lastStatus->status_kurzbz,
-					'studiensemester_kurzbz' => $lastStatus->studiensemester_kurzbz,
-					'ausbildungssemester' => $lastStatus->ausbildungssemester
-				),
-				array(
-					'bestaetigtvon' => $this->uid,
-					'bestaetigtam' => date('Y-m-d'),
-					'updatevon' => $this->uid,
-					'updateamum' => date('Y-m-d H:i:s')
-				)
-			);
-
-			if (isError($result))
+			//check if still Interessent and not freigegeben yet
+			if($lastStatus->status_kurzbz === 'Interessent' && !isset($lastStatus->bestaetigtam))
 			{
-				show_error($result->retval);
+				$result = $this->PrestudentstatusModel->update(
+					array(
+						'prestudent_id' => $prestudent_id,
+						'status_kurzbz' => $lastStatus->status_kurzbz,
+						'studiensemester_kurzbz' => $lastStatus->studiensemester_kurzbz,
+						'ausbildungssemester' => $lastStatus->ausbildungssemester
+					),
+					array(
+						'bestaetigtvon' => $this->uid,
+						'bestaetigtam' => date('Y-m-d'),
+						'updatevon' => $this->uid,
+						'updateamum' => date('Y-m-d H:i:s')
+					)
+				);
+
+				if (isError($result))
+				{
+					show_error($result->retval);
+				}
+
+				$logdata = $this->_getPersonAndStudiengangFromPrestudent($prestudent_id);
+
+				$this->_log($logdata['person_id'], 'freigegeben', array($prestudent_id, $logdata['studiengang_kurzbz']));
 			}
 		}
-
-		$logdata = $this->_getPersonAndStudiengangFromPrestudent($prestudent_id);
-
-		$this->_log($logdata['person_id'], 'freigegeben', array($prestudent_id, $logdata['studiengang_kurzbz']));
 
 		$this->_redirectToStart($prestudent_id, 'ZgvPruef');
 	}
@@ -374,7 +385,7 @@ class InfoCenter extends VileSci_Controller
 	 */
 	private function _setNavigationMenuArray()
 	{
-		$filtersSent = $this->FiltersModel->getFilterList('aufnahme', 'PersonActions', '%InfoCenterSentApplication%');
+		$filtersSent = $this->FiltersModel->getFilterList('infocenter', 'PersonActions', '%InfoCenterSentApplication%');
 		if (hasData($filtersSent))
 		{
 			for ($filtersCounter = 0; $filtersCounter < count($filtersSent->retval); $filtersCounter++)
@@ -385,7 +396,7 @@ class InfoCenter extends VileSci_Controller
 			}
 		}
 
-		$filtersNotSent = $this->FiltersModel->getFilterList('aufnahme', 'PersonActions', '%InfoCenterNotSentApplication%');
+		$filtersNotSent = $this->FiltersModel->getFilterList('infocenter', 'PersonActions', '%InfoCenterNotSentApplication%');
 		if (hasData($filtersNotSent))
 		{
 			for ($filtersCounter = 0; $filtersCounter < count($filtersNotSent->retval); $filtersCounter++)
@@ -449,7 +460,7 @@ class InfoCenter extends VileSci_Controller
 	 */
 	private function _loadPersonData($person_id)
 	{
-		$stammdaten = $this->PersonModel->getPersonStammdaten($person_id);
+		$stammdaten = $this->PersonModel->getPersonStammdaten($person_id, true);
 
 		if (isError($stammdaten))
 		{
@@ -470,7 +481,7 @@ class InfoCenter extends VileSci_Controller
 
 		if (isError($dokumente_nachgereicht))
 		{
-			show_error($dokumente->retval);
+			show_error($dokumente_nachgereicht->retval);
 		}
 
 		$logs = $this->personloglib->getLogs($person_id);
@@ -482,12 +493,22 @@ class InfoCenter extends VileSci_Controller
 			show_error($notizen->retval);
 		}
 
+		$user_person = $this->PersonModel->getByUid($this->uid);
+
+		if (isError($user_person))
+		{
+			show_error($user_person->retval);
+		}
+
+		$messagelink = base_url('/index.ci.php/system/Messages/write/'.$user_person->retval[0]->person_id);
+
 		$data = array (
 			'stammdaten' => $stammdaten->retval,
 			'dokumente' => $dokumente->retval,
 			'dokumente_nachgereicht' => $dokumente_nachgereicht->retval,
 			'logs' => $logs,
-			'notizen' => $notizen->retval
+			'notizen' => $notizen->retval,
+			'messagelink' => $messagelink
 		);
 
 		return $data;

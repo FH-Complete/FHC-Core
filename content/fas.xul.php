@@ -147,6 +147,8 @@ foreach($addon_obj->result as $addon)
   <command id="menu-dokumente-pruefungsprotokoll2_englisch:command" oncommand="StudentAbschlusspruefungPrintPruefungsprotokollMultiple(event,'en2');"/>
   <command id="menu-dokumente-pruefungszeugnis:command" oncommand="StudentAbschlusspruefungPrintPruefungszeugnisMultiple(event,'deutsch');"/>
   <command id="menu-dokumente-pruefungszeugnis_englisch:command" oncommand="StudentAbschlusspruefungPrintPruefungszeugnisMultiple(event,'englisch');"/>
+  <command id="menu-dokumente-bescheid_deutsch:command" oncommand="StudentAbschlusspruefungPrintBescheidMultiple(event, 'deutsch')"/>
+  <command id="menu-dokumente-bescheid_englisch:command" oncommand="StudentAbschlusspruefungPrintBescheidMultiple(event, 'englisch')"/>
   <command id="menu-dokumente-urkunde_deutsch:command" oncommand="StudentAbschlusspruefungPrintUrkundeMultiple(event, 'deutsch')"/>
   <command id="menu-dokumente-urkunde_englisch:command" oncommand="StudentAbschlusspruefungPrintUrkundeMultiple(event, 'englisch')"/>
   <command id="menu-dokumente-ausbildungsvertrag:command" oncommand="StudentPrintAusbildungsvertrag(event);"/>
@@ -673,6 +675,18 @@ foreach($addon_obj->result as $addon)
 	            </menupopup>
 	        </menu>
 			<menuseparator/>
+						<menuitem
+               id        =  "menu-dokumente-bescheid_deutsch"
+               key       =  "menu-dokumente-bescheid_deutsch:key"
+               label     = "&menu-dokumente-bescheid_deutsch.label;"
+               command   =  "menu-dokumente-bescheid_deutsch:command"
+               accesskey = "&menu-dokumente-bescheid_deutsch.accesskey;"/>
+			<menuitem
+               id        =  "menu-dokumente-bescheid_englisch"
+               key       =  "menu-dokumente-bescheid_englisch:key"
+               label     = "&menu-dokumente-bescheid_englisch.label;"
+               command   =  "menu-dokumente-bescheid_englisch:command"
+               accesskey = "&menu-dokumente-bescheid_englisch.accesskey;"/>
             <menuitem
                id        =  "menu-dokumente-diplsupplement"
                key       =  "menu-dokumente-diplsupplement:key"

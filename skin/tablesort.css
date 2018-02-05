@@ -61,3 +61,8 @@ table.table td{
     border-left: solid 1px #E0E0E0;
     vertical-align: top;
 }
+
+/*make filter row more condensed */
+.tablesorter-default input.tablesorter-filter{
+    padding: 0px;
+}

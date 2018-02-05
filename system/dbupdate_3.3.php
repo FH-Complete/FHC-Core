@@ -127,6 +127,75 @@ if(!$result = @$db->db_query("SELECT 1 FROM public.vw_msg_vars LIMIT 1"))
 	else
 		echo '<br>Granted privileges to <strong>vilesci</strong> on public.vw_msg_vars';
 }
+
+if(!$result = @$db->db_query("SELECT 1 FROM public.vw_msg_vars_person LIMIT 1"))
+{
+	// CREATE OR REPLACE VIEW public.vw_msg_vars and grants privileges
+	$qry = '
+		CREATE OR REPLACE VIEW public.vw_msg_vars_person AS (
+		SELECT DISTINCT ON(p.person_id) p.person_id,
+						   p.nachname AS "Nachname",
+						   p.vorname AS "Vorname",
+						   p.anrede AS "Anrede",
+						   a.strasse AS "Strasse",
+						   a.ort AS "Ort",
+						   a.plz AS "PLZ",
+						   a.gemeinde AS "Gemeinde",
+						   a.langtext AS "Nation",
+						   ke.kontakt AS "Email",
+						   kt.kontakt AS "Telefon"				
+					  FROM public.tbl_person p
+				 LEFT JOIN (
+								SELECT person_id,
+									   kontakt
+								  FROM public.tbl_kontakt
+								 WHERE zustellung = TRUE
+								   AND kontakttyp = \'email\'
+							  ORDER BY kontakt_id DESC
+						) ke USING(person_id)
+				 LEFT JOIN (
+								SELECT person_id,
+									   kontakt
+								  FROM public.tbl_kontakt
+								 WHERE zustellung = TRUE
+								   AND kontakttyp IN (\'telefon\', \'mobil\')
+							  ORDER BY kontakt_id DESC
+						) kt USING(person_id)
+				 LEFT JOIN (
+								SELECT person_id,
+									   strasse,
+									   ort,
+									   plz,
+									   gemeinde,
+									   langtext
+								  FROM public.tbl_adresse
+							 LEFT JOIN bis.tbl_nation ON(bis.tbl_nation.nation_code = public.tbl_adresse.nation)
+								 WHERE public.tbl_adresse.heimatadresse = TRUE
+							  ORDER BY adresse_id DESC
+						) a USING(person_id)
+				  ORDER BY p.person_id ASC
+		);';
+
+	if(!$db->db_query($qry))
+		echo '<strong>public.vw_msg_vars_person: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>public.vw_msg_vars_person view created';
+
+	$qry = 'GRANT SELECT ON TABLE public.vw_msg_vars_person TO web;';
+
+	if(!$db->db_query($qry))
+		echo '<strong>public.vw_msg_vars_person: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Granted privileges to <strong>web</strong> on public.vw_msg_vars_person';
+
+	$qry = 'GRANT SELECT ON TABLE public.vw_msg_vars_person TO vilesci;';
+
+	if(!$db->db_query($qry))
+		echo '<strong>public.vw_msg_vars_person: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Granted privileges to <strong>vilesci</strong> on public.vw_msg_vars_person';
+}
+
 //Spalte anmerkung und rechnungsadresse in tbl_adresse
 if(!$result = @$db->db_query("SELECT rechnungsadresse FROM public.tbl_adresse LIMIT 1"))
 {
@@ -810,7 +879,7 @@ if (!$result = @$db->db_query("SELECT 1 FROM system.tbl_log LIMIT 1"))
 			 INCREMENT BY 1
 			 NO MAXVALUE
 			 NO MINVALUE
-			 CACHE 1;
+			 CACHE 1;system.tbl_log
 			ALTER TABLE system.tbl_log ALTER COLUMN log_id SET DEFAULT nextval('system.tbl_log_log_id_seq');
 
 			GRANT SELECT, INSERT ON system.tbl_log TO vilesci;
@@ -1082,6 +1151,8 @@ if (!$result = @$db->db_query("SELECT 1 FROM system.tbl_verarbeitungstaetigkeit"
 	VALUES('lehrauftraege','Lehraufträge','{\'Lehraufträge\',\'Lehraufträge\'}', true);
 	INSERT INTO system.tbl_verarbeitungstaetigkeit(taetigkeit_kurzbz, bezeichnung, bezeichnung_mehrsprachig, aktiv)
 	VALUES('datenwartung','Datenwartung','{\'Datenwartung\',\'Datenwartung\'}', true);
+	INSERT INTO system.tbl_verarbeitungstaetigkeit(taetigkeit_kurzbz, bezeichnung, bezeichnung_mehrsprachig, aktiv)
+	VALUES('kommunikation','Kommunikation','{\'Kommunikation\',\'Kommunikation\'}', true);
 
 	GRANT SELECT, UPDATE, INSERT, DELETE ON system.tbl_verarbeitungstaetigkeit TO vilesci;
 	GRANT SELECT ON system.tbl_verarbeitungstaetigkeit TO web;
@@ -1118,7 +1189,7 @@ if ($result = @$db->db_query("SELECT conname FROM pg_constraint WHERE conname = 
 			echo '<br>system.tbl_filters: added primary key on column filter_id';
 	}
 }
-	
+
 // Add index to tbl_akte
 if ($result = $db->db_query("SELECT * FROM pg_class WHERE relname='idx_tbl_akte_dokument_kurzbz'"))
 {
@@ -1127,13 +1198,73 @@ if ($result = $db->db_query("SELECT * FROM pg_class WHERE relname='idx_tbl_akte_
 		$qry = " 	CREATE INDEX idx_tbl_akte_dokument_kurzbz ON tbl_akte USING btree (dokument_kurzbz);
 					CREATE INDEX idx_tbl_akte_person_id ON tbl_akte USING btree (person_id);
 					CREATE INDEX idx_tbl_akte_person_id_dokument_kurzbz ON tbl_akte USING btree (person_id, dokument_kurzbz)";
-		
+
 		if (! $db->db_query($qry))
 			echo '<strong>Indizes: ' . $db->db_last_error() . '</strong><br>';
 		else
 			echo 'Diverse Indizes fuer tbl_akte hinzugefuegt';
 	}
 }
+
+// Berechtigungen fuer vilesci User erteilen auf system.tbl_log
+if($result = @$db->db_query("SELECT * FROM information_schema.role_table_grants WHERE table_name='tbl_log' AND table_schema='system' AND grantee='vilesci' AND privilege_type='UPDATE'"))
+{
+	if($db->db_num_rows($result)==0)
+	{
+
+		$qry = "GRANT UPDATE ON system.tbl_log TO vilesci;";
+
+		if(!$db->db_query($qry))
+			echo '<strong>Permission Log: '.$db->db_last_error().'</strong><br>';
+		else
+			echo 'Updaterechte auf system.tbl_log für Vilesci User hinzugefügt';
+	}
+}
+
+// App 'core' hinzufügen
+if($result = $db->db_query("SELECT 1 FROM system.tbl_app WHERE app='core'"))
+{
+	if($db->db_num_rows($result)==0)
+	{
+
+		$qry = "INSERT INTO system.tbl_app(app) VALUES('core');";
+
+		if(!$db->db_query($qry))
+			echo '<strong>App: '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>Neue App core in system.tbl_app hinzugefügt';
+	}
+}
+
+// App 'infocenter' hinzufügen
+if($result = $db->db_query("SELECT 1 FROM system.tbl_app WHERE app='infocenter'"))
+{
+	if($db->db_num_rows($result)==0)
+	{
+
+		$qry = "INSERT INTO system.tbl_app(app) VALUES('infocenter');";
+
+		if(!$db->db_query($qry))
+			echo '<strong>App: '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>Neue App infocenter in system.tbl_app hinzugefügt';
+	}
+}
+// App 'bewerbung' hinzufügen
+if($result = $db->db_query("SELECT 1 FROM system.tbl_app WHERE app='bewerbung'"))
+{
+	if($db->db_num_rows($result)==0)
+	{
+
+		$qry = "INSERT INTO system.tbl_app(app) VALUES('bewerbung');";
+
+		if(!$db->db_query($qry))
+			echo '<strong>App: '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>Neue App bewerbung in system.tbl_app hinzugefügt';
+	}
+}
+
 
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';

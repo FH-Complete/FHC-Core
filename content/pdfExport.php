@@ -45,6 +45,7 @@ require_once('../include/addon.class.php');
 require_once('../include/studiengang.class.php');
 require_once('../include/studiensemester.class.php');
 require_once('../include/studienordnung.class.php');
+//require_once('../include/betriebsmittel.class.php');
 
 $user = get_uid();
 $db = new basis_db();
@@ -272,7 +273,7 @@ if($xsl=='AccountInfo')
 		exit;
 	}
 }
-elseif(in_array($xsl,array('Lehrveranstaltungszeugnis','Zertifikat','Diplomurkunde','Diplomzeugnis','Bakkurkunde','BakkurkundeEng','Bakkzeugnis',
+elseif(in_array($xsl,array('Lehrveranstaltungszeugnis','Zertifikat','Diplomurkunde','Diplomzeugnis','Bescheid', 'BescheidEng','Bakkurkunde','BakkurkundeEng','Bakkzeugnis',
 'PrProtokollBakk','PrProtokollDipl','Lehrauftrag','DiplomurkundeEng','Zeugnis','ZeugnisEng','StudienerfolgEng',
 'Sammelzeugnis','PrProtDiplEng','PrProtBakkEng','BakkzeugnisEng','DiplomzeugnisEng','statusbericht',
 'DiplSupplement','Zutrittskarte','Projektbeschr','Ausbildungsver','AusbildStatus','PrProtBA','PrProtMA',
@@ -363,6 +364,7 @@ if(!$xml_found)
 // Load the XML source
 $xml_doc = new DOMDocument;
 
+//echo $xml_url;
 if(!$xml_doc->load($xml_url))
 	die('unable to load xml: '.$xml_url);
 
@@ -395,7 +397,7 @@ if (!isset($_REQUEST["archive"]))
 			default:
 					$endung = 'pdf';
 		}
-
+		
 		// Load the XSL source
 		$xsl_doc = new DOMDocument;
 
@@ -738,14 +740,14 @@ else
 				$tempPdfName = $vorlage->vorlage_kurzbz.'.pdf';
 	            exec("unoconv -e IsSkipEmptyPages=false --stdout -f pdf $tempname_zip > $tempPdfName");
 			}
-			$file = $tempfolder.'/'.$tempPdfName;
+			$file = $tempfolder.'/'.$tempPdfName; 
 		}
 		else
 		{
 			if(PDF_CREATE_FUNCTION=='FOP')
 			{
 				$fop = new fop();
-				$file = $fop->generatePdf($xml_doc->saveXML(), $xsl_content, $filename, "F");
+				$file = $fop->generatePdf($xml_doc->saveXML(), $xsl_content, $filename, "F"); 
 			}
 			else
 			{
@@ -769,7 +771,7 @@ else
 					echo('Failed to generate PDF');
 				}
 				$tmp = sys_get_temp_dir();
-				$file = $tmp."/FHC".$filename.".pdf";
+				$file = $tmp."/FHC".$filename.".pdf"; 
 			}
 		}
 

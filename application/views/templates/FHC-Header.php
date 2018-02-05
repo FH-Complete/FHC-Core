@@ -97,8 +97,8 @@ function _generateJSsInclude($JSs)
 			// Table sorter CSS
 			if ($tablesorter === true)
 			{
-				_generateCSSsInclude('vendor/mottie/tablesorter/css/theme.default.css');
-				_generateCSSsInclude('vendor/mottie/tablesorter/addons/pager/jquery.tablesorter.pager.css');
+				_generateCSSsInclude('vendor/mottie/tablesorter/dist/css/theme.default.min.css');
+				_generateCSSsInclude('vendor/mottie/tablesorter/dist/css/jquery.tablesorter.pager.min.css');
 			}
 			// sb admin template CSS
 			if ($sbadmintemplate === true)
@@ -127,15 +127,15 @@ function _generateJSsInclude($JSs)
 			// Table sorter JS
 			if ($tablesorter === true)
 			{
-				_generateJSsInclude('vendor/mottie/tablesorter/js/jquery.tablesorter.js');
-				_generateJSsInclude('vendor/mottie/tablesorter/js/jquery.tablesorter.widgets.js');
-				_generateJSsInclude('vendor/mottie/tablesorter/addons/pager/jquery.tablesorter.pager.js');
+				_generateJSsInclude('vendor/mottie/tablesorter/dist/js/jquery.tablesorter.min.js');
+				_generateJSsInclude('vendor/mottie/tablesorter/dist/js/jquery.tablesorter.widgets.min.js');
+				_generateJSsInclude('vendor/mottie/tablesorter/dist/js/extras/jquery.tablesorter.pager.min.js');
 			}
 			// sb admin template JS
 			if ($sbadmintemplate === true)
 			{
 				_generateJSsInclude('vendor/BlackrockDigital/startbootstrap-sb-admin-2/vendor/metisMenu/metisMenu.min.js');
-				_generateJSsInclude('vendor/BlackrockDigital/startbootstrap-sb-admin-2/dist/js/sb-admin-2.js');
+				_generateJSsInclude('vendor/BlackrockDigital/startbootstrap-sb-admin-2/dist/js/sb-admin-2.min.js');
 			}
 
 			// Eventually required JS

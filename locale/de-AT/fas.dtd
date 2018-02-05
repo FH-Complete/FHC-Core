@@ -291,6 +291,12 @@
 <!ENTITY menu-dokumente-pruefungszeugnis_englisch.label		"Prüfungszeugnis Englisch">
 <!ENTITY menu-dokumente-pruefungszeugnis_englisch.accesskey	"G">
 
+<!ENTITY menu-dokumente-bescheid_deutsch.label		"Bescheid Deutsch">
+<!ENTITY menu-dokumente-bescheid_deutsch.accesskey	"D">
+
+<!ENTITY menu-dokumente-bescheid_englisch.label		"Bescheid Englisch">
+<!ENTITY menu-dokumente-bescheid_englisch.accesskey	"E">
+
 <!ENTITY menu-dokumente-urkunde_deutsch.label		"Urkunde Deutsch">
 <!ENTITY menu-dokumente-urkunde_deutsch.accesskey	"D">
 

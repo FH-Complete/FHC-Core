@@ -1124,6 +1124,7 @@ function StudentAuswahl()
 		document.getElementById('student-tab-zeugnis').collapsed=true;
 		document.getElementById('student-tab-betriebsmittel').collapsed=true;
 		document.getElementById('student-tab-io').collapsed=true;
+		document.getElementById('student-tab-mobilitaet').hidden=true;		
 		document.getElementById('student-tab-noten').collapsed=true;
 		document.getElementById('student-tab-pruefung').collapsed=true;
 		document.getElementById('student-tab-abschlusspruefung').collapsed=true;
@@ -3028,6 +3029,60 @@ function StudentZeugnisArchivieren(lang)
 			else
 				xsl_vorlage = 'Zeugnis';
 			url = '<?php echo APP_ROOT; ?>content/pdfExport.php?xsl='+xsl_vorlage+'&xml=zeugnis.rdf.php&uid='+uid+'&ss='+stsem+'&archive=1';
+
+			var req = new phpRequest(url,'','');
+
+			var response = req.execute();
+			if(response!='')
+				errormsg = errormsg + response;
+		}
+	}
+
+	if(errormsg!='')
+		alert(errormsg);
+
+	StudentAkteTreeDatasource.Refresh(false);
+}
+
+// * Startet das Script zum Archivieren des Bescheids und
+// * Refresht dann den Tree
+// ****
+function StudentBescheidArchivieren(lang)
+{
+	lang = lang || 'ger';
+
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+	var tree = document.getElementById('student-tree');
+
+	if (tree.currentIndex==-1)
+	{
+		alert('Student muss ausgewaehlt sein');
+		return;
+	}
+
+	var tree=document.getElementById('student-tree');
+	var numRanges = tree.view.selection.getRangeCount();
+	var start = new Object();
+	var end = new Object();
+	var anzfault=0;
+	var uid='';
+	var errormsg = '';
+	var stsem = getStudiensemester();
+
+	//Bescheid fuer alle markierten Studenten archivieren
+	for (var t=0; t<numRanges; t++)
+	{
+		tree.view.selection.getRangeAt(t,start,end);
+		for (v=start.value; v<=end.value; v++)
+		{
+			uid = getTreeCellText(tree, 'student-treecol-uid', v);
+
+			var xsl_vorlage;
+			if(lang=='eng')
+				xsl_vorlage = 'BescheidEng';
+			else
+				xsl_vorlage = 'Bescheid';
+			url = '<?php echo APP_ROOT; ?>content/pdfExport.php?xsl='+xsl_vorlage+'&xml=abschlusspruefung.rdf.php&uid='+uid+'&ss='+stsem+'&archive=1';
 
 			var req = new phpRequest(url,'','');
 

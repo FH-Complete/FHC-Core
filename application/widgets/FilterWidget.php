@@ -57,7 +57,7 @@ class FilterWidget extends Widget
 	const OPT_DAYS = 'days';
 	const OPT_MONTHS = 'months';
 
-	const DEFAULT_DATE_FORMAT = 'Y.m.d H:i:s';
+	const DEFAULT_DATE_FORMAT = 'd.m.Y H:i:s';
 
 	private $app;
 	private $query;
@@ -1051,7 +1051,7 @@ class FilterWidget extends Widget
 								&& ($activeFiltersOption[$field] == self::OPT_DAYS
 								|| $activeFiltersOption[$field] == self::OPT_MONTHS))
 							{
-								$condition = ' > (NOW() - \''.$activeFilterValue.' '.$activeFiltersOption[$field].'\'::interval)';
+								$condition = ' < (NOW() - \''.$activeFilterValue.' '.$activeFiltersOption[$field].'\'::interval)';
 							}
 							else
 							{
@@ -1065,7 +1065,7 @@ class FilterWidget extends Widget
 								&& ($activeFiltersOption[$field] == self::OPT_DAYS
 								|| $activeFiltersOption[$field] == self::OPT_MONTHS))
 							{
-								$condition = ' < (NOW() - \''.$activeFilterValue.' '.$activeFiltersOption[$field].'\'::interval)';
+								$condition = ' > (NOW() - \''.$activeFilterValue.' '.$activeFiltersOption[$field].'\'::interval)';
 							}
 							else
 							{

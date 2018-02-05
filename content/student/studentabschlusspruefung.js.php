@@ -891,6 +891,83 @@ function StudentAbschlusspruefungPrintPruefungszeugnis(event)
 }
 
 // ****
+// * Druckt den Bescheid fuer eine Abschlusspruefung fuer mehrere Studenten auf einmal aus.
+// * wenn mehrere Abschlusspruefungen angelegt sind, dann wird fuer jede Abschlusspruefung
+// * ein Bescheid gedruckt.
+// * Den Typ (Bakk/Dipl) der Urkunde bestimmt der zuletzt markierte Student.
+// ****
+function StudentAbschlusspruefungPrintBescheidMultiple(event, sprache)
+{
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+	var tree = document.getElementById('student-abschlusspruefung-tree');
+
+	//Typ der ersten Abschlusspruefung des zuletzt markierten Studenten (der von dem die Daten geladen wurden) holen
+	try
+	{
+		var pruefungstyp_kurzbz = getTreeCellText(tree,"student-abschlusspruefung-treecol-pruefungstyp_kurzbz", 0);
+	}
+	catch(e)
+	{
+		alert('Der zuletzt markierte Student hat keine Abschlusspruefungen');
+		return false;
+	}
+
+	if(pruefungstyp_kurzbz=='')
+	{
+		alert('Der zuletzt markierte Student hat keine Abschlusspruefungen');
+		return false;
+	}
+
+	if(pruefungstyp_kurzbz=='Bachelor' && sprache=='deutsch')
+		xsl='Bescheid';
+	else if(pruefungstyp_kurzbz=='Bachelor' && sprache=='englisch')
+		xsl='BescheidEng';
+	else if(pruefungstyp_kurzbz=='Diplom' && sprache=='deutsch')
+		xsl='Bescheid';
+	else if(pruefungstyp_kurzbz=='Diplom' && sprache=='englisch')
+		xsl='BescheidEng';
+
+	var tree = document.getElementById('student-tree');
+
+	if (tree.currentIndex==-1)
+		return;
+
+	//Uids aller markierten Studenten holen
+	var start = new Object();
+	var end = new Object();
+	var numRanges = tree.view.selection.getRangeCount();
+	var paramList= '';
+	var anzahl=0;
+	var uids='';
+	var stg_kz=0;
+	for (var t = 0; t < numRanges; t++)
+	{
+  		tree.view.selection.getRangeAt(t,start,end);
+		for (var v = start.value; v <= end.value; v++)
+		{
+			uid = ';'+getTreeCellText(tree,"student-treecol-uid", v);
+			uids = uids + uid;
+			stg_kz=getTreeCellText(tree,"student-treecol-studiengang_kz", v);
+			anzahl++;
+		}
+	}
+
+	if (event.shiftKey)
+	{
+	    var output='odt';
+	}
+	else if (event.ctrlKey)
+	{
+		var output='doc';
+	}
+	else
+	{
+		var output='pdf';
+	}
+
+	window.open('<?php echo APP_ROOT; ?>/content/pdfExport.php?xml=abschlusspruefung.rdf.php&xsl_stg_kz='+stg_kz+'&xsl='+xsl+'&uid='+uids+'&output='+output,'Pruefungsprotokoll', 'height=200,width=350,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
+}
+// ****
 // * Druckt die Urkunde fuer eine Abschlusspruefung fuer mehrere Studenten auf einmal aus.
 // * wenn mehrere Abschlusspruefungen angelegt sind, dann wird fuer jede Abschlusspruefung
 // * eine Urkunde gedruckt.

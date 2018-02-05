@@ -304,7 +304,15 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
 			</text:p>
 			<text:p text:style-name="P14">PRÜFUNGSZEUGNIS</text:p>
 			<text:p text:style-name="P1"/>
-			<text:p text:style-name="P15"><xsl:value-of select="stg_art"/></text:p>
+			<text:p text:style-name="P15">
+			<xsl:choose>
+				<xsl:when test="stg_art='b'">Bachelor</xsl:when>					
+				<xsl:when test="stg_art='m'">Master</xsl:when>					
+				<xsl:when test="stg_art='d'">Diplom</xsl:when>					
+				<xsl:when test="stg_art='l'">Lehrgang</xsl:when>				
+				<xsl:when test="stg_art='k'">Kurzstudium</xsl:when>								
+			</xsl:choose>-Studiengang
+			</text:p>
 			<text:p text:style-name="P1"><xsl:value-of select="stg_bezeichnung"/></text:p>
 			<text:p text:style-name="P13"/>
 			<text:p text:style-name="P13"/>
