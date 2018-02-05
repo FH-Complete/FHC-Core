@@ -54,6 +54,8 @@ $erreichbarkeit_kurzbz=(isset($_POST['erreichbarkeit_kurzbz'])?$_POST['erreichba
 $freigabeamum=(isset($_POST['freigabe_amum'])?$_POST['freigabe_amum']:'');
 $freigabevon=(isset($_POST['freigabe_von'])?$_POST['freigabe_von']:'');
 
+$alle = (isset($_GET['alle'])?true:false);
+
 $errormsg='';
 $message='';
 $error=false;
@@ -212,7 +214,8 @@ if($uid!='')
 
 	$zeitsperre = new zeitsperre();
 
-	$zeitsperre->getzeitsperren($uid);
+	echo "<a href='".$_SERVER['PHP_SELF']."?uid=$uid&alle=true'>Alle Einträge anzeigen</a>";
+	$zeitsperre->getzeitsperren($uid, !$alle);
 	echo '<h3>Zeitsperren von <b>'.$mitarbeiter->titelpre.' '.$mitarbeiter->vorname.' '.$mitarbeiter->nachname.' '.$mitarbeiter->titelpost.'</b></h3>';
 	echo "<table id='t1' class='tablesorter'>";
 	echo '
@@ -244,8 +247,8 @@ if($uid!='')
 		echo "<td>$row->freigabevon ".$datum->formatDatum($row->freigabeamum,'d.m.Y')."</td>";
 		echo "<td>".$datum->formatDatum($row->updateamum,'d.m.Y H:i:s')."</td>";
 		echo "<td>$row->updatevon</td>";
-		echo "<td align='center'><a href='".$_SERVER['PHP_SELF']."?action=edit&uid=$uid&zeitsperre_id=$row->zeitsperre_id'><img src='../../skin/images/application_form_edit.png' alt='bearbeiten' title='bearbeiten' /></a></td>";
-		echo "<td align='center'><a href='".$_SERVER['PHP_SELF']."?action=delete&uid=$uid&zeitsperre_id=$row->zeitsperre_id' onclick='return confdel(\"$row->zeitsperretyp_kurzbz von ".$datum->formatDatum($row->vondatum,'d.m.Y')." bis ".$datum->formatDatum($row->bisdatum,'d.m.Y')."\")'><img src='../../skin/images/application_form_delete.png' alt='loeschen' title='loeschen'/></a></td>";
+		echo "<td align='center'><a href='".$_SERVER['PHP_SELF']."?action=edit&uid=$uid&zeitsperre_id=$row->zeitsperre_id".($alle?'&alle=true':'')."'><img src='../../skin/images/application_form_edit.png' alt='bearbeiten' title='bearbeiten' /></a></td>";
+		echo "<td align='center'><a href='".$_SERVER['PHP_SELF']."?action=delete&uid=$uid&zeitsperre_id=$row->zeitsperre_id".($alle?'&alle=true':'')."'' onclick='return confdel(\"$row->zeitsperretyp_kurzbz von ".$datum->formatDatum($row->vondatum,'d.m.Y')." bis ".$datum->formatDatum($row->bisdatum,'d.m.Y')."\")'><img src='../../skin/images/application_form_delete.png' alt='loeschen' title='loeschen'/></a></td>";
 		echo '</tr>';
 	}
 	echo '</tbody></table>';
@@ -264,7 +267,7 @@ if($uid!='')
 	else
 		echo "<h3>Neue Zeitsperre:</h3>";
 
-	echo '<form accept-charset="UTF-8" action="'.$_SERVER['PHP_SELF'].'?uid='.$uid.'" method="POST">';
+	echo '<form accept-charset="UTF-8" action="'.$_SERVER['PHP_SELF'].'?uid='.$uid.($alle?'&alle=true':'').'" method="POST">';
 	echo '<input type="hidden" name="zeitsperre_id" value="'.$zeitsperre->zeitsperre_id.'">';
 	echo '<table>';
 	echo '<tr>';
