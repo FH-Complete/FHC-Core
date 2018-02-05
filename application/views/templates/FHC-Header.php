@@ -13,6 +13,7 @@ $jqueryui = isset($jqueryui) ? $jqueryui : false;
 $bootstrap = isset($bootstrap) ? $bootstrap : false;
 $fontawesome = isset($fontawesome) ? $fontawesome : false;
 $tablesorter = isset($tablesorter) ? $tablesorter : false;
+$tinymce = isset($tinymce) ? $tinymce : false;
 $sbadmintemplate = isset($sbadmintemplate) ? $sbadmintemplate : false;
 
 /**
@@ -131,6 +132,9 @@ function _generateJSsInclude($JSs)
 				_generateJSsInclude('vendor/mottie/tablesorter/dist/js/jquery.tablesorter.widgets.min.js');
 				_generateJSsInclude('vendor/mottie/tablesorter/dist/js/extras/jquery.tablesorter.pager.min.js');
 			}
+			//tinymce JS
+			if($tinymce === true) _generateJSsInclude('vendor/tinymce/tinymce/tinymce.min.js') ;
+
 			// sb admin template JS
 			if ($sbadmintemplate === true)
 			{

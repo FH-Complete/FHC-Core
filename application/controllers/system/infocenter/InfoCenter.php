@@ -61,7 +61,8 @@ class InfoCenter extends VileSci_Controller
 		$this->load->model('crm/statusgrund_model', 'StatusgrundModel');
 		$this->load->model('person/notiz_model', 'NotizModel');
 		$this->load->model('person/person_model', 'PersonModel');
-		$this->load->model('system/Filters_model', 'FiltersModel');
+		$this->load->model('system/message_model', 'MessageModel');
+		$this->load->model('system/filters_model', 'FiltersModel');
 
 		// Loads libraries
 		$this->load->library('DmsLib');
@@ -484,6 +485,13 @@ class InfoCenter extends VileSci_Controller
 			show_error($dokumente_nachgereicht->retval);
 		}
 
+		$messages = $this->MessageModel->getMessagesOfPerson($person_id, 1);
+
+		if (isError($messages))
+		{
+			show_error($messages->retval);
+		}
+
 		$logs = $this->personloglib->getLogs($person_id);
 
 		$notizen = $this->NotizModel->getNotiz($person_id);
@@ -506,6 +514,7 @@ class InfoCenter extends VileSci_Controller
 			'stammdaten' => $stammdaten->retval,
 			'dokumente' => $dokumente->retval,
 			'dokumente_nachgereicht' => $dokumente_nachgereicht->retval,
+			'messages' => $messages->retval,
 			'logs' => $logs,
 			'notizen' => $notizen->retval,
 			'messagelink' => $messagelink

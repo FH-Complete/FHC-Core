@@ -19,9 +19,6 @@ class Messages extends VileSci_Controller
         // Loads the widget library
 		$this->load->library('WidgetLib');
 
-		// Loads the person log library
-		$this->load->library('PersonLogLib');
-
 		$this->load->model('person/Person_model', 'PersonModel');
 
 		$this->_setAuthUID(); // sets property uid
@@ -208,6 +205,9 @@ class Messages extends VileSci_Controller
 					break;
 				}
 
+				// Loads the person log library
+				$this->load->library('PersonLogLib');
+
 				//write log entry
 				$this->personloglib->log(
 					$dataArray['person_id'],
@@ -313,4 +313,21 @@ class Messages extends VileSci_Controller
 				->set_output(json_encode($parsedText));
 		}
 	}
+
+	/**
+	 * Outputs message data for a message (identified my msg id and receiver id) in JSON format
+	 * @param $msg_id
+	 * @param $receiver_id
+	 */
+	public function getMessageFromIds($msg_id, $receiver_id)
+	{
+/*		$this->MessageModel->addSelect('subject, body, oe_kurzbz');
+		$msg = $this->MessageModel->load($msg_id);*/
+		$msg = $this->messagelib->getMessage($msg_id, $receiver_id);
+
+		$this->output
+			->set_content_type('application/json')
+			->set_output(json_encode(array($msg->retval[0])));
+	}
+
 }

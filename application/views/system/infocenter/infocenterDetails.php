@@ -8,6 +8,7 @@ $this->load->view(
 		'fontawesome' => true,
 		'jqueryui' => true,
 		'tablesorter' => true,
+		'tinymce' => true,
 		'sbadmintemplate' => true,
 		'customCSSs' => array('skin/admintemplate.css', 'skin/tablesort_bootstrap.css')
 	)
@@ -165,11 +166,13 @@ $this->load->view(
 								<div class="table-responsive">
 									<table id="doctable" class="table table-bordered">
 										<thead>
-										<th>Name</th>
-										<th>Typ</th>
-										<th>Uploaddatum</th>
-										<th>Ausstellungsnation</th>
-										<th>Formal gepr&uuml;ft</th>
+										<tr>
+											<th>Name</th>
+											<th>Typ</th>
+											<th>Uploaddatum</th>
+											<th>Ausstellungsnation</th>
+											<th>Formal gepr&uuml;ft</th>
+										</tr>
 										</thead>
 										<tbody>
 										<?php
@@ -198,10 +201,12 @@ $this->load->view(
 									<p>Nachzureichende Dokumente:</p>
 									<table id="nachgdoctable" class="table table-bordered">
 										<thead>
-										<th>Typ</th>
-										<th>Nachzureichen am</th>
-										<th>Ausstellungsnation</th>
-										<th>Anmerkung</th>
+										<tr>
+											<th>Typ</th>
+											<th>Nachzureichen am</th>
+											<th>Ausstellungsnation</th>
+											<th>Anmerkung</th>
+										</tr>
 										</thead>
 										<tbody>
 										<?php
@@ -594,6 +599,25 @@ $this->load->view(
 					<div class="col-lg-12">
 						<div class="panel panel-primary">
 							<div class="panel-heading text-center">
+								<a name="Nachrichten"></a>
+								<h4 class="text-center">Nachrichten</h4>
+							</div>
+							<div class="panel-body">
+								<div class="row">
+										<?php
+										$this->load->view('system/messageList.php', $messages);
+										?>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
+			<section>
+				<div class="row">
+					<div class="col-lg-12">
+						<div class="panel panel-primary">
+							<div class="panel-heading text-center">
 								<a name="NotizAkt"></a>
 								<h4 class="text-center">Notizen &amp; Aktivit&auml;ten</h4>
 							</div>
@@ -621,15 +645,16 @@ $this->load->view(
 										</form>
 										<table id="notiztable" class="table table-bordered table-hover">
 											<thead>
-											<th>Datum</th>
-											<th>Notiz</th>
-											<th>User</th>
+											<tr>
+												<th>Datum</th>
+												<th>Notiz</th>
+												<th>User</th>
+											</tr>
 											</thead>
 											<tbody>
-
 											<?php foreach ($notizen as $notiz): ?>
 												<tr data-toggle="tooltip"
-													title="<?php echo isset($notiz->text) ? $notiz->text : '' ?>">
+													title="<?php echo isset($notiz->text) ? strip_tags($notiz->text) : '' ?>">
 													<td><?php echo date_format(date_create($notiz->insertamum), 'd.m.Y H:i:s') ?></td>
 													<td><?php echo html_escape($notiz->titel) ?></td>
 													<td><?php echo $notiz->verfasser_uid ?></td>
@@ -641,9 +666,11 @@ $this->load->view(
 									<div class="col-lg-6">
 										<table id="logtable" class="table table-bordered table-hover">
 											<thead>
-											<th>Datum</th>
-											<th>Aktivit&auml;t</th>
-											<th>User</th>
+											<tr>
+												<th>Datum</th>
+												<th>Aktivit&auml;t</th>
+												<th>User</th>
+											</tr>
 											</thead>
 											<tbody>
 											<?php foreach ($logs as $log): ?>
@@ -669,11 +696,18 @@ $this->load->view(
 
 <script>
 
-	$(document).ready(function ()
+	$(document).ready(
+		function ()
 		{
+			//javascript bootstrap hack - not nice!
+			$("select").addClass('form-control');
+			$("table").addClass('table-condensed');
+			$("#logtable, #notiztable").addClass('table-hover');
+
 			//initialise table sorter
 			addTablesorter("doctable", [[2, 1], [1, 0]], ["zebra"]);
 			addTablesorter("nachgdoctable", [[2, 0], [1, 1]], ["zebra"]);
+			addTablesorter("msgtable", [[0, 1], [2, 0]], ["zebra", "filter"]);
 			addTablesorter("logtable", [[0, 1]], ["filter"]);
 			addTablesorter("notiztable", [[0, 1]], ["filter"]);
 
@@ -681,67 +715,11 @@ $this->load->view(
 			togglePager(23, "logtable", "logpager");
 			togglePager(10, "notiztable", "notizpager");
 
-			function addTablesorter(tableid, sortList, widgets)
-			{
-				$("#" + tableid).tablesorter(
-					{
-						theme: "default",
-						dateFormat: "ddmmyyyy",
-						sortList: sortList,
-						widgets: widgets
-					}
-				);
-
-				//hide filters if less than 2 datarows (+ 2 for headings and filter row itself)
-				if ($("#" + tableid + " tr").length < 4)
-				{
-					$("#" + tableid + " tr.tablesorter-filter-row").hide();
-				}
-			}
-
-			function togglePager(size, tableid, pagerid)
-			{
-				var html =
-					'<div id="' + pagerid + '" class="pager"> ' +
-					'<form class="form-inline">' +
-					'<i class="fa fa-step-backward first"></i>&nbsp;' +
-					'<i class="fa fa-backward prev"></i>' +
-					'<span class="pagedisplay"></span>' +
-					'<i class="fa fa-forward next"></i>&nbsp;' +
-					'<i class="fa fa-step-forward last"></i>' +
-					'</form>' +
-					'</div>';
-
-				var rowcount = $("#" + tableid + " tr").length;
-
-				//not show pager if on first table page
-				if (rowcount > size)
-				{
-					var table = $("#" + tableid);
-					table.after(html);
-
-					table.tablesorterPager(
-						{
-							container: $("#" + pagerid),
-							size: size,
-							cssDisabled: 'disabled',
-							savePages: false,
-							output: '{startRow} – {endRow} / {totalRows} Zeilen'
-						}
-					);
-				}
-			}
-
 			//initialise datepicker
 			$.datepicker.setDefaults($.datepicker.regional['de']);
 			$(".dateinput").datepicker({
 				"dateFormat": "dd.mm.yy"
 			});
-
-			//javascript bootstrap hack - not nice!
-			$("select").addClass('form-control');
-			$("table").addClass('table-condensed');
-			$("#logtable, #notiztable").addClass('table-hover');
 
 			//add submit event to message send link
 			$("#sendmsglink").click(
@@ -781,6 +759,57 @@ $this->load->view(
 			);
 		}
 	);
+
+	function addTablesorter(tableid, sortList, widgets)
+	{
+		$("#" + tableid).tablesorter(
+			{
+				theme: "default",
+				dateFormat: "ddmmyyyy",
+				sortList: sortList,
+				widgets: widgets
+			}
+		);
+
+		//hide filters if less than 2 datarows (+ 2 for headings and filter row itself)
+		if ($("#" + tableid + " tr").length < 4)
+		{
+			$("#" + tableid + " tr.tablesorter-filter-row").hide();
+		}
+	}
+
+	function togglePager(size, tableid, pagerid)
+	{
+		var html =
+			'<div id="' + pagerid + '" class="pager"> ' +
+			'<form class="form-inline">' +
+			'<i class="fa fa-step-backward first"></i>&nbsp;' +
+			'<i class="fa fa-backward prev"></i>' +
+			'<span class="pagedisplay"></span>' +
+			'<i class="fa fa-forward next"></i>&nbsp;' +
+			'<i class="fa fa-step-forward last"></i>' +
+			'</form>' +
+			'</div>';
+
+		var rowcount = $("#" + tableid + " tr").length;
+
+		//not show pager if on first table page
+		if (rowcount > size)
+		{
+			var table = $("#" + tableid);
+			table.after(html);
+
+			table.tablesorterPager(
+				{
+					container: $("#" + pagerid),
+					size: size,
+					cssDisabled: 'disabled',
+					savePages: false,
+					output: '{startRow} – {endRow} / {totalRows} Zeilen'
+				}
+			);
+		}
+	}
 </script>
 </body>
 

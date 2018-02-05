@@ -20,16 +20,17 @@
 }
 
 /* set colors of zebra widget */
-table.tablesorter tbody tr.even td{
-    background-color: #ffff !important;
+table.tablesorter tbody tr.even td, table.tablesorter tbody tr.even:hover, table.tablesorter tbody tr.even td:hover{
+    background-color: #ffff;
 }
 
-table.tablesorter tbody tr.odd td{
-    background-color: #f5f5f5 !important;
+table.tablesorter tbody tr.odd td, table.tablesorter tbody tr.odd:hover, table.tablesorter tbody tr.odd td:hover{
+    background-color: #f5f5f5;
 }
 
-table.tablesorter tbody tr.odd:hover{
-    background-color: #f5f5f5 !important;
+/* colors for hover over table rows and clicked rows*/
+table.tablesort-hover tr:hover, .tablesort-active{
+    background-color: #dfdfdf !important;
 }
 
 /* Remove background color from filter row */

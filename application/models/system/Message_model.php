@@ -86,6 +86,77 @@ class Message_model extends DB_Model
 	}
 
 	/**
+	 * Gets massages with a person being sender OR receiver.
+	 * @param $person_id
+	 * @param null $status message status. by default, latest status is returned
+	 * @return array|null
+	 */
+	public function getMessagesOfPerson($person_id, $status = null)
+	{
+		// Checks if the operation is permitted by the API caller
+		if (isError($ent = $this->isEntitled('public.tbl_person', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)))
+			return $ent;
+		if (isError($ent = $this->isEntitled('public.tbl_msg_status', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)))
+			return $ent;
+		if (isError($ent = $this->isEntitled('public.tbl_msg_message', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)))
+			return $ent;
+		if (isError($ent = $this->isEntitled('public.tbl_msg_recipient', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)))
+			return $ent;
+
+		$sql = 'SELECT m.message_id,
+						m.person_id,
+						m.subject,
+						m.body,
+						m.priority,
+						m.insertamum,
+						m.relationmessage_id,
+						m.oe_kurzbz,
+						se.person_id AS sepersonid,
+						se.anrede AS seanrede,
+						se.titelpost AS setitelpost,
+						se.titelpre AS setitelpre,
+						se.nachname AS senachname,
+						se.vorname AS sevorname,
+						se.vornamen AS sevornamen,
+						re.person_id AS repersonid,
+						re.anrede AS reanrede,
+						re.titelpost AS retitelpost,
+						re.titelpre AS retitelpre,
+						re.nachname AS renachname,
+						re.vorname AS revorname,
+						re.vornamen AS revornamen,
+						s.status,
+						s.statusinfo,
+						s.insertamum AS statusamum
+				  FROM public.tbl_msg_message m
+						JOIN public.tbl_msg_recipient r ON m.message_id = r.message_id 
+						JOIN public.tbl_person se ON (m.person_id = se.person_id)
+						JOIN public.tbl_person re ON (r.person_id = re.person_id)
+						LEFT JOIN (
+							SELECT message_id, person_id, status, statusinfo, insertamum
+							  FROM public.tbl_msg_status
+							  %s
+						  ORDER BY insertamum DESC
+						  ) s ON (m.message_id = s.message_id AND re.person_id = s.person_id)
+				 WHERE se.person_id = ?
+				 OR re.person_id = ?
+				 ';
+
+		if (is_numeric($status))
+		{
+			$sql = sprintf($sql, 'WHERE status = '.$status);
+		}
+		else
+		{
+			$sql = sprintf($sql, '');
+		}
+
+		$parametersArray = array($person_id, $person_id);
+
+		return $this->execQuery($sql, $parametersArray);
+	}
+
+	/**
 	 * getMessageVars
 	 */
 	public function getMessageVars()
