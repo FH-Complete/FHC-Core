@@ -1,12 +1,23 @@
 <div>
 <?php
 	$selectedFields = FilterWidget::getSelectedFields();
+	$columnsAliases = FilterWidget::getColumnsAliases();
 
 	for ($selectedFieldsCounter = 0; $selectedFieldsCounter < count($selectedFields); $selectedFieldsCounter++)
 	{
 		$selectedField = $selectedFields[$selectedFieldsCounter];
+		$selectedFieldAlias = $selectedField;
+
+		if ($columnsAliases != null)
+		{
+			$indx = array_search($selectedField, $listFields);
+			if ($indx !== false)
+			{
+				$selectedFieldAlias = $columnsAliases[$indx];
+			}
+		}
 ?>
-		<input type="button" value="<?php echo $selectedField; ?> X" class="remove-field" fieldToRemove="<?php echo $selectedField; ?>">
+		<input type="button" value="<?php echo $selectedFieldAlias; ?> X" class="remove-field" fieldToRemove="<?php echo $selectedField; ?>">
 <?php
 	}
 ?>
@@ -23,8 +34,14 @@
 			for ($listFieldsCounter = 0; $listFieldsCounter < count($listFields); $listFieldsCounter++)
 			{
 				$listField = $listFields[$listFieldsCounter];
+				$listFieldAlias = $listField;
+
+				if ($columnsAliases != null)
+				{
+					$listFieldAlias = $columnsAliases[$listFieldsCounter];
+				}
 		?>
-			<option value="<?php echo $listField; ?>"><?php echo $listField; ?></option>
+			<option value="<?php echo $listField; ?>"><?php echo $listFieldAlias; ?></option>
 		<?php
 			}
 		?>

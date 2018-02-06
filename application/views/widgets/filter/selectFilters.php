@@ -1,17 +1,29 @@
 <div>
 <?php
 	$selectedFilters = FilterWidget::getSelectedFilters();
+	$columnsAliases = FilterWidget::getColumnsAliases();
 
 	for ($filtersCounter = 0; $filtersCounter < count($selectedFilters); $filtersCounter++)
 	{
 		$selectedFilter = $selectedFilters[$filtersCounter];
 
 		$md = FilterWidget::getFilterMetaData($selectedFilter, $metaData);
+		$selectedFieldAlias = $md->name;
+
+		if ($columnsAliases != null)
+		{
+			$indx = array_search($selectedFilter, $listFields);
+			if ($indx !== false)
+			{
+				$selectedFieldAlias = $columnsAliases[$indx];
+			}
+		}
+
 ?>
 		<div>
 
 			<span>
-				<?php echo $md->name; ?>
+				<?php echo $selectedFieldAlias; ?>
 			</span>
 
 			<?php echo FilterWidget::renderFilterType($md); ?>
@@ -37,8 +49,14 @@
 		for ($listFieldsCounter = 0; $listFieldsCounter < count($listFields); $listFieldsCounter++)
 		{
 			$field = $listFields[$listFieldsCounter];
+			$listFieldAlias = $field;
+
+			if ($columnsAliases != null)
+			{
+				$listFieldAlias = $columnsAliases[$listFieldsCounter];
+			}
 	?>
-			<option value="<?php echo $field; ?>"><?php echo $field; ?></option>
+			<option value="<?php echo $field; ?>"><?php echo $listFieldAlias; ?></option>
 	<?php
 		}
 	?>

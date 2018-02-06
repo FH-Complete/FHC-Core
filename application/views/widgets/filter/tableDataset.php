@@ -4,6 +4,7 @@
 	$selectedFields = FilterWidget::getSelectedFields();
 	$additionalColumns = FilterWidget::getAdditionalColumns();
 	$checkboxes = FilterWidget::getCheckboxes();
+	$columnsAliases = FilterWidget::getColumnsAliases();
 ?>
 
 <div>
@@ -21,8 +22,19 @@
 				for ($selectedFieldsCounter = 0; $selectedFieldsCounter < count($selectedFields); $selectedFieldsCounter++)
 				{
 					$selectedField = $selectedFields[$selectedFieldsCounter];
+					$selectedFieldAlias = $selectedField;
+
+					if ($columnsAliases != null)
+					{
+						$indx = array_search($selectedField, $listFields);
+						if ($indx !== false)
+						{
+							$selectedFieldAlias = $columnsAliases[$indx];
+						}
+					}
+
 			?>
-					<th title="<?php echo $selectedField; ?>"><?php echo $selectedField; ?></th>
+					<th title="<?php echo $selectedField; ?>"><?php echo $selectedFieldAlias; ?></th>
 			<?php
 				}
 			?>
