@@ -30,17 +30,32 @@
 	</div>
 </div>
 <script>
-	$(document).ready(
-		function ()
+	tinymce.init({
+		menubar: false,
+		toolbar: false,
+		readonly: 1,
+		selector: "#msgbody",
+		statusbar: false,
+		height: 300,
+		//callback to avoid conflict with ajax (getting first message body)
+		init_instance_callback: "initMsgBody"
+	});
+
+	function initMsgBody()
+	{
+		var tblrows = $("#msgtable tbody tr");
+
+		if (tblrows.length > 0)
 		{
-			var lastelement = $("#msgtable tbody tr").last();
-			var id = lastelement.attr('id');
+			//in the begging last sent message is shown
+			var firstelement = tblrows.first();
+			var id = firstelement.attr('id');
 
 			getMsgBody(id);
-			lastelement.find("td").addClass("tablesort-active");
+			firstelement.find("td").addClass("tablesort-active");
 
 			//add click event on message table for message preview
-			$("#msgtable tbody tr").click(
+			tblrows.click(
 				function ()
 				{
 					$("#msgtable").find("td").removeClass("tablesort-active");
@@ -49,7 +64,7 @@
 				}
 			);
 		}
-	);
+	}
 
 	//retrieve message data from message and reiver id via AJAX
 	function getMsgBody(id)
@@ -73,14 +88,4 @@
 			}
 		)
 	}
-
-	tinymce.init({
-		menubar: false,
-		toolbar: false,
-		readonly: 1,
-		selector: "#msgbody",
-		statusbar: false,
-		height: 300/*,
-		 plugins: "autoresize"*/
-	});
 </script>

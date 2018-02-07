@@ -1,20 +1,42 @@
-<?php $this->load->view("templates/header", array("title" => "MessageReply", "jqueryV1" => true, "tinymce" => true)); ?>
+<?php
+$this->load->view(
+	'templates/FHC-Header',
+	array(
+		'title' => 'MessageReply',
+		'jquery' => true,
+		'bootstrap' => true,
+		'fontawesome' => true,
+		'tinymce' => true,
+		'sbadmintemplate' => true,
+		'customCSSs' => 'skin/admintemplate_contentonly.css',
+		'customJSs' => 'include/js/bootstrapper.js'
+	)
+);
+?>
+<body>
+<style>
+	input[type=text] {
+		height: 28px;
+	}
+</style>
+<?php
+$href = str_replace("/system/Messages/write", "/system/Messages/send", $_SERVER["REQUEST_URI"]);
+?>
+<div id="wrapper">
+	<div id="page-wrapper">
+		<div class="container-fluid">
+			<div class="row">
+				<div class="col-lg-12">
+					<h3 class="page-header">Send Message</h3>
+				</div>
+			</div>
+			<form id="sendForm" method="post" action="<?php echo $href; ?>">
+				<div class="row">
+					<div class="form-group">
 
-	<body>
-
-		<?php
-			$href = str_replace("/system/Messages/write", "/system/Messages/send", $_SERVER["REQUEST_URI"]);
-		?>
-
-		<form id="sendForm" method="post" action="<?php echo $href; ?>">
-
-			<table>
-				<tr>
-					<td>
-						<strong>To:</strong>
-					</td>
-					<td>
-						<?php
+						<label class="col-lg-1">To:</label>
+						<div class="col-lg-11">
+							<?php
 							for ($i = 0; $i < count($receivers); $i++)
 							{
 								$receiver = $receivers[$i];
@@ -23,275 +45,264 @@
 								{
 									echo '<br>';
 								}
-								echo $receiver->Vorname . " " . $receiver->Nachname . "; ";
+								echo $receiver->Vorname." ".$receiver->Nachname."; ";
 							}
-						?>
-					</td>
-				</tr>
-				<tr>
-					<td height="3px"></td>
-				</tr>
-				<tr>
-					<td>
-						<strong>Subject:</strong>&nbsp;
-					</td>
-					<td>
-						<?php
-							$subject = '';
-							if (isset($message))
-							{
-								$subject = 'Re: '.$message->subject;
-							}
-						?>
-						<input id="subject" type="text" value="<?php echo $subject; ?>" name="subject" size="70">
-					</td>
-				</tr>
-			</table>
+							?>
+						</div>
+					</div>
+				</div>
+				<div class="row">
 
-			<table width="100%">
-				<tr>
-					<td width="80%">
-						<strong>Message:</strong><br>
+					<div class="form-group form-inline">
+						<label id="subj" class="col-lg-1">Subject:</label>&nbsp;
 						<?php
-							$body = '';
-							if (isset($message))
-							{
-								$body = $message->body;
-							}
+						$subject = '';
+						if (isset($message))
+						{
+							$subject = 'Re: '.$message->subject;
+						}
+						?>
+						<div class="col-lg-10">
+							<input id="subject" class="form-control" type="text" value="<?php echo $subject; ?>"
+								   name="subject" aria-describedby="subj" size="70">
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-lg-10">
+						<br>
+						<label>Message:</label>
+						<?php
+						$body = '';
+						if (isset($message))
+						{
+							$body = $message->body;
+						}
 						?>
 						<textarea id="bodyTextArea" name="body"><?php echo $body; ?></textarea>
-					</td>
-					<td width="3%">&nbsp;</td>
-					<td width="17%">
-						<?php
-							if (isset($variables))
-							{
+					</div>
+					<?php
+					if (isset($variables)):
 						?>
-							<div>
-								<strong>Variables:</strong><br>
-								<select id="variables" size="14" style="min-width:200px;">
-								<?php
-									foreach($variables as $key => $val)
+						<div class="col-lg-2">
+							<div class="form-group text-center">
+								<label>Variables:</label>
+								<select id="variables" class="form-control" size="13" multiple="multiple">
+									<?php
+									foreach ($variables as $key => $val)
 									{
-								?>
+										?>
 										<option value="<?php echo $key; ?>"><?php echo $val; ?></option>
-								<?php
+										<?php
 									}
-								?>
+									?>
 								</select>
 							</div>
-						<?php
-							}
-						?>
-					</td>
-				</tr>
-			</table>
-
-			<table>
-				<tr>
-					<td>
-						<?php
-							echo $this->widgetlib->widget(
-								'Vorlage_widget',
-								array('oe_kurzbz' => $oe_kurzbz, 'isAdmin' => $isAdmin),
-								array('name' => 'vorlage', 'id' => 'vorlageDnD')
-							);
-						?>
-					</td>
-					<td>
-						&nbsp;
-					</td>
-					<td>
-						<button id="sendButton" type="button">Send</button>
-					</td>
-				</tr>
-			</table>
-
-			<br>
-
-			<?php
-				if (isset($receivers) && count($receivers) > 0)
-				{
-			?>
-				<div>
-					Preview:
+						</div>
+					<?php endif; ?>
 				</div>
-				<div style="border: 1px; border-style: solid;">
-					<table width="100%" style="margin: 3px;">
-						<tr>
-							<td>
-								<strong>Recipient:</strong>
-								<select id="recipients">
-									<option value="-1">Select...</option>
-								<?php
-									foreach($receivers as $receiver)
-									{
-										$receiverid = isset($receiver->prestudent_id) ? $receiver->prestudent_id : $receiver->person_id;
-								?>
-									<option value="<?php echo $receiverid; ?>"><?php echo $receiver->Vorname . " " . $receiver->Nachname; ?></option>
-								<?php
-									}
-								?>
-								</select>
-								&nbsp;
-								<strong><a href="#" id="refresh">Refresh</a></strong>
-							</td>
-						</tr>
-						<tr>
-							<td>
-								&nbsp;
-							</td>
-						</tr>
-						<tr>
-							<td width="100%">
-								<textarea id="tinymcePreview"></textarea>
-							</td>
-						</tr>
-					</table>
+				<div class="row">
+					<div class="col-lg-3 text-right">
+						<?php
+						echo $this->widgetlib->widget(
+							'Vorlage_widget',
+							array('oe_kurzbz' => $oe_kurzbz, 'isAdmin' => $isAdmin),
+							array('name' => 'vorlage', 'id' => 'vorlageDnD')
+						);
+						?>
+					</div>
+					<div class="col-lg-offset-6 col-lg-1 text-right">
+						<button id="sendButton" class="btn btn-default" type="button">Send</button>
+					</div>
 				</div>
-			<?php
-				}
-			?>
+				<?php if (isset($receivers) && count($receivers) > 0): ?>
+					<hr>
+					<div class="row">
+						<div class="col-lg-12">
+							Preview:
+						</div>
+					</div>
+					<div class="well"><!--style="border: 1px; border-style: solid; padding: 8px"-->
+						<div class="row">
+							<div class="col-lg-5">
+								<div class="form-grop form-inline">
+									<label>Recipient:</label>
+									<select id="recipients">
+										<option value="-1">Select...</option>
+										<?php
+										foreach ($receivers as $receiver)
+										{
+											$receiverid = isset($receiver->prestudent_id) ? $receiver->prestudent_id : $receiver->person_id;
+											?>
+											<option value="<?php echo $receiverid; ?>"><?php echo $receiver->Vorname." ".$receiver->Nachname; ?></option>
+											<?php
+										}
+										?>
+									</select>
+									&nbsp;
+									<strong><a href="#" id="refresh">Refresh</a></strong>
+								</div>
+							</div>
+							<div class="col-lg-2">
 
-			<?php
-				for($i = 0; $i < count($receivers); $i++)
+							</div>
+						</div>
+						<br>
+						<textarea id="tinymcePreview"></textarea>
+					</div>
+					<?php
+				endif;
+				?>
+
+				<?php
+				for ($i = 0; $i < count($receivers); $i++)
 				{
 					$receiver = $receivers[$i];
 					if (isset($receiver->prestudent_id))
 					{
 						$receiverid = $receiver->prestudent_id;
-						$fieldname= 'prestudents[]';
+						$fieldname = 'prestudents[]';
 					}
 					else
 					{
 						$receiverid = $receiver->person_id;
-						$fieldname= 'persons[]';
+						$fieldname = 'persons[]';
 					}
-					echo '<input type="hidden" name="' . $fieldname . '" value="' . $receiverid . '">' . "\n";
+					echo '<input type="hidden" name="'.$fieldname.'" value="'.$receiverid.'">'."\n";
 				}
-			?>
+				?>
 
-			<?php
+				<?php
 				if (isset($message))
 				{
-			?>
+					?>
 					<input type="hidden" name="relationmessage_id" value="<?php echo $message->message_id; ?>">
-			<?php
+					<?php
 				}
-			?>
+				?>
 
-		</form>
+			</form>
+		</div>
+	</div>
+</div>
+<script>
+	tinymce.init({
+		selector: "#bodyTextArea"
+	});
 
-	<script>
-		tinymce.init({
-			selector:  "#bodyTextArea"
-		});
+	tinymce.init({
+		menubar: false,
+		toolbar: false,
+		readonly: 1,
+		selector: "#tinymcePreview",
+		statusbar: true
+	});
 
-		tinymce.init({
-			menubar: false,
-			toolbar: false,
-			readonly: 1,
-			selector: "#tinymcePreview",
-			statusbar: true
-		});
-
-		$(document).ready(function() {
-			if ($("#variables"))
-			{
-				$("#variables").dblclick(function() {
-					if ($("#bodyTextArea"))
-					{
-						tinyMCE.get("bodyTextArea").setContent(tinyMCE.get("bodyTextArea").getContent() + $(this).children(":selected").val());
-					}
-				});
-			}
-
-			if ($("#recipients"))
-			{
-				$("#recipients").change(tinymcePreviewSetContent);
-			}
-
-			if ($("#refresh"))
-			{
-				$("#refresh").click(tinymcePreviewSetContent);
-			}
-
-			if ($("#sendButton") && $("#sendForm"))
-			{
-				$("#sendButton").click(function() {
-					if ($("#subject") && $("#subject").val() != '' && tinyMCE.get("bodyTextArea").getContent() != '')
-					{
-						$("#sendForm").submit();
-					}
-					else
-					{
-						alert("Subject and text are required fields!");
-					}
-				});
-			}
-
-			if ($("#vorlageDnD"))
-			{
-				$("#vorlageDnD").change(function() {
-					if (this.value != '')
-					{
-						<?php
-							$url = str_replace("/system/Messages/write", "/system/Messages/getVorlage", $_SERVER["REQUEST_URI"]);
-						?>
-
-						$.ajax({
-							dataType: "json",
-							url: "<?php echo $url; ?>",
-							data: {"vorlage_kurzbz": this.value},
-							success: function(data, textStatus, jqXHR) {
-								tinyMCE.get("bodyTextArea").setContent(data.retval[0].text);
-								$("#subject").val(data.retval[0].subject);
-							},
-							error: function(jqXHR, textStatus, errorThrown) {
-								alert(textStatus + " - " + errorThrown);
-							}
-						});
-					}
-				});
-			}
-		});
-
-		function tinymcePreviewSetContent()
+	$(document).ready(function ()
+	{
+		if ($("#variables"))
 		{
-			if ($("#tinymcePreview"))
+			$("#variables").dblclick(function ()
 			{
-				if ($("#recipients").children(":selected").val() > -1)
+				if ($("#bodyTextArea"))
 				{
-					parseMessageText($("#recipients").children(":selected").val(), tinyMCE.get("bodyTextArea").getContent());
-				}
-				else
-				{
-					tinyMCE.get("tinymcePreview").setContent("");
-				}
-			}
-		}
-
-		function parseMessageText(prestudent_id, text)
-		{
-			<?php
-				$url = str_replace("/system/Messages/write", "/system/Messages/parseMessageText", $_SERVER["REQUEST_URI"]);
-				$url = substr($url, 0, strrpos($url, '/'));
-			?>
-
-			$.ajax({
-				dataType: "json",
-				url: "<?php echo $url; ?>",
-				data: {"prestudent_id": prestudent_id, "text" : text},
-				success: function(data, textStatus, jqXHR) {
-					tinyMCE.get("tinymcePreview").setContent(data);
-				},
-				error: function(jqXHR, textStatus, errorThrown) {
-					alert(textStatus + " - " + errorThrown + " - " + jqXHR.responseText);
+					tinyMCE.get("bodyTextArea").setContent(tinyMCE.get("bodyTextArea").getContent() + $(this).children(":selected").val());
 				}
 			});
 		}
-	</script>
 
-	</body>
+		if ($("#recipients"))
+		{
+			$("#recipients").change(tinymcePreviewSetContent);
+		}
 
-<?php $this->load->view("templates/footer"); ?>
+		if ($("#refresh"))
+		{
+			$("#refresh").click(tinymcePreviewSetContent);
+		}
+
+		if ($("#sendButton") && $("#sendForm"))
+		{
+			$("#sendButton").click(function ()
+			{
+				if ($("#subject") && $("#subject").val() != '' && tinyMCE.get("bodyTextArea").getContent() != '')
+				{
+					$("#sendForm").submit();
+				}
+				else
+				{
+					alert("Subject and text are required fields!");
+				}
+			});
+		}
+
+		if ($("#vorlageDnD"))
+		{
+			$("#vorlageDnD").change(function ()
+			{
+				if (this.value != '')
+				{
+					<?php
+					$url = str_replace("/system/Messages/write", "/system/Messages/getVorlage", $_SERVER["REQUEST_URI"]);
+					?>
+
+					$.ajax({
+						dataType: "json",
+						url: "<?php echo $url; ?>",
+						data: {"vorlage_kurzbz": this.value},
+						success: function (data, textStatus, jqXHR)
+						{
+							tinyMCE.get("bodyTextArea").setContent(data.retval[0].text);
+							$("#subject").val(data.retval[0].subject);
+						},
+						error: function (jqXHR, textStatus, errorThrown)
+						{
+							alert(textStatus + " - " + errorThrown);
+						}
+					});
+				}
+			});
+		}
+	});
+
+	function tinymcePreviewSetContent()
+	{
+		if ($("#tinymcePreview"))
+		{
+			if ($("#recipients").children(":selected").val() > -1)
+			{
+				parseMessageText($("#recipients").children(":selected").val(), tinyMCE.get("bodyTextArea").getContent());
+			}
+			else
+			{
+				tinyMCE.get("tinymcePreview").setContent("");
+			}
+		}
+	}
+
+	function parseMessageText(prestudent_id, text)
+	{
+		<?php
+		$url = str_replace("/system/Messages/write", "/system/Messages/parseMessageText", $_SERVER["REQUEST_URI"]);
+		$url = substr($url, 0, strrpos($url, '/'));
+		?>
+
+		$.ajax({
+			dataType: "json",
+			url: "<?php echo $url; ?>",
+			data: {"prestudent_id": prestudent_id, "text": text},
+			success: function (data, textStatus, jqXHR)
+			{
+				tinyMCE.get("tinymcePreview").setContent(data);
+			},
+			error: function (jqXHR, textStatus, errorThrown)
+			{
+				alert(textStatus + " - " + errorThrown + " - " + jqXHR.responseText);
+			}
+		});
+	}
+</script>
+
+</body>
+
+<?php $this->load->view("templates/FHC-Footer"); ?>

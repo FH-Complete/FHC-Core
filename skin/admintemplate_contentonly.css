@@ -1,0 +1,7 @@
+@media (min-width:768px) {
+    #page-wrapper {
+        margin-right: 250px;
+        margin-top: 8px;
+        border: 1px solid #e7e7e7;
+    }
+}
