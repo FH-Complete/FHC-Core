@@ -31,6 +31,10 @@ class Messages extends VileSci_Controller
 	{
 		$prestudent_id = $this->input->post('prestudent_id');
 		$person_id = $this->input->post('person_id');
+		$personOnly = false;
+
+		if (isset($person_id) && !isset($prestudent_id))
+			$personOnly = true;
 
 		$msg = null;
 
@@ -53,10 +57,10 @@ class Messages extends VileSci_Controller
 
 		// Get variables
 		$this->load->model('system/Message_model', 'MessageModel');
-		if($prestudent_id !== null)
-			$this->getPrestudentMsgData($prestudent_id, $variablesArray, $msgVarsData);
-		elseif($person_id !== null)
+		if ($personOnly === true)
 			$this->getPersonMsgData($person_id, $variablesArray, $msgVarsData);
+		else
+			$this->getPrestudentMsgData($prestudent_id, $variablesArray, $msgVarsData);
 
 		// Organisation units used to get the templates
 		$oe_kurzbz = array(); // A person can have more organisation units
@@ -84,7 +88,8 @@ class Messages extends VileSci_Controller
 			'message' => $msg,
 			'variables' => $variablesArray,
 			'oe_kurzbz' => $oe_kurzbz, // used to get the templates
-			'isAdmin' => $isAdmin->retval
+			'isAdmin' => $isAdmin->retval,
+			'personOnly' => $personOnly//indicates if sent only to persons
 		);
 
 		$v = $this->load->view('system/messageWrite', $data);
@@ -289,12 +294,18 @@ class Messages extends VileSci_Controller
 	public function parseMessageText()
 	{
 		$prestudent_id = $this->input->get('prestudent_id');
+		$person_id = $this->input->get('person_id');
 		$text = $this->input->get('text');
 
-		if (isset($prestudent_id))
-		{
+		$data = null;
+
+		if (isset($person_id) && !isset($prestudent_id))
+			$data = $this->MessageModel->getMsgVarsDataByPersonId($person_id);
+		elseif (isset($prestudent_id))
 			$data = $this->MessageModel->getMsgVarsDataByPrestudentId($prestudent_id);
 
+		if (isset($data))
+		{
 			$parsedText = "";
 			if (hasData($data))
 			{
@@ -321,8 +332,6 @@ class Messages extends VileSci_Controller
 	 */
 	public function getMessageFromIds($msg_id, $receiver_id)
 	{
-/*		$this->MessageModel->addSelect('subject, body, oe_kurzbz');
-		$msg = $this->MessageModel->load($msg_id);*/
 		$msg = $this->messagelib->getMessage($msg_id, $receiver_id);
 
 		$this->output

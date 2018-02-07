@@ -16,7 +16,7 @@ $this->load->view(
 <body>
 <style>
 	input[type=text] {
-		height: 28px;
+		height: 30px;
 	}
 </style>
 <?php
@@ -52,9 +52,8 @@ $href = str_replace("/system/Messages/write", "/system/Messages/send", $_SERVER[
 					</div>
 				</div>
 				<div class="row">
-
 					<div class="form-group form-inline">
-						<label id="subj" class="col-lg-1">Subject:</label>&nbsp;
+						<label class="col-lg-1">Subject:</label>&nbsp;
 						<?php
 						$subject = '';
 						if (isset($message))
@@ -64,7 +63,7 @@ $href = str_replace("/system/Messages/write", "/system/Messages/send", $_SERVER[
 						?>
 						<div class="col-lg-10">
 							<input id="subject" class="form-control" type="text" value="<?php echo $subject; ?>"
-								   name="subject" aria-describedby="subj" size="70">
+								   name="subject" size="70">
 						</div>
 					</div>
 				</div>
@@ -122,7 +121,7 @@ $href = str_replace("/system/Messages/write", "/system/Messages/send", $_SERVER[
 							Preview:
 						</div>
 					</div>
-					<div class="well"><!--style="border: 1px; border-style: solid; padding: 8px"-->
+					<div class="well">
 						<div class="row">
 							<div class="col-lg-5">
 								<div class="form-grop form-inline">
@@ -130,11 +129,11 @@ $href = str_replace("/system/Messages/write", "/system/Messages/send", $_SERVER[
 									<select id="recipients">
 										<option value="-1">Select...</option>
 										<?php
+										$idtype = $personOnly === true ? 'person_id' : 'prestudent_id';
 										foreach ($receivers as $receiver)
 										{
-											$receiverid = isset($receiver->prestudent_id) ? $receiver->prestudent_id : $receiver->person_id;
 											?>
-											<option value="<?php echo $receiverid; ?>"><?php echo $receiver->Vorname." ".$receiver->Nachname; ?></option>
+											<option value="<?php echo $receiver->{$idtype}; ?>"><?php echo $receiver->Vorname." ".$receiver->Nachname; ?></option>
 											<?php
 										}
 										?>
@@ -158,15 +157,15 @@ $href = str_replace("/system/Messages/write", "/system/Messages/send", $_SERVER[
 				for ($i = 0; $i < count($receivers); $i++)
 				{
 					$receiver = $receivers[$i];
-					if (isset($receiver->prestudent_id))
-					{
-						$receiverid = $receiver->prestudent_id;
-						$fieldname = 'prestudents[]';
-					}
-					else
+					if ($personOnly === true)
 					{
 						$receiverid = $receiver->person_id;
 						$fieldname = 'persons[]';
+					}
+					else
+					{
+						$receiverid = $receiver->prestudent_id;
+						$fieldname = 'prestudents[]';
 					}
 					echo '<input type="hidden" name="'.$fieldname.'" value="'.$receiverid.'">'."\n";
 				}
@@ -206,7 +205,11 @@ $href = str_replace("/system/Messages/write", "/system/Messages/send", $_SERVER[
 			{
 				if ($("#bodyTextArea"))
 				{
-					tinyMCE.get("bodyTextArea").setContent(tinyMCE.get("bodyTextArea").getContent() + $(this).children(":selected").val());
+					//if editor active add at cursor position, otherwise at end
+					if(tinymce.activeEditor.id === "bodyTextArea")
+						tinymce.activeEditor.execCommand('mceInsertContent', false, $(this).children(":selected").val());
+					else
+						tinyMCE.get("bodyTextArea").setContent(tinyMCE.get("bodyTextArea").getContent() + $(this).children(":selected").val());
 				}
 			});
 		}
@@ -280,17 +283,18 @@ $href = str_replace("/system/Messages/write", "/system/Messages/send", $_SERVER[
 		}
 	}
 
-	function parseMessageText(prestudent_id, text)
+	function parseMessageText(receiver_id, text)
 	{
 		<?php
 		$url = str_replace("/system/Messages/write", "/system/Messages/parseMessageText", $_SERVER["REQUEST_URI"]);
 		$url = substr($url, 0, strrpos($url, '/'));
+		$idtype = $personOnly === true ? 'person_id' : 'prestudent_id';
 		?>
 
 		$.ajax({
 			dataType: "json",
 			url: "<?php echo $url; ?>",
-			data: {"prestudent_id": prestudent_id, "text": text},
+			data: {"<?php echo $idtype ?>": receiver_id, "text": text},
 			success: function (data, textStatus, jqXHR)
 			{
 				tinyMCE.get("tinymcePreview").setContent(data);

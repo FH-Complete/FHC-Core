@@ -2,7 +2,7 @@
 	<table id="msgtable" class="table table-bordered table-condensed tablesort-hover tablesort-active">
 		<thead>
 		<tr>
-			<th>Datum</th>
+			<th>Gelesen am</th>
 			<th>Sender</th>
 			<th>Empf&auml;nger</th>
 			<th>Betreff</th>
