@@ -124,6 +124,7 @@ $matrikelnummer = (isset($_POST['matrikelnummer'])?$_POST['matrikelnummer']:'');
 $semester = (isset($_POST['semester'])?$_POST['semester']:'');
 $verband = (isset($_POST['verband'])?$_POST['verband']:'');
 $gruppe = (isset($_POST['gruppe'])?$_POST['gruppe']:'');
+$dms_id_lichtbild = '';
 
 if($uid!='')
 {
