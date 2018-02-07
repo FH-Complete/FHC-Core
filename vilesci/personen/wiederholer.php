@@ -21,14 +21,14 @@
  */
 /**
  * Dieses Script ist fuer Personen, die das Studium abgebrochen haben und von neuem starten.
- * Dazu muessen Studenten ein neues Personenkennzeichen etc erhalten da es sonst zu Problemen bei 
+ * Dazu muessen Studenten ein neues Personenkennzeichen etc erhalten da es sonst zu Problemen bei
  * der BIS-Meldung kommt.
- * 
+ *
  * Mit diesem Script kann der Student gesucht werden und ein neuer Prestudent Eintrag angelegt werden.
  * Zusätzlich wird ein Interessentenstatus im ausgewaehlten Semester angelegt.
- * 
+ *
  * Die Prestudentdaten (ZGV etc) werden fuer den neuen Eintrag uebernommen.
- * 
+ *
  * Dieses Script ist NICHT fuer Studenten die nur ein Semester/Jahr wiederholen. Es ist nur fuer Abbrecher die
  * erneut in diesem Studiengang studieren moechten.
  */
@@ -78,30 +78,30 @@ if(isset($_POST['save']))
 		die('Studiensemester muss uebergeben werden');
 	if(!isset($_POST['ausbildungssemester']))
 		die('Ausbildungssemester muss uebergeben werden');
-	
+
 	$prestudent_id=$_POST['prestudent_id'];
 	$ausbildungssemester=$_POST['ausbildungssemester'];
 	$stsem_kurzbz=$_POST['stsem_kurzbz'];
 
 	if(!is_numeric($prestudent_id))
 		die('PrestudentID ist ungueltig');
-	
+
 	$prestd_obj = new prestudent();
 	if(!$prestd_obj->load($prestudent_id))
 		die('PrestudentID ist ungueltig');
-	
+
 	$prestd_obj->new = true;
 	if($prestd_obj->save())
 	{
 		$prestudent_id_neu=$prestd_obj->prestudent_id;
-		
+
 		if($prestd_obj->getLastStatus($prestudent_id))
 			$orgform_kurzbz = $prestd_obj->orgform_kurzbz;
 		else
 			$orgform_kurzbz = null;
-		
+
 		$prestd_obj = new prestudent();
-		
+
 		$prestd_obj->prestudent_id=$prestudent_id_neu;
 		$prestd_obj->status_kurzbz='Interessent';
 		$prestd_obj->studiensemester_kurzbz = $stsem_kurzbz;
@@ -113,7 +113,7 @@ if(isset($_POST['save']))
 		$prestd_obj->updatevon = $user;
 		$prestd_obj->orgform_kurzbz = $orgform_kurzbz;
 		$prestd_obj->new = true;;
-		
+
 		if(!$prestd_obj->save_rolle())
 		{
 			echo 'Fehler beim Speichern der Rolle:'.$prestd_obj->errormsg;
@@ -136,51 +136,56 @@ if(isset($_POST['filter']))
 	$stsem_obj->getAll();
 	if($std_obj->getTab($filter, 'nachname, vorname'))
 	{
-		echo '<table class="liste">';
-		echo '<tr>';
-		echo '<th>PersonID</td>';
-		echo '<th>Vorname</td>';
-		echo '<th>Nachname</td>';
-		echo '<th>Studiengang</td>';
-		echo '<th>Semester</td>';
-		echo '<th>Action</td>';
-		echo '</tr>';
-		$i=0;
-		foreach($std_obj->result as $row)
+		if(is_array($std_obj->result) && count($std_obj->result)>0)
 		{
-			$i++;
-			echo '<tr class="liste'.($i%2).'">';
-			echo '<td>'.$row->person_id.'</td>';
-			echo '<td>'.$row->vorname.'</td>';
-			echo '<td>'.$row->nachname.'</td>';
-			echo '<td>'.$stg_obj->kuerzel_arr[$row->studiengang_kz].'</td>';
-			echo '<td>'.$row->semester.'</td>';
-			echo '<td>';
-			echo '<form action="'.$_SERVER['PHP_SELF'].'" method="POST">';
-			echo '<input type="hidden" name="prestudent_id" value="'.$row->prestudent_id.'" />';
-			echo 'als neuen Interessenten in Studiensemester ';
-			echo '<SELECT name="stsem_kurzbz">';
-			foreach($stsem_obj->studiensemester as $row_stsem)
-			{
-				if($row_stsem->studiensemester_kurzbz==$stsem)
-					$selected='selected';
-				else
-					$selected='';
-				echo '<OPTION value="'.$row_stsem->studiensemester_kurzbz.'" '.$selected.'>'.$row_stsem->studiensemester_kurzbz.'</OPTION>';
-			}
-			echo '</SELECT>';
-			echo ' in Ausbildungssemester <SELECT name="ausbildungssemester">';
-			for($sem=1;$sem<=10;$sem++)
-			{
-				echo '<OPTION value="'.$sem.'">'.$sem.'</OPTION>';
-			}
-			echo '</SELECT>';
-			echo '<input type="submit" name="save" value="anlegen">';
-			echo '</form>';
-			echo '</td>';
+			echo '<table class="liste">';
+			echo '<tr>';
+			echo '<th>PersonID</td>';
+			echo '<th>Vorname</td>';
+			echo '<th>Nachname</td>';
+			echo '<th>Studiengang</td>';
+			echo '<th>Semester</td>';
+			echo '<th>Action</td>';
 			echo '</tr>';
+			$i=0;
+			foreach($std_obj->result as $row)
+			{
+				$i++;
+				echo '<tr class="liste'.($i%2).'">';
+				echo '<td>'.$row->person_id.'</td>';
+				echo '<td>'.$row->vorname.'</td>';
+				echo '<td>'.$row->nachname.'</td>';
+				echo '<td>'.$stg_obj->kuerzel_arr[$row->studiengang_kz].'</td>';
+				echo '<td>'.$row->semester.'</td>';
+				echo '<td>';
+				echo '<form action="'.$_SERVER['PHP_SELF'].'" method="POST">';
+				echo '<input type="hidden" name="prestudent_id" value="'.$row->prestudent_id.'" />';
+				echo 'als neuen Interessenten in Studiensemester ';
+				echo '<SELECT name="stsem_kurzbz">';
+				foreach($stsem_obj->studiensemester as $row_stsem)
+				{
+					if($row_stsem->studiensemester_kurzbz==$stsem)
+						$selected='selected';
+					else
+						$selected='';
+					echo '<OPTION value="'.$row_stsem->studiensemester_kurzbz.'" '.$selected.'>'.$row_stsem->studiensemester_kurzbz.'</OPTION>';
+				}
+				echo '</SELECT>';
+				echo ' in Ausbildungssemester <SELECT name="ausbildungssemester">';
+				for($sem=1;$sem<=10;$sem++)
+				{
+					echo '<OPTION value="'.$sem.'">'.$sem.'</OPTION>';
+				}
+				echo '</SELECT>';
+				echo '<input type="submit" name="save" value="anlegen">';
+				echo '</form>';
+				echo '</td>';
+				echo '</tr>';
+			}
+			echo '</table>';
 		}
-		echo '</table>';
+		else
+			echo 'Keine Eintraege gefunden';
 	}
 	else
 	{
