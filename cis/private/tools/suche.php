@@ -56,7 +56,7 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
 
 	include('../../../include/meta/jquery.php');
 	include('../../../include/meta/jquery-tablesorter.php');
-	
+
 echo '<title>Globale Suche</title>
 </head>
 <body>';
@@ -109,27 +109,27 @@ $searchContent = searchContent($searchItems);
 if (!$searchPerson && !$searchOrt && !$searchDms && !$searchContent && !$searchOE)
 	echo $p->t('tools/esWurdenKeineErgebnisseGefunden');
 
-	
+
 function searchPerson($searchItems)
 {
 	global $db, $p, $noalias;
 	$bn = new benutzer();
 	$bn->search($searchItems, 21);
-	
+
 	if(count($bn->result)>0)
 	{
 		echo '<h2 style="padding-bottom: 10px;">',$p->t('global/personen'),'</h2>';
 		echo '
-		<script type="text/javascript">	
-		$(document).ready(function() 
-			{ 
+		<script type="text/javascript">
+		$(document).ready(function()
+			{
 			    $("#personentable").tablesorter(
 				{
 					sortList: [[3,0],[1,0],[0,0]],
 					widgets: [\'zebra\'],
 					headers: {8:{sorter:false}}
-				}); 
-			} 
+				});
+			}
 		);
 		</script>';
 		if(count($bn->result)>20)
@@ -158,7 +158,7 @@ function searchPerson($searchItems)
 		{
 			$bisverwendung = new bisverwendung();
 			$bisverwendung->getLastAktVerwendung($row->uid);
-			
+
 			echo '<tr>';
 			//echo '<td>',$row->titelpre,'</td>';
 			echo '<td>',$row->vorname,'</td>';
@@ -185,14 +185,14 @@ function searchPerson($searchItems)
 		}
 		echo '</tbody></table><br>';
 		return true;
-	}	
-	else 
-		return false;	
+	}
+	else
+		return false;
 }
 function searchOE($searchItems)
 {
 	global $db, $p, $noalias;
-	
+
 	//Suche nach Studiengaengen mit dem Suchbegriff und merge mit $searchItems
 	$stg_oe_array = array();
 	$stg = new studiengang();
@@ -203,17 +203,17 @@ function searchOE($searchItems)
 			$stg_oe_array[].= $row->oe_kurzbz;
 	}
 	$searchItems = array_merge_recursive($stg_oe_array,$searchItems);
-	
+
 	$oe = new organisationseinheit();
 	$oe->search($searchItems);
-	
+
 	if(count($oe->result)>0)
 	{
 		echo '<h2 style="padding-bottom: 10px;">',$p->t('global/organisationseinheiten'),'</h2>';
 		echo '
-		<script type="text/javascript">	
-		$(document).ready(function() 
-			{ 
+		<script type="text/javascript">
+		$(document).ready(function()
+			{
 				$(".tablesorter").each(function(i,v)
 				{
 					$("#"+v.id).tablesorter(
@@ -223,10 +223,10 @@ function searchOE($searchItems)
 						headers: {8:{sorter:false}}
 					})
 				});
-			} 
+			}
 		);
 		</script>';
-		
+
 		foreach($oe->result as $row)
 		{
 			if($row->aktiv==true)
@@ -271,7 +271,7 @@ function searchOE($searchItems)
 								if($bisverwendung->beschausmasscode=='5')
 									echo '<span style="color: orange"> (karenziert)</span>';
 								echo '</td>';
-							
+
 							echo '<td>',($mitarbeiter->telefonklappe!=''?$kontakt->kontakt.'-'.$mitarbeiter->telefonklappe:'-'),'</td>';
 							echo '<td>',($mitarbeiter->ort_kurzbz!=''?$mitarbeiter->ort_kurzbz:'-'),'</td>';
 							//if($row->alias!='' && !in_array($row->studiengang_kz, $noalias)) ??? Was macht $noalias?
@@ -292,16 +292,16 @@ function searchOE($searchItems)
 			}
 		}
 		return true;
-	}	
-	else 
-		return false;	
+	}
+	else
+		return false;
 }
 function searchOrt($search)
 {
 	global $db, $p, $noalias;
 	$ort = new ort();
 	$ort->filter($search, true, true, true);
-	
+
 	$uid = get_uid();
 	$berechtigung=new benutzerberechtigung();
 	$berechtigung->getBerechtigungen($uid);
@@ -309,21 +309,21 @@ function searchOrt($search)
 		$raumres=true;
 	else
 		$raumres=false;
-	
+
 	if(count($ort->result)>0)
 	{
 		echo '<h2 style="padding-bottom: 10px;">',$p->t('lvplan/ort'),'</h2>';
 		echo '
-		<script type="text/javascript">	
-		$(document).ready(function() 
-			{ 
+		<script type="text/javascript">
+		$(document).ready(function()
+			{
 			    $("#orttable").tablesorter(
 				{
 					sortList: [[1,0]],
 					widgets: [\'zebra\'],
 					headers: {8:{sorter:false}}
-				}); 
-			} 
+				});
+			}
 		);
 		</script>
 		<table class="tablesorter" id="orttable">
@@ -335,7 +335,7 @@ function searchOrt($search)
 					<th>',$p->t('tools/telefonklappe'),'</th>';
 					if ($raumres)
 						echo '<th>',$p->t('tools/reservieren'),'</th>';
-					else 
+					else
 						echo '<th>',$p->t('lvplan/lvPlan'),'</th>';
 				echo '</tr>
 			</thead>
@@ -349,9 +349,9 @@ function searchOrt($search)
 			echo '<td>',$row->telefonklappe,'</td>';
 			if ($raumres)
 				echo '<td><a href="../../../cis/private/lvplan/stpl_week.php?type=ort&ort_kurzbz='.$row->ort_kurzbz.'">'.$p->t('tools/reservieren').'</a></td>';
-			else 
+			else
 				echo '<td><a href="../../../cis/private/lvplan/stpl_week.php?type=ort&ort_kurzbz='.$row->ort_kurzbz.'">'.$p->t('lvplan/lvPlan').'</a></td>';
-			//else 
+			//else
 			//	echo '<td></td>';
 			echo '</tr>';
 			echo "\n";
@@ -359,7 +359,7 @@ function searchOrt($search)
 		echo '</tbody></table><br>';
 		return true;
 	}
-	else 
+	else
 		return false;
 }
 function searchDms($searchItems)
@@ -383,21 +383,21 @@ function searchDms($searchItems)
 	global $db, $p, $uid;
 	$dms = new dms();
 	$dms->searchLastVersion($searchstring, 41);
-	
+
 	if(count($dms->result)>0)
 	{
 		echo '<h2 style="padding-bottom: 10px;">'.$p->t("tools/dokumente").'</h2>';
 		echo '
-		<script type="text/javascript">	
-		$(document).ready(function() 
-			{ 
+		<script type="text/javascript">
+		$(document).ready(function()
+			{
 			    $("#dmstable").tablesorter(
 				{
 					sortList: [[1,0]],
 					widgets: [\'zebra\'],
 					headers: {0:{sorter:false}}
-				}); 
-			} 
+				});
+			}
 		);
 		</script>';
 		if(count($dms->result)>40)
@@ -409,7 +409,7 @@ function searchDms($searchItems)
 				<tr>
 					<th></th>
 					<th>',$p->t('global/titel'),'</th>
-					<th>',$p->t('tools/aktuelleVersion'),'</th>	
+					<th>',$p->t('tools/aktuelleVersion'),'</th>
 				</tr>
 			</thead>
 			<tbody>
@@ -431,7 +431,7 @@ function searchDms($searchItems)
 					echo "\n";
 				}
 			}
-			else 
+			else
 			{
 				echo '<tr>';
 					if(array_key_exists($row->mimetype,$mimetypes))
@@ -446,7 +446,7 @@ function searchDms($searchItems)
 		echo '</tbody></table><br>';
 		return true;
 	}
-	else 
+	else
 		return false;
 }
 function searchContent($searchItems)
@@ -482,13 +482,13 @@ function searchContent($searchItems)
 					echo '<li><div class="suchergebnis">';
 					echo '<a href="../../../cms/content.php?content_id=',$db->convert_html_chars($row->content_id),'&sprache=',$db->convert_html_chars($row->sprache),'">',$db->convert_html_chars($row->titel),'</a><br>';
 					$preview = findAndMark($row->content, $searchItems);
-					
+
 					echo $preview;
 					echo '<br /><br /></div></li>';
 				}
 			}
 		}
-		echo '</ul>';	
+		echo '</ul>';
 		$anzeigesprache='';
 		foreach($cms->result as $row)
 		{
@@ -508,7 +508,7 @@ function searchContent($searchItems)
 					echo '<li><div class="suchergebnis">';
 					echo '<a href="../../../cms/content.php?content_id=',$db->convert_html_chars($row->content_id),'&sprache=',$db->convert_html_chars($row->sprache),'">',$db->convert_html_chars($row->titel),'</a><br>';
 					$preview = findAndMark($row->content, $searchItems);
-					
+
 					echo $preview;
 					echo '<br /><br /></div></li>';
 				}
@@ -522,6 +522,7 @@ function searchContent($searchItems)
 }
 function findAndMark($content, $items)
 {
+	$item = '';
 	foreach($items as $row)
 	{
 		if($row!='')
@@ -529,16 +530,19 @@ function findAndMark($content, $items)
 			$item = $row;
 			break;
 		}
-	}	
+	}
+	if($item == '')
+		return '...';
+	
 	//CDATA und HTML Tags entfernen
 	$content = mb_str_replace('<[CDATA[', '', $content);
 	$content = mb_str_replace(']]>', '', $content);
 	$content = strip_tags($content);
 	$item = mb_strtolower($item);
-	
+
 	$beginn = mb_strpos(mb_strtolower($content), $item);
 	$len = mb_strlen($item);
-	
+
 	//Im Content sind die Umlaute teilweise codiert gespeichert
 	//Wenn der Eintrag nicht gefunden wird, wird mit Codierten Zeichen nochmals gesucht
 	if($beginn=='')
@@ -546,7 +550,7 @@ function findAndMark($content, $items)
 		$beginn = mb_strpos(mb_strtolower($content), htmlentities($item,ENT_NOQUOTES,'UTF-8'));
 		$len = mb_strlen(htmlentities($item,ENT_NOQUOTES,'UTF-8'));
 	}
-	
+
 	if($beginn=='')
 	{
 		$beginn=0;
@@ -558,7 +562,7 @@ function findAndMark($content, $items)
 	$preview='';
 	if($start!=0)
 		$preview='...';
-	
+
 	$preview .= mb_substr($content, $start, ($beginn-$start));
 	$preview.='<span class="suchmarker">';
 	$preview.= mb_substr($content, $beginn, $len);
