@@ -130,16 +130,25 @@ class FilterWidget extends Widget
 		//
 		$this->listFields = $this->FiltersModel->getExecutedQueryListFields();
 
+
+		//
 		$filterSessionArray = $this->session->userdata(self::SESSION_NAME);
 		if (isset($filterSessionArray[self::SELECTED_FIELDS]))
 		{
 			$selectedFields = $filterSessionArray[self::SELECTED_FIELDS];
 		}
 
+		//
 		if (count($selectedFields) == 0)
 		{
 			$filterSessionArray[self::SELECTED_FIELDS] = $this->listFields;
 			$this->session->set_userdata(self::SESSION_NAME, $filterSessionArray);
+		}
+
+		//
+		if ($this->columnsAliases != null && count($this->listFields) != count($this->columnsAliases))
+		{
+			show_error('Parameter columnsAliases does not have a number of items equal to those returned by the query');
 		}
 
 		//
