@@ -816,10 +816,17 @@ class FilterWidget extends Widget
 				}
 			}
 
+			$desc = $_POST['customFilterDescription'];
+			$descPGArray = '{"'.$desc.'", "'.$desc.'", "'.$desc.'", "'.$desc.'"}';
+
+			$resultBenutzer = $this->BenutzerModel->load(getAuthUID());
+			$personId = $resultBenutzer->retval[0]->person_id;
+
 			$result = $this->FiltersModel->loadWhere(array(
 				'app' => $this->app,
 				'dataset_name' => $this->datasetName,
-				'filter_kurzbz' => $_POST['customFilterKurzbz']
+				'description' => $descPGArray,
+				'person_id' => $personId
 			));
 
 			if (hasData($result))
@@ -828,35 +835,27 @@ class FilterWidget extends Widget
 					array(
 						'app' => $this->app,
 						'dataset_name' => $this->datasetName,
-						'filter_kurzbz' => $_POST['customFilterKurzbz']
+						'description' => $descPGArray,
+						'person_id' => $personId
 					),
 					array(
-						'description' => '{}',
-						'sort' => null,
-						'default_filter' => false,
-						'filter' => json_encode($objToBeSaved),
-						'oe_kurzbz' => null
+						'filter' => json_encode($objToBeSaved)
 					)
 				);
 			}
 			else
 			{
-				$result = $this->BenutzerModel->load(getAuthUID());
-
-				if (hasData($result))
-				{
-					$this->FiltersModel->insert(array(
-						'app' => $this->app,
-						'dataset_name' => $this->datasetName,
-						'filter_kurzbz' => $_POST['customFilterKurzbz'],
-						'person_id' => $result->retval[0]->person_id,
-						'description' => '{}',
-						'sort' => null,
-						'default_filter' => false,
-						'filter' => json_encode($objToBeSaved),
-						'oe_kurzbz' => null
-					));
-				}
+				$this->FiltersModel->insert(array(
+					'app' => $this->app,
+					'dataset_name' => $this->datasetName,
+					'filter_kurzbz' => uniqid($personId, true),
+					'person_id' => $personId,
+					'description' => $descPGArray,
+					'sort' => null,
+					'default_filter' => false,
+					'filter' => json_encode($objToBeSaved),
+					'oe_kurzbz' => null
+				));
 			}
 		}
 	}

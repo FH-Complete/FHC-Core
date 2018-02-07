@@ -1,5 +1,5 @@
 <div>
-	Filter short description: <input type="text" id="customFilterKurzbz" name="customFilterKurzbz" value="">
+	Filter description: <input type="text" id="customFilterDescription" name="customFilterDescription" value="">
 </div>
 <div>
 	<input type="button" id="saveCustomFilterButton" value="Save filter">

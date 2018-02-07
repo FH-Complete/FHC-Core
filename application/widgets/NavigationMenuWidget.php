@@ -38,8 +38,26 @@ class NavigationMenuWidget extends Widget
 	public static function printNavItem($item, $depth = 1)
 	{
 		$expanded = isset($item['expand']) && $item['expand'] === true ? ' active' : '';
-		echo '<li class="'.$expanded.'">
-					<a href="'.$item['link'].'"'.$expanded.'>'.(isset($item['icon']) ? '<i class="fa fa-'.$item['icon'].' fa-fw"></i> ' : '').$item['description'].(!empty($item['children']) ? '<span class="fa arrow"></span>':'').'</a>';
+
+		echo '<li class="'.$expanded.'">';
+
+		echo '<a href="'.$item['link'].'"'.$expanded.'>';
+
+		if (isset($item['icon']))
+		{
+			echo '<i class="fa fa-'.$item['icon'].' fa-fw"></i> ';
+		}
+
+		// echo '<span>'.$item['description'].'</span>'.'<span style="">test</span>';
+		echo $item['description'];
+
+		if (!empty($item['children']))
+		{
+			echo '<span class="fa arrow"></span>';
+		}
+
+		echo '</a>';
+
 		if (!empty($item['children']))
 		{
 			$level = '';
@@ -53,6 +71,7 @@ class NavigationMenuWidget extends Widget
 				self::printNavItem($child, ++$depth);
 			echo '</ul>';
 		}
+
 		echo '</li>';
 	}
 }

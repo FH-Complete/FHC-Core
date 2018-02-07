@@ -31,4 +31,24 @@ class Filters_model extends DB_Model
 
 		return $this->FiltersModel->loadWhere($filterParametersArray);
 	}
+
+	/**
+	 *
+	 */
+	public function getCustomFiltersList($app, $dataset_name, $uid)
+	{
+		$this->addSelect('filter_id, description');
+		$this->addJoin('public.tbl_benutzer', 'person_id');
+		$this->addOrder('sort', 'ASC');
+
+		$filterParametersArray = array(
+			'app' => $app,
+			'dataset_name' => $dataset_name,
+			'default_filter' => false,
+			'array_length(description, 1) >' => 0,
+			'uid' => $uid
+		);
+
+		return $this->FiltersModel->loadWhere($filterParametersArray);
+	}
 }

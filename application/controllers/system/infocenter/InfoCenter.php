@@ -408,6 +408,17 @@ class InfoCenter extends VileSci_Controller
 			}
 		}
 
+		$customFilters = $this->FiltersModel->getCustomFiltersList('infocenter', 'PersonActions', $this->uid);
+		if (hasData($customFilters))
+		{
+			for ($filtersCounter = 0; $filtersCounter < count($customFilters->retval); $filtersCounter++)
+			{
+				$filter = $customFilters->retval[$filtersCounter];
+
+				$listCustomFilters[$filter->filter_id] = $filter->description[0];
+			}
+		}
+
 		$filtersarray = array(
 			'abgeschickt' => array(
 				'link' => '#',
@@ -425,6 +436,18 @@ class InfoCenter extends VileSci_Controller
 
 		$this->_fillFilters($listFiltersSent, $filtersarray['abgeschickt']);
 		$this->_fillFilters($listFiltersNotSent, $filtersarray['nichtabgeschickt']);
+
+		if (isset($listCustomFilters) && is_array($listCustomFilters) && count($listCustomFilters) > 0)
+		{
+			$filtersarray['personal'] = array(
+				'link' => '#',
+				'description' => 'Personal filters',
+				'expand' => true,
+				'children' => array()
+			);
+
+			$this->_fillFilters($listCustomFilters, $filtersarray['personal']);
+		}
 
 		$this->navigationMenuArray = array(
 			'dashboard' => array(
