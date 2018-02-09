@@ -10,7 +10,8 @@ $this->load->view(
 		'tablesorter' => true,
 		'tinymce' => true,
 		'sbadmintemplate' => true,
-		'customCSSs' => array('skin/admintemplate.css', 'skin/tablesort_bootstrap.css')
+		'customCSSs' => array('skin/admintemplate.css', 'skin/tablesort_bootstrap.css'),
+		'customJSs' => 'include/js/bootstrapper.js'
 	)
 );
 ?>
@@ -127,10 +128,6 @@ $this->load->view(
 	$(document).ready(
 		function ()
 		{
-			//javascript bootstrap hack - not nice!
-			$("select").addClass('form-control');
-			$("table").addClass('table-condensed');
-
 			//initialise table sorter
 			addTablesorter("doctable", [[2, 1], [1, 0]], ["zebra"]);
 			addTablesorter("nachgdoctable", [[2, 0], [1, 1]], ["zebra"]);
@@ -147,14 +144,6 @@ $this->load->view(
 			$(".dateinput").datepicker({
 				"dateFormat": "dd.mm.yy"
 			});
-
-			//add submit event to message send link
-			$("#sendmsglink").click(
-				function()
-				{
-					$("#sendmsgform").submit();
-				}
-			);
 
 			//add click events to "formal geprüft" checkboxes
 			<?php foreach($dokumente as $dokument): ?>

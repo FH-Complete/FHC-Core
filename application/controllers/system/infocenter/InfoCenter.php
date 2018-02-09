@@ -402,6 +402,9 @@ class InfoCenter extends VileSci_Controller
 	 */
 	private function _setNavigationMenuArray()
 	{
+		$listFiltersSent = array();
+		$listFiltersNotSent = array();
+
 		$filtersSent = $this->FiltersModel->getFilterList('infocenter', 'PersonActions', '%InfoCenterSentApplication%');
 		if (hasData($filtersSent))
 		{
