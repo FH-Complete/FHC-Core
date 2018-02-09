@@ -33,7 +33,7 @@ if (! defined('BASEPATH')) exit('No direct script access allowed');
 function generateToken($length = 64)
 {
 	// For PHP 7 you can use random_bytes()
-	if(function_exists('random_bytes'))
+	if (function_exists('random_bytes'))
 	{
 		$token = base64_encode(random_bytes($length));
 		//base64 is about 33% longer, so we need to truncate the result
@@ -41,7 +41,7 @@ function generateToken($length = 64)
 	}
 
 	// for PHP >=5.3 and <7
-	if(function_exists('openssl_random_pseudo_bytes'))
+	if (function_exists('openssl_random_pseudo_bytes'))
 	{
         $token = base64_encode(openssl_random_pseudo_bytes($length, $strong));
 		// is the token strong enough?
@@ -57,6 +57,7 @@ function generateToken($length = 64)
     //select some random characters
     for ($i = 0; $i < $length; $i++)
         $token .= $characters[mt_rand(0, $charactersLength)];
+
     return $token;
 }
 
@@ -103,7 +104,7 @@ function loadResource($path, $resources = null, $subdir = false)
 	{
 		$tmpResources = array();
 	}
-	else if (!is_array($resources))
+	elseif (!is_array($resources))
 	{
 		$tmpResources = array($resources);
 	}
@@ -135,10 +136,10 @@ function loadResource($path, $resources = null, $subdir = false)
 	}
 
 	// Loops through the resources
-	foreach($tmpResources as $tmpResource)
+	foreach ($tmpResources as $tmpResource)
 	{
 		// Loops through the paths
-		foreach($tmpPaths as $tmpPath)
+		foreach ($tmpPaths as $tmpPath)
 		{
 			$fileName = $tmpPath.$tmpResource.'.php'; // Php extension
 			if (file_exists($fileName))
