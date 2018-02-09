@@ -116,7 +116,6 @@ $config['fhc_acl'] = array
 	'lehre.tbl_vertrag' => 'basis/vertrag',
 	'lehre.tbl_vertragsstatus' => 'basis/vertragsstatus',
 	'lehre.tbl_vertragstyp' => 'basis/vertragstyp',
-	'lehre.tbl_zeitfenster' => 'basis/zeitfenster',
 	'lehre.tbl_zeugnis' => 'basis/zeugnis',
 	'lehre.tbl_zeugnisnote' => 'basis/zeugnisnote',
 	'lehre.vw_studienplan' => 'lehre/studienplan',
