@@ -204,7 +204,8 @@ $href = str_replace("/system/Messages/write", "/system/Messages/send", $_SERVER[
 		toolbar: false,
 		readonly: 1,
 		selector: "#tinymcePreview",
-		statusbar: true
+		statusbar: true,
+		plugins: "autoresize"
 	});
 
 	$(document).ready(function ()
