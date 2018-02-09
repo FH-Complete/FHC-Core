@@ -1,16 +1,6 @@
 <script language="Javascript" type="text/javascript">
 	$(document).ready(function() {
 
-		// Checks if the table contains data (rows)
-		if ($('#tableDataset').find('tbody:empty').length == 0
-			&& $('#tableDataset').find('tr:empty').length == 0)
-		{
-			$("#tableDataset").tablesorter(
-			{
-				widgets: ["zebra", "filter"]
-			});
-		}
-
 		$("#addField").change(function() {
 			$("#filterForm").submit();
 		});
@@ -72,8 +62,14 @@
 
 			<br>
 
+			<div id="datasetActionsTop">
+			</div>
+
 			<div>
 				<?php FilterWidget::loadViewTableDataset($dataset); ?>
+			</div>
+
+			<div id="datasetActionsBottom">
 			</div>
 		</form>
 	</div>

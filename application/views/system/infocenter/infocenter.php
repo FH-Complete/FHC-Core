@@ -8,7 +8,8 @@
 			'fontawesome' => true,
 			'sbadmintemplate' => true,
 			'tablesorter' => true,
-			'customCSSs' => 'skin/tablesort_bootstrap.css'
+			'customCSSs' => 'skin/tablesort_bootstrap.css',
+			'customJSs' => array('include/js/infocenterPersonDataset.js', 'include/js/bootstrapper.js')
 		)
 	);
 ?>
@@ -40,11 +41,7 @@
 		</div>
 	</div>
 	<script>
-		//javascript hacks for bootstrap
-		$("select").addClass("form-control");
-		$("input[type=text]").addClass("form-control");
-		$("input[type=button]").addClass("btn btn-default");
-		$("#tableDataset").addClass('table table-bordered table-responsive table-condensed');
+		$("#tableDataset").addClass('table table-bordered table-responsive');
 	</script>
 </body>
 
