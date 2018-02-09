@@ -8,7 +8,7 @@ class FilterWidget extends Widget
 	const APP_PARAMETER = 'app';
 	const DATASET_NAME_PARAMETER = 'datasetName';
 	const FILTER_KURZBZ = 'filterKurzbz';
-	const FILTER_ID = 'filterId';
+	const FILTER_ID = 'filter_id';
 	const QUERY_PARAMETER = 'query';
 	const DB_RESULT = 'dbResult';
 	const ADDITIONAL_COLUMNS = 'additionalColumns';

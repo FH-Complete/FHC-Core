@@ -11,9 +11,10 @@ class InfoCenter extends VileSci_Controller
 	// App and Verarbeitungstaetigkeit name for logging
 	const APP = 'infocenter';
 	const TAETIGKEIT = 'bewerbung';
+	const FILTER_ID = 'filter_id';
 
 	// URL prefix for this controller
-	const URL_PREFIX = '/system/infocenter/InfoCenter/';
+	const URL_PREFIX = '/system/infocenter/InfoCenter';
 
 	// Used to log with PersonLogLib
 	private $logparams = array(
@@ -165,7 +166,7 @@ class InfoCenter extends VileSci_Controller
 			)
 		);
 
-		redirect(self::URL_PREFIX.'showDetails/'.$person_id.'#DokPruef');
+		redirect(self::URL_PREFIX.'/showDetails/'.$person_id.'#DokPruef');
 	}
 
 	/**
@@ -337,7 +338,7 @@ class InfoCenter extends VileSci_Controller
 
 		$this->_log($person_id, 'savenotiz', array($titel));
 
-		redirect(self::URL_PREFIX.'showDetails/'.$person_id.'#NotizAkt');
+		redirect(self::URL_PREFIX.'/showDetails/'.$person_id.'#NotizAkt');
 	}
 
 	/**
@@ -366,6 +367,21 @@ class InfoCenter extends VileSci_Controller
 			->set_header('Content-Disposition: attachment; filename="'.$akte->retval[0]->titel.'"')
 			->set_output($aktecontent->retval)
 			->_display();
+	}
+
+	/**
+	 *
+	 */
+	public function deleteCustomFilter()
+	{
+		$filter_id = $this->input->get('filter_id');
+
+		if (is_numeric($filter_id))
+		{
+			$this->FiltersModel->deleteCustomFilter($filter_id);
+
+			redirect(self::URL_PREFIX);
+		}
 	}
 
 	// -----------------------------------------------------------------------------------------------------------------
@@ -446,7 +462,7 @@ class InfoCenter extends VileSci_Controller
 				'children' => array()
 			);
 
-			$this->_fillFilters($listCustomFilters, $filtersarray['personal']);
+			$this->_fillCustomFilters($listCustomFilters, $filtersarray['personal']);
 		}
 
 		$this->navigationMenuArray = array(
@@ -471,8 +487,22 @@ class InfoCenter extends VileSci_Controller
 		{
 			$toPrint = "%s=%s";
 			$tofill['children'][] = array(
-				'link' => sprintf($toPrint, base_url('index.ci.php/system/infocenter/InfoCenter?filterId'), $filterId),
+				'link' => sprintf($toPrint, base_url('index.ci.php/system/infocenter/InfoCenter?filter_id'), $filterId),
 				'description' => $description
+			);
+		}
+	}
+
+	private function _fillCustomFilters($filters, &$tofill)
+	{
+		foreach ($filters as $filterId => $description)
+		{
+			$toPrint = "%s=%s";
+			$tofill['children'][] = array(
+				'link' => sprintf($toPrint, base_url('index.ci.php/system/infocenter/InfoCenter?filter_id'), $filterId),
+				'description' => $description,
+				'subscriptLink' => sprintf($toPrint, base_url('index.ci.php/system/infocenter/InfoCenter/deleteCustomFilter?filter_id'), $filterId),
+				'subscriptDescription' => 'Remove'
 			);
 		}
 	}
@@ -627,7 +657,7 @@ class InfoCenter extends VileSci_Controller
 		$this->PrestudentModel->addSelect('person_id');
 		$person_id = $this->PrestudentModel->load($prestudent_id)->retval[0]->person_id;
 
-		redirect(self::URL_PREFIX.'showDetails/'.$person_id.'#'.$section);
+		redirect(self::URL_PREFIX.'/showDetails/'.$person_id.'#'.$section);
 	}
 
 	/**

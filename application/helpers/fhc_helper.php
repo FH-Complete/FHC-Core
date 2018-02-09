@@ -9,7 +9,7 @@
  * @license		GPLv3
  * @since		Version 1.0.0
  */
- 
+
 /**
  * FHC Helper
  *
@@ -33,7 +33,7 @@ if (! defined('BASEPATH')) exit('No direct script access allowed');
 function generateToken($length = 64)
 {
 	// For PHP 7 you can use random_bytes()
-	if(function_exists('random_bytes')) 
+	if(function_exists('random_bytes'))
 	{
 		$token = base64_encode(random_bytes($length));
 		//base64 is about 33% longer, so we need to truncate the result
@@ -41,7 +41,7 @@ function generateToken($length = 64)
 	}
 
 	// for PHP >=5.3 and <7
-	if(function_exists('openssl_random_pseudo_bytes')) 
+	if(function_exists('openssl_random_pseudo_bytes'))
 	{
         $token = base64_encode(openssl_random_pseudo_bytes($length, $strong));
 		// is the token strong enough?
@@ -51,7 +51,7 @@ function generateToken($length = 64)
 
     //fallback to mt_rand if php < 5.3 or no openssl available
     $characters = '0123456789';
-    $characters .= 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz/+'; 
+    $characters .= 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz/+';
     $charactersLength = strlen($characters)-1;
     $token = '';
     //select some random characters
@@ -96,7 +96,7 @@ function loadResource($path, $resources = null, $subdir = false)
 	{
 		$path .= '/';
 	}
-	
+
 	// Loads in $tmpResources all the given resources
 	$tmpResources = $resources;
 	if ($resources == null)
@@ -107,7 +107,7 @@ function loadResource($path, $resources = null, $subdir = false)
 	{
 		$tmpResources = array($resources);
 	}
-	
+
 	// Loads in $tmpPaths path and eventually the subdirectories
 	$tmpPaths = array($path);
 	// NOTE: Used @ to prevent ugly error messages
@@ -133,7 +133,7 @@ function loadResource($path, $resources = null, $subdir = false)
 		}
 		closedir($dirHandler);
 	}
-	
+
 	// Loops through the resources
 	foreach($tmpResources as $tmpResource)
 	{
