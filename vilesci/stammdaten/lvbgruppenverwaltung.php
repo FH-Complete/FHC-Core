@@ -95,9 +95,13 @@ if (!$db = new basis_db())
 		echo '<form accept-charset="UTF-8" name="frm_studiengang" action="' . $_SERVER['PHP_SELF'] . '" method="GET">';
 		echo 'Studiengang: <SELECT name="studiengang_kz"  onchange="document.frm_studiengang.submit()">';
 
-		foreach ($stud->result as $row) {
-			if ($rechte->isBerechtigt('admin', $row->studiengang_kz, 'suid') ||
-					$rechte->isBerechtigt('assistenz', $row->studiengang_kz, 'suid')) {
+		foreach ($stud->result as $row)
+		{
+			if ($rechte->isBerechtigt('admin', $row->studiengang_kz, 'suid')
+				|| $rechte->isBerechtigt('assistenz', $row->studiengang_kz, 'suid')
+				|| $rechte->isBerechtigt('lehre/gruppe', $row->studiengang_kz, 'suid')
+				)
+			{
 				if ($studiengang_kz == '')
 					$studiengang_kz = $row->studiengang_kz;
 
@@ -108,7 +112,8 @@ if (!$db = new basis_db())
 		echo '</SELECT>';
 		echo '</form>';
 
-		if ($rechte->isBerechtigt('admin', $studiengang_kz, 'suid'))
+		if ($rechte->isBerechtigt('admin', $studiengang_kz, 'suid')
+		 || $rechte->isBerechtigt('lehre/gruppe', $studiengang_kz, 'suid'))
 			$admin = true;
 		else
 			$admin = false;

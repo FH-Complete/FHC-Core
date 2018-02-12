@@ -45,7 +45,7 @@ class MessageLib
     }
 
     /**
-     * getMessage() - returns the spicified received message for a specified person
+     * getMessage() - returns the specified received message for a specified person
      */
     public function getMessage($msg_id, $person_id)
     {

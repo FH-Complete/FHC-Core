@@ -8,7 +8,7 @@ class FilterWidget extends Widget
 	const APP_PARAMETER = 'app';
 	const DATASET_NAME_PARAMETER = 'datasetName';
 	const FILTER_KURZBZ = 'filterKurzbz';
-	const FILTER_ID = 'filterId';
+	const FILTER_ID = 'filter_id';
 	const QUERY_PARAMETER = 'query';
 	const DB_RESULT = 'dbResult';
 	const ADDITIONAL_COLUMNS = 'additionalColumns';
@@ -16,6 +16,7 @@ class FilterWidget extends Widget
 	const CHECKBOXES = 'checkboxes';
 	const HIDE_HEADER = 'hideHeader';
 	const HIDE_SAVE = 'hideSave';
+	const COLUMNS_ALIASES = 'columnsAliases';
 
 	const DATASET_PARAMETER = 'dataset';
 	const METADATA_PARAMETER = 'metaData';
@@ -67,6 +68,7 @@ class FilterWidget extends Widget
 	private $additionalColumns;
 	private $formatRaw;
 	private $checkboxes;
+	private $columnsAliases;
 
 	private $dataset;
 	private $metaData;
@@ -128,16 +130,25 @@ class FilterWidget extends Widget
 		//
 		$this->listFields = $this->FiltersModel->getExecutedQueryListFields();
 
+
+		//
 		$filterSessionArray = $this->session->userdata(self::SESSION_NAME);
 		if (isset($filterSessionArray[self::SELECTED_FIELDS]))
 		{
 			$selectedFields = $filterSessionArray[self::SELECTED_FIELDS];
 		}
 
+		//
 		if (count($selectedFields) == 0)
 		{
 			$filterSessionArray[self::SELECTED_FIELDS] = $this->listFields;
 			$this->session->set_userdata(self::SESSION_NAME, $filterSessionArray);
+		}
+
+		//
+		if ($this->columnsAliases != null && count($this->listFields) != count($this->columnsAliases))
+		{
+			show_error('Parameter columnsAliases does not have a number of items equal to those returned by the query');
 		}
 
 		//
@@ -174,11 +185,24 @@ class FilterWidget extends Widget
 	/**
 	 *
 	 */
+	public static function getColumnsAliases()
+	{
+		return self::_getFromSession(self::COLUMNS_ALIASES);
+	}
+
+	/**
+	 *
+	 */
 	public static function loadViewSelectFields()
 	{
 		if (self::$FilterWidgetInstance->hideHeader != true)
 		{
-			self::_loadView(self::WIDGET_URL_SELECT_FIELDS, array(self::LIST_FIELDS_PARAMETER => self::$FilterWidgetInstance->listFields));
+			self::_loadView(
+				self::WIDGET_URL_SELECT_FIELDS,
+				array(
+					self::LIST_FIELDS_PARAMETER => self::$FilterWidgetInstance->listFields
+				)
+			);
 		}
 	}
 
@@ -189,7 +213,13 @@ class FilterWidget extends Widget
 	{
 		if (self::$FilterWidgetInstance->hideHeader != true)
 		{
-			self::_loadView(self::WIDGET_URL_SELECT_FILTERS, array(self::METADATA_PARAMETER => self::$FilterWidgetInstance->metaData));
+			self::_loadView(
+				self::WIDGET_URL_SELECT_FILTERS,
+				array(
+					self::LIST_FIELDS_PARAMETER => self::$FilterWidgetInstance->listFields,
+					self::METADATA_PARAMETER => self::$FilterWidgetInstance->metaData
+				)
+			);
 		}
 	}
 
@@ -209,7 +239,13 @@ class FilterWidget extends Widget
 	 */
 	public static function loadViewTableDataset()
 	{
-		self::_loadView(self::WIDGET_URL_TABLE_DATASET, array(self::DATASET_PARAMETER => self::$FilterWidgetInstance->dataset));
+		self::_loadView(
+			self::WIDGET_URL_TABLE_DATASET,
+			array(
+				self::LIST_FIELDS_PARAMETER => self::$FilterWidgetInstance->listFields,
+				self::DATASET_PARAMETER => self::$FilterWidgetInstance->dataset
+			)
+		);
 	}
 
 	/**
@@ -510,6 +546,11 @@ class FilterWidget extends Widget
 			$filterSessionArray[self::FILTER_ID] = -1;
 		}
 
+		if (!isset($filterSessionArray[self::COLUMNS_ALIASES]))
+		{
+			$filterSessionArray[self::COLUMNS_ALIASES] = array();
+		}
+
 		$this->session->set_userdata(self::SESSION_NAME, $filterSessionArray);
 	}
 
@@ -528,6 +569,7 @@ class FilterWidget extends Widget
 		$this->checkboxes = null;
 		$this->hideHeader = false;
 		$this->hideSave = false;
+		$this->columnsAliases = null;
 
 		if (!is_array($args) || (is_array($args) && count($args) == 0))
 		{
@@ -603,6 +645,13 @@ class FilterWidget extends Widget
 			if (isset($args[self::HIDE_SAVE]) && is_bool($args[self::HIDE_SAVE]))
 			{
 				$this->hideSave = $args[self::HIDE_SAVE];
+			}
+
+			if (isset($args[self::COLUMNS_ALIASES])
+				&& is_array($args[self::COLUMNS_ALIASES])
+				&& count($args[self::COLUMNS_ALIASES]) > 0)
+			{
+				$this->columnsAliases = $args[self::COLUMNS_ALIASES];
 			}
 		}
 	}
@@ -776,10 +825,17 @@ class FilterWidget extends Widget
 				}
 			}
 
+			$desc = $_POST['customFilterDescription'];
+			$descPGArray = '{"'.$desc.'", "'.$desc.'", "'.$desc.'", "'.$desc.'"}';
+
+			$resultBenutzer = $this->BenutzerModel->load(getAuthUID());
+			$personId = $resultBenutzer->retval[0]->person_id;
+
 			$result = $this->FiltersModel->loadWhere(array(
 				'app' => $this->app,
 				'dataset_name' => $this->datasetName,
-				'filter_kurzbz' => $_POST['customFilterKurzbz']
+				'description' => $descPGArray,
+				'person_id' => $personId
 			));
 
 			if (hasData($result))
@@ -788,35 +844,27 @@ class FilterWidget extends Widget
 					array(
 						'app' => $this->app,
 						'dataset_name' => $this->datasetName,
-						'filter_kurzbz' => $_POST['customFilterKurzbz']
+						'description' => $descPGArray,
+						'person_id' => $personId
 					),
 					array(
-						'description' => '{}',
-						'sort' => null,
-						'default_filter' => false,
-						'filter' => json_encode($objToBeSaved),
-						'oe_kurzbz' => null
+						'filter' => json_encode($objToBeSaved)
 					)
 				);
 			}
 			else
 			{
-				$result = $this->BenutzerModel->load(getAuthUID());
-
-				if (hasData($result))
-				{
-					$this->FiltersModel->insert(array(
-						'app' => $this->app,
-						'dataset_name' => $this->datasetName,
-						'filter_kurzbz' => $_POST['customFilterKurzbz'],
-						'person_id' => $result->retval[0]->person_id,
-						'description' => '{}',
-						'sort' => null,
-						'default_filter' => false,
-						'filter' => json_encode($objToBeSaved),
-						'oe_kurzbz' => null
-					));
-				}
+				$this->FiltersModel->insert(array(
+					'app' => $this->app,
+					'dataset_name' => $this->datasetName,
+					'filter_kurzbz' => uniqid($personId, true),
+					'person_id' => $personId,
+					'description' => $descPGArray,
+					'sort' => null,
+					'default_filter' => false,
+					'filter' => json_encode($objToBeSaved),
+					'oe_kurzbz' => null
+				));
 			}
 		}
 	}
@@ -967,7 +1015,8 @@ class FilterWidget extends Widget
 		$filterSessionArray = array(
 			self::SELECTED_FIELDS => $this->_getSelectedFieldsFromPost(),
 			self::SELECTED_FILTERS => $this->_getSelectedFiltersFromPost(),
-			self::ADDITIONAL_COLUMNS => $this->additionalColumns
+			self::ADDITIONAL_COLUMNS => $this->additionalColumns,
+			self::COLUMNS_ALIASES => $this->columnsAliases
 		);
 
 		$filterSessionArray[self::ACTIVE_FILTERS] = array();

@@ -1,15 +1,12 @@
+<style>
+
+	.filters-hidden-panel {
+		margin: 0 10px 10px 10px;
+	}
+
+</style>
 <script language="Javascript" type="text/javascript">
 	$(document).ready(function() {
-
-		// Checks if the table contains data (rows)
-		if ($('#tableDataset').find('tbody:empty').length == 0
-			&& $('#tableDataset').find('tr:empty').length == 0)
-		{
-			$("#tableDataset").tablesorter(
-			{
-				widgets: ["zebra", "filter"]
-			});
-		}
 
 		$("#addField").change(function() {
 			$("#filterForm").submit();
@@ -49,6 +46,10 @@
 			$("#filterForm").submit();
 		});
 
+		$("#applyFilter").click(function() {
+			$("#filterForm").submit();
+		});
+
 	});
 </script>
 <div class="row">
@@ -58,13 +59,9 @@
 				<?php FilterWidget::loadViewSelectFields($listFields); ?>
 			</div>
 
-			<br>
-
 			<div>
 				<?php FilterWidget::loadViewSelectFilters($metaData); ?>
 			</div>
-
-			<br>
 
 			<div>
 				<?php FilterWidget::loadViewSaveFilter(); ?>
@@ -72,8 +69,14 @@
 
 			<br>
 
+			<div id="datasetActionsTop">
+			</div>
+
 			<div>
 				<?php FilterWidget::loadViewTableDataset($dataset); ?>
+			</div>
+
+			<div id="datasetActionsBottom">
 			</div>
 		</form>
 	</div>

@@ -127,6 +127,75 @@ if(!$result = @$db->db_query("SELECT 1 FROM public.vw_msg_vars LIMIT 1"))
 	else
 		echo '<br>Granted privileges to <strong>vilesci</strong> on public.vw_msg_vars';
 }
+
+if(!$result = @$db->db_query("SELECT 1 FROM public.vw_msg_vars_person LIMIT 1"))
+{
+	// CREATE OR REPLACE VIEW public.vw_msg_vars and grants privileges
+	$qry = '
+		CREATE OR REPLACE VIEW public.vw_msg_vars_person AS (
+		SELECT DISTINCT ON(p.person_id) p.person_id,
+						   p.nachname AS "Nachname",
+						   p.vorname AS "Vorname",
+						   p.anrede AS "Anrede",
+						   a.strasse AS "Strasse",
+						   a.ort AS "Ort",
+						   a.plz AS "PLZ",
+						   a.gemeinde AS "Gemeinde",
+						   a.langtext AS "Nation",
+						   ke.kontakt AS "Email",
+						   kt.kontakt AS "Telefon"				
+					  FROM public.tbl_person p
+				 LEFT JOIN (
+								SELECT person_id,
+									   kontakt
+								  FROM public.tbl_kontakt
+								 WHERE zustellung = TRUE
+								   AND kontakttyp = \'email\'
+							  ORDER BY kontakt_id DESC
+						) ke USING(person_id)
+				 LEFT JOIN (
+								SELECT person_id,
+									   kontakt
+								  FROM public.tbl_kontakt
+								 WHERE zustellung = TRUE
+								   AND kontakttyp IN (\'telefon\', \'mobil\')
+							  ORDER BY kontakt_id DESC
+						) kt USING(person_id)
+				 LEFT JOIN (
+								SELECT person_id,
+									   strasse,
+									   ort,
+									   plz,
+									   gemeinde,
+									   langtext
+								  FROM public.tbl_adresse
+							 LEFT JOIN bis.tbl_nation ON(bis.tbl_nation.nation_code = public.tbl_adresse.nation)
+								 WHERE public.tbl_adresse.heimatadresse = TRUE
+							  ORDER BY adresse_id DESC
+						) a USING(person_id)
+				  ORDER BY p.person_id ASC
+		);';
+
+	if(!$db->db_query($qry))
+		echo '<strong>public.vw_msg_vars_person: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>public.vw_msg_vars_person view created';
+
+	$qry = 'GRANT SELECT ON TABLE public.vw_msg_vars_person TO web;';
+
+	if(!$db->db_query($qry))
+		echo '<strong>public.vw_msg_vars_person: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Granted privileges to <strong>web</strong> on public.vw_msg_vars_person';
+
+	$qry = 'GRANT SELECT ON TABLE public.vw_msg_vars_person TO vilesci;';
+
+	if(!$db->db_query($qry))
+		echo '<strong>public.vw_msg_vars_person: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Granted privileges to <strong>vilesci</strong> on public.vw_msg_vars_person';
+}
+
 //Spalte anmerkung und rechnungsadresse in tbl_adresse
 if(!$result = @$db->db_query("SELECT rechnungsadresse FROM public.tbl_adresse LIMIT 1"))
 {
@@ -1082,6 +1151,8 @@ if (!$result = @$db->db_query("SELECT 1 FROM system.tbl_verarbeitungstaetigkeit"
 	VALUES('lehrauftraege','Lehraufträge','{\'Lehraufträge\',\'Lehraufträge\'}', true);
 	INSERT INTO system.tbl_verarbeitungstaetigkeit(taetigkeit_kurzbz, bezeichnung, bezeichnung_mehrsprachig, aktiv)
 	VALUES('datenwartung','Datenwartung','{\'Datenwartung\',\'Datenwartung\'}', true);
+	INSERT INTO system.tbl_verarbeitungstaetigkeit(taetigkeit_kurzbz, bezeichnung, bezeichnung_mehrsprachig, aktiv)
+	VALUES('kommunikation','Kommunikation','{\'Kommunikation\',\'Kommunikation\'}', true);
 
 	GRANT SELECT, UPDATE, INSERT, DELETE ON system.tbl_verarbeitungstaetigkeit TO vilesci;
 	GRANT SELECT ON system.tbl_verarbeitungstaetigkeit TO web;

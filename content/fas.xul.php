@@ -127,7 +127,6 @@ foreach($addon_obj->result as $addon)
   <command id="menu-dokumente-inskriptionsbestaetigung:command" oncommand="StudentPrintInskriptionsbestaetigung(event);"/>
   <command id="menu-dokumente-zeugnis:command" oncommand="StudentCreateZeugnis('Zeugnis',event);"/>
   <command id="menu-dokumente-zeugniseng:command" oncommand="StudentCreateZeugnis('ZeugnisEng',event);"/>
-  <!--<command id="menu-dokumente-sammelzeugnis:command" oncommand="StudentCreateSammelzeugnis('Sammelzeugnis');"/>-->
   <command id="menu-dokumente-diplsupplement:command" oncommand="StudentCreateDiplSupplement(event);"/>
   <command id="menu-dokumente-studienerfolg-normal:command" oncommand="StudentCreateStudienerfolg(event, 'Studienerfolg');"/>
   <command id="menu-dokumente-studienerfolg-finanzamt:command" oncommand="StudentCreateStudienerfolg(event, 'Studienerfolg','finanzamt');"/>
@@ -741,26 +740,6 @@ foreach($addon_obj->result as $addon)
                label     = "&menu-dokumente-zeugniseng.label;"
                command   =  "menu-dokumente-zeugniseng:command"
                accesskey = "&menu-dokumente-zeugniseng.accesskey;"/>
-<!--            <menuitem
-               id        = "menu-dokumente-sammelzeugnis"
-               key       = "&menu-dokumente-sammelzeugnis.key;"
-               label     = "&menu-dokumente-sammelzeugnis.label;"
-               command   = "menu-dokumente-sammelzeugnis:command"
-               accesskey = "&menu-dokumente-sammelzeugnis.accesskey;"/>
-			<menuitem
-               id        =  "menu-dokumente-pruefungsprotokoll"
-               key       =  "menu-dokumente-pruefungsprotokoll:key"
-               label     = "&menu-dokumente-pruefungsprotokoll.label;"
-               command   =  "menu-dokumente-pruefungsprotokoll:command"
-               accesskey = "&menu-dokumente-pruefungsprotokoll.accesskey;"/>
-            <menuitem
-               id        =  "menu-dokumente-pruefungsprotokoll_englisch"
-               key       =  "menu-dokumente-pruefungsprotokoll_englisch:key"
-               label     = "&menu-dokumente-pruefungsprotokoll_englisch.label;"
-               command   =  "menu-dokumente-pruefungsprotokoll_englisch:command"
-               accesskey = "&menu-dokumente-pruefungsprotokoll_englisch.accesskey;"/>
-            -->
-
           </menupopup>
     </menu>
     <!-- ***** CIS ***** -->

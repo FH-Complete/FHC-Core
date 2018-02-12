@@ -733,9 +733,9 @@ class prestudent extends person
 
 	/**
 	 * Prueft ob eine Person bereits einen PreStudenteintrag
-	 * fuer einen Studiengang besitzt
-	 * @param person_id
-	 *        studiengang_kz
+	 * fuer einen Studiengang und optional ein Studiensemester besitzt
+	 * @param integer $person_id
+	 * @param integer $studiengang_kz
 	 * @return true wenn vorhanden
 	 *		 false wenn nicht vorhanden
 	 *		 false und errormsg wenn Fehler aufgetreten ist
@@ -786,6 +786,70 @@ class prestudent extends person
 		}
 	}
 
+	/**
+	 * Prueft ob eine Person bereits einen PreStudentstatus-Eintrag
+	 * fuer einen Studiengang und optional ein Studiensemester und optional ein Status_kurzbz besitzt
+	 * @param integer $person_id
+	 * @param integer $studiengang_kz
+	 * @param string $studiensemester_kurzbz Optional.
+	 * @param string $status_kurzbz Optional.
+	 * @return true wenn vorhanden
+	 *		 false wenn nicht vorhanden
+	 *		 false und errormsg wenn Fehler aufgetreten ist
+	 */
+	public function existsPrestudentstatus($person_id, $studiengang_kz, $studiensemester_kurzbz = null, $status_kurzbz = null)
+	{
+		if(!is_numeric($person_id))
+		{
+			$this->errormsg = 'Person_id muss eine gueltige Zahl sein';
+			return false;
+		}
+
+		if(!is_numeric($studiengang_kz))
+		{
+			$this->errormsg = 'Studiengang_kz muss eine gueltige Zahl sein';
+			return false;
+		}
+
+		$qry = "SELECT count(*) as anzahl FROM public.tbl_prestudent
+				JOIN public.tbl_prestudentstatus USING (prestudent_id)
+				WHERE person_id=".$this->db_add_param($person_id, FHC_INTEGER)."
+				AND studiengang_kz=".$this->db_add_param($studiengang_kz, FHC_INTEGER);
+		
+		if ($studiensemester_kurzbz != '')
+			$qry .= " AND studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz);
+		
+		if ($status_kurzbz != '')
+			$qry .= " AND status_kurzbz=".$this->db_add_param($status_kurzbz);
+
+		if($this->db_query($qry))
+		{
+			if($row = $this->db_fetch_object())
+			{
+				if($row->anzahl>0)
+				{
+					$this->errormsg = '';
+					return true;
+				}
+				else
+				{
+					$this->errormsg = '';
+					return false;
+				}
+			}
+			else
+			{
+				$this->errormsg = 'Fehler beim Laden der Daten';
+				return false;
+			}
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+	}
+	
 	/**
 	 * Speichert den Prestudentstatus
 	 * @return true wenn ok, false im Fehlerfall

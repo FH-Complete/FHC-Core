@@ -43,7 +43,8 @@ $studiengang->load($studiengang_kz);
 
 $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($user);
-if ($rechte->isBerechtigt('admin', $studiengang_kz, 'suid'))
+if ($rechte->isBerechtigt('admin', $studiengang_kz, 'suid')
+ || $rechte->isBerechtigt('lehre/gruppe', $studiengang_kz, 'suid'))
 	$admin = true;
 else
 	$admin = false;
