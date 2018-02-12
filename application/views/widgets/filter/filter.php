@@ -39,6 +39,10 @@
 			$("#filterForm").submit();
 		});
 
+		$("#applyFilter").click(function() {
+			$("#filterForm").submit();
+		});
+
 	});
 </script>
 <div class="row">

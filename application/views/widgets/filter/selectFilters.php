@@ -62,4 +62,8 @@
 	?>
 		</select>
 	</span>
+
+	<span>
+		<input id="applyFilter" name="applyFilter" type="button" value="Apply">
+	</span>
 </div>
