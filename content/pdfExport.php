@@ -40,6 +40,7 @@ require_once('../include/student.class.php');
 require_once('../include/prestudent.class.php');
 require_once('../include/variable.class.php');
 require_once('../include/addon.class.php');
+require_once('../include/mitarbeiter.class.php');
 require_once('../include/studiengang.class.php');
 require_once('../include/studiensemester.class.php');
 require_once('../include/studienordnung.class.php');
