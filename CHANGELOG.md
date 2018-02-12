@@ -28,6 +28,10 @@
 - **[CORE]** Update campus.tbl_templates (contentmittitel and contentohnetitel) with system/templates/contentmittitel_xslt_xhtml.xslt andsystem/templates/contentohnetitel_xslt_xhtml.xslt
 - **[CORE]** Neue Style Anweisungen (div.header_logo, td.headerbar, div.cis_logo) müssen in Custom Stylesheet hinzugefügt werden
 
+### Removed
+  **[CORE]** Removed Support for XSLFO2PDF Documents - use unoconv instead
+  **[CORE]** Removed Support for FOP Documents - use unoconv instead
+
 ## [3.2]
 
 ### Added
