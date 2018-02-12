@@ -7,7 +7,7 @@ class NavigationMenuWidget extends Widget
 {
 	private $navigationMenu;
 
-	private static $NavigationMenuWidgetInstance;
+	private static $navigationMenuWidgetInstance;
 
 	/**
 	 *
@@ -16,7 +16,7 @@ class NavigationMenuWidget extends Widget
 	{
 		$this->navigationMenu = $widgetData;
 
-		self::$NavigationMenuWidgetInstance = $this;
+		self::$navigationMenuWidgetInstance = $this;
 
 		$this->view('widgets/navigationMenu');
 	}
@@ -26,7 +26,7 @@ class NavigationMenuWidget extends Widget
 	 */
 	public static function printNavigationMenu()
 	{
-		foreach (self::$NavigationMenuWidgetInstance->navigationMenu as $item)
+		foreach (self::$navigationMenuWidgetInstance->navigationMenu as $item)
 		{
 			self::printNavItem($item);
 		}
@@ -41,6 +41,11 @@ class NavigationMenuWidget extends Widget
 
 		echo '<li class="'.$expanded.'">';
 
+		if (isset($item['subscriptLink']) && isset($item['subscriptDescription']))
+		{
+			echo '<span>';
+		}
+
 		echo '<a href="'.$item['link'].'"'.$expanded.'>';
 
 		if (isset($item['icon']))
@@ -48,7 +53,6 @@ class NavigationMenuWidget extends Widget
 			echo '<i class="fa fa-'.$item['icon'].' fa-fw"></i> ';
 		}
 
-		// echo '<span>'.$item['description'].'</span>'.'<span style="">test</span>';
 		echo $item['description'];
 
 		if (!empty($item['children']))
@@ -57,6 +61,16 @@ class NavigationMenuWidget extends Widget
 		}
 
 		echo '</a>';
+
+		if (isset($item['subscriptLink']) && isset($item['subscriptDescription']))
+		{
+			echo '<a class="menuSubscriptLink" href="'.$item['subscriptLink'].'">'.$item['subscriptDescription'].'</a>';
+		}
+
+		if (isset($item['subscriptLink']) && isset($item['subscriptDescription']))
+		{
+			echo '</span>';
+		}
 
 		if (!empty($item['children']))
 		{

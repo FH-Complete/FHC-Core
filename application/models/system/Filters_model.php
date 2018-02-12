@@ -29,7 +29,7 @@ class Filters_model extends DB_Model
 			'filter_kurzbz ILIKE' => $filter_kurzbz
 		);
 
-		return $this->FiltersModel->loadWhere($filterParametersArray);
+		return $this->loadWhere($filterParametersArray);
 	}
 
 	/**
@@ -49,6 +49,14 @@ class Filters_model extends DB_Model
 			'uid' => $uid
 		);
 
-		return $this->FiltersModel->loadWhere($filterParametersArray);
+		return $this->loadWhere($filterParametersArray);
+	}
+
+	/**
+	 *
+	 */
+	public function deleteCustomFilter($filter_id)
+	{
+		return $this->delete($filter_id);
 	}
 }

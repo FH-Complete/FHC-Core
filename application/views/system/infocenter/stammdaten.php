@@ -98,12 +98,18 @@
 		</div>
 		<?php if (isset($stammdaten->zugangscode)): ?>
 			<div class="col-lg-6 text-right">
-				<a
-					href="<?php echo base_url('addons/bewerbung/cis/registration.php?code='.html_escape($stammdaten->zugangscode)) ?>"
-					target='_blank'><i
-						class="glyphicon glyphicon-new-window"></i>&nbsp;Zugang
-					Bewerbung</a>
+				<a href="<?php echo base_url('addons/bewerbung/cis/registration.php?code='.html_escape($stammdaten->zugangscode)) ?>"
+					target='_blank'><i class="glyphicon glyphicon-new-window"></i>&nbsp;Zugang Bewerbung</a>
 			</div>
 		<?php endif; ?>
 	</div>
 </div>
+<script>
+//add submit event to message send link
+$("#sendmsglink").click(
+	function ()
+	{
+		$("#sendmsgform").submit();
+	}
+);
+</script>

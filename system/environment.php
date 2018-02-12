@@ -92,7 +92,10 @@ printValue("php-curl", extension_loaded('curl'));
 $returnArray = array();
 exec('unoconv --version',$returnArray);
 if(isset($returnArray[0]))
-	$unoconvVersion = explode(' ',$returnArray[0])[1];
+{
+	$hlp = explode(' ',$returnArray[0]);
+	$unoconvVersion = $hlp[1];
+}
 else
 	$unoconvVersion = false;
 

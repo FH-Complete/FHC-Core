@@ -139,11 +139,11 @@
 		}
 	);
 
-	$filterId = isset($_GET['filterId']) ? $_GET['filterId'] : null;
+	$filterId = isset($_GET[InfoCenter::FILTER_ID]) ? $_GET[InfoCenter::FILTER_ID] : null;
 
 	if (isset($filterId) && is_numeric($filterId))
 	{
-		$filterWidgetArray['filterId'] = $filterId;
+		$filterWidgetArray[InfoCenter::FILTER_ID] = $filterId;
 	}
 	else
 	{
