@@ -1,3 +1,10 @@
+<style>
+
+	.filters-hidden-panel {
+		margin: 0 10px 10px 10px;
+	}
+
+</style>
 <script language="Javascript" type="text/javascript">
 	$(document).ready(function() {
 
@@ -52,13 +59,9 @@
 				<?php FilterWidget::loadViewSelectFields($listFields); ?>
 			</div>
 
-			<br>
-
 			<div>
 				<?php FilterWidget::loadViewSelectFilters($metaData); ?>
 			</div>
-
-			<br>
 
 			<div>
 				<?php FilterWidget::loadViewSaveFilter(); ?>
