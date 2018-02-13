@@ -323,6 +323,14 @@ class FilterWidget extends Widget
 		}
 		elseif ($filterMetaData->type == 'timestamp')
 		{
+			$classOperation = 'select-filter-operation-value';
+			$classOption = 'select-filter-option';
+			if ($activeFilterOperationValue == self::OP_SET)
+			{
+				$classOperation .= ' hidden-control';
+				$classOption .= ' hidden-control';
+			}
+
 			$html = '
 				<span>
 					<select name="%s" class="select-filter-operation">
@@ -333,9 +341,9 @@ class FilterWidget extends Widget
 					</select>
 				</span>
 				<span>
-					<input type="text" name="%s" value="%s" class="select-filter-operation-value">
+					<input type="text" name="%s" value="%s" class="'.$classOperation.'">
 				</span>
-				<select name="%s" class="select-filter-option">
+				<select name="%s" class="'.$classOption.'">
 					<option value="'.self::OPT_DAYS.'" '.($activeFilterOptionValue == self::OPT_DAYS ? 'selected' : '').'>Days</option>
 					<option value="'.self::OPT_MONTHS.'" '.($activeFilterOptionValue == self::OPT_MONTHS ? 'selected' : '').'>Months</option>
 				</select>

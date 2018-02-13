@@ -4,6 +4,10 @@
 		margin: 0 10px 10px 10px;
 	}
 
+	.hidden-control {
+		display: none !important;
+	}
+
 </style>
 <script language="Javascript" type="text/javascript">
 	$(document).ready(function() {
