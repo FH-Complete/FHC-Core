@@ -55,25 +55,16 @@ if(!$rechte->isBerechtigt('basis/dokumente'))
 	die($rechte->errormsg);
 }
 
-echo '
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//DE" "http://www.w3.org/TR/html4/strict.dtd">
+echo '<!DOCTYPE HTML>
 <html>
 	<head>
 		<title>Dokumentvorlagen Verwaltung</title>
-		<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
-		<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
-		<link rel="stylesheet" type="text/css" href="../../skin/jquery-ui-1.9.2.custom.min.css">
-<script type="text/javascript" src="../../vendor/jquery/jqueryV1/jquery-1.12.4.min.js"></script>
-<script type="text/javascript" src="../../vendor/christianbach/tablesorter/jquery.tablesorter.min.js"></script>
-<script type="text/javascript" src="../../vendor/components/jqueryui/jquery-ui.min.js"></script>
-<script type="text/javascript" src="../../include/js/jquery.ui.datepicker.translation.js"></script>
-<script type="text/javascript" src="../../vendor/jquery/sizzle/sizzle.js"></script>
+		<meta charset="UTF-8" />
 		<link rel="stylesheet" href="../../skin/tablesort.css" type="text/css"/>
-		<link href="../../skin/jquery-ui-1.9.2.custom.min.css" rel="stylesheet" type="text/css">
+		<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
 		<script type="text/javascript" src="../../vendor/jquery/jqueryV1/jquery-1.12.4.min.js"></script>
 		<script type="text/javascript" src="../../vendor/christianbach/tablesorter/jquery.tablesorter.min.js"></script>
-		<script type="text/javascript" src="../../vendor/components/jqueryui/jquery-ui.min.js"></script>
-		<script type="text/javascript" src="../../include/js/jquery.ui.datepicker.translation.js"></script>
+		<script type="text/javascript" src="../../vendor/jquery/sizzle/sizzle.js"></script>
 		<script type="text/javascript">
 			$(document).ready(function()
 			{
@@ -279,7 +270,7 @@ if ((isset($_GET['neueVorlage']) && $_GET['neueVorlage'] == 'true'))
 					<tr>
 						<td>Mimetype</td>
 						<td>
-							<textarea cols="80" rows="4" name="neueVorlage_mimetype"></textarea>
+							<textarea cols="80" rows="4" name="neueVorlage_mimetype">application/vnd.oasis.opendocument.text</textarea>
 						</td>
 					</tr>
 					<tr>
@@ -441,7 +432,7 @@ else
 				</tr>
 				<tr>
 					<td>Aktiv</td>
-					<td><input type="checkbox" name="aktiv" id="aktiv" '.($vorlageOE->aktiv==true?'checked="checked"':'').'"></td>
+					<td><input type="checkbox" name="aktiv" id="aktiv" '.($vorlageOE->aktiv==true?'checked="checked"':'').'></td>
 				</tr>';
 			if(!$neu)
 				$val = 'Änderung Speichern';
