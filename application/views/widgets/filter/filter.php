@@ -1,3 +1,14 @@
+<style>
+
+	.filters-hidden-panel {
+		margin: 0 10px 10px 10px;
+	}
+
+	.hidden-control {
+		display: none !important;
+	}
+
+</style>
 <script language="Javascript" type="text/javascript">
 	$(document).ready(function() {
 
@@ -39,6 +50,10 @@
 			$("#filterForm").submit();
 		});
 
+		$("#applyFilter").click(function() {
+			$("#filterForm").submit();
+		});
+
 	});
 </script>
 <div class="row">
@@ -48,13 +63,9 @@
 				<?php FilterWidget::loadViewSelectFields($listFields); ?>
 			</div>
 
-			<br>
-
 			<div>
 				<?php FilterWidget::loadViewSelectFilters($metaData); ?>
 			</div>
-
-			<br>
 
 			<div>
 				<?php FilterWidget::loadViewSaveFilter(); ?>

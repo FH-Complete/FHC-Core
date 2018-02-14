@@ -68,7 +68,7 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
 				<text:sequence-decl text:display-outline-level="0" text:name="Text"/>
 				<text:sequence-decl text:display-outline-level="0" text:name="Drawing"/>
 			</text:sequence-decls>
-			<text:p text:style-name="Seitenumbruch"><xsl:value-of select="titel" /></text:p>
+			<text:p text:style-name="Seitenumbruch">Official Notification</text:p>
 				<!-- Ueberprueft ob benoetigte Datenfelder leer sind -->
 				<xsl:if test="staatsbuergerschaft = ''"><text:p text:style-name="P4">Staatsbürgerschaft nicht angegeben</text:p></xsl:if>
 				<xsl:if test="datum = ''"><text:p text:style-name="P4">Datum der Abschlussprüfung nicht gesetzt</text:p></xsl:if>

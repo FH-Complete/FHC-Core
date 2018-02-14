@@ -94,8 +94,8 @@
 				)
 			ORDER BY "LastAction" DESC
 		',
-		'hideHeader' => true,
-		'hideSave' => true,
+		'hideHeader' => false,
+		'hideSave' => false,
 		'checkboxes' => array('PersonId'),
 		'additionalColumns' => array('Details'),
 		'formatRaw' => function($fieldName, $fieldValue, $datasetRaw) {
