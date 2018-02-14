@@ -16,7 +16,12 @@ $this->load->view(
 <body>
 <style>
 	input[type=text] {
-		height: 30px;
+		height: 28px;
+		padding: 0px;
+	}
+	.msgfield label {
+		margin-bottom: 0px !important;
+		margin-top: 3px;
 	}
 </style>
 <?php
@@ -33,8 +38,9 @@ $href = str_replace("/system/Messages/write", "/system/Messages/send", $_SERVER[
 			<form id="sendForm" method="post" action="<?php echo $href; ?>">
 				<div class="row">
 					<div class="form-group">
-
-						<label class="col-lg-1">To:</label>
+						<div class="col-lg-1">
+							<label>To:</label>
+						</div>
 						<div class="col-lg-11">
 							<?php
 							for ($i = 0; $i < count($receivers); $i++)
@@ -53,7 +59,9 @@ $href = str_replace("/system/Messages/write", "/system/Messages/send", $_SERVER[
 				</div>
 				<div class="row">
 					<div class="form-group form-inline">
-						<label class="col-lg-1">Subject:</label>&nbsp;
+						<div class="col-lg-1 msgfield">
+							<label>Subject:</label>
+						</div>&nbsp;
 						<?php
 						$subject = '';
 						if (isset($message))
@@ -67,9 +75,9 @@ $href = str_replace("/system/Messages/write", "/system/Messages/send", $_SERVER[
 						</div>
 					</div>
 				</div>
+				<br>
 				<div class="row">
 					<div class="col-lg-10">
-						<br>
 						<label>Message:</label>
 						<?php
 						$body = '';
@@ -84,9 +92,9 @@ $href = str_replace("/system/Messages/write", "/system/Messages/send", $_SERVER[
 					if (isset($variables)):
 						?>
 						<div class="col-lg-2">
-							<div class="form-group text-center">
+							<div class="form-group">
 								<label>Variables:</label>
-								<select id="variables" class="form-control" size="13" multiple="multiple">
+								<select id="variables" class="form-control" size="14" multiple="multiple">
 									<?php
 									foreach ($variables as $key => $val)
 									{
@@ -100,6 +108,7 @@ $href = str_replace("/system/Messages/write", "/system/Messages/send", $_SERVER[
 						</div>
 					<?php endif; ?>
 				</div>
+				<br>
 				<div class="row">
 					<div class="col-lg-3 text-right">
 						<?php
@@ -118,7 +127,7 @@ $href = str_replace("/system/Messages/write", "/system/Messages/send", $_SERVER[
 					<hr>
 					<div class="row">
 						<div class="col-lg-12">
-							Preview:
+							<label>Preview:</label>
 						</div>
 					</div>
 					<div class="well">
@@ -186,7 +195,8 @@ $href = str_replace("/system/Messages/write", "/system/Messages/send", $_SERVER[
 </div>
 <script>
 	tinymce.init({
-		selector: "#bodyTextArea"
+		selector: "#bodyTextArea",
+		height: 155
 	});
 
 	tinymce.init({
@@ -194,7 +204,8 @@ $href = str_replace("/system/Messages/write", "/system/Messages/send", $_SERVER[
 		toolbar: false,
 		readonly: 1,
 		selector: "#tinymcePreview",
-		statusbar: true
+		statusbar: true,
+		plugins: "autoresize"
 	});
 
 	$(document).ready(function ()
@@ -206,7 +217,7 @@ $href = str_replace("/system/Messages/write", "/system/Messages/send", $_SERVER[
 				if ($("#bodyTextArea"))
 				{
 					//if editor active add at cursor position, otherwise at end
-					if(tinymce.activeEditor.id === "bodyTextArea")
+					if (tinymce.activeEditor.id === "bodyTextArea")
 						tinymce.activeEditor.execCommand('mceInsertContent', false, $(this).children(":selected").val());
 					else
 						tinyMCE.get("bodyTextArea").setContent(tinyMCE.get("bodyTextArea").getContent() + $(this).children(":selected").val());
@@ -286,8 +297,9 @@ $href = str_replace("/system/Messages/write", "/system/Messages/send", $_SERVER[
 	function parseMessageText(receiver_id, text)
 	{
 		<?php
-		$url = str_replace("/system/Messages/write", "/system/Messages/parseMessageText", $_SERVER["REQUEST_URI"]);
-		$url = substr($url, 0, strrpos($url, '/'));
+		//replacing url (can have sender id at end)
+		$url = preg_replace("/\/system\/Messages\/write(\/.*)?/", "/system/Messages/parseMessageText", $_SERVER["REQUEST_URI"]);
+
 		$idtype = $personOnly === true ? 'person_id' : 'prestudent_id';
 		?>
 

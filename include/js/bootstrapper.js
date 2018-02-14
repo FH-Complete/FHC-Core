@@ -6,6 +6,7 @@ $(document).ready(
 	function()
 	{
 		$("input[type=text], select").addClass("form-control");
-		$("button").addClass("btn btn-default");
+		$("button, input[type=button]").addClass("btn btn-default");
+		$("table").addClass('table-condensed');
 	}
 );

@@ -27,8 +27,19 @@ class Messages extends VileSci_Controller
 	/**
 	 * write
 	 */
-	public function write($sender_id, $msg_id = null, $receiver_id = null)
+	public function write($sender_id = null, $msg_id = null, $receiver_id = null)
 	{
+		if ($sender_id === null)
+		{
+			$user_person = $this->PersonModel->getByUid($this->uid);
+
+			if (isError($user_person))
+			{
+				show_error($user_person->retval);
+			}
+			$sender_id = $user_person->retval[0]->person_id;
+		}
+
 		$prestudent_id = $this->input->post('prestudent_id');
 		$person_id = $this->input->post('person_id');
 		$personOnly = false;
@@ -68,7 +79,7 @@ class Messages extends VileSci_Controller
 		$benutzerResult = $this->BenutzerfunktionModel->getByPersonId($sender_id);
 		if (hasData($benutzerResult))
 		{
-			foreach($benutzerResult->retval as $val)
+			foreach ($benutzerResult->retval as $val)
 			{
 				$oe_kurzbz[] = $val->oe_kurzbz;
 			}
@@ -95,6 +106,12 @@ class Messages extends VileSci_Controller
 		$v = $this->load->view('system/messageWrite', $data);
 	}
 
+	/**
+	 * gets Message Variables and their data for Prestudent
+	 * @param $prestudent_id
+	 * @param $variablesArray to be filled with variable names
+	 * @param $msgVarsData to be filled with variable data
+	 */
 	private function getPrestudentMsgData($prestudent_id, &$variablesArray, &$msgVarsData)
 	{
 		$msgVarsData = $this->MessageModel->getMsgVarsDataByPrestudentId($prestudent_id);
@@ -111,7 +128,7 @@ class Messages extends VileSci_Controller
 		{
 			$variablesArray = array();
 			// Skip person_id and prestudent_id
-			for($i = 2; $i < count($variables->retval); $i++)
+			for ($i = 2; $i < count($variables->retval); $i++)
 			{
 				$variablesArray['{'.str_replace(" ", "_", strtolower($variables->retval[$i])).'}'] = $variables->retval[$i];
 			}
@@ -121,6 +138,12 @@ class Messages extends VileSci_Controller
 		array_shift($variables->retval); // Remove prestudent_id
 	}
 
+	/**
+	 * gets Message Variables and their data for Person
+	 * @param $person_id
+	 * @param $variablesArray to be filled with variable names
+	 * @param $msgVarsData to be filled with variable data
+	 */
 	private function getPersonMsgData($person_id, &$variablesArray, &$msgVarsData)
 	{
 		$msgVarsData = $this->MessageModel->getMsgVarsDataByPersonId($person_id);
@@ -137,7 +160,7 @@ class Messages extends VileSci_Controller
 		{
 			$variablesArray = array();
 			// Skip person_id
-			for($i = 1; $i < count($variables->retval); $i++)
+			for ($i = 1; $i < count($variables->retval); $i++)
 			{
 				$variablesArray['{'.str_replace(" ", "_", strtolower($variables->retval[$i])).'}'] = $variables->retval[$i];
 			}
@@ -148,8 +171,19 @@ class Messages extends VileSci_Controller
 	/**
 	 * send
 	 */
-	public function send($sender_id)
+	public function send($sender_id = null)
 	{
+		if ($sender_id === null)
+		{
+			$user_person = $this->PersonModel->getByUid($this->uid);
+
+			if (isError($user_person))
+			{
+				show_error($user_person->retval);
+			}
+			$sender_id = $user_person->retval[0]->person_id;
+		}
+
 		$error = false;
 
 		$subject = $this->input->post('subject');
@@ -165,7 +199,7 @@ class Messages extends VileSci_Controller
 
 		// get message data of prestudents or persons
 		$prestudentsData = array();
-		if($prestudents !== null)
+		if ($prestudents !== null)
 		{
 			$data = $this->MessageModel->getMsgVarsDataByPrestudentId($prestudents);
 			//
@@ -182,7 +216,7 @@ class Messages extends VileSci_Controller
 			{
 				$parsedText = "";
 				$dataArray = (array)$data->retval[$i];
-				foreach($dataArray as $key => $val)
+				foreach ($dataArray as $key => $val)
 				{
 					$newKey = str_replace(" ", "_", strtolower($key));
 					$dataArray[$newKey] = $dataArray[$key];
@@ -191,7 +225,7 @@ class Messages extends VileSci_Controller
 				$parsedText = $this->messagelib->parseMessageText($body, $dataArray);
 
 				$oe_kurzbz = null;
-				if(hasData($prestudentsData))
+				if (hasData($prestudentsData))
 				{
 					for ($p = 0; $p < count($prestudentsData->retval); $p++)
 					{
@@ -247,7 +281,7 @@ class Messages extends VileSci_Controller
 		{
 			$person_id = $this->input->get('person_id');
 		}
-		else if ($this->input->post('person_id') !== null)
+		elseif ($this->input->post('person_id') !== null)
 		{
 			$person_id = $this->input->get('person_id');
 		}
@@ -310,7 +344,7 @@ class Messages extends VileSci_Controller
 			if (hasData($data))
 			{
 				$dataArray = (array)$data->retval[0];
-				foreach($dataArray as $key => $val)
+				foreach ($dataArray as $key => $val)
 				{
 					$newKey = str_replace(" ", "_", strtolower($key));
 					$dataArray[$newKey] = $dataArray[$key];

@@ -1,4 +1,8 @@
-<div class="col-lg-8">
+<?php
+$msgExists = count($messages) > 0;
+$widthColumn = $msgExists === true ? 8 : 12;
+?>
+<div class="col-lg-<?php echo $widthColumn ?>">
 	<table id="msgtable" class="table table-bordered table-condensed tablesort-hover tablesort-active">
 		<thead>
 		<tr>
@@ -22,6 +26,7 @@
 		</tbody>
 	</table>
 </div>
+<?php if ($msgExists === true): ?>
 <div class="col-lg-4">
 	<br>
 	<div class="text-center"><label for="msgbody" id="msgsubject"></label></div>
@@ -29,6 +34,7 @@
 		<textarea id="msgbody"></textarea>
 	</div>
 </div>
+<?php endif; ?>
 <script>
 	tinymce.init({
 		menubar: false,
@@ -36,8 +42,8 @@
 		readonly: 1,
 		selector: "#msgbody",
 		statusbar: false,
-		height: 300,
-		//callback to avoid conflict with ajax (getting first message body)
+		plugins: "autoresize",
+		//callback to avoid conflict with ajax (for getting body of first message)
 		init_instance_callback: "initMsgBody"
 	});
 
