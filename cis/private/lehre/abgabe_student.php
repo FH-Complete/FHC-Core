@@ -88,11 +88,16 @@ $htmlstr = '';
 $htmlstr1 = '';
 $vorname='';
 $nachname='';
+$zweitbetreuer = '';
 
 $sql_query = "SELECT (SELECT nachname FROM public.tbl_person  WHERE person_id=tbl_projektbetreuer.person_id) AS bnachname, 
 			(SELECT vorname FROM public.tbl_person WHERE person_id=tbl_projektbetreuer.person_id) AS bvorname, 
 			(SELECT titelpre FROM public.tbl_person WHERE person_id=tbl_projektbetreuer.person_id) AS btitelpre, 
 			(SELECT titelpost FROM public.tbl_person WHERE person_id=tbl_projektbetreuer.person_id) AS btitelpost, 
+			(SELECT person_id FROM lehre.tbl_projektbetreuer WHERE projektarbeit_id=tbl_projektarbeit.projektarbeit_id
+			AND betreuerart_kurzbz IN ('Zweitbetreuer', 'Zweitbegutachter') LIMIT 1) AS zweitbetreuer_person_id,
+			(SELECT betreuerart_kurzbz FROM lehre.tbl_projektbetreuer WHERE projektarbeit_id=tbl_projektarbeit.projektarbeit_id
+			AND betreuerart_kurzbz IN ('Zweitbetreuer', 'Zweitbegutachter') LIMIT 1) AS zweitbetreuer_betreuerart_kurzbz,
 			tbl_projektbetreuer.person_id AS betreuer_person_id, 
 			tbl_projekttyp.bezeichnung AS prjbez, * 
 		FROM lehre.tbl_projektarbeit 
@@ -127,18 +132,25 @@ else
 				<th>".$p->t('abgabetool/betreuer')."</th>
 				<th>".$p->t('abgabetool/typ')."</th>
 				<th>".$p->t('abgabetool/titel')."</th>
-				<th>".$p->t('abgabetool/betreuerart')."</th>";
+				<!--<th>".$p->t('abgabetool/betreuerart')."</th>-->";
 	$htmlstr .= "</tr></thead><tbody>\n";
 	$i = 0;
 	while($row=$db->db_fetch_object($erg))
 	{
-		$htmlstr1='';
+		$htmlstr1 = '';
+		$zweitbetreuer_obj = new person();
+		if ($zweitbetreuer_obj->load($row->zweitbetreuer_person_id))
+		{
+			$zweitbetreuer = ', <b>'.$db->convert_html_chars($row->zweitbetreuer_betreuerart_kurzbz).'</b>: '.$zweitbetreuer_obj->titelpre.' '.$zweitbetreuer_obj->vorname.' '.$zweitbetreuer_obj->nachname.' '.$zweitbetreuer_obj->titelpost;
+		}
+		$htmlstr1 = '<b>'.$db->convert_html_chars($row->betreuerart_kurzbz).'</b>: ';
 		$vorname=$row->vorname;
 		$nachname=$row->nachname;
 		$uid=$row->uid;
-		($row->btitelpre!=''?$htmlstr1 = $row->btitelpre.' ':$htmlstr1 .= '');
+		($row->btitelpre!=''?$htmlstr1 .= $row->btitelpre.' ':$htmlstr1 .= '');
 		$htmlstr1 .= $row->bvorname.' '.$row->bnachname;
 		($row->btitelpost!=''?$htmlstr1 .= ' '.$row->btitelpost:$htmlstr1 .= '');
+		$htmlstr1 .= $zweitbetreuer;
 		$htmlstr .= "   <tr>\n"; //class='liste".($i%2)."'
 		$htmlstr .= "       <td><a href='abgabe_student_details.php?uid=".$row->uid."&projektarbeit_id=".$row->projektarbeit_id."&bid=".$row->betreuer_person_id."' target='as_detail' title='Details anzeigen'>".$p->t('abgabetool/upload')."</a></td>\n";
 		$htmlstr .= "       <td>".$row->studiensemester_kurzbz."</td>\n";
@@ -164,7 +176,7 @@ else
 		$htmlstr .= "       <td>".$htmlstr1."	    </td>\n";
 		$htmlstr .= "       <td>".$db->convert_html_chars($row->prjbez)."</td>\n";
 		$htmlstr .= "       <td>".$db->convert_html_chars($row->titel)."</td>\n";
-		$htmlstr .= "       <td>".$db->convert_html_chars($row->betreuerart_kurzbz)."</td>\n";
+// 		$htmlstr .= "       <td>".$db->convert_html_chars($row->betreuerart_kurzbz)."</td>\n";
 		$htmlstr .= "   </tr>\n";
 		$i++;
 	}

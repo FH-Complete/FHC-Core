@@ -47,27 +47,33 @@ if(empty($kurzbz))
 
 if (isset($_POST['new']))
 {
-	if(!$rechte->isBerechtigt('lehre/gruppe',null,'sui'))
-		die($rechte->errormsg);
-
-	$e = new benutzergruppe();
-	$uid = $_POST['uid'];
-	if (!$e->load($uid, $kurzbz))
-	{	
-		$e->new=true;
-		$e->gruppe_kurzbz = $kurzbz;
-		$e->updateamum = date('Y-m-d H:i:s');
-		$e->updatevon = $user;
-		$e->insertamum = date('Y-m-d H:i:s');
-		$e->insertvon = $user;
-		$e->uid = $uid;
-		if(!$e->save())
-			die($e->errormsg);
+	$benutzer = new benutzer();
+	if ($benutzer->load($_POST['uid']))
+	{
+		if(!$rechte->isBerechtigt('lehre/gruppe',null,'sui'))
+			die($rechte->errormsg);
+	
+		$e = new benutzergruppe();
+		$uid = $_POST['uid'];
+		if (!$e->load($uid, $kurzbz))
+		{	
+			$e->new=true;
+			$e->gruppe_kurzbz = $kurzbz;
+			$e->updateamum = date('Y-m-d H:i:s');
+			$e->updatevon = $user;
+			$e->insertamum = date('Y-m-d H:i:s');
+			$e->insertvon = $user;
+			$e->uid = $uid;
+			if(!$e->save())
+				die($e->errormsg);
+		}
+		else 
+		{
+			$errormsg = '<span class="error">Diese Person ist bereits der Gruppe zugeteilt</span>';
+		}
 	}
 	else 
-	{
-		$errormsg = '<span class="error">Diese Person ist bereits der Gruppe zugeteilt</span>';
-	}
+		$errormsg = '<span class="error">UID '.$_POST['uid'].' wurde nicht gefunden</span>';
 }
 else if (isset($_GET['type']) && $_GET['type']=='delete')
 {
@@ -80,7 +86,7 @@ else if (isset($_GET['type']) && $_GET['type']=='delete')
 
 $gruppe = new gruppe();
 if(!$gruppe->load($kurzbz))
-		die('Gruppe wurde nicht gefunden:'+$kurzbz);
+	die('Gruppe wurde nicht gefunden:'+$kurzbz);
 
 ?>
 <!DOCTYPE html>
@@ -109,7 +115,7 @@ if(!$gruppe->generiert)
 	echo '
 	<FORM name="newpers" method="post" action="einheit_det.php">
 	  Name: <INPUT type="hidden" name="type" value="new">
-		<input type="text" name="uid" id="uid"/>
+		<input type="text" name="uid" id="uid" autofocus="autofocus" />
 		<script type="text/javascript">
 		$(document).ready(function()
 		{
@@ -131,6 +137,7 @@ if(!$gruppe->generiert)
 				}
 			});
 		});
+		$("#uid").focus();
 		</script>
 		 <INPUT type="hidden" name="kurzbz" value="'.$kurzbz.'">
 	  <INPUT type="submit" name="new" value="Hinzuf&uuml;gen">
