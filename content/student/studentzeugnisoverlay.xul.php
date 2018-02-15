@@ -102,6 +102,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 		</template>
 	</tree>
 	</groupbox>
+	<!--
 	<vbox id="student-zeugnis-buttons">
 		<spacer flex="1"/>
 		<button id="student-zeugnis-button-archivieren" label="aktuelles Zeugnis archivieren" disabled="false" oncommand="StudentZeugnisArchivieren()"/>
@@ -111,7 +112,61 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 		<button id="student-bescheid-button-archivieren-englisch" label="Bescheid archivieren (englisch)" disabled="false" oncommand="StudentBescheidArchivieren('eng')"/>
 		<spacer flex="1"/>
 	</vbox>
+	-->
 </hbox>
+<hbox>
+	<groupbox id="student-zeugnis-groupbox-archive">
+		<caption label="Dokument archivieren" />
+		<grid id="student-zeugnis-grid-archive" style="margin:4px;" flex="1">
+				<columns  >
+					<column flex="1"/>
+					<column flex="5"/>
+					<column flex="2"/>
+				</columns>
+				<rows>
+					<row>
+						<label value="Dokument" control="student-zeugnis-menulist-dokument"/>
+						<menulist id="student-zeugnis-menulist-dokument" disabled="false">
+							<menupopup>
+									<menuitem id="student-zeugnis-menulist-dokument-zeugnis" value="Zeugnis" label="Zeugnis"/>
+									<menuitem id="student-zeugnis-menulist-dokument-zeugniseng" value="ZeugnisEng" label="Zeugnis Englisch"/>
+									<menuitem id="student-zeugnis-menulist-dokument-diplsupplement" value="DiplSupplement" label="Diplomasupplement"/>
+									<menuitem id="student-zeugnis-menulist-dokument-bescheid" value="Bescheid" label="Bescheid"/>
+									<menuitem id="student-zeugnis-menulist-dokument-bescheideng" value="BescheidEng" label="Bescheid Englisch"/>
+							</menupopup>
+						</menulist>
+							<button id="student-zeugnis-button-archive" label="Archivieren" disabled="false" oncommand="StudentZeugnisDokumentArchivieren()"/>
+					</row>
+				</rows>
+		</grid>
+	</groupbox>
+	<spacer flex="1" />
+</hbox>
+<vbox>
+<hbox>
+	<label value="Erweiterte Einstellungen" onclick="document.getElementById('student-zeugnis-archivieren-erweitert').hidden=false;"/>
+	<image width="12px" height="12px" src="../skin/images/plus.png" onclick="document.getElementById('student-zeugnis-archivieren-erweitert').hidden=false;"/>
+</hbox>
+<hbox>
+	<grid id="student-zeugnis-archivieren-erweitert" style="margin:4px;" hidden="true">
+		<columns  >
+			<column flex="1"/>
+			<column flex="1"/>
+		</columns>
+		<rows>
+			<row>
+				<label value="Dokument elektronisch signieren"/>
+				<checkbox id="student-zeugnis-checkbox-sign" checked="true" />
+			</row>
+			<row>
+				<label value="Dokument herunterladbar"/>
+				<checkbox id="student-zeugnis-checkbox-selfservice" checked="true" />
+			</row>
+		</rows>
+	</grid>
+	<spacer flex="1"/>
+</hbox>
+</vbox>
 <spacer flex="8" />
 </vbox>
 </overlay>

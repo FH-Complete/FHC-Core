@@ -62,7 +62,10 @@ if (isset($_GET['xsl']))
 else
 	die('Fehlerhafte Parameteruebergabe');
 
-$sign = false; // TODO
+if(isset($_GET['sign']))
+	$sign = true;
+else
+	$sign = false;
 
 // Studiengang ermitteln dessen Vorlage verwendet werden soll
 $xsl_stg_kz = 0;
@@ -417,7 +420,7 @@ else
 			}
 			else
 			{
-				$echo = 'Datensatz wurde nicht gefunden';
+				die('Student hat keinen Status in diesem Semester');
 			}
 		}
 	}
@@ -442,6 +445,7 @@ else
 		if (!$dokument->create($output))
 			die($dokument->errormsg);
 
+		$error = false;
 		if ($sign === true)
 		{
 			if ($dokument->sign($user))
@@ -450,38 +454,47 @@ else
 			}
 			else
 			{
-				echo $dokument->errormsg;
+				$error = true;
+				$errormsg = $dokument->errormsg;
 			}
 		}
 		else
 			$doc = $dokument->output(false);
 		$dokument->close();
 
-		$hex = base64_encode($doc);
-		$akte = new akte();
-		$akte->person_id = $person_id;
-		$akte->dokument_kurzbz = 'Zeugnis';
-		$akte->inhalt = $hex;
-		$akte->mimetype = 'application/octet-stream';
-		$akte->erstelltam = $heute;
-		$akte->gedruckt = true;
-		$akte->titel = $titel.'.pdf';
-		$akte->bezeichnung = $bezeichnung;
-		$akte->updateamum = '';
-		$akte->updatevon = '';
-		$akte->insertamum = date('Y-m-d H:i:s');
-		$akte->insertvon = $user;
-		$akte->ext_id = '';
-		$akte->uid = $uid;
-		$akte->new = true;
-		if (!$akte->save())
+		if(!$error)
 		{
-			echo 'Erstellen Fehlgeschlagen: '.$akte->errormsg;
-			return false;
+			$hex = base64_encode($doc);
+			$akte = new akte();
+			$akte->person_id = $person_id;
+			$akte->dokument_kurzbz = 'Zeugnis';
+			$akte->inhalt = $hex;
+			$akte->mimetype = 'application/octet-stream';
+			$akte->erstelltam = $heute;
+			$akte->gedruckt = true;
+			$akte->titel = $titel.'.pdf';
+			$akte->bezeichnung = $bezeichnung;
+			$akte->updateamum = '';
+			$akte->updatevon = '';
+			$akte->insertamum = date('Y-m-d H:i:s');
+			$akte->insertvon = $user;
+			$akte->ext_id = '';
+			$akte->uid = $uid;
+			$akte->new = true;
+			if (!$akte->save())
+			{
+				echo 'Erstellen Fehlgeschlagen: '.$akte->errormsg;
+				return false;
+			}
+			else
+			{
+				return true;
+			}
 		}
 		else
 		{
-			return true;
+			echo $errormsg;
+			return false;
 		}
 	}
 	else

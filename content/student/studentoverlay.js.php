@@ -2954,6 +2954,77 @@ function StudentAkteUpload()
 	window.open('../vilesci/personen/akteupdate.php?akte_id='+akte_id);
 }
 
+function StudentZeugnisDokumentArchivieren()
+{
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+	var tree = document.getElementById('student-tree');
+
+	if (tree.currentIndex==-1)
+	{
+		alert('Student muss ausgewaehlt sein');
+		return;
+	}
+
+	var tree=document.getElementById('student-tree');
+	var numRanges = tree.view.selection.getRangeCount();
+	var start = new Object();
+	var end = new Object();
+	var anzfault=0;
+	var uid='';
+	var errormsg = '';
+	var stsem = getStudiensemester();
+
+	var vorlage = document.getElementById('student-zeugnis-menulist-dokument').value;
+	var url = '<?php echo APP_ROOT; ?>content/pdfExport.php';
+	var xml = '';
+	switch(vorlage)
+	{
+		case 'Zeugnis':
+		case 'ZeugnisEng':
+			xml = 'zeugnis.rdf.php'
+			break;
+		case 'Bescheid':
+		case 'BescheidEng':
+			xml = 'abschlusspruefung.rdf.php';
+			break;
+		case 'DiplSupplement':
+			xml = 'diplomasupplement.xml.php';
+			break;
+	}
+
+	var labelalt = document.getElementById('student-zeugnis-button-archive').label;
+	document.getElementById('student-zeugnis-button-archive').label='Loading...';
+
+	//Zeugnis fuer alle markierten Studenten archivieren
+	for (var t=0; t<numRanges; t++)
+	{
+		tree.view.selection.getRangeAt(t,start,end);
+		for (v=start.value; v<=end.value; v++)
+		{
+			uid = getTreeCellText(tree, 'student-treecol-uid', v);
+
+			var req = new phpRequest(url,'','');
+			req.add('xsl', vorlage);
+			req.add('xml', xml);
+			req.add('ss', stsem);
+			req.add('archive', '1');
+			req.add('uid', uid);
+
+			if(document.getElementById('student-zeugnis-checkbox-sign').checked)
+				req.add('sign', '1');
+
+			var response = req.execute();
+			if(response!='')
+				errormsg = errormsg + response;
+		}
+	}
+
+	if(errormsg!='')
+		alert(errormsg);
+	document.getElementById('student-zeugnis-button-archive').label=labelalt;
+	StudentAkteTreeDatasource.Refresh(false);
+}
+
 // ****
 // * Startet das Script zum Archivieren des Zeugnisses und
 // * Refresht dann den Tree
