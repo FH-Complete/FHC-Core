@@ -144,8 +144,8 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 </hbox>
 <vbox>
 <hbox>
-	<label value="Erweiterte Einstellungen" onclick="document.getElementById('student-zeugnis-archivieren-erweitert').hidden=false;"/>
-	<image width="12px" height="12px" src="../skin/images/plus.png" onclick="document.getElementById('student-zeugnis-archivieren-erweitert').hidden=false;"/>
+	<image width="12px" height="12px" src="../skin/images/plus.png" onclick="StudentAkteToggleDetails()"/>
+	<label value="Erweiterte Einstellungen" onclick="StudentAkteToggleDetails()"/>
 </hbox>
 <hbox>
 	<grid id="student-zeugnis-archivieren-erweitert" style="margin:4px;" hidden="true">

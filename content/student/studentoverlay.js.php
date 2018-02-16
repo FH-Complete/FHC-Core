@@ -2925,9 +2925,18 @@ function StudentAkteDel()
 // ****
 function StudentAkteDisableFields(val)
 {
-	document.getElementById('student-zeugnis-button-archivieren').disabled=val;
+	document.getElementById('student-zeugnis-button-archive').disabled=val;
 }
 
+function StudentAkteToggleDetails()
+{
+	var studentarchivierendetails = document.getElementById('student-zeugnis-archivieren-erweitert');
+
+	if(studentarchivierendetails.hidden)
+		studentarchivierendetails.hidden = false;
+	else
+		studentarchivierendetails.hidden = true;
+}
 // ****
 // * Offent eine Seite zum Upload einer neuen Datei zu einer archivierten Akte
 // ****
