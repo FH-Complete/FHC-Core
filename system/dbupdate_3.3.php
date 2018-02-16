@@ -143,7 +143,7 @@ if(!$result = @$db->db_query("SELECT 1 FROM public.vw_msg_vars_person LIMIT 1"))
 						   a.gemeinde AS "Gemeinde",
 						   a.langtext AS "Nation",
 						   ke.kontakt AS "Email",
-						   kt.kontakt AS "Telefon"				
+						   kt.kontakt AS "Telefon"
 					  FROM public.tbl_person p
 				 LEFT JOIN (
 								SELECT person_id,
@@ -879,7 +879,7 @@ if (!$result = @$db->db_query("SELECT 1 FROM system.tbl_log LIMIT 1"))
 			 INCREMENT BY 1
 			 NO MAXVALUE
 			 NO MINVALUE
-			 CACHE 1;system.tbl_log
+			 CACHE 1;
 			ALTER TABLE system.tbl_log ALTER COLUMN log_id SET DEFAULT nextval('system.tbl_log_log_id_seq');
 
 			GRANT SELECT, INSERT ON system.tbl_log TO vilesci;
