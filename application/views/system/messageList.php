@@ -6,7 +6,7 @@ $widthColumn = $msgExists === true ? 8 : 12;
 	<table id="msgtable" class="table table-bordered table-condensed tablesort-hover tablesort-active">
 		<thead>
 		<tr>
-			<th>Gelesen am</th>
+			<th>Gesendet am</th>
 			<th>Sender</th>
 			<th>Empf&auml;nger</th>
 			<th>Betreff</th>
