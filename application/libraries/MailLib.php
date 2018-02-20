@@ -65,12 +65,14 @@ class MailLib
 		$recipient = $to;
 		$recipientCC = $cc;
 		$recipientBCC = $bcc;
-		if ($this->validateEmailAddress(MAIL_DEBUG))
+		if (defined('MAIL_DEBUG') && MAIL_DEBUG != '')
 		{
 			// if is it valid use it!!!
 			$recipient = MAIL_DEBUG;
-			$recipientCC = MAIL_DEBUG;
-			$recipientBCC = MAIL_DEBUG;
+			if ($recipientCC != '')
+				$recipientCC = MAIL_DEBUG;
+			if ($recipientBCC != '')
+				$recipientBCC = MAIL_DEBUG;
 		}
 
 		$this->ci->email->to($recipient);
