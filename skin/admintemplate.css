@@ -1,3 +1,13 @@
+/*custom styles for sb admin 2 template: https://startbootstrap.com/template-overviews/sb-admin-2/*/
+
+/*optional header at right side of the main header*/
+.headerright{
+    margin: 40px 0 20px -30px;
+    padding: 6.4px 0 9px;
+    border-bottom: 1px solid #eee;
+}
+
+/*change of panel colors (grey) */
 .panel-primary > .panel-heading{
     color: black;
     background-color: #dfdfdf;

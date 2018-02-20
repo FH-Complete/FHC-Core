@@ -80,7 +80,9 @@
 					<?php echo isset($adresse) ? $adresse->strasse.', '.$adresse->plz.' '.$adresse->ort : '' ?>
 				</td>
 				<td>
-					<?php echo ($adresse->heimatadresse === true ? 'Heimatadresse' : '').($adresse->heimatadresse === true && $adresse->rechnungsadresse === true ? ', ' : '').($adresse->rechnungsadresse === true ? 'Rechnungsadresse' : ''); ?>
+					<?php echo ($adresse->heimatadresse === true ? 'Heimatadresse' : '').
+						($adresse->heimatadresse === true && $adresse->rechnungsadresse === true ? ', ' : '').
+						($adresse->rechnungsadresse === true ? 'Rechnungsadresse' : ''); ?>
 				</td>
 			</tr>
 		<?php endforeach; ?>
@@ -104,12 +106,3 @@
 		<?php endif; ?>
 	</div>
 </div>
-<script>
-//add submit event to message send link
-$("#sendmsglink").click(
-	function ()
-	{
-		$("#sendmsgform").submit();
-	}
-);
-</script>

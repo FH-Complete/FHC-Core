@@ -64,6 +64,7 @@ class InfoCenter extends VileSci_Controller
 		$this->load->model('person/person_model', 'PersonModel');
 		$this->load->model('system/message_model', 'MessageModel');
 		$this->load->model('system/filters_model', 'FiltersModel');
+		$this->load->model('system/personLock_model', 'PersonLockModel');
 
 		// Loads libraries
 		$this->load->library('DmsLib');
@@ -110,10 +111,20 @@ class InfoCenter extends VileSci_Controller
 		if (!is_numeric($person_id))
 			show_error('person id is not numeric!');
 
-		$persondata = $this->_loadPersonData($person_id);
-		if (!isset($persondata))
+		$personexists = $this->PersonModel->load($person_id);
+		if(isError($personexists))
+			show_error($personexists->retval);
+
+		if (empty($personexists->retval[0]))
 			show_error('person does not exist!');
 
+		//mark person as locked for editing
+		$result = $this->PersonLockModel->lockPerson($person_id, $this->uid, self::APP);
+
+		if(isError($result))
+			show_error($result->retval);
+
+		$persondata = $this->_loadPersonData($person_id);
 		$prestudentdata = $this->_loadPrestudentData($person_id);
 
 		$this->load->view(
@@ -127,6 +138,20 @@ class InfoCenter extends VileSci_Controller
 				)
 			)
 		);
+	}
+
+	/**
+	 * unlocks page from edit by a person, redirects to overview filter page
+	 * @param $person_id
+	 */
+	public function unlockPerson($person_id)
+	{
+		$result = $this->PersonLockModel->unlockPerson($person_id, self::APP);
+
+		if(isError($result))
+			show_error($result->retval);
+
+		redirect(self::URL_PREFIX);
 	}
 
 	/**
@@ -235,7 +260,7 @@ class InfoCenter extends VileSci_Controller
 		}
 
 		//check if still Interessent and not freigegeben yet
-		if($lastStatus->retval[0]->status_kurzbz === 'Interessent' && !isset($lastStatus->retval[0]->bestaetigtam))
+		if ($lastStatus->retval[0]->status_kurzbz === 'Interessent' && !isset($lastStatus->retval[0]->bestaetigtam))
 		{
 			$result = $this->PrestudentstatusModel->insert(
 				array(
@@ -517,6 +542,13 @@ class InfoCenter extends VileSci_Controller
 	 */
 	private function _loadPersonData($person_id)
 	{
+		$lockedby = $this->PersonLockModel->checkIfLocked($person_id);
+
+		if (isError($lockedby))
+		{
+			show_error($lockedby->retval);
+		}
+
 		$stammdaten = $this->PersonModel->getPersonStammdaten($person_id, true);
 
 		if (isError($stammdaten))
@@ -567,6 +599,7 @@ class InfoCenter extends VileSci_Controller
 		$messagelink = base_url('/index.ci.php/system/Messages/write/'.$user_person->retval[0]->person_id);
 
 		$data = array (
+			'lockedby' => isset($lockedby->retval[0]->uid) ? $lockedby->retval[0]->uid : null,
 			'stammdaten' => $stammdaten->retval,
 			'dokumente' => $dokumente->retval,
 			'dokumente_nachgereicht' => $dokumente_nachgereicht->retval,
@@ -606,7 +639,7 @@ class InfoCenter extends VileSci_Controller
 
 			$zgvpruefung = $prestudent->retval[0];
 
-			if(isset($zgvpruefung->prestudentstatus))
+			if (isset($zgvpruefung->prestudentstatus))
 			{
 				$position = strpos($zgvpruefung->prestudentstatus->anmerkung, 'Alt:');
 
