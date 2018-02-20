@@ -1273,7 +1273,7 @@ function StudentAuswahl()
 	{
 		// *** Zeugnis ***
 		zeugnistree = document.getElementById('student-zeugnis-tree');
-		url='<?php echo APP_ROOT;?>rdf/akte.rdf.php?person_id='+person_id+"&dokument_kurzbz=Zeugnis&"+gettimestamp();
+		url='<?php echo APP_ROOT;?>rdf/akte.rdf.php?person_id='+person_id+"&"+gettimestamp();
 
 		try
 		{
@@ -2926,17 +2926,10 @@ function StudentAkteDel()
 function StudentAkteDisableFields(val)
 {
 	document.getElementById('student-zeugnis-button-archive').disabled=val;
+	// Zeugnis als Default markieren
+	document.getElementById('student-zeugnis-menulist-dokument').value='Zeugnis';
 }
 
-function StudentAkteToggleDetails()
-{
-	var studentarchivierendetails = document.getElementById('student-zeugnis-archivieren-erweitert');
-
-	if(studentarchivierendetails.hidden)
-		studentarchivierendetails.hidden = false;
-	else
-		studentarchivierendetails.hidden = true;
-}
 // ****
 // * Offent eine Seite zum Upload einer neuen Datei zu einer archivierten Akte
 // ****
@@ -2986,18 +2979,38 @@ function StudentZeugnisDokumentArchivieren()
 	var vorlage = document.getElementById('student-zeugnis-menulist-dokument').value;
 	var url = '<?php echo APP_ROOT; ?>content/pdfExport.php';
 	var xml = '';
+
 	switch(vorlage)
 	{
 		case 'Zeugnis':
 		case 'ZeugnisEng':
 			xml = 'zeugnis.rdf.php'
 			break;
+
+		case 'PrProtokollBakk':
+		case 'PrProtBakkEng':
+		case 'PrProtBA':
+		case 'PrProtBAEng':
+		case 'PrProtokollDipl':
+		case 'PrProtDiplEng':
+		case 'PrProtMA':
+		case 'PrProtMAEng':
 		case 'Bescheid':
 		case 'BescheidEng':
 			xml = 'abschlusspruefung.rdf.php';
 			break;
+
 		case 'DiplSupplement':
 			xml = 'diplomasupplement.xml.php';
+			break;
+
+		case 'Studienblatt':
+		case 'StudienblattEng':
+			xml = 'studienblatt.xml.php';
+			break;
+		default:
+			alert('Das archivieren fuer diesen Dokumenttyp wird derzeit nicht unterstuetzt');
+			return
 			break;
 	}
 
@@ -3019,9 +3032,6 @@ function StudentZeugnisDokumentArchivieren()
 			req.add('archive', '1');
 			req.add('uid', uid);
 
-			if(document.getElementById('student-zeugnis-checkbox-sign').checked)
-				req.add('sign', '1');
-
 			var response = req.execute();
 			if(response!='')
 				errormsg = errormsg + response;
@@ -3038,6 +3048,7 @@ function StudentZeugnisDokumentArchivieren()
 // * Startet das Script zum Archivieren des Zeugnisses und
 // * Refresht dann den Tree
 // ****
+/*
 function StudentZeugnisArchivieren(lang)
 {
 	lang = lang || 'ger';
@@ -3142,7 +3153,7 @@ function StudentBescheidArchivieren(lang)
 
 	StudentAkteTreeDatasource.Refresh(false);
 }
-
+*/
 // **************** Incomming/Outgoing ******************
 
 // ****
@@ -5273,6 +5284,7 @@ function StudentCreateDiplSupplement(event)
 // ****
 // * Archiviert das Diplomasupplement einer Person
 // ****
+/*
 function StudentDiplomasupplementArchivieren()
 {
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
@@ -5309,7 +5321,7 @@ function StudentDiplomasupplementArchivieren()
 	document.getElementById('student-zeugnis-button-archivieren-diplomasupplement').label=labelalt;
 	StudentAkteTreeDatasource.Refresh(false);
 }
-
+*/
 // ****
 // * Erstellt den Ausbildungsvertrag fuer einen oder mehrere Studenten
 // ****

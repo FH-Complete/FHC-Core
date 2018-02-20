@@ -77,13 +77,21 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 				class="sortDirectionIndicator"
 				sort="rdf:http://www.technikum-wien.at/akte/rdf#erstelltam" />
 			<splitter class="tree-splitter"/>
-			<treecol id="student-zeugnis-tree-gedruckt" label="Gedruckt" flex="2" hidden="false"
+			<treecol id="student-zeugnis-tree-gedruckt" label="Gedruckt" flex="2" hidden="true"
 				class="sortDirectionIndicator"
 				sort="rdf:http://www.technikum-wien.at/akte/rdf#gedruckt" />
 			<splitter class="tree-splitter"/>
 			<treecol id="student-zeugnis-tree-akte_id" label="akte_id" flex="2" hidden="true"
 				class="sortDirectionIndicator"
 				sort="rdf:http://www.technikum-wien.at/akte/rdf#akte_id" />
+			<splitter class="tree-splitter"/>
+			<treecol id="student-zeugnis-tree-signiert" label="Signiert" flex="2" hidden="false"
+				class="sortDirectionIndicator"
+				sort="rdf:http://www.technikum-wien.at/akte/rdf#signiert" />
+			<splitter class="tree-splitter"/>
+			<treecol id="student-zeugnis-tree-stud_selfservice" label="Selfservice" flex="2" hidden="false"
+				class="sortDirectionIndicator"
+				sort="rdf:http://www.technikum-wien.at/akte/rdf#stud_selfservice" />
 			<splitter class="tree-splitter"/>
 		</treecols>
 
@@ -96,6 +104,8 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 						<treecell label="rdf:http://www.technikum-wien.at/akte/rdf#erstelltam"/>
 						<treecell label="rdf:http://www.technikum-wien.at/akte/rdf#gedruckt"/>
 						<treecell label="rdf:http://www.technikum-wien.at/akte/rdf#akte_id"/>
+						<treecell label="rdf:http://www.technikum-wien.at/akte/rdf#signiert"/>
+						<treecell label="rdf:http://www.technikum-wien.at/akte/rdf#stud_selfservice"/>
 					</treerow>
 				</treeitem>
 			</treechildren>
@@ -126,16 +136,18 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 				<rows>
 					<row>
 						<label value="Dokument" control="student-zeugnis-menulist-dokument"/>
-						<menulist id="student-zeugnis-menulist-dokument" disabled="false">
-							<menupopup>
-									<menuitem id="student-zeugnis-menulist-dokument-zeugnis" value="Zeugnis" label="Zeugnis"/>
-									<menuitem id="student-zeugnis-menulist-dokument-zeugniseng" value="ZeugnisEng" label="Zeugnis Englisch"/>
-									<menuitem id="student-zeugnis-menulist-dokument-diplsupplement" value="DiplSupplement" label="Diplomasupplement"/>
-									<menuitem id="student-zeugnis-menulist-dokument-bescheid" value="Bescheid" label="Bescheid"/>
-									<menuitem id="student-zeugnis-menulist-dokument-bescheideng" value="BescheidEng" label="Bescheid Englisch"/>
-							</menupopup>
+						<menulist id="student-zeugnis-menulist-dokument"
+							datasources="../rdf/vorlage.rdf.php" flex="1"
+							ref="http://www.technikum-wien.at/vorlage" >
+							<template>
+								<menupopup>
+									<menuitem value="rdf:http://www.technikum-wien.at/vorlage/rdf#vorlage_kurzbz"
+									          label="rdf:http://www.technikum-wien.at/vorlage/rdf#bezeichnung"
+									          uri="rdf:*"/>
+									</menupopup>
+							</template>
 						</menulist>
-							<button id="student-zeugnis-button-archive" label="Archivieren" disabled="false" oncommand="StudentZeugnisDokumentArchivieren()"/>
+						<button id="student-zeugnis-button-archive" label="Archivieren" disabled="false" oncommand="StudentZeugnisDokumentArchivieren()"/>
 					</row>
 				</rows>
 		</grid>
@@ -143,29 +155,6 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 	<spacer flex="1" />
 </hbox>
 <vbox>
-<hbox>
-	<image width="12px" height="12px" src="../skin/images/plus.png" onclick="StudentAkteToggleDetails()"/>
-	<label value="Erweiterte Einstellungen" onclick="StudentAkteToggleDetails()"/>
-</hbox>
-<hbox>
-	<grid id="student-zeugnis-archivieren-erweitert" style="margin:4px;" hidden="true">
-		<columns  >
-			<column flex="1"/>
-			<column flex="1"/>
-		</columns>
-		<rows>
-			<row>
-				<label value="Dokument elektronisch signieren"/>
-				<checkbox id="student-zeugnis-checkbox-sign" checked="true" />
-			</row>
-			<row>
-				<label value="Dokument herunterladbar"/>
-				<checkbox id="student-zeugnis-checkbox-selfservice" checked="true" />
-			</row>
-		</rows>
-	</grid>
-	<spacer flex="1"/>
-</hbox>
 </vbox>
 <spacer flex="8" />
 </vbox>

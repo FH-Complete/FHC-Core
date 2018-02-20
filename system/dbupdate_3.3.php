@@ -1265,6 +1265,154 @@ if($result = $db->db_query("SELECT 1 FROM system.tbl_app WHERE app='bewerbung'")
 	}
 }
 
+// Archiv boolean fuer public.tbl_akte
+if(!@$db->db_query("SELECT archiv FROM public.tbl_akte LIMIT 1"))
+{
+	// Defaultwerte und Update werden hier nacheinander durchgefuehrt da dies
+	// schneller ist als ein ALTER TABLE mit inkludiertem Defaultwert
+	$qry = "ALTER TABLE public.tbl_akte ADD COLUMN archiv boolean;
+			UPDATE public.tbl_akte SET archiv=true WHERE dokument_kurzbz='Zeugnis';
+			UPDATE public.tbl_akte SET archiv=false WHERE dokument_kurzbz<>'Zeugnis';
+			ALTER TABLE public.tbl_akte ALTER COLUMN archiv SET DEFAULT false;
+			ALTER TABLE public.tbl_akte ALTER COLUMN archiv SET NOT NULL;
+			COMMENT ON COLUMN public.tbl_akte.archiv IS 'Is the document part of the archive';";
+	if(!$db->db_query($qry))
+		echo '<strong>tbl_akte.archiv: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Neue Spalte archiv in public.tbl_akte hinzugefügt';
+}
+
+// signiert boolean fuer public.tbl_akte
+if(!@$db->db_query("SELECT signiert FROM public.tbl_akte LIMIT 1"))
+{
+	// Defaultwerte und Update werden hier nacheinander durchgefuehrt da dies
+	// schneller ist als ein ALTER TABLE mit inkludiertem Defaultwert
+	$qry = "ALTER TABLE public.tbl_akte ADD COLUMN signiert boolean;
+			UPDATE public.tbl_akte SET signiert = false;
+			ALTER TABLE public.tbl_akte ALTER COLUMN signiert SET DEFAULT false;
+			ALTER TABLE public.tbl_akte ALTER COLUMN signiert SET NOT NULL;
+			COMMENT ON COLUMN public.tbl_akte.signiert IS 'Is the document digitally signed'";
+
+	if(!$db->db_query($qry))
+		echo '<strong>App: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Neue Spalte signiert in public.tbl_akte hinzugefügt';
+}
+
+// stud_selfservice boolean fuer public.tbl_akte
+if(!@$db->db_query("SELECT stud_selfservice FROM public.tbl_akte LIMIT 1"))
+{
+	// Defaultwerte und Update werden hier nacheinander durchgefuehrt da dies
+	// schneller ist als ein ALTER TABLE mit inkludiertem Defaultwert
+	$qry = "ALTER TABLE public.tbl_akte ADD COLUMN stud_selfservice boolean;
+			UPDATE public.tbl_akte SET stud_selfservice = false;
+			ALTER TABLE public.tbl_akte ALTER COLUMN stud_selfservice SET DEFAULT false;
+			ALTER TABLE public.tbl_akte ALTER COLUMN stud_selfservice SET NOT NULL;
+			COMMENT ON COLUMN public.tbl_akte.stud_selfservice IS 'Is the document downloadable for students'";
+
+	if(!$db->db_query($qry))
+		echo '<strong>App: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Neue Spalte stud_selfservice in public.tbl_akte hinzugefügt';
+}
+
+// Berechtigung fuer Vorlagen setzen die vormals direkt in PDFExport.php geprueft wurden
+function AddBerechtigungVorlage($berechtigung_arr, $vorlage_arr)
+{
+	global $db;
+
+	$berechtigung = '{';
+	foreach($berechtigung_arr as $item)
+	{
+		$berechtigung .= '"'.$db->db_escape($item).'",';
+	}
+	$berechtigung = mb_substr($berechtigung, 0, -1).'}';
+
+	foreach($vorlage_arr as $vorlage)
+	{
+		$qry = "SELECT 1 FROM public.tbl_vorlagestudiengang
+			WHERE berechtigung is null AND vorlage_kurzbz=".$db->db_add_param($vorlage);
+
+		$result = $db->db_query($qry);
+		if($db->db_num_rows($result)>0)
+		{
+			$qry = "UPDATE public.tbl_vorlagestudiengang SET berechtigung='".$berechtigung."'
+				WHERE berechtigung is null AND vorlage_kurzbz=".$db->db_add_param($vorlage);
+
+			if(!$db->db_query($qry))
+				echo '<strong>Vorlage Berechtigung: '.$db->db_last_error().'</strong><br>';
+			else
+				echo '<br>Berechtigung '.$berechtigung.' fuer Vorlage '.$vorlage.' gesetzt';
+		}
+	}
+}
+
+AddBerechtigungVorlage(array('admin','assistenz'),array('Lehrveranstaltungszeugnis','Zertifikat','Diplomurkunde',
+	'Diplomzeugnis','Bescheid', 'BescheidEng','Bakkurkunde','BakkurkundeEng','Bakkzeugnis',
+	'PrProtokollBakk','PrProtokollDipl','Lehrauftrag','DiplomurkundeEng','Zeugnis','ZeugnisEng','StudienerfolgEng',
+	'Sammelzeugnis','PrProtDiplEng','PrProtBakkEng','BakkzeugnisEng','DiplomzeugnisEng','statusbericht',
+	'DiplSupplement','Zutrittskarte','Projektbeschr','Ausbildungsver','AusbildStatus','PrProtBA','PrProtMA',
+	'PrProtBAEng','PrProtMAEng','Studienordnung','Erfolgsnachweis','ErfolgsnwHead','Studienblatt','LV_Informationen',
+	'LVZeugnis','AnwListBarcode','Honorarvertrag','AusbVerEng','AusbVerEngHead','Zeugnis','ZeugnisNeu','ZeugnisEngNeu',
+	'ErfolgsnachweisE','ErfolgsnwHeadE','Magisterurkunde','Masterurkunde','Defensiourkunde','Magisterzeugnis',
+	'Laufzettel','StudienblattEng','Zahlung1','Terminliste','Studienbuchblatt','Veranstaltungen',
+	'Inskription','Studienerfolg','OutgoingLearning','OutgoingChangeL','LearningAgree','Zahlung','DichiaSost'
+	));
+AddBerechtigungVorlage(array('lehre/lvplan'), array('Ressource'));
+AddBerechtigungVorlage(array('wawi/inventar','assistenz','basis/betriebsmittel'), array('Uebernahme'));
+AddBerechtigungVorlage(array('wawi/bestellung'), array('Bestellung'));
+AddBerechtigungVorlage(array('admin','mitarbeiter','assistenz'), array('AccountInfo'));
+
+// archivierbar boolean fuer public.tbl_vorlage
+if(!@$db->db_query("SELECT archivierbar FROM public.tbl_vorlage LIMIT 1"))
+{
+	$qry = "ALTER TABLE public.tbl_vorlage ADD COLUMN archivierbar boolean DEFAULT false;
+			UPDATE public.tbl_vorlage SET archivierbar=true
+			WHERE vorlage_kurzbz in('DiplSupplement','Zeugnis','ZeugnisEng', 'Bescheid',' BescheidEng');
+			COMMENT ON COLUMN public.tbl_vorlage.archivierbar IS 'Can this document be archived'";
+
+	if(!$db->db_query($qry))
+		echo '<strong>App: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Neue Spalte archivierbar in public.tbl_vorlage hinzugefügt';
+}
+
+// signierbar boolean fuer public.tbl_vorlage
+if(!@$db->db_query("SELECT signierbar FROM public.tbl_vorlage LIMIT 1"))
+{
+	$qry = "ALTER TABLE public.tbl_vorlage ADD COLUMN signierbar boolean DEFAULT false;
+			COMMENT ON COLUMN public.tbl_vorlage.signierbar IS 'Can this document be digitally signed'";
+
+	if(!$db->db_query($qry))
+		echo '<strong>App: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Neue Spalte signierbar in public.tbl_vorlage hinzugefügt';
+}
+
+// stud_selfservice boolean fuer public.tbl_vorlage
+if(!@$db->db_query("SELECT stud_selfservice FROM public.tbl_vorlage LIMIT 1"))
+{
+	$qry = "ALTER TABLE public.tbl_vorlage ADD COLUMN stud_selfservice boolean DEFAULT false;
+			COMMENT ON COLUMN public.tbl_vorlage.stud_selfservice IS 'Can this documents be downloaded if archived'";
+
+	if(!$db->db_query($qry))
+		echo '<strong>App: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Neue Spalte stud_selfserice in public.tbl_vorlage hinzugefügt';
+}
+
+// dokument_kurzbz fuer public.tbl_vorlage
+if(!@$db->db_query("SELECT dokument_kurzbz FROM public.tbl_vorlage LIMIT 1"))
+{
+	$qry = "ALTER TABLE public.tbl_vorlage ADD COLUMN dokument_kurzbz varchar(8);
+			ALTER TABLE public.tbl_vorlage ADD CONSTRAINT fk_vorlage_dokument FOREIGN KEY (dokument_kurzbz) REFERENCES public.tbl_dokument (dokument_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;
+			COMMENT ON COLUMN public.tbl_vorlage.dokument_kurzbz IS 'Connects a Template with the corresponding Dokument'";
+
+	if(!$db->db_query($qry))
+		echo '<strong>App: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Neue Spalte dokument_kurzbz in public.tbl_vorlage hinzugefügt';
+}
 
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
@@ -1413,7 +1561,7 @@ $tabellen=array(
 	"lehre.tbl_zeugnisnote"  => array("lehrveranstaltung_id","student_uid","studiensemester_kurzbz","note","uebernahmedatum","benotungsdatum","bemerkung","updateamum","updatevon","insertamum","insertvon","ext_id","punkte"),
 	"public.ci_apikey" => array("apikey_id","key","level","ignore_limits","date_created"),
 	"public.tbl_adresse"  => array("adresse_id","person_id","name","strasse","plz","ort","gemeinde","nation","typ","heimatadresse","zustelladresse","firma_id","updateamum","updatevon","insertamum","insertvon","ext_id","rechnungsadresse","anmerkung"),
-	"public.tbl_akte"  => array("akte_id","person_id","dokument_kurzbz","uid","inhalt","mimetype","erstelltam","gedruckt","titel","bezeichnung","updateamum","updatevon","insertamum","insertvon","ext_id","dms_id","nachgereicht","anmerkung","titel_intern","anmerkung_intern","nachgereicht_am","ausstellungsnation","formal_geprueft_amum"),
+	"public.tbl_akte"  => array("akte_id","person_id","dokument_kurzbz","uid","inhalt","mimetype","erstelltam","gedruckt","titel","bezeichnung","updateamum","updatevon","insertamum","insertvon","ext_id","dms_id","nachgereicht","anmerkung","titel_intern","anmerkung_intern","nachgereicht_am","ausstellungsnation","formal_geprueft_amum","archiv","signiert","stud_selfservice"),
 	"public.tbl_ampel"  => array("ampel_id","kurzbz","beschreibung","benutzer_select","deadline","vorlaufzeit","verfallszeit","insertamum","insertvon","updateamum","updatevon","email","verpflichtend","buttontext"),
 	"public.tbl_ampel_benutzer_bestaetigt"  => array("ampel_benutzer_bestaetigt_id","ampel_id","uid","insertamum","insertvon"),
 	"public.tbl_aufmerksamdurch"  => array("aufmerksamdurch_kurzbz","beschreibung","ext_id","bezeichnung", "aktiv"),
@@ -1493,7 +1641,7 @@ $tabellen=array(
 	"public.tbl_studiensemester"  => array("studiensemester_kurzbz","bezeichnung","start","ende","studienjahr_kurzbz","ext_id","beschreibung","onlinebewerbung"),
 	"public.tbl_tag"  => array("tag"),
 	"public.tbl_variable"  => array("name","uid","wert"),
-	"public.tbl_vorlage"  => array("vorlage_kurzbz","bezeichnung","anmerkung","mimetype","attribute"),
+	"public.tbl_vorlage"  => array("vorlage_kurzbz","bezeichnung","anmerkung","mimetype","attribute","archivierbar","signierbar","stud_selfservice","dokument_kurzbz"),
 	"public.tbl_vorlagedokument"  => array("vorlagedokument_id","sort","vorlagestudiengang_id","dokument_kurzbz"),
 	"public.tbl_vorlagestudiengang"  => array("vorlagestudiengang_id","vorlage_kurzbz","studiengang_kz","version","text","oe_kurzbz","style","berechtigung","anmerkung_vorlagestudiengang","aktiv","sprache","subject","orgform_kurzbz"),
 	"testtool.tbl_ablauf"  => array("ablauf_id","gebiet_id","studiengang_kz","reihung","gewicht","semester", "insertamum","insertvon","updateamum", "updatevon","ablauf_vorgaben_id","studienplan_id"),

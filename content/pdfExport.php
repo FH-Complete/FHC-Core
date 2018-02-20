@@ -177,21 +177,9 @@ if (isset($_GET['output']) && $_GET['output'] != 'pdf')
 else
 	$output = 'pdf';
 
-/** TODO *******************/
-		//XSL aus der DB holen
-		$vorlage = new vorlage();
-		if ($xsl_oe_kurzbz != '')
-		{
-			$vorlage->getAktuelleVorlage($xsl_oe_kurzbz, $xsl, $version);
-		}
-		else
-		{
-			if ($xsl_stg_kz == '')
-				$xsl_stg_kz = '0';
-
-			$vorlage->getAktuelleVorlage($xsl_stg_kz, $xsl, $version);
-		}
-/** TODO ENDE ****************/
+$vorlage = new vorlage();
+if(!$vorlage->loadVorlage($xsl))
+	die('Vorlage wurde nicht gefunden');
 
 //Berechtigung pruefen
 if ($xsl == 'AccountInfo')
@@ -233,61 +221,25 @@ if ($xsl == 'AccountInfo')
 		exit;
 	}
 }
-elseif (in_array($xsl,array('Lehrveranstaltungszeugnis','Zertifikat','Diplomurkunde','Diplomzeugnis',
-'Bescheid', 'BescheidEng','Bakkurkunde','BakkurkundeEng','Bakkzeugnis',
-'PrProtokollBakk','PrProtokollDipl','Lehrauftrag','DiplomurkundeEng','Zeugnis','ZeugnisEng','StudienerfolgEng',
-'Sammelzeugnis','PrProtDiplEng','PrProtBakkEng','BakkzeugnisEng','DiplomzeugnisEng','statusbericht',
-'DiplSupplement','Zutrittskarte','Projektbeschr','Ausbildungsver','AusbildStatus','PrProtBA','PrProtMA',
-'PrProtBAEng','PrProtMAEng','Studienordnung','Erfolgsnachweis','ErfolgsnwHead','Studienblatt','LV_Informationen',
-'LVZeugnis','AnwListBarcode','Honorarvertrag','AusbVerEng','AusbVerEngHead','Zeugnis','ZeugnisNeu','ZeugnisEngNeu',
-'ErfolgsnachweisE','ErfolgsnwHeadE','Magisterurkunde','Masterurkunde','Defensiourkunde','Magisterzeugnis',
-'Laufzettel','StudienblattEng','Zahlung1','Terminliste','Studienbuchblatt','Veranstaltungen')))
-{
-	if (!$rechte->isBerechtigt('admin') && !$rechte->isBerechtigt('assistenz'))
-	{
-		echo 'Sie haben keine Berechtigung dieses Dokument zu erstellen';
-		exit;
-	}
-}
-elseif (in_array($xsl,array('Ressource')))
-{
-	if (!$rechte->isBerechtigt('lehre/lvplan'))
-	{
-		echo 'Sie haben keine Berechtigung dieses Dokument zu erstellen';
-		exit;
-	}
-}
-elseif (in_array($xsl,array('Inskription','Studienerfolg','OutgoingLearning','OutgoingChangeL','LearningAgree','Zahlung','DichiaSost')))
-{
-	if (!$rechte->isBerechtigt('admin') && !$rechte->isBerechtigt('assistenz'))
-	{
-		echo 'Sie haben keine Berechtigung dieses Dokument zu erstellen';
-		exit;
-	}
-}
-elseif ($xsl=='Uebernahme')
-{
-	if (!$rechte->isBerechtigt('wawi/inventar') && !$rechte->isBerechtigt('assistenz') && !$rechte->isBerechtigt('basis/betriebsmittel'))
-	{
-		echo 'Sie haben keine Berechtigung dieses Dokument zu erstellen';
-		exit;
-	}
-}
-elseif ($xsl=='Bestellung')
-{
-	if (!$rechte->isBerechtigt('wawi/bestellung'))
-	{
-		echo 'Sie haben keine Berechtigung dieses Dokument zu erstellen';
-		exit;
-	}
-}
 else
 {
+	$vorlagestudiengang = new vorlage();
+	if ($xsl_oe_kurzbz != '')
+	{
+		$vorlagestudiengang->getAktuelleVorlage($xsl_oe_kurzbz, $xsl, $version);
+	}
+	else
+	{
+		if ($xsl_stg_kz == '')
+			$xsl_stg_kz = '0';
+
+		$vorlagestudiengang->getAktuelleVorlage($xsl_stg_kz, $xsl, $version);
+	}
 	// Wenn Berechtigung direkt beim der Vorlage angegeben ist
-	if (count($vorlage->berechtigung)>0)
+	if (count($vorlagestudiengang->berechtigung)>0)
 	{
 		$allowed = false;
-		foreach($vorlage->berechtigung as $berechtigung_kurzbz)
+		foreach($vorlagestudiengang->berechtigung as $berechtigung_kurzbz)
 		{
 			if ($rechte->isBerechtigt($berechtigung_kurzbz))
 				$allowed = true;
@@ -325,6 +277,11 @@ if ($xsl_oe_kurzbz == '')
 	if (!$stg_obj->load($xsl_stg_kz))
 		die($stg_obj->errormsg);
 	$xsl_oe_kurzbz = $stg_obj->oe_kurzbz;
+}
+
+if($sign === true && $vorlage->signierbar === false)
+{
+	die('Diese Vorlage darf nicht signiert werden');
 }
 
 if (!isset($_REQUEST["archive"]))
@@ -383,6 +340,9 @@ if (!isset($_REQUEST["archive"]))
 }
 else
 {
+	if(!$vorlage->archivierbar)
+		die('Dieses Dokument ist nicht archivierbar');
+
 	// Archivieren von Dokumenten
 	$uid = $_REQUEST["uid"];
 	$heute = date('Y-m-d');
@@ -446,6 +406,11 @@ else
 			die($dokument->errormsg);
 
 		$error = false;
+
+		// Beim Archivieren wird das Dokument immer signiert wenn moeglich
+		if($vorlage->signierbar)
+			$sign = true;
+
 		if ($sign === true)
 		{
 			if ($dokument->sign($user))
@@ -467,7 +432,10 @@ else
 			$hex = base64_encode($doc);
 			$akte = new akte();
 			$akte->person_id = $person_id;
-			$akte->dokument_kurzbz = 'Zeugnis';
+			if($vorlage->dokument_kurzbz!='')
+				$akte->dokument_kurzbz = $vorlage->dokument_kurzbz;
+			else
+				$akte->dokument_kurzbz = 'Zeugnis';
 			$akte->inhalt = $hex;
 			$akte->mimetype = 'application/octet-stream';
 			$akte->erstelltam = $heute;
@@ -481,6 +449,10 @@ else
 			$akte->ext_id = '';
 			$akte->uid = $uid;
 			$akte->new = true;
+			$akte->archiv = true;
+			$akte->signiert = $sign;
+			$akte->stud_selfservice = $vorlage->stud_selfservice;
+
 			if (!$akte->save())
 			{
 				echo 'Erstellen Fehlgeschlagen: '.$akte->errormsg;
