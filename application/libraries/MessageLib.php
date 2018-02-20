@@ -15,7 +15,7 @@ class MessageLib
 	public function __construct()
 	{
 		// Get code igniter instance
-        $this->ci =& get_instance();
+		$this->ci =& get_instance();
 
 		// Loads message configuration
 		$this->ci->config->load('message');
@@ -41,70 +41,70 @@ class MessageLib
 		$this->ci->load->helper('message');
 
 		// Loads phrases
-        $this->ci->lang->load('message');
-    }
+		$this->ci->lang->load('message');
+	}
 
-    /**
-     * getMessage() - returns the specified received message for a specified person
-     */
-    public function getMessage($msg_id, $person_id)
-    {
-        if (empty($msg_id))
-        	return $this->_error('', MSG_ERR_INVALID_MSG_ID);
+	/**
+	 * getMessage() - returns the specified received message for a specified person
+	 */
+	public function getMessage($msg_id, $person_id)
+	{
+		if (empty($msg_id))
+			return $this->_error('', MSG_ERR_INVALID_MSG_ID);
 		if (empty($person_id))
-        	return $this->_error('', MSG_ERR_INVALID_RECIPIENTS);
+			return $this->_error('', MSG_ERR_INVALID_RECIPIENTS);
 
 		$msg = $this->ci->RecipientModel->getMessage($msg_id, $person_id);
 
-        return $msg;
-    }
+		return $msg;
+	}
 
 	/**
-     * getMessagesByUID() - will return all messages, including the latest status for specified user. It don´t returns Attachments.
-     */
-    public function getMessagesByUID($uid, $oe_kurzbz = null, $all = false)
-    {
-        if (empty($uid))
-        	return $this->_error('', MSG_ERR_INVALID_MSG_ID);
+	 * getMessagesByUID() - will return all messages, including the latest status for specified user. It don´t returns Attachments.
+	 */
+	public function getMessagesByUID($uid, $oe_kurzbz = null, $all = false)
+	{
+		if (empty($uid))
+			return $this->_error('', MSG_ERR_INVALID_MSG_ID);
 
 		$msg = $this->ci->RecipientModel->getMessagesByUID($uid, $oe_kurzbz, $all);
 
-        return $msg;
-    }
+		return $msg;
+	}
 
 	/**
-     * getMessagesByPerson() - will return all messages, including the latest status for specified user. It don´t returns Attachments.
-     */
-    public function getMessagesByPerson($person_id, $oe_kurzbz = null, $all = false)
-    {
-        if (empty($person_id))
-        	return $this->_error('', MSG_ERR_INVALID_MSG_ID);
+	 * getMessagesByPerson() - will return all messages, including the latest status for specified user. It don´t returns Attachments.
+	 */
+	public function getMessagesByPerson($person_id, $oe_kurzbz = null, $all = false)
+	{
+		if (empty($person_id))
+			return $this->_error('', MSG_ERR_INVALID_MSG_ID);
 
 		$msg = $this->ci->RecipientModel->getMessagesByPerson($person_id, $oe_kurzbz, $all);
 
-        return $msg;
-    }
+		return $msg;
+	}
 
 	/**
-     * getSentMessagesByPerson() - Get all sent messages from a person identified by person_id
-     */
-    public function getSentMessagesByPerson($person_id, $oe_kurzbz = null, $all = false)
-    {
-        if (empty($person_id))
-        	return $this->_error('', MSG_ERR_INVALID_MSG_ID);
+	 * getSentMessagesByPerson() - Get all sent messages from a person identified by person_id
+	 */
+	public function getSentMessagesByPerson($person_id, $oe_kurzbz = null, $all = false)
+	{
+		if (empty($person_id))
+			return $this->_error('', MSG_ERR_INVALID_MSG_ID);
 
 		$msg = $this->ci->MessageModel->getMessagesByPerson($person_id, $oe_kurzbz, $all);
 
-        return $msg;
-    }
+		return $msg;
+	}
 
 	/**
-     * getMessageByToken
-     */
-    public function getMessageByToken($token)
-    {
-        if (empty($token))
-        	return $this->_error('', MSG_ERR_INVALID_TOKEN);
+	 * getMessageByToken
+	 */
+	public function getMessageByToken($token)
+	{
+		if (empty($token))
+			return $this->_error('', MSG_ERR_INVALID_TOKEN);
 
 		$result = $this->ci->RecipientModel->getMessageByToken($token);
 		if (hasData($result))
@@ -138,43 +138,43 @@ class MessageLib
 			}
 		}
 
-        return $result;
-    }
+		return $result;
+	}
 
-    /**
-     * getCountUnreadMessages
-     */
-    public function getCountUnreadMessages($person_id, $oe_kurzbz = null)
-    {
-        if (!is_numeric($person_id))
-        	return $this->_error('', MSG_ERR_INVALID_RECIPIENTS);
+	/**
+	 * getCountUnreadMessages
+	 */
+	public function getCountUnreadMessages($person_id, $oe_kurzbz = null)
+	{
+		if (!is_numeric($person_id))
+			return $this->_error('', MSG_ERR_INVALID_RECIPIENTS);
 
 		$msg = $this->ci->RecipientModel->getCountUnreadMessages($person_id, $oe_kurzbz);
 
-        return $msg;
-    }
+		return $msg;
+	}
 
-    /**
-     * updateMessageStatus() - will change status on message for particular user
+	/**
+	 * updateMessageStatus() - will change status on message for particular user
 	 * NOTE: it performs an insert, NOT an update
-     */
-    public function updateMessageStatus($message_id, $person_id, $status)
-    {
-        if (empty($message_id))
-        {
-            return $this->_error('', MSG_ERR_INVALID_MSG_ID);
-        }
+	 */
+	public function updateMessageStatus($message_id, $person_id, $status)
+	{
+		if (empty($message_id))
+		{
+			return $this->_error('', MSG_ERR_INVALID_MSG_ID);
+		}
 
-        if (empty($person_id))
-        {
-            return $this->_error('', MSG_ERR_INVALID_USER_ID);
-        }
+		if (empty($person_id))
+		{
+			return $this->_error('', MSG_ERR_INVALID_USER_ID);
+		}
 
 		// NOTE: Not use empty otherwise if status is 0 it returns an error
-        if (!isset($status))
-        {
-            return $this->_error('', MSG_ERR_INVALID_STATUS_ID);
-        }
+		if (!isset($status))
+		{
+			return $this->_error('', MSG_ERR_INVALID_STATUS_ID);
+		}
 
 		// Searches if the status is already present
 		$result = $this->ci->MsgStatusModel->load(array($message_id, $person_id, $status));
@@ -195,17 +195,17 @@ class MessageLib
 		}
 
 		return $result;
-    }
+	}
 
-    /**
-     * sendMessage() - sends new internal message. This function will create a new thread
-     */
-    public function sendMessage($sender_id, $receiver_id, $subject, $body, $priority = PRIORITY_NORMAL, $relationmessage_id = null, $oe_kurzbz = null, $multiPartMime = true)
-    {
-        if (!is_numeric($sender_id))
-        {
+	/**
+	 * sendMessage() - sends new internal message. This function will create a new thread
+	 */
+	public function sendMessage($sender_id, $receiver_id, $subject, $body, $priority = PRIORITY_NORMAL, $relationmessage_id = null, $oe_kurzbz = null, $multiPartMime = true)
+	{
+		if (!is_numeric($sender_id))
+		{
 			$sender_id = $this->ci->config->item('system_person_id');
-        }
+		}
 
 		$receivers = $this->_getReceivers($receiver_id, $oe_kurzbz);
 
@@ -270,17 +270,17 @@ class MessageLib
 		}
 
 		return $result;
-    }
+	}
 
 	/**
-     * sendMessageVorlage() - sends new internal message using a template
-     */
-    public function sendMessageVorlage($sender_id, $receiver_id, $vorlage_kurzbz, $oe_kurzbz, $data, $relationmessage_id = null, $orgform_kurzbz = null, $multiPartMime = true)
-    {
-        if (!is_numeric($sender_id))
-        {
+	 * sendMessageVorlage() - sends new internal message using a template
+	 */
+	public function sendMessageVorlage($sender_id, $receiver_id, $vorlage_kurzbz, $oe_kurzbz, $data, $relationmessage_id = null, $orgform_kurzbz = null, $multiPartMime = true)
+	{
+		if (!is_numeric($sender_id))
+		{
 			$sender_id = $this->ci->config->item('system_person_id');
-        }
+		}
 
 		$receivers = $this->_getReceivers($receiver_id, $oe_kurzbz);
 
@@ -387,7 +387,7 @@ class MessageLib
 		}
 
 		return $result;
-    }
+	}
 
 	/**
 	 * Gets all the messages from DB and sends them via email
@@ -464,16 +464,16 @@ class MessageLib
 							$sender = $result->retval[0]->sender;
 						}
 
-						$receiverContanct = $result->retval[$i]->receiver;
+						$receiverContact = $result->retval[$i]->receiver;
 						if (!is_null($result->retval[$i]->employeecontact) && $result->retval[$i]->employeecontact != '')
 						{
-							$receiverContanct = $result->retval[$i]->employeecontact.'@'.DOMAIN;
+							$receiverContact = $result->retval[$i]->employeecontact.'@'.DOMAIN;
 						}
 
 						// Sending email
 						$sent = $this->ci->maillib->send(
 							$sender,
-							$receiverContanct,
+							$receiverContact,
 							$result->retval[$i]->subject,
 							$body,
 							null,
@@ -613,16 +613,16 @@ class MessageLib
 						$sender = $result->retval[0]->sender;
 					}
 
-					$receiverContanct = $result->retval[0]->receiver;
+					$receiverContact = $result->retval[0]->receiver;
 					if (!is_null($result->retval[0]->employeecontact) && $result->retval[0]->employeecontact != '')
 					{
-						$receiverContanct = $result->retval[0]->employeecontact.'@'.DOMAIN;
+						$receiverContact = $result->retval[0]->employeecontact.'@'.DOMAIN;
 					}
 
 					// Sending email
 					$sent = $this->ci->maillib->send(
 						$sender,
-						$receiverContanct,
+						$receiverContact,
 						is_null($subject) ? $result->retval[0]->subject : $subject, // if parameter subject is not null, use it!
 						$bodyMsg,
 						null,
@@ -689,8 +689,8 @@ class MessageLib
 		return $sent;
 	}
 
-    // ------------------------------------------------------------------------
-    // Private methods
+	// ------------------------------------------------------------------------
+	// Private methods
 
 	/**
 	 * Update the table tbl_msg_recipient
@@ -736,10 +736,10 @@ class MessageLib
 	}
 
 	/**
-     * Gets the receivers id that are enabled to read messages for that oe_kurzbz
-     */
-    private function _getReceiversByOekurzbz($oe_kurzbz)
-    {
+	 * Gets the receivers id that are enabled to read messages for that oe_kurzbz
+	 */
+	private function _getReceiversByOekurzbz($oe_kurzbz)
+	{
 		// Load Benutzerfunktion_model
 		$this->ci->load->model('person/Benutzerfunktion_model', 'BenutzerfunktionModel');
 		// Join with table public.tbl_benutzer on field uid
@@ -752,13 +752,13 @@ class MessageLib
 		);
 
 		return $receivers;
-    }
+	}
 
-    /**
-     * Gets the receivers id
-     */
-    private function _getReceivers($receiver_id, $oe_kurzbz = null)
-    {
+	/**
+	 * Gets the receivers id
+	 */
+	private function _getReceivers($receiver_id, $oe_kurzbz = null)
+	{
 		$receivers = null;
 
 		// If no receiver_id is given...
@@ -782,13 +782,13 @@ class MessageLib
 		}
 
 		return $receivers;
-    }
+	}
 
-    /**
-     * Checks if the given receiver id is a valid person
-     */
-    private function _checkReceiverId($receiver_id)
-    {
+	/**
+	 * Checks if the given receiver id is a valid person
+	 */
+	private function _checkReceiverId($receiver_id)
+	{
 		// Load Person_model
 		$this->ci->load->model('person/Person_model', 'PersonModel');
 		$result = $this->ci->PersonModel->load($receiver_id);
@@ -798,13 +798,13 @@ class MessageLib
 		}
 
 		return false;
-    }
+	}
 
-    /**
-     * Save a message in DB
-     **/
-    private function _saveMessage($sender_id, $receiver_id, $subject, $body, $relationmessage_id, $oe_kurzbz)
-    {
+	/**
+	 * Save a message in DB
+	 **/
+	private function _saveMessage($sender_id, $receiver_id, $subject, $body, $relationmessage_id, $oe_kurzbz)
+	{
 		// Starts db transaction
 		$this->ci->db->trans_start(false);
 
@@ -854,27 +854,27 @@ class MessageLib
 		}
 
 		return $result;
-    }
+	}
 
-    /**
-     * Wrapper for function error
-     */
-    private function _error($retval = '', $code = null)
-    {
+	/**
+	 * Wrapper for function error
+	 */
+	private function _error($retval = '', $code = null)
+	{
 		return error($retval, $code, MessageLib::MSG_INDX_PREFIX);
-    }
+	}
 
-    /**
-     * Wrapper for function success
-     */
-    private function _success($retval = '', $code = null)
-    {
+	/**
+	 * Wrapper for function success
+	 */
+	private function _success($retval = '', $code = null)
+	{
 		return success($retval, $code, MessageLib::MSG_INDX_PREFIX);
-    }
+	}
 
-    /**
-     *
-     */
+	/**
+	 *
+	 */
 	public function parseMessageText($text, $data = array())
 	{
 		return $this->ci->parser->parse_string($text, $data, true);
