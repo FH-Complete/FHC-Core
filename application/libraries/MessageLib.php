@@ -426,14 +426,14 @@ class MessageLib
 					if ((!is_null($result->retval[$i]->receiver) && $result->retval[$i]->receiver != '')
 						|| (!is_null($result->retval[$i]->employeecontact) && $result->retval[$i]->employeecontact != ''))
 					{
-						$href = $this->ci->config->item('message_server').$this->ci->config->item('message_html_view_url').$result->retval[0]->token;
+						$href = $this->ci->config->item('message_server').$this->ci->config->item('message_html_view_url').$result->retval[$i]->token;
 						// Using a template for the html email body
 						$body = $this->ci->parser->parse(
 							'templates/mailHTML',
 							array(
 								'href' => $href,
-								'subject' => $result->retval[0]->subject,
-								'body' => $result->retval[0]->body
+								'subject' => $result->retval[$i]->subject,
+								'body' => $result->retval[$i]->body
 							),
 							true
 						);
@@ -447,8 +447,8 @@ class MessageLib
 							'templates/mailTXT',
 							array(
 								'href' => $href,
-								'subject' => $result->retval[0]->subject,
-								'body' => $result->retval[0]->body
+								'subject' => $result->retval[$i]->subject,
+								'body' => $result->retval[$i]->body
 							),
 							true
 						);
@@ -457,11 +457,11 @@ class MessageLib
 							$this->ci->loglib->logError('Error while parsing the mail template');
 						}
 
-						// If the sender kontakt does not exist, then system-sender is used if empty
+						// If the sender is not an employee, then system-sender is used if empty
 						$sender = '';
-						if (!is_null($result->retval[0]->sender) && $result->retval[0]->sender != '')
+						if (!is_null($result->retval[0]->senderemployeecontact) && $result->retval[0]->senderemployeecontact != '')
 						{
-							$sender = $result->retval[0]->sender;
+							$sender = $result->retval[0]->senderemployeecontact.'@'.DOMAIN;
 						}
 
 						$receiverContact = $result->retval[$i]->receiver;
@@ -606,11 +606,11 @@ class MessageLib
 						$bodyMsg = $altBody = $body;
 					}
 
-					// If the sender kontakt does not exist, then system-sender is used if empty
+					// If the sender is not an employee, then system-sender is used if empty
 					$sender = '';
-					if (!is_null($result->retval[0]->sender) && $result->retval[0]->sender != '')
+					if (!is_null($result->retval[0]->senderemployeecontact) && $result->retval[0]->senderemployeecontact != '')
 					{
-						$sender = $result->retval[0]->sender;
+						$sender = $result->retval[0]->senderemployeecontact.'@'.DOMAIN;
 					}
 
 					$receiverContact = $result->retval[0]->receiver;
