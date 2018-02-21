@@ -35,7 +35,16 @@ require_once('../include/studiengang.class.php');
 
 // raumtypen holen
 $studiengangDAO=new studiengang();
-$studiengangDAO->getAll('typ, kurzbz', false);
+
+if(isset($_GET['studiengang_kz']))
+{
+	if($studiengangDAO->load($_GET['studiengang_kz']))
+	{
+		$studiengangDAO->result[] = $studiengangDAO;
+	}
+}
+else
+	$studiengangDAO->getAll('typ, kurzbz', false);
 
 $rdf_url='http://www.technikum-wien.at/studiengang';
 

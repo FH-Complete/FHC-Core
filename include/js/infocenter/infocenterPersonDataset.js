@@ -1,8 +1,26 @@
+/*
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
+
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 /**
+ * javascript file for infocenter overview page
  */
 $(document).ready(
 	function()
 	{
+		//bootstrap table
+		$("#tableDataset").addClass('table table-bordered table-responsive');
+
 		// Checks if the table contains data (rows)
 		if ($('#tableDataset').find('tbody:empty').length == 0
 			&& $('#tableDataset').find('tr:empty').length == 0)
@@ -17,6 +35,9 @@ $(document).ready(
 	}
 );
 
+/**
+ * adds person table additional actions html (above and beneath it)
+ */
 function appendTableActionsHtml()
 {
 	var currurl = window.location.href;
@@ -47,7 +68,9 @@ function appendTableActionsHtml()
 	$("#datasetActionsBottom").append("<br><br>");
 }
 
-
+/**
+ * sets functionality for the actions above and beneath the person table
+ */
 function setTableActions()
 {
 	$(".sendMsgsLink").click(function() {
@@ -67,7 +90,7 @@ function setTableActions()
 
 	$(".selectAll").click(function()
 		{
-			//trs only if not filtered by tablesorter
+			//select only trs if not filtered by tablesorter
 			var trs = $("#tableDataset tbody tr").not(".filtered");
 			trs.find("input[name=PersonId\\[\\]]").prop("checked", true);
 		}

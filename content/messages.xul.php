@@ -86,8 +86,6 @@ echo ']>
 	<treecols>
 		<treecol id="messages-tree-betreff" label="Betreff" flex="2" hidden="false" primary="true"
 		class="sortDirectionIndicator"
-		sortActive="true"
-		sortDirection="ascending"
 		sort="rdf:http://www.technikum-wien.at/messages/rdf#subject"/>
 		<splitter class="tree-splitter"/>
 		<treecol id="messages-tree-body" label="Body" flex="2" hidden="true"
@@ -100,6 +98,8 @@ echo ']>
 		<splitter class="tree-splitter"/>
 		<treecol id="messages-tree-insertamum" label="Datum" flex="2" hidden="false"
 			class="sortDirectionIndicator"
+			sortActive="true"
+			sortDirection="descending"
 			sort="rdf:http://www.technikum-wien.at/messages/rdf#insertamum"/>
 		<splitter class="tree-splitter"/>
 		<treecol id="messages-tree-sender" label="Sender" flex="2" hidden="false"

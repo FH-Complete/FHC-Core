@@ -9,7 +9,7 @@
 			'sbadmintemplate' => true,
 			'tablesorter' => true,
 			'customCSSs' => 'skin/tablesort_bootstrap.css',
-			'customJSs' => array('include/js/infocenterPersonDataset.js', 'include/js/bootstrapper.js')
+			'customJSs' => array('include/js/bootstrapper.js', 'include/js/infocenter/infocenterPersonDataset.js')
 		)
 	);
 ?>
@@ -40,9 +40,6 @@
 			</div>
 		</div>
 	</div>
-	<script>
-		$("#tableDataset").addClass('table table-bordered table-responsive');
-	</script>
 </body>
 
 <?php $this->load->view('templates/FHC-Footer'); ?>
