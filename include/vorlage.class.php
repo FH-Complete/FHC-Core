@@ -48,7 +48,7 @@ class vorlage extends basis_db
 	public $anmerkung_vorlagestudiengang;	// text
 	public $aktiv;							// boolean
 
-	public $archiverbar = false;
+	public $archivierbar = false;
 	public $signierbar = false;
 	public $stud_selfservice = false;
 	public $dokument_kurzbz;
@@ -109,18 +109,27 @@ class vorlage extends basis_db
 
 		if($new)
 		{
-			$qry = "INSERT INTO public.tbl_vorlage(vorlage_kurzbz, bezeichnung, anmerkung, mimetype) VALUES(".
+			$qry = "INSERT INTO public.tbl_vorlage(vorlage_kurzbz, bezeichnung, anmerkung, mimetype,
+					archivierbar, signierbar, stud_selfservice, dokument_kurzbz) VALUES(".
 					$this->db_add_param($this->vorlage_kurzbz).','.
 					$this->db_add_param($this->bezeichnung).','.
 					$this->db_add_param($this->anmerkung).','.
-					$this->db_add_param($this->mimetype).');';
+					$this->db_add_param($this->mimetype).','.
+					$this->db_add_param($this->archivierbar, FHC_BOOLEAN).','.
+					$this->db_add_param($this->signierbar, FHC_BOOLEAN).','.
+					$this->db_add_param($this->stud_selfservice, FHC_BOOLEAN).','.
+					$this->db_add_param($this->dokument_kurzbz).');';
 		}
 		else
 		{
 			$qry = 'UPDATE public.tbl_vorlage
 					SET 	bezeichnung='.$this->db_add_param($this->bezeichnung).',
 							anmerkung='.$this->db_add_param($this->anmerkung).',
-							mimetype='.$this->db_add_param($this->mimetype).'
+							mimetype='.$this->db_add_param($this->mimetype).',
+							archivierbar='.$this->db_add_param($this->archivierbar, FHC_BOOLEAN).',
+							signierbar='.$this->db_add_param($this->signierbar, FHC_BOOLEAN).',
+							stud_selfservice='.$this->db_add_param($this->archivierbar, FHC_BOOLEAN).',
+							dokument_kurzbz='.$this->db_add_param($this->dokument_kurzbz).'
 					WHERE vorlage_kurzbz='.$this->db_add_param($this->vorlage_kurzbz).';';
 		}
 
@@ -152,6 +161,10 @@ class vorlage extends basis_db
 				$obj->bezeichnung = $row->bezeichnung;
 				$obj->anmerkung = $row->anmerkung;
 				$obj->mimetype = $row->mimetype;
+				$obj->signierbar = $this->db_parse_bool($row->signierbar);
+				$obj->archivierbar = $this->db_parse_bool($row->archivierbar);
+				$obj->stud_selfservice = $this->db_parse_bool($row->stud_selfservice);
+				$obj->dokument_kurzbz = $row->dokument_kurzbz;
 
 				$this->result[]= $obj;
 			}

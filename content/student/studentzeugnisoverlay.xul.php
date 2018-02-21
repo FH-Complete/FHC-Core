@@ -112,25 +112,14 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 		</template>
 	</tree>
 	</groupbox>
-	<!--
-	<vbox id="student-zeugnis-buttons">
-		<spacer flex="1"/>
-		<button id="student-zeugnis-button-archivieren" label="aktuelles Zeugnis archivieren" disabled="false" oncommand="StudentZeugnisArchivieren()"/>
-		<button id="student-zeugnis-button-archivieren-englisch" label="aktuelles Zeugnis archivieren (englisch)" disabled="false" oncommand="StudentZeugnisArchivieren('eng')"/>
-		<button id="student-zeugnis-button-archivieren-diplomasupplement" label="Diplomasupplement archivieren" disabled="false" oncommand="StudentDiplomasupplementArchivieren()"/>
-		<button id="student-bescheid-button-archivieren" label="Bescheid archivieren" disabled="false" oncommand="StudentBescheidArchivieren()"/>
-		<button id="student-bescheid-button-archivieren-englisch" label="Bescheid archivieren (englisch)" disabled="false" oncommand="StudentBescheidArchivieren('eng')"/>
-		<spacer flex="1"/>
-	</vbox>
-	-->
 </hbox>
 <hbox>
 	<groupbox id="student-zeugnis-groupbox-archive">
 		<caption label="Dokument archivieren" />
-		<grid id="student-zeugnis-grid-archive" style="margin:4px;" flex="1">
+		<grid id="student-zeugnis-grid-archive" style="margin:4px;" flex="3">
 				<columns  >
 					<column flex="1"/>
-					<column flex="5"/>
+					<column flex="8"/>
 					<column flex="2"/>
 				</columns>
 				<rows>
