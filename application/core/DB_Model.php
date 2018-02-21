@@ -541,6 +541,21 @@ class DB_Model extends FHC_Model
 	}
 
 	/**
+	 * This method call the method escape_like_str from class CI_DB_driver, therefore:
+	 * this method should be used when strings are to be used in LIKE conditions so that LIKE wildcards (‘%’, ‘_’)
+	 * in the string are also properly escaped.
+	 * NOTE: The escape_like_str() method uses ‘!’ (exclamation mark) to escape special characters for LIKE conditions.
+	 * 		Because this method escapes partial strings that you would wrap in quotes yourself, it cannot automatically
+	 *		add the ESCAPE '!' condition for you, and so you’ll have to manually do that.
+	 *
+	 * @return  void
+	 */
+	public function escapeLike($value)
+	{
+		return $this->db->escape_like_str($value);
+	}
+
+	/**
 	 * Convert PG-Boolean to PHP-Boolean
 	 *
 	 * @param   char	$b	PG-Char to convert

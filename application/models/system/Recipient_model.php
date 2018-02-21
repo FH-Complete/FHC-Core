@@ -261,6 +261,7 @@ class Recipient_model extends DB_Model
 						 ks.kontakt as sender,
 						 kr.kontakt as receiver,
 						 mu.mitarbeiter_uid as employeeContact,
+						 ms.mitarbeiter_uid as senderemployeeContact,
 						 mr.person_id as receiver_id,
 						 mr.token,
 						 mm.subject,
@@ -278,7 +279,13 @@ class Recipient_model extends DB_Model
 								   m.mitarbeiter_uid
 							  FROM public.tbl_benutzer b INNER JOIN public.tbl_mitarbeiter m ON(b.uid = m.mitarbeiter_uid)
 							 WHERE b.aktiv = TRUE
-						) mu ON (mu.person_id = mr.person_id)';
+						) mu ON (mu.person_id = mr.person_id)
+						LEFT JOIN (
+							SELECT b.person_id,
+								   m.mitarbeiter_uid
+							  FROM public.tbl_benutzer b INNER JOIN public.tbl_mitarbeiter m ON(b.uid = m.mitarbeiter_uid)
+							 WHERE b.aktiv = TRUE
+						) ms ON (ms.person_id = mm.person_id)';
 
 		$parametersArray = array($kontaktType, $kontaktType);
 

@@ -17,31 +17,29 @@ class PersonLock_model extends DB_Model
 	}
 
 	/**
-	 * checks if a specific person is locked. By default, looks for any entries in locktable for the person.
-	 * Alternatively, looks only for locks in a certain app
+	 * Checks if a specific person is locked. By default, looks for entries with no app in locktable for the person.
+	 * Alternatively, looks only for locks in a certain app.
 	 * @param $person_id
 	 * @param null $app
 	 * @return array all locks for a person if locked, null otherwise
 	 */
 	public function checkIfLocked($person_id, $app = null)
 	{
-		$lockdata = $app === null ? array('person_id' => $person_id) : array('person_id' => $person_id, 'app' => $app);
+		$lockdata = array('person_id' => $person_id, 'app' => $app);
 
 		$result = $this->loadWhere($lockdata);
 
-		if($result->error)
+		if ($result->error)
 			return error($result->retval);
+
+		if (count($result->retval) > 0)
+			return success($result->retval);
 		else
-		{
-			if(count($result->retval) > 0)
-				return success($result->retval);
-			else
-				return success(null);
-		}
+			return success(null);
 	}
 
 	/**
-	 * locks a person. returns null if person was not locked (e.g. when already locked)
+	 * Locks a person. Returns null if person was not locked (e.g. when already locked).
 	 * @param $person_id
 	 * @param $uid user who locks the person
 	 * @param $app optional, application in which person is locked
@@ -51,19 +49,19 @@ class PersonLock_model extends DB_Model
 	{
 		$locked = $this->checkIfLocked($person_id, $app);
 
-		if($locked->error)
+		if ($locked->error)
 			return error($locked->retval);
 
 		//insert only if not already locked
-		if($locked->retval === null)
+		if ($locked->retval === null)
 			return $this->insert(array('person_id' => $person_id, 'uid' => $uid, 'app' => $app));
 		else
 			return success(null);
 	}
 
 	/**
-	 * remove a lock for a person. By default, removes any entries in locktable for the person
-	 * Alternatively, removes only locks in a certain app
+	 * Remove a lock for a person. By default, removes any entries in locktable for the person.
+	 * Alternatively, removes only locks in a certain app.
 	 * @param $person_id
 	 * @param null $app
 	 * @return array deleted lock ids if person was locked, null otherwise
@@ -79,7 +77,7 @@ class PersonLock_model extends DB_Model
 		foreach ($locks->retval as $lock)
 		{
 			$result = $this->delete($lock->lock_id);
-			if($result->error)
+			if ($result->error)
 				return error($result->retval);
 
 			$deleted[] = $lock;

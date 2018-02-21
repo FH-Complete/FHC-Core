@@ -33,7 +33,7 @@ class ViewMessage extends CI_Controller
 		// Load model MessageToken_model, not calling the authentication system
 		$this->load->model('system/MessageToken_model', 'MessageTokenModel');
 	}
-	
+
 	/**
 	 * Using the MessageTokenModel instead of MessageLib to allow
 	 * viewing the message without prompting the login
@@ -50,31 +50,36 @@ class ViewMessage extends CI_Controller
 		if (is_array($msg->retval) && count($msg->retval) > 0)
 		{
 			$setReadMessageStatusByToken = $this->MessageTokenModel->setReadMessageStatusByToken($token);
-			
+
 			if (isError($setReadMessageStatusByToken))
 			{
 				show_error($msg->$setReadMessageStatusByToken);
 			}
-			
+
 			$sender_id = $msg->retval[0]->sender_id;
 			$receiver_id = $msg->retval[0]->receiver_id;
 			$sender = $this->MessageTokenModel->getSenderData($sender_id);
-			
+
 			// To decide how to change the redirection
 			$isEmployee = $this->MessageTokenModel->isEmployee($receiver_id);
 			if (!is_bool($isEmployee) && isError($isEmployee))
 			{
 				show_error($isEmployee);
 			}
-			
+
+			if($this->config->item('redirect_view_message_url') != '')
+				$href = APP_ROOT . $this->config->item('redirect_view_message_url') . $token;
+			else
+				$href = '';
+
 			$data = array (
 				'sender_id' => $sender_id,
 				'sender' => $sender->retval[0],
 				'message' => $msg->retval[0],
 				'isEmployee' => $isEmployee,
-				'href' => APP_ROOT . $this->config->item('redirect_view_message_url') . $token
+				'href' => $href
 			);
-			
+
 			$this->load->view('system/messageHTML.php', $data);
 		}
 	}

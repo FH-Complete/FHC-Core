@@ -426,42 +426,78 @@ class MessageLib
 					if ((!is_null($result->retval[$i]->receiver) && $result->retval[$i]->receiver != '')
 						|| (!is_null($result->retval[$i]->employeecontact) && $result->retval[$i]->employeecontact != ''))
 					{
-						$href = $this->ci->config->item('message_server').$this->ci->config->item('message_html_view_url').$result->retval[0]->token;
-						// Using a template for the html email body
-						$body = $this->ci->parser->parse(
-							'templates/mailHTML',
-							array(
-								'href' => $href,
-								'subject' => $result->retval[0]->subject,
-								'body' => $result->retval[0]->body
-							),
-							true
-						);
+						$href = $this->ci->config->item('message_server').$this->ci->config->item('message_html_view_url').$result->retval[$i]->token;
+
+						$vorlage = $this->ci->vorlagelib->loadVorlagetext('MessageMailHTML');
+
+						if(hasData($vorlage))
+						{
+							// Using a template for the html email body
+							$body = $this->ci->parser->parse_string(
+								$vorlage->retval[0]->text,
+								array(
+									'href' => $href,
+									'subject' => $result->retval[$i]->subject,
+									'body' => $result->retval[$i]->body
+								),
+								true
+							);
+						}
+						else
+						{
+							// Using a template for the html email body
+							$body = $this->ci->parser->parse(
+								'templates/mailHTML',
+								array(
+									'href' => $href,
+									'subject' => $result->retval[$i]->subject,
+									'body' => $result->retval[$i]->body
+								),
+								true
+							);
+						}
 						if (is_null($body) || $body == '')
 						{
 							$this->ci->loglib->logError('Error while parsing the mail template');
 						}
 
-						// Using a template for the plain text email body
-						$altBody = $this->ci->parser->parse(
-							'templates/mailTXT',
-							array(
-								'href' => $href,
-								'subject' => $result->retval[0]->subject,
-								'body' => $result->retval[0]->body
-							),
-							true
-						);
+						$vorlage = $this->ci->vorlagelib->loadVorlagetext('MessageMailTXT');
+						if(hasData($vorlage))
+						{
+							// Using a template for the plain text email body
+							$altBody = $this->ci->parser->parse_string(
+								$vorlage->retval[0]->text,
+								array(
+									'href' => $href,
+									'subject' => $result->retval[$i]->subject,
+									'body' => $result->retval[$i]->body
+								),
+								true
+							);
+						}
+						else
+						{
+							// Using a template for the plain text email body
+							$altBody = $this->ci->parser->parse(
+								'templates/mailTXT',
+								array(
+									'href' => $href,
+									'subject' => $result->retval[$i]->subject,
+									'body' => $result->retval[$i]->body
+								),
+								true
+							);
+						}
 						if (is_null($altBody) || $altBody == '')
 						{
 							$this->ci->loglib->logError('Error while parsing the mail template');
 						}
 
-						// If the sender kontakt does not exist, then system-sender is used if empty
+						// If the sender is not an employee, then system-sender is used if empty
 						$sender = '';
-						if (!is_null($result->retval[0]->sender) && $result->retval[0]->sender != '')
+						if (!is_null($result->retval[0]->senderemployeecontact) && $result->retval[0]->senderemployeecontact != '')
 						{
-							$sender = $result->retval[0]->sender;
+							$sender = $result->retval[0]->senderemployeecontact.'@'.DOMAIN;
 						}
 
 						$receiverContact = $result->retval[$i]->receiver;
@@ -571,15 +607,32 @@ class MessageLib
 					{
 						// Using a template for the html email body
 						$href = $this->ci->config->item('message_server').$this->ci->config->item('message_html_view_url').$result->retval[0]->token;
-						$bodyMsg = $this->ci->parser->parse(
-							'templates/mailHTML',
-							array(
-								'href' => $href,
-								'subject' => $result->retval[0]->subject,
-								'body' => $result->retval[0]->body
-							),
-							true
-						);
+
+						$vorlage = $this->ci->vorlagelib->loadVorlagetext('MessageMailHTML');
+						if(hasData($vorlage))
+						{
+							$bodyMsg = $this->ci->parser->parse_string(
+								$vorlage->retval[0]->text,
+								array(
+									'href' => $href,
+									'subject' => $result->retval[0]->subject,
+									'body' => $result->retval[0]->body
+								),
+								true
+							);
+						}
+						else
+						{
+							$bodyMsg = $this->ci->parser->parse(
+								'templates/mailHTML',
+								array(
+									'href' => $href,
+									'subject' => $result->retval[0]->subject,
+									'body' => $result->retval[0]->body
+								),
+								true
+							);
+						}
 						if (is_null($bodyMsg) || $bodyMsg == '')
 						{
 							// $body = $result->retval[0]->body;
@@ -587,15 +640,31 @@ class MessageLib
 						}
 
 						// Using a template for the plain text email body
-						$altBody = $this->ci->parser->parse(
-							'templates/mailTXT',
-							array(
-								'href' => $href,
-								'subject' => $result->retval[0]->subject,
-								'body' => $result->retval[0]->body
-							),
-							true
-						);
+						$vorlage = $this->ci->vorlagelib->loadVorlagetext('MessageMailHTML');
+						if(hasData($vorlage))
+						{
+							$altBody = $this->ci->parser->parse_string(
+								$vorlage->retval[0]->text,
+								array(
+									'href' => $href,
+									'subject' => $result->retval[0]->subject,
+									'body' => $result->retval[0]->body
+								),
+								true
+							);
+						}
+						else
+						{
+							$altBody = $this->ci->parser->parse(
+								'templates/mailTXT',
+								array(
+									'href' => $href,
+									'subject' => $result->retval[0]->subject,
+									'body' => $result->retval[0]->body
+								),
+								true
+							);
+						}
 						if (is_null($altBody) || $altBody == '')
 						{
 							$this->ci->loglib->logError('Error while parsing the plain text mail template');
@@ -606,11 +675,11 @@ class MessageLib
 						$bodyMsg = $altBody = $body;
 					}
 
-					// If the sender kontakt does not exist, then system-sender is used if empty
+					// If the sender is not an employee, then system-sender is used if empty
 					$sender = '';
-					if (!is_null($result->retval[0]->sender) && $result->retval[0]->sender != '')
+					if (!is_null($result->retval[0]->senderemployeecontact) && $result->retval[0]->senderemployeecontact != '')
 					{
-						$sender = $result->retval[0]->sender;
+						$sender = $result->retval[0]->senderemployeecontact.'@'.DOMAIN;
 					}
 
 					$receiverContact = $result->retval[0]->receiver;

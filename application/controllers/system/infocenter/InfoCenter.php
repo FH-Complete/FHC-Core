@@ -69,6 +69,7 @@ class InfoCenter extends VileSci_Controller
 		// Loads libraries
 		$this->load->library('DmsLib');
 		$this->load->library('PersonLogLib');
+		$this->load->library('MailLib');
 		$this->load->library('WidgetLib');
 
 		$this->_setAuthUID(); // sets property uid
@@ -313,7 +314,7 @@ class InfoCenter extends VileSci_Controller
 			$lastStatus = $lastStatus->retval[0];
 
 			//check if still Interessent and not freigegeben yet
-			if($lastStatus->status_kurzbz === 'Interessent' && !isset($lastStatus->bestaetigtam))
+			if ($lastStatus->status_kurzbz === 'Interessent' && !isset($lastStatus->bestaetigtam))
 			{
 				$result = $this->PrestudentstatusModel->update(
 					array(
@@ -542,11 +543,23 @@ class InfoCenter extends VileSci_Controller
 	 */
 	private function _loadPersonData($person_id)
 	{
-		$lockedby = $this->PersonLockModel->checkIfLocked($person_id);
+		$locked = $this->PersonLockModel->checkIfLocked($person_id, self::APP);
 
-		if (isError($lockedby))
+		if (isError($locked))
 		{
-			show_error($lockedby->retval);
+			show_error($locked->retval);
+		}
+
+		$lockedby = null;
+
+		//mark red if locked by other user
+		$lockedbyother = false;
+
+		if (isset($locked->retval[0]->uid))
+		{
+			$lockedby = $locked->retval[0]->uid;
+			if ($lockedby !== $this->uid)
+				$lockedbyother = true;
 		}
 
 		$stammdaten = $this->PersonModel->getPersonStammdaten($person_id, true);
@@ -599,7 +612,8 @@ class InfoCenter extends VileSci_Controller
 		$messagelink = base_url('/index.ci.php/system/Messages/write/'.$user_person->retval[0]->person_id);
 
 		$data = array (
-			'lockedby' => isset($lockedby->retval[0]->uid) ? $lockedby->retval[0]->uid : null,
+			'lockedby' => $lockedby,
+			'lockedbyother' => $lockedbyother,
 			'stammdaten' => $stammdaten->retval,
 			'dokumente' => $dokumente->retval,
 			'dokumente_nachgereicht' => $dokumente_nachgereicht->retval,
@@ -741,4 +755,9 @@ class InfoCenter extends VileSci_Controller
 			$this->uid
 		);
 	}
+/*
+	private function _sendFreigabeMail()
+	{
+		$this->maillib->send('alex@alex-ThinkCentre-M900', 'karpen_ko@hotmail.com', 'test', 'test');
+	}*/
 }
