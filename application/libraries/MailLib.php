@@ -58,6 +58,14 @@ class MailLib
 				$alias = $this->alias_from_system;
 			}
 		}
+		if (defined('MAIL_FROM') && MAIL_FROM != '')
+		{
+			$from = MAIL_FROM;
+			if (is_null($alias) || $alias == '')
+			{
+				$alias = $this->alias_from_system;
+			}
+		}
 
 		$this->ci->email->from($from, $alias);
 
