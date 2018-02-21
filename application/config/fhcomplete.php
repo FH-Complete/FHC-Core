@@ -207,6 +207,7 @@ $config['fhc_acl'] = array
 	'system.tbl_udf' => 'system/udf',
 	'system.tbl_extensions' => 'system/extensions',
 	'system.tbl_log' => 'basis/log',
+	'system.tbl_person_lock' => 'system/personlock',
 	'testtool.tbl_ablauf' => 'basis/ablauf',
 	'testtool.tbl_antwort' => 'basis/antwort',
 	'testtool.tbl_frage' => 'basis/frage',

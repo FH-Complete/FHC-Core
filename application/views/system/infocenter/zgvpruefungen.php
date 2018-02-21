@@ -35,7 +35,7 @@
 									<?php
 									if (isset($zgvpruefung->prestudentstatus->status_kurzbz))
 									{
-										echo $zgvpruefung->prestudentstatus->status_kurzbz.(isset($zgvpruefung->prestudentstatus->bezeichnung_statusgrund[0]) && $zgvpruefung->prestudentstatus->status_kurzbz === 'Abgewiesener' ? ' ('.$zgvpruefung->prestudentstatus->bezeichnung_statusgrund[0].')' : '');
+										echo $zgvpruefung->prestudentstatus->status_kurzbz.(isset($zgvpruefung->prestudentstatus->bezeichnung_statusgrund[0]) ? ' ('.$zgvpruefung->prestudentstatus->bezeichnung_statusgrund[0].')' : '');
 									}
 									?>
 								</div>
@@ -57,12 +57,12 @@
 								<div class="form-group">
 									<label>Orgform: </label>
 									<span style="display: inline-block">
-																	<?php
-																	$separator = (isset($zgvpruefung->prestudentstatus->orgform)) ? ', ' : '';
-																	echo (isset($zgvpruefung->prestudentstatus->orgform) ? $zgvpruefung->prestudentstatus->orgform : '')
-																		.(isset($zgvpruefung->prestudentstatus->sprachedetails->bezeichnung) ? $separator.$zgvpruefung->prestudentstatus->sprachedetails->bezeichnung[0] : '')
-																		.(isset($zgvpruefung->prestudentstatus->alternative) ? ' ('.$zgvpruefung->prestudentstatus->alternative.')' : '') ?>
-																	</span>
+									<?php
+									$separator = (isset($zgvpruefung->prestudentstatus->orgform)) ? ', ' : '';
+									echo (isset($zgvpruefung->prestudentstatus->orgform) ? $zgvpruefung->prestudentstatus->orgform : '')
+										.(isset($zgvpruefung->prestudentstatus->sprachedetails->bezeichnung) ? $separator.$zgvpruefung->prestudentstatus->sprachedetails->bezeichnung[0] : '')
+										.(isset($zgvpruefung->prestudentstatus->alternative) ? ' ('.$zgvpruefung->prestudentstatus->alternative.')' : '') ?>
+									</span>
 								</div>
 							</div>
 						</div>

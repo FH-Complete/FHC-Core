@@ -1,3 +1,6 @@
+/*stylesheet for sb admin 2 pages that do not have menu and toolbar*/
+@import "admintemplate.css";
+
 @media (min-width:768px) {
     #page-wrapper {
         margin-right: 250px;
