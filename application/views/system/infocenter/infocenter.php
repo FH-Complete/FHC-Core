@@ -4,6 +4,7 @@
 		array(
 			'title' => 'Info Center',
 			'jquery' => true,
+			'jqueryui' => true,
 			'bootstrap' => true,
 			'fontawesome' => true,
 			'sbadmintemplate' => true,
