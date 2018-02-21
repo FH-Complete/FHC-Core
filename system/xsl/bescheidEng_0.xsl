@@ -121,17 +121,29 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
 			<text:p text:style-name="P1">(Council of the University of Applied Sciences Technikum Wien) within four weeks of</text:p>
 			<text:p text:style-name="P1">notification.</text:p>
 			<text:p text:style-name="P1"/>
-			<text:p text:style-name="P1"/>
-			<text:p text:style-name="P1"/>
-			<text:p text:style-name="P1">Vienna, <xsl:value-of select="sponsion" /></text:p>
-			<text:p text:style-name="P1"/>
-			<text:p text:style-name="P1"/>
-			<text:p text:style-name="P1">For the UAS Council</text:p>
-			<text:p text:style-name="P1">The Rector</text:p>
-			<text:p text:style-name="P1"/>
-			<text:p text:style-name="P1"/>
-			<text:p text:style-name="P1"/>
-			<text:p text:style-name="P1"><xsl:value-of select="rektor" /></text:p>
+
+			<xsl:choose>
+				<xsl:when test="../signed">
+					<text:p text:style-name="P3">
+						<draw:frame draw:style-name="fr1" draw:name="Bild1" text:anchor-type="paragraph" svg:width="17cm" svg:height="4.235cm" draw:z-index="0">
+							<draw:image xlink:href="Pictures/10000201000003A7000000E9CF15067258EBF314.png" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/>
+						</draw:frame>
+					</text:p>
+				</xsl:when>
+				<xsl:otherwise>
+					<text:p text:style-name="P1"/>
+					<text:p text:style-name="P1"/>
+					<text:p text:style-name="P1">Vienna, <xsl:value-of select="sponsion" /></text:p>
+					<text:p text:style-name="P1"/>
+					<text:p text:style-name="P1"/>
+					<text:p text:style-name="P1">For the UAS Council</text:p>
+					<text:p text:style-name="P1">The Rector</text:p>
+					<text:p text:style-name="P1"/>
+					<text:p text:style-name="P1"/>
+					<text:p text:style-name="P1"/>
+					<text:p text:style-name="P1"><xsl:value-of select="rektor" /></text:p>
+				</xsl:otherwise>
+			</xsl:choose>
 		</office:text>
 </xsl:template>
 </xsl:stylesheet>
