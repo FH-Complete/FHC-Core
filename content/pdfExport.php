@@ -411,7 +411,10 @@ else
 		if ($dokument->create($output))
 			$doc = $dokument->output(false);
 		else
+		{
+			$errormsg = $dokument->errormsg;
 			$error = true;
+		}
 
 		$dokument->close();
 
