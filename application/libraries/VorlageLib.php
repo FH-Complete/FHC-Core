@@ -9,9 +9,9 @@ class VorlageLib
 	/**
 	 * Loads parser library and OrganisationseinheitLib library
 	 */
-    public function __construct()
-    {
-        require_once APPPATH.'config/message.php';
+	public function __construct()
+	{
+		require_once APPPATH.'config/message.php';
 
 		$this->ci =& get_instance();
 
@@ -21,83 +21,83 @@ class VorlageLib
 		$this->ci->load->model('system/Vorlage_model', 'VorlageModel');
 		$this->ci->load->model('system/Vorlagestudiengang_model', 'VorlageStudiengangModel');
 
-        $this->ci->load->helper('language');
-        // Loads helper message to manage returning messages
+		$this->ci->load->helper('language');
+		// Loads helper message to manage returning messages
 		$this->ci->load->helper('message');
-        //$this->ci->lang->load('fhcomplete');
-    }
+		//$this->ci->lang->load('fhcomplete');
+	}
 
    	/**
-     * getVorlage() - will load a spezific Template
-     *
-     * @param   int  $vorlage_kurzbz    REQUIRED
-     * @return  struct
-     */
-    public function getVorlage($vorlage_kurzbz)
-    {
-        if (empty($vorlage_kurzbz))
-        	return error(MSG_ERR_INVALID_MSG_ID);
-
-        $vorlage = $this->ci->VorlageModel->load($vorlage_kurzbz);
-        return $vorlage;
-    }
-
-    /**
-     * getSubMessages() - will return all Messages subordinated from a specified message.
-     *
-     * @param   int  $msg_id    REQUIRED
-     * @return  array
-     */
-    public function getVorlageByMimetype($mimetype = null)
-    {
-	    $vorlage = $this->ci->VorlageModel->loadWhere(array('mimetype' => $mimetype));
-        return $vorlage;
-    }
-
-	/**
-     * saveVorlage() - will save a spezific Template.
-     *
-     * @param   array  $data    REQUIRED
-     * @return  array
-     */
-    public function saveVorlage($vorlage_kurzbz, $data)
-    {
-        if (empty($data))
-        	return error(MSG_ERR_INVALID_MSG_ID);
-
-        $vorlage = $this->ci->VorlageModel->update($vorlage_kurzbz, $data);
-        return $vorlage;
-    }
-
-	/**
-     * getVorlagetextByVorlage() - will load tbl_vorlagestudiengang for a spezific Template.
-     *
-     * @param   string  $vorlage_kurzbz    REQUIRED
-     * @return  array
-     */
-    public function getVorlagetextByVorlage($vorlage_kurzbz)
+	 * getVorlage() - will load a spezific Template
+	 *
+	 * @param   int  $vorlage_kurzbz	REQUIRED
+	 * @return  struct
+	 */
+	public function getVorlage($vorlage_kurzbz)
 	{
-        if (empty($vorlage_kurzbz))
-        	return error($this->ci->lang->line('fhc_'.FHC_INVALIDID, false));
+		if (empty($vorlage_kurzbz))
+			return error(MSG_ERR_INVALID_MSG_ID);
 
-        $vorlage = $this->ci->VorlageStudiengangModel->loadWhere(array('vorlage_kurzbz' => $vorlage_kurzbz));
-        return $vorlage;
-    }
+		$vorlage = $this->ci->VorlageModel->load($vorlage_kurzbz);
+		return $vorlage;
+	}
 
 	/**
-     * loadVorlagetext() - will load the best fitting Template.
-     *
-     * @param   string  $vorlage_kurzbz	REQUIRED
-     * @param   string  $oe_kurzbz		OPTIONAL
-     * @param   string  $orgform_kurzbz	OPTIONAL
+	 * getSubMessages() - will return all Messages subordinated from a specified message.
+	 *
+	 * @param   int  $msg_id	REQUIRED
+	 * @return  array
+	 */
+	public function getVorlageByMimetype($mimetype = null)
+	{
+		$vorlage = $this->ci->VorlageModel->loadWhere(array('mimetype' => $mimetype));
+		return $vorlage;
+	}
+
+	/**
+	 * saveVorlage() - will save a spezific Template.
+	 *
+	 * @param   array  $data	REQUIRED
+	 * @return  array
+	 */
+	public function saveVorlage($vorlage_kurzbz, $data)
+	{
+		if (empty($data))
+			return error(MSG_ERR_INVALID_MSG_ID);
+
+		$vorlage = $this->ci->VorlageModel->update($vorlage_kurzbz, $data);
+		return $vorlage;
+	}
+
+	/**
+	 * getVorlagetextByVorlage() - will load tbl_vorlagestudiengang for a spezific Template.
+	 *
+	 * @param   string  $vorlage_kurzbz	REQUIRED
+	 * @return  array
+	 */
+	public function getVorlagetextByVorlage($vorlage_kurzbz)
+	{
+		if (empty($vorlage_kurzbz))
+			return error($this->ci->lang->line('fhc_'.FHC_INVALIDID, false));
+
+		$vorlage = $this->ci->VorlageStudiengangModel->loadWhere(array('vorlage_kurzbz' => $vorlage_kurzbz));
+		return $vorlage;
+	}
+
+	/**
+	 * loadVorlagetext() - will load the best fitting Template.
+	 *
+	 * @param   string  $vorlage_kurzbz	REQUIRED
+	 * @param   string  $oe_kurzbz		OPTIONAL
+	 * @param   string  $orgform_kurzbz	OPTIONAL
 	 * @param   string  $sprache		OPTIONAL
-     * @return  array
-     */
-    public function loadVorlagetext($vorlage_kurzbz, $oe_kurzbz = null, $orgform_kurzbz = null, $sprache = null)
+	 * @return  array
+	 */
+	public function loadVorlagetext($vorlage_kurzbz, $oe_kurzbz = null, $orgform_kurzbz = null, $sprache = null)
 	{
-        if (empty($vorlage_kurzbz))
-        	return error($this->ci->lang->line('fhc_'.FHC_INVALIDID, false));
-		
+		if (empty($vorlage_kurzbz))
+			return error($this->ci->lang->line('fhc_'.FHC_INVALIDID, false));
+
 		// Try to search the template with the given vorlage_kurzbz and other parameters if present
 		$queryParameters = array("vorlage_kurzbz" => $vorlage_kurzbz, "aktiv" => true);
 
@@ -120,7 +120,7 @@ class VorlageLib
 		{
 			// Builds where clause
 			$where = $this->_where($vorlage_kurzbz, $orgform_kurzbz, $sprache);
-		
+
 			$vorlage = $this->ci->organisationseinheitlib->treeSearch(
 				'public',
 				'tbl_vorlagestudiengang',
@@ -133,17 +133,17 @@ class VorlageLib
 			);
 		}
 
-        return $vorlage;
-    }
+		return $vorlage;
+	}
 
-    /**
-     * _where
-     */
-    private function _where($vorlage_kurzbz, $orgform_kurzbz, $sprache)
-    {
+	/**
+	 * _where
+	 */
+	private function _where($vorlage_kurzbz, $orgform_kurzbz, $sprache)
+	{
 		// Builds where clause
 		$where = "vorlage_kurzbz = ".$this->ci->VorlageModel->escape($vorlage_kurzbz);
-		
+
 		if (is_null($sprache))
 		{
 			$where .= " AND sprache IS NULL";
@@ -152,60 +152,60 @@ class VorlageLib
 		{
 			$where .= " AND sprache = ".$this->ci->VorlageModel->escape($sprache);
 		}
-		
+
 		$where .= " AND aktiv = true";
-		
+
 		return $where;
-    }
+	}
 
 	/**
-     * insertVorlagetext() - will load tbl_vorlagestudiengang for a spezific Template.
-     *
-     * @param   string  $vorlage_kurzbz    REQUIRED
-     * @return  array
-     */
-    public function insertVorlagetext($data)
+	 * insertVorlagetext() - will load tbl_vorlagestudiengang for a spezific Template.
+	 *
+	 * @param   string  $vorlage_kurzbz	REQUIRED
+	 * @return  array
+	 */
+	public function insertVorlagetext($data)
 	{
-        $vorlagetext = $this->ci->VorlageStudiengangModel->insert($data);
-        return $vorlagetext;
-    }
+		$vorlagetext = $this->ci->VorlageStudiengangModel->insert($data);
+		return $vorlagetext;
+	}
 
 	/**
-     * loadVorlagetext() - will load tbl_vorlagestudiengang for a spezific Template.
-     *
-     * @param   string  $vorlage_kurzbz    REQUIRED
-     * @return  array
-     */
-    public function getVorlagetextById($vorlagestudiengang_id)
+	 * loadVorlagetext() - will load tbl_vorlagestudiengang for a spezific Template.
+	 *
+	 * @param   string  $vorlage_kurzbz	REQUIRED
+	 * @return  array
+	 */
+	public function getVorlagetextById($vorlagestudiengang_id)
 	{
-        $vorlagetext = $this->ci->VorlageStudiengangModel->load($vorlagestudiengang_id);
-        return $vorlagetext;
-    }
+		$vorlagetext = $this->ci->VorlageStudiengangModel->load($vorlagestudiengang_id);
+		return $vorlagetext;
+	}
 
 	/**
-     * saveVorlagetext() - will load tbl_vorlagestudiengang for a spezific Template.
-     *
-     * @param   string  $vorlage_kurzbz    REQUIRED
-     * @return  array
-     */
-    public function updateVorlagetext($vorlagestudiengang_id, $data)
+	 * saveVorlagetext() - will load tbl_vorlagestudiengang for a spezific Template.
+	 *
+	 * @param   string  $vorlage_kurzbz	REQUIRED
+	 * @return  array
+	 */
+	public function updateVorlagetext($vorlagestudiengang_id, $data)
 	{
-        $vorlagetext = $this->ci->VorlageStudiengangModel->update($vorlagestudiengang_id, $data);
-        return $vorlagetext;
-    }
+		$vorlagetext = $this->ci->VorlageStudiengangModel->update($vorlagestudiengang_id, $data);
+		return $vorlagetext;
+	}
 
 	/**
-     * parseVorlagetext() - will parse a Vorlagetext.
-     *
-     * @param   string  $text    REQUIRED
-     * @param   array  $data    REQUIRED
-     * @return  string
-     */
-    public function parseVorlagetext($text, $data = array())
+	 * parseVorlagetext() - will parse a Vorlagetext.
+	 *
+	 * @param   string  $text	REQUIRED
+	 * @param   array  $data	REQUIRED
+	 * @return  string
+	 */
+	public function parseVorlagetext($text, $data = array())
 	{
-        if (empty($text))
-        	return error($this->ci->lang->line('fhc_'.FHC_INVALIDID, false));
+		if (empty($text))
+			return error($this->ci->lang->line('fhc_'.FHC_INVALIDID, false));
 		$text = $this->ci->parser->parse_string($text, $data, true);
 		return $text;
-    }
+	}
 }
