@@ -38,6 +38,9 @@ class dokument_export
 	private $sourceDir;
 	public $errormsg;
 	private $unoconv_version;
+	private $sign;
+	private $sign_user;
+	private $sign_profile;
 
 	/**
 	 * Konstruktor
@@ -299,6 +302,9 @@ class dokument_export
 
 		}
 
+		if($this->sign)
+			return $this->_sign();
+
 		return true;
 	}
 
@@ -476,12 +482,26 @@ class dokument_export
 	}
 
 	/**
-	 * Schickt das Dokument an den Signaturserver um dieses mit einer Amtssignatur zu versehen
-	 * Es koennen nur PDFs signiert werden
+	 * Markiert das Dokument zur Signatur
+	 * Fuegt automatisch einen XML Tag fuer Signatur zun Dokument hinzu
 	 * @param $user User der die Signatur erstellen will
 	 * @param $profile Signaturprofil mit der das Dokument signiert werden soll (Optional)
 	 */
 	public function sign($user, $profile = null)
+	{
+		$this->sign = true;
+		$this->sign_user = $user;
+		$this->sign_profile = $profile;
+
+		$signblock = $this->xml_data->createElement("signed","true");
+		$this->xml_data->documentElement->appendChild($signblock);
+	}
+
+	/**
+	 * Schickt das Dokument an den Signaturserver um dieses mit einer Amtssignatur zu versehen
+	 * Es koennen nur PDFs signiert werden
+	 */
+	private function _sign()
 	{
 		if($this->outputformat != 'pdf')
 		{
@@ -496,13 +516,13 @@ class dokument_export
 		$data->document = base64_encode($file_data);
 
 		// Signatur Profil
-		if(!is_null($profile))
-			$data->profile = $profile;
+		if(!is_null($this->sign_profile))
+			$data->profile = $this->sign_profile;
 		else
 			$data->profile = SIGNATUR_DEFAULT_PROFILE;
 
 		// Username des Endusers der die Signatur angefordert hat
-		$data->user = $user;
+		$data->user = $this->sign_user;
 
 		$ch = curl_init();
 

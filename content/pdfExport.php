@@ -319,22 +319,14 @@ if (!isset($_REQUEST["archive"]))
 
 		$dokument->setFilename($filename);
 
-		if (!$dokument->create($output))
-			die($dokument->errormsg);
-
 		if ($sign === true)
 		{
-			if ($dokument->sign($user))
-			{
-				$dokument->output();
-			}
-			else
-			{
-				echo $dokument->errormsg;
-			}
+			$dokument->sign($user);
 		}
-		else
+
+		if ($dokument->create($output))
 			$dokument->output();
+
 		$dokument->close();
 	}
 }
@@ -413,18 +405,14 @@ else
 
 		if ($sign === true)
 		{
-			if ($dokument->sign($user))
-			{
-				$doc = $dokument->output(false);
-			}
-			else
-			{
-				$error = true;
-				$errormsg = $dokument->errormsg;
-			}
+			$dokument->sign($user);
 		}
-		else
+
+		if ($dokument->create($output))
 			$doc = $dokument->output(false);
+		else
+			$error = true;
+
 		$dokument->close();
 
 		if(!$error)

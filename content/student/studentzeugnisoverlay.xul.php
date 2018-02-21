@@ -127,7 +127,8 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 						<label value="Dokument" control="student-zeugnis-menulist-dokument"/>
 						<menulist id="student-zeugnis-menulist-dokument"
 							datasources="../rdf/vorlage.rdf.php" flex="1"
-							ref="http://www.technikum-wien.at/vorlage" >
+							ref="http://www.technikum-wien.at/vorlage"
+							style="min-width:300px" >
 							<template>
 								<menupopup>
 									<menuitem value="rdf:http://www.technikum-wien.at/vorlage/rdf#vorlage_kurzbz"
