@@ -154,10 +154,8 @@
 
 			if ($datasetRaw->LockDate != '')
 			{
-				return true;
+				return FilterWidget::DEFAULT_MARK_ROW_CLASS;
 			}
-
-			return false;
 		}
 	);
 
