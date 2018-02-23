@@ -69,7 +69,6 @@ class InfoCenter extends VileSci_Controller
 		// Loads libraries
 		$this->load->library('DmsLib');
 		$this->load->library('PersonLogLib');
-		$this->load->library('MailLib');
 		$this->load->library('WidgetLib');
 
 		$this->_setAuthUID(); // sets property uid
@@ -335,6 +334,8 @@ class InfoCenter extends VileSci_Controller
 				{
 					show_error($result->retval);
 				}
+
+				$this->_sendFreigabeMail($prestudent_id);
 
 				$logdata = $this->_getPersonAndStudiengangFromPrestudent($prestudent_id);
 
@@ -645,6 +646,7 @@ class InfoCenter extends VileSci_Controller
 		foreach ($prestudenten->retval as $prestudent)
 		{
 			$prestudent = $this->PrestudentModel->getPrestudentWithZgv($prestudent->prestudent_id);
+			$personid = $this->_getPersonAndStudiengangFromPrestudent($person_id);
 
 			if (isError($prestudent))
 			{
@@ -755,9 +757,86 @@ class InfoCenter extends VileSci_Controller
 			$this->uid
 		);
 	}
-/*
-	private function _sendFreigabeMail()
+
+	/**
+	 * Sends infomail with prestudent and person data when Prestudent is freigegeben
+	 * @param $prestudent_id
+	 */
+	private function _sendFreigabeMail($prestudent_id)
 	{
-		$this->maillib->send('alex@alex-ThinkCentre-M900', 'karpen_ko@hotmail.com', 'test', 'test');
-	}*/
+		//get data
+		$prestudent = $this->PrestudentModel->getPrestudentWithZgv($prestudent_id)->retval[0];
+		$prestudentstatus = $prestudent->prestudentstatus;
+		$person_id = $prestudent->person_id;
+		$person = $this->PersonModel->getPersonStammdaten($person_id, true)->retval;
+
+		//fill mail variables
+		$interessentbez = $person->geschlecht == 'm' ? 'Ein Interessent' : 'Eine Interessentin';
+		$sprache = $prestudentstatus->sprachedetails->bezeichnung[0];
+		$orgform = $prestudentstatus->orgform != '' ? ' ('.$prestudentstatus->orgform.')' : '';
+		$geschlecht = $person->geschlecht == 'm' ? 'm&auml;nnlich' : 'weiblich';
+		$geburtsdatum = date('d.m.Y', strtotime($person->gebdatum));
+
+		$notizenBewerbung = $this->NotizModel->getNotizByTitel($person_id, 'Anmerkung zur Bewerbung')->retval;
+
+		$notizentext = '';
+		$lastElement = end($notizenBewerbung);
+		foreach ($notizenBewerbung as $notiz)
+		{
+			$notizentext .= $notiz->text;
+			if ($notiz != $lastElement)
+				$notizentext .= ' | ';
+		}
+
+		$mailadresse = '';
+		foreach ($person->kontakte as $kontakt)
+		{
+			if ($kontakt->kontakttyp === 'email')
+			{
+				$mailadresse = $kontakt->kontakt;
+				break;
+			}
+		}
+
+		$data = array
+		(
+			'interessentbez' => $interessentbez,
+			'studiengangbez' => $prestudent->studiengangbezeichnung,
+			'studiengangtypbez' => $prestudent->studiengangtyp_bez,
+			'orgform' => $orgform,
+			'studiensemester' => $prestudentstatus->studiensemester_kurzbz,
+			'sprache' => $sprache,
+			'geschlecht' => $geschlecht,
+			'vorname' => $person->vorname,
+			'nachname' => $person->nachname,
+			'gebdatum' => $geburtsdatum,
+			'mailadresse' => $mailadresse,
+			'prestudentid' => $prestudent_id,
+			'notizentext' => $notizentext
+		);
+
+		$this->load->library('parser');
+		$this->load->library('MailLib');
+		$this->load->library('LogLib');
+
+		//parse freigabe html email template, wordwrap wraps text so no display errors
+		$email = wordwrap($this->parser->parse('templates/mailtemplates/interessentFreigabe', $data, true), 70);
+
+		$subject = ($person->geschlecht == 'm' ? 'Interessent ' : 'Interessentin ').$person->vorname.' '.$person->nachname.' freigegeben';
+
+		$receiver = $prestudent->studiengangmail;
+
+		if (!empty($receiver))
+		{
+			//Freigabeinformationmail sent from default system mail to studiengang mail(s)
+			$sent = $this->maillib->send('', $receiver, $subject, $email);
+
+			if (!$sent)
+				$this->loglib->logError('Error when sending Freigabe mail');
+		}
+		else
+		{
+			$this->loglib->logError('Studiengang has no mail for sending Freigabe mail');
+		}
+	}
 }

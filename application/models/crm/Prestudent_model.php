@@ -201,10 +201,12 @@ class Prestudent_model extends DB_Model
 	 */
 	public function getPrestudentWithZgv($prestudent_id)
 	{
-		$this->addSelect('tbl_prestudent.*, tbl_studiengang.kurzbzlang as studiengang, tbl_studiengang.bezeichnung as studiengangbezeichnung, tbl_studiengang.english as studiengangenglish, tbl_studiengang.typ as studiengangtyp, 
-		tbl_zgv.zgv_code, tbl_zgv.zgv_bez, tbl_prestudent.zgvort, tbl_prestudent.zgvdatum, tbl_prestudent.zgvnation as zgvnation_code, zgvnat.kurztext as zgvnation_kurzbez, zgvnat.langtext as zgvnation_bez, zgvnat.engltext as zgvnation_englbez,
-		tbl_zgvmaster.zgvmas_code, tbl_zgvmaster.zgvmas_bez, tbl_prestudent.zgvmaort, tbl_prestudent.zgvmadatum, tbl_prestudent.zgvmanation as zgvmanation_code, zgvmanat.kurztext as zgvmanation_kurzbez, zgvmanat.langtext as zgvmanation_bez, zgvmanat.engltext as zgvmanation_englbez');
+		$this->addSelect('tbl_prestudent.*, tbl_studiengang.studiengang_kz, tbl_studiengang.kurzbzlang as studiengang, tbl_studiengang.bezeichnung as studiengangbezeichnung, tbl_studiengang.english as studiengangenglish,
+		tbl_studiengang.email as studiengangmail, tbl_studiengang.typ as studiengangtyp, tbl_studiengangstyp.bezeichnung as studiengangtyp_bez,
+		tbl_zgv.zgv_code, tbl_zgv.zgv_bez, tbl_prestudent.zgvnation as zgvnation_code, zgvnat.kurztext as zgvnation_kurzbez, zgvnat.langtext as zgvnation_bez, zgvnat.engltext as zgvnation_englbez,
+		tbl_zgvmaster.zgvmas_code, tbl_zgvmaster.zgvmas_bez, tbl_prestudent.zgvmanation as zgvmanation_code, zgvmanat.kurztext as zgvmanation_kurzbez, zgvmanat.langtext as zgvmanation_bez, zgvmanat.engltext as zgvmanation_englbez');
 		$this->addJoin('public.tbl_studiengang', 'studiengang_kz', 'LEFT');
+		$this->addJoin('public.tbl_studiengangstyp', 'typ', 'LEFT');
 		$this->addJoin('bis.tbl_zgv', 'zgv_code', 'LEFT');
 		$this->addJoin('bis.tbl_zgvmaster', 'zgvmas_code', 'LEFT');
 		$this->addJoin('bis.tbl_nation zgvnat', 'zgvnation = zgvnat.nation_code', 'LEFT');
@@ -223,13 +225,13 @@ class Prestudent_model extends DB_Model
 			return error($lastStatus->retval);
 		}
 
-		if(count($lastStatus->retval) > 0)
+		if (count($lastStatus->retval) > 0)
 		{
 			$this->load->model('system/sprache_model', 'SpracheModel');
 			$language = $this->SpracheModel->load($lastStatus->retval[0]->sprache);
-			if($language->error)
+			if ($language->error)
 				return error($language->retval);
-			if(count($language->retval) > 0)
+			if (count($language->retval) > 0)
 				$lastStatus->retval[0]->sprachedetails = $language->retval[0];
 			$prestudent->retval[0]->prestudentstatus = $lastStatus->retval[0];
 		}
