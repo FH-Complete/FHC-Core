@@ -55,7 +55,7 @@ class LogLib
 			$function = $backtrace_arr[$functionIndex]['function'];
 		}
 
-		if (isset($backtrace_arr[$lineIndex]['line']) && $backgrace_arr[$lineIndex]['line'] != '')
+		if (isset($backtrace_arr[$lineIndex]['line']) && $backtrace_arr[$lineIndex]['line'] != '')
 		{
 			$line = $backtrace_arr[$lineIndex]['line'];
 		}

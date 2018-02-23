@@ -64,6 +64,7 @@ class InfoCenter extends VileSci_Controller
 		$this->load->model('person/person_model', 'PersonModel');
 		$this->load->model('system/message_model', 'MessageModel');
 		$this->load->model('system/filters_model', 'FiltersModel');
+		$this->load->model('system/personLock_model', 'PersonLockModel');
 
 		// Loads libraries
 		$this->load->library('DmsLib');
@@ -110,10 +111,20 @@ class InfoCenter extends VileSci_Controller
 		if (!is_numeric($person_id))
 			show_error('person id is not numeric!');
 
-		$persondata = $this->_loadPersonData($person_id);
-		if (!isset($persondata))
+		$personexists = $this->PersonModel->load($person_id);
+		if(isError($personexists))
+			show_error($personexists->retval);
+
+		if (empty($personexists->retval[0]))
 			show_error('person does not exist!');
 
+		//mark person as locked for editing
+		$result = $this->PersonLockModel->lockPerson($person_id, $this->uid, self::APP);
+
+		if(isError($result))
+			show_error($result->retval);
+
+		$persondata = $this->_loadPersonData($person_id);
 		$prestudentdata = $this->_loadPrestudentData($person_id);
 
 		$this->load->view(
@@ -127,6 +138,20 @@ class InfoCenter extends VileSci_Controller
 				)
 			)
 		);
+	}
+
+	/**
+	 * unlocks page from edit by a person, redirects to overview filter page
+	 * @param $person_id
+	 */
+	public function unlockPerson($person_id)
+	{
+		$result = $this->PersonLockModel->unlockPerson($person_id, self::APP);
+
+		if(isError($result))
+			show_error($result->retval);
+
+		redirect(self::URL_PREFIX);
 	}
 
 	/**
@@ -235,7 +260,7 @@ class InfoCenter extends VileSci_Controller
 		}
 
 		//check if still Interessent and not freigegeben yet
-		if($lastStatus->retval[0]->status_kurzbz === 'Interessent' && !isset($lastStatus->retval[0]->bestaetigtam))
+		if ($lastStatus->retval[0]->status_kurzbz === 'Interessent' && !isset($lastStatus->retval[0]->bestaetigtam))
 		{
 			$result = $this->PrestudentstatusModel->insert(
 				array(
@@ -288,7 +313,7 @@ class InfoCenter extends VileSci_Controller
 			$lastStatus = $lastStatus->retval[0];
 
 			//check if still Interessent and not freigegeben yet
-			if($lastStatus->status_kurzbz === 'Interessent' && !isset($lastStatus->bestaetigtam))
+			if ($lastStatus->status_kurzbz === 'Interessent' && !isset($lastStatus->bestaetigtam))
 			{
 				$result = $this->PrestudentstatusModel->update(
 					array(
@@ -309,6 +334,8 @@ class InfoCenter extends VileSci_Controller
 				{
 					show_error($result->retval);
 				}
+
+				$this->_sendFreigabeMail($prestudent_id);
 
 				$logdata = $this->_getPersonAndStudiengangFromPrestudent($prestudent_id);
 
@@ -517,6 +544,25 @@ class InfoCenter extends VileSci_Controller
 	 */
 	private function _loadPersonData($person_id)
 	{
+		$locked = $this->PersonLockModel->checkIfLocked($person_id, self::APP);
+
+		if (isError($locked))
+		{
+			show_error($locked->retval);
+		}
+
+		$lockedby = null;
+
+		//mark red if locked by other user
+		$lockedbyother = false;
+
+		if (isset($locked->retval[0]->uid))
+		{
+			$lockedby = $locked->retval[0]->uid;
+			if ($lockedby !== $this->uid)
+				$lockedbyother = true;
+		}
+
 		$stammdaten = $this->PersonModel->getPersonStammdaten($person_id, true);
 
 		if (isError($stammdaten))
@@ -567,6 +613,8 @@ class InfoCenter extends VileSci_Controller
 		$messagelink = base_url('/index.ci.php/system/Messages/write/'.$user_person->retval[0]->person_id);
 
 		$data = array (
+			'lockedby' => $lockedby,
+			'lockedbyother' => $lockedbyother,
 			'stammdaten' => $stammdaten->retval,
 			'dokumente' => $dokumente->retval,
 			'dokumente_nachgereicht' => $dokumente_nachgereicht->retval,
@@ -598,6 +646,7 @@ class InfoCenter extends VileSci_Controller
 		foreach ($prestudenten->retval as $prestudent)
 		{
 			$prestudent = $this->PrestudentModel->getPrestudentWithZgv($prestudent->prestudent_id);
+			$personid = $this->_getPersonAndStudiengangFromPrestudent($person_id);
 
 			if (isError($prestudent))
 			{
@@ -606,7 +655,7 @@ class InfoCenter extends VileSci_Controller
 
 			$zgvpruefung = $prestudent->retval[0];
 
-			if(isset($zgvpruefung->prestudentstatus))
+			if (isset($zgvpruefung->prestudentstatus))
 			{
 				$position = strpos($zgvpruefung->prestudentstatus->anmerkung, 'Alt:');
 
@@ -707,5 +756,87 @@ class InfoCenter extends VileSci_Controller
 			null,
 			$this->uid
 		);
+	}
+
+	/**
+	 * Sends infomail with prestudent and person data when Prestudent is freigegeben
+	 * @param $prestudent_id
+	 */
+	private function _sendFreigabeMail($prestudent_id)
+	{
+		//get data
+		$prestudent = $this->PrestudentModel->getPrestudentWithZgv($prestudent_id)->retval[0];
+		$prestudentstatus = $prestudent->prestudentstatus;
+		$person_id = $prestudent->person_id;
+		$person = $this->PersonModel->getPersonStammdaten($person_id, true)->retval;
+
+		//fill mail variables
+		$interessentbez = $person->geschlecht == 'm' ? 'Ein Interessent' : 'Eine Interessentin';
+		$sprache = $prestudentstatus->sprachedetails->bezeichnung[0];
+		$orgform = $prestudentstatus->orgform != '' ? ' ('.$prestudentstatus->orgform.')' : '';
+		$geschlecht = $person->geschlecht == 'm' ? 'm&auml;nnlich' : 'weiblich';
+		$geburtsdatum = date('d.m.Y', strtotime($person->gebdatum));
+
+		$notizenBewerbung = $this->NotizModel->getNotizByTitel($person_id, 'Anmerkung zur Bewerbung')->retval;
+
+		$notizentext = '';
+		$lastElement = end($notizenBewerbung);
+		foreach ($notizenBewerbung as $notiz)
+		{
+			$notizentext .= $notiz->text;
+			if ($notiz != $lastElement)
+				$notizentext .= ' | ';
+		}
+
+		$mailadresse = '';
+		foreach ($person->kontakte as $kontakt)
+		{
+			if ($kontakt->kontakttyp === 'email')
+			{
+				$mailadresse = $kontakt->kontakt;
+				break;
+			}
+		}
+
+		$data = array
+		(
+			'interessentbez' => $interessentbez,
+			'studiengangbez' => $prestudent->studiengangbezeichnung,
+			'studiengangtypbez' => $prestudent->studiengangtyp_bez,
+			'orgform' => $orgform,
+			'studiensemester' => $prestudentstatus->studiensemester_kurzbz,
+			'sprache' => $sprache,
+			'geschlecht' => $geschlecht,
+			'vorname' => $person->vorname,
+			'nachname' => $person->nachname,
+			'gebdatum' => $geburtsdatum,
+			'mailadresse' => $mailadresse,
+			'prestudentid' => $prestudent_id,
+			'notizentext' => $notizentext
+		);
+
+		$this->load->library('parser');
+		$this->load->library('MailLib');
+		$this->load->library('LogLib');
+
+		//parse freigabe html email template, wordwrap wraps text so no display errors
+		$email = wordwrap($this->parser->parse('templates/mailtemplates/interessentFreigabe', $data, true), 70);
+
+		$subject = ($person->geschlecht == 'm' ? 'Interessent ' : 'Interessentin ').$person->vorname.' '.$person->nachname.' freigegeben';
+
+		$receiver = $prestudent->studiengangmail;
+
+		if (!empty($receiver))
+		{
+			//Freigabeinformationmail sent from default system mail to studiengang mail(s)
+			$sent = $this->maillib->send('', $receiver, $subject, $email);
+
+			if (!$sent)
+				$this->loglib->logError('Error when sending Freigabe mail');
+		}
+		else
+		{
+			$this->loglib->logError('Studiengang has no mail for sending Freigabe mail');
+		}
 	}
 }

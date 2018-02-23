@@ -55,7 +55,7 @@
 				{
 					$result = $results[$resultsCounter];
 			?>
-					<tr>
+					<tr class="<?php echo FilterWidget::markRow($result); ?>">
 			<?php
 					if ($checkboxes != null)
 					{

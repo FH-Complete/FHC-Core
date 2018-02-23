@@ -27,7 +27,8 @@
 				</td>
 			</tr>
 			<tr>
-				<td>
+				<td valign="top">
+					<br>
 					<b>Message:</b>
 				</td>
 				<td>
@@ -38,7 +39,7 @@
 				</td>
 			</tr>
 			<?php
-				if ($isEmployee === false)
+				if ($isEmployee === false && $href != '')
 				{
 			?>
 					<tr>
@@ -48,7 +49,7 @@
 					</tr>
 			<?php
 				}
-			?>	
+			?>
 		</table>
 	</center>
 

@@ -13,6 +13,7 @@ class FilterWidget extends Widget
 	const DB_RESULT = 'dbResult';
 	const ADDITIONAL_COLUMNS = 'additionalColumns';
 	const FORMAT_RAW = 'formatRaw';
+	const MARK_ROW = 'markRow';
 	const CHECKBOXES = 'checkboxes';
 	const HIDE_HEADER = 'hideHeader';
 	const HIDE_SAVE = 'hideSave';
@@ -35,6 +36,7 @@ class FilterWidget extends Widget
 	const ACTIVE_FILTERS = 'activeFilters';
 	const ACTIVE_FILTERS_OPTION = 'activeFiltersOption';
 	const ACTIVE_FILTERS_OPERATION = 'activeFiltersOperation';
+	const FILTER_NAME = 'filterName';
 
 	const ACTIVE_FILTER_OPTION_POSTFIX = '-option';
 	const ACTIVE_FILTER_OPERATION_POSTFIX = '-operation';
@@ -60,6 +62,8 @@ class FilterWidget extends Widget
 
 	const DEFAULT_DATE_FORMAT = 'd.m.Y H:i:s';
 
+	const DEFAULT_MARK_ROW_CLASS = 'text-danger';
+
 	private $app;
 	private $query;
 	private $datasetName;
@@ -67,8 +71,10 @@ class FilterWidget extends Widget
 	private $filterId;
 	private $additionalColumns;
 	private $formatRaw;
+	private $markRow;
 	private $checkboxes;
 	private $columnsAliases;
+	private $filterName;
 
 	private $dataset;
 	private $metaData;
@@ -106,6 +112,12 @@ class FilterWidget extends Widget
 		if ($this->filterId == null && isset($filterSessionArray[self::FILTER_ID]))
 		{
 			$this->filterId = $filterSessionArray[self::FILTER_ID];
+		}
+
+		//
+		if ($this->filterName == null && isset($filterSessionArray[self::FILTER_NAME]))
+		{
+			$this->filterName = $filterSessionArray[self::FILTER_NAME];
 		}
 
 		//
@@ -388,9 +400,39 @@ class FilterWidget extends Widget
 	/**
 	 *
 	 */
+	public static function markRow($datasetRaw)
+	{
+		$class = '';
+
+		if (is_object($datasetRaw))
+		{
+			$markRow = self::$FilterWidgetInstance->getMarkRow();
+			if ($markRow != null)
+			{
+				$class = $markRow($datasetRaw);
+			}
+		}
+
+		return $class;
+	}
+
+	/**
+	 *
+	 */
 	public static function getCheckboxes()
 	{
 		return self::$FilterWidgetInstance->_getCheckboxes();
+	}
+
+	/**
+	 *
+	 */
+	public static function displayFilterName()
+	{
+		if (self::$FilterWidgetInstance->filterName != null && self::$FilterWidgetInstance->filterName != '')
+		{
+			echo '<div class="filter-name-title">'.self::$FilterWidgetInstance->filterName.'</div><br>';
+		}
 	}
 
 	//------------------------------------------------------------------------------------------------------------------
@@ -417,6 +459,14 @@ class FilterWidget extends Widget
 	protected function getFormatRaw()
 	{
 		return $this->formatRaw;
+	}
+
+	/**
+	 *
+	 */
+	protected function getMarkRow()
+	{
+		return $this->markRow;
 	}
 
 	/**
@@ -559,6 +609,11 @@ class FilterWidget extends Widget
 			$filterSessionArray[self::COLUMNS_ALIASES] = array();
 		}
 
+		if (!isset($filterSessionArray[self::FILTER_NAME]))
+		{
+			$filterSessionArray[self::FILTER_NAME] = null;
+		}
+
 		$this->session->set_userdata(self::SESSION_NAME, $filterSessionArray);
 	}
 
@@ -574,10 +629,12 @@ class FilterWidget extends Widget
 		$this->filterId = null;
 		$this->additionalColumns = null;
 		$this->formatRaw = null;
+		$this->markRow = null;
 		$this->checkboxes = null;
 		$this->hideHeader = false;
 		$this->hideSave = false;
 		$this->columnsAliases = null;
+		$this->filterName = null;
 
 		if (!is_array($args) || (is_array($args) && count($args) == 0))
 		{
@@ -636,6 +693,11 @@ class FilterWidget extends Widget
 			if (isset($args[self::FORMAT_RAW]) && is_callable($args[self::FORMAT_RAW]))
 			{
 				$this->formatRaw = $args[self::FORMAT_RAW];
+			}
+
+			if (isset($args[self::MARK_ROW]) && is_callable($args[self::MARK_ROW]))
+			{
+				$this->markRow = $args[self::MARK_ROW];
 			}
 
 			if (isset($args[self::CHECKBOXES])
@@ -723,6 +785,7 @@ class FilterWidget extends Widget
 			$activeFilters = array();
 			$activeFiltersOperation = array();
 			$activeFiltersOption = array();
+			$filterName = null;
 
 			if (isset($jsonEncodedFilter->columns))
 			{
@@ -756,12 +819,20 @@ class FilterWidget extends Widget
 				}
 			}
 
+			if (isset($jsonEncodedFilter->name))
+			{
+				$filterName = $jsonEncodedFilter->name;
+			}
+
+			$this->filterName = $filterName;
+
 			$filterSessionArray = array(
 				self::SELECTED_FIELDS => $selectedFields,
 				self::SELECTED_FILTERS => $selectedFilters,
 				self::ACTIVE_FILTERS => $activeFilters,
 				self::ACTIVE_FILTERS_OPERATION => $activeFiltersOperation,
-				self::ACTIVE_FILTERS_OPTION => $activeFiltersOption
+				self::ACTIVE_FILTERS_OPTION => $activeFiltersOption,
+				self::FILTER_NAME => $filterName
 			);
 
 			$this->session->set_userdata(self::SESSION_NAME, $filterSessionArray);
@@ -773,7 +844,8 @@ class FilterWidget extends Widget
 				self::SELECTED_FILTERS => array(),
 				self::ACTIVE_FILTERS => array(),
 				self::ACTIVE_FILTERS_OPERATION => array(),
-				self::ACTIVE_FILTERS_OPTION => array()
+				self::ACTIVE_FILTERS_OPTION => array(),
+				self::FILTER_NAME => null
 			);
 
 			$this->session->set_userdata(self::SESSION_NAME, $filterSessionArray);
@@ -1038,6 +1110,7 @@ class FilterWidget extends Widget
 		);
 
 		$filterSessionArray[self::FILTER_ID] = $this->filterId;
+		$filterSessionArray[self::FILTER_NAME] = $this->filterName;
 
 		$this->session->set_userdata(self::SESSION_NAME, $filterSessionArray);
 	}
@@ -1130,9 +1203,11 @@ class FilterWidget extends Widget
 							}
 							break;
 						case self::OP_CONTAINS:
+							$activeFilterValue = $this->FiltersModel->escapeLike($activeFilterValue); // escapes
 							$condition = ' ILIKE \'%'.$activeFilterValue.'%\'';
 							break;
 						case self::OP_NOT_CONTAINS:
+							$activeFilterValue = $this->FiltersModel->escapeLike($activeFilterValue); // escapes
 							$condition = ' NOT ILIKE \'%'.$activeFilterValue.'%\'';
 							break;
 						case self::OP_IS_TRUE:

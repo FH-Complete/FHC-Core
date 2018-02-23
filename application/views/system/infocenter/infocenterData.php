@@ -1,4 +1,7 @@
 <?php
+
+	$APP = 'infocenter';
+
 	$filterWidgetArray = array(
 		'query' => '
 		SELECT
@@ -60,8 +63,10 @@
 						AND ps.person_id = p.person_id
 						AND tbl_studiengang.typ in(\'b\')
 					LIMIT 1
-				) AS "AnzahlAbgeschickt"
+				) AS "AnzahlAbgeschickt",
+				pl.zeitpunkt AS "LockDate"
 			FROM public.tbl_person p
+	   LEFT JOIN (SELECT person_id, zeitpunkt FROM system.tbl_person_lock WHERE app = \''.$APP.'\') pl USING(person_id)
 			WHERE
 				EXISTS(
 					SELECT 1
@@ -135,7 +140,22 @@
 				}
 			}
 
+			if ($fieldName == 'LockDate')
+			{
+				if ($datasetRaw->{$fieldName} == '01.01.1970 01:00:00')
+				{
+					$datasetRaw->{$fieldName} = 'Not locked';
+				}
+			}
+
 			return $datasetRaw;
+		},
+		'markRow' => function($datasetRaw) {
+
+			if ($datasetRaw->LockDate != '')
+			{
+				return FilterWidget::DEFAULT_MARK_ROW_CLASS;
+			}
 		}
 	);
 
@@ -147,7 +167,7 @@
 	}
 	else
 	{
-		$filterWidgetArray['app'] = 'infocenter';
+		$filterWidgetArray['app'] = $APP;
 		$filterWidgetArray['datasetName'] = 'PersonActions';
 		$filterWidgetArray['filterKurzbz'] = 'InfoCenterNotSentApplicationAll';
 	}

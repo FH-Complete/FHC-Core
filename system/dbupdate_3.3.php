@@ -143,7 +143,7 @@ if(!$result = @$db->db_query("SELECT 1 FROM public.vw_msg_vars_person LIMIT 1"))
 						   a.gemeinde AS "Gemeinde",
 						   a.langtext AS "Nation",
 						   ke.kontakt AS "Email",
-						   kt.kontakt AS "Telefon"				
+						   kt.kontakt AS "Telefon"
 					  FROM public.tbl_person p
 				 LEFT JOIN (
 								SELECT person_id,
@@ -879,7 +879,7 @@ if (!$result = @$db->db_query("SELECT 1 FROM system.tbl_log LIMIT 1"))
 			 INCREMENT BY 1
 			 NO MAXVALUE
 			 NO MINVALUE
-			 CACHE 1;system.tbl_log
+			 CACHE 1;
 			ALTER TABLE system.tbl_log ALTER COLUMN log_id SET DEFAULT nextval('system.tbl_log_log_id_seq');
 
 			GRANT SELECT, INSERT ON system.tbl_log TO vilesci;
@@ -1265,6 +1265,41 @@ if($result = $db->db_query("SELECT 1 FROM system.tbl_app WHERE app='bewerbung'")
 	}
 }
 
+// Tabelle person_lock hinzufügen
+if (!$result = @$db->db_query("SELECT 1 FROM system.tbl_person_lock LIMIT 1"))
+{
+	$qry = "CREATE TABLE system.tbl_person_lock
+			(
+				lock_id bigint NOT NULL,
+				person_id integer NOT NULL,
+				uid varchar(32) NOT NULL,
+				zeitpunkt timestamp NOT NULL DEFAULT now(),
+				app varchar(32)
+			);
+
+			ALTER TABLE system.tbl_person_lock ADD CONSTRAINT pk_lock PRIMARY KEY (lock_id);
+
+			CREATE SEQUENCE system.tbl_person_lock_lock_id_seq
+			 INCREMENT BY 1
+			 NO MAXVALUE
+			 NO MINVALUE
+			 CACHE 1;
+			ALTER TABLE system.tbl_person_lock ALTER COLUMN lock_id SET DEFAULT nextval('system.tbl_person_lock_lock_id_seq');
+
+			GRANT SELECT, INSERT, DELETE ON system.tbl_person_lock TO vilesci;
+			GRANT SELECT, INSERT, DELETE ON system.tbl_person_lock TO web;
+			GRANT SELECT, UPDATE ON system.tbl_person_lock_lock_id_seq TO vilesci;
+			GRANT SELECT, UPDATE ON system.tbl_person_lock_lock_id_seq TO web;
+
+			ALTER TABLE system.tbl_person_lock ADD CONSTRAINT fk_lock_person_id FOREIGN KEY (person_id) REFERENCES public.tbl_person(person_id) ON UPDATE CASCADE ON DELETE RESTRICT;
+			ALTER TABLE system.tbl_person_lock ADD CONSTRAINT fk_lock_uid FOREIGN KEY (uid) REFERENCES public.tbl_benutzer(uid) ON UPDATE CASCADE ON DELETE RESTRICT;
+			ALTER TABLE system.tbl_person_lock ADD CONSTRAINT fk_lock_app FOREIGN KEY (app) REFERENCES system.tbl_app(app) ON UPDATE CASCADE ON DELETE RESTRICT;";
+	if (!$db->db_query($qry))
+		echo '<strong>system.tbl_person_lock '.$db->db_last_error().'</strong><br>';
+	else
+		echo ' system.tbl_person_lock hinzugefügt<br>';
+}
+
 
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
@@ -1527,6 +1562,7 @@ $tabellen=array(
 	"system.tbl_webservicetyp"  => array("webservicetyp_kurzbz","beschreibung"),
 	"system.tbl_server"  => array("server_kurzbz","beschreibung"),
 	"system.tbl_udf"  => array("schema", "table", "jsons"),
+	"system.tbl_person_lock" => array("lock_id", "person_id", "uid", "zeitpunkt", "app"),
 	"wawi.tbl_betriebsmittelperson"  => array("betriebsmittelperson_id","betriebsmittel_id","person_id", "anmerkung", "kaution", "ausgegebenam", "retouram","insertamum", "insertvon","updateamum", "updatevon","ext_id","uid"),
 	"wawi.tbl_betriebsmittel"  => array("betriebsmittel_id","betriebsmitteltyp","oe_kurzbz", "ort_kurzbz", "beschreibung", "nummer", "hersteller","seriennummer", "bestellung_id","bestelldetail_id", "afa","verwendung","anmerkung","reservieren","updateamum","updatevon","insertamum","insertvon","ext_id","inventarnummer","leasing_bis","inventuramum","inventurvon","anschaffungsdatum","anschaffungswert","hoehe","breite","tiefe","nummer2","verplanen"),
 	"wawi.tbl_betriebsmittel_betriebsmittelstatus"  => array("betriebsmittelbetriebsmittelstatus_id","betriebsmittel_id","betriebsmittelstatus_kurzbz", "datum", "updateamum", "updatevon", "insertamum", "insertvon","anmerkung"),

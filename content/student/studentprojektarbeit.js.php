@@ -246,8 +246,23 @@ function StudentProjektarbeitResetFields()
 	document.getElementById('student-projektarbeit-textbox-anmerkung').value='';
 	document.getElementById('student-projektarbeit-menulist-firma').value='';
 	document.getElementById('student-projektarbeit-menulist-note').value='';
-	document.getElementById('student-projektarbeit-menulist-projekttyp').value='Bachelor';
 	document.getElementById('student-projektarbeit-checkbox-final').checked=true;
+
+	var stg_kz = document.getElementById('student-detail-menulist-studiengang_kz').value;
+
+	var url = '<?php echo APP_ROOT ?>rdf/studiengang.rdf.php?studiengang_kz='+stg_kz+'&'+gettimestamp();
+	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].
+						getService(Components.interfaces.nsIRDFService);
+
+	var dsource = rdfService.GetDataSourceBlocking(url);
+	var subject = rdfService.GetResource("http://www.technikum-wien.at/studiengang/" + stg_kz);
+	var predicateNS = "http://www.technikum-wien.at/studiengang/rdf";
+	studiengangstyp = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#typ" ));
+
+	if(studiengangstyp=='m')
+		document.getElementById('student-projektarbeit-menulist-projekttyp').value='Diplom';
+	else
+		document.getElementById('student-projektarbeit-menulist-projekttyp').value='Bachelor';
 }
 
 // *****
@@ -336,10 +351,7 @@ function StudentProjektarbeitAuswahl()
 	gesamtstunden = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#gesamtstunden" ));
 	final = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#final" ));
 
-	//var verband_tree=document.getElementById('tree-verband');
-	//var col = verband_tree.columns ? verband_tree.columns["stg_kz"] : "stg_kz";
-	//var stg_kz=verband_tree.view.getCellText(verband_tree.currentIndex,col);
-	var stg_kz = studiengang_kz = document.getElementById('student-detail-menulist-studiengang_kz').value;
+	var stg_kz = document.getElementById('student-detail-menulist-studiengang_kz').value;
 
 	//Lehrveranstaltung DropDown laden
 	var LvDropDown = document.getElementById('student-projektarbeit-menulist-lehrveranstaltung');
@@ -591,10 +603,7 @@ function StudentProjektarbeitNeu()
 	StudentProjektarbeitResetFields();
 	StudentProjektarbeitDetailDisableFields(false);
 	StudentProjektbetreuerDisableFields(true);
-	//var verband_tree=document.getElementById('tree-verband');
-	//var col = verband_tree.columns ? verband_tree.columns["stg_kz"] : "stg_kz";
-	//var stg_kz=verband_tree.view.getCellText(verband_tree.currentIndex,col);
-	var stg_kz = studiengang_kz = document.getElementById('student-detail-menulist-studiengang_kz').value;
+	var stg_kz = document.getElementById('student-detail-menulist-studiengang_kz').value;
 
 	//Lehrveranstaltung DropDown laden
 	var LvDropDown = document.getElementById('student-projektarbeit-menulist-lehrveranstaltung');
