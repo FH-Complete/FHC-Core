@@ -36,6 +36,7 @@
 	?>
 	<div id="page-wrapper">
 		<div class="container-fluid">
+			<input type="hidden" id="hiddenpersonid" value="<?php echo $stammdaten->person_id ?>">
 			<div class="row<?php if($lockedbyother) echo ' alert-danger' ?>">
 				<div class="col-lg-8">
 							<h3 class="page-header">

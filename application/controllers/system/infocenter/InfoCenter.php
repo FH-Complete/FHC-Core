@@ -195,6 +195,26 @@ class InfoCenter extends VileSci_Controller
 	}
 
 	/**
+	 * Gets prestudent that was last modified in json format, for ZGV übernehmen
+	 * @param $person_id
+	 */
+	public function getLastPrestudentWithZgvJson($person_id)
+	{
+		$prestudent = $this->PrestudentModel->getLastPrestudent($person_id, true);
+
+		if (isError($prestudent))
+		{
+			show_error($prestudent->retval);
+		}
+
+		$jsonoutput = count($prestudent->retval) > 0 ? $prestudent->retval[0] : null;
+
+		$this->output
+			->set_content_type('application/json')
+			->set_output(json_encode($jsonoutput));
+	}
+
+	/**
 	 * Saves a zgv for a prestudent. includes Ort, Datum, Nation for bachelor and master.
 	 * @param $prestudent_id
 	 */
@@ -225,7 +245,8 @@ class InfoCenter extends VileSci_Controller
 				'zgvmas_code' => $zgvmas_code,
 				'zgvmaort' => $zgvmaort,
 				'zgvmadatum' => $zgvmadatum,
-				'zgvmanation' => $zgvmanation_code
+				'zgvmanation' => $zgvmanation_code,
+				'updateamum' => date('Y-m-d H:i:s')
 			)
 		);
 
@@ -249,7 +270,6 @@ class InfoCenter extends VileSci_Controller
 	 */
 	public function saveAbsage($prestudent_id)
 	{
-		//TODO email messaging
 		$statusgrund = $this->input->post('statusgrund');
 
 		$lastStatus = $this->PrestudentstatusModel->getLastStatus($prestudent_id);
@@ -646,7 +666,6 @@ class InfoCenter extends VileSci_Controller
 		foreach ($prestudenten->retval as $prestudent)
 		{
 			$prestudent = $this->PrestudentModel->getPrestudentWithZgv($prestudent->prestudent_id);
-			$personid = $this->_getPersonAndStudiengangFromPrestudent($person_id);
 
 			if (isError($prestudent))
 			{
@@ -668,15 +687,18 @@ class InfoCenter extends VileSci_Controller
 			$zgvpruefungen[] = $zgvpruefung;
 		}
 
-		// Interessenten come first
-		usort($zgvpruefungen, function ($a, $b)
-		{
+		// Interessenten come first, otherwise by bewerbungsdatum desc, then by prestudent_id desc
+		usort($zgvpruefungen, function ($a, $b) {
+			$bewdatesort = strcmp($b->prestudentstatus->bewerbung_abgeschicktamum, $a->prestudentstatus->bewerbung_abgeschicktamum);
+			$defaultsort = $bewdatesort === 0 ? (int)$b->prestudent_id - (int)$a->prestudent_id : $bewdatesort;
 			if (!isset($a->prestudentstatus->status_kurzbz) || !isset($b->prestudentstatus->status_kurzbz))
-				return 0;
+				return $defaultsort;
 			elseif ($a->prestudentstatus->status_kurzbz === 'Interessent' && $b->prestudentstatus->status_kurzbz === 'Interessent')
 			{
 				//infoonly Interessenten come after new Interessenten
-				if ($a->infoonly)
+				if ($a->infoonly === $b->infoonly)
+					return $defaultsort;
+				elseif ($a->infoonly)
 					return 1;
 				elseif ($b->infoonly)
 					return -1;
@@ -686,7 +708,7 @@ class InfoCenter extends VileSci_Controller
 			elseif ($b->prestudentstatus->status_kurzbz === 'Interessent')
 				return 1;
 			else
-				return 0;
+				return $defaultsort;
 		});
 
 		$statusgruende = $this->StatusgrundModel->loadWhere(array('status_kurzbz' => 'Abgewiesener'))->retval;
