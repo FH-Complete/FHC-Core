@@ -640,7 +640,7 @@ class MessageLib
 						}
 
 						// Using a template for the plain text email body
-						$vorlage = $this->ci->vorlagelib->loadVorlagetext('MessageMailHTML');
+						$vorlage = $this->ci->vorlagelib->loadVorlagetext('MessageMailTXT');
 						if(hasData($vorlage))
 						{
 							$altBody = $this->ci->parser->parse_string(

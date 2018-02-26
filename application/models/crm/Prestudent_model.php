@@ -239,4 +239,27 @@ class Prestudent_model extends DB_Model
 		return success($prestudent->retval);
 	}
 
+	/**
+	 * gets the prestudent edited last.
+	 * if no updateamum, sort by insertamum
+	 * @param $person_id
+	 * @param bool $withzgv if true, only prestudenten with zgv_code are taken
+	 * @return array|null
+	 */
+	public function getLastPrestudent($person_id, $withzgv = false)
+	{
+		$qry = 'SELECT * FROM public.tbl_prestudent
+				WHERE person_id = ?
+				%s
+				ORDER BY updateamum DESC NULLS LAST, insertamum DESC NULLS LAST
+				LIMIT 1';
+
+		$zgvwhere = $withzgv === true ? 'AND zgv_code IS NOT NULL' : '';
+
+		$qry = sprintf($qry, $zgvwhere);
+
+		$parametersArray = array($person_id);
+
+		return $this->execQuery($qry, $parametersArray);
+	}
 }
