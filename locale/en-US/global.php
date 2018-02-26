@@ -64,6 +64,7 @@ $this->phrasen['global/oder']='or';
 $this->phrasen['global/username']='Username';
 $this->phrasen['global/vorname']='First Name';
 $this->phrasen['global/nachname']='Last Name';
+$this->phrasen['global/anrede']='Title';
 $this->phrasen['global/name']='Name';
 $this->phrasen['global/uid']='UID';
 $this->phrasen['global/postnomen']='Postnomen';
