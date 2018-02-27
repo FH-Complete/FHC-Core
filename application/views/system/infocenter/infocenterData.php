@@ -116,7 +116,6 @@
 		'hideHeader' => false,
 		'hideSave' => false,
 		'checkboxes' => 'PersonId',
-		'columnsAliases' => array('Person ID', 'Name', 'Surname', 'Birthday', 'Last Action', 'User - Operator', 'Studien semester', 'Send Date', 'Number sent', 'Lock Date'),
 		'additionalColumns' => array('Details'),
 		'formatRaw' => function($datasetRaw) {
 
