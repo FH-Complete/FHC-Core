@@ -76,7 +76,12 @@ class Filters extends VileSci_Controller
 
 			if ($pos !== false)
 			{
-				$json->selectedFiltersAliases[] = $json->allColumnsAliases[$pos];
+				$json->selectedFiltersAliases[] = $json->selectedFilters[$i];
+				if ($json->allColumnsAliases != null && is_array($json->allColumnsAliases))
+				{
+					$json->selectedFiltersAliases[] = $json->allColumnsAliases[$pos];
+				}
+
 				$json->selectedFiltersMetaData[] = $metaData[$pos];
 
 				if (isset($activeFilters[$json->selectedFilters[$i]]))
@@ -233,7 +238,11 @@ class Filters extends VileSci_Controller
 		if (($pos = array_search($fieldName, $selectedFields)) !== false)
 		{
 			array_splice($selectedFields, $pos, 1);
-			array_splice($columnsAliases, $pos, 1);
+
+			if ($columnsAliases != null && is_array($columnsAliases))
+			{
+				array_splice($columnsAliases, $pos, 1);
+			}
 		}
 
 		$_SESSION[self::SESSION_NAME]['selectedFields'] = $selectedFields;
@@ -301,7 +310,11 @@ class Filters extends VileSci_Controller
 			&& array_search($fieldName, $selectedFields) === false)
 		{
 			array_push($selectedFields, $fieldName);
-			array_push($columnsAliases, $allColumnsAliases[$pos]);
+
+			if ($columnsAliases != null && is_array($columnsAliases))
+			{
+				array_push($columnsAliases, $allColumnsAliases[$pos]);
+			}
 		}
 
 		$_SESSION[self::SESSION_NAME]['selectedFields'] = $selectedFields;
