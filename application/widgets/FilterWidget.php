@@ -884,7 +884,7 @@ class FilterWidget extends Widget
 			$selectedFields = $filterSessionArray[self::SELECTED_FIELDS];
 		}
 
-		if (isset($this->listFields) && count($selectedFields) > 0)
+		if (isset($this->listFields) && count($selectedFields) > 0 && is_array($this->columnsAliases) && count($this->columnsAliases) > 0)
 		{
 			$columnsAliases = array();
 

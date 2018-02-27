@@ -145,6 +145,11 @@
 				$datasetRaw->{'LockDate'} = 'Not locked';
 			}
 
+			if ($datasetRaw->{'StgAbgeschickt'} == null)
+			{
+				$datasetRaw->{'StgAbgeschickt'} = 'N/A';
+			}
+
 			return $datasetRaw;
 		},
 		'markRow' => function($datasetRaw) {

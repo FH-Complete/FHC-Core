@@ -219,7 +219,12 @@
 				for (var i = 0; i < data.allSelectedFields.length; i++)
 				{
 					var fieldName = data.allSelectedFields[i];
-					var fieldToDisplay = data.allColumnsAliases[i];
+					var fieldToDisplay = data.allSelectedFields[i];
+
+					if (data.allColumnsAliases != null && $.isArray(data.allColumnsAliases))
+					{
+						fieldToDisplay = data.allColumnsAliases[i];
+					}
 
 					strDropDown = '<option value="' + fieldName + '">' + fieldToDisplay + '</option>';
 					$("#addFilter").append(strDropDown);
