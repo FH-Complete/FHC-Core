@@ -304,7 +304,7 @@ class benutzer extends person
 	{
 		$qry = "SELECT * FROM (
 					SELECT
-						distinct on (uid) vorname, nachname, uid, mitarbeiter_uid, titelpre, titelpost, lektor, fixangestellt, alias, tbl_benutzer.aktiv,
+						distinct on (uid) vorname, nachname, uid, mitarbeiter_uid, titelpre, titelpost, lektor, fixangestellt, alias, tbl_benutzer.aktiv, anrede,
 							(SELECT UPPER
 								(tbl_studiengang.typ || tbl_studiengang.kurzbz)
 					 		FROM public.tbl_student
@@ -371,6 +371,7 @@ class benutzer extends person
 				$obj->lektor = $row->lektor;
 				$obj->fixangestellt = $row->fixangestellt;
 				$obj->aktiv = $this->db_parse_bool($row->aktiv);
+				$obj->anrede = $row->anrede;
 
 				$this->result[] = $obj;
 			}

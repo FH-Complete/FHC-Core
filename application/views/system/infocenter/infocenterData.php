@@ -64,9 +64,23 @@
 						AND tbl_studiengang.typ in(\'b\')
 					LIMIT 1
 				) AS "AnzahlAbgeschickt",
+				array_to_string(
+					(
+					SELECT array_agg(tbl_studiengang.kurzbzlang)
+					FROM
+						public.tbl_prestudentstatus pss
+						INNER JOIN public.tbl_prestudent ps USING(prestudent_id)
+						JOIN public.tbl_studiengang USING(studiengang_kz)
+					WHERE pss.status_kurzbz = \'Interessent\'
+						AND pss.bewerbung_abgeschicktamum IS NOT NULL
+						AND ps.person_id = p.person_id
+						AND tbl_studiengang.typ in(\'b\')
+					LIMIT 1
+					),\',\'
+				) AS "StgAbgeschickt",
 				pl.zeitpunkt AS "LockDate"
 			FROM public.tbl_person p
-	   LEFT JOIN (SELECT person_id, zeitpunkt FROM system.tbl_person_lock WHERE app = \''.$APP.'\') pl USING(person_id)
+		LEFT JOIN (SELECT person_id, zeitpunkt FROM system.tbl_person_lock WHERE app = \''.$APP.'\') pl USING(person_id)
 			WHERE
 				EXISTS(
 					SELECT 1
@@ -154,10 +168,8 @@
 
 			if ($datasetRaw->LockDate != '')
 			{
-				return true;
+				return FilterWidget::DEFAULT_MARK_ROW_CLASS;
 			}
-
-			return false;
 		}
 	);
 

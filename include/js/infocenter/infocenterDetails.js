@@ -55,20 +55,67 @@ $(document).ready(
 		);
 
 		//prevent opening modal when Statusgrund not chosen
-		$("#absageModal").on('show.bs.modal', function (e)
+		$(".absageModal").on('show.bs.modal', function (e)
 			{
-				if ($("[name=statusgrund]").val() === "null")
+				var id = this.id.substr(this.id.indexOf("_") + 1);
+				var statusgrvalue = $("#statusgrselect_"+id+" select[name=statusgrund]").val();
+				if (statusgrvalue === "null")
 				{
-					$("#statusgrselect").addClass("has-error");
+					$("#statusgrselect_"+id).addClass("has-error");
 					return e.preventDefault();
 				}
 			}
 		);
 
-		$("[name=statusgrund]").change(function ()
+		//remove red mark when statusgrund is selected again
+		$("select[name=statusgrund]").change(
+			function ()
 			{
-				$("#statusgrselect").removeClass("has-error");
+				$(this).parent().removeClass("has-error");
 			}
 		);
+
+		//zgv uebernehmen ajax
+		if ($(".zgvUebernehmen"))
+		{
+			$(".zgvUebernehmen").click(function() {
+				var btn = $(this);
+				var personid = $("#hiddenpersonid").val();
+				var prestudentid = this.id.substr(this.id.indexOf("_") + 1);
+				$('#nearzgv').remove();
+
+				$.ajax({
+					type: "POST",
+					dataType: "json",
+					url: "../getLastPrestudentWithZgvJson/"+personid,
+					success: function(data, textStatus, jqXHR) {
+						if(data !== null)
+						{
+							var zgvcode = data.zgv_code !== null ? data.zgv_code : "null";
+							var zgvort = data.zgvort !== null ? data.zgvort : "";
+							var zgvdatum = data.zgvdatum;
+							var gerzgvdatum = "";
+							if(zgvdatum !== null)
+							{
+								zgvdatum = $.datepicker.parseDate("yy-mm-dd", data.zgvdatum);
+								gerzgvdatum = $.datepicker.formatDate("dd.mm.yy", zgvdatum);
+							}
+							var zgvnation = data.zgvnation !== null ? data.zgvnation : "null";
+							$("#zgv_" + prestudentid).val(zgvcode);
+							$("#zgvort_" + prestudentid).val(zgvort);
+							$("#zgvdatum_" + prestudentid).val(gerzgvdatum);
+							$("#zgvnation_" + prestudentid).val(zgvnation);
+						}
+						else
+						{
+							btn.after("&nbsp;&nbsp;<span id='nearzgv' class='text-warning'>keine ZGV vorhanden</span>");
+						}
+					},
+					error: function(jqXHR, textStatus, errorThrown) {
+						alert(textStatus + " - " + errorThrown + " - " + jqXHR.responseText);
+					}
+				});
+			});
+		}
 	}
 );

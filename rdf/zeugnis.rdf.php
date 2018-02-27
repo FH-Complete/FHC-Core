@@ -88,7 +88,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 	if(isset($_GET['ss']))
 		$studiensemester_kurzbz = $_GET['ss'];
 	else
-		$studiensemester_kurzbz = $semester_aktuell;
+		die('Studiensemester wurde nicht uebergeben');
 
 	//Daten holen
 
@@ -151,12 +151,12 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 					$bezeichnung = '';
 
 
-				$xml .= "		<studiensemester>".$row->sembezeichnung."</studiensemester>";
-				$xml .= "		<stsem>".$row->stsem."</stsem>";
-				$xml .=	"		<semester>".$row->semester."</semester>";
-				$xml .=	"		<semester_bezeichnung>".$bezeichnung."</semester_bezeichnung>";
-				$xml .= "		<studiengang>".$row->bezeichnung."</studiengang>";
-				$xml .= "		<studiengang_englisch>".$row->english."</studiengang_englisch>";
+				$xml .= "		<studiensemester><![CDATA[".$row->sembezeichnung."]]></studiensemester>";
+				$xml .= "		<stsem><![CDATA[".$row->stsem."]]></stsem>";
+				$xml .=	"		<semester><![CDATA[".$row->semester."]]></semester>";
+				$xml .=	"		<semester_bezeichnung><![CDATA[".$bezeichnung."]]></semester_bezeichnung>";
+				$xml .= "		<studiengang><![CDATA[".$row->bezeichnung."]]></studiengang>";
+				$xml .= "		<studiengang_englisch><![CDATA[".$row->english."]]></studiengang_englisch>";
 				if($row->typ=='b')
 					$bezeichnung='Bachelor';
 				elseif($row->typ=='m')
@@ -179,18 +179,18 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 				else
 					$studiengang_kz = sprintf("%04s", abs($row->studiengang_kz));
 
-				$xml .= "		<studiengang_art>".$bezeichnung."</studiengang_art>";
-				$xml .= "		<studiengang_kz>".$studiengang_kz."</studiengang_kz>";
-				$xml .= "\n		<anrede>".$row->anrede."</anrede>";
-				$xml .= "\n		<vorname>".$row->vorname."</vorname>";
-				$xml .= "		<nachname>".$row->nachname."</nachname>";
-				$xml .= "		<name>".trim($row->titelpre.' '.trim($row->vorname.' '.$row->vornamen).' '.$row->nachname.($row->titelpost!=''?', '.$row->titelpost:''))."</name>";
+				$xml .= "		<studiengang_art><![CDATA[".$bezeichnung."]]></studiengang_art>";
+				$xml .= "		<studiengang_kz><![CDATA[".$studiengang_kz."]]></studiengang_kz>";
+				$xml .= "\n		<anrede><![CDATA[".$row->anrede."]]></anrede>";
+				$xml .= "\n		<vorname><![CDATA[".$row->vorname."]]></vorname>";
+				$xml .= "		<nachname><![CDATA[".$row->nachname."]]></nachname>";
+				$xml .= "		<name><![CDATA[".trim($row->titelpre.' '.trim($row->vorname.' '.$row->vornamen).' '.$row->nachname.($row->titelpost!=''?', '.$row->titelpost:''))."]]></name>";
 				$gebdatum = date('d.m.Y',strtotime($row->gebdatum));
-				$xml .= "		<gebdatum>".$gebdatum."</gebdatum>";
-				$xml .= "		<matrikelnr>".trim($row->matrikelnr)."</matrikelnr>";
-				$xml .= "		<studiengangsleiter>".$stgl."</studiengangsleiter>";
+				$xml .= "		<gebdatum><![CDATA[".$gebdatum."]]></gebdatum>";
+				$xml .= "		<matrikelnr><![CDATA[".trim($row->matrikelnr)."]]></matrikelnr>";
+				$xml .= "		<studiengangsleiter><![CDATA[".$stgl."]]></studiengangsleiter>";
 				$datum_aktuell = date('d.m.Y');
-				$xml .= "		<ort_datum>".$datum_aktuell."</ort_datum>";
+				$xml .= "		<ort_datum><![CDATA[".$datum_aktuell."]]></ort_datum>";
 				$xml .= "		<projektarbeit_note_anzeige>".($row->projektarbeit_note_anzeige=='t'?'true':'false')."</projektarbeit_note_anzeige>";
 
 				$qry_proj = "
@@ -239,10 +239,10 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 					{
 						if($row_abschlusspruefung = $db->db_fetch_object($result_abschlusspruefung))
 						{
-							$xml .= "		<abschlusspruefung_typ>".$row_abschlusspruefung->pruefungstyp_kurzbz."</abschlusspruefung_typ>";
-							$xml .= "		<abschlusspruefung_datum>".$datum->formatDatum($row_abschlusspruefung->datum,'d.m.Y')."</abschlusspruefung_datum>";
-							$xml .= "		<abschlusspruefung_note>".$row_abschlusspruefung->bezeichnung."</abschlusspruefung_note>";
-							$xml .= "		<abschlusspruefung_note_english>".$row_abschlusspruefung->bezeichnung_english."</abschlusspruefung_note_english>";
+							$xml .= "		<abschlusspruefung_typ><![CDATA[".$row_abschlusspruefung->pruefungstyp_kurzbz."]]></abschlusspruefung_typ>";
+							$xml .= "		<abschlusspruefung_datum><![CDATA[".$datum->formatDatum($row_abschlusspruefung->datum,'d.m.Y')."]]></abschlusspruefung_datum>";
+							$xml .= "		<abschlusspruefung_note><![CDATA[".$row_abschlusspruefung->bezeichnung."]]></abschlusspruefung_note>";
+							$xml .= "		<abschlusspruefung_note_english><![CDATA[".$row_abschlusspruefung->bezeichnung_english."]]></abschlusspruefung_note_english>";
 						}
 					}
 				}
@@ -378,9 +378,9 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 						$xml .= "\n			<unterrichtsfach>";
 						$xml .= "				<bezeichnung><![CDATA[".$bezeichnung."]]></bezeichnung>";
 						$xml .= "				<bezeichnung_englisch><![CDATA[".$bezeichnung_englisch."]]></bezeichnung_englisch>";
-						$xml .= "				<note>".$note2."</note>";
-						$xml .= "				<sws>".($row->semesterstunden==0?'':number_format(sprintf('%.1F',$row->semesterstunden/$wochen),1))."</sws>";
-						$xml .= "				<sws_lv>".($row->sws==0?'':number_format(sprintf('%.1F',$row->sws),1))."</sws_lv>";
+						$xml .= "				<note><![CDATA[".$note2."]]></note>";
+						$xml .= "				<sws><![CDATA[".($row->semesterstunden==0?'':number_format(sprintf('%.1F',$row->semesterstunden/$wochen),1))."]]></sws>";
+						$xml .= "				<sws_lv><![CDATA[".($row->sws==0?'':number_format(sprintf('%.1F',$row->sws),1))."]]></sws_lv>";
 						$ectspunkte='';
 
 						$anrechnung = new anrechnung();
@@ -407,19 +407,19 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 						}
 						$ects_gesamt+=$ectspunkte;
 
-						$xml .= "				<ects>".$ectspunkte."</ects>";
-						$xml .= "				<lv_lehrform_kurzbz>".$row->lv_lehrform_kurzbz."</lv_lehrform_kurzbz>";
+						$xml .= "				<ects><![CDATA[".$ectspunkte."]]></ects>";
+						$xml .= "				<lv_lehrform_kurzbz><![CDATA[".$row->lv_lehrform_kurzbz."]]></lv_lehrform_kurzbz>";
 						if($auslandssemester)
 						{
-							$xml .= "			<bisio_von>".date('d.m.Y', $datum->mktime_fromdate($bisio_von))."</bisio_von>";
-							$xml .= "			<bisio_bis>".date('d.m.Y', $datum->mktime_fromdate($bisio_bis))."</bisio_bis>";
-							$xml .= "			<bisio_ort>$bisio_ort</bisio_ort>";
-							$xml .= "			<bisio_universitaet>$bisio_universitaet</bisio_universitaet>";
+							$xml .= "			<bisio_von><![CDATA[".date('d.m.Y', $datum->mktime_fromdate($bisio_von))."]]></bisio_von>";
+							$xml .= "			<bisio_bis><![CDATA[".date('d.m.Y', $datum->mktime_fromdate($bisio_bis))."]]></bisio_bis>";
+							$xml .= "			<bisio_ort><![CDATA[$bisio_ort]]></bisio_ort>";
+							$xml .= "			<bisio_universitaet><![CDATA[$bisio_universitaet]]></bisio_universitaet>";
 						}
 						$xml .= "			</unterrichtsfach>";
 					}
 				}
-				$xml .= "<ects_gesamt>".$ects_gesamt."</ects_gesamt>";
+				$xml .= "<ects_gesamt><![CDATA[".$ects_gesamt."]]></ects_gesamt>";
 				$xml .= $xml_fussnote;
 
 			}

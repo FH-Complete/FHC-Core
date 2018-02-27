@@ -14,7 +14,6 @@ class FilterWidget extends Widget
 	const ADDITIONAL_COLUMNS = 'additionalColumns';
 	const FORMAT_RAW = 'formatRaw';
 	const MARK_ROW = 'markRow';
-	const ALTERNATIVE_MARK_ROW_CLASS = 'alternativeMarkRowClass';
 	const CHECKBOXES = 'checkboxes';
 	const HIDE_HEADER = 'hideHeader';
 	const HIDE_SAVE = 'hideSave';
@@ -73,7 +72,6 @@ class FilterWidget extends Widget
 	private $additionalColumns;
 	private $formatRaw;
 	private $markRow;
-	private $alternativeMarkRowClass;
 	private $checkboxes;
 	private $columnsAliases;
 	private $filterName;
@@ -409,21 +407,9 @@ class FilterWidget extends Widget
 		if (is_object($datasetRaw))
 		{
 			$markRow = self::$FilterWidgetInstance->getMarkRow();
-
 			if ($markRow != null)
 			{
-				if ($markRow($datasetRaw) === true)
-				{
-					$alternativeMarkRowClass = self::$FilterWidgetInstance->getAlternativeMarkRowClass();
-					if ($alternativeMarkRowClass != null)
-					{
-						$class = $alternativeMarkRowClass;
-					}
-					else
-					{
-						$class = self::DEFAULT_MARK_ROW_CLASS;
-					}
-				}
+				$class = $markRow($datasetRaw);
 			}
 		}
 
@@ -481,14 +467,6 @@ class FilterWidget extends Widget
 	protected function getMarkRow()
 	{
 		return $this->markRow;
-	}
-
-	/**
-	 *
-	 */
-	protected function getAlternativeMarkRowClass()
-	{
-		return $this->alternativeMarkRowClass;
 	}
 
 	/**
@@ -652,7 +630,6 @@ class FilterWidget extends Widget
 		$this->additionalColumns = null;
 		$this->formatRaw = null;
 		$this->markRow = null;
-		$this->alternativeMarkRowClass = null;
 		$this->checkboxes = null;
 		$this->hideHeader = false;
 		$this->hideSave = false;
@@ -721,11 +698,6 @@ class FilterWidget extends Widget
 			if (isset($args[self::MARK_ROW]) && is_callable($args[self::MARK_ROW]))
 			{
 				$this->markRow = $args[self::MARK_ROW];
-			}
-
-			if (isset($args[self::ALTERNATIVE_MARK_ROW_CLASS]) && $args[self::ALTERNATIVE_MARK_ROW_CLASS] != '')
-			{
-				$this->alternativeMarkRowClass = $args[self::ALTERNATIVE_MARK_ROW_CLASS];
 			}
 
 			if (isset($args[self::CHECKBOXES])

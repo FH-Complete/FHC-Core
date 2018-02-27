@@ -1078,16 +1078,21 @@ class vertrag extends basis_db
 	 */
 	public function getFalscheBetraege($studiensemester_kurzbz)
 	{
-		$qry = "SELECT
-					tbl_vertrag.*, tbl_lehreinheitmitarbeiter.mitarbeiter_uid, tbl_lehreinheitmitarbeiter.lehreinheit_id,
-					tbl_lehreinheitmitarbeiter.stundensatz, tbl_lehreinheitmitarbeiter.semesterstunden
-				FROM
-					lehre.tbl_vertrag
-					JOIN lehre.tbl_lehreinheitmitarbeiter USING(vertrag_id)
-					JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
-				WHERE
-					studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz)."
-					AND tbl_lehreinheitmitarbeiter.semesterstunden*tbl_lehreinheitmitarbeiter.stundensatz!=tbl_vertrag.betrag";
+		$qry = "SELECT * FROM 
+				(
+					SELECT
+						tbl_vertrag.*, tbl_lehreinheitmitarbeiter.mitarbeiter_uid, tbl_lehreinheitmitarbeiter.lehreinheit_id,
+						COALESCE(tbl_lehreinheitmitarbeiter.stundensatz, 0) as stundensatz,
+						COALESCE(tbl_lehreinheitmitarbeiter.semesterstunden, 0) as semesterstunden
+					FROM
+						lehre.tbl_vertrag
+						JOIN lehre.tbl_lehreinheitmitarbeiter USING(vertrag_id)
+						JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
+					WHERE
+						studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz)."
+				)x
+				WHERE 
+					x.semesterstunden * x.stundensatz != x.betrag";
 
 		if($result = $this->db_query($qry))
 		{
