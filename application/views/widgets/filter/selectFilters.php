@@ -125,7 +125,7 @@
 		if (metaData.type.toLowerCase().indexOf("int") >= 0)
 		{
 			html = '<span>';
-			html += '	<select class="select-filter-operation">';
+			html += '	<select class="select-filter-operation form-control">';
 			html += '		<option value="equal" ' + (activeFiltersOperation == "equal" ? "selected" : "") + '>equal</option>';
 			html += '		<option value="nequal" ' + (activeFiltersOperation == "nqual" ? "selected" : "") + '>not equal</option>';
 			html += '		<option value="gt" ' + (activeFiltersOperation == "gt" ? "selected" : "") + '>greater than</option>';
@@ -133,37 +133,37 @@
 			html += '	</select>';
 			html += '</span>';
 			html += '<span>';
-			html += '	<input type="number" value="' + activeFilters + '" class="select-filter-operation-value">';
+			html += '	<input type="number" value="' + activeFilters + '" class="select-filter-operation-value form-control">';
 			html += '</span>';
 		}
 		if (metaData.type.toLowerCase().indexOf('varchar') >= 0)
 		{
 			html = '<span>';
-			html += '	<select class="select-filter-operation">';
+			html += '	<select class="select-filter-operation form-control">';
 			html += '		<option value="contains" ' + (activeFiltersOperation == "contains" ? "selected" : "") + '>contains</option>';
 			html += '		<option value="ncontains" ' + (activeFiltersOperation == "ncontains" ? "selected" : "") + '>does not contain</option>';
 			html += '	</select>';
 			html += '</span>';
 			html += '<span>';
-			html += '	<input type="text" value="' + activeFilters + '" class="select-filter-operation-value">';
+			html += '	<input type="text" value="' + activeFilters + '" class="select-filter-operation-value form-control">';
 			html += '</span>';
 		}
 		if (metaData.type.toLowerCase().indexOf('bool') >= 0)
 		{
 			html = '<span>';
-			html += '	<select class="select-filter-operation">';
+			html += '	<select class="select-filter-operation form-control">';
 			html += '		<option value="true" ' + (activeFiltersOperation == "true" ? "selected" : "") + '>is true</option>';
 			html += '		<option value="false" ' + (activeFiltersOperation == "false" ? "selected" : "") + '>is false</option>';
 			html += '	</select>';
 			html += '</span>';
 			html += '<span>';
-			html += '	<input type="hidden" value="' + activeFilters + '" class="select-filter-operation-value">';
+			html += '	<input type="hidden" value="' + activeFilters + '" class="select-filter-operation-value form-control">';
 			html += '</span>';
 		}
 		if (metaData.type.toLowerCase().indexOf('timestamp') >= 0 || metaData.type.toLowerCase().indexOf('date') >= 0)
 		{
-			var classOperation = 'select-filter-operation-value';
-			var classOption = 'select-filter-option';
+			var classOperation = 'select-filter-operation-value form-control';
+			var classOption = 'select-filter-option form-control';
 			var disabled = "";
 
 			if (activeFiltersOperation == "set" || activeFiltersOperation == "nset")
@@ -174,7 +174,7 @@
 			}
 
 			html = '<span>';
-			html += '	<select class="select-filter-operation">';
+			html += '	<select class="select-filter-operation form-control">';
 			html += '		<option value="lt" ' + (activeFiltersOperation == "lt" ? "selected" : "") + '>less than</option>';
 			html += '		<option value="gt" ' + (activeFiltersOperation == "gt" ? "selected" : "") + '>greater than</option>';
 			html += '		<option value="set" ' + (activeFiltersOperation == "set" ? "selected" : "") + '>is set</option>';
@@ -213,7 +213,7 @@
 
 			if (data != null)
 			{
-				var strDropDown = '<option value="">Select a filter to add..</option>';
+				var strDropDown = '<option value="">Select a filter to add...</option>';
 				$("#addFilter").append(strDropDown);
 
 				for (var i = 0; i < data.allSelectedFields.length; i++)
@@ -246,7 +246,7 @@
 					);
 
 					selectedFilters += '<span>';
-					selectedFilters += '<input type="button" value="X" class="remove-filter" filterToRemove="' + data.selectedFilters[i] + '">';
+					selectedFilters += '<input type="button" value="X" class="remove-filter btn btn-default" filterToRemove="' + data.selectedFilters[i] + '">';
 					selectedFilters += '</span>';
 
 					selectedFilters += '</div>';
@@ -280,8 +280,9 @@
 	<span>
 		Add filter:
 	</span>
+
 	<span>
-		<select id="addFilter" class=""></select>
+		<select id="addFilter"></select>
 	</span>
 
 	<span>

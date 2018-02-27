@@ -29,8 +29,11 @@
 </script>
 
 <div>
-	Filter description: <input type="text" id="customFilterDescription" value="" class="">
-</div>
-<div>
-	<input type="button" id="saveCustomFilterButton" value="Save filter">
+	<span>
+		Filter description: <input type="text" id="customFilterDescription" value="">
+	</span>
+
+	<span>
+		<input type="button" id="saveCustomFilterButton" value="Save filter">
+	</span>
 </div>

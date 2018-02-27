@@ -56,6 +56,40 @@
 		border-right: 2px solid #428bca;
 	}
 
+	.select-filter-operation {
+		display: inline;
+		width: 130px;
+	}
+
+	.select-filter-operation-value {
+		display: inline;
+		width: 400px;
+	}
+
+	.select-filter-option {
+		display: inline;
+		width: 90px;
+	}
+
+	#addField {
+		display: inline;
+		width: 400px;
+	}
+
+	#addFilter {
+		display: inline;
+		width: 400px;
+	}
+
+	#selectedFilters {
+		margin-bottom: 20px;
+	}
+
+	#customFilterDescription {
+		display: inline;
+		width: 400px;
+	}
+
 </style>
 <script language="Javascript" type="text/javascript">
 

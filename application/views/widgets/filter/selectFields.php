@@ -145,7 +145,7 @@
 					$("#filterSelectFieldsDnd").append(strHtml);
 				}
 
-				var strDropDown = '<option value="">Select a field to add..</option>';
+				var strDropDown = '<option value="">Select a field to add...</option>';
 				$("#addField").append(strDropDown);
 
 				for (var i = 0; i < data.allSelectedFields.length; i++)
@@ -189,7 +189,8 @@
 		<span>
 			Add field:
 		</span>
+
 		<span>
-			<select id="addField" class=""></select>
+			<select id="addField"></select>
 		</span>
 	</div>
