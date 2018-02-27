@@ -82,7 +82,6 @@ $searchItems = explode(' ',TRIM(str_replace(',', '', $search),'!.?'));
 // Leerzeichen und Whitespaces entfernen
 $searchItems = preg_replace("/\s/", '', $searchItems);
 
-
 // Leere Strings aus Array entfernen
 while ($array_key = array_search("", $searchItems))
 	unset ($searchItems[$array_key]);
@@ -139,6 +138,7 @@ function searchPerson($searchItems)
 		echo '<table class="tablesorter" id="personentable">
 			<thead>
 				<tr>
+					<th>',$p->t('global/anrede'),'</th>
 					<th>',$p->t('global/vorname'),'</th>
 					<th>',$p->t('global/nachname'),'</th>
 					<th>',$p->t('global/studiengang'),'</th>
@@ -161,6 +161,7 @@ function searchPerson($searchItems)
 
 			echo '<tr>';
 			//echo '<td>',$row->titelpre,'</td>';
+			echo '<td>',$row->anrede,'</td>';
 			echo '<td>',$row->vorname,'</td>';
 			echo '<td><a href="../profile/index.php?uid=',$row->uid,'" title="',$row->titelpre,' ',$row->vorname,' ',$row->nachname,' ',$row->titelpost,'">',$row->nachname,'</a>';
 			if($row->aktiv==false)

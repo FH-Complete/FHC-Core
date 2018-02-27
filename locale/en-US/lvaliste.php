@@ -6,7 +6,7 @@ $this->phrasen['lvaliste/hilfeText']='Legend\n\nDP-Sem: Degree-Program - Semeste
 $this->phrasen['lvaliste/hilfeAnzeigen']='Show Legend';
 
 $this->phrasen['lvaliste/lehrfach']='Subject';
-$this->phrasen['lvaliste/lehrform']='Lehrform';
+$this->phrasen['lvaliste/lehrform']='Course Type';
 $this->phrasen['lvaliste/lvBezeichnung']='Course Title';
 $this->phrasen['lvaliste/lehrfachBezeichnung']='Subject Title';
 $this->phrasen['lvaliste/lektor']='Lector';

@@ -826,6 +826,7 @@ class dokument extends basis_db
 					WHERE dokument_kurzbz = ".$this->db_add_param($dokument_kurzbz)."
 					AND person_id =".$this->db_add_param($person_id, FHC_INTEGER)."
 					AND tbl_prestudentstatus.status_kurzbz = 'Interessent'
+					AND get_rolle_prestudent (prestudent_id, NULL) NOT IN ('Abgewiesener','Abbrecher')
 	
 					ORDER BY kuerzel";
 

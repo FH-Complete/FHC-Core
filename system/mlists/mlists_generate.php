@@ -444,6 +444,39 @@ $error_msg='';
 												AND tbl_lehrveranstaltung.studiengang_kz=257
 												AND tbl_lehrveranstaltung.orgform_kurzbz='DUA'
 											";
+
+	$verteilerArray['pre_alumni_wintersemester']['bezeichnung'] = 'Zukünftige Absolventen Wintersemester';
+	$verteilerArray['pre_alumni_wintersemester']['beschreibung'] = 'Zukünftige Absolventen Wintersemester';
+	$verteilerArray['pre_alumni_wintersemester']['sql'] = "SELECT
+															distinct tbl_benutzer.uid
+														FROM
+															public.tbl_studentlehrverband
+															JOIN public.tbl_studiengang USING(studiengang_kz)
+															JOIN public.tbl_benutzer ON(uid=student_uid)
+														WHERE
+															(
+																(tbl_studiengang.typ='m' AND semester=3)
+																OR (tbl_studiengang.typ='b' AND semester=5)
+															)
+															AND tbl_benutzer.aktiv = true
+															AND tbl_studentlehrverband.studiensemester_kurzbz = (SELECT studiensemester_kurzbz FROM public.vw_studiensemester where studiensemester_kurzbz like 'WS%' ORDER BY delta LIMIT 1)";
+
+	$verteilerArray['pre_alumni_sommersemester']['bezeichnung'] = 'Zukünftige Absolventen Sommersemester';
+	$verteilerArray['pre_alumni_sommersemester']['beschreibung'] = 'Zukünftige Absolventen Sommersemester';
+	$verteilerArray['pre_alumni_sommersemester']['sql'] = "SELECT
+																distinct tbl_benutzer.uid
+															FROM
+																public.tbl_studentlehrverband
+																JOIN public.tbl_studiengang USING(studiengang_kz)
+																JOIN public.tbl_benutzer ON(uid=student_uid)
+															WHERE
+																(
+																	(tbl_studiengang.typ='m' AND semester=4)
+																	OR (tbl_studiengang.typ='b' AND semester=6)
+																)
+																AND tbl_benutzer.aktiv = true
+																AND tbl_studentlehrverband.studiensemester_kurzbz = (SELECT studiensemester_kurzbz FROM public.vw_studiensemester where studiensemester_kurzbz like 'SS%' ORDER BY delta LIMIT 1)";
+
 	$bezeichnung = '';
 	$beschreibung = '';
 	foreach ($verteilerArray AS $listname => $data)
