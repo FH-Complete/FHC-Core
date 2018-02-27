@@ -395,21 +395,6 @@ class InfoCenter extends VileSci_Controller
 			->_display();
 	}
 
-	/**
-	 *
-	 */
-	public function deleteCustomFilter()
-	{
-		$filter_id = $this->input->get('filter_id');
-
-		if (is_numeric($filter_id))
-		{
-			$this->FiltersModel->deleteCustomFilter($filter_id);
-
-			redirect(self::URL_PREFIX);
-		}
-	}
-
 	// -----------------------------------------------------------------------------------------------------------------
 	// Private methods
 
@@ -530,8 +515,9 @@ class InfoCenter extends VileSci_Controller
 			$tofill['children'][] = array(
 				'link' => sprintf($toPrint, base_url('index.ci.php/system/infocenter/InfoCenter?filter_id'), $filterId),
 				'description' => $description,
-				'subscriptLink' => sprintf($toPrint, base_url('index.ci.php/system/infocenter/InfoCenter/deleteCustomFilter?filter_id'), $filterId),
-				'subscriptDescription' => 'Remove'
+				'subscriptDescription' => 'Remove',
+				'subscriptLinkId' => 'removeFilterById',
+				'subscriptLinkValue' => $filterId
 			);
 		}
 	}
