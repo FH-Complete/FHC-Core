@@ -256,21 +256,21 @@
             <table:table-cell table:style-name="Tabelle1.A3" office:value-type="string">
                 <text:p text:style-name="P4">
                     <xsl:choose>
-                        <xsl:when test="foto_gesperrt!='t' and foto_url != ''">
+                        <xsl:when test="foto_gesperrt='f' and foto_url != ''">
                             <draw:frame draw:style-name="fr1" draw:name="Bild" text:anchor-type="as-char" svg:width="2.57cm" svg:height="3.431cm" draw:z-index="0">
                                 <draw:image xlink:href="{foto_url}" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/>
                             </draw:frame>
                         </xsl:when>
-                        <xsl:when test="foto_gesperrt!='f'">
+                        <xsl:when test="foto_gesperrt='t'">
                             <draw:frame draw:style-name="fr1" draw:name="Bild2" text:anchor-type="as-char" svg:width="2.57cm" svg:height="3.431cm" draw:z-index="0">
 								<draw:image xlink:href="Pictures/10000000000000F000000140BF2FB93E89B12D34.jpg" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/>
                             </draw:frame>
                         </xsl:when>
-                        <xsl:otherwise>
+						<xsl:when test="foto_url=''">
                             <draw:frame draw:style-name="fr1" draw:name="dummy" text:anchor-type="as-char" svg:width="2.57cm" svg:height="3.431cm" draw:z-index="0">
                                 <draw:image xlink:href="Pictures/dummyfoto_keinBildVorhanden.jpg" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/>
                             </draw:frame>
-                        </xsl:otherwise>
+                        </xsl:when>
                     </xsl:choose>
                 </text:p>
             </table:table-cell>
