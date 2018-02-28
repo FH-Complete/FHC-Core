@@ -26,6 +26,7 @@
 		margin-left: 3px;
 		margin-right: 3px;
 		padding: 10px;
+		top: 10px;
 	}
 
 	.filter-select-field-dnd-span:hover {

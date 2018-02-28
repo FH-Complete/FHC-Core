@@ -7,49 +7,90 @@
 			cursor: "move",
 			opacity: 0.4,
 			revert: "invalid",
-			revertDuration: 200
+			revertDuration: 200,
+			drag: function(event, ui) {
+
+				var padding = 20;
+				var draggedElement = $(this);
+
+				$(".filter-select-field-dnd-span").each(function(i, e) {
+
+					if ($(this).attr('id') != draggedElement.attr('id'))
+					{
+						$(this).removeClass("selection-after");
+						$(this).removeClass("selection-before");
+
+						var elementCenter = $(this).offset().left + ((padding + $(this).width()) / 2);
+
+						if (event.pageX > ($(this).offset().left - (padding / 2))
+							&& event.pageX < ($(this).offset().left + $(this).width() + (padding / 2)))
+						{
+							if (event.pageX > elementCenter)
+							{
+								$(this).addClass("selection-after");
+								$(this).removeClass("selection-before");
+							}
+							else if (event.pageX < elementCenter)
+							{
+								$(this).addClass("selection-before");
+								$(this).removeClass("selection-after");
+							}
+						}
+					}
+
+				});
+
+			}
 		});
 
 		$(".filter-select-field-dnd-span").droppable({
 			accept: ".filter-select-field-dnd-span",
-			over: function(event, ui) {
-				$(this).on("mousemove", function( event ) {
-					var padding = 20;
-					var elementCenter = $(this).offset().left + (padding + $(this).width() / 2);
-
-					if (event.pageX > elementCenter)
-					{
-						$(this).addClass("selection-after");
-						$(this).removeClass("selection-before");
-					}
-					else if (event.pageX < elementCenter)
-					{
-						$(this).addClass("selection-before");
-						$(this).removeClass("selection-after");
-					}
-				});
-			},
-			out: function(event, ui) {
-				$(this).off("mousemove");
-				$(this).removeClass("selection-before");
-				$(this).removeClass("selection-after");
-			},
 			drop: function(event, ui) {
+
 				var padding = 20;
-				var elementCenter = $(this).offset().left + (padding + $(this).width() / 2);
+				var elementCenter = $(this).offset().left + ((padding + $(this).width()) / 2);
+				var draggedElement = ui.helper;
 
 				if (event.pageX > elementCenter)
 				{
-					$(this).insertBefore(ui.draggable);
+					draggedElement.insertAfter($(this));
 				}
 				else if (event.pageX < elementCenter)
 				{
-					$(this).insertAfter(ui.draggable);
+					draggedElement.insertBefore($(this));
 				}
 
-				$(this).off("mousemove");
 				$(this).removeClass("selection-before");
 				$(this).removeClass("selection-after");
+
+				draggedElement.css({left: '0px', top: '10px'});
+
+				var arrayDndId = [];
+
+				$(".filter-select-field-dnd-span").each(function(i, e) {
+
+					arrayDndId[i] = $(this).attr('id').replace('dnd', '');
+
+				});
+
+				$.ajax({
+					url: "<?php echo base_url('index.ci.php/system/Filters/sortSelectedFields'); ?>",
+					method: "POST",
+					data: {
+						selectedFieldsLst: arrayDndId
+					}
+				})
+				.done(function(data, textStatus, jqXHR) {
+
+					resetSelectedFields();
+					renderSelectedFields();
+
+					renderTableDataset();
+
+				}).fail(function(jqXHR, textStatus, errorThrown) {
+					alert(textStatus);
+				});
+
 			}
 		});
 	}
@@ -137,10 +178,12 @@
 					var fieldToDisplay = arrayFieldsToDisplay[i];
 					var fieldName = data.selectedFields[i];
 
-					var strHtml = '<span class="filter-select-field-dnd-span">';
+					var strHtml = '<span id="dnd' + fieldName + '" class="filter-select-field-dnd-span">';
 
+					strHtml += '<span>';
 					strHtml += fieldToDisplay;
-					strHtml += '<a class="remove-field" fieldToRemove="' + fieldName + '">X</a>';
+					strHtml += '</span>';
+					strHtml += '<span><a class="remove-field" fieldToRemove="' + fieldName + '"> X </a></span>';
 					strHtml += '</span>';
 					$("#filterSelectFieldsDnd").append(strHtml);
 				}
