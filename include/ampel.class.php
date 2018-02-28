@@ -221,27 +221,23 @@ class ampel extends basis_db
 	/**
 	 * Laedt alle aktuellen Ampeln eines Users
 	 * @param string $user User, dessen Ampeln geladen werden sollen
-	 * @param boolean $zukuenftige_anzeigen Default false
-	 * 				wenn true, werden alle zukuenftigen Ampeln geladen 
-	 * 				wenn false, werden nur die Ampeln geladen die innerhalb der vorlaufzeit liegen
 	 * @param boolean $bestaetigt Default false
 	 * 				wenn true, werden alle Ampeln geladen 
 	 * 				wenn false, werden nur die Ampeln geladen die noch NICHT bestaetigt wurden
 	 */
-	public function loadUserAmpel($user, $zukuenftige_anzeigen=false, $bestaetigt=false)
+	public function loadUserAmpel($user, $bestaetigt=false)   
 	{
 		$sprache = new sprache();
 		$beschreibung = $sprache->getSprachQuery('beschreibung');
-		$buttontext = $sprache->getSprachQuery('buttontext');
+		$buttontext = $sprache->getSprachQuery('buttontext');		
 		
-		$qry = "SELECT *,".$beschreibung.", ".$buttontext." FROM public.tbl_ampel WHERE deadline+verfallszeit>now()";
+		//all ampeln except where now is before the vorlaufzeit
+		$qry = "SELECT *,".$beschreibung.", ".$buttontext." FROM public.tbl_ampel";
 		
-		if(!$zukuenftige_anzeigen)
-			$qry.=" AND deadline-vorlaufzeit<now()";
-			
+		//only ampeln that are not confirmed
 		if(!$bestaetigt)
 		{
-			$qry.=" AND NOT EXISTS
+			$qry.=" WHERE NOT EXISTS
 						(SELECT ampel_id 
 						 FROM public.tbl_ampel_benutzer_bestaetigt 
 						 WHERE uid=".$this->db_add_param($user)." AND ampel_id=tbl_ampel.ampel_id)";

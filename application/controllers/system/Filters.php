@@ -2,6 +2,9 @@
 
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
+/**
+ *
+ */
 class Filters extends VileSci_Controller
 {
 	const SESSION_NAME = 'FILTER';
@@ -13,6 +16,9 @@ class Filters extends VileSci_Controller
 	const ACTIVE_FILTERS_OPERATION = 'activeFiltersOperation';
 	const FILTER_NAME = 'filterName';
 
+	/**
+	 *
+	 */
 	public function __construct()
     {
         parent::__construct();
@@ -24,6 +30,9 @@ class Filters extends VileSci_Controller
 		$this->load->model('person/Benutzer_model', 'BenutzerModel');
     }
 
+	/**
+	 *
+	 */
 	public function tableDataset()
 	{
 		$json = new stdClass();
@@ -37,6 +46,9 @@ class Filters extends VileSci_Controller
 		$this->output->set_content_type('application/json')->set_output(json_encode($json));
 	}
 
+	/**
+	 *
+	 */
 	public function selectFields()
 	{
 		$json = new stdClass();
@@ -50,6 +62,43 @@ class Filters extends VileSci_Controller
 		$this->output->set_content_type('application/json')->set_output(json_encode($json));
 	}
 
+	/**
+	 *
+	 */
+	public function sortSelectedFields()
+	{
+		$selectedFieldsLst = $this->input->post('selectedFieldsLst');
+
+		$json = new stdClass();
+
+		$allSelectedFields = $_SESSION[self::SESSION_NAME]['allSelectedFields'];
+		$allColumnsAliases = $_SESSION[self::SESSION_NAME]['allColumnsAliases'];
+
+		if (isset($selectedFieldsLst) && is_array($selectedFieldsLst))
+		{
+			$json->selectedFields = $_SESSION[self::SESSION_NAME]['selectedFields'] = $selectedFieldsLst;
+
+			for ($i = 0; $i < count($json->selectedFields); $i++)
+			{
+				$pos = array_search($json->selectedFields[$i], $allSelectedFields);
+
+				if ($pos !== false)
+				{
+					$json->columnsAliases[] = $json->selectedFields[$i];
+					if ($allColumnsAliases != null && is_array($allColumnsAliases))
+					{
+						$json->columnsAliases[] = $allColumnsAliases[$pos];
+					}
+				}
+			}
+		}
+
+		$this->output->set_content_type('application/json')->set_output(json_encode($json));
+	}
+
+	/**
+	 *
+	 */
 	public function selectFilters()
 	{
 		$json = new stdClass();
@@ -104,6 +153,9 @@ class Filters extends VileSci_Controller
 		$this->output->set_content_type('application/json')->set_output(json_encode($json));
 	}
 
+	/**
+	 *
+	 */
 	public function saveFilter()
 	{
 		$this->_saveFilter($this->input->post("customFilterDescription"));
