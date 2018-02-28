@@ -27,7 +27,8 @@
 				 class="panel-collapse collapse<?php echo $infoonly ? '' : ' in' ?>">
 				<div class="panel-body">
 					<form method="post"
-						  action="../saveZgvPruefung/<?php echo $zgvpruefung->prestudent_id ?>">
+						  action="#" class="zgvform">
+						<input type="hidden" name="prestudentid" value="<?php echo $zgvpruefung->prestudent_id  ?>">
 						<div class="row">
 							<div class="col-lg-<?php echo $columns[0] ?>">
 								<div class="form-group">
@@ -193,7 +194,7 @@
 									</button>
 								</div>
 								<div class="col-lg-6 text-right">
-									<button type="submit" class="btn btn-default">
+									<button type="submit" class="btn btn-default saveZgv" id="zgvSpeichern_<?php echo $zgvpruefung->prestudent_id ?>">
 										Speichern
 									</button>
 								</div>
