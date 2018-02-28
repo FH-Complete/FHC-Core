@@ -27,7 +27,8 @@
 				 class="panel-collapse collapse<?php echo $infoonly ? '' : ' in' ?>">
 				<div class="panel-body">
 					<form method="post"
-						  action="../saveZgvPruefung/<?php echo $zgvpruefung->prestudent_id ?>">
+						  action="#" class="zgvform">
+						<input type="hidden" name="prestudentid" value="<?php echo $zgvpruefung->prestudent_id  ?>">
 						<div class="row">
 							<div class="col-lg-<?php echo $columns[0] ?>">
 								<div class="form-group">
@@ -96,13 +97,15 @@
 							<div class="col-lg-<?php echo $columns[2] ?>">
 								<div class="form-group">
 									<label>ZGV Datum: </label>
-									<?php if ($infoonly):
-										echo date_format(date_create($zgvpruefung->zgvdatum), 'd.m.Y');
+									<?php
+									$zgvdatum = empty($zgvpruefung->zgvdatum) ? "" : date_format(date_create($zgvpruefung->zgvdatum), 'd.m.Y');
+									if ($infoonly):
+										echo $zgvdatum;
 									else:
 										?>
 										<input type="text"
 											   class="dateinput form-control"
-											   value="<?php echo empty($zgvpruefung->zgvdatum) ? "" : date_format(date_create($zgvpruefung->zgvdatum), 'd.m.Y') ?>"
+											   value="<?php echo $zgvdatum ?>"
 											   name="zgvdatum" id="zgvdatum_<?php echo $zgvpruefung->prestudent_id ?>">
 									<?php endif; ?>
 								</div>
@@ -153,13 +156,15 @@
 								<div class="col-lg-<?php echo $columns[2] ?>">
 									<div class="form-group">
 										<label>ZGV Master Datum: </label>
-										<?php if ($infoonly):
-											echo date_format(date_create($zgvpruefung->zgvmadatum), 'd.m.Y');
+										<?php
+										$zgvmadatum = empty($zgvpruefung->zgvmadatum) ? "" : date_format(date_create($zgvpruefung->zgvmadatum), 'd.m.Y');
+										if ($infoonly):
+											echo $zgvmadatum;
 										else:
 											?>
 											<input type="text"
 												   class="dateinput form-control"
-												   value="<?php echo empty($zgvpruefung->zgvmadatum) ? "" : date_format(date_create($zgvpruefung->zgvmadatum), 'd.m.Y') ?>"
+												   value="<?php echo $zgvmadatum ?>"
 												   name="zgvmadatum">
 										<?php endif; ?>
 									</div>
@@ -189,7 +194,7 @@
 									</button>
 								</div>
 								<div class="col-lg-6 text-right">
-									<button type="submit" class="btn btn-default">
+									<button type="submit" class="btn btn-default saveZgv" id="zgvSpeichern_<?php echo $zgvpruefung->prestudent_id ?>">
 										Speichern
 									</button>
 								</div>

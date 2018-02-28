@@ -1155,6 +1155,7 @@ function StudentAuswahl()
 	else
 	{
 		//STUDENT
+		document.getElementById('student-tab-mobilitaet').hidden=false;
 		document.getElementById('student-tab-zeugnis').collapsed=false;
 		document.getElementById('student-tab-betriebsmittel').collapsed=false;
 		document.getElementById('student-tab-io').collapsed=false;

@@ -156,12 +156,12 @@ class InfoCenter extends VileSci_Controller
 
 	/**
 	 * Saves if a document has been formal geprueft. saves current timestamp if checked as geprueft, or null if not.
+	 * @param $person_id
 	 */
-	public function saveFormalGeprueft()
+	public function saveFormalGeprueft($person_id)
 	{
-		$akte_id = $this->input->get('akte_id');
-		$formalgeprueft = $this->input->get('formal_geprueft');
-		$person_id = $this->input->get('person_id');
+		$akte_id = $this->input->post('akte_id');
+		$formalgeprueft = $this->input->post('formal_geprueft');
 
 		if (!isset($akte_id) || !isset($formalgeprueft) || !isset($person_id))
 			show_error('Parameters not set!');
@@ -191,7 +191,9 @@ class InfoCenter extends VileSci_Controller
 			)
 		);
 
-		redirect(self::URL_PREFIX.'/showDetails/'.$person_id.'#DokPruef');
+		$this->output
+			->set_content_type('application/json')
+			->set_output(json_encode($timestamp));
 	}
 
 	/**
@@ -260,7 +262,9 @@ class InfoCenter extends VileSci_Controller
 
 		$this->_log($logdata['person_id'], 'savezgv', array($logdata['studiengang_kurzbz'], $prestudent_id));
 
-		$this->_redirectToStart($prestudent_id, 'ZgvPruef');
+		$this->output
+			->set_content_type('application/json')
+			->set_output(json_encode($result->retval));
 	}
 
 	/**
@@ -385,7 +389,35 @@ class InfoCenter extends VileSci_Controller
 
 		$this->_log($person_id, 'savenotiz', array($titel));
 
-		redirect(self::URL_PREFIX.'/showDetails/'.$person_id.'#NotizAkt');
+		$this->output
+			->set_content_type('application/json')
+			->set_output(json_encode($result->retval));
+	}
+
+	/**
+	 * Loads Notizen view for a person, helper for reloading after ajax request
+	 * @param $person_id
+	 */
+	public function reloadNotizen($person_id)
+	{
+		$notizen = $this->NotizModel->getNotiz($person_id);
+
+		if (isError($notizen))
+		{
+			show_error($notizen->retval);
+		}
+
+		$this->load->view('system/infocenter/notizen.php', array('notizen' => $notizen->retval));
+	}
+
+	/**
+	 * Loads Logs view for a person, helper for reloading after ajax request
+	 * @param $person_id
+	 */
+	public function reloadLogs($person_id)
+	{
+		$logs = $this->personloglib->getLogs($person_id);
+		$this->load->view('system/infocenter/logs.php', array('logs' => $logs));
 	}
 
 	/**
@@ -414,21 +446,6 @@ class InfoCenter extends VileSci_Controller
 			->set_header('Content-Disposition: attachment; filename="'.$akte->retval[0]->titel.'"')
 			->set_output($aktecontent->retval)
 			->_display();
-	}
-
-	/**
-	 *
-	 */
-	public function deleteCustomFilter()
-	{
-		$filter_id = $this->input->get('filter_id');
-
-		if (is_numeric($filter_id))
-		{
-			$this->FiltersModel->deleteCustomFilter($filter_id);
-
-			redirect(self::URL_PREFIX);
-		}
 	}
 
 	// -----------------------------------------------------------------------------------------------------------------
@@ -551,8 +568,9 @@ class InfoCenter extends VileSci_Controller
 			$tofill['children'][] = array(
 				'link' => sprintf($toPrint, base_url('index.ci.php/system/infocenter/InfoCenter?filter_id'), $filterId),
 				'description' => $description,
-				'subscriptLink' => sprintf($toPrint, base_url('index.ci.php/system/infocenter/InfoCenter/deleteCustomFilter?filter_id'), $filterId),
-				'subscriptDescription' => 'Remove'
+				'subscriptDescription' => 'Remove',
+				'subscriptLinkId' => 'removeFilterById',
+				'subscriptLinkValue' => $filterId
 			);
 		}
 	}
@@ -689,7 +707,7 @@ class InfoCenter extends VileSci_Controller
 
 		// Interessenten come first, otherwise by bewerbungsdatum desc, then by prestudent_id desc
 		usort($zgvpruefungen, function ($a, $b) {
-			$bewdatesort = strcmp($b->prestudentstatus->bewerbung_abgeschicktamum, $a->prestudentstatus->bewerbung_abgeschicktamum);
+			$bewdatesort = isset($a->prestudentstatus) && isset($b->prestudentstatus) ? strcmp($b->prestudentstatus->bewerbung_abgeschicktamum, $a->prestudentstatus->bewerbung_abgeschicktamum) : 0;
 			$defaultsort = $bewdatesort === 0 ? (int)$b->prestudent_id - (int)$a->prestudent_id : $bewdatesort;
 			if (!isset($a->prestudentstatus->status_kurzbz) || !isset($b->prestudentstatus->status_kurzbz))
 				return $defaultsort;

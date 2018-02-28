@@ -115,58 +115,46 @@
 		',
 		'hideHeader' => false,
 		'hideSave' => false,
-		'checkboxes' => array('PersonId'),
+		'checkboxes' => 'PersonId',
 		'additionalColumns' => array('Details'),
-		'formatRaw' => function($fieldName, $fieldValue, $datasetRaw) {
+		'formatRaw' => function($datasetRaw) {
 
-			if ($fieldName == 'Details')
+			$datasetRaw->{'Details'} = sprintf(
+				'<a href="%s%s">Details</a>',
+				base_url('index.ci.php/system/infocenter/InfoCenter/showDetails/'),
+				$datasetRaw->{'PersonId'}
+			);
+
+			if ($datasetRaw->{'SendDate'} == null)
 			{
-				$link = '<a href="%s%s">Details</a>';
-
-				$datasetRaw->{$fieldName} = sprintf(
-					$link,
-					base_url('index.ci.php/system/infocenter/InfoCenter/showDetails/'),
-					$datasetRaw->PersonId
-				);
+				$datasetRaw->{'SendDate'} = 'Not sent';
 			}
 
-			if ($fieldName == 'SendDate')
+			if ($datasetRaw->{'LastAction'} == null)
 			{
-				if ($datasetRaw->{$fieldName} == '01.01.1970 01:00:00')
-				{
-					$datasetRaw->{$fieldName} = 'Not sent';
-				}
+				$datasetRaw->{'LastAction'} = 'Not logged';
 			}
 
-			if ($fieldName == 'LastAction')
+			if ($datasetRaw->{'User/Operator'} == '')
 			{
-				if ($datasetRaw->{$fieldName} == '01.01.1970 01:00:00')
-				{
-					$datasetRaw->{$fieldName} = 'Not logged';
-				}
+				$datasetRaw->{'User/Operator'} = 'NA';
 			}
 
-			if ($fieldName == 'User/Operator')
+			if ($datasetRaw->{'LockDate'} == null)
 			{
-				if ($datasetRaw->{$fieldName} == '')
-				{
-					$datasetRaw->{$fieldName} = 'NA';
-				}
+				$datasetRaw->{'LockDate'} = 'Not locked';
 			}
 
-			if ($fieldName == 'LockDate')
+			if ($datasetRaw->{'StgAbgeschickt'} == null)
 			{
-				if ($datasetRaw->{$fieldName} == '01.01.1970 01:00:00')
-				{
-					$datasetRaw->{$fieldName} = 'Not locked';
-				}
+				$datasetRaw->{'StgAbgeschickt'} = 'N/A';
 			}
 
 			return $datasetRaw;
 		},
 		'markRow' => function($datasetRaw) {
 
-			if ($datasetRaw->LockDate != '')
+			if ($datasetRaw->LockDate != null)
 			{
 				return FilterWidget::DEFAULT_MARK_ROW_CLASS;
 			}

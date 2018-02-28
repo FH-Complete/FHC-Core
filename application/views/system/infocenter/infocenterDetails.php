@@ -129,10 +129,14 @@
 							<div class="panel-body">
 								<div class="row">
 									<div class="col-lg-6">
+										<div id="addnotiz">
 										<?php $this->load->view('system/infocenter/addNotiz.php'); ?>
+										</div>
+										<div id="notizen">
 										<?php $this->load->view('system/infocenter/notizen.php'); ?>
+										</div>
 									</div>
-									<div class="col-lg-6">
+									<div class="col-lg-6" id="logs">
 										<?php $this->load->view('system/infocenter/logs.php'); ?>
 									</div> <!-- ./column -->
 								</div> <!-- ./row -->
@@ -144,26 +148,6 @@
 		</div> <!-- ./container-fluid-->
 	</div> <!-- ./page-wrapper-->
 </div> <!-- ./wrapper -->
-
-<script>
-	$(document).ready(
-		function ()
-		{
-			//add click events to "formal geprüft" checkboxes
-			<?php foreach($dokumente as $dokument): ?>
-
-			if ($("#prchkbx<?php echo $dokument->akte_id; ?>"))
-			{
-				$("#prchkbx<?php echo $dokument->akte_id; ?>").click(function ()
-				{
-					window.location = "../saveFormalGeprueft?akte_id=<?php echo $dokument->akte_id; ?>&formal_geprueft=" + this.checked + "&person_id=<?php echo $stammdaten->person_id ?>";
-				});
-			}
-			<?php endforeach ?>
-
-		}
-	);
-</script>
 </body>
 
 <?php $this->load->view('templates/FHC-Footer'); ?>

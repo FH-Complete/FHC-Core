@@ -261,14 +261,14 @@
                                 <draw:image xlink:href="{foto_url}" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/>
                             </draw:frame>
                         </xsl:when>
-                        <xsl:when test="foto_url=''">
+                        <xsl:when test="foto_gesperrt!='f'">
                             <draw:frame draw:style-name="fr1" draw:name="Bild2" text:anchor-type="as-char" svg:width="2.57cm" svg:height="3.431cm" draw:z-index="0">
-                                <draw:image xlink:href="Pictures/dummyfoto_keinBildVorhanden.jpg" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/>
+								<draw:image xlink:href="Pictures/10000000000000F000000140BF2FB93E89B12D34.jpg" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/>
                             </draw:frame>
                         </xsl:when>
                         <xsl:otherwise>
                             <draw:frame draw:style-name="fr1" draw:name="dummy" text:anchor-type="as-char" svg:width="2.57cm" svg:height="3.431cm" draw:z-index="0">
-                                <draw:image xlink:href="Pictures/10000000000000F000000140BF2FB93E89B12D34.jpg" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/>
+                                <draw:image xlink:href="Pictures/dummyfoto_keinBildVorhanden.jpg" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/>
                             </draw:frame>
                         </xsl:otherwise>
                     </xsl:choose>
