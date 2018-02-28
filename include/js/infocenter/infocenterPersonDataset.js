@@ -11,29 +11,17 @@
 
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-/**
- * javascript file for infocenter overview page
- */
-$(document).ready(
-	function()
-	{
-		//bootstrap table
-		$("#tableDataset").addClass('table table-bordered table-responsive');
+*/
 
-		// Checks if the table contains data (rows)
-		if ($('#tableDataset').find('tbody:empty').length == 0
-			&& $('#tableDataset').find('tr:empty').length == 0)
-		{
-			$("#tableDataset").tablesorter(
-				{
-					widgets: ["zebra", "filter"]
-				});
-		}
-		appendTableActionsHtml();
-		setTableActions();
-	}
-);
+/**
+ * Javascript file for infocenter overview page
+ */
+$(document).ready(function() {
+
+	appendTableActionsHtml();
+	// setTableActions();
+
+});
 
 /**
  * adds person table additional actions html (above and beneath it)
@@ -44,7 +32,7 @@ function appendTableActionsHtml()
 	var url = currurl.replace(/infocenter\/InfoCenter(.*)/, "Messages/write");
 
 	var formHtml = '<form id="sendMsgsForm" method="post" action="'+ url +'" target="_blank"></form>';
-	$("#filterForm").before(formHtml);
+	$("#datasetActionsTop").before(formHtml);
 
 	var selectAllHtml =
 		'<a href="javascript:void(0)" class="selectAll">' +
@@ -56,16 +44,36 @@ function appendTableActionsHtml()
 		'<a href="javascript:void(0)" class="sendMsgsLink">' +
 		'<i class="fa fa-envelope"></i>&nbsp;Nachricht senden</a>';
 
-	var personcount = $("#tableDataset tbody tr").length;
-	var persontext = personcount === 1 ? "Person" : "Personen";
-	var countHtml = $("#tableDataset tbody tr").length +" "+persontext;
+	var personcount = 0;
 
-	$("#datasetActionsTop, #datasetActionsBottom").append(
-		"<div class='pull-left'>"+selectAllHtml+"&nbsp;&nbsp;"+ messageHtml+"</div>"+
-		"<div class='pull-right'>"+countHtml+"</div>"+
-		"<div class='clearfix'></div>"
-	);
-	$("#datasetActionsBottom").append("<br><br>");
+	$.ajax({
+		url: window.location.pathname.replace('infocenter/InfoCenter', 'Filters/rowNumber'),
+		method: "GET"
+	})
+	.done(function(data, textStatus, jqXHR) {
+
+		if (data != null)
+		{
+			if (data.rowNumber != null)
+			{
+				personcount = data.rowNumber;
+
+				var persontext = personcount === 1 ? "Person" : "Personen";
+				var countHtml = personcount + " " + persontext;
+
+				$("#datasetActionsTop, #datasetActionsBottom").append(
+					"<div class='pull-left'>" + selectAllHtml + "&nbsp;&nbsp;" + messageHtml + "</div>"+
+					"<div class='pull-right'>" + countHtml + "</div>"+
+					"<div class='clearfix'></div>"
+				);
+				$("#datasetActionsBottom").append("<br><br>");
+			}
+
+			setTableActions();
+		}
+
+	}).fail(function(jqXHR, textStatus, errorThrown) {});
+
 }
 
 /**
@@ -74,7 +82,7 @@ function appendTableActionsHtml()
 function setTableActions()
 {
 	$(".sendMsgsLink").click(function() {
-		var idsel = $("#tableDataset input:checked[name=PersonId\\[\\]]");
+		var idsel = $("#filterTableDataset input:checked[name=PersonId\\[\\]]");
 		if(idsel.length > 0)
 		{
 			var form = $("#sendMsgsForm");
@@ -91,14 +99,14 @@ function setTableActions()
 	$(".selectAll").click(function()
 		{
 			//select only trs if not filtered by tablesorter
-			var trs = $("#tableDataset tbody tr").not(".filtered");
+			var trs = $("#filterTableDataset tbody tr").not(".filtered");
 			trs.find("input[name=PersonId\\[\\]]").prop("checked", true);
 		}
 	);
 
 	$(".unselectAll").click(function()
 		{
-			var trs = $("#tableDataset tbody tr").not(".filtered");
+			var trs = $("#filterTableDataset tbody tr").not(".filtered");
 			trs.find("input[name=PersonId\\[\\]]").prop("checked", false);
 		}
 	);

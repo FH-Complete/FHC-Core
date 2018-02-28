@@ -392,4 +392,21 @@ class Filters extends VileSci_Controller
 
 		$this->output->set_content_type('application/json')->set_output(json_encode($json));
 	}
+
+	/**
+	 *
+	 */
+	public function rowNumber()
+	{
+		$json = new stdClass();
+
+		$dataset = $_SESSION[self::SESSION_NAME]['dataset'];
+
+		if (is_array($dataset))
+		{
+			$json->rowNumber = count($dataset);
+		}
+
+		$this->output->set_content_type('application/json')->set_output(json_encode($json));
+	}
 }
