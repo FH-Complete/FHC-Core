@@ -37,6 +37,8 @@ $this->phrasen['global/loeschen']='Delete';
 $this->phrasen['global/entfernen']='Delete';
 $this->phrasen['global/editieren']='Edit';
 $this->phrasen['global/suchen']='Search';
+$this->phrasen['global/lesen']='Read';
+$this->phrasen['global/bestaetigen']='Confirm';
 $this->phrasen['global/alle']='All';
 $this->phrasen['global/abbrechen']='Cancel';
 $this->phrasen['global/eintragen']='Register';
@@ -60,6 +62,7 @@ $this->phrasen['global/hinzufuegen']='Add';
 $this->phrasen['global/drucken']='Print';
 $this->phrasen['global/und']='and';
 $this->phrasen['global/oder']='or';
+$this->phrasen['global/faelligAm']='Due on';
 
 $this->phrasen['global/username']='Username';
 $this->phrasen['global/vorname']='First Name';
