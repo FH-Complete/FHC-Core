@@ -237,7 +237,8 @@ if ($result = $db->db_query($qry)) {
                 $row->foto_sperre = 'f';
 
             //create foto (if not locked by student OR if fotolist is created by admin or assistenz)
-            if ($row->foto_sperre == 'f' && $row->foto != '') {
+            $foto_url = '';
+			if ($row->foto_sperre == 'f' && $row->foto != '') {
                 $foto_src = $row->foto;
                 $foto_url = sys_get_temp_dir() . '/foto' . trim($row->matrikelnr) . '.jpg';
                 $foto_url_arr[] = $foto_url;
@@ -254,14 +255,14 @@ if ($result = $db->db_query($qry)) {
                 //add foto to document
                 $doc->addImage($foto_url, trim($row->matrikelnr) . '.jpg', 'image/jpg');
             }
-            elseif ($row->foto == '')
-            {
-                $foto_url = '';
-            }
-            else
-            {
-                $foto_url = '';
-            }
+//            elseif ($row->foto == '')
+//            {
+//                $foto_url = '';
+//            }
+//            else
+//            {
+//                $foto_url = '';
+//            }
 
             //create studiengruppe
             $student_studiengruppe = strtoupper($row->typ.$row->kurzbz.'-'.$row->semester);

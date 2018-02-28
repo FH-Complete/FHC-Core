@@ -1265,6 +1265,35 @@ if($result = $db->db_query("SELECT 1 FROM system.tbl_app WHERE app='bewerbung'")
 	}
 }
 
+// Remove NOT NULL constraint on vorlaufszeit on public.tbl_ampel
+if($result = @$db->db_query("SELECT is_nullable FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = 'public' AND TABLE_NAME = 'tbl_ampel' AND COLUMN_NAME = 'vorlaufzeit' AND is_nullable = 'NO'"))
+{
+	if($db->db_num_rows($result) > 0)
+	{
+		$qry = "ALTER TABLE public.tbl_ampel ALTER COLUMN vorlaufzeit DROP NOT NULL;";
+
+		if(!$db->db_query($qry))
+			echo '<strong>public.tbl_ampel '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>Removed NOT NULL constraint on "vorlaufszeit" from public.tbl_ampel<br>';
+	}
+}
+
+
+// Remove NOT NULL constraint on verfallszeit on public.tbl_ampel
+if($result = @$db->db_query("SELECT is_nullable FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = 'public' AND TABLE_NAME = 'tbl_ampel' AND COLUMN_NAME = 'verfallszeit' AND is_nullable = 'NO'"))
+{
+	if($db->db_num_rows($result) > 0 )
+	{
+		$qry = "ALTER TABLE public.tbl_ampel ALTER COLUMN verfallszeit DROP NOT NULL;";
+
+		if(!$db->db_query($qry))
+			echo '<strong>public.tbl_ampel '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>Removed NOT NULL constraint on "verfallszeit" from public.tbl_ampel<br>';
+	}
+}
+
 // Tabelle person_lock hinzufügen
 if (!$result = @$db->db_query("SELECT 1 FROM system.tbl_person_lock LIMIT 1"))
 {
@@ -1639,6 +1668,7 @@ if($result = $db->db_query("SELECT obj_description('public.ci_apikey'::regclass)
 			else
 				echo 'Kommentare fuer DB Datenbanktabellen hinzugefügt';
 		}
+
 	}
 }
 
