@@ -27,12 +27,11 @@ require_once(dirname(__FILE__).'/personlog.class.php');
 // Auth: Benutzer des Webportals
 /**
  * DEPRECATED - Use Authentication Class
- */	
+ */
 function get_uid()
 {
 	$auth = new authentication();
-//	return $auth->getUser();
-	return 'eckelt';
+	return $auth->getUser();
 }
 
 /**
