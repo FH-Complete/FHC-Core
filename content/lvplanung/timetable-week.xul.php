@@ -380,16 +380,17 @@ elseif ($aktion=='stpl_delete_single' || $aktion=='stpl_delete_block')
 			{
 				$reservierung = new reservierung();
 				$reservierung->load($reservierung_id);
-				$deletetext = ' AND datum='.$reservierung->datum.' AND stunde='.$reservierung->stunde.' AND titel='.$reservierung->titel.' AND beschreibung='.$reservierung->beschreibung.' AND uid='.$reservierung->uid.';';
+				$logdata_reservierung = (array)$reservierung;
+				$logdata = var_export($logdata_reservierung, true);
 				$reservierung->delete($reservierung_id);
 				$error_msg.=$reservierung->errormsg;
-				//UNDO Befehl zum mitloggen von geloeschten Reservierungen
+				// Logeintrag zum mitloggen von geloeschten Reservierungen
 				if($error_msg=='')
 				{
 					$log = new log();
 					$log->executetime = date('Y-m-d H:i:s');
 					$log->sqlundo = '';
-					$log->sql = 'DELETE FROM campus.tbl_reservierung WHERE reservierung_id='.$reservierung_id.$deletetext;
+					$log->sql = 'DELETE FROM campus.tbl_reservierung WHERE reservierung_id='.$reservierung_id.'; LogData:'.$logdata;
 					$log->beschreibung = 'Löschen der Reservierung '.$reservierung_id;
 					$log->mitarbeiter_uid = $uid;
 					if(!$log->save(true))
@@ -405,16 +406,17 @@ elseif ($aktion=='stpl_delete_single' || $aktion=='stpl_delete_block')
 			{
 				$reservierung = new reservierung();
 				$reservierung->load($reservierung_id);
-				$deletetext = ' AND datum='.$reservierung->datum.' AND stunde='.$reservierung->stunde.' AND titel='.$reservierung->titel.' AND beschreibung='.$reservierung->beschreibung.' AND uid='.$reservierung->uid.';';
+				$logdata_reservierung = (array)$reservierung;
+				$logdata = var_export($logdata_reservierung, true);
 				$reservierung->delete($reservierung_id);
 				$error_msg.=$reservierung->errormsg;
-				//UNDO Befehl zum mitloggen von geloeschten Reservierungen
+				// Logeintrag zum mitloggen von geloeschten Reservierungen
 				if($error_msg=='')
 				{
 					$log = new log();
 					$log->executetime = date('Y-m-d H:i:s');
 					$log->sqlundo = '';
-					$log->sql = 'DELETE FROM campus.tbl_reservierung WHERE reservierung_id='.$reservierung_id.$deletetext;
+					$log->sql = 'DELETE FROM campus.tbl_reservierung WHERE reservierung_id='.$reservierung_id.'; LogData:'.$logdata;
 					$log->beschreibung = 'Löschen der Reservierung '.$reservierung_id;
 					$log->mitarbeiter_uid = $uid;
 					if(!$log->save(true))
