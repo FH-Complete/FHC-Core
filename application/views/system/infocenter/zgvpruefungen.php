@@ -35,7 +35,7 @@
 									<?php
 									if (isset($zgvpruefung->prestudentstatus->status_kurzbz))
 									{
-										echo $zgvpruefung->prestudentstatus->status_kurzbz.(isset($zgvpruefung->prestudentstatus->bezeichnung_statusgrund[0]) && $zgvpruefung->prestudentstatus->status_kurzbz === 'Abgewiesener' ? ' ('.$zgvpruefung->prestudentstatus->bezeichnung_statusgrund[0].')' : '');
+										echo $zgvpruefung->prestudentstatus->status_kurzbz.(isset($zgvpruefung->prestudentstatus->bezeichnung_statusgrund[0]) ? ' ('.$zgvpruefung->prestudentstatus->bezeichnung_statusgrund[0].')' : '');
 									}
 									?>
 								</div>
@@ -57,12 +57,12 @@
 								<div class="form-group">
 									<label>Orgform: </label>
 									<span style="display: inline-block">
-																	<?php
-																	$separator = (isset($zgvpruefung->prestudentstatus->orgform)) ? ', ' : '';
-																	echo (isset($zgvpruefung->prestudentstatus->orgform) ? $zgvpruefung->prestudentstatus->orgform : '')
-																		.(isset($zgvpruefung->prestudentstatus->sprachedetails->bezeichnung) ? $separator.$zgvpruefung->prestudentstatus->sprachedetails->bezeichnung[0] : '')
-																		.(isset($zgvpruefung->prestudentstatus->alternative) ? ' ('.$zgvpruefung->prestudentstatus->alternative.')' : '') ?>
-																	</span>
+									<?php
+									$separator = (isset($zgvpruefung->prestudentstatus->orgform)) ? ', ' : '';
+									echo (isset($zgvpruefung->prestudentstatus->orgform) ? $zgvpruefung->prestudentstatus->orgform : '')
+										.(isset($zgvpruefung->prestudentstatus->sprachedetails->bezeichnung) ? $separator.$zgvpruefung->prestudentstatus->sprachedetails->bezeichnung[0] : '')
+										.(isset($zgvpruefung->prestudentstatus->alternative) ? ' ('.$zgvpruefung->prestudentstatus->alternative.')' : '') ?>
+									</span>
 								</div>
 							</div>
 						</div>
@@ -76,7 +76,7 @@
 										echo $this->widgetlib->widget(
 											'Zgv_widget',
 											array(DropdownWidget::SELECTED_ELEMENT => $zgvpruefung->zgv_code),
-											array('name' => 'zgv', 'id' => 'zgv')
+											array('name' => 'zgv', 'id' => 'zgv_'.$zgvpruefung->prestudent_id)
 										); ?>
 								</div>
 							</div>
@@ -89,21 +89,23 @@
 										?>
 										<input type="text" class="form-control"
 											   value="<?php echo $zgvpruefung->zgvort ?>"
-											   name="zgvort">
+											   name="zgvort" id="zgvort_<?php echo $zgvpruefung->prestudent_id ?>">
 									<?php endif; ?>
 								</div>
 							</div>
 							<div class="col-lg-<?php echo $columns[2] ?>">
 								<div class="form-group">
 									<label>ZGV Datum: </label>
-									<?php if ($infoonly):
-										echo date_format(date_create($zgvpruefung->zgvdatum), 'd.m.Y');
+									<?php
+									$zgvdatum = empty($zgvpruefung->zgvdatum) ? "" : date_format(date_create($zgvpruefung->zgvdatum), 'd.m.Y');
+									if ($infoonly):
+										echo $zgvdatum;
 									else:
 										?>
 										<input type="text"
 											   class="dateinput form-control"
-											   value="<?php echo empty($zgvpruefung->zgvdatum) ? "" : date_format(date_create($zgvpruefung->zgvdatum), 'd.m.Y') ?>"
-											   name="zgvdatum">
+											   value="<?php echo $zgvdatum ?>"
+											   name="zgvdatum" id="zgvdatum_<?php echo $zgvpruefung->prestudent_id ?>">
 									<?php endif; ?>
 								</div>
 							</div>
@@ -116,7 +118,7 @@
 										echo $this->widgetlib->widget(
 											'Nation_widget',
 											array(DropdownWidget::SELECTED_ELEMENT => $zgvpruefung->zgvnation_code),
-											array('name' => 'zgvnation', 'id' => 'zgvnation')
+											array('name' => 'zgvnation', 'id' => 'zgvnation_'.$zgvpruefung->prestudent_id)
 										); ?>
 								</div>
 							</div>
@@ -153,13 +155,15 @@
 								<div class="col-lg-<?php echo $columns[2] ?>">
 									<div class="form-group">
 										<label>ZGV Master Datum: </label>
-										<?php if ($infoonly):
-											echo date_format(date_create($zgvpruefung->zgvmadatum), 'd.m.Y');
+										<?php
+										$zgvmadatum = empty($zgvpruefung->zgvmadatum) ? "" : date_format(date_create($zgvpruefung->zgvmadatum), 'd.m.Y');
+										if ($infoonly):
+											echo $zgvmadatum;
 										else:
 											?>
 											<input type="text"
 												   class="dateinput form-control"
-												   value="<?php echo empty($zgvpruefung->zgvmadatum) ? "" : date_format(date_create($zgvpruefung->zgvmadatum), 'd.m.Y') ?>"
+												   value="<?php echo $zgvmadatum ?>"
 												   name="zgvmadatum">
 										<?php endif; ?>
 									</div>
@@ -183,7 +187,12 @@
 						<?php endif; ?>
 						<?php if (!$infoonly): ?>
 							<div class="row">
-								<div class="col-lg-12 text-right">
+								<div class="col-lg-6 text-left">
+									<button type="button" class="btn btn-default zgvUebernehmen" id="zgvUebernehmen_<?php echo $zgvpruefung->prestudent_id ?>">
+										Letzte ZGV &uuml;bernehmen
+									</button>
+								</div>
+								<div class="col-lg-6 text-right">
 									<button type="submit" class="btn btn-default">
 										Speichern
 									</button>
@@ -203,7 +212,7 @@
 								<div class="form-inline">
 									<form method="post"
 										  action="../saveAbsage/<?php echo $zgvpruefung->prestudent_id ?>">
-										<div class="input-group" id="statusgrselect">
+										<div class="input-group" id="statusgrselect_<?php echo $zgvpruefung->prestudent_id ?>">
 											<select name="statusgrund"
 													class="d-inline float-right"
 													required>
@@ -216,15 +225,15 @@
 												<?php endforeach ?>
 											</select>
 											<span class="input-group-btn">
-																				<button id="absageBtn" type="button"
-																						class="btn btn-default"
-																						data-toggle="modal"
-																						data-target="#absageModal">
-																					Absage
-																				</button>
-																			</span>
+												<button id="absageBtn" type="button"
+														class="btn btn-default"
+														data-toggle="modal"
+														data-target="#absageModal_<?php echo $zgvpruefung->prestudent_id ?>">
+													Absage
+												</button>
+											</span>
 										</div>
-										<div class="modal fade" id="absageModal"
+										<div class="modal fade absageModal" id="absageModal_<?php echo $zgvpruefung->prestudent_id ?>"
 											 tabindex="-1"
 											 role="dialog"
 											 aria-labelledby="absageModalLabel"
@@ -280,12 +289,12 @@
 								<div>
 									<button type="button" class="btn btn-default"
 											data-toggle="modal"
-											data-target="#freigabeModal">
+											data-target="#freigabeModal_<?php echo $zgvpruefung->prestudent_id ?>">
 										Freigabe an Studiengang
 									</button>
 								</div>
 							</div>
-							<div class="modal fade" id="freigabeModal" tabindex="-1"
+							<div class="modal fade" id="freigabeModal_<?php echo $zgvpruefung->prestudent_id ?>" tabindex="-1"
 								 role="dialog"
 								 aria-labelledby="freigabeModalLabel"
 								 aria-hidden="true">

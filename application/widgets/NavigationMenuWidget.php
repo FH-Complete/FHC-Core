@@ -41,7 +41,7 @@ class NavigationMenuWidget extends Widget
 
 		echo '<li class="'.$expanded.'">';
 
-		if (isset($item['subscriptLink']) && isset($item['subscriptDescription']))
+		if (isset($item['subscriptLinkId']) && isset($item['subscriptDescription']))
 		{
 			echo '<span>';
 		}
@@ -62,12 +62,12 @@ class NavigationMenuWidget extends Widget
 
 		echo '</a>';
 
-		if (isset($item['subscriptLink']) && isset($item['subscriptDescription']))
+		if (isset($item['subscriptLinkId']) && isset($item['subscriptDescription']))
 		{
-			echo '<a class="menuSubscriptLink" href="'.$item['subscriptLink'].'">'.$item['subscriptDescription'].'</a>';
+			echo '<a id="'.$item['subscriptLinkId'].'" class="menuSubscriptLink" value="'.$item['subscriptLinkValue'].'" href="#">'.$item['subscriptDescription'].'</a>';
 		}
 
-		if (isset($item['subscriptLink']) && isset($item['subscriptDescription']))
+		if (isset($item['subscriptLinkId']) && isset($item['subscriptDescription']))
 		{
 			echo '</span>';
 		}

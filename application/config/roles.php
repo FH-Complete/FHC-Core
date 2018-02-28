@@ -55,7 +55,8 @@ $config['roles'] = array
 		(
 			'basis/adresse','basis/akte','basis/kontakt','basis/log','basis/nation','basis/notiz','basis/notizzuordnung',
 			'basis/person','basis/prestudent','basis/prestudentstatus','basis/status','basis/zgv','basis/zgvmaster',
-			'lehre/studienplan','system/filters','fs/dms','basis/message','basis/benutzerrolle', 'basis/sprache'
+			'lehre/studienplan','system/filters','fs/dms','basis/message','basis/benutzerrolle', 'basis/sprache',
+			'system/personlock','basis/benutzerfunktion','system/vorlagestudiengang'
 		)
 	)
 );

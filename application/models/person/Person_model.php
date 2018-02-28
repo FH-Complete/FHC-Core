@@ -209,5 +209,4 @@ class Person_model extends DB_Model
 
 		return $this->loadWhere(array('uid' => $uid));
 	}
-
 }

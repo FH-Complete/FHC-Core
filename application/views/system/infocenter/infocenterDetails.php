@@ -1,19 +1,27 @@
 <?php
-$this->load->view(
-	'templates/FHC-Header',
-	array(
-		'title' => 'InfocenterDetails',
-		'jquery' => true,
-		'bootstrap' => true,
-		'fontawesome' => true,
-		'jqueryui' => true,
-		'tablesorter' => true,
-		'tinymce' => true,
-		'sbadmintemplate' => true,
-		'customCSSs' => array('skin/admintemplate.css', 'skin/tablesort_bootstrap.css'),
-		'customJSs' => 'include/js/bootstrapper.js'
-	)
-);
+	$this->load->view(
+		'templates/FHC-Header',
+		array(
+			'title' => 'InfocenterDetails',
+			'jquery' => true,
+			'bootstrap' => true,
+			'fontawesome' => true,
+			'jqueryui' => true,
+			'tablesorter' => true,
+			'tinymce' => true,
+			'sbadmintemplate' => true,
+			'customCSSs' =>
+				array(
+					'skin/admintemplate.css',
+					'skin/tablesort_bootstrap.css'
+				),
+			'customJSs' =>
+				array(
+					'include/js/bootstrapper.js',
+					'include/js/tablesort/tablesort.js',
+					'include/js/infocenter/infocenterDetails.js')
+				)
+	);
 ?>
 <body>
 <div id="wrapper">
@@ -28,13 +36,27 @@ $this->load->view(
 	?>
 	<div id="page-wrapper">
 		<div class="container-fluid">
-			<div class="row">
-				<div class="col-lg-12">
-					<h3 class="page-header">Infocenter
-						Details: <?php echo $stammdaten->vorname.' '.$stammdaten->nachname ?>
-					</h3>
+			<input type="hidden" id="hiddenpersonid" value="<?php echo $stammdaten->person_id ?>">
+			<div class="row<?php if($lockedbyother) echo ' alert-danger' ?>">
+				<div class="col-lg-8">
+							<h3 class="page-header">
+							Infocenter Details: <?php echo $stammdaten->vorname.' '.$stammdaten->nachname ?>
+							</h3>
+				</div>
+				<div class="col-lg-4">
+					<div class="headerright text-right">
+						wird bearbeitet von:
+						<?php
+							if(isset($lockedby)):
+								echo $lockedby;
+						?>
+						&nbsp;&nbsp;
+						<a href="../unlockPerson/<?php echo $stammdaten->person_id; ?>"><i class="fa fa-sign-out"></i>&nbsp;Freigeben</a>
+						<?php endif; ?>
+					</div>
 				</div>
 			</div>
+			<br />
 			<section>
 				<div class="row">
 					<div class="col-lg-12">
@@ -124,27 +146,9 @@ $this->load->view(
 </div> <!-- ./wrapper -->
 
 <script>
-
 	$(document).ready(
 		function ()
 		{
-			//initialise table sorter
-			addTablesorter("doctable", [[2, 1], [1, 0]], ["zebra"]);
-			addTablesorter("nachgdoctable", [[2, 0], [1, 1]], ["zebra"]);
-			addTablesorter("msgtable", [[0, 1], [2, 0]], ["zebra", "filter"]);
-			addTablesorter("logtable", [[0, 1]], ["filter"]);
-			addTablesorter("notiztable", [[0, 1]], ["filter"]);
-
-			//add pager
-			togglePager(23, "logtable", "logpager");
-			togglePager(10, "notiztable", "notizpager");
-
-			//initialise datepicker
-			$.datepicker.setDefaults($.datepicker.regional['de']);
-			$(".dateinput").datepicker({
-				"dateFormat": "dd.mm.yy"
-			});
-
 			//add click events to "formal geprüft" checkboxes
 			<?php foreach($dokumente as $dokument): ?>
 
@@ -157,75 +161,8 @@ $this->load->view(
 			}
 			<?php endforeach ?>
 
-			//prevent opening modal when Statusgrund not chosen
-			$("#absageModal").on('show.bs.modal', function (e)
-				{
-					if ($("[name=statusgrund]").val() === "null")
-					{
-						$("#statusgrselect").addClass("has-error");
-						return e.preventDefault();
-					}
-				}
-			);
-
-			$("[name=statusgrund]").change(function ()
-				{
-					$("#statusgrselect").removeClass("has-error");
-				}
-			);
 		}
 	);
-
-	function addTablesorter(tableid, sortList, widgets)
-	{
-		$("#" + tableid).tablesorter(
-			{
-				theme: "default",
-				dateFormat: "ddmmyyyy",
-				sortList: sortList,
-				widgets: widgets
-			}
-		);
-
-		//hide filters if less than 2 datarows (+ 2 for headings and filter row itself)
-		if ($("#" + tableid + " tr").length < 4)
-		{
-			$("#" + tableid + " tr.tablesorter-filter-row").hide();
-		}
-	}
-
-	function togglePager(size, tableid, pagerid)
-	{
-		var html =
-			'<div id="' + pagerid + '" class="pager"> ' +
-			'<form class="form-inline">' +
-			'<i class="fa fa-step-backward first"></i>&nbsp;' +
-			'<i class="fa fa-backward prev"></i>' +
-			'<span class="pagedisplay"></span>' +
-			'<i class="fa fa-forward next"></i>&nbsp;' +
-			'<i class="fa fa-step-forward last"></i>' +
-			'</form>' +
-			'</div>';
-
-		var rowcount = $("#" + tableid + " tr").length;
-
-		//not show pager if on first table page
-		if (rowcount > size)
-		{
-			var table = $("#" + tableid);
-			table.after(html);
-
-			table.tablesorterPager(
-				{
-					container: $("#" + pagerid),
-					size: size,
-					cssDisabled: 'disabled',
-					savePages: false,
-					output: '{startRow} – {endRow} / {totalRows} Zeilen'
-				}
-			);
-		}
-	}
 </script>
 </body>
 

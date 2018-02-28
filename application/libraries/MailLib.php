@@ -58,6 +58,14 @@ class MailLib
 				$alias = $this->alias_from_system;
 			}
 		}
+		if (defined('MAIL_FROM') && MAIL_FROM != '')
+		{
+			$from = MAIL_FROM;
+			if (is_null($alias) || $alias == '')
+			{
+				$alias = $this->alias_from_system;
+			}
+		}
 
 		$this->ci->email->from($from, $alias);
 
@@ -65,12 +73,14 @@ class MailLib
 		$recipient = $to;
 		$recipientCC = $cc;
 		$recipientBCC = $bcc;
-		if ($this->validateEmailAddress(MAIL_DEBUG))
+		if (defined('MAIL_DEBUG') && MAIL_DEBUG != '')
 		{
 			// if is it valid use it!!!
 			$recipient = MAIL_DEBUG;
-			$recipientCC = MAIL_DEBUG;
-			$recipientBCC = MAIL_DEBUG;
+			if ($recipientCC != '')
+				$recipientCC = MAIL_DEBUG;
+			if ($recipientBCC != '')
+				$recipientBCC = MAIL_DEBUG;
 		}
 
 		$this->ci->email->to($recipient);
