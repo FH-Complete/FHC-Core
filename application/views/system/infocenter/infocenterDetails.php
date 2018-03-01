@@ -10,6 +10,7 @@
 			'tablesorter' => true,
 			'tinymce' => true,
 			'sbadmintemplate' => true,
+			'addons' => true,
 			'customCSSs' =>
 				array(
 					'skin/admintemplate.css',

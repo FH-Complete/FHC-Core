@@ -58,6 +58,7 @@
 				<tr>
 					<td><?php echo ucfirst($kontakt->kontakttyp); ?></td>
 					<td>
+						<?php echo '<span class="'.$kontakt->kontakttyp.'">';?>
 						<?php if ($kontakt->kontakttyp === 'email'): ?>
 						<a href="mailto:<?php echo $kontakt->kontakt; ?>" target="_top">
 							<?php
@@ -67,6 +68,7 @@
 							?>
 						</a>
 					<?php endif; ?>
+					<?php echo '</span>'?>
 					</td>
 					<td><?php echo $kontakt->anmerkung; ?></td>
 				</tr>
