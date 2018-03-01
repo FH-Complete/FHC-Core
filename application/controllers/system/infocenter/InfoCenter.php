@@ -641,6 +641,13 @@ class InfoCenter extends VileSci_Controller
 			show_error($notizen->retval);
 		}
 
+		$notizen_bewerbung = $this->NotizModel->getNotizByTitel($person_id, 'Anmerkung zur Bewerbung');
+
+		if (isError($notizen_bewerbung))
+		{
+			show_error($notizen_bewerbung->retval);
+		}
+
 		$user_person = $this->PersonModel->getByUid($this->uid);
 
 		if (isError($user_person))
@@ -659,6 +666,7 @@ class InfoCenter extends VileSci_Controller
 			'messages' => $messages->retval,
 			'logs' => $logs,
 			'notizen' => $notizen->retval,
+			'notizenbewerbung' => $notizen_bewerbung->retval,
 			'messagelink' => $messagelink
 		);
 
