@@ -125,10 +125,10 @@ class Filters extends VileSci_Controller
 
 			if ($pos !== false)
 			{
-				$json->selectedFiltersAliases[] = $json->selectedFilters[$i];
+				$json->selectedFiltersAliases[$i] = $json->selectedFilters[$i];
 				if ($json->allColumnsAliases != null && is_array($json->allColumnsAliases))
 				{
-					$json->selectedFiltersAliases[] = $json->allColumnsAliases[$pos];
+					$json->selectedFiltersAliases[$i] = $json->allColumnsAliases[$pos];
 				}
 
 				$json->selectedFiltersMetaData[] = $metaData[$pos];
