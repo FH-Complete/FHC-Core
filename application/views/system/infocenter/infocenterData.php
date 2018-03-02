@@ -83,7 +83,7 @@
 				) AS "AnzahlAbgeschickt",
 				array_to_string(
 					(
-					SELECT array_agg(distinct tbl_studiengang.kurzbzlang)
+					SELECT array_agg(distinct UPPER(tbl_studiengang.typ || tbl_studiengang.kurzbz))
 					FROM
 						public.tbl_prestudentstatus pss
 						INNER JOIN public.tbl_prestudent ps USING(prestudent_id)
@@ -99,7 +99,7 @@
 							WHERE ende >= NOW()
 						)
 					LIMIT 1
-					),\',\'
+					),\', \'
 				) AS "StgAbgeschickt",
 				pl.zeitpunkt AS "LockDate",
 				pl.lockuser as "LockUser"
@@ -141,6 +141,8 @@
 		'hideSave' => false,
 		'checkboxes' => 'PersonId',
 		'additionalColumns' => array('Details'),
+		'columnsAliases' => array('PersonID','Vorname','Nachname','GebDatum','Letzte Aktion','Letzter Bearbeiter',
+			'StSem','GesendetAm','NumAbgeschickt','Studiengänge','Sperrdatum','GesperrtVon'),
 		'formatRaw' => function($datasetRaw) {
 
 			$datasetRaw->{'Details'} = sprintf(
@@ -153,10 +155,18 @@
 			{
 				$datasetRaw->{'SendDate'} = 'Not sent';
 			}
+			else
+			{
+				$datasetRaw->{'SendDate'} = date_format(date_create($datasetRaw->{'SendDate'}),'Y-m-d H:i');
+			}
 
 			if ($datasetRaw->{'LastAction'} == null)
 			{
-				$datasetRaw->{'LastAction'} = 'Not logged';
+				$datasetRaw->{'LastAction'} = '-';
+			}
+			else
+			{
+				$datasetRaw->{'LastAction'} = date_format(date_create($datasetRaw->{'LastAction'}),'Y-m-d H:i');
 			}
 
 			if ($datasetRaw->{'User/Operator'} == '')
@@ -166,12 +176,12 @@
 
 			if ($datasetRaw->{'LockDate'} == null)
 			{
-				$datasetRaw->{'LockDate'} = 'Not locked';
+				$datasetRaw->{'LockDate'} = '-';
 			}
 
 			if ($datasetRaw->{'LockUser'} == null)
 			{
-				$datasetRaw->{'LockUser'} = 'Not locked';
+				$datasetRaw->{'LockUser'} = '-';
 			}
 
 			if ($datasetRaw->{'StgAbgeschickt'} == null)

@@ -2,8 +2,8 @@
 
 	.filter-name-title {
 		font-family: inherit;
-		font-size: 20px;
-		font-weight: bold;
+		font-size: 16px;
+		/*font-weight: bold;*/
 		line-height: 1.1;
 		color: black;
 	}
