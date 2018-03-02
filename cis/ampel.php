@@ -28,43 +28,62 @@ if(is_user_logged_in())
 	$ampel = new ampel();
 	$ampel->loadUserAmpel($user);
 	$rot=0;
-	$gelb=0;
+	$gelb = 0; 
+	$gruen = 0;
 	$verpflichtend = false;
+	$cnt_verpflichtend = 0;			
+	$cnt_abgelaufen = 0;			
+	$cnt_notConf_notOverdue = 0;	//counts mandatory, not confirmed && not overdued ampeln (for popup)
+	
 	$datum = new datum();
+	$now = $datum->mktime_fromdate(date('Y-m-d'));
 	foreach($ampel->result as $row)
-	{
-		$ts_deadline = $datum->mktime_fromdate($row->deadline);
-		$vlz = "-".$row->vorlaufzeit." day";
-		$ts_vorlaufzeit = strtotime($vlz, $ts_deadline);
-		$ts_now = $datum->mktime_fromdate(date('Y-m-d'));
-		if($ts_deadline < $ts_now)
-		{
-			$rot++;
-			if ($row->verpflichtend == 't')
-				$verpflichtend = true;
-		}
-		else
-		{
-			if($ts_vorlaufzeit<=$ts_now && $ts_now<=$ts_deadline)
-			{
-				$gelb++;
-				if ($row->verpflichtend == 't')
-					$verpflichtend = true;
-			}
-		}
-	}
-	if($rot==0 && $gelb==0)
-		echo '<a href="private/tools/ampelverwaltung.php" target="content" title="'.$p->t("tools/ampelsystem").'"><span style="color: #A5AFB6">'.$p->t("tools/ampelsystem").'</span></a>&nbsp;&nbsp;<span style="color: #A5AFB6">|</span>&nbsp;&nbsp;';
+	{		
+		$deadline =$datum->mktime_fromdate($row->deadline);
+		$vorlaufzeit = $row->vorlaufzeit;
+		$verfallszeit = $row->verfallszeit;
+		$bestaetigt = $ampel->isBestaetigt($user, $row->ampel_id);
+		$verpflichtend = $row->verpflichtend;
+		$abgelaufen = false;
 		
-	if($rot>0 || $gelb>0)
-	{
-		// Wenn es eine verpflichtende Ampel gibt, das Pupup im CIS anzeigen
-		if ($verpflichtend == true)
-		{
+		$datum_liegt_vor_vorlaufzeit = false;
+		$datum_liegt_nach_verfallszeit = false;
+		
+		if (!is_null($vorlaufzeit))
+			$datum_liegt_vor_vorlaufzeit = $now < strtotime('-' .  $vorlaufzeit . ' day', $deadline); 
+		
+		if (!is_null($verfallszeit))
+			$datum_liegt_nach_verfallszeit = $now > strtotime('+' . $verfallszeit . ' day', $deadline);
+		
+		//count mandatory
+		if($verpflichtend == 't')
+			$cnt_verpflichtend++;
+		
+		//count overdue
+		if ($datum_liegt_nach_verfallszeit)
+			$cnt_abgelaufen++;
+
+		//set status
+		if ($bestaetigt)
+			$gruen++;	
+		else if ($now >= $deadline && !$datum_liegt_nach_verfallszeit && !$bestaetigt) 
+			$rot++;
+		else if (!$datum_liegt_nach_verfallszeit && !$datum_liegt_vor_vorlaufzeit)
+			$gelb++;	
+		
+		//count mandatory ampeln that are not confirmed and not overdue (for popup)
+		if ($verpflichtend == 't' && !$bestaetigt && !$datum_liegt_nach_verfallszeit && !$datum_liegt_vor_vorlaufzeit)
+			$cnt_notConf_notOverdue++;		
+	}
+
+	
+	// Wenn es eine verpflichtende Ampel gibt, das Pupup im CIS anzeigen
+	if ($cnt_notConf_notOverdue > 0)
+	{	
 			echo '	<script>
 					$(document).ready(function()
 					{
-						var html_content = \'<iframe src="'.APP_ROOT.'cis/private/tools/ampelverwaltung.php" name="ampel" frameborder="0" width="95%" height="95%"></iframe><button id="close_button" onclick="hide_ampel_div()">Close</button>\';
+						var html_content = \'<iframe src="'.APP_ROOT.'cis/private/tools/ampelverwaltung.php?verpflichtend=true" name="ampel" frameborder="0" width="95%" height="95%"></iframe><button id="close_button" onclick="hide_ampel_div()">Close</button>\';
 						$("#ampel_div").html(html_content);
 					});
 					</script>';
@@ -101,15 +120,17 @@ if(is_user_logged_in())
 					}
 					</style>';
 		}
-		if($rot>0)
+	
+		//show & color header ampel-link
+		if($rot > 0)
 			echo '<a href="private/tools/ampelverwaltung.php" target="content" title="'.$p->t("tools/ampelsystem").'"><span style="color: red;">'.$p->t("tools/ampelsystem").'</span></a>&nbsp;&nbsp;<span style="color: #A5AFB6">|</span>&nbsp;&nbsp;';
-		elseif($gelb>0)
+		elseif($gelb > 0)
 			echo '<a href="private/tools/ampelverwaltung.php" target="content" title="'.$p->t("tools/ampelsystem").'"><span style="color: orange;">'.$p->t("tools/ampelsystem").'</span></a>&nbsp;&nbsp;<span style="color: #A5AFB6">|</span>&nbsp;&nbsp;';
-	}
-}
+		elseif($rot==0 || $rot <= $cnt_abgelaufen && $gelb==0)
+			echo '<a href="private/tools/ampelverwaltung.php" target="content" title="'.$p->t("tools/ampelsystem").'"><span style="color: #A5AFB6">'.$p->t("tools/ampelsystem").'</span></a>&nbsp;&nbsp;<span style="color: #A5AFB6">|</span>&nbsp;&nbsp;';	
+		}
 else
 {
-	echo "<script>window.setTimeout('loadampel()',5000);</script>";
-	//echo microtime();
+	echo "<script>window.setTimeout('loadampel()',1000);</script>";
 }
 ?>

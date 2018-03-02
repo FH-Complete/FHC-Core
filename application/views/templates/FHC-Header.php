@@ -15,6 +15,7 @@ $fontawesome = isset($fontawesome) ? $fontawesome : false;
 $tablesorter = isset($tablesorter) ? $tablesorter : false;
 $tinymce = isset($tinymce) ? $tinymce : false;
 $sbadmintemplate = isset($sbadmintemplate) ? $sbadmintemplate : false;
+$addons = isset($addons) ? $addons : false;
 
 /**
  * Print the given title of the page
@@ -74,6 +75,16 @@ function _generateJSsInclude($JSs)
 			echo $toPrint;
 		}
 	}
+}
+
+/**
+ * Generates global JS-Object to pass parms to addon-js-functions
+ */
+function _generateAddonDataStorageObject()
+{
+	echo '<script type="text/javascript">';
+	echo 'var FHC_ADDON_DATA_STORAGE_OBJECT = {app_root:"'.APP_ROOT.'"};';
+	echo "</script>\n";
 }
 
 ?>
@@ -140,6 +151,28 @@ function _generateJSsInclude($JSs)
 			{
 				_generateJSsInclude('vendor/BlackrockDigital/startbootstrap-sb-admin-2/vendor/metisMenu/metisMenu.min.js');
 				_generateJSsInclude('vendor/BlackrockDigital/startbootstrap-sb-admin-2/dist/js/sb-admin-2.min.js');
+			}
+
+			// load addon hooks JS
+			if ($addons === true)
+			{
+				_generateAddonDataStorageObject();
+
+				$aktive_addons = array_filter(explode(";", ACTIVE_ADDONS));
+				$called_from = $this->router->directory.$this->router->class.'/'.$this->router->method;
+				foreach ($aktive_addons as $addon)
+				{
+					$hookfile = DOC_ROOT.'addons/'.$addon.'/hooks.config.inc.php';
+					if (file_exists($hookfile))
+					{
+						include($hookfile);
+						if (key_exists($called_from, $js_hooks))
+						{
+							foreach ($js_hooks[$called_from] as $js_file)
+								_generateJSsInclude('addons/'.$addon.'/'.$js_file);
+						}
+					}
+				}
 			}
 
 			// Eventually required JS

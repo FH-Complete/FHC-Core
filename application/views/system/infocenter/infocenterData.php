@@ -1,7 +1,7 @@
 <?php
 
 	$APP = 'infocenter';
-
+	$NOTBEFORE = '2018-03-01 18:00:00';
 	$filterWidgetArray = array(
 		'query' => '
 		SELECT
@@ -36,6 +36,11 @@
 					AND pss.bestaetigtam IS NULL
 					AND ps.person_id = p.person_id
 					AND tbl_studiengang.typ in(\'b\')
+					AND studiensemester_kurzbz IN (
+						SELECT studiensemester_kurzbz
+						FROM public.tbl_studiensemester
+						WHERE ende >= NOW()
+					)
 					ORDER BY pss.datum DESC, pss.insertamum DESC, pss.ext_id DESC
 					LIMIT 1
 				) AS "Studiensemester",
@@ -46,9 +51,15 @@
 						INNER JOIN public.tbl_prestudent ps USING(prestudent_id)
 						JOIN public.tbl_studiengang USING(studiengang_kz)
 					WHERE pss.status_kurzbz = \'Interessent\'
-						AND pss.bewerbung_abgeschicktamum IS NOT NULL
+						AND (pss.bewerbung_abgeschicktamum IS NOT NULL AND pss.bewerbung_abgeschicktamum>=\''.$NOTBEFORE.'\')
+						AND pss.bestaetigtam IS NULL
 						AND ps.person_id = p.person_id
 						AND tbl_studiengang.typ in(\'b\')
+						AND studiensemester_kurzbz IN (
+							SELECT studiensemester_kurzbz
+							FROM public.tbl_studiensemester
+							WHERE ende >= NOW()
+						)
 					ORDER BY pss.datum DESC, pss.insertamum DESC, pss.ext_id DESC
 					LIMIT 1
 				) AS "SendDate",
@@ -59,28 +70,41 @@
 						INNER JOIN public.tbl_prestudent ps USING(prestudent_id)
 						JOIN public.tbl_studiengang USING(studiengang_kz)
 					WHERE pss.status_kurzbz = \'Interessent\'
-						AND pss.bewerbung_abgeschicktamum IS NOT NULL
+						AND (pss.bewerbung_abgeschicktamum IS NOT NULL AND pss.bewerbung_abgeschicktamum>=\''.$NOTBEFORE.'\')
+						AND pss.bestaetigtam IS NULL
 						AND ps.person_id = p.person_id
 						AND tbl_studiengang.typ in(\'b\')
+						AND studiensemester_kurzbz IN (
+							SELECT studiensemester_kurzbz
+							FROM public.tbl_studiensemester
+							WHERE ende >= NOW()
+						)
 					LIMIT 1
 				) AS "AnzahlAbgeschickt",
 				array_to_string(
 					(
-					SELECT array_agg(tbl_studiengang.kurzbzlang)
+					SELECT array_agg(distinct tbl_studiengang.kurzbzlang)
 					FROM
 						public.tbl_prestudentstatus pss
 						INNER JOIN public.tbl_prestudent ps USING(prestudent_id)
 						JOIN public.tbl_studiengang USING(studiengang_kz)
 					WHERE pss.status_kurzbz = \'Interessent\'
-						AND pss.bewerbung_abgeschicktamum IS NOT NULL
+						AND (pss.bewerbung_abgeschicktamum IS NOT NULL AND pss.bewerbung_abgeschicktamum>=\''.$NOTBEFORE.'\')
+						AND pss.bestaetigtam IS NULL
 						AND ps.person_id = p.person_id
 						AND tbl_studiengang.typ in(\'b\')
+						AND studiensemester_kurzbz IN (
+							SELECT studiensemester_kurzbz
+							FROM public.tbl_studiensemester
+							WHERE ende >= NOW()
+						)
 					LIMIT 1
 					),\',\'
 				) AS "StgAbgeschickt",
-				pl.zeitpunkt AS "LockDate"
+				pl.zeitpunkt AS "LockDate",
+				pl.lockuser as "LockUser"
 			FROM public.tbl_person p
-		LEFT JOIN (SELECT person_id, zeitpunkt FROM system.tbl_person_lock WHERE app = \''.$APP.'\') pl USING(person_id)
+		LEFT JOIN (SELECT person_id, zeitpunkt, uid as lockuser FROM system.tbl_person_lock WHERE app = \''.$APP.'\') pl USING(person_id)
 			WHERE
 				EXISTS(
 					SELECT 1
@@ -103,7 +127,7 @@
 							WHERE
 								prestudent_id = tbl_prestudent.prestudent_id
 								AND status_kurzbz = \'Interessent\'
-								AND bestaetigtam IS NULL
+								AND (bestaetigtam IS NULL AND (bewerbung_abgeschicktamum is null OR bewerbung_abgeschicktamum>=\''.$NOTBEFORE.'\'))
 								AND studiensemester_kurzbz IN (
 									SELECT studiensemester_kurzbz
 									FROM public.tbl_studiensemester
@@ -115,58 +139,51 @@
 		',
 		'hideHeader' => false,
 		'hideSave' => false,
-		'checkboxes' => array('PersonId'),
+		'checkboxes' => 'PersonId',
 		'additionalColumns' => array('Details'),
-		'formatRaw' => function($fieldName, $fieldValue, $datasetRaw) {
+		'formatRaw' => function($datasetRaw) {
 
-			if ($fieldName == 'Details')
+			$datasetRaw->{'Details'} = sprintf(
+				'<a href="%s%s">Details</a>',
+				base_url('index.ci.php/system/infocenter/InfoCenter/showDetails/'),
+				$datasetRaw->{'PersonId'}
+			);
+
+			if ($datasetRaw->{'SendDate'} == null)
 			{
-				$link = '<a href="%s%s">Details</a>';
-
-				$datasetRaw->{$fieldName} = sprintf(
-					$link,
-					base_url('index.ci.php/system/infocenter/InfoCenter/showDetails/'),
-					$datasetRaw->PersonId
-				);
+				$datasetRaw->{'SendDate'} = 'Not sent';
 			}
 
-			if ($fieldName == 'SendDate')
+			if ($datasetRaw->{'LastAction'} == null)
 			{
-				if ($datasetRaw->{$fieldName} == '01.01.1970 01:00:00')
-				{
-					$datasetRaw->{$fieldName} = 'Not sent';
-				}
+				$datasetRaw->{'LastAction'} = 'Not logged';
 			}
 
-			if ($fieldName == 'LastAction')
+			if ($datasetRaw->{'User/Operator'} == '')
 			{
-				if ($datasetRaw->{$fieldName} == '01.01.1970 01:00:00')
-				{
-					$datasetRaw->{$fieldName} = 'Not logged';
-				}
+				$datasetRaw->{'User/Operator'} = 'NA';
 			}
 
-			if ($fieldName == 'User/Operator')
+			if ($datasetRaw->{'LockDate'} == null)
 			{
-				if ($datasetRaw->{$fieldName} == '')
-				{
-					$datasetRaw->{$fieldName} = 'NA';
-				}
+				$datasetRaw->{'LockDate'} = 'Not locked';
 			}
 
-			if ($fieldName == 'LockDate')
+			if ($datasetRaw->{'LockUser'} == null)
 			{
-				if ($datasetRaw->{$fieldName} == '01.01.1970 01:00:00')
-				{
-					$datasetRaw->{$fieldName} = 'Not locked';
-				}
+				$datasetRaw->{'LockUser'} = 'Not locked';
+			}
+
+			if ($datasetRaw->{'StgAbgeschickt'} == null)
+			{
+				$datasetRaw->{'StgAbgeschickt'} = 'N/A';
 			}
 
 			return $datasetRaw;
 		},
 		'markRow' => function($datasetRaw) {
 
-			if ($datasetRaw->LockDate != '')
+			if ($datasetRaw->LockDate != null)
 			{
 				return FilterWidget::DEFAULT_MARK_ROW_CLASS;
 			}

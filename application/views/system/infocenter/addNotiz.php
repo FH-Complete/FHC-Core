@@ -1,4 +1,4 @@
-<form method="post" action="../saveNotiz/<?php echo $stammdaten->person_id ?>">
+<form method="post" action="#" id="notizform">
 	<div class="form-group">
 		<div class="text-center">
 			<label>Notiz hinzuf&uuml;gen</label>

@@ -175,12 +175,12 @@ $datum_obj = new datum();
 				<td rowspan="3"><textarea name="benutzer_select" cols="60" rows="5" required>'.htmlspecialchars($ampel->benutzer_select).'</textarea></td>
 				<td></td>
 				<td valign="middle">Vorlaufzeit (in Tagen)</td>
-				<td valign="middle"><input type="text" name="vorlaufzeit" size="4" maxlength="4" value="'.htmlspecialchars($ampel->vorlaufzeit).'" required></td>
+				<td valign="middle"><input type="text" name="vorlaufzeit" size="4" maxlength="4" value="'.htmlspecialchars($ampel->vorlaufzeit).'"></td>
 			</tr>
 			<tr valign="top">
 				<td></td>
 				<td>Verfallszeit (in Tagen)</td>
-				<td><input type="text" name="verfallszeit" size="4" maxlength="4" value="'.htmlspecialchars($ampel->verfallszeit).'" required></td>
+				<td><input type="text" name="verfallszeit" size="4" maxlength="4" value="'.htmlspecialchars($ampel->verfallszeit).'"></td>
 			</tr>
 			<tr valign="top">
 				<td></td>

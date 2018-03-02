@@ -51,6 +51,14 @@ $this->phrasen['tools/waehlenSieEineOEoderAmpel']='Please select an organization
 $this->phrasen['tools/uebersichtLeitung']='Overview of notifications for Heads of Departments';
 $this->phrasen['tools/alleAnzeigen']='Show all';
 $this->phrasen['tools/nurAktuellesStudiensemester']='Show current semester only';
+$this->phrasen['tools/ampelAnzeigeFuer']='Show';
+$this->phrasen['tools/ampelAlleAnzeigen']='all';
+$this->phrasen['tools/ampelNurAktuellesStudiensemester']='actual term';
+$this->phrasen['tools/ampelPopupTitel']='Mandatory Notifications that need to be confirmed';
+$this->phrasen['tools/ampelBitteBestaetigen']='Please confirm now!';
+$this->phrasen['tools/ampelAbgelaufenTitel']='Notifications expired or confirmed';
+$this->phrasen['tools/ampelAbgelaufenTxt']='Notifications can still be read, but not confirmed anymore.';
+$this->phrasen['tools/ampelBestaetigtAbgelaufen']='Almost confirmed or expired';
 
 //Software fuer Lehre -> Softgrid
 $this->phrasen['tools/applikationsliste']='List of Applications';

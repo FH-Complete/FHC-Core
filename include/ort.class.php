@@ -518,7 +518,7 @@ class ort extends basis_db
 			$ort_obj->stockwerk			= $row->stockwerk;
 			$ort_obj->standort_id		= $row->standort_id;
 			$ort_obj->telefonklappe		= $row->telefonklappe;
-			//$ort_obj->content_id		= $row->content_id;
+			$ort_obj->content_id		= $row->content_id;
 			$ort_obj->m2 				= $row->m2;
 			$ort_obj->gebteil 			= $row->gebteil;
 			$ort_obj->oe_kurzbz 		= $row->oe_kurzbz;

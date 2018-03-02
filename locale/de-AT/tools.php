@@ -49,8 +49,14 @@ $this->phrasen['tools/ampelBereitsBestaetigt']='Diese Ampel wurde bereits bestä
 $this->phrasen['tools/dasAmpelsystemIstEinErinnerungsystem']='Das Ampelsystem ist ein ERINNERUNGS- und BESTÄTIGUNGSSYSTEM, welches Sie auf ausstehende Aufgaben aufmerksam machen soll.';
 $this->phrasen['tools/waehlenSieEineOEoderAmpel']='Bitte wählen Sie ein Organisationseinheit und/oder eine Ampel aus dem Dropdown';
 $this->phrasen['tools/uebersichtLeitung']='Ampel-Übersicht für LeiterInnen';
-$this->phrasen['tools/ampelAlleAnzeigen']='Alle anzeigen';
-$this->phrasen['tools/ampelNurAktuellesStudiensemester']='Nur aktuelles Studiensemester anzeigen';
+$this->phrasen['tools/ampelAnzeigeFuer']='Anzeige für';
+$this->phrasen['tools/ampelAlleAnzeigen']='alle';
+$this->phrasen['tools/ampelNurAktuellesStudiensemester']='aktuelles Studiensemester';
+$this->phrasen['tools/ampelPopupTitel']='Nachrichten, die verpflichtend bestätigt werden müssen';
+$this->phrasen['tools/ampelBitteBestaetigen']='Bitte bestätigen Sie diese jetzt:';
+$this->phrasen['tools/ampelAbgelaufenTitel']='Abgelaufene oder bereits bestätigte Ampeln';
+$this->phrasen['tools/ampelAbgelaufenTxt']='Sie können diese Ampeln weiterhin lesen, aber nicht mehr bestätigen.';
+$this->phrasen['tools/ampelBestaetigtAbgelaufen']='Bereits bestätigt oder abgelaufen';
 
 //Software fuer Lehre -> Softgrid
 $this->phrasen['tools/applikationsliste']='Applikationsliste';

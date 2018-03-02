@@ -26,6 +26,7 @@
 		margin-left: 3px;
 		margin-right: 3px;
 		padding: 10px;
+		top: 10px;
 	}
 
 	.filter-select-field-dnd-span:hover {
@@ -56,105 +57,58 @@
 		border-right: 2px solid #428bca;
 	}
 
+	.select-filter-operation {
+		display: inline;
+		width: 130px;
+	}
+
+	.select-filter-operation-value {
+		display: inline;
+		width: 400px;
+	}
+
+	.select-filter-option {
+		display: inline;
+		width: 90px;
+	}
+
+	#addField {
+		display: inline;
+		width: 400px;
+	}
+
+	#addFilter {
+		display: inline;
+		width: 400px;
+	}
+
+	#selectedFilters {
+		margin-bottom: 20px;
+	}
+
+	#customFilterDescription {
+		display: inline;
+		width: 400px;
+	}
+
 </style>
 <script language="Javascript" type="text/javascript">
 
 	$(document).ready(function() {
 
-		$(".filter-select-field-dnd-span").draggable({
-			containment: "parent",
-			cursor: "move",
-			opacity: 0.4,
-			revert: "invalid",
-			revertDuration: 200
-		});
-
-		$(".filter-select-field-dnd-span").droppable({
-			accept: ".filter-select-field-dnd-span",
-			over: function(event, ui) {
-				$(this).on("mousemove", function( event ) {
-					var padding = 20;
-					var elementCenter = $(this).offset().left + (padding + $(this).width() / 2);
-
-					console.log(elementCenter);
-					console.log(event.pageX);
-
-					if (event.pageX > elementCenter)
-					{
-						$(this).addClass("selection-after");
-						$(this).removeClass("selection-before");
-					}
-					else if (event.pageX < elementCenter)
-					{
-						$(this).addClass("selection-before");
-						$(this).removeClass("selection-after");
-					}
-				});
-			},
-			out: function(event, ui) {
-				$(this).off("mousemove");
-				$(this).removeClass("selection-before");
-				$(this).removeClass("selection-after");
-			},
-			drop: function(event, ui) {
-				var padding = 20;
-				var elementCenter = $(this).offset().left + (padding + $(this).width() / 2);
-
-				if (event.pageX > elementCenter)
-				{
-					$(this).insertBefore(ui.draggable);
+		$("#removeFilterById").click(function() {
+			$.ajax({
+				url: "<?php echo base_url('index.ci.php/system/Filters/deleteCustomFilter'); ?>",
+				method: "POST",
+				data: {
+					filter_id: $(this).attr('value')
 				}
-				else if (event.pageX < elementCenter)
-				{
-					$(this).insertAfter(ui.draggable);
-				}
-
-				$(this).off("mousemove");
-				$(this).removeClass("selection-before");
-				$(this).removeClass("selection-after");
-			}
-		});
-
-		$("#addField").change(function() {
-			$("#filterForm").submit();
-		});
-
-		$(".remove-field").each(function() {
-			$(this).click(function() {
-				$("#rmField").val($(this).attr('fieldToRemove'));
-				$("#filterForm").submit();
+			})
+			.done(function(data, textStatus, jqXHR) {
+				alert("Filter successfully removed");
+			}).fail(function(jqXHR, textStatus, errorThrown) {
+				alert(textStatus);
 			});
-		});
-
-		$("#addFilter").change(function() {
-			$("#filterForm").submit();
-		});
-
-		$(".remove-filter").each(function() {
-			$(this).click(function() {
-				$("#rmFilter").val($(this).attr('filterToRemove'));
-				$("#filterForm").submit();
-			});
-		});
-
-		$(".select-filter-operation").change(function() {
-			$("#filterForm").submit();
-		});
-
-		$(".select-filter-operation-value").keydown(function(event) {
-			if (event.which == 13)
-			{
-				$("#filterForm").submit();
-			}
-		});
-
-		$("#saveCustomFilterButton").click(function() {
-			$("#saveCustomFilter").val(true);
-			$("#filterForm").submit();
-		});
-
-		$("#applyFilter").click(function() {
-			$("#filterForm").submit();
 		});
 
 		$("[data-toggle='collapse']").click(function() {
@@ -182,49 +136,47 @@
 </script>
 <div class="row">
 	<div class="col-lg-12">
-		<form class="form-inline" id="filterForm" method="POST" action="<?php echo current_url(); ?>">
 
-			<?php FilterWidget::displayFilterName(); ?>
+		<?php FilterWidget::displayFilterName(); ?>
 
-			<div class="panel-group">
-				<div class="panel panel-default">
-					<div class="panel-heading">
-						<h4 class="panel-title">
-							<a data-toggle="collapse" href="#collapseFilterHeader">Filter options</a>
-						</h4>
-					</div>
-					<div id="collapseFilterHeader" class="panel-collapse collapse">
-						<div class="filters-hidden-panel">
-							<div>
-								<?php FilterWidget::loadViewSelectFields($listFields); ?>
-							</div>
+		<div class="panel-group">
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<h4 class="panel-title">
+						<a data-toggle="collapse" href="#collapseFilterHeader">Filter options</a>
+					</h4>
+				</div>
+				<div id="collapseFilterHeader" class="panel-collapse collapse">
+					<div class="filters-hidden-panel">
+						<div>
+							<?php FilterWidget::loadViewSelectFields(); ?>
+						</div>
 
-							<br>
+						<br>
 
-							<div>
-								<?php FilterWidget::loadViewSelectFilters($metaData); ?>
-							</div>
+						<div>
+							<?php FilterWidget::loadViewSelectFilters(); ?>
+						</div>
 
-							<br>
+						<br>
 
-							<div>
-								<?php FilterWidget::loadViewSaveFilter(); ?>
-							</div>
+						<div>
+							<?php FilterWidget::loadViewSaveFilter(); ?>
 						</div>
 					</div>
 				</div>
 			</div>
+		</div>
 
-			<br>
+		<br>
 
-			<div id="datasetActionsTop"></div>
+		<div id="datasetActionsTop"></div>
 
-			<div>
-				<?php FilterWidget::loadViewTableDataset($dataset); ?>
-			</div>
+		<div>
+			<?php FilterWidget::loadViewTableDataset(); ?>
+		</div>
 
-			<div id="datasetActionsBottom"></div>
+		<div id="datasetActionsBottom"></div>
 
-		</form>
 	</div>
 </div>

@@ -330,10 +330,11 @@ function searchOrt($search)
 		<table class="tablesorter" id="orttable">
 			<thead>
 				<tr>
-					<th>',$p->t('global/ort'),'</th>
+					<th>',$p->t('lvplan/raum'),'</th>
 					<th>',$p->t('global/bezeichnung'),'</th>
-					<th>',$p->t('tools/maxPersonen'),'</th>
-					<th>',$p->t('tools/telefonklappe'),'</th>';
+					<th>',$p->t('lvplan/anzahlPersonen'),'</th>
+					<th>',$p->t('tools/telefonklappe'),'</th>
+					<th>',$p->t('lvplan/rauminformationenAnzeigen'),'</th>';
 					if ($raumres)
 						echo '<th>',$p->t('tools/reservieren'),'</th>';
 					else
@@ -348,6 +349,7 @@ function searchOrt($search)
 			echo '<td>',$row->bezeichnung,'</td>';
 			echo '<td>',$row->max_person,'</td>';
 			echo '<td>',$row->telefonklappe,'</td>';
+			echo '<td>'.($row->content_id != '' ?'<a href="../../../cms/content.php?content_id='.$row->content_id.'" target="_self">'.$p->t('lvplan/rauminformationenAnzeigen').'</a>':'-').'</td>';
 			if ($raumres)
 				echo '<td><a href="../../../cis/private/lvplan/stpl_week.php?type=ort&ort_kurzbz='.$row->ort_kurzbz.'">'.$p->t('tools/reservieren').'</a></td>';
 			else
@@ -455,6 +457,7 @@ function searchContent($searchItems)
 	global $db,$p,$sprache,$uid;
 	$cms = new content();
 	$cms->search($searchItems, 21);
+	$content_id_arr = array();
 
 	if(count($cms->result) > 0)
 	{
@@ -480,18 +483,24 @@ function searchContent($searchItems)
 				$berechtigt = $berechtigt->berechtigt($row->content_id, $uid);
 				if ($berechtigt)
 				{
+					// Jede Content_ID nur einmal ausgeben
+					if (in_array($row->content_id, $content_id_arr))
+						continue;
+					
 					echo '<li><div class="suchergebnis">';
 					echo '<a href="../../../cms/content.php?content_id=',$db->convert_html_chars($row->content_id),'&sprache=',$db->convert_html_chars($row->sprache),'">',$db->convert_html_chars($row->titel),'</a><br>';
 					$preview = findAndMark($row->content, $searchItems);
 
 					echo $preview;
 					echo '<br /><br /></div></li>';
+					$content_id_arr[] .= $row->content_id;
 				}
 			}
 		}
 		echo '</ul>';
 		$anzeigesprache='';
-		foreach($cms->result as $row)
+		$content_id_arr = array();
+		foreach ($cms->result as $row)
 		{
 			if ($sprache != $row->sprache)
 			{
@@ -506,12 +515,17 @@ function searchContent($searchItems)
 				$berechtigt = $berechtigt->berechtigt($row->content_id, $uid);
 				if ($berechtigt)
 				{
+					// Jede Content_ID nur einmal ausgeben
+					if (in_array($row->content_id, $content_id_arr))
+						continue;
+					
 					echo '<li><div class="suchergebnis">';
 					echo '<a href="../../../cms/content.php?content_id=',$db->convert_html_chars($row->content_id),'&sprache=',$db->convert_html_chars($row->sprache),'">',$db->convert_html_chars($row->titel),'</a><br>';
 					$preview = findAndMark($row->content, $searchItems);
 
 					echo $preview;
 					echo '<br /><br /></div></li>';
+					$content_id_arr[] .= $row->content_id;
 				}
 			}
 		}
