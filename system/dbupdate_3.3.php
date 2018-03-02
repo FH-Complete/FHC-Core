@@ -1682,7 +1682,89 @@ if($result = $db->db_query("SELECT obj_description('public.ci_apikey'::regclass)
 			else
 				echo 'Kommentare fuer DB Datenbanktabellen hinzugefügt';
 		}
+	}
+}
 
+if($result = @$db->db_query("SELECT * FROM system.tbl_filters WHERE filter_kurzbz='InfoCenterSentApplicationAll' AND app='infocenter'"))
+{
+	if($db->db_num_rows($result)==0)
+	{
+		$qry = "INSERT INTO system.tbl_filters(app, dataset_name, filter_kurzbz, person_id, description, sort,
+										default_filter, filter, oe_kurzbz)
+				VALUES ('infocenter', 'PersonActions', 'InfoCenterSentApplicationAll', NULL, '{Alle}', 1, false,
+					'{\"name\": \"Abgeschickt - Alle\", \"columns\": [{\"name\": \"Vorname\"},
+					{\"name\": \"Nachname\"}, {\"name\": \"LastAction\"}, {\"name\": \"LockUser\"},
+					{\"name\": \"Studiensemester\"}, {\"name\": \"SendDate\"}, {\"name\": \"StgAbgeschickt\"}],
+					\"filters\": [{\"name\": \"AnzahlAbgeschickt\", \"option\": \"\",
+					\"condition\": \"0\", \"operation\": \"gt\"}]}', NULL);";
+		if(!$db->db_query($qry))
+			echo '<strong>Filter: '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>Filter InfoCenterSentApplicationAll hinzugefuegt';
+	}
+}
+
+if($result = @$db->db_query("SELECT * FROM system.tbl_filters WHERE filter_kurzbz='InfoCenterSentApplication3days' AND app='infocenter'"))
+{
+	if($db->db_num_rows($result)==0)
+	{
+		$qry = "INSERT INTO system.tbl_filters(app, dataset_name, filter_kurzbz, person_id, description, sort,
+					default_filter, filter, oe_kurzbz)
+				VALUES ('infocenter', 'PersonActions', 'InfoCenterSentApplication3days', NULL,
+					'{\"3 Tage keine Aktion\"}', 2, false, '{\"name\": \"Abgeschickt - 3 Tage keine Aktion\",
+					\"columns\": [{\"name\": \"Vorname\"}, {\"name\": \"Nachname\"}, {\"name\": \"LastAction\"},
+					{\"name\": \"LockUser\"}, {\"name\": \"Studiensemester\"}, {\"name\": \"SendDate\"},
+					{\"name\": \"StgAbgeschickt\"}],
+					\"filters\": [{\"name\": \"LastAction\", \"option\": \"days\", \"condition\": \"3\",
+					\"operation\": \"gt\"}, {\"name\": \"AnzahlAbgeschickt\", \"option\": \"\",
+					\"condition\": \"0\", \"operation\": \"gt\"}]}', NULL);";
+
+		if(!$db->db_query($qry))
+			echo '<strong>Filter: '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>Filter InfoCenterSentApplication3days hinzugefuegt';
+	}
+}
+
+if($result = @$db->db_query("SELECT * FROM system.tbl_filters WHERE filter_kurzbz='InfoCenterNotSentApplicationAll' AND app='infocenter'"))
+{
+	if($db->db_num_rows($result)==0)
+	{
+		$qry = "INSERT INTO system.tbl_filters(app, dataset_name, filter_kurzbz, person_id, description, sort,
+				default_filter, filter, oe_kurzbz)
+				VALUES ('infocenter', 'PersonActions', 'InfoCenterNotSentApplicationAll', NULL, '{Alle}', 1, false,
+				'{\"name\": \"Nicht abgeschickt - Alle\", \"columns\": [{\"name\": \"Vorname\"},
+				{\"name\": \"Nachname\"}, {\"name\": \"LastAction\"}, {\"name\": \"LockUser\"},
+				{\"name\": \"Studiensemester\"}, {\"name\": \"SendDate\"}, {\"name\": \"StgAbgeschickt\"}],
+				\"filters\": [{\"name\": \"SendDate\", \"option\": \"\",
+				\"condition\": \"\", \"operation\": \"nset\"}]}', NULL);";
+
+		if(!$db->db_query($qry))
+			echo '<strong>Filter: '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>Filter InfoCenterNotSentApplicationAll hinzugefuegt';
+	}
+}
+
+if($result = @$db->db_query("SELECT * FROM system.tbl_filters WHERE filter_kurzbz='InfoCenterNotSentApplication14Days' AND app='infocenter'"))
+{
+	if($db->db_num_rows($result)==0)
+	{
+		$qry = "INSERT INTO system.tbl_filters(app, dataset_name, filter_kurzbz, person_id, description, sort,
+					default_filter, filter, oe_kurzbz)
+				VALUES ('infocenter', 'PersonActions', 'InfoCenterNotSentApplication14Days', NULL,
+				'{\"14 Tage keine Aktion\"}', 2, false, '{\"name\": \"Nicht abgeschickt - 14 Tage keine Aktion\",
+				\"columns\": [{\"name\": \"Vorname\"}, {\"name\": \"Nachname\"}, {\"name\": \"LastAction\"},
+				{\"name\": \"LockUser\"}, {\"name\": \"Studiensemester\"}, {\"name\": \"SendDate\"},
+				{\"name\": \"StgAbgeschickt\"}], \"filters\": [{\"name\": \"LastAction\", \"option\": \"days\",
+				\"condition\": \"14\", \"operation\": \"gt\"}, {\"name\": \"SendDate\", \"option\": \"\",
+				\"condition\": \"\", \"operation\": \"nset\"}]}', NULL);
+		";
+
+		if(!$db->db_query($qry))
+			echo '<strong>Filter: '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>Filter InfoCenterNotSentApplication14Days hinzugefuegt';
 	}
 }
 
