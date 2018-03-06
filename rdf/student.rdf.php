@@ -50,6 +50,7 @@ require_once('../include/reihungstest.class.php');
 require_once('../include/studienordnung.class.php');
 require_once('../include/studienplan.class.php');
 require_once('../include/kontakt.class.php');
+require_once('../include/notiz.class.php');
 
 // *********** Funktionen *************************
 function convdate($date)
@@ -242,6 +243,10 @@ function draw_content($row)
 		$stgl .= trim(($i>0?', ':'').$stgl_ma->titelpre.' '.$stgl_ma->vorname.' '.$stgl_ma->nachname.' '.$stgl_ma->titelpost);
 		$i++;
 	}
+	
+	// Anzahl Notizen der Person laden
+	$notiz = new notiz();
+	$anzahl_notizen = $notiz->getAnzahlNotizen(null, null, null, null, null, $row->person_id, null, null, null, null, null);
 
 	if($row->prestudent_id!='')
 	{
@@ -300,6 +305,7 @@ function draw_content($row)
 			<STUDENT:studiengang_kz_student><![CDATA['.(is_a($row,'student')?$row->studiengang_kz:'').']]></STUDENT:studiengang_kz_student>
 			<STUDENT:matr_nr><![CDATA['.$row->matr_nr.']]></STUDENT:matr_nr>
 			<STUDENT:studiengang_studiengangsleitung><![CDATA['.$stgl.']]></STUDENT:studiengang_studiengangsleitung>
+			<STUDENT:anzahl_notizen><![CDATA['.$anzahl_notizen.']]></STUDENT:anzahl_notizen>
 	';
 	}
 }

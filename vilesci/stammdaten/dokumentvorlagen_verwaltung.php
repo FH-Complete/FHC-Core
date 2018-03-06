@@ -252,13 +252,13 @@ if ((isset($_GET['neueVorlage']) && $_GET['neueVorlage'] == 'true'))
 					<tr>
 						<td>Vorlagenkurzbezeichnung</td>
 						<td>
-							<input type="text" size="64" maxlength="64" name="neueVorlage_vorlage_kurzbz">
+							<input type="text" size="50" maxlength="32" name="neueVorlage_vorlage_kurzbz">
 						</td>
 					</tr>
 					<tr>
 						<td>Bezeichnung</td>
 						<td>
-							<textarea cols="80" rows="4" name="neueVorlage_bezeichnung"></textarea>
+							<input type="text" size="80" maxlength="64" name="neueVorlage_bezeichnung">
 						</td>
 					</tr>
 					<tr>
@@ -270,7 +270,7 @@ if ((isset($_GET['neueVorlage']) && $_GET['neueVorlage'] == 'true'))
 					<tr>
 						<td>Mimetype</td>
 						<td>
-							<textarea cols="80" rows="4" name="neueVorlage_mimetype">application/vnd.oasis.opendocument.text</textarea>
+							<input type="text" size="80" maxlength="64" name="neueVorlage_mimetype" value="application/vnd.oasis.opendocument.text">
 						</td>
 					</tr>
 					<tr>
@@ -293,13 +293,13 @@ elseif (isset($_GET['vorlageBearbeiten']))
 					<tr>
 						<td>Vorlagenkurzbezeichnung</td>
 						<td>
-							<input type="text" size="64" maxlength="64" name="updateVorlage_vorlage_kurzbz" value="'.$db->convert_html_chars($vorlage->vorlage_kurzbz).'" disabled>
+							<input type="text" size="50" maxlength="32" name="updateVorlage_vorlage_kurzbz" value="'.$db->convert_html_chars($vorlage->vorlage_kurzbz).'" disabled>
 						</td>
 					</tr>
 					<tr>
 						<td>Bezeichnung</td>
 						<td>
-							<textarea cols="80" rows="4" name="updateVorlage_bezeichnung">'.$db->convert_html_chars($vorlage->bezeichnung).'</textarea>
+							<input type="text" size="80" maxlength="64" name="updateVorlage_bezeichnung" value="'.$db->convert_html_chars($vorlage->bezeichnung).'">
 						</td>
 					</tr>
 					<tr>
@@ -311,7 +311,7 @@ elseif (isset($_GET['vorlageBearbeiten']))
 					<tr>
 						<td>Mimetype</td>
 						<td>
-							<textarea cols="80" rows="4" name="updateVorlage_mimetype">'.$db->convert_html_chars($vorlage->mimetype).'</textarea>
+							<input type="text" size="80" maxlength="64" name="updateVorlage_mimetype" value="'.$db->convert_html_chars($vorlage->mimetype).'">
 						</td>
 					</tr>
 					<tr>
