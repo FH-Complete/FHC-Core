@@ -690,7 +690,7 @@ class MessageLib
 
 					// Sending email
 					$sent = $this->ci->maillib->send(
-						$sender,
+						null,
 						$receiverContact,
 						is_null($subject) ? $result->retval[0]->subject : $subject, // if parameter subject is not null, use it!
 						$bodyMsg,

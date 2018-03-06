@@ -10,6 +10,7 @@
 			'tablesorter' => true,
 			'tinymce' => true,
 			'sbadmintemplate' => true,
+			'addons' => true,
 			'customCSSs' =>
 				array(
 					'skin/admintemplate.css',
@@ -37,35 +38,35 @@
 	<div id="page-wrapper">
 		<div class="container-fluid">
 			<input type="hidden" id="hiddenpersonid" value="<?php echo $stammdaten->person_id ?>">
-			<div class="row<?php if($lockedbyother) echo ' alert-danger' ?>">
+			<div class="row<?php if ($lockedbyother) echo ' alert-danger' ?>">
 				<div class="col-lg-8">
-							<h3 class="page-header">
-							Infocenter Details: <?php echo $stammdaten->vorname.' '.$stammdaten->nachname ?>
-							</h3>
+					<h3 class="page-header">
+						Infocenter Details: <?php echo $stammdaten->vorname.' '.$stammdaten->nachname ?>
+					</h3>
 				</div>
 				<div class="col-lg-4">
 					<div class="headerright text-right">
 						wird bearbeitet von:
 						<?php
-							if(isset($lockedby)):
-								echo $lockedby;
-						?>
-						&nbsp;&nbsp;
-						<a href="../unlockPerson/<?php echo $stammdaten->person_id; ?>"><i class="fa fa-sign-out"></i>&nbsp;Freigeben</a>
+						if (isset($lockedby)):
+							echo $lockedby;
+							?>
+							&nbsp;&nbsp;
+							<a href="../unlockPerson/<?php echo $stammdaten->person_id; ?>"><i
+										class="fa fa-sign-out"></i>&nbsp;Freigeben</a>
 						<?php endif; ?>
 					</div>
 				</div>
 			</div>
-			<br />
+			<br/>
 			<section>
 				<div class="row">
 					<div class="col-lg-12">
 						<div class="panel panel-primary">
 							<div class="panel-heading text-center"><h4>Stammdaten</h4></div>
 							<div class="panel-body">
-								<div class="row">
-									<?php $this->load->view('system/infocenter/stammdaten.php'); ?>
-								</div> <!-- ./row -->
+								<?php $this->load->view('system/infocenter/stammdaten.php'); ?>
+								<?php $this->load->view('system/infocenter/anmerkungenZurBewerbung.php'); ?>
 							</div> <!-- ./panel-body -->
 						</div> <!-- ./panel -->
 					</div> <!-- ./main column -->
@@ -109,9 +110,9 @@
 							</div>
 							<div class="panel-body">
 								<div class="row">
-										<?php
-										$this->load->view('system/messageList.php', $messages);
-										?>
+									<?php
+									$this->load->view('system/messageList.php', $messages);
+									?>
 								</div>
 							</div>
 						</div>
@@ -130,10 +131,10 @@
 								<div class="row">
 									<div class="col-lg-6">
 										<div id="addnotiz">
-										<?php $this->load->view('system/infocenter/addNotiz.php'); ?>
+											<?php $this->load->view('system/infocenter/addNotiz.php'); ?>
 										</div>
 										<div id="notizen">
-										<?php $this->load->view('system/infocenter/notizen.php'); ?>
+											<?php $this->load->view('system/infocenter/notizen.php'); ?>
 										</div>
 									</div>
 									<div class="col-lg-6" id="logs">

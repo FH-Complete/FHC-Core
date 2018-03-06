@@ -196,13 +196,16 @@
 					var fieldName = data.allSelectedFields[i];
 					var fieldToDisplay = data.allSelectedFields[i];
 
-					if (data.allColumnsAliases != null && $.isArray(data.allColumnsAliases))
+					if (data.selectedFields.indexOf(fieldName) < 0)
 					{
-						fieldToDisplay = data.allColumnsAliases[i];
-					}
+						if (data.allColumnsAliases != null && $.isArray(data.allColumnsAliases))
+						{
+							fieldToDisplay = data.allColumnsAliases[i];
+						}
 
-					strDropDown = '<option value="' + fieldName + '">' + fieldToDisplay + '</option>';
-					$("#addField").append(strDropDown);
+						strDropDown = '<option value="' + fieldName + '">' + fieldToDisplay + '</option>';
+						$("#addField").append(strDropDown);
+					}
 				}
 			}
 

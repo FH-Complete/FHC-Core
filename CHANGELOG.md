@@ -13,7 +13,9 @@
 - **[FAS]** Bei Statuswechsel von Studierenden können Gründe für den Statuswechsel angegeben werden
 - **[ADDONS]** Addons können Menüpunkte im Vilesci anpassen
 - **[ADDONS]** Addons können Noten für die Gesamtnote vorschlagen
-- **[CORE]** UserDefinedFields
+- **[CORE]** UserDefinedFields hinzugefügt zur Verwalung von eigenen Eingabefeldern
+- **[CORE]** Support für Extensions hinzugefügt - eine Weiterentwicklung der Addons für die Verwendung mit Codeigniter
+- **[CORE]** Infocenter Seite hinzugefügt zur zentralen Verwaltung und ZGV Prüfung von Interessenten
 
 ### CHANGED
 - **[CORE]** Berechtigungsprüfung wurde angepasst damit deaktivierte Benutzer keine Berechtigungen mehr haben
@@ -27,6 +29,18 @@
 - **[CORE]** Moodle Schnittstelle wurde aus dem Core entfernt und in ein eigenes Addon verschoben. Moodle Versionen < 2.4 werden nicht mehr unterstützt
 - **[CORE]** Update campus.tbl_templates (contentmittitel and contentohnetitel) with system/templates/contentmittitel_xslt_xhtml.xslt andsystem/templates/contentohnetitel_xslt_xhtml.xslt
 - **[CORE]** Neue Style Anweisungen (div.header_logo, td.headerbar, div.cis_logo) müssen in Custom Stylesheet hinzugefügt werden
+
+### Deprecated
+- **[CORE]** Die folgenden Datenbank Tabellen und Spalten wurden als DEPRECATED markiert und werden mit der nächsten Version entfernt:
+	public.tbl_aufnahmeschluessel, public.tbl_aufnahmetermin, public.tbl_aufnahmetermintyp,	public.tbl_preinteressent,
+	public.tbl_preinteressentstudiengang, campus.tbl_feedback, campus.tbl_lvinfo, campus.tbl_resturlaub, lehre.tbl_lehrfach
+	lehre.tbl_lehrmittel, lehre.tbl_moodle, lehre.tbl_moodle_version, lehre.tbl_studienordnung_semester, lehre.tbl_zeitfenster
+	lehre.tbl_zeugnis, fue.tbl_scrumsprint, fue.tbl_scrumteam, wawi.tbl_aufteilung, wawi.tbl_aufteilung_default,
+	testtool.tbl_kategorie, testtool.tbl_kriterien, public.tbl_prestudent.rt_punkte1, public.tbl_prestudent.rt_punkte2
+	public.tbl_prestudent.rt_punkte3, public.tbl_prestudent.anmeldungreihungstest, public.tbl_prestudent.reihungstest_id
+	public.tbl_prestudent.ausstellungsstaat, public.tbl_prestudent.aufnahmeschluessel, lehre.tbl_lehrveranstaltung.old_lehrfach_id
+- **[CORE]** LV-Infos werden mit der kommenden Version aus dem Core entfernt - Dies ist jetzt ein Addon
+- **[CORE]** WaWi wird mit der kommenden Version aus dem Core entfernt- Dies ist jetzt ein Addon
 
 ## [3.2]
 

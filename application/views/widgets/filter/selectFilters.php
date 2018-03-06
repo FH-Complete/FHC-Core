@@ -216,20 +216,6 @@
 				var strDropDown = '<option value="">Select a filter to add...</option>';
 				$("#addFilter").append(strDropDown);
 
-				for (var i = 0; i < data.allSelectedFields.length; i++)
-				{
-					var fieldName = data.allSelectedFields[i];
-					var fieldToDisplay = data.allSelectedFields[i];
-
-					if (data.allColumnsAliases != null && $.isArray(data.allColumnsAliases))
-					{
-						fieldToDisplay = data.allColumnsAliases[i];
-					}
-
-					strDropDown = '<option value="' + fieldName + '">' + fieldToDisplay + '</option>';
-					$("#addFilter").append(strDropDown);
-				}
-
 				for (var i = 0; i < data.selectedFilters.length; i++)
 				{
 					var selectedFilters = '<div>';
@@ -252,6 +238,23 @@
 					selectedFilters += '</div>';
 
 					$("#selectedFilters").append(selectedFilters);
+				}
+
+				for (var i = 0; i < data.allSelectedFields.length; i++)
+				{
+					var fieldName = data.allSelectedFields[i];
+					var fieldToDisplay = data.allSelectedFields[i];
+
+					if (data.selectedFilters.indexOf(fieldName) < 0)
+					{
+						if (data.allColumnsAliases != null && $.isArray(data.allColumnsAliases))
+						{
+							fieldToDisplay = data.allColumnsAliases[i];
+						}
+
+						strDropDown = '<option value="' + fieldName + '">' + fieldToDisplay + '</option>';
+						$("#addFilter").append(strDropDown);
+					}
 				}
 			}
 
