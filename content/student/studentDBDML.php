@@ -1681,7 +1681,7 @@ if(!$error)
 							}
 						}
 						else
-							$errormsg .= "Der Student $uid ist bereits in dieser Gruppe\n";
+							$errormsg .= "Der Student $uid ist bereits im $benutzergruppe->studiensemester_kurzbz dieser Gruppe zugeteilt. Entfernen Sie vorher diese Zuteilung.\n";
 					}
 					else
 					{
