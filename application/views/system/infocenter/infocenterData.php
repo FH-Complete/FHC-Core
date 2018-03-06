@@ -12,7 +12,7 @@
 				(
 					SELECT zeitpunkt
 					FROM system.tbl_log
-					WHERE taetigkeit_kurzbz = \'bewerbung\'
+					WHERE taetigkeit_kurzbz IN(\'bewerbung\',\'kommunikation\')
 					AND person_id = p.person_id
 					ORDER BY zeitpunkt DESC
 					LIMIT 1
@@ -20,7 +20,7 @@
 				(
 					SELECT insertvon
 					FROM system.tbl_log
-					WHERE taetigkeit_kurzbz = \'bewerbung\'
+					WHERE taetigkeit_kurzbz IN(\'bewerbung\',\'kommunikation\')
 					AND person_id = p.person_id
 					ORDER BY zeitpunkt DESC
 					LIMIT 1
@@ -135,7 +135,7 @@
 							)
 					)
 				)
-			ORDER BY "LastAction" DESC
+			ORDER BY "LastAction" ASC
 		',
 		'hideHeader' => false,
 		'hideSave' => false,
