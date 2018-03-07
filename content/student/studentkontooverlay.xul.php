@@ -50,10 +50,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 			</columns>
 			<rows>
 				<row>
-					<hbox>
-						<spacer flex="1" />
-						<button id="student-konto-button-filter" value="alle" oncommand="StudentKontoFilter()" label="offene anzeigen" disabled="true"/>
-					</hbox>
+					<hbox></hbox>
 					<hbox>
 						<!--
 						<button id="student-konto-button-filterstudenten" oncommand="StudentKontoFilterStudenten('konto')" label="Studentenliste auf offene Buchungen filtern" tooltiptext="Liste aller Studenten mit offenen Buchungen"/>
@@ -64,7 +61,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 
 						<vbox>
 							<spacer flex="1" />
-							<label value="Liste auf nicht gebuchte"/>
+							<label value="Liste filtern auf nicht belastet: "/>
 							<sapcer flex="1" />
 						</vbox>
 						<vbox flex="1">
@@ -91,7 +88,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 					<hbox>
 						<vbox>
 							<spacer flex="1" />
-							<label value="Liste auf offene"/>
+							<label value="Liste filtern auf fehlende Gegenbuchungen: "/>
 							<sapcer flex="1" />
 						</vbox>
 						<vbox flex="1">
@@ -118,7 +115,13 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 
 				<row flex="1">
 					<vbox flex="1">
-						<label id="student-konto-label-filter" value="alle Buchungen:"/>
+						<hbox>
+							<button id="student-konto-button-filter" value="alle" oncommand="StudentKontoFilter()" label="Offene anzeigen" disabled="true"/>
+							<spacer flex="1" />
+						</hbox>
+
+						<label id="student-konto-label-filter" value="alle Buchungen:" hidden="true"/>
+
 						<tree id="student-konto-tree" seltype="multi" hidecolumnpicker="false" flex="1"
 							datasources="rdf:null" ref="http://www.technikum-wien.at/konto/liste"
 							style="margin-left:10px;margin-right:10px;margin-bottom:5px;margin-top: 10px;" enableColumnDrag="true"
@@ -195,7 +198,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 						<hbox>
 							<button id="student-konto-button-neu" label="Neu" oncommand="StudentKontoNeu();" disabled="true"/>
 							<button id="student-konto-button-gegenbuchung" label="Gegenbuchung" oncommand="StudentKontoGegenbuchung();" disabled="true"/>
-							<box class="Datum" id="student-konto-textbox-gegenbuchungsdatum" disabled="true"/>
+							<box class="Datum" id="student-konto-textbox-gegenbuchungsdatum" disabled="true" tooltiptext="Optionales Datum der Gegenbuchung"/>
 							<button id="student-konto-button-loeschen" label="Loeschen" oncommand="StudentKontoDelete();" disabled="true"/>
 							<spacer flex="1"/>
 							<button id="student-konto-button-zahlungsbestaetigung" label="Zahlungsbestaetigung drucken" oncommand="StudentKontoZahlungsbestaetigung();" disabled="true"/>

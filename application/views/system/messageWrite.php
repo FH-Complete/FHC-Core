@@ -136,8 +136,10 @@ $href = str_replace("/system/Messages/write", "/system/Messages/send", $_SERVER[
 								<div class="form-grop form-inline">
 									<label>Recipient:</label>
 									<select id="recipients">
-										<option value="-1">Select...</option>
-										<?php
+										<?php 
+										if (count($receivers) > 1)
+											echo '<option value="-1">Select...</option>';
+
 										$idtype = $personOnly === true ? 'person_id' : 'prestudent_id';
 										foreach ($receivers as $receiver)
 										{

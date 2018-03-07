@@ -7,9 +7,9 @@ class Vorlage_widget extends DropdownWidget
 		// All organization units to which the user belongs
 		$oe_kurzbz = $widgetData['oe_kurzbz'];
 		$idAdmin = $widgetData['isAdmin'];
-		
+
 		$vorlage = null;
-		
+
 		// If the user is an admin
 		if ($idAdmin === true)
 		{
@@ -23,17 +23,17 @@ class Vorlage_widget extends DropdownWidget
 			// organisation unit tree
 			$vorlage = $this->_getUserVorlage($oe_kurzbz);
 		}
-		
+
 		$this->setElementsArray(
 			$vorlage,
 			true,
 			'Select a vorlage...',
 			'No vorlage found'
 		);
-		
+
 		$this->loadDropDownView($widgetData);
     }
-    
+
     /**
      * Get all the vorlage with mimetype = text/html
      */
@@ -41,12 +41,12 @@ class Vorlage_widget extends DropdownWidget
     {
 		$this->load->model('system/Vorlage_model', 'VorlageModel');
 		$this->VorlageModel->addOrder('vorlage_kurzbz');
-		
+
 		$this->addSelectToModel($this->VorlageModel, 'vorlage_kurzbz', 'bezeichnung');
-		
+
 		return $this->VorlageModel->loadWhere(array('mimetype' => 'text/html'));
     }
-    
+
     /**
      * Get all the vorlage that belongs to the organisation units of the user
      * and the parents of those organisation units until the root of the
@@ -56,9 +56,9 @@ class Vorlage_widget extends DropdownWidget
     {
 		// Loads library OrganisationseinheitLib
         $this->load->library('OrganisationseinheitLib');
-        
+
 		$vorlage = success(array()); // Default value
-		
+
 		$table = '(
 					SELECT v.vorlage_kurzbz, v.bezeichnung, vs.version, vs.oe_kurzbz, vs.aktiv, vs.subject, vs.text, v.mimetype
 					FROM tbl_vorlagestudiengang vs INNER JOIN tbl_vorlage v USING(vorlage_kurzbz)
@@ -70,7 +70,7 @@ class Vorlage_widget extends DropdownWidget
 				AND templates.text IS NOT NULL
 				AND templates.mimetype = \'text/html\'';
 		$order_by = 'description ASC';
-		
+
 		if (!is_array($oe_kurzbz))
 		{
 			$vorlage = $this->organisationseinheitlib->treeSearchEntire(
@@ -95,14 +95,20 @@ class Vorlage_widget extends DropdownWidget
 					$order_by,
 					$val
 				);
-				
+
 				// Everything is ok and data are inside
 				if (hasData($tmpVorlage))
 				{
 					// If it's the first vorlage copy it
 					if (count($vorlage->retval) == 0)
 					{
-						$vorlage->retval = $tmpVorlage->retval;
+						for ($j = 0; $j < count($tmpVorlage->retval); $j++)
+						{
+							if ($tmpVorlage->retval[$j]->id != '')
+							{
+								array_push($vorlage->retval, $tmpVorlage->retval[$j]);
+							}
+						}
 					}
 					else // checks for duplicates, if it's not already present push it into the array $vorlage->retval
 					{
@@ -110,7 +116,8 @@ class Vorlage_widget extends DropdownWidget
 						{
 							for ($j = 0; $j < count($tmpVorlage->retval); $j++)
 							{
-								if ($vorlage->retval[$i]->_pk != $tmpVorlage->retval[$j]->_pk
+								if ($tmpVorlage->retval[$j]->id != ''
+									&& $vorlage->retval[$i]->_pk != $tmpVorlage->retval[$j]->_pk
 									&& $vorlage->retval[$i]->_ppk != $tmpVorlage->retval[$j]->_ppk
 									&& $vorlage->retval[$i]->_jtpk != $tmpVorlage->retval[$j]->_jtpk)
 								{
@@ -122,7 +129,7 @@ class Vorlage_widget extends DropdownWidget
 				}
 			}
 		}
-		
+
 		return $vorlage;
-    }
+	}
 }

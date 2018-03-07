@@ -1549,6 +1549,13 @@ function StudentAuswahl()
 	}
 
 	// Notizen laden
+	anzahl_notizen = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#anzahl_notizen" ));
+
+	if(anzahl_notizen == "0")
+		document.getElementById('student-tab-notizen').label = "Notizen";
+	else
+		document.getElementById('student-tab-notizen').label = " Notizen (" + anzahl_notizen + ")";
+
 	var studentnotiz = document.getElementById('student-box-notizen');
 	studentnotiz.LoadNotizTree('','','','',person_id,'','','','');
 
@@ -2328,13 +2335,13 @@ function StudentKontoFilter()
 	if(filter.value=='offene')
 	{
 		filter.value='alle';
-		filter.label='offene Anzeigen';
+		filter.label='Offene Anzeigen';
 		document.getElementById('student-konto-label-filter').value='alle Buchungen:';
 	}
 	else
 	{
 		filter.value='offene';
-		filter.label='alle Anzeigen';
+		filter.label='Alle Anzeigen';
 		document.getElementById('student-konto-label-filter').value='offene Buchungen:';
 	}
 

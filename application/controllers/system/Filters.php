@@ -74,24 +74,32 @@ class Filters extends VileSci_Controller
 		$allSelectedFields = $_SESSION[self::SESSION_NAME]['allSelectedFields'];
 		$allColumnsAliases = $_SESSION[self::SESSION_NAME]['allColumnsAliases'];
 
+		$json->selectedFields = $_SESSION[self::SESSION_NAME]['selectedFields'];
+		$json->columnsAliases = $_SESSION[self::SESSION_NAME]['columnsAliases'];
+
 		if (isset($selectedFieldsLst) && is_array($selectedFieldsLst))
 		{
-			$json->selectedFields = $_SESSION[self::SESSION_NAME]['selectedFields'] = $selectedFieldsLst;
+			$json->selectedFields = $selectedFieldsLst;
+			$json->columnsAliases = array();
 
 			for ($i = 0; $i < count($json->selectedFields); $i++)
 			{
 				$pos = array_search($json->selectedFields[$i], $allSelectedFields);
 
+				$json->columnsAliases[$i] = $json->selectedFields[$i];
+
 				if ($pos !== false)
 				{
-					$json->columnsAliases[] = $json->selectedFields[$i];
 					if ($allColumnsAliases != null && is_array($allColumnsAliases))
 					{
-						$json->columnsAliases[] = $allColumnsAliases[$pos];
+						$json->columnsAliases[$i] = $allColumnsAliases[$pos];
 					}
 				}
 			}
 		}
+
+		$_SESSION[self::SESSION_NAME]['selectedFields'] = $json->selectedFields;
+		$_SESSION[self::SESSION_NAME]['columnsAliases'] = $json->columnsAliases;
 
 		$this->output->set_content_type('application/json')->set_output(json_encode($json));
 	}
@@ -125,10 +133,10 @@ class Filters extends VileSci_Controller
 
 			if ($pos !== false)
 			{
-				$json->selectedFiltersAliases[] = $json->selectedFilters[$i];
+				$json->selectedFiltersAliases[$i] = $json->selectedFilters[$i];
 				if ($json->allColumnsAliases != null && is_array($json->allColumnsAliases))
 				{
-					$json->selectedFiltersAliases[] = $json->allColumnsAliases[$pos];
+					$json->selectedFiltersAliases[$i] = $json->allColumnsAliases[$pos];
 				}
 
 				$json->selectedFiltersMetaData[] = $metaData[$pos];

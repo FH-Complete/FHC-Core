@@ -459,6 +459,7 @@ else
 					<tabbox id="student-tabbox" flex="3" orient="vertical">
 						<tabs orient="horizontal" id="student-content-tabs">
 							<tab id="student-tab-detail" label="Details" />
+							<tab id="student-tab-notizen" label="Notizen"/>
 							<tab id="student-tab-kontakt" label="Kontakt" />
 							<tab id="student-tab-prestudent" label="PreStudent" />
 							<tab id="student-tab-dokumente" label="Dokumente" />
@@ -477,7 +478,6 @@ else
 							<tab id="student-tab-projektarbeit" label="Projektarbeit" />
 							<tab id="student-tab-gruppen" label="Gruppen" onclick="StudentGruppenLoadData();"/>
 							<tab id="student-tab-funktionen" label="Funktionen" onclick="StudentFunktionIFrameLoad();"/>
-							<tab id="student-tab-notizen" label="Notizen"/>
 							<tab id="student-tab-termine" label="LV-Termine" onclick="StudentTermineIFrameLoad();"/>
 							<?php
                             if($rechte->isBerechtigt('student/anwesenheit'))
@@ -497,6 +497,9 @@ else
 						</tabs>
 						<tabpanels id="student-tabpanels-main" flex="1">
 							<vbox id="student-detail"  style="margin-top:10px;" />
+							<vbox id="student-box-notiz">
+								<box class="Notiz" flex="1" id="student-box-notizen"/>
+							</vbox>
 							<iframe id="student-kontakt" src="" style="margin-top:10px;" />
 							<vbox id="student-prestudent"  style="margin-top:10px;" />
 							<vbox id="interessent-dokumente"  style="margin-top:10px;" />
@@ -515,9 +518,6 @@ else
 							<vbox id="student-projektarbeit"  style="margin-top:10px;" />
 							<vbox id="student-gruppen"  style="margin-top:10px;" />
 							<iframe id="student-funktionen" src="" style="margin-top:10px;" />
-							<vbox id="student-box-notiz">
-								<box class="Notiz" flex="1" id="student-box-notizen"/>
-							</vbox>
 							<iframe id="student-termine" src="" style="margin-top:10px;" />
 							<?php
                             if($rechte->isBerechtigt('student/anwesenheit'))
