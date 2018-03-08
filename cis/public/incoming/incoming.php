@@ -465,7 +465,7 @@ else if($method=="lehrveranstaltungen")
 					$message = '<span style="color: red"><b>'.($p->t('global/fehleraufgetreten')).'</b></span>';
 			}
 			else
-				$message = '<span style="color: red"><b>'.$p->t('incoming/lvVollBelegt').'</b></span>';
+				$message = '<span style="color: red"><b>'.$p->t('incoming/lvVollBelegt',array(MAIL_INTERNATIONAL)).'</b></span>';
 		}
 		// löschen der LV-ID
 		if($_GET['mode'] == "delete")
@@ -2145,7 +2145,7 @@ else if($method == 'ende')
 		$mail = new mail(MAIL_INTERNATIONAL, 'no-reply', 'Incoming '.$person->vorname.' '.$person->nachname.' vollstaendig', 'Bitte sehen Sie sich die Nachricht in HTML Sicht an, um den Link vollständig darzustellen.');
 		$mail->setHTMLContent($emailtext);
 		if(!$mail->send())
-			$message = '<span style="color: red"><b>'.($p->t('incoming/fehlerBeimSenden')).'</b></span>';
+			$message = '<span style="color: red"><b>'.($p->t('incoming/fehlerBeimSenden',array(MAIL_INTERNATIONAL))).'</b></span>';
 		else
 			$message = '<span style="color: green"><b>'.($p->t('incoming/erfolgreichAbgeschickt')).'</b></span>';
 

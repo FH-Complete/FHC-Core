@@ -134,9 +134,9 @@ $this->phrasen['incoming/tabelleSortierinformation']='Sie können die Spalten du
 $this->phrasen['incoming/waehlenSieAusDenOptionen']='Bitte wählen Sie die gewünschen Optionen aus dem DropDown und klicken Sie auf "Filter"';
 $this->phrasen['incoming/lvInfo']='LV-Info';
 $this->phrasen['incoming/erfolgreichAbgeschickt']='Ihre Bewerbung wurde erfolgreich abgeschickt. Die zuständige Assistenz wird sich in Kürze mit Ihnen in Verbindung setzen';
-$this->phrasen['incoming/fehlerBeimSenden']='Fehler beim Senden der Bewerbung. Bitte kontaktieren Sie <a href="mailto:'.MAIL_INTERNATIONAL.'">'.MAIL_INTERNATIONAL.'</a>';
+$this->phrasen['incoming/fehlerBeimSenden']='Fehler beim Senden der Bewerbung. Bitte kontaktieren Sie <a href="mailto:%s">%s</a>';
 $this->phrasen['incoming/jahreStudiertMussGanzeZahlSein']='Das Feld "Jahre studiert" muss eine ganze Zahl sein';
-$this->phrasen['incoming/lvVollBelegt']='Es sind mittlerweile keine freien Plätze mehr für diese Lehrveranstaltung verfügbar. Bei Rückfragen kontaktieren Sie bitte <a href="mailto:'.MAIL_INTERNATIONAL.'">'.MAIL_INTERNATIONAL.'</a>';
+$this->phrasen['incoming/lvVollBelegt']='Es sind mittlerweile keine freien Plätze mehr für diese Lehrveranstaltung verfügbar. Bei Rückfragen kontaktieren Sie bitte <a href="mailto:%s">%s</a>';
 $this->phrasen['incoming/beginnNichtInVergangenheit']='Das Beginndatum darf nicht in der Vergangenheit liegen';
 $this->phrasen['incoming/endeGroesserStart']='Das Endedatum darf nicht vor dem Beginndatum liegen';
 $this->phrasen['incoming/bitteGueltigesDatumEingeben']='Das Start- oder Endedatum muss im Format TT.MM.YYYY vorliegen';
