@@ -81,7 +81,13 @@ class frage extends basis_db
 			return false;
 		}
 
-		$qry = "SELECT * FROM testtool.tbl_frage LEFT OUTER JOIN testtool.tbl_frage_sprache USING (frage_id) WHERE frage_id=".$this->db_add_param($frage_id, FHC_INTEGER);
+		$qry = "SELECT
+					*
+				FROM
+					testtool.tbl_frage
+		 			LEFT OUTER JOIN testtool.tbl_frage_sprache USING (frage_id)
+				WHERE
+					frage_id=".$this->db_add_param($frage_id, FHC_INTEGER);
 
 		if($this->db_query($qry))
 		{
@@ -381,9 +387,9 @@ class frage extends basis_db
 	{
 		$qry = "SELECT * FROM testtool.tbl_frage_sprache JOIN testtool.tbl_frage USING(frage_id)
 				WHERE frage_id=".$this->db_add_param($frage_id, FHC_INTEGER)." AND sprache=".$this->db_add_param($sprache);
-				
+
 		if (!is_null($aktiv))
-			$qry .= " AND aktiv=".$aktiv;
+			$qry .= " AND aktiv=".($aktiv?'true':'false');
 
 		if($this->db_query($qry))
 		{
@@ -832,10 +838,10 @@ class frage extends basis_db
 			return false;
 		}
 	}
-	
+
 	/**
 	 * Gibt die Nummer der naechsten Frage zurueck (nicht fuer den test sondern fuer die testtool-administrationsseite)
-	 * 
+	 *
 	 * @param $frage_nummer Nummer der aktuellen Frage
 	 * @param $gebiet_id Gebiet der Fragen
 	 * @param $aktiv true wenn nur aktiv, false wenn nur inaktiv, null wenn beides
@@ -846,14 +852,14 @@ class frage extends basis_db
 		$qry = "SELECT nummer FROM testtool.tbl_frage
 				WHERE gebiet_id=".$this->db_add_param($gebiet_id, FHC_INTEGER)."
 				 AND nummer>".$this->db_add_param($frage_nummer, FHC_INTEGER);
-		
+
 		if (!is_null($aktiv) && $aktiv)
 			$qry .= " AND aktiv";
 		if (!is_null($aktiv) && !$aktiv)
 			$qry .= " AND NOT aktiv";
-		
+
 		$qry .=	" ORDER BY nummer ASC LIMIT 1"; //Es wird immer nur ein Maximum geben, deswegen kein max()
-			
+
 		if($this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object())
@@ -886,7 +892,7 @@ class frage extends basis_db
 			}
 			return $number;
 		}
-		else 
+		else
 		{
 			return false;
 		}

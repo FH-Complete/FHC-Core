@@ -61,7 +61,6 @@ if(isset($_GET['method']))
 		$breadcrumb = "> ".$p->t('incoming/lehrveranstaltungen');
 	elseif($method == 'files')
 		$breadcrumb = "> ".$p->t('incoming/dateien');
-
 }
 
 $zugangscode = $_SESSION['incoming/user'];
@@ -107,7 +106,6 @@ else
 $stsem = new studiensemester();
 $stsem->load($stsemAktOrNext);
 
-
 $stg = new studiengang();
 $stg->getAll();
 
@@ -135,12 +133,6 @@ $message = '';
 	<link href="../../../skin/style.css.php" rel="stylesheet" type="text/css">
 	<link rel="stylesheet" href="../../../skin/tablesort.css" type="text/css"/>
 	<script src="../../../include/js/tablesort/table.js" type="text/javascript"></script>
-	<!--<link rel="stylesheet" type="text/css" href="../../../skin/jquery-ui-1.9.2.custom.min.css">
-<script type="text/javascript" src="../../../vendor/jquery/jqueryV1/jquery-1.12.4.min.js"></script>
-<script type="text/javascript" src="../../../vendor/christianbach/tablesorter/jquery.tablesorter.min.js"></script>
-<script type="text/javascript" src="../../../vendor/components/jqueryui/jquery-ui.min.js"></script>
-<script type="text/javascript" src="../../../include/js/jquery.ui.datepicker.translation.js"></script>
-<script type="text/javascript" src="../../../vendor/jquery/sizzle/sizzle.js"></script>-->
 	<script type="text/javascript" src="../../vendor/jquery/jqueryV1/jquery-1.12.4.min.js"></script>
 	<script type="text/javascript" src="../../vendor/christianbach/tablesorter/jquery.tablesorter.min.js"></script>
 	<script type="text/javascript" src="../../vendor/components/jqueryui/jquery-ui.min.js"></script>
@@ -152,6 +144,7 @@ $message = '';
 		$.datepicker.setDefaults( $.datepicker.regional[ "" ] );
 		<?php //Wenn Deutsch ausgewaehlt, dann Datepicker auch in Deutsch
 		if ($sprache=="German")
+		{
 			echo '$.datepicker.setDefaults( $.datepicker.regional[ "de" ] );
 			$( "#datepicker" ).datepicker(
 				{
@@ -168,7 +161,9 @@ $message = '';
 					changeYear: true
 				}
 				);';
+		}
 		else
+		{
 			echo '$( "#datepicker" ).datepicker({
 				dateFormat: "dd.mm.yy",
 				changeMonth: true,
@@ -184,6 +179,7 @@ $message = '';
 					changeYear: true
 				}
 				);';
+		}
 		?>
 
 	});
@@ -203,13 +199,13 @@ echo '
 <script>
 $( document ).ready(function()
 {
-    if(typeof addon  !== \'undefined\')
-    {
-        for(i in addon)
-        {
-            addon[i].init("cis/public/incoming/incoming.php", {method:\''.$method.'\'});
-        }
-    }
+	if(typeof addon  !== \'undefined\')
+	{
+		for(i in addon)
+		{
+			addon[i].init("cis/public/incoming/incoming.php", {method:\''.$method.'\'});
+		}
+	}
 });
 function setBisdatum(datum)
 {
@@ -293,7 +289,7 @@ function setBisdatum(datum)
 			</tr>
 		</table>
 <?php
-if($method =="austauschprogram")
+if($method == "austauschprogram")
 {
 	// Speichert Austauschprogram in preincoming tabelle
 	if(isset($_POST['submit_program']))
@@ -377,11 +373,11 @@ if($method =="austauschprogram")
 						</tr>
 						<tr>
 							<td>'.$p->t('incoming/studiertvon').' </td>
-							<td><input type="text" id="von_datum" name="von" class="datepicker_exchange" size="10"  value="'.($preincoming->von != ''?$date->formatDatum($preincoming->von,'d.m.Y'):$_REQUEST['von']).'" onchange="setBisdatum(this.value)"> (dd.mm.yyyy)</td>
+							<td><input type="text" id="von_datum" name="von" class="datepicker_exchange" size="10"  value="'.($preincoming->von != ''?$date->formatDatum($preincoming->von,'d.m.Y'):(isset($_REQUEST['von'])?$_REQUEST['von']:'')).'" onchange="setBisdatum(this.value)"> (dd.mm.yyyy)</td>
 						</tr>
 						<tr>
 							<td>'.$p->t('incoming/studiertbis').' </td>
-							<td><input type="text" id="bis_datum" name="bis" class="datepicker_exchange" size="10"  value="'.($preincoming->bis != ''?$date->formatDatum($preincoming->bis,'d.m.Y'):$_REQUEST['bis']).'"> (dd.mm.yyyy)</td>
+							<td><input type="text" id="bis_datum" name="bis" class="datepicker_exchange" size="10"  value="'.($preincoming->bis != ''?$date->formatDatum($preincoming->bis,'d.m.Y'):(isset($_REQUEST['bis'])?$_REQUEST['bis']:'')).'"> (dd.mm.yyyy)</td>
 						</tr>
 							<td>&nbsp;</td>
 							<td>&nbsp;</td>
@@ -416,39 +412,39 @@ else if($method=="lehrveranstaltungen")
 							JOIN PUBLIC.tbl_benutzer using (uid)
 							JOIN PUBLIC.tbl_student ON (uid = student_uid)
 							JOIN PUBLIC.tbl_prestudentstatus USING (prestudent_id)
-							WHERE lehrveranstaltung_id = ".$id."
+							WHERE lehrveranstaltung_id = ".$db->db_add_param($id, FHC_INTEGER)."
 								AND lehreinheit_id IN (
 									SELECT lehreinheit_id
 									FROM lehre.tbl_lehreinheit
-									WHERE lehrveranstaltung_id = ".$id."
-										AND tbl_lehreinheit.studiensemester_kurzbz = '$stsem->studiensemester_kurzbz'
+									WHERE lehrveranstaltung_id = ".$db->db_add_param($id, FHC_INTEGER)."
+										AND tbl_lehreinheit.studiensemester_kurzbz = ".$db->db_add_param($stsem->studiensemester_kurzbz)."
 									)
 								AND tbl_prestudentstatus.status_kurzbz = 'Incoming'
-								AND tbl_prestudentstatus.studiensemester_kurzbz = '$stsem->studiensemester_kurzbz'
+								AND tbl_prestudentstatus.studiensemester_kurzbz = ".$db->db_add_param($stsem->studiensemester_kurzbz)."
 
 							UNION
 
 							SELECT person_id
 							FROM PUBLIC.tbl_preincoming_lehrveranstaltung
 							JOIN PUBLIC.tbl_preincoming using (preincoming_id)
-							WHERE lehrveranstaltung_id = ".$id."
+							WHERE lehrveranstaltung_id = ".$db->db_add_param($id)."
 							AND
 							(
-								(bis - '$stsem->start' > '$stsem->start' - von) OR
-								('$stsem->start' <= von AND bis >= '$stsem->ende' AND '$stsem->ende' - von > bis - '$stsem->ende') OR
-								(bis <= '$stsem->ende' AND bis >= '$stsem->start' AND von < '$stsem->start') OR
-								('$stsem->start' <= von AND von < '$stsem->ende' AND bis > '$stsem->ende') OR
-								(von >= '$stsem->start' AND bis <= '$stsem->ende') OR
-								(von <= '$stsem->start' AND bis >= '$stsem->ende') OR
+								(bis - ".$db->db_add_param($stsem->start)." > ".$db->db_add_param($stsem->start)." - von) OR
+								(".$db->db_add_param($stsem->start)." <= von AND bis >= ".$db->db_add_param($stsem->ende)." AND ".$db->db_add_param($stsem->ende)." - von > bis - ".$db->db_add_param($stsem->ende).") OR
+								(bis <= ".$db->db_add_param($stsem->ende)." AND bis >= ".$db->db_add_param($stsem->start)." AND von < ".$db->db_add_param($stsem->start).") OR
+								(".$db->db_add_param($stsem->start)." <= von AND von < ".$db->db_add_param($stsem->ende)." AND bis > ".$db->db_add_param($stsem->ende).") OR
+								(von >= ".$db->db_add_param($stsem->start)." AND bis <= ".$db->db_add_param($stsem->ende).") OR
+								(von <= ".$db->db_add_param($stsem->start)." AND bis >= ".$db->db_add_param($stsem->ende).") OR
 								(von IS NULL AND bis IS NULL) OR
-								(von IS NULL AND bis <= '$stsem->ende' AND bis > '$stsem->start') OR
-								(bis IS NULL AND von < '$stsem->ende' AND von >= '$stsem->start')
+								(von IS NULL AND bis <= ".$db->db_add_param($stsem->ende)." AND bis > ".$db->db_add_param($stsem->start).") OR
+								(bis IS NULL AND von < ".$db->db_add_param($stsem->ende)." AND von >= ".$db->db_add_param($stsem->start).")
 							)
 							AND aktiv = true
 							) a
 						) AS anzahl
 						FROM lehre.tbl_lehrveranstaltung
-						WHERE tbl_lehrveranstaltung.lehrveranstaltung_id = ".$id;
+						WHERE tbl_lehrveranstaltung.lehrveranstaltung_id = ".$db->db_add_param($id, FHC_INTEGER);
 
 			if($result = $db->db_query($qry))
 			{
@@ -469,7 +465,7 @@ else if($method=="lehrveranstaltungen")
 					$message = '<span style="color: red"><b>'.($p->t('global/fehleraufgetreten')).'</b></span>';
 			}
 			else
-				$message = '<span style="color: red"><b>'.$p->t('incoming/lvVollBelegt').'</b></span>';
+				$message = '<span style="color: red"><b>'.$p->t('incoming/lvVollBelegt',array(MAIL_INTERNATIONAL)).'</b></span>';
 		}
 		// löschen der LV-ID
 		if($_GET['mode'] == "delete")
@@ -841,7 +837,7 @@ else if($method=="lehrveranstaltungen")
 				$filterqry= " AND tbl_lehrveranstaltung.semester IN (2,4,6)";
 
 		if(isset($_GET['unterrichtssprache']) && $_GET['unterrichtssprache']!='')
-			$filterqry .= " AND tbl_lehrveranstaltung.sprache='".$_GET['unterrichtssprache']."'";
+			$filterqry .= " AND tbl_lehrveranstaltung.sprache=".$db->db_add_param($_GET['unterrichtssprache']);
 
 
 		//Uebersicht LVs
@@ -888,10 +884,10 @@ else if($method=="lehrveranstaltungen")
 								lehreinheit_id in (SELECT lehreinheit_id FROM lehre.tbl_lehreinheit
 							WHERE lehrveranstaltung_id=tbl_lehrveranstaltung.lehrveranstaltung_id
 								AND
-								tbl_lehreinheit.studiensemester_kurzbz='$stsem->studiensemester_kurzbz')
+								tbl_lehreinheit.studiensemester_kurzbz=".$db->db_add_param($stsem->studiensemester_kurzbz).")
 								AND
 								tbl_prestudentstatus.status_kurzbz='Incoming'
-								AND tbl_prestudentstatus.studiensemester_kurzbz='$stsem->studiensemester_kurzbz'
+								AND tbl_prestudentstatus.studiensemester_kurzbz=".$db->db_add_param($stsem->studiensemester_kurzbz)."
 							UNION
 							SELECT
 								person_id
@@ -901,15 +897,15 @@ else if($method=="lehrveranstaltungen")
 							WHERE lehrveranstaltung_id=tbl_lehrveranstaltung.lehrveranstaltung_id
 							AND
 							(
-								(bis - '$stsem->start' > '$stsem->start' - von) OR
-								('$stsem->start' <= von AND bis >= '$stsem->ende' AND '$stsem->ende' - von > bis - '$stsem->ende') OR
-								(bis <= '$stsem->ende' AND bis >= '$stsem->start' AND von < '$stsem->start') OR
-								('$stsem->start' <= von AND von < '$stsem->ende' AND bis > '$stsem->ende') OR
-								(von >= '$stsem->start' AND bis <= '$stsem->ende') OR
-								(von <= '$stsem->start' AND bis >= '$stsem->ende') OR
+								(bis - ".$db->db_add_param($stsem->start)." > ".$db->db_add_param($stsem->start)." - von) OR
+								(".$db->db_add_param($stsem->start)." <= von AND bis >= ".$db->db_add_param($stsem->ende)." AND ".$db->db_add_param($stsem->ende)." - von > bis - ".$db->db_add_param($stsem->ende).") OR
+								(bis <= ".$db->db_add_param($stsem->ende)." AND bis >= ".$db->db_add_param($stsem->start)." AND von < ".$db->db_add_param($stsem->start).") OR
+								(".$db->db_add_param($stsem->start)." <= von AND von < ".$db->db_add_param($stsem->ende)." AND bis > ".$db->db_add_param($stsem->ende).") OR
+								(von >= ".$db->db_add_param($stsem->start)." AND bis <= ".$db->db_add_param($stsem->ende).") OR
+								(von <= ".$db->db_add_param($stsem->start)." AND bis >= ".$db->db_add_param($stsem->ende).") OR
 								(von IS NULL AND bis IS NULL) OR
-								(von IS NULL AND bis <= '$stsem->ende' AND bis > '$stsem->start') OR
-								(bis IS NULL AND von < '$stsem->ende' AND von >= '$stsem->start')
+								(von IS NULL AND bis <= ".$db->db_add_param($stsem->ende)." AND bis > ".$db->db_add_param($stsem->start).") OR
+								(bis IS NULL AND von < ".$db->db_add_param($stsem->ende)." AND von >= ".$db->db_add_param($stsem->start).")
 							)
 							AND aktiv = true
 							)a ) as anzahl
@@ -928,12 +924,12 @@ else if($method=="lehrveranstaltungen")
 								JOIN lehre.tbl_studienplan_semester USING (studienplan_id)
 								WHERE tbl_studienordnung.status_kurzbz='approved'
 								AND tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_studienplan_lehrveranstaltung.lehrveranstaltung_id
-								AND tbl_studienplan_semester.studiensemester_kurzbz IN ('".$stsem->studiensemester_kurzbz."')
+								AND tbl_studienplan_semester.studiensemester_kurzbz IN (".$db->db_add_param($stsem->studiensemester_kurzbz).")
 								AND tbl_lehrveranstaltung.semester=tbl_studienplan_semester.semester)
 								AND ((tbl_lehrveranstaltung.studiengang_kz>0 AND tbl_lehrveranstaltung.studiengang_kz<10000) OR tbl_lehrveranstaltung.studiengang_kz=10006)";
 
 						if (isset($_GET['studiengang']) && $_GET['studiengang'] !='')
-							$qry .= " AND tbl_lehrveranstaltung.studiengang_kz=".$_GET['studiengang'];
+							$qry .= " AND tbl_lehrveranstaltung.studiengang_kz=".$db->db_add_param($_GET['studiengang'], FHC_INTEGER);
 
 						$qry .= " AND tbl_studiengang.aktiv ".$filterqry." order by studiengang_kz
 						";
@@ -1834,65 +1830,66 @@ else if ($method == "profil")
 			<tr>
 				<td rowspan="4"><img id="personimage" src="../../public/bild.php?src=person&person_id='.$preincoming->person_id.'" alt="'.$preincoming->person_id.'" height="100px" width="75px"></td>';
 
-          echo "<td><a href='#BildUpload' onclick='window.open(\"../bildupload.php?person_id=$person->person_id\",\"BildUpload\", \"height=500,width=500,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes\"); return false;'>".$p->t('profil/bildHochladen')."<a href=\"../../../cms/content.php?content_id=6174\" target=\"_blank\"> <img src=\"../../../skin/images/help.png\" width=\"18px\" height=\"18px\"></img></a></td>";
+	echo "
+				<td><a href='#BildUpload' onclick='window.open(\"../bildupload.php?person_id=$person->person_id\",\"BildUpload\", \"height=500,width=500,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes\"); return false;'>".$p->t('profil/bildHochladen')."<a href=\"../../../cms/content.php?content_id=6174\" target=\"_blank\"> <img src=\"../../../skin/images/help.png\" width=\"18px\" height=\"18px\"></img></a></td>";
 
-        echo '
-                <td>'.$p->t('incoming/zugangsvoraussetzung').'&sup1;</td>
+	echo '
+				<td>'.$p->t('incoming/zugangsvoraussetzung').'&sup1;</td>
 				<td><input type="text" name="zgv" size=40 value="'.$preincoming->zgv.'"></td>
 			</tr>
 			<tr>
-                <td></td>
+				<td></td>
 				<td>'.$p->t('incoming/abgelegtin').'</td>
 				<td><input type="text" name="zgv_name" size=40 value="'.$preincoming->zgv_name.'"></td>
 			</tr>
 			<tr>
-                <td></td>
+				<td></td>
 				<td>'.$p->t('incoming/abgelegtinort').'</td>
 				<td><input type="text" name="zgv_ort" size=40 value="'.$preincoming->zgv_ort.'"></td>
 			</tr>
 			<tr>
-                <td></td>
+				<td></td>
 				<td>'.$p->t('incoming/abgelegtam').'</td>
 				<td><input type="text" name="zgv_datum" size=40 value="'.$date->formatDatum($preincoming->zgv_datum,'d.m.Y').'"></td>
 			</tr>
 			<tr>
 				<td>&nbsp;</td>
-                <td></td>
-                <td></td>
-                <td></td>
+				<td></td>
+				<td></td>
+				<td></td>
 			</tr>
 			<tr>
 				<td>'.$p->t('global/titel').' Pre</td>
 				<td><input type="text" size="20" maxlength="64" name="titel_pre" value="'.$person->titelpre.'"></td>
 				<td>'.$p->t('incoming/zugangsvoraussetzungmaster').'&sup2;</td>
 				<td><input type="text" name="zgv_master" value="'.$preincoming->zgvmaster.'" size=40></td>
-            </tr>
+			</tr>
 			<tr>
 				<td>'.$p->t('incoming/vorname').'</td>
 				<td><input type="text" size="20" maxlength="32" name="vorname" value="'.$person->vorname.'"></td>
-                <td>'.$p->t('incoming/abgelegtin').'</td>
+				<td>'.$p->t('incoming/abgelegtin').'</td>
 				<td><input type="text" name="zgv_master_name" size=40 value="'.$preincoming->zgvmaster_name.'"></td>
-            </tr>
+			</tr>
 			<tr>
-                <td>'.$p->t('incoming/nachname').'</td>
+				<td>'.$p->t('incoming/nachname').'</td>
 				<td><input type="text" size="20" maxlength="64" name="nachname" value="'.$person->nachname.'" required></td>
 				<td>'.$p->t('incoming/abgelegtinort').'</td>
 				<td><input type="text" name="zgv_master_ort" size=40 value="'.$preincoming->zgvmaster_ort.'"></td>
 			</tr>
 			<tr>
-                <td>'.$p->t('global/titel').' Post</td>
+				<td>'.$p->t('global/titel').' Post</td>
 				<td><input type="text" size="20" maxlength="32" name="titel_post" value="'.$person->titelpost.'"></td>
 				<td>'.$p->t('incoming/abgelegtam').'</td>
 				<td><input type="text" name="zgv_master_datum" size=40 value="'.$date->formatDatum($preincoming->zgvmaster_datum,'d.m.Y').'"></td>
 			</tr>
-            <tr>
-                <td>'.$p->t('global/geburtsdatum').'</td>
+			<tr>
+				<td>'.$p->t('global/geburtsdatum').'</td>
 				<td><input type="text" size="20" id="datepicker" name="geb_datum" value="'.$date->formatDatum($person->gebdatum,'d.m.Y').'"> (dd.mm.yyyy)</td>
 				<td>&nbsp;</td>
 				<td></td>
 			</tr>
 			<tr>
-                <td>'.$p->t('global/staatsbuergerschaft').'</td>
+				<td>'.$p->t('global/staatsbuergerschaft').'</td>
 				<td><SELECT required name="staatsbuerger">
 				<option value="staat_auswahl">-- select --</option>';
 				foreach ($nation->nation as $nat)
@@ -1906,35 +1903,42 @@ else if ($method == "profil")
 						echo '<option '.$selected.' value="'.$nat->code.'" >'.$nat->langtext."</option>\n";
 				}
 
-echo'			</SELECT></td>
+	echo'
+				</SELECT></td>
 				<td colspan="2">'.$p->t('incoming/personimernstfall').':</td>
 				<td></td>
 			</tr>
 			<tr>
-                <td>'.$p->t('global/geschlecht').'</td>';
+				<td>'.$p->t('global/geschlecht').'</td>';
 	if($person->geschlecht == "m")
+	{
 		echo '
-				<td>    <input type="radio" name="geschlecht" value="m" checked> '.$p->t('global/mann').'
-    					<input type="radio" name="geschlecht" value="w">'.$p->t('global/frau').'
-    			</td>';
-		else
-			echo '
+				<td>
+					<input type="radio" name="geschlecht" value="m" checked> '.$p->t('global/mann').'
+					<input type="radio" name="geschlecht" value="w">'.$p->t('global/frau').'
+				</td>';
+	}
+	else
+	{
+		echo '
 				<td>    <input type="radio" name="geschlecht" value="m"> '.$p->t('global/mann').'
-    					<input type="radio" name="geschlecht" value="w" checked>'.$p->t('global/frau').'
-    			</td>';
+						<input type="radio" name="geschlecht" value="w" checked>'.$p->t('global/frau').'
+				</td>';
+	}
 
-        echo    '<td>'.$p->t('incoming/vorname').'</td>
+	echo '
+			<td>'.$p->t('incoming/vorname').'</td>
 				<td><input type="text" size="40" name="emergency_vorname" value="'.$personEmergency->vorname.'">
 				<input type="hidden" name="emergency_name_id" id="emergency_name_id" value="'.$preincoming->person_id_emergency.'"></td>
-            </tr>
+			</tr>
 			<tr>
 				<td></td>
-                <td></td>
+				<td></td>
 				<td>'.$p->t('incoming/nachname').'</td>
 				<td><input type="text" size="40" name="emergency_nachname" value="'.$personEmergency->nachname.'"></td>
 			</tr>
 			<tr>
-                <td>'.$p->t('global/strasse').'</td>
+				<td>'.$p->t('global/strasse').'</td>
 				<td><input type="text" size="40" maxlength="256" name="strasse" value="'.$adresse->result[0]->strasse.'"></td>
 				<td>'.$p->t('global/telefon').'</td>
 				<td><input type="text" size="40" name="emergency_telefon" value="'.$emTelefon.'">
@@ -1947,12 +1951,12 @@ echo'			</SELECT></td>
 				<td><input type="text" size="40" name="emergency_email" value="'.$emEmail.'">
 				<input type="hidden" name="emergency_emailId" id="emergency_emailId" value="'.$emEmailId.'"></td>
 			</tr>
-            <tr>
-                <td>'.$p->t('global/ort').'</td>
+			<tr>
+				<td>'.$p->t('global/ort').'</td>
 				<td><input type="text" size="40" maxlength="256" name="ort" value="'.$adresse->result[0]->ort.'"></td>
-            </tr>
-            <tr valign="top">
-                <td>'.$p->t('incoming/nation').'</td>
+			</tr>
+			<tr valign="top">
+				<td>'.$p->t('incoming/nation').'</td>
 				<td><SELECT name="nation" required>
 				<option value="nat_auswahl">-- select --</option>';
 				foreach ($nation->nation as $nat)
@@ -1966,35 +1970,36 @@ echo'			</SELECT></td>
 						echo '<option '.$selected.' value="'.$nat->code.'" >'.$nat->langtext."</option>\n";
 				}
 	echo '		</select></td>
-                <td rowspan="4">'.$p->t('global/anmerkung').'</td>
+				<td rowspan="4">'.$p->t('global/anmerkung').'</td>
 				<td rowspan="4"><textarea name="anmerkung" cols="31" rows="5">'.$preincoming->anmerkung.'</textarea></td>
-            </tr>
+			</tr>
 			<tr>
 				<td>E-Mail</td>';
-            $email ='';
-            foreach($kontakt->result as $kon)
-            {
-                if($kon->kontakttyp == "email")
-                {
-                    $email = $kon->kontakt;
-                }
-            }
+			$email = '';
+			foreach($kontakt->result as $kon)
+			{
+				if($kon->kontakttyp == "email")
+				{
+					$email = $kon->kontakt;
+				}
+			}
 	echo'		<td><input type="text" size="40" maxlength="128" name="email" value="'.$email.'"></td>
 
 			</tr>
-            <tr>
-                <td></td>
-                <td></td>
-            </tr>
-            <tr>
-                <td>&nbsp;</td>
-                <td></td>
-                <td></td>
-                <td></td>
-            </tr>
 			<tr>
-
-                <td align = "center" colspan="4"><input type="submit" name="submit_profil" value="'.$p->t('global/speichern').'" onclick="return checkProfil()"></td>
+				<td></td>
+				<td></td>
+			</tr>
+			<tr>
+				<td>&nbsp;</td>
+				<td></td>
+				<td></td>
+				<td></td>
+			</tr>
+			<tr>
+				<td align = "center" colspan="4">
+					<input type="submit" name="submit_profil" value="'.$p->t('global/speichern').'" onclick="return checkProfil()">
+				</td>
 			</tr>
 			</table>
 		</td>
@@ -2140,7 +2145,7 @@ else if($method == 'ende')
 		$mail = new mail(MAIL_INTERNATIONAL, 'no-reply', 'Incoming '.$person->vorname.' '.$person->nachname.' vollstaendig', 'Bitte sehen Sie sich die Nachricht in HTML Sicht an, um den Link vollständig darzustellen.');
 		$mail->setHTMLContent($emailtext);
 		if(!$mail->send())
-			$message = '<span style="color: red"><b>'.($p->t('incoming/fehlerBeimSenden')).'</b></span>';
+			$message = '<span style="color: red"><b>'.($p->t('incoming/fehlerBeimSenden',array(MAIL_INTERNATIONAL))).'</b></span>';
 		else
 			$message = '<span style="color: green"><b>'.($p->t('incoming/erfolgreichAbgeschickt')).'</b></span>';
 
@@ -2184,12 +2189,6 @@ else
 			<tr>
 				<td>4. <a href="incoming.php?method=lehrveranstaltungen">'.$p->t('incoming/lehrveranstaltungenauswählen').'</a></td>
 			</tr>
-			<!--<tr>
-				<td>5. <a href="'.APP_ROOT.'cms/dms.php?id='.$p->t('dms_link/learningAgreement').'">'.$p->t('incoming/downloadLearningAgreement').'</a></td>
-			</tr>
-			<tr>
-				<td>6. <a href="'.APP_ROOT.'cis/public/incoming/akteupload.php?person_id='.$person->person_id.'&dokumenttyp=LearnAgr" onclick="FensterOeffnen(this.href); return false;">'.$p->t("incoming/uploadLearningAgreement").'</a></td>
-			</tr>-->
 			<tr>
 				<td>5. <a href="incoming.php?method=files">'.$p->t("incoming/uploadvondateien").'</a></td>
 			</tr>
@@ -2199,7 +2198,7 @@ else
 			function FensterOeffnen (adresse)
 			{
 				MeinFenster = window.open(adresse, "Info", "width=500,height=200");
-		  		MeinFenster.focus();
+				MeinFenster.focus();
 			}
 			</script>';
 

@@ -1768,6 +1768,132 @@ if($result = @$db->db_query("SELECT * FROM system.tbl_filters WHERE filter_kurzb
 	}
 }
 
+/** Budget **/
+if (!$result = @$db->db_query("SELECT 1 FROM wawi.tbl_budgetantrag LIMIT 1"))
+{
+	$qry = "CREATE TABLE wawi.tbl_budgetantrag
+			(
+				budgetantrag_id integer NOT NULL,
+				kostenstelle_id integer NOT NULL,
+				geschaeftsjahr_kurzbz varchar(32) NOT NULL,
+				bezeichnung	varchar(256),
+				insertamum timestamp DEFAULT now(),
+				insertvon varchar(32),
+				updateamum timestamp,
+				updatevon varchar(32)
+			);
+			COMMENT ON TABLE wawi.tbl_budgetantrag IS 'Budget Requests';
+
+			ALTER TABLE wawi.tbl_budgetantrag ADD CONSTRAINT pk_tbl_budgetantrag PRIMARY KEY (budgetantrag_id);
+
+			CREATE SEQUENCE wawi.tbl_budgetantrag_budgetantrag_id_seq
+			 INCREMENT BY 1
+			 NO MAXVALUE
+			 NO MINVALUE
+			 CACHE 1;
+			ALTER TABLE wawi.tbl_budgetantrag ALTER COLUMN budgetantrag_id SET DEFAULT nextval(' wawi.tbl_budgetantrag_budgetantrag_id_seq');
+
+			GRANT SELECT, INSERT, UPDATE, DELETE ON wawi.tbl_budgetantrag TO vilesci;
+			GRANT SELECT, UPDATE ON wawi.tbl_budgetantrag_budgetantrag_id_seq TO vilesci;
+
+			ALTER TABLE wawi.tbl_budgetantrag ADD CONSTRAINT fk_budgetantrag_kostenstelle_id FOREIGN KEY (kostenstelle_id) REFERENCES wawi.tbl_kostenstelle(kostenstelle_id) ON UPDATE CASCADE ON DELETE RESTRICT;
+			ALTER TABLE wawi.tbl_budgetantrag ADD CONSTRAINT fk_budgetantrag_geschaeftsjahr_kurzbz FOREIGN KEY (geschaeftsjahr_kurzbz) REFERENCES public.tbl_geschaeftsjahr(geschaeftsjahr_kurzbz) ON UPDATE CASCADE ON DELETE RESTRICT;
+
+			CREATE TABLE wawi.tbl_budgetstatus
+			(
+				budgetstatus_kurzbz varchar(32) NOT NULL,
+				bezeichnung varchar(128)
+			);
+			COMMENT ON TABLE wawi.tbl_budgetstatus IS 'Key Table of Budget Request Statuses';
+
+			ALTER TABLE wawi.tbl_budgetstatus ADD CONSTRAINT pk_tbl_budgetstatus PRIMARY KEY (budgetstatus_kurzbz);
+
+			INSERT INTO wawi.tbl_budgetstatus(budgetstatus_kurzbz, bezeichnung) VALUES('new','Neu');
+			INSERT INTO wawi.tbl_budgetstatus(budgetstatus_kurzbz, bezeichnung) VALUES('sent','Abgeschickt');
+			INSERT INTO wawi.tbl_budgetstatus(budgetstatus_kurzbz, bezeichnung) VALUES('approved','Freigegeben');
+			INSERT INTO wawi.tbl_budgetstatus(budgetstatus_kurzbz, bezeichnung) VALUES('accepted','Akzeptiert');
+			INSERT INTO wawi.tbl_budgetstatus(budgetstatus_kurzbz, bezeichnung) VALUES('rejected','Abgelehnt');
+
+			GRANT SELECT, INSERT, UPDATE, DELETE ON wawi.tbl_budgetantrag TO vilesci;
+
+			CREATE TABLE wawi.tbl_budgetantrag_status
+			(
+				budgetantrag_status_id integer NOT NULL,
+				budgetantrag_id integer NOT NULL,
+				budgetstatus_kurzbz varchar(32) NOT NULL,
+				datum timestamp NOT NULL,
+				uid varchar(32),
+				oe_kurzbz varchar(32),
+				insertamum timestamp DEFAULT now(),
+				insertvon varchar(32)
+			);
+			COMMENT ON TABLE wawi.tbl_budgetantrag_status IS 'Statuses of Budget Requests';
+
+			ALTER TABLE wawi.tbl_budgetantrag_status ADD CONSTRAINT pk_tbl_budgetantrag_status PRIMARY KEY (budgetantrag_status_id);
+
+			CREATE SEQUENCE wawi.tbl_budgetantrag_status_budgetantrag_status_id_seq
+			 INCREMENT BY 1
+			 NO MAXVALUE
+			 NO MINVALUE
+			 CACHE 1;
+			ALTER TABLE wawi.tbl_budgetantrag_status ALTER COLUMN budgetantrag_status_id SET DEFAULT nextval(' wawi.tbl_budgetantrag_status_budgetantrag_status_id_seq');
+
+			ALTER TABLE wawi.tbl_budgetantrag_status ADD CONSTRAINT fk_budgetantrag_status_budgetstatus_kurzbz FOREIGN KEY (budgetstatus_kurzbz) REFERENCES wawi.tbl_budgetstatus(budgetstatus_kurzbz) ON UPDATE CASCADE ON DELETE RESTRICT;
+			ALTER TABLE wawi.tbl_budgetantrag_status ADD CONSTRAINT fk_budgetantrag_status_uid FOREIGN KEY (uid) REFERENCES public.tbl_benutzer(uid) ON UPDATE CASCADE ON DELETE RESTRICT;
+			ALTER TABLE wawi.tbl_budgetantrag_status ADD CONSTRAINT fk_budgetantrag_status_oe_kurzbz FOREIGN KEY (oe_kurzbz) REFERENCES public.tbl_organisationseinheit(oe_kurzbz) ON UPDATE CASCADE ON DELETE RESTRICT;
+
+			GRANT SELECT, INSERT, UPDATE, DELETE ON wawi.tbl_budgetantrag TO vilesci;
+			GRANT SELECT, UPDATE ON wawi.tbl_budgetantrag_status_budgetantrag_status_id_seq TO vilesci;
+
+			CREATE SEQUENCE fue.tbl_projekt_projekt_id_seq
+			 INCREMENT BY 1
+			 NO MAXVALUE
+			 NO MINVALUE
+			 CACHE 1;
+			GRANT SELECT, UPDATE ON fue.tbl_projekt_projekt_id_seq TO vilesci;
+			ALTER TABLE fue.tbl_projekt ADD COLUMN projekt_id integer NOT NULL DEFAULT nextval('fue.tbl_projekt_projekt_id_seq');
+			ALTER TABLE fue.tbl_projekt ADD CONSTRAINT uk_tbl_projekt_projekt_id UNIQUE (projekt_id);
+
+			CREATE TABLE wawi.tbl_budgetposition
+			(
+				budgetposition_id integer NOT NULL,
+				budgetantrag_id integer NOT NULL,
+				budgetposten varchar(512),
+				konto_id integer,
+				betrag numeric(12,4),
+				kommentar text,
+				projekt_id integer,
+				insertamum timestamp,
+				insertvon varchar(32),
+				updateamum timestamp,
+				updatevon varchar(32)
+			);
+
+			COMMENT ON TABLE wawi.tbl_budgetposition IS 'Budget position';
+
+			ALTER TABLE wawi.tbl_budgetposition ADD CONSTRAINT pk_tbl_budgetposition PRIMARY KEY (budgetposition_id);
+
+			CREATE SEQUENCE wawi.tbl_budgetposition_budgetposition_id_seq
+			 INCREMENT BY 1
+			 NO MAXVALUE
+			 NO MINVALUE
+			 CACHE 1;
+			ALTER TABLE wawi.tbl_budgetposition ALTER COLUMN budgetposition_id SET DEFAULT nextval(' wawi.tbl_budgetposition_budgetposition_id_seq');
+
+			ALTER TABLE wawi.tbl_budgetposition ADD CONSTRAINT fk_tbl_budgetposition_budgetantrag_id FOREIGN KEY (budgetantrag_id) REFERENCES wawi.tbl_budgetantrag(budgetantrag_id) ON UPDATE CASCADE ON DELETE RESTRICT;
+			ALTER TABLE wawi.tbl_budgetposition ADD CONSTRAINT fk_tbl_budgetposition_konto_id FOREIGN KEY (konto_id) REFERENCES wawi.tbl_konto(konto_id) ON UPDATE CASCADE ON DELETE RESTRICT;
+			ALTER TABLE wawi.tbl_budgetposition ADD CONSTRAINT fk_tbl_budgetposition_projekt_id FOREIGN KEY (projekt_id) REFERENCES fue.tbl_projekt(projekt_id) ON UPDATE CASCADE ON DELETE RESTRICT;
+
+			GRANT SELECT, INSERT, UPDATE, DELETE ON wawi.tbl_budgetposition TO vilesci;
+			GRANT SELECT, UPDATE ON wawi.tbl_budgetposition_budgetposition_id_seq TO vilesci;
+	";
+	if(!$db->db_query($qry))
+		echo '<strong>Budget: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Neue Tabellen fuer Budgetantrag in Schema wawi hinzugefuegt';
+
+}
+
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
 
@@ -1858,7 +1984,7 @@ $tabellen=array(
 	"campus.tbl_zeitwunsch"  => array("stunde","mitarbeiter_uid","tag","gewicht","updateamum","updatevon","insertamum","insertvon"),
 	"fue.tbl_aktivitaet"  => array("aktivitaet_kurzbz","beschreibung","sort"),
 	"fue.tbl_aufwandstyp" => array("aufwandstyp_kurzbz","bezeichnung"),
-	"fue.tbl_projekt"  => array("projekt_kurzbz","nummer","titel","beschreibung","beginn","ende","oe_kurzbz","budget","farbe","aufwandstyp_kurzbz","ressource_id","anzahl_ma","aufwand_pt"),
+	"fue.tbl_projekt"  => array("projekt_kurzbz","nummer","titel","beschreibung","beginn","ende","oe_kurzbz","budget","farbe","aufwandstyp_kurzbz","ressource_id","anzahl_ma","aufwand_pt","projekt_id"),
 	"fue.tbl_projektphase"  => array("projektphase_id","projekt_kurzbz","projektphase_fk","bezeichnung","typ","beschreibung","start","ende","budget","insertamum","insertvon","updateamum","updatevon","personentage","farbe","ressource_id"),
 	"fue.tbl_projekttask"  => array("projekttask_id","projektphase_id","bezeichnung","beschreibung","aufwand","mantis_id","insertamum","insertvon","updateamum","updatevon","projekttask_fk","erledigt","ende","ressource_id","scrumsprint_id"),
 	"fue.tbl_projekt_dokument"  => array("projekt_dokument_id","projektphase_id","projekt_kurzbz","dms_id"),
@@ -2036,6 +2162,10 @@ $tabellen=array(
 	"wawi.tbl_betriebsmittelstatus"  => array("betriebsmittelstatus_kurzbz","beschreibung"),
 	"wawi.tbl_betriebsmitteltyp"  => array("betriebsmitteltyp","beschreibung","anzahl","kaution","typ_code","mastershapename"),
 	"wawi.tbl_budget"  => array("geschaeftsjahr_kurzbz","kostenstelle_id","budget"),
+	"wawi.tbl_budgetantrag"  => array("budgetantrag_id","kostenstelle_id","geschaeftsjahr_kurzbz","bezeichnung","insertamum","insertvon","updateamum","updatevon"),
+	"wawi.tbl_budgetantrag_status"  => array("budgetantrag_status_id","budgetantrag_id","budgetstatus_kurzbz","datum","uid","oe_kurzbz","insertamum","insertvon"),
+	"wawi.tbl_budgetstatus"  => array("budgetstatus_kurzbz","bezeichnung"),
+	"wawi.tbl_budgetposition"  => array("budgetposition_id","budgetantrag_id","budgetposten","konto_id","betrag","kommentar","projekt_id","insertamum","insertvon","updateamum","updatevon"),
 	"wawi.tbl_zahlungstyp"  => array("zahlungstyp_kurzbz","bezeichnung"),
 	"wawi.tbl_konto"  => array("konto_id","kontonr","beschreibung","kurzbz","aktiv","person_id","insertamum","insertvon","updateamum","updatevon","ext_id","person_id"),
 	"wawi.tbl_konto_kostenstelle"  => array("konto_id","kostenstelle_id","insertamum","insertvon"),

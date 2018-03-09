@@ -50,7 +50,7 @@ $veranstaltungskategorie_kurzbz=trim((isset($_REQUEST['veranstaltungskategorie_k
 // Parameter Veranstaltung
 $veranstaltung_id=trim((isset($_REQUEST['veranstaltung_id']) ? $_REQUEST['veranstaltung_id']:''));
 $Jahr=trim((isset($_REQUEST['Jahr']) ? $_REQUEST['Jahr']:date("Y", mktime(0,0,0,date("m"),date("d"),date("y")))));
-$Monat=trim((isset($_REQUEST['Monat']) ? $_REQUEST['Monat']:date("m", mktime(0,0,0,date("m"),date("d"),date("y")))));
+$Monat=trim((isset($_REQUEST['Monat']) && $_REQUEST['Monat']!='' ? $_REQUEST['Monat']:date("m", mktime(0,0,0,date("m"),date("d"),date("y")))));
 $suchtext=trim((isset($_REQUEST['suchtext']) ? $_REQUEST['suchtext']:''));
 
 if(!is_numeric($Jahr))
@@ -59,7 +59,7 @@ if(!is_numeric($Monat))
 	die($p->t("eventkalender/monatIstUngueltig"));
 if($veranstaltung_id!='' && !is_numeric($veranstaltung_id))
 	die($p->t("eventkalender/veranstaltungIdIstUngueltig"));
-	
+
 // ------------------------------------------------------------------------------------------
 // 	Alle Kategoriedaten lesen fuer Selektfeld (open in jahresplan_funktionen)
 // ------------------------------------------------------------------------------------------
@@ -196,13 +196,13 @@ if (!$veranstaltungskategorie=$Jahresplan->loadVeranstaltungskategorie())
 <body>
 
 	<h1>&nbsp;<?php echo $p->t('eventkalender/veranstaltungen');?>&nbsp;</h1>
-	
+
 	<?php
 	// Wartungsberechtigte bekommen noch ein spezielles Menue
 	if ($is_wartungsberechtigt)
 		echo '[&nbsp;<a href="index.php">'.$p->t("eventkalender/veranstaltung").'</a>&nbsp;|&nbsp;<a href="jahresplan_kategorie.php">'.$p->t("eventkalender/kategorie").'</a>&nbsp;]&nbsp;'.$userNAME.'<br/><br/>';
 	?>
-	
+
 	<form accept-charset="UTF-8" name="selJahresplan" target="_self" action="<?php echo $_SERVER['PHP_SELF'];?>"  method="post" enctype="multipart/form-data">
 		<table cellpadding="0" cellspacing="0">
 		<tr>
@@ -269,7 +269,7 @@ if (!$veranstaltungskategorie=$Jahresplan->loadVeranstaltungskategorie())
 				<input type="Submit" value="<?php echo $p->t('global/anzeigen');?>">
 			</td>
 			<td>&nbsp;</td>
-			<?php 
+			<?php
 			if($is_mitarbeiter)
 			{
 				echo '
@@ -330,7 +330,7 @@ if (!$veranstaltungskategorie=$Jahresplan->loadVeranstaltungskategorie())
 	{
 		$veranstaltung=array();
 	}
-	
+
 #	var_dump($veranstaltung);
 #	exit;
 

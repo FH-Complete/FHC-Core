@@ -29,7 +29,7 @@
    @edit	08-11-2006 Versionierung entfernt. Studiensemester = WS2007
   				03-01-2006 Anpassung an neue DB
 */
-	
+
 require_once('../../../../config/cis.config.inc.php');
 require_once('../../../../include/basis_db.class.php');
 require_once('../../../../include/functions.inc.php');
@@ -38,8 +38,8 @@ require_once('../../../../include/lvinfo.class.php');
 require_once('../../../../include/phrasen.class.php');
 require_once('../../../../include/benutzerberechtigung.class.php');
 
-$sprache = getSprache(); 
-$p = new phrasen($sprache); 
+$sprache = getSprache();
+$p = new phrasen($sprache);
 
 if (!$db = new basis_db())
 	die($p->t('global/fehlerBeimOeffnenDerDatenbankverbindung'));
@@ -70,14 +70,14 @@ $rechte->getBerechtigungen($user);
 			return false;
 	}
 
-	
+
 	$lv=trim((isset($_REQUEST['lv']) ? $_REQUEST['lv']:''));
 
 	//Studiengang der Angezeigt werden soll
 	$stg=trim((isset($_REQUEST['stg']) ? $_REQUEST['stg']:''));
 	//Semester das angezeigt werden soll
 	$sem=trim((isset($_REQUEST['sem']) ? $_REQUEST['sem']:''));
-	
+
 	if (!$rechte->isBerechtigt('lehre/lvinfo_freigabe',$stg))
 		die ($rechte->errormsg);
 
@@ -118,23 +118,24 @@ $rechte->getBerechtigungen($user);
 	{
 		//Setzt die Spalte genehmigt auf den entsprechenden Wert
 		//=Wenn Hackerl angeklickt wird
-	
-		$qry="SELECT genehmigt FROM campus.tbl_lvinfo WHERE lehrveranstaltung_id='$lv' AND sprache=";
+
+		$qry="SELECT genehmigt FROM campus.tbl_lvinfo WHERE lehrveranstaltung_id=".$db->db_add_param($lv)." AND sprache=";
 		if($_GET['lang']=='de')
-			$qry.="'".ATTR_SPRACHE_DE."'";
+			$qry.= $db->db_add_param(ATTR_SPRACHE_DE);
 		else
-			$qry.="'".ATTR_SPRACHE_EN."'";
+			$qry.= $db->db_add_param(ATTR_SPRACHE_EN);
 
 		if($result=$db->db_query($qry))
 		{
 			if($row=$db->db_fetch_object($result))
 			{
 				$wert = $row->genehmigt=='t'?'false':'true';
-				$qry="UPDATE campus.tbl_lvinfo SET genehmigt=$wert WHERE lehrveranstaltung_id=$lv AND sprache=";
+				$qry="UPDATE campus.tbl_lvinfo SET genehmigt=$wert
+					WHERE lehrveranstaltung_id=".$db->db_add_param($lv)." AND sprache=";
 				if($_GET['lang']=='de')
-					$qry.="'".ATTR_SPRACHE_DE."'";
+					$qry .= $db->db_add_param(ATTR_SPRACHE_DE);
 				else
-					$qry.="'".ATTR_SPRACHE_EN."'";
+					$qry .= $db->db_add_param(ATTR_SPRACHE_EN);
 
 				if($db->db_query($qry))
 					WriteLog($qry,$user);
@@ -167,20 +168,20 @@ $rechte->getBerechtigungen($user);
 function ask() {
 	return confirm("<?php echo $p->t('global/warnungWirklichLoeschen');?>");
 }
-$(document).ready(function() 
-	{ 
+$(document).ready(function()
+	{
 		$("#myTable").tablesorter(
 		{
 			sortList: [[1,0]],
 			widgets: ["zebra"],
 			headers : {0:{sorter: false}}
-		}); 
-	}); 
+		});
+	});
 </script>
 </head>
 <body style="padding:10px">
 <h1><?php echo $p->t('courseInformation/lvInfoFreigabe');?></h1>
-			
+
 					<table class="tabcontent">
 					<tr>
 							<td width="85%">
@@ -196,7 +197,7 @@ $(document).ready(function()
 							</td>
 						</tr>
 					</table>
-			
+
 
 		<?php
 		//DropDown Menues zur Auswahl von Studiengang und Semester anzeigen
@@ -243,7 +244,7 @@ $(document).ready(function()
 		$qry = "SELECT distinct semester FROM campus.tbl_lvinfo, lehre.tbl_lehrveranstaltung
 					WHERE tbl_lvinfo.aktiv=true
 					AND tbl_lvinfo.lehrveranstaltung_id=tbl_lehrveranstaltung.lehrveranstaltung_id
-					AND tbl_lehrveranstaltung.studiengang_kz='$stg'
+					AND tbl_lehrveranstaltung.studiengang_kz=".$db->db_add_param($stg)."
 					ORDER by semester";
 		if(!$result=$db->db_query($qry))
 			die ("<center>".$p->t('global/fehleraufgetreten')."</center>");
@@ -293,7 +294,17 @@ $(document).ready(function()
 					<tbody>
 
 					<?php
-						$qry="SELECT *, tbl_lehrveranstaltung.bezeichnung as bezeichnung, to_char(tbl_lvinfo.updateamum,'DD.MM.YYYY HH24:MI') as amum,tbl_lvinfo.updateamum as updateamum, tbl_lvinfo.updatevon as updatevon FROM campus.tbl_lvinfo JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id) WHERE studiengang_kz=$stg AND semester=$sem AND tbl_lvinfo.aktiv=true AND tbl_lvinfo.sprache='".ATTR_SPRACHE_DE."' ORDER BY tbl_lehrveranstaltung.bezeichnung ASC";
+						$qry="SELECT *, tbl_lehrveranstaltung.bezeichnung as bezeichnung,
+							to_char(tbl_lvinfo.updateamum,'DD.MM.YYYY HH24:MI') as amum,
+							tbl_lvinfo.updateamum as updateamum, tbl_lvinfo.updatevon as updatevon
+						FROM
+							campus.tbl_lvinfo
+							JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id)
+						WHERE
+							studiengang_kz=".$db->db_add_param($stg)."
+							AND semester=".$db->db_add_param($sem)." AND tbl_lvinfo.aktiv=true
+							AND tbl_lvinfo.sprache=".$db->db_add_param(ATTR_SPRACHE_DE)."
+						ORDER BY tbl_lehrveranstaltung.bezeichnung ASC";
 
 						if(!$result=$db->db_query($qry))
 							die("<center>Fehler bei einer Datenbankabfrage</center>");
@@ -302,7 +313,15 @@ $(document).ready(function()
 						while($row=$db->db_fetch_object($result))
 						{
 							$i++;
-							$qry1="SELECT *, tbl_lehrveranstaltung.bezeichnung as bezeichnung, tbl_lvinfo.updatevon as updatevon FROM campus.tbl_lvinfo JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id) WHERE tbl_lvinfo.sprache='".ATTR_SPRACHE_EN."' AND lehrveranstaltung_id='$row->lehrveranstaltung_id'";
+							$qry1="SELECT *,
+									tbl_lehrveranstaltung.bezeichnung as bezeichnung,
+									tbl_lvinfo.updatevon as updatevon
+								FROM
+									campus.tbl_lvinfo
+									JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id)
+								WHERE
+									tbl_lvinfo.sprache=".$db->db_add_param(ATTR_SPRACHE_EN)."
+									AND lehrveranstaltung_id=".$db->db_add_param($row->lehrveranstaltung_id);
 
 							if(!$result1=$db->db_query($qry1))
 								die("<center>Fehler bei einer Datenbankabfrage</center>");
@@ -310,12 +329,12 @@ $(document).ready(function()
 							if(!$row1=$db->db_fetch_object($result1))
 								die("<center>Fehler bei einer Datenbankabfrage</center>");
 
-							$qry2="SELECT vorname, nachname FROM campus.vw_mitarbeiter WHERE uid='$row->updatevon'";
+							$qry2="SELECT vorname, nachname FROM campus.vw_mitarbeiter WHERE uid=".$db->db_add_param($row->updatevon);
 
 							$style='';
 							if ($lv==$row->lehrveranstaltung_id)
 								$style='style="background-color: #AAA; border-top: 1px solid black; border-bottom: 1px solid black"';
-							
+
 							$bearbeitet=$row->updatevon;
 							if($result2=$db->db_query($qry2))
 								if($row2=$db->db_fetch_object($result2))
@@ -339,6 +358,6 @@ $(document).ready(function()
 				</td>
 			</tr>
 		</table>
-	
+
 </body>
 </html>

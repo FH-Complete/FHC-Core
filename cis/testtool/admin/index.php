@@ -278,7 +278,7 @@ if (isset($_POST['deletePicture']) || isset($_POST['deleteAudio']))
 {
 	if (!$rechte->isBerechtigt('basis/testtool', null, 'suid'))
 		die($rechte->errormsg);
-		
+
 	$frage = new frage();
 	if ($frage->load($_GET['frage_id']))
 	{
@@ -651,11 +651,14 @@ foreach ($studiengang->result as $row)
 		echo '</select>';
 
 //Liste der Gebiete
-	$qry = "SELECT * FROM testtool.tbl_ablauf WHERE studiengang_kz=".$stg_kz."";
+	$qry = "SELECT * FROM testtool.tbl_ablauf WHERE studiengang_kz=".$db->db_add_param($stg_kz);
 	$anzahl = $db->db_num_rows($db->db_query($qry));
 
 	if ($stg_kz !== "-1" && $anzahl !== 0)
-		$qry = "SELECT * FROM testtool.tbl_gebiet LEFT JOIN testtool.tbl_ablauf USING (gebiet_id) WHERE studiengang_kz=".$stg_kz." ORDER BY semester,reihung";
+	{
+		$qry = "SELECT * FROM testtool.tbl_gebiet LEFT JOIN testtool.tbl_ablauf USING (gebiet_id)
+		WHERE studiengang_kz=".$db->db_add_param($stg_kz)." ORDER BY semester,reihung";
+	}
 	else
 		$qry = "SELECT * FROM testtool.tbl_gebiet ORDER BY bezeichnung";
 

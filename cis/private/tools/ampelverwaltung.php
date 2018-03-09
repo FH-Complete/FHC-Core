@@ -341,6 +341,7 @@ $(document).ready(function(){
 
 
 <body style="font-family: Arial, Helvetica, sans-serif; font-size: 13px;">
+	<div class="container" > 
   
 	<?php 
 	//title in CIS
@@ -353,7 +354,7 @@ $(document).ready(function(){
 	?>
 	
 	<!--*****************************************	PANEL-GROUP -->
-	<div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true" style="width: 1000px;">		
+	<div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">		
 		
 	<!--*****************************************	radiobuttons actual term / all -->	
 	<?php
@@ -483,7 +484,7 @@ $(document).ready(function(){
 	?>
 </div> <!--end panel group -->
 
-
-  </body>
+		</div> <!--end container -->
+	</body>
 </html>
 
