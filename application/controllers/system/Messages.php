@@ -314,6 +314,7 @@ class Messages extends VileSci_Controller
 		if (isset($vorlage_kurzbz))
 		{
 			$this->load->model('system/Vorlagestudiengang_model', 'VorlagestudiengangModel');
+			$this->VorlagestudiengangModel->addOrder('version','DESC');
 			$result = $this->VorlagestudiengangModel->loadWhere(array('vorlage_kurzbz' => $vorlage_kurzbz));
 
 			$this->output
