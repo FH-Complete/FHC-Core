@@ -13,14 +13,16 @@
 					}
 				})
 				.done(function(data, textStatus, jqXHR) {
-					alert("Filter successfully saved");
+
+					refreshSideMenu()
+
 				}).fail(function(jqXHR, textStatus, errorThrown) {
 					alert(textStatus);
 				});
 			}
 			else
 			{
-				alert("You forgot something!");
+				alert("Please fill te description of this filter");
 			}
 		});
 

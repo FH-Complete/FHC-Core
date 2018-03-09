@@ -45,8 +45,6 @@ class InfoCenter extends VileSci_Controller
 		)
 	);
 	private $uid; // contains the UID of the logged user
-	private $navigationMenuArray; // contains all the voices for the navigation menu
-	private $navigationHeaderArray;
 
 	/**
 	 * Constructor
@@ -77,12 +75,7 @@ class InfoCenter extends VileSci_Controller
 		if(!$this->permissionlib->isBerechtigt('basis/person'))
 			show_error('You have no Permission! You need Infocenter Role');
 
-		$this->_setNavigationMenuArray(); // sets property navigationMenuArray
-
-		$this->navigationHeaderArray = array(
-			'headertext' => 'Infocenter',
-			'headertextlink' => base_url('index.ci.php/system/infocenter/InfoCenter')
-		);
+		$this->setNavigationMenuArray(); // sets property navigationMenuArray
     }
 
 	// -----------------------------------------------------------------------------------------------------------------
@@ -93,13 +86,7 @@ class InfoCenter extends VileSci_Controller
 	 */
 	public function index()
 	{
-		$this->load->view(
-			'system/infocenter/infocenter.php',
-			array(
-				'navigationHeaderArray' => $this->navigationHeaderArray,
-				'navigationMenuArray' => $this->navigationMenuArray
-			)
-		);
+		$this->load->view('system/infocenter/infocenter.php');
 	}
 
 	/**
@@ -131,11 +118,7 @@ class InfoCenter extends VileSci_Controller
 			'system/infocenter/infocenterDetails.php',
 			array_merge(
 				$persondata,
-				$prestudentdata,
-				array(
-					'navigationHeaderArray' => $this->navigationHeaderArray,
-					'navigationMenuArray' => $this->navigationMenuArray
-				)
+				$prestudentdata
 			)
 		);
 	}
@@ -464,7 +447,7 @@ class InfoCenter extends VileSci_Controller
 	/**
 	 *
 	 */
-	private function _setNavigationMenuArray()
+	public function setNavigationMenuArray()
 	{
 		$listFiltersSent = array();
 		$listFiltersNotSent = array();
@@ -532,12 +515,22 @@ class InfoCenter extends VileSci_Controller
 			$this->_fillCustomFilters($listCustomFilters, $filtersarray['personal']);
 		}
 
-		$this->navigationMenuArray = array(
-			'dashboard' => array(
+		if (!isset($_SESSION['navigation_menu']))
+		{
+			$_SESSION['navigation_menu'] = array();
+		}
+
+		$_SESSION['navigation_menu']['system/infocenter/InfoCenter/index'] = array(
+			'filters' => array(
 				'link' => '#',
-				'description' => 'Dashboard',
-				'icon' => 'dashboard'
-			),
+				'description' => 'Filter',
+				'icon' => 'filter',
+				'expand' => true,
+				'children' => $filtersarray
+			)
+		);
+
+		$_SESSION['navigation_menu']['system/infocenter/InfoCenter/showDetails'] = array(
 			'filters' => array(
 				'link' => '#',
 				'description' => 'Filter',
@@ -565,11 +558,17 @@ class InfoCenter extends VileSci_Controller
 		foreach ($filters as $filterId => $description)
 		{
 			$toPrint = "%s=%s";
+
+			if ($this->router->method != 'index')
+			{
+
+			}
+
 			$tofill['children'][] = array(
 				'link' => sprintf($toPrint, base_url('index.ci.php/system/infocenter/InfoCenter?filter_id'), $filterId),
 				'description' => $description,
 				'subscriptDescription' => 'Remove',
-				'subscriptLinkId' => 'removeFilterById',
+				'subscriptLinkClass' => 'remove-filter',
 				'subscriptLinkValue' => $filterId
 			);
 		}

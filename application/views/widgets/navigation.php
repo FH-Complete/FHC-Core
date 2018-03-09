@@ -1,9 +1,9 @@
 	<nav class="navbar navbar-default navbar-static-top" role="navigation" style="margin-bottom: 0">
 		<?php
 			// Header
-			echo $this->widgetlib->widget('NavigationHeaderWidget', $widgetData[NavigationWidget::NAVIGATION_HEADER]);
+			echo $this->widgetlib->widget('NavigationHeaderWidget');
 
 			// Left menu
-			echo $this->widgetlib->widget('NavigationMenuWidget', $widgetData[NavigationWidget::NAVIGATION_MENU]);
+			echo $this->widgetlib->widget('NavigationMenuWidget');
 		?>
 	</nav>

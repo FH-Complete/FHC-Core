@@ -17,15 +17,9 @@
 
 <body>
 	<div id="wrapper">
-		<?php
-			echo $this->widgetlib->widget(
-				'NavigationWidget',
-				array(
-					'navigationHeader' => $navigationHeaderArray,
-					'navigationMenu' => $navigationMenuArray
-				)
-			);
-		?>
+
+		<?php echo $this->widgetlib->widget('NavigationWidget'); ?>
+
 		<div id="page-wrapper">
 			<div class="container-fluid">
 				<div class="row">
