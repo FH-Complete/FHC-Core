@@ -25,10 +25,10 @@ require_once('../../../include/wochenplan.class.php');
 
 if(isset($_POST['id']))
 	$id = $_POST['id'];
-	
+
 if(isset($_POST['typ']))
 	$typ = $_POST['typ'];
-	
+
 if(isset($_POST['start']))
 	$start = $_POST['start'];
 if(isset($_POST['end']))
@@ -57,77 +57,77 @@ $events=array();
 switch($typ)
 {
 	case 'Ort':
-			// LVPlan/Reservierungen des Raumes holen
-			
-			$stdplan = new wochenplan('ort');
-			$stdplan->load_data('ort',null,$id);
+		// LVPlan/Reservierungen des Raumes holen
 
-			while($start<$end)
+		$stdplan = new wochenplan('ort');
+		$stdplan->load_data('ort',null,$id);
+
+		while($start<$end)
+		{
+			if(!date("w",$start))
+				$start=jump_day($start,1);
+
+			$stdplan->init_stdplan();
+			$datum=$start;
+			$start+=604800;	// eine Woche
+
+			// Stundenplan einer Woche laden
+			if(!$stdplan->load_week($datum,'stundenplan'))
 			{
-				if(!date("w",$start))
-					$start=jump_day($start,1);
-				
-				$stdplan->init_stdplan();
-				$datum=$start;
-				$start+=604800;	// eine Woche
-			
-				// Stundenplan einer Woche laden
-				if(!$stdplan->load_week($datum,'stundenplan'))
-				{
-					die($stdplan->errormsg);
-				}
-			
-				$result = $stdplan->draw_week_csv('return', LVPLAN_KATEGORIE);
-				foreach($result as $row)
-				{
-					$item['id']=$id.$row['dtstart'].$row['dtend'];
-					$item['title']=$id;
-					$item['start']=fixDate($row['dtstart']);
-					$item['end']=fixDate($row['dtend']);
-					$item['allDay']=false;
-					$item['editable']=false;					
-					$events[]=$item;
-				}	
+				die($stdplan->errormsg);
 			}
-			break;
-			
+
+			$result = $stdplan->draw_week_csv('return', LVPLAN_KATEGORIE);
+			foreach($result as $row)
+			{
+				$item['id']=$id.$row['dtstart'].$row['dtend'];
+				$item['title']=$id;
+				$item['start']=fixDate($row['dtstart']);
+				$item['end']=fixDate($row['dtend']);
+				$item['allDay']=false;
+				$item['editable']=false;
+				$events[]=$item;
+			}
+		}
+		break;
+
 	case 'Person':
-		
-			//FreeBusy Information holen
-			$fp = fopen(APP_ROOT.'cis/public/freebusy.php/'.$id,'r');
-			if (!$fp) 
+		//FreeBusy Information holen
+		$fp = fopen(APP_ROOT.'cis/public/freebusy.php/'.$id,'r');
+		if (!$fp)
+		{
+			//Load Failed
+			break;
+		}
+		else
+		{
+			$doc = '';
+			while (!feof($fp))
 			{
-			    echo "$errstr ($errno)<br />\n";
+				$line = fgets($fp);
+				$doc.=$line;
 			}
-			else 
-			{
-				$doc = '';
-			    while (!feof($fp)) 
-			    {
-			        $line = fgets($fp);
-			        $doc.=$line;
-			    }
-			    fclose($fp);
-			    
-			    //FreeBusy Parsen
-			    $ical = new ical();
-			    $ical->parseFreeBusy($doc);
+			fclose($fp);
 
-			    foreach($ical->dtresult as $row)
-			    {
-			    	$item['id']=$id.$row['dtstart'].$row['dtend'];
-					$item['title']=$id;
-					$item['start']=fixDate($row['dtstart']);
-					$item['end']=fixDate($row['dtend']);
-					$item['allDay']=false;
-					$item['editable']=false;					
-					$events[]=$item;
-			    }
+			//FreeBusy Parsen
+			$ical = new ical();
+			$ical->parseFreeBusy($doc);
+
+			foreach($ical->dtresult as $row)
+			{
+				$item['id']=$id.$row['dtstart'].$row['dtend'];
+				$item['title']=$id;
+				$item['start']=fixDate($row['dtstart']);
+				$item['end']=fixDate($row['dtend']);
+				$item['allDay']=false;
+				$item['editable']=false;
+				$events[]=$item;
 			}
-			
-			break;
-	default: 
-			break;
+		}
+
+		break;
+	default:
+		break;
 }
 echo json_encode($events);
 
