@@ -816,6 +816,8 @@ class InfoCenter extends VileSci_Controller
 		$prestudentstatus = $prestudent->prestudentstatus;
 		$person_id = $prestudent->person_id;
 		$person = $this->PersonModel->getPersonStammdaten($person_id, true)->retval;
+		$dokumente = $this->AkteModel->getAktenWithDokInfo($person_id, null, false)->retval;
+		$dokumenteNachzureichen = $this->AkteModel->getAktenWithDokInfo($person_id, null, true)->retval;
 
 		//fill mail variables
 		$interessentbez = $person->geschlecht == 'm' ? 'Ein Interessent' : 'Eine Interessentin';
@@ -823,6 +825,25 @@ class InfoCenter extends VileSci_Controller
 		$orgform = $prestudentstatus->orgform != '' ? ' ('.$prestudentstatus->orgform.')' : '';
 		$geschlecht = $person->geschlecht == 'm' ? 'm&auml;nnlich' : 'weiblich';
 		$geburtsdatum = date('d.m.Y', strtotime($person->gebdatum));
+		$zgvort = !empty($prestudent->zgvort) ? ' in '.$prestudent->zgvort : '';
+		$zgvnation = !empty($prestudent->zgvnation_bez) ? ', '.$prestudent->zgvnation_bez : '';
+		$zgvdatum = !empty($prestudent->zgvdatum) ? ', am '.date_format(date_create($prestudent->zgvdatum), 'd.m.Y') : '';
+
+		$dokumenteNachzureichenMail = $dokumenteMail = array();
+		//convert documents to array so they can be parsed, and keeping only needed fields
+		$lastel = end($dokumente);
+		foreach ($dokumente as $dokument)
+		{
+			$postfix = $lastel === $dokument ? '' : ' |';
+			$dokumenteMail[] = array('dokument_bezeichnung' => $dokument->dokument_bezeichnung.$postfix);
+		}
+
+		foreach ($dokumenteNachzureichen as $dokument)
+		{
+			$anmerkung = !empty($dokument->anmerkung) ? ' | Anmerkung: '.$dokument->anmerkung : '';
+			$nachgereichtam = !empty($dokument->nachgereicht_am) ? ' | wird nachgereicht bis '.date_format(date_create($dokument->nachgereicht_am), 'd.m.Y') : '';
+			$dokumenteNachzureichenMail[] = array('dokument_bezeichnung' => $dokument->dokument_bezeichnung, 'anmerkung' => $anmerkung, 'nachgereicht_am' => $nachgereichtam);
+		}
 
 		$notizenBewerbung = $this->NotizModel->getNotizByTitel($person_id, 'Anmerkung zur Bewerbung')->retval;
 
@@ -859,7 +880,13 @@ class InfoCenter extends VileSci_Controller
 			'gebdatum' => $geburtsdatum,
 			'mailadresse' => $mailadresse,
 			'prestudentid' => $prestudent_id,
-			'notizentext' => $notizentext
+			'zgvbez' => $prestudent->zgv_bez,
+			'zgvort' => $zgvort,
+			'zgvdatum' => $zgvdatum,
+			'zgvnation' => $zgvnation,
+			'notizentext' => $notizentext,
+			'dokumente' => $dokumenteMail,
+			'dokumente_nachgereicht' => $dokumenteNachzureichenMail
 		);
 
 		$this->load->library('parser');
