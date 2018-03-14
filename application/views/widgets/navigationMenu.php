@@ -114,7 +114,7 @@
 			{
 				var strMenu = '';
 
-				$("#side-menu").html('<li id="collapseicon" class="text-right" style="cursor: pointer; color: #337ab7"><i class="fa fa-angle-double-left fa-fw"></i></li>');
+				printCollapseIcon();
 
 				jQuery.each(data, function(i, e) {
 					strMenu += printNavItem(e);
@@ -134,12 +134,12 @@
 		});
 	}
 
-	$(document).ready(function() {
 
-		renderSideMenu();
-
+	function printCollapseIcon()
+	{
 		// Hiding/showing navigation menu - works only with sb admin 2 template!!
 
+		$("#side-menu").prepend('<li id="collapseicon" class="text-right" style="cursor: pointer; color: #337ab7"><i class="fa fa-angle-double-left fa-fw"></i></li>');
 		$("#collapseicon").click(function() {
 			$("#page-wrapper").css('margin-left', '0px');
 			$("#side-menu").hide();
@@ -151,6 +151,11 @@
 			$("#side-menu").show();
 			$("#collapseinicon").hide();
 		});
+	}
+
+	$(document).ready(function() {
+
+		renderSideMenu();
 
 	});
 
