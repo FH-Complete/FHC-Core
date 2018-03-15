@@ -45,8 +45,6 @@ class InfoCenter extends VileSci_Controller
 		)
 	);
 	private $uid; // contains the UID of the logged user
-	private $navigationMenuArray; // contains all the voices for the navigation menu
-	private $navigationHeaderArray;
 
 	/**
 	 * Constructor
@@ -77,12 +75,7 @@ class InfoCenter extends VileSci_Controller
 		if(!$this->permissionlib->isBerechtigt('basis/person'))
 			show_error('You have no Permission! You need Infocenter Role');
 
-		$this->_setNavigationMenuArray(); // sets property navigationMenuArray
-
-		$this->navigationHeaderArray = array(
-			'headertext' => 'Infocenter',
-			'headertextlink' => base_url('index.ci.php/system/infocenter/InfoCenter')
-		);
+		$this->setNavigationMenuArray(); // sets property navigationMenuArray
     }
 
 	// -----------------------------------------------------------------------------------------------------------------
@@ -93,13 +86,7 @@ class InfoCenter extends VileSci_Controller
 	 */
 	public function index()
 	{
-		$this->load->view(
-			'system/infocenter/infocenter.php',
-			array(
-				'navigationHeaderArray' => $this->navigationHeaderArray,
-				'navigationMenuArray' => $this->navigationMenuArray
-			)
-		);
+		$this->load->view('system/infocenter/infocenter.php');
 	}
 
 	/**
@@ -131,11 +118,7 @@ class InfoCenter extends VileSci_Controller
 			'system/infocenter/infocenterDetails.php',
 			array_merge(
 				$persondata,
-				$prestudentdata,
-				array(
-					'navigationHeaderArray' => $this->navigationHeaderArray,
-					'navigationMenuArray' => $this->navigationMenuArray
-				)
+				$prestudentdata
 			)
 		);
 	}
@@ -464,7 +447,7 @@ class InfoCenter extends VileSci_Controller
 	/**
 	 *
 	 */
-	private function _setNavigationMenuArray()
+	public function setNavigationMenuArray()
 	{
 		$listFiltersSent = array();
 		$listFiltersNotSent = array();
@@ -532,12 +515,22 @@ class InfoCenter extends VileSci_Controller
 			$this->_fillCustomFilters($listCustomFilters, $filtersarray['personal']);
 		}
 
-		$this->navigationMenuArray = array(
-			'dashboard' => array(
+		if (!isset($_SESSION['navigation_menu']))
+		{
+			$_SESSION['navigation_menu'] = array();
+		}
+
+		$_SESSION['navigation_menu']['system/infocenter/InfoCenter/index'] = array(
+			'filters' => array(
 				'link' => '#',
-				'description' => 'Dashboard',
-				'icon' => 'dashboard'
-			),
+				'description' => 'Filter',
+				'icon' => 'filter',
+				'expand' => true,
+				'children' => $filtersarray
+			)
+		);
+
+		$_SESSION['navigation_menu']['system/infocenter/InfoCenter/showDetails'] = array(
 			'filters' => array(
 				'link' => '#',
 				'description' => 'Filter',
@@ -565,11 +558,17 @@ class InfoCenter extends VileSci_Controller
 		foreach ($filters as $filterId => $description)
 		{
 			$toPrint = "%s=%s";
+
+			if ($this->router->method != 'index')
+			{
+
+			}
+
 			$tofill['children'][] = array(
 				'link' => sprintf($toPrint, base_url('index.ci.php/system/infocenter/InfoCenter?filter_id'), $filterId),
 				'description' => $description,
 				'subscriptDescription' => 'Remove',
-				'subscriptLinkId' => 'removeFilterById',
+				'subscriptLinkClass' => 'remove-filter',
 				'subscriptLinkValue' => $filterId
 			);
 		}
@@ -817,6 +816,8 @@ class InfoCenter extends VileSci_Controller
 		$prestudentstatus = $prestudent->prestudentstatus;
 		$person_id = $prestudent->person_id;
 		$person = $this->PersonModel->getPersonStammdaten($person_id, true)->retval;
+		$dokumente = $this->AkteModel->getAktenWithDokInfo($person_id, null, false)->retval;
+		$dokumenteNachzureichen = $this->AkteModel->getAktenWithDokInfo($person_id, null, true)->retval;
 
 		//fill mail variables
 		$interessentbez = $person->geschlecht == 'm' ? 'Ein Interessent' : 'Eine Interessentin';
@@ -824,6 +825,25 @@ class InfoCenter extends VileSci_Controller
 		$orgform = $prestudentstatus->orgform != '' ? ' ('.$prestudentstatus->orgform.')' : '';
 		$geschlecht = $person->geschlecht == 'm' ? 'm&auml;nnlich' : 'weiblich';
 		$geburtsdatum = date('d.m.Y', strtotime($person->gebdatum));
+		$zgvort = !empty($prestudent->zgvort) ? ' in '.$prestudent->zgvort : '';
+		$zgvnation = !empty($prestudent->zgvnation_bez) ? ', '.$prestudent->zgvnation_bez : '';
+		$zgvdatum = !empty($prestudent->zgvdatum) ? ', am '.date_format(date_create($prestudent->zgvdatum), 'd.m.Y') : '';
+
+		$dokumenteNachzureichenMail = $dokumenteMail = array();
+		//convert documents to array so they can be parsed, and keeping only needed fields
+		$lastel = end($dokumente);
+		foreach ($dokumente as $dokument)
+		{
+			$postfix = $lastel === $dokument ? '' : ' |';
+			$dokumenteMail[] = array('dokument_bezeichnung' => $dokument->dokument_bezeichnung.$postfix);
+		}
+
+		foreach ($dokumenteNachzureichen as $dokument)
+		{
+			$anmerkung = !empty($dokument->anmerkung) ? ' | Anmerkung: '.$dokument->anmerkung : '';
+			$nachgereichtam = !empty($dokument->nachgereicht_am) ? ' | wird nachgereicht bis '.date_format(date_create($dokument->nachgereicht_am), 'd.m.Y') : '';
+			$dokumenteNachzureichenMail[] = array('dokument_bezeichnung' => $dokument->dokument_bezeichnung, 'anmerkung' => $anmerkung, 'nachgereicht_am' => $nachgereichtam);
+		}
 
 		$notizenBewerbung = $this->NotizModel->getNotizByTitel($person_id, 'Anmerkung zur Bewerbung')->retval;
 
@@ -860,7 +880,13 @@ class InfoCenter extends VileSci_Controller
 			'gebdatum' => $geburtsdatum,
 			'mailadresse' => $mailadresse,
 			'prestudentid' => $prestudent_id,
-			'notizentext' => $notizentext
+			'zgvbez' => $prestudent->zgv_bez,
+			'zgvort' => $zgvort,
+			'zgvdatum' => $zgvdatum,
+			'zgvnation' => $zgvnation,
+			'notizentext' => $notizentext,
+			'dokumente' => $dokumenteMail,
+			'dokumente_nachgereicht' => $dokumenteNachzureichenMail
 		);
 
 		$this->load->library('parser');

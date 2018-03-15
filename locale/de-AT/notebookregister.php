@@ -1,6 +1,6 @@
 <?php
 $this->phrasen['notebookregister/notebook_absatz1']='Sollten Sie mehr als ein Notebook registrieren lassen wollen, wenden Sie sich bitte an <a class="Item" href="mailto:support@technikum-wien.at?Subject=Notebook-Registration">support@technikum-wien.at</a>, da nur ein Eintrag pro Person m&ouml;glich ist.<br/><br/>Geben Sie die MAC-Adresse in folgendem Format an: 00-50-DA-C2-32-1C, oder 00:50:DA:C2:32:1C';
-$this->phrasen['notebookregister/notebook_absatz2']='Die Änderungen werden in ca. 30 Minuten wirksam. Bitte haben Sie etwas Geduld.<br/><br/>Um das Internet nutzen zu können, lassen Sie bitte die Netzwerkverbindungseinstellungen vom DHCP-Server zuweisen.<br/>In Ihrem Browser tragen Sie bitte den Proxy-Server: <strong>proxy.technikum-wien.at</strong> und den Port <strong>3128</strong> ein.';
+$this->phrasen['notebookregister/notebook_absatz2']='Die Änderungen werden in ca. 30 Minuten wirksam. Bitte haben Sie etwas Geduld.<br/><br/>Um das Internet nutzen zu können, lassen Sie bitte die Netzwerkverbindungseinstellungen vom DHCP-Server zuweisen.';
 $this->phrasen['notebookregister/notebook_anmerkung']='muss nur angegeben werden, wenn UID nicht gleich dem angemeldetem Benutzer';
 $this->phrasen['notebookregister/titelNotebookRegistration']='LAN Zugang';
 $this->phrasen['notebookregister/passwortEingebenWennUIDgeaendert']='Es muss ein Passwort eingegeben werden, wenn die UID geändert wird';

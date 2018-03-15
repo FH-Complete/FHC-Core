@@ -11,15 +11,19 @@ class Manager extends VileSci_Controller
 	 *
 	 */
 	public function __construct()
-    {
-        parent::__construct();
+	{
+		parent::__construct();
 
 		// Load helpers to upload files
 		$this->load->helper(array('form', 'url'));
 
-        // Loads the extensions library
-        $this->load->library('ExtensionsLib');
-    }
+		// Loads the extensions library
+		$this->load->library('ExtensionsLib');
+
+		$this->load->library('PermissionLib');
+		if(!$this->permissionlib->isBerechtigt('system/extensions'))
+			show_error('You have no Permission! You need Extensions Permission');
+	}
 
 	/**
 	 *

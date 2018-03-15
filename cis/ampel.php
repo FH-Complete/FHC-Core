@@ -77,25 +77,32 @@ if(is_user_logged_in())
 	}
 
 	
-	// Wenn es eine verpflichtende Ampel gibt, das Pupup im CIS anzeigen
+	//if at least ONE mandatory notification, which is not overdue -> trigger notification-POPUP
 	if ($cnt_notConf_notOverdue > 0)
 	{	
 			echo '	<script>
 					$(document).ready(function()
-					{
-						var html_content = \'<iframe src="'.APP_ROOT.'cis/private/tools/ampelverwaltung.php?verpflichtend=true" name="ampel" frameborder="0" width="95%" height="95%"></iframe><button id="close_button" onclick="hide_ampel_div()">Close</button>\';
+					{				
+						function resizeIframe(obj) 
+						{
+							obj.style.height = obj.contentWindow.document.body.scrollHeight + \'px\';
+						}
+						
+						var html_content = \'<iframe src="'.APP_ROOT.'cis/private/tools/ampelverwaltung.php?verpflichtend=true" name="ampel" frameborder="0" width="100%" height="100%  onload="resizeIframe(this) id="ampel_frame"></iframe><button id="close_button" onclick="hide_ampel_div()">Close</button>\';
 						$("#ampel_div").html(html_content);
 					});
 					</script>';
-			
+						
 			echo '	<style type="text/css">
 					#ampel_div
 					{
 						position:absolute;
 						top: 20%;
-						left: 15%;
-						width: 70%;
-						height: 60%;
+						left: 10%;
+						right: 10%;
+						width: 80%;
+						height: 45%;
+						scrolling: no;
 						z-index: 1003;
 						background-color: #fefefe;
 						margin: auto;

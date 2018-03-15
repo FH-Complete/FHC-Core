@@ -76,15 +76,15 @@ class ablauf extends basis_db
 
 		//laden des Datensatzes
 		$qry = "SELECT
-					tbl_ablauf.*, 
-					tbl_ablauf_vorgaben.sprache, 
-					tbl_ablauf_vorgaben.sprachwahl, 
+					tbl_ablauf.*,
+					tbl_ablauf_vorgaben.sprache,
+					tbl_ablauf_vorgaben.sprachwahl,
 					tbl_ablauf_vorgaben.content_id
 				FROM
 					testtool.tbl_ablauf
-				LEFT JOIN 
+				LEFT JOIN
 					testtool.tbl_ablauf_vorgaben USING (ablauf_vorgaben_id)
-				WHERE 
+				WHERE
 					ablauf_id=".$this->db_add_param($ablauf_id, FHC_INTEGER, false).";";
 
 		if($this->db_query($qry))
@@ -92,7 +92,7 @@ class ablauf extends basis_db
 			if($row = $this->db_fetch_object())
 			{
 				$obj = new ablauf();
-				
+
 				$obj->studiengang_kz = $row->studiengang_kz;
 				$obj->gebiet_id = $row->gebiet_id;
 				$obj->reihung = $row->reihung;
@@ -108,7 +108,7 @@ class ablauf extends basis_db
 				$obj->sprache = $row->sprache;
 				$obj->sprachwahl = $this->db_parse_bool($row->sprachwahl);
 				$obj->content_id = $row->content_id;
-				
+
 				$this->result[] = $obj;
 				return true;
 			}
@@ -152,7 +152,7 @@ class ablauf extends basis_db
 			return false;
 		}
 	}
-	
+
 	/**
 	 * Loescht einen Ablauf-Vorgabe Datensatz
 	 * @param $ablauf_vorgabe_id ID des zu loeschenden Datensatzes
@@ -166,10 +166,10 @@ class ablauf extends basis_db
 			$this->errormsg = 'ablauf_vorgabe_id muss eine gueltige Zahl sein';
 			return false;
 		}
-	
+
 		$qry = "DELETE FROM testtool.tbl_ablauf_vorgaben
 				WHERE ablauf_vorgaben_id=".$this->db_add_param($ablauf_vorgabe_id, FHC_INTEGER).";";
-	
+
 		if($this->db_query($qry))
 		{
 			return true;
@@ -300,7 +300,7 @@ class ablauf extends basis_db
 			return false;
 		}
 	}
-	
+
 	/**
 	 * Laedt die zugehoerigen Gebiete zum angegebenen Studiengang (gegebenfalls auch Studienplan)
 	 * @param $studiengang_kz ID des Studiengang
@@ -308,30 +308,31 @@ class ablauf extends basis_db
 	 * @param $semester
 	 * @return boolean true wenn ok sonst false
 	 */
-	public function getAblaufGebiete($studiengang_kz, $studienplan_id=null, $semester=null) 
+	public function getAblaufGebiete($studiengang_kz, $studienplan_id=null, $semester=null)
 	{
-		$qry = "SELECT 
-					tbl_ablauf.*, 
-					tbl_ablauf_vorgaben.sprache, 
-					tbl_ablauf_vorgaben.sprachwahl, 
-					tbl_ablauf_vorgaben.content_id 
-				FROM 
-					testtool.tbl_ablauf 
-				LEFT JOIN 
+		$qry = "SELECT
+					tbl_ablauf.*,
+					tbl_ablauf_vorgaben.sprache,
+					tbl_ablauf_vorgaben.sprachwahl,
+					tbl_ablauf_vorgaben.content_id
+				FROM
+					testtool.tbl_ablauf
+				LEFT JOIN
 					testtool.tbl_ablauf_vorgaben USING (ablauf_vorgaben_id)
-				WHERE 
-					tbl_ablauf.studiengang_kz=".$studiengang_kz;
+				WHERE
+					tbl_ablauf.studiengang_kz=".$this->db_add_param($studiengang_kz, FHC_INTEGER);
+
 		if (!is_null($studienplan_id))
-			$qry .= " AND studienplan_id=".$studienplan_id;
+			$qry .= " AND studienplan_id=".$this->db_add_param($studienplan_id, FHC_INTEGER);
 		if (!is_null($semester))
-			$qry .= " AND semester=".$semester;
+			$qry .= " AND semester=".$this->db_add_param($semester, FHC_INTEGER);
 
 		if($result = $this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object($result))
 			{
 				$obj = new stdClass();
-	
+
 				$obj->ablauf_id = $row->ablauf_id;
 				$obj->gebiet_id = $row->gebiet_id;
 				$obj->reihung = $row->reihung;
@@ -342,7 +343,7 @@ class ablauf extends basis_db
 				$obj->sprache = $row->sprache;
 				$obj->sprachwahl = $this->db_parse_bool($row->sprachwahl);
 				$obj->content_id = $row->content_id;
-	
+
 				$this->result[]= $obj;
 			}
 			return true;
@@ -353,7 +354,7 @@ class ablauf extends basis_db
 			return false;
 		}
 	}
-	
+
 	/**
 	 * Leadt die ablauf_id zu einer Kombination aus Studiengang und Gebiet
 	 * @param $studiengang_kz Studiengang
@@ -366,8 +367,10 @@ class ablauf extends basis_db
 					*
 				FROM
 					testtool.tbl_ablauf
-				WHERE studiengang_kz=".$studiengang_kz." AND gebiet_id=".$gebiet_id.";";
-		
+				WHERE
+					studiengang_kz=".$this->db_add_param($studiengang_kz, FHC_INTEGER)."
+					AND gebiet_id=".$this->db_add_param($gebiet_id, FHC_INTEGER).";";
+
 		if($this->db_query($qry))
 		{
 			if($row = $this->db_fetch_object())
@@ -382,7 +385,7 @@ class ablauf extends basis_db
 			}
 		}
 	}
-	
+
 	/**
 	 * Laedt eine Ablauf-Vorgabe
 	 * @param $ablauf_vorgaben_id ID des zu ladenden Datensatzes
@@ -395,14 +398,14 @@ class ablauf extends basis_db
 			$this->errormsg = 'ablauf_vorgaben_id muss eine gueltige Zahl sein';
 			return false;
 		}
-	
+
 		//laden des Datensatzes
 		$qry = "SELECT
 					*
 				FROM
 					testtool.tbl_ablauf_vorgaben
 				WHERE ablauf_vorgaben_id=".$this->db_add_param($ablauf_vorgaben_id, FHC_INTEGER, false).";";
-	
+
 		if($this->db_query($qry))
 		{
 			if($row = $this->db_fetch_object())
@@ -430,7 +433,7 @@ class ablauf extends basis_db
 			return false;
 		}
 	}
-	
+
 	/**
 	 * Speichert eine Ablauf-Vorgabe
 	 * Wenn $neu auf true gesetzt ist wird ein neuer Datensatz angelegt
@@ -506,27 +509,27 @@ class ablauf extends basis_db
 			return false;
 		}
 	}
-	
+
 	/**
 	 * Laedt alle Ablauf-Vorgaben Eintraege
 	 * @return boolean true wenn ok sonst false
 	 */
-	public function getAllAblaufVorgaben() 
+	public function getAllAblaufVorgaben()
 	{
 		$qry = "SELECT * FROM testtool.tbl_ablauf_vorgaben";
-	
+
 		if($result = $this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object($result))
 			{
 				$obj = new ablauf();
-	
+
 				$obj->ablauf_vorgaben_id = $row->ablauf_vorgaben_id;
 				$obj->studiengang_kz = $row->studiengang_kz;
 				$obj->sprache = $row->sprache;
 				$obj->sprachwahl = $this->db_parse_bool($row->sprachwahl);
 				$obj->content_id = $row->content_id;
-	
+
 				$this->result[]= $obj;
 			}
 			return true;
@@ -537,7 +540,7 @@ class ablauf extends basis_db
 			return false;
 		}
 	}
-	
+
 	/**
 	 * Laedt einen Ablauf-Vorgabe Eintrag anhand der uebergebenen Studiengangskennzahl
 	 * @param $studiengang_kz ID des Studiengang
@@ -551,21 +554,22 @@ class ablauf extends basis_db
 			$this->errormsg = 'studiengang_kz muss eine gueltige Zahl sein';
 			return false;
 		}
-		
-		$qry = "SELECT * FROM testtool.tbl_ablauf_vorgaben WHERE studiengang_kz=".$this->db_add_param($studiengang_kz, FHC_INTEGER, false);
-	
+
+		$qry = "SELECT * FROM testtool.tbl_ablauf_vorgaben
+				WHERE studiengang_kz=".$this->db_add_param($studiengang_kz, FHC_INTEGER, false);
+
 		if($result = $this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object($result))
 			{
 				$obj = new ablauf();
-	
+
 				$obj->ablauf_vorgaben_id = $row->ablauf_vorgaben_id;
 				$obj->studiengang_kz = $row->studiengang_kz;
 				$obj->sprache = $row->sprache;
 				$obj->sprachwahl = $row->sprachwahl;
 				$obj->content_id = $row->content_id;
-	
+
 				$this->result[]= $obj;
 			}
 			return true;
@@ -576,7 +580,7 @@ class ablauf extends basis_db
 			return false;
 		}
 	}
-	
+
 	/**
 	 * Zaehlt, wie of die ablauf_vorgabe_id noch in tbl_ablauf verwendet wird
 	 * @param integer $ablauf_vorgaben_id Ablauf-Vorlage-ID
@@ -590,9 +594,10 @@ class ablauf extends basis_db
 			$this->errormsg = 'ablauf_vorgaben_id muss eine gueltige Zahl sein';
 			return false;
 		}
-	
-		$qry = "SELECT count(*) FROM testtool.tbl_ablauf WHERE ablauf_vorgaben_id=".$this->db_add_param($ablauf_vorgaben_id, FHC_INTEGER);
-	
+
+		$qry = "SELECT count(*) FROM testtool.tbl_ablauf
+				WHERE ablauf_vorgaben_id=".$this->db_add_param($ablauf_vorgaben_id, FHC_INTEGER);
+
 		if($this->db_query($qry))
 		{
 			if($row = $this->db_fetch_object())
@@ -621,24 +626,25 @@ class ablauf extends basis_db
 	 */
 	public function getDauer($studiengang_kz, $studienplan_id=null, $semester=null)
 	{
-		$qry = "SELECT 
+		$qry = "SELECT
 					SUM (zeit) as dauer
-				FROM 
-					testtool.tbl_ablauf 
-				JOIN 
+				FROM
+					testtool.tbl_ablauf
+				JOIN
 					testtool.tbl_gebiet USING (gebiet_id)
-				WHERE 
-					studiengang_kz=".$studiengang_kz;
+				WHERE
+					studiengang_kz=".$this->db_add_param($studiengang_kz, FHC_INTEGER);
+
 		if (!is_null($studienplan_id))
-			$qry .= " AND studienplan_id=".$studienplan_id;
+			$qry .= " AND studienplan_id=".$this->db_add_param($studienplan_id, FHC_INTEGER);
 		if (!is_null($semester))
-			$qry .= " AND semester=".$semester;
+			$qry .= " AND semester=".$this->db_add_param($semester, FHC_INTEGER);
 
 		if($this->db_query($qry))
 		{
 			if($row = $this->db_fetch_object())
 			{
-					
+
 				return $row->dauer;
 			}
 			else

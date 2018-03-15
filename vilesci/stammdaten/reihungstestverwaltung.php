@@ -178,14 +178,22 @@ if(isset($_GET['excel']))
 	$reihungstest = new reihungstest();
 	if($reihungstest->load($_GET['reihungstest_id']))
 	{
+		$rt_studienplan_id = '';
 		$studienplaene_arr = array();
 		$studienplaene = new reihungstest();
 		$studienplaene->getStudienplaeneReihungstest($reihungstest->reihungstest_id);
 		foreach ($studienplaene->result AS $row)
 		{
 			$studienplan = new studienplan();
-			$studienplan->loadStudienplan($row->studienplan_id);
-			$studienplaene_arr[ $row->studienplan_id] = $studienplan->bezeichnung;
+			if($studienplan->loadStudienplan($row->studienplan_id))
+			{
+				$studienplaene_arr[ $row->studienplan_id] = $studienplan->bezeichnung;
+				$rt_studienplan_id = $row->studienplan_id;
+			}
+			else
+			{
+				die('Fehler beim Laden:'.$studienplan->errormsg);
+			}
 		}
 
 		$studienplaene_list = implode(',', array_keys($studienplaene_arr));
@@ -249,12 +257,15 @@ if(isset($_GET['excel']))
 			";
 
 		$gebietbezeichnungen = array();
-		$qry_gebiete = "SELECT gebiet_id, reihung, bezeichnung FROM testtool.tbl_ablauf JOIN testtool.tbl_gebiet USING (gebiet_id) WHERE studienplan_id = ".$db->db_add_param($row->studienplan_id)." ORDER BY reihung";
-		if($result_gebiete = $db->db_query($qry_gebiete))
+		if ($rt_studienplan_id != '')
 		{
-			while($row_gebiete = $db->db_fetch_object($result_gebiete))
+			$qry_gebiete = "SELECT gebiet_id, reihung, bezeichnung FROM testtool.tbl_ablauf JOIN testtool.tbl_gebiet USING (gebiet_id) WHERE studienplan_id = ".$db->db_add_param($rt_studienplan_id)." ORDER BY reihung";
+			if($result_gebiete = $db->db_query($qry_gebiete))
 			{
-				$gebietbezeichnungen[$row_gebiete->gebiet_id] = $row_gebiete->bezeichnung;
+				while($row_gebiete = $db->db_fetch_object($result_gebiete))
+				{
+					$gebietbezeichnungen[$row_gebiete->gebiet_id] = $row_gebiete->bezeichnung;
+				}
 			}
 		}
 

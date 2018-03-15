@@ -30,11 +30,11 @@ require_once('../../../include/lehrveranstaltung.class.php');
 require_once('../../../include/phrasen.class.php');
 require_once('../../../include/basis_db.class.php');
 
-$sprache = getSprache(); 
+$sprache = getSprache();
 $p = new phrasen($sprache);
 
 if (!$db = new basis_db())
-	$db=false;
+	die('Unable to Connect');
 
 $user = get_uid();
 
@@ -42,38 +42,45 @@ $user = get_uid();
 $stsem_obj = new studiensemester();
 $stsem = $stsem_obj->getaktorNext();
 
-?>
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-	<html>
+?><!DOCTYPE HTML>
+<html>
 	<head>
-	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-	<link href="../../../skin/style.css.php" rel="stylesheet" type="text/css">
-	<title><?php echo $p->t('freifach/freifaecherAnmeldung');?></title>
+		<meta charset="UTF-8">
+		<link href="../../../skin/style.css.php" rel="stylesheet" type="text/css">
+		<title><?php echo $p->t('freifach/freifaecherAnmeldung');?></title>
 	</head>
-
 	<body>
 	<h1><?php echo $p->t('freifach/freifaecherAnmeldung');?></h1>
-	    	
 		<?php echo $p->t('freifach/markierenFreifachFuerAnmeldung');?>:
-	   	<br />
+	<br />
 <?php
 //Wenn das Formular abgeschickt wurde
-if(isset($_POST['submit']))
+if (isset($_POST['submit']))
 {
 	//Wenn eine der Checkboxen angeklickt wurde
-	if(isset($_POST['chkbox']))
+	if (isset($_POST['chkbox']))
 	{
 		$db->db_query('BEGIN');
 		//Zuerst die alten Eintraege herausloeschen...
-		$qry = "DELETE FROM campus.tbl_benutzerlvstudiensemester WHERE uid='$user' AND studiensemester_kurzbz='$stsem'";
-		if(!$db->db_query($qry))
+		$qry = "DELETE FROM campus.tbl_benutzerlvstudiensemester
+			WHERE
+				uid=".$db->db_add_param($user)."
+				AND studiensemester_kurzbz=".$db->db_add_param($stsem);
+		if (!$db->db_query($qry))
 			die($p->t('freifach/fehlerBeimAktualisieren'));
 
 		//...dann die angeklickten FF hinzufuegen
 		foreach ($_POST['chkbox'] as $elem)
 		{
-			$qry = "INSERT INTO campus.tbl_benutzerlvstudiensemester(uid, lehrveranstaltung_id, studiensemester_kurzbz) VALUES('$user','$elem','$stsem');";
-			if(!$db->db_query($qry))
+			if (!is_numeric($elem))
+			{
+				$db->db_query('ROLLBACK');
+				die('Unbekannter Parameter gefunden - Operation wird abgebrochen');
+			}
+
+			$qry = "INSERT INTO campus.tbl_benutzerlvstudiensemester(uid, lehrveranstaltung_id, studiensemester_kurzbz)
+			VALUES(".$db->db_add_param($user).",".$db->db_add_param($elem).",".$db->db_add_param($stsem).");";
+			if (!$db->db_query($qry))
 			{
 				$db->db_query('ROLLBACK');
 				die($p->t('freifach/freifaecherNichtZugeteilt'));
@@ -85,53 +92,60 @@ if(isset($_POST['submit']))
 	else
 	{
 		//Wenn keine Checkbox angeklickt wurde, alle Eintraege herausloeschen
-		$qry = "DELETE FROM campus.tbl_benutzerlvstudiensemester WHERE uid='$user' AND studiensemester_kurzbz='$stsem'";
-		if(!$db->db_query($qry))
-				die($p->t('freifach/fehlerBeimAktualisieren'));
+		$qry = "DELETE FROM campus.tbl_benutzerlvstudiensemester
+			WHERE uid=".$db->db_add_param($user)." AND studiensemester_kurzbz=".$db->db_add_param($stsem);
+
+		if (!$db->db_query($qry))
+			die($p->t('freifach/fehlerBeimAktualisieren'));
 		else
-				echo "<b>".$p->t('freifach/datenErfolgreichAktualisiert')."!</b><br />";
+			echo "<b>".$p->t('freifach/datenErfolgreichAktualisiert')."!</b><br />";
 	}
 }
 
 //Freifachzuteilungen holen
-$qry = "SELECT * FROM campus.tbl_benutzerlvstudiensemester WHERE uid = '$user' AND studiensemester_kurzbz='$stsem'";
-if($result=$db->db_query($qry))
+$qry = "SELECT * FROM campus.tbl_benutzerlvstudiensemester
+WHERE uid = ".$db->db_add_param($user)." AND studiensemester_kurzbz=".$db->db_add_param($stsem);
+
+if ($result = $db->db_query($qry))
 {
 	$ff = array();
-	while($row=$db->db_fetch_object($result))
-				$ff[] = $row->lehrveranstaltung_id;
+	while ($row = $db->db_fetch_object($result))
+	{
+		$ff[] = $row->lehrveranstaltung_id;
+	}
 }
 else
-	echo $p->t('freifach/fehlerBeimAuslesen');;
+	echo $p->t('freifach/fehlerBeimAuslesen');
 
 echo '<br />';
 //Freifaecher laden
 $lv_obj = new lehrveranstaltung();
-if($lv_obj->load_lva('0',null,null,true,null,'bezeichnung'))
+if ($lv_obj->load_lva('0', null, null, true, null, 'bezeichnung'))
 {
 	$anz = count($lv_obj->lehrveranstaltungen);
 
 	echo "<form method='POST'>";
-	$i=0;
+	$i = 0;
 	echo "<table><tr><td valign='top'>";
-	foreach($lv_obj->lehrveranstaltungen as $row)
+	foreach ($lv_obj->lehrveranstaltungen as $row)
 	{
 		//Auftrennen in eine zweite Spalte bei der haelfte der Eintraege
-		if($i==intval($anz/2))
+		if ($i == intval($anz / 2))
 			echo "</td><td valign='top'>";
 
-		if(in_array($row->lehrveranstaltung_id,$ff))
+		if (in_array($row->lehrveranstaltung_id, $ff))
 			$checked = "checked='true'";
 		else
 			$checked = '';
 
 		//Wenn aktiv=false dann ist fuer dieses Lehrfach keine Anmeldung mehr moeglich
-		if($row->aktiv==false && $checked=='')
+		if ($row->aktiv == false && $checked == '')
 			$disabled = "disabled='true'";
 		else
 			$disabled = "";
 
-		echo "<input type='checkbox' value='$row->lehrveranstaltung_id' name='chkbox[]' $checked $disabled >$row->bezeichnung<br />";
+		echo "\n<input type='checkbox' value='$row->lehrveranstaltung_id' name='chkbox[]' $checked $disabled >";
+		echo "$row->bezeichnung<br />";
 		$i++;
 	}
 	echo "</td></tr><tr><td></td><td>&nbsp;</td></tr>";
@@ -144,18 +158,5 @@ else
 	die($p->t('freifach/fehlerBeimAuslesenFreifach'));
 }
 ?>
-				
-			<table>
-			<tr>
-				<td>&nbsp;
-				</td>
-			</tr>
-<!-- 			<tr>  ****Von kindlm am 21.03.2012 aukommentiert, da diese Info nur zu Verwirrungen geführt hat.****
-				<td style="border-color:#0086CB; border-width:2px; border-style:solid; padding:8px"><?php echo $p->t('freifach/abmeldungNurUeberAssistenz');?>
-				</td>
-			</tr>-->
-			</table>
-			</table>
-
 </body>
 </html>
