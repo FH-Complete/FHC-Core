@@ -9,10 +9,12 @@
 				p.vorname AS "Vorname",
 				p.nachname AS "Nachname",
 				p.gebdatum AS "Gebdatum",
+				p.staatsbuergerschaft AS "Nation",
 				(
 					SELECT zeitpunkt
 					FROM system.tbl_log
 					WHERE taetigkeit_kurzbz IN(\'bewerbung\',\'kommunikation\')
+					AND logdata->>\'name\' != \'Login with code\'
 					AND person_id = p.person_id
 					ORDER BY zeitpunkt DESC
 					LIMIT 1
@@ -21,6 +23,7 @@
 					SELECT insertvon
 					FROM system.tbl_log
 					WHERE taetigkeit_kurzbz IN(\'bewerbung\',\'kommunikation\')
+					AND logdata->>\'name\' != \'Login with code\'
 					AND person_id = p.person_id
 					ORDER BY zeitpunkt DESC
 					LIMIT 1
@@ -141,7 +144,7 @@
 		'hideSave' => false,
 		'checkboxes' => 'PersonId',
 		'additionalColumns' => array('Details'),
-		'columnsAliases' => array('PersonID','Vorname','Nachname','GebDatum','Letzte Aktion','Letzter Bearbeiter',
+		'columnsAliases' => array('PersonID','Vorname','Nachname','GebDatum','Nation','Letzte Aktion','Letzter Bearbeiter',
 			'StSem','GesendetAm','NumAbgeschickt','Studiengänge','Sperrdatum','GesperrtVon'),
 		'formatRaw' => function($datasetRaw) {
 
@@ -187,6 +190,11 @@
 			if ($datasetRaw->{'StgAbgeschickt'} == null)
 			{
 				$datasetRaw->{'StgAbgeschickt'} = 'N/A';
+			}
+
+			if ($datasetRaw->{'Nation'} == null)
+			{
+				$datasetRaw->{'Nation'} = '-';
 			}
 
 			return $datasetRaw;
