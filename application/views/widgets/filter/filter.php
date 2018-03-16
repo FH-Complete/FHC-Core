@@ -94,9 +94,26 @@
 </style>
 <script language="Javascript" type="text/javascript">
 
-	$(document).ready(function() {
+	function refreshSideMenu()
+	{
+		$.ajax({
+			url: "<?php echo base_url('index.ci.php/system/infocenter/InfoCenter/setNavigationMenuArray'); ?>",
+			method: "GET",
+			data: {}
+		})
+		.done(function(data, textStatus, jqXHR) {
 
-		$("#removeFilterById").click(function() {
+			renderSideMenu();
+
+		}).fail(function(jqXHR, textStatus, errorThrown) {
+			alert(textStatus);
+		});
+	}
+
+	function sideMenuHook()
+	{
+		$(".remove-filter").click(function() {
+
 			$.ajax({
 				url: "<?php echo base_url('index.ci.php/system/Filters/deleteCustomFilter'); ?>",
 				method: "POST",
@@ -105,11 +122,17 @@
 				}
 			})
 			.done(function(data, textStatus, jqXHR) {
-				alert("Filter successfully removed");
+
+				refreshSideMenu();
+
 			}).fail(function(jqXHR, textStatus, errorThrown) {
 				alert(textStatus);
 			});
+
 		});
+	}
+
+	$(document).ready(function() {
 
 		$("[data-toggle='collapse']").click(function() {
 

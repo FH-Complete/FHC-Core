@@ -176,7 +176,7 @@ $menu=array
 	'Wartung'=>	array
 	(
 		'name'=>'Wartung', 'opener'=>'true', 'hide'=>'true', 'image'=>'vilesci_wartung.png', 'link'=>'left.php?categorie=Wartung', 'target'=>'nav',
-
+		'permissions'=>array('basis/studiengang','lehre/vorrueckung','student/vorrueckung','admin','basis/firma','student/stammdaten','assistenz','lv-plan'),
 		'DokumenteZuteilung'=>array('name'=>'Dokumente Zuteilung', 'link'=>'stammdaten/studiengang_dokumente.php', 'target'=>'main', 'permissions'=>array('basis/studiengang')),
 		'Vorrueckung'=>	array
 		(
@@ -186,7 +186,7 @@ $menu=array
 		),
 		'Kreuzerllistekopieren'=>array('name'=>'Kreuzerllisten kopieren', 'link'=>CIS_ROOT.'cis/private/lehre/benotungstool/copy_uebung.php', 'target'=>'_blank','permissions'=>array('admin')),
 		'Firmenwartung'=>array('name'=>'Firmenwartung', 'link'=>'stammdaten/firma_zusammen_uebersicht.php', 'target'=>'main','permissions'=>array('basis/firma')),
-		'checkStudenten'=>array('name'=>'CheckStudenten', 'link'=>'../system/checkStudenten.php', 'target'=>'main'),
+		'checkStudenten'=>array('name'=>'CheckStudenten', 'link'=>'../system/checkStudenten.php', 'target'=>'main', 'permissions'=>array('student/stammdaten')),
 		'StudienplanZuteilung'=>array('name'=>'Studienplan Zuteilung', 'link'=>'lehre/studienplan_zuteilung.php', 'target'=>'main','permissions'=>array('assistenz')),
 		'lv_merge'=>array('name'=>'LVs zusammenlegen', 'link'=>'lehre/lv_merge.php', 'target'=>'main','permissions'=>array('admin','lv-plan')),
 		'akteupdate'=>array('name'=>'Akten überschreiben', 'link'=>'personen/akteupdate.php', 'target'=>'main','permissions'=>array('admin')),

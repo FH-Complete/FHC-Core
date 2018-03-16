@@ -49,7 +49,7 @@ class nation extends basis_db
 	public function __construct($code=null)
 	{
 		parent::__construct();
-		
+
 		if($code != null)
 			$this->load($code);
 	}
@@ -64,7 +64,7 @@ class nation extends basis_db
 	{
 		//Lesen der Daten aus der Datenbank
 		$qry = "SELECT * FROM bis.tbl_nation WHERE nation_code=".$this->db_add_param($code).';';
-		
+
 		if(!$this->db_query($qry))
 		{
 			$this->errormsg = 'Fehler bei einer Datenbankabfrage';
@@ -101,17 +101,17 @@ class nation extends basis_db
 	{
 		//Lesen der Daten aus der Datenbank
 		$qry = "SELECT * FROM bis.tbl_nation";
-		
+
 		if ($ohnesperre)
-			$qry .= " WHERE sperre is null";
-		
+			$qry .= " WHERE sperre is null OR sperre is false";
+
 		if ($orderEnglish == false)
 			$qry .= " ORDER BY kurztext";
-		else 
+		else
 			$qry .= " ORDER BY engltext";
-        
+
         $qry .= ';';
-			
+
 		if (!$this->db_query($qry))
 		{
 			$this->errormsg = 'Fehler bei einer Datenbankabfrage';
@@ -134,10 +134,10 @@ class nation extends basis_db
 
 			$this->nation[] = $nation;
 		}
-		
+
 		return true;
 	}
-	
+
 	/**
 	 * Speichert die Personendaten in die Datenbank
 	 * @return true wenn erfolgreich, false im Fehlerfall

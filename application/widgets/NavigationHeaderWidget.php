@@ -8,8 +8,8 @@ class NavigationHeaderWidget extends Widget
 	/**
 	 *
 	 */
-	public function display($data)
+	public function display($widgetData)
 	{
-		$this->view('widgets/navigationHeader', $data);
+		$this->view('widgets/navigationHeader');
 	}
 }

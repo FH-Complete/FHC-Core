@@ -133,7 +133,7 @@ class zeitaufzeichnung extends basis_db
 		//Variablen pruefen
 		if(!$this->validate())
 			return false;
-		
+
 		// check ob identischer eintrag existiert
 		$check_qry = 'SELECT count(*) from campus.tbl_zeitaufzeichnung where uid='.$this->db_add_param($this->uid).' and start = '.$this->db_add_param($this->start).' and ende = '.$this->db_add_param($this->ende);
 		if($this->db_query($check_qry) && $this->new)
@@ -142,13 +142,13 @@ class zeitaufzeichnung extends basis_db
 			{
 				if ($row->count)
 				{
-					$this->errormsg = 'Identischer Eintrag existiert!';							
+					$this->errormsg = 'Identischer Eintrag existiert!';
 					return false;
 				}
 			}
 		}
-		
-		
+
+
 		if($this->new)
 		{
 			//Neuen Datensatz einfuegen
@@ -339,7 +339,7 @@ class zeitaufzeichnung extends basis_db
 		//zusätzlicher Tag - SQL rechnet letzten Tag nicht hinein
 		$to = date('Y-m-d', strtotime($to. ' + 1 days'));
 
-		$where.= " AND ((start >= ".$this->db_add_param($from)."::DATE AND start <= ".$this->db_add_param($to)."::DATE) 
+		$where.= " AND ((start >= ".$this->db_add_param($from)."::DATE AND start <= ".$this->db_add_param($to)."::DATE)
 		OR (ende >= ".$this->db_add_param($from)."::DATE AND ende <= ".$this->db_add_param($to)."::DATE))";
 
 		$qry = "SELECT
@@ -506,16 +506,16 @@ class zeitaufzeichnung extends basis_db
 	    	return false;
 	    }
 	}
-	
+
 	/**
-	 * Löscht sämtliche Einträge eines Users für einen Tag 
+	 * Löscht sämtliche Einträge eines Users für einen Tag
 	 * @param string $user
 	 * @param string $tag Y-m-d
 	 */
 	public function deleteEntriesForUser($user, $tag)
-	{		 
-		$where = "uid=".$this->db_add_param($user);	
-		
+	{
+		$where = "uid=".$this->db_add_param($user);
+
 		$qry = "delete from campus.tbl_zeitaufzeichnung where $where and date_trunc('day', start) = '$tag'";
 	    if($result = $this->db_query($qry))
 	    {
@@ -529,28 +529,28 @@ class zeitaufzeichnung extends basis_db
 	}
 
 	/**
-	 * Löscht Pauseneinträge eines Users für einen Tag, die außerhalb der Arbeitszeit liegen 
+	 * Löscht Pauseneinträge eines Users für einen Tag, die außerhalb der Arbeitszeit liegen
 	 * Löscht Pauseneinträge an Tagen ohne Arbeitszeit
 	 * @param string $user
 	 * @param string $tag Y-m-d
 	 */
 	public function cleanPausenForUser($user, $tag)
-	{		 
-		$where = "uid=".$this->db_add_param($user);	
-		
+	{
+		$where = "uid=".$this->db_add_param($user);
+
 		$qry = "
 		delete from campus.tbl_zeitaufzeichnung where aktivitaet_kurzbz = 'Pause' and start::date = '$tag' and $where and
 (
-start::time >= 
+start::time >=
 (SELECT max(ende::time) as endzeit from campus.tbl_zeitaufzeichnung where $where and start::date = '$tag' AND (aktivitaet_kurzbz != 'LehreExtern' or aktivitaet_kurzbz is null ) and aktivitaet_kurzbz != 'Pause')
 or
 ende::time<=
 (SELECT min(start::time) as startzeit from campus.tbl_zeitaufzeichnung where $where and start::date = '$tag' AND (aktivitaet_kurzbz != 'LehreExtern' or aktivitaet_kurzbz is null ) and aktivitaet_kurzbz != 'Pause')
 or not exists
-(select 1 from campus.tbl_zeitaufzeichnung where aktivitaet_kurzbz != 'LehreExtern' and aktivitaet_kurzbz != 'Pause' and start::date = '$tag' and $where ) 
+(select 1 from campus.tbl_zeitaufzeichnung where aktivitaet_kurzbz != 'LehreExtern' and aktivitaet_kurzbz != 'Pause' and start::date = '$tag' and $where )
 )
 		";
-		
+
 	    if($result = $this->db_query($qry))
 	    {
 	    	return true;
@@ -563,52 +563,79 @@ or not exists
 	}
 
 	/**
-	 * Holt alle ZA-Einträge Typ LehreIntern und LehreExtern  eines Users 
+	 * Holt alle ZA-Einträge Typ LehreIntern und LehreExtern  eines Users
 	 * für das laufende Studienjahr und gibt die Summen in einem Array zurück
 	 * @param string $user
-	 * @return Array mit Keay: LehreIntern, LehreExtern, LehreAuftraege, LehreInkludiert
-	 */	
+	 * @return Array mit Key: LehreIntern, LehreExtern, LehreAuftraege, LehreInkludiert
+	 */
 	public function getLehreForUser($user,$sem)
 	{
-		$where = "uid=".$this->db_add_param($user);	
+		$where = "uid=".$this->db_add_param($user);
 		$where_sem = "studiensemester_kurzbz=".$this->db_add_param($sem);
 		$lehre_arr = array("LehreIntern"=>0, "LehreExtern"=>0, "LehreAuftraege"=>0);
-		
+
 		$qry = "
 		select sum(extract(epoch from ende-start))/3600 as lehre, aktivitaet_kurzbz from campus.tbl_zeitaufzeichnung where $where and aktivitaet_kurzbz in ('LehreIntern', 'LehreExtern') and start > (select start from public.tbl_studiensemester where $where_sem) group by aktivitaet_kurzbz
 		";
-		
+
 	    if($result = $this->db_query($qry))
 	    {
-				    	
+
 	    	while($row = $this->db_fetch_object($result))
 	    	{
-					$lehre_arr[$row->aktivitaet_kurzbz] = round($row->lehre,2);	
+					$lehre_arr[$row->aktivitaet_kurzbz] = round($row->lehre,2);
 	    	}
 	    }
 	    else
 	    {
 	    	return false;
-	    }	
+	    }
 	    $where = "mitarbeiter_uid=".$this->db_add_param($user);
 	    $where_sem = "l.studiensemester_kurzbz=".$this->db_add_param($sem);
-	    $qry = "
-		select sum(m.semesterstunden) from lehre.tbl_lehreinheitmitarbeiter m, lehre.tbl_lehreinheit l where $where and $where_sem and l.lehreinheit_id = m.lehreinheit_id and m.stundensatz*m.semesterstunden > 0
+
+		$qry = "
+		SELECT sum(semstunden) AS stunden
+		FROM
+		(
+			SELECT sum(m.semesterstunden) AS semstunden
+			FROM
+				lehre.tbl_lehreinheitmitarbeiter m,
+				lehre.tbl_lehreinheit l
+			WHERE
+				$where AND
+				$where_sem AND
+				l.lehreinheit_id = m.lehreinheit_id AND
+				m.stundensatz * m.semesterstunden > 0
+			UNION
+			SELECT sum(pb.stunden) AS semstunden
+			FROM
+				lehre.tbl_projektarbeit pa,
+				lehre.tbl_projektbetreuer pb,
+				lehre.tbl_lehreinheit l,
+				public.tbl_benutzer b
+			WHERE
+				pa.lehreinheit_id = l.lehreinheit_id AND
+				pb.projektarbeit_id = pa.projektarbeit_id AND
+				pb.person_id = b.person_id AND
+				b.uid = ".$this->db_add_param($user)." AND
+				pb.stunden * pb.stundensatz > 0 AND
+				$where_sem
+		) AS semstunden
 		";
-		
+
 	    if($result = $this->db_query($qry))
 	    {
-				    	
+
 	    	while($row = $this->db_fetch_object($result))
 	    	{
-					$lehre_arr["LehreAuftraege"] = round($row->sum);	
+					$lehre_arr["LehreAuftraege"] = round($row->stunden);
 	    	}
 	    }
 	    else
 	    {
 	    	return false;
-	    }	
-	    
+	    }
+
 	    return $lehre_arr;
 	}
 }
