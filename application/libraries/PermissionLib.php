@@ -23,12 +23,19 @@ require_once(FHCPATH.'include/benutzerberechtigung.class.php');
 
 class PermissionLib
 {
-	// Available rights
+	// Available rights in the DB
 	const SELECT_RIGHT = 's';
 	const UPDATE_RIGHT = 'u';
 	const INSERT_RIGHT = 'i';
 	const DELETE_RIGHT = 'd';
 	const REPLACE_RIGHT = 'ui';
+
+	// Available rights to access a controller
+	const READ_RIGHT = 'r';
+	const WRITE_RIGHT = 'w';
+	const READ_WRITE_RIGHT = 'rw';
+
+	const PERMISSION_SEPARATOR = ':'; // used as separator berween permission and right
 
 	private $acl; // conversion array from a source to a permission
 	private static $bb; // benutzerberechtigung
@@ -41,9 +48,6 @@ class PermissionLib
 	{
 		// Loads CI instance
 		$this->ci =& get_instance();
-
-		// Loads the library to manage the rights system
-		//$this->ci->load->library('FHC_DB_ACL');
 
 		// Loads the auth helper
 		$this->ci->load->helper('fhcauth');
@@ -69,7 +73,8 @@ class PermissionLib
 	{
 		$isEntitled = false;
 
-		if(!is_cli())
+		// If it's called from command line than it's trusted
+		if (!is_cli())
 		{
 			// If the resource exists
 			if (isset($this->acl[$sourceName]))
