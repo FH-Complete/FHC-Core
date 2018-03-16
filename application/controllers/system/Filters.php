@@ -5,7 +5,7 @@ if (! defined('BASEPATH')) exit('No direct script access allowed');
 /**
  *
  */
-class Filters extends VileSci_Controller
+class Filters extends FHC_Controller
 {
 	const SESSION_NAME = 'FILTER';
 

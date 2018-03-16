@@ -2,7 +2,7 @@
 
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
-class Vorlage extends VileSci_Controller 
+class Vorlage extends FHC_Controller 
 {
 	public function __construct()
     {

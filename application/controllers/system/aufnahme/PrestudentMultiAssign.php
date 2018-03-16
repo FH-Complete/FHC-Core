@@ -2,7 +2,7 @@
 
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
-class PrestudentMultiAssign extends VileSci_Controller
+class PrestudentMultiAssign extends FHC_Controller
 {
 	public function __construct()
     {

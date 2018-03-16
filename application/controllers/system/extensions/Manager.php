@@ -5,7 +5,7 @@ if (! defined('BASEPATH')) exit('No direct script access allowed');
 /**
  *
  */
-class Manager extends VileSci_Controller
+class Manager extends FHC_Controller
 {
 	/**
 	 *

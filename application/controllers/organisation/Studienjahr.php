@@ -5,7 +5,7 @@ if (!defined("BASEPATH")) exit("No direct script access allowed");
 /**
  * Studienjahr controller for listing, editing and removing a Studienjahr
  */
-class Studienjahr extends VileSci_Controller
+class Studienjahr extends FHC_Controller
 {
 
 	/**

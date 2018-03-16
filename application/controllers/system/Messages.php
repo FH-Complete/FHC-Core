@@ -2,7 +2,7 @@
 
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
-class Messages extends VileSci_Controller
+class Messages extends FHC_Controller
 {
 	private $uid; // contains the UID of the logged user
 

@@ -6,7 +6,7 @@ if (! defined('BASEPATH')) exit('No direct script access allowed');
  * Also shows infocenter-related data for a person and its prestudents, enables document and zgv checks,
  * displays and saves Notizen for a person, logs infocenter-related actions for a person
  */
-class InfoCenter extends VileSci_Controller
+class InfoCenter extends FHC_Controller
 {
 	// App and Verarbeitungstaetigkeit name for logging
 	const APP = 'infocenter';

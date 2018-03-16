@@ -1,7 +1,7 @@
 <?php
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
-class Login extends VileSci_Controller 
+class Login extends FHC_Controller 
 {
 
 	public function __construct()

@@ -2,7 +2,7 @@
 
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
-class UDF extends VileSci_Controller 
+class UDF extends FHC_Controller 
 {
 	public function __construct()
     {

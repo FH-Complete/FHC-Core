@@ -5,7 +5,7 @@ if (! defined('BASEPATH')) exit('No direct script access allowed');
 /**
  *
  */
-class Navigation extends VileSci_Controller
+class Navigation extends FHC_Controller
 {
 	const SESSION_NAME = 'NAVIGATION_MENU';
 
