@@ -26,6 +26,7 @@ require_once('../include/dms.class.php');
 require_once('../include/benutzerberechtigung.class.php');
 require_once('../include/basis_db.class.php');
 require_once('../include/datum.class.php');
+require_once('../include/log.class.php');
 
 $db = new basis_db();
 $user = get_uid();
@@ -395,32 +396,58 @@ if(isset($_POST['action']) && $_POST['action']=='rename')
 
 if(isset($_REQUEST['delete']))
 {
-    if(!$rechte->isberechtigt('basis/dms',null, 'suid', null))
-        die($rechte->errormsg);
-
-    // lösche nur die Version
-    if(isset($_REQUEST['version']))
-    {
-        $dms_id = $_REQUEST['dms_id'];
-        $version = $_REQUEST['version'];
-
-        $dms = new dms();
-        $dms->load($dms_id, $version);
-
-        //  DB Eintrag löschen
-        if(!$dms->deleteVersion($dms_id, $version))
-            echo '<span class="error">'.$dms->errormsg.'</span>';
-    }
-    else
-    {
-        // lösche gesamten Eintrag
-        $dms = new dms();
-        $dms_id = $_REQUEST['dms_id'];
-
-        // DB Einträge und Dokumente löschen
-        if(!$dms->deleteDms($dms_id))
-            echo '<span class="error">'.$dms->errormsg.'</span>';
-    }
+	if (! $rechte->isberechtigt('basis/dms', null, 'suid', null))
+		die($rechte->errormsg);
+	
+	// lösche nur die Version
+	if (isset($_REQUEST['version']))
+	{
+		$dms_id = $_REQUEST['dms_id'];
+		$version = $_REQUEST['version'];
+		
+		$dms = new dms();
+		$dms->load($dms_id, $version);
+		
+		// DB Eintrag löschen
+		if (! $dms->deleteVersion($dms_id, $version))
+			echo '<span class="error">' . $dms->errormsg . '</span>';
+		else 
+		{
+			// Log schreiben
+			$logdata_dms = (array)$dms; 
+			$logdata = var_export($logdata_dms, true); 
+			$log = new log();
+			$log->executetime = date('Y-m-d H:i:s');
+			$log->mitarbeiter_uid = $user;
+			$log->beschreibung = "Löschen der DMS_ID ".$dms_id;
+			$log->sql = 'LogData:'.$logdata;
+			$log->sqlundo = '';
+			$log->save(true);
+		}
+	}
+	else
+	{
+		// lösche gesamten Eintrag
+		$dms = new dms();
+		$dms_id = $_REQUEST['dms_id'];
+		
+		// DB Einträge und Dokumente löschen
+		if (! $dms->deleteDms($dms_id))
+			echo '<span class="error">' . $dms->errormsg . '</span>';
+		else 
+		{
+			// Log schreiben
+			$logdata_dms = (array)$dms; 
+			$logdata = var_export($logdata_dms, true); 
+			$log = new log();
+			$log->executetime = date('Y-m-d H:i:s');
+			$log->mitarbeiter_uid = $user;
+			$log->beschreibung = "Löschen der DMS_ID ".$dms_id;
+			$log->sql = 'LogData:'.$logdata;
+			$log->sqlundo = '';
+			$log->save(true);
+		}
+	}
 }
 
 if($versionId != '')
