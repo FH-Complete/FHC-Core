@@ -1801,6 +1801,22 @@ if ($result = $db->db_query("SELECT schema_name FROM information_schema.schemata
 	}
 }
 
+// Berechtigungen fuer web-user erteilen Log in public.tbl_log zu schreiben
+if($result = @$db->db_query("SELECT * FROM information_schema.role_table_grants WHERE table_name='tbl_log' AND table_schema='public' AND grantee='web' AND privilege_type='INSERT'"))
+{
+	if($db->db_num_rows($result)==0)
+	{
+
+		$qry = "GRANT SELECT, INSERT ON public.tbl_log TO web;
+			";
+
+		if(!$db->db_query($qry))
+			echo '<strong>Log Berechtigungen: '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>Web User Insert fuer public.tbl_log berechtigt';
+	}
+}
+
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
 
