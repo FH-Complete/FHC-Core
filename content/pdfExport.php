@@ -326,6 +326,8 @@ if (!isset($_REQUEST["archive"]))
 
 		if ($dokument->create($output))
 			$dokument->output();
+		else
+			echo $dokument->errormsg;
 
 		$dokument->close();
 	}
@@ -393,9 +395,6 @@ else
 		$dokument->addDataURL($xml, $params);
 
 		$dokument->setFilename($filename);
-
-		if (!$dokument->create($output))
-			die($dokument->errormsg);
 
 		$error = false;
 
