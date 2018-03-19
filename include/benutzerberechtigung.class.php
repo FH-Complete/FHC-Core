@@ -1065,6 +1065,7 @@ class benutzerberechtigung extends basis_db
 	 *
 	 * @param string $berechtigung_kurzbz Kurzbezeichnung der Berechtigung, deren Rollen geladen werden sollen
 	 * @param boolean $inklusiveRollen Default TRUE. Wenn true, wird ein UNION SELECT mit der tbl_rolleberechtigung ausgefuehrt
+	 * @param string $oe_kurzbz Organisationseinheit 
 	 * @return boolean true wenn ok, false im Fehlerfall
 	 */
 	public function getBenutzerFromBerechtigung($berechtigung_kurzbz, $inklusiveRollen = true, $oe_kurzbz = null)
@@ -1073,6 +1074,7 @@ class benutzerberechtigung extends basis_db
 					benutzerberechtigung_id,
 					rolle_kurzbz,
 					funktion_kurzbz,
+					oe_kurzbz,
 					uid,
 					art,
 					berechtigung_kurzbz,
@@ -1093,6 +1095,7 @@ class benutzerberechtigung extends basis_db
 			$qry .= "	UNION SELECT
 							NULL,
 							rolle_kurzbz,
+							NULL,
 							NULL,
 							NULL,
 							art,
@@ -1118,6 +1121,7 @@ class benutzerberechtigung extends basis_db
 				$obj->uid = $row->uid;
 				$obj->funktion_kurzbz = $row->funktion_kurzbz;
 				$obj->art = $row->art;
+				$obj->oe_kurzbz = $row->oe_kurzbz;
 				$obj->start = $row->start;
 				$obj->ende = $row->ende;
 
