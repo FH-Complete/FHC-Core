@@ -126,7 +126,7 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
 				<xsl:when test="../signed">
 					<text:p text:style-name="P3">
 						<draw:frame draw:style-name="fr1" draw:name="Bild1" text:anchor-type="paragraph" svg:width="17cm" svg:height="4.235cm" draw:z-index="0">
-							<draw:image xlink:href="Pictures/10000201000003A7000000E9CF15067258EBF314.png" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/>
+							<draw:image xlink:href="Pictures/Platzhalter_QR_FHC_GROSS_AMT_EN.png" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/>
 						</draw:frame>
 					</text:p>
 				</xsl:when>
