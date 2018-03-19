@@ -1817,6 +1817,41 @@ if($result = @$db->db_query("SELECT * FROM information_schema.role_table_grants 
 	}
 }
 
+// ADD COLUMN oe_kurzbz AND berechtigung_kurzbz to campus.tbl_dms_kategorie
+if(!@$db->db_query("SELECT oe_kurzbz FROM campus.tbl_dms_kategorie LIMIT 1"))
+{
+	$qry = "ALTER TABLE campus.tbl_dms_kategorie ADD COLUMN oe_kurzbz varchar(32);
+			ALTER TABLE campus.tbl_dms_kategorie ADD COLUMN berechtigung_kurzbz varchar(32);
+			
+			ALTER TABLE campus.tbl_dms_kategorie ADD CONSTRAINT fk_dms_kategorie_oe_kurzbz FOREIGN KEY (oe_kurzbz) REFERENCES public.tbl_organisationseinheit(oe_kurzbz) ON UPDATE CASCADE ON DELETE RESTRICT;
+			ALTER TABLE campus.tbl_dms_kategorie ADD CONSTRAINT fk_dms_kategorie_berechtigung_kurzbz FOREIGN KEY (berechtigung_kurzbz) REFERENCES system.tbl_berechtigung(berechtigung_kurzbz) ON UPDATE CASCADE ON DELETE RESTRICT;
+			";
+
+	if(!$db->db_query($qry))
+		echo '<strong>campus.tbl_dms_kategorie '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>Spalte oe_kurzbz und berechtigung_kurzbz in campus.tbl_dms_kategorie hinzugefügt';
+}
+
+// ADD COLUMN cis_suche (boolean) AND schlagworte to campus.tbl_dms_version
+if(!@$db->db_query("SELECT cis_suche FROM campus.tbl_dms_version LIMIT 1"))
+{
+	$qry = "ALTER TABLE campus.tbl_dms_version ADD COLUMN cis_suche boolean NOT NULL DEFAULT false;
+			ALTER TABLE campus.tbl_dms_version ADD COLUMN schlagworte text;
+
+			COMMENT ON COLUMN campus.tbl_dms_version.schlagworte IS 'Semicolon-separated string with keywords for CIS-search';
+			UPDATE campus.tbl_dms_version SET cis_suche=true WHERE beschreibung != '';
+			UPDATE campus.tbl_dms_version SET schlagworte=beschreibung WHERE beschreibung != '';
+			";
+
+	if(!$db->db_query($qry))
+		echo '<strong>campus.tbl_dms_version '.$db->db_last_error().'</strong><br>';
+		else
+			echo '	<br>Spalte cis_suche und schlagworte in campus.tbl_dms_version hinzugefügt.
+					<br><b>Alle DMS-Einträge mit befülltem Beschreibungstext wurden auf cis_suche=true gesetzt</b>
+					<br><b>Bei allen DMS-Einträge mit befülltem Beschreibungstext, wurde dieser in die Spalte schlagworte übernommen</b>';
+}
+
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
 
@@ -1869,9 +1904,9 @@ $tabellen=array(
 	"campus.tbl_coodle_ressource_termin"  => array("coodle_ressource_id","coodle_termin_id","insertamum","insertvon"),
 	"campus.tbl_coodle_status"  => array("coodle_status_kurzbz","bezeichnung"),
 	"campus.tbl_dms"  => array("dms_id","oe_kurzbz","dokument_kurzbz","kategorie_kurzbz"),
-	"campus.tbl_dms_kategorie"  => array("kategorie_kurzbz","bezeichnung","beschreibung","parent_kategorie_kurzbz"),
+	"campus.tbl_dms_kategorie"  => array("kategorie_kurzbz","bezeichnung","beschreibung","parent_kategorie_kurzbz","oe_kurzbz","berechtigung_kurzbz"),
 	"campus.tbl_dms_kategorie_gruppe" => array("kategorie_kurzbz","gruppe_kurzbz","insertamum","insertvon"),
-	"campus.tbl_dms_version"  => array("dms_id","version","filename","mimetype","name","beschreibung","letzterzugriff","updateamum","updatevon","insertamum","insertvon"),
+	"campus.tbl_dms_version"  => array("dms_id","version","filename","mimetype","name","beschreibung","letzterzugriff","updateamum","updatevon","insertamum","insertvon","cis_suche","schlagworte"),
 	"campus.tbl_erreichbarkeit"  => array("erreichbarkeit_kurzbz","beschreibung","farbe"),
 	"campus.tbl_feedback"  => array("feedback_id","betreff","text","datum","uid","lehrveranstaltung_id","updateamum","updatevon","insertamum","insertvon"),
 	"campus.tbl_freebusy"  => array("freebusy_id","uid","freebusytyp_kurzbz","url","aktiv","bezeichnung","insertamum","insertvon","updateamum","updatevon"),
