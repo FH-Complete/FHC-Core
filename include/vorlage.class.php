@@ -128,7 +128,7 @@ class vorlage extends basis_db
 							mimetype='.$this->db_add_param($this->mimetype).',
 							archivierbar='.$this->db_add_param($this->archivierbar, FHC_BOOLEAN).',
 							signierbar='.$this->db_add_param($this->signierbar, FHC_BOOLEAN).',
-							stud_selfservice='.$this->db_add_param($this->archivierbar, FHC_BOOLEAN).',
+							stud_selfservice='.$this->db_add_param($this->stud_selfservice, FHC_BOOLEAN).',
 							dokument_kurzbz='.$this->db_add_param($this->dokument_kurzbz).'
 					WHERE vorlage_kurzbz='.$this->db_add_param($this->vorlage_kurzbz).';';
 		}
