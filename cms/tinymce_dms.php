@@ -56,10 +56,21 @@ if(!$rechte->isberechtigt('basis/dms',null, 's', null))
 	<script type="text/javascript" src="../vendor/joeldbirch/superfish/dist/js/superfish.min.js"></script>
 	<script type="text/javascript" src="../include/tiny_mce/tiny_mce_popup.js"></script>
 	<style type="text/css">
-	.buttondesign {
+	.buttondesign 
+	{
 		background-color: #87cefa;
 		border: 1px solid black;
 		border-radius: 5px;
+	}
+	.sf-menu
+	{
+		margin: 0;
+		padding: 0;
+		line-height: 1.0;
+	}
+	.sf-menu a
+	{
+		padding: .3em;
 	}
 	</style>
 	<script type="text/javascript">
