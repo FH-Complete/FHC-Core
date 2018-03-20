@@ -61,6 +61,11 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
 </xsl:template>
 
 <xsl:template match="pruefung">
+	<!-- 
+	Der Bescheid wird nur aufgrund der zuletzt vorhandenen Abschlusspruefung ausgestellt
+	Diese wird als erstes vom RDF geliefert
+	-->
+	<xsl:if test="position()=1">
 		<office:text text:use-soft-page-breaks="true" xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0" xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0" xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0" xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0" xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0">
 			<text:sequence-decls>
 				<text:sequence-decl text:display-outline-level="0" text:name="Illustration"/>
@@ -157,5 +162,6 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
 				</xsl:otherwise>
 			</xsl:choose>
 		</office:text>
+	</xsl:if>
 </xsl:template>
 </xsl:stylesheet>
