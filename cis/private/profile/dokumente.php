@@ -81,7 +81,7 @@ if(isset($_GET['action']) && $_GET['action']=='download')
 		{
 			if($akte->inhalt!='')
 			{
-				//Header fuer Bild schicken
+				//Header fuer Datei schicken
 				header("Content-type: $akte->mimetype");
 				header('Content-Disposition: attachment; filename="'.$akte->titel.'"');
 				echo base64_decode($akte->inhalt);
@@ -117,9 +117,8 @@ echo '
 		{
 			$("#t1").tablesorter(
 			{
-				sortList: [[0,0]],
-				widgets: ["zebra"],
-				headers: {1:{sorter: false}}
+				sortList: [[0,1]],
+				widgets: ["zebra"]
 			});
 		});
 
@@ -230,7 +229,6 @@ if($akte->getArchiv($student_studiengang->person_id, true, true) && count($akte-
 		<tr>
 			<th>Erstelldatum</th>
 			<th>Dokument</th>
-
 		</tr>
 		</thead>
 		<tbody>
@@ -243,8 +241,7 @@ if($akte->getArchiv($student_studiengang->person_id, true, true) && count($akte-
 		$pfad = 'dokumente.php?action=download&id='.$row->akte_id.'&uid='.$uid;
 		echo '<tr>';
 		echo '<td>'.$datum_obj->formatDatum($row->erstelltam,'d.m.Y').'</td>';
-		echo '<td><a href="'.$pfad.'">'.$row->bezeichnung.'</a></td>';
-
+		echo '<td><a href="'.$pfad.'"><img src="../../../skin/images/pdfpic.gif" /> '.$row->bezeichnung.'</a></td>';
 		echo '</tr>';
 	}
 

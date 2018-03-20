@@ -427,7 +427,7 @@ else
 			else
 				$akte->dokument_kurzbz = 'Zeugnis';
 			$akte->inhalt = $hex;
-			$akte->mimetype = 'application/octet-stream';
+			$akte->mimetype = 'application/pdf';
 			$akte->erstelltam = $heute;
 			$akte->gedruckt = true;
 			$akte->titel = $titel.'.pdf';
