@@ -14,7 +14,12 @@ class Navigation extends FHC_Controller
 	 */
 	public function __construct()
     {
-        parent::__construct();
+        parent::__construct(
+			array(
+				'menu' => 'basis/vilesci:r',
+				'header' => 'basis/vilesci:r'
+			)
+		);
 
 		$this->config->load('navigation');
 

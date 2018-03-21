@@ -6,14 +6,27 @@ class Phrases extends FHC_Controller
 
 	public function __construct()
     {
-        parent::__construct();
-        
+        parent::__construct(
+			array(
+				'index' => 'system/phrase:r',
+				'table' => 'system/phrase:r',
+				'view' => 'system/phrase:r',
+				'deltext' => 'system/phrase:w',
+				'edit' => 'system/phrase:w',
+				'write' => 'system/phrase:w',
+				'save' => 'system/phrase:w',
+				'newText' => 'system/phrase:w',
+				'editText' => 'system/phrase:w',
+				'saveText' => 'system/phrase:w'
+			)
+		);
+
         // Loads the phrases library
         $this->load->library('PhrasesLib');
-        
+
         // Loads the widget library
 		$this->load->library('WidgetLib');
-        
+
         // Loads helper message to manage returning messages
 		$this->load->helper('message');
     }
@@ -113,19 +126,19 @@ class Phrases extends FHC_Controller
 	public function newText()
 	{
 		$phrase_id = $this->input->post('phrase_id');
-		
+
 		$this->load->model('organisation/Organisationseinheit_model', 'OrganisationseinheitModel');
 		$this->OrganisationseinheitModel->addLimit(1);
 		$this->OrganisationseinheitModel->addOrder('oe_kurzbz');
 		$resultOE = $this->OrganisationseinheitModel->loadWhere(array('aktiv' => true, 'oe_parent_kurzbz' => null));
-		
+
 		if ($resultOE->error)
 			show_error($resultOE->retval);
-		
+
 		if (hasData($resultOE))
 		{
 			$orgeinheit_kurzbz = $resultOE->retval[0]->oe_kurzbz;
-			
+
 			$data = array (
 				'phrase_id' => $phrase_id,
 				'sprache' => 'German',
@@ -133,13 +146,13 @@ class Phrases extends FHC_Controller
 				'description' => '',
 				'orgeinheit_kurzbz' => $orgeinheit_kurzbz
 			);
-			
+
 			$phrase_inhalt = $this->phraseslib->insertPhraseinhalt($data);
 			if ($phrase_inhalt->error)
 				show_error($phrase_inhalt->retval);
-			
+
 			$phrase_inhalt_id = $phrase_inhalt->retval;
-			
+
 			redirect('/system/Phrases/editText/'.$phrase_inhalt_id);
 		}
 		else

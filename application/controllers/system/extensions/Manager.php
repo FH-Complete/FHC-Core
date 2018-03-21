@@ -12,7 +12,14 @@ class Manager extends FHC_Controller
 	 */
 	public function __construct()
     {
-        parent::__construct();
+        parent::__construct(
+			array(
+				'index' => 'system/extensions:r',
+				'toggleExtension' => 'system/extensions:w',
+				'delExtension' => 'system/extensions:w',
+				'uploadExtension' => 'system/extensions:w'
+			)
+		);
 
 		// Load helpers to upload files
 		$this->load->helper(array('form', 'url'));

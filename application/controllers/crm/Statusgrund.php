@@ -6,7 +6,20 @@ class Statusgrund extends FHC_Controller
 {
 	public function __construct()
     {
-        parent::__construct();
+        parent::__construct(
+			array(
+				'index' => 'basis/status:r',
+				'listStatus' => 'basis/status:r',
+				'listGrund' => 'basis/status:r',
+				'editGrund' => 'basis/status:w',
+				'editStatus' => 'basis/status:w',
+				'newGrund' => 'basis/status:w',
+				'saveGrund' => 'basis/status:w',
+				'insGrund' => 'basis/status:w',
+				'saveStatus' => 'basis/status:w'
+			)
+		);
+
         $this->load->model("crm/Status_model", "StatusModel");
         $this->load->model("crm/Statusgrund_model", "StatusgrundModel");
         $this->load->model("system/Sprache_model", "SpracheModel");

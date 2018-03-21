@@ -6,15 +6,21 @@ class PrestudentMultiAssign extends FHC_Controller
 {
 	public function __construct()
     {
-        parent::__construct();
-        
+        parent::__construct(
+			array(
+				'index' => 'basis/student:r',
+				'linkToStufe' => 'basis/student:w',
+				'linkToAufnahmegruppe' => 'basis/student:w'
+			)
+		);
+
         // Loads helper message to manage returning messages
 		$this->load->helper('message');
-		
+
 		// Loads the widget library
 		$this->load->library('WidgetLib');
     }
-    
+
     public function index()
 	{
 		$studiengang = $this->input->post('studiengang');
@@ -22,27 +28,27 @@ class PrestudentMultiAssign extends FHC_Controller
 		$aufnahmegruppe = $this->input->post('aufnahmegruppe');
 		$reihungstest = $this->input->post('reihungstest');
 		$stufe = $this->input->post('stufe');
-		
+
 		// Converts string 'null' to a null value
 		$stufe = ($stufe == 'null' ? null : $stufe);
 		$studiengang = ($studiengang == 'null' ? null : $studiengang);
 		$reihungstest = ($reihungstest == 'null' ? null : $reihungstest);
 		$aufnahmegruppe = ($aufnahmegruppe == 'null' ? null : $aufnahmegruppe);
 		$studiensemester = ($studiensemester == 'null' ? null : $studiensemester);
-		
+
 		$returnUsers = null;
 		if ($studiengang != null || $studiensemester != null || $aufnahmegruppe!= null
 			|| $reihungstest != null || $stufe != null)
 		{
 			$returnUsers = $this->_getPrestudents($studiengang, $studiensemester, $aufnahmegruppe, $reihungstest, $stufe);
 		}
-		
+
 		$users = null;
 		if (hasData($returnUsers))
 		{
 			$users = $returnUsers->retval;
 		}
-		
+
 		if ($returnUsers == null || isSuccess($returnUsers))
 		{
 			$viewData = array(
@@ -53,7 +59,7 @@ class PrestudentMultiAssign extends FHC_Controller
 				'stufe' => $stufe,
 				'users' => $users
 			);
-			
+
 			$this->load->view('system/aufnahme/prestudentMultiAssign', $viewData);
 		}
 		else if (isError($returnUsers))
@@ -61,7 +67,7 @@ class PrestudentMultiAssign extends FHC_Controller
 			show_error($returnUsers->retval);
 		}
 	}
-	
+
 	/**
 	 * To assign a stufe to one or more prestudents
 	 */
@@ -69,16 +75,16 @@ class PrestudentMultiAssign extends FHC_Controller
 	{
 		$prestudentIdArray = $this->input->post('prestudent_id');
 		$stufe = $this->input->post('stufe');
-		
+
 		// Converts string 'null' to a null value
 		$stufe = ($stufe == 'null' ? null : $stufe);
-		
+
 		// Load model PrestudentstatusModel
         $this->load->model('crm/Prestudentstatus_model', 'PrestudentstatusModel');
-        
+
         // Set the HTTP header
         $this->output->set_header('Content-Type: application/json; charset=utf-8');
-        
+
         $result = error("No valid parameters");
         if (isset($stufe)
 			&& isset($prestudentIdArray)
@@ -86,7 +92,7 @@ class PrestudentMultiAssign extends FHC_Controller
 			&& count($prestudentIdArray) > 0)
         {
 			$result = $this->PrestudentstatusModel->updateStufe($prestudentIdArray, $stufe);
-			
+
 			if (isSuccess($result))
 			{
 				echo '{"msg": "Data correctly saved"}';
@@ -101,7 +107,7 @@ class PrestudentMultiAssign extends FHC_Controller
 			echo '{"msg": "'.$result->retval.'"}';
 		}
 	}
-	
+
 	/**
 	 * To assign one or more prestudents to a gruppe
 	 */
@@ -109,16 +115,16 @@ class PrestudentMultiAssign extends FHC_Controller
 	{
 		$prestudentIdArray = $this->input->post('prestudent_id');
 		$aufnahmegruppe = $this->input->post('aufnahmegruppe');
-		
+
 		// Converts string 'null' to a null value
 		$aufnahmegruppe = ($aufnahmegruppe == 'null' ? null : $aufnahmegruppe);
-		
+
 		// Load model PrestudentstatusModel
         $this->load->model('crm/Prestudent_model', 'PrestudentModel');
-        
+
         // Set the HTTP header
         $this->output->set_header('Content-Type: application/json; charset=utf-8');
-        
+
         $result = error("No valid parameters");
         if (isset($aufnahmegruppe)
 			&& isset($prestudentIdArray)
@@ -126,7 +132,7 @@ class PrestudentMultiAssign extends FHC_Controller
 			&& count($prestudentIdArray) > 0)
         {
 			$result = $this->PrestudentModel->updateAufnahmegruppe($prestudentIdArray, $aufnahmegruppe);
-			
+
 			if (isSuccess($result))
 			{
 				echo '{"msg": "Data correctly saved"}';
@@ -141,7 +147,7 @@ class PrestudentMultiAssign extends FHC_Controller
 			echo '{"msg": "'.$result->retval.'"}';
 		}
 	}
-	
+
 	/**
 	 * Get the prestudents using search parameters
 	 */
@@ -149,32 +155,32 @@ class PrestudentMultiAssign extends FHC_Controller
 	{
 		// Load model prestudentm_model
         $this->load->model('crm/Prestudent_model', 'PrestudentModel');
-        
+
         if ($studiengang == '' || empty($studiengang))
 		{
 			$studiengang = null;
 		}
-		
+
 		if ($studiensemester == '' || empty($studiensemester))
 		{
 			$studiensemester = null;
 		}
-		
+
 		if ($aufnahmegruppe == '' || empty($aufnahmegruppe))
 		{
 			$aufnahmegruppe = null;
 		}
-		
+
 		if ($reihungstest == '' || empty($reihungstest))
 		{
 			$reihungstest = null;
 		}
-		
+
 		if ($stufe == '' || empty($stufe))
 		{
 			$stufe = null;
 		}
-        
+
         return $this->PrestudentModel->getPrestudentMultiAssign(
 			$studiengang,
 			$studiensemester,

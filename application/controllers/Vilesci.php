@@ -6,7 +6,11 @@ class Vilesci extends FHC_Controller
 
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(
+			array(
+				'index' => 'basis/vilesci:r'
+			)
+		);
 
 		$this->load->library('WidgetLib');
 	}

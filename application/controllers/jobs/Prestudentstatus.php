@@ -17,7 +17,8 @@ class Prestudentstatus extends FHC_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		// An empty array as parameter will ensure that this controller is ONLY callable from command line
+		parent::__construct(array());
 
 		if ($this->input->is_cli_request())
 		{

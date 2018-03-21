@@ -14,7 +14,17 @@ class Studiensemester extends FHC_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(
+			array(
+				'listStudiensemester' => 'basis/studiensemester:r',
+				'editStudiensemester' => 'basis/studiensemester:w',
+				'newStudiensemester' => 'basis/studiensemester:w',
+				'insStudiensemester' => 'basis/studiensemester:w',
+				'saveStudiensemester' => 'basis/studiensemester:w',
+				'deleteStudiensemester' => 'basis/studiensemester:w'
+			)
+		);
+
 		$this->load->model("organisation/Studiensemester_model", "StudiensemesterModel");
 		$this->load->model("organisation/Studienjahr_model", "StudienjahrModel");
 	}

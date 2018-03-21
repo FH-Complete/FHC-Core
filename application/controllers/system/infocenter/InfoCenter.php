@@ -51,7 +51,22 @@ class InfoCenter extends FHC_Controller
 	 */
 	public function __construct()
     {
-        parent::__construct();
+        parent::__construct(
+			array(
+				'index' => 'infocenter:r',
+				'showDetails' => 'infocenter:r',
+				'unlockPerson' => 'infocenter:w',
+				'saveFormalGeprueft' => 'infocenter:w',
+				'getLastPrestudentWithZgvJson' => 'infocenter:r',
+				'saveZgvPruefung' => 'infocenter:w',
+				'saveAbsage' => 'infocenter:w',
+				'saveFreigabe' => 'infocenter:w',
+				'saveNotiz' => 'infocenter:w',
+				'reloadNotizen' => 'infocenter:r',
+				'reloadLogs' => 'infocenter:r',
+				'outputAkteContent' => 'infocenter:r'
+			)
+		);
 
 		// Loads models
 		$this->load->model('crm/akte_model', 'AkteModel');

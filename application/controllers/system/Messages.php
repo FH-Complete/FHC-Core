@@ -11,7 +11,15 @@ class Messages extends FHC_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(
+			array(
+				'write' => array('basis/message:w', 'infocenter:w'),
+				'send' => array('basis/message:w', 'infocenter:w'),
+				'getVorlage' => array('basis/message:r', 'infocenter:r'),
+				'parseMessageText' => array('basis/message:r', 'infocenter:r'),
+				'getMessageFromIds' => array('basis/message:r', 'infocenter:r')
+			)
+		);
 
 		// Loads the message library
 		$this->load->library('MessageLib');
