@@ -11,12 +11,12 @@ class Statusgrund extends FHC_Controller
 				'index' => 'basis/status:r',
 				'listStatus' => 'basis/status:r',
 				'listGrund' => 'basis/status:r',
-				'editGrund' => 'basis/status:w',
-				'editStatus' => 'basis/status:w',
-				'newGrund' => 'basis/status:w',
-				'saveGrund' => 'basis/status:w',
-				'insGrund' => 'basis/status:w',
-				'saveStatus' => 'basis/status:w'
+				'editGrund' => 'basis/status:rw',
+				'editStatus' => 'basis/status:rw',
+				'newGrund' => 'basis/status:rw',
+				'saveGrund' => 'basis/status:rw',
+				'insGrund' => 'basis/status:rw',
+				'saveStatus' => 'basis/status:rw'
 			)
 		);
 

@@ -17,11 +17,11 @@ class Studienjahr extends FHC_Controller
 		parent::__construct(
 			array(
 				'listStudienjahr' => 'basis/studiensemester:r',
-				'editStudienjahr' => 'basis/studiensemester:w',
-				'newStudienjahr' => 'basis/studiensemester:w',
-				'insStudienjahr' => 'basis/studiensemester:w',
-				'saveStudienjahr' => 'basis/studiensemester:w',
-				'deleteStudienjahr' => 'basis/studiensemester:w'
+				'editStudienjahr' => 'basis/studiensemester:rw',
+				'newStudienjahr' => 'basis/studiensemester:rw',
+				'insStudienjahr' => 'basis/studiensemester:rw',
+				'saveStudienjahr' => 'basis/studiensemester:rw',
+				'deleteStudienjahr' => 'basis/studiensemester:rw'
 			)
 		);
 

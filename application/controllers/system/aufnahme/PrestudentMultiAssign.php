@@ -9,8 +9,8 @@ class PrestudentMultiAssign extends FHC_Controller
         parent::__construct(
 			array(
 				'index' => 'basis/student:r',
-				'linkToStufe' => 'basis/student:w',
-				'linkToAufnahmegruppe' => 'basis/student:w'
+				'linkToStufe' => 'basis/student:rw',
+				'linkToAufnahmegruppe' => 'basis/student:rw'
 			)
 		);
 

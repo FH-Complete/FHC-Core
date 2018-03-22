@@ -13,8 +13,8 @@ class Messages extends FHC_Controller
 	{
 		parent::__construct(
 			array(
-				'write' => array('basis/message:w', 'infocenter:w'),
-				'send' => array('basis/message:w', 'infocenter:w'),
+				'write' => array('basis/message:rw', 'infocenter:rw'),
+				'send' => array('basis/message:rw', 'infocenter:rw'),
 				'getVorlage' => array('basis/message:r', 'infocenter:r'),
 				'parseMessageText' => array('basis/message:r', 'infocenter:r'),
 				'getMessageFromIds' => array('basis/message:r', 'infocenter:r')

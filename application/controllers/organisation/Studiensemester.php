@@ -17,11 +17,11 @@ class Studiensemester extends FHC_Controller
 		parent::__construct(
 			array(
 				'listStudiensemester' => 'basis/studiensemester:r',
-				'editStudiensemester' => 'basis/studiensemester:w',
-				'newStudiensemester' => 'basis/studiensemester:w',
-				'insStudiensemester' => 'basis/studiensemester:w',
-				'saveStudiensemester' => 'basis/studiensemester:w',
-				'deleteStudiensemester' => 'basis/studiensemester:w'
+				'editStudiensemester' => 'basis/studiensemester:rw',
+				'newStudiensemester' => 'basis/studiensemester:rw',
+				'insStudiensemester' => 'basis/studiensemester:rw',
+				'saveStudiensemester' => 'basis/studiensemester:rw',
+				'deleteStudiensemester' => 'basis/studiensemester:rw'
 			)
 		);
 

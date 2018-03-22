@@ -15,9 +15,9 @@ class Manager extends FHC_Controller
         parent::__construct(
 			array(
 				'index' => 'system/extensions:r',
-				'toggleExtension' => 'system/extensions:w',
-				'delExtension' => 'system/extensions:w',
-				'uploadExtension' => 'system/extensions:w'
+				'toggleExtension' => 'system/extensions:rw',
+				'delExtension' => 'system/extensions:rw',
+				'uploadExtension' => 'system/extensions:rw'
 			)
 		);
 

@@ -9,7 +9,7 @@ class UDF extends FHC_Controller
         parent::__construct(
 			array(
 				'index' => 'basis/person:r',
-				'saveUDF' => 'basis/person:w'
+				'saveUDF' => 'basis/person:rw'
 			)
 		);
 

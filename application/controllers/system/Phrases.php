@@ -11,13 +11,13 @@ class Phrases extends FHC_Controller
 				'index' => 'system/phrase:r',
 				'table' => 'system/phrase:r',
 				'view' => 'system/phrase:r',
-				'deltext' => 'system/phrase:w',
-				'edit' => 'system/phrase:w',
-				'write' => 'system/phrase:w',
-				'save' => 'system/phrase:w',
-				'newText' => 'system/phrase:w',
-				'editText' => 'system/phrase:w',
-				'saveText' => 'system/phrase:w'
+				'deltext' => 'system/phrase:rw',
+				'edit' => 'system/phrase:rw',
+				'write' => 'system/phrase:rw',
+				'save' => 'system/phrase:rw',
+				'newText' => 'system/phrase:rw',
+				'editText' => 'system/phrase:rw',
+				'saveText' => 'system/phrase:rw'
 			)
 		);
 

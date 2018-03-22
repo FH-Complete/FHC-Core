@@ -5,7 +5,7 @@
 <div class="row">
   <div class="span4">
 	<h2>Vorlagentext - <?php echo $vorlage_kurzbz; ?></h2>
-	<form method="post" action="../newtext" target="VorlageBottom">
+	<form method="post" action="../newText" target="VorlageBottom">
 	  <input type="hidden" name="vorlage_kurzbz" value="<?php echo $vorlage_kurzbz; ?>"/>
 	  <button type="submit">Neu</button>
 	</form>
@@ -28,8 +28,8 @@
 	  <tbody>
 		<?php foreach ($vorlagentext as $v): ?>
 			<tr>
-				<td><a href="../edittext/<?php echo $v->vorlagestudiengang_id; ?>" target="VorlageBottom"><?php echo $v->vorlagestudiengang_id; ?></a></td>
-				<td><a href="../edittext/<?php echo $v->vorlagestudiengang_id; ?>" target="VorlageBottom"><?php echo $v->vorlage_kurzbz; ?></a></td>
+				<td><a href="../editText/<?php echo $v->vorlagestudiengang_id; ?>" target="VorlageBottom"><?php echo $v->vorlagestudiengang_id; ?></a></td>
+				<td><a href="../editText/<?php echo $v->vorlagestudiengang_id; ?>" target="VorlageBottom"><?php echo $v->vorlage_kurzbz; ?></a></td>
 				<td><?php echo $v->version; ?></td>
 				<td><?php echo $v->oe_kurzbz; ?></td>
 				<td></td>
