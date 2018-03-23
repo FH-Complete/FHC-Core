@@ -860,6 +860,7 @@ if ($result = @$db->db_query("SELECT 1 FROM system.tbl_berechtigung WHERE berech
 // End extensions
 //---------------------------------------------------------------------------------------------------------------------
 
+// Tabellen fuer Person Log
 if (!$result = @$db->db_query("SELECT 1 FROM system.tbl_log LIMIT 1"))
 {
 	$qry = "CREATE TABLE system.tbl_log
@@ -908,6 +909,20 @@ if (!$result = @$db->db_query("SELECT 1 FROM system.tbl_log LIMIT 1"))
 		echo '<strong>system.tbl_log '.$db->db_last_error().'</strong><br>';
 	else
 		echo ' system.tbl_log hinzugefügt<br>';
+}
+
+// Add index to system.tbl_log
+if ($result = $db->db_query("SELECT * FROM pg_class WHERE relname='idx_tbl_log_person_id'"))
+{
+	if ($db->db_num_rows($result) == 0)
+	{
+		$qry = "CREATE INDEX idx_tbl_log_person_id ON system.tbl_log USING btree (person_id)";
+
+		if (! $db->db_query($qry))
+			echo '<strong>Indizes: ' . $db->db_last_error() . '</strong><br>';
+		else
+			echo 'Index fuer system.tbl_log hinzugefuegt';
+	}
 }
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -1822,7 +1837,7 @@ if(!@$db->db_query("SELECT oe_kurzbz FROM campus.tbl_dms_kategorie LIMIT 1"))
 {
 	$qry = "ALTER TABLE campus.tbl_dms_kategorie ADD COLUMN oe_kurzbz varchar(32);
 			ALTER TABLE campus.tbl_dms_kategorie ADD COLUMN berechtigung_kurzbz varchar(32);
-			
+
 			ALTER TABLE campus.tbl_dms_kategorie ADD CONSTRAINT fk_dms_kategorie_oe_kurzbz FOREIGN KEY (oe_kurzbz) REFERENCES public.tbl_organisationseinheit(oe_kurzbz) ON UPDATE CASCADE ON DELETE RESTRICT;
 			ALTER TABLE campus.tbl_dms_kategorie ADD CONSTRAINT fk_dms_kategorie_berechtigung_kurzbz FOREIGN KEY (berechtigung_kurzbz) REFERENCES system.tbl_berechtigung(berechtigung_kurzbz) ON UPDATE CASCADE ON DELETE RESTRICT;
 			";
