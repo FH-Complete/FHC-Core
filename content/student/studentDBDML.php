@@ -2199,6 +2199,8 @@ if(!$error)
 				$akte->anmerkung_intern = $_POST['anmerkung_intern'];
 				$akte->titel_intern = $_POST['titel_intern'];
 				$akte->dokument_kurzbz = $_POST['dokument_kurzbz'];
+				$akte->updateamum = date('Y-m-d H:i:s');
+				$akte->updatevon = $user;
 
 				if(!$akte->save())
 				{
