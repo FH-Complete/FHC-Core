@@ -434,9 +434,15 @@ if($berechtigung_kurzbz != '')
 				$user_rolleberechtigung->getBenutzerFromRolle($row->rolle_kurzbz); 
 			} 
 
-			$htmlstr .= "<h3>".$berechtigung_kurzbz."</h3>\n"; 
+			// Anzahl uniquer UIDs ermitteln
+			$berechtigungen_array_uids = array_map(function ($each)
+			{
+				return $each['uid'];
+			}, $berechtigungen_array);
+
+			$htmlstr .= "<h3>".$berechtigung_kurzbz."</h3>\n";
 			$htmlstr .= "<div style='font-size: 9pt'>".count($berechtigungen_array)." Einträge</div>";
-			$htmlstr .= "<div style='font-size: 9pt'>".count(array_unique(array_column($berechtigungen_array, 'uid')))." UIDs</div>";
+			$htmlstr .= "<div style='font-size: 9pt'>".count(array_unique($berechtigungen_array_uids))." UIDs</div>";
 			$htmlstr .= "<table id='t2' class='tablesorter'><thead><tr>\n"; 
 			$htmlstr .= "	<th>Nachname</th> 
 							<th>Vorname</th> 
