@@ -29,28 +29,6 @@
 
 		});
 
-		$(".remove-filter").click(function(event) {
-
-			$.ajax({
-				url: "<?php echo base_url('index.ci.php/system/Filters/removeSelectedFilters'); ?>",
-				method: "POST",
-				data: {
-					fieldName: $(this).attr('filterToRemove')
-				}
-			})
-			.done(function(data, textStatus, jqXHR) {
-
-				resetSelectedFilters();
-				renderSelectedFilters();
-
-				renderTableDataset();
-
-			}).fail(function(jqXHR, textStatus, errorThrown) {
-				alert(textStatus);
-			});
-
-		});
-
 		$(".select-filter-operation").change(function() {
 
 			if ($(this).val() == "set" || $(this).val() == "nset")

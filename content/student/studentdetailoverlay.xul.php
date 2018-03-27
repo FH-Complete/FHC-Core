@@ -52,8 +52,6 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 		<vbox hidden="true">
 			<label value="Neu"/>
 			<checkbox id="student-detail-checkbox-new" checked="true" />
-			<label value="Person_id"/>
-			<textbox id="student-detail-textbox-person_id" disabled="true"/>
 		</vbox>
 		<vbox flex="1">
 		<groupbox id="student-detail-groupbox-person">
@@ -68,6 +66,10 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 						<column flex="5"/>
 					</columns>
 					<rows>
+						<row>
+							<label value="Person ID" control="student-detail-textbox-person_id"/>
+							<hbox><textbox id="student-detail-textbox-person_id" readonly="true" maxlength="16" size="16"/></hbox>
+						</row>
 						<row>
 							<label value="Anrede" control="student-detail-textbox-anrede"/>
 							<hbox><textbox id="student-detail-textbox-anrede" disabled="true" maxlength="16" size="16"/></hbox>
@@ -534,7 +536,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 								class="sortDirectionIndicator"
 								sort="rdf:http://www.technikum-wien.at/prestudentrolle/rdf#bestaetigt_Am" />
 							<splitter class="tree-splitter"/>
-							<treecol id="student-prestudent-tree-rolle-bewerbung_abgeschicktamum" label="AbgeschicktAm" flex="1" hidden="true" persist="hidden, width, ordinal"
+							<treecol id="student-prestudent-tree-rolle-bewerbung_abgeschicktamum" label="AbgeschicktAm" flex="1" hidden="false" persist="hidden, width, ordinal"
 								class="sortDirectionIndicator"
 								sort="rdf:http://www.technikum-wien.at/prestudentrolle/rdf#bewerbung_abgeschicktamum" />
 							<splitter class="tree-splitter"/>

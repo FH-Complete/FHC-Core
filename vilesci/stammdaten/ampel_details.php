@@ -16,6 +16,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
  * Authors: Andreas Oesterreicher 	< andreas.oesterreicher@technikum-wien.at >
+ *			Cristina Hainberger		<hainberg@technikum-wien.at>
  */
 /**
  * Seite zur Wartung der Ampeln
@@ -44,10 +45,12 @@ $datum_obj = new datum();
 	<title>Ampel - Details</title>
 	<link rel="stylesheet" href="../../skin/fhcomplete.css" type="text/css">
 	<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
+	<link rel="stylesheet" href="../../vendor/fortawesome/font-awesome/css/font-awesome.min.css">
 	<link rel="stylesheet" href="../../skin/jquery-ui-1.9.2.custom.min.css" type="text/css">
-	<script type="text/javascript" src="../../vendor/jquery/jqueryV1/jquery-1.12.4.min.js"></script>
 	<script type="text/javascript" src="../../vendor/christianbach/tablesorter/jquery.tablesorter.min.js"></script>
 	<script type="text/javascript" src="../../vendor/components/jqueryui/jquery-ui.min.js"></script>
+	<script type="text/javascript" src="../../vendor/components/jquery/jquery.min.js"></script>
+	<script type="text/javascript" src="../../vendor/twbs/bootstrap/dist/js/bootstrap.min.js"></script>
 	<script type="text/javascript" src="../../include/js/jquery.ui.datepicker.translation.js"></script>
 	<script type="text/javascript">
 		$(document).ready(function()
@@ -59,6 +62,13 @@ $datum_obj = new datum();
 					 });
 			});
 	</script>
+	<style>
+		/*remove input type="date" arrows*/ 
+		input[type=date]::-webkit-inner-spin-button,
+		input[type=date]::-webkit-outer-spin-button {
+			-webkit-appearance: none;
+}
+	</style>
 </head>
 <body>
 
@@ -167,19 +177,25 @@ $datum_obj = new datum();
 				<td>Kurzbz (64)</td>
 				<td><input type="text" name="kurzbz" size="60" maxlength="64" value="'.htmlspecialchars($ampel->kurzbz).'" required></td>
 				<td></td>
-				<td>Deadline</td>
-				<td><input type="text" class="datepicker_datum" name="deadline" size="10" maxlength="10" value="'.htmlspecialchars($datum_obj->formatDatum($ampel->deadline,'d.m.Y')).'" required></td>
+				<td>Deadline&nbsp
+					<i class="fa fa-info-circle fa-lg" aria-hidden="true" data-toggle="tooltip" data-placement="left" title="Die Deadline gibt den Tag an, ab dem die Ampel von gelb auf rot gesetzt wird."></i>
+				</td>
+				<td><input type="date" name="deadline" size="10" maxlength="10" value="'.htmlspecialchars($datum_obj->formatDatum($ampel->deadline,'Y-m-d')).'" required></td>
 			</tr>
 			<tr valign="top">
 				<td rowspan="3">Benutzer Select</td>
 				<td rowspan="3"><textarea name="benutzer_select" cols="60" rows="5" required>'.htmlspecialchars($ampel->benutzer_select).'</textarea></td>
 				<td></td>
-				<td valign="middle">Vorlaufzeit (in Tagen)</td>
+				<td valign="middle">Vorlaufzeit (in Tagen)&nbsp
+					<i class="fa fa-info-circle fa-lg" aria-hidden="true" data-toggle="tooltip" data-placement="left" title="Anzahl der Tage VOR der Deadline, an denen die Ampel gezeigt werden soll.&#013Wenn keine Angabe, dann wird die Ampel gleich nach ihrer Erstellung angezeigt."></i>
+				</td>
 				<td valign="middle"><input type="text" name="vorlaufzeit" size="4" maxlength="4" value="'.htmlspecialchars($ampel->vorlaufzeit).'"></td>
 			</tr>
 			<tr valign="top">
 				<td></td>
-				<td>Verfallszeit (in Tagen)</td>
+				<td>Verfallszeit (in Tagen)&nbsp
+					<i class="fa fa-info-circle fa-lg" aria-hidden="true" data-toggle="tooltip" data-placement="left" title="Anzahl der Tage NACH der Deadline, an denen die Ampel gezeigt werden soll.&#013Wenn keine Angabe, dann wird die Ampel solange angezeigt, bis sie bestätigt wird."></i>
+				</td>
 				<td><input type="text" name="verfallszeit" size="4" maxlength="4" value="'.htmlspecialchars($ampel->verfallszeit).'"></td>
 			</tr>
 			<tr valign="top">
@@ -210,13 +226,17 @@ $datum_obj = new datum();
 	$sprache->getAll(null, 'index');
 	foreach($sprache->result as $lang)
 	{
-		echo '
-			<tr valign="top">
-				<td>'.$lang->sprache.'</td>
-				<td><textarea name="beschreibung'.$lang->sprache.'" cols="60" rows="5">'.htmlspecialchars((isset($ampel->beschreibung[$lang->sprache])?$ampel->beschreibung[$lang->sprache]:'')).'</textarea></td>
-				<td></td>
-				<td colspan="2"><input size="70" maxlength="64" name="buttontext'.$lang->sprache.'" value="'.htmlspecialchars((isset($ampel->buttontext[$lang->sprache])?$ampel->buttontext[$lang->sprache]:'')).'"></td>
-			</tr>';
+		//only show languages which are set true
+		if ($lang->content == true)
+		{
+			echo '
+				<tr valign="top">
+					<td>'.$lang->sprache.'</td>
+					<td><textarea name="beschreibung'.$lang->sprache.'" cols="60" rows="5">'.htmlspecialchars((isset($ampel->beschreibung[$lang->sprache])?$ampel->beschreibung[$lang->sprache]:'')).'</textarea></td>
+					<td></td>
+					<td colspan="2"><input size="70" maxlength="64" name="buttontext'.$lang->sprache.'" value="'.htmlspecialchars((isset($ampel->buttontext[$lang->sprache])?$ampel->buttontext[$lang->sprache]:'')).'"></td>
+				</tr>';
+		}
 	}
 	echo '
 		<tr valign="bottom">
