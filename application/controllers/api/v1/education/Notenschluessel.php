@@ -21,7 +21,7 @@ class Notenschluessel extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Notenschluessel' => 'basis/notenschluessel:rw'));
 		// Load model NotenschluesselModel
 		$this->load->model('education/Notenschluessel_model', 'NotenschluesselModel');
 	}
@@ -32,11 +32,11 @@ class Notenschluessel extends APIv1_Controller
 	public function getNotenschluessel()
 	{
 		$notenschluessel_kurzbz = $this->get('notenschluessel_kurzbz');
-		
+
 		if (isset($notenschluessel_kurzbz))
 		{
 			$result = $this->NotenschluesselModel->load($notenschluessel_kurzbz);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -60,7 +60,7 @@ class Notenschluessel extends APIv1_Controller
 			{
 				$result = $this->NotenschluesselModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -68,7 +68,7 @@ class Notenschluessel extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($notenschluessel = NULL)
 	{
 		return true;

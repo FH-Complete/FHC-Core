@@ -21,7 +21,18 @@ class Prestudent extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(
+			array(
+				'Prestudent' => 'basis/prestudent:rw',
+				'PrestudentByPersonID' => 'basis/prestudent:r',
+				'Specialization' => 'basis/prestudent:rw',
+				'LastStatuses' => 'basis/prestudent:r',
+				'PrestudentsPerStatus' => 'basis/prestudent:r',
+				'RmSpecialization' => 'basis/prestudent:w',
+				'AddReihungstest' => 'basis/prestudent:w',
+				'DelReihungstest' => 'basis/prestudent:w'
+			)
+		);
 		// Load model PrestudentModel
 		$this->load->model('crm/prestudent_model', 'PrestudentModel');
 		// Load library ReihungstestLib

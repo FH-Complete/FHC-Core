@@ -21,7 +21,7 @@ class Lvangebot extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Lvangebot' => 'basis/lvangebot:rw'));
 		// Load model LvangebotModel
 		$this->load->model('education/Lvangebot_model', 'LvangebotModel');
 	}
@@ -32,11 +32,11 @@ class Lvangebot extends APIv1_Controller
 	public function getLvangebot()
 	{
 		$lvangebot_id = $this->get('lvangebot_id');
-		
+
 		if (isset($lvangebot_id))
 		{
 			$result = $this->LvangebotModel->load($lvangebot_id);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -60,7 +60,7 @@ class Lvangebot extends APIv1_Controller
 			{
 				$result = $this->LvangebotModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -68,7 +68,7 @@ class Lvangebot extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($lvangebot = NULL)
 	{
 		return true;

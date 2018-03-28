@@ -21,11 +21,11 @@ class Lehrverband extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Lehrverband' => 'basis/lehrverband:rw'));
 		// Load model LehrverbandModel
 		$this->load->model('organisation/lehrverband_model', 'LehrverbandModel');
-		
-		
+
+
 	}
 
 	/**
@@ -37,11 +37,11 @@ class Lehrverband extends APIv1_Controller
 		$verband = $this->get('verband');
 		$semester = $this->get('semester');
 		$studiengang_kz = $this->get('studiengang_kz');
-		
+
 		if (isset($gruppe) && isset($verband) && isset($semester) && isset($studiengang_kz))
 		{
 			$result = $this->LehrverbandModel->load(array($gruppe, $verband, $semester, $studiengang_kz));
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -65,14 +65,14 @@ class Lehrverband extends APIv1_Controller
 									$this->post()['semester'],
 									$this->post()['studiengang_kz']
 								);
-				
+
 				$result = $this->LehrverbandModel->update($pksArray, $this->post());
 			}
 			else
 			{
 				$result = $this->LehrverbandModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -80,7 +80,7 @@ class Lehrverband extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($lehrverband = NULL)
 	{
 		return true;

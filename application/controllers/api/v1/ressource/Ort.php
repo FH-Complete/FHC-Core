@@ -21,7 +21,7 @@ class Ort extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Ort' => 'basis/ort:rw', 'All' => 'basis/ort:r'));
 		// Load model OrtModel
 		$this->load->model("ressource/ort_model", "OrtModel");
 	}
@@ -32,11 +32,11 @@ class Ort extends APIv1_Controller
 	public function getOrt()
 	{
 		$ort_kurzbz = $this->get("ort_kurzbz");
-		
+
 		if (isset($ort_kurzbz))
 		{
 			$result = $this->OrtModel->load(trim($ort_kurzbz));
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -44,7 +44,7 @@ class Ort extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	/**
 	 * @return void
 	 */
@@ -60,7 +60,7 @@ class Ort extends APIv1_Controller
 		{
 			$result = $this->OrtModel->load();
 		}
-		
+
 		$this->response($result, REST_Controller::HTTP_OK);
 	}
 
@@ -79,7 +79,7 @@ class Ort extends APIv1_Controller
 			{
 				$result = $this->OrtModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -87,7 +87,7 @@ class Ort extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($ort = NULL)
 	{
 		return true;

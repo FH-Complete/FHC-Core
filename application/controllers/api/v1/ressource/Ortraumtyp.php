@@ -21,11 +21,11 @@ class Ortraumtyp extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Ortraumtyp' => 'basis/ortraumtyp:rw'));
 		// Load model OrtraumtypModel
 		$this->load->model('ressource/ortraumtyp_model', 'OrtraumtypModel');
-		
-		
+
+
 	}
 
 	/**
@@ -35,11 +35,11 @@ class Ortraumtyp extends APIv1_Controller
 	{
 		$hierarchie = $this->get('hierarchie');
 		$ort_kurzbz = $this->get('ort_kurzbz');
-		
+
 		if (isset($hierarchie) && isset($ort_kurzbz))
 		{
 			$result = $this->OrtraumtypModel->load(array($hierarchie, $ort_kurzbz));
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -63,7 +63,7 @@ class Ortraumtyp extends APIv1_Controller
 			{
 				$result = $this->OrtraumtypModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -71,7 +71,7 @@ class Ortraumtyp extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($ortraumtyp = NULL)
 	{
 		return true;

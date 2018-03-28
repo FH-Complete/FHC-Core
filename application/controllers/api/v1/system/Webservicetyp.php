@@ -21,11 +21,11 @@ class Webservicetyp extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Webservicetyp' => 'basis/webservicetyp:rw'));
 		// Load model WebservicetypModel
 		$this->load->model('system/webservicetyp_model', 'WebservicetypModel');
-		
-		
+
+
 	}
 
 	/**
@@ -34,11 +34,11 @@ class Webservicetyp extends APIv1_Controller
 	public function getWebservicetyp()
 	{
 		$webservicetyp_kurzbz = $this->get('webservicetyp_kurzbz');
-		
+
 		if (isset($webservicetyp_kurzbz))
 		{
 			$result = $this->WebservicetypModel->load($webservicetyp_kurzbz);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -62,7 +62,7 @@ class Webservicetyp extends APIv1_Controller
 			{
 				$result = $this->WebservicetypModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -70,7 +70,7 @@ class Webservicetyp extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($webservicetyp = NULL)
 	{
 		return true;

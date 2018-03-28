@@ -21,11 +21,11 @@ class Vorlage extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Vorlage' => 'system/vorlage:rw'));
 		// Load model VorlageModel
 		$this->load->model('system/vorlage_model', 'VorlageModel');
-		
-		
+
+
 	}
 
 	/**
@@ -34,11 +34,11 @@ class Vorlage extends APIv1_Controller
 	public function getVorlage()
 	{
 		$vorlage_kurzbz = $this->get('vorlage_kurzbz');
-		
+
 		if (isset($vorlage_kurzbz))
 		{
 			$result = $this->VorlageModel->load($vorlage_kurzbz);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -62,7 +62,7 @@ class Vorlage extends APIv1_Controller
 			{
 				$result = $this->VorlageModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -70,7 +70,7 @@ class Vorlage extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($vorlage = NULL)
 	{
 		return true;

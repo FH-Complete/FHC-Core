@@ -21,7 +21,7 @@ class Phrase extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Phrase' => 'system/phrase:rw', 'Phrases' => 'system/phrase:r'));
 		$this->load->library('PhrasesLib');
 	}
 
@@ -31,11 +31,11 @@ class Phrase extends APIv1_Controller
 	public function getPhrase()
 	{
 		$phrase_id = $this->get('phrase_id');
-		
+
 		if (isset($phrase_id))
 		{
 			$result = $this->phraseslib->getPhrase($phrase_id);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -43,7 +43,7 @@ class Phrase extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	/**
 	 * @return void
 	 */
@@ -55,11 +55,11 @@ class Phrase extends APIv1_Controller
 		$orgeinheit_kurzbz = $this->get('orgeinheit_kurzbz');
 		$orgform_kurzbz = $this->get('orgform_kurzbz');
 		$blockTags = $this->get('blockTags');
-		
+
 		if (isset($app) && isset($sprache))
 		{
 			$result = $this->phraseslib->getPhrases($app, $sprache, $phrase, $orgeinheit_kurzbz, $orgform_kurzbz, $blockTags);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -83,7 +83,7 @@ class Phrase extends APIv1_Controller
 			{
 				$result = $this->PhraseModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -91,7 +91,7 @@ class Phrase extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($phrase = null)
 	{
 		return false;

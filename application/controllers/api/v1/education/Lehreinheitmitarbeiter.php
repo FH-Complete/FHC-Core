@@ -21,7 +21,7 @@ class Lehreinheitmitarbeiter extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Lehreinheitmitarbeiter' => 'basis/lehreinheitmitarbeiter:rw'));
 		// Load model LehreinheitmitarbeiterModel
 		$this->load->model('education/Lehreinheitmitarbeiter_model', 'LehreinheitmitarbeiterModel');
 	}
@@ -33,11 +33,11 @@ class Lehreinheitmitarbeiter extends APIv1_Controller
 	{
 		$mitarbeiter_uid = $this->get('mitarbeiter_uid');
 		$lehreinheit_id = $this->get('lehreinheit_id');
-		
+
 		if (isset($mitarbeiter_uid) && isset($lehreinheit_id))
 		{
 			$result = $this->LehreinheitmitarbeiterModel->load(array($mitarbeiter_uid, $lehreinheit_id));
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -61,7 +61,7 @@ class Lehreinheitmitarbeiter extends APIv1_Controller
 			{
 				$result = $this->LehreinheitmitarbeiterModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -69,7 +69,7 @@ class Lehreinheitmitarbeiter extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($lehreinheitmitarbeiter = NULL)
 	{
 		return true;

@@ -21,7 +21,7 @@ class Zgv extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Zgv' => 'basis/zgv:rw'));
 		// Load model ZgvModel
 		$this->load->model('codex/zgv_model', 'ZgvModel');
 	}
@@ -32,11 +32,11 @@ class Zgv extends APIv1_Controller
 	public function getZgv()
 	{
 		$zgv_code = $this->get('zgv_code');
-		
+
 		if (isset($zgv_code))
 		{
 			$result = $this->ZgvModel->load($zgv_code);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -60,7 +60,7 @@ class Zgv extends APIv1_Controller
 			{
 				$result = $this->ZgvModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -68,7 +68,7 @@ class Zgv extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($zgv = NULL)
 	{
 		return true;

@@ -21,11 +21,11 @@ class Preinteressent extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Preinteressent' => 'basis/preinteressent:rw', 'PreinteressentByPersonID' => 'basis/preinteressent:r'));
 		// Load model PersonModel
 		$this->load->model('crm/preinteressent_model', 'PreinteressentModel');
-		
-		
+
+
 	}
 
 	/**
@@ -34,11 +34,11 @@ class Preinteressent extends APIv1_Controller
 	public function getPreinteressent()
 	{
 		$preinteressent_id = $this->get('preinteressent_id');
-		
+
 		if (isset($preinteressent_id))
 		{
 			$result = $this->PreinteressentModel->load($preinteressent_id);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -46,18 +46,18 @@ class Preinteressent extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	/**
 	 * @return void
 	 */
 	public function getPreinteressentByPersonID()
 	{
 		$person_id = $this->get('person_id');
-		
+
 		if (isset($person_id))
 		{
 			$result = $this->PreinteressentModel->load(array('person_id' => $person_id));
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -81,7 +81,7 @@ class Preinteressent extends APIv1_Controller
 			{
 				$result = $this->PreinteressentModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -89,7 +89,7 @@ class Preinteressent extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($preinteressent)
 	{
 		if ($preinteressent['person_id'] == '')
@@ -97,13 +97,13 @@ class Preinteressent extends APIv1_Controller
 			//$this->errormsg = 'Person_id muss angegeben werden';
 			return false;
 		}
-		
+
 		if ($preinteressent['aufmerksamdurch_kurzbz'] == '')
 		{
 			//$this->errormsg = 'Aufmerksamdurch muss angegeben werden';
 			return false;
 		}
-		
+
 		return true;
 	}
 }

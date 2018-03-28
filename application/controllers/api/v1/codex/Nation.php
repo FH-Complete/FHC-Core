@@ -21,7 +21,7 @@ class Nation extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Nation' => 'basis/nation:r', 'All' => 'basis/nation:r'));
 		// Load model NationModel
 		$this->load->model('codex/nation_model', 'NationModel');
 	}

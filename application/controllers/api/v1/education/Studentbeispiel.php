@@ -21,7 +21,7 @@ class Studentbeispiel extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Studentbeispiel' => 'basis/studentbeispiel:rw'));
 		// Load model StudentbeispielModel
 		$this->load->model('education/Studentbeispiel_model', 'StudentbeispielModel');
 	}
@@ -33,11 +33,11 @@ class Studentbeispiel extends APIv1_Controller
 	{
 		$beispiel_id = $this->get('beispiel_id');
 		$student_uid = $this->get('student_uid');
-		
+
 		if (isset($beispiel_id) && isset($student_uid))
 		{
 			$result = $this->StudentbeispielModel->load(array($beispiel_id, $student_uid));
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -61,7 +61,7 @@ class Studentbeispiel extends APIv1_Controller
 			{
 				$result = $this->StudentbeispielModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -69,7 +69,7 @@ class Studentbeispiel extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($studentbeispiel = NULL)
 	{
 		return true;

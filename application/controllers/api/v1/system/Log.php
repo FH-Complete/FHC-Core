@@ -21,11 +21,11 @@ class Log extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Log' => 'basis/log:rw'));
 		// Load model LogModel
 		$this->load->model('system/log_model', 'LogModel');
-		
-		
+
+
 	}
 
 	/**
@@ -34,11 +34,11 @@ class Log extends APIv1_Controller
 	public function getLog()
 	{
 		$logID = $this->get('log_id');
-		
+
 		if (isset($logID))
 		{
 			$result = $this->LogModel->load($logID);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -62,7 +62,7 @@ class Log extends APIv1_Controller
 			{
 				$result = $this->LogModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -70,7 +70,7 @@ class Log extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($log = NULL)
 	{
 		return true;

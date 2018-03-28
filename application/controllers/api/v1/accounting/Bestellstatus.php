@@ -21,7 +21,7 @@ class Bestellstatus extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Bestellstatus' => 'basis/bestellstatus:rw'));
 		// Load model BestellstatusModel
 		$this->load->model('accounting/bestellstatus_model', 'BestellstatusModel');
 	}
@@ -32,11 +32,11 @@ class Bestellstatus extends APIv1_Controller
 	public function getBestellstatus()
 	{
 		$bestellstatus_kurzbz = $this->get('bestellstatus_kurzbz');
-		
+
 		if (isset($bestellstatus_kurzbz))
 		{
 			$result = $this->BestellstatusModel->load($bestellstatus_kurzbz);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -60,7 +60,7 @@ class Bestellstatus extends APIv1_Controller
 			{
 				$result = $this->BestellstatusModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -68,7 +68,7 @@ class Bestellstatus extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($bestellstatus = NULL)
 	{
 		return true;

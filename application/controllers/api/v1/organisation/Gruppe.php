@@ -21,11 +21,11 @@ class Gruppe extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Gruppe' => 'basis/gruppe:rw'));
 		// Load model GruppeModel
 		$this->load->model('organisation/gruppe_model', 'GruppeModel');
-		
-		
+
+
 	}
 
 	/**
@@ -34,11 +34,11 @@ class Gruppe extends APIv1_Controller
 	public function getGruppe()
 	{
 		$gruppe_kurzbz = $this->get('gruppe_kurzbz');
-		
+
 		if (isset($gruppe_kurzbz))
 		{
 			$result = $this->GruppeModel->load($gruppe_kurzbz);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -62,7 +62,7 @@ class Gruppe extends APIv1_Controller
 			{
 				$result = $this->GruppeModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -70,7 +70,7 @@ class Gruppe extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($gruppe = NULL)
 	{
 		return true;

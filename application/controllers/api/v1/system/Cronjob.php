@@ -21,11 +21,11 @@ class Cronjob extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Cronjob' => 'basis/cronjob:rw'));
 		// Load model CronjobModel
 		$this->load->model('system/cronjob_model', 'CronjobModel');
-		
-		
+
+
 	}
 
 	/**
@@ -34,11 +34,11 @@ class Cronjob extends APIv1_Controller
 	public function getCronjob()
 	{
 		$cronjobID = $this->get('cronjob_id');
-		
+
 		if (isset($cronjobID))
 		{
 			$result = $this->CronjobModel->load($cronjobID);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -62,7 +62,7 @@ class Cronjob extends APIv1_Controller
 			{
 				$result = $this->CronjobModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -70,7 +70,7 @@ class Cronjob extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($cronjob = NULL)
 	{
 		return true;

@@ -21,7 +21,7 @@ class Person extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Person' => 'basis/person:rw', 'CheckBewerbung' => 'basis/person:r'));
 		// Load model PersonModel
 		$this->load->model('person/person_model', 'PersonModel');
 	}
@@ -34,7 +34,7 @@ class Person extends APIv1_Controller
 		$person_id = $this->get('person_id');
 		$code = $this->get('code');
 		$email = $this->get('email');
-		
+
 		if (isset($code) || isset($email) || isset($person_id))
 		{
 			if (isset($code) && isset($email))
@@ -44,7 +44,7 @@ class Person extends APIv1_Controller
 			else
 			{
 				$parametersArray = array();
-				
+
 				if (isset($code))
 				{
 					$parametersArray['zugangscode'] = $code;
@@ -53,10 +53,10 @@ class Person extends APIv1_Controller
 				{
 					$parametersArray['person_id'] = $person_id;
 				}
-				
+
 				$result = $this->PersonModel->loadWhere($parametersArray);
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -64,7 +64,7 @@ class Person extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	/**
 	 * @return void
 	 */
@@ -72,11 +72,11 @@ class Person extends APIv1_Controller
 	{
 		$email = $this->get('email');
 		$studiensemester_kurzbz = $this->get('studiensemester_kurzbz');
-		
+
 		if (isset($email))
 		{
 			$result = $this->PersonModel->checkBewerbung($email, $studiensemester_kurzbz);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -92,7 +92,7 @@ class Person extends APIv1_Controller
 	{
 		$person = $this->post();
 		$validation = $this->_validate($person);
-		
+
 		if (isSuccess($validation))
 		{
 			if(isset($person['person_id']) && !(is_null($person['person_id'])) && ($person['person_id'] != ''))
@@ -103,7 +103,7 @@ class Person extends APIv1_Controller
 			{
 				$result = $this->PersonModel->insert($person);
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -111,7 +111,7 @@ class Person extends APIv1_Controller
 			$this->response($validation, REST_Controller::HTTP_OK);
 		}
 	}
-	
+
 	private function _validate($person)
 	{
 		// If $person is consistent
@@ -119,7 +119,7 @@ class Person extends APIv1_Controller
 		{
 			return error('Any parameters posted');
 		}
-		
+
 		// Trim all the values
 		foreach($person as $key => $value)
 		{
@@ -128,7 +128,7 @@ class Person extends APIv1_Controller
 				$person[$key] = trim($value);
 			}
 		}
-		
+
 		if (isset($person['sprache']) && mb_strlen($person['sprache']) > 16)
 		{
 			return error('Sprache darf nicht laenger als 16 Zeichen sein');
@@ -213,7 +213,7 @@ class Person extends APIv1_Controller
 		{
 			return error('Geschlecht muss w, m oder u sein!');
 		}
-		
+
 		if (isset($person['svnr']))
 		{
 			if ($person['svnr'] != '' && mb_strlen($person['svnr']) != 16
@@ -240,7 +240,7 @@ class Person extends APIv1_Controller
 				{
 					return error('SVNR ist ungueltig');
 				}
-				
+
 				if (mb_strlen($person['svnr']) == 12)
 				{
 					$last = substr($person['svnr'], 10, 12);
@@ -250,7 +250,7 @@ class Person extends APIv1_Controller
 					}
 				}
 			}
-			
+
 			//Pruefen ob das Geburtsdatum mit der SVNR uebereinstimmt.
 			if (isset($person['gebdatum']) && $person['svnr'] != '' && $person['gebdatum'] != '')
 			{
@@ -261,7 +261,7 @@ class Person extends APIv1_Controller
 				}
 			}
 		}
-		
+
 		return success('Input data are valid');
 	}
 }

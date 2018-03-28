@@ -21,7 +21,14 @@ class Reihungstest extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(
+			array(
+				'Reihungstest' => 'basis/reihungstest:rw',
+				'ByStudiengangStudiensemester' => 'basis/reihungstest:r',
+				'ReihungstestByPersonID' => 'basis/reihungstest:r',
+				'AvailableReihungstestByPersonId' => 'basis/reihungstest:r'
+			)
+		);
 		// Load model ReihungstestModel
 		$this->load->model('crm/Reihungstest_model', 'ReihungstestModel');
 		// Load library ReihungstestLib
@@ -34,11 +41,11 @@ class Reihungstest extends APIv1_Controller
 	public function getReihungstest()
 	{
 		$reihungstestID = $this->get('reihungstest_id');
-		
+
 		if (isset($reihungstestID))
 		{
 			$result = $this->ReihungstestModel->load($reihungstestID);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -46,7 +53,7 @@ class Reihungstest extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	/**
 	 * @return void
 	 */
@@ -55,7 +62,7 @@ class Reihungstest extends APIv1_Controller
 		$studiengang_kz = $this->get('studiengang_kz');
 		$studiensemester_kurzbz = $this->get('studiensemester_kurzbz');
 		$available = $this->get('available');
-		
+
 		if (isset($studiengang_kz))
 		{
 			$parametersArray = array('studiengang_kz' => $studiengang_kz);
@@ -68,7 +75,7 @@ class Reihungstest extends APIv1_Controller
 				$parametersArray['anmeldefrist >='] = 'NOW()';
 			}
 			$result = $this->ReihungstestModel->loadWhere($parametersArray);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -76,7 +83,7 @@ class Reihungstest extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	/**
 	 * @return void
 	 */
@@ -84,11 +91,11 @@ class Reihungstest extends APIv1_Controller
 	{
 		$person_id = $this->get('person_id');
 		$available = $this->get('available');
-		
+
 		if (isset($person_id))
 		{
 			$result = $this->reihungstestlib->getReihungstestByPersonID($person_id, $available);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -96,20 +103,20 @@ class Reihungstest extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	/**
 	 * @return void
 	 */
 	public function getAvailableReihungstestByPersonId()
 	{
 		$person_id = $this->get('person_id');
-		
+
 		if (isset($person_id))
 		{
 			$this->load->model('organisation/Studiengang_model', 'StudiengangModel');
-			
+
 			$result = $this->StudiengangModel->getAvailableReihungstestByPersonId($person_id);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -133,7 +140,7 @@ class Reihungstest extends APIv1_Controller
 			{
 				$result = $this->ReihungstestModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -141,7 +148,7 @@ class Reihungstest extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($reihungstest = NULL)
 	{
 		return true;

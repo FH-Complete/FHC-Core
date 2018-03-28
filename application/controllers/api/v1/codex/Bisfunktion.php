@@ -21,7 +21,7 @@ class Bisfunktion extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Bisfunktion' => 'basis/bisfunktion:rw'));
 		// Load model BisfunktionModel
 		$this->load->model('codex/bisfunktion_model', 'BisfunktionModel');
 	}
@@ -33,11 +33,11 @@ class Bisfunktion extends APIv1_Controller
 	{
 		$studiengang_kz = $this->get('studiengang_kz');
 		$bisverwendung_id = $this->get('bisverwendung_id');
-		
+
 		if (isset($studiengang_kz) && isset($bisverwendung_id))
 		{
 			$result = $this->BisfunktionModel->load(array($studiengang_kz, $bisverwendung_id));
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -61,7 +61,7 @@ class Bisfunktion extends APIv1_Controller
 			{
 				$result = $this->BisfunktionModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -69,7 +69,7 @@ class Bisfunktion extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($bisfunktion = NULL)
 	{
 		return true;

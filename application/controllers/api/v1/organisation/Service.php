@@ -21,11 +21,11 @@ class Service extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Service' => 'basis/service:rw'));
 		// Load model ServiceModel
 		$this->load->model('organisation/service_model', 'ServiceModel');
-		
-		
+
+
 	}
 
 	/**
@@ -34,11 +34,11 @@ class Service extends APIv1_Controller
 	public function getService()
 	{
 		$serviceID = $this->get('service_id');
-		
+
 		if (isset($serviceID))
 		{
 			$result = $this->ServiceModel->load($serviceID);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -62,7 +62,7 @@ class Service extends APIv1_Controller
 			{
 				$result = $this->ServiceModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -70,7 +70,7 @@ class Service extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($service = NULL)
 	{
 		return true;

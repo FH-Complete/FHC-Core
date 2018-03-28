@@ -21,11 +21,11 @@ class Betriebsmittel extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Betriebsmittel' => 'basis/betriebsmittel:rw'));
 		// Load model BetriebsmittelModel
 		$this->load->model('ressource/betriebsmittel_model', 'BetriebsmittelModel');
-		
-		
+
+
 	}
 
 	/**
@@ -34,11 +34,11 @@ class Betriebsmittel extends APIv1_Controller
 	public function getBetriebsmittel()
 	{
 		$betriebsmittelID = $this->get('betriebsmittel_id');
-		
+
 		if (isset($betriebsmittelID))
 		{
 			$result = $this->BetriebsmittelModel->load($betriebsmittelID);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -62,7 +62,7 @@ class Betriebsmittel extends APIv1_Controller
 			{
 				$result = $this->BetriebsmittelModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -70,7 +70,7 @@ class Betriebsmittel extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($betriebsmittel = NULL)
 	{
 		return true;

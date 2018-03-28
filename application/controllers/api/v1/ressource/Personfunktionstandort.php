@@ -21,11 +21,11 @@ class Personfunktionstandort extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Personfunktionstandort' => 'basis/personfunktionstandort:rw'));
 		// Load model PersonfunktionstandortModel
 		$this->load->model('ressource/personfunktionstandort_model', 'PersonfunktionstandortModel');
-		
-		
+
+
 	}
 
 	/**
@@ -34,11 +34,11 @@ class Personfunktionstandort extends APIv1_Controller
 	public function getPersonfunktionstandort()
 	{
 		$personfunktionstandortID = $this->get('personfunktionstandort_id');
-		
+
 		if (isset($personfunktionstandortID))
 		{
 			$result = $this->PersonfunktionstandortModel->load($personfunktionstandortID);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -62,7 +62,7 @@ class Personfunktionstandort extends APIv1_Controller
 			{
 				$result = $this->PersonfunktionstandortModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -70,7 +70,7 @@ class Personfunktionstandort extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($personfunktionstandort = NULL)
 	{
 		return true;

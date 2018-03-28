@@ -21,11 +21,11 @@ class Zeitwunsch extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Zeitwunsch' => 'basis/zeitwunsch:rw'));
 		// Load model ZeitwunschModel
 		$this->load->model('ressource/zeitwunsch_model', 'ZeitwunschModel');
-		
-		
+
+
 	}
 
 	/**
@@ -36,11 +36,11 @@ class Zeitwunsch extends APIv1_Controller
 		$tag = $this->get('tag');
 		$mitarbeiter_uid = $this->get('mitarbeiter_uid');
 		$stunde = $this->get('stunde');
-		
+
 		if (isset($tag) && isset($mitarbeiter_uid) && isset($stunde))
 		{
 			$result = $this->ZeitwunschModel->load(array($tag, $mitarbeiter_uid, $stunde));
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -62,14 +62,14 @@ class Zeitwunsch extends APIv1_Controller
 									$this->post()['mitarbeiter_uid'],
 									$this->post()['stunde']
 								);
-				
+
 				$result = $this->ZeitwunschModel->update($pksArray, $this->post());
 			}
 			else
 			{
 				$result = $this->ZeitwunschModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -77,7 +77,7 @@ class Zeitwunsch extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($zeitwunsch = NULL)
 	{
 		return true;

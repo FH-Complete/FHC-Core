@@ -21,11 +21,11 @@ class Zeitfenster extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Zeitfenster' => 'basis/zeitfenster:rw'));
 		// Load model ZeitfensterModel
 		$this->load->model('ressource/zeitfenster_model', 'ZeitfensterModel');
-		
-		
+
+
 	}
 
 	/**
@@ -37,11 +37,11 @@ class Zeitfenster extends APIv1_Controller
 		$studiengang_kz = $this->get('studiengang_kz');
 		$ort_kurzbz = $this->get('ort_kurzbz');
 		$stunde = $this->get('stunde');
-		
+
 		if (isset($wochentag) && isset($studiengang_kz) && isset($ort_kurzbz) && isset($stunde))
 		{
 			$result = $this->ZeitfensterModel->load(array($wochentag, $studiengang_kz, $ort_kurzbz, $stunde));
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -65,14 +65,14 @@ class Zeitfenster extends APIv1_Controller
 									$this->post()['ort_kurzbz'],
 									$this->post()['stunde']
 								);
-				
+
 				$result = $this->ZeitfensterModel->update($pksArray, $this->post());
 			}
 			else
 			{
 				$result = $this->ZeitfensterModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -80,7 +80,7 @@ class Zeitfenster extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($zeitfenster = NULL)
 	{
 		return true;

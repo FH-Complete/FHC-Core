@@ -21,11 +21,11 @@ class Freebusy extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Freebusy' => 'basis/freebusy:rw'));
 		// Load model FreebusyModel
 		$this->load->model('person/freebusy_model', 'FreebusyModel');
-		
-		
+
+
 	}
 
 	/**
@@ -34,11 +34,11 @@ class Freebusy extends APIv1_Controller
 	public function getFreebusy()
 	{
 		$freebusyID = $this->get('freebusy_id');
-		
+
 		if (isset($freebusyID))
 		{
 			$result = $this->FreebusyModel->load($freebusyID);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -62,7 +62,7 @@ class Freebusy extends APIv1_Controller
 			{
 				$result = $this->FreebusyModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -70,7 +70,7 @@ class Freebusy extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($freebusy = NULL)
 	{
 		return true;

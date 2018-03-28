@@ -21,7 +21,7 @@ class RtPerson extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('RtPerson' => 'basis/rtperson:rw'));
 		// Load model StatusModel
 		$this->load->model("crm/RtPerson_model", "RtPersonModel");
 	}
@@ -32,11 +32,11 @@ class RtPerson extends APIv1_Controller
 	public function getRtPerson()
 	{
 		$rt_person_id = $this->get("rt_person_id");
-		
+
 		if (isset($rt_person_id))
 		{
 			$result = $this->RtPersonModel->load($rt_person_id);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -60,7 +60,7 @@ class RtPerson extends APIv1_Controller
 			{
 				$result = $this->RtPersonModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -68,7 +68,7 @@ class RtPerson extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($rtPerson = NULL)
 	{
 		return true;

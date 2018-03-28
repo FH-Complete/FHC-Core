@@ -21,7 +21,7 @@ class Uebung extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Uebung' => 'basis/uebung:rw'));
 		// Load model UebungModel
 		$this->load->model('education/uebung_model', 'UebungModel');
 	}
@@ -32,11 +32,11 @@ class Uebung extends APIv1_Controller
 	public function getUebung()
 	{
 		$uebung_id = $this->get('uebung_id');
-		
+
 		if (isset($uebung_id))
 		{
 			$result = $this->UebungModel->load($uebung_id);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -60,7 +60,7 @@ class Uebung extends APIv1_Controller
 			{
 				$result = $this->UebungModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -68,7 +68,7 @@ class Uebung extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($uebung = NULL)
 	{
 		return true;

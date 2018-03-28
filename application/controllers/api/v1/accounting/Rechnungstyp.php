@@ -21,7 +21,7 @@ class Rechnungstyp extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Rechnungstyp' => 'basis/rechnungstyp:rw'));
 		// Load model RechnungstypModel
 		$this->load->model('accounting/rechnungstyp_model', 'RechnungstypModel');
 	}
@@ -32,11 +32,11 @@ class Rechnungstyp extends APIv1_Controller
 	public function getRechnungstyp()
 	{
 		$rechnungstyp_kurzbz = $this->get('rechnungstyp_kurzbz');
-		
+
 		if (isset($rechnungstyp_kurzbz))
 		{
 			$result = $this->RechnungstypModel->load($rechnungstyp_kurzbz);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -60,7 +60,7 @@ class Rechnungstyp extends APIv1_Controller
 			{
 				$result = $this->RechnungstypModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -68,7 +68,7 @@ class Rechnungstyp extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($rechnungstyp = NULL)
 	{
 		return true;

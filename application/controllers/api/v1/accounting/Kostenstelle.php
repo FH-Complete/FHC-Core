@@ -21,7 +21,7 @@ class Kostenstelle extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Kostenstelle' => 'basis/kostenstelle:rw'));
 		// Load model KostenstelleModel
 		$this->load->model('accounting/kostenstelle_model', 'KostenstelleModel');
 	}
@@ -32,11 +32,11 @@ class Kostenstelle extends APIv1_Controller
 	public function getKostenstelle()
 	{
 		$kostenstelleID = $this->get('kostenstelle_id');
-		
+
 		if (isset($kostenstelleID))
 		{
 			$result = $this->KostenstelleModel->load($kostenstelleID);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -60,7 +60,7 @@ class Kostenstelle extends APIv1_Controller
 			{
 				$result = $this->KostenstelleModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -68,7 +68,7 @@ class Kostenstelle extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($kostenstelle = NULL)
 	{
 		return true;

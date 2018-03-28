@@ -21,7 +21,7 @@ class Bisio extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Bisio' => 'basis/bisio:rw'));
 		// Load model BisioModel
 		$this->load->model('codex/bisio_model', 'BisioModel');
 	}
@@ -32,11 +32,11 @@ class Bisio extends APIv1_Controller
 	public function getBisio()
 	{
 		$bisioID = $this->get('bisio_id');
-		
+
 		if (isset($bisioID))
 		{
 			$result = $this->BisioModel->load($bisioID);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -60,7 +60,7 @@ class Bisio extends APIv1_Controller
 			{
 				$result = $this->BisioModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -68,7 +68,7 @@ class Bisio extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($bisio = NULL)
 	{
 		return true;

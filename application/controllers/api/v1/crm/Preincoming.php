@@ -21,11 +21,11 @@ class Preincoming extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Preincoming' => 'basis/preincoming:rw'));
 		// Load model PreincomingModel
 		$this->load->model('crm/preincoming_model', 'PreincomingModel');
-		
-		
+
+
 	}
 
 	/**
@@ -34,11 +34,11 @@ class Preincoming extends APIv1_Controller
 	public function getPreincoming()
 	{
 		$preincomingID = $this->get('preincoming_id');
-		
+
 		if (isset($preincomingID))
 		{
 			$result = $this->PreincomingModel->load($preincomingID);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -62,7 +62,7 @@ class Preincoming extends APIv1_Controller
 			{
 				$result = $this->PreincomingModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -70,7 +70,7 @@ class Preincoming extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($preincoming = NULL)
 	{
 		return true;

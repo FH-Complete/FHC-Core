@@ -21,7 +21,14 @@ class Bewerbungstermine extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(
+			array(
+				'Bewerbungstermine' => 'basis/bewerbungstermine:rw',
+				'ByStudiengangStudiensemester' => 'basis/bewerbungstermine:r',
+				'ByStudienplan' => 'basis/bewerbungstermine:r',
+				'Current' => 'basis/bewerbungstermine:r'
+			)
+		);
 		// Load model BewerbungstermineModel
 		$this->load->model('crm/bewerbungstermine_model', 'BewerbungstermineModel');
 

@@ -21,7 +21,7 @@ class Zweck extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Zweck' => 'basis/zweck:rw'));
 		// Load model ZweckModel
 		$this->load->model('codex/zweck_model', 'ZweckModel');
 	}
@@ -32,11 +32,11 @@ class Zweck extends APIv1_Controller
 	public function getZweck()
 	{
 		$zweck_code = $this->get('zweck_code');
-		
+
 		if (isset($zweck_code))
 		{
 			$result = $this->ZweckModel->load($zweck_code);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -60,7 +60,7 @@ class Zweck extends APIv1_Controller
 			{
 				$result = $this->ZweckModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -68,7 +68,7 @@ class Zweck extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($zweck = NULL)
 	{
 		return true;

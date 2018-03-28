@@ -21,7 +21,7 @@ class Veranstaltungskategorie extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Veranstaltungskategorie' => 'basis/veranstaltungskategorie:rw'));
 		// Load model VeranstaltungskategorieModel
 		$this->load->model('content/veranstaltungskategorie_model', 'VeranstaltungskategorieModel');
 	}
@@ -32,11 +32,11 @@ class Veranstaltungskategorie extends APIv1_Controller
 	public function getVeranstaltungskategorie()
 	{
 		$veranstaltungskategorie_kurzbz = $this->get('veranstaltungskategorie_kurzbz');
-		
+
 		if (isset($veranstaltungskategorie_kurzbz))
 		{
 			$result = $this->VeranstaltungskategorieModel->load($veranstaltungskategorie_kurzbz);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -60,7 +60,7 @@ class Veranstaltungskategorie extends APIv1_Controller
 			{
 				$result = $this->VeranstaltungskategorieModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -68,7 +68,7 @@ class Veranstaltungskategorie extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($veranstaltungskategorie = NULL)
 	{
 		return true;

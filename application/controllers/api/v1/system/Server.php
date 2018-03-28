@@ -21,11 +21,11 @@ class Server extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Server' => 'basis/server:rw'));
 		// Load model ServerModel
 		$this->load->model('system/server_model', 'ServerModel');
-		
-		
+
+
 	}
 
 	/**
@@ -34,11 +34,11 @@ class Server extends APIv1_Controller
 	public function getServer()
 	{
 		$server_kurzbz = $this->get('server_kurzbz');
-		
+
 		if (isset($server_kurzbz))
 		{
 			$result = $this->ServerModel->load($server_kurzbz);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -62,7 +62,7 @@ class Server extends APIv1_Controller
 			{
 				$result = $this->ServerModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -70,7 +70,7 @@ class Server extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($server = NULL)
 	{
 		return true;

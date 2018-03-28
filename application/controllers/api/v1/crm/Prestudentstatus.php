@@ -21,7 +21,13 @@ class Prestudentstatus extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(
+			array(
+				'Prestudentstatus' => 'basis/prestudentstatus:rw',
+				'LastStatus' => 'basis/prestudentstatus:r',
+				'StatusByFilter' => 'basis/prestudentstatus:r'
+			)
+		);
 		// Load model PrestudentstatusModel
 		$this->load->model('crm/prestudentstatus_model', 'PrestudentstatusModel');
 	}

@@ -21,7 +21,7 @@ class Abgabe extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Abgabe' => 'basis/abgabe:rw'));
 		// Load model AbgabeModel
 		$this->load->model('education/Abgabe_model', 'AbgabeModel');
 	}
@@ -32,11 +32,11 @@ class Abgabe extends APIv1_Controller
 	public function getAbgabe()
 	{
 		$abgabe_id = $this->get('abgabe_id');
-		
+
 		if (isset($abgabe_id))
 		{
 			$result = $this->AbgabeModel->load($abgabe_id);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -60,7 +60,7 @@ class Abgabe extends APIv1_Controller
 			{
 				$result = $this->AbgabeModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -68,7 +68,7 @@ class Abgabe extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($abgabe = NULL)
 	{
 		return true;

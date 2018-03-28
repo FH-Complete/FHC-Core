@@ -21,11 +21,11 @@ class Semesterwochen extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Semesterwochen' => 'basis/semesterwochen:rw'));
 		// Load model SemesterwochenModel
 		$this->load->model('organisation/semesterwochen_model', 'SemesterwochenModel');
-		
-		
+
+
 	}
 
 	/**
@@ -35,11 +35,11 @@ class Semesterwochen extends APIv1_Controller
 	{
 		$studiengang_kz = $this->get('studiengang_kz');
 		$semester = $this->get('semester');
-		
+
 		if (isset($studiengang_kz) && isset($semester))
 		{
 			$result = $this->SemesterwochenModel->load(array($studiengang_kz, $semester));
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -63,7 +63,7 @@ class Semesterwochen extends APIv1_Controller
 			{
 				$result = $this->SemesterwochenModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -71,7 +71,7 @@ class Semesterwochen extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($semesterwochen = NULL)
 	{
 		return true;

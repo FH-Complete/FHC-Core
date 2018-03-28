@@ -21,11 +21,11 @@ class Sprache2 extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Sprache' => 'basis/sprache:rw'));
 		// Load model SpracheModel
 		$this->load->model('system/sprache_model', 'SpracheModel');
-		
-		
+
+
 	}
 
 	/**
@@ -34,9 +34,9 @@ class Sprache2 extends APIv1_Controller
 	public function getSprache()
 	{
 		$sprache = $this->get('sprache');
-		
+
 		$result = $this->SpracheModel->load($sprache);
-			
+
 		$this->response($result, REST_Controller::HTTP_OK);
 	}
 
@@ -55,7 +55,7 @@ class Sprache2 extends APIv1_Controller
 			{
 				$result = $this->SpracheModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -63,7 +63,7 @@ class Sprache2 extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($sprache = NULL)
 	{
 		return true;

@@ -21,7 +21,7 @@ class Gemeinde extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Gemeinde' => 'basis/gemeinde:rw', 'GemeindeByPlz' => 'basis/gemeinde:r'));
 		// Load model GemeindeModel
 		$this->load->model("codex/gemeinde_model", "GemeindeModel");
 	}
@@ -32,7 +32,7 @@ class Gemeinde extends APIv1_Controller
 	public function getGemeinde()
 	{
 		$gemeindeID = $this->get("gemeinde_id");
-		
+
 		$this->GemeindeModel->addOrder("plz");
 		if (isset($gemeindeID))
 		{
@@ -42,21 +42,21 @@ class Gemeinde extends APIv1_Controller
 		{
 			$result = $this->GemeindeModel->load();
 		}
-		
+
 		$this->response($result, REST_Controller::HTTP_OK);
 	}
-	
+
 	/**
 	 * @return void
 	 */
 	public function getGemeindeByPlz()
 	{
 		$plz = $this->get("plz");
-		
+
 		if (is_numeric($plz))
 		{
 			$result = $this->GemeindeModel->getGemeindeByPlz($plz);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -80,7 +80,7 @@ class Gemeinde extends APIv1_Controller
 			{
 				$result = $this->GemeindeModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -88,7 +88,7 @@ class Gemeinde extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($gemeinde = NULL)
 	{
 		return true;

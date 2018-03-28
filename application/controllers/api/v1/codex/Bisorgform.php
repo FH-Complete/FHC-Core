@@ -21,7 +21,7 @@ class Bisorgform extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Bisorgform' => 'basis/bisorgform:rw'));
 		// Load model BisorgformModel
 		$this->load->model('codex/bisorgform_model', 'BisorgformModel');
 	}
@@ -32,11 +32,11 @@ class Bisorgform extends APIv1_Controller
 	public function getBisorgform()
 	{
 		$bisorgform_kurzbz = $this->get('bisorgform_kurzbz');
-		
+
 		if (isset($bisorgform_kurzbz))
 		{
 			$result = $this->BisorgformModel->load($bisorgform_kurzbz);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -60,7 +60,7 @@ class Bisorgform extends APIv1_Controller
 			{
 				$result = $this->BisorgformModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -68,7 +68,7 @@ class Bisorgform extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($bisorgform = NULL)
 	{
 		return true;

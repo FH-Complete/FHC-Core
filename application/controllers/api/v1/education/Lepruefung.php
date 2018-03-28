@@ -21,7 +21,7 @@ class Lepruefung extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('LePruefung' => 'basis/lepruefung:rw'));
 		// Load model LePruefungModel
 		$this->load->model('education/LePruefung_model', 'LePruefungModel');
 	}
@@ -32,11 +32,11 @@ class Lepruefung extends APIv1_Controller
 	public function getLePruefung()
 	{
 		$lepruefung_id = $this->get('lepruefung_id');
-		
+
 		if (isset($lepruefung_id))
 		{
 			$result = $this->LePruefungModel->load($lepruefung_id);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -60,7 +60,7 @@ class Lepruefung extends APIv1_Controller
 			{
 				$result = $this->LePruefungModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -68,7 +68,7 @@ class Lepruefung extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($lepruefung = NULL)
 	{
 		return true;

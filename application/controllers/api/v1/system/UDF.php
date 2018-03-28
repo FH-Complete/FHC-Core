@@ -21,8 +21,8 @@ class UDF extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
-		
+		parent::__construct(array('UDF' => 'system/udf:rw'));
+
 		// Load model UDF_model
 		$this->load->model('system/UDF_model', 'UDFModel');
 	}
@@ -35,9 +35,9 @@ class UDF extends APIv1_Controller
 		$decode = $this->get('decode');
 		$schema = $this->get('schema');
 		$table = $this->get('table');
-		
+
 		$result = error();
-		
+
 		if (isset($schema) || isset($table))
 		{
 			$result = $this->UDFModel->loadWhere(
@@ -51,23 +51,23 @@ class UDF extends APIv1_Controller
 		{
 			$result = $this->UDFModel->load();
 		}
-		
+
 		if ($decode)
 		{
 			$this->_jsonDecodeResult($result);
 		}
-		
+
 		$this->response($result, REST_Controller::HTTP_OK);
 	}
-	
+
 	/**
-	 * 
+	 *
 	 */
 	public function postUDF()
 	{
 		$udfs = $this->post();
 		$validation = $this->_validate($udfs);
-		
+
 		if (isSuccess($validation))
 		{
 			$caller = null;
@@ -76,9 +76,9 @@ class UDF extends APIv1_Controller
 				$caller = $udfs['caller'];
 				unset($udfs['caller']);
 			}
-			
+
 			$result = $this->UDFModel->saveUDFs($udfs);
-			
+
 			if ($caller != null)
 			{
 				$res = 'ERR';
@@ -86,7 +86,7 @@ class UDF extends APIv1_Controller
 				{
 					$res = 'OK';
 				}
-				
+
 				redirect($caller.'&res='.$res);
 			}
 			else
@@ -99,23 +99,23 @@ class UDF extends APIv1_Controller
 			$this->response($validation, REST_Controller::HTTP_OK);
 		}
 	}
-	
+
 	/**
-	 * 
+	 *
 	 */
 	private function _validate($udfs)
 	{
 		$validation = error('person_id or prestudent_id is missing');
-		
+
 		if((isset($udfs['person_id']) && !(is_null($udfs['person_id'])) && ($udfs['person_id'] != ''))
 			|| (isset($udfs['prestudent_id']) && !(is_null($udfs['prestudent_id'])) && ($udfs['prestudent_id'] != '')))
 		{
 			$validation = success(true);
 		}
-		
+
 		return $validation;
 	}
-	
+
 	/**
 	 * Decode to json the column jsons for every result set
 	 */

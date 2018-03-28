@@ -20,7 +20,17 @@ class Studiengang2 extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(
+			array(
+				'Studiengang' => 'basis/studiengang:r',
+				'AllForBewerbung' => 'basis/studiengang:r',
+				'StudiengangStudienplan' => 'basis/studiengang:r',
+				'StudiengangBewerbung' => 'basis/studiengang:r',
+				'AppliedStudiengang' => 'basis/studiengang:r',
+				'AppliedStudiengangFromNow' => 'basis/studiengang:r',
+				'AppliedStudiengangFromNowOE' => 'basis/studiengang:r'
+			)
+		);
 
 		// Load model PersonModel
 		$this->load->model('organisation/studiengang_model', 'StudiengangModel');

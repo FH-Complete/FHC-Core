@@ -21,11 +21,11 @@ class Kontaktmedium extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Kontaktmedium' => 'basis/kontaktmedium:rw'));
 		// Load model KontaktmediumModel
 		$this->load->model('person/kontaktmedium_model', 'KontaktmediumModel');
-		
-		
+
+
 	}
 
 	/**
@@ -34,11 +34,11 @@ class Kontaktmedium extends APIv1_Controller
 	public function getKontaktmedium()
 	{
 		$kontaktmedium_kurzbz = $this->get('kontaktmedium_kurzbz');
-		
+
 		if (isset($kontaktmedium_kurzbz))
 		{
 			$result = $this->KontaktmediumModel->load($kontaktmedium_kurzbz);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -62,7 +62,7 @@ class Kontaktmedium extends APIv1_Controller
 			{
 				$result = $this->KontaktmediumModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -70,7 +70,7 @@ class Kontaktmedium extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($kontaktmedium = NULL)
 	{
 		return true;

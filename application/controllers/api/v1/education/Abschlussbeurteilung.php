@@ -21,7 +21,7 @@ class Abschlussbeurteilung extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Abschlussbeurteilung' => 'basis/abschlussbeurteilung:rw'));
 		// Load model AbschlussbeurteilungModel
 		$this->load->model('education/Abschlussbeurteilung_model', 'AbschlussbeurteilungModel');
 	}
@@ -32,11 +32,11 @@ class Abschlussbeurteilung extends APIv1_Controller
 	public function getAbschlussbeurteilung()
 	{
 		$abschlussbeurteilung_kurzbz = $this->get('abschlussbeurteilung_kurzbz');
-		
+
 		if (isset($abschlussbeurteilung_kurzbz))
 		{
 			$result = $this->AbschlussbeurteilungModel->load($abschlussbeurteilung_kurzbz);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -60,7 +60,7 @@ class Abschlussbeurteilung extends APIv1_Controller
 			{
 				$result = $this->AbschlussbeurteilungModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -68,7 +68,7 @@ class Abschlussbeurteilung extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($abschlussbeurteilung = NULL)
 	{
 		return true;

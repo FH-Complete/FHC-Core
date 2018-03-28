@@ -21,11 +21,11 @@ class Frage extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Frage' => 'basis/frage:rw'));
 		// Load model FrageModel
 		$this->load->model('testtool/frage_model', 'FrageModel');
-		
-		
+
+
 	}
 
 	/**
@@ -34,11 +34,11 @@ class Frage extends APIv1_Controller
 	public function getFrage()
 	{
 		$frageID = $this->get('frage_id');
-		
+
 		if (isset($frageID))
 		{
 			$result = $this->FrageModel->load($frageID);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -62,7 +62,7 @@ class Frage extends APIv1_Controller
 			{
 				$result = $this->FrageModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -70,7 +70,7 @@ class Frage extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($frage = NULL)
 	{
 		return true;

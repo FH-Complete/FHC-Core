@@ -21,11 +21,11 @@ class Ressource extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Ressource' => 'basis/ressource:rw'));
 		// Load model RessourceModel
 		$this->load->model('project/ressource_model', 'RessourceModel');
-		
-		
+
+
 	}
 
 	/**
@@ -34,11 +34,11 @@ class Ressource extends APIv1_Controller
 	public function getRessource()
 	{
 		$ressourceID = $this->get('ressource_id');
-		
+
 		if (isset($ressourceID))
 		{
 			$result = $this->RessourceModel->load($ressourceID);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -62,7 +62,7 @@ class Ressource extends APIv1_Controller
 			{
 				$result = $this->RessourceModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -70,7 +70,7 @@ class Ressource extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($ressource = NULL)
 	{
 		return true;

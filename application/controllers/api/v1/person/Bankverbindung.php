@@ -21,11 +21,11 @@ class Bankverbindung extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Bankverbindung' => 'basis/bankverbindung:rw'));
 		// Load model BankverbindungModel
 		$this->load->model('person/bankverbindung_model', 'BankverbindungModel');
-		
-		
+
+
 	}
 
 	/**
@@ -34,11 +34,11 @@ class Bankverbindung extends APIv1_Controller
 	public function getBankverbindung()
 	{
 		$bankverbindungID = $this->get('bankverbindung_id');
-		
+
 		if (isset($bankverbindungID))
 		{
 			$result = $this->BankverbindungModel->load($bankverbindungID);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -62,7 +62,7 @@ class Bankverbindung extends APIv1_Controller
 			{
 				$result = $this->BankverbindungModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -70,7 +70,7 @@ class Bankverbindung extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($bankverbindung = NULL)
 	{
 		return true;

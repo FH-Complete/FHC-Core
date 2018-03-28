@@ -21,7 +21,7 @@ class Buchung extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Buchung' => 'basis/buchung:r'));
 		// Load model BuchungModel
 		$this->load->model('accounting/buchung_model', 'BuchungModel');
 	}
@@ -32,11 +32,11 @@ class Buchung extends APIv1_Controller
 	public function getBuchung()
 	{
 		$buchungID = $this->get('buchung_id');
-		
+
 		if (isset($buchungID))
 		{
 			$result = $this->BuchungModel->load($buchungID);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -60,7 +60,7 @@ class Buchung extends APIv1_Controller
 			{
 				$result = $this->BuchungModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -68,7 +68,7 @@ class Buchung extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($buchung = NULL)
 	{
 		return true;

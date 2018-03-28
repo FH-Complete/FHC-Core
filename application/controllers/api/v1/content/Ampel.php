@@ -21,7 +21,7 @@ class Ampel extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Ampel' => 'basis/ampel:rw'));
 		// Load model AmpelModel
 		$this->load->model('content/ampel_model', 'AmpelModel');
 	}
@@ -32,11 +32,11 @@ class Ampel extends APIv1_Controller
 	public function getAmpel()
 	{
 		$ampelID = $this->get('ampel_id');
-		
+
 		if (isset($ampelID))
 		{
 			$result = $this->AmpelModel->load($ampelID);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -60,7 +60,7 @@ class Ampel extends APIv1_Controller
 			{
 				$result = $this->AmpelModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -68,7 +68,7 @@ class Ampel extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($ampel = NULL)
 	{
 		return true;

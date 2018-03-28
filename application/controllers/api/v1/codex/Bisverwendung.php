@@ -21,7 +21,7 @@ class Bisverwendung extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Bisverwendung' => 'basis/bisverwendung:rw'));
 		// Load model BisverwendungModel
 		$this->load->model('codex/bisverwendung_model', 'BisverwendungModel');
 	}
@@ -32,11 +32,11 @@ class Bisverwendung extends APIv1_Controller
 	public function getBisverwendung()
 	{
 		$bisverwendungID = $this->get('bisverwendung_id');
-		
+
 		if (isset($bisverwendungID))
 		{
 			$result = $this->BisverwendungModel->load($bisverwendungID);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -60,7 +60,7 @@ class Bisverwendung extends APIv1_Controller
 			{
 				$result = $this->BisverwendungModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -68,7 +68,7 @@ class Bisverwendung extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($bisverwendung = NULL)
 	{
 		return true;

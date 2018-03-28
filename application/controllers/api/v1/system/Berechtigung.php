@@ -21,11 +21,11 @@ class Berechtigung extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Berechtigung' => 'basis/berechtigung:rw'));
 		// Load model BerechtigungModel
 		$this->load->model('system/berechtigung_model', 'BerechtigungModel');
-		
-		
+
+
 	}
 
 	/**
@@ -34,11 +34,11 @@ class Berechtigung extends APIv1_Controller
 	public function getBerechtigung()
 	{
 		$berechtigung_kurzbz = $this->get('berechtigung_kurzbz');
-		
+
 		if (isset($berechtigung_kurzbz))
 		{
 			$result = $this->BerechtigungModel->load($berechtigung_kurzbz);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -62,7 +62,7 @@ class Berechtigung extends APIv1_Controller
 			{
 				$result = $this->BerechtigungModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -70,7 +70,7 @@ class Berechtigung extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($berechtigung = NULL)
 	{
 		return true;

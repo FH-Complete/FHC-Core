@@ -21,7 +21,7 @@ class Zeugnisnote extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Zeugnisnote' => 'basis/zeugnisnote:rw'));
 		// Load model ZeugnisnoteModel
 		$this->load->model('education/Zeugnisnote_model', 'ZeugnisnoteModel');
 	}
@@ -34,11 +34,11 @@ class Zeugnisnote extends APIv1_Controller
 		$studiensemester_kurzbz = $this->get('studiensemester_kurzbz');
 		$student_uid = $this->get('student_uid');
 		$lehrveranstaltung_id = $this->get('lehrveranstaltung_id');
-		
+
 		if (isset($studiensemester_kurzbz) && isset($student_uid) && isset($lehrveranstaltung_id))
 		{
 			$result = $this->ZeugnisnoteModel->load(array($studiensemester_kurzbz, $student_uid, $lehrveranstaltung_id));
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -60,14 +60,14 @@ class Zeugnisnote extends APIv1_Controller
 									$this->post()['student_uid'],
 									$this->post()['lehrveranstaltung_id']
 								);
-				
+
 				$result = $this->ZeugnisnoteModel->update($pksArray, $this->post());
 			}
 			else
 			{
 				$result = $this->ZeugnisnoteModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -75,7 +75,7 @@ class Zeugnisnote extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($zeugnisnote = NULL)
 	{
 		return true;

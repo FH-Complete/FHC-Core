@@ -21,7 +21,7 @@ class Lehrfunktion extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Lehrfunktion' => 'basis/lehrfunktion:rw'));
 		// Load model LehrfunktionModel
 		$this->load->model('education/Lehrfunktion_model', 'LehrfunktionModel');
 	}
@@ -32,11 +32,11 @@ class Lehrfunktion extends APIv1_Controller
 	public function getLehrfunktion()
 	{
 		$lehrfunktion_kurzbz = $this->get('lehrfunktion_kurzbz');
-		
+
 		if (isset($lehrfunktion_kurzbz))
 		{
 			$result = $this->LehrfunktionModel->load($lehrfunktion_kurzbz);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -60,7 +60,7 @@ class Lehrfunktion extends APIv1_Controller
 			{
 				$result = $this->LehrfunktionModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -68,7 +68,7 @@ class Lehrfunktion extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($lehrfunktion = NULL)
 	{
 		return true;

@@ -21,7 +21,7 @@ class Vertrag extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Vertrag' => 'basis/vertrag:rw'));
 		// Load model VertragModel
 		$this->load->model('accounting/vertrag_model', 'VertragModel');
 	}
@@ -32,11 +32,11 @@ class Vertrag extends APIv1_Controller
 	public function getVertrag()
 	{
 		$vertragID = $this->get('vertrag_id');
-		
+
 		if (isset($vertragID))
 		{
 			$result = $this->VertragModel->load($vertragID);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -60,7 +60,7 @@ class Vertrag extends APIv1_Controller
 			{
 				$result = $this->VertragModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -68,7 +68,7 @@ class Vertrag extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($vertrag = NULL)
 	{
 		return true;

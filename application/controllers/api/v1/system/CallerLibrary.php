@@ -21,8 +21,8 @@ class CallerLibrary extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
-		
+		parent::__construct(array('Call' => 'basis/callerlibrary:rw'));
+
 		// Loads the CallerLib
 		$this->load->library('CallerLib');
 	}
@@ -50,7 +50,7 @@ class CallerLibrary extends APIv1_Controller
 		// Print the result
 		$this->response($result, REST_Controller::HTTP_OK);
 	}
-	
+
 	/**
 	 * @return void
 	 */
@@ -62,7 +62,7 @@ class CallerLibrary extends APIv1_Controller
 		// Print the result
 		$this->response($result, REST_Controller::HTTP_OK);
 	}
-	
+
 	/**
 	 * @return void
 	 */

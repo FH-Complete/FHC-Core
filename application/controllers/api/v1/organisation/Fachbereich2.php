@@ -21,11 +21,11 @@ class Fachbereich2 extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Fachbereich' => 'basis/fachbereich:rw'));
 		// Load model FachbereichModel
 		$this->load->model('organisation/fachbereich_model', 'FachbereichModel');
-		
-		
+
+
 	}
 
 	/**
@@ -34,11 +34,11 @@ class Fachbereich2 extends APIv1_Controller
 	public function getFachbereich()
 	{
 		$fachbereich_kurzbz = $this->get('fachbereich_kurzbz');
-		
+
 		if (isset($fachbereich_kurzbz))
 		{
 			$result = $this->FachbereichModel->load($fachbereich_kurzbz);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -62,7 +62,7 @@ class Fachbereich2 extends APIv1_Controller
 			{
 				$result = $this->FachbereichModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -70,7 +70,7 @@ class Fachbereich2 extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($fachbereich = NULL)
 	{
 		return true;

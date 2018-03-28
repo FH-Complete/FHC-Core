@@ -21,7 +21,7 @@ class Bestellung extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Bestellung' => 'basis/bestellung:rw'));
 		// Load model BestellungModel
 		$this->load->model('accounting/bestellung_model', 'BestellungModel');
 	}
@@ -32,11 +32,11 @@ class Bestellung extends APIv1_Controller
 	public function getBestellung()
 	{
 		$bestellungID = $this->get('bestellung_id');
-		
+
 		if (isset($bestellungID))
 		{
 			$result = $this->BestellungModel->load($bestellungID);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -60,7 +60,7 @@ class Bestellung extends APIv1_Controller
 			{
 				$result = $this->BestellungModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -68,7 +68,7 @@ class Bestellung extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($bestellung = NULL)
 	{
 		return true;

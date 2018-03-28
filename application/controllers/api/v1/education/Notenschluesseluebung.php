@@ -21,7 +21,7 @@ class Notenschluesseluebung extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Notenschluesseluebung' => 'basis/notenschluesseluebung:rw'));
 		// Load model NotenschluesseluebungModel
 		$this->load->model('education/Notenschluesseluebung_model', 'NotenschluesseluebungModel');
 	}
@@ -33,11 +33,11 @@ class Notenschluesseluebung extends APIv1_Controller
 	{
 		$note = $this->get('note');
 		$uebung_id = $this->get('uebung_id');
-		
+
 		if (isset($note) && isset($uebung_id))
 		{
 			$result = $this->NotenschluesseluebungModel->load(array($note, $uebung_id));
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -61,7 +61,7 @@ class Notenschluesseluebung extends APIv1_Controller
 			{
 				$result = $this->NotenschluesseluebungModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -69,7 +69,7 @@ class Notenschluesseluebung extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($notenschluesseluebung = NULL)
 	{
 		return true;

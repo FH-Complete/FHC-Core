@@ -21,11 +21,11 @@ class Projektphase extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Projektphase' => 'basis/projektphase:rw'));
 		// Load model ProjektphaseModel
 		$this->load->model('project/projektphase_model', 'ProjektphaseModel');
-		
-		
+
+
 	}
 
 	/**
@@ -34,11 +34,11 @@ class Projektphase extends APIv1_Controller
 	public function getProjektphase()
 	{
 		$projektphaseID = $this->get('projektphase_id');
-		
+
 		if (isset($projektphaseID))
 		{
 			$result = $this->ProjektphaseModel->load($projektphaseID);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -62,7 +62,7 @@ class Projektphase extends APIv1_Controller
 			{
 				$result = $this->ProjektphaseModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -70,7 +70,7 @@ class Projektphase extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($projektphase = NULL)
 	{
 		return true;

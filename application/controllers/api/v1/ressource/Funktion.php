@@ -21,11 +21,11 @@ class Funktion extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Funktion' => 'basis/funktion:rw'));
 		// Load model FunktionModel
 		$this->load->model('ressource/funktion_model', 'FunktionModel');
-		
-		
+
+
 	}
 
 	/**
@@ -34,11 +34,11 @@ class Funktion extends APIv1_Controller
 	public function getFunktion()
 	{
 		$funktion_kurzbz = $this->get('funktion_kurzbz');
-		
+
 		if (isset($funktion_kurzbz))
 		{
 			$result = $this->FunktionModel->load($funktion_kurzbz);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -62,7 +62,7 @@ class Funktion extends APIv1_Controller
 			{
 				$result = $this->FunktionModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -70,7 +70,7 @@ class Funktion extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($funktion = NULL)
 	{
 		return true;

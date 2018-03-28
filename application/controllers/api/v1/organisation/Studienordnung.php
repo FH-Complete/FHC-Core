@@ -21,11 +21,11 @@ class Studienordnung extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Studienordnung' => 'lehre/studienordnung:rw'));
 		// Load model StudienordnungModel
 		$this->load->model('organisation/studienordnung_model', 'StudienordnungModel');
-		
-		
+
+
 	}
 
 	/**
@@ -34,11 +34,11 @@ class Studienordnung extends APIv1_Controller
 	public function getStudienordnung()
 	{
 		$studienordnungID = $this->get('studienordnung_id');
-		
+
 		if (isset($studienordnungID))
 		{
 			$result = $this->StudienordnungModel->load($studienordnungID);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -62,7 +62,7 @@ class Studienordnung extends APIv1_Controller
 			{
 				$result = $this->StudienordnungModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -70,7 +70,7 @@ class Studienordnung extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($studienordnung = NULL)
 	{
 		return true;

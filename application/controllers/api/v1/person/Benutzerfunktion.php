@@ -21,11 +21,11 @@ class Benutzerfunktion extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Benutzerfunktion' => 'basis/benutzerfunktion:rw'));
 		// Load model BenutzerfunktionModel
 		$this->load->model('person/benutzerfunktion_model', 'BenutzerfunktionModel');
-		
-		
+
+
 	}
 
 	/**
@@ -34,11 +34,11 @@ class Benutzerfunktion extends APIv1_Controller
 	public function getBenutzerfunktion()
 	{
 		$benutzerfunktionID = $this->get('benutzerfunktion_id');
-		
+
 		if (isset($benutzerfunktionID))
 		{
 			$result = $this->BenutzerfunktionModel->load($benutzerfunktionID);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -62,7 +62,7 @@ class Benutzerfunktion extends APIv1_Controller
 			{
 				$result = $this->BenutzerfunktionModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -70,7 +70,7 @@ class Benutzerfunktion extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($benutzerfunktion = NULL)
 	{
 		return true;

@@ -21,11 +21,11 @@ class Pruefling extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Pruefling' => 'basis/pruefling:rw'));
 		// Load model PrueflingModel
 		$this->load->model('testtool/pruefling_model', 'PrueflingModel');
-		
-		
+
+
 	}
 
 	/**
@@ -34,11 +34,11 @@ class Pruefling extends APIv1_Controller
 	public function getPruefling()
 	{
 		$prueflingID = $this->get('pruefling_id');
-		
+
 		if (isset($prueflingID))
 		{
 			$result = $this->PrueflingModel->load($prueflingID);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -62,7 +62,7 @@ class Pruefling extends APIv1_Controller
 			{
 				$result = $this->PrueflingModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -70,7 +70,7 @@ class Pruefling extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($pruefling = NULL)
 	{
 		return true;

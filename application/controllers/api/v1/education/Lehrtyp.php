@@ -21,7 +21,7 @@ class Lehrtyp extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Lehrtyp' => 'basis/lehrtyp:rw'));
 		// Load model LehrtypModel
 		$this->load->model('education/Lehrtyp_model', 'LehrtypModel');
 	}
@@ -32,11 +32,11 @@ class Lehrtyp extends APIv1_Controller
 	public function getLehrtyp()
 	{
 		$lehrtyp_kurzbz = $this->get('lehrtyp_kurzbz');
-		
+
 		if (isset($lehrtyp_kurzbz))
 		{
 			$result = $this->LehrtypModel->load($lehrtyp_kurzbz);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -60,7 +60,7 @@ class Lehrtyp extends APIv1_Controller
 			{
 				$result = $this->LehrtypModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -68,7 +68,7 @@ class Lehrtyp extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($lehrtyp = NULL)
 	{
 		return true;

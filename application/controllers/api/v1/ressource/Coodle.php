@@ -21,11 +21,11 @@ class Coodle extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Coodle' => 'basis/coodle:rw'));
 		// Load model CoodleModel
 		$this->load->model('ressource/coodle_model', 'CoodleModel');
-		
-		
+
+
 	}
 
 	/**
@@ -34,11 +34,11 @@ class Coodle extends APIv1_Controller
 	public function getCoodle()
 	{
 		$coodleID = $this->get('coodle_id');
-		
+
 		if (isset($coodleID))
 		{
 			$result = $this->CoodleModel->load($coodleID);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -62,7 +62,7 @@ class Coodle extends APIv1_Controller
 			{
 				$result = $this->CoodleModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -70,7 +70,7 @@ class Coodle extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($coodle = NULL)
 	{
 		return true;

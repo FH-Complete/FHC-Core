@@ -21,7 +21,7 @@ class Template extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Template' => 'basis/template:rw'));
 		// Load model TemplateModel
 		$this->load->model('content/template_model', 'TemplateModel');
 	}
@@ -32,11 +32,11 @@ class Template extends APIv1_Controller
 	public function getTemplate()
 	{
 		$template_kurzbz = $this->get('template_kurzbz');
-		
+
 		if (isset($template_kurzbz))
 		{
 			$result = $this->TemplateModel->load($template_kurzbz);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -60,7 +60,7 @@ class Template extends APIv1_Controller
 			{
 				$result = $this->TemplateModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -68,7 +68,7 @@ class Template extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($template = NULL)
 	{
 		return true;
