@@ -21,7 +21,7 @@ class CallerLibrary extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct(array('Call' => 'basis/callerlibrary:rw'));
+		parent::__construct(array('Call' => 'admin:rw'));
 
 		// Loads the CallerLib
 		$this->load->library('CallerLib');
