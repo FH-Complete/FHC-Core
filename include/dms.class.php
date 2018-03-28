@@ -46,7 +46,10 @@ class dms extends basis_db
 	public $updateamum;
 	public $updatevon;
 	public $kategorie_kurzbz_old;
-	
+	public $cis_suche = false;
+	public $schlagworte;
+	public $kategorie_oe_kurzbz;
+	public $berechtigung_kurzbz;
 	public $bezeichnung;
 	
 	/**
@@ -92,6 +95,8 @@ class dms extends basis_db
 				$this->insertvon = $row->insertvon;
 				$this->updateamum = $row->updateamum;
 				$this->updatevon = $row->updatevon;
+				$this->cis_suche = $this->db_parse_bool($row->cis_suche);
+				$this->schlagworte = $row->schlagworte;
 				
 				return true;
 			}
@@ -143,7 +148,7 @@ class dms extends basis_db
 								
 			$qry.="INSERT INTO campus.tbl_dms_version(dms_id, version,  
 						filename, mimetype, name, beschreibung, letzterzugriff, insertamum, insertvon, 
-						updateamum, updatevon) VALUES(".
+						updateamum, updatevon, cis_suche, schlagworte) VALUES(".
 					$dms_id.','.
 					$this->db_add_param($this->version, FHC_INTEGER).','.
 					$this->db_add_param($this->filename).','.
@@ -154,7 +159,9 @@ class dms extends basis_db
 					$this->db_add_param($this->insertamum).','.
 					$this->db_add_param($this->insertvon).','.
 					$this->db_add_param($this->updateamum).','.
-					$this->db_add_param($this->updatevon).');';
+					$this->db_add_param($this->updatevon).','.
+					$this->db_add_param($this->cis_suche, FHC_BOOLEAN).','.
+					$this->db_add_param($this->schlagworte).');';
 		}
 		else
 		{
@@ -170,7 +177,9 @@ class dms extends basis_db
 						" beschreibung=".$this->db_add_param($this->beschreibung).",".
 						" letzterzugriff=".$this->db_add_param($this->letzterzugriff).",".
 						" updateamum=".$this->db_add_param($this->updateamum).",".
-						" updatevon=".$this->db_add_param($this->updatevon).
+						" updatevon=".$this->db_add_param($this->updatevon).",".
+						" cis_suche=".$this->db_add_param($this->cis_suche, FHC_BOOLEAN).",".
+						" schlagworte=".$this->db_add_param($this->schlagworte).
 						" WHERE dms_id=".$this->db_add_param($this->dms_id,FHC_INTEGER)." AND version=".$this->db_add_param($this->version, FHC_INTEGER).";";
 		}
 		
@@ -214,96 +223,98 @@ class dms extends basis_db
 		}
 	}
 	
-    /**
-     * Löscht einen DMS Eintrag mit übergebener ID und Version
-     * Wird die letzte Version eines Eintrages gelöscht, wird automatisch der Eintrag mitgelöscht
-     * @param $dms_id
-     * @param $version 
-     */
-    public function deleteVersion($dms_id, $version)
-    {     
-        $dms = new dms(); 
-        $dms->load($dms_id, $version);
-        
-        $qry ="DELETE FROM campus.tbl_dms_version WHERE dms_id = ".$this->db_add_param($dms_id, FHC_INTEGER)." and version =".$this->db_add_param($version, FHC_INTEGER).';';
-        
-        if($this->db_query($qry))
-        {
-            $qry_anzahl ="SELECT 1 FROM campus.tbl_dms_version WHERE dms_id =".$this->db_add_param($dms_id, FHC_INTEGER).';';
-            if($result = $this->db_query($qry_anzahl))
-            {
-                // File der Version im Filesystem löschen 
-                if(is_file(DMS_PATH.$dms->filename) && !unlink(DMS_PATH.$dms->filename))
-                {
-                    $this->errormsg = "Fehler beim Löschen des Dokuments aufgetreten"; 
-                    return false;
-                }
-                
-                // Wenn letzte Version gelöscht wurde -> lösche gesamten Eintrag
-                if($this->db_num_rows($result) == 0 )
-                {
-                    if(!$this->deleteDms($dms_id))
-                    {
-                        $this->errormsg = "Fehler beim Löschen aufgetreten"; 
-                        return false;
-                    }
-                    else
-                        return true; 
-                }
-            }
-        }
-        else
-        {
-            $this->errormsg="Fehler beim Löschen der Version aufgetreten";
-            return false;
-        }
-        return true; 
-    }
+	/**
+	 * Löscht einen DMS Eintrag mit übergebener ID und Version
+	 * Wird die letzte Version eines Eintrages gelöscht, wird automatisch der Eintrag mitgelöscht
+	 * 
+	 * @param $dms_id
+	 * @param $version
+	 */
+	public function deleteVersion($dms_id, $version)
+	{
+		$dms = new dms();
+		$dms->load($dms_id, $version);
+		
+		$qry = "DELETE FROM campus.tbl_dms_version WHERE dms_id = " . $this->db_add_param($dms_id, FHC_INTEGER) . " and version =" . $this->db_add_param($version, FHC_INTEGER) . ';';
+		
+		if ($this->db_query($qry))
+		{
+			$qry_anzahl = "SELECT 1 FROM campus.tbl_dms_version WHERE dms_id =" . $this->db_add_param($dms_id, FHC_INTEGER) . ';';
+			if ($result = $this->db_query($qry_anzahl))
+			{
+				// File der Version im Filesystem löschen
+				if (is_file(DMS_PATH . $dms->filename) && ! unlink(DMS_PATH . $dms->filename))
+				{
+					$this->errormsg = "Fehler beim Löschen des Dokuments aufgetreten";
+					return false;
+				}
+				
+				// Wenn letzte Version gelöscht wurde -> lösche gesamten Eintrag
+				if ($this->db_num_rows($result) == 0)
+				{
+					if (! $this->deleteDms($dms_id))
+					{
+						$this->errormsg = "Fehler beim Löschen aufgetreten";
+						return false;
+					}
+					else
+						return true;
+				}
+			}
+		}
+		else
+		{
+			$this->errormsg = "Fehler beim Löschen der Version aufgetreten";
+			return false;
+		}
+		return true;
+	}
+	
+	/**
+	 * Löscht einen gesamten DMS Eintrag inklusive aller Versionen und Projekteinträge
+	 * 
+	 * @param $dms_id
+	 */
+	public function deleteDms($dms_id)
+	{
+		$this->load($dms_id);
+		$this->getAllVersions($dms_id);
+		$error = false;
+		
+		// lösche Versionen
+		$qry = "BEGIN;DELETE FROM campus.tbl_dms_version WHERE dms_id =" . $this->db_add_param($dms_id, FHC_INTEGER) . "; ";
+		$qry .= "DELETE FROM fue.tbl_projekt_dokument WHERE dms_id=" . $this->db_add_param($dms_id, FHC_INTEGER) . "; ";
+		$qry .= "DELETE FROM campus.tbl_dms WHERE dms_id =" . $this->db_add_param($dms_id, FHC_INTEGER) . ";";
+		if ($this->db_query($qry))
+		{
+			$this->db_query('COMMIT;');
+			
+			// Alle Versionen der Datei im Filesystem löschen
+			foreach ($this->result as $obj)
+			{
+				if (is_file(DMS_PATH . $obj->filename) && ! unlink(DMS_PATH . $obj->filename))
+					$error = true;
+			}
+			
+			if ($error)
+			{
+				$this->errormsg = "Fehler beim Löschen des Dokuments aufgetreten";
+				return false;
+			}
+			else
+			{
+				return true;
+			}
+		}
+		else
+		{
+			$this->db_query('ROLLBACK;');
+			$this->errormsg = "Fehler beim Löschen des Eintrages aufgetreten";
+			return false;
+		}
+	}
 
-    /**
-     * Löscht einen gesamten DMS Eintrag inklusive aller Versionen und Projekteinträge
-     * @param $dms_id 
-     */
-    public function deleteDms($dms_id)
-    {
-        $this->load($dms_id);
-        $this->getAllVersions($dms_id);
-        $error = false;
-
-        // lösche Versionen
-        $qry ="BEGIN;DELETE FROM campus.tbl_dms_version WHERE dms_id =".$this->db_add_param($dms_id, FHC_INTEGER)."; ";
-        $qry.="DELETE FROM fue.tbl_projekt_dokument WHERE dms_id=".$this->db_add_param($dms_id, FHC_INTEGER)."; ";
-        $qry.="DELETE FROM campus.tbl_dms WHERE dms_id =".$this->db_add_param($dms_id, FHC_INTEGER).";";  
-        if($this->db_query($qry))
-        {
-           $this->db_query('COMMIT;');
-           
-           // Alle Versionen der Datei im Filesystem löschen
-           foreach($this->result as $obj)
-           {
-               if(is_file(DMS_PATH.$obj->filename) && !unlink(DMS_PATH.$obj->filename))
-                   $error = true;
-           }
-           
-           if($error)
-           {
-               $this->errormsg = "Fehler beim Löschen des Dokuments aufgetreten";
-               return false;
-           }
-           else
-           {
-               return true;
-           }
-        }
-        else
-        {
-            $this->db_query('ROLLBACK;');
-            $this->errormsg = "Fehler beim Löschen des Eintrages aufgetreten";
-            return false; 
-        }
-    }
-
-    /**
+	/**
 	 * Setzt die Zeit des letzten Zugriffs auf die Datei
 	 * 
 	 * @param $dms_id
@@ -339,16 +350,16 @@ class dms extends basis_db
 			if($this->db_num_rows($result) == 0 )
 			{
 				$qry ="BEGIN; DELETE FROM campus.tbl_dms_kategorie_gruppe where kategorie_kurzbz =".$this->db_add_param($kategorie_kurzbz, FHC_STRING)."; 
-                    DELETE FROM campus.tbl_dms_kategorie WHERE kategorie_kurzbz =".$this->db_add_param($kategorie_kurzbz, FHC_STRING).';';
+					DELETE FROM campus.tbl_dms_kategorie WHERE kategorie_kurzbz =".$this->db_add_param($kategorie_kurzbz, FHC_STRING).';';
 				if($this->db_query($qry))
 				{
-                    $this->db_query('COMMIT;');
+					$this->db_query('COMMIT;');
 					return true;
 				}
 				else
 				{
 					$this->errormsg = 'Fehler beim Löschen der Daten'."\n";
-                    $this->db_query('ROLLBACK;');
+					$this->db_query('ROLLBACK;');
 					return false;
 				}
 			}
@@ -489,11 +500,13 @@ class dms extends basis_db
 		if($new)
 		{
 			//Neuen Datensatz einfuegen
-			$qry='INSERT INTO campus.tbl_dms_kategorie (kategorie_kurzbz, bezeichnung, beschreibung, parent_kategorie_kurzbz) VALUES('.
-			      $this->db_add_param($this->kategorie_kurzbz).', '.
-			      $this->db_add_param($this->bezeichnung).', '.
-			      $this->db_add_param($this->beschreibung).', '.
-			      $this->db_add_param($this->parent_kategorie_kurzbz).');';
+			$qry='INSERT INTO campus.tbl_dms_kategorie (kategorie_kurzbz, bezeichnung, beschreibung, parent_kategorie_kurzbz, oe_kurzbz, berechtigung_kurzbz) VALUES('.
+					$this->db_add_param($this->kategorie_kurzbz).', '.
+					$this->db_add_param($this->bezeichnung).', '.
+					$this->db_add_param($this->beschreibung).', '.
+					$this->db_add_param($this->parent_kategorie_kurzbz).', '.
+					$this->db_add_param($this->kategorie_oe_kurzbz).', '.
+					$this->db_add_param($this->berechtigung_kurzbz).');';
 		}
 		else
 		{
@@ -503,7 +516,9 @@ class dms extends basis_db
 				' kategorie_kurzbz='.$this->db_add_param($this->kategorie_kurzbz).', '.
 				' bezeichnung='.$this->db_add_param($this->bezeichnung).', '.
 				' beschreibung='.$this->db_add_param($this->beschreibung).', '.
-				' parent_kategorie_kurzbz='.$this->db_add_param($this->parent_kategorie_kurzbz).' '.
+				' parent_kategorie_kurzbz='.$this->db_add_param($this->parent_kategorie_kurzbz).', '.
+				' oe_kurzbz='.$this->db_add_param($this->kategorie_oe_kurzbz).', '.
+				' berechtigung_kurzbz='.$this->db_add_param($this->berechtigung_kurzbz).' '.
 		      	'WHERE kategorie_kurzbz='.$this->db_add_param($this->kategorie_kurzbz_old).';';
 		}
 		
@@ -537,6 +552,8 @@ class dms extends basis_db
 					$this->beschreibung = $row->beschreibung; 
 					$this->parent_kategorie_kurzbz = $row->parent_kategorie_kurzbz; 
 					$this->kategorie_kurzbz_old = $row->kategorie_kurzbz;
+					$this->kategorie_oe_kurzbz = $row->oe_kurzbz;
+					$this->berechtigung_kurzbz = $row->berechtigung_kurzbz;
 				}
 				return true; 
 			}
@@ -567,6 +584,8 @@ class dms extends basis_db
 				$obj->bezeichnung = $row->bezeichnung; 
 				$obj->beschreibung = $row->beschreibung; 
 				$obj->parent_kategorie_kurzbz = $row->parent_kategorie_kurzbz; 
+				$obj->kategorie_oe_kurzbz = $row->oe_kurzbz;
+				$obj->berechtigung_kurzbz = $row->berechtigung_kurzbz;
 				
 				$this->result[]= $obj; 
 			}
@@ -577,8 +596,7 @@ class dms extends basis_db
 	
 	/**
 	 * Laedt die Kategorien
-	 * @param $parent_kategorie_kurzbz Wenn die Parent Kategorie übergeben wird, werden nur die direkten 
-	 *        Unterkategorien geladen
+	 * @param string $parent_kategorie_kurzbz Wenn die Parent Kategorie übergeben wird, werden nur die direkten Unterkategorien geladen
 	 * @return boolean
 	 */
 	public function getKategorie($parent_kategorie_kurzbz='')
@@ -600,6 +618,8 @@ class dms extends basis_db
 				$obj->kategorie_kurzbz = $row->kategorie_kurzbz;
 				$obj->bezeichnung = $row->bezeichnung;
 				$obj->beschreibung = $row->beschreibung;
+				$obj->kategorie_oe_kurzbz = $row->oe_kurzbz;
+				$obj->berechtigung_kurzbz = $row->berechtigung_kurzbz;
 				
 				$this->result[] = $obj;
 			}
@@ -663,6 +683,8 @@ class dms extends basis_db
 				$obj->insertamum = $row->insertamum;
 				$obj->insertvon = $row->insertvon;
 				$obj->updateamum = $row->updateamum;
+				$obj->cis_suche = $this->db_parse_bool($row->cis_suche);
+				$obj->schlagworte = $row->schlagworte;
 				
 				$this->result[] = $obj;
 			}
@@ -675,9 +697,34 @@ class dms extends basis_db
 	}
 	
 	/**
-	 * Sucht nach Dokumenten
+	 * Zählt die Anzahl an Dokumenten in einer Kategorie
 	 *
 	 * @param $kategorie_kurzbz
+	 */
+	public function countDocumentsKategorie($kategorie_kurzbz)
+	{
+		$qry = "SELECT count(*) as anzahl FROM campus.tbl_dms WHERE kategorie_kurzbz=".$this->db_add_param($kategorie_kurzbz).";";
+		
+		if($result = $this->db_query($qry))
+		{
+			if($row = $this->db_fetch_object($result))
+			{
+				return $row->anzahl; 
+			}
+			else
+				return false; 
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+	}
+	
+	/**
+	 * Sucht nach Dokumenten
+	 *
+	 * @param string $suchstring String nach dem gesucht werden soll
 	 */
 	public function search($suchstring, $dpp=NULL, $page=NULL)
 	{
@@ -695,12 +742,13 @@ class dms extends basis_db
 			}
 		}
 		
-		$qry = "SELECT * FROM campus.tbl_dms  JOIN campus.tbl_dms_version USING(dms_id)
+		$qry = "SELECT tbl_dms.*, tbl_dms_version.*, tbl_dms_kategorie.berechtigung_kurzbz FROM campus.tbl_dms 
+				JOIN campus.tbl_dms_version USING(dms_id)
+				JOIN campus.tbl_dms_kategorie USING (kategorie_kurzbz)
 				WHERE lower(name) like lower('%".$this->db_escape($suchstring)."%')
-				OR lower(beschreibung) like lower('%".$this->db_escape($suchstring)."%')
+				OR lower(tbl_dms_version.beschreibung) like lower('%".$this->db_escape($suchstring)."%')
 						";
 
-		
 		if (is_numeric($suchstring))
 			$qry.= " OR dms_id = ".$this->db_escape($suchstring)."";
 
@@ -728,6 +776,9 @@ class dms extends basis_db
 				$obj->insertamum = $row->insertamum;
 				$obj->insertvon = $row->insertvon;
 				$obj->updateamum = $row->updateamum;
+				$obj->cis_suche = $this->db_parse_bool($row->cis_suche);
+				$obj->schlagworte = $row->schlagworte;
+				$obj->berechtigung_kurzbz = $row->berechtigung_kurzbz;
 				
 				$this->result[] = $obj;
 			}
@@ -777,6 +828,8 @@ class dms extends basis_db
 				$obj->insertamum = $row->insertamum;
 				$obj->insertvon = $row->insertvon;
 				$obj->updateamum = $row->updateamum;
+				$obj->cis_suche = $this->db_parse_bool($row->cis_suche);
+				$obj->schlagworte = $row->schlagworte;
 				
 				$this->result[] = $obj;
 			}
@@ -791,7 +844,7 @@ class dms extends basis_db
 	/**
 	 * 
 	 * lädt alle Versionen zu einer übergebenen ID
-	 * @param $id der zu ladenden Dokumente
+	 * @param integer $id ID der zu ladenden Dokumente
 	 */
 	public function getAllVersions($dms_id)
 	{
@@ -823,6 +876,8 @@ class dms extends basis_db
 				$obj->insertvon = $row->insertvon;
 				$obj->updateamum = $row->updateamum;
 				$obj->version = $row->version; 
+				$obj->cis_suche = $this->db_parse_bool($row->cis_suche);
+				$obj->schlagworte = $row->schlagworte;
 				
 				$this->result[] = $obj;
 			}
@@ -899,6 +954,8 @@ class dms extends basis_db
 				$obj->insertamum = $row->insertamum;
 				$obj->insertvon = $row->insertvon;
 				$obj->updateamum = $row->updateamum;
+				$obj->cis_suche = $this->db_parse_bool($row->cis_suche);
+				$obj->schlagworte = $row->schlagworte;
 				
 				$this->result[] = $obj;
 			}
@@ -948,6 +1005,8 @@ class dms extends basis_db
 				$obj->insertamum = $row->insertamum;
 				$obj->insertvon = $row->insertvon;
 				$obj->updateamum = $row->updateamum;
+				$obj->cis_suche = $this->db_parse_bool($row->cis_suche);
+				$obj->schlagworte = $row->schlagworte;
 				
 				$this->result[] = $obj;
 			}
@@ -998,6 +1057,8 @@ class dms extends basis_db
 				$obj->insertamum = $row->insertamum;
 				$obj->insertvon = $row->insertvon;
 				$obj->updateamum = $row->updateamum;
+				$obj->cis_suche = $this->db_parse_bool($row->cis_suche);
+				$obj->schlagworte = $row->schlagworte;
 				
 				$this->result[] = $obj;
 			}
@@ -1346,6 +1407,8 @@ class dms extends basis_db
 				$obj->insertamum = $row->insertamum;
 				$obj->insertvon = $row->insertvon;
 				$obj->updateamum = $row->updateamum;
+				$obj->cis_suche = $this->db_parse_bool($row->cis_suche);
+				$obj->schlagworte = $row->schlagworte;
 				
 				$this->result[] = $obj;
 			}
@@ -1366,8 +1429,8 @@ class dms extends basis_db
 			$qry.= " AND parent_kategorie_kurzbz=".$this->db_add_param($parent_kategorie_kurzbz);
 		else
 			$qry.=" AND parent_kategorie_kurzbz is null";
-        
-        $qry.=";";
+
+		$qry.=";";
 		if($result = $this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object($result))
@@ -1378,6 +1441,9 @@ class dms extends basis_db
 				$obj->bezeichnung = $row->bezeichnung;
 				$obj->beschreibung = $row->beschreibung;
 				$obj->parent_kategorie_kurzbz = $row->parent_kategorie_kurzbz;
+				$obj->oe_kurzbz = $row->oe_kurzbz;
+				$obj->berechtigung_kurzbz = $row->berechtigung_kurzbz;
+				
 				
 				$this->result[] = $obj;
 			}

@@ -23,13 +23,15 @@ require_once('../include/functions.inc.php');
 require_once('../include/dms.class.php');
 require_once('../include/gruppe.class.php');
 require_once('../include/benutzerberechtigung.class.php');
+require_once('../include/berechtigung.class.php');
+require_once('../include/organisationseinheit.class.php');
 
 
 $user = get_uid();
 $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($user);
-if(!$rechte->isberechtigt('basis/dms',null, 'suid', null))
-	die('Sie haben keine Berechtigung diese Seite zu sehen.');
+if(!$rechte->isberechtigt('basis/dmsAdmin',null, 'suid', null))
+	die($rechte->errormsg);
 
 $kategorie_kurzbz = isset($_REQUEST['kategorie_kurzbz'])?$_REQUEST['kategorie_kurzbz']:'';
 
@@ -49,11 +51,11 @@ $method = isset($_REQUEST['method'])?$_REQUEST['method']:'';
 		<link href="../skin/style.css.php" rel="stylesheet" type="text/css">
 		<script type="text/javascript" src="../include/tiny_mce/tiny_mce.js"></script>
 		<link rel="stylesheet" type="text/css" href="../skin/jquery-ui-1.9.2.custom.min.css">
-<script type="text/javascript" src="../vendor/jquery/jqueryV1/jquery-1.12.4.min.js"></script>
-<script type="text/javascript" src="../vendor/christianbach/tablesorter/jquery.tablesorter.min.js"></script>
-<script type="text/javascript" src="../vendor/components/jqueryui/jquery-ui.min.js"></script>
-<script type="text/javascript" src="../include/js/jquery.ui.datepicker.translation.js"></script>
-<script type="text/javascript" src="../vendor/jquery/sizzle/sizzle.js"></script>
+		<script type="text/javascript" src="../vendor/jquery/jqueryV1/jquery-1.12.4.min.js"></script>
+		<script type="text/javascript" src="../vendor/christianbach/tablesorter/jquery.tablesorter.min.js"></script>
+		<script type="text/javascript" src="../vendor/components/jqueryui/jquery-ui.min.js"></script>
+		<script type="text/javascript" src="../include/js/jquery.ui.datepicker.translation.js"></script>
+		<script type="text/javascript" src="../vendor/jquery/sizzle/sizzle.js"></script>
 		<script type="text/javascript">
 
 		var __js_page_array = new Array();
@@ -113,22 +115,21 @@ $method = isset($_REQUEST['method'])?$_REQUEST['method']:'';
 	</head>
 <body>
 <?php
-
-if(isset($_REQUEST['save']))
+if (isset($_REQUEST['save']))
 {
-	if($method == 'gruppe')
+	if ($method == 'gruppe')
 	{
 		// Speichert die Gruppenzugehörigkeit
-		if($_REQUEST['kategorie_kurzbz'] != '')
+		if ($_REQUEST['kategorie_kurzbz'] != '')
 		{
 			$dms = new dms();
 			$dms->kategorie_kurzbz = $_REQUEST['kategorie_kurzbz'];
 			$dms->gruppe_kurzbz = $_POST['gruppe_kurzbz'];
 			$dms->insertamum = date('Y-m-d H:i:s');
 			$dms->insertvon = $user;
-
-			if(!$dms->saveGruppeKategorie())
-				echo '<span class="error">'.$dms->errormsg.'</span>';
+			
+			if (! $dms->saveGruppeKategorie())
+				echo '<span class="error">' . $dms->errormsg . '</span>';
 			else
 				echo '<span class="ok">Gruppe erfolgreich zugeteilt</span>';
 		}
@@ -140,36 +141,39 @@ if(isset($_REQUEST['save']))
 	else
 	{
 		$kategorieSave = new dms();
-		if($_POST['kategorie_kurzbz'] != '')
+		if ($_POST['kategorie_kurzbz'] != '')
 		{
 			// wenn keine auswahl getroffen wurde
-			$kategorie_auswahl = (($_POST['kategorie_parent']=='auswahl')?null:$_POST['kategorie_parent']);
-
-			if($kategorieSave->loadKategorie($_POST['kategorie_kurzbz']))
+			$kategorie_auswahl = (($_POST['kategorie_parent'] == 'auswahl') ? null : $_POST['kategorie_parent']);
+			
+			if ($kategorieSave->loadKategorie($_POST['kategorie_kurzbz']))
 			{
 				// Update
 				$kategorieSave->bezeichnung = $_POST['kategorie_bezeichnung'];
-				$kategorieSave->beschreibung =$_POST['kategorie_beschreibung'];
+				$kategorieSave->beschreibung = $_POST['kategorie_beschreibung'];
+				$kategorieSave->berechtigung_kurzbz = $_POST['berechtigung_kurzbz'];
+				$kategorieSave->kategorie_oe_kurzbz = $_POST['oe_kurzbz'];
 				$kategorieSave->parent_kategorie_kurzbz = $kategorie_auswahl;
-				$kategorieSave->new=false;
-				if(!$kategorieSave->saveKategorie())
-					echo '<span class="error">'.$kategorieSave->errormsg.'</span>';
+				$kategorieSave->new = false;
+				if (! $kategorieSave->saveKategorie())
+					echo '<span class="error">' . $kategorieSave->errormsg . '</span>';
 				else
-					echo'<span class="ok">Erfolgreich gespeichert</span>';
-
+					echo '<span class="ok">Erfolgreich gespeichert</span>';
 			}
 			else
 			{
 				// Neu anlegen
 				$kategorieSave->kategorie_kurzbz = $_POST['kategorie_kurzbz'];
 				$kategorieSave->bezeichnung = $_POST['kategorie_bezeichnung'];
-				$kategorieSave->beschreibung =$_POST['kategorie_beschreibung'];
+				$kategorieSave->beschreibung = $_POST['kategorie_beschreibung'];
+				$kategorieSave->berechtigung_kurzbz = $_POST['berechtigung_kurzbz'];
+				$kategorieSave->kategorie_oe_kurzbz = $_POST['oe_kurzbz'];
 				$kategorieSave->parent_kategorie_kurzbz = $kategorie_auswahl;
-				$kategorieSave->new=true;
-				if(!$kategorieSave->saveKategorie())
-					echo '<span class="error">'.$kategorieSave->errormsg.'<span class="error">';
+				$kategorieSave->new = true;
+				if (! $kategorieSave->saveKategorie())
+					echo '<span class="error">' . $kategorieSave->errormsg . '<span class="error">';
 				else
-					echo'<span class="ok">Erfolgreich gespeichert</span>';
+					echo '<span class="ok">Erfolgreich gespeichert</span>';
 			}
 		}
 		else
@@ -178,39 +182,38 @@ if(isset($_REQUEST['save']))
 }
 
 // Löscht eine Kategorie
-if(isset($_REQUEST['delete']))
+if (isset($_REQUEST['delete']))
 {
-
-	if($method=='gruppe')
+	
+	if ($method == 'gruppe')
 	{
 		$dms = new dms();
-		if(!$dms->deleteGruppe($_REQUEST['kategorie_kurzbz'], $_REQUEST['gruppe_kurzbz']))
-			echo '<span class="error">'.$dms->errormsg.'</span>';
+		if (! $dms->deleteGruppe($_REQUEST['kategorie_kurzbz'], $_REQUEST['gruppe_kurzbz']))
+			echo '<span class="error">' . $dms->errormsg . '</span>';
 		else
-			echo'<span class="ok">Gruppe erfolgreich gelöscht!</span>';
-
+			echo '<span class="ok">Gruppe erfolgreich gelöscht!</span>';
 	}
 	else
 	{
-		if(isset($_REQUEST['kategorie_kurzbz']))
+		if (isset($_REQUEST['kategorie_kurzbz']))
 		{
 			$dms = new dms();
-			if(!$dms->deleteKategorie($_REQUEST['kategorie_kurzbz']))
-				echo '<span class="error">'.$dms->errormsg.'</span>';
+			if (! $dms->deleteKategorie($_REQUEST['kategorie_kurzbz']))
+				echo '<span class="error">' . $dms->errormsg . '</span>';
 			else
 				echo '<span class="ok">Erfolgreich gelöscht</span>';
 		}
 		else
 			echo "keine Kategorie übergeben";
-
-		$kategorie_kurzbz ='';
+		
+		$kategorie_kurzbz = '';
 	}
 }
-	//Kategorien anzeigen
-	$dms = new dms();
-	$dms->getKategorie();
+// Kategorien anzeigen
+$dms = new dms();
+$dms->getKategorie();
 
-echo'	<table cellspacing=0 border="0">
+echo '	<table cellspacing=0 border="0">
 			<tr>
 				<td valign="top" nowrap style="border-right: 1px solid lightblue;border-top: 1px solid lightblue;padding-right:5px">
 					<h3>Kategorie:</h3>
@@ -222,19 +225,19 @@ echo'	<table cellspacing=0 border="0">
 					<td class="tdwidth10" nowrap>&nbsp;</td>
 					<td>&nbsp;</td>
 				</tr>';
-	drawKategorieMenue($dms->result);
-	echo '
+drawKategorieMenue($dms->result);
+echo '
 	<tr><td>&nbsp;</td></tr>
-	<tr><td colspan="2"><a href ="'.$_SERVER['PHP_SELF'].'">Neue Kategorie anlegen</a></td></tr>
+	<tr><td colspan="2"><a href ="' . $_SERVER['PHP_SELF'] . '">Neue Kategorie anlegen</a></td></tr>
 
 
 	</table></td></tr></table>';
-	echo '<script>
+echo '<script>
 
 
 	$(document).ready(function()
 	{
-		OpenTreeToKategorie("'.$kategorie_kurzbz.'");
+		OpenTreeToKategorie("' . $kategorie_kurzbz . '");
 	});
 
 	//Klappt den Kategoriebaum auf, damit die ausgewaehlte Kategorie sichtbar ist
@@ -258,70 +261,111 @@ echo'	<table cellspacing=0 border="0">
 		}
 	}
 	</script>';
-	echo '</td>
+echo '</td>
 		<td valign="top" style="border-top: 1px solid lightblue; width: 100%;">
-		<a href="'.$_SERVER['PHP_SELF'].'?kategorie_kurzbz='.$kategorie_kurzbz.'">Eigenschaften</a> | <a href="'.$_SERVER['PHP_SELF'].'?kategorie_kurzbz='.$kategorie_kurzbz.'&method=gruppe">Gruppen</a><br><br>';
+		<a href="' . $_SERVER['PHP_SELF'] . '?kategorie_kurzbz=' . $kategorie_kurzbz . '">Eigenschaften</a> | <a href="' . $_SERVER['PHP_SELF'] . '?kategorie_kurzbz=' . $kategorie_kurzbz . '&method=gruppe">Gruppen</a><br><br>';
 
-		switch($method)
-		{
-			case 'gruppe':
-				print_rights($kategorie_kurzbz);
-			break;
+switch ($method)
+{
+	case 'gruppe':
+		print_rights($kategorie_kurzbz);
+		break;
+	
+	default:
+		drawKategorie($kategorie_kurzbz);
+		break;
+}
 
-			default:
-				drawKategorie($kategorie_kurzbz);
-			break;
-		}
-
-
-	echo '
+echo '
 			</td>
 		</tr>
 		</table>';
-
-
 function drawKategorie($kategorie_kurzbz)
 {
 	$kategorie = new dms();
 	$kategorie_beschreibung = '';
 	$kategorie_bezeichnung = '';
-	$disabled='';
-
-	if($kategorie->loadKategorie($kategorie_kurzbz))
+	$disabled = '';
+	$kategorie_berechtigung = '';
+	
+	if ($kategorie->loadKategorie($kategorie_kurzbz))
 	{
 		// Formular zum Editieren bestehender Kategorien
 		$kategorie_bezeichnung = $kategorie->bezeichnung;
 		$kategorie_beschreibung = $kategorie->beschreibung;
 		$disabled = 'disabled="true"';
+		$kategorie_berechtigung = $kategorie->berechtigung_kurzbz;
+		$kategorie_oe_kurzbz = $kategorie->kategorie_oe_kurzbz;
 	}
-
+	
 	$allKategorien = new dms();
 	$allKategorien->getAllKategories();
-	//var_dump($allKategorien->result);
-	echo '	<form action="'.$_SERVER['PHP_SELF'].'?save" method="POST" name="form_kategorie">
+	$berechtigungen = new berechtigung();
+	$berechtigungen->getBerechtigungen();
+	$organisationseinheiten = new organisationseinheit();
+	$organisationseinheiten->getAll(true, null, 'organisationseinheittyp_kurzbz, bezeichnung');
+	$oe_typ = '';
+	
+	// var_dump($allKategorien->result);
+	echo '	<form action="' . $_SERVER['PHP_SELF'] . '?save" method="POST" name="form_kategorie">
 				<table border="0">
 					<tr>
-						<td>Kategorie_kurzbz: </td><td><input type="text" name="kategorie_kurzbz" value="'.$kategorie_kurzbz.'" '.$disabled.' ></td>
+						<td>Kategorie_kurzbz: </td><td><input type="text" name="kategorie_kurzbz" value="' . $kategorie_kurzbz . '" ' . $disabled . ' ></td>
 					</tr>
 					<tr>
-						<td>Kategorie Bezeichnung: </td><td><input type="text" name="kategorie_bezeichnung" value="'.$kategorie_bezeichnung.'"></td>
+						<td>Kategorie Bezeichnung: </td><td><input type="text" name="kategorie_bezeichnung" value="' . $kategorie_bezeichnung . '"></td>
 					</tr>
 					<tr>
-						<td>Kategorie Beschreibung: </td><td><textarea name="kategorie_beschreibung" cols="30" rows="3">'.$kategorie_beschreibung.'</textarea></td>
+						<td>Kategorie Beschreibung: </td><td><textarea name="kategorie_beschreibung" cols="30" rows="3" style="font-size: 9pt;">' . $kategorie_beschreibung . '</textarea></td>
 					</tr>
 					<tr>
 						<td>Hängt unter: </td><td><select name="kategorie_parent">
 						<option value="auswahl">-- Bitte Auswählen --</option>';
-					foreach($allKategorien->result as $kategorienResult)
-					{
-						$selected ='';
-						if($kategorienResult->kategorie_kurzbz == $kategorie->parent_kategorie_kurzbz )
-							$selected='selected';
-						if($kategorienResult->kategorie_kurzbz != $kategorie->kategorie_kurzbz)
-							echo '<option '.$selected.' value="'.$kategorienResult->kategorie_kurzbz.'">'.$kategorienResult->bezeichnung.' ['.$kategorienResult->kategorie_kurzbz.']</option>';
-					}
-
-	echo'				</select>
+						foreach ($allKategorien->result as $kategorienResult)
+						{
+							$selected = '';
+							if ($kategorienResult->kategorie_kurzbz == $kategorie->parent_kategorie_kurzbz)
+								$selected = 'selected';
+							if ($kategorienResult->kategorie_kurzbz != $kategorie->kategorie_kurzbz)
+								echo '<option ' . $selected . ' value="' . $kategorienResult->kategorie_kurzbz . '">' . $kategorienResult->bezeichnung . ' [' . $kategorienResult->kategorie_kurzbz . ']</option>';
+						}
+	echo '				</select>
+						</td>
+					</tr>
+					<tr>
+						<td>Organisationseinheit: <br>(Upload, Ansicht, Änderungen)</td><td><select name="oe_kurzbz">
+						<option value="">-- Bitte Auswählen --</option>';
+						foreach ($organisationseinheiten->result as $oe)
+						{
+							if ($oe_typ != $oe->organisationseinheittyp_kurzbz || $oe_typ=='')
+							{
+								if ($oe_typ!='')
+									echo '</optgroup>';
+								
+								echo '<optgroup label="'.$oe->organisationseinheittyp_kurzbz.'">';
+							}
+							$selected = '';
+							if ($oe->oe_kurzbz == $kategorie_oe_kurzbz)
+								$selected = 'selected';
+					
+							echo '<option ' . $selected . ' value="' . $oe->oe_kurzbz . '">'.$oe->organisationseinheittyp_kurzbz.' ' . $oe->bezeichnung . '</option>';
+							$oe_typ = $oe->organisationseinheittyp_kurzbz;
+						}
+	echo '				</select>
+						</td>
+					</tr>
+					<tr>
+						<td>Berechtigung: <br>(Zugriff auf Kategorie)</td><td><select name="berechtigung_kurzbz">
+						<option value="">-- Bitte Auswählen --</option>';
+						foreach ($berechtigungen->result as $recht)
+						{
+							$selected = '';
+							if ($recht->berechtigung_kurzbz == $kategorie_berechtigung)
+								$selected = 'selected';
+					
+							echo '<option ' . $selected . ' value="' . $recht->berechtigung_kurzbz . '">' . $recht->berechtigung_kurzbz . '</option>';
+						}
+	echo '				</select>
 						</td>
 					</tr>
 					<tr><td>&nbsp;</td></tr>
@@ -332,18 +376,18 @@ function drawKategorie($kategorie_kurzbz)
 				</table></form>';
 }
 
-
 /**
  * Erstellt den Karteireiter zum Verwalten der Zugriffsrechte auf einen Content
- * Zu einem Content können Gruppen zugeteilt werden. Diese haben dann zugriff auf den Content
+ * Zu einem Content können Gruppen zugeteilt werden.
+ * Diese haben dann zugriff auf den Content
  * Wenn keine Gruppen zugeordnet sind, können alle Personen auf den Content zugreifen
  */
 function print_rights($kategorie_kurzbz)
 {
 	$dms = new dms();
 	$dms->loadGruppenForKategorie($kategorie_kurzbz);
-
-	if(count($dms->result)>0)
+	$gruppen_array = array();
+	if (count($dms->result) > 0)
 	{
 		echo 'Die Mitglieder der folgenden Gruppen dürfen die Seite ansehen:<br><br>';
 		echo '
@@ -366,13 +410,14 @@ function print_rights($kategorie_kurzbz)
 			</tr>
 			</thead>
 			<tbody>';
-		foreach($dms->result as $row)
+		foreach ($dms->result as $row)
 		{
+			$gruppen_array[] = $row->gruppe_kurzbz;
 			echo '<tr>';
-			echo '<td>',$row->gruppe_kurzbz,'</td>';
-			echo '<td>',$row->bezeichnung,'</td>';
+			echo '<td>', $row->gruppe_kurzbz, '</td>';
+			echo '<td>', $row->bezeichnung, '</td>';
 			echo '<td>
-					<a href="'.$_SERVER['PHP_SELF'].'?kategorie_kurzbz='.$kategorie_kurzbz.'&gruppe_kurzbz='.$row->gruppe_kurzbz.'&method=gruppe&delete" title="entfernen">
+					<a href="' . $_SERVER['PHP_SELF'] . '?kategorie_kurzbz=' . $kategorie_kurzbz . '&gruppe_kurzbz=' . $row->gruppe_kurzbz . '&method=gruppe&delete" title="entfernen">
 						<img src="../skin/images/delete_x.png">
 					</a>
 				</td>';
@@ -382,21 +427,42 @@ function print_rights($kategorie_kurzbz)
 	}
 	else
 		echo 'Diese Seite darf von allen angezeigt werden!<br><br>';
-
+	
 	$gruppe = new gruppe();
 	$gruppe->getgruppe(null, null, null, null, true);
-
-	echo '<form action="'.$_SERVER['PHP_SELF'].'?kategorie_kurzbz='.$kategorie_kurzbz.'&method=gruppe&save" method="POST">';
+	
+	// Sortieren der Gruppen nach kurzbz
+	function sortGruppen($a, $b) 
+	{ 
+		return strcasecmp($a->gruppe_kurzbz, $b->gruppe_kurzbz); 
+	}
+	usort($gruppe->result, "sortGruppen"); 
+	
+// 	function sortDocuments($a, $b)
+// 	{
+// 		$c = $a->anzahl_akten_formal_geprueft - $b->anzahl_akten_formal_geprueft;
+// 		$c .= $a->anzahl_dokumente_akzeptiert - $b->anzahl_dokumente_akzeptiert;
+// 		$c .= $a->anzahl_akten_vorhanden - $b->anzahl_akten_vorhanden;
+// 		$c .= $b->pflicht - $a->pflicht;
+// 		$c .= strcmp(strtolower($a->bezeichnung_mehrsprachig[getSprache()]), strtolower($b->bezeichnung_mehrsprachig[getSprache()]));
+// 		return $c;
+// 	}
+// 	if ($dokumente_abzugeben)
+// 		usort($dokumente_abzugeben, "sortDocuments");
+	
+	echo '<form action="' . $_SERVER['PHP_SELF'] . '?kategorie_kurzbz=' . $kategorie_kurzbz . '&method=gruppe&save" method="POST">';
 	echo 'Gruppe <select name="gruppe_kurzbz">';
-	foreach($gruppe->result as $row)
+	foreach ($gruppe->result as $row)
 	{
-		echo '<option value="'.$row->gruppe_kurzbz.'">'.$row->gruppe_kurzbz.'</option>';
+		if (in_array($row->gruppe_kurzbz, $gruppen_array))
+			echo '<option value="' . $row->gruppe_kurzbz . '" disabled="disabled">' . $row->gruppe_kurzbz . ' (' . $row->bezeichnung . ')</option>';
+		else
+			echo '<option value="' . $row->gruppe_kurzbz . '">' . $row->gruppe_kurzbz . ' (' . $row->bezeichnung . ')</option>';
 	}
 	echo '</select>';
 	echo '<input type="submit" value="Hinzufügen" name="addgroup">';
 	echo '</form>';
 }
-
 
 /**
  * Zeichnet das Kategorie Menu
@@ -406,40 +472,40 @@ function print_rights($kategorie_kurzbz)
 function drawKategorieMenue($rows)
 {
 	global $kategorie_kurzbz;
-
-	//echo '<ul>';
-	foreach($rows as $row)
+	
+	// echo '<ul>';
+	foreach ($rows as $row)
 	{
-		if($kategorie_kurzbz==$row->kategorie_kurzbz)
-			$class='marked';
+		if ($kategorie_kurzbz == $row->kategorie_kurzbz)
+			$class = 'marked';
 		else
-			$class='';
-
+			$class = '';
+		
 		$dms = new dms();
 		$dms->getKategorie($row->kategorie_kurzbz);
-
-		$delete = '<a href="'.$_SERVER['PHP_SELF'].'?delete&kategorie_kurzbz='.$row->kategorie_kurzbz.'"><img src="../skin/images/cross.png" height="12px" title="Kategorie löschen" /></a>';
-
-		//Suchen, ob eine Sperre fuer diese Kategorie vorhanden ist
+		
+		$delete = '<a href="' . $_SERVER['PHP_SELF'] . '?delete&kategorie_kurzbz=' . $row->kategorie_kurzbz . '"><img src="../skin/images/cross.png" height="12px" title="Kategorie löschen" /></a>';
+		
+		// Suchen, ob eine Sperre fuer diese Kategorie vorhanden ist
 		$groups = $dms->getLockGroups($row->kategorie_kurzbz);
-		$locked='';
-		if(count($groups)>0)
+		$locked = '';
+		if (count($groups) > 0)
 		{
 			$locked = '<img src="../skin/images/login.gif" height="12px" title="Zugriff nur für Mitglieder folgender Gruppen:';
-			foreach($groups as $group)
-				$locked.=" $group ";
-			$locked.='"/>';
+			foreach ($groups as $group)
+				$locked .= " $group ";
+			$locked .= '"/>';
 		}
-		if(count($dms->result)>0)
+		if (count($dms->result) > 0)
 		{
-
+			
 			echo '
 			<tr>
 				<td class="tdwidth10" nowrap>&nbsp;</td>
 	          	<td class="tdwrap">
-	          		<a href="'.$_SERVER['PHP_SELF'].'?kategorie_kurzbz='.$row->kategorie_kurzbz.'" class="MenuItem" onClick="js_toggle_container(\''.$row->kategorie_kurzbz.'\');"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;<span class="'.$class.'">'.$row->bezeichnung.' </span></a>
-	          		'.$locked.'
-					<table class="tabcontent" id="'.$row->kategorie_kurzbz.'" style="display: none;">';
+	          		<a href="' . $_SERVER['PHP_SELF'] . '?kategorie_kurzbz=' . $row->kategorie_kurzbz . '" class="MenuItem" onClick="js_toggle_container(\'' . $row->kategorie_kurzbz . '\');"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;<span class="' . $class . '">' . $row->bezeichnung . ' </span></a>
+	          		' . $locked . '
+					<table class="tabcontent" id="' . $row->kategorie_kurzbz . '" style="display: none;">';
 			drawKategorieMenue($dms->result);
 			echo '	</table>
 	          	</td>
@@ -450,12 +516,11 @@ function drawKategorieMenue($rows)
 			echo '
 			<tr>
 				<td class="tdwidth10" nowrap>&nbsp;</td>
-	          	<td class="tdwrap"><a id="'.$row->kategorie_kurzbz.'" href="'.$_SERVER['PHP_SELF'].'?kategorie_kurzbz='.$row->kategorie_kurzbz.'" class="Item"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;<span class="'.$class.'">'.$row->bezeichnung.' </span></a>'.$delete.$locked.'</td>
+	          	<td class="tdwrap"><a id="' . $row->kategorie_kurzbz . '" href="' . $_SERVER['PHP_SELF'] . '?kategorie_kurzbz=' . $row->kategorie_kurzbz . '" class="Item"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;<span class="' . $class . '">' . $row->bezeichnung . ' </span></a>' . $delete . $locked . '</td>
         	</tr>';
 		}
-
 	}
-	//echo '</table>';
-	//echo '</ul>';
+	// echo '</table>';
+	// echo '</ul>';
 }
 ?>
