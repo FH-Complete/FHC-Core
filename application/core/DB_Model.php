@@ -60,9 +60,6 @@ class DB_Model extends FHC_Model
 		// Check class properties
 		if (is_null($this->dbTable)) return error(FHC_MODEL_ERROR, FHC_NODBTABLE);
 
-		// Checks rights
-		if (isError($ent = $this->_isEntitled(PermissionLib::INSERT_RIGHT))) return $ent;
-
 		// If this table has UDF and the validation of them is ok
 		if (isError($validate = $this->_manageUDFs($data, $this->dbTable))) return $validate;
 
@@ -110,9 +107,6 @@ class DB_Model extends FHC_Model
 		if (is_null($this->pk)) return error(FHC_MODEL_ERROR, FHC_NOPK);
 		if (is_null($this->dbTable)) return error(FHC_MODEL_ERROR, FHC_NODBTABLE);
 
-		// Checks rights
-		if (isError($ent = $this->_isEntitled(PermissionLib::UPDATE_RIGHT))) return $ent;
-
 		// If this table has UDF and the validation of them is ok
 		if (isError($validate = $this->_manageUDFs($data, $this->dbTable, $id))) return $validate;
 
@@ -156,9 +150,6 @@ class DB_Model extends FHC_Model
 		if (is_null($this->dbTable)) return error(FHC_MODEL_ERROR, FHC_NODBTABLE);
 		if (is_null($this->pk)) return error(FHC_MODEL_ERROR, FHC_NOPK);
 
-		// Checks rights
-		if (isError($ent = $this->_isEntitled(PermissionLib::DELETE_RIGHT))) return $ent;
-
 		$tmpId = $id;
 
 		// Check for composite Primary Key
@@ -197,9 +188,6 @@ class DB_Model extends FHC_Model
 		if (is_null($this->pk)) return error(FHC_MODEL_ERROR, FHC_NOPK);
 		if (is_null($this->dbTable)) return error(FHC_MODEL_ERROR, FHC_NODBTABLE);
 
-		// Checks rights
-		if (isError($ent = $this->_isEntitled(PermissionLib::SELECT_RIGHT))) return $ent;
-
 		$tmpId = $id;
 
 		// Check for composite Primary Key
@@ -236,9 +224,6 @@ class DB_Model extends FHC_Model
 		// Check class properties
 		if (is_null($this->dbTable)) return error(FHC_MODEL_ERROR, FHC_NODBTABLE);
 
-		// Checks rights
-		if (isError($ent = $this->_isEntitled(PermissionLib::SELECT_RIGHT))) return $ent;
-
 		// Execute query
 		if ($result = $this->db->get_where($this->dbTable, $where))
 		{
@@ -266,9 +251,6 @@ class DB_Model extends FHC_Model
 	{
 		// Check class properties
 		if (is_null($this->dbTable)) return error(FHC_MODEL_ERROR, FHC_NODBTABLE);
-
-		// Checks rights
-		if (isError($ent = $this->_isEntitled(PermissionLib::SELECT_RIGHT))) return $ent;
 
 		// List of tables on which it will work
 		$tables = array_merge(array($mainTable), $sideTables);
@@ -811,25 +793,6 @@ class DB_Model extends FHC_Model
 		if (count($idexes) != count($values)) return null;
 
 		return array_combine($idexes, $values);
-	}
-
-	/**
-	 * Checks if the caller is entitled to perform this operation with this right
-	 */
-	private function _isEntitled($permission)
-	{
-		$ent = success(true);
-
-		$ent = $this->isEntitled($this->dbTable, $permission, FHC_NORIGHT, FHC_MODEL_ERROR);
-		// If true is not returned, then an error has occurred
-		if (isError($ent))
-		{
-			// Before returning the object containing the error, reset the build query
-			// This is for preventing that other parts of the query will be built before of the next execution
-			$this->resetQuery();
-		}
-
-		return $ent;
 	}
 
 	/**
