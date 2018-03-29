@@ -18,6 +18,7 @@ class FilterWidget extends Widget
 	const HIDE_HEADER = 'hideHeader';
 	const HIDE_SAVE = 'hideSave';
 	const COLUMNS_ALIASES = 'columnsAliases';
+	const REQUIRED_PERMISSIONS = 'requiredPermissions';
 
 	const DATASET_PARAMETER = 'dataset';
 	const METADATA_PARAMETER = 'metaData';
@@ -78,6 +79,7 @@ class FilterWidget extends Widget
 	private $checkboxes;
 	private $columnsAliases;
 	private $filterName;
+	private $requiredPermissions;
 
 	private $dataset;
 	private $metaData;
@@ -164,6 +166,7 @@ class FilterWidget extends Widget
 
 		$filterSessionArray[self::COLUMNS_ALIASES] = $this->_getColumnAliasesFromPost();
 		$filterSessionArray[self::CHECKBOXES] = $this->checkboxes;
+		$filterSessionArray[self::REQUIRED_PERMISSIONS] = $this->requiredPermissions;
 
 		if ($this->app != null)
 		{
@@ -482,6 +485,11 @@ class FilterWidget extends Widget
 			$filterSessionArray[self::DATASET_NAME_PARAMETER] = null;
 		}
 
+		if (!isset($filterSessionArray[self::REQUIRED_PERMISSIONS]))
+		{
+			$filterSessionArray[self::REQUIRED_PERMISSIONS] = null;
+		}
+
 		$this->session->set_userdata(self::SESSION_NAME, $filterSessionArray);
 	}
 
@@ -503,6 +511,7 @@ class FilterWidget extends Widget
 		$this->hideSave = false;
 		$this->columnsAliases = null;
 		$this->filterName = null;
+		$this->requiredPermissions = null;
 
 		if (!is_array($args) || (is_array($args) && count($args) == 0))
 		{
@@ -588,6 +597,11 @@ class FilterWidget extends Widget
 				&& count($args[self::COLUMNS_ALIASES]) > 0)
 			{
 				$this->columnsAliases = $args[self::COLUMNS_ALIASES];
+			}
+
+			if (isset($args[self::REQUIRED_PERMISSIONS]))
+			{
+				$this->requiredPermissions = $args[self::REQUIRED_PERMISSIONS];
 			}
 		}
 	}

@@ -137,12 +137,13 @@
 				)
 			ORDER BY "LastAction" ASC
 		',
-		'hideHeader' => false,
-		'hideSave' => false,
+		'requiredPermissions' => 'infocenter',
 		'checkboxes' => 'PersonId',
 		'additionalColumns' => array('Details'),
-		'columnsAliases' => array('PersonID','Vorname','Nachname','GebDatum','Letzte Aktion','Letzter Bearbeiter',
-			'StSem','GesendetAm','NumAbgeschickt','Studiengänge','Sperrdatum','GesperrtVon'),
+		'columnsAliases' => array(
+			'PersonID','Vorname','Nachname','GebDatum','Letzte Aktion','Letzter Bearbeiter',
+			'StSem','GesendetAm','NumAbgeschickt','Studiengänge','Sperrdatum','GesperrtVon'
+		),
 		'formatRaw' => function($datasetRaw) {
 
 			$datasetRaw->{'Details'} = sprintf(

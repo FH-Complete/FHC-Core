@@ -5,7 +5,7 @@ if (! defined('BASEPATH')) exit('No direct script access allowed');
 /**
  *
  */
-class Filters extends FHC_Controller
+class Filters extends CI_Controller
 {
 	const SESSION_NAME = 'FILTER';
 
@@ -25,9 +25,13 @@ class Filters extends FHC_Controller
 
         // Load session library
         $this->load->library('session');
+		// Load permission library
+		$this->load->library('PermissionLib');
 
 		$this->load->model('system/Filters_model', 'FiltersModel');
 		$this->load->model('person/Benutzer_model', 'BenutzerModel');
+
+		$this->_isAllowed();
     }
 
 	/**
@@ -468,5 +472,35 @@ class Filters extends FHC_Controller
 		}
 
 		$this->output->set_content_type('application/json')->set_output(json_encode($json));
+	}
+
+	/**
+	 * Cheks
+	 */
+	private function _isAllowed()
+	{
+		if (isset($_SESSION[self::SESSION_NAME]['requiredPermissions']))
+		{
+			$requiredPermissions = array(
+				'filters' => $_SESSION[self::SESSION_NAME]['requiredPermissions'].':rw'
+			);
+
+			if (!$this->permissionlib->isEntitled($requiredPermissions, 'filters'))
+			{
+				header('Content-Type: application/json');
+
+				echo json_encode('You are not allowed to access to this content');
+
+				exit(1);
+			}
+		}
+		else
+		{
+			header('Content-Type: application/json');
+
+			echo json_encode('You are not allowed to access to this content');
+
+			exit(1);
+		}
 	}
 }
