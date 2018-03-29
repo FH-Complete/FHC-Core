@@ -29,7 +29,7 @@ class APIv1_Controller extends REST_Controller
 	 */
 	private function _isAllowed($requiredPermissions)
 	{
-		if (!$this->permissionlib->checkPermissions($requiredPermissions, $this->router->method))
+		if (!$this->permissionlib->isEntitled($requiredPermissions, $this->router->method))
 		{
 			$this->response(error('You are not allowed to access to this content'), REST_Controller::HTTP_UNAUTHORIZED);
 		}

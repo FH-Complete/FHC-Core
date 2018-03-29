@@ -68,34 +68,6 @@ class PermissionLib
 	}
 
 	/**
-	 * Check if the user is entitled to get access to a source with the given access type
-	 *
-	 * @return bool <b>true</b> if a user has the right to access to the specified
-	 *				resource with a specified permission type, <b>false</b> otherwise
-	 */
-	public function isEntitled($sourceName, $permissionType)
-	{
-		$isEntitled = false;
-
-		// If it's called from command line than it's trusted
-		if (!is_cli())
-		{
-			// If the resource exists
-			if (isset($this->acl[$sourceName]))
-			{
-				// Checks permission
-				$isEntitled = $this->isBerechtigt($this->acl[$sourceName], $permissionType);
-			}
-		}
-		else
-		{
-			$isEntitled	= true;
-		}
-
-		return $isEntitled;
-	}
-
-	/**
 	 * Get a permission by a given source
 	 */
 	public function getBerechtigungKurzbz($sourceName)
@@ -130,6 +102,7 @@ class PermissionLib
 
 	/**
 	 * Checks if the caller is allowed to access to this content with the given permissions
+	 * - if it's called from command line than it's trusted
 	 * - checks if the parameter $requiredPermissions is set, is an array and contains at least one element
 	 * - checks if the given $requiredPermissions parameter contains the called method of the controller
 	 * - checks if the HTTP method used to call is GET or POST
@@ -145,10 +118,13 @@ class PermissionLib
 	 * NOTE: the displayed error messages are used to warn the developer about any issues that could occur,
 	 * 		they are not intended for the final user!
 	 */
-	public function checkPermissions($requiredPermissions, $calledMethod)
+	public function isEntitled($requiredPermissions, $calledMethod)
 	{
 		$checkPermissions = false;
 		$requestMethod = $_SERVER['REQUEST_METHOD'];
+
+		// If it's called from command line than it's trusted
+		if (is_cli()) return true;
 
 		// Checks if the parameter $requiredPermissions is set, is an array and contains at least one element
 		if (isset($requiredPermissions) && is_array($requiredPermissions) && count($requiredPermissions) > 0)
