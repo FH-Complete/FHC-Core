@@ -60,14 +60,41 @@ $(document).ready(function()
 		$("#t1").tablesorter(
 		{
 			sortList: [[0,0],[1,0],[2,0]], 
-            widgets: ["zebra"], 
-            headers: {4:{sorter:false}} 
+			widgets: ["zebra"], 
+			headers: {4:{sorter:false}} 
 		});
 		$("#t2").tablesorter(
 		{
 			sortList: [[0,0],[1,0],[2,0],[3,0]], 
 			widgets: ["zebra", "filter", "stickyHeaders"],
-			headers: {4:{sorter:false}},
+			headers: {8:{sorter:false}},
+			emptyTo: "emptyMax", 
+			widgetOptions : {	filter_functions:  
+								{ 
+									// Add select menu to this column 
+									6 : { 
+									"Ja" : function(e, n, f, i, $r, c, data) { return /Ja/.test(e); }, 
+									"Nein" : function(e, n, f, i, $r, c, data) { return /Nein/.test(e); } 
+									}, 
+									7 : { 
+									"Aktiv" : function(e, n, f, i, $r, c, data) { return $r.find("div").hasClass( "buttonGreen" ); }, 
+									"Inaktiv" : function(e, n, f, i, $r, c, data) { return $r.find("div").hasClass( "buttonRed" ) || $r.find("div").hasClass( "buttonYellow" ); } 
+									} 
+								} 
+							} 
+		});
+		$("#t3").tablesorter(
+		{
+			sortList: [[1,0],[2,0],[3,0]],
+			widgets: ["zebra"],
+			headers: {8:{sorter:false}},
+			emptyTo: "emptyMax"
+		});
+		$("#t4").tablesorter(
+		{
+			sortList: [[0,0],[1,0],[2,0]], 
+			widgets: ["zebra", "filter", "stickyHeaders"],
+			headers: {9:{sorter:false}},
 			emptyTo: "emptyMax", 
 			widgetOptions : {	filter_functions:  
 								{ 
@@ -82,13 +109,6 @@ $(document).ready(function()
 									} 
 								} 
 							} 
-		});
-		$("#t3").tablesorter(
-		{
-			sortList: [[1,0],[2,0],[3,0]],
-			widgets: ["zebra"],
-			headers: {8:{sorter:false}},
-			emptyTo: "emptyMax"
 		});
 	});
 
@@ -443,7 +463,7 @@ if($berechtigung_kurzbz != '')
 			$htmlstr .= "<h3>".$berechtigung_kurzbz."</h3>\n";
 			$htmlstr .= "<div style='font-size: 9pt'>".count($berechtigungen_array)." Einträge</div>";
 			$htmlstr .= "<div style='font-size: 9pt'>".count(array_unique($berechtigungen_array_uids))." UIDs</div>";
-			$htmlstr .= "<table id='t2' class='tablesorter'><thead><tr>\n"; 
+			$htmlstr .= "<table id='t4' class='tablesorter'><thead><tr>\n"; 
 			$htmlstr .= "	<th>Nachname</th> 
 							<th>Vorname</th> 
 							<th>UID</th> 

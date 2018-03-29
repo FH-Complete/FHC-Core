@@ -413,6 +413,7 @@ function searchDms($searchItems)
 					<th></th>
 					<th>',$p->t('global/titel'),'</th>
 					<th>',$p->t('tools/aktuelleVersion'),'</th>
+					<th>',$p->t('tools/suchbegriffe'),'</th>
 				</tr>
 			</thead>
 			<tbody>
@@ -430,6 +431,7 @@ function searchDms($searchItems)
 					else
 						echo '<td width="20px" height="20px" style="vertical-align:middle;"><img src="../../../skin/images/blank.gif" style="height: 18px; vertical-align:middle;"></td><td height="20px" style="vertical-align:middle;"><a href="../../../cms/dms.php?id='.$row->dms_id.'">',$row->beschreibung,'</a></td>';
 					echo '<td style="vertical-align:middle;">',$row->version,'</td>';
+					echo '<td style="vertical-align:middle;">',$row->schlagworte,'</td>';
 					echo '</tr>';
 					echo "\n";
 				}
@@ -442,6 +444,7 @@ function searchDms($searchItems)
 					else
 						echo '<td width="20px" height="20px" style="vertical-align:middle;"><img src="../../../skin/images/blank.gif" style="height: 18px; vertical-align:middle;"></td><td height="20px" style="vertical-align:middle;"><a href="../../../cms/dms.php?id='.$row->dms_id.'">',$row->beschreibung,'</a></td>';
 					echo '<td style="vertical-align:middle;">',$row->version,'</td>';
+					echo '<td style="vertical-align:middle;">',$row->schlagworte,'</td>';
 					echo '</tr>';
 					echo "\n";
 			}

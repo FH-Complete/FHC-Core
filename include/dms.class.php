@@ -744,10 +744,20 @@ class dms extends basis_db
 		
 		$qry = "SELECT tbl_dms.*, tbl_dms_version.*, tbl_dms_kategorie.berechtigung_kurzbz FROM campus.tbl_dms 
 				JOIN campus.tbl_dms_version USING(dms_id)
-				JOIN campus.tbl_dms_kategorie USING (kategorie_kurzbz)
-				WHERE lower(name) like lower('%".$this->db_escape($suchstring)."%')
-				OR lower(tbl_dms_version.beschreibung) like lower('%".$this->db_escape($suchstring)."%')
+				JOIN campus.tbl_dms_kategorie USING (kategorie_kurzbz)";
+		// Wenn erstes Zeichen # ist, dieses wegkürzen und checken ob der Rest numerisch ist. Dann nach eindeutiger ID suchen
+		if (substr($suchstring, 0, 1) == '#')
+		{
+			$suchstring = substr($suchstring, 1);
+			if (is_numeric($suchstring))
+				$qry .= " WHERE tbl_dms.dms_id = ".$this->db_add_param($suchstring, FHC_INTEGER);
+		}
+		else 
+		{
+			$qry .= " 	WHERE lower(name) like lower('%".$this->db_escape($suchstring)."%')
+						OR lower(tbl_dms_version.beschreibung) like lower('%".$this->db_escape($suchstring)."%')
 						";
+		}
 
 		if (is_numeric($suchstring))
 			$qry.= " OR dms_id = ".$this->db_escape($suchstring)."";
@@ -791,19 +801,19 @@ class dms extends basis_db
 	}
 	
 	/**
-	 * Sucht nach Dokumenten (nur Spalte Beschreibung) mit der aktuellsten Version.
+	 * Sucht nach Dokumenten (Spalte schlagworte) mit der aktuellsten Version, bei denen cis_suche true ist
 	 * Optional kann die Anzahl an Suchergebnissen übergeben werden.
 	 *
-	 * @param suchstring
-	 * @param limit (optional)
+	 * @param string $suchstring
+	 * @param integer $limit (optional)
 	 */
 	public function searchLastVersion($suchstring, $limit=null)
 	{
-		$qry = "SELECT * FROM campus.tbl_dms  JOIN campus.tbl_dms_version USING(dms_id)
-				WHERE 1=1 ";
+		$qry = "SELECT * FROM campus.tbl_dms JOIN campus.tbl_dms_version USING(dms_id)
+				WHERE cis_suche=true ";
 				foreach($suchstring as $value)
-				$qry.=" AND (lower(beschreibung::text) like lower('%".$this->db_escape($value)."%')
-						OR lower (beschreibung::text) like lower ('%".$this->db_escape(htmlentities($value,ENT_NOQUOTES,'UTF-8'))."%'))";
+				$qry.=" AND (lower(schlagworte::text) like lower('%".$this->db_escape($value)."%')
+						OR lower (schlagworte::text) like lower ('%".$this->db_escape(htmlentities($value,ENT_NOQUOTES,'UTF-8'))."%'))";
 			$qry.= "AND version=(SELECT MAX(version) FROM campus.tbl_dms_version where dms_id=tbl_dms.dms_id)";			
 			
 		if(!is_null($limit) && is_numeric($limit))

@@ -82,6 +82,7 @@ $this->phrasen['tools/telefonklappe']='Extension';
 $this->phrasen['tools/reservieren']='Reserve room';
 $this->phrasen['tools/maxPersonen']='Max. # of people';
 $this->phrasen['tools/esWurdenKeineErgebnisseGefunden']='Your search did not return any results.';
+$this->phrasen['tools/suchbegriffe']='Keywords';
 
 //Partnerhochschulen
 $this->phrasen['tools/partnerhochschulenUebersicht']='Partner Universities';

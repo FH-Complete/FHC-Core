@@ -551,7 +551,7 @@ else
 	// Suche anzeigen
 	echo '<div align="left"><h1>Dokument Auswählen</h1></div><div align="right"></div>
 		<form action="'.$_SERVER['PHP_SELF'].'?searching=true&searchstring='.$searchstring.'" method="POST">
-			<input type="text" name="searchstring" value="'.$searchstring.'">
+			<input type="text" name="searchstring" value="'.$searchstring.'" placeholder="#123 oder Text">
 			<input type="submit" class="buttondesign" value="Suchen">
 		</form>';
 
