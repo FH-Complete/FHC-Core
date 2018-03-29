@@ -10,16 +10,16 @@ class FS_Model extends FHC_Model
 	public function __construct($filepath = null)
 	{
 		parent::__construct();
-		
+
 		// Load the filesystem library
 		$this->load->library('FilesystemLib');
-		
+
 		// Load return message helper
 		$this->load->helper('message');
-		
+
 		$this->filepath = $filepath;
 	}
-	
+
 	/** ---------------------------------------------------------------
 	 * Read data from file system
 	 *
@@ -29,13 +29,10 @@ class FS_Model extends FHC_Model
 	{
 		// Check Class-Attributes
 		if (is_null($this->filepath)) return error(FHC_MODEL_ERROR, FHC_ERROR);
-		
+
 		// Check method parameters
 		if (is_null($filename)) return error(FHC_MODEL_ERROR, FHC_ERROR);
 
-		// Check rights
-		if (isError($ent = $this->isEntitled($this->filepath, PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR))) return $ent;
-		
 		if (!is_null($data = $this->filesystemlib->read($this->filepath, $filename)))
 		{
 			return success(base64_encode($data));
@@ -45,7 +42,7 @@ class FS_Model extends FHC_Model
 			return error(FHC_MODEL_ERROR, FHC_ERROR);
 		}
 	}
-	
+
 	/** ---------------------------------------------------------------
 	 * Writing data to file system
 	 *
@@ -56,13 +53,10 @@ class FS_Model extends FHC_Model
 	{
 		// Check Class-Attributes
 		if (is_null($this->filepath)) return error(FHC_MODEL_ERROR, FHC_ERROR);
-		
+
 		// Check method parameters
 		if (is_null($filename)) return error(FHC_MODEL_ERROR, FHC_ERROR);
 		if (is_null($content)) return error(FHC_MODEL_ERROR, FHC_ERROR);
-
-		// Check rights
-		if (isError(($ent = $this->isEntitled($this->filepath, PermissionLib::INSERT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)))) return $ent;
 
 		if ($this->filesystemlib->write($this->filepath, $filename, base64_decode($content)) === true)
 		{
@@ -84,13 +78,10 @@ class FS_Model extends FHC_Model
 	{
 		// Check Class-Attributes
 		if (is_null($this->filepath)) return error(FHC_MODEL_ERROR, FHC_ERROR);
-		
+
 		// Check method parameters
 		if (is_null($content)) return error(FHC_MODEL_ERROR, FHC_ERROR);
 		if (is_null($filename)) return error(FHC_MODEL_ERROR, FHC_ERROR);
-
-		// Check rights
-		if (isError($ent = $this->isEntitled($this->filepath, PermissionLib::INSERT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR))) return $ent;
 
 		if ($this->filesystemlib->append($this->filepath, $filename, base64_decode($content)) === true)
 		{
@@ -112,12 +103,9 @@ class FS_Model extends FHC_Model
 	{
 		// Check Class-Attributes
 		if (is_null($this->filepath)) return error(FHC_MODEL_ERROR, FHC_ERROR);
-		
+
 		// Check method parameters
 		if (is_null($filename)) return error(FHC_MODEL_ERROR, FHC_ERROR);
-
-		// Check rights
-		if (isError($ent = $this->isEntitled($this->filepath, PermissionLib::DELETE_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR))) return $ent;
 
 		if ($this->filesystemlib->remove($this->filepath, $filename) === true)
 		{
@@ -128,7 +116,7 @@ class FS_Model extends FHC_Model
 			return error(FHC_MODEL_ERROR, FHC_ERROR);
 		}
 	}
-	
+
 	/** ---------------------------------------------------------------
 	 * Rename a file
 	 *
@@ -139,13 +127,10 @@ class FS_Model extends FHC_Model
 	{
 		// Check Class-Attributes
 		if (is_null($this->filepath)) return error(FHC_MODEL_ERROR, FHC_ERROR);
-		
+
 		// Check method parameters
 		if (is_null($filename)) return error(FHC_MODEL_ERROR, FHC_ERROR);
 		if (is_null($newFilename)) return error(FHC_MODEL_ERROR, FHC_ERROR);
-		
-		// Check rights
-		if (isError($ent = $this->isEntitled($this->filepath, PermissionLib::UPDATE_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR))) return $ent;
 
 		if ($this->filesystemlib->rename($this->filepath, $filename, $this->filepath, $newFilename) === true)
 		{
