@@ -19,14 +19,6 @@ class Message_model extends DB_Model
 	 */
 	public function getMessagesByPerson($person_id, $oe_kurzbz, $all)
 	{
-		// Checks if the operation is permitted by the API caller
-		if (isError($ent = $this->isEntitled('public.tbl_person', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)))
-			return $ent;
-		if (isError($ent = $this->isEntitled('public.tbl_msg_status', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)))
-			return $ent;
-		if (isError($ent = $this->isEntitled('public.tbl_msg_message', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)))
-			return $ent;
-
 		$sql = 'SELECT m.message_id,
 						m.person_id,
 						m.subject,
@@ -93,16 +85,6 @@ class Message_model extends DB_Model
 	 */
 	public function getMessagesOfPerson($person_id, $status = null)
 	{
-		// Checks if the operation is permitted by the API caller
-		if (isError($ent = $this->isEntitled('public.tbl_person', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)))
-			return $ent;
-		if (isError($ent = $this->isEntitled('public.tbl_msg_status', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)))
-			return $ent;
-		if (isError($ent = $this->isEntitled('public.tbl_msg_message', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)))
-			return $ent;
-		if (isError($ent = $this->isEntitled('public.tbl_msg_recipient', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)))
-			return $ent;
-
 		$sql = 'SELECT m.message_id,
 						m.person_id,
 						m.subject,
@@ -129,7 +111,7 @@ class Message_model extends DB_Model
 						s.statusinfo,
 						s.insertamum AS statusamum
 				  FROM public.tbl_msg_message m
-						JOIN public.tbl_msg_recipient r ON m.message_id = r.message_id 
+						JOIN public.tbl_msg_recipient r ON m.message_id = r.message_id
 						JOIN public.tbl_person se ON (m.person_id = se.person_id)
 						JOIN public.tbl_person re ON (r.person_id = re.person_id)
 						LEFT JOIN (

@@ -11,17 +11,14 @@ class Dokumentprestudent_model extends DB_Model
 		$this->dbTable = 'public.tbl_dokumentprestudent';
 		$this->pk = array('prestudent_id', 'dokument_kurzbz');
 	}
-	
+
 	/**
 	 * setAccepted
 	 */
 	public function setAccepted($prestudent_id, $studiengang_kz)
 	{
-		if (isError($ent = $this->isEntitled('public.tbl_dokumentprestudent', PermissionLib::INSERT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)))
-			return $ent;
-		
 		$result = null;
-		
+
 		if (is_numeric($prestudent_id) && is_numeric($studiengang_kz))
 		{
 			$query = 'INSERT INTO public.tbl_dokumentprestudent (dokument_kurzbz, prestudent_id, insertamum) (
@@ -37,23 +34,20 @@ class Dokumentprestudent_model extends DB_Model
 						AND p.prestudent_id = ?
 						AND ds.studiengang_kz = ?
 					)';
-			
+
 			$result = $this->execQuery($query, array($prestudent_id, $studiengang_kz));
 		}
-		
+
 		return $result;
 	}
-	
+
 	/**
 	 * setAcceptedDocuments
 	 */
 	public function setAcceptedDocuments($prestudent_id, $dokument_kurzbz)
 	{
-		if (isError($ent = $this->isEntitled('public.tbl_dokumentprestudent', PermissionLib::INSERT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)))
-			return $ent;
-		
 		$result = null;
-		
+
 		if (is_numeric($prestudent_id) && is_array($dokument_kurzbz) && count($dokument_kurzbz) > 0)
 		{
 			$query = 'INSERT INTO public.tbl_dokumentprestudent (dokument_kurzbz, prestudent_id, insertamum) (
@@ -68,10 +62,10 @@ class Dokumentprestudent_model extends DB_Model
 								 WHERE prestudent_id = ?
 							)
 					)';
-			
+
 			$result = $this->execQuery($query, array($prestudent_id, $dokument_kurzbz, $prestudent_id));
 		}
-		
+
 		return $result;
 	}
 }
