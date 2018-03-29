@@ -43,23 +43,23 @@ class CallerLib
 	/**
 	 * Wrapper method for _call
 	 */
-	public function callLibrary($callParameters, $permissionType)
+	public function callLibrary($callParameters)
 	{
-		return $this->_call($callParameters, $permissionType);
+		return $this->_call($callParameters);
 	}
 
 	/**
 	 * Wrapper method for _call
 	 */
-	public function callModel($callParameters, $permissionType)
+	public function callModel($callParameters)
 	{
-		return $this->_call($callParameters, $permissionType);
+		return $this->_call($callParameters);
 	}
 
 	/**
 	 * Everything starts here...
 	 */
-	private function _call($callParameters, $permissionType)
+	private function _call($callParameters)
 	{
 		$result = null;
 		$parameters = $this->_getParameters($callParameters);
@@ -87,26 +87,11 @@ class CallerLib
 				// If not loaded then load it
 				if ($isLoaded === false)
 				{
-					// Checks if the operation is permitted by the API caller
-					// Only for libraries, permissions are automatically handled by models
-					$result = $this->checkLibraryPermission(
-						$parameters->resourcePath,
-						$parameters->resourceName,
-						$parameters->function,
-						$permissionType
-					);
-					if (isError($result))
+					// Try to load the library
+					$result = $this->_loadLibrary($parameters->resourcePath, $parameters->resourceName);
+					if (isSuccess($result))
 					{
-						$loaded = null;
-					}
-					else
-					{
-						// Try to load the library
-						$result = $this->_loadLibrary($parameters->resourcePath, $parameters->resourceName);
-						if (isSuccess($result))
-						{
-							$loaded = $result->retval;
-						}
+						$loaded = $result->retval;
 					}
 				}
 				// If it is already loaded $isLoaded contains the instance of the library
@@ -239,34 +224,6 @@ class CallerLib
 		if (!is_null($loaded))
 		{
 			$result = success($loaded);
-		}
-
-		return $result;
-	}
-
-	/**
-	 * Search for a valid permission for this library that should be present with this format:
-	 * '<library path>.<library name>.<library method name>' => '<permission>'
-	 */
-	private function checkLibraryPermission($resourcePath, $resourceName, $function, $permissionType)
-	{
-		$result = null;
-		$permissionPath = '';
-
-		if ($resourcePath != '')
-		{
-			$permissionPath = $resourcePath;
-		}
-
-		$permissionPath .= $resourceName.'.'.$function;
-
-		if ($this->ci->permissionlib->isEntitled($permissionPath, $permissionType) === false)
-		{
-			$result = error(FHC_NORIGHT, FHC_NORIGHT);
-		}
-		else
-		{
-			$result = success('Has permission');
 		}
 
 		return $result;

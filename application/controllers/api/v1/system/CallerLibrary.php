@@ -33,7 +33,7 @@ class CallerLibrary extends APIv1_Controller
 	public function getCall()
 	{
 		// Start me up!
-		$result = $this->callerlib->callLibrary($this->get(), PermissionLib::SELECT_RIGHT);
+		$result = $this->callerlib->callLibrary($this->get());
 
 		// Print the result
 		$this->response($result, REST_Controller::HTTP_OK);
@@ -45,7 +45,7 @@ class CallerLibrary extends APIv1_Controller
 	public function postCall()
 	{
 		// Start me up!
-		$result = $this->callerlib->callLibrary($this->post(), PermissionLib::UPDATE_RIGHT);
+		$result = $this->callerlib->callLibrary($this->post());
 
 		// Print the result
 		$this->response($result, REST_Controller::HTTP_OK);
@@ -57,7 +57,7 @@ class CallerLibrary extends APIv1_Controller
 	public function putCall()
 	{
 		// Start me up!
-		$result = $this->callerlib->callLibrary($this->put(), PermissionLib::INSERT_RIGHT);
+		$result = $this->callerlib->callLibrary($this->put());
 
 		// Print the result
 		$this->response($result, REST_Controller::HTTP_OK);
@@ -69,7 +69,7 @@ class CallerLibrary extends APIv1_Controller
 	public function deleteCall()
 	{
 		// Start me up!
-		$result = $this->callerlib->callLibrary($this->delete(), PermissionLib::DELETE_RIGHT);
+		$result = $this->callerlib->callLibrary($this->delete());
 
 		// Print the result
 		$this->response($result, REST_Controller::HTTP_OK);
