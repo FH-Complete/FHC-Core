@@ -1214,12 +1214,15 @@ class betriebsmittel extends basis_db
     }
 
     /**
-     * Überprüft ob die Zutrittskarte schon ausgegeben worden ist -> ausgegeben an == null und retouram != null
+     * Überprüft ob die Zutrittskarte schon ausgegeben worden ist -> ausgegeben am == null und retouram != null
      * @param $uid
-     * @return boolean
+     * @return boolean; (letztes) Ausgabedatum wenn ok
      */
     public function zutrittskarteAusgegeben($uid)
     {
+		$this->result='';
+		$this->errormsg = '';
+		
         $qry ="SELECT * FROM wawi.tbl_betriebsmittelperson WHERE uid =".$this->db_add_param($uid, FHC_STRING)."
             AND betriebsmittel_id IN(
                 SELECT betriebsmittel_id
@@ -1230,11 +1233,21 @@ class betriebsmittel extends basis_db
 
         if($result = $this->db_query($qry))
         {
-            if($this->db_num_rows($result)>0)
-                return true;
-            else
-                return false;
+			$ausgegeben_am = '';
+			while($row = $this->db_fetch_object($result))
+			{
+				if(empty($ausgegeben_am) || (!empty($ausgegeben_am) && $ausgegeben_am < $row->ausgegebenam))
+					$ausgegeben_am = $row->ausgegebenam;
+			}
+			//return latest issue date
+			$this->result = $ausgegeben_am;
+			return true;         
         }
+		 else
+		 {
+			 $this->errormsg = 'Fehler beim Laden der Daten';
+			 return false;
+		 }            
     }
 
 	/**
