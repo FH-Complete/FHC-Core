@@ -346,7 +346,7 @@ $(document).ready(function(){
 	<?php 
 	//title in CIS
 	if (!$is_popup)
-		echo '<h2>' . $p->t('tools/ampelsystem') . '</h2>';
+		echo '<h3>' . $p->t('tools/ampelsystem') . '</h3>';
 		
 	//title in popup for mandatory ampeln 
 	if ($is_popup)
@@ -402,10 +402,33 @@ $(document).ready(function(){
 	
 	$cnt = 1;								//counter to set iterative id's
 	$cnt_inactive = 1;						//counter to set only one heading line for inactive ampeln
+	$cnt_active = 0;
+	
+	//show panel "no actual ampeln" if there are no active ampeln
+	foreach ($user_ampel_arr as $user_ampel)
+	{
+		if ($user_ampel['active'] == true)
+				$cnt_active++;
+	}
+	
+	if ($cnt_active == 0)
+	{
+		echo '
+			<div class="panel">
+				<div class="row" style="margin-bottom: 15px; padding-left: 15px;">
+					<div class="panel-heading" style="background-color: transparent" role="tab" id="heading">
+						<h3>' . $p->t('tools/ampelKeineAktuellen'). '</h3>
+						<small>' . $p->t('tools/ampelKeineAktuellenTxt'). '</small>
+					</div>
+				</div>
+			</div>';	
+
+	}
 	
 	//fill panel with ampeln
 	foreach ($user_ampel_arr as $user_ampel)
 	{
+		
 		//use only ampeln that are not overdue
 		if ($user_ampel['show_ampel'] == true)
 		{	
@@ -465,7 +488,7 @@ $(document).ready(function(){
 		</div>
 		<div id="collapse<?php echo $cnt ?>" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading<?php echo $cnt ?>">
 			<div class="panel-body" style="font-size: 12px;">
-				<?php echo $user_ampel['beschreibung'][$sprache]?>		
+				<?php echo $user_ampel['beschreibung'][$sprache] ?>		
 				<p><br></p>
 				<form method="POST" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']) . '?ampel_id='. urlencode($user_ampel['ampel_id']) . '&type=bestaetigen'; ?>">
 					<button type="type" type="submit" class="btn btn-default pull-right" 
