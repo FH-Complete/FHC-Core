@@ -275,11 +275,7 @@ function getActualUserAmpelData($user_ampel_arr, $semester_start)
 <html lang="en">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<link rel="stylesheet" href="../../../skin/fhcomplete.css" type="text/css"/>
-<link rel="stylesheet" href="../../../skin/style.css.php" rel="stylesheet" type="text/css">
-<link rel="stylesheet" href="../../../skin/jquery.css" type="text/css"/>
 <link rel="stylesheet" type="text/css" href="../../../vendor/twbs/bootstrap/dist/css/bootstrap.min.css">
-<link rel="stylesheet" type="text/css" href="../../../skin/jquery-ui-1.9.2.custom.min.css">
 <script type="text/javascript" src="../../../vendor/components/jquery/jquery.min.js"></script>
 <script type="text/javascript" src="../../../vendor/twbs/bootstrap/dist/js/bootstrap.min.js"></script>
 <title><?php echo $p->t('tools/ampelsystem') ?></title>
@@ -417,7 +413,7 @@ $(document).ready(function(){
 			<div class="panel">
 				<div class="row" style="margin-bottom: 15px; padding-left: 15px;">
 					<div class="panel-heading" style="background-color: transparent" role="tab" id="heading">
-						<h3>' . $p->t('tools/ampelKeineAktuellen'). '</h3>
+						<h4>' . $p->t('tools/ampelKeineAktuellen'). '</h4>
 						<small>' . $p->t('tools/ampelKeineAktuellenTxt'). '</small>
 					</div>
 				</div>
@@ -439,7 +435,7 @@ $(document).ready(function(){
 				<div class="panel">
 					<div class="row" style="margin-bottom: 15px; padding-left: 15px;">
 						<div class="panel-heading" style="background-color: transparent" role="tab" id="heading">
-							<h3>' . $p->t('tools/ampelAbgelaufenTitel'). '</h3>
+							<h4>' . $p->t('tools/ampelAbgelaufenTitel'). '</h4>
 							<small>' . $p->t('tools/ampelAbgelaufenTxt'). '</small>
 						</div>
 					</div>
@@ -451,12 +447,12 @@ $(document).ready(function(){
 		<div class="row" style="margin-bottom: 15px">
 			<div class="panel-heading <?php if ($user_ampel['abgelaufen']  || $user_ampel['bestaetigt']) echo 'text-muted' ?>" style="background-color: transparent" role="tab" id="heading<?php echo $cnt ?>">				
 				<div class="col-xs-4">
-					<h4 style="text-decoration: none" class="panel-title">
-						<a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" 
+					<h5 class="panel-title" style="text-decoration: none; font-size: 14px;">
+						<a class="collapsed" style="text-decoration: none;" role="button" data-toggle="collapse" data-parent="#accordion" 
 						   href="#collapse<?php echo $cnt ?>" aria-expanded="false" aria-controls="collapse<?php echo $cnt ?>">
 						<?php echo $user_ampel['kurzbz'] ?>
 						</a>
-					</h4>
+					</h5>
 					<small <?php if ($user_ampel['status'] == 'rot' && !$user_ampel['abgelaufen']) echo 'style="color: red; font-weight : bold;"'?>><?php echo $p->t('global/faelligAm') . ' '; echo date('d.m.Y', strtotime($user_ampel['deadline'])) ?></small>			
 				</div>
 				<div class="col-xs-2">
