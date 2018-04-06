@@ -475,17 +475,34 @@ class Filters extends CI_Controller
 	}
 
 	/**
-	 * Cheks
+	 * Checks
 	 */
 	private function _isAllowed()
 	{
+		$isAllowed = false;
+
 		if (isset($_SESSION[self::SESSION_NAME]['requiredPermissions']))
 		{
-			$requiredPermissions = array(
-				'filters' => $_SESSION[self::SESSION_NAME]['requiredPermissions'].':rw'
-			);
+			$tmpRequiredPermissions = $_SESSION[self::SESSION_NAME]['requiredPermissions'];
+			if (!is_array($tmpRequiredPermissions))
+			{
+				$tmpRequiredPermissions = array($_SESSION[self::SESSION_NAME]['requiredPermissions']);
+			}
 
-			if (!$this->permissionlib->isEntitled($requiredPermissions, 'filters'))
+			for ($i = 0; $i < count($tmpRequiredPermissions); $i++)
+			{
+				$requiredPermissions = array(
+					'filters' => $tmpRequiredPermissions[$i].':rw'
+				);
+
+				if ($this->permissionlib->isEntitled($requiredPermissions, 'filters'))
+				{
+					$isAllowed = true;
+					break;
+				}
+			}
+
+			if (!$isAllowed)
 			{
 				header('Content-Type: application/json');
 
