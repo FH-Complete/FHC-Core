@@ -121,7 +121,7 @@ echo '<html>
 $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($user);
 
-if(!$rechte->isBerechtigt('mitarbeiter/zeitsperre'))
+if(!$rechte->isBerechtigt('mitarbeiter/zeitsperre', null, 'suid'))
 	die('Sie haben keine Berechtigung für diese Seite');
 
 //Formular zur Eingabe der UID

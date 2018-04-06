@@ -37,7 +37,7 @@ $user = get_uid();
 $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($user);
 
-if(!$rechte->isBerechtigt('basis/statistik'))
+if(!$rechte->isBerechtigt('basis/statistik', null, 'suid'))
 	die('Sie haben keine Berechtigung fuer diese Seite');
 ?><!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 <html>

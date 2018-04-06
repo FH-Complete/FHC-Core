@@ -27,16 +27,16 @@ $user = get_uid();
 
 $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($user);
-	
-if(!$rechte->isBerechtigt('basis/statistik'))
+
+if(!$rechte->isBerechtigt('basis/statistik', null, 'suid'))
 	die('Sie haben keine Berechtigung fuer diese Seite');
-	
+
 echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 <html>
 <head>
 	<title>Statistik</title>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-	
+
 	<link rel="stylesheet" href="../../skin/tablesort.css" type="text/css"/>
 	<link rel="stylesheet" href="../../skin/fhcomplete.css" type="text/css">
 	<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
@@ -45,19 +45,19 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 <script type="text/javascript" src="../../vendor/christianbach/tablesorter/jquery.tablesorter.min.js"></script>
 <script type="text/javascript" src="../../vendor/components/jqueryui/jquery-ui.min.js"></script>
 <script type="text/javascript" src="../../include/js/jquery.ui.datepicker.translation.js"></script>
-<script type="text/javascript" src="../../vendor/jquery/sizzle/sizzle.js"></script> 
+<script type="text/javascript" src="../../vendor/jquery/sizzle/sizzle.js"></script>
 	<script type="text/javascript">
-	
-		$(document).ready(function() 
-			{ 
+
+		$(document).ready(function()
+			{
 			    $("#myTable").tablesorter(
 				{
 					sortList: [[1,0]],
 					widgets: [\'zebra\']
-				}); 
-			} 
+				});
+			}
 		);
-		
+
 		function confdel()
 		{
 			return confirm("Wollen Sie diesen Eintrag wirklich löschen?");
@@ -73,10 +73,10 @@ if(isset($_GET['action']) && $_GET['action']=='delete')
 {
 	if(!$rechte->isBerechtigt('basis/statistik', null, 'suid'))
 		die('Sie haben keine Berechtigung fuer diese Seite');
-	
+
 	if(!isset($_GET['statistik_kurzbz']))
 		die('Fehlender Parameter Statistik');
-	
+
 	$statistik = new statistik();
 	if($statistik->delete($_GET['statistik_kurzbz']))
 		echo '<span class="ok">Eintrag wurde erfolgreich gelöscht</span>';

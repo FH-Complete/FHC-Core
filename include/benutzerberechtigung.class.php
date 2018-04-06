@@ -650,7 +650,7 @@ class benutzerberechtigung extends basis_db
 
 		foreach ($this->berechtigungen as $b)
 		{
-			if	(($berechtigung_kurzbz==$b->berechtigung_kurzbz || $berechtigung_kurzbz==null || mb_substr($berechtigung_kurzbz,0,mb_strpos($berechtigung_kurzbz,':'))==$b->berechtigung_kurzbz)
+			if	(($berechtigung_kurzbz==$b->berechtigung_kurzbz || (mb_strpos($berechtigung_kurzbz,':')!==false && mb_substr($berechtigung_kurzbz,0,mb_strpos($berechtigung_kurzbz,':'))==$b->berechtigung_kurzbz))
 				&& (($timestamp>$b->starttimestamp || $b->starttimestamp==null) && ($timestamp<$b->endetimestamp || $b->endetimestamp==null)))
 			{
 				if($b->negativ)
@@ -671,7 +671,9 @@ class benutzerberechtigung extends basis_db
 					{
 						$childoes = $oe->getChilds($b->oe_kurzbz);
 						foreach($childoes as $row)
+						{
 							$in .= "'".$this->db_escape($row)."',";
+						}
 					}
 					else
 					{
@@ -728,7 +730,7 @@ class benutzerberechtigung extends basis_db
 
 		foreach ($this->berechtigungen as $b)
 		{
-			if	(($berechtigung_kurzbz==$b->berechtigung_kurzbz || $berechtigung_kurzbz==null  || mb_substr($berechtigung_kurzbz,0,mb_strpos($berechtigung_kurzbz,':'))==$b->berechtigung_kurzbz)
+			if	(($berechtigung_kurzbz==$b->berechtigung_kurzbz || (mb_strpos($berechtigung_kurzbz,':')!==false && mb_substr($berechtigung_kurzbz,0,mb_strpos($berechtigung_kurzbz,':'))==$b->berechtigung_kurzbz))
 				&& (($timestamp>$b->starttimestamp || $b->starttimestamp==null) && ($timestamp<$b->endetimestamp || $b->endetimestamp==null)))
 			{
 				if($b->negativ)
@@ -801,7 +803,7 @@ class benutzerberechtigung extends basis_db
 		$oe = new organisationseinheit();
 		foreach ($this->berechtigungen as $b)
 		{
-			if	(($berechtigung_kurzbz==$b->berechtigung_kurzbz || $berechtigung_kurzbz==null  || mb_substr($berechtigung_kurzbz,0,mb_strpos($berechtigung_kurzbz,':'))==$b->berechtigung_kurzbz)
+			if	(($berechtigung_kurzbz==$b->berechtigung_kurzbz || $berechtigung_kurzbz==null || (mb_strpos($berechtigung_kurzbz,':')!==false && mb_substr($berechtigung_kurzbz,0,mb_strpos($berechtigung_kurzbz,':'))==$b->berechtigung_kurzbz))
 				&& (($timestamp>$b->starttimestamp || $b->starttimestamp==null) && ($timestamp<$b->endetimestamp || $b->endetimestamp==null)))
 			{
 				if($b->negativ)
@@ -828,9 +830,9 @@ class benutzerberechtigung extends basis_db
 					{
 						if(!is_null($b->oe_kurzbz))
 						{
-						$childoes = $oe->getChilds($b->oe_kurzbz);
-						foreach($childoes as $row)
-							$oe_kurzbz[] = $row;
+							$childoes = $oe->getChilds($b->oe_kurzbz);
+							foreach($childoes as $row)
+								$oe_kurzbz[] = $row;
 						}
 						else
 						{
@@ -874,7 +876,7 @@ class benutzerberechtigung extends basis_db
 			if(!mb_strstr($b->berechtigung_kurzbz,'wawi/'))
 				continue;
 
-			if	(($berechtigung_kurzbz==$b->berechtigung_kurzbz || $berechtigung_kurzbz==null  || mb_substr($berechtigung_kurzbz,0,mb_strpos($berechtigung_kurzbz,':'))==$b->berechtigung_kurzbz)
+			if	(($berechtigung_kurzbz==$b->berechtigung_kurzbz || (mb_strpos($berechtigung_kurzbz,':')!==false &&  mb_substr($berechtigung_kurzbz,0,mb_strpos($berechtigung_kurzbz,':'))==$b->berechtigung_kurzbz))
 				&& (($timestamp>$b->starttimestamp || $b->starttimestamp==null) && ($timestamp<$b->endetimestamp || $b->endetimestamp==null)))
 			{
 				if($b->negativ)
@@ -1065,7 +1067,7 @@ class benutzerberechtigung extends basis_db
 	 *
 	 * @param string $berechtigung_kurzbz Kurzbezeichnung der Berechtigung, deren Rollen geladen werden sollen
 	 * @param boolean $inklusiveRollen Default TRUE. Wenn true, wird ein UNION SELECT mit der tbl_rolleberechtigung ausgefuehrt
-	 * @param string $oe_kurzbz Organisationseinheit 
+	 * @param string $oe_kurzbz Organisationseinheit
 	 * @return boolean true wenn ok, false im Fehlerfall
 	 */
 	public function getBenutzerFromBerechtigung($berechtigung_kurzbz, $inklusiveRollen = true, $oe_kurzbz = null)
