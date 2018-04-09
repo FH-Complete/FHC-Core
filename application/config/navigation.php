@@ -63,12 +63,6 @@ $config['navigation_menu']['Vilesci/index'] = array(
 				'icon' => 'cubes',
 				'description' => 'Extensions Manager',
 				'expand' => true
-			),
-			'Datenschutz' => array(
-				'link' => base_url('index.ci.php/extensions/FHC-Core-DSMS/export'),
-				'description' => 'Datenschutz',
-				'icon' => 'legal',
-				'expand' => true
 			)
 		)
 	)
