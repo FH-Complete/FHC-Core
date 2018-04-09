@@ -111,10 +111,13 @@ class Person_model extends DB_Model
 
 		$this->addJoin('public.tbl_prestudent', 'person_id');
 
+		$this->addJoin('public.tbl_benutzer', 'person_id');
+
 		$result = $this->loadTree(
 			'public.tbl_person',
 			array(
-				'public.tbl_prestudent'
+				'public.tbl_prestudent',
+				'public.tbl_benutzer'
 			),
 			'EXISTS (
 				SELECT
@@ -129,7 +132,8 @@ class Person_model extends DB_Model
 					AND datum <= '.$this->escape($bis).'
 				)',
 			array(
-				'prestudenten'
+				'prestudenten',
+				'benutzer'
 			)
 		);
 
