@@ -229,7 +229,7 @@ if (isset($_GET['excel']))
 	$maxlength[$i] = 3;
 
 	//Tabellenzeilen
-	$stgs = $rechte->getStgKz();
+	$stgs = $rechte->getStgKz('assistenz');
 
 	if ($stgs[0] == '')
 		$stgwhere = '';
@@ -756,7 +756,7 @@ if (isset($_GET['excel']))
 		//zweites Blatt mit Statistik des Vorjahres zum gleichen Datum
 		if (!$mail)
 		{
-			$stgs = $rechte->getStgKz();
+			$stgs = $rechte->getStgKz('assistenz');
 
 			if ($stgs[0] == '')
 				$stgwhere = '';
@@ -1451,7 +1451,7 @@ else
 	{
 		if (!$mail)
 		{
-			$stgs = $rechte->getStgKz();
+			$stgs = $rechte->getStgKz('assistenz');
 
 			if ($stgs[0] == '')
 				$stgwhere = '';
@@ -1838,7 +1838,7 @@ else
 		// Bewerberstatistik fuer Vorjahr (selbes Datum)
 		if (!$mail)
 		{
-			$stgs = $rechte->getStgKz();
+			$stgs = $rechte->getStgKz('assistenz');
 
 			if ($stgs[0] == '')
 				$stgwhere = '';
@@ -2208,7 +2208,7 @@ function generateMischformenQuery($orgform_arr, $stsem, $ausgeschieden, $stgwher
 
 	foreach ($orgform_arr as $row_orgform)
 	{
-		$qry .= " (SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id) 
+		$qry .= " (SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id)
 						WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Interessent' AND studiensemester_kurzbz=".$db->db_add_param($stsem)."
 						AND orgform_kurzbz=".$db->db_add_param($row_orgform).") AS interessenten_".$row_orgform.",";
 		$qry .= " (SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id)
