@@ -824,7 +824,12 @@ if (isset($_GET['excel']))
 										person_id=tbl_prestudent.person_id
 										AND tbl_reihungstest.studiensemester_kurzbz=tbl_prestudentstatus.studiensemester_kurzbz
 										AND tbl_studienordnung.studiengang_kz=tbl_prestudent.studiengang_kz
-										AND anmeldungreihungstest<=".$db->db_add_param($datum)."
+										AND (
+												anmeldedatum<=".$db->db_add_param($datum)."
+												OR
+												(anmeldedatum is null
+												AND tbl_rt_person.insertamum<=".$db->db_add_param($datum).")
+											)
 								)
 					) AS interessentenrtanmeldung,
 					(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id) JOIN public.tbl_person USING(person_id)
@@ -841,7 +846,11 @@ if (isset($_GET['excel']))
 										person_id=tbl_prestudent.person_id
 										AND tbl_reihungstest.studiensemester_kurzbz=tbl_prestudentstatus.studiensemester_kurzbz
 										AND tbl_studienordnung.studiengang_kz=tbl_prestudent.studiengang_kz
-										AND anmeldungreihungstest<=".$db->db_add_param($datum)."
+										AND (anmeldedatum<=".$db->db_add_param($datum)."
+												OR
+												(anmeldedatum is null
+												AND tbl_rt_person.insertamum<=".$db->db_add_param($datum).")
+											)
 								)
 					) AS interessentenrtanmeldung_m,
 					(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id) JOIN public.tbl_person USING(person_id)
@@ -858,7 +867,11 @@ if (isset($_GET['excel']))
 										person_id=tbl_prestudent.person_id
 										AND tbl_reihungstest.studiensemester_kurzbz=tbl_prestudentstatus.studiensemester_kurzbz
 										AND tbl_studienordnung.studiengang_kz=tbl_prestudent.studiengang_kz
-										AND anmeldungreihungstest<=".$db->db_add_param($datum)."
+										AND (anmeldedatum<=".$db->db_add_param($datum)."
+												OR
+												(anmeldedatum is null
+												AND tbl_rt_person.insertamum<=".$db->db_add_param($datum).")
+											)
 								)
 					) AS interessentenrtanmeldung_w,
 					(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id)
@@ -1908,7 +1921,11 @@ else
 										person_id=tbl_prestudent.person_id
 										AND tbl_reihungstest.studiensemester_kurzbz=tbl_prestudentstatus.studiensemester_kurzbz
 										AND tbl_studienordnung.studiengang_kz=tbl_prestudent.studiengang_kz
-										AND anmeldungreihungstest<=".$db->db_add_param($datum)."
+										AND (anmeldedatum<=".$db->db_add_param($datum)."
+												OR
+												(anmeldedatum is null
+												AND tbl_rt_person.insertamum<=".$db->db_add_param($datum).")
+											)
 								)
 					) AS interessentenrtanmeldung,
 					(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id) JOIN public.tbl_person USING(person_id)
@@ -1925,7 +1942,11 @@ else
 										person_id=tbl_prestudent.person_id
 										AND tbl_reihungstest.studiensemester_kurzbz=tbl_prestudentstatus.studiensemester_kurzbz
 										AND tbl_studienordnung.studiengang_kz=tbl_prestudent.studiengang_kz
-										AND anmeldungreihungstest<=".$db->db_add_param($datum)."
+										AND (anmeldedatum<=".$db->db_add_param($datum)."
+												OR
+												(anmeldedatum is null
+												AND tbl_rt_person.insertamum<=".$db->db_add_param($datum).")
+											)
 								)
 					) AS interessentenrtanmeldung_m,
 					(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id) JOIN public.tbl_person USING(person_id)
@@ -1942,7 +1963,11 @@ else
 										person_id=tbl_prestudent.person_id
 										AND tbl_reihungstest.studiensemester_kurzbz=tbl_prestudentstatus.studiensemester_kurzbz
 										AND tbl_studienordnung.studiengang_kz=tbl_prestudent.studiengang_kz
-										AND anmeldungreihungstest<=".$db->db_add_param($datum)."
+										AND (anmeldedatum<=".$db->db_add_param($datum)."
+												OR
+												(anmeldedatum is null
+												AND tbl_rt_person.insertamum<=".$db->db_add_param($datum).")
+											)
 								)
 					) AS interessentenrtanmeldung_w,
 
