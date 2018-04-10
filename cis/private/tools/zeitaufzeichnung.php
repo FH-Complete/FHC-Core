@@ -91,12 +91,12 @@ $fieldheadings = array(
 if ($rechte->isBerechtigt('basis/servicezeitaufzeichnung'))
 {
 	$za_simple = 0;
-	$activities = 	array('Design', 'Operativ', 'Betrieb',  'Pause', 'LehreIntern', 'LehreExtern', 'Arztbesuch', 'Dienstreise', 'Behoerde');
+	$activities = 	array('Design', 'Operativ', 'Betrieb',  'Pause', 'LehreIntern', 'LehreExtern', 'Arztbesuch', 'Dienstreise', 'Behoerde', 'Ersatzruhe');
 }
 else
 {
 	$za_simple = 1;
-	$activities = array('Arbeit', 'Pause', 'LehreIntern', 'LehreExtern', 'Arztbesuch', 'Dienstreise', 'Behoerde');
+	$activities = array('Arbeit', 'Pause', 'LehreIntern', 'LehreExtern', 'Arztbesuch', 'Dienstreise', 'Behoerde', 'Ersatzruhe');
 }
 
 $activities_str = "'".implode("','", $activities)."'";
@@ -1096,6 +1096,8 @@ if($projekt->getProjekteMitarbeiter($user, true))
 			$wochensumme='00:00';
 			$extlehrearr=array();
 			$elsumme = '00:00';
+			$ersumme = '00:00';
+			$ersumme_woche = '00:00';
 			$datum_obj = new datum();
 			$tagesbeginn = '';
 			$tagesende = '';
@@ -1168,13 +1170,18 @@ if($projekt->getProjekteMitarbeiter($user, true))
 						else
 							$langindex = 2;
 						echo '<b>'.$tagbez[$langindex][$datum->formatDatum($tag,'N')].' '.$datum->formatDatum($tag,'d.m.Y').'</b> <span id="tag_'.$datum->formatDatum($tag,'d_m_Y').'">'.$zeitsperre_text.'</span>';
-
+						if ($ersumme != '00:00')
+							$erstr = ' (+ '.$ersumme.' ER)';
+						else
+						{
+							$erstr = '';
+						}
 						echo '</td>
 				        <td align="right" colspan="2" '.$style.'>
 				        	<b>'.$p->t("zeitaufzeichnung/arbeitszeit").': '.$datum->formatDatum($tagesbeginn, $format='H:i').'-'.$datum->formatDatum($tagesende, $format='H:i').' '.$p->t("eventkalender/uhr").'</b><br>LehreExtern /
 				        	'.$p->t("zeitaufzeichnung/pause").' '.($pflichtpause==false?$p->t("zeitaufzeichnung/inklusivePflichtpause"):'').':
 				        </td>
-				        <td '.$style.' align="right"><b>'.$tagessaldo.'</b><br>'.date('H:i', ($pausesumme-3600)).'</td>
+				        <td '.$style.' align="right"><b>'.$tagessaldo.$erstr.'</b><br>'.date('H:i', ($pausesumme-3600)).'</td>
 				        <td '.$style.' colspan="3" align="right">';
 						if ($tag > $sperrdatum)
 				      	echo '<a href="?von_datum='.$datum->formatDatum($tag,'d.m.Y').'&bis_datum='.$datum->formatDatum($tag,'d.m.Y').'" class="item">&lt;-</a>';
@@ -1185,6 +1192,7 @@ if($projekt->getProjekteMitarbeiter($user, true))
 						$tagessumme='00:00';
 						$pausesumme='00:00';
 						$elsumme='00:00';
+						$ersumme = '00:00';
 						$extlehrearr = array();
 						$tagesbeginn = '';
 						$tagesende = '';
@@ -1202,13 +1210,19 @@ if($projekt->getProjekteMitarbeiter($user, true))
 					$woche = $datumwoche;
 				if($woche!=$datumwoche)
 				{
+					if ($ersumme_woche != '00:00')
+						$erstr = ' (+ '.$ersumme_woche.')';
+					else
+					{
+						$erstr = '';
+					}
 					echo '
 
 
 							<tr>
 								<th  colspan="'.$colspan.'" style="background-color: #8DBDD8;"></th>
 								<th style="background-color: #8DBDD8;" align="right" colspan="2" style="font-weight: normal;"><b>'.$p->t("zeitaufzeichnung/wochensummeArbeitszeit").':</b></th>
-								<th style="background-color: #8DBDD8;" align="right" style="font-weight: normal;"><b>'.$wochensaldo.'</b></th>
+								<th style="background-color: #8DBDD8;" align="right" style="font-weight: normal;"><b>'.$wochensaldo.$erstr.'</b></th>
 								<th style="background-color: #8DBDD8;" colspan="3"></th>
 							</tr>
 
@@ -1230,6 +1244,8 @@ if($projekt->getProjekteMitarbeiter($user, true))
 					$tagessumme='00:00';
 					$pausesumme='00:00';
 					$wochensaldo = '00:00';
+					$ersumme = '00:00';
+					$ersumme_woche = '00:00';
 				}
 				if ($row->uid)
 				{
@@ -1243,12 +1259,17 @@ if($projekt->getProjekteMitarbeiter($user, true))
 						$pflichtpause = true;
 					}
 				}
+				elseif ($row->aktivitaet_kurzbz=='Ersatzruhe')
+				{
+					$ersumme = $datum_obj->sumZeit($ersumme, $row->diff);
+					$ersumme_woche = $datum_obj->sumZeit($ersumme_woche, $row->diff);
+				}
 				else
 					$tagessumme = $datum_obj->sumZeit($tagessumme, $row->diff);
 				$style = '';
 				if ($row->zeitaufzeichnung_id == $zeitaufzeichnung_id)
 					$style = 'style="border-top: 3px solid #8DBDD8; border-bottom: 3px solid #8DBDD8"';
-				if ($row->aktivitaet_kurzbz=='Pause' || $row->aktivitaet_kurzbz=='LehreExtern')
+				if ($row->aktivitaet_kurzbz=='Pause' || $row->aktivitaet_kurzbz=='LehreExtern'|| $row->aktivitaet_kurzbz=='Ersatzruhe')
 					$style .= ' style="color: grey;"';
 				$summe = $row->summe;
 				$service = new service();
@@ -1281,10 +1302,10 @@ if($projekt->getProjekteMitarbeiter($user, true))
 		        echo "</td>\n";
 		        echo "   </tr>\n";
 
-		        if (($tagesbeginn=='' || $datum->mktime_fromtimestamp($datum->formatDatum($tagesbeginn, $format='Y-m-d H:i:s')) > $datum->mktime_fromtimestamp($datum->formatDatum($row->start, $format='Y-m-d H:i:s'))) && $row->aktivitaet_kurzbz != 'LehreExtern')
+		        if (($tagesbeginn=='' || $datum->mktime_fromtimestamp($datum->formatDatum($tagesbeginn, $format='Y-m-d H:i:s')) > $datum->mktime_fromtimestamp($datum->formatDatum($row->start, $format='Y-m-d H:i:s'))) && $row->aktivitaet_kurzbz != 'LehreExtern' && $row->aktivitaet_kurzbz != 'Ersatzruhe')
 					$tagesbeginn = $row->start;
 
-				if (($tagesende=='' || $datum->mktime_fromtimestamp($datum->formatDatum($tagesende, $format='Y-m-d H:i:s')) < $datum->mktime_fromtimestamp($datum->formatDatum($row->ende, $format='Y-m-d H:i:s'))) && $row->aktivitaet_kurzbz != 'LehreExtern')
+				if (($tagesende=='' || $datum->mktime_fromtimestamp($datum->formatDatum($tagesende, $format='Y-m-d H:i:s')) < $datum->mktime_fromtimestamp($datum->formatDatum($row->ende, $format='Y-m-d H:i:s'))) && $row->aktivitaet_kurzbz != 'LehreExtern' && $row->aktivitaet_kurzbz != 'Ersatzruhe')
 					$tagesende = $row->ende;
 				if ($row->aktivitaet_kurzbz == 'LehreExtern')
 					$extlehrearr[] = array("start"=>$row->start, "ende"=>$row->ende, "diff"=>$row->diff);
