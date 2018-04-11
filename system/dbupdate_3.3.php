@@ -723,6 +723,20 @@ if(!@$db->db_query("SELECT ausstellungsdetails FROM public.tbl_dokument LIMIT 1"
 			echo '<br>Spalte ausstellungsdetails in public.tbl_dokument hinzugefügt';
 }
 
+// ADD COLUMN geschaeftsjahrvon and geschaeftsjahrbis in wawi.tbl_kostenstelle
+if(!$result = @$db->db_query("SELECT geschaeftsjahrvon FROM wawi.tbl_kostenstelle LIMIT 1;"))
+{
+	$qry = "ALTER TABLE wawi.tbl_kostenstelle ADD COLUMN geschaeftsjahrvon varchar(32);
+			ALTER TABLE wawi.tbl_kostenstelle ADD COLUMN geschaeftsjahrbis varchar(32);
+			ALTER TABLE wawi.tbl_kostenstelle ADD CONSTRAINT fk_tbl_geschaeftsjahr_geschaeftsjahrvon FOREIGN KEY (geschaeftsjahrvon) REFERENCES public.tbl_geschaeftsjahr (geschaeftsjahr_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;
+			ALTER TABLE wawi.tbl_kostenstelle ADD CONSTRAINT fk_tbl_geschaeftsjahr_geschaeftsjahrbis FOREIGN KEY (geschaeftsjahrbis) REFERENCES public.tbl_geschaeftsjahr (geschaeftsjahr_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;
+			";
+
+	if(!$db->db_query($qry))
+		echo '<strong>wawi.tbl_kostenstelle: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>wawi.tbl_kostenstelle: Spalten geschaeftsjahrvon, geschaeftsjahrbis hinzugefuegt!<br>';
+}
 
 //---------------------------------------------------------------------------------------------------------------------
 // Start extensions
@@ -2137,7 +2151,7 @@ $tabellen=array(
 	"wawi.tbl_zahlungstyp"  => array("zahlungstyp_kurzbz","bezeichnung"),
 	"wawi.tbl_konto"  => array("konto_id","kontonr","beschreibung","kurzbz","aktiv","person_id","insertamum","insertvon","updateamum","updatevon","ext_id","person_id"),
 	"wawi.tbl_konto_kostenstelle"  => array("konto_id","kostenstelle_id","insertamum","insertvon"),
-	"wawi.tbl_kostenstelle"  => array("kostenstelle_id","oe_kurzbz","bezeichnung","kurzbz","aktiv","insertamum","insertvon","updateamum","updatevon","ext_id","kostenstelle_nr","deaktiviertvon","deaktiviertamum"),
+	"wawi.tbl_kostenstelle"  => array("kostenstelle_id","oe_kurzbz","bezeichnung","kurzbz","aktiv","insertamum","insertvon","updateamum","updatevon","ext_id","kostenstelle_nr","deaktiviertvon","deaktiviertamum", "geschaeftsjahrvon", "geschaeftsjahrbis"),
 	"wawi.tbl_bestellungtag"  => array("tag","bestellung_id","insertamum","insertvon"),
 	"wawi.tbl_bestelldetailtag"  => array("tag","bestelldetail_id","insertamum","insertvon"),
 	"wawi.tbl_projekt_bestellung"  => array("projekt_kurzbz","bestellung_id","anteil"),
@@ -2174,7 +2188,7 @@ foreach ($tabellen AS $attribute)
 
 echo '<H2>Gegenpruefung!</H2>';
 $error=false;
-$sql_query="SELECT schemaname,tablename FROM pg_catalog.pg_tables WHERE schemaname != 'pg_catalog' AND schemaname != 'information_schema' AND schemaname != 'sync' AND schemaname != 'addon' AND schemaname != 'reports';";
+$sql_query="SELECT schemaname,tablename FROM pg_catalog.pg_tables WHERE schemaname != 'pg_catalog' AND schemaname != 'information_schema' AND schemaname != 'sync' AND schemaname != 'addon' AND schemaname != 'reports' AND schemaname != 'extension';";
 if (!$result=@$db->db_query($sql_query))
 		echo '<BR><strong>'.$db->db_last_error().' </strong><BR>';
 	else
