@@ -235,6 +235,10 @@ $config['fhc_acl'] = array
 	'wawi.tbl_rechnungsbetrag' => 'basis/rechnungsbetrag',
 	'wawi.tbl_rechnungstyp' => 'basis/rechnungstyp',
 	'wawi.tbl_zahlungstyp' => 'basis/zahlungstyp',
+	'extension.tbl_budgetantrag' => 'basis/kostenstelle',
+	'extension.tbl_budgetposition' => 'basis/kostenstelle',
+	'extension.tbl_budgetstatus' => 'basis/kostenstelle',
+	'extension.tbl_budgetantrag_status' => 'basis/kostenstelle',
 
 	DMS_PATH => 'fs/dms',
 
