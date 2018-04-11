@@ -42,3 +42,12 @@
 .panel-heading .accordion-toggle:focus{
     text-decoration: none !important;
 }
+
+/*required asterisk for labels for required fields*/
+.label-required:after
+{
+    content:"\00a0*";
+    position: absolute;
+    top: 2px;
+    font-size: 1.3em;
+}
