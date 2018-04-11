@@ -94,6 +94,23 @@
 			});
 
 		});
+
+		$(".remove-selected-filter").click(function(event) {
+			$.ajax({
+				url: "<?php echo base_url('index.ci.php/system/Filters/removeSelectedFilters'); ?>",
+				method: "POST",
+				data: {
+					fieldName: $(this).attr('filterToRemove')
+				}
+			})
+			.done(function(data, textStatus, jqXHR) {
+				resetSelectedFilters();
+				renderSelectedFilters();
+			}).fail(function(jqXHR, textStatus, errorThrown) {
+				alert(textStatus);
+			});
+		});
+
 	}
 
 	function renderSelectedFilterFields(metaData, activeFilters, activeFiltersOperation, activeFiltersOption)
@@ -210,7 +227,7 @@
 					);
 
 					selectedFilters += '<span>';
-					selectedFilters += '<input type="button" value="X" class="remove-filter btn btn-default" filterToRemove="' + data.selectedFilters[i] + '">';
+					selectedFilters += '<input type="button" value="X" class="remove-selected-filter btn btn-default" filterToRemove="' + data.selectedFilters[i] + '">';
 					selectedFilters += '</span>';
 
 					selectedFilters += '</div>';
