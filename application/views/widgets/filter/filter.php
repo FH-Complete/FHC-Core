@@ -83,16 +83,16 @@
 		width: 535px;
 	}
 
-	#addFilter {
-		margin-right: 12px;
-	}
-
 	#selectedFilters {
 		margin-bottom: 20px;
 	}
 
 	#applyFilter, #saveCustomFilterButton, .remove-selected-filter {
 		font-weight: bold;
+	}
+
+	#applyFilter, #saveCustomFilterButton {
+		width: 100px;
 	}
 
 	.remove-selected-filter {
