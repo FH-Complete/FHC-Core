@@ -20,6 +20,7 @@ application/models/extensions/
 application/views/extensions/
 application/widgets/extensions/
 application/logs/
+public/extensions/
 tests/codeception/_output/*
 !/tests/codeception/_output/.placeholder
 tests/codeception/codeception.yml
