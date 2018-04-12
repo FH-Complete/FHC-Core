@@ -1,145 +1,174 @@
 <?php
+
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
 class Phrases extends FHC_Controller
 {
-
+	/**
+	 *
+	 */
 	public function __construct()
     {
         parent::__construct();
-        
+
         // Loads the phrases library
         $this->load->library('PhrasesLib');
-        
+
         // Loads the widget library
 		$this->load->library('WidgetLib');
-        
+
         // Loads helper message to manage returning messages
 		$this->load->helper('message');
     }
 
+	/**
+	 *
+	 */
 	public function index()
 	{
-		$this->load->view('system/phrases.php');
+		$this->load->view('system/phrases/phrases.php');
 	}
 
+	/**
+	 *
+	 */
 	public function table()
 	{
 		$phrases = $this->phraseslib->getPhraseByApp('aufnahme');
 		if ($phrases->error)
 			show_error($phrases->retval);
-		//var_dump($vorlage);
 
-		$data = array
-		(
+		$data = array(
 			'app' => 'aufnahme',
 			'phrases' => $phrases->retval
 		);
-		$v = $this->load->view('system/phrasesList.php', $data);
+
+		$this->load->view('system/phrases/phrasesList.php', $data);
 	}
 
-	public function view($phrase_id = null)
+	/**
+	 *
+	 */
+	public function view($phrase_id)
 	{
 		if (empty($phrase_id))
-			exit;
-		$phrase_inhalt = $this->phraseslib->getPhraseInhalt($phrase_id);
+			show_error('Invalid phrase_id parameter');
+
 		$phrase = $this->phraseslib->getPhrase($phrase_id);
+
+		$phrase_inhalt = $this->phraseslib->getPhraseInhalt($phrase_id);
 		if ($phrase_inhalt->error)
 			show_error($phrase_inhalt->retval);
-		//var_dump($vorlage);
 
-		$data = array
-		(
+		$data = array(
 			'phrase_id' => $phrase_id,
 			'phrase' => $phrase->retval[0]->phrase,
 			'phrase_inhalt' => $phrase_inhalt->retval
 		);
-		$v = $this->load->view('system/phrasesinhaltList.php', $data);
+
+		$this->load->view('system/phrases/phrasesinhaltList.php', $data);
 	}
 
-	public function deltext($phrasentext_id=null, $phrase_id = null)
+	/**
+	 *
+	 */
+	public function deltext($phrasentext_id, $phrase_id)
 	{
-		if (empty($phrase_id) or empty($phrasentext_id))
-			exit;
+		if (empty($phrasentext_id) || empty($phrase_id))
+			show_error('Invalid phrasentext_id or phrase_id parameter');
+
 		$phrase_inhalt = $this->phraseslib->delPhrasentext($phrasentext_id);
 		if ($phrase_inhalt->error)
 			show_error($phrase_inhalt->retval);
-		//var_dump($vorlage);
 
 		redirect('/system/Phrases/view/'.$phrase_id);
 	}
 
+	/**
+	 *
+	 */
 	public function edit($phrase_id = null)
 	{
-		if (empty($phrase_id))
-			exit;
+		if (empty($phrase_id)) return;
+
 		$phrase = $this->phraseslib->getPhrase($phrase_id);
-		//var_dump($vorlage);
 		if ($phrase->error)
 			show_error($phrase->retval);
+
 		if (count($phrase->retval) != 1)
 			show_error('Phrase nicht vorhanden! ID: '.$phrase_id);
 
-		$data = array
-		(
+		$data = array(
 			'phrase' => $phrase->retval[0]
 		);
-		//var_dump($data['message']);
-		$v = $this->load->view('system/phrasesEdit', $data);
+
+		$this->load->view('system/phrases/phrasesEdit', $data);
 	}
 
-	public function write($vorlage_kurzbz = null)
+	/**
+	 *
+	 */
+	public function write()
 	{
-		$data = array
-		(
+		$data = array(
 			'subject' => 'TestSubject',
 			'body' => 'TestDevelopmentBodyText'
 		);
-		$v = $this->load->view('system/messageWrite', $data);
+
+		$this->load->view('system/messageWrite', $data);
 	}
 
+	/**
+	 *
+	 */
 	public function save()
 	{
 		$phrase_id = $this->input->post('phrase_id');
-		$data['phrase'] = $this->input->post('phrase');
+		$data = array('phrase' => $this->input->post('phrase'));
+
 		$phrase = $this->phraseslib->savePhrase($phrase_id, $data);
 		if ($phrase->error)
 			show_error($phrase->retval);
+
 		$phrase_id = $phrase->retval;
 
 		redirect('/system/Phrases/edit/'.$phrase_id);
 	}
 
+	/**
+	 *
+	 */
 	public function newText()
 	{
 		$phrase_id = $this->input->post('phrase_id');
-		
+
 		$this->load->model('organisation/Organisationseinheit_model', 'OrganisationseinheitModel');
+
 		$this->OrganisationseinheitModel->addLimit(1);
 		$this->OrganisationseinheitModel->addOrder('oe_kurzbz');
+
 		$resultOE = $this->OrganisationseinheitModel->loadWhere(array('aktiv' => true, 'oe_parent_kurzbz' => null));
-		
 		if ($resultOE->error)
 			show_error($resultOE->retval);
-		
+
 		if (hasData($resultOE))
 		{
 			$orgeinheit_kurzbz = $resultOE->retval[0]->oe_kurzbz;
-			
-			$data = array (
+
+			$data = array(
 				'phrase_id' => $phrase_id,
 				'sprache' => 'German',
 				'text' => '',
 				'description' => '',
 				'orgeinheit_kurzbz' => $orgeinheit_kurzbz
 			);
-			
+
 			$phrase_inhalt = $this->phraseslib->insertPhraseinhalt($data);
 			if ($phrase_inhalt->error)
 				show_error($phrase_inhalt->retval);
-			
+
 			$phrase_inhalt_id = $phrase_inhalt->retval;
-			
+
 			redirect('/system/Phrases/editText/'.$phrase_inhalt_id);
 		}
 		else
@@ -148,30 +177,40 @@ class Phrases extends FHC_Controller
 		}
 	}
 
+	/**
+	 *
+	 */
 	public function editText($phrasentext_id)
 	{
 		$phrase_inhalt = $this->phraseslib->getPhrasentextById($phrasentext_id);
 		if ($phrase_inhalt->error)
 			show_error($phrase_inhalt->retval);
+
 		$data = $phrase_inhalt->retval[0];
 
-		$this->load->view('system/phraseinhaltEdit', $data);
+		$this->load->view('system/phrases/phraseinhaltEdit', $data);
 	}
 
+	/**
+	 *
+	 */
 	public function saveText()
 	{
 		$phrase_inhalt_id = $this->input->post('phrase_inhalt_id');
-		$data['orgeinheit_kurzbz'] = $this->input->post('oe_kurzbz');
-		$data['orgform_kurzbz'] = $this->input->post('orgform_kurzbz');
-		$data['text'] = $this->input->post('text');
-		$data['description'] = $this->input->post('description');
-		$data['sprache'] = $this->input->post('sprache');
+
+		$data = array(
+			'orgeinheit_kurzbz' => $this->input->post('oe_kurzbz'),
+			'orgform_kurzbz' => $this->input->post('orgform_kurzbz'),
+			'text' => $this->input->post('text'),
+			'description' => $this->input->post('description'),
+			'sprache' => $this->input->post('sprache')
+		);
+
 		$phrase_inhalt = $this->phraseslib->updatePhraseInhalt($phrase_inhalt_id, $data);
 		if ($phrase_inhalt->error)
 			show_error($phrase_inhalt->retval);
-		$data['phrase_inhalt_id'] = $phrase_inhalt_id;
-		redirect('/system/Phrases/editText/'.$phrase_inhalt_id);
-		//$this->load->view('system/templatetextEdit', $data);
-	}
 
+
+		redirect('/system/Phrases/editText/'.$phrase_inhalt_id);
+	}
 }

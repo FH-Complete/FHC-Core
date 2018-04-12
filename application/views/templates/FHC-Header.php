@@ -70,7 +70,7 @@ function _generateJSDataStorageObject($calledFrom)
 		var FHC_JS_DATA_STORAGE_OBJECT = {
 			app_root: "'.APP_ROOT.'",
 			ci_router: "index.ci.php",
-			called_route: "'.$calledFrom.'",
+			called_route: "'.$calledFrom.'"
 		};';
 	$toPrint .= "\n";
 	$toPrint .= '</script>';
