@@ -1089,6 +1089,20 @@ if (!@$db->db_query("SELECT 0 FROM system.tbl_filters WHERE 0 = 1"))
 		echo '<br>Altered sequence system.tbl_filters_id_seq';
 }
 
+// Add missing primary Key to system.tbl_filters.filter_id
+if ($result = @$db->db_query("SELECT conname FROM pg_constraint WHERE conname = 'pk_filters_filter_id'"))
+{
+	if ($db->db_num_rows($result) == 0)
+	{
+		$qry = "ALTER TABLE system.tbl_filters ADD CONSTRAINT pk_filters_filter_id PRIMARY KEY (filter_id);";
+
+		if (!$db->db_query($qry))
+			echo '<strong>system.tbl_filters '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>system.tbl_filters: added primary key on column filter_id';
+	}
+}
+
 // UNIQUE INDEX uidx_filters_app_dataset_name_filter_kurzbz
 if ($result = $db->db_query("SELECT 0 FROM pg_class WHERE relname = 'uidx_filters_app_dataset_name_filter_kurzbz'"))
 {
@@ -1205,20 +1219,6 @@ if (!$result = @$db->db_query("SELECT taetigkeit_kurzbz FROM system.tbl_log"))
 		echo '<br>Added Column taetigkeit_kurzbz to system.tbl_log';
 }
 
-// Add missing primary Key to system.tbl_filters.filter_id
-if ($result = @$db->db_query("SELECT conname FROM pg_constraint WHERE conname = 'pk_filters_filter_id'"))
-{
-	if ($db->db_num_rows($result) == 0)
-	{
-		$qry = "ALTER TABLE system.tbl_filters ADD CONSTRAINT pk_filters_filter_id PRIMARY KEY (filter_id);";
-
-		if (!$db->db_query($qry))
-			echo '<strong>system.tbl_filters '.$db->db_last_error().'</strong><br>';
-		else
-			echo '<br>system.tbl_filters: added primary key on column filter_id';
-	}
-}
-
 // Add index to tbl_akte
 if ($result = $db->db_query("SELECT * FROM pg_class WHERE relname='idx_tbl_akte_dokument_kurzbz'"))
 {
@@ -1279,6 +1279,7 @@ if($result = $db->db_query("SELECT 1 FROM system.tbl_app WHERE app='infocenter'"
 			echo '<br>Neue App infocenter in system.tbl_app hinzugefügt';
 	}
 }
+
 // App 'bewerbung' hinzufügen
 if($result = $db->db_query("SELECT 1 FROM system.tbl_app WHERE app='bewerbung'"))
 {
@@ -1307,7 +1308,6 @@ if($result = @$db->db_query("SELECT is_nullable FROM INFORMATION_SCHEMA.COLUMNS 
 			echo '<br>Removed NOT NULL constraint on "vorlaufszeit" from public.tbl_ampel<br>';
 	}
 }
-
 
 // Remove NOT NULL constraint on verfallszeit on public.tbl_ampel
 if($result = @$db->db_query("SELECT is_nullable FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = 'public' AND TABLE_NAME = 'tbl_ampel' AND COLUMN_NAME = 'verfallszeit' AND is_nullable = 'NO'"))
@@ -1880,6 +1880,42 @@ if(!@$db->db_query("SELECT cis_suche FROM campus.tbl_dms_version LIMIT 1"))
 					<br><b>Alle DMS-Einträge mit befülltem Beschreibungstext wurden auf cis_suche=true gesetzt</b>
 					<br><b>Bei allen DMS-Einträge mit befülltem Beschreibungstext, wurde dieser in die Spalte schlagworte übernommen</b>';
 }
+
+//---------------------------------------------------------------------------------------------------------------------
+// Start changes to Phrases
+
+// ADD COLUMN category to system.tbl_phrase
+if (!$result = @$db->db_query("SELECT category FROM system.tbl_phrase LIMIT 1"))
+{
+	$qry = 'ALTER TABLE system.tbl_phrase ADD COLUMN category character varying(64);';
+	if (!$db->db_query($qry))
+		echo '<strong>system.tbl_phrase: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Added column category to table system.tbl_phrase';
+}
+
+// UNIQUE INDEX uidx_filters_app_dataset_name_filter_kurzbz
+if ($result = $db->db_query("SELECT 0 FROM pg_class WHERE relname = 'uidx_phrase_category_phrase'"))
+{
+	if ($db->db_num_rows($result) == 0)
+	{
+		$qry = 'CREATE UNIQUE INDEX uidx_phrase_category_phrase ON system.tbl_phrase USING btree (category, phrase);';
+		if (!$db->db_query($qry))
+			echo '<strong>uidx_phrase_category_phrase '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>Created unique uidx_phrase_category_phrase';
+	}
+}
+
+// COMMENT ON TABLE system.tbl_phrase
+	$qry = 'COMMENT ON COLUMN system.tbl_phrase.category IS \'To divide the phrases into categories\';';
+	if (!$db->db_query($qry))
+		echo '<strong>Adding comment to system.tbl_phrase.category: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Added comment to system.tbl_phrase.category';
+
+// End changes to Phrases
+// ---------------------------------------------------------------------------------------------------------------------
 
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
