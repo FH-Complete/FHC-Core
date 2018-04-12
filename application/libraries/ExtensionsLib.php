@@ -723,6 +723,7 @@ class ExtensionsLib
 				);
 				if (!$_addSoftLinks)
 				{
+					log_message('error','Failed to create Symlink to '.$extensionPath.$targetDirectory);
 					break;
 				}
 			}
