@@ -286,6 +286,6 @@
 	</span>
 
 	<span>
-		<input id="applyFilter" type="button" value="Apply">
+		<input id="applyFilter" type="button" value="Apply filter">
 	</span>
 </div>
