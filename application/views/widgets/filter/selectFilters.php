@@ -120,7 +120,7 @@
 		if (metaData.type.toLowerCase().indexOf("int") >= 0)
 		{
 			html = '<span>';
-			html += '	<select class="select-filter-operation form-control">';
+			html += '	<select class="form-control select-filter-operation">';
 			html += '		<option value="equal" ' + (activeFiltersOperation == "equal" ? "selected" : "") + '>equal</option>';
 			html += '		<option value="nequal" ' + (activeFiltersOperation == "nqual" ? "selected" : "") + '>not equal</option>';
 			html += '		<option value="gt" ' + (activeFiltersOperation == "gt" ? "selected" : "") + '>greater than</option>';
@@ -128,37 +128,37 @@
 			html += '	</select>';
 			html += '</span>';
 			html += '<span>';
-			html += '	<input type="number" value="' + activeFilters + '" class="select-filter-operation-value form-control">';
+			html += '	<input type="number" value="' + activeFilters + '" class="form-control select-filter-operation-value">';
 			html += '</span>';
 		}
-		if (metaData.type.toLowerCase().indexOf('varchar') >= 0)
+		if (metaData.type.toLowerCase().indexOf('varchar') >= 0 || metaData.type.toLowerCase() == 'text')
 		{
 			html = '<span>';
-			html += '	<select class="select-filter-operation form-control">';
+			html += '	<select class="form-control select-filter-operation">';
 			html += '		<option value="contains" ' + (activeFiltersOperation == "contains" ? "selected" : "") + '>contains</option>';
 			html += '		<option value="ncontains" ' + (activeFiltersOperation == "ncontains" ? "selected" : "") + '>does not contain</option>';
 			html += '	</select>';
 			html += '</span>';
 			html += '<span>';
-			html += '	<input type="text" value="' + activeFilters + '" class="select-filter-operation-value form-control">';
+			html += '	<input type="text" value="' + activeFilters + '" class="form-control select-filter-operation-value">';
 			html += '</span>';
 		}
 		if (metaData.type.toLowerCase().indexOf('bool') >= 0)
 		{
 			html = '<span>';
-			html += '	<select class="select-filter-operation form-control">';
+			html += '	<select class="form-control select-filter-operation">';
 			html += '		<option value="true" ' + (activeFiltersOperation == "true" ? "selected" : "") + '>is true</option>';
 			html += '		<option value="false" ' + (activeFiltersOperation == "false" ? "selected" : "") + '>is false</option>';
 			html += '	</select>';
 			html += '</span>';
 			html += '<span>';
-			html += '	<input type="hidden" value="' + activeFilters + '" class="select-filter-operation-value form-control">';
+			html += '	<input type="hidden" value="' + activeFilters + '" class="form-control select-filter-operation-value">';
 			html += '</span>';
 		}
 		if (metaData.type.toLowerCase().indexOf('timestamp') >= 0 || metaData.type.toLowerCase().indexOf('date') >= 0)
 		{
-			var classOperation = 'select-filter-operation-value form-control';
-			var classOption = 'select-filter-option form-control';
+			var classOperation = 'form-control select-filter-operation-value';
+			var classOption = 'form-control select-filter-option';
 			var disabled = "";
 
 			if (activeFiltersOperation == "set" || activeFiltersOperation == "nset")
@@ -169,7 +169,7 @@
 			}
 
 			html = '<span>';
-			html += '	<select class="select-filter-operation form-control">';
+			html += '	<select class="form-control select-filter-operation">';
 			html += '		<option value="lt" ' + (activeFiltersOperation == "lt" ? "selected" : "") + '>less than</option>';
 			html += '		<option value="gt" ' + (activeFiltersOperation == "gt" ? "selected" : "") + '>greater than</option>';
 			html += '		<option value="set" ' + (activeFiltersOperation == "set" ? "selected" : "") + '>is set</option>';
@@ -215,7 +215,7 @@
 				{
 					var selectedFilters = '<div>';
 
-					selectedFilters += '<span>';
+					selectedFilters += '<span class="filter-options-span">';
 					selectedFilters += data.selectedFiltersAliases[i];
 					selectedFilters += '</span>';
 
@@ -272,10 +272,12 @@
 
 </script>
 
+<br>
+
 <div id="selectedFilters"></div>
 
 <div>
-	<span>
+	<span class="filter-options-span">
 		Add filter:
 	</span>
 

@@ -232,7 +232,7 @@
 	<div id="filterSelectFieldsDnd" class="filter-select-fields-dnd-div"></div>
 
 	<div>
-		<span>
+		<span class="filter-options-span">
 			Add field:
 		</span>
 

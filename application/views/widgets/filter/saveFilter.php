@@ -30,12 +30,19 @@
 
 </script>
 
+<br>
+
 <div>
+	<span class="filter-options-span">
+		Filter description:
+	</span>
 	<span>
-		Filter description: <input type="text" id="customFilterDescription" value="">
+		<input type="text" id="customFilterDescription" value="">
 	</span>
 
 	<span>
 		<input type="button" id="saveCustomFilterButton" value="Save filter">
 	</span>
 </div>
+
+<br>
