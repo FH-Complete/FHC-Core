@@ -1,5 +1,11 @@
 <style>
 
+	.filter-options-span {
+		display: inline-block;
+		width: 130px;
+		font-weight: bold;
+	}
+
 	.filter-name-title {
 		font-family: inherit;
 		font-size: 16px;
@@ -69,26 +75,37 @@
 
 	.select-filter-option {
 		display: inline;
-		width: 90px;
+		width: 100px;
 	}
 
-	#addField {
+	#addField, #customFilterDescription, #addFilter {
 		display: inline;
-		width: 400px;
+		width: 535px;
 	}
 
 	#addFilter {
-		display: inline;
-		width: 400px;
+		margin-right: 12px;
 	}
 
 	#selectedFilters {
 		margin-bottom: 20px;
 	}
 
-	#customFilterDescription {
-		display: inline;
-		width: 400px;
+	#applyFilter, #saveCustomFilterButton, .remove-selected-filter {
+		font-weight: bold;
+	}
+
+	.remove-selected-filter {
+		padding-bottom: 3px;
+	}
+
+	.panel-title {
+		font-weight: bold;
+		padding-top: 3px;
+	}
+
+	.remove-field {
+		font-weight: bold;
 	}
 
 </style>

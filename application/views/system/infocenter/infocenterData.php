@@ -140,8 +140,6 @@
 				)
 			ORDER BY "LastAction" ASC
 		',
-		'hideHeader' => false,
-		'hideSave' => false,
 		'checkboxes' => 'PersonId',
 		'additionalColumns' => array('Details'),
 		'columnsAliases' => array('PersonID','Vorname','Nachname','GebDatum','Nation','Letzte Aktion','Letzter Bearbeiter',
