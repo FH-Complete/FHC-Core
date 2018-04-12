@@ -1,18 +1,8 @@
 <?php
 
 $config['navigation_header'] = array(
-	'Vilesci/index' => array(
-		'FH-Complete' => base_url('index.ci.php/'),
-		'Vilesci' => base_url('/vilesci'),
-		'CIS' => CIS_ROOT
-	),
-	'system/infocenter/InfoCenter/index' => array(
-		'FH-Complete' => base_url('index.ci.php/'),
-		'Vilesci' => base_url('/vilesci'),
-		'CIS' => CIS_ROOT
-	),
-	'system/infocenter/InfoCenter/showDetails' => array(
-		'FH-Complete' => base_url('index.ci.php/'),
+	'*' => array(
+		'FH-Complete' => site_url(''),
 		'Vilesci' => base_url('/vilesci'),
 		'CIS' => CIS_ROOT
 	)
@@ -39,7 +29,7 @@ $config['navigation_menu']['Vilesci/index'] = array(
 				'expand' => true
 			),
 			'Infocenter' => array(
-				'link' => base_url('index.ci.php/system/infocenter/InfoCenter'),
+				'link' => site_url('/system/infocenter/InfoCenter'),
 				'icon' => 'info',
 				'description' => 'Infocenter',
 				'expand' => true
@@ -59,15 +49,9 @@ $config['navigation_menu']['Vilesci/index'] = array(
 				'expand' => true
 			),
 			'Extensions' => array(
-				'link' => base_url('index.ci.php/system/extensions/Manager'),
+				'link' => site_url('/system/extensions/Manager'),
 				'icon' => 'cubes',
 				'description' => 'Extensions Manager',
-				'expand' => true
-			),
-			'Datenschutz' => array(
-				'link' => base_url('index.ci.php/extensions/FHC-Core-DSMS/export'),
-				'description' => 'Datenschutz',
-				'icon' => 'legal',
 				'expand' => true
 			)
 		)

@@ -20,22 +20,31 @@
  *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
  *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
-
-
 /**
  * Changes:	23.10.2004: Anpassung an neues DB-Schema (WM)
  */
 require_once('../../config/vilesci.config.inc.php');
+require_once('../../include/functions.inc.php');
+require_once('../../include/benutzerberechtigung.class.php');
 require_once('../../include/basis_db.class.php');
+
+$uid = get_uid();
+
 if (!$db = new basis_db())
 	die('Es konnte keine Verbindung zum Server aufgebaut werden.');
+
+$rechte = new benutzerberechtigung();
+$rechte->getBerechtigungen($uid);
+
+if(!$rechte->isBerechtigt('mitarbeiter',null,'suid'))
+	die($rechte->errormsg);
 
 $sql_query="SELECT beschreibung,funktion_kurzbz FROM public.tbl_funktion ORDER BY funktion_kurzbz";
 $result_funktion=$db->db_query($sql_query);
 if(!$result_funktion)
 	die("funktion not found!" .$db->db_last_error());
 ?>
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<!DOCTYPE HTML>
 <html>
 <head>
 	<title>Funktion</title>
@@ -71,7 +80,7 @@ if ($result_funktion!=0)
 	echo '<thead>
 			<tr>';
 	for ($i=0;$i<$num_fields; $i++)
-	    echo "<th class='table-sortable:default'>".$db->db_field_name($result_funktion,$i)."</th>";
+		echo "<th class='table-sortable:default'>".$db->db_field_name($result_funktion,$i)."</th>";
 	echo '<th></th>';
 	echo '<th></th>';
 	echo '</tr></thead><tbody>';

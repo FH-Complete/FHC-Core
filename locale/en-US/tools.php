@@ -59,6 +59,8 @@ $this->phrasen['tools/ampelBitteBestaetigen']='Please confirm now!';
 $this->phrasen['tools/ampelAbgelaufenTitel']='Notifications expired or confirmed';
 $this->phrasen['tools/ampelAbgelaufenTxt']='Notifications can still be read, but not confirmed anymore.';
 $this->phrasen['tools/ampelBestaetigtAbgelaufen']='Almost confirmed or expired';
+$this->phrasen['tools/ampelKeineAktuellen']='No current notifications.';
+$this->phrasen['tools/ampelKeineAktuellenTxt']='You currently do not have any notifications.';
 
 //Software fuer Lehre -> Softgrid
 $this->phrasen['tools/applikationsliste']='List of Applications';
@@ -82,6 +84,7 @@ $this->phrasen['tools/telefonklappe']='Extension';
 $this->phrasen['tools/reservieren']='Reserve room';
 $this->phrasen['tools/maxPersonen']='Max. # of people';
 $this->phrasen['tools/esWurdenKeineErgebnisseGefunden']='Your search did not return any results.';
+$this->phrasen['tools/suchbegriffe']='Keywords';
 
 //Partnerhochschulen
 $this->phrasen['tools/partnerhochschulenUebersicht']='Partner Universities';

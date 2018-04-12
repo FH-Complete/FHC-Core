@@ -23,18 +23,18 @@
 	require_once('../../include/functions.inc.php');
 	require_once('../../include/benutzerberechtigung.class.php');
 	require_once('../../include/filter.class.php');
-	
+
 	if (!$db = new basis_db())
 		die('Es konnte keine Verbindung zum Server aufgebaut werden.');
-	
+
 	$user = get_uid();
 	$rechte = new benutzerberechtigung();
 	$rechte->getBerechtigungen($user);
-	
-	if(!$rechte->isBerechtigt('basis/statistik'))
+
+	if(!$rechte->isBerechtigt('basis/statistik', null, 'suid'))
 		die('Sie haben keine Berechtigung fuer diese Seite!');
-	
-	
+
+
 	$reloadstr = '';  // neuladen der liste im oberen frame
 	$htmlstr = '';
 	$errorstr = ''; //fehler beim insert

@@ -703,8 +703,7 @@ echo '
 										"False" : function(e, n, f, i, $r, c, data) { return /f/.test(e); }
 										}
 									}
-		
-}
+								}
 				}); 
 		
 				$(\'.resetsaved\').click(function()

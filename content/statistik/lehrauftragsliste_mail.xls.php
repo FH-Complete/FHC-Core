@@ -475,7 +475,7 @@ if($result_stg = $db->db_query($qry_stg))
 	$worksheet->setInputEncoding('utf-8');
 	$qry = "SELECT 
 				studiensemester_kurzbz, nachname, vorname, sum(stunden) AS stunden, titelpre,
-				sum(tbl_projektbetreuer.stundensatz*stunden*tbl_projektbetreuer.faktor)::numeric(6,2) AS euro, person_id 
+				sum(tbl_projektbetreuer.stundensatz*stunden*tbl_projektbetreuer.faktor)::numeric(8,2) AS euro, person_id 
 			FROM 
 				public.tbl_person JOIN lehre.tbl_projektbetreuer USING (person_id) 
 				JOIN lehre.tbl_projektarbeit USING (projektarbeit_id) 
@@ -496,7 +496,7 @@ if($result_stg = $db->db_query($qry_stg))
 			";
 	$i=0;
 	$gesamtkosten=0;
-	
+
 	$worksheet->write(0,0,'Erstellt am '.date('d.m.Y').' '.$semester_aktuell.' Betreuerstunden', $format_bold);
 	//Ueberschriften
 	//$worksheet->write(2,$i,"Studiengang", $format_bold);

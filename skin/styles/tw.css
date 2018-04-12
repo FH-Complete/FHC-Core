@@ -862,6 +862,10 @@ option.inactive
 {
 	font-weight: bold;
 }
+.suchergebnis
+{
+	padding-bottom: 15px;
+}
 .suchicon
 {
 	margin:0px;

@@ -1938,7 +1938,7 @@ else if ($method == "profil")
 				<td><input type="text" size="40" name="emergency_nachname" value="'.$personEmergency->nachname.'"></td>
 			</tr>
 			<tr>
-				<td>'.$p->t('global/strasse').'</td>
+				<td>'.$p->t('global/adresse').'</td>
 				<td><input type="text" size="40" maxlength="256" name="strasse" value="'.$adresse->result[0]->strasse.'"></td>
 				<td>'.$p->t('global/telefon').'</td>
 				<td><input type="text" size="40" name="emergency_telefon" value="'.$emTelefon.'">

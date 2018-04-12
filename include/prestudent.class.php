@@ -1105,6 +1105,7 @@ class prestudent extends person
 				$this->studienplan_bezeichnung = $row->studienplan_bezeichnung;
 				$this->rt_stufe = $row->rt_stufe;
 				$this->statusgrund_id = $row->statusgrund_id;
+				$this->anmerkung = $row->anmerkung;
 				return true;
 			}
 			else
