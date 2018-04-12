@@ -559,11 +559,6 @@ class InfoCenter extends VileSci_Controller
 		{
 			$toPrint = "%s=%s";
 
-			if ($this->router->method != 'index')
-			{
-
-			}
-
 			$tofill['children'][] = array(
 				'link' => sprintf($toPrint, base_url('index.ci.php/system/infocenter/InfoCenter?filter_id'), $filterId),
 				'description' => $description,
