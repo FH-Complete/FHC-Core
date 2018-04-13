@@ -102,7 +102,7 @@
 	function renderSideMenu()
 	{
 		$.ajax({
-			url: "<?php echo base_url('index.ci.php/system/Navigation/menu'); ?>",
+			url: "<?php echo site_url('system/Navigation/menu'); ?>",
 			method: "GET",
 			data: {
 				navigation_widget_called: "<?php echo $this->router->directory.$this->router->class.'/'.$this->router->method; ?>"
@@ -120,7 +120,7 @@
 					strMenu += printNavItem(e);
 				});
 
-				$("#side-menu").append(strMenu);
+				$("#side-menu").html(strMenu);
 				$("#side-menu").metisMenu();
 			}
 
@@ -138,17 +138,20 @@
 	function printCollapseIcon()
 	{
 		// Hiding/showing navigation menu - works only with sb admin 2 template!!
+		if(!$("#collapseicon").length)
+			$("#side-menu").parent().append('<div id="collapseicon" title="hide Menu" class="text-right" style="cursor: pointer; color: #337ab7"><i class="fa fa-angle-double-left fa-fw"></i></div>');
 
-		$("#side-menu").html('<li id="collapseicon" class="text-right" style="cursor: pointer; color: #337ab7"><i class="fa fa-angle-double-left fa-fw"></i></li>');
 		$("#collapseicon").click(function() {
 			$("#page-wrapper").css('margin-left', '0px');
 			$("#side-menu").hide();
+			$("#collapseicon").hide();
 			$("#collapseinicon").show();
 		});
 
 		$("#collapseinicon").click(function() {
 			$("#page-wrapper").css('margin-left', '250px');
 			$("#side-menu").show();
+			$("#collapseicon").show();
 			$("#collapseinicon").hide();
 		});
 	}
@@ -165,5 +168,5 @@
 	<div class="sidebar-nav navbar-collapse">
 		<ul class="nav" id="side-menu"></ul>
 	</div>
-	<i id="collapseinicon" class="fa fa-angle-double-right fa-fw"></i>
+	<i id="collapseinicon" title="show Menu" class="fa fa-angle-double-right fa-fw"></i>
 </div>
