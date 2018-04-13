@@ -1917,6 +1917,20 @@ if ($result = $db->db_query("SELECT 0 FROM pg_class WHERE relname = 'uidx_phrase
 // End changes to Phrases
 // ---------------------------------------------------------------------------------------------------------------------
 
+// Remove NOT NULL constraint on matrikelnr on public.tbl_student
+if($result = @$db->db_query("SELECT is_nullable FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = 'public' AND TABLE_NAME = 'tbl_student' AND COLUMN_NAME = 'matrikelnr' AND is_nullable = 'NO'"))
+{
+	if($db->db_num_rows($result) > 0)
+	{
+		$qry = "ALTER TABLE public.tbl_student ALTER COLUMN matrikelnr DROP NOT NULL;";
+
+		if(!$db->db_query($qry))
+			echo '<strong>public.tbl_student '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>Removed NOT NULL constraint on "matrikelnr" from public.tbl_student<br>';
+	}
+}
+
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
 
