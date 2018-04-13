@@ -1892,6 +1892,13 @@ if (!$result = @$db->db_query("SELECT category FROM system.tbl_phrase LIMIT 1"))
 		echo '<strong>system.tbl_phrase: '.$db->db_last_error().'</strong><br>';
 	else
 		echo '<br>Added column category to table system.tbl_phrase';
+
+	// COMMENT ON TABLE system.tbl_phrase
+	$qry = 'COMMENT ON COLUMN system.tbl_phrase.category IS \'To divide the phrases into categories\';';
+	if (!$db->db_query($qry))
+		echo '<strong>Adding comment to system.tbl_phrase.category: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Added comment to system.tbl_phrase.category';
 }
 
 // UNIQUE INDEX uidx_filters_app_dataset_name_filter_kurzbz
@@ -1907,13 +1914,6 @@ if ($result = $db->db_query("SELECT 0 FROM pg_class WHERE relname = 'uidx_phrase
 	}
 }
 
-// COMMENT ON TABLE system.tbl_phrase
-	$qry = 'COMMENT ON COLUMN system.tbl_phrase.category IS \'To divide the phrases into categories\';';
-	if (!$db->db_query($qry))
-		echo '<strong>Adding comment to system.tbl_phrase.category: '.$db->db_last_error().'</strong><br>';
-	else
-		echo '<br>Added comment to system.tbl_phrase.category';
-
 // End changes to Phrases
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -1928,6 +1928,131 @@ if($result = @$db->db_query("SELECT is_nullable FROM INFORMATION_SCHEMA.COLUMNS 
 			echo '<strong>public.tbl_student '.$db->db_last_error().'</strong><br>';
 		else
 			echo '<br>Removed NOT NULL constraint on "matrikelnr" from public.tbl_student<br>';
+	}
+}
+
+// public.vw_prestudentstatus Datum zur Reihungstestanmeldung aus tbl_rt_person
+if($result = $db->db_query("SELECT view_definition FROM information_schema.views WHERE table_schema='public' AND table_name='vw_prestudentstatus'"))
+{
+	if($row = $db->db_fetch_object($result))
+	{
+		if(!mb_stristr($row->view_definition, 'tbl_rt_person'))
+		{
+			$qry = "
+			CREATE OR REPLACE VIEW public.vw_prestudentstatus AS
+			SELECT tbl_prestudent.prestudent_id,
+				tbl_person.person_id,
+				tbl_person.staatsbuergerschaft,
+				tbl_person.geburtsnation,
+				tbl_person.sprache,
+				tbl_person.anrede,
+				tbl_person.titelpost,
+				tbl_person.titelpre,
+				tbl_person.nachname,
+				tbl_person.vorname,
+				tbl_person.vornamen,
+				tbl_person.gebdatum,
+				tbl_person.gebort,
+				tbl_person.gebzeit,
+				tbl_person.foto,
+				tbl_person.homepage,
+				tbl_person.svnr,
+				tbl_person.ersatzkennzeichen,
+				tbl_person.familienstand,
+				tbl_person.geschlecht,
+				tbl_person.anzahlkinder,
+				tbl_person.aktiv,
+				tbl_person.bundesland_code,
+				tbl_person.kompetenzen,
+				tbl_person.kurzbeschreibung,
+				tbl_person.zugangscode,
+				tbl_person.foto_sperre,
+				tbl_person.matr_nr,
+				tbl_prestudent.aufmerksamdurch_kurzbz,
+				tbl_prestudent.studiengang_kz,
+				tbl_prestudent.berufstaetigkeit_code,
+				tbl_prestudent.ausbildungcode,
+				tbl_prestudent.zgv_code,
+				tbl_prestudent.zgvort,
+				tbl_prestudent.zgvdatum,
+				tbl_prestudent.zgvmas_code,
+				tbl_prestudent.zgvmaort,
+				tbl_prestudent.zgvmadatum,
+				tbl_prestudent.aufnahmeschluessel,
+				tbl_prestudent.facheinschlberuf,
+				tbl_prestudent.reihungstest_id,
+				(SELECT
+							COALESCE(anmeldedatum, tbl_rt_person.insertamum::date)
+						FROM
+							public.tbl_rt_person
+							JOIN public.tbl_reihungstest ON(rt_id=reihungstest_id)
+							JOIN lehre.tbl_studienplan USING(studienplan_id)
+							JOIN lehre.tbl_studienordnung USING(studienordnung_id)
+						WHERE
+							person_id=tbl_prestudent.person_id
+							AND tbl_reihungstest.studiensemester_kurzbz=prestudentstatus.studiensemester_kurzbz
+							AND tbl_studienordnung.studiengang_kz=tbl_prestudent.studiengang_kz
+						ORDER BY anmeldedatum DESC, tbl_rt_person.insertamum DESC limit 1
+					) as anmeldungreihungstest,
+				tbl_prestudent.reihungstestangetreten,
+				tbl_prestudent.rt_gesamtpunkte,
+				tbl_prestudent.bismelden,
+				tbl_prestudent.anmerkung,
+				tbl_prestudent.dual,
+				tbl_prestudent.rt_punkte1,
+				tbl_prestudent.rt_punkte2,
+				tbl_prestudent.ausstellungsstaat,
+				tbl_prestudent.rt_punkte3,
+				tbl_prestudent.zgvdoktor_code,
+				tbl_prestudent.zgvdoktorort,
+				tbl_prestudent.zgvdoktordatum,
+				tbl_prestudent.mentor,
+				prestudentstatus.status_kurzbz,
+				prestudentstatus.studiensemester_kurzbz,
+				prestudentstatus.ausbildungssemester,
+				prestudentstatus.datum,
+				prestudentstatus.insertamum,
+				prestudentstatus.insertvon,
+				prestudentstatus.updateamum,
+				prestudentstatus.updatevon,
+				COALESCE(prestudentstatus.orgform_kurzbz, tbl_studiengang.orgform_kurzbz) AS orgform_kurzbz,
+				prestudentstatus.studienplan_id,
+				prestudentstatus.bestaetigtam,
+				prestudentstatus.bestaetigtvon,
+				prestudentstatus.fgm,
+				prestudentstatus.faktiv,
+				tbl_studiengang.kurzbz,
+				tbl_studiengang.kurzbzlang,
+				tbl_studiengang.typ,
+				tbl_studiensemester.start,
+				tbl_studiensemester.ende,
+				tbl_studiensemester.studienjahr_kurzbz,
+				substr(tbl_studiensemester.studiensemester_kurzbz::text, 3) || lower(substr(tbl_studiensemester.studiensemester_kurzbz::text, 1, 1)) AS studiensemester,
+				    CASE
+				        WHEN tbl_studiengang.typ = 'b'::bpchar AND tbl_prestudent.zgv_code IS NOT NULL OR tbl_studiengang.typ = 'm'::bpchar AND tbl_prestudent.zgvmas_code IS NOT NULL OR tbl_studiengang.typ = 'd'::bpchar AND tbl_prestudent.zgvdoktor_code IS NOT NULL THEN true
+				        ELSE false
+				    END AS zgv,
+				    CASE
+				        WHEN tbl_prestudentstatus.prestudent_id IS NULL THEN false
+				        ELSE true
+				    END AS student,
+				date_part('week'::text, prestudentstatus.datum) AS kw
+				FROM public.tbl_person
+				 JOIN public.tbl_prestudent USING (person_id)
+				 JOIN public.tbl_prestudentstatus prestudentstatus USING (prestudent_id)
+				 JOIN public.tbl_studiengang USING (studiengang_kz)
+				 JOIN public.tbl_studiensemester USING (studiensemester_kurzbz)
+				 LEFT JOIN public.tbl_prestudentstatus ON tbl_prestudentstatus.prestudent_id = prestudentstatus.prestudent_id AND tbl_prestudentstatus.studiensemester_kurzbz::text = prestudentstatus.studiensemester_kurzbz::text AND tbl_prestudentstatus.status_kurzbz::text = 'Student'::text;
+
+			GRANT SELECT ON public.vw_prestudentstatus TO vilesci;
+			GRANT SELECT ON public.vw_prestudentstatus TO web;
+			";
+
+			if(!$db->db_query($qry))
+				echo '<strong>public.vw_prestudentstatus:'.$db->db_last_error().'</strong><br>';
+			else
+				echo '<br>public.vw_prestudentstatus angepasst damit anmeldungzumreihungstest aus tbl_rt_person kommt';
+		}
 	}
 }
 
@@ -2182,7 +2307,7 @@ $tabellen=array(
 	"system.tbl_log" => array("log_id","person_id","zeitpunkt","app","oe_kurzbz","logtype_kurzbz","logdata","insertvon","taetigkeit_kurzbz"),
 	"system.tbl_logtype" => array("logtype_kurzbz", "data_schema"),
 	"system.tbl_filters" => array("filter_id","app","dataset_name","filter_kurzbz","person_id","description","sort","default_filter","filter","oe_kurzbz"),
-	"system.tbl_phrase" => array("phrase_id","app","phrase","insertamum","insertvon"),
+	"system.tbl_phrase" => array("phrase_id","app","phrase","insertamum","insertvon","category"),
 	"system.tbl_phrasentext" => array("phrasentext_id","phrase_id","sprache","orgeinheit_kurzbz","orgform_kurzbz","text","description","insertamum","insertvon"),
 	"system.tbl_rolle"  => array("rolle_kurzbz","beschreibung"),
 	"system.tbl_rolleberechtigung"  => array("berechtigung_kurzbz","rolle_kurzbz","art"),
