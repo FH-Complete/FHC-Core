@@ -547,7 +547,7 @@ class InfoCenter extends VileSci_Controller
 		{
 			$toPrint = "%s=%s";
 			$tofill['children'][] = array(
-				'link' => sprintf($toPrint, base_url('index.ci.php/system/infocenter/InfoCenter?filter_id'), $filterId),
+				'link' => sprintf($toPrint, site_url('system/infocenter/InfoCenter?filter_id'), $filterId),
 				'description' => $description
 			);
 		}
@@ -560,7 +560,7 @@ class InfoCenter extends VileSci_Controller
 			$toPrint = "%s=%s";
 
 			$tofill['children'][] = array(
-				'link' => sprintf($toPrint, base_url('index.ci.php/system/infocenter/InfoCenter?filter_id'), $filterId),
+				'link' => sprintf($toPrint, site_url('system/infocenter/InfoCenter?filter_id'), $filterId),
 				'description' => $description,
 				'subscriptDescription' => 'Remove',
 				'subscriptLinkClass' => 'remove-filter',
