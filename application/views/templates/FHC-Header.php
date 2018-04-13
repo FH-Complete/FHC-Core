@@ -4,7 +4,8 @@ if (! defined('BASEPATH')) exit('No direct script access allowed');
 
 // Retrives the URL path of the called controller + controller method
 // NOTE: placed here because it doesn't work inside functions
-$calledFrom = $this->router->directory.$this->router->class.'/'.$this->router->method;
+$calledPath = $this->router->directory.$this->router->class;
+$calledMethod = $this->router->method;
 
 // By default set the parameters to null
 $title = isset($title) ? $title : null;
@@ -62,7 +63,7 @@ function _generateCSSsInclude($CSSs)
 /**
  * Generates global JS-Object to pass parms to other javascripts
  */
-function _generateJSDataStorageObject($calledFrom)
+function _generateJSDataStorageObject($calledPath, $calledMethod)
 {
 	$toPrint = "\n";
 	$toPrint .= '<script type="text/javascript">';
@@ -70,7 +71,8 @@ function _generateJSDataStorageObject($calledFrom)
 		var FHC_JS_DATA_STORAGE_OBJECT = {
 			app_root: "'.APP_ROOT.'",
 			ci_router: "index.ci.php",
-			called_route: "'.$calledFrom.'"
+			called_path: "'.$calledPath.'",
+			called_method: "'.$calledMethod.'"
 		};';
 	$toPrint .= "\n";
 	$toPrint .= '</script>';
@@ -167,7 +169,7 @@ function _generateAddonsJSsInclude($calledFrom)
 
 			// Generates the global object to pass useful parms to the other javascripts
 			// NOTE: must be called before any other JS include
-			_generateJSDataStorageObject($calledFrom);
+			_generateJSDataStorageObject($calledPath, $calledMethod);
 
 			// JQuery V3
 			if ($jquery === true) _generateJSsInclude('vendor/components/jquery/jquery.min.js');
@@ -202,7 +204,7 @@ function _generateAddonsJSsInclude($calledFrom)
 			}
 
 			// Load addon hooks JS
-			if ($addons === true) _generateAddonsJSsInclude($calledFrom);
+			if ($addons === true) _generateAddonsJSsInclude($calledPath.'/'.$calledMethod);
 
 			// Eventually required JS
 			_generateJSsInclude($customJSs);
