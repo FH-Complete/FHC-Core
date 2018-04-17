@@ -88,7 +88,12 @@ class InfoCenter extends VileSci_Controller
 	{
 		$this->load->view('system/infocenter/infocenter.php');
 	}
-
+	
+	public function infocenterFreigegeben()
+	{
+		$this->load->view('system/infocenter/infocenterFreigegeben.php');
+	}
+	
 	/**
 	 * Initialization function, gets person and prestudent data and loads the view with the data
 	 * @param $person_id
@@ -122,7 +127,7 @@ class InfoCenter extends VileSci_Controller
 			)
 		);
 	}
-
+	
 	/**
 	 * unlocks page from edit by a person, redirects to overview filter page
 	 * @param $person_id
@@ -352,7 +357,7 @@ class InfoCenter extends VileSci_Controller
 
 		$this->_redirectToStart($prestudent_id, 'ZgvPruef');
 	}
-
+	
 	/**
 	 * Saves a new Notiz for a person
 	 * @param $person_id
@@ -499,7 +504,7 @@ class InfoCenter extends VileSci_Controller
 				'children' => array()
 			)
 		);
-
+				
 		$this->_fillFilters($listFiltersSent, $filtersarray['abgeschickt']);
 		$this->_fillFilters($listFiltersNotSent, $filtersarray['nichtabgeschickt']);
 
