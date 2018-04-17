@@ -62,15 +62,18 @@ class Phrase_model extends DB_Model
 	}
 
 	/**
-	 *
+	 * Loads phrases using category(s) and language as keys
+	 * The retrived fields are category, phrase, orgeinheit_kurzbz, orgform_kurzbz and text
+	 * They are ordered by p.category, p.phrase, pt.orgeinheit_kurzbz DESC and pt.orgform_kurzbz DESC'
 	 */
 	public function getPhrasesByCategoryAndLanguage($categories, $language)
 	{
-		$query = 'SELECT p.category, p.phrase, pt.text
+		$query = 'SELECT p.category, p.phrase, pt.orgeinheit_kurzbz, pt.orgform_kurzbz, pt.text
 					FROM system.tbl_phrase p
 			  INNER JOIN system.tbl_phrasentext pt USING(phrase_id)
 				   WHERE p.category IN ?
-				   	 AND pt.sprache = ?';
+				   	 AND pt.sprache = ?
+				ORDER BY p.category, p.phrase, pt.orgeinheit_kurzbz DESC, pt.orgform_kurzbz DESC';
 
 		return $this->execQuery($query, array($categories, $language));
 	}
