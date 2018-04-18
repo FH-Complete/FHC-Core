@@ -1901,7 +1901,7 @@ if (!$result = @$db->db_query("SELECT category FROM system.tbl_phrase LIMIT 1"))
 		echo '<br>Added comment to system.tbl_phrase.category';
 }
 
-// UNIQUE INDEX uidx_filters_app_dataset_name_filter_kurzbz
+// UNIQUE INDEX uidx_phrase_category_phrase
 if ($result = $db->db_query("SELECT 0 FROM pg_class WHERE relname = 'uidx_phrase_category_phrase'"))
 {
 	if ($db->db_num_rows($result) == 0)
@@ -1911,6 +1911,19 @@ if ($result = $db->db_query("SELECT 0 FROM pg_class WHERE relname = 'uidx_phrase
 			echo '<strong>uidx_phrase_category_phrase '.$db->db_last_error().'</strong><br>';
 		else
 			echo '<br>Created unique uidx_phrase_category_phrase';
+	}
+}
+
+// UNIQUE INDEX uidx_phrasestext_phrase_id_sprache_orgeinheit_kurzbz_orgform_kurzbz
+if ($result = $db->db_query("SELECT 0 FROM pg_class WHERE relname = 'uidx_phrasestext_phrase_id_sprache_orgeinheit_kurzbz_orgform_kurzbz'"))
+{
+	if ($db->db_num_rows($result) == 0)
+	{
+		$qry = 'CREATE UNIQUE INDEX uidx_phrasestext_phrase_id_sprache_orgeinheit_kurzbz_orgform_kurzbz ON system.tbl_phrasentext USING btree (phrase_id, sprache, orgeinheit_kurzbz, orgform_kurzbz);';
+		if (!$db->db_query($qry))
+			echo '<strong>uidx_phrasestext_phrase_id_sprache_orgeinheit_kurzbz_orgform_kurzbz '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>Created unique uidx_phrasestext_phrase_id_sprache_orgeinheit_kurzbz_orgform_kurzbz';
 	}
 }
 
