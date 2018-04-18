@@ -113,6 +113,8 @@ $berechtigungen = array(
 	array('inout/incoming','Incomingverwaltung'),
 	array('inout/outgoing','Outgoingverwaltung'),
 	array('inout/uebersicht','Verbandsanzeige fuer Incoming/Outgoing im FAS'),
+	array('extension/budget_genehmigung','Genehmigen und Ablehnen von Budgetanträgen'),
+	array('extension/budget_verwaltung','Verwaltung von Budgetanträgen'),
 	array('lehre','Berechtigung fuer CIS-Seite'),
 	array('lehre/abgabetool','Projektabgabetool, Studentenansicht'),
 	array('lehre/abgabetool:download','Download von Projektarbeitsabgaben'),
