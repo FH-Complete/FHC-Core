@@ -14,6 +14,8 @@ class Kostenstelle_model extends DB_Model
 
 	/**
 	 * Gets all active Kostenstellen for a geschaeftsjahr, as determined by the geschaeftsjahrvon and bis fields
+	 * Gets Kostenstellen of current Geschaeftsjahr if Geschaeftsjahr not specified
+	 * Only the Kostenstellen for which a permission exists are returned!
 	 * @param $geschaeftsjahr
 	 * @return array|null
 	 */
@@ -23,7 +25,7 @@ class Kostenstelle_model extends DB_Model
 
 		if ($geschaeftsjahr === null)
 		{
-			$lgj = $this->GeschaeftsjahrModel->getLastGeschaeftsjahr();
+			$lgj = $this->GeschaeftsjahrModel->getCurrGeschaeftsjahr();
 
 			if ($lgj->error)
 				return error($lgj->retval);
@@ -45,18 +47,34 @@ class Kostenstelle_model extends DB_Model
 
 		$gjstart = $gj->retval[0]->start;
 
-		$query = 'SELECT kostenstelle_id, kostenstelle_nr, kurzbz, wawi.tbl_kostenstelle.bezeichnung, kgjvon.start, kgjbis.ende 
+		$query = 'SELECT kostenstelle_id, kurzbz, wawi.tbl_kostenstelle.bezeichnung, wawi.tbl_kostenstelle.aktiv
 					FROM wawi.tbl_kostenstelle 
 					LEFT JOIN public.tbl_geschaeftsjahr kgjvon on wawi.tbl_kostenstelle.geschaeftsjahrvon = kgjvon.geschaeftsjahr_kurzbz
 					LEFT JOIN public.tbl_geschaeftsjahr kgjbis on wawi.tbl_kostenstelle.geschaeftsjahrbis = kgjbis.geschaeftsjahr_kurzbz 
 					WHERE
-					(wawi.tbl_kostenstelle.geschaeftsjahrbis IS NULL AND wawi.tbl_kostenstelle.geschaeftsjahrvon IS NULL)
-					OR 
-					(DATE ? >= kgjvon.start AND (DATE ? < kgjbis.ende OR wawi.tbl_kostenstelle.geschaeftsjahrbis IS NULL))
-					OR
-					(DATE ? < kgjbis.ende AND (DATE ? >= kgjvon.start OR wawi.tbl_kostenstelle.geschaeftsjahrvon IS NULL))
+					(DATE ? >= kgjvon.start OR wawi.tbl_kostenstelle.geschaeftsjahrvon IS NULL)
+					AND
+					(DATE ? < kgjbis.ende OR wawi.tbl_kostenstelle.geschaeftsjahrbis IS NULL)
 					ORDER BY wawi.tbl_kostenstelle.bezeichnung';
 
-		return $this->execQuery($query, array($gjstart, $gjstart, $gjstart, $gjstart));
+		$kostenstellen = $this->execQuery($query, array($gjstart, $gjstart));
+
+		if ($kostenstellen->error)
+			return error($kostenstellen->retval);
+
+		$this->load->library('PermissionLib');
+
+		$kostenstellenresult = array();
+
+		//filter kostenstellen, only kostenstellen for which berechtigt
+		foreach ($kostenstellen->retval as $kostenstelle)
+		{
+			if ($this->permissionlib->isBerechtigt('extension/budget_verwaltung', 'suid', null, $kostenstelle->kostenstelle_id) === true)
+			{
+				$kostenstellenresult[] = $kostenstelle;
+			}
+		}
+
+		return success($kostenstellenresult);
 	}
 }
