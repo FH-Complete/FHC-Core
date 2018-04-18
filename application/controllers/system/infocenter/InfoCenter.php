@@ -42,6 +42,11 @@ class InfoCenter extends VileSci_Controller
 			'logtype' => 'Action',
 			'name' => 'Note added',
 			'message' => 'Note with title %s was added'
+		),
+		'updatenotiz' => array(
+			'logtype' => 'Action',
+			'name' => 'Note updated',
+			'message' => 'Note with title %s was updated'
 		)
 	);
 	private $uid; // contains the UID of the logged user
@@ -380,6 +385,44 @@ class InfoCenter extends VileSci_Controller
 		$this->output
 			->set_content_type('application/json')
 			->set_output(json_encode($result->retval));
+	}
+	
+	/**
+	 * Updates a new Notiz for a person
+	 * @param int $notiz_id
+	 * @param int $person_id
+	 * @return bool true if success
+	 */
+	public function updateNotiz($notiz_id, $person_id)
+	{	
+		$titel = $this->input->post('notiztitel');
+		$text = $this->input->post('notiz');
+
+		$result = $this->NotizModel->update(
+			$notiz_id,
+			array(
+				'titel' => $titel,
+				'text' => $text,
+				'verfasser_uid' => $this->uid,
+				"updateamum" => 'NOW()',
+				"updatevon" => $this->uid
+			)
+		);
+		
+		
+		$json = FALSE;
+		
+		if (isSuccess($result))
+		{
+			$json = TRUE;
+			
+			//set log "Notiz updated"
+			$this->_log($person_id, 'updatenotiz', array($titel));
+		}
+		
+		$this->output
+			->set_content_type('application/json')
+			->set_output(json_encode($json));
 	}
 
 	/**
