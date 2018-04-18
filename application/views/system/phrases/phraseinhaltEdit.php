@@ -65,10 +65,6 @@
 			</code><br/>
 		<a href="https://warpedvisions.org/projects/textile-cheat-sheet/" target="_blank">Textile CheatSheet</a>
 	</td></tr>
- 	<?php
-		// This is an example to show that you can load stuff from inside the template file
-		//echo $this->widgetlib->widget("tinymce_widget", array('name' => 'text', 'text' => $text));
-	?>
 	<tr><td colspan="2" align="right"><button type="submit">Save</button></td></tr>
 </table>
 </form>
@@ -77,34 +73,29 @@
 </div>
 
 
-<script>
+		<script>
 
-$(document).ready(function () {
-    initTextile();
-});
+			$(document).ready(function () {
+			    initTextile();
+			});
 
-function initTextile() {
-    var $content = $('#markitup'); // my textarea
-    var $preview = $('#textile-preview'); // the preview div
+			function initTextile() {
+			    var $content = $('#markitup'); // my textarea
+			    var $preview = $('#textile-preview'); // the preview div
 
-    //$content.markItUp(); // init markitup
+			    // use a simple timer to check if the textarea content has changed
+			    var value = $content.val();
+				$preview.html(textile.parse(value));
+			    setInterval(function () {
+			        var newValue = $content.val();
+			        if (value != newValue) {
+			            value = newValue;
+			            $preview.html(textile.parse(newValue)); // convert the textile to html
+			        }
+			    }, 500);
+			};
 
-    // use a simple timer to check if the textarea content has changed
-    var value = $content.val();
-	$preview.html(textile.parse(value));
-    setInterval(function () {
-        var newValue = $content.val();
-        if (value != newValue) {
-            value = newValue;
-            $preview.html(textile.parse(newValue)); // convert the textile to html
-        }
-    }, 500);
-};
+		</script>
 
-</script>
-
-<!--
-<iframe name="TemplatePreview" width="100%" src=""/>
--->
-</body>
+	</body>
 </html>

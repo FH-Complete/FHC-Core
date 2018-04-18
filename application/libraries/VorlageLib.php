@@ -114,6 +114,8 @@ class VorlageLib
 			$queryParameters["sprache"] = $sprache;
 		}
 
+		$this->ci->VorlageStudiengangModel->addOrder('version', 'DESC');
+
 		$vorlage = $this->ci->VorlageStudiengangModel->loadWhere($queryParameters);
 		// If the searched template was not found
 		if (!hasData($vorlage))

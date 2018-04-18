@@ -133,10 +133,14 @@ else
 										echo '<menuitem id="'.$id.'" label="'.$label.'" oncommand="'.$command.'" disabled="false" tooltiptext="Status ändern auf '.$status_kurzbz.'" hidden="true"/>';
 									}
 								}
+								function sortGruende($a, $b)
+								{
+									return strcasecmp($a['bezeichnung'], $b['bezeichnung']);
+								}
 								// Statusgruende laden
 								$statusgrund = new statusgrund();
 								$statusgrund->getAll(true);
-								$gruende=array();
+								$gruende = array();
 								foreach($statusgrund->result as $row)
 								{
 									$gruende[$row->status_kurzbz][] = array(
@@ -144,6 +148,7 @@ else
 										'bezeichnung'=>$row->bezeichnung_mehrsprachig[DEFAULT_LANGUAGE],
 										'beschreibung'=>$row->beschreibung[DEFAULT_LANGUAGE]
 									);
+									usort($gruende[$row->status_kurzbz], "sortGruende");
 								}
 
 								printStatuswechselMenuitem($gruende, 'Abbrecher', 'student-toolbar-abbrecher', 'Abbrecher', "StudentAddRolle('Abbrecher','0',undefined,'STATUSGRUNDID')");

@@ -22,11 +22,12 @@ class Phrase extends APIv1_Controller
 	public function __construct()
 	{
 		parent::__construct(array('Phrase' => 'system/phrase:rw', 'Phrases' => 'system/phrase:r'));
+
 		$this->load->library('PhrasesLib');
 	}
 
 	/**
-	 * @return void
+	 *
 	 */
 	public function getPhrase()
 	{
@@ -45,7 +46,7 @@ class Phrase extends APIv1_Controller
 	}
 
 	/**
-	 * @return void
+	 *
 	 */
 	public function getPhrases()
 	{
@@ -69,7 +70,7 @@ class Phrase extends APIv1_Controller
 	}
 
 	/**
-	 * @return void
+	 *
 	 */
 	public function postPhrase()
 	{
@@ -92,6 +93,9 @@ class Phrase extends APIv1_Controller
 		}
 	}
 
+	/**
+	 *
+	 */
 	private function _validate($phrase = null)
 	{
 		return false;

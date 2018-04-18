@@ -24,9 +24,9 @@ class Manager extends FHC_Controller
 		// Load helpers to upload files
 		$this->load->helper(array('form', 'url'));
 
-        // Loads the extensions library
-        $this->load->library('ExtensionsLib');
-    }
+		// Loads the extensions library
+		$this->load->library('ExtensionsLib');
+	}
 
 	/**
 	 *

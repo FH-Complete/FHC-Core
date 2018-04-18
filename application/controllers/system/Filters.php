@@ -439,6 +439,11 @@ class Filters extends CI_Controller
 		$filterOperationValues = $this->input->post('filterOperationValues');
 		$filterOptions = $this->input->post('filterOptions');
 
+		if ($fieldNames == null) $fieldNames = array();
+		if ($filterOperationValues == null) $filterOperationValues = array();
+		if ($filterOperations == null) $filterOperations = array();
+		if ($filterOptions == null) $filterOptions = array();
+
 		$activeFilters = array_combine($fieldNames, $filterOperationValues);
 		$activeFiltersOperation = array_combine($fieldNames, $filterOperations);
 		$activeFiltersOption = array_combine($fieldNames, $filterOptions);

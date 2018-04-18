@@ -1,5 +1,11 @@
 <style>
 
+	.filter-options-span {
+		display: inline-block;
+		width: 130px;
+		font-weight: bold;
+	}
+
 	.filter-name-title {
 		font-family: inherit;
 		font-size: 16px;
@@ -69,26 +75,37 @@
 
 	.select-filter-option {
 		display: inline;
-		width: 90px;
+		width: 100px;
 	}
 
-	#addField {
+	#addField, #customFilterDescription, #addFilter {
 		display: inline;
-		width: 400px;
-	}
-
-	#addFilter {
-		display: inline;
-		width: 400px;
+		width: 535px;
 	}
 
 	#selectedFilters {
 		margin-bottom: 20px;
 	}
 
-	#customFilterDescription {
-		display: inline;
-		width: 400px;
+	#applyFilter, #saveCustomFilterButton, .remove-selected-filter {
+		font-weight: bold;
+	}
+
+	#applyFilter, #saveCustomFilterButton {
+		width: 100px;
+	}
+
+	.remove-selected-filter {
+		padding-bottom: 3px;
+	}
+
+	.panel-title {
+		font-weight: bold;
+		padding-top: 3px;
+	}
+
+	.remove-field {
+		font-weight: bold;
 	}
 
 </style>
@@ -97,7 +114,7 @@
 	function refreshSideMenu()
 	{
 		$.ajax({
-			url: "<?php echo base_url('index.ci.php/system/infocenter/InfoCenter/setNavigationMenuArray'); ?>",
+			url: "<?php echo site_url('system/infocenter/InfoCenter/setNavigationMenuArray'); ?>",
 			method: "GET",
 			data: {}
 		})
@@ -115,7 +132,7 @@
 		$(".remove-filter").click(function() {
 
 			$.ajax({
-				url: "<?php echo base_url('index.ci.php/system/Filters/deleteCustomFilter'); ?>",
+				url: "<?php echo site_url('system/Filters/deleteCustomFilter'); ?>",
 				method: "POST",
 				data: {
 					filter_id: $(this).attr('value')

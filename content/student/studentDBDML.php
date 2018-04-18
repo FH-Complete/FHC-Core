@@ -2199,6 +2199,8 @@ if(!$error)
 				$akte->anmerkung_intern = $_POST['anmerkung_intern'];
 				$akte->titel_intern = $_POST['titel_intern'];
 				$akte->dokument_kurzbz = $_POST['dokument_kurzbz'];
+				$akte->updateamum = date('Y-m-d H:i:s');
+				$akte->updatevon = $user;
 
 				if(!$akte->save())
 				{
@@ -2251,6 +2253,29 @@ if(!$error)
 										$error=true;
 										$errormsg='Fehler beim Loeschen des Dokuments';
 									}
+									else
+									{
+										// Log schreiben
+										$logdata_dms = (array)$dms; 
+										$logdata = var_export($logdata_dms, true); 
+										$log = new log();
+										$log->executetime = date('Y-m-d H:i:s');
+										$log->mitarbeiter_uid = $user;
+										$log->beschreibung = "Löschen der DMS_ID ".$akte->dms_id;
+										$log->sql = 'LogData:'.$logdata;
+										$log->sqlundo = '';
+										$log->save(true);
+									}
+									// Log schreiben
+									$logdata_akte = (array)$akte; 
+									$logdata = var_export($logdata_akte, true); 
+									$log = new log();
+									$log->executetime = date('Y-m-d H:i:s');
+									$log->mitarbeiter_uid = $user;
+									$log->beschreibung = "Löschen der Akte '".$akte->dokument_kurzbz."' ID '".$akte_id."'";
+									$log->sql = 'DELETE FROM public.tbl_akte WHERE akte_id='.$db->db_add_param($akte_id, FHC_INTEGER).'; LogData:'.$logdata;
+									$log->sqlundo = '';
+									$log->save(true);
 								}
 								else
 								{

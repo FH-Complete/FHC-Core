@@ -1279,7 +1279,7 @@ class content extends basis_db
 	public function search($searchItems, $limit=null)
 	{
 		$qry = "SELECT 
-					distinct on(content_id,sprache,version) content_id, content::text, titel, sprache, version, 1 AS sort
+					distinct on(content_id,sprache,version) content_id, content::text, titel, sprache, version, template_kurzbz, 1 AS sort
 				FROM 
 					campus.tbl_contentsprache
 					JOIN campus.tbl_content USING(content_id)
@@ -1298,7 +1298,7 @@ class content extends basis_db
 					";
 		}
 		$qry .= " UNION SELECT
-					distinct on(content_id,sprache,version) content_id, content::text, titel, sprache, version, 2 AS sort
+					distinct on(content_id,sprache,version) content_id, content::text, titel, sprache, version, template_kurzbz, 2 AS sort
 				FROM
 					campus.tbl_contentsprache
 					JOIN campus.tbl_content USING(content_id)
@@ -1333,6 +1333,7 @@ class content extends basis_db
 				$obj->titel = $row->titel;
 				$obj->sprache = $row->sprache;
 				$obj->version = $row->version;
+				$obj->template_kurzbz = $row->template_kurzbz;
 				
 				$this->result[] = $obj;
 			}

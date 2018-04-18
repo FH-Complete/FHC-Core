@@ -87,16 +87,62 @@ echo '<!DOCTYPE HTML>
 	<link href="../../skin/style.css.php" rel="stylesheet" type="text/css">
 	<title>'.$p->t('mailverteiler/oeffnenEinesVerteilers').'</title>
 </head>
+<style>
+body
+{
+	width: 95%;
+	margin: 10px;
+	overflow: hidden;
+}
+.button_oeffnen
+{
+	display: block;
+	color: #fff;
+	background-color: #337ab7;
+	padding: 6px 12px;
+	margin-bottom: 0;
+	margin-top: 10px;
+	text-align: center;
+	white-space: nowrap;
+	vertical-align: middle;
+	cursor: pointer;
+	background-image: none;
+	border-radius: 4px;
+	border: 1px solid transparent;
+	overflow: visible;
+	box-sizing: border-box;
+	text-transform: none;
+}
+.button_oeffnen:hover
+{
+	display: block;
+	color: #fff;
+	background-color: #286090;
+	padding: 6px 12px;
+	margin-bottom: 0;
+	margin-top: 10px;
+	text-align: center;
+	white-space: nowrap;
+	vertical-align: middle;
+	cursor: pointer;
+	background-image: none;
+	border-radius: 4px;
+	border: 1px solid transparent;
+	overflow: visible;
+	box-sizing: border-box;
+	text-transform: none;
+}
+a, a:hover
+{
+	text-decoration: none;
+}
+</style>
 <body>';
 
 if (isset($_REQUEST['token']) && isset($_REQUEST['grp']))
 {
 	echo '
-	<table class="tabcontent">
-		<tr>
-			<td class="ContentHeader"><font class="ContentHeader">'.$p->t('mailverteiler/mailverteiler').'</font></td>
-			<td class="ContentHeader"><font class="ContentHeader">'.$p->t('mailverteiler/status').'</font></td>
-		</tr>';
+	<h1>'.$p->t('mailverteiler/oeffnenEinesVerteilers').'</h1>';
 
 	/* Generate an random String  */
 	$mail_id = mail_id_generator();
@@ -116,30 +162,18 @@ if (isset($_REQUEST['token']) && isset($_REQUEST['grp']))
 		fwrite($filet, $message, mb_strlen($message));
 		fclose($filet);
 
-		echo "
-		<tr>
-			<td><a href='mailto:".$_REQUEST['grp'].$mail_id."@".DOMAIN."'>".$db->convert_html_chars($_REQUEST['desc'])."</a></td>
-			<td>".$p->t('mailverteiler/geoeffnet')." (Code: ".$mail_id.")</td>
-		</tr>
-		<tr>
-		<td colspan='2'>
-		<p>".$p->t('mailverteiler/klickenZumSchicken')."</p>
-
-		<p>".$p->t('mailverteiler/infoBenutzung',array($_REQUEST['grp'].$mail_id."@".DOMAIN))."</p>
-		</td>
-		</tr>
-		";
+		echo '
+		<p>'.$p->t('mailverteiler/geoeffnet',$db->convert_html_chars($_REQUEST['desc'])).'</p>
+		<p><b>Code</b>: '.$mail_id.'<br>
+		<b>Adresse</b>: <a href="mailto:?bcc='.$_REQUEST["grp"].$mail_id.'@'.DOMAIN.'">'.$_REQUEST["grp"].$mail_id.'@'.DOMAIN.'</a></p>
+		<p>'.$p->t('mailverteiler/klickenZumSchicken').'</p>
+		<p>'.$p->t('mailverteiler/infoBenutzung').'</p>';
 	}
 	else
 	{
 		echo '
-		<tr>
-			<td colspan="2">
-				'.$p->t('mailverteiler/oeffnenFehlgeschlagen').'
-			</td>
-		</tr>';
+		<p class="error">'.$p->t('mailverteiler/oeffnenFehlgeschlagen').'</p>';
 	}
-	echo '</table>';
 }
 else
 {
@@ -149,7 +183,9 @@ else
 	}
 	else
 	{
-		echo $p->t('mailverteiler/bestaetigeOeffnen',array($_REQUEST['grp']))." : <a href=\"".$_SERVER['SCRIPT_NAME']."?grp=".$_REQUEST['grp']."&desc=".$db->convert_html_chars($_REQUEST['desc'])."&token=1\">".$p->t('mailverteiler/bestaetige')."</a>";
+		echo '<h1>'.$p->t('mailverteiler/oeffnenEinesVerteilers').'</h1>';
+		echo $p->t('mailverteiler/bestaetigeOeffnen').':';
+		echo '<a href="'.$_SERVER['SCRIPT_NAME'].'?grp='.$_REQUEST['grp'].'&desc='.$db->convert_html_chars($_REQUEST['desc']).'&token=1"><button class="button_oeffnen">'.$p->t('mailverteiler/verteilerGenerieren',array($_REQUEST['grp'])).'</button></a>';
 	}
 }
 

@@ -3,7 +3,7 @@
 	$(document).ready(function() {
 
 		$.ajax({
-			url: "<?php echo base_url('index.ci.php/system/Navigation/header'); ?>",
+			url: "<?php echo site_url('system/Navigation/header'); ?>",
 			method: "GET",
 			data: {
 				navigation_widget_called: "<?php echo $this->router->directory.$this->router->class.'/'.$this->router->method; ?>"

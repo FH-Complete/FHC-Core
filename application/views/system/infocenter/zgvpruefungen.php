@@ -287,10 +287,25 @@
 								</div>
 							</div><!-- /.column-absage -->
 							<div class="col-lg-6 text-right">
+								<?php  
+								$disabled = $disabledTxt = '';
+								if (empty($zgvpruefung->prestudentstatus->bewerbung_abgeschicktamum))
+								{
+									$disabled = 'disabled';
+									$disabledTxt = 'Die Bewerbung muss erst abgeschickt worden sein.';
+								} 
+								
+								if ($zgvpruefung->studiengangtyp !== 'b')
+								{
+									$disabled = 'disabled';
+									$disabledTxt = 'Nur Bachelorstudiengänge können freigegeben werden.';;
+								}
+								?>
 								<div>
-									<button type="button" class="btn btn-default"
+									<button type="button" class="btn btn-default" <?php echo $disabled ?>			
 											data-toggle="modal"
-											data-target="#freigabeModal_<?php echo $zgvpruefung->prestudent_id ?>">
+											data-target="#freigabeModal_<?php echo $zgvpruefung->prestudent_id ?>"
+											data-toggle="tooltip" title="<?php echo $disabledTxt ?>">
 										Freigabe an Studiengang
 									</button>
 								</div>

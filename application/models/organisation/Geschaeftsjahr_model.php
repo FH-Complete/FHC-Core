@@ -11,4 +11,33 @@ class Geschaeftsjahr_model extends DB_Model
 		$this->dbTable = 'public.tbl_geschaeftsjahr';
 		$this->pk = 'geschaeftsjahr_kurzbz';
 	}
+
+	/**
+	 * Gets current Geschaeftsjahr, as determined by its start date
+	 * @return array|null
+	 */
+	public function getCurrGeschaeftsjahr()
+	{
+		$query = 'SELECT *
+					FROM public.tbl_geschaeftsjahr
+					WHERE start <= now()
+					AND ende >= now()';
+
+		return $this->execQuery($query);
+	}
+
+	/**
+	 * Gets next Geschaeftsjahr, as determined by its start date
+	 * @return array|null
+	 */
+	public function getNextGeschaeftsjahr()
+	{
+		$query = 'SELECT *
+					FROM public.tbl_geschaeftsjahr
+					WHERE start > now()
+					ORDER BY start
+					LIMIT 1';
+
+		return $this->execQuery($query);
+	}
 }

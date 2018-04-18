@@ -29,18 +29,16 @@ class DB_Model extends FHC_Model
 	/**
 	 * Constructor
 	 */
-	public function __construct($dbTable = null, $pk = null, $hasSequence = true)
+	public function __construct($dbtype = 'default')
 	{
 		// Call parent constructor
 		parent::__construct();
 
 		// Set properties
-		$this->pk = $pk;
-		$this->dbTable = $dbTable;
-		$this->hasSequence = $hasSequence;
+		$this->hasSequence = true;
 
 		// Loads DB conns and confs
-		$this->load->database();
+		$this->load->database($dbtype);
 
 		// Loads the UDF library
 		$this->load->library('UDFLib');

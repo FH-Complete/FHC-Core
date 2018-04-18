@@ -575,7 +575,7 @@ class organisationseinheit extends basis_db
 							OR (LOWER(bezeichnung) LIKE LOWER(\'%'.$this->db_escape($value).'%\'))'; 
 				}
 	    $qry.=	' ORDER BY organisationseinheittyp_kurzbz, bezeichnung;';
-	    
+
 	    if($this->db_query($qry))
 	    {
 			while($row = $this->db_fetch_object())

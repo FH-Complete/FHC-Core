@@ -16,13 +16,17 @@ $this->phrasen['mailverteiler/studentenverteiler']='Students mailing list';
 $this->phrasen['mailverteiler/keineVerteilerVorhanden']='No mailing list is existing';
 $this->phrasen['mailverteiler/fehlerBeimLadenDerStudenten']='Error: Loading Students';
 $this->phrasen['mailverteiler/mailverteiler']='Mailing list';
-$this->phrasen['mailverteiler/oeffnenEinesVerteilers']='Unlock a Mailing list';
+$this->phrasen['mailverteiler/oeffnenEinesVerteilers']='Unlock a mailing list';
 $this->phrasen['mailverteiler/status']='Status';
-$this->phrasen['mailverteiler/geoeffnet']='Unlocked';
-$this->phrasen['mailverteiler/klickenZumSchicken']='To send a Mail to this List click on the link above.';
-$this->phrasen['mailverteiler/infoBenutzung']='You can use the Mailinglist during a period of <b>2 hours</b> or a <b>single</b> Usage under the adress <a href="mailto:%1$s">%1$s</a>.';
-$this->phrasen['mailverteiler/bestaetigeOeffnen']='Please confirm to unlock the Mailing list %1$s';
+$this->phrasen['mailverteiler/geoeffnet']='Mailing list "%1$s" unlocked';
+$this->phrasen['mailverteiler/klickenZumSchicken']='To send an E-Mail to this list click on the link above.';
+$this->phrasen['mailverteiler/infoBenutzung']='You can use the mailing list during a period of <b>1 hour</b>.<br>
+												 <div style="color: #721c24; background-color: #f8d7da; border-color: #f5c6cb; border-radius: 4px; border: 1px solid transparent; padding: 6px 12px;">
+													If you copy the E-Mail adress manually to your mail client, please mind to set it as <b>BCC</b> (Blind Copy)!
+												</div>';
+$this->phrasen['mailverteiler/bestaetigeOeffnen']='For sending an E-Mail from an external account, click the button. The mailing list will then be available for <b>1 hour</b>';
 $this->phrasen['mailverteiler/bestaetige']='Confirm';
 $this->phrasen['mailverteiler/personenImVerteiler']='People in this mailing list';
-$this->phrasen['mailverteiler/oeffnenFehlgeschlagen']='Failed to open mailing list. Please inform your administrator.';
+$this->phrasen['mailverteiler/oeffnenFehlgeschlagen']='Failed to open mailing list.<br>Please inform your administrator.';
+$this->phrasen['mailverteiler/verteilerGenerieren']='Generate mailing list for <b>%1$s</b>';
 ?>

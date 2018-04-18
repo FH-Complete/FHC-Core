@@ -4,38 +4,40 @@ if (! defined('BASEPATH')) exit('No direct script access allowed');
 
 class PhrasesLib
 {
+	private $_ci; // Code igniter instance
+	private $_phrases; // Contains the retrived phrases
+
 	/**
 	 * Loads parser library
 	 */
     public function __construct()
     {
-        //require_once APPPATH.'config/message.php';
+		$this->_ci =& get_instance();
 
-		$this->ci =& get_instance();
+		// CI parser
+		$this->_ci->load->library('parser');
 
-		// Loads message configuration
-		$this->ci->config->load('message');
-		
-		$this->ci->load->library('parser');
-		
-		$this->ci->load->model('system/Phrase_model', 'PhraseModel');
-		$this->ci->load->model('system/Phrasentext_model', 'PhrasentextModel');
+		$this->_ci->load->model('system/Phrase_model', 'PhraseModel');
+		$this->_ci->load->model('system/Phrasentext_model', 'PhrasentextModel');
 
-        $this->ci->load->helper('language');
 		// Loads helper message to manage returning messages
-		$this->ci->load->helper('message');
+		$this->_ci->load->helper('message');
+
+		// Workaround to use more parameters in the construct since PHP doesn't support many constructors
+		$this->_extend_construct(func_get_args());
     }
 
+	// -----------------------------------------------------------------------------------------------------------------
+	// Public methods
+
    	/**
-     * getPhrase() - will load a spezific Phrase
+     * getPhrase() - loads a specific Phrase
      */
     public function getPhrase($phrase_id)
     {
-        if (empty($phrase_id))
-        	return error(MSG_ERR_INVALID_MSG_ID);
+        if (empty($phrase_id)) return error(MSG_ERR_INVALID_MSG_ID);
 
-        $phrase = $this->ci->PhraseModel->load($phrase_id);
-        return $phrase;
+        return $this->_ci->PhraseModel->load($phrase_id);
     }
 
     /**
@@ -43,8 +45,7 @@ class PhrasesLib
      */
     public function getPhraseByApp($app = null)
     {
-	    $phrases = $this->ci->PhraseModel->loadWhere(array('app' => $app));
-        return $phrases;
+	    return $this->_ci->PhraseModel->loadWhere(array('app' => $app));
     }
 
     /**
@@ -52,11 +53,9 @@ class PhrasesLib
      */
 	public function getPhraseInhalt($phrase_id)
     {
-        if (empty($phrase_id))
-        	return error(MSG_ERR_INVALID_MSG_ID);
+        if (empty($phrase_id)) return error(MSG_ERR_INVALID_MSG_ID);
 
-        $phrasentext = $this->ci->PhrasentextModel->loadWhere(array('phrase_id' => $phrase_id));
-        return $phrasentext;
+        return $this->_ci->PhrasentextModel->loadWhere(array('phrase_id' => $phrase_id));
     }
 
     /**
@@ -64,11 +63,9 @@ class PhrasesLib
      */
     public function delPhrasentext($phrasentext_id)
     {
-        if (empty($phrasentext_id))
-        	return error(MSG_ERR_INVALID_MSG_ID);
+        if (empty($phrasentext_id)) return error(MSG_ERR_INVALID_MSG_ID);
 
-        $phrasentext = $this->ci->PhrasentextModel->delete(array('phrasentext_id' => $phrasentext_id));
-        return $phrasentext;
+        return $this->_ci->PhrasentextModel->delete(array('phrasentext_id' => $phrasentext_id));
     }
 
 	/**
@@ -76,11 +73,9 @@ class PhrasesLib
      */
     public function savePhrase($phrase_id, $data)
     {
-        if (empty($data))
-        	return error(MSG_ERR_INVALID_MSG_ID);
+        if (empty($data)) return error(MSG_ERR_INVALID_MSG_ID);
 
-        $phrase = $this->ci->PhraseModel->update($phrase_id, $data);
-        return $phrase;
+        return $this->_ci->PhraseModel->update($phrase_id, $data);
     }
 
 
@@ -90,32 +85,33 @@ class PhrasesLib
     public function getPhrasentextById($phrasentext_id)
 	{
         if (empty($phrasentext_id))
-        	return error($this->ci->lang->line('fhc_'.FHC_INVALIDID, false));
+        	return error($this->_ci->lang->line('fhc_'.FHC_INVALIDID, false));
 
-        $phrasentext = $this->ci->PhrasentextModel->load($phrasentext_id);
-        return $phrasentext;
+        return $this->_ci->PhrasentextModel->load($phrasentext_id);
     }
 
 	/**
-     * getPhrases()
+     * getPhrases() - Retrives phrases from the DB
+	 * The given parameter are the same needed to read from the table system.tb_phrase
      */
     public function getPhrases($app, $sprache, $phrase = null, $orgeinheit_kurzbz = null, $orgform_kurzbz = null, $blockTags = null)
     {
 		if (isset($app) && isset($sprache))
 		{
-			$result = $this->ci->PhraseModel->getPhrases($app, $sprache, $phrase, $orgeinheit_kurzbz, $orgform_kurzbz);
-			
+			$result = $this->_ci->PhraseModel->getPhrases($app, $sprache, $phrase, $orgeinheit_kurzbz, $orgform_kurzbz);
+
 			if (hasData($result))
 			{
-				$parser = new \Netcarver\Textile\Parser();
-				
+				// Textile parser
+				$textileParser = new \Netcarver\Textile\Parser();
+
 				for ($i = 0; $i < count($result->retval); $i++)
 				{
 					// If no <p> tags required
 					if ($blockTags == 'no')
 					{
-						$tmpText = $parser->textileThis($result->retval[$i]->text); // Parse
-						
+						$tmpText = $textileParser->textileThis($result->retval[$i]->text); // Parse
+
 						// Removes tags <p> and </p> from the beginning and from the end of the string if they are present
 						// NOTE: Those tags are usually, but not always, added by the textile parser
 						if (strlen($tmpText) >= 7)
@@ -129,12 +125,12 @@ class PhrasesLib
 								$tmpText = substr($tmpText, 0, strlen($tmpText) - 4);
 							}
 						}
-						
+
 						$result->retval[$i]->text = $tmpText;
 					}
 					else
 					{
-						$result->retval[$i]->text = $parser->textileThis($result->retval[$i]->text);
+						$result->retval[$i]->text = $textileParser->textileThis($result->retval[$i]->text);
 					}
 				}
 			}
@@ -152,8 +148,7 @@ class PhrasesLib
      */
     public function insertPhraseinhalt($data)
 	{
-        $phrasentext = $this->ci->PhrasentextModel->insert($data);
-        return $phrasentext;
+        return $this->_ci->PhrasentextModel->insert($data);
     }
 
 	/**
@@ -161,8 +156,7 @@ class PhrasesLib
      */
     public function getVorlagetextById($vorlagestudiengang_id)
 	{
-        $vorlagetext = $this->ci->VorlageStudiengangModel->load($vorlagestudiengang_id);
-        return $vorlagetext;
+        return $this->_ci->VorlageStudiengangModel->load($vorlagestudiengang_id);
     }
 
 	/**
@@ -170,8 +164,7 @@ class PhrasesLib
      */
     public function updatePhraseInhalt($phrasentext_id, $data)
 	{
-        $phrasentext = $this->ci->PhrasentextModel->update($phrasentext_id, $data);
-        return $phrasentext;
+        return $this->_ci->PhrasentextModel->update($phrasentext_id, $data);
     }
 
 	/**
@@ -180,8 +173,84 @@ class PhrasesLib
     public function parseVorlagetext($text, $data = array())
 	{
         if (empty($text))
-        	return error($this->ci->lang->line('fhc_'.FHC_INVALIDID, false));
-		$text = $this->ci->parser->parse_string($text, $data, true);
-		return $text;
+        	return error($this->_ci->lang->line('fhc_'.FHC_INVALIDID, false));
+
+		return $this->_ci->parser->parse_string($text, $data, true);
     }
+
+	/**
+	 *
+	 */
+	public function t($category, $phrase, $parameters = array(), $orgeinheit_kurzbz = null, $orgform_kurzbz = null)
+	{
+		if (isset($this->_phrases) && is_array($this->_phrases))
+		{
+			for ($i = 0; $i < count($this->_phrases); $i++)
+			{
+				$_phrase = $this->_phrases[$i];
+
+				if ($_phrase->category == $category
+					&& $_phrase->phrase == $phrase
+					&& $_phrase->orgeinheit_kurzbz == $orgeinheit_kurzbz
+					&& $_phrase->orgform_kurzbz== $orgform_kurzbz)
+				{
+					if ($parameters == null) $parameters = array();
+
+					echo $this->_ci->parser->parse_string($_phrase->text, $parameters, true)."\n";
+					break;
+				}
+			}
+		}
+	}
+
+	// -----------------------------------------------------------------------------------------------------------------
+	// Private methods
+
+	/**
+	 * Extends the functionalities of the constructor of this class
+	 * This is a workaround to use more parameters in the construct since PHP doesn't support many constructors
+	 * The new accepted parameters are:
+	 * - categories: could be a string or an array of strings. These are the categories used to load phrases
+	 * - language: optional parameter must be a string. It's used to load phrases
+	 */
+	private function _extend_construct($params)
+	{
+		// Checks if the $params is an array with at least one element
+		if (is_array($params) && count($params) > 0)
+		{
+			$parameters = $params[0]; // temporary variable
+
+			// If there are parameters
+			if (is_array($parameters) && count($parameters) > 0)
+			{
+				$categories = $parameters[0]; // categories is always the first parameter
+				if (!is_array($categories)) // if it is not an array, then convert into one
+				{
+					$categories = array($categories);
+				}
+
+				// Use the given language if present, otherwise retrives the language for the logged user
+				$language = DEFAULT_LANGUAGE;
+				if (count($parameters) == 2 && !empty($parameters[1]) && is_string($parameters[1]))
+				{
+					$language = $parameters[1];
+				}
+				else
+				{
+					$this->_ci->load->model('person/Person_model', 'PersonModel');
+
+					$language = $this->_ci->PersonModel->getLanguage(getAuthUID());
+				}
+
+				// Loads phrases
+				$phrases = $this->_ci->PhraseModel->getPhrasesByCategoryAndLanguage($categories, $language);
+
+				// If there are phrases loaded then store them in the property _phrases
+				if (hasData($phrases))
+				{
+					$this->_phrases = $phrases->retval;
+				}
+			}
+		}
+	}
 }

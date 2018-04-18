@@ -96,11 +96,45 @@ $(document).ready(
 		$("#notizform").on("submit", function (e)
 			{
 				e.preventDefault();
-				var personid = $("#hiddenpersonid").val();
+				var personId = $("#hiddenpersonid").val();
+				var notizId = $("#notizform :input[name='hiddenNotizId']").val();
 				var data = $(this).serializeArray();
-				saveNotiz(personid, data);
+				
+				if (notizId !== '')
+				{
+					updateNotiz(notizId, personId, data);
+				}
+				else
+				{
+					saveNotiz(personId, data);
+				}			
 			}
-		)
+		);
+
+		
+		//update notiz - autofill notizform
+		$(document).on("click", "#notiztable tbody tr", function ()
+			{
+				var notizId = $(this).find("td:eq(3)").html();
+				var notizTitle = $(this).find("td:eq(1)").text();
+				var notizContent = this.title;
+				
+				$("#notizform label:first").text("Notiz ändern").css("color", "red");
+				$("#notizform :input[type='reset']").css("display", "inline-block");
+				
+				$("#notizform :input[name='hiddenNotizId']").val(notizId);
+				$("#notizform :input[name='notiztitel']").val(notizTitle);
+				$("#notizform :input[name='notiz']").val(notizContent);				
+			}
+		);
+
+		//update notiz - abbrechen-button: reset styles
+		$("#notizform :input[type='reset']").click(function ()
+			{
+				resetNotizFields();
+			}
+		);
+
 	});
 
 // -----------------------------------------------------------------------------------------------------------------
@@ -220,6 +254,29 @@ function saveNotiz(personid, data)
 	});
 }
 
+function updateNotiz(notizId, personId, data)
+{
+	$.ajax({
+		type: "POST",
+		dataType: "json",
+		data: data,
+		url: "../updateNotiz/" + notizId + "/" + personId,
+		success: function (data, textStatus, jqXHR)
+		{
+			if (data)
+			{
+				refreshNotizen();
+				refreshLog();
+				resetNotizFields();
+			}
+		},
+		error: function (jqXHR, textStatus, errorThrown)
+		{
+			alert(textStatus + " - " + errorThrown + " - " + jqXHR.responseText);
+		}
+	});
+}
+
 // -----------------------------------------------------------------------------------------------------------------
 // methods executed after ajax (refreshers)
 
@@ -252,7 +309,7 @@ function refreshNotizen()
 			//readd tablesorter
 			formatNotizTable()
 		}
-	);
+	);	
 }
 
 function formatNotizTable()
@@ -260,4 +317,11 @@ function formatNotizTable()
 	addTablesorter("notiztable", [[0, 1]], ["filter"], 2);
 	tablesortAddPager("notiztable", "notizpager", 10);
 	$("#notiztable").addClass("table-condensed");
+}
+
+function resetNotizFields()
+{
+	$("#notizform :input[name='hiddenNotizId']").val("");
+	$("#notizform label:first").text("Notiz hinzufügen").css("color", "black");
+	$("#notizform :input[type='reset']").css("display", "none");
 }

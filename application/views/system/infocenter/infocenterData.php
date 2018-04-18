@@ -9,10 +9,12 @@
 				p.vorname AS "Vorname",
 				p.nachname AS "Nachname",
 				p.gebdatum AS "Gebdatum",
+				p.staatsbuergerschaft AS "Nation",
 				(
 					SELECT zeitpunkt
 					FROM system.tbl_log
 					WHERE taetigkeit_kurzbz IN(\'bewerbung\',\'kommunikation\')
+					AND logdata->>\'name\' NOT IN (\'Login with code\', \'New application\')
 					AND person_id = p.person_id
 					ORDER BY zeitpunkt DESC
 					LIMIT 1
@@ -21,6 +23,7 @@
 					SELECT insertvon
 					FROM system.tbl_log
 					WHERE taetigkeit_kurzbz IN(\'bewerbung\',\'kommunikation\')
+					AND logdata->>\'name\' NOT IN (\'Login with code\', \'New application\')
 					AND person_id = p.person_id
 					ORDER BY zeitpunkt DESC
 					LIMIT 1
@@ -79,15 +82,17 @@
 							FROM public.tbl_studiensemester
 							WHERE ende >= NOW()
 						)
+						AND not exists (select 1 from tbl_prestudentstatus psss where psss.prestudent_id = pss.prestudent_id and psss.status_kurzbz = \'Abgewiesener\')
 					LIMIT 1
 				) AS "AnzahlAbgeschickt",
 				array_to_string(
 					(
-					SELECT array_agg(distinct UPPER(tbl_studiengang.typ || tbl_studiengang.kurzbz))
+					SELECT array_agg(distinct UPPER(tbl_studiengang.typ || tbl_studiengang.kurzbz) || \':\' || tbl_studienplan.orgform_kurzbz)
 					FROM
 						public.tbl_prestudentstatus pss
 						INNER JOIN public.tbl_prestudent ps USING(prestudent_id)
 						JOIN public.tbl_studiengang USING(studiengang_kz)
+						JOIN lehre.tbl_studienplan using (studienplan_id)
 					WHERE pss.status_kurzbz = \'Interessent\'
 						AND (pss.bewerbung_abgeschicktamum IS NOT NULL AND pss.bewerbung_abgeschicktamum>=\''.$NOTBEFORE.'\')
 						AND pss.bestaetigtam IS NULL
@@ -98,9 +103,53 @@
 							FROM public.tbl_studiensemester
 							WHERE ende >= NOW()
 						)
+						AND not exists (select 1 from tbl_prestudentstatus psss where psss.prestudent_id = pss.prestudent_id and psss.status_kurzbz = \'Abgewiesener\')
 					LIMIT 1
 					),\', \'
 				) AS "StgAbgeschickt",
+				array_to_string(
+					(
+					SELECT array_agg(distinct UPPER(tbl_studiengang.typ || tbl_studiengang.kurzbz) || \':\' || tbl_studienplan.orgform_kurzbz)
+					FROM
+						public.tbl_prestudentstatus pss
+						INNER JOIN public.tbl_prestudent ps USING(prestudent_id)
+						JOIN public.tbl_studiengang USING(studiengang_kz)
+						JOIN lehre.tbl_studienplan using (studienplan_id)
+					WHERE pss.status_kurzbz = \'Interessent\'
+						AND (pss.bewerbung_abgeschicktamum IS NULL)
+						AND pss.bestaetigtam IS NULL
+						AND ps.person_id = p.person_id
+						AND tbl_studiengang.typ in(\'b\')
+						AND studiensemester_kurzbz IN (
+							SELECT studiensemester_kurzbz
+							FROM public.tbl_studiensemester
+							WHERE ende >= NOW()
+						)
+					AND not exists (select 1 from tbl_prestudentstatus psss where psss.prestudent_id = pss.prestudent_id and psss.status_kurzbz = \'Abgewiesener\')
+					LIMIT 1
+					),\', \'
+				) AS "StgNichtAbgeschickt",
+				array_to_string(
+					(
+					SELECT array_agg(distinct UPPER(tbl_studiengang.typ || tbl_studiengang.kurzbz) || \':\' || tbl_studienplan.orgform_kurzbz)
+					FROM
+						public.tbl_prestudentstatus pss
+						INNER JOIN public.tbl_prestudent ps USING(prestudent_id)
+						JOIN public.tbl_studiengang USING(studiengang_kz)
+						JOIN lehre.tbl_studienplan using (studienplan_id)
+					WHERE pss.status_kurzbz in (\'Wartender\', \'Bewerber\', \'Aufgenommener\', \'Student\')
+						AND (pss.bewerbung_abgeschicktamum IS NULL)
+						AND ps.person_id = p.person_id
+						AND tbl_studiengang.typ in(\'b\')
+						AND studiensemester_kurzbz IN (
+							SELECT studiensemester_kurzbz
+							FROM public.tbl_studiensemester
+							WHERE start >= NOW()
+						)
+					AND not exists (select 1 from tbl_prestudentstatus psss where psss.prestudent_id = pss.prestudent_id and psss.status_kurzbz = \'Abgewiesener\')
+					LIMIT 1
+					),\', \'
+				) AS "StgAktiv",
 				pl.zeitpunkt AS "LockDate",
 				pl.lockuser as "LockUser"
 			FROM public.tbl_person p
@@ -141,14 +190,17 @@
 		'checkboxes' => 'PersonId',
 		'additionalColumns' => array('Details'),
 		'columnsAliases' => array(
-			'PersonID','Vorname','Nachname','GebDatum','Letzte Aktion','Letzter Bearbeiter',
-			'StSem','GesendetAm','NumAbgeschickt','Studiengänge','Sperrdatum','GesperrtVon'
+			'PersonID', 'Vorname', 'Nachname',
+			'GebDatum', 'Nation', 'Letzte Aktion',
+			'Letzter Bearbeiter', 'StSem', 'GesendetAm',
+			'NumAbgeschickt', 'StgSent', 'StgNotSent',
+			'StgAktiv', 'Sperrdatum', 'GesperrtVon'
 		),
 		'formatRaw' => function($datasetRaw) {
 
 			$datasetRaw->{'Details'} = sprintf(
 				'<a href="%s%s">Details</a>',
-				base_url('index.ci.php/system/infocenter/InfoCenter/showDetails/'),
+				site_url('system/infocenter/InfoCenter/showDetails/'),
 				$datasetRaw->{'PersonId'}
 			);
 
@@ -187,7 +239,19 @@
 
 			if ($datasetRaw->{'StgAbgeschickt'} == null)
 			{
-				$datasetRaw->{'StgAbgeschickt'} = 'N/A';
+				$datasetRaw->{'StgAbgeschickt'} = '-';
+			}
+			if ($datasetRaw->{'StgNichtAbgeschickt'} == null)
+			{
+				$datasetRaw->{'StgNichtAbgeschickt'} = '-';
+			}
+			if ($datasetRaw->{'StgAktiv'} == null)
+			{
+				$datasetRaw->{'StgAktiv'} = '-';
+			}
+			if ($datasetRaw->{'Nation'} == null)
+			{
+				$datasetRaw->{'Nation'} = '-';
 			}
 
 			return $datasetRaw;

@@ -94,10 +94,13 @@ class Person_model extends DB_Model
 	{
 		$this->addJoin('public.tbl_prestudent', 'person_id');
 
+		$this->addJoin('public.tbl_benutzer', 'person_id');
+
 		$result = $this->loadTree(
 			'public.tbl_person',
 			array(
-				'public.tbl_prestudent'
+				'public.tbl_prestudent',
+				'public.tbl_benutzer'
 			),
 			'EXISTS (
 				SELECT
@@ -112,7 +115,8 @@ class Person_model extends DB_Model
 					AND datum <= '.$this->escape($bis).'
 				)',
 			array(
-				'prestudenten'
+				'prestudenten',
+				'benutzer'
 			)
 		);
 
@@ -191,5 +195,38 @@ class Person_model extends DB_Model
 		$this->addJoin('tbl_benutzer', 'person_id');
 
 		return $this->loadWhere(array('uid' => $uid));
+	}
+
+	/**
+	 * Retrives the language of the user by the UID
+	 * Gets all the persons related to the given UID and starting from the most recent person in DB
+	 * tries to find a valid language (!= null), if found is returned, otherwise is returned the
+	 * default global language of the system
+	 */
+	public function getLanguage($uid)
+	{
+		$language = DEFAULT_LANGUAGE;
+
+		$this->addJoin('public.tbl_benutzer', 'person_id');
+		$this->addOrder('public.tbl_person.updateamum', 'DESC');
+		$this->addOrder('public.tbl_person.insertvon', 'DESC');
+
+		$persons = $this->loadWhere(array('uid' => $uid));
+
+		if (hasData($persons))
+		{
+			for ($i = 0; $i < count($persons->retval); $i++)
+			{
+				$person = $persons->retval[$i];
+
+				if (!empty($person->sprache))
+				{
+					$language = $person->sprache;
+					break;
+				}
+			}
+		}
+
+		return $language;
 	}
 }

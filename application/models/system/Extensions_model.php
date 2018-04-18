@@ -7,7 +7,7 @@ class Extensions_model extends DB_Model
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct('system');
 		$this->dbTable = 'system.tbl_extensions';
 		$this->pk = 'extension_id';
 	}

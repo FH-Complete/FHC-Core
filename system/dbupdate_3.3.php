@@ -723,6 +723,20 @@ if(!@$db->db_query("SELECT ausstellungsdetails FROM public.tbl_dokument LIMIT 1"
 			echo '<br>Spalte ausstellungsdetails in public.tbl_dokument hinzugefügt';
 }
 
+// ADD COLUMN geschaeftsjahrvon and geschaeftsjahrbis in wawi.tbl_kostenstelle
+if(!$result = @$db->db_query("SELECT geschaeftsjahrvon FROM wawi.tbl_kostenstelle LIMIT 1;"))
+{
+	$qry = "ALTER TABLE wawi.tbl_kostenstelle ADD COLUMN geschaeftsjahrvon varchar(32);
+			ALTER TABLE wawi.tbl_kostenstelle ADD COLUMN geschaeftsjahrbis varchar(32);
+			ALTER TABLE wawi.tbl_kostenstelle ADD CONSTRAINT fk_tbl_geschaeftsjahr_geschaeftsjahrvon FOREIGN KEY (geschaeftsjahrvon) REFERENCES public.tbl_geschaeftsjahr (geschaeftsjahr_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;
+			ALTER TABLE wawi.tbl_kostenstelle ADD CONSTRAINT fk_tbl_geschaeftsjahr_geschaeftsjahrbis FOREIGN KEY (geschaeftsjahrbis) REFERENCES public.tbl_geschaeftsjahr (geschaeftsjahr_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;
+			";
+
+	if(!$db->db_query($qry))
+		echo '<strong>wawi.tbl_kostenstelle: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>wawi.tbl_kostenstelle: Spalten geschaeftsjahrvon, geschaeftsjahrbis hinzugefuegt!<br>';
+}
 
 //---------------------------------------------------------------------------------------------------------------------
 // Start extensions
@@ -860,6 +874,7 @@ if ($result = @$db->db_query("SELECT 1 FROM system.tbl_berechtigung WHERE berech
 // End extensions
 //---------------------------------------------------------------------------------------------------------------------
 
+// Tabellen fuer Person Log
 if (!$result = @$db->db_query("SELECT 1 FROM system.tbl_log LIMIT 1"))
 {
 	$qry = "CREATE TABLE system.tbl_log
@@ -908,6 +923,20 @@ if (!$result = @$db->db_query("SELECT 1 FROM system.tbl_log LIMIT 1"))
 		echo '<strong>system.tbl_log '.$db->db_last_error().'</strong><br>';
 	else
 		echo ' system.tbl_log hinzugefügt<br>';
+}
+
+// Add index to system.tbl_log
+if ($result = $db->db_query("SELECT * FROM pg_class WHERE relname='idx_tbl_log_person_id'"))
+{
+	if ($db->db_num_rows($result) == 0)
+	{
+		$qry = "CREATE INDEX idx_tbl_log_person_id ON system.tbl_log USING btree (person_id)";
+
+		if (! $db->db_query($qry))
+			echo '<strong>Indizes: ' . $db->db_last_error() . '</strong><br>';
+		else
+			echo 'Index fuer system.tbl_log hinzugefuegt';
+	}
 }
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -1060,6 +1089,20 @@ if (!@$db->db_query("SELECT 0 FROM system.tbl_filters WHERE 0 = 1"))
 		echo '<br>Altered sequence system.tbl_filters_id_seq';
 }
 
+// Add missing primary Key to system.tbl_filters.filter_id
+if ($result = @$db->db_query("SELECT conname FROM pg_constraint WHERE conname = 'pk_filters_filter_id'"))
+{
+	if ($db->db_num_rows($result) == 0)
+	{
+		$qry = "ALTER TABLE system.tbl_filters ADD CONSTRAINT pk_filters_filter_id PRIMARY KEY (filter_id);";
+
+		if (!$db->db_query($qry))
+			echo '<strong>system.tbl_filters '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>system.tbl_filters: added primary key on column filter_id';
+	}
+}
+
 // UNIQUE INDEX uidx_filters_app_dataset_name_filter_kurzbz
 if ($result = $db->db_query("SELECT 0 FROM pg_class WHERE relname = 'uidx_filters_app_dataset_name_filter_kurzbz'"))
 {
@@ -1176,20 +1219,6 @@ if (!$result = @$db->db_query("SELECT taetigkeit_kurzbz FROM system.tbl_log"))
 		echo '<br>Added Column taetigkeit_kurzbz to system.tbl_log';
 }
 
-// Add missing primary Key to system.tbl_filters.filter_id
-if ($result = @$db->db_query("SELECT conname FROM pg_constraint WHERE conname = 'pk_filters_filter_id'"))
-{
-	if ($db->db_num_rows($result) == 0)
-	{
-		$qry = "ALTER TABLE system.tbl_filters ADD CONSTRAINT pk_filters_filter_id PRIMARY KEY (filter_id);";
-
-		if (!$db->db_query($qry))
-			echo '<strong>system.tbl_filters '.$db->db_last_error().'</strong><br>';
-		else
-			echo '<br>system.tbl_filters: added primary key on column filter_id';
-	}
-}
-
 // Add index to tbl_akte
 if ($result = $db->db_query("SELECT * FROM pg_class WHERE relname='idx_tbl_akte_dokument_kurzbz'"))
 {
@@ -1250,6 +1279,7 @@ if($result = $db->db_query("SELECT 1 FROM system.tbl_app WHERE app='infocenter'"
 			echo '<br>Neue App infocenter in system.tbl_app hinzugefügt';
 	}
 }
+
 // App 'bewerbung' hinzufügen
 if($result = $db->db_query("SELECT 1 FROM system.tbl_app WHERE app='bewerbung'"))
 {
@@ -1278,7 +1308,6 @@ if($result = @$db->db_query("SELECT is_nullable FROM INFORMATION_SCHEMA.COLUMNS 
 			echo '<br>Removed NOT NULL constraint on "vorlaufszeit" from public.tbl_ampel<br>';
 	}
 }
-
 
 // Remove NOT NULL constraint on verfallszeit on public.tbl_ampel
 if($result = @$db->db_query("SELECT is_nullable FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = 'public' AND TABLE_NAME = 'tbl_ampel' AND COLUMN_NAME = 'verfallszeit' AND is_nullable = 'NO'"))
@@ -1768,84 +1797,9 @@ if($result = @$db->db_query("SELECT * FROM system.tbl_filters WHERE filter_kurzb
 	}
 }
 
-/** Budget **/
-if (!$result = @$db->db_query("SELECT 1 FROM wawi.tbl_budgetantrag LIMIT 1"))
+if (!$result = @$db->db_query("SELECT projekt_id FROM fue.tbl_projekt LIMIT 1"))
 {
-	$qry = "CREATE TABLE wawi.tbl_budgetantrag
-			(
-				budgetantrag_id integer NOT NULL,
-				kostenstelle_id integer NOT NULL,
-				geschaeftsjahr_kurzbz varchar(32) NOT NULL,
-				bezeichnung	varchar(256),
-				insertamum timestamp DEFAULT now(),
-				insertvon varchar(32),
-				updateamum timestamp,
-				updatevon varchar(32)
-			);
-			COMMENT ON TABLE wawi.tbl_budgetantrag IS 'Budget Requests';
-
-			ALTER TABLE wawi.tbl_budgetantrag ADD CONSTRAINT pk_tbl_budgetantrag PRIMARY KEY (budgetantrag_id);
-
-			CREATE SEQUENCE wawi.tbl_budgetantrag_budgetantrag_id_seq
-			 INCREMENT BY 1
-			 NO MAXVALUE
-			 NO MINVALUE
-			 CACHE 1;
-			ALTER TABLE wawi.tbl_budgetantrag ALTER COLUMN budgetantrag_id SET DEFAULT nextval(' wawi.tbl_budgetantrag_budgetantrag_id_seq');
-
-			GRANT SELECT, INSERT, UPDATE, DELETE ON wawi.tbl_budgetantrag TO vilesci;
-			GRANT SELECT, UPDATE ON wawi.tbl_budgetantrag_budgetantrag_id_seq TO vilesci;
-
-			ALTER TABLE wawi.tbl_budgetantrag ADD CONSTRAINT fk_budgetantrag_kostenstelle_id FOREIGN KEY (kostenstelle_id) REFERENCES wawi.tbl_kostenstelle(kostenstelle_id) ON UPDATE CASCADE ON DELETE RESTRICT;
-			ALTER TABLE wawi.tbl_budgetantrag ADD CONSTRAINT fk_budgetantrag_geschaeftsjahr_kurzbz FOREIGN KEY (geschaeftsjahr_kurzbz) REFERENCES public.tbl_geschaeftsjahr(geschaeftsjahr_kurzbz) ON UPDATE CASCADE ON DELETE RESTRICT;
-
-			CREATE TABLE wawi.tbl_budgetstatus
-			(
-				budgetstatus_kurzbz varchar(32) NOT NULL,
-				bezeichnung varchar(128)
-			);
-			COMMENT ON TABLE wawi.tbl_budgetstatus IS 'Key Table of Budget Request Statuses';
-
-			ALTER TABLE wawi.tbl_budgetstatus ADD CONSTRAINT pk_tbl_budgetstatus PRIMARY KEY (budgetstatus_kurzbz);
-
-			INSERT INTO wawi.tbl_budgetstatus(budgetstatus_kurzbz, bezeichnung) VALUES('new','Neu');
-			INSERT INTO wawi.tbl_budgetstatus(budgetstatus_kurzbz, bezeichnung) VALUES('sent','Abgeschickt');
-			INSERT INTO wawi.tbl_budgetstatus(budgetstatus_kurzbz, bezeichnung) VALUES('approved','Freigegeben');
-			INSERT INTO wawi.tbl_budgetstatus(budgetstatus_kurzbz, bezeichnung) VALUES('accepted','Akzeptiert');
-			INSERT INTO wawi.tbl_budgetstatus(budgetstatus_kurzbz, bezeichnung) VALUES('rejected','Abgelehnt');
-
-			GRANT SELECT, INSERT, UPDATE, DELETE ON wawi.tbl_budgetantrag TO vilesci;
-
-			CREATE TABLE wawi.tbl_budgetantrag_status
-			(
-				budgetantrag_status_id integer NOT NULL,
-				budgetantrag_id integer NOT NULL,
-				budgetstatus_kurzbz varchar(32) NOT NULL,
-				datum timestamp NOT NULL,
-				uid varchar(32),
-				oe_kurzbz varchar(32),
-				insertamum timestamp DEFAULT now(),
-				insertvon varchar(32)
-			);
-			COMMENT ON TABLE wawi.tbl_budgetantrag_status IS 'Statuses of Budget Requests';
-
-			ALTER TABLE wawi.tbl_budgetantrag_status ADD CONSTRAINT pk_tbl_budgetantrag_status PRIMARY KEY (budgetantrag_status_id);
-
-			CREATE SEQUENCE wawi.tbl_budgetantrag_status_budgetantrag_status_id_seq
-			 INCREMENT BY 1
-			 NO MAXVALUE
-			 NO MINVALUE
-			 CACHE 1;
-			ALTER TABLE wawi.tbl_budgetantrag_status ALTER COLUMN budgetantrag_status_id SET DEFAULT nextval(' wawi.tbl_budgetantrag_status_budgetantrag_status_id_seq');
-
-			ALTER TABLE wawi.tbl_budgetantrag_status ADD CONSTRAINT fk_budgetantrag_status_budgetstatus_kurzbz FOREIGN KEY (budgetstatus_kurzbz) REFERENCES wawi.tbl_budgetstatus(budgetstatus_kurzbz) ON UPDATE CASCADE ON DELETE RESTRICT;
-			ALTER TABLE wawi.tbl_budgetantrag_status ADD CONSTRAINT fk_budgetantrag_status_uid FOREIGN KEY (uid) REFERENCES public.tbl_benutzer(uid) ON UPDATE CASCADE ON DELETE RESTRICT;
-			ALTER TABLE wawi.tbl_budgetantrag_status ADD CONSTRAINT fk_budgetantrag_status_oe_kurzbz FOREIGN KEY (oe_kurzbz) REFERENCES public.tbl_organisationseinheit(oe_kurzbz) ON UPDATE CASCADE ON DELETE RESTRICT;
-
-			GRANT SELECT, INSERT, UPDATE, DELETE ON wawi.tbl_budgetantrag TO vilesci;
-			GRANT SELECT, UPDATE ON wawi.tbl_budgetantrag_status_budgetantrag_status_id_seq TO vilesci;
-
-			CREATE SEQUENCE fue.tbl_projekt_projekt_id_seq
+	$qry = "CREATE SEQUENCE fue.tbl_projekt_projekt_id_seq
 			 INCREMENT BY 1
 			 NO MAXVALUE
 			 NO MINVALUE
@@ -1853,45 +1807,266 @@ if (!$result = @$db->db_query("SELECT 1 FROM wawi.tbl_budgetantrag LIMIT 1"))
 			GRANT SELECT, UPDATE ON fue.tbl_projekt_projekt_id_seq TO vilesci;
 			ALTER TABLE fue.tbl_projekt ADD COLUMN projekt_id integer NOT NULL DEFAULT nextval('fue.tbl_projekt_projekt_id_seq');
 			ALTER TABLE fue.tbl_projekt ADD CONSTRAINT uk_tbl_projekt_projekt_id UNIQUE (projekt_id);
-
-			CREATE TABLE wawi.tbl_budgetposition
-			(
-				budgetposition_id integer NOT NULL,
-				budgetantrag_id integer NOT NULL,
-				budgetposten varchar(512),
-				konto_id integer,
-				betrag numeric(12,4),
-				kommentar text,
-				projekt_id integer,
-				insertamum timestamp,
-				insertvon varchar(32),
-				updateamum timestamp,
-				updatevon varchar(32)
-			);
-
-			COMMENT ON TABLE wawi.tbl_budgetposition IS 'Budget position';
-
-			ALTER TABLE wawi.tbl_budgetposition ADD CONSTRAINT pk_tbl_budgetposition PRIMARY KEY (budgetposition_id);
-
-			CREATE SEQUENCE wawi.tbl_budgetposition_budgetposition_id_seq
-			 INCREMENT BY 1
-			 NO MAXVALUE
-			 NO MINVALUE
-			 CACHE 1;
-			ALTER TABLE wawi.tbl_budgetposition ALTER COLUMN budgetposition_id SET DEFAULT nextval(' wawi.tbl_budgetposition_budgetposition_id_seq');
-
-			ALTER TABLE wawi.tbl_budgetposition ADD CONSTRAINT fk_tbl_budgetposition_budgetantrag_id FOREIGN KEY (budgetantrag_id) REFERENCES wawi.tbl_budgetantrag(budgetantrag_id) ON UPDATE CASCADE ON DELETE RESTRICT;
-			ALTER TABLE wawi.tbl_budgetposition ADD CONSTRAINT fk_tbl_budgetposition_konto_id FOREIGN KEY (konto_id) REFERENCES wawi.tbl_konto(konto_id) ON UPDATE CASCADE ON DELETE RESTRICT;
-			ALTER TABLE wawi.tbl_budgetposition ADD CONSTRAINT fk_tbl_budgetposition_projekt_id FOREIGN KEY (projekt_id) REFERENCES fue.tbl_projekt(projekt_id) ON UPDATE CASCADE ON DELETE RESTRICT;
-
-			GRANT SELECT, INSERT, UPDATE, DELETE ON wawi.tbl_budgetposition TO vilesci;
-			GRANT SELECT, UPDATE ON wawi.tbl_budgetposition_budgetposition_id_seq TO vilesci;
 	";
-	if(!$db->db_query($qry))
-		echo '<strong>Budget: '.$db->db_last_error().'</strong><br>';
+	if (!$db->db_query($qry))
+		echo '<strong>Projekt: '.$db->db_last_error().'</strong><br>';
 	else
-		echo '<br>Neue Tabellen fuer Budgetantrag in Schema wawi hinzugefuegt';
+		echo '<br>Neue Spalte projekt_id für fue.tbl_projekt hinzugefügt';
 
+}
+
+// Extension Schema
+if ($result = $db->db_query("SELECT schema_name FROM information_schema.schemata WHERE schema_name='extension'"))
+{
+	if ($db->db_num_rows($result) == 0)
+	{
+		$qry = "CREATE SCHEMA extension;
+				COMMENT ON SCHEMA extension is 'Extension Tables';";
+
+		if (!$db->db_query($qry))
+			echo '<strong>Extension: '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>Neues Schema extension hinzugefuegt';
+	}
+}
+
+// Berechtigungen fuer web-user erteilen Log in public.tbl_log zu schreiben
+if($result = @$db->db_query("SELECT * FROM information_schema.role_table_grants WHERE table_name='tbl_log' AND table_schema='public' AND grantee='web' AND privilege_type='INSERT'"))
+{
+	if($db->db_num_rows($result)==0)
+	{
+
+		$qry = "GRANT SELECT, INSERT ON public.tbl_log TO web;
+			";
+
+		if(!$db->db_query($qry))
+			echo '<strong>Log Berechtigungen: '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>Web User Insert fuer public.tbl_log berechtigt';
+	}
+}
+
+// ADD COLUMN oe_kurzbz AND berechtigung_kurzbz to campus.tbl_dms_kategorie
+if(!@$db->db_query("SELECT oe_kurzbz FROM campus.tbl_dms_kategorie LIMIT 1"))
+{
+	$qry = "ALTER TABLE campus.tbl_dms_kategorie ADD COLUMN oe_kurzbz varchar(32);
+			ALTER TABLE campus.tbl_dms_kategorie ADD COLUMN berechtigung_kurzbz varchar(32);
+
+			ALTER TABLE campus.tbl_dms_kategorie ADD CONSTRAINT fk_dms_kategorie_oe_kurzbz FOREIGN KEY (oe_kurzbz) REFERENCES public.tbl_organisationseinheit(oe_kurzbz) ON UPDATE CASCADE ON DELETE RESTRICT;
+			ALTER TABLE campus.tbl_dms_kategorie ADD CONSTRAINT fk_dms_kategorie_berechtigung_kurzbz FOREIGN KEY (berechtigung_kurzbz) REFERENCES system.tbl_berechtigung(berechtigung_kurzbz) ON UPDATE CASCADE ON DELETE RESTRICT;
+			";
+
+	if(!$db->db_query($qry))
+		echo '<strong>campus.tbl_dms_kategorie '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>Spalte oe_kurzbz und berechtigung_kurzbz in campus.tbl_dms_kategorie hinzugefügt';
+}
+
+// ADD COLUMN cis_suche (boolean) AND schlagworte to campus.tbl_dms_version
+if(!@$db->db_query("SELECT cis_suche FROM campus.tbl_dms_version LIMIT 1"))
+{
+	$qry = "ALTER TABLE campus.tbl_dms_version ADD COLUMN cis_suche boolean NOT NULL DEFAULT false;
+			ALTER TABLE campus.tbl_dms_version ADD COLUMN schlagworte text;
+
+			COMMENT ON COLUMN campus.tbl_dms_version.schlagworte IS 'Semicolon-separated string with keywords for CIS-search';
+			UPDATE campus.tbl_dms_version SET cis_suche=true WHERE beschreibung != '';
+			UPDATE campus.tbl_dms_version SET schlagworte=beschreibung WHERE beschreibung != '';
+			";
+
+	if(!$db->db_query($qry))
+		echo '<strong>campus.tbl_dms_version '.$db->db_last_error().'</strong><br>';
+		else
+			echo '	<br>Spalte cis_suche und schlagworte in campus.tbl_dms_version hinzugefügt.
+					<br><b>Alle DMS-Einträge mit befülltem Beschreibungstext wurden auf cis_suche=true gesetzt</b>
+					<br><b>Bei allen DMS-Einträge mit befülltem Beschreibungstext, wurde dieser in die Spalte schlagworte übernommen</b>';
+}
+
+//---------------------------------------------------------------------------------------------------------------------
+// Start changes to Phrases
+
+// ADD COLUMN category to system.tbl_phrase
+if (!$result = @$db->db_query("SELECT category FROM system.tbl_phrase LIMIT 1"))
+{
+	$qry = 'ALTER TABLE system.tbl_phrase ADD COLUMN category character varying(64);';
+	if (!$db->db_query($qry))
+		echo '<strong>system.tbl_phrase: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Added column category to table system.tbl_phrase';
+
+	// COMMENT ON TABLE system.tbl_phrase
+	$qry = 'COMMENT ON COLUMN system.tbl_phrase.category IS \'To divide the phrases into categories\';';
+	if (!$db->db_query($qry))
+		echo '<strong>Adding comment to system.tbl_phrase.category: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Added comment to system.tbl_phrase.category';
+}
+
+// UNIQUE INDEX uidx_phrase_category_phrase
+if ($result = $db->db_query("SELECT 0 FROM pg_class WHERE relname = 'uidx_phrase_category_phrase'"))
+{
+	if ($db->db_num_rows($result) == 0)
+	{
+		$qry = 'CREATE UNIQUE INDEX uidx_phrase_category_phrase ON system.tbl_phrase USING btree (category, phrase);';
+		if (!$db->db_query($qry))
+			echo '<strong>uidx_phrase_category_phrase '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>Created unique uidx_phrase_category_phrase';
+	}
+}
+
+// UNIQUE INDEX uidx_phrasestext_phrase_id_sprache_orgeinheit_kurzbz_orgform_kurzbz
+if ($result = $db->db_query("SELECT 0 FROM pg_class WHERE relname = 'uidx_phrasestext_phrase_id_sprache_orgeinheit_kurzbz_orgform_kurzbz'"))
+{
+	if ($db->db_num_rows($result) == 0)
+	{
+		$qry = 'CREATE UNIQUE INDEX uidx_phrasestext_phrase_id_sprache_orgeinheit_kurzbz_orgform_kurzbz ON system.tbl_phrasentext USING btree (phrase_id, sprache, orgeinheit_kurzbz, orgform_kurzbz);';
+		if (!$db->db_query($qry))
+			echo '<strong>uidx_phrasestext_phrase_id_sprache_orgeinheit_kurzbz_orgform_kurzbz '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>Created unique uidx_phrasestext_phrase_id_sprache_orgeinheit_kurzbz_orgform_kurzbz';
+	}
+}
+
+// End changes to Phrases
+// ---------------------------------------------------------------------------------------------------------------------
+
+// Remove NOT NULL constraint on matrikelnr on public.tbl_student
+if($result = @$db->db_query("SELECT is_nullable FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = 'public' AND TABLE_NAME = 'tbl_student' AND COLUMN_NAME = 'matrikelnr' AND is_nullable = 'NO'"))
+{
+	if($db->db_num_rows($result) > 0)
+	{
+		$qry = "ALTER TABLE public.tbl_student ALTER COLUMN matrikelnr DROP NOT NULL;";
+
+		if(!$db->db_query($qry))
+			echo '<strong>public.tbl_student '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>Removed NOT NULL constraint on "matrikelnr" from public.tbl_student<br>';
+	}
+}
+
+// public.vw_prestudentstatus Datum zur Reihungstestanmeldung aus tbl_rt_person
+if($result = $db->db_query("SELECT view_definition FROM information_schema.views WHERE table_schema='public' AND table_name='vw_prestudentstatus'"))
+{
+	if($row = $db->db_fetch_object($result))
+	{
+		if(!mb_stristr($row->view_definition, 'tbl_rt_person'))
+		{
+			$qry = "
+			CREATE OR REPLACE VIEW public.vw_prestudentstatus AS
+			SELECT tbl_prestudent.prestudent_id,
+				tbl_person.person_id,
+				tbl_person.staatsbuergerschaft,
+				tbl_person.geburtsnation,
+				tbl_person.sprache,
+				tbl_person.anrede,
+				tbl_person.titelpost,
+				tbl_person.titelpre,
+				tbl_person.nachname,
+				tbl_person.vorname,
+				tbl_person.vornamen,
+				tbl_person.gebdatum,
+				tbl_person.gebort,
+				tbl_person.gebzeit,
+				tbl_person.foto,
+				tbl_person.homepage,
+				tbl_person.svnr,
+				tbl_person.ersatzkennzeichen,
+				tbl_person.familienstand,
+				tbl_person.geschlecht,
+				tbl_person.anzahlkinder,
+				tbl_person.aktiv,
+				tbl_person.bundesland_code,
+				tbl_person.kompetenzen,
+				tbl_person.kurzbeschreibung,
+				tbl_person.zugangscode,
+				tbl_person.foto_sperre,
+				tbl_person.matr_nr,
+				tbl_prestudent.aufmerksamdurch_kurzbz,
+				tbl_prestudent.studiengang_kz,
+				tbl_prestudent.berufstaetigkeit_code,
+				tbl_prestudent.ausbildungcode,
+				tbl_prestudent.zgv_code,
+				tbl_prestudent.zgvort,
+				tbl_prestudent.zgvdatum,
+				tbl_prestudent.zgvmas_code,
+				tbl_prestudent.zgvmaort,
+				tbl_prestudent.zgvmadatum,
+				tbl_prestudent.aufnahmeschluessel,
+				tbl_prestudent.facheinschlberuf,
+				tbl_prestudent.reihungstest_id,
+				(SELECT
+							COALESCE(anmeldedatum, tbl_rt_person.insertamum::date)
+						FROM
+							public.tbl_rt_person
+							JOIN public.tbl_reihungstest ON(rt_id=reihungstest_id)
+							JOIN lehre.tbl_studienplan USING(studienplan_id)
+							JOIN lehre.tbl_studienordnung USING(studienordnung_id)
+						WHERE
+							person_id=tbl_prestudent.person_id
+							AND tbl_reihungstest.studiensemester_kurzbz=prestudentstatus.studiensemester_kurzbz
+							AND tbl_studienordnung.studiengang_kz=tbl_prestudent.studiengang_kz
+						ORDER BY anmeldedatum DESC, tbl_rt_person.insertamum DESC limit 1
+					) as anmeldungreihungstest,
+				tbl_prestudent.reihungstestangetreten,
+				tbl_prestudent.rt_gesamtpunkte,
+				tbl_prestudent.bismelden,
+				tbl_prestudent.anmerkung,
+				tbl_prestudent.dual,
+				tbl_prestudent.rt_punkte1,
+				tbl_prestudent.rt_punkte2,
+				tbl_prestudent.ausstellungsstaat,
+				tbl_prestudent.rt_punkte3,
+				tbl_prestudent.zgvdoktor_code,
+				tbl_prestudent.zgvdoktorort,
+				tbl_prestudent.zgvdoktordatum,
+				tbl_prestudent.mentor,
+				prestudentstatus.status_kurzbz,
+				prestudentstatus.studiensemester_kurzbz,
+				prestudentstatus.ausbildungssemester,
+				prestudentstatus.datum,
+				prestudentstatus.insertamum,
+				prestudentstatus.insertvon,
+				prestudentstatus.updateamum,
+				prestudentstatus.updatevon,
+				COALESCE(prestudentstatus.orgform_kurzbz, tbl_studiengang.orgform_kurzbz) AS orgform_kurzbz,
+				prestudentstatus.studienplan_id,
+				prestudentstatus.bestaetigtam,
+				prestudentstatus.bestaetigtvon,
+				prestudentstatus.fgm,
+				prestudentstatus.faktiv,
+				tbl_studiengang.kurzbz,
+				tbl_studiengang.kurzbzlang,
+				tbl_studiengang.typ,
+				tbl_studiensemester.start,
+				tbl_studiensemester.ende,
+				tbl_studiensemester.studienjahr_kurzbz,
+				substr(tbl_studiensemester.studiensemester_kurzbz::text, 3) || lower(substr(tbl_studiensemester.studiensemester_kurzbz::text, 1, 1)) AS studiensemester,
+				    CASE
+				        WHEN tbl_studiengang.typ = 'b'::bpchar AND tbl_prestudent.zgv_code IS NOT NULL OR tbl_studiengang.typ = 'm'::bpchar AND tbl_prestudent.zgvmas_code IS NOT NULL OR tbl_studiengang.typ = 'd'::bpchar AND tbl_prestudent.zgvdoktor_code IS NOT NULL THEN true
+				        ELSE false
+				    END AS zgv,
+				    CASE
+				        WHEN tbl_prestudentstatus.prestudent_id IS NULL THEN false
+				        ELSE true
+				    END AS student,
+				date_part('week'::text, prestudentstatus.datum) AS kw
+				FROM public.tbl_person
+				 JOIN public.tbl_prestudent USING (person_id)
+				 JOIN public.tbl_prestudentstatus prestudentstatus USING (prestudent_id)
+				 JOIN public.tbl_studiengang USING (studiengang_kz)
+				 JOIN public.tbl_studiensemester USING (studiensemester_kurzbz)
+				 LEFT JOIN public.tbl_prestudentstatus ON tbl_prestudentstatus.prestudent_id = prestudentstatus.prestudent_id AND tbl_prestudentstatus.studiensemester_kurzbz::text = prestudentstatus.studiensemester_kurzbz::text AND tbl_prestudentstatus.status_kurzbz::text = 'Student'::text;
+
+			GRANT SELECT ON public.vw_prestudentstatus TO vilesci;
+			GRANT SELECT ON public.vw_prestudentstatus TO web;
+			";
+
+			if(!$db->db_query($qry))
+				echo '<strong>public.vw_prestudentstatus:'.$db->db_last_error().'</strong><br>';
+			else
+				echo '<br>public.vw_prestudentstatus angepasst damit anmeldungzumreihungstest aus tbl_rt_person kommt';
+		}
+	}
 }
 
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
@@ -1946,9 +2121,9 @@ $tabellen=array(
 	"campus.tbl_coodle_ressource_termin"  => array("coodle_ressource_id","coodle_termin_id","insertamum","insertvon"),
 	"campus.tbl_coodle_status"  => array("coodle_status_kurzbz","bezeichnung"),
 	"campus.tbl_dms"  => array("dms_id","oe_kurzbz","dokument_kurzbz","kategorie_kurzbz"),
-	"campus.tbl_dms_kategorie"  => array("kategorie_kurzbz","bezeichnung","beschreibung","parent_kategorie_kurzbz"),
+	"campus.tbl_dms_kategorie"  => array("kategorie_kurzbz","bezeichnung","beschreibung","parent_kategorie_kurzbz","oe_kurzbz","berechtigung_kurzbz"),
 	"campus.tbl_dms_kategorie_gruppe" => array("kategorie_kurzbz","gruppe_kurzbz","insertamum","insertvon"),
-	"campus.tbl_dms_version"  => array("dms_id","version","filename","mimetype","name","beschreibung","letzterzugriff","updateamum","updatevon","insertamum","insertvon"),
+	"campus.tbl_dms_version"  => array("dms_id","version","filename","mimetype","name","beschreibung","letzterzugriff","updateamum","updatevon","insertamum","insertvon","cis_suche","schlagworte"),
 	"campus.tbl_erreichbarkeit"  => array("erreichbarkeit_kurzbz","beschreibung","farbe"),
 	"campus.tbl_feedback"  => array("feedback_id","betreff","text","datum","uid","lehrveranstaltung_id","updateamum","updatevon","insertamum","insertvon"),
 	"campus.tbl_freebusy"  => array("freebusy_id","uid","freebusytyp_kurzbz","url","aktiv","bezeichnung","insertamum","insertvon","updateamum","updatevon"),
@@ -2145,7 +2320,7 @@ $tabellen=array(
 	"system.tbl_log" => array("log_id","person_id","zeitpunkt","app","oe_kurzbz","logtype_kurzbz","logdata","insertvon","taetigkeit_kurzbz"),
 	"system.tbl_logtype" => array("logtype_kurzbz", "data_schema"),
 	"system.tbl_filters" => array("filter_id","app","dataset_name","filter_kurzbz","person_id","description","sort","default_filter","filter","oe_kurzbz"),
-	"system.tbl_phrase" => array("phrase_id","app","phrase","insertamum","insertvon"),
+	"system.tbl_phrase" => array("phrase_id","app","phrase","insertamum","insertvon","category"),
 	"system.tbl_phrasentext" => array("phrasentext_id","phrase_id","sprache","orgeinheit_kurzbz","orgform_kurzbz","text","description","insertamum","insertvon"),
 	"system.tbl_rolle"  => array("rolle_kurzbz","beschreibung"),
 	"system.tbl_rolleberechtigung"  => array("berechtigung_kurzbz","rolle_kurzbz","art"),
@@ -2161,15 +2336,10 @@ $tabellen=array(
 	"wawi.tbl_betriebsmittel_betriebsmittelstatus"  => array("betriebsmittelbetriebsmittelstatus_id","betriebsmittel_id","betriebsmittelstatus_kurzbz", "datum", "updateamum", "updatevon", "insertamum", "insertvon","anmerkung"),
 	"wawi.tbl_betriebsmittelstatus"  => array("betriebsmittelstatus_kurzbz","beschreibung"),
 	"wawi.tbl_betriebsmitteltyp"  => array("betriebsmitteltyp","beschreibung","anzahl","kaution","typ_code","mastershapename"),
-	"wawi.tbl_budget"  => array("geschaeftsjahr_kurzbz","kostenstelle_id","budget"),
-	"wawi.tbl_budgetantrag"  => array("budgetantrag_id","kostenstelle_id","geschaeftsjahr_kurzbz","bezeichnung","insertamum","insertvon","updateamum","updatevon"),
-	"wawi.tbl_budgetantrag_status"  => array("budgetantrag_status_id","budgetantrag_id","budgetstatus_kurzbz","datum","uid","oe_kurzbz","insertamum","insertvon"),
-	"wawi.tbl_budgetstatus"  => array("budgetstatus_kurzbz","bezeichnung"),
-	"wawi.tbl_budgetposition"  => array("budgetposition_id","budgetantrag_id","budgetposten","konto_id","betrag","kommentar","projekt_id","insertamum","insertvon","updateamum","updatevon"),
 	"wawi.tbl_zahlungstyp"  => array("zahlungstyp_kurzbz","bezeichnung"),
 	"wawi.tbl_konto"  => array("konto_id","kontonr","beschreibung","kurzbz","aktiv","person_id","insertamum","insertvon","updateamum","updatevon","ext_id","person_id"),
 	"wawi.tbl_konto_kostenstelle"  => array("konto_id","kostenstelle_id","insertamum","insertvon"),
-	"wawi.tbl_kostenstelle"  => array("kostenstelle_id","oe_kurzbz","bezeichnung","kurzbz","aktiv","insertamum","insertvon","updateamum","updatevon","ext_id","kostenstelle_nr","deaktiviertvon","deaktiviertamum"),
+	"wawi.tbl_kostenstelle"  => array("kostenstelle_id","oe_kurzbz","bezeichnung","kurzbz","aktiv","insertamum","insertvon","updateamum","updatevon","ext_id","kostenstelle_nr","deaktiviertvon","deaktiviertamum", "geschaeftsjahrvon", "geschaeftsjahrbis"),
 	"wawi.tbl_bestellungtag"  => array("tag","bestellung_id","insertamum","insertvon"),
 	"wawi.tbl_bestelldetailtag"  => array("tag","bestelldetail_id","insertamum","insertvon"),
 	"wawi.tbl_projekt_bestellung"  => array("projekt_kurzbz","bestellung_id","anteil"),
@@ -2206,7 +2376,7 @@ foreach ($tabellen AS $attribute)
 
 echo '<H2>Gegenpruefung!</H2>';
 $error=false;
-$sql_query="SELECT schemaname,tablename FROM pg_catalog.pg_tables WHERE schemaname != 'pg_catalog' AND schemaname != 'information_schema' AND schemaname != 'sync' AND schemaname != 'addon' AND schemaname != 'reports';";
+$sql_query="SELECT schemaname,tablename FROM pg_catalog.pg_tables WHERE schemaname != 'pg_catalog' AND schemaname != 'information_schema' AND schemaname != 'sync' AND schemaname != 'addon' AND schemaname != 'reports' AND schemaname != 'extension';";
 if (!$result=@$db->db_query($sql_query))
 		echo '<BR><strong>'.$db->db_last_error().' </strong><BR>';
 	else

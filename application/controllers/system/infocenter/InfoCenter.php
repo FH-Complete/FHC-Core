@@ -42,6 +42,11 @@ class InfoCenter extends FHC_Controller
 			'logtype' => 'Action',
 			'name' => 'Note added',
 			'message' => 'Note with title %s was added'
+		),
+		'updatenotiz' => array(
+			'logtype' => 'Action',
+			'name' => 'Note updated',
+			'message' => 'Note with title %s was updated'
 		)
 	);
 	private $uid; // contains the UID of the logged user
@@ -103,7 +108,12 @@ class InfoCenter extends FHC_Controller
 	{
 		$this->load->view('system/infocenter/infocenter.php');
 	}
-
+	
+	public function infocenterFreigegeben()
+	{
+		$this->load->view('system/infocenter/infocenterFreigegeben.php');
+	}
+	
 	/**
 	 * Initialization function, gets person and prestudent data and loads the view with the data
 	 * @param $person_id
@@ -137,7 +147,7 @@ class InfoCenter extends FHC_Controller
 			)
 		);
 	}
-
+	
 	/**
 	 * unlocks page from edit by a person, redirects to overview filter page
 	 * @param $person_id
@@ -367,7 +377,7 @@ class InfoCenter extends FHC_Controller
 
 		$this->_redirectToStart($prestudent_id, 'ZgvPruef');
 	}
-
+	
 	/**
 	 * Saves a new Notiz for a person
 	 * @param $person_id
@@ -390,6 +400,44 @@ class InfoCenter extends FHC_Controller
 		$this->output
 			->set_content_type('application/json')
 			->set_output(json_encode($result->retval));
+	}
+	
+	/**
+	 * Updates a new Notiz for a person
+	 * @param int $notiz_id
+	 * @param int $person_id
+	 * @return bool true if success
+	 */
+	public function updateNotiz($notiz_id, $person_id)
+	{	
+		$titel = $this->input->post('notiztitel');
+		$text = $this->input->post('notiz');
+
+		$result = $this->NotizModel->update(
+			$notiz_id,
+			array(
+				'titel' => $titel,
+				'text' => $text,
+				'verfasser_uid' => $this->uid,
+				"updateamum" => 'NOW()',
+				"updatevon" => $this->uid
+			)
+		);
+		
+		
+		$json = FALSE;
+		
+		if (isSuccess($result))
+		{
+			$json = TRUE;
+			
+			//set log "Notiz updated"
+			$this->_log($person_id, 'updatenotiz', array($titel));
+		}
+		
+		$this->output
+			->set_content_type('application/json')
+			->set_output(json_encode($json));
 	}
 
 	/**
@@ -514,7 +562,7 @@ class InfoCenter extends FHC_Controller
 				'children' => array()
 			)
 		);
-
+				
 		$this->_fillFilters($listFiltersSent, $filtersarray['abgeschickt']);
 		$this->_fillFilters($listFiltersNotSent, $filtersarray['nichtabgeschickt']);
 
@@ -562,7 +610,7 @@ class InfoCenter extends FHC_Controller
 		{
 			$toPrint = "%s=%s";
 			$tofill['children'][] = array(
-				'link' => sprintf($toPrint, base_url('index.ci.php/system/infocenter/InfoCenter?filter_id'), $filterId),
+				'link' => sprintf($toPrint, site_url('system/infocenter/InfoCenter?filter_id'), $filterId),
 				'description' => $description
 			);
 		}
@@ -574,13 +622,8 @@ class InfoCenter extends FHC_Controller
 		{
 			$toPrint = "%s=%s";
 
-			if ($this->router->method != 'index')
-			{
-
-			}
-
 			$tofill['children'][] = array(
-				'link' => sprintf($toPrint, base_url('index.ci.php/system/infocenter/InfoCenter?filter_id'), $filterId),
+				'link' => sprintf($toPrint, site_url('system/infocenter/InfoCenter?filter_id'), $filterId),
 				'description' => $description,
 				'subscriptDescription' => 'Remove',
 				'subscriptLinkClass' => 'remove-filter',
@@ -831,6 +874,8 @@ class InfoCenter extends FHC_Controller
 		$prestudentstatus = $prestudent->prestudentstatus;
 		$person_id = $prestudent->person_id;
 		$person = $this->PersonModel->getPersonStammdaten($person_id, true)->retval;
+		$dokumente = $this->AkteModel->getAktenWithDokInfo($person_id, null, false)->retval;
+		$dokumenteNachzureichen = $this->AkteModel->getAktenWithDokInfo($person_id, null, true)->retval;
 
 		//fill mail variables
 		$interessentbez = $person->geschlecht == 'm' ? 'Ein Interessent' : 'Eine Interessentin';
@@ -838,6 +883,25 @@ class InfoCenter extends FHC_Controller
 		$orgform = $prestudentstatus->orgform != '' ? ' ('.$prestudentstatus->orgform.')' : '';
 		$geschlecht = $person->geschlecht == 'm' ? 'm&auml;nnlich' : 'weiblich';
 		$geburtsdatum = date('d.m.Y', strtotime($person->gebdatum));
+		$zgvort = !empty($prestudent->zgvort) ? ' in '.$prestudent->zgvort : '';
+		$zgvnation = !empty($prestudent->zgvnation_bez) ? ', '.$prestudent->zgvnation_bez : '';
+		$zgvdatum = !empty($prestudent->zgvdatum) ? ', am '.date_format(date_create($prestudent->zgvdatum), 'd.m.Y') : '';
+
+		$dokumenteNachzureichenMail = $dokumenteMail = array();
+		//convert documents to array so they can be parsed, and keeping only needed fields
+		$lastel = end($dokumente);
+		foreach ($dokumente as $dokument)
+		{
+			$postfix = $lastel === $dokument ? '' : ' |';
+			$dokumenteMail[] = array('dokument_bezeichnung' => $dokument->dokument_bezeichnung.$postfix);
+		}
+
+		foreach ($dokumenteNachzureichen as $dokument)
+		{
+			$anmerkung = !empty($dokument->anmerkung) ? ' | Anmerkung: '.$dokument->anmerkung : '';
+			$nachgereichtam = !empty($dokument->nachgereicht_am) ? ' | wird nachgereicht bis '.date_format(date_create($dokument->nachgereicht_am), 'd.m.Y') : '';
+			$dokumenteNachzureichenMail[] = array('dokument_bezeichnung' => $dokument->dokument_bezeichnung, 'anmerkung' => $anmerkung, 'nachgereicht_am' => $nachgereichtam);
+		}
 
 		$notizenBewerbung = $this->NotizModel->getNotizByTitel($person_id, 'Anmerkung zur Bewerbung')->retval;
 
@@ -874,7 +938,13 @@ class InfoCenter extends FHC_Controller
 			'gebdatum' => $geburtsdatum,
 			'mailadresse' => $mailadresse,
 			'prestudentid' => $prestudent_id,
-			'notizentext' => $notizentext
+			'zgvbez' => $prestudent->zgv_bez,
+			'zgvort' => $zgvort,
+			'zgvdatum' => $zgvdatum,
+			'zgvnation' => $zgvnation,
+			'notizentext' => $notizentext,
+			'dokumente' => $dokumenteMail,
+			'dokumente_nachgereicht' => $dokumenteNachzureichenMail
 		);
 
 		$this->load->library('parser');
@@ -884,7 +954,7 @@ class InfoCenter extends FHC_Controller
 		//parse freigabe html email template, wordwrap wraps text so no display errors
 		$email = wordwrap($this->parser->parse('templates/mailtemplates/interessentFreigabe', $data, true), 70);
 
-		$subject = ($person->geschlecht == 'm' ? 'Interessent ' : 'Interessentin ').$person->vorname.' '.$person->nachname.' freigegeben';
+		$subject = ($person->geschlecht == 'm' ? 'Interessent ' : 'Interessentin ').$person->vorname.' '.$person->nachname.' für '.$prestudent->studiengangbezeichnung.$orgform.' freigegeben';
 
 		$receiver = $prestudent->studiengangmail;
 

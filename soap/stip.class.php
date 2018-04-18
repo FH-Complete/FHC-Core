@@ -18,38 +18,38 @@
  * Authors:		Karl Burkhart <burkhart@technikum-wien.at>.
  */
 
-require_once('../config/vilesci.config.inc.php'); 
+require_once('../config/vilesci.config.inc.php');
 require_once('../include/basis_db.class.php');
 require_once('../include/studiensemester.class.php');
 require_once('../include/zeugnisnote.class.php');
-require_once('../include/prestudent.class.php'); 
+require_once('../include/prestudent.class.php');
 
 class stip extends basis_db
 {
-	public $Semester; 
-	public $Studienjahr; 
-	public $PersKz; 
-	public $SVNR; 
-	public $Familienname; 
-	public $Vorname; 
-	public $Typ;  
+	public $Semester;
+	public $Studienjahr;
+	public $PersKz;
+	public $SVNR;
+	public $Familienname;
+	public $Vorname;
+	public $Typ;
 	public $PersKz_Antwort;
-	public $SVNR_Antwort; 
-	public $Familienname_Antwort; 
-	public $Vorname_Antwort; 
-	public $Ausbildungssemester; 
-	public $StudStatusCode; 
-	public $BeendigungsDatum; 
-	public $VonNachPersKz; 
-	public $Studienbeitrag; 
-	public $Inskribiert; 
-	public $Erfolg; 
-	public $OrgFormTeilCode; 
-	public $AntwortStatusCode; 
-	
-	
+	public $SVNR_Antwort;
+	public $Familienname_Antwort;
+	public $Vorname_Antwort;
+	public $Ausbildungssemester;
+	public $StudStatusCode;
+	public $BeendigungsDatum;
+	public $VonNachPersKz;
+	public $Studienbeitrag;
+	public $Inskribiert;
+	public $Erfolg;
+	public $OrgFormTeilCode;
+	public $AntwortStatusCode;
+
+
 	/**
-	 * 
+	 *
 	 * Überprüft die Daten
 	 * @param $ErhKz
 	 * @param $Anfragedaten
@@ -59,111 +59,111 @@ class stip extends basis_db
 	{
 		if(mb_strlen($ErhKz)!=3 || !is_numeric($ErhKz))
 		{
-			$this->errormsg = "Kein gültiger Wert für ErhKz"; 
-			return false; 
+			$this->errormsg = "Kein gültiger Wert für ErhKz";
+			return false;
 		}
-			
+
 		if(mb_strlen($Bezieher->Semester)!=2 || ($Bezieher->Semester != "ws" && $Bezieher->Semester != "ss" && $Bezieher->Semester != "WS" && $Bezieher->Semester != "SS"))
 		{
-			$this->errormsg = "Kein gültiger Wert für Semester"; 
-			return false; 
+			$this->errormsg = "Kein gültiger Wert für Semester";
+			return false;
 		}
-	
+
 		if(mb_strlen($Bezieher->Studienjahr) != 7)
 		{
-			$this->errormsg = "Kein gültiger Wert für Studienjahr"; 
-			return false; 
+			$this->errormsg = "Kein gültiger Wert für Studienjahr";
+			return false;
 		}
-		
+
 		// kein Mussfeld
 		if($Bezieher->PersKz != null && strlen($Bezieher->PersKz) != 10)
 		{
-			$this->errormsg = "Kein gültiger Wert für PersKz"; 
-			//return false; 
+			$this->errormsg = "Kein gültiger Wert für PersKz";
+			//return false;
 		}
-			
+
 		if(mb_strlen($Bezieher->SVNR) != 10 || !is_numeric($Bezieher->SVNR))
 		{
-			$this->errormsg = "Kein gültiger Wert für SVNR"; 
-			//	return false; 
+			$this->errormsg = "Kein gültiger Wert für SVNR";
+			//	return false;
 		}
-			
+
 			// preg_match funktioniert noch nicht || preg_match_all('[^0-9]*',$Bezieher->Familienname)>0
 		if(mb_strlen($Bezieher->Familienname) > 255 || $Bezieher->Familienname == null || mb_strlen($Bezieher->Familienname)<2)
 		{
-			$this->errormsg = "Kein gültiger Wert für Familienname"; 
-			//return false; 
+			$this->errormsg = "Kein gültiger Wert für Familienname";
+			//return false;
 		}
-			
+
 		if(mb_strlen($Bezieher->Vorname) > 255 || $Bezieher->Vorname == null || mb_strlen($Bezieher->Vorname) <2)
 		{
-			$this->errormsg = "Kein gültiger Wert für Vorname"; 
-			//	return false; 
+			$this->errormsg = "Kein gültiger Wert für Vorname";
+			//	return false;
 		}
-			
+
 		if(mb_strlen($Bezieher->Typ) != 2 || ($Bezieher->Typ != "ag" && $Bezieher->Typ != "as" && $Bezieher->Typ != "AG" && $Bezieher->Typ != "AS"))
 		{
-			$this->errormsg = "Kein gültiger Wert für Typ"; 
-			return false; 
+			$this->errormsg = "Kein gültiger Wert für Typ";
+			return false;
 		}
-			
-		return true; 
+
+		return true;
 	}
-		
-	
+
+
 	/**
-	 * 
+	 *
 	 * Suche Studenten anhand PersonKz
 	 * @param $PersonKz
 	 */
 	function searchPersonKz($PersonKz)
 	{
 		$qry = "SELECT
-			 prestudent_id, vorname, nachname, svnr, matrikelnr 
-			FROM 
-				public.tbl_student student 
+			 prestudent_id, vorname, nachname, svnr, matrikelnr
+			FROM
+				public.tbl_student student
 				JOIN public.tbl_benutzer benutzer on(benutzer.uid=student.student_uid)
 				JOIN public.tbl_person person using(person_id)
-			WHERE student.matrikelnr = ".$this->db_add_param($PersonKz).";"; 
-		
+			WHERE student.matrikelnr = ".$this->db_add_param($PersonKz).";";
+
 		if($this->db_query($qry))
 		{
 			if($row = $this->db_fetch_object())
 			{
-				$this->Vorname_Antwort = $row->vorname; 
-				$this->Familienname_Antwort = $row->nachname; 
-				$this->SVNR_Antwort = $row->svnr; 
-				$this->PersKz_Antwort = trim($row->matrikelnr); 
-				$this->AntwortStatusCode = 1; 
-				return $row->prestudent_id; 
+				$this->Vorname_Antwort = $row->vorname;
+				$this->Familienname_Antwort = $row->nachname;
+				$this->SVNR_Antwort = $row->svnr;
+				$this->PersKz_Antwort = trim($row->matrikelnr);
+				$this->AntwortStatusCode = 1;
+				return $row->prestudent_id;
 			}
 			else
 			{
-				$this->AntwortStatusCode =2; 
-				return false; 
+				$this->AntwortStatusCode =2;
+				return false;
 			}
 		}
 		else
 		{
-			return false; 
+			return false;
 		}
 
 	}
 	/**
-	 * 
+	 *
 	 * Suche Studenten anhand Sozialversicherungsnummer
 	 * @param $Svnr
 	 */
 	function searchSvnr($Svnr)
 	{
-		$qry = "SELECT 
-					prestudent_id, vorname, nachname, svnr, matrikelnr 
-				FROM 
-					public.tbl_student student 
+		$qry = "SELECT
+					prestudent_id, vorname, nachname, svnr, matrikelnr
+				FROM
+					public.tbl_student student
 					JOIN public.tbl_benutzer benutzer on(benutzer.uid=student.student_uid)
 					JOIN public.tbl_person person using(person_id)
-				WHERE person.svnr = ".$this->db_add_param($Svnr).";"; 
-		
+				WHERE person.svnr = ".$this->db_add_param($Svnr).";";
+
 		if($this->db_query($qry))
 		{
 			// wenn mehr als 1 Datensatz gefunden wird --> Fehler
@@ -171,50 +171,50 @@ class stip extends basis_db
 			{
 				if($row = $this->db_fetch_object())
 				{
-					$this->Vorname_Antwort = $row->vorname; 
-					$this->Familienname_Antwort = $row->nachname; 
-					$this->SVNR_Antwort = $row->svnr; 
-					$this->PersKz_Antwort = trim($row->matrikelnr); 
-					$this->AntwortStatusCode = 1; 
-					return $row->prestudent_id; 
+					$this->Vorname_Antwort = $row->vorname;
+					$this->Familienname_Antwort = $row->nachname;
+					$this->SVNR_Antwort = $row->svnr;
+					$this->PersKz_Antwort = trim($row->matrikelnr);
+					$this->AntwortStatusCode = 1;
+					return $row->prestudent_id;
 				}
 				else
 				{
-					$this->AntwortStatusCode =2; 
-					return false; 
+					$this->AntwortStatusCode =2;
+					return false;
 				}
 			}
-			else 
+			else
 			{
-				$this->AntwortStatusCode = 2; 
-				return false; 
+				$this->AntwortStatusCode = 2;
+				return false;
 			}
 		}
 		else
 		{
-			return false; 
+			return false;
 		}
-		return true; 
-		
+		return true;
+
 	}
-	
+
 	/**
-	 * 
+	 *
 	 * Suche Studenten anhand Vor- und Nachname
 	 * @param $Svnr
 	 */
 	function searchVorNachname($Vorname, $Nachname)
 	{
-		$qry = "SELECT 
-					prestudent_id, vorname, nachname, svnr, matrikelnr 
+		$qry = "SELECT
+					prestudent_id, vorname, nachname, svnr, matrikelnr
 				FROM
-					public.tbl_student student 
+					public.tbl_student student
 					JOIN public.tbl_benutzer benutzer on(benutzer.uid=student.student_uid)
 					JOIN public.tbl_person person using(person_id)
-				WHERE 
+				WHERE
 					person.vorname = ".$this->db_add_param($Vorname)."
-					AND person.nachname = ".$this->db_add_param($Nachname).";"; 
-		
+					AND person.nachname = ".$this->db_add_param($Nachname).";";
+
 		if($this->db_query($qry))
 		{
 			// wenn mehr als 1 Datensatz gefunden wird --> Fehler
@@ -222,36 +222,36 @@ class stip extends basis_db
 			{
 				if($row = $this->db_fetch_object())
 				{
-					$this->Vorname_Antwort = $row->vorname; 
-					$this->Familienname_Antwort = $row->nachname; 
-					$this->SVNR_Antwort = $row->svnr; 
-					$this->PersKz_Antwort = trim($row->matrikelnr); 
-					$this->AntwortStatusCode = 1; 
-					return $row->prestudent_id; 
+					$this->Vorname_Antwort = $row->vorname;
+					$this->Familienname_Antwort = $row->nachname;
+					$this->SVNR_Antwort = $row->svnr;
+					$this->PersKz_Antwort = trim($row->matrikelnr);
+					$this->AntwortStatusCode = 1;
+					return $row->prestudent_id;
 				}
 				else
 				{
-					$this->AntwortStatusCode =2; 
-					return false; 
+					$this->AntwortStatusCode =2;
+					return false;
 				}
 			}
-			else 
+			else
 			{
-				$this->AntwortStatusCode = 2; 
-				return false; 
+				$this->AntwortStatusCode = 2;
+				return false;
 			}
-			
+
 		}
 		else
 		{
-			return false; 
+			return false;
 		}
-		return true; 
-		
+		return true;
+
 	}
-	
+
 	/**
-	 * 
+	 *
 	 * Gibt den orgform_code zurück für übergebene StudentUID und Semester
 	 * z.B. 1 für Vollzeit
 	 * z.B. 2 für Berufsbegleitend
@@ -260,12 +260,12 @@ class stip extends basis_db
 	 */
 	function getOrgFormTeilCode($studentUID, $studSemester, $prestudentID)
 	{
-					
+
 		// hole mischform von studenten
 		$qry_mischform = "
-			SELECT 
-				studiengang.mischform 
-			FROM 
+			SELECT
+				studiengang.mischform
+			FROM
 				public.tbl_studiengang studiengang
 				JOIN public.tbl_student student using(studiengang_kz)
 				JOIN public.tbl_prestudent prestudent using(prestudent_id)
@@ -276,84 +276,97 @@ class stip extends basis_db
 			if($row= $this->db_fetch_object())
 			{
 				$mischform = $this->db_parse_bool($row->mischform);
-				
+
 			}
 		}
-		
+
 		// hole OrgFormTeilCode aus studiengang
 		if($mischform == false)
 		{
-			
+
 			$qry = "
-			SELECT 	
+			SELECT
 				orgform.code, studiengang.orgform_kurzbz as studorgkz, student.student_uid, student.studiengang_kz studiengang
-			FROM 
+			FROM
 				public.tbl_studiengang studiengang
 				JOIN public.tbl_student student using(studiengang_kz)
 				JOIN public.tbl_prestudent prestudent using(prestudent_id)
 				JOIN public.tbl_prestudentstatus status using(prestudent_id)
-				JOIN bis.tbl_orgform orgform on(orgform.orgform_kurzbz = studiengang.orgform_kurzbz) 
+				JOIN bis.tbl_orgform orgform on(orgform.orgform_kurzbz = studiengang.orgform_kurzbz)
 			WHERE
 				student_uid=".$this->db_add_param($studentUID)."
 				AND status.studiensemester_kurzbz =".$this->db_add_param($studSemester);
-			
+
 			// Wenn kein Status gefunden wurde -> null
 			if($this->db_query($qry))
 			{
 				if($row = $this->db_fetch_object())
 				{
-					$this->OrgFormTeilCode = $row->code; 
-					return true; 
+					$this->OrgFormTeilCode = $row->code;
+					return true;
 				}
 				$this->OrgFormTeilCode = null;
-				return false; 
+				return false;
 			}
 			else
-				return false; 
+				return false;
 		}
 		else // hole OrgFormTeilCode aus letztem Status
 		{
 
 			$prestudentStatus = new prestudent();
 			// wenn status vorhanden übernehme OrgForm
-			if($prestudentStatus->getLastStatus($prestudentID,$studSemester)) 
+			if($prestudentStatus->getLastStatus($prestudentID,$studSemester))
 			{
-				$statusOrgForm = $prestudentStatus->orgform_kurzbz; 
+				$statusOrgForm = null;
+				if($prestudentStatus->orgform_kurzbz != '')
+					$statusOrgForm = $prestudentStatus->orgform_kurzbz;
+				elseif($prestudentStatus->studienplan_id!='')
+				{
+					$qry = "SELECT orgform_kurzbz FROM lehre.tbl_studienplan WHERE studienplan_id=".$this->db_add_param($prestudentStatus->studienplan_id);
+					if($result = $this->db_query($qry))
+					{
+						if($row = $this->db_fetch_object($result))
+						{
+							$statusOrgForm = $row->orgform_kurzbz;
+						}
+					}
+				}
 				$this->OrgFormTeilCode = $this->getOrgFormCodeFromKurzbz($statusOrgForm);
-				return true; 
+				return true;
 			}
-			else 
-				$this->OrgFormTeilCode = null; 
-				
-				
+			else
+				$this->OrgFormTeilCode = null;
+
+
 		}
-		$this->OrgFormTeilCode = null; 
+		$this->OrgFormTeilCode = null;
 	}
-	
-	
+
+
 	/**
-	 * 
+	 *
 	 * Gibt den orgform_code zurück für übergebene orgform_kurzbz
 	 * @param orgform_kurzbz
 	 */
 	function getOrgFormCodeFromKurzbz($orgform_kurzbz)
 	{
 		$qry = "SELECT code FROM bis.tbl_orgform WHERE orgform_kurzbz = ".$this->db_add_param($orgform_kurzbz).";";
-		
+
 		if($this->db_query($qry))
 		{
 			if($row = $this->db_fetch_object())
 			{
-				return $row->code; 
+				return $row->code;
 			}
-			return false; 
+			return false;
 		}
 		else
-			return false; 
+			return false;
 	}
-	
+
 	/**
-	 * 
+	 *
 	 * Ermittelt den StutStatusCode
 	 * Stati Aktiver Student[Code 1], Unterbrecher[2], Absolvent[3] und Ausgeschieden ohne Abschluss[4]
 	 * Stati Übertritt[5] kommt nicht vor
@@ -361,36 +374,36 @@ class stip extends basis_db
 	public function getStudStatusCode($prestudent_id, $studiensemester_kurzbz, $bisdatum=null)
 	{
 		$qrystatus="
-			SELECT 
-				* 
-			FROM 
+			SELECT
+				*
+			FROM
 				public.tbl_prestudentstatus
-			WHERE 
+			WHERE
 				prestudent_id=".$this->db_add_param($prestudent_id)."
 				AND studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz);
 		if(!is_null($bisdatum))
 				$qrystatus.=" AND (tbl_prestudentstatus.datum<".$this->db_add_param($bisdatum).")";
-		
+
 		$qrystatus.=" ORDER BY datum desc, insertamum desc, ext_id desc;";
-		
+
 		if($resultstatus = $this->db_query($qrystatus))
 		{
 			if($this->db_num_rows($resultstatus)==0)
 			{
 				$stsem = new studiensemester();
 				$psem = $stsem->getPreviousFrom($studiensemester_kurzbz);
-				
+
 				$qrystatus="
-					SELECT * 
-					FROM 
-						public.tbl_prestudentstatus 
-					WHERE 
+					SELECT *
+					FROM
+						public.tbl_prestudentstatus
+					WHERE
 						prestudent_id=".$this->db_add_param($prestudent_id, FHC_INTEGER)."
 						AND studiensemester_kurzbz=".$this->db_add_param($psem)."'";
-				if(!is_null($bisdatum)) 
+				if(!is_null($bisdatum))
 					$qrystatus.=" AND (tbl_prestudentstatus.datum<".$this->db_add_param($bisdatum).") ";
 				$qrystatus.=" ORDER BY datum desc, insertamum desc, ext_id desc;";
-				
+
 				if(!$resultstatus = $this->db_query($qrystatus))
 				{
 					$this->errormsg='Fehler beim Laden der Daten';
@@ -423,47 +436,47 @@ class stip extends basis_db
 					break;
 			}
 		}
-		
+
 		return $status;
 	}
 	/**
-	 * 
+	 *
 	 * Ermittelt den SemesterCode
 	 */
 	public function getSemester($prestudent_id, $studiensemester_kurzbz, $bisdatum=null)
 	{
 		$qrystatus="
-			SELECT 
-				* 
-			FROM 
+			SELECT
+				*
+			FROM
 				public.tbl_prestudentstatus
-			WHERE 
+			WHERE
 				prestudent_id=".$this->db_add_param($prestudent_id)."
 				AND studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz);
 		if(!is_null($bisdatum))
 				$qrystatus.=" AND (tbl_prestudentstatus.datum<".$this->db_add_param($bisdatum).")";
-		
+
 		$qrystatus.=" ORDER BY datum desc, insertamum desc, ext_id desc;";
-		
+
 		if($resultstatus = $this->db_query($qrystatus))
 		{
-			
+
 			if($rowstatus = $this->db_fetch_object($resultstatus))
 			{
 				$qry1="
-					SELECT count(*) AS dipl FROM public.tbl_prestudentstatus 
-					WHERE 
+					SELECT count(*) AS dipl FROM public.tbl_prestudentstatus
+					WHERE
 						prestudent_id=".$this->db_add_param($prestudent_id, FHC_INTEGER)."
 						AND status_kurzbz='Diplomand'";
 				if(!is_null($bisdatum))
 					$qry1.=" AND (tbl_prestudentstatus.datum<".$this->db_add_param($bisdatum).") ";
-				
+
 				if($result1 = $this->db_query($qry1))
 				{
 					if($row1 = $this->db_fetch_object($result1))
 					{
 						$sem=$rowstatus->ausbildungssemester;
-						
+
 						if($row1->dipl>1)
 						{
 							$sem=50;
@@ -478,10 +491,10 @@ class stip extends basis_db
 		}
 		return $sem;
 	}
-	
+
 	/**
 	 * Liefert die ECTS Punkte aller LVs die besucht wurden
-	 * 
+	 *
 	 * @param $prestudent_id
 	 * @param $studiensemester_kurzbz
 	 */
@@ -489,7 +502,7 @@ class stip extends basis_db
 	{
 		$student = new student();
 		$uid = $student->getUid($prestudent_id);
-		
+
 		$noten = new note();
 		$noten->getAll();
 
@@ -512,15 +525,4 @@ class stip extends basis_db
 		return number_format($ects,2,',','');
 	}
 }
-
-class error
-{
-	public $ErrorNumbe; 
-	public $KeyAttribute; 
-	public $KeyValues; 
-	public $CheckAttribute; 
-	public $CheckValue; 
-	public $ErrorText; 
-}
-
 ?>
