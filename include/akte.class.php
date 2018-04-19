@@ -51,6 +51,9 @@ class akte extends basis_db
 	public $nachgereicht_am;
 	public $ausstellungsnation;
 	public $formal_geprueft_amum;
+	public $archiv = false;
+	public $signiert = false;
+	public $stud_selfservice = false;
 
 	/**
 	 * Konstruktor
@@ -106,6 +109,10 @@ class akte extends basis_db
 				$this->nachgereicht_am = $row->nachgereicht_am;
 				$this->ausstellungsnation = $row->ausstellungsnation;
 				$this->formal_geprueft_amum = $row->formal_geprueft_amum;
+				$this->archiv = $this->db_parse_bool($row->archiv);
+				$this->signiert = $this->db_parse_bool($row->signiert);
+				$this->stud_selfservice = $this->db_parse_bool($row->stud_selfservice);
+
 				return true;
 			}
 			else
@@ -189,7 +196,8 @@ class akte extends basis_db
 			//Neuen Datensatz anlegen
 			$qry = "BEGIN;INSERT INTO public.tbl_akte (person_id, dokument_kurzbz, inhalt, mimetype, erstelltam, gedruckt, titel,
 					bezeichnung, updateamum, updatevon, insertamum, insertvon, uid, dms_id, nachgereicht, anmerkung,
-					titel_intern, anmerkung_intern, nachgereicht_am, ausstellungsnation, formal_geprueft_amum) VALUES (".
+					titel_intern, anmerkung_intern, nachgereicht_am, ausstellungsnation, formal_geprueft_amum,
+					archiv, signiert, stud_selfservice) VALUES (".
 						$this->db_add_param($this->person_id, FHC_INTEGER).', '.
 						$this->db_add_param($this->dokument_kurzbz).', '.
 						$this->db_add_param($this->inhalt).', '.
@@ -210,7 +218,10 @@ class akte extends basis_db
 						$this->db_add_param($this->anmerkung_intern).','.
 						$this->db_add_param($this->nachgereicht_am).','.
 						$this->db_add_param($this->ausstellungsnation).','.
-						$this->db_add_param($this->formal_geprueft_amum).');';
+						$this->db_add_param($this->formal_geprueft_amum).','.
+						$this->db_add_param($this->archiv, FHC_BOOLEAN).','.
+						$this->db_add_param($this->signiert, FHC_BOOLEAN).','.
+						$this->db_add_param($this->stud_selfservice, FHC_BOOLEAN).');';
 		}
 		else
 		{
@@ -234,7 +245,10 @@ class akte extends basis_db
 				" anmerkung_intern=".$this->db_add_param($this->anmerkung_intern).",".
 				" nachgereicht_am=".$this->db_add_param($this->nachgereicht_am).",".
 				" ausstellungsnation=".$this->db_add_param($this->ausstellungsnation).",".
-				" formal_geprueft_amum=".$this->db_add_param($this->formal_geprueft_amum).
+				" formal_geprueft_amum=".$this->db_add_param($this->formal_geprueft_amum).",".
+				" archiv=".$this->db_add_param($this->archiv, FHC_BOOLEAN).",".
+				" signiert=".$this->db_add_param($this->signiert, FHC_BOOLEAN).",".
+				" stud_selfservice=".$this->db_add_param($this->stud_selfservice, FHC_BOOLEAN).
 				" WHERE akte_id=".$this->db_add_param($this->akte_id, FHC_INTEGER);
 		}
 
@@ -285,13 +299,13 @@ class akte extends basis_db
 	 * nicht mehr angezeigt werden
 	 * @return true wenn ok, sonst false
 	 */
-	public function getAkten($person_id, $dokument_kurzbz=null, $stg_kz = null, $prestudent_id= null)
+	public function getAkten($person_id, $dokument_kurzbz=null, $stg_kz = null, $prestudent_id = null)
 	{
 		$qry = "SELECT
 					akte_id, person_id, dokument_kurzbz, mimetype, erstelltam, gedruckt, titel_intern, anmerkung_intern,
 					titel, bezeichnung, updateamum, insertamum, updatevon, insertvon, uid, dms_id, anmerkung, nachgereicht,
 					CASE WHEN inhalt is not null THEN true ELSE false END as inhalt_vorhanden,
-					nachgereicht_am, ausstellungsnation, formal_geprueft_amum
+					nachgereicht_am, ausstellungsnation, formal_geprueft_amum, archiv, signiert, stud_selfservice
 				FROM public.tbl_akte WHERE person_id=".$this->db_add_param($person_id, FHC_INTEGER);
 		if($dokument_kurzbz!=null)
 			$qry.=" AND dokument_kurzbz=".$this->db_add_param($dokument_kurzbz);
@@ -334,6 +348,9 @@ class akte extends basis_db
 				$akten->nachgereicht_am = $row->nachgereicht_am;
 				$akten->ausstellungsnation = $row->ausstellungsnation;
 				$akten->formal_geprueft_amum = $row->formal_geprueft_amum;
+				$akten->archiv = $this->db_parse_bool($row->archiv);
+				$akten->signiert = $this->db_parse_bool($row->signiert);
+				$akten->stud_selfservice = $this->db_parse_bool($row->stud_selfservice);
 
 				$this->result[] = $akten;
 			}
@@ -359,7 +376,7 @@ class akte extends basis_db
 			akte_id, person_id, dokument_kurzbz, mimetype, erstelltam, gedruckt,
 			titel, bezeichnung, updateamum, insertamum, updatevon, insertvon, uid,
 			dms_id,nachgereicht,anmerkung,titel_intern,anmerkung_intern, nachgereicht_am,
-			ausstellungsnation, formal_geprueft_amum
+			ausstellungsnation, formal_geprueft_amum, archiv, signiert, stud_selfservice
 			FROM public.tbl_akte WHERE person_id=".$this->db_add_param($person_id, FHC_INTEGER);
 
 		$qry.=" AND dokument_kurzbz IN ('Lebenslf','Motivat','LearnAgr')";
@@ -393,6 +410,9 @@ class akte extends basis_db
 				$akten->nachgereicht_am = $row->nachgereicht_am;
 				$akten->ausstellungsnation = $row->ausstellungsnation;
 				$akten->formal_geprueft_amum = $row->formal_geprueft_amum;
+				$akten->archiv = $this->db_parse_bool($row->archiv);
+				$akten->signiert = $this->db_parse_bool($row->signiert);
+				$akten->stud_selfservice = $this->db_parse_bool($row->stud_selfservice);
 
 				$this->result[] = $akten;
 			}
@@ -417,7 +437,7 @@ class akte extends basis_db
 					akte_id, person_id, dokument_kurzbz, mimetype, erstelltam, gedruckt,
 					titel, bezeichnung, updateamum, insertamum, updatevon, insertvon, uid,
 					dms_id,nachgereicht,anmerkung,titel_intern,anmerkung_intern, nachgereicht_am,
-					ausstellungsnation, formal_geprueft_amum
+					ausstellungsnation, formal_geprueft_amum, archiv, signiert, stud_selfservice
 				FROM public.tbl_akte WHERE dms_id=".$this->db_add_param($dms_id, FHC_INTEGER)."
 				ORDER BY erstelltam";
 
@@ -449,6 +469,84 @@ class akte extends basis_db
 				$akten->nachgereicht_am = $row->nachgereicht_am;
 				$akten->ausstellungsnation = $row->ausstellungsnation;
 				$akten->formal_geprueft_amum = $row->formal_geprueft_amum;
+				$akten->archiv = $this->db_parse_bool($row->archiv);
+				$akten->signiert = $this->db_parse_bool($row->signiert);
+				$akten->stud_selfservice = $this->db_parse_bool($row->stud_selfservice);
+
+				$this->result[] = $akten;
+			}
+			return true;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+	}
+
+	/**
+	 * Liefert die Archivdokumente einer Person
+	 *
+	 * @param $person_id ID der Person.
+	 * @param $signiert Boolean Wenn true werden nur Dokumente geliefert die digital signiert wurden.
+	 * @param $stud_selfservice Boolean Wenn true werden nur Dokumente geliefert die Studierende selbst herunterladen duerfen.
+	 * @return true wenn ok, sonst false
+	 */
+	public function getArchiv($person_id, $signiert = null, $stud_selfservice = null)
+	{
+		$qry = "
+			SELECT
+				akte_id, person_id, dokument_kurzbz, mimetype, erstelltam, gedruckt, titel_intern, anmerkung_intern,
+				titel, bezeichnung, updateamum, insertamum, updatevon, insertvon, uid, dms_id, anmerkung, nachgereicht,
+				CASE WHEN inhalt is not null THEN true ELSE false END as inhalt_vorhanden,
+				nachgereicht_am, ausstellungsnation, formal_geprueft_amum, archiv, signiert, stud_selfservice
+			FROM
+				public.tbl_akte
+			WHERE
+				person_id=".$this->db_add_param($person_id, FHC_INTEGER)."
+				AND archiv = true";
+
+		if(!is_null($signiert))
+			$qry.=" AND signiert=".($signiert?'true':'false');
+		if(!is_null($stud_selfservice))
+			$qry.=" AND stud_selfservice=".($stud_selfservice?'true':'false');
+
+		$qry.=" ORDER BY erstelltam";
+
+		$this->errormsg = $qry;
+
+		if($this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object())
+			{
+				$akten = new akte();
+
+				$akten->akte_id = $row->akte_id;
+				$akten->person_id = $row->person_id;
+				$akten->dokument_kurzbz = $row->dokument_kurzbz;
+				//$akte->inhalt = $row->inhalt;
+				$akten->inhalt_vorhanden = $this->db_parse_bool($row->inhalt_vorhanden);
+				$akten->mimetype = $row->mimetype;
+				$akten->erstelltam = $row->erstelltam;
+				$akten->gedruckt = $this->db_parse_bool($row->gedruckt);
+				$akten->titel = $row->titel;
+				$akten->bezeichnung = $row->bezeichnung;
+				$akten->updateamum = $row->updateamum;
+				$akten->updatevon = $row->updatevon;
+				$akten->insertamum = $row->insertamum;
+				$akten->insertvon = $row->insertvon;
+				$akten->uid = $row->uid;
+				$akten->dms_id = $row->dms_id;
+				$akten->nachgereicht = $this->db_parse_bool($row->nachgereicht);
+				$akten->anmerkung = $row->anmerkung;
+				$akten->titel_intern = $row->titel_intern;
+				$akten->anmerkung_intern = $row->anmerkung_intern;
+				$akten->nachgereicht_am = $row->nachgereicht_am;
+				$akten->ausstellungsnation = $row->ausstellungsnation;
+				$akten->formal_geprueft_amum = $row->formal_geprueft_amum;
+				$akten->archiv = $this->db_parse_bool($row->archiv);
+				$akten->signiert = $this->db_parse_bool($row->signiert);
+				$akten->stud_selfservice = $this->db_parse_bool($row->stud_selfservice);
 
 				$this->result[] = $akten;
 			}

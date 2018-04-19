@@ -24,11 +24,8 @@ header("Cache-Control: no-cache");
 header("Cache-Control: post-check=0, pre-check=0",false);
 header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
 header("Pragma: no-cache");
-// content type setzen
 header("Content-type: application/xhtml+xml");
-// xml
 echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
-// DAO
 require_once('../config/vilesci.config.inc.php');
 require_once('../include/akte.class.php');
 require_once('../include/dokument.class.php');
@@ -54,7 +51,7 @@ $datum = new datum();
 $akten = new akte();
 if(!isset($akte_id))
 {
-	if(!$akten->getAkten($person_id, $dokument_kurzbz))
+	if(!$akten->getArchiv($person_id))
 		die($akten->errormsg);
 }
 else
@@ -71,7 +68,7 @@ echo '
 	xmlns:AKTE="'.$rdf_url.'/rdf#"
 >
 
-   <RDF:Seq about="'.$rdf_url.'/liste">
+	<RDF:Seq about="'.$rdf_url.'/liste">
 ';
 
 foreach ($akten->result as $row)
@@ -79,15 +76,15 @@ foreach ($akten->result as $row)
 	$dokument = new dokument();
 	$dokument->loadDokumenttyp($row->dokument_kurzbz);
 	echo '
-      <RDF:li>
-         <RDF:Description  id="'.$row->akte_id.'"  about="'.$rdf_url.'/'.$row->akte_id.'" >
-            <AKTE:akte_id><![CDATA['.$row->akte_id.']]></AKTE:akte_id>
-            <AKTE:person_id><![CDATA['.$row->person_id.']]></AKTE:person_id>
-            <AKTE:dokument_kurzbz><![CDATA['.$row->dokument_kurzbz.']]></AKTE:dokument_kurzbz>
-            <AKTE:dokument_bezeichnung><![CDATA['.$dokument->bezeichnung.']]></AKTE:dokument_bezeichnung>
-            <AKTE:mimetype><![CDATA['.$row->mimetype.']]></AKTE:mimetype>
-            <AKTE:erstelltam><![CDATA['.$datum->convertISODate($row->erstelltam).']]></AKTE:erstelltam>
-            <AKTE:erstelltam_iso><![CDATA['.$row->erstelltam.']]></AKTE:erstelltam_iso>
+	<RDF:li>
+		<RDF:Description  id="'.$row->akte_id.'"  about="'.$rdf_url.'/'.$row->akte_id.'" >
+			<AKTE:akte_id><![CDATA['.$row->akte_id.']]></AKTE:akte_id>
+			<AKTE:person_id><![CDATA['.$row->person_id.']]></AKTE:person_id>
+			<AKTE:dokument_kurzbz><![CDATA['.$row->dokument_kurzbz.']]></AKTE:dokument_kurzbz>
+			<AKTE:dokument_bezeichnung><![CDATA['.$dokument->bezeichnung.']]></AKTE:dokument_bezeichnung>
+			<AKTE:mimetype><![CDATA['.$row->mimetype.']]></AKTE:mimetype>
+			<AKTE:erstelltam><![CDATA['.$datum->convertISODate($row->erstelltam).']]></AKTE:erstelltam>
+			<AKTE:erstelltam_iso><![CDATA['.$row->erstelltam.']]></AKTE:erstelltam_iso>
 			<AKTE:gedruckt><![CDATA['.($row->gedruckt?'Ja':'Nein').']]></AKTE:gedruckt>
 			<AKTE:titel><![CDATA['.$row->titel.']]></AKTE:titel>
 			<AKTE:bezeichnung><![CDATA['.$row->bezeichnung.']]></AKTE:bezeichnung>
@@ -100,10 +97,12 @@ foreach ($akten->result as $row)
 			<AKTE:titel_intern><![CDATA['.$row->titel_intern.']]></AKTE:titel_intern>
 			<AKTE:anmerkung><![CDATA['.$row->anmerkung.']]></AKTE:anmerkung>
 			<AKTE:nachgereicht><![CDATA['.($row->nachgereicht?'Ja':'Nein').']]></AKTE:nachgereicht>
-         </RDF:Description>
-      </RDF:li>
-      ';
+			<AKTE:signiert><![CDATA['.($row->signiert?'Ja':'Nein').']]></AKTE:signiert>
+			<AKTE:stud_selfservice><![CDATA['.($row->stud_selfservice?'Ja':'Nein').']]></AKTE:stud_selfservice>
+		</RDF:Description>
+	</RDF:li>
+	';
 }
 ?>
-   </RDF:Seq>
+	</RDF:Seq>
 </RDF:RDF>

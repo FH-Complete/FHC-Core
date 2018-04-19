@@ -15,7 +15,8 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Manfred Kindl		< manfred.kindl@technikum-wien.at >
+ * Authors: Manfred Kindl < manfred.kindl@technikum-wien.at >,
+ *			Andreas Österreicher < andreas.oesterreicher@technikum-wien.at >
  */
 /**
  * Dokumentvorlagen
@@ -29,6 +30,7 @@ require_once('../../include/vorlage.class.php');
 require_once('../../include/benutzerberechtigung.class.php');
 require_once('../../include/organisationseinheit.class.php');
 require_once('../../include/studiengang.class.php');
+require_once('../../include/dokument.class.php');
 
 if (!$db = new basis_db())
 {
@@ -246,6 +248,8 @@ echo '
 <hr>';
 if ((isset($_GET['neueVorlage']) && $_GET['neueVorlage'] == 'true'))
 {
+	$dokument = new dokument();
+	$dokument->getAllDokumente();
 	echo'
 			<form action="'.$_SERVER['PHP_SELF'].'?neueVorlage=save" method="POST">
 				<table>
@@ -274,6 +278,40 @@ if ((isset($_GET['neueVorlage']) && $_GET['neueVorlage'] == 'true'))
 						</td>
 					</tr>
 					<tr>
+						<td>Dokument</td>
+						<td>
+						<SELECT name="neueVorlage_dokument_kurzbz">
+						<option value="">-- keine Auswahl --</option>';
+		foreach($dokument->result as $dok)
+		{
+			if ($dok->dokument_kurzbz == $vorlage->dokument_kurzbz)
+				$selected = 'selected';
+			else
+				$selected = '';
+
+			echo '<option value="'.$dok->dokument_kurzbz.'" '.$selected.'>'.$dok->bezeichnung.'</option>';
+		}
+		echo '			</SELECT></td>
+					</tr>
+					<tr>
+						<td>Archivierbar</td>
+						<td>
+							<input type="checkbox" name="neueVorlage_archivierbar" '.($vorlage->archivierbar?'checked="checked"':'').'/>
+						</td>
+					</tr>
+					<tr>
+						<td>Signierbar</td>
+						<td>
+							<input type="checkbox" name="neueVorlage_signierbar" '.($vorlage->signierbar?'checked="checked"':'').'/>
+						</td>
+					</tr>
+					<tr>
+						<td>Studierenden Selfservice</td>
+						<td>
+							<input type="checkbox" name="neueVorlage_stud_selfservice" '.($vorlage->stud_selfservice?'checked="checked"':'').'/>
+						</td>
+					</tr>
+					<tr>
 						<td></td>
 						<td>
 							<input type="submit" value="Neu anlegen">
@@ -285,6 +323,9 @@ if ((isset($_GET['neueVorlage']) && $_GET['neueVorlage'] == 'true'))
 }
 elseif (isset($_GET['vorlageBearbeiten']))
 {
+	$dokument = new dokument();
+	$dokument->getAllDokumente();
+
 	$vorlage = new vorlage();
 	$vorlage->loadVorlage($_GET['vorlageBearbeiten']);
 	echo'
@@ -315,6 +356,40 @@ elseif (isset($_GET['vorlageBearbeiten']))
 						</td>
 					</tr>
 					<tr>
+						<td>Dokument</td>
+						<td>
+						<SELECT name="updateVorlage_dokument_kurzbz">
+						<option value="">-- keine Auswahl --</option>';
+		foreach($dokument->result as $dok)
+		{
+			if ($dok->dokument_kurzbz == $vorlage->dokument_kurzbz)
+				$selected = 'selected';
+			else
+				$selected = '';
+
+			echo '<option value="'.$dok->dokument_kurzbz.'" '.$selected.'>'.$dok->bezeichnung.'</option>';
+		}
+		echo '			</SELECT></td>
+					</tr>
+					<tr>
+						<td>Archivierbar</td>
+						<td>
+							<input type="checkbox" name="updateVorlage_archivierbar" '.($vorlage->archivierbar?'checked="checked"':'').'/>
+						</td>
+					</tr>
+					<tr>
+						<td>Signierbar</td>
+						<td>
+							<input type="checkbox" name="updateVorlage_signierbar" '.($vorlage->signierbar?'checked="checked"':'').'/>
+						</td>
+					</tr>
+					<tr>
+						<td>Studierenden Selfservice</td>
+						<td>
+							<input type="checkbox" name="updateVorlage_stud_selfservice" '.($vorlage->stud_selfservice?'checked="checked"':'').'/>
+						</td>
+					</tr>
+					<tr>
 						<td></td>
 						<td>
 							<input type="submit" value="Änderungen speichern">
@@ -333,6 +408,10 @@ else
 		$neuevorlage->bezeichnung = htmlspecialchars($_POST['neueVorlage_bezeichnung']);
 		$neuevorlage->anmerkung = htmlspecialchars($_POST['neueVorlage_anmerkung']);
 		$neuevorlage->mimetype = htmlspecialchars($_POST['neueVorlage_mimetype']);
+		$neuevorlage->dokument_kurzbz = htmlspecialchars($_POST['neueVorlage_dokument_kurzbz']);
+		$neuevorlage->archivierbar = isset($_POST['neueVorlage_archivierbar']);
+		$neuevorlage->signierbar = isset($_POST['neueVorlage_signierbar']);
+		$neuevorlage->stud_selfservice = isset($_POST['neueVorlage_stud_selfservice']);
 		if (!($neuevorlage->saveVorlage(true)))
 		{
 			echo 'Fehler beim Speichern';
@@ -345,6 +424,10 @@ else
 		$updatevorlage->bezeichnung = htmlspecialchars($_POST['updateVorlage_bezeichnung']);
 		$updatevorlage->anmerkung = htmlspecialchars($_POST['updateVorlage_anmerkung']);
 		$updatevorlage->mimetype = htmlspecialchars($_POST['updateVorlage_mimetype']);
+		$updatevorlage->dokument_kurzbz = htmlspecialchars($_POST['updateVorlage_dokument_kurzbz']);
+		$updatevorlage->archivierbar = isset($_POST['updateVorlage_archivierbar']);
+		$updatevorlage->signierbar = isset($_POST['updateVorlage_signierbar']);
+		$updatevorlage->stud_selfservice = isset($_POST['updateVorlage_stud_selfservice']);
 		if (!($updatevorlage->saveVorlage()))
 		{
 			echo 'Fehler beim Speichern';
@@ -470,6 +553,7 @@ if($vorlage_kurzbz!='' || $oe_kurzbz!='')
 					<th>Organisationseinheit</th>
 					<th>Studiengang</th>
 					<th>Version</th>
+					<th>Berechtigung</th>
 					<th>Anmerkung</th>
 					<th>Aktiv</th>
 					<th colspan="2"></th>
@@ -492,6 +576,7 @@ if($vorlage_kurzbz!='' || $oe_kurzbz!='')
 				<td '.$style.'>'.$db->convert_html_chars($oe->organisationseinheittyp_kurzbz.' '.$oe->bezeichnung).'</td>
 				<td>'.$db->convert_html_chars($row->studiengang_kz).'</td>
 				<td>'.$db->convert_html_chars($row->version).'</td>
+				<td>'.$db->convert_html_chars($row->berechtigung).'</td>
 				<td>'.$db->convert_html_chars($row->anmerkung_vorlagestudiengang).'</td>
 				<td>'.($row->aktiv==false?'inaktiv':'aktiv').'</td>
 				<td><a href="'.$_SERVER['PHP_SELF'].'?vorlagestudiengang_id='.$row->vorlagestudiengang_id.'&vorlage_kurzbz='.$vorlage_kurzbz.'&oe_auswahl='.$oe_auswahl.'">Edit</a></td>
