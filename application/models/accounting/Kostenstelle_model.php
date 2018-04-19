@@ -57,24 +57,6 @@ class Kostenstelle_model extends DB_Model
 					(DATE ? < kgjbis.ende OR wawi.tbl_kostenstelle.geschaeftsjahrbis IS NULL)
 					ORDER BY wawi.tbl_kostenstelle.bezeichnung';
 
-		$kostenstellen = $this->execQuery($query, array($gjstart, $gjstart));
-
-		if ($kostenstellen->error)
-			return error($kostenstellen->retval);
-
-		$this->load->library('PermissionLib');
-
-		$kostenstellenresult = array();
-
-		//filter kostenstellen, only kostenstellen for which berechtigt
-		foreach ($kostenstellen->retval as $kostenstelle)
-		{
-			if ($this->permissionlib->isBerechtigt('extension/budget_verwaltung', 'suid', null, $kostenstelle->kostenstelle_id) === true)
-			{
-				$kostenstellenresult[] = $kostenstelle;
-			}
-		}
-
-		return success($kostenstellenresult);
+		return $this->execQuery($query, array($gjstart, $gjstart));
 	}
 }
