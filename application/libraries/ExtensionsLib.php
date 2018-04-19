@@ -15,12 +15,17 @@ class ExtensionsLib
 	const EXTENSION_JSON_NAME = 'extension.json'; // file that contains extension data
 	const EXTENSIONS_DIR_NAME = 'extensions'; // name of the directories where will be created the symlinks
 
+	private $_ci;
+
 	private $ARCHIVE_EXTENSIONS = array('.tgz', '.tbz2'); // accepted file extensions for an uploaded extension
 	private $UPLOAD_PATH; // temporary directory to store the upload file and checks the archive
 	private $EXTENSIONS_PATH; // directory where all the extensions are
 
 	// Directories that are part of the extension archive
-	private $SOFTLINK_TARGET_DIRECTORIES = array('config', 'controllers', 'helpers', 'hooks', 'libraries', 'models', 'views', 'widgets');
+	private $SOFTLINK_TARGET_DIRECTORIES = array(
+		APPPATH => array('config', 'controllers', 'helpers', 'hooks', 'libraries', 'models', 'views', 'widgets'),
+		DOC_ROOT => array('public')
+	);
 
 	private $_errorOccurred; // boolean, true if an error occurred while installing an extension
 	private $_currentInstalledExtensionVersion; // contains the version of the current installation of an extension
@@ -33,16 +38,16 @@ class ExtensionsLib
 		$this->UPLOAD_PATH = APPPATH.'tmp/';
 		$this->EXTENSIONS_PATH = APPPATH.'extensions/';
 		// Get code igniter instance
-		$this->ci =& get_instance();
+		$this->_ci =& get_instance();
 
 		// Loads message configurationx
-		$this->ci->config->load('message');
+		$this->_ci->config->load('message');
 
 		// Loads EPrintfLib
-		$this->ci->load->library('EPrintfLib');
+		$this->_ci->load->library('EPrintfLib');
 
 		// Loading models
-		$this->ci->load->model('system/Extensions_model', 'ExtensionsModel');
+		$this->_ci->load->model('system/Extensions_model', 'ExtensionsModel');
 
 		// Set default values fot class properties
 		$this->_errorOccurred = false;
@@ -153,7 +158,7 @@ class ExtensionsLib
 		$delExtension = false;
 
 		// Loads data about this extension from the DB
-		$result = $this->ci->ExtensionsModel->load($extensionId);
+		$result = $this->_ci->ExtensionsModel->load($extensionId);
 		if (hasData($result)) // if something was found
 		{
 			$extensionName = $result->retval[0]->name; // extension name
@@ -162,15 +167,15 @@ class ExtensionsLib
 			$delExtension = $this->_rrm($this->EXTENSIONS_PATH.$extensionName);
 
 			// Select all the version of this extension
-			$this->ci->ExtensionsModel->addSelect('extension_id');
-			$result = $this->ci->ExtensionsModel->loadWhere(array('name' => $extensionName));
+			$this->_ci->ExtensionsModel->addSelect('extension_id');
+			$result = $this->_ci->ExtensionsModel->loadWhere(array('name' => $extensionName));
 			if (hasData($result)) // if something was found
 			{
 				$extsArray = array();
 				foreach ($result->retval as $key => $extension) // loops on them
 				{
 					// Remove them all
-					$result = $this->ci->ExtensionsModel->delete($extension->extension_id);
+					$result = $this->_ci->ExtensionsModel->delete($extension->extension_id);
 					if (isSuccess($result))
 					{
 						$delExtension = true;
@@ -187,7 +192,7 @@ class ExtensionsLib
 	 */
 	public function getInstalledExtensions()
 	{
-		return $this->ci->ExtensionsModel->getInstalledExtensions();
+		return $this->_ci->ExtensionsModel->getInstalledExtensions();
 	}
 
 	/**
@@ -214,7 +219,7 @@ class ExtensionsLib
 	 */
 	private function _loadUploadLibrary()
 	{
-		$this->ci->load->library(
+		$this->_ci->load->library(
 			'upload',
 			array(
 				'upload_path' => $this->UPLOAD_PATH,
@@ -234,9 +239,9 @@ class ExtensionsLib
 		$this->_printStart('Uploading extension');
 
 		// If the upload was a success
-		if ($this->ci->upload->do_upload(ExtensionsLib::FILE_INPUT_NAME))
+		if ($this->_ci->upload->do_upload(ExtensionsLib::FILE_INPUT_NAME))
 		{
-			$uploadData = $this->ci->upload->data(); // retrives data about the uploaded file
+			$uploadData = $this->_ci->upload->data(); // retrives data about the uploaded file
 			// Checks the file extension
 			$uploadedFileExtension = '.'.pathinfo($uploadData['full_path'], PATHINFO_EXTENSION);
 			if (!in_array($uploadedFileExtension, $this->ARCHIVE_EXTENSIONS))
@@ -259,7 +264,7 @@ class ExtensionsLib
 		}
 		else
 		{
-			$this->_printFailure($this->ci->upload->display_errors('', ''));
+			$this->_printFailure($this->_ci->upload->display_errors('', ''));
 		}
 
 		$this->_printSuccess($_uploadExtension != null);
@@ -309,9 +314,9 @@ class ExtensionsLib
 		$this->_printStart('Loads any previous installation data');
 
 		// Loads the last version of the previous installation of this extension
-		$this->ci->ExtensionsModel->addOrder('version', 'DESC');
-		$this->ci->ExtensionsModel->addLimit(1);
-		$result = $this->ci->ExtensionsModel->loadWhere(array('name' => $extensionName));
+		$this->_ci->ExtensionsModel->addOrder('version', 'DESC');
+		$this->_ci->ExtensionsModel->addLimit(1);
+		$result = $this->_ci->ExtensionsModel->loadWhere(array('name' => $extensionName));
 		if (isError($result))
 		{
 			$this->_errorOccurred = true;
@@ -428,7 +433,7 @@ class ExtensionsLib
 							&& count($extensionJson->dependencies) > 0)
 						{
 							// Gets the required dependencies
-							$result = $this->ci->ExtensionsModel->getDependencies($extensionJson->dependencies);
+							$result = $this->_ci->ExtensionsModel->getDependencies($extensionJson->dependencies);
 							// If they are matcheds
 							if (hasData($result) && count($result->retval) == count($extensionJson->dependencies))
 							{
@@ -525,7 +530,7 @@ class ExtensionsLib
 	{
 		$this->_printStart('Adding new entry in the DB');
 
-		$result = $this->ci->ExtensionsModel->insert(
+		$result = $this->_ci->ExtensionsModel->insert(
 			array(
 				'name' => $extensionJson->name,
 				'description' => isset($extensionJson->description) ? $extensionJson->description : null,
@@ -581,7 +586,7 @@ class ExtensionsLib
 					$this->_printMessage($sql);
 
 					// Try to execute that
-					if (!isSuccess($result = @$this->ci->ExtensionsModel->executeQuery($sql)))
+					if (!isSuccess($result = @$this->_ci->ExtensionsModel->executeQuery($sql)))
 					{
 						$this->_errorOccurred = true;
 						$this->_printFailure(' error occurred while executing the query');
@@ -592,7 +597,7 @@ class ExtensionsLib
 					{
 						$this->_printMessage('Query result:');
 						var_dump($result->retval); // KEEP IT!!!
-						$this->ci->eprintflib->printEOL();
+						$this->_ci->eprintflib->printEOL();
 					}
 	            }
 	        }
@@ -654,11 +659,14 @@ class ExtensionsLib
 	{
 		$_delSoftLinks = false;
 
-		foreach ($this->SOFTLINK_TARGET_DIRECTORIES as $key => $targetDirectory)
+		foreach ($this->SOFTLINK_TARGET_DIRECTORIES as $rootPath => $targetDirectories)
 		{
-			if (file_exists(APPPATH.$targetDirectory.'/'.ExtensionsLib::EXTENSIONS_DIR_NAME.'/'.$extensionName))
+			foreach ($targetDirectories as $key => $targetDirectory)
 			{
-				$_delSoftLinks = unlink(APPPATH.$targetDirectory.'/'.ExtensionsLib::EXTENSIONS_DIR_NAME.'/'.$extensionName);
+				if (file_exists($rootPath.$targetDirectory.'/'.ExtensionsLib::EXTENSIONS_DIR_NAME.'/'.$extensionName))
+				{
+					$_delSoftLinks = unlink($rootPath.$targetDirectory.'/'.ExtensionsLib::EXTENSIONS_DIR_NAME.'/'.$extensionName);
+				}
 			}
 		}
 
@@ -705,26 +713,29 @@ class ExtensionsLib
 		$extensionPath = $this->EXTENSIONS_PATH.$extensionName.'/';
 
 		// For every target directory
-		foreach ($this->SOFTLINK_TARGET_DIRECTORIES as $key => $targetDirectory)
+		foreach ($this->SOFTLINK_TARGET_DIRECTORIES as $rootPath => $targetDirectories)
 		{
-			// If destination of the symlink does not exist
-			if (!file_exists(APPPATH.$targetDirectory.'/'.ExtensionsLib::EXTENSIONS_DIR_NAME.'/'.$extensionName))
+			foreach ($targetDirectories as $key => $targetDirectory)
 			{
-				// If the target directory does not exist than creates that
-				if (!is_dir($extensionPath.$targetDirectory))
+				// If destination of the symlink does not exist
+				if (!file_exists($rootPath.$targetDirectory.'/'.ExtensionsLib::EXTENSIONS_DIR_NAME.'/'.$extensionName))
 				{
-					mkdir($extensionPath.$targetDirectory);
-				}
+					// If the target directory does not exist than creates that
+					if (!is_dir($extensionPath.$targetDirectory))
+					{
+						mkdir($extensionPath.$targetDirectory);
+					}
 
-				// Create the symlink
-				$_addSoftLinks = symlink(
-					$extensionPath.$targetDirectory,
-					APPPATH.$targetDirectory.'/'.ExtensionsLib::EXTENSIONS_DIR_NAME.'/'.$extensionName
-				);
-				if (!$_addSoftLinks)
-				{
-					log_message('error','Failed to create Symlink to '.$extensionPath.$targetDirectory);
-					break;
+					// Create the symlink
+					$_addSoftLinks = symlink(
+						$extensionPath.$targetDirectory,
+						$rootPath.$targetDirectory.'/'.ExtensionsLib::EXTENSIONS_DIR_NAME.'/'.$extensionName
+					);
+					if (!$_addSoftLinks)
+					{
+						log_message('error','Failed to create Symlink to '.$extensionPath.$targetDirectory);
+						break;
+					}
 				}
 			}
 		}
@@ -758,13 +769,13 @@ class ExtensionsLib
 		if ($uploadData != null && isset($uploadData->extensionName) && $extensionDB == null)
 		{
 			// Loads all the previous installations of this extension
-			$this->ci->ExtensionsModel->addOrder('version', 'DESC');
-			$this->ci->ExtensionsModel->addLimit(1);
-			$result = $this->ci->ExtensionsModel->loadWhere(array('name' => $uploadData->extensionName));
+			$this->_ci->ExtensionsModel->addOrder('version', 'DESC');
+			$this->_ci->ExtensionsModel->addLimit(1);
+			$result = $this->_ci->ExtensionsModel->loadWhere(array('name' => $uploadData->extensionName));
 			if (hasData($result)) // if found
 			{
 				// Remove them all from file system and DB
-				$this->_printMessage('Removing entries in the DB related to this extension');
+				$this->_printMessage('Removing entries in the DB related to this extension and from extensions directory');
 				$this->delExtension($result->retval[0]->extension_id);
 			}
 		}
@@ -773,7 +784,7 @@ class ExtensionsLib
 			// Remove them all only from DB
 			if ($extensionJson != null && isset($extensionJson->extension_id))
 			{
-				$this->ci->ExtensionsModel->delete($extensionJson->extension_id);
+				$this->_ci->ExtensionsModel->delete($extensionJson->extension_id);
 			}
 		}
 
@@ -790,7 +801,7 @@ class ExtensionsLib
 		$_toggleExtension = false;
 
 		// Loads data from DB about the given extension
-		$result = $this->ci->ExtensionsModel->load($extensionId);
+		$result = $this->_ci->ExtensionsModel->load($extensionId);
 		if (hasData($result))
 		{
 			$extensionName = $result->retval[0]->name; // extension name
@@ -810,7 +821,7 @@ class ExtensionsLib
 			if ($_toggleExtension) // if is a success
 			{
 				// Updates DB
-				$result = $this->ci->ExtensionsModel->update($extensionId, array('enabled' => $enabled));
+				$result = $this->_ci->ExtensionsModel->update($extensionId, array('enabled' => $enabled));
 				if (isSuccess($result))
 				{
 					$_toggleExtension = true;
@@ -830,7 +841,7 @@ class ExtensionsLib
 	 */
 	private function _printError($error)
 	{
-		$this->ci->eprintflib->printError($error);
+		$this->_ci->eprintflib->printError($error);
 	}
 
 	/**
@@ -846,7 +857,7 @@ class ExtensionsLib
 	 */
 	private function _printMessage($message)
 	{
-		$this->ci->eprintflib->printMessage($message);
+		$this->_ci->eprintflib->printMessage($message);
 	}
 
 	/**
@@ -865,7 +876,7 @@ class ExtensionsLib
 	 */
 	private function _printInfo($info)
 	{
-		$this->ci->eprintflib->printInfo($info);
+		$this->_ci->eprintflib->printInfo($info);
 	}
 
 	/**
