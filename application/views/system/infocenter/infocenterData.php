@@ -194,7 +194,7 @@
 
 			$datasetRaw->{'Details'} = sprintf(
 				'<a href="%s%s">Details</a>',
-				base_url('index.ci.php/system/infocenter/InfoCenter/showDetails/'),
+				site_url('system/infocenter/InfoCenter/showDetails/'),
 				$datasetRaw->{'PersonId'}
 			);
 

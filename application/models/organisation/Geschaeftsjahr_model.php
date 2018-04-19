@@ -13,17 +13,30 @@ class Geschaeftsjahr_model extends DB_Model
 	}
 
 	/**
-	 * Gets latest Geschaeftsjahr, as determined by its start date
+	 * Gets current Geschaeftsjahr, as determined by its start date
 	 * @return array|null
 	 */
-	public function getLastGeschaeftsjahr()
+	public function getCurrGeschaeftsjahr()
 	{
-		$query = 'SELECT * 
+		$query = 'SELECT *
 					FROM public.tbl_geschaeftsjahr
-					WHERE start = (
-									SELECT max(start) 
-									FROM public.tbl_geschaeftsjahr
-								  )';
+					WHERE start <= now()
+					AND ende >= now()';
+
+		return $this->execQuery($query);
+	}
+
+	/**
+	 * Gets next Geschaeftsjahr, as determined by its start date
+	 * @return array|null
+	 */
+	public function getNextGeschaeftsjahr()
+	{
+		$query = 'SELECT *
+					FROM public.tbl_geschaeftsjahr
+					WHERE start > now()
+					ORDER BY start
+					LIMIT 1';
 
 		return $this->execQuery($query);
 	}

@@ -22,7 +22,7 @@ class Phrase_model extends DB_Model
 			return $ent;
 		if (isError($ent = $this->isEntitled('system.tbl_phrasentext', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)))
 			return $ent;
-		
+
 		$parametersArray = array('app' => $app, 'sprache' => $sprache);
 
 		$query = 'SELECT phrase,
@@ -36,7 +36,7 @@ class Phrase_model extends DB_Model
 		if (isset($phrase))
 		{
 			$parametersArray['phrase'] = $phrase;
-			
+
 			if (is_array($phrase))
 			{
 				$query .= ' AND phrase IN ?';
@@ -57,7 +57,24 @@ class Phrase_model extends DB_Model
 			$parametersArray['orgform_kurzbz'] = $orgform_kurzbz;
 			$query .= ' AND orgform_kurzbz = ?';
 		}
-		
+
 		return $this->execQuery($query, $parametersArray);
+	}
+
+	/**
+	 * Loads phrases using category(s) and language as keys
+	 * The retrived fields are category, phrase, orgeinheit_kurzbz, orgform_kurzbz and text
+	 * They are ordered by p.category, p.phrase, pt.orgeinheit_kurzbz DESC and pt.orgform_kurzbz DESC'
+	 */
+	public function getPhrasesByCategoryAndLanguage($categories, $language)
+	{
+		$query = 'SELECT p.category, p.phrase, pt.orgeinheit_kurzbz, pt.orgform_kurzbz, pt.text
+					FROM system.tbl_phrase p
+			  INNER JOIN system.tbl_phrasentext pt USING(phrase_id)
+				   WHERE p.category IN ?
+				   	 AND pt.sprache = ?
+				ORDER BY p.category, p.phrase, pt.orgeinheit_kurzbz DESC, pt.orgform_kurzbz DESC';
+
+		return $this->execQuery($query, array($categories, $language));
 	}
 }

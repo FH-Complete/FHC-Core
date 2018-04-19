@@ -10,7 +10,17 @@ class FHC_Controller extends CI_Controller
     public function __construct()
 	{
         parent::__construct();
-		
+
 		$this->load->helper('fhcauth');
+	}
+
+	/**
+	 * Wrapper to load phrases using the PhrasesLib
+	 * NOTE: The library is loaded with the alias 'p', so must me used with this alias in the rest of the code.
+	 *		EX: $this->p->t(<category>, <phrase name>)
+	 */
+	public function loadPhrases($categories, $language = null)
+	{
+		$this->load->library('PhrasesLib', array($categories, $language), 'p');
 	}
 }

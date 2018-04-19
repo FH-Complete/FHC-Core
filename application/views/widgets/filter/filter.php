@@ -114,7 +114,7 @@
 	function refreshSideMenu()
 	{
 		$.ajax({
-			url: "<?php echo base_url('index.ci.php/system/infocenter/InfoCenter/setNavigationMenuArray'); ?>",
+			url: "<?php echo site_url('system/infocenter/InfoCenter/setNavigationMenuArray'); ?>",
 			method: "GET",
 			data: {}
 		})
@@ -132,7 +132,7 @@
 		$(".remove-filter").click(function() {
 
 			$.ajax({
-				url: "<?php echo base_url('index.ci.php/system/Filters/deleteCustomFilter'); ?>",
+				url: "<?php echo site_url('system/Filters/deleteCustomFilter'); ?>",
 				method: "POST",
 				data: {
 					filter_id: $(this).attr('value')

@@ -4,16 +4,6 @@
 <div class="row">
 	<div class="span4">
 	  <h2>Phrasen</h2>
-<!--
-<form method="post" action="">
-App: aufnahme
-<?php
-    // This is an example to show that you can load stuff from inside the template file
-    //echo $this->widgetlib->widget("mimetype_widget", array('mimetype' => $mimetype));
-?>
- <button type="submit">Filter</button>
-</form>
--->
 <table id="t1" class="tablesorter">
 	<thead>
 		<tr><th class='table-sortable:default'>ID</th>

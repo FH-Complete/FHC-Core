@@ -6,7 +6,7 @@
 			if ($("#customFilterDescription").val() != '')
 			{
 				$.ajax({
-					url: "<?php echo base_url('index.ci.php/system/Filters/saveFilter'); ?>",
+					url: "<?php echo site_url('system/Filters/saveFilter'); ?>",
 					method: "POST",
 					data: {
 						customFilterDescription: $("#customFilterDescription").val()

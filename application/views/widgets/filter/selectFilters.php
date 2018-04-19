@@ -10,7 +10,7 @@
 		$("#addFilter").change(function(event) {
 
 			$.ajax({
-				url: "<?php echo base_url('index.ci.php/system/Filters/addSelectedFilters'); ?>",
+				url: "<?php echo site_url('system/Filters/addSelectedFilters'); ?>",
 				method: "POST",
 				data: {
 					fieldName: $(this).val()
@@ -70,7 +70,7 @@
 			});
 
 			$.ajax({
-				url: "<?php echo base_url('index.ci.php/system/Filters/applyFilter'); ?>",
+				url: "<?php echo site_url('system/Filters/applyFilter'); ?>",
 				method: "POST",
 				data: {
 					filterNames: selectFilterName,
@@ -97,7 +97,7 @@
 
 		$(".remove-selected-filter").click(function(event) {
 			$.ajax({
-				url: "<?php echo base_url('index.ci.php/system/Filters/removeSelectedFilters'); ?>",
+				url: "<?php echo site_url('system/Filters/removeSelectedFilters'); ?>",
 				method: "POST",
 				data: {
 					fieldName: $(this).attr('filterToRemove')
@@ -197,7 +197,7 @@
 	function renderSelectedFilters()
 	{
 		$.ajax({
-			url: "<?php echo base_url('index.ci.php/system/Filters/selectFilters'); ?>",
+			url: "<?php echo site_url('system/Filters/selectFilters'); ?>",
 			method: "GET",
 			data: {},
 			dataType: "json"
