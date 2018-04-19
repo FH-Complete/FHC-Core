@@ -30,6 +30,10 @@
 - **[CORE]** Update campus.tbl_templates (contentmittitel and contentohnetitel) with system/templates/contentmittitel_xslt_xhtml.xslt andsystem/templates/contentohnetitel_xslt_xhtml.xslt
 - **[CORE]** Neue Style Anweisungen (div.header_logo, td.headerbar, div.cis_logo) müssen in Custom Stylesheet hinzugefügt werden
 
+### Removed
+  **[CORE]** Removed Support for XSLFO2PDF Documents - use unoconv instead
+  **[CORE]** Removed Support for FOP Documents - use unoconv instead
+
 ### Deprecated
 - **[CORE]** Die folgenden Datenbank Tabellen und Spalten wurden als DEPRECATED markiert und werden mit der nächsten Version entfernt:
 	public.tbl_aufnahmeschluessel, public.tbl_aufnahmetermin, public.tbl_aufnahmetermintyp,	public.tbl_preinteressent,

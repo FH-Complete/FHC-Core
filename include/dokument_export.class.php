@@ -31,12 +31,16 @@ class dokument_export
 	private $vorlage_file; // Vorlage ODT/ODS in das hineingezippt wird
 	private $outputformat; // Datentyp des Ausgabefiles
 	private $filename; // Dateiname des Ausgabefiles
-	private $temp_filename;
-	private $temp_folder;
+	private $temp_filename; // Dateinamen des Temp. Ausgabefiles
+	private $temp_folder; // Ordner in dem die Temp Dateien abgelegt werden
+	private $signed_filename; // Dateiname der signierten Datei
 	private $images=array();
 	private $sourceDir;
 	public $errormsg;
 	private $unoconv_version;
+	private $sign;
+	private $sign_user;
+	private $sign_profile;
 
 	/**
 	 * Konstruktor
@@ -151,7 +155,7 @@ class dokument_export
 		$this->xml_data = new DOMDocument;
 
 		if(!$this->xml_data->load($xml_url))
-			die('unable to load xml: '.$xml_url);
+			die('unable to load xml: '.$xml_url.' XML:'.$xml.' PARAMs:'.$params);
 
 		return true;
 	}
@@ -298,6 +302,9 @@ class dokument_export
 
 		}
 
+		if($this->sign)
+			return $this->_sign();
+
 		return true;
 	}
 
@@ -309,10 +316,18 @@ class dokument_export
 	 */
 	public function output($download=true)
 	{
-
-		$fsize = filesize($this->temp_filename);
-		if(!$handle = fopen($this->temp_filename,'r'))
-			die('load failed');
+		if($this->signed_filename!='')
+		{
+			$fsize = filesize($this->signed_filename);
+			if(!$handle = fopen($this->signed_filename,'r'))
+				die('load failed');
+		}
+		else
+		{
+			$fsize = filesize($this->temp_filename);
+			if(!$handle = fopen($this->temp_filename,'r'))
+				die('load failed');
+		}
 
 		if($download)
 		{
@@ -368,6 +383,10 @@ class dokument_export
 			unlink('styles.xml');
 
 		unlink($this->temp_filename);
+
+		if($this->signed_filename != '')
+			unlink($this->signed_filename);
+
 		if(file_exists("out.zip"))
 			unlink('out.zip');
 
@@ -460,6 +479,100 @@ class dokument_export
 	public function setFilename($filename)
 	{
 		$this->filename = $filename;
+	}
+
+	/**
+	 * Markiert das Dokument zur Signatur
+	 * Fuegt automatisch einen XML Tag fuer Signatur zun Dokument hinzu
+	 * @param $user User der die Signatur erstellen will
+	 * @param $profile Signaturprofil mit der das Dokument signiert werden soll (Optional)
+	 */
+	public function sign($user, $profile = null)
+	{
+		$this->sign = true;
+		$this->sign_user = $user;
+		$this->sign_profile = $profile;
+
+		$signblock = $this->xml_data->createElement("signed","true");
+		$this->xml_data->documentElement->appendChild($signblock);
+	}
+
+	/**
+	 * Schickt das Dokument an den Signaturserver um dieses mit einer Amtssignatur zu versehen
+	 * Es koennen nur PDFs signiert werden
+	 */
+	private function _sign()
+	{
+		if($this->outputformat != 'pdf')
+		{
+			$this->errormsg = 'Derzeit koennen nur PDFs signiert werden';
+			return false;
+		}
+
+		// Load the File
+		$file_data = file_get_contents($this->temp_filename);
+
+		$data = new stdClass();
+		$data->document = base64_encode($file_data);
+
+		// Signatur Profil
+		if(!is_null($this->sign_profile))
+			$data->profile = $this->sign_profile;
+		else
+			$data->profile = SIGNATUR_DEFAULT_PROFILE;
+
+		// Username des Endusers der die Signatur angefordert hat
+		$data->user = $this->sign_user;
+
+		$ch = curl_init();
+
+		curl_setopt($ch, CURLOPT_URL, SIGNATUR_URL);
+		curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 7);
+		curl_setopt($ch, CURLOPT_USERAGENT, "FH-Complete");
+
+		// SSL Zertifikatsprüfung deaktivieren
+		// Besser ist es das Zertifikat am Server zu installieren!
+		//curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+		//curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+
+		$data_string = json_encode($data,JSON_FORCE_OBJECT);
+
+		curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
+		curl_setopt($ch, CURLOPT_POSTFIELDS, $data_string);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+		curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+			'Content-Type: application/json',
+			'Content-Length:'.mb_strlen($data_string),
+			'Authorization: Basic '.base64_encode(SIGNATUR_USER.":".SIGNATUR_PASSWORD)
+			)
+		);
+
+		$result = curl_exec($ch);
+		if (curl_errno($ch))
+		{
+			curl_close($ch);
+			$this->errormsg = 'Signaturserver ist derzeit nicht erreichbar';
+		}
+		else
+		{
+			curl_close($ch);
+			$resultdata = json_decode($result);
+
+			if (isset($resultdata->success) && $resultdata->success == 'true')
+			{
+				$this->signed_filename = $this->temp_folder .'/signed.pdf';
+				file_put_contents($this->signed_filename, base64_decode($resultdata->document));
+				return true;
+			}
+			else
+			{
+				if(isset($resultdata->errormsg))
+					$this->errormsg = $resultdata->errormsg;
+				else
+					$this->errormsg = 'Unknown Error:'.print_r($resultdata,true);
+				return false;
+			}
+		}
 	}
 }
 ?>

@@ -77,13 +77,21 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 				class="sortDirectionIndicator"
 				sort="rdf:http://www.technikum-wien.at/akte/rdf#erstelltam" />
 			<splitter class="tree-splitter"/>
-			<treecol id="student-zeugnis-tree-gedruckt" label="Gedruckt" flex="2" hidden="false"
+			<treecol id="student-zeugnis-tree-gedruckt" label="Gedruckt" flex="2" hidden="true"
 				class="sortDirectionIndicator"
 				sort="rdf:http://www.technikum-wien.at/akte/rdf#gedruckt" />
 			<splitter class="tree-splitter"/>
 			<treecol id="student-zeugnis-tree-akte_id" label="akte_id" flex="2" hidden="true"
 				class="sortDirectionIndicator"
 				sort="rdf:http://www.technikum-wien.at/akte/rdf#akte_id" />
+			<splitter class="tree-splitter"/>
+			<treecol id="student-zeugnis-tree-signiert" label="Signiert" flex="2" hidden="false"
+				class="sortDirectionIndicator"
+				sort="rdf:http://www.technikum-wien.at/akte/rdf#signiert" />
+			<splitter class="tree-splitter"/>
+			<treecol id="student-zeugnis-tree-stud_selfservice" label="Selfservice" flex="2" hidden="false"
+				class="sortDirectionIndicator"
+				sort="rdf:http://www.technikum-wien.at/akte/rdf#stud_selfservice" />
 			<splitter class="tree-splitter"/>
 		</treecols>
 
@@ -96,22 +104,48 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 						<treecell label="rdf:http://www.technikum-wien.at/akte/rdf#erstelltam"/>
 						<treecell label="rdf:http://www.technikum-wien.at/akte/rdf#gedruckt"/>
 						<treecell label="rdf:http://www.technikum-wien.at/akte/rdf#akte_id"/>
+						<treecell label="rdf:http://www.technikum-wien.at/akte/rdf#signiert"/>
+						<treecell label="rdf:http://www.technikum-wien.at/akte/rdf#stud_selfservice"/>
 					</treerow>
 				</treeitem>
 			</treechildren>
 		</template>
 	</tree>
 	</groupbox>
-	<vbox id="student-zeugnis-buttons">
-		<spacer flex="1"/>
-		<button id="student-zeugnis-button-archivieren" label="aktuelles Zeugnis archivieren" disabled="false" oncommand="StudentZeugnisArchivieren()"/>
-		<button id="student-zeugnis-button-archivieren-englisch" label="aktuelles Zeugnis archivieren (englisch)" disabled="false" oncommand="StudentZeugnisArchivieren('eng')"/>
-		<button id="student-zeugnis-button-archivieren-diplomasupplement" label="Diplomasupplement archivieren" disabled="false" oncommand="StudentDiplomasupplementArchivieren()"/>
-		<button id="student-bescheid-button-archivieren" label="Bescheid archivieren" disabled="false" oncommand="StudentBescheidArchivieren()"/>
-		<button id="student-bescheid-button-archivieren-englisch" label="Bescheid archivieren (englisch)" disabled="false" oncommand="StudentBescheidArchivieren('eng')"/>
-		<spacer flex="1"/>
-	</vbox>
 </hbox>
+<hbox>
+	<groupbox id="student-zeugnis-groupbox-archive">
+		<caption label="Dokument archivieren" />
+		<grid id="student-zeugnis-grid-archive" style="margin:4px;" flex="3">
+				<columns  >
+					<column flex="1"/>
+					<column flex="8"/>
+					<column flex="2"/>
+				</columns>
+				<rows>
+					<row>
+						<label value="Dokument" control="student-zeugnis-menulist-dokument"/>
+						<menulist id="student-zeugnis-menulist-dokument"
+							datasources="../rdf/vorlage.rdf.php" flex="1"
+							ref="http://www.technikum-wien.at/vorlage"
+							style="min-width:300px" >
+							<template>
+								<menupopup>
+									<menuitem value="rdf:http://www.technikum-wien.at/vorlage/rdf#vorlage_kurzbz"
+									          label="rdf:http://www.technikum-wien.at/vorlage/rdf#bezeichnung"
+									          uri="rdf:*"/>
+									</menupopup>
+							</template>
+						</menulist>
+						<button id="student-zeugnis-button-archive" label="Archivieren" disabled="false" oncommand="StudentZeugnisDokumentArchivieren()"/>
+					</row>
+				</rows>
+		</grid>
+	</groupbox>
+	<spacer flex="1" />
+</hbox>
+<vbox>
+</vbox>
 <spacer flex="8" />
 </vbox>
 </overlay>
