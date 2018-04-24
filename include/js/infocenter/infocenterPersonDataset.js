@@ -111,3 +111,22 @@ function setTableActions()
 		}
 	);
 }
+
+/**
+ * Refreshes the side menu
+ */
+function refreshSideMenu()
+{
+	$.ajax({
+		url: window.location.pathname+"/setNavigationMenuArray",
+		method: "GET",
+		data: {}
+	})
+	.done(function(data, textStatus, jqXHR) {
+
+		renderSideMenu();
+
+	}).fail(function(jqXHR, textStatus, errorThrown) {
+		alert(textStatus);
+	});
+}
