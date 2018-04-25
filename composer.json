@@ -265,17 +265,6 @@
 	},
 	"config": {
 		"bin-dir": "vendor/bin"
-	},
-	"extra": {
-		"merge-plugin": {
-			"include": [
-				"composer.json",
-				"addons/*/composer.json"
-			],
-			"recurse": true,
-			"replace": false,
-			"merge-dev": false,
-			"merge-extra": false
-		}
 	}
 }
+

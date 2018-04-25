@@ -131,7 +131,7 @@ class ampel extends basis_db
 			$qry .= " AND (NOW()<(deadline+(verfallszeit || ' days')::interval)::date)";
 		}
 		$qry .= " ORDER BY deadline";
-		
+						
 		if($result = $this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object($result))
