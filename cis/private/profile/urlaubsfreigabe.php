@@ -187,6 +187,7 @@ function draw_monat($monat)
 	{
 		while($row = $db->db_fetch_object($result))
 		{
+			$vertretung = new benutzer($row->vertretung_uid);
 			$freigabe='';
 			if($row->freigabeamum!='')
 			{
@@ -194,6 +195,8 @@ function draw_monat($monat)
 			}
 			echo "<span title='$freigabe'>";
 			echo $mitarbeiter[$row->mitarbeiter_uid]['nachname'].' '.$datum_obj->formatDatum($row->vondatum,'d.m.Y')." - ".$datum_obj->formatDatum($row->bisdatum,'d.m.Y');
+			if ($vertretung->uid != '')
+				echo ' (Vertretung: '.$vertretung->nachname.')';
 			if($row->freigabeamum=='')
 				echo " <a href='".$_SERVER['PHP_SELF']."?action=freigabe&id=$row->zeitsperre_id&year=$year&uid=$uid' class='Item'>Freigabe</a>";
 			echo "</span>";
