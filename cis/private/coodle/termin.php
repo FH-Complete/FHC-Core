@@ -286,22 +286,7 @@ echo '<html>
 
 	.ressourceItem
 	{
-		display: table-cell;
 		font-size: 0.8em;
-		padding: 3px;
-		margin-bottom: 3px;
-		border-radius: 10px 0 0 10px;
-		-moz-border-radius: 10px 0 0 10px;
-	}
-
-	.ressourceImage
-	{
-		display: table-cell;
-		vertical-align: top;
-		padding: 3px;
-		margin-bottom: 3px;
-		border-radius: 10px 0 0 10px;
-		-moz-border-radius: 10px 0 0 10px;
 	}
 
 	#fertig
@@ -329,28 +314,6 @@ echo '<html>
 		font-size: 11px;
 		color: #666;
 	}
-
-	.fc-event-draggable
-	{
-		z-index: 1000 !important;
-	}
-
-	.ui-state-active
-	{
-		border: none !important;
-		background-color: lightgrey !important;
-		background-image: none !important;
-	}
-	
-	.ressourceElement
-	{
-		background-color: lightblue;
-		margin: 3px;
-		padding: 2px 4px;
-		border-radius: 2px;
-		margin-bottom: 3px;
-	}
-
 
 </style>
 <script type="text/javascript">
@@ -625,7 +588,7 @@ echo '
 	</div>
 	<div id="ressourcen">
 	<h4>'.$p->t('coodle/ressourcen').'</h4>
-	<div id="ressourcecontainer" style="display: table">
+	<div id="ressourcecontainer">
 	</div>
 	<div id="ressourcenInput">
 	<p>
@@ -669,7 +632,6 @@ echo '
 				type:"POST",
 				url:"coodle_worker.php",
 				data:{
-						"format" : "json",
 						"work": "addressource",
 						"id": id,
 						"typ": typ,
@@ -678,16 +640,15 @@ echo '
 					 },
 				success: function(data)
 					{
-						var data_obj = jQuery.parseJSON(data);
-						if(data_obj.result != "true")
+						if(data!="true")
 							alert("ERROR:"+data)
 						else
 						{
 							// Speichern der Ressource OK
-							if(typ == "Gruppe")
+							if(typ=="Gruppe")
 								location.reload(true);
 							else
-								addRessourceToContent(id, typ, bezeichnung, data_obj.backgroundColor, data_obj.textColor);
+								addRessourceToContent(id, typ, bezeichnung);
 						}
 
 					},
@@ -695,28 +656,21 @@ echo '
 			});
 	}
 	// Zeigt eine Ressource mit deren Events an
-	function addRessourceToContent(id, typ, bezeichnung, backgroundColor, textColor, cr32)
+	function addRessourceToContent(id, typ, bezeichnung)
 	{
 		// HTML Tags aus der Bezeichnung Entfernen, sofern vorhanden
-		var div = document.createElement("ul");
+		var div = document.createElement("div");
 	  	var text = document.createTextNode(bezeichnung);
 	  	div.appendChild(text);
 	  	bezeichnung = div.innerHTML;
-		if (backgroundColor == "")
-			backgroundColor = "lightgrey";
-
-		if (textColor == "")
-			textColor = "white";
 
 		// Anzeige der Ressource mit Loeschen Button
-		var code = \'<div class="ressourceElement" style="background-color: \
-				\'+backgroundColor+\' \
-				"><div class="ressourceImage"> \
+		var code = \'<span class="ressourceItem"> \
 				<a href="#delete" onclick="removeRessource(this, \\\'\'+id+\'\\\',\\\'\'+typ+\'\\\'); return false;"> \
-					<img src="../../../skin/images/delete_x.png" height="13px" title="'.$p->t('coodle/ressourceEntfernen').'"/> \
-				</a></div><div class="ressourceItem"> \
-				\'+bezeichnung+cr32+\' \
-			<br /></div></div>\';
+					<img src="../../../skin/images/delete_round.png" height="13px" title="'.$p->t('coodle/ressourceEntfernen').'"/> \
+				</a> \
+				\'+bezeichnung+\' \
+			<br /></span>\';
 		$("#ressourcecontainer").append(code);
 
 		// Events der Ressource hinzufuegen
@@ -731,8 +685,8 @@ echo '
 				error: function() {
 					alert("Error fetching data for "+typ+" "+id);
 				},
-				color: backgroundColor,
-				textColor: textColor
+				color:"lightgrey"
+				//textColor:"black"
 			});
 
 	}
@@ -782,7 +736,7 @@ echo '
 					alert("Error fetching data for "+typ+" "+id);
 				}
 			});
-		$(item).closest(".ressourceElement").remove();
+		$(item).parent().remove();
 	}';
 
 echo '
@@ -794,64 +748,36 @@ echo '
 if(!$coodle->getRessourcen($coodle_id))
 	die('Fehler:'.$coodle->errormsg);
 
-$backgroundcolor = 0;
-$zahl = 0;
-$textcolor = '';
 foreach($coodle->result as $row)
 {
 	echo "\n\t";
-	$typ = '';
-	$id = '';
-	$bezeichnung = '';
+	$typ='';
+	$id='';
+	$bezeichnung='';
 
 	if($row->uid!='')
 	{
-		$typ = 'Person';
-		$id = $row->uid;
+		$typ='Person';
+		$id=$row->uid;
 		$benutzer = new benutzer();
 		$benutzer->load($row->uid);
 		$bezeichnung = $benutzer->nachname.' '.$benutzer->vorname;
-// 		$backgroundcolor = 'hsl('.abs((crc32($id)) % 360).', 80%, 90%)';
-		$textcolor = 'hsl('.abs((crc32($id)) % 360).', 60%, 70%)';
 	}
 	elseif($row->ort_kurzbz!='')
 	{
-		$typ = 'Ort';
-		$id = $row->ort_kurzbz;
+		$typ='Ort';
+		$id=$row->ort_kurzbz;
 		$ort = new ort();
 		$ort->load($row->ort_kurzbz);
-		$bezeichnung = $ort->bezeichnung.' '.$row->ort_kurzbz;
-// 		$backgroundcolor = 'hsl('.abs((crc32($id)) % 360).', 0%, 80%)';
-		$textcolor = 'hsl('.abs((crc32($id)) % 360).', 0%, 50%)';
+		$bezeichnung = $ort->bezeichnung;
 	}
 	elseif($row->email!='')
 	{
 		$typ = 'Extern';
 		$id = $row->email;
 		$bezeichnung = $row->name;
-// 		$backgroundcolor = 'hsl('.abs((crc32($id)) % 360).', 80%, 90%)';
-		$textcolor = 'hsl('.abs((crc32($id)) % 360).', 60%, 70%)';
 	}
-	$zahl = abs(crc32($id));
-	$zahl = strval($zahl);
-// 	$zahl = strrev($zahl);
-	$zahl = substr($zahl, -3, 3);
-	$zahl = intval($zahl);
-	$zahl = abs($zahl % 360);
-	
-// 	$backgroundcolor = crc32($id);
-// 	$backgroundcolor = strval($backgroundcolor);
-// 	$backgroundcolor = strrev($backgroundcolor);
-// 	$backgroundcolor = substr($backgroundcolor, 0, 3);
-// 	$backgroundcolor = intval($backgroundcolor);
-// 	$backgroundcolor = abs($backgroundcolor % 360);
-// 	$backgroundcolor = 'hsl('.$backgroundcolor.', 80%, 90%)';
-	
-	$backgroundcolor = 'hsl('.$zahl.', 80%, 90%)';
-	
-	echo 'addRessourceToContent("'.$db->convert_html_chars($id).'", "'.$db->convert_html_chars($typ).'", "'.$db->convert_html_chars($bezeichnung).'", "'.$backgroundcolor.'", "'.$textcolor.'", "'.$zahl.'");';
-
-	$zahl = $zahl+20;
+	echo 'addRessourceToContent("'.$db->convert_html_chars($id).'", "'.$db->convert_html_chars($typ).'", "'.$db->convert_html_chars($bezeichnung).'");';
 }
 
 // Bereits eingetragene Terminvorschlaege laden
