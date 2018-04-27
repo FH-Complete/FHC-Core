@@ -2,6 +2,11 @@
 
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
+// Retrives the URL path of the called controller + controller method
+// NOTE: placed here because it doesn't work inside functions
+$calledPath = $this->router->directory.$this->router->class;
+$calledMethod = $this->router->method;
+
 // By default set the parameters to null
 $title = isset($title) ? $title : null;
 $customCSSs = isset($customCSSs) ? $customCSSs : null;
@@ -56,6 +61,27 @@ function _generateCSSsInclude($CSSs)
 }
 
 /**
+ * Generates global JS-Object to pass parms to other javascripts
+ */
+function _generateJSDataStorageObject($calledPath, $calledMethod)
+{
+	$toPrint = "\n";
+	$toPrint .= '<script type="text/javascript">';
+	$toPrint .= '
+		var FHC_JS_DATA_STORAGE_OBJECT = {
+			app_root: "'.APP_ROOT.'",
+			ci_router: "index.ci.php",
+			called_path: "'.$calledPath.'",
+			called_method: "'.$calledMethod.'"
+		};';
+	$toPrint .= "\n";
+	$toPrint .= '</script>';
+	$toPrint .= "\n\n";
+
+	echo $toPrint;
+}
+
+/**
  * Generates tags for the javascripts you want to include, the parameter could by a string or an array of strings
  */
 function _generateJSsInclude($JSs)
@@ -78,13 +104,25 @@ function _generateJSsInclude($JSs)
 }
 
 /**
- * Generates global JS-Object to pass parms to addon-js-functions
+ * Generates all the includes needed by the Addons
  */
-function _generateAddonDataStorageObject()
+function _generateAddonsJSsInclude($calledFrom)
 {
-	echo '<script type="text/javascript">';
-	echo 'var FHC_ADDON_DATA_STORAGE_OBJECT = {app_root:"'.APP_ROOT.'"};';
-	echo "</script>\n";
+	$aktive_addons = array_filter(explode(";", ACTIVE_ADDONS));
+
+	foreach ($aktive_addons as $addon)
+	{
+		$hookfile = DOC_ROOT.'addons/'.$addon.'/hooks.config.inc.php';
+		if (file_exists($hookfile))
+		{
+			include($hookfile);
+			if (key_exists($calledFrom, $js_hooks))
+			{
+				foreach ($js_hooks[$calledFrom] as $js_file)
+					_generateJSsInclude('addons/'.$addon.'/'.$js_file);
+			}
+		}
+	}
 }
 
 ?>
@@ -102,16 +140,20 @@ function _generateAddonDataStorageObject()
 
 			// jQuery UI CSS
 			if ($jqueryui === true) _generateCSSsInclude('vendor/components/jqueryui/themes/base/jquery-ui.min.css');
+
 			// bootstrap CSS
 			if ($bootstrap === true) _generateCSSsInclude('vendor/twbs/bootstrap/dist/css/bootstrap.min.css');
+
 			// font awesome CSS
 			if ($fontawesome === true) _generateCSSsInclude('vendor/components/font-awesome/css/font-awesome.min.css');
+
 			// Table sorter CSS
 			if ($tablesorter === true)
 			{
 				_generateCSSsInclude('vendor/mottie/tablesorter/dist/css/theme.default.min.css');
 				_generateCSSsInclude('vendor/mottie/tablesorter/dist/css/jquery.tablesorter.pager.min.css');
 			}
+
 			// sb admin template CSS
 			if ($sbadmintemplate === true)
 			{
@@ -125,8 +167,13 @@ function _generateAddonDataStorageObject()
 			// --------------------------------------------------------------------------------------------------------
 			// Javascripts
 
+			// Generates the global object to pass useful parms to the other javascripts
+			// NOTE: must be called before any other JS include
+			_generateJSDataStorageObject($calledPath, $calledMethod);
+
 			// JQuery V3
 			if ($jquery === true) _generateJSsInclude('vendor/components/jquery/jquery.min.js');
+
 			// JQuery UI
 			if ($jqueryui === true)
 			{
@@ -134,8 +181,10 @@ function _generateAddonDataStorageObject()
 				//datepicker german language file
 				_generateJSsInclude('vendor/components/jqueryui/ui/i18n/datepicker-de.js');
 			}
+
 			// bootstrap JS
 			if ($bootstrap === true) _generateJSsInclude('vendor/twbs/bootstrap/dist/js/bootstrap.min.js');
+
 			// Table sorter JS
 			if ($tablesorter === true)
 			{
@@ -143,6 +192,7 @@ function _generateAddonDataStorageObject()
 				_generateJSsInclude('vendor/mottie/tablesorter/dist/js/jquery.tablesorter.widgets.min.js');
 				_generateJSsInclude('vendor/mottie/tablesorter/dist/js/extras/jquery.tablesorter.pager.min.js');
 			}
+
 			//tinymce JS
 			if($tinymce === true) _generateJSsInclude('vendor/tinymce/tinymce/tinymce.min.js') ;
 
@@ -153,27 +203,8 @@ function _generateAddonDataStorageObject()
 				_generateJSsInclude('vendor/BlackrockDigital/startbootstrap-sb-admin-2/dist/js/sb-admin-2.min.js');
 			}
 
-			// load addon hooks JS
-			if ($addons === true)
-			{
-				_generateAddonDataStorageObject();
-
-				$aktive_addons = array_filter(explode(";", ACTIVE_ADDONS));
-				$called_from = $this->router->directory.$this->router->class.'/'.$this->router->method;
-				foreach ($aktive_addons as $addon)
-				{
-					$hookfile = DOC_ROOT.'addons/'.$addon.'/hooks.config.inc.php';
-					if (file_exists($hookfile))
-					{
-						include($hookfile);
-						if (key_exists($called_from, $js_hooks))
-						{
-							foreach ($js_hooks[$called_from] as $js_file)
-								_generateJSsInclude('addons/'.$addon.'/'.$js_file);
-						}
-					}
-				}
-			}
+			// Load addon hooks JS
+			if ($addons === true) _generateAddonsJSsInclude($calledPath.'/'.$calledMethod);
 
 			// Eventually required JS
 			_generateJSsInclude($customJSs);

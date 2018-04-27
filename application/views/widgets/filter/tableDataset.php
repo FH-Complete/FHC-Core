@@ -19,7 +19,7 @@
 	function renderTableDataset()
 	{
 		$.ajax({
-			url: "<?php echo base_url('index.ci.php/system/Filters/tableDataset'); ?>",
+			url: "<?php echo site_url('system/Filters/tableDataset'); ?>",
 			method: "GET",
 			data: {},
 		    dataType: "json"

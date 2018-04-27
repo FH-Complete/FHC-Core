@@ -723,6 +723,20 @@ if(!@$db->db_query("SELECT ausstellungsdetails FROM public.tbl_dokument LIMIT 1"
 			echo '<br>Spalte ausstellungsdetails in public.tbl_dokument hinzugefügt';
 }
 
+// ADD COLUMN geschaeftsjahrvon and geschaeftsjahrbis in wawi.tbl_kostenstelle
+if(!$result = @$db->db_query("SELECT geschaeftsjahrvon FROM wawi.tbl_kostenstelle LIMIT 1;"))
+{
+	$qry = "ALTER TABLE wawi.tbl_kostenstelle ADD COLUMN geschaeftsjahrvon varchar(32);
+			ALTER TABLE wawi.tbl_kostenstelle ADD COLUMN geschaeftsjahrbis varchar(32);
+			ALTER TABLE wawi.tbl_kostenstelle ADD CONSTRAINT fk_tbl_geschaeftsjahr_geschaeftsjahrvon FOREIGN KEY (geschaeftsjahrvon) REFERENCES public.tbl_geschaeftsjahr (geschaeftsjahr_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;
+			ALTER TABLE wawi.tbl_kostenstelle ADD CONSTRAINT fk_tbl_geschaeftsjahr_geschaeftsjahrbis FOREIGN KEY (geschaeftsjahrbis) REFERENCES public.tbl_geschaeftsjahr (geschaeftsjahr_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;
+			";
+
+	if(!$db->db_query($qry))
+		echo '<strong>wawi.tbl_kostenstelle: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>wawi.tbl_kostenstelle: Spalten geschaeftsjahrvon, geschaeftsjahrbis hinzugefuegt!<br>';
+}
 
 //---------------------------------------------------------------------------------------------------------------------
 // Start extensions
@@ -1075,6 +1089,20 @@ if (!@$db->db_query("SELECT 0 FROM system.tbl_filters WHERE 0 = 1"))
 		echo '<br>Altered sequence system.tbl_filters_id_seq';
 }
 
+// Add missing primary Key to system.tbl_filters.filter_id
+if ($result = @$db->db_query("SELECT conname FROM pg_constraint WHERE conname = 'pk_filters_filter_id'"))
+{
+	if ($db->db_num_rows($result) == 0)
+	{
+		$qry = "ALTER TABLE system.tbl_filters ADD CONSTRAINT pk_filters_filter_id PRIMARY KEY (filter_id);";
+
+		if (!$db->db_query($qry))
+			echo '<strong>system.tbl_filters '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>system.tbl_filters: added primary key on column filter_id';
+	}
+}
+
 // UNIQUE INDEX uidx_filters_app_dataset_name_filter_kurzbz
 if ($result = $db->db_query("SELECT 0 FROM pg_class WHERE relname = 'uidx_filters_app_dataset_name_filter_kurzbz'"))
 {
@@ -1191,20 +1219,6 @@ if (!$result = @$db->db_query("SELECT taetigkeit_kurzbz FROM system.tbl_log"))
 		echo '<br>Added Column taetigkeit_kurzbz to system.tbl_log';
 }
 
-// Add missing primary Key to system.tbl_filters.filter_id
-if ($result = @$db->db_query("SELECT conname FROM pg_constraint WHERE conname = 'pk_filters_filter_id'"))
-{
-	if ($db->db_num_rows($result) == 0)
-	{
-		$qry = "ALTER TABLE system.tbl_filters ADD CONSTRAINT pk_filters_filter_id PRIMARY KEY (filter_id);";
-
-		if (!$db->db_query($qry))
-			echo '<strong>system.tbl_filters '.$db->db_last_error().'</strong><br>';
-		else
-			echo '<br>system.tbl_filters: added primary key on column filter_id';
-	}
-}
-
 // Add index to tbl_akte
 if ($result = $db->db_query("SELECT * FROM pg_class WHERE relname='idx_tbl_akte_dokument_kurzbz'"))
 {
@@ -1265,6 +1279,7 @@ if($result = $db->db_query("SELECT 1 FROM system.tbl_app WHERE app='infocenter'"
 			echo '<br>Neue App infocenter in system.tbl_app hinzugefügt';
 	}
 }
+
 // App 'bewerbung' hinzufügen
 if($result = $db->db_query("SELECT 1 FROM system.tbl_app WHERE app='bewerbung'"))
 {
@@ -1280,6 +1295,155 @@ if($result = $db->db_query("SELECT 1 FROM system.tbl_app WHERE app='bewerbung'")
 	}
 }
 
+// Archiv boolean fuer public.tbl_akte
+if(!@$db->db_query("SELECT archiv FROM public.tbl_akte LIMIT 1"))
+{
+	// Defaultwerte und Update werden hier nacheinander durchgefuehrt da dies
+	// schneller ist als ein ALTER TABLE mit inkludiertem Defaultwert
+	$qry = "ALTER TABLE public.tbl_akte ADD COLUMN archiv boolean;
+			UPDATE public.tbl_akte SET archiv=true WHERE dokument_kurzbz='Zeugnis';
+			UPDATE public.tbl_akte SET archiv=false WHERE dokument_kurzbz<>'Zeugnis';
+			ALTER TABLE public.tbl_akte ALTER COLUMN archiv SET DEFAULT false;
+			ALTER TABLE public.tbl_akte ALTER COLUMN archiv SET NOT NULL;
+			COMMENT ON COLUMN public.tbl_akte.archiv IS 'Is the document part of the archive';";
+	if(!$db->db_query($qry))
+		echo '<strong>tbl_akte.archiv: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Neue Spalte archiv in public.tbl_akte hinzugefügt';
+}
+
+// signiert boolean fuer public.tbl_akte
+if(!@$db->db_query("SELECT signiert FROM public.tbl_akte LIMIT 1"))
+{
+	// Defaultwerte und Update werden hier nacheinander durchgefuehrt da dies
+	// schneller ist als ein ALTER TABLE mit inkludiertem Defaultwert
+	$qry = "ALTER TABLE public.tbl_akte ADD COLUMN signiert boolean;
+			UPDATE public.tbl_akte SET signiert = false;
+			ALTER TABLE public.tbl_akte ALTER COLUMN signiert SET DEFAULT false;
+			ALTER TABLE public.tbl_akte ALTER COLUMN signiert SET NOT NULL;
+			COMMENT ON COLUMN public.tbl_akte.signiert IS 'Is the document digitally signed'";
+
+	if(!$db->db_query($qry))
+		echo '<strong>App: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Neue Spalte signiert in public.tbl_akte hinzugefügt';
+}
+
+// stud_selfservice boolean fuer public.tbl_akte
+if(!@$db->db_query("SELECT stud_selfservice FROM public.tbl_akte LIMIT 1"))
+{
+	// Defaultwerte und Update werden hier nacheinander durchgefuehrt da dies
+	// schneller ist als ein ALTER TABLE mit inkludiertem Defaultwert
+	$qry = "ALTER TABLE public.tbl_akte ADD COLUMN stud_selfservice boolean;
+			UPDATE public.tbl_akte SET stud_selfservice = false;
+			ALTER TABLE public.tbl_akte ALTER COLUMN stud_selfservice SET DEFAULT false;
+			ALTER TABLE public.tbl_akte ALTER COLUMN stud_selfservice SET NOT NULL;
+			COMMENT ON COLUMN public.tbl_akte.stud_selfservice IS 'Is the document downloadable for students'";
+
+	if(!$db->db_query($qry))
+		echo '<strong>App: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Neue Spalte stud_selfservice in public.tbl_akte hinzugefügt';
+}
+
+// Berechtigung fuer Vorlagen setzen die vormals direkt in PDFExport.php geprueft wurden
+function AddBerechtigungVorlage($berechtigung_arr, $vorlage_arr)
+{
+	global $db;
+
+	$berechtigung = '{';
+	foreach($berechtigung_arr as $item)
+	{
+		$berechtigung .= '"'.$db->db_escape($item).'",';
+	}
+	$berechtigung = mb_substr($berechtigung, 0, -1).'}';
+
+	foreach($vorlage_arr as $vorlage)
+	{
+		$qry = "SELECT 1 FROM public.tbl_vorlagestudiengang
+			WHERE berechtigung is null AND vorlage_kurzbz=".$db->db_add_param($vorlage);
+
+		$result = $db->db_query($qry);
+		if($db->db_num_rows($result)>0)
+		{
+			$qry = "UPDATE public.tbl_vorlagestudiengang SET berechtigung='".$berechtigung."'
+				WHERE berechtigung is null AND vorlage_kurzbz=".$db->db_add_param($vorlage);
+
+			if(!$db->db_query($qry))
+				echo '<strong>Vorlage Berechtigung: '.$db->db_last_error().'</strong><br>';
+			else
+				echo '<br>Berechtigung '.$berechtigung.' fuer Vorlage '.$vorlage.' gesetzt';
+		}
+	}
+}
+
+AddBerechtigungVorlage(array('admin','assistenz'),array('Lehrveranstaltungszeugnis','Zertifikat','Diplomurkunde',
+	'Diplomzeugnis','Bescheid', 'BescheidEng','Bakkurkunde','BakkurkundeEng','Bakkzeugnis',
+	'PrProtokollBakk','PrProtokollDipl','Lehrauftrag','DiplomurkundeEng','Zeugnis','ZeugnisEng','StudienerfolgEng',
+	'Sammelzeugnis','PrProtDiplEng','PrProtBakkEng','BakkzeugnisEng','DiplomzeugnisEng','statusbericht',
+	'DiplSupplement','Zutrittskarte','Projektbeschr','Ausbildungsver','AusbildStatus','PrProtBA','PrProtMA',
+	'PrProtBAEng','PrProtMAEng','Studienordnung','Erfolgsnachweis','ErfolgsnwHead','Studienblatt','LV_Informationen',
+	'LVZeugnis','AnwListBarcode','Honorarvertrag','AusbVerEng','AusbVerEngHead','Zeugnis','ZeugnisNeu','ZeugnisEngNeu',
+	'ErfolgsnachweisE','ErfolgsnwHeadE','Magisterurkunde','Masterurkunde','Defensiourkunde','Magisterzeugnis',
+	'Laufzettel','StudienblattEng','Zahlung1','Terminliste','Studienbuchblatt','Veranstaltungen',
+	'Inskription','Studienerfolg','OutgoingLearning','OutgoingChangeL','LearningAgree','Zahlung','DichiaSost'
+	));
+AddBerechtigungVorlage(array('lehre/lvplan'), array('Ressource'));
+AddBerechtigungVorlage(array('wawi/inventar','assistenz','basis/betriebsmittel'), array('Uebernahme'));
+AddBerechtigungVorlage(array('wawi/bestellung'), array('Bestellung'));
+AddBerechtigungVorlage(array('admin','mitarbeiter','assistenz'), array('AccountInfo'));
+
+// archivierbar boolean fuer public.tbl_vorlage
+if(!@$db->db_query("SELECT archivierbar FROM public.tbl_vorlage LIMIT 1"))
+{
+	$qry = "ALTER TABLE public.tbl_vorlage ADD COLUMN archivierbar boolean DEFAULT false;
+			UPDATE public.tbl_vorlage SET archivierbar=true
+			WHERE vorlage_kurzbz in('DiplSupplement','Zeugnis','ZeugnisEng', 'Bescheid',' BescheidEng');
+			COMMENT ON COLUMN public.tbl_vorlage.archivierbar IS 'Can this document be archived'";
+
+	if(!$db->db_query($qry))
+		echo '<strong>App: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Neue Spalte archivierbar in public.tbl_vorlage hinzugefügt';
+}
+
+// signierbar boolean fuer public.tbl_vorlage
+if(!@$db->db_query("SELECT signierbar FROM public.tbl_vorlage LIMIT 1"))
+{
+	$qry = "ALTER TABLE public.tbl_vorlage ADD COLUMN signierbar boolean DEFAULT false;
+			COMMENT ON COLUMN public.tbl_vorlage.signierbar IS 'Can this document be digitally signed'";
+
+	if(!$db->db_query($qry))
+		echo '<strong>App: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Neue Spalte signierbar in public.tbl_vorlage hinzugefügt';
+}
+
+// stud_selfservice boolean fuer public.tbl_vorlage
+if(!@$db->db_query("SELECT stud_selfservice FROM public.tbl_vorlage LIMIT 1"))
+{
+	$qry = "ALTER TABLE public.tbl_vorlage ADD COLUMN stud_selfservice boolean DEFAULT false;
+			COMMENT ON COLUMN public.tbl_vorlage.stud_selfservice IS 'Can this documents be downloaded if archived'";
+
+	if(!$db->db_query($qry))
+		echo '<strong>App: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Neue Spalte stud_selfserice in public.tbl_vorlage hinzugefügt';
+}
+
+// dokument_kurzbz fuer public.tbl_vorlage
+if(!@$db->db_query("SELECT dokument_kurzbz FROM public.tbl_vorlage LIMIT 1"))
+{
+	$qry = "ALTER TABLE public.tbl_vorlage ADD COLUMN dokument_kurzbz varchar(8);
+			ALTER TABLE public.tbl_vorlage ADD CONSTRAINT fk_vorlage_dokument FOREIGN KEY (dokument_kurzbz) REFERENCES public.tbl_dokument (dokument_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;
+			COMMENT ON COLUMN public.tbl_vorlage.dokument_kurzbz IS 'Connects a Template with the corresponding Dokument'";
+
+	if(!$db->db_query($qry))
+		echo '<strong>App: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Neue Spalte dokument_kurzbz in public.tbl_vorlage hinzugefügt';
+}
+
 // Remove NOT NULL constraint on vorlaufszeit on public.tbl_ampel
 if($result = @$db->db_query("SELECT is_nullable FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = 'public' AND TABLE_NAME = 'tbl_ampel' AND COLUMN_NAME = 'vorlaufzeit' AND is_nullable = 'NO'"))
 {
@@ -1293,7 +1457,6 @@ if($result = @$db->db_query("SELECT is_nullable FROM INFORMATION_SCHEMA.COLUMNS 
 			echo '<br>Removed NOT NULL constraint on "vorlaufszeit" from public.tbl_ampel<br>';
 	}
 }
-
 
 // Remove NOT NULL constraint on verfallszeit on public.tbl_ampel
 if($result = @$db->db_query("SELECT is_nullable FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = 'public' AND TABLE_NAME = 'tbl_ampel' AND COLUMN_NAME = 'verfallszeit' AND is_nullable = 'NO'"))
@@ -1867,6 +2030,194 @@ if(!@$db->db_query("SELECT cis_suche FROM campus.tbl_dms_version LIMIT 1"))
 					<br><b>Bei allen DMS-Einträge mit befülltem Beschreibungstext, wurde dieser in die Spalte schlagworte übernommen</b>';
 }
 
+//---------------------------------------------------------------------------------------------------------------------
+// Start changes to Phrases
+
+// ADD COLUMN category to system.tbl_phrase
+if (!$result = @$db->db_query("SELECT category FROM system.tbl_phrase LIMIT 1"))
+{
+	$qry = 'ALTER TABLE system.tbl_phrase ADD COLUMN category character varying(64);';
+	if (!$db->db_query($qry))
+		echo '<strong>system.tbl_phrase: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Added column category to table system.tbl_phrase';
+
+	// COMMENT ON TABLE system.tbl_phrase
+	$qry = 'COMMENT ON COLUMN system.tbl_phrase.category IS \'To divide the phrases into categories\';';
+	if (!$db->db_query($qry))
+		echo '<strong>Adding comment to system.tbl_phrase.category: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Added comment to system.tbl_phrase.category';
+}
+
+// UNIQUE INDEX uidx_phrase_category_phrase
+if ($result = $db->db_query("SELECT 0 FROM pg_class WHERE relname = 'uidx_phrase_category_phrase'"))
+{
+	if ($db->db_num_rows($result) == 0)
+	{
+		$qry = 'CREATE UNIQUE INDEX uidx_phrase_category_phrase ON system.tbl_phrase USING btree (category, phrase);';
+		if (!$db->db_query($qry))
+			echo '<strong>uidx_phrase_category_phrase '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>Created unique uidx_phrase_category_phrase';
+	}
+}
+
+// UNIQUE INDEX uidx_phrasestext_phrase_id_sprache_orgeinheit_kurzbz_orgform_kurzbz
+if ($result = $db->db_query("SELECT 0 FROM pg_class WHERE relname = 'uidx_phrasestext_phrase_id_sprache_orgeinheit_kurzbz_orgform_kurzbz'"))
+{
+	if ($db->db_num_rows($result) == 0)
+	{
+		$qry = 'CREATE UNIQUE INDEX uidx_phrasestext_phrase_id_sprache_orgeinheit_kurzbz_orgform_kurzbz ON system.tbl_phrasentext USING btree (phrase_id, sprache, orgeinheit_kurzbz, orgform_kurzbz);';
+		if (!$db->db_query($qry))
+			echo '<strong>uidx_phrasestext_phrase_id_sprache_orgeinheit_kurzbz_orgform_kurzbz '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>Created unique uidx_phrasestext_phrase_id_sprache_orgeinheit_kurzbz_orgform_kurzbz';
+	}
+}
+
+// End changes to Phrases
+// ---------------------------------------------------------------------------------------------------------------------
+
+// Remove NOT NULL constraint on matrikelnr on public.tbl_student
+if($result = @$db->db_query("SELECT is_nullable FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = 'public' AND TABLE_NAME = 'tbl_student' AND COLUMN_NAME = 'matrikelnr' AND is_nullable = 'NO'"))
+{
+	if($db->db_num_rows($result) > 0)
+	{
+		$qry = "ALTER TABLE public.tbl_student ALTER COLUMN matrikelnr DROP NOT NULL;";
+
+		if(!$db->db_query($qry))
+			echo '<strong>public.tbl_student '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>Removed NOT NULL constraint on "matrikelnr" from public.tbl_student<br>';
+	}
+}
+
+// public.vw_prestudentstatus Datum zur Reihungstestanmeldung aus tbl_rt_person
+if($result = $db->db_query("SELECT view_definition FROM information_schema.views WHERE table_schema='public' AND table_name='vw_prestudentstatus'"))
+{
+	if($row = $db->db_fetch_object($result))
+	{
+		if(!mb_stristr($row->view_definition, 'tbl_rt_person'))
+		{
+			$qry = "
+			CREATE OR REPLACE VIEW public.vw_prestudentstatus AS
+			SELECT tbl_prestudent.prestudent_id,
+				tbl_person.person_id,
+				tbl_person.staatsbuergerschaft,
+				tbl_person.geburtsnation,
+				tbl_person.sprache,
+				tbl_person.anrede,
+				tbl_person.titelpost,
+				tbl_person.titelpre,
+				tbl_person.nachname,
+				tbl_person.vorname,
+				tbl_person.vornamen,
+				tbl_person.gebdatum,
+				tbl_person.gebort,
+				tbl_person.gebzeit,
+				tbl_person.foto,
+				tbl_person.homepage,
+				tbl_person.svnr,
+				tbl_person.ersatzkennzeichen,
+				tbl_person.familienstand,
+				tbl_person.geschlecht,
+				tbl_person.anzahlkinder,
+				tbl_person.aktiv,
+				tbl_person.bundesland_code,
+				tbl_person.kompetenzen,
+				tbl_person.kurzbeschreibung,
+				tbl_person.zugangscode,
+				tbl_person.foto_sperre,
+				tbl_person.matr_nr,
+				tbl_prestudent.aufmerksamdurch_kurzbz,
+				tbl_prestudent.studiengang_kz,
+				tbl_prestudent.berufstaetigkeit_code,
+				tbl_prestudent.ausbildungcode,
+				tbl_prestudent.zgv_code,
+				tbl_prestudent.zgvort,
+				tbl_prestudent.zgvdatum,
+				tbl_prestudent.zgvmas_code,
+				tbl_prestudent.zgvmaort,
+				tbl_prestudent.zgvmadatum,
+				tbl_prestudent.aufnahmeschluessel,
+				tbl_prestudent.facheinschlberuf,
+				tbl_prestudent.reihungstest_id,
+				(SELECT
+							COALESCE(anmeldedatum, tbl_rt_person.insertamum::date)
+						FROM
+							public.tbl_rt_person
+							JOIN public.tbl_reihungstest ON(rt_id=reihungstest_id)
+							JOIN lehre.tbl_studienplan USING(studienplan_id)
+							JOIN lehre.tbl_studienordnung USING(studienordnung_id)
+						WHERE
+							person_id=tbl_prestudent.person_id
+							AND tbl_reihungstest.studiensemester_kurzbz=prestudentstatus.studiensemester_kurzbz
+							AND tbl_studienordnung.studiengang_kz=tbl_prestudent.studiengang_kz
+						ORDER BY anmeldedatum DESC, tbl_rt_person.insertamum DESC limit 1
+					) as anmeldungreihungstest,
+				tbl_prestudent.reihungstestangetreten,
+				tbl_prestudent.rt_gesamtpunkte,
+				tbl_prestudent.bismelden,
+				tbl_prestudent.anmerkung,
+				tbl_prestudent.dual,
+				tbl_prestudent.rt_punkte1,
+				tbl_prestudent.rt_punkte2,
+				tbl_prestudent.ausstellungsstaat,
+				tbl_prestudent.rt_punkte3,
+				tbl_prestudent.zgvdoktor_code,
+				tbl_prestudent.zgvdoktorort,
+				tbl_prestudent.zgvdoktordatum,
+				tbl_prestudent.mentor,
+				prestudentstatus.status_kurzbz,
+				prestudentstatus.studiensemester_kurzbz,
+				prestudentstatus.ausbildungssemester,
+				prestudentstatus.datum,
+				prestudentstatus.insertamum,
+				prestudentstatus.insertvon,
+				prestudentstatus.updateamum,
+				prestudentstatus.updatevon,
+				COALESCE(prestudentstatus.orgform_kurzbz, tbl_studiengang.orgform_kurzbz) AS orgform_kurzbz,
+				prestudentstatus.studienplan_id,
+				prestudentstatus.bestaetigtam,
+				prestudentstatus.bestaetigtvon,
+				prestudentstatus.fgm,
+				prestudentstatus.faktiv,
+				tbl_studiengang.kurzbz,
+				tbl_studiengang.kurzbzlang,
+				tbl_studiengang.typ,
+				tbl_studiensemester.start,
+				tbl_studiensemester.ende,
+				tbl_studiensemester.studienjahr_kurzbz,
+				substr(tbl_studiensemester.studiensemester_kurzbz::text, 3) || lower(substr(tbl_studiensemester.studiensemester_kurzbz::text, 1, 1)) AS studiensemester,
+				    CASE
+				        WHEN tbl_studiengang.typ = 'b'::bpchar AND tbl_prestudent.zgv_code IS NOT NULL OR tbl_studiengang.typ = 'm'::bpchar AND tbl_prestudent.zgvmas_code IS NOT NULL OR tbl_studiengang.typ = 'd'::bpchar AND tbl_prestudent.zgvdoktor_code IS NOT NULL THEN true
+				        ELSE false
+				    END AS zgv,
+				    CASE
+				        WHEN tbl_prestudentstatus.prestudent_id IS NULL THEN false
+				        ELSE true
+				    END AS student,
+				date_part('week'::text, prestudentstatus.datum) AS kw
+				FROM public.tbl_person
+				 JOIN public.tbl_prestudent USING (person_id)
+				 JOIN public.tbl_prestudentstatus prestudentstatus USING (prestudent_id)
+				 JOIN public.tbl_studiengang USING (studiengang_kz)
+				 JOIN public.tbl_studiensemester USING (studiensemester_kurzbz)
+				 LEFT JOIN public.tbl_prestudentstatus ON tbl_prestudentstatus.prestudent_id = prestudentstatus.prestudent_id AND tbl_prestudentstatus.studiensemester_kurzbz::text = prestudentstatus.studiensemester_kurzbz::text AND tbl_prestudentstatus.status_kurzbz::text = 'Student'::text;
+
+			GRANT SELECT ON public.vw_prestudentstatus TO vilesci;
+			GRANT SELECT ON public.vw_prestudentstatus TO web;
+			";
+
+			if(!$db->db_query($qry))
+				echo '<strong>public.vw_prestudentstatus:'.$db->db_last_error().'</strong><br>';
+			else
+				echo '<br>public.vw_prestudentstatus angepasst damit anmeldungzumreihungstest aus tbl_rt_person kommt';
+		}
+	}
+}
+
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
 
@@ -2014,7 +2365,7 @@ $tabellen=array(
 	"lehre.tbl_zeugnisnote"  => array("lehrveranstaltung_id","student_uid","studiensemester_kurzbz","note","uebernahmedatum","benotungsdatum","bemerkung","updateamum","updatevon","insertamum","insertvon","ext_id","punkte"),
 	"public.ci_apikey" => array("apikey_id","key","level","ignore_limits","date_created"),
 	"public.tbl_adresse"  => array("adresse_id","person_id","name","strasse","plz","ort","gemeinde","nation","typ","heimatadresse","zustelladresse","firma_id","updateamum","updatevon","insertamum","insertvon","ext_id","rechnungsadresse","anmerkung"),
-	"public.tbl_akte"  => array("akte_id","person_id","dokument_kurzbz","uid","inhalt","mimetype","erstelltam","gedruckt","titel","bezeichnung","updateamum","updatevon","insertamum","insertvon","ext_id","dms_id","nachgereicht","anmerkung","titel_intern","anmerkung_intern","nachgereicht_am","ausstellungsnation","formal_geprueft_amum"),
+	"public.tbl_akte"  => array("akte_id","person_id","dokument_kurzbz","uid","inhalt","mimetype","erstelltam","gedruckt","titel","bezeichnung","updateamum","updatevon","insertamum","insertvon","ext_id","dms_id","nachgereicht","anmerkung","titel_intern","anmerkung_intern","nachgereicht_am","ausstellungsnation","formal_geprueft_amum","archiv","signiert","stud_selfservice"),
 	"public.tbl_ampel"  => array("ampel_id","kurzbz","beschreibung","benutzer_select","deadline","vorlaufzeit","verfallszeit","insertamum","insertvon","updateamum","updatevon","email","verpflichtend","buttontext"),
 	"public.tbl_ampel_benutzer_bestaetigt"  => array("ampel_benutzer_bestaetigt_id","ampel_id","uid","insertamum","insertvon"),
 	"public.tbl_aufmerksamdurch"  => array("aufmerksamdurch_kurzbz","beschreibung","ext_id","bezeichnung", "aktiv"),
@@ -2094,7 +2445,7 @@ $tabellen=array(
 	"public.tbl_studiensemester"  => array("studiensemester_kurzbz","bezeichnung","start","ende","studienjahr_kurzbz","ext_id","beschreibung","onlinebewerbung"),
 	"public.tbl_tag"  => array("tag"),
 	"public.tbl_variable"  => array("name","uid","wert"),
-	"public.tbl_vorlage"  => array("vorlage_kurzbz","bezeichnung","anmerkung","mimetype","attribute"),
+	"public.tbl_vorlage"  => array("vorlage_kurzbz","bezeichnung","anmerkung","mimetype","attribute","archivierbar","signierbar","stud_selfservice","dokument_kurzbz"),
 	"public.tbl_vorlagedokument"  => array("vorlagedokument_id","sort","vorlagestudiengang_id","dokument_kurzbz"),
 	"public.tbl_vorlagestudiengang"  => array("vorlagestudiengang_id","vorlage_kurzbz","studiengang_kz","version","text","oe_kurzbz","style","berechtigung","anmerkung_vorlagestudiengang","aktiv","sprache","subject","orgform_kurzbz"),
 	"testtool.tbl_ablauf"  => array("ablauf_id","gebiet_id","studiengang_kz","reihung","gewicht","semester", "insertamum","insertvon","updateamum", "updatevon","ablauf_vorgaben_id","studienplan_id"),
@@ -2118,7 +2469,7 @@ $tabellen=array(
 	"system.tbl_log" => array("log_id","person_id","zeitpunkt","app","oe_kurzbz","logtype_kurzbz","logdata","insertvon","taetigkeit_kurzbz"),
 	"system.tbl_logtype" => array("logtype_kurzbz", "data_schema"),
 	"system.tbl_filters" => array("filter_id","app","dataset_name","filter_kurzbz","person_id","description","sort","default_filter","filter","oe_kurzbz"),
-	"system.tbl_phrase" => array("phrase_id","app","phrase","insertamum","insertvon"),
+	"system.tbl_phrase" => array("phrase_id","app","phrase","insertamum","insertvon","category"),
 	"system.tbl_phrasentext" => array("phrasentext_id","phrase_id","sprache","orgeinheit_kurzbz","orgform_kurzbz","text","description","insertamum","insertvon"),
 	"system.tbl_rolle"  => array("rolle_kurzbz","beschreibung"),
 	"system.tbl_rolleberechtigung"  => array("berechtigung_kurzbz","rolle_kurzbz","art"),
@@ -2137,7 +2488,7 @@ $tabellen=array(
 	"wawi.tbl_zahlungstyp"  => array("zahlungstyp_kurzbz","bezeichnung"),
 	"wawi.tbl_konto"  => array("konto_id","kontonr","beschreibung","kurzbz","aktiv","person_id","insertamum","insertvon","updateamum","updatevon","ext_id","person_id"),
 	"wawi.tbl_konto_kostenstelle"  => array("konto_id","kostenstelle_id","insertamum","insertvon"),
-	"wawi.tbl_kostenstelle"  => array("kostenstelle_id","oe_kurzbz","bezeichnung","kurzbz","aktiv","insertamum","insertvon","updateamum","updatevon","ext_id","kostenstelle_nr","deaktiviertvon","deaktiviertamum"),
+	"wawi.tbl_kostenstelle"  => array("kostenstelle_id","oe_kurzbz","bezeichnung","kurzbz","aktiv","insertamum","insertvon","updateamum","updatevon","ext_id","kostenstelle_nr","deaktiviertvon","deaktiviertamum", "geschaeftsjahrvon", "geschaeftsjahrbis"),
 	"wawi.tbl_bestellungtag"  => array("tag","bestellung_id","insertamum","insertvon"),
 	"wawi.tbl_bestelldetailtag"  => array("tag","bestelldetail_id","insertamum","insertvon"),
 	"wawi.tbl_projekt_bestellung"  => array("projekt_kurzbz","bestellung_id","anteil"),
@@ -2174,7 +2525,7 @@ foreach ($tabellen AS $attribute)
 
 echo '<H2>Gegenpruefung!</H2>';
 $error=false;
-$sql_query="SELECT schemaname,tablename FROM pg_catalog.pg_tables WHERE schemaname != 'pg_catalog' AND schemaname != 'information_schema' AND schemaname != 'sync' AND schemaname != 'addon' AND schemaname != 'reports';";
+$sql_query="SELECT schemaname,tablename FROM pg_catalog.pg_tables WHERE schemaname != 'pg_catalog' AND schemaname != 'information_schema' AND schemaname != 'sync' AND schemaname != 'addon' AND schemaname != 'reports' AND schemaname != 'extension';";
 if (!$result=@$db->db_query($sql_query))
 		echo '<BR><strong>'.$db->db_last_error().' </strong><BR>';
 	else

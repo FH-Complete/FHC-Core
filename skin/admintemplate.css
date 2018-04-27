@@ -8,7 +8,7 @@
 }
 
 /*change of panel colors (grey) */
-.panel-primary > .panel-heading{
+.panel-primary > .panel-heading, .panel-primary > .panel-collapse > .panel-footer, .panel-primary > .panel-footer{
     color: black;
     background-color: #dfdfdf;
     border-color: #dfdfdf;
@@ -16,4 +16,38 @@
 
 .panel-primary{
     border-color: #dfdfdf;
+}
+
+.panel-primary > .panel-heading + .panel-collapse > .panel-body{
+    border-top-color: #ddd;
+}
+
+/*arrow toggle for panels*/
+.panel-heading .accordion-toggle:before{
+    /* symbol for "opening" panels */
+    font-family: 'Glyphicons Halflings';  /* essential for enabling glyphicon */
+    content: "\e114";    /* adjust as needed, taken from bootstrap.css */
+    /*float: right; */       /* adjust as needed */
+    margin: 15px;
+    color: grey;         /* adjust as needed */
+
+}
+
+.panel-heading .accordion-toggle.collapsed:before{
+    /* symbol for "collapsed" panels */
+    content: "\e080";    /* adjust as needed, taken from bootstrap.css */
+}
+
+.panel-heading .accordion-toggle:hover, .panel-heading .accordion-toggle:active,
+.panel-heading .accordion-toggle:focus{
+    text-decoration: none !important;
+}
+
+/*required asterisk for labels for required fields*/
+.label-required:after
+{
+    content:"\00a0*";
+    position: absolute;
+    top: 2px;
+    font-size: 1.3em;
 }

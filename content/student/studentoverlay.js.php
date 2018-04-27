@@ -1274,7 +1274,7 @@ function StudentAuswahl()
 	{
 		// *** Zeugnis ***
 		zeugnistree = document.getElementById('student-zeugnis-tree');
-		url='<?php echo APP_ROOT;?>rdf/akte.rdf.php?person_id='+person_id+"&dokument_kurzbz=Zeugnis&"+gettimestamp();
+		url='<?php echo APP_ROOT;?>rdf/akte.rdf.php?person_id='+person_id+"&"+gettimestamp();
 
 		try
 		{
@@ -2933,7 +2933,9 @@ function StudentAkteDel()
 // ****
 function StudentAkteDisableFields(val)
 {
-	document.getElementById('student-zeugnis-button-archivieren').disabled=val;
+	document.getElementById('student-zeugnis-button-archive').disabled=val;
+	// Zeugnis als Default markieren
+	document.getElementById('student-zeugnis-menulist-dokument').value='Zeugnis';
 }
 
 // ****
@@ -2962,14 +2964,8 @@ function StudentAkteUpload()
 	window.open('../vilesci/personen/akteupdate.php?akte_id='+akte_id);
 }
 
-// ****
-// * Startet das Script zum Archivieren des Zeugnisses und
-// * Refresht dann den Tree
-// ****
-function StudentZeugnisArchivieren(lang)
+function StudentZeugnisDokumentArchivieren()
 {
-	lang = lang || 'ger';
-
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 	var tree = document.getElementById('student-tree');
 
@@ -2987,6 +2983,47 @@ function StudentZeugnisArchivieren(lang)
 	var uid='';
 	var errormsg = '';
 	var stsem = getStudiensemester();
+
+	var vorlage = document.getElementById('student-zeugnis-menulist-dokument').value;
+	var url = '<?php echo APP_ROOT; ?>content/pdfExport.php';
+	var xml = '';
+
+	switch(vorlage)
+	{
+		case 'Zeugnis':
+		case 'ZeugnisEng':
+			xml = 'zeugnis.rdf.php'
+			break;
+
+		case 'PrProtokollBakk':
+		case 'PrProtBakkEng':
+		case 'PrProtBA':
+		case 'PrProtBAEng':
+		case 'PrProtokollDipl':
+		case 'PrProtDiplEng':
+		case 'PrProtMA':
+		case 'PrProtMAEng':
+		case 'Bescheid':
+		case 'BescheidEng':
+			xml = 'abschlusspruefung.rdf.php';
+			break;
+
+		case 'DiplSupplement':
+			xml = 'diplomasupplement.xml.php';
+			break;
+
+		case 'Studienblatt':
+		case 'StudienblattEng':
+			xml = 'studienblatt.xml.php';
+			break;
+		default:
+			alert('Das archivieren fuer diesen Dokumenttyp wird derzeit nicht unterstuetzt');
+			return
+			break;
+	}
+
+	var labelalt = document.getElementById('student-zeugnis-button-archive').label;
+	document.getElementById('student-zeugnis-button-archive').label='Loading...';
 
 	//Zeugnis fuer alle markierten Studenten archivieren
 	for (var t=0; t<numRanges; t++)
@@ -2996,14 +3033,12 @@ function StudentZeugnisArchivieren(lang)
 		{
 			uid = getTreeCellText(tree, 'student-treecol-uid', v);
 
-			var xsl_vorlage;
-			if(lang=='eng')
-				xsl_vorlage = 'ZeugnisEng';
-			else
-				xsl_vorlage = 'Zeugnis';
-			url = '<?php echo APP_ROOT; ?>content/pdfExport.php?xsl='+xsl_vorlage+'&xml=zeugnis.rdf.php&uid='+uid+'&ss='+stsem+'&archive=1';
-
 			var req = new phpRequest(url,'','');
+			req.add('xsl', vorlage);
+			req.add('xml', xml);
+			req.add('ss', stsem);
+			req.add('archive', '1');
+			req.add('uid', uid);
 
 			var response = req.execute();
 			if(response!='')
@@ -3013,61 +3048,7 @@ function StudentZeugnisArchivieren(lang)
 
 	if(errormsg!='')
 		alert(errormsg);
-
-	StudentAkteTreeDatasource.Refresh(false);
-}
-
-// * Startet das Script zum Archivieren des Bescheids und
-// * Refresht dann den Tree
-// ****
-function StudentBescheidArchivieren(lang)
-{
-	lang = lang || 'ger';
-
-	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
-	var tree = document.getElementById('student-tree');
-
-	if (tree.currentIndex==-1)
-	{
-		alert('Student muss ausgewaehlt sein');
-		return;
-	}
-
-	var tree=document.getElementById('student-tree');
-	var numRanges = tree.view.selection.getRangeCount();
-	var start = new Object();
-	var end = new Object();
-	var anzfault=0;
-	var uid='';
-	var errormsg = '';
-	var stsem = getStudiensemester();
-
-	//Bescheid fuer alle markierten Studenten archivieren
-	for (var t=0; t<numRanges; t++)
-	{
-		tree.view.selection.getRangeAt(t,start,end);
-		for (v=start.value; v<=end.value; v++)
-		{
-			uid = getTreeCellText(tree, 'student-treecol-uid', v);
-
-			var xsl_vorlage;
-			if(lang=='eng')
-				xsl_vorlage = 'BescheidEng';
-			else
-				xsl_vorlage = 'Bescheid';
-			url = '<?php echo APP_ROOT; ?>content/pdfExport.php?xsl='+xsl_vorlage+'&xml=abschlusspruefung.rdf.php&uid='+uid+'&ss='+stsem+'&archive=1';
-
-			var req = new phpRequest(url,'','');
-
-			var response = req.execute();
-			if(response!='')
-				errormsg = errormsg + response;
-		}
-	}
-
-	if(errormsg!='')
-		alert(errormsg);
-
+	document.getElementById('student-zeugnis-button-archive').label=labelalt;
 	StudentAkteTreeDatasource.Refresh(false);
 }
 
@@ -3618,36 +3599,6 @@ function StudentNotenTreeSelectDifferent()
 function StudentLvGesamtNotenTreeSelectID()
 {
 	StudentNotenTreeSelectDifferent();
-
-	/*
-	var tree=document.getElementById('student-lvgesamtnoten-tree');
-	if(tree.view)
-		var items = tree.view.rowCount; //Anzahl der Zeilen ermitteln
-	else
-		return false;
-
-	//In der globalen Variable ist die zu selektierende Eintrag gespeichert
-	if(StudentLvGesamtNotenSelectLehrveranstaltungID!=null)
-	{
-	   	for(var i=0;i<items;i++)
-	   	{
-	   		//ID der row holen
-			col = tree.columns ? tree.columns["student-lvgesamtnoten-tree-lehrveranstaltung_id"] : "student-lvgesamtnoten-tree-lehrveranstaltung_id";
-			var lehrveranstaltung_id=tree.view.getCellText(i,col);
-
-			//wenn dies die zu selektierende Zeile
-			if(lehrveranstaltung_id == StudentLvGesamtNotenSelectLehrveranstaltungID)
-			{
-				//Zeile markieren
-				tree.view.selection.select(i);
-				//Sicherstellen, dass die Zeile im sichtbaren Bereich liegt
-				tree.treeBoxObject.ensureRowIsVisible(i);
-				StudentNotenSelectLehrveranstaltungID=null;
-				StudentNotenSelectStudentUID=null;
-				return true;
-			}
-	   	}
-	}*/
 }
 
 // ***
@@ -4365,7 +4316,6 @@ function StudentPruefungAuswahl()
 
 	//Lehrveranstaltung Drop Down laden
 	var LVDropDown = document.getElementById('student-pruefung-menulist-lehrveranstaltung');
-	//url='<?php echo APP_ROOT;?>rdf/lehrveranstaltung.rdf.php?stg_kz='+stg_kz+"&"+gettimestamp();
 	var uid = document.getElementById('student-detail-textbox-uid').value;
 	url="<?php echo APP_ROOT;?>rdf/lehrveranstaltung.rdf.php?uid="+uid+"&"+gettimestamp();
 
@@ -4483,9 +4433,9 @@ function StudentAnrechnungenTreeSelectID()
 	//In der globalen Variable ist die zu selektierende Eintrag gespeichert
 	if(StudentAnrechnungSelectID!=null)
 	{
-	   	for(var i=0;i<items;i++)
-	   	{
-	   		//ID der row holen
+		for(var i=0;i<items;i++)
+		{
+			//ID der row holen
 			col = tree.columns ? tree.columns["student-anrechnungen-tree-anrechnung_id"] : "student-anrechnungen-tree-anrechnung_id";
 			var anrechnung_id=tree.view.getCellText(i,col);
 
@@ -4499,7 +4449,7 @@ function StudentAnrechnungenTreeSelectID()
 				StudentAnrechnungSelectID=null;
 				return true;
 			}
-	   	}
+		}
 	}
 }
 
@@ -4517,7 +4467,7 @@ function StudentNotizNeu()
 	}
 
 	//Ausgewaehlte ID holen
-    var col = tree.columns ? tree.columns["student-anrechnungen-tree-anrechnung_id"] : "student-anrechnungen-tree-anrechnung_id";
+	var col = tree.columns ? tree.columns["student-anrechnungen-tree-anrechnung_id"] : "student-anrechnungen-tree-anrechnung_id";
 	var anrechnung_id = tree.view.getCellText(tree.currentIndex,col);
 
 	window.open("<?php echo APP_ROOT; ?>content/notizdialog.xul.php?anrechnung_id="+anrechnung_id,"","chrome, status=no, width=500, height=500, centerscreen, resizable");
@@ -4565,7 +4515,7 @@ function StudentAnrechnungNeu()
 
 	document.getElementById("student-anrechnungen-menulist-kompatible_lehrveranstaltung-row").hidden = true;
 	StudentAnrechnungDetailDisableFields(false);
-    StudentAnrechnungResetNotizLabel();
+	StudentAnrechnungResetNotizLabel();
 
 	// Prestudent-ID in hidden field speichern
 	var col = tree.columns ? tree.columns["student-treecol-prestudent_id"] : "student-treecol-prestudent_id";
@@ -4751,7 +4701,7 @@ function StudentAnrechnungDelete()
 	}
 
 	//Ausgewaehlte ID holen
-    var col = tree.columns ? tree.columns["student-anrechnungen-tree-anrechnung_id"] : "student-anrechnungen-tree-anrechnung_id";
+	var col = tree.columns ? tree.columns["student-anrechnungen-tree-anrechnung_id"] : "student-anrechnungen-tree-anrechnung_id";
 	var anrechnung_id = tree.view.getCellText(tree.currentIndex,col);
 
 	// Studiengang ermitteln
@@ -4793,7 +4743,7 @@ function StudentAnrechnungDelete()
 // ****
 function StudentAnrechnungResetNotizLabel()
 {
-    document.getElementById('student-anrechnungen-button-notiz').label = "Notiz hinzufügen";
+	document.getElementById('student-anrechnungen-button-notiz').label = "Notiz hinzufügen";
 }
 
 // ****
@@ -4809,7 +4759,7 @@ function StudentAnrechnungAuswahl()
 	StudentAnrechnungDetailDisableFields(false);
 
 	//Ausgewaehlte ID holen
-    var col = tree.columns ? tree.columns["student-anrechnungen-tree-anrechnung_id"] : "student-anrechnungen-tree-anrechnung_id";
+	var col = tree.columns ? tree.columns["student-anrechnungen-tree-anrechnung_id"] : "student-anrechnungen-tree-anrechnung_id";
 	var anrechnung_id = tree.view.getCellText(tree.currentIndex,col);
 
 	// Prestudent-ID in hidden field speichern
@@ -4821,7 +4771,7 @@ function StudentAnrechnungAuswahl()
 	var url = '<?php echo APP_ROOT ?>rdf/anrechnung.rdf.php?anrechnung_id='+anrechnung_id+'&'+gettimestamp();
 
 	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
-    var dsource = rdfService.GetDataSourceBlocking(url);
+	var dsource = rdfService.GetDataSourceBlocking(url);
 	var subject = rdfService.GetResource("http://www.technikum-wien.at/anrechnung/" + anrechnung_id);
 	var predicateNS = "http://www.technikum-wien.at/anrechnung/rdf";
 
@@ -5199,46 +5149,6 @@ function StudentCreateDiplSupplement(event)
 }
 
 // ****
-// * Archiviert das Diplomasupplement einer Person
-// ****
-function StudentDiplomasupplementArchivieren()
-{
-	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
-
-	tree = document.getElementById('student-tree');
-
-	//Markierte Studenten holen
-	var start = new Object();
-	var end = new Object();
-	var numRanges = tree.view.selection.getRangeCount();
-	var paramList= '';
-	var errormsg='';
-
-	var labelalt = document.getElementById('student-zeugnis-button-archivieren-diplomasupplement').label;
-	document.getElementById('student-zeugnis-button-archivieren-diplomasupplement').label='Loading...';
-	for (var t = 0; t < numRanges; t++)
-	{
-		tree.view.selection.getRangeAt(t,start,end);
-		for (var v = start.value; v <= end.value; v++)
-		{
-			var col = tree.columns ? tree.columns["student-treecol-uid"] : "student-treecol-uid";
-			var uid=tree.view.getCellText(v,col);
-			stg_kz=getTreeCellText(tree,"student-treecol-studiengang_kz", v);
-
-			url = '<?php echo APP_ROOT; ?>content/pdfExport.php?xml=diplomasupplement.xml.php&output=pdf&xsl=DiplSupplement&xsl_stg_kz='+stg_kz+'&uid='+uid+'&archive=true';
-			var req = new phpRequest(url,'','');
-
-			var response = req.execute();
-			if(response!='')
-				errormsg = errormsg + response;
-		}
-	}
-
-	document.getElementById('student-zeugnis-button-archivieren-diplomasupplement').label=labelalt;
-	StudentAkteTreeDatasource.Refresh(false);
-}
-
-// ****
 // * Erstellt den Ausbildungsvertrag fuer einen oder mehrere Studenten
 // ****
 function StudentPrintAusbildungsvertrag(event)
@@ -5284,7 +5194,7 @@ function StudentPrintAusbildungsvertrag(event)
 	}
 
 	//PDF erzeugen
-	window.open('<?php echo APP_ROOT; ?>content/pdfExport.php?xml=ausbildungsvertrag.xml.php&xsl=Ausbildungsver&style_xsl=AusbildStatus&output='+output+'&prestudent_id='+paramList,'Ausbildungsvertrag', 'height=200,width=350,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
+	window.open('<?php echo APP_ROOT; ?>content/pdfExport.php?xml=ausbildungsvertrag.xml.php&xsl=Ausbildungsver&output='+output+'&prestudent_id='+paramList,'Ausbildungsvertrag', 'height=200,width=350,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
 }
 
 //****
@@ -5333,7 +5243,7 @@ function StudentPrintAusbildungsvertragEnglisch(event)
 	}
 
 	//PDF erzeugen
-	window.open('<?php echo APP_ROOT; ?>content/pdfExport.php?xml=ausbildungsvertrag.xml.php&xsl=AusbVerEng&style_xsl=AusbVerEngHead&output='+output+'&prestudent_id='+paramList,'AusbildungsvertragEng', 'height=200,width=350,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
+	window.open('<?php echo APP_ROOT; ?>content/pdfExport.php?xml=ausbildungsvertrag.xml.php&xsl=AusbVerEng&output='+output+'&prestudent_id='+paramList,'AusbildungsvertragEng', 'height=200,width=350,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
 }
 
 // ****
@@ -5558,7 +5468,7 @@ function StudentPrestudentRolleVorruecken()
 
 	if (tree.currentIndex==-1)
 	{
-	    return;
+		return;
 	}
 
 	//markierte Rolle holen

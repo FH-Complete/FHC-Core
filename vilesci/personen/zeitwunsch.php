@@ -52,7 +52,7 @@ $uid_benutzer = get_uid();
 
 $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($uid_benutzer);
-if(!$rechte->isBerechtigt('mitarbeiter'))
+if(!$rechte->isBerechtigt('mitarbeiter', null, 'suid'))
 	die($rechte->errormsg);
 
 $datum_obj = new datum();

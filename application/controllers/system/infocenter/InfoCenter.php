@@ -42,6 +42,11 @@ class InfoCenter extends VileSci_Controller
 			'logtype' => 'Action',
 			'name' => 'Note added',
 			'message' => 'Note with title %s was added'
+		),
+		'updatenotiz' => array(
+			'logtype' => 'Action',
+			'name' => 'Note updated',
+			'message' => 'Note with title %s was updated'
 		)
 	);
 	private $uid; // contains the UID of the logged user
@@ -88,7 +93,12 @@ class InfoCenter extends VileSci_Controller
 	{
 		$this->load->view('system/infocenter/infocenter.php');
 	}
-
+	
+	public function infocenterFreigegeben()
+	{
+		$this->load->view('system/infocenter/infocenterFreigegeben.php');
+	}
+	
 	/**
 	 * Initialization function, gets person and prestudent data and loads the view with the data
 	 * @param $person_id
@@ -122,7 +132,7 @@ class InfoCenter extends VileSci_Controller
 			)
 		);
 	}
-
+	
 	/**
 	 * unlocks page from edit by a person, redirects to overview filter page
 	 * @param $person_id
@@ -352,7 +362,7 @@ class InfoCenter extends VileSci_Controller
 
 		$this->_redirectToStart($prestudent_id, 'ZgvPruef');
 	}
-
+	
 	/**
 	 * Saves a new Notiz for a person
 	 * @param $person_id
@@ -375,6 +385,44 @@ class InfoCenter extends VileSci_Controller
 		$this->output
 			->set_content_type('application/json')
 			->set_output(json_encode($result->retval));
+	}
+	
+	/**
+	 * Updates a new Notiz for a person
+	 * @param int $notiz_id
+	 * @param int $person_id
+	 * @return bool true if success
+	 */
+	public function updateNotiz($notiz_id, $person_id)
+	{	
+		$titel = $this->input->post('notiztitel');
+		$text = $this->input->post('notiz');
+
+		$result = $this->NotizModel->update(
+			$notiz_id,
+			array(
+				'titel' => $titel,
+				'text' => $text,
+				'verfasser_uid' => $this->uid,
+				"updateamum" => 'NOW()',
+				"updatevon" => $this->uid
+			)
+		);
+		
+		
+		$json = FALSE;
+		
+		if (isSuccess($result))
+		{
+			$json = TRUE;
+			
+			//set log "Notiz updated"
+			$this->_log($person_id, 'updatenotiz', array($titel));
+		}
+		
+		$this->output
+			->set_content_type('application/json')
+			->set_output(json_encode($json));
 	}
 
 	/**
@@ -499,7 +547,7 @@ class InfoCenter extends VileSci_Controller
 				'children' => array()
 			)
 		);
-
+				
 		$this->_fillFilters($listFiltersSent, $filtersarray['abgeschickt']);
 		$this->_fillFilters($listFiltersNotSent, $filtersarray['nichtabgeschickt']);
 
@@ -547,7 +595,7 @@ class InfoCenter extends VileSci_Controller
 		{
 			$toPrint = "%s=%s";
 			$tofill['children'][] = array(
-				'link' => sprintf($toPrint, base_url('index.ci.php/system/infocenter/InfoCenter?filter_id'), $filterId),
+				'link' => sprintf($toPrint, site_url('system/infocenter/InfoCenter?filter_id'), $filterId),
 				'description' => $description
 			);
 		}
@@ -559,13 +607,8 @@ class InfoCenter extends VileSci_Controller
 		{
 			$toPrint = "%s=%s";
 
-			if ($this->router->method != 'index')
-			{
-
-			}
-
 			$tofill['children'][] = array(
-				'link' => sprintf($toPrint, base_url('index.ci.php/system/infocenter/InfoCenter?filter_id'), $filterId),
+				'link' => sprintf($toPrint, site_url('system/infocenter/InfoCenter?filter_id'), $filterId),
 				'description' => $description,
 				'subscriptDescription' => 'Remove',
 				'subscriptLinkClass' => 'remove-filter',

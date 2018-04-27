@@ -61,6 +61,11 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
 </xsl:template>
 
 <xsl:template match="pruefung">
+	<!-- 
+	Der Bescheid wird nur aufgrund der zuletzt vorhandenen Abschlusspruefung ausgestellt
+	Diese wird als erstes vom RDF geliefert
+	-->
+	<xsl:if test="position()=1">
 		<office:text text:use-soft-page-breaks="true" xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0" xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0" xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0" xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0" xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0">
 			<text:sequence-decls>
 				<text:sequence-decl text:display-outline-level="0" text:name="Illustration"/>
@@ -136,15 +141,27 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
 			<text:p text:style-name="P1">von vier Wochen ab Zustellung bei der belangten Behörde (Kollegium der Fachhochschule</text:p>
 			<text:p text:style-name="P1">Technikum Wien) einzubringen.</text:p>
 			<text:p text:style-name="P1"/>
-			<text:p text:style-name="P1">Wien, <xsl:value-of select="sponsion" /></text:p>
-			<text:p text:style-name="P1"/>
-			<text:p text:style-name="P1">Für das Fachhochschulkollegium</text:p>
-			<text:p text:style-name="P1">Der Rektor</text:p>
-			<text:p text:style-name="P1"/>
-			<text:p text:style-name="P1"/>
-			<text:p text:style-name="P1"/>
-			<text:p text:style-name="P1"/>
-			<text:p text:style-name="P1"><xsl:value-of select="rektor" /></text:p>
+			<xsl:choose>
+				<xsl:when test="../signed">
+				<text:p text:style-name="P1">
+					<draw:frame draw:style-name="fr1" draw:name="Bild1" text:anchor-type="paragraph" svg:width="17cm" svg:height="4.235cm" draw:z-index="0">
+					<draw:image xlink:href="Pictures/Platzhalter_QR_FHC_GROSS_AMT_DE.png" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/>
+					</draw:frame>
+				</text:p>
+				</xsl:when>
+				<xsl:otherwise>
+					<text:p text:style-name="P1">Wien, <xsl:value-of select="sponsion" /></text:p>
+					<text:p text:style-name="P1"/>
+					<text:p text:style-name="P1">Für das Fachhochschulkollegium</text:p>
+					<text:p text:style-name="P1">Der Rektor</text:p>
+					<text:p text:style-name="P1"/>
+					<text:p text:style-name="P1"/>
+					<text:p text:style-name="P1"/>
+					<text:p text:style-name="P1"/>
+					<text:p text:style-name="P1"><xsl:value-of select="rektor" /></text:p>
+				</xsl:otherwise>
+			</xsl:choose>
 		</office:text>
+	</xsl:if>
 </xsl:template>
 </xsl:stylesheet>

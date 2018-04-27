@@ -74,7 +74,7 @@
 				});
 
 				$.ajax({
-					url: "<?php echo base_url('index.ci.php/system/Filters/sortSelectedFields'); ?>",
+					url: "<?php echo site_url('system/Filters/sortSelectedFields'); ?>",
 					method: "POST",
 					data: {
 						selectedFieldsLst: arrayDndId
@@ -106,7 +106,7 @@
 		$("#addField").change(function(event) {
 
 			$.ajax({
-				url: "<?php echo base_url('index.ci.php/system/Filters/addSelectedFields'); ?>",
+				url: "<?php echo site_url('system/Filters/addSelectedFields'); ?>",
 				method: "POST",
 				data: {
 					fieldName: $(this).val()
@@ -128,7 +128,7 @@
 		$(".remove-field").click(function(event) {
 
 			$.ajax({
-				url: "<?php echo base_url('index.ci.php/system/Filters/removeSelectedFields'); ?>",
+				url: "<?php echo site_url('system/Filters/removeSelectedFields'); ?>",
 				method: "POST",
 				data: {
 					fieldName: $(this).attr('fieldToRemove')
@@ -151,7 +151,7 @@
 	function renderSelectedFields()
 	{
 		$.ajax({
-			url: "<?php echo base_url('index.ci.php/system/Filters/selectFields'); ?>",
+			url: "<?php echo site_url('system/Filters/selectFields'); ?>",
 			method: "GET",
 			data: {},
 		    dataType: "json"
@@ -232,7 +232,7 @@
 	<div id="filterSelectFieldsDnd" class="filter-select-fields-dnd-div"></div>
 
 	<div>
-		<span>
+		<span class="filter-options-span">
 			Add field:
 		</span>
 

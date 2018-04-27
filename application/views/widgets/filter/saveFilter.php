@@ -6,7 +6,7 @@
 			if ($("#customFilterDescription").val() != '')
 			{
 				$.ajax({
-					url: "<?php echo base_url('index.ci.php/system/Filters/saveFilter'); ?>",
+					url: "<?php echo site_url('system/Filters/saveFilter'); ?>",
 					method: "POST",
 					data: {
 						customFilterDescription: $("#customFilterDescription").val()
@@ -30,12 +30,19 @@
 
 </script>
 
+<br>
+
 <div>
+	<span class="filter-options-span">
+		Filter description:
+	</span>
 	<span>
-		Filter description: <input type="text" id="customFilterDescription" value="">
+		<input type="text" id="customFilterDescription" value="">
 	</span>
 
 	<span>
 		<input type="button" id="saveCustomFilterButton" value="Save filter">
 	</span>
 </div>
+
+<br>

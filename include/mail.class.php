@@ -96,7 +96,8 @@ class mail
 
 		$header .= 'X-Mailer: FHComplete V1'.$eol; 
 	  	$header .= 'Mime-Version: 1.0'.$eol;
-		$header .= "Content-Type: multipart/mixed; boundary=\"$mime_boundary_mixed\"".$eol;
+		$header .= "Content-Type: multipart/related; boundary=\"$mime_boundary_mixed\"".$eol;
+		$header .= "Content-Transfer-Encoding: 8bit".$eol;
 		
 		// Body
 		$mailbody = "";
@@ -152,7 +153,7 @@ class mail
 				$dispo = empty($attachment[3]) ? 'attachment' : 'inline';
 				$mailbody .= $eol;
 				$mailbody .= "Content-Disposition: $dispo; filename={$attachment[2]}".$eol;
-				$mailbody .= "Content-Type: {$attachment[1]}; name={$attachment[2]}".$eol;
+				$mailbody .= "Content-Type: {$attachment[1]}; name={$attachment[2]}".$eol;					
 				if (!empty($attachment[3])) 
 				{
 					$mailbody .= "Content-ID: <{$attachment[3]}>".$eol;
@@ -229,6 +230,26 @@ class mail
 		$attachment_string = chunk_split(base64_encode($file_content));
 		$this->attachments[] = Array($attachment_string, $type, $name, $ContentID);
 		return true;
+	}
+	
+	/**
+	 * Fuegt ein Bild zum Mail hinzu
+	 * $image	image-URL
+	 * $type	MIME Type "image/[image-type]", zB "image/jpg"
+	 * $name	Anzeigename des Files
+	 * $ContentID ContentID für inline-embedding (diese muss im script im tag <img src="cid:ContentID"> angegeben werden)
+	 */
+	public function addEmbeddedImage ($image, $type, $name = '', $ContentID)
+	{
+		$image_string = file_get_contents($image);
+		if (!$image_string) 
+		{
+			$this->errormsg = 'Fehler beim Einlesen der Datei';
+			return false;
+		}
+		
+		$image_b64 = chunk_split(base64_encode($image_string), 76, "\n");
+		$this->attachments[] = Array($image_b64, $type, $name, $ContentID);
 	}
 	
 	/**

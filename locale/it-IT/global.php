@@ -133,6 +133,7 @@ $this->phrasen['global/studiengangsleitung']='Direzione del corso di studi';
 $this->phrasen['global/studiengangsmanagement']='Management del corso di studi';
 $this->phrasen['global/studienrichtung']='indirizzo di studio';
 $this->phrasen['global/studiensemester']='Semestre di studio';
+$this->phrasen['global/studienplan']='Piano di studio';
 $this->phrasen['global/studiensemesterKonnteNichtGefundenWerden ']='impossibile trovare semestre di studio digitato';
 $this->phrasen['global/studienzentrum']='';
 $this->phrasen['global/stunde']='ora';
