@@ -175,4 +175,5 @@ $this->phrasen['benotungstool/notenlisteImport']='Notenliste für den LV-Noten-I
 $this->phrasen['benotungstool/bearbeitetvon']='Bearbeitet von';
 $this->phrasen['benotungstool/teilnoten']='Teilnoten';
 $this->phrasen['benotungstool/hilfeImport']='Zum Importieren der Noten markieren sie die Spalten Kennzeichen und Note im Excel-File und kopieren sie diese in die Zwischenablage. Drücken sie danach diesen Knopf erneut, um die Noten zu importieren';
+$this->phrasen['benotungstool/geaenderteNotenVorhanden']='Es sind geänderte Noten vorhanden. Geben Sie diese frei, um die Assistenz zu informieren';
 ?>
