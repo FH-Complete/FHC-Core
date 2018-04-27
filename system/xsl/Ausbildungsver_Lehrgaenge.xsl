@@ -432,25 +432,6 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
 		</text:p>
 		<text:p text:style-name="P6">Adresse: <text:tab/><xsl:value-of select="strasse"/>; <xsl:value-of select="plz"/></text:p>
 		<text:p text:style-name="P7">Geburtsdatum: <text:tab/><text:database-display text:table-name="" text:table-type="table" text:column-name="Geb.datum"><xsl:value-of select="gebdatum"/></text:database-display></text:p>
-		<text:p text:style-name="P1">
-		<text:span text:style-name="T10"><text:span text:style-name="T10">Sozialversicherungsnummer:</text:span>
-		<text:span text:style-name="Footnote_20_Symbol">
-			<text:span text:style-name="T10">
-			<text:note text:id="ftn1" text:note-class="footnote">
-			 <text:note-citation text:label="1">1</text:note-citation>
-				<text:note-body>
-				<text:p text:style-name="Standard">
-					<text:span text:style-name="T4">
-					<text:s/>
-					</text:span>
-					<text:span text:style-name="T5">Gemäß § 3 Absatz 1 des Bildungsdokumentationsgesetzes und der Bildungsdokumentationsverordnung-Fachhochschulen <text:s/>hat der Erhalter die Sozialversicherungsnummer zu erfassen und gemäß § 7 Absatz 2 im Wege der Agentur für Qualitätssicherung und Akkreditierung Austria an das zuständige Bundesministerium und die Bundesanstalt Statistik Österreich zu übermitteln.</text:span>
-				</text:p>
-				<text:p text:style-name="P10"/>
-				</text:note-body>
-			</text:note>
-			</text:span>
-		</text:span><text:tab/><xsl:value-of select="svnr"/></text:span>
-		</text:p>
 		<text:p text:style-name="P11"/>
 		<text:p text:style-name="P4">(kurz „ao. Studentin“ bzw. „ao. Student“ genannt) andererseits, im Rahmen des Lehrgangs zur Weiterbildung nach §9 FHStG idgF</text:p>
 		<text:p text:style-name="P11"/>
@@ -614,14 +595,14 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
 		<text:p text:style-name="P32">6.2.4 Aktualisierung eigener Daten und Bezug von Informationen</text:p>
 		<text:p text:style-name="P35">Die ao. Studentin bzw. der ao. Student hat unaufgefordert dafür zu sorgen, dass die von ihr/ihm beigebrachten Daten aktuell sind. Änderungen sind der Lehrgangsassistenz unverzüglich schriftlich mitzuteilen. Darüber hinaus trifft sie/ihn die Pflicht, sich von studienbezogenen Informationen, die ihr/ihm an die vom Erhalter zur Verfügung gestellte Emailadresse zugestellt werden, in geeigneter Weise Kenntnis zu verschaffen.</text:p>
 		<text:p text:style-name="P32">6.2.5 Verwertungsrechte</text:p>
-		<text:p text:style-name="P35">Sofern nicht im Einzelfall andere Regelungen zwischen dem Erhalter und der ao. Studentin oder dem ao. Studenten getroffen wurden, ist die ao. Studentin oder der ao. Student verpflichtet, dem Erhalter die Rechte an Forschungs- und Entwicklungsergebnissen auf dessen schriftliche Anfrage hin anzubieten.</text:p>
+		<text:p text:style-name="P35">Sofern nicht im Einzelfall andere Regelungen zwischen dem Erhalter und der ao. Studentin oder dem ao. Studenten getroffen wurden, ist die ao. Studentin oder der ao. Student verpflichtet, dem Erhalter die Rechte an Forschungs- und Entwicklungsergebnissen, die im Rahmen von geförderten Projekten geschaffen wurden, auf dessen schriftliche Anfrage hin einzuräumen.</text:p>
 		<text:p text:style-name="P32">6.2.6 Aufzeichnungen und Mitschnitte</text:p>
 		<text:p text:style-name="P35">Es ist der/dem ao. Studierenden ausdrücklich untersagt, Lehrveranstaltungen als Ganzes oder nur Teile davon aufzuzeichnen und/oder mitzuschneiden (z.B. durch Film- und/oder Tonaufnahmen oder sonstige hierfür geeignete audiovisuelle Mittel). Darüber hinaus ist jede Form der öffentlichen Zurverfügungstellung (drahtlos oder drahtgebunden) der vorgenannten Aufnahmen z.B. in sozialen Netzwerken wie Facebook, WhatsAPP, LinkedIn, Xing etc, aber auch auf Youtube, Instagram usw. oder durch sonstige für diese Zwecke geeignete Kommunikationsmittel untersagt. Diese Regelungen gelten sinngemäß auch für Skripten, sonstige Lernbehelfe und Prüfungsangaben.</text:p>
 		<text:p text:style-name="P35">Ausgenommen hiervon ist eine Aufzeichnung zu ausschließlichen Lern-, Studien- und Forschungszwecken und zum privaten Gebrauch, sofern hierfür der/die Vortragende vorab ausdrücklich seine/ihre schriftliche Zustimmung erteilt hat.</text:p>
 		<text:p text:style-name="P31">6.2.7 Geheimhaltungspflicht</text:p>
 		<text:p text:style-name="P5">Die ao. Studentin bzw. der ao. Student ist zur Geheimhaltung von Forschungs- und Entwicklungsaktivitäten und -ergebnissen gegenüber Dritten verpflichtet. </text:p>
 		<text:p text:style-name="P31">6.2.8 Schadensmeldung</text:p>
-		<text:p text:style-name="P5">Im Falle des Eintretens eines Schadens am Inventar der Fachhochschule ist der/die ao. Studierende verpflichtet, diesen innerhalb von drei Tagen dem Lehrgangssekretariat zu melden. Allfällige Haftungsansprüche bleiben hiervon unberührt.</text:p>
+		<text:p text:style-name="P5">Im Falle des Eintretens eines Schadens am Inventar der Fachhochschule ist der/die ao. Studierende verpflichtet, diesen unverzüglich, spätestens aber innerhalb von drei Tagen dem Lehrgangssekretariat zu melden. Allfällige Haftungsansprüche bleiben hiervon unberührt.</text:p>
 		<text:p text:style-name="P31">6.2.9 Rückgabeverpflichtung bei Studienende</text:p>
 		<text:p text:style-name="P5">Die ao. Studentin bzw. der ao. Student ist verpflichtet, bei einer Beendigung des Lehrgangs unverzüglich alle zur Verfügung gestellten Gerätschaften, Bücher, Schlüssel und sonstige Materialien zurückzugeben.</text:p>
 
@@ -663,10 +644,10 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
 			<text:p text:style-name="P40">persönlichem Verhalten, das zu einer Beeinträchtigung des Images und/oder Betriebes des Lehrgangs, der Fachhochschule bzw. des Erhalters oder von Personen führt, die für die Fachhochschule bzw. den Erhalter tätig sind;</text:p>
 		</text:list-item>
 		<text:list-item>
-			<text:p text:style-name="P40">Weigerung zur Beibringung von Daten (siehe Pkt. 6.2.3)</text:p>
+			<text:p text:style-name="P40">Weigerung zur Beibringung von Daten (siehe Pkt. 6.2.3);</text:p>
 		</text:list-item>
 		<text:list-item>
-			<text:p text:style-name="P40">Verletzung der Verpflichtung, dem Erhalter die Rechte an Forschungs- und Entwicklungsergebnissen anzubieten (siehe Pkt. 6.2.5);</text:p>
+			<text:p text:style-name="P40">Verletzung der Verpflichtung, dem Erhalter die Rechte an Forschungs- und Entwicklungsergebnissen einzuräumen (siehe Pkt. 6.2.5);</text:p>
 		</text:list-item>
 		<text:list-item>
 			<text:p text:style-name="P40">Verletzung der Geheimhaltungspflicht (siehe Pkt. 6.2.7); </text:p>
@@ -678,7 +659,7 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
 			<text:p text:style-name="P40">Nichterfüllung finanzieller Verpflichtungen trotz Mahnung;</text:p>
 		</text:list-item>
 		<text:list-item>
-			<text:p text:style-name="P40">Plagiieren im Rahmen wissenschaftlicher Arbeiten</text:p>
+			<text:p text:style-name="P40">Plagiieren im Rahmen wissenschaftlicher Arbeiten.</text:p>
 		</text:list-item>
 		</text:list>
 		<text:p text:style-name="P12"/>
@@ -698,7 +679,7 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
 		</text:list-item>
 		</text:list>
 		<text:p text:style-name="P5">
-		Ao. Studierende des Programms sind verpflichtet, eine EDV-Ausstattung zu beschaffen und zu unterhalten, die es ermöglicht, an den Fernlehrelementen teilzunehmen. Die gesamten Kosten der Anschaffung und des Betriebs (inkl. Kosten für Internet und e-mail) trägt der ao. Student bzw. die ao. Studentin.
+		Ao. Studierende des Programms sind verpflichtet, eine EDV-Ausstattung zu beschaffen und zu unterhalten, die es ermöglicht, an den Fernlehrelementen teilzunehmen. Die gesamten Kosten der Anschaffung und des Betriebs (inkl. Kosten für Internet) trägt der ao. Student bzw. die ao. Studentin.
 		</text:p>
 		<text:p text:style-name="P5"/>
 
