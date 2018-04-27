@@ -68,6 +68,8 @@ switch($work)
 		$email='';
 		$gruppe_kurzbz='';
 		$name='';
+		$backgroundcolor = '';
+		$textcolor = '';
 		switch($typ)
 		{
 			case 'Ort': $ort = $id; break;
@@ -85,7 +87,7 @@ switch($work)
 			$gruppe = new gruppe();
 			if(!$gruppe->loadUser($gruppe_kurzbz))
 				die('Fehler: '.$gruppe->errormsg);
-            	
+
 			foreach($gruppe->result as $row)
 			{
 				$coodle->coodle_id = $coodle_id;
@@ -108,7 +110,15 @@ switch($work)
 					}
 				}
 			}
-			echo 'true';
+			
+			$data['result'] = 'true';
+			$data['backgroundColor'] = $backgroundcolor;
+			$data['textColor'] = $textcolor;
+
+			if(isset($_POST['format']) && $_POST['format'] == 'json')
+				echo json_encode($data);
+			else
+				echo 'true';
 		}
 		else 
 		{
@@ -133,9 +143,33 @@ switch($work)
 			$coodle->insertvon = $user;
 			$coodle->updateamum = date('Y-m-d H:i:s');
 			$coodle->updatevon = $user;
-            
+
+			if ($uid != '')
+			{
+				$backgroundcolor = 'hsl('.abs((crc32($id)) % 360).', 80%, 90%)';
+				$textcolor = 'hsl('.abs((crc32($id)) % 360).', 60%, 70%)';
+			}
+			elseif ($ort != '')
+			{
+				$backgroundcolor = 'hsl('.abs((crc32($id)) % 360).', 0%, 80%)';
+				$textcolor = 'hsl('.abs((crc32($id)) % 360).', 0%, 50%)';
+			}
+			elseif ($email != '')
+			{
+				$backgroundcolor = 'hsl('.abs((crc32($id)) % 360).', 80%, 90%)';
+				$textcolor = 'hsl('.abs((crc32($id)) % 360).', 60%, 70%)';
+			}
+			$data['result'] = 'true';
+			$data['backgroundColor'] = $backgroundcolor;
+			$data['textColor'] = $textcolor;
+			
 			if($coodle->saveRessource(true))
-				echo 'true';
+			{
+				if(isset($_POST['format']) && $_POST['format'] == 'json')
+					echo json_encode($data);
+				else 
+					echo 'true';
+			}
 			else
 				echo 'Fehler beim Speichern:'.$coodle->errormsg;
 		}
