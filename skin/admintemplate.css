@@ -51,3 +51,9 @@
     top: 2px;
     font-size: 1.3em;
 }
+
+/*table footer line (e.g. for sums)*/
+.table-bordered > tfoot > tr > td, .table-bordered > tfoot > tr > th
+{
+    border-top-width: 2px;
+}
