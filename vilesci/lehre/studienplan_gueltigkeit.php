@@ -23,6 +23,7 @@ require_once('../../include/benutzerberechtigung.class.php');
 require_once('../../include/studiengang.class.php');
 require_once('../../include/studienplan.class.php');
 require_once('../../include/studiensemester.class.php');
+require_once('../../include/organisationsform.class.php');
 
 $user = get_uid();
 $rechte = new benutzerberechtigung();
@@ -32,6 +33,7 @@ if(!$rechte->isBerechtigt('lehre/studienordnung', null, 's'))
 	die('keine Berechtigung für diese Seite!');
 
 $studiengang_kz = isset($_GET['studiengang_kz'])?$_GET['studiengang_kz']:'';
+$orgform_kurzbz = isset($_GET['orgform_kurzbz'])?$_GET['orgform_kurzbz']:'';
 $db = new basis_db();
 
 echo '<!doctype html>
@@ -61,13 +63,37 @@ echo '
 ';
 $stg = new studiengang();
 $stg->getAll('typ, kurzbz');
+$types = new studiengang();
+$types->getAllTypes();
+$typ = '';
 foreach($stg->result as $row)
 {
+	if ($typ != $row->typ || $typ == '')
+	{
+		if ($typ != '')
+			echo '</optgroup>';
+			echo '<optgroup label="'.($types->studiengang_typ_arr[$row->typ] != ''?$types->studiengang_typ_arr[$row->typ]:$row->typ).'">';
+	}
 	if($row->studiengang_kz == $studiengang_kz)
 		$selected = 'selected';
 	else
 		$selected = '';
 	echo '<option value="'.$row->studiengang_kz.'" '.$selected.'>'.$db->convert_html_chars($row->kuerzel.' - '.$row->bezeichnung).'</option>';
+	$typ = $row->typ;
+}
+echo '</select>
+<select name="orgform_kurzbz">
+<option value="" '.($orgform_kurzbz==''?'selected':'').'>Alle Orgformen</option>';
+$orgform = new organisationsform();
+$orgform->getOrgformLV();
+foreach ($orgform->result as $of)
+{
+	if($orgform_kurzbz == $of->orgform_kurzbz)
+		$selected = 'selected';
+	else
+		$selected = '';
+		
+	echo '<OPTION value="'.$db->convert_html_chars($of->orgform_kurzbz).'" '.$selected.'>'.$db->convert_html_chars($of->orgform_kurzbz).' - '.$db->convert_html_chars($of->bezeichnung).'</OPTION>';
 }
 echo '</select>
 <input type="submit" value="Anzeigen">
@@ -77,7 +103,7 @@ $max_semester=0;
 if($studiengang_kz!='')
 {
 	$studienplan = new studienplan();
-	$studienplan->getStudienplaeneFromSem($studiengang_kz);
+	$studienplan->getStudienplaeneFromSem($studiengang_kz, null, null, $orgform_kurzbz);
 
 	foreach($studienplan->result as $row)
 	{

@@ -37,7 +37,7 @@ class addon extends basis_db
 	public function __construct()
 	{
 		parent::__construct();
-		$this->aktive_addons = array_filter(explode(";", ACTIVE_ADDONS));
+		$this->aktive_addons = array_filter(array_map('trim', explode(";", ACTIVE_ADDONS)));
 		
 	}
 

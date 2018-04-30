@@ -25,6 +25,7 @@
  * @create 2007-06-06
  */
 require_once(dirname(__FILE__).'/basis_db.class.php');
+require_once(dirname(__FILE__).'/sprache.class.php');
 
 class note extends basis_db
 {
@@ -32,14 +33,16 @@ class note extends basis_db
 	public $result=array();
 
 	//Tabellenspalten
-	public $note;			// smallint
-	public $bezeichnung;	// varchar(32)
-	public $anmerkung;		// varchar(256)
-	public $farbe;			// varchar(6)
-	public $positiv=true;	// boolean
-	public $notenwert;		// boolean
-	public $aktiv;			// boolean
-	public $lehre;			// boolean
+	public $note;						// smallint
+	public $bezeichnung;				// varchar(32)
+	public $anmerkung;					// varchar(256)
+	public $farbe;						// varchar(6)
+	public $positiv=true;				// boolean
+	public $notenwert;					// boolean
+	public $aktiv;						// boolean
+	public $lehre;						// boolean
+	public $offiziell;					// boolean
+	public $bezeichnung_mehrsprachig; 	// varchar (64)[]
 
 	/**
 	 * Konstruktor
@@ -65,8 +68,22 @@ class note extends basis_db
 			$this->errormsg = 'Note ist ungueltig';
 			return false;
 		}
-
-		$qry = "SELECT * FROM lehre.tbl_note WHERE note=".$this->db_add_param($note);
+		$sprache = new sprache();
+		$bezeichnung_mehrsprachig = $sprache->getSprachQuery('bezeichnung_mehrsprachig');
+		$qry = "SELECT 	note, 
+						bezeichnung, 
+						anmerkung, 
+						farbe, 
+						positiv, 
+						notenwert, 
+						aktiv, 
+						lehre, 
+						offiziell, 
+						$bezeichnung_mehrsprachig 
+				FROM 
+					lehre.tbl_note 
+				WHERE 
+					note=".$this->db_add_param($note);
 
 		if($this->db_query($qry))
 		{
@@ -80,6 +97,8 @@ class note extends basis_db
 				$this->positiv = $this->db_parse_bool($row->positiv);
 				$this->lehre = $this->db_parse_bool($row->lehre);
 				$this->aktiv = $this->db_parse_bool($row->aktiv);
+				$this->offiziell = $this->db_parse_bool($row->offiziell);
+				$this->bezeichnung_mehrsprachig = $sprache->parseSprachResult('bezeichnung_mehrsprachig',$row);
 				return true;
 			}
 			else
@@ -126,14 +145,27 @@ class note extends basis_db
 		if($new)
 		{
 			//Neuen Datensatz einfuegen
-			$qry='INSERT INTO lehre.tbl_note (note, bezeichnung, anmerkung, positiv, notenwert, aktiv, lehre) VALUES('.
-			     $this->db_add_param($this->note).', '.
-			     $this->db_add_param($this->bezeichnung).', '.
-			     $this->db_add_param($this->anmerkung).', '.
-				 $this->db_add_param($this->positiv, FHC_BOOLEAN).','.
-				 $this->db_add_param($this->notenwert).','.
-				 $this->db_add_param($this->aktiv, FHC_BOOLEAN).','.
-				 $this->db_add_param($this->lehre, FHC_BOOLEAN).');';
+			$qry='INSERT INTO lehre.tbl_note (note, bezeichnung, anmerkung, positiv, notenwert, aktiv, lehre, ';
+			foreach($this->bezeichnung_mehrsprachig as $key=>$value)
+			{
+				$idx = sprache::$index_arr[$key];
+				$qry .= " bezeichnung_mehrsprachig[$idx],";
+			}
+			$qry .= ' offiziell) VALUES('.
+				$this->db_add_param($this->note).', '.
+				$this->db_add_param($this->bezeichnung).', '.
+				$this->db_add_param($this->anmerkung).', '.
+				$this->db_add_param($this->positiv, FHC_BOOLEAN).','.
+				$this->db_add_param($this->notenwert).','.
+				$this->db_add_param($this->aktiv, FHC_BOOLEAN).','.
+				$this->db_add_param($this->lehre, FHC_BOOLEAN).',';
+
+				foreach($this->bezeichnung_mehrsprachig as $key=>$value)
+					$qry .= $this->db_add_param($value).',';
+				
+			$qry .= $this->db_add_param($this->offiziell, FHC_BOOLEAN).');';
+			
+				 
 		}
 		else
 		{
@@ -144,8 +176,18 @@ class note extends basis_db
 				'positiv='.$this->db_add_param($this->positiv, FHC_BOOLEAN).', '.
 				'notenwert='.$this->db_add_param($this->notenwert).', '.
 				'aktiv='.$this->db_add_param($this->aktiv, FHC_BOOLEAN).', '.
-				'lehre='.$this->db_add_param($this->lehre, FHC_BOOLEAN).' '.
+				'lehre='.$this->db_add_param($this->lehre, FHC_BOOLEAN).', ';
+				
+				foreach($this->bezeichnung_mehrsprachig as $key=>$value)
+				{
+					$idx = sprache::$index_arr[$key];
+					$qry .= " bezeichnung_mehrsprachig[$idx]=".$this->db_add_param($value).", ";
+				}
+				
+				$qry .= ' offiziell='.$this->db_add_param($this->offiziell, FHC_BOOLEAN).' '.
 				'WHERE note='.$this->db_add_param($this->note).';';
+			
+			
 		}
 
 		if($this->db_query($qry))
@@ -166,7 +208,20 @@ class note extends basis_db
 	 */
 	public function getAll($offiziell = null)
 	{
-		$qry = "SELECT * FROM lehre.tbl_note";
+		$sprache = new sprache();
+		$bezeichnung_mehrsprachig = $sprache->getSprachQuery('bezeichnung_mehrsprachig');
+		$qry = "SELECT 	note, 
+						bezeichnung, 
+						anmerkung, 
+						farbe, 
+						positiv, 
+						notenwert, 
+						aktiv, 
+						lehre, 
+						offiziell, 
+						$bezeichnung_mehrsprachig 
+				FROM 
+					lehre.tbl_note ";
 
 		if(is_bool($offiziell))
 			$qry .= " WHERE offiziell = ".$this->db_add_param($offiziell, FHC_BOOLEAN);
@@ -187,6 +242,8 @@ class note extends basis_db
 				$n->notenwert = $row->notenwert;
 				$n->aktiv = $this->db_parse_bool($row->aktiv);
 				$n->lehre = $this->db_parse_bool($row->lehre);
+				$n->offiziell = $this->db_parse_bool($row->lehre);
+				$n->bezeichnung_mehrsprachig = $sprache->parseSprachResult('bezeichnung_mehrsprachig', $row);
 
 				$this->result[] = $n;
 			}
@@ -206,8 +263,22 @@ class note extends basis_db
 	 */
 	public function getActive($offiziell = null)
 	{
-		$qry = "SELECT * FROM lehre.tbl_note WHERE aktiv = TRUE";
-
+		$sprache = new sprache();
+		$bezeichnung_mehrsprachig = $sprache->getSprachQuery('bezeichnung_mehrsprachig');
+		$qry = "SELECT 	note, 
+						bezeichnung, 
+						anmerkung, 
+						farbe, 
+						positiv, 
+						notenwert, 
+						aktiv, 
+						lehre, 
+						offiziell, 
+						$bezeichnung_mehrsprachig 
+				FROM 
+					lehre.tbl_note 
+				WHERE 
+					aktiv = TRUE";
 
 		if(is_bool($offiziell))
 			$qry .= " AND offiziell = ".$this->db_add_param($offiziell, FHC_BOOLEAN);
@@ -228,6 +299,8 @@ class note extends basis_db
 				$n->notenwert = $row->notenwert;
 				$n->aktiv = $this->db_parse_bool($row->aktiv);
 				$n->lehre = $this->db_parse_bool($row->lehre);
+				$n->offiziell = $this->db_parse_bool($row->lehre);
+				$n->bezeichnung_mehrsprachig = $sprache->parseSprachResult('bezeichnung_mehrsprachig', $row);
 
 				$this->result[] = $n;
 			}

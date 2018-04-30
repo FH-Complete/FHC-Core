@@ -196,10 +196,10 @@ function searchOE($searchItems)
 
 	//Suche nach Studiengaengen mit dem Suchbegriff und merge mit $searchItems
 	$stg_oe_array = array();
-	
+
 	$oe = new organisationseinheit();
-	$oe->search($searchItems); 
-	
+	$oe->search($searchItems);
+
 	$stg = new studiengang();
 	$stg->search($searchItems);
 	foreach($stg->result as $row)
@@ -490,7 +490,7 @@ function searchContent($searchItems)
 					// Jede Content_ID nur einmal ausgeben
 					if (in_array($row->content_id, $content_id_arr))
 						continue;
-					
+
 					// Wenn der Eintrag vom Typ "redirect" ist, checken ob extern verlinkt wird oder nur ein Anker gesetzt ist (erstes Zeichen #)
 					// Externe Links werden so ausgegeben, interne Anker gar nicht
 					if ($row->template_kurzbz == 'redirect')
@@ -499,14 +499,23 @@ function searchContent($searchItems)
 						$dom = new DOMDocument();
 						$dom->loadXML($row->content);
 						$content = $dom->getElementsByTagName('url')->item(0)->nodeValue;
-						
+
 						if (substr($content, 0, 1) == '#')
 							continue;
 						else
 						{
-							echo '<li><div class="suchergebnis">';
-							echo '<a href="'.$content.'" target="blank">',$db->convert_html_chars($row->titel),'</a><br>';
-							echo '</div></li>';
+							if(mb_strpos($content, 'http') === 0)
+							{
+								echo '<li><div class="suchergebnis">';
+								echo '<a href="'.$content.'" target="blank">',$db->convert_html_chars($row->titel),'</a><br>';
+								echo '</div></li>';
+							}
+							else
+							{
+								echo '<li><div class="suchergebnis">';
+								echo '<a href="../../../cms/content.php?content_id=',$db->convert_html_chars($row->content_id),'&sprache=',$db->convert_html_chars($row->sprache),'">',$db->convert_html_chars($row->titel),'</a><br>';
+								echo '</div></li>';
+							}
 						}
 					}
 					else
@@ -514,7 +523,7 @@ function searchContent($searchItems)
 						echo '<li><div class="suchergebnis">';
 						echo '<a href="../../../cms/content.php?content_id=',$db->convert_html_chars($row->content_id),'&sprache=',$db->convert_html_chars($row->sprache),'">',$db->convert_html_chars($row->titel),'</a><br>';
 						$preview = findAndMark($row->content, $searchItems);
-	
+
 						echo $preview;
 						echo '</div></li>';
 					}
@@ -543,7 +552,7 @@ function searchContent($searchItems)
 					// Jede Content_ID nur einmal ausgeben
 					if (in_array($row->content_id, $content_id_arr))
 						continue;
-					
+
 					// Wenn der Eintrag vom Typ "redirect" ist, checken ob extern verlinkt wird oder nur ein Anker gesetzt ist (erstes Zeichen #)
 					// Externe Links werden so ausgegeben, interne Anker gar nicht
 					if ($row->template_kurzbz == 'redirect')
@@ -552,7 +561,7 @@ function searchContent($searchItems)
 						$dom = new DOMDocument();
 						$dom->loadXML($row->content);
 						$content = $dom->getElementsByTagName('url')->item(0)->nodeValue;
-						
+
 						if (substr($content, 0, 1) == '#')
 							continue;
 						else
@@ -567,7 +576,7 @@ function searchContent($searchItems)
 						echo '<li><div class="suchergebnis">';
 						echo '<a href="../../../cms/content.php?content_id=',$db->convert_html_chars($row->content_id),'&sprache=',$db->convert_html_chars($row->sprache),'">',$db->convert_html_chars($row->titel),'</a><br>';
 						$preview = findAndMark($row->content, $searchItems);
-	
+
 						echo $preview;
 						echo '</div></li>';
 					}
@@ -594,7 +603,7 @@ function findAndMark($content, $items)
 	}
 	if($item == '')
 		return '...';
-	
+
 	//CDATA und HTML Tags entfernen
 	$content = mb_str_replace('<[CDATA[', '', $content);
 	$content = mb_str_replace(']]>', '', $content);
