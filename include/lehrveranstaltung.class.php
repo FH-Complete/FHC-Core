@@ -2378,7 +2378,7 @@ class lehrveranstaltung extends basis_db
 
 		if(!in_array($stg->oe_kurzbz, $oe))
 		{
-			$oe[] = $this->oe_kurzbz;
+			$oe[] = $stg->oe_kurzbz;
 		}
 
 		return $oe;
