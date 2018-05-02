@@ -115,4 +115,49 @@ class Organisationseinheit_model extends DB_Model
 
 		return $this->execQuery($query, array($oe_kurzbz));
 	}
+
+	/**
+	 * Liefert die ChildNodes einer Organisationseinheit
+	 * @param $oe_kurzbz
+	 * @return Array mit den Childs inkl dem Uebergebenen Element
+	 */
+	public function getChilds($oe_kurzbz)
+	{
+		$query = "
+		WITH RECURSIVE oes(oe_kurzbz, oe_parent_kurzbz) as 
+		(
+			SELECT oe_kurzbz, oe_parent_kurzbz FROM public.tbl_organisationseinheit 
+			WHERE oe_kurzbz=?
+			UNION ALL
+			SELECT o.oe_kurzbz, o.oe_parent_kurzbz FROM public.tbl_organisationseinheit o, oes 
+			WHERE o.oe_parent_kurzbz=oes.oe_kurzbz
+		)
+		SELECT oe_kurzbz
+		FROM oes
+		GROUP BY oe_kurzbz;";
+
+		return $this->execQuery($query, array($oe_kurzbz));
+	}
+
+	/**
+	 * Liefert die OEs die im Tree ueberhalb der uebergebene OE liegen
+	 * @param $oe_kurzbz
+	 */
+	public function getParents($oe_kurzbz)
+	{
+		$query=
+		"WITH RECURSIVE oes(oe_kurzbz, oe_parent_kurzbz) as 
+		(
+			SELECT oe_kurzbz, oe_parent_kurzbz FROM public.tbl_organisationseinheit 
+			WHERE oe_kurzbz=? and aktiv = true 
+			UNION ALL
+			SELECT o.oe_kurzbz, o.oe_parent_kurzbz FROM public.tbl_organisationseinheit o, oes 
+			WHERE o.oe_kurzbz=oes.oe_parent_kurzbz and aktiv = true
+		)
+		SELECT oe_kurzbz
+		FROM oes";
+
+		return $this->execQuery($query, array($oe_kurzbz));
+	}
+
 }

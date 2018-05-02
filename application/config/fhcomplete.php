@@ -237,10 +237,10 @@ $config['fhc_acl'] = array
 	'wawi.tbl_zahlungstyp' => 'basis/zahlungstyp',
 
 	// Temporary
-	'extension.tbl_budgetantrag' => 'basis/kostenstelle',
-	'extension.tbl_budgetposition' => 'basis/kostenstelle',
-	'extension.tbl_budgetstatus' => 'basis/kostenstelle',
-	'extension.tbl_budgetantrag_status' => 'basis/kostenstelle',
+	'extension.tbl_budget_antrag' => 'basis/kostenstelle',
+	'extension.tbl_budget_position' => 'basis/kostenstelle',
+	'extension.tbl_budget_status' => 'basis/kostenstelle',
+	'extension.tbl_budget_antrag_status' => 'basis/kostenstelle',
 	'extension.tbl_dsms_anonymisierung' => 'dsms/export',
 
 	DMS_PATH => 'fs/dms',
