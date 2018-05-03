@@ -5,11 +5,6 @@ $config['navigation_header'] = array(
 		'FH-Complete' => site_url(''),
 		'Vilesci' => base_url('/vilesci'),
 		'CIS' => CIS_ROOT
-	),
-	'system/infocenter/InfoCenter/infocenterFreigegeben' => array(
-		'FH-Complete' => base_url('index.ci.php/'),
-		'Vilesci' => base_url('/vilesci'),
-		'CIS' => CIS_ROOT
 	)
 );
 
@@ -63,13 +58,13 @@ $config['navigation_menu']['Vilesci/index'] = array(
 	)
 );
 
-//HIDDEN as long as filter is revised
-//$config['navigation_menu']['system/infocenter/InfoCenter/index'] = array(
-//	'Freigegeben' => array(
-//		'link' => base_url('index.ci.php/system/infocenter/InfoCenter/infocenterFreigegeben'),
-//		'description' => 'Freigegeben',
-//		'icon' => 'thumbs-up'
-//	));
+
+$config['navigation_menu']['system/infocenter/InfoCenter/index'] = array(
+	'Freigegeben' => array(
+		'link' => base_url('index.ci.php/system/infocenter/InfoCenter/infocenterFreigegeben'),
+		'description' => 'Freigegeben',
+		'icon' => 'thumbs-up'
+	));
 
 $config['navigation_menu']['system/infocenter/InfoCenter/showDetails'] = array(
 	'Freigegeben' => array(
@@ -84,5 +79,3 @@ $config['navigation_menu']['system/infocenter/InfoCenter/infocenterFreigegeben']
 		'description' => 'Zurück',
 		'icon' => 'angle-left'
 	));
-
-
