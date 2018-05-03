@@ -80,6 +80,8 @@ class InfoCenter extends VileSci_Controller
 		if(!$this->permissionlib->isBerechtigt('basis/person'))
 			show_error('You have no Permission! You need Infocenter Role');
 
+		$this->_setControllerId(); // sets the controller id
+
 		$this->setNavigationMenuArray(); // sets property navigationMenuArray
     }
 
@@ -91,14 +93,14 @@ class InfoCenter extends VileSci_Controller
 	 */
 	public function index()
 	{
-		$this->load->view('system/infocenter/infocenter.php');
+		$this->load->view('system/infocenter/infocenter.php', array('fhc_controller_id' => $this->fhc_controller_id));
 	}
-	
+
 	public function infocenterFreigegeben()
 	{
-		$this->load->view('system/infocenter/infocenterFreigegeben.php');
+		$this->load->view('system/infocenter/infocenterFreigegeben.php', array('fhc_controller_id' => $this->fhc_controller_id));
 	}
-	
+
 	/**
 	 * Initialization function, gets person and prestudent data and loads the view with the data
 	 * @param $person_id
@@ -132,7 +134,7 @@ class InfoCenter extends VileSci_Controller
 			)
 		);
 	}
-	
+
 	/**
 	 * unlocks page from edit by a person, redirects to overview filter page
 	 * @param $person_id
@@ -362,7 +364,7 @@ class InfoCenter extends VileSci_Controller
 
 		$this->_redirectToStart($prestudent_id, 'ZgvPruef');
 	}
-	
+
 	/**
 	 * Saves a new Notiz for a person
 	 * @param $person_id
@@ -386,7 +388,7 @@ class InfoCenter extends VileSci_Controller
 			->set_content_type('application/json')
 			->set_output(json_encode($result->retval));
 	}
-	
+
 	/**
 	 * Updates a new Notiz for a person
 	 * @param int $notiz_id
@@ -394,7 +396,7 @@ class InfoCenter extends VileSci_Controller
 	 * @return bool true if success
 	 */
 	public function updateNotiz($notiz_id, $person_id)
-	{	
+	{
 		$titel = $this->input->post('notiztitel');
 		$text = $this->input->post('notiz');
 
@@ -408,18 +410,18 @@ class InfoCenter extends VileSci_Controller
 				"updatevon" => $this->uid
 			)
 		);
-		
-		
+
+
 		$json = FALSE;
-		
+
 		if (isSuccess($result))
 		{
 			$json = TRUE;
-			
+
 			//set log "Notiz updated"
 			$this->_log($person_id, 'updatenotiz', array($titel));
 		}
-		
+
 		$this->output
 			->set_content_type('application/json')
 			->set_output(json_encode($json));
@@ -547,7 +549,7 @@ class InfoCenter extends VileSci_Controller
 				'children' => array()
 			)
 		);
-				
+
 		$this->_fillFilters($listFiltersSent, $filtersarray['abgeschickt']);
 		$this->_fillFilters($listFiltersNotSent, $filtersarray['nichtabgeschickt']);
 
@@ -593,9 +595,10 @@ class InfoCenter extends VileSci_Controller
 	{
 		foreach ($filters as $filterId => $description)
 		{
-			$toPrint = "%s=%s";
+			$toPrint = "%s?%s=%s&%s=%s";
+
 			$tofill['children'][] = array(
-				'link' => sprintf($toPrint, site_url('system/infocenter/InfoCenter?filter_id'), $filterId),
+				'link' => sprintf($toPrint, site_url('system/infocenter/InfoCenter'), 'filter_id', $filterId, 'fhc_controller_id', $this->fhc_controller_id),
 				'description' => $description
 			);
 		}
@@ -605,10 +608,10 @@ class InfoCenter extends VileSci_Controller
 	{
 		foreach ($filters as $filterId => $description)
 		{
-			$toPrint = "%s=%s";
+			$toPrint = "%s?%s=%s&%s=%s";
 
 			$tofill['children'][] = array(
-				'link' => sprintf($toPrint, site_url('system/infocenter/InfoCenter?filter_id'), $filterId),
+				'link' => sprintf($toPrint, site_url('system/infocenter/InfoCenter'), 'filter_id', $filterId, 'fhc_controller_id', $this->fhc_controller_id),
 				'description' => $description,
 				'subscriptDescription' => 'Remove',
 				'subscriptLinkClass' => 'remove-filter',
@@ -955,5 +958,22 @@ class InfoCenter extends VileSci_Controller
 		{
 			$this->loglib->logError('Studiengang has no mail for sending Freigabe mail');
 		}
+	}
+
+	/**
+	 * Sets the unique id for the called controller
+	 */
+	private function _setControllerId()
+	{
+		$fhc_controller_id = $this->input->get('fhc_controller_id');
+
+		if (!isset($fhc_controller_id) || empty($fhc_controller_id))
+		{
+			$fhc_controller_id = uniqid();
+			header('Location: '.$_SERVER['REQUEST_URI'].'?fhc_controller_id='.$fhc_controller_id);
+			exit;
+		}
+
+		$this->fhc_controller_id = $fhc_controller_id;
 	}
 }
