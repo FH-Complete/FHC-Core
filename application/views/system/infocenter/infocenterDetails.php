@@ -13,14 +13,14 @@
 			'addons' => true,
 			'customCSSs' =>
 				array(
-					'skin/admintemplate.css',
-					'skin/tablesort_bootstrap.css'
+					'public/css/sbadmin2/admintemplate.css',
+					'public/css/sbadmin2/tablesort_bootstrap.css'
 				),
 			'customJSs' =>
 				array(
-					'include/js/bootstrapper.js',
-					'include/js/tablesort/tablesort.js',
-					'include/js/infocenter/infocenterDetails.js')
+					'public/js/bootstrapper.js',
+					'public/js/tablesort/tablesort.js',
+					'public/js/infocenter/infocenterDetails.js')
 				)
 	);
 ?>
