@@ -2218,6 +2218,20 @@ if($result = $db->db_query("SELECT view_definition FROM information_schema.views
 	}
 }
 
+// OE_KURZBZ in system.tbl_filters auf 32 Zeichen verlängert
+if($result = $db->db_query("SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA='system' AND TABLE_NAME='tbl_filters' AND COLUMN_NAME = 'oe_kurzbz' AND character_maximum_length=16"))
+{
+	if($db->db_num_rows($result)>0)
+	{
+		$qry = " ALTER TABLE system.tbl_filters ALTER COLUMN oe_kurzbz TYPE varchar(32)";
+
+		if(!$db->db_query($qry))
+			echo '<strong>system.tbl_filters '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>Spalte oe_kurzbz in system.tbl_filters von varchar(16) auf varchar(32) geändert<br>';
+	}
+}
+
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
 
