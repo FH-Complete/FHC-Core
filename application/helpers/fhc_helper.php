@@ -62,7 +62,6 @@ function generateToken($length = 64)
 }
 
 /**
- * var_dump_to_error_log()
  * Gets the output of the var_dump function and print it out
  * via the error log. It also removes the end line characters
  */
@@ -72,7 +71,7 @@ function var_dump_to_error_log($parameter)
 	var_dump($parameter); // KEEP IT!!!
 	$ob_get_contents = ob_get_contents();
 	ob_end_clean();
-	error_log(str_replace("\n", '', $ob_get_contents));
+	error_log(str_replace("\n", '', $ob_get_contents)); // KEEP IT!!!
 }
 
 /**
