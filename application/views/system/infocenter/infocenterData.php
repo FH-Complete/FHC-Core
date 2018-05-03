@@ -186,6 +186,7 @@
 				)
 			ORDER BY "LastAction" ASC
 		',
+		'fhc_controller_id' => $fhc_controller_id,
 		'checkboxes' => 'PersonId',
 		'additionalColumns' => array('Details'),
 		'columnsAliases' => array('PersonID','Vorname','Nachname','GebDatum','Nation', 'Letzte Aktion','Letzter Bearbeiter',

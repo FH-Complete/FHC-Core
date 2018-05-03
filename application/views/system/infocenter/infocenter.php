@@ -29,7 +29,7 @@
 				</div>
 				<div>
 					<?php
-						$this->load->view('system/infocenter/infocenterData.php');
+						$this->load->view('system/infocenter/infocenterData.php', array('fhc_controller_id' => $fhc_controller_id));
 					?>
 				</div>
 			</div>

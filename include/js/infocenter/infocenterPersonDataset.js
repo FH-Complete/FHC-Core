@@ -48,7 +48,11 @@ function appendTableActionsHtml()
 
 	$.ajax({
 		url: window.location.pathname.replace('infocenter/InfoCenter', 'Filters/rowNumber'),
-		method: "GET"
+		method: "GET",
+		data: {
+			fhc_controller_id: getUrlParameter("fhc_controller_id")
+		},
+		dataType: "json"
 	})
 	.done(function(data, textStatus, jqXHR) {
 
@@ -72,7 +76,9 @@ function appendTableActionsHtml()
 			setTableActions();
 		}
 
-	}).fail(function(jqXHR, textStatus, errorThrown) {});
+	}).fail(function(jqXHR, textStatus, errorThrown) {
+		alert(textStatus);
+	});
 
 }
 
@@ -113,6 +119,27 @@ function setTableActions()
 }
 
 /**
+ *
+ */
+function getUrlParameter(sParam)
+{
+    var sPageURL = decodeURIComponent(window.location.search.substring(1)),
+        sURLVariables = sPageURL.split('&'),
+        sParameterName,
+        i;
+
+    for (i = 0; i < sURLVariables.length; i++)
+	{
+        sParameterName = sURLVariables[i].split('=');
+
+        if (sParameterName[0] === sParam)
+		{
+            return sParameterName[1];
+        }
+    }
+}
+
+/**
  * Refreshes the side menu
  */
 function refreshSideMenu()
@@ -120,7 +147,9 @@ function refreshSideMenu()
 	$.ajax({
 		url: window.location.pathname+"/setNavigationMenuArray",
 		method: "GET",
-		data: {}
+		data: {
+			fhc_controller_id: getUrlParameter("fhc_controller_id")
+		}
 	})
 	.done(function(data, textStatus, jqXHR) {
 

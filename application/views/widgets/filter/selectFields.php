@@ -77,7 +77,8 @@
 					url: "<?php echo site_url('system/Filters/sortSelectedFields'); ?>",
 					method: "POST",
 					data: {
-						selectedFieldsLst: arrayDndId
+						selectedFieldsLst: arrayDndId,
+						fhc_controller_id: getUrlParameter("fhc_controller_id")
 					}
 				})
 				.done(function(data, textStatus, jqXHR) {
@@ -109,7 +110,8 @@
 				url: "<?php echo site_url('system/Filters/addSelectedFields'); ?>",
 				method: "POST",
 				data: {
-					fieldName: $(this).val()
+					fieldName: $(this).val(),
+					fhc_controller_id: getUrlParameter("fhc_controller_id")
 				}
 			})
 			.done(function(data, textStatus, jqXHR) {
@@ -131,7 +133,8 @@
 				url: "<?php echo site_url('system/Filters/removeSelectedFields'); ?>",
 				method: "POST",
 				data: {
-					fieldName: $(this).attr('fieldToRemove')
+					fieldName: $(this).attr('fieldToRemove'),
+					fhc_controller_id: getUrlParameter("fhc_controller_id")
 				}
 			})
 			.done(function(data, textStatus, jqXHR) {
@@ -153,7 +156,9 @@
 		$.ajax({
 			url: "<?php echo site_url('system/Filters/selectFields'); ?>",
 			method: "GET",
-			data: {},
+			data: {
+				fhc_controller_id: getUrlParameter("fhc_controller_id")
+			},
 		    dataType: "json"
 		})
 		.done(function(data, textStatus, jqXHR) {

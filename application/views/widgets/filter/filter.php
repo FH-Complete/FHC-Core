@@ -119,7 +119,8 @@
 				url: "<?php echo site_url('system/Filters/deleteCustomFilter'); ?>",
 				method: "POST",
 				data: {
-					filter_id: $(this).attr('value')
+					filter_id: $(this).attr('value'),
+					fhc_controller_id: getUrlParameter("fhc_controller_id")
 				}
 			})
 			.done(function(data, textStatus, jqXHR) {

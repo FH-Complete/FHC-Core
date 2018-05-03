@@ -11,7 +11,7 @@ class mimetype_widget extends Widget
 				$data['mimetype'] = '';
 		$this->load->model('system/Vorlage_model');
 		$res = $this->Vorlage_model->getMimeTypes();
-		//var_dump($res);
+
 		foreach ($res->retval as $obj)
 		{
 			$item = array('name' => $obj->mimetype, 'value' => $obj->mimetype);

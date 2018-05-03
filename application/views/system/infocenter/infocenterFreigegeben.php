@@ -146,7 +146,7 @@
 											JOIN public.tbl_studiengang USING(studiengang_kz)
 										WHERE
 											person_id=p.person_id
-											AND tbl_studiengang.typ in(\'b\')  
+											AND tbl_studiengang.typ in(\'b\')
 											AND \'Interessent\' = (SELECT status_kurzbz FROM public.tbl_prestudentstatus
 																	WHERE prestudent_id=tbl_prestudent.prestudent_id
 																	ORDER BY datum DESC, insertamum DESC, ext_id DESC
@@ -170,8 +170,7 @@
 									)
 								ORDER BY "LastAction" ASC
 							',
-							'hideHeader' => false,
-							'hideSave' => false,
+							'fhc_controller_id' => $fhc_controller_id,
 							'checkboxes' => 'PersonId',
 							'additionalColumns' => array('Details'),
 							'columnsAliases' => array('PersonID','Vorname','Nachname','GebDatum','Nation','Letzte Aktion','Letzter Bearbeiter',
@@ -238,9 +237,9 @@
 							}
 						);
 
-					
+
 						$filterId = isset($_GET[InfoCenter::FILTER_ID]) ? $_GET[InfoCenter::FILTER_ID] : null;
-						
+
 						if (isset($filterId) && is_numeric($filterId))
 						{
 							$filterWidgetArray[InfoCenter::FILTER_ID] = $filterId;
@@ -251,7 +250,7 @@
 							$filterWidgetArray['datasetName'] = 'PersonActions';
 							$filterWidgetArray['filterKurzbz'] = 'InfoCenterNotSentApplicationAll';
 						}
-						
+
 						echo $this->widgetlib->widget('FilterWidget', $filterWidgetArray);
 					?>
 
