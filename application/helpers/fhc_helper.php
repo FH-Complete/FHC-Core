@@ -69,7 +69,7 @@ function generateToken($length = 64)
 function var_dump_to_error_log($parameter)
 {
 	ob_start();
-	var_dump($parameter);
+	var_dump($parameter); // KEEP IT!!!
 	$ob_get_contents = ob_get_contents();
 	ob_end_clean();
 	error_log(str_replace("\n", '', $ob_get_contents));
