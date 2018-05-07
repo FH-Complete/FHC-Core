@@ -795,6 +795,7 @@ if(!@$db->db_query("SELECT 0 FROM system.tbl_extensions WHERE 0 = 1"))
 	else
 		echo '<br>Created table system.tbl_extensions';
 
+
 	// GRANT SELECT ON TABLE system.tbl_extensions TO web;
 	$qry = 'GRANT SELECT ON TABLE system.tbl_extensions TO web;';
 	if (!$db->db_query($qry))
@@ -843,6 +844,20 @@ if(!@$db->db_query("SELECT 0 FROM system.tbl_extensions WHERE 0 = 1"))
 		echo '<strong>system.tbl_extensions_id_seq '.$db->db_last_error().'</strong><br>';
 	else
 		echo '<br>Altered sequence system.tbl_extensions_id_seq';
+}
+
+// Adds primary key to system.tbl_extensions using column extension_id
+if ($result = @$db->db_query("SELECT conname FROM pg_constraint WHERE conname = 'pk_extensions_extension_id'"))
+{
+	if ($db->db_num_rows($result) == 0)
+	{
+		$qry = "ALTER TABLE system.tbl_extensions ADD CONSTRAINT pk_extensions_extension_id PRIMARY KEY (extension_id);";
+
+		if (!$db->db_query($qry))
+			echo '<strong>system.tbl_extensions '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>system.tbl_extensions: added primary key on column extension_id';
+	}
 }
 
 // UNIQUE INDEX uidx_extensions_name_version
