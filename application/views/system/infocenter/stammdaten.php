@@ -91,7 +91,7 @@
 			</tbody>
 		</table>
 		<div class="row">
-			<div class="col-lg-6">
+			<div class="col-xs-6">
 				<form id="sendmsgform" method="post" action="<?php echo $messagelink ?>"
 					  target="_blank">
 					<input type="hidden" name="person_id"
@@ -101,7 +101,7 @@
 				</form>
 			</div>
 			<?php if (isset($stammdaten->zugangscode)): ?>
-				<div class="col-lg-6 text-right">
+				<div class="col-xs-6 text-right">
 					<a href="<?php echo CIS_ROOT.'addons/bewerbung/cis/registration.php?code='.html_escape($stammdaten->zugangscode) ?>"
 					   target='_blank'><i class="glyphicon glyphicon-new-window"></i>&nbsp;Zugang Bewerbung</a>
 				</div>

@@ -79,6 +79,14 @@ $(document).ready(
 			}
 		);
 
+		//show popup with zgvinfo
+		$(".zgvinfo").click(function ()
+			{
+				var prestudentid = this.id.substr(this.id.indexOf("_") + 1);
+				openZgvInfoForPrestudent(prestudentid);
+			}
+		);
+
 		//prevent opening modal when Statusgrund not chosen
 		$(".absageModal").on('show.bs.modal', function (e)
 			{
@@ -119,7 +127,6 @@ $(document).ready(
 			}
 		);
 
-
 		//update notiz - autofill notizform
 		$(document).on("click", "#notiztable tbody tr", function ()
 			{
@@ -144,6 +151,15 @@ $(document).ready(
 		);
 
 	});
+
+function openZgvInfoForPrestudent(prestudent_id)
+{
+	var screenwidth = screen.width;
+	var popupwidth = 760;
+	var marginleft = screenwidth - popupwidth;
+	console.log(marginleft);
+	window.open("../getZgvInfoForPrestudent/" + prestudent_id, "_blank","resizable=yes,scrollbars=yes,width="+popupwidth+",height="+screen.height+",left="+marginleft);
+}
 
 // -----------------------------------------------------------------------------------------------------------------
 // ajax calls

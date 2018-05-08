@@ -229,10 +229,34 @@ class Prestudent_model extends DB_Model
 		{
 			$this->load->model('system/sprache_model', 'SpracheModel');
 			$language = $this->SpracheModel->load($lastStatus->retval[0]->sprache);
+
 			if ($language->error)
 				return error($language->retval);
+
 			if (count($language->retval) > 0)
 				$lastStatus->retval[0]->sprachedetails = $language->retval[0];
+
+			//get Bewerbungsfrist
+			$this->load->model('crm/bewerbungstermine_model', 'BewerbungstermineModel');
+			$this->BewerbungstermineModel->addSelect('ende, nachfrist_ende');
+			$this->BewerbungstermineModel->addOrder('ende', 'DESC');
+			$this->BewerbungstermineModel->addLimit(1);
+			$bewerbungstermin = $this->BewerbungstermineModel->loadWhere(
+				array(
+					'studienplan_id' => $lastStatus->retval[0]->studienplan_id,
+					'studiensemester_kurzbz' => $lastStatus->retval[0]->studiensemester_kurzbz,
+					'studiengang_kz' => $prestudent->retval[0]->studiengang_kz
+				)
+			);
+			if ($bewerbungstermin->error)
+				return error($bewerbungstermin->retval);
+
+			if (count($bewerbungstermin->retval) > 0)
+			{
+				$lastStatus->retval[0]->bewerbungstermin = $bewerbungstermin->retval[0]->ende;
+				$lastStatus->retval[0]->bewerbungsnachfrist = $bewerbungstermin->retval[0]->nachfrist_ende;
+			}
+
 			$prestudent->retval[0]->prestudentstatus = $lastStatus->retval[0];
 		}
 

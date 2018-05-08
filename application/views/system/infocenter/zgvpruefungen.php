@@ -9,18 +9,29 @@
 		<div class="panel panel-default">
 			<div class="panel-heading">
 				<div class="row">
-					<div class="col-lg-8">
+					<div class="col-xs-7">
 						<h4 class="panel-title">
 							<a data-toggle="collapse"
 							   href="#collapse<?php echo $zgvpruefung->prestudent_id ?>"><?php echo $zgvpruefung->studiengang.' - '.$zgvpruefung->studiengangbezeichnung.' | '.(isset($zgvpruefung->prestudentstatus->status_kurzbz) ? $zgvpruefung->prestudentstatus->status_kurzbz : '');
 								?></a>
 						</h4>
 					</div>
-					<?php if (isset($zgvpruefung->prestudentstatus->status_kurzbz) && $zgvpruefung->prestudentstatus->status_kurzbz === 'Interessent' && !$infoonly): ?>
-						<div class="col-lg-4 text-right">
+					<?php if (isset($zgvpruefung->prestudentstatus->status_kurzbz) && $zgvpruefung->prestudentstatus->status_kurzbz === 'Interessent'/* && !$infoonly*/): ?>
+						<?php if ($infoonly): ?>
+							<?php if (isset($zgvpruefung->prestudentstatus->bestaetigtam)): ?>
+							<div class="col-xs-5 text-right">
+								<i class="fa fa-check" style="color: green"></i>
+								An Studiengang freigegeben
+							</div>
+							<?php endif; ?>
+						<?php else: ?>
+						<div class="col-xs-5 text-right">
 							<?php echo 'Bewerbung abgeschickt: '.(isset($zgvpruefung->prestudentstatus->bewerbung_abgeschicktamum) ? '<i class="fa fa-check" style="color:green"></i>' : '<i class="fa fa-times" style="color:red"></i>'); ?>
+							<?php echo (isset($zgvpruefung->prestudentstatus->bewerbungsnachfrist) ? ' | Nachfrist: '. date_format(date_create($zgvpruefung->prestudentstatus->bewerbungsnachfrist), 'd.m.Y') : ''); ?>
+							<?php echo (isset($zgvpruefung->prestudentstatus->bewerbungstermin) ? ' | Bewerbungsfrist: '. date_format(date_create($zgvpruefung->prestudentstatus->bewerbungstermin), 'd.m.Y') : ''); ?>
 						</div>
-					<?php endif ?>
+						<?php endif; ?>
+					<?php endif; ?>
 				</div>
 			</div>
 			<div id="collapse<?php echo $zgvpruefung->prestudent_id ?>"
@@ -70,10 +81,24 @@
 						<div class="row">
 							<div class="col-lg-<?php echo $columns[0] ?>">
 								<div class="form-group">
-									<label>ZGV: </label>
-									<?php if ($infoonly)
-										echo $zgvpruefung->zgv_bez;
-									else
+									<div class="row">
+										<?php if ($infoonly): ?>
+										<div class="col-xs-8">
+										<label>ZGV:</label>
+											<?php echo $zgvpruefung->zgv_bez; ?>
+										</div>
+										<?php else: ?>
+										<div class="col-xs-3">
+											<label>ZGV:</label>
+										</div>
+										<?php endif;
+											$zgvinfocolumns = $infoonly ? 4 : 9;
+										?>
+										<div class="col-xs-<?php echo $zgvinfocolumns; ?> text-right zgvinfo" id="zgvinfo_<?php echo $zgvpruefung->prestudent_id ?>">
+											<a href="javascript:void(0)"><i class="fa fa-info-circle"></i> ZGV <?php echo $zgvpruefung->studiengang; ?></a>
+										</div>
+									</div>
+									<?php if (!$infoonly)
 										echo $this->widgetlib->widget(
 											'Zgv_widget',
 											array(DropdownWidget::SELECTED_ELEMENT => $zgvpruefung->zgv_code),
@@ -188,12 +213,12 @@
 						<?php endif; ?>
 						<?php if (!$infoonly): ?>
 							<div class="row">
-								<div class="col-lg-6 text-left">
+								<div class="col-xs-6 text-left">
 									<button type="button" class="btn btn-default zgvUebernehmen" id="zgvUebernehmen_<?php echo $zgvpruefung->prestudent_id ?>">
 										Letzte ZGV &uuml;bernehmen
 									</button>
 								</div>
-								<div class="col-lg-6 text-right">
+								<div class="col-xs-6 text-right">
 									<button type="submit" class="btn btn-default saveZgv" id="zgvSpeichern_<?php echo $zgvpruefung->prestudent_id ?>">
 										Speichern
 									</button>
@@ -331,8 +356,7 @@
 											Interessentenstatus bestätigt und<br/>deren
 											Zgvdaten
 											können im
-											Infocenter nicht mehr bearbeitet oder
-											freigegeben
+											Infocenter nicht mehr bearbeitet
 											werden.
 											<br/>Alle nicht gespeicherten Zgvdaten gehen
 											verloren.

@@ -111,10 +111,11 @@ class InfoCenter extends VileSci_Controller
 			show_error('person id is not numeric!');
 
 		$personexists = $this->PersonModel->load($person_id);
+
 		if(isError($personexists))
 			show_error($personexists->retval);
 
-		if (empty($personexists->retval[0]))
+		if (empty($personexists->retval))
 			show_error('person does not exist!');
 
 		//mark person as locked for editing
@@ -212,6 +213,29 @@ class InfoCenter extends VileSci_Controller
 	}
 
 	/**
+	 * Gets Zugangsvoraussetzungen for a prestudents as a description text
+	 * @param $prestudent_id
+	 */
+	public function getZgvInfoForPrestudent($prestudent_id)
+	{
+		$studienordnung = $this->PrestudentstatusModel->getStudienordnungWithZgvText($prestudent_id);
+
+		$prestudentdata = $this->_getPersonAndStudiengangFromPrestudent($prestudent_id);
+		$studiengangbezeichnung = $prestudentdata['studiengang_bezeichnung'];
+
+		$data = array('studiengang_bezeichnung' => $studiengangbezeichnung, 'data' => null);
+
+		if (hasData($studienordnung))
+		{
+			$data['data'] = $studienordnung->retval[0]->data;
+		}
+
+		$this->load->view('system/infocenter/studiengangZgvInfo.php',
+			$data
+		);
+	}
+
+	/**
 	 * Saves a zgv for a prestudent. includes Ort, Datum, Nation for bachelor and master.
 	 * @param $prestudent_id
 	 */
@@ -279,7 +303,7 @@ class InfoCenter extends VileSci_Controller
 		}
 
 		//check if still Interessent and not freigegeben yet
-		if ($lastStatus->retval[0]->status_kurzbz === 'Interessent' && !isset($lastStatus->retval[0]->bestaetigtam))
+		if (count($lastStatus->retval) > 0 && $lastStatus->retval[0]->status_kurzbz === 'Interessent' && !isset($lastStatus->retval[0]->bestaetigtam))
 		{
 			$result = $this->PrestudentstatusModel->insert(
 				array(
@@ -327,6 +351,11 @@ class InfoCenter extends VileSci_Controller
 	{
 		$lastStatus = $this->PrestudentstatusModel->getLastStatus($prestudent_id);
 
+		if (isError($lastStatus))
+		{
+			show_error($lastStatus->retval);
+		}
+
 		if (count($lastStatus->retval) > 0)
 		{
 			$lastStatus = $lastStatus->retval[0];
@@ -354,9 +383,33 @@ class InfoCenter extends VileSci_Controller
 					show_error($result->retval);
 				}
 
-				$this->_sendFreigabeMail($prestudent_id);
+				$this->load->model('crm/dokumentprestudent_model', 'DokumentprestudentModel');
 
 				$logdata = $this->_getPersonAndStudiengangFromPrestudent($prestudent_id);
+
+				//set documents which have been formal geprüft to accepted
+				$result = $this->AkteModel->loadWhere(array('person_id' => $logdata['person_id'], 'formal_geprueft_amum !=' => NULL));
+
+				if (isError($result))
+				{
+					show_error($result->retval);
+				}
+
+				$dokument_kurzbzs = array();
+
+				foreach ($result->retval as $akte)
+				{
+					$dokument_kurzbzs[] = $akte->dokument_kurzbz;
+				}
+
+				$result = $this->DokumentprestudentModel->setAcceptedDocuments($prestudent_id, $dokument_kurzbzs);
+
+				if (isError($result))
+				{
+					show_error($result->retval);
+				}
+
+				$this->_sendFreigabeMail($prestudent_id);
 
 				$this->_log($logdata['person_id'], 'freigegeben', array($prestudent_id, $logdata['studiengang_kurzbz']));
 			}
@@ -821,8 +874,9 @@ class InfoCenter extends VileSci_Controller
 
 		$person_id = $prestudent->retval[0]->person_id;
 		$studiengang_kurzbz = $prestudent->retval[0]->studiengang;
+		$studiengang_bezeichnung = $prestudent->retval[0]->studiengangbezeichnung;
 
-		return array('person_id' => $person_id, 'studiengang_kurzbz' => $studiengang_kurzbz);
+		return array('person_id' => $person_id, 'studiengang_kurzbz' => $studiengang_kurzbz, 'studiengang_bezeichnung' => $studiengang_bezeichnung);
 	}
 
 	/**
