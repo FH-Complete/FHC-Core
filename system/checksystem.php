@@ -62,6 +62,18 @@ echo '<div>';
 	require_once($dbupdStr);
 echo '</div>';
 
+
+// ******** phrasenupdate ************/
+echo '<H2>Phrasen-Updates!</H2>';
+
+echo '<div>';
+	echo 'phrasesupdate.php wird aufgerufen...';
+echo '</div>';
+echo '<div>';
+	require_once('phrasesupdate.php');
+echo '</div>';
+
+
 // ******** Berechtigungen Prüfen ************/
 echo '<h2>Berechtigungen pruefen</h2>';
 $neue=false;
