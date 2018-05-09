@@ -40,14 +40,14 @@
 				</div>
 				<div class="col-lg-4">
 					<div class="headerright text-right">
-						wird bearbeitet von:
+						<?= $this->p->t('global', 'wirdBearbeitetVon') . ' :' ?>
 						<?php
 						if (isset($lockedby)):
 							echo $lockedby;
 							?>
 							&nbsp;&nbsp;
 							<a href="../unlockPerson/<?php echo $stammdaten->person_id; ?>"><i
-										class="fa fa-sign-out"></i>&nbsp;Freigeben</a>
+										class="fa fa-sign-out"></i>&nbsp;<?= ucfirst($this->p->t('ui', 'freigeben')) ?></a>
 						<?php endif; ?>
 					</div>
 				</div>
@@ -57,7 +57,7 @@
 				<div class="row">
 					<div class="col-lg-12">
 						<div class="panel panel-primary">
-							<div class="panel-heading text-center"><h4>Stammdaten</h4></div>
+							<div class="panel-heading text-center"><h4><?= ucfirst($this->p->t('global','stammdaten')) ?></h4></div>
 							<div class="panel-body">
 								<?php $this->load->view('system/infocenter/stammdaten.php'); ?>
 								<?php $this->load->view('system/infocenter/anmerkungenZurBewerbung.php'); ?>
@@ -71,7 +71,7 @@
 					<div class="col-lg-12">
 						<div class="panel panel-primary">
 							<a name="DokPruef"></a><!-- anchor for jumping to the section -->
-							<div class="panel-heading text-center"><h4>Dokumentenpr&uuml;fung</h4></div>
+							<div class="panel-heading text-center"><h4><?= ucfirst($this->p->t('infocenter','dokumentenpruefung')) ?></h4></div>
 							<div class="panel-body">
 								<?php $this->load->view('system/infocenter/dokpruefung.php'); ?>
 							</div> <!-- ./panel-body -->
@@ -85,7 +85,7 @@
 						<div class="panel panel-primary">
 							<div class="panel-heading text-center">
 								<a name="ZgvPruef"></a>
-								<h4>ZGV-Pr&uuml;fung</h4>
+								<h4><?= $this->p->t('infocenter', 'zgv') . ' - ' . ucfirst($this->p->t('lehre','pruefung'))?></h4>
 							</div>
 							<div class="panel-body">
 								<?php $this->load->view('system/infocenter/zgvpruefungen.php'); ?><!-- /.panel-group -->
@@ -100,7 +100,7 @@
 						<div class="panel panel-primary">
 							<div class="panel-heading text-center">
 								<a name="Nachrichten"></a>
-								<h4 class="text-center">Nachrichten</h4>
+								<h4 class="text-center"><?= ucfirst($this->p->t('global','nachrichten')) ?></h4>
 							</div>
 							<div class="panel-body">
 								<div class="row">
@@ -119,7 +119,7 @@
 						<div class="panel panel-primary">
 							<div class="panel-heading text-center">
 								<a name="NotizAkt"></a>
-								<h4 class="text-center">Notizen &amp; Aktivit&auml;ten</h4>
+								<h4 class="text-center"><?= ucfirst($this->p->t('global','notizen')) . ' & ' . ucfirst($this->p->t('global','aktivitaeten')) ?></h4>
 							</div>
 							<div class="panel-body">
 								<div class="row">

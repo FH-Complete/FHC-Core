@@ -5,7 +5,7 @@
 			<table class="table-bordered" align="center" width="100%">
 				<thead>
 				<tr>
-					<th colspan="2" class="text-center">Anmerkungen zur Bewerbung</th>
+					<th colspan="2" class="text-center"><?= ucfirst($this->p->t('infocenter','anmerkungenZurBewerbung')) ?></th>
 				</tr>
 				</thead>
 				<tbody>

@@ -74,6 +74,14 @@ class InfoCenter extends VileSci_Controller
 		$this->load->library('PersonLogLib');
 		$this->load->library('WidgetLib');
 
+		$this->loadPhrases(array(
+								'global', 
+								'person',
+								'lehre',
+								'ui',
+								'infocenter',
+								'filter'));
+		
 		$this->_setAuthUID(); // sets property uid
 
 		$this->load->library('PermissionLib');
@@ -591,13 +599,13 @@ class InfoCenter extends VileSci_Controller
 		$filtersarray = array(
 			'abgeschickt' => array(
 				'link' => '#',
-				'description' => 'Abgeschickt',
+				'description' => ucfirst($this->p->t('global', 'abgeschickt')),
 				'expand' => true,
 				'children' => array()
 			),
 			'nichtabgeschickt' => array(
 				'link' => '#',
-				'description' => 'Nicht abgeschickt',
+				'description' => ucfirst($this->p->t('global', 'nichtAbgeschickt')),
 				'expand' => true,
 				'children' => array()
 			)

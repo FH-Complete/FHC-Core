@@ -1,8 +1,8 @@
 <table id="notiztable" class="table table-bordered table-hover">
 	<thead>
 	<tr>
-		<th>Datum</th>
-		<th>Notiz</th>
+		<th><?= ucfirst($this->p->t('global', 'datum')) ?></th>
+		<th><?= ucfirst($this->p->t('global', 'notiz')) ?></th>
 		<th>User</th>
 	</tr>
 	</thead>

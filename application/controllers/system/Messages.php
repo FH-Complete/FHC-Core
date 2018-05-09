@@ -20,6 +20,13 @@ class Messages extends VileSci_Controller
 		$this->load->library('WidgetLib');
 
 		$this->load->model('person/Person_model', 'PersonModel');
+		
+		$this->loadPhrases(array(
+								'global', 
+								'person',
+								'lehre',
+								'ui',
+								'infocenter'));
 
 		$this->_setAuthUID(); // sets property uid
 	}

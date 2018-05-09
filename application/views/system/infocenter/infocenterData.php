@@ -189,8 +189,22 @@
 		'fhc_controller_id' => $fhc_controller_id,
 		'checkboxes' => 'PersonId',
 		'additionalColumns' => array('Details'),
-		'columnsAliases' => array('PersonID','Vorname','Nachname','GebDatum','Nation', 'Letzte Aktion','Letzter Bearbeiter',
-			'StSem','GesendetAm','NumAbgeschickt','StgSent','StgNotSent','StgAktiv', 'Sperrdatum','GesperrtVon'),
+		'columnsAliases' => array(
+			'PersonID', 
+			ucfirst($this->p->t('person','vorname')) , 
+			ucfirst($this->p->t('person','nachname')),
+			ucfirst($this->p->t('person','geburtsdatum')),
+			ucfirst($this->p->t('person','nation')), 
+			ucfirst($this->p->t('global','letzteAktion')),
+			ucfirst($this->p->t('global','letzterBearbeiter')),
+			ucfirst($this->p->t('lehre','studiensemester')),
+			ucfirst($this->p->t('global','gesendetAm')),
+			ucfirst($this->p->t('global','abgeschickt')) . ' (' . $this->p->t('global','anzahl') . ')',
+			ucfirst($this->p->t('lehre','studiengang')) . ' (' . $this->p->t('global','gesendet') . ')',
+			ucfirst($this->p->t('lehre','studiengang')) . ' (' . $this->p->t('global','nichtGesendet') . ')',
+			ucfirst($this->p->t('lehre','studiengang')) . ' (' . $this->p->t('global','aktiv') . ')',
+			ucfirst($this->p->t('global','sperrdatum')),
+			ucfirst($this->p->t('global','gesperrtVon'))),
 		'formatRaw' => function($datasetRaw) {
 
 			$datasetRaw->{'Details'} = sprintf(
@@ -259,7 +273,7 @@
 			}
 		}
 	);
-
+	
 	$filterId = isset($_GET[InfoCenter::FILTER_ID]) ? $_GET[InfoCenter::FILTER_ID] : null;
 
 	if (isset($filterId) && is_numeric($filterId))

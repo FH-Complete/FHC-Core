@@ -2,11 +2,11 @@
 	<input type="hidden" name="hiddenNotizId" value="">
 	<div class="form-group">
 		<div class="text-center">
-			<label>Notiz hinzuf&uuml;gen</label>
+			<label><?= $this->p->t('infocenter', 'notizHinzufuegen') ?></label>
 		</div>
 		<div>
 			<div class="form-group">
-				<label>Titel: </label>
+				<label><?= ucfirst($this->p->t('global', 'titel')) . ': ' ?></label>
 				<div class="input-group">
 					<input id="inputNotizTitel" type="text" class="form-control" name="notiztitel"/>
 					<div class="input-group-addon" onclick="document.getElementById('inputNotizTitel').value='Anmerkung zur Bewerbung'">
@@ -21,8 +21,8 @@
 		</div>
 		<div class="text-right">
 			<!--abbrechen-button only shown when notice is clicked to be changed-->
-			<button type="reset" class="btn btn-default" style="display: none">Abbrechen</button>
-			<button type="submit" class="btn btn-default">Speichern</button>
+			<button type="reset" class="btn btn-default" style="display: none"><?= $this->p->t('ui', 'abbrechen') ?></button>
+			<button type="submit" class="btn btn-default"><?= $this->p->t('ui', 'speichern') ?></button>
 		</div>
 	</div>
 </form>

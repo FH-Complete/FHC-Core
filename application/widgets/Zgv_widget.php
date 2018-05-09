@@ -13,8 +13,7 @@ class Zgv_widget extends DropdownWidget
 		$this->setElementsArray(
 			$this->ZgvModel->load(),
 			true,
-			'Zgv wählen...',
-			'keine Zgv gefunden'
+			$this->p->t('ui', 'bitteEintragWaehlen')
 		);
 
 		$this->loadDropDownView($widgetData);

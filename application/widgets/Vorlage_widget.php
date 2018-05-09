@@ -27,8 +27,7 @@ class Vorlage_widget extends DropdownWidget
 		$this->setElementsArray(
 			$vorlage,
 			true,
-			'Select a vorlage...',
-			'No vorlage found'
+			$this->p->t('ui', 'vorlageWaehlen')
 		);
 
 		$this->loadDropDownView($widgetData);
