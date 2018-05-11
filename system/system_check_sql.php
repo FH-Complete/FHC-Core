@@ -94,6 +94,7 @@ if (($files = glob($slq_import_path.'/*.sql')) != false)
 		{
 			$mailcontent .= '<h3>Die Abfrage der Datei "'.$filename.'" hat folgenden Fehler geliefert:</h3>';
 			$mailcontent .= '<span class="error">'.$db->db_last_error () . '</span><br>';
+			$mailcontent .= '<pre>'.$sql.'</pre><br>';
 			continue;
 		}
 		
@@ -101,18 +102,22 @@ if (($files = glob($slq_import_path.'/*.sql')) != false)
 		if ($db->db_num_rows($result) > 0)
 		{
 			$mailcontent .= '<h3>Die Abfrage der Datei "'.$filename.'" hat folgendes Ergebnis geliefert:</h3>';
+
 			// Wenn zu viele Datensätze retourniert werden, abbrechen und Meldung ausgeben
 			if ($db->db_num_rows($result) > 1000)
 				$mailcontent .= '<span class="error">ACHTUNG! Es wurden mehr als 1000 Datensätze zurückgegeben</span><br>';
 			
 			$mailcontent .= '<table class="table"><thead><tr>';
-			foreach($db->db_fetch_object($result) AS $key => $value)
+			$array = array();
+			$object = $db->db_fetch_object($result);
+			$row_array = get_object_vars($object);
+			foreach($row_array AS $key => $value)
 			{
 				$mailcontent .= '<th>'.$key.'</th>';
-				continue;
 			}
 			$mailcontent .= '</tr></thead><tbody>';
 			$counter = 0; // Wenn mehr als 1000 Datensätze retourniert werden, abbrechen
+			$result = $db->db_query ($sql);
 			while($row = $db->db_fetch_object($result))
 			{
 				if ($counter == 1000)
@@ -126,7 +131,7 @@ if (($files = glob($slq_import_path.'/*.sql')) != false)
 				$mailcontent .= '</tr>';
 				$counter++;
 			}
-			$mailcontent .= '</tr></tbody></table>';
+			$mailcontent .= '</tbody></table>';
 		}
 	}
 }
