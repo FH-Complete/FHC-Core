@@ -1,18 +1,3 @@
-/*
- This program is free software: you can redistribute it and/or modify
- it under the terms of the GNU General Public License as published by
- the Free Software Foundation, either version 3 of the License, or
- (at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
-
 /**
  * Javascript file for infocenter overview page
  */
@@ -48,7 +33,11 @@ function appendTableActionsHtml()
 
 	$.ajax({
 		url: window.location.pathname.replace('infocenter/InfoCenter', 'Filters/rowNumber'),
-		method: "GET"
+		method: "GET",
+		data: {
+			fhc_controller_id: getUrlParameter("fhc_controller_id")
+		},
+		dataType: "json"
 	})
 	.done(function(data, textStatus, jqXHR) {
 
@@ -72,7 +61,9 @@ function appendTableActionsHtml()
 			setTableActions();
 		}
 
-	}).fail(function(jqXHR, textStatus, errorThrown) {});
+	}).fail(function(jqXHR, textStatus, errorThrown) {
+		alert(textStatus);
+	});
 
 }
 
@@ -113,6 +104,27 @@ function setTableActions()
 }
 
 /**
+ *
+ */
+function getUrlParameter(sParam)
+{
+    var sPageURL = decodeURIComponent(window.location.search.substring(1)),
+        sURLVariables = sPageURL.split('&'),
+        sParameterName,
+        i;
+
+    for (i = 0; i < sURLVariables.length; i++)
+	{
+        sParameterName = sURLVariables[i].split('=');
+
+        if (sParameterName[0] === sParam)
+		{
+            return sParameterName[1];
+        }
+    }
+}
+
+/**
  * Refreshes the side menu
  */
 function refreshSideMenu()
@@ -120,7 +132,9 @@ function refreshSideMenu()
 	$.ajax({
 		url: window.location.pathname+"/setNavigationMenuArray",
 		method: "GET",
-		data: {}
+		data: {
+			fhc_controller_id: getUrlParameter("fhc_controller_id")
+		}
 	})
 	.done(function(data, textStatus, jqXHR) {
 

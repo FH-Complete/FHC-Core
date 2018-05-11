@@ -21,7 +21,9 @@
 		$.ajax({
 			url: "<?php echo site_url('system/Filters/tableDataset'); ?>",
 			method: "GET",
-			data: {},
+			data: {
+				fhc_controller_id: getUrlParameter("fhc_controller_id")
+			},
 		    dataType: "json"
 		})
 		.done(function(data, textStatus, jqXHR) {

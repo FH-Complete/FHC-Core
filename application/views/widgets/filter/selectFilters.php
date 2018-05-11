@@ -13,7 +13,8 @@
 				url: "<?php echo site_url('system/Filters/addSelectedFilters'); ?>",
 				method: "POST",
 				data: {
-					fieldName: $(this).val()
+					fieldName: $(this).val(),
+					fhc_controller_id: getUrlParameter("fhc_controller_id")
 				}
 			})
 			.done(function(data, textStatus, jqXHR) {
@@ -76,7 +77,8 @@
 					filterNames: selectFilterName,
 					filterOperations: selectFilterOperation,
 					filterOperationValues: selectFilterOperationValue,
-					filterOptions: selectFilterOption
+					filterOptions: selectFilterOption,
+					fhc_controller_id: getUrlParameter("fhc_controller_id")
 				}
 			})
 			.done(function(data, textStatus, jqXHR) {
@@ -100,7 +102,8 @@
 				url: "<?php echo site_url('system/Filters/removeSelectedFilters'); ?>",
 				method: "POST",
 				data: {
-					fieldName: $(this).attr('filterToRemove')
+					fieldName: $(this).attr('filterToRemove'),
+					fhc_controller_id: getUrlParameter("fhc_controller_id")
 				}
 			})
 			.done(function(data, textStatus, jqXHR) {
@@ -199,7 +202,9 @@
 		$.ajax({
 			url: "<?php echo site_url('system/Filters/selectFilters'); ?>",
 			method: "GET",
-			data: {},
+			data: {
+				fhc_controller_id: getUrlParameter("fhc_controller_id")
+			},
 			dataType: "json"
 		})
 		.done(function(data, textStatus, jqXHR) {

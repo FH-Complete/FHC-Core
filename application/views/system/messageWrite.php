@@ -8,8 +8,8 @@ $this->load->view(
 		'fontawesome' => true,
 		'tinymce' => true,
 		'sbadmintemplate' => true,
-		'customCSSs' => 'skin/admintemplate_contentonly.css',
-		'customJSs' => 'include/js/bootstrapper.js'
+		'customCSSs' => 'public/css/sbadmin2/admintemplate_contentonly.css',
+		'customJSs' => 'public/js/bootstrapper.js'
 	)
 );
 ?>

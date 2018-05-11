@@ -60,41 +60,8 @@ if ( ! function_exists('auth'))
 */
 function getAuthUID()
 {
-	$uid = false;
 	$ci =& get_instance(); // get CI instance
-	$ci->load->library('session'); // load session library
+	$ci->load->library('AuthLib'); // load session library
 
-	// If uid hasn't never been set and is present in CI session
-	if ($uid === false && isset($ci->session->uid))
-	{
-		$uid = $ci->session->uid;
-	}
-	else
-	{
-		// Try to check if uid is stored elsewhere
-		if (isset($_SERVER['PHP_AUTH_USER']))
-		{
-			$uid = $_SERVER['PHP_AUTH_USER'];
-		}
-		else if (isset($_SESSION['uid']))
-		{
-			$uid = $_SESSION['uid'];
-		}
-		// Workaround for a strange behavior
-		// Sometimes $_SERVER['PHP_AUTH_USER'] is not set here, but is set when
-		// used by authentication object
-		else
-		{
-			$auth = new authentication();
-			$uid = $auth->getUser();
-		}
-	}
-
-	// If uid is set and uid in CI session is not set
-	if ($uid !== false && !isset($ci->session->uid))
-	{
-		$ci->session->uid = $uid;
-	}
-	
-	return $uid;
+	return $ci->authlib->getUser();
 }

@@ -9,7 +9,8 @@
 					url: "<?php echo site_url('system/Filters/saveFilter'); ?>",
 					method: "POST",
 					data: {
-						customFilterDescription: $("#customFilterDescription").val()
+						customFilterDescription: $("#customFilterDescription").val(),
+						fhc_controller_id: getUrlParameter("fhc_controller_id")
 					}
 				})
 				.done(function(data, textStatus, jqXHR) {

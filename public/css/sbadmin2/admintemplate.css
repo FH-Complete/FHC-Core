@@ -30,7 +30,6 @@
     /*float: right; */       /* adjust as needed */
     margin: 15px;
     color: grey;         /* adjust as needed */
-
 }
 
 .panel-heading .accordion-toggle.collapsed:before{

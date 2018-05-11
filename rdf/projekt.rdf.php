@@ -34,7 +34,7 @@ else
 $projekt_obj = new projekt();
 if(isset($_REQUEST['filter']))
 {
-    if($_REQUEST['filter']=='')
+    if($_REQUEST['filter']=='' || $_REQUEST['filter']=='alle')
         $projekt_obj->getProjekte($oe);
     if($_REQUEST['filter']=='aktuell')
         $projekt_obj->getProjekteAktuell(false, $oe);
