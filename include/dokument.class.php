@@ -832,9 +832,9 @@ class dokument extends basis_db
 
 		if($result = $this->db_query($qry))
 		{
+			$stg_obj = new basis_db();
 			while($row = $this->db_fetch_object($result))
 			{
-				$stg_obj = new basis_db();
 				$stg_obj->kuerzel = $row->kuerzel;
 				$stg_obj->bezeichnung = $row->bezeichnung;
 				$stg_obj->studiengang_kz = $row->studiengang_kz;

@@ -32,3 +32,4 @@ tests/codeception/tests/acceptance.suite.yml
 tests/codeception/tests/unit.suite.yml
 /sparks/*
 /webdav/google.php
+system/sql/
