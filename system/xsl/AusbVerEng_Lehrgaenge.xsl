@@ -909,53 +909,6 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
 				<text:p text:style-name="P2">
 					<text:span text:style-name="T15">Geburtsdatum (Date of birth): <text:tab/><xsl:value-of select="gebdatum"/></text:span>
 				</text:p>
-				<text:p text:style-name="P2">
-					<text:span text:style-name="T13">Sozialversicherungsnr. </text:span>
-					<text:span text:style-name="Footnote_20_Symbol">
-						<text:span text:style-name="T13">
-							<text:note text:id="ftn1" text:note-class="footnote">
-								<text:note-citation>1</text:note-citation>
-								<text:note-body>
-									<text:p text:style-name="Standard">
-										<text:span text:style-name="T18">
-											<text:s/>
-										</text:span>
-										<text:span text:style-name="T2">Gemäß § 3 Absatz 1 des Bildungsdokumentationsgesetzes idgF und der Bildungsdokumentationsverordnung-Fachhochschulen <text:s/>idgF hat der Erhalter die Sozialversicherungsnummer zu erfassen und gemäß § 7 Absatz 2 im Wege der Agentur für Qualitätssicherung und Akkreditierung Austria an das zuständige Bundesministerium und die Bundesanstalt Statistik Österreich zu übermitteln.</text:span>
-									</text:p>
-									<text:p text:style-name="P6"/>
-								</text:note-body>
-							</text:note>
-						</text:span>
-					</text:span>
-					<text:span text:style-name="Footnote_20_Symbol">
-						<text:span text:style-name="T13"> </text:span>
-					</text:span>
-					<text:span text:style-name="T16">:<text:tab/><xsl:value-of select="svnr"/></text:span>
-				</text:p>
-				<text:p text:style-name="P3">
-					<text:span text:style-name="T15">
-						<text:tab/>(Social security number)</text:span>
-					<text:span text:style-name="Footnote_20_Symbol">
-						<text:span text:style-name="T15">
-							<text:note text:id="ftn2" text:note-class="footnote">
-								<text:note-citation>2</text:note-citation>
-								<text:note-body>
-									<text:p text:style-name="Standard">
-										<text:span text:style-name="T20">
-											<text:s/>
-										</text:span>
-										<text:span text:style-name="T4">Pursuant to § 3 section 1 of the Education Documentation Act as amended and the Education Documentation Regulation for Universities of Applied Sciences as amended, the operator shall record the social security number pursuant to § 7 paragraph 2 and shall transfer it via the Agency for Quality Assurance and Accreditation Austria to the competent Ministry and Statistics Austria.</text:span>
-									</text:p>
-								</text:note-body>
-							</text:note>
-						</text:span>
-					</text:span>
-					<text:span text:style-name="Footnote_20_Symbol">
-						<text:span text:style-name="T15"> </text:span>
-					</text:span>
-					<text:span text:style-name="T15">: <text:tab/>
-					</text:span>
-				</text:p>
 				<text:p text:style-name="P41"/>
 			</text:section>
 			<text:section text:style-name="Sect1" text:name="Bereich3">
@@ -1355,11 +1308,11 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
 				<text:p text:style-name="P36">Die ao. Studentin bzw. der ao. Student hat unaufgefordert dafür zu sorgen, dass die von ihr/ihm beigebrachten Daten aktuell sind. Änderungen sind der Studiengangsassistenz unverzüglich schriftlich mitzuteilen. Darüber hinaus trifft sie/ihn die Pflicht, sich von studienbezogenen Informationen, die ihr/ihm an die vom Erhalter zur Verfügung gestellte Emailadresse zugestellt werden, in geeigneter Weise Kenntnis zu verschaffen.</text:p>
 				<text:p text:style-name="P38"/>
 				<text:p text:style-name="P38">6.2.5 Verwertungsrechte </text:p>
-				<text:p text:style-name="P38">Sofern nicht im Einzelfall andere Regelungen zwischen dem Erhalter und der ao. Studentin oder dem ao. Studenten getroffen wurden, ist die ao. Studentin oder der ao. Student verpflichtet, dem Erhalter die Rechte an Forschungs- und Entwicklungsergebnissen auf dessen schriftliche Anfrage hin anzubieten.</text:p>
+				<text:p text:style-name="P38">Sofern nicht im Einzelfall andere Regelungen zwischen dem Erhalter und der ao. Studentin oder dem ao. Studenten getroffen wurden, ist die ao. Studentin oder der ao. Student verpflichtet, dem Erhalter die Rechte an Forschungs- und Entwicklungsergebnissen, die im Rahmen von geförderten Projekten geschaffen wurden, auf dessen schriftliche Anfrage hin einzuräumen.</text:p>
 				<text:p text:style-name="P38"/>
 				<text:p text:style-name="P38">6.2.6 Aufzeichnungen und Mitschnitte</text:p>
 				<text:p text:style-name="P38">Es ist der/dem ao. Studierenden ausdrücklich untersagt, Lehrveranstaltungen als Ganzes oder nur Teile davon aufzuzeichnen und/oder mitzuschneiden (z.B. durch Film- und/oder Tonaufnahmen oder sonstige hierfür geeignete audiovisuelle Mittel). Darüber hinaus ist jede Form der öffentlichen Zurverfügungstellung (drahtlos oder drahtgebunden) der vorgenannten Aufnahmen z.B. in sozialen Netzwerken wie Facebook, WhatsAPP, LinkedIn, XING etc, aber auch auf Youtube, Instagram usw. oder durch sonstige für diese Zwecke geeignete Kommunikations-mittel untersagt. Diese Regelungen gelten sinngemäß auch für Skripten, sonstige Lernbehelfe und Prüfungsangaben. </text:p>
-				<text:p text:style-name="P38">Ausgenommen hiervon ist eine Aufzeichnung zu ausschließlichen Lern-, Studien- und Forschungszwecken und zum privaten Gebrauch, sofern hierfür der / die Vortragende vorab ausdrücklich seine / ihre schriftliche Zustimmung erteilt hat. </text:p>
+				<text:p text:style-name="P38">Ausgenommen hiervon ist eine Aufzeichnung zu ausschließlichen Lern-, Studien- und Forschungszwecken und</text:p>
 				<text:p text:style-name="P92">6.2.4 Updating personal data and the retrieval of information</text:p>
 				<text:p text:style-name="P57">
 					<text:span text:style-name="T48">Without being reminded, the external student must ensure that the data provided by them is up-to-date. Changes are to be immediately communicated to the administrative assistant in writing. Furthermore, it is the students’ responsibility to make themselves suitably aware of information relating to their studies which has been sent to them at the email address provided for them by the operator.</text:span>
@@ -1367,16 +1320,20 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
 				<text:p text:style-name="P57"/>
 				<text:p text:style-name="P57"/>
 				<text:p text:style-name="P68">6.2.5 Exploitation Rights</text:p>
-				<text:p text:style-name="P68">Unless other arrangements have been agreed between the operator and the external student at an individual level, on written request, the external student undertakes to offer the operator the rights to research and development results. </text:p>
+				<text:p text:style-name="P68">Unless otherwise agreed between the operator and the student on an individual basis, the student is required, upon written request, to offer the operator the rights to research and development results generated as part of funded projects.</text:p>
+				<text:p text:style-name="P68"/>
+				<text:p text:style-name="P68"/>
 				<text:p text:style-name="P68"/>
 				<text:p text:style-name="P68"/>
 				<text:p text:style-name="P68">6.2.6 Recordings </text:p>
 				<text:p text:style-name="P68">It is expressly forbidden for the external student to record lectures in part or in total (e.g. by using film and / or sound recordings or other audio-visual means suitable for this purpose). In addition, any form of making the aforementioned recordings publically available (wired or wireless) for example in social networks such as Facebook, WhatsAPP, LinkedIn, XING etc, but also on Youtube, Instagram etc., or by other means of communication designed for these purposes is strictly prohibited. These regulations shall apply correspondingly to scripts, other learning aids and examination data. </text:p>
-				<text:p text:style-name="P68">The only exception is a recording exclusively for the purpose of learning, study and research and for personal use, provided that the lecturer has expressly granted his / her prior written consent.<text:bookmark-start text:name="_Ref78867653"/>
+				<text:p text:style-name="P68">The only exception is a recording exclusively for the purpose of learning, study and research<text:bookmark-start text:name="_Ref78867653"/>
 				</text:p>
-				<text:p text:style-name="P33"/>
-				<text:p text:style-name="P33"/>
-				<text:p text:style-name="P33"/>
+				<text:p text:style-name="P68"/>
+				<text:p text:style-name="P68"/>
+				<text:p text:style-name="P68"/>
+				<text:p text:style-name="P68">zum privaten Gebrauch, sofern hierfür der / die Vortragende vorab ausdrücklich seine / ihre schriftliche Zustimmung erteilt hat. </text:p>
+				<text:p text:style-name="P68"/>
 				<text:p text:style-name="P33">
 					<text:soft-page-break/>
 					<text:span text:style-name="T42">6.2.7</text:span>
@@ -1386,8 +1343,7 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
 				<text:p text:style-name="P13">Die ao. Studentin bzw. der ao. Student ist zur Geheimhaltung von Forschungs- und Entwicklungsaktivitäten und -ergebnissen gegenüber Dritten verpflichtet. </text:p>
 				<text:p text:style-name="P13"/>
 				<text:p text:style-name="P68">6.2.8 Schadensmeldung</text:p>
-				<text:p text:style-name="P68">Im Falle des Eintretens eines Schadens am Inventar der Fachhochschule ist der/die ao. Studierende verpflichtet, diesen innerhalb von drei Tagen dem Lehrgangssekretariat zu melden. Allfällige Haftungsansprüche bleiben hiervon unberührt.</text:p>
-				<text:p text:style-name="P68"/>
+				<text:p text:style-name="P68">Im Falle des Eintretens eines Schadens am Inventar der Fachhochschule ist der/die ao. Studierende verpflichtet, diesen diesen unverzüglich, spätestens aber innerhalb von drei Tagen dem Lehrgangssekretariat zu melden. Allfällige Haftungsansprüche bleiben hiervon unberührt.</text:p>
 				<text:p text:style-name="P68"/>
 				<text:p text:style-name="P68">6.2.9 Rückgabeverpflichtung bei Studienende</text:p>
 				<text:p text:style-name="P68">Die ao. Studentin bzw. der ao. Student ist verpflichtet, bei einer Beendigung des Lehrgangs unverzüglich alle zur Verfügung gestellten Gerätschaften, Bücher, Schlüssel und sonstige Materialien zurückzugeben.</text:p>
@@ -1405,12 +1361,16 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
 				</text:p>
 				<text:p text:style-name="P70">Die ao. Studentin bzw. der ao. Student kann den Ausbildungsvertrag schriftlich jeweils zum Ende eines Semesters kündigen. <text:span text:style-name="T49">Die Verpflichtung zur vollständigen Leistung der Lehrgangskosten wird von einer Kündigung durch die ao. Studentin bzw. den ao. Studenten nicht berührt.</text:span>
 				</text:p>
-				<text:p text:style-name="P93">6.2.7 Confidentiality </text:p>
+				<text:p text:style-name="P93">and for personal use, provided that the lecturer has expressly granted his / her prior written consent.</text:p>
+				<text:p text:style-name="P13"/>
+				<text:p text:style-name="P68">6.2.7 Confidentiality</text:p>
 				<text:p text:style-name="P13">The external student is required to maintain confidentiality towards third parties of research and development activities and results. </text:p>
 				<text:p text:style-name="P13"/>
 				<text:p text:style-name="P13"/>
 				<text:p text:style-name="P68">6.2.8 Damage Report</text:p>
-				<text:p text:style-name="P68">If any damage should be caused to the inventory of the University of Applied Sciences, the external student undertakes to report this to the administrative assistant of the Certificate Program for Further Education within three days. Any liability claims shall remain unaffected.</text:p>
+				<text:p text:style-name="P68">In the case of damage to the inventory of the University of Applied Sciences, the student is obliged to notify the course secretariat immediately, but no later than within three days. Any liability claims remain unaffected.</text:p>
+				<text:p text:style-name="P68"/>
+				<text:p text:style-name="P68"/>
 				<text:p text:style-name="P68"/>
 				<text:p text:style-name="P68">6.2.9 Obligation to Return Borrowed Items</text:p>
 				<text:p text:style-name="P68">The external student undertakes to return promptly all equipment, books, keys and other materials that have been made available, when the Certificate Program for Further Education is finished or broken off.</text:p>
@@ -1461,10 +1421,10 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
 						<text:p text:style-name="P99">persönlichem Verhalten, das zu einer Beeinträchtigung des Images und/oder Betriebes des Lehrganges, der Fach-hochschule bzw. des Erhalters oder von Personen führt, die für die Fachhochschule bzw. den Erhalter tätig sind;</text:p>
 					</text:list-item>
 					<text:list-item>
-						<text:p text:style-name="P99">Verletzung der Verpflichtung, dem Erhalter die Rechte an Forschungs- und Entwicklungsergebnissen anzubieten (siehe Pkt. 6.2.<text:span text:style-name="T51">5</text:span>);</text:p>
+						<text:p text:style-name="P99">Verletzung der Verpflichtung, dem Erhalter die Rechte an Forschungs- und Entwicklungsergebnissen einzuräumen (siehe Pkt. 6.2.5);</text:p>
 					</text:list-item>
 					<text:list-item>
-						<text:p text:style-name="P99">Verletzung der Geheimhaltungspflicht (siehe Pkt. 6.2.<text:span text:style-name="T51">7</text:span>); </text:p>
+						<text:p text:style-name="P99">Verletzung der Geheimhaltungspflicht (siehe Pkt. 6.2.7); </text:p>
 					</text:list-item>
 					<text:list-item>
 						<text:p text:style-name="P99">strafgerichtlicher Verurteilung (wobei die Art des Deliktes und der Grad der Schuld berücksichtigt werden);</text:p>
@@ -1501,11 +1461,11 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
 						<text:p text:style-name="P99">personal behavior, which leads to an adverse effect on the image and / or operation of the Certificate Program, the university or the operator or on persons who are working for the university or the operator;</text:p>
 					</text:list-item>
 					<text:list-item>
-						<text:p text:style-name="P99">breach of the obligation to offer the operator the rights to research and development results (see Section 6.2.<text:span text:style-name="T51">5</text:span>);<text:line-break/>
+						<text:p text:style-name="P99">breach of the obligation to offer the operator the rights to research and development results (see Section 6.2.5);<text:line-break/>
 						</text:p>
 					</text:list-item>
 					<text:list-item>
-						<text:p text:style-name="P99">breach of confidentiality (see Section 6.2.<text:span text:style-name="T51">7</text:span>);</text:p>
+						<text:p text:style-name="P99">breach of confidentiality (see Section 6.2.7);</text:p>
 					</text:list-item>
 					<text:list-item>
 						<text:p text:style-name="P99">a criminal conviction (whereby the nature of the offence and the level of culpability are taken into account);</text:p>
@@ -1514,13 +1474,13 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
 				<text:p text:style-name="P115"/>
 				<text:list xml:id="list155838677773193" text:continue-numbering="true" text:style-name="WW8Num4">
 					<text:list-item>
-						<text:p text:style-name="P116">Nichterfüllung finanzieller Verpflichtungen trotz Mahnung (z.B. Unkostenbeitrag, Studienbeitrag etc.); </text:p>
+						<text:p text:style-name="P116">Nichterfüllung finanzieller Verpflichtungen trotz Mahnung (z.B. Unkostenbeitrag, Studienbeitrag etc.);</text:p>
 					</text:list-item>
 					<text:list-item>
-						<text:p text:style-name="P98">Weigerung zur Beibringung von Daten (siehe Pkt. 6.2.<text:span text:style-name="T51">3</text:span>) </text:p>
+						<text:p text:style-name="P98">Weigerung zur Beibringung von Daten (siehe Pkt. 6.2.3);</text:p>
 					</text:list-item>
 					<text:list-item>
-						<text:p text:style-name="P98">Plagiieren im Rahmen wissenschaftlicher Arbeiten </text:p>
+						<text:p text:style-name="P98">Plagiieren im Rahmen wissenschaftlicher Arbeiten.</text:p>
 					</text:list-item>
 				</text:list>
 				<text:p text:style-name="P13"/>
@@ -1532,7 +1492,7 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
 					<text:span text:style-name="T21">8. Ergänzende Vereinbarungen</text:span>
 				</text:p>
 				<text:p text:style-name="P97"/>
-				<text:p text:style-name="P49">Ao. Studierende des Programms sind verpflichtet, eine EDV-Ausstattung zu beschaffen und zu unterhalten, die es ermöglicht, an den Fernlehrelementen teilzunehmen. Die gesamten Kosten der Anschaffung und des Betriebs (inkl. Kosten für Internet und e-mail) trägt der ao. Student bzw. die ao. Studentin. </text:p>
+				<text:p text:style-name="P49">Ao. Studierende des Programms sind verpflichtet, eine EDV-Ausstattung zu beschaffen und zu unterhalten, die es ermöglicht, an den Fernlehrelementen teilzunehmen. Die gesamten Kosten der Anschaffung und des Betriebs (inkl. Kosten für Internet) trägt der ao. Student bzw. die ao. Studentin. </text:p>
 				<text:p text:style-name="P49"/>
 				<text:p text:style-name="P85">
 					<text:span text:style-name="T21">9. Unwirksamkeit von Vertrags-bestimmungen</text:span>
@@ -1549,10 +1509,10 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
 						<text:p text:style-name="P111">non-fulfilment of the financial obligations, despite a reminder (e.g. contribution towards expenses, tuition fees , etc.); </text:p>
 					</text:list-item>
 					<text:list-item>
-						<text:p text:style-name="P98">refusal to provide any data (see section 6.2.<text:span text:style-name="T51">3</text:span>); </text:p>
+						<text:p text:style-name="P98">refusal to provide any data (see section 6.2.3); </text:p>
 					</text:list-item>
 					<text:list-item>
-						<text:p text:style-name="P98">plagiarism in academic work</text:p>
+						<text:p text:style-name="P98">plagiarism in academic work.</text:p>
 					</text:list-item>
 				</text:list>
 				<text:p text:style-name="P13"/>
@@ -1566,7 +1526,7 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
 					<text:span text:style-name="T21">8. Supplementary Agreements</text:span>
 				</text:p>
 				<text:p text:style-name="P46"/>
-				<text:p text:style-name="P45">External students in the program are required to obtain and maintain computer equipment which allows them to participate in the distance learning elements. The total cost of acquisition and operation (including costs for Internet and e-mail) shall be borne by the external student. </text:p>
+				<text:p text:style-name="P45">External students in the program are required to obtain and maintain computer equipment which allows them to participate in the distance learning elements. The total cost of acquisition and operation (including costs for Internet) shall be borne by the external student. </text:p>
 				<text:p text:style-name="P45"/>
 				<text:p text:style-name="P45"/>
 				<text:p text:style-name="P86">

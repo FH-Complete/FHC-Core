@@ -171,4 +171,5 @@ $this->phrasen['benotungstool/punkte']='Points';
 $this->phrasen['benotungstool/importAnweisung']='Copy the columns "personal identifier" and "grade" from the grade list and insert them in the following field';
 $this->phrasen['benotungstool/pruefung']='Examination';
 $this->phrasen['benotungstool/notenlisteImport']='Grade list for the subject grade import (Excel)';
+$this->phrasen['benotungstool/geaenderteNotenVorhanden']='There are changed grades. Please send the changes to the assistant by clicking "Approval"';
 ?>

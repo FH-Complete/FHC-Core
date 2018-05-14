@@ -321,7 +321,10 @@ switch($method)
 		$studienSemesterResult = $studienplan->loadStudiensemesterFromStudienplan($studienplan_id);
 
 		$studiensemester = new studiensemester();
-		$studiensemester->getAll();
+		$studiensemester->getAll('desc');
+		$studiensemester_array = array();
+		foreach ($studiensemester->studiensemester AS $row)
+			$studiensemester_array[$row->studiensemester_kurzbz] = false;
 
 		$ausbildungssemesterResult = array();
 /*
@@ -357,6 +360,9 @@ switch($method)
 
 		foreach($ausbildungssemesterResult as $row)
 		{
+			if (array_key_exists($row->studiensemester, $studiensemester_array))
+				$studiensemester_array[$row->studiensemester] = true;
+				
 			echo '<tr id="row_'.$row->studiensemester.'" style="font-size: 1em !important;"><td style="font-size: 1em; padding: 0.5em 0.5em 0.5em 0.5em;" align="center">'.$row->studiensemester.'</td>';
 			for($i = 1; $i<=$ausbildungssemester; $i++)
 			{
@@ -373,10 +379,23 @@ switch($method)
 		}
 		echo '<tr>
 				<td align="center"><select id="studiensemester">';
-				$length = count($studiensemester->studiensemester)-1;
-				for($i = $length; $i>0; $i--)
+				$lastStudiensemesterActive = '';
+				$selected = '';
+				//Das nächste Studiensemester wird selected
+				foreach($studiensemester_array AS $key => $value)
 				{
-					echo '<option value='.$studiensemester->studiensemester[$i]->studiensemester_kurzbz.'>'.$studiensemester->studiensemester[$i]->studiensemester_kurzbz.'</option>';
+					if ($value == true)
+					{							
+						echo '<option value='.$key.' disabled="disabled">'.$key.'</option>';
+						$lastStudiensemesterActive = false;
+					}
+					else
+					{
+						if ($selected == '' && $lastStudiensemesterActive !== false)
+							$selected = 'selected';
+						echo '<option value='.$key.' '.$selected.'>'.$key.'</option>';
+					}
+					$selected = '';
 				}
 		echo '</select></td>';
 		for($j=1; $j<=$ausbildungssemester; $j++)

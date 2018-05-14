@@ -62,7 +62,8 @@ class Prestudentstatus extends FHC_Controller
 			tbl_prestudentstatus.status_kurzbz,
 			tbl_prestudent.studiengang_kz,
 			tbl_prestudentstatus.studienplan_id,
-			tbl_studienplan.orgform_kurzbz');
+			tbl_studienplan.orgform_kurzbz,
+			tbl_prestudent.person_id');
 		$this->PrestudentstatusModel->addJoin('public.tbl_prestudent', 'prestudent_id');
 		$this->PrestudentstatusModel->addJoin('lehre.tbl_studienplan', 'studienplan_id','LEFT');
 		$this->PrestudentstatusModel->addJoin('lehre.tbl_studienordnung', 'studienordnung_id','LEFT');
@@ -106,6 +107,14 @@ class Prestudentstatus extends FHC_Controller
 							$this->PrestudentstatusModel->update($pk_arr,
 								array('studienplan_id' => $studienplan->retval[0]->studienplan_id));
 							$sum_corrected++;
+
+							if($row_status->status_kurzbz == 'Interessent')
+							{
+								$this->correctReihungstest(
+									$row_status->person_id,
+									$row_status->studienplan_id,
+									$studienplan->retval[0]->studienplan_id);
+							}
 						}
 					}
 					else
@@ -124,5 +133,59 @@ class Prestudentstatus extends FHC_Controller
 		echo "Corrected:".$sum_corrected."\n";
 		echo "Not Corrected:".$sum_notcorrected."\n";
 		echo "Overall incorrect:".$sum_overall."\n";
+	}
+
+	/**
+	 * Corrects the Assignment to a Placement Test
+	 * Corrects the Studyplan and adds the Studyplan to the Placement test
+	 * @param $person_id ID of the Person
+	 * @param $studienplan_id_old ID of the old Studyplan
+	 * @param $studienplan_id ID of the new Studyplan
+	 */
+	private function correctReihungstest($person_id, $studienplan_id_old, $studienplan_id)
+	{
+		$this->load->model('crm/RtPerson_model', 'RtPersonModel');
+		$this->load->model('crm/RtStudienplan_model', 'RtStudienplanModel');
+
+		$this->RtPersonModel->resetQuery();
+		// Correct also Assignments to Placement test
+		$this->RtPersonModel->addJoin(
+			'public.tbl_reihungstest',
+			'tbl_reihungstest.reihungstest_id = tbl_rt_person.rt_id'
+		);
+
+		$rt = $this->RtPersonModel->loadWhere(array(
+			"person_id" => $person_id,
+			"studienplan_id" => $studienplan_id_old
+			));
+
+		//	"tbl_reihungstest.datum > " => date('Y-m-d H:i:s')
+
+		if(hasData($rt))
+		{
+			foreach($rt->retval as $row_rt)
+			{
+				// Update RTPerson Record
+				$this->RtPersonModel->update($row_rt->rt_person_id, array(
+					'studienplan_id' => $studienplan_id,
+					'updateamum' => date('Y-m-d H:i:s'),
+					'updatevon' => 'cron'
+				));
+
+				// Add new Studyplan to RtStudienplan if missing
+				$rt_studienplan = $this->RtStudienplanModel->loadWhere(array(
+					"reihungstest_id" => $row_rt->reihungstest_id,
+					"studienplan_id" => $studienplan_id
+				));
+
+				if(!hasData($rt_studienplan))
+				{
+					$this->RtStudienplanModel->insert(array(
+						"reihungstest_id" => $row_rt->reihungstest_id,
+						"studienplan_id" => $studienplan_id
+					));
+				}
+			}
+		}
 	}
 }

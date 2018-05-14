@@ -111,22 +111,6 @@
 </style>
 <script language="Javascript" type="text/javascript">
 
-	function refreshSideMenu()
-	{
-		$.ajax({
-			url: "<?php echo site_url('system/infocenter/InfoCenter/setNavigationMenuArray'); ?>",
-			method: "GET",
-			data: {}
-		})
-		.done(function(data, textStatus, jqXHR) {
-
-			renderSideMenu();
-
-		}).fail(function(jqXHR, textStatus, errorThrown) {
-			alert(textStatus);
-		});
-	}
-
 	function sideMenuHook()
 	{
 		$(".remove-filter").click(function() {
@@ -135,7 +119,8 @@
 				url: "<?php echo site_url('system/Filters/deleteCustomFilter'); ?>",
 				method: "POST",
 				data: {
-					filter_id: $(this).attr('value')
+					filter_id: $(this).attr('value'),
+					fhc_controller_id: getUrlParameter("fhc_controller_id")
 				}
 			})
 			.done(function(data, textStatus, jqXHR) {

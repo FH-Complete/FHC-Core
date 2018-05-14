@@ -30,7 +30,7 @@ class FilterWidget extends Widget
 	const WIDGET_URL_SELECT_FILTERS = 'widgets/filter/selectFilters';
 	const WIDGET_URL_SAVE_FILTER = 'widgets/filter/saveFilter';
 
-	const SESSION_NAME = 'FILTER';
+	const SESSION_NAME = 'FHC_FILTER_WIDGET';
 
 	const ALL_SELECTED_FIELDS = 'allSelectedFields';
 	const ALL_COLUMNS_ALIASES = 'allColumnsAliases';
@@ -111,7 +111,7 @@ class FilterWidget extends Widget
 	public function display($widgetData)
 	{
 		//
-		$filterSessionArray = $this->session->userdata(self::SESSION_NAME);
+		$filterSessionArray = $this->_readSession();
 
 		//
 		if ($this->filterId == null && isset($filterSessionArray[self::FILTER_ID]))
@@ -146,7 +146,7 @@ class FilterWidget extends Widget
 
 		//
 		$selectedFields = array();
-		$filterSessionArray = $this->session->userdata(self::SESSION_NAME);
+		$filterSessionArray = $this->_readSession();
 		if (isset($filterSessionArray[self::SELECTED_FIELDS]))
 		{
 			$selectedFields = $filterSessionArray[self::SELECTED_FIELDS];
@@ -198,6 +198,7 @@ class FilterWidget extends Widget
 				$tmpDataset[] = $formattedResult;
 			}
 		}
+
 		$filterSessionArray[self::DATASET_PARAMETER] = $tmpDataset;
 
 		/* ------------------------------------------------------------ */
@@ -207,7 +208,7 @@ class FilterWidget extends Widget
 
 		$filterSessionArray[self::METADATA_PARAMETER] = $this->metaData;
 
-		$this->session->set_userdata(self::SESSION_NAME, $filterSessionArray);
+		$this->_writeSession($filterSessionArray);
 
 		//
 		$this->loadViewFilters();
@@ -425,9 +426,11 @@ class FilterWidget extends Widget
 	{
 		$filterSessionArray = array();
 
-		if (isset($_SESSION[self::SESSION_NAME]))
+		$session = $this->_readSession();
+
+		if (count($session) > 0)
 		{
-			$filterSessionArray = $_SESSION[self::SESSION_NAME];
+			$filterSessionArray = $session;
 		}
 
 		if (!isset($filterSessionArray[self::SELECTED_FIELDS]))
@@ -490,7 +493,7 @@ class FilterWidget extends Widget
 			$filterSessionArray[self::REQUIRED_PERMISSIONS] = null;
 		}
 
-		$this->session->set_userdata(self::SESSION_NAME, $filterSessionArray);
+		$this->_writeSession($filterSessionArray);
 	}
 
 	/**
@@ -512,6 +515,7 @@ class FilterWidget extends Widget
 		$this->columnsAliases = null;
 		$this->filterName = null;
 		$this->requiredPermissions = null;
+		$this->fhc_controller_id = null;
 
 		if (!is_array($args) || (is_array($args) && count($args) == 0))
 		{
@@ -519,6 +523,15 @@ class FilterWidget extends Widget
 		}
 		else
 		{
+			if (!isset($args['fhc_controller_id']))
+			{
+				show_error('Dude you forgot the fhc_controller_id');
+			}
+			else
+			{
+				$this->fhc_controller_id = $args['fhc_controller_id'];
+			}
+
 			if ((
 					!isset($args[self::APP_PARAMETER])
 					&& !isset($args[self::DATASET_NAME_PARAMETER])
@@ -718,7 +731,7 @@ class FilterWidget extends Widget
 				self::DATASET_NAME_PARAMETER => $filter->retval[0]->dataset_name
 			);
 
-			$this->session->set_userdata(self::SESSION_NAME, $filterSessionArray);
+			$this->_writeSession($filterSessionArray);
 		}
 		else
 		{
@@ -733,7 +746,7 @@ class FilterWidget extends Widget
 				self::DATASET_NAME_PARAMETER => null
 			);
 
-			$this->session->set_userdata(self::SESSION_NAME, $filterSessionArray);
+			$this->_writeSession($filterSessionArray);
 		}
 	}
 
@@ -746,7 +759,7 @@ class FilterWidget extends Widget
 		{
 			$objToBeSaved = new stdClass();
 
-			$filterSessionArray = $this->session->userdata(self::SESSION_NAME);
+			$filterSessionArray = $this->_readSession();
 
 			if (isset($filterSessionArray[self::SELECTED_FIELDS]))
 			{
@@ -842,7 +855,7 @@ class FilterWidget extends Widget
 		// Selected fields
 		$selectedFields = array();
 
-		$filterSessionArray = $this->session->userdata(self::SESSION_NAME);
+		$filterSessionArray = $this->_readSession();
 		if (isset($filterSessionArray[self::SELECTED_FIELDS]))
 		{
 			$selectedFields = $filterSessionArray[self::SELECTED_FIELDS];
@@ -858,7 +871,7 @@ class FilterWidget extends Widget
 	{
 		$app = $this->app;
 
-		$filterSessionArray = $this->session->userdata(self::SESSION_NAME);
+		$filterSessionArray = $this->_readSession();
 		if (isset($filterSessionArray[self::APP_PARAMETER]))
 		{
 			$app = $filterSessionArray[self::APP_PARAMETER];
@@ -874,7 +887,7 @@ class FilterWidget extends Widget
 	{
 		$datasetName = $this->datasetName;
 
-		$filterSessionArray = $this->session->userdata(self::SESSION_NAME);
+		$filterSessionArray = $this->_readSession();
 		if (isset($filterSessionArray[self::DATASET_NAME_PARAMETER]))
 		{
 			$datasetName = $filterSessionArray[self::DATASET_NAME_PARAMETER];
@@ -891,7 +904,7 @@ class FilterWidget extends Widget
 		$columnsAliases = $this->columnsAliases;
 		$selectedFields = array();
 
-		$filterSessionArray = $this->session->userdata(self::SESSION_NAME);
+		$filterSessionArray = $this->_readSession();
 
 		if (isset($filterSessionArray[self::SELECTED_FIELDS]))
 		{
@@ -922,7 +935,7 @@ class FilterWidget extends Widget
 		// Selected filters
 		$selectedFilters = array();
 
-		$filterSessionArray = $this->session->userdata(self::SESSION_NAME);
+		$filterSessionArray = $this->_readSession();
 		if (isset($filterSessionArray[self::SELECTED_FILTERS]))
 		{
 			$selectedFilters = $filterSessionArray[self::SELECTED_FILTERS];
@@ -937,7 +950,7 @@ class FilterWidget extends Widget
 	private function _setActiveFiltersFromPost(&$activeFilters, &$activeFiltersOperation, &$activeFiltersOption)
 	{
 		$selectedFilters = array();
-		$filterSessionArray = $this->session->userdata(self::SESSION_NAME);
+		$filterSessionArray = $this->_readSession();
 
 		if (isset($filterSessionArray[self::ACTIVE_FILTERS]))
 		{
@@ -1008,6 +1021,8 @@ class FilterWidget extends Widget
 	 */
 	private function _setSessionFilterData()
 	{
+		$session = $this->_readSession();
+
 		$filterSessionArray = array(
 			self::SELECTED_FIELDS => $this->_getSelectedFieldsFromPost(),
 			self::SELECTED_FILTERS => $this->_getSelectedFiltersFromPost(),
@@ -1030,7 +1045,7 @@ class FilterWidget extends Widget
 		$filterSessionArray[self::FILTER_ID] = $this->filterId;
 		$filterSessionArray[self::FILTER_NAME] = $this->filterName;
 
-		$this->session->set_userdata(self::SESSION_NAME, $filterSessionArray);
+		$this->_writeSession(array_merge($session, $filterSessionArray));
 	}
 
 	/**
@@ -1044,7 +1059,7 @@ class FilterWidget extends Widget
 		$activeFiltersOperation = array();
 		$activeFiltersOption = array();
 
-		$filterSessionArray = $this->session->userdata(self::SESSION_NAME);
+		$filterSessionArray = $this->_readSession();
 
 		if (isset($filterSessionArray[self::ACTIVE_FILTERS]))
 		{
@@ -1156,5 +1171,30 @@ class FilterWidget extends Widget
 		}
 
 		return $query;
+	}
+
+	/**
+	 *
+	 */
+	private function _readSession()
+	{
+		if (isset($_SESSION[self::SESSION_NAME]) && isset($_SESSION[self::SESSION_NAME][$this->fhc_controller_id]))
+			return $_SESSION[self::SESSION_NAME][$this->fhc_controller_id];
+
+		return array();
+	}
+
+	/**
+	 *
+	 */
+	private function _writeSession($data)
+	{
+		if (!isset($_SESSION[self::SESSION_NAME])
+			|| (isset($_SESSION[self::SESSION_NAME]) && !is_array($_SESSION[self::SESSION_NAME])))
+		{
+			$_SESSION[self::SESSION_NAME] = array();
+		}
+
+		$_SESSION[self::SESSION_NAME][$this->fhc_controller_id] = $data;
 	}
 }

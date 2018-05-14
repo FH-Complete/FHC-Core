@@ -4,6 +4,7 @@ $this->phrasen['global/studienrichtung']='Degree-Program';
 $this->phrasen['global/institut']='Institute';
 $this->phrasen['global/semester']='Semester';
 $this->phrasen['global/studiensemester']='Semester';
+$this->phrasen['global/studienplan']='Study Plan';
 $this->phrasen['global/studienzentrum']='Study Center';
 $this->phrasen['global/studiengangsleitung']='Program Director';
 $this->phrasen['global/leitung']='Head';

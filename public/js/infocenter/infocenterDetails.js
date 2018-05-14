@@ -1,21 +1,29 @@
-/*
- This program is free software: you can redistribute it and/or modify
- it under the terms of the GNU General Public License as published by
- the Free Software Foundation, either version 3 of the License, or
- (at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>.
+/**
+ *
  */
+function getUrlParameter(sParam)
+{
+    var sPageURL = decodeURIComponent(window.location.search.substring(1)),
+        sURLVariables = sPageURL.split('&'),
+        sParameterName,
+        i;
+
+    for (i = 0; i < sURLVariables.length; i++)
+	{
+        sParameterName = sURLVariables[i].split('=');
+
+        if (sParameterName[0] === sParam)
+		{
+            return sParameterName[1];
+        }
+    }
+}
+
+var fhc_controller_id = getUrlParameter("fhc_controller_id");
+
 /**
  * javascript file for infocenterDetails page
  */
-
 $(document).ready(
 	function ()
 	{
@@ -71,6 +79,14 @@ $(document).ready(
 			}
 		);
 
+		//show popup with zgvinfo
+		$(".zgvinfo").click(function ()
+			{
+				var prestudentid = this.id.substr(this.id.indexOf("_") + 1);
+				openZgvInfoForPrestudent(prestudentid);
+			}
+		);
+
 		//prevent opening modal when Statusgrund not chosen
 		$(".absageModal").on('show.bs.modal', function (e)
 			{
@@ -99,7 +115,7 @@ $(document).ready(
 				var personId = $("#hiddenpersonid").val();
 				var notizId = $("#notizform :input[name='hiddenNotizId']").val();
 				var data = $(this).serializeArray();
-				
+
 				if (notizId !== '')
 				{
 					updateNotiz(notizId, personId, data);
@@ -107,24 +123,23 @@ $(document).ready(
 				else
 				{
 					saveNotiz(personId, data);
-				}			
+				}
 			}
 		);
 
-		
 		//update notiz - autofill notizform
 		$(document).on("click", "#notiztable tbody tr", function ()
 			{
 				var notizId = $(this).find("td:eq(3)").html();
 				var notizTitle = $(this).find("td:eq(1)").text();
 				var notizContent = this.title;
-				
+
 				$("#notizform label:first").text("Notiz ändern").css("color", "red");
 				$("#notizform :input[type='reset']").css("display", "inline-block");
-				
+
 				$("#notizform :input[name='hiddenNotizId']").val(notizId);
 				$("#notizform :input[name='notiztitel']").val(notizTitle);
-				$("#notizform :input[name='notiz']").val(notizContent);				
+				$("#notizform :input[name='notiz']").val(notizContent);
 			}
 		);
 
@@ -137,6 +152,15 @@ $(document).ready(
 
 	});
 
+function openZgvInfoForPrestudent(prestudent_id)
+{
+	var screenwidth = screen.width;
+	var popupwidth = 760;
+	var marginleft = screenwidth - popupwidth;
+	console.log(marginleft);
+	window.open("../getZgvInfoForPrestudent/" + prestudent_id, "_blank","resizable=yes,scrollbars=yes,width="+popupwidth+",height="+screen.height+",left="+marginleft);
+}
+
 // -----------------------------------------------------------------------------------------------------------------
 // ajax calls
 
@@ -145,7 +169,7 @@ function saveFormalGeprueft(personid, akteid, checked)
 	$.ajax({
 		type: "POST",
 		dataType: "json",
-		url: "../saveFormalGeprueft/" + personid,
+		url: "../saveFormalGeprueft/" + personid + '?fhc_controller_id=' + fhc_controller_id,
 		data: {"akte_id": akteid, "formal_geprueft": checked},
 		success: function (data, textStatus, jqXHR)
 		{
@@ -175,7 +199,7 @@ function zgvUebernehmen(personid, prestudentid, btn)
 	$.ajax({
 		type: "POST",
 		dataType: "json",
-		url: "../getLastPrestudentWithZgvJson/" + personid,
+		url: "../getLastPrestudentWithZgvJson/" + personid + '?fhc_controller_id=' + fhc_controller_id,
 		success: function (data, textStatus, jqXHR)
 		{
 			if (data !== null)
@@ -215,7 +239,7 @@ function saveZgv(data)
 		type: "POST",
 		dataType: "json",
 		data: data,
-		url: "../saveZgvPruefung/" + prestudentid,
+		url: "../saveZgvPruefung/" + prestudentid + '?fhc_controller_id=' + fhc_controller_id,
 		success: function (data, textStatus, jqXHR)
 		{
 			if (data === prestudentid)
@@ -241,7 +265,7 @@ function saveNotiz(personid, data)
 		type: "POST",
 		dataType: "json",
 		data: data,
-		url: "../saveNotiz/" + personid,
+		url: "../saveNotiz/" + personid + '?fhc_controller_id=' + fhc_controller_id,
 		success: function (data, textStatus, jqXHR)
 		{
 			refreshNotizen();
@@ -260,7 +284,7 @@ function updateNotiz(notizId, personId, data)
 		type: "POST",
 		dataType: "json",
 		data: data,
-		url: "../updateNotiz/" + notizId + "/" + personId,
+		url: "../updateNotiz/" + notizId + "/" + personId + '?fhc_controller_id=' + fhc_controller_id,
 		success: function (data, textStatus, jqXHR)
 		{
 			if (data)
@@ -309,7 +333,7 @@ function refreshNotizen()
 			//readd tablesorter
 			formatNotizTable()
 		}
-	);	
+	);
 }
 
 function formatNotizTable()

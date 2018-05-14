@@ -78,12 +78,12 @@ $error_msg='';
 	}
 
 	/**
-	 * Löscht alle BenutzerInnen aus NICHT-generierten Verteilern im Studiengang 0 (Erhalter), deren Account vor mehr als 3 Wochen deaktiviert wurde
+	 * Löscht alle BenutzerInnen aus NICHT-generierten Verteilern die nicht für die Lehre sind (Attribut lehre=false), deren Account vor mehr als 3 Wochen deaktiviert wurde
 	 */
 
 	$qry_delete = "	DELETE FROM public.tbl_benutzergruppe
 					WHERE tbl_benutzergruppe.studiensemester_kurzbz IS NULL
-					AND gruppe_kurzbz IN (SELECT gruppe_kurzbz FROM public.tbl_gruppe WHERE generiert=false AND studiengang_kz=0)
+					AND gruppe_kurzbz IN (SELECT gruppe_kurzbz FROM public.tbl_gruppe WHERE generiert=false AND lehre=false)
 					AND uid IN (SELECT uid FROM public.tbl_benutzer WHERE aktiv=false AND updateaktivam<now()-'3 weeks'::interval);";
 
 	if(!($result = $db->db_query($qry_delete)))

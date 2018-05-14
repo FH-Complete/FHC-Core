@@ -392,7 +392,6 @@ class DBTools extends FHC_Controller
 			// **** Permission ****
 			// ToDo: Check Persmissions in the bottom of this file
 			case 'permissions':
-				//var_dump($this->config->item('fhc_acl'));
 				echo ' Permissions!';
 				//$this->config->load('roles');
 				foreach ($this->config->item('fhc_acl') as $b)

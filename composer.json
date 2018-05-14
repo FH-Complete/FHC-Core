@@ -205,7 +205,19 @@
 				"source": {
 					"url": "https://github.com/BlackrockDigital/startbootstrap-sb-admin-2.git",
 					"type": "git",
-					"reference": "master"
+					"reference": "e85ee3814ba12b7095024d31424cc9d19d791d05"
+				}
+			}
+		},
+		{
+			"type": "package",
+			"package": {
+				"name": "ludo/jquery-treetable",
+				"version": "3.2.0",
+				"source": {
+					"url": "https://github.com/ludo/jquery-treetable.git",
+					"type": "git",
+					"reference": "73690a9df26dbc1a49981f9335df2a9cd9808813"
 				}
 			}
 		}
@@ -240,6 +252,7 @@
 		"json-forms": "1.4.0",
 		"jsoneditor": "5.5.6",
 		"kingsquare/json-schema-form": "*",
+		"ludo/jquery-treetable": "^3.2",
 		"michelf/php-markdown": "1.5.0",
 		"ml/json-ld": "1.*",
 		"mottie/tablesorter": "^2.29",
@@ -265,17 +278,6 @@
 	},
 	"config": {
 		"bin-dir": "vendor/bin"
-	},
-	"extra": {
-		"merge-plugin": {
-			"include": [
-				"composer.json",
-				"addons/*/composer.json"
-			],
-			"recurse": true,
-			"replace": false,
-			"merge-dev": false,
-			"merge-extra": false
-		}
 	}
 }
+

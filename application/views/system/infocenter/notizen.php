@@ -9,7 +9,7 @@
 	<tbody>
 	<?php foreach ($notizen as $notiz): ?>	
 		<tr data-toggle="tooltip"
-			title="<?php echo isset($notiz->text) ? strip_tags($notiz->text) : '' ?>">		
+			title="<?php echo isset($notiz->text) ? strip_tags($notiz->text) : '' ?>" style="cursor: pointer">
 			<td><?php echo date_format(date_create($notiz->insertamum), 'd.m.Y H:i:s') ?></td>
 			<td><?php echo html_escape($notiz->titel) ?></td>
 			<td><?php echo $notiz->verfasser_uid ?></td>

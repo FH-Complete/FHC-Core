@@ -115,4 +115,52 @@ class Organisationseinheit_model extends DB_Model
 
 		return $this->execQuery($query, array($oe_kurzbz));
 	}
+
+	/**
+	 * Liefert die ChildNodes einer Organisationseinheit
+	 * @param $oe_kurzbz
+	 * @param bool $includeinactive - wether to include inactive parent oes
+	 * @return array mit den Childs inkl dem Uebergebenen Element
+	 */
+	public function getChilds($oe_kurzbz, $includeinactive = false)
+	{
+		$query = "
+		WITH RECURSIVE oes(oe_kurzbz, oe_parent_kurzbz) as 
+		(
+			SELECT oe_kurzbz, oe_parent_kurzbz FROM public.tbl_organisationseinheit 
+			WHERE oe_kurzbz=? %s
+			UNION ALL
+			SELECT o.oe_kurzbz, o.oe_parent_kurzbz FROM public.tbl_organisationseinheit o, oes 
+			WHERE o.oe_parent_kurzbz=oes.oe_kurzbz
+		)
+		SELECT oe_kurzbz
+		FROM oes
+		GROUP BY oe_kurzbz;";
+
+		return $this->execQuery(sprintf($query, $includeinactive === true ? "" :  "AND aktiv = true"), array($oe_kurzbz));
+	}
+
+	/**
+	 * Liefert die OEs die im Tree ueberhalb der uebergebene OE liegen
+	 * @param $oe_kurzbz
+	 * @param bool $includeinactive - wether to include inactive parent oes
+	 * @return array|null
+	 */
+	public function getParents($oe_kurzbz, $includeinactive = false)
+	{
+		$query=
+		"WITH RECURSIVE oes(oe_kurzbz, oe_parent_kurzbz) as 
+		(
+			SELECT oe_kurzbz, oe_parent_kurzbz FROM public.tbl_organisationseinheit 
+			WHERE oe_kurzbz=? %s
+			UNION ALL
+			SELECT o.oe_kurzbz, o.oe_parent_kurzbz FROM public.tbl_organisationseinheit o, oes 
+			WHERE o.oe_kurzbz=oes.oe_parent_kurzbz and aktiv = true
+		)
+		SELECT oe_kurzbz
+		FROM oes";
+
+		return $this->execQuery(sprintf($query, $includeinactive === true ? "" :  "AND aktiv = true"), array($oe_kurzbz));
+	}
+
 }

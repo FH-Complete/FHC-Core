@@ -95,6 +95,8 @@ class InfoCenter extends FHC_Controller
 		if(!$this->permissionlib->isBerechtigt('basis/person'))
 			show_error('You have no Permission! You need Infocenter Role');
 
+		$this->_setControllerId(); // sets the controller id
+
 		$this->setNavigationMenuArray(); // sets property navigationMenuArray
     }
 
@@ -106,14 +108,14 @@ class InfoCenter extends FHC_Controller
 	 */
 	public function index()
 	{
-		$this->load->view('system/infocenter/infocenter.php');
+		$this->load->view('system/infocenter/infocenter.php', array('fhc_controller_id' => $this->fhc_controller_id));
 	}
-	
+
 	public function infocenterFreigegeben()
 	{
-		$this->load->view('system/infocenter/infocenterFreigegeben.php');
+		$this->load->view('system/infocenter/infocenterFreigegeben.php', array('fhc_controller_id' => $this->fhc_controller_id));
 	}
-	
+
 	/**
 	 * Initialization function, gets person and prestudent data and loads the view with the data
 	 * @param $person_id
@@ -124,10 +126,11 @@ class InfoCenter extends FHC_Controller
 			show_error('person id is not numeric!');
 
 		$personexists = $this->PersonModel->load($person_id);
+
 		if(isError($personexists))
 			show_error($personexists->retval);
 
-		if (empty($personexists->retval[0]))
+		if (empty($personexists->retval))
 			show_error('person does not exist!');
 
 		//mark person as locked for editing
@@ -147,7 +150,7 @@ class InfoCenter extends FHC_Controller
 			)
 		);
 	}
-	
+
 	/**
 	 * unlocks page from edit by a person, redirects to overview filter page
 	 * @param $person_id
@@ -225,6 +228,30 @@ class InfoCenter extends FHC_Controller
 	}
 
 	/**
+	 * Gets Zugangsvoraussetzungen for a prestudents as a description text
+	 * @param $prestudent_id
+	 */
+	public function getZgvInfoForPrestudent($prestudent_id)
+	{
+		$studienordnung = $this->PrestudentstatusModel->getStudienordnungWithZgvText($prestudent_id);
+
+		$prestudentdata = $this->_getPersonAndStudiengangFromPrestudent($prestudent_id);
+		$studiengangkurzbz = $prestudentdata['studiengang_kurzbz'];
+		$studiengangbezeichnung = $prestudentdata['studiengang_bezeichnung'];
+
+		$data = array('studiengang_bezeichnung' => $studiengangbezeichnung, 'studiengang_kurzbz' => $studiengangkurzbz, 'data' => null);
+
+		if (hasData($studienordnung))
+		{
+			$data['data'] = $studienordnung->retval[0]->data;
+		}
+
+		$this->load->view('system/infocenter/studiengangZgvInfo.php',
+			$data
+		);
+	}
+
+	/**
 	 * Saves a zgv for a prestudent. includes Ort, Datum, Nation for bachelor and master.
 	 * @param $prestudent_id
 	 */
@@ -292,7 +319,7 @@ class InfoCenter extends FHC_Controller
 		}
 
 		//check if still Interessent and not freigegeben yet
-		if ($lastStatus->retval[0]->status_kurzbz === 'Interessent' && !isset($lastStatus->retval[0]->bestaetigtam))
+		if (count($lastStatus->retval) > 0 && $lastStatus->retval[0]->status_kurzbz === 'Interessent' && !isset($lastStatus->retval[0]->bestaetigtam))
 		{
 			$result = $this->PrestudentstatusModel->insert(
 				array(
@@ -340,6 +367,11 @@ class InfoCenter extends FHC_Controller
 	{
 		$lastStatus = $this->PrestudentstatusModel->getLastStatus($prestudent_id);
 
+		if (isError($lastStatus))
+		{
+			show_error($lastStatus->retval);
+		}
+
 		if (count($lastStatus->retval) > 0)
 		{
 			$lastStatus = $lastStatus->retval[0];
@@ -367,9 +399,33 @@ class InfoCenter extends FHC_Controller
 					show_error($result->retval);
 				}
 
-				$this->_sendFreigabeMail($prestudent_id);
+				$this->load->model('crm/dokumentprestudent_model', 'DokumentprestudentModel');
 
 				$logdata = $this->_getPersonAndStudiengangFromPrestudent($prestudent_id);
+
+				//set documents which have been formal geprüft to accepted
+				$result = $this->AkteModel->loadWhere(array('person_id' => $logdata['person_id'], 'formal_geprueft_amum !=' => NULL));
+
+				if (isError($result))
+				{
+					show_error($result->retval);
+				}
+
+				$dokument_kurzbzs = array();
+
+				foreach ($result->retval as $akte)
+				{
+					$dokument_kurzbzs[] = $akte->dokument_kurzbz;
+				}
+
+				$result = $this->DokumentprestudentModel->setAcceptedDocuments($prestudent_id, $dokument_kurzbzs);
+
+				if (isError($result))
+				{
+					show_error($result->retval);
+				}
+
+				$this->_sendFreigabeMail($prestudent_id);
 
 				$this->_log($logdata['person_id'], 'freigegeben', array($prestudent_id, $logdata['studiengang_kurzbz']));
 			}
@@ -377,7 +433,7 @@ class InfoCenter extends FHC_Controller
 
 		$this->_redirectToStart($prestudent_id, 'ZgvPruef');
 	}
-	
+
 	/**
 	 * Saves a new Notiz for a person
 	 * @param $person_id
@@ -401,7 +457,7 @@ class InfoCenter extends FHC_Controller
 			->set_content_type('application/json')
 			->set_output(json_encode($result->retval));
 	}
-	
+
 	/**
 	 * Updates a new Notiz for a person
 	 * @param int $notiz_id
@@ -409,7 +465,7 @@ class InfoCenter extends FHC_Controller
 	 * @return bool true if success
 	 */
 	public function updateNotiz($notiz_id, $person_id)
-	{	
+	{
 		$titel = $this->input->post('notiztitel');
 		$text = $this->input->post('notiz');
 
@@ -423,18 +479,18 @@ class InfoCenter extends FHC_Controller
 				"updatevon" => $this->uid
 			)
 		);
-		
-		
+
+
 		$json = FALSE;
-		
+
 		if (isSuccess($result))
 		{
 			$json = TRUE;
-			
+
 			//set log "Notiz updated"
 			$this->_log($person_id, 'updatenotiz', array($titel));
 		}
-		
+
 		$this->output
 			->set_content_type('application/json')
 			->set_output(json_encode($json));
@@ -562,7 +618,7 @@ class InfoCenter extends FHC_Controller
 				'children' => array()
 			)
 		);
-				
+
 		$this->_fillFilters($listFiltersSent, $filtersarray['abgeschickt']);
 		$this->_fillFilters($listFiltersNotSent, $filtersarray['nichtabgeschickt']);
 
@@ -608,9 +664,10 @@ class InfoCenter extends FHC_Controller
 	{
 		foreach ($filters as $filterId => $description)
 		{
-			$toPrint = "%s=%s";
+			$toPrint = "%s?%s=%s&%s=%s";
+
 			$tofill['children'][] = array(
-				'link' => sprintf($toPrint, site_url('system/infocenter/InfoCenter?filter_id'), $filterId),
+				'link' => sprintf($toPrint, site_url('system/infocenter/InfoCenter'), 'filter_id', $filterId, 'fhc_controller_id', $this->fhc_controller_id),
 				'description' => $description
 			);
 		}
@@ -620,10 +677,10 @@ class InfoCenter extends FHC_Controller
 	{
 		foreach ($filters as $filterId => $description)
 		{
-			$toPrint = "%s=%s";
+			$toPrint = "%s?%s=%s&%s=%s";
 
 			$tofill['children'][] = array(
-				'link' => sprintf($toPrint, site_url('system/infocenter/InfoCenter?filter_id'), $filterId),
+				'link' => sprintf($toPrint, site_url('system/infocenter/InfoCenter'), 'filter_id', $filterId, 'fhc_controller_id', $this->fhc_controller_id),
 				'description' => $description,
 				'subscriptDescription' => 'Remove',
 				'subscriptLinkClass' => 'remove-filter',
@@ -833,8 +890,9 @@ class InfoCenter extends FHC_Controller
 
 		$person_id = $prestudent->retval[0]->person_id;
 		$studiengang_kurzbz = $prestudent->retval[0]->studiengang;
+		$studiengang_bezeichnung = $prestudent->retval[0]->studiengangbezeichnung;
 
-		return array('person_id' => $person_id, 'studiengang_kurzbz' => $studiengang_kurzbz);
+		return array('person_id' => $person_id, 'studiengang_kurzbz' => $studiengang_kurzbz, 'studiengang_bezeichnung' => $studiengang_bezeichnung);
 	}
 
 	/**
@@ -970,5 +1028,22 @@ class InfoCenter extends FHC_Controller
 		{
 			$this->loglib->logError('Studiengang has no mail for sending Freigabe mail');
 		}
+	}
+
+	/**
+	 * Sets the unique id for the called controller
+	 */
+	private function _setControllerId()
+	{
+		$fhc_controller_id = $this->input->get('fhc_controller_id');
+
+		if (!isset($fhc_controller_id) || empty($fhc_controller_id))
+		{
+			$fhc_controller_id = uniqid();
+			header('Location: '.$_SERVER['REQUEST_URI'].'?fhc_controller_id='.$fhc_controller_id);
+			exit;
+		}
+
+		$this->fhc_controller_id = $fhc_controller_id;
 	}
 }

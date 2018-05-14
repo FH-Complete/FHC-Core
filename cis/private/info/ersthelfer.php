@@ -60,7 +60,7 @@ if(check_lektor($user))
 			{ 
 				$("#t1").tablesorter(
 				{
-					sortList: [[2,0]],
+					sortList: [[0,0],[1,0]],
 					widgets: ["zebra"]
 				});
 				$("#t2").tablesorter(
@@ -103,40 +103,62 @@ if(check_lektor($user))
 				
 				<?php
 					$zeilenzaehl=0;
-					$sql_query = "SELECT vorname, nachname, telefonklappe, ort_kurzbz, beschreibung, standort_id 
-					FROM campus.vw_mitarbeiter 
-					JOIN public.tbl_benutzerfunktion USING (uid) 
-					JOIN public.tbl_funktion USING (funktion_kurzbz) 
-					WHERE funktion_kurzbz='ersthelfer' 
-					AND (datum_bis>='now()' OR datum_bis IS NULL) 
-					AND campus.vw_mitarbeiter.aktiv=TRUE 
-					AND standort_id IS NOT NULL 
-					ORDER BY standort_id, nachname, vorname";
+					$sql_query = "	SELECT uid, 
+										vorname,
+										nachname,
+										COALESCE((
+												SELECT tbl_kontakt.kontakt || ' - ' || telefonklappe
+												FROM PUBLIC.tbl_mitarbeiter
+												LEFT JOIN PUBLIC.tbl_kontakt USING (standort_id)
+												WHERE mitarbeiter_uid = vw_mitarbeiter.uid
+													AND (
+														tbl_kontakt.kontakttyp = 'telefon'
+														OR tbl_kontakt.kontakttyp IS NULL
+														) limit 1
+												), '-') AS telefonklappe,
+										COALESCE((
+												SELECT planbezeichnung
+												FROM PUBLIC.tbl_mitarbeiter
+												LEFT JOIN PUBLIC.tbl_ort USING (ort_kurzbz)
+												WHERE mitarbeiter_uid = vw_mitarbeiter.uid
+												), '-') AS ort_kurzbz,
+										beschreibung
+									FROM campus.vw_mitarbeiter
+									JOIN PUBLIC.tbl_benutzerfunktion USING (uid)
+									JOIN PUBLIC.tbl_funktion USING (funktion_kurzbz)
+									WHERE funktion_kurzbz = 'ersthelfer'
+										AND (
+											datum_von <= 'now()'
+											OR datum_von IS NULL
+											)
+										AND (
+											datum_bis >= 'now()'
+											OR datum_bis IS NULL
+											)
+										AND campus.vw_mitarbeiter.aktiv = TRUE
+									ORDER BY nachname,
+										vorname";
 					$result = $db->db_query($sql_query);
 					if ($db->db_num_rows($result) > 0)
 					{
-						$count = 0;
-						
 						echo '<table class="tablesorter" id="t1">
 						<thead>
 							<tr>
-								<th></th>
-								<th>'.$p->t("global/vorname").'</th>
 								<th>'.$p->t("global/nachname").'</th>
+								<th>'.$p->t("global/vorname").'</th>
 								<th>'.$p->t("lvplan/raum").'</th>				
 								<th>'.$p->t("global/telefonnummer").'</th>
 							</tr>
 						</thead><tbody>';
 						
 						while($row = $db->db_fetch_object($result))		
-						{$count++;
+						{
 							echo '
 							<tr>
-								<td width="10px">'.$count.'</td>
+								<td width="40%"><a href="../profile/index.php?uid='.$row->uid.'">'.$row->nachname.'</a></td>
 								<td width="30%">'.$row->vorname.'</td>
-								<td width="40%">'.$row->nachname.'</td>
 								<td width="15%">'.$row->ort_kurzbz.'</td>
-								<td width="30%"><nobr>01/333 40 77 - <strong>'.$row->telefonklappe.'</strong></nobr></td>
+								<td width="30%"><nobr>'.$row->telefonklappe.'</nobr></td>
 							</tr>';
 						}
 						
@@ -211,7 +233,7 @@ if(check_lektor($user))
 		
 				<?php
 					$zeilenzaehl=0;
-					$sql_query = "SELECT vorname, nachname, telefonklappe, kontakt, ort_kurzbz, beschreibung, vw_mitarbeiter.standort_id 
+					$sql_query = "SELECT uid, vorname, nachname, telefonklappe, kontakt, ort_kurzbz, beschreibung, vw_mitarbeiter.standort_id 
 					FROM campus.vw_mitarbeiter 
 					JOIN public.tbl_benutzerfunktion USING (uid) 
 					JOIN public.tbl_funktion USING (funktion_kurzbz) 
@@ -238,7 +260,7 @@ if(check_lektor($user))
 						{
 								echo '
 									<tr>
-										<td>'.$row->nachname.'</td>
+										<td><a href="../profile/index.php?uid='.$row->uid.'">'.$row->nachname.'</a></td>
 										<td>'.$row->vorname.'</td>
 										<td>('.$row->beschreibung.')</td>
 										<td><nobr>'.$row->kontakt.'</nobr></td>
@@ -253,7 +275,7 @@ if(check_lektor($user))
 		
 				<?php
 					$zeilenzaehl=0;
-					$sql_query = "SELECT vorname, nachname, telefonklappe, ort_kurzbz, beschreibung, standort_id 
+					$sql_query = "SELECT uid, vorname, nachname, telefonklappe, ort_kurzbz, beschreibung, standort_id 
 					FROM campus.vw_mitarbeiter 
 					JOIN public.tbl_benutzerfunktion USING (uid) 
 					JOIN public.tbl_funktion USING (funktion_kurzbz) 
@@ -277,7 +299,7 @@ if(check_lektor($user))
 						{
 								echo '
 									<tr>
-										<td width="40%">'.$row->nachname.'</td>
+										<td width="40%"><a href="../profile/index.php?uid='.$row->uid.'">'.$row->nachname.'</a></td>
 										<td width="30%">'.$row->vorname.'</td>
 									</tr>';
 						}

@@ -686,7 +686,6 @@
 			<text:section text:style-name="Sect1" text:name="Bereich1">
 				<text:h text:style-name="P72" text:outline-level="1">Ausbildungsvertrag</text:h>
 					<!-- Ueberprueft ob benoetigte Datenfelder leer sind -->
-					<xsl:if test="svnr = ''"><text:p text:style-name="P91">Keine Sozialversicherungsnummer oder Ersatzkennzeichen vorhanden</text:p></xsl:if>
 					<xsl:if test="gebdatum = ''"><text:p text:style-name="P91">Kein Geburtsdatum vorhanden</text:p></xsl:if>
 					<xsl:if test="titel_kurzbz = ''"><text:p text:style-name="P91">Kein akademischer Grad vorhanden</text:p></xsl:if>
 					<xsl:if test="student_maxsemester = ''"><text:p text:style-name="P91">Keine Ausbildungsdauer vorhanden</text:p></xsl:if>
@@ -732,52 +731,6 @@
 				</text:p>
 				<text:p text:style-name="P4">
 					<text:span text:style-name="T12">Geburtsdatum (Date of birth): <text:tab/><xsl:value-of select="gebdatum"/></text:span>
-				</text:p>
-				<text:p text:style-name="P4">
-					<text:span text:style-name="T10">Sozialversicherungsnr. </text:span>
-					<text:span text:style-name="Footnote_20_Symbol">
-						<text:span text:style-name="T10">
-							<text:note text:id="ftn1" text:note-class="footnote">
-								<text:note-citation>1</text:note-citation>
-								<text:note-body>
-									<text:p text:style-name="Standard">
-										<text:span text:style-name="T15">
-											<text:s/>
-										</text:span>
-										<text:span text:style-name="T2">Gemäß § 3 Absatz 1 des Bildungsdokumentationsgesetzes idgF und der Bildungsdokumentationsverordnung-Fachhochschulen idgF<text:s/>hat der Erhalter die Sozialversicherungsnummer zu erfassen und gemäß § 7 Absatz 2 im Wege der Agentur für Qualitätssicherung und Akkreditierung Austria an das zuständige Bundesministerium und die Bundesanstalt Statistik Österreich zu übermitteln.</text:span>
-									</text:p>
-									<text:p text:style-name="P8"/>
-								</text:note-body>
-							</text:note>
-						</text:span>
-					</text:span>
-					<text:span text:style-name="Footnote_20_Symbol">
-						<text:span text:style-name="T10"> </text:span>
-					</text:span>
-					<text:span text:style-name="T13">:<text:tab/><xsl:value-of select="svnr"/></text:span>
-				</text:p>
-				<text:p text:style-name="P5">
-					<text:span text:style-name="T12">
-						<text:tab/>(Social security number)</text:span>
-					<text:span text:style-name="Footnote_20_Symbol">
-						<text:span text:style-name="T12">
-							<text:note text:id="ftn2" text:note-class="footnote">
-								<text:note-citation>2</text:note-citation>
-								<text:note-body>
-									<text:p text:style-name="Standard">
-										<text:span text:style-name="T17">
-											<text:s/>
-										</text:span>
-										<text:span text:style-name="T4">Pursuant to § 3 section 1 of the Education Documentation Act as amended and the Education Documentation Regulation for Universities of Applied Sciences as amended, the operator shall record the social security number pursuant to § 7 paragraph 2 and shall transfer it via the Agency for Quality Assurance and Accreditation Austria to the competent Ministry and Statistics Austria.</text:span>
-									</text:p>
-								</text:note-body>
-							</text:note>
-						</text:span>
-					</text:span>
-					<text:span text:style-name="Footnote_20_Symbol">
-						<text:span text:style-name="T12"> </text:span>
-					</text:span>
-					<text:span text:style-name="T12">: </text:span>
 				</text:p>
 				<text:p text:style-name="P17"/>
 				<text:p text:style-name="P17"/>
@@ -1220,7 +1173,7 @@
 					<text:span text:style-name="T40">6.2.9 Verwertungsrechte</text:span>
 					<text:span text:style-name="T41"> </text:span>
 				</text:p>
-				<text:p text:style-name="P39">Sofern nicht im Einzelfall andere Regelungen zwischen dem Erhalter und der Studentin oder dem Studenten getroffen wurden, ist die Studentin oder der Student verpflichtet, dem Erhalter die Rechte an Forschungs- und Entwicklungsergebnissen auf dessen schriftliche Anfrage hin anzubieten.</text:p>
+				<text:p text:style-name="P39">Sofern nicht im Einzelfall andere Regelungen zwischen dem Erhalter und der Studentin oder dem Studenten getroffen wurden, ist die Studentin oder der Student verpflichtet, dem Erhalter die Rechte an Forschungs- und Entwicklungsergebnissen, die im Rahmen von geförderten Projekten geschaffen wurden, auf dessen schriftliche Anfrage hin einzuräumen.</text:p>
 				<text:p text:style-name="P39"/>
 				<text:p text:style-name="P41">6.2.10 Aufzeichnungen und Mitschnitte</text:p>
 				<text:p text:style-name="P39">Es ist der/dem Studierenden ausdrücklich untersagt, Lehrveranstaltungen als Ganzes oder nur Teile davon aufzuzeichnen und/oder mitzuschneiden (z.B. durch Film- und/oder Tonaufnahmen oder sonstige hierfür geeignete audiovisuelle Mittel). Darüber hinaus ist jede Form der öffentlichen Zurverfügungstellung (drahtlos oder drahtgebunden) der vorgenannten Aufnahmen z.B. in sozialen Netzwerken wie Facebook, StudiVZ etc., aber auch auf Youtube usw. oder durch sonstige für diese Zwecke geeignete Kommunikations-mittel untersagt. Diese Regelungen gelten sinngemäß auch für Skripten, sonstige Lernbehelfe und Prüfungsangaben. </text:p>
@@ -1233,14 +1186,13 @@
 				<text:p text:style-name="P20">Die Studentin bzw. der Student ist zur Geheimhaltung von Forschungs- und Entwicklungsaktivitäten und -ergebnissen gegenüber Dritten verpflichtet. </text:p>
 				<text:p text:style-name="P20"/>
 				<text:p text:style-name="P67">6.2.9 Exploitation Rights</text:p>
-				<text:p text:style-name="P20">Unless other arrangements have been agreed between the operator and the student at an individual level, on written request, the student undertakes to offer the operator the rights to research and development results. </text:p>
+				<text:p text:style-name="P20">Unless otherwise agreed between the operator and the student on an individual basis, the student is required, upon written request, to offer the operator the rights to research and development results generated as part of funded projects.</text:p>
 				<text:p text:style-name="P20"/>
 				<text:p text:style-name="P20"/>
 				<text:p text:style-name="P20"/>
 				<text:p text:style-name="P20">6.2.10 Recordings </text:p>
 				<text:p text:style-name="P20">It is expressly forbidden for the student to record lectures in part or in total (e.g. by using film and / or sound recordings or other audio-visual means suitable for this purpose). In addition, any form of making the aforementioned recordings publically available (wired or wireless) for example in social networks such as Facebook, StudiVZ etc., but also on Youtube, etc., or by other means of communication designed for these purposes is strictly prohibited. These regulations shall apply correspondingly to scripts, other learning aids and examination data. </text:p>
 				<text:p text:style-name="P20">The only exception is a recording exclusively for the purpose of learning, study and research and for personal use, provided that the lecturer has expressly granted his / her prior written consent.</text:p>
-				<text:p text:style-name="P20"/>
 				<text:p text:style-name="P20"/>
 				<text:p text:style-name="P20"/>
 				<text:p text:style-name="P20"/>
@@ -1254,7 +1206,7 @@
 				<text:p text:style-name="P39">Im Falle eines Unfalles mit körperlicher Verletzung des/der Studierenden im Zusammenhang mit dem Studium ist die/der Studierende verpflichtet, diesen innerhalb von drei Tagen dem Studiengangssekretariat zu melden. Dies betrifft auch Wegunfälle zur oder von der FH.</text:p>
 				<text:p text:style-name="P39"/>
 				<text:p text:style-name="P39">6.2.13 Schadensmeldung </text:p>
-				<text:p text:style-name="P39">Im Falle des Eintretens eines Schadens am Inventar der Fachhochschule ist der/die Studierende verpflichtet, diesen innerhalb von drei Tagen dem Studiengangssekretariat zu melden. Allfällige Haftungsansprüche bleiben hiervon unberührt.</text:p>
+				<text:p text:style-name="P39">Im Falle des Eintretens eines Schadens am Inventar der Fachhochschule ist der/die Studierende verpflichtet, diesen unverzüglich, spätestens aber innerhalb von drei Tagen dem Studiengangssekretariat zu melden. Allfällige Haftungsansprüche bleiben hiervon unberührt.</text:p>
 				<text:p text:style-name="P39"/>
 				<text:p text:style-name="P92">6.2.14 Rückgabeverpflichtung bei Studienende </text:p>
 				<text:p text:style-name="P39">Die Studentin bzw. der Student ist verpflichtet, bei einer Beendigung des Studiums unverzüglich alle zur Verfügung gestellten Gerätschaften, Bücher, Schlüssel und sonstige Materialien zurückzugeben.</text:p>
@@ -1280,7 +1232,8 @@
 				<text:p text:style-name="P20"/>
 				<text:p text:style-name="P20"/>
 				<text:p text:style-name="P20">6.2.13 Damage Report</text:p>
-				<text:p text:style-name="P20">If any damage should be caused to the inventory of the University of Applied Sciences, the student undertakes to report this to the administrative assistant of the degree program within three days. Any liability claims shall remain unaffected.</text:p>
+				<text:p text:style-name="P20">In the case of damage to the inventory of the University of Applied Sciences, the student is obliged to notify the course secretariat immediately, but no later than within three days. Any liability claims remain unaffected.</text:p>
+				<text:p text:style-name="P20"/>
 				<text:p text:style-name="P20"/>
 				<text:p text:style-name="P92">6.2.14 Obligation to Return Borrowed Items</text:p>
 				<text:p text:style-name="P20">The student undertakes to return promptly all equipment, books, keys and other materials that have been made available, when the course is finished or broken off.</text:p>
@@ -1336,7 +1289,7 @@
 						<text:p text:style-name="P76">persönliche<text:span text:style-name="T24">m</text:span> Verhalten, das zu einer Beeinträchtigung des Images und/oder Betriebes des Studienganges, der Fach-hochschule bzw. des Erhalters oder von Personen führt, die für die Fachhochschule bzw. den Erhalter tätig sind;</text:p>
 					</text:list-item>
 					<text:list-item>
-						<text:p text:style-name="P76">Verletzung der Verpflichtung, dem Erhalter die Rechte an Forschungs- und Entwicklungsergebnissen anzubieten (siehe Pkt. 6.2.9);</text:p>
+						<text:p text:style-name="P76">Verletzung der Verpflichtung, dem Erhalter die Rechte an Forschungs- und Entwicklungsergebnissen einzuräumen (siehe Pkt. 6.2.9);</text:p>
 					</text:list-item>
 					<text:list-item>
 						<text:p text:style-name="P76">Verletzung der Geheimhaltungspflicht (siehe Pkt. 6.2.11); </text:p>
@@ -1414,7 +1367,7 @@
 						<text:span text:style-name="T38">Das gesamte Studienprogramm wird in englischer Sprache angeboten. Die Studentin bzw. der Student erklärt, die englische Sprache in Wort und Schrift in dem für eine akademische Ausbildung erforderlichen Ausmaß zu beherrschen.</text:span>
 					</text:p>
 					<text:p text:style-name="P71"/>
-					<text:p text:style-name="P53">Studierende des Studiengangs sind verpflichtet, eine EDV-Ausstattung zu beschaffen und zu unterhalten, die es ermöglicht, an den Fernlehrelementen teilzunehmen. Die gesamten Kosten der Anschaffung und des Betriebs (inkl. Kosten für Internet und e-mail) trägt der Student bzw. die Studentin. </text:p>
+					<text:p text:style-name="P53">Studierende des Studiengangs sind verpflichtet, eine EDV-Ausstattung zu beschaffen und zu unterhalten, die es ermöglicht, an den Fernlehrelementen teilzunehmen. Die gesamten Kosten der Anschaffung und des Betriebs (inkl. Kosten für Internet) trägt der Student bzw. die Studentin. </text:p>
 				</xsl:if>
 				<text:list xml:id="list101940709679101" text:continue-numbering="true" text:style-name="WW8Num4">
 					<text:list-item>
@@ -1444,7 +1397,7 @@
 					</text:p>
 					<text:p text:style-name="P56"/>
 					<text:p text:style-name="P56"/>
-					<text:p text:style-name="P55">Students in the program are required to obtain and maintain computer equipment which allows them to participate in the distance learning elements. The total cost of acquisition and operation (including costs for Internet and e-mail) shall be borne by the student. </text:p>
+					<text:p text:style-name="P55">Students in the program are required to obtain and maintain computer equipment which allows them to participate in the distance learning elements. The total cost of acquisition and operation (including costs for Internet) shall be borne by the student. </text:p>
 				</xsl:if>
 				<text:p text:style-name="P65">
 					<text:soft-page-break/>

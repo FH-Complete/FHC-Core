@@ -9,8 +9,8 @@
 			'fontawesome' => true,
 			'sbadmintemplate' => true,
 			'tablesorter' => true,
-			'customCSSs' => 'skin/tablesort_bootstrap.css',
-			'customJSs' => array('include/js/bootstrapper.js', 'include/js/infocenter/infocenterPersonDataset.js')
+			'customCSSs' => 'public/css/sbadmin2/tablesort_bootstrap.css',
+			'customJSs' => array('public/js/bootstrapper.js', 'public/js/infocenter/infocenterPersonDataset.js')
 		)
 	);
 ?>
@@ -29,7 +29,7 @@
 				</div>
 				<div>
 					<?php
-						$this->load->view('system/infocenter/infocenterData.php');
+						$this->load->view('system/infocenter/infocenterData.php', array('fhc_controller_id' => $fhc_controller_id));
 					?>
 				</div>
 			</div>

@@ -107,4 +107,40 @@ class Prestudentstatus_model extends DB_Model
 
 		return $this->execQuery($query, $parametersArray);
 	}
+
+	/**
+	 * Gets Studienordnung for last status of Prestudent
+	 * @param $prestudent_id
+	 * @return array
+	 */
+	public function getStudienordnungWithZgvText($prestudent_id)
+	{
+		$lastStatus = $this->getLastStatus($prestudent_id);
+
+		if ($lastStatus->error)
+		{
+			return error($lastStatus->retval);
+		}
+
+		if (count($lastStatus->retval) > 0)
+		{
+			$lastStatus = $lastStatus->retval[0];
+
+			$this->addJoin('lehre.tbl_studienplan', 'studienplan_id');
+			$this->addJoin('lehre.tbl_studienordnung', 'studienordnung_id');
+			$this->addJoin('addon.tbl_stgv_zugangsvoraussetzung', 'studienordnung_id');
+			return $this->loadWhere(
+				array(
+					'public.tbl_prestudentstatus.prestudent_id' => $lastStatus->prestudent_id,
+					'public.tbl_prestudentstatus.status_kurzbz' => $lastStatus->status_kurzbz,
+					'public.tbl_prestudentstatus.studiensemester_kurzbz' => $lastStatus->studiensemester_kurzbz,
+					'public.tbl_prestudentstatus.ausbildungssemester' => $lastStatus->ausbildungssemester
+				)
+			);
+		}
+		else
+		{
+			return sucess(array());
+		}
+	}
 }

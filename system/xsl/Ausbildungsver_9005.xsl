@@ -359,7 +359,6 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 		</text:sequence-decls>
 		<text:h text:style-name="P22" text:outline-level="1" text:is-list-header="true">Ausbildungsvertrag außerordentliches Studium (Besuch einzelner Lehrveranstaltungen eines Studiengangs)</text:h>
 			<!-- Ueberprueft ob benoetigte Datenfelder leer sind -->
-			<xsl:if test="svnr = ''"><text:p text:style-name="P42">Keine Sozialversicherungsnummer oder Ersatzkennzeichen vorhanden</text:p></xsl:if>
 			<xsl:if test="gebdatum = ''"><text:p text:style-name="P42">Kein Geburtsdatum vorhanden</text:p></xsl:if>
 			<xsl:if test="student_maxsemester = ''"><text:p text:style-name="P42">Keine Ausbildungsdauer vorhanden</text:p></xsl:if>
 		<text:p text:style-name="P2"/>
@@ -378,25 +377,6 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 		</text:p>
 		<text:p text:style-name="P6">Adresse: <text:tab/><xsl:value-of select="strasse"/>; <xsl:value-of select="plz"/></text:p>
 		<text:p text:style-name="P7">Geburtsdatum: <text:tab/><text:database-display text:table-name="" text:table-type="table" text:column-name="Geb.datum"><xsl:value-of select="gebdatum"/></text:database-display></text:p>
-		<text:p text:style-name="P1">
-		<text:span text:style-name="T10"><text:span text:style-name="T10">Sozialversicherungsnummer:</text:span>
-		<text:span text:style-name="Footnote_20_Symbol">
-			<text:span text:style-name="T10">
-			<text:note text:id="ftn1" text:note-class="footnote">
-			 <text:note-citation text:label="1">1</text:note-citation>
-				<text:note-body>
-				<text:p text:style-name="Standard">
-					<text:span text:style-name="T4">
-					<text:s/>
-					</text:span>
-					<text:span text:style-name="T5">Gemäß § 3 Absatz 1 des Bildungsdokumentationsgesetzes idgF und der Bildungsdokumentationsverordnung-Fachhochschulen <text:s/> idgF hat der Erhalter die Sozialversicherungsnummer zu erfassen und gemäß § 7 Absatz 2 im Wege der Agentur für Qualitätssicherung und Akkreditierung Austria an das zuständige Bundesministerium und die Bundesanstalt Statistik Österreich zu übermitteln.</text:span>
-				</text:p>
-				<text:p text:style-name="P10"/>
-				</text:note-body>
-			</text:note>
-			</text:span>
-		</text:span><text:tab/><xsl:value-of select="svnr"/></text:span>
-		</text:p>
 		<text:p text:style-name="P11"/>
 		<text:p text:style-name="P4">(kurz „ao. Studentin“ bzw. „ao. Student“ genannt) andererseits im Rahmen des außerordentlichen Studiums bzw. des Besuchs einzelner Lehrveranstaltungen an der FH Technikum Wien.</text:p>
 		<text:p text:style-name="P4">Die konkreten Lehrveranstaltungen des außerordentlichen Studiums sind in der Information über die Zulassung zum außerordentlichen Studium angeführt.</text:p>
@@ -528,7 +508,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 		<text:p text:style-name="P32">6.2.7 Aktualisierung eigener Daten und Bezug von Informationen</text:p>
 		<text:p text:style-name="P35">Die ao. Studentin bzw. der ao. Student hat unaufgefordert dafür zu sorgen, dass die von ihr/ihm beigebrachten Daten aktuell sind. Änderungen sind der Studiengangsassistenz unverzüglich schriftlich mitzuteilen. Darüber hinaus trifft sie/ihn die Pflicht, sich von studienbezogenen Informationen, die ihr/ihm an die vom Erhalter zur Verfügung gestellte Emailadresse zugestellt werden, in geeigneter Weise Kenntnis zu verschaffen.</text:p>
 		<text:p text:style-name="P32">6.2.8 Verwertungsrechte</text:p>
-		<text:p text:style-name="P35">Sofern nicht im Einzelfall andere Regelungen zwischen dem Erhalter und der ao. Studentin oder dem ao. Studenten getroffen wurden, ist die ao. Studentin oder der ao. Student verpflichtet, dem Erhalter die Rechte an Forschungs- und Entwicklungsergebnissen auf dessen schriftliche Anfrage hin anzubieten.</text:p>
+		<text:p text:style-name="P35">Sofern nicht im Einzelfall andere Regelungen zwischen dem Erhalter und der ao. Studentin oder dem ao. Studenten getroffen wurden, ist die ao. Studentin oder der ao. Student verpflichtet, dem Erhalter die Rechte an Forschungs- und Entwicklungsergebnissen, die im Rahmen von geförderten Projekten geschaffen wurden, auf dessen schriftliche Anfrage hin einzuräumen.</text:p>
 		<text:p text:style-name="P32">6.2.9 Aufzeichnungen und Mitschnitte</text:p>
 		<text:p text:style-name="P35">Es ist der/dem ao. Studierenden ausdrücklich untersagt, Lehrveranstaltungen als Ganzes oder nur Teile davon aufzuzeichnen und/oder mitzuschneiden (z.B. durch Film- und/oder Tonaufnahmen oder sonstige hierfür geeignete audiovisuelle Mittel). Darüber hinaus ist jede Form der öffentlichen Zurverfügungstellung (drahtlos oder drahtgebunden) der vorgenannten Aufnahmen z.B. in sozialen Netzwerken wie Facebook, StudiVZ etc, aber auch auf Youtube usw. oder durch sonstige für diese Zwecke geeignete Kommunikationsmittel untersagt. Diese Regelungen gelten sinngemäß auch für Skripten, sonstige Lernbehelfe und Prüfungsangaben.</text:p>
 		<text:p text:style-name="P35">Ausgenommen hiervon ist eine Aufzeichnung zu ausschließlichen Lern-, Studien- und Forschungszwecken und zum privaten Gebrauch, sofern hierfür der/die Vortragende vorab ausdrücklich seine/ihre schriftliche Zustimmung erteilt hat.</text:p>
@@ -537,7 +517,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 		<text:p text:style-name="P31">6.2.11 Unfallmeldung</text:p>
 		<text:p text:style-name="P5">Im Falle eines Unfalles mit körperlicher Verletzung des/der ao. Studierenden im Zusammenhang mit dem ao. Studium ist die/der ao. Studierende verpflichtet, diesen innerhalb von drei Tagen dem Studiengangssekretariat zu melden. Dies betrifft auch Wegunfälle zur oder von der FH.</text:p>
 		<text:p text:style-name="P31">6.2.12 Schadensmeldung</text:p>
-		<text:p text:style-name="P5">Im Falle des Eintretens eines Schadens am Inventar der Fachhochschule ist der/die ao. Studierende verpflichtet, diesen innerhalb von drei Tagen dem Studiengangssekretariat zu melden. Allfällige Haftungsansprüche bleiben hiervon unberührt.</text:p>
+		<text:p text:style-name="P5">Im Falle des Eintretens eines Schadens am Inventar der Fachhochschule ist der/die ao. Studierende verpflichtet, diesen unverzüglich, spätestens aber innerhalb von drei Tagen dem Studiengangssekretariat zu melden. Allfällige Haftungsansprüche bleiben hiervon unberührt.</text:p>
 		<text:p text:style-name="P31">6.2.13 Rückgabeverpflichtung bei Studienende</text:p>
 		<text:p text:style-name="P5">Die ao. Studentin bzw der ao. Student ist verpflichtet, bei einer Beendigung des ao. Ausbildungsverhältnisses unverzüglich alle zur Verfügung gestellten Gerätschaften, Bücher, Schlüssel und sonstige Materialien zurückzugeben.</text:p>
 		<text:p text:style-name="P5"/>
@@ -575,7 +555,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 			<text:p text:style-name="P40">persönlichem Verhalten, das zu einer Beeinträchtigung des Images und/oder Betriebes des Studienganges, der Fachhochschule bzw. des Erhalters oder von Personen führt, die für die Fachhochschule bzw. den Erhalter tätig sind;</text:p>
 		</text:list-item>
 		<text:list-item>
-			<text:p text:style-name="P40">Verletzung der Verpflichtung, dem Erhalter die Rechte an Forschungs- und Entwicklungsergebnissen anzubieten (siehe Pkt. 6.2.8);</text:p>
+			<text:p text:style-name="P40">Verletzung der Verpflichtung, dem Erhalter die Rechte an Forschungs- und Entwicklungsergebnissen einzuräumen (siehe Pkt. 6.2.8);</text:p>
 		</text:list-item>
 		<text:list-item>
 			<text:p text:style-name="P40">Verletzung der Geheimhaltungspflicht (siehe Pkt. 6.2.10); </text:p>
@@ -587,10 +567,10 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 			<text:p text:style-name="P40">Nichterfüllung finanzieller Verpflichtungen trotz Mahnung (z.B. Unkostenbeitrag, Studienbeitrag etc.);</text:p>
 		</text:list-item>
 		<text:list-item>
-			<text:p text:style-name="P40">Weigerung zur Beibringung von Daten (siehe Pkt. 6.2.5)</text:p>
+			<text:p text:style-name="P40">Weigerung zur Beibringung von Daten (siehe Pkt. 6.2.5);</text:p>
 		</text:list-item>
 		<text:list-item>
-			<text:p text:style-name="P40">Plagiieren im Rahmen wissenschaftlicher Arbeiten</text:p>
+			<text:p text:style-name="P40">Plagiieren im Rahmen wissenschaftlicher Arbeiten.</text:p>
 		</text:list-item>
 		</text:list>
 		<text:p text:style-name="P12"/>
@@ -614,7 +594,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 		</text:list>
 		<text:p text:style-name="P5">Das gesamte Studienprogramm wird in englischer Sprache angeboten. Die ao. Studentin bzw. der ao. Student erklärt, die englische Sprache in Wort und Schrift in dem für eine akademische Ausbildung erforderlichen Ausmaß zu beherrschen.</text:p>
 		<text:p text:style-name="P17"/>
-		<text:p text:style-name="P5">Ao. Studierende des Studiengangs sind verpflichtet, eine EDV-Ausstattung zu beschaffen und zu unterhalten, die es ermöglicht, an den Fernlehrelementen teilzunehmen. Die gesamten Kosten der Anschaffung und des Betriebs (inkl. Kosten für Internet und e-mail) trägt der ao. Student bzw. die ao. Studentin.</text:p>
+		<text:p text:style-name="P5">Ao. Studierende des Studiengangs sind verpflichtet, eine EDV-Ausstattung zu beschaffen und zu unterhalten, die es ermöglicht, an den Fernlehrelementen teilzunehmen. Die gesamten Kosten der Anschaffung und des Betriebs (inkl. Kosten für Internet) trägt der ao. Student bzw. die ao. Studentin.</text:p>
 		<text:p text:style-name="P5"/>
 	</xsl:if>
 

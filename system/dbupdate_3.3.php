@@ -795,6 +795,7 @@ if(!@$db->db_query("SELECT 0 FROM system.tbl_extensions WHERE 0 = 1"))
 	else
 		echo '<br>Created table system.tbl_extensions';
 
+
 	// GRANT SELECT ON TABLE system.tbl_extensions TO web;
 	$qry = 'GRANT SELECT ON TABLE system.tbl_extensions TO web;';
 	if (!$db->db_query($qry))
@@ -843,6 +844,20 @@ if(!@$db->db_query("SELECT 0 FROM system.tbl_extensions WHERE 0 = 1"))
 		echo '<strong>system.tbl_extensions_id_seq '.$db->db_last_error().'</strong><br>';
 	else
 		echo '<br>Altered sequence system.tbl_extensions_id_seq';
+}
+
+// Adds primary key to system.tbl_extensions using column extension_id
+if ($result = @$db->db_query("SELECT conname FROM pg_constraint WHERE conname = 'pk_extensions_extension_id'"))
+{
+	if ($db->db_num_rows($result) == 0)
+	{
+		$qry = "ALTER TABLE system.tbl_extensions ADD CONSTRAINT pk_extensions_extension_id PRIMARY KEY (extension_id);";
+
+		if (!$db->db_query($qry))
+			echo '<strong>system.tbl_extensions '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>system.tbl_extensions: added primary key on column extension_id';
+	}
 }
 
 // UNIQUE INDEX uidx_extensions_name_version
@@ -2215,6 +2230,20 @@ if($result = $db->db_query("SELECT view_definition FROM information_schema.views
 			else
 				echo '<br>public.vw_prestudentstatus angepasst damit anmeldungzumreihungstest aus tbl_rt_person kommt';
 		}
+	}
+}
+
+// OE_KURZBZ in system.tbl_filters auf 32 Zeichen verlängert
+if($result = $db->db_query("SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA='system' AND TABLE_NAME='tbl_filters' AND COLUMN_NAME = 'oe_kurzbz' AND character_maximum_length=16"))
+{
+	if($db->db_num_rows($result)>0)
+	{
+		$qry = " ALTER TABLE system.tbl_filters ALTER COLUMN oe_kurzbz TYPE varchar(32)";
+
+		if(!$db->db_query($qry))
+			echo '<strong>system.tbl_filters '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>Spalte oe_kurzbz in system.tbl_filters von varchar(16) auf varchar(32) geändert<br>';
 	}
 }
 

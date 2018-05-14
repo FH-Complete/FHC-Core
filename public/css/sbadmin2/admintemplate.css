@@ -30,7 +30,6 @@
     /*float: right; */       /* adjust as needed */
     margin: 15px;
     color: grey;         /* adjust as needed */
-
 }
 
 .panel-heading .accordion-toggle.collapsed:before{
@@ -50,4 +49,10 @@
     position: absolute;
     top: 2px;
     font-size: 1.3em;
+}
+
+/*table footer line (e.g. for sums)*/
+.table-bordered > tfoot > tr > td, .table-bordered > tfoot > tr > th
+{
+    border-top-width: 2px;
 }

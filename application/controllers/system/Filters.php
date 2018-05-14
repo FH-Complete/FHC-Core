@@ -7,7 +7,7 @@ if (! defined('BASEPATH')) exit('No direct script access allowed');
  */
 class Filters extends CI_Controller
 {
-	const SESSION_NAME = 'FILTER';
+	const SESSION_NAME = 'FHC_FILTER_WIDGET';
 
 	const SELECTED_FIELDS = 'selectedFields';
 	const SELECTED_FILTERS = 'selectedFilters';
@@ -41,11 +41,13 @@ class Filters extends CI_Controller
 	{
 		$json = new stdClass();
 
-		$json->selectedFields = $_SESSION[self::SESSION_NAME]['selectedFields'];
-		$json->columnsAliases = $_SESSION[self::SESSION_NAME]['columnsAliases'];
-		$json->additionalColumns = $_SESSION[self::SESSION_NAME]['additionalColumns'];
-		$json->checkboxes = $_SESSION[self::SESSION_NAME]['checkboxes'];
-		$json->dataset = $_SESSION[self::SESSION_NAME]['dataset'];
+		$session = $this->_readSession($this->input->get('fhc_controller_id'));
+
+		$json->selectedFields = $session['selectedFields'];
+		$json->columnsAliases = $session['columnsAliases'];
+		$json->additionalColumns = $session['additionalColumns'];
+		$json->checkboxes = $session['checkboxes'];
+		$json->dataset = $session['dataset'];
 
 		$this->output->set_content_type('application/json')->set_output(json_encode($json));
 	}
@@ -57,11 +59,13 @@ class Filters extends CI_Controller
 	{
 		$json = new stdClass();
 
-		$json->allSelectedFields = $_SESSION[self::SESSION_NAME]['allSelectedFields'];
-		$json->allColumnsAliases = $_SESSION[self::SESSION_NAME]['allColumnsAliases'];
+		$session = $this->_readSession($this->input->get('fhc_controller_id'));
 
-		$json->selectedFields = $_SESSION[self::SESSION_NAME]['selectedFields'];
-		$json->columnsAliases = $_SESSION[self::SESSION_NAME]['columnsAliases'];
+		$json->allSelectedFields = $session['allSelectedFields'];
+		$json->allColumnsAliases = $session['allColumnsAliases'];
+
+		$json->selectedFields = $session['selectedFields'];
+		$json->columnsAliases = $session['columnsAliases'];
 
 		$this->output->set_content_type('application/json')->set_output(json_encode($json));
 	}
@@ -72,14 +76,17 @@ class Filters extends CI_Controller
 	public function sortSelectedFields()
 	{
 		$selectedFieldsLst = $this->input->post('selectedFieldsLst');
+		$fhc_controller_id = $this->input->post('fhc_controller_id');
 
 		$json = new stdClass();
 
-		$allSelectedFields = $_SESSION[self::SESSION_NAME]['allSelectedFields'];
-		$allColumnsAliases = $_SESSION[self::SESSION_NAME]['allColumnsAliases'];
+		$session = $this->_readSession($fhc_controller_id);
 
-		$json->selectedFields = $_SESSION[self::SESSION_NAME]['selectedFields'];
-		$json->columnsAliases = $_SESSION[self::SESSION_NAME]['columnsAliases'];
+		$allSelectedFields = $session['allSelectedFields'];
+		$allColumnsAliases = $session['allColumnsAliases'];
+
+		$json->selectedFields = $session['selectedFields'];
+		$json->columnsAliases = $session['columnsAliases'];
 
 		if (isset($selectedFieldsLst) && is_array($selectedFieldsLst))
 		{
@@ -102,8 +109,8 @@ class Filters extends CI_Controller
 			}
 		}
 
-		$_SESSION[self::SESSION_NAME]['selectedFields'] = $json->selectedFields;
-		$_SESSION[self::SESSION_NAME]['columnsAliases'] = $json->columnsAliases;
+		$_SESSION[self::SESSION_NAME][$fhc_controller_id]['selectedFields'] = $json->selectedFields;
+		$_SESSION[self::SESSION_NAME][$fhc_controller_id]['columnsAliases'] = $json->columnsAliases;
 
 		$this->output->set_content_type('application/json')->set_output(json_encode($json));
 	}
@@ -115,10 +122,12 @@ class Filters extends CI_Controller
 	{
 		$json = new stdClass();
 
-		$json->allSelectedFields = $_SESSION[self::SESSION_NAME]['allSelectedFields'];
-		$json->allColumnsAliases = $_SESSION[self::SESSION_NAME]['allColumnsAliases'];
+		$session = $this->_readSession($this->input->get('fhc_controller_id'));
 
-		$json->selectedFilters = $_SESSION[self::SESSION_NAME]['selectedFilters'];
+		$json->allSelectedFields = $session['allSelectedFields'];
+		$json->allColumnsAliases = $session['allColumnsAliases'];
+
+		$json->selectedFilters = $session['selectedFilters'];
 		$json->selectedFiltersAliases = array();
 		$json->selectedFiltersMetaData = array();
 
@@ -126,10 +135,10 @@ class Filters extends CI_Controller
 		$json->selectedFiltersActiveFiltersOperation = array();
 		$json->selectedFiltersActiveFiltersOption = array();
 
-		$metaData = $_SESSION[self::SESSION_NAME]['metaData'];
-		$activeFilters = $_SESSION[self::SESSION_NAME]['activeFilters'];
-		$activeFiltersOperation = $_SESSION[self::SESSION_NAME]['activeFiltersOperation'];
-		$activeFiltersOption = $_SESSION[self::SESSION_NAME]['activeFiltersOption'];
+		$metaData = $session['metaData'];
+		$activeFilters = $session['activeFilters'];
+		$activeFiltersOperation = $session['activeFiltersOperation'];
+		$activeFiltersOption = $session['activeFiltersOption'];
 
 		for ($i = 0; $i < count($json->selectedFilters); $i++)
 		{
@@ -170,7 +179,7 @@ class Filters extends CI_Controller
 	 */
 	public function saveFilter()
 	{
-		$this->_saveFilter($this->input->post("customFilterDescription"));
+		$this->_saveFilter($this->input->post("customFilterDescription"), $this->input->post("fhc_controller_id"));
 
 		$this->output->set_content_type('application/json')->set_output(json_encode('Tutto bene!!!'));
 	}
@@ -178,11 +187,11 @@ class Filters extends CI_Controller
 	/**
 	 *
 	 */
-	private function _saveFilter($customFilterDescription)
+	private function _saveFilter($customFilterDescription, $fhc_controller_id)
 	{
 		$objToBeSaved = new stdClass();
 
-		$filterSessionArray = $this->session->userdata(self::SESSION_NAME);
+		$filterSessionArray = $this->_readSession($fhc_controller_id);
 
 		$objToBeSaved->name = $customFilterDescription;
 
@@ -235,8 +244,8 @@ class Filters extends CI_Controller
 		$personId = $resultBenutzer->retval[0]->person_id;
 
 		$result = $this->FiltersModel->loadWhere(array(
-			'app' => $_SESSION[self::SESSION_NAME]['app'],
-			'dataset_name' => $_SESSION[self::SESSION_NAME]['datasetName'],
+			'app' => $_SESSION[self::SESSION_NAME][$fhc_controller_id]['app'],
+			'dataset_name' => $_SESSION[self::SESSION_NAME][$fhc_controller_id]['datasetName'],
 			'description' => $descPGArray,
 			'person_id' => $personId
 		));
@@ -245,8 +254,8 @@ class Filters extends CI_Controller
 		{
 			$this->FiltersModel->update(
 				array(
-					'app' => $_SESSION[self::SESSION_NAME]['app'],
-					'dataset_name' => $_SESSION[self::SESSION_NAME]['datasetName'],
+					'app' => $_SESSION[self::SESSION_NAME][$fhc_controller_id]['app'],
+					'dataset_name' => $_SESSION[self::SESSION_NAME][$fhc_controller_id]['datasetName'],
 					'description' => $descPGArray,
 					'person_id' => $personId
 				),
@@ -258,8 +267,8 @@ class Filters extends CI_Controller
 		else
 		{
 			$this->FiltersModel->insert(array(
-				'app' => $_SESSION[self::SESSION_NAME]['app'],
-				'dataset_name' => $_SESSION[self::SESSION_NAME]['datasetName'],
+				'app' => $_SESSION[self::SESSION_NAME][$fhc_controller_id]['app'],
+				'dataset_name' => $_SESSION[self::SESSION_NAME][$fhc_controller_id]['datasetName'],
 				'filter_kurzbz' => uniqid($personId, true),
 				'person_id' => $personId,
 				'description' => $descPGArray,
@@ -277,12 +286,13 @@ class Filters extends CI_Controller
 	public function deleteCustomFilter()
 	{
 		$filter_id = $this->input->post('filter_id');
+		$fhc_controller_id = $this->input->post('fhc_controller_id');
 
 		if (is_numeric($filter_id))
 		{
 			$this->FiltersModel->deleteCustomFilter($filter_id);
 
-			$this->output->set_content_type('application/json')->set_output(json_encode('Tutto bene!!!'));
+			$this->output->set_content_type('application/json')->set_output(json_encode('Removed'));
 		}
 	}
 
@@ -292,12 +302,15 @@ class Filters extends CI_Controller
 	public function removeSelectedFields()
 	{
 		$fieldName = $this->input->post('fieldName');
+		$fhc_controller_id = $this->input->post('fhc_controller_id');
 
-		$allSelectedFields = $_SESSION[self::SESSION_NAME]['allSelectedFields'];
-		$allColumnsAliases = $_SESSION[self::SESSION_NAME]['allColumnsAliases'];
+		$session = $this->_readSession($fhc_controller_id);
 
-		$selectedFields = $_SESSION[self::SESSION_NAME]['selectedFields'];
-		$columnsAliases = $_SESSION[self::SESSION_NAME]['columnsAliases'];
+		$allSelectedFields = $session['allSelectedFields'];
+		$allColumnsAliases = $session['allColumnsAliases'];
+
+		$selectedFields = $session['selectedFields'];
+		$columnsAliases = $session['columnsAliases'];
 
 		if (($pos = array_search($fieldName, $selectedFields)) !== false)
 		{
@@ -309,8 +322,8 @@ class Filters extends CI_Controller
 			}
 		}
 
-		$_SESSION[self::SESSION_NAME]['selectedFields'] = $selectedFields;
-		$_SESSION[self::SESSION_NAME]['columnsAliases'] = $columnsAliases;
+		$_SESSION[self::SESSION_NAME][$fhc_controller_id]['selectedFields'] = $selectedFields;
+		$_SESSION[self::SESSION_NAME][$fhc_controller_id]['columnsAliases'] = $columnsAliases;
 
 		$json = new stdClass();
 
@@ -328,11 +341,14 @@ class Filters extends CI_Controller
 	public function removeSelectedFilters()
 	{
 		$fieldName = $this->input->post('fieldName');
+		$fhc_controller_id = $this->input->post('fhc_controller_id');
 
-		$selectedFilters = $_SESSION[self::SESSION_NAME]['selectedFilters'];
-		$selectedFiltersActiveFilters = $_SESSION[self::SESSION_NAME]['activeFilters'];
-		$selectedFiltersActiveFiltersOperation = $_SESSION[self::SESSION_NAME]['activeFiltersOperation'];
-		$selectedFiltersActiveFiltersOption = $_SESSION[self::SESSION_NAME]['activeFiltersOption'];
+		$session = $this->_readSession($fhc_controller_id);
+
+		$selectedFilters = $session['selectedFilters'];
+		$selectedFiltersActiveFilters = $session['activeFilters'];
+		$selectedFiltersActiveFiltersOperation = $session['activeFiltersOperation'];
+		$selectedFiltersActiveFiltersOption = $session['activeFiltersOption'];
 
 		if (($pos = array_search($fieldName, $selectedFilters)) !== false)
 		{
@@ -342,10 +358,10 @@ class Filters extends CI_Controller
 			array_splice($selectedFiltersActiveFiltersOption, $pos, 1);
 		}
 
-		$_SESSION[self::SESSION_NAME]['selectedFilters'] = $selectedFilters;
-		$_SESSION[self::SESSION_NAME]['activeFilters'] = $selectedFiltersActiveFilters;
-		$_SESSION[self::SESSION_NAME]['activeFiltersOperation'] = $selectedFiltersActiveFiltersOperation;
-		$_SESSION[self::SESSION_NAME]['activeFiltersOption'] = $selectedFiltersActiveFiltersOption;
+		$_SESSION[self::SESSION_NAME][$fhc_controller_id]['selectedFilters'] = $selectedFilters;
+		$_SESSION[self::SESSION_NAME][$fhc_controller_id]['activeFilters'] = $selectedFiltersActiveFilters;
+		$_SESSION[self::SESSION_NAME][$fhc_controller_id]['activeFiltersOperation'] = $selectedFiltersActiveFiltersOperation;
+		$_SESSION[self::SESSION_NAME][$fhc_controller_id]['activeFiltersOption'] = $selectedFiltersActiveFiltersOption;
 
 		$json = new stdClass();
 
@@ -363,12 +379,15 @@ class Filters extends CI_Controller
 	public function addSelectedFields()
 	{
 		$fieldName = $this->input->post('fieldName');
+		$fhc_controller_id = $this->input->post('fhc_controller_id');
 
-		$allSelectedFields = $_SESSION[self::SESSION_NAME]['allSelectedFields'];
-		$allColumnsAliases = $_SESSION[self::SESSION_NAME]['allColumnsAliases'];
+		$session = $this->_readSession($fhc_controller_id);
 
-		$selectedFields = $_SESSION[self::SESSION_NAME]['selectedFields'];
-		$columnsAliases = $_SESSION[self::SESSION_NAME]['columnsAliases'];
+		$allSelectedFields = $session['allSelectedFields'];
+		$allColumnsAliases = $session['allColumnsAliases'];
+
+		$selectedFields = $session['selectedFields'];
+		$columnsAliases = $session['columnsAliases'];
 
 		if (($pos = array_search($fieldName, $allSelectedFields)) !== false
 			&& array_search($fieldName, $selectedFields) === false)
@@ -381,8 +400,8 @@ class Filters extends CI_Controller
 			}
 		}
 
-		$_SESSION[self::SESSION_NAME]['selectedFields'] = $selectedFields;
-		$_SESSION[self::SESSION_NAME]['columnsAliases'] = $columnsAliases;
+		$_SESSION[self::SESSION_NAME][$fhc_controller_id]['selectedFields'] = $selectedFields;
+		$_SESSION[self::SESSION_NAME][$fhc_controller_id]['columnsAliases'] = $columnsAliases;
 
 		$json = new stdClass();
 
@@ -400,11 +419,14 @@ class Filters extends CI_Controller
 	public function addSelectedFilters()
 	{
 		$fieldName = $this->input->post('fieldName');
+		$fhc_controller_id = $this->input->post('fhc_controller_id');
 
-		$selectedFilters = $_SESSION[self::SESSION_NAME]['selectedFilters'];
-		$selectedFiltersActiveFilters = $_SESSION[self::SESSION_NAME]['activeFilters'];
-		$selectedFiltersActiveFiltersOperation = $_SESSION[self::SESSION_NAME]['activeFiltersOperation'];
-		$selectedFiltersActiveFiltersOption = $_SESSION[self::SESSION_NAME]['activeFiltersOption'];
+		$session = $this->_readSession($fhc_controller_id);
+
+		$selectedFilters = $session['selectedFilters'];
+		$selectedFiltersActiveFilters = $session['activeFilters'];
+		$selectedFiltersActiveFiltersOperation = $session['activeFiltersOperation'];
+		$selectedFiltersActiveFiltersOption = $session['activeFiltersOption'];
 
 		if (!in_array($fieldName, $selectedFilters))
 		{
@@ -414,10 +436,10 @@ class Filters extends CI_Controller
 			$selectedFiltersActiveFiltersOption[$fieldName] = "";
 		}
 
-		$_SESSION[self::SESSION_NAME]['selectedFilters'] = $selectedFilters;
-		$_SESSION[self::SESSION_NAME]['activeFilters'] = $selectedFiltersActiveFilters;
-		$_SESSION[self::SESSION_NAME]['activeFiltersOperation'] = $selectedFiltersActiveFiltersOperation;
-		$_SESSION[self::SESSION_NAME]['activeFiltersOption'] = $selectedFiltersActiveFiltersOption;
+		$_SESSION[self::SESSION_NAME][$fhc_controller_id]['selectedFilters'] = $selectedFilters;
+		$_SESSION[self::SESSION_NAME][$fhc_controller_id]['activeFilters'] = $selectedFiltersActiveFilters;
+		$_SESSION[self::SESSION_NAME][$fhc_controller_id]['activeFiltersOperation'] = $selectedFiltersActiveFiltersOperation;
+		$_SESSION[self::SESSION_NAME][$fhc_controller_id]['activeFiltersOption'] = $selectedFiltersActiveFiltersOption;
 
 		$json = new stdClass();
 
@@ -438,6 +460,9 @@ class Filters extends CI_Controller
 		$filterOperations = $this->input->post('filterOperations');
 		$filterOperationValues = $this->input->post('filterOperationValues');
 		$filterOptions = $this->input->post('filterOptions');
+		$fhc_controller_id = $this->input->post('fhc_controller_id');
+
+		$session = $this->_readSession($fhc_controller_id);
 
 		if ($fieldNames == null) $fieldNames = array();
 		if ($filterOperationValues == null) $filterOperationValues = array();
@@ -448,9 +473,9 @@ class Filters extends CI_Controller
 		$activeFiltersOperation = array_combine($fieldNames, $filterOperations);
 		$activeFiltersOption = array_combine($fieldNames, $filterOptions);
 
-		$_SESSION[self::SESSION_NAME]['activeFilters'] = $activeFilters;
-		$_SESSION[self::SESSION_NAME]['activeFiltersOperation'] = $activeFiltersOperation;
-		$_SESSION[self::SESSION_NAME]['activeFiltersOption'] = $activeFiltersOption;
+		$_SESSION[self::SESSION_NAME][$fhc_controller_id]['activeFilters'] = $activeFilters;
+		$_SESSION[self::SESSION_NAME][$fhc_controller_id]['activeFiltersOperation'] = $activeFiltersOperation;
+		$_SESSION[self::SESSION_NAME][$fhc_controller_id]['activeFiltersOption'] = $activeFiltersOption;
 
 		$json = new stdClass();
 
@@ -469,7 +494,9 @@ class Filters extends CI_Controller
 	{
 		$json = new stdClass();
 
-		$dataset = $_SESSION[self::SESSION_NAME]['dataset'];
+		$session = $this->_readSession($this->input->get('fhc_controller_id'));
+
+		$dataset = $session['dataset'];
 
 		if (is_array($dataset))
 		{
@@ -480,18 +507,20 @@ class Filters extends CI_Controller
 	}
 
 	/**
-	 * Checks
+	 * Checks if the user is allowed to use this filter
 	 */
 	private function _isAllowed()
 	{
 		$isAllowed = false;
 
-		if (isset($_SESSION[self::SESSION_NAME]['requiredPermissions']))
+		$session = $this->_readSession($this->input->get('fhc_controller_id'));
+
+		if (isset($session['requiredPermissions']))
 		{
-			$tmpRequiredPermissions = $_SESSION[self::SESSION_NAME]['requiredPermissions'];
+			$tmpRequiredPermissions = $session['requiredPermissions'];
 			if (!is_array($tmpRequiredPermissions))
 			{
-				$tmpRequiredPermissions = array($_SESSION[self::SESSION_NAME]['requiredPermissions']);
+				$tmpRequiredPermissions = array($session['requiredPermissions']);
 			}
 
 			for ($i = 0; $i < count($tmpRequiredPermissions); $i++)
@@ -506,17 +535,9 @@ class Filters extends CI_Controller
 					break;
 				}
 			}
-
-			if (!$isAllowed)
-			{
-				header('Content-Type: application/json');
-
-				echo json_encode('You are not allowed to access to this content');
-
-				exit(1);
-			}
 		}
-		else
+
+		if (!$isAllowed)
 		{
 			header('Content-Type: application/json');
 
@@ -524,5 +545,30 @@ class Filters extends CI_Controller
 
 			exit(1);
 		}
+	}
+
+	/**
+	 *
+	 */
+	private function _readSession($fhc_controller_id)
+	{
+		if (isset($_SESSION[self::SESSION_NAME]) && isset($_SESSION[self::SESSION_NAME][$fhc_controller_id]))
+			return $_SESSION[self::SESSION_NAME][$fhc_controller_id];
+
+		return array();
+	}
+
+	/**
+	 *
+	 */
+	private function _writeSession($data, $fhc_controller_id)
+	{
+		if (!isset($_SESSION[self::SESSION_NAME])
+			|| (isset($_SESSION[self::SESSION_NAME]) && !is_array($_SESSION[self::SESSION_NAME])))
+		{
+			$_SESSION[self::SESSION_NAME] = array();
+		}
+
+		$_SESSION[self::SESSION_NAME][$fhc_controller_id] = $data;
 	}
 }
