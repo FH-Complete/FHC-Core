@@ -57,8 +57,15 @@ class DocumentLib
 			case 'application/vnd.ms-word':
 			case 'application/vnd.oasis.opendocument.text':
 			case 'text/plain':
-				$this->convert($filename, $outFile, 'pdf');
-				return success($outFile);
+				$ret = $this->convert($filename, $outFile, 'pdf');
+				if(isSuccess($ret))
+				{
+					return success($outFile);
+				}
+				else
+				{
+					return $ret;
+				}
 			case 'application/pdf':
 				return success($filename);
 			default:
