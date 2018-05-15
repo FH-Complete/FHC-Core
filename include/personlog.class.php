@@ -79,13 +79,18 @@ class personlog extends basis_db
 	}
 	
 	/**
-	 * Löscht alle Logeinträge vom Typ "Parked" der übergebenen Person_id die in der Zukunft liegen.
+	 * Löscht alle Logeinträge vom Typ "Precessstate" mit Namen "Parked" der übergebenen Person_id, die in der Zukunft liegen.
 	 * @param integer $person_id ID der Person, deren geparkter Logeintrag gelöscht werden soll.
 	 * @return boolean true wenn erfolgreich, false im Fehlerfall.
 	 */
 	public function deleteParked($person_id)
 	{
-		$qry = "DELETE FROM system.tbl_log WHERE logtype_kurzbz='Parked' AND person_id=".$this->db_add_param($person_id)." AND zeitpunkt>=now();";
+		$qry = "DELETE
+				FROM system.tbl_log
+				WHERE logtype_kurzbz = 'Processstate'
+					AND person_id = ".$this->db_add_param($person_id)."
+					AND logdata ->> 'name' = 'Parked'
+					AND zeitpunkt >= now();";
 			
 			if($this->db_query($qry))
 			{
