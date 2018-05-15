@@ -2,7 +2,7 @@
 
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
-// Retrives the URL path of the called controller + controller method
+// Retrives the URL path of the called controller + called controller method
 // NOTE: placed here because it doesn't work inside functions
 $calledPath = $this->router->directory.$this->router->class;
 $calledMethod = $this->router->method;
@@ -15,6 +15,7 @@ $customJSs = isset($customJSs) ? $customJSs : null;
 // By default set the parameters to false
 $jquery = isset($jquery) ? $jquery : false;
 $jqueryui = isset($jqueryui) ? $jqueryui : false;
+$ajaxlib = isset($ajaxlib) ? $ajaxlib : false;
 $bootstrap = isset($bootstrap) ? $bootstrap : false;
 $fontawesome = isset($fontawesome) ? $fontawesome : false;
 $tablesorter = isset($tablesorter) ? $tablesorter : false;
@@ -141,11 +142,14 @@ function _generateAddonsJSsInclude($calledFrom)
 			// jQuery UI CSS
 			if ($jqueryui === true) _generateCSSsInclude('vendor/components/jqueryui/themes/base/jquery-ui.min.css');
 
-			// bootstrap CSS
+			// Bootstrap CSS
 			if ($bootstrap === true) _generateCSSsInclude('vendor/twbs/bootstrap/dist/css/bootstrap.min.css');
 
-			// font awesome CSS
+			// Font Awesome CSS
 			if ($fontawesome === true) _generateCSSsInclude('vendor/components/font-awesome/css/font-awesome.min.css');
+
+			// AjaxLib CSS
+			if ($ajaxlib === true) _generateCSSsInclude('public/css/AjaxLib.css');
 
 			// Table sorter CSS
 			if ($tablesorter === true)
@@ -154,7 +158,7 @@ function _generateAddonsJSsInclude($calledFrom)
 				_generateCSSsInclude('vendor/mottie/tablesorter/dist/css/jquery.tablesorter.pager.min.css');
 			}
 
-			// sb admin template CSS
+			// SB Admin 2 template CSS
 			if ($sbadmintemplate === true)
 			{
 				_generateCSSsInclude('vendor/BlackrockDigital/startbootstrap-sb-admin-2/vendor/metisMenu/metisMenu.min.css');
@@ -164,10 +168,11 @@ function _generateAddonsJSsInclude($calledFrom)
 			// Eventually required CSS
 			_generateCSSsInclude($customCSSs); // Eventually required CSS
 
+
 			// --------------------------------------------------------------------------------------------------------
 			// Javascripts
 
-			// Generates the global object to pass useful parms to the other javascripts
+			// Generates the global object to pass useful parameters to other javascripts
 			// NOTE: must be called before any other JS include
 			_generateJSDataStorageObject($calledPath, $calledMethod);
 
@@ -178,11 +183,13 @@ function _generateAddonsJSsInclude($calledFrom)
 			if ($jqueryui === true)
 			{
 				_generateJSsInclude('vendor/components/jqueryui/jquery-ui.min.js');
-				//datepicker german language file
-				_generateJSsInclude('vendor/components/jqueryui/ui/i18n/datepicker-de.js');
+				_generateJSsInclude('vendor/components/jqueryui/ui/i18n/datepicker-de.js'); // datepicker german language file
 			}
 
-			// bootstrap JS
+			// AjaxLib JS
+			if ($ajaxlib === true) _generateJSsInclude('public/js/AjaxLib.js');
+
+			// Bootstrap JS
 			if ($bootstrap === true) _generateJSsInclude('vendor/twbs/bootstrap/dist/js/bootstrap.min.js');
 
 			// Table sorter JS
@@ -193,10 +200,10 @@ function _generateAddonsJSsInclude($calledFrom)
 				_generateJSsInclude('vendor/mottie/tablesorter/dist/js/extras/jquery.tablesorter.pager.min.js');
 			}
 
-			//tinymce JS
+			// Tinymce JS
 			if($tinymce === true) _generateJSsInclude('vendor/tinymce/tinymce/tinymce.min.js') ;
 
-			// sb admin template JS
+			// SB Admin 2 template JS
 			if ($sbadmintemplate === true)
 			{
 				_generateJSsInclude('vendor/BlackrockDigital/startbootstrap-sb-admin-2/vendor/metisMenu/metisMenu.min.js');
