@@ -57,6 +57,10 @@ class DocumentLib
 			case 'application/vnd.ms-word':
 			case 'application/vnd.oasis.opendocument.text':
 			case 'text/plain':
+				// Unoconv Version 0.6 seems to fail on converting TXT Files
+				if ($this->unoconv_version == '0.6')
+					return error();
+
 				$ret = $this->convert($filename, $outFile, 'pdf');
 				if(isSuccess($ret))
 				{
@@ -64,7 +68,7 @@ class DocumentLib
 				}
 				else
 				{
-					return $ret;
+					return error($ret->retval);
 				}
 			case 'application/pdf':
 				return success($filename);
