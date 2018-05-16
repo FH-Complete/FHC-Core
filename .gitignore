@@ -10,6 +10,8 @@ documents/
 .project
 .buildpath
 application/config/development/
+application/config/testing/
+application/config/production
 application/extensions/
 application/controllers/extensions/
 application/config/extensions/
@@ -30,3 +32,4 @@ tests/codeception/tests/acceptance.suite.yml
 tests/codeception/tests/unit.suite.yml
 /sparks/*
 /webdav/google.php
+system/sql/

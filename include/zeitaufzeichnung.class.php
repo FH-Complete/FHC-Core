@@ -634,24 +634,37 @@ or not exists
 			FROM
 				lehre.tbl_lehreinheitmitarbeiter m,
 				lehre.tbl_lehreinheit l
+			JOIN
+				lehre.tbl_lehrveranstaltung lv using (lehrveranstaltung_id)
+			JOIN
+				public.tbl_studiengang s using (studiengang_kz)
 			WHERE
 				$where AND
 				$where_sem AND
 				l.lehreinheit_id = m.lehreinheit_id AND
-				m.stundensatz * m.semesterstunden > 0
+				m.stundensatz * m.semesterstunden > 0 AND
+				s.typ not in ('l') AND
+				lv.studiengang_kz > 0
 			UNION
 			SELECT sum(pb.stunden) AS semstunden
 			FROM
 				lehre.tbl_projektarbeit pa,
 				lehre.tbl_projektbetreuer pb,
-				lehre.tbl_lehreinheit l,
-				public.tbl_benutzer b
+				public.tbl_benutzer b,
+				lehre.tbl_lehreinheit l
+			JOIN
+				lehre.tbl_lehrveranstaltung lv using (lehrveranstaltung_id)
+			JOIN
+				public.tbl_studiengang s using (studiengang_kz)
+
 			WHERE
 				pa.lehreinheit_id = l.lehreinheit_id AND
 				pb.projektarbeit_id = pa.projektarbeit_id AND
 				pb.person_id = b.person_id AND
 				b.uid = ".$this->db_add_param($user)." AND
 				pb.stunden * pb.stundensatz > 0 AND
+				s.typ not in ('l') AND
+				lv.studiengang_kz > 0 AND
 				$where_sem
 		) AS semstunden
 		";
