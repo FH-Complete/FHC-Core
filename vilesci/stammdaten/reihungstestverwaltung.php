@@ -2169,8 +2169,10 @@ if($reihungstest_id!='')
 
                                     if ($item->prestudent_id == $row->prestudent_id && $rt_letztes_login < $rt_antrittstermin)
                                     {
-                                        $rt_in_anderen_stg .= '(Letzter '.$studiengang->kuerzel_arr[$pruefling->studiengang_kz].'-Antritt: '.$datum_obj->formatDatum($rt_letztes_login, 'd.m.Y').',<br>';
-                                        $rt_in_anderen_stg .= '<a href="reihungstest_administration.php">absolvierte RT-Gebiete entsperren</a>)<br>';
+                                        $rt_in_anderen_stg .= '(Letzter '.$studiengang->kuerzel_arr[$pruefling->studiengang_kz].'-Antritt: '.$datum_obj->formatDatum($rt_letztes_login, 'd.m.Y');
+                                        if($rechte->isBerechtigt('basis/testtool', null, 'suid'))
+                                        	$rt_in_anderen_stg .= ',<br><a href="reihungstest_administration.php">absolvierte RT-Gebiete entsperren</a>';
+                                        $rt_in_anderen_stg .= ')<br>';
                                     }
                                 }
                             }

@@ -151,12 +151,12 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//DE" "http://www
 	<h2>Reihungstest - Administration</h2>';
 
 if(!$rechte->isBerechtigt('basis/testtool', null, 's'))
-		die('Sie haben keine Berechtigung für diese Seite');
+	die($rechte->errormsg.'&nbsp;&nbsp;<a href="reihungstest_administration.php">Seite neu laden</a>');
 
 if(isset($_POST['personzuteilen']))
 {
 	if(!$rechte->isBerechtigt('basis/testtool', null, 'sui'))
-		die('<span class="error">Sie haben keine Berechtigung für diese Aktion. <a href="reihungstest_administration.php">Seite neu laden</a></span>');
+		die($rechte->errormsg.'&nbsp;&nbsp;<a href="reihungstest_administration.php">Seite neu laden</a>');
 
 	$prestudent = new prestudent();
 	if($prestudent->load($_POST['prestudent_id']))
@@ -333,7 +333,7 @@ echo '&nbsp;&nbsp;&nbsp;&nbsp;<input type="submit" value="Dieses Teilgebiet l&ou
 if(isset($_POST['deleteteilgebiet']))
 {
 	if(!$rechte->isBerechtigt('basis/testtool', null, 'suid'))
-		die('<span class="error">Sie haben keine Berechtigung für diese Aktion. <a href="reihungstest_administration.php">Seite neu laden</a></span>');
+		die($rechte->errormsg.'&nbsp;&nbsp;<a href="reihungstest_administration.php">Seite neu laden</a>');
 
 	if(isset($_POST['prestudent']) && isset($_POST['gebiet']) &&
 	   is_numeric($_POST['prestudent']) && is_numeric($_POST['gebiet']))
@@ -591,7 +591,7 @@ echo '<hr><br><a href="'.$_SERVER['PHP_SELF'].'?action=deletedummyanswers" oncli
 if(isset($_GET['action']) && $_GET['action']=='deletedummyanswers')
 {
 	if(!$rechte->isBerechtigt('basis/testtool', null, 'suid'))
-		die('<span class="error">Sie haben keine Berechtigung für diese Aktion. <a href="reihungstest_administration.php">Seite neu laden</a></span>');
+		die($rechte->errormsg.'&nbsp;&nbsp;<a href="reihungstest_administration.php">Seite neu laden</a>');
 
 	$qry = "DELETE FROM testtool.tbl_antwort WHERE pruefling_id=(SELECT pruefling_id FROM testtool.tbl_pruefling WHERE prestudent_id=".$db->db_add_param(PRESTUDENT_ID_DUMMY_STUDENT).");
 			DELETE FROM testtool.tbl_pruefling_frage where pruefling_id=(SELECT pruefling_id FROM testtool.tbl_pruefling WHERE prestudent_id=".$db->db_add_param(PRESTUDENT_ID_DUMMY_STUDENT).");";
@@ -606,7 +606,7 @@ echo '<br><br>';
 if(isset($_POST['savedummystg']) && isset($_POST['stg']))
 {
 	if(!$rechte->isBerechtigt('basis/testtool', null, 'su'))
-		die('<span class="error">Sie haben keine Berechtigung für diese Aktion. <a href="reihungstest_administration.php">Seite neu laden</a></span>');
+		die($rechte->errormsg.'&nbsp;&nbsp;<a href="reihungstest_administration.php">Seite neu laden</a>');
 
 	$qry = "UPDATE public.tbl_prestudent SET studiengang_kz=".$db->db_add_param($_POST['stg'])." WHERE prestudent_id=".$db->db_add_param(PRESTUDENT_ID_DUMMY_STUDENT).";
 	UPDATE testtool.tbl_pruefling SET studiengang_kz=".$db->db_add_param($_POST['stg'])." WHERE prestudent_id=".$db->db_add_param(PRESTUDENT_ID_DUMMY_STUDENT).";";
@@ -859,7 +859,7 @@ echo 'Freigeschaltene Reihungstests:';
 if(isset($_GET['action']) && $_GET['action']=='sperren')
 {
 	if(!$rechte->isBerechtigt('basis/testtool', null, 'su'))
-		die('<span class="error">Sie haben keine Berechtigung für diese Aktion. <a href="reihungstest_administration.php">Seite neu laden</a></span>');
+		die($rechte->errormsg.'&nbsp;&nbsp;<a href="reihungstest_administration.php">Seite neu laden</a>');
 
 	$rt = new reihungstest();
 	if($rt->load($_GET['reihungstest_id']))
