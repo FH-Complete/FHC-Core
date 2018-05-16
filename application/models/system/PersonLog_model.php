@@ -90,4 +90,36 @@ class PersonLog_model extends CI_Model
 
 		return success($result->result());
 	}
+
+	/**
+	 * Gets all logs with zeitpunkt > today
+	 * @param $person_id
+	 * @return array
+	 */
+	public function getLogsInFuture($person_id)
+	{
+		$this->db->order_by('zeitpunkt', 'DESC');
+		$this->db->order_by('log_id', 'DESC');
+
+		$result = $this->db->get_where($this->dbTable, "person_id=".$this->db->escape($person_id)." AND zeitpunkt > now()");
+
+		return success($result->result());
+	}
+
+	/**
+	 * Deletes a log
+	 * @param $log_id
+	 * @return array
+	 */
+	public function deleteLog($log_id)
+	{
+		$this->load->library('PermissionLib');
+		if(!$this->permissionlib->isEntitled('system.tbl_log', PermissionLib::DELETE_RIGHT))
+			show_error('Permission denied - You need Access to system.tbl_log');
+
+		$this->db->where('log_id', $log_id);
+		$result = $this->db->delete($this->dbTable);
+
+		return success($result);
+	}
 }

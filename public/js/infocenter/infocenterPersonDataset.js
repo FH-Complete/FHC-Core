@@ -25,9 +25,12 @@ function appendTableActionsHtml()
 		'<a href="javascript:void(0)" class="unselectAll">' +
 		'<i class="fa fa-times"></i>&nbsp;Keinen</a>&nbsp;&nbsp;&nbsp;&nbsp;';
 
-	var messageHtml = 'Mit Ausgew&auml;hlten:&nbsp;&nbsp;' +
+	var actionHtml = 'Mit Ausgew&auml;hlten:&nbsp;&nbsp;' +
 		'<a href="javascript:void(0)" class="sendMsgsLink">' +
 		'<i class="fa fa-envelope"></i>&nbsp;Nachricht senden</a>';
+
+	var legendHtml = '<i class="fa fa-circle text-danger"></i> Gesperrt&nbsp;&nbsp;&nbsp;&nbsp;' +
+		'<i class="fa fa-circle text-info"></i> Geparkt';
 
 	var personcount = 0;
 
@@ -51,9 +54,12 @@ function appendTableActionsHtml()
 				var countHtml = personcount + " " + persontext;
 
 				$("#datasetActionsTop, #datasetActionsBottom").append(
-					"<div class='pull-left'>" + selectAllHtml + "&nbsp;&nbsp;" + messageHtml + "</div>"+
-					"<div class='pull-right'>" + countHtml + "</div>"+
-					"<div class='clearfix'></div>"
+					"<div class='row'>"+
+						"<div class='col-xs-4'>" + selectAllHtml + "&nbsp;&nbsp;" + actionHtml + "</div>"+
+						"<div class='col-xs-4 text-center'>" + legendHtml + "</div>"+
+						"<div class='col-xs-4 text-right'>" + countHtml + "</div>"+
+						"<div class='clearfix'></div>"+
+					"</div>"
 				);
 				$("#datasetActionsBottom").append("<br><br>");
 			}

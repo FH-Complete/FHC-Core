@@ -151,9 +151,16 @@
 					),\', \'
 				) AS "StgAktiv",
 				pl.zeitpunkt AS "LockDate",
-				pl.lockuser as "LockUser"
+				pl.lockuser as "LockUser",
+				pd.parkdate AS "ParkDate"
 			FROM public.tbl_person p
 		LEFT JOIN (SELECT person_id, zeitpunkt, uid as lockuser FROM system.tbl_person_lock WHERE app = \''.$APP.'\') pl USING(person_id)
+		LEFT JOIN (
+					SELECT person_id, zeitpunkt as parkdate
+					FROM system.tbl_log
+					WHERE logdata->>\'name\' = \'Parked\'
+					AND zeitpunkt > now()
+				) pd USING(person_id)	
 			WHERE
 				EXISTS(
 					SELECT 1
@@ -204,7 +211,9 @@
 			ucfirst($this->p->t('lehre','studiengang')) . ' (' . $this->p->t('global','nichtGesendet') . ')',
 			ucfirst($this->p->t('lehre','studiengang')) . ' (' . $this->p->t('global','aktiv') . ')',
 			ucfirst($this->p->t('global','sperrdatum')),
-			ucfirst($this->p->t('global','gesperrtVon'))),
+			ucfirst($this->p->t('global','gesperrtVon')),
+			"ParkedDate"
+		),
 		'formatRaw' => function($datasetRaw) {
 
 			$datasetRaw->{'Details'} = sprintf(
@@ -267,10 +276,20 @@
 		},
 		'markRow' => function($datasetRaw) {
 
+			$mark = '';
+
 			if ($datasetRaw->LockDate != null)
 			{
-				return FilterWidget::DEFAULT_MARK_ROW_CLASS;
+				$mark = FilterWidget::DEFAULT_MARK_ROW_CLASS;
 			}
+
+			if ($datasetRaw->ParkDate != null)
+			{
+				//parking has prio over locking
+				$mark = "text-info";
+			}
+
+			return $mark;
 		}
 	);
 	

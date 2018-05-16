@@ -131,8 +131,11 @@
 											<?php $this->load->view('system/infocenter/notizen.php'); ?>
 										</div>
 									</div>
-									<div class="col-lg-6" id="logs">
+									<div class="col-lg-6">
+										<div id="parking"></div>
+										<div id="logs">
 										<?php $this->load->view('system/infocenter/logs.php'); ?>
+										</div>
 									</div> <!-- ./column -->
 								</div> <!-- ./row -->
 							</div> <!-- ./panel-body -->
