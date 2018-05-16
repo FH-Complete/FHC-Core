@@ -49,7 +49,7 @@ $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($user);
 
 if(!$rechte->isBerechtigt('assistenz'))
-	die('Sie haben keine Berechtigung fuer diese Seite');
+	die($rechte->errormsg);
 
 if(isset($_GET['studiengang_kz']))
 	$stg_kz = $_GET['studiengang_kz'];
@@ -62,7 +62,7 @@ if(isset($_GET['action']) && $_GET['action']=='save')
 	$studiengang = new studiengang();
 	$studiengang->load($studiengang_kz);
 	if(!$rechte->isBerechtigt('assistenz', $studiengang->oe_kurzbz, 'suid'))
-		die('Sie haben keine Berechtigung fuer diese Seite');
+		die($rechte->errormsg);
 
 	$bezeichnung = $_POST['bezeichnung'];
 	$english = $_POST['english'];
@@ -127,15 +127,18 @@ echo '<form method="GET">
 Studiengang: <SELECT name="studiengang_kz">';
 foreach($stg->result as $row)
 {
-	if($stg_kz=='')
-		$stg_kz=$row->studiengang_kz;
-
-	if($stg_kz==$row->studiengang_kz)
-		$selected='selected';
-	else
-		$selected='';
-
-	echo '<OPTION value="'.$row->studiengang_kz.'" '.$selected.'>'.$row->kuerzel.' - '.$row->kurzbzlang.'</OPTION>';
+	if (in_array($row->studiengang_kz, $stg_arr))
+	{
+		if($stg_kz=='')
+			$stg_kz=$row->studiengang_kz;
+	
+		if($stg_kz==$row->studiengang_kz)
+			$selected='selected';
+		else
+			$selected='';
+	
+		echo '<OPTION value="'.$row->studiengang_kz.'" '.$selected.'>'.$row->kuerzel.' - '.$row->bezeichnung.'</OPTION>';
+	}
 }
 echo '</SELECT><input type="submit" value="Anzeigen" /></form>';
 

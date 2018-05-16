@@ -14,7 +14,7 @@
 					SELECT zeitpunkt
 					FROM system.tbl_log
 					WHERE taetigkeit_kurzbz IN(\'bewerbung\',\'kommunikation\')
-					AND logdata->>\'name\' NOT IN (\'Login with code\', \'New application\')
+					AND logdata->>\'name\' NOT IN (\'Login with code\', \'New application\', \'Interessent rejected\')
 					AND person_id = p.person_id
 					ORDER BY zeitpunkt DESC
 					LIMIT 1
@@ -23,7 +23,7 @@
 					SELECT insertvon
 					FROM system.tbl_log
 					WHERE taetigkeit_kurzbz IN(\'bewerbung\',\'kommunikation\')
-					AND logdata->>\'name\' NOT IN (\'Login with code\', \'New application\')
+					AND logdata->>\'name\' NOT IN (\'Login with code\', \'New application\', \'Interessent rejected\')
 					AND person_id = p.person_id
 					ORDER BY zeitpunkt DESC
 					LIMIT 1

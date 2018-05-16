@@ -2,14 +2,20 @@
 	<?php
 	foreach ($zgvpruefungen as $zgvpruefung):
 		$infoonly = $zgvpruefung->infoonly;
-		//set bootstrap columns
+		//set bootstrap columns for zgv form
 		$columns = array(4, 3, 2, 3);
+		$headercolumns = array(7, 5);
+		if (!$infoonly && isset($zgvpruefung->prestudentstatus->bewerbungsnachfrist) && isset($zgvpruefung->prestudentstatus->bewerbungstermin))
+		{
+			$headercolumns[0] = 5;
+			$headercolumns[1] = 7;
+		}
 		?>
 		<br/>
 		<div class="panel panel-default">
 			<div class="panel-heading">
 				<div class="row">
-					<div class="col-xs-7">
+					<div class="col-xs-<?php echo $headercolumns[0]; ?>">
 						<h4 class="panel-title">
 							<a data-toggle="collapse"
 							   href="#collapse<?php echo $zgvpruefung->prestudent_id ?>"><?php echo $zgvpruefung->studiengang.' - '.$zgvpruefung->studiengangbezeichnung.' | '.(isset($zgvpruefung->prestudentstatus->status_kurzbz) ? $zgvpruefung->prestudentstatus->status_kurzbz : '');
@@ -19,13 +25,13 @@
 					<?php if (isset($zgvpruefung->prestudentstatus->status_kurzbz) && $zgvpruefung->prestudentstatus->status_kurzbz === 'Interessent'/* && !$infoonly*/): ?>
 						<?php if ($infoonly): ?>
 							<?php if (isset($zgvpruefung->prestudentstatus->bestaetigtam)): ?>
-							<div class="col-xs-5 text-right">
+							<div class="col-xs-<?php echo $headercolumns[1]; ?> text-right">
 								<i class="fa fa-check" style="color: green"></i>
 								<?= $this->p->t('global', 'anStudiengangFreigegeben') ?>
 							</div>
 							<?php endif; ?>
 						<?php else: ?>
-						<div class="col-xs-5 text-right">
+						<div class="col-xs-<?php echo $headercolumns[1]; ?> text-right">
 							<?php echo ucfirst($this->p->t('infocenter','bewerbung')) . ' ' . $this->p->t('global','abgeschickt') . ': '.(isset($zgvpruefung->prestudentstatus->bewerbung_abgeschicktamum) ? '<i class="fa fa-check" style="color:green"></i>' : '<i class="fa fa-times" style="color:red"></i>'); ?>
 							<?php echo (isset($zgvpruefung->prestudentstatus->bewerbungsnachfrist) ? ' | ' . $this->p->t('infocenter', 'nachfrist') . ': ' . date_format(date_create($zgvpruefung->prestudentstatus->bewerbungsnachfrist), 'd.m.Y') : ''); ?>
 							<?php echo (isset($zgvpruefung->prestudentstatus->bewerbungstermin) ? ' | ' . $this->p->t('infocenter', 'bewerbungsfrist') . ': ' . date_format(date_create($zgvpruefung->prestudentstatus->bewerbungstermin), 'd.m.Y') : ''); ?>

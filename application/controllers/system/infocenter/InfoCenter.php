@@ -229,9 +229,10 @@ class InfoCenter extends VileSci_Controller
 		$studienordnung = $this->PrestudentstatusModel->getStudienordnungWithZgvText($prestudent_id);
 
 		$prestudentdata = $this->_getPersonAndStudiengangFromPrestudent($prestudent_id);
+		$studiengangkurzbz = $prestudentdata['studiengang_kurzbz'];
 		$studiengangbezeichnung = $prestudentdata['studiengang_bezeichnung'];
 
-		$data = array('studiengang_bezeichnung' => $studiengangbezeichnung, 'data' => null);
+		$data = array('studiengang_bezeichnung' => $studiengangbezeichnung, 'studiengang_kurzbz' => $studiengangkurzbz, 'data' => null);
 
 		if (hasData($studienordnung))
 		{

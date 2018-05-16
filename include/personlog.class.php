@@ -45,13 +45,13 @@ class personlog extends basis_db
 
 	/**
 	 * Erstellt einen Log Eintrag zu einer Person
-	 * @param $person_id ID der Person.
-	 * @param $logtype_kurzbz Typ des Logeintrages
-	 * @param $logdata Array mit den zusaetzlichen Logdaten zu diesem Typ.
-	 * @param $taetigkeit_kurzbz Kurzbz der Verarbeitungstaetigkeit.
-	 * @param $app Applikation von der dieser Logeintrag stammt.
-	 * @param $oe_kurzbz Kurzbz der Organisationseinheit. (optional)
-	 * @param $user User der die Aktion durchgefuehrt hat. (optional)
+	 * @param integer $person_id ID der Person.
+	 * @param string $logtype_kurzbz Typ des Logeintrages
+	 * @param array $logdata Array mit den zusaetzlichen Logdaten zu diesem Typ.
+	 * @param string $taetigkeit_kurzbz Kurzbz der Verarbeitungstaetigkeit.
+	 * @param string $app Applikation von der dieser Logeintrag stammt.
+	 * @param string $oe_kurzbz Kurzbz der Organisationseinheit. (optional)
+	 * @param string $user User der die Aktion durchgefuehrt hat. (optional)
 	 * @return boolean true wenn erfolgreich, false im Fehlerfall.
 	 */
 	public function log($person_id, $logtype_kurzbz, $logdata, $taetigkeit_kurzbz, $app = 'core', $oe_kurzbz = null, $user = null)
@@ -76,6 +76,31 @@ class personlog extends basis_db
 			$this->errormsg = 'Fehler beim Speichern des Logeintrages';
 			return false;
 		}
+	}
+	
+	/**
+	 * Löscht alle Logeinträge vom Typ "Precessstate" mit Namen "Parked" der übergebenen Person_id, die in der Zukunft liegen.
+	 * @param integer $person_id ID der Person, deren geparkter Logeintrag gelöscht werden soll.
+	 * @return boolean true wenn erfolgreich, false im Fehlerfall.
+	 */
+	public function deleteParked($person_id)
+	{
+		$qry = "DELETE
+				FROM system.tbl_log
+				WHERE logtype_kurzbz = 'Processstate'
+					AND person_id = ".$this->db_add_param($person_id)."
+					AND logdata ->> 'name' = 'Parked'
+					AND zeitpunkt >= now();";
+			
+			if($this->db_query($qry))
+			{
+				return true;
+			}
+			else
+			{
+				$this->errormsg = 'Fehler beim Löschen des geparkten Logeintrages';
+				return false;
+			}
 	}
 }
 ?>

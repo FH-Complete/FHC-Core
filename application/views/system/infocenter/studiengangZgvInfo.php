@@ -17,7 +17,7 @@ $this->load->view(
 			<div class="container-fluid">
 				<div class="row">
 					<div class="col-lg-12">
-						<h3 class="page-header">Zugangsvoraussetzungen <?php echo $studiengang_bezeichnung; ?></h3>
+						<h3 class="page-header">Zugangsvoraussetzungen <?php echo $studiengang_kurzbz; ?> - <?php echo $studiengang_bezeichnung; ?></h3>
 					</div>
 				</div>
 				<div id="data">
