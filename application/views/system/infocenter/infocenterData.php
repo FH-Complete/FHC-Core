@@ -158,8 +158,9 @@
 		LEFT JOIN (
 					SELECT person_id, zeitpunkt as parkdate
 					FROM system.tbl_log
-					WHERE logdata->>\'name\' = \'Parked\'
-					AND zeitpunkt > now()
+					WHERE logtype_kurzbz = \'Processstate\' 
+					AND logdata->>\'name\' = \'Parked\'
+					AND zeitpunkt >= now()
 				) pd USING(person_id)	
 			WHERE
 				EXISTS(
@@ -253,6 +254,11 @@
 			if ($datasetRaw->{'LockUser'} == null)
 			{
 				$datasetRaw->{'LockUser'} = '-';
+			}
+
+			if ($datasetRaw->{'ParkDate'} == null)
+			{
+				$datasetRaw->{'ParkDate'} = '-';
 			}
 
 			if ($datasetRaw->{'StgAbgeschickt'} == null)

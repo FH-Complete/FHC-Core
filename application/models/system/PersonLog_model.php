@@ -101,7 +101,11 @@ class PersonLog_model extends CI_Model
 		$this->db->order_by('zeitpunkt', 'DESC');
 		$this->db->order_by('log_id', 'DESC');
 
-		$result = $this->db->get_where($this->dbTable, "person_id=".$this->db->escape($person_id)." AND zeitpunkt > now()");
+		$where = "logtype_kurzbz = 'Processstate' 
+					AND person_id=".$this->db->escape($person_id)."
+					AND zeitpunkt >= now()";
+
+		$result = $this->db->get_where($this->dbTable, $where);
 
 		return success($result->result());
 	}
@@ -113,10 +117,6 @@ class PersonLog_model extends CI_Model
 	 */
 	public function deleteLog($log_id)
 	{
-		$this->load->library('PermissionLib');
-		if(!$this->permissionlib->isEntitled('system.tbl_log', PermissionLib::DELETE_RIGHT))
-			show_error('Permission denied - You need Access to system.tbl_log');
-
 		$this->db->where('log_id', $log_id);
 		$result = $this->db->delete($this->dbTable);
 
