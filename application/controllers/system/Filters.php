@@ -37,7 +37,7 @@ class Filters extends VileSci_Controller
 	{
 		$json = new stdClass();
 
-		$session = $this->_readSession($this->input->get('fhc_controller_id'));
+		$session = $this->_readSession($this->_getFilterUniqueId());
 
 		$json->selectedFields = $session['selectedFields'];
 		$json->columnsAliases = $session['columnsAliases'];
@@ -55,7 +55,7 @@ class Filters extends VileSci_Controller
 	{
 		$json = new stdClass();
 
-		$session = $this->_readSession($this->input->get('fhc_controller_id'));
+		$session = $this->_readSession($this->_getFilterUniqueId());
 
 		$json->allSelectedFields = $session['allSelectedFields'];
 		$json->allColumnsAliases = $session['allColumnsAliases'];
@@ -72,11 +72,12 @@ class Filters extends VileSci_Controller
 	public function sortSelectedFields()
 	{
 		$selectedFieldsLst = $this->input->post('selectedFieldsLst');
-		$fhc_controller_id = $this->input->post('fhc_controller_id');
+
+		$filterUniqueId = $this->_getFilterUniqueId();
 
 		$json = new stdClass();
 
-		$session = $this->_readSession($fhc_controller_id);
+		$session = $this->_readSession($filterUniqueId);
 
 		$allSelectedFields = $session['allSelectedFields'];
 		$allColumnsAliases = $session['allColumnsAliases'];
@@ -105,8 +106,8 @@ class Filters extends VileSci_Controller
 			}
 		}
 
-		$_SESSION[self::SESSION_NAME][$fhc_controller_id]['selectedFields'] = $json->selectedFields;
-		$_SESSION[self::SESSION_NAME][$fhc_controller_id]['columnsAliases'] = $json->columnsAliases;
+		$_SESSION[self::SESSION_NAME][$filterUniqueId]['selectedFields'] = $json->selectedFields;
+		$_SESSION[self::SESSION_NAME][$filterUniqueId]['columnsAliases'] = $json->columnsAliases;
 
 		$this->output->set_content_type('application/json')->set_output(json_encode($json));
 	}
@@ -118,7 +119,7 @@ class Filters extends VileSci_Controller
 	{
 		$json = new stdClass();
 
-		$session = $this->_readSession($this->input->get('fhc_controller_id'));
+		$session = $this->_readSession($this->_getFilterUniqueId());
 
 		$json->allSelectedFields = $session['allSelectedFields'];
 		$json->allColumnsAliases = $session['allColumnsAliases'];
@@ -175,19 +176,19 @@ class Filters extends VileSci_Controller
 	 */
 	public function saveFilter()
 	{
-		$this->_saveFilter($this->input->post("customFilterDescription"), $this->input->post("fhc_controller_id"));
+		$this->_saveFilter($this->input->post("customFilterDescription"), $this->_getFilterUniqueId());
 
-		$this->output->set_content_type('application/json')->set_output(json_encode('Tutto bene!!!'));
+		$this->output->set_content_type('application/json')->set_output(json_encode('Filter saved'));
 	}
 
 	/**
 	 *
 	 */
-	private function _saveFilter($customFilterDescription, $fhc_controller_id)
+	private function _saveFilter($customFilterDescription, $filterUniqueId)
 	{
 		$objToBeSaved = new stdClass();
 
-		$filterSessionArray = $this->_readSession($fhc_controller_id);
+		$filterSessionArray = $this->_readSession($filterUniqueId);
 
 		$objToBeSaved->name = $customFilterDescription;
 
@@ -240,8 +241,8 @@ class Filters extends VileSci_Controller
 		$personId = $resultBenutzer->retval[0]->person_id;
 
 		$result = $this->FiltersModel->loadWhere(array(
-			'app' => $_SESSION[self::SESSION_NAME][$fhc_controller_id]['app'],
-			'dataset_name' => $_SESSION[self::SESSION_NAME][$fhc_controller_id]['datasetName'],
+			'app' => $_SESSION[self::SESSION_NAME][$filterUniqueId]['app'],
+			'dataset_name' => $_SESSION[self::SESSION_NAME][$filterUniqueId]['datasetName'],
 			'description' => $descPGArray,
 			'person_id' => $personId
 		));
@@ -250,8 +251,8 @@ class Filters extends VileSci_Controller
 		{
 			$this->FiltersModel->update(
 				array(
-					'app' => $_SESSION[self::SESSION_NAME][$fhc_controller_id]['app'],
-					'dataset_name' => $_SESSION[self::SESSION_NAME][$fhc_controller_id]['datasetName'],
+					'app' => $_SESSION[self::SESSION_NAME][$filterUniqueId]['app'],
+					'dataset_name' => $_SESSION[self::SESSION_NAME][$filterUniqueId]['datasetName'],
 					'description' => $descPGArray,
 					'person_id' => $personId
 				),
@@ -263,8 +264,8 @@ class Filters extends VileSci_Controller
 		else
 		{
 			$this->FiltersModel->insert(array(
-				'app' => $_SESSION[self::SESSION_NAME][$fhc_controller_id]['app'],
-				'dataset_name' => $_SESSION[self::SESSION_NAME][$fhc_controller_id]['datasetName'],
+				'app' => $_SESSION[self::SESSION_NAME][$filterUniqueId]['app'],
+				'dataset_name' => $_SESSION[self::SESSION_NAME][$filterUniqueId]['datasetName'],
 				'filter_kurzbz' => uniqid($personId, true),
 				'person_id' => $personId,
 				'description' => $descPGArray,
@@ -282,7 +283,6 @@ class Filters extends VileSci_Controller
 	public function deleteCustomFilter()
 	{
 		$filter_id = $this->input->post('filter_id');
-		$fhc_controller_id = $this->input->post('fhc_controller_id');
 
 		if (is_numeric($filter_id))
 		{
@@ -298,9 +298,9 @@ class Filters extends VileSci_Controller
 	public function removeSelectedFields()
 	{
 		$fieldName = $this->input->post('fieldName');
-		$fhc_controller_id = $this->input->post('fhc_controller_id');
+		$filterUniqueId = $this->_getFilterUniqueId();
 
-		$session = $this->_readSession($fhc_controller_id);
+		$session = $this->_readSession($filterUniqueId);
 
 		$allSelectedFields = $session['allSelectedFields'];
 		$allColumnsAliases = $session['allColumnsAliases'];
@@ -318,8 +318,8 @@ class Filters extends VileSci_Controller
 			}
 		}
 
-		$_SESSION[self::SESSION_NAME][$fhc_controller_id]['selectedFields'] = $selectedFields;
-		$_SESSION[self::SESSION_NAME][$fhc_controller_id]['columnsAliases'] = $columnsAliases;
+		$_SESSION[self::SESSION_NAME][$filterUniqueId]['selectedFields'] = $selectedFields;
+		$_SESSION[self::SESSION_NAME][$filterUniqueId]['columnsAliases'] = $columnsAliases;
 
 		$json = new stdClass();
 
@@ -337,9 +337,9 @@ class Filters extends VileSci_Controller
 	public function removeSelectedFilters()
 	{
 		$fieldName = $this->input->post('fieldName');
-		$fhc_controller_id = $this->input->post('fhc_controller_id');
+		$filterUniqueId = $this->_getFilterUniqueId();
 
-		$session = $this->_readSession($fhc_controller_id);
+		$session = $this->_readSession($filterUniqueId);
 
 		$selectedFilters = $session['selectedFilters'];
 		$selectedFiltersActiveFilters = $session['activeFilters'];
@@ -354,10 +354,10 @@ class Filters extends VileSci_Controller
 			array_splice($selectedFiltersActiveFiltersOption, $pos, 1);
 		}
 
-		$_SESSION[self::SESSION_NAME][$fhc_controller_id]['selectedFilters'] = $selectedFilters;
-		$_SESSION[self::SESSION_NAME][$fhc_controller_id]['activeFilters'] = $selectedFiltersActiveFilters;
-		$_SESSION[self::SESSION_NAME][$fhc_controller_id]['activeFiltersOperation'] = $selectedFiltersActiveFiltersOperation;
-		$_SESSION[self::SESSION_NAME][$fhc_controller_id]['activeFiltersOption'] = $selectedFiltersActiveFiltersOption;
+		$_SESSION[self::SESSION_NAME][$filterUniqueId]['selectedFilters'] = $selectedFilters;
+		$_SESSION[self::SESSION_NAME][$filterUniqueId]['activeFilters'] = $selectedFiltersActiveFilters;
+		$_SESSION[self::SESSION_NAME][$filterUniqueId]['activeFiltersOperation'] = $selectedFiltersActiveFiltersOperation;
+		$_SESSION[self::SESSION_NAME][$filterUniqueId]['activeFiltersOption'] = $selectedFiltersActiveFiltersOption;
 
 		$json = new stdClass();
 
@@ -375,9 +375,9 @@ class Filters extends VileSci_Controller
 	public function addSelectedFields()
 	{
 		$fieldName = $this->input->post('fieldName');
-		$fhc_controller_id = $this->input->post('fhc_controller_id');
+		$filterUniqueId = $this->_getFilterUniqueId();
 
-		$session = $this->_readSession($fhc_controller_id);
+		$session = $this->_readSession($filterUniqueId);
 
 		$allSelectedFields = $session['allSelectedFields'];
 		$allColumnsAliases = $session['allColumnsAliases'];
@@ -396,8 +396,8 @@ class Filters extends VileSci_Controller
 			}
 		}
 
-		$_SESSION[self::SESSION_NAME][$fhc_controller_id]['selectedFields'] = $selectedFields;
-		$_SESSION[self::SESSION_NAME][$fhc_controller_id]['columnsAliases'] = $columnsAliases;
+		$_SESSION[self::SESSION_NAME][$filterUniqueId]['selectedFields'] = $selectedFields;
+		$_SESSION[self::SESSION_NAME][$filterUniqueId]['columnsAliases'] = $columnsAliases;
 
 		$json = new stdClass();
 
@@ -415,9 +415,9 @@ class Filters extends VileSci_Controller
 	public function addSelectedFilters()
 	{
 		$fieldName = $this->input->post('fieldName');
-		$fhc_controller_id = $this->input->post('fhc_controller_id');
+		$filterUniqueId = $this->_getFilterUniqueId();
 
-		$session = $this->_readSession($fhc_controller_id);
+		$session = $this->_readSession($filterUniqueId);
 
 		$selectedFilters = $session['selectedFilters'];
 		$selectedFiltersActiveFilters = $session['activeFilters'];
@@ -432,10 +432,10 @@ class Filters extends VileSci_Controller
 			$selectedFiltersActiveFiltersOption[$fieldName] = "";
 		}
 
-		$_SESSION[self::SESSION_NAME][$fhc_controller_id]['selectedFilters'] = $selectedFilters;
-		$_SESSION[self::SESSION_NAME][$fhc_controller_id]['activeFilters'] = $selectedFiltersActiveFilters;
-		$_SESSION[self::SESSION_NAME][$fhc_controller_id]['activeFiltersOperation'] = $selectedFiltersActiveFiltersOperation;
-		$_SESSION[self::SESSION_NAME][$fhc_controller_id]['activeFiltersOption'] = $selectedFiltersActiveFiltersOption;
+		$_SESSION[self::SESSION_NAME][$filterUniqueId]['selectedFilters'] = $selectedFilters;
+		$_SESSION[self::SESSION_NAME][$filterUniqueId]['activeFilters'] = $selectedFiltersActiveFilters;
+		$_SESSION[self::SESSION_NAME][$filterUniqueId]['activeFiltersOperation'] = $selectedFiltersActiveFiltersOperation;
+		$_SESSION[self::SESSION_NAME][$filterUniqueId]['activeFiltersOption'] = $selectedFiltersActiveFiltersOption;
 
 		$json = new stdClass();
 
@@ -456,17 +456,17 @@ class Filters extends VileSci_Controller
 		$filterOperations = $this->input->post('filterOperations');
 		$filterOperationValues = $this->input->post('filterOperationValues');
 		$filterOptions = $this->input->post('filterOptions');
-		$fhc_controller_id = $this->input->post('fhc_controller_id');
+		$filterUniqueId = $this->_getFilterUniqueId();
 
-		$session = $this->_readSession($fhc_controller_id);
+		$session = $this->_readSession($filterUniqueId);
 
 		$activeFilters = array_combine($fieldNames, $filterOperationValues);
 		$activeFiltersOperation = array_combine($fieldNames, $filterOperations);
 		$activeFiltersOption = array_combine($fieldNames, $filterOptions);
 
-		$_SESSION[self::SESSION_NAME][$fhc_controller_id]['activeFilters'] = $activeFilters;
-		$_SESSION[self::SESSION_NAME][$fhc_controller_id]['activeFiltersOperation'] = $activeFiltersOperation;
-		$_SESSION[self::SESSION_NAME][$fhc_controller_id]['activeFiltersOption'] = $activeFiltersOption;
+		$_SESSION[self::SESSION_NAME][$filterUniqueId]['activeFilters'] = $activeFilters;
+		$_SESSION[self::SESSION_NAME][$filterUniqueId]['activeFiltersOperation'] = $activeFiltersOperation;
+		$_SESSION[self::SESSION_NAME][$filterUniqueId]['activeFiltersOption'] = $activeFiltersOption;
 
 		$json = new stdClass();
 
@@ -485,7 +485,7 @@ class Filters extends VileSci_Controller
 	{
 		$json = new stdClass();
 
-		$session = $this->_readSession($this->input->get('fhc_controller_id'));
+		$session = $this->_readSession($this->_getFilterUniqueId());
 
 		$dataset = $session['dataset'];
 
@@ -500,10 +500,10 @@ class Filters extends VileSci_Controller
 	/**
 	 *
 	 */
-	private function _readSession($fhc_controller_id)
+	private function _readSession($filterUniqueId)
 	{
-		if (isset($_SESSION[self::SESSION_NAME]) && isset($_SESSION[self::SESSION_NAME][$fhc_controller_id]))
-			return $_SESSION[self::SESSION_NAME][$fhc_controller_id];
+		if (isset($_SESSION[self::SESSION_NAME]) && isset($_SESSION[self::SESSION_NAME][$filterUniqueId]))
+			return $_SESSION[self::SESSION_NAME][$filterUniqueId];
 
 		return array();
 	}
@@ -511,7 +511,7 @@ class Filters extends VileSci_Controller
 	/**
 	 *
 	 */
-	private function _writeSession($data, $fhc_controller_id)
+	private function _writeSession($data, $filterUniqueId)
 	{
 		if (!isset($_SESSION[self::SESSION_NAME])
 			|| (isset($_SESSION[self::SESSION_NAME]) && !is_array($_SESSION[self::SESSION_NAME])))
@@ -519,6 +519,25 @@ class Filters extends VileSci_Controller
 			$_SESSION[self::SESSION_NAME] = array();
 		}
 
-		$_SESSION[self::SESSION_NAME][$fhc_controller_id] = $data;
+		$_SESSION[self::SESSION_NAME][$filterUniqueId] = $data;
+	}
+
+	/**
+	 *
+	 */
+	private function _getFilterUniqueId()
+	{
+		$_getFilterUniqueId = '';
+
+		if ($_SERVER['REQUEST_METHOD'] === 'POST')
+		{
+			$_getFilterUniqueId = $this->input->post('filter_page').'/'.$this->input->post('fhc_controller_id');
+		}
+		elseif ($_SERVER['REQUEST_METHOD'] === 'GET')
+		{
+			$_getFilterUniqueId = $this->input->get('filter_page').'/'.$this->input->get('fhc_controller_id');
+		}
+
+		return $_getFilterUniqueId;
 	}
 }

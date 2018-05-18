@@ -281,7 +281,7 @@ var FHC_Ajax_Client = {
 	/**
 	 * Retrives parameters from URL query string (HTTP GET parameters)
 	 */
-	_getUrlParameter: function(sParam) {
+	getUrlParameter: function(sParam) {
 	    var sPageURL = decodeURIComponent(window.location.search.substring(1)),
 	        sURLVariables = sPageURL.split('&'),
 	        sParameterName,
@@ -343,7 +343,7 @@ var FHC_Ajax_Client = {
 			// Remote controller
 			data[REMOTE_CONTROLLER] = remoteController;
 			// fhc_controller_id is given if present
-			data[FHC_CONTROLLER_ID] = FHC_Ajax_Client._getUrlParameter(FHC_CONTROLLER_ID);
+			data[FHC_CONTROLLER_ID] = FHC_Ajax_Client.getUrlParameter(FHC_CONTROLLER_ID);
 
 			// Stores them into ajaxParameters
 			// NOTE: property data is not possible to get later,

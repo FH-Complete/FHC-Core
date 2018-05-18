@@ -38,7 +38,8 @@ function appendTableActionsHtml()
 		url: window.location.pathname.replace('infocenter/InfoCenter', 'Filters/rowNumber'),
 		method: "GET",
 		data: {
-			fhc_controller_id: getUrlParameter("fhc_controller_id")
+			fhc_controller_id: getUrlParameter("fhc_controller_id"),
+			filter_page: FHC_JS_DATA_STORAGE_OBJECT.called_path + "/" + FHC_JS_DATA_STORAGE_OBJECT.called_method
 		},
 		dataType: "json"
 	})

@@ -9,6 +9,9 @@
 			'fontawesome' => true,
 			'sbadmintemplate' => true,
 			'tablesorter' => true,
+			'ajaxlib' => true,
+			'filterwidget' => true,
+			'navigationwidget' => true,
 			'customCSSs' => 'public/css/sbadmin2/tablesort_bootstrap.css',
 			'customJSs' => array('public/js/bootstrapper.js', 'public/js/infocenter/infocenterPersonDataset.js')
 		)

@@ -78,14 +78,17 @@ class InfoCenter extends FHC_Controller
 		$this->load->library('PersonLogLib');
 		$this->load->library('WidgetLib');
 
-		$this->loadPhrases(array(
-								'global', 
-								'person',
-								'lehre',
-								'ui',
-								'infocenter',
-								'filter'));
-		
+		$this->loadPhrases(
+			array(
+				'global',
+				'person',
+				'lehre',
+				'ui',
+				'infocenter',
+				'filter'
+			)
+		);
+
 		$this->_setAuthUID(); // sets property uid
 
 		$this->load->library('PermissionLib');
@@ -139,13 +142,14 @@ class InfoCenter extends FHC_Controller
 		$persondata = $this->_loadPersonData($person_id);
 		$prestudentdata = $this->_loadPrestudentData($person_id);
 
-		$this->load->view(
-			'system/infocenter/infocenterDetails.php',
-			array_merge(
-				$persondata,
-				$prestudentdata
-			)
+		$data = array_merge(
+			$persondata,
+			$prestudentdata
 		);
+
+		$data['fhc_controller_id'] = $this->fhc_controller_id;
+
+		$this->load->view('system/infocenter/infocenterDetails.php', $data);
 	}
 
 	/**
@@ -159,7 +163,7 @@ class InfoCenter extends FHC_Controller
 		if(isError($result))
 			show_error($result->retval);
 
-		redirect(self::URL_PREFIX);
+		redirect(self::URL_PREFIX.'?fhc_controller_id='.$this->fhc_controller_id);
 	}
 
 	/**
@@ -715,10 +719,10 @@ class InfoCenter extends FHC_Controller
 	{
 		foreach ($filters as $filterId => $description)
 		{
-			$toPrint = "%s?%s=%s&%s=%s";
+			$toPrint = "%s?%s=%s";
 
 			$tofill['children'][] = array(
-				'link' => sprintf($toPrint, site_url('system/infocenter/InfoCenter'), 'filter_id', $filterId, 'fhc_controller_id', $this->fhc_controller_id),
+				'link' => sprintf($toPrint, site_url('system/infocenter/InfoCenter'), 'filter_id', $filterId),
 				'description' => $description
 			);
 		}
@@ -728,10 +732,10 @@ class InfoCenter extends FHC_Controller
 	{
 		foreach ($filters as $filterId => $description)
 		{
-			$toPrint = "%s?%s=%s&%s=%s";
+			$toPrint = "%s?%s=%s";
 
 			$tofill['children'][] = array(
-				'link' => sprintf($toPrint, site_url('system/infocenter/InfoCenter'), 'filter_id', $filterId, 'fhc_controller_id', $this->fhc_controller_id),
+				'link' => sprintf($toPrint, site_url('system/infocenter/InfoCenter'), 'filter_id', $filterId),
 				'description' => $description,
 				'subscriptDescription' => 'Remove',
 				'subscriptLinkClass' => 'remove-filter',
@@ -922,7 +926,7 @@ class InfoCenter extends FHC_Controller
 		$this->PrestudentModel->addSelect('person_id');
 		$person_id = $this->PrestudentModel->load($prestudent_id)->retval[0]->person_id;
 
-		redirect(self::URL_PREFIX.'/showDetails/'.$person_id.'#'.$section);
+		redirect(self::URL_PREFIX.'/showDetails/'.$person_id.'?fhc_controller_id='.$this->fhc_controller_id.'#'.$section);
 	}
 
 	/**

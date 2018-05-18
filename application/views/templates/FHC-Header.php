@@ -22,6 +22,8 @@ $tablesorter = isset($tablesorter) ? $tablesorter : false;
 $tinymce = isset($tinymce) ? $tinymce : false;
 $sbadmintemplate = isset($sbadmintemplate) ? $sbadmintemplate : false;
 $addons = isset($addons) ? $addons : false;
+$filterwidget = isset($filterwidget) ? $filterwidget : false;
+$navigationwidget = isset($navigationwidget) ? $navigationwidget : false;
 
 /**
  * Print the given title of the page
@@ -165,6 +167,12 @@ function _generateAddonsJSsInclude($calledFrom)
 				_generateCSSsInclude('vendor/BlackrockDigital/startbootstrap-sb-admin-2/dist/css/sb-admin-2.min.css');
 			}
 
+			// FilterWidget CSS
+			if ($filterwidget === true) _generateCSSsInclude('public/css/FilterWidget.css');
+
+			// NavigationWidget CSS
+			if ($navigationwidget === true) _generateCSSsInclude('public/css/NavigationWidget.css');
+
 			// Eventually required CSS
 			_generateCSSsInclude($customCSSs); // Eventually required CSS
 
@@ -209,6 +217,12 @@ function _generateAddonsJSsInclude($calledFrom)
 				_generateJSsInclude('vendor/BlackrockDigital/startbootstrap-sb-admin-2/vendor/metisMenu/metisMenu.min.js');
 				_generateJSsInclude('vendor/BlackrockDigital/startbootstrap-sb-admin-2/dist/js/sb-admin-2.min.js');
 			}
+
+			// FilterWidget JS
+			if($filterwidget === true) _generateJSsInclude('public/js/FilterWidget.js') ;
+
+			// NavigationWidget JS
+			if($navigationwidget === true) _generateJSsInclude('public/js/NavigationWidget.js') ;
 
 			// Load addon hooks JS
 			if ($addons === true) _generateAddonsJSsInclude($calledPath.'/'.$calledMethod);

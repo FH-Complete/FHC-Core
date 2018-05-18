@@ -1,25 +1,5 @@
-/**
- *
- */
-function getUrlParameter(sParam)
-{
-    var sPageURL = decodeURIComponent(window.location.search.substring(1)),
-        sURLVariables = sPageURL.split('&'),
-        sParameterName,
-        i;
 
-    for (i = 0; i < sURLVariables.length; i++)
-	{
-        sParameterName = sURLVariables[i].split('=');
-
-        if (sParameterName[0] === sParam)
-		{
-            return sParameterName[1];
-        }
-    }
-}
-
-var fhc_controller_id = getUrlParameter("fhc_controller_id");
+var fhc_controller_id = FHC_Ajax_Client.getUrlParameter('fhc_controller_id');
 const CONTROLLER_URL = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router + "/"+FHC_JS_DATA_STORAGE_OBJECT.called_path;
 
 /**
@@ -161,7 +141,6 @@ function openZgvInfoForPrestudent(prestudent_id)
 	var screenwidth = screen.width;
 	var popupwidth = 760;
 	var marginleft = screenwidth - popupwidth;
-	console.log(marginleft);
 	window.open("../getZgvInfoForPrestudent/" + prestudent_id, "_blank","resizable=yes,scrollbars=yes,width="+popupwidth+",height="+screen.height+",left="+marginleft);
 }
 
@@ -308,11 +287,10 @@ function updateNotiz(notizId, personId, data)
 function getStudienjahrEndAjax()
 {
 	$.ajax({
-		url: CONTROLLER_URL+"/getStudienjahrEnd?fhc_controller_id="+getUrlParameter("fhc_controller_id"),
+		url: CONTROLLER_URL+"/getStudienjahrEnd?fhc_controller_id="+fhc_controller_id,
 		method: "GET",
 		success: function(data, textStatus, jqXHR)
 		{
-			console.log(data);
 			//var gerdate = data.substring(8, 10) + "."+data.substring(5, 7) + "." + data.substring(0, 4);
 			var engdate = $.datepicker.parseDate("yy-mm-dd", data);
 			var gerdate = $.datepicker.formatDate("dd.mm.yy", engdate);
@@ -328,11 +306,10 @@ function getStudienjahrEndAjax()
 function getParkedDateAjax(personid)
 {
 	$.ajax({
-		url: CONTROLLER_URL+"/getParkedDate/"+personid+"?fhc_controller_id="+getUrlParameter("fhc_controller_id"),
+		url: CONTROLLER_URL+"/getParkedDate/"+personid+"?fhc_controller_id="+fhc_controller_id,
 		method: "GET",
 		success: function(data, textStatus, jqXHR)
 		{
-			console.log(data);
 			refreshParking(data);
 			refreshLog();
 			getStudienjahrEndAjax();
@@ -347,7 +324,7 @@ function getParkedDateAjax(personid)
 function parkPersonAjax(personid, date)
 {
 	$.ajax({
-		url: CONTROLLER_URL+"/park?fhc_controller_id="+getUrlParameter("fhc_controller_id"),
+		url: CONTROLLER_URL+"/park?fhc_controller_id="+fhc_controller_id,
 		method: "POST",
 		data:
 		{
@@ -368,7 +345,7 @@ function parkPersonAjax(personid, date)
 function unparkPersonAjax(personid)
 {
 	$.ajax({
-		url: CONTROLLER_URL+"/unpark?fhc_controller_id="+getUrlParameter("fhc_controller_id"),
+		url: CONTROLLER_URL+"/unpark?fhc_controller_id="+fhc_controller_id,
 		method: "POST",
 		data:
 		{
@@ -391,7 +368,7 @@ function unparkPersonAjax(personid)
 function refreshLog()
 {
 	var personid = $("#hiddenpersonid").val();
-	$("#logs").load('../reloadLogs/' + personid,
+	$("#logs").load('../reloadLogs/' + personid + '?fhc_controller_id=' + fhc_controller_id,
 		function ()
 		{
 			//readd tablesorter

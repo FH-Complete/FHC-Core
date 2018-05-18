@@ -2,6 +2,7 @@
 
 	$APP = 'infocenter';
 	$NOTBEFORE = '2018-03-01 18:00:00';
+
 	$filterWidgetArray = array(
 		'query' => '
 		SELECT
@@ -160,7 +161,7 @@
 					FROM system.tbl_log
 					WHERE logdata->>\'name\' = \'Parked\'
 					AND zeitpunkt > now()
-				) pd USING(person_id)	
+				) pd USING(person_id)
 			WHERE
 				EXISTS(
 					SELECT 1
@@ -193,33 +194,33 @@
 				)
 			ORDER BY "LastAction" ASC
 		',
-		'fhc_controller_id' => $fhc_controller_id,
 		'checkboxes' => 'PersonId',
 		'additionalColumns' => array('Details'),
 		'columnsAliases' => array(
-			'PersonID', 
-			ucfirst($this->p->t('person','vorname')) , 
-			ucfirst($this->p->t('person','nachname')),
-			ucfirst($this->p->t('person','geburtsdatum')),
-			ucfirst($this->p->t('person','nation')), 
-			ucfirst($this->p->t('global','letzteAktion')),
-			ucfirst($this->p->t('global','letzterBearbeiter')),
-			ucfirst($this->p->t('lehre','studiensemester')),
-			ucfirst($this->p->t('global','gesendetAm')),
-			ucfirst($this->p->t('global','abgeschickt')) . ' (' . $this->p->t('global','anzahl') . ')',
-			ucfirst($this->p->t('lehre','studiengang')) . ' (' . $this->p->t('global','gesendet') . ')',
-			ucfirst($this->p->t('lehre','studiengang')) . ' (' . $this->p->t('global','nichtGesendet') . ')',
-			ucfirst($this->p->t('lehre','studiengang')) . ' (' . $this->p->t('global','aktiv') . ')',
-			ucfirst($this->p->t('global','sperrdatum')),
-			ucfirst($this->p->t('global','gesperrtVon')),
-			"ParkedDate"
+			'PersonID',
+			ucfirst($this->p->t('person', 'vorname')) ,
+			ucfirst($this->p->t('person', 'nachname')),
+			ucfirst($this->p->t('person', 'geburtsdatum')),
+			ucfirst($this->p->t('person', 'nation')),
+			ucfirst($this->p->t('global', 'letzteAktion')),
+			ucfirst($this->p->t('global', 'letzterBearbeiter')),
+			ucfirst($this->p->t('lehre', 'studiensemester')),
+			ucfirst($this->p->t('global', 'gesendetAm')),
+			ucfirst($this->p->t('global', 'abgeschickt')).' ('.$this->p->t('global', 'anzahl').')',
+			ucfirst($this->p->t('lehre', 'studiengang')).' ('.$this->p->t('global', 'gesendet').')',
+			ucfirst($this->p->t('lehre', 'studiengang')).' ('.$this->p->t('global', 'nichtGesendet').')',
+			ucfirst($this->p->t('lehre', 'studiengang')).' ('.$this->p->t('global', 'aktiv').')',
+			ucfirst($this->p->t('global', 'sperrdatum')),
+			ucfirst($this->p->t('global', 'gesperrtVon')),
+			'ParkedDate'
 		),
 		'formatRaw' => function($datasetRaw) {
 
 			$datasetRaw->{'Details'} = sprintf(
-				'<a href="%s%s">Details</a>',
-				site_url('system/infocenter/InfoCenter/showDetails/'),
-				$datasetRaw->{'PersonId'}
+				'<a href="%s/%s?fhc_controller_id=%s">Details</a>',
+				site_url('system/infocenter/InfoCenter/showDetails'),
+				$datasetRaw->{'PersonId'},
+				$this->input->get('fhc_controller_id')
 			);
 
 			if ($datasetRaw->{'SendDate'} == null)
@@ -228,7 +229,7 @@
 			}
 			else
 			{
-				$datasetRaw->{'SendDate'} = date_format(date_create($datasetRaw->{'SendDate'}),'Y-m-d H:i');
+				$datasetRaw->{'SendDate'} = date_format(date_create($datasetRaw->{'SendDate'}), 'Y-m-d H:i');
 			}
 
 			if ($datasetRaw->{'LastAction'} == null)
@@ -237,7 +238,7 @@
 			}
 			else
 			{
-				$datasetRaw->{'LastAction'} = date_format(date_create($datasetRaw->{'LastAction'}),'Y-m-d H:i');
+				$datasetRaw->{'LastAction'} = date_format(date_create($datasetRaw->{'LastAction'}), 'Y-m-d H:i');
 			}
 
 			if ($datasetRaw->{'User/Operator'} == '')
@@ -285,14 +286,14 @@
 
 			if ($datasetRaw->ParkDate != null)
 			{
-				//parking has prio over locking
+				// Parking has priority over locking
 				$mark = "text-info";
 			}
 
 			return $mark;
 		}
 	);
-	
+
 	$filterId = isset($_GET[InfoCenter::FILTER_ID]) ? $_GET[InfoCenter::FILTER_ID] : null;
 
 	if (isset($filterId) && is_numeric($filterId))

@@ -9,6 +9,9 @@
 			'fontawesome' => true,
 			'sbadmintemplate' => true,
 			'tablesorter' => true,
+			'ajaxlib' => true,
+			'filterwidget' => true,
+			'navigationwidget' => true,
 			'customCSSs' => 'public/css/sbadmin2/tablesort_bootstrap.css',
 			'customJSs' => array('public/js/bootstrapper.js', 'public/js/infocenter/infocenterPersonDataset.js')
 		)
@@ -170,7 +173,6 @@
 									)
 								ORDER BY "LastAction" ASC
 							',
-							'fhc_controller_id' => $fhc_controller_id,
 							'checkboxes' => 'PersonId',
 							'additionalColumns' => array('Details'),
 							'columnsAliases' => array('PersonID','Vorname','Nachname','GebDatum','Nation','Letzte Aktion','Letzter Bearbeiter',
@@ -178,9 +180,10 @@
 							'formatRaw' => function($datasetRaw) {
 
 								$datasetRaw->{'Details'} = sprintf(
-									'<a href="%s%s">Details</a>',
-									base_url('index.ci.php/system/infocenter/InfoCenter/showDetails/'),
-									$datasetRaw->{'PersonId'}
+									'<a href="%s/%s?fhc_controller_id=%s">Details</a>',
+									site_url('system/infocenter/InfoCenter/showDetails'),
+									$datasetRaw->{'PersonId'},
+									$this->input->get('fhc_controller_id')
 								);
 
 								if ($datasetRaw->{'SendDate'} == null)

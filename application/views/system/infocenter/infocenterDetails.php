@@ -11,6 +11,8 @@
 			'tinymce' => true,
 			'sbadmintemplate' => true,
 			'addons' => true,
+			'ajaxlib' => true,
+			'navigationwidget' => true,
 			'customCSSs' =>
 				array(
 					'public/css/sbadmin2/admintemplate.css',
@@ -46,7 +48,7 @@
 							echo $lockedby;
 							?>
 							&nbsp;&nbsp;
-							<a href="../unlockPerson/<?php echo $stammdaten->person_id; ?>"><i
+							<a href="../unlockPerson/<?php echo $stammdaten->person_id; ?>?fhc_controller_id=<?php echo $fhc_controller_id; ?>"><i
 										class="fa fa-sign-out"></i>&nbsp;<?= ucfirst($this->p->t('ui', 'freigeben')) ?></a>
 						<?php endif; ?>
 					</div>
