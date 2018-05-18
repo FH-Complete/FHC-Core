@@ -12,7 +12,7 @@ $(document).ready(
 		addTablesorter("doctable", [[2, 1], [1, 0]], ["zebra"]);
 		addTablesorter("nachgdoctable", [[2, 0], [1, 1]], ["zebra"]);
 		addTablesorter("msgtable", [[0, 1], [2, 0]], ["zebra", "filter"], 2);
-		tablesortAddPager("msgtable", "msgpager", 10);
+		tablesortAddPager("msgtable", "msgpager", 14);
 
 		formatNotizTable();
 		formatLogTable();
@@ -380,7 +380,7 @@ function refreshLog()
 function formatLogTable()
 {
 	addTablesorter("logtable", [[0, 1]], ["filter"], 2);
-	tablesortAddPager("logtable", "logpager", 23);
+	tablesortAddPager("logtable", "logpager", 22);
 	$("#logtable").addClass("table-condensed");
 }
 
@@ -444,7 +444,7 @@ function refreshParking(date)
 function formatNotizTable()
 {
 	addTablesorter("notiztable", [[0, 1]], ["filter"], 2);
-	tablesortAddPager("notiztable", "notizpager", 10);
+	tablesortAddPager("notiztable", "notizpager", 11);
 	$("#notiztable").addClass("table-condensed");
 }
 
