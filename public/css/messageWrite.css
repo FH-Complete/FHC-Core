@@ -1,0 +1,10 @@
+/*smaller subject field*/
+input[type=text] {
+    height: 28px;
+    padding: 0px;
+}
+
+.msgfield label {
+    margin-bottom: 0px !important;
+    margin-top: 3px;
+}

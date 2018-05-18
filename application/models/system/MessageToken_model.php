@@ -31,6 +31,7 @@ class MessageToken_model extends CI_Model
 		$sql = 'SELECT r.message_id,
 						m.person_id as sender_id,
 						r.person_id as receiver_id,
+						r.sent,
 						m.subject,
 						m.body,
 						m.insertamum,
@@ -162,6 +163,34 @@ class MessageToken_model extends CI_Model
 				 WHERE p.person_id = ?';
 
 		$result = $this->db->query($sql, array($person_id));
+
+		// If no errors occurred
+		if ($result)
+		{
+			return success($result->result());
+		}
+		else
+		{
+			return error($this->db->error());
+		}
+	}
+
+	/**
+	 * Get data of a person
+	 */
+	public function getPersonData($person_id)
+	{
+		$sql = 'SELECT person_id,
+					   vorname as "Vorname",
+					   nachname as "Nachname",
+					   anrede as "Anrede",
+					   titelpost as "TitelPost",
+					   titelpre as "TitelPre",
+					   vornamen as "Vornamen"
+				  FROM public.tbl_person
+				 WHERE person_id %s ?';
+
+		$result = $this->db->query(sprintf($sql, is_array($person_id) ? 'IN' : '='), array($person_id));
 
 		// If no errors occurred
 		if ($result)

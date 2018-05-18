@@ -8,24 +8,14 @@ $this->load->view(
 		'fontawesome' => true,
 		'tinymce' => true,
 		'sbadmintemplate' => true,
-		'customCSSs' => 'public/css/sbadmin2/admintemplate_contentonly.css',
-		'customJSs' => 'public/js/bootstrapper.js'
+		'customCSSs' => array('public/css/sbadmin2/admintemplate_contentonly.css', 'public/css/messageWrite.css'),
+		'customJSs' => array('public/js/bootstrapper.js')
 	)
 );
 ?>
 <body>
-<style>
-	input[type=text] {
-		height: 28px;
-		padding: 0px;
-	}
-	.msgfield label {
-		margin-bottom: 0px !important;
-		margin-top: 3px;
-	}
-</style>
 <?php
-$href = str_replace("/system/Messages/write", "/system/Messages/send", $_SERVER["REQUEST_URI"]);
+$href = site_url().'/system/Messages/send/';
 ?>
 <div id="wrapper">
 	<div id="page-wrapper">
@@ -36,78 +26,7 @@ $href = str_replace("/system/Messages/write", "/system/Messages/send", $_SERVER[
 				</div>
 			</div>
 			<form id="sendForm" method="post" action="<?php echo $href; ?>">
-				<div class="row">
-					<div class="form-group">
-						<div class="col-lg-1">
-							<label>To:</label>
-						</div>
-						<div class="col-lg-11">
-							<?php
-							for ($i = 0; $i < count($receivers); $i++)
-							{
-								$receiver = $receivers[$i];
-								// Every 10 recipients a new line
-								if ($i > 1 && $i % 10 == 0)
-								{
-									echo '<br>';
-								}
-								echo $receiver->Vorname." ".$receiver->Nachname."; ";
-							}
-							?>
-						</div>
-					</div>
-				</div>
-				<div class="row">
-					<div class="form-group form-inline">
-						<div class="col-lg-1 msgfield">
-							<label>Subject:</label>
-						</div>&nbsp;
-						<?php
-						$subject = '';
-						if (isset($message))
-						{
-							$subject = 'Re: '.$message->subject;
-						}
-						?>
-						<div class="col-lg-10">
-							<input id="subject" class="form-control" type="text" value="<?php echo $subject; ?>"
-								   name="subject" size="70">
-						</div>
-					</div>
-				</div>
-				<br>
-				<div class="row">
-					<div class="col-lg-10">
-						<label>Message:</label>
-						<?php
-						$body = '';
-						if (isset($message))
-						{
-							$body = $message->body;
-						}
-						?>
-						<textarea id="bodyTextArea" name="body"><?php echo $body; ?></textarea>
-					</div>
-					<?php
-					if (isset($variables)):
-						?>
-						<div class="col-lg-2">
-							<div class="form-group">
-								<label>Variables:</label>
-								<select id="variables" class="form-control" size="14" multiple="multiple">
-									<?php
-									foreach ($variables as $key => $val)
-									{
-										?>
-										<option value="<?php echo $key; ?>"><?php echo $val; ?></option>
-										<?php
-									}
-									?>
-								</select>
-							</div>
-						</div>
-					<?php endif; ?>
-				</div>
+				<?php $this->load->view('system/messageForm.php'); ?>
 				<br>
 				<div class="row">
 					<div class="col-lg-3 text-right">
@@ -118,9 +37,6 @@ $href = str_replace("/system/Messages/write", "/system/Messages/send", $_SERVER[
 							array('name' => 'vorlage', 'id' => 'vorlageDnD')
 						);
 						?>
-					</div>
-					<div class="col-lg-offset-6 col-lg-1 text-right">
-						<button id="sendButton" class="btn btn-default" type="button">Send</button>
 					</div>
 				</div>
 				<?php if (isset($receivers) && count($receivers) > 0): ?>
@@ -196,18 +112,25 @@ $href = str_replace("/system/Messages/write", "/system/Messages/send", $_SERVER[
 	</div>
 </div>
 <script>
+	const CONTROLLER_URL = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router + "/"+FHC_JS_DATA_STORAGE_OBJECT.called_path;
+
 	tinymce.init({
 		selector: "#bodyTextArea",
-		height: 155
+		plugins: "autoresize",
+		autoresize_min_height: 150,
+		autoresize_max_height: 600,
+		autoresize_bottom_margin: 10
 	});
 
 	tinymce.init({
 		menubar: false,
 		toolbar: false,
+		statusbar: false,
 		readonly: 1,
 		selector: "#tinymcePreview",
-		statusbar: true,
-		plugins: "autoresize"
+		plugins: "autoresize",
+		autoresize_min_height: 150,
+		autoresize_bottom_margin: 10
 	});
 
 	$(document).ready(function ()
@@ -258,13 +181,9 @@ $href = str_replace("/system/Messages/write", "/system/Messages/send", $_SERVER[
 			{
 				if (this.value != '')
 				{
-					<?php
-					$url = str_replace("/system/Messages/write", "/system/Messages/getVorlage", $_SERVER["REQUEST_URI"]);
-					?>
-
 					$.ajax({
 						dataType: "json",
-						url: "<?php echo $url; ?>",
+						url: CONTROLLER_URL+"/getVorlage",
 						data: {"vorlage_kurzbz": this.value},
 						success: function (data, textStatus, jqXHR)
 						{
@@ -279,6 +198,9 @@ $href = str_replace("/system/Messages/write", "/system/Messages/send", $_SERVER[
 				}
 			});
 		}
+
+		$("#subject").focus();
+
 	});
 
 	function tinymcePreviewSetContent()
@@ -299,15 +221,12 @@ $href = str_replace("/system/Messages/write", "/system/Messages/send", $_SERVER[
 	function parseMessageText(receiver_id, text)
 	{
 		<?php
-		//replacing url (can have sender id at end)
-		$url = preg_replace("/\/system\/Messages\/write(\/.*)?/", "/system/Messages/parseMessageText", $_SERVER["REQUEST_URI"]);
-
 		$idtype = $personOnly === true ? 'person_id' : 'prestudent_id';
 		?>
 
 		$.ajax({
 			dataType: "json",
-			url: "<?php echo $url; ?>",
+			url: CONTROLLER_URL+"/parseMessageText",
 			data: {"<?php echo $idtype ?>": receiver_id, "text": text},
 			success: function (data, textStatus, jqXHR)
 			{

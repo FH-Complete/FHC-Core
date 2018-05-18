@@ -48,6 +48,7 @@ class Recipient_model extends DB_Model
 		$sql = 'SELECT r.message_id,
 						m.person_id as sender_id,
 						r.person_id as receiver_id,
+						r.sent,
 						m.subject,
 						m.body,
 						m.insertamum,

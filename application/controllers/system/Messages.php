@@ -185,9 +185,9 @@ class Messages extends FHC_Controller
 		{
 			$user_person = $this->PersonModel->getByUid($this->uid);
 
-			if (isError($user_person))
+			if (!hasData($user_person))
 			{
-				show_error($user_person->retval);
+				show_error('no sender');
 			}
 			$sender_id = $user_person->retval[0]->person_id;
 		}

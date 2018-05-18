@@ -42,6 +42,8 @@
 				if ($isEmployee === false && $href != '')
 				{
 			?>
+					<tr><td>&nbsp;</td></tr>
+					<tr><td>&nbsp;</td></tr>
 					<tr>
 						<td colspan="3" align="center" style="background-color:#dddddd; padding:5px;">
 							<a href="<?php echo $href; ?>">Reply</a>

@@ -75,5 +75,16 @@ class Redirect extends CI_Controller
 				redirect($addonAufnahmeUrls[$organisationRoot] . '?token=' . $token);
 			}
 		}
+		else
+		{
+			$addonAufnahmeUrls = $this->config->item('addons_aufnahme_url');
+			if (isset($token)
+				&& hasData($msg)
+				&& is_array($addonAufnahmeUrls)
+				&& isset($addonAufnahmeUrls['fallback']))
+			{
+				redirect($addonAufnahmeUrls['fallback'] . '?token=' . $token);
+			}
+		}
 	}
 }
