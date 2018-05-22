@@ -1,5 +1,5 @@
 
-var fhc_controller_id = FHC_Ajax_Client.getUrlParameter('fhc_controller_id');
+var fhc_controller_id = FHC_AjaxClient.getUrlParameter('fhc_controller_id');
 const CONTROLLER_URL = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router + "/"+FHC_JS_DATA_STORAGE_OBJECT.called_path;
 
 /**

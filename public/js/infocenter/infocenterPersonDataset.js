@@ -145,7 +145,7 @@ function refreshSideMenu()
 	})
 	.done(function(data, textStatus, jqXHR) {
 
-		renderSideMenu();
+		FHC_NavigationWidget.renderSideMenu();
 
 	}).fail(function(jqXHR, textStatus, errorThrown) {
 		alert(textStatus);
