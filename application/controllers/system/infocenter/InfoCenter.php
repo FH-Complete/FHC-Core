@@ -1080,7 +1080,7 @@ class InfoCenter extends FHC_Controller
 		if (!empty($receiver))
 		{
 			//Freigabeinformationmail sent from default system mail to studiengang mail(s)
-			$sent = $this->maillib->send('', $receiver, $subject, $email, '', null, null, 'noHtml');
+			$sent = $this->maillib->send('', $receiver, $subject, $email, '', null, null, 'Bitte sehen Sie sich die Nachricht in HTML Sicht an, um den Inhalt vollständig darzustellen.');
 
 			if (!$sent)
 				$this->loglib->logError('Error when sending Freigabe mail');
