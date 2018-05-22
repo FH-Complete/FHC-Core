@@ -42,7 +42,7 @@
 				</div>
 				<div class="col-lg-4">
 					<div class="headerright text-right">
-						<?= $this->p->t('global', 'wirdBearbeitetVon') . ' :' ?>
+						<?= $this->p->t('global', 'wirdBearbeitetVon') . ':' ?>
 						<?php
 						if (isset($lockedby)):
 							echo $lockedby;
