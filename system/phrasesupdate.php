@@ -888,7 +888,26 @@ $phrases = array(
 			)
 		)
 	),
-	
+	array(
+		'app' => 'core',
+		'category' => 'global',
+		'phrase' => 'bis',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'bis',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'until',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
 	
 	
 	//*******************************		CORE/ui
@@ -1928,6 +1947,26 @@ $phrases = array(
 	array(
 		'app' => 'infocenter',
 		'category' => 'infocenter',
+		'phrase' => 'bewerber',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'BewerberIn',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'applicant',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'infocenter',
+		'category' => 'infocenter',
 		'phrase' => 'reifepruefung',
 		'insertvon' => 'system',
 		'phrases' => array(
@@ -2164,7 +2203,8 @@ $phrases = array(
 				'insertvon' => 'system'
 			)
 		)
-	),array(
+	),
+	array(
 		'app' => 'infocenter',
 		'category' => 'infocenter',
 		'phrase' => 'absagegrund',
@@ -2183,7 +2223,8 @@ $phrases = array(
 				'insertvon' => 'system'
 			)
 		)
-	),array(
+	),
+	array(
 		'app' => 'infocenter',
 		'category' => 'infocenter',
 		'phrase' => 'absage',
@@ -2202,7 +2243,8 @@ $phrases = array(
 				'insertvon' => 'system'
 			)
 		)
-	),array(
+	),
+	array(
 		'app' => 'infocenter',
 		'category' => 'infocenter',
 		'phrase' => 'absageBestaetigen',
@@ -2221,7 +2263,8 @@ $phrases = array(
 				'insertvon' => 'system'
 			)
 		)
-	),array(
+	),
+	array(
 		'app' => 'infocenter',
 		'category' => 'infocenter',
 		'phrase' => 'absageBestaetigenTxt',
@@ -2242,7 +2285,8 @@ $phrases = array(
 				'insertvon' => 'system'
 			)
 		)
-	),array(
+	),
+	array(
 		'app' => 'infocenter',
 		'category' => 'infocenter',
 		'phrase' => 'notizHinzufuegen',
@@ -2261,7 +2305,8 @@ $phrases = array(
 				'insertvon' => 'system'
 			)
 		)
-	),array(
+	),
+	array(
 		'app' => 'infocenter',
 		'category' => 'infocenter',
 		'phrase' => 'tageKeineAktion',
@@ -2280,7 +2325,8 @@ $phrases = array(
 				'insertvon' => 'system'
 			)
 		)
-	),array(
+	),
+	array(
 		'app' => 'infocenter',
 		'category' => 'infocenter',
 		'phrase' => 'anAusgewaehlte',
@@ -2299,7 +2345,8 @@ $phrases = array(
 				'insertvon' => 'system'
 			)
 		)
-	),array(
+	),
+	array(
 		'app' => 'infocenter',
 		'category' => 'infocenter',
 		'phrase' => 'interessentAbweisen',
@@ -2318,7 +2365,8 @@ $phrases = array(
 				'insertvon' => 'system'
 			)
 		)
-	),array(
+	),
+	array(
 		'app' => 'infocenter',
 		'category' => 'infocenter',
 		'phrase' => 'interessentFreigeben',
@@ -2337,7 +2385,8 @@ $phrases = array(
 				'insertvon' => 'system'
 			)
 		)
-	),array(
+	),
+	array(
 		'app' => 'infocenter',
 		'category' => 'infocenter',
 		'phrase' => 'interessentFreigebenTxt',
@@ -2359,7 +2408,8 @@ $phrases = array(
 				'insertvon' => 'system'
 			)
 		)
-	),array(
+	),
+	array(
 		'app' => 'infocenter',
 		'category' => 'infocenter',
 		'phrase' => 'freigabeBestaetigen',
@@ -2378,7 +2428,8 @@ $phrases = array(
 				'insertvon' => 'system'
 			)
 		)
-	),array(
+	),
+	array(
 		'app' => 'infocenter',
 		'category' => 'infocenter',
 		'phrase' => 'nachfrist',
@@ -2392,12 +2443,13 @@ $phrases = array(
 			),
 			array(
 				'sprache' => 'English',
-				'text' => '',
+				'text' => 'extended deadline',
 				'description' => '',
 				'insertvon' => 'system'
 			)
 		)
-	),array(
+	),
+	array(
 		'app' => 'infocenter',
 		'category' => 'infocenter',
 		'phrase' => 'bewerbungsfrist',
@@ -2411,12 +2463,13 @@ $phrases = array(
 			),
 			array(
 				'sprache' => 'English',
-				'text' => '',
+				'text' => 'application deadline',
 				'description' => '',
 				'insertvon' => 'system'
 			)
 		)
-	), array(
+	),
+	array(
 		'app' => 'infocenter',
 		'category' => 'infocenter',
 		'phrase' => 'notizAendern',
@@ -2435,8 +2488,87 @@ $phrases = array(
 				'insertvon' => 'system'
 			)
 		)
+	),
+	array(
+		'app' => 'infocenter',
+		'category' => 'infocenter',
+		'phrase' => 'parken',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'parken',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'park',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'infocenter',
+		'category' => 'infocenter',
+		'phrase' => 'ausparken',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'ausparken',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'unpark',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'infocenter',
+		'category' => 'infocenter',
+		'phrase' => 'geparkt',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'geparkt',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'parked',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'global',
+		'phrase' => 'parkdatum',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'parkdatum',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'parking date',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
 	)
-
 );
 
 
@@ -2444,7 +2576,7 @@ $phrases = array(
 //*****		INSERT into phrase_tbl if new app + category + phrase found in phrasen-array.
 //*****		INSERT into phrasentext_tbl if new text found in phrasen-phrases-array, conciders every language apart.
 
-foreach($phrases as $phrase)
+foreach ($phrases as $phrase)
 {
 	$qry = "SELECT phrase_id 
 			FROM system.tbl_phrase
@@ -2454,12 +2586,12 @@ foreach($phrases as $phrase)
 				phrase=" . $db->db_add_param($phrase['phrase']);
 
 	//***	CHECK PHRASE
-	if($result = $db->db_query($qry))
+	if ($result = $db->db_query($qry))
 	{
 		$phrase_id = '';
 		
 		//phrase not existing -> insert phrase and get last inserted phrase_id
-		if($db->db_num_rows($result) === 0)
+		if ($db->db_num_rows($result) === 0)
 		{
 			$qry_insert = "INSERT INTO system.tbl_phrase(
 								app, 
@@ -2474,18 +2606,18 @@ foreach($phrases as $phrase)
 								$db->db_add_param($phrase['insertvon']) . ','.
 								$db->db_add_param($phrase['category']) . ');';
 
-			if($db->db_query($qry_insert))
+			if ($db->db_query($qry_insert))
 			{
 				$new = true;
 				
 				$qry_lastId = "SELECT currval('system.tbl_phrase_phrase_id_seq') as id";
-				if($db->db_query($qry_lastId))
+				if ($db->db_query($qry_lastId))
 				{
-					if($obj = $db->db_fetch_object())
+					if ($obj = $db->db_fetch_object())
 					{
 						$phrase_id = $obj->id;
 					}
-				}						
+				}
 				echo 'Kategorie/Phrase: <b>' . $phrase['category'] . '/' . $phrase['phrase'] . ' hinzugefügt</b><br>';
 			}
 			else
@@ -2493,19 +2625,19 @@ foreach($phrases as $phrase)
 
 		}
 		//phrase existing -> get phrase_id
-		else 
+		else
 		{
 			if ($obj = $db->db_fetch_object($result))
 			{
 				$phrase_id = $obj->phrase_id;
-			}	
+			}
 			echo 'Kategorie/Phrase: ' . $phrase['category'] . '/' . $phrase['phrase'] . ' vorhanden.<br>';
 		}
 		
 	
 		//***	CHECK PHRASENTEXT
 		//loop through languages
-		foreach($phrase['phrases'] as $phrase_phrases)
+		foreach ($phrase['phrases'] as $phrase_phrases)
 		{			
 			$language = $phrase_phrases['sprache'];
 			
@@ -2518,10 +2650,10 @@ foreach($phrases as $phrase)
 					sprache='" . $language . "'";
 			
 			
-			if($result_language = $db->db_query($qry_language))
+			if ($result_language = $db->db_query($qry_language))
 			{
 				//if phrasentext not existing in certain language -> insert
-				if($db->db_num_rows($result_language) === 0 && !empty($phrase_phrases['text']))
+				if ($db->db_num_rows($result_language) === 0 && !empty($phrase_phrases['text']))
 				{
 					$qry_insert = "INSERT INTO system.tbl_phrasentext(
 										phrase_id, 
@@ -2542,7 +2674,7 @@ foreach($phrases as $phrase)
 										' now(),'.
 										$db->db_add_param($phrase_phrases['insertvon']) . ');';
 
-					if($db->db_query($qry_insert))
+					if ($db->db_query($qry_insert))
 					{
 						echo '-- Phrasentext ' . strtoupper(substr($phrase_phrases['sprache'], 0, 3)) . ': <b>' . $phrase_phrases['text'] . ' hinzugefügt</b><br>';
 					}
@@ -2558,5 +2690,3 @@ foreach($phrases as $phrase)
 
 if(!$new)
 	echo '<b>Keine neuen Phrasen</b><br>';
-
-

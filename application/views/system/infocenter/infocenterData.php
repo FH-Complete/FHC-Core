@@ -213,7 +213,7 @@
 			ucfirst($this->p->t('lehre', 'studiengang')).' ('.$this->p->t('global', 'aktiv').')',
 			ucfirst($this->p->t('global', 'sperrdatum')),
 			ucfirst($this->p->t('global', 'gesperrtVon')),
-			'ParkedDate'
+			ucfirst($this->p->t('global', 'parkdatum'))
 		),
 		'formatRaw' => function($datasetRaw) {
 
