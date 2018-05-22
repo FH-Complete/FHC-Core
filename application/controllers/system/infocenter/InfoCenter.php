@@ -421,7 +421,8 @@ class InfoCenter extends FHC_Controller
 
 				$result = $this->DokumentprestudentModel->setAcceptedDocuments($prestudent_id, $dokument_kurzbzs);
 
-				if (isError($result))
+				//returns null if no documents to accept
+				if ($result !== null && isError($result))
 				{
 					show_error($result->retval);
 				}
@@ -1079,7 +1080,7 @@ class InfoCenter extends FHC_Controller
 		if (!empty($receiver))
 		{
 			//Freigabeinformationmail sent from default system mail to studiengang mail(s)
-			$sent = $this->maillib->send('', $receiver, $subject, $email);
+			$sent = $this->maillib->send('', $receiver, $subject, $email, '', null, null, 'noHtml');
 
 			if (!$sent)
 				$this->loglib->logError('Error when sending Freigabe mail');
