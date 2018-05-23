@@ -2247,6 +2247,20 @@ if($result = $db->db_query("SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE
 	}
 }
 
+// Berechtigungen fuer vilesci User erteilen auf system.tbl_log
+if($result = @$db->db_query("SELECT * FROM information_schema.role_table_grants WHERE table_name='tbl_log' AND table_schema='system' AND grantee='vilesci' AND privilege_type='DELETE'"))
+{
+	if($db->db_num_rows($result)==0)
+	{
+		$qry = "GRANT DELETE ON system.tbl_log TO vilesci;";
+
+		if(!$db->db_query($qry))
+			echo '<strong>Permission Log: '.$db->db_last_error().'</strong><br>';
+		else
+			echo 'Loeschrechte auf system.tbl_log für Vilesci User hinzugefügt';
+	}
+}
+
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
 
