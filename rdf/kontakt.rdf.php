@@ -73,7 +73,8 @@ else
 function draw_rdf($row)
 {
 	global $rdf_url;
-
+	if($row->kontakttyp == 'hidden')
+		return;
 	echo '
       <RDF:li>
          <RDF:Description  id="'.$row->kontakt_id.'"  about="'.$rdf_url.'/'.$row->kontakt_id.'" >
