@@ -95,7 +95,9 @@ class InfoCenter extends FHC_Controller
 		if(!$this->permissionlib->isBerechtigt('basis/person'))
 			show_error('You have no Permission! You need Infocenter Role');
 
-		$this->_setControllerId(); // sets the controller id
+		$this->setControllerId(); // sets the controller id
+
+		$this->fhc_controller_id = $this->getControllerId();
 
 		$this->setNavigationMenuArray(); // sets property navigationMenuArray
     }
@@ -1089,22 +1091,5 @@ class InfoCenter extends FHC_Controller
 		{
 			$this->loglib->logError('Studiengang has no mail for sending Freigabe mail');
 		}
-	}
-
-	/**
-	 * Sets the unique id for the called controller
-	 */
-	private function _setControllerId()
-	{
-		$fhc_controller_id = $this->input->get('fhc_controller_id');
-
-		if (!isset($fhc_controller_id) || empty($fhc_controller_id))
-		{
-			$fhc_controller_id = uniqid();
-			header('Location: '.$_SERVER['REQUEST_URI'].'?fhc_controller_id='.$fhc_controller_id);
-			exit;
-		}
-
-		$this->fhc_controller_id = $fhc_controller_id;
 	}
 }
