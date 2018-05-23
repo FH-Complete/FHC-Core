@@ -27,7 +27,7 @@
 							<?php if (isset($zgvpruefung->prestudentstatus->bestaetigtam)): ?>
 							<div class="col-xs-<?php echo $headercolumns[1]; ?> text-right">
 								<i class="fa fa-check" style="color: green"></i>
-								<?= $this->p->t('global', 'anStudiengangFreigegeben') ?>
+								<?php echo  $this->p->t('global', 'anStudiengangFreigegeben') ?>
 							</div>
 							<?php endif; ?>
 						<?php else: ?>
@@ -49,7 +49,7 @@
 						<div class="row">
 							<div class="col-lg-<?php echo $columns[0] ?>">
 								<div class="form-group">
-									<label><?= ucfirst($this->p->t('global','letzterStatus')) . ':' ?></label>
+									<label><?php echo  ucfirst($this->p->t('global','letzterStatus')) . ':' ?></label>
 									<?php
 									if (isset($zgvpruefung->prestudentstatus->status_kurzbz))
 									{
@@ -60,7 +60,7 @@
 							</div>
 							<div class="col-lg-<?php echo $columns[1] ?>">
 								<div class="form-group">
-									<label><?= ucfirst($this->p->t('lehre','studiensemester')) . ':' ?></label>
+									<label><?php echo  ucfirst($this->p->t('lehre','studiensemester')) . ':' ?></label>
 									<?php echo isset($zgvpruefung->prestudentstatus->studiensemester_kurzbz) ? $zgvpruefung->prestudentstatus->studiensemester_kurzbz : '' ?>
 								</div>
 							</div>
@@ -73,7 +73,7 @@
 							</div>
 							<div class="col-lg-<?php echo $columns[3] ?>">
 								<div class="form-group">
-									<label><?= ucfirst($this->p->t('lehre','organisationsform')) . ':' ?></label>
+									<label><?php echo  ucfirst($this->p->t('lehre','organisationsform')) . ':' ?></label>
 									<span style="display: inline-block">
 									<?php
 									$separator = (isset($zgvpruefung->prestudentstatus->orgform)) ? ', ' : '';
@@ -90,18 +90,18 @@
 									<div class="row">
 										<?php if ($infoonly): ?>
 										<div class="col-xs-8">
-										<label><?= $this->p->t('infocenter', 'zgv') . ':' ?></label>
+										<label><?php echo  $this->p->t('infocenter', 'zgv') . ':' ?></label>
 											<?php echo $zgvpruefung->zgv_bez; ?>
 										</div>
 										<?php else: ?>
 										<div class="col-xs-3">
-											<label><?= $this->p->t('infocenter', 'zgv') . ':' ?></label>
+											<label><?php echo  $this->p->t('infocenter', 'zgv') . ':' ?></label>
 										</div>
 										<?php endif;
 											$zgvinfocolumns = $infoonly ? 4 : 9;
 										?>
 										<div class="col-xs-<?php echo $zgvinfocolumns; ?> text-right zgvinfo" id="zgvinfo_<?php echo $zgvpruefung->prestudent_id ?>">
-											<a href="javascript:void(0)"><i class="fa fa-info-circle"></i> <?= $this->p->t('infocenter', 'zgv') ?> <?php echo $zgvpruefung->studiengang; ?></a>
+											<a href="javascript:void(0)"><i class="fa fa-info-circle"></i> <?php echo  $this->p->t('infocenter', 'zgv') ?> <?php echo $zgvpruefung->studiengang; ?></a>
 										</div>
 									</div>
 									<?php if (!$infoonly)
@@ -114,7 +114,7 @@
 							</div>
 							<div class="col-lg-<?php echo $columns[1] ?>">
 								<div class="form-group">
-									<label><?= $this->p->t('infocenter', 'zgv') . ' ' . $this->p->t('person','ort') . ':'?></label>
+									<label><?php echo  $this->p->t('infocenter', 'zgv') . ' ' . $this->p->t('person','ort') . ':'?></label>
 									<?php if ($infoonly):
 										echo html_escape($zgvpruefung->zgvort);
 									else:
@@ -127,7 +127,7 @@
 							</div>
 							<div class="col-lg-<?php echo $columns[2] ?>">
 								<div class="form-group">
-									<label><?= $this->p->t('infocenter', 'zgv') . ' ' . $this->p->t('global','datum') . ':'?></label>
+									<label><?php echo  $this->p->t('infocenter', 'zgv') . ' ' . $this->p->t('global','datum') . ':'?></label>
 									<?php
 									$zgvdatum = empty($zgvpruefung->zgvdatum) ? "" : date_format(date_create($zgvpruefung->zgvdatum), 'd.m.Y');
 									if ($infoonly):
@@ -143,7 +143,7 @@
 							</div>
 							<div class="col-lg-<?php echo $columns[3] ?>">
 								<div class="form-group">
-									<label><?= $this->p->t('infocenter', 'zgv') . ' ' . $this->p->t('person','nation') . ':'?></label>
+									<label><?php echo  $this->p->t('infocenter', 'zgv') . ' ' . $this->p->t('person','nation') . ':'?></label>
 									<?php if ($infoonly)
 										echo $zgvpruefung->zgvnation_bez;
 									else
@@ -159,7 +159,7 @@
 						<?php if ($zgvpruefung->studiengangtyp === 'm') : ?>
 							<div class="row">
 								<div class="col-lg-<?php echo $columns[0] ?>">
-									<div class="form-group"><label><?= $this->p->t('infocenter', 'zgv') . ' ' . $this->p->t('lehre','master') . ':'?></label>
+									<div class="form-group"><label><?php echo  $this->p->t('infocenter', 'zgv') . ' ' . $this->p->t('lehre','master') . ':'?></label>
 										<?php
 										if ($infoonly)
 											echo $zgvpruefung->zgvmas_bez;
@@ -173,7 +173,7 @@
 								</div>
 								<div class="col-lg-<?php echo $columns[1] ?>">
 									<div class="form-group">
-										<label><?= $this->p->t('infocenter', 'zgv') . ' ' . $this->p->t('lehre','master') . ' ' . $this->p->t('person','ort') . ':'?></label>
+										<label><?php echo  $this->p->t('infocenter', 'zgv') . ' ' . $this->p->t('lehre','master') . ' ' . $this->p->t('person','ort') . ':'?></label>
 										<?php if ($infoonly):
 											echo $zgvpruefung->zgvmaort;
 										else:
@@ -186,7 +186,7 @@
 								</div>
 								<div class="col-lg-<?php echo $columns[2] ?>">
 									<div class="form-group">
-										<label><?= $this->p->t('infocenter', 'zgv') . ' ' . $this->p->t('lehre','master') . ' ' . $this->p->t('global','datum') . ':'?></label>
+										<label><?php echo  $this->p->t('infocenter', 'zgv') . ' ' . $this->p->t('lehre','master') . ' ' . $this->p->t('global','datum') . ':'?></label>
 										<?php
 										$zgvmadatum = empty($zgvpruefung->zgvmadatum) ? "" : date_format(date_create($zgvpruefung->zgvmadatum), 'd.m.Y');
 										if ($infoonly):
@@ -201,7 +201,7 @@
 									</div>
 								</div>
 								<div class="col-lg-<?php echo $columns[3] ?>">
-									<div class="form-group"><label><?= $this->p->t('infocenter', 'zgv') . ' ' . $this->p->t('lehre','master') . ' ' . $this->p->t('person','nation') . ':'?></label>
+									<div class="form-group"><label><?php echo  $this->p->t('infocenter', 'zgv') . ' ' . $this->p->t('lehre','master') . ' ' . $this->p->t('person','nation') . ':'?></label>
 										<?php
 										if ($infoonly)
 											echo $zgvpruefung->zgvmanation_bez;
@@ -220,12 +220,12 @@
 							<div class="row">
 								<div class="col-xs-6 text-left">
 									<button type="button" class="btn btn-default zgvUebernehmen" id="zgvUebernehmen_<?php echo $zgvpruefung->prestudent_id ?>">
-										<?= $this->p->t('infocenter', 'letzteZgvUebernehmen') ?>
+										<?php echo  $this->p->t('infocenter', 'letzteZgvUebernehmen') ?>
 									</button>
 								</div>
 								<div class="col-xs-6 text-right">
 									<button type="submit" class="btn btn-default saveZgv" id="zgvSpeichern_<?php echo $zgvpruefung->prestudent_id ?>">
-										<?= $this->p->t('ui', 'speichern') ?>
+										<?php echo  $this->p->t('ui', 'speichern') ?>
 									</button>
 								</div>
 							</div>
@@ -248,7 +248,7 @@
 													class="d-inline float-right"
 													required>
 												<option value="null"
-														selected="selected"><?= $this->p->t('infocenter', 'absagegrund', array($this->p->t('global', 'waehlen'))) . '...' ?>
+														selected="selected"><?php echo  $this->p->t('infocenter', 'absagegrund', array($this->p->t('global', 'waehlen'))) . '...' ?>
 												</option>
 												<?php foreach ($statusgruende as $statusgrund): ?>
 													<option value="<?php echo $statusgrund->statusgrund_id ?>"><?php echo $statusgrund->bezeichnung_mehrsprachig[0] ?></option>
@@ -259,7 +259,7 @@
 														class="btn btn-default"
 														data-toggle="modal"
 														data-target="#absageModal_<?php echo $zgvpruefung->prestudent_id ?>">
-													<?= $this->p->t('ui', 'absagen') ?>
+													<?php echo  $this->p->t('ui', 'absagen') ?>
 												</button>
 											</span>
 										</div>
@@ -278,20 +278,20 @@
 															&times;
 														</button>
 														<h4 class="modal-title"
-															id="absageModalLabel"><?= $this->p->t('infocenter', 'absageBestaetigen') ?></h4>
+															id="absageModalLabel"><?php echo  $this->p->t('infocenter', 'absageBestaetigen') ?></h4>
 													</div>
 													<div class="modal-body">
-														<?= $this->p->t('infocenter', 'absageBestaetigenTxt') ?>
+														<?php echo  $this->p->t('infocenter', 'absageBestaetigenTxt') ?>
 													</div>
 													<div class="modal-footer">
 														<button type="button"
 																class="btn btn-default"
 																data-dismiss="modal">
-															<?= $this->p->t('ui', 'abbrechen') ?>
+															<?php echo  $this->p->t('ui', 'abbrechen') ?>
 														</button>
 														<button type="submit"
 																class="btn btn-primary">
-															<?= $this->p->t('infocenter', 'interessentAbweisen') ?>
+															<?php echo  $this->p->t('infocenter', 'interessentAbweisen') ?>
 														</button>
 													</div>
 												</div>
@@ -322,7 +322,7 @@
 											data-toggle="modal"
 											data-target="#freigabeModal_<?php echo $zgvpruefung->prestudent_id ?>"
 											data-toggle="tooltip" title="<?php echo $disabledTxt ?>">
-										<?= $this->p->t('ui', 'freigabeAnStudiengang') ?>
+										<?php echo  $this->p->t('ui', 'freigabeAnStudiengang') ?>
 									</button>
 								</div>
 							</div>
@@ -339,20 +339,20 @@
 											</button>
 											<h4 class="modal-title"
 												id="freigabeModalLabel">
-												<?= $this->p->t('global', 'freigabeBestaetigen') ?></h4>
+												<?php echo  $this->p->t('global', 'freigabeBestaetigen') ?></h4>
 										</div>
 										<div class="modal-body">
-											<?= $this->p->t('infocenter', 'interessentFreigebenTxt') ?>
+											<?php echo  $this->p->t('infocenter', 'interessentFreigebenTxt') ?>
 										</div>
 										<div class="modal-footer">
 											<button type="button"
 													class="btn btn-default"
-													data-dismiss="modal"><?= $this->p->t('ui', 'abbrechen') ?>
+													data-dismiss="modal"><?php echo  $this->p->t('ui', 'abbrechen') ?>
 											</button>
 											<a href="../saveFreigabe/<?php echo $zgvpruefung->prestudent_id ?>">
 												<button type="button"
 														class="btn btn-primary">
-													<?= $this->p->t('infocenter', 'interessentFreigeben') ?>
+													<?php echo  $this->p->t('infocenter', 'interessentFreigeben') ?>
 												</button>
 											</a>
 										</div>
@@ -366,7 +366,7 @@
 						<div class="row">
 							<div class="col-lg-12 text-left">
 								<?php echo isset($zgvpruefung->prestudentstatus->bestaetigtam) ? '<i class="fa fa-check" style="color: green"></i>' : '<i class="fa fa-check" style="color: red"></i>' ?>
-								<label><?= $this->p->t('global', 'anStudiengangFreigegeben') ?></label>
+								<label><?php echo  $this->p->t('global', 'anStudiengangFreigegeben') ?></label>
 							</div>
 						</div><!-- /.row -->
 					</div><!-- /.panel-footer -->

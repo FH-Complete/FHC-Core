@@ -32,14 +32,14 @@ $href = str_replace("/system/Messages/write", "/system/Messages/send", $_SERVER[
 		<div class="container-fluid">
 			<div class="row">
 				<div class="col-lg-12">
-					<h3 class="page-header"><?= ucfirst($this->p->t('ui', 'nachrichtSenden')) ?></h3>
+					<h3 class="page-header"><?php echo  ucfirst($this->p->t('ui', 'nachrichtSenden')) ?></h3>
 				</div>
 			</div>
 			<form id="sendForm" method="post" action="<?php echo $href; ?>">
 				<div class="row">
 					<div class="form-group">
 						<div class="col-lg-1">
-							<label><?= ucfirst($this->p->t('global', 'empfaenger')) . ':'?></label>
+							<label><?php echo  ucfirst($this->p->t('global', 'empfaenger')) . ':'?></label>
 						</div>
 						<div class="col-lg-11">
 							<?php
@@ -60,7 +60,7 @@ $href = str_replace("/system/Messages/write", "/system/Messages/send", $_SERVER[
 				<div class="row">
 					<div class="form-group form-inline">
 						<div class="col-lg-1 msgfield">
-							<label><?= ucfirst($this->p->t('global', 'betreff')) . ':'?></label>
+							<label><?php echo  ucfirst($this->p->t('global', 'betreff')) . ':'?></label>
 						</div>&nbsp;
 						<?php
 						$subject = '';
@@ -78,7 +78,7 @@ $href = str_replace("/system/Messages/write", "/system/Messages/send", $_SERVER[
 				<br>
 				<div class="row">
 					<div class="col-lg-10">
-						<label><?= ucfirst($this->p->t('global', 'nachricht')) . ':'?></label>
+						<label><?php echo  ucfirst($this->p->t('global', 'nachricht')) . ':'?></label>
 						<?php
 						$body = '';
 						if (isset($message))
@@ -93,7 +93,7 @@ $href = str_replace("/system/Messages/write", "/system/Messages/send", $_SERVER[
 						?>
 						<div class="col-lg-2">
 							<div class="form-group">
-								<label><?= ucfirst($this->p->t('ui', 'felder')) . ':'?></label>
+								<label><?php echo  ucfirst($this->p->t('ui', 'felder')) . ':'?></label>
 								<select id="variables" class="form-control" size="14" multiple="multiple">
 									<?php
 									foreach ($variables as $key => $val)
@@ -120,21 +120,21 @@ $href = str_replace("/system/Messages/write", "/system/Messages/send", $_SERVER[
 						?>
 					</div>
 					<div class="col-lg-offset-6 col-lg-1 text-right">
-						<button id="sendButton" class="btn btn-default" type="button"><?= $this->p->t('ui', 'senden')?></button>
+						<button id="sendButton" class="btn btn-default" type="button"><?php echo  $this->p->t('ui', 'senden')?></button>
 					</div>
 				</div>
 				<?php if (isset($receivers) && count($receivers) > 0): ?>
 					<hr>
 					<div class="row">
 						<div class="col-lg-12">
-							<label><?= ucfirst($this->p->t('global', 'vorschau')) . ':'?></label>
+							<label><?php echo  ucfirst($this->p->t('global', 'vorschau')) . ':'?></label>
 						</div>
 					</div>
 					<div class="well">
 						<div class="row">
 							<div class="col-lg-5">
 								<div class="form-grop form-inline">
-									<label><?= ucfirst($this->p->t('global', 'empfaenger')) . ': ' ?></label>
+									<label><?php echo  ucfirst($this->p->t('global', 'empfaenger')) . ': ' ?></label>
 									<select id="recipients">
 										<?php 
 										if (count($receivers) > 1)

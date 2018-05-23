@@ -6,11 +6,11 @@ $widthColumn = $msgExists === true ? 8 : 12;
 	<table id="msgtable" class="table table-bordered table-condensed tablesort-hover tablesort-active">
 		<thead>
 		<tr>
-			<th><?= ucfirst($this->p->t('global','gesendetAm')) ?></th>
-			<th><?= ucfirst($this->p->t('global','sender')) ?></th>
-			<th><?= ucfirst($this->p->t('global','empfaenger')) ?></th>
-			<th><?= ucfirst($this->p->t('global','betreff')) ?></th>
-			<th><?= ucfirst($this->p->t('global','gelesenAm')) ?></th>
+			<th><?php echo  ucfirst($this->p->t('global','gesendetAm')) ?></th>
+			<th><?php echo  ucfirst($this->p->t('global','sender')) ?></th>
+			<th><?php echo  ucfirst($this->p->t('global','empfaenger')) ?></th>
+			<th><?php echo  ucfirst($this->p->t('global','betreff')) ?></th>
+			<th><?php echo  ucfirst($this->p->t('global','gelesenAm')) ?></th>
 		</tr>
 		</thead>
 		<tbody>

@@ -11,7 +11,7 @@
 			<div class="panel panel-default">
 				<div class="panel-heading">
 					<h4 class="panel-title">
-						<a data-toggle="collapse" href="#collapseFilterHeader"><?= ucfirst($this->p->t('filter', 'filterEinstellungen')) ?></a>
+						<a data-toggle="collapse" href="#collapseFilterHeader"><?php echo  ucfirst($this->p->t('filter', 'filterEinstellungen')) ?></a>
 					</h4>
 				</div>
 				<div id="collapseFilterHeader" class="panel-collapse collapse">
