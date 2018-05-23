@@ -221,7 +221,7 @@
 				'<a href="%s/%s?fhc_controller_id=%s">Details</a>',
 				site_url('system/infocenter/InfoCenter/showDetails'),
 				$datasetRaw->{'PersonId'},
-				$this->input->get('fhc_controller_id')
+				(isset($_GET['fhc_controller_id'])?$_GET['fhc_controller_id']:'')
 			);
 
 			if ($datasetRaw->{'SendDate'} == null)
