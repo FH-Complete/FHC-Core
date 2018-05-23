@@ -2,7 +2,6 @@
 
 	$APP = 'infocenter';
 	$NOTBEFORE = '2018-03-01 18:00:00';
-
 	$filterWidgetArray = array(
 		'query' => '
 		SELECT
@@ -83,7 +82,7 @@
 							FROM public.tbl_studiensemester
 							WHERE ende >= NOW()
 						)
-						AND not exists (select 1 from tbl_prestudentstatus psss where psss.prestudent_id = pss.prestudent_id and psss.status_kurzbz = \'Abgewiesener\')
+						AND not exists (select 1 from tbl_prestudentstatus psss where psss.prestudent_id = pss.prestudent_id and psss.status_kurzbz = \'Abgewiesener\' and psss.studiensemester_kurzbz = \'WS2018\')
 					LIMIT 1
 				) AS "AnzahlAbgeschickt",
 				array_to_string(
@@ -104,7 +103,7 @@
 							FROM public.tbl_studiensemester
 							WHERE ende >= NOW()
 						)
-						AND not exists (select 1 from tbl_prestudentstatus psss where psss.prestudent_id = pss.prestudent_id and psss.status_kurzbz = \'Abgewiesener\')
+						AND not exists (select 1 from tbl_prestudentstatus psss where psss.prestudent_id = pss.prestudent_id and psss.status_kurzbz = \'Abgewiesener\' and psss.studiensemester_kurzbz = \'WS2018\')
 					LIMIT 1
 					),\', \'
 				) AS "StgAbgeschickt",
@@ -126,7 +125,7 @@
 							FROM public.tbl_studiensemester
 							WHERE ende >= NOW()
 						)
-					AND not exists (select 1 from tbl_prestudentstatus psss where psss.prestudent_id = pss.prestudent_id and psss.status_kurzbz = \'Abgewiesener\')
+					AND not exists (select 1 from tbl_prestudentstatus psss where psss.prestudent_id = pss.prestudent_id and psss.status_kurzbz = \'Abgewiesener\' and psss.studiensemester_kurzbz = \'WS2018\')
 					LIMIT 1
 					),\', \'
 				) AS "StgNichtAbgeschickt",
@@ -147,7 +146,7 @@
 							FROM public.tbl_studiensemester
 							WHERE start >= NOW()
 						)
-					AND not exists (select 1 from tbl_prestudentstatus psss where psss.prestudent_id = pss.prestudent_id and psss.status_kurzbz = \'Abgewiesener\')
+					AND not exists (select 1 from tbl_prestudentstatus psss where psss.prestudent_id = pss.prestudent_id and psss.status_kurzbz = \'Abgewiesener\' and psss.studiensemester_kurzbz = \'WS2018\')
 					LIMIT 1
 					),\', \'
 				) AS "StgAktiv",
