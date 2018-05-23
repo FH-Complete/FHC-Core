@@ -79,8 +79,11 @@ if(!isset($_POST['submit']))
 echo '	<form action="registration.php" method="POST" name="RegistrationForm">
 			<table border = "0" style="margin: auto; width: 60%; margin-top:5%;">
 				<tr>
-					<td>'.$p->t('global/titel').' Pre</td>
-					<td><input type="text" size="20" maxlength="64" name="titel_pre"></td>
+					<td colspan="2" style="border-bottom: 1px solid grey; padding-bottom: 10px;">'.$p->t('incoming/datenschutzHinweisRegistration').'</td>
+				</tr>
+				<tr>
+					<td style="padding-top: 10px;">'.$p->t('global/titel').' Pre</td>
+					<td style="padding-top: 10px;"><input type="text" size="20" maxlength="64" name="titel_pre"></td>
 				</tr>
 				<tr>
 					<td>'.$p->t('incoming/vorname').'*</td>
@@ -137,7 +140,7 @@ echo '	<form action="registration.php" method="POST" name="RegistrationForm">
 					<td><input type="text" size="40" maxlength="256" name="ort"></td>
 				</tr>
 				<tr>
-					<td>'.$p->t('incoming/nation').'</td>
+					<td>'.$p->t('incoming/nation').'*</td>
 					<td><SELECT name="nation">
 					<option value="nat_auswahl">-- select --</option>';
 					foreach ($nation->nation as $nat)
