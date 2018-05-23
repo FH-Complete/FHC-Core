@@ -6,11 +6,11 @@ $widthColumn = $msgExists === true ? 8 : 12;
 	<table id="msgtable" class="table table-bordered table-condensed tablesort-hover tablesort-active">
 		<thead>
 		<tr>
-			<th>Gesendet am</th>
-			<th>Sender</th>
-			<th>Empf&auml;nger</th>
-			<th>Betreff</th>
-			<th>Gelesen am</th>
+			<th><?= ucfirst($this->p->t('global','gesendetAm')) ?></th>
+			<th><?= ucfirst($this->p->t('global','sender')) ?></th>
+			<th><?= ucfirst($this->p->t('global','empfaenger')) ?></th>
+			<th><?= ucfirst($this->p->t('global','betreff')) ?></th>
+			<th><?= ucfirst($this->p->t('global','gelesenAm')) ?></th>
 		</tr>
 		</thead>
 		<tbody>
@@ -43,6 +43,9 @@ $widthColumn = $msgExists === true ? 8 : 12;
 		selector: "#msgbody",
 		statusbar: false,
 		plugins: "autoresize",
+		autoresize_bottom_margin: 10,
+		autoresize_min_height: 140,
+		autoresize_max_height: 495,
 		//callback to avoid conflict with ajax (for getting body of first message)
 		init_instance_callback: "initMsgBody"
 	});

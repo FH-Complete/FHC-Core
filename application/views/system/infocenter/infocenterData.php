@@ -2,6 +2,7 @@
 
 	$APP = 'infocenter';
 	$NOTBEFORE = '2018-03-01 18:00:00';
+
 	$filterWidgetArray = array(
 		'query' => '
 		SELECT
@@ -151,9 +152,17 @@
 					),\', \'
 				) AS "StgAktiv",
 				pl.zeitpunkt AS "LockDate",
-				pl.lockuser as "LockUser"
+				pl.lockuser as "LockUser",
+				pd.parkdate AS "ParkDate"
 			FROM public.tbl_person p
 		LEFT JOIN (SELECT person_id, zeitpunkt, uid as lockuser FROM system.tbl_person_lock WHERE app = \''.$APP.'\') pl USING(person_id)
+		LEFT JOIN (
+					SELECT person_id, zeitpunkt as parkdate
+					FROM system.tbl_log
+					WHERE logtype_kurzbz = \'Processstate\'
+					AND logdata->>\'name\' = \'Parked\'
+					AND zeitpunkt >= now()
+				) pd USING(person_id)
 			WHERE
 				EXISTS(
 					SELECT 1
@@ -186,17 +195,33 @@
 				)
 			ORDER BY "LastAction" ASC
 		',
-		'fhc_controller_id' => $fhc_controller_id,
 		'checkboxes' => 'PersonId',
 		'additionalColumns' => array('Details'),
-		'columnsAliases' => array('PersonID','Vorname','Nachname','GebDatum','Nation', 'Letzte Aktion','Letzter Bearbeiter',
-			'StSem','GesendetAm','NumAbgeschickt','StgSent','StgNotSent','StgAktiv', 'Sperrdatum','GesperrtVon'),
+		'columnsAliases' => array(
+			'PersonID',
+			ucfirst($this->p->t('person', 'vorname')) ,
+			ucfirst($this->p->t('person', 'nachname')),
+			ucfirst($this->p->t('person', 'geburtsdatum')),
+			ucfirst($this->p->t('person', 'nation')),
+			ucfirst($this->p->t('global', 'letzteAktion')),
+			ucfirst($this->p->t('global', 'letzterBearbeiter')),
+			ucfirst($this->p->t('lehre', 'studiensemester')),
+			ucfirst($this->p->t('global', 'gesendetAm')),
+			ucfirst($this->p->t('global', 'abgeschickt')).' ('.$this->p->t('global', 'anzahl').')',
+			ucfirst($this->p->t('lehre', 'studiengang')).' ('.$this->p->t('global', 'gesendet').')',
+			ucfirst($this->p->t('lehre', 'studiengang')).' ('.$this->p->t('global', 'nichtGesendet').')',
+			ucfirst($this->p->t('lehre', 'studiengang')).' ('.$this->p->t('global', 'aktiv').')',
+			ucfirst($this->p->t('global', 'sperrdatum')),
+			ucfirst($this->p->t('global', 'gesperrtVon')),
+			ucfirst($this->p->t('global', 'parkdatum'))
+		),
 		'formatRaw' => function($datasetRaw) {
 
 			$datasetRaw->{'Details'} = sprintf(
-				'<a href="%s%s">Details</a>',
-				site_url('system/infocenter/InfoCenter/showDetails/'),
-				$datasetRaw->{'PersonId'}
+				'<a href="%s/%s?fhc_controller_id=%s">Details</a>',
+				site_url('system/infocenter/InfoCenter/showDetails'),
+				$datasetRaw->{'PersonId'},
+				$this->input->get('fhc_controller_id')
 			);
 
 			if ($datasetRaw->{'SendDate'} == null)
@@ -205,7 +230,7 @@
 			}
 			else
 			{
-				$datasetRaw->{'SendDate'} = date_format(date_create($datasetRaw->{'SendDate'}),'Y-m-d H:i');
+				$datasetRaw->{'SendDate'} = date_format(date_create($datasetRaw->{'SendDate'}), 'Y-m-d H:i');
 			}
 
 			if ($datasetRaw->{'LastAction'} == null)
@@ -214,7 +239,7 @@
 			}
 			else
 			{
-				$datasetRaw->{'LastAction'} = date_format(date_create($datasetRaw->{'LastAction'}),'Y-m-d H:i');
+				$datasetRaw->{'LastAction'} = date_format(date_create($datasetRaw->{'LastAction'}), 'Y-m-d H:i');
 			}
 
 			if ($datasetRaw->{'User/Operator'} == '')
@@ -230,6 +255,11 @@
 			if ($datasetRaw->{'LockUser'} == null)
 			{
 				$datasetRaw->{'LockUser'} = '-';
+			}
+
+			if ($datasetRaw->{'ParkDate'} == null)
+			{
+				$datasetRaw->{'ParkDate'} = '-';
 			}
 
 			if ($datasetRaw->{'StgAbgeschickt'} == null)
@@ -253,10 +283,20 @@
 		},
 		'markRow' => function($datasetRaw) {
 
+			$mark = '';
+
 			if ($datasetRaw->LockDate != null)
 			{
-				return FilterWidget::DEFAULT_MARK_ROW_CLASS;
+				$mark = FilterWidget::DEFAULT_MARK_ROW_CLASS;
 			}
+
+			if ($datasetRaw->ParkDate != null)
+			{
+				// Parking has priority over locking
+				$mark = "text-info";
+			}
+
+			return $mark;
 		}
 	);
 

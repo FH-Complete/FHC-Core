@@ -37,9 +37,9 @@ const REMOTE_CONTROLLER = "remoteController";
 const FHC_CONTROLLER_ID = "fhc_controller_id";
 
 /**
- * Definition and initialization of object FHC_Ajax_Client
+ * Definition and initialization of object FHC_AjaxClient
  */
-var FHC_Ajax_Client = {
+var FHC_AjaxClient = {
 	//------------------------------------------------------------------------------------------------------------------
 	// Properties
 
@@ -54,7 +54,7 @@ var FHC_Ajax_Client = {
 	 * ajaxCallParameters is an object
 	 */
 	ajaxCallGet: function(remoteController, controllerParameters, ajaxCallParameters) {
-	    FHC_Ajax_Client._ajaxCall(remoteController, controllerParameters, HTTP_GET_METHOD, ajaxCallParameters);
+	    FHC_AjaxClient._ajaxCall(remoteController, controllerParameters, HTTP_GET_METHOD, ajaxCallParameters);
 	},
 
 	/**
@@ -63,7 +63,7 @@ var FHC_Ajax_Client = {
 	 * ajaxCallParameters is an object
 	 */
 	ajaxCallPost: function(remoteController, controllerParameters, ajaxCallParameters) {
-	    FHC_Ajax_Client._ajaxCall(remoteController, controllerParameters, HTTP_POST_METHOD, ajaxCallParameters);
+	    FHC_AjaxClient._ajaxCall(remoteController, controllerParameters, HTTP_POST_METHOD, ajaxCallParameters);
 	},
 
 	/**
@@ -87,7 +87,7 @@ var FHC_Ajax_Client = {
 	 * Checks if the response is an error
 	 */
 	isError: function(response) {
-		return !FHC_Ajax_Client.isSuccess(response);
+		return !FHC_AjaxClient.isSuccess(response);
 	},
 
 	/**
@@ -96,7 +96,7 @@ var FHC_Ajax_Client = {
 	hasData: function(response) {
 		var hasData = false;
 
-	    if (FHC_Ajax_Client.isSuccess(response))
+	    if (FHC_AjaxClient.isSuccess(response))
 	    {
 			if ((jQuery.type(response.retval) == "object" && !jQuery.isEmptyObject(response.retval))
 				|| (jQuery.isArray(response.retval) && response.retval.length > 0)
@@ -116,7 +116,7 @@ var FHC_Ajax_Client = {
 	getData: function(response) {
 		var data = null;
 
-	    if (FHC_Ajax_Client.hasData(response))
+	    if (FHC_AjaxClient.hasData(response))
 	    {
 			data = response.retval;
 	    }
@@ -147,20 +147,20 @@ var FHC_Ajax_Client = {
 	showVeil: function(veilTimeout) {
 		if (typeof veilTimeout == "number")
 		{
-			FHC_Ajax_Client._veilTimeout = veilTimeout;
+			FHC_AjaxClient._veilTimeout = veilTimeout;
 		}
 		else
 		{
-			FHC_Ajax_Client._veilTimeout = VEIL_TIMEOUT;
+			FHC_AjaxClient._veilTimeout = VEIL_TIMEOUT;
 		}
-		FHC_Ajax_Client._showVeil();
+		FHC_AjaxClient._showVeil();
 	},
 
 	/**
 	 * Hide a veil that was shown before
 	 */
 	hideVeil: function() {
-		FHC_Ajax_Client._hideVeil();
+		FHC_AjaxClient._hideVeil();
 	},
 
 	//------------------------------------------------------------------------------------------------------------------
@@ -212,10 +212,10 @@ var FHC_Ajax_Client = {
 	 */
 	_onSuccess: function(response, textStatus, jqXHR) {
 
-		FHC_Ajax_Client._printDebug(this._data, response); // debug time!
+		FHC_AjaxClient._printDebug(this._data, response); // debug time!
 
 		// Call the success callback saved in _successCallback property
-		// NOTE: this is not referred to FHC_Ajax_Client but to the ajax object
+		// NOTE: this is not referred to FHC_AjaxClient but to the ajax object
 		this._successCallback(response);
 	},
 
@@ -224,10 +224,10 @@ var FHC_Ajax_Client = {
 	 */
 	_onError: function(jqXHR, textStatus, errorThrown) {
 
-		FHC_Ajax_Client._printDebug(this._data, null, errorThrown); // debug time!
+		FHC_AjaxClient._printDebug(this._data, null, errorThrown); // debug time!
 
 		 // Call the error callback saved in _errorCallback property
-		 // NOTE: this is not referred to FHC_Ajax_Client but to the ajax object
+		 // NOTE: this is not referred to FHC_AjaxClient but to the ajax object
 	    this._errorCallback(jqXHR, textStatus, errorThrown);
 	},
 
@@ -249,12 +249,12 @@ var FHC_Ajax_Client = {
 	 * Method to show the veil
 	 */
 	_showVeil: function() {
-		if (FHC_Ajax_Client._veilCallersCounter == 0)
+		if (FHC_AjaxClient._veilCallersCounter == 0)
 		{
 			$("<div class=\"veil\"></div>").appendTo('body');
 		}
 
-		FHC_Ajax_Client._veilCallersCounter++;
+		FHC_AjaxClient._veilCallersCounter++;
 	},
 
 	/**
@@ -262,14 +262,14 @@ var FHC_Ajax_Client = {
 	 */
 	_hideVeil: function() {
 		window.setTimeout(function() {
-			if (FHC_Ajax_Client._veilCallersCounter >= 0)
+			if (FHC_AjaxClient._veilCallersCounter >= 0)
 			{
-				if (FHC_Ajax_Client._veilCallersCounter > 0)
+				if (FHC_AjaxClient._veilCallersCounter > 0)
 				{
-					FHC_Ajax_Client._veilCallersCounter--;
+					FHC_AjaxClient._veilCallersCounter--;
 				}
 
-				if (FHC_Ajax_Client._veilCallersCounter == 0)
+				if (FHC_AjaxClient._veilCallersCounter == 0)
 				{
 					$(".veil").remove();
 				}
@@ -281,7 +281,7 @@ var FHC_Ajax_Client = {
 	/**
 	 * Retrives parameters from URL query string (HTTP GET parameters)
 	 */
-	_getUrlParameter: function(sParam) {
+	getUrlParameter: function(sParam) {
 	    var sPageURL = decodeURIComponent(window.location.search.substring(1)),
 	        sURLVariables = sPageURL.split('&'),
 	        sParameterName,
@@ -319,7 +319,7 @@ var FHC_Ajax_Client = {
 	    if (typeof remoteController == "string" && remoteController.trim() != "")
 	    {
 			// Is it possible to generate the URL
-			if ((url = FHC_Ajax_Client._generateRouterURI(remoteController)) != null)
+			if ((url = FHC_AjaxClient._generateRouterURI(remoteController)) != null)
 			{
 				ajaxParameters.url = url;
 			}
@@ -339,11 +339,10 @@ var FHC_Ajax_Client = {
 	    if (typeof controllerParameters == "object")
 	    {
 			// Copy the properties of controllerParameters into a new object
-			var data = FHC_Ajax_Client._cpObjProps(controllerParameters);
-			// Remote controller
-			data[REMOTE_CONTROLLER] = remoteController;
+			var data = FHC_AjaxClient._cpObjProps(controllerParameters);
+
 			// fhc_controller_id is given if present
-			data[FHC_CONTROLLER_ID] = FHC_Ajax_Client._getUrlParameter(FHC_CONTROLLER_ID);
+			data[FHC_CONTROLLER_ID] = FHC_AjaxClient.getUrlParameter(FHC_CONTROLLER_ID);
 
 			// Stores them into ajaxParameters
 			// NOTE: property data is not possible to get later,
@@ -367,7 +366,7 @@ var FHC_Ajax_Client = {
 				if (typeof ajaxCallParameters.errorCallback == "function")
 				{
 					ajaxParameters._errorCallback = ajaxCallParameters.errorCallback; // save as property the callback error
-					ajaxParameters.error = FHC_Ajax_Client._onError; // function to call if an error occurred
+					ajaxParameters.error = FHC_AjaxClient._onError; // function to call if an error occurred
 				}
 				else
 				{
@@ -382,7 +381,7 @@ var FHC_Ajax_Client = {
 				if (typeof ajaxCallParameters.successCallback == "function")
 				{
 					ajaxParameters._successCallback = ajaxCallParameters.successCallback; // save as property the callback success
-					ajaxParameters.success = FHC_Ajax_Client._onSuccess; // function to call if succeeded
+					ajaxParameters.success = FHC_AjaxClient._onSuccess; // function to call if succeeded
 				}
 				else
 				{
@@ -397,8 +396,8 @@ var FHC_Ajax_Client = {
 				if (ajaxCallParameters.veilTimeout > 0 && ajaxCallParameters.veilTimeout < 60000)
 				{
 					ajaxParameters._veilTimeout = ajaxCallParameters.veilTimeout;
-					ajaxParameters.beforeSend = FHC_Ajax_Client._showVeil;
-					ajaxParameters.complete = FHC_Ajax_Client._hideVeil;
+					ajaxParameters.beforeSend = FHC_AjaxClient._showVeil;
+					ajaxParameters.complete = FHC_AjaxClient._hideVeil;
 				}
 				else if(ajaxCallParameters.veilTimeout == 0)
 				{
@@ -413,8 +412,8 @@ var FHC_Ajax_Client = {
 			else // is not present or the value is invalid
 			{
 				ajaxParameters._veilTimeout = VEIL_TIMEOUT;
-				ajaxParameters.beforeSend = FHC_Ajax_Client._showVeil;
-				ajaxParameters.complete = FHC_Ajax_Client._hideVeil;
+				ajaxParameters.beforeSend = FHC_AjaxClient._showVeil;
+				ajaxParameters.complete = FHC_AjaxClient._hideVeil;
 			}
 		}
 
@@ -438,7 +437,7 @@ var FHC_Ajax_Client = {
 	 */
 	_ajaxCall: function(remoteController, controllerParameters, type, ajaxCallParameters) {
 		// Retrives the parameters for the ajax call
-		var ajaxParameters = FHC_Ajax_Client._checkAndGenerateAjaxParams(remoteController, controllerParameters, type, ajaxCallParameters);
+		var ajaxParameters = FHC_AjaxClient._checkAndGenerateAjaxParams(remoteController, controllerParameters, type, ajaxCallParameters);
 
 		// Checks the given parameters if they are present and are valid
 	    if (ajaxParameters != null)

@@ -90,4 +90,36 @@ class PersonLog_model extends CI_Model
 
 		return success($result->result());
 	}
+
+	/**
+	 * Gets all logs with zeitpunkt > today
+	 * @param $person_id
+	 * @return array
+	 */
+	public function getLogsInFuture($person_id)
+	{
+		$this->db->order_by('zeitpunkt', 'DESC');
+		$this->db->order_by('log_id', 'DESC');
+
+		$where = "logtype_kurzbz = 'Processstate' 
+					AND person_id=".$this->db->escape($person_id)."
+					AND zeitpunkt >= now()";
+
+		$result = $this->db->get_where($this->dbTable, $where);
+
+		return success($result->result());
+	}
+
+	/**
+	 * Deletes a log
+	 * @param $log_id
+	 * @return array
+	 */
+	public function deleteLog($log_id)
+	{
+		$this->db->where('log_id', $log_id);
+		$result = $this->db->delete($this->dbTable);
+
+		return success($result);
+	}
 }

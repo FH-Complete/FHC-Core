@@ -77,4 +77,15 @@ class Phrase_model extends DB_Model
 
 		return $this->execQuery($query, array($categories, $language));
 	}
+
+	/**
+	 * Loads all categories 
+	 */
+	public function getCategories()
+	{
+		$query = 'SELECT DISTINCT category
+					FROM system.tbl_phrase';
+
+		return $this->execQuery($query);
+	}
 }

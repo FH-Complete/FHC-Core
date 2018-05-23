@@ -46,7 +46,7 @@ function tablesortAddPager(tableid, pagerid, size)
 		'</form>' +
 		'</div>';
 
-	var rowcount = $("#" + tableid + " tr").length;
+	var rowcount = $("#" + tableid + " tbody tr").length;
 
 	//not show pager if only one table page
 	if (rowcount > size)

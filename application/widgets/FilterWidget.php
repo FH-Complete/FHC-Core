@@ -506,7 +506,8 @@ class FilterWidget extends Widget
 		$this->hideSave = false;
 		$this->columnsAliases = null;
 		$this->filterName = null;
-		$this->fhc_controller_id = null;
+
+		$this->filterUniqueId = $this->_getFilterUniqueId();
 
 		if (!is_array($args) || (is_array($args) && count($args) == 0))
 		{
@@ -514,15 +515,6 @@ class FilterWidget extends Widget
 		}
 		else
 		{
-			if (!isset($args['fhc_controller_id']))
-			{
-				show_error('Dude you forgot the fhc_controller_id');
-			}
-			else
-			{
-				$this->fhc_controller_id = $args['fhc_controller_id'];
-			}
-
 			if ((
 					!isset($args[self::APP_PARAMETER])
 					&& !isset($args[self::DATASET_NAME_PARAMETER])
@@ -1164,8 +1156,8 @@ class FilterWidget extends Widget
 	 */
 	private function _readSession()
 	{
-		if (isset($_SESSION[self::SESSION_NAME]) && isset($_SESSION[self::SESSION_NAME][$this->fhc_controller_id]))
-			return $_SESSION[self::SESSION_NAME][$this->fhc_controller_id];
+		if (isset($_SESSION[self::SESSION_NAME]) && isset($_SESSION[self::SESSION_NAME][$this->filterUniqueId]))
+			return $_SESSION[self::SESSION_NAME][$this->filterUniqueId];
 
 		return array();
 	}
@@ -1181,6 +1173,14 @@ class FilterWidget extends Widget
 			$_SESSION[self::SESSION_NAME] = array();
 		}
 
-		$_SESSION[self::SESSION_NAME][$this->fhc_controller_id] = $data;
+		$_SESSION[self::SESSION_NAME][$this->filterUniqueId] = $data;
+	}
+
+	/**
+	 *
+	 */
+	private function _getFilterUniqueId()
+	{
+		return $this->router->directory.$this->router->class.'/'.$this->router->method.'/'.$this->input->get('fhc_controller_id');
 	}
 }

@@ -6,7 +6,7 @@ if (! defined('BASEPATH')) exit('No direct script access allowed');
  * Also shows infocenter-related data for a person and its prestudents, enables document and zgv checks,
  * displays and saves Notizen for a person, logs infocenter-related actions for a person
  */
-class InfoCenter extends VileSci_Controller
+class InfoCenter extends FHC_Controller
 {
 	// App and Verarbeitungstaetigkeit name for logging
 	const APP = 'infocenter';
@@ -21,12 +21,14 @@ class InfoCenter extends VileSci_Controller
 		'saveformalgep' => array(
 			'logtype' => 'Action',
 			'name' => 'Document formally checked',
-			'message' => 'Document %s formally checked, set to %s'
+			'message' => 'Document %s formally checked, set to %s',
+			'success' => null
 		),
 		'savezgv' => array(
 			'logtype' => 'Action',
 			'name' => 'ZGV saved',
-			'message' => 'ZGV saved for degree program %s, prestudentid %s'
+			'message' => 'ZGV saved for degree program %s, prestudentid %s',
+			'success' => null
 		),
 		'abgewiesen' => array(
 			'logtype' => 'Processstate',
@@ -41,12 +43,14 @@ class InfoCenter extends VileSci_Controller
 		'savenotiz' => array(
 			'logtype' => 'Action',
 			'name' => 'Note added',
-			'message' => 'Note with title %s was added'
+			'message' => 'Note with title %s was added',
+			'success' => null
 		),
 		'updatenotiz' => array(
 			'logtype' => 'Action',
 			'name' => 'Note updated',
-			'message' => 'Note with title %s was updated'
+			'message' => 'Note with title %s was updated',
+			'success' => null
 		)
 	);
 	private $uid; // contains the UID of the logged user
@@ -73,6 +77,17 @@ class InfoCenter extends VileSci_Controller
 		$this->load->library('DmsLib');
 		$this->load->library('PersonLogLib');
 		$this->load->library('WidgetLib');
+
+		$this->loadPhrases(
+			array(
+				'global',
+				'person',
+				'lehre',
+				'ui',
+				'infocenter',
+				'filter'
+			)
+		);
 
 		$this->_setAuthUID(); // sets property uid
 
@@ -127,13 +142,14 @@ class InfoCenter extends VileSci_Controller
 		$persondata = $this->_loadPersonData($person_id);
 		$prestudentdata = $this->_loadPrestudentData($person_id);
 
-		$this->load->view(
-			'system/infocenter/infocenterDetails.php',
-			array_merge(
-				$persondata,
-				$prestudentdata
-			)
+		$data = array_merge(
+			$persondata,
+			$prestudentdata
 		);
+
+		$data['fhc_controller_id'] = $this->fhc_controller_id;
+
+		$this->load->view('system/infocenter/infocenterDetails.php', $data);
 	}
 
 	/**
@@ -147,7 +163,7 @@ class InfoCenter extends VileSci_Controller
 		if(isError($result))
 			show_error($result->retval);
 
-		redirect(self::URL_PREFIX);
+		redirect(self::URL_PREFIX.'?fhc_controller_id='.$this->fhc_controller_id);
 	}
 
 	/**
@@ -405,7 +421,8 @@ class InfoCenter extends VileSci_Controller
 
 				$result = $this->DokumentprestudentModel->setAcceptedDocuments($prestudent_id, $dokument_kurzbzs);
 
-				if (isError($result))
+				//returns null if no documents to accept
+				if ($result !== null && isError($result))
 				{
 					show_error($result->retval);
 				}
@@ -465,12 +482,11 @@ class InfoCenter extends VileSci_Controller
 			)
 		);
 
-
-		$json = FALSE;
+		$json = false;
 
 		if (isSuccess($result))
 		{
-			$json = TRUE;
+			$json = true;
 
 			//set log "Notiz updated"
 			$this->_log($person_id, 'updatenotiz', array($titel));
@@ -535,6 +551,61 @@ class InfoCenter extends VileSci_Controller
 			->_display();
 	}
 
+	/**
+	 * Gets the date until which a person is parked
+	 * @param $person_id
+	 */
+	public function getParkedDate($person_id)
+	{
+		$result = $this->personloglib->getParkedDate($person_id);
+
+		$this->output
+			->set_content_type('application/json')
+			->set_output(json_encode($result));
+	}
+
+	/**
+	 * Initializes parking of a person, i.e. a person is not expected to do any actions while it is parked
+	 */
+	public function park()
+	{
+		$person_id = $this->input->post('person_id');
+		$date = $this->input->post('parkdate');
+
+		$this->personloglib->park($person_id, date_format(date_create($date), 'Y-m-d'), self::TAETIGKEIT, self::APP, null, $this->uid);
+	}
+
+	/**
+	 * Removes parking of a person
+	 */
+	public function unPark()
+	{
+		$person_id = $this->input->post('person_id');
+
+		$this->personloglib->unPark($person_id);
+	}
+
+	/**
+	 * Gets the End date of the current Studienjahr
+	 */
+	public function getStudienjahrEnd()
+	{
+		$this->load->model('organisation/studienjahr_model', 'StudienjahrModel');
+
+		$result = $this->StudienjahrModel->getCurrStudienjahr();
+
+		$json = false;
+
+		if (hasData($result))
+		{
+			$json = $result->retval[0]->ende;
+		}
+
+		$this->output
+			->set_content_type('application/json')
+			->set_output(json_encode($json));
+	}
+
 	// -----------------------------------------------------------------------------------------------------------------
 	// Private methods
 
@@ -592,13 +663,13 @@ class InfoCenter extends VileSci_Controller
 		$filtersarray = array(
 			'abgeschickt' => array(
 				'link' => '#',
-				'description' => 'Abgeschickt',
+				'description' => ucfirst($this->p->t('global', 'abgeschickt')),
 				'expand' => true,
 				'children' => array()
 			),
 			'nichtabgeschickt' => array(
 				'link' => '#',
-				'description' => 'Nicht abgeschickt',
+				'description' => ucfirst($this->p->t('global', 'nichtAbgeschickt')),
 				'expand' => true,
 				'children' => array()
 			)
@@ -649,10 +720,10 @@ class InfoCenter extends VileSci_Controller
 	{
 		foreach ($filters as $filterId => $description)
 		{
-			$toPrint = "%s?%s=%s&%s=%s";
+			$toPrint = "%s?%s=%s";
 
 			$tofill['children'][] = array(
-				'link' => sprintf($toPrint, site_url('system/infocenter/InfoCenter'), 'filter_id', $filterId, 'fhc_controller_id', $this->fhc_controller_id),
+				'link' => sprintf($toPrint, site_url('system/infocenter/InfoCenter'), 'filter_id', $filterId),
 				'description' => $description
 			);
 		}
@@ -662,10 +733,10 @@ class InfoCenter extends VileSci_Controller
 	{
 		foreach ($filters as $filterId => $description)
 		{
-			$toPrint = "%s?%s=%s&%s=%s";
+			$toPrint = "%s?%s=%s";
 
 			$tofill['children'][] = array(
-				'link' => sprintf($toPrint, site_url('system/infocenter/InfoCenter'), 'filter_id', $filterId, 'fhc_controller_id', $this->fhc_controller_id),
+				'link' => sprintf($toPrint, site_url('system/infocenter/InfoCenter'), 'filter_id', $filterId),
 				'description' => $description,
 				'subscriptDescription' => 'Remove',
 				'subscriptLinkClass' => 'remove-filter',
@@ -754,7 +825,7 @@ class InfoCenter extends VileSci_Controller
 			show_error($user_person->retval);
 		}
 
-		$messagelink = base_url('/index.ci.php/system/Messages/write/'.$user_person->retval[0]->person_id);
+		$messagelink = site_url('/system/Messages/write/'.$user_person->retval[0]->person_id);
 
 		$data = array (
 			'lockedby' => $lockedby,
@@ -856,7 +927,7 @@ class InfoCenter extends VileSci_Controller
 		$this->PrestudentModel->addSelect('person_id');
 		$person_id = $this->PrestudentModel->load($prestudent_id)->retval[0]->person_id;
 
-		redirect(self::URL_PREFIX.'/showDetails/'.$person_id.'#'.$section);
+		redirect(self::URL_PREFIX.'/showDetails/'.$person_id.'?fhc_controller_id='.$this->fhc_controller_id.'#'.$section);
 	}
 
 	/**
@@ -890,15 +961,20 @@ class InfoCenter extends VileSci_Controller
 	{
 		$logdata = $this->logparams[$logname];
 
+		$datatolog = array(
+			'name' => $logdata['name']
+		);
+
+		if (isset($logdata['message']))
+			$datatolog['message'] = vsprintf($logdata['message'], $messageparams);
+
+		if (array_key_exists('success', $logdata))
+			$datatolog['success'] = true;
+
 		$this->personloglib->log(
 			$person_id,
 			$logdata['logtype'],
-			array(
-				'name' => $logdata['name'],
-				'message' => vsprintf($logdata['message'],
-				$messageparams),
-				'success' => 'true'
-			),
+			$datatolog,
 			self::TAETIGKEIT,
 			self::APP,
 			null,
@@ -1004,7 +1080,7 @@ class InfoCenter extends VileSci_Controller
 		if (!empty($receiver))
 		{
 			//Freigabeinformationmail sent from default system mail to studiengang mail(s)
-			$sent = $this->maillib->send('', $receiver, $subject, $email);
+			$sent = $this->maillib->send('', $receiver, $subject, $email, '', null, null, 'Bitte sehen Sie sich die Nachricht in HTML Sicht an, um den Inhalt vollständig darzustellen.');
 
 			if (!$sent)
 				$this->loglib->logError('Error when sending Freigabe mail');

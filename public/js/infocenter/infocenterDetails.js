@@ -1,25 +1,6 @@
-/**
- *
- */
-function getUrlParameter(sParam)
-{
-    var sPageURL = decodeURIComponent(window.location.search.substring(1)),
-        sURLVariables = sPageURL.split('&'),
-        sParameterName,
-        i;
 
-    for (i = 0; i < sURLVariables.length; i++)
-	{
-        sParameterName = sURLVariables[i].split('=');
-
-        if (sParameterName[0] === sParam)
-		{
-            return sParameterName[1];
-        }
-    }
-}
-
-var fhc_controller_id = getUrlParameter("fhc_controller_id");
+var fhc_controller_id = FHC_AjaxClient.getUrlParameter('fhc_controller_id');
+const CONTROLLER_URL = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router + "/"+FHC_JS_DATA_STORAGE_OBJECT.called_path;
 
 /**
  * javascript file for infocenterDetails page
@@ -31,7 +12,7 @@ $(document).ready(
 		addTablesorter("doctable", [[2, 1], [1, 0]], ["zebra"]);
 		addTablesorter("nachgdoctable", [[2, 0], [1, 1]], ["zebra"]);
 		addTablesorter("msgtable", [[0, 1], [2, 0]], ["zebra", "filter"], 2);
-		tablesortAddPager("msgtable", "msgpager", 10);
+		tablesortAddPager("msgtable", "msgpager", 14);
 
 		formatNotizTable();
 		formatLogTable();
@@ -41,6 +22,8 @@ $(document).ready(
 		$(".dateinput").datepicker({
 			"dateFormat": "dd.mm.yy"
 		});
+
+		var personid = $("#hiddenpersonid").val();
 
 		//add submit event to message send link
 		$("#sendmsglink").click(
@@ -54,7 +37,6 @@ $(document).ready(
 		$(".prchbox").click(function ()
 		{
 			var boxid = this.id;
-			var personid = $("#hiddenpersonid").val();
 			var akteid = boxid.substr(boxid.indexOf("_") + 1);
 			var checked = this.checked;
 			saveFormalGeprueft(personid, akteid, checked)
@@ -64,7 +46,6 @@ $(document).ready(
 		$(".zgvUebernehmen").click(function ()
 		{
 			var btn = $(this);
-			var personid = $("#hiddenpersonid").val();
 			var prestudentid = this.id.substr(this.id.indexOf("_") + 1);
 			$('#zgvUebernehmenNotice').remove();
 			zgvUebernehmen(personid, prestudentid, btn)
@@ -118,11 +99,11 @@ $(document).ready(
 
 				if (notizId !== '')
 				{
-					updateNotiz(notizId, personId, data);
+					updateNotiz(notizId, personid, data);
 				}
 				else
 				{
-					saveNotiz(personId, data);
+					saveNotiz(personid, data);
 				}
 			}
 		);
@@ -150,6 +131,9 @@ $(document).ready(
 			}
 		);
 
+		//check if person is parked and display it
+		getParkedDateAjax(personid);
+
 	});
 
 function openZgvInfoForPrestudent(prestudent_id)
@@ -157,7 +141,6 @@ function openZgvInfoForPrestudent(prestudent_id)
 	var screenwidth = screen.width;
 	var popupwidth = 760;
 	var marginleft = screenwidth - popupwidth;
-	console.log(marginleft);
 	window.open("../getZgvInfoForPrestudent/" + prestudent_id, "_blank","resizable=yes,scrollbars=yes,width="+popupwidth+",height="+screen.height+",left="+marginleft);
 }
 
@@ -169,7 +152,7 @@ function saveFormalGeprueft(personid, akteid, checked)
 	$.ajax({
 		type: "POST",
 		dataType: "json",
-		url: "../saveFormalGeprueft/" + personid + '?fhc_controller_id=' + fhc_controller_id,
+		url: CONTROLLER_URL+"/saveFormalGeprueft/" + personid + '?fhc_controller_id=' + fhc_controller_id,
 		data: {"akte_id": akteid, "formal_geprueft": checked},
 		success: function (data, textStatus, jqXHR)
 		{
@@ -197,9 +180,9 @@ function saveFormalGeprueft(personid, akteid, checked)
 function zgvUebernehmen(personid, prestudentid, btn)
 {
 	$.ajax({
-		type: "POST",
+		type: "GET",
 		dataType: "json",
-		url: "../getLastPrestudentWithZgvJson/" + personid + '?fhc_controller_id=' + fhc_controller_id,
+		url: CONTROLLER_URL+"/getLastPrestudentWithZgvJson/" + personid + '?fhc_controller_id=' + fhc_controller_id,
 		success: function (data, textStatus, jqXHR)
 		{
 			if (data !== null)
@@ -239,7 +222,7 @@ function saveZgv(data)
 		type: "POST",
 		dataType: "json",
 		data: data,
-		url: "../saveZgvPruefung/" + prestudentid + '?fhc_controller_id=' + fhc_controller_id,
+		url: CONTROLLER_URL+"/saveZgvPruefung/" + prestudentid + '?fhc_controller_id=' + fhc_controller_id,
 		success: function (data, textStatus, jqXHR)
 		{
 			if (data === prestudentid)
@@ -265,7 +248,7 @@ function saveNotiz(personid, data)
 		type: "POST",
 		dataType: "json",
 		data: data,
-		url: "../saveNotiz/" + personid + '?fhc_controller_id=' + fhc_controller_id,
+		url: CONTROLLER_URL+"/saveNotiz/" + personid + '?fhc_controller_id=' + fhc_controller_id,
 		success: function (data, textStatus, jqXHR)
 		{
 			refreshNotizen();
@@ -284,7 +267,7 @@ function updateNotiz(notizId, personId, data)
 		type: "POST",
 		dataType: "json",
 		data: data,
-		url: "../updateNotiz/" + notizId + "/" + personId + '?fhc_controller_id=' + fhc_controller_id,
+		url: CONTROLLER_URL+"/updateNotiz/" + notizId + "/" + personId + '?fhc_controller_id=' + fhc_controller_id,
 		success: function (data, textStatus, jqXHR)
 		{
 			if (data)
@@ -301,13 +284,91 @@ function updateNotiz(notizId, personId, data)
 	});
 }
 
+function getStudienjahrEndAjax()
+{
+	$.ajax({
+		url: CONTROLLER_URL+"/getStudienjahrEnd?fhc_controller_id="+fhc_controller_id,
+		method: "GET",
+		success: function(data, textStatus, jqXHR)
+		{
+			//var gerdate = data.substring(8, 10) + "."+data.substring(5, 7) + "." + data.substring(0, 4);
+			var engdate = $.datepicker.parseDate("yy-mm-dd", data);
+			var gerdate = $.datepicker.formatDate("dd.mm.yy", engdate);
+			$("#parkdate").val(gerdate);
+		},
+		error: function (jqXHR, textStatus, errorThrown)
+		{
+			alert(textStatus);
+		}
+	});
+}
+
+function getParkedDateAjax(personid)
+{
+	$.ajax({
+		url: CONTROLLER_URL+"/getParkedDate/"+personid+"?fhc_controller_id="+fhc_controller_id,
+		method: "GET",
+		success: function(data, textStatus, jqXHR)
+		{
+			refreshParking(data);
+			refreshLog();
+			getStudienjahrEndAjax();
+		},
+		error: function (jqXHR, textStatus, errorThrown)
+		{
+			alert(textStatus);
+		}
+	});
+}
+
+function parkPersonAjax(personid, date)
+{
+	$.ajax({
+		url: CONTROLLER_URL+"/park?fhc_controller_id="+fhc_controller_id,
+		method: "POST",
+		data:
+		{
+			"person_id": personid,
+			"parkdate": date
+		},
+		success: function(data, textStatus, jqXHR)
+		{
+			getParkedDateAjax(personid);
+		},
+		error: function (jqXHR, textStatus, errorThrown)
+		{
+			alert(textStatus);
+		}
+	});
+}
+
+function unparkPersonAjax(personid)
+{
+	$.ajax({
+		url: CONTROLLER_URL+"/unpark?fhc_controller_id="+fhc_controller_id,
+		method: "POST",
+		data:
+		{
+			"person_id": personid
+		},
+		success: function(data, textStatus, jqXHR)
+		{
+			getParkedDateAjax(personid);
+		},
+		error: function (jqXHR, textStatus, errorThrown)
+		{
+			alert(textStatus);
+		}
+	});
+}
+
 // -----------------------------------------------------------------------------------------------------------------
 // methods executed after ajax (refreshers)
 
 function refreshLog()
 {
 	var personid = $("#hiddenpersonid").val();
-	$("#logs").load('../reloadLogs/' + personid,
+	$("#logs").load('../reloadLogs/' + personid + '?fhc_controller_id=' + fhc_controller_id,
 		function ()
 		{
 			//readd tablesorter
@@ -319,7 +380,7 @@ function refreshLog()
 function formatLogTable()
 {
 	addTablesorter("logtable", [[0, 1]], ["filter"], 2);
-	tablesortAddPager("logtable", "logpager", 23);
+	tablesortAddPager("logtable", "logpager", 22);
 	$("#logtable").addClass("table-condensed");
 }
 
@@ -336,10 +397,54 @@ function refreshNotizen()
 	);
 }
 
+function refreshParking(date)
+{
+	if (date === null)
+	{
+		$("#parking").html(
+			'<div class="form-group form-inline">'+
+				'<button class="btn btn-default" id="parklink" type="button""><i class="fa fa-clock-o"></i>&nbsp;BewerberIn parken</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'+
+				'bis&nbsp;&nbsp;'+
+				'<input id="parkdate" type="text" class="form-control" placeholder="Parkdatum" style="height: 25px; width: 99px">'+
+			'</div>');
+
+		$("#parkdate").datepicker({
+			"dateFormat": "dd.mm.yy",
+			"minDate": 0
+		});
+
+		$("#parklink").click(
+			function ()
+			{
+				var personid = $("#hiddenpersonid").val();
+				var date = $("#parkdate").val();
+
+				parkPersonAjax(personid, date);
+			}
+		);
+	}
+	else
+	{
+		var parkdate = $.datepicker.parseDate("yy-mm-dd", date);
+		var gerparkdate = $.datepicker.formatDate("dd.mm.yy", parkdate);
+		$("#parking").html(
+			'BewerberIn geparkt bis '+gerparkdate+'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'+
+			'<button class="btn btn-default" id="unparklink"><i class="fa fa-sign-out"></i>&nbsp;BewerberIn ausparken</button>&nbsp;');
+
+		$("#unparklink").click(
+			function ()
+			{
+				var personid = $("#hiddenpersonid").val();
+				unparkPersonAjax(personid, date);
+			}
+		);
+	}
+}
+
 function formatNotizTable()
 {
 	addTablesorter("notiztable", [[0, 1]], ["filter"], 2);
-	tablesortAddPager("notiztable", "notizpager", 10);
+	tablesortAddPager("notiztable", "notizpager", 11);
 	$("#notiztable").addClass("table-condensed");
 }
 

@@ -187,22 +187,67 @@ class PhrasesLib
 		{
 			for ($i = 0; $i < count($this->_phrases); $i++)
 			{
+				
 				$_phrase = $this->_phrases[$i];
-
+									
 				if ($_phrase->category == $category
 					&& $_phrase->phrase == $phrase
 					&& $_phrase->orgeinheit_kurzbz == $orgeinheit_kurzbz
-					&& $_phrase->orgform_kurzbz== $orgform_kurzbz)
-				{
-					if ($parameters == null) $parameters = array();
+					&& $_phrase->orgform_kurzbz== $orgform_kurzbz
+					&& (!empty($_phrase->text)))
+					{
+						if ($parameters == null) 
+							$parameters = array();
+						
+						return $this->_ci->parser->parse_string($_phrase->text, $parameters, true);	
+					}			
+			}
+			
+			//fallback 1: if phrase not found in phrases-array, try with default language
+			$default_language = DEFAULT_LANGUAGE;
+			$categories = $this->_ci->PhraseModel->getCategories();
+			
+			if (hasData($categories))
+			{
+				$categories = $categories->retval;
+				foreach($categories as $cat)
+					$all_categories[] = $cat->category;
+			}
+			
+			$phrases = $this->_ci->PhraseModel->getPhrasesByCategoryAndLanguage($all_categories, $default_language);
+			
+			if (hasData($phrases))
+			{
+				$default_phrases = $phrases->retval;
+			}
 
-					echo $this->_ci->parser->parse_string($_phrase->text, $parameters, true)."\n";
-					break;
+			if (isset($default_phrases) && is_array($default_phrases))
+			{
+				for ($i = 0; $i < count($default_phrases); $i++)
+				{
+					$_phrase = $default_phrases[$i];
+//									var_dump($_phrase);
+									
+//									echo $phrase . "<br>";
+//									echo $_phrase->phrase . "<br><br>";
+
+					if ($_phrase->category == $category
+						&& $_phrase->phrase == $phrase
+						&& $_phrase->orgeinheit_kurzbz == $orgeinheit_kurzbz
+						&& $_phrase->orgform_kurzbz== $orgform_kurzbz)
+					{
+						if ($parameters == null) 
+							$parameters = array();						
+						return $this->_ci->parser->parse_string($_phrase->text, $parameters, true);	
+					}			
 				}
 			}
-		}
+			
+			//fallback 2: if phrase not found at all, return phrasename
+			$phrase = '<< PHRASE ' . $phrase . ' >>';
+			return $this->_ci->parser->parse_string($phrase, $parameters, true);
+		}		
 	}
-
 	// -----------------------------------------------------------------------------------------------------------------
 	// Private methods
 
