@@ -24,13 +24,31 @@ require_once('../../include/functions.inc.php');
 require_once('../../include/phrasen.class.php');
 require_once('../../include/basis_db.class.php');
 require_once('../../include/gruppe.class.php');
+require_once('../../include/student.class.php');
+require_once('../../include/benutzerfunktion.class.php');
+require_once('../../include/studiengang.class.php');
 
 $sprache = getSprache();
 $p = new phrasen($sprache);
 $uid = get_uid();
+
+$is_lector=check_lektor($uid);
+$is_stdv=false;
+$std_obj = new student($uid); 
+
+//Studien- und Hochschulvertreter duerfen den Verteiler tw_std oeffnen
+if(!$is_lector)
+{
+	$fkt = new benutzerfunktion();
+	if($fkt->benutzerfunktion_exists($uid, 'stdv', true)) // Studienvertretung
+		$is_stdv=true;
+	elseif($fkt->benutzerfunktion_exists($uid, 'hsv', true)) // Hochschulvertretung
+		$is_stdv=true;
+}
+
 $db = new basis_db();
 if (!isset($_REQUEST['grp']))
-	die('Falsche Parameter');
+	die('Parameter "grp" wurde nicht uebergeben');
 
 if (mb_strlen($_REQUEST['grp'])>32)
 	die('Grp ungueltig');
@@ -41,12 +59,30 @@ if (!$gruppe->exists($_REQUEST['grp']))
 {
 	//Wenn es keine Gruppe in der DB ist, kann es
 	//noch ein Studierendenverteiler sein
-	//bif_std
+	//zb bif_std oder tw_std
 	if (!preg_match('/^\D\D\D_std$/', $_REQUEST['grp']))
 	{
 		die('Ungueltige Gruppe');
 	}
+	else
+	{
+		// Kürzel aus Gruppe auslesen
+		$studiengang_kuerzel = substr($_REQUEST['grp'], 0, strpos($_REQUEST['grp'], '_'));
+		$studiengang = new studiengang();
+		$studiengang->getStudiengangFromOe($studiengang_kuerzel);
+
+		// Lektoren oder Studierende dieses Studiengangs dürfen
+		if (!$is_lector && $std_obj->studiengang_kz != $studiengang->studiengang_kz)
+			die('Sie haben keine Berechtigung zum öffnen dieses Mailverteilers');
+	}
 }
+elseif (!$is_lector && $_REQUEST['grp'] == 'tw_std')
+{
+	//Studien- und Hochschulvertreter duerfen den Verteiler tw_std oeffnen
+	if ($is_stdv === false)
+		die('!$is_lector Sie haben keine Berechtigung zum öffnen dieses Mailverteilers');
+}
+
 function mail_id_generator()
 {
 	mt_srand((double)microtime()*1000000);

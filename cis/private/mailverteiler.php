@@ -46,7 +46,9 @@ $std_obj = new student($user);
 if(!$is_lector)
 {
 	$fkt = new benutzerfunktion();
-	if($fkt->benutzerfunktion_exists($user, 'stdv'))
+	if($fkt->benutzerfunktion_exists($user, 'stdv', true)) // Studienvertretung
+		$is_stdv=true;
+	elseif($fkt->benutzerfunktion_exists($user, 'hsv', true)) // Hochschulvertretung
 		$is_stdv=true;
 }
 

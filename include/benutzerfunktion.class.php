@@ -102,12 +102,18 @@ class benutzerfunktion extends basis_db
 
 	/**
 	 * Prueft ob der Benutzer $uid die
-	 * Funktion $benutzerfunktion hat
+	 * Funktion $benutzerfunktion hat. Der optionale Parameter $gueltig prüft zusätzlich auf das Gültigkeitsdatum.
+	 * @param string $uid
+	 * @param string $benutzerfunktion
+	 * @param boolean $gueltig. Default=false. Wenn true, wird zusätzlich das Gültigkeitsdatum geprüft
 	 */
-	public function benutzerfunktion_exists($uid, $benutzerfunktion)
+	public function benutzerfunktion_exists($uid, $benutzerfunktion, $gueltig = false)
 	{
 		$qry = "SELECT count(*) as anzahl FROM public.tbl_benutzerfunktion
 				WHERE uid=".$this->db_add_param($uid)." AND funktion_kurzbz=".$this->db_add_param($benutzerfunktion);
+		
+		if ($gueltig = TRUE)
+			$qry .= ' AND (datum_von IS NULL OR datum_von <= now()) AND (datum_bis IS NULL OR datum_bis >= now()) ';
 
 		if($row = $this->db_fetch_object($this->db_query($qry)))
 		{
