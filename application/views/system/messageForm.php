@@ -1,9 +1,9 @@
 <div class="row">
 	<div class="form-group">
-		<div class="col-lg-1">
+		<div class="col-lg-1 msgfieldcol-left">
 			<label>To:</label>
 		</div>
-		<div class="col-lg-11">
+		<div class="col-lg-11 msgfieldcol-right">
 			<?php
 			for ($i = 0; $i < count($receivers); $i++)
 			{
@@ -21,7 +21,7 @@
 </div>
 <div class="row">
 	<div class="form-group">
-		<div class="col-lg-1 msgfield">
+		<div class="col-lg-1 msgfield msgfieldcol-left">
 			<label>Subject:</label>
 		</div>&nbsp;
 		<?php
@@ -32,7 +32,7 @@
 		}
 		?>
 		<div class="col-lg-7">
-			<input id="subject" class="form-control col-lg-10" type="text" value="<?php echo $subject; ?>"
+			<input id="subject" class="form-control" type="text" value="<?php echo $subject; ?>"
 				   name="subject">
 		</div>
 	</div>

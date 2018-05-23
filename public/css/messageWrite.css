@@ -8,3 +8,13 @@ input[type=text] {
     margin-bottom: 0px !important;
     margin-top: 3px;
 }
+
+@media screen and (min-width: 1200px) {
+    .col-lg-1.msgfieldcol-left {
+        width: 13%;
+    }
+
+    .col-lg-11.msgfieldcol-right {
+        width: 87%;
+    }
+}
