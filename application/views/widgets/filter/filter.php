@@ -1,7 +1,11 @@
 <div class="row">
 	<div class="col-lg-12">
 
-		<?php FilterWidget::displayFilterName(); ?>
+		<div class="filter-name-title">
+			<?php FilterWidget::displayFilterName(); ?>
+		</div>
+
+		<br>
 
 		<div class="panel-group">
 			<div class="panel panel-default">

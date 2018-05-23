@@ -40,6 +40,7 @@ class FilterWidget extends Widget
 	const ACTIVE_FILTERS_OPTION = 'activeFiltersOption';
 	const ACTIVE_FILTERS_OPERATION = 'activeFiltersOperation';
 	const FILTER_NAME = 'filterName';
+	const FILTER_NAME_PHRASE = 'filterNamePhrase';
 
 	const ACTIVE_FILTER_OPTION_POSTFIX = '-option';
 	const ACTIVE_FILTER_OPERATION_POSTFIX = '-operation';
@@ -78,6 +79,7 @@ class FilterWidget extends Widget
 	private $checkboxes;
 	private $columnsAliases;
 	private $filterName;
+	private $filterNamePhrase;
 
 	private $dataset;
 	private $metaData;
@@ -121,6 +123,11 @@ class FilterWidget extends Widget
 		if ($this->filterName == null && isset($filterSessionArray[self::FILTER_NAME]))
 		{
 			$this->filterName = $filterSessionArray[self::FILTER_NAME];
+		}
+
+		if ($this->filterNamePhrase == null && isset($filterSessionArray[self::FILTER_NAME_PHRASE]))
+		{
+			$this->filterNamePhrase = $filterSessionArray[self::FILTER_NAME_PHRASE];
 		}
 
 		//
@@ -318,9 +325,13 @@ class FilterWidget extends Widget
 	 */
 	public static function displayFilterName()
 	{
-		if (self::$FilterWidgetInstance->filterName != null && self::$FilterWidgetInstance->filterName != '')
+		if (self::$FilterWidgetInstance->filterNamePhrase != null && self::$FilterWidgetInstance->filterNamePhrase != '')
 		{
-			echo '<div class="filter-name-title">'.self::$FilterWidgetInstance->filterName.'</div><br>';
+			echo self::$FilterWidgetInstance->filterNamePhrase;
+		}
+		elseif (self::$FilterWidgetInstance->filterName != null && self::$FilterWidgetInstance->filterName != '')
+		{
+			echo self::$FilterWidgetInstance->filterName;
 		}
 	}
 
@@ -506,6 +517,7 @@ class FilterWidget extends Widget
 		$this->hideSave = false;
 		$this->columnsAliases = null;
 		$this->filterName = null;
+		$this->filterNamePhrase = null;
 
 		$this->filterUniqueId = $this->_getFilterUniqueId();
 
@@ -657,6 +669,7 @@ class FilterWidget extends Widget
 			$activeFiltersOperation = array();
 			$activeFiltersOption = array();
 			$filterName = null;
+			$filterNamePhrase = null;
 
 			if (isset($jsonEncodedFilter->columns))
 			{
@@ -695,7 +708,15 @@ class FilterWidget extends Widget
 				$filterName = $jsonEncodedFilter->name;
 			}
 
+			// Filter name from phrases system
+			if (isset($jsonEncodedFilter->namePhrase))
+			{
+				$this->load->library('PhrasesLib', array('FilterWidget'));
+				$filterNamePhrase = $this->phraseslib->t('FilterWidget', $jsonEncodedFilter->namePhrase);
+			}
+
 			$this->filterName = $filterName;
+			$this->filterNamePhrase = $filterNamePhrase;
 			$this->app = $filter->retval[0]->app;
 
 			$filterSessionArray = array(
@@ -1022,6 +1043,7 @@ class FilterWidget extends Widget
 
 		$filterSessionArray[self::FILTER_ID] = $this->filterId;
 		$filterSessionArray[self::FILTER_NAME] = $this->filterName;
+		$filterSessionArray[self::FILTER_NAME_PHRASE] = $this->filterNamePhrase;
 
 		$this->_writeSession(array_merge($session, $filterSessionArray));
 	}
