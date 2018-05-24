@@ -131,7 +131,7 @@ class FilterWidget extends Widget
 		}
 
 		//
-		if ($filterSessionArray[self::FILTER_ID] != $this->filterId)
+		if ($this->filterId <= 0 || $filterSessionArray[self::FILTER_ID] != $this->filterId)
 		{
 			//
 			$this->_loadFilter();
@@ -143,74 +143,78 @@ class FilterWidget extends Widget
 		//
 		$this->FiltersModel->resetQuery();
 
-		//
-		$this->dataset = @$this->FiltersModel->execReadOnlyQuery($this->_generateQuery());
-
-		//
-		$this->listFields = $this->FiltersModel->getExecutedQueryListFields();
-
-		//
-		$selectedFields = array();
-		$filterSessionArray = $this->_readSession();
-		if (isset($filterSessionArray[self::SELECTED_FIELDS]))
+		$query = $this->_generateQuery();
+		if ($query != null)
 		{
-			$selectedFields = $filterSessionArray[self::SELECTED_FIELDS];
-		}
+			//
+			$this->dataset = @$this->FiltersModel->execReadOnlyQuery($query);
 
-		//
-		if (count($selectedFields) == 0)
-		{
-			$filterSessionArray[self::SELECTED_FIELDS] = $this->listFields;
-		}
+			//
+			$this->listFields = $this->FiltersModel->getExecutedQueryListFields();
 
-		//
-		if ($this->columnsAliases != null && count($this->listFields) != count($this->columnsAliases))
-		{
-			show_error('Parameter columnsAliases does not have a number of items equal to those returned by the query');
-		}
-
-		$filterSessionArray[self::COLUMNS_ALIASES] = $this->_getColumnAliasesFromPost();
-		$filterSessionArray[self::CHECKBOXES] = $this->checkboxes;
-
-		if ($this->app != null)
-		{
-			$filterSessionArray[self::APP_PARAMETER] = $this->app;
-		}
-
-		if ($this->datasetName != null)
-		{
-			$filterSessionArray[self::DATASET_NAME_PARAMETER] = $this->datasetName;
-		}
-
-		$filterSessionArray[self::ALL_SELECTED_FIELDS] = $this->listFields;
-		$filterSessionArray[self::ALL_COLUMNS_ALIASES] = $this->columnsAliases;
-
-		/* ------------------------------------------------------------ */
-
-		$tmpDataset = null;
-		if (hasData($this->dataset))
-		{
-			$tmpDataset = array();
-
-			for ($resultsCounter = 0; $resultsCounter < count($this->dataset->retval); $resultsCounter++)
+			//
+			$selectedFields = array();
+			$filterSessionArray = $this->_readSession();
+			if (isset($filterSessionArray[self::SELECTED_FIELDS]))
 			{
-				$result = $this->dataset->retval[$resultsCounter];
-
-				$class = $this->_markRow($result);
-				$formattedResult = $this->_formatRaw($result);
-				$formattedResult->FILTER_CLASS_MARK_ROW = $class;
-				$tmpDataset[] = $formattedResult;
+				$selectedFields = $filterSessionArray[self::SELECTED_FIELDS];
 			}
+
+			//
+			if (count($selectedFields) == 0)
+			{
+				$filterSessionArray[self::SELECTED_FIELDS] = $this->listFields;
+			}
+
+			//
+			if ($this->columnsAliases != null && count($this->listFields) != count($this->columnsAliases))
+			{
+				show_error('Parameter columnsAliases does not have a number of items equal to those returned by the query');
+			}
+
+			$filterSessionArray[self::COLUMNS_ALIASES] = $this->_getColumnAliasesFromPost();
+			$filterSessionArray[self::CHECKBOXES] = $this->checkboxes;
+
+			if ($this->app != null)
+			{
+				$filterSessionArray[self::APP_PARAMETER] = $this->app;
+			}
+
+			if ($this->datasetName != null)
+			{
+				$filterSessionArray[self::DATASET_NAME_PARAMETER] = $this->datasetName;
+			}
+
+			$filterSessionArray[self::ALL_SELECTED_FIELDS] = $this->listFields;
+			$filterSessionArray[self::ALL_COLUMNS_ALIASES] = $this->columnsAliases;
+
+			/* ------------------------------------------------------------ */
+
+			$tmpDataset = null;
+			if (hasData($this->dataset))
+			{
+				$tmpDataset = array();
+
+				for ($resultsCounter = 0; $resultsCounter < count($this->dataset->retval); $resultsCounter++)
+				{
+					$result = $this->dataset->retval[$resultsCounter];
+
+					$class = $this->_markRow($result);
+					$formattedResult = $this->_formatRaw($result);
+					$formattedResult->FILTER_CLASS_MARK_ROW = $class;
+					$tmpDataset[] = $formattedResult;
+				}
+			}
+
+			$filterSessionArray[self::DATASET_PARAMETER] = $tmpDataset;
+
+			/* ------------------------------------------------------------ */
+
+			//
+			$this->metaData = $this->FiltersModel->getExecutedQueryMetaData();
+
+			$filterSessionArray[self::METADATA_PARAMETER] = $this->metaData;
 		}
-
-		$filterSessionArray[self::DATASET_PARAMETER] = $tmpDataset;
-
-		/* ------------------------------------------------------------ */
-
-		//
-		$this->metaData = $this->FiltersModel->getExecutedQueryMetaData();
-
-		$filterSessionArray[self::METADATA_PARAMETER] = $this->metaData;
 
 		$this->_writeSession($filterSessionArray);
 
@@ -631,12 +635,13 @@ class FilterWidget extends Widget
 
 		$whereParameters = null;
 
-		if ($this->filterId == null)
+		if ($this->filterId <= 0)
 		{
+			// Try to load the custom filter (person_id = logged user person_id) with the given "app" and "dataset_name"
+			// that is set as default filter (default_filter = true)
 			$whereParameters = array(
 				'app' => $this->app,
 				'dataset_name' => $this->datasetName,
-				'filter_kurzbz' => $this->filterKurzbz,
 				'uid' => getAuthUID(),
 				'default_filter' => true
 			);
@@ -658,6 +663,24 @@ class FilterWidget extends Widget
 			if (isset($filter->retval[0]->filter) && trim($filter->retval[0]->filter) != '')
 			{
 				$jsonEncodedFilter = json_decode($filter->retval[0]->filter);
+			}
+		}
+		else // Try to load the global filter (person_id = null) with the given "app" and "dataset_name" that is set as
+			// default filter (default_filter = true)
+		{
+			$whereParameters = array(
+				'app' => $this->app,
+				'dataset_name' => $this->datasetName,
+				'default_filter' => true
+			);
+
+			$filter = $this->FiltersModel->loadWhere($whereParameters);
+			if (hasData($filter))
+			{
+				if (isset($filter->retval[0]->filter) && trim($filter->retval[0]->filter) != '')
+				{
+					$jsonEncodedFilter = json_decode($filter->retval[0]->filter);
+				}
 			}
 		}
 
@@ -1053,7 +1076,7 @@ class FilterWidget extends Widget
 	 */
 	private function _generateQuery()
 	{
-		$query = $this->query;
+		$query = null;//$this->query;
 
 		$activeFilters = array();
 		$activeFiltersOperation = array();

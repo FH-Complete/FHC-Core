@@ -39,11 +39,11 @@ class Filters extends VileSci_Controller
 
 		$session = $this->_readSession($this->_getFilterUniqueId());
 
-		$json->selectedFields = $session['selectedFields'];
-		$json->columnsAliases = $session['columnsAliases'];
-		$json->additionalColumns = $session['additionalColumns'];
-		$json->checkboxes = $session['checkboxes'];
-		$json->dataset = $session['dataset'];
+		$json->selectedFields = $this->_getFromSession('selectedFields');
+		$json->columnsAliases = $this->_getFromSession('columnsAliases');
+		$json->additionalColumns = $this->_getFromSession('additionalColumns');
+		$json->checkboxes = $this->_getFromSession('checkboxes');
+		$json->dataset = $this->_getFromSession('dataset');
 
 		$this->output->set_content_type('application/json')->set_output(json_encode($json));
 	}
@@ -57,11 +57,11 @@ class Filters extends VileSci_Controller
 
 		$session = $this->_readSession($this->_getFilterUniqueId());
 
-		$json->allSelectedFields = $session['allSelectedFields'];
-		$json->allColumnsAliases = $session['allColumnsAliases'];
+		$json->allSelectedFields = $this->_getFromSession('allSelectedFields');
+		$json->allColumnsAliases = $this->_getFromSession('allColumnsAliases');
 
-		$json->selectedFields = $session['selectedFields'];
-		$json->columnsAliases = $session['columnsAliases'];
+		$json->selectedFields = $this->_getFromSession('selectedFields');
+		$json->columnsAliases = $this->_getFromSession('columnsAliases');
 
 		$this->output->set_content_type('application/json')->set_output(json_encode($json));
 	}
@@ -79,11 +79,11 @@ class Filters extends VileSci_Controller
 
 		$session = $this->_readSession($filterUniqueId);
 
-		$allSelectedFields = $session['allSelectedFields'];
-		$allColumnsAliases = $session['allColumnsAliases'];
+		$allSelectedFields = $this->_getFromSession('allSelectedFields');
+		$allColumnsAliases = $this->_getFromSession('allColumnsAliases');
 
-		$json->selectedFields = $session['selectedFields'];
-		$json->columnsAliases = $session['columnsAliases'];
+		$json->selectedFields = $this->_getFromSession('selectedFields');
+		$json->columnsAliases = $this->_getFromSession('columnsAliases');
 
 		if (isset($selectedFieldsLst) && is_array($selectedFieldsLst))
 		{
@@ -121,10 +121,10 @@ class Filters extends VileSci_Controller
 
 		$session = $this->_readSession($this->_getFilterUniqueId());
 
-		$json->allSelectedFields = $session['allSelectedFields'];
-		$json->allColumnsAliases = $session['allColumnsAliases'];
+		$json->allSelectedFields = $this->_getFromSession('allSelectedFields');
+		$json->allColumnsAliases = $this->_getFromSession('allColumnsAliases');
 
-		$json->selectedFilters = $session['selectedFilters'];
+		$json->selectedFilters = $this->_getFromSession('selectedFilters');
 		$json->selectedFiltersAliases = array();
 		$json->selectedFiltersMetaData = array();
 
@@ -132,10 +132,10 @@ class Filters extends VileSci_Controller
 		$json->selectedFiltersActiveFiltersOperation = array();
 		$json->selectedFiltersActiveFiltersOption = array();
 
-		$metaData = $session['metaData'];
-		$activeFilters = $session['activeFilters'];
-		$activeFiltersOperation = $session['activeFiltersOperation'];
-		$activeFiltersOption = $session['activeFiltersOption'];
+		$metaData = $this->_getFromSession('metaData');
+		$activeFilters = $this->_getFromSession('activeFilters');
+		$activeFiltersOperation = $this->_getFromSession('activeFiltersOperation');
+		$activeFiltersOption = $this->_getFromSession('activeFiltersOption');
 
 		for ($i = 0; $i < count($json->selectedFilters); $i++)
 		{
@@ -302,11 +302,11 @@ class Filters extends VileSci_Controller
 
 		$session = $this->_readSession($filterUniqueId);
 
-		$allSelectedFields = $session['allSelectedFields'];
-		$allColumnsAliases = $session['allColumnsAliases'];
+		$allSelectedFields = $this->_getFromSession('allSelectedFields');
+		$allColumnsAliases = $this->_getFromSession('allColumnsAliases');
 
-		$selectedFields = $session['selectedFields'];
-		$columnsAliases = $session['columnsAliases'];
+		$selectedFields = $this->_getFromSession('selectedFields');
+		$columnsAliases = $this->_getFromSession('columnsAliases');
 
 		if (($pos = array_search($fieldName, $selectedFields)) !== false)
 		{
@@ -341,10 +341,10 @@ class Filters extends VileSci_Controller
 
 		$session = $this->_readSession($filterUniqueId);
 
-		$selectedFilters = $session['selectedFilters'];
-		$selectedFiltersActiveFilters = $session['activeFilters'];
-		$selectedFiltersActiveFiltersOperation = $session['activeFiltersOperation'];
-		$selectedFiltersActiveFiltersOption = $session['activeFiltersOption'];
+		$selectedFilters = $this->_getFromSession('selectedFilters');
+		$selectedFiltersActiveFilters = $this->_getFromSession('activeFilters');
+		$selectedFiltersActiveFiltersOperation = $this->_getFromSession('activeFiltersOperation');
+		$selectedFiltersActiveFiltersOption = $this->_getFromSession('activeFiltersOption');
 
 		if (($pos = array_search($fieldName, $selectedFilters)) !== false)
 		{
@@ -379,11 +379,11 @@ class Filters extends VileSci_Controller
 
 		$session = $this->_readSession($filterUniqueId);
 
-		$allSelectedFields = $session['allSelectedFields'];
-		$allColumnsAliases = $session['allColumnsAliases'];
+		$allSelectedFields = $this->_getFromSession('allSelectedFields');
+		$allColumnsAliases = $this->_getFromSession('allColumnsAliases');
 
-		$selectedFields = $session['selectedFields'];
-		$columnsAliases = $session['columnsAliases'];
+		$selectedFields = $this->_getFromSession('selectedFields');
+		$columnsAliases = $this->_getFromSession('columnsAliases');
 
 		if (($pos = array_search($fieldName, $allSelectedFields)) !== false
 			&& array_search($fieldName, $selectedFields) === false)
@@ -419,10 +419,10 @@ class Filters extends VileSci_Controller
 
 		$session = $this->_readSession($filterUniqueId);
 
-		$selectedFilters = $session['selectedFilters'];
-		$selectedFiltersActiveFilters = $session['activeFilters'];
-		$selectedFiltersActiveFiltersOperation = $session['activeFiltersOperation'];
-		$selectedFiltersActiveFiltersOption = $session['activeFiltersOption'];
+		$selectedFilters = $this->_getFromSession('selectedFilters');
+		$selectedFiltersActiveFilters = $this->_getFromSession('activeFilters');
+		$selectedFiltersActiveFiltersOperation = $this->_getFromSession('activeFiltersOperation');
+		$selectedFiltersActiveFiltersOption = $this->_getFromSession('activeFiltersOption');
 
 		if (!in_array($fieldName, $selectedFilters))
 		{
@@ -487,7 +487,7 @@ class Filters extends VileSci_Controller
 
 		$session = $this->_readSession($this->_getFilterUniqueId());
 
-		$dataset = $session['dataset'];
+		$dataset = $this->_getFromSession('dataset');
 
 		if (is_array($dataset))
 		{
@@ -539,5 +539,17 @@ class Filters extends VileSci_Controller
 		}
 
 		return $_getFilterUniqueId;
+	}
+
+	/**
+	 *
+	 */
+	private function _getFromSession($el)
+	{
+		$_getFromSession = null;
+
+		if (isset($_SESSION[$el])) return $_SESSION[$el];
+
+		return $_getFromSession;
 	}
 }

@@ -81,20 +81,23 @@ var FHC_FilterWidget = {
 						var strDropDown = '<option value="">Select a field to add...</option>';
 						$("#addField").append(strDropDown);
 
-						for (var i = 0; i < data.allSelectedFields.length; i++)
+						if (data.allSelectedFields != null)
 						{
-							var fieldName = data.allSelectedFields[i];
-							var fieldToDisplay = data.allSelectedFields[i];
-
-							if (data.selectedFields.indexOf(fieldName) < 0)
+							for (var i = 0; i < data.allSelectedFields.length; i++)
 							{
-								if (data.allColumnsAliases != null && $.isArray(data.allColumnsAliases))
-								{
-									fieldToDisplay = data.allColumnsAliases[i];
-								}
+								var fieldName = data.allSelectedFields[i];
+								var fieldToDisplay = data.allSelectedFields[i];
 
-								strDropDown = '<option value="' + fieldName + '">' + fieldToDisplay + '</option>';
-								$("#addField").append(strDropDown);
+								if (data.selectedFields.indexOf(fieldName) < 0)
+								{
+									if (data.allColumnsAliases != null && $.isArray(data.allColumnsAliases))
+									{
+										fieldToDisplay = data.allColumnsAliases[i];
+									}
+
+									strDropDown = '<option value="' + fieldName + '">' + fieldToDisplay + '</option>';
+									$("#addField").append(strDropDown);
+								}
 							}
 						}
 					}
@@ -126,44 +129,50 @@ var FHC_FilterWidget = {
 						var strDropDown = '<option value="">Select a filter to add...</option>';
 						$("#addFilter").append(strDropDown);
 
-						for (var i = 0; i < data.selectedFilters.length; i++)
+						if (data.selectedFilters != null)
 						{
-							var selectedFilters = '<div>';
+							for (var i = 0; i < data.selectedFilters.length; i++)
+							{
+								var selectedFilters = '<div>';
 
-							selectedFilters += '<span class="filter-options-span">';
-							selectedFilters += data.selectedFiltersAliases[i];
-							selectedFilters += '</span>';
+								selectedFilters += '<span class="filter-options-span">';
+								selectedFilters += data.selectedFiltersAliases[i];
+								selectedFilters += '</span>';
 
-							selectedFilters += FHC_FilterWidget._getSelectedFilterFields(
-								data.selectedFiltersMetaData[i],
-								data.selectedFiltersActiveFilters[i],
-								data.selectedFiltersActiveFiltersOperation[i],
-								data.selectedFiltersActiveFiltersOption[i]
-							);
+								selectedFilters += FHC_FilterWidget._getSelectedFilterFields(
+									data.selectedFiltersMetaData[i],
+									data.selectedFiltersActiveFilters[i],
+									data.selectedFiltersActiveFiltersOperation[i],
+									data.selectedFiltersActiveFiltersOption[i]
+								);
 
-							selectedFilters += '<span>';
-							selectedFilters += '<input type="button" value="X" class="remove-selected-filter btn btn-default" filterToRemove="' + data.selectedFilters[i] + '">';
-							selectedFilters += '</span>';
+								selectedFilters += '<span>';
+								selectedFilters += '<input type="button" value="X" class="remove-selected-filter btn btn-default" filterToRemove="' + data.selectedFilters[i] + '">';
+								selectedFilters += '</span>';
 
-							selectedFilters += '</div>';
+								selectedFilters += '</div>';
 
-							$("#selectedFilters").append(selectedFilters);
+								$("#selectedFilters").append(selectedFilters);
+							}
 						}
 
-						for (var i = 0; i < data.allSelectedFields.length; i++)
+						if (data.allSelectedFields != null)
 						{
-							var fieldName = data.allSelectedFields[i];
-							var fieldToDisplay = data.allSelectedFields[i];
-
-							if (data.selectedFilters.indexOf(fieldName) < 0)
+							for (var i = 0; i < data.allSelectedFields.length; i++)
 							{
-								if (data.allColumnsAliases != null && $.isArray(data.allColumnsAliases))
-								{
-									fieldToDisplay = data.allColumnsAliases[i];
-								}
+								var fieldName = data.allSelectedFields[i];
+								var fieldToDisplay = data.allSelectedFields[i];
 
-								strDropDown = '<option value="' + fieldName + '">' + fieldToDisplay + '</option>';
-								$("#addFilter").append(strDropDown);
+								if (data.selectedFilters.indexOf(fieldName) < 0)
+								{
+									if (data.allColumnsAliases != null && $.isArray(data.allColumnsAliases))
+									{
+										fieldToDisplay = data.allColumnsAliases[i];
+									}
+
+									strDropDown = '<option value="' + fieldName + '">' + fieldToDisplay + '</option>';
+									$("#addFilter").append(strDropDown);
+								}
 							}
 						}
 					}
@@ -279,7 +288,7 @@ var FHC_FilterWidget = {
 						}
 						else
 						{
-							console.log("No fields to display!!!");
+							// console.log("No fields to display!!!");
 						}
 					}
 					else
