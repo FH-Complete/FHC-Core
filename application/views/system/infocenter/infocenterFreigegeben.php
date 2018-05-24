@@ -171,7 +171,7 @@
 												)
 										)
 									)
-								ORDER BY "LastAction" ASC
+								ORDER BY "LastAction" DESC
 							',
 							'checkboxes' => 'PersonId',
 							'additionalColumns' => array('Details'),
