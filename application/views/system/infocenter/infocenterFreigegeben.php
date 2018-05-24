@@ -69,7 +69,6 @@
 											INNER JOIN public.tbl_prestudent ps USING(prestudent_id)
 											JOIN public.tbl_studiengang USING(studiengang_kz)
 										WHERE pss.status_kurzbz = \'Interessent\'
-										AND pss.bestaetigtam IS NULL
 										AND ps.person_id = p.person_id
 										AND tbl_studiengang.typ in(\'b\')
 										AND studiensemester_kurzbz IN (
@@ -88,7 +87,6 @@
 											JOIN public.tbl_studiengang USING(studiengang_kz)
 										WHERE pss.status_kurzbz = \'Interessent\'
 											AND (pss.bewerbung_abgeschicktamum IS NOT NULL AND pss.bewerbung_abgeschicktamum>=\''.$NOTBEFORE.'\')
-											AND pss.bestaetigtam IS NULL
 											AND ps.person_id = p.person_id
 											AND tbl_studiengang.typ in(\'b\')
 											AND studiensemester_kurzbz IN (
@@ -107,7 +105,6 @@
 											JOIN public.tbl_studiengang USING(studiengang_kz)
 										WHERE pss.status_kurzbz = \'Interessent\'
 											AND (pss.bewerbung_abgeschicktamum IS NOT NULL AND pss.bewerbung_abgeschicktamum>=\''.$NOTBEFORE.'\')
-											AND pss.bestaetigtam IS NULL
 											AND ps.person_id = p.person_id
 											AND tbl_studiengang.typ in(\'b\')
 											AND studiensemester_kurzbz IN (
@@ -126,7 +123,6 @@
 											JOIN public.tbl_studiengang USING(studiengang_kz)
 										WHERE pss.status_kurzbz = \'Interessent\'
 											AND (pss.bewerbung_abgeschicktamum IS NOT NULL AND pss.bewerbung_abgeschicktamum>=\''.$NOTBEFORE.'\')
-											AND pss.bestaetigtam IS NULL
 											AND ps.person_id = p.person_id
 											AND tbl_studiengang.typ in(\'b\')
 											AND studiensemester_kurzbz IN (
@@ -150,11 +146,7 @@
 										WHERE
 											person_id=p.person_id
 											AND tbl_studiengang.typ in(\'b\')
-											AND \'Interessent\' = (SELECT status_kurzbz FROM public.tbl_prestudentstatus
-																	WHERE prestudent_id=tbl_prestudent.prestudent_id
-																	ORDER BY datum DESC, insertamum DESC, ext_id DESC
-																	LIMIT 1
-																	)
+
 											AND EXISTS (
 												SELECT
 													1
@@ -163,7 +155,7 @@
 												WHERE
 													prestudent_id = tbl_prestudent.prestudent_id
 													AND status_kurzbz = \'Interessent\'
-													AND (bestaetigtam IS NOT NULL AND (bewerbung_abgeschicktamum is null OR bewerbung_abgeschicktamum>=\''.$NOTBEFORE.'\'))
+													AND (bestaetigtam IS NOT NULL AND bewerbung_abgeschicktamum >= \''.$NOTBEFORE.'\')
 													AND studiensemester_kurzbz IN (
 														SELECT studiensemester_kurzbz
 														FROM public.tbl_studiensemester
