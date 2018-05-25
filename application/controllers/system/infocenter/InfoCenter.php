@@ -155,7 +155,7 @@ class InfoCenter extends FHC_Controller
 	}
 
 	/**
-	 * unlocks page from edit by a person, redirects to overview filter page
+	 * Unlocks page from edit by a person, redirects to overview filter page
 	 * @param $person_id
 	 */
 	public function unlockPerson($person_id)
@@ -169,7 +169,7 @@ class InfoCenter extends FHC_Controller
 	}
 
 	/**
-	 * Saves if a document has been formal geprueft. saves current timestamp if checked as geprueft, or null if not.
+	 * Saves if a document has been formal geprueft. Saves current timestamp if checked as geprueft, or null if not.
 	 * @param $person_id
 	 */
 	public function saveFormalGeprueft($person_id)
@@ -177,37 +177,36 @@ class InfoCenter extends FHC_Controller
 		$akte_id = $this->input->post('akte_id');
 		$formalgeprueft = $this->input->post('formal_geprueft');
 
-		if (!isset($akte_id) || !isset($formalgeprueft) || !isset($person_id))
-			show_error('Parameters not set!');
+		$json = false;
 
-		$akte = $this->AkteModel->load($akte_id);
-
-		if (isError($akte))
+		if (isset($akte_id) && isset($formalgeprueft) && isset($person_id))
 		{
-			show_error($akte->retval);
+			$akte = $this->AkteModel->load($akte_id);
+
+			if (hasData($akte))
+			{
+				$timestamp = ($formalgeprueft === 'true') ? date('Y-m-d H:i:s') : null;
+				$result = $this->AkteModel->update($akte_id, array('formal_geprueft_amum' => $timestamp));
+
+				if (isSuccess($result))
+				{
+					$json = $timestamp;
+
+					$this->_log(
+						$person_id,
+						'saveformalgep',
+						array(
+							empty($akte->retval[0]->titel) ? $akte->retval[0]->bezeichnung : $akte->retval[0]->titel,
+							is_null($timestamp) ? 'NULL' : $timestamp
+						)
+					);
+				}
+			}
 		}
-
-		$timestamp = ($formalgeprueft === 'true') ? date('Y-m-d H:i:s') : null;
-		$result = $this->AkteModel->update($akte_id, array('formal_geprueft_amum' => $timestamp));
-
-		if (isError($result))
-		{
-			show_error($result->retval);
-		}
-
-		//write person log
-		$this->_log(
-			$person_id,
-			'saveformalgep',
-			array(
-				empty($akte->retval[0]->titel) ? $akte->retval[0]->bezeichnung : $akte->retval[0]->titel,
-				is_null($timestamp) ? 'NULL' : $timestamp
-			)
-		);
 
 		$this->output
 			->set_content_type('application/json')
-			->set_output(json_encode($timestamp));
+			->set_output(json_encode($json));
 	}
 
 	/**
@@ -218,20 +217,13 @@ class InfoCenter extends FHC_Controller
 	{
 		$prestudent = $this->PrestudentModel->getLastPrestudent($person_id, true);
 
-		if (isError($prestudent))
-		{
-			show_error($prestudent->retval);
-		}
-
-		$jsonoutput = count($prestudent->retval) > 0 ? $prestudent->retval[0] : null;
-
 		$this->output
 			->set_content_type('application/json')
-			->set_output(json_encode($jsonoutput));
+			->set_output(json_encode($prestudent));
 	}
 
 	/**
-	 * Gets Zugangsvoraussetzungen for a prestudents as a description text
+	 * Gets Zugangsvoraussetzungen for a prestudent as a description text and shows them in a view
 	 * @param $prestudent_id
 	 */
 	public function getZgvInfoForPrestudent($prestudent_id)
@@ -242,7 +234,11 @@ class InfoCenter extends FHC_Controller
 		$studiengangkurzbz = $prestudentdata['studiengang_kurzbz'];
 		$studiengangbezeichnung = $prestudentdata['studiengang_bezeichnung'];
 
-		$data = array('studiengang_bezeichnung' => $studiengangbezeichnung, 'studiengang_kurzbz' => $studiengangkurzbz, 'data' => null);
+		$data = array(
+					'studiengang_bezeichnung' => $studiengangbezeichnung,
+					'studiengang_kurzbz' => $studiengangkurzbz,
+					'data' => null
+				);
 
 		if (hasData($studienordnung))
 		{
@@ -255,54 +251,58 @@ class InfoCenter extends FHC_Controller
 	}
 
 	/**
-	 * Saves a zgv for a prestudent. includes Ort, Datum, Nation for bachelor and master.
+	 * Saves a ZGV for a prestudent, includes Ort, Datum, Nation for bachelor and master
 	 * @param $prestudent_id
 	 */
-	public function saveZgvPruefung($prestudent_id)
+	public function saveZgvPruefung()
 	{
-		// zgvdata
-		// Check for string null, in case dropdown changed to default value
-		$zgv_code = $this->input->post('zgv') === 'null' ? null : $this->input->post('zgv');
-		$zgvort = $this->input->post('zgvort');
-		$zgvdatum = $this->input->post('zgvdatum');
-		$zgvdatum = empty($zgvdatum) ? null : date_format(date_create($zgvdatum), 'Y-m-d');
-		$zgvnation_code = $this->input->post('zgvnation') === 'null' ? null : $this->input->post('zgvnation');
+		$prestudent_id = $this->input->post('prestudentid');
 
-		//zgvmasterdata
-		$zgvmas_code = $this->input->post('zgvmas') === 'null' ? null : $this->input->post('zgvmas');
-		$zgvmaort = $this->input->post('zgvmaort');
-		$zgvmadatum = $this->input->post('zgvmadatum');
-		$zgvmadatum = empty($zgvmadatum) ? null : date_format(date_create($zgvmadatum), 'Y-m-d');
-		$zgvmanation_code = $this->input->post('zgvmanation') === 'null' ? null : $this->input->post('zgvmanation');
-
-		$result = $this->PrestudentModel->update(
-			$prestudent_id,
-			array(
-				'zgv_code' => $zgv_code,
-				'zgvort' => $zgvort,
-				'zgvdatum' => $zgvdatum,
-				'zgvnation' => $zgvnation_code,
-				'zgvmas_code' => $zgvmas_code,
-				'zgvmaort' => $zgvmaort,
-				'zgvmadatum' => $zgvmadatum,
-				'zgvmanation' => $zgvmanation_code,
-				'updateamum' => date('Y-m-d H:i:s')
-			)
-		);
-
-		if (isError($result))
+		if (empty($prestudent_id))
+			$result = error('Prestudentid missing');
+		else
 		{
-			show_error($result->retval);
+			// zgvdata
+			// Check for string null, in case dropdown changed to default value
+			$zgv_code = $this->input->post('zgv') === 'null' ? null : $this->input->post('zgv');
+			$zgvort = $this->input->post('zgvort');
+			$zgvdatum = $this->input->post('zgvdatum');
+			$zgvdatum = empty($zgvdatum) ? null : date_format(date_create($zgvdatum), 'Y-m-d');
+			$zgvnation_code = $this->input->post('zgvnation') === 'null' ? null : $this->input->post('zgvnation');
+
+			//zgvmasterdata
+			$zgvmas_code = $this->input->post('zgvmas') === 'null' ? null : $this->input->post('zgvmas');
+			$zgvmaort = $this->input->post('zgvmaort');
+			$zgvmadatum = $this->input->post('zgvmadatum');
+			$zgvmadatum = empty($zgvmadatum) ? null : date_format(date_create($zgvmadatum), 'Y-m-d');
+			$zgvmanation_code = $this->input->post('zgvmanation') === 'null' ? null : $this->input->post('zgvmanation');
+
+			$result = $this->PrestudentModel->update(
+				$prestudent_id,
+				array(
+					'zgv_code' => $zgv_code,
+					'zgvort' => $zgvort,
+					'zgvdatum' => $zgvdatum,
+					'zgvnation' => $zgvnation_code,
+					'zgvmas_code' => $zgvmas_code,
+					'zgvmaort' => $zgvmaort,
+					'zgvmadatum' => $zgvmadatum,
+					'zgvmanation' => $zgvmanation_code,
+					'updateamum' => date('Y-m-d H:i:s')
+				)
+			);
+
+			if (isSuccess($result))
+			{
+				//get extended Prestudent data for logging
+				$logdata = $this->_getPersonAndStudiengangFromPrestudent($prestudent_id);
+
+				$this->_log($logdata['person_id'], 'savezgv', array($logdata['studiengang_kurzbz'], $prestudent_id));
+			}
 		}
-
-		//get extended Prestudent data for logging
-		$logdata = $this->_getPersonAndStudiengangFromPrestudent($prestudent_id);
-
-		$this->_log($logdata['person_id'], 'savezgv', array($logdata['studiengang_kurzbz'], $prestudent_id));
-
 		$this->output
 			->set_content_type('application/json')
-			->set_output(json_encode($result->retval));
+			->set_output(json_encode($result));
 	}
 
 	/**
@@ -450,16 +450,14 @@ class InfoCenter extends FHC_Controller
 
 		$result = $this->NotizModel->addNotizForPerson($person_id, $titel, $text, $erledigt, $this->uid);
 
-		if (isError($result))
+		if (isSuccess($result))
 		{
-			show_error($result->retval);
+			$this->_log($person_id, 'savenotiz', array($titel));
 		}
-
-		$this->_log($person_id, 'savenotiz', array($titel));
 
 		$this->output
 			->set_content_type('application/json')
-			->set_output(json_encode($result->retval));
+			->set_output(json_encode($result));
 	}
 
 	/**
@@ -484,19 +482,15 @@ class InfoCenter extends FHC_Controller
 			)
 		);
 
-		$json = false;
-
 		if (isSuccess($result))
 		{
-			$json = true;
-
 			//set log "Notiz updated"
 			$this->_log($person_id, 'updatenotiz', array($titel));
 		}
 
 		$this->output
 			->set_content_type('application/json')
-			->set_output(json_encode($json));
+			->set_output(json_encode($result));
 	}
 
 	/**
@@ -567,14 +561,18 @@ class InfoCenter extends FHC_Controller
 	}
 
 	/**
-	 * Initializes parking of a person, i.e. a person is not expected to do any actions while it is parked
+	 * Initializes parking of a person, i.e. a person is not expected to do any actions while parked
 	 */
 	public function park()
 	{
 		$person_id = $this->input->post('person_id');
 		$date = $this->input->post('parkdate');
 
-		$this->personloglib->park($person_id, date_format(date_create($date), 'Y-m-d'), self::TAETIGKEIT, self::APP, null, $this->uid);
+		$result = $this->personloglib->park($person_id, date_format(date_create($date), 'Y-m-d'), self::TAETIGKEIT, self::APP, null, $this->uid);
+
+		$this->output
+			->set_content_type('application/json')
+			->set_output(json_encode($result));
 	}
 
 	/**
@@ -584,7 +582,11 @@ class InfoCenter extends FHC_Controller
 	{
 		$person_id = $this->input->post('person_id');
 
-		$this->personloglib->unPark($person_id);
+		$result = $this->personloglib->unPark($person_id);
+
+		$this->output
+			->set_content_type('application/json')
+			->set_output(json_encode($result));
 	}
 
 	/**

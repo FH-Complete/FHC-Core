@@ -21,6 +21,7 @@
 		</div>
 		<div class="text-right">
 			<!--abbrechen-button only shown when notice is clicked to be changed-->
+			<span class="text-danger" id="notizmsg"></span>
 			<button type="reset" class="btn btn-default" style="display: none"><?php echo  $this->p->t('ui', 'abbrechen') ?></button>
 			<button type="submit" class="btn btn-default"><?php echo  $this->p->t('ui', 'speichern') ?></button>
 		</div>
