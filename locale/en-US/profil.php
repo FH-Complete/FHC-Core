@@ -35,19 +35,19 @@ $this->phrasen['profil/zeitsperrenVon']='Unavailabilities of';
 $this->phrasen['profil/lvplanVon']='Schedule from';
 
 $this->phrasen['profil/AccountInaktiv']='NOTICE: This account is no longer active';
-$this->phrasen['profil/inaktivStudent']='NOTICE!<br> We would like to remind you that your user record has been deactivated. 
+$this->phrasen['profil/inaktivStudent']='NOTICE!<br> We would like to remind you that your user record has been deactivated.
 You were also removed from all e-mail distribution lists when your account was deactivated.<br><br>
 If your user account is not reactivated within 6 months (for students) or 3 weeks (for dropouts) of being deactivated, the following data will be automatically deleted:<br>
 - Your account<br>- Your mailbox (including all e-mails) and<br>- Your home directory (including all files).<br><br>
 If your account has been deactivated by mistake, please contact the administrative assistant for your degree program immediately.<br>';
 
-$this->phrasen['profil/inaktivMitarbeiter']='NOTICE!<br> We would like to remind you that your user record has been deactivated. 
+$this->phrasen['profil/inaktivMitarbeiter']='NOTICE!<br> We would like to remind you that your user record has been deactivated.
 You were also removed from all e-mail distribution lists when your account was deactivated.<br><br>
 If your user account is not reactivated within 12 months of being deactivated, the following data will be automatically deleted:<br>
 - Your account<br>- Your mailbox (including all e-mails) and<br>- Your home directory (including all files).<br><br>
 If your account has been deactivated by mistake, please contact the administrative assistant for your degree program immediately.<br>';
 
-$this->phrasen['profil/inaktivSonstige']='NOTICE!<br> We would like to remind you that your user record has been deactivated. 
+$this->phrasen['profil/inaktivSonstige']='NOTICE!<br> We would like to remind you that your user record has been deactivated.
 You were also removed from all e-mail distribution lists when your account was deactivated.<br><br>
 If your user account is not reactivated within the next days of being deactivated, the following data will be automatically deleted:<br>
 - Your account<br>- Your mailbox (including all e-mails) and<br>- Your home directory (including all files).<br><br>
@@ -75,4 +75,6 @@ $this->phrasen['profil/fhausweisWurdeNochNichtGedruckt']='UAS ID card has not ye
 $this->phrasen['profil/ihrFotoWurdeNochNichtGeprueft']='Your photo has not yet been approved';
 $this->phrasen['profil/fotoAuswählen']='Click on the image below to upload a photo';
 $this->phrasen['profil/bildSpeichern']='Save image';
+$this->phrasen['profil/gueltigvon']='Valid from';
+$this->phrasen['profil/gueltigbis']='Valid to';
 ?>
