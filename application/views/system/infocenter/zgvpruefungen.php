@@ -243,6 +243,7 @@
 								<div class="form-inline">
 									<form method="post"
 										  action="../saveAbsage/<?php echo $zgvpruefung->prestudent_id ?>">
+										<input type="hidden" name="fhc_controller_id" value="<?php echo $fhc_controller_id; ?>">
 										<div class="input-group" id="statusgrselect_<?php echo $zgvpruefung->prestudent_id ?>">
 											<select name="statusgrund"
 													class="d-inline float-right"
@@ -349,7 +350,7 @@
 													class="btn btn-default"
 													data-dismiss="modal"><?php echo  $this->p->t('ui', 'abbrechen') ?>
 											</button>
-											<a href="../saveFreigabe/<?php echo $zgvpruefung->prestudent_id ?>">
+											<a href="../saveFreigabe/<?php echo $zgvpruefung->prestudent_id ?>?fhc_controller_id=<?php echo $fhc_controller_id; ?>">
 												<button type="button"
 														class="btn btn-primary">
 													<?php echo  $this->p->t('infocenter', 'interessentFreigeben') ?>

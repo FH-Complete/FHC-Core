@@ -313,6 +313,7 @@ class InfoCenter extends FHC_Controller
 	public function saveAbsage($prestudent_id)
 	{
 		$statusgrund = $this->input->post('statusgrund');
+		$this->fhc_controller_id = $this->input->post('fhc_controller_id');
 
 		$lastStatus = $this->PrestudentstatusModel->getLastStatus($prestudent_id);
 

@@ -240,7 +240,7 @@ var InfocenterDetails = {
 			}
 		);
 	},
-	saveZgv: function (data)
+	saveZgv: function(data)
 	{
 		var zgvError = function(){
 			$("#zgvSpeichern_" + prestudentid).before("<span id='zgvSpeichernNotice' class='text-danger'>Fehler beim Speichern der ZGV!</span>&nbsp;&nbsp;");
@@ -270,7 +270,7 @@ var InfocenterDetails = {
 			}
 		);
 	},
-	saveNotiz: function (personid, data)
+	saveNotiz: function(personid, data)
 	{
 		FHC_AjaxClient.ajaxCallPost(
 			CALLED_PATH + '/saveNotiz/' + encodeURIComponent(personid),
@@ -292,7 +292,7 @@ var InfocenterDetails = {
 			}
 		);
 	},
-	updateNotiz: function (notizId, personId, data)
+	updateNotiz: function(notizId, personId, data)
 	{
 		FHC_AjaxClient.ajaxCallPost(
 			CALLED_PATH + '/updateNotiz/' + encodeURIComponent(notizId) + "/" + encodeURIComponent(personId),
