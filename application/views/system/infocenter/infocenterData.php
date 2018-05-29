@@ -151,7 +151,7 @@
 					),\', \'
 				) AS "StgAktiv",
 				pl.zeitpunkt AS "LockDate",
-				pl.lockuser as "LockUser",
+				pl.lockuser AS "LockUser",
 				pd.parkdate AS "ParkDate"
 			FROM public.tbl_person p
 		LEFT JOIN (SELECT person_id, zeitpunkt, uid as lockuser FROM system.tbl_person_lock WHERE app = \''.$APP.'\') pl USING(person_id)
@@ -299,18 +299,9 @@
 		}
 	);
 
-	$filterId = isset($_GET[InfoCenter::FILTER_ID]) ? $_GET[InfoCenter::FILTER_ID] : null;
-
-	if (isset($filterId) && is_numeric($filterId))
-	{
-		$filterWidgetArray[InfoCenter::FILTER_ID] = $filterId;
-	}
-	else
-	{
-		$filterWidgetArray['app'] = $APP;
-		$filterWidgetArray['datasetName'] = 'PersonActions';
-		$filterWidgetArray['filterKurzbz'] = 'InfoCenterNotSentApplicationAll';
-	}
+	$filterWidgetArray[InfoCenter::FILTER_ID] = $this->input->get(InfoCenter::FILTER_ID);
+	$filterWidgetArray['app'] = $APP;
+	$filterWidgetArray['datasetName'] = 'PersonActions';
 
 	echo $this->widgetlib->widget('FilterWidget', $filterWidgetArray);
 ?>

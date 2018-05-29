@@ -38,72 +38,28 @@ var FHC_FilterWidget = {
 	/**
 	 *
 	 */
-	renderSelectedFields: function() {
-		//
+	display: function() {
+		FHC_FilterWidget._getFilter(FHC_FilterWidget._renderFilterWidget);
+	},
+
+	/**
+	 *
+	 */
+	_getFilter: function(renderFunction) {
 		FHC_AjaxClient.ajaxCallGet(
-			'system/Filters/selectFields',
+			'system/Filters/getFilter',
 			{
 				filter_page: FHC_FilterWidget._getFilterPage()
 			},
 			{
 				successCallback: function(data, textStatus, jqXHR) {
 
-					FHC_FilterWidget._resetEventsSF();
+					// console.log(data);
 
-					if (data != null)
+					if (FHC_AjaxClient.hasData(data) && typeof renderFunction == 'function')
 					{
-						var arrayFieldsToDisplay = [];
-
-						if (data.columnsAliases != null && $.isArray(data.columnsAliases))
-						{
-							arrayFieldsToDisplay = data.columnsAliases;
-						}
-						else if (data.selectedFields != null && $.isArray(data.selectedFields))
-						{
-							arrayFieldsToDisplay = data.selectedFields;
-						}
-
-						for (var i = 0; i < arrayFieldsToDisplay.length; i++)
-						{
-							var fieldToDisplay = arrayFieldsToDisplay[i];
-							var fieldName = data.selectedFields[i];
-
-							var strHtml = '<span id="dnd' + fieldName + '" class="filter-select-field-dnd-span">';
-
-							strHtml += '<span>';
-							strHtml += fieldToDisplay;
-							strHtml += '</span>';
-							strHtml += '<span><a class="remove-field" fieldToRemove="' + fieldName + '"> X </a></span>';
-							strHtml += '</span>';
-							$("#filterSelectFieldsDnd").append(strHtml);
-						}
-
-						var strDropDown = '<option value="">Select a field to add...</option>';
-						$("#addField").append(strDropDown);
-
-						if (data.allSelectedFields != null)
-						{
-							for (var i = 0; i < data.allSelectedFields.length; i++)
-							{
-								var fieldName = data.allSelectedFields[i];
-								var fieldToDisplay = data.allSelectedFields[i];
-
-								if (data.selectedFields.indexOf(fieldName) < 0)
-								{
-									if (data.allColumnsAliases != null && $.isArray(data.allColumnsAliases))
-									{
-										fieldToDisplay = data.allColumnsAliases[i];
-									}
-
-									strDropDown = '<option value="' + fieldName + '">' + fieldToDisplay + '</option>';
-									$("#addField").append(strDropDown);
-								}
-							}
-						}
+						renderFunction(FHC_AjaxClient.getData(data));
 					}
-
-					FHC_FilterWidget._dndSF();
-					FHC_FilterWidget._addEventsSF();
 				}
 			}
 		);
@@ -112,69 +68,326 @@ var FHC_FilterWidget = {
 	/**
 	 *
 	 */
+	_renderFilterWidget: function(data) {
+
+		console.log(data);
+
+		FHC_FilterWidget._setFilterName(data); //
+
+		FHC_FilterWidget._renderDnDFields(data); //
+
+		FHC_FilterWidget._renderDropDownFields(data); //
+
+		FHC_FilterWidget._renderAppliedFilters(data); //
+
+	},
+
+	_setFilterName: function(data) {
+		if (data.hasOwnProperty('filterName'))
+		{
+			$(".filter-name-title").html(data.filterName);
+		}
+	},
+
+	/**
+	 *
+	 */
+	_renderDnDFields: function(data) {
+
+		$(".remove-field").off('click');
+
+		if (data.hasOwnProperty('rowNumber') && data.rowNumber > 0)
+		{
+			var arrayFieldsToDisplay = [];
+
+			if (data.hasOwnProperty('selectedFields') && $.isArray(data.selectedFields))
+			{
+				if (data.hasOwnProperty('columnsAliases') && $.isArray(data.columnsAliases))
+				{
+					for (var i = 0; i < data.selectedFields.length; i++)
+					{
+						for (var j = 0; j < data.fields.length; j++)
+						{
+							if (data.selectedFields[i] == data.fields[j])
+							{
+								arrayFieldsToDisplay[i] = data.columnsAliases[j];
+							}
+						}
+					}
+				}
+				else
+				{
+					arrayFieldsToDisplay = data.selectedFields;
+				}
+			}
+
+			for (var i = 0; i < arrayFieldsToDisplay.length; i++)
+			{
+				var fieldToDisplay = arrayFieldsToDisplay[i];
+				var fieldName = data.selectedFields[i];
+
+				var strHtml = '<span id="dnd' + fieldName + '" class="filter-select-field-dnd-span">';
+				strHtml += '	<span>' + fieldToDisplay + '</span>';
+				strHtml += '	<span>';
+				strHtml += '		<a class="remove-field" fieldToRemove="' + fieldName + '"> X </a>';
+				strHtml += '	</span>';
+				strHtml += '</span>';
+
+				$("#filterSelectFieldsDnd").append(strHtml);
+			}
+
+			FHC_FilterWidget._drangAndDropEvents();
+
+			$(".remove-field").click(function(event) {
+				//
+				FHC_AjaxClient.ajaxCallPost(
+					'system/Filters/removeSelectedFields',
+					{
+						fieldName: $(this).attr('fieldToRemove'),
+						filter_page: FHC_FilterWidget._getFilterPage()
+					},
+					{
+						successCallback: function(data, textStatus, jqXHR) {
+							FHC_FilterWidget._resetSelectedFields();
+
+							FHC_FilterWidget.renderSelectedFields();
+							FHC_FilterWidget.renderTableDataset();
+						}
+					}
+				);
+			});
+		}
+	},
+
+	_renderDropDownFields: function(data) {
+
+		$("#addField").off('change');
+
+		var strDropDown = '<option value="">Select a field to add...</option>';
+		$("#addField").append(strDropDown);
+
+		if (data.fields != null)
+		{
+			for (var i = 0; i < data.fields.length; i++)
+			{
+				var fieldName = data.fields[i];
+				var fieldToDisplay = data.fields[i];
+
+				if (data.selectedFields.indexOf(fieldName) < 0)
+				{
+					if (data.allColumnsAliases != null && $.isArray(data.allColumnsAliases))
+					{
+						fieldToDisplay = data.allColumnsAliases[i];
+					}
+
+					strDropDown = '<option value="' + fieldName + '">' + fieldToDisplay + '</option>';
+					$("#addField").append(strDropDown);
+				}
+			}
+		}
+
+		$("#addField").change(function(event) {
+			//
+			FHC_AjaxClient.ajaxCallPost(
+				'system/Filters/addSelectedFields',
+				{
+					fieldName: $(this).val(),
+					filter_page: FHC_FilterWidget._getFilterPage()
+				},
+				{
+					successCallback: function(data, textStatus, jqXHR) {
+						FHC_FilterWidget._resetSelectedFields();
+
+						FHC_FilterWidget.renderSelectedFields();
+						FHC_FilterWidget.renderTableDataset();
+					}
+				}
+			);
+		});
+	},
+
+	/**
+	 *
+	 */
+	_renderAppliedFilters: function(data) {
+
+		$("#addFilter").off('change');
+
+		var data = FHC_AjaxClient.getData(data);
+		var strDropDown = '<option value="">Select a filter to add...</option>';
+
+		$("#addFilter").append(strDropDown);
+
+		if (data.selectedFilters != null)
+		{
+			for (var i = 0; i < data.selectedFilters.length; i++)
+			{
+				var selectedFilters = '<div>';
+
+				selectedFilters += '<span class="filter-options-span">';
+				selectedFilters += data.selectedFiltersAliases[i];
+				selectedFilters += '</span>';
+
+				selectedFilters += FHC_FilterWidget._getSelectedFilterFields(
+					data.selectedFiltersMetaData[i],
+					data.selectedFiltersActiveFilters[i],
+					data.selectedFiltersActiveFiltersOperation[i],
+					data.selectedFiltersActiveFiltersOption[i]
+				);
+
+				selectedFilters += '<span>';
+				selectedFilters += '<input type="button" value="X" class="remove-selected-filter btn btn-default" filterToRemove="' + data.selectedFilters[i] + '">';
+				selectedFilters += '</span>';
+
+				selectedFilters += '</div>';
+
+				$("#selectedFilters").append(selectedFilters);
+			}
+		}
+
+		if (data.allSelectedFields != null)
+		{
+			for (var i = 0; i < data.allSelectedFields.length; i++)
+			{
+				var fieldName = data.allSelectedFields[i];
+				var fieldToDisplay = data.allSelectedFields[i];
+
+				if (data.selectedFilters.indexOf(fieldName) < 0)
+				{
+					if (data.allColumnsAliases != null && $.isArray(data.allColumnsAliases))
+					{
+						fieldToDisplay = data.allColumnsAliases[i];
+					}
+
+					strDropDown = '<option value="' + fieldName + '">' + fieldToDisplay + '</option>';
+					$("#addFilter").append(strDropDown);
+				}
+			}
+		}
+
+		$(".select-filter-operation").change(function() {
+
+			if ($(this).val() == "set" || $(this).val() == "nset")
+			{
+				$(this).parent().parent().find(".select-filter-operation-value").addClass("hidden-control");
+				$(this).parent().parent().find(".select-filter-option").addClass("hidden-control");
+
+				$(this).parent().parent().find(".select-filter-operation-value").prop('disabled', true);
+				$(this).parent().parent().find(".select-filter-option").prop('disabled', true);
+			}
+			else
+			{
+				$(this).parent().parent().find(".select-filter-operation-value").removeClass("hidden-control");
+				$(this).parent().parent().find(".select-filter-option").removeClass("hidden-control");
+
+				$(this).parent().parent().find(".select-filter-operation-value").prop('disabled', false);
+				$(this).parent().parent().find(".select-filter-option").prop('disabled', false);
+			}
+
+		});
+
+		$("#applyFilter").click(function() {
+
+			var selectFilterName = [];
+			var selectFilterOperation = [];
+			var selectFilterOperationValue = [];
+			var selectFilterOption = [];
+
+			$("#selectedFilters > div").each(function(i, e) {
+				var tmpSelectFilterName = $(this).find('.hidden-field-name').val();
+				var tmpSelectFilterOperation = $(this).find('.select-filter-operation').val();
+				var tmpSelectFilterOperationValue = $(this).find('.select-filter-operation-value:enabled').val();
+				var tmpSelectFilterOption = $(this).find('.select-filter-option:enabled').val();
+
+				selectFilterName.push(tmpSelectFilterName);
+				selectFilterOperation.push(tmpSelectFilterOperation);
+				selectFilterOperationValue.push(tmpSelectFilterOperationValue != null ? tmpSelectFilterOperationValue : "");
+				selectFilterOption.push(tmpSelectFilterOption != null ? tmpSelectFilterOption : "");
+			});
+
+			//
+			FHC_AjaxClient.ajaxCallPost(
+				'system/Filters/applyFilter',
+				{
+					filterNames: selectFilterName,
+					filterOperations: selectFilterOperation,
+					filterOperationValues: selectFilterOperationValue,
+					filterOptions: selectFilterOption,
+					filter_page: FHC_FilterWidget._getFilterPage()
+				},
+				{
+					successCallback: function(data, textStatus, jqXHR) {
+						FHC_FilterWidget._resetSelectedFilters();
+
+						location.reload();
+					}
+				}
+			);
+		});
+
+		$(".remove-selected-filter").click(function(event) {
+			//
+			FHC_AjaxClient.ajaxCallPost(
+				'system/Filters/removeSelectedFilters',
+				{
+					fieldName: $(this).attr('filterToRemove'),
+					filter_page: FHC_FilterWidget._getFilterPage()
+				},
+				{
+					successCallback: function(data, textStatus, jqXHR) {
+						FHC_FilterWidget._resetSelectedFilters();
+
+						location.reload();
+					}
+				}
+			);
+		});
+
+	},
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	/**
+	 *
+	 */
 	renderSelectedFilters: function() {
 		//
 		FHC_AjaxClient.ajaxCallGet(
-			'system/Filters/selectFilters',
+			'system/Filters/getFilters',
 			{
 				filter_page: FHC_FilterWidget._getFilterPage()
 			},
 			{
 				successCallback: function(data, textStatus, jqXHR) {
 
-					FHC_FilterWidget._resetEventsSFilters();
-
-					if (data != null)
+					if (FHC_AjaxClient.hasData(data))
 					{
-						var strDropDown = '<option value="">Select a filter to add...</option>';
-						$("#addFilter").append(strDropDown);
 
-						if (data.selectedFilters != null)
-						{
-							for (var i = 0; i < data.selectedFilters.length; i++)
-							{
-								var selectedFilters = '<div>';
-
-								selectedFilters += '<span class="filter-options-span">';
-								selectedFilters += data.selectedFiltersAliases[i];
-								selectedFilters += '</span>';
-
-								selectedFilters += FHC_FilterWidget._getSelectedFilterFields(
-									data.selectedFiltersMetaData[i],
-									data.selectedFiltersActiveFilters[i],
-									data.selectedFiltersActiveFiltersOperation[i],
-									data.selectedFiltersActiveFiltersOption[i]
-								);
-
-								selectedFilters += '<span>';
-								selectedFilters += '<input type="button" value="X" class="remove-selected-filter btn btn-default" filterToRemove="' + data.selectedFilters[i] + '">';
-								selectedFilters += '</span>';
-
-								selectedFilters += '</div>';
-
-								$("#selectedFilters").append(selectedFilters);
-							}
-						}
-
-						if (data.allSelectedFields != null)
-						{
-							for (var i = 0; i < data.allSelectedFields.length; i++)
-							{
-								var fieldName = data.allSelectedFields[i];
-								var fieldToDisplay = data.allSelectedFields[i];
-
-								if (data.selectedFilters.indexOf(fieldName) < 0)
-								{
-									if (data.allColumnsAliases != null && $.isArray(data.allColumnsAliases))
-									{
-										fieldToDisplay = data.allColumnsAliases[i];
-									}
-
-									strDropDown = '<option value="' + fieldName + '">' + fieldToDisplay + '</option>';
-									$("#addFilter").append(strDropDown);
-								}
-							}
-						}
 					}
 
 					FHC_FilterWidget._addEventsSFilters();
@@ -309,7 +522,7 @@ var FHC_FilterWidget = {
 	/**
 	 *
 	 */
-	_dndSF: function() {
+	_drangAndDropEvents: function() {
 		$(".filter-select-field-dnd-span").draggable({
 			containment: "parent",
 			cursor: "move",
@@ -404,67 +617,9 @@ var FHC_FilterWidget = {
 	/**
 	 *
 	 */
-	_resetEventsSF: function() {
-		$("#addField").off('change');
-		$(".remove-field").off('click');
-	},
-
-	/**
-	 *
-	 */
-	_addEventsSF: function() {
-		$("#addField").change(function(event) {
-			//
-			FHC_AjaxClient.ajaxCallPost(
-				'system/Filters/addSelectedFields',
-				{
-					fieldName: $(this).val(),
-					filter_page: FHC_FilterWidget._getFilterPage()
-				},
-				{
-					successCallback: function(data, textStatus, jqXHR) {
-						FHC_FilterWidget._resetSelectedFields();
-
-						FHC_FilterWidget.renderSelectedFields();
-						FHC_FilterWidget.renderTableDataset();
-					}
-				}
-			);
-		});
-
-		$(".remove-field").click(function(event) {
-			//
-			FHC_AjaxClient.ajaxCallPost(
-				'system/Filters/removeSelectedFields',
-				{
-					fieldName: $(this).attr('fieldToRemove'),
-					filter_page: FHC_FilterWidget._getFilterPage()
-				},
-				{
-					successCallback: function(data, textStatus, jqXHR) {
-						FHC_FilterWidget._resetSelectedFields();
-
-						FHC_FilterWidget.renderSelectedFields();
-						FHC_FilterWidget.renderTableDataset();
-					}
-				}
-			);
-		});
-	},
-
-	/**
-	 *
-	 */
 	_resetSelectedFields: function() {
 		$("#filterSelectFieldsDnd").html("");
 		$("#addField").html("");
-	},
-
-	/**
-	 *
-	 */
-	_resetEventsSFilters: function() {
-		$("#addFilter").off('change');
 	},
 
 	/**
@@ -490,83 +645,7 @@ var FHC_FilterWidget = {
 			);
 		});
 
-		$(".select-filter-operation").change(function() {
 
-			if ($(this).val() == "set" || $(this).val() == "nset")
-			{
-				$(this).parent().parent().find(".select-filter-operation-value").addClass("hidden-control");
-				$(this).parent().parent().find(".select-filter-option").addClass("hidden-control");
-
-				$(this).parent().parent().find(".select-filter-operation-value").prop('disabled', true);
-				$(this).parent().parent().find(".select-filter-option").prop('disabled', true);
-			}
-			else
-			{
-				$(this).parent().parent().find(".select-filter-operation-value").removeClass("hidden-control");
-				$(this).parent().parent().find(".select-filter-option").removeClass("hidden-control");
-
-				$(this).parent().parent().find(".select-filter-operation-value").prop('disabled', false);
-				$(this).parent().parent().find(".select-filter-option").prop('disabled', false);
-			}
-
-		});
-
-		$("#applyFilter").click(function() {
-
-			var selectFilterName = [];
-			var selectFilterOperation = [];
-			var selectFilterOperationValue = [];
-			var selectFilterOption = [];
-
-			$("#selectedFilters > div").each(function(i, e) {
-				var tmpSelectFilterName = $(this).find('.hidden-field-name').val();
-				var tmpSelectFilterOperation = $(this).find('.select-filter-operation').val();
-				var tmpSelectFilterOperationValue = $(this).find('.select-filter-operation-value:enabled').val();
-				var tmpSelectFilterOption = $(this).find('.select-filter-option:enabled').val();
-
-				selectFilterName.push(tmpSelectFilterName);
-				selectFilterOperation.push(tmpSelectFilterOperation);
-				selectFilterOperationValue.push(tmpSelectFilterOperationValue != null ? tmpSelectFilterOperationValue : "");
-				selectFilterOption.push(tmpSelectFilterOption != null ? tmpSelectFilterOption : "");
-			});
-
-			//
-			FHC_AjaxClient.ajaxCallPost(
-				'system/Filters/applyFilter',
-				{
-					filterNames: selectFilterName,
-					filterOperations: selectFilterOperation,
-					filterOperationValues: selectFilterOperationValue,
-					filterOptions: selectFilterOption,
-					filter_page: FHC_FilterWidget._getFilterPage()
-				},
-				{
-					successCallback: function(data, textStatus, jqXHR) {
-						FHC_FilterWidget._resetSelectedFilters();
-
-						location.reload();
-					}
-				}
-			);
-		});
-
-		$(".remove-selected-filter").click(function(event) {
-			//
-			FHC_AjaxClient.ajaxCallPost(
-				'system/Filters/removeSelectedFilters',
-				{
-					fieldName: $(this).attr('filterToRemove'),
-					filter_page: FHC_FilterWidget._getFilterPage()
-				},
-				{
-					successCallback: function(data, textStatus, jqXHR) {
-						FHC_FilterWidget._resetSelectedFilters();
-
-						location.reload();
-					}
-				}
-			);
-		});
 
 	},
 
@@ -743,8 +822,11 @@ $(document).ready(function() {
 		}
 	});
 
-	FHC_FilterWidget.renderSelectedFields();
-	FHC_FilterWidget.renderSelectedFilters();
-	FHC_FilterWidget.renderTableDataset();
+	// FHC_FilterWidget.setFilterName();
+	// FHC_FilterWidget.renderSelectedFields();
+	// FHC_FilterWidget.renderSelectedFilters();
+	// FHC_FilterWidget.renderTableDataset();
+
+	FHC_FilterWidget.display();
 
 });

@@ -1,9 +1,7 @@
 <div class="row">
 	<div class="col-lg-12">
 
-		<div class="filter-name-title">
-			<?php FilterWidget::displayFilterName(); ?>
-		</div>
+		<div class="filter-name-title"></div>
 
 		<br>
 
