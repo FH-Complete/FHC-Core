@@ -13,10 +13,10 @@
 			'ajaxlib' => true,
 			'filterwidget' => true,
 			'phrases'=> array(
-				'person' => array('vorname','nachname'),
+				'person' => array('vorname', 'nachname'),
 				'ui' => array('speichern'),
 				'global' => array('mailAnXversandt')
-				),
+			),
 			'navigationwidget' => true,
 			'customCSSs' => 'public/css/sbadmin2/tablesort_bootstrap.css',
 			'customJSs' => array('public/js/bootstrapper.js', 'public/js/infocenter/infocenterPersonDataset.js')

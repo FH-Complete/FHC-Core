@@ -92,18 +92,17 @@ function _generateJSPhrasesStorageObject($phrases)
 {
 	$ci =& get_instance();
 	$ci->load->library('PhrasesLib', array($phrases), 'pj');
-	
+
 	$toPrint = "\n";
 	$toPrint .= '<script type="text/javascript">';
-	$toPrint .= '
-		var FHC_JS_PHRASES_STORAGE_OBJECT = '.$ci->pj->getJSON();
+	$toPrint = "\n";
+	$toPrint .= 'var FHC_JS_PHRASES_STORAGE_OBJECT = '.$ci->pj->getJSON();
 	$toPrint .= "\n";
 	$toPrint .= '</script>';
 	$toPrint .= "\n\n";
 
 	echo $toPrint;
 }
-
 
 /**
  * Generates tags for the javascripts you want to include, the parameter could by a string or an array of strings
@@ -204,8 +203,9 @@ function _generateAddonsJSsInclude($calledFrom)
 			// Generates the global object to pass useful parameters to other javascripts
 			// NOTE: must be called before any other JS include
 			_generateJSDataStorageObject($calledPath, $calledMethod);
-			
+
 			// Generates the global object to pass phrases to javascripts
+			// NOTE: must be called before including the PhrasesLib.js
 			_generateJSPhrasesStorageObject($phrases);
 
 			// JQuery V3
@@ -217,12 +217,6 @@ function _generateAddonsJSsInclude($calledFrom)
 				_generateJSsInclude('vendor/components/jqueryui/jquery-ui.min.js');
 				_generateJSsInclude('vendor/components/jqueryui/ui/i18n/datepicker-de.js'); // datepicker german language file
 			}
-
-			// AjaxLib JS
-			if ($ajaxlib === true) _generateJSsInclude('public/js/AjaxLib.js');
-			
-//			// PhfrasesLib JS
-			if ($phrases != null) _generateJSsInclude('public/js/PhrasesLib.js');
 
 			// Bootstrap JS
 			if ($bootstrap === true) _generateJSsInclude('vendor/twbs/bootstrap/dist/js/bootstrap.min.js');
@@ -245,6 +239,13 @@ function _generateAddonsJSsInclude($calledFrom)
 				_generateJSsInclude('vendor/BlackrockDigital/startbootstrap-sb-admin-2/dist/js/sb-admin-2.min.js');
 			}
 
+			// AjaxLib JS
+			// NOTE: must be called before including others JS libraries that use it
+			if ($ajaxlib === true) _generateJSsInclude('public/js/AjaxLib.js');
+
+			// PhrasesLib JS
+			if ($phrases != null) _generateJSsInclude('public/js/PhrasesLib.js');
+
 			// FilterWidget JS
 			if($filterwidget === true) _generateJSsInclude('public/js/FilterWidget.js') ;
 
@@ -257,6 +258,6 @@ function _generateAddonsJSsInclude($calledFrom)
 			// Eventually required JS
 			_generateJSsInclude($customJSs);
 		?>
-		
+
 	</head>
 <!-- Header end -->
