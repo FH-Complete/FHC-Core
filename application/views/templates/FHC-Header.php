@@ -11,6 +11,7 @@ $calledMethod = $this->router->method;
 $title = isset($title) ? $title : null;
 $customCSSs = isset($customCSSs) ? $customCSSs : null;
 $customJSs = isset($customJSs) ? $customJSs : null;
+$phrases = isset($phrases) ? $phrases : null;
 
 // By default set the parameters to false
 $jquery = isset($jquery) ? $jquery : false;
@@ -83,6 +84,26 @@ function _generateJSDataStorageObject($calledPath, $calledMethod)
 
 	echo $toPrint;
 }
+
+/**
+ * Generates global JS-Object to pass phrases to other javascripts
+ */
+function _generateJSPhrasesStorageObject($phrases)
+{
+	$ci =& get_instance();
+	$ci->load->library('PhrasesLib', array($phrases), 'pj');
+	
+	$toPrint = "\n";
+	$toPrint .= '<script type="text/javascript">';
+	$toPrint .= '
+		var FHC_JS_PHRASES_STORAGE_OBJECT = '.$ci->pj->getJSON();
+	$toPrint .= "\n";
+	$toPrint .= '</script>';
+	$toPrint .= "\n\n";
+
+	echo $toPrint;
+}
+
 
 /**
  * Generates tags for the javascripts you want to include, the parameter could by a string or an array of strings
@@ -183,6 +204,9 @@ function _generateAddonsJSsInclude($calledFrom)
 			// Generates the global object to pass useful parameters to other javascripts
 			// NOTE: must be called before any other JS include
 			_generateJSDataStorageObject($calledPath, $calledMethod);
+			
+			// Generates the global object to pass phrases to javascripts
+			_generateJSPhrasesStorageObject($phrases);
 
 			// JQuery V3
 			if ($jquery === true) _generateJSsInclude('vendor/components/jquery/jquery.min.js');
@@ -196,6 +220,9 @@ function _generateAddonsJSsInclude($calledFrom)
 
 			// AjaxLib JS
 			if ($ajaxlib === true) _generateJSsInclude('public/js/AjaxLib.js');
+			
+//			// PhfrasesLib JS
+			if ($phrases != null) _generateJSsInclude('public/js/PhrasesLib.js');
 
 			// Bootstrap JS
 			if ($bootstrap === true) _generateJSsInclude('vendor/twbs/bootstrap/dist/js/bootstrap.min.js');
@@ -230,6 +257,6 @@ function _generateAddonsJSsInclude($calledFrom)
 			// Eventually required JS
 			_generateJSsInclude($customJSs);
 		?>
-
+		
 	</head>
 <!-- Header end -->

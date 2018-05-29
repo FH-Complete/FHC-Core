@@ -909,6 +909,27 @@ $phrases = array(
 		)
 	),
 	
+	array(
+		'app' => 'core',
+		'category' => 'global',
+		'phrase' => 'mailAnXversandt',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Mail an {email} versandt.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Mail was sent to {email}.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	
 	
 	//*******************************		CORE/ui
 	array(

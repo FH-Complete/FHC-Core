@@ -259,7 +259,7 @@ class PhrasesLib
 	 * - language: optional parameter must be a string. It's used to load phrases
 	 */
 	private function _extend_construct($params)
-	{
+	{		
 		// Checks if the $params is an array with at least one element
 		if (is_array($params) && count($params) > 0)
 		{
@@ -287,15 +287,44 @@ class PhrasesLib
 					$language = $this->_ci->PersonModel->getLanguage(getAuthUID());
 				}
 
-				// Loads phrases
-				$phrases = $this->_ci->PhraseModel->getPhrasesByCategoryAndLanguage($categories, $language);
+				//checks if categories is associative or indexed array 
+				if (ctype_digit(implode('', array_keys($categories))))
+				{		
+					//	Loads phrases
+					$phrases = $this->_ci->PhraseModel->getPhrasesByCategoryAndLanguage($categories, $language);
 
-				// If there are phrases loaded then store them in the property _phrases
-				if (hasData($phrases))
+					// If there are phrases loaded then store them in the property _phrases
+					if (hasData($phrases))
+					{
+						$this->_phrases = $phrases->retval;
+					}
+				}
+				else 
 				{
-					$this->_phrases = $phrases->retval;
+					//	Loads specific phrasentexte by category and phrases 
+					$phrases = $this->_ci->PhraseModel->getPhrasesByCategoryAndPhrasesAndLanguage($categories, $language);
+
+					//	If there are phrases loaded then store them in the property _phrases
+					if (hasData($phrases))
+					{
+						$this->_phrases = $phrases->retval;
+					}
 				}
 			}
-		}
+		}		
 	}
+	
+	public function getJSON()
+	{
+		if (is_array($this->_phrases) && !is_null($this->_phrases))
+		{
+			return json_encode($this->_phrases);
+		}
+		else
+		{
+			//...CECK: better a return than console.log?
+			console.log('No phrases set to be returned to JS.');
+		}	
+	}
+
 }

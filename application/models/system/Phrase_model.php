@@ -77,6 +77,40 @@ class Phrase_model extends DB_Model
 
 		return $this->execQuery($query, array($categories, $language));
 	}
+	
+	/**
+	 * 
+	 */
+	public function getPhrasesByCategoryAndPhrasesAndLanguage($phrasesParams, $language)
+	{	
+		$qry = '
+			SELECT p.category, p.phrase, pt.orgeinheit_kurzbz, pt.orgform_kurzbz, pt.text
+			FROM system.tbl_phrase p
+			INNER JOIN system.tbl_phrasentext pt USING(phrase_id)
+			WHERE ';
+		
+		foreach ($phrasesParams as $category => $phrases)
+		{
+			$qry .= '
+				(p.category = \'' . $category . '\'
+				AND phrase IN (';		
+				foreach ($phrases as $phrase)
+				{
+					$qry .= '\'' . $phrase . '\', ';
+				}
+			
+			$qry = rtrim($qry, ', ');
+			$qry .= ')) AND pt.sprache = \'' . $language . '\' OR ';
+		}
+		$qry = rtrim($qry, 'OR ');
+		
+		return $this->execQuery($qry, array($phrasesParams, $language));
+	
+
+	}
+	
+	
+	
 
 	/**
 	 * Loads all categories 

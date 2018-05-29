@@ -25,11 +25,11 @@ class FHC_Controller extends CI_Controller
 	 * NOTE: The library is loaded with the alias 'p', so must me used with this alias in the rest of the code.
 	 *		EX: $this->p->t(<category>, <phrase name>)
 	 */
-	public function loadPhrases($categories, $language = null)
+	protected function loadPhrases($categories, $language = null)
 	{
 		$this->load->library('PhrasesLib', array($categories, $language), 'p');
 	}
-
+	
 	/**
 	 * Sets the unique id for the called controller
 	 * NOTE: it is only working with HTTP GET request, not neeaded with POST
