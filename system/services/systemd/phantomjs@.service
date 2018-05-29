@@ -5,7 +5,7 @@ After=network.target
 [Service]
 ExecStart=/usr/bin/phantomjs /home/%i/highcharts/highcharts-convert.js -host 10.127.0.197 -port 3003
 KillMode=process
-Restart=on-failure on-abort
+Restart=always
 User=%i
 Group=%i
 
