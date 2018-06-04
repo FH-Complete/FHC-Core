@@ -46,7 +46,15 @@ class FHC_Controller extends CI_Controller
 			{
 				$this->_controllerId = uniqid(); // generate a unique id
 				// Redirect to the same URL, but giving FHC_CONTROLLER_ID as HTTP GET parameter
-				header(sprintf('Location: %s?%s=%s', $_SERVER['REQUEST_URI'], self::FHC_CONTROLLER_ID, $this->_controllerId));
+				header(
+					sprintf(
+						'Location: %s%s%s=%s',
+						$_SERVER['REQUEST_URI'],
+						strpos($_SERVER['REQUEST_URI'], '?') === false ? '?' : '&', // place the corret character to divide parameters
+						self::FHC_CONTROLLER_ID,
+						$this->_controllerId
+					)
+				);
 				exit; // terminate immediately the execution of this controller
 			}
 		}

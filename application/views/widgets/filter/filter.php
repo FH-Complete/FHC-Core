@@ -1,13 +1,17 @@
 <div class="row">
 	<div class="col-lg-12">
 
-		<?php FilterWidget::displayFilterName(); ?>
+		<div class="filter-name-title">
+			<?php FilterWidget::displayFilterName(); ?>
+		</div>
+
+		<br>
 
 		<div class="panel-group">
 			<div class="panel panel-default">
 				<div class="panel-heading">
 					<h4 class="panel-title">
-						<a data-toggle="collapse" href="#collapseFilterHeader"><?= ucfirst($this->p->t('filter', 'filterEinstellungen')) ?></a>
+						<a data-toggle="collapse" href="#collapseFilterHeader"><?php echo  ucfirst($this->p->t('filter', 'filterEinstellungen')) ?></a>
 					</h4>
 				</div>
 				<div id="collapseFilterHeader" class="panel-collapse collapse">

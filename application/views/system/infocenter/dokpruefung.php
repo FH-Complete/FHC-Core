@@ -2,11 +2,11 @@
 	<table id="doctable" class="table table-bordered">
 		<thead>
 		<tr>
-			<th><?= ucfirst($this->p->t('global','name')) ?></th>
-			<th><?= ucfirst($this->p->t('global','typ')) ?></th>
-			<th><?= ucfirst($this->p->t('global','uploaddatum')) ?></th>
-			<th><?= ucfirst($this->p->t('infocenter','ausstellungsnation')) ?></th>
-			<th><?= ucfirst($this->p->t('infocenter','formalGeprueft')) ?></th>
+			<th><?php echo  ucfirst($this->p->t('global','name')) ?></th>
+			<th><?php echo  ucfirst($this->p->t('global','typ')) ?></th>
+			<th><?php echo  ucfirst($this->p->t('global','uploaddatum')) ?></th>
+			<th><?php echo  ucfirst($this->p->t('infocenter','ausstellungsnation')) ?></th>
+			<th><?php echo  ucfirst($this->p->t('infocenter','formalGeprueft')) ?></th>
 		</tr>
 		</thead>
 		<tbody>
@@ -35,14 +35,14 @@
 </div>
 <?php if (count($dokumente_nachgereicht) > 0): ?>
 	<br/>
-	<p><?= ucfirst($this->p->t('infocenter','nachzureichendeDokumente')) ?></p>
+	<p><?php echo  ucfirst($this->p->t('infocenter','nachzureichendeDokumente')) ?></p>
 	<table id="nachgdoctable" class="table table-bordered">
 		<thead>
 		<tr>
-			<th><?= ucfirst($this->p->t('global','typ')) ?></th>
-			<th><?= ucfirst($this->p->t('infocenter','nachzureichenAm')) ?></th>
-			<th><?= ucfirst($this->p->t('infocenter','ausstellungsnation')) ?></th>
-			<th><?= ucfirst($this->p->t('global','anmerkung')) ?></th>
+			<th><?php echo  ucfirst($this->p->t('global','typ')) ?></th>
+			<th><?php echo  ucfirst($this->p->t('infocenter','nachzureichenAm')) ?></th>
+			<th><?php echo  ucfirst($this->p->t('infocenter','ausstellungsnation')) ?></th>
+			<th><?php echo  ucfirst($this->p->t('global','anmerkung')) ?></th>
 		</tr>
 		</thead>
 		<tbody>

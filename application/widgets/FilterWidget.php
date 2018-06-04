@@ -40,6 +40,7 @@ class FilterWidget extends Widget
 	const ACTIVE_FILTERS_OPTION = 'activeFiltersOption';
 	const ACTIVE_FILTERS_OPERATION = 'activeFiltersOperation';
 	const FILTER_NAME = 'filterName';
+	const FILTER_NAME_PHRASE = 'filterNamePhrase';
 
 	const ACTIVE_FILTER_OPTION_POSTFIX = '-option';
 	const ACTIVE_FILTER_OPERATION_POSTFIX = '-operation';
@@ -78,6 +79,7 @@ class FilterWidget extends Widget
 	private $checkboxes;
 	private $columnsAliases;
 	private $filterName;
+	private $filterNamePhrase;
 
 	private $dataset;
 	private $metaData;
@@ -123,8 +125,13 @@ class FilterWidget extends Widget
 			$this->filterName = $filterSessionArray[self::FILTER_NAME];
 		}
 
+		if ($this->filterNamePhrase == null && isset($filterSessionArray[self::FILTER_NAME_PHRASE]))
+		{
+			$this->filterNamePhrase = $filterSessionArray[self::FILTER_NAME_PHRASE];
+		}
+
 		//
-		if ($filterSessionArray[self::FILTER_ID] != $this->filterId)
+		if ($this->filterId <= 0 || $filterSessionArray[self::FILTER_ID] != $this->filterId)
 		{
 			//
 			$this->_loadFilter();
@@ -136,74 +143,78 @@ class FilterWidget extends Widget
 		//
 		$this->FiltersModel->resetQuery();
 
-		//
-		$this->dataset = @$this->FiltersModel->execReadOnlyQuery($this->_generateQuery());
-
-		//
-		$this->listFields = $this->FiltersModel->getExecutedQueryListFields();
-
-		//
-		$selectedFields = array();
-		$filterSessionArray = $this->_readSession();
-		if (isset($filterSessionArray[self::SELECTED_FIELDS]))
+		$query = $this->_generateQuery();
+		if ($query != null)
 		{
-			$selectedFields = $filterSessionArray[self::SELECTED_FIELDS];
-		}
+			//
+			$this->dataset = @$this->FiltersModel->execReadOnlyQuery($query);
 
-		//
-		if (count($selectedFields) == 0)
-		{
-			$filterSessionArray[self::SELECTED_FIELDS] = $this->listFields;
-		}
+			//
+			$this->listFields = $this->FiltersModel->getExecutedQueryListFields();
 
-		//
-		if ($this->columnsAliases != null && count($this->listFields) != count($this->columnsAliases))
-		{
-			show_error('Parameter columnsAliases does not have a number of items equal to those returned by the query');
-		}
-
-		$filterSessionArray[self::COLUMNS_ALIASES] = $this->_getColumnAliasesFromPost();
-		$filterSessionArray[self::CHECKBOXES] = $this->checkboxes;
-
-		if ($this->app != null)
-		{
-			$filterSessionArray[self::APP_PARAMETER] = $this->app;
-		}
-
-		if ($this->datasetName != null)
-		{
-			$filterSessionArray[self::DATASET_NAME_PARAMETER] = $this->datasetName;
-		}
-
-		$filterSessionArray[self::ALL_SELECTED_FIELDS] = $this->listFields;
-		$filterSessionArray[self::ALL_COLUMNS_ALIASES] = $this->columnsAliases;
-
-		/* ------------------------------------------------------------ */
-
-		$tmpDataset = null;
-		if (hasData($this->dataset))
-		{
-			$tmpDataset = array();
-
-			for ($resultsCounter = 0; $resultsCounter < count($this->dataset->retval); $resultsCounter++)
+			//
+			$selectedFields = array();
+			$filterSessionArray = $this->_readSession();
+			if (isset($filterSessionArray[self::SELECTED_FIELDS]))
 			{
-				$result = $this->dataset->retval[$resultsCounter];
-
-				$class = $this->_markRow($result);
-				$formattedResult = $this->_formatRaw($result);
-				$formattedResult->FILTER_CLASS_MARK_ROW = $class;
-				$tmpDataset[] = $formattedResult;
+				$selectedFields = $filterSessionArray[self::SELECTED_FIELDS];
 			}
+
+			//
+			if (count($selectedFields) == 0)
+			{
+				$filterSessionArray[self::SELECTED_FIELDS] = $this->listFields;
+			}
+
+			//
+			if ($this->columnsAliases != null && count($this->listFields) != count($this->columnsAliases))
+			{
+				show_error('Parameter columnsAliases does not have a number of items equal to those returned by the query');
+			}
+
+			$filterSessionArray[self::COLUMNS_ALIASES] = $this->_getColumnAliasesFromPost();
+			$filterSessionArray[self::CHECKBOXES] = $this->checkboxes;
+
+			if ($this->app != null)
+			{
+				$filterSessionArray[self::APP_PARAMETER] = $this->app;
+			}
+
+			if ($this->datasetName != null)
+			{
+				$filterSessionArray[self::DATASET_NAME_PARAMETER] = $this->datasetName;
+			}
+
+			$filterSessionArray[self::ALL_SELECTED_FIELDS] = $this->listFields;
+			$filterSessionArray[self::ALL_COLUMNS_ALIASES] = $this->columnsAliases;
+
+			/* ------------------------------------------------------------ */
+
+			$tmpDataset = null;
+			if (hasData($this->dataset))
+			{
+				$tmpDataset = array();
+
+				for ($resultsCounter = 0; $resultsCounter < count($this->dataset->retval); $resultsCounter++)
+				{
+					$result = $this->dataset->retval[$resultsCounter];
+
+					$class = $this->_markRow($result);
+					$formattedResult = $this->_formatRaw($result);
+					$formattedResult->FILTER_CLASS_MARK_ROW = $class;
+					$tmpDataset[] = $formattedResult;
+				}
+			}
+
+			$filterSessionArray[self::DATASET_PARAMETER] = $tmpDataset;
+
+			/* ------------------------------------------------------------ */
+
+			//
+			$this->metaData = $this->FiltersModel->getExecutedQueryMetaData();
+
+			$filterSessionArray[self::METADATA_PARAMETER] = $this->metaData;
 		}
-
-		$filterSessionArray[self::DATASET_PARAMETER] = $tmpDataset;
-
-		/* ------------------------------------------------------------ */
-
-		//
-		$this->metaData = $this->FiltersModel->getExecutedQueryMetaData();
-
-		$filterSessionArray[self::METADATA_PARAMETER] = $this->metaData;
 
 		$this->_writeSession($filterSessionArray);
 
@@ -318,9 +329,13 @@ class FilterWidget extends Widget
 	 */
 	public static function displayFilterName()
 	{
-		if (self::$FilterWidgetInstance->filterName != null && self::$FilterWidgetInstance->filterName != '')
+		if (self::$FilterWidgetInstance->filterNamePhrase != null && self::$FilterWidgetInstance->filterNamePhrase != '')
 		{
-			echo '<div class="filter-name-title">'.self::$FilterWidgetInstance->filterName.'</div><br>';
+			echo self::$FilterWidgetInstance->filterNamePhrase;
+		}
+		elseif (self::$FilterWidgetInstance->filterName != null && self::$FilterWidgetInstance->filterName != '')
+		{
+			echo self::$FilterWidgetInstance->filterName;
 		}
 	}
 
@@ -506,6 +521,7 @@ class FilterWidget extends Widget
 		$this->hideSave = false;
 		$this->columnsAliases = null;
 		$this->filterName = null;
+		$this->filterNamePhrase = null;
 
 		$this->filterUniqueId = $this->_getFilterUniqueId();
 
@@ -619,12 +635,13 @@ class FilterWidget extends Widget
 
 		$whereParameters = null;
 
-		if ($this->filterId == null)
+		if ($this->filterId <= 0)
 		{
+			// Try to load the custom filter (person_id = logged user person_id) with the given "app" and "dataset_name"
+			// that is set as default filter (default_filter = true)
 			$whereParameters = array(
 				'app' => $this->app,
 				'dataset_name' => $this->datasetName,
-				'filter_kurzbz' => $this->filterKurzbz,
 				'uid' => getAuthUID(),
 				'default_filter' => true
 			);
@@ -648,6 +665,24 @@ class FilterWidget extends Widget
 				$jsonEncodedFilter = json_decode($filter->retval[0]->filter);
 			}
 		}
+		else // Try to load the global filter (person_id = null) with the given "app" and "dataset_name" that is set as
+			// default filter (default_filter = true)
+		{
+			$whereParameters = array(
+				'app' => $this->app,
+				'dataset_name' => $this->datasetName,
+				'default_filter' => true
+			);
+
+			$filter = $this->FiltersModel->loadWhere($whereParameters);
+			if (hasData($filter))
+			{
+				if (isset($filter->retval[0]->filter) && trim($filter->retval[0]->filter) != '')
+				{
+					$jsonEncodedFilter = json_decode($filter->retval[0]->filter);
+				}
+			}
+		}
 
 		if ($jsonEncodedFilter != null)
 		{
@@ -657,6 +692,7 @@ class FilterWidget extends Widget
 			$activeFiltersOperation = array();
 			$activeFiltersOption = array();
 			$filterName = null;
+			$filterNamePhrase = null;
 
 			if (isset($jsonEncodedFilter->columns))
 			{
@@ -695,7 +731,15 @@ class FilterWidget extends Widget
 				$filterName = $jsonEncodedFilter->name;
 			}
 
+			// Filter name from phrases system
+			if (isset($jsonEncodedFilter->namePhrase))
+			{
+				$this->load->library('PhrasesLib', array('FilterWidget'));
+				$filterNamePhrase = $this->phraseslib->t('FilterWidget', $jsonEncodedFilter->namePhrase);
+			}
+
 			$this->filterName = $filterName;
+			$this->filterNamePhrase = $filterNamePhrase;
 			$this->app = $filter->retval[0]->app;
 
 			$filterSessionArray = array(
@@ -1022,6 +1066,7 @@ class FilterWidget extends Widget
 
 		$filterSessionArray[self::FILTER_ID] = $this->filterId;
 		$filterSessionArray[self::FILTER_NAME] = $this->filterName;
+		$filterSessionArray[self::FILTER_NAME_PHRASE] = $this->filterNamePhrase;
 
 		$this->_writeSession(array_merge($session, $filterSessionArray));
 	}
@@ -1031,7 +1076,7 @@ class FilterWidget extends Widget
 	 */
 	private function _generateQuery()
 	{
-		$query = $this->query;
+		$query = null;//$this->query;
 
 		$activeFilters = array();
 		$activeFiltersOperation = array();

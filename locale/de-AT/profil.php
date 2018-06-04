@@ -38,25 +38,25 @@ $this->phrasen['profil/zeitsperrenVon']='Zeitsperren von';
 $this->phrasen['profil/lvplanVon']='LV-Plan von';
 
 $this->phrasen['profil/AccountInaktiv']='Achtung: Dieser Account ist nicht mehr aktiv';
-$this->phrasen['profil/inaktivStudent']='Achtung!<br> Wir möchten Sie darauf aufmerksam machen, dass Ihr Benutzerdatensatz 
+$this->phrasen['profil/inaktivStudent']='Achtung!<br> Wir möchten Sie darauf aufmerksam machen, dass Ihr Benutzerdatensatz
 deaktiviert wurde.Durch diese Deaktivierung wurden Sie auch aus allen Email-Verteilern gelöscht. <br><br>
-Sollte innerhalb von 6 Monaten (für Studierende) bzw. 3 Wochen (für AbbrecherInnen) nach der Deaktivierung keine 
+Sollte innerhalb von 6 Monaten (für Studierende) bzw. 3 Wochen (für AbbrecherInnen) nach der Deaktivierung keine
 neuerliche Aktivierung Ihres Benutzerdatensatzes erfolgen, dann werden automatisch auch<br>- Ihr Account, <br>- Ihre Mailbox (inkl. aller E-Mails) und<br>
-- Ihr Home-Verzeichnis (inkl. aller Dateien) gelöscht.<br><br>Falls es sich bei der Deaktivierung um einen Irrtum handelt, würden wir Sie bitten, 
+- Ihr Home-Verzeichnis (inkl. aller Dateien) gelöscht.<br><br>Falls es sich bei der Deaktivierung um einen Irrtum handelt, würden wir Sie bitten,
 sich umgehend mit Ihrer Studiengangsassistenz in Verbindung zu setzen.<br>';
 
-$this->phrasen['profil/inaktivMitarbeiter']='Achtung!<br> Wir möchten Sie darauf aufmerksam machen, dass Ihr Benutzerdatensatz 
+$this->phrasen['profil/inaktivMitarbeiter']='Achtung!<br> Wir möchten Sie darauf aufmerksam machen, dass Ihr Benutzerdatensatz
 deaktiviert wurde.Durch diese Deaktivierung wurden Sie auch aus allen Email-Verteilern gelöscht. <br><br>
 Sollte innerhalb von 12 Monaten nach der Deaktivierung keine neuerliche Aktivierung Ihres Benutzerdatensatzes erfolgen, dann werden automatisch auch<br>
 - Ihr Account, <br>- Ihre Mailbox (inkl. aller E-Mails) und<br>
-- Ihr Home-Verzeichnis (inkl. aller Dateien) gelöscht.<br><br>Falls es sich bei der Deaktivierung um einen Irrtum handelt, würden wir Sie bitten, 
+- Ihr Home-Verzeichnis (inkl. aller Dateien) gelöscht.<br><br>Falls es sich bei der Deaktivierung um einen Irrtum handelt, würden wir Sie bitten,
 sich umgehend mit Ihrer Studiengangsassistenz in Verbindung zu setzen.<br>';
 
-$this->phrasen['profil/inaktivSonstige']='Achtung!<br> Wir möchten Sie darauf aufmerksam machen, dass Ihr Benutzerdatensatz 
+$this->phrasen['profil/inaktivSonstige']='Achtung!<br> Wir möchten Sie darauf aufmerksam machen, dass Ihr Benutzerdatensatz
 deaktiviert wurde.Durch diese Deaktivierung wurden Sie auch aus allen Email-Verteilern gelöscht. <br><br>
 Sollte innerhalb der nächsten Tagen keine neuerliche Aktivierung Ihres Benutzerdatensatzes erfolgen, dann werden automatisch auch<br>
 - Ihr Account, <br>- Ihre Mailbox (inkl. aller E-Mails) und<br>
-- Ihr Home-Verzeichnis (inkl. aller Dateien) gelöscht.<br><br>Falls es sich bei der Deaktivierung um einen Irrtum handelt, würden wir Sie bitten, 
+- Ihr Home-Verzeichnis (inkl. aller Dateien) gelöscht.<br><br>Falls es sich bei der Deaktivierung um einen Irrtum handelt, würden wir Sie bitten,
 sich umgehend mit Ihrer Studiengangsassistenz in Verbindung zu setzen.<br>';
 
 $this->phrasen['profil/nurJPGBilder']='Derzeit können nur Bilder im JPG Format hochgeladen werden';
@@ -78,4 +78,6 @@ $this->phrasen['profil/fhausweisWurdeNochNichtGedruckt']='FH-Ausweis wurde noch 
 $this->phrasen['profil/ihrFotoWurdeNochNichtGeprueft']='Ihr Foto wurde noch nicht geprüft';
 $this->phrasen['profil/fotoAuswählen']='Klicken Sie auf das Bild um ein Foto hochzuladen';
 $this->phrasen['profil/bildSpeichern']='Bild speichern';
+$this->phrasen['profil/gueltigvon']='Gültig von';
+$this->phrasen['profil/gueltigbis']='Gültig bis';
 ?>

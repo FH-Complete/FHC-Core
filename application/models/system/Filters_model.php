@@ -44,7 +44,6 @@ class Filters_model extends DB_Model
 		$filterParametersArray = array(
 			'app' => $app,
 			'dataset_name' => $dataset_name,
-			'default_filter' => false,
 			'array_length(description, 1) >' => 0,
 			'uid' => $uid
 		);

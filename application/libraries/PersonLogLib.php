@@ -91,7 +91,7 @@ class PersonLogLib
 	 * @param string $app
 	 * @param null $oe_kurzbz
 	 * @param null $user
-	 * @return bool wether parking was successfull
+	 * @return insert object
 	 */
 	public function park($person_id, $date, $taetigkeit_kurzbz, $app = 'core', $oe_kurzbz = null, $user = null)
 	{
@@ -110,16 +110,13 @@ class PersonLogLib
 			'insertvon' => $user
 		);
 
-		$result = $this->ci->PersonLogModel->insert($data);
-		if (isSuccess($result))
-			return true;
-		else
-			show_error($result->retval);
+		return $this->ci->PersonLogModel->insert($data);
 	}
 
 	/**
 	 * Unparks a person, i.e. removes all log entries in the future
 	 * @param $person_id
+	 * @return array with deleted logids
 	 */
 	public function unPark($person_id)
 	{
@@ -127,24 +124,21 @@ class PersonLogLib
 
 		$deleted = array();
 
-		if (isSuccess($result))
+		if (hasData($result))
 		{
-			if (count($result->retval) > 0)
+			foreach ($result->retval as $log)
 			{
-				foreach ($result->retval as $log)
+				$logdata = json_decode($log->logdata);
+				if (isset($logdata->name) && $logdata->name === self::PARKED_LOGNAME)
 				{
-					$logdata = json_decode($log->logdata);
-					if (isset($logdata->name) && $logdata->name === self::PARKED_LOGNAME)
-					{
-						$delresult = $this->ci->PersonLogModel->deleteLog($log->log_id);
-						if (isSuccess($delresult))
-							$deleted[] = $log->log_id;
-					}
+					$delresult = $this->ci->PersonLogModel->deleteLog($log->log_id);
+					if (isSuccess($delresult))
+						$deleted[] = $log->log_id;
 				}
 			}
 		}
-		else
-			show_error($result->retval);
+
+		return $deleted;
 	}
 
 	/**
@@ -158,23 +152,18 @@ class PersonLogLib
 
 		$parkeddate = null;
 
-		if (isSuccess($result))
+		if (hasData($result))
 		{
-			if (count($result->retval) > 0)
+			foreach ($result->retval as $log)
 			{
-				foreach ($result->retval as $log)
+				$logdata = json_decode($log->logdata);
+				if (isset($logdata->name) && $logdata->name === self::PARKED_LOGNAME)
 				{
-					$logdata = json_decode($log->logdata);
-					if (isset($logdata->name) && $logdata->name === self::PARKED_LOGNAME)
-					{
-						$parkeddate = $log->zeitpunkt;
-						break;
-					}
+					$parkeddate = $log->zeitpunkt;
+					break;
 				}
 			}
 		}
-		else
-			show_error($result->retval);
 
 		return $parkeddate;
 	}

@@ -56,9 +56,9 @@ function appendTableActionsHtml()
 
 				$("#datasetActionsTop, #datasetActionsBottom").append(
 					"<div class='row'>"+
-						"<div class='col-xs-4'>" + selectAllHtml + "&nbsp;&nbsp;" + actionHtml + "</div>"+
-						"<div class='col-xs-4 text-center'>" + legendHtml + "</div>"+
-						"<div class='col-xs-4 text-right'>" + countHtml + "</div>"+
+						"<div class='col-xs-6'>" + selectAllHtml + "&nbsp;&nbsp;" + actionHtml + "</div>"+
+						"<div class='col-xs-4'>" + legendHtml + "</div>"+
+						"<div class='col-xs-2 text-right'>" + countHtml + "</div>"+
 						"<div class='clearfix'></div>"+
 					"</div>"
 				);
