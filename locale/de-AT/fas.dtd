@@ -291,7 +291,7 @@
 <!ENTITY menu-dokumente-pruefungszeugnis_englisch.label		"Prüfungszeugnis Englisch">
 <!ENTITY menu-dokumente-pruefungszeugnis_englisch.accesskey	"G">
 
-<!ENTITY menu-dokumente-bescheid_deutsch.label		"Bescheid Deutsch">
+<!ENTITY menu-dokumente-bescheid_deutsch.label		"Bescheid (Nur Voransicht)">
 <!ENTITY menu-dokumente-bescheid_deutsch.accesskey	"D">
 
 <!ENTITY menu-dokumente-bescheid_englisch.label		"Bescheid Englisch">
