@@ -14,7 +14,7 @@
  */
 function sideMenuHook()
 {
-	$(".remove-filter").click(function() {
+	$(".remove-applied-filter").click(function() {
 		//
 		FHC_AjaxClient.ajaxCallPost(
 			'system/Filters/deleteCustomFilter',
@@ -41,6 +41,9 @@ var FHC_FilterWidget = {
 	display: function() {
 		FHC_FilterWidget._getFilter(FHC_FilterWidget._renderFilterWidget);
 	},
+
+	//------------------------------------------------------------------------------------------------------------------
+	// Private methods
 
 	/**
 	 *
@@ -74,14 +77,21 @@ var FHC_FilterWidget = {
 
 		FHC_FilterWidget._setFilterName(data); //
 
-		FHC_FilterWidget._renderDnDFields(data); //
+		FHC_FilterWidget._renderDragAndDropFields(data); //
 
 		FHC_FilterWidget._renderDropDownFields(data); //
 
 		FHC_FilterWidget._renderAppliedFilters(data); //
 
+		FHC_FilterWidget._renderDropDownFilters(data); //
+
+		FHC_FilterWidget._renderTableDataset(data); //
+
 	},
 
+	/**
+	 *
+	 */
 	_setFilterName: function(data) {
 		if (data.hasOwnProperty('filterName'))
 		{
@@ -92,58 +102,124 @@ var FHC_FilterWidget = {
 	/**
 	 *
 	 */
-	_renderDnDFields: function(data) {
+	_renderDragAndDropFields: function(data) {
 
-		$(".remove-field").off('click');
+		$(".remove-selected-field").off('click');
 
-		if (data.hasOwnProperty('rowNumber') && data.rowNumber > 0)
+		var arrayFieldsToDisplay = [];
+
+		if (data.hasOwnProperty('selectedFields') && $.isArray(data.selectedFields))
 		{
-			var arrayFieldsToDisplay = [];
-
-			if (data.hasOwnProperty('selectedFields') && $.isArray(data.selectedFields))
+			if (data.hasOwnProperty('columnsAliases') && $.isArray(data.columnsAliases))
 			{
-				if (data.hasOwnProperty('columnsAliases') && $.isArray(data.columnsAliases))
+				for (var i = 0; i < data.selectedFields.length; i++)
 				{
-					for (var i = 0; i < data.selectedFields.length; i++)
+					for (var j = 0; j < data.fields.length; j++)
 					{
-						for (var j = 0; j < data.fields.length; j++)
+						if (data.selectedFields[i] == data.fields[j])
 						{
-							if (data.selectedFields[i] == data.fields[j])
-							{
-								arrayFieldsToDisplay[i] = data.columnsAliases[j];
-							}
+							arrayFieldsToDisplay[i] = data.columnsAliases[j];
 						}
 					}
 				}
-				else
-				{
-					arrayFieldsToDisplay = data.selectedFields;
-				}
 			}
-
-			for (var i = 0; i < arrayFieldsToDisplay.length; i++)
+			else
 			{
-				var fieldToDisplay = arrayFieldsToDisplay[i];
-				var fieldName = data.selectedFields[i];
-
-				var strHtml = '<span id="dnd' + fieldName + '" class="filter-select-field-dnd-span">';
-				strHtml += '	<span>' + fieldToDisplay + '</span>';
-				strHtml += '	<span>';
-				strHtml += '		<a class="remove-field" fieldToRemove="' + fieldName + '"> X </a>';
-				strHtml += '	</span>';
-				strHtml += '</span>';
-
-				$("#filterSelectFieldsDnd").append(strHtml);
+				arrayFieldsToDisplay = data.selectedFields;
 			}
+		}
 
-			FHC_FilterWidget._drangAndDropEvents();
+		for (var i = 0; i < arrayFieldsToDisplay.length; i++)
+		{
+			var fieldToDisplay = arrayFieldsToDisplay[i];
+			var fieldName = data.selectedFields[i];
 
-			$(".remove-field").click(function(event) {
+			var strHtml = '<span id="dnd' + fieldName + '" class="drag-and-drop-fields-span">';
+			strHtml += '	<span>' + fieldToDisplay + '</span>';
+			strHtml += '	<span>';
+			strHtml += '		<a class="remove-selected-field" fieldToRemove="' + fieldName + '"> X </a>';
+			strHtml += '	</span>';
+			strHtml += '</span>';
+
+			$("#dragAndDropFieldsArea").append(strHtml);
+		}
+
+		$(".drag-and-drop-fields-span").draggable({
+			containment: "parent",
+			cursor: "move",
+			opacity: 0.4,
+			revert: "invalid",
+			revertDuration: 200,
+			drag: function(event, ui) {
+
+				var padding = 20;
+				var draggedElement = $(this);
+
+				$(".drag-and-drop-fields-span").each(function(i, e) {
+
+					if ($(this).attr('id') != draggedElement.attr('id'))
+					{
+						$(this).removeClass("selection-after");
+						$(this).removeClass("selection-before");
+
+						var elementCenter = $(this).offset().left + ((padding + $(this).width()) / 2);
+
+						if (event.pageX > ($(this).offset().left - (padding / 2))
+							&& event.pageX < ($(this).offset().left + $(this).width() + (padding / 2)))
+						{
+							if (event.pageX > elementCenter)
+							{
+								$(this).addClass("selection-after");
+								$(this).removeClass("selection-before");
+							}
+							else if (event.pageX < elementCenter)
+							{
+								$(this).addClass("selection-before");
+								$(this).removeClass("selection-after");
+							}
+						}
+					}
+
+				});
+
+			}
+		});
+
+		$(".drag-and-drop-fields-span").droppable({
+			accept: ".drag-and-drop-fields-span",
+			drop: function(event, ui) {
+
+				var padding = 20;
+				var elementCenter = $(this).offset().left + ((padding + $(this).width()) / 2);
+				var draggedElement = ui.helper;
+
+				if (event.pageX > elementCenter)
+				{
+					draggedElement.insertAfter($(this));
+				}
+				else if (event.pageX < elementCenter)
+				{
+					draggedElement.insertBefore($(this));
+				}
+
+				$(this).removeClass("selection-before");
+				$(this).removeClass("selection-after");
+
+				draggedElement.css({left: '0px', top: '10px'});
+
+				var arrayDndId = [];
+
+				$(".drag-and-drop-fields-span").each(function(i, e) {
+
+					arrayDndId[i] = $(this).attr('id').replace('dnd', '');
+
+				});
+
 				//
 				FHC_AjaxClient.ajaxCallPost(
-					'system/Filters/removeSelectedFields',
+					'system/Filters/sortSelectedFields',
 					{
-						fieldName: $(this).attr('fieldToRemove'),
+						selectedFieldsLst: arrayDndId,
 						filter_page: FHC_FilterWidget._getFilterPage()
 					},
 					{
@@ -155,29 +231,58 @@ var FHC_FilterWidget = {
 						}
 					}
 				);
-			});
-		}
+			}
+		});
+
+		$(".remove-selected-field").click(function(event) {
+			//
+			FHC_AjaxClient.ajaxCallPost(
+				'system/Filters/removeSelectedFields',
+				{
+					fieldName: $(this).attr('fieldToRemove'),
+					filter_page: FHC_FilterWidget._getFilterPage()
+				},
+				{
+					successCallback: function(data, textStatus, jqXHR) {
+						FHC_FilterWidget._resetSelectedFields();
+
+						FHC_FilterWidget.renderSelectedFields();
+						FHC_FilterWidget.renderTableDataset();
+					}
+				}
+			);
+		});
 	},
 
 	_renderDropDownFields: function(data) {
 
 		$("#addField").off('change');
 
-		var strDropDown = '<option value="">Select a field to add...</option>';
-		$("#addField").append(strDropDown);
+		var strDropDown = '';
 
-		if (data.fields != null)
+		if (data.hasOwnProperty('fields') && $.isArray(data.fields))
 		{
 			for (var i = 0; i < data.fields.length; i++)
 			{
-				var fieldName = data.fields[i];
-				var fieldToDisplay = data.fields[i];
+				var toBeDisplayed = true;
 
-				if (data.selectedFields.indexOf(fieldName) < 0)
+				for (var j = 0; j < data.selectedFields.length; j++)
 				{
-					if (data.allColumnsAliases != null && $.isArray(data.allColumnsAliases))
+					if (data.fields[i] == data.selectedFields[j])
 					{
-						fieldToDisplay = data.allColumnsAliases[i];
+						toBeDisplayed = false;
+						break;
+					}
+				}
+
+				if (toBeDisplayed == true)
+				{
+					var fieldName = data.fields[i];
+					var fieldToDisplay = data.fields[i];
+
+					if (data.hasOwnProperty('columnsAliases') && $.isArray(data.columnsAliases))
+					{
+						fieldToDisplay = data.columnsAliases[i];
 					}
 
 					strDropDown = '<option value="' + fieldName + '">' + fieldToDisplay + '</option>';
@@ -211,77 +316,65 @@ var FHC_FilterWidget = {
 	 */
 	_renderAppliedFilters: function(data) {
 
-		$("#addFilter").off('change');
-
-		var data = FHC_AjaxClient.getData(data);
-		var strDropDown = '<option value="">Select a filter to add...</option>';
-
-		$("#addFilter").append(strDropDown);
-
-		if (data.selectedFilters != null)
+		if (data.hasOwnProperty('datasetMetadata') && $.isArray(data.datasetMetadata)
+			&& data.hasOwnProperty('filters') && $.isArray(data.filters))
 		{
-			for (var i = 0; i < data.selectedFilters.length; i++)
+			for (var i = 0; i < data.filters.length; i++)
 			{
-				var selectedFilters = '<div>';
-
-				selectedFilters += '<span class="filter-options-span">';
-				selectedFilters += data.selectedFiltersAliases[i];
-				selectedFilters += '</span>';
-
-				selectedFilters += FHC_FilterWidget._getSelectedFilterFields(
-					data.selectedFiltersMetaData[i],
-					data.selectedFiltersActiveFilters[i],
-					data.selectedFiltersActiveFiltersOperation[i],
-					data.selectedFiltersActiveFiltersOption[i]
-				);
-
-				selectedFilters += '<span>';
-				selectedFilters += '<input type="button" value="X" class="remove-selected-filter btn btn-default" filterToRemove="' + data.selectedFilters[i] + '">';
-				selectedFilters += '</span>';
-
-				selectedFilters += '</div>';
-
-				$("#selectedFilters").append(selectedFilters);
-			}
-		}
-
-		if (data.allSelectedFields != null)
-		{
-			for (var i = 0; i < data.allSelectedFields.length; i++)
-			{
-				var fieldName = data.allSelectedFields[i];
-				var fieldToDisplay = data.allSelectedFields[i];
-
-				if (data.selectedFilters.indexOf(fieldName) < 0)
+				for (var j = 0; j < data.datasetMetadata.length; j++)
 				{
-					if (data.allColumnsAliases != null && $.isArray(data.allColumnsAliases))
+					if (data.filters[i].name == data.datasetMetadata[j].name)
 					{
-						fieldToDisplay = data.allColumnsAliases[i];
-					}
+						var appliedFilters = '<div>';
 
-					strDropDown = '<option value="' + fieldName + '">' + fieldToDisplay + '</option>';
-					$("#addFilter").append(strDropDown);
+						appliedFilters += '<span class="filter-span-label">';
+
+						if (data.hasOwnProperty('columnsAliases') && $.isArray(data.columnsAliases))
+						{
+							fieldToDisplay = data.columnsAliases[j];
+						}
+						else
+						{
+							fieldToDisplay = data.datasetMetadata[j].name;
+						}
+
+						appliedFilters += fieldToDisplay;
+						appliedFilters += '</span>';
+
+						appliedFilters += FHC_FilterWidget._getSelectedFilterFields(
+							data.datasetMetadata[j],
+							data.filters[i]
+						);
+
+						appliedFilters += '<span>';
+						appliedFilters += '	<input type="button" value="X" class="remove-applied-filter btn btn-default" filterToRemove="' + data.filters[i].name + '">';
+						appliedFilters += '</span>';
+
+						appliedFilters += '</div>';
+
+						$("#appliedFilters").append(appliedFilters);
+					}
 				}
 			}
 		}
 
-		$(".select-filter-operation").change(function() {
+		$(".applied-filter-operation").change(function() {
 
 			if ($(this).val() == "set" || $(this).val() == "nset")
 			{
-				$(this).parent().parent().find(".select-filter-operation-value").addClass("hidden-control");
-				$(this).parent().parent().find(".select-filter-option").addClass("hidden-control");
+				$(this).parent().parent().find(".applied-filter-condition").addClass("hidden-control");
+				$(this).parent().parent().find(".applied-filter-option").addClass("hidden-control");
 
-				$(this).parent().parent().find(".select-filter-operation-value").prop('disabled', true);
-				$(this).parent().parent().find(".select-filter-option").prop('disabled', true);
+				$(this).parent().parent().find(".applied-filter-condition").prop('disabled', true);
+				$(this).parent().parent().find(".applied-filter-option").prop('disabled', true);
 			}
 			else
 			{
-				$(this).parent().parent().find(".select-filter-operation-value").removeClass("hidden-control");
-				$(this).parent().parent().find(".select-filter-option").removeClass("hidden-control");
+				$(this).parent().parent().find(".applied-filter-condition").removeClass("hidden-control");
+				$(this).parent().parent().find(".applied-filter-option").removeClass("hidden-control");
 
-				$(this).parent().parent().find(".select-filter-operation-value").prop('disabled', false);
-				$(this).parent().parent().find(".select-filter-option").prop('disabled', false);
+				$(this).parent().parent().find(".applied-filter-condition").prop('disabled', false);
+				$(this).parent().parent().find(".applied-filter-option").prop('disabled', false);
 			}
 
 		});
@@ -295,9 +388,9 @@ var FHC_FilterWidget = {
 
 			$("#selectedFilters > div").each(function(i, e) {
 				var tmpSelectFilterName = $(this).find('.hidden-field-name').val();
-				var tmpSelectFilterOperation = $(this).find('.select-filter-operation').val();
-				var tmpSelectFilterOperationValue = $(this).find('.select-filter-operation-value:enabled').val();
-				var tmpSelectFilterOption = $(this).find('.select-filter-option:enabled').val();
+				var tmpSelectFilterOperation = $(this).find('.applied-filter-operation').val();
+				var tmpSelectFilterOperationValue = $(this).find('.applied-filter-condition:enabled').val();
+				var tmpSelectFilterOption = $(this).find('.applied-filter-option:enabled').val();
 
 				selectFilterName.push(tmpSelectFilterName);
 				selectFilterOperation.push(tmpSelectFilterOperation);
@@ -325,7 +418,7 @@ var FHC_FilterWidget = {
 			);
 		});
 
-		$(".remove-selected-filter").click(function(event) {
+		$(".remove-applied-filter").click(function(event) {
 			//
 			FHC_AjaxClient.ajaxCallPost(
 				'system/Filters/removeSelectedFilters',
@@ -345,287 +438,44 @@ var FHC_FilterWidget = {
 
 	},
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 	/**
 	 *
 	 */
-	renderSelectedFilters: function() {
-		//
-		FHC_AjaxClient.ajaxCallGet(
-			'system/Filters/getFilters',
+	_renderDropDownFilters: function(data) {
+
+		$("#addFilter").off('change');
+
+		if (data.hasOwnProperty('fields') && $.isArray(data.fields))
+		{
+			for (var i = 0; i < data.fields.length; i++)
 			{
-				filter_page: FHC_FilterWidget._getFilterPage()
-			},
-			{
-				successCallback: function(data, textStatus, jqXHR) {
+				var toBeDisplayed = true;
 
-					if (FHC_AjaxClient.hasData(data))
-					{
-
-					}
-
-					FHC_FilterWidget._addEventsSFilters();
-				}
-			}
-		);
-	},
-
-	/**
-	 *
-	 */
-	renderTableDataset: function() {
-		//
-		FHC_AjaxClient.ajaxCallGet(
-			'system/Filters/tableDataset',
-			{
-				filter_page: FHC_FilterWidget._getFilterPage()
-			},
-			{
-				successCallback: function(data, textStatus, jqXHR) {
-
-					FHC_FilterWidget._resetTableDataset();
-
-					if (data != null)
-					{
-						if (data.checkboxes != null)
-						{
-							$("#filterTableDataset > thead > tr").append("<th title=\"Select\">Select</th>");
-						}
-
-						var arrayFieldsToDisplay = [];
-
-						if (data.columnsAliases != null && $.isArray(data.columnsAliases) && data.columnsAliases.length > 0)
-						{
-							arrayFieldsToDisplay = data.columnsAliases;
-						}
-						else if (data.selectedFields != null && $.isArray(data.selectedFields))
-						{
-							arrayFieldsToDisplay = data.selectedFields;
-						}
-
-						/* ------------------------------------------------------------------------------------------------ */
-						if (data.checkboxes != null && data.checkboxes != "")
-						{
-							$("#filterTableDataset > thead > tr").html("<th title=\"Select\">Select</th>");
-						}
-
-						for (var i = 0; i < arrayFieldsToDisplay.length; i++)
-						{
-							var th = arrayFieldsToDisplay[i];
-
-							$("#filterTableDataset > thead > tr").append("<th title=\"" + th + "\">" + th + "</th>");
-						}
-
-						if (data.additionalColumns != null && $.isArray(data.additionalColumns))
-						{
-							for (var i = 0; i < data.additionalColumns.length; i++)
-							{
-								var th = data.additionalColumns[i];
-
-								$("#filterTableDataset > thead > tr").append("<th title=\"" + th + "\">" + th + "</th>");
-							}
-						}
-						/* ------------------------------------------------------------------------------------------------ */
-
-						if (arrayFieldsToDisplay.length > 0)
-						{
-							if (data.dataset != null && $.isArray(data.dataset))
-							{
-								for (var i = 0; i < data.dataset.length; i++)
-								{
-									var record = data.dataset[i];
-									var strHtml = '<tr class="' + record.FILTER_CLASS_MARK_ROW + '">';
-
-									if (data.checkboxes != null && data.checkboxes != "")
-									{
-										strHtml += '<td>';
-										strHtml += '<input type="checkbox" name="' + data.checkboxes + '[]" value="' + record[data.checkboxes] + '">';
-										strHtml += '</td>';
-									}
-
-									$.each(arrayFieldsToDisplay, function(i, fieldToDisplay) {
-
-										if (record.hasOwnProperty(data.selectedFields[i]))
-										{
-											strHtml += '<td>' + record[data.selectedFields[i]] + '</td>';
-										}
-									});
-
-									if (data.additionalColumns != null && $.isArray(data.additionalColumns))
-									{
-										$.each(data.additionalColumns, function(i, additionalColumn) {
-
-											if (record.hasOwnProperty(additionalColumn))
-											{
-												strHtml += '<td>' + record[additionalColumn] + '</td>';
-											}
-
-										});
-									}
-
-									strHtml += '</tr>';
-
-									$("#filterTableDataset > tbody").append(strHtml);
-								}
-							}
-							else
-							{
-								// console.log("No dataset!!!");
-							}
-						}
-						else
-						{
-							// console.log("No fields to display!!!");
-						}
-					}
-					else
-					{
-						console.log("No data!!!");
-					}
-
-					FHC_FilterWidget._callTableSorter();
-
-				}
-			}
-		);
-	},
-
-	//------------------------------------------------------------------------------------------------------------------
-	// Private methods
-
-	/**
-	 *
-	 */
-	_drangAndDropEvents: function() {
-		$(".filter-select-field-dnd-span").draggable({
-			containment: "parent",
-			cursor: "move",
-			opacity: 0.4,
-			revert: "invalid",
-			revertDuration: 200,
-			drag: function(event, ui) {
-
-				var padding = 20;
-				var draggedElement = $(this);
-
-				$(".filter-select-field-dnd-span").each(function(i, e) {
-
-					if ($(this).attr('id') != draggedElement.attr('id'))
-					{
-						$(this).removeClass("selection-after");
-						$(this).removeClass("selection-before");
-
-						var elementCenter = $(this).offset().left + ((padding + $(this).width()) / 2);
-
-						if (event.pageX > ($(this).offset().left - (padding / 2))
-							&& event.pageX < ($(this).offset().left + $(this).width() + (padding / 2)))
-						{
-							if (event.pageX > elementCenter)
-							{
-								$(this).addClass("selection-after");
-								$(this).removeClass("selection-before");
-							}
-							else if (event.pageX < elementCenter)
-							{
-								$(this).addClass("selection-before");
-								$(this).removeClass("selection-after");
-							}
-						}
-					}
-
-				});
-
-			}
-		});
-
-		$(".filter-select-field-dnd-span").droppable({
-			accept: ".filter-select-field-dnd-span",
-			drop: function(event, ui) {
-
-				var padding = 20;
-				var elementCenter = $(this).offset().left + ((padding + $(this).width()) / 2);
-				var draggedElement = ui.helper;
-
-				if (event.pageX > elementCenter)
+				for (var j = 0; j < data.filters.length; j++)
 				{
-					draggedElement.insertAfter($(this));
-				}
-				else if (event.pageX < elementCenter)
-				{
-					draggedElement.insertBefore($(this));
-				}
-
-				$(this).removeClass("selection-before");
-				$(this).removeClass("selection-after");
-
-				draggedElement.css({left: '0px', top: '10px'});
-
-				var arrayDndId = [];
-
-				$(".filter-select-field-dnd-span").each(function(i, e) {
-
-					arrayDndId[i] = $(this).attr('id').replace('dnd', '');
-
-				});
-
-				//
-				FHC_AjaxClient.ajaxCallPost(
-					'system/Filters/sortSelectedFields',
+					if (data.fields[i] == data.filters[j].name)
 					{
-						selectedFieldsLst: arrayDndId,
-						filter_page: FHC_FilterWidget._getFilterPage()
-					},
-					{
-						successCallback: function(data, textStatus, jqXHR) {
-							FHC_FilterWidget._resetSelectedFields();
-
-							FHC_FilterWidget.renderSelectedFields();
-							FHC_FilterWidget.renderTableDataset();
-						}
+						toBeDisplayed = false;
+						break;
 					}
-				);
+				}
+
+				if (toBeDisplayed == true)
+				{
+					var fieldName = data.fields[i];
+					var fieldToDisplay = data.fields[i];
+
+					if (data.hasOwnProperty('columnsAliases') && $.isArray(data.columnsAliases))
+					{
+						fieldToDisplay = data.columnsAliases[i];
+					}
+
+					strDropDown = '<option value="' + fieldName + '">' + fieldToDisplay + '</option>';
+					$("#addFilter").append(strDropDown);
+				}
 			}
-		});
-	},
+		}
 
-	/**
-	 *
-	 */
-	_resetSelectedFields: function() {
-		$("#filterSelectFieldsDnd").html("");
-		$("#addField").html("");
-	},
-
-	/**
-	 *
-	 */
-	_addEventsSFilters: function() {
 		$("#addFilter").change(function(event) {
 			//
 			FHC_AjaxClient.ajaxCallPost(
@@ -645,61 +495,68 @@ var FHC_FilterWidget = {
 			);
 		});
 
-
-
 	},
 
 	/**
 	 *
 	 */
-	_getSelectedFilterFields: function(metaData, activeFilters, activeFiltersOperation, activeFiltersOption) {
+	_resetSelectedFields: function() {
+		$("#dragAndDropFieldsArea").html("");
+		$("#addField").html("");
+	},
+
+	/**
+	 *
+	 */
+	_getSelectedFilterFields: function(metaData, appliedFilter) {
+
 		var html = '';
 
 		if (metaData.type.toLowerCase().indexOf("int") >= 0)
 		{
 			html = '<span>';
-			html += '	<select class="form-control select-filter-operation">';
-			html += '		<option value="equal" ' + (activeFiltersOperation == "equal" ? "selected" : "") + '>equal</option>';
-			html += '		<option value="nequal" ' + (activeFiltersOperation == "nqual" ? "selected" : "") + '>not equal</option>';
-			html += '		<option value="gt" ' + (activeFiltersOperation == "gt" ? "selected" : "") + '>greater than</option>';
-			html += '		<option value="lt" ' + (activeFiltersOperation == "lt" ? "selected" : "") + '>less than</option>';
+			html += '	<select class="form-control applied-filter-operation">';
+			html += '		<option value="equal" ' + (appliedFilter.operation == "equal" ? "selected" : "") + '>equal</option>';
+			html += '		<option value="nequal" ' + (appliedFilter.operation == "nqual" ? "selected" : "") + '>not equal</option>';
+			html += '		<option value="gt" ' + (appliedFilter.operation == "gt" ? "selected" : "") + '>greater than</option>';
+			html += '		<option value="lt" ' + (appliedFilter.operation == "lt" ? "selected" : "") + '>less than</option>';
 			html += '	</select>';
 			html += '</span>';
 			html += '<span>';
-			html += '	<input type="number" value="' + activeFilters + '" class="form-control select-filter-operation-value">';
+			html += '	<input type="number" value="' + appliedFilter.condition + '" class="form-control applied-filter-condition">';
 			html += '</span>';
 		}
 		if (metaData.type.toLowerCase().indexOf('varchar') >= 0 || metaData.type.toLowerCase() == 'text')
 		{
 			html = '<span>';
-			html += '	<select class="form-control select-filter-operation">';
-			html += '		<option value="contains" ' + (activeFiltersOperation == "contains" ? "selected" : "") + '>contains</option>';
-			html += '		<option value="ncontains" ' + (activeFiltersOperation == "ncontains" ? "selected" : "") + '>does not contain</option>';
+			html += '	<select class="form-control applied-filter-operation">';
+			html += '		<option value="contains" ' + (appliedFilter.operation == "contains" ? "selected" : "") + '>contains</option>';
+			html += '		<option value="ncontains" ' + (appliedFilter.operation == "ncontains" ? "selected" : "") + '>does not contain</option>';
 			html += '	</select>';
 			html += '</span>';
 			html += '<span>';
-			html += '	<input type="text" value="' + activeFilters + '" class="form-control select-filter-operation-value">';
+			html += '	<input type="text" value="' + appliedFilter.condition + '" class="form-control applied-filter-condition">';
 			html += '</span>';
 		}
 		if (metaData.type.toLowerCase().indexOf('bool') >= 0)
 		{
 			html = '<span>';
-			html += '	<select class="form-control select-filter-operation">';
-			html += '		<option value="true" ' + (activeFiltersOperation == "true" ? "selected" : "") + '>is true</option>';
-			html += '		<option value="false" ' + (activeFiltersOperation == "false" ? "selected" : "") + '>is false</option>';
+			html += '	<select class="form-control applied-filter-operation">';
+			html += '		<option value="true" ' + (appliedFilter.operation == "true" ? "selected" : "") + '>is true</option>';
+			html += '		<option value="false" ' + (appliedFilter.operation == "false" ? "selected" : "") + '>is false</option>';
 			html += '	</select>';
 			html += '</span>';
 			html += '<span>';
-			html += '	<input type="hidden" value="' + activeFilters + '" class="form-control select-filter-operation-value">';
+			html += '	<input type="hidden" value="' + appliedFilter.condition + '" class="form-control applied-filter-condition">';
 			html += '</span>';
 		}
 		if (metaData.type.toLowerCase().indexOf('timestamp') >= 0 || metaData.type.toLowerCase().indexOf('date') >= 0)
 		{
-			var classOperation = 'form-control select-filter-operation-value';
-			var classOption = 'form-control select-filter-option';
+			var classOperation = 'form-control applied-filter-condition';
+			var classOption = 'form-control applied-filter-option';
 			var disabled = "";
 
-			if (activeFiltersOperation == "set" || activeFiltersOperation == "nset")
+			if (appliedFilter.operation == "set" || appliedFilter.operation == "nset")
 			{
 				classOperation += ' hidden-control';
 				classOption += ' hidden-control';
@@ -707,20 +564,20 @@ var FHC_FilterWidget = {
 			}
 
 			html = '<span>';
-			html += '	<select class="form-control select-filter-operation">';
-			html += '		<option value="lt" ' + (activeFiltersOperation == "lt" ? "selected" : "") + '>less than</option>';
-			html += '		<option value="gt" ' + (activeFiltersOperation == "gt" ? "selected" : "") + '>greater than</option>';
-			html += '		<option value="set" ' + (activeFiltersOperation == "set" ? "selected" : "") + '>is set</option>';
-			html += '		<option value="nset" ' + (activeFiltersOperation == "nset" ? "selected" : "") + '>is not set</option>';
+			html += '	<select class="form-control applied-filter-operation">';
+			html += '		<option value="lt" ' + (appliedFilter.operation == "lt" ? "selected" : "") + '>less than</option>';
+			html += '		<option value="gt" ' + (appliedFilter.operation == "gt" ? "selected" : "") + '>greater than</option>';
+			html += '		<option value="set" ' + (appliedFilter.operation == "set" ? "selected" : "") + '>is set</option>';
+			html += '		<option value="nset" ' + (appliedFilter.operation == "nset" ? "selected" : "") + '>is not set</option>';
 			html += '	</select>';
 			html += '</span>';
 			html += '<span>';
-			html += '	<input type="text" value="' + activeFilters + '" class="' + classOperation + '" ' + disabled + '>';
+			html += '	<input type="text" value="' + appliedFilter.condition + '" class="' + classOperation + '" ' + disabled + '>';
 			html += '</span>';
 			html += '<span>';
 			html += '	<select class="' + classOption + '" ' + disabled + '>';
-			html += '		<option value="days" ' + (activeFiltersOption == "days" ? "selected" : "") + '>Days</option>';
-			html += '		<option value="months" ' + (activeFiltersOption == "months" ? "selected" : "") + '>Months</option>';
+			html += '		<option value="days" ' + (appliedFilter.option == "days" ? "selected" : "") + '>Days</option>';
+			html += '		<option value="months" ' + (appliedFilter.option == "months" ? "selected" : "") + '>Months</option>';
 			html += '	</select>';
 			html += '</span>';
 		}
@@ -735,10 +592,162 @@ var FHC_FilterWidget = {
 	/**
 	 *
 	 */
+	_renderTableDataset: function(data) {
+
+		FHC_FilterWidget._resetTableDataset();
+
+		if (data.hasOwnProperty('checkboxes') && data.checkboxes.trim() != '')
+		{
+			$("#filterTableDataset > thead > tr").append("<th title=\"Select\">Select</th>");
+		}
+
+		var arrayFieldsToDisplay = [];
+
+		if (data.hasOwnProperty('selectedFields') && $.isArray(data.selectedFields))
+		{
+			if (data.hasOwnProperty('columnsAliases') && $.isArray(data.columnsAliases))
+			{
+				for (var i = 0; i < data.selectedFields.length; i++)
+				{
+					for (var j = 0; j < data.fields.length; j++)
+					{
+						if (data.selectedFields[i] == data.fields[j])
+						{
+							arrayFieldsToDisplay[i] = data.columnsAliases[j];
+						}
+					}
+				}
+			}
+			else
+			{
+				arrayFieldsToDisplay = data.selectedFields;
+			}
+		}
+
+		for (var i = 0; i < arrayFieldsToDisplay.length; i++)
+		{
+			var th = arrayFieldsToDisplay[i];
+
+			$("#filterTableDataset > thead > tr").append("<th title=\"" + th + "\">" + th + "</th>");
+		}
+
+		if (data.hasOwnProperty('additionalColumns') && $.isArray(data.additionalColumns))
+		{
+			for (var i = 0; i < data.additionalColumns.length; i++)
+			{
+				var th = data.additionalColumns[i];
+
+				$("#filterTableDataset > thead > tr").append("<th title=\"" + th + "\">" + th + "</th>");
+			}
+		}
+
+		if (arrayFieldsToDisplay.length > 0)
+		{
+			if (data.hasOwnProperty('dataset') && $.isArray(data.dataset))
+			{
+				for (var i = 0; i < data.dataset.length; i++)
+				{
+					var record = data.dataset[i];
+					var strHtml = '<tr class="' + record.FILTER_CLASS_MARK_ROW + '">';
+
+					if (data.checkboxes != null && data.checkboxes != "")
+					{
+						strHtml += '<td>';
+						strHtml += '<input type="checkbox" name="' + data.checkboxes + '[]" value="' + record[data.checkboxes] + '">';
+						strHtml += '</td>';
+					}
+
+					$.each(arrayFieldsToDisplay, function(i, fieldToDisplay) {
+
+						if (record.hasOwnProperty(data.selectedFields[i]))
+						{
+							strHtml += '<td>' + record[data.selectedFields[i]] + '</td>';
+						}
+					});
+
+					if (data.additionalColumns != null && $.isArray(data.additionalColumns))
+					{
+						$.each(data.additionalColumns, function(i, additionalColumn) {
+
+							if (record.hasOwnProperty(additionalColumn))
+							{
+								strHtml += '<td>' + record[additionalColumn] + '</td>';
+							}
+
+						});
+					}
+
+					strHtml += '</tr>';
+
+					$("#filterTableDataset > tbody").append(strHtml);
+				}
+			}
+			else
+			{
+				// console.log("No dataset!!!");
+			}
+		}
+		else
+		{
+			// console.log("No fields to display!!!");
+		}
+
+		FHC_FilterWidget._callTableSorter();
+
+	},
+
+	/**
+	 *
+	 */
+	_getFilterPage: function() {
+		return FHC_JS_DATA_STORAGE_OBJECT.called_path + "/" + FHC_JS_DATA_STORAGE_OBJECT.called_method;
+	},
+
+	/**
+	 *
+	 */
 	_resetSelectedFilters: function() {
 		$("#addFilter").html("");
 		$("#selectedFilters").html("");
 	},
+
+	/**
+	 *
+	 */
+	_resetTableDataset: function() {
+		$("#filterTableDataset > thead > tr").html("");
+		$("#filterTableDataset > tbody").html("");
+	},
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 	/**
 	 *
@@ -758,20 +767,9 @@ var FHC_FilterWidget = {
 		}
 	},
 
-	/**
-	 *
-	 */
-	_resetTableDataset: function() {
-		$("#filterTableDataset > thead > tr").html("");
-		$("#filterTableDataset > tbody").html("");
-	},
 
-	/**
-	 *
-	 */
-	_getFilterPage: function() {
-		return FHC_JS_DATA_STORAGE_OBJECT.called_path + "/" + FHC_JS_DATA_STORAGE_OBJECT.called_method;
-	}
+
+
 };
 
 
@@ -780,26 +778,36 @@ var FHC_FilterWidget = {
  */
 $(document).ready(function() {
 
-	$("[data-toggle='collapse']").click(function() {
-
-		var filterOptionsStatus = sessionStorage.getItem('filter-options-status');
-
-		if (filterOptionsStatus != null && filterOptionsStatus == 'closed')
+	if (typeof(Storage) !== "undefined")
+	{
+		if (sessionStorage.getItem('filter-options-status') && sessionStorage.getItem('filter-options-status') == 'open')
 		{
-			sessionStorage.setItem('filter-options-status', 'open');
+			$('.collapse').collapse("show");
 		}
 		else
 		{
 			sessionStorage.setItem('filter-options-status', 'closed');
 		}
+	}
+
+	$("[data-toggle='collapse']").click(function() {
+
+		if (typeof(Storage) !== "undefined")
+		{
+			if (sessionStorage.getItem('filter-options-status'))
+			{
+				if (sessionStorage.getItem('filter-options-status') == 'closed')
+				{
+					sessionStorage.setItem('filter-options-status', 'open');
+				}
+				else
+				{
+					sessionStorage.setItem('filter-options-status', 'closed');
+				}
+			}
+		}
 
 	});
-
-	var filterOptionsStatus = sessionStorage.getItem('filter-options-status');
-	if (filterOptionsStatus != null && filterOptionsStatus == 'open')
-	{
-		$('.collapse').collapse("show");
-	}
 
 	$("#saveCustomFilterButton").click(function() {
 		if ($("#customFilterDescription").val() != '')

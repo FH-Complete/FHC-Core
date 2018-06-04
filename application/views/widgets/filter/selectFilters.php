@@ -1,14 +1,16 @@
 <br>
 
-<div id="selectedFilters"></div>
+<div id="appliedFilters"></div>
 
 <div>
-	<span class="filter-options-span">
+	<span class="filter-span-label">
 		Add filter:
 	</span>
 
 	<span>
-		<select id="addFilter"></select>
+		<select id="addFilter" class="drop-down-filters">
+			<option value="">Select a filter to add...</option>
+		</select>
 	</span>
 
 	<span>

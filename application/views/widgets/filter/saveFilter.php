@@ -1,11 +1,11 @@
 <br>
 
 <div>
-	<span class="filter-options-span">
+	<span class="filter-span-label">
 		Filter description:
 	</span>
 	<span>
-		<input type="text" id="customFilterDescription" value="">
+		<input type="text" id="customFilterDescription" class="input-text-custom-filter" value="">
 	</span>
 
 	<span>
