@@ -66,6 +66,18 @@ office:version="1.2">
 		<style:font-face style:name="SimSun" svg:font-family="SimSun" style:font-family-generic="system" style:font-pitch="variable"/>
 	</office:font-face-decls>
 	<office:automatic-styles>
+		<style:style style:name="Tabelle1" style:family="table">
+			<style:table-properties style:width="17cm" table:align="margins" style:shadow="none" style:writing-mode="page"/>
+		</style:style>
+		<style:style style:name="Tabelle1.A" style:family="table-column">
+			<style:table-column-properties style:column-width="8.5cm" style:rel-column-width="32767*"/>
+		</style:style>
+		<style:style style:name="Tabelle1.A1" style:family="table-cell">
+			<style:table-cell-properties fo:padding-left="0cm" fo:padding-right="0.6cm" fo:padding-top="0cm" fo:padding-bottom="0cm" fo:border="none"/>
+		</style:style>
+		<style:style style:name="Tabelle1.B1" style:family="table-cell">
+			<style:table-cell-properties fo:padding-left="0.6cm" fo:padding-right="0cm" fo:padding-top="0cm" fo:padding-bottom="0cm" fo:border-left="0.05pt solid #000000" fo:border-right="none" fo:border-top="none" fo:border-bottom="none"/>
+		</style:style>
 		<style:style style:name="P1" style:family="paragraph" style:parent-style-name="Standard">
 			<style:paragraph-properties fo:margin-left="0cm" fo:margin-right="0cm" fo:line-height="120%" fo:text-align="center" style:justify-single-word="false" fo:text-indent="0cm" style:auto-text-indent="false" style:writing-mode="page"/>
 			<style:text-properties style:font-name="Arial" fo:font-size="28pt" style:font-size-asian="28pt" style:font-size-complex="28pt"/>
@@ -174,80 +186,93 @@ office:version="1.2">
 			<text:p text:style-name="P3"/>
 			<text:p text:style-name="P5"><xsl:value-of select="anrede" /><xsl:text> </xsl:text><xsl:value-of select="name" /></text:p>
 			<text:p text:style-name="P3"/>
-			<text:section text:style-name="Sect1" text:name="Bereich1">
-				<text:p text:style-name="P4">geboren am <xsl:value-of select="gebdatum" /> in 
-			<xsl:if test="string-length(gebort)!=0">
-				<xsl:value-of select="gebort" />
-				<xsl:text>, </xsl:text>
-			</xsl:if>
-				<xsl:value-of select="geburtsnation" />
-			<xsl:choose>
-				<xsl:when test="contains(anrede, 'err')">
-					<xsl:text> der</xsl:text>
-				</xsl:when>
-				<xsl:when test="contains(anrede, 'rau')">
-					<xsl:text> die</xsl:text>
-				</xsl:when>
-				<xsl:otherwise>
-					<xsl:text> die/der</xsl:text>
-				</xsl:otherwise>
-			</xsl:choose>
- 			durch Ablegung der 
- 			<xsl:choose>
-				<xsl:when test="stg_art='b'">Bachelor</xsl:when>					
-				<xsl:when test="stg_art='m'">Master</xsl:when>					
-				<xsl:when test="stg_art='d'">Diplom</xsl:when>					
-				<xsl:when test="stg_art='l'">Lehrgang</xsl:when>				
-				<xsl:when test="stg_art='k'">Kurzstudium</xsl:when>								
-			</xsl:choose>prüfung am <xsl:value-of select="datum" /> den 
-			<xsl:choose>
-				<xsl:when test="stg_art='b'">Bachelor</xsl:when>					
-				<xsl:when test="stg_art='m'">Master</xsl:when>					
-				<xsl:when test="stg_art='d'">Diplom</xsl:when>					
-				<xsl:when test="stg_art='l'">Lehrgang</xsl:when>				
-				<xsl:when test="stg_art='k'">Kurzstudium</xsl:when>								
-			</xsl:choose>studiengang</text:p>
-				<text:p text:style-name="P4"/>
-				<text:p text:style-name="P4"/>
-				<text:p text:style-name="P5"><xsl:value-of select="stg_bezeichnung" /></text:p>
-				<text:p text:style-name="P3">(Studiengangskennzahl <xsl:value-of select="studiengang_kz" />)</text:p>
-				<text:p text:style-name="P3"/>
-				<text:p text:style-name="P3">ordnungsgemäß abgeschlossen hat,</text:p>
-				<text:p text:style-name="P3">gemäß § 6 Abs 1 FHStG, BGBl. Nr. 340/1993, idgF, den akademischen Grad</text:p>
-				
-				
-				<text:p text:style-name="P6">born on <xsl:value-of select="gebdatum" /> in 
-				<xsl:if test="string-length(gebort)!=0">
-					<xsl:value-of select="gebort" />
-					<xsl:text>, </xsl:text>
-				</xsl:if>
-					<xsl:value-of select="geburtsnation_engl" />
-				who, by taking the 
-				<xsl:choose>
-				<xsl:when test="stg_art='b'">Bachelor</xsl:when>					
-				<xsl:when test="stg_art='m'">Master</xsl:when>					
-				<xsl:when test="stg_art='d'">Diploma</xsl:when>					
-				<xsl:when test="stg_art='l'">Course</xsl:when>				
-				<xsl:when test="stg_art='k'">Short study</xsl:when>											
-			</xsl:choose> examination on <xsl:value-of select="datum" />, has duly completed the 
-			<xsl:choose>
-				<xsl:when test="stg_art='b'">Bachelor</xsl:when>					
-				<xsl:when test="stg_art='m'">Master</xsl:when>					
-				<xsl:when test="stg_art='d'">Diploma</xsl:when>					
-				<xsl:when test="stg_art='l'">Course</xsl:when>				
-				<xsl:when test="stg_art='k'">Short study</xsl:when>											
-			</xsl:choose><xsl:if test="stg_art != 'l' or 'k'" >'s</xsl:if> degree program</text:p>
-				<text:p text:style-name="P4"/>
-				<!-- Wenn Geburtsort oder Nation leer ist, wird im Englischen ein extra Zeilenumbruch ergaenzt -->
-				<xsl:if test="string-length(gebort)=0 or string-length(geburtsnation)=0">
-					<text:p text:style-name="P4"/>
-				</xsl:if>
-				<text:p text:style-name="P5"><xsl:value-of select="stg_bezeichnung_engl" /></text:p>
-				<text:p text:style-name="P3">(Degree Program Code <xsl:value-of select="studiengang_kz" />)</text:p>
-				<text:p text:style-name="P3"/>
-				<text:p text:style-name="P3">according to § 6 Abs 1 FHStG, BGBl. No. 340/1993, as amended, the academic degree of</text:p>
-				<text:p text:style-name="P4"/>
-			</text:section>
+			
+			
+			<table:table table:name="Tabelle1" table:style-name="Tabelle1">
+				<table:table-column table:style-name="Tabelle1.A" table:number-columns-repeated="2"/>
+				<table:table-row>
+					<table:table-cell table:style-name="Tabelle1.A1" office:value-type="string">
+						<text:p text:style-name="P4">geboren am <xsl:value-of select="gebdatum" /> in 
+						<xsl:if test="string-length(gebort)!=0">
+							<xsl:value-of select="gebort" />
+							<xsl:text>, </xsl:text>
+						</xsl:if>
+							<xsl:value-of select="geburtsnation" />
+						<xsl:choose>
+							<xsl:when test="contains(anrede, 'err')">
+								<xsl:text> der</xsl:text>
+							</xsl:when>
+							<xsl:when test="contains(anrede, 'rau')">
+								<xsl:text> die</xsl:text>
+							</xsl:when>
+							<xsl:otherwise>
+								<xsl:text> die/der</xsl:text>
+							</xsl:otherwise>
+						</xsl:choose>
+			 			durch Ablegung der 
+			 			<xsl:choose>
+							<xsl:when test="stg_art='b'">Bachelor</xsl:when>					
+							<xsl:when test="stg_art='m'">Master</xsl:when>					
+							<xsl:when test="stg_art='d'">Diplom</xsl:when>					
+							<xsl:when test="stg_art='l'">Lehrgang</xsl:when>				
+							<xsl:when test="stg_art='k'">Kurzstudium</xsl:when>								
+						</xsl:choose>prüfung am <xsl:value-of select="datum" /> den 
+						<xsl:choose>
+							<xsl:when test="stg_art='b'">Bachelor</xsl:when>					
+							<xsl:when test="stg_art='m'">Master</xsl:when>					
+							<xsl:when test="stg_art='d'">Diplom</xsl:when>					
+							<xsl:when test="stg_art='l'">Lehrgang</xsl:when>				
+							<xsl:when test="stg_art='k'">Kurzstudium</xsl:when>								
+						</xsl:choose>studiengang</text:p>
+						<text:p text:style-name="P4"/>
+					</table:table-cell>
+					<table:table-cell table:style-name="Tabelle1.B1" office:value-type="string">
+						<text:p text:style-name="P6">born on <xsl:value-of select="gebdatum" /> in 
+							<xsl:if test="string-length(gebort)!=0">
+								<xsl:value-of select="gebort" />
+								<xsl:text>, </xsl:text>
+							</xsl:if>
+								<xsl:value-of select="geburtsnation_engl" />
+							who, by taking the 
+							<xsl:choose>
+							<xsl:when test="stg_art='b'">Bachelor</xsl:when>					
+							<xsl:when test="stg_art='m'">Master</xsl:when>					
+							<xsl:when test="stg_art='d'">Diploma</xsl:when>					
+							<xsl:when test="stg_art='l'">Course</xsl:when>				
+							<xsl:when test="stg_art='k'">Short study</xsl:when>											
+						</xsl:choose> examination on <xsl:value-of select="datum" />, has duly completed the 
+						<xsl:choose>
+							<xsl:when test="stg_art='b'">Bachelor</xsl:when>					
+							<xsl:when test="stg_art='m'">Master</xsl:when>					
+							<xsl:when test="stg_art='d'">Diploma</xsl:when>					
+							<xsl:when test="stg_art='l'">Course</xsl:when>				
+							<xsl:when test="stg_art='k'">Short study</xsl:when>											
+						</xsl:choose><xsl:if test="stg_art != 'l' or 'k'" >'s</xsl:if> degree program</text:p>
+						<text:p text:style-name="P4"/>
+					</table:table-cell>
+				</table:table-row>
+				<table:table-row>
+					<table:table-cell table:style-name="Tabelle1.A1" office:value-type="string">
+						<text:p text:style-name="P5"><xsl:value-of select="stg_bezeichnung" /></text:p>
+						<text:p text:style-name="P3">(Studiengangskennzahl <xsl:value-of select="studiengang_kz" />)</text:p>
+					</table:table-cell>
+					<table:table-cell table:style-name="Tabelle1.B1" office:value-type="string">
+						<text:p text:style-name="P5"><xsl:value-of select="stg_bezeichnung_engl" /></text:p>
+						<text:p text:style-name="P3">(Degree Program Code <xsl:value-of select="studiengang_kz" />)</text:p>
+					</table:table-cell>
+				</table:table-row>
+				<table:table-row>
+					<table:table-cell table:style-name="Tabelle1.A1" office:value-type="string">
+						<text:p text:style-name="P3"/>
+						<text:p text:style-name="P3">ordnungsgemäß abgeschlossen hat,</text:p>
+						<text:p text:style-name="P3">gemäß § 6 Abs 1 FHStG, BGBl. Nr. 340/1993, idgF, den akademischen Grad</text:p>
+					</table:table-cell>
+					<table:table-cell table:style-name="Tabelle1.B1" office:value-type="string">
+						<text:p text:style-name="P3"/>
+						<text:p text:style-name="P3">according to § 6 Abs 1 FHStG, BGBl. No. 340/1993, as amended, the academic degree of</text:p>
+					</table:table-cell>
+				</table:table-row>
+			</table:table>
 			<text:p text:style-name="P3"/>
 			<text:p text:style-name="P3"/>
 			<text:p text:style-name="P5"><xsl:value-of select="titel" /> (<xsl:value-of select="akadgrad_kurzbz" />)</text:p>
