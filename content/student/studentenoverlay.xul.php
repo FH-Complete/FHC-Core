@@ -75,6 +75,11 @@ else
 					<menuitem label="Student aus dieser Gruppe entfernen" oncommand="StudentGruppeDel();" id="student-tree-popup-gruppedel" hidden="false"/>
 					<menuitem label="EMail senden (intern)" oncommand="StudentSendMail(event);" id="student-tree-popup-mail" hidden="false" tooltiptext="STRG-Taste fuer BCC" />
 					<menuitem label="EMail senden (privat)" oncommand="StudentSendMailPrivat();" id="student-tree-popup-mailprivat" hidden="false"/>
+					<menu id="student-tree-popup-export-archiv" label="Archivdokument exportieren">
+						<menupopup id="student-tree-popup-export-popup">
+							<menuitem label="Bescheid" oncommand="StudentExportBescheid();" id="student-tree-popup-export-bescheid" hidden="false"/>
+						</menupopup>
+					</menu>
 					<menuseparator />
 					<menuitem label="Personendetails anzeigen" oncommand="StudentShowPersonendetails();" id="student-tree-popup-personendetails" hidden="false"/>
 					<!--
