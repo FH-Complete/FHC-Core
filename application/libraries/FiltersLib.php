@@ -19,6 +19,7 @@ class FiltersLib
 	const SESSION_DATASET_METADATA = 'datasetMetadata';
 	const SESSION_DATASET = 'dataset';
 	const SESSION_ROW_NUMBER = 'rowNumber';
+	const SESSION_RELOAD_DATASET = 'reloadDataset';
 
 	// Alias for the dynamic table used to retrive the dataset
 	const DATASET_TABLE_ALIAS = 'datasetFilterTable';
@@ -28,10 +29,10 @@ class FiltersLib
 	const FHC_CONTROLLER_ID = 'fhc_controller_id';
 
 	 // ...to identify a single filter widget in the DB
+	const FILTER_ID = 'filter_id';
 	const APP_PARAMETER = 'app';
 	const DATASET_NAME_PARAMETER = 'datasetName';
 	const FILTER_KURZBZ_PARAMETER = 'filterKurzbz';
-	const FILTER_ID = 'filter_id';
 
 	// ...stament to retrive the dataset
 	const QUERY_PARAMETER = 'query';
@@ -42,7 +43,7 @@ class FiltersLib
 	const COLUMNS_ALIASES = 'columnsAliases';
 
 	// ...to format/mark records of a dataset
-	const FORMAT_RAW = 'formatRaw';
+	const FORMAT_ROW = 'formatRow';
 	const MARK_ROW = 'markRow';
 
 	// ...to hide the options for a filter
@@ -87,40 +88,6 @@ class FiltersLib
 
 	//------------------------------------------------------------------------------------------------------------------
 	// Public methods
-
-	/**
-	 * Return an unique string that identify this filter widget
-	 * NOTE: The default value is the URI where the FilterWidget is called
-	 * If the fhc_controller_id is present then is also used
-	 */
-	private function _getFilterUniqueId($params)
-	{
-		//
-		if ($params != null
-			&& is_array($params)
-			&& isset($params[self::FILTER_PAGE_PARAM])
-			&& !empty(trim($params[self::FILTER_PAGE_PARAM])))
-		{
-			$filterUniqueId = $params[self::FILTER_PAGE_PARAM];
-		}
-		else
-		{
-			// Gets the current page URI
-			$filterUniqueId = $this->_ci->router->directory.$this->_ci->router->class.'/'.$this->_ci->router->method;
-		}
-
-		// If the FHC_CONTROLLER_ID parameter is present in the HTTP GET
-		if (isset($_GET[self::FHC_CONTROLLER_ID]))
-		{
-			$filterUniqueId .= '/'.$this->_ci->input->get(self::FHC_CONTROLLER_ID); // then use it
-		}
-		elseif (isset($_POST[self::FHC_CONTROLLER_ID])) // else if the FHC_CONTROLLER_ID parameter is present in the HTTP POST
-		{
-			$filterUniqueId .= '/'.$this->_ci->input->post(self::FHC_CONTROLLER_ID); // then use it
-		}
-
-		return $filterUniqueId;
-	}
 
 	/**
 	 * Returns the whole session for this filter widget if found, otherwise null
@@ -294,21 +261,19 @@ class FiltersLib
 
 	/**
 	 * Generate the query to retrive the dataset for a filter
-	 * NOTE: filterJson should be already checked using the method parseFilterJson
 	 */
-	public function generateDatasetQuery($query, $filterJson)
+	public function generateDatasetQuery($query, $filters)
 	{
 		$datasetQuery = null;
 
 		// If the given query is valid and the json of the filter is valid
-		if (!empty(trim($query)) && $filterJson != null)
+		if (!empty(trim($query)) && $filters != null && is_array($filters))
 		{
-			$definedFilters = $filterJson->filters;
 			$where = '';
 
-			for ($filtersCounter = 0; $filtersCounter < count($definedFilters); $filtersCounter++)
+			for ($filtersCounter = 0; $filtersCounter < count($filters); $filtersCounter++)
 			{
-				$filterDefinition = $definedFilters[$filtersCounter];
+				$filterDefinition = $filters[$filtersCounter];
 
 				if ($filtersCounter > 0) $where .= ' AND ';
 
@@ -367,8 +332,360 @@ class FiltersLib
 		return $filterName;
 	}
 
+	/**
+	 *
+	 */
+	public function sortSelectedFields($selectedFields)
+	{
+		$sortSelectedFields = false;
+
+		if (isset($selectedFields) && is_array($selectedFields) && count($selectedFields) > 0)
+		{
+			$fields = $this->getElementSession(self::SESSION_FIELDS);
+
+			if (!array_diff($selectedFields, $fields))
+			{
+				$this->setElementSession(self::SESSION_SELECTED_FIELDS, $selectedFields);
+
+				$sortSelectedFields = true;
+			}
+		}
+
+		return $sortSelectedFields;
+	}
+
+	/**
+	 *
+	 */
+	public function removeSelectedField($selectedField)
+	{
+		$removeSelectedField = false;
+
+		if (isset($selectedField) && !empty(trim($selectedField)))
+		{
+			$fields = $this->getElementSession(self::SESSION_FIELDS);
+			$selectedFields = $this->getElementSession(self::SESSION_SELECTED_FIELDS);
+
+			if (in_array($selectedField, $fields))
+			{
+				if (($pos = array_search($selectedField, $selectedFields)) !== false)
+				{
+					array_splice($selectedFields, $pos, 1);
+				}
+
+				$this->setElementSession(self::SESSION_SELECTED_FIELDS, $selectedFields);
+
+				$removeSelectedField = true;
+			}
+		}
+
+		return $removeSelectedField;
+	}
+
+	/**
+	 *
+	 */
+	public function addSelectedField($selectedField)
+	{
+		$removeSelectedField = false;
+
+		if (isset($selectedField) && !empty(trim($selectedField)))
+		{
+			$fields = $this->getElementSession(self::SESSION_FIELDS);
+			$selectedFields = $this->getElementSession(self::SESSION_SELECTED_FIELDS);
+
+			if (in_array($selectedField, $fields))
+			{
+				array_push($selectedFields, $selectedField);
+
+				$this->setElementSession(self::SESSION_SELECTED_FIELDS, $selectedFields);
+
+				$removeSelectedField = true;
+			}
+		}
+
+		return $removeSelectedField;
+	}
+
+	/**
+	 *
+	 */
+	public function removeAppliedFilter($appliedFilter)
+	{
+		$removeAppliedFilter = false;
+
+		if (isset($appliedFilter) && !empty(trim($appliedFilter)))
+		{
+			$fields = $this->getElementSession(self::SESSION_FIELDS);
+			$filters = $this->getElementSession(self::SESSION_FILTERS);
+
+			if (in_array($appliedFilter, $fields))
+			{
+				$pos = false;
+				for($i = 0; $i < count($filters); $i++)
+				{
+					if ($filters[$i]->name == $appliedFilter)
+					{
+						$pos = $i;
+						break;
+					}
+				}
+
+				if ($pos !== false)
+				{
+					array_splice($filters, $pos, 1);
+				}
+
+				$this->setElementSession(self::SESSION_FILTERS, $filters);
+				$this->setElementSession(self::SESSION_RELOAD_DATASET, true);
+
+				$removeAppliedFilter = true;
+			}
+		}
+
+		return $removeAppliedFilter;
+	}
+
+	/**
+	 *
+	 */
+	public function applyFilters($appliedFilters, $appliedFiltersOperations, $appliedFiltersConditions, $appliedFiltersOptions)
+	{
+		$applyFilters = false;
+
+		if (isset($appliedFilters) && is_array($appliedFilters)
+			&& isset($appliedFiltersOperations) && is_array($appliedFiltersOperations))
+		{
+			$fields = $this->getElementSession(self::SESSION_FIELDS);
+
+			if (!array_diff($appliedFilters, $fields))
+			{
+				$filters = array();
+				for ($i = 0; $i < count($appliedFilters); $i++)
+				{
+					$filterDefinition = new stdClass();
+
+					$filterDefinition->name = $appliedFilters[$i];
+					$filterDefinition->operation = $appliedFiltersOperations[$i];
+
+					$filterDefinition->condition = null;
+					if (isset($appliedFiltersConditions) && isset($appliedFiltersConditions[$i]))
+					{
+						$filterDefinition->condition = $appliedFiltersConditions[$i];
+					}
+
+					$filterDefinition->option = null;
+					if (isset($appliedFiltersOptions) && isset($appliedFiltersOptions[$i]))
+					{
+						$filterDefinition->option = $appliedFiltersOptions[$i];
+					}
+
+					$filters[$i] = $filterDefinition;
+				}
+
+				$this->setElementSession(self::SESSION_FILTERS, $filters);
+				$this->setElementSession(self::SESSION_RELOAD_DATASET, true);
+
+				$applyFilters = true;
+			}
+		}
+
+		return $applyFilters;
+	}
+
+	/**
+	 *
+	 */
+	public function addFilter($filter)
+	{
+		$addFilter = false;
+
+		if (isset($filter) && !empty(trim($filter)))
+		{
+			$fields = $this->getElementSession(self::SESSION_FIELDS);
+			$filters = $this->getElementSession(self::SESSION_FILTERS);
+
+			if (in_array($filter, $fields))
+			{
+				$pos = false;
+				for($i = 0; $i < count($filters); $i++)
+				{
+					if ($filters[$i]->name == $filter)
+					{
+						$pos = $i;
+						break;
+					}
+				}
+
+				if ($pos === false)
+				{
+					$filterDefinition = new stdClass();
+					$filterDefinition->name = $filter;
+					$filterDefinition->operation = null;
+					$filterDefinition->condition = null;
+					$filterDefinition->option = null;
+					array_push($filters, $filterDefinition);
+				}
+
+				$this->setElementSession(self::SESSION_FILTERS, $filters);
+
+				$addFilter = true;
+			}
+		}
+
+		return $addFilter;
+	}
+
+	/**
+	 *
+	 */
+	public function saveCustomFilter($customFilterDescription)
+	{
+		$saveCustomFilter = false; // by default returns a failure
+
+		// Checks parameter customFilterDescription
+		if (!isset($customFilterDescription) || empty(trim($customFilterDescription)))
+		{
+			return $saveCustomFilter;
+		}
+
+		$this->_ci->load->model('system/Filters_model', 'FiltersModel'); // to load the filter definitions
+		$this->_ci->load->model('person/Benutzer_model', 'BenutzerModel'); // to get the person_id of the authenticated user
+
+		$this->_ci->FiltersModel->resetQuery(); // reset any previous built query
+		$this->_ci->BenutzerModel->resetQuery(); // reset any previous built query
+
+		// Loads data for the authenticated user
+		$authBenutzer = $this->_ci->BenutzerModel->loadWhere(array('uid' => getAuthUID()));
+		if (hasData($authBenutzer)) // if data are found
+		{
+			// person_id of the authenticated user
+			$authPersonId = $authBenutzer->retval[0]->person_id;
+			// Postgres array for the description
+			$descPGArray = str_replace('%desc%', $customFilterDescription, '{"%desc%", "%desc%", "%desc%", "%desc%"}');
+
+			// Loads the definition to check if is already present in the DB
+			$definition = $this->_ci->FiltersModel->loadWhere(array(
+				'app' => $this->getElementSession(self::APP_PARAMETER),
+				'dataset_name' => $this->getElementSession(self::DATASET_NAME_PARAMETER),
+				'description' => $descPGArray,
+				'person_id' => $authPersonId
+			));
+
+			// New definition to be json encoded
+			$jsonDeifinition = new stdClass();
+			$jsonDeifinition->name = $customFilterDescription; // name of the filter
+
+			// Generates the "column" property
+			$jsonDeifinition->columns = array();
+			$selectedFields = $this->getElementSession(self::SESSION_SELECTED_FIELDS); // retrived the selected fields
+			for ($i = 0; $i < count($selectedFields); $i++)
+			{
+				// Each element is an object with a property called "name"
+				$jsonDeifinition->columns[$i] = new stdClass();
+				$jsonDeifinition->columns[$i]->name = $selectedFields[$i];
+			}
+
+			// List of applied filters
+			$jsonDeifinition->filters = $this->getElementSession(self::SESSION_FILTERS);
+
+			// If it is already present
+			if (hasData($definition))
+			{
+				// update it
+				$this->_ci->FiltersModel->update(
+					array(
+						'app' => $this->getElementSession(self::APP_PARAMETER),
+						'dataset_name' => $this->getElementSession(self::DATASET_NAME_PARAMETER),
+						'description' => $descPGArray,
+						'person_id' => $authPersonId
+					),
+					array(
+						'filter' => json_encode($jsonDeifinition)
+					)
+				);
+
+				$saveCustomFilter = true;
+			}
+			else // otherwise insert a new one
+			{
+				$this->_ci->FiltersModel->insert(
+					array(
+						'app' => $this->getElementSession(self::APP_PARAMETER),
+						'dataset_name' => $this->getElementSession(self::DATASET_NAME_PARAMETER),
+						'filter_kurzbz' => uniqid($authPersonId, true),
+						'description' => $descPGArray,
+						'person_id' => $authPersonId,
+						'sort' => null,
+						'default_filter' => false,
+						'filter' => json_encode($jsonDeifinition),
+						'oe_kurzbz' => null
+					)
+				);
+
+				$saveCustomFilter = true;
+			}
+		}
+
+		return $saveCustomFilter;
+	}
+
+	/**
+	 *
+	 */
+	public function removeCustomFilter($filterId)
+	{
+		$removeCustomFilter = false;
+
+		if (isset($filterId) && is_numeric($filterId) && $filterId > 0)
+		{
+			$this->_ci->load->model('system/Filters_model', 'FiltersModel'); // to remove the filter definitions from DB
+
+			// delete it!
+			$this->_ci->FiltersModel->delete(array('filter_id' => $filterId));
+
+			$removeCustomFilter = true;
+		}
+
+		return $removeCustomFilter;
+	}
+
 	//------------------------------------------------------------------------------------------------------------------
 	// Private methods
+
+	/**
+	 * Return an unique string that identify this filter widget
+	 * NOTE: The default value is the URI where the FilterWidget is called
+	 * If the fhc_controller_id is present then is also used
+	 */
+	private function _getFilterUniqueId($params)
+	{
+		//
+		if ($params != null
+			&& is_array($params)
+			&& isset($params[self::FILTER_PAGE_PARAM])
+			&& !empty(trim($params[self::FILTER_PAGE_PARAM])))
+		{
+			$filterUniqueId = $params[self::FILTER_PAGE_PARAM];
+		}
+		else
+		{
+			// Gets the current page URI
+			$filterUniqueId = $this->_ci->router->directory.$this->_ci->router->class.'/'.$this->_ci->router->method;
+		}
+
+		// If the FHC_CONTROLLER_ID parameter is present in the HTTP GET
+		if (isset($_GET[self::FHC_CONTROLLER_ID]))
+		{
+			$filterUniqueId .= '/'.$this->_ci->input->get(self::FHC_CONTROLLER_ID); // then use it
+		}
+		elseif (isset($_POST[self::FHC_CONTROLLER_ID])) // else if the FHC_CONTROLLER_ID parameter is present in the HTTP POST
+		{
+			$filterUniqueId .= '/'.$this->_ci->input->post(self::FHC_CONTROLLER_ID); // then use it
+		}
+
+		return $filterUniqueId;
+	}
 
 	/**
 	 *

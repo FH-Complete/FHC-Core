@@ -214,7 +214,7 @@
 			ucfirst($this->p->t('global', 'gesperrtVon')),
 			ucfirst($this->p->t('global', 'parkdatum'))
 		),
-		'formatRaw' => function($datasetRaw) {
+		'formatRow' => function($datasetRaw) {
 
 			$datasetRaw->{'Details'} = sprintf(
 				'<a href="%s/%s?fhc_controller_id=%s">Details</a>',

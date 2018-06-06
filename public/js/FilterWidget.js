@@ -10,19 +10,32 @@
  */
 
 /**
- * Global function used by MavigationWidget JS
+ * Global function used by NavigationWidget JS
  */
 function sideMenuHook()
 {
-	$(".remove-applied-filter").click(function() {
+	$(".remove-custom-filter").click(function() {
 		//
 		FHC_AjaxClient.ajaxCallPost(
-			'system/Filters/deleteCustomFilter',
+			'system/Filters/removeCustomFilter',
 			{
-				filter_id: $(this).attr('value')
+				filter_id: $(this).attr('value'),
+				filter_page: FHC_FilterWidget.getFilterPage()
 			},
 			{
-				successCallback: refreshSideMenu // NOTE: to be checked
+				successCallback: function(data, textStatus, jqXHR) {
+					if (FHC_AjaxClient.isError(data))
+					{
+						console.log(FHC_AjaxClient.getError(data));
+					}
+					else
+					{
+						if (typeof refreshSideMenu == 'function')
+						{
+							refreshSideMenu();
+						}
+					}
+				}
 			}
 		);
 	});
@@ -42,8 +55,63 @@ var FHC_FilterWidget = {
 		FHC_FilterWidget._getFilter(FHC_FilterWidget._renderFilterWidget);
 	},
 
+	/**
+	 *
+	 */
+	refresh: function() {
+		FHC_FilterWidget._resetAll();
+		FHC_FilterWidget.display();
+	},
+
+	/**
+	 *
+	 */
+	getFilterPage: function() {
+		return FHC_JS_DATA_STORAGE_OBJECT.called_path + "/" + FHC_JS_DATA_STORAGE_OBJECT.called_method;
+	},
+
 	//------------------------------------------------------------------------------------------------------------------
 	// Private methods
+
+	/**
+	 *
+	 */
+	_failOrRefresh: function(data, textStatus, jqXHR) {
+		if (FHC_AjaxClient.isError(data))
+		{
+			console.log(FHC_AjaxClient.getError(data));
+		}
+		else
+		{
+			FHC_FilterWidget.refresh();
+		}
+	},
+
+	/**
+	 *
+	 */
+	_failOrReload: function(data, textStatus, jqXHR) {
+		if (FHC_AjaxClient.isError(data))
+		{
+			console.log(FHC_AjaxClient.getError(data));
+		}
+		else
+		{
+			location.reload();
+		}
+	},
+
+	/**
+	 *
+	 */
+	_resetAll: function() {
+		//
+		$("#dragAndDropFieldsArea").html("");
+		$("#addField").html("<option value=\"\">Select a field to add...</option>");
+		//
+		$("#appliedFilters").html("");
+		$("#addFilter").html("<option value=\"\">Select a filter to add...</option>");
+	},
 
 	/**
 	 *
@@ -52,13 +120,10 @@ var FHC_FilterWidget = {
 		FHC_AjaxClient.ajaxCallGet(
 			'system/Filters/getFilter',
 			{
-				filter_page: FHC_FilterWidget._getFilterPage()
+				filter_page: FHC_FilterWidget.getFilterPage()
 			},
 			{
 				successCallback: function(data, textStatus, jqXHR) {
-
-					// console.log(data);
-
 					if (FHC_AjaxClient.hasData(data) && typeof renderFunction == 'function')
 					{
 						renderFunction(FHC_AjaxClient.getData(data));
@@ -73,7 +138,7 @@ var FHC_FilterWidget = {
 	 */
 	_renderFilterWidget: function(data) {
 
-		console.log(data);
+		FHC_FilterWidget._resetAll(); //
 
 		FHC_FilterWidget._setFilterName(data); //
 
@@ -219,15 +284,12 @@ var FHC_FilterWidget = {
 				FHC_AjaxClient.ajaxCallPost(
 					'system/Filters/sortSelectedFields',
 					{
-						selectedFieldsLst: arrayDndId,
-						filter_page: FHC_FilterWidget._getFilterPage()
+						selectedFields: arrayDndId,
+						filter_page: FHC_FilterWidget.getFilterPage()
 					},
 					{
 						successCallback: function(data, textStatus, jqXHR) {
-							FHC_FilterWidget._resetSelectedFields();
-
-							FHC_FilterWidget.renderSelectedFields();
-							FHC_FilterWidget.renderTableDataset();
+							FHC_FilterWidget._failOrRefresh(data, textStatus, jqXHR);
 						}
 					}
 				);
@@ -237,17 +299,14 @@ var FHC_FilterWidget = {
 		$(".remove-selected-field").click(function(event) {
 			//
 			FHC_AjaxClient.ajaxCallPost(
-				'system/Filters/removeSelectedFields',
+				'system/Filters/removeSelectedField',
 				{
-					fieldName: $(this).attr('fieldToRemove'),
-					filter_page: FHC_FilterWidget._getFilterPage()
+					selectedField: $(this).attr('fieldToRemove'),
+					filter_page: FHC_FilterWidget.getFilterPage()
 				},
 				{
 					successCallback: function(data, textStatus, jqXHR) {
-						FHC_FilterWidget._resetSelectedFields();
-
-						FHC_FilterWidget.renderSelectedFields();
-						FHC_FilterWidget.renderTableDataset();
+						FHC_FilterWidget._failOrRefresh(data, textStatus, jqXHR);
 					}
 				}
 			);
@@ -294,17 +353,14 @@ var FHC_FilterWidget = {
 		$("#addField").change(function(event) {
 			//
 			FHC_AjaxClient.ajaxCallPost(
-				'system/Filters/addSelectedFields',
+				'system/Filters/addSelectedField',
 				{
-					fieldName: $(this).val(),
-					filter_page: FHC_FilterWidget._getFilterPage()
+					selectedField: $(this).val(),
+					filter_page: FHC_FilterWidget.getFilterPage()
 				},
 				{
 					successCallback: function(data, textStatus, jqXHR) {
-						FHC_FilterWidget._resetSelectedFields();
-
-						FHC_FilterWidget.renderSelectedFields();
-						FHC_FilterWidget.renderTableDataset();
+						FHC_FilterWidget._failOrRefresh(data, textStatus, jqXHR);
 					}
 				}
 			);
@@ -381,38 +437,31 @@ var FHC_FilterWidget = {
 
 		$("#applyFilter").click(function() {
 
-			var selectFilterName = [];
-			var selectFilterOperation = [];
-			var selectFilterOperationValue = [];
-			var selectFilterOption = [];
+			var appliedFilters = [];
+			var appliedFiltersOperations = [];
+			var appliedFiltersConditions = [];
+			var appliedFiltersOptions = [];
 
-			$("#selectedFilters > div").each(function(i, e) {
-				var tmpSelectFilterName = $(this).find('.hidden-field-name').val();
-				var tmpSelectFilterOperation = $(this).find('.applied-filter-operation').val();
-				var tmpSelectFilterOperationValue = $(this).find('.applied-filter-condition:enabled').val();
-				var tmpSelectFilterOption = $(this).find('.applied-filter-option:enabled').val();
-
-				selectFilterName.push(tmpSelectFilterName);
-				selectFilterOperation.push(tmpSelectFilterOperation);
-				selectFilterOperationValue.push(tmpSelectFilterOperationValue != null ? tmpSelectFilterOperationValue : "");
-				selectFilterOption.push(tmpSelectFilterOption != null ? tmpSelectFilterOption : "");
+			$("#appliedFilters > div").each(function(i, e) {
+				appliedFilters.push($(this).find('.hidden-field-name').val());
+				appliedFiltersOperations.push($(this).find('.applied-filter-operation').val());
+				appliedFiltersConditions.push($(this).find('.applied-filter-condition:enabled').val());
+				appliedFiltersOptions.push($(this).find('.applied-filter-option:enabled').val());
 			});
 
 			//
 			FHC_AjaxClient.ajaxCallPost(
-				'system/Filters/applyFilter',
+				'system/Filters/applyFilters',
 				{
-					filterNames: selectFilterName,
-					filterOperations: selectFilterOperation,
-					filterOperationValues: selectFilterOperationValue,
-					filterOptions: selectFilterOption,
-					filter_page: FHC_FilterWidget._getFilterPage()
+					appliedFilters: appliedFilters,
+					appliedFiltersOperations: appliedFiltersOperations,
+					appliedFiltersConditions: appliedFiltersConditions,
+					appliedFiltersOptions: appliedFiltersOptions,
+					filter_page: FHC_FilterWidget.getFilterPage()
 				},
 				{
 					successCallback: function(data, textStatus, jqXHR) {
-						FHC_FilterWidget._resetSelectedFilters();
-
-						location.reload();
+						FHC_FilterWidget._failOrReload(data, textStatus, jqXHR);
 					}
 				}
 			);
@@ -421,16 +470,14 @@ var FHC_FilterWidget = {
 		$(".remove-applied-filter").click(function(event) {
 			//
 			FHC_AjaxClient.ajaxCallPost(
-				'system/Filters/removeSelectedFilters',
+				'system/Filters/removeAppliedFilter',
 				{
-					fieldName: $(this).attr('filterToRemove'),
-					filter_page: FHC_FilterWidget._getFilterPage()
+					appliedFilter: $(this).attr('filterToRemove'),
+					filter_page: FHC_FilterWidget.getFilterPage()
 				},
 				{
 					successCallback: function(data, textStatus, jqXHR) {
-						FHC_FilterWidget._resetSelectedFilters();
-
-						location.reload();
+						FHC_FilterWidget._failOrReload(data, textStatus, jqXHR);
 					}
 				}
 			);
@@ -479,17 +526,14 @@ var FHC_FilterWidget = {
 		$("#addFilter").change(function(event) {
 			//
 			FHC_AjaxClient.ajaxCallPost(
-				'system/Filters/addSelectedFilters',
+				'system/Filters/addFilter',
 				{
-					fieldName: $(this).val(),
-					filter_page: FHC_FilterWidget._getFilterPage()
+					filter: $(this).val(),
+					filter_page: FHC_FilterWidget.getFilterPage()
 				},
 				{
 					successCallback: function(data, textStatus, jqXHR) {
-						FHC_FilterWidget._resetSelectedFilters();
-
-						FHC_FilterWidget.renderSelectedFilters();
-						FHC_FilterWidget.renderTableDataset();
+						FHC_FilterWidget._failOrRefresh(data, textStatus, jqXHR);
 					}
 				}
 			);
@@ -514,6 +558,8 @@ var FHC_FilterWidget = {
 
 		if (metaData.type.toLowerCase().indexOf("int") >= 0)
 		{
+			if (appliedFilter.condition == null) appliedFilter.condition = 0;
+
 			html = '<span>';
 			html += '	<select class="form-control applied-filter-operation">';
 			html += '		<option value="equal" ' + (appliedFilter.operation == "equal" ? "selected" : "") + '>equal</option>';
@@ -528,6 +574,8 @@ var FHC_FilterWidget = {
 		}
 		if (metaData.type.toLowerCase().indexOf('varchar') >= 0 || metaData.type.toLowerCase() == 'text')
 		{
+			if (appliedFilter.condition == null) appliedFilter.condition = "";
+
 			html = '<span>';
 			html += '	<select class="form-control applied-filter-operation">';
 			html += '		<option value="contains" ' + (appliedFilter.operation == "contains" ? "selected" : "") + '>contains</option>';
@@ -556,6 +604,8 @@ var FHC_FilterWidget = {
 			var classOption = 'form-control applied-filter-option';
 			var disabled = "";
 
+			if (appliedFilter.condition == null) appliedFilter.condition = 0;
+
 			if (appliedFilter.operation == "set" || appliedFilter.operation == "nset")
 			{
 				classOperation += ' hidden-control';
@@ -572,7 +622,7 @@ var FHC_FilterWidget = {
 			html += '	</select>';
 			html += '</span>';
 			html += '<span>';
-			html += '	<input type="text" value="' + appliedFilter.condition + '" class="' + classOperation + '" ' + disabled + '>';
+			html += '	<input type="number" value="' + appliedFilter.condition + '" class="' + classOperation + '" ' + disabled + '>';
 			html += '</span>';
 			html += '<span>';
 			html += '	<select class="' + classOption + '" ' + disabled + '>';
@@ -598,7 +648,7 @@ var FHC_FilterWidget = {
 
 		if (data.hasOwnProperty('checkboxes') && data.checkboxes.trim() != '')
 		{
-			$("#filterTableDataset > thead > tr").append("<th title=\"Select\">Select</th>");
+			$("#filterTableDataset > thead > tr").append("<th data-filter=\"false\" title=\"Select\">Select</th>");
 		}
 
 		var arrayFieldsToDisplay = [];
@@ -648,7 +698,7 @@ var FHC_FilterWidget = {
 				for (var i = 0; i < data.dataset.length; i++)
 				{
 					var record = data.dataset[i];
-					var strHtml = '<tr class="' + record.FILTER_CLASS_MARK_ROW + '">';
+					var strHtml = '<tr class="' + record.MARK_ROW_CLASS + '">';
 
 					if (data.checkboxes != null && data.checkboxes != "")
 					{
@@ -682,25 +732,10 @@ var FHC_FilterWidget = {
 					$("#filterTableDataset > tbody").append(strHtml);
 				}
 			}
-			else
-			{
-				// console.log("No dataset!!!");
-			}
-		}
-		else
-		{
-			// console.log("No fields to display!!!");
 		}
 
 		FHC_FilterWidget._callTableSorter();
 
-	},
-
-	/**
-	 *
-	 */
-	_getFilterPage: function() {
-		return FHC_JS_DATA_STORAGE_OBJECT.called_path + "/" + FHC_JS_DATA_STORAGE_OBJECT.called_method;
 	},
 
 	/**
@@ -719,36 +754,6 @@ var FHC_FilterWidget = {
 		$("#filterTableDataset > tbody").html("");
 	},
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 	/**
 	 *
 	 */
@@ -765,10 +770,7 @@ var FHC_FilterWidget = {
 			var config = $('#filterTableDataset')[0].config;
 			$.tablesorter.updateAll(config, true, null);
 		}
-	},
-
-
-
+	}
 
 };
 
@@ -814,10 +816,10 @@ $(document).ready(function() {
 		{
 			//
 			FHC_AjaxClient.ajaxCallPost(
-				'system/Filters/saveFilter',
+				'system/Filters/saveCustomFilter',
 				{
 					customFilterDescription: $("#customFilterDescription").val(),
-					filter_page: FHC_FilterWidget._getFilterPage()
+					filter_page: FHC_FilterWidget.getFilterPage()
 				},
 				{
 					successCallback: refreshSideMenu // NOTE: to be checked
@@ -829,11 +831,6 @@ $(document).ready(function() {
 			alert("Please fill te description of this filter");
 		}
 	});
-
-	// FHC_FilterWidget.setFilterName();
-	// FHC_FilterWidget.renderSelectedFields();
-	// FHC_FilterWidget.renderSelectedFilters();
-	// FHC_FilterWidget.renderTableDataset();
 
 	FHC_FilterWidget.display();
 

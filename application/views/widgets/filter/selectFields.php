@@ -6,8 +6,6 @@
 	</span>
 
 	<span>
-		<select id="addField" class="drop-down-fields">
-			<option value="">Select a field to add...</option>
-		</select>
+		<select id="addField" class="drop-down-fields"></select>
 	</span>
 </div>

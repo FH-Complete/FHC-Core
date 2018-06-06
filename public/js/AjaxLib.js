@@ -125,6 +125,20 @@ var FHC_AjaxClient = {
 	},
 
 	/**
+	 * Retrives error message from response object
+	 */
+	getError: function(response) {
+		var error = 'Generic error';
+
+	    if (jQuery.type(response) == "object" && !jQuery.isEmptyObject(response) && response.hasOwnProperty(RESPONSE))
+	    {
+			error = response.retval;
+	    }
+
+		return error;
+	},
+
+	/**
 	 * Retrives code from response object
 	 */
 	getCode: function(response) {

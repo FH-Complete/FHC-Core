@@ -169,7 +169,7 @@
 							'additionalColumns' => array('Details'),
 							'columnsAliases' => array('PersonID','Vorname','Nachname','GebDatum','Nation','Letzte Aktion','Letzter Bearbeiter',
 								'StSem','GesendetAm','NumAbgeschickt','Studiengänge','Sperrdatum','GesperrtVon'),
-							'formatRaw' => function($datasetRaw) {
+							'formatRow' => function($datasetRaw) {
 
 								$datasetRaw->{'Details'} = sprintf(
 									'<a href="%s/%s?fhc_controller_id=%s">Details</a>',

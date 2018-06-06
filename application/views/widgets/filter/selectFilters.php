@@ -8,9 +8,7 @@
 	</span>
 
 	<span>
-		<select id="addFilter" class="drop-down-filters">
-			<option value="">Select a filter to add...</option>
-		</select>
+		<select id="addFilter" class="drop-down-filters"></select>
 	</span>
 
 	<span>

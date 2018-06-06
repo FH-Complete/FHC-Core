@@ -744,7 +744,7 @@ class InfoCenter extends FHC_Controller
 				'link' => sprintf($toPrint, site_url('system/infocenter/InfoCenter'), 'filter_id', $filterId),
 				'description' => $description,
 				'subscriptDescription' => 'Remove',
-				'subscriptLinkClass' => 'remove-filter',
+				'subscriptLinkClass' => 'remove-custom-filter',
 				'subscriptLinkValue' => $filterId
 			);
 		}
