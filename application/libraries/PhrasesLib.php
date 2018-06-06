@@ -263,8 +263,13 @@ class PhrasesLib
 	}
 
 	/**
-	 *
-	 * stores phrases-array in property $_phrases
+	 * Retrieves phrases in the users language.
+	 * If a phrase is not set in the users language it will be retrieved in the default language.
+	 * Stores phrases-array in property $_phrases.
+	 * @param array $categories Could be an:
+	 *		- indexed array: string or an array of strings. These are the categories used to load phrases.
+	 *		- associative array: of categories, and for each category there is an array of phrases.
+	 * @param string User's language or default language.
 	 */
 	private function _setPhrases($categories, $language)
 	{
