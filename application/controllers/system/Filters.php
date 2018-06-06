@@ -26,7 +26,7 @@ class Filters extends FHC_Controller
 	// Public methods
 
 	/**
-	 *
+	 * Retrives data about the current filter from the session and will be written on the output in JSON format
 	 */
 	public function getFilter()
 	{
@@ -34,7 +34,7 @@ class Filters extends FHC_Controller
 	}
 
 	/**
-	 * Retrives the number of records present in the dataset
+	 * Retrives the number of records present in the current dataset and will be written on the output in JSON format
 	 */
 	public function rowNumber()
 	{
@@ -50,7 +50,8 @@ class Filters extends FHC_Controller
 	}
 
 	/**
-	 *
+	 * Change the sort of the selected fields of the current filter and
+	 * its data will be written on the output in JSON format
 	 */
 	public function sortSelectedFields()
 	{
@@ -67,7 +68,8 @@ class Filters extends FHC_Controller
 	}
 
 	/**
-	 *
+	 * Remove a selected field from the current filter and
+	 * its data will be written on the output in JSON format
 	 */
 	public function removeSelectedField()
 	{
@@ -84,7 +86,7 @@ class Filters extends FHC_Controller
 	}
 
 	/**
-	 *
+	 * Add a field to the current filter and its data will be written on the output in JSON format
 	 */
 	public function addSelectedField()
 	{
@@ -101,7 +103,7 @@ class Filters extends FHC_Controller
 	}
 
 	/**
-	 *
+	 * Remove an applied filter (SQL where condition) from the current filter
 	 */
 	public function removeAppliedFilter()
 	{
@@ -118,7 +120,7 @@ class Filters extends FHC_Controller
 	}
 
 	/**
-	 *
+	 * Apply all the applied filters (SQL where conditions) to the current filter
 	 */
 	public function applyFilters()
 	{
@@ -143,7 +145,7 @@ class Filters extends FHC_Controller
 	}
 
 	/**
-	 *
+	 * Add a filter (SQL where clause) to be applied to the current filter
 	 */
 	public function addFilter()
 	{
@@ -160,7 +162,7 @@ class Filters extends FHC_Controller
 	}
 
 	/**
-	 *
+	 * Save the current filter as a custom filter for this user with the given description
 	 */
 	public function saveCustomFilter()
 	{
@@ -177,7 +179,7 @@ class Filters extends FHC_Controller
 	}
 
 	/**
-	 *
+	 * Remove a custom filter by its filter_id
 	 */
 	public function removeCustomFilter()
 	{
@@ -221,6 +223,7 @@ class Filters extends FHC_Controller
 		}
 		else // Otherwise an error will be written in the output
 		{
+			// NOTE: Used echo to speed up the output before the exit otherwise it's not shown
 			echo 'Parameter "'.self::FILTER_PAGE_PARAM.'" not provided!';
 			exit;
 		}

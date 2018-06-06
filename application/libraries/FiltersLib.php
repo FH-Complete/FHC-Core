@@ -266,24 +266,26 @@ class FiltersLib
 	{
 		$datasetQuery = null;
 
-		// If the given query is valid and the json of the filter is valid
+		// If the given query is valid and the parameter filters is an array
 		if (!empty(trim($query)) && $filters != null && is_array($filters))
 		{
-			$where = '';
+			$where = ''; // starts building the SQL where clause
 
+			// Loops through the given applied filters
 			for ($filtersCounter = 0; $filtersCounter < count($filters); $filtersCounter++)
 			{
-				$filterDefinition = $filters[$filtersCounter];
+				$filterDefinition = $filters[$filtersCounter]; // definition of one filter
 
-				if ($filtersCounter > 0) $where .= ' AND ';
+				if ($filtersCounter > 0) $where .= ' AND '; // if it's NOT the last one
 
-				if (!empty(trim($filterDefinition->name)))
+				if (!empty(trim($filterDefinition->name))) // if the name of the applied filter is valid
 				{
+					// ...build the condition
 					$where .= '"'.$filterDefinition->name.'"'.$this->_getDatasetQueryCondition($filterDefinition);
 				}
 			}
 
-			if ($where != '')
+			if ($where != '') // if the SQL where clause was built
 			{
 				$datasetQuery = 'SELECT * FROM ('.$query.') '.self::DATASET_TABLE_ALIAS.' WHERE '.$where;
 			}
@@ -301,6 +303,7 @@ class FiltersLib
 
 		if ($datasetQuery != null)
 		{
+			// Execute the given SQL statement suppressing error messages
 			$dataset = @$this->_ci->FiltersModel->execReadOnlyQuery($datasetQuery);
 		}
 
@@ -333,19 +336,22 @@ class FiltersLib
 	}
 
 	/**
-	 *
+	 * Change the sort of the selected fields of the current filter
 	 */
 	public function sortSelectedFields($selectedFields)
 	{
 		$sortSelectedFields = false;
 
+		// Checks the parameter selectedFields
 		if (isset($selectedFields) && is_array($selectedFields) && count($selectedFields) > 0)
 		{
+			// Retrives all the used fields by the current filter
 			$fields = $this->getElementSession(self::SESSION_FIELDS);
 
+			// Checks that the given selected fields are present in all the used fields by the current filter
 			if (!array_diff($selectedFields, $fields))
 			{
-				$this->setElementSession(self::SESSION_SELECTED_FIELDS, $selectedFields);
+				$this->setElementSession(self::SESSION_SELECTED_FIELDS, $selectedFields); // write changes into the session
 
 				$sortSelectedFields = true;
 			}
@@ -355,25 +361,31 @@ class FiltersLib
 	}
 
 	/**
-	 *
+	 * Remove a selected field from the current filter
 	 */
 	public function removeSelectedField($selectedField)
 	{
 		$removeSelectedField = false;
 
+		// Checks the parameter selectedField
 		if (isset($selectedField) && !empty(trim($selectedField)))
 		{
+			// Retrives all the used fields by the current filter
 			$fields = $this->getElementSession(self::SESSION_FIELDS);
+			// Retrives the selected fields by the current filter
 			$selectedFields = $this->getElementSession(self::SESSION_SELECTED_FIELDS);
 
+			// Checks that the given selected field is present in the list of all the used fields by the current filter
 			if (in_array($selectedField, $fields))
 			{
+				// If the selected field is present in the list of the selected fields by the current filter
 				if (($pos = array_search($selectedField, $selectedFields)) !== false)
 				{
+					// Then remove it and shift the rest of elements by one if needed
 					array_splice($selectedFields, $pos, 1);
 				}
 
-				$this->setElementSession(self::SESSION_SELECTED_FIELDS, $selectedFields);
+				$this->setElementSession(self::SESSION_SELECTED_FIELDS, $selectedFields); // write changes into the session
 
 				$removeSelectedField = true;
 			}
@@ -383,22 +395,26 @@ class FiltersLib
 	}
 
 	/**
-	 *
+	 * Add a field to the current filter
 	 */
 	public function addSelectedField($selectedField)
 	{
 		$removeSelectedField = false;
 
+		// Checks the parameter selectedField
 		if (isset($selectedField) && !empty(trim($selectedField)))
 		{
+			// Retrives all the used fields by the current filter
 			$fields = $this->getElementSession(self::SESSION_FIELDS);
+			// Retrives the selected fields by the current filter
 			$selectedFields = $this->getElementSession(self::SESSION_SELECTED_FIELDS);
 
+			// Checks that the given selected field is present in the list of all the used fields by the current filter
 			if (in_array($selectedField, $fields))
 			{
-				array_push($selectedFields, $selectedField);
+				array_push($selectedFields, $selectedField); // place the new filed at the end of the selected fields list
 
-				$this->setElementSession(self::SESSION_SELECTED_FIELDS, $selectedFields);
+				$this->setElementSession(self::SESSION_SELECTED_FIELDS, $selectedFields); // write changes into the session
 
 				$removeSelectedField = true;
 			}
@@ -408,36 +424,33 @@ class FiltersLib
 	}
 
 	/**
-	 *
+	 * Remove an applied filter (SQL where condition) from the current filter
 	 */
 	public function removeAppliedFilter($appliedFilter)
 	{
 		$removeAppliedFilter = false;
 
+		// Checks the parameter appliedFilter
 		if (isset($appliedFilter) && !empty(trim($appliedFilter)))
 		{
+			// Retrives all the used fields by the current filter
 			$fields = $this->getElementSession(self::SESSION_FIELDS);
+			// Retrives the applied filters by the current filter
 			$filters = $this->getElementSession(self::SESSION_FILTERS);
 
+			// Checks that the given applied filter is present in the list of all the used fields by the current filter
 			if (in_array($appliedFilter, $fields))
 			{
-				$pos = false;
-				for($i = 0; $i < count($filters); $i++)
+				// Search in what position the given applied filter is
+				$pos = $this->_searchFilterByName($filters, $appliedFilter);
+				if ($pos !== false) // If found
 				{
-					if ($filters[$i]->name == $appliedFilter)
-					{
-						$pos = $i;
-						break;
-					}
+					array_splice($filters, $pos, 1); // Then remove it and shift the rest of elements by one if needed
 				}
 
-				if ($pos !== false)
-				{
-					array_splice($filters, $pos, 1);
-				}
-
+				 // Write changes into the session
 				$this->setElementSession(self::SESSION_FILTERS, $filters);
-				$this->setElementSession(self::SESSION_RELOAD_DATASET, true);
+				$this->setElementSession(self::SESSION_RELOAD_DATASET, true); // the dataset must be reloaded
 
 				$removeAppliedFilter = true;
 			}
@@ -447,27 +460,31 @@ class FiltersLib
 	}
 
 	/**
-	 *
+	 * Apply all the applied filters (SQL where conditions) to the current filter
 	 */
 	public function applyFilters($appliedFilters, $appliedFiltersOperations, $appliedFiltersConditions, $appliedFiltersOptions)
 	{
 		$applyFilters = false;
 
+		// Checks the required parameters: appliedFilters and appliedFiltersOperations
 		if (isset($appliedFilters) && is_array($appliedFilters)
 			&& isset($appliedFiltersOperations) && is_array($appliedFiltersOperations))
 		{
-			$fields = $this->getElementSession(self::SESSION_FIELDS);
+			$fields = $this->getElementSession(self::SESSION_FIELDS); // Retrives all the used fields by the current filter
 
+			// Checks that the given applied filters are present in all the used fields by the current filter
 			if (!array_diff($appliedFilters, $fields))
 			{
-				$filters = array();
-				for ($i = 0; $i < count($appliedFilters); $i++)
+				$filters = array(); // starts building the new applied filters list
+				for ($i = 0; $i < count($appliedFilters); $i++) // loops through the given applied filters
 				{
-					$filterDefinition = new stdClass();
+					$filterDefinition = new stdClass(); // new applied filter definition
 
+					// Sets the filter definition required properties
 					$filterDefinition->name = $appliedFilters[$i];
 					$filterDefinition->operation = $appliedFiltersOperations[$i];
 
+					// Sets the filter definition optional properties
 					$filterDefinition->condition = null;
 					if (isset($appliedFiltersConditions) && isset($appliedFiltersConditions[$i]))
 					{
@@ -480,11 +497,12 @@ class FiltersLib
 						$filterDefinition->option = $appliedFiltersOptions[$i];
 					}
 
-					$filters[$i] = $filterDefinition;
+					$filters[$i] = $filterDefinition; // adds the new definition to the list
 				}
 
+				// Write changes into the session
 				$this->setElementSession(self::SESSION_FILTERS, $filters);
-				$this->setElementSession(self::SESSION_RELOAD_DATASET, true);
+				$this->setElementSession(self::SESSION_RELOAD_DATASET, true); // the dataset must be reloaded
 
 				$applyFilters = true;
 			}
@@ -494,40 +512,40 @@ class FiltersLib
 	}
 
 	/**
-	 *
+	 * Add a filter (SQL where clause) to be applied to the current filter
 	 */
 	public function addFilter($filter)
 	{
 		$addFilter = false;
 
+		// Checks the parameter filter
 		if (isset($filter) && !empty(trim($filter)))
 		{
+			// Retrives all the used fields by the current filter
 			$fields = $this->getElementSession(self::SESSION_FIELDS);
+			// Retrives the applied filters by the current filter
 			$filters = $this->getElementSession(self::SESSION_FILTERS);
 
+			// Checks that the given applied filter is present in the list of all the used fields by the current filter
 			if (in_array($filter, $fields))
 			{
-				$pos = false;
-				for($i = 0; $i < count($filters); $i++)
+				// Search in what position the given applied filter is
+				$pos = $this->_searchFilterByName($filters, $filter);
+				if ($pos === false) // If NOT found then add it
 				{
-					if ($filters[$i]->name == $filter)
-					{
-						$pos = $i;
-						break;
-					}
-				}
-
-				if ($pos === false)
-				{
+					// New filter definition
 					$filterDefinition = new stdClass();
+					// Sets filter definition required properties
 					$filterDefinition->name = $filter;
+					// Sets filter definition optional properties
 					$filterDefinition->operation = null;
 					$filterDefinition->condition = null;
 					$filterDefinition->option = null;
+					// Place the new applied filter at the end of the applied filters list
 					array_push($filters, $filterDefinition);
 				}
 
-				$this->setElementSession(self::SESSION_FILTERS, $filters);
+				$this->setElementSession(self::SESSION_FILTERS, $filters); // write changes into the session
 
 				$addFilter = true;
 			}
@@ -537,13 +555,13 @@ class FiltersLib
 	}
 
 	/**
-	 *
+	 * Save the current filter as a custom filter for this user with the given description
 	 */
 	public function saveCustomFilter($customFilterDescription)
 	{
 		$saveCustomFilter = false; // by default returns a failure
 
-		// Checks parameter customFilterDescription
+		// Checks parameter customFilterDescription if not valid stop the execution
 		if (!isset($customFilterDescription) || empty(trim($customFilterDescription)))
 		{
 			return $saveCustomFilter;
@@ -631,12 +649,13 @@ class FiltersLib
 	}
 
 	/**
-	 *
+	 * Remove a custom filter by its filter_id
 	 */
 	public function removeCustomFilter($filterId)
 	{
 		$removeCustomFilter = false;
 
+		// Checks the parameter filterId
 		if (isset($filterId) && is_numeric($filterId) && $filterId > 0)
 		{
 			$this->_ci->load->model('system/Filters_model', 'FiltersModel'); // to remove the filter definitions from DB
@@ -688,23 +707,30 @@ class FiltersLib
 	}
 
 	/**
-	 *
+	 * Generates a condition for a SQL where clause using the given applied filter definition.
+	 * By default an empty string is returned.
 	 */
 	private function _getDatasetQueryCondition($filterDefinition)
 	{
-		$condition = '';
+		$condition = ''; // starts building the condition
 
+		// "operation" is a required property for the applied filter definition
 		if (!empty(trim($filterDefinition->operation)))
 		{
+			// Checks what operation is required
 			switch ($filterDefinition->operation)
 			{
+				// comparison (==)
 				case self::OP_EQUAL:
 					if (is_numeric($filterDefinition->condition)) $condition = '= '.$filterDefinition->condition;
 					break;
+				// not equal (!=)
 				case self::OP_NOT_EQUAL:
 					if (is_numeric($filterDefinition->condition)) $condition = '!= '.$filterDefinition->condition;
 					break;
+				// greater than (>)
 				case self::OP_GREATER_THAN:
+					// It it's a date type
 					if (is_numeric($filterDefinition->condition)
 						&& isset($filterDefinition->option)
 						&& ($filterDefinition->option == self::OPT_DAYS
@@ -712,12 +738,14 @@ class FiltersLib
 					{
 						$condition = '< (NOW() - \''.$filterDefinition->condition.' '.$filterDefinition->option.'\'::interval)';
 					}
-					else
+					else // otherwise is a number
 					{
 						$condition = '> '.$filterDefinition->condition;
 					}
 					break;
+				// less than (<)
 				case self::OP_LESS_THAN:
+					// It it's a date type
 					if (is_numeric($filterDefinition->condition)
 						&& isset($filterDefinition->option)
 						&& ($filterDefinition->option == self::OPT_DAYS
@@ -725,37 +753,65 @@ class FiltersLib
 					{
 						$condition = '> (NOW() - \''.$filterDefinition->condition.' '.$filterDefinition->option.'\'::interval)';
 					}
-					else
+					else // otherwise is a number
 					{
 						$condition = '< '.$filterDefinition->condition;
 					}
 					break;
+				// contains (ILIKE)
 				case self::OP_CONTAINS:
 					$condition = 'ILIKE \'%'.$this->_ci->FiltersModel->escapeLike($filterDefinition->condition).'%\'';
 					break;
+				// not contains (NOT ILIKE)
 				case self::OP_NOT_CONTAINS:
 					$condition = 'NOT ILIKE \'%'.$this->_ci->FiltersModel->escapeLike($filterDefinition->condition).'%\'';
 					break;
+				// is true (=== true)
 				case self::OP_IS_TRUE:
 					$condition = 'IS TRUE';
 					break;
+				// is false (=== false)
 				case self::OP_IS_FALSE:
 					$condition = 'IS FALSE';
 					break;
+				// is set
 				case self::OP_SET:
 					$condition = 'IS NOT NULL';
 					break;
+				// is NOT set
 				case self::OP_NOT_SET:
 					$condition = 'IS NULL';
 					break;
+				// by default must not be null (!= null)
 				default:
 					$condition = 'IS NOT NULL';
 					break;
 			}
 		}
 
-		if (!empty(trim($condition))) $condition = ' '.$condition;
+		// if the condition is valid
+		if (!empty(trim($condition))) $condition = ' '.$condition; // add a white space before
 
 		return $condition;
+	}
+
+	/**
+	 * Search for a filter inside a list of filters by the given filter name
+	 * Returns false if NOT found, otherwise the position inside the list
+	 */
+	private function _searchFilterByName($filters, $filterName)
+	{
+		$pos = false;
+
+		for($i = 0; $i < count($filters); $i++)
+		{
+			if ($filters[$i]->name == $filterName)
+			{
+				$pos = $i;
+				break;
+			}
+		}
+
+		return $pos;
 	}
 }
