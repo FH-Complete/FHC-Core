@@ -4,7 +4,7 @@
 
 <div>
 	<span class="filter-span-label">
-		Add filter:
+		<?php echo  ucfirst($this->p->t('filter', 'filterHinzufuegen')); ?>:
 	</span>
 
 	<span>
@@ -12,6 +12,6 @@
 	</span>
 
 	<span>
-		<input id="applyFilter" type="button" value="Apply filter">
+		<input id="applyFilter" type="button" value="<?php echo  ucfirst($this->p->t('global', 'hinzufuegen')); ?>">
 	</span>
 </div>

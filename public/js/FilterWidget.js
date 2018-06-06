@@ -32,7 +32,7 @@ function sideMenuHook()
 					{
 						if (typeof refreshSideMenu == 'function')
 						{
-							refreshSideMenu();
+							InfocenterPersonDataset.refreshSideMenu();
 						}
 					}
 				}
@@ -107,10 +107,10 @@ var FHC_FilterWidget = {
 	_resetAll: function() {
 		//
 		$("#dragAndDropFieldsArea").html("");
-		$("#addField").html("<option value=\"\">Select a field to add...</option>");
+		$("#addField").html('<option value="">' + FHC_PhraseLib.t('ui', 'bitteEintragWaehlen') + '</option>');
 		//
 		$("#appliedFilters").html("");
-		$("#addFilter").html("<option value=\"\">Select a filter to add...</option>");
+		$("#addFilter").html('<option value="">' + FHC_PhraseLib.t('ui', 'bitteEintragWaehlen') + '</option>');
 	},
 
 	/**
@@ -289,6 +289,9 @@ var FHC_FilterWidget = {
 					},
 					{
 						successCallback: function(data, textStatus, jqXHR) {
+							// Tablesorter filter local storage clean
+							$("#filterTableDataset").trigger("filterResetSaved");
+
 							FHC_FilterWidget._failOrRefresh(data, textStatus, jqXHR);
 						}
 					}
@@ -344,8 +347,7 @@ var FHC_FilterWidget = {
 						fieldToDisplay = data.columnsAliases[i];
 					}
 
-					strDropDown = '<option value="' + fieldName + '">' + fieldToDisplay + '</option>';
-					$("#addField").append(strDropDown);
+					$("#addField").append('<option value="' + fieldName + '">' + fieldToDisplay + '</option>');
 				}
 			}
 		}
@@ -360,6 +362,9 @@ var FHC_FilterWidget = {
 				},
 				{
 					successCallback: function(data, textStatus, jqXHR) {
+						// Tablesorter filter local storage clean
+						$("#filterTableDataset").trigger("filterResetSaved");
+
 						FHC_FilterWidget._failOrRefresh(data, textStatus, jqXHR);
 					}
 				}
@@ -517,8 +522,7 @@ var FHC_FilterWidget = {
 						fieldToDisplay = data.columnsAliases[i];
 					}
 
-					strDropDown = '<option value="' + fieldName + '">' + fieldToDisplay + '</option>';
-					$("#addFilter").append(strDropDown);
+					$("#addFilter").append('<option value="' + fieldName + '">' + fieldToDisplay + '</option>');
 				}
 			}
 		}
@@ -764,8 +768,18 @@ var FHC_FilterWidget = {
 			&& $('#filterTableDataset').hasClass('table-condensed'))
 		{
 			$("#filterTableDataset").tablesorter({
-				widgets: ["zebra", "filter"]
+				widgets: ["zebra", "filter"],
+				widgetOptions: {
+					filter_saveFilters : true
+				}
 			});
+
+			// reset filter storage if there is a filter id in url TODO: find better solution
+			var filter_id = FHC_AjaxClient.getUrlParameter("filter_id");
+			if (typeof filter_id !== 'undefined')
+			{
+				$("#filterTableDataset").trigger("filterResetSaved");
+			}
 
 			var config = $('#filterTableDataset')[0].config;
 			$.tablesorter.updateAll(config, true, null);
@@ -822,7 +836,7 @@ $(document).ready(function() {
 					filter_page: FHC_FilterWidget.getFilterPage()
 				},
 				{
-					successCallback: refreshSideMenu // NOTE: to be checked
+					successCallback: InfocenterPersonDataset.refreshSideMenu // NOTE: to be checked
 				}
 			);
 		}

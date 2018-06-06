@@ -5575,3 +5575,40 @@ function StudentLVGesamtNotenTreeSort()
 	// da sonst nach dem sortieren falsche Eintraege markiert sind
 	window.setTimeout(StudentNotenTreeSelectDifferent,20);
 }
+
+//****
+//* Exportiert den Bescheid fuer alle markierten Studierenden
+//****
+function StudentExportBescheid()
+{
+
+	tree = document.getElementById('student-tree');
+	//Alle markierten Studenten holen
+	var start = new Object();
+	var end = new Object();
+	var numRanges = tree.view.selection.getRangeCount();
+	var paramList= '';
+	var anzahl=0;
+
+	for (var t = 0; t < numRanges; t++)
+	{
+  		tree.view.selection.getRangeAt(t,start,end);
+		for (var v = start.value; v <= end.value; v++)
+		{
+			uid = getTreeCellText(tree, 'student-treecol-uid', v);
+			paramList += ';'+uid;
+			anzahl = anzahl+1;
+		}
+	}
+
+	if(paramList.replace(";",'') == '')
+	{
+		alert('Bitte einen Studenten auswaehlen');
+		return false;
+	}
+
+	if(anzahl>0)
+		window.open('<?php echo APP_ROOT; ?>content/pdfExport.php?archivdokument=Bescheid&uid='+paramList,'Bescheide', 'height=200,width=350,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
+	else
+		alert('Bitte einen Studenten auswaehlen');
+}
