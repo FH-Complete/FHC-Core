@@ -24,13 +24,13 @@ var FHC_PhraseLib = {
 	 * @param {array} params : String-parameters to be set in variables in phrasentext
 	 * @returns {String} : phrase-text
 	 */
-	t: function(category, phrase, params = []) {
+	t: function (category, phrase, params = []) {
 
 		// Checks if FHC_JS_PHRASES_STORAGE_OBJECT is an array
 		if ($.isArray(FHC_JS_PHRASES_STORAGE_OBJECT))
 		{
 			// loop through global JS PHRASES STORAGE OBJECT and search for phrase
-			for (var i in FHC_JS_PHRASES_STORAGE_OBJECT)
+			for (i in FHC_JS_PHRASES_STORAGE_OBJECT)
 			{
 				var phraseObj = FHC_JS_PHRASES_STORAGE_OBJECT[i]; // Single phrase object
 
@@ -41,17 +41,17 @@ var FHC_PhraseLib = {
 					&& phraseObj.text.trim() != '')
 				{
 					// If params is null or not an array
-					if (params == null || (params != null && $.isArray(params)))
+					if (params == null || (params != null && !$.isArray(params)))
 					{
 						params = [];
 					}
-
-					return = FHC_PhraseLib._replacePhraseVariable(phraseObj.text, params); // parsing
+					
+					return FHC_PhraseLib._replacePhraseVariable(phraseObj.text, params); // parsing
 				}
 			}
 		}
 
-		return '<< PHRASE ' + phraseObj.phrase + ' >>';
+		return '<< PHRASE ' + phrase + ' >>';
 	},
 
 	//------------------------------------------------------------------------------------------------------------------
@@ -63,7 +63,7 @@ var FHC_PhraseLib = {
 	 * @param {array} replaceStringArr : String-array to be set in variables in phrasentext (order matters)
 	 * @returns {String} : replaced phrasen-text
 	 */
-	_replacePhraseVariable: function(phrase, replaceStringArr) {
+	_replacePhraseVariable: function (phrase, replaceStringArr) {
 		for (var i = 0; i < replaceStringArr.length; i++)
 		{
 			phrase = phrase.replace(/\{(.*?)\}/, replaceStringArr[i]);

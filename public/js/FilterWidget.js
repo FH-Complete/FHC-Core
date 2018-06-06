@@ -78,7 +78,7 @@ var FHC_FilterWidget = {
 							$("#filterSelectFieldsDnd").append(strHtml);
 						}
 
-						var strDropDown = '<option value="">Select a field to add...</option>';
+						var strDropDown = '<option value="">' + FHC_PhraseLib.t('ui', 'bitteEintragWaehlen') + '</option>';
 						$("#addField").append(strDropDown);
 
 						if (data.allSelectedFields != null)
@@ -126,7 +126,7 @@ var FHC_FilterWidget = {
 
 					if (data != null)
 					{
-						var strDropDown = '<option value="">Select a filter to add...</option>';
+						var strDropDown = '<option value="">' + FHC_PhraseLib.t('ui', 'bitteEintragWaehlen') + '</option>';
 						$("#addFilter").append(strDropDown);
 
 						if (data.selectedFilters != null)

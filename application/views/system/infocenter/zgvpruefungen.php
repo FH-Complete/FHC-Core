@@ -201,7 +201,7 @@
 									</div>
 								</div>
 								<div class="col-lg-<?php echo $columns[3] ?>">
-									<div class="form-group"><label><?php echo  $this->p->t('infocenter', 'zgv') . ' ' . $this->p->t('lehre','master') . ' ' . $this->p->t('person','nation') . ':'?></label>
+									<div class="form-group"><label><?php echo $this->p->t('infocenter', 'zgv') . ' ' . $this->p->t('lehre','master') . ' ' . $this->p->t('person', 'nation') . ':'?></label>
 										<?php
 										if ($infoonly)
 											echo $zgvpruefung->zgvmanation_bez;
@@ -220,7 +220,7 @@
 							<div class="row">
 								<div class="col-xs-6 text-left">
 									<button type="button" class="btn btn-default zgvUebernehmen" id="zgvUebernehmen_<?php echo $zgvpruefung->prestudent_id ?>">
-										<?php echo  $this->p->t('infocenter', 'letzteZgvUebernehmen') ?>
+										<?php echo $this->p->t('infocenter', 'letzteZgvUebernehmen') ?>
 									</button>
 								</div>
 								<div class="col-xs-6 text-right">
@@ -248,7 +248,7 @@
 													class="d-inline float-right"
 													required>
 												<option value="null"
-														selected="selected"><?php echo  $this->p->t('infocenter', 'absagegrund', array($this->p->t('global', 'waehlen'))) . '...' ?>
+														selected="selected"><?php echo ucfirst($this->p->t('infocenter', 'absagegrund')) . '...' ?>
 												</option>
 												<?php foreach ($statusgruende as $statusgrund): ?>
 													<option value="<?php echo $statusgrund->statusgrund_id ?>"><?php echo $statusgrund->bezeichnung_mehrsprachig[0] ?></option>
@@ -322,7 +322,7 @@
 											data-toggle="modal"
 											data-target="#freigabeModal_<?php echo $zgvpruefung->prestudent_id ?>"
 											data-toggle="tooltip" title="<?php echo $disabledTxt ?>">
-										<?php echo  $this->p->t('ui', 'freigabeAnStudiengang') ?>
+												<?php echo  $this->p->t('ui', 'freigabeAnStudiengang') ?>
 									</button>
 								</div>
 							</div>
@@ -339,10 +339,10 @@
 											</button>
 											<h4 class="modal-title"
 												id="freigabeModalLabel">
-												<?php echo  $this->p->t('global', 'freigabeBestaetigen') ?></h4>
+												<?php echo $this->p->t('infocenter', 'freigabeBestaetigen') ?></h4>
 										</div>
 										<div class="modal-body">
-											<?php echo  $this->p->t('infocenter', 'interessentFreigebenTxt') ?>
+											<?php echo $this->p->t('infocenter', 'interessentFreigebenTxt') ?>
 										</div>
 										<div class="modal-footer">
 											<button type="button"
@@ -352,7 +352,7 @@
 											<a href="../saveFreigabe/<?php echo $zgvpruefung->prestudent_id ?>">
 												<button type="button"
 														class="btn btn-primary">
-													<?php echo  $this->p->t('infocenter', 'interessentFreigeben') ?>
+													<?php echo $this->p->t('infocenter', 'interessentFreigeben') ?>
 												</button>
 											</a>
 										</div>
