@@ -226,7 +226,6 @@ class PhrasesLib
 	 *		- could be a string or an array of strings. These are the categories used to load phrases
 	 *		- could be an array of categories, and for each category there is an array of phrases
 	 * language: optional parameter must be a string. It's used to load phrases
-	 * stores phrases-array in property $_phrases
 	 */
 	private function _extend_construct($params)
 	{
@@ -234,8 +233,7 @@ class PhrasesLib
 		if (is_array($params) && count($params) > 0)
 		{
 			$parameters = $params[0];	// temporary variable
-			$indexArray = false;		//flag for indexed array
-			$assocArray = false;		//flag for associative array
+			$isIndexArray = false;		//flag for indexed array
 
 			// If there are parameters
 			if (is_array($parameters) && count($parameters) > 0)
@@ -259,83 +257,89 @@ class PhrasesLib
 					$language = $this->_ci->PersonModel->getLanguage(getAuthUID());
 				}
 
-				// Checks if categories is associative or indexed array
-				if (ctype_digit(implode('', array_keys($categories))))
-				{
-					// is indexed array -> Loads phrases
-					$indexArray = true;
-					$phrases = $this->_ci->PhraseModel->getPhrasesByCategoryAndLanguage($categories, $language);
-				}
-				else
-				{
-					// is assoc array -> Loads specific phrasentexte by category and phrases
-					$assocArray = true;
-					$phrases = $this->_ci->PhraseModel
-						->getPhrasesByCategoryAndPhrasesAndLanguage($categories, $language);
-				}
-				
-				// If language is not default language and phrasentext is null -> fallback to default language
-				if ($language != DEFAULT_LANGUAGE)
-				{
-					// get array with phrasentexte in the default language
-					$defaultPhrases = array();
-					if ($indexArray)
-					{
-						$defaultPhrases = $this->_ci->PhraseModel
-							->getPhrasesByCategoryAndLanguage($categories, DEFAULT_LANGUAGE);
-					}
-					elseif ($assocArray)
-					{
-						$defaultPhrases = $this->_ci->PhraseModel
-							->getPhrasesByCategoryAndPhrasesAndLanguage($categories, DEFAULT_LANGUAGE);
-					}
+				$this->_setPhrases($categories, $language);
+			}
+		}
+	}
 
-					// combine array with phrasentexte in users language and in default language
-					// (default used if phrasentext in users language is null or not set)
-					$phrasesArr = array();
-					if (!empty($phrases->retval))
+	/**
+	 *
+	 * stores phrases-array in property $_phrases
+	 */
+	private function _setPhrases($categories, $language)
+	{
+		$phrases = null;
+		// Checks if categories is associative or indexed array
+		if (ctype_digit(implode('', array_keys($categories))))
+		{
+			// is indexed array -> Loads phrases
+			$isIndexArray = true;
+			$phrases = $this->_ci->PhraseModel->getPhrasesByCategoryAndLanguage($categories, $language);
+		}
+		else
+		{
+			// is assoc array -> Loads specific phrasentexte by category and phrases
+			$isIndexArray = false;
+			$phrases = $this->_ci->PhraseModel
+				->getPhrasesByCategoryAndPhrasesAndLanguage($categories, $language);
+		}
+
+		// If language is not default language and phrasentext is null -> fallback to default language
+		if ($language != DEFAULT_LANGUAGE)
+		{
+			// get array with phrasentexte in the default language
+			$defaultPhrases = null;
+			if ($isIndexArray)
+			{
+				$defaultPhrases = $this->_ci->PhraseModel
+					->getPhrasesByCategoryAndLanguage($categories, DEFAULT_LANGUAGE);
+			}
+			else
+			{
+				$defaultPhrases = $this->_ci->PhraseModel
+					->getPhrasesByCategoryAndPhrasesAndLanguage($categories, DEFAULT_LANGUAGE);
+			}
+
+			// combine array with phrasentexte in users language and in default language
+			// (default used if phrasentext in users language is null or not set)
+			if (hasData($phrases) && hasData($defaultPhrases))
+			{
+				// loop through phrases in default language
+				foreach ($defaultPhrases->retval as $defaultPhrase)
+				{
+					$found = false;	// flag for found phrase
+
+					// loop through phrases in users language
+					foreach ($phrases->retval as $phrase)
 					{
-						// loop through phrases in default language
-						foreach ($defaultPhrases->retval as $defaultPhrase)
+						// if same phrase and category found and text is not null
+						// use phrase in users language
+						if ($phrase->phrase == $defaultPhrase->phrase
+							&& $phrase->category == $defaultPhrase->category
+							&& !is_null($phrase->text))
 						{
-							$phraseObj = new stdClass();
-							$found = false;	// flag for found phrase
-
-							// loop through phrases in users language
-							foreach ($phrases->retval as $phrase)
-							{
-								// if same phrase and category found and text is not null
-								// use phrase in users language
-								if ($phrase->phrase === $defaultPhrase->phrase
-									&& $phrase->category === $defaultPhrase->category
-									&& !is_null($phrase->text))
-								{
-									$found = true;
-									array_push($phrasesArr, $phrase);						
-									break;
-								}
-							}
-							
-							// otherwise use phrase in default language
-							if (!$found)
-							{
-								array_push($phrasesArr, $defaultPhrase);
-							}
+							$found = true;
+							break;
 						}
-						$phrases->retval = $phrasesArr;
 					}
-					else
-					{
-						$phrases->retval = $defaultPhrases->retval;
-					}
-				}
 
-				// If there are phrases loaded then store them in the property _phrases
-				if (hasData($phrases))
-				{
-					$this->_phrases = $phrases->retval;
+					// otherwise use phrase in default language
+					if (!$found)
+					{
+						array_push($phrases->retval, $defaultPhrase);
+					}
 				}
 			}
+			elseif (hasData($defaultPhrases))
+			{
+				$phrases = $defaultPhrases;
+			}
+		}
+
+		// If there are phrases loaded then store them in the property _phrases
+		if (hasData($phrases))
+		{
+			$this->_phrases = $phrases->retval;
 		}
 	}
 
