@@ -26,7 +26,7 @@
 $new = false;
 
 
-$phrases = array(	
+$phrases = array(
 	//*******************	CORE/global
 	array(
 		'app' => 'core',
@@ -43,6 +43,26 @@ $phrases = array(
 			array(
 				'sprache' => 'English',
 				'text' => 'all',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'global',
+		'phrase' => 'zeilen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Zeilen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'lines',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -909,6 +929,48 @@ $phrases = array(
 		)
 	),
 	
+	array(
+		'app' => 'core',
+		'category' => 'global',
+		'phrase' => 'mailAnXversandt',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Mail an {email} versandt.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Mail was sent to {email}.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	
+	array(
+		'app' => 'core',
+		'category' => 'global',
+		'phrase' => 'beschreibung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Beschreibung',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'description',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	
 	
 	//*******************************		CORE/ui
 	array(
@@ -1231,6 +1293,46 @@ $phrases = array(
 			)
 		)
 	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'fehlerBeimSpeichern',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Fehler beim Speichern',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Error on Saving',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'gespeichert',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Gespeichert',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Saved',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
 	
 	
 	//***************************	CORE/filter
@@ -1254,6 +1356,70 @@ $phrases = array(
 			)
 		)
 	),
+	
+	array(
+		'app' => 'core',
+		'category' => 'filter',
+		'phrase' => 'filterHinzufuegen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Filter hinzufügen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'add filter',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	
+	array(
+		'app' => 'core',
+		'category' => 'filter',
+		'phrase' => 'feldHinzufuegen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Feld hinzufügen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'add field',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	
+	array(
+		'app' => 'core',
+		'category' => 'filter',
+		'phrase' => 'filterBeschreibung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Filter Beschreibung',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'filter description',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	
 	
 	
 	
@@ -2187,6 +2353,46 @@ $phrases = array(
 	array(
 		'app' => 'infocenter',
 		'category' => 'infocenter',
+		'phrase' => 'zugangsvoraussetzungen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Zugangsvoraussetzungen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => '',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'infocenter',
+		'category' => 'infocenter',
+		'phrase' => 'keineZugangsvoraussetzungenTxt',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Keine Zugangsvoraussetzungen für den Studiengang definiert',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => '',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'infocenter',
+		'category' => 'infocenter',
 		'phrase' => 'letzteZgvUebernehmen',
 		'insertvon' => 'system',
 		'phrases' => array(
@@ -2273,8 +2479,8 @@ $phrases = array(
 			array(
 				'sprache' => 'German',
 				'text' => 'Bei Absage von InteressentInnen	erhalten diese den Status "Abgewiesener" und deren '
-				. 'ZGV-Daten können im Infocenter nicht mehr bearbeitet oder freigegeben werden. '
-				. 'Alle nicht gespeicherten ZGV-Daten gehen verloren. Fortfahren?',
+				.'ZGV-Daten können im Infocenter nicht mehr bearbeitet oder freigegeben werden. '
+				.'Alle nicht gespeicherten ZGV-Daten gehen verloren. Fortfahren?',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -2380,7 +2586,7 @@ $phrases = array(
 			),
 			array(
 				'sprache' => 'English',
-				'text' => '',
+				'text' => 'Approve applicant',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -2483,7 +2689,7 @@ $phrases = array(
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'change note',
+				'text' => 'Change note',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -2568,7 +2774,128 @@ $phrases = array(
 				'insertvon' => 'system'
 			)
 		)
+	),
+	array(
+		'app' => 'infocenter',
+		'category' => 'infocenter',
+		'phrase' => 'bewerberParken',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'BewerberIn parken',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Park applicant',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'infocenter',
+		'category' => 'infocenter',
+		'phrase' => 'bewerberAusparken',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'BewerberIn ausparken',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Unpark applicant',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'infocenter',
+		'category' => 'infocenter',
+		'phrase' => 'nichtsZumAusparken',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Nichts zum ausparken',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => '',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'infocenter',
+		'category' => 'infocenter',
+		'phrase' => 'fehlerBeimAusparken',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Fehler beim Ausparken',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => '',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'infocenter',
+		'category' => 'infocenter',
+		'phrase' => 'fehlerBeimParken',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Fehler beim Parken',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => '',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'infocenter',
+		'category' => 'infocenter',
+		'phrase' => 'bewerberGeparktBis',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'BewerberIn geparkt bis',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Applicant parked until',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
 	)
+	
 );
 
 
@@ -2581,9 +2908,9 @@ foreach ($phrases as $phrase)
 	$qry = "SELECT phrase_id 
 			FROM system.tbl_phrase
 			WHERE 
-				app=" . $db->db_add_param($phrase['app']) . " AND
-				category=" . $db->db_add_param($phrase['category']) . " AND
-				phrase=" . $db->db_add_param($phrase['phrase']);
+				app=". $db->db_add_param($phrase['app']). " AND
+				category=". $db->db_add_param($phrase['category']). " AND
+				phrase=". $db->db_add_param($phrase['phrase']);
 
 	//***	CHECK PHRASE
 	if ($result = $db->db_query($qry))
@@ -2600,11 +2927,11 @@ foreach ($phrases as $phrase)
 								insertvon, 
 								category) 
 							VALUES(".
-								$db->db_add_param($phrase['app']) . ','.
-								$db->db_add_param($phrase['phrase']) . ','.
+								$db->db_add_param($phrase['app']). ','.
+								$db->db_add_param($phrase['phrase']). ','.
 								' now(),'.
-								$db->db_add_param($phrase['insertvon']) . ','.
-								$db->db_add_param($phrase['category']) . ');';
+								$db->db_add_param($phrase['insertvon']). ','.
+								$db->db_add_param($phrase['category']). ');';
 
 			if ($db->db_query($qry_insert))
 			{
@@ -2618,11 +2945,11 @@ foreach ($phrases as $phrase)
 						$phrase_id = $obj->id;
 					}
 				}
-				echo 'Kategorie/Phrase: <b>' . $phrase['category'] . '/' . $phrase['phrase'] . ' hinzugefügt</b><br>';
+				echo 'Kategorie/Phrase: <b>'. $phrase['category']. '/'. $phrase['phrase']. ' hinzugefügt</b><br>';
 			}
 			else
-				echo '<span class="error">Fehler: ' . $phrase['category'] . '/' . $phrase['phrase'] . ' hinzufügen nicht möglich</span><br>';
-
+				echo '<span class="error">Fehler: '. $phrase['category']. '/'.
+				$phrase['phrase']. ' hinzufügen nicht möglich</span><br>';
 		}
 		//phrase existing -> get phrase_id
 		else
@@ -2631,23 +2958,23 @@ foreach ($phrases as $phrase)
 			{
 				$phrase_id = $obj->phrase_id;
 			}
-			echo 'Kategorie/Phrase: ' . $phrase['category'] . '/' . $phrase['phrase'] . ' vorhanden.<br>';
+			echo 'Kategorie/Phrase: '. $phrase['category']. '/'. $phrase['phrase']. ' vorhanden.<br>';
 		}
 		
 	
 		//***	CHECK PHRASENTEXT
 		//loop through languages
 		foreach ($phrase['phrases'] as $phrase_phrases)
-		{			
+		{
 			$language = $phrase_phrases['sprache'];
 			
 			//query phrasentext in certain language
-			$qry_language = 
+			$qry_language =
 				"SELECT *
 				FROM system.tbl_phrasentext
 				WHERE 
-					phrase_id=" . $phrase_id . " AND
-					sprache='" . $language . "'";
+					phrase_id=". $phrase_id. " AND
+					sprache='". $language. "'";
 			
 			
 			if ($result_language = $db->db_query($qry_language))
@@ -2665,22 +2992,25 @@ foreach ($phrases as $phrase)
 										insertamum, 
 										insertvon) 
 									VALUES(".
-										$db->db_add_param($phrase_id, FHC_INTEGER) . ','.
-										$db->db_add_param($phrase_phrases['sprache']) . ','.
+										$db->db_add_param($phrase_id, FHC_INTEGER). ','.
+										$db->db_add_param($phrase_phrases['sprache']). ','.
 										' NULL,'.
 										' NULL,'.
-										$db->db_add_param($phrase_phrases['text']) . ','.
-										$db->db_add_param($phrase_phrases['description']) . ','.
+										$db->db_add_param($phrase_phrases['text']). ','.
+										$db->db_add_param($phrase_phrases['description']). ','.
 										' now(),'.
-										$db->db_add_param($phrase_phrases['insertvon']) . ');';
+										$db->db_add_param($phrase_phrases['insertvon']). ');';
 
 					if ($db->db_query($qry_insert))
 					{
-						echo '-- Phrasentext ' . strtoupper(substr($phrase_phrases['sprache'], 0, 3)) . ': <b>' . $phrase_phrases['text'] . ' hinzugefügt</b><br>';
+						echo '-- Phrasentext '. strtoupper(substr($phrase_phrases['sprache'], 0, 3)). ': <b>'.
+							$phrase_phrases['text']. ' hinzugefügt</b><br>';
 					}
 					else
 					{
-						echo '<span class="error">Fehler: Phrasentext '  . strtoupper(substr($phrase_phrases['sprache'], 0, 3)) . ': '. $phrase_phrases['text'] . ' hinzufügen nicht möglich</span><br>';
+						echo '<span class="error">Fehler: Phrasentext '.
+							strtoupper(substr($phrase_phrases['sprache'], 0, 3)). ': '. $phrase_phrases['text'].
+							' hinzufügen nicht möglich</span><br>';
 					}
 				}
 			}

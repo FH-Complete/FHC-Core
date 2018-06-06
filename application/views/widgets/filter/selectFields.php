@@ -2,7 +2,7 @@
 
 <div>
 	<span class="filter-options-span">
-		Add field:
+		<?php echo  ucfirst($this->p->t('filter', 'feldHinzufuegen')); ?>:
 	</span>
 
 	<span>

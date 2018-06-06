@@ -14,6 +14,8 @@ class PhrasesLib
     {
 		$this->_ci =& get_instance();
 
+		$this->_phrases = null; // set the property _phrases as null by default
+
 		// CI parser
 		$this->_ci->load->library('parser');
 
@@ -77,7 +79,6 @@ class PhrasesLib
 
         return $this->_ci->PhraseModel->update($phrase_id, $data);
     }
-
 
 	/**
      * getVorlagetextByVorlage() - will load tbl_vorlagestudiengang for a spezific Template.
@@ -179,91 +180,60 @@ class PhrasesLib
     }
 
 	/**
-	 *
+	 * Retrives a phrases from the the property _phrases with the given parameters
+	 * It also replace parameters inside the phrase if they are provided
+	 * @param string $category Category name which is used to categorize the phrase.
+	 * @param string $phrase Phrase name.
+	 * @param array $parameters Array of String var(s) to be set into phrases' placeholder values (order matters).
+	 * @return string Phrase text
 	 */
 	public function t($category, $phrase, $parameters = array(), $orgeinheit_kurzbz = null, $orgform_kurzbz = null)
 	{
-		if (isset($this->_phrases) && is_array($this->_phrases))
+		// If the property _phrases is populated
+		if (is_array($this->_phrases))
 		{
+			// Loops through the _phrases property
 			for ($i = 0; $i < count($this->_phrases); $i++)
 			{
-				
-				$_phrase = $this->_phrases[$i];
-									
+				$_phrase = $this->_phrases[$i]; // single phrase
+
+				// If the single phrase match the given parameters and is not an empty string
 				if ($_phrase->category == $category
 					&& $_phrase->phrase == $phrase
 					&& $_phrase->orgeinheit_kurzbz == $orgeinheit_kurzbz
-					&& $_phrase->orgform_kurzbz== $orgform_kurzbz
-					&& (!empty($_phrase->text)))
-					{
-						if ($parameters == null) 
-							$parameters = array();
-						
-						return $this->_ci->parser->parse_string($_phrase->text, $parameters, true);	
-					}			
-			}
-			
-			//fallback 1: if phrase not found in phrases-array, try with default language
-			$default_language = DEFAULT_LANGUAGE;
-			$categories = $this->_ci->PhraseModel->getCategories();
-			
-			if (hasData($categories))
-			{
-				$categories = $categories->retval;
-				foreach($categories as $cat)
-					$all_categories[] = $cat->category;
-			}
-			
-			$phrases = $this->_ci->PhraseModel->getPhrasesByCategoryAndLanguage($all_categories, $default_language);
-			
-			if (hasData($phrases))
-			{
-				$default_phrases = $phrases->retval;
-			}
-
-			if (isset($default_phrases) && is_array($default_phrases))
-			{
-				for ($i = 0; $i < count($default_phrases); $i++)
+					&& $_phrase->orgform_kurzbz == $orgform_kurzbz
+					&& (!empty(trim($_phrase->text))))
 				{
-					$_phrase = $default_phrases[$i];
-//									var_dump($_phrase);
-									
-//									echo $phrase . "<br>";
-//									echo $_phrase->phrase . "<br><br>";
+					if (!is_array($parameters)) $parameters = array(); // if params is not an array
 
-					if ($_phrase->category == $category
-						&& $_phrase->phrase == $phrase
-						&& $_phrase->orgeinheit_kurzbz == $orgeinheit_kurzbz
-						&& $_phrase->orgform_kurzbz== $orgform_kurzbz)
-					{
-						if ($parameters == null) 
-							$parameters = array();						
-						return $this->_ci->parser->parse_string($_phrase->text, $parameters, true);	
-					}			
+					return $this->_ci->parser->parse_string($_phrase->text, $parameters, true); // parsing
 				}
 			}
-			
-			//fallback 2: if phrase not found at all, return phrasename
-			$phrase = '<< PHRASE ' . $phrase . ' >>';
-			return $this->_ci->parser->parse_string($phrase, $parameters, true);
-		}		
+		}
+
+		// If a valid phrase is not found
+		return '<< PHRASE '.$phrase.' >>';
 	}
+
 	// -----------------------------------------------------------------------------------------------------------------
 	// Private methods
 
 	/**
 	 * Extends the functionalities of the constructor of this class
 	 * This is a workaround to use more parameters in the construct since PHP doesn't support many constructors
-	 * The new accepted parameters are:
-	 * - categories: could be a string or an array of strings. These are the categories used to load phrases
-	 * - language: optional parameter must be a string. It's used to load phrases
+	 * @param (array) $params Array of categories and (optional) language.
+	 * categories:
+	 *		- could be a string or an array of strings. These are the categories used to load phrases
+	 *		- could be an array of categories, and for each category there is an array of phrases
+	 * language: optional parameter must be a string. It's used to load phrases
 	 */
 	private function _extend_construct($params)
 	{
 		// Checks if the $params is an array with at least one element
 		if (is_array($params) && count($params) > 0)
 		{
-			$parameters = $params[0]; // temporary variable
+			$parameters = $params[0];	// temporary variable
+			$isIndexArray = false;		//flag for indexed array
 
 			// If there are parameters
 			if (is_array($parameters) && count($parameters) > 0)
@@ -287,15 +257,103 @@ class PhrasesLib
 					$language = $this->_ci->PersonModel->getLanguage(getAuthUID());
 				}
 
-				// Loads phrases
-				$phrases = $this->_ci->PhraseModel->getPhrasesByCategoryAndLanguage($categories, $language);
-
-				// If there are phrases loaded then store them in the property _phrases
-				if (hasData($phrases))
-				{
-					$this->_phrases = $phrases->retval;
-				}
+				$this->_setPhrases($categories, $language);
 			}
 		}
+	}
+
+	/**
+	 * Retrieves phrases in the users language.
+	 * If a phrase is not set in the users language it will be retrieved in the default language.
+	 * Stores phrases-array in property $_phrases.
+	 * @param array $categories Could be an:
+	 *		- indexed array: string or an array of strings. These are the categories used to load phrases.
+	 *		- associative array: of categories, and for each category there is an array of phrases.
+	 * @param string User's language or default language.
+	 */
+	private function _setPhrases($categories, $language)
+	{
+		$phrases = null;
+		// Checks if categories is associative or indexed array
+		if (ctype_digit(implode('', array_keys($categories))))
+		{
+			// is indexed array -> Loads phrases
+			$isIndexArray = true;
+			$phrases = $this->_ci->PhraseModel->getPhrasesByCategoryAndLanguage($categories, $language);
+		}
+		else
+		{
+			// is assoc array -> Loads specific phrasentexte by category and phrases
+			$isIndexArray = false;
+			$phrases = $this->_ci->PhraseModel
+				->getPhrasesByCategoryAndPhrasesAndLanguage($categories, $language);
+		}
+
+		// If language is not default language and phrasentext is null -> fallback to default language
+		if ($language != DEFAULT_LANGUAGE)
+		{
+			// get array with phrasentexte in the default language
+			$defaultPhrases = null;
+			if ($isIndexArray)
+			{
+				$defaultPhrases = $this->_ci->PhraseModel
+					->getPhrasesByCategoryAndLanguage($categories, DEFAULT_LANGUAGE);
+			}
+			else
+			{
+				$defaultPhrases = $this->_ci->PhraseModel
+					->getPhrasesByCategoryAndPhrasesAndLanguage($categories, DEFAULT_LANGUAGE);
+			}
+
+			// combine array with phrasentexte in users language and in default language
+			// (default used if phrasentext in users language is null or not set)
+			if (hasData($phrases) && hasData($defaultPhrases))
+			{
+				// loop through phrases in default language
+				foreach ($defaultPhrases->retval as $defaultPhrase)
+				{
+					$found = false;	// flag for found phrase
+
+					// loop through phrases in users language
+					foreach ($phrases->retval as $phrase)
+					{
+						// if same phrase and category found and text is not null
+						// use phrase in users language
+						if ($phrase->phrase == $defaultPhrase->phrase
+							&& $phrase->category == $defaultPhrase->category
+							&& !is_null($phrase->text))
+						{
+							$found = true;
+							break;
+						}
+					}
+
+					// otherwise use phrase in default language
+					if (!$found)
+					{
+						array_push($phrases->retval, $defaultPhrase);
+					}
+				}
+			}
+			elseif (hasData($defaultPhrases))
+			{
+				$phrases = $defaultPhrases;
+			}
+		}
+
+		// If there are phrases loaded then store them in the property _phrases
+		if (hasData($phrases))
+		{
+			$this->_phrases = $phrases->retval;
+		}
+	}
+
+	/**
+	 * Returns the property _phrases JSON encoded
+	 * @return json encoded property _phrases
+	 */
+	public function getJSON()
+	{
+		return json_encode($this->_phrases);
 	}
 }

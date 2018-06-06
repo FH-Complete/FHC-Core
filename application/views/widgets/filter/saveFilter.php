@@ -2,14 +2,14 @@
 
 <div>
 	<span class="filter-options-span">
-		Filter description:
+		<?php echo  ucfirst($this->p->t('global', 'beschreibung')); ?>:
 	</span>
 	<span>
 		<input type="text" id="customFilterDescription" value="">
 	</span>
 
 	<span>
-		<input type="button" id="saveCustomFilterButton" value="Save filter">
+		<input type="button" id="saveCustomFilterButton" value="<?php echo  ucfirst($this->p->t('ui', 'speichern')); ?>">
 	</span>
 </div>
 
