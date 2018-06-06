@@ -69,17 +69,16 @@
 				</div>
 				<div class="col-lg-4">
 					<div class="headerright text-right">
-						<?php echo  $this->p->t('global', 'wirdBearbeitetVon').':' ?>
 						<?php
 						if (isset($lockedby)):
+							echo  $this->p->t('global', 'wirdBearbeitetVon') . ': ';
 							echo $lockedby;
-							?>
-							&nbsp;&nbsp;
-							<a href="../unlockPerson/<?php echo $stammdaten->person_id; ?>
-							   ?fhc_controller_id=<?php echo $fhc_controller_id; ?>">
-								<i class="fa fa-sign-out"></i>&nbsp;
-									<?php echo  ucfirst($this->p->t('ui', 'freigeben')) ?>
-							</a>
+							if (!isset($show_lock_link) || $show_lock_link === true): ?>
+								&nbsp;&nbsp;
+								<a href="../unlockPerson/<?php echo $stammdaten->person_id; ?>?fhc_controller_id=<?php echo $fhc_controller_id; ?>">
+									<i class="fa fa-sign-out"></i>&nbsp;<?php echo  ucfirst($this->p->t('ui', 'freigeben')) ?>
+								</a>
+							<?php endif; ?>
 						<?php endif; ?>
 					</div>
 				</div>

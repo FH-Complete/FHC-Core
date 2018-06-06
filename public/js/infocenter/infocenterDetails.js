@@ -6,9 +6,8 @@ const CALLED_PATH = FHC_JS_DATA_STORAGE_OBJECT.called_path;
 /**
  * javascript file for infocenterDetails page
  */
-$(document).ready(
-	function ()
-	{
+$(document).ready(function ()
+{
 		//initialise table sorter
 		Tablesort.addTablesorter("doctable", [[2, 1], [1, 0]], ["zebra"]);
 		Tablesort.addTablesorter("nachgdoctable", [[2, 0], [1, 1]], ["zebra"]);
@@ -209,8 +208,7 @@ var InfocenterDetails = {
 	{
 		FHC_AjaxClient.ajaxCallGet(
 			CALLED_PATH + "/getLastPrestudentWithZgvJson/" + encodeURIComponent(personid),
-			{
-			},
+			null,
 			{
 				successCallback: function(data, textStatus, jqXHR) {
 					if (FHC_AjaxClient.hasData(data))
@@ -319,13 +317,11 @@ var InfocenterDetails = {
 	{
 		FHC_AjaxClient.ajaxCallGet(
 			CALLED_PATH + "/getStudienjahrEnd",
-			{
-			},
+			null,
 			{
 				successCallback: function(data, textStatus, jqXHR) {
 					if (data)
 					{
-						console.log("studienjahr end executed");
 						var engdate = $.datepicker.parseDate("yy-mm-dd", data);
 						var gerdate = $.datepicker.formatDate("dd.mm.yy", engdate);
 						$("#parkdate").val(gerdate);
@@ -339,8 +335,7 @@ var InfocenterDetails = {
 	{
 		FHC_AjaxClient.ajaxCallGet(
 			CALLED_PATH + "/getParkedDate/"+encodeURIComponent(personid),
-			{
-			},
+			null,
 			{
 				successCallback: function(data, textStatus, jqXHR) {
 					InfocenterDetails._refreshParking(data);

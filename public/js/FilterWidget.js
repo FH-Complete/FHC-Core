@@ -22,7 +22,7 @@ function sideMenuHook()
 				filter_id: $(this).attr('value')
 			},
 			{
-				successCallback: refreshSideMenu // NOTE: to be checked
+				successCallback: InfocenterPersonDataset.refreshSideMenu // NOTE: to be checked
 			}
 		);
 	});
@@ -390,6 +390,9 @@ var FHC_FilterWidget = {
 					},
 					{
 						successCallback: function(data, textStatus, jqXHR) {
+							//tablesorter filter local storage clean
+							$("#filterTableDataset").trigger("filterResetSaved");
+
 							FHC_FilterWidget._resetSelectedFields();
 
 							FHC_FilterWidget.renderSelectedFields();
@@ -442,6 +445,9 @@ var FHC_FilterWidget = {
 				},
 				{
 					successCallback: function(data, textStatus, jqXHR) {
+						//tablesorter filter local storage clean
+						$("#filterTableDataset").trigger("filterResetSaved");
+
 						FHC_FilterWidget._resetSelectedFields();
 
 						FHC_FilterWidget.renderSelectedFields();
@@ -671,8 +677,18 @@ var FHC_FilterWidget = {
 			&& $('#filterTableDataset').hasClass('table-condensed'))
 		{
 			$("#filterTableDataset").tablesorter({
-				widgets: ["zebra", "filter"]
+				widgets: ["zebra", "filter"],
+				widgetOptions: {
+					filter_saveFilters : true
+				}
 			});
+
+			// reset filter storage if there is a filter id in url TODO: find better solution
+			var filter_id = FHC_AjaxClient.getUrlParameter("filter_id");
+			if (typeof filter_id !== 'undefined')
+			{
+				$("#filterTableDataset").trigger("filterResetSaved");
+			}
 
 			var config = $('#filterTableDataset')[0].config;
 			$.tablesorter.updateAll(config, true, null);
@@ -733,7 +749,7 @@ $(document).ready(function() {
 					filter_page: FHC_FilterWidget._getFilterPage()
 				},
 				{
-					successCallback: refreshSideMenu // NOTE: to be checked
+					successCallback: InfocenterPersonDataset.refreshSideMenu // NOTE: to be checked
 				}
 			);
 		}
