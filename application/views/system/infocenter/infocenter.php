@@ -10,7 +10,6 @@
 			'fontawesome' => true,
 			'sbadmintemplate' => true,
 			'tablesorter' => true,
-			'ajaxlib' => true,
 			'filterwidget' => true,
 			'phrases' => array(
 				'person' => array('vorname', 'nachname'),
@@ -33,7 +32,7 @@
 			<div class="container-fluid">
 				<div class="row">
 					<div class="col-lg-12">
-						<h3 class="page-header">Infocenter 
+						<h3 class="page-header">Infocenter
 							<?php echo ucfirst($this->p->t('global', 'uebersicht')); ?>
 						</h3>
 					</div>
