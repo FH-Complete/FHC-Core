@@ -133,6 +133,10 @@ $studiensemester->getAll();
 		margin: 0;
 		height: 24px;
 	    }
+		.ui-dialog
+		{
+			z-index: 101;
+		}
         </style>
 
     </head>
@@ -140,11 +144,11 @@ $studiensemester->getAll();
         <script>
 	    var count = 0;
 	    $(document).ajaxSend(function(event, xhr, options){
-		count++;
+		//count++;
 	     });
 
 	     $(document).ajaxComplete(function(event, xhr, settings){
-		count--;
+		//count--;
 		//Wenn alle AJAX-Request fertig sind
 		if(count===0)
 		{
