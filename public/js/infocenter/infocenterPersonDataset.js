@@ -1,13 +1,31 @@
 /**
  * Javascript file for infocenter overview page
  */
-$(document).ready(function() {
 
-	InfocenterPersonDataset.appendTableActionsHtml();
-	// setTableActions();
+/**
+* Refreshes the side menu
+* NOTE: it is called from the FilterWidget therefore must be a global function
+*/
+function refreshSideMenu()
+{
+	//
+	FHC_AjaxClient.ajaxCallGet(
+		'system/infocenter/InfoCenter/setNavigationMenuArrayJson',
+		null,
+		{
+			successCallback: function(data, textStatus, jqXHR) {
+				FHC_NavigationWidget.renderSideMenu();
+			},
+			errorCallback: function(jqXHR, textStatus, errorThrown) {
+				alert(textStatus);
+			}
+		}
+	);
+}
 
-});
-
+/**
+ *
+ */
 var InfocenterPersonDataset = {
 
 	/**
@@ -40,16 +58,16 @@ var InfocenterPersonDataset = {
 		FHC_AjaxClient.ajaxCallGet(
 			'system/Filters/rowNumber',
 			{
-				filter_page: FHC_JS_DATA_STORAGE_OBJECT.called_path + "/" + FHC_JS_DATA_STORAGE_OBJECT.called_method
+				filter_page: FHC_FilterWidget.getFilterPage()
 			},
 			{
 				successCallback: function(data, textStatus, jqXHR) {
-					if (data != null)
+					if (FHC_AjaxClient.hasData(data))
 					{
-						if (data.rowNumber != null)
-						{
-							personcount = data.rowNumber;
+						personcount = FHC_AjaxClient.getData(data);
 
+						if (personcount > 0)
+						{
 							var persontext = personcount === 1 ? "Person" : "Personen";
 							var countHtml = personcount + " " + persontext;
 
@@ -62,9 +80,9 @@ var InfocenterPersonDataset = {
 								"</div>"
 							);
 							$("#datasetActionsBottom").append("<br><br>");
-						}
 
-						InfocenterPersonDataset.setTableActions();
+							InfocenterPersonDataset.setTableActions();
+						}
 					}
 				},
 				errorCallback: function(jqXHR, textStatus, errorThrown) {
@@ -108,24 +126,15 @@ var InfocenterPersonDataset = {
 				trs.find("input[name=PersonId\\[\\]]").prop("checked", false);
 			}
 		);
-	},
-
-	/**
-	 * Refreshes the side menu
-	 */
-	refreshSideMenu: function()
-	{
-		FHC_AjaxClient.ajaxCallGet(
-			'system/infocenter/InfoCenter/setNavigationMenuArrayJson',
-			null,
-			{
-				successCallback: function(data, textStatus, jqXHR) {
-					FHC_NavigationWidget.renderSideMenu();
-				},
-				errorCallback: function(jqXHR, textStatus, errorThrown) {
-					alert(textStatus);
-				}
-			}
-		);
 	}
+
 };
+
+/**
+ * When JQuery is up
+ */
+$(document).ready(function() {
+
+	InfocenterPersonDataset.appendTableActionsHtml();
+
+});
