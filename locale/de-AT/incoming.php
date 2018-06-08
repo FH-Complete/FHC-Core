@@ -140,4 +140,14 @@ $this->phrasen['incoming/lvVollBelegt']='Es sind mittlerweile keine freien Plät
 $this->phrasen['incoming/beginnNichtInVergangenheit']='Das Beginndatum darf nicht in der Vergangenheit liegen';
 $this->phrasen['incoming/endeGroesserStart']='Das Endedatum darf nicht vor dem Beginndatum liegen';
 $this->phrasen['incoming/bitteGueltigesDatumEingeben']='Das Start- oder Endedatum muss im Format TT.MM.YYYY vorliegen';
+$this->phrasen['incoming/datenschutzHinweisRegistration']='Datenschutz-Hinweis:<br>
+Die uns von Ihnen zum Zwecke der Bewerbung bekanntgegebenen Daten werden von uns ausschließlich zur Abwicklung der Bewerbung auf der Grundlage von 
+vor- bzw vertraglichen Zwecken verarbeitet und mit der unten beschriebenen Ausnahme bei Unklarheiten betreffend die Zugangsvoraussetzungen nicht 
+an Dritte weitergegeben. Kommt es zu keinem weiteren Kontakt bzw zu keiner Aufnahme, löschen wir Ihre Daten nach drei Jahren.<br><br>
+Informationen zu Ihren Betroffenenrechten finden Sie hier: <a href=\'https://www.technikum-wien.at/information-ueber-ihre-rechte-gemaess-datenschutz-grundverordnung/\' target=\'_blank\'>https://www.technikum-wien.at/information-ueber-ihre-rechte-gemaess-datenschutz-grundverordnung/</a><br><br>
+Bei Fragen stehen wir Ihnen jederzeit unter <a href=\'mailto:datenschutz@technikum-wien.at\'>datenschutz@technikum-wien.at</a> zur Verfügung.<br><br>
+Verantwortlich für die Datenverarbeitung:<br>
+Fachhochschule Technikum Wien<br>
+Höchstädtplatz 6<br>
+1200 Wien';
 ?>

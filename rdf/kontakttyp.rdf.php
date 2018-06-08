@@ -49,6 +49,8 @@ if($kontakt->getKontakttyp())
 {
 	foreach ($kontakt->result as $row)
 	{
+		if($row->kontakttyp == 'hidden')
+			continue;
 		echo '
 	      <RDF:li>
 	         <RDF:Description  id="'.$row->kontakttyp.'"  about="'.$rdf_url.'/'.$row->kontakttyp.'" >

@@ -2,7 +2,7 @@
 
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
-class UDF extends FHC_Controller
+class UDF extends Auth_Controller
 {
 	public function __construct()
     {

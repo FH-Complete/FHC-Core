@@ -23,7 +23,7 @@
 }
 
 /*arrow toggle for panels*/
-.panel-heading .accordion-toggle:before{
+.panel-heading .accordion-toggle.arrowcollapse:before{
     /* symbol for "opening" panels */
     font-family: 'Glyphicons Halflings';  /* essential for enabling glyphicon */
     content: "\e114";    /* adjust as needed, taken from bootstrap.css */
@@ -32,7 +32,7 @@
     color: grey;         /* adjust as needed */
 }
 
-.panel-heading .accordion-toggle.collapsed:before{
+.panel-heading .accordion-toggle.collapsed.arrowcollapse:before{
     /* symbol for "collapsed" panels */
     content: "\e080";    /* adjust as needed, taken from bootstrap.css */
 }

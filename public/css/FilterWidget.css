@@ -1,0 +1,107 @@
+.filter-name-title {
+	font-family: inherit;
+	font-size: 16px;
+	line-height: 1.1;
+	color: black;
+}
+
+.panel-title {
+	font-weight: bold;
+	padding-top: 3px;
+}
+
+.filters-hidden-panel {
+	margin: 0 10px 10px 10px;
+}
+
+.filter-span-label {
+	display: inline-block;
+	width: 200px;
+	font-weight: bold;
+}
+
+.drag-and-drop-fields-area {
+	height: 50px;
+}
+
+.drag-and-drop-fields-span {
+	border: 1px solid black;
+	border-radius: 7px;
+	margin-left: 3px;
+	margin-right: 3px;
+	padding: 10px;
+	top: 10px;
+}
+
+.drag-and-drop-fields-span:hover {
+	cursor: move;
+}
+
+.remove-selected-field {
+	font-weight: bold;
+	cursor: pointer;
+}
+
+.remove-selected-field:hover {
+	text-decoration: none;
+}
+
+.hidden-control {
+	display: none !important;
+}
+
+.selection-before::before {
+	content: "";
+	position: absolute;
+	top: 0;
+	right: 100%;
+	height: 100%;
+	margin-right: 3px;
+	border-left: 2px solid #428bca;
+}
+
+.selection-after::after {
+	content: "";
+	position: absolute;
+	top: 0;
+	left: 100%;
+	height: 100%;
+	margin-left: 3px;
+	border-right: 2px solid #428bca;
+}
+
+.applied-filter-operation {
+	display: inline;
+	width: 130px;
+}
+
+.applied-filter-condition {
+	display: inline;
+	width: 400px;
+}
+
+.applied-filter-option {
+	display: inline;
+	width: 100px;
+}
+
+.remove-applied-filter {
+	padding-bottom: 3px;
+}
+
+.drop-down-fields, .drop-down-filters, .input-text-custom-filter {
+	display: inline;
+	width: 535px;
+}
+
+#appliedFilters {
+	margin-bottom: 20px;
+}
+
+#applyFilter, #saveCustomFilterButton, .remove-applied-filter {
+	font-weight: bold;
+}
+
+#applyFilter, #saveCustomFilterButton {
+	width: 100px;
+}

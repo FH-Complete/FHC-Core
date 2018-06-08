@@ -8,7 +8,7 @@ if (! defined('BASEPATH'))
  *
  */
 
-class DBTools extends FHC_Controller
+class DBTools extends Auth_Controller
 {
 	private $cli = false;
 	/**

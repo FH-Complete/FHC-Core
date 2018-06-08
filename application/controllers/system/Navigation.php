@@ -5,7 +5,7 @@ if (! defined('BASEPATH')) exit('No direct script access allowed');
 /**
  *
  */
-class Navigation extends FHC_Controller
+class Navigation extends Auth_Controller
 {
 	const SESSION_NAME = 'NAVIGATION_MENU';
 

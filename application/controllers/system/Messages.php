@@ -2,7 +2,7 @@
 
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
-class Messages extends FHC_Controller
+class Messages extends Auth_Controller
 {
 	private $uid; // contains the UID of the logged user
 
@@ -28,6 +28,13 @@ class Messages extends FHC_Controller
 		$this->load->library('WidgetLib');
 
 		$this->load->model('person/Person_model', 'PersonModel');
+
+		$this->loadPhrases(array(
+								'global',
+								'person',
+								'lehre',
+								'ui',
+								'infocenter'));
 
 		$this->_setAuthUID(); // sets property uid
 	}

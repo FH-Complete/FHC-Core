@@ -14,7 +14,7 @@
 
 if (!defined("BASEPATH")) exit("No direct script access allowed");
 
-class MailJob extends FHC_Controller
+class MailJob extends Auth_Controller
 {
 	/**
 	 * API constructor

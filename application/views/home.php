@@ -5,7 +5,9 @@ $this->load->view('templates/FHC-Header',
 		'jquery' => true,
 		'bootstrap' => true,
 		'fontawesome' => true,
-		'sbadmintemplate' => true
+		'sbadmintemplate' => true,
+		'ajaxlib' => true,
+		'navigationwidget' => true
 	)
 );
 ?>

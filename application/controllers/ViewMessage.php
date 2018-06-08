@@ -19,7 +19,7 @@ if (!defined('BASEPATH')) exit('No direct script access allowed');
  * NOTE: in this controller is not possible to include/call everything
  * that automatically call the authentication system, like the most of models or libraries
  */
-class ViewMessage extends CI_Controller
+class ViewMessage extends FHC_Controller
 {
 	/**
 	 * API constructor

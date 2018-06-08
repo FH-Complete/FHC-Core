@@ -2,7 +2,7 @@
 
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
-class Vorlage extends FHC_Controller
+class Vorlage extends Auth_Controller
 {
 	public function __construct()
     {

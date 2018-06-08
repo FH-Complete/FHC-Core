@@ -9,6 +9,9 @@
 			'fontawesome' => true,
 			'sbadmintemplate' => true,
 			'tablesorter' => true,
+			'ajaxlib' => true,
+			'filterwidget' => true,
+			'navigationwidget' => true,
 			'customCSSs' => 'public/css/sbadmin2/tablesort_bootstrap.css',
 			'customJSs' => array('public/js/bootstrapper.js', 'public/js/infocenter/infocenterPersonDataset.js')
 		)
@@ -66,7 +69,6 @@
 											INNER JOIN public.tbl_prestudent ps USING(prestudent_id)
 											JOIN public.tbl_studiengang USING(studiengang_kz)
 										WHERE pss.status_kurzbz = \'Interessent\'
-										AND pss.bestaetigtam IS NULL
 										AND ps.person_id = p.person_id
 										AND tbl_studiengang.typ in(\'b\')
 										AND studiensemester_kurzbz IN (
@@ -85,7 +87,6 @@
 											JOIN public.tbl_studiengang USING(studiengang_kz)
 										WHERE pss.status_kurzbz = \'Interessent\'
 											AND (pss.bewerbung_abgeschicktamum IS NOT NULL AND pss.bewerbung_abgeschicktamum>=\''.$NOTBEFORE.'\')
-											AND pss.bestaetigtam IS NULL
 											AND ps.person_id = p.person_id
 											AND tbl_studiengang.typ in(\'b\')
 											AND studiensemester_kurzbz IN (
@@ -104,7 +105,6 @@
 											JOIN public.tbl_studiengang USING(studiengang_kz)
 										WHERE pss.status_kurzbz = \'Interessent\'
 											AND (pss.bewerbung_abgeschicktamum IS NOT NULL AND pss.bewerbung_abgeschicktamum>=\''.$NOTBEFORE.'\')
-											AND pss.bestaetigtam IS NULL
 											AND ps.person_id = p.person_id
 											AND tbl_studiengang.typ in(\'b\')
 											AND studiensemester_kurzbz IN (
@@ -123,7 +123,6 @@
 											JOIN public.tbl_studiengang USING(studiengang_kz)
 										WHERE pss.status_kurzbz = \'Interessent\'
 											AND (pss.bewerbung_abgeschicktamum IS NOT NULL AND pss.bewerbung_abgeschicktamum>=\''.$NOTBEFORE.'\')
-											AND pss.bestaetigtam IS NULL
 											AND ps.person_id = p.person_id
 											AND tbl_studiengang.typ in(\'b\')
 											AND studiensemester_kurzbz IN (
@@ -147,11 +146,7 @@
 										WHERE
 											person_id=p.person_id
 											AND tbl_studiengang.typ in(\'b\')
-											AND \'Interessent\' = (SELECT status_kurzbz FROM public.tbl_prestudentstatus
-																	WHERE prestudent_id=tbl_prestudent.prestudent_id
-																	ORDER BY datum DESC, insertamum DESC, ext_id DESC
-																	LIMIT 1
-																	)
+
 											AND EXISTS (
 												SELECT
 													1
@@ -160,7 +155,7 @@
 												WHERE
 													prestudent_id = tbl_prestudent.prestudent_id
 													AND status_kurzbz = \'Interessent\'
-													AND (bestaetigtam IS NOT NULL AND (bewerbung_abgeschicktamum is null OR bewerbung_abgeschicktamum>=\''.$NOTBEFORE.'\'))
+													AND (bestaetigtam IS NOT NULL AND bewerbung_abgeschicktamum >= \''.$NOTBEFORE.'\')
 													AND studiensemester_kurzbz IN (
 														SELECT studiensemester_kurzbz
 														FROM public.tbl_studiensemester
@@ -168,19 +163,33 @@
 												)
 										)
 									)
-								ORDER BY "LastAction" ASC
+								ORDER BY "LastAction" DESC
 							',
-							'fhc_controller_id' => $fhc_controller_id,
+							'requiredPermissions' => 'infocenter',
 							'checkboxes' => 'PersonId',
 							'additionalColumns' => array('Details'),
-							'columnsAliases' => array('PersonID','Vorname','Nachname','GebDatum','Nation','Letzte Aktion','Letzter Bearbeiter',
-								'StSem','GesendetAm','NumAbgeschickt','Studiengänge','Sperrdatum','GesperrtVon'),
-							'formatRaw' => function($datasetRaw) {
+							'columnsAliases' => array(
+								'PersonID',
+								'Vorname',
+								'Nachname',
+								'GebDatum',
+								'Nation',
+								'Letzte Aktion',
+								'Letzter Bearbeiter',
+								'StSem',
+								'GesendetAm',
+								'NumAbgeschickt',
+								'Studiengänge',
+								'Sperrdatum',
+								'GesperrtVon'
+							),
+							'formatRow' => function($datasetRaw) {
 
 								$datasetRaw->{'Details'} = sprintf(
-									'<a href="%s%s">Details</a>',
-									base_url('index.ci.php/system/infocenter/InfoCenter/showDetails/'),
-									$datasetRaw->{'PersonId'}
+									'<a href="%s/%s?show_lock_link=0&fhc_controller_id=%s">Details</a>',
+									site_url('system/infocenter/InfoCenter/showDetails'),
+									$datasetRaw->{'PersonId'},
+									(isset($_GET['fhc_controller_id'])?$_GET['fhc_controller_id']:'')
 								);
 
 								if ($datasetRaw->{'SendDate'} == null)
@@ -237,19 +246,9 @@
 							}
 						);
 
-
-						$filterId = isset($_GET[InfoCenter::FILTER_ID]) ? $_GET[InfoCenter::FILTER_ID] : null;
-
-						if (isset($filterId) && is_numeric($filterId))
-						{
-							$filterWidgetArray[InfoCenter::FILTER_ID] = $filterId;
-						}
-						else
-						{
-							$filterWidgetArray['app'] = $APP;
-							$filterWidgetArray['datasetName'] = 'PersonActions';
-							$filterWidgetArray['filterKurzbz'] = 'InfoCenterNotSentApplicationAll';
-						}
+						$filterWidgetArray[InfoCenter::FILTER_ID] = $this->input->get(InfoCenter::FILTER_ID);
+						$filterWidgetArray['app'] = $APP;
+						$filterWidgetArray['datasetName'] = 'PersonActions';
 
 						echo $this->widgetlib->widget('FilterWidget', $filterWidgetArray);
 					?>

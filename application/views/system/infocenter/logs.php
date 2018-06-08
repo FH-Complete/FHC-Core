@@ -1,8 +1,8 @@
 <table id="logtable" class="table table-bordered table-hover">
 	<thead>
 	<tr>
-		<th>Datum</th>
-		<th>Aktivit&auml;t</th>
+		<th><?php echo  ucfirst($this->p->t('global', 'datum')) ?></th>
+		<th><?php echo  ucfirst($this->p->t('global', 'aktivitaet')) ?></th>
 		<th>User</th>
 	</tr>
 	</thead>

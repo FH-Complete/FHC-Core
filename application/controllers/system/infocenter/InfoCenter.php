@@ -6,7 +6,7 @@ if (! defined('BASEPATH')) exit('No direct script access allowed');
  * Also shows infocenter-related data for a person and its prestudents, enables document and zgv checks,
  * displays and saves Notizen for a person, logs infocenter-related actions for a person
  */
-class InfoCenter extends FHC_Controller
+class InfoCenter extends Auth_Controller
 {
 	// App and Verarbeitungstaetigkeit name for logging
 	const APP = 'infocenter';
@@ -21,12 +21,14 @@ class InfoCenter extends FHC_Controller
 		'saveformalgep' => array(
 			'logtype' => 'Action',
 			'name' => 'Document formally checked',
-			'message' => 'Document %s formally checked, set to %s'
+			'message' => 'Document %s formally checked, set to %s',
+			'success' => null
 		),
 		'savezgv' => array(
 			'logtype' => 'Action',
 			'name' => 'ZGV saved',
-			'message' => 'ZGV saved for degree program %s, prestudentid %s'
+			'message' => 'ZGV saved for degree program %s, prestudentid %s',
+			'success' => null
 		),
 		'abgewiesen' => array(
 			'logtype' => 'Processstate',
@@ -41,12 +43,14 @@ class InfoCenter extends FHC_Controller
 		'savenotiz' => array(
 			'logtype' => 'Action',
 			'name' => 'Note added',
-			'message' => 'Note with title %s was added'
+			'message' => 'Note with title %s was added',
+			'success' => null
 		),
 		'updatenotiz' => array(
 			'logtype' => 'Action',
 			'name' => 'Note updated',
-			'message' => 'Note with title %s was updated'
+			'message' => 'Note with title %s was updated',
+			'success' => null
 		)
 	);
 	private $uid; // contains the UID of the logged user
@@ -59,6 +63,7 @@ class InfoCenter extends FHC_Controller
         parent::__construct(
 			array(
 				'index' => 'infocenter:r',
+				'infocenterFreigegeben' => 'infocenter:r',
 				'showDetails' => 'infocenter:r',
 				'unlockPerson' => 'infocenter:rw',
 				'saveFormalGeprueft' => 'infocenter:rw',
@@ -89,13 +94,26 @@ class InfoCenter extends FHC_Controller
 		$this->load->library('PersonLogLib');
 		$this->load->library('WidgetLib');
 
+		$this->loadPhrases(
+			array(
+				'global',
+				'person',
+				'lehre',
+				'ui',
+				'infocenter',
+				'filter'
+			)
+		);
+
 		$this->_setAuthUID(); // sets property uid
 
 		$this->load->library('PermissionLib');
 		if(!$this->permissionlib->isBerechtigt('basis/person'))
 			show_error('You have no Permission! You need Infocenter Role');
 
-		$this->_setControllerId(); // sets the controller id
+		$this->setControllerId(); // sets the controller id
+
+		$this->fhc_controller_id = $this->getControllerId();
 
 		$this->setNavigationMenuArray(); // sets property navigationMenuArray
     }
@@ -127,46 +145,54 @@ class InfoCenter extends FHC_Controller
 
 		$personexists = $this->PersonModel->load($person_id);
 
-		if(isError($personexists))
+		if (isError($personexists))
 			show_error($personexists->retval);
 
 		if (empty($personexists->retval))
 			show_error('person does not exist!');
 
-		//mark person as locked for editing
-		$result = $this->PersonLockModel->lockPerson($person_id, $this->uid, self::APP);
+		$show_lock_link_get = $this->input->get('show_lock_link');
+		$show_lock_link = !isset($show_lock_link_get) || $show_lock_link_get === '1';
 
-		if(isError($result))
-			show_error($result->retval);
+		if ($show_lock_link)
+		{
+			//mark person as locked for editing
+			$result = $this->PersonLockModel->lockPerson($person_id, $this->uid, self::APP);
+
+			if (isError($result))
+				show_error($result->retval);
+		}
 
 		$persondata = $this->_loadPersonData($person_id);
 		$prestudentdata = $this->_loadPrestudentData($person_id);
 
-		$this->load->view(
-			'system/infocenter/infocenterDetails.php',
-			array_merge(
-				$persondata,
-				$prestudentdata
-			)
+		$data = array_merge(
+			$persondata,
+			$prestudentdata,
+			array('show_lock_link' => $show_lock_link)
 		);
+
+		$data['fhc_controller_id'] = $this->fhc_controller_id;
+
+		$this->load->view('system/infocenter/infocenterDetails.php', $data);
 	}
 
 	/**
-	 * unlocks page from edit by a person, redirects to overview filter page
+	 * Unlocks page from edit by a person, redirects to overview filter page
 	 * @param $person_id
 	 */
 	public function unlockPerson($person_id)
 	{
 		$result = $this->PersonLockModel->unlockPerson($person_id, self::APP);
 
-		if(isError($result))
+		if (isError($result))
 			show_error($result->retval);
 
-		redirect(self::URL_PREFIX);
+		redirect(self::URL_PREFIX.'?fhc_controller_id='.$this->fhc_controller_id);
 	}
 
 	/**
-	 * Saves if a document has been formal geprueft. saves current timestamp if checked as geprueft, or null if not.
+	 * Saves if a document has been formal geprueft. Saves current timestamp if checked as geprueft, or null if not.
 	 * @param $person_id
 	 */
 	public function saveFormalGeprueft($person_id)
@@ -174,37 +200,36 @@ class InfoCenter extends FHC_Controller
 		$akte_id = $this->input->post('akte_id');
 		$formalgeprueft = $this->input->post('formal_geprueft');
 
-		if (!isset($akte_id) || !isset($formalgeprueft) || !isset($person_id))
-			show_error('Parameters not set!');
+		$json = false;
 
-		$akte = $this->AkteModel->load($akte_id);
-
-		if (isError($akte))
+		if (isset($akte_id) && isset($formalgeprueft) && isset($person_id))
 		{
-			show_error($akte->retval);
+			$akte = $this->AkteModel->load($akte_id);
+
+			if (hasData($akte))
+			{
+				$timestamp = ($formalgeprueft === 'true') ? date('Y-m-d H:i:s') : null;
+				$result = $this->AkteModel->update($akte_id, array('formal_geprueft_amum' => $timestamp));
+
+				if (isSuccess($result))
+				{
+					$json = $timestamp;
+
+					$this->_log(
+						$person_id,
+						'saveformalgep',
+						array(
+							empty($akte->retval[0]->titel) ? $akte->retval[0]->bezeichnung : $akte->retval[0]->titel,
+							is_null($timestamp) ? 'NULL' : $timestamp
+						)
+					);
+				}
+			}
 		}
-
-		$timestamp = ($formalgeprueft === 'true') ? date('Y-m-d H:i:s') : null;
-		$result = $this->AkteModel->update($akte_id, array('formal_geprueft_amum' => $timestamp));
-
-		if (isError($result))
-		{
-			show_error($result->retval);
-		}
-
-		//write person log
-		$this->_log(
-			$person_id,
-			'saveformalgep',
-			array(
-				empty($akte->retval[0]->titel) ? $akte->retval[0]->bezeichnung : $akte->retval[0]->titel,
-				is_null($timestamp) ? 'NULL' : $timestamp
-			)
-		);
 
 		$this->output
 			->set_content_type('application/json')
-			->set_output(json_encode($timestamp));
+			->set_output(json_encode($json));
 	}
 
 	/**
@@ -215,20 +240,13 @@ class InfoCenter extends FHC_Controller
 	{
 		$prestudent = $this->PrestudentModel->getLastPrestudent($person_id, true);
 
-		if (isError($prestudent))
-		{
-			show_error($prestudent->retval);
-		}
-
-		$jsonoutput = count($prestudent->retval) > 0 ? $prestudent->retval[0] : null;
-
 		$this->output
 			->set_content_type('application/json')
-			->set_output(json_encode($jsonoutput));
+			->set_output(json_encode($prestudent));
 	}
 
 	/**
-	 * Gets Zugangsvoraussetzungen for a prestudents as a description text
+	 * Gets Zugangsvoraussetzungen for a prestudent as a description text and shows them in a view
 	 * @param $prestudent_id
 	 */
 	public function getZgvInfoForPrestudent($prestudent_id)
@@ -239,67 +257,73 @@ class InfoCenter extends FHC_Controller
 		$studiengangkurzbz = $prestudentdata['studiengang_kurzbz'];
 		$studiengangbezeichnung = $prestudentdata['studiengang_bezeichnung'];
 
-		$data = array('studiengang_bezeichnung' => $studiengangbezeichnung, 'studiengang_kurzbz' => $studiengangkurzbz, 'data' => null);
+		$data = array(
+					'studiengang_bezeichnung' => $studiengangbezeichnung,
+					'studiengang_kurzbz' => $studiengangkurzbz,
+					'data' => null
+				);
 
 		if (hasData($studienordnung))
 		{
 			$data['data'] = $studienordnung->retval[0]->data;
 		}
 
-		$this->load->view('system/infocenter/studiengangZgvInfo.php',
-			$data
-		);
+		$this->load->view('system/infocenter/studiengangZgvInfo.php', $data);
 	}
 
 	/**
-	 * Saves a zgv for a prestudent. includes Ort, Datum, Nation for bachelor and master.
+	 * Saves a ZGV for a prestudent, includes Ort, Datum, Nation for bachelor and master
 	 * @param $prestudent_id
 	 */
-	public function saveZgvPruefung($prestudent_id)
+	public function saveZgvPruefung()
 	{
-		// zgvdata
-		// Check for string null, in case dropdown changed to default value
-		$zgv_code = $this->input->post('zgv') === 'null' ? null : $this->input->post('zgv');
-		$zgvort = $this->input->post('zgvort');
-		$zgvdatum = $this->input->post('zgvdatum');
-		$zgvdatum = empty($zgvdatum) ? null : date_format(date_create($zgvdatum), 'Y-m-d');
-		$zgvnation_code = $this->input->post('zgvnation') === 'null' ? null : $this->input->post('zgvnation');
+		$prestudent_id = $this->input->post('prestudentid');
 
-		//zgvmasterdata
-		$zgvmas_code = $this->input->post('zgvmas') === 'null' ? null : $this->input->post('zgvmas');
-		$zgvmaort = $this->input->post('zgvmaort');
-		$zgvmadatum = $this->input->post('zgvmadatum');
-		$zgvmadatum = empty($zgvmadatum) ? null : date_format(date_create($zgvmadatum), 'Y-m-d');
-		$zgvmanation_code = $this->input->post('zgvmanation') === 'null' ? null : $this->input->post('zgvmanation');
-
-		$result = $this->PrestudentModel->update(
-			$prestudent_id,
-			array(
-				'zgv_code' => $zgv_code,
-				'zgvort' => $zgvort,
-				'zgvdatum' => $zgvdatum,
-				'zgvnation' => $zgvnation_code,
-				'zgvmas_code' => $zgvmas_code,
-				'zgvmaort' => $zgvmaort,
-				'zgvmadatum' => $zgvmadatum,
-				'zgvmanation' => $zgvmanation_code,
-				'updateamum' => date('Y-m-d H:i:s')
-			)
-		);
-
-		if (isError($result))
+		if (empty($prestudent_id))
+			$result = error('Prestudentid missing');
+		else
 		{
-			show_error($result->retval);
+			// zgvdata
+			// Check for string null, in case dropdown changed to default value
+			$zgv_code = $this->input->post('zgv') === 'null' ? null : $this->input->post('zgv');
+			$zgvort = $this->input->post('zgvort');
+			$zgvdatum = $this->input->post('zgvdatum');
+			$zgvdatum = empty($zgvdatum) ? null : date_format(date_create($zgvdatum), 'Y-m-d');
+			$zgvnation_code = $this->input->post('zgvnation') === 'null' ? null : $this->input->post('zgvnation');
+
+			//zgvmasterdata
+			$zgvmas_code = $this->input->post('zgvmas') === 'null' ? null : $this->input->post('zgvmas');
+			$zgvmaort = $this->input->post('zgvmaort');
+			$zgvmadatum = $this->input->post('zgvmadatum');
+			$zgvmadatum = empty($zgvmadatum) ? null : date_format(date_create($zgvmadatum), 'Y-m-d');
+			$zgvmanation_code = $this->input->post('zgvmanation') === 'null' ? null : $this->input->post('zgvmanation');
+
+			$result = $this->PrestudentModel->update(
+				$prestudent_id,
+				array(
+					'zgv_code' => $zgv_code,
+					'zgvort' => $zgvort,
+					'zgvdatum' => $zgvdatum,
+					'zgvnation' => $zgvnation_code,
+					'zgvmas_code' => $zgvmas_code,
+					'zgvmaort' => $zgvmaort,
+					'zgvmadatum' => $zgvmadatum,
+					'zgvmanation' => $zgvmanation_code,
+					'updateamum' => date('Y-m-d H:i:s')
+				)
+			);
+
+			if (isSuccess($result))
+			{
+				//get extended Prestudent data for logging
+				$logdata = $this->_getPersonAndStudiengangFromPrestudent($prestudent_id);
+
+				$this->_log($logdata['person_id'], 'savezgv', array($logdata['studiengang_kurzbz'], $prestudent_id));
+			}
 		}
-
-		//get extended Prestudent data for logging
-		$logdata = $this->_getPersonAndStudiengangFromPrestudent($prestudent_id);
-
-		$this->_log($logdata['person_id'], 'savezgv', array($logdata['studiengang_kurzbz'], $prestudent_id));
-
 		$this->output
 			->set_content_type('application/json')
-			->set_output(json_encode($result->retval));
+			->set_output(json_encode($result));
 	}
 
 	/**
@@ -310,6 +334,7 @@ class InfoCenter extends FHC_Controller
 	public function saveAbsage($prestudent_id)
 	{
 		$statusgrund = $this->input->post('statusgrund');
+		$this->fhc_controller_id = $this->input->post('fhc_controller_id');
 
 		$lastStatus = $this->PrestudentstatusModel->getLastStatus($prestudent_id);
 
@@ -420,7 +445,8 @@ class InfoCenter extends FHC_Controller
 
 				$result = $this->DokumentprestudentModel->setAcceptedDocuments($prestudent_id, $dokument_kurzbzs);
 
-				if (isError($result))
+				//returns null if no documents to accept
+				if ($result !== null && isError($result))
 				{
 					show_error($result->retval);
 				}
@@ -446,16 +472,14 @@ class InfoCenter extends FHC_Controller
 
 		$result = $this->NotizModel->addNotizForPerson($person_id, $titel, $text, $erledigt, $this->uid);
 
-		if (isError($result))
+		if (isSuccess($result))
 		{
-			show_error($result->retval);
+			$this->_log($person_id, 'savenotiz', array($titel));
 		}
-
-		$this->_log($person_id, 'savenotiz', array($titel));
 
 		$this->output
 			->set_content_type('application/json')
-			->set_output(json_encode($result->retval));
+			->set_output(json_encode($result));
 	}
 
 	/**
@@ -480,20 +504,15 @@ class InfoCenter extends FHC_Controller
 			)
 		);
 
-
-		$json = FALSE;
-
 		if (isSuccess($result))
 		{
-			$json = TRUE;
-
 			//set log "Notiz updated"
 			$this->_log($person_id, 'updatenotiz', array($titel));
 		}
 
 		$this->output
 			->set_content_type('application/json')
-			->set_output(json_encode($json));
+			->set_output(json_encode($result));
 	}
 
 	/**
@@ -548,6 +567,69 @@ class InfoCenter extends FHC_Controller
 			->set_header('Content-Disposition: attachment; filename="'.$akte->retval[0]->titel.'"')
 			->set_output($aktecontent->retval)
 			->_display();
+	}
+
+	/**
+	 * Gets the date until which a person is parked
+	 * @param $person_id
+	 */
+	public function getParkedDate($person_id)
+	{
+		$result = $this->personloglib->getParkedDate($person_id);
+
+		$this->output
+			->set_content_type('application/json')
+			->set_output(json_encode($result));
+	}
+
+	/**
+	 * Initializes parking of a person, i.e. a person is not expected to do any actions while parked
+	 */
+	public function park()
+	{
+		$person_id = $this->input->post('person_id');
+		$date = $this->input->post('parkdate');
+
+		$result = $this->personloglib->park($person_id, date_format(date_create($date), 'Y-m-d'), self::TAETIGKEIT, self::APP, null, $this->uid);
+
+		$this->output
+			->set_content_type('application/json')
+			->set_output(json_encode($result));
+	}
+
+	/**
+	 * Removes parking of a person
+	 */
+	public function unPark()
+	{
+		$person_id = $this->input->post('person_id');
+
+		$result = $this->personloglib->unPark($person_id);
+
+		$this->output
+			->set_content_type('application/json')
+			->set_output(json_encode($result));
+	}
+
+	/**
+	 * Gets the End date of the current Studienjahr
+	 */
+	public function getStudienjahrEnd()
+	{
+		$this->load->model('organisation/studienjahr_model', 'StudienjahrModel');
+
+		$result = $this->StudienjahrModel->getCurrStudienjahr();
+
+		$json = false;
+
+		if (hasData($result))
+		{
+			$json = $result->retval[0]->ende;
+		}
+
+		$this->output
+			->set_content_type('application/json')
+			->set_output(json_encode($json));
 	}
 
 	// -----------------------------------------------------------------------------------------------------------------
@@ -607,13 +689,13 @@ class InfoCenter extends FHC_Controller
 		$filtersarray = array(
 			'abgeschickt' => array(
 				'link' => '#',
-				'description' => 'Abgeschickt',
+				'description' => ucfirst($this->p->t('global', 'abgeschickt')),
 				'expand' => true,
 				'children' => array()
 			),
 			'nichtabgeschickt' => array(
 				'link' => '#',
-				'description' => 'Nicht abgeschickt',
+				'description' => ucfirst($this->p->t('global', 'nichtAbgeschickt')),
 				'expand' => true,
 				'children' => array()
 			)
@@ -660,14 +742,26 @@ class InfoCenter extends FHC_Controller
 		);
 	}
 
+	/**
+	 * Wrapper for setNavigationMenu, returns JSON message
+	 */
+	public function setNavigationMenuArrayJson()
+	{
+		$this->setNavigationMenuArray();
+
+		$this->output
+			->set_content_type('application/json')
+			->set_output(json_encode(success('success')));
+	}
+
 	private function _fillFilters($filters, &$tofill)
 	{
 		foreach ($filters as $filterId => $description)
 		{
-			$toPrint = "%s?%s=%s&%s=%s";
+			$toPrint = "%s?%s=%s";
 
 			$tofill['children'][] = array(
-				'link' => sprintf($toPrint, site_url('system/infocenter/InfoCenter'), 'filter_id', $filterId, 'fhc_controller_id', $this->fhc_controller_id),
+				'link' => sprintf($toPrint, site_url('system/infocenter/InfoCenter'), 'filter_id', $filterId),
 				'description' => $description
 			);
 		}
@@ -677,13 +771,13 @@ class InfoCenter extends FHC_Controller
 	{
 		foreach ($filters as $filterId => $description)
 		{
-			$toPrint = "%s?%s=%s&%s=%s";
+			$toPrint = "%s?%s=%s";
 
 			$tofill['children'][] = array(
-				'link' => sprintf($toPrint, site_url('system/infocenter/InfoCenter'), 'filter_id', $filterId, 'fhc_controller_id', $this->fhc_controller_id),
+				'link' => sprintf($toPrint, site_url('system/infocenter/InfoCenter'), 'filter_id', $filterId),
 				'description' => $description,
 				'subscriptDescription' => 'Remove',
-				'subscriptLinkClass' => 'remove-filter',
+				'subscriptLinkClass' => 'remove-custom-filter',
 				'subscriptLinkValue' => $filterId
 			);
 		}
@@ -769,7 +863,7 @@ class InfoCenter extends FHC_Controller
 			show_error($user_person->retval);
 		}
 
-		$messagelink = base_url('/index.ci.php/system/Messages/write/'.$user_person->retval[0]->person_id);
+		$messagelink = site_url('/system/Messages/write/'.$user_person->retval[0]->person_id);
 
 		$data = array (
 			'lockedby' => $lockedby,
@@ -871,7 +965,7 @@ class InfoCenter extends FHC_Controller
 		$this->PrestudentModel->addSelect('person_id');
 		$person_id = $this->PrestudentModel->load($prestudent_id)->retval[0]->person_id;
 
-		redirect(self::URL_PREFIX.'/showDetails/'.$person_id.'#'.$section);
+		redirect(self::URL_PREFIX.'/showDetails/'.$person_id.'?fhc_controller_id='.$this->fhc_controller_id.'#'.$section);
 	}
 
 	/**
@@ -905,15 +999,20 @@ class InfoCenter extends FHC_Controller
 	{
 		$logdata = $this->logparams[$logname];
 
+		$datatolog = array(
+			'name' => $logdata['name']
+		);
+
+		if (isset($logdata['message']))
+			$datatolog['message'] = vsprintf($logdata['message'], $messageparams);
+
+		if (array_key_exists('success', $logdata))
+			$datatolog['success'] = true;
+
 		$this->personloglib->log(
 			$person_id,
 			$logdata['logtype'],
-			array(
-				'name' => $logdata['name'],
-				'message' => vsprintf($logdata['message'],
-				$messageparams),
-				'success' => 'true'
-			),
+			$datatolog,
 			self::TAETIGKEIT,
 			self::APP,
 			null,
@@ -1019,7 +1118,7 @@ class InfoCenter extends FHC_Controller
 		if (!empty($receiver))
 		{
 			//Freigabeinformationmail sent from default system mail to studiengang mail(s)
-			$sent = $this->maillib->send('', $receiver, $subject, $email);
+			$sent = $this->maillib->send('', $receiver, $subject, $email, '', null, null, 'Bitte sehen Sie sich die Nachricht in HTML Sicht an, um den Inhalt vollständig darzustellen.');
 
 			if (!$sent)
 				$this->loglib->logError('Error when sending Freigabe mail');
@@ -1028,22 +1127,5 @@ class InfoCenter extends FHC_Controller
 		{
 			$this->loglib->logError('Studiengang has no mail for sending Freigabe mail');
 		}
-	}
-
-	/**
-	 * Sets the unique id for the called controller
-	 */
-	private function _setControllerId()
-	{
-		$fhc_controller_id = $this->input->get('fhc_controller_id');
-
-		if (!isset($fhc_controller_id) || empty($fhc_controller_id))
-		{
-			$fhc_controller_id = uniqid();
-			header('Location: '.$_SERVER['REQUEST_URI'].'?fhc_controller_id='.$fhc_controller_id);
-			exit;
-		}
-
-		$this->fhc_controller_id = $fhc_controller_id;
 	}
 }

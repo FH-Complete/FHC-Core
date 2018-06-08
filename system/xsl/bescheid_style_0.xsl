@@ -31,13 +31,13 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
 	<office:styles>
 		<style:default-style style:family="graphic">
 			<style:graphic-properties svg:stroke-color="#3465a4" draw:fill-color="#729fcf" fo:wrap-option="no-wrap" draw:shadow-offset-x="0.3cm" draw:shadow-offset-y="0.3cm" draw:start-line-spacing-horizontal="0.283cm" draw:start-line-spacing-vertical="0.283cm" draw:end-line-spacing-horizontal="0.283cm" draw:end-line-spacing-vertical="0.283cm" style:flow-with-text="false"/>
-			<style:paragraph-properties style:text-autospace="ideograph-alpha" style:line-break="strict" style:writing-mode="lr-tb" style:font-independent-line-spacing="false">
+			<style:paragraph-properties style:text-autospace="ideograph-alpha" style:line-break="strict" style:font-independent-line-spacing="false">
 				<style:tab-stops/>
 			</style:paragraph-properties>
 			<style:text-properties style:use-window-font-color="true" style:font-name="Liberation Serif" fo:font-size="12pt" fo:language="de" fo:country="AT" style:letter-kerning="true" style:font-name-asian="SimSun" style:font-size-asian="10.5pt" style:language-asian="zh" style:country-asian="CN" style:font-name-complex="Mangal" style:font-size-complex="12pt" style:language-complex="hi" style:country-complex="IN"/>
 		</style:default-style>
 		<style:default-style style:family="paragraph">
-			<style:paragraph-properties fo:hyphenation-ladder-count="no-limit" style:text-autospace="ideograph-alpha" style:punctuation-wrap="hanging" style:line-break="strict" style:tab-stop-distance="1.251cm" style:writing-mode="page"/>
+			<style:paragraph-properties fo:orphans="2" fo:widows="2" fo:hyphenation-ladder-count="no-limit" style:text-autospace="ideograph-alpha" style:punctuation-wrap="hanging" style:line-break="strict" style:tab-stop-distance="1.251cm" style:writing-mode="page"/>
 			<style:text-properties style:use-window-font-color="true" style:font-name="Liberation Serif" fo:font-size="12pt" fo:language="de" fo:country="AT" style:letter-kerning="true" style:font-name-asian="SimSun" style:font-size-asian="10.5pt" style:language-asian="zh" style:country-asian="CN" style:font-name-complex="Mangal" style:font-size-complex="12pt" style:language-complex="hi" style:country-complex="IN" fo:hyphenate="false" fo:hyphenation-remain-char-count="2" fo:hyphenation-push-char-count="2"/>
 		</style:default-style>
 		<style:default-style style:family="table">
@@ -65,28 +65,13 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
 			<style:paragraph-properties text:number-lines="false" text:line-number="0"/>
 			<style:text-properties style:font-size-asian="12pt" style:font-name-complex="Mangal1" style:font-family-complex="Mangal"/>
 		</style:style>
-		<style:style style:name="Quotations" style:family="paragraph" style:parent-style-name="Standard" style:class="html">
-			<style:paragraph-properties fo:margin-left="1cm" fo:margin-right="1cm" fo:margin-top="0cm" fo:margin-bottom="0.499cm" loext:contextual-spacing="false" fo:text-indent="0cm" style:auto-text-indent="false"/>
-		</style:style>
-		<style:style style:name="Title" style:family="paragraph" style:parent-style-name="Heading" style:next-style-name="Text_20_body" style:class="chapter">
-			<style:paragraph-properties fo:text-align="center" style:justify-single-word="false"/>
-			<style:text-properties fo:font-size="28pt" fo:font-weight="bold" style:font-size-asian="28pt" style:font-weight-asian="bold" style:font-size-complex="28pt" style:font-weight-complex="bold"/>
-		</style:style>
-		<style:style style:name="Subtitle" style:family="paragraph" style:parent-style-name="Heading" style:next-style-name="Text_20_body" style:class="chapter">
-			<style:paragraph-properties fo:margin-top="0.106cm" fo:margin-bottom="0.212cm" loext:contextual-spacing="false" fo:text-align="center" style:justify-single-word="false"/>
-			<style:text-properties fo:font-size="18pt" style:font-size-asian="18pt" style:font-size-complex="18pt"/>
-		</style:style>
-		<style:style style:name="Heading_20_1" style:display-name="Heading 1" style:family="paragraph" style:parent-style-name="Heading" style:next-style-name="Text_20_body" style:default-outline-level="1" style:class="text">
-			<style:paragraph-properties fo:margin-top="0.423cm" fo:margin-bottom="0.212cm" loext:contextual-spacing="false"/>
-			<style:text-properties fo:font-size="130%" fo:font-weight="bold" style:font-size-asian="130%" style:font-weight-asian="bold" style:font-size-complex="130%" style:font-weight-complex="bold"/>
-		</style:style>
-		<style:style style:name="Heading_20_2" style:display-name="Heading 2" style:family="paragraph" style:parent-style-name="Heading" style:next-style-name="Text_20_body" style:default-outline-level="2" style:class="text">
-			<style:paragraph-properties fo:margin-top="0.353cm" fo:margin-bottom="0.212cm" loext:contextual-spacing="false"/>
-			<style:text-properties fo:font-size="115%" fo:font-weight="bold" style:font-size-asian="115%" style:font-weight-asian="bold" style:font-size-complex="115%" style:font-weight-complex="bold"/>
-		</style:style>
-		<style:style style:name="Heading_20_3" style:display-name="Heading 3" style:family="paragraph" style:parent-style-name="Heading" style:next-style-name="Text_20_body" style:default-outline-level="3" style:class="text">
-			<style:paragraph-properties fo:margin-top="0.247cm" fo:margin-bottom="0.212cm" loext:contextual-spacing="false"/>
-			<style:text-properties fo:font-size="101%" fo:font-weight="bold" style:font-size-asian="101%" style:font-weight-asian="bold" style:font-size-complex="101%" style:font-weight-complex="bold"/>
+		<style:style style:name="Header" style:family="paragraph" style:parent-style-name="Standard" style:class="extra">
+			<style:paragraph-properties text:number-lines="false" text:line-number="0">
+				<style:tab-stops>
+					<style:tab-stop style:position="8.5cm" style:type="center"/>
+					<style:tab-stop style:position="17cm" style:type="right"/>
+				</style:tab-stops>
+			</style:paragraph-properties>
 		</style:style>
 		<style:style style:name="Graphics" style:family="graphic">
 			<style:graphic-properties text:anchor-type="paragraph" svg:x="0cm" svg:y="0cm" style:wrap="dynamic" style:number-wrapped-paragraphs="no-limit" style:wrap-contour="false" style:vertical-pos="top" style:vertical-rel="paragraph" style:horizontal-pos="center" style:horizontal-rel="paragraph"/>
@@ -94,52 +79,52 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
 		<text:outline-style style:name="Outline">
 			<text:outline-level-style text:level="1" style:num-format="">
 				<style:list-level-properties text:list-level-position-and-space-mode="label-alignment">
-					<style:list-level-label-alignment text:label-followed-by="listtab" text:list-tab-stop-position="0.762cm" fo:text-indent="-0.762cm" fo:margin-left="0.762cm"/>
+					<style:list-level-label-alignment text:label-followed-by="listtab"/>
 				</style:list-level-properties>
 			</text:outline-level-style>
 			<text:outline-level-style text:level="2" style:num-format="">
 				<style:list-level-properties text:list-level-position-and-space-mode="label-alignment">
-					<style:list-level-label-alignment text:label-followed-by="listtab" text:list-tab-stop-position="1.016cm" fo:text-indent="-1.016cm" fo:margin-left="1.016cm"/>
+					<style:list-level-label-alignment text:label-followed-by="listtab"/>
 				</style:list-level-properties>
 			</text:outline-level-style>
 			<text:outline-level-style text:level="3" style:num-format="">
 				<style:list-level-properties text:list-level-position-and-space-mode="label-alignment">
-					<style:list-level-label-alignment text:label-followed-by="listtab" text:list-tab-stop-position="1.27cm" fo:text-indent="-1.27cm" fo:margin-left="1.27cm"/>
+					<style:list-level-label-alignment text:label-followed-by="listtab"/>
 				</style:list-level-properties>
 			</text:outline-level-style>
 			<text:outline-level-style text:level="4" style:num-format="">
 				<style:list-level-properties text:list-level-position-and-space-mode="label-alignment">
-					<style:list-level-label-alignment text:label-followed-by="listtab" text:list-tab-stop-position="1.524cm" fo:text-indent="-1.524cm" fo:margin-left="1.524cm"/>
+					<style:list-level-label-alignment text:label-followed-by="listtab"/>
 				</style:list-level-properties>
 			</text:outline-level-style>
 			<text:outline-level-style text:level="5" style:num-format="">
 				<style:list-level-properties text:list-level-position-and-space-mode="label-alignment">
-					<style:list-level-label-alignment text:label-followed-by="listtab" text:list-tab-stop-position="1.778cm" fo:text-indent="-1.778cm" fo:margin-left="1.778cm"/>
+					<style:list-level-label-alignment text:label-followed-by="listtab"/>
 				</style:list-level-properties>
 			</text:outline-level-style>
 			<text:outline-level-style text:level="6" style:num-format="">
 				<style:list-level-properties text:list-level-position-and-space-mode="label-alignment">
-					<style:list-level-label-alignment text:label-followed-by="listtab" text:list-tab-stop-position="2.032cm" fo:text-indent="-2.032cm" fo:margin-left="2.032cm"/>
+					<style:list-level-label-alignment text:label-followed-by="listtab"/>
 				</style:list-level-properties>
 			</text:outline-level-style>
 			<text:outline-level-style text:level="7" style:num-format="">
 				<style:list-level-properties text:list-level-position-and-space-mode="label-alignment">
-					<style:list-level-label-alignment text:label-followed-by="listtab" text:list-tab-stop-position="2.286cm" fo:text-indent="-2.286cm" fo:margin-left="2.286cm"/>
+					<style:list-level-label-alignment text:label-followed-by="listtab"/>
 				</style:list-level-properties>
 			</text:outline-level-style>
 			<text:outline-level-style text:level="8" style:num-format="">
 				<style:list-level-properties text:list-level-position-and-space-mode="label-alignment">
-					<style:list-level-label-alignment text:label-followed-by="listtab" text:list-tab-stop-position="2.54cm" fo:text-indent="-2.54cm" fo:margin-left="2.54cm"/>
+					<style:list-level-label-alignment text:label-followed-by="listtab"/>
 				</style:list-level-properties>
 			</text:outline-level-style>
 			<text:outline-level-style text:level="9" style:num-format="">
 				<style:list-level-properties text:list-level-position-and-space-mode="label-alignment">
-					<style:list-level-label-alignment text:label-followed-by="listtab" text:list-tab-stop-position="2.794cm" fo:text-indent="-2.794cm" fo:margin-left="2.794cm"/>
+					<style:list-level-label-alignment text:label-followed-by="listtab"/>
 				</style:list-level-properties>
 			</text:outline-level-style>
 			<text:outline-level-style text:level="10" style:num-format="">
 				<style:list-level-properties text:list-level-position-and-space-mode="label-alignment">
-					<style:list-level-label-alignment text:label-followed-by="listtab" text:list-tab-stop-position="3.048cm" fo:text-indent="-3.048cm" fo:margin-left="3.048cm"/>
+					<style:list-level-label-alignment text:label-followed-by="listtab"/>
 				</style:list-level-properties>
 			</text:outline-level-style>
 		</text:outline-style>
@@ -148,17 +133,38 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
 		<text:linenumbering-configuration text:number-lines="false" text:offset="0.499cm" style:num-format="1" text:number-position="left" text:increment="5"/>
 	</office:styles>
 	<office:automatic-styles>
+		<style:style style:name="MP1" style:family="paragraph" style:parent-style-name="Header">
+			<style:paragraph-properties fo:line-height="120%" style:writing-mode="page"/>
+			<style:text-properties style:font-name="Arial" fo:font-size="10pt" fo:font-weight="bold" style:font-size-asian="10pt" style:font-weight-asian="bold" style:font-size-complex="10pt" style:font-weight-complex="bold"/>
+		</style:style>
+		<style:style style:name="MP2" style:family="paragraph" style:parent-style-name="Header">
+			<style:paragraph-properties fo:line-height="120%" style:writing-mode="page"/>
+			<style:text-properties style:font-name="Arial" fo:font-size="10pt" style:font-size-asian="10pt" style:font-size-complex="10pt"/>
+		</style:style>
+		<style:style style:name="Mfr1" style:family="graphic" style:parent-style-name="Graphics">
+			<style:graphic-properties fo:margin-left="0.319cm" fo:margin-right="0.319cm" style:run-through="background" style:wrap="run-through" style:number-wrapped-paragraphs="no-limit" style:vertical-pos="from-top" style:vertical-rel="paragraph" style:horizontal-pos="from-left" style:horizontal-rel="paragraph" fo:padding="0.026cm" fo:border="none" style:mirror="none" fo:clip="rect(0cm, 0cm, 0cm, 0cm)" draw:luminance="0%" draw:contrast="0%" draw:red="0%" draw:green="0%" draw:blue="0%" draw:gamma="100%" draw:color-inversion="false" draw:image-opacity="100%" draw:color-mode="standard"/>
+		</style:style>
 		<style:page-layout style:name="Mpm1">
-			<!--seitenränder hier angepasst: margin-top auf 5.5cm--> 
-			<style:page-layout-properties fo:page-width="21.001cm" fo:page-height="29.7cm" style:num-format="1" style:print-orientation="portrait" fo:margin-top="5.5cm" fo:margin-bottom="2cm" fo:margin-left="2cm" fo:margin-right="2cm" style:writing-mode="lr-tb" style:footnote-max-height="0cm">
+			<style:page-layout-properties fo:page-width="21.001cm" fo:page-height="29.7cm" style:num-format="1" style:print-orientation="portrait" fo:margin-top="1.27cm" fo:margin-bottom="1.4cm" fo:margin-left="2cm" fo:margin-right="2cm" style:writing-mode="lr-tb" style:footnote-max-height="0cm">
 				<style:footnote-sep style:width="0.018cm" style:distance-before-sep="0.101cm" style:distance-after-sep="0.101cm" style:line-style="solid" style:adjustment="left" style:rel-width="25%" style:color="#000000"/>
 			</style:page-layout-properties>
-			<style:header-style/>
+			<style:header-style>
+				<style:header-footer-properties fo:min-height="2.801cm" fo:margin-left="0cm" fo:margin-right="0cm" fo:margin-bottom="2.501cm" fo:background-color="transparent" style:dynamic-spacing="false" draw:fill="none"/>
+			</style:header-style>
 			<style:footer-style/>
 		</style:page-layout>
 	</office:automatic-styles>
 	<office:master-styles>
-		<style:master-page style:name="Standard" style:page-layout-name="Mpm1"/>
+		<style:master-page style:name="Standard" style:page-layout-name="Mpm1">
+			<style:header>
+				<text:p text:style-name="MP1">
+					<draw:frame draw:style-name="Mfr1" draw:name="Bild4" text:anchor-type="char" svg:x="13.259cm" svg:y="0cm" svg:width="4.193cm" svg:height="2.17cm" draw:z-index="0">
+						<draw:image xlink:href="Pictures/1000020100000185000000C8D52FE05B715D2B9D.png" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/>
+					</draw:frame>Kollegium der FH Technikum Wien</text:p>
+				<text:p text:style-name="MP2">Höchstädtplatz 6</text:p>
+				<text:p text:style-name="MP2">A-1200 Wien</text:p>
+			</style:header>
+		</style:master-page>
 	</office:master-styles>
 </office:document-styles>
 </xsl:template>

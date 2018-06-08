@@ -7,6 +7,8 @@ if (! defined('BASEPATH')) exit('No direct script access allowed');
  */
 class PersonLogLib
 {
+	const PARKED_LOGNAME = 'Parked';
+
 	/**
 	 * Constructor
 	 */
@@ -78,5 +80,91 @@ class PersonLogLib
 		}
 		else
 			show_error($result->retval);
+	}
+
+	/**
+	 * Parks a person, i.e. marks a person so no actions are expected for the person (e.g. as a prestudent)
+	 * Done by adding a logentry in the future
+	 * @param $person_id
+	 * @param $date
+	 * @param $taetigkeit_kurzbz
+	 * @param string $app
+	 * @param null $oe_kurzbz
+	 * @param null $user
+	 * @return insert object
+	 */
+	public function park($person_id, $date, $taetigkeit_kurzbz, $app = 'core', $oe_kurzbz = null, $user = null)
+	{
+		$logdata = array(
+			'name' => self::PARKED_LOGNAME
+		);
+
+		$data = array(
+			'person_id' => $person_id,
+			'zeitpunkt' => $date,
+			'taetigkeit_kurzbz' => $taetigkeit_kurzbz,
+			'app' => $app,
+			'oe_kurzbz' => $oe_kurzbz,
+			'logtype_kurzbz' => 'Processstate',
+			'logdata' => json_encode($logdata),
+			'insertvon' => $user
+		);
+
+		return $this->ci->PersonLogModel->insert($data);
+	}
+
+	/**
+	 * Unparks a person, i.e. removes all log entries in the future
+	 * @param $person_id
+	 * @return array with deleted logids
+	 */
+	public function unPark($person_id)
+	{
+		$result = $this->ci->PersonLogModel->getLogsInFuture($person_id);
+
+		$deleted = array();
+
+		if (hasData($result))
+		{
+			foreach ($result->retval as $log)
+			{
+				$logdata = json_decode($log->logdata);
+				if (isset($logdata->name) && $logdata->name === self::PARKED_LOGNAME)
+				{
+					$delresult = $this->ci->PersonLogModel->deleteLog($log->log_id);
+					if (isSuccess($delresult))
+						$deleted[] = $log->log_id;
+				}
+			}
+		}
+
+		return $deleted;
+	}
+
+	/**
+	 * Gets date until which a person is parked
+	 * @param $person_id
+	 * @return the date if person is parked, null otherwise
+	 */
+	public function getParkedDate($person_id)
+	{
+		$result = $this->ci->PersonLogModel->getLogsInFuture($person_id);
+
+		$parkeddate = null;
+
+		if (hasData($result))
+		{
+			foreach ($result->retval as $log)
+			{
+				$logdata = json_decode($log->logdata);
+				if (isset($logdata->name) && $logdata->name === self::PARKED_LOGNAME)
+				{
+					$parkeddate = $log->zeitpunkt;
+					break;
+				}
+			}
+		}
+
+		return $parkeddate;
 	}
 }

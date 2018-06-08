@@ -5,7 +5,7 @@ if (!defined("BASEPATH")) exit("No direct script access allowed");
 /**
  * Studiensemester controller for listing, editing and removing a Studiensemester
  */
-class Studiensemester extends FHC_Controller
+class Studiensemester extends Auth_Controller
 {
 
 	/**

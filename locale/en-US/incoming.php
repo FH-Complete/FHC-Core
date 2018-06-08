@@ -141,4 +141,12 @@ $this->phrasen['incoming/lvVollBelegt']='By now there are no vacancies for this 
 $this->phrasen['incoming/beginnNichtInVergangenheit']='The "From"-date may not be in the past';
 $this->phrasen['incoming/endeGroesserStart']='The "To"-date may not be before the start';
 $this->phrasen['incoming/bitteGueltigesDatumEingeben']='The date for the begin and end must be entered in the DD.MM.YYYY format';
+$this->phrasen['incoming/datenschutzHinweisRegistration']='Privacy information:<br>
+The data communicated to us by you for the purpose of the application will be used by us exclusively for the processing of the application on the basis of pre-contractual or contractual purposes and will not be passed on to third parties with the exception described below in case of uncertainties regarding the entry requirements. If there is no further contact or enrolment, your data will be deleted after three years.<br><br>
+Information on your data subject rights can be found here: <a href=\'https://www.technikum-wien.at/information-ueber-ihre-rechte-gemaess-datenschutz-grundverordnung/\' target=\'_blank\'>https://www.technikum-wien.at/information-ueber-ihre-rechte-gemaess-datenschutz-grundverordnung/</a><br><br>
+If you have any questions, please contact us at <a href=\'mailto:datenschutz@technikum-wien.at\'>datenschutz@technikum-wien.at</a><br><br>
+Data Processing Office:<br>
+University of Applied Sciences Technikum Wien<br>
+Höchstädtplatz 6<br>
+1200 Wien';
 ?>

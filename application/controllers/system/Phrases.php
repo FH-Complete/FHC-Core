@@ -2,7 +2,7 @@
 
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
-class Phrases extends FHC_Controller
+class Phrases extends Auth_Controller
 {
 	/**
 	 *

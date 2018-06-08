@@ -2,7 +2,7 @@
 
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
-// Retrives the URL path of the called controller + controller method
+// Retrives the URL path of the called controller + called controller method
 // NOTE: placed here because it doesn't work inside functions
 $calledPath = $this->router->directory.$this->router->class;
 $calledMethod = $this->router->method;
@@ -11,16 +11,20 @@ $calledMethod = $this->router->method;
 $title = isset($title) ? $title : null;
 $customCSSs = isset($customCSSs) ? $customCSSs : null;
 $customJSs = isset($customJSs) ? $customJSs : null;
+$phrases = isset($phrases) ? $phrases : null;
 
 // By default set the parameters to false
 $jquery = isset($jquery) ? $jquery : false;
 $jqueryui = isset($jqueryui) ? $jqueryui : false;
+$ajaxlib = isset($ajaxlib) ? $ajaxlib : false;
 $bootstrap = isset($bootstrap) ? $bootstrap : false;
 $fontawesome = isset($fontawesome) ? $fontawesome : false;
 $tablesorter = isset($tablesorter) ? $tablesorter : false;
 $tinymce = isset($tinymce) ? $tinymce : false;
 $sbadmintemplate = isset($sbadmintemplate) ? $sbadmintemplate : false;
 $addons = isset($addons) ? $addons : false;
+$filterwidget = isset($filterwidget) ? $filterwidget : false;
+$navigationwidget = isset($navigationwidget) ? $navigationwidget : false;
 
 /**
  * Print the given title of the page
@@ -74,6 +78,25 @@ function _generateJSDataStorageObject($calledPath, $calledMethod)
 			called_path: "'.$calledPath.'",
 			called_method: "'.$calledMethod.'"
 		};';
+	$toPrint .= "\n";
+	$toPrint .= '</script>';
+	$toPrint .= "\n\n";
+
+	echo $toPrint;
+}
+
+/**
+ * Generates global JS-Object to pass phrases to other javascripts
+ */
+function _generateJSPhrasesStorageObject($phrases)
+{
+	$ci =& get_instance();
+	$ci->load->library('PhrasesLib', array($phrases), 'pj');
+
+	$toPrint = "\n";
+	$toPrint .= '<script type="text/javascript">';
+	$toPrint .= "\n";
+	$toPrint .= '	var FHC_JS_PHRASES_STORAGE_OBJECT = '.$ci->pj->getJSON().';';
 	$toPrint .= "\n";
 	$toPrint .= '</script>';
 	$toPrint .= "\n\n";
@@ -141,11 +164,14 @@ function _generateAddonsJSsInclude($calledFrom)
 			// jQuery UI CSS
 			if ($jqueryui === true) _generateCSSsInclude('vendor/components/jqueryui/themes/base/jquery-ui.min.css');
 
-			// bootstrap CSS
+			// Bootstrap CSS
 			if ($bootstrap === true) _generateCSSsInclude('vendor/twbs/bootstrap/dist/css/bootstrap.min.css');
 
-			// font awesome CSS
+			// Font Awesome CSS
 			if ($fontawesome === true) _generateCSSsInclude('vendor/components/font-awesome/css/font-awesome.min.css');
+
+			// AjaxLib CSS
+			if ($ajaxlib === true) _generateCSSsInclude('public/css/AjaxLib.css');
 
 			// Table sorter CSS
 			if ($tablesorter === true)
@@ -154,22 +180,33 @@ function _generateAddonsJSsInclude($calledFrom)
 				_generateCSSsInclude('vendor/mottie/tablesorter/dist/css/jquery.tablesorter.pager.min.css');
 			}
 
-			// sb admin template CSS
+			// SB Admin 2 template CSS
 			if ($sbadmintemplate === true)
 			{
 				_generateCSSsInclude('vendor/BlackrockDigital/startbootstrap-sb-admin-2/vendor/metisMenu/metisMenu.min.css');
 				_generateCSSsInclude('vendor/BlackrockDigital/startbootstrap-sb-admin-2/dist/css/sb-admin-2.min.css');
 			}
 
+			// FilterWidget CSS
+			if ($filterwidget === true) _generateCSSsInclude('public/css/FilterWidget.css');
+
+			// NavigationWidget CSS
+			if ($navigationwidget === true) _generateCSSsInclude('public/css/NavigationWidget.css');
+
 			// Eventually required CSS
 			_generateCSSsInclude($customCSSs); // Eventually required CSS
+
 
 			// --------------------------------------------------------------------------------------------------------
 			// Javascripts
 
-			// Generates the global object to pass useful parms to the other javascripts
+			// Generates the global object to pass useful parameters to other javascripts
 			// NOTE: must be called before any other JS include
 			_generateJSDataStorageObject($calledPath, $calledMethod);
+
+			// Generates the global object to pass phrases to javascripts
+			// NOTE: must be called before including the PhrasesLib.js
+			_generateJSPhrasesStorageObject($phrases);
 
 			// JQuery V3
 			if ($jquery === true) _generateJSsInclude('vendor/components/jquery/jquery.min.js');
@@ -178,11 +215,10 @@ function _generateAddonsJSsInclude($calledFrom)
 			if ($jqueryui === true)
 			{
 				_generateJSsInclude('vendor/components/jqueryui/jquery-ui.min.js');
-				//datepicker german language file
-				_generateJSsInclude('vendor/components/jqueryui/ui/i18n/datepicker-de.js');
+				_generateJSsInclude('vendor/components/jqueryui/ui/i18n/datepicker-de.js'); // datepicker german language file
 			}
 
-			// bootstrap JS
+			// Bootstrap JS
 			if ($bootstrap === true) _generateJSsInclude('vendor/twbs/bootstrap/dist/js/bootstrap.min.js');
 
 			// Table sorter JS
@@ -193,15 +229,28 @@ function _generateAddonsJSsInclude($calledFrom)
 				_generateJSsInclude('vendor/mottie/tablesorter/dist/js/extras/jquery.tablesorter.pager.min.js');
 			}
 
-			//tinymce JS
+			// Tinymce JS
 			if($tinymce === true) _generateJSsInclude('vendor/tinymce/tinymce/tinymce.min.js') ;
 
-			// sb admin template JS
+			// SB Admin 2 template JS
 			if ($sbadmintemplate === true)
 			{
 				_generateJSsInclude('vendor/BlackrockDigital/startbootstrap-sb-admin-2/vendor/metisMenu/metisMenu.min.js');
 				_generateJSsInclude('vendor/BlackrockDigital/startbootstrap-sb-admin-2/dist/js/sb-admin-2.min.js');
 			}
+
+			// AjaxLib JS
+			// NOTE: must be called before including others JS libraries that use it
+			if ($ajaxlib === true) _generateJSsInclude('public/js/AjaxLib.js');
+
+			// PhrasesLib JS
+			if ($phrases != null) _generateJSsInclude('public/js/PhrasesLib.js');
+
+			// FilterWidget JS
+			if($filterwidget === true) _generateJSsInclude('public/js/FilterWidget.js') ;
+
+			// NavigationWidget JS
+			if($navigationwidget === true) _generateJSsInclude('public/js/NavigationWidget.js') ;
 
 			// Load addon hooks JS
 			if ($addons === true) _generateAddonsJSsInclude($calledPath.'/'.$calledMethod);

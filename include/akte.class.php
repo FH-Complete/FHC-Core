@@ -297,16 +297,21 @@ class akte extends basis_db
 	 * @param $stg_kz -> wenn gesetzt werden nur Akten angezeigt die ZUSÄTZLICH zum Studiengang abgegeben worden sind ohne Zeugnis
 	 * @param $prestudent_id -> gesetzt wenn auch stg_kz gesetzt ist um sicherzugehen, dass Akten, die er schon für seinen Studiengang abgegeben hat,
 	 * nicht mehr angezeigt werden
+	 * @param boolean $returnInhalt Wenn true, wird auch den Inhalt (base64-Code) geladen, sonst nur allgemeine Informationen
+	 * @param string $order Sortierreihenfolge im SQL
 	 * @return true wenn ok, sonst false
 	 */
-	public function getAkten($person_id, $dokument_kurzbz=null, $stg_kz = null, $prestudent_id = null)
+	public function getAkten($person_id, $dokument_kurzbz=null, $stg_kz = null, $prestudent_id = null, $returnInhalt = false, $order = 'erstelltam')
 	{
 		$qry = "SELECT
 					akte_id, person_id, dokument_kurzbz, mimetype, erstelltam, gedruckt, titel_intern, anmerkung_intern,
 					titel, bezeichnung, updateamum, insertamum, updatevon, insertvon, uid, dms_id, anmerkung, nachgereicht,
 					CASE WHEN inhalt is not null THEN true ELSE false END as inhalt_vorhanden,
-					nachgereicht_am, ausstellungsnation, formal_geprueft_amum, archiv, signiert, stud_selfservice
-				FROM public.tbl_akte WHERE person_id=".$this->db_add_param($person_id, FHC_INTEGER);
+					nachgereicht_am, ausstellungsnation, formal_geprueft_amum, archiv, signiert, stud_selfservice";
+		if($returnInhalt === true)
+			$qry.=",inhalt ";
+		
+		$qry.=" FROM public.tbl_akte WHERE person_id=".$this->db_add_param($person_id, FHC_INTEGER);
 		if($dokument_kurzbz!=null)
 			$qry.=" AND dokument_kurzbz=".$this->db_add_param($dokument_kurzbz);
 		if($stg_kz != null && $prestudent_id != null)
@@ -315,7 +320,8 @@ class akte extends basis_db
 				(SELECT dokument_kurzbz FROM public.tbl_dokumentprestudent JOIN public.tbl_dokument USING(dokument_kurzbz)
 				WHERE prestudent_id=".$this->db_add_param($prestudent_id).")";
 
-		$qry.=" ORDER BY erstelltam";
+		if ($order != '')
+			$qry.=" ORDER BY ".$order;
 
 		$this->errormsg = $qry;
 
@@ -328,7 +334,9 @@ class akte extends basis_db
 				$akten->akte_id = $row->akte_id;
 				$akten->person_id = $row->person_id;
 				$akten->dokument_kurzbz = $row->dokument_kurzbz;
-				//$akte->inhalt = $row->inhalt;
+				if($returnInhalt === true)
+					$akten->inhalt = $row->inhalt;
+				
 				$akten->inhalt_vorhanden = $this->db_parse_bool($row->inhalt_vorhanden);
 				$akten->mimetype = $row->mimetype;
 				$akten->erstelltam = $row->erstelltam;

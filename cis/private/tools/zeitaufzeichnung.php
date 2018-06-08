@@ -738,7 +738,11 @@ if($projekt->getProjekteMitarbeiter($user, true))
 		      		<td class='menubox' height='10px'>";
 		if ($p->t("dms_link/handbuchZeitaufzeichnung")!='')
 		{
-			echo '<p><a href="../../../cms/dms.php?id='.$p->t("dms_link/handbuchZeitaufzeichnung").'" target="_blank">'.$p->t("zeitaufzeichnung/handbuchZeitaufzeichnung").'</a></p>';
+			// An der FHTW wird ins Moodle verlinkt
+			if (CAMPUS_NAME == 'FH Technikum Wien')
+				echo '<p><a href="https://moodle.technikum-wien.at/course/view.php?id=6251" target="_blank">'.$p->t("zeitaufzeichnung/handbuchZeitaufzeichnung").'</a></p>';
+			else 
+				echo '<p><a href="../../../cms/dms.php?id='.$p->t("dms_link/handbuchZeitaufzeichnung").'" target="_blank">'.$p->t("zeitaufzeichnung/handbuchZeitaufzeichnung").'</a></p>';
 		}
 		if ($p->t("dms_link/fiktiveNormalarbeitszeit")!='')
 		{

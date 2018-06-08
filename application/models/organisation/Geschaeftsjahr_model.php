@@ -21,7 +21,9 @@ class Geschaeftsjahr_model extends DB_Model
 		$query = 'SELECT *
 					FROM public.tbl_geschaeftsjahr
 					WHERE start <= now()
-					AND ende >= now()';
+					AND ende >= now()
+					ORDER BY start DESC
+					LIMIT 1';
 
 		return $this->execQuery($query);
 	}

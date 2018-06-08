@@ -5,7 +5,7 @@ if (! defined('BASEPATH')) exit('No direct script access allowed');
 /**
  *
  */
-class Manager extends FHC_Controller
+class Manager extends Auth_Controller
 {
 	/**
 	 *

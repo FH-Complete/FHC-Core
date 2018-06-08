@@ -680,12 +680,6 @@ foreach($addon_obj->result as $addon)
                label     = "&menu-dokumente-bescheid_deutsch.label;"
                command   =  "menu-dokumente-bescheid_deutsch:command"
                accesskey = "&menu-dokumente-bescheid_deutsch.accesskey;"/>
-			<menuitem
-               id        =  "menu-dokumente-bescheid_englisch"
-               key       =  "menu-dokumente-bescheid_englisch:key"
-               label     = "&menu-dokumente-bescheid_englisch.label;"
-               command   =  "menu-dokumente-bescheid_englisch:command"
-               accesskey = "&menu-dokumente-bescheid_englisch.accesskey;"/>
             <menuitem
                id        =  "menu-dokumente-diplsupplement"
                key       =  "menu-dokumente-diplsupplement:key"

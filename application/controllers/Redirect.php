@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Redirect extends CI_Controller
+class Redirect extends FHC_Controller
 {
 	/**
 	 * API constructor

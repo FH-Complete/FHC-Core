@@ -3,572 +3,253 @@
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
 /**
- *
+ * This controller operates between (interface) the JS (GUI) and the FiltersLib (back-end)
+ * Provides data to the ajax get calls about the filter
+ * Accepts ajax post calls to change the filter data
+ * This controller works with JSON calls on the HTTP GET or POST and the output is always JSON
  */
-class Filters extends CI_Controller
+class Filters extends FHC_Controller
 {
-	const SESSION_NAME = 'FHC_FILTER_WIDGET';
-
-	const SELECTED_FIELDS = 'selectedFields';
-	const SELECTED_FILTERS = 'selectedFilters';
-	const ACTIVE_FILTERS = 'activeFilters';
-	const ACTIVE_FILTERS_OPTION = 'activeFiltersOption';
-	const ACTIVE_FILTERS_OPERATION = 'activeFiltersOperation';
-	const FILTER_NAME = 'filterName';
+	const FILTER_PAGE_PARAM = 'filter_page';
 
 	/**
-	 *
+	 * Calls the parent's constructor and loads the FiltersLib
 	 */
 	public function __construct()
     {
         parent::__construct();
 
-        // Load session library
-        $this->load->library('session');
-		// Load permission library
-		$this->load->library('PermissionLib');
+		// Loads the FiltersLib with HTTP GET/POST parameters
+		$this->_loadFiltersLib();
 
-		$this->load->model('system/Filters_model', 'FiltersModel');
-		$this->load->model('person/Benutzer_model', 'BenutzerModel');
-
+		// Checks if the caller is allow to read this data
 		$this->_isAllowed();
     }
 
+	//------------------------------------------------------------------------------------------------------------------
+	// Public methods
+
 	/**
-	 *
+	 * Retrives data about the current filter from the session and will be written on the output in JSON format
 	 */
-	public function tableDataset()
+	public function getFilter()
 	{
-		$json = new stdClass();
-
-		$session = $this->_readSession($this->input->get('fhc_controller_id'));
-
-		$json->selectedFields = $session['selectedFields'];
-		$json->columnsAliases = $session['columnsAliases'];
-		$json->additionalColumns = $session['additionalColumns'];
-		$json->checkboxes = $session['checkboxes'];
-		$json->dataset = $session['dataset'];
-
-		$this->output->set_content_type('application/json')->set_output(json_encode($json));
+		$this->outputJsonSuccess($this->filterslib->getSession());
 	}
 
 	/**
-	 *
-	 */
-	public function selectFields()
-	{
-		$json = new stdClass();
-
-		$session = $this->_readSession($this->input->get('fhc_controller_id'));
-
-		$json->allSelectedFields = $session['allSelectedFields'];
-		$json->allColumnsAliases = $session['allColumnsAliases'];
-
-		$json->selectedFields = $session['selectedFields'];
-		$json->columnsAliases = $session['columnsAliases'];
-
-		$this->output->set_content_type('application/json')->set_output(json_encode($json));
-	}
-
-	/**
-	 *
-	 */
-	public function sortSelectedFields()
-	{
-		$selectedFieldsLst = $this->input->post('selectedFieldsLst');
-		$fhc_controller_id = $this->input->post('fhc_controller_id');
-
-		$json = new stdClass();
-
-		$session = $this->_readSession($fhc_controller_id);
-
-		$allSelectedFields = $session['allSelectedFields'];
-		$allColumnsAliases = $session['allColumnsAliases'];
-
-		$json->selectedFields = $session['selectedFields'];
-		$json->columnsAliases = $session['columnsAliases'];
-
-		if (isset($selectedFieldsLst) && is_array($selectedFieldsLst))
-		{
-			$json->selectedFields = $selectedFieldsLst;
-			$json->columnsAliases = array();
-
-			for ($i = 0; $i < count($json->selectedFields); $i++)
-			{
-				$pos = array_search($json->selectedFields[$i], $allSelectedFields);
-
-				$json->columnsAliases[$i] = $json->selectedFields[$i];
-
-				if ($pos !== false)
-				{
-					if ($allColumnsAliases != null && is_array($allColumnsAliases))
-					{
-						$json->columnsAliases[$i] = $allColumnsAliases[$pos];
-					}
-				}
-			}
-		}
-
-		$_SESSION[self::SESSION_NAME][$fhc_controller_id]['selectedFields'] = $json->selectedFields;
-		$_SESSION[self::SESSION_NAME][$fhc_controller_id]['columnsAliases'] = $json->columnsAliases;
-
-		$this->output->set_content_type('application/json')->set_output(json_encode($json));
-	}
-
-	/**
-	 *
-	 */
-	public function selectFilters()
-	{
-		$json = new stdClass();
-
-		$session = $this->_readSession($this->input->get('fhc_controller_id'));
-
-		$json->allSelectedFields = $session['allSelectedFields'];
-		$json->allColumnsAliases = $session['allColumnsAliases'];
-
-		$json->selectedFilters = $session['selectedFilters'];
-		$json->selectedFiltersAliases = array();
-		$json->selectedFiltersMetaData = array();
-
-		$json->selectedFiltersActiveFilters = array();
-		$json->selectedFiltersActiveFiltersOperation = array();
-		$json->selectedFiltersActiveFiltersOption = array();
-
-		$metaData = $session['metaData'];
-		$activeFilters = $session['activeFilters'];
-		$activeFiltersOperation = $session['activeFiltersOperation'];
-		$activeFiltersOption = $session['activeFiltersOption'];
-
-		for ($i = 0; $i < count($json->selectedFilters); $i++)
-		{
-			$pos = array_search($json->selectedFilters[$i], $json->allSelectedFields);
-
-			if ($pos !== false)
-			{
-				$json->selectedFiltersAliases[$i] = $json->selectedFilters[$i];
-				if ($json->allColumnsAliases != null && is_array($json->allColumnsAliases))
-				{
-					$json->selectedFiltersAliases[$i] = $json->allColumnsAliases[$pos];
-				}
-
-				$json->selectedFiltersMetaData[] = $metaData[$pos];
-
-				if (isset($activeFilters[$json->selectedFilters[$i]]))
-				{
-					$json->selectedFiltersActiveFilters[] = $activeFilters[$json->selectedFilters[$i]];
-				}
-
-				if (isset($activeFiltersOperation[$json->selectedFilters[$i]]))
-				{
-					$json->selectedFiltersActiveFiltersOperation[] = $activeFiltersOperation[$json->selectedFilters[$i]];
-				}
-
-				if (isset($activeFiltersOption[$json->selectedFilters[$i]]))
-				{
-					$json->selectedFiltersActiveFiltersOption[] = $activeFiltersOption[$json->selectedFilters[$i]];
-				}
-			}
-		}
-
-		$this->output->set_content_type('application/json')->set_output(json_encode($json));
-	}
-
-	/**
-	 *
-	 */
-	public function saveFilter()
-	{
-		$this->_saveFilter($this->input->post("customFilterDescription"), $this->input->post("fhc_controller_id"));
-
-		$this->output->set_content_type('application/json')->set_output(json_encode('Tutto bene!!!'));
-	}
-
-	/**
-	 *
-	 */
-	private function _saveFilter($customFilterDescription, $fhc_controller_id)
-	{
-		$objToBeSaved = new stdClass();
-
-		$filterSessionArray = $this->_readSession($fhc_controller_id);
-
-		$objToBeSaved->name = $customFilterDescription;
-
-		if (isset($filterSessionArray[self::SELECTED_FIELDS]))
-		{
-			$selectedFields = $filterSessionArray[self::SELECTED_FIELDS];
-			$objToBeSaved->columns = array();
-
-			for ($selectedFieldsCounter = 0; $selectedFieldsCounter < count($selectedFields); $selectedFieldsCounter++)
-			{
-				$objToBeSaved->columns[$selectedFieldsCounter] = new stdClass();
-				$objToBeSaved->columns[$selectedFieldsCounter]->name = $selectedFields[$selectedFieldsCounter];
-			}
-		}
-
-		if (isset($filterSessionArray[self::SELECTED_FILTERS]))
-		{
-			$selectedFilters = $filterSessionArray[self::SELECTED_FILTERS];
-			$objToBeSaved->filters = array();
-
-			for ($selectedFiltersCounter = 0; $selectedFiltersCounter < count($selectedFilters); $selectedFiltersCounter++)
-			{
-				$objToBeSaved->filters[$selectedFiltersCounter] = new stdClass();
-				$objToBeSaved->filters[$selectedFiltersCounter]->name = $selectedFilters[$selectedFiltersCounter];
-
-				if (isset($filterSessionArray[self::ACTIVE_FILTERS])
-					&& isset($filterSessionArray[self::ACTIVE_FILTERS][$selectedFilters[$selectedFiltersCounter]]))
-				{
-					$objToBeSaved->filters[$selectedFiltersCounter]->condition = $filterSessionArray[self::ACTIVE_FILTERS][$selectedFilters[$selectedFiltersCounter]];
-				}
-
-				if (isset($filterSessionArray[self::ACTIVE_FILTERS_OPERATION])
-					&& isset($filterSessionArray[self::ACTIVE_FILTERS_OPERATION][$selectedFilters[$selectedFiltersCounter]]))
-				{
-					$objToBeSaved->filters[$selectedFiltersCounter]->operation = $filterSessionArray[self::ACTIVE_FILTERS_OPERATION][$selectedFilters[$selectedFiltersCounter]];
-				}
-
-				if (isset($filterSessionArray[self::ACTIVE_FILTERS_OPTION])
-					&& isset($filterSessionArray[self::ACTIVE_FILTERS_OPTION][$selectedFilters[$selectedFiltersCounter]]))
-				{
-					$objToBeSaved->filters[$selectedFiltersCounter]->option = $filterSessionArray[self::ACTIVE_FILTERS_OPTION][$selectedFilters[$selectedFiltersCounter]];
-				}
-			}
-		}
-
-		$desc = $customFilterDescription;
-		$descPGArray = '{"'.$desc.'", "'.$desc.'", "'.$desc.'", "'.$desc.'"}';
-
-		$resultBenutzer = $this->BenutzerModel->load(getAuthUID());
-		$personId = $resultBenutzer->retval[0]->person_id;
-
-		$result = $this->FiltersModel->loadWhere(array(
-			'app' => $_SESSION[self::SESSION_NAME][$fhc_controller_id]['app'],
-			'dataset_name' => $_SESSION[self::SESSION_NAME][$fhc_controller_id]['datasetName'],
-			'description' => $descPGArray,
-			'person_id' => $personId
-		));
-
-		if (hasData($result))
-		{
-			$this->FiltersModel->update(
-				array(
-					'app' => $_SESSION[self::SESSION_NAME][$fhc_controller_id]['app'],
-					'dataset_name' => $_SESSION[self::SESSION_NAME][$fhc_controller_id]['datasetName'],
-					'description' => $descPGArray,
-					'person_id' => $personId
-				),
-				array(
-					'filter' => json_encode($objToBeSaved)
-				)
-			);
-		}
-		else
-		{
-			$this->FiltersModel->insert(array(
-				'app' => $_SESSION[self::SESSION_NAME][$fhc_controller_id]['app'],
-				'dataset_name' => $_SESSION[self::SESSION_NAME][$fhc_controller_id]['datasetName'],
-				'filter_kurzbz' => uniqid($personId, true),
-				'person_id' => $personId,
-				'description' => $descPGArray,
-				'sort' => null,
-				'default_filter' => false,
-				'filter' => json_encode($objToBeSaved),
-				'oe_kurzbz' => null
-			));
-		}
-	}
-
-	/**
-	 *
-	 */
-	public function deleteCustomFilter()
-	{
-		$filter_id = $this->input->post('filter_id');
-		$fhc_controller_id = $this->input->post('fhc_controller_id');
-
-		if (is_numeric($filter_id))
-		{
-			$this->FiltersModel->deleteCustomFilter($filter_id);
-
-			$this->output->set_content_type('application/json')->set_output(json_encode('Removed'));
-		}
-	}
-
-	/**
-	 *
-	 */
-	public function removeSelectedFields()
-	{
-		$fieldName = $this->input->post('fieldName');
-		$fhc_controller_id = $this->input->post('fhc_controller_id');
-
-		$session = $this->_readSession($fhc_controller_id);
-
-		$allSelectedFields = $session['allSelectedFields'];
-		$allColumnsAliases = $session['allColumnsAliases'];
-
-		$selectedFields = $session['selectedFields'];
-		$columnsAliases = $session['columnsAliases'];
-
-		if (($pos = array_search($fieldName, $selectedFields)) !== false)
-		{
-			array_splice($selectedFields, $pos, 1);
-
-			if ($columnsAliases != null && is_array($columnsAliases))
-			{
-				array_splice($columnsAliases, $pos, 1);
-			}
-		}
-
-		$_SESSION[self::SESSION_NAME][$fhc_controller_id]['selectedFields'] = $selectedFields;
-		$_SESSION[self::SESSION_NAME][$fhc_controller_id]['columnsAliases'] = $columnsAliases;
-
-		$json = new stdClass();
-
-		$json->allSelectedFields = $allSelectedFields;
-		$json->allColumnsAliases = $allColumnsAliases;
-		$json->selectedFields = $selectedFields;
-		$json->columnsAliases = $columnsAliases;
-
-		$this->output->set_content_type('application/json')->set_output(json_encode($json));
-	}
-
-	/**
-	 *
-	 */
-	public function removeSelectedFilters()
-	{
-		$fieldName = $this->input->post('fieldName');
-		$fhc_controller_id = $this->input->post('fhc_controller_id');
-
-		$session = $this->_readSession($fhc_controller_id);
-
-		$selectedFilters = $session['selectedFilters'];
-		$selectedFiltersActiveFilters = $session['activeFilters'];
-		$selectedFiltersActiveFiltersOperation = $session['activeFiltersOperation'];
-		$selectedFiltersActiveFiltersOption = $session['activeFiltersOption'];
-
-		if (($pos = array_search($fieldName, $selectedFilters)) !== false)
-		{
-			array_splice($selectedFilters, $pos, 1);
-			array_splice($selectedFiltersActiveFilters, $pos, 1);
-			array_splice($selectedFiltersActiveFiltersOperation, $pos, 1);
-			array_splice($selectedFiltersActiveFiltersOption, $pos, 1);
-		}
-
-		$_SESSION[self::SESSION_NAME][$fhc_controller_id]['selectedFilters'] = $selectedFilters;
-		$_SESSION[self::SESSION_NAME][$fhc_controller_id]['activeFilters'] = $selectedFiltersActiveFilters;
-		$_SESSION[self::SESSION_NAME][$fhc_controller_id]['activeFiltersOperation'] = $selectedFiltersActiveFiltersOperation;
-		$_SESSION[self::SESSION_NAME][$fhc_controller_id]['activeFiltersOption'] = $selectedFiltersActiveFiltersOption;
-
-		$json = new stdClass();
-
-		$json->selectedFilters = $selectedFilters;
-		$json->selectedFiltersActiveFilters = $selectedFiltersActiveFilters;
-		$json->selectedFiltersActiveFiltersOperation = $selectedFiltersActiveFiltersOperation;
-		$json->selectedFiltersActiveFiltersOption = $selectedFiltersActiveFiltersOption;
-
-		$this->output->set_content_type('application/json')->set_output(json_encode($json));
-	}
-
-	/**
-	 *
-	 */
-	public function addSelectedFields()
-	{
-		$fieldName = $this->input->post('fieldName');
-		$fhc_controller_id = $this->input->post('fhc_controller_id');
-
-		$session = $this->_readSession($fhc_controller_id);
-
-		$allSelectedFields = $session['allSelectedFields'];
-		$allColumnsAliases = $session['allColumnsAliases'];
-
-		$selectedFields = $session['selectedFields'];
-		$columnsAliases = $session['columnsAliases'];
-
-		if (($pos = array_search($fieldName, $allSelectedFields)) !== false
-			&& array_search($fieldName, $selectedFields) === false)
-		{
-			array_push($selectedFields, $fieldName);
-
-			if ($columnsAliases != null && is_array($columnsAliases))
-			{
-				array_push($columnsAliases, $allColumnsAliases[$pos]);
-			}
-		}
-
-		$_SESSION[self::SESSION_NAME][$fhc_controller_id]['selectedFields'] = $selectedFields;
-		$_SESSION[self::SESSION_NAME][$fhc_controller_id]['columnsAliases'] = $columnsAliases;
-
-		$json = new stdClass();
-
-		$json->allSelectedFields = $allSelectedFields;
-		$json->allColumnsAliases = $allColumnsAliases;
-		$json->selectedFields = $selectedFields;
-		$json->columnsAliases = $columnsAliases;
-
-		$this->output->set_content_type('application/json')->set_output(json_encode($json));
-	}
-
-	/**
-	 *
-	 */
-	public function addSelectedFilters()
-	{
-		$fieldName = $this->input->post('fieldName');
-		$fhc_controller_id = $this->input->post('fhc_controller_id');
-
-		$session = $this->_readSession($fhc_controller_id);
-
-		$selectedFilters = $session['selectedFilters'];
-		$selectedFiltersActiveFilters = $session['activeFilters'];
-		$selectedFiltersActiveFiltersOperation = $session['activeFiltersOperation'];
-		$selectedFiltersActiveFiltersOption = $session['activeFiltersOption'];
-
-		if (!in_array($fieldName, $selectedFilters))
-		{
-			array_push($selectedFilters, $fieldName);
-			$selectedFiltersActiveFilters[$fieldName] = "";
-			$selectedFiltersActiveFiltersOperation[$fieldName] = "";
-			$selectedFiltersActiveFiltersOption[$fieldName] = "";
-		}
-
-		$_SESSION[self::SESSION_NAME][$fhc_controller_id]['selectedFilters'] = $selectedFilters;
-		$_SESSION[self::SESSION_NAME][$fhc_controller_id]['activeFilters'] = $selectedFiltersActiveFilters;
-		$_SESSION[self::SESSION_NAME][$fhc_controller_id]['activeFiltersOperation'] = $selectedFiltersActiveFiltersOperation;
-		$_SESSION[self::SESSION_NAME][$fhc_controller_id]['activeFiltersOption'] = $selectedFiltersActiveFiltersOption;
-
-		$json = new stdClass();
-
-		$json->selectedFilters = $selectedFilters;
-		$json->selectedFiltersActiveFilters = $selectedFiltersActiveFilters;
-		$json->selectedFiltersActiveFiltersOperation = $selectedFiltersActiveFiltersOperation;
-		$json->selectedFiltersActiveFiltersOption = $selectedFiltersActiveFiltersOption;
-
-		$this->output->set_content_type('application/json')->set_output(json_encode($json));
-	}
-
-	/**
-	 *
-	 */
-	public function applyFilter()
-	{
-		$fieldNames = $this->input->post('filterNames');
-		$filterOperations = $this->input->post('filterOperations');
-		$filterOperationValues = $this->input->post('filterOperationValues');
-		$filterOptions = $this->input->post('filterOptions');
-		$fhc_controller_id = $this->input->post('fhc_controller_id');
-
-		$session = $this->_readSession($fhc_controller_id);
-
-		if ($fieldNames == null) $fieldNames = array();
-		if ($filterOperationValues == null) $filterOperationValues = array();
-		if ($filterOperations == null) $filterOperations = array();
-		if ($filterOptions == null) $filterOptions = array();
-
-		$activeFilters = array_combine($fieldNames, $filterOperationValues);
-		$activeFiltersOperation = array_combine($fieldNames, $filterOperations);
-		$activeFiltersOption = array_combine($fieldNames, $filterOptions);
-
-		$_SESSION[self::SESSION_NAME][$fhc_controller_id]['activeFilters'] = $activeFilters;
-		$_SESSION[self::SESSION_NAME][$fhc_controller_id]['activeFiltersOperation'] = $activeFiltersOperation;
-		$_SESSION[self::SESSION_NAME][$fhc_controller_id]['activeFiltersOption'] = $activeFiltersOption;
-
-		$json = new stdClass();
-
-		$json->fieldNames = $fieldNames;
-		$json->activeFilters = $activeFilters;
-		$json->activeFiltersOperation = $activeFiltersOperation;
-		$json->activeFiltersOption = $activeFiltersOption;
-
-		$this->output->set_content_type('application/json')->set_output(json_encode($json));
-	}
-
-	/**
-	 *
+	 * Retrives the number of records present in the current dataset and will be written on the output in JSON format
 	 */
 	public function rowNumber()
 	{
-		$json = new stdClass();
+		$rowNumber = 0;
+		$dataset = $this->filterslib->getElementSession(FiltersLib::SESSION_DATASET);
 
-		$session = $this->_readSession($this->input->get('fhc_controller_id'));
-
-		$dataset = $session['dataset'];
-
-		if (is_array($dataset))
+		if (isset($dataset) && is_array($dataset))
 		{
-			$json->rowNumber = count($dataset);
+			$rowNumber = count($dataset);
 		}
 
-		$this->output->set_content_type('application/json')->set_output(json_encode($json));
+		$this->outputJsonSuccess($rowNumber);
 	}
+
+	/**
+	 * Change the sort of the selected fields of the current filter and
+	 * its data will be written on the output in JSON format
+	 */
+	public function sortSelectedFields()
+	{
+		$selectedFields = $this->input->post('selectedFields');
+
+		if ($this->filterslib->sortSelectedFields($selectedFields) == true)
+		{
+			$this->getFilter();
+		}
+		else
+		{
+			$this->outputJsonError('Wrong parameter');
+		}
+	}
+
+	/**
+	 * Remove a selected field from the current filter and
+	 * its data will be written on the output in JSON format
+	 */
+	public function removeSelectedField()
+	{
+		$selectedField = $this->input->post('selectedField');
+
+		if ($this->filterslib->removeSelectedField($selectedField) == true)
+		{
+			$this->getFilter();
+		}
+		else
+		{
+			$this->outputJsonError('Wrong parameter');
+		}
+	}
+
+	/**
+	 * Add a field to the current filter and its data will be written on the output in JSON format
+	 */
+	public function addSelectedField()
+	{
+		$selectedField = $this->input->post('selectedField');
+
+		if ($this->filterslib->addSelectedField($selectedField) == true)
+		{
+			$this->getFilter();
+		}
+		else
+		{
+			$this->outputJsonError('Wrong parameter');
+		}
+	}
+
+	/**
+	 * Remove an applied filter (SQL where condition) from the current filter
+	 */
+	public function removeAppliedFilter()
+	{
+		$appliedFilter = $this->input->post('appliedFilter');
+
+		if ($this->filterslib->removeAppliedFilter($appliedFilter) == true)
+		{
+			$this->outputJsonSuccess('Removed');
+		}
+		else
+		{
+			$this->outputJsonError('Wrong parameter');
+		}
+	}
+
+	/**
+	 * Apply all the applied filters (SQL where conditions) to the current filter
+	 */
+	public function applyFilters()
+	{
+		$appliedFilters = $this->input->post('appliedFilters');
+		$appliedFiltersOperations = $this->input->post('appliedFiltersOperations');
+		$appliedFiltersConditions = $this->input->post('appliedFiltersConditions');
+		$appliedFiltersOptions = $this->input->post('appliedFiltersOptions');
+
+		if ($this->filterslib->applyFilters(
+				$appliedFilters,
+				$appliedFiltersOperations,
+				$appliedFiltersConditions,
+				$appliedFiltersOptions
+			) == true)
+		{
+			$this->outputJsonSuccess('Applied');
+		}
+		else
+		{
+			$this->outputJsonError('Wrong parameter');
+		}
+	}
+
+	/**
+	 * Add a filter (SQL where clause) to be applied to the current filter
+	 */
+	public function addFilter()
+	{
+		$filter = $this->input->post('filter');
+
+		if ($this->filterslib->addFilter($filter) == true)
+		{
+			$this->getFilter();
+		}
+		else
+		{
+			$this->outputJsonError('Wrong parameter');
+		}
+	}
+
+	/**
+	 * Save the current filter as a custom filter for this user with the given description
+	 */
+	public function saveCustomFilter()
+	{
+		$customFilterDescription = $this->input->post('customFilterDescription');
+
+		if ($this->filterslib->saveCustomFilter($customFilterDescription) == true)
+		{
+			$this->outputJsonSuccess('Saved');
+		}
+		else
+		{
+			$this->outputJsonError('Wrong parameter');
+		}
+	}
+
+	/**
+	 * Remove a custom filter by its filter_id
+	 */
+	public function removeCustomFilter()
+	{
+		$filter_id = $this->input->post('filter_id');
+
+		if ($this->filterslib->removeCustomFilter($filter_id) == true)
+		{
+			$this->outputJsonSuccess('Removed');
+		}
+		else
+		{
+			$this->outputJsonError('Wrong parameter');
+		}
+	}
+
+	//------------------------------------------------------------------------------------------------------------------
+	// Private methods
 
 	/**
 	 * Checks if the user is allowed to use this filter
 	 */
 	private function _isAllowed()
 	{
-		$isAllowed = false;
-
-		$session = $this->_readSession($this->input->get('fhc_controller_id'));
-
-		if (isset($session['requiredPermissions']))
+		if (!$this->filterslib->isAllowed())
 		{
-			$tmpRequiredPermissions = $session['requiredPermissions'];
-			if (!is_array($tmpRequiredPermissions))
-			{
-				$tmpRequiredPermissions = array($session['requiredPermissions']);
-			}
-
-			for ($i = 0; $i < count($tmpRequiredPermissions); $i++)
-			{
-				$requiredPermissions = array(
-					'filters' => $tmpRequiredPermissions[$i].':rw'
-				);
-
-				if ($this->permissionlib->isEntitled($requiredPermissions, 'filters'))
-				{
-					$isAllowed = true;
-					break;
-				}
-			}
-		}
-
-		if (!$isAllowed)
-		{
-			header('Content-Type: application/json');
-
-			echo json_encode('You are not allowed to access to this content');
-
-			exit(1);
+			$this->_terminateWithJsonError('You are not allowed to access to this content');
 		}
 	}
 
 	/**
-	 *
+	 * Loads the FiltersLib with the FILTER_PAGE_PARAM parameter
+	 * If the parameter FILTER_PAGE_PARAM is not given then the execution of the controller is terminated and
+	 * an error message is printed
 	 */
-	private function _readSession($fhc_controller_id)
+	private function _loadFiltersLib()
 	{
-		if (isset($_SESSION[self::SESSION_NAME]) && isset($_SESSION[self::SESSION_NAME][$fhc_controller_id]))
-			return $_SESSION[self::SESSION_NAME][$fhc_controller_id];
+		// If the parameter FILTER_PAGE_PARAM is present in the HTTP GET or POST
+		if (isset($_GET[self::FILTER_PAGE_PARAM]) || isset($_POST[self::FILTER_PAGE_PARAM]))
+		{
+			// If it is present in the HTTP GET
+			if (isset($_GET[self::FILTER_PAGE_PARAM]))
+			{
+				$filterPage = $this->input->get(self::FILTER_PAGE_PARAM); // is retrived from the HTTP GET
+			}
+			elseif (isset($_POST[self::FILTER_PAGE_PARAM])) // Else if it is present in the HTTP POST
+			{
+				$filterPage = $this->input->post(self::FILTER_PAGE_PARAM); // is retrived from the HTTP POST
+			}
 
-		return array();
+			// Loads the FiltersLib that contains all the used logic
+			$this->load->library('FiltersLib', array(self::FILTER_PAGE_PARAM => $filterPage));
+		}
+		else // Otherwise an error will be written in the output
+		{
+			$this->_terminateWithJsonError('Parameter "'.self::FILTER_PAGE_PARAM.'" not provided!');
+		}
 	}
 
 	/**
-	 *
+	 * Terminate the execution of the page after have printed a message encoded to JSON.
+	 * Used directly header and echo to speed up the output before the exit command stops the execution.
 	 */
-	private function _writeSession($data, $fhc_controller_id)
+	private function _terminateWithJsonError($message)
 	{
-		if (!isset($_SESSION[self::SESSION_NAME])
-			|| (isset($_SESSION[self::SESSION_NAME]) && !is_array($_SESSION[self::SESSION_NAME])))
-		{
-			$_SESSION[self::SESSION_NAME] = array();
-		}
-
-		$_SESSION[self::SESSION_NAME][$fhc_controller_id] = $data;
+		header('Content-Type: application/json');
+		echo json_encode(error($message));
+		exit;
 	}
 }

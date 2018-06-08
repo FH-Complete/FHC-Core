@@ -2,7 +2,7 @@
 
 if (! defined("BASEPATH")) exit("No direct script access allowed");
 
-class Statusgrund extends FHC_Controller
+class Statusgrund extends Auth_Controller
 {
 	public function __construct()
     {

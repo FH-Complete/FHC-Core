@@ -344,7 +344,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 			}
 		}
 
-		$qry = "SELECT von, bis FROM bis.tbl_bisio WHERE student_uid=".$db->db_add_param($uid_arr[$i]);
+		$qry = "SELECT von, bis, lehreinheit_id FROM bis.tbl_bisio WHERE student_uid=".$db->db_add_param($uid_arr[$i]);
 		if($db->db_query($qry))
 		{
 			if($db->db_num_rows()>0)
@@ -534,31 +534,6 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		echo "  <gradePrevLastYearNb>".sprintf("%01.1f",($noteArrayPrev[7]/$noten_anzahl*100))."</gradePrevLastYearNb>";
 		echo "  <gradePrevLastYearEa>".sprintf("%01.1f",($noteArrayPrev[12]/$noten_anzahl*100))."</gradePrevLastYearEa>";
 
-		//Projektarbeiten
-		$qry_projektarbeit = "
-		SELECT
-			lehrveranstaltung_id, titel, themenbereich, note, titel_english
-		FROM
-			lehre.tbl_projektarbeit
-			JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
-		WHERE
-			student_uid=".$db->db_add_param($uid_arr[$i])."
-			AND projekttyp_kurzbz in('Bachelor', 'Diplom')
-		ORDER BY beginn ASC, projektarbeit_id ASC;";
-
-		$projektarbeit = array();
-
-		if($result_projektarbeit = $db->db_query($qry_projektarbeit))
-		{
-			while($row_projektarbeit = $db->db_fetch_object($result_projektarbeit))
-			{
-				$projektarbeit[$row_projektarbeit->lehrveranstaltung_id]['titel']=$row_projektarbeit->titel;
-				$projektarbeit[$row_projektarbeit->lehrveranstaltung_id]['titel_en']=$row_projektarbeit->titel_english;
-				$projektarbeit[$row_projektarbeit->lehrveranstaltung_id]['themenbereich']=$row_projektarbeit->themenbereich;
-				$projektarbeit[$row_projektarbeit->lehrveranstaltung_id]['note']=$row_projektarbeit->note;
-			}
-		}
-
 		$ects_total = 0;
 
 		echo "<studiensemester>";
@@ -615,6 +590,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 			echo "   <semesterKurzbz>Semester $start | $semester_kurzbz</semesterKurzbz>";
 
 			// alle lvs im semester holen
+			// Ohne LVs an denen ein Auslandssemester haengt. Diese werden spaeter separat geholt
 			$qry ="
 			SELECT
 				distinct(tbl_lehrveranstaltung.lehrveranstaltung_id),
@@ -631,6 +607,10 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 				student_uid = ".$db->db_add_param($uid_arr[$i])."
 				AND zeugnis = true
 				AND studiensemester_kurzbz in (".$sqlStudent->implode4SQL($aktuellesSemester).")
+				AND NOT EXISTS(SELECT 1 FROM bis.tbl_bisio JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
+					WHERE lehrveranstaltung_id=tbl_lehrveranstaltung.lehrveranstaltung_id
+					AND student_uid=".$db->db_add_param($uid_arr[$i])."
+					AND tbl_lehreinheit.studiensemester_kurzbz in(".$sqlStudent->implode4SQL($aktuellesSemester)."))
 			ORDER BY sort, tbl_lehrveranstaltung.bezeichnung;";
 
 			$arrayLvAusbildungssemester= array();
@@ -774,6 +754,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 					}
 
 					// Check ob an Lehrveranstaltung eine Thesis hängt
+					// Aber kein Auslandssemester war, sonst wirds spaeter hinzugefügt
 					$qry = "
 						SELECT
 							lehrveranstaltung_id, titel, themenbereich, note, titel_english
@@ -784,6 +765,11 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 							student_uid=".$db->db_add_param($uid_arr[$i])."
 							AND projekttyp_kurzbz in('Bachelor', 'Diplom')
 							AND lehrveranstaltung_id=".$db->db_add_param($row_stud->lehrveranstaltung_id)."
+							AND NOT EXISTS(SELECT 1
+								FROM bis.tbl_bisio
+								JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
+								WHERE lehrveranstaltung_id=".$db->db_add_param($row_stud->lehrveranstaltung_id)."
+								AND student_uid=".$db->db_add_param($uid_arr[$i]).")
 						ORDER BY beginn DESC, projektarbeit_id DESC LIMIT 1;";
 
 					if($result_thesis = $db->db_query($qry))
@@ -836,7 +822,10 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 				$qry_outgoing = "
 					SELECT
 						studiensemester_kurzbz, ort, ects, semesterstunden, von, bis,
-						universitaet, lehrveranstaltung_id, tbl_lehrveranstaltung.sws
+						universitaet, lehrveranstaltung_id, tbl_lehrveranstaltung.sws,
+						(SELECT titel_english FROM lehre.tbl_projektarbeit
+						WHERE lehreinheit_id=tbl_bisio.lehreinheit_id
+						AND student_uid = ".$db->db_add_param($uid_arr[$i])." limit 1) as projektarbeitstitel
 					FROM
 						bis.tbl_bisio
 						JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
@@ -905,6 +894,13 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 									break;
 							}
 
+							if($row_outgoing->projektarbeitstitel != '')
+							{
+								$projektarbeitszusatz = 'Thesis: "'.$row_outgoing->projektarbeitstitel.'"';
+							}
+							else
+								$projektarbeitszusatz = '';
+
 							echo '<lv>
 								<lehrform_kurzbz></lehrform_kurzbz>
 								<benotungsdatum>'.$benotungsdatum_outgoing.'</benotungsdatum>
@@ -914,7 +910,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 								<kurzbz>'.$lehrform_kurzbz_outgoing.'</kurzbz>
 								<stsem></stsem>
 								<bezeichnung><![CDATA[]]></bezeichnung>
-								<bezeichnung_englisch><![CDATA[International Semester Abroad: '.$datum_von.'-'.$datum_bis.', at '.$row_outgoing->ort.', '.$row_outgoing->universitaet.'. All credits earned during the International Semester Abroad (ISA) are fully credited for the '.$start.$auslandssemester_start.' semester at the UAS Technikum Wien.]]></bezeichnung_englisch>
+								<bezeichnung_englisch><![CDATA[International Semester Abroad: '.$datum_von.'-'.$datum_bis.', at '.$row_outgoing->ort.', '.$row_outgoing->universitaet.'. All credits earned during the International Semester Abroad (ISA) are fully credited for the '.$start.$auslandssemester_start.' semester at the UAS Technikum Wien.'.$projektarbeitszusatz.']]></bezeichnung_englisch>
 								<ects>'.$row_outgoing->ects.'</ects>
 								<semesterstunden>'.$row_outgoing->semesterstunden.'</semesterstunden>
 								<note>'.$note_outgoing.'</note>
