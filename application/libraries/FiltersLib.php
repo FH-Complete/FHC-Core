@@ -16,7 +16,7 @@ class FiltersLib
 	const SESSION_ADDITIONAL_COLUMNS = 'additionalColumns';
 	const SESSION_CHECKBOXES = 'checkboxes';
 	const SESSION_FILTERS = 'filters';
-	const SESSION_DATASET_METADATA = 'datasetMetadata';
+	const SESSION_METADATA = 'datasetMetadata';
 	const SESSION_DATASET = 'dataset';
 	const SESSION_ROW_NUMBER = 'rowNumber';
 	const SESSION_RELOAD_DATASET = 'reloadDataset';

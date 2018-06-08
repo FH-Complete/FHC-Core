@@ -283,15 +283,12 @@ class FilterWidget extends Widget
 					// Save changes into session if data are valid
 					if (!isError($dataset))
 					{
-						$formattedDataset = $this->_formatDataset($dataset); // format the dataset using markRow and formatRow
+						$this->_formatDataset($dataset); // marks rows using markRow and format rowns using formatRow
 
-						// Set the new dataset and it's attributes in the session
-						$this->filterslib->setElementSession(
-							FiltersLib::SESSION_DATASET_METADATA,
-							$this->FiltersModel->getExecutedQueryMetaData()
-						);
+						// Set the new dataset and its attributes in the session
+						$this->filterslib->setElementSession(FiltersLib::SESSION_METADATA, $this->FiltersModel->getExecutedQueryMetaData());
 						$this->filterslib->setElementSession(FiltersLib::SESSION_ROW_NUMBER, count($dataset->retval));
-						$this->filterslib->setElementSession(FiltersLib::SESSION_DATASET, $formattedDataset);
+						$this->filterslib->setElementSession(FiltersLib::SESSION_DATASET, $dataset->retval);
 					}
 				}
 			}
@@ -324,7 +321,7 @@ class FilterWidget extends Widget
 				// Save changes into session if data are valid
 				if (!isError($dataset))
 				{
-					$formattedDataset = $this->_formatDataset($dataset); // format the dataset using markRow and formatRow
+					$this->_formatDataset($dataset); // marks rows using markRow and format rowns using formatRow
 
 					// Stores an array that contains all the data useful for
 					$this->filterslib->setSession(
@@ -341,90 +338,86 @@ class FilterWidget extends Widget
 							FiltersLib::SESSION_ADDITIONAL_COLUMNS => $this->_additionalColumns, //
 							FiltersLib::SESSION_CHECKBOXES => $this->_checkboxes, //
 							FiltersLib::SESSION_FILTERS => $parsedFilterJson->filters, //
-							FiltersLib::SESSION_DATASET_METADATA => $this->FiltersModel->getExecutedQueryMetaData(), //
+							FiltersLib::SESSION_METADATA => $this->FiltersModel->getExecutedQueryMetaData(), //
 							FiltersLib::SESSION_ROW_NUMBER => count($dataset->retval), //
-							FiltersLib::SESSION_DATASET => $formattedDataset, //
+							FiltersLib::SESSION_DATASET => $dataset->retval, //
 							FiltersLib::SESSION_RELOAD_DATASET => false //
 						)
 					);
 				}
 			}
 		}
-
-		// var_dump($this->filterslib->getSession());
 	}
 
 	/**
-	 *
+	 * Calls the method _markRow and _formatRow to marks rows using markRow and format rowns using formatRow
+	 * NOTE: this method operates directly on the retrived dataset: parameter passed by reference
 	 */
-	private function _formatDataset($rawDataset)
+	private function _formatDataset(&$rawDataset)
 	{
-		$formattedDataset = null;
-
 		if (hasData($rawDataset) && is_array($rawDataset->retval))
 		{
-			$formattedDataset = array();
-
+			// For each row of the data set
 			for ($rowCounter = 0; $rowCounter < count($rawDataset->retval); $rowCounter++)
 			{
-				$row = $rawDataset->retval[$rowCounter];
-
-				$formattedRow = $this->_formatRow($row);
-				$formattedRow->MARK_ROW_CLASS = $this->_markRow($row);
-				$formattedDataset[] = $formattedRow;
+				// Calls the methods to mark and to format a row
+				// NOTE: keep this order! the markRow function given as parameter is supposing to work
+				// on a raw dataset, NOT on a formatted one
+				$rawDataset->retval[$rowCounter]->MARK_ROW_CLASS = $this->_markRow($rawDataset->retval[$rowCounter]);
+				$this->_formatRow($rawDataset->retval[$rowCounter]);
 			}
 		}
-
-		return $formattedDataset;
 	}
 
 	/**
-	 *
+	 * Formats the columns of all the rows of the entire dataset
+	 * - converts booleans into strings "true" and "false"
+	 * - format dates using the format string defined in DEFAULT_DATE_FORMAT
+	 * Calls the parameter formatRow if it was given and if it is a valid funtion
+	 * NOTE: this method operates directly on the retrived dataset: parameter passed by reference
 	 */
-	private function _formatRow($datasetRaw)
+	private function _formatRow(&$rawDatasetRow)
 	{
-		$tmpDatasetRaw = clone $datasetRaw;
-
-		foreach ($tmpDatasetRaw as $columnName => $columnValue)
+		// For each column of the row
+		foreach ($rawDatasetRow as $columnName => $columnValue)
 		{
+			// Basic conversions
 			if (is_bool($columnValue))
 			{
-				$tmpDatasetRaw->{$columnValue} = $columnValue === true ? 'true' : 'false';
+				$rawDatasetRow->{$columnValue} = $columnValue === true ? 'true' : 'false';
 			}
 			elseif (DateTime::createFromFormat('Y-m-d G:i:s', $columnValue) !== false)
 			{
-				$tmpDatasetRaw->{$columnValue} = date(self::DEFAULT_DATE_FORMAT, strtotime($columnValue));
+				$rawDatasetRow->{$columnValue} = date(self::DEFAULT_DATE_FORMAT, strtotime($columnValue));
 			}
 		}
 
-		if ($this->_formatRow != null)
+		// If a valid function call the given formatRow
+		if ($this->_formatRow != null && is_callable($this->_formatRow))
 		{
-			$formatRow = $this->_formatRow;
-			$tmpDatasetRaw = $formatRow($tmpDatasetRaw);
+			$formatRowFunction = $this->_formatRow;
+			$rawDatasetRow = $formatRowFunction($rawDatasetRow);
 		}
-
-		return $tmpDatasetRaw;
 	}
 
 	/**
-	 *
+	 * Returns a string that contains a class name used to mark rows in the dataset table
+	 * Calls the parameter markRow if it was given and if it is a valid funtion
 	 */
-	private function _markRow($datasetRaw)
+	private function _markRow($rawDatasetRow)
 	{
-		if (is_object($datasetRaw))
+		// If a valid function call the given markRow
+		if ($this->_markRow != null && is_callable($this->_markRow))
 		{
-			if ($this->_markRow != null)
-			{
-				$markRow = $this->_markRow;
-				$class = $markRow($datasetRaw);
-			}
+			$markRowFunction = $this->_markRow;
+			$class = $markRowFunction($rawDatasetRow);
 		}
 
 		return !isset($class) ? '' : $class;
 	}
 
 	/**
-	 *
+	 * Utility method that retrives the name of the columns present in a filter JSON definition
 	 */
 	private function _getColumnsNames($columns)
 	{

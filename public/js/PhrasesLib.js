@@ -10,9 +10,9 @@
  */
 
 /**
- * Definition and initialization of object FHC_PhraseLib
+ * Definition and initialization of object FHC_PhrasesLib
  */
-var FHC_PhraseLib = {
+var FHC_PhrasesLib = {
 
 	//------------------------------------------------------------------------------------------------------------------
 	// Public methods
@@ -46,7 +46,7 @@ var FHC_PhraseLib = {
 						params = [];
 					}
 					
-					return FHC_PhraseLib._replacePhraseVariable(phraseObj.text, params); // parsing
+					return FHC_PhrasesLib._replacePhraseVariable(phraseObj.text, params); // parsing
 				}
 			}
 		}

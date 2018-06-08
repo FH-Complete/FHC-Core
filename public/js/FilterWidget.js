@@ -60,11 +60,10 @@ var FHC_FilterWidget = {
 	},
 
 	/**
-	 * To refresh the whole FilterWidget GUI
+	 * Alias call to method display only to inprove the readability of the code
 	 */
 	refresh: function() {
 
-		FHC_FilterWidget._resetFilterOptions();
 		FHC_FilterWidget.display();
 	},
 
@@ -114,19 +113,12 @@ var FHC_FilterWidget = {
 	/**
 	 * To reset the Filter Options GUI
 	 */
-	_resetFilterOptions: function() {
+	_resetGUI: function() {
 
 		$("#dragAndDropFieldsArea").html("");
-		$("#addField").html("<option value=''>" + FHC_PhraseLib.t("ui", "bitteEintragWaehlen") + "</option>");
+		$("#addField").html("<option value=''>" + FHC_PhrasesLib.t("ui", "bitteEintragWaehlen") + "</option>");
 		$("#appliedFilters").html("");
-		$("#addFilter").html("<option value=''>" + FHC_PhraseLib.t("ui", "bitteEintragWaehlen") + "</option>");
-	},
-
-	/**
-	 * To reset the Filter Table GUI
-	 */
-	_resetTableDataset: function() {
-
+		$("#addFilter").html("<option value=''>" + FHC_PhrasesLib.t("ui", "bitteEintragWaehlen") + "</option>");
 		$("#filterTableDataset > thead > tr").html("");
 		$("#filterTableDataset > tbody").html("");
 	},
@@ -157,15 +149,13 @@ var FHC_FilterWidget = {
 	 * This method calls all the other methods needed to rendere the GUI for a FilterWidget
 	 * The parameter data contains all the data about the FilterWidget and it is given as parameter
 	 * to all the methods that here are called
+	 * NOTE: think very carefully before changing the order of the calls
 	 */
 	_renderFilterWidget: function(data) {
 
 		FHC_FilterWidget._initSessionStorage(); // initialize the session storage
 		FHC_FilterWidget._turnOffEvents(); // turns all the events off
-
-		// Reset the entire GUI
-		FHC_FilterWidget._resetFilterOptions();
-		FHC_FilterWidget._resetTableDataset();
+		FHC_FilterWidget._resetGUI(); // Reset the entire GUI
 
 		// Render the GUI for this FilterWidget
 		FHC_FilterWidget._setFilterName(data); // set the name in the GUI

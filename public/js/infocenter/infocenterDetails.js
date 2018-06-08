@@ -132,7 +132,7 @@ $(document).ready(function ()
 				var notizTitle = $(this).find("td:eq(1)").text();
 				var notizContent = this.title;
 
-				$("#notizform label:first").text(FHC_PhraseLib.t('infocenter', 'notizAendern')).css("color", "red");
+				$("#notizform label:first").text(FHC_PhrasesLib.t('infocenter', 'notizAendern')).css("color", "red");
 				$("#notizform :input[type='reset']").css("display", "inline-block");
 
 				$("#notizform :input[name='hiddenNotizId']").val(notizId);
@@ -241,7 +241,7 @@ var InfocenterDetails = {
 	saveZgv: function(data)
 	{
 		var zgvError = function(){
-			$("#zgvSpeichern_" + prestudentid).before("<span id='zgvSpeichernNotice' class='text-danger'>" + FHC_PhraseLib.t('ui', 'fehlerBeimSpeichern') + "</span>&nbsp;&nbsp;");
+			$("#zgvSpeichern_" + prestudentid).before("<span id='zgvSpeichernNotice' class='text-danger'>" + FHC_PhrasesLib.t('ui', 'fehlerBeimSpeichern') + "</span>&nbsp;&nbsp;");
 		};
 
 		var prestudentid = data.prestudentid;
@@ -256,7 +256,7 @@ var InfocenterDetails = {
 					if (FHC_AjaxClient.hasData(data))
 					{
 						InfocenterDetails._refreshLog();
-						$("#zgvSpeichern_" + prestudentid).before("<span id='zgvSpeichernNotice' class='text-success'>" + FHC_PhraseLib.t('ui', 'gespeichert') + "</span>&nbsp;&nbsp;");
+						$("#zgvSpeichern_" + prestudentid).before("<span id='zgvSpeichernNotice' class='text-success'>" + FHC_PhrasesLib.t('ui', 'gespeichert') + "</span>&nbsp;&nbsp;");
 					}
 					else
 					{
@@ -387,11 +387,11 @@ var InfocenterDetails = {
 						if (data.length > 0)
 							InfocenterDetails.getParkedDate(personid);
 						else
-							$("#unparkmsg").removeClass().addClass("text-warning").text(FHC_PhraseLib.t('infocenter', 'nichtsZumAusparken'));
+							$("#unparkmsg").removeClass().addClass("text-warning").text(FHC_PhrasesLib.t('infocenter', 'nichtsZumAusparken'));
 					}
 				},
 				errorCallback: function(){
-					$("#unparkmsg").removeClass().addClass("text-danger").text(FHC_PhraseLib.t('infocenter', 'fehlerBeimAusparken'));
+					$("#unparkmsg").removeClass().addClass("text-danger").text(FHC_PhrasesLib.t('infocenter', 'fehlerBeimAusparken'));
 				},
 				veilTimeout: 0
 			}
@@ -435,8 +435,8 @@ var InfocenterDetails = {
 		{
 			$("#parking").html(
 				'<div class="form-group form-inline">'+
-					'<button class="btn btn-default" id="parklink" type="button""><i class="fa fa-clock-o"></i>&nbsp;' + FHC_PhraseLib.t('infocenter', 'bewerberParken') + '</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'+
-					FHC_PhraseLib.t('global', 'bis') + '&nbsp;&nbsp;'+
+					'<button class="btn btn-default" id="parklink" type="button""><i class="fa fa-clock-o"></i>&nbsp;' + FHC_PhrasesLib.t('infocenter', 'bewerberParken') + '</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'+
+					FHC_PhrasesLib.t('global', 'bis') + '&nbsp;&nbsp;'+
 					'<input id="parkdate" type="text" class="form-control" placeholder="Parkdatum" style="height: 25px; width: 99px">&nbsp;'+
 					'<span class="text-danger" id="parkmsg"></span>'+
 				'</div>');
@@ -462,8 +462,8 @@ var InfocenterDetails = {
 			var parkdate = $.datepicker.parseDate("yy-mm-dd", date);
 			var gerparkdate = $.datepicker.formatDate("dd.mm.yy", parkdate);
 			$("#parking").html(
-				FHC_PhraseLib.t('infocenter', 'bewerberGeparktBis')+'&nbsp;&nbsp;'+gerparkdate+'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'+
-				'<button class="btn btn-default" id="unparklink"><i class="fa fa-sign-out"></i>&nbsp;'+FHC_PhraseLib.t('infocenter', 'bewerberAusparken')+'</button>&nbsp;'+
+				FHC_PhrasesLib.t('infocenter', 'bewerberGeparktBis')+'&nbsp;&nbsp;'+gerparkdate+'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'+
+				'<button class="btn btn-default" id="unparklink"><i class="fa fa-sign-out"></i>&nbsp;'+FHC_PhrasesLib.t('infocenter', 'bewerberAusparken')+'</button>&nbsp;'+
 				'<span id="unparkmsg"></span>'
 			);
 
@@ -486,11 +486,11 @@ var InfocenterDetails = {
 	{
 		$("#notizmsg").empty();
 		$("#notizform :input[name='hiddenNotizId']").val("");
-		$("#notizform label:first").text(FHC_PhraseLib.t('infocenter', 'notizHinzufuegen')).css("color", "black");
+		$("#notizform label:first").text(FHC_PhrasesLib.t('infocenter', 'notizHinzufuegen')).css("color", "black");
 		$("#notizform :input[type='reset']").css("display", "none");
 	},
 	_errorSaveNotiz: function()
 	{
-		$("#notizmsg").text(FHC_PhraseLib.t('ui', 'fehlerBeimSpeichern'));
+		$("#notizmsg").text(FHC_PhrasesLib.t('ui', 'fehlerBeimSpeichern'));
 	}
 };

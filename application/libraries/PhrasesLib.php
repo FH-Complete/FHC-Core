@@ -257,7 +257,8 @@ class PhrasesLib
 					$language = $this->_ci->PersonModel->getLanguage(getAuthUID());
 				}
 
-				$this->_setPhrases($categories, $language);
+				// If only categories is not an empty array then loads phrases
+				if (count($categories) > 0) $this->_setPhrases($categories, $language);
 			}
 		}
 	}
@@ -285,8 +286,7 @@ class PhrasesLib
 		{
 			// is assoc array -> Loads specific phrasentexte by category and phrases
 			$isIndexArray = false;
-			$phrases = $this->_ci->PhraseModel
-				->getPhrasesByCategoryAndPhrasesAndLanguage($categories, $language);
+			$phrases = $this->_ci->PhraseModel->getPhrasesByCategoryAndPhrasesAndLanguage($categories, $language);
 		}
 
 		// If language is not default language and phrasentext is null -> fallback to default language
@@ -296,13 +296,11 @@ class PhrasesLib
 			$defaultPhrases = null;
 			if ($isIndexArray)
 			{
-				$defaultPhrases = $this->_ci->PhraseModel
-					->getPhrasesByCategoryAndLanguage($categories, DEFAULT_LANGUAGE);
+				$defaultPhrases = $this->_ci->PhraseModel->getPhrasesByCategoryAndLanguage($categories, DEFAULT_LANGUAGE);
 			}
 			else
 			{
-				$defaultPhrases = $this->_ci->PhraseModel
-					->getPhrasesByCategoryAndPhrasesAndLanguage($categories, DEFAULT_LANGUAGE);
+				$defaultPhrases = $this->_ci->PhraseModel->getPhrasesByCategoryAndPhrasesAndLanguage($categories, DEFAULT_LANGUAGE);
 			}
 
 			// combine array with phrasentexte in users language and in default language
