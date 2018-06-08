@@ -263,6 +263,9 @@ class FilterWidget extends Widget
 		// Read the all session for this filter widget
 		$session = $this->filterslib->getSession();
 
+		// To be always stored in the session, otherwise is not possible to load data from Filters controller
+		$this->filterslib->setElementSession(FiltersLib::REQUIRED_PERMISSIONS_PARAMETER, $this->_requiredPermissions);
+
 		// If session is NOT empty -> a filter was already loaded
 		if ($session != null)
 		{
@@ -339,14 +342,10 @@ class FilterWidget extends Widget
 					// Stores an array that contains all the data useful for
 					$this->filterslib->setSession(
 						array(
-							FiltersLib::REQUIRED_PERMISSIONS_PARAMETER => $this->_requiredPermissions, // required permissions
-
 							FiltersLib::FILTER_ID => $this->_filterId, // the current filter id
 							FiltersLib::APP_PARAMETER => $this->_app, // the current app parameter
 							FiltersLib::DATASET_NAME_PARAMETER => $this->_datasetName, // the carrent dataset name
-
 							FiltersLib::SESSION_FILTER_NAME => $filterName, // the current filter name
-
 							FiltersLib::SESSION_FIELDS => $this->FiltersModel->getExecutedQueryListFields(), // all the fields of the dataset
 							FiltersLib::SESSION_SELECTED_FIELDS => $this->_getColumnsNames($parsedFilterJson->columns), // all the selected fields
 							FiltersLib::SESSION_COLUMNS_ALIASES => $this->_columnsAliases, // all the fields aliases

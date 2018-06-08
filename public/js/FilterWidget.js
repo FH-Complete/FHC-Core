@@ -160,6 +160,8 @@ var FHC_FilterWidget = {
 	 */
 	_renderFilterWidget: function(data) {
 
+		console.log(data);
+
 		FHC_FilterWidget._initSessionStorage(); // initialize the session storage
 		FHC_FilterWidget._turnOffEvents(); // turns all the events off
 		FHC_FilterWidget._resetGUI(); // Reset the entire GUI
@@ -545,10 +547,7 @@ var FHC_FilterWidget = {
 	 */
 	_renderDropDownFields: function(data) {
 
-		if (data.hasOwnProperty("fields") && $.isArray(data.fields))
-		{
-			FHC_FilterWidget._renderDropDown(data, data.selectedFields, 'addField');
-		}
+		FHC_FilterWidget._renderDropDown(data, data.selectedFields, 'addField');
 	},
 
 	/**
@@ -557,34 +556,37 @@ var FHC_FilterWidget = {
 	 */
 	_renderDropDown: function(data, elements, ddElementId) {
 
-		for (var i = 0; i < data.fields.length; i++)
+		if (data.hasOwnProperty("fields") && $.isArray(data.fields))
 		{
-			var toBeDisplayed = true;
-
-			for (var j = 0; j < elements.length; j++)
+			for (var i = 0; i < data.fields.length; i++)
 			{
-				var elementName = elements[j].hasOwnProperty("name") ? elements[j].name : elements[j];
+				var toBeDisplayed = true;
 
-				if (data.fields[i] == elementName)
+				for (var j = 0; j < elements.length; j++)
 				{
-					toBeDisplayed = false;
-					break;
-				}
-			}
+					var elementName = elements[j].hasOwnProperty("name") ? elements[j].name : elements[j];
 
-			if (toBeDisplayed == true)
-			{
-				var fieldName = data.fields[i];
-				var fieldToDisplay = data.fields[i];
-
-				if (data.hasOwnProperty("columnsAliases") && $.isArray(data.columnsAliases))
-				{
-					fieldToDisplay = data.columnsAliases[i];
+					if (data.fields[i] == elementName)
+					{
+						toBeDisplayed = false;
+						break;
+					}
 				}
 
-				if ($("#" + ddElementId).length) // checks if the element exists
+				if (toBeDisplayed == true)
 				{
-					$("#" + ddElementId).append("<option value='" + fieldName + "'>" + fieldToDisplay + "</option>");
+					var fieldName = data.fields[i];
+					var fieldToDisplay = data.fields[i];
+
+					if (data.hasOwnProperty("columnsAliases") && $.isArray(data.columnsAliases))
+					{
+						fieldToDisplay = data.columnsAliases[i];
+					}
+
+					if ($("#" + ddElementId).length) // checks if the element exists
+					{
+						$("#" + ddElementId).append("<option value='" + fieldName + "'>" + fieldToDisplay + "</option>");
+					}
 				}
 			}
 		}
