@@ -20,7 +20,7 @@
  *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
  *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
-require_once('../../config/vilesci.config.inc.php');		
+require_once('../../config/vilesci.config.inc.php');
 require_once('../../include/functions.inc.php');
 require_once('../../include/benutzerberechtigung.class.php');
 require_once('../../include/person.class.php');
@@ -35,68 +35,64 @@ $user=get_uid();
 $datum_obj = new datum();
 loadVariables($user);
 
-?>
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+?><!DOCTYPE HTML>
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<link href="../../skin/cis.css" rel="stylesheet" type="text/css">
-<script language="Javascript">
-function disablefields(obj)
-{
-	if(obj.value==0)
-		val=false;
-	else
-		val=true;
-
-	document.getElementById('anrede').disabled=val;
-	document.getElementById('titel').disabled=val;
-	document.getElementById('titelpost').disabled=val;
-	document.getElementById('nachname').disabled=val;
-	document.getElementById('vorname').disabled=val;
-	document.getElementById('geschlecht').disabled=val;
-	document.getElementById('geburtsdatum').disabled=val;
-	document.getElementById('svnr').disabled=val;
-	document.getElementById('ersatzkennzeichen').disabled=val;
-	//document.getElementById('adresse').disabled=val;
-	//document.getElementById('plz').disabled=val;
-	//document.getElementById('ort').disabled=val;
-	if(val)
+	<meta charset="UTF-8">
+	<link href="../../skin/cis.css" rel="stylesheet" type="text/css">
+	<script language="Javascript">
+	function disablefields(obj)
 	{
-		document.getElementById('ueb1').style.display = 'block';
-		document.getElementById('ueb2').style.display = 'block';
-		document.getElementById('ueb3').style.display = 'block';
-	}
-	else
-	{
-		document.getElementById('ueb1').style.display = 'none';
-		document.getElementById('ueb2').style.display = 'none';
-		document.getElementById('ueb3').style.display = 'none';
-	}
-}
+		if (obj.value==0)
+			val=false;
+		else
+			val=true;
 
-function GeburtsdatumEintragen()
-{
-	svnr = document.getElementById('svnr').value;
-	gebdat = document.getElementById('geburtsdatum');
-	
-	if(svnr.length==10 && gebdat.value=='')
-	{
-		var tag = svnr.substr(4,2);
-		var monat = svnr.substr(6,2);
-		var jahr = svnr.substr(8,2);
-		
-		gebdat.value='19'+jahr+'-'+monat+'-'+tag;
+		document.getElementById('anrede').disabled=val;
+		document.getElementById('titel').disabled=val;
+		document.getElementById('titelpost').disabled=val;
+		document.getElementById('nachname').disabled=val;
+		document.getElementById('vorname').disabled=val;
+		document.getElementById('geschlecht').disabled=val;
+		document.getElementById('geburtsdatum').disabled=val;
+		document.getElementById('svnr').disabled=val;
+		document.getElementById('ersatzkennzeichen').disabled=val;
+		if (val)
+		{
+			document.getElementById('ueb1').style.display = 'block';
+			document.getElementById('ueb2').style.display = 'block';
+			document.getElementById('ueb3').style.display = 'block';
+		}
+		else
+		{
+			document.getElementById('ueb1').style.display = 'none';
+			document.getElementById('ueb2').style.display = 'none';
+			document.getElementById('ueb3').style.display = 'none';
+		}
 	}
-}
 
-function disablefields2(val)
-{
-	document.getElementById('adresse').disabled=val;
-	document.getElementById('plz').disabled=val;
-	document.getElementById('ort').disabled=val;
-}
-</script>
+	function GeburtsdatumEintragen()
+	{
+		svnr = document.getElementById('svnr').value;
+		gebdat = document.getElementById('geburtsdatum');
+
+		if (svnr.length==10 && gebdat.value=='')
+		{
+			var tag = svnr.substr(4,2);
+			var monat = svnr.substr(6,2);
+			var jahr = svnr.substr(8,2);
+
+			gebdat.value='19'+jahr+'-'+monat+'-'+tag;
+		}
+	}
+
+	function disablefields2(val)
+	{
+		document.getElementById('adresse').disabled=val;
+		document.getElementById('plz').disabled=val;
+		document.getElementById('ort').disabled=val;
+	}
+	</script>
 </head>
 <body>
 <h1>Person Anlegen</h1>
@@ -105,7 +101,10 @@ function disablefields2(val)
 $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($user);
 
-if(!$rechte->isBerechtigt('admin') && !$rechte->isBerechtigt('mitarbeiter') && !$rechte->isBerechtigt('assistenz') && !$rechte->isBerechtigt('basis/firma'))
+if (!$rechte->isBerechtigt('admin')
+	&& !$rechte->isBerechtigt('mitarbeiter')
+	&& !$rechte->isBerechtigt('assistenz')
+	&& !$rechte->isBerechtigt('basis/firma', null, 'sui'))
 	die('Sie haben keine Berechtigung fuer diese Seite');
 
 $where = '';
@@ -132,7 +131,7 @@ $ueberschreiben = (isset($_REQUEST['ueberschreiben'])?$_REQUEST['ueberschreiben'
 $geburtsdatum_error=false;
 
 // *** Speichern der Daten ***
-if(isset($_POST['save']))
+if (isset($_POST['save']))
 {
 	//echo "Saving Data: Geburtsdatum: $geburtsdatum | Titel: $titel | Nachname: $nachname | Vorname: $vorname |
 	//		Geschlecht: $geschlecht | Adresse: $adresse | Plz: $plz | Ort: $ort |
@@ -142,7 +141,10 @@ if(isset($_POST['save']))
 	$db->db_query('BEGIN');
 	//Wenn die person_id=0 dann wird eine neue Person angelegt
 	//Sonst nicht
-	if($person_id=='0')
+	if ($person_id == '')
+		die('Es ist ein Fehler aufgetreten');
+
+	if ($person_id=='0')
 	{
 		$person->new = true;
 		$person->anrede = $anrede;
@@ -157,9 +159,9 @@ if(isset($_POST['save']))
 		$person->aktiv = true;
 		$person->insertamum = date('Y-m-d H:i:s');
 		$person->insertvon = $user;
-        $person->zugangscode= uniqid();
-		
-		if($person->save())
+		$person->zugangscode= uniqid();
+
+		if ($person->save())
 		{
 			$error=false;
 		}
@@ -169,16 +171,16 @@ if(isset($_POST['save']))
 			$errormsg = "Person konnte nicht gespeichert werden: $person->errormsg";
 		}
 	}
-	
+
 	//Adresse anlegen
-	if($ueberschreiben!='' && !($plz=='' && $adresse=='' && $ort==''))
+	if ($ueberschreiben!='' && !($plz=='' && $adresse=='' && $ort==''))
 	{
-		if($person_id=='0')
+		if ($person_id=='0')
 			$ueberschreiben='Nein';
 
 		$adr = new adresse();
 		//Adresse neu anlegen
-		if($ueberschreiben=='Nein')
+		if ($ueberschreiben=='Nein')
 		{
 			$adr->new = true;
 			$adr->insertamum = date('Y-m-d H:i:s');
@@ -190,10 +192,10 @@ if(isset($_POST['save']))
 
 			//Adressen der Peron laden
 			$adr->load_pers($person->person_id);
-			if(isset($adr->result[0]))
+			if (isset($adr->result[0]))
 			{
 				//Erste Adresse laden
-				if($adr->load($adr->result[0]->adresse_id))
+				if ($adr->load($adr->result[0]->adresse_id))
 				{
 					$adr->new = false;
 					$adr->updateamum = date('Y-m-d H:i:s');
@@ -214,7 +216,7 @@ if(isset($_POST['save']))
 			}
 		}
 
-		if(!$error)
+		if (!$error)
 		{
 			//Adressdaten zuweisen und speichern
 			$adr->person_id = $person->person_id;
@@ -224,7 +226,7 @@ if(isset($_POST['save']))
 			$adr->typ = 'h';
 			$adr->heimatadresse = true;
 			$adr->zustelladresse = true;
-			if(!$adr->save())
+			if (!$adr->save())
 			{
 				$error = true;
 				$errormsg = $adr->errormsg;
@@ -233,10 +235,10 @@ if(isset($_POST['save']))
 	}
 
 	//Kontaktdaten anlegen
-	if(!$error)
+	if (!$error)
 	{
 		//EMail Adresse speichern
-		if($email!='')
+		if ($email!='')
 		{
 			$kontakt = new kontakt();
 			$kontakt->person_id = $person->person_id;
@@ -247,14 +249,14 @@ if(isset($_POST['save']))
 			$kontakt->insertvon = $user;
 			$kontakt->new = true;
 
-			if(!$kontakt->save())
+			if (!$kontakt->save())
 			{
 				$error = true;
 				$errormsg = 'Fehler beim Speichern der Email Adresse';
 			}
 		}
 		//Telefonnummer speichern
-		if($telefon!='')
+		if ($telefon!='')
 		{
 			$kontakt = new kontakt();
 			$kontakt->person_id = $person->person_id;
@@ -265,14 +267,14 @@ if(isset($_POST['save']))
 			$kontakt->insertvon = $user;
 			$kontakt->new = true;
 
-			if(!$kontakt->save())
+			if (!$kontakt->save())
 			{
 				$error = true;
 				$errormsg = 'Fehler beim Speichern der Telefonnummer';
 			}
 		}
 		//Mobiltelefonnummer speichern
-		if($mobil!='')
+		if ($mobil!='')
 		{
 			$kontakt = new kontakt();
 			$kontakt->person_id = $person->person_id;
@@ -283,7 +285,7 @@ if(isset($_POST['save']))
 			$kontakt->insertvon = $user;
 			$kontakt->new = true;
 
-			if(!$kontakt->save())
+			if (!$kontakt->save())
 			{
 				$error = true;
 				$errormsg = 'Fehler beim Speichern der Mobiltelefonnummer';
@@ -291,7 +293,7 @@ if(isset($_POST['save']))
 		}
 	}
 
-	if(!$error)
+	if (!$error)
 	{
 		$db->db_query('COMMIT');
 		die("<script language='Javascript'>
@@ -307,12 +309,12 @@ if(isset($_POST['save']))
 	}
 }
 // *** SAVE ENDE ***
-if($geburtsdatum!='')
+if ($geburtsdatum!='')
 {
 	//Wenn das Datum im Format d.m.Y ist dann in Y-m-d umwandeln
-	if(strpos($geburtsdatum,'.'))
+	if (strpos($geburtsdatum,'.'))
 	{
-		if($datum_obj->mktime_datum($geburtsdatum))
+		if ($datum_obj->mktime_datum($geburtsdatum))
 		{
 			$geburtsdatum = date('Y-m-d',$datum_obj->mktime_datum($geburtsdatum));
 		}
@@ -321,13 +323,13 @@ if($geburtsdatum!='')
 			$geburtsdatum_error=true;
 		}
 	}
-	else 
+	else
 	{
-		if(!mb_ereg("([0-9]{4})-([0-9]{2})-([0-9]{2})",$geburtsdatum))
+		if (!mb_ereg("([0-9]{4})-([0-9]{2})-([0-9]{2})",$geburtsdatum))
 			$geburtsdatum_error=true;
 	}
-	
-	if($geburtsdatum_error)
+
+	if ($geburtsdatum_error)
 		echo "Format des Geburtsdatums ist ungueltig!";
 }
 ?>
@@ -367,7 +369,7 @@ echo '<tr><td>Telefon</td><td><input type="text" id="telefon" maxlength="128" na
 echo '<tr><td>Mobil</td><td><input type="text" id="mobil" maxlength="128" name="mobil" value="'.$mobil.'" /></td></tr>';
 echo '<tr><td></td><td>';
 
-if(($geburtsdatum=='' && $vorname=='' && $nachname=='') || $geburtsdatum_error)
+if (($geburtsdatum=='' && $vorname=='' && $nachname=='') || $geburtsdatum_error)
 	echo '<input type="submit" name="showagain" value="Vorschlag laden">';
 else
 	echo '<input type="submit" name="save" value="Speichern">';
@@ -383,27 +385,34 @@ echo '<td valign="top">';
 
 //Vorschlaege
 
+$where = '';
 //Vorschlaege laden
-if($geburtsdatum!='')
-{		
-	if(mb_ereg("([0-9]{4})-([0-9]{2})-([0-9]{2})",$geburtsdatum))
+if ($geburtsdatum!='')
+{
+	if (mb_ereg("([0-9]{4})-([0-9]{2})-([0-9]{2})",$geburtsdatum))
 	{
-		$where = " gebdatum='".$geburtsdatum."'";
+		$where = " gebdatum=".$db->db_add_param($geburtsdatum);
 	}
 }
 
-if($vorname!='' && $nachname!='')
+if ($vorname!='' && $nachname!='')
 {
-	if($where!='')
+	if ($where!='')
 		$where.=' OR';
-	$where.=" (LOWER(vorname)=LOWER('".$vorname."') AND LOWER(nachname)=LOWER('".$nachname."'))";
+	$where.=" (LOWER(vorname)=LOWER(".$db->db_add_param($vorname).") AND LOWER(nachname)=LOWER(".$db->db_add_param($nachname)."))";
+}
+elseif ($nachname!='')
+{
+	if ($where!='')
+		$where.=' OR';
+	$where.=" LOWER(nachname)=LOWER(".$db->db_add_param($nachname).")";
 }
 
-if($where!='')
+if ($where!='')
 {
 	$qry = "SELECT * FROM public.tbl_person WHERE $where ORDER BY nachname, vorname, gebdatum";
-	
-	if($result = $db->db_query($qry))
+
+	if ($result = $db->db_query($qry))
 	{
 		echo '<table>
 				<tr>
@@ -425,7 +434,7 @@ if($where!='')
 							SELECT (get_rolle_prestudent(prestudent_id, null) || ' ' || UPPER(tbl_studiengang.typ::varchar(1) || tbl_studiengang.kurzbz)) as rolle FROM public.tbl_prestudent JOIN public.tbl_studiengang USING(studiengang_kz) WHERE person_id='$row->person_id'
 							UNION
 							SELECT 'PreInteressent' as rolle FROM public.tbl_preinteressent WHERE person_id='$row->person_id'";
-			if($result_stati = $db->db_query($qry_stati))
+			if ($result_stati = $db->db_query($qry_stati))
 			{
 				while($row_stati=$db->db_fetch_object($result_stati))
 				{
@@ -433,10 +442,10 @@ if($where!='')
 				}
 			}
 			$status = mb_substr($status, 0, mb_strlen($status)-2);
-					
+
 			echo '<tr valign="top"><td><input type="radio" name="person_id" value="'.$row->person_id.'" onclick="disablefields(this)"></td><td>'."$row->nachname</td><td>$row->vorname</td><td>$row->gebdatum</td><td>$row->svnr</td><td>".($row->geschlecht=='m'?'männlich':'weiblich')."</td><td>";
 			$qry_adr = "SELECT * FROM public.tbl_adresse WHERE person_id='$row->person_id'";
-			if($result_adr = $db->db_query($qry_adr))
+			if ($result_adr = $db->db_query($qry_adr))
 				while($row_adr=$db->db_fetch_object($result_adr))
 					echo "$row_adr->plz $row_adr->ort, $row_adr->strasse<br>";
 			echo "<td>$status</td>";
@@ -447,8 +456,6 @@ if($where!='')
 		echo '</table>';
 	}
 }
-//else
-//	echo 'Zum Erstellen des Vorschlags bitte Geburtsdatum oder Vorname und Nachname eingeben';
 
 ?>
 </td>

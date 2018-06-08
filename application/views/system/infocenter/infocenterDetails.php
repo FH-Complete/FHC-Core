@@ -8,12 +8,10 @@
 			'fontawesome' => true,
 			'jqueryui' => true,
 			'ajaxlib' => true,
-			'phraseslib' => true,
 			'tablesorter' => true,
 			'tinymce' => true,
 			'sbadmintemplate' => true,
 			'addons' => true,
-			'ajaxlib' => true,
 			'navigationwidget' => true,
 			'customCSSs' =>
 				array(
