@@ -104,7 +104,6 @@ class Phrase_model extends DB_Model
 
 		$query .= ') ORDER BY p.category, p.phrase, pt.orgeinheit_kurzbz DESC, pt.orgform_kurzbz DESC';
 
-		var_dump($query);exit;
 		return $this->execQuery($query, $parametersArray);
 	}
 }
