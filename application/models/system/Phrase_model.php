@@ -82,7 +82,7 @@ class Phrase_model extends DB_Model
 			SELECT p.category, p.phrase, pt.orgeinheit_kurzbz, pt.orgform_kurzbz, pt.text
 			  FROM system.tbl_phrase p
 		INNER JOIN system.tbl_phrasentext pt USING(phrase_id)
-			 WHERE pt.sprache = ? AND ';
+			 WHERE pt.sprache = ? AND (';
 
 		$parametersArray = array($language);
 
@@ -95,7 +95,8 @@ class Phrase_model extends DB_Model
 
 		$query = rtrim($query, ' OR ');
 
-		$query .= ' ORDER BY p.category, p.phrase, pt.orgeinheit_kurzbz DESC, pt.orgform_kurzbz DESC';
+
+		$query .= ') ORDER BY p.category, p.phrase, pt.orgeinheit_kurzbz DESC, pt.orgform_kurzbz DESC';
 
 		return $this->execQuery($query, $parametersArray);
 	}
