@@ -1,5 +1,4 @@
 <?php
-
 /* Copyright (C) 2014 fhcomplete.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -18,8 +17,6 @@
  *
  * Authors:		Stefan Puraner	<puraner@technikum-wien.at>
  */
-
-
 require_once('../../../../config/cis.config.inc.php');
 require_once('../../../../include/phrasen.class.php');
 require_once('../../../../include/globals.inc.php');
@@ -32,12 +29,9 @@ $p = new phrasen($sprache);
 
 ?>
 
-
 /**
  * Error-Behandlung bei Ajax Requests
  */
-
-
 function loadError(xhr, textStatus, errorThrown)
 {
 	if(xhr.status==200)
@@ -62,7 +56,7 @@ function loadPruefungenMitarbeiter()
 			mitarbeiter_uid: uid
 		},
 		error: loadError
-	}).success(function(data){
+	}).done(function(data){
 		$("#pruefungen").find("h2").first().text("<?php echo $p->t('pruefung/pruefungPruefungenTitle'); ?> ("+uid+")");
 		if(data.error === 'false')
 		{
@@ -72,7 +66,7 @@ function loadPruefungenMitarbeiter()
 				e.pruefung.lehrveranstaltungen.forEach(function(d)
 				{
 					d.pruefung.termine.forEach(function(f){
-						liste += "<li> <a onclick='showTeilnehmer(\""+f.pruefungstermin_id+"\", \""+e.lehrveranstaltung_id+"\", \""+e.bezeichnung+"\", \""+convertDateTime(f.von)+"\");'>"+convertDateTime(f.von)+"</a></li>";
+						liste += "<li> <a onclick='showTeilnehmer(\""+f.pruefungstermin_id+"\", \""+e.lehrveranstaltung_id+"\", \""+e.bezeichnung.replace("'", "&apos;")+"\", \""+convertDateTime(f.von)+"\");'>"+convertDateTime(f.von)+"</a></li>";
 					});
 				})
 				liste += "</li></ul>";
@@ -106,7 +100,7 @@ function showTeilnehmer(pruefungstermin_id, lehrveranstaltung_id, lehrveranstalt
 			method: "getNoten"
 		},
 		error: loadError
-	}).success(function(data){
+	}).done(function(data){
 		if(data.error != 'true')
 		{
 			data.result.forEach(function(d)
@@ -119,7 +113,7 @@ function showTeilnehmer(pruefungstermin_id, lehrveranstaltung_id, lehrveranstalt
 		{
 			messageBox("message",data.errormsg, "red", "highlight", 1000);
 		}
-	}).complete(function(event, xhr, settings){
+	}).always(function(event, xhr, settings){
 		var notenSelect = noten;
 		$.ajax({
 			dataType: 'json',
@@ -131,7 +125,7 @@ function showTeilnehmer(pruefungstermin_id, lehrveranstaltung_id, lehrveranstalt
 				lehrveranstaltung_id: lehrveranstaltung_id
 			},
 			error: loadError
-		}).success(function(data){
+		}).done(function(data){
 			var entry = "";
 			if(data.error === "false")
 			{
@@ -142,11 +136,21 @@ function showTeilnehmer(pruefungstermin_id, lehrveranstaltung_id, lehrveranstalt
 						var datum = d.von.split(" ");
 						if(d.pruefung.note===null)
 						{
-							entry = "<div class='anmeldung' id="+d.student.uid+"><div>"+d.student.vorname+" "+d.student.nachname+"</div>"+notenSelect+"<input type='button' onclick='saveBeurteilung(this,\""+datum[0]+"\",\""+d.pruefungsanmeldung_id+"\",\""+d.pruefung_id+"\",\""+d.lehrveranstaltung_id+"\");' value='<?php echo $p->t('global/speichern'); ?>'/></br><input id='note_anmerkung_"+d.student.uid+"' placeholder='<?php echo $p->t('global/anmerkung'); ?>' /></div>";
+							entry = "<div class='anmeldung' id="+d.student.uid+">";
+							entry = entry+"<div>"+d.student.vorname+" "+d.student.nachname+"</div>"
+							entry = entry+notenSelect;
+							entry = entry+"<input id='note_anmerkung_"+d.student.uid+"' placeholder='<?php echo $p->t('global/anmerkung'); ?>' />";
+							entry = entry+"<input type='button' onclick='saveBeurteilung(this,\""+datum[0]+"\",\""+d.pruefungsanmeldung_id+"\",\""+d.pruefung_id+"\",\""+d.lehrveranstaltung_id+"\");' value='<?php echo $p->t('global/speichern'); ?>'/>";
+							entry = entry+"</div>";
 						}
 						else
 						{
-							entry = "<div class='anmeldung' id="+d.student.uid+"><div>"+d.student.vorname+" "+d.student.nachname+"</div>"+notenSelect+"<input type='button' onclick='updateBeurteilung(this,\""+d.pruefung.pruefung_id+"\");' value='<?php echo $p->t('global/speichern'); ?>'/></br><input id='note_anmerkung_"+d.student.uid+"' placeholder='<?php echo $p->t('global/anmerkung'); ?>' value='"+d.pruefung.anmerkung+"' /></div>";
+							entry = "<div class='anmeldung' id="+d.student.uid+">";
+							entry = entry+"<div>"+d.student.vorname+" "+d.student.nachname+"</div>";
+							entry = entry+notenSelect;
+							entry = entry+"<input id='note_anmerkung_"+d.student.uid+"' placeholder='<?php echo $p->t('global/anmerkung'); ?>' value='"+d.pruefung.anmerkung+"' />";
+							entry = entry+"<input type='button' onclick='updateBeurteilung(this,\""+d.pruefung.pruefung_id+"\");' value='<?php echo $p->t('global/speichern'); ?>'/>";
+							entry = entry+"</div>";
 						}
 						$("#anmeldeDaten").append(entry);
 						if(d.pruefung.note!==null)
@@ -173,7 +177,7 @@ function showTeilnehmer(pruefungstermin_id, lehrveranstaltung_id, lehrveranstalt
 				entry = "<div><div>"+data.errormsg+"</div></div>";
 				$("#anmeldeDaten").html(entry);
 			}
-		}).complete(function(event, xhr, settings){
+		}).always(function(event, xhr, settings){
 			$("#modalOverlay").removeClass("modalOverlay");
 		});
 	});
@@ -217,7 +221,7 @@ function saveBeurteilung(ele, datum, pruefungsanmeldung_id, pruefung_id, lehrver
 			pruefungsanmeldung_id: pruefungsanmeldung_id
 		},
 		error: loadError
-	}).success(function(data){
+	}).done(function(data){
 		if(data.error != 'true')
 		{
 			markAsSaved(ele);
@@ -228,7 +232,7 @@ function saveBeurteilung(ele, datum, pruefungsanmeldung_id, pruefung_id, lehrver
 			messageBox("message",data.errormsg, "red", "highlight", 1000);
 			$(ele).parent().find("select").val(null);
 		}
-	}).complete(function(event, xhr, settings){
+	}).always(function(event, xhr, settings){
 
 	});
 }
@@ -261,7 +265,7 @@ function updateBeurteilung(ele, pruefung_id)
 			anmerkung: anmerkung
 		},
 		error: loadError
-	}).success(function(data){
+	}).done(function(data){
 		if(data.error != 'true')
 		{
 			markAsSaved(ele);
@@ -272,7 +276,7 @@ function updateBeurteilung(ele, pruefung_id)
 		}
 
 
-	}).complete(function(event, xhr, settings){
+	}).always(function(event, xhr, settings){
 
 	});
 }

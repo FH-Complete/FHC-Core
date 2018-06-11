@@ -21,19 +21,19 @@
 
 require_once('../../../../config/cis.config.inc.php');
 require_once('../../../../include/basis_db.class.php');
-require_once('../../../../include/mitarbeiter.class.php'); 
-	
+require_once('../../../../include/mitarbeiter.class.php');
+
 if (!$db = new basis_db())
-    die('Es konnte keine Verbindung zum Server aufgebaut werden.');
+	die('Es konnte keine Verbindung zum Server aufgebaut werden.');
 
 if(isset($_REQUEST['autocomplete']) && $_REQUEST['autocomplete']=='lektor')
 {
 	$search=trim((isset($_REQUEST['term']) ? $_REQUEST['term']:''));
 	if (is_null($search) ||$search=='')
-		exit();	
-	$mitarbeiter = new mitarbeiter(); 
+		exit();
+	$mitarbeiter = new mitarbeiter();
 	$searchItems = explode(' ',$search);
-	if($mitarbeiter->search($search))
+	if ($mitarbeiter->search($search))
 	{
 		$result_obj = array();
 		foreach($mitarbeiter->result as $row)

@@ -1,4 +1,3 @@
-<!DOCTYPE html>
 <?php
 /*
  * Copyright 2014 fhcomplete.org
@@ -44,41 +43,44 @@ $rechte->getBerechtigungen($uid);
 $studiensemester = new studiensemester();
 $pruefung = new pruefungCis();
 $pruefung->getPruefungByMitarbeiter($uid, $studiensemester->getaktorNext());
-if(empty($pruefung->result) && !$rechte->isBerechtigt('lehre/pruefungsanmeldungAdmin'))
-    die('Sie haben keine Berechtigung für diese Seite');
+if (empty($pruefung->result) && !$rechte->isBerechtigt('lehre/pruefungsanmeldungAdmin'))
+	die('Sie haben keine Berechtigung für diese Seite');
 
-?>
+?><!DOCTYPE html>
 <html>
-    <head>
-        <meta charset="UTF-8">
-        <title><?php echo $p->t('pruefung/anmeldungenVerwaltenTitle'); ?></title>
-        <script src="../../../../include/js/datecheck.js"></script>
-		<script type="text/javascript" src="../../../../vendor/jquery/jqueryV1/jquery-1.12.4.min.js"></script>
-		<script type="text/javascript" src="../../../../vendor/christianbach/tablesorter/jquery.tablesorter.min.js"></script>
+	<head>
+		<meta charset="UTF-8">
+		<title><?php echo $p->t('pruefung/anmeldungenVerwaltenTitle'); ?></title>
+		<script src="../../../../include/js/datecheck.js"></script>
+		<script type="text/javascript" src="../../../../vendor/components/jquery/jquery.min.js"></script>
+		<script type="text/javascript" src="../../../../vendor/mottie/tablesorter/dist/js/jquery.tablesorter.min.js"></script>
+		<script type="text/javascript" src="../../../../vendor/mottie/tablesorter/dist/js/jquery.tablesorter.widgets.min.js"></script>
+		<script type="text/javascript" src="../../../../vendor/mottie/tablesorter/dist/js/extras/jquery.tablesorter.pager.min.js"></script>
 		<script type="text/javascript" src="../../../../vendor/components/jqueryui/jquery-ui.min.js"></script>
 		<script type="text/javascript" src="../../../../include/js/jquery.ui.datepicker.translation.js"></script>
-        <script src="./pruefung.js.php"></script>
-        <link rel="stylesheet" href="../../../../skin/jquery-ui-1.9.2.custom.min.css">
-        <link rel="stylesheet" href="../../../../skin/fhcomplete.css">
-        <link rel="stylesheet" href="../../../../skin/style.css.php">
-        <link rel="stylesheet" href="../../../../skin/tablesort.css">
-	<link rel="stylesheet" href="//code.jquery.com/ui/1.10.4/themes/smoothness/jquery-ui.css">
-	<style type="text/css">
-	    body {
-		padding: 10px 0 0 10px;
-	    }
+		<script src="./pruefung.js.php"></script>
+		<link rel="stylesheet" href="../../../../vendor/components/jqueryui/themes/base/jquery-ui.min.css">
+		<link rel="stylesheet" href="../../../../skin/fhcomplete.css">
+		<link rel="stylesheet" href="../../../../skin/style.css.php">
+		<link rel="stylesheet" href="../../../../vendor/mottie/tablesorter/dist/css/theme.default.min.css">
+		<link rel="stylesheet" href="../../../../vendor/mottie/tablesorter/dist/css/jquery.tablesorter.pager.min.css">
 
-	    #stgWrapper {
+	<style type="text/css">
+		body {
+		padding: 10px 0 0 10px;
+		}
+
+		#stgWrapper {
 		position: absolute;
-		height: 70px;
+		height: 80px;
 		width: 850px;
 		padding: 1.8em 1.5em 1.8em 1em;
 		/*border-radius: 25px;*/
 		border: 1px solid #dddddd;
 		/*box-shadow: 0em 0em 2em 0.5em #888888 inset;*/
-	    }
+		}
 
-	    #studiengaenge {
+		#studiengaenge {
 		/*border: 1px solid black;*/
 		width: 94%;
 		position: relative;
@@ -87,10 +89,10 @@ if(empty($pruefung->result) && !$rechte->isBerechtigt('lehre/pruefungsanmeldungA
 		height: 100%;
 		overflow: auto;
 		overflow-x: hidden;
-	    }
+		}
 
 
-	    #prfWrapper {
+		#prfWrapper {
 		position: absolute;
 		height: 70%;
 		width: 300px;
@@ -99,9 +101,9 @@ if(empty($pruefung->result) && !$rechte->isBerechtigt('lehre/pruefungsanmeldungA
 		/*border-radius: 25px;*/
 		border: 1px solid #dddddd;
 		/*box-shadow: 0em 0em 2em 0.5em #888888 inset;*/
-	    }
+		}
 
-	    #pruefungen {
+		#pruefungen {
 		/*border: 1px solid black;*/
 		width: 94%;
 		position: relative;
@@ -110,9 +112,9 @@ if(empty($pruefung->result) && !$rechte->isBerechtigt('lehre/pruefungsanmeldungA
 		height: 100%;
 		overflow: auto;
 		overflow-x: hidden;
-	    }
+		}
 
-	    #anmWrapper {
+		#anmWrapper {
 		position: absolute;
 		/*top: 45px;*/
 		left: 350px;
@@ -123,38 +125,38 @@ if(empty($pruefung->result) && !$rechte->isBerechtigt('lehre/pruefungsanmeldungA
 		/*border-radius: 25px;*/
 		border: 1px solid #dddddd;
 		/*box-shadow: 0em 0em 2em 0.5em #888888 inset;*/
-	    }
+		}
 
-	    #anmeldungen {
+		#anmeldungen {
 		height: 100%;
 		overflow: auto;
 		overflow-x: hidden;
-	    }
+		}
 
-	    #anmeldungen > * {
+		#anmeldungen > * {
 		padding: 0.5em;
-	    }
+		}
 
-	    #raum > * {
+		#raum > * {
 		margin-bottom: 0.5em;
-	    }
+		}
 
-	    #message {
+		#message {
 		position: fixed;
 		bottom: 0px;
 		width: 100%;
 		height: 2em;
 		font-size: 1.5em;
 		font-weight: bold;
-	    }
+		}
 
-	    #sortable {
+		#sortable {
 		list-style-type: none;
 		margin: 0;
 		padding: 0;
 		width: 100%;
-	    }
-	    #sortable li {
+		}
+		#sortable li {
 		margin: 0 3px 3px 3px;
 		padding: 0.2em 0.4em 0.4em;
 		padding-left: 1.5em;
@@ -162,37 +164,37 @@ if(empty($pruefung->result) && !$rechte->isBerechtigt('lehre/pruefungsanmeldungA
 		height: 18px;
 		list-style-image: none;
 		display: block;
-	    }
-	    #sortable li span {
+		}
+		#sortable li span {
 		/*position: absolute;*/
 		margin-left: -1.3em;
 		float:left;
-	    }
+		}
 
-	    .resultOK {
+		.resultOK {
 		color: green;
-	    }
+		}
 
-	    .resultNotOK {
+		.resultNotOK {
 		color: red;
-	    }
+		}
 
-	    #sortable li a {
+		#sortable li a {
 		float: left;
-	    }
+		}
 
-	    #sortable li div {
+		#sortable li div {
 		float: right;
 		margin-left: 5px;
 		font-size: 0.8em;
-	    }
+		}
 
-	    .anmerkungInfo {
+		.anmerkungInfo {
 		text-align: right;
 		width: 10%;
-	    }
+		}
 
-	    #progressbar {
+		#progressbar {
 		position: fixed;
 		width: 300px;
 		top: 30%;
@@ -200,83 +202,84 @@ if(empty($pruefung->result) && !$rechte->isBerechtigt('lehre/pruefungsanmeldungA
 		margin-left: -150px;
 		z-index: 100;
 		background: '#9CFF29';
-	    }
-	    .modalOverlay {
+		}
+		.modalOverlay {
 		position: fixed;
 		width: 100%;
 		height: 100%;
 		top: 0px;
 		left: 0px;
 		background-color: rgba(0,0,0,0.3); /* black semi-transparent */
-	    }
+		}
 
-	    .studiengang {
+		.studiengang {
 		font-size: 1em;
 		font-weight: bold;
-	    }
+		}
 
-	    #studiengaenge > div {
+		#studiengaenge > div {
 		float: left;
 		width: 50%;
-	    }
+		}
 
 	</style>
-    </head>
-    <body>
+	</head>
+	<body>
 	<script>
-	    $(document).ready(function(){
-		loadStudiengaenge();
-		$("#filter_studiensemester").css("visibility","visible");
-		// console.log($("#filter_studiensemester"));
-		$("#raumDialog").dialog({
-		    modal: true,
-		    autoOpen: false,
-		    width: "400px"
+		$(document).ready(function()
+		{
+			loadStudiengaenge();
+			$("#filter_studiensemester").css("visibility","visible");
+
+			$("#raumDialog").dialog({
+				modal: true,
+				autoOpen: false,
+				width: "400px"
+			});
 		});
-	    });
 	</script>
 	<h1><?php echo $p->t('pruefung/anmeldungenVerwalten'); ?></h1>
 	<div id='stgWrapper'>
-	    <div id='studiengaenge'>
+		<div id='studiengaenge'>
 		<div>
-		    <h2><?php echo $p->t('global/studiengang'); ?></h2>
-		    <div id='stgListe'>
+			<h2><?php echo $p->t('global/studiengang'); ?></h2>
+			<div id='stgListe'>
 
-		    </div>
+			</div>
 		</div>
 		<div>
-		    <h2><?php echo $p->t('global/studiensemester'); ?></h2>
-		    <?php
+			<h2><?php echo $p->t('global/studiensemester'); ?></h2>
+			<?php
 			echo '<select id="filter_studiensemester" onchange="loadPruefungStudiengang();" style="visibility: hidden;">';
 			$aktuellesSemester = $studiensemester->getaktorNext();
 			$studiensemester->getAll();
 			foreach($studiensemester->studiensemester as $sem)
 			{
-			    /*@var $sem studiensemester */
-			    if($aktuellesSemester == $sem->studiensemester_kurzbz)
-			    {
+				/*@var $sem studiensemester */
+				if ($aktuellesSemester == $sem->studiensemester_kurzbz)
+				{
 				echo '<option selected value="'.$sem->studiensemester_kurzbz.'">'.$sem->bezeichnung.'</option>';
-			    }
-			    else
-			    {
+				}
+				else
+				{
 				echo '<option value="'.$sem->studiensemester_kurzbz.'">'.$sem->bezeichnung.'</option>';
-			    }
+				}
 			}
-		       echo '</select></p>';
+			   echo '</select></p>';
 		   ?>
 		</div>
-	    </div>
+		</div>
 	</div>
 	<div id='prfWrapper'>
-	    <div id='pruefungen'>
+		<div id='pruefungen'>
 		<h2><?php echo $p->t('pruefung/pruefungPruefungenTitle'); ?></h2>
 		<ul id="pruefungenListe">
 
 		</ul>
-	    </div>
+		</div>
 	</div>
 	<div id='anmWrapper'>
-	    <div id="anmeldungen">
+		<div id="anmeldungen">
 		<h2><?php echo $p->t('pruefung/pruefungsbewertungAnmeldungen'); ?> <span id='lvdaten'></span></h2>
 		<div id="anmeldung_hinzufuegen">
 
@@ -300,17 +303,17 @@ if(empty($pruefung->result) && !$rechte->isBerechtigt('lehre/pruefungsanmeldungA
 
 		</div>
 		<div id="raumDialog">
-		    <div id="raum">
+			<div id="raum">
 
-		    </div>
-		    <div id="raumSpeichernButton">
+			</div>
+			<div id="raumSpeichernButton">
 
-		    </div>
+			</div>
 		</div>
-	    </div>
+		</div>
 	</div>
 
 	<div id="message"></div>
 	<div id="progressbar"></div>
-    </body>
+	</body>
 </html>

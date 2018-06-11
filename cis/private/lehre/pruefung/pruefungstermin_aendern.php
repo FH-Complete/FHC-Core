@@ -1,4 +1,3 @@
-<!DOCTYPE html>
 <?php
 /*
  * Copyright 2014 fhcomplete.org
@@ -55,7 +54,7 @@ $studiensemester = new studiensemester();
 $lehrveranstaltung = new lehrveranstaltung();
 $lehrveranstaltung->loadLVAfromMitarbeiter(0, $uid, $studiensemester->getaktorNext());
 if(empty($lehrveranstaltung->lehrveranstaltungen) && !$rechte->isBerechtigt('lehre/pruefungsterminAdmin'))
-    die('Sie haben keine Berechtigung für diese Seite');
+	die('Sie haben keine Berechtigung für diese Seite');
 
 if (!ctype_digit($_GET['termin_id']))
 	die('Wrong Parameter');
@@ -129,52 +128,55 @@ foreach ($anmeldungen as $row)
 	$uids .= $row->uid.'@'.DOMAIN.'<br>';
 }
 
-?>
+?><!DOCTYPE html>
 <html>
-    <head>
-        <meta charset="UTF-8">
-        <title><?php echo $p->t('pruefung/titlePruefungstermin'); ?></title>
-        <script src="../../../../include/js/datecheck.js"></script>
-		<script type="text/javascript" src="../../../../vendor/jquery/jqueryV1/jquery-1.12.4.min.js"></script>
-		<script type="text/javascript" src="../../../../vendor/christianbach/tablesorter/jquery.tablesorter.min.js"></script>
-		<script type="text/javascript" src="../../../../vendor/components/jqueryui/jquery-ui.min.js"></script>
-		<script type="text/javascript" src="../../../../include/js/jquery.ui.datepicker.translation.js"></script>
-        <script src="./pruefung.js.php"></script>
-        <link rel="stylesheet" href="../../../../skin/jquery-ui-1.9.2.custom.min.css">
-        <link rel="stylesheet" href="../../../../skin/fhcomplete.css">
-        <link rel="stylesheet" href="../../../../skin/style.css.php">
-        <link rel="stylesheet" href="../../../../skin/tablesort.css">
+<head>
+	<meta charset="UTF-8">
+	<title><?php echo $p->t('pruefung/titlePruefungstermin'); ?></title>
+	<script src="../../../../include/js/datecheck.js"></script>
+	<script type="text/javascript" src="../../../../vendor/components/jquery/jquery.min.js"></script>
+	<script type="text/javascript" src="../../../../vendor/mottie/tablesorter/dist/js/jquery.tablesorter.min.js"></script>
+	<script type="text/javascript" src="../../../../vendor/mottie/tablesorter/dist/js/jquery.tablesorter.widgets.min.js"></script>
+	<script type="text/javascript" src="../../../../vendor/mottie/tablesorter/dist/js/extras/jquery.tablesorter.pager.min.js"></script>
+	<script type="text/javascript" src="../../../../vendor/components/jqueryui/jquery-ui.min.js"></script>
+	<script type="text/javascript" src="../../../../vendor/components/jqueryui/ui/i18n/datepicker-de.js"></script>
+	<link rel="stylesheet" href="../../../../vendor/components/jqueryui/themes/base/jquery-ui.min.css">
+	<script src="./pruefung.js.php"></script>
+	<link rel="stylesheet" href="../../../../skin/fhcomplete.css">
+	<link rel="stylesheet" href="../../../../skin/style.css.php">
+	<link rel="stylesheet" href="../../../../vendor/mottie/tablesorter/dist/css/theme.default.min.css">
+	<link rel="stylesheet" href="../../../../vendor/mottie/tablesorter/dist/css/jquery.tablesorter.pager.min.css">
 	<style type="text/css">
-	    #message {
-		position: fixed;
-		top: 0px;
-		right: 0px;
-		width: 50%;
-		height: 2em;
-		font-size: 1.5em;
-		font-weight: bold;
-	    }
+		#message {
+			position: fixed;
+			top: 0px;
+			right: 0px;
+			width: 50%;
+			height: 2em;
+			font-size: 1.5em;
+			font-weight: bold;
+		}
 
-	    .missingFormData {
-		border: 2px solid red;
-		outline: 2px solid red;
-	    }
+		.missingFormData {
+			border: 2px solid red;
+			outline: 2px solid red;
+		}
 
-	    .modalOverlay {
-		position: fixed;
-		width: 100%;
-		height: 100%;
-		top: 0px;
-		left: 0px;
-		background-color: rgba(0,0,0,0.3); /* black semi-transparent */
-	    }
+		.modalOverlay {
+			position: fixed;
+			width: 100%;
+			height: 100%;
+			top: 0px;
+			left: 0px;
+			background-color: rgba(0,0,0,0.3); /* black semi-transparent */
+		}
 
-	    #prfDetails, #prfVerwaltung {
-		margin: 1em;
-	    }
+		#prfDetails, #prfVerwaltung {
+			margin: 1em;
+		}
 	</style>
-    </head>
-    <body style="padding-top:20px">
+	</head>
+	<body style="padding-top:20px">
 		<center>
 		<form name="change_termin" action="./pruefungstermin_aendern.php" method="GET">
 		<table>
@@ -220,5 +222,5 @@ foreach ($anmeldungen as $row)
 		</table>
 		</form>
 	</center>
-    </body>
+	</body>
 </html>

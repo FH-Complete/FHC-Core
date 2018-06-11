@@ -1,4 +1,3 @@
-<!DOCTYPE html>
 <?php
 /*
  * Copyright 2014 fhcomplete.org
@@ -45,145 +44,145 @@ $p = new phrasen($sprache);
 $uid = get_uid();
 $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($uid);
-?>
+?><!DOCTYPE html>
 <html moznomarginboxes="">
-    <head>
-	 <meta charset="UTF-8">
-	 	<script type="text/javascript" src="../../../../vendor/jquery/jqueryV1/jquery-1.12.4.min.js"></script>
-		<script type="text/javascript" src="../../../../vendor/christianbach/tablesorter/jquery.tablesorter.min.js"></script>
-		<script type="text/javascript" src="../../../../vendor/components/jqueryui/jquery-ui.min.js"></script>
-		<script type="text/javascript" src="../../../../include/js/jquery.ui.datepicker.translation.js"></script>
-	 <style type="text/css">
-	    body {
-		margin: 0;
-		padding: 0;
-	    }
+<head>
+	<meta charset="UTF-8">
+	<script type="text/javascript" src="../../../../vendor/components/jquery/jquery.min.js"></script>
+	<script type="text/javascript" src="../../../../vendor/components/jqueryui/jquery-ui.min.js"></script>
+	<style type="text/css">
+		body {
+			margin: 0;
+			padding: 0;
+		}
 
-	    * {
-		box-sizing: border-box;
-		-moz-box-sizing: border-box;
-	    }
+		* {
+			box-sizing: border-box;
+			-moz-box-sizing: border-box;
+		}
 
-	    #page {
-	       width: 210mm;
-	       min-height: 297mm;
-	       padding: 20mm;
-	       margin: 10mm auto;
-	       border: 1px #ffffff solid;
-	       border-radius: 5px;
-	       background: white;
-	       box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
-	       font-family: Arial, Helvetica;
-	    }
-
-	    #subpage {
-		padding: 10mm;
-		border: 1px white solid;
-		height: 256mm;
-		outline: 20mm
-	    }
-
-	    #liste {
-		border: 1px solid black;
-		border-collapse: collapse;
-		width: 100%;
-		margin-top: 5mm;
-		font-size: 11pt;
-	    }
-
-	    h1 {
-		text-align: center;
-	    }
-
-	    .bold {
-		font-weight: bold;
-	    }
-
-	    td {
-		border: 1px solid black;
-		padding: 1mm;
-	    }
-
-	    th {
-		border: 1px solid black;
-	    }
-
-	    thead > tr {
-		background-color: white !important;
-	    }
-
-	    tr:nth-child(odd){
-		background-color: lightgrey;
-	    }
-
-	    span {
-		line-height: 16pt;
-		font-size: 12pt;
-	    }
-
-	    @page {
-		 size: A4;
-		 margin: 0;
-	    }
-
-	    @media print {
-		html, body {
-		     width: 210mm;
-		     height: 250mm;
-		 }
 		#page {
-		    margin: 0;
-		    border: initial;
-		    border-radius: initial;
-		    width: initial;
-		    min-height: initial;
-		    box-shadow: initial;
-		    background: initial;
-		    page-break-after: auto;
+			width: 210mm;
+			min-height: 297mm;
+			padding: 20mm;
+			margin: 10mm auto;
+			border: 1px #ffffff solid;
+			border-radius: 5px;
+			background: white;
+			box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+			font-family: Arial, Helvetica;
 		}
 
-		/*
-		* Workaround um beim Drucken jede zweite Zeile der Tabelle
-		* grau darzustellen. Standardmäßig werden von Browsern keine
-		* Hintergrundfarben gedruckt.
-		*/
-		tr:nth-child(odd) > td{
-		    box-shadow: inset 0 0 0 1000px lightgrey;
+		#subpage {
+			padding: 10mm;
+			border: 1px white solid;
+			height: 256mm;
+			outline: 20mm;
 		}
 
-		//Veranlasst Chrome Hintergrundfarben zu drucken
-		body{
-		    -webkit-print-color-adjust:exact;
-		    background-color: #FFFFFF;
-		    margin: 0;
+		#liste {
+			border: 1px solid black;
+			border-collapse: collapse;
+			width: 100%;
+			margin-top: 5mm;
+			font-size: 11pt;
 		}
 
-		//Anweisungen nur für Firefox
-		@-moz-document url-prefix() {
-		    html, body {
-			height: 280mm;
-		    }
+		h1 {
+			text-align: center;
 		}
-		@-moz-document url-prefix() {
-		    #page {
-			padding: 15mm 25mm 25mm 15mm !important;
-		    }
+
+		.bold {
+			font-weight: bold;
 		}
-	    }
+
+		td {
+			border: 1px solid black;
+			padding: 1mm;
+		}
+
+		th {
+			border: 1px solid black;
+		}
+
+		thead > tr {
+			background-color: white !important;
+		}
+
+		tr:nth-child(odd){
+			background-color: lightgrey;
+		}
+
+		span {
+			line-height: 16pt;
+			font-size: 12pt;
+		}
+
+		@page {
+			size: A4;
+			margin: 0;
+		}
+
+		@media print
+		{
+			html, body {
+				width: 210mm;
+				height: 250mm;
+			}
+			#page {
+				margin: 0;
+				border: initial;
+				border-radius: initial;
+				width: initial;
+				min-height: initial;
+				box-shadow: initial;
+				background: initial;
+				page-break-after: auto;
+			}
+
+			/*
+			* Workaround um beim Drucken jede zweite Zeile der Tabelle
+			* grau darzustellen. Standardmäßig werden von Browsern keine
+			* Hintergrundfarben gedruckt.
+			*/
+			tr:nth-child(odd) > td{
+				box-shadow: inset 0 0 0 1000px lightgrey;
+			}
+
+			//Veranlasst Chrome Hintergrundfarben zu drucken
+			body{
+				-webkit-print-color-adjust:exact;
+				background-color: #FFFFFF;
+				margin: 0;
+			}
+
+			//Anweisungen nur für Firefox
+			@-moz-document url-prefix() {
+				html, body {
+				height: 280mm;
+				}
+			}
+			@-moz-document url-prefix() {
+				#page {
+				padding: 15mm 25mm 25mm 15mm !important;
+				}
+			}
+		}
 	 </style>
-    </head>
-    <body>
+	</head>
+	<body>
 	<script>
-	    $(document).ready(function(){
-		window.print();
-	    });
+		$(document).ready(function()
+		{
+			window.print();
+		});
 	</script>
 	<div id="page">
-	    <div id="subpage">
-	    <h1><?php echo $p->t('pruefung/anmeldungsliste'); ?></h1>
+		<div id="subpage">
+		<h1><?php echo $p->t('pruefung/anmeldungsliste'); ?></h1>
 	<?php
 	if(empty($pruefung->result) && !$rechte->isBerechtigt('lehre/pruefungsanmeldungAdmin'))
-	    die('Sie haben keine Berechtigung für diese Seite');
+		die('Sie haben keine Berechtigung für diese Seite');
 
 	$termin_id = filter_input(INPUT_GET,"termin_id");
 	$lehrveranstaltung_id = filter_input(INPUT_GET,"lehrveranstaltung_id");
@@ -191,42 +190,42 @@ $rechte->getBerechtigungen($uid);
 
 	if(is_null($lehrveranstaltung_id))
 	{
-	    die($p->t('pruefung/fehlenderParam_lvid'));
+		die($p->t('pruefung/fehlenderParam_lvid'));
 	}
 	else if(is_null($termin_id))
 	{
-	    die($p->t('pruefung/fehlenderParam_terminid'));
+		die($p->t('pruefung/fehlenderParam_terminid'));
 	}
 	else if(is_null($studiensemester))
 	{
-	    die($p->t('pruefung/fehlenderParam_studiensemester'));
+		die($p->t('pruefung/fehlenderParam_studiensemester'));
 	}
 	else
 	{
-	    $datum = new datum();
-	    $stdsem = new studiensemester($studiensemester);
-	    $pruefungsanmeldung = new pruefungsanmeldung();
-	    $anmeldungen = $pruefungsanmeldung->getAnmeldungenByTermin($termin_id, $lehrveranstaltung_id, $studiensemester, "bestaetigt");
-	    $lehrveranstaltung = new lehrveranstaltung($lehrveranstaltung_id);
-	    $einzeln = FALSE;
-	    if(!empty($anmeldungen))
-	    {
+		$datum = new datum();
+		$stdsem = new studiensemester($studiensemester);
+		$pruefungsanmeldung = new pruefungsanmeldung();
+		$anmeldungen = $pruefungsanmeldung->getAnmeldungenByTermin($termin_id, $lehrveranstaltung_id, $studiensemester, "bestaetigt");
+		$lehrveranstaltung = new lehrveranstaltung($lehrveranstaltung_id);
+		$einzeln = FALSE;
+		if(!empty($anmeldungen))
+		{
 		$pruefung = new pruefungCis($anmeldungen[0]->pruefung_id);
 		$pruefungstermin = new pruefungstermin($anmeldungen[0]->pruefungstermin_id);
 		$mitarbeiter = new mitarbeiter($pruefung->mitarbeiter_uid);
 		if($pruefung->einzeln)
 		{
-		    $einzeln = TRUE;
-		    $pruefungsintervall = $pruefung->pruefungsintervall;
+			$einzeln = TRUE;
+			$pruefungsintervall = $pruefung->pruefungsintervall;
 		}
 
-	    ?>
-	    <span class="bold"><?php echo $p->t('global/lehrveranstaltung'); ?>: </span><span><?=$lehrveranstaltung->bezeichnung?></span><br/>
-	    <span class="bold"><?php echo $p->t('global/studiensemester'); ?>: </span><span><?=$stdsem->bezeichnung?></span><br/>
-	    <span class="bold"><?php echo $p->t('pruefung/pruefer'); ?>: </span><span><?=$mitarbeiter->getFullName(FALSE)?></span><br/>
-	    <table id="liste">
+		?>
+		<span class="bold"><?php echo $p->t('global/lehrveranstaltung'); ?>: </span><span><?=$lehrveranstaltung->bezeichnung?></span><br/>
+		<span class="bold"><?php echo $p->t('global/studiensemester'); ?>: </span><span><?=$stdsem->bezeichnung?></span><br/>
+		<span class="bold"><?php echo $p->t('pruefung/pruefer'); ?>: </span><span><?=$mitarbeiter->getFullName(FALSE)?></span><br/>
+		<table id="liste">
 		<thead>
-		    <tr>
+			<tr>
 			<th>#</th>
 			<th><?php echo $p->t('global/vorname'); ?></th>
 			<th><?php echo $p->t('global/nachname'); ?></th>
@@ -234,31 +233,31 @@ $rechte->getBerechtigungen($uid);
 			<th><?php echo $p->t('global/datum'); ?></th>
 			<th><?php echo $p->t('benotungstool/note'); ?></th>
 			<th><?php echo $p->t('global/anmerkung'); ?></th>
-		    </tr>
+			</tr>
 		</thead>
 		<tbody>
-		    <?php
+			<?php
 			$count = 0;
 			/*@var $anmeldung pruefungsanmeldung */
 			foreach($anmeldungen as $anmeldung)
 			{
-			    $student = new student($anmeldung->uid);
-			    $prfTermin = new pruefungstermin($anmeldung->pruefungstermin_id);
+				$student = new student($anmeldung->uid);
+				$prfTermin = new pruefungstermin($anmeldung->pruefungstermin_id);
 
-			    if($einzeln)
-			    {
+				if($einzeln)
+				{
 				$date = $datum->formatDatum($prfTermin->von, "Y-m-d H:i:s");
 				$date = strtotime($date);
 				$date = $date+(60*$pruefungsintervall*($count));
 				$date = $datum->formatDatum($prfTermin->von,"d.m.Y").' - '.date("H:i",$date);
 				$count++;
-			    }
-			    else
-			    {
+				}
+				else
+				{
 				$date =  $datum->formatDatum($prfTermin->von,"d.m.Y - H:i");
 				$count++;
-			    }
-			    echo '<tr>';
+				}
+				echo '<tr>';
 				echo '<td>'.$count.'</td>';
 				echo '<td>'.$student->vorname.'</td>';
 				echo '<td>'.$student->nachname.'</td>';
@@ -266,22 +265,24 @@ $rechte->getBerechtigungen($uid);
 				echo '<td>'.$date.'</td>';
 				echo '<td></td>';
 				echo '<td></td>';
-			    echo '</tr>';
+				echo '</tr>';
 			}
-		    ?>
+			?>
 		</tbody>
-	    <?php
-	    }
-	    else
-	    {
+		<?php
+		}
+		else
+		{
 		?>
 
 		<span><?php echo $p->t('pruefung/keineBestaetigtenAnmeldungenVorhanden'); ?></span><br/>
+
 		<?php
-	    }
+		exit;
+		}
 	}
 	?>
-	    </table>
+		</table>
 		<br>
 		<table width="100%" id="liste">
 			<tr>
@@ -295,7 +296,7 @@ $rechte->getBerechtigungen($uid);
 				<td></td>
 			</tr
 		</table>
-	    </div>
+		</div>
 	</div>
-    </body>
+	</body>
 </html>
