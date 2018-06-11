@@ -263,9 +263,6 @@ class FilterWidget extends Widget
 		// Read the all session for this filter widget
 		$session = $this->filterslib->getSession();
 
-		// To be always stored in the session, otherwise is not possible to load data from Filters controller
-		$this->filterslib->setElementSession(FiltersLib::REQUIRED_PERMISSIONS_PARAMETER, $this->_requiredPermissions);
-
 		// If session is NOT empty -> a filter was already loaded
 		if ($session != null)
 		{
@@ -361,6 +358,10 @@ class FilterWidget extends Widget
 				}
 			}
 		}
+
+		// To be always stored in the session, otherwise is not possible to load data from Filters controller
+		// NOTE: must the latest operation to be performed in the session to be shure that is always present
+		$this->filterslib->setElementSession(FiltersLib::REQUIRED_PERMISSIONS_PARAMETER, $this->_requiredPermissions);
 	}
 
 	/**

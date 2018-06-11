@@ -160,8 +160,6 @@ var FHC_FilterWidget = {
 	 */
 	_renderFilterWidget: function(data) {
 
-		console.log(data);
-
 		FHC_FilterWidget._initSessionStorage(); // initialize the session storage
 		FHC_FilterWidget._turnOffEvents(); // turns all the events off
 		FHC_FilterWidget._resetGUI(); // Reset the entire GUI
@@ -558,15 +556,15 @@ var FHC_FilterWidget = {
 
 		if (data.hasOwnProperty("fields") && $.isArray(data.fields))
 		{
-			for (var i = 0; i < data.fields.length; i++)
+			for (var fc = 0; fc < data.fields.length; fc++)
 			{
 				var toBeDisplayed = true;
 
-				for (var j = 0; j < elements.length; j++)
+				for (var ec = 0; ec < elements.length; ec++)
 				{
-					var elementName = elements[j].hasOwnProperty("name") ? elements[j].name : elements[j];
+					var elementName = elements[ec].hasOwnProperty("name") ? elements[ec].name : elements[ec];
 
-					if (data.fields[i] == elementName)
+					if (data.fields[fc] == elementName)
 					{
 						toBeDisplayed = false;
 						break;
@@ -575,12 +573,12 @@ var FHC_FilterWidget = {
 
 				if (toBeDisplayed == true)
 				{
-					var fieldName = data.fields[i];
-					var fieldToDisplay = data.fields[i];
+					var fieldName = data.fields[fc];
+					var fieldToDisplay = data.fields[fc];
 
 					if (data.hasOwnProperty("columnsAliases") && $.isArray(data.columnsAliases))
 					{
-						fieldToDisplay = data.columnsAliases[i];
+						fieldToDisplay = data.columnsAliases[fc];
 					}
 
 					if ($("#" + ddElementId).length) // checks if the element exists
@@ -601,11 +599,11 @@ var FHC_FilterWidget = {
 		if (data.hasOwnProperty("datasetMetadata") && $.isArray(data.datasetMetadata)
 			&& data.hasOwnProperty("filters") && $.isArray(data.filters))
 		{
-			for (var i = 0; i < data.filters.length; i++)
+			for (var fc = 0; fc < data.filters.length; fc++)
 			{
-				for (var j = 0; j < data.datasetMetadata.length; j++)
+				for (var dmc = 0; dmc < data.datasetMetadata.length; dmc++)
 				{
-					if (data.filters[i].name == data.datasetMetadata[j].name)
+					if (data.filters[fc].name == data.datasetMetadata[dmc].name)
 					{
 						var appliedFilters = "<div>";
 
@@ -613,17 +611,17 @@ var FHC_FilterWidget = {
 
 						if (data.hasOwnProperty("columnsAliases") && $.isArray(data.columnsAliases))
 						{
-							fieldToDisplay = data.columnsAliases[j];
+							fieldToDisplay = data.columnsAliases[dmc];
 						}
 						else
 						{
-							fieldToDisplay = data.datasetMetadata[j].name;
+							fieldToDisplay = data.datasetMetadata[dmc].name;
 						}
 
 						appliedFilters += fieldToDisplay;
 						appliedFilters += "</span>";
 
-						appliedFilters += FHC_FilterWidget._renderSingleAppliedFilter(data.filters[i], data.datasetMetadata[j]);
+						appliedFilters += FHC_FilterWidget._renderSingleAppliedFilter(data.filters[fc], data.datasetMetadata[dmc]);
 
 						appliedFilters += "</div>";
 
@@ -856,13 +854,13 @@ var FHC_FilterWidget = {
 		{
 			if (data.hasOwnProperty("columnsAliases") && $.isArray(data.columnsAliases))
 			{
-				for (var i = 0; i < data.selectedFields.length; i++)
+				for (var sfc = 0; sfc < data.selectedFields.length; sfc++)
 				{
-					for (var j = 0; j < data.fields.length; j++)
+					for (var fc = 0; fc < data.fields.length; fc++)
 					{
-						if (data.selectedFields[i] == data.fields[j])
+						if (data.selectedFields[sfc] == data.fields[fc])
 						{
-							arrayFieldsToDisplay[i] = data.columnsAliases[j];
+							arrayFieldsToDisplay[sfc] = data.columnsAliases[fc];
 						}
 					}
 				}

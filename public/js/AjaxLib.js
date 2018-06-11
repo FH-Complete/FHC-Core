@@ -186,7 +186,7 @@ var FHC_AjaxClient = {
 	        sParameterName,
 	        i;
 
-	    for (i = 0; i < sURLVariables.length; i++)
+	    for (var i = 0; i < sURLVariables.length; i++)
 		{
 	        sParameterName = sURLVariables[i].split('=');
 
