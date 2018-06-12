@@ -8,7 +8,7 @@ $this->load->view(
 		'fontawesome' => true,
 		'tinymce' => true,
 		'sbadmintemplate' => true,
-		'customCSSs' => array('public/css/sbadmin2/admintemplate_contentonly.css', 'public/css/messageWrite.css'),
+		'customCSSs' => array('public/css/sbadmin2/admintemplate_contentonly.css', 'public/css/messaging/messageWrite.css'),
 		'customJSs' => array('public/js/bootstrapper.js')
 	)
 );
@@ -28,10 +28,10 @@ $href = site_url().'/system/Messages/send/';
 			<form id="sendForm" method="post" action="<?php echo $href; ?>">
 				<div class="row">
 					<div class="form-group">
-						<div class="col-lg-1">
+						<div class="col-lg-1 msgfieldcol-left">
 							<label><?php echo  ucfirst($this->p->t('global', 'empfaenger')) . ':'?></label>
 						</div>
-						<div class="col-lg-11">
+						<div class="col-lg-11 msgfieldcol-right">
 							<?php
 							for ($i = 0; $i < count($receivers); $i++)
 							{
@@ -48,9 +48,9 @@ $href = site_url().'/system/Messages/send/';
 					</div>
 				</div>
 				<div class="row">
-					<div class="form-group form-inline">
-						<div class="col-lg-1 msgfield">
-							<label><?php echo  ucfirst($this->p->t('global', 'betreff')) . ':'?></label>
+					<div class="form-group">
+						<div class="col-lg-1 msgfield msgfieldcol-left">
+							<label><?php echo ucfirst($this->p->t('global', 'betreff')) . ':'?></label>
 						</div>&nbsp;
 						<?php
 						$subject = '';
@@ -59,9 +59,9 @@ $href = site_url().'/system/Messages/send/';
 							$subject = 'Re: '.$message->subject;
 						}
 						?>
-						<div class="col-lg-10">
+						<div class="col-lg-7">
 							<input id="subject" class="form-control" type="text" value="<?php echo $subject; ?>"
-								   name="subject" size="70">
+								   name="subject">
 						</div>
 					</div>
 				</div>
@@ -100,7 +100,7 @@ $href = site_url().'/system/Messages/send/';
 				</div>
 				<br>
 				<div class="row">
-					<div class="col-lg-3 text-right">
+					<div class="col-xs-3">
 						<?php
 						echo $this->widgetlib->widget(
 							'Vorlage_widget',
@@ -109,7 +109,7 @@ $href = site_url().'/system/Messages/send/';
 						);
 						?>
 					</div>
-					<div class="col-lg-offset-6 col-lg-1 text-right">
+					<div class="col-lg-7 col-xs-9 text-right">
 						<button id="sendButton" class="btn btn-default" type="button"><?php echo  $this->p->t('ui', 'senden')?></button>
 					</div>
 				</div>

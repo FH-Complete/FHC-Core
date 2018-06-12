@@ -206,7 +206,7 @@ function _generateAddonsJSsInclude($calledFrom)
 
 			// Generates the global object to pass phrases to javascripts
 			// NOTE: must be called before including the PhrasesLib.js
-			_generateJSPhrasesStorageObject($phrases);
+			if ($phrases != null) _generateJSPhrasesStorageObject($phrases);
 
 			// JQuery V3
 			if ($jquery === true) _generateJSsInclude('vendor/components/jquery/jquery.min.js');

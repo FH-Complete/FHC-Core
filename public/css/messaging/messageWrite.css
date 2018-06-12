@@ -1,11 +1,11 @@
 /*smaller subject field*/
 input[type=text] {
     height: 28px;
-    padding: 0px;
+    padding: 0;
 }
 
 .msgfield label {
-    margin-bottom: 0px !important;
+    margin-bottom: 0 !important;
     margin-top: 3px;
 }
 
@@ -17,4 +17,8 @@ input[type=text] {
     .col-lg-11.msgfieldcol-right {
         width: 87%;
     }
+}
+
+#sendButton {
+    width: 120px;
 }

@@ -1,7 +1,7 @@
 <div class="row">
 	<div class="form-group">
 		<div class="col-lg-1 msgfieldcol-left">
-			<label>To:</label>
+			<label>Receiver:</label>
 		</div>
 		<div class="col-lg-11 msgfieldcol-right">
 			<?php
@@ -43,10 +43,10 @@
 		<label>Message:</label>
 		<?php
 		$body = '';
-		if (isset($message) )
+		if (isset($message))
 		{
 			if (isset($receivers[0]))
-				$body .= '<br><br><br><!--<hr style="color: #e6e6e6">--><blockquote><i>On '.date_format(date_create($message->sent), 'd.m.Y H:i').' '.$receivers[0]->Vorname.' '.$receivers[0]->Nachname.' wrote:'.'</i></blockquote>';
+				$body .= '<p></p><p></p><blockquote><i>On '.date_format(date_create($message->sent), 'd.m.Y H:i').' '.$receivers[0]->Vorname.' '.$receivers[0]->Nachname.' wrote:'.'</i></blockquote>';
 			$body .= '<blockquote style="border-left:2px solid; padding-left: 8px">';
 			$body .= $message->body.'</blockquote>';
 		}
@@ -58,7 +58,7 @@
 		?>
 		<div class="col-lg-2">
 			<div class="form-group">
-				<label>Variables:</label>
+				<label>Fields:</label>
 				<select id="variables" class="form-control" size="14" multiple="multiple">
 					<?php
 					foreach ($variables as $key => $val)

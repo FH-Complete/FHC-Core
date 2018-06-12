@@ -123,7 +123,7 @@ class ViewMessage extends FHC_Controller
 			'token' => $token
 		);
 
-		$v = $this->load->view('system/messageWriteReply', $data);
+		$this->load->view('system/messageWriteReply', $data);
 	}
 
 	/**
@@ -207,7 +207,7 @@ class ViewMessage extends FHC_Controller
 
 		if (!$error)
 		{
-			echo "Messages sent successfully";
+			$this->load->view('system/messageSent');
 		}
 	}
 }

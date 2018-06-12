@@ -8,7 +8,7 @@ $this->load->view(
 		'fontawesome' => true,
 		'tinymce' => true,
 		'sbadmintemplate' => true,
-		'customCSSs' => array('public/css/sbadmin2/admintemplate_contentonly.css', 'public/css/messageWrite.css'),
+		'customCSSs' => array('public/css/sbadmin2/admintemplate_contentonly.css', 'public/css/messaging/messageWrite.css'),
 		'customJSs' => array('public/js/bootstrapper.js')
 	)
 );
@@ -22,7 +22,7 @@ $href = site_url().'/ViewMessage/sendReply';
 		<div class="container-fluid">
 			<div class="row">
 				<div class="col-lg-12">
-					<h3 class="page-header">Send Message</h3>
+					<h3 class="page-header">Send message</h3>
 				</div>
 			</div>
 			<form id="sendForm" method="post" action="<?php echo $href; ?>">
@@ -85,7 +85,5 @@ $href = site_url().'/ViewMessage/sendReply';
 		}
 	});
 </script>
-
 </body>
-
 <?php $this->load->view("templates/FHC-Footer"); ?>
