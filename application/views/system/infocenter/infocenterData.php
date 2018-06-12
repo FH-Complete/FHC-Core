@@ -63,6 +63,7 @@
 							FROM public.tbl_studiensemester
 							WHERE ende >= NOW()
 						)
+						AND not exists (select 1 from tbl_prestudentstatus psss where psss.prestudent_id = pss.prestudent_id and psss.status_kurzbz = \'Abgewiesener\' and psss.studiensemester_kurzbz = \'WS2018\')
 					ORDER BY pss.datum DESC, pss.insertamum DESC, pss.ext_id DESC
 					LIMIT 1
 				) AS "SendDate",
