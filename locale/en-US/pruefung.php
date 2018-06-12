@@ -48,7 +48,7 @@ $this->phrasen['pruefung/zurLvAnmeldung'] = 'zur LV-Anmeldung';
 $this->phrasen['pruefung/zuerstPruefungAuswaehlen'] = 'Zuerst Prüfung auswählen.';
 $this->phrasen['pruefung/bemerkungVonLektorHinzugefuegt'] = 'von Lektor hinzugefügt';
 $this->phrasen['pruefung/bestaetigen'] = 'Bestätigen';
-$this->phrasen['pruefung/anmerkungDesStudenten'] = 'Anmerkung des Studenten:</br>';
+$this->phrasen['pruefung/anmerkungDesStudenten'] = 'Anmerkung des Studenten:';
 $this->phrasen['pruefung/bestaetigt'] = 'bestätigt';
 $this->phrasen['pruefung/statusAenderungVon'] = 'Satusänderung von';
 $this->phrasen['pruefung/reihungSpeichern'] = 'Reihung speichern';
@@ -148,7 +148,7 @@ $this->phrasen['pruefung/emailVerschiebung'] = 'Dear student,
 The exam for course %1$s has been resceduled.
 The exam will take place on  %2$s at %3$s hrs.';
 $this->phrasen['pruefung/emailVerschiebungSubject'] = 'Exam changed';
-
+$this->phrasen['pruefung/TerminVorlaufzeit'] = 'Termin muss mindestens %s Tage in der Zukunft liegen!';
 
 
 ?>
