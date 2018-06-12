@@ -3005,6 +3005,10 @@ function StudentZeugnisDokumentArchivieren()
 		case 'PrProtMAEng':
 		case 'Bescheid':
 		case 'BescheidEng':
+		case 'Bakkurkunde':
+		case 'BakkurkundeEng':
+		case 'Diplomurkunde':
+		case 'DiplomurkundeEng':
 			xml = 'abschlusspruefung.rdf.php';
 			break;
 
