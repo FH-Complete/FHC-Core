@@ -63,6 +63,7 @@
 							FROM public.tbl_studiensemester
 							WHERE ende >= NOW()
 						)
+						AND not exists (select 1 from tbl_prestudentstatus psss where psss.prestudent_id = pss.prestudent_id and psss.status_kurzbz = \'Abgewiesener\' and psss.studiensemester_kurzbz = \'WS2018\')
 					ORDER BY pss.datum DESC, pss.insertamum DESC, pss.ext_id DESC
 					LIMIT 1
 				) AS "SendDate",
@@ -151,7 +152,7 @@
 					),\', \'
 				) AS "StgAktiv",
 				pl.zeitpunkt AS "LockDate",
-				pl.lockuser as "LockUser",
+				pl.lockuser AS "LockUser",
 				pd.parkdate AS "ParkDate"
 			FROM public.tbl_person p
 		LEFT JOIN (SELECT person_id, zeitpunkt, uid as lockuser FROM system.tbl_person_lock WHERE app = \''.$APP.'\') pl USING(person_id)
@@ -214,7 +215,7 @@
 			ucfirst($this->p->t('global', 'gesperrtVon')),
 			ucfirst($this->p->t('global', 'parkdatum'))
 		),
-		'formatRaw' => function($datasetRaw) {
+		'formatRow' => function($datasetRaw) {
 
 			$datasetRaw->{'Details'} = sprintf(
 				'<a href="%s/%s?fhc_controller_id=%s">Details</a>',
@@ -299,18 +300,9 @@
 		}
 	);
 
-	$filterId = isset($_GET[InfoCenter::FILTER_ID]) ? $_GET[InfoCenter::FILTER_ID] : null;
-
-	if (isset($filterId) && is_numeric($filterId))
-	{
-		$filterWidgetArray[InfoCenter::FILTER_ID] = $filterId;
-	}
-	else
-	{
-		$filterWidgetArray['app'] = $APP;
-		$filterWidgetArray['datasetName'] = 'PersonActions';
-		$filterWidgetArray['filterKurzbz'] = 'InfoCenterNotSentApplicationAll';
-	}
+	$filterWidgetArray[InfoCenter::FILTER_ID] = $this->input->get(InfoCenter::FILTER_ID);
+	$filterWidgetArray['app'] = $APP;
+	$filterWidgetArray['datasetName'] = 'PersonActions';
 
 	echo $this->widgetlib->widget('FilterWidget', $filterWidgetArray);
 ?>

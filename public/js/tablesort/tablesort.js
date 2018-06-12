@@ -61,7 +61,7 @@ var Tablesort = {
 					size: size,
 					cssDisabled: 'disabled',
 					savePages: false,
-					output: '{startRow} – {endRow} / {totalRows} Zeilen'
+					output: '{startRow} – {endRow} / {totalRows} ' + FHC_PhrasesLib.t('global', 'zeilen')
 				}
 			);
 		}

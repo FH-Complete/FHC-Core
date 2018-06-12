@@ -48,7 +48,7 @@ $this->phrasen['pruefung/zurLvAnmeldung'] = 'zur LV-Anmeldung';
 $this->phrasen['pruefung/zuerstPruefungAuswaehlen'] = 'Zuerst Prüfung auswählen.';
 $this->phrasen['pruefung/bemerkungVonLektorHinzugefuegt'] = 'von Lektor hinzugefügt';
 $this->phrasen['pruefung/bestaetigen'] = 'Bestätigen';
-$this->phrasen['pruefung/anmerkungDesStudenten'] = 'Anmerkung des Studenten:</br>';
+$this->phrasen['pruefung/anmerkungDesStudenten'] = 'Anmerkung des Studenten:';
 $this->phrasen['pruefung/bestaetigt'] = 'bestätigt';
 $this->phrasen['pruefung/statusAenderungVon'] = 'Satusänderung von';
 $this->phrasen['pruefung/reihungSpeichern'] = 'Reihung speichern';
@@ -151,6 +151,6 @@ Der neue Termin für die Prüfung ist am  %2$s um %3$s Uhr.';
 $this->phrasen['pruefung/emailVerschiebungSubject'] = 'Verschiebung einer Prüfung';
 
 $this->phrasen['pruefung/AnrechnungInStudiengang'] = 'Studiengang für Anrechnung';
-
+$this->phrasen['pruefung/TerminVorlaufzeit'] = 'Termin muss mindestens %s Tage in der Zukunft liegen!';
 
 ?>

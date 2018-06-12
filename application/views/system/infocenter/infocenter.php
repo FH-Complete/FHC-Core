@@ -5,12 +5,17 @@
 			'title' => 'Info Center',
 			'jquery' => true,
 			'jqueryui' => true,
+			'ajaxlib' => true,
 			'bootstrap' => true,
 			'fontawesome' => true,
 			'sbadmintemplate' => true,
 			'tablesorter' => true,
-			'ajaxlib' => true,
 			'filterwidget' => true,
+			'phrases' => array(
+				'person' => array('vorname', 'nachname'),
+				'global' => array('mailAnXversandt'),
+				'ui' => array('bitteEintragWaehlen')
+			),
 			'navigationwidget' => true,
 			'customCSSs' => 'public/css/sbadmin2/tablesort_bootstrap.css',
 			'customJSs' => array('public/js/bootstrapper.js', 'public/js/infocenter/infocenterPersonDataset.js')
@@ -27,12 +32,17 @@
 			<div class="container-fluid">
 				<div class="row">
 					<div class="col-lg-12">
-						<h3 class="page-header">Infocenter <?php echo  ucfirst($this->p->t('global', 'uebersicht')); ?></h3>
+						<h3 class="page-header">Infocenter
+							<?php echo ucfirst($this->p->t('global', 'uebersicht')); ?>
+						</h3>
 					</div>
 				</div>
 				<div>
 					<?php
-						$this->load->view('system/infocenter/infocenterData.php', array('fhc_controller_id' => $fhc_controller_id));
+						$this->load->view(
+							'system/infocenter/infocenterData.php',
+							array('fhc_controller_id' => $fhc_controller_id)
+						);
 					?>
 				</div>
 			</div>

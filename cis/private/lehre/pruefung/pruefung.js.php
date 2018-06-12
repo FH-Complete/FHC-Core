@@ -74,12 +74,13 @@ else
  * Liest GET Variablen einer URL aus
  * @returns {String|value|Element.value|document@arr;all.value}
  */
-function getUrlVars() {
-    var vars = {};
-    var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m,key,value) {
-        vars[key] = value;
-    });
-    return vars;
+function getUrlVars()
+{
+	var vars = {};
+	var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m,key,value) {
+		vars[key] = value;
+	});
+	return vars;
 }
 
 /**
@@ -142,7 +143,7 @@ function lehrveranstaltungDropdownhinzufuegen(element, isChanged)
 		newSelect.attr("id", "lvDropdown"+id);
 		element.setAttribute("onchange", "lehrveranstaltungDropdownhinzufuegen(this, true);");
 		newSelect.appendTo("#lvDropdowns");
-		$("#lvDropdowns").append("</br>");
+		$("#lvDropdowns").append("<br/>");
 	}
 
 }
@@ -173,20 +174,19 @@ function loadPruefungsfenster()
 			method: "getPruefungsfensterByStudiensemester",
 			studiensemester_kurzbz: studiensemester_kurzbz
 		},
-		error: loadError
-	}).success(function(data){
-		if(data.result.length === 0)
-		{
-			messageBox("message", "<?php echo $p->t('pruefung/keinFensterVorhanden'); ?>", "red", "highlight", 1000);
-			$("#pruefungsfenster").html("<option value='null'></option>");
+		error: loadError,
+		success: function(data){
+			if(data.result.length === 0)
+			{
+				messageBox("message", "<?php echo $p->t('pruefung/keinFensterVorhanden'); ?>", "red", "highlight", 1000);
+				$("#pruefungsfenster").html("<option value='null'></option>");
+			}
+			else
+			{
+				writePruefungsfenster(data);
+				setDatePicker();
+			}
 		}
-		else
-		{
-			writePruefungsfenster(data);
-			setDatePicker();
-		}
-	}).complete(function(){
-
 	});
 }
 
@@ -242,25 +242,25 @@ function loadPruefungen()
 			method: "getPruefungByLv",
 			studiensemester: $("#filter_studiensemester").val()
 		},
-		error: loadError
-	}).success(function(data){
-		$("#pruefungen").empty();
-		if(data.error === 'false')
-		{
-			data.result.pruefungen.forEach(function(e){
-				if(e.pruefung.storniert === false)
-				{
-					var table = writePruefungsTable(e, data, true);
-					$("#pruefungen").append(table);
-				}
-			});
+		error: loadError,
+		success: function(data){
+			$("#pruefungen").empty();
+			if(data.error === 'false')
+			{
+				data.result.pruefungen.forEach(function(e){
+					if(e.pruefung.storniert === false)
+					{
+						var table = writePruefungsTable(e, data, true);
+						$("#pruefungen").append(table);
+					}
+				});
+			}
+			else
+			{
+				$("#pruefungen").append("<td align='center' colspan='6'><?php echo $p->t('pruefung/keineDatenVorhanden'); ?></td>");
+			}
+			setTablesorter("table1");
 		}
-		else
-		{
-			$("#pruefungen").append("<td align='center' colspan='6'><?php echo $p->t('pruefung/keineDatenVorhanden'); ?></td>");
-		}
-	}).complete(function(event, xhr, settings){
-		setTablesorter("table1");
 	});
 }
 
@@ -278,24 +278,25 @@ function loadPruefungenOfStudiengang()
 			method: "getPruefungByLvFromStudiengang",
 			studiensemester: $("#filter_studiensemester").val()
 		},
-		error: loadError
-	}).success(function(data){
-		if(data.error === 'false')
-		{
-			data.result.pruefungen.forEach(function(e){
-				if(e.pruefung.storniert === false)
-				{
-					var table = writePruefungsTable(e, data, true);
-					$("#pruefungenStudiengang").append(table);
-				}
-			});
+		error: loadError,
+		success: function(data){
+			if(data.error === 'false')
+			{
+				data.result.pruefungen.forEach(function(e){
+					if(e.pruefung.storniert === false)
+					{
+						var table = writePruefungsTable(e, data, true);
+						$("#pruefungenStudiengang").append(table);
+					}
+				});
+			}
+			else
+			{
+				$("#pruefungenStudiengang").append("<td align='center' colspan='6'><?php echo $p->t('pruefung/keineDatenVorhanden'); ?></td>");
+			}
+
+			setTablesorter("table2");
 		}
-		else
-		{
-			$("#pruefungenStudiengang").append("<td align='center' colspan='6'><?php echo $p->t('pruefung/keineDatenVorhanden'); ?></td>");
-		}
-	}).complete(function(event, xhr, settings){
-		setTablesorter("table2");
 	});
 }
 
@@ -312,17 +313,17 @@ function loadPruefungenGesamt()
 		data: {
 			method: "getAllPruefungen",
 		},
-		error: loadError
-	}).success(function(data){
-		data.result.pruefungen.forEach(function(e){
-			if(e.pruefung.storniert === false)
-			{
-				var table = writePruefungsTable(e, data, false);
-				$("#pruefungenGesamt").append(table);
-			}
-		});
-	}).complete(function(event, xhr, settings){
-		setTablesorter("table3");
+		error: loadError,
+		success: function(data){
+			data.result.pruefungen.forEach(function(e){
+				if(e.pruefung.storniert === false)
+				{
+					var table = writePruefungsTable(e, data, false);
+					$("#pruefungenGesamt").append(table);
+				}
+			});
+			setTablesorter("table3");
+		}
 	});
 }
 
@@ -362,22 +363,20 @@ function writePruefungsTable(e, data, anmeldung)
 		if(fristDate < new Date())
 		{
 			if(!storno)
-				button = "<p><span style='display: inline-block; width: 155px;'><?php echo $p->t('pruefung/anmeldefristAbgelaufen'); ?></span></br>";
+				button = "<p><span style='display: inline-block; width: 155px;'><?php echo $p->t('pruefung/anmeldefristAbgelaufen'); ?></span><br />";
 			else
-				button = "<p><span style='display: inline-block; width: 155px;'><?php echo $p->t('pruefung/stornoNichtMehrMoeglich'); ?></span></br>";
+				button = "<p><span style='display: inline-block; width: 155px;'><?php echo $p->t('pruefung/stornoNichtMehrMoeglich'); ?></span><br />";
 		}
 		else if(anmeldung || e.lehrveranstaltung[0].angemeldet)
 		{
 			if(storno)
 			{
-				//button = "<p><span style='display: inline-block; width: 155px;'>Stornieren (bis "+frist+"): </span><input style='width: 90px;' type='button' value='"+termin+"' onclick='stornoAnmeldung(\""+anmeldung_id+"\");'></br>";
 				button = "<p><a href='#' title='<?php echo $p->t('pruefung/stornierenMoeglichBis'); ?> "+frist+"'><input style='width: 140px;' type='button' value='"+termin+" "+time+"' onclick='stornoAnmeldung(\""+anmeldung_id+"\");'></a></p>";
 
 			}
 			else
 			{
-				//button = "<p><span style='display: inline-block; width: 155px;'>Anmelden (bis "+frist+"): </span><input style='width: 90px;' type='button' value='"+termin+"' onclick='openDialog(\""+e.lehrveranstaltung[0].lehrveranstaltung_id+"\", \""+d.pruefungstermin_id+"\", \""+e.lehrveranstaltung[0].bezeichnung+"\", \""+d.von+"\", \""+d.bis+"\");'></p>";
-				button = "<p><a href='#' title='<?php echo $p->t('pruefung/anmeldenMoeglichBis'); ?> "+frist+"';><input style='width: 140px; background-color: green;' type='button' value='"+termin+" "+time+"' onclick='openDialog(\""+e.lehrveranstaltung[0].lehrveranstaltung_id+"\", \""+d.pruefungstermin_id+"\", \""+e.lehrveranstaltung[0].bezeichnung+"\", \""+d.von+"\", \""+d.bis+"\");'></a></p>";
+				button = "<p><a href='#' title='<?php echo $p->t('pruefung/anmeldenMoeglichBis'); ?> "+frist+"'><input style='width: 140px; background-color: green;' type='button' value='"+termin+" "+time+"' onclick='openDialog(\""+e.lehrveranstaltung[0].lehrveranstaltung_id+"\", \""+d.pruefungstermin_id+"\", \""+e.lehrveranstaltung[0].bezeichnung.replace("'", "&apos;")+"\", \""+d.von+"\", \""+d.bis+"\");'></a></p>";
 			}
 		}
 		else
@@ -389,7 +388,7 @@ function writePruefungsTable(e, data, anmeldung)
 
 		if(d.max === null)
 		{
-			teilnehmer += "<?php echo $p->t('pruefung/unbegrenzt'); ?></br>";
+			teilnehmer += "<?php echo $p->t('pruefung/unbegrenzt'); ?><br />";
 		}
 		else
 		{
@@ -419,40 +418,41 @@ function showPruefungsDetails(prfId, lvId)
 				method: "loadPruefung",
 				pruefung_id: prfId
 			},
-			error: loadError
-		}).success(function(data){
-			data.result.forEach(function(e){
-				if(e.lehrveranstaltung.lehrveranstaltung_id === lvId)
-				{
-					var p = e.pruefung;
-					var l = e.lehrveranstaltung
-//					$("#prfTyp").html(p.pruefungstyp_kurzbz);
-					$("#prfMethode").html(p.methode);
-					$("#prfBeschreibung").html(p.beschreibung);
-					if(p.einzeln === true)
+			error: loadError,
+			success: function(data){
+				data.result.forEach(function(e){
+					if(e.lehrveranstaltung.lehrveranstaltung_id === lvId)
 					{
-						$("#prfEinzeln").html("<b>Einzelprüfung!</b>");
-						$("#prfIntervall").html(p.pruefungsintervall+" min");
-						$("#prfIntervall").prev().css("visibility", "visible");
+						var p = e.pruefung;
+						var l = e.lehrveranstaltung
+
+						$("#prfMethode").html(p.methode);
+						$("#prfBeschreibung").html(p.beschreibung);
+						if(p.einzeln === true)
+						{
+							$("#prfEinzeln").html("<b>Einzelprüfung!</b>");
+							$("#prfIntervall").html(p.pruefungsintervall+" min");
+							$("#prfIntervall").prev().css("visibility", "visible");
+						}
+						else
+						{
+							$("#prfEinzeln").html("");
+							$("#prfIntervall").html("");
+							$("#prfIntervall").prev().css("visibility", "hidden");
+						}
+						$("#lvBez").html(l.bezeichnung);
+						if(l.ects !== null)
+						{
+							$("#lvEcts").html(l.ects);
+						}
+						else
+						{
+							$("#lvEcts").html("0");
+						}
 					}
-					else
-					{
-						$("#prfEinzeln").html("");
-						$("#prfIntervall").html("");
-						$("#prfIntervall").prev().css("visibility", "hidden");
-					}
-					$("#lvBez").html(l.bezeichnung);
-					if(l.ects !== null)
-					{
-						$("#lvEcts").html(l.ects);
-					}
-					else
-					{
-						$("#lvEcts").html("0");
-					}
-				}
-			});
-			$("#details").dialog("open");
+				});
+				$("#details").dialog("open");
+			}
 		});
 	}
 	else
@@ -486,45 +486,47 @@ function openDialog(lehrveranstaltung_id, termin_id, lvBezeichnung, terminVon, t
 			method: "getLvKompatibel",
 			lehrveranstaltung_id: lehrveranstaltung_id
 		},
-		error: loadError
-	}).success(function(data){
-		var html = "";
-		html += '<option id="'+lehrveranstaltung_id+'" value="'+lehrveranstaltung_id+'">';
-		html += lvBezeichnung;
-		html += "</option>";
-		data.result.forEach(function(v, i){
-			html += '<option id="'+v.lehrveranstaltung_id+'" value="'+v.lehrveranstaltung_id+'">';
-			html += v.bezeichnung;
+		error: loadError,
+		success: function(data){
+			var html = "";
+			html += '<option id="'+lehrveranstaltung_id+'" value="'+lehrveranstaltung_id+'">';
+			html += lvBezeichnung;
 			html += "</option>";
-		});
-		$("#studienverpflichtung").html(html);
+			data.result.forEach(function(v, i){
+				html += '<option id="'+v.lehrveranstaltung_id+'" value="'+v.lehrveranstaltung_id+'">';
+				html += v.bezeichnung;
+				html += "</option>";
+			});
+			$("#studienverpflichtung").html(html);
+		}
 	});
 
-    $.ajax({
-        dataType: 'json',
-        url: "./pruefungsanmeldung.json.php",
-        type: "POST",
-        data: {
-            method: "getPrestudenten"
-        },
-        error: loadError
-    }).success(function(data)
-    {
-        if(data.error !== false)
-        {
-            //show if more than 1 active prestudent exists
-            if(data.result.length > 1)
-            {
-                var html = "<select id='prestudent_studiengang' name='studiengang'>";
-                data.result.forEach(function(v,i){
-                    html += "<option value='"+v.studiengang_kz+"'>"+v.kuerzel+"</option>";
-                });
-                html += "</select>";
+	$.ajax({
+		dataType: 'json',
+		url: "./pruefungsanmeldung.json.php",
+		type: "POST",
+		data: {
+			method: "getPrestudenten"
+		},
+		error: loadError,
+		success: function(data)
+		{
+			if(data.error !== false)
+			{
+				//show if more than 1 active prestudent exists
+				if(data.result.length > 1)
+				{
+					var html = "<select id='prestudent_studiengang' name='studiengang'>";
+					data.result.forEach(function(v,i){
+						html += "<option value='"+v.studiengang_kz+"'>"+v.kuerzel+"</option>";
+					});
+					html += "</select>";
 
-                $("#studiengang").html("<td style='vertical-align: top; font-weight: bold;'><?php echo $p->t('pruefung/AnrechnungInStudiengang'); ?>:</td><td>"+html+"</td>");
-            }
-        }
-    });
+					$("#studiengang").html("<td style='vertical-align: top; font-weight: bold;'><?php echo $p->t('pruefung/AnrechnungInStudiengang'); ?>:</td><td>"+html+"</td>");
+				}
+			}
+		}
+	});
 
 	var start = terminVon;
 	var ende = terminBis;
@@ -564,12 +566,12 @@ function saveAnmeldung(lehrveranstaltung_id, termin_id)
 		bemerkungen = "<?php echo $p->t('pruefung/bemerkungVonLektorHinzugefuegt'); ?>";
 
 	var studienverpflichtung_id = null;
-    if($("#studienverpflichtung").length)
-        studienverpflichtung_id = $("#studienverpflichtung option:selected").val();
+	if($("#studienverpflichtung").length)
+		studienverpflichtung_id = $("#studienverpflichtung option:selected").val();
 
-    var studiengang_kz = null;
-    if($('#prestudent_studiengang').length)
-        studiengang_kz =   $('#prestudent_studiengang option:selected').val();
+	var studiengang_kz = null;
+	if($('#prestudent_studiengang').length)
+		studiengang_kz =   $('#prestudent_studiengang option:selected').val();
 
 	$.ajax({
 		dataType: 'json',
@@ -582,31 +584,32 @@ function saveAnmeldung(lehrveranstaltung_id, termin_id)
 			bemerkung: bemerkungen,
 			uid: uid,
 			studienverpflichtung_id: studienverpflichtung_id,
-            studiengang_kz: studiengang_kz
+			studiengang_kz: studiengang_kz
 		},
-		error: loadError
-	}).success(function(data){
-		if(data.error === 'false')
-		{
-			messageBox("message", data.result, "green", "highlight", 1000);
-		}
-		else
-		{
-			messageBox("message", data.errormsg, "red", "highlight", 1000);
-		}
-		resetForm();
-	}).complete(function(event, xhr, settings){
-		$("#saveDialog").dialog("close");
+		error: loadError,
+		success: function(data){
+			if(data.error === 'false')
+			{
+				messageBox("message", data.result, "green", "highlight", 1000);
+			}
+			else
+			{
+				messageBox("message", data.errormsg, "red", "highlight", 1000);
+			}
+			resetForm();
 
-		if(uid === undefined)
-		{
-			//Wenn Anmeldung durch Student
-			refresh();
-		}
-		else
-		{
-			//Wenn Anmeldung durch Lektor
-			showAnmeldungen(termin_id, lehrveranstaltung_id);
+			$("#saveDialog").dialog("close");
+
+			if(uid === undefined)
+			{
+				//Wenn Anmeldung durch Student
+				refresh();
+			}
+			else
+			{
+				//Wenn Anmeldung durch Lektor
+				showAnmeldungen(termin_id, lehrveranstaltung_id);
+			}
 		}
 	});
 }
@@ -628,18 +631,19 @@ function stornoAnmeldung(pruefungsanmeldung_id)
 				method: "stornoAnmeldung",
 				pruefungsanmeldung_id: pruefungsanmeldung_id
 			},
-			error: loadError
-		}).success(function(data){
-			if(data.error === 'false')
-			{
-				messageBox("message", data.result, "green", "highlight", 1000);
+			error: loadError,
+			success: function(data){
+				if(data.error === 'false')
+				{
+					messageBox("message", data.result, "green", "highlight", 1000);
+				}
+				else
+				{
+					messageBox("message", data.errormsg, "red", "highlight", 1000);
+				}
+
+				refresh();
 			}
-			else
-			{
-				messageBox("message", data.errormsg, "red", "highlight", 1000);
-			}
-		}).complete(function(event, xhr, settings){
-			refresh();
 		});
 	}
 }
@@ -673,22 +677,22 @@ function resetForm()
  */
 function setTablesorter(tableId)
 {
-    if($("#"+tableId).length != 0)
-    {
-        if($("#"+tableId)[0].hasInitialized !== true)
-        {
-                $("#"+tableId).tablesorter({
-                        widgets: ["zebra"],
-                        sortList: [[1,0]]
-                });
-        }
-        else
-        {
-                $("#"+tableId).trigger("updateAll");
-                var sorting = [[1,0],[0,0]];
-                $("#"+tableId).trigger("sorton",[sorting]);
-        }
-    }
+	if($("#"+tableId).length != 0)
+	{
+		if($("#"+tableId)[0].hasInitialized !== true)
+		{
+			$("#"+tableId).tablesorter({
+				widgets: ["zebra"],
+				sortList: [[1,0]]
+			});
+		}
+		else
+		{
+			$("#"+tableId).trigger("updateAll");
+			var sorting = [[1,0],[0,0]];
+			$("#"+tableId).trigger("sorton",[sorting]);
+		}
+	}
 }
 
 /**
@@ -764,12 +768,12 @@ function showAnmeldungen(pruefungstermin_id, lehrveranstaltung_id)
 			pruefungstermin_id: pruefungstermin_id,
 			lehrveranstaltung_id: lehrveranstaltung_id
 		},
-		error: loadError
-	}).success(function(data){
-		writeAnmeldungen(data);
-	}).complete(function(event, xhr, settings){
-		$("#sortable").sortable();
-		$("#sortable").disableSelection();
+		error: loadError,
+		success: function(data){
+			writeAnmeldungen(data);
+			$("#sortable").sortable();
+			$("#sortable").disableSelection();
+		}
 	});
 }
 
@@ -831,12 +835,6 @@ function writeAnmeldungen(data)
 			$("#raumLink").html("<a href='#' onclick='openRaumDialog(\""+terminId+"\", \""+lehrveranstaltung_id+"\");'><?php echo $p->t('pruefung/pruefungsort'); ?></a>");
 		}
 
-		$(document).tooltip({
-			position: {
-				at: "right center",
-				my: "left+15 center"
-			}
-		});
 	}
 	else
 	{
@@ -860,7 +858,7 @@ function writeAnmeldungen(data)
 function openRaumDialog(terminId, lehrveranstaltung_id)
 {
 	getRaeume(terminId);
-	$("#raum").html('<h2><?php echo $p->t('pruefung/pruefungsraum'); ?></h2><input onChange="changeStateOfRaumDropdown();" type="checkbox" /><span><?php echo $p->t('pruefung/imBuero'); ?></span></br><span style="font-weight: bold;"><?php echo $p->t('pruefung/raum'); ?>: </span><select id="raeumeDropdown"></select>');
+	$("#raum").html('<h2><?php echo $p->t('pruefung/pruefungsraum'); ?></h2><input onChange="changeStateOfRaumDropdown();" type="checkbox" /><span><?php echo $p->t('pruefung/imBuero'); ?></span><br /><span style="font-weight: bold;"><?php echo $p->t('pruefung/raum'); ?>: </span><select id="raeumeDropdown"></select>');
 	$("#raumSpeichernButton").html("<input type='button' value='<?php echo $p->t('pruefung/raumSpeichern'); ?>' onclick='saveRaum(\""+terminId+"\", \""+lehrveranstaltung_id+"\");'/>");
 	$("#raumDialog").dialog("open");
 }
@@ -890,18 +888,19 @@ function saveReihung(terminId, lehrveranstaltung_id)
 			method: "saveReihung",
 			reihung: reihung
 		},
-		error: loadError
-	}).success(function(data){
-		if(data.error === 'false' && data.result === true)
-		{
-			messageBox("message", "<?php echo $p->t('pruefung/reihunghErfolgreichGeaendert'); ?>", "green", "highlight", 1000);
+		error: loadError,
+		success: function(data){
+			if(data.error === 'false' && data.result === true)
+			{
+				messageBox("message", "<?php echo $p->t('pruefung/reihunghErfolgreichGeaendert'); ?>", "green", "highlight", 1000);
+			}
+			else
+			{
+				messageBox("message", data.errormsg, "red", "highlight", 1000);
+			}
+
+			showAnmeldungen(terminId, lehrveranstaltung_id);
 		}
-		else
-		{
-			messageBox("message", data.errormsg, "red", "highlight", 1000);
-		}
-	}).complete(function(){
-		showAnmeldungen(terminId, lehrveranstaltung_id);
 	});
 }
 
@@ -922,18 +921,19 @@ function anmeldungBestaetigen(pruefungsanmeldung_id, termin_id, lehrveranstaltun
 			method: "anmeldungBestaetigen",
 			pruefungsanmeldung_id: pruefungsanmeldung_id
 		},
-		error: loadError
-	}).success(function(data){
-		if(data.error === 'false' && data.result === true)
-		{
-			if(termin_id !== 'undefined' && lehrveranstaltung_id !== 'undefined')
+		error: loadError,
+		success: function(data){
+			if(data.error === 'false' && data.result === true)
 			{
-				showAnmeldungen(termin_id, lehrveranstaltung_id);
+				if(termin_id !== 'undefined' && lehrveranstaltung_id !== 'undefined')
+				{
+					showAnmeldungen(termin_id, lehrveranstaltung_id);
+				}
 			}
-		}
-		else
-		{
-			messageBox("message", data.errormsg, "red", "highlight", 1000);
+			else
+			{
+				messageBox("message", data.errormsg, "red", "highlight", 1000);
+			}
 		}
 	});
 }
@@ -955,18 +955,19 @@ function alleBestaetigen(termin_id, lehrveranstaltung_id)
 			termin_id: termin_id,
 			lehrveranstaltung_id: lehrveranstaltung_id
 		},
-		error: loadError
-	}).success(function(data){
-		if(data.error === 'false' && data.result === true)
-		{
-			if(termin_id !== 'undefined' && lehrveranstaltung_id !== 'undefined')
+		error: loadError,
+		success: function(data){
+			if(data.error === 'false' && data.result === true)
 			{
-				showAnmeldungen(termin_id, lehrveranstaltung_id);
+				if(termin_id !== 'undefined' && lehrveranstaltung_id !== 'undefined')
+				{
+					showAnmeldungen(termin_id, lehrveranstaltung_id);
+				}
 			}
-		}
-		else
-		{
-			messageBox("message", data.errormsg, "red", "highlight", 1000);
+			else
+			{
+				messageBox("message", data.errormsg, "red", "highlight", 1000);
+			}
 		}
 	});
 }
@@ -1002,22 +1003,23 @@ function loadStudiengaenge()
 		data: {
 			method: "getStudiengaenge"
 		},
-		error: loadError
-	}).success(function(data){
-		$("#stgListe").empty();
-		if(data.error === 'false')
-		{
-			var liste = "<select id='select_studiengang' onchange='loadPruefungStudiengang();'><option><?php echo $p->t('pruefung/studiengangAuswaehlen'); ?></option>";
-			data.result.forEach(function(e){
-				var kuerzel = e.typ+e.kurzbz
-				liste += "<option id='stg"+e.studiengang_kz+"' value='"+e.studiengang_kz+"'>"+e.bezeichnung+" ("+kuerzel.toUpperCase()+")</option>";
-			});
-			liste += "</select>";
-			$("#stgListe").append(liste);
-		}
-		else
-		{
-			messageBox("message", data.errormsg, "red", "highlight", 1000);
+		error: loadError,
+		success: function(data){
+			$("#stgListe").empty();
+			if(data.error === 'false')
+			{
+				var liste = "<select id='select_studiengang' onchange='loadPruefungStudiengang();'><option><?php echo $p->t('pruefung/studiengangAuswaehlen'); ?></option>";
+				data.result.forEach(function(e){
+					var kuerzel = e.typ+e.kurzbz
+					liste += "<option id='stg"+e.studiengang_kz+"' value='"+e.studiengang_kz+"'>"+e.bezeichnung+" ("+kuerzel.toUpperCase()+")</option>";
+				});
+				liste += "</select>";
+				$("#stgListe").append(liste);
+			}
+			else
+			{
+				messageBox("message", data.errormsg, "red", "highlight", 1000);
+			}
 		}
 	});
 }
@@ -1044,38 +1046,39 @@ function loadPruefungStudiengang(studiengang_kz, studiensemester)
 			studiengang_kz: studiengang_kz,
 			studiensemester: studiensemester
 		},
-		error: loadError
-	}).success(function(data){
-		if(data.error === 'false')
-		{
-			$("#pruefungenListe").empty();
-			if(data.result.length > 0)
+		error: loadError,
+		success: function(data){
+			if(data.error === 'false')
 			{
-				var liste = "";
-				data.result.forEach(function(e){
-					liste += "<ul><li>"+e.bezeichnung+"<ul>";
-					try
-					{
-						e.pruefung[0].termine.forEach(function(d){
-							liste += "<li> <a onclick='showAnmeldungen(\""+d.pruefungstermin_id+"\", \""+e.lehrveranstaltung_id+"\");'>"+convertDateTime(d.von)+" "+convertDateTime(d.von, "time")+" - "+convertDateTime(d.bis, "time")+"</a></li>";
-						});
-					}
-					catch(err)
-					{
-						var errmsg = err.message;
-					}
-					liste += "</ul></li></ul>";
-				});
-				$("#pruefungenListe").append(liste);
+				$("#pruefungenListe").empty();
+				if(data.result.length > 0)
+				{
+					var liste = "";
+					data.result.forEach(function(e){
+						liste += "<ul><li>"+e.bezeichnung+"<ul>";
+						try
+						{
+							e.pruefung[0].termine.forEach(function(d){
+								liste += "<li> <a onclick='showAnmeldungen(\""+d.pruefungstermin_id+"\", \""+e.lehrveranstaltung_id+"\");'>"+convertDateTime(d.von)+" "+convertDateTime(d.von, "time")+" - "+convertDateTime(d.bis, "time")+"</a></li>";
+							});
+						}
+						catch(err)
+						{
+							var errmsg = err.message;
+						}
+						liste += "</ul></li></ul>";
+					});
+					$("#pruefungenListe").append(liste);
+				}
+				else
+				{
+					$("#pruefungenListe").html("<?php echo $p->t('pruefung/keinePruefungenVorhanden'); ?>");
+				}
 			}
 			else
 			{
-				$("#pruefungenListe").html("<?php echo $p->t('pruefung/keinePruefungenVorhanden'); ?>");
+				messageBox("message", data.errormsg, "red", "highlight", 1000);
 			}
-		}
-		else
-		{
-			messageBox("message", data.errormsg, "red", "highlight", 1000);
 		}
 	});
 }
@@ -1117,11 +1120,11 @@ function saveKommentar(pruefungsanmeldung_id, termin_id, lehrveranstaltung_id)
 			pruefungsanmeldung_id: pruefungsanmeldung_id,
 			kommentar: kommentar
 		},
-		error: loadError
-	}).success(function(data){
-		messageBox("message", "<?php echo $p->t('pruefung/kommentarErfolgreichGespeichert'); ?>", "green", "highlight", 1000);
-	}).complete(function(){
-		showAnmeldungen(termin_id, lehrveranstaltung_id);
+		error: loadError,
+		success: function(data){
+			messageBox("message", "<?php echo $p->t('pruefung/kommentarErfolgreichGespeichert'); ?>", "green", "highlight", 1000);
+			showAnmeldungen(termin_id, lehrveranstaltung_id);
+		}
 	});
 }
 
@@ -1140,15 +1143,16 @@ function loadPruefungstypen(abschluss)
 			method: "loadPruefungstypen",
 			abschluss: abschluss
 		},
-		error: loadError
-	}).success(function(data){
-		var selectData = "";
-		data.result.forEach(function(d){
-			if(d.beschreibung === null)
-				d.beschreibung = "";
-			selectData += "<option value='"+d.pruefungstyp_kurzbz+"'>"+d.beschreibung+"</option>";
-		});
-		$('#pruefungsTyp').html(selectData);
+		error: loadError,
+		success: function(data){
+			var selectData = "";
+			data.result.forEach(function(d){
+				if(d.beschreibung === null)
+					d.beschreibung = "";
+				selectData += "<option value='"+d.pruefungstyp_kurzbz+"'>"+d.beschreibung+"</option>";
+			});
+			$('#pruefungsTyp').html(selectData);
+		}
 	});
 }
 
@@ -1165,16 +1169,16 @@ function loadStudiensemester()
 		data: {
 			method: "loadStudiensemester"
 		},
-		error: loadError
-	}).success(function(data){
-		var selectData = "";
-		data.result.forEach(function(d){
-			selectData += "<option "+((d.studiensemester_kurzbz === data.aktSem) ? "selected" : "")+" value='"+d.studiensemester_kurzbz+"'>"+d.studiensemester_kurzbz+"</option>";
-		});
-		$('#studiensemester').html(selectData);
-	}).complete(function(){
-		loadPruefungsfenster();
-		loadLehrveranstaltungen();
+		error: loadError,
+		success: function(data){
+			var selectData = "";
+			data.result.forEach(function(d){
+				selectData += "<option "+((d.studiensemester_kurzbz === data.aktSem) ? "selected" : "")+" value='"+d.studiensemester_kurzbz+"'>"+d.studiensemester_kurzbz+"</option>";
+			});
+			$('#studiensemester').html(selectData);
+			loadPruefungsfenster();
+			loadLehrveranstaltungen();
+		}
 	});
 }
 
@@ -1229,7 +1233,6 @@ function savePruefungstermin()
 	unmarkMissingFormEntry();
 	var studiensemester_kurzbz = $("#studiensemester").val();
 	var pruefungsfenster_id = $("#pruefungsfenster").val();
-//	var pruefungstyp_kurzbz = $("#pruefungsTyp").val();
 	var titel = $("#titel").val();
 	var beschreibung = $("#beschreibung").val();
 	var methode = $("#methode").val();
@@ -1306,11 +1309,6 @@ function savePruefungstermin()
 		error = true;
 		markMissingFormEntry("pruefungsfenster");
 	}
-//	if(is_null(pruefungstyp_kurzbz) || is_undefined(pruefungstyp_kurzbz) || is_empty_String(pruefungstyp_kurzbz) || (pruefungstyp_kurzbz === "undefiniert"))
-//	{
-//		error = true;
-//		markMissingFormEntry("pruefungsTyp");
-//	}
 	if(is_null(titel) || is_undefined(titel) || is_empty_String(titel))
 	{
 		error = true;
@@ -1353,7 +1351,6 @@ function savePruefungstermin()
 				method: "savePruefungstermin",
 				studiensemester_kurzbz: studiensemester_kurzbz,
 				pruefungsfenster_id: pruefungsfenster_id,
-//				pruefungstyp_kurzbz: pruefungstyp_kurzbz,
 				titel: titel,
 				beschreibung: beschreibung,
 				methode: methode,
@@ -1363,17 +1360,18 @@ function savePruefungstermin()
 				mitarbeiter_uid: mitarbeiter_uid,
 				pruefungsintervall: pruefungsintervall
 			},
-			error: loadError
-		}).success(function(data){
-			unmarkMissingFormEntry();
-			if(data.error === "false")
-			{
-				messageBox("message", "<?php echo $p->t('pruefung/pruefungErfolgreichGespeichert'); ?>", "green", "highlight", 1000);
-				resetPruefungsverwaltung();
-			}
-			else
-			{
-				messageBox("message", data.errormsg, "red", "highlight", 1000);
+			error: loadError,
+			success: function(data){
+				unmarkMissingFormEntry();
+				if(data.error === "false")
+				{
+					messageBox("message", "<?php echo $p->t('pruefung/pruefungErfolgreichGespeichert'); ?>", "green", "highlight", 1000);
+					resetPruefungsverwaltung();
+				}
+				else
+				{
+					messageBox("message", data.errormsg, "red", "highlight", 1000);
+				}
 			}
 		});
 	}
@@ -1423,15 +1421,14 @@ function loadLehrveranstaltungen()
 			mitarbeiter_uid: mitarbeiter_uid,
 			studiensemester_kurzbz: studiensemester_kurzbz
 		},
-		error: loadError
-	}).success(function(data){
-		var selectData = '<option value="null"><?php echo $p->t('pruefung/lehrveranstaltungAuswaehlen'); ?></option>';
-		data.result.forEach(function(d){
-			selectData += '<option value="'+d.lehrveranstaltung_id+'">'+d.studiengang_bezeichnung+' | <b>'+d.bezeichnung+'</b> ('+d.lehrform_kurzbz+')</option>';
-		});
-		$("#lvDropdown1").html(selectData);
-	}).complete(function(){
-
+		error: loadError,
+		success: function(data){
+			var selectData = '<option value="null"><?php echo $p->t('pruefung/lehrveranstaltungAuswaehlen'); ?></option>';
+			data.result.forEach(function(d){
+				selectData += '<option value="'+d.lehrveranstaltung_id+'">'+d.studiengang_bezeichnung+' | <b>'+d.bezeichnung+'</b> ('+d.lehrform_kurzbz+')</option>';
+			});
+			$("#lvDropdown1").html(selectData);
+		}
 	});
 }
 
@@ -1455,14 +1452,14 @@ function loadPruefungsDetails(prfId)
 		data: {
 			method: "loadStudiensemester"
 		},
-		error: loadError
-	}).success(function(data){
+		error: loadError,
+	}).done(function(data){
 		var selectData = "";
 		data.result.forEach(function(d){
 			selectData += "<option "+((d.studiensemester_kurzbz === data.aktSem) ? "selected" : "")+" value='"+d.studiensemester_kurzbz+"'>"+d.studiensemester_kurzbz+"</option>";
 		});
 		$('#studiensemester').html(selectData);
-	}).complete(function(){
+	}).always(function(){
 		var studiensemester_kurzbz = $("#studiensemester option:selected").val();
 		$.ajax({
 			dataType: 'json',
@@ -1473,7 +1470,7 @@ function loadPruefungsDetails(prfId)
 				studiensemester_kurzbz: studiensemester_kurzbz
 			},
 			error: loadError
-		}).success(function(data){
+		}).done(function(data){
 			if(data.result.length === 0)
 			{
 				messageBox("message", "<?php echo $p->t('pruefung/keinePruefungsfensterGespeichert'); ?>", "red", "highlight", 1000);
@@ -1484,7 +1481,7 @@ function loadPruefungsDetails(prfId)
 				writePruefungsfenster(data);
 				setDatePicker();
 			}
-		}).complete(function(){
+		}).always(function(){
 			var studiensemester_kurzbz = $("#studiensemester").val();
 			var mitarbeiter_uid = $("#mitarbeiter_uid").val();
 			$.ajax({
@@ -1497,13 +1494,13 @@ function loadPruefungsDetails(prfId)
 					studiensemester_kurzbz: studiensemester_kurzbz
 				},
 				error: loadError
-			}).success(function(data){
+			}).done(function(data){
 				var selectData = '<option value="null"><?php echo $p->t('pruefung/lehrveranstaltungAuswaehlen'); ?></option>';
 				data.result.forEach(function(d){
 					selectData += '<option value="'+d.lehrveranstaltung_id+'">'+d.studiengang_bezeichnung+' | <b>'+d.bezeichnung+'</b> ('+d.lehrform_kurzbz+')</option>';
 				});
 				$("#lvDropdown1").html(selectData);
-			}).complete(function(){
+			}).always(function(){
 				$.ajax({
 					dataType: 'json',
 					url: "./pruefungsanmeldung.json.php",
@@ -1513,7 +1510,7 @@ function loadPruefungsDetails(prfId)
 						pruefung_id: prfId
 					},
 					error: loadError
-				}).success(function(data){
+				}).done(function(data){
 					var copy = $("#lvDropdown1").clone();
 					$("#lvDropdowns").empty();
 					$("#lvDropdowns").html(copy);
@@ -1523,7 +1520,6 @@ function loadPruefungsDetails(prfId)
 					$("#beschreibung").val(result.pruefung.beschreibung);
 					$("#studiensemester").val(result.pruefung.studiensemester_kurzbz);
 					$("#pruefungsfenster").val(result.pruefung.pruefungsfenster_id);
-//					$("#pruefungsTyp").val(result.pruefung.pruefungstyp_kurzbz);
 					$("#methode").val(result.pruefung.methode);
 					var i = 0;
 					$("#termin1").closest("tr").remove();
@@ -1533,11 +1529,11 @@ function loadPruefungsDetails(prfId)
 						var lv = "";
 						if(d.lehrveranstaltung !== undefined)
 						{
-							lv = "<span value='"+d.lehrveranstaltung.lehrveranstaltung_id+"'>"+d.lehrveranstaltung.studiengang.kurzbzlang+" | <b>"+d.lehrveranstaltung.bezeichnung+"</b> ("+d.lehrveranstaltung.lehrform_kurzbz+")</span><a href='#' onclick='deleteLehrveranstaltungFromPruefung(\""+d.lehrveranstaltung.lehrveranstaltung_id+"\", \""+d.pruefung.pruefung_id+"\");'> <?php echo $p->t('global/löschen'); ?></a></br>";
+							lv = "<span value='"+d.lehrveranstaltung.lehrveranstaltung_id+"'>"+d.lehrveranstaltung.studiengang.kurzbzlang+" | <b>"+d.lehrveranstaltung.bezeichnung+"</b> ("+d.lehrveranstaltung.lehrform_kurzbz+")</span><a href='#' onclick='deleteLehrveranstaltungFromPruefung(\""+d.lehrveranstaltung.lehrveranstaltung_id+"\", \""+d.pruefung.pruefung_id+"\");'> <?php echo $p->t('global/löschen'); ?></a><br />";
 						}
 						else
 						{
-							lv = "<span><?php echo $p->t('pruefung/keineLehrveranstaltungenVorhanden'); ?></span></br>";
+							lv = "<span><?php echo $p->t('pruefung/keineLehrveranstaltungenVorhanden'); ?></span><br />";
 						}
 						$("#lvDropdowns").children().first().before(lv);
 						var j = 0;
@@ -1582,7 +1578,7 @@ function loadPruefungsDetails(prfId)
 					{
 						$("#einzeln").removeAttr("checked");
 					}
-				}).complete(function(){
+				}).always(function(){
 					$("#buttonSave").attr("onclick", "updatePruefung(\""+prfId+"\");");
 					if($("#buttonStorno").length === 0)
 					{
@@ -1637,7 +1633,6 @@ function updatePruefung(prfId)
 	unmarkMissingFormEntry();
 	var studiensemester_kurzbz = $("#studiensemester").val();
 	var pruefungsfenster_id = $("#pruefungsfenster").val();
-//	var pruefungstyp_kurzbz = $("#pruefungsTyp").val();
 	var titel = $("#titel").val();
 	var beschreibung = $("#beschreibung").val();
 	var methode = $("#methode").val();
@@ -1748,11 +1743,6 @@ function updatePruefung(prfId)
 		error = true;
 		markMissingFormEntry("pruefungsfenster");
 	}
-//	if(is_null(pruefungstyp_kurzbz) || is_undefined(pruefungstyp_kurzbz) || is_empty_String(pruefungstyp_kurzbz) || (pruefungstyp_kurzbz === "undefiniert"))
-//	{
-//		error = true;
-//		markMissingFormEntry("pruefungsTyp");
-//	}
 	if(is_null(titel) || is_undefined(titel) || is_empty_String(titel))
 	{
 		error = true;
@@ -1789,7 +1779,6 @@ function updatePruefung(prfId)
 				pruefung_id: prfId,
 				studiensemester_kurzbz: studiensemester_kurzbz,
 				pruefungsfenster_id: pruefungsfenster_id,
-//				pruefungstyp_kurzbz: pruefungstyp_kurzbz,
 				titel: titel,
 				beschreibung: beschreibung,
 				methode: methode,
@@ -1801,7 +1790,7 @@ function updatePruefung(prfId)
 				pruefungsintervall: pruefungsintervall
 			},
 			error: loadError
-		}).success(function(data){
+		}).done(function(data){
 			unmarkMissingFormEntry();
 			if(data.error === "false")
 			{
@@ -1812,7 +1801,7 @@ function updatePruefung(prfId)
 			{
 				messageBox("message", data.errormsg, "red", "highlight", 1000);
 			}
-		}).complete(function(){
+		}).always(function(){
 			loadAllPruefungen();
 			$("#modalOverlay").removeClass("modalOverlay");
 		});
@@ -1837,7 +1826,7 @@ function deleteLehrveranstaltungFromPruefung(lvId, pruefung_id)
 			lehrveranstaltung_id: lvId
 		},
 		error: loadError
-	}).success(function(data){
+	}).done(function(data){
 		if(data.error === "false")
 		{
 			messageBox("message", "<?php echo $p->t('pruefung/lvErfolgreichEntfernt'); ?>", "green", "highlight", 1000);
@@ -1846,7 +1835,7 @@ function deleteLehrveranstaltungFromPruefung(lvId, pruefung_id)
 		{
 			messageBox("message", data.errormsg, "red", "highlight", 1000);
 		}
-	}).complete(function(){
+	}).always(function(){
 		loadPruefungsDetails(pruefung_id);
 	});
 }
@@ -1868,7 +1857,7 @@ function stornoPruefung(pruefung_id)
 			pruefung_id: pruefung_id
 		},
 		error: loadError
-	}).success(function(data){
+	}).done(function(data){
 		if(data.error === "false")
 		{
 			messageBox("message", "<?php echo $p->t('pruefung/pruefungStorniert'); ?>", "green", "highlight", 1000);
@@ -1877,7 +1866,7 @@ function stornoPruefung(pruefung_id)
 		{
 			messageBox("message", data.errormsg, "red", "highlight", 1000);
 		}
-	}).complete(function(){
+	}).always(function(){
 		loadAllPruefungen();
 		resetPruefungsverwaltung();
 	});
@@ -1901,7 +1890,7 @@ function terminLoeschen(pruefung_id, pruefungstermin_id)
 			pruefungstermin_id: pruefungstermin_id
 		},
 		error: loadError
-	}).success(function(data){
+	}).done(function(data){
 		if(data.error === "false")
 		{
 			messageBox("message", "<?php echo $p->t('pruefung/terminGeloescht'); ?>", "green", "highlight", 1000);
@@ -1910,7 +1899,7 @@ function terminLoeschen(pruefung_id, pruefungstermin_id)
 		{
 			messageBox("message", data.errormsg, "red", "highlight", 1000);
 		}
-	}).complete(function(){
+	}).always(function(){
 		loadPruefungsDetails(pruefung_id);
 		loadAllPruefungen();
 	});
@@ -1932,7 +1921,7 @@ function loadAllPruefungen()
 			uid: uid
 		},
 		error: loadError
-	}).success(function(data){
+	}).done(function(data){
 		if(data.error != 'true')
 		{
 			$("#prfTable tbody").first().html("");
@@ -1953,7 +1942,6 @@ function loadAllPruefungen()
 					});
 					tableRow+="</td>";
 					tableRow += "<td>"+e.methode+"</td>";
-//					tableRow += "<td>"+e.pruefungstyp_kurzbz+"</td>";
 					tableRow += "<td>"+e.einzeln+"</td>";
 					tableRow += "<td>"+e.mitarbeiter_uid+"</td>";
 					tableRow += "<td>"+e.storniert+"</td>";
@@ -1966,7 +1954,7 @@ function loadAllPruefungen()
 		{
 			messageBox("message", data.errormsg, "red", "highlight", 1000);
 		}
-	}).complete(function(event, xhr, settings){
+	}).always(function(event, xhr, settings){
 		if($("#prfTable")[0].hasInitialized !== true)
 		{
 			$("#prfTable").tablesorter({
@@ -2042,7 +2030,6 @@ function resetPruefungsverwaltung()
 	loadAllPruefungen();
 	$("#titel").val("");
 	$("#beschreibung").val("");
-//	loadPruefungstypen("false");
 	loadStudiensemester();
 	$("#methode").val("");
 	resetLehrveranstaltungen();
@@ -2125,7 +2112,7 @@ function saveRaum(terminId, lehrveranstaltung_id)
 			terminId: terminId
 		},
 		error: loadError
-	}).success(function(data){
+	}).done(function(data){
 		$("#raumDialog").dialog("close");
 		showAnmeldungen(terminId, lehrveranstaltung_id);
 	});
@@ -2142,7 +2129,7 @@ function getRaeume(terminId)
 			terminId: terminId
 		},
 		error: loadError
-	}).success(function(data){
+	}).done(function(data){
 		var liste = "";
 		data.result.forEach(function(d){
 			liste += "<option value="+d.ort_kurzbz+">"+d.ort_kurzbz+"</option>"

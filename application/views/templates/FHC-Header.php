@@ -11,6 +11,7 @@ $calledMethod = $this->router->method;
 $title = isset($title) ? $title : null;
 $customCSSs = isset($customCSSs) ? $customCSSs : null;
 $customJSs = isset($customJSs) ? $customJSs : null;
+$phrases = isset($phrases) ? $phrases : null;
 
 // By default set the parameters to false
 $jquery = isset($jquery) ? $jquery : false;
@@ -77,6 +78,25 @@ function _generateJSDataStorageObject($calledPath, $calledMethod)
 			called_path: "'.$calledPath.'",
 			called_method: "'.$calledMethod.'"
 		};';
+	$toPrint .= "\n";
+	$toPrint .= '</script>';
+	$toPrint .= "\n\n";
+
+	echo $toPrint;
+}
+
+/**
+ * Generates global JS-Object to pass phrases to other javascripts
+ */
+function _generateJSPhrasesStorageObject($phrases)
+{
+	$ci =& get_instance();
+	$ci->load->library('PhrasesLib', array($phrases), 'pj');
+
+	$toPrint = "\n";
+	$toPrint .= '<script type="text/javascript">';
+	$toPrint .= "\n";
+	$toPrint .= '	var FHC_JS_PHRASES_STORAGE_OBJECT = '.$ci->pj->getJSON().';';
 	$toPrint .= "\n";
 	$toPrint .= '</script>';
 	$toPrint .= "\n\n";
@@ -184,6 +204,10 @@ function _generateAddonsJSsInclude($calledFrom)
 			// NOTE: must be called before any other JS include
 			_generateJSDataStorageObject($calledPath, $calledMethod);
 
+			// Generates the global object to pass phrases to javascripts
+			// NOTE: must be called before including the PhrasesLib.js
+			_generateJSPhrasesStorageObject($phrases);
+
 			// JQuery V3
 			if ($jquery === true) _generateJSsInclude('vendor/components/jquery/jquery.min.js');
 
@@ -193,9 +217,6 @@ function _generateAddonsJSsInclude($calledFrom)
 				_generateJSsInclude('vendor/components/jqueryui/jquery-ui.min.js');
 				_generateJSsInclude('vendor/components/jqueryui/ui/i18n/datepicker-de.js'); // datepicker german language file
 			}
-
-			// AjaxLib JS
-			if ($ajaxlib === true) _generateJSsInclude('public/js/AjaxLib.js');
 
 			// Bootstrap JS
 			if ($bootstrap === true) _generateJSsInclude('vendor/twbs/bootstrap/dist/js/bootstrap.min.js');
@@ -217,6 +238,13 @@ function _generateAddonsJSsInclude($calledFrom)
 				_generateJSsInclude('vendor/BlackrockDigital/startbootstrap-sb-admin-2/vendor/metisMenu/metisMenu.min.js');
 				_generateJSsInclude('vendor/BlackrockDigital/startbootstrap-sb-admin-2/dist/js/sb-admin-2.min.js');
 			}
+
+			// AjaxLib JS
+			// NOTE: must be called before including others JS libraries that use it
+			if ($ajaxlib === true) _generateJSsInclude('public/js/AjaxLib.js');
+
+			// PhrasesLib JS
+			if ($phrases != null) _generateJSsInclude('public/js/PhrasesLib.js');
 
 			// FilterWidget JS
 			if($filterwidget === true) _generateJSsInclude('public/js/FilterWidget.js') ;

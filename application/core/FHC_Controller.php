@@ -20,15 +20,21 @@ class FHC_Controller extends CI_Controller
 		$this->load->helper('fhcauth');
 	}
 
+	//------------------------------------------------------------------------------------------------------------------
+	// Public methods
+
 	/**
 	 * Wrapper to load phrases using the PhrasesLib
 	 * NOTE: The library is loaded with the alias 'p', so must me used with this alias in the rest of the code.
 	 *		EX: $this->p->t(<category>, <phrase name>)
 	 */
-	public function loadPhrases($categories, $language = null)
+	protected function loadPhrases($categories, $language = null)
 	{
 		$this->load->library('PhrasesLib', array($categories, $language), 'p');
 	}
+
+	//------------------------------------------------------------------------------------------------------------------
+	// Protected methods
 
 	/**
 	 * Sets the unique id for the called controller
@@ -66,5 +72,34 @@ class FHC_Controller extends CI_Controller
 	protected function getControllerId()
 	{
 		return $this->_controllerId;
+	}
+
+	/**
+	 * Utility method to output a success using JSON as content type
+	 * Wraps the private method _outputJson
+	 */
+	protected function outputJsonSuccess($mixed)
+	{
+		$this->_outputJson(success($mixed));
+	}
+
+	/**
+	 * Utility method to output an error using JSON as content type
+	 * Wraps the private method _outputJson
+	 */
+	protected function outputJsonError($mixed)
+	{
+		$this->_outputJson(error($mixed));
+	}
+
+	//------------------------------------------------------------------------------------------------------------------
+	// Private methods
+
+	/**
+	 * Utility method to output using JSON as content type
+	 */
+	private function _outputJson($mixed)
+	{
+		$this->output->set_content_type('application/json')->set_output(json_encode($mixed));
 	}
 }

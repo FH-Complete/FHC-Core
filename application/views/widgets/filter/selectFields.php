@@ -1,11 +1,11 @@
-<div id="filterSelectFieldsDnd" class="filter-select-fields-dnd-div"></div>
+<div id="dragAndDropFieldsArea" class="drag-and-drop-fields-area"></div>
 
 <div>
-	<span class="filter-options-span">
-		Add field:
+	<span class="filter-span-label">
+		<?php echo  ucfirst($this->p->t('filter', 'feldHinzufuegen')); ?>:
 	</span>
 
 	<span>
-		<select id="addField"></select>
+		<select id="addField" class="drop-down-fields"></select>
 	</span>
 </div>

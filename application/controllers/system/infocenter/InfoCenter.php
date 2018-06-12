@@ -129,24 +129,31 @@ class InfoCenter extends FHC_Controller
 
 		$personexists = $this->PersonModel->load($person_id);
 
-		if(isError($personexists))
+		if (isError($personexists))
 			show_error($personexists->retval);
 
 		if (empty($personexists->retval))
 			show_error('person does not exist!');
 
-		//mark person as locked for editing
-		$result = $this->PersonLockModel->lockPerson($person_id, $this->uid, self::APP);
+		$show_lock_link_get = $this->input->get('show_lock_link');
+		$show_lock_link = !isset($show_lock_link_get) || $show_lock_link_get === '1';
 
-		if(isError($result))
-			show_error($result->retval);
+		if ($show_lock_link)
+		{
+			//mark person as locked for editing
+			$result = $this->PersonLockModel->lockPerson($person_id, $this->uid, self::APP);
+
+			if (isError($result))
+				show_error($result->retval);
+		}
 
 		$persondata = $this->_loadPersonData($person_id);
 		$prestudentdata = $this->_loadPrestudentData($person_id);
 
 		$data = array_merge(
 			$persondata,
-			$prestudentdata
+			$prestudentdata,
+			array('show_lock_link' => $show_lock_link)
 		);
 
 		$data['fhc_controller_id'] = $this->fhc_controller_id;
@@ -162,7 +169,7 @@ class InfoCenter extends FHC_Controller
 	{
 		$result = $this->PersonLockModel->unlockPerson($person_id, self::APP);
 
-		if(isError($result))
+		if (isError($result))
 			show_error($result->retval);
 
 		redirect(self::URL_PREFIX.'?fhc_controller_id='.$this->fhc_controller_id);
@@ -245,9 +252,7 @@ class InfoCenter extends FHC_Controller
 			$data['data'] = $studienordnung->retval[0]->data;
 		}
 
-		$this->load->view('system/infocenter/studiengangZgvInfo.php',
-			$data
-		);
+		$this->load->view('system/infocenter/studiengangZgvInfo.php', $data);
 	}
 
 	/**
@@ -721,6 +726,18 @@ class InfoCenter extends FHC_Controller
 		);
 	}
 
+	/**
+	 * Wrapper for setNavigationMenu, returns JSON message
+	 */
+	public function setNavigationMenuArrayJson()
+	{
+		$this->setNavigationMenuArray();
+
+		$this->output
+			->set_content_type('application/json')
+			->set_output(json_encode(success('success')));
+	}
+
 	private function _fillFilters($filters, &$tofill)
 	{
 		foreach ($filters as $filterId => $description)
@@ -744,7 +761,7 @@ class InfoCenter extends FHC_Controller
 				'link' => sprintf($toPrint, site_url('system/infocenter/InfoCenter'), 'filter_id', $filterId),
 				'description' => $description,
 				'subscriptDescription' => 'Remove',
-				'subscriptLinkClass' => 'remove-filter',
+				'subscriptLinkClass' => 'remove-custom-filter',
 				'subscriptLinkValue' => $filterId
 			);
 		}

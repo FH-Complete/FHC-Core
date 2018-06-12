@@ -1,30 +1,30 @@
-.filter-options-span {
-	display: inline-block;
-	width: 130px;
-	font-weight: bold;
-}
-
 .filter-name-title {
 	font-family: inherit;
 	font-size: 16px;
-	/*font-weight: bold;*/
 	line-height: 1.1;
 	color: black;
+}
+
+.panel-title {
+	font-weight: bold;
+	padding-top: 3px;
 }
 
 .filters-hidden-panel {
 	margin: 0 10px 10px 10px;
 }
 
-.hidden-control {
-	display: none !important;
+.filter-span-label {
+	display: inline-block;
+	width: 200px;
+	font-weight: bold;
 }
 
-.filter-select-fields-dnd-div {
+.drag-and-drop-fields-area {
 	height: 50px;
 }
 
-.filter-select-field-dnd-span {
+.drag-and-drop-fields-span {
 	border: 1px solid black;
 	border-radius: 7px;
 	margin-left: 3px;
@@ -33,12 +33,21 @@
 	top: 10px;
 }
 
-.filter-select-field-dnd-span:hover {
+.drag-and-drop-fields-span:hover {
 	cursor: move;
 }
 
-.filter-select-field-dnd-span a {
+.remove-selected-field {
+	font-weight: bold;
 	cursor: pointer;
+}
+
+.remove-selected-field:hover {
+	text-decoration: none;
+}
+
+.hidden-control {
+	display: none !important;
 }
 
 .selection-before::before {
@@ -61,47 +70,38 @@
 	border-right: 2px solid #428bca;
 }
 
-.select-filter-operation {
+.applied-filter-operation {
 	display: inline;
 	width: 130px;
 }
 
-.select-filter-operation-value {
+.applied-filter-condition {
 	display: inline;
 	width: 400px;
 }
 
-.select-filter-option {
+.applied-filter-option {
 	display: inline;
 	width: 100px;
 }
 
-#addField, #customFilterDescription, #addFilter {
+.remove-applied-filter {
+	padding-bottom: 3px;
+}
+
+.drop-down-fields, .drop-down-filters, .input-text-custom-filter {
 	display: inline;
 	width: 535px;
 }
 
-#selectedFilters {
+#appliedFilters {
 	margin-bottom: 20px;
 }
 
-#applyFilter, #saveCustomFilterButton, .remove-selected-filter {
+#applyFilter, #saveCustomFilterButton, .remove-applied-filter {
 	font-weight: bold;
 }
 
 #applyFilter, #saveCustomFilterButton {
 	width: 100px;
-}
-
-.remove-selected-filter {
-	padding-bottom: 3px;
-}
-
-.panel-title {
-	font-weight: bold;
-	padding-top: 3px;
-}
-
-.remove-field {
-	font-weight: bold;
 }
