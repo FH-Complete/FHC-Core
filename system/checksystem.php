@@ -73,6 +73,16 @@ echo '<div>';
 	require_once('phrasesupdate.php');
 echo '</div>';
 
+// ******** filtersupdate ************/
+echo '<H2>Filters time!</H2>';
+
+echo '<div>';
+	echo 'filtersupdate.php wird aufgerufen...';
+echo '</div>';
+echo '<div>';
+	require_once('filtersupdate.php');
+echo '</div>';
+
 
 // ******** Berechtigungen Prüfen ************/
 echo '<h2>Berechtigungen pruefen</h2>';
