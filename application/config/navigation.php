@@ -64,18 +64,21 @@ $config['navigation_menu']['system/infocenter/InfoCenter/index'] = array(
 		'link' => base_url('index.ci.php/system/infocenter/InfoCenter/infocenterFreigegeben'),
 		'description' => 'Freigegeben',
 		'icon' => 'thumbs-up'
-	));
+	)
+);
 
 $config['navigation_menu']['system/infocenter/InfoCenter/showDetails'] = array(
 	'Freigegeben' => array(
 		'link' => base_url('index.ci.php/system/infocenter/InfoCenter/infocenterFreigegeben'),
 		'description' => 'Freigegeben',
 		'icon' => 'thumbs-up'
-	));
+	)
+);
 
 $config['navigation_menu']['system/infocenter/InfoCenter/infocenterFreigegeben'] = array(
 	'Zurück' => array(
 		'link' => base_url('index.ci.php/system/infocenter/InfoCenter/index'),
-		'description' => 'Zurück',
+		'description' => 'Home',
 		'icon' => 'angle-left'
-	));
+	)
+);
