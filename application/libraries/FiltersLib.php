@@ -264,7 +264,7 @@ class FiltersLib
 	 */
 	public function generateDatasetQuery($query, $filters)
 	{
-		$datasetQuery = null;
+		$datasetQuery = 'SELECT * FROM ('.$query.') '.self::DATASET_TABLE_ALIAS;
 
 		// If the given query is valid and the parameter filters is an array
 		if (!empty(trim($query)) && $filters != null && is_array($filters))
@@ -287,7 +287,7 @@ class FiltersLib
 
 			if ($where != '') // if the SQL where clause was built
 			{
-				$datasetQuery = 'SELECT * FROM ('.$query.') '.self::DATASET_TABLE_ALIAS.' WHERE '.$where;
+				$datasetQuery .= ' WHERE '.$where;
 			}
 		}
 
