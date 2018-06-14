@@ -61,21 +61,13 @@ $config['navigation_menu']['Vilesci/index'] = array(
 
 $config['navigation_menu']['system/infocenter/InfoCenter/index'] = array(
 	'Freigegeben' => array(
-		'link' => base_url('index.ci.php/system/infocenter/InfoCenter/infocenterFreigegeben'),
+		'link' => base_url('index.ci.php/system/infocenter/InfoCenter/freigegeben'),
 		'description' => 'Freigegeben',
 		'icon' => 'thumbs-up'
 	)
 );
 
-$config['navigation_menu']['system/infocenter/InfoCenter/showDetails'] = array(
-	'Freigegeben' => array(
-		'link' => base_url('index.ci.php/system/infocenter/InfoCenter/infocenterFreigegeben'),
-		'description' => 'Freigegeben',
-		'icon' => 'thumbs-up'
-	)
-);
-
-$config['navigation_menu']['system/infocenter/InfoCenter/infocenterFreigegeben'] = array(
+$config['navigation_menu']['system/infocenter/InfoCenter/freigegeben'] = array(
 	'Zurück' => array(
 		'link' => base_url('index.ci.php/system/infocenter/InfoCenter/index'),
 		'description' => 'Home',

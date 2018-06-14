@@ -15,7 +15,7 @@
 					SELECT zeitpunkt
 					FROM system.tbl_log
 					WHERE taetigkeit_kurzbz IN(\'bewerbung\',\'kommunikation\')
-					AND logdata->>\'name\' NOT IN (\'Login with code\', \'New application\', \'Interessent rejected\')
+					AND logdata->>\'name\' NOT IN (\'Login with code\', \'New application\')
 					AND person_id = p.person_id
 					ORDER BY zeitpunkt DESC
 					LIMIT 1
@@ -24,7 +24,7 @@
 					SELECT insertvon
 					FROM system.tbl_log
 					WHERE taetigkeit_kurzbz IN(\'bewerbung\',\'kommunikation\')
-					AND logdata->>\'name\' NOT IN (\'Login with code\', \'New application\', \'Interessent rejected\')
+					AND logdata->>\'name\' NOT IN (\'Login with code\', \'New application\')
 					AND person_id = p.person_id
 					ORDER BY zeitpunkt DESC
 					LIMIT 1
@@ -37,7 +37,6 @@
 						INNER JOIN public.tbl_prestudent ps USING(prestudent_id)
 						JOIN public.tbl_studiengang USING(studiengang_kz)
 					WHERE pss.status_kurzbz = \'Interessent\'
-					AND pss.bestaetigtam IS NULL
 					AND ps.person_id = p.person_id
 					AND tbl_studiengang.typ in(\'b\')
 					AND studiensemester_kurzbz IN (
@@ -56,7 +55,6 @@
 						JOIN public.tbl_studiengang USING(studiengang_kz)
 					WHERE pss.status_kurzbz = \'Interessent\'
 						AND (pss.bewerbung_abgeschicktamum IS NOT NULL AND pss.bewerbung_abgeschicktamum>=\''.$NOTBEFORE.'\')
-						AND pss.bestaetigtam IS NULL
 						AND ps.person_id = p.person_id
 						AND tbl_studiengang.typ in(\'b\')
 						AND studiensemester_kurzbz IN (
@@ -75,7 +73,6 @@
 						JOIN public.tbl_studiengang USING(studiengang_kz)
 					WHERE pss.status_kurzbz = \'Interessent\'
 						AND (pss.bewerbung_abgeschicktamum IS NOT NULL AND pss.bewerbung_abgeschicktamum>=\''.$NOTBEFORE.'\')
-						AND pss.bestaetigtam IS NULL
 						AND ps.person_id = p.person_id
 						AND tbl_studiengang.typ in(\'b\')
 						AND studiensemester_kurzbz IN (
@@ -83,20 +80,17 @@
 							FROM public.tbl_studiensemester
 							WHERE ende >= NOW()
 						)
-						AND not exists (select 1 from tbl_prestudentstatus psss where psss.prestudent_id = pss.prestudent_id and psss.status_kurzbz = \'Abgewiesener\' and psss.studiensemester_kurzbz = \'WS2018\')
 					LIMIT 1
 				) AS "AnzahlAbgeschickt",
 				array_to_string(
 					(
-					SELECT array_agg(distinct UPPER(tbl_studiengang.typ || tbl_studiengang.kurzbz) || \':\' || tbl_studienplan.orgform_kurzbz)
+					SELECT array_agg(distinct UPPER(tbl_studiengang.typ || tbl_studiengang.kurzbz))
 					FROM
 						public.tbl_prestudentstatus pss
 						INNER JOIN public.tbl_prestudent ps USING(prestudent_id)
 						JOIN public.tbl_studiengang USING(studiengang_kz)
-						JOIN lehre.tbl_studienplan using (studienplan_id)
 					WHERE pss.status_kurzbz = \'Interessent\'
 						AND (pss.bewerbung_abgeschicktamum IS NOT NULL AND pss.bewerbung_abgeschicktamum>=\''.$NOTBEFORE.'\')
-						AND pss.bestaetigtam IS NULL
 						AND ps.person_id = p.person_id
 						AND tbl_studiengang.typ in(\'b\')
 						AND studiensemester_kurzbz IN (
@@ -104,65 +98,13 @@
 							FROM public.tbl_studiensemester
 							WHERE ende >= NOW()
 						)
-						AND not exists (select 1 from tbl_prestudentstatus psss where psss.prestudent_id = pss.prestudent_id and psss.status_kurzbz = \'Abgewiesener\' and psss.studiensemester_kurzbz = \'WS2018\')
 					LIMIT 1
 					),\', \'
 				) AS "StgAbgeschickt",
-				array_to_string(
-					(
-					SELECT array_agg(distinct UPPER(tbl_studiengang.typ || tbl_studiengang.kurzbz) || \':\' || tbl_studienplan.orgform_kurzbz)
-					FROM
-						public.tbl_prestudentstatus pss
-						INNER JOIN public.tbl_prestudent ps USING(prestudent_id)
-						JOIN public.tbl_studiengang USING(studiengang_kz)
-						JOIN lehre.tbl_studienplan using (studienplan_id)
-					WHERE pss.status_kurzbz = \'Interessent\'
-						AND (pss.bewerbung_abgeschicktamum IS NULL)
-						AND pss.bestaetigtam IS NULL
-						AND ps.person_id = p.person_id
-						AND tbl_studiengang.typ in(\'b\')
-						AND studiensemester_kurzbz IN (
-							SELECT studiensemester_kurzbz
-							FROM public.tbl_studiensemester
-							WHERE ende >= NOW()
-						)
-					AND not exists (select 1 from tbl_prestudentstatus psss where psss.prestudent_id = pss.prestudent_id and psss.status_kurzbz = \'Abgewiesener\' and psss.studiensemester_kurzbz = \'WS2018\')
-					LIMIT 1
-					),\', \'
-				) AS "StgNichtAbgeschickt",
-				array_to_string(
-					(
-					SELECT array_agg(distinct UPPER(tbl_studiengang.typ || tbl_studiengang.kurzbz) || \':\' || tbl_studienplan.orgform_kurzbz)
-					FROM
-						public.tbl_prestudentstatus pss
-						INNER JOIN public.tbl_prestudent ps USING(prestudent_id)
-						JOIN public.tbl_studiengang USING(studiengang_kz)
-						JOIN lehre.tbl_studienplan using (studienplan_id)
-					WHERE pss.status_kurzbz in (\'Wartender\', \'Bewerber\', \'Aufgenommener\', \'Student\')
-						AND (pss.bewerbung_abgeschicktamum IS NULL)
-						AND ps.person_id = p.person_id
-						AND tbl_studiengang.typ in(\'b\')
-						AND studiensemester_kurzbz IN (
-							SELECT studiensemester_kurzbz
-							FROM public.tbl_studiensemester
-							WHERE start >= NOW()
-						)
-					AND not exists (select 1 from tbl_prestudentstatus psss where psss.prestudent_id = pss.prestudent_id and psss.status_kurzbz = \'Abgewiesener\' and psss.studiensemester_kurzbz = \'WS2018\')
-					LIMIT 1
-					),\', \'
-				) AS "StgAktiv",
 				pl.zeitpunkt AS "LockDate",
-				pl.lockuser AS "LockUser",
-				pd.parkdate AS "ParkDate"
+				pl.lockuser as "LockUser"
 			FROM public.tbl_person p
 		LEFT JOIN (SELECT person_id, zeitpunkt, uid as lockuser FROM system.tbl_person_lock WHERE app = \''.$APP.'\') pl USING(person_id)
-		LEFT JOIN (
-					SELECT person_id, zeitpunkt as parkdate
-					FROM system.tbl_log
-					WHERE logtype_kurzbz = \'Processstate\'
-					AND logdata->>\'name\' = \'Parked\'
-					AND zeitpunkt >= now()
-				) pd USING(person_id)
 			WHERE
 				EXISTS(
 					SELECT 1
@@ -172,11 +114,7 @@
 					WHERE
 						person_id=p.person_id
 						AND tbl_studiengang.typ in(\'b\')
-						AND \'Interessent\' = (SELECT status_kurzbz FROM public.tbl_prestudentstatus
-												WHERE prestudent_id=tbl_prestudent.prestudent_id
-												ORDER BY datum DESC, insertamum DESC, ext_id DESC
-												LIMIT 1
-												)
+
 						AND EXISTS (
 							SELECT
 								1
@@ -185,7 +123,7 @@
 							WHERE
 								prestudent_id = tbl_prestudent.prestudent_id
 								AND status_kurzbz = \'Interessent\'
-								AND (bestaetigtam IS NULL AND (bewerbung_abgeschicktamum is null OR bewerbung_abgeschicktamum>=\''.$NOTBEFORE.'\'))
+								AND (bestaetigtam IS NOT NULL AND bewerbung_abgeschicktamum >= \''.$NOTBEFORE.'\')
 								AND studiensemester_kurzbz IN (
 									SELECT studiensemester_kurzbz
 									FROM public.tbl_studiensemester
@@ -193,27 +131,24 @@
 							)
 					)
 				)
-			ORDER BY "LastAction" ASC
+			ORDER BY "LastAction" DESC
 		',
 		'checkboxes' => 'PersonId',
 		'additionalColumns' => array('Details'),
 		'columnsAliases' => array(
 			'PersonID',
-			ucfirst($this->p->t('person', 'vorname')) ,
-			ucfirst($this->p->t('person', 'nachname')),
-			ucfirst($this->p->t('person', 'geburtsdatum')),
-			ucfirst($this->p->t('person', 'nation')),
-			ucfirst($this->p->t('global', 'letzteAktion')),
-			ucfirst($this->p->t('global', 'letzterBearbeiter')),
-			ucfirst($this->p->t('lehre', 'studiensemester')),
-			ucfirst($this->p->t('global', 'gesendetAm')),
-			ucfirst($this->p->t('global', 'abgeschickt')).' ('.$this->p->t('global', 'anzahl').')',
-			ucfirst($this->p->t('lehre', 'studiengang')).' ('.$this->p->t('global', 'gesendet').')',
-			ucfirst($this->p->t('lehre', 'studiengang')).' ('.$this->p->t('global', 'nichtGesendet').')',
-			ucfirst($this->p->t('lehre', 'studiengang')).' ('.$this->p->t('global', 'aktiv').')',
-			ucfirst($this->p->t('global', 'sperrdatum')),
-			ucfirst($this->p->t('global', 'gesperrtVon')),
-			ucfirst($this->p->t('global', 'parkdatum'))
+			'Vorname',
+			'Nachname',
+			'GebDatum',
+			'Nation',
+			'Letzte Aktion',
+			'Letzter Bearbeiter',
+			'StSem',
+			'GesendetAm',
+			'NumAbgeschickt',
+			'Studiengänge',
+			'Sperrdatum',
+			'GesperrtVon'
 		),
 		'formatRow' => function($datasetRaw) {
 
@@ -231,7 +166,7 @@
 			}
 			else
 			{
-				$datasetRaw->{'SendDate'} = date_format(date_create($datasetRaw->{'SendDate'}), 'Y-m-d H:i');
+				$datasetRaw->{'SendDate'} = date_format(date_create($datasetRaw->{'SendDate'}),'Y-m-d H:i');
 			}
 
 			if ($datasetRaw->{'LastAction'} == null)
@@ -240,7 +175,7 @@
 			}
 			else
 			{
-				$datasetRaw->{'LastAction'} = date_format(date_create($datasetRaw->{'LastAction'}), 'Y-m-d H:i');
+				$datasetRaw->{'LastAction'} = date_format(date_create($datasetRaw->{'LastAction'}),'Y-m-d H:i');
 			}
 
 			if ($datasetRaw->{'User/Operator'} == '')
@@ -258,24 +193,9 @@
 				$datasetRaw->{'LockUser'} = '-';
 			}
 
-			if ($datasetRaw->{'ParkDate'} == null)
-			{
-				$datasetRaw->{'ParkDate'} = '-';
-			}
-
 			if ($datasetRaw->{'StgAbgeschickt'} == null)
 			{
-				$datasetRaw->{'StgAbgeschickt'} = '-';
-			}
-
-			if ($datasetRaw->{'StgNichtAbgeschickt'} == null)
-			{
-				$datasetRaw->{'StgNichtAbgeschickt'} = '-';
-			}
-
-			if ($datasetRaw->{'StgAktiv'} == null)
-			{
-				$datasetRaw->{'StgAktiv'} = '-';
+				$datasetRaw->{'StgAbgeschickt'} = 'N/A';
 			}
 
 			if ($datasetRaw->{'Nation'} == null)
@@ -287,26 +207,16 @@
 		},
 		'markRow' => function($datasetRaw) {
 
-			$mark = '';
-
 			if ($datasetRaw->LockDate != null)
 			{
-				$mark = FilterWidget::DEFAULT_MARK_ROW_CLASS;
+				return FilterWidget::DEFAULT_MARK_ROW_CLASS;
 			}
-
-			// Parking has priority over locking
-			if ($datasetRaw->ParkDate != null)
-			{
-				$mark = "text-info";
-			}
-
-			return $mark;
 		}
 	);
 
 	$filterWidgetArray['app'] = $APP;
 	$filterWidgetArray['datasetName'] = 'PersonActions';
-	$filterWidgetArray['filterKurzbz'] = 'InfoCenterSentApplicationAll';
+	$filterWidgetArray['filterKurzbz'] = 'InfoCenterFreigegeben5days';
 	$filterWidgetArray['filter_id'] = $this->input->get('filter_id');
 
 	echo $this->widgetlib->widget('FilterWidget', $filterWidgetArray);

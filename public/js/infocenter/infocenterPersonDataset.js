@@ -11,7 +11,9 @@ function refreshSideMenu()
 	//
 	FHC_AjaxClient.ajaxCallGet(
 		'system/infocenter/InfoCenter/setNavigationMenuArrayJson',
-		null,
+		{
+			navigation_page: FHC_NavigationWidget._getNavigationWidgetCalled()
+		},
 		{
 			successCallback: function(data, textStatus, jqXHR) {
 				FHC_NavigationWidget.renderSideMenu();
