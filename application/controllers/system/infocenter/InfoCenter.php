@@ -1069,7 +1069,7 @@ class InfoCenter extends FHC_Controller
 		$this->PrestudentModel->addSelect('person_id');
 		$person_id = $this->PrestudentModel->load($prestudent_id)->retval[0]->person_id;
 
-		redirect(self::URL_PREFIX.'/showDetails/'.$person_id.'?fhc_controller_id='.$this->getControllerId().'#'.$section);
+		redirect(self::URL_PREFIX.'/showDetails?person_id='.$person_id.'&fhc_controller_id='.$this->getControllerId().'#'.$section);
 	}
 
 	/**
