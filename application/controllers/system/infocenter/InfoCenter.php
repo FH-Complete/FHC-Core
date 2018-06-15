@@ -73,7 +73,11 @@ class InfoCenter extends Auth_Controller
 				'saveNotiz' => 'infocenter:rw',
 				'reloadNotizen' => 'infocenter:r',
 				'reloadLogs' => 'infocenter:r',
-				'outputAkteContent' => 'infocenter:r'
+				'outputAkteContent' => 'infocenter:r',
+				'getZgvInfoForPrestudent' => 'infocenter:r',
+				'getParkedDate' => 'infocenter:r',
+				'getStudienjahrEnd' => 'infocenter:r',
+				'updateNotiz' => 'infocenter:rw'
 			)
 		);
 
