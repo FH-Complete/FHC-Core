@@ -280,6 +280,8 @@ class variable extends basis_db
 		if (!isset($this->variable->allow_lehrstunde_drop))
 			$this->variable->allow_lehrstunde_drop='false';
 
+		if (!isset($this->variable->fasfunktionfilter))
+			$this->variable->fasfunktionfilter='alle';
 		return true;
 	}
 

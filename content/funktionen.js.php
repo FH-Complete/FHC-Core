@@ -33,7 +33,6 @@ var FunktionenTreeDatasource=''; // Datasource des Adressen Trees
 var FunktionenSelectID='';
 var FunktionenUID=null;
 var FunktionBezeichnungChanged=false;
-
 <?php
 
 // JS-Variable anlegen mit einer Uebersetzungstabellle
@@ -85,6 +84,25 @@ var FunktionenTreeListener =
 };
 
 // ********** FUNKTIONEN ********** //
+function FunktionFilter()
+{
+	var filter = document.getElementById('funktionen-button-filter')
+	var state = document.getElementById('funktionen-filter-state')
+	if(state.value == 'alle')
+	{
+		state.value = 'offene';
+		loadFunktionen(FunktionenUID);
+		filter.label = 'Alle anzeigen';
+		setVariable('fasfunktionfilter', 'offene');
+	}
+	else
+	{
+		state.value = 'alle';
+		loadFunktionen(FunktionenUID);
+		filter.label = 'Nur aktuelle anzeigen';
+		setVariable('fasfunktionfilter', 'alle')
+	}
+}
 
 // ****
 // * Laedt die Trees
@@ -92,13 +110,15 @@ var FunktionenTreeListener =
 function loadFunktionen(uid)
 {
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
-	
+
 	FunktionenUID = uid;
-	
+	var filter = document.getElementById('funktionen-filter-state');
+
 	//Adressen laden
-	url = "<?php echo APP_ROOT; ?>rdf/benutzerfunktion.rdf.php?uid="+uid+"&"+gettimestamp();	
+	url = "<?php echo APP_ROOT; ?>rdf/benutzerfunktion.rdf.php?uid="+uid+"&filter="+filter.value+"&"+gettimestamp();
+
 	var tree=document.getElementById('funktion-tree');
-	
+
 	try
 	{
 		FunktionenTreeDatasource.removeXMLSinkObserver(FunktionenTreeSinkObserver);
@@ -106,14 +126,14 @@ function loadFunktionen(uid)
 	}
 	catch(e)
 	{}
-	
+
 	//Alte DS entfernen
 	var oldDatasources = tree.database.GetDataSources();
 	while(oldDatasources.hasMoreElements())
 	{
 		tree.database.RemoveDataSource(oldDatasources.getNext());
 	}
-	
+
 	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
 	FunktionenTreeDatasource = rdfService.GetDataSource(url);
 	FunktionenTreeDatasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
@@ -122,7 +142,7 @@ function loadFunktionen(uid)
 	FunktionenTreeDatasource.addXMLSinkObserver(FunktionenTreeSinkObserver);
 	tree.builder.addListener(FunktionenTreeListener);
 	FunktionDisableFields(false);
-	
+
 }
 
 // ****
@@ -136,13 +156,13 @@ function FunktionenTreeSelectID()
 
 	//In der globalen Variable ist die zu selektierende Adresse gespeichert
 	if(FunktionenSelectID!=null)
-	{		
+	{
 	   	for(var i=0;i<items;i++)
 	   	{
 	   		//ID der row holen
 			col = tree.columns ? tree.columns["funktion-treecol-benutzerfunktion_id"] : "funktion-treecol-benutzerfunktion_id";
 			id=tree.view.getCellText(i,col);
-			
+
 			if(id == FunktionenSelectID)
 			{
 				//Zeile markieren
@@ -153,7 +173,7 @@ function FunktionenTreeSelectID()
 			}
 	   	}
 	   	FunktionenSelectID=null;
-	}	
+	}
 }
 
 // ****
@@ -165,11 +185,11 @@ function FunktionNeu()
 	FunktionDetailDisableFields(false);
 	document.getElementById('funktion-checkbox-neu').checked=true;
 	document.getElementById('funktion-textbox-benutzerfunktion_id').value='';
-		
+
 	//Wenn die aktuelle Person ein Student ist,
 	//dann wird Studiengang und 'Studentenvertreter' vorausgewaehlt
 	if(window.parent.document.getElementById('main-content-tabs').selectedItem==window.parent.document.getElementById('tab-mitarbeiter'))
-		oe_kurzbz='';	
+		oe_kurzbz='';
 	else
 		oe_kurzbz = organisationseinheit[ window.parent.document.getElementById('student-prestudent-menulist-studiengang_kz').value ];
 
@@ -178,7 +198,7 @@ function FunktionNeu()
 		document.getElementById('funktion-menulist-oe_kurzbz').value=oe_kurzbz;
 		document.getElementById('funktion-menulist-funktion').value='stdv';
 	}
-	
+
 	var Datum = new Date()
 	var Jahr = Datum.getFullYear()
 	var Tag = Datum.getDate()
@@ -197,20 +217,20 @@ function FunktionNeu()
 function FunktionDelete()
 {
 	tree = document.getElementById('funktion-tree');
-	
-	if (tree.currentIndex==-1) 
+
+	if (tree.currentIndex==-1)
 	{
 		alert('Bitte zuerst eine Funktion auswaehlen');
 		return;
 	}
-	
+
 	//Ausgewaehlte ID holen
     var col = tree.columns ? tree.columns["funktion-treecol-benutzerfunktion_id"] : "funktion-treecol-benutzerfunktion_id";
 	var benutzerfunktion_id=tree.view.getCellText(tree.currentIndex,col);
-	
+
 	//Bei Mitarbeitern wird kein Studiengang mitgeschickt
 	if(window.parent.document.getElementById('main-content-tabs').selectedItem==window.parent.document.getElementById('tab-mitarbeiter'))
-		studiengang_kz='';	
+		studiengang_kz='';
 	else
 		studiengang_kz = window.parent.document.getElementById('student-prestudent-menulist-studiengang_kz').value;
 
@@ -218,16 +238,16 @@ function FunktionDelete()
 	{
 		var url = '<?php echo APP_ROOT ?>content/fasDBDML.php';
 		var req = new phpRequest(url,'','');
-		
+
 		req.add('type', 'funktiondelete');
-		
+
 		req.add('benutzerfunktion_id', benutzerfunktion_id);
 		req.add('studiengang_kz', studiengang_kz);
-	
+
 		var response = req.executePOST();
-	
+
 		var val =  new ParseReturnValue(response)
-		
+
 		if (!val.dbdml_return)
 		{
 			if(val.dbdml_errormsg=='')
@@ -262,10 +282,10 @@ function FunktionDetailSpeichern()
 	var datum_bis = document.getElementById('funktion-box-datum_bis').value;
 	var bezeichnung = document.getElementById('funktion-textbox-bezeichnung').value;
 	var wochenstunden = document.getElementById('funktion-textbox-wochenstunden').value;
-		
+
 	//Bei Mitarbeitern wird kein Studiengang mitgeschickt
 	if(window.parent.document.getElementById('main-content-tabs').selectedItem==window.parent.document.getElementById('tab-mitarbeiter'))
-		studiengang_kz_berecht='';	
+		studiengang_kz_berecht='';
 	else
 		studiengang_kz_berecht = window.parent.document.getElementById('student-prestudent-menulist-studiengang_kz').value;
 
@@ -275,7 +295,7 @@ function FunktionDetailSpeichern()
 	//Wenn Fachbereich ausgeblendet ist, dann sicherheitshalber auf '' setzen
 	if(document.getElementById('funktion-menulist-fachbereich').hidden==true)
 		fachbereich_kurzbz='';
-	
+
 	req.add('type', 'funktionsave');
 
 	req.add('funktion_kurzbz', funktion_kurzbz);
@@ -294,7 +314,7 @@ function FunktionDetailSpeichern()
 	var response = req.executePOST();
 
 	var val =  new ParseReturnValue(response)
-	
+
 	if (!val.dbdml_return)
 	{
 		if(val.dbdml_errormsg=='')
@@ -321,16 +341,16 @@ function FunktionDetailSpeichern()
 function FunktionBearbeiten()
 {
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
-	
+
 	tree = document.getElementById('funktion-tree');
-	
-	if (tree.currentIndex==-1) 
+
+	if (tree.currentIndex==-1)
 		return;
 
 	//Ausgewaehlte Nr holen
     var col = tree.columns ? tree.columns["funktion-treecol-benutzerfunktion_id"] : "funktion-treecol-benutzerfunktion_id";
 	var benutzerfunktion_id=tree.view.getCellText(tree.currentIndex,col);
-	
+
 	//Daten holen
 	var url = '<?php echo APP_ROOT ?>rdf/benutzerfunktion.rdf.php?benutzerfunktion_id='+benutzerfunktion_id+'&'+gettimestamp();
 
@@ -353,7 +373,7 @@ function FunktionBearbeiten()
 	var datum_bis = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#datum_bis" ));
 	var bezeichnung = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#bezeichnung" ));
 	var wochenstunden = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#wochenstunden" ));
-	
+
 	document.getElementById('funktion-menulist-fachbereich').value=fachbereich_kurzbz;
 	document.getElementById('funktion-menulist-oe_kurzbz').value=oe_kurzbz;
 	document.getElementById('funktion-menulist-semester').value=semester;
@@ -364,7 +384,7 @@ function FunktionBearbeiten()
 	document.getElementById('funktion-box-datum_bis').value=datum_bis;
 	document.getElementById('funktion-textbox-bezeichnung').value=bezeichnung;
 	document.getElementById('funktion-textbox-wochenstunden').value=wochenstunden;
-	
+
 	FunktionBezeichnungChanged=true;
 	FunktionDetailDisableFields(false);
 	FunktionToggleFachbereich();
@@ -377,7 +397,7 @@ function FunktionDisableFields(val)
 {
 	document.getElementById('funktion-button-neu').disabled=val;
 	document.getElementById('funktion-button-loeschen').disabled=val;
-	
+
 	if(val)
 		FunktionDetailDisableFields(val);
 }
@@ -407,12 +427,12 @@ function FunktionDetailResetFields()
 	document.getElementById('funktion-menulist-oe_kurzbz').selectedIndex=0;
 	document.getElementById('funktion-menulist-semester').value='';
 	document.getElementById('funktion-menulist-funktion').value='ass';
-	
+
 	var Datum = new Date();
 	var Jahr = Datum.getFullYear();
 	var Tag = Datum.getDate();
 	var Monat = Datum.getMonth()+1;
-	
+
 	document.getElementById('funktion-box-datum_von').value=Tag+'.'+Monat+'.'+Jahr;
 	document.getElementById('funktion-box-datum_bis').value='';
 	document.getElementById('funktion-textbox-bezeichnung').value='';
@@ -427,19 +447,19 @@ function FunktionDetailResetFields()
 function FunktionToggleFachbereich()
 {
 	var menulist = document.getElementById('funktion-menulist-funktion');
-	
+
 	//ersten selektierten Eintrag holen
 	var children = menulist.getElementsByAttribute('selected','true');
 	children = children[0];
-	
+
 	//Attribute semester und fachbereich auslesen
 	var semester = children.getAttribute('semester');
 	var fachbereich = children.getAttribute('fachbereich');
 	var bezeichnung = children.label;
-	
+
 	//wenn in der Bezeichung noch nichts drinnen steht, dann die Funktion in die Bezeichnung schreiben
 	var tbbezeichnung = document.getElementById('funktion-textbox-bezeichnung')
-	
+
 	if(!FunktionBezeichnungChanged)
 	{
 		tbbezeichnung.value=bezeichnung;
@@ -448,23 +468,23 @@ function FunktionToggleFachbereich()
 	//Felder sichtbar/unsichtbar setzen
 	var semesterhidden=false;
 	var fachbereichhidden=false;
-	
+
 	if(semester=='true')
 		semesterhidden=false;
 	else
 		semesterhidden=true;
-		
+
 	if(fachbereich=='true')
 		fachbereichhidden=false;
 	else
 		fachbereichhidden=true;
-	
+
 	document.getElementById('funktion-menulist-fachbereich').hidden=fachbereichhidden;
 	document.getElementById('funktion-label-fachbereich').hidden=fachbereichhidden;
-	
+
 	document.getElementById('funktion-menulist-semester').hidden=semesterhidden;
 	document.getElementById('funktion-label-semester').hidden=semesterhidden;
-	
+
 }
 
 function FunktionBezeichnungChange()
