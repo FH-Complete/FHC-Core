@@ -71,7 +71,7 @@ class FiltersLib
 
 	const FILTER_PHRASES_CATEGORY = 'FilterWidget'; // The category used to store phrases for the FilterWidget
 
-	const FILTER_PAGE_PARAM = 'filter_page'; // Filter page parameter used to overwrite the page URI
+	const FILTER_PAGE_PARAM = 'filter_page'; // Filter page parameter name
 
 	const PERMISSION_FILTER_METHOD = 'FilterWidget'; // Name for fake method to be checked by the PermissionLib
 	const PERMISSION_TYPE = 'rw';
@@ -84,10 +84,12 @@ class FiltersLib
 	 */
 	public function __construct($params = null)
 	{
-		$this->_ci =& get_instance();
+		$this->_ci =& get_instance(); // get code igniter instance
 
 		// Loads helper message to manage returning messages
 		$this->_ci->load->helper('message');
+		// Loads helper session to manage the php session
+		$this->_ci->load->helper('session');
 
 		$this->_filterUniqueId = $this->_getFilterUniqueId($params); // sets the id for the related filter widget
 	}
@@ -137,27 +139,19 @@ class FiltersLib
 	}
 
 	/**
-	 * Returns the whole session for this filter widget if found, otherwise null
+	 * Wrapper method to the session helper funtions to retrive the whole session for this filter
 	 */
 	public function getSession()
 	{
-		$session = null;
-
-		// If it is present a session for this filter
-		if (isset($_SESSION[self::SESSION_NAME]) && isset($_SESSION[self::SESSION_NAME][$this->_filterUniqueId]))
-		{
-			$session = $_SESSION[self::SESSION_NAME][$this->_filterUniqueId];
-		}
-
-		return $session;
+		return getElementSession(self::SESSION_NAME, $this->_filterUniqueId);
 	}
 
 	/**
-	 * Returns one element from the session of this filter widget, otherwise null
+	 * Wrapper method to the session helper funtions to retrive one element from the session of this filter
 	 */
 	public function getElementSession($name)
 	{
-		$session = $this->getSession(); // get the whole session for this filter
+		$session = getElementSession(self::SESSION_NAME, $this->_filterUniqueId);
 
 		if (isset($session[$name]))
 		{
@@ -168,41 +162,23 @@ class FiltersLib
 	}
 
 	/**
-	 * Sets the whole session for this filter widget
+	 * Wrapper method to the session helper funtions to set the whole session for this filter
 	 */
 	public function setSession($data)
 	{
-		// If is NOT already present into the session
-		if (!isset($_SESSION[self::SESSION_NAME])
-			|| (isset($_SESSION[self::SESSION_NAME]) && !is_array($_SESSION[self::SESSION_NAME])))
-		{
-			$_SESSION[self::SESSION_NAME] = array(); // then create it
-		}
-
-		$_SESSION[self::SESSION_NAME][$this->_filterUniqueId] = $data; // stores data
+		setElementSession(self::SESSION_NAME, $this->_filterUniqueId, $data);
 	}
 
 	/**
-	 * Sets one element of the session of this filter widget
+	 * Wrapper method to the session helper funtions to set one element in the session for this filter
 	 */
 	public function setElementSession($name, $value)
 	{
-		// If is NOT already present into the session
-		if (!isset($_SESSION[self::SESSION_NAME])
-			|| (isset($_SESSION[self::SESSION_NAME]) && !is_array($_SESSION[self::SESSION_NAME])))
-		{
-			$_SESSION[self::SESSION_NAME] = array(); // then create it
-		}
+		$session = getElementSession(self::SESSION_NAME, $this->_filterUniqueId);
 
-		// If the session for this filter is NOT already present into the session
-		if (!isset($_SESSION[self::SESSION_NAME][$this->_filterUniqueId])
-			|| (isset($_SESSION[self::SESSION_NAME][$this->_filterUniqueId])
-			&& !is_array($_SESSION[self::SESSION_NAME][$this->_filterUniqueId])))
-		{
-			$_SESSION[self::SESSION_NAME][$this->_filterUniqueId] = array(); // then create it
-		}
+		$session[$name] = $value;
 
-		$_SESSION[self::SESSION_NAME][$this->_filterUniqueId][$name] = $value; // stores the single value
+		setElementSession(self::SESSION_NAME, $this->_filterUniqueId, $session); // stores the single value
 	}
 
 	/**
@@ -311,7 +287,7 @@ class FiltersLib
 	 */
 	public function generateDatasetQuery($query, $filters)
 	{
-		$datasetQuery = null;
+		$datasetQuery = 'SELECT * FROM ('.$query.') '.self::DATASET_TABLE_ALIAS;
 
 		// If the given query is valid and the parameter filters is an array
 		if (!empty(trim($query)) && $filters != null && is_array($filters))
@@ -334,7 +310,7 @@ class FiltersLib
 
 			if ($where != '') // if the SQL where clause was built
 			{
-				$datasetQuery = 'SELECT * FROM ('.$query.') '.self::DATASET_TABLE_ALIAS.' WHERE '.$where;
+				$datasetQuery .= ' WHERE '.$where;
 			}
 		}
 

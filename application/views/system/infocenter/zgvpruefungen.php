@@ -241,8 +241,7 @@
 						<div class="row">
 							<div class="col-lg-6 text-left">
 								<div class="form-inline">
-									<form method="post"
-										  action="../saveAbsage/<?php echo $zgvpruefung->prestudent_id ?>">
+									<form method="post" action="saveAbsage/<?php echo $zgvpruefung->prestudent_id ?>">
 										<input type="hidden" name="fhc_controller_id" value="<?php echo $fhc_controller_id; ?>">
 										<div class="input-group" id="statusgrselect_<?php echo $zgvpruefung->prestudent_id ?>">
 											<select name="statusgrund"
@@ -304,14 +303,14 @@
 								</div>
 							</div><!-- /.column-absage -->
 							<div class="col-lg-6 text-right">
-								<?php  
+								<?php
 								$disabled = $disabledTxt = '';
 								if (empty($zgvpruefung->prestudentstatus->bewerbung_abgeschicktamum))
 								{
 									$disabled = 'disabled';
 									$disabledTxt = 'Die Bewerbung muss erst abgeschickt worden sein.';
-								} 
-								
+								}
+
 								if ($zgvpruefung->studiengangtyp !== 'b')
 								{
 									$disabled = 'disabled';
@@ -319,7 +318,7 @@
 								}
 								?>
 								<div>
-									<button type="button" class="btn btn-default" <?php echo $disabled ?>			
+									<button type="button" class="btn btn-default" <?php echo $disabled ?>
 											data-toggle="modal"
 											data-target="#freigabeModal_<?php echo $zgvpruefung->prestudent_id ?>"
 											data-toggle="tooltip" title="<?php echo $disabledTxt ?>">
@@ -350,7 +349,7 @@
 													class="btn btn-default"
 													data-dismiss="modal"><?php echo  $this->p->t('ui', 'abbrechen') ?>
 											</button>
-											<a href="../saveFreigabe/<?php echo $zgvpruefung->prestudent_id ?>?fhc_controller_id=<?php echo $fhc_controller_id; ?>">
+											<a href="saveFreigabe/<?php echo $zgvpruefung->prestudent_id ?>?fhc_controller_id=<?php echo $fhc_controller_id; ?>">
 												<button type="button"
 														class="btn btn-primary">
 													<?php echo $this->p->t('infocenter', 'interessentFreigeben') ?>

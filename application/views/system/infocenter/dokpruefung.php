@@ -16,7 +16,7 @@
 			?>
 			<tr>
 				<td>
-					<a href="../outputAkteContent/<?php echo $dokument->akte_id ?>"><?php echo empty($dokument->titel) ? $dokument->bezeichnung : $dokument->titel ?></a>
+					<a href="outputAkteContent/<?php echo $dokument->akte_id ?>"><?php echo empty($dokument->titel) ? $dokument->bezeichnung : $dokument->titel ?></a>
 				</td>
 				<td><?php echo $dokument->dokument_bezeichnung ?></td>
 				<td><?php echo date_format(date_create($dokument->erstelltam), 'd.m.Y') ?></td>

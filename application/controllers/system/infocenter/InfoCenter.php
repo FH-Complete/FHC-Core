@@ -3,7 +3,7 @@
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
 /**
- * Also shows infocenter-related data for a person and its prestudents, enables document and zgv checks,
+ * Shows infocenter-related data for a person and its prestudents, enables document and zgv checks,
  * displays and saves Notizen for a person, logs infocenter-related actions for a person
  */
 class InfoCenter extends Auth_Controller
@@ -11,10 +11,10 @@ class InfoCenter extends Auth_Controller
 	// App and Verarbeitungstaetigkeit name for logging
 	const APP = 'infocenter';
 	const TAETIGKEIT = 'bewerbung';
-	const FILTER_ID = 'filter_id';
 
-	// URL prefix for this controller
-	const URL_PREFIX = '/system/infocenter/InfoCenter';
+	const URL_PREFIX = '/system/infocenter/InfoCenter'; // URL prefix for this controller
+
+	private $_uid; // contains the UID of the logged user
 
 	// Used to log with PersonLogLib
 	private $logparams = array(
@@ -53,7 +53,6 @@ class InfoCenter extends Auth_Controller
 			'success' => null
 		)
 	);
-	private $uid; // contains the UID of the logged user
 
 	/**
 	 * Constructor
@@ -63,7 +62,7 @@ class InfoCenter extends Auth_Controller
         parent::__construct(
 			array(
 				'index' => 'infocenter:r',
-				'infocenterFreigegeben' => 'infocenter:r',
+				'freigegeben' => 'infocenter:r',
 				'showDetails' => 'infocenter:r',
 				'unlockPerson' => 'infocenter:rw',
 				'saveFormalGeprueft' => 'infocenter:rw',
@@ -90,7 +89,6 @@ class InfoCenter extends Auth_Controller
 		$this->load->model('system/personLock_model', 'PersonLockModel');
 
 		// Loads libraries
-		$this->load->library('DmsLib');
 		$this->load->library('PersonLogLib');
 		$this->load->library('WidgetLib');
 
@@ -112,10 +110,6 @@ class InfoCenter extends Auth_Controller
 			show_error('You have no Permission! You need Infocenter Role');
 
 		$this->setControllerId(); // sets the controller id
-
-		$this->fhc_controller_id = $this->getControllerId();
-
-		$this->setNavigationMenuArray(); // sets property navigationMenuArray
     }
 
 	// -----------------------------------------------------------------------------------------------------------------
@@ -126,20 +120,28 @@ class InfoCenter extends Auth_Controller
 	 */
 	public function index()
 	{
-		$this->load->view('system/infocenter/infocenter.php', array('fhc_controller_id' => $this->fhc_controller_id));
+		$this->setNavigationMenuIndex(); // define the navigation menu for this page
+
+		$this->load->view('system/infocenter/infocenter.php');
 	}
 
-	public function infocenterFreigegeben()
+	public function freigegeben()
 	{
-		$this->load->view('system/infocenter/infocenterFreigegeben.php', array('fhc_controller_id' => $this->fhc_controller_id));
+		$this->setNavigationMenuFreigegeben(); // define the navigation menu for this page
+
+		$this->load->view('system/infocenter/infocenterFreigegeben.php');
 	}
 
 	/**
 	 * Initialization function, gets person and prestudent data and loads the view with the data
 	 * @param $person_id
 	 */
-	public function showDetails($person_id)
+	public function showDetails()
 	{
+		$this->setNavigationMenuShowDetails();
+
+		$person_id = $this->input->get('person_id');
+
 		if (!is_numeric($person_id))
 			show_error('person id is not numeric!');
 
@@ -151,13 +153,11 @@ class InfoCenter extends Auth_Controller
 		if (empty($personexists->retval))
 			show_error('person does not exist!');
 
-		$show_lock_link_get = $this->input->get('show_lock_link');
-		$show_lock_link = !isset($show_lock_link_get) || $show_lock_link_get === '1';
-
-		if ($show_lock_link)
+		$origin_page = $this->input->get('origin_page');
+		if ($origin_page == 'index')
 		{
-			//mark person as locked for editing
-			$result = $this->PersonLockModel->lockPerson($person_id, $this->uid, self::APP);
+			// mark person as locked for editing
+			$result = $this->PersonLockModel->lockPerson($person_id, $this->_uid, self::APP);
 
 			if (isError($result))
 				show_error($result->retval);
@@ -168,11 +168,11 @@ class InfoCenter extends Auth_Controller
 
 		$data = array_merge(
 			$persondata,
-			$prestudentdata,
-			array('show_lock_link' => $show_lock_link)
+			$prestudentdata
 		);
 
-		$data['fhc_controller_id'] = $this->fhc_controller_id;
+		$data['fhc_controller_id'] = $this->getControllerId();
+		$data['origin_page'] = $origin_page;
 
 		$this->load->view('system/infocenter/infocenterDetails.php', $data);
 	}
@@ -188,7 +188,7 @@ class InfoCenter extends Auth_Controller
 		if (isError($result))
 			show_error($result->retval);
 
-		redirect(self::URL_PREFIX.'?fhc_controller_id='.$this->fhc_controller_id);
+		redirect(self::URL_PREFIX.'?fhc_controller_id='.$this->getControllerId());
 	}
 
 	/**
@@ -334,7 +334,6 @@ class InfoCenter extends Auth_Controller
 	public function saveAbsage($prestudent_id)
 	{
 		$statusgrund = $this->input->post('statusgrund');
-		$this->fhc_controller_id = $this->input->post('fhc_controller_id');
 
 		$lastStatus = $this->PrestudentstatusModel->getLastStatus($prestudent_id);
 
@@ -356,7 +355,7 @@ class InfoCenter extends Auth_Controller
 					'studienplan_id' => $lastStatus->retval[0]->studienplan_id,
 					'status_kurzbz' => 'Abgewiesener',
 					'statusgrund_id' => $statusgrund,
-					'insertvon' => $this->uid,
+					'insertvon' => $this->_uid,
 					'insertamum' => date('Y-m-d H:i:s')
 				)
 			);
@@ -412,9 +411,9 @@ class InfoCenter extends Auth_Controller
 						'ausbildungssemester' => $lastStatus->ausbildungssemester
 					),
 					array(
-						'bestaetigtvon' => $this->uid,
+						'bestaetigtvon' => $this->_uid,
 						'bestaetigtam' => date('Y-m-d'),
-						'updatevon' => $this->uid,
+						'updatevon' => $this->_uid,
 						'updateamum' => date('Y-m-d H:i:s')
 					)
 				);
@@ -470,7 +469,7 @@ class InfoCenter extends Auth_Controller
 		$text = $this->input->post('notiz');
 		$erledigt = false;
 
-		$result = $this->NotizModel->addNotizForPerson($person_id, $titel, $text, $erledigt, $this->uid);
+		$result = $this->NotizModel->addNotizForPerson($person_id, $titel, $text, $erledigt, $this->_uid);
 
 		if (isSuccess($result))
 		{
@@ -498,9 +497,9 @@ class InfoCenter extends Auth_Controller
 			array(
 				'titel' => $titel,
 				'text' => $text,
-				'verfasser_uid' => $this->uid,
+				'verfasser_uid' => $this->_uid,
 				"updateamum" => 'NOW()',
-				"updatevon" => $this->uid
+				"updatevon" => $this->_uid
 			)
 		);
 
@@ -547,6 +546,8 @@ class InfoCenter extends Auth_Controller
 	 */
 	public function outputAkteContent($akte_id)
 	{
+		$this->load->library('DmsLib');
+
 		$akte = $this->AkteModel->load($akte_id);
 
 		if (isError($akte))
@@ -590,7 +591,7 @@ class InfoCenter extends Auth_Controller
 		$person_id = $this->input->post('person_id');
 		$date = $this->input->post('parkdate');
 
-		$result = $this->personloglib->park($person_id, date_format(date_create($date), 'Y-m-d'), self::TAETIGKEIT, self::APP, null, $this->uid);
+		$result = $this->personloglib->park($person_id, date_format(date_create($date), 'Y-m-d'), self::TAETIGKEIT, self::APP, null, $this->_uid);
 
 		$this->output
 			->set_content_type('application/json')
@@ -640,18 +641,21 @@ class InfoCenter extends Auth_Controller
 	 */
 	private function _setAuthUID()
 	{
-		$this->uid = getAuthUID();
+		$this->_uid = getAuthUID();
 
-		if (!$this->uid) show_error('User authentification failed');
+		if (!$this->_uid) show_error('User authentification failed');
 	}
 
 	/**
-	 *
+	 *  Define the navigation menu for the index page
 	 */
-	public function setNavigationMenuArray()
+	public function setNavigationMenuIndex()
 	{
+		$this->load->library('NavigationLib', array('navigation_page' => 'system/infocenter/InfoCenter/index'));
+
 		$listFiltersSent = array();
 		$listFiltersNotSent = array();
+		$listCustomFilters = array();
 
 		$filtersSent = $this->FiltersModel->getFilterList('infocenter', 'PersonActions', '%InfoCenterSentApplication%');
 		if (hasData($filtersSent))
@@ -675,7 +679,7 @@ class InfoCenter extends Auth_Controller
 			}
 		}
 
-		$customFilters = $this->FiltersModel->getCustomFiltersList('infocenter', 'PersonActions', $this->uid);
+		$customFilters = $this->FiltersModel->getCustomFiltersList('infocenter', 'PersonActions', $this->_uid);
 		if (hasData($customFilters))
 		{
 			for ($filtersCounter = 0; $filtersCounter < count($customFilters->retval); $filtersCounter++)
@@ -686,58 +690,139 @@ class InfoCenter extends Auth_Controller
 			}
 		}
 
-		$filtersarray = array(
-			'abgeschickt' => array(
-				'link' => '#',
-				'description' => ucfirst($this->p->t('global', 'abgeschickt')),
-				'expand' => true,
-				'children' => array()
-			),
-			'nichtabgeschickt' => array(
-				'link' => '#',
-				'description' => ucfirst($this->p->t('global', 'nichtAbgeschickt')),
-				'expand' => true,
-				'children' => array()
-			)
+		$filtersArray = array();
+
+		$filtersArray['abgeschickt'] = $this->navigationlib->oneLevel(
+			ucfirst($this->p->t('global', 'abgeschickt')), 	// description
+			'#',											// link
+			array(),										// children
+			'',												// icon
+			true											// expand
 		);
 
-		$this->_fillFilters($listFiltersSent, $filtersarray['abgeschickt']);
-		$this->_fillFilters($listFiltersNotSent, $filtersarray['nichtabgeschickt']);
+		$filtersArray['nichtabgeschickt'] = $this->navigationlib->oneLevel(
+			ucfirst($this->p->t('global', 'nichtAbgeschickt')),	// description
+			'#',												// link
+			array(),											// children
+			'',													// icon
+			true												// expand
+		);
 
-		if (isset($listCustomFilters) && is_array($listCustomFilters) && count($listCustomFilters) > 0)
+		$this->_fillFilters($listFiltersSent, $filtersArray['abgeschickt']);
+		$this->_fillFilters($listFiltersNotSent, $filtersArray['nichtabgeschickt']);
+
+		if (count($listCustomFilters) > 0)
 		{
-			$filtersarray['personal'] = array(
-				'link' => '#',
-				'description' => 'Personal filters',
-				'expand' => true,
-				'children' => array()
+			$filtersArray['personal'] = $this->navigationlib->oneLevel(
+				'Personal filters',	// description
+				'#',				// link
+				array(),			// children
+				'',					// icon
+				true				// expand
 			);
 
-			$this->_fillCustomFilters($listCustomFilters, $filtersarray['personal']);
+			$this->_fillCustomFilters($listCustomFilters, $filtersArray['personal']);
 		}
 
-		if (!isset($_SESSION['navigation_menu']))
-		{
-			$_SESSION['navigation_menu'] = array();
-		}
-
-		$_SESSION['navigation_menu']['system/infocenter/InfoCenter/index'] = array(
-			'filters' => array(
-				'link' => '#',
-				'description' => 'Filter',
-				'icon' => 'filter',
-				'expand' => true,
-				'children' => $filtersarray
+		$this->navigationlib->setSessionMenu(
+			array(
+				'filters' => $this->navigationlib->oneLevel(
+					'Filter',		// description
+					'#',			// link
+					$filtersArray,	// children
+					'',				// icon
+					true			// expand
+				)
 			)
 		);
+	}
 
-		$_SESSION['navigation_menu']['system/infocenter/InfoCenter/showDetails'] = array(
-			'filters' => array(
-				'link' => '#',
-				'description' => 'Filter',
-				'icon' => 'filter',
-				'expand' => true,
-				'children' => $filtersarray
+	/**
+	 *  Define the navigation menu for the showDetails page
+	 */
+	public function setNavigationMenuShowDetails()
+	{
+		$this->load->library('NavigationLib', array('navigation_page' => 'system/infocenter/InfoCenter/showDetails'));
+
+		$origin_page = $this->input->get('origin_page');
+
+		$link = base_url('index.ci.php/system/infocenter/InfoCenter/index');
+		if ($origin_page == 'freigegeben')
+		{
+			$link = base_url('index.ci.php/system/infocenter/InfoCenter/freigegeben');
+		}
+
+		$this->navigationlib->setSessionMenu(
+			array(
+				'back' => $this->navigationlib->oneLevel(
+					'<< Züruck',	// description
+					$link,			// link
+					array(),		// children
+					'',				// icon
+					true			// expand
+				)
+			)
+		);
+	}
+
+	/**
+	 *  Define the navigation menu for the freigegeben page
+	 */
+	public function setNavigationMenuFreigegeben()
+	{
+		$this->load->library('NavigationLib', array('navigation_page' => 'system/infocenter/InfoCenter/freigegeben'));
+
+		$listFilters = array();
+		$listCustomFilters = array();
+
+		$filters = $this->FiltersModel->getFilterList('infocenter', 'PersonActions', '%InfoCenterFreigegeben%');
+		if (hasData($filters))
+		{
+			for ($filtersCounter = 0; $filtersCounter < count($filters->retval); $filtersCounter++)
+			{
+				$filter = $filters->retval[$filtersCounter];
+
+				$listFilters[$filter->filter_id] = $filter->description[0];
+			}
+		}
+
+		$customFilters = $this->FiltersModel->getCustomFiltersList('infocenter', 'PersonActions', $this->_uid);
+		if (hasData($customFilters))
+		{
+			for ($filtersCounter = 0; $filtersCounter < count($customFilters->retval); $filtersCounter++)
+			{
+				$filter = $customFilters->retval[$filtersCounter];
+
+				$listCustomFilters[$filter->filter_id] = $filter->description[0];
+			}
+		}
+
+		$filtersArray = array();
+
+		$this->_fillFiltersFreigegeben($listFilters, $filtersArray);
+
+		if (count($listCustomFilters) > 0)
+		{
+			$filtersArray['children']['personal'] = $this->navigationlib->oneLevel(
+				'Personal filters',	// description
+				'#',				// link
+				array(),			// children
+				'',					// icon
+				true				// expand
+			);
+
+			$this->_fillCustomFilters($listCustomFilters, $filtersArray['children']['personal']);
+		}
+
+		$this->navigationlib->setSessionMenu(
+			array(
+				'filters' => $this->navigationlib->oneLevel(
+					'Filter',					// description
+					'#',						// link
+					$filtersArray['children'],	// children
+					'',							// icon
+					true						// expand
+				)
 			)
 		);
 	}
@@ -747,21 +832,51 @@ class InfoCenter extends Auth_Controller
 	 */
 	public function setNavigationMenuArrayJson()
 	{
-		$this->setNavigationMenuArray();
+		$navigation_page = $this->input->get('navigation_page');
 
-		$this->output
-			->set_content_type('application/json')
-			->set_output(json_encode(success('success')));
+		if (strpos($navigation_page, 'index') !== false)
+		{
+			$this->setNavigationMenuIndex();
+		}
+		else
+		{
+			$this->setNavigationMenuFreigegeben();
+		}
+
+		$this->outputJsonSuccess('success');
 	}
 
 	private function _fillFilters($filters, &$tofill)
 	{
+		$toPrint = "%s?%s=%s&%s=%s";
+
 		foreach ($filters as $filterId => $description)
 		{
-			$toPrint = "%s?%s=%s";
-
 			$tofill['children'][] = array(
-				'link' => sprintf($toPrint, site_url('system/infocenter/InfoCenter'), 'filter_id', $filterId),
+				'link' => sprintf(
+					$toPrint,
+					site_url('system/infocenter/InfoCenter'), 'filter_id', $filterId,
+					FHC_Controller::FHC_CONTROLLER_ID,
+					$this->getControllerId()
+				),
+				'description' => $description
+			);
+		}
+	}
+
+	private function _fillFiltersFreigegeben($filters, &$tofill)
+	{
+		$toPrint = "%s?%s=%s&%s=%s";
+
+		foreach ($filters as $filterId => $description)
+		{
+			$tofill['children'][] = array(
+				'link' => sprintf(
+					$toPrint,
+					site_url('system/infocenter/InfoCenter/freigegeben'), 'filter_id', $filterId,
+					FHC_Controller::FHC_CONTROLLER_ID,
+					$this->getControllerId()
+				),
 				'description' => $description
 			);
 		}
@@ -769,12 +884,17 @@ class InfoCenter extends Auth_Controller
 
 	private function _fillCustomFilters($filters, &$tofill)
 	{
+		$toPrint = "%s?%s=%s&%s=%s";
+
 		foreach ($filters as $filterId => $description)
 		{
-			$toPrint = "%s?%s=%s";
-
 			$tofill['children'][] = array(
-				'link' => sprintf($toPrint, site_url('system/infocenter/InfoCenter'), 'filter_id', $filterId),
+				'link' => sprintf(
+					$toPrint,
+					site_url('system/infocenter/InfoCenter'), 'filter_id', $filterId,
+					FHC_Controller::FHC_CONTROLLER_ID,
+					$this->getControllerId()
+				),
 				'description' => $description,
 				'subscriptDescription' => 'Remove',
 				'subscriptLinkClass' => 'remove-custom-filter',
@@ -805,7 +925,7 @@ class InfoCenter extends Auth_Controller
 		if (isset($locked->retval[0]->uid))
 		{
 			$lockedby = $locked->retval[0]->uid;
-			if ($lockedby !== $this->uid)
+			if ($lockedby !== $this->_uid)
 				$lockedbyother = true;
 		}
 
@@ -856,7 +976,7 @@ class InfoCenter extends Auth_Controller
 			show_error($notizen_bewerbung->retval);
 		}
 
-		$user_person = $this->PersonModel->getByUid($this->uid);
+		$user_person = $this->PersonModel->getByUid($this->_uid);
 
 		if (isError($user_person))
 		{
@@ -965,7 +1085,7 @@ class InfoCenter extends Auth_Controller
 		$this->PrestudentModel->addSelect('person_id');
 		$person_id = $this->PrestudentModel->load($prestudent_id)->retval[0]->person_id;
 
-		redirect(self::URL_PREFIX.'/showDetails/'.$person_id.'?fhc_controller_id='.$this->fhc_controller_id.'#'.$section);
+		redirect(self::URL_PREFIX.'/showDetails?person_id='.$person_id.'&fhc_controller_id='.$this->getControllerId().'#'.$section);
 	}
 
 	/**
@@ -1016,7 +1136,7 @@ class InfoCenter extends Auth_Controller
 			self::TAETIGKEIT,
 			self::APP,
 			null,
-			$this->uid
+			$this->_uid
 		);
 	}
 
