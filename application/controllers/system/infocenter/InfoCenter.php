@@ -109,10 +109,6 @@ class InfoCenter extends Auth_Controller
 
 		$this->_setAuthUID(); // sets property uid
 
-		$this->load->library('PermissionLib');
-		if(!$this->permissionlib->isBerechtigt('basis/person'))
-			show_error('You have no Permission! You need Infocenter Role');
-
 		$this->setControllerId(); // sets the controller id
     }
 
