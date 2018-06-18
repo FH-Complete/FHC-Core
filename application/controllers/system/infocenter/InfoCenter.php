@@ -67,17 +67,20 @@ class InfoCenter extends Auth_Controller
 				'unlockPerson' => 'infocenter:rw',
 				'saveFormalGeprueft' => 'infocenter:rw',
 				'getLastPrestudentWithZgvJson' => 'infocenter:r',
+				'getZgvInfoForPrestudent' => 'infocenter:r',
 				'saveZgvPruefung' => 'infocenter:rw',
 				'saveAbsage' => 'infocenter:rw',
 				'saveFreigabe' => 'infocenter:rw',
 				'saveNotiz' => 'infocenter:rw',
+				'updateNotiz' => 'infocenter:rw',
 				'reloadNotizen' => 'infocenter:r',
 				'reloadLogs' => 'infocenter:r',
 				'outputAkteContent' => 'infocenter:r',
-				'getZgvInfoForPrestudent' => 'infocenter:r',
 				'getParkedDate' => 'infocenter:r',
+				'park' => 'infocenter:rw',
+				'unpark' => 'infocenter:rw',
 				'getStudienjahrEnd' => 'infocenter:r',
-				'updateNotiz' => 'infocenter:rw'
+				'setNavigationMenuArrayJson' => 'infocenter:r'
 			)
 		);
 
@@ -798,6 +801,7 @@ class InfoCenter extends Auth_Controller
 		}
 
 		$filtersArray = array();
+		$filtersArray['children'] = array();
 
 		$this->_fillFiltersFreigegeben($listFilters, $filtersArray);
 
