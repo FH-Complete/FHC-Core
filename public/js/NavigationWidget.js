@@ -24,13 +24,13 @@ var FHC_NavigationWidget = {
 		FHC_AjaxClient.ajaxCallGet(
 			'system/Navigation/header',
 			{
-				navigation_widget_called: FHC_NavigationWidget._getNavigationWidgetCalled()
+				navigation_page: FHC_NavigationWidget._getNavigationWidgetCalled()
 			},
 			{
 				successCallback: function(data, textStatus, jqXHR) {
-					if (data != null)
+					if (FHC_AjaxClient.hasData(data))
 					{
-						jQuery.each(data, function(i, e) {
+						jQuery.each(FHC_AjaxClient.getData(data), function(i, e) {
 							$(".menu-header-items").append('<a class="navbar-brand" href="' + e + '">' + i + '</a>');
 						});
 					}
@@ -47,18 +47,18 @@ var FHC_NavigationWidget = {
 		FHC_AjaxClient.ajaxCallGet(
 			'system/Navigation/menu',
 			{
-				navigation_widget_called: FHC_NavigationWidget._getNavigationWidgetCalled()
+				navigation_page: FHC_NavigationWidget._getNavigationWidgetCalled()
 			},
 			{
 				successCallback: function(data, textStatus, jqXHR) {
-					if (data != null)
+					if (FHC_AjaxClient.hasData(data))
 					{
 						var strMenu = '';
 
 						FHC_NavigationWidget._printCollapseIcon();
 
-						jQuery.each(data, function(i, e) {
-							strMenu += FHC_NavigationWidget._printNavItem(e);
+						jQuery.each(FHC_AjaxClient.getData(data), function(i, e) {
+							if (e != null) strMenu += FHC_NavigationWidget._printNavItem(e);
 						});
 
 						$("#side-menu").html(strMenu);
@@ -104,30 +104,16 @@ var FHC_NavigationWidget = {
 	 *
 	 */
 	_printNavItem: function(item, depth = 1) {
+
 		strMenu = "";
 		var expanded = typeof item['expand'] != 'undefined' && item['expand'] === true ? ' active' : '';
 
 		strMenu += '<li class="' + expanded + '">';
 
-		if (typeof item['subscriptLinkClass'] != 'undefined' && typeof item['subscriptDescription'] != 'undefined')
+		if (typeof item['subscriptLinkClass'] != 'undefined' && typeof item['subscriptDescription'] != 'undefined'
+			&& item['subscriptLinkClass'] != null && item['subscriptDescription'] != null)
 		{
 			strMenu += '<span>';
-		}
-
-		// Handle fhc_controller_id
-		var fhc_controller_id = FHC_AjaxClient.getUrlParameter('fhc_controller_id');
-		if (fhc_controller_id != null && fhc_controller_id != '' && item['link'] != '#')
-		{
-			if (item['link'].indexOf('?') != -1)
-			{
-				item['link'] += '&';
-			}
-			else
-			{
-				item['link'] += '?';
-			}
-
-			item['link'] += 'fhc_controller_id=' + fhc_controller_id;
 		}
 
 		strMenu += '<a href="' + item['link'] + '"' + expanded + '>';
@@ -146,7 +132,8 @@ var FHC_NavigationWidget = {
 
 		strMenu += '</a>';
 
-		if (typeof item['subscriptLinkClass'] != 'undefined' && typeof item['subscriptDescription'] != 'undefined')
+		if (typeof item['subscriptLinkClass'] != 'undefined' && typeof item['subscriptDescription'] != 'undefined'
+			&& item['subscriptLinkClass'] != null && item['subscriptDescription'] != null)
 		{
 			strMenu += '<a class="' + item['subscriptLinkClass'] + ' menuSubscriptLink" value="' + item['subscriptLinkValue'] + '" href="#"> (' + item['subscriptDescription'] + ')</a>';
 			strMenu += '</span>';
@@ -167,7 +154,7 @@ var FHC_NavigationWidget = {
 			strMenu += '<ul class="nav nav-' + level + '-level" ' + expanded + '>';
 
 			jQuery.each(item['children'], function(i, e) {
-				strMenu += FHC_NavigationWidget._printNavItem(e, ++depth);
+				if (e != null) strMenu += FHC_NavigationWidget._printNavItem(e, ++depth);
 			});
 
 			strMenu += '</ul>';

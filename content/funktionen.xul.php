@@ -27,6 +27,9 @@ header("Pragma: no-cache");
 header("Content-type: application/vnd.mozilla.xul+xml");
 
 include('../config/vilesci.config.inc.php');
+include('../include/functions.inc.php');
+include('../include/variable.class.php');
+
 echo '<?xml version="1.0" encoding="UTF-8"?>'."\n";
 
 echo '<?xml-stylesheet href="'.APP_ROOT.'skin/tempus.css" type="text/css"?>';
@@ -38,13 +41,20 @@ if(isset($_GET['uid']))
 else
 	die('Parameter uid muss uebergeben werden');
 
+$user = get_uid();
+$variable = new variable();
+$variable->loadVariables($user);
+
+if ($variable->variable->fasfunktionfilter == 'alle')
+	$filtertext = 'Nur aktuelle anzeigen';
+else
+	$filtertext = 'Alle anzeigen';
 ?>
 
 <window id="funktionen-window" title="Funktionen"
         xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
         onload="loadFunktionen('<?php echo $uid; ?>');"
         >
-
 <script type="application/x-javascript" src="<?php echo APP_ROOT; ?>content/funktionen.js.php" />
 <script type="application/x-javascript" src="<?php echo APP_ROOT; ?>content/functions.js.php" />
 <script type="application/x-javascript" src="<?php echo APP_ROOT; ?>content/fasoverlay.js.php" />
@@ -52,62 +62,76 @@ else
 
 <hbox flex="1">
  	<!-- FUNKTIONEN -->
+	<vbox flex="4">
+		<hbox>
+			<button id="funktionen-button-filter" oncommand="FunktionFilter()" label="<?php echo $filtertext;?>"/>
+			<textbox hidden="true" id="funktionen-filter-state" value="<?php echo $variable->variable->fasfunktionfilter; ?>" />
+			<spacer flex="1" />
+		</hbox>
 	<tree id="funktion-tree" seltype="single" hidecolumnpicker="false" flex="2"
 			datasources="rdf:null" ref="http://www.technikum-wien.at/bnfunktion/liste"
-			onclick="FunktionBearbeiten()"
+			onselect="FunktionBearbeiten()"
 			flags="dont-build-content"
 			enableColumnDrag="true"
 			style="margin-left:10px;margin-right:10px;margin-bottom:5px;" height="100"
 			persist="hidden, height"
 		>
 		<treecols>
-			<treecol id="funktion-treecol-funktion" label="Funktion" flex="2" hidden="false"
+			<treecol id="funktion-treecol-funktion" label="Funktion" flex="1" hidden="false"
 				class="sortDirectionIndicator"
-				sort="rdf:http://www.technikum-wien.at/bnfunktion/rdf#funktion" onclick="FunktionTreeSort()"/>
+				sort="rdf:http://www.technikum-wien.at/bnfunktion/rdf#funktion"/>
 			<splitter class="tree-splitter"/>
 			<treecol id="funktion-treecol-oe_kurzbz" label="Organisationseinheit" flex="1" hidden="false"
 				class="sortDirectionIndicator"
-				sort="rdf:http://www.technikum-wien.at/bnfunktion/rdf#studiengang" onclick="FunktionTreeSort()"/>
+				sort="rdf:http://www.technikum-wien.at/bnfunktion/rdf#organisationseinheit"/>
 			<splitter class="tree-splitter"/>
 			<treecol id="funktion-treecol-semester" label="Semester" flex="1" hidden="false"
 				class="sortDirectionIndicator"
-				sort="rdf:http://www.technikum-wien.at/bnfunktion/rdf#semester" onclick="FunktionTreeSort()"/>
+				sort="rdf:http://www.technikum-wien.at/bnfunktion/rdf#semester"/>
 			<splitter class="tree-splitter"/>
 			<treecol id="funktion-treecol-bezeichnung" label="Bezeichnung" flex="1" hidden="false"
 				class="sortDirectionIndicator"
-				sort="rdf:http://www.technikum-wien.at/bnfunktion/rdf#bezeichnung" onclick="FunktionTreeSort()"/>
+				sort="rdf:http://www.technikum-wien.at/bnfunktion/rdf#bezeichnung"/>
 			<splitter class="tree-splitter"/>
 			<treecol id="funktion-treecol-fachbereich" label="Institut" flex="1" hidden="false"
 				class="sortDirectionIndicator"
-				sort="rdf:http://www.technikum-wien.at/bnfunktion/rdf#fachbereich_kurzbz" onclick="FunktionTreeSort()"/>
+				sort="rdf:http://www.technikum-wien.at/bnfunktion/rdf#fachbereich_kurzbz"/>
 			<splitter class="tree-splitter"/>
 			<treecol id="funktion-treecol-uid" label="uid" flex="1" hidden="true"
 				class="sortDirectionIndicator"
-				sort="rdf:http://www.technikum-wien.at/bnfunktion/rdf#uid" onclick="FunktionTreeSort()"/>
+				sort="rdf:http://www.technikum-wien.at/bnfunktion/rdf#uid"/>
 			<splitter class="tree-splitter"/>
 			<treecol id="funktion-treecol-benutzerfunktion_id" label="BenutzerfunktionID" flex="1" hidden="true"
 				class="sortDirectionIndicator"
-				sort="rdf:http://www.technikum-wien.at/bnfunktion/rdf#benutzerfunktion_id" onclick="FunktionTreeSort()"/>
+				sort="rdf:http://www.technikum-wien.at/bnfunktion/rdf#benutzerfunktion_id"/>
 			<splitter class="tree-splitter"/>
 			<treecol id="funktion-treecol-studiengang_kz" label="StudiengangKZ" flex="1" hidden="true"
 				class="sortDirectionIndicator"
-				sort="rdf:http://www.technikum-wien.at/bnfunktion/rdf#studiengang_kz" onclick="FunktionTreeSort()"/>
+				sort="rdf:http://www.technikum-wien.at/bnfunktion/rdf#studiengang_kz"/>
 			<splitter class="tree-splitter"/>
 			<treecol id="funktion-treecol-funktion_kurzbz" label="FunktionKurzBz" flex="1" hidden="true"
 				class="sortDirectionIndicator"
-				sort="rdf:http://www.technikum-wien.at/bnfunktion/rdf#funktion_kurzbz" onclick="FunktionTreeSort()"/>
+				sort="rdf:http://www.technikum-wien.at/bnfunktion/rdf#funktion_kurzbz"/>
 			<splitter class="tree-splitter"/>
 			<treecol id="funktion-treecol-datum_von" label="GueltigVon" flex="1" hidden="false"
 				class="sortDirectionIndicator"
-				sort="rdf:http://www.technikum-wien.at/bnfunktion/rdf#datum_von_iso" onclick="FunktionTreeSort()"/>
+				sort="rdf:http://www.technikum-wien.at/bnfunktion/rdf#datum_von_iso"/>
 			<splitter class="tree-splitter"/>
 			<treecol id="funktion-treecol-datum_bis" label="GueltigBis" flex="1" hidden="false"
 				class="sortDirectionIndicator"
-				sort="rdf:http://www.technikum-wien.at/bnfunktion/rdf#datum_bis_iso" onclick="FunktionTreeSort()"/>
+				sort="rdf:http://www.technikum-wien.at/bnfunktion/rdf#datum_bis_iso"/>
 			<splitter class="tree-splitter"/>
-			<treecol id="funktion-treecol-wochenstunden" label="Wochenstunden" flex="1" hidden="false"
+			<treecol id="funktion-treecol-wochenstunden" label="Wochenstunden" flex="1" hidden="true"
 				class="sortDirectionIndicator"
-				sort="rdf:http://www.technikum-wien.at/bnfunktion/rdf#wochenstunden" onclick="FunktionTreeSort()"/>
+				sort="rdf:http://www.technikum-wien.at/bnfunktion/rdf#wochenstunden"/>
+			<splitter class="tree-splitter"/>
+			<treecol id="funktion-treecol-datum_von_iso" label="GueltigVonISO" flex="1" hidden="true"
+				class="sortDirectionIndicator"
+				sort="rdf:http://www.technikum-wien.at/bnfunktion/rdf#datum_von_iso"/>
+			<splitter class="tree-splitter"/>
+			<treecol id="funktion-treecol-datum_bis_iso" label="GueltigBisISO" flex="1" hidden="true"
+				class="sortDirectionIndicator"
+				sort="rdf:http://www.technikum-wien.at/bnfunktion/rdf#datum_bis_iso"/>
 			<splitter class="tree-splitter"/>
 		</treecols>
 
@@ -128,13 +152,15 @@ else
 							<treecell label="rdf:http://www.technikum-wien.at/bnfunktion/rdf#datum_von" />
 							<treecell label="rdf:http://www.technikum-wien.at/bnfunktion/rdf#datum_bis" />
 							<treecell label="rdf:http://www.technikum-wien.at/bnfunktion/rdf#wochenstunden" />
+							<treecell label="rdf:http://www.technikum-wien.at/bnfunktion/rdf#datum_von_iso" />
+							<treecell label="rdf:http://www.technikum-wien.at/bnfunktion/rdf#datum_bis_iso" />
 						</treerow>
 					</treeitem>
 				</treechildren>
 			</rule>
 		</template>
 	</tree>
-
+	</vbox>
 	<vbox flex="1">
 		<hbox>
 			<button id="funktion-button-neu" label="Neu" oncommand="FunktionNeu();" disabled="true"/>

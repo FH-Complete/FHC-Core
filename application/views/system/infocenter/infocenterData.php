@@ -2,6 +2,7 @@
 
 	$APP = 'infocenter';
 	$NOTBEFORE = '2018-03-01 18:00:00';
+
 	$filterWidgetArray = array(
 		'query' => '
 		SELECT
@@ -218,10 +219,11 @@
 		'formatRow' => function($datasetRaw) {
 
 			$datasetRaw->{'Details'} = sprintf(
-				'<a href="%s/%s?fhc_controller_id=%s">Details</a>',
+				'<a href="%s?person_id=%s&origin_page=%s&fhc_controller_id=%s">Details</a>',
 				site_url('system/infocenter/InfoCenter/showDetails'),
 				$datasetRaw->{'PersonId'},
-				(isset($_GET['fhc_controller_id'])?$_GET['fhc_controller_id']:'')
+				$this->router->method,
+				$this->input->get('fhc_controller_id')
 			);
 
 			if ($datasetRaw->{'SendDate'} == null)
@@ -266,14 +268,17 @@
 			{
 				$datasetRaw->{'StgAbgeschickt'} = '-';
 			}
+
 			if ($datasetRaw->{'StgNichtAbgeschickt'} == null)
 			{
 				$datasetRaw->{'StgNichtAbgeschickt'} = '-';
 			}
+
 			if ($datasetRaw->{'StgAktiv'} == null)
 			{
 				$datasetRaw->{'StgAktiv'} = '-';
 			}
+
 			if ($datasetRaw->{'Nation'} == null)
 			{
 				$datasetRaw->{'Nation'} = '-';
@@ -290,9 +295,9 @@
 				$mark = FilterWidget::DEFAULT_MARK_ROW_CLASS;
 			}
 
+			// Parking has priority over locking
 			if ($datasetRaw->ParkDate != null)
 			{
-				// Parking has priority over locking
 				$mark = "text-info";
 			}
 
@@ -300,9 +305,10 @@
 		}
 	);
 
-	$filterWidgetArray[InfoCenter::FILTER_ID] = $this->input->get(InfoCenter::FILTER_ID);
 	$filterWidgetArray['app'] = $APP;
 	$filterWidgetArray['datasetName'] = 'PersonActions';
+	$filterWidgetArray['filterKurzbz'] = 'InfoCenterSentApplicationAll';
+	$filterWidgetArray['filter_id'] = $this->input->get('filter_id');
 
 	echo $this->widgetlib->widget('FilterWidget', $filterWidgetArray);
 ?>

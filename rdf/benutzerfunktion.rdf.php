@@ -47,6 +47,7 @@ echo '
 ';
 $uid = (isset($_GET['uid'])?$_GET['uid']:'');
 $benutzerfunktion_id = (isset($_GET['benutzerfunktion_id'])?$_GET['benutzerfunktion_id']:'');
+$filter = (isset($_GET['filter'])?$_GET['filter']:'');
 $stg_arr = array();
 $fkt_arr = array();
 $datum_obj = new datum();
@@ -60,7 +61,10 @@ $db = new basis_db();
 
 if($uid!='')
 {
-	$qry = "SELECT * FROM public.tbl_benutzerfunktion WHERE uid=".$db->db_add_param($uid)." ORDER BY funktion_kurzbz";
+	$qry = "SELECT * FROM public.tbl_benutzerfunktion WHERE uid=".$db->db_add_param($uid);
+	if($filter == 'offene')
+		$qry .= " AND (datum_bis>=now() OR datum_bis is null)";
+	$qry.=" ORDER BY funktion_kurzbz";
 }
 else
 {
