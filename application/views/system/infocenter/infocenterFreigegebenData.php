@@ -153,12 +153,13 @@
 		),
 		'formatRow' => function($datasetRaw) {
 
+			/* NOTE: Dont use $this here for PHP Version compatibility */
 			$datasetRaw->{'Details'} = sprintf(
 				'<a href="%s?person_id=%s&origin_page=%s&fhc_controller_id=%s">Details</a>',
 				site_url('system/infocenter/InfoCenter/showDetails'),
 				$datasetRaw->{'PersonId'},
-				$this->router->method,
-				$this->input->get('fhc_controller_id')
+				'freigegeben',
+				(isset($_GET['fhc_controller_id'])?$_GET['fhc_controller_id']:'')
 			);
 
 			if ($datasetRaw->{'SendDate'} == null)

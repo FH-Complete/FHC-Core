@@ -758,10 +758,10 @@ class InfoCenter extends Auth_Controller
 		$this->navigationlib->setSessionMenu(
 			array(
 				'back' => $this->navigationlib->oneLevel(
-					'<< Züruck',	// description
+					'Zurück',	// description
 					$link,			// link
 					array(),		// children
-					'',				// icon
+					'angle-left',	// icon
 					true			// expand
 				)
 			)
@@ -823,7 +823,7 @@ class InfoCenter extends Auth_Controller
 				'filters' => $this->navigationlib->oneLevel(
 					'Filter',					// description
 					'#',						// link
-					$filtersArray['children'],	// children
+					(isset($filtersArray['children'])?$filtersArray['children']:''),	// children
 					'',							// icon
 					true						// expand
 				)

@@ -2,7 +2,7 @@
 
 	$APP = 'infocenter';
 	$NOTBEFORE = '2018-03-01 18:00:00';
-
+	
 	$filterWidgetArray = array(
 		'query' => '
 		SELECT
@@ -219,12 +219,13 @@
 		),
 		'formatRow' => function($datasetRaw) {
 
+			/* NOTE: Dont use $this here for PHP Version compatibility */
 			$datasetRaw->{'Details'} = sprintf(
 				'<a href="%s?person_id=%s&origin_page=%s&fhc_controller_id=%s">Details</a>',
 				site_url('system/infocenter/InfoCenter/showDetails'),
 				$datasetRaw->{'PersonId'},
-				$this->router->method,
-				$this->input->get('fhc_controller_id')
+				'index',
+				(isset($_GET['fhc_controller_id'])?$_GET['fhc_controller_id']:'')
 			);
 
 			if ($datasetRaw->{'SendDate'} == null)

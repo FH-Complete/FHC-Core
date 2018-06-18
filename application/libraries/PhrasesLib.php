@@ -197,12 +197,13 @@ class PhrasesLib
 			{
 				$_phrase = $this->_phrases[$i]; // single phrase
 
+				$trimedval = trim($_phrase->text);
 				// If the single phrase match the given parameters and is not an empty string
 				if ($_phrase->category == $category
 					&& $_phrase->phrase == $phrase
 					&& $_phrase->orgeinheit_kurzbz == $orgeinheit_kurzbz
 					&& $_phrase->orgform_kurzbz == $orgform_kurzbz
-					&& (!empty(trim($_phrase->text))))
+					&& (!empty($trimedval)))
 				{
 					if (!is_array($parameters)) $parameters = array(); // if params is not an array
 
