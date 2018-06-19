@@ -2,8 +2,9 @@
 
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
-// Retrives the URL path of the called controller + called controller method
+// Retrives the name of the index page, the URL path of the called controller and the called controller
 // NOTE: placed here because it doesn't work inside functions
+$indexPage = $this->config->item('index_page');
 $calledPath = $this->router->directory.$this->router->class;
 $calledMethod = $this->router->method;
 
@@ -67,14 +68,14 @@ function _generateCSSsInclude($CSSs)
 /**
  * Generates global JS-Object to pass parms to other javascripts
  */
-function _generateJSDataStorageObject($calledPath, $calledMethod)
+function _generateJSDataStorageObject($indexPage, $calledPath, $calledMethod)
 {
 	$toPrint = "\n";
 	$toPrint .= '<script type="text/javascript">';
 	$toPrint .= '
 		var FHC_JS_DATA_STORAGE_OBJECT = {
 			app_root: "'.APP_ROOT.'",
-			ci_router: "index.ci.php",
+			ci_router: "'.$indexPage.'",
 			called_path: "'.$calledPath.'",
 			called_method: "'.$calledMethod.'"
 		};';
@@ -202,7 +203,7 @@ function _generateAddonsJSsInclude($calledFrom)
 
 			// Generates the global object to pass useful parameters to other javascripts
 			// NOTE: must be called before any other JS include
-			_generateJSDataStorageObject($calledPath, $calledMethod);
+			_generateJSDataStorageObject($indexPage, $calledPath, $calledMethod);
 
 			// Generates the global object to pass phrases to javascripts
 			// NOTE: must be called before including the PhrasesLib.js

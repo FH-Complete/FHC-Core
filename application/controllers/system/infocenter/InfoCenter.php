@@ -12,12 +12,18 @@ class InfoCenter extends FHC_Controller
 	const APP = 'infocenter';
 	const TAETIGKEIT = 'bewerbung';
 
-	const URL_PREFIX = '/system/infocenter/InfoCenter'; // URL prefix for this controller
+	const INFOCENTER_URI = 'system/infocenter/InfoCenter'; // URL prefix for this controller
+	const INDEX_PAGE = 'index';
+	const FREIGEGEBEN_PAGE = 'freigegeben';
+	const SHOW_DETAILS_PAGE = 'showDetails';
+
+	const NAVIGATION_PAGE = 'navigation_page';
+	const ORIGIN_PAGE = 'origin_page';
 
 	private $_uid; // contains the UID of the logged user
 
 	// Used to log with PersonLogLib
-	private $logparams = array(
+	private $_logparams = array(
 		'saveformalgep' => array(
 			'logtype' => 'Action',
 			'name' => 'Document formally checked',
@@ -100,29 +106,33 @@ class InfoCenter extends FHC_Controller
 	// Public methods
 
 	/**
-	 * Default
+	 * Main page of the InfoCenter tool
 	 */
 	public function index()
 	{
-		$this->setNavigationMenuIndex(); // define the navigation menu for this page
+		$this->_setNavigationMenuIndex(); // define the navigation menu for this page
 
 		$this->load->view('system/infocenter/infocenter.php');
 	}
 
+	/**
+	 * Freigegeben page of the InfoCenter tool
+	 */
 	public function freigegeben()
 	{
-		$this->setNavigationMenuFreigegeben(); // define the navigation menu for this page
+		$this->_setNavigationMenuFreigegeben(); // define the navigation menu for this page
 
 		$this->load->view('system/infocenter/infocenterFreigegeben.php');
 	}
 
 	/**
+	 * Personal details page of the InfoCenter tool
 	 * Initialization function, gets person and prestudent data and loads the view with the data
 	 * @param $person_id
 	 */
 	public function showDetails()
 	{
-		$this->setNavigationMenuShowDetails();
+		$this->_setNavigationMenuShowDetails();
 
 		$person_id = $this->input->get('person_id');
 
@@ -137,8 +147,8 @@ class InfoCenter extends FHC_Controller
 		if (empty($personexists->retval))
 			show_error('person does not exist!');
 
-		$origin_page = $this->input->get('origin_page');
-		if ($origin_page == 'index')
+		$origin_page = $this->input->get(self::ORIGIN_PAGE);
+		if ($origin_page == self::INDEX_PAGE)
 		{
 			// mark person as locked for editing
 			$result = $this->PersonLockModel->lockPerson($person_id, $this->_uid, self::APP);
@@ -155,8 +165,8 @@ class InfoCenter extends FHC_Controller
 			$prestudentdata
 		);
 
-		$data['fhc_controller_id'] = $this->getControllerId();
-		$data['origin_page'] = $origin_page;
+		$data[self::FHC_CONTROLLER_ID] = $this->getControllerId();
+		$data[self::ORIGIN_PAGE] = $origin_page;
 
 		$this->load->view('system/infocenter/infocenterDetails.php', $data);
 	}
@@ -172,7 +182,7 @@ class InfoCenter extends FHC_Controller
 		if (isError($result))
 			show_error($result->retval);
 
-		redirect(self::URL_PREFIX.'?fhc_controller_id='.$this->getControllerId());
+		redirect('/'.self::INFOCENTER_URI.'?'.self::FHC_CONTROLLER_ID.'='.$this->getControllerId());
 	}
 
 	/**
@@ -211,9 +221,7 @@ class InfoCenter extends FHC_Controller
 			}
 		}
 
-		$this->output
-			->set_content_type('application/json')
-			->set_output(json_encode($json));
+		$this->output->set_content_type('application/json')->set_output(json_encode($json));
 	}
 
 	/**
@@ -224,9 +232,7 @@ class InfoCenter extends FHC_Controller
 	{
 		$prestudent = $this->PrestudentModel->getLastPrestudent($person_id, true);
 
-		$this->output
-			->set_content_type('application/json')
-			->set_output(json_encode($prestudent));
+		$this->output->set_content_type('application/json')->set_output(json_encode($prestudent));
 	}
 
 	/**
@@ -305,9 +311,7 @@ class InfoCenter extends FHC_Controller
 				$this->_log($logdata['person_id'], 'savezgv', array($logdata['studiengang_kurzbz'], $prestudent_id));
 			}
 		}
-		$this->output
-			->set_content_type('application/json')
-			->set_output(json_encode($result));
+		$this->output->set_content_type('application/json')->set_output(json_encode($result));
 	}
 
 	/**
@@ -460,9 +464,7 @@ class InfoCenter extends FHC_Controller
 			$this->_log($person_id, 'savenotiz', array($titel));
 		}
 
-		$this->output
-			->set_content_type('application/json')
-			->set_output(json_encode($result));
+		$this->output->set_content_type('application/json')->set_output(json_encode($result));
 	}
 
 	/**
@@ -493,9 +495,7 @@ class InfoCenter extends FHC_Controller
 			$this->_log($person_id, 'updatenotiz', array($titel));
 		}
 
-		$this->output
-			->set_content_type('application/json')
-			->set_output(json_encode($result));
+		$this->output->set_content_type('application/json')->set_output(json_encode($result));
 	}
 
 	/**
@@ -562,9 +562,7 @@ class InfoCenter extends FHC_Controller
 	{
 		$result = $this->personloglib->getParkedDate($person_id);
 
-		$this->output
-			->set_content_type('application/json')
-			->set_output(json_encode($result));
+		$this->output->set_content_type('application/json')->set_output(json_encode($result));
 	}
 
 	/**
@@ -577,9 +575,7 @@ class InfoCenter extends FHC_Controller
 
 		$result = $this->personloglib->park($person_id, date_format(date_create($date), 'Y-m-d'), self::TAETIGKEIT, self::APP, null, $this->_uid);
 
-		$this->output
-			->set_content_type('application/json')
-			->set_output(json_encode($result));
+		$this->output->set_content_type('application/json')->set_output(json_encode($result));
 	}
 
 	/**
@@ -591,9 +587,7 @@ class InfoCenter extends FHC_Controller
 
 		$result = $this->personloglib->unPark($person_id);
 
-		$this->output
-			->set_content_type('application/json')
-			->set_output(json_encode($result));
+		$this->output->set_content_type('application/json')->set_output(json_encode($result));
 	}
 
 	/**
@@ -612,9 +606,26 @@ class InfoCenter extends FHC_Controller
 			$json = $result->retval[0]->ende;
 		}
 
-		$this->output
-			->set_content_type('application/json')
-			->set_output(json_encode($json));
+		$this->output->set_content_type('application/json')->set_output(json_encode($json));
+	}
+
+	/**
+	 * Wrapper for setNavigationMenu, returns JSON message
+	 */
+	public function setNavigationMenuArrayJson()
+	{
+		$navigation_page = $this->input->get(self::NAVIGATION_PAGE);
+
+		if (strpos($navigation_page, self::INDEX_PAGE) !== false)
+		{
+			$this->_setNavigationMenuIndex();
+		}
+		else
+		{
+			$this->_setNavigationMenuFreigegeben();
+		}
+
+		$this->outputJsonSuccess('success');
 	}
 
 	// -----------------------------------------------------------------------------------------------------------------
@@ -633,9 +644,9 @@ class InfoCenter extends FHC_Controller
 	/**
 	 *  Define the navigation menu for the index page
 	 */
-	public function setNavigationMenuIndex()
+	private function _setNavigationMenuIndex()
 	{
-		$this->load->library('NavigationLib', array('navigation_page' => 'system/infocenter/InfoCenter/index'));
+		$this->load->library('NavigationLib', array(self::NAVIGATION_PAGE => self::INFOCENTER_URI.'/'.self::INDEX_PAGE));
 
 		$listFiltersSent = array();
 		$listFiltersNotSent = array();
@@ -724,16 +735,16 @@ class InfoCenter extends FHC_Controller
 	/**
 	 *  Define the navigation menu for the showDetails page
 	 */
-	public function setNavigationMenuShowDetails()
+	private function _setNavigationMenuShowDetails()
 	{
-		$this->load->library('NavigationLib', array('navigation_page' => 'system/infocenter/InfoCenter/showDetails'));
+		$this->load->library('NavigationLib', array(self::NAVIGATION_PAGE => self::INFOCENTER_URI.'/'.self::SHOW_DETAILS_PAGE));
 
-		$origin_page = $this->input->get('origin_page');
+		$origin_page = $this->input->get(self::ORIGIN_PAGE);
 
-		$link = base_url('index.ci.php/system/infocenter/InfoCenter/index');
-		if ($origin_page == 'freigegeben')
+		$link = site_url(self::INFOCENTER_URI.'/'.self::INDEX_PAGE);
+		if ($origin_page == self::FREIGEGEBEN_PAGE)
 		{
-			$link = base_url('index.ci.php/system/infocenter/InfoCenter/freigegeben');
+			$link = site_url(self::INFOCENTER_URI.'/'.self::FREIGEGEBEN_PAGE);
 		}
 
 		$this->navigationlib->setSessionMenu(
@@ -752,9 +763,9 @@ class InfoCenter extends FHC_Controller
 	/**
 	 *  Define the navigation menu for the freigegeben page
 	 */
-	public function setNavigationMenuFreigegeben()
+	private function _setNavigationMenuFreigegeben()
 	{
-		$this->load->library('NavigationLib', array('navigation_page' => 'system/infocenter/InfoCenter/freigegeben'));
+		$this->load->library('NavigationLib', array(self::NAVIGATION_PAGE => self::INFOCENTER_URI.'/'.self::FREIGEGEBEN_PAGE));
 
 		$listFilters = array();
 		$listCustomFilters = array();
@@ -782,6 +793,7 @@ class InfoCenter extends FHC_Controller
 		}
 
 		$filtersArray = array();
+		$filtersArray['children'] = array();
 
 		$this->_fillFiltersFreigegeben($listFilters, $filtersArray);
 
@@ -812,24 +824,8 @@ class InfoCenter extends FHC_Controller
 	}
 
 	/**
-	 * Wrapper for setNavigationMenu, returns JSON message
+	 * Utility method used to fill elements of the InfoCenter left menu of the main InfoCenter page
 	 */
-	public function setNavigationMenuArrayJson()
-	{
-		$navigation_page = $this->input->get('navigation_page');
-
-		if (strpos($navigation_page, 'index') !== false)
-		{
-			$this->setNavigationMenuIndex();
-		}
-		else
-		{
-			$this->setNavigationMenuFreigegeben();
-		}
-
-		$this->outputJsonSuccess('success');
-	}
-
 	private function _fillFilters($filters, &$tofill)
 	{
 		$toPrint = "%s?%s=%s&%s=%s";
@@ -839,7 +835,7 @@ class InfoCenter extends FHC_Controller
 			$tofill['children'][] = array(
 				'link' => sprintf(
 					$toPrint,
-					site_url('system/infocenter/InfoCenter'), 'filter_id', $filterId,
+					site_url(self::INFOCENTER_URI), 'filter_id', $filterId,
 					FHC_Controller::FHC_CONTROLLER_ID,
 					$this->getControllerId()
 				),
@@ -848,6 +844,9 @@ class InfoCenter extends FHC_Controller
 		}
 	}
 
+	/**
+	 * Utility method used to fill elements of the InfoCenter left menu of the freigegeben InfoCenter page
+	 */
 	private function _fillFiltersFreigegeben($filters, &$tofill)
 	{
 		$toPrint = "%s?%s=%s&%s=%s";
@@ -857,7 +856,7 @@ class InfoCenter extends FHC_Controller
 			$tofill['children'][] = array(
 				'link' => sprintf(
 					$toPrint,
-					site_url('system/infocenter/InfoCenter/freigegeben'), 'filter_id', $filterId,
+					site_url(self::INFOCENTER_URI.'/'.self::FREIGEGEBEN_PAGE), 'filter_id', $filterId,
 					FHC_Controller::FHC_CONTROLLER_ID,
 					$this->getControllerId()
 				),
@@ -866,6 +865,10 @@ class InfoCenter extends FHC_Controller
 		}
 	}
 
+	/**
+	 * Utility method used to fill elements of the InfoCenter left menu
+	 * with the list of the custom filter of the authenticated user
+	 */
 	private function _fillCustomFilters($filters, &$tofill)
 	{
 		$toPrint = "%s?%s=%s&%s=%s";
@@ -875,7 +878,7 @@ class InfoCenter extends FHC_Controller
 			$tofill['children'][] = array(
 				'link' => sprintf(
 					$toPrint,
-					site_url('system/infocenter/InfoCenter'), 'filter_id', $filterId,
+					site_url(self::INFOCENTER_URI), 'filter_id', $filterId,
 					FHC_Controller::FHC_CONTROLLER_ID,
 					$this->getControllerId()
 				),
@@ -1069,7 +1072,18 @@ class InfoCenter extends FHC_Controller
 		$this->PrestudentModel->addSelect('person_id');
 		$person_id = $this->PrestudentModel->load($prestudent_id)->retval[0]->person_id;
 
-		redirect(self::URL_PREFIX.'/showDetails?person_id='.$person_id.'&fhc_controller_id='.$this->getControllerId().'#'.$section);
+		redirect(
+			sprintf(
+				'/%s/%s?%s=%s&%s=%s#%s',
+				self::INFOCENTER_URI,
+				self::SHOW_DETAILS_PAGE,
+				'person_id',
+				$person_id,
+				self::FHC_CONTROLLER_ID,
+				$this->getControllerId(),
+				$section
+			)
+		);
 	}
 
 	/**
@@ -1101,7 +1115,7 @@ class InfoCenter extends FHC_Controller
 	 */
 	private function _log($person_id, $logname, $messageparams)
 	{
-		$logdata = $this->logparams[$logname];
+		$logdata = $this->_logparams[$logname];
 
 		$datatolog = array(
 			'name' => $logdata['name']

@@ -3,7 +3,7 @@
 $config['navigation_header'] = array(
 	'*' => array(
 		'FH-Complete' => site_url(''),
-		'Vilesci' => base_url('/vilesci'),
+		'Vilesci' => base_url('vilesci'),
 		'CIS' => CIS_ROOT
 	)
 );
@@ -29,7 +29,7 @@ $config['navigation_menu']['Vilesci/index'] = array(
 				'expand' => true
 			),
 			'Infocenter' => array(
-				'link' => site_url('/system/infocenter/InfoCenter'),
+				'link' => site_url('system/infocenter/InfoCenter'),
 				'icon' => 'info',
 				'description' => 'Infocenter',
 				'expand' => true
@@ -43,13 +43,13 @@ $config['navigation_menu']['Vilesci/index'] = array(
 		'expand' => false,
 		'children'=> array(
 			'Vilesci' => array(
-				'link' => base_url('vilesci/'),
+				'link' => base_url('vilesci'),
 				'icon' => '',
 				'description' => 'Vilesci',
 				'expand' => true
 			),
 			'Extensions' => array(
-				'link' => site_url('/system/extensions/Manager'),
+				'link' => site_url('system/extensions/Manager'),
 				'icon' => 'cubes',
 				'description' => 'Extensions Manager',
 				'expand' => true
@@ -60,16 +60,16 @@ $config['navigation_menu']['Vilesci/index'] = array(
 
 
 $config['navigation_menu']['system/infocenter/InfoCenter/index'] = array(
-	'Freigegeben' => array(
-		'link' => base_url('index.ci.php/system/infocenter/InfoCenter/freigegeben'),
+	'freigegeben' => array(
+		'link' => site_url('system/infocenter/InfoCenter/freigegeben'),
 		'description' => 'Freigegeben',
 		'icon' => 'thumbs-up'
 	)
 );
 
 $config['navigation_menu']['system/infocenter/InfoCenter/freigegeben'] = array(
-	'Zurück' => array(
-		'link' => base_url('index.ci.php/system/infocenter/InfoCenter/index'),
+	'back' => array(
+		'link' => site_url('system/infocenter/InfoCenter/index'),
 		'description' => 'Home',
 		'icon' => 'angle-left'
 	)

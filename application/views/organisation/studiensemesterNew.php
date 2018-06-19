@@ -7,9 +7,7 @@ $this->load->view('templates/header', array('title' => 'StudiensemesterNew', 'jq
 	<div class="row">
 		<div class="span4">
 			<h2>Neues Studiensemester anlegen</h2>
-			<form method="post"
-				  action="<?php echo APP_ROOT."index.ci.php/organisation/studiensemester/insStudiensemester"; ?>"
-				  id="newSemesterForm">
+			<form method="post" action="<?php echo site_url("organisation/studiensemester/insStudiensemester"); ?>" id="newSemesterForm">
 				<table>
 					<tr>
 						<td colspan="2">

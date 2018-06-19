@@ -84,7 +84,7 @@ $widthColumn = $msgExists === true ? 8 : 12;
 		$.ajax(
 			{
 				dataType: "json",
-				url: "<?php echo base_url("/index.ci.php/system/Messages/getMessageFromIds/") ?>" + msgid + "/" + recid,
+				url: "<?php echo site_url("system/Messages/getMessageFromIds/") ?>" + msgid + "/" + recid,
 				success: function (data, textStatus, jqXHR)
 				{
 					$("#msgsubject").text(data[0].subject);
