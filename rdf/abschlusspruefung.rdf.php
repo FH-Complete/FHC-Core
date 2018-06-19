@@ -41,21 +41,10 @@ require_once('../include/projektarbeit.class.php');
 require_once('../include/lehreinheit.class.php');
 require_once('../include/lehrveranstaltung.class.php');
 require_once('../include/note.class.php');
-require_once('../include/benutzerberechtigung.class.php');
 
 $xmlformat='rdf';
 if(isset($_GET['xmlformat']))
 	$xmlformat=$_GET['xmlformat'];
-
-if(isset($_SERVER['REMOTE_USER']))
-{
-	// Wenn das Script direkt aufgerufen wird muss es ein Admin sein
-	$user=get_uid();
-	$berechtigung = new benutzerberechtigung();
-	$berechtigung->getBerechtigungen($user);
-	if(!$berechtigung->isBerechtigt('admin'))
-		die('Sie haben keine Berechtigung fuer diese Seite');
-}
 
 echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 
