@@ -97,6 +97,8 @@ class NavigationLib
 			}
 		}
 
+		$this->_sortArray($menuArray);
+
 		return $menuArray;
 	}
 
@@ -150,6 +152,8 @@ class NavigationLib
 			}
 		}
 
+		$this->_sortArray($headerArray);
+
 		return $headerArray;
 	}
 
@@ -158,17 +162,20 @@ class NavigationLib
 	 */
 	public function oneLevel(
 		$description, $link = '#', $children = null, $icon = '', $expand = false,
-		$subscriptDescription = null, $subscriptLinkClass = null, $subscriptLinkValue = null)
+		$subscriptDescription = null, $subscriptLinkClass = null, $subscriptLinkValue = null, $target = '',
+		$sort = null)
 	{
 		return array(
 			'description' => $description,
 			'link' => $link,
+			'target' => $target,
 			'children'=> $children,
 			'icon' => $icon,
 			'expand' => $expand,
 			'subscriptDescription' => $subscriptDescription,
 			'subscriptLinkClass' => $subscriptLinkClass,
-			'subscriptLinkValue' => $subscriptLinkValue
+			'subscriptLinkValue' => $subscriptLinkValue,
+			'sort' => $sort
 		);
 	}
 
@@ -349,5 +356,35 @@ class NavigationLib
 		}
 
 		return $navigationPage;
+	}
+
+	/**
+	 * Sorts using the sort element present in the array
+	 */
+	private function _sortArray(&$array)
+	{
+		uasort($array, function($a, $b) {
+
+			// If the element sort is not present then the default value is 999
+			$sortA = 999;
+			if (isset($a['sort'])) $sortA = $a['sort'];
+
+			// If the element sort is not present then the default value is 999
+			$sortB = 999;
+			if (isset($b['sort'])) $sortB = $b['sort'];
+
+			return $sortA - $sortB; // < 0 => lt, == 0 => equal, > 0 => gt
+		});
+
+		// Sort also the children
+		foreach ($array as $key => $value)
+		{
+			if (isset($value['children']) && is_array($value['children']) && count($value['children']) > 0)
+			{
+				// NOTE: keep this way to give the element by reference, $value has a different reference!
+				// 		otherwise the children will not be sorted
+				$this->_sortArray($array[$key]['children']); // recursive call
+			}
+		}
 	}
 }
