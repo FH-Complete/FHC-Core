@@ -2192,6 +2192,35 @@ if($result = @$db->db_query("SELECT * FROM information_schema.role_table_grants 
 	}
 }
 
+// Add missing Foreign Key to public.tbl_rt_person.person_id
+if ($result = @$db->db_query("SELECT conname FROM pg_constraint WHERE conname = 'fk_tbl_rt_person_person_id'"))
+{
+	if ($db->db_num_rows($result) == 0)
+	{
+		$qry = "SELECT person_id FROM public.tbl_rt_person WHERE NOT EXISTS(SELECT 1 FROM public.tbl_person WHERE person_id=tbl_rt_person.person_id)";
+		if($result = $db->db_query($qry))
+		{
+			if($db->db_num_rows($result)==0)
+			{
+				$qry = "ALTER TABLE public.tbl_rt_person ADD CONSTRAINT fk_tbl_rt_person_person_id FOREIGN KEY (person_id) REFERENCES public.tbl_person ON DELETE RESTRICT ON UPDATE CASCADE;";
+
+				if (!$db->db_query($qry))
+					echo '<strong>public.tbl_rt_person '.$db->db_last_error().'</strong><br>';
+				else
+					echo '<br>public.tbl_rt_person: added foreign key on column person_id';
+			}
+			else
+			{
+				echo '<strong>public.tbl_rt_person:
+				Fehlender Foreign Key auf person_id kann nicht erstellt werden!
+				In der Tabelle public.tbl_rt_person wird auf Personen verlinkt die nicht mehr in der Tabelle
+				public.tbl_person vorhanden sind. Bitte bereinigen Sie die Datensätze manuell und starten Sie dieses Script erneut.
+				</strong>';
+			}
+		}
+	}
+}
+
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
 
