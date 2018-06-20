@@ -7,7 +7,7 @@
 		<div class="row">
 			<div class="span4">
 				<h2>Statusgrund: <?php echo $sg->status_kurzbz; ?></h2>
-				<form method="post" action="<?php echo APP_ROOT . "index.ci.php/crm/Statusgrund/saveGrund";?>">
+				<form method="post" action="<?php echo site_url("crm/Statusgrund/saveGrund"); ?>">
 					<table>
 						<tr>
 							<td colspan="2">

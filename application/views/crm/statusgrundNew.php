@@ -5,7 +5,7 @@
 		<div class="row">
 			<div class="span4">
 				<h2>Neuer Statusgrund</h2>
-				<form method="post" action="<?php echo APP_ROOT . "index.ci.php/crm/Statusgrund/insGrund";?>">
+				<form method="post" action="<?php echo site_url("crm/Statusgrund/insGrund"); ?>">
 					<table>
 						<tr>
 							<td colspan="2">
