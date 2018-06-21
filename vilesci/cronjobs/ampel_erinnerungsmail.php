@@ -34,7 +34,7 @@ $p = new phrasen($sprache);
 
 //get all notifications
 $ampel_obj = new ampel();
-$ampel_obj->getAll();		
+$ampel_obj->getAll();	
 $ampel_arr = $ampel_obj->result;
 
 //filter only notifications that are not expired, not before vorlaufzeit AND email is true
@@ -56,9 +56,9 @@ foreach($ampel_arr as $ampel)
 	$overdue_user_arr = array();
 
 	if($result = $db->db_query($qry_all_ampel_user))
-	{		
+	{
 		while($row = $db->db_fetch_object($result))
-		{			
+		{
 			$user = $row->uid;
 
 			//break if almost confirmed
@@ -66,7 +66,7 @@ foreach($ampel_arr as $ampel)
 				break;
 			
 			//check if notification is new (within last week, as cronjob will run every week)
-			if ($datum->DateDiff (date('Y-m-d'), $insert_date) >= -7)
+			if($datum->DateDiff(date('Y-m-d'), $insert_date) >= -7)
 			{
 				$new = true;
 				$new_user_arr[] = $user;
@@ -77,28 +77,32 @@ foreach($ampel_arr as $ampel)
 			{
 				$overdue = true;
 				$overdue_user_arr[] = $user;
-			}			 
-		}			
-	}
+			}	 
+		};	
+	};
 	
 	if ($new)
 	{
-	$new_ampel_user_arr[] = array(
-							'ampel_id' => $ampel->ampel_id, 
-							'ampel_bezeichnung' => $kurzbz,
-							'user' => $new_user_arr,
-							'deadline' => date('d.m.Y', $deadline));
-	} 
+		$new_ampel_user_arr[] =
+		array(
+				'ampel_id' => $ampel->ampel_id,
+				'ampel_bezeichnung' => $kurzbz,
+				'user' => $new_user_arr,
+				'deadline' => date('d.m.Y', $deadline)
+		);
+	}
 	
 	if ($overdue)
 	{
-	$overdue_ampel_user_arr[] = array(
-								'ampel_id' => $ampel->ampel_id, 
-								'ampel_bezeichnung' => $kurzbz,
-								'user' => $overdue_user_arr,
-								'deadline' => date('d.m.Y', $deadline));
+		$overdue_ampel_user_arr[] =
+		array(
+			'ampel_id' => $ampel->ampel_id,
+			'ampel_bezeichnung' => $kurzbz,
+			'user' => $overdue_user_arr,
+			'deadline' => date('d.m.Y', $deadline)
+		);
 	}
-}
+};
 
 //rearrange arrays as needed to send in eMails
 $new_ampel_user_arr = organizeAmpelnForMail($new_ampel_user_arr);
@@ -113,29 +117,31 @@ foreach ($new_ampel_user_arr as $receiver)
 	$firstName = $person->vorname;
 	
 	//link to notifications system site
-	$link = APP_ROOT . "cis/index.php?sprache=German&content_id=&menu=" . APP_ROOT . "cis/menu.php?content_id=&content=" . APP_ROOT . "cis/private/tools/ampelverwaltung.php";
+	$link = APP_ROOT. "cis/index.php?sprache=German&content_id=&menu=". 
+		APP_ROOT. "cis/menu.php?content_id=&content=". 
+		APP_ROOT. "cis/private/tools/ampelverwaltung.php";
 
 	//eMail data
-	$to = $receiver['user']  . '@' . DOMAIN;
-	$from = 'noreply@'.DOMAIN;				
+	$to = $receiver['user']. '@'. DOMAIN;
+	$from = 'noreply@'. DOMAIN;				
 	$subject = 'Sie haben eine neue Ampel!';
-	$title = "Sie haben neue Nachrichten in Ihrem Ampelsystem!";
-	$content = "<p>Hallo " . $firstName . ",</p>";
+	$headerImg = "sancho_header_neue_nachrichten_in_ampelsystem.jpg";
+	$content = "<p align=\"center\">Hallo ". $firstName. ",</p><br>";
 	$content .= "<p>es gibt neue Ampeln für Sie:</p><br>";
 	
 	for ($i = 0; $i < count($receiver) - 1; $i++)
 	{
 		$receiver[$i]['ampel_id'];
-		$content .= "<p><i>NEU:</i>&nbsp&nbsp<strong>" . $receiver[$i]['ampel_bezeichnung'] . "</strong></p>";
+		$content .= "<p><strong>". strtoupper($receiver[$i]['ampel_bezeichnung']). "</strong></p></br>";
 	}
 	
-	$content .= "<br><p>Sie können sie jetzt gleich in Ihrem Ampelsystem bestätigen:</p>";
-	$content .= "<br><a style=\"color: #74ba24;\" href=" . $link . ">Zu meinem Ampelsystem</a></br>";
-	$content .= "<p><br>Schönen Tag noch,</p>";
-	$content .= "<p>Sancho</p>";
+	$content .= "<p>Sie können sie jetzt gleich in Ihrem Ampelsystem bestätigen:</p>";
+	$content .= "<a style=\"color: #bfc130;\" href=". $link. ">Zu meinem Ampelsystem</a></br>";
+	$content .= "<p align=\"center\"><br>Schönen Tag noch,</br>";
+	$content .= "Sancho</p><br>";
 	
 	//send eMail
-	sendMail($to, $from, $subject, $content, $title);
+	sendMail($to, $from, $subject, $content, $headerImg);
 }
 
 //send eMail for overdue notifications
@@ -147,30 +153,32 @@ foreach ($overdue_ampel_user_arr as $receiver)
 	$firstName = $person->vorname;
 	
 	//link to notifications system site
-	$link = APP_ROOT . "cis/index.php?sprache=German&content_id=&menu=" . APP_ROOT . "cis/menu.php?content_id=&content=" . APP_ROOT . "cis/private/tools/ampelverwaltung.php";
+	$link = APP_ROOT. "cis/index.php?sprache=German&content_id=&menu=". 
+		APP_ROOT. "cis/menu.php?content_id=&content=". 
+		APP_ROOT. "cis/private/tools/ampelverwaltung.php";
 
 	//eMail data
 	$to = $receiver['user']  . '@' . DOMAIN;
 	$from = 'noreply@'.DOMAIN;			
 	$subject = 'Bestätigen Sie bitte Ihre Ampel!';
-	$title = "Die Deadline für Ihre Ampel ist überschritten!";
-	$content = "<p>Hallo " . $firstName . ",</p>";
-	$content .= "<p>es gibt Ampeln, die von Ihnen noch bestätigt werden müssen:</p><br>";
+	$headerImg = "sancho_header_deadline_ampel_overdue.jpg";
+	$content = "<p align=\"center\">Hallo " . $firstName . ",</p><br>";
+	$content .= "<p>diese Ampeln müssen von Ihnen noch bestätigt werden:</p><br>";
 	
 	for ($i = 0; $i < count($receiver) - 1; $i++)
 	{
 		$receiver[$i]['ampel_id'];
-		$content .= "<p><i>BESTÄTIGUNG FEHLT:</i>&nbsp&nbsp<strong>" . $receiver[$i]['ampel_bezeichnung'] . "</strong></p>";
-		$content .= "<p><small><i style=\"color: #65696E;\">Die Deadline für die Bestätigung war am <span style=\"color: #FF0000;\">" . $receiver[$i]['deadline'] . "</span></i></small></p><br>";
+		$content .= "<p><strong>" . strtoupper($receiver[$i]['ampel_bezeichnung']) . "</strong><br>";
+		$content .= "<small><i style=\"color: #65696E;\">Die Deadline für die Bestätigung war am <span style=\"color: #FF0000;\">" . $receiver[$i]['deadline'] . "</span></i></small></p><br>";
 	}
 	
-	$content .= "<br><p>Sie können sie jetzt gleich in Ihrem Ampelsystem bestätigen:</p>";
-	$content .= "<br><a style=\"color: #74ba24;\" href=" . $link . ">Zu meinem Ampelsystem</a></br>";
-	$content .= "<p><br>Schönen Tag noch,</p>";
-	$content .= "<p>Sancho</p>";
+	$content .= "<p>Sie können sie jetzt gleich in Ihrem Ampelsystem bestätigen:</p>";
+	$content .= "<a style=\"color: #bfc130;\" href=\"$link\">Zu meinem Ampelsystem</a><br>";
+	$content .= "<p align=\"center\"><br>Schönen Tag noch!<br>";
+	$content .= "Sancho</p><br>";
 	
 	//send eMail
-	sendMail($to, $from, $subject, $content, $title);
+	sendMail($to, $from, $subject, $content, $headerImg);
 }
 
 
@@ -234,10 +242,10 @@ function organizeAmpelnForMail ($ampel_user_arr)
 	}
 	return $unique_user_arr;
 }
-function sendMail($to, $from, $subject, $html_content, $title = 'Sancho hat neue Nachrichten für Sie!')
+function sendMail($to, $from, $subject, $html_content, $headerImg = 'sancho_header_sie_haben_neue_nachrichten.jpg')
 {
-	$sancho_img = APP_ROOT . "skin/images/sancho_round_right_blue.png";
-	$logo_img = APP_ROOT . "skin/images/fh_logo.png";
+	$sanchoHeader_img = APP_ROOT . "skin/images/sancho/" . $headerImg;
+	$sanchoFooter_img = APP_ROOT . "skin/images/sancho/sancho_footer.jpg";
 	
 	//mail content as plain text (fallback if html not activated)
 	$plain_text = "Hallo,\n\n";
@@ -249,6 +257,7 @@ function sendMail($to, $from, $subject, $html_content, $title = 'Sancho hat neue
 	/*
 	 * no css styles in html-head (email clients picky about that)
 	 * tables inside tables for correct styles in different email clients
+	 * border-collapse and mso-table: this corrects strange behavior of outlook 2013 adding unwished extra space
 	 */
 	$html_text = '
 		<html>
@@ -256,26 +265,24 @@ function sendMail($to, $from, $subject, $html_content, $title = 'Sancho hat neue
 				<title>Sancho Ampelmail</title>
 			</head>
 			<body><center>
-				<table width="650px" cellpadding="0" cellspacing="0" style="border: 2px solid #65696e; border-spacing: 0px; margin-top: 40px;">  
+				<table cellpadding="0" cellspacing="0" style="border: 2px solid #000000; padding: 0px; max-width: 850px; 
+				border-collapse:collapse; mso-table-lspace:0pt; mso-table-rspace:0pt;">  
 					<tr>
-						<td align="left">
-							<table cellpadding="0" width="100%" cellspacing="0" style="padding:0; border-bottom: 2px solid #A0A0A0; margin: 0; font-family: arial, verdana, sans-serif; font-size: 0.8em; border-spacing: 0px;">
+						<td align="center">
+							<table cellpadding="0" cellspacing="0" width="100%" border="0">
 								<tr>
-									<td width="25%" style="padding: 25px;">
-										<img src="cid:SanchoFace" align="left" alt="sancho_face" width="105" height="105">
-									</td>
-									<td width="75%" style="padding: 25px;">
-										<h4 align="center" style="padding-top: 20">' . $title . '</h4>
+									<td>
+										<img src="cid:SanchoHeader" alt="sancho_header" width="100%">
 									</td>
 								</tr>
 							</table>
 						</td>
 					</tr>
 					 <tr>
-						<td align="left">
-							<table cellpadding="0" width="100%" cellspacing="0" style="padding:0; border-bottom: 2px solid #A0A0A0; margin: 0; font-family: arial, verdana, sans-serif; font-size: 0.8em; border-spacing: 0px;">
+						<td align="center">
+							<table cellpadding="0" cellspacing="0" width="100%" style="font-family: courier, verdana, sans-serif; font-size: 0.95em; border-bottom: 2px solid #000000;">
 								<tr>
-									<td style="padding: 25px;">
+									<td style="padding-left: 8%; padding-right: 8%; padding-top: 5%; padding-bottom: 5%;">
 										<br>' . $html_content . '</br>
 									</td>
 								</tr>
@@ -283,14 +290,11 @@ function sendMail($to, $from, $subject, $html_content, $title = 'Sancho hat neue
 						</td>
 					</tr>
 					<tr>
-						<td align="left">
-							<table cellpadding="0" width="100%" cellspacing="0" style="padding:0; margin: 0; font-family: arial, verdana, sans-serif; font-size: 0.8em; border-spacing: 0px;">
+						<td align="center">
+							<table cellpadding="0" cellspacing="0" width="100%">
 								<tr>
-									<td width="75%" style="padding: 25px;">
-										<span style="color: #0a629c; padding: 20 0 0 20;">So spannend kann Technik sein!</span>
-									</td>
-									<td width="25%" style="padding: 25px;">
-										<a href="https://www.technikum-wien.at"><img src="cid:Logo" align="right" alt="logo" width="120" height="70">
+									<td>
+										<img src="cid:SanchoFooter" alt="sancho_footer" width="100%">
 									</td>
 								</tr>
 							</table>
@@ -302,14 +306,10 @@ function sendMail($to, $from, $subject, $html_content, $title = 'Sancho hat neue
 	
 	$mail = new mail($to, $from, $subject, $plain_text);
 	$mail->setHtmlContent($html_text);
-	$mail->addEmbeddedImage($sancho_img, "image/png", "", "SanchoFace");
-	$mail->addEmbeddedImage($logo_img, "image/png", "", "Logo");
+	$mail->addEmbeddedImage($sanchoFooter_img, "image/jpg", "", "SanchoFooter");
+	$mail->addEmbeddedImage($sanchoHeader_img, "image/jpg", "", "SanchoHeader");
 
 	if(!$mail->send())
 		echo $p->t('global/emailNichtVersendet') . ' an ' . $to . "<br>";
 }
-
-
-
-
-
+ 

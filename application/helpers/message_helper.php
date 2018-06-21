@@ -9,7 +9,7 @@
  * @license		GPLv3
  * @since		Version 1.0.0
  */
- 
+
 /**
  * Message Helper
  *
@@ -35,7 +35,7 @@ function success($retval, $code = null, $msg_indx_prefix = 'fhc_')
 	$success->fhcCode = $code;
 	if (!is_null($code)) $success->msg = lang($msg_indx_prefix . $code);
 	$success->retval = $retval;
-	
+
 	return $success;
 }
 
@@ -51,7 +51,7 @@ function error($retval = '', $code = null, $msg_indx_prefix = 'fhc_')
 	$error->fhcCode = $code;
 	if (!is_null($code)) $error->msg = lang($msg_indx_prefix . $code);
 	$error->retval = $retval;
-	
+
 	return $error;
 }
 
@@ -64,7 +64,7 @@ function isSuccess($result)
 	{
 		return true;
 	}
-	
+
 	return false;
 }
 
@@ -78,13 +78,14 @@ function hasData($result)
 	{
 		return true;
 	}
-	
+
 	return false;
 }
 
 /**
  * Checks if the result represents an error
  * Wrapper function of isSuccess, more readable code
+ * Bob Dylan: ...there's no success like failure. And that failure's no success at all.
  */
 function isError($result)
 {

@@ -40,7 +40,7 @@ class Prestudentstatus extends Auth_Controller
 	public function index()
 	{
 		$result = "The following are the available command line interface commands\n\n";
-		$result .= "php index.ci.php jobs/Prestudentstatus CorrectStudienplan";
+		$result .= "php ".$this->config->item('index_page')." jobs/Prestudentstatus CorrectStudienplan";
 
 		echo $result.PHP_EOL;
 	}

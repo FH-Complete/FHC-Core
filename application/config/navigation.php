@@ -1,75 +1,102 @@
 <?php
 
+// --------------------------------------------------------------------------------------------------------------------
+// Header menu
+
 $config['navigation_header'] = array(
 	'*' => array(
-		'FH-Complete' => site_url(''),
-		'Vilesci' => base_url('/vilesci'),
-		'CIS' => CIS_ROOT
+		'fhcomplete' => array(
+			'link' => site_url(''),
+			'icon' => '',
+			'description' => 'FH-Complete',
+			'sort' => 1
+		),
+		'vilesci' => array(
+			'link' => base_url('vilesci'),
+			'icon' => '',
+			'description' => 'Vilesci',
+			'sort' => 2
+		),
+		'cis' => array(
+			'link' => CIS_ROOT,
+			'icon' => '',
+			'description' => 'CIS',
+			'sort' => 3
+		)
 	)
 );
+
+// --------------------------------------------------------------------------------------------------------------------
+// Left side menu
 
 $config['navigation_menu'] = array();
 
 $config['navigation_menu']['Vilesci/index'] = array(
-	'Dashboard' => array(
+	'dashboard' => array(
 		'link' => '#',
 		'description' => 'Dashboard',
-		'icon' => 'dashboard'
+		'icon' => 'dashboard',
+		'sort' => 1
 	),
-	'Lehre' => array(
+	'lehre' => array(
 		'link' => '#',
 		'icon' => 'graduation-cap',
 		'description' => 'Lehre',
 		'expand' => true,
+		'sort' => 2,
 		'children'=> array(
-			'CIS' => array(
+			'cis' => array(
 				'link' => CIS_ROOT,
 				'icon' => '',
 				'description' => 'CIS',
-				'expand' => true
+				'expand' => true,
+				'sort' => 1
 			),
-			'Infocenter' => array(
-				'link' => site_url('/system/infocenter/InfoCenter'),
+			'infocenter' => array(
+				'link' => site_url('system/infocenter/InfoCenter'),
 				'icon' => 'info',
 				'description' => 'Infocenter',
-				'expand' => true
+				'expand' => true,
+				'sort' => 2
 			),
 		)
 	),
-	'Administration' => array(
+	'administration' => array(
 		'link' => '#',
 		'icon' => 'gear',
 		'description' => 'Administration',
 		'expand' => false,
+		'sort' => 3,
 		'children'=> array(
-			'Vilesci' => array(
-				'link' => base_url('vilesci/'),
+			'vilesci' => array(
+				'link' => base_url('vilesci'),
 				'icon' => '',
 				'description' => 'Vilesci',
-				'expand' => true
+				'expand' => true,
+				'sort' => 1
 			),
-			'Extensions' => array(
-				'link' => site_url('/system/extensions/Manager'),
+			'extensions' => array(
+				'link' => site_url('system/extensions/Manager'),
 				'icon' => 'cubes',
 				'description' => 'Extensions Manager',
-				'expand' => true
+				'expand' => true,
+				'sort' => 2
 			)
 		)
 	)
 );
 
-
 $config['navigation_menu']['system/infocenter/InfoCenter/index'] = array(
-	'Freigegeben' => array(
-		'link' => base_url('index.ci.php/system/infocenter/InfoCenter/freigegeben'),
+	'freigegeben' => array(
+		'link' => site_url('system/infocenter/InfoCenter/freigegeben'),
 		'description' => 'Freigegeben',
 		'icon' => 'thumbs-up'
 	)
 );
 
 $config['navigation_menu']['system/infocenter/InfoCenter/freigegeben'] = array(
-	'Zurück' => array(
-		'link' => base_url('index.ci.php/system/infocenter/InfoCenter/index'),
+	'back' => array(
+		'link' => site_url('system/infocenter/InfoCenter/index'),
 		'description' => 'Home',
 		'icon' => 'angle-left'
 	)
