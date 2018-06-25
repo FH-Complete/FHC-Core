@@ -149,7 +149,7 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
 				<style:footnote-sep style:width="0.018cm" style:distance-before-sep="0.101cm" style:distance-after-sep="0.101cm" style:line-style="solid" style:adjustment="left" style:rel-width="25%" style:color="#000000"/>
 			</style:page-layout-properties>
 			<style:header-style>
-				<style:header-footer-properties fo:min-height="2.801cm" fo:margin-left="0cm" fo:margin-right="0cm" fo:margin-bottom="2.501cm" fo:background-color="transparent" style:dynamic-spacing="false" draw:fill="none"/>
+				<style:header-footer-properties fo:min-height="2.801cm" fo:margin-left="0cm" fo:margin-right="0cm" fo:margin-bottom="2.001cm" fo:background-color="transparent" style:dynamic-spacing="false" draw:fill="none"/>
 			</style:header-style>
 			<style:footer-style/>
 		</style:page-layout>
