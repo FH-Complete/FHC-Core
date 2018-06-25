@@ -24,75 +24,75 @@ function hide_ampel_div()
 if(is_user_logged_in())
 {
 	$user = get_uid();
-	
+
 	$ampel = new ampel();
 	$ampel->loadUserAmpel($user);
 	$rot=0;
-	$gelb = 0; 
+	$gelb = 0;
 	$gruen = 0;
 	$verpflichtend = false;
-	$cnt_verpflichtend = 0;			
-	$cnt_abgelaufen = 0;			
+	$cnt_verpflichtend = 0;
+	$cnt_abgelaufen = 0;
 	$cnt_notConf_notOverdue = 0;	//counts mandatory, not confirmed && not overdued ampeln (for popup)
-	
+
 	$datum = new datum();
 	$now = $datum->mktime_fromdate(date('Y-m-d'));
 	foreach($ampel->result as $row)
-	{		
+	{
 		$deadline =$datum->mktime_fromdate($row->deadline);
 		$vorlaufzeit = $row->vorlaufzeit;
 		$verfallszeit = $row->verfallszeit;
 		$bestaetigt = $ampel->isBestaetigt($user, $row->ampel_id);
 		$verpflichtend = $row->verpflichtend;
 		$abgelaufen = false;
-		
+
 		$datum_liegt_vor_vorlaufzeit = false;
 		$datum_liegt_nach_verfallszeit = false;
-		
+
 		if (!is_null($vorlaufzeit))
-			$datum_liegt_vor_vorlaufzeit = $now < strtotime('-' .  $vorlaufzeit . ' day', $deadline); 
-		
+			$datum_liegt_vor_vorlaufzeit = $now < strtotime('-' .  $vorlaufzeit . ' day', $deadline);
+
 		if (!is_null($verfallszeit))
 			$datum_liegt_nach_verfallszeit = $now > strtotime('+' . $verfallszeit . ' day', $deadline);
-		
+
 		//count mandatory
 		if($verpflichtend == 't')
 			$cnt_verpflichtend++;
-		
+
 		//count overdue
 		if ($datum_liegt_nach_verfallszeit)
 			$cnt_abgelaufen++;
 
 		//set status
 		if ($bestaetigt)
-			$gruen++;	
-		else if ($now >= $deadline && !$datum_liegt_nach_verfallszeit && !$bestaetigt) 
+			$gruen++;
+		else if ($now >= $deadline && !$datum_liegt_nach_verfallszeit && !$bestaetigt)
 			$rot++;
 		else if (!$datum_liegt_nach_verfallszeit && !$datum_liegt_vor_vorlaufzeit)
-			$gelb++;	
-		
+			$gelb++;
+
 		//count mandatory ampeln that are not confirmed and not overdue (for popup)
 		if ($verpflichtend == 't' && !$bestaetigt && !$datum_liegt_nach_verfallszeit && !$datum_liegt_vor_vorlaufzeit)
-			$cnt_notConf_notOverdue++;		
+			$cnt_notConf_notOverdue++;
 	}
 
-	
+
 	//if at least ONE mandatory notification, which is not overdue -> trigger notification-POPUP
 	if ($cnt_notConf_notOverdue > 0)
-	{	
+	{
 			echo '	<script>
 					$(document).ready(function()
-					{				
-						function resizeIframe(obj) 
+					{
+						function resizeIframe(obj)
 						{
 							obj.style.height = obj.contentWindow.document.body.scrollHeight + \'px\';
 						}
-						
-						var html_content = \'<iframe src="'.APP_ROOT.'cis/private/tools/ampelverwaltung.php?verpflichtend=true" name="ampel" frameborder="0" width="100%" height="100%  onload="resizeIframe(this) id="ampel_frame"></iframe><button id="close_button" onclick="hide_ampel_div()">Close</button>\';
+
+						var html_content = \'<iframe src="'.APP_ROOT.'cis/private/tools/ampelverwaltung.php?verpflichtend=true" name="ampel" frameborder="0" width="100%" height="100%  onload="resizeIframe(this) id="ampel_frame"></iframe><button id="close_button" class="btn btn-default" onclick="hide_ampel_div()">'.$p->t('tools/ampelClose').'</button>\';
 						$("#ampel_div").html(html_content);
 					});
 					</script>';
-						
+
 			echo '	<style type="text/css">
 					#ampel_div
 					{
@@ -107,8 +107,8 @@ if(is_user_logged_in())
 						background-color: #fefefe;
 						margin: auto;
 						text-align: center;
-						padding-top: 20px;
-						border: 3px solid black;
+						/*padding-top: 20px;*/
+						/*border: 3px solid black;*/
 						-webkit-box-shadow: 0px 0px 0px 2000px rgba(0,0,0,0.47);
 						-moz-box-shadow: 0px 0px 0px 2000px rgba(0,0,0,0.47);
 						box-shadow: 0px 0px 0px 2000px rgba(0,0,0,0.47);
@@ -120,21 +120,21 @@ if(is_user_logged_in())
 					#close_button
 					{
 						position: relative;
-						top: 5px;
+						top: 0px;
 						font-size: 150%;
 						height: 50px;
 						width: 100%;
 					}
 					</style>';
 		}
-	
+
 		//show & color header ampel-link
 		if($rot > 0)
 			echo '<a href="private/tools/ampelverwaltung.php" target="content" title="'.$p->t("tools/ampelsystem").'"><span style="color: red;">'.$p->t("tools/ampelsystem").'</span></a>&nbsp;&nbsp;<span style="color: #A5AFB6">|</span>&nbsp;&nbsp;';
 		elseif($gelb > 0)
 			echo '<a href="private/tools/ampelverwaltung.php" target="content" title="'.$p->t("tools/ampelsystem").'"><span style="color: orange;">'.$p->t("tools/ampelsystem").'</span></a>&nbsp;&nbsp;<span style="color: #A5AFB6">|</span>&nbsp;&nbsp;';
 		elseif($rot==0 || $rot <= $cnt_abgelaufen && $gelb==0)
-			echo '<a href="private/tools/ampelverwaltung.php" target="content" title="'.$p->t("tools/ampelsystem").'"><span style="color: #A5AFB6">'.$p->t("tools/ampelsystem").'</span></a>&nbsp;&nbsp;<span style="color: #A5AFB6">|</span>&nbsp;&nbsp;';	
+			echo '<a href="private/tools/ampelverwaltung.php" target="content" title="'.$p->t("tools/ampelsystem").'"><span style="color: #A5AFB6">'.$p->t("tools/ampelsystem").'</span></a>&nbsp;&nbsp;<span style="color: #A5AFB6">|</span>&nbsp;&nbsp;';
 		}
 else
 {

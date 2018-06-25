@@ -1878,89 +1878,6 @@ if($result = $db->db_query("SELECT obj_description('public.ci_apikey'::regclass)
 	}
 }
 
-if($result = @$db->db_query("SELECT * FROM system.tbl_filters WHERE filter_kurzbz='InfoCenterSentApplicationAll' AND app='infocenter'"))
-{
-	if($db->db_num_rows($result)==0)
-	{
-		$qry = "INSERT INTO system.tbl_filters(app, dataset_name, filter_kurzbz, person_id, description, sort,
-										default_filter, filter, oe_kurzbz)
-				VALUES ('infocenter', 'PersonActions', 'InfoCenterSentApplicationAll', NULL, '{Alle}', 1, false,
-					'{\"name\": \"Abgeschickt - Alle\", \"columns\": [{\"name\": \"Vorname\"},
-					{\"name\": \"Nachname\"}, {\"name\": \"LastAction\"}, {\"name\": \"LockUser\"},
-					{\"name\": \"Studiensemester\"}, {\"name\": \"SendDate\"}, {\"name\": \"StgAbgeschickt\"}],
-					\"filters\": [{\"name\": \"AnzahlAbgeschickt\", \"option\": \"\",
-					\"condition\": \"0\", \"operation\": \"gt\"}]}', NULL);";
-		if(!$db->db_query($qry))
-			echo '<strong>Filter: '.$db->db_last_error().'</strong><br>';
-		else
-			echo '<br>Filter InfoCenterSentApplicationAll hinzugefuegt';
-	}
-}
-
-if($result = @$db->db_query("SELECT * FROM system.tbl_filters WHERE filter_kurzbz='InfoCenterSentApplication3days' AND app='infocenter'"))
-{
-	if($db->db_num_rows($result)==0)
-	{
-		$qry = "INSERT INTO system.tbl_filters(app, dataset_name, filter_kurzbz, person_id, description, sort,
-					default_filter, filter, oe_kurzbz)
-				VALUES ('infocenter', 'PersonActions', 'InfoCenterSentApplication3days', NULL,
-					'{\"3 Tage keine Aktion\"}', 2, false, '{\"name\": \"Abgeschickt - 3 Tage keine Aktion\",
-					\"columns\": [{\"name\": \"Vorname\"}, {\"name\": \"Nachname\"}, {\"name\": \"LastAction\"},
-					{\"name\": \"LockUser\"}, {\"name\": \"Studiensemester\"}, {\"name\": \"SendDate\"},
-					{\"name\": \"StgAbgeschickt\"}],
-					\"filters\": [{\"name\": \"LastAction\", \"option\": \"days\", \"condition\": \"3\",
-					\"operation\": \"gt\"}, {\"name\": \"AnzahlAbgeschickt\", \"option\": \"\",
-					\"condition\": \"0\", \"operation\": \"gt\"}]}', NULL);";
-
-		if(!$db->db_query($qry))
-			echo '<strong>Filter: '.$db->db_last_error().'</strong><br>';
-		else
-			echo '<br>Filter InfoCenterSentApplication3days hinzugefuegt';
-	}
-}
-
-if($result = @$db->db_query("SELECT * FROM system.tbl_filters WHERE filter_kurzbz='InfoCenterNotSentApplicationAll' AND app='infocenter'"))
-{
-	if($db->db_num_rows($result)==0)
-	{
-		$qry = "INSERT INTO system.tbl_filters(app, dataset_name, filter_kurzbz, person_id, description, sort,
-				default_filter, filter, oe_kurzbz)
-				VALUES ('infocenter', 'PersonActions', 'InfoCenterNotSentApplicationAll', NULL, '{Alle}', 1, false,
-				'{\"name\": \"Nicht abgeschickt - Alle\", \"columns\": [{\"name\": \"Vorname\"},
-				{\"name\": \"Nachname\"}, {\"name\": \"LastAction\"}, {\"name\": \"LockUser\"},
-				{\"name\": \"Studiensemester\"}, {\"name\": \"SendDate\"}, {\"name\": \"StgAbgeschickt\"}],
-				\"filters\": [{\"name\": \"SendDate\", \"option\": \"\",
-				\"condition\": \"\", \"operation\": \"nset\"}]}', NULL);";
-
-		if(!$db->db_query($qry))
-			echo '<strong>Filter: '.$db->db_last_error().'</strong><br>';
-		else
-			echo '<br>Filter InfoCenterNotSentApplicationAll hinzugefuegt';
-	}
-}
-
-if($result = @$db->db_query("SELECT * FROM system.tbl_filters WHERE filter_kurzbz='InfoCenterNotSentApplication14Days' AND app='infocenter'"))
-{
-	if($db->db_num_rows($result)==0)
-	{
-		$qry = "INSERT INTO system.tbl_filters(app, dataset_name, filter_kurzbz, person_id, description, sort,
-					default_filter, filter, oe_kurzbz)
-				VALUES ('infocenter', 'PersonActions', 'InfoCenterNotSentApplication14Days', NULL,
-				'{\"14 Tage keine Aktion\"}', 2, false, '{\"name\": \"Nicht abgeschickt - 14 Tage keine Aktion\",
-				\"columns\": [{\"name\": \"Vorname\"}, {\"name\": \"Nachname\"}, {\"name\": \"LastAction\"},
-				{\"name\": \"LockUser\"}, {\"name\": \"Studiensemester\"}, {\"name\": \"SendDate\"},
-				{\"name\": \"StgAbgeschickt\"}], \"filters\": [{\"name\": \"LastAction\", \"option\": \"days\",
-				\"condition\": \"14\", \"operation\": \"gt\"}, {\"name\": \"SendDate\", \"option\": \"\",
-				\"condition\": \"\", \"operation\": \"nset\"}]}', NULL);
-		";
-
-		if(!$db->db_query($qry))
-			echo '<strong>Filter: '.$db->db_last_error().'</strong><br>';
-		else
-			echo '<br>Filter InfoCenterNotSentApplication14Days hinzugefuegt';
-	}
-}
-
 if (!$result = @$db->db_query("SELECT projekt_id FROM fue.tbl_projekt LIMIT 1"))
 {
 	$qry = "CREATE SEQUENCE fue.tbl_projekt_projekt_id_seq
@@ -2267,11 +2184,40 @@ if($result = @$db->db_query("SELECT * FROM information_schema.role_table_grants 
 	if($db->db_num_rows($result)==0)
 	{
 		$qry = "GRANT DELETE ON system.tbl_log TO web;";
-		
+
 		if(!$db->db_query($qry))
 			echo '<strong>Permission Log: '.$db->db_last_error().'</strong><br>';
 			else
 				echo 'Delete-Rechte auf system.tbl_log für Web User hinzugefügt';
+	}
+}
+
+// Add missing Foreign Key to public.tbl_rt_person.person_id
+if ($result = @$db->db_query("SELECT conname FROM pg_constraint WHERE conname = 'fk_tbl_rt_person_person_id'"))
+{
+	if ($db->db_num_rows($result) == 0)
+	{
+		$qry = "SELECT person_id FROM public.tbl_rt_person WHERE NOT EXISTS(SELECT 1 FROM public.tbl_person WHERE person_id=tbl_rt_person.person_id)";
+		if($result = $db->db_query($qry))
+		{
+			if($db->db_num_rows($result)==0)
+			{
+				$qry = "ALTER TABLE public.tbl_rt_person ADD CONSTRAINT fk_tbl_rt_person_person_id FOREIGN KEY (person_id) REFERENCES public.tbl_person ON DELETE RESTRICT ON UPDATE CASCADE;";
+
+				if (!$db->db_query($qry))
+					echo '<strong>public.tbl_rt_person '.$db->db_last_error().'</strong><br>';
+				else
+					echo '<br>public.tbl_rt_person: added foreign key on column person_id';
+			}
+			else
+			{
+				echo '<strong>public.tbl_rt_person:
+				Fehlender Foreign Key auf person_id kann nicht erstellt werden!
+				In der Tabelle public.tbl_rt_person wird auf Personen verlinkt die nicht mehr in der Tabelle
+				public.tbl_person vorhanden sind. Bitte bereinigen Sie die Datensätze manuell und starten Sie dieses Script erneut.
+				</strong>';
+			}
+		}
 	}
 }
 

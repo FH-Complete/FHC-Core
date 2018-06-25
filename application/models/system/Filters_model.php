@@ -13,7 +13,7 @@ class Filters_model extends DB_Model
 	}
 
 	/**
-	 *
+	 * Loads a filter by its app, dataset_name and filter_kurzbz
 	 */
 	public function getFilterList($app, $dataset_name, $filter_kurzbz)
 	{
@@ -24,7 +24,6 @@ class Filters_model extends DB_Model
 			'app' => $app,
 			'dataset_name' => $dataset_name,
 			'person_id' => null,
-			'default_filter' => false,
 			'array_length(description, 1) >' => 0,
 			'filter_kurzbz ILIKE' => $filter_kurzbz
 		);
@@ -33,7 +32,7 @@ class Filters_model extends DB_Model
 	}
 
 	/**
-	 *
+	 * Loads a custom filter by its app, dataset_name and the uid of the owner
 	 */
 	public function getCustomFiltersList($app, $dataset_name, $uid)
 	{
@@ -49,13 +48,5 @@ class Filters_model extends DB_Model
 		);
 
 		return $this->loadWhere($filterParametersArray);
-	}
-
-	/**
-	 *
-	 */
-	public function deleteCustomFilter($filter_id)
-	{
-		return $this->delete($filter_id);
 	}
 }

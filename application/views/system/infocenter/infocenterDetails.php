@@ -13,41 +13,35 @@
 			'sbadmintemplate' => true,
 			'addons' => true,
 			'navigationwidget' => true,
-			'customCSSs' =>
-				array(
-					'public/css/sbadmin2/admintemplate.css',
-					'public/css/sbadmin2/tablesort_bootstrap.css'
+			'customCSSs' => array(
+				'public/css/sbadmin2/admintemplate.css',
+				'public/css/sbadmin2/tablesort_bootstrap.css'
+			),
+			'customJSs' => array(
+				'public/js/bootstrapper.js',
+				'public/js/tablesort/tablesort.js',
+				'public/js/infocenter/infocenterDetails.js'
+			),
+			'phrases' => array(
+				'infocenter' => array(
+					'notizHinzufuegen',
+					'notizAendern',
+					'bewerberParken',
+					'bewerberAusparken',
+					'nichtsZumAusparken',
+					'fehlerBeimAusparken',
+					'fehlerBeimParken',
+					'bewerberGeparktBis'
 				),
-			'customJSs' =>
-				array(
-					'public/js/bootstrapper.js',
-					'public/js/tablesort/tablesort.js',
-					'public/js/infocenter/infocenterDetails.js'
+				'ui' => array(
+					'gespeichert',
+					'fehlerBeimSpeichern'
 				),
-			'phrases' =>
-				array(
-					'infocenter' =>
-					array(
-						'notizHinzufuegen',
-						'notizAendern',
-						'bewerberParken',
-						'bewerberAusparken',
-						'nichtsZumAusparken',
-						'fehlerBeimAusparken',
-						'fehlerBeimParken',
-						'bewerberGeparktBis'
-					),
-					'ui' =>
-					array(
-						'gespeichert',
-						'fehlerBeimSpeichern'
-					),
-					'global' =>
-					array(
-						'bis',
-						'zeilen'
-					)
+				'global' => array(
+					'bis',
+					'zeilen'
 				)
+			)
 		)
 	);
 ?>
@@ -69,12 +63,12 @@
 					<div class="headerright text-right">
 						<?php
 						if (isset($lockedby)):
-							echo  $this->p->t('global', 'wirdBearbeitetVon') . ': ';
+							echo $this->p->t('global', 'wirdBearbeitetVon').': ';
 							echo $lockedby;
-							if (!isset($show_lock_link) || $show_lock_link === true): ?>
+							if ($origin_page == 'index'): ?>
 								&nbsp;&nbsp;
-								<a href="../unlockPerson/<?php echo $stammdaten->person_id; ?>?fhc_controller_id=<?php echo $fhc_controller_id; ?>">
-									<i class="fa fa-sign-out"></i>&nbsp;<?php echo  ucfirst($this->p->t('ui', 'freigeben')) ?>
+								<a href="unlockPerson/<?php echo $stammdaten->person_id; ?>?fhc_controller_id=<?php echo $fhc_controller_id; ?>">
+									<i class="fa fa-sign-out"></i>&nbsp;<?php echo ucfirst($this->p->t('ui', 'freigeben')) ?>
 								</a>
 							<?php endif; ?>
 						<?php endif; ?>
@@ -103,7 +97,9 @@
 						<div class="panel panel-primary">
 							<a name="DokPruef"></a><!-- anchor for jumping to the section -->
 							<div class="panel-heading text-center">
-								<h4><?php echo  ucfirst($this->p->t('infocenter', 'dokumentenpruefung')) ?></h4>
+								<h4>
+									<?php echo  ucfirst($this->p->t('infocenter', 'dokumentenpruefung')) ?>
+								</h4>
 							</div>
 							<div class="panel-body">
 								<?php $this->load->view('system/infocenter/dokpruefung.php'); ?>
@@ -118,8 +114,9 @@
 						<div class="panel panel-primary">
 							<div class="panel-heading text-center">
 								<a name="ZgvPruef"></a>
-								<h4><?php echo $this->p->t('infocenter', 'zgv'). ' - '.
-									ucfirst($this->p->t('lehre', 'pruefung'))?></h4>
+								<h4>
+									<?php echo $this->p->t('infocenter', 'zgv').' - '.ucfirst($this->p->t('lehre', 'pruefung'))?>
+								</h4>
 							</div>
 							<div class="panel-body">
 								<?php $this->load->view('system/infocenter/zgvpruefungen.php'); ?><!-- /.panel-group -->
@@ -134,7 +131,9 @@
 						<div class="panel panel-primary">
 							<div class="panel-heading text-center">
 								<a name="Nachrichten"></a>
-								<h4 class="text-center"><?php echo ucfirst($this->p->t('global', 'nachrichten')) ?></h4>
+								<h4 class="text-center">
+									<?php echo ucfirst($this->p->t('global', 'nachrichten')) ?>
+								</h4>
 							</div>
 							<div class="panel-body">
 								<div class="row">
@@ -153,8 +152,9 @@
 						<div class="panel panel-primary">
 							<div class="panel-heading text-center">
 								<a name="NotizAkt"></a>
-								<h4 class="text-center"><?php echo ucfirst($this->p->t('global', 'notizen')). ' & '.
-									ucfirst($this->p->t('global', 'aktivitaeten')) ?></h4>
+								<h4 class="text-center">
+									<?php echo ucfirst($this->p->t('global', 'notizen')).' & '.ucfirst($this->p->t('global', 'aktivitaeten')) ?>
+								</h4>
 							</div>
 							<div class="panel-body">
 								<div class="row">

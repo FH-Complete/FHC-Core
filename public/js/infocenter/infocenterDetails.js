@@ -1,5 +1,4 @@
 
-var fhc_controller_id = FHC_AjaxClient.getUrlParameter('fhc_controller_id');
 const CONTROLLER_URL = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router + "/"+FHC_JS_DATA_STORAGE_OBJECT.called_path;
 const CALLED_PATH = FHC_JS_DATA_STORAGE_OBJECT.called_path;
 
@@ -403,9 +402,9 @@ var InfocenterDetails = {
 	_refreshLog: function()
 	{
 		var personid = $("#hiddenpersonid").val();
-		$("#logs").load(CONTROLLER_URL + '/reloadLogs/' + personid + '?fhc_controller_id=' + fhc_controller_id,
-			function ()
-			{
+		$("#logs").load(
+			CONTROLLER_URL + '/reloadLogs/' + personid + '?fhc_controller_id=' + FHC_AjaxClient.getUrlParameter('fhc_controller_id'),
+			function () {
 				//readd tablesorter
 				InfocenterDetails._formatLogTable()
 			}

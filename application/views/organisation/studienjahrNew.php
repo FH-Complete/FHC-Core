@@ -8,7 +8,7 @@ $this->load->view('templates/header', array('title' => 'StudienjahrNew', 'jquery
 		<div class="span4">
 			<h2>Neues Studienjahr anlegen</h2>
 			<form method="post"
-				  action="<?php echo APP_ROOT."index.ci.php/organisation/studienjahr/insStudienjahr"; ?>"
+				  action="<?php echo site_url("organisation/studienjahr/insStudienjahr"); ?>"
 				  id="newStudienjahrForm">
 				<table>
 					<tr>
