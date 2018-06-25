@@ -31,7 +31,20 @@ var FHC_NavigationWidget = {
 					if (FHC_AjaxClient.hasData(data))
 					{
 						jQuery.each(FHC_AjaxClient.getData(data), function(i, e) {
-							$(".menu-header-items").append('<a class="navbar-brand" href="' + e + '">' + i + '</a>');
+
+							var headerEntry = '';
+
+							if (e['icon'] != 'undefined' && e['icon'] != '')
+							{
+								headerEntry += '<i class="navbar-brand-icon fa fa-' + e['icon'] + ' fa-fw"></i>';
+							}
+
+							var target = '';
+							if (e['target'] != null) target = e['target'];
+
+							headerEntry += '<a class="navbar-brand" href="' + e['link'] + '" target=' + target + '>' + e['description'] + '</a>';
+
+							$(".menu-header-items").append(headerEntry);
 						});
 					}
 				}
@@ -116,7 +129,10 @@ var FHC_NavigationWidget = {
 			strMenu += '<span>';
 		}
 
-		strMenu += '<a href="' + item['link'] + '"' + expanded + '>';
+		var target = '';
+		if (item['target'] != null) target = item['target'];
+
+		strMenu += '<a href="' + item['link'] + '"' + expanded + ' target="' + target + '">';
 
 		if (item['icon'] != 'undefined')
 		{
