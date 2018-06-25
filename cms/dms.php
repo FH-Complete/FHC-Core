@@ -73,10 +73,16 @@ if($doc->isLocked($id))
 		
 		$dokumente_person = new dokument();
 		$dokumente_person->getAllDokumenteForPerson($person_id, true);
+		
 		$dokumente_arr = array();
 		foreach ($dokumente_person->result AS $row)
 			$dokumente_arr[] .= $row->dokument_kurzbz;
-		
+
+		// An der FHTW wird das vorläufige ZGV Dokument verlangt und kann somit auch heruntergeladen werden
+		if (CAMPUS_NAME == 'FH Technikum Wien')
+		{
+			$dokumente_arr[] .= 'ZgvBaPre';
+		}
 		if ($person_id!=$akte_person || !in_array($akte_dokument_kurzbz, $dokumente_arr))
 			die('Sie haben keinen Zugriff auf dieses Dokument');
 	}
