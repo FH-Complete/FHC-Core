@@ -17,10 +17,10 @@ if (! defined('BASEPATH'))
 class AmpelMail extends FHC_Controller
 {
 	const CIS_AMPELVERWALTUNG_URL =
-		CIS_ROOT. "index.php?sprache=German&content_id=&menu=".
-		CIS_ROOT. "menu.php?content_id=&content=".
-		CIS_ROOT. "private/tools/ampelverwaltung.php";
-	
+		CIS_ROOT. "cis/index.php?menu=".
+		CIS_ROOT. "cis/menu.php?content_id=&content=".
+		CIS_ROOT. "cis/private/tools/ampelverwaltung.php";
+
 	/**
 	 * Constructor
 	 */
@@ -39,11 +39,11 @@ class AmpelMail extends FHC_Controller
 			echo "Jobs must be run from the CLI";
 			exit;
 		}
-		
+
 		// Load models
 		$this->load->model('content/Ampel_model', 'AmpelModel');
 		$this->load->model('person/Person_model', 'PersonModel');
-		
+
 		// Load helpers
 		$this->load->helper('sancho');
 	}
@@ -60,7 +60,7 @@ class AmpelMail extends FHC_Controller
 
 		echo $result. PHP_EOL;
 	}
-	
+
 	/**
 	 * Generates mail content for new and overdue Ampeln, which
 	 * 1. are not confirmed by the user yet and
@@ -81,7 +81,7 @@ class AmpelMail extends FHC_Controller
 		if (hasData($result_active_ampeln))
 		{
 			$ampel_arr = $result_active_ampeln->retval;
-			
+
 			// Loop through ampeln
 			foreach ($ampel_arr as $ampel)
 			{
@@ -95,11 +95,11 @@ class AmpelMail extends FHC_Controller
 
 				// get all user, who get this ampel
 				$result_ampel_user = $this->AmpelModel->execBenutzerSelect($qry_all_ampel_user);
-				
+
 				if (hasData($result_ampel_user))
 				{
 					$ampel_user_arr = $result_ampel_user->retval;
-					
+
 					// loop through all user, who get this ampel
 					foreach ($ampel_user_arr as $ampel_user)
 					{
@@ -131,7 +131,7 @@ class AmpelMail extends FHC_Controller
 							$html_text = '
 								<p><strong>'. strtoupper($ampel->kurzbz). '</strong><br>
 								<small>
-									<i style="color: #65696E;">Die Deadline für die Bestätigung war am 
+									<i style="color: #65696E;">Die Deadline für die Bestätigung war am
 										<span style="color: #FF0000;">'. date_format($deadline, 'Y-m-d'). '</span>
 									</i>
 								</small></p><br>';
@@ -177,7 +177,7 @@ class AmpelMail extends FHC_Controller
 			);
 		};
 	}
-	
+
 	// ------------------------------------------------------------------------
 	// Private methods
 	/**
@@ -190,10 +190,10 @@ class AmpelMail extends FHC_Controller
 	private function _getAmpelContentData($uid, $html_text, $ampel_data_arr)
 	{
 		$firstName = $this->PersonModel->getByUid($uid)->retval[0]->vorname;
-		
+
 		// check if user already exists in the array
 		$key_position = array_search($uid, array_column($ampel_data_arr, 'uid'));
-		
+
 		// If user already exists in the array, add only new ampel data to users ampel list
 		if ($key_position !== false)
 		{

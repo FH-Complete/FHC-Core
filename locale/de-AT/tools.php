@@ -59,6 +59,7 @@ $this->phrasen['tools/ampelAbgelaufenTxt']='Sie können diese Ampeln weiterhin l
 $this->phrasen['tools/ampelBestaetigtAbgelaufen']='Bereits bestätigt oder abgelaufen';
 $this->phrasen['tools/ampelKeineAktuellen']='Keine aktuellen Ampeln';
 $this->phrasen['tools/ampelKeineAktuellenTxt']='Sie haben zur Zeit keine aktuellen Ampeln.';
+$this->phrasen['tools/ampelClose']='Jetzt nicht';
 
 //Software fuer Lehre -> Softgrid
 $this->phrasen['tools/applikationsliste']='Applikationsliste';
