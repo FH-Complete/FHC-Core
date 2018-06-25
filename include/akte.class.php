@@ -316,7 +316,7 @@ class akte extends basis_db
 			$qry.=" AND dokument_kurzbz=".$this->db_add_param($dokument_kurzbz);
 		if($stg_kz != null && $prestudent_id != null)
 			$qry.=" AND dokument_kurzbz not in (SELECT dokument_kurzbz FROM public.tbl_dokument JOIN public.tbl_dokumentstudiengang USING(dokument_kurzbz)
-				WHERE studiengang_kz= ".$this->db_add_param($stg_kz).") AND dokument_kurzbz NOT IN ('Zeugnis') AND dokument_kurzbz NOT IN
+				WHERE studiengang_kz= ".$this->db_add_param($stg_kz).") AND dokument_kurzbz NOT IN ('Zeugnis','DiplSupp','Bescheid') AND dokument_kurzbz NOT IN
 				(SELECT dokument_kurzbz FROM public.tbl_dokumentprestudent JOIN public.tbl_dokument USING(dokument_kurzbz)
 				WHERE prestudent_id=".$this->db_add_param($prestudent_id).")";
 
