@@ -16,10 +16,7 @@ if (! defined('BASEPATH'))
 
 class AmpelMail extends FHC_Controller
 {
-	const CIS_AMPELVERWALTUNG_URL =
-		CIS_ROOT. "cis/index.php?menu=".
-		CIS_ROOT. "cis/menu.php?content_id=&content=".
-		CIS_ROOT. "cis/private/tools/ampelverwaltung.php";
+	private $CIS_AMPELVERWALTUNG_URL;
 
 	/**
 	 * Constructor
@@ -39,7 +36,9 @@ class AmpelMail extends FHC_Controller
 			echo "Jobs must be run from the CLI";
 			exit;
 		}
-
+		$this->CIS_AMPELVERWALTUNG_URL = CIS_ROOT. "cis/index.php?menu=".
+			CIS_ROOT. "cis/menu.php?content_id=&content=".
+			CIS_ROOT. "cis/private/tools/ampelverwaltung.php";
 		// Load models
 		$this->load->model('content/Ampel_model', 'AmpelModel');
 		$this->load->model('person/Person_model', 'PersonModel');
@@ -206,7 +205,7 @@ class AmpelMail extends FHC_Controller
 				'uid' => $uid,
 				'firstName' => $firstName,
 				'ampel_list' => $html_text,
-				'link' => self::CIS_AMPELVERWALTUNG_URL
+				'link' => $this->CIS_AMPELVERWALTUNG_URL
 			);
 		}
 		return $ampel_data_arr;
