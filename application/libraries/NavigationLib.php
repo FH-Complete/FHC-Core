@@ -234,7 +234,7 @@ class NavigationLib
 						if (isset($config[$configName]) && is_array($config[$configName]))
 						{
 							$extensionArray = array_merge_recursive(
-								$json_extension,
+								$extensionArray,
 								$this->_wildcardsearch($config[$configName],
 								$navigationPage)
 							);
