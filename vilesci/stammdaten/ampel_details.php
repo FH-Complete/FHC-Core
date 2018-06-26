@@ -45,11 +45,11 @@ $datum_obj = new datum();
 	<title>Ampel - Details</title>
 	<link rel="stylesheet" href="../../skin/fhcomplete.css" type="text/css">
 	<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
-	<link rel="stylesheet" href="../../vendor/fortawesome/font-awesome/css/font-awesome.min.css">
-	<link rel="stylesheet" href="../../skin/jquery-ui-1.9.2.custom.min.css" type="text/css">
-	<script type="text/javascript" src="../../vendor/christianbach/tablesorter/jquery.tablesorter.min.js"></script>
-	<script type="text/javascript" src="../../vendor/components/jqueryui/jquery-ui.min.js"></script>
+	<link rel="stylesheet" href="../../vendor/components/font-awesome/css/font-awesome.min.css">
+	<link rel="stylesheet" href="../../vendor/components/jqueryui/themes/base/jquery-ui.min.css">
 	<script type="text/javascript" src="../../vendor/components/jquery/jquery.min.js"></script>
+	<script type="text/javascript" src="../../vendor/components/jqueryui/jquery-ui.min.js"></script>
+		<script type="text/javascript" src="../../vendor/christianbach/tablesorter/jquery.tablesorter.min.js"></script>
 	<script type="text/javascript" src="../../vendor/twbs/bootstrap/dist/js/bootstrap.min.js"></script>
 	<script type="text/javascript" src="../../include/js/jquery.ui.datepicker.translation.js"></script>
 	<script type="text/javascript">
@@ -180,7 +180,7 @@ $datum_obj = new datum();
 				<td>Deadline&nbsp
 					<i class="fa fa-info-circle fa-lg" aria-hidden="true" data-toggle="tooltip" data-placement="left" title="Die Deadline gibt den Tag an, ab dem die Ampel von gelb auf rot gesetzt wird."></i>
 				</td>
-				<td><input type="date" name="deadline" size="10" maxlength="10" value="'.htmlspecialchars($datum_obj->formatDatum($ampel->deadline,'Y-m-d')).'" required></td>
+				<td><input type="text" class="datepicker_datum" name="deadline" size="10" maxlength="10" value="'.htmlspecialchars($datum_obj->formatDatum($ampel->deadline,'Y-m-d')).'" required></td>
 			</tr>
 			<tr valign="top">
 				<td rowspan="3">Benutzer Select</td>

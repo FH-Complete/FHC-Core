@@ -20,7 +20,8 @@ var FHC_NavigationWidget = {
 	 * Renders the header menu (top horizontal menu)
 	 */
 	renderHeaderMenu: function() {
-		//
+
+		// Retrives the header menu array
 		FHC_AjaxClient.ajaxCallGet(
 			'system/Navigation/header',
 			{
@@ -28,24 +29,16 @@ var FHC_NavigationWidget = {
 			},
 			{
 				successCallback: function(data, textStatus, jqXHR) {
+
 					if (FHC_AjaxClient.hasData(data))
 					{
+						var strHeaderMenu = '';
+
 						jQuery.each(FHC_AjaxClient.getData(data), function(i, e) {
-
-							var headerEntry = '';
-
-							if (e['icon'] != 'undefined' && e['icon'] != '')
-							{
-								headerEntry += '<i class="navbar-brand-icon fa fa-' + e['icon'] + ' fa-fw"></i>';
-							}
-
-							var target = '';
-							if (e['target'] != null) target = e['target'];
-
-							headerEntry += '<a class="navbar-brand" href="' + e['link'] + '" target=' + target + '>' + e['description'] + '</a>';
-
-							$(".menu-header-items").append(headerEntry);
+							if (e != null) strHeaderMenu += FHC_NavigationWidget._buildHeaderMenuStructure(e);
 						});
+
+						$(".menu-header-items").html(strHeaderMenu);
 					}
 				}
 			}
@@ -56,7 +49,8 @@ var FHC_NavigationWidget = {
 	 * Renders the side left menu
 	 */
 	renderSideMenu: function() {
-		//
+
+		// Retrives the left menu array
 		FHC_AjaxClient.ajaxCallGet(
 			'system/Navigation/menu',
 			{
@@ -64,24 +58,48 @@ var FHC_NavigationWidget = {
 			},
 			{
 				successCallback: function(data, textStatus, jqXHR) {
+
 					if (FHC_AjaxClient.hasData(data))
 					{
-						var strMenu = '';
+						FHC_NavigationWidget._printCollapseIcon(); // Applies bootstrap SB Admin 2 theme elements to the left menu
 
-						FHC_NavigationWidget._printCollapseIcon();
+						var strLeftMenu = '';
 
+						// Builds left menu
 						jQuery.each(FHC_AjaxClient.getData(data), function(i, e) {
-							if (e != null) strMenu += FHC_NavigationWidget._printNavItem(e);
+							if (e != null) strLeftMenu += FHC_NavigationWidget._buildLeftMenuStructure(e);
 						});
 
-						$("#side-menu").html(strMenu);
-						$("#side-menu").metisMenu();
+						$("#side-menu").html(strLeftMenu); // render left menu
+						$("#side-menu").metisMenu(); // call the Bootstrap SB Admin 2 theme renderer
 					}
 
+					// If this global function is present...
 					if (typeof sideMenuHook == 'function')
 					{
-						sideMenuHook();
+						sideMenuHook(); // ...then call it
 					}
+				}
+			}
+		);
+	},
+
+	/**
+	 * Calls URL to retrive a refreshed menu array
+	 */
+	refreshSideMenuHook: function(url) {
+
+		FHC_AjaxClient.ajaxCallGet(
+			url,
+			{
+				navigation_page: FHC_NavigationWidget._getNavigationWidgetCalled()
+			},
+			{
+				successCallback: function(data, textStatus, jqXHR) {
+					FHC_NavigationWidget.renderSideMenu();
+				},
+				errorCallback: function(jqXHR, textStatus, errorThrown) {
+					alert(textStatus);
 				}
 			}
 		);
@@ -91,12 +109,16 @@ var FHC_NavigationWidget = {
 	// Private methods
 
 	/**
-	 *
+	 * Applies bootstrap SB Admin 2 theme elements to the left menu
 	 */
 	_printCollapseIcon: function() {
 		// Hiding/showing navigation menu - works only with sb admin 2 template!!
 		if(!$("#collapseicon").length)
-			$("#side-menu").parent().append('<div id="collapseicon" title="hide Menu" class="text-right" style="cursor: pointer; color: #337ab7"><i class="fa fa-angle-double-left fa-fw"></i></div>');
+			$("#side-menu").parent().append(
+				'<div id="collapseicon" title="hide Menu" class="text-right" style="cursor: pointer; color: #337ab7">' +
+				' <i class="fa fa-angle-double-left fa-fw"></i>' +
+				'</div>'
+			);
 
 		$("#collapseicon").click(function() {
 			$("#page-wrapper").css('margin-left', '0px');
@@ -114,48 +136,68 @@ var FHC_NavigationWidget = {
 	},
 
 	/**
-	 *
+	 * Recursively builds the header menu structure
 	 */
-	_printNavItem: function(item, depth = 1) {
+	_buildHeaderMenuStructure: function(item) {
 
-		strMenu = "";
-		var expanded = typeof item['expand'] != 'undefined' && item['expand'] === true ? ' active' : '';
+		var strHeaderMenu = '';
 
-		strMenu += '<li class="' + expanded + '">';
-
-		if (typeof item['subscriptLinkClass'] != 'undefined' && typeof item['subscriptDescription'] != 'undefined'
-			&& item['subscriptLinkClass'] != null && item['subscriptDescription'] != null)
+		if (item['icon'] != 'undefined' && item['icon'] != '')
 		{
-			strMenu += '<span>';
+			strHeaderMenu += '<i class="navbar-brand-icon fa fa-' + item['icon'] + ' fa-fw"></i>';
 		}
 
 		var target = '';
 		if (item['target'] != null) target = item['target'];
 
-		strMenu += '<a href="' + item['link'] + '"' + expanded + ' target="' + target + '">';
+		strHeaderMenu += '<a class="navbar-brand" href="' + item['link'] + '" target="' + target + '">' + item['description'] + '</a>';
+
+		return strHeaderMenu;
+	},
+
+	/**
+	 * Recursively builds the left menu structure
+	 */
+	_buildLeftMenuStructure: function(item, depth = 1) {
+
+		strLeftMenu = "";
+		var expanded = item['expand'] != null && item['expand'] === true ? ' active' : '';
+
+		strLeftMenu += '<li class="' + expanded + '">';
+
+		if (item['subscriptLinkClass'] != null && item['subscriptDescription'] != null)
+		{
+			strLeftMenu += '<span>';
+		}
+
+		var target = '';
+		if (item['target'] != null) target = item['target'];
+
+		strLeftMenu += '<a href="' + item['link'] + '"' + expanded + ' target="' + target + '">';
 
 		if (item['icon'] != 'undefined')
 		{
-			strMenu += '<i class="fa fa-' + item['icon'] + ' fa-fw"></i> ';
+			strLeftMenu += '<i class="fa fa-' + item['icon'] + ' fa-fw"></i> ';
 		}
 
-		strMenu += item['description'];
+		strLeftMenu += item['description'];
 
-		if (typeof item['children'] != 'undefined' && Object.keys(item['children']).length > 0)
+		if (item['children'] != null && Object.keys(item['children']).length > 0)
 		{
-			strMenu += '<span class="fa arrow"></span>';
+			strLeftMenu += '<span class="fa arrow"></span>';
 		}
 
-		strMenu += '</a>';
+		strLeftMenu += '</a>';
 
-		if (typeof item['subscriptLinkClass'] != 'undefined' && typeof item['subscriptDescription'] != 'undefined'
-			&& item['subscriptLinkClass'] != null && item['subscriptDescription'] != null)
+		if (item['subscriptLinkClass'] != null && item['subscriptDescription'] != null)
 		{
-			strMenu += '<a class="' + item['subscriptLinkClass'] + ' menuSubscriptLink" value="' + item['subscriptLinkValue'] + '" href="#"> (' + item['subscriptDescription'] + ')</a>';
-			strMenu += '</span>';
+			strLeftMenu += '<a class="' + item['subscriptLinkClass'] + ' menuSubscriptLink" value="' + item['subscriptLinkValue'] + '" href="#">' +
+						' (' + item['subscriptDescription'] + ')' +
+						'</a>';
+			strLeftMenu += '</span>';
 		}
 
-		if (typeof item['children'] != 'undefined' && Object.keys(item['children']).length > 0)
+		if (item['children'] != null && Object.keys(item['children']).length > 0)
 		{
 			var level = '';
 			if (depth === 1)
@@ -167,18 +209,18 @@ var FHC_NavigationWidget = {
 				level = 'third';
 			}
 
-			strMenu += '<ul class="nav nav-' + level + '-level" ' + expanded + '>';
+			strLeftMenu += '<ul class="nav nav-' + level + '-level" ' + expanded + '>';
 
 			jQuery.each(item['children'], function(i, e) {
-				if (e != null) strMenu += FHC_NavigationWidget._printNavItem(e, ++depth);
+				if (e != null) strLeftMenu += FHC_NavigationWidget._buildLeftMenuStructure(e, ++depth);
 			});
 
-			strMenu += '</ul>';
+			strLeftMenu += '</ul>';
 		}
 
-		strMenu += '</li>';
+		strLeftMenu += '</li>';
 
-		return strMenu;
+		return strLeftMenu;
 	},
 
 	/**

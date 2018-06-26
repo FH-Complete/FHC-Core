@@ -178,7 +178,7 @@ class Filters extends FHC_Controller
 		}
 		else
 		{
-			$this->outputJsonError('Wrong parameter');
+			$this->outputJsonError('An error occurred while saving a custom filter');
 		}
 	}
 

@@ -3,26 +3,12 @@
  */
 
 /**
-* Refreshes the side menu
-* NOTE: it is called from the FilterWidget therefore must be a global function
+* Global function used by FilterWidget JS to refresh the side menu
+* NOTE: it is called from the FilterWidget JS therefore must be a global function
 */
-function refreshSideMenu()
+function refreshSideMenuHook()
 {
-	//
-	FHC_AjaxClient.ajaxCallGet(
-		'system/infocenter/InfoCenter/setNavigationMenuArrayJson',
-		{
-			navigation_page: FHC_NavigationWidget._getNavigationWidgetCalled()
-		},
-		{
-			successCallback: function(data, textStatus, jqXHR) {
-				FHC_NavigationWidget.renderSideMenu();
-			},
-			errorCallback: function(jqXHR, textStatus, errorThrown) {
-				alert(textStatus);
-			}
-		}
-	);
+	FHC_NavigationWidget.refreshSideMenuHook('system/infocenter/InfoCenter/setNavigationMenuArrayJson');
 }
 
 /**

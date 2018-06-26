@@ -328,29 +328,36 @@ function typeWrite(span){
   },randInt+4500);
 }
 
-$(document).ready(function(){
-  typeWrite('sancho_ampel_text');
-});
 
 </script>
 </head>
 
 
 <body style="font-family: Arial, Helvetica, sans-serif; font-size: 13px;">
-	<div class="container" > 
+	<div class="container-fluid" style="padding: 0px;"> 
   
 	<?php 
 	//title in CIS
 	if (!$is_popup)
 		echo '<h3>' . $p->t('tools/ampelsystem') . '</h3>';
 		
-	//title in popup for mandatory ampeln 
+	//*****************************************			AROUSE SANCHO for mandatory ampeln
 	if ($is_popup)
-		echo '<p><p><h3>' . $p->t('tools/ampelPopupTitel'). '</h3><p><br></p>';
+	{
+	//sancho message if mandatory ampeln exist
+		if (count($user_ampel_arr) > 0)
+		{
+			echo '		
+				<div>
+					<img src="../../../skin/images/sancho/sancho_header_du_hast_verpflichtende_ampeln.jpg" alt="sancho_verpflichtende_ampeln" style="width: 100%;">
+				</div>			
+				<p><br><br></p>';		
+		}	
+	}
 	?>
 	
 	<!--*****************************************	PANEL-GROUP -->
-	<div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">		
+	<div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true" style="padding-left: 15px; padding-right:15px;">		
 		
 	<!--*****************************************	radiobuttons actual term / all -->	
 	<?php
@@ -370,30 +377,7 @@ $(document).ready(function(){
 	<?php
 	} //end if
 	
-	
-//*****************************************			AROUSE SANCHO for mandatory ampeln
-	if ($is_popup)
-	{
-	//sancho message if mandatory ampeln exist
-		if (count($user_ampel_arr) == 1)
-			$ovdue_txt = 'ich habe 1 Nachricht entdeckt, die verpflichtend zu bestätigen ist.';
-		else if (count($user_ampel_arr) > 1)
-			$ovdue_txt = 'ich habe ' . count($user_ampel_arr) . ' Nachrichten entdeckt, die verpflichtend zu bestätigen sind.';
 
-		if (count($user_ampel_arr) > 0)
-		{
-			echo '
-				<div class="row">
-					<div class="col-xs-2">
-						<img src="../../../skin/images/sancho_round_right_red.png" alt="sancho_ampel_ueberfaellig" class="img-circle" style="width: 120px;">
-					</div>
-					<div class="col-xs-8" style="color: red; font-weight: bold; font-family: Courier New, Courier, monospace;">
-						<br><br><span id="sancho_ampel_text"><noscript>Hallo ' . $person->vorname . ', ' . $ovdue_txt . ' ' . $p->t('tools/ampelBitteBestaetigen'). '</noscript></span>
-					</div>			
-				</div>
-				<p><br><br></p>';		
-		}	
-	}
 //*****************************************			COLLAPSED PANELS WITH AMPELN
 	
 	$cnt = 1;								//counter to set iterative id's
@@ -418,7 +402,17 @@ $(document).ready(function(){
 					</div>
 				</div>
 			</div>';	
-
+	}
+	elseif ($cnt_active != 0 && !$is_popup)
+	{
+		echo '
+			<div class="panel">
+				<div class="row" style="margin-bottom: 15px; padding-left: 15px;">
+					<div class="panel-heading" style="background-color: transparent" role="tab" id="heading">
+						<h4>' . $p->t('tools/ampelAktuelleAmpeln'). '</h4>
+					</div>
+				</div>
+			</div>';	
 	}
 	
 	//fill panel with ampeln
@@ -435,6 +429,7 @@ $(document).ready(function(){
 				<div class="panel">
 					<div class="row" style="margin-bottom: 15px; padding-left: 15px;">
 						<div class="panel-heading" style="background-color: transparent" role="tab" id="heading">
+						<br>
 							<h4>' . $p->t('tools/ampelAbgelaufenTitel'). '</h4>
 							<small>' . $p->t('tools/ampelAbgelaufenTxt'). '</small>
 						</div>
@@ -492,8 +487,6 @@ $(document).ready(function(){
 					</button>
 				</form>
 			</div>
-			
-
 		</div>		
 	</div>
 	<?php 

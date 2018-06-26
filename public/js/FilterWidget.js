@@ -11,6 +11,8 @@
 
 /**
  * Global function used by NavigationWidget JS to bind events to side menu elements
+ * NOTE: it is called from the NavigationWidget JS therefore must be a global function
+ *		Be carefull about recursive function calls!!!
  */
 function sideMenuHook()
 {
@@ -32,10 +34,10 @@ function sideMenuHook()
 					}
 					else
 					{
-						// If a success and refreshSideMenu is a valid function then call it to refresh the side menu
-						if (typeof refreshSideMenu == "function")
+						// If a success and refreshSideMenuHook is a valid function then call it to refresh the side menu
+						if (typeof refreshSideMenuHook == "function")
 						{
-							refreshSideMenu();
+							refreshSideMenuHook();
 						}
 					}
 				}
@@ -493,7 +495,7 @@ var FHC_FilterWidget = {
  					filter_page: FHC_FilterWidget.getFilterPage()
  				},
  				{
- 					successCallback: refreshSideMenu // NOTE: to be checked
+ 					successCallback: refreshSideMenuHook // NOTE: to be checked
  				}
  			);
  		}
