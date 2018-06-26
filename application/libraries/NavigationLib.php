@@ -47,114 +47,23 @@ class NavigationLib
 	// Public methods
 
 	/**
-	 * Creates the left Menu for each Page
-	 * @param navigation_widget_called GET Parameter witch holds the currently called Page
+	 * Creates the left menu for each Page
+	 * @param navigationPage GET Parameter witch holds the currently called Page
 	 * @return array with the Menu Entries
 	 */
 	public function getMenuArray($navigationPage)
 	{
-		$menuArray = array();
-
-		if (isset($navigationPage))
-		{
-			// Get Menu Entries of the Core
-			$navigationMenuArray = $this->_ci->config->item(self::CONFIG_MENU_NAME);
-			$menuArray = $this->_wildcardsearch($navigationMenuArray, $navigationPage);
-
-			// Load Menu Entries of Extensions
-			$extensions = $this->_ci->extensionslib->getInstalledExtensions();
-			if(hasData($extensions))
-			{
-				$json_extension = array();
-				foreach($extensions->retval as $ext)
-				{
-					$filename = APPPATH.'config/'.ExtensionsLib::EXTENSIONS_DIR_NAME.'/'.$ext->name.'/'.self::CONFIG_NAVIGATION_FILENAME;
-					if (file_exists($filename))
-					{
-						unset($config);
-						include($filename);
-						if(isset($config[self::CONFIG_MENU_NAME]) && is_array($config[self::CONFIG_MENU_NAME]))
-						{
-							$json_extension = array_merge_recursive(
-								$json_extension,
-								$this->_wildcardsearch($config[self::CONFIG_MENU_NAME],
-								$navigationPage)
-							);
-						}
-					}
-				}
-				// Merge Extension Menuentries with the Core Entries
-				$menuArray = array_merge_recursive($menuArray, $json_extension);
-			}
-
-			// Load dynamic Menu Entries from Session
-			if (($navigationMenuSessionArray = $this->getSessionMenu()) != null)
-			{
-				if (isset($navigationMenuSessionArray) && is_array($navigationMenuSessionArray))
-				{
-					$menuArray = array_merge_recursive($menuArray, $navigationMenuSessionArray);
-				}
-			}
-		}
-
-		$this->_sortArray($menuArray);
-
-		return $menuArray;
+		return $this->_getNavigationArray($navigationPage, self::CONFIG_MENU_NAME, $this->getSessionMenu());
 	}
 
 	/**
-	 * Creates the Top Menu for each Page
-	 * @param navigation_widget_called GET Parameter witch holds the currently called Page
+	 * Creates the header menu for each Page
+	 * @param navigationPage GET Parameter witch holds the currently called Page
 	 * @return array with the Menu Entries
 	 */
 	public function getHeaderArray($navigationPage)
 	{
-		$headerArray = array();
-
-		if (isset($navigationPage))
-		{
-			// Load Header Entries of Core
-			$navigationHeaderArray = $this->_ci->config->item(self::CONFIG_HEADER_NAME);
-			$headerArray = $this->_wildcardsearch($navigationHeaderArray, $navigationPage);
-
-			// Load Header Entries of Extensions
-			$extensions = $this->_ci->extensionslib->getInstalledExtensions();
-			if(hasData($extensions))
-			{
-				$headerArray_extension = array();
-				foreach($extensions->retval as $ext)
-				{
-					$filename = APPPATH.'config/'.ExtensionsLib::EXTENSIONS_DIR_NAME.'/'.$ext->name.'/'.self::CONFIG_NAVIGATION_FILENAME;
-					if (file_exists($filename))
-					{
-						unset($config);
-						include($filename);
-						if(isset($config[self::CONFIG_HEADER_NAME]) && is_array($config[self::CONFIG_HEADER_NAME]))
-						{
-							$headerArray_extension = array_merge_recursive(
-								$json_extension,
-								$this->_wildcardsearch($config[self::CONFIG_HEADER_NAME],
-								$navigationPage)
-							);
-						}
-					}
-				}
-				$headerArray = array_merge_recursive($headerArray, $headerArray_extension);
-			}
-
-			// Load dynamic Header Entries from Session
-			if (($navigationHeaderSessionArray = $this->getSessionHeader()) != null)
-			{
-				if (isset($navigationHeaderSessionArray) && is_array($navigationHeaderSessionArray))
-				{
-					$headerArray = array_merge_recursive($headerArray, $navigationHeaderSessionArray);
-				}
-			}
-		}
-
-		$this->_sortArray($headerArray);
-
-		return $headerArray;
+		return $this->_getNavigationArray($navigationPage, self::CONFIG_HEADER_NAME, $this->getSessionHeader());
 	}
 
 	/**
@@ -293,6 +202,61 @@ class NavigationLib
 	// Private methods
 
 	/**
+	 * Build the array needed by the NavigationWidget to render the left menu or the header
+	 * menu depending on the given parameters
+	 * @param navigationPage GET Parameter witch holds the currently called Page
+	 * @param configName the name of the navigation config entry
+	 * @param sessionArray array present in the session that could contains other menu entries
+	 * @return array with the Menu Entries
+	 */
+	private function _getNavigationArray($navigationPage, $configName, $sessionArray)
+	{
+		$navigationArray = array();
+
+		if (isset($navigationPage))
+		{
+			// Load Header Entries of Core
+			$configArray = $this->_ci->config->item($configName);
+			$navigationArray = $this->_wildcardsearch($configArray, $navigationPage);
+
+			// Load Header Entries of Extensions
+			$extensions = $this->_ci->extensionslib->getInstalledExtensions();
+			if (hasData($extensions))
+			{
+				$extensionArray = array();
+				foreach ($extensions->retval as $ext)
+				{
+					$filename = APPPATH.'config/'.ExtensionsLib::EXTENSIONS_DIR_NAME.'/'.$ext->name.'/'.self::CONFIG_NAVIGATION_FILENAME;
+					if (file_exists($filename))
+					{
+						unset($config);
+						include($filename);
+						if (isset($config[$configName]) && is_array($config[$configName]))
+						{
+							$extensionArray = array_merge_recursive(
+								$json_extension,
+								$this->_wildcardsearch($config[$configName],
+								$navigationPage)
+							);
+						}
+					}
+				}
+				$navigationArray = array_merge_recursive($navigationArray, $extensionArray);
+			}
+
+			// Load dynamic header entries from session
+			if ($sessionArray != null && is_array($sessionArray))
+			{
+				$navigationArray = array_merge_recursive($navigationArray, $sessionArray);
+			}
+		}
+
+		$this->_sortArray($navigationArray);
+
+		return $navigationArray;
+	}
+
+	/**
 	 * Searches a Menuentry. If there is no exact entry it searches for Wildcard Entries with a Star
 	 * Example:
 	 * Searching for /system/foo/index will Match the following Menuentries:
@@ -311,20 +275,20 @@ class NavigationLib
 		krsort($navigationArray);
 
 		// 100% match found
-		if(isset($navigationArray[$navigationPage]))
+		if (isset($navigationArray[$navigationPage]))
 		{
 			return $navigationArray[$navigationPage];
 		}
 		else
 		{
-			foreach($navigationArray as $key=>$row)
+			foreach ($navigationArray as $key=>$row)
 			{
 				// Search for * Entries
-				if(mb_strpos($key, '*') === 0 || mb_strpos($key, '*') === mb_strlen($key) - 1)
+				if (mb_strpos($key, '*') === 0 || mb_strpos($key, '*') === mb_strlen($key) - 1)
 				{
 					// Take * Entry if Matches
 					$search = mb_substr($key, 0, -1);
-					if($search == '' || mb_strpos($navigationPage, $search) === 0)
+					if ($search == '' || mb_strpos($navigationPage, $search) === 0)
 					{
 						return $row;
 					}
