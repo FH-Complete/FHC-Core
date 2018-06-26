@@ -306,10 +306,11 @@ class NavigationLib
 	private function _getNavigationtPage($params)
 	{
 		//
+		$trimed = trim($params[self::NAVIGATION_PAGE_PARAM]);
 		if ($params != null
 			&& is_array($params)
 			&& isset($params[self::NAVIGATION_PAGE_PARAM])
-			&& !empty(trim($params[self::NAVIGATION_PAGE_PARAM])))
+			&& !empty($trimed))
 		{
 			$navigationPage = $params[self::NAVIGATION_PAGE_PARAM];
 		}

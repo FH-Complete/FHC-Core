@@ -241,9 +241,9 @@ class FiltersLib
 	public function generateDatasetQuery($query, $filters)
 	{
 		$datasetQuery = 'SELECT * FROM ('.$query.') '.self::DATASET_TABLE_ALIAS;
-
+		$trimed = trim($query);
 		// If the given query is valid and the parameter filters is an array
-		if (!empty(trim($query)) && $filters != null && is_array($filters))
+		if (!empty($trimed) && $filters != null && is_array($filters))
 		{
 			$where = ''; // starts building the SQL where clause
 
@@ -254,7 +254,8 @@ class FiltersLib
 
 				if ($filtersCounter > 0) $where .= ' AND '; // if it's NOT the last one
 
-				if (!empty(trim($filterDefinition->name))) // if the name of the applied filter is valid
+				$trimed2 = trim($filterDefinition->name);
+				if (!empty($trimed2)) // if the name of the applied filter is valid
 				{
 					// ...build the condition
 					$where .= '"'.$filterDefinition->name.'"'.$this->_getDatasetQueryCondition($filterDefinition);
@@ -294,15 +295,16 @@ class FiltersLib
 	public function getFilterName($filterJson)
 	{
 		$filterName = $filterJson->name; // always present, used as default
-
+		$trimed = (isset($filterJson->namePhrase)?trim($filterJson->namePhrase):'');
 		// Filter name from phrases system
-		if (isset($filterJson->namePhrase) && !empty(trim($filterJson->namePhrase)))
+		if (isset($filterJson->namePhrase) && !empty($trimed))
 		{
 			// Loads the library to use the phrases system
 			$this->_ci->load->library('PhrasesLib', array(self::FILTER_PHRASES_CATEGORY));
 
 			$tmpFilterNamePhrase = $this->_ci->phraseslib->t(self::FILTER_PHRASES_CATEGORY, $filterJson->namePhrase);
-			if (isset($tmpFilterNamePhrase) && !empty(trim($tmpFilterNamePhrase))) // if is not null or an empty string
+			$trimed2 = trim($tmpFilterNamePhrase);
+			if (isset($tmpFilterNamePhrase) && !empty($trimed2)) // if is not null or an empty string
 			{
 				$filterName = $tmpFilterNamePhrase;
 			}
@@ -342,9 +344,9 @@ class FiltersLib
 	public function removeSelectedField($selectedField)
 	{
 		$removeSelectedField = false;
-
+		$trimed = trim($selectedField);
 		// Checks the parameter selectedField
-		if (isset($selectedField) && !empty(trim($selectedField)))
+		if (isset($selectedField) && !empty($trimed))
 		{
 			// Retrives all the used fields by the current filter
 			$fields = $this->getElementSession(self::SESSION_FIELDS);
@@ -376,9 +378,9 @@ class FiltersLib
 	public function addSelectedField($selectedField)
 	{
 		$removeSelectedField = false;
-
+		$trimed = trim($selectedField);
 		// Checks the parameter selectedField
-		if (isset($selectedField) && !empty(trim($selectedField)))
+		if (isset($selectedField) && !empty($trimed))
 		{
 			// Retrives all the used fields by the current filter
 			$fields = $this->getElementSession(self::SESSION_FIELDS);
@@ -405,9 +407,9 @@ class FiltersLib
 	public function removeAppliedFilter($appliedFilter)
 	{
 		$removeAppliedFilter = false;
-
+		$trimed = trim($appliedFilter);
 		// Checks the parameter appliedFilter
-		if (isset($appliedFilter) && !empty(trim($appliedFilter)))
+		if (isset($appliedFilter) && !empty($trimed))
 		{
 			// Retrives all the used fields by the current filter
 			$fields = $this->getElementSession(self::SESSION_FIELDS);
@@ -493,9 +495,9 @@ class FiltersLib
 	public function addFilter($filter)
 	{
 		$addFilter = false;
-
+		$trimed = trim($filter);
 		// Checks the parameter filter
-		if (isset($filter) && !empty(trim($filter)))
+		if (isset($filter) && !empty($trimed))
 		{
 			// Retrives all the used fields by the current filter
 			$fields = $this->getElementSession(self::SESSION_FIELDS);
@@ -536,9 +538,9 @@ class FiltersLib
 	public function saveCustomFilter($customFilterDescription)
 	{
 		$saveCustomFilter = false; // by default returns a failure
-
+		$trimed = trim($customFilterDescription);
 		// Checks parameter customFilterDescription if not valid stop the execution
-		if (!isset($customFilterDescription) || empty(trim($customFilterDescription)))
+		if (!isset($customFilterDescription) || empty($triemd))
 		{
 			return $saveCustomFilter;
 		}
@@ -655,11 +657,11 @@ class FiltersLib
 	 */
 	private function _getFilterUniqueId($params)
 	{
-		//
+		$trimed = trim($params[self::FILTER_PAGE_PARAM]);
 		if ($params != null
 			&& is_array($params)
 			&& isset($params[self::FILTER_PAGE_PARAM])
-			&& !empty(trim($params[self::FILTER_PAGE_PARAM])))
+			&& !empty($trimed))
 		{
 			$filterUniqueId = $params[self::FILTER_PAGE_PARAM];
 		}
@@ -689,9 +691,9 @@ class FiltersLib
 	private function _getDatasetQueryCondition($filterDefinition)
 	{
 		$condition = ''; // starts building the condition
-
+		$trimed = trim($filterDefinition->operation);
 		// "operation" is a required property for the applied filter definition
-		if (!empty(trim($filterDefinition->operation)))
+		if (!empty($trimed))
 		{
 			// Checks what operation is required
 			switch ($filterDefinition->operation)
@@ -764,9 +766,9 @@ class FiltersLib
 					break;
 			}
 		}
-
+		$trimed = trim($condition);
 		// if the condition is valid
-		if (!empty(trim($condition))) $condition = ' '.$condition; // add a white space before
+		if (!empty($trimed)) $condition = ' '.$condition; // add a white space before
 
 		return $condition;
 	}
