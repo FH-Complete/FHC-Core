@@ -88,7 +88,7 @@ if(is_user_logged_in())
 							obj.style.height = obj.contentWindow.document.body.scrollHeight + \'px\';
 						}
 
-						var html_content = \'<iframe src="'.APP_ROOT.'cis/private/tools/ampelverwaltung.php?verpflichtend=true" name="ampel" frameborder="0" width="100%" height="100%  onload="resizeIframe(this) id="ampel_frame"></iframe><button id="close_button" class="btn btn-default" onclick="hide_ampel_div()">'.$p->t('tools/ampelClose').'</button>\';
+						var html_content = \'<iframe src="'.APP_ROOT.'cis/private/tools/ampelverwaltung.php?verpflichtend=true" name="ampel" frameborder="0" width="100%" height="100% onload="resizeIframe(this) id="ampel_frame"></iframe><button id="close_button" class="btn btn-default" onclick="hide_ampel_div()">'.$p->t('tools/ampelClose').'</button>\';
 						$("#ampel_div").html(html_content);
 					});
 					</script>';
@@ -100,15 +100,13 @@ if(is_user_logged_in())
 						top: 20%;
 						left: 10%;
 						right: 10%;
-						width: 80%;
-						height: 45%;
+						width: 70%;
+						height: 50%;
 						scrolling: no;
 						z-index: 1003;
 						background-color: #fefefe;
 						margin: auto;
 						text-align: center;
-						/*padding-top: 20px;*/
-						/*border: 3px solid black;*/
 						-webkit-box-shadow: 0px 0px 0px 2000px rgba(0,0,0,0.47);
 						-moz-box-shadow: 0px 0px 0px 2000px rgba(0,0,0,0.47);
 						box-shadow: 0px 0px 0px 2000px rgba(0,0,0,0.47);
@@ -124,6 +122,10 @@ if(is_user_logged_in())
 						font-size: 150%;
 						height: 50px;
 						width: 100%;
+						background-color: white;
+						border: none;
+						/*border-top: 4px solid black;*/
+						/*border-bottom: 4px solid black;*/
 					}
 					</style>';
 		}

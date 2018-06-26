@@ -59,6 +59,7 @@ $this->phrasen['tools/ampelBitteBestaetigen']='Please confirm now!';
 $this->phrasen['tools/ampelAbgelaufenTitel']='Notifications expired or confirmed';
 $this->phrasen['tools/ampelAbgelaufenTxt']='Notifications can still be read, but not confirmed anymore.';
 $this->phrasen['tools/ampelBestaetigtAbgelaufen']='Almost confirmed or expired';
+$this->phrasen['tools/ampelAktuelleAmpeln']='Actual notifications';
 $this->phrasen['tools/ampelKeineAktuellen']='No current notifications.';
 $this->phrasen['tools/ampelKeineAktuellenTxt']='You currently do not have any notifications.';
 
