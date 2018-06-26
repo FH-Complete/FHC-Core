@@ -1180,14 +1180,16 @@ class InfoCenter extends FHC_Controller
 
 		$notizenBewerbung = $this->NotizModel->getNotizByTitel($person_id, 'Anmerkung zur Bewerbung')->retval;
 
-		$notizentext = '';
-		$lastElement = end($notizenBewerbung);
+		$notizentext = '<ul style="padding-left: 20px; margin-left: 0;">';
 		foreach ($notizenBewerbung as $notiz)
 		{
-			$notizentext .= $notiz->text;
-			if ($notiz != $lastElement)
-				$notizentext .= ' | ';
+			// For applicant-notices the user is not shown
+			if ($notiz->insertvon != 'online_notiz')
+				$notizentext .= '<li>'.$notiz->text.' ('.$notiz->insertvon.')</li>';
+			else
+				$notizentext .= '<li>'.$notiz->text.'</li>';
 		}
+		$notizentext .= '</ul>';
 
 		$mailadresse = '';
 		foreach ($person->kontakte as $kontakt)

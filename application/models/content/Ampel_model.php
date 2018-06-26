@@ -10,7 +10,7 @@ class Ampel_model extends DB_Model
 		$this->dbTable = 'public.tbl_ampel';
 		$this->pk = 'ampel_id';
 	}
-	
+
 	/**
 	 * Returns all active Ampeln, that are actually:
 	 * 1. not after the deadline date
@@ -25,24 +25,24 @@ class Ampel_model extends DB_Model
 			SELECT *
 			  FROM public.tbl_ampel
 			 WHERE';
-		
+
 		if ($email === true)
 		{
 			$parametersArray['email'] = $email;
 			$query .= ' email = ? AND';
 		}
-		
+
 		$query .= '
-			(NOW()<(deadline+(verfallszeit || \' days\')::interval)::date)
-			    OR (verfallszeit IS NULL AND NOW() < deadline)
-			   AND (NOW()>(deadline-(vorlaufzeit || \' days\')::interval)::date)
-			    OR (vorlaufzeit IS NULL AND NOW() > deadline)';
-		
+			(NOW()<(deadline+(COALESCE(verfallszeit,0) || \' days\')::interval)::date)
+			    OR (verfallszeit IS NULL)
+			   AND (NOW()>(deadline-(COALESCE(vorlaufzeit,0) || \' days\')::interval)::date)
+			    OR (vorlaufzeit IS NULL AND NOW() < deadline)';
+
 		$query .= ' ORDER BY deadline DESC';
-		
+
 		return $this->execQuery($query, $parametersArray);
 	}
-	
+
 	/**
 	 * Returns all Ampel-receiver of a specific Ampel.
 	 * @param string $benutzer_select SQL Statement which defines the Ampel-receiver.
@@ -55,7 +55,7 @@ class Ampel_model extends DB_Model
 			return $this->execQuery($benutzer_select);
 		}
 	}
-	
+
 	/**
 	 * Checks if Ampel was confirmed by the user.
 	 * @param int $ampel_id Ampel-ID
@@ -75,7 +75,7 @@ class Ampel_model extends DB_Model
 		{
 			$result = $this->execQuery($query, array($ampel_id, $uid));
 		}
-		
+
 		if ($result)
 		{
 			if (count($result->retval) > 0)
@@ -87,7 +87,7 @@ class Ampel_model extends DB_Model
 				return false;
 			}
 		}
-		else 
+		else
 			return $result; //will contain the error-msg from execQuery
 	}
 }
