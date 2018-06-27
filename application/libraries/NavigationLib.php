@@ -32,8 +32,6 @@ class NavigationLib
 		// Loads navigation configs
 		$this->_ci->config->load('navigation');
 
-		// Loads helper message to manage returning messages
-		$this->_ci->load->helper('message');
 		// Loads helper session to manage the php session
 		$this->_ci->load->helper('session');
 

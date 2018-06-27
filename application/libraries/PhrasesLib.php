@@ -22,9 +22,6 @@ class PhrasesLib
 		$this->_ci->load->model('system/Phrase_model', 'PhraseModel');
 		$this->_ci->load->model('system/Phrasentext_model', 'PhrasentextModel');
 
-		// Loads helper message to manage returning messages
-		$this->_ci->load->helper('message');
-
 		// Workaround to use more parameters in the construct since PHP doesn't support many constructors
 		$this->_extend_construct(func_get_args());
     }

@@ -80,8 +80,6 @@ class FiltersLib
 	{
 		$this->_ci =& get_instance(); // get code igniter instance
 
-		// Loads helper message to manage returning messages
-		$this->_ci->load->helper('message');
 		// Loads helper session to manage the php session
 		$this->_ci->load->helper('session');
 

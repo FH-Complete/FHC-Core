@@ -22,9 +22,6 @@ class VorlageLib
 		$this->ci->load->model('system/Vorlagestudiengang_model', 'VorlageStudiengangModel');
 
 		$this->ci->load->helper('language');
-		// Loads helper message to manage returning messages
-		$this->ci->load->helper('message');
-		//$this->ci->lang->load('fhcomplete');
 	}
 
    	/**

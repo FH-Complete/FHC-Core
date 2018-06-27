@@ -37,8 +37,6 @@ class MessageLib
 
 		// Loads fhc helper
 		$this->ci->load->helper('fhc');
-		// Loads helper message to manage returning messages
-		$this->ci->load->helper('message');
 
 		// Loads phrases
 		$this->ci->lang->load('message');
