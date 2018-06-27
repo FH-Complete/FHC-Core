@@ -33,9 +33,6 @@ class CallerLib
 		// Gets CI instance
 		$this->ci =& get_instance();
 
-		// Loads helper message to manage returning messages
-		$this->ci->load->helper('Message');
-
 		// Loads permission library
 		$this->ci->load->library('PermissionLib');
 	}
