@@ -540,7 +540,7 @@ class FiltersLib
 		$saveCustomFilter = false; // by default returns a failure
 		$trimed = trim($customFilterDescription);
 		// Checks parameter customFilterDescription if not valid stop the execution
-		if (!isset($customFilterDescription) || empty($triemd))
+		if (!isset($customFilterDescription) || empty($trimed))
 		{
 			return $saveCustomFilter;
 		}
