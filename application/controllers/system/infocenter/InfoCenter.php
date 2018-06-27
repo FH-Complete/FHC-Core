@@ -692,7 +692,12 @@ class InfoCenter extends FHC_Controller
 			'#',											// link
 			array(),										// children
 			'',												// icon
-			true											// expand
+			true,											// expand
+			null, 											// subscriptDescription
+			null, 											// subscriptLinkClass
+			null, 											// subscriptLinkValue
+			'', 											// target
+			1 												// sort
 		);
 
 		$filtersArray['nichtabgeschickt'] = $this->navigationlib->oneLevel(
@@ -700,7 +705,12 @@ class InfoCenter extends FHC_Controller
 			'#',												// link
 			array(),											// children
 			'',													// icon
-			true												// expand
+			true,												// expand
+			null, 											// subscriptDescription
+			null, 											// subscriptLinkClass
+			null, 											// subscriptLinkValue
+			'', 											// target
+			2 												// sort
 		);
 
 		$this->_fillFilters($listFiltersSent, $filtersArray['abgeschickt']);
@@ -713,7 +723,12 @@ class InfoCenter extends FHC_Controller
 				'#',				// link
 				array(),			// children
 				'',					// icon
-				true				// expand
+				true,				// expand
+				null, 											// subscriptDescription
+				null, 											// subscriptLinkClass
+				null, 											// subscriptLinkValue
+				'', 											// target
+				3 												// sort
 			);
 
 			$this->_fillCustomFilters($listCustomFilters, $filtersArray['personal']);
@@ -726,7 +741,12 @@ class InfoCenter extends FHC_Controller
 					'#',			// link
 					$filtersArray,	// children
 					'',				// icon
-					true			// expand
+					true,			// expand
+					null,			// subscriptDescription
+					null,			// subscriptLinkClass
+					null, 			// subscriptLinkValue
+					'', 			// target
+					10 				// sort
 				)
 			)
 		);
@@ -754,7 +774,12 @@ class InfoCenter extends FHC_Controller
 					$link,			// link
 					array(),		// children
 					'angle-left',	// icon
-					true			// expand
+					true,			// expand
+					null, 			// subscriptDescription
+					null, 			// subscriptLinkClass
+					null, 			// subscriptLinkValue
+					'', 			// target
+					1 				// sort
 				)
 			)
 		);
@@ -804,7 +829,12 @@ class InfoCenter extends FHC_Controller
 				'#',				// link
 				array(),			// children
 				'',					// icon
-				true				// expand
+				true,				// expand
+				null,				// subscriptDescription
+				null,				// subscriptLinkClass
+				null,				// subscriptLinkValue
+				'', 				// target
+				15 					// sort
 			);
 
 			$this->_fillCustomFilters($listCustomFilters, $filtersArray['children']['personal']);
@@ -817,7 +847,12 @@ class InfoCenter extends FHC_Controller
 					'#',						// link
 					$filtersArray['children'],	// children
 					'',							// icon
-					true						// expand
+					true,						// expand
+					null, 						// subscriptDescription
+					null, 						// subscriptLinkClass
+					null, 						// subscriptLinkValue
+					'', 						// target
+					10 							// sort
 				)
 			)
 		);
