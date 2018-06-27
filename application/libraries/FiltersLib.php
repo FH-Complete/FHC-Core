@@ -80,9 +80,6 @@ class FiltersLib
 	{
 		$this->_ci =& get_instance(); // get code igniter instance
 
-		// Loads helper session to manage the php session
-		$this->_ci->load->helper('session');
-
 		$this->_filterUniqueId = $this->_getFilterUniqueId($params); // sets the id for the related filter widget
 	}
 

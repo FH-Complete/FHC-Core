@@ -53,8 +53,6 @@ class UDFLib
 	public function __construct()
 	{
 		$this->_ci =& get_instance();
-
-		$this->_ci->load->helper('fhc');
 	}
 
 	// -------------------------------------------------------------------------------------------------

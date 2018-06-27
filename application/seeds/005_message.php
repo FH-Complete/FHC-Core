@@ -10,7 +10,7 @@ class Seed_Message
 			$this->fhc =& get_instance();
 			$this->fhc->load->helper('fhc');
 		}
-		
+
         public function seed($limit = 50)
         {
 			echo "Seeding $limit messages ";
@@ -18,11 +18,11 @@ class Seed_Message
 			$db = $this->fhc->db->query('SELECT person_id FROM public.tbl_person LIMIT 100;');
 			$person = $db->result();
 			$num_persons = $db->num_rows();
-			
+
 			for ($i = 0; $i < $limit; $i++)
 			{
 		        echo ".";
-		        
+
 				$data = array
 				(
 		            'subject' => $this->fhc->faker->sentence(4, true),
@@ -43,9 +43,9 @@ class Seed_Message
 				if (!$recipient)
 					show_error($recipient);
 		    }
-	 
+
 		    echo PHP_EOL;
-          
+
 		}
 
         public function truncate()
@@ -53,4 +53,3 @@ class Seed_Message
               $this->fhc->db->query('DELETE FROM public.msg_message;');
         }
 }
-

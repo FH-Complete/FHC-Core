@@ -32,9 +32,6 @@ class NavigationLib
 		// Loads navigation configs
 		$this->_ci->config->load('navigation');
 
-		// Loads helper session to manage the php session
-		$this->_ci->load->helper('session');
-
 		// Loads library ExtensionsLib
 		$this->_ci->load->library('ExtensionsLib');
 

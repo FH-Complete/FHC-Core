@@ -35,9 +35,6 @@ class MessageLib
 		$this->ci->load->model('system/Recipient_model', 'RecipientModel');
 		$this->ci->load->model('system/Attachment_model', 'AttachmentModel');
 
-		// Loads fhc helper
-		$this->ci->load->helper('fhc');
-
 		// Loads phrases
 		$this->ci->lang->load('message');
 	}

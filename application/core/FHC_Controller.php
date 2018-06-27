@@ -9,7 +9,10 @@ class FHC_Controller extends CI_Controller
 	private $_controllerId; // contains the unique identifier of a call to a controller
 
 	/**
-	 * Standard construct for all the controllers, loads the authentication system
+	 * Standard construct for all the controllers
+	 * - initialize the object properties
+	 * - loads the authentication system
+	 * - loads all the helpers that later are always needed
 	 */
     public function __construct()
 	{
@@ -22,6 +25,12 @@ class FHC_Controller extends CI_Controller
 
 		// Loads helper message to manage returning messages
 		$this->load->helper('message');
+
+		// Loads helper with generic utility function
+		$this->load->helper('fhc');
+
+		// Loads helper session to manage the php session
+		$this->load->helper('session');
 	}
 
 	//------------------------------------------------------------------------------------------------------------------

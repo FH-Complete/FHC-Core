@@ -51,10 +51,12 @@ class UDF_model extends DB_Model
 		$resultPerson = success('person');
 		$resultPrestudent = success('prestudent');
 
-		$person_id = $udfs['person_id'];
+		$person_id = null;
+		if (isset($udfs['person_id'])) $person_id = $udfs['person_id'];
 		unset($udfs['person_id']);
 
-		$prestudent_id = $udfs['prestudent_id'];
+		$prestudent_id = null;
+		if (isset($udfs['prestudent_id'])) $prestudent_id = $udfs['prestudent_id'];
 		unset($udfs['prestudent_id']);
 
 		$jsons = array();

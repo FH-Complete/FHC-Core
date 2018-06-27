@@ -20,8 +20,6 @@ class VorlageLib
 
 		$this->ci->load->model('system/Vorlage_model', 'VorlageModel');
 		$this->ci->load->model('system/Vorlagestudiengang_model', 'VorlageStudiengangModel');
-
-		$this->ci->load->helper('language');
 	}
 
    	/**
