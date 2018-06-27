@@ -16,9 +16,6 @@ class Phrases extends FHC_Controller
 
         // Loads the widget library
 		$this->load->library('WidgetLib');
-
-        // Loads helper message to manage returning messages
-		$this->load->helper('message');
     }
 
 	/**

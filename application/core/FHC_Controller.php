@@ -17,7 +17,11 @@ class FHC_Controller extends CI_Controller
 
 		$this->_controllerId = null; // set _controllerId as null by default
 
+		// Loads helper fhcauth to manage the authentication
 		$this->load->helper('fhcauth');
+
+		// Loads helper message to manage returning messages
+		$this->load->helper('message');
 	}
 
 	//------------------------------------------------------------------------------------------------------------------
