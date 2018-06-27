@@ -21,7 +21,7 @@ $this->load->view(
 					</div>
 				</div>
 				<div id="data">
-					<?php if (empty($data)): ?>
+					<?php if ($data == null): ?>
 						<?php echo $this->p->t('infocenter', 'keineZugangsvoraussetzungenTxt'); ?>
 					<?php
 					else:

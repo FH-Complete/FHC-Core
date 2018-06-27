@@ -147,27 +147,27 @@ class PrestudentMultiAssign extends VileSci_Controller
 		// Load model prestudentm_model
         $this->load->model('crm/Prestudent_model', 'PrestudentModel');
 
-        if ($studiengang == '' || empty($studiengang))
+        if ($studiengang == '' || isEmptyString($studiengang))
 		{
 			$studiengang = null;
 		}
 
-		if ($studiensemester == '' || empty($studiensemester))
+		if ($studiensemester == '' || isEmptyString($studiensemester))
 		{
 			$studiensemester = null;
 		}
 
-		if ($aufnahmegruppe == '' || empty($aufnahmegruppe))
+		if ($aufnahmegruppe == '' || isEmptyString($aufnahmegruppe))
 		{
 			$aufnahmegruppe = null;
 		}
 
-		if ($reihungstest == '' || empty($reihungstest))
+		if ($reihungstest == '' || isEmptyString($reihungstest))
 		{
 			$reihungstest = null;
 		}
 
-		if ($stufe == '' || empty($stufe))
+		if ($stufe == '' || isEmptyString($stufe))
 		{
 			$stufe = null;
 		}

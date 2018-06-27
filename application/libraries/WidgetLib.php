@@ -57,7 +57,7 @@ class WidgetLib
         loadResource($this->_widget_path.WidgetLib::DIR_HTML_WIDGETS);
 
 		// If config are given then initialize this lib with the given config
-        if (!empty($config)) $this->initialize($config);
+        if (!isEmptyArray($config)) $this->initialize($config);
     }
 
     /**

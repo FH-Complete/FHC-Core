@@ -484,9 +484,9 @@ class DB_Model extends FHC_Model
 		$tmpTable = trim($table);
 
 		// Check parameters
-		if (empty($tmpTable)) return error(FHC_MODEL_ERROR, FHC_MODEL_ERROR);
+		if (isEmptyString($tmpTable)) return error(FHC_MODEL_ERROR, FHC_MODEL_ERROR);
 
-		if (!empty($alias))
+		if (!isEmptyString($alias))
 		{
 			$tmpTable .= ' AS '.$alias;
 		}
@@ -586,7 +586,7 @@ class DB_Model extends FHC_Model
 		$result = array();
 
 		// String that represents the pgsql array, better if not empty
-		if (!empty($string))
+		if (!isEmptyString($string))
 		{
 			// Magic convertion
 			preg_match_all(
@@ -742,7 +742,7 @@ class DB_Model extends FHC_Model
 		$result = null;
 
 		// If the query is empty don't lose time
-		if (!empty($query))
+		if (!isEmptyString($query))
 		{
 			// If there are parameters to bind to the query
 			if (is_array($parametersArray) && count($parametersArray) > 0)

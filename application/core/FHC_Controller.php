@@ -61,7 +61,7 @@ class FHC_Controller extends CI_Controller
 		{
 			$this->_controllerId = $this->input->get(self::FHC_CONTROLLER_ID);
 
-			if (!isset($this->_controllerId) || empty($this->_controllerId))
+			if (!isset($this->_controllerId) || isEmptyString($this->_controllerId))
 			{
 				$this->_controllerId = uniqid(); // generate a unique id
 				// Redirect to the same URL, but giving FHC_CONTROLLER_ID as HTTP GET parameter
