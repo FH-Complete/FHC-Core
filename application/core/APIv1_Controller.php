@@ -25,7 +25,7 @@ class APIv1_Controller extends REST_Controller
 	/**
 	 * Checks if the caller is allowed to access to this content with the given permissions
 	 * If it is not allowed will set the HTTP header with code 401
-	 * Wrapper for _checkPermissions
+	 * Wrapper for permissionlib->isEntitled
 	 */
 	private function _isAllowed($requiredPermissions)
 	{

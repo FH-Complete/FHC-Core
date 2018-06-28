@@ -144,52 +144,59 @@ class PermissionLib
 						$permissions = array($requiredPermissions[$calledMethod]);
 					}
 
-					// Loops through the required permissions
-					for ($pCounter = 0; $pCounter < count($permissions); $pCounter++)
+					if (!isEmptyArray($permissions))
 					{
-						// Checks if the permission is well formatted
-						if (strpos($permissions[$pCounter], PermissionLib::PERMISSION_SEPARATOR) !== false)
+						// Loops through the required permissions
+						for ($pCounter = 0; $pCounter < count($permissions); $pCounter++)
 						{
-							// Retrives permission and required access type from the $requiredPermissions array
-							list($permission, $requiredAccessType) = explode(PermissionLib::PERMISSION_SEPARATOR, $permissions[$pCounter]);
-
-							$accessType = null;
-
-							// Checks if the required access type is compliant with the HTTP method (GET => r, POST => w)
-							if ($requestMethod == self::READ_HTTP_METHOD
-								&& strpos($requiredAccessType, PermissionLib::READ_RIGHT) !== false)
+							// Checks if the permission is well formatted
+							if (strpos($permissions[$pCounter], PermissionLib::PERMISSION_SEPARATOR) !== false)
 							{
-								$accessType = PermissionLib::SELECT_RIGHT; // S
+								// Retrives permission and required access type from the $requiredPermissions array
+								list($permission, $requiredAccessType) = explode(PermissionLib::PERMISSION_SEPARATOR, $permissions[$pCounter]);
+
+								$accessType = null;
+
+								// Checks if the required access type is compliant with the HTTP method (GET => r, POST => w)
+								if ($requestMethod == self::READ_HTTP_METHOD
+									&& strpos($requiredAccessType, PermissionLib::READ_RIGHT) !== false)
+								{
+									$accessType = PermissionLib::SELECT_RIGHT; // S
+								}
+								elseif ($requestMethod == self::WRITE_HTTP_METHOD
+									&& strpos($requiredAccessType, PermissionLib::WRITE_RIGHT) !== false)
+								{
+									$accessType = PermissionLib::REPLACE_RIGHT.PermissionLib::DELETE_RIGHT; // UID
+								}
+
+								if ($accessType != null) // if compliant
+								{
+									// Checks if the user has the same required permissiond with the same required access type
+									$checkPermissions = $this->isBerechtigt($permission, $accessType);
+
+									// If the user has one of the permissionsm than exit the loop
+									if ($checkPermissions === true) break;
+								}
 							}
-							elseif ($requestMethod == self::WRITE_HTTP_METHOD
-								&& strpos($requiredAccessType, PermissionLib::WRITE_RIGHT) !== false)
+							else
 							{
-								$accessType = PermissionLib::REPLACE_RIGHT.PermissionLib::DELETE_RIGHT; // UID
-							}
-
-							if ($accessType != null) // if compliant
-							{
-								// Checks if the user has the same required permissiond with the same required access type
-								$checkPermissions = $this->isBerechtigt($permission, $accessType);
-
-								// If the user has one of the permissionsm than exit the loop
-								if ($checkPermissions === true) break;
+								show_error('The given permission does not use the correct format');
 							}
 						}
-						else
-						{
-							show_error('The given permission does not use the correct format');
-						}
+					}
+					else
+					{
+						show_error('No permissions are set for this method, an empty array is given');
 					}
 				}
 				else
 				{
-					show_error('Your are trying to access to this content with a not valid HTTP method');
+					show_error('You are trying to access to this content with a not valid HTTP method');
 				}
 			}
 			else
 			{
-				show_error('The given permission array does not contain the called method');
+				show_error('The given permission array does not contain the called method or is not correctly set');
 			}
 		}
 		else
