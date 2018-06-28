@@ -22,9 +22,6 @@ class CheckUserAuth extends APIv1_Controller
 	public function __construct()
 	{
 		parent::__construct();
-
-		// Loads the authentication library
-		$this->load->library('AuthLib');
 	}
 
 	/**

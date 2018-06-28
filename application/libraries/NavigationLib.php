@@ -32,11 +32,6 @@ class NavigationLib
 		// Loads navigation configs
 		$this->_ci->config->load('navigation');
 
-		// Loads helper message to manage returning messages
-		$this->_ci->load->helper('message');
-		// Loads helper session to manage the php session
-		$this->_ci->load->helper('session');
-
 		// Loads library ExtensionsLib
 		$this->_ci->load->library('ExtensionsLib');
 
@@ -305,12 +300,10 @@ class NavigationLib
 	 */
 	private function _getNavigationtPage($params)
 	{
-		//
-		$trimed = trim($params[self::NAVIGATION_PAGE_PARAM]);
 		if ($params != null
 			&& is_array($params)
 			&& isset($params[self::NAVIGATION_PAGE_PARAM])
-			&& !empty($trimed))
+			&& !isEmptyString($params[self::NAVIGATION_PAGE_PARAM]))
 		{
 			$navigationPage = $params[self::NAVIGATION_PAGE_PARAM];
 		}

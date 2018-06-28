@@ -35,11 +35,6 @@ class MessageLib
 		$this->ci->load->model('system/Recipient_model', 'RecipientModel');
 		$this->ci->load->model('system/Attachment_model', 'AttachmentModel');
 
-		// Loads fhc helper
-		$this->ci->load->helper('fhc');
-		// Loads helper message to manage returning messages
-		$this->ci->load->helper('message');
-
 		// Loads phrases
 		$this->ci->lang->load('message');
 	}
@@ -49,9 +44,9 @@ class MessageLib
 	 */
 	public function getMessage($msg_id, $person_id)
 	{
-		if (empty($msg_id))
+		if (!is_numeric($msg_id))
 			return $this->_error('', MSG_ERR_INVALID_MSG_ID);
-		if (empty($person_id))
+		if (!is_numeric($person_id))
 			return $this->_error('', MSG_ERR_INVALID_RECIPIENTS);
 
 		$msg = $this->ci->RecipientModel->getMessage($msg_id, $person_id);
@@ -64,7 +59,7 @@ class MessageLib
 	 */
 	public function getMessagesByUID($uid, $oe_kurzbz = null, $all = false)
 	{
-		if (empty($uid))
+		if (isEmptyString($uid))
 			return $this->_error('', MSG_ERR_INVALID_MSG_ID);
 
 		$msg = $this->ci->RecipientModel->getMessagesByUID($uid, $oe_kurzbz, $all);
@@ -77,7 +72,7 @@ class MessageLib
 	 */
 	public function getMessagesByPerson($person_id, $oe_kurzbz = null, $all = false)
 	{
-		if (empty($person_id))
+		if (!is_numeric($person_id))
 			return $this->_error('', MSG_ERR_INVALID_MSG_ID);
 
 		$msg = $this->ci->RecipientModel->getMessagesByPerson($person_id, $oe_kurzbz, $all);
@@ -90,7 +85,7 @@ class MessageLib
 	 */
 	public function getSentMessagesByPerson($person_id, $oe_kurzbz = null, $all = false)
 	{
-		if (empty($person_id))
+		if (!is_numeric($person_id))
 			return $this->_error('', MSG_ERR_INVALID_MSG_ID);
 
 		$msg = $this->ci->MessageModel->getMessagesByPerson($person_id, $oe_kurzbz, $all);
@@ -103,7 +98,7 @@ class MessageLib
 	 */
 	public function getMessageByToken($token)
 	{
-		if (empty($token))
+		if (isEmptyString($token))
 			return $this->_error('', MSG_ERR_INVALID_TOKEN);
 
 		$result = $this->ci->RecipientModel->getMessageByToken($token);
@@ -160,12 +155,12 @@ class MessageLib
 	 */
 	public function updateMessageStatus($message_id, $person_id, $status)
 	{
-		if (empty($message_id))
+		if (!is_numeric($message_id))
 		{
 			return $this->_error('', MSG_ERR_INVALID_MSG_ID);
 		}
 
-		if (empty($person_id))
+		if (!is_numeric($person_id))
 		{
 			return $this->_error('', MSG_ERR_INVALID_USER_ID);
 		}
@@ -227,7 +222,7 @@ class MessageLib
 				if ($this->_checkReceiverId($receiver_id))
 				{
 					// If the text and the subject of the template are not empty
-					if (!empty($subject) && !empty($body))
+					if (!isEmptyString($subject) && !isEmptyString($body))
 					{
 						$result = $this->_saveMessage($sender_id, $receiver_id, $subject, $body, $relationmessage_id, $oe_kurzbz);
 						// If no errors were occurred
@@ -244,12 +239,12 @@ class MessageLib
 					}
 					else
 					{
-						if (empty($subject))
+						if (isEmptyString($subject))
 						{
 							$result = $this->_error('', MSG_ERR_SUBJECT_EMPTY);
 							break;
 						}
-						elseif (empty($body))
+						elseif (isEmptyString($body))
 						{
 							$result = $this->_error('', MSG_ERR_BODY_EMPTY);
 							break;
@@ -320,7 +315,7 @@ class MessageLib
 					{
 						// If the text and the subject of the template are not empty
 						if (is_array($result->retval) && count($result->retval) > 0 &&
-							!empty($result->retval[0]->text) && !empty($result->retval[0]->subject))
+							!isEmptyString($result->retval[0]->text) && !isEmptyString($result->retval[0]->subject))
 						{
 							// Parses template text
 							$parsedText = $this->ci->vorlagelib->parseVorlagetext($result->retval[0]->text, $data);
@@ -354,12 +349,12 @@ class MessageLib
 									$result = $this->_error('', MSG_ERR_TEMPLATE_NOT_FOUND);
 									break;
 								}
-								elseif (empty($result->retval[0]->text))
+								elseif (isEmptyString($result->retval[0]->text))
 								{
 									$result = $this->_error('', MSG_ERR_INVALID_TEMPLATE);
 									break;
 								}
-								elseif (empty($result->retval[0]->subject))
+								elseif (isEmptyString($result->retval[0]->subject))
 								{
 									$result = $this->_error('', MSG_ERR_INVALID_TEMPLATE);
 									break;

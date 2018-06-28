@@ -80,11 +80,6 @@ class FiltersLib
 	{
 		$this->_ci =& get_instance(); // get code igniter instance
 
-		// Loads helper message to manage returning messages
-		$this->_ci->load->helper('message');
-		// Loads helper session to manage the php session
-		$this->_ci->load->helper('session');
-
 		$this->_filterUniqueId = $this->_getFilterUniqueId($params); // sets the id for the related filter widget
 	}
 
@@ -241,9 +236,9 @@ class FiltersLib
 	public function generateDatasetQuery($query, $filters)
 	{
 		$datasetQuery = 'SELECT * FROM ('.$query.') '.self::DATASET_TABLE_ALIAS;
-		$trimed = trim($query);
+
 		// If the given query is valid and the parameter filters is an array
-		if (!empty($trimed) && $filters != null && is_array($filters))
+		if (!isEmptyString($query) && $filters != null && is_array($filters))
 		{
 			$where = ''; // starts building the SQL where clause
 
@@ -254,8 +249,7 @@ class FiltersLib
 
 				if ($filtersCounter > 0) $where .= ' AND '; // if it's NOT the last one
 
-				$trimed2 = trim($filterDefinition->name);
-				if (!empty($trimed2)) // if the name of the applied filter is valid
+				if (!isEmptyString($filterDefinition->name)) // if the name of the applied filter is valid
 				{
 					// ...build the condition
 					$where .= '"'.$filterDefinition->name.'"'.$this->_getDatasetQueryCondition($filterDefinition);
@@ -295,16 +289,15 @@ class FiltersLib
 	public function getFilterName($filterJson)
 	{
 		$filterName = $filterJson->name; // always present, used as default
-		$trimed = (isset($filterJson->namePhrase)?trim($filterJson->namePhrase):'');
+
 		// Filter name from phrases system
-		if (isset($filterJson->namePhrase) && !empty($trimed))
+		if (isset($filterJson->namePhrase) && !isEmptyString($filterJson->namePhrase))
 		{
 			// Loads the library to use the phrases system
 			$this->_ci->load->library('PhrasesLib', array(self::FILTER_PHRASES_CATEGORY));
 
 			$tmpFilterNamePhrase = $this->_ci->phraseslib->t(self::FILTER_PHRASES_CATEGORY, $filterJson->namePhrase);
-			$trimed2 = trim($tmpFilterNamePhrase);
-			if (isset($tmpFilterNamePhrase) && !empty($trimed2)) // if is not null or an empty string
+			if (isset($tmpFilterNamePhrase) && !isEmptyString($tmpFilterNamePhrase)) // if is not null or an empty string
 			{
 				$filterName = $tmpFilterNamePhrase;
 			}
@@ -344,9 +337,9 @@ class FiltersLib
 	public function removeSelectedField($selectedField)
 	{
 		$removeSelectedField = false;
-		$trimed = trim($selectedField);
+
 		// Checks the parameter selectedField
-		if (isset($selectedField) && !empty($trimed))
+		if (isset($selectedField) && !isEmptyString($selectedField))
 		{
 			// Retrives all the used fields by the current filter
 			$fields = $this->getElementSession(self::SESSION_FIELDS);
@@ -378,9 +371,9 @@ class FiltersLib
 	public function addSelectedField($selectedField)
 	{
 		$removeSelectedField = false;
-		$trimed = trim($selectedField);
+
 		// Checks the parameter selectedField
-		if (isset($selectedField) && !empty($trimed))
+		if (isset($selectedField) && !isEmptyString($selectedField))
 		{
 			// Retrives all the used fields by the current filter
 			$fields = $this->getElementSession(self::SESSION_FIELDS);
@@ -407,9 +400,9 @@ class FiltersLib
 	public function removeAppliedFilter($appliedFilter)
 	{
 		$removeAppliedFilter = false;
-		$trimed = trim($appliedFilter);
+
 		// Checks the parameter appliedFilter
-		if (isset($appliedFilter) && !empty($trimed))
+		if (isset($appliedFilter) && !isEmptyString($appliedFilter))
 		{
 			// Retrives all the used fields by the current filter
 			$fields = $this->getElementSession(self::SESSION_FIELDS);
@@ -495,9 +488,9 @@ class FiltersLib
 	public function addFilter($filter)
 	{
 		$addFilter = false;
-		$trimed = trim($filter);
+
 		// Checks the parameter filter
-		if (isset($filter) && !empty($trimed))
+		if (isset($filter) && !isEmptyString($filter))
 		{
 			// Retrives all the used fields by the current filter
 			$fields = $this->getElementSession(self::SESSION_FIELDS);
@@ -538,9 +531,9 @@ class FiltersLib
 	public function saveCustomFilter($customFilterDescription)
 	{
 		$saveCustomFilter = false; // by default returns a failure
-		$trimed = trim($customFilterDescription);
+
 		// Checks parameter customFilterDescription if not valid stop the execution
-		if (!isset($customFilterDescription) || empty($triemd))
+		if (!isset($customFilterDescription) || isEmptyString($customFilterDescription))
 		{
 			return $saveCustomFilter;
 		}
@@ -657,11 +650,10 @@ class FiltersLib
 	 */
 	private function _getFilterUniqueId($params)
 	{
-		$trimed = trim($params[self::FILTER_PAGE_PARAM]);
 		if ($params != null
 			&& is_array($params)
 			&& isset($params[self::FILTER_PAGE_PARAM])
-			&& !empty($trimed))
+			&& !isEmptyString($params[self::FILTER_PAGE_PARAM]))
 		{
 			$filterUniqueId = $params[self::FILTER_PAGE_PARAM];
 		}
@@ -691,9 +683,9 @@ class FiltersLib
 	private function _getDatasetQueryCondition($filterDefinition)
 	{
 		$condition = ''; // starts building the condition
-		$trimed = trim($filterDefinition->operation);
+
 		// "operation" is a required property for the applied filter definition
-		if (!empty($trimed))
+		if (!isEmptyString($filterDefinition->operation))
 		{
 			// Checks what operation is required
 			switch ($filterDefinition->operation)
@@ -766,9 +758,9 @@ class FiltersLib
 					break;
 			}
 		}
-		$trimed = trim($condition);
+
 		// if the condition is valid
-		if (!empty($trimed)) $condition = ' '.$condition; // add a white space before
+		if (!isEmptyString($condition)) $condition = ' '.$condition; // add a white space before
 
 		return $condition;
 	}

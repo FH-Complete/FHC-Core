@@ -11,7 +11,7 @@ class Basic extends CI_Controller
 		parent::__construct();
 
 		$this->load->library(array('rdf'));
-		$this->load->helper(array('form', 'url'));
+		$this->load->helper('form');
 	}
 
 	/**
@@ -25,7 +25,7 @@ class Basic extends CI_Controller
 			$d['content'] = $this->load->view('rdf/basic', $d, true);
 			$this->load->view('home', $d);
 	}
-	
+
 	/**
 	 * Load Sparql-View
 	 * @return void
@@ -37,7 +37,7 @@ class Basic extends CI_Controller
 			$d['content'] = $this->load->view('rdf/basic_sparql', $d, true);
 			$this->load->view('home', $d);
 	}
-	
+
 	/**
 	 * Load foaf-View
 	 * @return void
@@ -60,7 +60,7 @@ class Basic extends CI_Controller
 			$d['content'] = $this->load->view('rdf/foafmaker', $d, true);
 			$this->load->view('home', $d);
 	}
-	
+
 	/**
 	 * Load converter View
 	 * @return void

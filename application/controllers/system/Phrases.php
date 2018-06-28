@@ -16,9 +16,6 @@ class Phrases extends FHC_Controller
 
         // Loads the widget library
 		$this->load->library('WidgetLib');
-
-        // Loads helper message to manage returning messages
-		$this->load->helper('message');
     }
 
 	/**
@@ -51,7 +48,7 @@ class Phrases extends FHC_Controller
 	 */
 	public function view($phrase_id)
 	{
-		if (empty($phrase_id))
+		if (!is_numeric($phrase_id))
 			show_error('Invalid phrase_id parameter');
 
 		$phrase = $this->phraseslib->getPhrase($phrase_id);
@@ -74,7 +71,7 @@ class Phrases extends FHC_Controller
 	 */
 	public function deltext($phrasentext_id, $phrase_id)
 	{
-		if (empty($phrasentext_id) || empty($phrase_id))
+		if (!is_numeric($phrasentext_id) || !is_numeric($phrase_id))
 			show_error('Invalid phrasentext_id or phrase_id parameter');
 
 		$phrase_inhalt = $this->phraseslib->delPhrasentext($phrasentext_id);
@@ -89,7 +86,7 @@ class Phrases extends FHC_Controller
 	 */
 	public function edit($phrase_id = null)
 	{
-		if (empty($phrase_id)) return;
+		if (!is_numeric($phrase_id)) return;
 
 		$phrase = $this->phraseslib->getPhrase($phrase_id);
 		if ($phrase->error)

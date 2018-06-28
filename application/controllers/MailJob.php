@@ -22,11 +22,11 @@ class MailJob extends FHC_Controller
 	public function __construct()
 	{
 		parent::__construct();
-		
+
 		// Loads MessageLib
-		$this->load->library("MessageLib");
+		$this->load->library('MessageLib');
 	}
-	
+
 	public function sendMessages($numberToSent = null, $numberPerTimeRange = null, $email_time_range = null, $email_from_system = null)
 	{
 		$this->messagelib->sendAll($numberToSent, $numberPerTimeRange, $email_time_range, $email_from_system);

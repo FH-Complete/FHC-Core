@@ -17,9 +17,6 @@ class DmsLib
 		$this->ci->load->model('content/Dms_model', 'DmsModel');
 		$this->ci->load->model('content/DmsVersion_model', 'DmsVersionModel');
 		$this->ci->load->model('content/DmsFS_model', 'DmsFSModel');
-
-		// Loads helper message to manage returning messages
-		$this->ci->load->helper('message');
 	}
 
 	/**

@@ -22,9 +22,6 @@ class PhrasesLib
 		$this->_ci->load->model('system/Phrase_model', 'PhraseModel');
 		$this->_ci->load->model('system/Phrasentext_model', 'PhrasentextModel');
 
-		// Loads helper message to manage returning messages
-		$this->_ci->load->helper('message');
-
 		// Workaround to use more parameters in the construct since PHP doesn't support many constructors
 		$this->_extend_construct(func_get_args());
     }
@@ -37,7 +34,7 @@ class PhrasesLib
      */
     public function getPhrase($phrase_id)
     {
-        if (empty($phrase_id)) return error(MSG_ERR_INVALID_MSG_ID);
+        if (isEmptyString($phrase_id)) return error(MSG_ERR_INVALID_MSG_ID);
 
         return $this->_ci->PhraseModel->load($phrase_id);
     }
@@ -55,7 +52,7 @@ class PhrasesLib
      */
 	public function getPhraseInhalt($phrase_id)
     {
-        if (empty($phrase_id)) return error(MSG_ERR_INVALID_MSG_ID);
+        if (isEmptyString($phrase_id)) return error(MSG_ERR_INVALID_MSG_ID);
 
         return $this->_ci->PhrasentextModel->loadWhere(array('phrase_id' => $phrase_id));
     }
@@ -65,7 +62,7 @@ class PhrasesLib
      */
     public function delPhrasentext($phrasentext_id)
     {
-        if (empty($phrasentext_id)) return error(MSG_ERR_INVALID_MSG_ID);
+        if (isEmptyString($phrasentext_id)) return error(MSG_ERR_INVALID_MSG_ID);
 
         return $this->_ci->PhrasentextModel->delete(array('phrasentext_id' => $phrasentext_id));
     }
@@ -75,7 +72,7 @@ class PhrasesLib
      */
     public function savePhrase($phrase_id, $data)
     {
-        if (empty($data)) return error(MSG_ERR_INVALID_MSG_ID);
+        if (isEmptyString($data)) return error(MSG_ERR_INVALID_MSG_ID);
 
         return $this->_ci->PhraseModel->update($phrase_id, $data);
     }
@@ -85,7 +82,7 @@ class PhrasesLib
      */
     public function getPhrasentextById($phrasentext_id)
 	{
-        if (empty($phrasentext_id))
+        if (isEmptyString($phrasentext_id))
         	return error($this->_ci->lang->line('fhc_'.FHC_INVALIDID, false));
 
         return $this->_ci->PhrasentextModel->load($phrasentext_id);
@@ -173,7 +170,7 @@ class PhrasesLib
      */
     public function parseVorlagetext($text, $data = array())
 	{
-        if (empty($text))
+        if (isEmptyString($text))
         	return error($this->_ci->lang->line('fhc_'.FHC_INVALIDID, false));
 
 		return $this->_ci->parser->parse_string($text, $data, true);
@@ -196,13 +193,13 @@ class PhrasesLib
 			for ($i = 0; $i < count($this->_phrases); $i++)
 			{
 				$_phrase = $this->_phrases[$i]; // single phrase
-				$trimed = trim($_phrase->text);
+
 				// If the single phrase match the given parameters and is not an empty string
 				if ($_phrase->category == $category
 					&& $_phrase->phrase == $phrase
 					&& $_phrase->orgeinheit_kurzbz == $orgeinheit_kurzbz
 					&& $_phrase->orgform_kurzbz == $orgform_kurzbz
-					&& (!empty($trimed)))
+					&& !isEmptyString($_phrase->text))
 				{
 					if (!is_array($parameters)) $parameters = array(); // if params is not an array
 
@@ -246,7 +243,7 @@ class PhrasesLib
 
 				// Use the given language if present, otherwise retrives the language for the logged user
 				$language = DEFAULT_LANGUAGE;
-				if (count($parameters) == 2 && !empty($parameters[1]) && is_string($parameters[1]))
+				if (count($parameters) == 2 && !isEmptyString($parameters[1]) && is_string($parameters[1]))
 				{
 					$language = $parameters[1];
 				}

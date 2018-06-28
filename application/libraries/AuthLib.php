@@ -27,6 +27,8 @@ require_once FHCPATH.'include/authentication.class.php';
 
 class AuthLib extends authentication
 {
+	private $_ci; // CI instance
+
 	/**
 	 * Construct
 	 */
@@ -35,10 +37,7 @@ class AuthLib extends authentication
 		parent::__construct();
 
 		// Gets CI instance
-		$this->ci =& get_instance();
-
-		// Loads helper message to manage returning messages
-		$this->ci->load->helper('Message');
+		$this->_ci =& get_instance();
 	}
 
 	/**
@@ -83,9 +82,9 @@ class AuthLib extends authentication
 		$result = error(false);
 
 		// Load model PersonModel
-		$this->ci->load->model('person/person_model', 'PersonModel');
+		$this->_ci->load->model('person/person_model', 'PersonModel');
 
-		$person = $this->ci->PersonModel->loadWhere(array('zugangscode' => $code));
+		$person = $this->_ci->PersonModel->loadWhere(array('zugangscode' => $code));
 
 		if (hasData($person))
 		{
@@ -103,9 +102,9 @@ class AuthLib extends authentication
 		$result = error(false);
 
 		// Load model PersonModel
-		$this->ci->load->model('person/person_model', 'PersonModel');
+		$this->_ci->load->model('person/person_model', 'PersonModel');
 
-		$person = $this->ci->PersonModel->getPersonKontaktByZugangscode($code, $email);
+		$person = $this->_ci->PersonModel->getPersonKontaktByZugangscode($code, $email);
 
 		if (hasData($person))
 		{
@@ -124,9 +123,9 @@ class AuthLib extends authentication
 		$finalUserBasicDataByUID = null;
 
 		// Load model BenutzerModel
-		$this->ci->load->model('person/Benutzer_model', 'BenutzerModel');
+		$this->_ci->load->model('person/Benutzer_model', 'BenutzerModel');
 
-		$benutzer = $this->ci->BenutzerModel->load($uid);
+		$benutzer = $this->_ci->BenutzerModel->load($uid);
 
 		if (hasData($benutzer))
 		{

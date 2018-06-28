@@ -53,8 +53,6 @@ class UDFLib
 	public function __construct()
 	{
 		$this->_ci =& get_instance();
-
-		$this->_ci->load->helper('fhc');
 	}
 
 	// -------------------------------------------------------------------------------------------------
@@ -65,7 +63,8 @@ class UDFLib
      */
     public function UDFWidget($args, $htmlArgs = array())
     {
-		if (!empty($args[UDFLib::SCHEMA_ARG_NAME]) && !empty($args[UDFLib::TABLE_ARG_NAME]))
+		if ((isset($args[UDFLib::SCHEMA_ARG_NAME]) && !isEmptyString($args[UDFLib::SCHEMA_ARG_NAME]))
+			&& (isset($args[UDFLib::TABLE_ARG_NAME]) && !isEmptyString($args[UDFLib::TABLE_ARG_NAME])))
 		{
 			// Loads the widget library
 			$this->_ci->load->library('WidgetLib');
@@ -74,7 +73,7 @@ class UDFLib
 			loadResource(APPPATH.'widgets/udf');
 
 			// Default external block is true
-			if (empty($args[UDFLib::FIELD_ARG_NAME]) && !isset($htmlArgs[HTMLWidget::EXTERNAL_BLOCK]))
+			if (!isset($args[UDFLib::FIELD_ARG_NAME]) && !isset($htmlArgs[HTMLWidget::EXTERNAL_BLOCK]))
 			{
 				$htmlArgs[HTMLWidget::EXTERNAL_BLOCK] = true;
 			}
@@ -87,11 +86,11 @@ class UDFLib
 		}
 		else
 		{
-			if (empty($args[UDFLib::SCHEMA_ARG_NAME]))
+			if (!isset($args[UDFLib::SCHEMA_ARG_NAME]) || isEmptyString($args[UDFLib::SCHEMA_ARG_NAME]))
 			{
 				show_error(UDFLib::SCHEMA_ARG_NAME.' parameter is missing!');
 			}
-			if (empty($args[UDFLib::TABLE_ARG_NAME]))
+			if (!isset($args[UDFLib::TABLE_ARG_NAME]) || isEmptyString($args[UDFLib::TABLE_ARG_NAME]))
 			{
 				show_error(UDFLib::TABLE_ARG_NAME.' parameter is missing!');
 			}

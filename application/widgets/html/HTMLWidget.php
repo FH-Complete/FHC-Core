@@ -10,12 +10,12 @@ class HTMLWidget extends Widget
 	const HTML_DEFAULT_VALUE = ''; // Default value of the html element
     const HTML_NAME = 'name'; // HTML name attribute
     const HTML_ID = 'id'; // HTML id attribute
-    
+
     // External block definition
     const EXTERNAL_BLOCK = 'externalBlock'; // External block name
     const EXTERNAL_START_BLOCK_HTML_TAG = '<div>'; // External block start tag
     const EXTERNAL_END_BLOCK_HTML_TAG = '</div>'; // External block end tag
-    
+
     // HTML attributes
     const LABEL = 'title';
 	const REGEX = 'regex';
@@ -26,21 +26,18 @@ class HTMLWidget extends Widget
 	const MAX_LENGTH = 'max-length';
 	const MIN_LENGTH = 'min-length';
 	const PLACEHOLDER = 'placeholder';
-    
+
     /**
      * It gets also the htmlArgs array as parameter, it will be used to set the HTML properties
      */
     public function __construct($name, $args = array(), $htmlArgs = array())
 	{
 		parent::__construct($name, $args);
-		
+
 		// Initialising HTML properties
 		$this->_setHtmlProperties($htmlArgs);
-        
-        // Loads helper message to manage returning messages
-		$this->load->helper('message');
 	}
-    
+
     /**
      * Initialising html properties, such as the id and name attributes of the HTML element
      */
@@ -50,19 +47,19 @@ class HTMLWidget extends Widget
 		if (!isset($this->_args[HTMLWidget::HTML_ARG_NAME]))
 		{
 			$this->_args[HTMLWidget::HTML_ARG_NAME] = array();
-			
+
 			// Avoids that elements in a HTML page have the same name or id
 			$randomIdentifier = uniqid(rand(0, 1000));
 			$this->_args[HTMLWidget::HTML_ARG_NAME][HTMLWidget::HTML_ID] = $randomIdentifier;
 			$this->_args[HTMLWidget::HTML_ARG_NAME][HTMLWidget::HTML_NAME] = $randomIdentifier;
-			
+
 			foreach($htmlArgs as $argName => $argValue)
 			{
 				$this->_args[HTMLWidget::HTML_ARG_NAME][$argName] = $argValue;
 			}
 		}
     }
-    
+
     /**
 	 * Prints an attribute name and eventually also the value extracted from $htmlArgs
 	 * Set $isValuePresent to false the value should not be displayed
@@ -76,12 +73,12 @@ class HTMLWidget extends Widget
 				if ($isValuePresent === true)
 				{
 					$value = $htmlArgs[$attribute];
-					
+
 					if (is_bool($value))
 					{
 						$value = $value ? 'true' : 'false';
 					}
-					
+
 					echo sprintf('%s="%s"', $attribute, $value);
 				}
 				else
@@ -91,7 +88,7 @@ class HTMLWidget extends Widget
 			}
 		}
 	}
-	
+
 	/**
 	 * Prints the external block start tag
 	 */
@@ -103,7 +100,7 @@ class HTMLWidget extends Widget
 			echo HTMLWidget::EXTERNAL_START_BLOCK_HTML_TAG;
 		}
 	}
-	
+
 	/**
 	 * Prints the external block end tag
 	 */

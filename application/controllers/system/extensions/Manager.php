@@ -15,7 +15,7 @@ class Manager extends VileSci_Controller
 		parent::__construct();
 
 		// Load helpers to upload files
-		$this->load->helper(array('form', 'url'));
+		$this->load->helper('form');
 
 		// Loads the extensions library
 		$this->load->library('ExtensionsLib');

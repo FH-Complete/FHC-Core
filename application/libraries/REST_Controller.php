@@ -1814,6 +1814,9 @@ abstract class REST_Controller extends CI_Controller {
             return FALSE;
         }
 
+		// Loads authentication library
+		$this->load->library('AuthLib');
+
         if (is_callable([$auth_library_class, $auth_library_function]) === FALSE)
         {
             $this->load->library($auth_library_class);

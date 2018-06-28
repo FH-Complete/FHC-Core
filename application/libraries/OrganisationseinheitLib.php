@@ -13,9 +13,6 @@ class OrganisationseinheitLib
 
 		// Loads model Organisationseinheit_model
 		$this->ci->load->model('organisation/Organisationseinheit_model', 'OrganisationseinheitModel');
-
-		// Loads helper message to manage returning messages
-		$this->ci->load->helper('Message');
 	}
 
 	/**
