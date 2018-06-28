@@ -155,21 +155,19 @@ class PermissionLib
 								// Retrives permission and required access type from the $requiredPermissions array
 								list($permission, $requiredAccessType) = explode(PermissionLib::PERMISSION_SEPARATOR, $permissions[$pCounter]);
 
-								$accessType = null;
+								$accessType = '';
 
 								// Checks if the required access type is compliant with the HTTP method (GET => r, POST => w)
-								if ($requestMethod == self::READ_HTTP_METHOD
-									&& strpos($requiredAccessType, PermissionLib::READ_RIGHT) !== false)
+								if (strpos($requiredAccessType, PermissionLib::READ_RIGHT) !== false)
 								{
 									$accessType = PermissionLib::SELECT_RIGHT; // S
 								}
-								elseif ($requestMethod == self::WRITE_HTTP_METHOD
-									&& strpos($requiredAccessType, PermissionLib::WRITE_RIGHT) !== false)
+								if (strpos($requiredAccessType, PermissionLib::WRITE_RIGHT) !== false)
 								{
-									$accessType = PermissionLib::REPLACE_RIGHT.PermissionLib::DELETE_RIGHT; // UID
+									$accessType .= PermissionLib::REPLACE_RIGHT.PermissionLib::DELETE_RIGHT; // UID
 								}
 
-								if ($accessType != null) // if compliant
+								if (!isEmptyString($accessType)) // if compliant
 								{
 									// Checks if the user has the same required permissiond with the same required access type
 									$checkPermissions = $this->isBerechtigt($permission, $accessType);
