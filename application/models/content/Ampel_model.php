@@ -32,11 +32,11 @@ class Ampel_model extends DB_Model
 			$query .= ' email = ? AND';
 		}
 
-		$query .= '
+		$query .= '(
 			(NOW()<(deadline+(COALESCE(verfallszeit,0) || \' days\')::interval)::date)
 			    OR (verfallszeit IS NULL)
 			   AND (NOW()>(deadline-(COALESCE(vorlaufzeit,0) || \' days\')::interval)::date)
-			    OR (vorlaufzeit IS NULL AND NOW() < deadline)';
+			    OR (vorlaufzeit IS NULL AND NOW() < deadline))';
 
 		$query .= ' ORDER BY deadline DESC';
 
