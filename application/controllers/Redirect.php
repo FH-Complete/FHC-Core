@@ -26,9 +26,6 @@ class Redirect extends FHC_Controller
 		// Loads config file fhcomplete
 		$this->config->load('fhcomplete');
 
-		// Loads message helper
-		$this->load->helper('message');
-
 		// Loads model MessageTokenModel
 		$this->load->model('system/MessageToken_model', 'MessageTokenModel');
 	}

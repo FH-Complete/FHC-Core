@@ -25,10 +25,10 @@ class Vorlage extends Auth_Controller
 			)
 		);
 
-        // Loads the vorlage library
-        $this->load->library('VorlageLib');
+		// Loads the vorlage library
+		$this->load->library('VorlageLib');
 
-        // Loads the widget library
+		// Loads the widget library
 		$this->load->library('WidgetLib');
     }
 
@@ -61,7 +61,7 @@ class Vorlage extends Auth_Controller
 
 	public function view($vorlage_kurzbz = null)
 	{
-		if (empty($vorlage_kurzbz)) exit;
+		if (isEmptyString($vorlage_kurzbz)) exit;
 
 		$vorlagentext = $this->vorlagelib->getVorlagetextByVorlage($vorlage_kurzbz);
 
@@ -78,7 +78,7 @@ class Vorlage extends Auth_Controller
 
 	public function edit($vorlage_kurzbz = null)
 	{
-		if (empty($vorlage_kurzbz)) exit;
+		if (isEmptyString($vorlage_kurzbz)) exit;
 
 		$vorlage = $this->vorlagelib->getVorlage($vorlage_kurzbz);
 

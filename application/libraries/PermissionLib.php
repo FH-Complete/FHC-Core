@@ -41,6 +41,7 @@ class PermissionLib
 	const READ_HTTP_METHOD = 'GET';
 	const WRITE_HTTP_METHOD = 'POST';
 
+	private $_ci; // CI instance
 	private $acl; // conversion array from a source to a permission
 	private static $bb; // benutzerberechtigung
 
@@ -51,19 +52,20 @@ class PermissionLib
 	public function __construct()
 	{
 		// Loads CI instance
-		$this->ci =& get_instance();
-
-		// Loads the auth helper
-		$this->ci->load->helper('fhcauth');
+		$this->_ci =& get_instance();
 
 		// Loads the array of resources
-		$this->acl = $this->ci->config->item('fhc_acl');
+		$this->acl = $this->_ci->config->item('fhc_acl');
 
+		// Loads authentication library
+		$this->_ci->load->library('AuthLib');
+
+		// If it's NOT called from command line
 		if (!is_cli())
 		{
 			// API Caller rights initialization
 			self::$bb = new benutzerberechtigung();
-			self::$bb->getBerechtigungen(getAuthUID());
+			self::$bb->getBerechtigungen($this->_ci->authlib->getUser());
 		}
 	}
 

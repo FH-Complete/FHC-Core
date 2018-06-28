@@ -88,7 +88,7 @@ class MailLib
 		if (!is_null($recipientBCC)) $this->ci->email->bcc($recipientBCC);
 		$this->ci->email->subject($subject);
 		$this->ci->email->message($message);
-		if (!empty($altMessage)) $this->ci->email->set_alt_message($altMessage);
+		if (!isEmptyString($altMessage)) $this->ci->email->set_alt_message($altMessage);
 
 		// Avoid printing on standard output ugly error messages
 		$result = @$this->ci->email->send();
@@ -151,7 +151,7 @@ class MailLib
 	{
 		$valid = false;
 
-		if (!empty($emailAddress))
+		if (!isEmptyString($emailAddress))
 		{
 			$valid = filter_var($emailAddress, FILTER_VALIDATE_EMAIL);
 		}

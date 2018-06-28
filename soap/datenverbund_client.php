@@ -53,6 +53,7 @@ $staat = filter_input(INPUT_POST, 'staat');
 $matura = filter_input(INPUT_POST, 'matura');
 $svnr = filter_input(INPUT_POST, 'svnr');
 $ersatzkennzeichen = filter_input(INPUT_POST, 'ersatzkennzeichen');
+$person_id = filter_input(INPUT_POST, 'person_id');
 
 ?><!DOCTYPE html>
 <html>
@@ -73,6 +74,7 @@ $ersatzkennzeichen = filter_input(INPUT_POST, 'ersatzkennzeichen');
 		<li><a href="datenverbund_client.php?action=getReservations">Matrikelnummer Reservierungen anzeigen</a></li>
 		<li><a href="datenverbund_client.php?action=getKontingent">Matrikelnummer Kontingent anfordern</a></li>
 		<li><a href="datenverbund_client.php?action=setMatrikelnummer">Matrikelnummer Vergabe melden</a></li>
+		<li><a href="datenverbund_client.php?action=assignMatrikelnummer">Gesamtprozess (Abfrage, ggf Vergabemeldung, Speichern bei Person)</a></li>
 	</ul>
 	<br><br>
 	<form action="<?php echo $_SERVER['PHP_SELF'].'?action='.$action; ?>" method="post">
@@ -87,7 +89,7 @@ $ersatzkennzeichen = filter_input(INPUT_POST, 'ersatzkennzeichen');
 	 * @param int $maxlength Maximallaenge des Eingabefeldes.
 	 * @return void
 	 */
-	function printrow($name, $title, $value, $hint = '', $maxlength = 15)
+	function printrow($name, $title, $value, $hint = '', $maxlength = 15, $type = 'text')
 	{
 		global $db;
 
@@ -95,14 +97,14 @@ $ersatzkennzeichen = filter_input(INPUT_POST, 'ersatzkennzeichen');
 		<tr>
 			<td align="right">'.$title.':</td>
 			<td>
-				<input name="'.$name.'" type="text" size="30" maxlength="'.$maxlength.'"
+				<input name="'.$name.'" type="'.$type.'" size="30" maxlength="'.$maxlength.'"
 					value="'.$db->convert_html_chars($value).'"> '.$hint.'
 			</td>
 		</tr>';
 	}
 
 	printrow('username', 'Username', $username, '', 100);
-	printrow('password', 'Passwort', $password, '', 100);
+	printrow('password', 'Passwort', $password, '', 100, 'password');
 
 	switch($action)
 	{
@@ -144,6 +146,10 @@ $ersatzkennzeichen = filter_input(INPUT_POST, 'ersatzkennzeichen');
 			printrow('staat', 'Staat', $staat, '1-3 Stellen Codex (zb A für Österreich)', 3);
 			printrow('svnr', 'SVNR', $staat);
 			printrow('matura', 'Maturadatum', $matura, 'Format: YYYYMMDD (optional)', 10);
+			break;
+
+		case 'assignMatrikelnummer':
+			printrow('person_id', 'PersonID', $person_id);
 			break;
 
 		default:
@@ -228,6 +234,15 @@ if (isset($_REQUEST['submit']))
 
 			if ($dvb->setMatrikelnummer($_POST['bildungseinrichtung'], $person))
 				echo '<br><b>Erfolgreich gemeldet</b>';
+			else
+				echo '<br><b>Fehlgeschlagen:</b>'.$dvb->errormsg;
+			break;
+
+		case 'assignMatrikelnummer':
+			if($dvb->assignMatrikelnummer($person_id))
+			{
+				echo '<br><b>OK</b>';
+			}
 			else
 				echo '<br><b>Fehlgeschlagen:</b>'.$dvb->errormsg;
 			break;

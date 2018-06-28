@@ -40,7 +40,7 @@ define('XML_ROOT', 'http://www.fhcomlete.org/build/rdf/');
 // Pfad zu Document Root
 define('DOC_ROOT', '/var/www/html/build/');
 // URL zu CIS
-define('CIS_ROOT', 'http://www.fhcomlete.org/build/cis/');
+define('CIS_ROOT', 'http://www.fhcomlete.org/build/');
 
 // Externe Funktionen - Unterordner im Include-Verzeichnis
 define('EXT_FKT_PATH', 'tw');
@@ -185,4 +185,14 @@ define('SIGNATUR_USER', 'username');
 define('SIGNATUR_PASSWORD', 'password');
 // Signaturprofil das verwendet werden soll
 define('SIGNATUR_DEFAULT_PROFILE', 'FHC_AMT_GROSS_DE');
+
+/**
+ * Datenverbund Anbindung
+ */
+// Code der Bildungseinrichtung
+define('DVB_BILDUNGSEINRICHTUNG_CODE','XX');
+// Username
+define('DVB_USERNAME','username');
+// Passwort
+define('DVB_PASSWORD','passwort');
 ?>

@@ -13,7 +13,7 @@ class Test extends REST_Controller
     {
 		parent::__construct();
 
-		// Loads return messages
+		// Loads helper message to manage returning messages
 		$this->load->helper('message');
     }
 

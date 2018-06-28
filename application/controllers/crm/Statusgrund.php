@@ -20,9 +20,9 @@ class Statusgrund extends Auth_Controller
 			)
 		);
 
-        $this->load->model("crm/Status_model", "StatusModel");
-        $this->load->model("crm/Statusgrund_model", "StatusgrundModel");
-        $this->load->model("system/Sprache_model", "SpracheModel");
+        $this->load->model('crm/Status_model', 'StatusModel');
+        $this->load->model('crm/Statusgrund_model', 'StatusgrundModel');
+        $this->load->model('system/Sprache_model', 'SpracheModel');
     }
 
 	public function index()

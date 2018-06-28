@@ -23,7 +23,7 @@ class Ort extends APIv1_Controller
 	{
 		parent::__construct(array('Ort' => 'basis/ort:rw', 'All' => 'basis/ort:r'));
 		// Load model OrtModel
-		$this->load->model("ressource/ort_model", "OrtModel");
+		$this->load->model('ressource/ort_model', 'OrtModel');
 	}
 
 	/**

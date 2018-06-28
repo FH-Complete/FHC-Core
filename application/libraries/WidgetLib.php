@@ -4,17 +4,17 @@
  * @author      Jens Segers
  * @link        http://www.jenssegers.be
  * @license     MIT License Copyright (c) 2012 Jens Segers
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -30,16 +30,16 @@ class WidgetLib
 {
 	const DIR_HTML_WIDGETS = 'html';
 	const HTML_WIDGET_NAME = 'HTMLWidget';
-	
+
     /* default values */
     private $_template = 'template';
     private $_parser = false;
     private $_cache_ttl = 0;
     private $_widget_path = '';
-    
+
     private $_ci;
     private $_partials = array();
-    
+
     /**
      * Construct with configuration array. Codeigniter will use the config file otherwise
      * @param array $config
@@ -47,23 +47,19 @@ class WidgetLib
     public function __construct($config = array())
 	{
         $this->_ci = & get_instance();
-        
-        $this->_ci->load->helper('fhc');
-        
+
         // Set the default widget path with APPPATH
         $this->_widget_path = APPPATH.'widgets/';
-		
+
         // Loads widgets to render HTML elements
         // NOTE: the first one to be loaded must be HTMLWidget
         loadResource($this->_widget_path.WidgetLib::DIR_HTML_WIDGETS, WidgetLib::HTML_WIDGET_NAME);
         loadResource($this->_widget_path.WidgetLib::DIR_HTML_WIDGETS);
-        
-        if (!empty($config))
-            $this->initialize($config);
-        
-        log_message('debug', 'Template library initialized');
+
+		// If config are given then initialize this lib with the given config
+        if (!isEmptyArray($config)) $this->initialize($config);
     }
-    
+
     /**
      * Initialize with configuration array
      * @param array $config
@@ -73,14 +69,14 @@ class WidgetLib
 	{
         foreach ($config as $key => $val)
             $this->{'_'.$key} = $val;
-        
+
         if ($this->_widget_path == '')
             $this->_widget_path = APPPATH.'widgets/';
-        
+
         if ($this->_parser && !class_exists('CI_Parser'))
             $this->_ci->load->library('parser');
     }
-    
+
     /**
      * Set a partial's content. This will create a new partial when not existing
      * @param string $index
@@ -90,7 +86,7 @@ class WidgetLib
 	{
         $this->partial($name)->set($value);
     }
-    
+
     /**
      * Access to partials for method chaining
      * @param string $name
@@ -100,7 +96,7 @@ class WidgetLib
 	{
         return $this->partial($name);
     }
-    
+
     /**
      * Check if a partial exists
      * @param string $index
@@ -110,7 +106,7 @@ class WidgetLib
 	{
         return array_key_exists($index, $this->_partials);
     }
-    
+
     /**
      * Set the template file
      * @param string $template
@@ -119,7 +115,7 @@ class WidgetLib
 	{
         $this->_template = $template;
     }
-    
+
     /**
      * Publish the template with the current partials
      * You can manually pass a template file with extra data, or use the default template from the config file
@@ -136,12 +132,12 @@ class WidgetLib
         {
             $this->_template = $template;
         }
-        
+
         if (!$this->_template)
         {
             show_error('There was no template file selected for the current template');
         }
-        
+
         if (is_array($data) || is_object($data))
         {
             foreach ($data as $name => $content)
@@ -149,9 +145,9 @@ class WidgetLib
                 $this->partial($name)->set($content);
             }
         }
-        
+
         unset($data);
-        
+
         if ($this->_parser)
         {
             $this->_ci->parser->parse($this->_template, $this->_partials);
@@ -161,7 +157,7 @@ class WidgetLib
             $this->_ci->load->view($this->_template, $this->_partials);
         }
     }
-    
+
     /**
      * Create a partial object with an optional default content
      * Can be usefull to use straight from the template file
@@ -183,24 +179,24 @@ class WidgetLib
             {
                 $partial->cache($this->_cache_ttl);
             }
-            
+
             // detect local triggers
             if (method_exists($this, 'trigger_'.$name))
             {
                 $partial->bind($this, 'trigger_'.$name);
             }
-            
+
             $this->_partials[$name] = $partial;
         }
-        
+
         if (!$partial->content() && $default)
         {
             $partial->set($default);
         }
-        
+
         return $partial;
     }
-    
+
     /**
      * Create a widget object with optional parameters
      * Can be usefull to use straight from the template file
@@ -213,15 +209,15 @@ class WidgetLib
     {
 		// Loads the widget file, trying to find it also in the subdirectories
         loadResource($this->_widget_path, $name, true);
-        
+
         if (!class_exists($name))
         {
             show_error("Widget '".$name."' was not found.");
         }
-        
+
         return new $name($name, $data, $htmlArgs);
     }
-    
+
     /**
      * Enable cache for all partials with TTL, default TTL is 60
      * @param int $ttl
@@ -233,10 +229,10 @@ class WidgetLib
         {
             $partial->cache($ttl, $identifier);
         }
-        
+
         $this->_cache_ttl = $ttl;
     }
-    
+
     // ---- TRIGGERS -----------------------------------------------------------------
 
     /**
@@ -255,27 +251,27 @@ class WidgetLib
             }
             return $return;
         }
-        
+
         if (!stristr($url, 'http://') && !stristr($url, 'https://') && substr($url, 0, 2) != '//')
         {
             $url = $this->_ci->config->item('base_url').$url;
         }
-        
+
         // legacy support for media
         if (is_string($attributes))
         {
             $attributes = array('media' => $attributes);
         }
-        
+
         if (is_array($attributes))
         {
         	$attributeString = "";
-        	
+
         	foreach ($attributes as $key => $value)
         	{
 	        	$attributeString .= $key.'="'.$value.'" ';
         	}
-        	
+
             return '<link rel="stylesheet" href="'.htmlspecialchars(strip_tags($url)).'" '.$attributeString.'>'."\n\t";
         }
         else
@@ -283,7 +279,7 @@ class WidgetLib
             return '<link rel="stylesheet" href="'.htmlspecialchars(strip_tags($url)).'">'."\n\t";
         }
     }
-    
+
     /**
      * Javascript trigger
      * @param string $source
@@ -300,15 +296,15 @@ class WidgetLib
             }
             return $return;
         }
-        
+
         if (!stristr($url, 'http://') && !stristr($url, 'https://') && substr($url, 0, 2) != '//')
         {
             $url = $this->_ci->config->item('base_url').$url;
         }
-        
+
         return '<script src="'.htmlspecialchars(strip_tags($url)).'"></script>'."\n\t";
     }
-    
+
     /**
      * Meta trigger
      * @param string $name
@@ -319,12 +315,12 @@ class WidgetLib
     {
         $name = htmlspecialchars(strip_tags($name));
         $value = htmlspecialchars(strip_tags($value));
-        
+
         if ($name == 'keywords' and !strpos($value, ','))
         {
             $content = preg_replace('/[\s]+/', ', ', trim($value));
         }
-        
+
         switch ($type)
         {
             case 'meta' :
@@ -334,10 +330,10 @@ class WidgetLib
                 $content = '<link rel="'.$name.'" href="'.$value.'">'."\n\t";
                 break;
         }
-        
+
         return $content;
     }
-    
+
     /**
      * Title trigger, keeps it clean
      * @param string $name
@@ -348,7 +344,7 @@ class WidgetLib
     {
         return htmlspecialchars(strip_tags($title));
     }
-    
+
     /**
      * Title trigger, keeps it clean
      * @param string $name
@@ -366,7 +362,7 @@ class Partial
 {
     protected $_ci, $_content, $_name, $_cache_ttl = 0, $_cached = false, $_identifier, $_trigger;
     protected $_args = array();
-    
+
     /**
      * Construct with optional parameters
      * @param array $args
@@ -377,7 +373,7 @@ class Partial
         $this->_args = $args;
         $this->_name = $name;
     }
-    
+
     /**
      * Gives access to codeigniter's functions from this class if needed
      * This will be handy in extending classes
@@ -387,7 +383,7 @@ class Partial
     {
         return $this->_ci->$name;
     }
-    
+
     /**
      * Alias methods
      */
@@ -403,7 +399,7 @@ class Partial
                 break;
         }
     }
-    
+
     /**
      * Returns the content when converted to a string
      * @return string
@@ -412,7 +408,7 @@ class Partial
     {
         return (string) $this->content();
     }
-    
+
     /**
      * Returns the content
      * @return string
@@ -423,10 +419,10 @@ class Partial
         {
             $this->cache->save($this->cache_id(), $this->_content, $this->_cache_ttl);
         }
-        
+
         return $this->_content;
     }
-    
+
     /**
      * Overwrite the content
      * @param mixed $content
@@ -438,10 +434,10 @@ class Partial
         {
             $this->_content = (string) $this->trigger(func_get_args());
         }
-        
+
         return $this;
     }
-    
+
     /**
      * Append something to the content
      * @param mixed $content
@@ -453,10 +449,10 @@ class Partial
         {
             $this->_content .= (string) $this->trigger(func_get_args());
         }
-        
+
         return $this;
     }
-    
+
     /**
      * Prepend something to the content
      * @param mixed $content
@@ -468,10 +464,10 @@ class Partial
         {
             $this->_content = (string) $this->trigger(func_get_args()).$this->_content;
         }
-        
+
         return $this;
     }
-    
+
     /**
      * Set content if partial is empty
      * @param mixed $default
@@ -486,10 +482,10 @@ class Partial
                 $this->_content = $default;
             }
         }
-        
+
         return $this;
     }
-    
+
     /**
      * Load a view inside this partial, overwrite if wanted
      * @param string $view
@@ -511,9 +507,9 @@ class Partial
                 }
                 $data = $array;
             }
-            
+
             $content = $this->_ci->load->view($view, $data, true);
-            
+
             if ($overwrite)
             {
                 $this->set($content);
@@ -525,7 +521,7 @@ class Partial
         }
         return $this;
     }
-    
+
     /**
      * Parses a view inside this partial, overwrite if wanted
      * @param string $view
@@ -541,7 +537,7 @@ class Partial
             {
                 $this->_ci->load->library('parser');
             }
-            
+
             // better object to array
             if (is_object($data))
             {
@@ -552,9 +548,9 @@ class Partial
                 }
                 $data = $array;
             }
-            
+
             $content = $this->_ci->parser->parse($view, $data, true);
-            
+
             if ($overwrite)
             {
                 $this->set($content);
@@ -564,10 +560,10 @@ class Partial
                 $this->append($content);
             }
         }
-        
+
         return $this;
     }
-    
+
     /**
      * Loads a widget inside this partial, overwrite if wanted
      * @param string $name
@@ -580,7 +576,7 @@ class Partial
         if (!$this->_cached)
         {
             $widget = $this->template->widget($name, $data);
-            
+
             if ($overwrite)
             {
                 $this->set($widget->content());
@@ -592,7 +588,7 @@ class Partial
         }
         return $this;
     }
-    
+
     /**
      * Enable cache with TTL, default TTL is 60
      * @param int $ttl
@@ -604,10 +600,10 @@ class Partial
         {
             $this->_ci->load->driver('cache', array('adapter' => 'file'));
         }
-        
+
         $this->_cache_ttl = $ttl;
         $this->_identifier = $identifier;
-        
+
         if ($cached = $this->_ci->cache->get($this->cache_id()))
         {
             $this->_cached = true;
@@ -615,7 +611,7 @@ class Partial
         }
         return $this;
     }
-    
+
     /**
      * Used for cache identification
      * @return string
@@ -631,7 +627,7 @@ class Partial
             return $this->_name.'_'.md5(get_class($this).implode('', $this->_args));
         }
     }
-    
+
     /**
      * Trigger returns the result if a trigger is set
      * @param array $args
@@ -648,7 +644,7 @@ class Partial
             return call_user_func_array($this->_trigger, $args);
         }
     }
-    
+
     /**
      * Bind a trigger function
      * Can be used like bind($this, "function") or bind("function")
@@ -663,12 +659,12 @@ class Partial
                 $args = func_get_args();
                 $obj = array_shift($args);
                 $func = array_pop($args);
-                
+
                 foreach ($args as $trigger)
                 {
                     $obj = $obj->$trigger;
                 }
-                
+
                 $this->_trigger = array($obj, $func);
             }
             else
@@ -703,8 +699,8 @@ class Widget extends Partial
 				ob_start();
 				$this->display($this->_args);
 				$buffer = ob_get_clean();
-				
-				// if no content is produced but there was direct ouput we set 
+
+				// if no content is produced but there was direct ouput we set
 				// that output as content
 				if (!$this->_content && $buffer)
 				{
@@ -712,7 +708,7 @@ class Widget extends Partial
 				}
 			}
 		}
-		
+
 		return parent::content();
 	}
 }

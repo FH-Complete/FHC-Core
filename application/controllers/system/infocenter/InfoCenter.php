@@ -163,8 +163,8 @@ class InfoCenter extends Auth_Controller
 		if (isError($personexists))
 			show_error($personexists->retval);
 
-		if (empty($personexists->retval))
-			show_error('person does not exist!');
+		if (!hasData($personexists))
+			show_error('Person does not exist!');
 
 		$origin_page = $this->input->get(self::ORIGIN_PAGE);
 		if ($origin_page == self::INDEX_PAGE)
@@ -232,7 +232,7 @@ class InfoCenter extends Auth_Controller
 						$person_id,
 						'saveformalgep',
 						array(
-							empty($akte->retval[0]->titel) ? $akte->retval[0]->bezeichnung : $akte->retval[0]->titel,
+							isEmptyString($akte->retval[0]->titel) ? $akte->retval[0]->bezeichnung : $akte->retval[0]->titel,
 							is_null($timestamp) ? 'NULL' : $timestamp
 						)
 					);
@@ -288,7 +288,7 @@ class InfoCenter extends Auth_Controller
 	{
 		$prestudent_id = $this->input->post('prestudentid');
 
-		if (empty($prestudent_id))
+		if (isEmptyString($prestudent_id))
 			$result = error('Prestudentid missing');
 		else
 		{
@@ -297,14 +297,14 @@ class InfoCenter extends Auth_Controller
 			$zgv_code = $this->input->post('zgv') === 'null' ? null : $this->input->post('zgv');
 			$zgvort = $this->input->post('zgvort');
 			$zgvdatum = $this->input->post('zgvdatum');
-			$zgvdatum = empty($zgvdatum) ? null : date_format(date_create($zgvdatum), 'Y-m-d');
+			$zgvdatum = isEmptyString($zgvdatum) ? null : date_format(date_create($zgvdatum), 'Y-m-d');
 			$zgvnation_code = $this->input->post('zgvnation') === 'null' ? null : $this->input->post('zgvnation');
 
 			//zgvmasterdata
 			$zgvmas_code = $this->input->post('zgvmas') === 'null' ? null : $this->input->post('zgvmas');
 			$zgvmaort = $this->input->post('zgvmaort');
 			$zgvmadatum = $this->input->post('zgvmadatum');
-			$zgvmadatum = empty($zgvmadatum) ? null : date_format(date_create($zgvmadatum), 'Y-m-d');
+			$zgvmadatum = isEmptyString($zgvmadatum) ? null : date_format(date_create($zgvmadatum), 'Y-m-d');
 			$zgvmanation_code = $this->input->post('zgvmanation') === 'null' ? null : $this->input->post('zgvmanation');
 
 			$result = $this->PrestudentModel->update(
@@ -711,7 +711,12 @@ class InfoCenter extends Auth_Controller
 			'#',											// link
 			array(),										// children
 			'',												// icon
-			true											// expand
+			true,											// expand
+			null, 											// subscriptDescription
+			null, 											// subscriptLinkClass
+			null, 											// subscriptLinkValue
+			'', 											// target
+			1 												// sort
 		);
 
 		$filtersArray['nichtabgeschickt'] = $this->navigationlib->oneLevel(
@@ -719,7 +724,12 @@ class InfoCenter extends Auth_Controller
 			'#',												// link
 			array(),											// children
 			'',													// icon
-			true												// expand
+			true,												// expand
+			null, 											// subscriptDescription
+			null, 											// subscriptLinkClass
+			null, 											// subscriptLinkValue
+			'', 											// target
+			2 												// sort
 		);
 
 		$this->_fillFilters($listFiltersSent, $filtersArray['abgeschickt']);
@@ -732,7 +742,12 @@ class InfoCenter extends Auth_Controller
 				'#',				// link
 				array(),			// children
 				'',					// icon
-				true				// expand
+				true,				// expand
+				null, 											// subscriptDescription
+				null, 											// subscriptLinkClass
+				null, 											// subscriptLinkValue
+				'', 											// target
+				3 												// sort
 			);
 
 			$this->_fillCustomFilters($listCustomFilters, $filtersArray['personal']);
@@ -745,7 +760,12 @@ class InfoCenter extends Auth_Controller
 					'#',			// link
 					$filtersArray,	// children
 					'',				// icon
-					true			// expand
+					true,			// expand
+					null,			// subscriptDescription
+					null,			// subscriptLinkClass
+					null, 			// subscriptLinkValue
+					'', 			// target
+					10 				// sort
 				)
 			)
 		);
@@ -773,7 +793,12 @@ class InfoCenter extends Auth_Controller
 					$link,			// link
 					array(),		// children
 					'angle-left',	// icon
-					true			// expand
+					true,			// expand
+					null, 			// subscriptDescription
+					null, 			// subscriptLinkClass
+					null, 			// subscriptLinkValue
+					'', 			// target
+					1 				// sort
 				)
 			)
 		);
@@ -823,7 +848,12 @@ class InfoCenter extends Auth_Controller
 				'#',				// link
 				array(),			// children
 				'',					// icon
-				true				// expand
+				true,				// expand
+				null,				// subscriptDescription
+				null,				// subscriptLinkClass
+				null,				// subscriptLinkValue
+				'', 				// target
+				15 					// sort
 			);
 
 			$this->_fillCustomFilters($listCustomFilters, $filtersArray['children']['personal']);
@@ -836,7 +866,12 @@ class InfoCenter extends Auth_Controller
 					'#',						// link
 					(isset($filtersArray['children'])?$filtersArray['children']:''),	// children
 					'',							// icon
-					true						// expand
+					true,						// expand
+					null, 						// subscriptDescription
+					null, 						// subscriptLinkClass
+					null, 						// subscriptLinkValue
+					'', 						// target
+					10 							// sort
 				)
 			)
 		);
@@ -1177,9 +1212,9 @@ class InfoCenter extends Auth_Controller
 		$orgform = $prestudentstatus->orgform != '' ? ' ('.$prestudentstatus->orgform.')' : '';
 		$geschlecht = $person->geschlecht == 'm' ? 'm&auml;nnlich' : 'weiblich';
 		$geburtsdatum = date('d.m.Y', strtotime($person->gebdatum));
-		$zgvort = !empty($prestudent->zgvort) ? ' in '.$prestudent->zgvort : '';
-		$zgvnation = !empty($prestudent->zgvnation_bez) ? ', '.$prestudent->zgvnation_bez : '';
-		$zgvdatum = !empty($prestudent->zgvdatum) ? ', am '.date_format(date_create($prestudent->zgvdatum), 'd.m.Y') : '';
+		$zgvort = !isEmptyString($prestudent->zgvort) ? ' in '.$prestudent->zgvort : '';
+		$zgvnation = !isEmptyString($prestudent->zgvnation_bez) ? ', '.$prestudent->zgvnation_bez : '';
+		$zgvdatum = !isEmptyString($prestudent->zgvdatum) ? ', am '.date_format(date_create($prestudent->zgvdatum), 'd.m.Y') : '';
 
 		$dokumenteNachzureichenMail = $dokumenteMail = array();
 		//convert documents to array so they can be parsed, and keeping only needed fields
@@ -1192,8 +1227,8 @@ class InfoCenter extends Auth_Controller
 
 		foreach ($dokumenteNachzureichen as $dokument)
 		{
-			$anmerkung = !empty($dokument->anmerkung) ? ' | Anmerkung: '.$dokument->anmerkung : '';
-			$nachgereichtam = !empty($dokument->nachgereicht_am) ? ' | wird nachgereicht bis '.date_format(date_create($dokument->nachgereicht_am), 'd.m.Y') : '';
+			$anmerkung = !isEmptyString($dokument->anmerkung) ? ' | Anmerkung: '.$dokument->anmerkung : '';
+			$nachgereichtam = !isEmptyString($dokument->nachgereicht_am) ? ' | wird nachgereicht bis '.date_format(date_create($dokument->nachgereicht_am), 'd.m.Y') : '';
 			$dokumenteNachzureichenMail[] = array('dokument_bezeichnung' => $dokument->dokument_bezeichnung, 'anmerkung' => $anmerkung, 'nachgereicht_am' => $nachgereichtam);
 		}
 
@@ -1254,7 +1289,7 @@ class InfoCenter extends Auth_Controller
 
 		$receiver = $prestudent->studiengangmail;
 
-		if (!empty($receiver))
+		if (!isEmptyString($receiver))
 		{
 			//Freigabeinformationmail sent from default system mail to studiengang mail(s)
 			$sent = $this->maillib->send('', $receiver, $subject, $email, '', null, null, 'Bitte sehen Sie sich die Nachricht in HTML Sicht an, um den Inhalt vollständig darzustellen.');

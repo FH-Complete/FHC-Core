@@ -7,6 +7,8 @@ if (! defined('BASEPATH')) exit('No direct script access allowed');
  * Provides data to the ajax get calls about the filter
  * Accepts ajax post calls to change the filter data
  * This controller works with JSON calls on the HTTP GET or POST and the output is always JSON
+ * NOTE: extends the FHC_Controller instead of the Auth_Controller because the FilterWidget has its
+ * 		own permissions check
  */
 class Filters extends FHC_Controller
 {
@@ -18,6 +20,10 @@ class Filters extends FHC_Controller
 	public function __construct()
     {
         parent::__construct();
+
+		// Loads authentication helper
+		// NOTE: needed to load custom filters do not remove!
+		$this->load->helper('fhcauth');
 
 		// Loads the FiltersLib with HTTP GET/POST parameters
 		$this->_loadFiltersLib();
@@ -209,7 +215,7 @@ class Filters extends FHC_Controller
 	{
 		if (!$this->filterslib->isAllowed())
 		{
-			$this->_terminateWithJsonError('You are not allowed to access to this content');
+			$this->terminateWithJsonError('You are not allowed to access to this content');
 		}
 	}
 
@@ -238,18 +244,7 @@ class Filters extends FHC_Controller
 		}
 		else // Otherwise an error will be written in the output
 		{
-			$this->_terminateWithJsonError('Parameter "'.self::FILTER_PAGE_PARAM.'" not provided!');
+			$this->terminateWithJsonError('Parameter "'.self::FILTER_PAGE_PARAM.'" not provided!');
 		}
-	}
-
-	/**
-	 * Terminate the execution of the page after have printed a message encoded to JSON.
-	 * Used directly header and echo to speed up the output before the exit command stops the execution.
-	 */
-	private function _terminateWithJsonError($message)
-	{
-		header('Content-Type: application/json');
-		echo json_encode(error($message));
-		exit;
 	}
 }

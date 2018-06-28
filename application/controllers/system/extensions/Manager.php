@@ -22,7 +22,7 @@ class Manager extends Auth_Controller
 		);
 
 		// Load helpers to upload files
-		$this->load->helper(array('form', 'url'));
+		$this->load->helper('form');
 
 		// Loads the extensions library
 		$this->load->library('ExtensionsLib');

@@ -2221,6 +2221,20 @@ if ($result = @$db->db_query("SELECT conname FROM pg_constraint WHERE conname = 
 	}
 }
 
+// Webservicetyp dvb
+if ($result = $db->db_query("SELECT * FROM system.tbl_webservicetyp WHERE webservicetyp_kurzbz='dvb'"))
+{
+	if ($db->db_num_rows($result) == 0)
+	{
+		$qry = "INSERT INTO system.tbl_webservicetyp(webservicetyp_kurzbz, beschreibung) VALUES('dvb','Datenverbund');";
+
+		if(!$db->db_query($qry))
+			echo '<strong>WebserviceLog: '.$db->db_last_error().'</strong><br>';
+			else
+				echo 'Webservicelog Typ für Datenverbund hinzugefügt';
+	}
+}
+
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
 

@@ -23,8 +23,13 @@
  * Abfrage und Vergabe von Matrikelnummern
  */
 require_once(dirname(__FILE__).'/basis_db.class.php');
+require_once(dirname(__FILE__).'/person.class.php');
+require_once(dirname(__FILE__).'/student.class.php');
+require_once(dirname(__FILE__).'/studiensemester.class.php');
+require_once(dirname(__FILE__).'/adresse.class.php');
+require_once(dirname(__FILE__).'/webservicelog.class.php');
 
-class dvb
+class dvb extends basis_db
 {
 	const DVB_URL_WEBSERVICE_OAUTH = 'https://stubei-q.portal.at/dvb/oauth/token';
 	const DVB_URL_WEBSERVICE_SVNR = 'https://stubei-q.portal.at/rws/0.1/simpleStudentBySozialVersicherungsnummer.xml';
@@ -35,7 +40,7 @@ class dvb
 	public $authentication;
 	private $username;
 	private $password;
-	private $debug;
+	protected $debug;
 	public $debug_output = '';
 
 	/**
@@ -49,6 +54,170 @@ class dvb
 		$this->username = $username;
 		$this->password = $password;
 		$this->debug = $debug;
+	}
+
+	/**
+	 * Versucht die Matrikelnummer für eine Person zu ermitteln.
+	 * Wenn die Person noch keine Matrikelnummer besitzt, wird eine neue Matrikelnummer
+	 * angefordert und der Person zugeordnet
+	 * @param int $person_id ID der Person.
+	 * @return boolean true wenn Erfolgreich, false im Fehlerfall
+	 */
+	public function assignMatrikelnummer($person_id)
+	{
+		$person = new person();
+		if (!$person->load($person_id))
+		{
+			$this->errormsg = $person->errormsg;
+			return false;
+		}
+
+		if ($person->svnr != '')
+		{
+			$matrikelnummer = $this->getMatrikelnrBySVNR($person->svnr);
+
+			if ($matrikelnummer === false && $this->errormsg != '')
+			{
+				$this->logRequest($person, 'getMatrikelnrBySVNR', false);
+				return false;
+			}
+		}
+		elseif ($person->ersatzkennzeichen != '')
+		{
+			$matrikelnummer = $this->getMatrikelnrByErsatzkennzeichen($person->ersatzkennzeichen);
+
+			if ($matrikelnummer === false && $this->errormsg != '')
+			{
+				$this->logRequest($person, 'getMatrikelnrByErsatzkennzeichen', false);
+				return false;
+			}
+		}
+		else
+		{
+			$this->errormsg = 'Person braucht SVNR oder Ersatzkennzeichen';
+			return false;
+		}
+
+		if ($matrikelnummer !== false && $matrikelnummer != '')
+		{
+			// Matrikelnummer wurde gefunden
+			// Bei Person speichern
+			$person->matr_nr = $matrikelnummer;
+			if ($person->save())
+			{
+				$this->logRequest($person, 'assignExistingMatrikelnummer', true, $matrikelnummer);
+				return true;
+			}
+		}
+		else
+		{
+			// Es wurde noch keine Matrikelnummer zu dieser Person zugeordnet
+			// Es wird eine neue Matrikelnummer aus dem Kontingent angefordert
+			// und an die Person vergeben
+
+			// Studienjahr ermitteln
+			$qry = "
+			SELECT
+				studiensemester_kurzbz, prestudent_id
+			FROM
+				public.tbl_student
+				JOIN public.tbl_prestudent USING(prestudent_id)
+				JOIN public.tbl_prestudentstatus USING(prestudent_id)
+				JOIN public.tbl_benutzer ON(tbl_student.student_uid = tbl_benutzer.uid)
+			WHERE
+				tbl_prestudent.person_id=".$this->db_add_param($person->person_id)."
+				AND tbl_benutzer.aktiv
+				AND tbl_prestudentstatus.status_kurzbz='Student'
+				AND tbl_prestudent.bismelden
+			ORDER BY tbl_prestudentstatus.datum desc LIMIT 1
+			";
+
+			$prestudent_id = '';
+			$studiensemester_kurzbz = '';
+
+			if ($result = $this->db_query($qry))
+			{
+				if ($row = $this->db_fetch_object($result))
+				{
+					$studiensemester_kurzbz = $row->studiensemester_kurzbz;
+					$prestudent_id = $row->prestudent_id;
+				}
+				else
+				{
+					$this->logRequest($person, 'assignNewMatrikelnummer', false);
+					$this->errormsg = 'Fehler beim Ermitteln des Studienjahrs für diese Person';
+					return false;
+				}
+			}
+			else
+			{
+				$this->logRequest($person, 'assignNewMatrikelnummer', false);
+				$this->errormsg = 'Fehler beim Ermitteln des Studienjahrs für diese Person';
+				return false;
+			}
+
+			$studienjahr = substr($studiensemester_kurzbz, 4);
+			$art = substr($studiensemester_kurzbz, 0, 2);
+			if ($art == 'SS')
+				$studienjahr = $studienjahr - 1;
+
+			// Erstaustattung im Jahr 2018. Alle davor bekommen 18er Nummern
+			if ($studienjahr < 2018)
+				$studienjahr = 2018;
+
+			// Neue Matrikelnummer aus Kontingent anfordern
+			$kontingent = $this->getKontingent(DVB_BILDUNGSEINRICHTUNG_CODE, $studienjahr);
+
+			if ($kontingent !== false && isset($kontingent[0]))
+			{
+				$person_meldung = new stdClass();
+				$person_meldung->matrikelnummer = $kontingent[0];
+				$person_meldung->vorname = $person->vorname;
+				$person_meldung->nachname = $person->nachname;
+				$person_meldung->geburtsdatum = $person->gebdatum;
+				$person_meldung->geschlecht = UPPER($person->geschlecht);
+				$person_meldung->staat = $person->staatsbuergerschaft;
+				if ($person->svnr != '')
+					$person_meldung->svnr = $person->svnr;
+
+				// PLZ der Meldeadresse laden
+				$adresse = new adresse();
+				if ($adresse->loadZustellAdresse($person->person_id))
+					$person_meldung->plz = $row->plz;
+
+				// ZGV Datum laden falls vorhanden
+				$prestudent = new prestudent();
+				if ($prestudent->load($prestudent_id) && $prestudent->zgvdatum != '')
+				{
+					$datum_obj = new datum();
+					$person->matura = $datum_obj->formatDatum($matura, 'Ymd');
+				}
+
+				// Meldung der Vergabe der Matrikelnummer
+				if ($this->setMatrikelnummer(DVB_BILDUNGSEINRICHTUNG_CODE, $person))
+				{
+					// Matrikelnummer bei Person speichern
+					$person->matr_nr = $matrikelnummer;
+					if ($person->save())
+					{
+						$this->logRequest($person, 'assignNewMatrikelnummer', true, $matrikelnummer);
+						return true;
+					}
+				}
+				else
+				{
+					$this->logRequest($person, 'assignNewgMatrikelnummer', false, $person_meldung);
+					$this->errormsg .= 'Vergabe fehlgeschlagen';
+					return false;
+				}
+			}
+			else
+			{
+				$this->logRequest($person, 'assignNewgMatrikelnummer', false, $studienjahr);
+				$this->errormsg .= 'Failed to get Kontingent';
+				return false;
+			}
+		}
 	}
 
 	/**
@@ -113,7 +282,8 @@ class dvb
 		}
 		else
 		{
-			$this->errormsg = 'Request Failed with HTTP Code:'.$curl_info['http_code'].' and Response:'.$json_response;
+			$this->errormsg = 'Authentication failed with HTTP Code:'.$curl_info['http_code'];
+			$this->errormsg .= ' and Response:'.$json_response;
 			return false;
 		}
 	}
@@ -145,10 +315,11 @@ class dvb
 	{
 		if ($this->tokenIsExpired())
 		{
-			$this->authenticate();
+			if (!$this->authenticate())
+				return false;
 		}
 
-		$this->debug('getMatirkelnrBySVNR');
+		$this->debug('getMatrikelnrBySVNR');
 
 		$curl = curl_init();
 
@@ -176,7 +347,9 @@ class dvb
 		$curl_info = curl_getinfo($curl);
 		curl_close($curl);
 
-		$this->debug('Response '.$curl_info['http_code']);
+		$this->debug('ResponseCode: '.$curl_info['http_code']);
+		$this->debug('ResponseData: '.print_r($response, true));
+
 		if ($curl_info['http_code'] == '200')
 		{
 			/* Example Response:
@@ -194,11 +367,22 @@ class dvb
 			$dom = new DOMDocument();
 			$dom->loadXML($response);
 			$namespace = 'http://www.brz.gv.at/datenverbund-unis';
-			$domnodes_matrikelnummer = $dom->getElementsByTagNameNS($namespace, 'matrikelNummer');
-			foreach ($domnodes_matrikelnummer as $row)
+			$domnodes_student = $dom->getElementsByTagNameNS($namespace, 'student');
+			foreach ($domnodes_student as $row_student)
 			{
-				// Found
-				return $row->textContent;
+				// Wenn nicht gesperrt und fix vergeben
+				$ingesamtpool = $row_student->getAttribute('inGesamtPool');
+				$gesperrt = $row_student->getAttribute('gesperrt');
+
+				if ($ingesamtpool == 'true' && $gesperrt == 'false')
+				{
+					$domnodes_matrikelnummer = $row_student->getElementsByTagNameNS($namespace, 'matrikelNummer');
+					foreach ($domnodes_matrikelnummer as $row)
+					{
+						// Found
+						return $row->textContent;
+					}
+				}
 			}
 
 			$this->errormsg = '';
@@ -220,7 +404,8 @@ class dvb
 	{
 		if ($this->tokenIsExpired())
 		{
-			$this->authenticate();
+			if (!$this->authenticate())
+				return false;
 		}
 
 		$this->debug('getMatrikelnrByErsatzkennzeichen');
@@ -248,7 +433,8 @@ class dvb
 		$xml_response = curl_exec($curl);
 		$curl_info = curl_getinfo($curl);
 		curl_close($curl);
-		$this->debug('Response: '.$curl_info['http_code']);
+		$this->debug('ResponseCode: '.$curl_info['http_code']);
+		$this->debug('ResponseData: '.print_r($response, true));
 
 		if ($curl_info['http_code'] == '200')
 		{
@@ -315,12 +501,26 @@ class dvb
 			$dom = new DOMDocument();
 			$dom->loadXML($xml_response);
 			$namespace = 'http://www.brz.gv.at/datenverbund-unis';
-			$domnodes_matrikelnummer = $dom->getElementsByTagNameNS($namespace, 'matrikelNummer');
-			foreach ($domnodes_matrikelnummer as $row)
+			$domnodes_student = $dom->getElementsByTagNameNS($namespace, 'student');
+			foreach ($domnodes_student as $row_student)
 			{
-				// Found
-				return $row->textContent;
+				// Wenn nicht gesperrt und fix vergeben
+				$ingesamtpool = $row_student->getAttribute('inGesamtPool');
+				$gesperrt = $row_student->getAttribute('gesperrt');
+
+				if ($ingesamtpool == 'true' && $gesperrt == 'false')
+				{
+					$domnodes_matrikelnummer = $row_student->getElementsByTagNameNS($namespace, 'matrikelNummer');
+					foreach ($domnodes_matrikelnummer as $row)
+					{
+						// Found
+						return $row->textContent;
+					}
+				}
 			}
+
+			$this->errormsg = '';
+			return false;
 		}
 		else
 		{
@@ -342,7 +542,8 @@ class dvb
 
 		if ($this->tokenIsExpired())
 		{
-			$this->authenticate();
+			if (!$this->authenticate())
+				return false;
 		}
 
 		$curl = curl_init();
@@ -371,7 +572,8 @@ class dvb
 		$curl_info = curl_getinfo($curl);
 		curl_close($curl);
 
-		$this->debug('Response: '.$curl_info['http_code']);
+		$this->debug('ResponseCode: '.$curl_info['http_code']);
+		$this->debug('ResponseData: '.print_r($response, true));
 
 		/* 200 ok
 		<?xml version="1.0" encoding="UTF-8"?>
@@ -417,7 +619,8 @@ class dvb
 
 		if ($this->tokenIsExpired())
 		{
-			$this->authenticate();
+			if (!$this->authenticate())
+				return false;
 		}
 
 		$data = '<?xml version="1.0" encoding="UTF-8"?>
@@ -457,7 +660,8 @@ class dvb
 		$curl_info = curl_getinfo($curl);
 		curl_close($curl);
 
-		$this->debug('Response: '.$curl_info['http_code']);
+		$this->debug('ResponseCode: '.$curl_info['http_code']);
+		$this->debug('ResponseData: '.print_r($response, true));
 
 		if ($curl_info['http_code'] == '200')
 		{
@@ -491,7 +695,8 @@ class dvb
 
 		if ($this->tokenIsExpired())
 		{
-			$this->authenticate();
+			if (!$this->authenticate())
+				return false;
 		}
 
 		$data = '<?xml version="1.0" encoding="UTF-8"?>
@@ -650,5 +855,27 @@ class dvb
 	{
 		if ($this->debug)
 			$this->debug_output .= "\n<br>".date('Y-m-d H:i:s').': '.htmlentities($msg);
+	}
+
+	/**
+	 * Erstellt einen Logeintrag
+	 * @param object $person Personen objekt.
+	 * @param string $typ Art des Requests.
+	 * @param bool $result True wen Erfolgreich, false wenn Fehlerhaft.
+	 * @param object $data Zusatzdaten die Übermittelt wurden und geloggt werden sollen.
+	 * @return void
+	 */
+	public function logRequest($person, $typ, $result, $data = null)
+	{
+		$webservicelog = new webservicelog();
+
+		$webservicelog->webservicetyp_kurzbz = 'dvb';
+		$webservicelog->request_id = $person->person_id;
+		$webservicelog->beschreibung = $typ;
+		$webservicelog->request_data = ($result?'SUCCESS':'FAILED').' '.$this->errormsg;
+		if (!is_null($data))
+			$webservicelog->request_data .= ' '.print_r($data, true);
+
+		$webservicelog->save();
 	}
 }

@@ -23,7 +23,7 @@ class Gemeinde extends APIv1_Controller
 	{
 		parent::__construct(array('Gemeinde' => 'basis/gemeinde:rw', 'GemeindeByPlz' => 'basis/gemeinde:r'));
 		// Load model GemeindeModel
-		$this->load->model("codex/gemeinde_model", "GemeindeModel");
+		$this->load->model('codex/gemeinde_model', 'GemeindeModel');
 	}
 
 	/**

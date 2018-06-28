@@ -25,7 +25,7 @@ class Studienjahr extends Auth_Controller
 			)
 		);
 
-		$this->load->model("organisation/Studienjahr_model", "StudienjahrModel");
+		$this->load->model('organisation/Studienjahr_model', 'StudienjahrModel');
 	}
 
 	/**

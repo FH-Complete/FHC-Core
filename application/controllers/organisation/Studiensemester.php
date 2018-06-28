@@ -25,8 +25,8 @@ class Studiensemester extends Auth_Controller
 			)
 		);
 
-		$this->load->model("organisation/Studiensemester_model", "StudiensemesterModel");
-		$this->load->model("organisation/Studienjahr_model", "StudienjahrModel");
+		$this->load->model('organisation/Studiensemester_model', 'StudiensemesterModel');
+		$this->load->model('organisation/Studienjahr_model', 'StudienjahrModel');
 	}
 
 	/**

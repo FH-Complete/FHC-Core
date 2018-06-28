@@ -92,7 +92,7 @@ class ViewMessage extends FHC_Controller
 	{
 		$token = $this->input->get('token');
 
-		if (empty($token))
+		if (isEmptyString($token))
 		{
 			show_error('no token supplied');
 		}

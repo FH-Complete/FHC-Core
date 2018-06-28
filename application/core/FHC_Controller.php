@@ -10,13 +10,24 @@ class FHC_Controller extends CI_Controller
 
 	/**
 	 * Standard construct for all the controllers
+	 * - initialize the object properties
+	 * - loads the authentication system
+	 * - loads all the helpers that later are always needed
 	 */
     public function __construct()
 	{
         parent::__construct();
 
-		// Set _controllerId as null by default
-		$this->_controllerId = null;
+		$this->_controllerId = null; // set _controllerId as null by default
+
+		// Loads helper message to manage returning messages
+		$this->load->helper('message');
+
+		// Loads helper with generic utility function
+		$this->load->helper('fhc');
+
+		// Loads helper session to manage the php session
+		$this->load->helper('session');
 	}
 
 	//------------------------------------------------------------------------------------------------------------------
@@ -47,7 +58,7 @@ class FHC_Controller extends CI_Controller
 		{
 			$this->_controllerId = $this->input->get(self::FHC_CONTROLLER_ID);
 
-			if (!isset($this->_controllerId) || empty($this->_controllerId))
+			if (!isset($this->_controllerId) || isEmptyString($this->_controllerId))
 			{
 				$this->_controllerId = uniqid(); // generate a unique id
 				// Redirect to the same URL, but giving FHC_CONTROLLER_ID as HTTP GET parameter
@@ -89,6 +100,17 @@ class FHC_Controller extends CI_Controller
 	protected function outputJsonError($mixed)
 	{
 		$this->_outputJson(error($mixed));
+	}
+
+	/**
+	 * Terminate the execution of the page after have printed a message encoded to JSON.
+	 * Used directly header and echo to speed up the output before the exit command stops the execution.
+	 */
+	protected function terminateWithJsonError($message)
+	{
+		header('Content-Type: application/json');
+		echo json_encode(error($message));
+		exit;
 	}
 
 	//------------------------------------------------------------------------------------------------------------------

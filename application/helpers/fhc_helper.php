@@ -148,3 +148,22 @@ function loadResource($path, $resources = null, $subdir = false)
 		}
 	}
 }
+
+/**
+ * Returns true if the given string is empty
+ * Empty means that the parameter string is null or made of space, tab, vertical tab, line feed, carriage return
+ * and form feed characters.
+ */
+function isEmptyString($string)
+{
+	return ($string == null) || ($string != null && ctype_space($string) === true);
+}
+
+/**
+ * Returns true if the given array is empty
+ * Empty means that is null, or is not null and it is not an array, or it is an array but without elements
+ */
+function isEmptyArray($array)
+{
+	return ($array == null) || ($array != null && !is_array($array) || (is_array($array) && count($array) == 0));
+}

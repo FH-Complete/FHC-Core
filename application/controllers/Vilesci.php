@@ -1,9 +1,9 @@
-	<?php
+<?php
+
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
 class Vilesci extends Auth_Controller
 {
-
 	public function __construct()
 	{
 		parent::__construct(

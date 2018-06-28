@@ -25,7 +25,7 @@ class MailJob extends Auth_Controller
 		parent::__construct(array());
 
 		// Loads MessageLib
-		$this->load->library("MessageLib");
+		$this->load->library('MessageLib');
 	}
 
 	public function sendMessages($numberToSent = null, $numberPerTimeRange = null, $email_time_range = null, $email_from_system = null)

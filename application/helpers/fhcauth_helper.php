@@ -61,7 +61,7 @@ if ( ! function_exists('auth'))
 function getAuthUID()
 {
 	$ci =& get_instance(); // get CI instance
-	$ci->load->library('AuthLib'); // load session library
+	$ci->load->library('AuthLib'); // load authentication library
 
 	return $ci->authlib->getUser();
 }

@@ -14,9 +14,6 @@ class FS_Model extends FHC_Model
 		// Load the filesystem library
 		$this->load->library('FilesystemLib');
 
-		// Load return message helper
-		$this->load->helper('message');
-
 		$this->filepath = $filepath;
 	}
 

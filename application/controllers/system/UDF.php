@@ -13,13 +13,6 @@ class UDF extends Auth_Controller
 			)
 		);
 
-        // Load session library
-        $this->load->library('session');
-
-        // Loads the UDF library
-		$this->load->library('UDFLib');
-
-		//
 		$this->load->model('person/Person_model', 'PersonModel');
 		$this->load->model('crm/Prestudent_model', 'PrestudentModel');
     }
@@ -90,8 +83,8 @@ class UDF extends Auth_Controller
 		$validation = $this->_validate($udfs);
 
 		$userdata = array(
-			'person_id' => $udfs['person_id'],
-			'prestudent_id' => $udfs['prestudent_id']
+			'person_id' => $this->input->post('person_id'),
+			'prestudent_id' => $this->input->post('prestudent_id')
 		);
 
 		if (isSuccess($validation))

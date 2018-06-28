@@ -100,7 +100,7 @@ class Akte_model extends DB_Model
 
 		$parametersArray = array($person_id);
 
-		if (!empty($dokument_kurzbz))
+		if (!isEmptyString($dokument_kurzbz))
 		{
 			$query .= ' AND a.dokument_kurzbz = ?';
 			array_push($parametersArray, $dokument_kurzbz);
@@ -153,7 +153,7 @@ class Akte_model extends DB_Model
 
 		$parametersArray = array($person_id);
 
-		if (!empty($dokument_kurzbz))
+		if (!isEmptyString($dokument_kurzbz))
 		{
 			$query .= ' AND a.dokument_kurzbz = ?';
 			array_push($parametersArray, $dokument_kurzbz);
@@ -191,5 +191,4 @@ class Akte_model extends DB_Model
 
 		return success($dokumente->retval);
 	}
-
 }

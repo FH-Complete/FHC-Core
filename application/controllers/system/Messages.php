@@ -29,12 +29,15 @@ class Messages extends Auth_Controller
 
 		$this->load->model('person/Person_model', 'PersonModel');
 
-		$this->loadPhrases(array(
-								'global',
-								'person',
-								'lehre',
-								'ui',
-								'infocenter'));
+		$this->loadPhrases(
+			array(
+				'global',
+				'person',
+				'lehre',
+				'ui',
+				'infocenter'
+			)
+		);
 
 		$this->_setAuthUID(); // sets property uid
 	}

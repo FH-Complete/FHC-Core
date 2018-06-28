@@ -23,7 +23,7 @@ class RtPerson extends APIv1_Controller
 	{
 		parent::__construct(array('RtPerson' => 'basis/rtperson:rw'));
 		// Load model StatusModel
-		$this->load->model("crm/RtPerson_model", "RtPersonModel");
+		$this->load->model('crm/RtPerson_model', 'RtPersonModel');
 	}
 
 	/**

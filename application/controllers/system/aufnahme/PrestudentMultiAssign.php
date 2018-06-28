@@ -14,9 +14,6 @@ class PrestudentMultiAssign extends Auth_Controller
 			)
 		);
 
-        // Loads helper message to manage returning messages
-		$this->load->helper('message');
-
 		// Loads the widget library
 		$this->load->library('WidgetLib');
     }
@@ -156,27 +153,27 @@ class PrestudentMultiAssign extends Auth_Controller
 		// Load model prestudentm_model
         $this->load->model('crm/Prestudent_model', 'PrestudentModel');
 
-        if ($studiengang == '' || empty($studiengang))
+        if ($studiengang == '' || isEmptyString($studiengang))
 		{
 			$studiengang = null;
 		}
 
-		if ($studiensemester == '' || empty($studiensemester))
+		if ($studiensemester == '' || isEmptyString($studiensemester))
 		{
 			$studiensemester = null;
 		}
 
-		if ($aufnahmegruppe == '' || empty($aufnahmegruppe))
+		if ($aufnahmegruppe == '' || isEmptyString($aufnahmegruppe))
 		{
 			$aufnahmegruppe = null;
 		}
 
-		if ($reihungstest == '' || empty($reihungstest))
+		if ($reihungstest == '' || isEmptyString($reihungstest))
 		{
 			$reihungstest = null;
 		}
 
-		if ($stufe == '' || empty($stufe))
+		if ($stufe == '' || isEmptyString($stufe))
 		{
 			$stufe = null;
 		}

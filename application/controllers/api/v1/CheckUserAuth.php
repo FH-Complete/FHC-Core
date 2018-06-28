@@ -24,9 +24,6 @@ class CheckUserAuth extends REST_Controller
 	public function __construct()
 	{
 		parent::__construct();
-
-		// Loads the authentication library
-		$this->load->library('AuthLib');
 	}
 
 	/**

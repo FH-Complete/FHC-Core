@@ -8,6 +8,7 @@ class MessageToken_model extends CI_Model
 {
 	/**
 	 * Constructor
+	 * NOTE: here are loaded libs, models, helpers, etc. because MessageToken_model extends directly the CI_Model
 	 */
 	public function __construct()
 	{
@@ -204,7 +205,7 @@ class MessageToken_model extends CI_Model
 	}
 
 	/**
-	 *
+	 * Searchs for a person by its person_id and checks if it is an employee
 	 */
 	public function isEmployee($person_id)
 	{

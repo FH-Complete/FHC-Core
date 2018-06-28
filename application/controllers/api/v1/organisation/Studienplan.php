@@ -29,7 +29,7 @@ class Studienplan extends APIv1_Controller
 			)
 		);
 		// Load model PersonModel
-		$this->load->model("organisation/studienplan_model", "StudienplanModel");
+		$this->load->model('organisation/studienplan_model', 'StudienplanModel');
 	}
 
 	public function getStudienplan()
