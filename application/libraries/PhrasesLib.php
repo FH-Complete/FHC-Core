@@ -249,6 +249,8 @@ class PhrasesLib
 					$language = $parameters[1];
 				}
 				// Checks if the user is authenticated to retrive the users's language
+				// NOTE: this library could be called when the user is not logged in the system
+				// 		so this is why is checked if the function getAuthUID exists
 				elseif (function_exists('getAuthUID'))
 				{
 					$this->_ci->load->model('person/Person_model', 'PersonModel');

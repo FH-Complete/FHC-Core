@@ -25,16 +25,14 @@ class CallerLib
 		'PersonLogLib'
 	);
 
+	private $_ci; // CI instance
+
 	/**
-	 * Object initialization
+	 * Library initialization
 	 */
 	public function __construct()
 	{
-		// Gets CI instance
-		$this->ci =& get_instance();
-
-		// Loads permission library
-		$this->ci->load->library('PermissionLib');
+		$this->_ci =& get_instance(); // Gets CI instance
 	}
 
 	/**
@@ -80,7 +78,7 @@ class CallerLib
 			elseif (strpos($parameters->resourceName, CallerLib::LIB_PREFIX) !== false)
 			{
 				// Check if the resource is already loaded, it works only with libraries and drivers
-				$isLoaded = $this->ci->load->is_loaded($parameters->resourceName);
+				$isLoaded = $this->_ci->load->is_loaded($parameters->resourceName);
 				// If not loaded then load it
 				if ($isLoaded === false)
 				{
@@ -210,7 +208,7 @@ class CallerLib
 
 		try
 		{
-			$loaded = $this->ci->load->model($resourcePath.$resourceName);
+			$loaded = $this->_ci->load->model($resourcePath.$resourceName);
 		}
 		catch (Exception $e)
 		{
@@ -245,7 +243,7 @@ class CallerLib
 		try
 		{
 			// Gets all the configured resources paths
-			$packagePaths = $this->ci->load->get_package_paths();
+			$packagePaths = $this->_ci->load->get_package_paths();
 			// Looking for a file in every paths with the same name of the resource
 			$found = null;
 			for ($i = 0; $i < count($packagePaths) && is_null($found); $i++)
@@ -262,7 +260,7 @@ class CallerLib
 			if (!is_null($found))
 			{
 				// Load the file
-				$loaded = $this->ci->load->file($found);
+				$loaded = $this->_ci->load->file($found);
 				// If the resource is not present inside the file
 				if (!class_exists($resourceName))
 				{

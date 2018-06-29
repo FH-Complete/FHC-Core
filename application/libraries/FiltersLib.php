@@ -86,6 +86,9 @@ class FiltersLib
 	{
 		$this->_ci =& get_instance(); // get code igniter instance
 
+		// Loads authentication helper
+		$this->_ci->load->helper('fhcauth'); // NOTE: needed to load custom filters do not remove!
+
 		$this->_filterUniqueId = $this->_getFilterUniqueId($params); // sets the id for the related filter widget
 	}
 
@@ -96,6 +99,7 @@ class FiltersLib
 	 * Checks if at least one of the permissions given as parameter (requiredPermissions) belongs
 	 * to the authenticated user, if confirmed then is allowed to use this FilterWidget.
 	 * If the parameter requiredPermissions is NOT given, then no one is allow to use this FilterWidget
+	 * NOTE: PermissionLib is loaded hedere
 	 */
 	public function isAllowed($requiredPermissions = null)
 	{

@@ -21,10 +21,6 @@ class Filters extends FHC_Controller
     {
         parent::__construct();
 
-		// Loads authentication helper
-		// NOTE: needed to load custom filters do not remove!
-		$this->load->helper('fhcauth');
-
 		// Loads the FiltersLib with HTTP GET/POST parameters
 		$this->_loadFiltersLib();
 
