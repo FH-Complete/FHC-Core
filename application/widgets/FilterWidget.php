@@ -59,7 +59,7 @@ class FilterWidget extends Widget
 		$this->_initFilterWidget($args); // checks parameters and initialize properties
 
 		// Let's start if it's allowed
-		// NOTE: If it is NOT allowed then no date are loaded
+		// NOTE: If it is NOT allowed then no data are loaded
 		if ($this->filterslib->isAllowed($this->_requiredPermissions)) $this->_startFilterWidget();
 	}
 

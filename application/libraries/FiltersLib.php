@@ -98,43 +98,19 @@ class FiltersLib
 	/**
 	 * Checks if at least one of the permissions given as parameter (requiredPermissions) belongs
 	 * to the authenticated user, if confirmed then is allowed to use this FilterWidget.
-	 * If the parameter requiredPermissions is NOT given, then no one is allow to use this FilterWidget
-	 * NOTE: PermissionLib is loaded hedere
+	 * If the parameter requiredPermissions is NOT given or is not present in the session,
+	 * then NO one is allow to use this FilterWidget
+	 * Wrapper method to permissionlib->hasAtLeastOne
 	 */
 	public function isAllowed($requiredPermissions = null)
 	{
 		$this->_ci->load->library('PermissionLib'); // Load permission library
 
-		$isAllowed = false; // by default is not allowed
-
 		// Gets the required permissions from the session if they are not provided as parameter
 		$rq = $requiredPermissions;
 		if ($rq == null) $rq = $this->getElementSession(self::REQUIRED_PERMISSIONS_PARAMETER);
 
-		// If the parameter requiredPermissions is NOT given, then no one is allow to use this FilterWidget
-		if ($rq != null)
-		{
-			// If requiredPermissions is NOT an array then converts it to an array
-			if (!is_array($rq))
-			{
-				$rq = array($rq);
-			}
-
-			// Checks if at least one of the permissions given as parameter belongs to the authenticated user...
-			for ($p = 0; $p < count($rq); $p++)
-			{
-				$isAllowed = $this->_ci->permissionlib->isEntitled(
-					array(
-						self::PERMISSION_FILTER_METHOD => $rq[$p].':'.self::PERMISSION_TYPE
-					),
-					self::PERMISSION_FILTER_METHOD
-				);
-
-				if ($isAllowed) break; // ...if confirmed then is allowed to use this FilterWidget
-			}
-		}
-
-		return $isAllowed;
+		return $this->_ci->permissionlib->hasAtLeastOne($rq, self::PERMISSION_FILTER_METHOD, self::PERMISSION_TYPE);
 	}
 
 	/**

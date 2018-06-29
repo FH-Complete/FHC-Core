@@ -204,4 +204,38 @@ class PermissionLib
 
 		return $checkPermissions;
 	}
+
+	/**
+	 * Checks if at least one of the permissions given as parameter (requiredPermissions) belongs to the authenticated user
+	 * It checks the given permissions against a given method (controller method name) and a given permission type (R and/or W)
+	 */
+	public function hasAtLeastOne($requiredPermissions, $method, $permissionType)
+	{
+		$isAllowed = false; // by default is NOT allowed
+
+		// If the parameter requiredPermissions is NOT given, then no one is allow to use this FilterWidget
+		if ($requiredPermissions != null)
+		{
+			// If requiredPermissions is NOT an array then converts it to an array
+			if (!is_array($requiredPermissions))
+			{
+				$requiredPermissions = array($requiredPermissions);
+			}
+
+			// Checks if at least one of the permissions given as parameter belongs to the authenticated user...
+			for ($p = 0; $p < count($requiredPermissions); $p++)
+			{
+				$isAllowed = $this->_ci->permissionlib->isEntitled(
+					array(
+						$method => $requiredPermissions[$p].':'.$permissionType
+					),
+					$method
+				);
+
+				if ($isAllowed === true) break; // ...if confirmed then is allowed to use this FilterWidget
+			}
+		}
+
+		return $isAllowed;
+	}
 }

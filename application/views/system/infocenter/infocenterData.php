@@ -2,7 +2,7 @@
 
 	$APP = 'infocenter';
 	$NOTBEFORE = '2018-03-01 18:00:00';
-	
+
 	$filterWidgetArray = array(
 		'query' => '
 		SELECT
