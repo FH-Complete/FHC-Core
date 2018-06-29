@@ -208,8 +208,9 @@ class PermissionLib
 	/**
 	 * Checks if at least one of the permissions given as parameter (requiredPermissions) belongs to the authenticated user
 	 * It checks the given permissions against a given method (controller method name) and a given permission type (R and/or W)
+	 * If the $permissionType is not given then it is assumed that is already present inside requiredPermissions
 	 */
-	public function hasAtLeastOne($requiredPermissions, $method, $permissionType)
+	public function hasAtLeastOne($requiredPermissions, $method, $permissionType = null)
 	{
 		$isAllowed = false; // by default is NOT allowed
 
@@ -225,9 +226,15 @@ class PermissionLib
 			// Checks if at least one of the permissions given as parameter belongs to the authenticated user...
 			for ($p = 0; $p < count($requiredPermissions); $p++)
 			{
+				$pt = ''; // by default the permission is alredy present in $requiredPermissions[$p]
+				if ($permissionType != null) // if is it given as parameter
+				{
+					$pt = self::PERMISSION_SEPARATOR.$permissionType; // then build the permission type string
+				}
+
 				$isAllowed = $this->_ci->permissionlib->isEntitled(
 					array(
-						$method => $requiredPermissions[$p].':'.$permissionType
+						$method => $requiredPermissions[$p].$pt
 					),
 					$method
 				);
