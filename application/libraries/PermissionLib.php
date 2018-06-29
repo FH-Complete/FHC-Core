@@ -129,7 +129,7 @@ class PermissionLib
 		if (is_cli()) return true;
 
 		// Checks if the parameter $requiredPermissions is set, is an array and contains at least one element
-		if (isset($requiredPermissions) && is_array($requiredPermissions) && count($requiredPermissions) > 0)
+		if (isset($requiredPermissions) && !isEmptyArray($requiredPermissions))
 		{
 			// Checks if the given $requiredPermissions parameter contains the called method of the controller
 			if (isset($requiredPermissions[$calledMethod]))
@@ -209,6 +209,7 @@ class PermissionLib
 	 * Checks if at least one of the permissions given as parameter (requiredPermissions) belongs to the authenticated user
 	 * It checks the given permissions against a given method (controller method name) and a given permission type (R and/or W)
 	 * If the $permissionType is not given then it is assumed that is already present inside requiredPermissions
+	 * Wrapper method for isEntitled, it uses method to build an associative array of permissions having as key the method itself
 	 */
 	public function hasAtLeastOne($requiredPermissions, $method, $permissionType = null)
 	{

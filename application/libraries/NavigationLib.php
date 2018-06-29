@@ -19,6 +19,8 @@ class NavigationLib
 
 	const NAVIGATION_PAGE_PARAM = 'navigation_page'; // Navigation page parameter name
 
+	const PERMISSION_NAVIGATION_METHOD = 'NavigationWidget'; // Name for fake method to be checked by the PermissionLib
+
 	private $_ci; // Code igniter instance
 	private $_navigationPage; // unique id for this navigation widget
 
@@ -67,7 +69,7 @@ class NavigationLib
 	public function oneLevel(
 		$description, $link = '#', $children = null, $icon = '', $expand = false,
 		$subscriptDescription = null, $subscriptLinkClass = null, $subscriptLinkValue = null, $target = '',
-		$sort = null)
+		$sort = null, $requiredPermissions = null)
 	{
 		return array(
 			'description' => $description,
@@ -79,7 +81,8 @@ class NavigationLib
 			'subscriptDescription' => $subscriptDescription,
 			'subscriptLinkClass' => $subscriptLinkClass,
 			'subscriptLinkValue' => $subscriptLinkValue,
-			'sort' => $sort
+			'sort' => $sort,
+			'requiredPermissions' => $requiredPermissions
 		);
 	}
 
@@ -208,7 +211,7 @@ class NavigationLib
 	{
 		$navigationArray = array();
 
-		if (isset($navigationPage))
+		if (isset($navigationPage)) // if the current page name is given
 		{
 			// Load Header Entries of Core
 			$configArray = $this->_ci->config->item($configName);
@@ -219,6 +222,7 @@ class NavigationLib
 			if (hasData($extensions))
 			{
 				$extensionArray = array();
+
 				foreach ($extensions->retval as $ext)
 				{
 					$filename = APPPATH.'config/'.ExtensionsLib::EXTENSIONS_DIR_NAME.'/'.$ext->name.'/'.self::CONFIG_NAVIGATION_FILENAME;
@@ -226,6 +230,7 @@ class NavigationLib
 					{
 						unset($config);
 						include($filename);
+
 						if (isset($config[$configName]) && is_array($config[$configName]))
 						{
 							$extensionArray = array_merge_recursive(
@@ -236,6 +241,7 @@ class NavigationLib
 						}
 					}
 				}
+
 				$navigationArray = array_merge_recursive($navigationArray, $extensionArray);
 			}
 
@@ -246,7 +252,9 @@ class NavigationLib
 			}
 		}
 
-		$this->_sortArray($navigationArray);
+		$this->_rmNotAllowedEntries($navigationArray); // remove not allowed menu entries
+
+		$this->_sortNavigationArray($navigationArray); // sort menu entries
 
 		return $navigationArray;
 	}
@@ -319,9 +327,9 @@ class NavigationLib
 	/**
 	 * Sorts using the sort element present in the array
 	 */
-	private function _sortArray(&$array)
+	private function _sortNavigationArray(&$navigationArray)
 	{
-		uasort($array, function($a, $b) {
+		uasort($navigationArray, function($a, $b) {
 
 			// If the element sort is not present then the default value is 999
 			$sortA = 999;
@@ -335,13 +343,55 @@ class NavigationLib
 		});
 
 		// Sort also the children
-		foreach ($array as $key => $value)
+		foreach ($navigationArray as $menuName => $singleMenu)
 		{
-			if (isset($value['children']) && is_array($value['children']) && count($value['children']) > 0)
+			if (isset($singleMenu['children']) && !isEmptyArray($singleMenu['children']))
 			{
-				// NOTE: keep this way to give the element by reference, $value has a different reference!
+				// NOTE: keep this way to give the element by reference, $singleMenu has a different reference!
 				// 		otherwise the children will not be sorted
-				$this->_sortArray($array[$key]['children']); // recursive call
+				$this->_sortNavigationArray($navigationArray[$menuName]['children']); // recursive call
+			}
+		}
+	}
+
+	/**
+	 * Remove menu entries that the logged user is not allow to use
+	 */
+	private function _rmNotAllowedEntries(&$navigationArray)
+	{
+		$this->_ci->load->library('PermissionLib'); // Load permission library
+
+		if (isset($navigationArray)) // to avoid error in the foreach
+		{
+			// Loops through the navigation array
+			foreach ($navigationArray as $menuName => $singleMenu)
+			{
+				// If the property requiredPermissions is present is checked
+				if (isset($singleMenu['requiredPermissions']))
+				{
+					// Checks if the logged uses has at least one of required permissions
+					$isAllowed = $this->_ci->permissionlib->hasAtLeastOne(
+						$singleMenu['requiredPermissions'],
+						self::PERMISSION_NAVIGATION_METHOD
+					);
+
+					// If the user is not allowed then this menu entry and its children (sub menus) are removed and not displayed
+					if (!$isAllowed)
+					{
+						unset($navigationArray[$menuName]);
+					}
+				}
+				// Otherwise this menu entry is displayed
+
+				// If the menu entry was NOT removed, then checks if it has children (sub menus) to check them for permissions
+				// NOTE: used $navigationArray[$menuName] because could be removed by the previous unset command
+				// 		therefore $singleMenu is still set
+				if (isset($navigationArray[$menuName]) && isset($singleMenu['children']) && !isEmptyArray($singleMenu['children']))
+				{
+					// NOTE: keep this way to give the element by reference, $value has a different reference!
+					// 		otherwise the children will not be checked correctly
+					$this->_rmNotAllowedEntries($navigationArray[$menuName]['children']); // recursive call
+				}
 			}
 		}
 	}
