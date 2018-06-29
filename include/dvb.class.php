@@ -28,12 +28,13 @@ require_once(dirname(__FILE__).'/student.class.php');
 require_once(dirname(__FILE__).'/studiensemester.class.php');
 require_once(dirname(__FILE__).'/adresse.class.php');
 require_once(dirname(__FILE__).'/webservicelog.class.php');
+require_once(dirname(__FILE__).'/prestudent.class.php');
 
 class dvb extends basis_db
 {
 	const DVB_URL_WEBSERVICE_OAUTH = 'https://stubei-q.portal.at/dvb/oauth/token';
-	const DVB_URL_WEBSERVICE_SVNR = 'https://stubei-q.portal.at/rws/0.1/simpleStudentBySozialVersicherungsnummer.xml';
-	const DVB_URL_WEBSERVICE_ERSATZKZ = 'https://stubei-q.portal.at/rws/0.1/simpleStudentByErsatzKennzeichen.xml';
+	const DVB_URL_WEBSERVICE_SVNR = 'https://stubei-q.portal.at/rws/0.2/simpleStudentBySozialVersicherungsnummer.xml';
+	const DVB_URL_WEBSERVICE_ERSATZKZ = 'https://stubei-q.portal.at/rws/0.2/simpleStudentByErsatzKennzeichen.xml';
 	const DVB_URL_WEBSERVICE_RESERVIERUNG = 'https://stubei-q.portal.at/dvb/matrikelnummern/1.0/reservierung.xml';
 	const DVB_URL_WEBSERVICE_MELDUNG = 'https://stubei-q.portal.at/dvb/matrikelnummern/1.0/meldung.xml';
 
@@ -175,7 +176,7 @@ class dvb extends basis_db
 				$person_meldung->vorname = $person->vorname;
 				$person_meldung->nachname = $person->nachname;
 				$person_meldung->geburtsdatum = $person->gebdatum;
-				$person_meldung->geschlecht = UPPER($person->geschlecht);
+				$person_meldung->geschlecht = mb_strtoupper($person->geschlecht);
 				$person_meldung->staat = $person->staatsbuergerschaft;
 				if ($person->svnr != '')
 					$person_meldung->svnr = $person->svnr;
@@ -183,18 +184,18 @@ class dvb extends basis_db
 				// PLZ der Meldeadresse laden
 				$adresse = new adresse();
 				if ($adresse->loadZustellAdresse($person->person_id))
-					$person_meldung->plz = $row->plz;
+					$person_meldung->plz = $adresse->plz;
 
 				// ZGV Datum laden falls vorhanden
 				$prestudent = new prestudent();
 				if ($prestudent->load($prestudent_id) && $prestudent->zgvdatum != '')
 				{
 					$datum_obj = new datum();
-					$person->matura = $datum_obj->formatDatum($matura, 'Ymd');
+					$person_meldung->matura = $datum_obj->formatDatum($prestudent->zgvdatum, 'Ymd');
 				}
 
 				// Meldung der Vergabe der Matrikelnummer
-				if ($this->setMatrikelnummer(DVB_BILDUNGSEINRICHTUNG_CODE, $person))
+				if ($this->setMatrikelnummer(DVB_BILDUNGSEINRICHTUNG_CODE, $person_meldung))
 				{
 					// Matrikelnummer bei Person speichern
 					$person->matr_nr = $matrikelnummer;
@@ -434,7 +435,7 @@ class dvb extends basis_db
 		$curl_info = curl_getinfo($curl);
 		curl_close($curl);
 		$this->debug('ResponseCode: '.$curl_info['http_code']);
-		$this->debug('ResponseData: '.print_r($response, true));
+		$this->debug('ResponseData: '.print_r($xml_response, true));
 
 		if ($curl_info['http_code'] == '200')
 		{
