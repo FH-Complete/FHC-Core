@@ -306,7 +306,7 @@
 	);
 
 	$filterWidgetArray['app'] = $APP;
-	$filterWidgetArray['datasetName'] = 'PersonActions';
+	$filterWidgetArray['datasetName'] = 'overview';
 	$filterWidgetArray['filterKurzbz'] = 'InfoCenterSentApplicationAll';
 	$filterWidgetArray['filter_id'] = $this->input->get('filter_id');
 
