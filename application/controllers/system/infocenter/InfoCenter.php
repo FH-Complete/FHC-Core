@@ -671,7 +671,7 @@ class InfoCenter extends Auth_Controller
 		$listFiltersNotSent = array();
 		$listCustomFilters = array();
 
-		$filtersSent = $this->FiltersModel->getFilterList('infocenter', 'PersonActions', '%InfoCenterSentApplication%');
+		$filtersSent = $this->FiltersModel->getFilterList('infocenter', 'overview', '%InfoCenterSentApplication%');
 		if (hasData($filtersSent))
 		{
 			for ($filtersCounter = 0; $filtersCounter < count($filtersSent->retval); $filtersCounter++)
@@ -682,7 +682,7 @@ class InfoCenter extends Auth_Controller
 			}
 		}
 
-		$filtersNotSent = $this->FiltersModel->getFilterList('infocenter', 'PersonActions', '%InfoCenterNotSentApplication%');
+		$filtersNotSent = $this->FiltersModel->getFilterList('infocenter', 'overview', '%InfoCenterNotSentApplication%');
 		if (hasData($filtersNotSent))
 		{
 			for ($filtersCounter = 0; $filtersCounter < count($filtersNotSent->retval); $filtersCounter++)
@@ -693,7 +693,7 @@ class InfoCenter extends Auth_Controller
 			}
 		}
 
-		$customFilters = $this->FiltersModel->getCustomFiltersList('infocenter', 'PersonActions', $this->_uid);
+		$customFilters = $this->FiltersModel->getCustomFiltersList('infocenter', 'overview', $this->_uid);
 		if (hasData($customFilters))
 		{
 			for ($filtersCounter = 0; $filtersCounter < count($customFilters->retval); $filtersCounter++)
@@ -814,7 +814,7 @@ class InfoCenter extends Auth_Controller
 		$listFilters = array();
 		$listCustomFilters = array();
 
-		$filters = $this->FiltersModel->getFilterList('infocenter', 'PersonActions', '%InfoCenterFreigegeben%');
+		$filters = $this->FiltersModel->getFilterList('infocenter', 'freigegeben', '%InfoCenterFreigegeben%');
 		if (hasData($filters))
 		{
 			for ($filtersCounter = 0; $filtersCounter < count($filters->retval); $filtersCounter++)
@@ -825,7 +825,7 @@ class InfoCenter extends Auth_Controller
 			}
 		}
 
-		$customFilters = $this->FiltersModel->getCustomFiltersList('infocenter', 'PersonActions', $this->_uid);
+		$customFilters = $this->FiltersModel->getCustomFiltersList('infocenter', 'freigegeben', $this->_uid);
 		if (hasData($customFilters))
 		{
 			for ($filtersCounter = 0; $filtersCounter < count($customFilters->retval); $filtersCounter++)

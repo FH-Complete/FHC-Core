@@ -217,7 +217,7 @@
 	);
 
 	$filterWidgetArray['app'] = $APP;
-	$filterWidgetArray['datasetName'] = 'PersonActions';
+	$filterWidgetArray['datasetName'] = 'freigegeben';
 	$filterWidgetArray['filterKurzbz'] = 'InfoCenterFreigegeben5days';
 	$filterWidgetArray['filter_id'] = $this->input->get('filter_id');
 

@@ -326,7 +326,7 @@ class FiltersLib
 			$this->_ci->load->library('PhrasesLib', array(self::FILTER_PHRASES_CATEGORY));
 
 			$tmpFilterNamePhrase = $this->_ci->phraseslib->t(self::FILTER_PHRASES_CATEGORY, $filterJson->namePhrase);
-			if (isset($tmpFilterNamePhrase) && !isEmptyString($tmpFilterNamePhrase)) // if is not null or an empty string
+			if (!isEmptyString($tmpFilterNamePhrase)) // if is not null or an empty string
 			{
 				$filterName = $tmpFilterNamePhrase;
 			}
@@ -368,7 +368,7 @@ class FiltersLib
 		$removeSelectedField = false;
 		$trimedval = (isset($selectedField)?trim($selectedField):'');
 		// Checks the parameter selectedField
-		if (isset($selectedField) && !isEmptyString($selectedField))
+		if (!isEmptyString($selectedField))
 		{
 			// Retrives all the used fields by the current filter
 			$fields = $this->getElementSession(self::SESSION_FIELDS);
@@ -402,7 +402,7 @@ class FiltersLib
 		$removeSelectedField = false;
 		$trimedval = (isset($selectedField)?trim($selectedField):'');
 		// Checks the parameter selectedField
-		if (isset($selectedField) && !isEmptyString($selectedField))
+		if (!isEmptyString($selectedField))
 		{
 			// Retrives all the used fields by the current filter
 			$fields = $this->getElementSession(self::SESSION_FIELDS);
@@ -431,7 +431,7 @@ class FiltersLib
 		$removeAppliedFilter = false;
 		$trimedval = (isset($appliedFilter)?trim($appliedFilter):'');
 		// Checks the parameter appliedFilter
-		if (isset($appliedFilter) && !isEmptyString($appliedFilter))
+		if (!isEmptyString($appliedFilter))
 		{
 			// Retrives all the used fields by the current filter
 			$fields = $this->getElementSession(self::SESSION_FIELDS);
@@ -519,7 +519,7 @@ class FiltersLib
 		$addFilter = false;
 		$trimedval = (isset($filter)?trim($filter):'');
 		// Checks the parameter filter
-		if (isset($filter) && !isEmptyString($filter))
+		if (!isEmptyString($filter))
 		{
 			// Retrives all the used fields by the current filter
 			$fields = $this->getElementSession(self::SESSION_FIELDS);
@@ -562,7 +562,7 @@ class FiltersLib
 		$saveCustomFilter = false; // by default returns a failure
 		$trimedval = (isset($customFilterDescription)?trim($customFilterDescription):'');
 		// Checks parameter customFilterDescription if not valid stop the execution
-		if (!isset($customFilterDescription) || isEmptyString($customFilterDescription))
+		if (isEmptyString($customFilterDescription))
 		{
 			return $saveCustomFilter;
 		}

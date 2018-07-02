@@ -75,6 +75,7 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
 				<xsl:if test="datum = ''"><text:p text:style-name="P4">Datum der Abschlussprüfung nicht gesetzt</text:p></xsl:if>
 				<xsl:if test="titel = ''"><text:p text:style-name="P4">Kein akademischer Grad ausgewählt</text:p></xsl:if>
 				<xsl:if test="sponsion = ''"><text:p text:style-name="P4">Sponsionsdatum nicht gesetzt</text:p></xsl:if>
+				<xsl:if test="bescheidbgbl1 = ''"><text:p text:style-name="P4">Bundesgesetzblattnummer (BGBl) beim Studiengang ist nicht gesetzt</text:p></xsl:if>
 			
 			<text:p text:style-name="P1"/>
 			<text:p text:style-name="P1"/>
@@ -119,7 +120,7 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
 			<text:p text:style-name="P1"/>
 			<text:p text:style-name="P1">an der Fachhochschule Technikum Wien</text:p>
 			<text:p text:style-name="P1">durch Ablegung der Master-Prüfung am <xsl:value-of select="datum" /> ordnungsgemäß abgeschlossen hat,</text:p>
-			<text:p text:style-name="P1">den mit Bescheid des Board der Agentur für Qualitätssicherung und Akkreditierung Austria vom 9.5.2012,</text:p>
+			<text:p text:style-name="P1">den mit Bescheid des Board der Agentur für Qualitätssicherung und Akkreditierung Austria vom 09.05.2012,</text:p>
 			<text:p text:style-name="P1">GZ FH12020016 idgF, gemäß § 6 Abs. 2 FHStG</text:p>
 			<text:p text:style-name="P1">festgesetzten akademischen Grad</text:p>
 			<text:p text:style-name="P1"/>
