@@ -11,7 +11,7 @@ class Akte_model extends DB_Model
 		$this->dbTable = 'public.tbl_akte';
 		$this->pk = 'akte_id';
 	}
-	
+
 	/**
 	 * getAkten
 	 */
@@ -19,7 +19,7 @@ class Akte_model extends DB_Model
 	{
 		// Checks if the operation is permitted by the API caller
 		if (isError($ent = $this->isEntitled($this->dbTable, PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR))) return $ent;
-		
+
 		$query = 'SELECT akte_id,
 						 person_id,
 						 dokument_kurzbz,
@@ -41,15 +41,15 @@ class Akte_model extends DB_Model
 						 CASE WHEN inhalt is not null THEN true ELSE false END as inhalt_vorhanden
 					FROM public.tbl_akte
 				   WHERE person_id = ?';
-		
+
 		$parametersArray = array($person_id);
-		
+
 		if (!is_null($dokument_kurzbz))
 		{
 			$query .= ' AND dokument_kurzbz = ?';
 			array_push($parametersArray, $dokument_kurzbz);
 		}
-		
+
 		if (!is_null($stg_kz) && !is_null($prestudent_id))
 		{
 			$query .= ' AND dokument_kurzbz NOT IN (
@@ -65,9 +65,9 @@ class Akte_model extends DB_Model
 						)';
 			array_push($parametersArray, $stg_kz, $prestudent_id);
 		}
-		
+
 		$query .= ' ORDER BY erstelltam';
-		
+
 		return $this->execQuery($query, $parametersArray);
 	}
 
@@ -78,7 +78,7 @@ class Akte_model extends DB_Model
 	{
 		// Checks if the operation is permitted by the API caller
 		if (isError($ent = $this->isEntitled($this->dbTable, PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR))) return $ent;
-		
+
 		$query = 'SELECT a.akte_id,
 						 a.person_id,
 						 a.dokument_kurzbz,
@@ -103,17 +103,17 @@ class Akte_model extends DB_Model
 			  INNER JOIN public.tbl_prestudent p USING(person_id)
 			   LEFT JOIN public.tbl_dokumentprestudent dp USING(prestudent_id, dokument_kurzbz)
 				   WHERE a.person_id = ?';
-		
+
 		$parametersArray = array($person_id);
-		
-		if (!empty($dokument_kurzbz))
+
+		if (!isEmptyString($dokument_kurzbz))
 		{
 			$query .= ' AND a.dokument_kurzbz = ?';
 			array_push($parametersArray, $dokument_kurzbz);
 		}
-		
+
 		$query .= ' GROUP BY a.akte_id ORDER BY a.erstelltam';
-		
+
 		return $this->execQuery($query, $parametersArray);
 	}
 
@@ -125,7 +125,7 @@ class Akte_model extends DB_Model
 		// Checks if the operation is permitted by the API caller
 		if (isError($ent = $this->isEntitled($this->dbTable, PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR))) return $ent;
 		if (isError($ent = $this->isEntitled('campus.tbl_dms', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR))) return $ent;
-		
+
 		$query = 'SELECT a.akte_id,
 						 a.person_id,
 						 a.dokument_kurzbz,
@@ -160,17 +160,17 @@ class Akte_model extends DB_Model
 			  INNER JOIN (SELECT dms_id, MAX(version) AS version FROM campus.tbl_dms_version GROUP BY dms_id) dvv ON (d.dms_id = dvv.dms_id)
 			  INNER JOIN campus.tbl_dms_version dv ON (dv.dms_id = dvv.dms_id AND dv.version = dvv.version)
 				   WHERE a.person_id = ?';
-		
+
 		$parametersArray = array($person_id);
-		
-		if (!empty($dokument_kurzbz))
+
+		if (!isEmptyString($dokument_kurzbz))
 		{
 			$query .= ' AND a.dokument_kurzbz = ?';
 			array_push($parametersArray, $dokument_kurzbz);
 		}
-		
+
 		$query .= ' GROUP BY a.akte_id, d.dms_id, dv.dms_id, dv.version ORDER BY a.erstelltam';
-		
+
 		return $this->execQuery($query, $parametersArray);
 	}
 

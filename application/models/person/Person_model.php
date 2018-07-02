@@ -236,7 +236,7 @@ class Person_model extends DB_Model
 			{
 				$person = $persons->retval[$i];
 
-				if (!empty($person->sprache))
+				if (!isEmptyString($person->sprache))
 				{
 					$language = $person->sprache;
 					break;

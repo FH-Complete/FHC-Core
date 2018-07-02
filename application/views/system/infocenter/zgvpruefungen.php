@@ -129,7 +129,7 @@
 								<div class="form-group">
 									<label><?php echo  $this->p->t('infocenter', 'zgv') . ' ' . $this->p->t('global','datum') . ':'?></label>
 									<?php
-									$zgvdatum = empty($zgvpruefung->zgvdatum) ? "" : date_format(date_create($zgvpruefung->zgvdatum), 'd.m.Y');
+									$zgvdatum = isEmptyString($zgvpruefung->zgvdatum) ? "" : date_format(date_create($zgvpruefung->zgvdatum), 'd.m.Y');
 									if ($infoonly):
 										echo $zgvdatum;
 									else:
@@ -188,7 +188,7 @@
 									<div class="form-group">
 										<label><?php echo  $this->p->t('infocenter', 'zgv') . ' ' . $this->p->t('lehre','master') . ' ' . $this->p->t('global','datum') . ':'?></label>
 										<?php
-										$zgvmadatum = empty($zgvpruefung->zgvmadatum) ? "" : date_format(date_create($zgvpruefung->zgvmadatum), 'd.m.Y');
+										$zgvmadatum = isEmptyString($zgvpruefung->zgvmadatum) ? "" : date_format(date_create($zgvpruefung->zgvmadatum), 'd.m.Y');
 										if ($infoonly):
 											echo $zgvmadatum;
 										else:
@@ -305,7 +305,7 @@
 							<div class="col-lg-6 text-right">
 								<?php
 								$disabled = $disabledTxt = '';
-								if (empty($zgvpruefung->prestudentstatus->bewerbung_abgeschicktamum))
+								if (isEmptyString($zgvpruefung->prestudentstatus->bewerbung_abgeschicktamum))
 								{
 									$disabled = 'disabled';
 									$disabledTxt = 'Die Bewerbung muss erst abgeschickt worden sein.';

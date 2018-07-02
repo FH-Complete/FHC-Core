@@ -57,6 +57,7 @@ $this->phrasen['tools/ampelBitteBestaetigen']='Bitte bestätigen Sie diese jetzt
 $this->phrasen['tools/ampelAbgelaufenTitel']='Abgelaufene oder bereits bestätigte Ampeln';
 $this->phrasen['tools/ampelAbgelaufenTxt']='Sie können diese Ampeln weiterhin lesen, aber nicht mehr bestätigen.';
 $this->phrasen['tools/ampelBestaetigtAbgelaufen']='Bereits bestätigt oder abgelaufen';
+$this->phrasen['tools/ampelAktuelleAmpeln']='Aktuelle Ampeln';
 $this->phrasen['tools/ampelKeineAktuellen']='Keine aktuellen Ampeln';
 $this->phrasen['tools/ampelKeineAktuellenTxt']='Sie haben zur Zeit keine aktuellen Ampeln.';
 $this->phrasen['tools/ampelClose']='Jetzt nicht';

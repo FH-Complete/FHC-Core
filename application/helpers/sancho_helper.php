@@ -35,7 +35,7 @@ function sendMail($vorlage_kurzbz, $vorlage_data, $to, $subject, $headerImg = DE
 	$ci =& get_instance();
 	$ci->load->library('email');
 	$ci->load->library('MailLib');
-	
+
 	$sanchoHeader_img = 'skin/images/sancho/'. $headerImg;
 	$sanchoFooter_img = 'skin/images/sancho/sancho_footer.jpg';
 
@@ -49,7 +49,7 @@ function sendMail($vorlage_kurzbz, $vorlage_data, $to, $subject, $headerImg = DE
 
 	// Set specific mail content into specific content template
 	$content = _parseMailContent($vorlage_kurzbz, $vorlage_data);
-	
+
 	// overall main content data array
 	$layout = array(
 		'CID_header' => $cid_header,
@@ -75,14 +75,14 @@ function _parseMailContent($vorlage_kurzbz, $vorlage_data)
 {
 	$ci =& get_instance();
 	$ci->load->library('VorlageLib');
-	
+
 	$result = $ci->vorlagelib->getVorlagetextByVorlage($vorlage_kurzbz);
 
 	if (isSuccess($result))
 	{
 		// If the text and the subject of the template are not empty
 		if (is_array($result->retval) && count($result->retval) > 0 &&
-			!empty($result->retval[0]->text))
+			!isEmptyString($result->retval[0]->text))
 		{
 			// Parses template text
 			$parsedText = $ci->vorlagelib->parseVorlagetext($result->retval[0]->text, $vorlage_data);

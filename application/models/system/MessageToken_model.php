@@ -8,6 +8,7 @@ class MessageToken_model extends CI_Model
 {
 	/**
 	 * Constructor
+	 * NOTE: here are loaded libs, models, helpers, etc. because MessageToken_model extends directly the CI_Model
 	 */
 	public function __construct()
 	{

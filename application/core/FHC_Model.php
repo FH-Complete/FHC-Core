@@ -17,9 +17,6 @@ class FHC_Model extends CI_Model
 		$this->lang->load('fhc_model');
 		$this->lang->load('fhcomplete');
 
-		// Load return message helper
-		$this->load->helper('message');
-
 		// Loads the permission library
 		$this->load->library('PermissionLib');
 	}

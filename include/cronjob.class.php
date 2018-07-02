@@ -25,6 +25,7 @@
  */
 require_once(dirname(__FILE__).'/basis_db.class.php');
 require_once(dirname(__FILE__).'/datum.class.php');
+require_once(dirname(__FILE__).'/functions.inc.php');
 
 class cronjob extends basis_db
 {

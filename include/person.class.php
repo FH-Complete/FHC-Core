@@ -63,6 +63,7 @@ class person extends basis_db
 	public $zugangscode = null; // varchar(32)
 	public $foto_sperre = false;	// boolean
 	public $matr_nr;			//varchar(32)
+	public $bpk; 				//varchar(255)
 
 	/**
 	 * Konstruktor - Uebergibt die Connection und laedt optional eine Person
@@ -89,7 +90,8 @@ class person extends basis_db
 			$qry = "SELECT person_id, sprache, anrede, titelpost, titelpre, nachname, vorname, vornamen,
 							gebdatum, gebort, gebzeit, foto, anmerkung, homepage, svnr, ersatzkennzeichen,
 							familienstand, anzahlkinder, aktiv, insertamum, insertvon, updateamum, updatevon, ext_id,
-							geschlecht, staatsbuergerschaft, geburtsnation, kurzbeschreibung, zugangscode, foto_sperre, matr_nr
+							geschlecht, staatsbuergerschaft, geburtsnation, kurzbeschreibung, zugangscode, foto_sperre,
+							matr_nr, bpk
 					  FROM public.tbl_person
 					 WHERE person_id = " . $this->db_add_param($personId, FHC_INTEGER);
 
@@ -132,6 +134,7 @@ class person extends basis_db
 				$this->zugangscode = $row->zugangscode;
 				$this->foto_sperre = $this->db_parse_bool($row->foto_sperre);
 				$this->matr_nr = $row->matr_nr;
+				$this->bpk = $row->bpk;
 			}
 			else
 			{
@@ -276,6 +279,12 @@ class person extends basis_db
 			if ($this->svnr{3} != ($erg % 11)) //Vergleichen der Pruefziffer mit Quersumme Modulo 11
 			{
 				$this->errormsg = 'SVNR ist ungueltig';
+				return false;
+			}
+
+			if (mb_strlen($this->bpk) > 255)
+			{
+				$this->errormsg = 'BPK darf nicht laenger als 255 Zeichen sein';
 				return false;
 			}
 		}
@@ -425,7 +434,8 @@ class person extends basis_db
 			$qry = 'INSERT INTO public.tbl_person (sprache, anrede, titelpost, titelpre, nachname, vorname, vornamen,
 			                    gebdatum, gebort, gebzeit, foto, anmerkung, homepage, svnr, ersatzkennzeichen,
 			                    familienstand, anzahlkinder, aktiv, insertamum, insertvon, updateamum, updatevon,
-			                    geschlecht, geburtsnation, staatsbuergerschaft, kurzbeschreibung, zugangscode, foto_sperre, matr_nr)
+			                    geschlecht, geburtsnation, staatsbuergerschaft, kurzbeschreibung, zugangscode,
+								foto_sperre, matr_nr, bpk)
 			        VALUES('.$this->db_add_param($this->sprache).','.
 						$this->db_add_param($this->anrede).','.
 						$this->db_add_param($this->titelpost).','.
@@ -454,7 +464,8 @@ class person extends basis_db
 				        $this->db_add_param($this->kurzbeschreibung).','.
 				        $this->db_add_param($this->zugangscode).','.
 				        $this->db_add_param($this->foto_sperre, FHC_BOOLEAN).','.
-						$this->db_add_param($this->matr_nr).');';
+						$this->db_add_param($this->matr_nr).','.
+						$this->db_add_param($this->bpk).');';
 		}
 		else
 		{
@@ -492,7 +503,8 @@ class person extends basis_db
 			       ' kurzbeschreibung='.$this->db_add_param($this->kurzbeschreibung).','.
 				   ' foto_sperre='.$this->db_add_param($this->foto_sperre, FHC_BOOLEAN).','.
 				   ' zugangscode='.$this->db_add_param($this->zugangscode).','.
-				   ' matr_nr ='.$this->db_add_param($this->matr_nr).
+				   ' matr_nr ='.$this->db_add_param($this->matr_nr).','.
+				   ' bpk = '.$this->db_add_param($this->bpk).
 			       ' WHERE person_id='.$this->person_id.';';
 		}
 
@@ -592,6 +604,7 @@ class person extends basis_db
 				$l->kurzbeschreibung = $row->kurzbeschreibung;
 				$l->foto_sperre = $this->db_parse_bool($row->foto_sperre);
 				$l->matr_nr = $row->matr_nr;
+				$l->bpk = $row->bpk;
 				$this->personen[] = $l;
 			}
 		}
@@ -848,6 +861,7 @@ class person extends basis_db
 				$this->zugangscode = $row->zugangscode;
 				$this->foto_sperre = $this->db_parse_bool($row->foto_sperre);
 				$this->matr_nr = $row->matr_nr;
+				$this->bpk = $row->bpk;
 			}
 			else
 			{
@@ -965,6 +979,7 @@ class person extends basis_db
 				$this->updateaktivvon = $row->updateaktivvon;
 				$this->updateaktivam = $row->updateaktivam;
 				$this->aktivierungscode = $row->aktivierungscode;
+				$this->bpk = $row->bpk;
 				return true;
 			}
 			else

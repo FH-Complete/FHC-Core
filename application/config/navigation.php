@@ -90,7 +90,8 @@ $config['navigation_menu']['system/infocenter/InfoCenter/index'] = array(
 	'freigegeben' => array(
 		'link' => site_url('system/infocenter/InfoCenter/freigegeben'),
 		'description' => 'Freigegeben',
-		'icon' => 'thumbs-up'
+		'icon' => 'thumbs-up',
+		'sort' => 1
 	)
 );
 
@@ -98,6 +99,7 @@ $config['navigation_menu']['system/infocenter/InfoCenter/freigegeben'] = array(
 	'back' => array(
 		'link' => site_url('system/infocenter/InfoCenter/index'),
 		'description' => 'Home',
-		'icon' => 'angle-left'
+		'icon' => 'angle-left',
+		'sort' => 1
 	)
 );

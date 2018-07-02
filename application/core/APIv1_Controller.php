@@ -10,10 +10,13 @@ class APIv1_Controller extends REST_Controller
     public function __construct()
     {
         parent::__construct();
-        
+
+		// Loads helper fhcauth to manage the authentication
+		$this->load->helper('fhcauth');
+
         // Loads return messages
 		$this->load->helper('message');
-		
+
 		log_message('debug', 'Called API: '.$_SERVER['PHP_SELF'].'?'.$_SERVER['QUERY_STRING']);
     }
 }
