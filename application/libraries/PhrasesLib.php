@@ -242,21 +242,8 @@ class PhrasesLib
 					$categories = array($categories);
 				}
 
-				// Use the given language if present, otherwise retrives the language for the logged user
-				$language = DEFAULT_LANGUAGE;
-				if (count($parameters) == 2 && !isEmptyString($parameters[1]) && is_string($parameters[1]))
-				{
-					$language = $parameters[1];
-				}
-				// Checks if the user is authenticated to retrive the users's language
-				// NOTE: this library could be called when the user is not logged in the system
-				// 		so this is why is checked if the function getAuthUID exists
-				elseif (function_exists('getAuthUID'))
-				{
-					$this->_ci->load->model('person/Person_model', 'PersonModel');
-
-					$language = $this->_ci->PersonModel->getLanguage(getAuthUID());
-				}
+				// Retrives the language of the logged user
+				$language = getUserLanguage(count($parameters) == 2 ? $parameters[1] : null);
 
 				// If only categories is not an empty array then loads phrases
 				if (count($categories) > 0) $this->_setPhrases($categories, $language);

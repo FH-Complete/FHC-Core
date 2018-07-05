@@ -711,7 +711,7 @@ class UDFLib
 			|| isset($jsonSchema->{UDFLib::TITLE})
 			|| isset($jsonSchema->{UDFLib::PLACEHOLDER}))
 		{
-			// Loads PhrasesLib
+			// Loads phrases library
 			$this->_ci->load->library('PhrasesLib');
 
 			// If is set the label property in the json schema
@@ -720,7 +720,7 @@ class UDFLib
 				// Load the related phrase
 				$tmpResult = $this->_ci->phraseslib->getPhrases(
 					UDFLib::PHRASES_APP_NAME,
-					DEFAULT_LANGUAGE,
+					getUserLanguage(),
 					$jsonSchema->{UDFLib::LABEL},
 					null,
 					null,
@@ -738,7 +738,7 @@ class UDFLib
 				// Load the related phrase
 				$tmpResult = $this->_ci->phraseslib->getPhrases(
 					UDFLib::PHRASES_APP_NAME,
-					DEFAULT_LANGUAGE,
+					getUserLanguage(),
 					$jsonSchema->{UDFLib::TITLE},
 					null,
 					null,
@@ -756,7 +756,7 @@ class UDFLib
 				// Load the related phrase
 				$tmpResult = $this->_ci->phraseslib->getPhrases(
 					UDFLib::PHRASES_APP_NAME,
-					DEFAULT_LANGUAGE,
+					getUserLanguage(),
 					$jsonSchema->{UDFLib::PLACEHOLDER},
 					null,
 					null,
