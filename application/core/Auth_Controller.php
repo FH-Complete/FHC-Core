@@ -48,6 +48,10 @@ class Auth_Controller extends FHC_Controller
 		}
 	}
 
+	/**
+	 * Converts an array of permissions to a string that contains them as a comma separated list
+	 * Ex: "<permission 1>, <permission 2>, <permission 3>"
+	 */
 	private function _rpsToString($requiredPermissions, $method)
 	{
 		$strRequiredPermissions = ''; // string that contains all the required permissions needed to access to this method

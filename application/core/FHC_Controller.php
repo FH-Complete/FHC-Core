@@ -28,6 +28,9 @@ class FHC_Controller extends CI_Controller
 
 		// Loads helper session to manage the php session
 		$this->load->helper('session');
+
+		// Loads language helper
+		$this->load->helper('language');
 	}
 
 	//------------------------------------------------------------------------------------------------------------------
