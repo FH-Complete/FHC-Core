@@ -19,12 +19,13 @@ var FHC_PhrasesLib = {
 
 	/**
 	 * Returns the phrase-text in the user's language
+	 * NOTE: the parameter params is an object since associative arrays are NOT supported in JS
 	 * @param {String} category : phrase-category
 	 * @param {String} phrase : phrase-name
-	 * @param {array} params : String-parameters to be set in variables in phrasentext
+	 * @param {Object} params : parameters to be replaced instead of {<parameter name>} in phraseObj.text
 	 * @returns {String} : phrase-text
 	 */
-	t: function (category, phrase, params = []) {
+	t: function(category, phrase, params = {}) {
 
 		// Checks if FHC_JS_PHRASES_STORAGE_OBJECT is an array
 		if ($.isArray(FHC_JS_PHRASES_STORAGE_OBJECT))
@@ -41,11 +42,11 @@ var FHC_PhrasesLib = {
 					&& phraseObj.text.trim() != '')
 				{
 					// If params is null or not an array
-					if (params == null || (params != null && !$.isArray(params)))
+					if (params == null)
 					{
-						params = [];
+						params = {};
 					}
-					
+
 					return FHC_PhrasesLib._replacePhraseVariable(phraseObj.text, params); // parsing
 				}
 			}
@@ -59,15 +60,21 @@ var FHC_PhrasesLib = {
 
 	/**
 	 * Returns phrase with variables being replaced
+	 * NOTE: params is an object but here is treat as an associative array, not that much orthodox but it works fine ;)
 	 * @param {String} phrase : phrasen-text (with one ore more variables)
-	 * @param {array} replaceStringArr : String-array to be set in variables in phrasentext (order matters)
+	 * @param {Object} params : parameters to be replaced instead of {<parameter name>} in phrase
 	 * @returns {String} : replaced phrasen-text
 	 */
-	_replacePhraseVariable: function (phrase, replaceStringArr) {
-		for (var i = 0; i < replaceStringArr.length; i++)
+	_replacePhraseVariable: function(phrase, params) {
+
+		// Loops
+		for (var paramName in params)
 		{
-			phrase = phrase.replace(/\{(.*?)\}/, replaceStringArr[i]);
+			var paramValue = params[paramName];
+
+			phrase = phrase.replace('{' + paramName + '}', paramValue);
 		}
+
 		return phrase;
 	}
 };
