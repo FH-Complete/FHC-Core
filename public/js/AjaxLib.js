@@ -128,7 +128,7 @@ var FHC_AjaxClient = {
 	 * Retrives error message from response object
 	 */
 	getError: function(response) {
-		var error = 'Generic error';
+		var error = "Generic error";
 
 	    if (jQuery.type(response) == "object" && !jQuery.isEmptyObject(response) && response.hasOwnProperty(RESPONSE))
 	    {
@@ -182,13 +182,13 @@ var FHC_AjaxClient = {
 	 */
 	getUrlParameter: function(sParam) {
 	    var sPageURL = decodeURIComponent(window.location.search.substring(1)),
-	        sURLVariables = sPageURL.split('&'),
+	        sURLVariables = sPageURL.split("&"),
 	        sParameterName,
 	        i;
 
 	    for (i = 0; i < sURLVariables.length; i++)
 		{
-	        sParameterName = sURLVariables[i].split('=');
+	        sParameterName = sURLVariables[i].split("=");
 
 	        if (sParameterName[0] === sParam)
 			{
@@ -266,6 +266,57 @@ var FHC_AjaxClient = {
 	},
 
 	/**
+	 * If an error callback is not given, this is the default error callback that is used
+	 * to display useful info about the occurred error. It uses the JQuery UI dialog
+	 */
+	_defaultErrorCallback: function(jqXHR, textStatus, errorThrown) {
+
+		// Row table format
+		var tableRowFormat = "<tr><td class=\"fhc-ajaxclient-error-td\"><b>%1s: </b></td><td>%2s</td></tr>";
+		var strDivDialog = "<div id=\"fhc-ajaxclient-dialog\"><table>"; // dialog div and open the error table
+
+		// If textStatus is usable then place it in the table
+		if (textStatus != null) strDivDialog += tableRowFormat.replace(/%1s/g, "Error").replace(/%2s/g, textStatus);
+
+		// If errorThrown is usable then place it in the table
+		if (errorThrown != null) strDivDialog += tableRowFormat.replace(/%1s/g, "Error text").replace(/%2s/g, errorThrown);
+
+		// If jqXHR.status is usable then place it in the table
+		if (jqXHR != null && jqXHR.hasOwnProperty("status"))
+		{
+			strDivDialog += tableRowFormat.replace(/%1s/g, "HTTP status").replace(/%2s/g, jqXHR.status);
+		}
+
+		// If jqXHR.responseText is usable then place it in the table
+		if (jqXHR != null && jqXHR.hasOwnProperty("responseText"))
+		{
+			strDivDialog += tableRowFormat.replace(/%1s/g, "HTTP response").replace(/%2s/g, jqXHR.responseText);
+		}
+
+		strDivDialog += "</table></div>"; // close table and div
+
+		$(strDivDialog).appendTo("body"); // append the dialog div to the body
+
+		// Dialog definition
+		$("#fhc-ajaxclient-dialog").dialog({
+			title: "Error occurred",
+			dialogClass: "no-close",
+			autoOpen: true,
+			modal: true,
+			resizable: false,
+			height: "auto",
+			width: 700,
+			closeOnEscape: false,
+			buttons: [{
+				text: "Ok",
+				click: function() {
+					$(this).dialog("close");
+				}
+			}]
+		});
+	},
+
+	/**
 	 * Instantiate a new object and copy in it the properties from the parameter
 	 */
 	_cpObjProps: function(obj) {
@@ -285,7 +336,7 @@ var FHC_AjaxClient = {
 	_showVeil: function() {
 		if (FHC_AjaxClient._veilCallersCounter == 0)
 		{
-			$("<div class=\"veil\"></div>").appendTo('body');
+			$("<div class=\"fhc-ajaxclient-veil\"></div>").appendTo("body");
 		}
 
 		FHC_AjaxClient._veilCallersCounter++;
@@ -305,7 +356,7 @@ var FHC_AjaxClient = {
 
 				if (FHC_AjaxClient._veilCallersCounter == 0)
 				{
-					$(".veil").remove();
+					$(".fhc-ajaxclient-veil").remove();
 				}
 			}
 		},
@@ -388,6 +439,11 @@ var FHC_AjaxClient = {
 					valid = false;
 				}
 		    }
+			else // if is not given then call the default errorCallback
+			{
+				ajaxParameters._errorCallback = FHC_AjaxClient._defaultErrorCallback; // save as property the callback error
+				ajaxParameters.error = FHC_AjaxClient._onError; // function to call if an error occurred
+			}
 
 			// If present, successCallback must be a function
 		    if (ajaxCallParameters.hasOwnProperty("successCallback"))
