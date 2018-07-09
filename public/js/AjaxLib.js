@@ -260,9 +260,28 @@ var FHC_AjaxClient = {
 
 		FHC_AjaxClient._printDebug(this._data, null, errorThrown); // debug time!
 
-		 // Call the error callback saved in _errorCallback property
-		 // NOTE: this is not referred to FHC_AjaxClient but to the ajax object
+		// Call the error callback saved in _errorCallback property
+		// NOTE: this is not referred to FHC_AjaxClient but to the ajax object
 	    this._errorCallback(jqXHR, textStatus, errorThrown);
+	},
+
+	/**
+	 * Method to call after the ajax call has ended
+	 */
+	_onComplete: function(jqXHR, textStatus) {
+
+		FHC_AjaxClient._printDebug(this._data, null, jqXHR.responseJSON); // debug time!
+
+		// Call the complete callback if it was saved in the _completeCallback property
+		// NOTE: this is not referred to FHC_AjaxClient but to the ajax object.
+		//		It's known that it's a function because it was already checked before in the
+		//		_checkAndGenerateAjaxParams method
+		if (this.hasOwnProperty("_completeCallback"))
+		{
+			this._completeCallback(jqXHR, textStatus);
+		}
+
+		FHC_AjaxClient._hideVeil(); // finally hide the veil
 	},
 
 	/**
@@ -460,14 +479,27 @@ var FHC_AjaxClient = {
 				}
 		    }
 
-			// If present, veilTimeout must be a number and cannot be less then 0 or greater then 60000
-		    if (ajaxCallParameters.hasOwnProperty("veilTimeout") && typeof ajaxCallParameters.veilTimeout == "number")
+			// If present, completeCallback must be a function
+		    if (ajaxCallParameters.hasOwnProperty("completeCallback"))
 		    {
+				if (typeof ajaxCallParameters.completeCallback == "function")
+				{
+					ajaxParameters._completeCallback = ajaxCallParameters.completeCallback; // save as property the callback complete
+				}
+				else
+				{
+					console.error("Invalid completeCallback, it must be a function");
+					valid = false;
+				}
+		    }
+
+			// If present, veilTimeout must be a number and cannot be less then 0 or greater then 60000
+			if (ajaxCallParameters.hasOwnProperty("veilTimeout") && typeof ajaxCallParameters.veilTimeout == "number")
+			{
 				if (ajaxCallParameters.veilTimeout > 0 && ajaxCallParameters.veilTimeout < 60000)
 				{
 					ajaxParameters._veilTimeout = ajaxCallParameters.veilTimeout;
 					ajaxParameters.beforeSend = FHC_AjaxClient._showVeil;
-					ajaxParameters.complete = FHC_AjaxClient._hideVeil;
 				}
 				else if(ajaxCallParameters.veilTimeout == 0)
 				{
@@ -478,13 +510,15 @@ var FHC_AjaxClient = {
 					console.error("Invalid veilTimeout parameter, must be a number >= 0 and <= 60000");
 					valid = false;
 				}
-		    }
+			}
 			else // is not present or the value is invalid
 			{
 				ajaxParameters._veilTimeout = VEIL_TIMEOUT;
 				ajaxParameters.beforeSend = FHC_AjaxClient._showVeil;
-				ajaxParameters.complete = FHC_AjaxClient._hideVeil;
 			}
+
+			// Function to call after the ajax call is ended, is it here because it must be always called
+			ajaxParameters.complete = FHC_AjaxClient._onComplete;
 		}
 
 		if (valid === false)
