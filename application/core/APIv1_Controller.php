@@ -14,6 +14,9 @@ class APIv1_Controller extends REST_Controller
 		// Loads helper message to manage returning messages
 		$this->load->helper('message');
 
+		// Loads helper with generic utility function
+		$this->load->helper('fhc');
+
 		// Loads permission lib
 		$this->load->library('PermissionLib');
 
