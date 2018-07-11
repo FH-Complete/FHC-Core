@@ -148,12 +148,9 @@ function generateAddonsJSsInclude($calledFrom)
 /**
  * This function merely print some useful HTML to help some vacuous browsers to handle modern JS features
  */
-function backwardCompatibleJSMsIe()
+function generateBackwardCompatibleJSMsIe($js)
 {
-	echo '<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->'."\n";
-    echo '<!-- WARNING: Respond.js does not work if you view the page via file:// -->'."\n";
-	echo '<!--[if lt IE 9]>'."\n";
-	echo '	<script type="text/javascript" src="vendor/afarkas/html5shiv/dist/html5shiv.min.js"></script>'."\n";
-	echo '	<script type="text/javascript" src="vendor/scottjehl/Respond/dest/respond.min.js"></script>'."\n";
-	echo '<![endif]-->'."\n";
+	echo "<!--[if lt IE 9]>\n";
+	echo '	<script type="text/javascript" src="'.$js.'"></script>'."\n";
+	echo "<![endif]-->\n";
 }

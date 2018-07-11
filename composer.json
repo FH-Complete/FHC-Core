@@ -64,11 +64,10 @@
 			"type": "package",
 			"package": {
 				"name": "borgar/textile-js",
-				"version": "1.0",
-				"source": {
-					"url": "https://github.com/borgar/textile-js.git",
-					"type": "git",
-					"reference": "master"
+				"version": "2.0.4",
+				"dist": {
+					"url": "https://github.com/borgar/textile-js/archive/v2.0.4.zip",
+					"type": "zip"
 				}
 			}
 		},
@@ -77,10 +76,9 @@
 			"package": {
 				"name": "rmariuzzo/jquery-checkboxes",
 				"version": "1.0.7",
-				"source": {
-					"url": "https://github.com/rmariuzzo/checkboxes.js.git",
-					"type": "git",
-					"reference": "081cac1eb9b504dc32be27b57f32f6d1d29a5253"
+				"dist": {
+					"url": "https://github.com/rmariuzzo/checkboxes.js/archive/v1.0.7.zip",
+					"type": "zip"
 				}
 			}
 		},
@@ -142,30 +140,6 @@
 		{
 			"type": "package",
 			"package": {
-				"name": "jquery-archive/jquery-metadata",
-				"version": "1.0",
-				"source": {
-					"url": "https://github.com/jquery-archive/jquery-metadata.git",
-					"type": "git",
-					"reference": "e5a9e4315675bf4d68716872ca754e858088f8ab"
-				}
-			}
-		},
-		{
-			"type": "package",
-			"package": {
-				"name": "tomazdragar/SimpleCropper",
-				"version": "1.0",
-				"source": {
-					"url": "https://github.com/tomazdragar/SimpleCropper.git",
-					"type": "git",
-					"reference": "9750b81fa55ed07b3b429297d18ffbeac07a2cde"
-				}
-			}
-		},
-		{
-			"type": "package",
-			"package": {
 				"name": "joeldbirch/superfish",
 				"version": "1.7.9",
 				"dist": {
@@ -190,10 +164,9 @@
 			"package": {
 				"name": "nicolaskruchten/pivottable",
 				"version": "2.15.0",
-				"source": {
-					"url": "https://github.com/nicolaskruchten/pivottable.git",
-					"type": "git",
-					"reference": "b15ea33268b587d986371c0b6f215c36ffbb860c"
+				"dist": {
+					"url": "https://github.com/nicolaskruchten/pivottable/archive/v2.15.0.zip",
+					"type": "zip"
 				}
 			}
 		},
@@ -201,11 +174,10 @@
 			"type": "package",
 			"package": {
 				"name": "BlackrockDigital/startbootstrap-sb-admin-2",
-				"version": "3.3.7",
-				"source": {
-					"url": "https://github.com/BlackrockDigital/startbootstrap-sb-admin-2.git",
-					"type": "git",
-					"reference": "e85ee3814ba12b7095024d31424cc9d19d791d05"
+				"version": "3.3.7.1",
+				"dist": {
+					"url": "https://github.com/BlackrockDigital/startbootstrap-sb-admin-2/archive/v3.3.7+1.zip",
+					"type": "zip"
 				}
 			}
 		},
@@ -214,10 +186,9 @@
 			"package": {
 				"name": "ludo/jquery-treetable",
 				"version": "3.2.0",
-				"source": {
-					"url": "https://github.com/ludo/jquery-treetable.git",
-					"type": "git",
-					"reference": "73690a9df26dbc1a49981f9335df2a9cd9808813"
+				"dist": {
+					"url": "https://github.com/ludo/jquery-treetable/archive/3.2.0.zip",
+					"type": "zip"
 				}
 			}
 		},
@@ -231,6 +202,30 @@
 					"type": "zip"
 				}
 			}
+		},
+		{
+			"type": "package",
+			"package": {
+				"name": "jquery-archive/jquery-metadata",
+				"version": "1.0",
+				"source": {
+					"url": "https://github.com/jquery-archive/jquery-metadata.git",
+					"type": "git",
+					"reference": "e5a9e4315675bf4d68716872ca754e858088f8ab"
+				}
+			}
+		},
+		{
+			"type": "package",
+			"package": {
+				"name": "tomazdragar/SimpleCropper",
+				"version": "1.0",
+				"source": {
+					"url": "https://github.com/tomazdragar/SimpleCropper.git",
+					"type": "git",
+					"reference": "9750b81fa55ed07b3b429297d18ffbeac07a2cde"
+				}
+			}
 		}
 	],
 	"require": {
@@ -239,7 +234,7 @@
 		"afarkas/html5shiv": "^3.7",
 		"alvaro-prieto/colResizable": "^1.6",
 
-		"borgar/textile-js": "1.0",
+		"borgar/textile-js": "2.0.4",
 		"BlackrockDigital/startbootstrap-sb-admin-2": "^3.3",
 
 		"christianbach/tablesorter": "^1.0",
