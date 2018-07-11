@@ -34,20 +34,23 @@
 	text-decoration: underline;
 }
 
-.navbar-brand {
-	float: left;
-	height: 50px;
+.navbar-header {
 	padding-top: 15px;
-	padding-right: 20px;
-	padding-left: 7px;
-	font-size: 18px;
+	height: 50px;
 }
 
 .navbar-brand-icon {
-	float: left;
 	height: 50px;
-	padding-top: 15px;
-	padding-left: 7px;
+	top: 0px;
 	font-size: 16px;
 	margin-right: 3px;
+}
+
+.header-menu-link-entry {
+	padding-right: 23px;
+	padding-top: 15px;
+	font-size: 18px;
+	color: #5e5e5e !important;
+	background-color: transparent;
+	text-decoration: none !important;
 }

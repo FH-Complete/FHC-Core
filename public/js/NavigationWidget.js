@@ -38,7 +38,7 @@ var FHC_NavigationWidget = {
 							if (e != null) strHeaderMenu += FHC_NavigationWidget._buildHeaderMenuStructure(e);
 						});
 
-						$(".menu-header-items").html(strHeaderMenu);
+						$("#header-menu").html(strHeaderMenu);
 					}
 				}
 			}
@@ -142,24 +142,26 @@ var FHC_NavigationWidget = {
 
 		var strHeaderMenu = "";
 
-		if (item["icon"] != "undefined" && item["icon"] != "")
+		var icon = "";
+		if (item["icon"] != null && item["icon"] != "")
 		{
-			strHeaderMenu += '<i class="navbar-brand-icon fa fa-' + item["icon"] + ' fa-fw"></i>';
-		}
-
-		if (item["children"] != null && Object.keys(item["children"]).length > 0)
-		{
-			strHeaderMenu += '<span><a class="navbar-brand" data-toggle="dropdown" href="#" aria-expanded="false">';
+			icon = '<i class="navbar-brand-icon fa fa-' + item["icon"] + ' fa-fw"></i>';
 		}
 
 		var target = "";
 		if (item["target"] != null) target = item["target"];
 
+		strHeaderMenu += '<span class="dropdown">';
+
 		if (item["children"] != null && Object.keys(item["children"]).length > 0)
 		{
+			strHeaderMenu += '<a class="dropdown-toggle header-menu-link-entry" data-toggle="dropdown" href="#">';
+			strHeaderMenu += icon;
 			strHeaderMenu += item["description"] + " ";
-			strHeaderMenu += '<i class="fa fa-caret-down"></i></a>';
-			strHeaderMenu += '<ul class="dropdown-menu dropdown-user">';
+			strHeaderMenu += '<i class="fa fa-caret-down"></i>';
+			strHeaderMenu += '</a>';
+
+			strHeaderMenu += '<ul class="dropdown-menu">';
 
 			jQuery.each(item["children"], function(i, e) {
 				if (e != null)
@@ -167,22 +169,29 @@ var FHC_NavigationWidget = {
 					var eTarget = "";
 					if (e["target"] != null) eTarget = e["target"];
 
-					strHeaderMenu += '<li><a href="' + e["link"] + '" target="' + eTarget + '">';
+					var eIcon = "";
+					if (e["icon"] != null && e["icon"] != "") eIcon += '<i class="fa fa-' + e["icon"] + ' fa-fw"></i>';
 
-					if (e["icon"] != "undefined" && e["icon"] != "")
-					{
-						strHeaderMenu += '<i class="fa fa-' + e["icon"] + ' fa-fw"></i>';
-					}
-
-					strHeaderMenu += e["description"] + '</a></li>';
+					strHeaderMenu += '<li>';
+					strHeaderMenu += '<a href="' + e["link"] + '" target="' + eTarget + '">';
+					strHeaderMenu += eIcon;
+					strHeaderMenu += e["description"];
+					strHeaderMenu += '</a>';
+					strHeaderMenu += '</li>';
 				}
 			});
-			strHeaderMenu += '</ul></span>';
+
+			strHeaderMenu += '</ul>';
 		}
 		else
 		{
-			strHeaderMenu += '<a class="navbar-brand" href="' + item["link"] + '" target="' + target + '">' + item["description"] + '</a>';
+			strHeaderMenu += '<a class="header-menu-link-entry" href="' + item["link"] + '" target="' + target + '">' +
+				icon +
+				item["description"] +
+			'</a>';
 		}
+
+		strHeaderMenu += '</span>';
 
 		return strHeaderMenu;
 	},
