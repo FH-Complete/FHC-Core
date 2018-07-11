@@ -156,7 +156,7 @@ class AmpelMail extends FHC_Controller
 		// Send mails for new ampeln merged by user
 		foreach ($new_ampel_data_arr as $new_ampel_data)
 		{
-			sendMail(
+			sendSanchoMail(
 				'Sancho_Content_AmpelNeu',
 				$new_ampel_data,
 				$new_ampel_data['uid']. '@'. DOMAIN,
@@ -167,7 +167,7 @@ class AmpelMail extends FHC_Controller
 		// Send mails for overdue ampeln merged by user
 		foreach ($overdue_ampel_data_arr as $overdue_ampel_data)
 		{
-			sendMail(
+			sendSanchoMail(
 				'Sancho_Content_AmpelUeberfaellig',
 				$overdue_ampel_data,
 				$overdue_ampel_data['uid']. '@'. DOMAIN,

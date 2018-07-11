@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "00d176bc89167feef10405c7457b6d6a",
-    "content-hash": "8cd3ddef525145593a8fe885184ef4cc",
+    "hash": "3f0f6c60692efa0e8970d047b507f988",
+    "content-hash": "114153c22310130fed0c1c41f74c5a62",
     "packages": [
         {
             "name": "BlackrockDigital/startbootstrap-sb-admin-2",
@@ -16,6 +16,37 @@
                 "reference": "master"
             },
             "type": "library"
+        },
+        {
+            "name": "afarkas/html5shiv",
+            "version": "3.7.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/aFarkas/html5shiv.git",
+                "reference": "ed28c56c071bddfe7d635ad88995674957a016be"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/aFarkas/html5shiv/zipball/ed28c56c071bddfe7d635ad88995674957a016be",
+                "reference": "ed28c56c071bddfe7d635ad88995674957a016be",
+                "shasum": ""
+            },
+            "type": "component",
+            "extra": {
+                "component": {
+                    "scripts": [
+                        "dist/html5shiv.js"
+                    ]
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT",
+                "GPL-2.0"
+            ],
+            "description": "Defacto way to enable use of HTML5 sectioning elements in legacy Internet Explorer.",
+            "homepage": "http://paulirish.com/2011/the-history-of-the-html5-shiv/",
+            "time": "2015-07-20 20:04:00"
         },
         {
             "name": "alvaro-prieto/colResizable",
@@ -1598,6 +1629,17 @@
                 "spark-plug"
             ],
             "time": "2015-10-23 08:27:10"
+        },
+        {
+            "name": "scottjehl/Respond",
+            "version": "1.4.2",
+            "dist": {
+                "type": "zip",
+                "url": "https://github.com/scottjehl/Respond/archive/1.4.2.zip",
+                "reference": null,
+                "shasum": null
+            },
+            "type": "library"
         },
         {
             "name": "symfony/console",

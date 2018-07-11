@@ -12,6 +12,10 @@
 
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
+// ------------------------------------------------------------------------
+// Functions needed to manage the user language preference
+// ------------------------------------------------------------------------
+
 /**
  * Function to retrive the language of the logged user
  * If is not possible to retrive it, then the default system language is returnd

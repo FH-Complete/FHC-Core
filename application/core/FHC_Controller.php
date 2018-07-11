@@ -31,6 +31,9 @@ class FHC_Controller extends CI_Controller
 
 		// Loads language helper
 		$this->load->helper('fhc_language');
+
+		// Loads header helper
+		$this->load->helper('fhc_header');
 	}
 
 	//------------------------------------------------------------------------------------------------------------------

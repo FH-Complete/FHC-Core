@@ -1,4 +1,5 @@
 <?php
+
 /**
  * FH-Complete
  *
@@ -18,6 +19,10 @@
 
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
+// ------------------------------------------------------------------------
+// Functions needed in the view FHC-Header
+// ------------------------------------------------------------------------
+
 const DEFAULT_SANCHO_HEADER_IMG = 'sancho_header_du_hast_neue_nachrichten.jpg';
 
 /**
@@ -30,7 +35,7 @@ const DEFAULT_SANCHO_HEADER_IMG = 'sancho_header_du_hast_neue_nachrichten.jpg';
  * @param string $headerImg	Filename of the specific Sancho header image.
  * @return void
  */
-function sendMail($vorlage_kurzbz, $vorlage_data, $to, $subject, $headerImg = DEFAULT_SANCHO_HEADER_IMG)
+function sendSanchoMail($vorlage_kurzbz, $vorlage_data, $to, $subject, $headerImg = DEFAULT_SANCHO_HEADER_IMG)
 {
 	$ci =& get_instance();
 	$ci->load->library('email');

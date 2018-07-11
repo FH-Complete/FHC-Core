@@ -220,48 +220,66 @@
 					"reference": "73690a9df26dbc1a49981f9335df2a9cd9808813"
 				}
 			}
+		},
+		{
+			"type": "package",
+			"package": {
+				"name": "scottjehl/Respond",
+				"version": "1.4.2",
+				"dist": {
+					"url": "https://github.com/scottjehl/Respond/archive/1.4.2.zip",
+					"type": "zip"
+				}
+			}
 		}
 	],
 	"require": {
 		"php": ">=5.4.0",
 
+		"afarkas/html5shiv": "^3.7",
 		"alvaro-prieto/colResizable": "^1.6",
+
 		"borgar/textile-js": "1.0",
 		"BlackrockDigital/startbootstrap-sb-admin-2": "^3.3",
-		"christianbach/tablesorter": "^1.0",
 
+		"christianbach/tablesorter": "^1.0",
 		"codeigniter/framework": "3.*",
 		"codeigniter-restserver": "2.6",
-
 		"components/jquery": "^3.2",
 		"components/jqueryui": "^1.12",
 		"components/font-awesome": "^4.7",
 		"components/angular.js": "1.3.16",
 
 		"easyrdf/easyrdf": "0.9.*",
+
 		"fgelinas/timepicker": "^0.3.3",
 		"fzaninotto/faker": "1.*",
-		"joeldbirch/superfish": "^1.7",
 
+		"joeldbirch/superfish": "^1.7",
 		"jquery/jqueryV1": "^1.12",
 		"jquery/jqueryV2": "^2.2",
 		"jquery/sizzle": "^1.0",
-
 		"jquery-archive/jquery-metadata": "^1.0",
 
 		"json-forms": "1.4.0",
 		"jsoneditor": "5.5.6",
+
 		"kingsquare/json-schema-form": "*",
+
 		"ludo/jquery-treetable": "^3.2",
+
 		"michelf/php-markdown": "1.5.0",
 		"ml/json-ld": "1.*",
 		"mottie/tablesorter": "^2.29",
+
 		"netcarver/textile": "^3.5",
 		"nicolaskruchten/pivottable": "^2.15.0",
-		"rmariuzzo/jquery-checkboxes": "1.0.7",
 
+		"rmariuzzo/jquery-checkboxes": "1.0.7",
 		"rougin/combustor": "1.1.*",
 		"rougin/refinery": "*",
+
+		"scottjehl/Respond": "^1.4",
 
 		"tapmodo/Jcrop": "^2.0",
 		"tinymce/tinymce": "4.*",
@@ -280,4 +298,3 @@
 		"bin-dir": "vendor/bin"
 	}
 }
-
