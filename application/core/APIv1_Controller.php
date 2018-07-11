@@ -12,10 +12,10 @@ class APIv1_Controller extends REST_Controller
         parent::__construct();
 
 		// Loads helper message to manage returning messages
-		$this->load->helper('message');
+		$this->load->helper('fhc_message');
 
 		// Loads helper with generic utility function
-		$this->load->helper('fhc');
+		$this->load->helper('fhc_common');
 
 		// Loads permission lib
 		$this->load->library('PermissionLib');

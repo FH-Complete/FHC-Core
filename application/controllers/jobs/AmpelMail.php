@@ -44,7 +44,7 @@ class AmpelMail extends FHC_Controller
 		$this->load->model('person/Person_model', 'PersonModel');
 
 		// Load helpers
-		$this->load->helper('sancho');
+		$this->load->helper('fhc_sancho');
 	}
 
 	/**
