@@ -84,6 +84,8 @@ class AmpelMail extends FHC_Controller
 			// Loop through ampeln
 			foreach ($ampel_arr as $ampel)
 			{
+				echo "Checking Ampel: ".$ampel->kurzbz;
+
 				$ampel_id = $ampel->ampel_id;
 				$now = date_create(date('Y-m-d'));
 				$deadline = date_create($ampel->deadline);
@@ -105,7 +107,8 @@ class AmpelMail extends FHC_Controller
 						$uid = $ampel_user->uid;
 
 						// break if ampel was almost confirmed by the user
-						if($this->AmpelModel->isConfirmed($ampel_id, $uid)) break;
+						if($this->AmpelModel->isConfirmed($ampel_id, $uid))
+							continue;
 
 						// check if ampel is new (inserted within last week, as cronjob will run every week)
 						if ($now->diff($insert_date)->days <= 7) $new = true;
@@ -156,6 +159,7 @@ class AmpelMail extends FHC_Controller
 		// Send mails for new ampeln merged by user
 		foreach ($new_ampel_data_arr as $new_ampel_data)
 		{
+			echo "\nSend New Ampel Mail to ".$new_ampel_data['uid'];
 			sendSanchoMail(
 				'Sancho_Content_AmpelNeu',
 				$new_ampel_data,
@@ -167,6 +171,7 @@ class AmpelMail extends FHC_Controller
 		// Send mails for overdue ampeln merged by user
 		foreach ($overdue_ampel_data_arr as $overdue_ampel_data)
 		{
+			echo "\nSend Ampel Ueberfaellig Mail to ".$overdue_ampel_data['uid'];
 			sendSanchoMail(
 				'Sancho_Content_AmpelUeberfaellig',
 				$overdue_ampel_data,
