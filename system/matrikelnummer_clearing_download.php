@@ -30,7 +30,7 @@ $rechte->getBerechtigungen($uid);
 if(!$rechte->isBerechtigt('admin', null, 'suid'))
 	die($rechte->errormsg);
 
-$be = DVB_BILDUNGSEINRICHTUNG_CODE; 
+$be = DVB_BILDUNGSEINRICHTUNG_CODE;
 $username = DVB_USERNAME;
 $passwort = DVB_PASSWORD;
 $meldedatum = '20180415';
@@ -38,7 +38,7 @@ $meldedatum = '20180415';
 
 // OAuth Token holen
 $curl = curl_init();
-$url = 'https://stubei-q.portal.at/dvb/oauth/token?grant_type=client_credentials';
+$url = DVB_PORTAL.'/dvb/oauth/token?grant_type=client_credentials';
 
 curl_setopt($curl, CURLOPT_URL, $url);
 curl_setopt($curl, CURLOPT_POST, true);
@@ -75,7 +75,7 @@ else
 // Clearing Daten holen
 $curl = curl_init();
 
-$url = 'https://stubei-q.portal.at/rws/clearing/0.2/clearing-upload.xml';
+$url = DVB_PORTAL.'/rws/clearing/0.2/clearing-upload.xml';
 $url .= '?be='.$be.'&meldedatum='.$meldedatum;
 
 curl_setopt($curl, CURLOPT_URL, $url);
