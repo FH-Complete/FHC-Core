@@ -21,7 +21,7 @@ class Konto extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Konto' => 'basis/konto:rw'));
 		// Load model KontoModel
 		$this->load->model('accounting/konto_model', 'KontoModel');
 	}
@@ -32,11 +32,11 @@ class Konto extends APIv1_Controller
 	public function getKonto()
 	{
 		$kontoID = $this->get('konto_id');
-		
+
 		if (isset($kontoID))
 		{
 			$result = $this->KontoModel->load($kontoID);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -60,7 +60,7 @@ class Konto extends APIv1_Controller
 			{
 				$result = $this->KontoModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -68,7 +68,7 @@ class Konto extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($konto = NULL)
 	{
 		return true;

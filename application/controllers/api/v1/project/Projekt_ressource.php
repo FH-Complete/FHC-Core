@@ -21,11 +21,11 @@ class Projekt_ressource extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Projekt_ressource' => 'basis/projekt_ressource:rw'));
 		// Load model Projekt_ressourceModel
 		$this->load->model('project/projekt_ressource_model', 'Projekt_ressourceModel');
-		
-		
+
+
 	}
 
 	/**
@@ -34,11 +34,11 @@ class Projekt_ressource extends APIv1_Controller
 	public function getProjekt_ressource()
 	{
 		$projekt_ressourceID = $this->get('projekt_ressource_id');
-		
+
 		if (isset($projekt_ressourceID))
 		{
 			$result = $this->Projekt_ressourceModel->load($projekt_ressourceID);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -62,7 +62,7 @@ class Projekt_ressource extends APIv1_Controller
 			{
 				$result = $this->Projekt_ressourceModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -70,7 +70,7 @@ class Projekt_ressource extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($projekt_ressource = NULL)
 	{
 		return true;

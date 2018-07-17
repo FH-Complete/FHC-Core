@@ -21,7 +21,7 @@ class Notenschluesselaufteilung extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Notenschluesselaufteilung' => 'basis/notenschluesselaufteilung:rw'));
 		// Load model NotenschluesselaufteilungModel
 		$this->load->model('education/Notenschluesselaufteilung_model', 'NotenschluesselaufteilungModel');
 	}
@@ -32,11 +32,11 @@ class Notenschluesselaufteilung extends APIv1_Controller
 	public function getNotenschluesselaufteilung()
 	{
 		$notenschluesselaufteilung_id = $this->get('notenschluesselaufteilung_id');
-		
+
 		if (isset($notenschluesselaufteilung_id))
 		{
 			$result = $this->NotenschluesselaufteilungModel->load($notenschluesselaufteilung_id);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -60,7 +60,7 @@ class Notenschluesselaufteilung extends APIv1_Controller
 			{
 				$result = $this->NotenschluesselaufteilungModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -68,7 +68,7 @@ class Notenschluesselaufteilung extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($notenschluesselaufteilung = NULL)
 	{
 		return true;

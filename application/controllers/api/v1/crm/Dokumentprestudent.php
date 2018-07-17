@@ -21,7 +21,13 @@ class Dokumentprestudent extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(
+			array(
+				'Dokumentprestudent' => 'basis/dokumentprestudent:rw',
+				'SetAccepted' => 'basis/dokumentprestudent:w',
+				'SetAcceptedDocuments' => 'basis/dokumentprestudent:w'
+			)
+		);
 		// Load model DokumentprestudentModel
 		$this->load->model('crm/dokumentprestudent_model', 'DokumentprestudentModel');
 	}
@@ -33,11 +39,11 @@ class Dokumentprestudent extends APIv1_Controller
 	{
 		$prestudent_id = $this->get('prestudent_id');
 		$dokument_kurzbz = $this->get('dokument_kurzbz');
-		
+
 		if (isset($prestudent_id) && isset($dokument_kurzbz))
 		{
 			$result = $this->DokumentprestudentModel->load(array($prestudent_id, $dokument_kurzbz));
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -61,7 +67,7 @@ class Dokumentprestudent extends APIv1_Controller
 			{
 				$result = $this->DokumentprestudentModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -69,7 +75,7 @@ class Dokumentprestudent extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	/**
 	 * @return void
 	 */
@@ -78,7 +84,7 @@ class Dokumentprestudent extends APIv1_Controller
 		if (isset($this->post()['prestudent_id']) && isset($this->post()['studiengang_kz']))
 		{
 			$result = $this->DokumentprestudentModel->setAccepted($this->post()['prestudent_id'], $this->post()['studiengang_kz']);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -86,7 +92,7 @@ class Dokumentprestudent extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	/**
 	 * @return void
 	 */
@@ -95,7 +101,7 @@ class Dokumentprestudent extends APIv1_Controller
 		if (isset($this->post()['prestudent_id']) && is_array($this->post()['dokument_kurzbz']))
 		{
 			$result = $this->DokumentprestudentModel->setAcceptedDocuments($this->post()['prestudent_id'], $this->post()['dokument_kurzbz']);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -103,7 +109,7 @@ class Dokumentprestudent extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($dokumentprestudent = null)
 	{
 		return true;

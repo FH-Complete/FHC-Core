@@ -138,9 +138,16 @@ var FHC_FilterWidget = {
 			},
 			{
 				successCallback: function(data, textStatus, jqXHR) {
-					if (FHC_AjaxClient.hasData(data) && typeof renderFunction == "function")
+					if (FHC_AjaxClient.hasData(data))
 					{
-						renderFunction(FHC_AjaxClient.getData(data));
+						if (typeof renderFunction == "function")
+						{
+							renderFunction(FHC_AjaxClient.getData(data));
+						}
+					}
+					else
+					{
+						console.log(FHC_AjaxClient.getError(data));
 					}
 				}
 			}
@@ -540,10 +547,7 @@ var FHC_FilterWidget = {
 	 */
 	_renderDropDownFields: function(data) {
 
-		if (data.hasOwnProperty("fields") && $.isArray(data.fields))
-		{
-			FHC_FilterWidget._renderDropDown(data, data.selectedFields, 'addField');
-		}
+		FHC_FilterWidget._renderDropDown(data, data.selectedFields, 'addField');
 	},
 
 	/**
@@ -552,34 +556,37 @@ var FHC_FilterWidget = {
 	 */
 	_renderDropDown: function(data, elements, ddElementId) {
 
-		for (var i = 0; i < data.fields.length; i++)
+		if (data.hasOwnProperty("fields") && $.isArray(data.fields))
 		{
-			var toBeDisplayed = true;
-
-			for (var j = 0; j < elements.length; j++)
+			for (var fc = 0; fc < data.fields.length; fc++)
 			{
-				var elementName = elements[j].hasOwnProperty("name") ? elements[j].name : elements[j];
+				var toBeDisplayed = true;
 
-				if (data.fields[i] == elementName)
+				for (var ec = 0; ec < elements.length; ec++)
 				{
-					toBeDisplayed = false;
-					break;
-				}
-			}
+					var elementName = elements[ec].hasOwnProperty("name") ? elements[ec].name : elements[ec];
 
-			if (toBeDisplayed == true)
-			{
-				var fieldName = data.fields[i];
-				var fieldToDisplay = data.fields[i];
-
-				if (data.hasOwnProperty("columnsAliases") && $.isArray(data.columnsAliases))
-				{
-					fieldToDisplay = data.columnsAliases[i];
+					if (data.fields[fc] == elementName)
+					{
+						toBeDisplayed = false;
+						break;
+					}
 				}
 
-				if ($("#" + ddElementId).length) // checks if the element exists
+				if (toBeDisplayed == true)
 				{
-					$("#" + ddElementId).append("<option value='" + fieldName + "'>" + fieldToDisplay + "</option>");
+					var fieldName = data.fields[fc];
+					var fieldToDisplay = data.fields[fc];
+
+					if (data.hasOwnProperty("columnsAliases") && $.isArray(data.columnsAliases))
+					{
+						fieldToDisplay = data.columnsAliases[fc];
+					}
+
+					if ($("#" + ddElementId).length) // checks if the element exists
+					{
+						$("#" + ddElementId).append("<option value='" + fieldName + "'>" + fieldToDisplay + "</option>");
+					}
 				}
 			}
 		}
@@ -594,11 +601,11 @@ var FHC_FilterWidget = {
 		if (data.hasOwnProperty("datasetMetadata") && $.isArray(data.datasetMetadata)
 			&& data.hasOwnProperty("filters") && $.isArray(data.filters))
 		{
-			for (var i = 0; i < data.filters.length; i++)
+			for (var fc = 0; fc < data.filters.length; fc++)
 			{
-				for (var j = 0; j < data.datasetMetadata.length; j++)
+				for (var dmc = 0; dmc < data.datasetMetadata.length; dmc++)
 				{
-					if (data.filters[i].name == data.datasetMetadata[j].name)
+					if (data.filters[fc].name == data.datasetMetadata[dmc].name)
 					{
 						var appliedFilters = "<div>";
 
@@ -606,17 +613,17 @@ var FHC_FilterWidget = {
 
 						if (data.hasOwnProperty("columnsAliases") && $.isArray(data.columnsAliases))
 						{
-							fieldToDisplay = data.columnsAliases[j];
+							fieldToDisplay = data.columnsAliases[dmc];
 						}
 						else
 						{
-							fieldToDisplay = data.datasetMetadata[j].name;
+							fieldToDisplay = data.datasetMetadata[dmc].name;
 						}
 
 						appliedFilters += fieldToDisplay;
 						appliedFilters += "</span>";
 
-						appliedFilters += FHC_FilterWidget._renderSingleAppliedFilter(data.filters[i], data.datasetMetadata[j]);
+						appliedFilters += FHC_FilterWidget._renderSingleAppliedFilter(data.filters[fc], data.datasetMetadata[dmc]);
 
 						appliedFilters += "</div>";
 
@@ -849,13 +856,13 @@ var FHC_FilterWidget = {
 		{
 			if (data.hasOwnProperty("columnsAliases") && $.isArray(data.columnsAliases))
 			{
-				for (var i = 0; i < data.selectedFields.length; i++)
+				for (var sfc = 0; sfc < data.selectedFields.length; sfc++)
 				{
-					for (var j = 0; j < data.fields.length; j++)
+					for (var fc = 0; fc < data.fields.length; fc++)
 					{
-						if (data.selectedFields[i] == data.fields[j])
+						if (data.selectedFields[sfc] == data.fields[fc])
 						{
-							arrayFieldsToDisplay[i] = data.columnsAliases[j];
+							arrayFieldsToDisplay[sfc] = data.columnsAliases[fc];
 						}
 					}
 				}

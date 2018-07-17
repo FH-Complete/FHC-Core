@@ -21,7 +21,7 @@
 $filters = array(
 	array(
 		'app' => 'infocenter',
-		'dataset_name' => 'PersonActions',
+		'dataset_name' => 'overview',
 		'filter_kurzbz' => 'InfoCenterSentApplicationAll',
 		'description' => '{Alle}',
 		'sort' => 1,
@@ -52,7 +52,7 @@ $filters = array(
 	),
 	array(
 		'app' => 'infocenter',
-		'dataset_name' => 'PersonActions',
+		'dataset_name' => 'overview',
 		'filter_kurzbz' => 'InfoCenterSentApplication3days',
 		'description' => '{"3 Tage keine Aktion"}',
 		'sort' => 2,
@@ -89,7 +89,7 @@ $filters = array(
 	),
 	array(
 		'app' => 'infocenter',
-		'dataset_name' => 'PersonActions',
+		'dataset_name' => 'overview',
 		'filter_kurzbz' => 'InfoCenterNotSentApplicationAll',
 		'description' => '{Alle}',
 		'sort' => 1,
@@ -124,7 +124,7 @@ $filters = array(
 	),
 	array(
 		'app' => 'infocenter',
-		'dataset_name' => 'PersonActions',
+		'dataset_name' => 'overview',
 		'filter_kurzbz' => 'InfoCenterNotSentApplication14Days',
 		'description' => '{"14 Tage keine Aktion"}',
 		'sort' => 3,
@@ -164,7 +164,7 @@ $filters = array(
 	),
 	array(
 		'app' => 'infocenter',
-		'dataset_name' => 'PersonActions',
+		'dataset_name' => 'overview',
 		'filter_kurzbz' => 'InfoCenterSentApplicationLt3days',
 		'description' => '{"< 3 Tage"}',
 		'sort' => 3,
@@ -201,7 +201,7 @@ $filters = array(
 	),
 	array(
 		'app' => 'infocenter',
-		'dataset_name' => 'PersonActions',
+		'dataset_name' => 'overview',
 		'filter_kurzbz' => 'InfoCenterNotSentApplication5DaysOnline',
 		'description' => '{"5 Tage keine BewAktion"}',
 		'sort' => 2,
@@ -247,7 +247,7 @@ $filters = array(
 	),
 	array(
 		'app' => 'infocenter',
-		'dataset_name' => 'PersonActions',
+		'dataset_name' => 'freigegeben',
 		'filter_kurzbz' => 'InfoCenterFreigegeben5days',
 		'description' => '{"5 Tage Letzte Aktion"}',
 		'sort' => 1,
@@ -277,7 +277,7 @@ $filters = array(
 	),
 	array(
 		'app' => 'infocenter',
-		'dataset_name' => 'PersonActions',
+		'dataset_name' => 'freigegeben',
 		'filter_kurzbz' => 'InfoCenterFreigegebenAlle',
 		'description' => '{Alle}',
 		'sort' => 2,

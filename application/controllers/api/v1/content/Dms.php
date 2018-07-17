@@ -17,27 +17,27 @@ if (!defined('BASEPATH')) exit('No direct script access allowed');
 class Dms extends APIv1_Controller
 {
 	/**
-	 * 
+	 *
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Dms' => 'basis/dms:rw', 'AktenAcceptedDms' => 'basis/dms:r', 'DelDms' => 'basis/dms:w'));
 		// Load library DmsLib
 		$this->load->library('DmsLib');
 	}
-	
+
 	/**
-	 * 
+	 *
 	 */
 	public function getDms()
 	{
 		$dms_id = $this->get('dms_id');
 		$version = $this->get('version');
-		
+
 		if (isset($dms_id))
 		{
 			$result = $this->dmslib->read($dms_id, $version);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -45,20 +45,20 @@ class Dms extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	/**
-	 * 
+	 *
 	 */
 	public function getAktenAcceptedDms()
 	{
 		$person_id = $this->get('person_id');
 		$dokument_kurzbz = $this->get('dokument_kurzbz');
 		$no_file = $this->get('no_file');
-		
+
 		if (isset($person_id))
 		{
 			$result = $this->dmslib->getAktenAcceptedDms($person_id, $dokument_kurzbz, $no_file);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -66,18 +66,18 @@ class Dms extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	/**
-	 * 
+	 *
 	 */
 	public function postDms()
 	{
 		$dms = $this->post();
-		
+
 		if ($this->_validatePost($dms))
 		{
 			$result = $this->dmslib->save($dms);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -85,18 +85,18 @@ class Dms extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	/**
-	 * 
+	 *
 	 */
 	public function postDelDms()
 	{
 		$dms = $this->post();
-		
+
 		if ($this->_validateDelete($this->post()))
 		{
 			$result = $this->dmslib->delete($dms['person_id'], $dms['dms_id']);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -104,7 +104,7 @@ class Dms extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validatePost($dms = null)
 	{
 		if (!isset($dms))
@@ -119,10 +119,10 @@ class Dms extends APIv1_Controller
 		{
 			return false;
 		}
-		
+
 		return true;
 	}
-	
+
 	private function _validateDelete($dms = null)
 	{
 		if (!isset($dms))
@@ -137,7 +137,7 @@ class Dms extends APIv1_Controller
 		{
 			return false;
 		}
-		
+
 		return true;
 	}
 }

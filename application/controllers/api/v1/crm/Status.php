@@ -21,11 +21,11 @@ class Status extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Status' => 'basis/status:rw'));
 		// Load model StatusModel
 		$this->load->model('crm/status_model', 'StatusModel');
-		
-		
+
+
 	}
 
 	/**
@@ -34,11 +34,11 @@ class Status extends APIv1_Controller
 	public function getStatus()
 	{
 		$status_kurzbz = $this->get('status_kurzbz');
-		
+
 		if (isset($status_kurzbz))
 		{
 			$result = $this->StatusModel->load($status_kurzbz);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -62,7 +62,7 @@ class Status extends APIv1_Controller
 			{
 				$result = $this->StatusModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -70,7 +70,7 @@ class Status extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($status = NULL)
 	{
 		return true;

@@ -17,9 +17,6 @@ class Akte_model extends DB_Model
 	 */
 	public function getAkten($person_id, $dokument_kurzbz = null, $stg_kz = null, $prestudent_id = null)
 	{
-		// Checks if the operation is permitted by the API caller
-		if (isError($ent = $this->isEntitled($this->dbTable, PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR))) return $ent;
-
 		$query = 'SELECT akte_id,
 						 person_id,
 						 dokument_kurzbz,
@@ -76,9 +73,6 @@ class Akte_model extends DB_Model
 	 */
 	public function getAktenAccepted($person_id, $dokument_kurzbz = null)
 	{
-		// Checks if the operation is permitted by the API caller
-		if (isError($ent = $this->isEntitled($this->dbTable, PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR))) return $ent;
-
 		$query = 'SELECT a.akte_id,
 						 a.person_id,
 						 a.dokument_kurzbz,
@@ -122,10 +116,6 @@ class Akte_model extends DB_Model
 	 */
 	public function getAktenAcceptedDms($person_id, $dokument_kurzbz = null)
 	{
-		// Checks if the operation is permitted by the API caller
-		if (isError($ent = $this->isEntitled($this->dbTable, PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR))) return $ent;
-		if (isError($ent = $this->isEntitled('campus.tbl_dms', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR))) return $ent;
-
 		$query = 'SELECT a.akte_id,
 						 a.person_id,
 						 a.dokument_kurzbz,
@@ -183,8 +173,6 @@ class Akte_model extends DB_Model
 	 */
 	public function getAktenWithDokInfo($person_id, $dokument_kurzbz = null, $nachgereicht = null)
 	{
-		if (isError($ent = $this->isEntitled($this->dbTable, PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR))) return $ent;
-
 		$this->addSelect('public.tbl_akte.*, bezeichnung_mehrsprachig, dokumentbeschreibung_mehrsprachig, public.tbl_dokument.bezeichnung as dokument_bezeichnung, bis.tbl_nation.*, ausstellungsdetails');
 		$this->addJoin('public.tbl_dokument', 'dokument_kurzbz');
 		$this->addJoin('bis.tbl_nation', 'ausstellungsnation = nation_code', 'LEFT');
@@ -203,5 +191,4 @@ class Akte_model extends DB_Model
 
 		return success($dokumente->retval);
 	}
-
 }

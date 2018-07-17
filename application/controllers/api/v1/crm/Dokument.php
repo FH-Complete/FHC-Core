@@ -21,7 +21,7 @@ class Dokument extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Dokument' => 'basis/dokument:rw'));
 		// Load model DokumentModel
 		$this->load->model('crm/dokument_model', 'DokumentModel');
 	}
@@ -32,11 +32,11 @@ class Dokument extends APIv1_Controller
 	public function getDokument()
 	{
 		$dokument_kurzbz = $this->get('dokument_kurzbz');
-		
+
 		if (isset($dokument_kurzbz))
 		{
 			$result = $this->DokumentModel->load($dokument_kurzbz);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -60,7 +60,7 @@ class Dokument extends APIv1_Controller
 			{
 				$result = $this->DokumentModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -68,7 +68,7 @@ class Dokument extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($dokument = NULL)
 	{
 		return true;

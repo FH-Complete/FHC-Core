@@ -21,7 +21,7 @@ class Feedback extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Feedback' => 'basis/feedback:rw'));
 		// Load model FeedbackModel
 		$this->load->model('education/Feedback_model', 'FeedbackModel');
 	}
@@ -32,11 +32,11 @@ class Feedback extends APIv1_Controller
 	public function getFeedback()
 	{
 		$feedback_id = $this->get('feedback_id');
-		
+
 		if (isset($feedback_id))
 		{
 			$result = $this->FeedbackModel->load($feedback_id);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -60,7 +60,7 @@ class Feedback extends APIv1_Controller
 			{
 				$result = $this->FeedbackModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -68,7 +68,7 @@ class Feedback extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($feedback = NULL)
 	{
 		return true;

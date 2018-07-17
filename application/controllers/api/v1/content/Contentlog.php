@@ -21,7 +21,7 @@ class Contentlog extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Contentlog' => 'basis/contentlog:rw'));
 		// Load model ContentlogModel
 		$this->load->model('content/contentlog_model', 'ContentlogModel');
 	}
@@ -32,11 +32,11 @@ class Contentlog extends APIv1_Controller
 	public function getContentlog()
 	{
 		$contentlogID = $this->get('contentlog_id');
-		
+
 		if (isset($contentlogID))
 		{
 			$result = $this->ContentlogModel->load($contentlogID);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -60,7 +60,7 @@ class Contentlog extends APIv1_Controller
 			{
 				$result = $this->ContentlogModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -68,7 +68,7 @@ class Contentlog extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($contentlog = NULL)
 	{
 		return true;

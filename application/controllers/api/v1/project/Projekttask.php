@@ -21,11 +21,11 @@ class Projekttask extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Projekttask' => 'basis/projekttask:rw'));
 		// Load model ProjekttaskModel
 		$this->load->model('project/projekttask_model', 'ProjekttaskModel');
-		
-		
+
+
 	}
 
 	/**
@@ -34,11 +34,11 @@ class Projekttask extends APIv1_Controller
 	public function getProjekttask()
 	{
 		$projekttaskID = $this->get('projekttask_id');
-		
+
 		if (isset($projekttaskID))
 		{
 			$result = $this->ProjekttaskModel->load($projekttaskID);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -62,7 +62,7 @@ class Projekttask extends APIv1_Controller
 			{
 				$result = $this->ProjekttaskModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -70,7 +70,7 @@ class Projekttask extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($projekttask = NULL)
 	{
 		return true;

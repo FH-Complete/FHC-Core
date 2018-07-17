@@ -1,12 +1,16 @@
-	<?php
+<?php
+
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
-class Vilesci extends FHC_Controller
+class Vilesci extends Auth_Controller
 {
-
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(
+			array(
+				'index' => 'basis/vilesci:r'
+			)
+		);
 
 		$this->load->library('WidgetLib');
 	}

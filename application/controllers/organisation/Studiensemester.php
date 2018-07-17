@@ -5,7 +5,7 @@ if (!defined("BASEPATH")) exit("No direct script access allowed");
 /**
  * Studiensemester controller for listing, editing and removing a Studiensemester
  */
-class Studiensemester extends VileSci_Controller
+class Studiensemester extends Auth_Controller
 {
 
 	/**
@@ -14,9 +14,19 @@ class Studiensemester extends VileSci_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
-		$this->load->model("organisation/Studiensemester_model", "StudiensemesterModel");
-		$this->load->model("organisation/Studienjahr_model", "StudienjahrModel");
+		parent::__construct(
+			array(
+				'listStudiensemester' => 'basis/studiensemester:r',
+				'editStudiensemester' => 'basis/studiensemester:rw',
+				'newStudiensemester' => 'basis/studiensemester:rw',
+				'insStudiensemester' => 'basis/studiensemester:rw',
+				'saveStudiensemester' => 'basis/studiensemester:rw',
+				'deleteStudiensemester' => 'basis/studiensemester:rw'
+			)
+		);
+
+		$this->load->model('organisation/Studiensemester_model', 'StudiensemesterModel');
+		$this->load->model('organisation/Studienjahr_model', 'StudienjahrModel');
 	}
 
 	/**

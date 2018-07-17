@@ -8,7 +8,7 @@ if (! defined('BASEPATH'))
  *
  */
 
-class DBTools extends FHC_Controller
+class DBTools extends Auth_Controller
 {
 	private $cli = false;
 	/**
@@ -32,7 +32,8 @@ class DBTools extends FHC_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		// An empty array as parameter will ensure that this controller is ONLY callable from command line
+		parent::__construct(array());
 
 		$this->seed_path = APPPATH.'seeds/';
 

@@ -191,6 +191,8 @@ define('SIGNATUR_DEFAULT_PROFILE', 'FHC_AMT_GROSS_DE');
  */
 // Code der Bildungseinrichtung
 define('DVB_BILDUNGSEINRICHTUNG_CODE','XX');
+// Datenverbund-Portal
+define('DVB_PORTAL', 'https://stubei-p.portal.at');
 // Username
 define('DVB_USERNAME','username');
 // Passwort

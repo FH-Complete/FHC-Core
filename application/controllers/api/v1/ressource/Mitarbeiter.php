@@ -21,11 +21,11 @@ class Mitarbeiter extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Mitarbeiter' => 'basis/mitarbeiter:rw'));
 		// Load model MitarbeiterModel
 		$this->load->model('ressource/mitarbeiter_model', 'MitarbeiterModel');
-		
-		
+
+
 	}
 
 	/**
@@ -34,11 +34,11 @@ class Mitarbeiter extends APIv1_Controller
 	public function getMitarbeiter()
 	{
 		$mitarbeiter_uid = $this->get('mitarbeiter_uid');
-		
+
 		if (isset($mitarbeiter_uid))
 		{
 			$result = $this->MitarbeiterModel->load($mitarbeiter_uid);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -62,7 +62,7 @@ class Mitarbeiter extends APIv1_Controller
 			{
 				$result = $this->MitarbeiterModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -70,7 +70,7 @@ class Mitarbeiter extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($mitarbeiter = NULL)
 	{
 		return true;

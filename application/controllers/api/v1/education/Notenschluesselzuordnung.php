@@ -21,7 +21,7 @@ class Notenschluesselzuordnung extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Notenschluesselzuordnung' => 'basis/notenschluesselzuordnung:rw'));
 		// Load model NotenschluesselzuordnungModel
 		$this->load->model('education/Notenschluesselzuordnung_model', 'NotenschluesselzuordnungModel');
 	}
@@ -32,11 +32,11 @@ class Notenschluesselzuordnung extends APIv1_Controller
 	public function getNotenschluesselzuordnung()
 	{
 		$notenschluesselzuordnung_id = $this->get('notenschluesselzuordnung_id');
-		
+
 		if (isset($notenschluesselzuordnung_id))
 		{
 			$result = $this->NotenschluesselzuordnungModel->load($notenschluesselzuordnung_id);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -60,7 +60,7 @@ class Notenschluesselzuordnung extends APIv1_Controller
 			{
 				$result = $this->NotenschluesselzuordnungModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -68,7 +68,7 @@ class Notenschluesselzuordnung extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($notenschluesselzuordnung = NULL)
 	{
 		return true;

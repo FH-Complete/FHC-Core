@@ -21,7 +21,7 @@ class Anrechnung extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Anrechnung' => 'basis/anrechnung:rw'));
 		// Load model AnrechnungModel
 		$this->load->model('education/Anrechnung_model', 'AnrechnungModel');
 	}
@@ -32,11 +32,11 @@ class Anrechnung extends APIv1_Controller
 	public function getAnrechnung()
 	{
 		$anrechnung_id = $this->get('anrechnung_id');
-		
+
 		if (isset($anrechnung_id))
 		{
 			$result = $this->AnrechnungModel->load($anrechnung_id);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -60,7 +60,7 @@ class Anrechnung extends APIv1_Controller
 			{
 				$result = $this->AnrechnungModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -68,7 +68,7 @@ class Anrechnung extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($anrechnung = NULL)
 	{
 		return true;

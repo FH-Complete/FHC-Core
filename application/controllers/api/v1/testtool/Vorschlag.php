@@ -21,11 +21,11 @@ class Vorschlag extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Vorschlag' => 'basis/vorschlag:rw'));
 		// Load model VorschlagModel
 		$this->load->model('testtool/vorschlag_model', 'VorschlagModel');
-		
-		
+
+
 	}
 
 	/**
@@ -34,11 +34,11 @@ class Vorschlag extends APIv1_Controller
 	public function getVorschlag()
 	{
 		$vorschlagID = $this->get('vorschlag_id');
-		
+
 		if (isset($vorschlagID))
 		{
 			$result = $this->VorschlagModel->load($vorschlagID);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -62,7 +62,7 @@ class Vorschlag extends APIv1_Controller
 			{
 				$result = $this->VorschlagModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -70,7 +70,7 @@ class Vorschlag extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($vorschlag = NULL)
 	{
 		return true;

@@ -1,0 +1,24 @@
+/*smaller subject field*/
+input[type=text] {
+    height: 28px;
+    padding: 0;
+}
+
+.msgfield label {
+    margin-bottom: 0 !important;
+    margin-top: 3px;
+}
+
+@media screen and (min-width: 1200px) {
+    .col-lg-1.msgfieldcol-left {
+        width: 13%;
+    }
+
+    .col-lg-11.msgfieldcol-right {
+        width: 87%;
+    }
+}
+
+#sendButton {
+    width: 120px;
+}

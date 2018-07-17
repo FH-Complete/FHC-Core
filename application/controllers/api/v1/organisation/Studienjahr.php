@@ -21,11 +21,11 @@ class Studienjahr extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Studienjahr' => 'basis/studienjahr:rw'));
 		// Load model StudienjahrModel
 		$this->load->model('organisation/studienjahr_model', 'StudienjahrModel');
-		
-		
+
+
 	}
 
 	/**
@@ -34,11 +34,11 @@ class Studienjahr extends APIv1_Controller
 	public function getStudienjahr()
 	{
 		$studienjahr_kurzbz = $this->get('studienjahr_kurzbz');
-		
+
 		if (isset($studienjahr_kurzbz))
 		{
 			$result = $this->StudienjahrModel->load($studienjahr_kurzbz);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -62,7 +62,7 @@ class Studienjahr extends APIv1_Controller
 			{
 				$result = $this->StudienjahrModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -70,7 +70,7 @@ class Studienjahr extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($studienjahr = NULL)
 	{
 		return true;

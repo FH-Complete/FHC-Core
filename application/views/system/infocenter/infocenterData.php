@@ -196,6 +196,7 @@
 				)
 			ORDER BY "LastAction" ASC
 		',
+		'requiredPermissions' => 'infocenter',
 		'checkboxes' => 'PersonId',
 		'additionalColumns' => array('Details'),
 		'columnsAliases' => array(
@@ -218,6 +219,7 @@
 		),
 		'formatRow' => function($datasetRaw) {
 
+			/* NOTE: Dont use $this here for PHP Version compatibility */
 			$datasetRaw->{'Details'} = sprintf(
 				'<a href="%s?person_id=%s&origin_page=%s&fhc_controller_id=%s">Details</a>',
 				site_url('system/infocenter/InfoCenter/showDetails'),
@@ -306,7 +308,7 @@
 	);
 
 	$filterWidgetArray['app'] = $APP;
-	$filterWidgetArray['datasetName'] = 'PersonActions';
+	$filterWidgetArray['datasetName'] = 'overview';
 	$filterWidgetArray['filterKurzbz'] = 'InfoCenterSentApplicationAll';
 	$filterWidgetArray['filter_id'] = $this->input->get('filter_id');
 

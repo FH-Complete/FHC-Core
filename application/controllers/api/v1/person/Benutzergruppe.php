@@ -21,11 +21,11 @@ class Benutzergruppe extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Benutzergruppe' => 'basis/benutzergruppe:rw'));
 		// Load model BenutzergruppeModel
 		$this->load->model('person/benutzergruppe_model', 'BenutzergruppeModel');
-		
-		
+
+
 	}
 
 	/**
@@ -35,11 +35,11 @@ class Benutzergruppe extends APIv1_Controller
 	{
 		$gruppe_kurzbz = $this->get('gruppe_kurzbz');
 		$uid = $this->get('uid');
-		
+
 		if (isset($gruppe_kurzbz) && isset($uid))
 		{
 			$result = $this->BenutzergruppeModel->load(array($gruppe_kurzbz, $uid));
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -63,7 +63,7 @@ class Benutzergruppe extends APIv1_Controller
 			{
 				$result = $this->BenutzergruppeModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -71,7 +71,7 @@ class Benutzergruppe extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($benutzergruppe = NULL)
 	{
 		return true;

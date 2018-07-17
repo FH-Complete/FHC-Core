@@ -21,11 +21,11 @@ class Webservicelog extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Webservicelog' => 'basis/webservicelog:rw'));
 		// Load model WebservicelogModel
 		$this->load->model('system/webservicelog_model', 'WebservicelogModel');
-		
-		
+
+
 	}
 
 	/**
@@ -34,11 +34,11 @@ class Webservicelog extends APIv1_Controller
 	public function getWebservicelog()
 	{
 		$webservicelogID = $this->get('webservicelog_id');
-		
+
 		if (isset($webservicelogID))
 		{
 			$result = $this->WebservicelogModel->load($webservicelogID);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -62,7 +62,7 @@ class Webservicelog extends APIv1_Controller
 			{
 				$result = $this->WebservicelogModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -70,7 +70,7 @@ class Webservicelog extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($webservicelog = NULL)
 	{
 		return true;

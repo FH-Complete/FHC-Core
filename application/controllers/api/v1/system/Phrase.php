@@ -21,9 +21,8 @@ class Phrase extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Phrase' => 'system/phrase:rw', 'Phrases' => 'system/phrase:r'));
 
-		// Loads the phrases library
 		$this->load->library('PhrasesLib');
 	}
 

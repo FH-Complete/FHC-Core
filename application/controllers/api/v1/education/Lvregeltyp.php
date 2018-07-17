@@ -21,7 +21,7 @@ class Lvregeltyp extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Lvregeltyp' => 'basis/lvregeltyp:rw'));
 		// Load model LvregeltypModel
 		$this->load->model('education/Lvregeltyp_model', 'LvregeltypModel');
 	}
@@ -32,11 +32,11 @@ class Lvregeltyp extends APIv1_Controller
 	public function getLvregeltyp()
 	{
 		$lvregeltyp_kurzbz = $this->get('lvregeltyp_kurzbz');
-		
+
 		if (isset($lvregeltyp_kurzbz))
 		{
 			$result = $this->LvregeltypModel->load($lvregeltyp_kurzbz);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -60,7 +60,7 @@ class Lvregeltyp extends APIv1_Controller
 			{
 				$result = $this->LvregeltypModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -68,7 +68,7 @@ class Lvregeltyp extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($lvregeltyp = NULL)
 	{
 		return true;

@@ -50,7 +50,7 @@ class Ampel_model extends DB_Model
 	 */
 	public function execBenutzerSelect($benutzer_select)
 	{
-		if (isset($benutzer_select) && !isEmptyString($benutzer_select))
+		if (!isEmptyString($benutzer_select))
 		{
 			return $this->execQuery($benutzer_select);
 		}

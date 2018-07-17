@@ -21,7 +21,7 @@ class Bestelldetail extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Bestelldetail' => 'basis/bestelldetail:rw'));
 		// Load model BestelldetailModel
 		$this->load->model('accounting/bestelldetail_model', 'BestelldetailModel');
 	}
@@ -32,11 +32,11 @@ class Bestelldetail extends APIv1_Controller
 	public function getBestelldetail()
 	{
 		$bestelldetailID = $this->get('bestelldetail_id');
-		
+
 		if (isset($bestelldetailID))
 		{
 			$result = $this->BestelldetailModel->load($bestelldetailID);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -60,7 +60,7 @@ class Bestelldetail extends APIv1_Controller
 			{
 				$result = $this->BestelldetailModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -68,7 +68,7 @@ class Bestelldetail extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($bestelldetail = NULL)
 	{
 		return true;

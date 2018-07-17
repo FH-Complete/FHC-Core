@@ -21,11 +21,11 @@ class Geschaeftsjahr2 extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Geschaeftsjahr' => 'basis/geschaeftsjahr:rw'));
 		// Load model GeschaeftsjahrModel
 		$this->load->model('organisation/geschaeftsjahr_model', 'GeschaeftsjahrModel');
-		
-		
+
+
 	}
 
 	/**
@@ -34,11 +34,11 @@ class Geschaeftsjahr2 extends APIv1_Controller
 	public function getGeschaeftsjahr()
 	{
 		$geschaeftsjahr_kurzbz = $this->get('geschaeftsjahr_kurzbz');
-		
+
 		if (isset($geschaeftsjahr_kurzbz))
 		{
 			$result = $this->GeschaeftsjahrModel->load($geschaeftsjahr_kurzbz);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -62,7 +62,7 @@ class Geschaeftsjahr2 extends APIv1_Controller
 			{
 				$result = $this->GeschaeftsjahrModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -70,7 +70,7 @@ class Geschaeftsjahr2 extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($geschaeftsjahr = NULL)
 	{
 		return true;

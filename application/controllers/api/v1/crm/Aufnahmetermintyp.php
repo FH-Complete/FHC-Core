@@ -21,11 +21,11 @@ class Aufnahmetermintyp extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Aufnahmetermintyp' => 'basis/aufnahmetermintyp:rw'));
 		// Load model AufnahmetermintypModel
 		$this->load->model('crm/aufnahmetermintyp_model', 'AufnahmetermintypModel');
-		
-		
+
+
 	}
 
 	/**
@@ -34,11 +34,11 @@ class Aufnahmetermintyp extends APIv1_Controller
 	public function getAufnahmetermintyp()
 	{
 		$aufnahmetermintyp_kurzbz = $this->get('aufnahmetermintyp_kurzbz');
-		
+
 		if (isset($aufnahmetermintyp_kurzbz))
 		{
 			$result = $this->AufnahmetermintypModel->load($aufnahmetermintyp_kurzbz);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -62,7 +62,7 @@ class Aufnahmetermintyp extends APIv1_Controller
 			{
 				$result = $this->AufnahmetermintypModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -70,7 +70,7 @@ class Aufnahmetermintyp extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($aufnahmetermintyp = NULL)
 	{
 		return true;

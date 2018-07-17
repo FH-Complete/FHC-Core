@@ -21,7 +21,7 @@ class Bundesland extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('All' => 'basis/bundesland:r'));
 		// Load model PersonModel
 		$this->load->model('codex/bundesland_model', 'BundeslandModel');
 	}

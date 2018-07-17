@@ -18,16 +18,6 @@ class Recipient_model extends DB_Model
 	 */
 	public function getMessage($message_id, $person_id)
 	{
-		// Checks if the operation is permitted by the API caller
-		if (isError($ent = $this->isEntitled('public.tbl_person', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)))
-			return $ent;
-		if (isError($ent = $this->isEntitled('public.tbl_kontakt', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)))
-			return $ent;
-		if (isError($ent = $this->isEntitled('public.tbl_msg_message', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)))
-			return $ent;
-		if (isError($ent = $this->isEntitled('public.tbl_msg_recipient', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)))
-			return $ent;
-
 		$query = 'SELECT mr.message_id,
 						 mr.person_id,
 						 mm.subject,
@@ -55,17 +45,10 @@ class Recipient_model extends DB_Model
 	 */
 	public function getMessageByToken($token)
 	{
-		// Checks if the operation is permitted by the API caller
-		if (isError($ent = $this->isEntitled('public.tbl_msg_recipient', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)))
-			return $ent;
-		if (isError($ent = $this->isEntitled('public.tbl_msg_message', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)))
-			return $ent;
-		if (isError($ent = $this->isEntitled('public.tbl_msg_status', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)))
-			return $ent;
-
 		$sql = 'SELECT r.message_id,
 						m.person_id as sender_id,
 						r.person_id as receiver_id,
+						r.sent,
 						m.subject,
 						m.body,
 						m.insertamum,
@@ -89,16 +72,6 @@ class Recipient_model extends DB_Model
 	 */
 	public function getMessagesByPerson($person_id, $oe_kurzbz, $all)
 	{
-		// Checks if the operation is permitted by the API caller
-		if (isError($ent = $this->isEntitled('public.tbl_msg_recipient', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)))
-			return $ent;
-		if (isError($ent = $this->isEntitled('public.tbl_msg_message', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)))
-			return $ent;
-		if (isError($ent = $this->isEntitled('public.tbl_person', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)))
-			return $ent;
-		if (isError($ent = $this->isEntitled('public.tbl_msg_status', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)))
-			return $ent;
-
 		$sql = 'SELECT DISTINCT ON (r.message_id) r.message_id,
 						m.person_id,
 						m.subject,
@@ -166,21 +139,6 @@ class Recipient_model extends DB_Model
 	 */
 	public function getMessagesByUID($uid, $oe_kurzbz, $all)
 	{
-		// Checks if the operation is permitted by the API caller
-		// TODO: Define the special right for reading own messages 'basis/message:own'
-		// if same user
-		if ($uid === getAuthUID())
-		{
-			if (isError($ent = $this->isEntitled('public.tbl_msg_message', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)))
-				return $ent;
-		}
-		// if different user, for reading messages from other users
-		else
-		{
-			if (isError($ent = $this->isEntitled('public.tbl_msg_message', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)))
-				return $ent;
-		}
-
 		// get Data
 		$sql = 'SELECT DISTINCT ON (r.message_id) r.message_id,
 						m.person_id,
@@ -249,14 +207,6 @@ class Recipient_model extends DB_Model
 	 */
 	public function getMessages($kontaktType, $sent, $limit = null, $message_id = null)
 	{
-		// Checks if the operation is permitted by the API caller
-		if (isError($ent = $this->isEntitled('public.tbl_msg_recipient', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)))
-			return $ent;
-		if (isError($ent = $this->isEntitled('public.tbl_msg_message', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)))
-			return $ent;
-		if (isError($ent = $this->isEntitled('public.tbl_kontakt', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)))
-			return $ent;
-
 		$query = 'SELECT mm.message_id,
 						 ks.kontakt as sender,
 						 kr.kontakt as receiver,
@@ -321,12 +271,6 @@ class Recipient_model extends DB_Model
 	 */
 	public function getCountUnreadMessages($person_id, $oe_kurzbz)
 	{
-		// Checks if the operation is permitted by the API caller
-		if (isError($ent = $this->isEntitled('public.tbl_msg_recipient', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)))
-			return $ent;
-		if (isError($ent = $this->isEntitled('public.tbl_msg_status', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)))
-			return $ent;
-
 		$sql = 'SELECT COUNT(r.message_id) AS unreadMessages
 				  FROM public.tbl_msg_recipient r
 				  JOIN public.tbl_msg_status s ON (r.message_id = s.message_id AND r.person_id = s.person_id)

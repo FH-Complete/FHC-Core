@@ -21,7 +21,7 @@ class Projekttyp extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Projekttyp' => 'basis/projekttyp:rw'));
 		// Load model ProjekttypModel
 		$this->load->model('education/Projekttyp_model', 'ProjekttypModel');
 	}
@@ -32,11 +32,11 @@ class Projekttyp extends APIv1_Controller
 	public function getProjekttyp()
 	{
 		$projekttyp_kurzbz = $this->get('projekttyp_kurzbz');
-		
+
 		if (isset($projekttyp_kurzbz))
 		{
 			$result = $this->ProjekttypModel->load($projekttyp_kurzbz);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -60,7 +60,7 @@ class Projekttyp extends APIv1_Controller
 			{
 				$result = $this->ProjekttypModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -68,7 +68,7 @@ class Projekttyp extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($projekttyp = NULL)
 	{
 		return true;

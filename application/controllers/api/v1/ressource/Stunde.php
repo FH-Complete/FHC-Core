@@ -21,11 +21,11 @@ class Stunde extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Stunde' => 'basis/stunde:rw'));
 		// Load model StundeModel
 		$this->load->model('ressource/stunde_model', 'StundeModel');
-		
-		
+
+
 	}
 
 	/**
@@ -34,11 +34,11 @@ class Stunde extends APIv1_Controller
 	public function getStunde()
 	{
 		$stunde = $this->get('stunde');
-		
+
 		if (isset($stunde))
 		{
 			$result = $this->StundeModel->load($stunde);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -62,7 +62,7 @@ class Stunde extends APIv1_Controller
 			{
 				$result = $this->StundeModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -70,7 +70,7 @@ class Stunde extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($stunde = NULL)
 	{
 		return true;

@@ -21,11 +21,11 @@ class Aufwandstyp extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Aufwandstyp' => 'basis/aufwandstyp:rw'));
 		// Load model AufwandstypModel
 		$this->load->model('project/aufwandstyp_model', 'AufwandstypModel');
-		
-		
+
+
 	}
 
 	/**
@@ -34,11 +34,11 @@ class Aufwandstyp extends APIv1_Controller
 	public function getAufwandstyp()
 	{
 		$aufwandstyp_kurzbz = $this->get('aufwandstyp_kurzbz');
-		
+
 		if (isset($aufwandstyp_kurzbz))
 		{
 			$result = $this->AufwandstypModel->load($aufwandstyp_kurzbz);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -62,7 +62,7 @@ class Aufwandstyp extends APIv1_Controller
 			{
 				$result = $this->AufwandstypModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -70,7 +70,7 @@ class Aufwandstyp extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($aufwandstyp = NULL)
 	{
 		return true;

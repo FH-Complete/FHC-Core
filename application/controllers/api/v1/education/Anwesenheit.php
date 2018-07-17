@@ -21,7 +21,7 @@ class Anwesenheit extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Anwesenheit' => 'basis/anwesenheit:rw'));
 		// Load model AnwesenheitModel
 		$this->load->model('education/Anwesenheit_model', 'AnwesenheitModel');
 	}
@@ -32,11 +32,11 @@ class Anwesenheit extends APIv1_Controller
 	public function getAnwesenheit()
 	{
 		$anwesenheit_id = $this->get('anwesenheit_id');
-		
+
 		if (isset($anwesenheit_id))
 		{
 			$result = $this->AnwesenheitModel->load($anwesenheit_id);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -60,7 +60,7 @@ class Anwesenheit extends APIv1_Controller
 			{
 				$result = $this->AnwesenheitModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -68,7 +68,7 @@ class Anwesenheit extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($anwesenheit = NULL)
 	{
 		return true;

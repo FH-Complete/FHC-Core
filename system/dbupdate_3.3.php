@@ -2247,6 +2247,22 @@ if(!$result = @$db->db_query("SELECT bpk FROM public.tbl_person LIMIT 1"))
 		echo '<br>public.tbl_person: Spalte bpk hinzugefuegt';
 }
 
+// titel und bezeichnung in tbl_akte verlaengert
+if($result = $db->db_query("SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA='public' AND TABLE_NAME='tbl_akte' AND COLUMN_NAME = 'titel' AND character_maximum_length=32"))
+{
+	if($db->db_num_rows($result)>0)
+	{
+		$qry = "ALTER TABLE public.tbl_akte ALTER COLUMN titel TYPE varchar(64);
+		ALTER TABLE public.tbl_akte ALTER COLUMN bezeichnung TYPE varchar(64);
+		";
+
+		if(!$db->db_query($qry))
+			echo '<strong>public.tbl_akte '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>Spalte titel und bezeichnung in public.tbl_akte von varchar(32) auf varchar(64) geändert<br>';
+	}
+}
+
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
 

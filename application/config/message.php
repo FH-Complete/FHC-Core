@@ -7,9 +7,11 @@ $config['send_immediately'] = false;
 
 $config['msg_delivery'] = true; // Default true
 $config['system_person_id'] = 1; // Dummy sender, used for sending messages from the system
-$config['redirect_view_message_url'] = site_url('Redirect/redirectByToken/'); //
-$config['message_html_view_url'] = site_url('ViewMessage/toHTML/');
-$config['message_server'] = 'http://www.fhcomplete.org/';
+$config['redirect_view_message_url'] = '/Redirect/redirectByToken/';
+$config['message_html_view_url'] = '/ViewMessage/toHTML/';
+
+// Change this to CIS Server (https://cis.example.com/index.ci.php) if you are sending Messages from Vilesci
+$config['message_server'] = site_url();
 $config['assistent_function'] = 'ass';
 
 define('EMAIL_KONTAKT_TYPE', 'email'); // Email kontakt type

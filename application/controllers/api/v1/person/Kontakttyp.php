@@ -21,11 +21,11 @@ class Kontakttyp extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Kontakttyp' => 'basis/kontakttyp:rw'));
 		// Load model KontakttypModel
 		$this->load->model('person/kontakttyp_model', 'KontakttypModel');
-		
-		
+
+
 	}
 
 	/**
@@ -34,11 +34,11 @@ class Kontakttyp extends APIv1_Controller
 	public function getKontakttyp()
 	{
 		$kontakttyp = $this->get('kontakttyp');
-		
+
 		if (isset($kontakttyp))
 		{
 			$result = $this->KontakttypModel->load($kontakttyp);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -62,7 +62,7 @@ class Kontakttyp extends APIv1_Controller
 			{
 				$result = $this->KontakttypModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -70,7 +70,7 @@ class Kontakttyp extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($kontakttyp = NULL)
 	{
 		return true;

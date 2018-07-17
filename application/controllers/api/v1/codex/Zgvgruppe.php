@@ -21,7 +21,7 @@ class Zgvgruppe extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Zgvgruppe' => 'basis/zgvgruppe:rw'));
 		// Load model ZgvgruppeModel
 		$this->load->model('codex/zgvgruppe_model', 'ZgvgruppeModel');
 	}
@@ -32,11 +32,11 @@ class Zgvgruppe extends APIv1_Controller
 	public function getZgvgruppe()
 	{
 		$gruppe_kurzbz = $this->get('gruppe_kurzbz');
-		
+
 		if (isset($gruppe_kurzbz))
 		{
 			$result = $this->ZgvgruppeModel->load($gruppe_kurzbz);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -60,7 +60,7 @@ class Zgvgruppe extends APIv1_Controller
 			{
 				$result = $this->ZgvgruppeModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -68,7 +68,7 @@ class Zgvgruppe extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($zgvgruppe = NULL)
 	{
 		return true;

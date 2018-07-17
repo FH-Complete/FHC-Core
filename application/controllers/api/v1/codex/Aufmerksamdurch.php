@@ -21,7 +21,7 @@ class Aufmerksamdurch extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Aufmerksamdurch' => 'basis/aufmerksamdurch:rw'));
 		// Load model AufmerksamdurchModel
 		$this->load->model('codex/aufmerksamdurch_model', 'AufmerksamdurchModel');
 	}
@@ -32,11 +32,11 @@ class Aufmerksamdurch extends APIv1_Controller
 	public function getAufmerksamdurch()
 	{
 		$aufmerksamdurch_kurzbz = $this->get('aufmerksamdurch_kurzbz');
-		
+
 		if (isset($aufmerksamdurch_kurzbz))
 		{
 			$result = $this->AufmerksamdurchModel->load($aufmerksamdurch_kurzbz);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -60,7 +60,7 @@ class Aufmerksamdurch extends APIv1_Controller
 			{
 				$result = $this->AufmerksamdurchModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -68,7 +68,7 @@ class Aufmerksamdurch extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($aufmerksamdurch = NULL)
 	{
 		return true;

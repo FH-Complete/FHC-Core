@@ -21,7 +21,7 @@ class Zeugnis extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Zeugnis' => 'basis/zeugnis:rw'));
 		// Load model ZeugnisModel
 		$this->load->model('education/Zeugnis_model', 'ZeugnisModel');
 	}
@@ -32,11 +32,11 @@ class Zeugnis extends APIv1_Controller
 	public function getZeugnis()
 	{
 		$zeugnis_id = $this->get('zeugnis_id');
-		
+
 		if (isset($zeugnis_id))
 		{
 			$result = $this->ZeugnisModel->load($zeugnis_id);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -60,7 +60,7 @@ class Zeugnis extends APIv1_Controller
 			{
 				$result = $this->ZeugnisModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -68,7 +68,7 @@ class Zeugnis extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($zeugnis = NULL)
 	{
 		return true;

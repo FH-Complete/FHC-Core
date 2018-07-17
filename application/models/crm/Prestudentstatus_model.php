@@ -18,12 +18,6 @@ class Prestudentstatus_model extends DB_Model
 	 */
 	public function getLastStatus($prestudent_id, $studiensemester_kurzbz = '', $status_kurzbz = '')
 	{
-		// Checks if the operation is permitted by the API caller
-		if (isError($ent = $this->isEntitled('public.tbl_status', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR))) return $ent;
-		if (isError($ent = $this->isEntitled('lehre.tbl_studienplan', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR))) return $ent;
-		if (isError($ent = $this->isEntitled('public.tbl_prestudentstatus', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)))
-			return $ent;
-
 		$query = 'SELECT tbl_prestudentstatus.*,
 						 bezeichnung AS studienplan_bezeichnung,
 						 tbl_studienplan.orgform_kurzbz as orgform,
@@ -59,8 +53,6 @@ class Prestudentstatus_model extends DB_Model
 	 */
 	public function updateStufe($prestudentIdArray, $stufe)
 	{
-		if (isError($ent = $this->isEntitled($this->dbTable, PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR))) return $ent;
-		
 		return $this->execQuery(
 			'UPDATE public.tbl_prestudentstatus
 				SET rt_stufe = ?
@@ -85,10 +77,6 @@ class Prestudentstatus_model extends DB_Model
 	 */
 	public function getStatusByFilter($prestudent_id, $status_kurzbz = '', $ausbildungssemester = '', $studiensemester_kurzbz = '')
 	{
-		// Checks if the operation is permitted by the API caller
-		if (isError($ent = $this->isEntitled('public.tbl_prestudentstatus', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)))
-			return $ent;
-
 		$query = '
 			SELECT
 				tbl_prestudentstatus.*

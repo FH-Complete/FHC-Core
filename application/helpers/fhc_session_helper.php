@@ -10,13 +10,6 @@
  * @since		Version 1.0.0
  */
 
-/**
- * Message Helper
- *
- * @subpackage	Helpers
- * @category	Helpers
- */
-
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
 // -------------------------------------------------------------------------------------------------------

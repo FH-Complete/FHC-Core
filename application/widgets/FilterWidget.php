@@ -12,8 +12,12 @@ class FilterWidget extends Widget
 	const WIDGET_URL_SELECT_FILTERS = 'widgets/filter/selectFilters';
 	const WIDGET_URL_SAVE_FILTER = 'widgets/filter/saveFilter';
 
+	// Default formats
 	const DEFAULT_DATE_FORMAT = 'd.m.Y H:i:s';
 	const DEFAULT_MARK_ROW_CLASS = 'text-danger';
+
+	// Required permissions to use this FilterWidget
+	private $_requiredPermissions;
 
 	// Fitler info from DB
 	private $_app;
@@ -54,7 +58,9 @@ class FilterWidget extends Widget
 
 		$this->_initFilterWidget($args); // checks parameters and initialize properties
 
-		$this->_startFilterWidget(); // let's start
+		// Let's start if it's allowed
+		// NOTE: If it is NOT allowed then no data are loaded
+		if ($this->filterslib->isAllowed($this->_requiredPermissions)) $this->_startFilterWidget();
 	}
 
 	//------------------------------------------------------------------------------------------------------------------
@@ -125,6 +131,7 @@ class FilterWidget extends Widget
 		// If here then everything is ok
 
 		// Initialize class properties
+		$this->_requiredPermissions = null;
 		$this->_app = null;
 		$this->_datasetName = null;
 		$this->_filterKurzbz = null;
@@ -137,6 +144,12 @@ class FilterWidget extends Widget
 		$this->_checkboxes = null;
 		$this->_hideHeader = null;
 		$this->_hideSave = null;
+
+		// Retrived the required permissions parameter if present
+		if (isset($args[FiltersLib::REQUIRED_PERMISSIONS_PARAMETER]))
+		{
+			$this->_requiredPermissions = $args[FiltersLib::REQUIRED_PERMISSIONS_PARAMETER];
+		}
 
 		// Parameters needed to retrive univocally a filter from DB
 		if (isset($args[FiltersLib::APP_PARAMETER]))
@@ -250,7 +263,7 @@ class FilterWidget extends Widget
 		// Read the all session for this filter widget
 		$session = $this->filterslib->getSession();
 
-		// If session is NOT empty
+		// If session is NOT empty -> a filter was already loaded
 		if ($session != null)
 		{
 			// Retrive the filterId stored in the session
@@ -266,9 +279,9 @@ class FilterWidget extends Widget
 			{
 				// Get SESSION_RELOAD_DATASET from the session
 				$reloadDataset = $this->filterslib->getElementSession(FiltersLib::SESSION_RELOAD_DATASET);
-				if ($reloadDataset === true) // if it's value is very true, reload the dataset
+				if ($reloadDataset === true) // if it's value is very true then reload the dataset
 				{
-					// set as false to stop changing the dataset
+					// Set as false to stop changing the dataset
 					$this->filterslib->setElementSession(FiltersLib::SESSION_RELOAD_DATASET, false);
 
 					// Generate dataset query using filters from the session
@@ -294,7 +307,7 @@ class FilterWidget extends Widget
 			}
 		}
 
-		// If the session is empty
+		// If the session is empty -> first time that this filter is loaded
 		if ($session == null)
 		{
 			// Load filter definition data from DB
@@ -326,27 +339,29 @@ class FilterWidget extends Widget
 					// Stores an array that contains all the data useful for
 					$this->filterslib->setSession(
 						array(
-							FiltersLib::FILTER_ID => $this->_filterId, //
-							FiltersLib::APP_PARAMETER => $this->_app, //
-							FiltersLib::DATASET_NAME_PARAMETER => $this->_datasetName, //
-
-							FiltersLib::SESSION_FILTER_NAME => $filterName, //
-
-							FiltersLib::SESSION_FIELDS => $this->FiltersModel->getExecutedQueryListFields(), //
-							FiltersLib::SESSION_SELECTED_FIELDS => $this->_getColumnsNames($parsedFilterJson->columns), //
-							FiltersLib::SESSION_COLUMNS_ALIASES => $this->_columnsAliases, //
-							FiltersLib::SESSION_ADDITIONAL_COLUMNS => $this->_additionalColumns, //
-							FiltersLib::SESSION_CHECKBOXES => $this->_checkboxes, //
-							FiltersLib::SESSION_FILTERS => $parsedFilterJson->filters, //
-							FiltersLib::SESSION_METADATA => $this->FiltersModel->getExecutedQueryMetaData(), //
-							FiltersLib::SESSION_ROW_NUMBER => count($dataset->retval), //
-							FiltersLib::SESSION_DATASET => $dataset->retval, //
-							FiltersLib::SESSION_RELOAD_DATASET => false //
+							FiltersLib::FILTER_ID => $this->_filterId, // the current filter id
+							FiltersLib::APP_PARAMETER => $this->_app, // the current app parameter
+							FiltersLib::DATASET_NAME_PARAMETER => $this->_datasetName, // the carrent dataset name
+							FiltersLib::SESSION_FILTER_NAME => $filterName, // the current filter name
+							FiltersLib::SESSION_FIELDS => $this->FiltersModel->getExecutedQueryListFields(), // all the fields of the dataset
+							FiltersLib::SESSION_SELECTED_FIELDS => $this->_getColumnsNames($parsedFilterJson->columns), // all the selected fields
+							FiltersLib::SESSION_COLUMNS_ALIASES => $this->_columnsAliases, // all the fields aliases
+							FiltersLib::SESSION_ADDITIONAL_COLUMNS => $this->_additionalColumns, // additional columns
+							FiltersLib::SESSION_CHECKBOXES => $this->_checkboxes, // the name of the field used to build the checkboxes column
+							FiltersLib::SESSION_FILTERS => $parsedFilterJson->filters, // all the filters used to filter the dataset
+							FiltersLib::SESSION_METADATA => $this->FiltersModel->getExecutedQueryMetaData(), // the metadata of the dataset
+							FiltersLib::SESSION_ROW_NUMBER => count($dataset->retval), // the number of loaded rows by this filter
+							FiltersLib::SESSION_DATASET => $dataset->retval, // the entire dataset
+							FiltersLib::SESSION_RELOAD_DATASET => false // if the dataset must be reloaded, not needed the first time
 						)
 					);
 				}
 			}
 		}
+
+		// To be always stored in the session, otherwise is not possible to load data from Filters controller
+		// NOTE: must the latest operation to be performed in the session to be shure that is always present
+		$this->filterslib->setElementSession(FiltersLib::REQUIRED_PERMISSIONS_PARAMETER, $this->_requiredPermissions);
 	}
 
 	/**

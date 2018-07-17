@@ -21,8 +21,8 @@ class CallerModel extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
-		
+		parent::__construct(array('Call' => 'admin:rw'));
+
 		// Loads the CallerLib
 		$this->load->library('CallerLib');
 	}
@@ -33,7 +33,7 @@ class CallerModel extends APIv1_Controller
 	public function getCall()
 	{
 		// Start me up!
-		$result = $this->callerlib->callModel($this->get(), PermissionLib::SELECT_RIGHT);
+		$result = $this->callerlib->callModel($this->get());
 
 		// Print the result
 		$this->response($result, REST_Controller::HTTP_OK);
@@ -45,31 +45,31 @@ class CallerModel extends APIv1_Controller
 	public function postCall()
 	{
 		// Start me up!
-		$result = $this->callerlib->callModel($this->post(), PermissionLib::UPDATE_RIGHT);
+		$result = $this->callerlib->callModel($this->post());
 
 		// Print the result
 		$this->response($result, REST_Controller::HTTP_OK);
 	}
-	
+
 	/**
 	 * @return void
 	 */
 	public function putCall()
 	{
 		// Start me up!
-		$result = $this->callerlib->callModel($this->put(), PermissionLib::INSERT_RIGHT);
+		$result = $this->callerlib->callModel($this->put());
 
 		// Print the result
 		$this->response($result, REST_Controller::HTTP_OK);
 	}
-	
+
 	/**
 	 * @return void
 	 */
 	public function deleteCall()
 	{
 		// Start me up!
-		$result = $this->callerlib->callModel($this->delete(), PermissionLib::DELETE_RIGHT);
+		$result = $this->callerlib->callModel($this->delete());
 
 		// Print the result
 		$this->response($result, REST_Controller::HTTP_OK);

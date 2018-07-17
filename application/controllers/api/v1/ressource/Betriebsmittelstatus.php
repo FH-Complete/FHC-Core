@@ -21,11 +21,11 @@ class Betriebsmittelstatus extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Betriebsmittelstatus' => 'basis/betriebsmittelstatus:rw'));
 		// Load model BetriebsmittelstatusModel
 		$this->load->model('ressource/betriebsmittelstatus_model', 'BetriebsmittelstatusModel');
-		
-		
+
+
 	}
 
 	/**
@@ -34,11 +34,11 @@ class Betriebsmittelstatus extends APIv1_Controller
 	public function getBetriebsmittelstatus()
 	{
 		$betriebsmittelstatus_kurzbz = $this->get('betriebsmittelstatus_kurzbz');
-		
+
 		if (isset($betriebsmittelstatus_kurzbz))
 		{
 			$result = $this->BetriebsmittelstatusModel->load($betriebsmittelstatus_kurzbz);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -62,7 +62,7 @@ class Betriebsmittelstatus extends APIv1_Controller
 			{
 				$result = $this->BetriebsmittelstatusModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -70,7 +70,7 @@ class Betriebsmittelstatus extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($betriebsmittelstatus = NULL)
 	{
 		return true;

@@ -2,14 +2,27 @@
 
 if (! defined("BASEPATH")) exit("No direct script access allowed");
 
-class Statusgrund extends VileSci_Controller
+class Statusgrund extends Auth_Controller
 {
 	public function __construct()
     {
-        parent::__construct();
-        $this->load->model("crm/Status_model", "StatusModel");
-        $this->load->model("crm/Statusgrund_model", "StatusgrundModel");
-        $this->load->model("system/Sprache_model", "SpracheModel");
+        parent::__construct(
+			array(
+				'index' => 'basis/status:r',
+				'listStatus' => 'basis/status:r',
+				'listGrund' => 'basis/status:r',
+				'editGrund' => 'basis/status:rw',
+				'editStatus' => 'basis/status:rw',
+				'newGrund' => 'basis/status:rw',
+				'saveGrund' => 'basis/status:rw',
+				'insGrund' => 'basis/status:rw',
+				'saveStatus' => 'basis/status:rw'
+			)
+		);
+
+        $this->load->model('crm/Status_model', 'StatusModel');
+        $this->load->model('crm/Statusgrund_model', 'StatusgrundModel');
+        $this->load->model('system/Sprache_model', 'SpracheModel');
     }
 
 	public function index()

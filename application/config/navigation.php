@@ -15,7 +15,8 @@ $config['navigation_header'] = array(
 			'link' => base_url('vilesci'),
 			'icon' => '',
 			'description' => 'Vilesci',
-			'sort' => 2
+			'sort' => 2,
+			'requiredPermissions' => 'basis/vilesci:r'
 		),
 		'cis' => array(
 			'link' => CIS_ROOT,
@@ -57,7 +58,8 @@ $config['navigation_menu']['Vilesci/index'] = array(
 				'icon' => 'info',
 				'description' => 'Infocenter',
 				'expand' => true,
-				'sort' => 2
+				'sort' => 2,
+				'requiredPermissions' => 'infocenter:r'
 			),
 		)
 	),
@@ -73,14 +75,16 @@ $config['navigation_menu']['Vilesci/index'] = array(
 				'icon' => '',
 				'description' => 'Vilesci',
 				'expand' => true,
-				'sort' => 1
+				'sort' => 1,
+				'requiredPermissions' => 'basis/vilesci:r'
 			),
 			'extensions' => array(
 				'link' => site_url('system/extensions/Manager'),
 				'icon' => 'cubes',
 				'description' => 'Extensions Manager',
 				'expand' => true,
-				'sort' => 2
+				'sort' => 2,
+				'requiredPermissions' => 'admin:r'
 			)
 		)
 	)

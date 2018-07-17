@@ -21,7 +21,7 @@ class Statusgrund extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Statusgrund' => 'basis/statusgrund:rw'));
 		// Load model StatusModel
 		$this->load->model('crm/Statusgrund_model', 'StatusgrundModel');
 	}
@@ -32,11 +32,11 @@ class Statusgrund extends APIv1_Controller
 	public function getStatusgrund()
 	{
 		$statusgrund_kurzbz = $this->get('statusgrund_kurzbz');
-		
+
 		if (isset($statusgrund_kurzbz))
 		{
 			$result = $this->StatusgrundModel->load($statusgrund_kurzbz);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -60,7 +60,7 @@ class Statusgrund extends APIv1_Controller
 			{
 				$result = $this->StatusgrundModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -68,7 +68,7 @@ class Statusgrund extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($statusgrund = NULL)
 	{
 		return true;

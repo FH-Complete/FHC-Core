@@ -21,11 +21,11 @@ class Firma extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Firma' => 'basis/firma:rw'));
 		// Load model FirmaModel
 		$this->load->model('ressource/firma_model', 'FirmaModel');
-		
-		
+
+
 	}
 
 	/**
@@ -34,11 +34,11 @@ class Firma extends APIv1_Controller
 	public function getFirma()
 	{
 		$firmaID = $this->get('firma_id');
-		
+
 		if (isset($firmaID))
 		{
 			$result = $this->FirmaModel->load($firmaID);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -62,7 +62,7 @@ class Firma extends APIv1_Controller
 			{
 				$result = $this->FirmaModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -70,7 +70,7 @@ class Firma extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($firma = NULL)
 	{
 		return true;

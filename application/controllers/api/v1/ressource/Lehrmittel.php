@@ -21,11 +21,11 @@ class Lehrmittel extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Lehrmittel' => 'basis/lehrmittel:rw'));
 		// Load model LehrmittelModel
 		$this->load->model('ressource/lehrmittel_model', 'LehrmittelModel');
-		
-		
+
+
 	}
 
 	/**
@@ -34,11 +34,11 @@ class Lehrmittel extends APIv1_Controller
 	public function getLehrmittel()
 	{
 		$lehrmittel_kurzbz = $this->get('lehrmittel_kurzbz');
-		
+
 		if (isset($lehrmittel_kurzbz))
 		{
 			$result = $this->LehrmittelModel->load($lehrmittel_kurzbz);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -62,7 +62,7 @@ class Lehrmittel extends APIv1_Controller
 			{
 				$result = $this->LehrmittelModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -70,7 +70,7 @@ class Lehrmittel extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($lehrmittel = NULL)
 	{
 		return true;

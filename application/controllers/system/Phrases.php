@@ -2,14 +2,27 @@
 
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
-class Phrases extends FHC_Controller
+class Phrases extends Auth_Controller
 {
 	/**
 	 *
 	 */
 	public function __construct()
     {
-        parent::__construct();
+        parent::__construct(
+			array(
+				'index' => 'system/phrase:r',
+				'table' => 'system/phrase:r',
+				'view' => 'system/phrase:r',
+				'deltext' => 'system/phrase:rw',
+				'edit' => 'system/phrase:rw',
+				'write' => 'system/phrase:rw',
+				'save' => 'system/phrase:rw',
+				'newText' => 'system/phrase:rw',
+				'editText' => 'system/phrase:rw',
+				'saveText' => 'system/phrase:rw'
+			)
+		);
 
         // Loads the phrases library
         $this->load->library('PhrasesLib');

@@ -5,24 +5,27 @@ if (! defined('BASEPATH')) exit('No direct script access allowed');
 /**
  *
  */
-class Manager extends VileSci_Controller
+class Manager extends Auth_Controller
 {
 	/**
 	 *
 	 */
 	public function __construct()
-	{
-		parent::__construct();
+    {
+        parent::__construct(
+			array(
+				'index' => 'system/extensions:r',
+				'toggleExtension' => 'system/extensions:rw',
+				'delExtension' => 'system/extensions:rw',
+				'uploadExtension' => 'system/extensions:rw'
+			)
+		);
 
 		// Load helpers to upload files
 		$this->load->helper('form');
 
 		// Loads the extensions library
 		$this->load->library('ExtensionsLib');
-
-		$this->load->library('PermissionLib');
-		if(!$this->permissionlib->isBerechtigt('system/extensions'))
-			show_error('You have no Permission! You need Extensions Permission');
 	}
 
 	/**

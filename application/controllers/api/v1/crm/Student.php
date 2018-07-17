@@ -21,11 +21,11 @@ class Student extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Student' => 'basis/student:rw'));
 		// Load model StudentModel
 		$this->load->model('crm/student_model', 'StudentModel');
-		
-		
+
+
 	}
 
 	/**
@@ -34,11 +34,11 @@ class Student extends APIv1_Controller
 	public function getStudent()
 	{
 		$studentID = $this->get('student_id');
-		
+
 		if (isset($studentID))
 		{
 			$result = $this->StudentModel->load($studentID);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -62,7 +62,7 @@ class Student extends APIv1_Controller
 			{
 				$result = $this->StudentModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -70,7 +70,7 @@ class Student extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($student = NULL)
 	{
 		return true;

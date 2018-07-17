@@ -21,7 +21,12 @@ class Dokumentstudiengang extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(
+			array(
+				'Dokumentstudiengang' => 'basis/dokumentstudiengang:rw',
+				'DokumentstudiengangByStudiengang_kz' => 'basis/dokumentstudiengang:r'
+			)
+		);
 		// Load model DokumentstudiengangModel
 		$this->load->model('crm/Dokumentstudiengang_model', 'DokumentstudiengangModel');
 	}
@@ -33,11 +38,11 @@ class Dokumentstudiengang extends APIv1_Controller
 	{
 		$studiengang_kz = $this->get('studiengang_kz');
 		$dokument_kurzbz = $this->get('dokument_kurzbz');
-		
+
 		if (isset($studiengang_kz) && isset($dokument_kurzbz))
 		{
 			$result = $this->DokumentstudiengangModel->load(array($studiengang_kz, $dokument_kurzbz));
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -45,7 +50,7 @@ class Dokumentstudiengang extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	/**
 	 * @return void
 	 */
@@ -55,7 +60,7 @@ class Dokumentstudiengang extends APIv1_Controller
 		$onlinebewerbung = $this->get('onlinebewerbung');
 		$pflicht = $this->get('pflicht');
 		$nachreichbar = $this->get('nachreichbar');
-		
+
 		if (isset($studiengang_kz))
 		{
 			$result = $this->DokumentstudiengangModel->getDokumentstudiengangByStudiengang_kz(
@@ -64,7 +69,7 @@ class Dokumentstudiengang extends APIv1_Controller
 				$pflicht,
 				$nachreichbar
 			);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -92,7 +97,7 @@ class Dokumentstudiengang extends APIv1_Controller
 			{
 				$result = $this->DokumentstudiengangModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -100,7 +105,7 @@ class Dokumentstudiengang extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($dokumentstudiengang = NULL)
 	{
 		return true;

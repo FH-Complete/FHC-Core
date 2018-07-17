@@ -2,11 +2,17 @@
 
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
-class PrestudentMultiAssign extends VileSci_Controller
+class PrestudentMultiAssign extends Auth_Controller
 {
 	public function __construct()
     {
-        parent::__construct();
+        parent::__construct(
+			array(
+				'index' => 'basis/student:r',
+				'linkToStufe' => 'basis/student:rw',
+				'linkToAufnahmegruppe' => 'basis/student:rw'
+			)
+		);
 
 		// Loads the widget library
 		$this->load->library('WidgetLib');

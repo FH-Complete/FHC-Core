@@ -42,11 +42,6 @@ class PersonLog_model extends CI_Model
 	 */
 	public function getLastLog($person_id, $taetigkeit_kurzbz = null, $app = null, $oe_kurzbz = null)
 	{
-		// Check Permissions
-		$this->load->library('PermissionLib');
-		if(!$this->permissionlib->isEntitled('system.tbl_log',PermissionLib::SELECT_RIGHT))
-			show_error('Permission denied - You need Access to system.tbl_log');
-
 		$this->db->order_by('zeitpunkt', 'DESC');
 		$this->db->order_by('log_id', 'DESC');
 		$this->db->limit(1);
@@ -72,11 +67,6 @@ class PersonLog_model extends CI_Model
 	 */
 	public function filterLog($person_id, $taetigkeit_kurzbz = null, $app = null, $oe_kurzbz = null)
 	{
-		// Check Permissions
-		$this->load->library('PermissionLib');
-		if(!$this->permissionlib->isEntitled('system.tbl_log',PermissionLib::SELECT_RIGHT))
-			show_error('Permission denied - You need Access to system.tbl_log');
-
 		$this->db->order_by('zeitpunkt', 'DESC');
 		$this->db->order_by('log_id', 'DESC');
 		if (!is_null($taetigkeit_kurzbz))

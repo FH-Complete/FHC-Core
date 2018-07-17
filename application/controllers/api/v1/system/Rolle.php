@@ -21,11 +21,11 @@ class Rolle extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Rolle' => 'basis/rolle:rw'));
 		// Load model RolleModel
 		$this->load->model('system/rolle_model', 'RolleModel');
-		
-		
+
+
 	}
 
 	/**
@@ -34,11 +34,11 @@ class Rolle extends APIv1_Controller
 	public function getRolle()
 	{
 		$rolle_kurzbz = $this->get('rolle_kurzbz');
-		
+
 		if (isset($rolle_kurzbz))
 		{
 			$result = $this->RolleModel->load($rolle_kurzbz);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -62,7 +62,7 @@ class Rolle extends APIv1_Controller
 			{
 				$result = $this->RolleModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -70,7 +70,7 @@ class Rolle extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($rolle = NULL)
 	{
 		return true;

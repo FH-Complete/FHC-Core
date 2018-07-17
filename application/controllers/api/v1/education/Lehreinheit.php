@@ -21,7 +21,7 @@ class Lehreinheit extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Lehreinheit' => 'basis/lehreinheit:rw'));
 		// Load model LehreinheitModel
 		$this->load->model('education/Lehreinheit_model', 'LehreinheitModel');
 	}
@@ -32,11 +32,11 @@ class Lehreinheit extends APIv1_Controller
 	public function getLehreinheit()
 	{
 		$lehreinheit_id = $this->get('lehreinheit_id');
-		
+
 		if (isset($lehreinheit_id))
 		{
 			$result = $this->LehreinheitModel->load($lehreinheit_id);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -60,7 +60,7 @@ class Lehreinheit extends APIv1_Controller
 			{
 				$result = $this->LehreinheitModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -68,7 +68,7 @@ class Lehreinheit extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($lehreinheit = NULL)
 	{
 		return true;

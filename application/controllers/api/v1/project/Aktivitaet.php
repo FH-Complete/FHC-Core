@@ -21,11 +21,11 @@ class Aktivitaet extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Aktivitaet' => 'basis/aktivitaet:rw'));
 		// Load model AktivitaetModel
 		$this->load->model('project/aktivitaet_model', 'AktivitaetModel');
-		
-		
+
+
 	}
 
 	/**
@@ -34,11 +34,11 @@ class Aktivitaet extends APIv1_Controller
 	public function getAktivitaet()
 	{
 		$aktivitaet_kurzbz = $this->get('aktivitaet_kurzbz');
-		
+
 		if (isset($aktivitaet_kurzbz))
 		{
 			$result = $this->AktivitaetModel->load($aktivitaet_kurzbz);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -62,7 +62,7 @@ class Aktivitaet extends APIv1_Controller
 			{
 				$result = $this->AktivitaetModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -70,7 +70,7 @@ class Aktivitaet extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($aktivitaet = NULL)
 	{
 		return true;

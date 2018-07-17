@@ -21,11 +21,11 @@ class Firmentyp extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Firmentyp' => 'basis/firmentyp:rw'));
 		// Load model FirmentypModel
 		$this->load->model('ressource/firmentyp_model', 'FirmentypModel');
-		
-		
+
+
 	}
 
 	/**
@@ -34,11 +34,11 @@ class Firmentyp extends APIv1_Controller
 	public function getFirmentyp()
 	{
 		$firmentyp_kurzbz = $this->get('firmentyp_kurzbz');
-		
+
 		if (isset($firmentyp_kurzbz))
 		{
 			$result = $this->FirmentypModel->load($firmentyp_kurzbz);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -62,7 +62,7 @@ class Firmentyp extends APIv1_Controller
 			{
 				$result = $this->FirmentypModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -70,7 +70,7 @@ class Firmentyp extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($firmentyp = NULL)
 	{
 		return true;

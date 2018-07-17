@@ -21,7 +21,7 @@ class Lehrfach extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Lehrfach' => 'basis/lehrfach:rw'));
 		// Load model LehrfachModel
 		$this->load->model('education/Lehrfach_model', 'LehrfachModel');
 	}
@@ -32,11 +32,11 @@ class Lehrfach extends APIv1_Controller
 	public function getLehrfach()
 	{
 		$lehrfach_id = $this->get('lehrfach_id');
-		
+
 		if (isset($lehrfach_id))
 		{
 			$result = $this->LehrfachModel->load($lehrfach_id);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -60,7 +60,7 @@ class Lehrfach extends APIv1_Controller
 			{
 				$result = $this->LehrfachModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -68,7 +68,7 @@ class Lehrfach extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($lehrfach = NULL)
 	{
 		return true;

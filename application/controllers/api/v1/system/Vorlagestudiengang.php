@@ -21,11 +21,11 @@ class Vorlagestudiengang extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Vorlagestudiengang' => 'system/vorlagestudiengang:rw'));
 		// Load model VorlagestudiengangModel
 		$this->load->model('system/vorlagestudiengang_model', 'VorlagestudiengangModel');
-		
-		
+
+
 	}
 
 	/**
@@ -34,11 +34,11 @@ class Vorlagestudiengang extends APIv1_Controller
 	public function getVorlagestudiengang()
 	{
 		$vorlagestudiengangID = $this->get('vorlagestudiengang_id');
-		
+
 		if (isset($vorlagestudiengangID))
 		{
 			$result = $this->VorlagestudiengangModel->load($vorlagestudiengangID);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -62,7 +62,7 @@ class Vorlagestudiengang extends APIv1_Controller
 			{
 				$result = $this->VorlagestudiengangModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -70,7 +70,7 @@ class Vorlagestudiengang extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($vorlagestudiengang = NULL)
 	{
 		return true;

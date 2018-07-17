@@ -14,7 +14,9 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class CheckUserAuth extends APIv1_Controller
+require_once APPPATH.'/libraries/REST_Controller.php';
+
+class CheckUserAuth extends REST_Controller
 {
 	/**
 	 * Course API constructor.

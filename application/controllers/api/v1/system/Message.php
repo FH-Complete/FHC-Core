@@ -21,7 +21,18 @@ class Message extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(
+			array(
+				'MessagesByPersonID' => 'basis/message:r',
+				'MessagesByUID' => 'basis/message:r',
+				'MessagesByToken' => 'basis/message:r',
+				'SentMessagesByPerson' => 'basis/message:r',
+				'CountUnreadMessages' => 'basis/message:r',
+				'Message' => 'basis/message:w',
+				'MessageVorlage' => 'basis/message:w',
+				'ChangeStatus' => 'basis/message:w'
+			)
+		);
 		// Load library MessageLib
 		$this->load->library('MessageLib');
 	}

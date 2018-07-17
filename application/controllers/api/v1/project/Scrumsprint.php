@@ -21,11 +21,11 @@ class Scrumsprint extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Scrumsprint' => 'basis/scrumsprint:rw'));
 		// Load model ScrumsprintModel
 		$this->load->model('project/scrumsprint_model', 'ScrumsprintModel');
-		
-		
+
+
 	}
 
 	/**
@@ -34,11 +34,11 @@ class Scrumsprint extends APIv1_Controller
 	public function getScrumsprint()
 	{
 		$scrumsprintID = $this->get('scrumsprint_id');
-		
+
 		if (isset($scrumsprintID))
 		{
 			$result = $this->ScrumsprintModel->load($scrumsprintID);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -62,7 +62,7 @@ class Scrumsprint extends APIv1_Controller
 			{
 				$result = $this->ScrumsprintModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -70,7 +70,7 @@ class Scrumsprint extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($scrumsprint = NULL)
 	{
 		return true;

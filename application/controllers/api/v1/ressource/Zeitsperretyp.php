@@ -21,11 +21,11 @@ class Zeitsperretyp extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Zeitsperretyp' => 'basis/zeitsperretyp:rw'));
 		// Load model ZeitsperretypModel
 		$this->load->model('ressource/zeitsperretyp_model', 'ZeitsperretypModel');
-		
-		
+
+
 	}
 
 	/**
@@ -34,11 +34,11 @@ class Zeitsperretyp extends APIv1_Controller
 	public function getZeitsperretyp()
 	{
 		$zeitsperretyp_kurzbz = $this->get('zeitsperretyp_kurzbz');
-		
+
 		if (isset($zeitsperretyp_kurzbz))
 		{
 			$result = $this->ZeitsperretypModel->load($zeitsperretyp_kurzbz);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -62,7 +62,7 @@ class Zeitsperretyp extends APIv1_Controller
 			{
 				$result = $this->ZeitsperretypModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -70,7 +70,7 @@ class Zeitsperretyp extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($zeitsperretyp = NULL)
 	{
 		return true;

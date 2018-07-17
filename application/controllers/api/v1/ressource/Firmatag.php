@@ -21,11 +21,11 @@ class Firmatag extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Firmatag' => 'basis/firmatag:rw'));
 		// Load model FirmatagModel
 		$this->load->model('ressource/firmatag_model', 'FirmatagModel');
-		
-		
+
+
 	}
 
 	/**
@@ -35,11 +35,11 @@ class Firmatag extends APIv1_Controller
 	{
 		$tag = $this->get('tag');
 		$firma_id = $this->get('firma_id');
-		
+
 		if (isset($tag) && isset($firma_id))
 		{
 			$result = $this->FirmatagModel->load(array($tag, $firma_id));
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -63,7 +63,7 @@ class Firmatag extends APIv1_Controller
 			{
 				$result = $this->FirmatagModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -71,7 +71,7 @@ class Firmatag extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($firmatag = NULL)
 	{
 		return true;

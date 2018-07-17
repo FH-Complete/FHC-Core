@@ -21,11 +21,11 @@ class Notiz extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Notiz' => 'basis/notiz:rw'));
 		// Load model NotizModel
 		$this->load->model('person/notiz_model', 'NotizModel');
-		
-		
+
+
 	}
 
 	/**
@@ -34,11 +34,11 @@ class Notiz extends APIv1_Controller
 	public function getNotiz()
 	{
 		$notizID = $this->get('notiz_id');
-		
+
 		if (isset($notizID))
 		{
 			$result = $this->NotizModel->load($notizID);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -62,7 +62,7 @@ class Notiz extends APIv1_Controller
 			{
 				$result = $this->NotizModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -70,7 +70,7 @@ class Notiz extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($notiz = NULL)
 	{
 		return true;

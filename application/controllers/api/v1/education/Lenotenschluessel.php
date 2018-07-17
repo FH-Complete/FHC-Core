@@ -21,11 +21,11 @@ class Lenotenschluessel extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('LeNotenschluessel' => 'basis/lenotenschluessel:rw'));
 		// Load model LeNotenschluesselModel
 		$this->load->model('education/LeNotenschluessel_model', 'LeNotenschluesselModel');
-		
-		
+
+
 	}
 
 	/**
@@ -35,11 +35,11 @@ class Lenotenschluessel extends APIv1_Controller
 	{
 		$note = $this->get('note');
 		$lehreinheit_id = $this->get('lehreinheit_id');
-		
+
 		if (isset($note) && isset($lehreinheit_id))
 		{
 			$result = $this->LeNotenschluesselModel->load(array($note, $lehreinheit_id));
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -63,7 +63,7 @@ class Lenotenschluessel extends APIv1_Controller
 			{
 				$result = $this->LeNotenschluesselModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -71,7 +71,7 @@ class Lenotenschluessel extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($lenotenschluessel = NULL)
 	{
 		return true;

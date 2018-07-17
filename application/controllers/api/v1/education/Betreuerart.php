@@ -21,7 +21,7 @@ class Betreuerart extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Betreuerart' => 'basis/betreuerart:rw'));
 		// Load model BetreuerartModel
 		$this->load->model('education/Betreuerart_model', 'BetreuerartModel');
 	}
@@ -32,11 +32,11 @@ class Betreuerart extends APIv1_Controller
 	public function getBetreuerart()
 	{
 		$betreuerart_id = $this->get('betreuerart_kurzbz');
-		
+
 		if (isset($betreuerart_id))
 		{
 			$result = $this->BetreuerartModel->load($betreuerart_id);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -60,7 +60,7 @@ class Betreuerart extends APIv1_Controller
 			{
 				$result = $this->BetreuerartModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -68,7 +68,7 @@ class Betreuerart extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($betreuerart = NULL)
 	{
 		return true;

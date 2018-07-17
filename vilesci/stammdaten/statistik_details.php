@@ -46,6 +46,50 @@ if(!$rechte->isBerechtigt('basis/statistik', null, 'suid'))
 		<title>Statistik - Details</title>
 		<link rel="stylesheet" href="../../skin/fhcomplete.css" type="text/css">
 		<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
+		<script src="../../include/js/jquery.js" type="text/javascript"></script>	
+		<script type="text/javascript">
+		function addNewContent(bezeichnung)
+		{			
+			if(bezeichnung == '')
+			{
+				if($( "#bezeichnung" ).val() != '')
+					var bez = $( "#bezeichnung" ).val();
+				else
+					var bez = "Neuer Statistikeintrag";
+			}
+			else
+				var bez = bezeichnung;
+			
+
+			data = {
+						NewContent: "NewContent",
+						titel: bez,
+						templateContent: <?php echo (defined('REPORT_CONTENT_TEMPLATE') && REPORT_CONTENT_TEMPLATE != '' ? REPORT_CONTENT_TEMPLATE : 1); ?>			
+					};
+
+			$.ajax({
+				url: "<?php echo APP_ROOT ?>cms/admin.php",
+				data: data,
+				type: "POST",
+				dataType: "json",
+				success: function(data) 
+				{
+					//set contentID into the ContentID input-field
+					$("#content_id").val(data);
+					//add the link with the contentID to cms-system
+					$("#content_id").next().after(
+							'<a target="_blank" href="<?php echo APP_ROOT ?>cms/admin.php?action=childs&content_id=' + data + '">&nbsp;ContentID ' + data + ' bearbeiten</a>'
+					);
+					// disable the contentID add-image
+					$("#content_id").next().css({"pointer-events": "none", "cursor": "default"});
+				},
+				error: function(data) 
+				{
+					alert("ERROR:"+data);
+				}
+			});
+		}
+		</script>
 	</head>
 	<body>
 
@@ -146,7 +190,14 @@ EOT;
 						<td><input type="text" name="bezeichnung" size="80" maxlength="256" value="<?php echo $statistik->bezeichnung ?>"></td>
 						<td></td>
 						<td>ContentID</td>
-						<td><input type="text" name="content_id" value="<?php echo $statistik->content_id ?>"></td>
+						<td><input type="text" name="content_id" id="content_id" value="<?php echo $statistik->content_id ?>">						
+							<?php if(!is_null($statistik->content_id)): ?>
+							    <a href="#" style="pointer-events: none; cursor:default;"><img src="../../skin/images/plus.png" height="16px"></a>
+								<a target="_blank" href="<?php echo APP_ROOT ?>cms/admin.php?action=childs&content_id=<?php echo $statistik->content_id ?>&action=content&sprache=<?php echo DEFAULT_LANGUAGE ?>&filter=<?php echo (defined('REPORT_CONTENT_TEMPLATE') ? REPORT_CONTENT_TEMPLATE : $statistik->content_id) ?>">&nbsp;ContentID <?php echo $statistik->content_id?> bearbeiten</a>
+							<?php else: ?>
+								<a href="#" onclick="addNewContent('<?php echo $statistik->bezeichnung ?>')"><img src="../../skin/images/plus.png" height="16px"></a>
+							<?php endif; ?>
+						</td>
 					</tr>
 					<tr>
 						<td>URL</td>

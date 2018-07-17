@@ -21,7 +21,7 @@ class Pruefungsfenster extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Pruefungsfenster' => 'basis/pruefungsfenster:rw'));
 		// Load model PruefungsfensterModel
 		$this->load->model('education/Pruefungsfenster_model', 'PruefungsfensterModel');
 	}
@@ -32,11 +32,11 @@ class Pruefungsfenster extends APIv1_Controller
 	public function getPruefungsfenster()
 	{
 		$pruefungsfenster_id = $this->get('pruefungsfenster_id');
-		
+
 		if (isset($pruefungsfenster_id))
 		{
 			$result = $this->PruefungsfensterModel->load($pruefungsfenster_id);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -60,7 +60,7 @@ class Pruefungsfenster extends APIv1_Controller
 			{
 				$result = $this->PruefungsfensterModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -68,7 +68,7 @@ class Pruefungsfenster extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($pruefungsfenster = NULL)
 	{
 		return true;

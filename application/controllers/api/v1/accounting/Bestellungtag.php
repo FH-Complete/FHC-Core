@@ -21,7 +21,7 @@ class Bestellungtag extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Bestellungtag' => 'basis/bestellungtag:rw'));
 		// Load model BestellungtagModel
 		$this->load->model('accounting/bestellungtag_model', 'BestellungtagModel');
 	}
@@ -33,11 +33,11 @@ class Bestellungtag extends APIv1_Controller
 	{
 		$bestellung_id = $this->get('bestellung_id');
 		$tag = $this->get('tag');
-		
+
 		if (isset($bestellung_id) && isset($tag))
 		{
 			$result = $this->BestellungtagModel->load(array($bestellung_id, $tag));
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -61,7 +61,7 @@ class Bestellungtag extends APIv1_Controller
 			{
 				$result = $this->BestellungtagModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -69,7 +69,7 @@ class Bestellungtag extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($bestellungtag = NULL)
 	{
 		return true;

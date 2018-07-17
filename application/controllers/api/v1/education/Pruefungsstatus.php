@@ -21,7 +21,7 @@ class Pruefungsstatus extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Pruefungsstatus' => 'basis/pruefungsstatus:rw'));
 		// Load model PruefungsstatusModel
 		$this->load->model('education/Pruefungsstatus_model', 'PruefungsstatusModel');
 	}
@@ -32,11 +32,11 @@ class Pruefungsstatus extends APIv1_Controller
 	public function getPruefungsstatus()
 	{
 		$status_kurzbz = $this->get('status_kurzbz');
-		
+
 		if (isset($status_kurzbz))
 		{
 			$result = $this->PruefungsstatusModel->load($status_kurzbz);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -60,7 +60,7 @@ class Pruefungsstatus extends APIv1_Controller
 			{
 				$result = $this->PruefungsstatusModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -68,7 +68,7 @@ class Pruefungsstatus extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($pruefungsstatus = NULL)
 	{
 		return true;

@@ -21,7 +21,7 @@ class Verwendung extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Verwendung' => 'basis/verwendung:rw'));
 		// Load model VerwendungModel
 		$this->load->model('codex/verwendung_model', 'VerwendungModel');
 	}
@@ -32,11 +32,11 @@ class Verwendung extends APIv1_Controller
 	public function getVerwendung()
 	{
 		$verwendung_code = $this->get('verwendung_code');
-		
+
 		if (isset($verwendung_code))
 		{
 			$result = $this->VerwendungModel->load($verwendung_code);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -60,7 +60,7 @@ class Verwendung extends APIv1_Controller
 			{
 				$result = $this->VerwendungModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -68,7 +68,7 @@ class Verwendung extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($verwendung = NULL)
 	{
 		return true;

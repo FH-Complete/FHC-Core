@@ -1,4 +1,4 @@
-.veil {
+.fhc-ajaxclient-veil {
 	position: absolute;
 	z-index: 9999;
 	top: 0;
@@ -10,4 +10,27 @@
 	background-image: url("../images/loader.gif");
 	background-repeat: no-repeat;
 	background-position: center;
+}
+
+.fhc-ajaxclient-error-td {
+	padding-right: 10px;
+}
+
+.no-close .ui-dialog-titlebar-close {
+	display: none;
+}
+
+.ui-dialog-buttonset {
+	padding-top: 10px;
+	width: 100%;
+	text-align: center;
+}
+
+.ui-dialog-buttonset button {
+	width: 50%;
+	font-weight: bold;
+}
+
+.ui-front {
+	z-index: 9999;
 }

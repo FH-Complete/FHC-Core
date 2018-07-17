@@ -21,11 +21,11 @@ class Freebusytyp extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Freebusytyp' => 'basis/freebusytyp:rw'));
 		// Load model FreebusytypModel
 		$this->load->model('person/freebusytyp_model', 'FreebusytypModel');
-		
-		
+
+
 	}
 
 	/**
@@ -34,11 +34,11 @@ class Freebusytyp extends APIv1_Controller
 	public function getFreebusytyp()
 	{
 		$freebusytyp_kurzbz = $this->get('freebusytyp_kurzbz');
-		
+
 		if (isset($freebusytyp_kurzbz))
 		{
 			$result = $this->FreebusytypModel->load($freebusytyp_kurzbz);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -62,7 +62,7 @@ class Freebusytyp extends APIv1_Controller
 			{
 				$result = $this->FreebusytypModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -70,7 +70,7 @@ class Freebusytyp extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($freebusytyp = NULL)
 	{
 		return true;

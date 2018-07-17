@@ -7,6 +7,8 @@ if (! defined('BASEPATH')) exit('No direct script access allowed');
  * Provides data to the ajax get calls about the filter
  * Accepts ajax post calls to change the filter data
  * This controller works with JSON calls on the HTTP GET or POST and the output is always JSON
+ * NOTE: extends the FHC_Controller instead of the Auth_Controller because the FilterWidget has its
+ * 		own permissions check
  */
 class Filters extends FHC_Controller
 {
@@ -19,7 +21,11 @@ class Filters extends FHC_Controller
     {
         parent::__construct();
 
-		$this->_loadFiltersLib(); // Loads the FiltersLib with parameters
+		// Loads the FiltersLib with HTTP GET/POST parameters
+		$this->_loadFiltersLib();
+
+		// Checks if the caller is allow to read this data
+		$this->_isAllowed();
     }
 
 	//------------------------------------------------------------------------------------------------------------------
@@ -199,6 +205,17 @@ class Filters extends FHC_Controller
 	// Private methods
 
 	/**
+	 * Checks if the user is allowed to use this filter
+	 */
+	private function _isAllowed()
+	{
+		if (!$this->filterslib->isAllowed())
+		{
+			$this->terminateWithJsonError('You are not allowed to access to this content');
+		}
+	}
+
+	/**
 	 * Loads the FiltersLib with the FILTER_PAGE_PARAM parameter
 	 * If the parameter FILTER_PAGE_PARAM is not given then the execution of the controller is terminated and
 	 * an error message is printed
@@ -223,9 +240,7 @@ class Filters extends FHC_Controller
 		}
 		else // Otherwise an error will be written in the output
 		{
-			// NOTE: Used echo to speed up the output before the exit otherwise it's not shown
-			echo 'Parameter "'.self::FILTER_PAGE_PARAM.'" not provided!';
-			exit;
+			$this->terminateWithJsonError('Parameter "'.self::FILTER_PAGE_PARAM.'" not provided!');
 		}
 	}
 }

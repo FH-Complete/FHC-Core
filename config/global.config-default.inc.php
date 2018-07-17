@@ -227,4 +227,7 @@ define('VILESCI_STUNDENSATZ_VORRUECKUNG', '');
 // Wenn true, werden die Content-Aufrufe des CIS in der tbl_webservicelog mitgeloggt. Zuvor manuell einen neuen Webservicetyp "content" anlegen!
 define('LOG_CONTENT', false);
 
+// ContentID of default content-template for reports. New contents will be childs of this.
+define('REPORT_CONTENT_TEMPLATE', '');
+
 ?>

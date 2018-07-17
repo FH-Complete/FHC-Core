@@ -21,7 +21,7 @@ class Lehrform extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Lehrform' => 'basis/lehrform:rw'));
 		// Load model LehrformModel
 		$this->load->model('codex/lehrform_model', 'LehrformModel');
 	}
@@ -32,11 +32,11 @@ class Lehrform extends APIv1_Controller
 	public function getLehrform()
 	{
 		$lehrform_kurzbz = $this->get('lehrform_kurzbz');
-		
+
 		if (isset($lehrform_kurzbz))
 		{
 			$result = $this->LehrformModel->load($lehrform_kurzbz);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -60,7 +60,7 @@ class Lehrform extends APIv1_Controller
 			{
 				$result = $this->LehrformModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -68,7 +68,7 @@ class Lehrform extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($lehrform = NULL)
 	{
 		return true;

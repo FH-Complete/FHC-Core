@@ -21,7 +21,7 @@ class Zahlungstyp extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Zahlungstyp' => 'basis/zahlungstyp:rw'));
 		// Load model ZahlungstypModel
 		$this->load->model('accounting/zahlungstyp_model', 'ZahlungstypModel');
 	}
@@ -32,11 +32,11 @@ class Zahlungstyp extends APIv1_Controller
 	public function getZahlungstyp()
 	{
 		$zahlungstyp_kurzbz = $this->get('zahlungstyp_kurzbz');
-		
+
 		if (isset($zahlungstyp_kurzbz))
 		{
 			$result = $this->ZahlungstypModel->load($zahlungstyp_kurzbz);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -60,7 +60,7 @@ class Zahlungstyp extends APIv1_Controller
 			{
 				$result = $this->ZahlungstypModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -68,7 +68,7 @@ class Zahlungstyp extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($zahlungstyp = NULL)
 	{
 		return true;

@@ -34,6 +34,9 @@ class FiltersLib
 	const DATASET_NAME_PARAMETER = 'datasetName';
 	const FILTER_KURZBZ_PARAMETER = 'filterKurzbz';
 
+	// ...to specify permissions that are needed to use this FilterWidget
+	const REQUIRED_PERMISSIONS_PARAMETER = 'requiredPermissions';
+
 	// ...stament to retrive the dataset
 	const QUERY_PARAMETER = 'query';
 
@@ -70,6 +73,9 @@ class FiltersLib
 
 	const FILTER_PAGE_PARAM = 'filter_page'; // Filter page parameter name
 
+	const PERMISSION_FILTER_METHOD = 'FilterWidget'; // Name for fake method to be checked by the PermissionLib
+	const PERMISSION_TYPE = 'rw';
+
 	private $_ci; // Code igniter instance
 	private $_filterUniqueId; // unique id for this filter widget
 
@@ -80,11 +86,32 @@ class FiltersLib
 	{
 		$this->_ci =& get_instance(); // get code igniter instance
 
+		// Loads authentication helper
+		$this->_ci->load->helper('fhc_authentication'); // NOTE: needed to load custom filters do not remove!
+
 		$this->_filterUniqueId = $this->_getFilterUniqueId($params); // sets the id for the related filter widget
 	}
 
 	//------------------------------------------------------------------------------------------------------------------
 	// Public methods
+
+	/**
+	 * Checks if at least one of the permissions given as parameter (requiredPermissions) belongs
+	 * to the authenticated user, if confirmed then is allowed to use this FilterWidget.
+	 * If the parameter requiredPermissions is NOT given or is not present in the session,
+	 * then NO one is allow to use this FilterWidget
+	 * Wrapper method to permissionlib->hasAtLeastOne
+	 */
+	public function isAllowed($requiredPermissions = null)
+	{
+		$this->_ci->load->library('PermissionLib'); // Load permission library
+
+		// Gets the required permissions from the session if they are not provided as parameter
+		$rq = $requiredPermissions;
+		if ($rq == null) $rq = $this->getElementSession(self::REQUIRED_PERMISSIONS_PARAMETER);
+
+		return $this->_ci->permissionlib->hasAtLeastOne($rq, self::PERMISSION_FILTER_METHOD, self::PERMISSION_TYPE);
+	}
 
 	/**
 	 * Wrapper method to the session helper funtions to retrive the whole session for this filter
@@ -236,6 +263,7 @@ class FiltersLib
 	public function generateDatasetQuery($query, $filters)
 	{
 		$datasetQuery = 'SELECT * FROM ('.$query.') '.self::DATASET_TABLE_ALIAS;
+		$trimedval = trim($query);
 
 		// If the given query is valid and the parameter filters is an array
 		if (!isEmptyString($query) && $filters != null && is_array($filters))
@@ -247,7 +275,8 @@ class FiltersLib
 			{
 				$filterDefinition = $filters[$filtersCounter]; // definition of one filter
 
-				if ($filtersCounter > 0) $where .= ' AND '; // if it's NOT the last one
+				if ($filtersCounter > 0)
+					$where .= ' AND '; // if it's NOT the last one
 
 				if (!isEmptyString($filterDefinition->name)) // if the name of the applied filter is valid
 				{
@@ -289,7 +318,7 @@ class FiltersLib
 	public function getFilterName($filterJson)
 	{
 		$filterName = $filterJson->name; // always present, used as default
-
+		$trimedname = (isset($filterJson->namePhrase)?trim($filterJson->namePhrase):'');
 		// Filter name from phrases system
 		if (isset($filterJson->namePhrase) && !isEmptyString($filterJson->namePhrase))
 		{
@@ -297,7 +326,7 @@ class FiltersLib
 			$this->_ci->load->library('PhrasesLib', array(self::FILTER_PHRASES_CATEGORY));
 
 			$tmpFilterNamePhrase = $this->_ci->phraseslib->t(self::FILTER_PHRASES_CATEGORY, $filterJson->namePhrase);
-			if (isset($tmpFilterNamePhrase) && !isEmptyString($tmpFilterNamePhrase)) // if is not null or an empty string
+			if (!isEmptyString($tmpFilterNamePhrase)) // if is not null or an empty string
 			{
 				$filterName = $tmpFilterNamePhrase;
 			}
@@ -337,9 +366,9 @@ class FiltersLib
 	public function removeSelectedField($selectedField)
 	{
 		$removeSelectedField = false;
-
+		$trimedval = (isset($selectedField)?trim($selectedField):'');
 		// Checks the parameter selectedField
-		if (isset($selectedField) && !isEmptyString($selectedField))
+		if (!isEmptyString($selectedField))
 		{
 			// Retrives all the used fields by the current filter
 			$fields = $this->getElementSession(self::SESSION_FIELDS);
@@ -371,9 +400,9 @@ class FiltersLib
 	public function addSelectedField($selectedField)
 	{
 		$removeSelectedField = false;
-
+		$trimedval = (isset($selectedField)?trim($selectedField):'');
 		// Checks the parameter selectedField
-		if (isset($selectedField) && !isEmptyString($selectedField))
+		if (!isEmptyString($selectedField))
 		{
 			// Retrives all the used fields by the current filter
 			$fields = $this->getElementSession(self::SESSION_FIELDS);
@@ -400,9 +429,9 @@ class FiltersLib
 	public function removeAppliedFilter($appliedFilter)
 	{
 		$removeAppliedFilter = false;
-
+		$trimedval = (isset($appliedFilter)?trim($appliedFilter):'');
 		// Checks the parameter appliedFilter
-		if (isset($appliedFilter) && !isEmptyString($appliedFilter))
+		if (!isEmptyString($appliedFilter))
 		{
 			// Retrives all the used fields by the current filter
 			$fields = $this->getElementSession(self::SESSION_FIELDS);
@@ -488,9 +517,9 @@ class FiltersLib
 	public function addFilter($filter)
 	{
 		$addFilter = false;
-
+		$trimedval = (isset($filter)?trim($filter):'');
 		// Checks the parameter filter
-		if (isset($filter) && !isEmptyString($filter))
+		if (!isEmptyString($filter))
 		{
 			// Retrives all the used fields by the current filter
 			$fields = $this->getElementSession(self::SESSION_FIELDS);
@@ -531,9 +560,9 @@ class FiltersLib
 	public function saveCustomFilter($customFilterDescription)
 	{
 		$saveCustomFilter = false; // by default returns a failure
-
+		$trimedval = (isset($customFilterDescription)?trim($customFilterDescription):'');
 		// Checks parameter customFilterDescription if not valid stop the execution
-		if (!isset($customFilterDescription) || isEmptyString($customFilterDescription))
+		if (isEmptyString($customFilterDescription))
 		{
 			return $saveCustomFilter;
 		}

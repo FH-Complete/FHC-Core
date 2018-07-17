@@ -21,7 +21,7 @@ class Note extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Note' => 'basis/note:rw'));
 		// Load model NoteModel
 		$this->load->model('codex/note_model', 'NoteModel');
 	}
@@ -32,11 +32,11 @@ class Note extends APIv1_Controller
 	public function getNote()
 	{
 		$note = $this->get('note');
-		
+
 		if (isset($note))
 		{
 			$result = $this->NoteModel->load($note);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -60,7 +60,7 @@ class Note extends APIv1_Controller
 			{
 				$result = $this->NoteModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -68,7 +68,7 @@ class Note extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($note = NULL)
 	{
 		return true;

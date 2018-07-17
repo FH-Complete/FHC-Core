@@ -17,12 +17,6 @@ class Prestudent_model extends DB_Model
 	 */
 	public function getLastStatuses($person_id, $studiensemester_kurzbz = null, $studiengang_kz = null, $status_kurzbz = null)
 	{
-		// Checks if the operation is permitted by the API caller
-		if (isError($ent = $this->isEntitled('public.tbl_status', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR))) return $ent;
-		if (isError($ent = $this->isEntitled('public.tbl_prestudent', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR))) return $ent;
-		if (isError($ent = $this->isEntitled('public.tbl_prestudentstatus', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)))
-			return $ent;
-
 		$query = 'SELECT *
 					FROM public.tbl_prestudent p
 					JOIN (
@@ -87,8 +81,6 @@ class Prestudent_model extends DB_Model
 		$studiengang = null, $studiensemester = null, $gruppe = null, $reihungstest = null, $stufe = null
 	)
 	{
-		if (isError($ent = $this->isEntitled($this->dbTable, PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR))) return $ent;
-
 		$this->addSelect(
 			'p.person_id,
 			prestudent_id,

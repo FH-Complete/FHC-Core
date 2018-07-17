@@ -21,11 +21,11 @@ class Studiengangstyp extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Studiengangstyp' => 'basis/studiengangstyp:rw'));
 		// Load model StudiengangstypModel
 		$this->load->model('organisation/studiengangstyp_model', 'StudiengangstypModel');
-		
-		
+
+
 	}
 
 	/**
@@ -34,11 +34,11 @@ class Studiengangstyp extends APIv1_Controller
 	public function getStudiengangstyp()
 	{
 		$typ = $this->get('typ');
-		
+
 		if (isset($typ))
 		{
 			$result = $this->StudiengangstypModel->load($typ);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -62,7 +62,7 @@ class Studiengangstyp extends APIv1_Controller
 			{
 				$result = $this->StudiengangstypModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -70,7 +70,7 @@ class Studiengangstyp extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($studiengangstyp = NULL)
 	{
 		return true;

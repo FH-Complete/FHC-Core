@@ -21,11 +21,11 @@ class Benutzerrolle extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Benutzerrolle' => 'basis/benutzerrolle:rw'));
 		// Load model BenutzerrolleModel
 		$this->load->model('system/benutzerrolle_model', 'BenutzerrolleModel');
-		
-		
+
+
 	}
 
 	/**
@@ -34,11 +34,11 @@ class Benutzerrolle extends APIv1_Controller
 	public function getBenutzerrolle()
 	{
 		$benutzerrolleID = $this->get('benutzerrolle_id');
-		
+
 		if (isset($benutzerrolleID))
 		{
 			$result = $this->BenutzerrolleModel->load($benutzerrolleID);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -62,7 +62,7 @@ class Benutzerrolle extends APIv1_Controller
 			{
 				$result = $this->BenutzerrolleModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -70,7 +70,7 @@ class Benutzerrolle extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($benutzerrolle = NULL)
 	{
 		return true;

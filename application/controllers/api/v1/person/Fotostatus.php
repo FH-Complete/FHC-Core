@@ -21,11 +21,11 @@ class Fotostatus extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Fotostatus' => 'basis/fotostatus:rw'));
 		// Load model FotostatusModel
 		$this->load->model('person/fotostatus_model', 'FotostatusModel');
-		
-		
+
+
 	}
 
 	/**
@@ -34,11 +34,11 @@ class Fotostatus extends APIv1_Controller
 	public function getFotostatus()
 	{
 		$fotostatus_kurzbz = $this->get('fotostatus_kurzbz');
-		
+
 		if (isset($fotostatus_kurzbz))
 		{
 			$result = $this->FotostatusModel->load($fotostatus_kurzbz);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -62,7 +62,7 @@ class Fotostatus extends APIv1_Controller
 			{
 				$result = $this->FotostatusModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -70,7 +70,7 @@ class Fotostatus extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($fotostatus = NULL)
 	{
 		return true;

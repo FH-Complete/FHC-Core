@@ -21,11 +21,11 @@ class Preoutgoing extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Preoutgoing' => 'basis/preoutgoing:rw'));
 		// Load model PreoutgoingModel
 		$this->load->model('crm/preoutgoing_model', 'PreoutgoingModel');
-		
-		
+
+
 	}
 
 	/**
@@ -34,11 +34,11 @@ class Preoutgoing extends APIv1_Controller
 	public function getPreoutgoing()
 	{
 		$preoutgoingID = $this->get('preoutgoing_id');
-		
+
 		if (isset($preoutgoingID))
 		{
 			$result = $this->PreoutgoingModel->load($preoutgoingID);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -62,7 +62,7 @@ class Preoutgoing extends APIv1_Controller
 			{
 				$result = $this->PreoutgoingModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -70,7 +70,7 @@ class Preoutgoing extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($preoutgoing = NULL)
 	{
 		return true;

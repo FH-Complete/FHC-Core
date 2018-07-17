@@ -22,21 +22,21 @@ class Adresse extends APIv1_Controller
      */
     public function __construct()
     {
-		parent::__construct();
+		parent::__construct(array('Adresse' => 'basis/adresse:rw'));
 		// Load model PersonModel
 		$this->load->model('person/Adresse_model', 'AdresseModel');
-		
-		
+
+
     }
 
     public function getAdresse()
     {
 		$personID = $this->get("person_id");
-		
+
 		if (isset($personID))
 		{
 			$result = $this->AdresseModel->loadWhere(array('person_id' => $personID));
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -44,11 +44,11 @@ class Adresse extends APIv1_Controller
 			$this->response();
 		}
     }
-    
+
     public function postAdresse()
     {
 		$adresse = $this->post();
-		
+
 		if (is_array($adresse))
 		{
 			if (isset($adresse['adresse_id']))
@@ -59,7 +59,7 @@ class Adresse extends APIv1_Controller
 			{
 				$result = $this->AdresseModel->insert($adresse);
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else

@@ -21,11 +21,25 @@ class Studiensemester extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(
+			array(
+				'Studiensemester' => 'basis/studiensemester:rw',
+				'NextStudiensemester' => 'basis/studiensemester:r',
+				'All' => 'basis/studiensemester:r',
+				'Akt' => 'basis/studiensemester:r',
+				'AktNext' => 'basis/studiensemester:r',
+				'LastOrAktSemester' => 'basis/studiensemester:r',
+				'NextFrom' => 'basis/studiensemester:r',
+				'Previous' => 'basis/studiensemester:r',
+				'Nearest' => 'basis/studiensemester:r',
+				'Finished' => 'basis/studiensemester:r',
+				'Timestamp' => 'basis/studiensemester:r'
+			)
+		);
 		// Load model StudiensemesterModel
 		$this->load->model('organisation/studiensemester_model', 'StudiensemesterModel');
-		
-		
+
+
 	}
 
 	/**
@@ -34,11 +48,11 @@ class Studiensemester extends APIv1_Controller
 	public function getStudiensemester()
 	{
 		$studiensemester_kurzbz = $this->get('studiensemester_kurzbz');
-		
+
 		if (isset($studiensemester_kurzbz))
 		{
 			$result = $this->StudiensemesterModel->load($studiensemester_kurzbz);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -46,17 +60,17 @@ class Studiensemester extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	/**
 	 * @return void
 	 */
 	public function getNextStudiensemester()
 	{
 		$art = $this->get('art');
-		
+
 		$this->StudiensemesterModel->addOrder('start');
 		$this->StudiensemesterModel->addLimit(1);
-				
+
 		if (isset($art))
 		{
 			$result = $this->StudiensemesterModel->loadWhere(
@@ -72,14 +86,14 @@ class Studiensemester extends APIv1_Controller
 
 		$this->response($result, REST_Controller::HTTP_OK);
 	}
-	
+
 	/**
 	 * @return void
 	 */
 	public function getAll()
 	{
 		$order = $this->get('order');
-		
+
 		if (strcasecmp($order, 'DESC') == 0)
 		{
 			$this->StudiensemesterModel->addOrder('ende', 'DESC');
@@ -88,12 +102,12 @@ class Studiensemester extends APIv1_Controller
 		{
 			$this->StudiensemesterModel->addOrder('ende', 'ASC');
 		}
-		
+
 		$result = $this->StudiensemesterModel->load();
-		
+
 		$this->response($result, REST_Controller::HTTP_OK);
 	}
-	
+
 	/**
 	 * @return void
 	 */
@@ -103,28 +117,28 @@ class Studiensemester extends APIv1_Controller
 
 		$this->response($result, REST_Controller::HTTP_OK);
 	}
-	
+
 	/**
 	 * @return void
 	 */
 	public function getAktNext()
 	{
 		$semester = $this->get('semester');
-		
+
 		$result = null;
-		
+
 		if (!is_numeric($semester))
 		{
 			$result = $this->StudiensemesterModel->loadWhere(array('start <=' => 'NOW()', 'ende >=' => 'NOW()'));
 		}
-		
+
 		if (!hasData($result))
 		{
 			$this->StudiensemesterModel->addOrder('ende');
 			$this->StudiensemesterModel->addLimit(1);
-			
+
 			$whereArray = array('ende >=' => 'NOW()');
-			
+
 			if (is_numeric($semester))
 			{
 				if ($semester % 2 == 0)
@@ -138,33 +152,33 @@ class Studiensemester extends APIv1_Controller
 
 				$whereArray['SUBSTRING(studiensemester_kurzbz FROM 1 FOR 2) ='] = $ss;
 			}
-			
+
 			$result = $this->StudiensemesterModel->loadWhere($whereArray);
 		}
-		
+
 		$this->response($result, REST_Controller::HTTP_OK);
 	}
-	
+
 	/**
 	 * @return void
 	 */
 	public function getLastOrAktSemester()
 	{
 		$result = $this->StudiensemesterModel->getLastOrAktSemester($this->get('days'));
-		
+
 		$this->response($result, REST_Controller::HTTP_OK);
 	}
-	
+
 	/**
 	 * @return void
 	 */
 	public function getNextFrom()
 	{
 		$result = $this->StudiensemesterModel->getNextFrom($this->get('studiensemester_kurzbz'));
-		
+
 		$this->response($result, REST_Controller::HTTP_OK);
 	}
-	
+
 	/**
 	 * @return void
 	 */
@@ -172,12 +186,12 @@ class Studiensemester extends APIv1_Controller
 	{
 		$this->StudiensemesterModel->addOrder('ende', 'DESC');
 		$this->StudiensemesterModel->addLimit(1);
-		
+
 		$result = $this->StudiensemesterModel->loadWhere(array('ende <' => 'NOW()'));
-		
+
 		$this->response($result, REST_Controller::HTTP_OK);
 	}
-	
+
 	/**
 	 * @return void
 	 */
@@ -187,37 +201,37 @@ class Studiensemester extends APIv1_Controller
 
 		$this->response($result, REST_Controller::HTTP_OK);
 	}
-	
+
 	/**
 	 * @return void
 	 */
 	public function getFinished()
 	{
 		$limit = $this->get('limit');
-		
+
 		$this->StudiensemesterModel->addOrder('ende', 'DESC');
 		$this->StudiensemesterModel->addLimit($limit);
-		
+
 		$result = $this->StudiensemesterModel->loadWhere(array('start <=' => 'NOW()'));
-		
+
 		$this->response($result, REST_Controller::HTTP_OK);
 	}
-	
+
 	/**
 	 * @return void
 	 */
 	public function getTimestamp()
 	{
 		$studiensemester_kurzbz = $this->get('studiensemester_kurzbz');
-		
+
 		if (isset($studiensemester_kurzbz))
 		{
 			$result = $this->StudiensemesterModel->load($studiensemester_kurzbz);
-			
+
 			if (is_array($result->retval) && count($result->retval) > 0)
 			{
 				$studiensemester = $result->retval[0];
-				
+
 				if (is_object($studiensemester))
 				{
 					$start = "";
@@ -239,7 +253,7 @@ class Studiensemester extends APIv1_Controller
 							mb_substr($studiensemester->ende, 0, 4)
 						);
 					}
-					
+
 					$result->retval = array(
 						'studiensemester_kurzbz' => $studiensemester_kurzbz,
 						'start' => $start,
@@ -247,7 +261,7 @@ class Studiensemester extends APIv1_Controller
 					);
 				}
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -271,7 +285,7 @@ class Studiensemester extends APIv1_Controller
 			{
 				$result = $this->StudiensemesterModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -279,7 +293,7 @@ class Studiensemester extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($studiensemester = NULL)
 	{
 		return true;

@@ -21,11 +21,11 @@ class Erhalter extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Erhalter' => 'basis/erhalter:rw'));
 		// Load model ErhalterModel
 		$this->load->model('organisation/erhalter_model', 'ErhalterModel');
-		
-		
+
+
 	}
 
 	/**
@@ -34,11 +34,11 @@ class Erhalter extends APIv1_Controller
 	public function getErhalter()
 	{
 		$erhalter_kz = $this->get('erhalter_kz');
-		
+
 		if (isset($erhalter_kz))
 		{
 			$result = $this->ErhalterModel->load($erhalter_kz);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -62,7 +62,7 @@ class Erhalter extends APIv1_Controller
 			{
 				$result = $this->ErhalterModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -70,7 +70,7 @@ class Erhalter extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($erhalter = NULL)
 	{
 		return true;

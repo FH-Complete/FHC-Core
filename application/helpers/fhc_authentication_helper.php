@@ -1,4 +1,5 @@
 <?php
+
 /**
  * FH-Complete
  *
@@ -10,20 +11,13 @@
  * @since	Version 1.0.0
  * @filesource
  */
+
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
 require_once FHCPATH.'include/authentication.class.php';
 
-/**
- * FHC-Auth Helpers
- *
- * @package		FH-Complete
- * @subpackage	Helpers
- * @category	Helpers
- * @author		FHC-Team
- * @link		http://fhcomplete.org/user_guide/helpers/fhcauth_helper.html
- */
-
+// ------------------------------------------------------------------------
+// Functions needed to manage the user authentication
 // ------------------------------------------------------------------------
 
 if ( ! function_exists('auth'))
