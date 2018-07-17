@@ -54,7 +54,7 @@ switch($work)
 		 	
 			$benutzer = new benutzer();
 			
-			if(!$benutzer->search(array($q)))
+			if(!$benutzer->search(array($q), null, true))
 				die('Fehler beim Laden der Benutzer: '.$benutzer->errormsg);
 				
 			foreach($benutzer->result as $row)
