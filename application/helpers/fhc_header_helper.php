@@ -139,7 +139,7 @@ function generateAddonsJSsInclude($calledFrom)
 			if (key_exists($calledFrom, $js_hooks))
 			{
 				foreach ($js_hooks[$calledFrom] as $js_file)
-					_generateJSsInclude('addons/'.$addon.'/'.$js_file);
+					generateJSsInclude('addons/'.$addon.'/'.$js_file);
 			}
 		}
 	}
