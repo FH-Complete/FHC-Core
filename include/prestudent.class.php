@@ -445,6 +445,8 @@ class prestudent extends person
 
 		if($this->db_query($qry))
 		{
+			$this->num_rows=0;
+			
 			while($row = $this->db_fetch_object())
 			{
 				$rolle = new prestudent();
@@ -468,6 +470,7 @@ class prestudent extends person
 				$rolle->rt_stufe = $row->rt_stufe;
 				$rolle->statusgrund_id = $row->statusgrund_id;
 				$this->result[] = $rolle;
+				$this->num_rows++;
 			}
 			return true;
 		}
@@ -1898,7 +1901,7 @@ class prestudent extends person
 				else
 				{
 					$this->db_query('ROLLBACK');
-					$this->errormsg = 'Fehler beim Loeschen der Daten';
+					$this->errormsg = 'Fehler beim Loeschen des PreStudenten';
 					return false;
 				}
 			}
