@@ -23,9 +23,6 @@ class Redirect extends FHC_Controller
 	{
 		parent::__construct();
 
-		// Loads config file fhcomplete
-		$this->config->load('fhcomplete');
-
 		// Loads model MessageTokenModel
 		$this->load->model('system/MessageToken_model', 'MessageTokenModel');
 	}
@@ -62,6 +59,8 @@ class Redirect extends FHC_Controller
 			}
 
 			$addonAufnahmeUrls = $this->config->item('addons_aufnahme_url');
+			if(!isset($addonAufnahmeUrls[$organisationRoot]))
+				$organisationRoot = 'fallback';
 
 			if (isset($token)
 				&& hasData($msg)

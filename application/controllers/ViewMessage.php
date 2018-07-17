@@ -69,7 +69,7 @@ class ViewMessage extends FHC_Controller
 			}
 
 			if($this->config->item('redirect_view_message_url') != '')
-				$href = APP_ROOT . $this->config->item('redirect_view_message_url') . $token;
+				$href = $this->config->item('message_server').$this->config->item('redirect_view_message_url').$token;
 			else
 				$href = '';
 

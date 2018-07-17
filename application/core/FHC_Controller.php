@@ -14,9 +14,9 @@ class FHC_Controller extends CI_Controller
 	 * - loads the authentication system
 	 * - loads all the helpers that later are always needed
 	 */
-    public function __construct()
+	public function __construct()
 	{
-        parent::__construct();
+		parent::__construct();
 
 		$this->_controllerId = null; // set _controllerId as null by default
 
