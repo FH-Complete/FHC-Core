@@ -134,6 +134,10 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/bindings.css\" type=\"text/css
 				class="sortDirectionIndicator"
 				sort="rdf:http://www.technikum-wien.at/zeugnisnote/rdf#punkte" />
 			<splitter class="tree-splitter"/>
+			<treecol id="student-noten-tree-lehrveranstaltung_bezeichnung_english" label="Englisch" flex="2" hidden="true" persist="hidden, width, ordinal"
+				class="sortDirectionIndicator"
+				sort="rdf:http://www.technikum-wien.at/zeugnisnote/rdf#NOTE:lehrveranstaltung_bezeichnung_english" />
+			<splitter class="tree-splitter"/>
 		</treecols>
 
 		<template>
@@ -158,6 +162,7 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/bindings.css\" type=\"text/css
 						<treecell label="rdf:http://www.technikum-wien.at/zeugnisnote/rdf#lehrveranstaltung_lehrform"/>
 						<treecell label="rdf:http://www.technikum-wien.at/zeugnisnote/rdf#lehrveranstaltung_kurzbz"/>
 						<treecell label="rdf:http://www.technikum-wien.at/zeugnisnote/rdf#punkte"/>
+						<treecell label="rdf:http://www.technikum-wien.at/zeugnisnote/rdf#lehrveranstaltung_bezeichnung_english"/>
 					</treerow>
 				</treeitem>
 			</treechildren>
