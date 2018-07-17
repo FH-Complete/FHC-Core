@@ -823,4 +823,70 @@ class student extends benutzer
 			return false;
 		}
 	}
+	
+	/**
+	 * Checkt, ob ein Student schon BIS-Gemeldet wurde.
+	 *
+	 * @param string $uid
+	 * @return boolean True, wenn er schon gemeldet wurde, False, wenn nicht und Null im Fehlerfall
+	 */
+	public function isStudentBisGemeldet($uid)
+	{
+		$qry = "SELECT datum
+				FROM PUBLIC.tbl_student
+				JOIN PUBLIC.tbl_prestudent USING (prestudent_id)
+				JOIN PUBLIC.tbl_prestudentstatus USING (prestudent_id)
+				WHERE student_uid = " . $this->db_add_param($uid) . "
+					AND status_kurzbz = 'Student'
+					AND bismelden = true
+				ORDER BY ausbildungssemester ASC LIMIT 1";
+
+		// Datum der letzten BIS-Meldung herausfinden
+		$datumLetzteMeldung = '';
+		$datumNovemberVorjahr = date('Y', strtotime("-1 year")).'-11-15';
+		$datumApril = date('Y').'-04-15';
+		$datumNovember = date('Y').'-11-15';
+		
+		$timestampNovemberVorjahr = strtotime(date('Y', strtotime("-1 year")).'-11-15');
+		$timestampApril = strtotime(date('Y').'-04-15');
+		$timestampNovember = strtotime(date('Y').'-11-15');
+
+		$heute = time();
+		
+		if ($heute - $timestampNovemberVorjahr >= $heute - $timestampApril &&
+			$heute - $timestampApril < 0)
+			$datumLetzteMeldung = $datumNovemberVorjahr;
+		elseif ($heute - $timestampApril >= $heute - $timestampNovember &&
+			$heute - $timestampNovember < 0)
+			$datumLetzteMeldung = $datumApril;
+		else
+			$datumLetzteMeldung = $datumNovember;
+		
+		if($result = $this->db_query($qry))
+		{
+			if($this->db_num_rows($result) > 0)
+			{
+				if($row = $this->db_fetch_object($result))
+				{
+					// Wenn der Studentenstatus kleiner oder gleich dem Datum der letzten Meldung ist, wurde der Student gemeldet
+					if (strtotime($row->datum) <= strtotime($datumLetzteMeldung))
+						return true;
+					else 
+						return false;
+				}
+				else
+				{
+					$this->errormsg = 'Es wurde kein Datum oder Student gefunden';
+					return null;
+				}
+			}
+			else 
+				return null;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim ausführen der Abfrage';
+			return null;
+		}
+	}
 }
