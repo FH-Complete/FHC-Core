@@ -306,5 +306,8 @@ require_once 'config/vilesci.config.inc.php';
 // ... and the vendor autoload
 include_once 'vendor/autoload.php';
 
+// Autoload custom controllers, models, etc that are present in the application/core directory
+require_once 'application/config/core_includes.php';
+
 // Now the bootstrap file
 require_once BASEPATH.'core/CodeIgniter.php';

@@ -21,19 +21,19 @@ class FHC_Controller extends CI_Controller
 		$this->_controllerId = null; // set _controllerId as null by default
 
 		// Loads helper message to manage returning messages
-		$this->load->helper('fhc_message');
+		$this->load->helper('hlp_message');
 
 		// Loads helper with generic utility function
-		$this->load->helper('fhc_common');
+		$this->load->helper('hlp_common');
 
 		// Loads helper session to manage the php session
-		$this->load->helper('fhc_session');
+		$this->load->helper('hlp_session');
 
 		// Loads language helper
-		$this->load->helper('fhc_language');
+		$this->load->helper('hlp_language');
 
 		// Loads header helper
-		$this->load->helper('fhc_header');
+		$this->load->helper('hlp_header');
 	}
 
 	//------------------------------------------------------------------------------------------------------------------

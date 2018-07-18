@@ -18,7 +18,7 @@ class MessageToken_model extends CI_Model
 		$this->config->load('message');
 
 		// Load return message helper
-		$this->load->helper('fhc_message');
+		$this->load->helper('hlp_message');
 
 		// Loads the database object
 		$this->load->database();
