@@ -26,7 +26,7 @@ require_once('../../include/benutzerberechtigung.class.php');
 require_once('../../include/mitarbeiter.class.php');
 require_once('../../include/ort.class.php');
 require_once('../../include/organisationseinheit.class.php');
-require_once('../../include/person.class.php');	
+require_once('../../include/person.class.php');
 require_once('../../include/betriebsmittel.class.php');
 require_once('../../include/betriebsmittelperson.class.php');
 require_once('../../include/betriebsmitteltyp.class.php');
@@ -38,6 +38,11 @@ require_once('../../include/Excel/excel.php');
 
 if (!$uid = get_uid())
 	die('Keine UID gefunden !  <a href="javascript:history.back()">Zur&uuml;ck</a>');
+$rechte = new benutzerberechtigung();
+$rechte->getBerechtigungen($uid);
+
+if(!$rechte->isBerechtigt('wawi/inventar:begrenzt'))
+	die($rechte->errormsg);
 
 $inventarnummer=trim((isset($_REQUEST['inventarnummer']) ? $_REQUEST['inventarnummer']:''));
 $seriennummer=trim((isset($_REQUEST['seriennummer']) ? $_REQUEST['seriennummer']:''));
@@ -67,7 +72,7 @@ $default_status_vorhanden='vorhanden';
 
 $oBetriebsmittelstatus = new betriebsmittelstatus();
 $oBetriebsmittelstatus->result=array();
-	
+
 $resultBetriebsmittelstatus=$oBetriebsmittelstatus->result;
 
 $oBetriebsmittel = new betriebsmittel();
@@ -104,7 +109,7 @@ $format_right->setAlign('right');
 
 $spalte=0;
 $zeile=0;
-	
+
 if (is_null($resultBetriebsmittel) || !is_array($resultBetriebsmittel) || count($resultBetriebsmittel)<1)
 	return false;
 
@@ -132,6 +137,8 @@ $worksheet->write($zeile,++$spalte,'Anschaffungsdatum',$format_bold);
 $maxlength[$spalte]=17;
 $worksheet->write($zeile,++$spalte,'Anschaffungswert',$format_bold);
 $maxlength[$spalte]=16;
+$worksheet->write($zeile,++$spalte,'Status',$format_bold);
+$maxlength[$spalte]=16;
 $worksheet->write($zeile,++$spalte,'Person',$format_bold);
 $maxlength[$spalte]=20;
 
@@ -139,7 +146,7 @@ for ($pos=0;$pos<count($resultBetriebsmittel);$pos++)
 {
 	$zeile++;
 	$spalte=0;
-	// Pruefen ob OE vorhanden ist - ansonst suchen ob ein Benutzer vorhanden ist	
+	// Pruefen ob OE vorhanden ist - ansonst suchen ob ein Benutzer vorhanden ist
 	$resultBetriebsmittel[$pos]->oe_kurzbz=trim($resultBetriebsmittel[$pos]->oe_kurzbz);
 	if (empty($resultBetriebsmittel[$pos]->oe_kurzbz))
 	{
@@ -147,11 +154,11 @@ for ($pos=0;$pos<count($resultBetriebsmittel);$pos++)
 		$oBetriebsmittelOrganisationseinheit = new betriebsmittel();
 		if ($oBetriebsmittelOrganisationseinheit->load_betriebsmittel_oe($resultBetriebsmittel[$pos]->betriebsmittel_id))
 			$resultBetriebsmittel[$pos]->oe_kurzbz=$oBetriebsmittelOrganisationseinheit->oe_kurzbz;
-		else if ($oBetriebsmittelOrganisationseinheit->errormsg)	
+		else if ($oBetriebsmittelOrganisationseinheit->errormsg)
 			$resultBetriebsmittel[$pos]->oe_kurzbz=$oBetriebsmittelOrganisationseinheit->errormsg;
 	}
-	
-	
+
+
 	$oOrganisationseinheit = new organisationseinheit($resultBetriebsmittel[$pos]->oe_kurzbz);
 	//$oOrganisationseinheit->bezeichnung='';
 	// String - Daten Leerzeichen am Ende entfernen
@@ -163,7 +170,7 @@ for ($pos=0;$pos<count($resultBetriebsmittel);$pos++)
 	$resultBetriebsmittel[$pos]->firma_id=trim($resultBetriebsmittel[$pos]->firma_id);
 	$resultBetriebsmittel[$pos]->firmenname=trim($resultBetriebsmittel[$pos]->firmenname);
 
-	
+
 	InsertCell($zeile,$spalte,$resultBetriebsmittel[$pos]->inventarnummer);
 	InsertCell($zeile,++$spalte,mb_str_replace("\r\n"," ",$resultBetriebsmittel[$pos]->beschreibung));
 	InsertCell($zeile,++$spalte,mb_str_replace("\r\n"," ",$resultBetriebsmittel[$pos]->verwendung));
@@ -174,9 +181,10 @@ for ($pos=0;$pos<count($resultBetriebsmittel);$pos++)
 	InsertCell($zeile,++$spalte,$datum_obj->formatDatum($resultBetriebsmittel[$pos]->betriebsmittelstatus_datum,'d.m.Y'),$format_date);
 	InsertCell($zeile,++$spalte,$datum_obj->formatDatum($resultBetriebsmittel[$pos]->inventuramum,'d.m.Y'),$format_date);
 	InsertCell($zeile,++$spalte,$datum_obj->formatDatum($resultBetriebsmittel[$pos]->leasing_bis,'d.m.Y'),$format_date);
-			
+
 	InsertCell($zeile,++$spalte,$datum_obj->formatDatum($resultBetriebsmittel[$pos]->anschaffungsdatum,'d.m.Y'),$format_date);
 	InsertCell($zeile,++$spalte,$resultBetriebsmittel[$pos]->anschaffungswert, $format_number);
+	InsertCell($zeile,++$spalte,$resultBetriebsmittel[$pos]->betriebsmittelstatus_kurzbz);
 
 	$bmp = new betriebsmittelperson();
 	$bmp->load_betriebsmittelpersonen($resultBetriebsmittel[$pos]->betriebsmittel_id);
@@ -190,12 +198,12 @@ $maxlength[2]=30;
 foreach($maxlength as $i=>$breite)
 	$worksheet->setColumn(0, $i, $breite+2);
 $workbook->close();
-	
+
 
 function InsertCell($zeile, $spalte, $value, $format=null)
 {
 	global $maxlength, $worksheet;
-	
+
 	if(!is_null($format))
 	{
 		if($format=='string')
@@ -205,7 +213,7 @@ function InsertCell($zeile, $spalte, $value, $format=null)
 	}
 	else
 		$worksheet->write($zeile,$spalte,$value);
-	
+
 	if(mb_strlen($value)>$maxlength[$spalte])
 		$maxlength[$spalte]=mb_strlen($value);
 }
