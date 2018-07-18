@@ -87,7 +87,7 @@ class FiltersLib
 		$this->_ci =& get_instance(); // get code igniter instance
 
 		// Loads authentication helper
-		$this->_ci->load->helper('fhc_authentication'); // NOTE: needed to load custom filters do not remove!
+		$this->_ci->load->helper('hlp_authentication'); // NOTE: needed to load custom filters do not remove!
 
 		$this->_filterUniqueId = $this->_getFilterUniqueId($params); // sets the id for the related filter widget
 	}

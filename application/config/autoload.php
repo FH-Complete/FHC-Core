@@ -98,7 +98,7 @@ $autoload['helper'] = array('url', 'language');
 | config files.  Otherwise, leave it blank.
 |
 */
-$autoload['config'] = array('fhcomplete');
+$autoload['config'] = array();
 
 /*
 | -------------------------------------------------------------------

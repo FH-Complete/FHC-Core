@@ -14,6 +14,10 @@ $config['message_html_view_url'] = '/ViewMessage/toHTML/';
 $config['message_server'] = site_url();
 $config['assistent_function'] = 'ass';
 
+$config['message_redirect_url'] = array();
+$config['message_redirect_url']['fallback'] = site_url('ViewMessage/writeReply');
+// $config['message_redirect_url']['OE_ROOT'] = 'https://SERVER-NAME/addons/aufnahme/OE_ROOT/cis/index.php';
+
 define('EMAIL_KONTAKT_TYPE', 'email'); // Email kontakt type
 define('SENT_INFO_NEWLINE', '\n'); // tbl_msg_recipient->sentInfo separator
 

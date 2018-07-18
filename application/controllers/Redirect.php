@@ -58,7 +58,7 @@ class Redirect extends FHC_Controller
 				show_error('No organisation unit present in the message');
 			}
 
-			$addonAufnahmeUrls = $this->config->item('addons_aufnahme_url');
+			$addonAufnahmeUrls = $this->config->item('message_redirect_url');
 			if(!isset($addonAufnahmeUrls[$organisationRoot]))
 				$organisationRoot = 'fallback';
 
@@ -73,7 +73,7 @@ class Redirect extends FHC_Controller
 		}
 		else
 		{
-			$addonAufnahmeUrls = $this->config->item('addons_aufnahme_url');
+			$addonAufnahmeUrls = $this->config->item('message_redirect_url');
 			if (isset($token)
 				&& hasData($msg)
 				&& is_array($addonAufnahmeUrls)

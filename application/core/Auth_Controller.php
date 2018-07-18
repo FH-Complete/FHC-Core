@@ -12,7 +12,7 @@ class Auth_Controller extends FHC_Controller
         parent::__construct();
 
 		// Loads authentication helper
-		$this->load->helper('fhc_authentication');
+		$this->load->helper('hlp_authentication');
 
 		// Checks if the caller is allowed to access to this content
 		$this->_isAllowed($requiredPermissions);
