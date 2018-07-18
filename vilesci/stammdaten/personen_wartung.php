@@ -39,6 +39,7 @@ require_once ('../../include/mitarbeiter.class.php');
 require_once ('../../include/fotostatus.class.php');
 require_once ('../../include/kontakt.class.php');
 require_once ('../../include/dokument.class.php');
+require_once ('../../include/reihungstest.class.php');
 
 
 if (! $db = new basis_db())
@@ -217,7 +218,8 @@ if (isset($personToDelete) && isset($personToKeep) && $personToDelete >= 0 && $p
 					}
 					
 					// Bild in tbl_person auf 240x320 skalieren
-					$base64_src = resize($base64foto, 240, 320);
+					//$base64_src = resize($base64foto, 240, 320); Auskommentiert bis das auch im Echtsystem geht
+					$base64_src = $base64foto;
 					$sql_query_upd1 .= "UPDATE public.tbl_person SET foto=" . $db->db_add_param($base64_src) . " WHERE person_id=" . $db->db_add_param($personToKeep, FHC_INTEGER) . ";";
 				}
 	
@@ -257,6 +259,22 @@ if (isset($personToDelete) && isset($personToKeep) && $personToDelete >= 0 && $p
 					$zugangscode = $personToKeep_obj->zugangscode;
 				else
 					$zugangscode = $personToKeep_obj->zugangscode; 
+				
+				// Check ob rt_person-zuordnung schon vorhanden ist
+				// Wenn ja, wird der Eintrag der zu löschenden Person ebenfalls gelöscht
+				$reihungstest_person = new reihungstest();
+
+				if (!$reihungstest_person->getReihungstestPerson($personToKeep))
+					$sql_query_upd1 .= "UPDATE public.tbl_rt_person SET person_id=" . $db->db_add_param($personToKeep, FHC_INTEGER) . " WHERE person_id=" . $db->db_add_param($personToDelete, FHC_INTEGER) . ";";
+				else 
+				{
+					$sql_query_upd1 .= "DELETE FROM public.tbl_rt_person WHERE person_id=" . $db->db_add_param($personToDelete, FHC_INTEGER) . ";";
+					$reihungstest = new reihungstest($reihungstest_person->result[0]->reihungstest_id);
+					$msg_warning[] = "Das verbliebene Person ".$personToKeep." hat schon eine Reihungstestzuordnung 
+										zu Reihungstest ID".$reihungstest->reihungstest_id." am ".$reihungstest->datum." 
+										für das ".$reihungstest->studiensemester_kurzbz." im Studiengang ".$reihungstest->studiengang_kz." (Studienplan ".$reihungstest_person->result[0]->studienplan_id.")<br>
+										Die Reihungstestzuordnung von ".$personToDelete." wurde gelöscht";
+				}
 					
 				$sql_query_upd1 .= "UPDATE addon.tbl_kompetenz SET person_id=" . $db->db_add_param($personToKeep, FHC_INTEGER) . " WHERE person_id=" . $db->db_add_param($personToDelete, FHC_INTEGER) . ";";
 				$sql_query_upd1 .= "UPDATE lehre.tbl_abschlusspruefung SET pruefer1=" . $db->db_add_param($personToKeep, FHC_INTEGER) . " WHERE pruefer1=" . $db->db_add_param($personToDelete, FHC_INTEGER) . ";";
@@ -281,7 +299,6 @@ if (isset($personToDelete) && isset($personToKeep) && $personToDelete >= 0 && $p
 				$sql_query_upd1 .= "UPDATE public.tbl_preincoming SET person_id_emergency=" . $db->db_add_param($personToKeep, FHC_INTEGER) . " WHERE person_id_emergency=" . $db->db_add_param($personToDelete, FHC_INTEGER) . ";";
 				$sql_query_upd1 .= "UPDATE public.tbl_preinteressent SET person_id=" . $db->db_add_param($personToKeep, FHC_INTEGER) . " WHERE person_id=" . $db->db_add_param($personToDelete, FHC_INTEGER) . ";";
 				$sql_query_upd1 .= "UPDATE public.tbl_prestudent SET person_id=" . $db->db_add_param($personToKeep, FHC_INTEGER) . " WHERE person_id=" . $db->db_add_param($personToDelete, FHC_INTEGER) . ";";
-				$sql_query_upd1 .= "UPDATE public.tbl_rt_person SET person_id=" . $db->db_add_param($personToKeep, FHC_INTEGER) . " WHERE person_id=" . $db->db_add_param($personToDelete, FHC_INTEGER) . ";";
 				$sql_query_upd1 .= "UPDATE system.tbl_filters SET person_id=" . $db->db_add_param($personToKeep, FHC_INTEGER) . " WHERE person_id=" . $db->db_add_param($personToDelete, FHC_INTEGER) . ";";
 				$sql_query_upd1 .= "UPDATE system.tbl_log SET person_id=" . $db->db_add_param($personToKeep, FHC_INTEGER) . " WHERE person_id=" . $db->db_add_param($personToDelete, FHC_INTEGER) . ";";
 				$sql_query_upd1 .= "UPDATE system.tbl_person_lock SET person_id=" . $db->db_add_param($personToKeep, FHC_INTEGER) . " WHERE person_id=" . $db->db_add_param($personToDelete, FHC_INTEGER) . ";";
