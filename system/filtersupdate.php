@@ -34,6 +34,7 @@ $filters = array(
 					{"name": "Nachname"},
 					{"name": "Nation"},
 					{"name": "StgAbgeschickt"},
+					{"name": "Studiensemester"},
 					{"name": "LastAction"},
 					{"name": "User/Operator"},
 					{"name": "LockUser"}
@@ -65,6 +66,7 @@ $filters = array(
 					{"name": "Nachname"},
 					{"name": "Nation"},
 					{"name": "StgAbgeschickt"},
+					{"name": "Studiensemester"},
 					{"name": "LastAction"},
 					{"name": "User/Operator"},
 					{"name": "LockUser"}
@@ -177,6 +179,7 @@ $filters = array(
 					{"name": "Nachname"},
 					{"name": "Nation"},
 					{"name": "StgAbgeschickt"},
+					{"name": "Studiensemester"},
 					{"name": "LastAction"},
 					{"name": "User/Operator"},
 					{"name": "LockUser"}
