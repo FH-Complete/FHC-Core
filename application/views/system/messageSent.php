@@ -67,10 +67,10 @@ $this->load->view(
 									<br>
 									<div class="row">
 										<div class="col-xs-6 text-right">
-											Ihr InfoCenter@FHTW Team
+											Your InfoCenter@FHTW Team
 										</div>
 										<div class="col-xs-6">
-											Your InfoCenter@FHTW Team
+											Ihr InfoCenter@FHTW Team											
 										</div>
 									</div>
 									<br>
