@@ -8,7 +8,7 @@ if (! defined('BASEPATH'))
  *
  */
 
-class Prestudentstatus extends Auth_Controller
+class Prestudentstatus extends FHC_Controller
 {
 	/**
 	 * Initialize Prestudentstatus Class
