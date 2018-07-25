@@ -76,7 +76,8 @@ $ts_beginn=mktime(0,0,0,substr($datum_beginn,5,2),substr($datum_beginn,8,2),subs
 $ts_ende=mktime(0,0,0,substr($datum_ende,5,2),substr($datum_ende,8,2),substr($datum_ende,0,4));
 
 $wochen=round(($ts_ende-$ts_beginn)/(60*60*24*7));
-
+if ($wochen == 0)
+	$wochen = 1;
 //Stundenplandaten holen
 $sql_query="SELECT DISTINCT datum,stunde,ort_kurzbz, EXTRACT(DOW FROM datum) AS tag, max_person
 			FROM lehre.".$stundenplantable." JOIN public.tbl_ort USING (ort_kurzbz)
