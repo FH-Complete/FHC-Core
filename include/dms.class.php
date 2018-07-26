@@ -34,8 +34,8 @@ class dms extends basis_db
 	public $oe_kurzbz;
 	public $dokument_kurzbz;
 	public $kategorie_kurzbz;
-	public $parent_kategorie_kurzbz; 
-	public $gruppe_kurzbz; 
+	public $parent_kategorie_kurzbz;
+	public $gruppe_kurzbz;
 	public $filename;
 	public $mimetype;
 	public $name;
@@ -51,13 +51,13 @@ class dms extends basis_db
 	public $kategorie_oe_kurzbz;
 	public $berechtigung_kurzbz;
 	public $bezeichnung;
-	
+
 	/**
 	 * Konstruktor
 	 */
 	public function __construct()
 	{
-		parent::__construct();		
+		parent::__construct();
 	}
 
 	/**
@@ -71,12 +71,12 @@ class dms extends basis_db
 		$qry = "SELECT tbl_dms.dms_id, *
 				  FROM campus.tbl_dms JOIN campus.tbl_dms_version USING(dms_id)
 				 WHERE dms_id = " . $this->db_add_param($dms_id, FHC_INTEGER);
-		
+
 		if (!is_null($version))
 			$qry .= " AND version=".$this->db_add_param($version, FHC_INTEGER);
-			
+
 		$qry .= " ORDER BY version DESC LIMIT 1;";
-		
+
 		if ($result = $this->db_query($qry))
 		{
 			if ($row = $this->db_fetch_object($result))
@@ -97,7 +97,7 @@ class dms extends basis_db
 				$this->updatevon = $row->updatevon;
 				$this->cis_suche = $this->db_parse_bool($row->cis_suche);
 				$this->schlagworte = $row->schlagworte;
-				
+
 				return true;
 			}
 			else
@@ -112,7 +112,7 @@ class dms extends basis_db
 			return false;
 		}
 	}
-	
+
 	/**
 	 * Speichert einen DMS Eintrag
 	 * @param $new
@@ -121,16 +121,16 @@ class dms extends basis_db
 	{
 		if(is_null($new))
 			$new = $this->new;
-			
+
 		if($new)
 		{
 			$qry = "BEGIN;";
-			
+
 			if($this->dms_id=='')
 			{
 				$dms_id="currval('campus.seq_dms_dms_id')";
-				
-				$qry.="INSERT INTO campus.tbl_dms(oe_kurzbz, dokument_kurzbz, kategorie_kurzbz) 
+
+				$qry.="INSERT INTO campus.tbl_dms(oe_kurzbz, dokument_kurzbz, kategorie_kurzbz)
 						VALUES(".
 					$this->db_add_param($this->oe_kurzbz).','.
 					$this->db_add_param($this->dokument_kurzbz).','.
@@ -145,9 +145,9 @@ class dms extends basis_db
 				}
 				$dms_id=$this->dms_id;
 			}
-								
-			$qry.="INSERT INTO campus.tbl_dms_version(dms_id, version,  
-						filename, mimetype, name, beschreibung, letzterzugriff, insertamum, insertvon, 
+
+			$qry.="INSERT INTO campus.tbl_dms_version(dms_id, version,
+						filename, mimetype, name, beschreibung, letzterzugriff, insertamum, insertvon,
 						updateamum, updatevon, cis_suche, schlagworte) VALUES(".
 					$dms_id.','.
 					$this->db_add_param($this->version, FHC_INTEGER).','.
@@ -168,7 +168,7 @@ class dms extends basis_db
 			$qry = "UPDATE campus.tbl_dms SET".
 						" oe_kurzbz=".$this->db_add_param($this->oe_kurzbz).",".
 						" dokument_kurzbz=".$this->db_add_param($this->dokument_kurzbz).",".
-						" kategorie_kurzbz=".$this->db_add_param($this->kategorie_kurzbz)." ". 
+						" kategorie_kurzbz=".$this->db_add_param($this->kategorie_kurzbz)." ".
 					"WHERE dms_id=".$this->db_add_param($this->dms_id, FHC_INTEGER).";".
 					"UPDATE campus.tbl_dms_version SET".
 						" filename=".$this->db_add_param($this->filename).",".
@@ -182,7 +182,7 @@ class dms extends basis_db
 						" schlagworte=".$this->db_add_param($this->schlagworte).
 						" WHERE dms_id=".$this->db_add_param($this->dms_id,FHC_INTEGER)." AND version=".$this->db_add_param($this->version, FHC_INTEGER).";";
 		}
-		
+
 		if($this->db_query($qry))
 		{
 			if($new)
@@ -222,11 +222,11 @@ class dms extends basis_db
 				return true;
 		}
 	}
-	
+
 	/**
 	 * Löscht einen DMS Eintrag mit übergebener ID und Version
 	 * Wird die letzte Version eines Eintrages gelöscht, wird automatisch der Eintrag mitgelöscht
-	 * 
+	 *
 	 * @param $dms_id
 	 * @param $version
 	 */
@@ -234,9 +234,9 @@ class dms extends basis_db
 	{
 		$dms = new dms();
 		$dms->load($dms_id, $version);
-		
+
 		$qry = "DELETE FROM campus.tbl_dms_version WHERE dms_id = " . $this->db_add_param($dms_id, FHC_INTEGER) . " and version =" . $this->db_add_param($version, FHC_INTEGER) . ';';
-		
+
 		if ($this->db_query($qry))
 		{
 			$qry_anzahl = "SELECT 1 FROM campus.tbl_dms_version WHERE dms_id =" . $this->db_add_param($dms_id, FHC_INTEGER) . ';';
@@ -248,7 +248,7 @@ class dms extends basis_db
 					$this->errormsg = "Fehler beim Löschen des Dokuments aufgetreten";
 					return false;
 				}
-				
+
 				// Wenn letzte Version gelöscht wurde -> lösche gesamten Eintrag
 				if ($this->db_num_rows($result) == 0)
 				{
@@ -269,10 +269,10 @@ class dms extends basis_db
 		}
 		return true;
 	}
-	
+
 	/**
 	 * Löscht einen gesamten DMS Eintrag inklusive aller Versionen und Projekteinträge
-	 * 
+	 *
 	 * @param $dms_id
 	 */
 	public function deleteDms($dms_id)
@@ -280,7 +280,7 @@ class dms extends basis_db
 		$this->load($dms_id);
 		$this->getAllVersions($dms_id);
 		$error = false;
-		
+
 		// lösche Versionen
 		$qry = "BEGIN;DELETE FROM campus.tbl_dms_version WHERE dms_id =" . $this->db_add_param($dms_id, FHC_INTEGER) . "; ";
 		$qry .= "DELETE FROM fue.tbl_projekt_dokument WHERE dms_id=" . $this->db_add_param($dms_id, FHC_INTEGER) . "; ";
@@ -288,14 +288,14 @@ class dms extends basis_db
 		if ($this->db_query($qry))
 		{
 			$this->db_query('COMMIT;');
-			
+
 			// Alle Versionen der Datei im Filesystem löschen
 			foreach ($this->result as $obj)
 			{
 				if (is_file(DMS_PATH . $obj->filename) && ! unlink(DMS_PATH . $obj->filename))
 					$error = true;
 			}
-			
+
 			if ($error)
 			{
 				$this->errormsg = "Fehler beim Löschen des Dokuments aufgetreten";
@@ -316,26 +316,26 @@ class dms extends basis_db
 
 	/**
 	 * Setzt die Zeit des letzten Zugriffs auf die Datei
-	 * 
+	 *
 	 * @param $dms_id
 	 * @param $version
 	 */
 	public function touch($dms_id, $version)
 	{
-		$qry ="UPDATE campus.tbl_dms_version SET letzterzugriff=now() 
+		$qry ="UPDATE campus.tbl_dms_version SET letzterzugriff=now()
 			WHERE dms_id=".$this->db_add_param($dms_id, FHC_INTEGER)." AND version=".$this->db_add_param($version, FHC_INTEGER).";";
-		
+
 		if($this->db_query($qry))
 			return true;
 		else
 		{
 			$this->errormsg='Fehler beim Aktualisieren der Zugriffszeit';
 			return false;
-		}		
+		}
 	}
 
 	/**
-	 * 
+	 *
 	 * Löscht die Kategorie und daran hängende Gruppen der übergebenen kurzbz
 	 * Überprüft ob noch dms Einträge an zu löschender Kategorie hängen
 	 * @param $kategorie_kurzbz
@@ -343,13 +343,13 @@ class dms extends basis_db
 	public function deleteKategorie($kategorie_kurzbz)
 	{
 		$qry_anzahl = "SELECT * FROM campus.tbl_dms WHERE kategorie_kurzbz=".$this->db_add_param($kategorie_kurzbz).';';
-		
+
 		if($result = $this->db_query($qry_anzahl))
 		{
-			// löschen nur möglich wenn keine DMS-Einträge mehr auf Kategorie hängen 
+			// löschen nur möglich wenn keine DMS-Einträge mehr auf Kategorie hängen
 			if($this->db_num_rows($result) == 0 )
 			{
-				$qry ="BEGIN; DELETE FROM campus.tbl_dms_kategorie_gruppe where kategorie_kurzbz =".$this->db_add_param($kategorie_kurzbz, FHC_STRING)."; 
+				$qry ="BEGIN; DELETE FROM campus.tbl_dms_kategorie_gruppe where kategorie_kurzbz =".$this->db_add_param($kategorie_kurzbz, FHC_STRING).";
 					DELETE FROM campus.tbl_dms_kategorie WHERE kategorie_kurzbz =".$this->db_add_param($kategorie_kurzbz, FHC_STRING).';';
 				if($this->db_query($qry))
 				{
@@ -366,44 +366,44 @@ class dms extends basis_db
 			else
 			{
 				$this->errormsg = "Löschen Fehlgeschlagen! Es hängen noch DMS Einträge an dieser Kategorie";
-				return false; 
+				return false;
 			}
 		}
-		$this->errormsg ="Fehler beim Löschen der Daten"; 
-		return false; 
+		$this->errormsg ="Fehler beim Löschen der Daten";
+		return false;
 	}
-	
+
 	/**
-	 * 
+	 *
 	 * Lädt alle Gruppen der übergebenen Kategorie
 	 * @param $kategorie_kurzbz
 	 */
 	public function loadGruppenForKategorie($kategorie_kurzbz)
 	{
-		$qry = "SELECT 
+		$qry = "SELECT
 					campus.tbl_dms_kategorie_gruppe.kategorie_kurzbz,
 					campus.tbl_dms_kategorie_gruppe.insertamum,
 					campus.tbl_dms_kategorie_gruppe.insertvon,
 					campus.tbl_dms_kategorie_gruppe.gruppe_kurzbz,
 					public.tbl_gruppe.bezeichnung
-				FROM 
+				FROM
 					campus.tbl_dms_kategorie_gruppe
 					JOIN public.tbl_gruppe USING(gruppe_kurzbz)
 				WHERE
-					kategorie_kurzbz=".$this->db_add_param($kategorie_kurzbz)." 
+					kategorie_kurzbz=".$this->db_add_param($kategorie_kurzbz)."
 				ORDER BY gruppe_kurzbz;";
-		
+
 		if($result = $this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object($result))
 			{
 				$obj = new dms();
-				
+
 				$obj->gruppe_kurzbz = $row->gruppe_kurzbz;
 				$obj->insertamum = $row->insertamum;
 				$obj->insertvon = $row->insertvon;
 				$obj->bezeichnung = $row->bezeichnung;
-				
+
 				$this->result[] = $obj;
 			}
 			return true;
@@ -414,8 +414,8 @@ class dms extends basis_db
 			return false;
 		}
 	}
-	
-	
+
+
 	/**
 	 * Speichert den aktuellen Datensatz in die Datenbank
 	 * Wenn $neu auf true gesetzt ist wird ein neuer Datensatz angelegt
@@ -424,7 +424,7 @@ class dms extends basis_db
 	 */
 	public function saveGruppeKategorie()
 	{
-		
+
 		if($this->isGruppeZugeteilt($this->kategorie_kurzbz, $this->gruppe_kurzbz))
 		{
 			$this->errormsg = 'Diese Gruppe ist bereits zugeordnet';
@@ -437,32 +437,32 @@ class dms extends basis_db
 			      $this->db_add_param($this->gruppe_kurzbz).', '.
 			      $this->db_add_param($this->insertamum).', '.
 			      $this->db_add_param($this->insertvon).');';
-		
+
 		if(!$this->db_query($qry))
 		{
 			$this->errormsg = 'Fehler beim Zuordner der Gruppe';
 			return false;
 		}
-		return true; 
+		return true;
 
 	}
-	
+
 	public function deleteGruppe($kategorie_kurzbz, $gruppe_kurzbz)
 	{
 		$qry = "DELETE FROM campus.tbl_dms_kategorie_gruppe where kategorie_kurzbz =".$this->db_add_param($kategorie_kurzbz)." AND gruppe_kurzbz =".$this->db_add_param($gruppe_kurzbz).';';
-		
+
 		if(!$this->db_query($qry))
 		{
 			$this->errormsg ="Löschen der Gruppe fehlgeschlagen";
-			return false; 
+			return false;
 		}
-		return true; 
+		return true;
 	}
-	
-	
+
+
 	/**
 	 * Prueft ob eine Gruppenzuteilung vorhanden ist
-	 * 
+	 *
 	 * @param kategorie_kurzbz
 	 * @param $gruppe_kurzbz
 	 * @return boolean
@@ -470,7 +470,7 @@ class dms extends basis_db
 	public function isGruppeZugeteilt($kategorie_kurzbz, $gruppe_kurzbz)
 	{
 		$qry = "SELECT 1 FROM campus.tbl_dms_kategorie_gruppe WHERE kategorie_kurzbz=".$this->db_add_param($kategorie_kurzbz)." AND gruppe_kurzbz=".$this->db_add_param($gruppe_kurzbz).';';
-		
+
 		if($result = $this->db_query($qry))
 		{
 			if($this->db_num_rows($result)>0)
@@ -484,8 +484,8 @@ class dms extends basis_db
 			return false;
 		}
 	}
-	
-	
+
+
 	/**
 	 * Speichert den aktuellen Datensatz in die Datenbank
 	 * Wenn $neu auf true gesetzt ist wird ein neuer Datensatz angelegt
@@ -521,25 +521,25 @@ class dms extends basis_db
 				' berechtigung_kurzbz='.$this->db_add_param($this->berechtigung_kurzbz).' '.
 		      	'WHERE kategorie_kurzbz='.$this->db_add_param($this->kategorie_kurzbz_old).';';
 		}
-		
+
 		if(!$this->db_query($qry))
 		{
 			$this->errormsg = 'Fehler beim Speichern der Kategorie';
 			return false;
 		}
-		return true; 
+		return true;
 
 	}
-	
+
 	/**
-	 * 
+	 *
 	 * Laedt Kategorie anhand von kurzbz
 	 * @param $kategorie_kurzbz
 	 */
 	public function loadKategorie($kategorie_kurzbz)
 	{
 		$qry = "SELECT * FROM campus.tbl_dms_kategorie WHERE kategorie_kurzbz = ".$this->db_add_param($kategorie_kurzbz).";";
-		
+
 		if($result = $this->db_query($qry))
 		{
 			// wenn es keine kategorie gibt -> gib false zurück
@@ -547,15 +547,15 @@ class dms extends basis_db
 			{
 				if($row = $this->db_fetch_object($result))
 				{
-					$this->kategorie_kurzbz = $row->kategorie_kurzbz; 
-					$this->bezeichnung = $row->bezeichnung; 
-					$this->beschreibung = $row->beschreibung; 
-					$this->parent_kategorie_kurzbz = $row->parent_kategorie_kurzbz; 
+					$this->kategorie_kurzbz = $row->kategorie_kurzbz;
+					$this->bezeichnung = $row->bezeichnung;
+					$this->beschreibung = $row->beschreibung;
+					$this->parent_kategorie_kurzbz = $row->parent_kategorie_kurzbz;
 					$this->kategorie_kurzbz_old = $row->kategorie_kurzbz;
 					$this->kategorie_oe_kurzbz = $row->oe_kurzbz;
 					$this->berechtigung_kurzbz = $row->berechtigung_kurzbz;
 				}
-				return true; 
+				return true;
 			}
 			else
 				return false;
@@ -566,34 +566,34 @@ class dms extends basis_db
 			return false;
 		}
 	}
-	
+
 	/**
-	 * 
+	 *
 	 * Liefert alle Kategorien zurück
 	 */
 	public function getAllKategories()
 	{
 		$qry ="SELECT * FROM campus.tbl_dms_kategorie ORDER BY bezeichnung;";
-		
+
 		if($result = $this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object($result))
 			{
-				$obj = new dms(); 
-				$obj->kategorie_kurzbz = $row->kategorie_kurzbz; 
-				$obj->bezeichnung = $row->bezeichnung; 
-				$obj->beschreibung = $row->beschreibung; 
-				$obj->parent_kategorie_kurzbz = $row->parent_kategorie_kurzbz; 
+				$obj = new dms();
+				$obj->kategorie_kurzbz = $row->kategorie_kurzbz;
+				$obj->bezeichnung = $row->bezeichnung;
+				$obj->beschreibung = $row->beschreibung;
+				$obj->parent_kategorie_kurzbz = $row->parent_kategorie_kurzbz;
 				$obj->kategorie_oe_kurzbz = $row->oe_kurzbz;
 				$obj->berechtigung_kurzbz = $row->berechtigung_kurzbz;
-				
-				$this->result[]= $obj; 
+
+				$this->result[]= $obj;
 			}
 		}
 		else
-			return false; 
+			return false;
 	}
-	
+
 	/**
 	 * Laedt die Kategorien
 	 * @param string $parent_kategorie_kurzbz Wenn die Parent Kategorie übergeben wird, werden nur die direkten Unterkategorien geladen
@@ -602,25 +602,25 @@ class dms extends basis_db
 	public function getKategorie($parent_kategorie_kurzbz='')
 	{
 		$qry = "SELECT * FROM campus.tbl_dms_kategorie WHERE ";
-		
+
 		if($parent_kategorie_kurzbz!='')
 			$qry.=" parent_kategorie_kurzbz=".$this->db_add_param($parent_kategorie_kurzbz);
 		else
 			$qry.=" parent_kategorie_kurzbz is null";
 		$qry.=" ORDER BY bezeichnung;";
-		
+
 		if($result = $this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object($result))
 			{
 				$obj = new dms();
-				
+
 				$obj->kategorie_kurzbz = $row->kategorie_kurzbz;
 				$obj->bezeichnung = $row->bezeichnung;
 				$obj->beschreibung = $row->beschreibung;
 				$obj->kategorie_oe_kurzbz = $row->oe_kurzbz;
 				$obj->berechtigung_kurzbz = $row->berechtigung_kurzbz;
-				
+
 				$this->result[] = $obj;
 			}
 			return true;
@@ -631,7 +631,7 @@ class dms extends basis_db
 			return false;
 		}
 	}
-	
+
 	/**
 	 * Laedt die Dokumente einer Kategorie
 	 *
@@ -647,31 +647,31 @@ class dms extends basis_db
 				$limit = '';
 				$offset = '';
 			}
-			else 
+			else
 			{
 				$limit = 'LIMIT '.$dpp;
 				$offset = ' OFFSET '.($page-1)*$dpp;
 			}
 		}
-		$qry = "SELECT * FROM campus.tbl_dms JOIN campus.tbl_dms_version USING(dms_id) 
+		$qry = "SELECT * FROM campus.tbl_dms JOIN campus.tbl_dms_version USING(dms_id)
 				WHERE (dms_id, version) in(
 					SELECT dms_id, max(version)
-					FROM campus.tbl_dms_version 
+					FROM campus.tbl_dms_version
 					GROUP BY dms_id)
 				AND kategorie_kurzbz=".$this->db_add_param($kategorie_kurzbz)."
 				ORDER BY name ";
 		if (isset($limit)) $qry .= $limit;
 		if (isset($offset)) $qry .= $offset;
 		$qry .= ";";
-		
+
 		if($result = $this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object($result))
 			{
 				$obj = new dms();
-				
+
 				$obj->dms_id = $row->dms_id;
-				$obj->version = $row->version; 
+				$obj->version = $row->version;
 				$obj->oe_kurzbz = $row->oe_kurzbz;
 				$obj->dokument_kurzbz = $row->dokument_kurzbz;
 				$obj->kategorie_kurzbz = $row->kategorie_kurzbz;
@@ -685,7 +685,7 @@ class dms extends basis_db
 				$obj->updateamum = $row->updateamum;
 				$obj->cis_suche = $this->db_parse_bool($row->cis_suche);
 				$obj->schlagworte = $row->schlagworte;
-				
+
 				$this->result[] = $obj;
 			}
 		}
@@ -695,7 +695,7 @@ class dms extends basis_db
 			return false;
 		}
 	}
-	
+
 	/**
 	 * Zählt die Anzahl an Dokumenten in einer Kategorie
 	 *
@@ -704,15 +704,15 @@ class dms extends basis_db
 	public function countDocumentsKategorie($kategorie_kurzbz)
 	{
 		$qry = "SELECT count(*) as anzahl FROM campus.tbl_dms WHERE kategorie_kurzbz=".$this->db_add_param($kategorie_kurzbz).";";
-		
+
 		if($result = $this->db_query($qry))
 		{
 			if($row = $this->db_fetch_object($result))
 			{
-				return $row->anzahl; 
+				return $row->anzahl;
 			}
 			else
-				return false; 
+				return false;
 		}
 		else
 		{
@@ -720,7 +720,7 @@ class dms extends basis_db
 			return false;
 		}
 	}
-	
+
 	/**
 	 * Sucht nach Dokumenten
 	 *
@@ -741,8 +741,8 @@ class dms extends basis_db
 				$offset = ' OFFSET '.($page-1)*$dpp;
 			}
 		}
-		
-		$qry = "SELECT tbl_dms.*, tbl_dms_version.*, tbl_dms_kategorie.berechtigung_kurzbz FROM campus.tbl_dms 
+
+		$qry = "SELECT tbl_dms.*, tbl_dms_version.*, tbl_dms_kategorie.berechtigung_kurzbz FROM campus.tbl_dms
 				JOIN campus.tbl_dms_version USING(dms_id)
 				JOIN campus.tbl_dms_kategorie USING (kategorie_kurzbz)";
 		// Wenn erstes Zeichen # ist, dieses wegkürzen und checken ob der Rest numerisch ist. Dann nach eindeutiger ID suchen
@@ -752,7 +752,7 @@ class dms extends basis_db
 			if (is_numeric($suchstring))
 				$qry .= " WHERE tbl_dms.dms_id = ".$this->db_add_param($suchstring, FHC_INTEGER);
 		}
-		else 
+		else
 		{
 			$qry .= " 	WHERE lower(name) like lower('%".$this->db_escape($suchstring)."%')
 						OR lower(tbl_dms_version.beschreibung) like lower('%".$this->db_escape($suchstring)."%')
@@ -764,17 +764,17 @@ class dms extends basis_db
 
 		if (isset($limit)) $qry .= $limit;
 		if (isset($offset)) $qry .= $offset;
-		
+
 		$qry.=";";
-		
+
 		if($result = $this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object($result))
 			{
 				$obj = new dms();
-				
+
 				$obj->dms_id = $row->dms_id;
-				$obj->version = $row->version; 
+				$obj->version = $row->version;
 				$obj->oe_kurzbz = $row->oe_kurzbz;
 				$obj->dokument_kurzbz = $row->dokument_kurzbz;
 				$obj->kategorie_kurzbz = $row->kategorie_kurzbz;
@@ -789,7 +789,7 @@ class dms extends basis_db
 				$obj->cis_suche = $this->db_parse_bool($row->cis_suche);
 				$obj->schlagworte = $row->schlagworte;
 				$obj->berechtigung_kurzbz = $row->berechtigung_kurzbz;
-				
+
 				$this->result[] = $obj;
 			}
 		}
@@ -799,7 +799,7 @@ class dms extends basis_db
 			return false;
 		}
 	}
-	
+
 	/**
 	 * Sucht nach Dokumenten (Spalte schlagworte) mit der aktuellsten Version, bei denen cis_suche true ist
 	 * Optional kann die Anzahl an Suchergebnissen übergeben werden.
@@ -814,19 +814,19 @@ class dms extends basis_db
 				foreach($suchstring as $value)
 				$qry.=" AND (lower(schlagworte::text) like lower('%".$this->db_escape($value)."%')
 						OR lower (schlagworte::text) like lower ('%".$this->db_escape(htmlentities($value,ENT_NOQUOTES,'UTF-8'))."%'))";
-			$qry.= "AND version=(SELECT MAX(version) FROM campus.tbl_dms_version where dms_id=tbl_dms.dms_id)";			
-			
+			$qry.= "AND version=(SELECT MAX(version) FROM campus.tbl_dms_version where dms_id=tbl_dms.dms_id)";
+
 		if(!is_null($limit) && is_numeric($limit))
 			$qry.=" LIMIT ".$limit;
-			
+
 		if($result = $this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object($result))
 			{
 				$obj = new dms();
-				
+
 				$obj->dms_id = $row->dms_id;
-				$obj->version = $row->version; 
+				$obj->version = $row->version;
 				$obj->oe_kurzbz = $row->oe_kurzbz;
 				$obj->dokument_kurzbz = $row->dokument_kurzbz;
 				$obj->kategorie_kurzbz = $row->kategorie_kurzbz;
@@ -840,7 +840,7 @@ class dms extends basis_db
 				$obj->updateamum = $row->updateamum;
 				$obj->cis_suche = $this->db_parse_bool($row->cis_suche);
 				$obj->schlagworte = $row->schlagworte;
-				
+
 				$this->result[] = $obj;
 			}
 		}
@@ -850,9 +850,9 @@ class dms extends basis_db
 			return false;
 		}
 	}
-	
+
 	/**
-	 * 
+	 *
 	 * lädt alle Versionen zu einer übergebenen ID
 	 * @param integer $id ID der zu ladenden Dokumente
 	 */
@@ -860,19 +860,19 @@ class dms extends basis_db
 	{
 		if(!is_numeric($dms_id))
 		{
-			$this->errormsg = "Falsche Dokument ID"; 
-			return false; 
+			$this->errormsg = "Falsche Dokument ID";
+			return false;
 		}
-		
+
 		$qry =	"SELECT * FROM campus.tbl_dms JOIN campus.tbl_dms_version USING(dms_id)
-				 WHERE dms_id = ".$this->db_add_param($dms_id, FHC_INTEGER)." ORDER BY version ASC;";	
-		
+				 WHERE dms_id = ".$this->db_add_param($dms_id, FHC_INTEGER)." ORDER BY version ASC;";
+
 		if($result = $this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object($result))
 			{
 				$obj = new dms();
-				
+
 				$obj->dms_id = $row->dms_id;
 				$obj->oe_kurzbz = $row->oe_kurzbz;
 				$obj->dokument_kurzbz = $row->dokument_kurzbz;
@@ -885,10 +885,10 @@ class dms extends basis_db
 				$obj->insertamum = $row->insertamum;
 				$obj->insertvon = $row->insertvon;
 				$obj->updateamum = $row->updateamum;
-				$obj->version = $row->version; 
+				$obj->version = $row->version;
 				$obj->cis_suche = $this->db_parse_bool($row->cis_suche);
 				$obj->schlagworte = $row->schlagworte;
-				
+
 				$this->result[] = $obj;
 			}
 		}
@@ -898,9 +898,9 @@ class dms extends basis_db
 			return false;
 		}
 	}
-	
+
 	/**
-	 * 
+	 *
 	 * Überprüft ob die übergebene Version die aktuellste ist
 	 * @param $dms_id
 	 * @param $version
@@ -908,7 +908,7 @@ class dms extends basis_db
 	public function checkVersion($dms_id, $version)
 	{
 		$qry = "SELECT * FROM campus.tbl_dms_version
-		WHERE dms_id = ".$this->db_add_param($dms_id, FHC_INTEGER)." and 
+		WHERE dms_id = ".$this->db_add_param($dms_id, FHC_INTEGER)." and
 		version > ".$this->db_add_param($version, FHC_INTEGER).";";
 
 		if($result = $this->db_query($qry))
@@ -918,13 +918,13 @@ class dms extends basis_db
 			else
 				return false;
 		}
-		else 
+		else
 		{
-			$this->errormsg = "Fehler bei der Abfrage aufgetreten"; 
-			return false; 
+			$this->errormsg = "Fehler bei der Abfrage aufgetreten";
+			return false;
 		}
 	}
-	
+
 	/**
 	 * Laedt die Dokumente eines Projekts
 	 *
@@ -932,27 +932,27 @@ class dms extends basis_db
 	 */
 	public function getDokumenteProjekt($projekt_kurzbz)
 	{
-		$qry = "SELECT 
-					* 
-				FROM 
-					campus.tbl_dms 
+		$qry = "SELECT
+					*
+				FROM
+					campus.tbl_dms
 					JOIN campus.tbl_dms_version USING(dms_id)
-					JOIN fue.tbl_projekt_dokument USING(dms_id) 
+					JOIN fue.tbl_projekt_dokument USING(dms_id)
 				WHERE (dms_id, version) in(
 					SELECT dms_id, max(version)
-					FROM campus.tbl_dms_version 
+					FROM campus.tbl_dms_version
 					GROUP BY dms_id)
 				AND tbl_projekt_dokument.projekt_kurzbz=".$this->db_add_param($projekt_kurzbz)."
 				ORDER BY name;";
-		
+
 		if($result = $this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object($result))
 			{
 				$obj = new dms();
-				
+
 				$obj->dms_id = $row->dms_id;
-				$obj->version = $row->version; 
+				$obj->version = $row->version;
 				$obj->oe_kurzbz = $row->oe_kurzbz;
 				$obj->dokument_kurzbz = $row->dokument_kurzbz;
 				$obj->kategorie_kurzbz = $row->kategorie_kurzbz;
@@ -966,7 +966,7 @@ class dms extends basis_db
 				$obj->updateamum = $row->updateamum;
 				$obj->cis_suche = $this->db_parse_bool($row->cis_suche);
 				$obj->schlagworte = $row->schlagworte;
-				
+
 				$this->result[] = $obj;
 			}
 		}
@@ -976,34 +976,34 @@ class dms extends basis_db
 			return false;
 		}
 	}
-    
+
     /**
      * Gibt die Dokumente einer Notiz zurück
      * @param int $notiz_id
      * @return boolean
      */
-    public function getDokumenteNotiz($notiz_id) 
+    public function getDokumenteNotiz($notiz_id)
     {
-        $qry = "SELECT * 
-				FROM 
-					campus.tbl_dms 
+        $qry = "SELECT *
+				FROM
+					campus.tbl_dms
 					JOIN campus.tbl_dms_version USING(dms_id)
-					JOIN public.tbl_notiz_dokument USING(dms_id) 
+					JOIN public.tbl_notiz_dokument USING(dms_id)
 				WHERE (dms_id, version) in(
 					SELECT dms_id, max(version)
-					FROM campus.tbl_dms_version 
+					FROM campus.tbl_dms_version
 					GROUP BY dms_id)
 				AND tbl_notiz_dokument.notiz_id=".$this->db_add_param($notiz_id)."
 				ORDER BY name;";
-		
+
 		if($result = $this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object($result))
 			{
 				$obj = new dms();
-				
+
 				$obj->dms_id = $row->dms_id;
-				$obj->version = $row->version; 
+				$obj->version = $row->version;
 				$obj->oe_kurzbz = $row->oe_kurzbz;
 				$obj->dokument_kurzbz = $row->dokument_kurzbz;
 				$obj->kategorie_kurzbz = $row->kategorie_kurzbz;
@@ -1017,7 +1017,7 @@ class dms extends basis_db
 				$obj->updateamum = $row->updateamum;
 				$obj->cis_suche = $this->db_parse_bool($row->cis_suche);
 				$obj->schlagworte = $row->schlagworte;
-				
+
 				$this->result[] = $obj;
 			}
 		}
@@ -1027,7 +1027,7 @@ class dms extends basis_db
 			return false;
 		}
     }
-	
+
 	/**
 	 * Laedt die Dokumente einer Projektphase
 	 *
@@ -1035,27 +1035,27 @@ class dms extends basis_db
 	 */
 	public function getDokumenteProjektphase($projektphase_id)
 	{
-		$qry = "SELECT 
-					* 
-				FROM 
-					campus.tbl_dms 
+		$qry = "SELECT
+					*
+				FROM
+					campus.tbl_dms
 					JOIN campus.tbl_dms_version USING(dms_id)
-					JOIN fue.tbl_projekt_dokument USING(dms_id) 
+					JOIN fue.tbl_projekt_dokument USING(dms_id)
 				WHERE (dms_id, version) in(
 					SELECT dms_id, max(version)
-					FROM campus.tbl_dms_version 
+					FROM campus.tbl_dms_version
 					GROUP BY dms_id)
 				AND tbl_projekt_dokument.projektphase_id=".$this->db_add_param($projektphase_id, FHC_INTEGER)."
 				ORDER BY name;";
-		
+
 		if($result = $this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object($result))
 			{
 				$obj = new dms();
-				
+
 				$obj->dms_id = $row->dms_id;
-				$obj->version = $row->version; 
+				$obj->version = $row->version;
 				$obj->oe_kurzbz = $row->oe_kurzbz;
 				$obj->dokument_kurzbz = $row->dokument_kurzbz;
 				$obj->kategorie_kurzbz = $row->kategorie_kurzbz;
@@ -1069,7 +1069,7 @@ class dms extends basis_db
 				$obj->updateamum = $row->updateamum;
 				$obj->cis_suche = $this->db_parse_bool($row->cis_suche);
 				$obj->schlagworte = $row->schlagworte;
-				
+
 				$this->result[] = $obj;
 			}
 		}
@@ -1079,11 +1079,11 @@ class dms extends basis_db
 			return false;
 		}
 	}
-	
+
 	/**
 	 * Speichert die Zuordnung eines Dokuments zu einem Projekt
 	 * Wenn die Zuordnung bereits vorhanden ist, geschieht nichts
-	 * 
+	 *
 	 * @param $dms_id
 	 * @param $projekt_kurzbz
 	 * @param $projektphase_id
@@ -1096,9 +1096,9 @@ class dms extends basis_db
 			$qry.=" AND projekt_kurzbz=".$this->db_add_param($projekt_kurzbz);
 		if($projektphase_id!='')
 			$qry.=" AND projektphase_id=".$this->db_add_param($projektphase_id, FHC_INTEGER);
-        
+
         $qry.=';';
-			
+
 		if($result = $this->db_query($qry))
 		{
 			if($this->db_num_rows($result)==0)
@@ -1108,7 +1108,7 @@ class dms extends basis_db
 						$this->db_add_param($projektphase_id, FHC_INTEGER).','.
 						$this->db_add_param($projekt_kurzbz).','.
 						$this->db_add_param($dms_id, FHC_INTEGER).');';
-						
+
 				if($this->db_query($qry))
 				{
 					return true;
@@ -1128,24 +1128,24 @@ class dms extends basis_db
 			return false;
 		}
 	}
-	
+
 	/**
-	 * 
+	 *
 	 * Liefert ein Array mit den Gruppen welche auf die Kategorie zugreifen duerfen
 	 * @param $kategorie_kurzbz
 	 */
 	function getLockGroups($kategorie_kurzbz)
 	{
-		$qry = "SELECT gruppe_kurzbz FROM 
+		$qry = "SELECT gruppe_kurzbz FROM
 				(
-				WITH RECURSIVE kategorien(parent_kategorie_kurzbz) as 
+				WITH RECURSIVE kategorien(parent_kategorie_kurzbz) as
 				(
-					SELECT parent_kategorie_kurzbz FROM campus.tbl_dms_kategorie 
+					SELECT parent_kategorie_kurzbz FROM campus.tbl_dms_kategorie
 					WHERE kategorie_kurzbz=".$this->db_add_param($kategorie_kurzbz)."
 					UNION ALL
 					SELECT kategorie_kurzbz FROM campus.tbl_dms_kategorie WHERE kategorie_kurzbz=".$this->db_add_param($kategorie_kurzbz)."
 					UNION ALL
-					SELECT k.parent_kategorie_kurzbz FROM campus.tbl_dms_kategorie k, kategorien 
+					SELECT k.parent_kategorie_kurzbz FROM campus.tbl_dms_kategorie k, kategorien
 					WHERE k.kategorie_kurzbz=kategorien.parent_kategorie_kurzbz
 				)
 				SELECT parent_kategorie_kurzbz
@@ -1169,7 +1169,7 @@ class dms extends basis_db
 			return false;
 		}
 	}
-	
+
 	/**
 	 * Prueft ob fuer diese Datei eine Authentifizierung erforderlich ist
 	 * @param $dms_id
@@ -1179,25 +1179,25 @@ class dms extends basis_db
 	 */
 	function isLocked($dms_id)
 	{
-		$qry = "SELECT 1 FROM 
+		$qry = "SELECT 1 FROM
 				(
-				WITH RECURSIVE kategorien(parent_kategorie_kurzbz) as 
+				WITH RECURSIVE kategorien(parent_kategorie_kurzbz) as
 				(
-					SELECT parent_kategorie_kurzbz FROM campus.tbl_dms_kategorie 
+					SELECT parent_kategorie_kurzbz FROM campus.tbl_dms_kategorie
 					WHERE kategorie_kurzbz=(SELECT kategorie_kurzbz FROM campus.tbl_dms WHERE dms_id=".$this->db_add_param($dms_id, FHC_INTEGER).")
 					UNION ALL
 					SELECT kategorie_kurzbz FROM campus.tbl_dms WHERE dms_id=".$this->db_add_param($dms_id, FHC_INTEGER)."
 					UNION ALL
-					SELECT k.parent_kategorie_kurzbz FROM campus.tbl_dms_kategorie k, kategorien 
+					SELECT k.parent_kategorie_kurzbz FROM campus.tbl_dms_kategorie k, kategorien
 					WHERE k.kategorie_kurzbz=kategorien.parent_kategorie_kurzbz
-					
+
 				)
 				SELECT parent_kategorie_kurzbz
 				FROM kategorien
 				) a
 				JOIN campus.tbl_dms_kategorie_gruppe ON(a.parent_kategorie_kurzbz=kategorie_kurzbz)
 				UNION
-				SELECT 1 FROM fue.tbl_projekt_dokument WHERE dms_id=".$this->db_add_param($dms_id, FHC_INTEGER)."			
+				SELECT 1 FROM fue.tbl_projekt_dokument WHERE dms_id=".$this->db_add_param($dms_id, FHC_INTEGER)."
 				;";
 
 		if($result = $this->db_query($qry))
@@ -1213,12 +1213,12 @@ class dms extends basis_db
 			return false;
 		}
 	}
-	
+
 	/**
-	 * 
+	 *
 	 * Prueft ob der User fuer das Dokument berechtigt ist
 	 * Vorher muss mit isLocked geprueft werden ob das Dokument gesperrt ist
-	 * 
+	 *
 	 * @param $dms_id
 	 * @param $user
 	 * @return boolean
@@ -1233,7 +1233,7 @@ class dms extends basis_db
 			{
 				//Berechtigung auf Projekt
 
-				//Alle Mitarbeiter des Projektes oder dazughoeriger Phasen 
+				//Alle Mitarbeiter des Projektes oder dazughoeriger Phasen
 				//duerfen auf die Datei zugreifen
 				//auch dann, wenn das Dokument an einer anderen Phase des gleichen Projektes haengt
 				while($row = $this->db_fetch_object($result))
@@ -1241,23 +1241,23 @@ class dms extends basis_db
 					if($row->projekt_kurzbz!='')
 					{
 						//Datei haengt an Projekt
-						$qry = "SELECT 
-									1 
-								FROM 
+						$qry = "SELECT
+									1
+								FROM
 									fue.tbl_ressource
 									JOIN fue.tbl_projekt_ressource USING(ressource_id)
 								WHERE
 									(tbl_ressource.student_uid=".$this->db_add_param($user)."
 									 OR tbl_ressource.mitarbeiter_uid=".$this->db_add_param($user).")
-									 AND 
+									 AND
 									 (projekt_kurzbz=".$this->db_add_param($row->projekt_kurzbz)."
 									 OR projektphase_id in(
-									 WITH RECURSIVE phasen(projektphase_id) as 
+									 WITH RECURSIVE phasen(projektphase_id) as
 									(
-										SELECT projektphase_id FROM fue.tbl_projektphase 
+										SELECT projektphase_id FROM fue.tbl_projektphase
 										WHERE projekt_kurzbz=".$this->db_add_param($row->projekt_kurzbz)."
 										UNION ALL
-										SELECT p.projektphase_id FROM fue.tbl_projektphase p, phasen 
+										SELECT p.projektphase_id FROM fue.tbl_projektphase p, phasen
 										WHERE p.projektphase_fk=phasen.projektphase_id
 									)
 									SELECT projektphase_id
@@ -1266,9 +1266,9 @@ class dms extends basis_db
 					else
 					{
 						//Datei haengt an Projektphase
-						$qry = "SELECT 
-									1 
-								FROM 
+						$qry = "SELECT
+									1
+								FROM
 									fue.tbl_ressource
 									JOIN fue.tbl_projekt_ressource USING(ressource_id)
 								WHERE
@@ -1278,18 +1278,18 @@ class dms extends basis_db
 									 (
 									 tbl_projekt_ressource.projekt_kurzbz=(Select projekt_kurzbz FROM fue.tbl_projektphase where projektphase_id=".$this->db_add_param($row->projektphase_id, FHC_INTEGER).")
 									 OR tbl_projekt_ressource.projektphase_id in (
-									 WITH RECURSIVE phasen(projektphase_id) as 
+									 WITH RECURSIVE phasen(projektphase_id) as
 									(
-										SELECT projektphase_id FROM fue.tbl_projektphase 
+										SELECT projektphase_id FROM fue.tbl_projektphase
 										WHERE projekt_kurzbz IN (SELECT projekt_kurzbz FROM fue.tbl_projektphase WHERE projektphase_id= ".$this->db_add_param($row->projektphase_id, FHC_INTEGER).")
 										UNION ALL
-										SELECT p.projektphase_id FROM fue.tbl_projektphase p, phasen 
+										SELECT p.projektphase_id FROM fue.tbl_projektphase p, phasen
 										WHERE p.projektphase_fk=phasen.projektphase_id
 									)
 									SELECT projektphase_id
 									FROM phasen));";
 					}
-					
+
 					if($result_user = $this->db_query($qry))
 					{
 						if($this->db_num_rows($result_user)>0)
@@ -1305,25 +1305,25 @@ class dms extends basis_db
 						return false;
 					}
 				}
-				
+
 				//Die Datei ist einem Projekt zugewiesen, die Person jedoch nicht
 				// -> kein Zugriff
 				return false;
 			}
 		}
-		
+
 		//Wenn die Datei zu keinem Projekt gehoert, dann die Gruppenrechte pruefen
-		$qry = "SELECT 1 FROM 
+		$qry = "SELECT 1 FROM
 				(
-				WITH RECURSIVE kategorien(parent_kategorie_kurzbz) as 
+				WITH RECURSIVE kategorien(parent_kategorie_kurzbz) as
 				(
-					SELECT parent_kategorie_kurzbz FROM campus.tbl_dms_kategorie 
+					SELECT parent_kategorie_kurzbz FROM campus.tbl_dms_kategorie
 					WHERE kategorie_kurzbz=(SELECT kategorie_kurzbz FROM campus.tbl_dms WHERE dms_id=".$this->db_add_param($dms_id, FHC_INTEGER).")
 					UNION ALL
 					SELECT kategorie_kurzbz FROM campus.tbl_dms WHERE dms_id=".$this->db_add_param($dms_id, FHC_INTEGER)."
 					UNION ALL
-					SELECT k.parent_kategorie_kurzbz FROM campus.tbl_dms_kategorie k, kategorien 
-					WHERE k.kategorie_kurzbz=kategorien.parent_kategorie_kurzbz					
+					SELECT k.parent_kategorie_kurzbz FROM campus.tbl_dms_kategorie k, kategorien
+					WHERE k.kategorie_kurzbz=kategorien.parent_kategorie_kurzbz
 				)
 				SELECT parent_kategorie_kurzbz
 				FROM kategorien
@@ -1344,13 +1344,13 @@ class dms extends basis_db
 		{
 			$this->errormsg = 'Fehler beim Laden der Daten';
 			return false;
-		}		
+		}
 	}
 
 	/**
-	 * 
+	 *
 	 * Prueft ob der User fuer die Kategorie berechtigt ist
-	 * 
+	 *
 	 * @param $kategorie_kurzbz
 	 * @param $user
 	 * @return boolean
@@ -1379,7 +1379,7 @@ class dms extends basis_db
 			{
 				$this->errormsg = 'Fehler beim Laden der Daten';
 				return false;
-			}		
+			}
 		}
 		else
 			return true;
@@ -1387,15 +1387,15 @@ class dms extends basis_db
 
 	function getDocumentFromName($name, $kategorie_kurzbz=null)
 	{
-		$qry = "SELECT * FROM campus.tbl_dms JOIN campus.tbl_dms_version USING(dms_id) 
+		$qry = "SELECT * FROM campus.tbl_dms JOIN campus.tbl_dms_version USING(dms_id)
 				WHERE (dms_id, version) in(
 					SELECT dms_id, max(version)
-					FROM campus.tbl_dms_version 
+					FROM campus.tbl_dms_version
 					GROUP BY dms_id)
 				AND name=".$this->db_add_param($name);
 		if(!is_null($kategorie_kurzbz))
 			$qry .= " AND kategorie_kurzbz=".$this->db_add_param($kategorie_kurzbz);
-        
+
         $qry.=';';
 
 		if($result = $this->db_query($qry))
@@ -1403,9 +1403,9 @@ class dms extends basis_db
 			while($row = $this->db_fetch_object($result))
 			{
 				$obj = new dms();
-				
+
 				$obj->dms_id = $row->dms_id;
-				$obj->version = $row->version; 
+				$obj->version = $row->version;
 				$obj->oe_kurzbz = $row->oe_kurzbz;
 				$obj->dokument_kurzbz = $row->dokument_kurzbz;
 				$obj->kategorie_kurzbz = $row->kategorie_kurzbz;
@@ -1419,7 +1419,7 @@ class dms extends basis_db
 				$obj->updateamum = $row->updateamum;
 				$obj->cis_suche = $this->db_parse_bool($row->cis_suche);
 				$obj->schlagworte = $row->schlagworte;
-				
+
 				$this->result[] = $obj;
 			}
 			return true;
@@ -1430,7 +1430,7 @@ class dms extends basis_db
 			return false;
 		}
 	}
-	
+
 	public function getKategorieFromBezeichnung($bezeichnung, $parent_kategorie_kurzbz=null)
 	{
 		$qry = "SELECT * FROM campus.tbl_dms_kategorie WHERE bezeichnung=".$this->db_add_param($bezeichnung);
@@ -1446,15 +1446,15 @@ class dms extends basis_db
 			while($row = $this->db_fetch_object($result))
 			{
 				$obj = new dms();
-				
+
 				$obj->kategorie_kurzbz = $row->kategorie_kurzbz;
 				$obj->bezeichnung = $row->bezeichnung;
 				$obj->beschreibung = $row->beschreibung;
 				$obj->parent_kategorie_kurzbz = $row->parent_kategorie_kurzbz;
 				$obj->oe_kurzbz = $row->oe_kurzbz;
 				$obj->berechtigung_kurzbz = $row->berechtigung_kurzbz;
-				
-				
+
+
 				$this->result[] = $obj;
 			}
 			return true;
@@ -1464,6 +1464,30 @@ class dms extends basis_db
 			$this->errormsg = 'Fehler beim Laden der Daten';
 			return false;
 		}
+	}
+
+	/**
+	 * Sets the Filesystem Permission for the DMS File
+	 * @param $file Full Filename to the DMS File.
+	 * @return boolean true if successfull, false on error.
+	 */
+	public function setPermission($file)
+	{
+		$group = 'dms';
+		$permission = 0774;
+
+		if (!chgrp($file, $group))
+		{
+			$this->errormsg =  'Failed to change group to '.$group;
+			return false;
+		}
+		if (!chmod($file, $permission))
+		{
+			$this->errormsg = 'Failed to change permissions to '.$permission;
+			return false;
+		}
+
+		return true;
 	}
 }
 ?>

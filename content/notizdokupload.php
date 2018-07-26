@@ -22,7 +22,7 @@
 require_once('../config/vilesci.config.inc.php');
 require_once('../include/functions.inc.php');
 require_once('../include/benutzerberechtigung.class.php');
-require_once('../include/dms.class.php'); 
+require_once('../include/dms.class.php');
 require_once('../include/notiz.class.php');
 
 header("Content-Type: text/html; charset=utf-8");
@@ -41,68 +41,64 @@ $dokument_kurzbz = isset($_REQUEST['dokument_kurzbz'])?$_REQUEST['dokument_kurzb
 
 if(isset($_POST['fileupload']))
 {
-    $error = false; 
-    
-    // dms Eintrag anlegen
-    if(isset($_GET['notiz_id']))
-    {
-        $ext = pathinfo($_FILES['file']['name'], PATHINFO_EXTENSION); 
-        $filename = uniqid();
-        $filename.=".".$ext; 
-        $uploadfile = DMS_PATH.$filename;
+	$error = false;
 
+	// dms Eintrag anlegen
+	if(isset($_GET['notiz_id']))
+	{
+		$ext = pathinfo($_FILES['file']['name'], PATHINFO_EXTENSION);
+		$filename = uniqid();
+		$filename.=".".$ext;
+		$uploadfile = DMS_PATH.$filename;
 
-        if(move_uploaded_file($_FILES['file']['tmp_name'], $uploadfile)) 
-        {
-            if(!chgrp($uploadfile,'dms'))
-                echo 'CHGRP failed';
-            if(!chmod($uploadfile, 0774))
-                echo 'CHMOD failed';
-            exec('sudo chown wwwrun '.$uploadfile);	
+		if(move_uploaded_file($_FILES['file']['tmp_name'], $uploadfile))
+		{
+			$dms = new dms();
+			if(!$dms->setPermission($uploadfile))
+				echo $dms->errormsg;
 
-            $dms = new dms();
-            $dms->version='0';
-            $dms->kategorie_kurzbz=$kategorie_kurzbz;
-            $dms->insertamum=date('Y-m-d H:i:s');
-            $dms->insertvon = $user;
-            $dms->mimetype=$_FILES['file']['type'];
-            $dms->filename = $filename;
-            $dms->name = $_FILES['file']['name'];
-            $dms->beschreibung = $_POST['anmerkung_intern'];
+			$dms->version='0';
+			$dms->kategorie_kurzbz=$kategorie_kurzbz;
+			$dms->insertamum=date('Y-m-d H:i:s');
+			$dms->insertvon = $user;
+			$dms->mimetype=$_FILES['file']['type'];
+			$dms->filename = $filename;
+			$dms->name = $_FILES['file']['name'];
+			$dms->beschreibung = $_POST['anmerkung_intern'];
 
-            if($dms->save(true))
-            {
-                $dms_id=$dms->dms_id;
-                
-                $notiz = new notiz($_GET['notiz_id']);
-                if(!$notiz->saveDokument($dms_id))
-                {
-                    echo 'Fehler beim Speichern des Dokuments';
-                    $error = true; 
-                }
+			if($dms->save(true))
+			{
+				$dms_id=$dms->dms_id;
+
+				$notiz = new notiz($_GET['notiz_id']);
+				if(!$notiz->saveDokument($dms_id))
+				{
+					echo 'Fehler beim Speichern des Dokuments';
+					$error = true;
+				}
 				else
 				{
 					echo '<script>window.opener.NotizDokumentUploadScope.RefreshNotizBlocking();window.opener.NotizDokumentUploadScope.selectItem();window.close();</script>';
 				}
 
-            }    	
-            else
-            {
-                echo 'Fehler beim Speichern der Daten';
-                $error = true; 
-            }
-        } 
-        else 
-        {
-            echo 'Fehler beim Hochladen der Datei';
-            $error = true; 
-        }
-    }
-    else
-    {
-        echo 'Es muss eine Notiz ausgewaehlt werden';
-        $error = true; 
-    }
+			}
+			else
+			{
+				echo 'Fehler beim Speichern der Daten';
+				$error = true;
+			}
+		}
+		else
+		{
+			echo 'Fehler beim Hochladen der Datei';
+			$error = true;
+		}
+	}
+	else
+	{
+		echo 'Es muss eine Notiz ausgewaehlt werden';
+		$error = true;
+	}
 }
 
 if(isset($_GET['notiz_id']))
@@ -113,7 +109,7 @@ if(isset($_GET['notiz_id']))
 				<meta http-equiv='Content-Type' content='text/html; charset=UTF-8'>
 				<link href='../skin/style.css.php' rel='stylesheet' type='text/css'>
 				<link rel='stylesheet' href='../skin/jquery.css' type='text/css'/>
-			</head>			
+			</head>
 			<body style='padding:10px;'>
 			<h1>Upload Dokumente</h1>
 			<form method='POST' enctype='multipart/form-data' action='$PHP_SELF?notiz_id=".$_GET['notiz_id']."'>
@@ -122,8 +118,8 @@ if(isset($_GET['notiz_id']))
 					<td align='right'>Dokument:</td>
 					<td><input type='file' name='file' /></td>
 				</tr>";
-				
-	echo "	<tr> 
+
+	echo "	<tr>
 				<td align='right'>Anmerkung:</td><td><textarea name='anmerkung_intern' cols='45' id='anmerkung_intern'></textarea></td>
 			</tr>
 			<tr>
