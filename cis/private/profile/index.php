@@ -437,7 +437,7 @@ if (!$ansicht)
 	".$p->t('profil/solltenDatenNichtStimmen')." <a class='Item' href=\"mailto:$mail?subject=Datenkorrektur&body=Die%20Profildaten%20fuer%20User%20'$user->uid'%20sind%20nicht%20korrekt.%0D
 	Hier die richtigen Daten:%0A%0ANachname:%20$user->nachname%0AVorname:%20$user->vorname%0AGeburtsdatum:%20$user->gebdatum
 	%0AGeburtsort:%20$user->gebort%0ATitelPre:%20$user->titelpre%0ATitelPost:%20$user->titelpost
-	%0A%0A***%0DPlatz fuer weitere (nicht angefuehrte Daten)%0D***\">".$p->t('profil/zustaendigeAssistenz')."</a><br><br>";
+	%0A%0A***%0DPlatz fuer weitere (nicht angefuehrte Daten)%0D***%0A%0A[Bitte%20uebermitteln%20Sie%20uns%20etwaige%20Dokumente%20zum%20Beleg%20der%20Aenderung]\">".$p->t('profil/zustaendigeAssistenz')."</a><br><br>";
 }
 
 echo '<table width="100%">';
