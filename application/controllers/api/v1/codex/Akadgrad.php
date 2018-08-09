@@ -21,7 +21,7 @@ class Akadgrad extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Akadgrad' => 'basis/akadgrad:rw'));
 		// Load model AkadgradModel
 		$this->load->model('codex/akadgrad_model', 'AkadgradModel');
 	}
@@ -32,11 +32,11 @@ class Akadgrad extends APIv1_Controller
 	public function getAkadgrad()
 	{
 		$akadgradID = $this->get('akadgrad_id');
-		
+
 		if (isset($akadgradID))
 		{
 			$result = $this->AkadgradModel->load($akadgradID);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -60,7 +60,7 @@ class Akadgrad extends APIv1_Controller
 			{
 				$result = $this->AkadgradModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -68,7 +68,7 @@ class Akadgrad extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($akadgrad = NULL)
 	{
 		return true;

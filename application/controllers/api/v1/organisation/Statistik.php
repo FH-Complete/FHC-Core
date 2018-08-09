@@ -21,11 +21,17 @@ class Statistik extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(
+			array(
+				'Statistik' => 'basis/statistik:rw',
+				'All' => 'basis/statistik:r',
+				'MenueArray' => 'basis/statistik:r'
+			)
+		);
 		// Load model StatistikModel
 		$this->load->model('organisation/statistik_model', 'StatistikModel');
-		
-		
+
+
 	}
 
 	/**
@@ -34,11 +40,11 @@ class Statistik extends APIv1_Controller
 	public function getStatistik()
 	{
 		$statistik_kurzbz = $this->get('statistik_kurzbz');
-		
+
 		if (isset($statistik_kurzbz))
 		{
 			$result = $this->StatistikModel->load($statistik_kurzbz);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -46,19 +52,19 @@ class Statistik extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	/**
 	 * @return void
 	 */
 	public function getAll()
 	{
 		$this->StatistikModel->addOrder($this->get('order'));
-		
+
 		$result = $this->StatistikModel->load();
-		
+
 		$this->response($result, REST_Controller::HTTP_OK);
 	}
-	
+
 	/**
 	 * @return void
 	 */
@@ -67,9 +73,9 @@ class Statistik extends APIv1_Controller
 		$this->StatistikModel->addOrder('gruppe');
 		$this->StatistikModel->addOrder('bezeichnung');
 		$this->StatistikModel->addOrder('statistik_kurzbz');
-		
+
 		$result = $this->StatistikModel->load();
-		
+
 		$this->response($result, REST_Controller::HTTP_OK);
 	}
 
@@ -88,7 +94,7 @@ class Statistik extends APIv1_Controller
 			{
 				$result = $this->StatistikModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -96,7 +102,7 @@ class Statistik extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($statistik = NULL)
 	{
 		return true;

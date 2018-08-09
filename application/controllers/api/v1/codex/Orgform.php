@@ -21,7 +21,7 @@ class Orgform extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Orgform' => 'basis/orgform:rw', 'All' => 'basis/orgform:r', 'OrgformLV' => 'basis/orgform:r'));
 		// Load model OrgformModel
 		$this->load->model('codex/orgform_model', 'OrgformModel');
 	}
@@ -32,11 +32,11 @@ class Orgform extends APIv1_Controller
 	public function getOrgform()
 	{
 		$orgform_kurzbz = $this->get('orgform_kurzbz');
-		
+
 		if (isset($orgform_kurzbz))
 		{
 			$result = $this->OrgformModel->load($orgform_kurzbz);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -44,24 +44,24 @@ class Orgform extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	/**
 	 * @return void
 	 */
 	public function getAll()
 	{
 		$result = $this->OrgformModel->load();
-		
+
 		$this->response($result, REST_Controller::HTTP_OK);
 	}
-	
+
 	/**
 	 * @return void
 	 */
 	public function getOrgformLV()
 	{
 		$result = $this->OrgformModel->getOrgformLV();
-		
+
 		$this->response($result, REST_Controller::HTTP_OK);
 	}
 
@@ -80,7 +80,7 @@ class Orgform extends APIv1_Controller
 			{
 				$result = $this->OrgformModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -88,7 +88,7 @@ class Orgform extends APIv1_Controller
 			$this->response();
 		}
 	}
-        
+
 	private function _validate($orgform = NULL)
 	{
 		return true;

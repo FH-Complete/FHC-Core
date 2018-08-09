@@ -21,7 +21,7 @@ class Ausbildung extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Ausbildung' => 'basis/ausbildung:rw'));
 		// Load model AusbildungModel
 		$this->load->model('codex/ausbildung_model', 'AusbildungModel');
 	}
@@ -32,11 +32,11 @@ class Ausbildung extends APIv1_Controller
 	public function getAusbildung()
 	{
 		$ausbildungcode = $this->get('ausbildungcode');
-		
+
 		if (isset($ausbildungcode))
 		{
 			$result = $this->AusbildungModel->load($ausbildungcode);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -60,7 +60,7 @@ class Ausbildung extends APIv1_Controller
 			{
 				$result = $this->AusbildungModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -68,7 +68,7 @@ class Ausbildung extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($ausbildung = NULL)
 	{
 		return true;

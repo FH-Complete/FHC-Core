@@ -21,7 +21,7 @@ class Lvregel extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Lvregel' => 'basis/lvregel:rw'));
 		// Load model LvregelModel
 		$this->load->model('education/Lvregel_model', 'LvregelModel');
 	}
@@ -32,11 +32,11 @@ class Lvregel extends APIv1_Controller
 	public function getLvregel()
 	{
 		$lvregel_id = $this->get('lvregel_id');
-		
+
 		if (isset($lvregel_id))
 		{
 			$result = $this->LvregelModel->load($lvregel_id);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -60,7 +60,7 @@ class Lvregel extends APIv1_Controller
 			{
 				$result = $this->LvregelModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -68,7 +68,7 @@ class Lvregel extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($lvregel = NULL)
 	{
 		return true;

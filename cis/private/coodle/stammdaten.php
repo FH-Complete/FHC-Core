@@ -305,6 +305,25 @@ if(isset($_POST['save']))
 			if (!$coodletermin->saveTermin(true))
 				$message.= '<span class="error">'.$coodletermin->errormsg.'</span>';
 		}
+		// Einer neuen Umfrage wird der Ersteller automatisch als TeilnehmerIn hinzugefügt
+		if ($coodle->new == true)
+		{
+			$coodleRessource = new coodle();
+			
+			if(!$coodleRessource->RessourceExists($coodle->coodle_id, $user))
+			{
+				$coodleRessource->coodle_id = $coodle->coodle_id;
+				$coodleRessource->uid = $user;
+				$coodleRessource->email = $user.'@'.DOMAIN;
+				$coodleRessource->insertamum = date('Y-m-d H:i:s');
+				$coodleRessource->insertvon = $user;
+				$coodleRessource->updateamum = date('Y-m-d H:i:s');
+				$coodleRessource->updatevon = $user;
+				
+				if(!$coodleRessource->saveRessource(true))
+					$message.= '<span class="error">'.$coodleRessource->errormsg.'</span>';
+			}
+		}
 	}
 	else
 	{

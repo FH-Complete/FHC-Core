@@ -21,11 +21,11 @@ class Antwort extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Antwort' => 'basis/antwort:rw'));
 		// Load model AntwortModel
 		$this->load->model('testtool/antwort_model', 'AntwortModel');
-		
-		
+
+
 	}
 
 	/**
@@ -34,11 +34,11 @@ class Antwort extends APIv1_Controller
 	public function getAntwort()
 	{
 		$antwortID = $this->get('antwort_id');
-		
+
 		if (isset($antwortID))
 		{
 			$result = $this->AntwortModel->load($antwortID);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -62,7 +62,7 @@ class Antwort extends APIv1_Controller
 			{
 				$result = $this->AntwortModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -70,7 +70,7 @@ class Antwort extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($antwort = NULL)
 	{
 		return true;

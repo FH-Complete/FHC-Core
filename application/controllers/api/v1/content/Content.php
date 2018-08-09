@@ -21,7 +21,7 @@ class Content extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Content' => 'basis/content:rw'));
 		// Load model ContentModel
 		$this->load->model('content/content_model', 'ContentModel');
 	}
@@ -32,11 +32,11 @@ class Content extends APIv1_Controller
 	public function getContent()
 	{
 		$contentID = $this->get('content_id');
-		
+
 		if (isset($contentID))
 		{
 			$result = $this->ContentModel->load($contentID);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -60,7 +60,7 @@ class Content extends APIv1_Controller
 			{
 				$result = $this->ContentModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -68,7 +68,7 @@ class Content extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($content = NULL)
 	{
 		return true;

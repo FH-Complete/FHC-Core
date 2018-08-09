@@ -222,7 +222,7 @@ if (isset($_REQUEST['submit']))
 
 		case 'setMatrikelnummer':
 			$person = new stdClass();
-			$person->matrikelnummer = $matrikelnummer;
+			$person->matrikelnummer = $matrikelnr;
 			$person->vorname = $vorname;
 			$person->nachname = $nachname;
 			$person->geburtsdatum = $geburtsdatum;

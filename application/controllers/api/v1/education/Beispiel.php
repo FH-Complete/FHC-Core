@@ -21,7 +21,7 @@ class Beispiel extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Beispiel' => 'basis/beispiel:rw'));
 		// Load model BeispielModel
 		$this->load->model('education/Beispiel_model', 'BeispielModel');
 	}
@@ -32,11 +32,11 @@ class Beispiel extends APIv1_Controller
 	public function getBeispiel()
 	{
 		$beispiel_id = $this->get('beispiel_id');
-		
+
 		if (isset($beispiel_id))
 		{
 			$result = $this->BeispielModel->load($beispiel_id);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -60,7 +60,7 @@ class Beispiel extends APIv1_Controller
 			{
 				$result = $this->BeispielModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -68,7 +68,7 @@ class Beispiel extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($beispiel = NULL)
 	{
 		return true;

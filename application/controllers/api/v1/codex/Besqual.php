@@ -21,7 +21,7 @@ class Besqual extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Besqual' => 'basis/besqual:rw'));
 		// Load model BesqualModel
 		$this->load->model('codex/besqual_model', 'BesqualModel');
 	}
@@ -32,11 +32,11 @@ class Besqual extends APIv1_Controller
 	public function getBesqual()
 	{
 		$besqualcode = $this->get('besqualcode');
-		
+
 		if (isset($besqualcode))
 		{
 			$result = $this->BesqualModel->load($besqualcode);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -60,7 +60,7 @@ class Besqual extends APIv1_Controller
 			{
 				$result = $this->BesqualModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -68,7 +68,7 @@ class Besqual extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($besqual = NULL)
 	{
 		return true;

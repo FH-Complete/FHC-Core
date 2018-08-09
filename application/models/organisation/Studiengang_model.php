@@ -17,11 +17,6 @@ class Studiengang_model extends DB_Model
 	 */
 	public function getAllForBewerbung()
 	{
-		// Checks if the operation is permitted by the API caller
-		if (isError($ent = $this->isEntitled($this->dbTable, PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR))) return $ent;
-		if (isError($ent = $this->isEntitled('bis.tbl_lgartcode', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR))) return $ent;
-		if (isError($ent = $this->isEntitled('lehre.vw_studienplan', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR))) return $ent;
-
 		$allForBewerbungQuery = 'SELECT DISTINCT studiengang_kz,
 										typ,
 										organisationseinheittyp_kurzbz,
@@ -103,8 +98,6 @@ class Studiengang_model extends DB_Model
 	 */
 	public function getStudienplan($studiensemester_kurzbz, $ausbildungssemester, $aktiv, $onlinebewerbung)
 	{
-		if (isError($ent = $this->isEntitled($this->dbTable, PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR))) return $ent;
-
 		// Join table public.tbl_studiengang with table lehre.tbl_studienordnung on column studiengang_kz
 		$this->addJoin('lehre.tbl_studienordnung', 'studiengang_kz');
 		// Then join with table lehre.tbl_studienplan on column studienordnung_id
@@ -140,8 +133,6 @@ class Studiengang_model extends DB_Model
 	 */
 	public function getStudiengangBewerbung($oe_kurzbz = null)
 	{
-		if (isError($ent = $this->isEntitled($this->dbTable, PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR))) return $ent;
-
 		// Join table public.tbl_studiengang with table lehre.tbl_studienordnung on column studiengang_kz
 		$this->addJoin('lehre.tbl_studienordnung', 'studiengang_kz');
 		// Join table lehre.tbl_studienordnung with table lehre.tbl_akadgrad on column akadgrad_id
@@ -213,8 +204,6 @@ class Studiengang_model extends DB_Model
 	 */
 	public function getAppliedStudiengang($person_id, $studiensemester_kurzbz, $titel)
 	{
-		if (isError($ent = $this->isEntitled($this->dbTable, PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR))) return $ent;
-
 		// Then join with table public.tbl_prestudent
 		$this->addJoin('public.tbl_prestudent', 'studiengang_kz');
 		// Join table public.tbl_prestudentstatus
@@ -262,8 +251,6 @@ class Studiengang_model extends DB_Model
 	 */
 	public function getAppliedStudiengangFromNow($person_id, $titel)
 	{
-		if (isError($ent = $this->isEntitled($this->dbTable, PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR))) return $ent;
-
 		// Then join with table public.tbl_prestudent
 		$this->addJoin('public.tbl_prestudent', 'studiengang_kz');
 		// Join table public.tbl_prestudentstatus
@@ -315,8 +302,6 @@ class Studiengang_model extends DB_Model
 	 */
 	public function getAppliedStudiengangFromNowOE($person_id, $titel, $oe_kurzbz)
 	{
-		if (isError($ent = $this->isEntitled($this->dbTable, PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR))) return $ent;
-
 		// Then join with table public.tbl_prestudent
 		$this->addJoin('public.tbl_prestudent', 'studiengang_kz');
 		// Join table public.tbl_prestudentstatus
@@ -381,17 +366,6 @@ class Studiengang_model extends DB_Model
 	 */
 	public function getAvailableReihungstestByPersonId($person_id)
 	{
-		if (isError($ent = $this->isEntitled('lehre.tbl_studienplan', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)))
-			return $ent;
-		if (isError($ent = $this->isEntitled('public.tbl_prestudent', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)))
-			return $ent;
-		if (isError($ent = $this->isEntitled('public.tbl_reihungstest', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)))
-			return $ent;
-		if (isError($ent = $this->isEntitled('lehre.tbl_studienordnung', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)))
-			return $ent;
-		if (isError($ent = $this->isEntitled('public.tbl_prestudentstatus', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)))
-			return $ent;
-
 		$this->addJoin('lehre.tbl_studienordnung', 'studiengang_kz');
 
 		$this->addJoin('lehre.tbl_studienplan', 'studienordnung_id');

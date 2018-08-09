@@ -21,7 +21,7 @@ class Pruefungsanmeldung extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Pruefungsanmeldung' => 'basis/pruefungsanmeldung:rw'));
 		// Load model PruefungsanmeldungModel
 		$this->load->model('education/Pruefungsanmeldung_model', 'PruefungsanmeldungModel');
 	}
@@ -32,11 +32,11 @@ class Pruefungsanmeldung extends APIv1_Controller
 	public function getPruefungsanmeldung()
 	{
 		$pruefungsanmeldung_id = $this->get('pruefungsanmeldung_id');
-		
+
 		if (isset($pruefungsanmeldung_id))
 		{
 			$result = $this->PruefungsanmeldungModel->load($pruefungsanmeldung_id);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -60,7 +60,7 @@ class Pruefungsanmeldung extends APIv1_Controller
 			{
 				$result = $this->PruefungsanmeldungModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -68,7 +68,7 @@ class Pruefungsanmeldung extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($pruefungsanmeldung = NULL)
 	{
 		return true;

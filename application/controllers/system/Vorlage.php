@@ -2,16 +2,33 @@
 
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
-class Vorlage extends VileSci_Controller
+class Vorlage extends Auth_Controller
 {
 	public function __construct()
     {
-        parent::__construct();
+        parent::__construct(
+			array(
+				'index' => 'system/vorlage:r',
+				'table' => 'system/vorlage:r',
+				'view' => 'system/vorlage:r',
+				'edit' => 'system/vorlage:rw',
+				'write' => 'system/vorlage:rw',
+				'save' => 'system/vorlage:rw',
+				'newText' => 'system/vorlage:rw',
+				'editText' => 'system/vorlage:rw',
+				'newText' => 'system/vorlage:rw',
+				'linkDocuments' => 'system/vorlage:r',
+				'saveDocuments' => 'system/vorlage:rw',
+				'deleteDocumentLink' => 'system/vorlage:rw',
+				'saveText' => 'system/vorlage:rw',
+				'preview' => 'system/vorlage:r'
+			)
+		);
 
-        // Loads the vorlage library
-        $this->load->library('VorlageLib');
+		// Loads the vorlage library
+		$this->load->library('VorlageLib');
 
-        // Loads the widget library
+		// Loads the widget library
 		$this->load->library('WidgetLib');
     }
 

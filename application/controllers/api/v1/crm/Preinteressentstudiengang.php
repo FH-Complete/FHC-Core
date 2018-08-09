@@ -21,11 +21,11 @@ class Preinteressentstudiengang extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Preinteressentstudiengang' => 'basis/preinteressentstudiengang:rw'));
 		// Load model PreinteressentstudiengangModel
 		$this->load->model('crm/preinteressentstudiengang_model', 'PreinteressentstudiengangModel');
-		
-		
+
+
 	}
 
 	/**
@@ -35,11 +35,11 @@ class Preinteressentstudiengang extends APIv1_Controller
 	{
 		$preinteressent_id = $this->get('preinteressent_id');
 		$studiengang_kz = $this->get('studiengang_kz');
-		
+
 		if (isset($preinteressent_id) && isset($studiengang_kz))
 		{
 			$result = $this->PreinteressentstudiengangModel->load(array($preinteressent_id, $studiengang_kz));
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -63,7 +63,7 @@ class Preinteressentstudiengang extends APIv1_Controller
 			{
 				$result = $this->PreinteressentstudiengangModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -71,7 +71,7 @@ class Preinteressentstudiengang extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($preinteressentstudiengang = NULL)
 	{
 		return true;

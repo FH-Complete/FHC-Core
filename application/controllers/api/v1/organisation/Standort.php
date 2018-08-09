@@ -21,11 +21,11 @@ class Standort extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Standort' => 'basis/standort:rw'));
 		// Load model StandortModel
 		$this->load->model('organisation/standort_model', 'StandortModel');
-		
-		
+
+
 	}
 
 	/**
@@ -34,11 +34,11 @@ class Standort extends APIv1_Controller
 	public function getStandort()
 	{
 		$standortID = $this->get('standort_id');
-		
+
 		if (isset($standortID))
 		{
 			$result = $this->StandortModel->load($standortID);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -62,7 +62,7 @@ class Standort extends APIv1_Controller
 			{
 				$result = $this->StandortModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -70,7 +70,7 @@ class Standort extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($standort = NULL)
 	{
 		return true;

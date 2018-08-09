@@ -21,7 +21,7 @@ class Beschaeftigungsausmass extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Beschaeftigungsausmass' => 'basis/beschaeftigungsausmass:rw'));
 		// Load model BeschaeftigungsausmassModel
 		$this->load->model('codex/beschaeftigungsausmass_model', 'BeschaeftigungsausmassModel');
 	}
@@ -32,11 +32,11 @@ class Beschaeftigungsausmass extends APIv1_Controller
 	public function getBeschaeftigungsausmass()
 	{
 		$beschausmasscode = $this->get('beschausmasscode');
-		
+
 		if (isset($beschausmasscode))
 		{
 			$result = $this->BeschaeftigungsausmassModel->load($beschausmasscode);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -60,7 +60,7 @@ class Beschaeftigungsausmass extends APIv1_Controller
 			{
 				$result = $this->BeschaeftigungsausmassModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -68,7 +68,7 @@ class Beschaeftigungsausmass extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($beschaeftigungsausmass = NULL)
 	{
 		return true;

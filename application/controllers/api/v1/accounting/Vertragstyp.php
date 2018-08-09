@@ -21,7 +21,7 @@ class Vertragstyp extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Vertragstyp' => 'basis/vertragstyp:rw'));
 		// Load model VertragstypModel
 		$this->load->model('accounting/vertragstyp_model', 'VertragstypModel');
 	}
@@ -32,11 +32,11 @@ class Vertragstyp extends APIv1_Controller
 	public function getVertragstyp()
 	{
 		$vertragstyp_kurzbz = $this->get('vertragstyp_kurzbz');
-		
+
 		if (isset($vertragstyp_kurzbz))
 		{
 			$result = $this->VertragstypModel->load($vertragstyp_kurzbz);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -60,7 +60,7 @@ class Vertragstyp extends APIv1_Controller
 			{
 				$result = $this->VertragstypModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -68,7 +68,7 @@ class Vertragstyp extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($vertragstyp = NULL)
 	{
 		return true;

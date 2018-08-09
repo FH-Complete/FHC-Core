@@ -21,11 +21,11 @@ class Organisationseinheit2 extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Organisationseinheit' => 'basis/organisationseinheit:rw'));
 		// Load model OrganisationseinheitModel
 		$this->load->model('organisation/organisationseinheit_model', 'OrganisationseinheitModel');
-		
-		
+
+
 	}
 
 	/**
@@ -34,11 +34,11 @@ class Organisationseinheit2 extends APIv1_Controller
 	public function getOrganisationseinheit()
 	{
 		$oe_kurzbz = $this->get('oe_kurzbz');
-		
+
 		if (isset($oe_kurzbz))
 		{
 			$result = $this->OrganisationseinheitModel->load($oe_kurzbz);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -62,7 +62,7 @@ class Organisationseinheit2 extends APIv1_Controller
 			{
 				$result = $this->OrganisationseinheitModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -70,7 +70,7 @@ class Organisationseinheit2 extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($organisationseinheit = NULL)
 	{
 		return true;

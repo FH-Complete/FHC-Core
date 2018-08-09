@@ -21,7 +21,7 @@ class Projektbetreuer extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Projektbetreuer' => 'basis/projektbetreuer:rw'));
 		// Load model ProjektbetreuerModel
 		$this->load->model('education/Projektbetreuer_model', 'ProjektbetreuerModel');
 	}
@@ -34,11 +34,11 @@ class Projektbetreuer extends APIv1_Controller
 		$betreuerart_kurzbz = $this->get('betreuerart_kurzbz');
 		$projektarbeit_id = $this->get('projektarbeit_id');
 		$person_id = $this->get('person_id');
-		
+
 		if (isset($betreuerart_kurzbz) && isset($projektarbeit_id) && isset($person_id))
 		{
 			$result = $this->ProjektbetreuerModel->load(array($betreuerart_kurzbz, $projektarbeit_id, $person_id));
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -60,14 +60,14 @@ class Projektbetreuer extends APIv1_Controller
 									$this->post()['projektarbeit_id'],
 									$this->post()['person_id']
 								);
-				
+
 				$result = $this->ProjektbetreuerModel->update($pksArray, $this->post());
 			}
 			else
 			{
 				$result = $this->ProjektbetreuerModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -75,7 +75,7 @@ class Projektbetreuer extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($projektbetreuer = NULL)
 	{
 		return true;

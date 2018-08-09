@@ -21,11 +21,11 @@ class Filter extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Filter' => 'basis/filter:rw'));
 		// Load model FilterModel
 		$this->load->model('system/filter_model', 'FilterModel');
-		
-		
+
+
 	}
 
 	/**
@@ -34,11 +34,11 @@ class Filter extends APIv1_Controller
 	public function getFilter()
 	{
 		$filterID = $this->get('filter_id');
-		
+
 		if (isset($filterID))
 		{
 			$result = $this->FilterModel->load($filterID);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -62,7 +62,7 @@ class Filter extends APIv1_Controller
 			{
 				$result = $this->FilterModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -70,7 +70,7 @@ class Filter extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($filter = NULL)
 	{
 		return true;

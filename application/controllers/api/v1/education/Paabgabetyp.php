@@ -21,7 +21,7 @@ class Paabgabetyp extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Paabgabetyp' => 'basis/paabgabetyp:rw'));
 		// Load model PaabgabetypModel
 		$this->load->model('education/Paabgabetyp_model', 'PaabgabetypModel');
 	}
@@ -32,11 +32,11 @@ class Paabgabetyp extends APIv1_Controller
 	public function getPaabgabetyp()
 	{
 		$paabgabetyp_kurzbz = $this->get('paabgabetyp_kurzbz');
-		
+
 		if (isset($paabgabetyp_kurzbz))
 		{
 			$result = $this->PaabgabetypModel->load($paabgabetyp_kurzbz);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -60,7 +60,7 @@ class Paabgabetyp extends APIv1_Controller
 			{
 				$result = $this->PaabgabetypModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -68,7 +68,7 @@ class Paabgabetyp extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($paabgabetyp = NULL)
 	{
 		return true;

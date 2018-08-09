@@ -21,11 +21,11 @@ class Akte extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Akte' => 'basis/akte:rw', 'Akten' => 'basis/akte:r', 'AktenAccepted' => 'basis/akte:r'));
 		// Load model AkteModel
 		$this->load->model('crm/akte_model', 'AkteModel');
-		
-		
+
+
 	}
 
 	/**
@@ -34,11 +34,11 @@ class Akte extends APIv1_Controller
 	public function getAkte()
 	{
 		$akteID = $this->get('akte_id');
-		
+
 		if (isset($akteID))
 		{
 			$result = $this->AkteModel->load($akteID);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -46,7 +46,7 @@ class Akte extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	/**
 	 * @return void
 	 */
@@ -56,11 +56,11 @@ class Akte extends APIv1_Controller
 		$dokument_kurzbz = $this->get('dokument_kurzbz');
 		$stg_kz = $this->get('stg_kz');
 		$prestudent_id = $this->get('prestudent_id');
-		
+
 		if (isset($person_id))
 		{
 			$result = $this->AkteModel->getAkten($person_id, $dokument_kurzbz, $stg_kz, $prestudent_id);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -68,7 +68,7 @@ class Akte extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	/**
 	 * @return void
 	 */
@@ -76,11 +76,11 @@ class Akte extends APIv1_Controller
 	{
 		$person_id = $this->get('person_id');
 		$dokument_kurzbz = $this->get('dokument_kurzbz');
-		
+
 		if (isset($person_id))
 		{
 			$result = $this->AkteModel->getAktenAccepted($person_id, $dokument_kurzbz);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -104,7 +104,7 @@ class Akte extends APIv1_Controller
 			{
 				$result = $this->AkteModel->insert($akte);
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -112,11 +112,11 @@ class Akte extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($akte = null)
 	{
 		unset($akte['accepted']);
-		
+
 		return $akte;
 	}
 }

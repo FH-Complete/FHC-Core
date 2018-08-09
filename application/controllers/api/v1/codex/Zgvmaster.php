@@ -21,7 +21,7 @@ class Zgvmaster extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Zgvmaster' => 'basis/zgvmaster:rw'));
 		// Load model ZgvmasterModel
 		$this->load->model('codex/zgvmaster_model', 'ZgvmasterModel');
 	}
@@ -32,11 +32,11 @@ class Zgvmaster extends APIv1_Controller
 	public function getZgvmaster()
 	{
 		$zgvmas_code = $this->get('zgvmas_code');
-		
+
 		if (isset($zgvmas_code))
 		{
 			$result = $this->ZgvmasterModel->load($zgvmas_code);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -60,7 +60,7 @@ class Zgvmaster extends APIv1_Controller
 			{
 				$result = $this->ZgvmasterModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -68,7 +68,7 @@ class Zgvmaster extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($zgvmaster = NULL)
 	{
 		return true;

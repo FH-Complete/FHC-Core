@@ -21,7 +21,7 @@ class Appdaten extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Appdaten' => 'system/appdaten:rw'));
 		// Load model AppdatenModel
 		$this->load->model('system/Appdaten_model', 'AppdatenModel');
 	}
@@ -32,11 +32,11 @@ class Appdaten extends APIv1_Controller
 	public function getAppdaten()
 	{
 		$appdatenID = $this->get('appdaten_id');
-		
+
 		if (isset($appdatenID))
 		{
 			$result = $this->AppdatenModel->load($appdatenID);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -60,7 +60,7 @@ class Appdaten extends APIv1_Controller
 			{
 				$result = $this->AppdatenModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -68,7 +68,7 @@ class Appdaten extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($appdaten = NULL)
 	{
 		return true;

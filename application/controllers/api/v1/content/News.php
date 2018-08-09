@@ -21,7 +21,7 @@ class News extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('News' => 'basis/news:rw'));
 		// Load model NewsModel
 		$this->load->model('content/news_model', 'NewsModel');
 	}
@@ -32,11 +32,11 @@ class News extends APIv1_Controller
 	public function getNews()
 	{
 		$newsID = $this->get('news_id');
-		
+
 		if (isset($newsID))
 		{
 			$result = $this->NewsModel->load($newsID);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -60,7 +60,7 @@ class News extends APIv1_Controller
 			{
 				$result = $this->NewsModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -68,7 +68,7 @@ class News extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($news = NULL)
 	{
 		return true;

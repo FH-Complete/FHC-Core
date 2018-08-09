@@ -21,11 +21,11 @@ class Gebiet extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Gebiet' => 'basis/gebiet:rw'));
 		// Load model GebietModel
 		$this->load->model('testtool/gebiet_model', 'GebietModel');
-		
-		
+
+
 	}
 
 	/**
@@ -34,11 +34,11 @@ class Gebiet extends APIv1_Controller
 	public function getGebiet()
 	{
 		$gebietID = $this->get('gebiet_id');
-		
+
 		if (isset($gebietID))
 		{
 			$result = $this->GebietModel->load($gebietID);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -62,7 +62,7 @@ class Gebiet extends APIv1_Controller
 			{
 				$result = $this->GebietModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -70,7 +70,7 @@ class Gebiet extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($gebiet = NULL)
 	{
 		return true;

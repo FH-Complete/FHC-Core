@@ -324,7 +324,12 @@ class benutzer extends person
 
 							(SELECT planbezeichnung FROM public.tbl_mitarbeiter
 							LEFT JOIN public.tbl_ort USING (ort_kurzbz)
-							WHERE mitarbeiter_uid=tbl_benutzer.uid) as raum
+							WHERE mitarbeiter_uid=tbl_benutzer.uid) as raum,
+
+							(SELECT 1
+							FROM PUBLIC.tbl_mitarbeiter
+							WHERE mitarbeiter_uid = tbl_benutzer.uid
+							) AS is_mitarbeiter
 				FROM
 					public.tbl_person
 					JOIN public.tbl_benutzer USING(person_id)
@@ -346,7 +351,7 @@ class benutzer extends person
 		{
 			$qry.=" OR lower(uid) = lower(".$this->db_add_param($value).")";
 		}
-		$qry.=")) a ORDER BY nachname, vorname";
+		$qry.=")) a ORDER BY is_mitarbeiter, nachname, vorname";
 
 		if(!is_null($limit) && is_numeric($limit))
 			$qry.=" LIMIT ".$limit;

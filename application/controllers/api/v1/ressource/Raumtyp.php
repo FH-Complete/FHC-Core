@@ -21,11 +21,11 @@ class Raumtyp extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Raumtyp' => 'basis/raumtyp:rw'));
 		// Load model RaumtypModel
 		$this->load->model('ressource/raumtyp_model', 'RaumtypModel');
-		
-		
+
+
 	}
 
 	/**
@@ -34,11 +34,11 @@ class Raumtyp extends APIv1_Controller
 	public function getRaumtyp()
 	{
 		$raumtyp_kurzbz = $this->get('raumtyp_kurzbz');
-		
+
 		if (isset($raumtyp_kurzbz))
 		{
 			$result = $this->RaumtypModel->load($raumtyp_kurzbz);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -62,7 +62,7 @@ class Raumtyp extends APIv1_Controller
 			{
 				$result = $this->RaumtypModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -70,7 +70,7 @@ class Raumtyp extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($raumtyp = NULL)
 	{
 		return true;

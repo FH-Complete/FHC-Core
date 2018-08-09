@@ -21,11 +21,11 @@ class Studienplatz extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Studienplatz' => 'basis/studienplatz:rw'));
 		// Load model StudienplatzModel
 		$this->load->model('organisation/studienplatz_model', 'StudienplatzModel');
-		
-		
+
+
 	}
 
 	/**
@@ -34,11 +34,11 @@ class Studienplatz extends APIv1_Controller
 	public function getStudienplatz()
 	{
 		$studienplatzID = $this->get('studienplatz_id');
-		
+
 		if (isset($studienplatzID))
 		{
 			$result = $this->StudienplatzModel->load($studienplatzID);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -62,7 +62,7 @@ class Studienplatz extends APIv1_Controller
 			{
 				$result = $this->StudienplatzModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -70,7 +70,7 @@ class Studienplatz extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($studienplatz = NULL)
 	{
 		return true;

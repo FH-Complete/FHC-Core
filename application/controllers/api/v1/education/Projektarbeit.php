@@ -21,7 +21,7 @@ class Projektarbeit extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Projektarbeit' => 'basis/projektarbeit:rw'));
 		// Load model ProjektarbeitModel
 		$this->load->model('education/Projektarbeit_model', 'ProjektarbeitModel');
 	}
@@ -32,11 +32,11 @@ class Projektarbeit extends APIv1_Controller
 	public function getProjektarbeit()
 	{
 		$projektarbeit_id = $this->get('projektarbeit_id');
-		
+
 		if (isset($projektarbeit_id))
 		{
 			$result = $this->ProjektarbeitModel->load($projektarbeit_id);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -60,7 +60,7 @@ class Projektarbeit extends APIv1_Controller
 			{
 				$result = $this->ProjektarbeitModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -68,7 +68,7 @@ class Projektarbeit extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($projektarbeit = NULL)
 	{
 		return true;

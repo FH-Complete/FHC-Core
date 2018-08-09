@@ -21,11 +21,11 @@ class Tag extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Tag' => 'basis/tag:rw'));
 		// Load model TagModel
 		$this->load->model('system/tag_model', 'TagModel');
-		
-		
+
+
 	}
 
 	/**
@@ -34,11 +34,11 @@ class Tag extends APIv1_Controller
 	public function getTag()
 	{
 		$tag = $this->get('tag');
-		
+
 		if (isset($tag))
 		{
 			$result = $this->TagModel->load($tag);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -62,7 +62,7 @@ class Tag extends APIv1_Controller
 			{
 				$result = $this->TagModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -70,7 +70,7 @@ class Tag extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($tag = NULL)
 	{
 		return true;

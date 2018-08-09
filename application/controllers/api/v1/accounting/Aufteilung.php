@@ -21,7 +21,7 @@ class Aufteilung extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Aufteilung' => 'basis/aufteilung:rw'));
 		// Load model AufteilungModel
 		$this->load->model('accounting/aufteilung_model', 'AufteilungModel');
 	}
@@ -32,11 +32,11 @@ class Aufteilung extends APIv1_Controller
 	public function getAufteilung()
 	{
 		$aufteilungID = $this->get('aufteilung_id');
-		
+
 		if (isset($aufteilungID))
 		{
 			$result = $this->AufteilungModel->load($aufteilungID);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -60,7 +60,7 @@ class Aufteilung extends APIv1_Controller
 			{
 				$result = $this->AufteilungModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -68,7 +68,7 @@ class Aufteilung extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($aufteilung = NULL)
 	{
 		return true;

@@ -21,11 +21,11 @@ class Aufnahmetermin extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Aufnahmetermin' => 'basis/aufnahmetermin:rw'));
 		// Load model AufnahmeterminModel
 		$this->load->model('crm/aufnahmetermin_model', 'AufnahmeterminModel');
-		
-		
+
+
 	}
 
 	/**
@@ -34,11 +34,11 @@ class Aufnahmetermin extends APIv1_Controller
 	public function getAufnahmetermin()
 	{
 		$aufnahmeterminID = $this->get('aufnahmetermin_id');
-		
+
 		if (isset($aufnahmeterminID))
 		{
 			$result = $this->AufnahmeterminModel->load($aufnahmeterminID);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -62,7 +62,7 @@ class Aufnahmetermin extends APIv1_Controller
 			{
 				$result = $this->AufnahmeterminModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -70,7 +70,7 @@ class Aufnahmetermin extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($aufnahmetermin = NULL)
 	{
 		return true;

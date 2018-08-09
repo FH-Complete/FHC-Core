@@ -21,7 +21,7 @@ class Lvinfo extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Lvinfo' => 'basis/lvinfo:rw'));
 		// Load model LvinfoModel
 		$this->load->model('education/Lvinfo_model', 'LvinfoModel');
 	}
@@ -33,11 +33,11 @@ class Lvinfo extends APIv1_Controller
 	{
 		$sprache = $this->get('sprache');
 		$lehrveranstaltung_id = $this->get('lehrveranstaltung_id');
-		
+
 		if (isset($sprache) && isset($lehrveranstaltung_id))
 		{
 			$result = $this->LvinfoModel->load(array($sprache, $lehrveranstaltung_id));
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -61,7 +61,7 @@ class Lvinfo extends APIv1_Controller
 			{
 				$result = $this->LvinfoModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -69,7 +69,7 @@ class Lvinfo extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($lvinfo = NULL)
 	{
 		return true;

@@ -23,9 +23,6 @@ class Redirect extends FHC_Controller
 	{
 		parent::__construct();
 
-		// Loads config file fhcomplete
-		$this->config->load('fhcomplete');
-
 		// Loads model MessageTokenModel
 		$this->load->model('system/MessageToken_model', 'MessageTokenModel');
 	}
@@ -61,7 +58,9 @@ class Redirect extends FHC_Controller
 				show_error('No organisation unit present in the message');
 			}
 
-			$addonAufnahmeUrls = $this->config->item('addons_aufnahme_url');
+			$addonAufnahmeUrls = $this->config->item('message_redirect_url');
+			if(!isset($addonAufnahmeUrls[$organisationRoot]))
+				$organisationRoot = 'fallback';
 
 			if (isset($token)
 				&& hasData($msg)
@@ -70,6 +69,17 @@ class Redirect extends FHC_Controller
 				&& isset($addonAufnahmeUrls[$organisationRoot]))
 			{
 				redirect($addonAufnahmeUrls[$organisationRoot] . '?token=' . $token);
+			}
+		}
+		else
+		{
+			$addonAufnahmeUrls = $this->config->item('message_redirect_url');
+			if (isset($token)
+				&& hasData($msg)
+				&& is_array($addonAufnahmeUrls)
+				&& isset($addonAufnahmeUrls['fallback']))
+			{
+				redirect($addonAufnahmeUrls['fallback'] . '?token=' . $token);
 			}
 		}
 	}

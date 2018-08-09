@@ -25,38 +25,36 @@ class CallerLib
 		'PersonLogLib'
 	);
 
+	private $_ci; // CI instance
+
 	/**
-	 * Object initialization
+	 * Library initialization
 	 */
 	public function __construct()
 	{
-		// Gets CI instance
-		$this->ci =& get_instance();
-
-		// Loads permission library
-		$this->ci->load->library('PermissionLib');
+		$this->_ci =& get_instance(); // Gets CI instance
 	}
 
 	/**
 	 * Wrapper method for _call
 	 */
-	public function callLibrary($callParameters, $permissionType)
+	public function callLibrary($callParameters)
 	{
-		return $this->_call($callParameters, $permissionType);
+		return $this->_call($callParameters);
 	}
 
 	/**
 	 * Wrapper method for _call
 	 */
-	public function callModel($callParameters, $permissionType)
+	public function callModel($callParameters)
 	{
-		return $this->_call($callParameters, $permissionType);
+		return $this->_call($callParameters);
 	}
 
 	/**
 	 * Everything starts here...
 	 */
-	private function _call($callParameters, $permissionType)
+	private function _call($callParameters)
 	{
 		$result = null;
 		$parameters = $this->_getParameters($callParameters);
@@ -80,30 +78,15 @@ class CallerLib
 			elseif (strpos($parameters->resourceName, CallerLib::LIB_PREFIX) !== false)
 			{
 				// Check if the resource is already loaded, it works only with libraries and drivers
-				$isLoaded = $this->ci->load->is_loaded($parameters->resourceName);
+				$isLoaded = $this->_ci->load->is_loaded($parameters->resourceName);
 				// If not loaded then load it
 				if ($isLoaded === false)
 				{
-					// Checks if the operation is permitted by the API caller
-					// Only for libraries, permissions are automatically handled by models
-					$result = $this->checkLibraryPermission(
-						$parameters->resourcePath,
-						$parameters->resourceName,
-						$parameters->function,
-						$permissionType
-					);
-					if (isError($result))
+					// Try to load the library
+					$result = $this->_loadLibrary($parameters->resourcePath, $parameters->resourceName);
+					if (isSuccess($result))
 					{
-						$loaded = null;
-					}
-					else
-					{
-						// Try to load the library
-						$result = $this->_loadLibrary($parameters->resourcePath, $parameters->resourceName);
-						if (isSuccess($result))
-						{
-							$loaded = $result->retval;
-						}
+						$loaded = $result->retval;
 					}
 				}
 				// If it is already loaded $isLoaded contains the instance of the library
@@ -225,7 +208,7 @@ class CallerLib
 
 		try
 		{
-			$loaded = $this->ci->load->model($resourcePath.$resourceName);
+			$loaded = $this->_ci->load->model($resourcePath.$resourceName);
 		}
 		catch (Exception $e)
 		{
@@ -236,34 +219,6 @@ class CallerLib
 		if (!is_null($loaded))
 		{
 			$result = success($loaded);
-		}
-
-		return $result;
-	}
-
-	/**
-	 * Search for a valid permission for this library that should be present with this format:
-	 * '<library path>.<library name>.<library method name>' => '<permission>'
-	 */
-	private function checkLibraryPermission($resourcePath, $resourceName, $function, $permissionType)
-	{
-		$result = null;
-		$permissionPath = '';
-
-		if ($resourcePath != '')
-		{
-			$permissionPath = $resourcePath;
-		}
-
-		$permissionPath .= $resourceName.'.'.$function;
-
-		if ($this->ci->permissionlib->isEntitled($permissionPath, $permissionType) === false)
-		{
-			$result = error(FHC_NORIGHT, FHC_NORIGHT);
-		}
-		else
-		{
-			$result = success('Has permission');
 		}
 
 		return $result;
@@ -288,7 +243,7 @@ class CallerLib
 		try
 		{
 			// Gets all the configured resources paths
-			$packagePaths = $this->ci->load->get_package_paths();
+			$packagePaths = $this->_ci->load->get_package_paths();
 			// Looking for a file in every paths with the same name of the resource
 			$found = null;
 			for ($i = 0; $i < count($packagePaths) && is_null($found); $i++)
@@ -305,7 +260,7 @@ class CallerLib
 			if (!is_null($found))
 			{
 				// Load the file
-				$loaded = $this->ci->load->file($found);
+				$loaded = $this->_ci->load->file($found);
 				// If the resource is not present inside the file
 				if (!class_exists($resourceName))
 				{

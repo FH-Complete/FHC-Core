@@ -223,7 +223,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 
 		switch($row->orgform_kurzbz)
 		{
-			case 'BB':	echo '		<studienart>Berufbegleitendes Studium / Part-time degree programm</studienart>';
+			case 'BB':	echo '		<studienart>Berufsbegleitendes Studium / Part-time degree programm</studienart>';
 						break;
 			case 'VZ':	echo '		<studienart>Vollzeitstudium / Full-time degree programm</studienart>';
 						break;

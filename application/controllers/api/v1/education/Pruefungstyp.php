@@ -21,7 +21,7 @@ class Pruefungstyp extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Pruefungstyp' => 'basis/pruefungstyp:rw'));
 		// Load model PruefungstypModel
 		$this->load->model('education/Pruefungstyp_model', 'PruefungstypModel');
 	}
@@ -32,11 +32,11 @@ class Pruefungstyp extends APIv1_Controller
 	public function getPruefungstyp()
 	{
 		$pruefungstyp_kurzbz = $this->get('pruefungstyp_kurzbz');
-		
+
 		if (isset($pruefungstyp_kurzbz))
 		{
 			$result = $this->PruefungstypModel->load($pruefungstyp_kurzbz);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -60,7 +60,7 @@ class Pruefungstyp extends APIv1_Controller
 			{
 				$result = $this->PruefungstypModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -68,7 +68,7 @@ class Pruefungstyp extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($pruefungstyp = NULL)
 	{
 		return true;

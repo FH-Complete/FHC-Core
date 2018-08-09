@@ -21,7 +21,7 @@ class Rechnungsbetrag extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Rechnungsbetrag' => 'basis/rechnungsbetrag:rw'));
 		// Load model RechnungsbetragModel
 		$this->load->model('accounting/rechnungsbetrag_model', 'RechnungsbetragModel');
 	}
@@ -32,11 +32,11 @@ class Rechnungsbetrag extends APIv1_Controller
 	public function getRechnungsbetrag()
 	{
 		$rechnungsbetragID = $this->get('rechnungsbetrag_id');
-		
+
 		if (isset($rechnungsbetragID))
 		{
 			$result = $this->RechnungsbetragModel->load($rechnungsbetragID);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -60,7 +60,7 @@ class Rechnungsbetrag extends APIv1_Controller
 			{
 				$result = $this->RechnungsbetragModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -68,7 +68,7 @@ class Rechnungsbetrag extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($rechnungsbetrag = NULL)
 	{
 		return true;

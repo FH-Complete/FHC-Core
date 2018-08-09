@@ -21,7 +21,7 @@ class Budget extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Budget' => 'basis/budget:rw'));
 		// Load model BudgetModel
 		$this->load->model('accounting/budget_model', 'BudgetModel');
 	}
@@ -33,11 +33,11 @@ class Budget extends APIv1_Controller
 	{
 		$kostenstelle_id = $this->get('kostenstelle_id');
 		$geschaeftsjahr_kurzbz = $this->get('geschaeftsjahr_kurzbz');
-		
+
 		if (isset($kostenstelle_id) && isset($geschaeftsjahr_kurzbz))
 		{
 			$result = $this->BudgetModel->load(array($kostenstelle_id, $geschaeftsjahr_kurzbz));
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -61,7 +61,7 @@ class Budget extends APIv1_Controller
 			{
 				$result = $this->BudgetModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -69,7 +69,7 @@ class Budget extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($budget = NULL)
 	{
 		return true;

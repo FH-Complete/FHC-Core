@@ -21,7 +21,7 @@ class Entwicklungsteam extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Entwicklungsteam' => 'basis/entwicklungsteam:rw'));
 		// Load model EntwicklungsteamModel
 		$this->load->model('codex/entwicklungsteam_model', 'EntwicklungsteamModel');
 	}
@@ -33,11 +33,11 @@ class Entwicklungsteam extends APIv1_Controller
 	{
 		$studiengang_kz = $this->get('studiengang_kz');
 		$mitarbeiter_uid = $this->get('mitarbeiter_uid');
-		
+
 		if (isset($studiengang_kz) && isset($mitarbeiter_uid))
 		{
 			$result = $this->EntwicklungsteamModel->load(array($studiengang_kz, $mitarbeiter_uid));
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -61,7 +61,7 @@ class Entwicklungsteam extends APIv1_Controller
 			{
 				$result = $this->EntwicklungsteamModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -69,7 +69,7 @@ class Entwicklungsteam extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($entwicklungsteam = NULL)
 	{
 		return true;

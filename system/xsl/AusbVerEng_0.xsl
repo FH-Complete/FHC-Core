@@ -641,6 +641,10 @@
 		<style:style style:name="T43" style:family="text">
 			<style:text-properties fo:font-size="12pt" style:font-size-asian="12pt"/>
 		</style:style>
+		<style:style style:name="X1" style:family="paragraph" style:parent-style-name="Standard">
+			<style:paragraph-properties fo:line-height="130%" fo:text-align="justify" style:justify-single-word="false"/>
+			<style:text-properties style:use-window-font-color="true" style:font-name="Arial" fo:font-size="10pt" fo:language="en" fo:country="US" fo:font-weight="bold" officeooo:paragraph-rsid="001f9220" fo:background-color="transparent" style:font-name-asian="Times New Roman" style:font-size-asian="10pt" style:font-weight-asian="bold" style:font-name-complex="Arial" style:font-size-complex="9pt" style:language-complex="ar" style:country-complex="SA" style:font-weight-complex="bold"/>
+		</style:style>
 		<style:style style:name="fr1" style:family="graphic" style:parent-style-name="Graphics">
 			<style:graphic-properties fo:margin-left="0.319cm" fo:margin-right="0.319cm" style:run-through="background" style:wrap="run-through" style:number-wrapped-paragraphs="no-limit" style:vertical-pos="from-top" style:vertical-rel="paragraph" style:horizontal-pos="from-left" style:horizontal-rel="paragraph" fo:padding="0.002cm" fo:border="none" style:mirror="none" fo:clip="rect(0cm, 0cm, 0cm, 0cm)" draw:luminance="0%" draw:contrast="0%" draw:red="0%" draw:green="0%" draw:blue="0%" draw:gamma="100%" draw:color-inversion="false" draw:image-opacity="100%" draw:color-mode="standard"/>
 		</style:style>
@@ -880,11 +884,6 @@
 					</text:span>
 					<text:span text:style-name="Strong_20_Emphasis"> </text:span>
 				</text:p>
-				<text:p text:style-name="Standard">
-					<text:span text:style-name="Strong_20_Emphasis">
-						<text:span text:style-name="T33"/>
-					</text:span>
-				</text:p>
 				<text:list xml:id="list8019569486514330718" text:style-name="WW8Num4">
 					<text:list-item>
 						<text:p text:style-name="P77">Der Erhalter verpflichtet sich zur ordnungsgemäßen Planung und Durchführung des Studienganges in der Regelstudiendauer. Der Erhalter ist verpflichtet, allfällige Änderungen des akkreditierten Studienganges zeitgerecht bekannt zu geben.</text:p>
@@ -1059,7 +1058,7 @@
 				<text:p text:style-name="P20">Diese Dokumente sind öffentlich zugänglich unter www.technikum-wien.at.</text:p>
 				<text:p text:style-name="P20"/>
 				<text:p text:style-name="P48">6.2.2 Studienbeitrag </text:p>
-				<text:p text:style-name="P48">Die Studentin bzw. der Student ist verpflichtet, zwei Wochen vor Beginn jedes Semesters (StudienanfängerInnen: bis 20. August vor Studienbeginn) einen Studienbeitrag gemäß Fachhochschul-Studiengesetz idgF in der Höhe von derzeit € 363,36 netto pro Semester zu entrichten. Dies gilt auch in Semestern mit DiplomandInnenenstatus o.ä. Im Falle einer Erhöhung des gesetzlichen Studienbeitrags-satzes erhöht sich der angeführte Betrag entsprechend. Die vollständige Bezahlung des Studienbeitrags ist Voraussetzung für die Aufnahme bzw. die Fortsetzung des Studiums. Bei Nichtantritt des Studiums oder Abbruch zu Beginn oder während des Semesters verfällt der Studienbeitrag. </text:p>
+				<text:p text:style-name="P48">Die Studentin bzw. der Student ist verpflichtet, zwei Wochen vor Beginn jedes Semesters (StudienanfängerInnen: bis 20. August vor Studienbeginn) einen Studienbeitrag gemäß Fachhochschul-Studiengesetz idgF in der Höhe von derzeit € 363,36 netto pro Semester zu entrichten. Dies gilt auch in Semestern mit DiplomandInnenenstatus o.ä. Im Falle einer Erhöhung des gesetzlichen Studienbeitrags-satzes erhöht sich der angeführte Betrag entsprechend. Die vollständige Bezahlung des Studienbeitrags ist Voraussetzung für die Aufnahme bzw. die Fortsetzung des Studiums. Bei Nichtantritt des Studiums oder Abbruch zu Beginn oder während des Semesters verfällt der Studienbeitrag. </text:p>
 				<text:p text:style-name="P69">
 					<text:span text:style-name="T8">6.2 Duties</text:span>
 				</text:p>
@@ -1087,14 +1086,14 @@
 				<text:p text:style-name="P20">These documents are publically available at www.technikum-wien.at.</text:p>
 				<text:p text:style-name="P48"/>
 				<text:p text:style-name="P48">6.2.2 Tuition Fees</text:p>
-				<text:p text:style-name="P48">Two weeks before the beginning of each semester (new students: up to August 20 before taking up studies) the student undertakes to pay tuition fees according to the University of Applied Sciences Studies Act as amended currently to the sum of € 363.36 net payable per semester. This also applies in semesters with graduand status etc. In the event of an increase in the legal tuition fees rate, the amount quoted will increase accordingly. Full payment of the tuition fees is a prerequisite both for enrolling on the course and continuing with the degree program. For non-commencement or termination of the study at the beginning or during the semester, the tuition fee is forfeited. </text:p>
+				<text:p text:style-name="P48">Two weeks before the beginning of each semester (new students: up to August 20 before taking up studies) the student undertakes to pay tuition fees according to the University of Applied Sciences Studies Act as amended currently to the sum of € 363.36 net payable per semester. This also applies in semesters with graduand status etc. In the event of an increase in the legal tuition fees rate, the amount quoted will increase accordingly. Full payment of the tuition fees is a prerequisite both for enrolling on the course and continuing with the degree program. For non-commencement or termination of the study at the beginning or during the semester, the tuition fee is forfeited. </text:p>
 				<text:p text:style-name="P67">
 					<text:soft-page-break/>6.2.3 ÖH-Beitrag</text:p>
 				<text:p text:style-name="P20">Gemäß § 4 Abs. 10 FHStG sind Studierende an Fachhochschulen Mitglieder der Österreichischen HochschülerInnenschaft (ÖH). Der/Die Studierende hat semesterweise einen ÖH-Beitrag an den Erhalter zu entrichten, der diesen an die ÖH abführt. Die Entrichtung des Betrags ist Voraussetzung für die Zulassung zum Studium bzw. für dessen Fortsetzung.</text:p>
 				<text:p text:style-name="P20"/>
 				<text:p text:style-name="P20">6.2.4 Kaution </text:p>
 				<text:p text:style-name="P20">Im Zuge der Einschreibung ist der Nachweis über die einbezahlte Kaution zu erbringen. </text:p>
-				<text:p text:style-name="P20">Die Kaution beträgt € 150,–. </text:p>
+				<text:p text:style-name="P20">Die Kaution beträgt € 150,–. </text:p>
 				<text:p text:style-name="P20">Bei Nichtantritt des Studiums oder Abbruch während des ersten oder zweiten Semesters verfällt die Kaution. </text:p>
 				<text:p text:style-name="P48">Bei aufrechtem Inskriptionsverhältnis zu Beginn des zweiten Semesters wird die Kaution auf den Unkostenbeitrag (siehe nächster Punkt) des ersten und zweiten Semesters angerechnet. </text:p>
 				<text:p text:style-name="P48">
@@ -1105,7 +1104,7 @@
 				</text:p>
 				<text:p text:style-name="P48">Pro Semester ist ein Unkostenbeitrag zu entrichten, wobei es sich nicht um einen Pauschalbetrag handelt. Der Unkostenbeitrag stellt eine Abgeltung für über das Normalmaß hinausgehende Serviceleistungen der FH dar, z.B. Freifächer, Beratung/Info Auslands-studium, Sponsionsfeiern, Vorträge / Job-börse, Mensa etc. </text:p>
 				<text:p text:style-name="P48"/>
-				<text:p text:style-name="P48">Die Höhe des Unkostenbeitrages beträgt derzeit € 75,– pro Semester. Eine allfällige Anpassung wird durch Aushang bekannt gemacht. </text:p>
+				<text:p text:style-name="P48">Die Höhe des Unkostenbeitrages beträgt derzeit € 75,– pro Semester. Eine allfällige Anpassung wird durch Aushang bekannt gemacht. </text:p>
 				<text:p text:style-name="P48">Der Unkostenbeitrag ist
 				<xsl:choose>
 						<xsl:when test="semesterStudent = 3" >
@@ -1121,14 +1120,14 @@
 				<text:p text:style-name="P20"/>
 				<text:p text:style-name="P20">6.2.4 Deposit </text:p>
 				<text:p text:style-name="P20">During the process of registration, proof of deposit paid must be provided.</text:p>
-				<text:p text:style-name="P20">The deposit is € 150,–. </text:p>
+				<text:p text:style-name="P20">The deposit is € 150,–. </text:p>
 				<text:p text:style-name="P20">For non-commencement of studies or termination during the first or second semester, the deposit shall be forfeited. </text:p>
 				<text:p text:style-name="P20">If, by the beginning of the second semester, registration has been completed correctly the deposit will be credited to the contribution towards expenses (see next point) for the first and second semester. </text:p>
 				<text:p text:style-name="P79"/>
 				<text:p text:style-name="P79">6.2.5 Contribution towards Expenses </text:p>
 				<text:p text:style-name="P48">A contribution towards expenses, which is not a lump sum, is payable per semester. The contribution towards expenses represents compensation for the services provided by the UAS that go beyond the normal level, such as electives, counseling/ information about studying abroad, graduation ceremonies, lectures/job market, cafeteria, etc. </text:p>
 				<text:p text:style-name="P48"/>
-				<text:p text:style-name="P48">The amount of the contribution is currently <text:line-break/>€ 75,– per semester. Any possible adjustment is posted on the noticeboard. </text:p>
+				<text:p text:style-name="P48">The amount of the contribution is currently <text:line-break/>€ 75,– per semester. Any possible adjustment is posted on the noticeboard. </text:p>
 				<text:p text:style-name="P48">
 				<xsl:choose>
 					<xsl:when test="semesterStudent = 3" >
@@ -1239,7 +1238,6 @@
 				<text:p text:style-name="P20">The student undertakes to return promptly all equipment, books, keys and other materials that have been made available, when the course is finished or broken off.</text:p>
 				<text:p text:style-name="P20"/>
 				<text:p text:style-name="P20"/>
-				<text:p text:style-name="P20"/>
 				<text:p text:style-name="P20">
 					<text:span text:style-name="Strong_20_Emphasis">
 						<text:span text:style-name="T42">7. Termination of the contract</text:span>
@@ -1252,6 +1250,7 @@
 				<text:p text:style-name="P61"/>
 				<text:p text:style-name="P20">By mutual consent, the annulment of the training contract is possible at any time, without notice and for any reason. The amicable annulment must be put down in writing. </text:p>
 				<text:p text:style-name="P20"/>
+				<text:p text:style-name="P20"/>
 				<text:p text:style-name="P20">
 					<text:span text:style-name="Strong_20_Emphasis">
 						<text:span text:style-name="T8">7.2 Termination by the Student</text:span>
@@ -1261,8 +1260,7 @@
 				<text:p text:style-name="P20"/>
 				<text:p text:style-name="P20">The student may terminate the training contract in writing at the end of each semester.</text:p>
 				<text:p text:style-name="P20"/>
-				<text:p text:style-name="P70">
-					<text:soft-page-break/>
+				<text:p text:style-name="P43">
 					<text:span text:style-name="T8">7.3 Automatische Beendigung des Vertrages</text:span>
 				</text:p>
 				<text:p text:style-name="P22">Nach erfolgreicher Beendigung des Studiums endet der Vertrag automatisch mit der Verleihung des akademischen Grades.</text:p>
@@ -1298,7 +1296,6 @@
 						<text:p text:style-name="P76">strafgerichtlicher Verurteilung (wobei die Art des Deliktes und der Grad der Schuld berücksichtigt werden);</text:p>
 					</text:list-item>
 				</text:list>
-				<text:p text:style-name="P89"/>
 				<text:p text:style-name="P69">
 					<text:span text:style-name="Strong_20_Emphasis">
 						<text:span text:style-name="T8">7.3 Automatic Ending of the Contract</text:span>

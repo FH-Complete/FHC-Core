@@ -21,11 +21,11 @@ class Zeitsperre extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Zeitsperre' => 'basis/zeitsperre:rw'));
 		// Load model ZeitsperreModel
 		$this->load->model('ressource/zeitsperre_model', 'ZeitsperreModel');
-		
-		
+
+
 	}
 
 	/**
@@ -34,11 +34,11 @@ class Zeitsperre extends APIv1_Controller
 	public function getZeitsperre()
 	{
 		$zeitsperreID = $this->get('zeitsperre_id');
-		
+
 		if (isset($zeitsperreID))
 		{
 			$result = $this->ZeitsperreModel->load($zeitsperreID);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -62,7 +62,7 @@ class Zeitsperre extends APIv1_Controller
 			{
 				$result = $this->ZeitsperreModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -70,7 +70,7 @@ class Zeitsperre extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($zeitsperre = NULL)
 	{
 		return true;

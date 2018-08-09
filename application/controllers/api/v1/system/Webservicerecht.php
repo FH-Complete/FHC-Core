@@ -21,11 +21,11 @@ class Webservicerecht extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Webservicerecht' => 'basis/webservicerecht:rw'));
 		// Load model WebservicerechtModel
 		$this->load->model('system/webservicerecht_model', 'WebservicerechtModel');
-		
-		
+
+
 	}
 
 	/**
@@ -34,11 +34,11 @@ class Webservicerecht extends APIv1_Controller
 	public function getWebservicerecht()
 	{
 		$webservicerechtID = $this->get('webservicerecht_id');
-		
+
 		if (isset($webservicerechtID))
 		{
 			$result = $this->WebservicerechtModel->load($webservicerechtID);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -62,7 +62,7 @@ class Webservicerecht extends APIv1_Controller
 			{
 				$result = $this->WebservicerechtModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -70,7 +70,7 @@ class Webservicerecht extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($webservicerecht = NULL)
 	{
 		return true;

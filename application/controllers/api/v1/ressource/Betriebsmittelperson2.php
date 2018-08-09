@@ -21,11 +21,11 @@ class Betriebsmittelperson2 extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Betriebsmittelperson' => 'basis/betriebsmittelperson:rw'));
 		// Load model BetriebsmittelpersonModel
 		$this->load->model('ressource/betriebsmittelperson_model', 'BetriebsmittelpersonModel');
-		
-		
+
+
 	}
 
 	/**
@@ -34,11 +34,11 @@ class Betriebsmittelperson2 extends APIv1_Controller
 	public function getBetriebsmittelperson()
 	{
 		$betriebsmittelpersonID = $this->get('betriebsmittelperson_id');
-		
+
 		if (isset($betriebsmittelpersonID))
 		{
 			$result = $this->BetriebsmittelpersonModel->load($betriebsmittelpersonID);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -62,7 +62,7 @@ class Betriebsmittelperson2 extends APIv1_Controller
 			{
 				$result = $this->BetriebsmittelpersonModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -70,7 +70,7 @@ class Betriebsmittelperson2 extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($betriebsmittelperson = NULL)
 	{
 		return true;

@@ -382,7 +382,8 @@ class dokument_export
 		if($this->styles_xsl!='')
 			unlink('styles.xml');
 
-		unlink($this->temp_filename);
+		if(file_exists($this->temp_filename))
+			unlink($this->temp_filename);
 
 		if($this->signed_filename != '')
 			unlink($this->signed_filename);

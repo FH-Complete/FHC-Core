@@ -21,7 +21,7 @@ class Mobilitaetsprogramm extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Mobilitaetsprogramm' => 'basis/mobilitaetsprogramm:rw'));
 		// Load model MobilitaetsprogrammModel
 		$this->load->model('codex/mobilitaetsprogramm_model', 'MobilitaetsprogrammModel');
 	}
@@ -32,11 +32,11 @@ class Mobilitaetsprogramm extends APIv1_Controller
 	public function getMobilitaetsprogramm()
 	{
 		$mobilitaetsprogramm_code = $this->get('mobilitaetsprogramm_code');
-		
+
 		if (isset($mobilitaetsprogramm_code))
 		{
 			$result = $this->MobilitaetsprogrammModel->load($mobilitaetsprogramm_code);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -60,7 +60,7 @@ class Mobilitaetsprogramm extends APIv1_Controller
 			{
 				$result = $this->MobilitaetsprogrammModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -68,7 +68,7 @@ class Mobilitaetsprogramm extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($mobilitaetsprogramm = NULL)
 	{
 		return true;

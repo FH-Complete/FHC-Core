@@ -1536,7 +1536,7 @@ if($result = @$db->db_query("SELECT * FROM information_schema.role_table_grants 
 	}
 }
 
-// INSERT Berechtigungen fuer web User erteilen fuer tbl_msg_status
+// UPDATE Berechtigungen fuer web User erteilen fuer tbl_msg_status
 if($result = @$db->db_query("SELECT * FROM information_schema.role_table_grants WHERE table_name='tbl_msg_status' AND table_schema='public' AND grantee='web' AND privilege_type='UPDATE'"))
 {
 	if($db->db_num_rows($result)==0)
@@ -2245,6 +2245,56 @@ if(!$result = @$db->db_query("SELECT bpk FROM public.tbl_person LIMIT 1"))
 		echo '<strong>public.tbl_person: '.$db->db_last_error().'</strong><br>';
 	else
 		echo '<br>public.tbl_person: Spalte bpk hinzugefuegt';
+}
+
+// titel und bezeichnung in tbl_akte verlaengert
+if($result = $db->db_query("SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA='public' AND TABLE_NAME='tbl_akte' AND COLUMN_NAME = 'titel' AND character_maximum_length=32"))
+{
+	if($db->db_num_rows($result)>0)
+	{
+		$qry = "ALTER TABLE public.tbl_akte ALTER COLUMN titel TYPE varchar(64);
+		ALTER TABLE public.tbl_akte ALTER COLUMN bezeichnung TYPE varchar(64);
+		";
+
+		if(!$db->db_query($qry))
+			echo '<strong>public.tbl_akte '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>Spalte titel und bezeichnung in public.tbl_akte von varchar(32) auf varchar(64) geändert<br>';
+	}
+}
+
+// INSERT und Update Berechtigungen fuer web User erteilen fuer tbl_msg_message
+if($result = @$db->db_query("SELECT * FROM information_schema.role_table_grants WHERE table_name='tbl_msg_message' AND table_schema='public' AND grantee='web' AND privilege_type='INSERT'"))
+{
+	if($db->db_num_rows($result)==0)
+	{
+		$qry = "GRANT SELECT, INSERT, UPDATE ON public.tbl_msg_message TO web;
+		GRANT SELECT, UPDATE ON SEQUENCE public.tbl_msg_message_message_id_seq TO web;";
+
+		if(!$db->db_query($qry))
+		{
+			echo '<strong>public.tbl_msg_message Berechtigungen: '.$db->db_last_error().'</strong><br>';
+		}
+		else
+		{
+			echo '<br>INSERT und UPDATE Rechte fuer public.tbl_msg_message
+				und tbl_msg_message_message_id_seq fuer web user gesetzt ';
+		}
+	}
+}
+
+// INSERT und Update Berechtigungen fuer web User erteilen fuer tbl_msg_recipient
+if($result = @$db->db_query("SELECT * FROM information_schema.role_table_grants WHERE table_name='tbl_msg_recipient' AND table_schema='public' AND grantee='web' AND privilege_type='INSERT'"))
+{
+	if($db->db_num_rows($result)==0)
+	{
+		$qry = "GRANT SELECT, INSERT, UPDATE ON public.tbl_msg_recipient TO web;";
+
+		if(!$db->db_query($qry))
+			echo '<strong>public.tbl_msg_message Berechtigungen: '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>INSERT und UPDATE Rechte fuer public.tbl_msg_message fuer web user gesetzt ';
+	}
 }
 
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen

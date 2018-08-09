@@ -6,7 +6,7 @@ if (! defined('BASEPATH')) exit('No direct script access allowed');
  * Shows infocenter-related data for a person and its prestudents, enables document and zgv checks,
  * displays and saves Notizen for a person, logs infocenter-related actions for a person
  */
-class InfoCenter extends FHC_Controller
+class InfoCenter extends Auth_Controller
 {
 	// App and Verarbeitungstaetigkeit name for logging
 	const APP = 'infocenter';
@@ -65,7 +65,30 @@ class InfoCenter extends FHC_Controller
 	 */
 	public function __construct()
     {
-        parent::__construct();
+        parent::__construct(
+			array(
+				'index' => 'infocenter:r',
+				'freigegeben' => 'infocenter:r',
+				'showDetails' => 'infocenter:r',
+				'unlockPerson' => 'infocenter:rw',
+				'saveFormalGeprueft' => 'infocenter:rw',
+				'getLastPrestudentWithZgvJson' => 'infocenter:r',
+				'getZgvInfoForPrestudent' => 'infocenter:r',
+				'saveZgvPruefung' => 'infocenter:rw',
+				'saveAbsage' => 'infocenter:rw',
+				'saveFreigabe' => 'infocenter:rw',
+				'saveNotiz' => 'infocenter:rw',
+				'updateNotiz' => 'infocenter:rw',
+				'reloadNotizen' => 'infocenter:r',
+				'reloadLogs' => 'infocenter:r',
+				'outputAkteContent' => 'infocenter:r',
+				'getParkedDate' => 'infocenter:r',
+				'park' => 'infocenter:rw',
+				'unpark' => 'infocenter:rw',
+				'getStudienjahrEnd' => 'infocenter:r',
+				'setNavigationMenuArrayJson' => 'infocenter:r'
+			)
+		);
 
 		// Loads models
 		$this->load->model('crm/akte_model', 'AkteModel');
@@ -94,10 +117,6 @@ class InfoCenter extends FHC_Controller
 		);
 
 		$this->_setAuthUID(); // sets property uid
-
-		$this->load->library('PermissionLib');
-		if(!$this->permissionlib->isBerechtigt('basis/person'))
-			show_error('You have no Permission! You need Infocenter Role');
 
 		$this->setControllerId(); // sets the controller id
     }
@@ -652,7 +671,7 @@ class InfoCenter extends FHC_Controller
 		$listFiltersNotSent = array();
 		$listCustomFilters = array();
 
-		$filtersSent = $this->FiltersModel->getFilterList('infocenter', 'PersonActions', '%InfoCenterSentApplication%');
+		$filtersSent = $this->FiltersModel->getFilterList('infocenter', 'overview', '%InfoCenterSentApplication%');
 		if (hasData($filtersSent))
 		{
 			for ($filtersCounter = 0; $filtersCounter < count($filtersSent->retval); $filtersCounter++)
@@ -663,7 +682,7 @@ class InfoCenter extends FHC_Controller
 			}
 		}
 
-		$filtersNotSent = $this->FiltersModel->getFilterList('infocenter', 'PersonActions', '%InfoCenterNotSentApplication%');
+		$filtersNotSent = $this->FiltersModel->getFilterList('infocenter', 'overview', '%InfoCenterNotSentApplication%');
 		if (hasData($filtersNotSent))
 		{
 			for ($filtersCounter = 0; $filtersCounter < count($filtersNotSent->retval); $filtersCounter++)
@@ -674,7 +693,7 @@ class InfoCenter extends FHC_Controller
 			}
 		}
 
-		$customFilters = $this->FiltersModel->getCustomFiltersList('infocenter', 'PersonActions', $this->_uid);
+		$customFilters = $this->FiltersModel->getCustomFiltersList('infocenter', 'overview', $this->_uid);
 		if (hasData($customFilters))
 		{
 			for ($filtersCounter = 0; $filtersCounter < count($customFilters->retval); $filtersCounter++)
@@ -795,7 +814,7 @@ class InfoCenter extends FHC_Controller
 		$listFilters = array();
 		$listCustomFilters = array();
 
-		$filters = $this->FiltersModel->getFilterList('infocenter', 'PersonActions', '%InfoCenterFreigegeben%');
+		$filters = $this->FiltersModel->getFilterList('infocenter', 'freigegeben', '%InfoCenterFreigegeben%');
 		if (hasData($filters))
 		{
 			for ($filtersCounter = 0; $filtersCounter < count($filters->retval); $filtersCounter++)
@@ -806,7 +825,7 @@ class InfoCenter extends FHC_Controller
 			}
 		}
 
-		$customFilters = $this->FiltersModel->getCustomFiltersList('infocenter', 'PersonActions', $this->_uid);
+		$customFilters = $this->FiltersModel->getCustomFiltersList('infocenter', 'freigegeben', $this->_uid);
 		if (hasData($customFilters))
 		{
 			for ($filtersCounter = 0; $filtersCounter < count($customFilters->retval); $filtersCounter++)
@@ -845,7 +864,7 @@ class InfoCenter extends FHC_Controller
 				'filters' => $this->navigationlib->oneLevel(
 					'Filter',					// description
 					'#',						// link
-					$filtersArray['children'],	// children
+					(isset($filtersArray['children'])?$filtersArray['children']:''),	// children
 					'',							// icon
 					true,						// expand
 					null, 						// subscriptDescription

@@ -21,11 +21,11 @@ class Projekt extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Projekt' => 'basis/projekt:rw'));
 		// Load model ProjektModel
 		$this->load->model('project/projekt_model', 'ProjektModel');
-		
-		
+
+
 	}
 
 	/**
@@ -34,11 +34,11 @@ class Projekt extends APIv1_Controller
 	public function getProjekt()
 	{
 		$projekt_kurzbz = $this->get('projekt_kurzbz');
-		
+
 		if (isset($projekt_kurzbz))
 		{
 			$result = $this->ProjektModel->load($projekt_kurzbz);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -62,7 +62,7 @@ class Projekt extends APIv1_Controller
 			{
 				$result = $this->ProjektModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -70,7 +70,7 @@ class Projekt extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($projekt = NULL)
 	{
 		return true;

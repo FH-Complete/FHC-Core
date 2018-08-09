@@ -324,6 +324,10 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
 	</office:automatic-styles>
 	<office:body>
 		<xsl:apply-templates select="lehrauftrag"/>
+		<!-- Add extra page to avoid problems with libreoffice 6 -->
+		<office:text text:use-soft-page-breaks="true" xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0" xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0" xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0" xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0" xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0">
+			<text:p text:style-name="Seitenumbruch"/>
+		</office:text>
 	</office:body>
 </office:document-content>
 </xsl:template>

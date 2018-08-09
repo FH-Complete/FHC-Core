@@ -63,15 +63,15 @@ if (isset($_GET['archivdokument']))
 	$archivdokument = $_GET['archivdokument'];
 	$allDocs = array();
 	$errorText = '';
-	
+
 	$dokument = new dokument();
 	$dokument->loadDokumenttyp($archivdokument);
-	
+
 	$pdf = new pdf();
-	
+
 	// Temporaeren Ordner fuer die Erstellung der Dokumente generieren
 	$tmpDir = sys_get_temp_dir() . "/fhc_archivexport_" . uniqid();
-	
+
 	if (!file_exists($tmpDir))
 		mkdir($tmpDir, 0777, true);
 
@@ -90,11 +90,11 @@ if (isset($_GET['archivdokument']))
 		{
 			$rechte = new benutzerberechtigung();
 			$rechte->getBerechtigungen($user);
-			
+
 			if (!$rechte->isBerechtigt('admin', $student_obj->studiengang_kz, 'suid')
 				&& !$rechte->isBerechtigt('assistenz', $student_obj->studiengang_kz, 'suid'))
 				die('Sie haben keine Berechtigung für diese Studierenden');
-			else 
+			else
 			{
 				// Die jeweils letzte (aktuellste) Akte dieses Typs von jedem Studierenden laden und in eine temporäre Datei schreiben
 				foreach ($uids AS $value)
@@ -102,28 +102,28 @@ if (isset($_GET['archivdokument']))
 					// Leere Einträge überspringen
 					if ($value == '')
 						continue;
-					
+
 					$student_obj = new student($value);
 					$person_id = $student_obj->person_id;
 					$akte = new akte();
 					$akte->getAkten($person_id, $archivdokument, null, null, true, 'erstelltam DESC');
-					
+
 					if (isset($akte->result[0]))
 					{
 						$filename = '';
 						if($akte->result[0]->inhalt != '')
 						{
 							$filename = $tmpDir . "/" . uniqid();
-							
+
 							$fileData = base64_decode($akte->result[0]->inhalt);
 							file_put_contents($filename, $fileData);
-							
+
 							$allDocs[] = $filename;
 						}
 						else
 							$errorText .= "Das Dokument ".$dokument->bezeichnung." bei ".$student_obj->nachname." ".$student_obj->vorname." (".$value.") ist leer\n";
 					}
-					else 
+					else
 						$errorText .= $student_obj->nachname." ".$student_obj->vorname." (".$value.") hat kein Dokument '".$dokument->bezeichnung."' im Archiv\n";
 				}
 				if (count($allDocs) == 0)
@@ -131,19 +131,19 @@ if (isset($_GET['archivdokument']))
 					rmdir($tmpDir);
 					die('Bei keinem der gewählten Studierenden ist einen Bescheid vorhanden');
 				}
-				
+
 				// Textseite mit Errormessages generieren und in PDF umwandeln
 				if ($errorText != '')
 				{
 					$errorfile = $tmpDir . "/" . uniqid() . ".txt";
 					file_put_contents($errorfile, $errorText);
-					
+
 					$newnameErrorfile = $tmpDir . "/" . uniqid();
-	
+
 					$docExport = new dokument_export();
 					$docExport->convert($errorfile, $newnameErrorfile, "pdf");
 					unlink($errorfile);
-					
+
 					// Konvertiertes File an erste Position im Array hängen
 					array_unshift($allDocs, $newnameErrorfile);
 				}
@@ -155,46 +155,46 @@ if (isset($_GET['archivdokument']))
 					unlink($doc);
 
 				$fsize = filesize($finishedPdf);
-					
+
 				if(!$handle = fopen($finishedPdf,'r'))
 					die('load failed');
-					
+
 				header('Content-type: application/pdf');
 				header('Content-Disposition: attachment; filename="'.$archivdokument.'_Album.pdf"');
 				header('Content-Length: '.$fsize);
-				
+
 				while (!feof($handle))
 				{
 					echo fread($handle, 8192);
 				}
 				fclose($handle);
-				
+
 				unlink($finishedPdf);
 				rmdir($tmpDir);
 			}
 		}
-		else 
+		else
 			die('Der/Die Studierenden konnte nicht geladen werden');
 	}
 }
-else 
+else
 {
 	//Parameter holen
 	if (isset($_GET['xml']))
 		$xml = $_GET['xml'];
 	else
 		die('Fehlerhafte Parameteruebergabe');
-	
+
 	if (isset($_GET['xsl']))
 		$xsl = $_GET['xsl'];
 	else
 		die('Fehlerhafte Parameteruebergabe');
-	
+
 	if(isset($_GET['sign']))
 		$sign = true;
 	else
 		$sign = false;
-	
+
 	// Studiengang ermitteln dessen Vorlage verwendet werden soll
 	$xsl_stg_kz = 0;
 	// Direkte uebergabe des Studienganges dessen Vorlage verwendet werden soll
@@ -215,7 +215,7 @@ else
 					$uids = explode(';',$_GET['uid']);
 				else
 					$uids[1] = $_GET['uid'];
-	
+
 				$student_obj = new student();
 				if ($student_obj->load($uids[1]))
 				{
@@ -228,7 +228,7 @@ else
 					$prestudent_ids = explode(';',$_GET['prestudent_id']);
 				else
 					$prestudent_ids[1] = $_GET['prestudent_id'];
-	
+
 				$prestudent_obj = new prestudent();
 				if ($prestudent_obj->load($prestudent_ids[1]))
 				{
@@ -241,10 +241,10 @@ else
 		$xsl_oe_kurzbz = $_GET['xsl_oe_kurzbz'];
 	else
 		$xsl_oe_kurzbz = '';
-	
+
 	//Parameter setzen
 	$params = 'xmlformat=xml';
-	
+
 	// GET Parameter die an XML durchgereicht werden
 	foreach ($_GET as $getkey=>$getvalue)
 	{
@@ -259,7 +259,7 @@ else
 			$params .= '&'.$getkey.'='.urlencode($getvalue);
 		}
 	}
-	
+
 	if (isset($_GET['vertrag_id']))
 	{
 		foreach($_GET['vertrag_id'] as $id)
@@ -271,14 +271,14 @@ else
 		$version = $_GET['version'];
 	else
 		$version = null;
-	
+
 	$output = (isset($_GET['output'])?$_GET['output']:'odt');
-	
+
 	$rechte = new benutzerberechtigung();
 	$rechte->getBerechtigungen($user);
-	
+
 	//OE fuer Output ermitteln
-	
+
 	if ($xsl_oe_kurzbz != '')
 	{
 		$oe_kurzbz = $xsl_oe_kurzbz;
@@ -291,7 +291,7 @@ else
 		$oe->load($xsl_stg_kz);
 		$oe_kurzbz = $oe->oe_kurzbz;
 	}
-	
+
 	//Darf der User Dokumente in einem NICHT-PDF-Format exportieren?
 	if (isset($_GET['output']) && $_GET['output'] != 'pdf')
 	{
@@ -304,16 +304,16 @@ else
 	}
 	else
 		$output = 'pdf';
-	
+
 	$vorlage = new vorlage();
 	if(!$vorlage->loadVorlage($xsl))
 		die('Vorlage wurde nicht gefunden');
-	
+
 	//Berechtigung pruefen
 	if ($xsl == 'AccountInfo')
 	{
 		$isberechtigt = false;
-	
+
 		$uids = explode(';',$_GET['uid']);
 		foreach ($uids as $uid)
 		{
@@ -327,7 +327,7 @@ else
 					$isberechtigt = true;
 				}
 			}
-	
+
 			$stud = new student();
 			if ($stud->load($uid))
 			{
@@ -342,7 +342,7 @@ else
 				}
 			}
 		}
-	
+
 		if (!$isberechtigt)
 		{
 			echo 'Sie haben keine Berechtigung um dieses AccountInfoBlatt zu drucken';
@@ -360,7 +360,7 @@ else
 		{
 			if ($xsl_stg_kz == '')
 				$xsl_stg_kz = '0';
-	
+
 			$vorlagestudiengang->getAktuelleVorlage($xsl_stg_kz, $xsl, $version);
 		}
 		// Wenn Berechtigung direkt beim der Vorlage angegeben ist
@@ -384,7 +384,7 @@ else
 			exit;
 		}
 	}
-	
+
 	//wenn uid gefunden wird, dann den Nachnamen zum Dateinamen dazuhaengen
 	$nachname = '';
 	if (isset($_GET['uid']) && $_GET['uid']!='')
@@ -393,10 +393,10 @@ else
 		$benutzer_obj = new benutzer();
 		if ($benutzer_obj->load($uid))
 			$nachname = '_'.convertProblemChars($benutzer_obj->nachname);
-	
+
 	}
 	$filename = $xsl.$nachname;
-	
+
 	if ($xsl_oe_kurzbz == '')
 	{
 		if ($xsl_stg_kz == '')
@@ -406,19 +406,19 @@ else
 			die($stg_obj->errormsg);
 		$xsl_oe_kurzbz = $stg_obj->oe_kurzbz;
 	}
-	
+
 	if($sign === true && $vorlage->signierbar === false)
 	{
 		die('Diese Vorlage darf nicht signiert werden');
 	}
-	
+
 	if (!isset($_REQUEST["archive"]))
 	{
 		if (mb_strstr($vorlage->mimetype, 'application/vnd.oasis.opendocument'))
 		{
 			$dokument = new dokument_export($xsl, $xsl_oe_kurzbz, $version);
 			$dokument->addDataURL($xml, $params);
-	
+
 			/**
 			 * Get Filename
 			 * TODO cleanup
@@ -427,7 +427,7 @@ else
 				$filename = $vorlage->bezeichnung.$nachname;
 			else
 				$filename = $vorlage->vorlage_kurzbz.$nachname;
-	
+
 			switch($xsl)
 			{
 				case 'LV_Informationen':
@@ -444,19 +444,19 @@ else
 					$filename = 'Studienordnung-Studienplan-'. sprintf("%'.04d",$studienordnung->studiengang_kz).'-'.$studienordnung->studiengangkurzbzlang;
 					break;
 			}
-	
+
 			$dokument->setFilename($filename);
-	
+
 			if ($sign === true)
 			{
 				$dokument->sign($user);
 			}
-	
+
 			if ($dokument->create($output))
 				$dokument->output();
 			else
 				echo $dokument->errormsg;
-	
+
 			$dokument->close();
 		}
 	}
@@ -464,22 +464,22 @@ else
 	{
 		if(!$vorlage->archivierbar)
 			die('Dieses Dokument ist nicht archivierbar');
-	
+
 		// Archivieren von Dokumenten
 		$uid = $_REQUEST["uid"];
 		$heute = date('Y-m-d');
-	
+
 		$student = new student();
 		$student->load($uid);
-	
+
 		if (isset($_REQUEST['ss']))
 		{
 			$ss = $_REQUEST["ss"];
-	
+
 			$prestudent = new prestudent();
 			$prestudent->getLastStatus($student->prestudent_id,$ss);
 			$semester = $prestudent->ausbildungssemester;
-	
+
 			$query = "SELECT
 						tbl_studiengang.studiengang_kz, tbl_studentlehrverband.semester, tbl_studiengang.typ,
 						tbl_studiengang.kurzbz, tbl_person.person_id FROM tbl_person, tbl_benutzer,
@@ -490,14 +490,14 @@ else
 						AND tbl_studentlehrverband.studiengang_kz = tbl_studiengang.studiengang_kz
 						AND tbl_studentlehrverband.student_uid = ".$db->db_add_param($uid)."
 						AND tbl_studentlehrverband.studiensemester_kurzbz = ".$db->db_add_param($ss);
-	
+
 			if ($result = $db->db_query($query))
 			{
 				if ($row = $db->db_fetch_object($result))
 				{
 					$person_id = $row->person_id;
-					$titel = $xsl."_".strtoupper($row->typ).strtoupper($row->kurzbz)."_".$semester;
-					$bezeichnung = $xsl." ".strtoupper($row->typ).strtoupper($row->kurzbz)." ".$semester.". Semester";
+					$titel = mb_substr($xsl."_".strtoupper($row->typ).strtoupper($row->kurzbz)."_".$semester.'_'.$ss, 0, 64);
+					$bezeichnung = mb_substr($xsl." ".strtoupper($row->typ).strtoupper($row->kurzbz)." ".$semester.". Semester".' '.$ss, 0, 64);
 					$studiengang_kz = $row->studiengang_kz;
 				}
 				else
@@ -515,26 +515,26 @@ else
 			$titel = $vorlage->bezeichnung.'_'.$studiengang->kuerzel;
 			$bezeichnung = $vorlage->bezeichnung.'_'.$studiengang->kuerzel;
 		}
-	
+
 		if ($rechte->isBerechtigt('admin', $studiengang_kz, 'suid')
 		 || $rechte->isBerechtigt('assistenz', $studiengang_kz, 'suid'))
 		{
 			$dokument = new dokument_export($xsl, $xsl_oe_kurzbz, $version);
 			$dokument->addDataURL($xml, $params);
-	
+
 			$dokument->setFilename($filename);
-	
+
 			$error = false;
-	
+
 			// Beim Archivieren wird das Dokument immer signiert wenn moeglich
 			if($vorlage->signierbar)
 				$sign = true;
-	
+
 			if ($sign === true)
 			{
 				$dokument->sign($user);
 			}
-	
+
 			if ($dokument->create($output))
 				$doc = $dokument->output(false);
 			else
@@ -542,9 +542,9 @@ else
 				$errormsg = $dokument->errormsg;
 				$error = true;
 			}
-	
+
 			$dokument->close();
-	
+
 			if(!$error)
 			{
 				$hex = base64_encode($doc);
@@ -570,7 +570,7 @@ else
 				$akte->archiv = true;
 				$akte->signiert = $sign;
 				$akte->stud_selfservice = $vorlage->stud_selfservice;
-	
+
 				if (!$akte->save())
 				{
 					echo 'Erstellen Fehlgeschlagen: '.$akte->errormsg;

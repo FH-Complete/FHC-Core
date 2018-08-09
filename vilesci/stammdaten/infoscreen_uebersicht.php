@@ -26,7 +26,7 @@ $user = get_uid();
 $basis = new basis();
 $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($user);
-	
+
 if(!$rechte->isBerechtigt('basis/infoscreen'))
 	die($rechte->errormsg);
 
@@ -40,7 +40,7 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 <head>
 	<title>Infoscreen</title>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-	
+
 	<link rel="stylesheet" href="../../skin/tablesort.css" type="text/css"/>
 	<link rel="stylesheet" href="../../skin/fhcomplete.css" type="text/css">
 	<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
@@ -49,17 +49,17 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 <script type="text/javascript" src="../../vendor/christianbach/tablesorter/jquery.tablesorter.min.js"></script>
 <script type="text/javascript" src="../../vendor/components/jqueryui/jquery-ui.min.js"></script>
 <script type="text/javascript" src="../../include/js/jquery.ui.datepicker.translation.js"></script>
-<script type="text/javascript" src="../../vendor/jquery/sizzle/sizzle.js"></script> 
+<script type="text/javascript" src="../../vendor/jquery/sizzle/sizzle.js"></script>
 	<script type="text/javascript">
-	
-		$(document).ready(function() 
-			{ 
+
+		$(document).ready(function()
+			{
 			    $("#myTable").tablesorter(
 				{
 					sortList: [[2,0]],
 					widgets: [\'zebra\']
-				}); 
-			} 
+				});
+			}
 		);
 		</script>
 </head>
@@ -85,15 +85,15 @@ if($action=='save')
 	}
 	else
 		$infoscreen->new = true;
-	
+
 	$infoscreen->bezeichnung = $bezeichnung;
 	$infoscreen->beschreibung = $beschreibung;
 	$infoscreen->ipadresse = $ipadresse;
-	
+
 	if(!$infoscreen->save())
 		echo '<span class="error">',$basis->convert_html_chars($infoscreen->errormsg),'</span>';
 	else
-		echo '<span class="ok">Daten erfolgreich gespeichert</span>';		
+		echo '<span class="ok">Daten erfolgreich gespeichert</span>';
 }
 
 if($action=='new' || $action=='update')
@@ -107,7 +107,7 @@ if($action=='new' || $action=='update')
 	{
 		echo '<h3>Bearbeiten von ID ',$basis->convert_html_chars($infoscreen_id),'</h3>';
 		if(!$infoscreen->load($infoscreen_id))
-			die('Fehler: '.$infoscreen->errormsg);			
+			die('Fehler: '.$infoscreen->errormsg);
 	}
 	echo '
 	<form action="',$_SERVER['PHP_SELF'],'?action=save" method="POST">
@@ -136,13 +136,12 @@ if($action=='reboot')
 {
 	if(!$rechte->isBerechtigt('admin'))
 		die($rechte->errormsg);
-	
-	set_include_path ("../../vendor/FHC-vendor/phpseclib");
-	require_once("Net/SSH2.php");
-	
+
+	require_once("../../vendor/autoload.php");
+
 	if(isset($_GET["ip"]) && $_GET["ip"])
 	{
-		$ssh = new Net_SSH2($_GET["ip"]);
+		$ssh = new \phpseclib\Net\SSH2($_GET["ip"]);
 		if (!$ssh->login(INFOSCREEN_USER, INFOSCREEN_PASSWORD))
 		{
 			exit('Login Failed');

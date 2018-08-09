@@ -268,7 +268,7 @@ class MessageLib
 	}
 
 	/**
-	 * sendMessageVorlage() - sends new internal message using a template
+	 * Sends new internal message using a template
 	 */
 	public function sendMessageVorlage($sender_id, $receiver_id, $vorlage_kurzbz, $oe_kurzbz, $data, $relationmessage_id = null, $orgform_kurzbz = null, $multiPartMime = true)
 	{
@@ -298,16 +298,12 @@ class MessageLib
 			{
 				$receiver_id = $receivers->retval[$i]->person_id;
 
+				// Checks if the receiver exists
 				$result = $this->ci->PersonModel->load($receiver_id);
 				if (hasData($result))
 				{
-					// Set the language with the global value
-					$sprache = DEFAULT_LANGUAGE;
-					// If the receiver has a prefered language use this
-					if (isset($result->retval[0]->sprache) && $result->retval[0]->sprache != '')
-					{
-						$sprache = $result->retval[0]->sprache;
-					}
+					// Retrives the language of the logged user
+					$sprache = getUserLanguage();
 
 					// Loads template data
 					$result = $this->ci->vorlagelib->loadVorlagetext($vorlage_kurzbz, $oe_kurzbz, $orgform_kurzbz, $sprache);

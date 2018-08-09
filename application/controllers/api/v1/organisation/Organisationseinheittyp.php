@@ -21,11 +21,11 @@ class Organisationseinheittyp extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Organisationseinheittyp' => 'basis/organisationseinheittyp:rw'));
 		// Load model OrganisationseinheittypModel
 		$this->load->model('organisation/organisationseinheittyp_model', 'OrganisationseinheittypModel');
-		
-		
+
+
 	}
 
 	/**
@@ -34,11 +34,11 @@ class Organisationseinheittyp extends APIv1_Controller
 	public function getOrganisationseinheittyp()
 	{
 		$organisationseinheittyp_kurzbz = $this->get('organisationseinheittyp_kurzbz');
-		
+
 		if (isset($organisationseinheittyp_kurzbz))
 		{
 			$result = $this->OrganisationseinheittypModel->load($organisationseinheittyp_kurzbz);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -62,7 +62,7 @@ class Organisationseinheittyp extends APIv1_Controller
 			{
 				$result = $this->OrganisationseinheittypModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -70,7 +70,7 @@ class Organisationseinheittyp extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($organisationseinheittyp = NULL)
 	{
 		return true;

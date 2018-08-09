@@ -21,11 +21,11 @@ class Reservierung extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Reservierung' => 'basis/reservierung:rw'));
 		// Load model ReservierungModel
 		$this->load->model('ressource/reservierung_model', 'ReservierungModel');
-		
-		
+
+
 	}
 
 	/**
@@ -34,11 +34,11 @@ class Reservierung extends APIv1_Controller
 	public function getReservierung()
 	{
 		$reservierungID = $this->get('reservierung_id');
-		
+
 		if (isset($reservierungID))
 		{
 			$result = $this->ReservierungModel->load($reservierungID);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -62,7 +62,7 @@ class Reservierung extends APIv1_Controller
 			{
 				$result = $this->ReservierungModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -70,7 +70,7 @@ class Reservierung extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($reservierung = NULL)
 	{
 		return true;

@@ -21,7 +21,7 @@ class Lehrveranstaltung extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Lehrveranstaltung' => 'basis/lehrveranstaltung:rw'));
 		// Load model LehrveranstaltungModel
 		$this->load->model('education/Lehrveranstaltung_model', 'LehrveranstaltungModel');
 	}
@@ -32,11 +32,11 @@ class Lehrveranstaltung extends APIv1_Controller
 	public function getLehrveranstaltung()
 	{
 		$lehrveranstaltung_id = $this->get('lehrveranstaltung_id');
-		
+
 		if (isset($lehrveranstaltung_id))
 		{
 			$result = $this->LehrveranstaltungModel->load($lehrveranstaltung_id);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -60,7 +60,7 @@ class Lehrveranstaltung extends APIv1_Controller
 			{
 				$result = $this->LehrveranstaltungModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -68,7 +68,7 @@ class Lehrveranstaltung extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($lehrveranstaltung = NULL)
 	{
 		return true;

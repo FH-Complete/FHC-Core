@@ -21,7 +21,7 @@ class Rechnung extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Rechnung' => 'basis/rechnung:rw'));
 		// Load model RechnungModel
 		$this->load->model('accounting/rechnung_model', 'RechnungModel');
 	}
@@ -32,11 +32,11 @@ class Rechnung extends APIv1_Controller
 	public function getRechnung()
 	{
 		$rechnungID = $this->get('rechnung_id');
-		
+
 		if (isset($rechnungID))
 		{
 			$result = $this->RechnungModel->load($rechnungID);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -60,7 +60,7 @@ class Rechnung extends APIv1_Controller
 			{
 				$result = $this->RechnungModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -68,7 +68,7 @@ class Rechnung extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($rechnung = NULL)
 	{
 		return true;

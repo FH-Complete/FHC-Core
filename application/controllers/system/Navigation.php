@@ -7,7 +7,7 @@ if (! defined('BASEPATH')) exit('No direct script access allowed');
  * Provides data to the ajax get calls about the filter
  * This controller works with JSON calls on the HTTP GET or POST and the output is always JSON
  */
-class Navigation extends FHC_Controller
+class Navigation extends Auth_Controller
 {
 	const NAVIGATION_PAGE_PARAM = 'navigation_page'; // Navigation page parameter name
 
@@ -15,8 +15,13 @@ class Navigation extends FHC_Controller
 	 * Loads the NavigationLib where the used logic lies
 	 */
 	public function __construct()
-	{
-		parent::__construct(); // parents constructor
+    {
+        parent::__construct(
+			array(
+				'menu' => 'basis/vilesci:r',
+				'header' => 'basis/vilesci:r'
+			)
+		);
 
 		$this->_loadNavigationLib(); // Loads the NavigationLib with parameters
 	}

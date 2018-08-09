@@ -32,13 +32,13 @@ var FHC_NavigationWidget = {
 
 					if (FHC_AjaxClient.hasData(data))
 					{
-						var strHeaderMenu = '';
+						var strHeaderMenu = "";
 
 						jQuery.each(FHC_AjaxClient.getData(data), function(i, e) {
 							if (e != null) strHeaderMenu += FHC_NavigationWidget._buildHeaderMenuStructure(e);
 						});
 
-						$(".menu-header-items").html(strHeaderMenu);
+						$("#header-menu").html(strHeaderMenu);
 					}
 				}
 			}
@@ -63,7 +63,7 @@ var FHC_NavigationWidget = {
 					{
 						FHC_NavigationWidget._printCollapseIcon(); // Applies bootstrap SB Admin 2 theme elements to the left menu
 
-						var strLeftMenu = '';
+						var strLeftMenu = "";
 
 						// Builds left menu
 						jQuery.each(FHC_AjaxClient.getData(data), function(i, e) {
@@ -140,17 +140,58 @@ var FHC_NavigationWidget = {
 	 */
 	_buildHeaderMenuStructure: function(item) {
 
-		var strHeaderMenu = '';
+		var strHeaderMenu = "";
 
-		if (item['icon'] != 'undefined' && item['icon'] != '')
+		var icon = "";
+		if (item["icon"] != null && item["icon"] != "")
 		{
-			strHeaderMenu += '<i class="navbar-brand-icon fa fa-' + item['icon'] + ' fa-fw"></i>';
+			icon = '<i class="navbar-brand-icon fa fa-' + item["icon"] + ' fa-fw"></i>';
 		}
 
-		var target = '';
-		if (item['target'] != null) target = item['target'];
+		var target = "";
+		if (item["target"] != null) target = item["target"];
 
-		strHeaderMenu += '<a class="navbar-brand" href="' + item['link'] + '" target="' + target + '">' + item['description'] + '</a>';
+		strHeaderMenu += '<span class="dropdown">';
+
+		if (item["children"] != null && Object.keys(item["children"]).length > 0)
+		{
+			strHeaderMenu += '<a class="dropdown-toggle header-menu-link-entry" data-toggle="dropdown" href="#">';
+			strHeaderMenu += icon;
+			strHeaderMenu += item["description"] + " ";
+			strHeaderMenu += '<i class="fa fa-caret-down"></i>';
+			strHeaderMenu += '</a>';
+
+			strHeaderMenu += '<ul class="dropdown-menu">';
+
+			jQuery.each(item["children"], function(i, e) {
+				if (e != null)
+				{
+					var eTarget = "";
+					if (e["target"] != null) eTarget = e["target"];
+
+					var eIcon = "";
+					if (e["icon"] != null && e["icon"] != "") eIcon += '<i class="fa fa-' + e["icon"] + ' fa-fw"></i>';
+
+					strHeaderMenu += '<li>';
+					strHeaderMenu += '<a href="' + e["link"] + '" target="' + eTarget + '">';
+					strHeaderMenu += eIcon;
+					strHeaderMenu += e["description"];
+					strHeaderMenu += '</a>';
+					strHeaderMenu += '</li>';
+				}
+			});
+
+			strHeaderMenu += '</ul>';
+		}
+		else
+		{
+			strHeaderMenu += '<a class="header-menu-link-entry" href="' + item["link"] + '" target="' + target + '">' +
+				icon +
+				item["description"] +
+			'</a>';
+		}
+
+		strHeaderMenu += '</span>';
 
 		return strHeaderMenu;
 	},
@@ -161,45 +202,45 @@ var FHC_NavigationWidget = {
 	_buildLeftMenuStructure: function(item, depth = 1) {
 
 		strLeftMenu = "";
-		var expanded = item['expand'] != null && item['expand'] === true ? ' active' : '';
+		var expanded = item["expand"] != null && item["expand"] === true ? ' active' : "";
 
 		strLeftMenu += '<li class="' + expanded + '">';
 
-		if (item['subscriptLinkClass'] != null && item['subscriptDescription'] != null)
+		if (item["subscriptLinkClass"] != null && item["subscriptDescription"] != null)
 		{
 			strLeftMenu += '<span>';
 		}
 
-		var target = '';
-		if (item['target'] != null) target = item['target'];
+		var target = "";
+		if (item["target"] != null) target = item["target"];
 
-		strLeftMenu += '<a href="' + item['link'] + '"' + expanded + ' target="' + target + '">';
+		strLeftMenu += '<a href="' + item["link"] + '"' + expanded + ' target="' + target + '">';
 
-		if (item['icon'] != 'undefined')
+		if (item["icon"] != "undefined")
 		{
-			strLeftMenu += '<i class="fa fa-' + item['icon'] + ' fa-fw"></i> ';
+			strLeftMenu += '<i class="fa fa-' + item["icon"] + ' fa-fw"></i> ';
 		}
 
-		strLeftMenu += item['description'];
+		strLeftMenu += item["description"];
 
-		if (item['children'] != null && Object.keys(item['children']).length > 0)
+		if (item["children"] != null && Object.keys(item["children"]).length > 0)
 		{
 			strLeftMenu += '<span class="fa arrow"></span>';
 		}
 
 		strLeftMenu += '</a>';
 
-		if (item['subscriptLinkClass'] != null && item['subscriptDescription'] != null)
+		if (item["subscriptLinkClass"] != null && item["subscriptDescription"] != null)
 		{
-			strLeftMenu += '<a class="' + item['subscriptLinkClass'] + ' menuSubscriptLink" value="' + item['subscriptLinkValue'] + '" href="#">' +
-						' (' + item['subscriptDescription'] + ')' +
+			strLeftMenu += '<a class="' + item["subscriptLinkClass"] + ' menuSubscriptLink" value="' + item["subscriptLinkValue"] + '" href="#">' +
+						' (' + item["subscriptDescription"] + ')' +
 						'</a>';
 			strLeftMenu += '</span>';
 		}
 
-		if (item['children'] != null && Object.keys(item['children']).length > 0)
+		if (item["children"] != null && Object.keys(item["children"]).length > 0)
 		{
-			var level = '';
+			var level = "";
 			if (depth === 1)
 			{
 				level = 'second';
@@ -211,7 +252,7 @@ var FHC_NavigationWidget = {
 
 			strLeftMenu += '<ul class="nav nav-' + level + '-level" ' + expanded + '>';
 
-			jQuery.each(item['children'], function(i, e) {
+			jQuery.each(item["children"], function(i, e) {
 				if (e != null) strLeftMenu += FHC_NavigationWidget._buildLeftMenuStructure(e, ++depth);
 			});
 

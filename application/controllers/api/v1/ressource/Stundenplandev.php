@@ -21,11 +21,11 @@ class Stundenplandev extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Stundenplandev' => 'basis/stundenplandev:rw'));
 		// Load model StundenplandevModel
 		$this->load->model('ressource/stundenplandev_model', 'StundenplandevModel');
-		
-		
+
+
 	}
 
 	/**
@@ -34,11 +34,11 @@ class Stundenplandev extends APIv1_Controller
 	public function getStundenplandev()
 	{
 		$stundenplandevID = $this->get('stundenplandev_id');
-		
+
 		if (isset($stundenplandevID))
 		{
 			$result = $this->StundenplandevModel->load($stundenplandevID);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -62,7 +62,7 @@ class Stundenplandev extends APIv1_Controller
 			{
 				$result = $this->StundenplandevModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -70,7 +70,7 @@ class Stundenplandev extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($stundenplandev = NULL)
 	{
 		return true;

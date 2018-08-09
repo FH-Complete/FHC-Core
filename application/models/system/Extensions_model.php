@@ -17,8 +17,6 @@ class Extensions_model extends DB_Model
 	 */
 	public function getDependencies($dependencies)
 	{
-		if (isError($ent = $this->isEntitled($this->dbTable, PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR))) return $ent;
-
 		return $this->execQuery(
 			'SELECT *
 			   FROM '.$this->dbTable.'
@@ -49,8 +47,6 @@ class Extensions_model extends DB_Model
 	 */
 	public function executeQuery($sql)
 	{
-		if (isError($ent = $this->isEntitled($this->dbTable, PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR))) return $ent;
-
 		return $this->execQuery($sql);
 	}
 }

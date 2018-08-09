@@ -32,11 +32,11 @@ require_once(dirname(__FILE__).'/prestudent.class.php');
 
 class dvb extends basis_db
 {
-	const DVB_URL_WEBSERVICE_OAUTH = 'https://stubei-q.portal.at/dvb/oauth/token';
-	const DVB_URL_WEBSERVICE_SVNR = 'https://stubei-q.portal.at/rws/0.2/simpleStudentBySozialVersicherungsnummer.xml';
-	const DVB_URL_WEBSERVICE_ERSATZKZ = 'https://stubei-q.portal.at/rws/0.2/simpleStudentByErsatzKennzeichen.xml';
-	const DVB_URL_WEBSERVICE_RESERVIERUNG = 'https://stubei-q.portal.at/dvb/matrikelnummern/1.0/reservierung.xml';
-	const DVB_URL_WEBSERVICE_MELDUNG = 'https://stubei-q.portal.at/dvb/matrikelnummern/1.0/meldung.xml';
+	const DVB_URL_WEBSERVICE_OAUTH = DVB_PORTAL.'/dvb/oauth/token';
+	const DVB_URL_WEBSERVICE_SVNR = DVB_PORTAL.'/rws/0.2/simpleStudentBySozialVersicherungsnummer.xml';
+	const DVB_URL_WEBSERVICE_ERSATZKZ = DVB_PORTAL.'/rws/0.2/simpleStudentByErsatzKennzeichen.xml';
+	const DVB_URL_WEBSERVICE_RESERVIERUNG = DVB_PORTAL.'/dvb/matrikelnummern/1.0/reservierung.xml';
+	const DVB_URL_WEBSERVICE_MELDUNG = DVB_PORTAL.'/dvb/matrikelnummern/1.0/meldung.xml';
 
 	public $authentication;
 	private $username;

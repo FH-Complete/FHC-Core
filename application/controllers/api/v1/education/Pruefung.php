@@ -21,7 +21,7 @@ class Pruefung extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Pruefung' => 'basis/pruefung:rw'));
 		// Load model PruefungModel
 		$this->load->model('education/Pruefung_model', 'PruefungModel');
 	}
@@ -32,11 +32,11 @@ class Pruefung extends APIv1_Controller
 	public function getPruefung()
 	{
 		$pruefung_id = $this->get('pruefung_id');
-		
+
 		if (isset($pruefung_id))
 		{
 			$result = $this->PruefungModel->load($pruefung_id);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -60,7 +60,7 @@ class Pruefung extends APIv1_Controller
 			{
 				$result = $this->PruefungModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -68,7 +68,7 @@ class Pruefung extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($pruefung = NULL)
 	{
 		return true;

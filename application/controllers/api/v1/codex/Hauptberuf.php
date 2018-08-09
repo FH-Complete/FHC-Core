@@ -21,7 +21,7 @@ class Hauptberuf extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Hauptberuf' => 'basis/hauptberuf:rw'));
 		// Load model HauptberufModel
 		$this->load->model('codex/hauptberuf_model', 'HauptberufModel');
 	}
@@ -32,11 +32,11 @@ class Hauptberuf extends APIv1_Controller
 	public function getHauptberuf()
 	{
 		$hauptberufcode = $this->get('hauptberufcode');
-		
+
 		if (isset($hauptberufcode))
 		{
 			$result = $this->HauptberufModel->load($hauptberufcode);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -60,7 +60,7 @@ class Hauptberuf extends APIv1_Controller
 			{
 				$result = $this->HauptberufModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -68,7 +68,7 @@ class Hauptberuf extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($hauptberuf = NULL)
 	{
 		return true;

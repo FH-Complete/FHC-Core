@@ -14,14 +14,15 @@
 
 if (!defined("BASEPATH")) exit("No direct script access allowed");
 
-class MailJob extends FHC_Controller
+class MailJob extends Auth_Controller
 {
 	/**
 	 * API constructor
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		// An empty array as parameter will ensure that this controller is ONLY callable from command line
+		parent::__construct(array());
 
 		// Loads MessageLib
 		$this->load->library('MessageLib');

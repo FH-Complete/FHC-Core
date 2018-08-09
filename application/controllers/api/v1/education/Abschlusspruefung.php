@@ -21,7 +21,7 @@ class Abschlusspruefung extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Abschlusspruefung' => 'basis/abschlusspruefung:rw'));
 		// Load model AbschlusspruefungModel
 		$this->load->model('education/Abschlusspruefung_model', 'AbschlusspruefungModel');
 	}
@@ -32,11 +32,11 @@ class Abschlusspruefung extends APIv1_Controller
 	public function getAbschlusspruefung()
 	{
 		$abschlusspruefung_id = $this->get('abschlusspruefung_id');
-		
+
 		if (isset($abschlusspruefung_id))
 		{
 			$result = $this->AbschlusspruefungModel->load($abschlusspruefung_id);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -60,7 +60,7 @@ class Abschlusspruefung extends APIv1_Controller
 			{
 				$result = $this->AbschlusspruefungModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -68,7 +68,7 @@ class Abschlusspruefung extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($abschlusspruefung = NULL)
 	{
 		return true;

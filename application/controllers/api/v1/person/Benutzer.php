@@ -21,11 +21,11 @@ class Benutzer extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Benutzer' => 'basis/benutzer:rw'));
 		// Load model BenutzerModel
 		$this->load->model('person/benutzer_model', 'BenutzerModel');
-		
-		
+
+
 	}
 
 	/**
@@ -34,11 +34,11 @@ class Benutzer extends APIv1_Controller
 	public function getBenutzer()
 	{
 		$uid = $this->get('uid');
-		
+
 		if (isset($uid))
 		{
 			$result = $this->BenutzerModel->load($uid);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -62,7 +62,7 @@ class Benutzer extends APIv1_Controller
 			{
 				$result = $this->BenutzerModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -70,7 +70,7 @@ class Benutzer extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($benutzer = NULL)
 	{
 		return true;

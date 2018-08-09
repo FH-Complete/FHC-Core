@@ -21,7 +21,7 @@ class Contentgruppe extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Contentgruppe' => 'basis/contentgruppe:rw'));
 		// Load model ContentgruppeModel
 		$this->load->model('content/contentgruppe_model', 'ContentgruppeModel');
 	}
@@ -33,11 +33,11 @@ class Contentgruppe extends APIv1_Controller
 	{
 		$gruppe_kurzbz = $this->get('gruppe_kurzbz');
 		$content_id = $this->get('content_id');
-		
+
 		if (isset($gruppe_kurzbz) && isset($content_id))
 		{
 			$result = $this->ContentgruppeModel->load(array($gruppe_kurzbz, $content_id));
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -61,7 +61,7 @@ class Contentgruppe extends APIv1_Controller
 			{
 				$result = $this->ContentgruppeModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -69,7 +69,7 @@ class Contentgruppe extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($contentgruppe = NULL)
 	{
 		return true;

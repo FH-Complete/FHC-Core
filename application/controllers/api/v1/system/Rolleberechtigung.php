@@ -21,11 +21,11 @@ class Rolleberechtigung extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Rolleberechtigung' => 'basis/rolleberechtigung:rw'));
 		// Load model RolleberechtigungModel
 		$this->load->model('system/rolleberechtigung_model', 'RolleberechtigungModel');
-		
-		
+
+
 	}
 
 	/**
@@ -35,11 +35,11 @@ class Rolleberechtigung extends APIv1_Controller
 	{
 		$rolle_kurzbz = $this->get('rolle_kurzbz');
 		$berechtigung_kurzbz = $this->get('berechtigung_kurzbz');
-		
+
 		if (isset($rolle_kurzbz) && isset($berechtigung_kurzbz))
 		{
 			$result = $this->RolleberechtigungModel->load(array($rolle_kurzbz, $berechtigung_kurzbz));
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -63,7 +63,7 @@ class Rolleberechtigung extends APIv1_Controller
 			{
 				$result = $this->RolleberechtigungModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -71,7 +71,7 @@ class Rolleberechtigung extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($rolleberechtigung = NULL)
 	{
 		return true;

@@ -21,11 +21,11 @@ class Kriterien extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Kriterien' => 'basis/kriterien:rw'));
 		// Load model KriterienModel
 		$this->load->model('testtool/kriterien_model', 'KriterienModel');
-		
-		
+
+
 	}
 
 	/**
@@ -34,11 +34,11 @@ class Kriterien extends APIv1_Controller
 	public function getKriterien()
 	{
 		$kriterienID = $this->get('kriterien_id');
-		
+
 		if (isset($kriterienID))
 		{
 			$result = $this->KriterienModel->load($kriterienID);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -62,7 +62,7 @@ class Kriterien extends APIv1_Controller
 			{
 				$result = $this->KriterienModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -70,7 +70,7 @@ class Kriterien extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($kriterien = NULL)
 	{
 		return true;

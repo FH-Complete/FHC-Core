@@ -21,7 +21,7 @@ class Vertragsstatus extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Vertragsstatus' => 'basis/vertragsstatus:rw'));
 		// Load model VertragsstatusModel
 		$this->load->model('accounting/vertragsstatus_model', 'VertragsstatusModel');
 	}
@@ -32,11 +32,11 @@ class Vertragsstatus extends APIv1_Controller
 	public function getVertragsstatus()
 	{
 		$vertragsstatus_kurzbz = $this->get('vertragsstatus_kurzbz');
-		
+
 		if (isset($vertragsstatus_kurzbz))
 		{
 			$result = $this->VertragsstatusModel->load($vertragsstatus_kurzbz);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -60,7 +60,7 @@ class Vertragsstatus extends APIv1_Controller
 			{
 				$result = $this->VertragsstatusModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -68,7 +68,7 @@ class Vertragsstatus extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($vertragsstatus = NULL)
 	{
 		return true;

@@ -21,7 +21,7 @@ class Studentlehrverband extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Studentlehrverband' => 'basis/studentlehrverband:rw'));
 		// Load model StudentlehrverbandModel
 		$this->load->model('education/Studentlehrverband_model', 'StudentlehrverbandModel');
 	}
@@ -33,11 +33,11 @@ class Studentlehrverband extends APIv1_Controller
 	{
 		$studiensemester_kurzbz = $this->get('studiensemester_kurzbz');
 		$student_uid = $this->get('student_uid');
-		
+
 		if (isset($studiensemester_kurzbz) && isset($student_uid))
 		{
 			$result = $this->StudentlehrverbandModel->load(array($studiensemester_kurzbz, $student_uid));
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -61,7 +61,7 @@ class Studentlehrverband extends APIv1_Controller
 			{
 				$result = $this->StudentlehrverbandModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -69,7 +69,7 @@ class Studentlehrverband extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($studentlehrverband = NULL)
 	{
 		return true;

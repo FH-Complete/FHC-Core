@@ -675,6 +675,8 @@ else
 						$message[$row->old_uid]->isset=true;
 						$message[$row->old_uid]->mailadress=$row->old_uid.'@'.DOMAIN;
 						$message[$row->old_uid]->message_begin=$message_begin.'<BR>';
+						if(!isset($message[$row->old_uid]->message))
+							$message[$row->old_uid]->message = '';
 						$message[$row->old_uid]->message.='<font style="color:blue"><strong>'.$p_de->t('lvplan/geaenderteStunden').' / '.$p_en->t('lvplan/geaenderteStunden').'</strong></font><BR>
 							<TABLE>
 							<TR>

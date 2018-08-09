@@ -21,11 +21,11 @@ class Zeitaufzeichnung extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Zeitaufzeichnung' => 'basis/zeitaufzeichnung:rw'));
 		// Load model ZeitaufzeichnungModel
 		$this->load->model('ressource/zeitaufzeichnung_model', 'ZeitaufzeichnungModel');
-		
-		
+
+
 	}
 
 	/**
@@ -34,11 +34,11 @@ class Zeitaufzeichnung extends APIv1_Controller
 	public function getZeitaufzeichnung()
 	{
 		$zeitaufzeichnungID = $this->get('zeitaufzeichnung_id');
-		
+
 		if (isset($zeitaufzeichnungID))
 		{
 			$result = $this->ZeitaufzeichnungModel->load($zeitaufzeichnungID);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -62,7 +62,7 @@ class Zeitaufzeichnung extends APIv1_Controller
 			{
 				$result = $this->ZeitaufzeichnungModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -70,7 +70,7 @@ class Zeitaufzeichnung extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($zeitaufzeichnung = NULL)
 	{
 		return true;

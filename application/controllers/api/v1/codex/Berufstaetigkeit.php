@@ -21,7 +21,7 @@ class Berufstaetigkeit extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Berufstaetigkeit' => 'basis/berufstaetigkeit:rw'));
 		// Load model BerufstaetigkeitModel
 		$this->load->model('codex/berufstaetigkeit_model', 'BerufstaetigkeitModel');
 	}
@@ -32,11 +32,11 @@ class Berufstaetigkeit extends APIv1_Controller
 	public function getBerufstaetigkeit()
 	{
 		$berufstaetigkeit_code = $this->get('berufstaetigkeit_code');
-		
+
 		if (isset($berufstaetigkeit_code))
 		{
 			$result = $this->BerufstaetigkeitModel->load($berufstaetigkeit_code);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -60,7 +60,7 @@ class Berufstaetigkeit extends APIv1_Controller
 			{
 				$result = $this->BerufstaetigkeitModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -68,7 +68,7 @@ class Berufstaetigkeit extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($berufstaetigkeit = NULL)
 	{
 		return true;

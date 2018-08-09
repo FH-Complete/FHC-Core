@@ -21,11 +21,11 @@ class Erreichbarkeit extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Erreichbarkeit' => 'basis/erreichbarkeit:rw'));
 		// Load model ErreichbarkeitModel
 		$this->load->model('ressource/erreichbarkeit_model', 'ErreichbarkeitModel');
-		
-		
+
+
 	}
 
 	/**
@@ -34,11 +34,11 @@ class Erreichbarkeit extends APIv1_Controller
 	public function getErreichbarkeit()
 	{
 		$erreichbarkeit_kurzbz = $this->get('erreichbarkeit_kurzbz');
-		
+
 		if (isset($erreichbarkeit_kurzbz))
 		{
 			$result = $this->ErreichbarkeitModel->load($erreichbarkeit_kurzbz);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -62,7 +62,7 @@ class Erreichbarkeit extends APIv1_Controller
 			{
 				$result = $this->ErreichbarkeitModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -70,7 +70,7 @@ class Erreichbarkeit extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($erreichbarkeit = NULL)
 	{
 		return true;

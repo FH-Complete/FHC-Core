@@ -14,23 +14,26 @@ class FHC_Controller extends CI_Controller
 	 * - loads the authentication system
 	 * - loads all the helpers that later are always needed
 	 */
-    public function __construct()
+	public function __construct()
 	{
-        parent::__construct();
+		parent::__construct();
 
 		$this->_controllerId = null; // set _controllerId as null by default
 
-		// Loads helper fhcauth to manage the authentication
-		$this->load->helper('fhcauth');
-
 		// Loads helper message to manage returning messages
-		$this->load->helper('message');
+		$this->load->helper('hlp_message');
 
 		// Loads helper with generic utility function
-		$this->load->helper('fhc');
+		$this->load->helper('hlp_common');
 
 		// Loads helper session to manage the php session
-		$this->load->helper('session');
+		$this->load->helper('hlp_session');
+
+		// Loads language helper
+		$this->load->helper('hlp_language');
+
+		// Loads header helper
+		$this->load->helper('hlp_header');
 	}
 
 	//------------------------------------------------------------------------------------------------------------------
@@ -61,7 +64,7 @@ class FHC_Controller extends CI_Controller
 		{
 			$this->_controllerId = $this->input->get(self::FHC_CONTROLLER_ID);
 
-			if (!isset($this->_controllerId) || isEmptyString($this->_controllerId))
+			if (isEmptyString($this->_controllerId))
 			{
 				$this->_controllerId = uniqid(); // generate a unique id
 				// Redirect to the same URL, but giving FHC_CONTROLLER_ID as HTTP GET parameter
@@ -103,6 +106,17 @@ class FHC_Controller extends CI_Controller
 	protected function outputJsonError($mixed)
 	{
 		$this->_outputJson(error($mixed));
+	}
+
+	/**
+	 * Terminate the execution of the page after have printed a message encoded to JSON.
+	 * Used directly header and echo to speed up the output before the exit command stops the execution.
+	 */
+	protected function terminateWithJsonError($message)
+	{
+		header('Content-Type: application/json');
+		echo json_encode(error($message));
+		exit;
 	}
 
 	//------------------------------------------------------------------------------------------------------------------

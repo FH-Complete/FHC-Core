@@ -16,6 +16,8 @@
 - **[CORE]** UserDefinedFields hinzugefügt zur Verwalung von eigenen Eingabefeldern
 - **[CORE]** Support für Extensions hinzugefügt - eine Weiterentwicklung der Addons für die Verwendung mit Codeigniter
 - **[CORE]** Infocenter Seite hinzugefügt zur zentralen Verwaltung und ZGV Prüfung von Interessenten
+- **[CORE]** Unterstützung für Matrikelnummern und BPK - Anbindung an den Datenverbund
+- **[CORE]** Digitale Signatur für Dokumente
 
 ### CHANGED
 - **[CORE]** Berechtigungsprüfung wurde angepasst damit deaktivierte Benutzer keine Berechtigungen mehr haben
@@ -23,6 +25,9 @@
 - **[CORE]** Has many as possible javascripts and css present in the repository were removed. Their lack is overcome by the packages in the composer. In the meanwhile also the versions were updated
 - **[CIS]** Die Fotoliste wird jetzt mit unoconv erstellt. Die bestehende Vorlage für den Dokumentenexport muss hier angepasst werden
 - **[CORE]** Resturlaubstage und Mehrarbeitsstunden wurden aus dem Core entfernt und können nicht mehr mit FH-Complete verwaltet werden.
+- **[CORE]** Personenzusammenlegen agiert intelligenter und kann direkt aus dem FAS erfolgen.
+- **[CIS]** Ampeln können jetzt verpflichtend sein und per Mail benachrichtigen
+
 
 ### Updateinfo
 - **[CORE]** Infoscreen wurde umbenannt (informationsbildschirm.php)
@@ -31,8 +36,8 @@
 - **[CORE]** Neue Style Anweisungen (div.header_logo, td.headerbar, div.cis_logo) müssen in Custom Stylesheet hinzugefügt werden
 
 ### Removed
-  **[CORE]** Removed Support for XSLFO2PDF Documents - use unoconv instead
-  **[CORE]** Removed Support for FOP Documents - use unoconv instead
+- **[CORE]** Removed Support for XSLFO2PDF Documents - use unoconv instead
+- **[CORE]** Removed Support for FOP Documents - use unoconv instead
 
 ### Deprecated
 - **[CORE]** Die folgenden Datenbank Tabellen und Spalten wurden als DEPRECATED markiert und werden mit der nächsten Version entfernt:
@@ -45,6 +50,8 @@
 	public.tbl_prestudent.ausstellungsstaat, public.tbl_prestudent.aufnahmeschluessel, lehre.tbl_lehrveranstaltung.old_lehrfach_id
 - **[CORE]** LV-Infos werden mit der kommenden Version aus dem Core entfernt - Dies ist jetzt ein Addon
 - **[CORE]** WaWi wird mit der kommenden Version aus dem Core entfernt- Dies ist jetzt ein Addon
+- **[CIS]** Benotungstool/Kreuzerltool wird mit der kommenden Version aus dem Core entfernt
+- **[CIS]** Feedback wird mit der kommenden Version aus dem Core entfernt
 
 ## [3.2]
 

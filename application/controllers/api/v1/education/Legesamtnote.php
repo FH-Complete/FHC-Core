@@ -21,7 +21,7 @@ class Legesamtnote extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Legesamtnote' => 'basis/legesamtnote:rw'));
 		// Load model LegesamtnoteModel
 		$this->load->model('education/Legesamtnote_model', 'LegesamtnoteModel');
 	}
@@ -33,11 +33,11 @@ class Legesamtnote extends APIv1_Controller
 	{
 		$lehreinheit_id = $this->get('lehreinheit_id');
 		$student_uid = $this->get('student_uid');
-		
+
 		if (isset($lehreinheit_id) && isset($student_uid))
 		{
 			$result = $this->LegesamtnoteModel->load(array($lehreinheit_id, $student_uid));
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -61,7 +61,7 @@ class Legesamtnote extends APIv1_Controller
 			{
 				$result = $this->LegesamtnoteModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -69,7 +69,7 @@ class Legesamtnote extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($legesamtnote = NULL)
 	{
 		return true;

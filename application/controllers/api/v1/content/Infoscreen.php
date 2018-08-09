@@ -21,7 +21,7 @@ class Infoscreen extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Infoscreen' => 'basis/infoscreen:rw'));
 		// Load model InfoscreenModel
 		$this->load->model('content/infoscreen_model', 'InfoscreenModel');
 	}
@@ -32,11 +32,11 @@ class Infoscreen extends APIv1_Controller
 	public function getInfoscreen()
 	{
 		$infoscreenID = $this->get('infoscreen_id');
-		
+
 		if (isset($infoscreenID))
 		{
 			$result = $this->InfoscreenModel->load($infoscreenID);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -60,7 +60,7 @@ class Infoscreen extends APIv1_Controller
 			{
 				$result = $this->InfoscreenModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -68,7 +68,7 @@ class Infoscreen extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($infoscreen = NULL)
 	{
 		return true;

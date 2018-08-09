@@ -5616,3 +5616,46 @@ function StudentExportBescheid()
 	else
 		alert('Bitte einen Studenten auswaehlen');
 }
+
+//****
+//* Übergibt die PersonIDs an das Skript personen_wartung.php um Personen zusammenzulegen
+//****
+function StudentPersonenZusammenlegen()
+{
+	tree = document.getElementById('student-tree');
+	//Alle markierten Studenten holen
+	var start = new Object();
+	var end = new Object();
+	var numRanges = tree.view.selection.getRangeCount();
+	var anzahl = 0;
+	var person1 = '';
+	var person2 = '';
+
+	for (var t = 0; t < numRanges; t++)
+	{
+		tree.view.selection.getRangeAt(t,start,end);
+		for (var v = start.value; v <= end.value; v++)
+		{
+			if (person1 == '')
+			{
+				person1 = getTreeCellText(tree, 'student-treecol-person_id', v);
+				anzahl = anzahl+1;
+				continue;
+			}
+
+			person2 = getTreeCellText(tree, 'student-treecol-person_id', v);
+			anzahl = anzahl+1;
+		}
+	}
+
+	if(anzahl > 2)
+	{
+		alert('Sie können maximal 2 Personen zum Zusammenlegen auswählen');
+		return false;
+	}
+
+	if(anzahl > 0)
+		window.open('<?php echo APP_ROOT ?>vilesci/stammdaten/personen_wartung.php?person_id_1='+person1+'&person_id_2='+person2,'Personen-Zusammenlegen','');
+	else
+		alert('Bitte eine oder 2 Personen zum Zusammenlegen auswählen');
+}

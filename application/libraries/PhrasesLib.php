@@ -194,6 +194,7 @@ class PhrasesLib
 			{
 				$_phrase = $this->_phrases[$i]; // single phrase
 
+				$trimedval = trim($_phrase->text);
 				// If the single phrase match the given parameters and is not an empty string
 				if ($_phrase->category == $category
 					&& $_phrase->phrase == $phrase
@@ -241,18 +242,8 @@ class PhrasesLib
 					$categories = array($categories);
 				}
 
-				// Use the given language if present, otherwise retrives the language for the logged user
-				$language = DEFAULT_LANGUAGE;
-				if (count($parameters) == 2 && !isEmptyString($parameters[1]) && is_string($parameters[1]))
-				{
-					$language = $parameters[1];
-				}
-				else
-				{
-					$this->_ci->load->model('person/Person_model', 'PersonModel');
-
-					$language = $this->_ci->PersonModel->getLanguage(getAuthUID());
-				}
+				// Retrives the language of the logged user
+				$language = getUserLanguage(count($parameters) == 2 ? $parameters[1] : null);
 
 				// If only categories is not an empty array then loads phrases
 				if (count($categories) > 0) $this->_setPhrases($categories, $language);

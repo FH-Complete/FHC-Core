@@ -21,11 +21,11 @@ class Aufnahmeschluessel extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Aufnahmeschluessel' => 'basis/aufnahmeschluessel:rw'));
 		// Load model AufnahmeschluesselModel
 		$this->load->model('crm/aufnahmeschluessel_model', 'AufnahmeschluesselModel');
-		
-		
+
+
 	}
 
 	/**
@@ -34,11 +34,11 @@ class Aufnahmeschluessel extends APIv1_Controller
 	public function getAufnahmeschluessel()
 	{
 		$aufnahmeschluessel = $this->get('aufnahmeschluessel');
-		
+
 		if (isset($aufnahmeschluessel))
 		{
 			$result = $this->AufnahmeschluesselModel->load($aufnahmeschluessel);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -62,7 +62,7 @@ class Aufnahmeschluessel extends APIv1_Controller
 			{
 				$result = $this->AufnahmeschluesselModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -70,7 +70,7 @@ class Aufnahmeschluessel extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($aufnahmeschluessel = NULL)
 	{
 		return true;

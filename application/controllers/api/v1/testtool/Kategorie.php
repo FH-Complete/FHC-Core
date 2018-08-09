@@ -21,11 +21,11 @@ class Kategorie extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Kategorie' => 'basis/kategorie:rw'));
 		// Load model KategorieModel
 		$this->load->model('testtool/kategorie_model', 'KategorieModel');
-		
-		
+
+
 	}
 
 	/**
@@ -34,11 +34,11 @@ class Kategorie extends APIv1_Controller
 	public function getKategorie()
 	{
 		$kategorie_kurzbz = $this->get('kategorie_kurzbz');
-		
+
 		if (isset($kategorie_kurzbz))
 		{
 			$result = $this->KategorieModel->load($kategorie_kurzbz);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -62,7 +62,7 @@ class Kategorie extends APIv1_Controller
 			{
 				$result = $this->KategorieModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -70,7 +70,7 @@ class Kategorie extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($kategorie = NULL)
 	{
 		return true;

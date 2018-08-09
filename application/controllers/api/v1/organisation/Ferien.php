@@ -21,11 +21,11 @@ class Ferien extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Ferien' => 'basis/ferien:rw'));
 		// Load model FerienModel
 		$this->load->model('organisation/ferien_model', 'FerienModel');
-		
-		
+
+
 	}
 
 	/**
@@ -35,11 +35,11 @@ class Ferien extends APIv1_Controller
 	{
 		$studiengang_kz = $this->get('studiengang_kz');
 		$bezeichnung = $this->get('bezeichnung');
-		
+
 		if (isset($studiengang_kz) && isset($bezeichnung))
 		{
 			$result = $this->FerienModel->load(array($studiengang_kz, $bezeichnung));
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -63,7 +63,7 @@ class Ferien extends APIv1_Controller
 			{
 				$result = $this->FerienModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -71,7 +71,7 @@ class Ferien extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($ferien = NULL)
 	{
 		return true;

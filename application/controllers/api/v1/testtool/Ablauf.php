@@ -21,11 +21,11 @@ class Ablauf extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Ablauf' => 'basis/ablauf:rw'));
 		// Load model AblaufModel
 		$this->load->model('testtool/ablauf_model', 'AblaufModel');
-		
-		
+
+
 	}
 
 	/**
@@ -34,11 +34,11 @@ class Ablauf extends APIv1_Controller
 	public function getAblauf()
 	{
 		$ablaufID = $this->get('ablauf_id');
-		
+
 		if (isset($ablaufID))
 		{
 			$result = $this->AblaufModel->load($ablaufID);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -62,7 +62,7 @@ class Ablauf extends APIv1_Controller
 			{
 				$result = $this->AblaufModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -70,7 +70,7 @@ class Ablauf extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($ablauf = NULL)
 	{
 		return true;

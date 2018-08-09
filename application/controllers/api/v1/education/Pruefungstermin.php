@@ -21,7 +21,7 @@ class Pruefungstermin extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Pruefungstermin' => 'basis/pruefungstermin:rw'));
 		// Load model PruefungsterminModel
 		$this->load->model('education/Pruefungstermin_model', 'PruefungsterminModel');
 	}
@@ -32,11 +32,11 @@ class Pruefungstermin extends APIv1_Controller
 	public function getPruefungstermin()
 	{
 		$pruefungstermin_id = $this->get('pruefungstermin_id');
-		
+
 		if (isset($pruefungstermin_id))
 		{
 			$result = $this->PruefungsterminModel->load($pruefungstermin_id);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -60,7 +60,7 @@ class Pruefungstermin extends APIv1_Controller
 			{
 				$result = $this->PruefungsterminModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -68,7 +68,7 @@ class Pruefungstermin extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($pruefungstermin = NULL)
 	{
 		return true;

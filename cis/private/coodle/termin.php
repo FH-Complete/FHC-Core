@@ -427,7 +427,17 @@ echo '<html>
 					// Pruefen ob die Reservierungsgrenze ueberschritten wurde und ggf Warnung anzeigen
 					if(datum>\''.RES_TAGE_LEKTOR_BIS.'\')
 					{
-						alert("'.$p->t('coodle/ReservierungNichtMoeglich', array($datum_obj->formatDatum(RES_TAGE_LEKTOR_BIS, 'd.m.Y'))).'");
+						// Wenn SessionStorage unterstützt wird, Warnung nur einmal ausgeben
+						if (typeof(Storage) !== "undefined")
+						{
+							if (!sessionStorage.warningReservierungGiven)
+							{
+								alert("'.$p->t('coodle/ReservierungNichtMoeglich', array($datum_obj->formatDatum(RES_TAGE_LEKTOR_BIS, 'd.m.Y'))).'");
+								sessionStorage.setItem("warningReservierungGiven", "true");
+							}
+						}
+						else
+							alert("'.$p->t('coodle/ReservierungNichtMoeglich', array($datum_obj->formatDatum(RES_TAGE_LEKTOR_BIS, 'd.m.Y'))).'");
 					}
 
 					// Termin Speichern
@@ -597,8 +607,19 @@ echo '
 	</p>
 
 	<script>
+
 	$(document).ready(function()
 	{
+		// Correct width to avoid jump on hover
+		$.extend($.ui.autocomplete.prototype.options, {
+			open: function(event, ui) {
+				$(this).autocomplete("widget").css({
+					"width": ($(".ui-menu-item").width()+ 20 + "px"),
+					"padding-left": "5px"
+					});
+				}
+		});
+		
 		// Autocomplete Feld fuer Ressourcen initialisieren
 		$("#input_ressource").autocomplete({
 			source: "coodle_autocomplete.php?work=ressource",
@@ -620,7 +641,9 @@ echo '
 				ui.item.label="";
 			}
 		});
+
 	 });
+
 
 	/*
  	 * Fuegt eine Ressource hinzu

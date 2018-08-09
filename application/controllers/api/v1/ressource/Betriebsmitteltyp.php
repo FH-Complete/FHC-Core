@@ -21,11 +21,11 @@ class Betriebsmitteltyp extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Betriebsmitteltyp' => 'basis/betriebsmitteltyp:rw'));
 		// Load model BetriebsmitteltypModel
 		$this->load->model('ressource/betriebsmitteltyp_model', 'BetriebsmitteltypModel');
-		
-		
+
+
 	}
 
 	/**
@@ -34,11 +34,11 @@ class Betriebsmitteltyp extends APIv1_Controller
 	public function getBetriebsmitteltyp()
 	{
 		$betriebsmitteltyp = $this->get('betriebsmitteltyp');
-		
+
 		if (isset($betriebsmitteltyp))
 		{
 			$result = $this->BetriebsmitteltypModel->load($betriebsmitteltyp);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -62,7 +62,7 @@ class Betriebsmitteltyp extends APIv1_Controller
 			{
 				$result = $this->BetriebsmitteltypModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -70,7 +70,7 @@ class Betriebsmitteltyp extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($betriebsmitteltyp = NULL)
 	{
 		return true;

@@ -21,7 +21,7 @@ class Veranstaltung extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Veranstaltung' => 'basis/veranstaltung:rw'));
 		// Load model VeranstaltungModel
 		$this->load->model('content/veranstaltung_model', 'VeranstaltungModel');
 	}
@@ -32,11 +32,11 @@ class Veranstaltung extends APIv1_Controller
 	public function getVeranstaltung()
 	{
 		$veranstaltungID = $this->get('veranstaltung_id');
-		
+
 		if (isset($veranstaltungID))
 		{
 			$result = $this->VeranstaltungModel->load($veranstaltungID);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -60,7 +60,7 @@ class Veranstaltung extends APIv1_Controller
 			{
 				$result = $this->VeranstaltungModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -68,7 +68,7 @@ class Veranstaltung extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($veranstaltung = NULL)
 	{
 		return true;

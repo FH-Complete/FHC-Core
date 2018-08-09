@@ -21,7 +21,7 @@ class Archiv extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Archiv' => 'basis/archiv:rw'));
 		// Load model ArchivModel
 		$this->load->model('codex/archiv_model', 'ArchivModel');
 	}
@@ -32,11 +32,11 @@ class Archiv extends APIv1_Controller
 	public function getArchiv()
 	{
 		$archivID = $this->get('archiv_id');
-		
+
 		if (isset($archivID))
 		{
 			$result = $this->ArchivModel->load($archivID);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -60,7 +60,7 @@ class Archiv extends APIv1_Controller
 			{
 				$result = $this->ArchivModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -68,7 +68,7 @@ class Archiv extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($archiv = NULL)
 	{
 		return true;

@@ -53,7 +53,7 @@ if (! $rechte->isberechtigt('basis/dms', null, 's', null))
 	<script type="text/javascript" src="../vendor/joeldbirch/superfish/dist/js/superfish.min.js"></script>
 	<script type="text/javascript" src="../include/tiny_mce/tiny_mce_popup.js"></script>
 	<style type="text/css">
-	.buttondesign 
+	.buttondesign
 	{
 		background-color: #87cefa;
 		border: 1px solid black;
@@ -259,17 +259,19 @@ if ($importFile != '')
 {
 	if (! $rechte->isberechtigt('basis/dms', $kategorie->kategorie_oe_kurzbz, 'sui'))
 		die($rechte->errormsg);
-	
+
 	$ext = pathinfo($importFile, PATHINFO_EXTENSION);
 	$filename = uniqid();
 	$filename .= ".".$ext;
 	$dms_id = $_POST['dms_id_import'];
-	
+
 	// kopiert aus import Verzeichnis
 	if (copy(IMPORT_PATH.$importFile, DMS_PATH.$filename))
 	{
 		$dms = new dms();
-		
+		if(!$dms->setPermission(DMS_PATH.$filename))
+			echo $dms->errormsg;
+
 		if ($dms_id != '')
 		{
 			if (! $dms->load($dms_id))
@@ -285,18 +287,18 @@ if ($importFile != '')
 		}
 		// Mimetype auslesen
 		$finfo = finfo_open(FILEINFO_MIME_TYPE);
-		
+
 		$dms->insertamum = date('Y-m-d H:i:s');
 		$dms->insertvon = $user;
 		$dms->mimetype = finfo_file($finfo, IMPORT_PATH.$importFile); // Davor deprecated: mime_content_type(IMPORT_PATH.$importFile);
 		$dms->filename = $filename;
 		$dms->name = $importFile;
-		
+
 		if ($dms->save(true))
 		{
 			echo 'File wurde erfolgreich hochgeladen. <br>Filename:'.$filename.' <br>ID: <a href="id://'.$dms->dms_id.'/Auswahl" onclick="FileBrowserDialog.mySubmit('.$dms->dms_id.'); return false;" style="font-size: small">'.$dms->dms_id.'</a>';
 			$dms_id = $dms->dms_id;
-			
+
 			if ($projekt_kurzbz != '' || $projektphase_id != '')
 			{
 				if (! $dms->saveProjektzuordnung($dms_id, $projekt_kurzbz, $projektphase_id))
@@ -305,13 +307,7 @@ if ($importFile != '')
 		}
 		else
 			echo 'Fehler beim Speichern der Daten';
-		
-		if (! @chgrp(DMS_PATH.$filename, 'dms'))
-			echo '<br>CHGRP failed';
-		if (! @chmod(DMS_PATH.$filename, 0774))
-			echo '<br>CHMOD failed';
-		exec('sudo chown wwwrun '.$filename);
-		
+
 		// Lösche File aus Verzeichnis nachdem es raufgeladen wurde
 		if (! unlink(IMPORT_PATH.$importFile))
 			echo 'Fehler beim Löschen aufgetreten.';
@@ -321,7 +317,7 @@ if (isset($_POST['fileupload']))
 {
 	if (! $rechte->isberechtigt('basis/dms', $kategorie->kategorie_oe_kurzbz, 'sui'))
 		die($rechte->errormsg);
-	
+
 	$dms_id = $_POST['dms_id'];
 	$beschreibung = $_POST['beschreibung'];
 	$schlagworte = $_POST['schlagworte'];
@@ -330,17 +326,14 @@ if (isset($_POST['fileupload']))
 	$filename = uniqid();
 	$filename .= ".".$ext;
 	$uploadfile = DMS_PATH.$filename;
-	
+
 	if (move_uploaded_file($_FILES['userfile']['tmp_name'], $uploadfile))
 	{
-		if (! @chgrp($uploadfile, 'dms'))
-			echo '<br>CHGRP failed';
-		if (! @chmod($uploadfile, 0774))
-			echo '<br>CHMOD failed';
-		exec('sudo chown wwwrun '.$uploadfile);
-		
 		$dms = new dms();
 		
+		if(!$dms->setPermission($uploadfile))
+			echo $dms->errormsg;
+
 		if ($dms_id != '')
 		{
 			if (! $dms->load($dms_id))
@@ -356,7 +349,7 @@ if (isset($_POST['fileupload']))
 		}
 		// Mimetype auslesen
 		$finfo = finfo_open(FILEINFO_MIME_TYPE);
-		
+
 		$dms->insertamum = date('Y-m-d H:i:s');
 		$dms->insertvon = $user;
 		$dms->mimetype = finfo_file($finfo, $uploadfile); // Davor deprecated: $_FILES['userfile']['type'];
@@ -365,14 +358,14 @@ if (isset($_POST['fileupload']))
 		$dms->beschreibung = $beschreibung;
 		$dms->schlagworte = $schlagworte;
 		$dms->cis_suche = $cis_suche;
-		
+
 		if ($dms->save(true))
 		{
 			echo '<p class="ok">File wurde erfolgreich hochgeladen.</p>Filename intern: '.$filename.' <br>Dateiname: '.$dms->name;
 			echo '<br>ID: <a href="id://'.$dms->dms_id.'/Auswahl" onclick="FileBrowserDialog.mySubmit('.$dms->dms_id.'); return false;" style="font-size: small" title="'.$dms->beschreibung.'">
 				'.$dms->dms_id.'</a><br><br>';
 			$dms_id = $dms->dms_id;
-			
+
 			if ($projekt_kurzbz != '' || $projektphase_id != '')
 			{
 				if (! $dms->saveProjektzuordnung($dms_id, $projekt_kurzbz, $projektphase_id))
@@ -394,14 +387,14 @@ if (isset($_POST['action']) && $_POST['action'] == 'rename')
 {
 	if (! $rechte->isberechtigt('basis/dms', $kategorie->kategorie_oe_kurzbz, 'su'))
 		die($rechte->errormsg);
-	
+
 	$name = $_POST['dateiname'];
 	$dms_id = $_POST['dms_id'];
 	$version = $_POST['version'];
 	$beschreibung = $_POST['beschreibung'];
 	$schlagworte = $_POST['schlagworte'];
 	$cis_suche = isset($_POST['cis_suche']) ? true : false;
-	
+
 	$dms = new dms();
 	if ($dms->load($dms_id, $version))
 	{
@@ -411,7 +404,7 @@ if (isset($_POST['action']) && $_POST['action'] == 'rename')
 		$dms->cis_suche = $cis_suche;
 		$dms->updateamum = date('Y-m-d H:i:s');
 		$dms->updatevon = $user;
-		
+
 		if ($dms->save(false))
 			echo '<span class="ok">Dateiname wurde erfolgreich geändert</span>';
 		else
@@ -425,16 +418,16 @@ if (isset($_REQUEST['delete']))
 {
 	if (! $rechte->isberechtigt('basis/dms', $kategorie->kategorie_oe_kurzbz, 'suid'))
 		die($rechte->errormsg);
-	
+
 	// lösche nur die Version
 	if (isset($_REQUEST['version']))
 	{
 		$dms_id = $_REQUEST['dms_id'];
 		$version = $_REQUEST['version'];
-		
+
 		$dms = new dms();
 		$dms->load($dms_id, $version);
-		
+
 		// DB Eintrag löschen
 		if (! $dms->deleteVersion($dms_id, $version))
 			echo '<span class="error">'.$dms->errormsg.'</span>';
@@ -457,7 +450,7 @@ if (isset($_REQUEST['delete']))
 		// lösche gesamten Eintrag
 		$dms = new dms();
 		$dms_id = $_REQUEST['dms_id'];
-		
+
 		// DB Einträge und Dokumente löschen
 		if (! $dms->deleteDms($dms_id))
 			echo '<span class="error">'.$dms->errormsg.'</span>';
@@ -490,10 +483,10 @@ if ($versionId != '')
 elseif ($renameId != '')
 {
 	// Datei umbenennen
-	
+
 	if (! $rechte->isberechtigt('basis/dms', $kategorie->kategorie_oe_kurzbz, 'su'))
 		die($rechte->errormsg);
-	
+
 	echo '<h1>Datei umbennen</h1>';
 	if (isset($_REQUEST['searching']) && $_REQUEST['searching'] == 'true')
 		echo '<p><a href="'.$_SERVER['PHP_SELF'].'?searching=true&searchstring='.$_REQUEST['searchstring'].'&page='.$page.'&dpp='.$dpp.'">zurück</a></p>';
@@ -516,10 +509,10 @@ elseif ($renameId != '')
 elseif ($chkatID != '')
 {
 	// Kategorie aendern
-	
+
 	if (! $rechte->isberechtigt('basis/dms', $kategorie->kategorie_oe_kurzbz, 'su'))
 		die($rechte->errormsg);
-	
+
 	if (isset($_POST['action']) && ($_POST['action'] == 'chkat'))
 	{
 		// neue Kategorie speichern
@@ -564,7 +557,7 @@ else
 	{
 		echo '<div style="padding: 5px; border-bottom: 1px solid lightblue"><a href="admin_dms.php" target="_blank">Administration</a></div>';
 	}
-	
+
 	// Kategorien anzeigen
 	$dms = new dms();
 	$dms->getKategorie();
@@ -599,7 +592,7 @@ else
 		<td valign="top" style="border-top: 1px solid lightblue;">';
 	// Dokumente der Ausgewaehlten Kategorie laden und Anzeigen
 	$dms = new dms();
-	
+
 	if ($searchstring != '' && (isset($_GET['searching']) && $_GET['searching'] == true))
 	{
 		$count = new dms();
@@ -607,7 +600,7 @@ else
 		$anzahl = count($count->result); // Falsches Ergebnis falls keine Berechtigung für eine Kategorie besteht
 		$dms->search($searchstring, $dpp, $page);
 		$suche = true;
-		
+
 		if ($page != 0)
 		{
 			echo '<span style="float:left">'.$anzahl.' Elemente gefunden</span><span  style="float:right">Seite '.$page.' von <a href="'.$_SERVER['PHP_SELF'].'?page=';
@@ -633,9 +626,9 @@ else
 		{
 			echo '<span align="center"><a href="'.$_SERVER['PHP_SELF'].'?page=1&dpp='.$dpp.'&searching=true&searchstring='.$searchstring.'">Seite 1</a></span>';
 		}
-		
+
 		drawFilesList($dms->result);
-		
+
 		echo '<form action="'.$_SERVER['PHP_SELF'].'?page=';
 		if ($page - 100 < 1)
 		{
@@ -783,7 +776,7 @@ else
 		</form>';
 	}
 	else
-	{		
+	{
 		// Wenn eine Berechtigung auf der Kategorie liegt prüfen, ob der User die notwendigen Rechte hat
 		if ($kategorie->berechtigung_kurzbz == '' || $rechte->isBerechtigt($kategorie->berechtigung_kurzbz))
 		{
@@ -792,7 +785,7 @@ else
 				$count = new dms();
 				$anzahl = $count->countDocumentsKategorie($kategorie_kurzbz);
 				$dms->getDocuments($kategorie_kurzbz, $dpp, $page);
-				
+
 				if ($page != 0)
 				{
 					echo '<span style="float:left">'.$anzahl.' Elemente gefunden</span><span style="float:right">Seite '.$page.' von <a href="'.$_SERVER['PHP_SELF'].'?kategorie_kurzbz='.$kategorie_kurzbz.'&page=';
@@ -818,7 +811,7 @@ else
 				{
 					echo '<span align="center"><a href="'.$_SERVER['PHP_SELF'].'?kategorie_kurzbz='.$kategorie_kurzbz.'&page=1&dpp='.$dpp.'">Seite 1</a></span>';
 				}
-				
+
 				drawFilesList($dms->result);
 				echo '<form action="'.$_SERVER['PHP_SELF'].'?kategorie_kurzbz='.$kategorie_kurzbz.'&page=';
 				if ($page - 100 < 1)
@@ -964,14 +957,14 @@ else
 					</select> Elemente pro Seite&nbsp;
 				</form>';
 			}
-			else 
+			else
 				echo '<span style="float:left">Sie haben keine Berechtigung für diese Kategorie</span>';
 		}
-		else 
+		else
 			echo '<span style="float:left">Sie haben keine Berechtigung für diese Kategorie</span>';
 	}
 	// drawFilesThumb($dms->result);
-	
+
 	echo '
 			</td>
 		</tr>
@@ -1042,7 +1035,7 @@ else
 		}
 		else
 			echo 'upload();';
-		
+
 		echo '
 			});
 			</script>';
@@ -1063,7 +1056,7 @@ function drawAllVersions($id)
 	global $rechte, $kategorie;
 	$dms = new dms();
 	$dms->getAllVersions($id);
-	
+
 	echo '<script>
 			$(document).ready(function()
 			{
@@ -1109,7 +1102,7 @@ function drawAllVersions($id)
 			echo '<li><a href="'.$_SERVER['PHP_SELF'].'?renameid='.$dms_help->dms_id.'&kategorie_kurzbz='.$dms_help->kategorie_kurzbz.'&dms_id='.$dms_help->dms_id.'&version='.$dms_help->version.'" style="font-size:small">Datei umbenennen</a></li>';
 		if ($rechte->isberechtigt('basis/dms', $kategorie->kategorie_oe_kurzbz, 'suid'))
 			echo '<li><a href="'.$_SERVER['PHP_SELF'].'?kategorie_kurzbz='.$dms_help->kategorie_kurzbz.'&versionid='.$dms_help->dms_id.'&dms_id='.$dms_help->dms_id.'&version='.$dms_help->version.'&delete" style="font-size:small">Löschen</a></li>';
-		
+
 		echo '</ul>
 						</li>
 					</ul>
@@ -1125,7 +1118,7 @@ function drawAllVersions($id)
 function drawFilesFromImport()
 {
 	global $kategorie_kurzbz, $projekt_kurzbz, $projektphase_id;
-	
+
 	if ($handle = opendir(IMPORT_PATH))
 	{
 		echo '<script>
@@ -1141,7 +1134,7 @@ function drawFilesFromImport()
 		echo '	<h3>Files im Import Ordner</h3>
 				<table class="tablesorter" id="t3" style="width: auto"> <form action ="'.$_SERVER['PHP_SELF'].'" method="POST" name="import" >
     			<thead><th>File</th><th></th></thead><tbody>';
-		
+
 		while (false !== ($file = readdir($handle)))
 		{
 			if ($file != '.' && $file != '..')
@@ -1176,19 +1169,19 @@ function drawKategorieMenue($rows)
 {
 	global $kategorie_kurzbz;
 	global $rechte;
-	
+
 	$kategorie_berechtigt = false;
-	
+
 	// echo '<ul>';
 	foreach ($rows as $row)
 	{
 		// Wenn eine Berechtigung auf der Kategorie liegt prüfen, ob der User die notwendigen Rechte hat
 		if ($row->berechtigung_kurzbz != '' && !$rechte->isberechtigt($row->berechtigung_kurzbz))
 			continue;
-			
+
 		$dms = new dms();
 		$dms->getKategorie($row->kategorie_kurzbz);
-		
+
 		$kategorie = new dms();
 		$kategorie->loadKategorie($row->kategorie_kurzbz);
 
@@ -1198,14 +1191,14 @@ function drawKategorieMenue($rows)
 			// Wenn eine oe_kurzbz auf der Kategorie liegt prüfen, ob der User die Kategorie sehen darf
 			if ($dms->kategorie_oe_kurzbz == '' || !$rechte->isberechtigt('basis/dms', $dms->kategorie_oe_kurzbz, 's'))
 				$kategorie_berechtigt = true;
-				
+
 			if ($kategorie_kurzbz == '')
 				$kategorie_kurzbz = $row->kategorie_kurzbz;
 			if ($kategorie_kurzbz == $row->kategorie_kurzbz)
 				$class = 'marked';
 			else
 				$class = '';
-	
+
 			// Suchen, ob eine Sperre fuer diese Kategorie vorhanden ist
 			$groups = $dms->getLockGroups($row->kategorie_kurzbz);
 			$locked = '';
@@ -1233,7 +1226,7 @@ function drawKategorieMenue($rows)
 	 			</li>';
 			}
 		}
-		else 
+		else
 		{
 			if (count($dms->result) > 0)
 				drawKategorieMenue($dms->result);
@@ -1251,7 +1244,7 @@ function drawFilesList($rows)
 {
 	global $mimetypes, $suche, $rechte;
 	$dms = new dms();
-	
+
 	if (count($rows) > 0)
 	{
 		echo '
@@ -1264,7 +1257,7 @@ function drawFilesList($rows)
 			echo 'sortList: [[4,0],[1,1]], headers: {3:{sorter:false}},';
 		else
 			echo 'sortList: [[0,0]], headers: {2:{sorter:false}},';
-		
+
 		echo '
 				widgets: ["zebra"]
 			});
@@ -1272,7 +1265,7 @@ function drawFilesList($rows)
 		</script>
 		';
 	}
-	
+
 	echo '
 			<table class="tablesorter" id="t2">
 			<thead>
@@ -1299,7 +1292,7 @@ function drawFilesList($rows)
 		// Wenn eine Berechtigung auf der Kategorie liegt prüfen, ob der User die notwendigen Rechte hat
 		if ($row->berechtigung_kurzbz != '' && !$rechte->isberechtigt($row->berechtigung_kurzbz))
 			continue;
-		else 
+		else
 			$i++;
 
 		echo '
@@ -1309,7 +1302,7 @@ function drawFilesList($rows)
 			echo '<img title="'.$row->name.'" src="../skin/images/'.$mimetypes[$row->mimetype].'" style="height: 15px">';
 		else
 			echo '<img title="'.$row->name.'" src="../skin/images/blank.gif" style="height: 15px">';
-		
+
 		// wenn es noch höhere Versionen zu diesem Dokument gibt, wird dieses gekennzeichnet
 		$newVersion = '';
 		$newerVersionAlert = '';
@@ -1318,20 +1311,20 @@ function drawFilesList($rows)
 			$newVersion = '--';
 			$newerVersionAlert = 'alert(\'Achtung!! Es gibt eine neuere Version dieses Dokuments. Es wird die aktuellste eingefügt.\');';
 		}
-		
+
 		echo '
 				<a href="id://'.$row->dms_id.'/Auswahl" onclick="'.$newerVersionAlert.' FileBrowserDialog.mySubmit('.$row->dms_id.'); return false;" style="font-size: small" title="'.$row->beschreibung.'">
 				'.$newVersion.' '.$row->name.'</a>
 			</td>';
 		$datum = new datum();
-		
+
 		echo '<td style="padding: 1px;" title="'.$datum->formatDatum($row->insertamum, 'd.m.Y H:m').' von '.$row->insertvon.'">';
 		echo $row->version;
 		echo '</td>';
-		
+
 		$kategorie = new dms();
 		$kategorie->loadKategorie($row->kategorie_kurzbz);
-		
+
 		// zeige bei suche auch kategorie an
 		if ($suche == true)
 		{
@@ -1340,7 +1333,7 @@ function drawFilesList($rows)
 			echo '</td>';
 		}
 		echo '<td style="padding: 1px;">';
-		
+
 		// Upload einer neuen Version
 		echo '<ul class="sf-menu">
 				<li><a href="#" style="font-size:small">Erweitert</a>
@@ -1428,7 +1421,7 @@ function drawFilesList($rows)
 				echo '<li><a href="'.$_SERVER['PHP_SELF'].'?searching=true';
 				if (isset($_REQUEST['searchstring']))
 					echo '&searchstring='.$_REQUEST['searchstring'];
-					
+
 				echo '&dms_id='.$row->dms_id.'&delete" onclick="return conf_del()" style="font-size:small" >Löschen</a></li>';
 			}
 		}
@@ -1510,9 +1503,9 @@ function drawFilesList($rows)
 	}
 	if ($i > 0)
 		echo '</tbody></table>';
-	else 
+	else
 		echo '<tr><td colspan="5">Für keines der gefundenen Elemente besteht eine Berechtigung</td></tr></tbody></table>';
-	
+
 	$suche = false;
 }
 
@@ -1525,7 +1518,7 @@ function drawFilesList($rows)
 function drawRenameForm($dms_id, $version, $page = NULL, $dpp = NULL, $searching, $searchstring)
 {
 	global $kategorie_kurzbz;
-	
+
 	$dms = new dms();
 	if ($dms->load($dms_id, $version))
 	{
@@ -1588,10 +1581,10 @@ function drawChangeKategorie($dms_id, $page = NULL, $dpp = NULL)
 	global $rechte;
 	$dms = new dms();
 	$dms->load($dms_id);
-	
+
 	$allKategorien = new dms();
 	$allKategorien->getAllKategories();
-	
+
 	if (isset($_REQUEST['searching']) && $_REQUEST['searching'] == 'true')
 	{
 		echo '<form action="'.$_SERVER['PHP_SELF'].'?chkatID='.$dms_id.'&searching=true&searchstring='.$_REQUEST['searchstring'];
@@ -1613,19 +1606,19 @@ function drawChangeKategorie($dms_id, $page = NULL, $dpp = NULL)
 	echo '
 		<select name="kategoriez">
 			<option value="auswahl">-- Bitte Auswählen --</option>';
-	
+
 	foreach ($allKategorien->result as $kategorienResult)
 	{
 		if ($kategorienResult->kategorie_oe_kurzbz != '' && !$rechte->isberechtigt('basis/dms', $kategorienResult->kategorie_oe_kurzbz, 'su'))
 			continue;
-		
+
 		$selected = '';
 		if ($kategorienResult->kategorie_kurzbz == $dms->kategorie_kurzbz)
 			$selected = 'selected';
-		
+
 		echo '<option '.$selected.' value="'.$kategorienResult->kategorie_kurzbz.'">'.$x.$kategorienResult->bezeichnung.' ['.$kategorienResult->kategorie_kurzbz.']</option>';
 	}
-	
+
 	echo '</select>
 		  <input type="hidden" name="action" value="chkat">
 		  <input type="hidden" name="dms_id" value="'.$dms_id.'">';

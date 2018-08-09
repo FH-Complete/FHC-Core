@@ -21,7 +21,7 @@ class Lgartcode extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Lgartcode' => 'basis/lgartcode:rw'));
 		// Load model LgartcodeModel
 		$this->load->model('codex/lgartcode_model', 'LgartcodeModel');
 	}
@@ -32,11 +32,11 @@ class Lgartcode extends APIv1_Controller
 	public function getLgartcode()
 	{
 		$lgartcode = $this->get('lgartcode');
-		
+
 		if (isset($lgartcode))
 		{
 			$result = $this->LgartcodeModel->load($lgartcode);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -60,7 +60,7 @@ class Lgartcode extends APIv1_Controller
 			{
 				$result = $this->LgartcodeModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -68,7 +68,7 @@ class Lgartcode extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($lgartcode = NULL)
 	{
 		return true;

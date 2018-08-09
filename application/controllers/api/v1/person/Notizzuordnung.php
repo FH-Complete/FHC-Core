@@ -21,11 +21,11 @@ class Notizzuordnung extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Notizzuordnung' => 'basis/notizzuordnung:rw'));
 		// Load model NotizzuordnungModel
 		$this->load->model('person/notizzuordnung_model', 'NotizzuordnungModel');
-		
-		
+
+
 	}
 
 	/**
@@ -34,11 +34,11 @@ class Notizzuordnung extends APIv1_Controller
 	public function getNotizzuordnung()
 	{
 		$notizzuordnungID = $this->get('notizzuordnung_id');
-		
+
 		if (isset($notizzuordnungID))
 		{
 			$result = $this->NotizzuordnungModel->load($notizzuordnungID);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -62,7 +62,7 @@ class Notizzuordnung extends APIv1_Controller
 			{
 				$result = $this->NotizzuordnungModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -70,7 +70,7 @@ class Notizzuordnung extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($notizzuordnung = NULL)
 	{
 		return true;

@@ -2,13 +2,17 @@
 
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
-class UDF extends VileSci_Controller
+class UDF extends Auth_Controller
 {
 	public function __construct()
     {
-        parent::__construct();
+        parent::__construct(
+			array(
+				'index' => 'basis/person:r',
+				'saveUDF' => 'basis/person:rw'
+			)
+		);
 
-		//
 		$this->load->model('person/Person_model', 'PersonModel');
 		$this->load->model('crm/Prestudent_model', 'PrestudentModel');
     }

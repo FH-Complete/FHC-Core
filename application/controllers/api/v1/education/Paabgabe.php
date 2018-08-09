@@ -21,7 +21,7 @@ class Paabgabe extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Paabgabe' => 'basis/paabgabe:rw'));
 		// Load model PaabgabeModel
 		$this->load->model('education/Paabgabe_model', 'PaabgabeModel');
 	}
@@ -32,11 +32,11 @@ class Paabgabe extends APIv1_Controller
 	public function getPaabgabe()
 	{
 		$paabgabe_id = $this->get('paabgabe_id');
-		
+
 		if (isset($paabgabe_id))
 		{
 			$result = $this->PaabgabeModel->load($paabgabe_id);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -60,7 +60,7 @@ class Paabgabe extends APIv1_Controller
 			{
 				$result = $this->PaabgabeModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -68,7 +68,7 @@ class Paabgabe extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($paabgabe = NULL)
 	{
 		return true;

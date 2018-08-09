@@ -21,11 +21,11 @@ class Buchungstyp extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Buchungstyp' => 'basis/buchungstyp:rw');
 		// Load model BuchungstypModel
 		$this->load->model('crm/buchungstyp_model', 'BuchungstypModel');
-		
-		
+
+
 	}
 
 	/**
@@ -34,11 +34,11 @@ class Buchungstyp extends APIv1_Controller
 	public function getBuchungstyp()
 	{
 		$buchungstyp_kurzbz = $this->get('buchungstyp_kurzbz');
-		
+
 		if (isset($buchungstyp_kurzbz))
 		{
 			$result = $this->BuchungstypModel->load($buchungstyp_kurzbz);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -62,7 +62,7 @@ class Buchungstyp extends APIv1_Controller
 			{
 				$result = $this->BuchungstypModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -70,7 +70,7 @@ class Buchungstyp extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($buchungstyp = NULL)
 	{
 		return true;

@@ -82,6 +82,10 @@ else
 					</menu>
 					<menuseparator />
 					<menuitem label="Personendetails anzeigen" oncommand="StudentShowPersonendetails();" id="student-tree-popup-personendetails" hidden="false"/>
+					<?php
+					if($rechte->isBerechtigt('basis/person', null, 'suid'))
+						echo '<menuitem label="Person(en) zusammenlegen" oncommand="StudentPersonenZusammenlegen();" id="student-tree-popup-personenzusammenlegen" hidden="false"/>';
+					?>
 					<!--
 					<menuitem label="Interessenten löschen" oncommand="StudentDeleteInteressent();" id="student-tree-popup-deleteinteressent" hidden="false"/>
 					-->

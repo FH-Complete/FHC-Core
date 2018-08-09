@@ -2,7 +2,7 @@
 
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
-class Messages extends VileSci_Controller
+class Messages extends Auth_Controller
 {
 	private $uid; // contains the UID of the logged user
 
@@ -11,7 +11,15 @@ class Messages extends VileSci_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(
+			array(
+				'write' => array('basis/message:rw', 'infocenter:rw'),
+				'send' => array('basis/message:rw', 'infocenter:rw'),
+				'getVorlage' => array('basis/message:r', 'infocenter:r'),
+				'parseMessageText' => array('basis/message:r', 'infocenter:r'),
+				'getMessageFromIds' => array('basis/message:r', 'infocenter:r')
+			)
+		);
 
 		// Loads the message library
 		$this->load->library('MessageLib');
@@ -20,13 +28,16 @@ class Messages extends VileSci_Controller
 		$this->load->library('WidgetLib');
 
 		$this->load->model('person/Person_model', 'PersonModel');
-		
-		$this->loadPhrases(array(
-								'global', 
-								'person',
-								'lehre',
-								'ui',
-								'infocenter'));
+
+		$this->loadPhrases(
+			array(
+				'global',
+				'person',
+				'lehre',
+				'ui',
+				'infocenter'
+			)
+		);
 
 		$this->_setAuthUID(); // sets property uid
 	}
@@ -184,9 +195,9 @@ class Messages extends VileSci_Controller
 		{
 			$user_person = $this->PersonModel->getByUid($this->uid);
 
-			if (isError($user_person))
+			if (!hasData($user_person))
 			{
-				show_error($user_person->retval);
+				show_error('no sender');
 			}
 			$sender_id = $user_person->retval[0]->person_id;
 		}

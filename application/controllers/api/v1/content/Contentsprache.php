@@ -21,7 +21,7 @@ class Contentsprache extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(array('Contentsprache' => 'basis/contentsprache:rw'));
 		// Load model ContentspracheModel
 		$this->load->model('content/contentsprache_model', 'ContentspracheModel');
 	}
@@ -32,11 +32,11 @@ class Contentsprache extends APIv1_Controller
 	public function getContentsprache()
 	{
 		$contentspracheID = $this->get('contentsprache_id');
-		
+
 		if (isset($contentspracheID))
 		{
 			$result = $this->ContentspracheModel->load($contentspracheID);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -60,7 +60,7 @@ class Contentsprache extends APIv1_Controller
 			{
 				$result = $this->ContentspracheModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -68,7 +68,7 @@ class Contentsprache extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($contentsprache = NULL)
 	{
 		return true;

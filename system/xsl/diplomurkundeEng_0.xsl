@@ -74,11 +74,13 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
 				<xsl:if test="datum = ''"><text:p text:style-name="P4">Datum der Abschlussprüfung nicht gesetzt</text:p></xsl:if>
 				<xsl:if test="titel = ''"><text:p text:style-name="P4">Kein akademischer Grad ausgewählt</text:p></xsl:if>
 				<xsl:if test="sponsion = ''"><text:p text:style-name="P4">Sponsionsdatum nicht gesetzt</text:p></xsl:if>
+				<xsl:if test="bescheidbgbl1 = ''"><text:p text:style-name="P4">Bundesgesetzblattnummer (BGBl) beim Studiengang ist nicht gesetzt</text:p></xsl:if>
+				
 			<text:p text:style-name="P1"/>
 			<text:p text:style-name="P1"/>
 			<text:p text:style-name="P1"/>
 			<text:p text:style-name="P1">Pursuant to section 6 subsection 1 of the Universities of Applied Sciences Studies Act</text:p>
-			<text:p text:style-name="P1">(Austrian legal reference: Fachhochschul-Studiengesetz - FHStG, BGBl. Nr. <xsl:value-of select="bescheidbgbl1" /> idgF,</text:p>
+			<text:p text:style-name="P1">(Austrian legal reference: Fachhochschul-Studiengesetz - FHStG, BGBl. Nr. <xsl:value-of select="bescheidbgbl1" /> idgF),</text:p>
 			<text:p text:style-name="P1">the University of Applied Sciences Council (Fachhochschulkollegium) awards</text:p>
 			<text:p text:style-name="P1"/>
 			<text:p text:style-name="P3"><xsl:value-of select="anrede_engl" /><xsl:text> </xsl:text><xsl:value-of select="name" /></text:p>
@@ -89,7 +91,7 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
 				<xsl:text>, </xsl:text>
 			</xsl:if>
 			<xsl:value-of select="geburtsnation_engl" />, citizen of <xsl:value-of select="staatsbuergerschaft_engl" />,</text:p>
-			<text:p text:style-name="P1">student of the university of applied sciences 
+			<text:p text:style-name="P1">student of the University of Applied Sciences 
 				<xsl:choose>
 					<xsl:when test="stg_art='b'">Bachelor</xsl:when>					
 					<xsl:when test="stg_art='m'">Master</xsl:when>					
@@ -105,7 +107,7 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
 			<text:p text:style-name="P1">after successfully passing the diploma examination on <xsl:value-of select="datum" /></text:p>
 			<text:p text:style-name="P1">at the University of Applied Sciences Technikum Wien (Fachhochschule Technikum Wien)</text:p>
 			<text:p text:style-name="P1">in accordance with the directive of the Agency for Quality Assurance and Accreditation Austria</text:p>
-			<text:p text:style-name="P1">dated 9.5.2012 the academic degree</text:p>
+			<text:p text:style-name="P1">dated 09.05.2012 the academic degree</text:p>
 			<text:p text:style-name="P1"/>
 			<text:p text:style-name="P3"><xsl:value-of select="titel" /></text:p>
 			<text:p text:style-name="P1">abbreviated</text:p>
