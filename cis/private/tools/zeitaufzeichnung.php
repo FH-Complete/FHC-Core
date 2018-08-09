@@ -102,10 +102,15 @@ else
 $activities_str = "'".implode("','", $activities)."'";
 
 // definiert bis zu welchem Datum die Eintragung nicht mehr möglich ist
-if (defined('CIS_ZEITAUFZEICHNUNG_GESPERRT_BIS') && CIS_ZEITAUFZEICHNUNG_GESPERRT_BIS != '')
+$zasperre = new zeitaufzeichnung();
+if ($sperrdat = $zasperre->getEintragungGesperrtBisForUser($user))
+	$gesperrt_bis = $sperrdat;
+else if (defined('CIS_ZEITAUFZEICHNUNG_GESPERRT_BIS') && CIS_ZEITAUFZEICHNUNG_GESPERRT_BIS != '')
 	$gesperrt_bis = CIS_ZEITAUFZEICHNUNG_GESPERRT_BIS;
 else
 	$gesperrt_bis = '2015-08-31';
+
+//var_dump($gesperrt_bis);
 
 $sperrdatum = date('c', strtotime($gesperrt_bis));
 
@@ -1506,4 +1511,5 @@ function getZeitaufzeichnung($user, $von, $bis)
 	$za->getListeUserFromTo($user, $von, $bis);
 	return $za;
 }
+
 ?>

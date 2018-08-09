@@ -742,5 +742,48 @@ or not exists
 
 	    return $lehre_arr;
 	}
+
+	/**
+	 * Holt das Datum bis zu dem die Eintragung für einen bestimmten User gesperrt ist
+	 * @param string $user
+	 * @return string $tag Y-m-d or false
+	 */
+
+	public function getEintragungGesperrtBisForUser($user)
+	{
+		//check if addon casetime is installed
+		$qrytable = "
+		SELECT EXISTS(
+		    SELECT *
+		    FROM information_schema.tables
+		    WHERE
+		      table_schema = 'addon' AND
+		      table_name = 'tbl_casetime_timesheet'
+		);
+		";
+
+		$res = $this->db_query($qrytable);
+		if ($this->db_fetch_row($res)[0])
+		{
+			//check if sent timesheets for the UID exist
+			$where = "uid=".$this->db_add_param($user);
+
+			$qry = "select max(datum) from addon.tbl_casetime_timesheet where ".$where." and abgeschicktamum is not null";
+
+		    if($result = $this->db_query($qry))
+		    {
+				$datum = $this->db_fetch_object($result);
+				return $datum->max;
+		    }
+		    else
+		    {
+		    	return false;
+		    }
+		}
+		else
+		{
+			return false;
+		}
+	}
 }
 ?>
