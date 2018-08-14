@@ -31,10 +31,12 @@ require_once('../include/abschlusspruefung.class.php');
 require_once('../include/person.class.php');
 require_once('../include/benutzer.class.php');
 require_once('../include/student.class.php');
+require_once('../include/prestudent.class.php');
 require_once('../include/mitarbeiter.class.php');
 require_once('../include/nation.class.php');
 require_once('../include/datum.class.php');
 require_once('../include/studiengang.class.php');
+require_once('../include/studienordnung.class.php');
 require_once('../include/akadgrad.class.php');
 require_once('../include/organisationseinheit.class.php');
 require_once('../include/projektarbeit.class.php');
@@ -85,6 +87,7 @@ function draw_content_xml($row)
 	$person = new person();
 	$mitarbeiter = new mitarbeiter();
 	$student= new student($row->student_uid);
+	$prestudent = new prestudent($student->prestudent_id);
 
 	$nation=new nation($student->geburtsnation);
 	$geburtsnation=$nation->kurztext;
@@ -96,6 +99,19 @@ function draw_content_xml($row)
 	$studiengang = new studiengang($student->studiengang_kz);
 	$akadgrad = new akadgrad($row->akadgrad_id);
 	$vorsitz_geschlecht = '';
+
+	if ($prestudent->getLastStatus($student->prestudent_id, null, 'Absolvent'))
+	{
+		$studienplan_id = $prestudent->studienplan_id;
+		$studienordnung = new studienordnung();
+		if ($studienordnung->getStudienordnungFromStudienplan($studienplan_id))
+		{
+			$studiengangbezeichnung = $studienordnung->__get('studiengangbezeichnung');
+			$studiengangbezeichnung_englisch = $studienordnung->__get('studiengangbezeichnung_englisch');
+		}
+	}
+	$studiengang_bezeichnung = empty($studiengangbezeichnung) ? $row->bezeichnung : $studiengangbezeichnung;
+	$studiengang_bezeichnung_englisch = empty($studiengangbezeichnung_englisch) ? $row->english : $studiengangbezeichnung_englisch;
 
 	if($mitarbeiter->load($row->vorsitz))
 	{
@@ -218,7 +234,7 @@ function draw_content_xml($row)
 		}
 	}
 
-	$studiengang_bezeichnung2 = explode(" ", $studiengang->bezeichnung, 2);
+	$studiengang_bezeichnung2 = explode(" ", $studiengang_bezeichnung, 2);
 	$name = $student->titelpre.' '.trim($student->vorname.' '.$student->vornamen).' '.$student->nachname;
 	$name .= ($student->titelpost!=''?', '.$student->titelpost:'');
 	$name = trim($name);
@@ -274,9 +290,9 @@ function draw_content_xml($row)
 	<geburtsnation><![CDATA['.$geburtsnation.']]></geburtsnation>
 	<geburtsnation_engl><![CDATA['.$geburtsnation_engl.']]></geburtsnation_engl>
 	<studiengang_kz><![CDATA['.$studiengang_kz.']]></studiengang_kz>
-	<stg_bezeichnung><![CDATA['.$studiengang->bezeichnung.']]></stg_bezeichnung>
+	<stg_bezeichnung><![CDATA['.$studiengang_bezeichnung.']]></stg_bezeichnung>
 	<stg_bezeichnung2><![CDATA['.(isset($studiengang_bezeichnung2[1])?$studiengang_bezeichnung2[1]:'').']]></stg_bezeichnung2>
-	<stg_bezeichnung_engl><![CDATA['.$studiengang->english.']]></stg_bezeichnung_engl>
+	<stg_bezeichnung_engl><![CDATA['.$studiengang_bezeichnung_englisch.']]></stg_bezeichnung_engl>
 	<stg_oe_parent><![CDATA['.$oe_parent.']]></stg_oe_parent>
 	<stg_art><![CDATA['.$studiengang->typ.']]></stg_art>
 	<akadgrad_kurzbz><![CDATA['.$akadgrad->akadgrad_kurzbz.']]></akadgrad_kurzbz>
