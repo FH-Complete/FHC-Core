@@ -16,8 +16,8 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ *		  Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
+ *		  Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
 
 // Oberflaeche zum Upload von Dokumenten aus dem FAS
@@ -27,8 +27,8 @@ require_once('../include/person.class.php');
 require_once('../include/benutzerberechtigung.class.php');
 require_once('../include/akte.class.php');
 require_once('../include/dokument.class.php');
-require_once('../include/dms.class.php'); 
-require_once('../include/phrasen.class.php'); 
+require_once('../include/dms.class.php');
+require_once('../include/phrasen.class.php');
 
 header("Content-Type: text/html; charset=utf-8");
 
@@ -36,7 +36,7 @@ $PHP_SELF = $_SERVER['PHP_SELF'];
 echo "<html><body>";
 
 $user = get_uid();
-$p = new phrasen(); 
+$p = new phrasen();
 $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($user);
 if(!$rechte->isBerechtigt('admin') && !$rechte->isBerechtigt('assistenz') && !$rechte->isBerechtigt('mitarbeiter'))
@@ -47,69 +47,68 @@ $dokument_kurzbz = isset($_REQUEST['dokument_kurzbz'])?$_REQUEST['dokument_kurzb
 
 if(isset($_POST['submitbild']))
 {
-    $error = false; 
-    
-    // dms Eintrag anlegen
-    if(isset($_POST['fileupload']))
-    {
-        $ext = pathinfo($_FILES['file']['name'], PATHINFO_EXTENSION); 
-        $filename = uniqid();
-        $filename.=".".$ext; 
-        $uploadfile = DMS_PATH.$filename;
+	$error = false;
+
+	// dms Eintrag anlegen
+	if(isset($_POST['fileupload']))
+	{
+		$ext = pathinfo($_FILES['file']['name'], PATHINFO_EXTENSION);
+		$filename = uniqid();
+		$filename.=".".$ext;
+		$uploadfile = DMS_PATH.$filename;
 
 
-        if(move_uploaded_file($_FILES['file']['tmp_name'], $uploadfile)) 
-        {
-            if(!chgrp($uploadfile,'dms'))
-                echo 'CHGRP failed';
-            if(!chmod($uploadfile, 0774))
-                echo 'CHMOD failed';
-            exec('sudo chown wwwrun '.$uploadfile);	
+		if(move_uploaded_file($_FILES['file']['tmp_name'], $uploadfile))
+		{
+			if(!chgrp($uploadfile,'dms'))
+				echo 'CHGRP failed';
+			if(!chmod($uploadfile, 0774))
+				echo 'CHMOD failed';
 
-            $dms = new dms();
+			$dms = new dms();
 
-            $dms->version='0';
-            $dms->kategorie_kurzbz=$kategorie_kurzbz;
+			$dms->version='0';
+			$dms->kategorie_kurzbz=$kategorie_kurzbz;
 
-            $dms->insertamum=date('Y-m-d H:i:s');
-            //$dms->insertvon = $user;
-            $dms->mimetype=$_FILES['file']['type'];
-            $dms->filename = $filename;
-            $dms->name = $_FILES['file']['name'];
+			$dms->insertamum=date('Y-m-d H:i:s');
+			//$dms->insertvon = $user;
+			$dms->mimetype=$_FILES['file']['type'];
+			$dms->filename = $filename;
+			$dms->name = $_FILES['file']['name'];
 
-            if($dms->save(true))
-            {
-                $dms_id=$dms->dms_id;
+			if($dms->save(true))
+			{
+				$dms_id=$dms->dms_id;
 
-            }    	
-            else
-            {
-                echo 'Fehler beim Speichern der Daten';
-                $error = true; 
-            }
-        } 
-        else 
-        {
-            echo 'Fehler beim Hochladen der Datei';
-            $error = true; 
-        }
-    }
-    
+			}
+			else
+			{
+				echo 'Fehler beim Speichern der Daten';
+				$error = true;
+			}
+		}
+		else
+		{
+			echo 'Fehler beim Hochladen der Datei';
+			$error = true;
+		}
+	}
+
 	if(isset($_FILES['file']['tmp_name']) && !$error)
 	{
 		//Extension herausfiltern
-    	$ext = explode('.',$_FILES['file']['name']);
-        $ext = mb_strtolower($ext[count($ext)-1]);
-		
+		$ext = explode('.',$_FILES['file']['name']);
+		$ext = mb_strtolower($ext[count($ext)-1]);
+
 		$filename = $_FILES['file']['tmp_name'];
-		
+
 		//$fp = fopen($filename,'r');
 		//auslesen
 		//$content = fread($fp, filesize($filename));
 		//fclose($fp);
-		
+
 		$akte = new akte();
-		
+
 		if($akte->getAkten($_GET['person_id'], 'Lichtbil'))
 		{
 			if(count($akte->result)>0)
@@ -117,39 +116,39 @@ if(isset($_POST['submitbild']))
 				$akte = $akte->result[0];
 				$akte->new = false;
 			}
-			else 
+			else
 				$akte->new = true;
 		}
-		else 
+		else
 		{
 			$akte->new = true;
 		}
-		
-		$dokument = new dokument(); 
+
+		$dokument = new dokument();
 		$dokument->loadDokumenttyp($_REQUEST['dokumenttyp']);
 
 		$extension = end(explode(".",strtolower($_FILES['file']['name'])));
-			
+
 		$akte->dokument_kurzbz = $_REQUEST['dokumenttyp'];
 		$akte->person_id = $_GET['person_id'];
 		//$akte->inhalt = base64_encode($content);
 		$akte->mimetype = $_FILES['file']['type'];
 		$akte->erstelltam = date('Y-m-d H:i:s');
 		$akte->gedruckt = false;
-		$akte->titel = $akte->titel = cutString($_FILES['file']['name'], 32, '~', true); // Filename gekuerzt auf 32 Zeichen; 
+		$akte->titel = $akte->titel = cutString($_FILES['file']['name'], 32, '~', true); // Filename gekuerzt auf 32 Zeichen;
 		$akte->bezeichnung = cutString($dokument->bezeichnung_mehrsprachig[DEFAULT_LANGUAGE], 32);
 		$akte->updateamum = date('Y-m-d H:i:s');
 		$akte->updatevon = $user;
 		$akte->insertamum = date('Y-m-d H:i:s');
-		$akte->nachgereicht = false; 
-		$akte->anmerkung = ''; 
+		$akte->nachgereicht = false;
+		$akte->anmerkung = '';
 		$akte->insertvon = $user;
 		$akte->uid = '';
 		$akte->dms_id = $dms_id;
-		$akte->new = true; 
+		$akte->new = true;
 		$akte->titel_intern = $_REQUEST['titel_intern'];
-		$akte->anmerkung_intern = $_REQUEST['anmerkung_intern']; 
-		
+		$akte->anmerkung_intern = $_REQUEST['anmerkung_intern'];
+
 		if(!$akte->save())
 		{
 			echo "<b>Fehler: $akte->errormsg</b>";
@@ -172,7 +171,7 @@ if(isset($_POST['submitbild']))
 
 if(isset($_GET['person_id']))
 {
-	$dokument = new dokument(); 
+	$dokument = new dokument();
 	$dokument->getAllDokumente('Zeugnis');
 
 	echo "	<!DOCTYPE HTML PUBLIC '-//W3C//DTD HTML 4.01 Transitional//EN' 'http://www.w3.org/TR/html4/loose.dtd'>
@@ -181,7 +180,7 @@ if(isset($_GET['person_id']))
 				<meta http-equiv='Content-Type' content='text/html; charset=UTF-8'>
 				<link href='../skin/style.css.php' rel='stylesheet' type='text/css'>
 				<link rel='stylesheet' href='../skin/jquery.css' type='text/css'/>
-			</head>			
+			</head>
 			<body style='padding:10px;'>
 			<h1>Upload Dokumente</h1>
 			<form method='POST' enctype='multipart/form-data' action='$PHP_SELF?person_id=".$_GET['person_id']."'>
@@ -193,10 +192,10 @@ if(isset($_GET['person_id']))
 				<tr>
 					<td align='right'>Typ:</td>
 					<td><SELECT style='width:300px' name='dokumenttyp'>";
-			
+
 				foreach ($dokument->result as $dok)
 				{
-					$onclick="document.getElementById('titel_intern').value='".$dok->dokument_kurzbz."';"; 
+					$onclick="document.getElementById('titel_intern').value='".$dok->dokument_kurzbz."';";
 
 					if(isset($_GET['dokument_kurzbz']) && $_GET['dokument_kurzbz']==$dok->dokument_kurzbz)
 						$selected='selected';
@@ -204,11 +203,11 @@ if(isset($_GET['person_id']))
 						$selected='';
 					echo '<option value="'.$dok->dokument_kurzbz.'" onclick="'.$onclick.'" '.$selected.'>'.$dok->bezeichnung."</option>\n";
 				}
-				
+
 	echo "	<tr>
 				<td align='right'>Titel:</td><td><input size='45' maxlength='32' type='text' name='titel_intern' id='titel_intern' length='35' ></td>
 			</tr>
-			<tr> 
+			<tr>
 				<td align='right'>Anmerkung:</td><td><textarea name='anmerkung_intern' cols='45' id='anmerkung_intern'></textarea></td>
 			</tr>
 			<tr>

@@ -82,10 +82,17 @@ foreach ($uid_arr as $uid)
 		$studiengang='';
 	}
 	else 
-	{	
+	{
 		//Student
-		$qry ="SELECT vorname, nachname, matrikelnr, uid, tbl_studiengang.bezeichnung, tbl_studiengang.english, aktivierungscode, alias
-		       FROM campus.vw_student JOIN public.tbl_studiengang USING(studiengang_kz) WHERE uid=".$db->db_add_param($uid);
+		$qry ="SELECT vorname, nachname, matrikelnr, uid, tbl_studiengang.bezeichnung, tbl_studiengang.english, aktivierungscode, alias, tbl_studienordnung.studiengangbezeichnung, tbl_studienordnung.studiengangbezeichnung_englisch
+		       FROM campus.vw_student
+		       JOIN public.tbl_studiengang USING(studiengang_kz)
+		       LEFT JOIN public.tbl_prestudentstatus USING(prestudent_id)
+		       LEFT JOIN lehre.tbl_studienplan USING (studienplan_id)
+			   LEFT JOIN lehre.tbl_studienordnung USING (studienordnung_id)
+		       WHERE uid=".$db->db_add_param($uid)."
+		       ORDER BY tbl_prestudentstatus.datum DESC LIMIT 1";
+
 		if($db->db_query($qry))
 		{
 			if($row = $db->db_fetch_object())
@@ -97,6 +104,10 @@ foreach ($uid_arr as $uid)
 				$matrikelnr = $row->matrikelnr;
 				$studiengang = convertProblemChars($row->bezeichnung);
 				$studiengang_eng = convertProblemChars($row->english);
+				$studiengangbezeichnung = convertProblemChars($row->studiengangbezeichnung);
+				$studiengangbezeichnung_englisch = convertProblemChars($row->studiengangbezeichnung_englisch);
+				$studiengang_bezeichnung = empty($studiengangbezeichnung) ? $studiengang : $studiengangbezeichnung;
+				$studiengang_bezeichnung_englisch = empty($studiengangbezeichnung_englisch) ? $studiengang_eng : $studiengangbezeichnung_englisch;
 				$uid = $row->uid;
 			}
 			else 
@@ -118,8 +129,8 @@ foreach ($uid_arr as $uid)
 		echo "\n			<alias><![CDATA[]]></alias>";
 	if($studiengang!='')
 	{
-		echo "\n			<bezeichnung><![CDATA[".$studiengang."]]></bezeichnung>";
-		echo "\n			<bezeichnung_english><![CDATA[".$studiengang_eng."]]></bezeichnung_english>";
+		echo "\n			<bezeichnung><![CDATA[".$studiengang_bezeichnung."]]></bezeichnung>";
+		echo "\n			<bezeichnung_english><![CDATA[".$studiengang_bezeichnung_englisch."]]></bezeichnung_english>";
 	}
 	echo "\n			<email><![CDATA[".$uid.'@'.DOMAIN."]]></email>";
 	echo "\n			<fileserver><![CDATA[".$fileserver."]]></fileserver>";

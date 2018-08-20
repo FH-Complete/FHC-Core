@@ -68,7 +68,7 @@ if ($filter != '')
 	// Leere Strings aus Array entfernen
 	while ($array_key = array_search("", $searchItems))
 		unset($searchItems[$array_key]);
-	
+
 	// Wenn Zeichen uebrig bleiben
 	if (implode(',', $searchItems) != '')
 	{
@@ -138,7 +138,7 @@ if (isset($personToDelete) && isset($personToKeep) && $personToDelete >= 0 && $p
 		{
 			$personToKeep_obj = new person();
 			$personToKeep_obj->load($personToKeep);
-			
+
 			// Wenn beide Personen eine SVNR oder ein Ersatzkennzeichen haben, abbrechen
 			if (($personToDelete_obj->ersatzkennzeichen != '' && $personToKeep_obj->ersatzkennzeichen != '') ||
 				($personToDelete_obj->svnr != '' && $personToKeep_obj->svnr != ''))
@@ -152,7 +152,7 @@ if (isset($personToDelete) && isset($personToKeep) && $personToDelete >= 0 && $p
 				// Wenn bei einer der Personen das Foto gesperrt ist, dann die Sperre uebernehmen
 				if ($personToDelete_obj->foto_sperre)
 					$sql_query_upd1 .= "UPDATE public.tbl_person SET foto_sperre=true WHERE person_id=" . $db->db_add_param($personToKeep, FHC_INTEGER) . ";";
-				
+
 				// Wenn die zu loeschende Person ein Foto hat, und die andere nicht,
 				// dann wird das Foto, die Fotosperre und die Historie des Fotostatus übernommen
 				if ($personToDelete_obj->foto != '' && $personToKeep_obj->foto == '')
@@ -170,14 +170,14 @@ if (isset($personToDelete) && isset($personToKeep) && $personToDelete >= 0 && $p
 						$insertamum1 = $akte1->result[0]->insertamum;
 					else
 						$insertamum1 = 0;
-					
+
 					$akte2 = new akte();
 					$akte2->getAkten($personToKeep, 'Lichtbil');
 					if (isset($akte2->result[0]->insertamum))
 						$insertamum2 = $akte2->result[0]->insertamum;
 					else
 						$insertamum2 = 0;
-					
+
 					// Die zu löschende Person hat ein aktuelleres Foto -> dieses nehmen
 					if ($insertamum1 > $insertamum2)
 					{
@@ -216,18 +216,18 @@ if (isset($personToDelete) && isset($personToKeep) && $personToDelete >= 0 && $p
 							$base64foto = base64_encode(file_get_contents($filename));
 						}
 					}
-					
+
 					// Bild in tbl_person auf 240x320 skalieren
 					//$base64_src = resize($base64foto, 240, 320); Auskommentiert bis das auch im Echtsystem geht
 					$base64_src = $base64foto;
 					$sql_query_upd1 .= "UPDATE public.tbl_person SET foto=" . $db->db_add_param($base64_src) . " WHERE person_id=" . $db->db_add_param($personToKeep, FHC_INTEGER) . ";";
 				}
-	
+
 				// Wenn Ersatzkennzeichen und Sozialversicherungsnummer vorhanden ist, beide erhalten
 				// Setzen erst möglich, wenn $personToDelete_obj gelöscht
-				
+
 				$ersatzkennzeichen = '';
-				if ($personToDelete_obj->ersatzkennzeichen == '' && $personToKeep_obj->ersatzkennzeichen != '') 
+				if ($personToDelete_obj->ersatzkennzeichen == '' && $personToKeep_obj->ersatzkennzeichen != '')
 					$ersatzkennzeichen = $personToKeep_obj->ersatzkennzeichen;
 				if ($personToKeep_obj->ersatzkennzeichen == '' && $personToDelete_obj->ersatzkennzeichen != '')
 					$ersatzkennzeichen = $personToDelete_obj->ersatzkennzeichen;
@@ -237,7 +237,7 @@ if (isset($personToDelete) && isset($personToKeep) && $personToDelete >= 0 && $p
 					$sozialversicherungsnummer = $personToKeep_obj->svnr;
 				if ($personToKeep_obj->svnr == '' && $personToDelete_obj->svnr != '')
 					$sozialversicherungsnummer = $personToDelete_obj->svnr;
-				
+
 				// Letztbenutzten Zugangscode abfragen und übernehmen
 				$zugangscode = '';
 				$log = new personlog();
@@ -246,36 +246,37 @@ if (isset($personToDelete) && isset($personToKeep) && $personToDelete >= 0 && $p
 					$logZugriff1 = strtotime($log->logs[0]->zeitpunkt);
 				else
 					$logZugriff1 = 0;
-				
+
 				$log->getLog($personToKeep, null, null, array('name' => 'Login with code'));
 				if (isset($log->logs[0]))
 					$logZugriff2 = strtotime($log->logs[0]->zeitpunkt);
 				else
 					$logZugriff2 = 0;
-				
+
 				if ($logZugriff1 > $logZugriff2)
 					$zugangscode = $personToDelete_obj->zugangscode;
 				elseif ($logZugriff2 > $logZugriff1)
 					$zugangscode = $personToKeep_obj->zugangscode;
 				else
-					$zugangscode = $personToKeep_obj->zugangscode; 
-				
+					$zugangscode = $personToKeep_obj->zugangscode;
+
 				// Check ob rt_person-zuordnung schon vorhanden ist
 				// Wenn ja, wird der Eintrag der zu löschenden Person ebenfalls gelöscht
 				$reihungstest_person = new reihungstest();
 
-				if (!$reihungstest_person->getReihungstestPerson($personToKeep))
-					$sql_query_upd1 .= "UPDATE public.tbl_rt_person SET person_id=" . $db->db_add_param($personToKeep, FHC_INTEGER) . " WHERE person_id=" . $db->db_add_param($personToDelete, FHC_INTEGER) . ";";
-				else 
+
+				//if (!$reihungstest_person->getReihungstestPerson($personToKeep))
+				$sql_query_upd1 .= "UPDATE public.tbl_rt_person SET person_id=" . $db->db_add_param($personToKeep, FHC_INTEGER) . " WHERE person_id=" . $db->db_add_param($personToDelete, FHC_INTEGER) . ";";
+				/*else
 				{
 					$sql_query_upd1 .= "DELETE FROM public.tbl_rt_person WHERE person_id=" . $db->db_add_param($personToDelete, FHC_INTEGER) . ";";
 					$reihungstest = new reihungstest($reihungstest_person->result[0]->reihungstest_id);
-					$msg_warning[] = "Das verbliebene Person ".$personToKeep." hat schon eine Reihungstestzuordnung 
-										zu Reihungstest ID".$reihungstest->reihungstest_id." am ".$reihungstest->datum." 
+					$msg_warning[] = "Das verbliebene Person ".$personToKeep." hat schon eine Reihungstestzuordnung
+										zu Reihungstest ID".$reihungstest->reihungstest_id." am ".$reihungstest->datum."
 										für das ".$reihungstest->studiensemester_kurzbz." im Studiengang ".$reihungstest->studiengang_kz." (Studienplan ".$reihungstest_person->result[0]->studienplan_id.")<br>
 										Die Reihungstestzuordnung von ".$personToDelete." wurde gelöscht";
-				}
-					
+				}*/
+
 				$sql_query_upd1 .= "UPDATE addon.tbl_kompetenz SET person_id=" . $db->db_add_param($personToKeep, FHC_INTEGER) . " WHERE person_id=" . $db->db_add_param($personToDelete, FHC_INTEGER) . ";";
 				$sql_query_upd1 .= "UPDATE lehre.tbl_abschlusspruefung SET pruefer1=" . $db->db_add_param($personToKeep, FHC_INTEGER) . " WHERE pruefer1=" . $db->db_add_param($personToDelete, FHC_INTEGER) . ";";
 				$sql_query_upd1 .= "UPDATE lehre.tbl_abschlusspruefung SET pruefer2=" . $db->db_add_param($personToKeep, FHC_INTEGER) . " WHERE pruefer2=" . $db->db_add_param($personToDelete, FHC_INTEGER) . ";";
@@ -306,10 +307,10 @@ if (isset($personToDelete) && isset($personToKeep) && $personToDelete >= 0 && $p
 				$sql_query_upd1 .= "UPDATE wawi.tbl_konto SET person_id=" . $db->db_add_param($personToKeep, FHC_INTEGER) . " WHERE person_id=" . $db->db_add_param($personToDelete, FHC_INTEGER) . ";";
 
 				$sql_query_upd1 .= "DELETE FROM public.tbl_person WHERE person_id=" . $db->db_add_param($personToDelete, FHC_INTEGER) . ";";
-				
+
 				// Ersatzkennzeichen und Sozialversicherungsnummer erst setzen, wenn nur mehr eine Person vorhanden ist
 				$sql_query_upd1 .= "UPDATE public.tbl_person SET ersatzkennzeichen=" . $db->db_add_param($ersatzkennzeichen, FHC_STRING) . ", svnr=" . $db->db_add_param($sozialversicherungsnummer, FHC_STRING) . " WHERE person_id=" . $db->db_add_param($personToKeep, FHC_INTEGER) . ";";
-				
+
 				// Zugangscode erst setzen, wenn nur mehr eine Person vorhanden ist
 				$sql_query_upd1 .= "UPDATE public.tbl_person SET zugangscode=" . $db->db_add_param($zugangscode, FHC_STRING) . " WHERE person_id=" . $db->db_add_param($personToKeep, FHC_INTEGER) . ";";
 
@@ -324,7 +325,7 @@ if (isset($personToDelete) && isset($personToKeep) && $personToDelete >= 0 && $p
 						'message' => 'Person with id ' . $personToDelete . ' merged into person with id ' . $personToKeep,
 						'success' => 'true'
 					), 'datenwartung', 'core', null, $uid);
-					
+
 					/*
 					* ----------------------------------------------------------------------
 					* Adressen der verbliebenen Person laden und zusammenräumen
@@ -334,7 +335,7 @@ if (isset($personToDelete) && isset($personToKeep) && $personToDelete >= 0 && $p
 					$adresse->load_pers($personToKeep);
 					$adressArray = array();
 					$adressLoeschArray = array();
-					
+
 					// Alle Adressen in ein Array schreiben
 					foreach ($adresse->result AS $row)
 					{
@@ -362,7 +363,7 @@ if (isset($personToDelete) && isset($personToKeep) && $personToDelete >= 0 && $p
 						return $c;
 					}
 					usort($adressArray, "sortAdressArray");
-	
+
 					$cleanstrasse = '';
 					$plz =  '';
 					$ort = '';
@@ -425,12 +426,12 @@ if (isset($personToDelete) && isset($personToKeep) && $personToDelete >= 0 && $p
 					}
 					if ($anzahlHeimatadressen > 1)
 						$msg_error[] = "Es ist mehr als eine Adresse als Heimatadresse gekennzeichnet";
-					
+
 					/*
 					 * -------------------------------------------------------------------
 					 * Kontakte der verbliebenen Person laden und zusammenräumen
 					 * -------------------------------------------------------------------
-					 */ 
+					 */
 					$kontakt = new kontakt();
 					$kontakt->load_pers($personToKeep);
 					$kontaktArray = array();
@@ -442,7 +443,7 @@ if (isset($personToDelete) && isset($personToKeep) && $personToDelete >= 0 && $p
 							$cleanKontakt = preg_replace("/[^0-9+]/", '', $row->kontakt);
 						else
 							$cleanKontakt = $row->kontakt;
-								
+
 						$kontaktArray[] = array('kontakt_id' => $row->kontakt_id,
 							'cleanKontakt' => $cleanKontakt,
 							'kontakttyp' => $row->kontakttyp,
@@ -451,7 +452,7 @@ if (isset($personToDelete) && isset($personToKeep) && $personToDelete >= 0 && $p
 							'zustellung' => $row->zustellung
 						);
 					}
-					
+
 					// Sortiert die Kontakte
 					function sortKontaktArray($a, $b)
 					{
@@ -463,7 +464,7 @@ if (isset($personToDelete) && isset($personToKeep) && $personToDelete >= 0 && $p
 						return $c;
 					}
 					usort($kontaktArray, "sortKontaktArray");
-					
+
 					$cleanKontakt = '';
 					$anmerkung = '';
 					foreach ($kontaktArray AS $key => $value)
@@ -505,7 +506,7 @@ if (isset($personToDelete) && isset($personToKeep) && $personToDelete >= 0 && $p
 							$msg_warning[] = "Kontakt mit ID" . $value . " gelöscht";
 						}
 					}
-					
+
 					/*
 					 * --------------------------------------------------------
 					 * Doppelte PreStudenten löschen
@@ -514,14 +515,14 @@ if (isset($personToDelete) && isset($personToKeep) && $personToDelete >= 0 && $p
 					$prestudenten = new prestudent();
 					$prestudenten->getPrestudenten($personToKeep);
 					$statusArrayWichtigeWichtige = array(); // Array mit allen PreStudentStatus die NICHT Interessent oder Abgewiesener sind
-					
+
 					foreach ($prestudenten->result AS $key => $value)
 					{
 						$laststatus = new prestudent();
 						$laststatus->getLastStatus($value->prestudent_id);
 						$prestudentStatus = new prestudent();
 						$prestudentStatus->getPrestudentRolle($value->prestudent_id);
-						
+
 						foreach ($prestudentStatus->result AS $row)
 						{
 							if ($row->status_kurzbz != 'Interessent' && $row->status_kurzbz != 'Abgewiesener')
@@ -529,7 +530,7 @@ if (isset($personToDelete) && isset($personToKeep) && $personToDelete >= 0 && $p
 						}
 						if (isset($statusArrayWichtige[$value->prestudent_id]))
 							$statusArrayWichtige[$value->prestudent_id] = array_unique($statusArrayWichtige[$value->prestudent_id]);
-						
+
 						$studiengang = new studiengang($value->studiengang_kz);
 						$prestudenten->result[$key]->studiensemester_kurzbz = $laststatus->studiensemester_kurzbz;
 						$prestudenten->result[$key]->orgform_kurzbz = $laststatus->orgform_kurzbz;
@@ -540,16 +541,16 @@ if (isset($personToDelete) && isset($personToKeep) && $personToDelete >= 0 && $p
 						$prestudenten->result[$key]->studiengang_typ = $studiengang->typ;
 						$prestudenten->result[$key]->anzahlStatus = $prestudentStatus->num_rows;
 					}
-					
+
 					$statusreihenfolge = array('Aufgenommener','Wartender','Bewerber','Interessent','Abgewiesener');
-					
+
 					function sortPrestudents($a, $b)
 					{
 						global $statusreihenfolge;
 						$c = $a->studiengang_kz - $b->studiengang_kz;
 						$c .= strcmp(strtolower($b->studiensemester_kurzbz), strtolower($a->studiensemester_kurzbz));
 						$c .= strcmp(strtolower($b->orgform_kurzbz), strtolower($a->orgform_kurzbz));
-						
+
 						// Sortiert den Status nach der vorgegebenen Liste $statusreihenfolge
 						$x = array_search($a->status_kurzbz, $statusreihenfolge);
 						$y = array_search($b->status_kurzbz, $statusreihenfolge);
@@ -569,7 +570,7 @@ if (isset($personToDelete) && isset($personToKeep) && $personToDelete >= 0 && $p
 						{
 							$c .= $x - $y;
 						}
-						
+
 						$c .= $b->anzahlStatus - $a->anzahlStatus;
 						$c .= $b->bestaetigtam - $a->bestaetigtam;
 						$c .= $b->bewerbung_abgeschicktamum - $a->bewerbung_abgeschicktamum;
@@ -584,9 +585,9 @@ if (isset($personToDelete) && isset($personToKeep) && $personToDelete >= 0 && $p
 						$c .= strcmp(strtolower($b->zgvnation), strtolower($a->zgvnation));
 						return $c;
 					}
-					
+
 					usort($prestudenten->result, "sortPrestudents");
-					
+
 					$prestudentenArray = array();
 					$kontaktLoeschArray = array();
 					foreach ($prestudenten->result AS $row)
@@ -621,7 +622,7 @@ if (isset($personToDelete) && isset($personToKeep) && $personToDelete >= 0 && $p
 					 *
 					 * Wenn ein PreStudent in seiner Historie ausschließlich Interessent und Abgewiesener hat,
 					 * wird einer gelöscht. Bei allen anderen wird eine Warnung ausgegeben
-					 * 
+					 *
 					 */
 					$studiengang_kz = '';
 					$anmerkung = '';
@@ -746,7 +747,7 @@ if (isset($personToDelete) && isset($personToKeep) && $personToDelete >= 0 && $p
 						$zgvmanation = $value['zgvmanation'];
 						$previousKey = $key;
 					}
-					
+
 					// Messages in $msg_warning schreiben
 					$messageOutput = '';
 					if (isset($warningList['zgvUnklar']))
@@ -755,7 +756,7 @@ if (isset($personToDelete) && isset($personToKeep) && $personToDelete >= 0 && $p
 						{
 							$messageOutput .= '<div>Bei Prestudent ID '.$verbleibenderPrestudent.' sind widersprüchliche ZGV-Angaben vorhanden.
 							<br>Folgende ZGV-Daten sind bei anderen PreStudenten gespeichert:<br>';
-							
+
 							foreach ($gefundeneZgv as $key => $zgvArray)
 							{
 								foreach ($zgvArray as $zgv => $wert)
@@ -767,16 +768,16 @@ if (isset($personToDelete) && isset($personToKeep) && $personToDelete >= 0 && $p
 							$messageOutput .= '</div>';
 						}
 					}
-					
+
 					$msg_warning[] = $messageOutput;
 					$messageOutput = '';
-					
+
 					if (isset($warningList['statusUnklar']))
 					{
 						foreach ($warningList['statusUnklar'] as $key => $value)
 						{
 							$messageOutput .= '<div>Bei folgenden PreStudenten ist der Status widersprüchlich oder unklar:<br>';
-							
+
 							foreach ($value as $key => $presstudentid)
 							{
 								$messageOutput .= '&nbsp;&nbsp;&nbsp;&nbsp;'.$presstudentid.'<br>';
@@ -784,9 +785,9 @@ if (isset($personToDelete) && isset($personToKeep) && $personToDelete >= 0 && $p
 							$messageOutput .= '</div>';
 						}
 					}
-					
+
 					$msg_warning[] = $messageOutput;
-					
+
 					// Prestudenten in $prestudentLoeschArray löschen
 					foreach ($prestudentLoeschArray AS $key => $value)
 					{
@@ -803,12 +804,12 @@ if (isset($personToDelete) && isset($personToKeep) && $personToDelete >= 0 && $p
 						//Rollen laden und einzeln löschen
 						$prestudentenRollen = new prestudent();
 						$prestudentenRollen->getPrestudentRolle($value);
-						
+
 						foreach ($prestudentenRollen->result as $row)
 						{
 							$prestudentenRollen->delete_rolle($row->prestudent_id, $row->status_kurzbz, $row->studiensemester_kurzbz, $row->ausbildungssemester);
 						}
-						
+
 						if (!$prestudentenRollen->deletePrestudent($value))
 							$msg_error[] = 'Fehler beim Löschen des Prestudenten '.$value;
 						else
@@ -841,10 +842,10 @@ function resize($base64, $width, $height) // 828 x 1104 -> 240 x 320
 {
 	ob_start();
 	$image = imagecreatefromstring(base64_decode($base64));
-	
+
 	// Hoehe und Breite neu berechnen
 	list ($width_orig, $height_orig) = getimagesizefromstring(base64_decode($base64));
-	
+
 	if ($width && ($width_orig < $height_orig))
 	{
 		$width = intval(($height / $height_orig) * $width_orig);
@@ -853,21 +854,21 @@ function resize($base64, $width, $height) // 828 x 1104 -> 240 x 320
 	{
 		$height = intval(($width / $width_orig) * $height_orig);
 	}
-	
+
 	$image_p = imagecreatetruecolor($width, $height);
 	// $image = imagecreatefromjpeg($filename);
-	
+
 	// Bild nur verkleinern aber nicht vergroessern
 	if ($width_orig > $width || $height_orig > $height)
 		imagecopyresampled($image_p, $image, 0, 0, 0, 0, $width, $height, $width_orig, $height_orig);
 	else
 		$image_p = $image;
-	
+
 	imagejpeg($image_p);
 	$retval = ob_get_contents();
 	ob_end_clean();
 	$retval = base64_encode($retval);
-	
+
 	@imagedestroy($image_p);
 	@imagedestroy($image);
 	return $retval;
@@ -992,7 +993,7 @@ if ($filter != '' || ($person_id_1 != '' && $person_id_2 != ''))
 {
 	$studiengang = new studiengang();
 	$studiengang->getAll('typ, kurzbz', false);
-	
+
 	/*
 	 * echo '<br>
 	 * <center>
@@ -1022,15 +1023,15 @@ if ($filter != '' || ($person_id_1 != '' && $person_id_2 != ''))
 		}
 	}
 	echo '<br><br><div contenteditable="true" style="width: 100%; height : 150px; border : 1px dotted grey; overflow-y:auto; text-align: left; font-size: 9pt">' . $messageOutput . '</div><br>';
-	
+
 	// Tabellen anzeigen
 	echo '<form name="form_table" action="personen_wartung.php?filter=' . $db->convert_html_chars($filter) . '" method="POST">';
 	echo '<div style="text-align: center"><input type="submit" value="Zusammenlegen" class="button" onclick="return checkPersonen()"></div>';
 	echo "<table width='100%' border='0' cellspacing='0' cellpadding='0'>";
 	echo "<tr>";
-	
+
 	echo '<td valign="top" style="text-align: center;"><span style="font-size: 1.5em; font-style: bold; color: red;">Person wird gelöscht:</span>';
-	
+
 	// Tabelle 1
 	echo '<table id="t1" class="tablesorter" style="padding-right: 5px"><thead><tr>';
 	echo "<th>ID</th>";
@@ -1042,7 +1043,7 @@ if ($filter != '' || ($person_id_1 != '' && $person_id_2 != ''))
 	echo "<th>Ersatzkennz.</th>";
 	echo "<th>Rollen</th>";
 	echo "<th>&nbsp;</th></tr></thead><tbody>";
-	
+
 	// Wenn Person IDs uebergeben werden, werden diese geladen
 	if ($person_id_1 != '' && $person_id_2 != '')
 	{
@@ -1055,7 +1056,7 @@ if ($filter != '' || ($person_id_1 != '' && $person_id_2 != ''))
 		$person = new person();
 		$person->getTab($filter);
 	}
-	
+
 	$i = 0;
 	foreach ($person->personen as $l)
 	{
@@ -1076,13 +1077,13 @@ if ($filter != '' || ($person_id_1 != '' && $person_id_2 != ''))
 					$style = 'color: grey;';
 				elseif ($laststatus->status_kurzbz == 'Student')
 					$style = 'color: green;';
-				
+
 				if (isset($laststatus->status_mehrsprachig[DEFAULT_LANGUAGE]))
 					$status = $laststatus->status_mehrsprachig[DEFAULT_LANGUAGE];
-				else 
+				else
 					$status = $laststatus->status_kurzbz;
-					
-				$rollen .= '<li><span style="'.$style.'">'.$status.'</span> ('.$studiengang->kuerzel_arr[$row->studiengang_kz].' '.$laststatus->ausbildungssemester.'. Semester '.$laststatus->studiensemester_kurzbz.')</li>'; 
+
+				$rollen .= '<li><span style="'.$style.'">'.$status.'</span> ('.$studiengang->kuerzel_arr[$row->studiengang_kz].' '.$laststatus->ausbildungssemester.'. Semester '.$laststatus->studiensemester_kurzbz.')</li>';
 			}
 		}
 		// Benutzer laden
@@ -1098,7 +1099,7 @@ if ($filter != '' || ($person_id_1 != '' && $person_id_2 != ''))
 			}
 		}
 		$rollen .= '</ul>';
-		
+
 		echo "<tr>";
 		echo "<td>$l->person_id</td>";
 		echo '<td>'.($l->foto != '' ? '<img id="imgLeft_'.$l->person_id.'" src="../../content/bild.php?src=person&person_id='.$l->person_id.'" style="height: 50px; max-width: 38px" onclick="changeImageSize(\'imgLeft_'.$l->person_id.'\')">':'').'</td>';
@@ -1116,7 +1117,7 @@ if ($filter != '' || ($person_id_1 != '' && $person_id_2 != ''))
 	echo "</td>";
 	// echo '<td valign="top"></td>';
 	echo '<td valign="top" style="text-align: center;"><span style="font-size: 1.5em; font-style: bold; color: green;">Person bleibt:</span>';
-	
+
 	// Tabelle 2
 	echo '<table id="t2" class="tablesorter" style="padding-left: 5px"><thead><tr>';
 	echo "<th>&nbsp;</th>";
@@ -1129,7 +1130,7 @@ if ($filter != '' || ($person_id_1 != '' && $person_id_2 != ''))
 	echo "<th>Ersatzkennz.</th>";
 	echo "<th>Rollen</th>";
 	echo "</tr></thead><tbody>";
-	
+
 	// Wenn Person IDs uebergeben werden, werden diese geladen
 	if ($person_id_1 != '' && $person_id_2 != '')
 	{
@@ -1142,7 +1143,7 @@ if ($filter != '' || ($person_id_1 != '' && $person_id_2 != ''))
 		$person = new person();
 		$person->getTab($filter);
 	}
-	
+
 	$i = 0;
 	foreach ($person->personen as $l)
 	{
@@ -1163,12 +1164,12 @@ if ($filter != '' || ($person_id_1 != '' && $person_id_2 != ''))
 					$style = 'color: grey;';
 				elseif ($laststatus->status_kurzbz == 'Student')
 					$style = 'color: green;';
-				
+
 				if (isset($laststatus->status_mehrsprachig[DEFAULT_LANGUAGE]))
 					$status = $laststatus->status_mehrsprachig[DEFAULT_LANGUAGE];
 				else
 					$status = $laststatus->status_kurzbz;
-				
+
 				$rollen .= '<li><span style="'.$style.'">'.$status.'</span> ('.$studiengang->kuerzel_arr[$row->studiengang_kz].' '.$laststatus->ausbildungssemester.'. Semester '.$laststatus->studiensemester_kurzbz.')</li>';
 			}
 		}
@@ -1185,7 +1186,7 @@ if ($filter != '' || ($person_id_1 != '' && $person_id_2 != ''))
 			}
 		}
 		$rollen .= '</ul>';
-		
+
 		echo "<tr>";
 		echo "<td><input type='radio' name='radio_2' id='radio_2_$l->person_id' value='$l->person_id' " . ((isset($personToKeep) && $personToKeep == $l->person_id) ? 'checked' : '') . " onclick='enable(\"radio_2\"); disable(\"radio_1_$l->person_id\")'></td>";
 		echo "<td>$l->person_id</td>";

@@ -60,14 +60,27 @@ if (isset($_POST['stunde_ende']))
 else
 	$stunde_ende=16;
 
+if (isset($_POST['stundenplantable']))
+{
+	if($_POST['stundenplantable'] == 'stundenplan')
+		$stundenplantable='tbl_stundenplan';
+	elseif($_POST['stundenplantable'] == 'stundenplandev')
+		$stundenplantable='tbl_stundenplandev';
+	else
+		die('Invalid table');
+}
+else
+	$stundenplantable='tbl_stundenplan';
+
 $ts_beginn=mktime(0,0,0,substr($datum_beginn,5,2),substr($datum_beginn,8,2),substr($datum_beginn,0,4));
 $ts_ende=mktime(0,0,0,substr($datum_ende,5,2),substr($datum_ende,8,2),substr($datum_ende,0,4));
 
 $wochen=round(($ts_ende-$ts_beginn)/(60*60*24*7));
-
+if ($wochen == 0)
+	$wochen = 1;
 //Stundenplandaten holen
 $sql_query="SELECT DISTINCT datum,stunde,ort_kurzbz, EXTRACT(DOW FROM datum) AS tag, max_person
-			FROM lehre.tbl_stundenplan JOIN public.tbl_ort USING (ort_kurzbz)
+			FROM lehre.".$stundenplantable." JOIN public.tbl_ort USING (ort_kurzbz)
 			WHERE
 				datum>=".$db->db_add_param($datum_beginn)."
 				AND datum<=".$db->db_add_param($datum_ende)."
@@ -108,6 +121,10 @@ while ($row=$db->db_fetch_object($result))
 	&nbsp;&nbsp;&nbsp;&nbsp;
 	Unterrichtseinheit von:<input name="stunde_beginn" value="<?php echo $stunde_beginn; ?>" size="2" />
 	bis:<input name="stunde_ende" value="<?php echo $stunde_ende; ?>" size="2" />
+	Tabelle:<select name="stundenplantable">
+		<option value="stundenplan" <?php echo ($stundenplantable=='tbl_stundenplan'?'selected':'');?>>Stundenplan</option>
+		<option value="stundenplandev" <?php echo ($stundenplantable=='tbl_stundenplandev'?'selected':'');?>>StundenplanDEV</option>
+	</select>
 	<input type="submit">
 </form>
 <h2> Raumauslastung vom <?PHP echo $datum_beginn.' - '.$datum_ende.' ('.$wochen; ?> Wochen)</h2>
@@ -135,7 +152,22 @@ while ($row=$db->db_fetch_object($result))
 	?>
 	</TR>
 	<?php
-	$anz_colors=count($cfgStdBgcolor)-1;
+
+	$cfgColorGreenToRed[0]='#bbffd4';
+	$cfgColorGreenToRed[1]='#bfff00';
+	$cfgColorGreenToRed[2]='#dfff00';
+	$cfgColorGreenToRed[3]='#ffff00';
+	$cfgColorGreenToRed[4]='#ffdf00';
+	$cfgColorGreenToRed[5]='#ffbf00';
+	$cfgColorGreenToRed[6]='#ff9f00';
+	$cfgColorGreenToRed[7]='#ff7f00';
+	$cfgColorGreenToRed[8]='#ff5f00';
+	$cfgColorGreenToRed[9]='#ff3f00';
+	$cfgColorGreenToRed[10]='#ff1f00';
+
+	$cfgColorRedToGreen = array_reverse($cfgColorGreenToRed);
+	$anz_colors=count($cfgColorRedToGreen)-1;
+
 	foreach ($raum AS $ort)
 	{
 		echo '<TR><TD>'.$ort->ort.' ('.$ort->personen.')</TD>';
@@ -147,7 +179,8 @@ while ($row=$db->db_fetch_object($result))
 					$ort->last[$t][$s] = new stdClass();
 					$ort->last[$t][$s]->anzahl=0;
 				}
-				$bgcolor=$cfgStdBgcolor[$anz_colors-round(($ort->last[$t][$s]->anzahl)/($wochen/$anz_colors))];
+
+				$bgcolor=$cfgColorRedToGreen[$anz_colors-round(($ort->last[$t][$s]->anzahl)/($wochen/$anz_colors))];
 				echo '<TD bgcolor="'.$bgcolor.'">';
 				echo $ort->last[$t][$s]->anzahl;
 				echo '</TD>';
