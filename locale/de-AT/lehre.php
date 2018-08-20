@@ -18,7 +18,7 @@ $this->phrasen['lehre/anwesenheitsUndNotenlisten']='Anwesenheits- und Notenliste
 $this->phrasen['lehre/leistungsuebersicht']='Leistungsübersicht';
 $this->phrasen['lehre/newsgroups']='Newsgroups';
 $this->phrasen['lehre/feedback']='Feedback';
-$this->phrasen['lehre/termineImLvPlan']='Termine im LV-Plan';
+$this->phrasen['lehre/termineImLvPlan']='Alle Termine dieser LV';
 
 $this->phrasen['lehre/benotungstoolHandbuch']='Handbuch';
 $this->phrasen['lehre/kreuzerltool']='Übungstool<br>("Kreuzerl"-Tool)';
