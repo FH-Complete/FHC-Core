@@ -80,4 +80,23 @@ class Studiensemester_model extends DB_Model
 
 		return $this->execQuery($query);
 	}
+
+	/**
+	 * Gets valid Ausbildungssemester of a Studiensemester with a Studiengang
+	 * @param $studiensemester_kurzbz
+	 * @param $studiengang_kz
+	 * @return array|null
+	 */
+	public function getAusbildungssemesterByStudiensemesterAndStudiengang($studiensemester_kurzbz, $studiengang_kz)
+	{
+		$query = "SELECT DISTINCT semester 
+							FROM lehre.tbl_studienplan
+							JOIN lehre.tbl_studienordnung USING(studienordnung_id)
+							JOIN lehre.tbl_studienplan_semester USING(studienplan_id)
+							WHERE tbl_studienplan_semester.studiensemester_kurzbz = ?
+							AND tbl_studienordnung.studiengang_kz = ?
+							ORDER BY semester";
+
+		return $this->execQuery($query, array($studiensemester_kurzbz, $studiengang_kz));
+	}
 }
