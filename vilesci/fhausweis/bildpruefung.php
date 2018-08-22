@@ -342,12 +342,13 @@ $qry_anzahl_mitarbeiter = "
 	FROM
 		public.tbl_person
 		JOIN public.tbl_benutzer USING(person_id)
-		JOIN public.tbl_akte USING (person_id)
+		LEFT JOIN PUBLIC.tbl_akte ON (tbl_akte.person_id = tbl_person.person_id 
+										AND tbl_akte.dokument_kurzbz = 'Lichtbil'
+										AND (tbl_akte.inhalt IS NOT NULL OR tbl_akte.dms_id IS NOT NULL))
 		LEFT JOIN public.tbl_mitarbeiter ON (tbl_benutzer.uid=mitarbeiter_uid)
 	WHERE
 		foto is not NULL
 		AND tbl_benutzer.aktiv
-		AND tbl_akte.dokument_kurzbz='Lichtbil'
 		AND 'akzeptiert' NOT IN(SELECT fotostatus_kurzbz FROM public.tbl_person_fotostatus
 					WHERE person_id=tbl_person.person_id ORDER BY datum desc, person_fotostatus_id desc LIMIT 1)
 		AND 'abgewiesen' NOT IN (SELECT fotostatus_kurzbz FROM public.tbl_person_fotostatus
@@ -367,12 +368,13 @@ $qry_anzahl_studenten = "
 	FROM
 		public.tbl_person
 		JOIN public.tbl_benutzer USING(person_id)
-		JOIN public.tbl_akte USING (person_id)
+		LEFT JOIN PUBLIC.tbl_akte ON (tbl_akte.person_id = tbl_person.person_id 
+										AND tbl_akte.dokument_kurzbz = 'Lichtbil' 
+										AND (tbl_akte.inhalt IS NOT NULL OR tbl_akte.dms_id IS NOT NULL))
 		LEFT JOIN public.tbl_mitarbeiter ON (tbl_benutzer.uid=mitarbeiter_uid)
 	WHERE
 		foto is not NULL
 		AND tbl_benutzer.aktiv
-		AND tbl_akte.dokument_kurzbz='Lichtbil'
 		AND 'akzeptiert' NOT IN(SELECT fotostatus_kurzbz FROM public.tbl_person_fotostatus
 					WHERE person_id=tbl_person.person_id ORDER BY datum desc, person_fotostatus_id desc LIMIT 1)
 		AND 'abgewiesen' NOT IN (SELECT fotostatus_kurzbz FROM public.tbl_person_fotostatus
@@ -392,11 +394,12 @@ $qry_anzahl_gesamt = "
 	FROM
 		public.tbl_person
 		JOIN public.tbl_benutzer USING(person_id)
-		JOIN public.tbl_akte USING (person_id)
+		LEFT JOIN PUBLIC.tbl_akte ON (tbl_akte.person_id = tbl_person.person_id 
+										AND tbl_akte.dokument_kurzbz = 'Lichtbil'
+										AND (tbl_akte.inhalt IS NOT NULL OR tbl_akte.dms_id IS NOT NULL))
 	WHERE
 		foto is not NULL
 		AND tbl_benutzer.aktiv
-		AND tbl_akte.dokument_kurzbz='Lichtbil'
 		AND 'akzeptiert' NOT IN(SELECT fotostatus_kurzbz FROM public.tbl_person_fotostatus
 					WHERE person_id=tbl_person.person_id ORDER BY datum desc, person_fotostatus_id desc LIMIT 1)
 		AND 'abgewiesen' NOT IN (SELECT fotostatus_kurzbz FROM public.tbl_person_fotostatus
@@ -418,24 +421,29 @@ echo '<form action="'.$_SERVER['PHP_SELF'].'" method="POST" style="float:left">
 // Laden einer Person deren Profilfoto noch nicht akzeptiert wurde
 $qry = "
 	SELECT 
-		*,
+		tbl_person.person_id,
+		tbl_person.vorname,
+		tbl_person.nachname,
+		tbl_akte.dokument_kurzbz,
+		tbl_akte.dms_id,
 		(SELECT 1 FROM public.tbl_mitarbeiter JOIN public.tbl_benutzer ON(mitarbeiter_uid=uid) 
 		 WHERE person_id=tbl_person.person_id LIMIT 1) as mitarbeiter
 	FROM 
 		public.tbl_person 
 		JOIN public.tbl_benutzer USING(person_id)
-		JOIN public.tbl_akte USING (person_id)
+		LEFT JOIN PUBLIC.tbl_akte ON (tbl_akte.person_id = tbl_person.person_id 
+										AND tbl_akte.dokument_kurzbz = 'Lichtbil'
+										AND (tbl_akte.inhalt IS NOT NULL OR tbl_akte.dms_id IS NOT NULL))
 	WHERE 
 		foto is not NULL
 		AND tbl_benutzer.aktiv
-		AND tbl_akte.dokument_kurzbz='Lichtbil'
 		".$ansicht;
 		
 
 if($error==true && $person_id!='')
 {
 	// Wenn ein Fehler auftritt oder Bestof geklickt wird, wird die Person erneut angezeigt
-	$qry.=" AND person_id=".$db->db_add_param($person_id);
+	$qry.=" AND tbl_person.person_id=".$db->db_add_param($person_id);
 }
 else
 {
@@ -470,7 +478,22 @@ if($result = $db->db_query($qry))
 		<table style="position: relative;">	
 			<tr>
 				<td class="hoverbox">
-				<a href="#"><p class="previewtext">Originalvorschau</p><img id="image" class="image" src="../../content/bild.php?src=akte&person_id='.$row->person_id.'"><img id="imagepreview" src="../../content/bild.php?src=akte&person_id='.$row->person_id.'" class="preview"></a>
+					<a href="#">';
+				// Wenn es keine Akte mit Lichtbild gibt, das Foto der Person laden, sonst aus der Akte
+				if ($row->dokument_kurzbz == 'Lichtbil')
+				{
+					echo '	<p class="previewtext">Originalvorschau</p>
+							<img id="image" class="image" src="../../content/bild.php?src=akte&person_id='.$row->person_id.'">
+							<img id="imagepreview" src="../../content/bild.php?src=akte&person_id='.$row->person_id.'" class="preview">';
+				}
+				else 
+				{
+					echo '	<p class="previewtext">Originalvorschau</p>
+							<img id="image" class="image" src="../../content/bild.php?src=person&person_id='.$row->person_id.'">
+							<img id="imagepreview" src="../../content/bild.php?src=person&person_id='.$row->person_id.'" class="preview">';
+				}
+				echo '	
+					</a>
 				<br>
 				<div id="imagesize"></div>
 				</td>
@@ -493,7 +516,12 @@ if($result = $db->db_query($qry))
 		echo '<input type="submit" name="refresh" value="Refresh" /> ';
 		echo '</form>';
 		echo '<br><br><br>';
-		echo '<a href="#FotoUpload" onclick="window.open(\'../../content/bildupload.php?person_id='.$row->person_id.'\',\'BildUpload\', \'height=50,width=600,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes\'); return false;">Bild Upload</a>';
+		// Wenn es eine Akte mit Lichtbild gibt, das Foto aus der Akte laden (Parameter Akte im Link) sonst aus der Person
+		if ($row->dokument_kurzbz == 'Lichtbil')
+			echo '<a href="#FotoUpload" onclick="window.open(\'bildzuschnitt.php?person_id='.$row->person_id.'&typ=akte\',\'BildUpload\', \'height=900,width=700,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes\'); return false;">Bild zuschneiden/Upload</a>';
+		else 
+			echo '<a href="#FotoUpload" onclick="window.open(\'bildzuschnitt.php?person_id='.$row->person_id.'&typ=person\',\'BildUpload\', \'height=900,width=700,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes\'); return false;">Bild zuschneiden/Upload</a>';
+		
 		if ($row->dms_id !='')
 		{
 			echo '<br><br>';
