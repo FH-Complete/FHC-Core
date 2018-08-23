@@ -33,6 +33,26 @@ class Studiensemester_model extends DB_Model
 	}
 
 	/**
+	 * getNextOrAktSemester
+	 * 62 days - in july and august, semester after summer is returned
+	 */
+	public function getNextOrAktSemester($days = 62)
+	{
+		if (!is_numeric($days))
+		{
+			$days = 62;
+		}
+
+		$query = 'SELECT studiensemester_kurzbz
+					FROM public.tbl_studiensemester
+					WHERE start < (NOW() + \'' . $days . ' DAYS\':: INTERVAL)
+					ORDER BY start DESC
+					LIMIT 1';
+
+		return $this->execQuery($query);
+	}
+
+	/**
 	 * getNextFrom
 	 */
 	public function getNextFrom($studiensemester_kurzbz)
