@@ -23,7 +23,7 @@ class Lehrveranstaltung_model extends DB_Model
 	public function getLehrveranstaltungGroupNames($studiensemester_kurzbz, $ausbildungssemester = null, $studiengang_kz = null, $lehrveranstaltung_ids = null)
 	{
 		$this->load->model('system/studiensemester_model', 'StudiensemesterModel');
-		$this->load->model('organisation/studienplan_model', 'StudiengangModel');
+		$this->load->model('organisation/studiengang_model', 'StudiengangModel');
 
 		$studiengang_kz_arr = array();
 		$ausbildungssemester_arr = array();
