@@ -110,8 +110,8 @@ function draw_content_xml($row)
 			$studiengangbezeichnung_englisch = $studienordnung->__get('studiengangbezeichnung_englisch');
 		}
 	}
-	$studiengang_bezeichnung = empty($studiengangbezeichnung) ? $row->bezeichnung : $studiengangbezeichnung;
-	$studiengang_bezeichnung_englisch = empty($studiengangbezeichnung_englisch) ? $row->english : $studiengangbezeichnung_englisch;
+	$studiengang_bezeichnung = empty($studiengangbezeichnung) ? $studiengang->bezeichnung : $studiengangbezeichnung;
+	$studiengang_bezeichnung_englisch = empty($studiengangbezeichnung_englisch) ? $studiengang->english : $studiengangbezeichnung_englisch;
 
 	if($mitarbeiter->load($row->vorsitz))
 	{
