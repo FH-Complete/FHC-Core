@@ -25,9 +25,6 @@ class Lehrveranstaltung_model extends DB_Model
 		$this->load->model('system/studiensemester_model', 'StudiensemesterModel');
 		$this->load->model('organisation/studienplan_model', 'StudiengangModel');
 
-		$lvs = new StdClass();
-		$lvs->error = 0;
-		$lvs->retval = array();
 		$studiengang_kz_arr = array();
 		$ausbildungssemester_arr = array();
 		$lehrveranstaltung_id_arr = array();
@@ -115,14 +112,7 @@ class Lehrveranstaltung_model extends DB_Model
 
 		$query .= ") lvgroups ORDER BY lvgroupname";
 
-		$result = $this->execQuery($query, $parametersarray);
-
-		if (hasData($result))
-		{
-			$lvs->retval = array_merge($lvs->retval, $result->retval);
-		}
-
-		return $lvs;
+		return $this->execQuery($query, $parametersarray);
 	}
 
 	/**
