@@ -197,4 +197,7 @@ define('DVB_PORTAL', 'https://stubei-p.portal.at');
 define('DVB_USERNAME','username');
 // Passwort
 define('DVB_PASSWORD','passwort');
+
+define('CI_ENVIRONMENT', 'development'); // Code igniter environment variable
+
 ?>
