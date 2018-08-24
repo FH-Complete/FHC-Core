@@ -763,7 +763,7 @@ or not exists
 		";
 
 		$res = $this->db_query($qrytable);
-		if ($this->db_fetch_row($res)[0])
+		if ($this->db_fetch_row($res)[0]===true)
 		{
 			//check if sent timesheets for the UID exist
 			$where = "uid=".$this->db_add_param($user);
