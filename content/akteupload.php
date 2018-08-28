@@ -60,12 +60,8 @@ if(isset($_POST['submitbild']))
 
 		if(move_uploaded_file($_FILES['file']['tmp_name'], $uploadfile))
 		{
-			if(!chgrp($uploadfile,'dms'))
-				echo 'CHGRP failed';
-			if(!chmod($uploadfile, 0774))
-				echo 'CHMOD failed';
-
 			$dms = new dms();
+			$dms->setPermission($uploadfile);
 
 			$dms->version='0';
 			$dms->kategorie_kurzbz=$kategorie_kurzbz;
