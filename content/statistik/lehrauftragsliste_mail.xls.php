@@ -81,7 +81,7 @@ if(count($stg->result)>0)
 	}
 }
 //Studiengaenge ermitteln bei denen sich die lektorzuordnung innerhalb der letzten 31 Tage geaendert haben
-$qry_stg = "SELECT distinct studiengang_kz
+$qry_stg = "SELECT distinct studiengang_kz, typ, kurzbz
 			FROM (
 				SELECT
 					studiengang_kz
@@ -105,9 +105,12 @@ $qry_stg = "SELECT distinct studiengang_kz
 					tbl_projektarbeit.lehreinheit_id = tbl_lehreinheit.lehreinheit_id AND
 					tbl_lehreinheit.lehrveranstaltung_id = tbl_lehrveranstaltung.lehrveranstaltung_id
 				) as foo
+				JOIN public.tbl_studiengang USING (studiengang_kz)
 				";
 if(count($stg_arr)>0)
 	$qry_stg.=" WHERE studiengang_kz in (".$db->db_implode4SQL($stg_arr).")";
+
+	$qry_stg.=" ORDER BY typ, kurzbz";
 
 $liste_gesamt = array();
 
@@ -152,6 +155,8 @@ if($result_stg = $db->db_query($qry_stg))
 
 		$i=0;
 		$gesamtsheet_row++;
+		$gesamt->write(0,0,'', $format_colored);
+		$gesamt->write(0,1,'Kennzeichnet Änderungen am Lehrauftrag innerhalb der letzten 31 Tage', $format_normal);
 		$worksheet->write(0,0,'Erstellt am '.date('d.m.Y').' '.$semester_aktuell.' '.$studiengang->kuerzel, $format_bold);
 		$gesamt->write($gesamtsheet_row,0,'Erstellt am '.date('d.m.Y').' '.$semester_aktuell.' '.$studiengang->kuerzel, $format_bold);
 		$gesamtsheet_row+=2;
@@ -166,6 +171,8 @@ if($result_stg = $db->db_query($qry_stg))
 		$gesamt->write($gesamtsheet_row,$i,"Vorname", $format_bold);
 		$worksheet->write(2,++$i,"Familienname", $format_bold);
 		$gesamt->write($gesamtsheet_row,$i,"Familienname", $format_bold);
+		$worksheet->write(2,++$i,"Fixangestellt", $format_bold);
+		$gesamt->write($gesamtsheet_row,$i,"Fixangestellt", $format_bold);
 		$worksheet->write(2,++$i,"LV-Stunden", $format_bold);
 		$gesamt->write($gesamtsheet_row,$i,"LV-Stunden", $format_bold);
 		$worksheet->write(2,++$i,"LV-Kosten", $format_bold);
@@ -185,6 +192,7 @@ if($result_stg = $db->db_query($qry_stg))
 					tbl_mitarbeiter.personalnummer, tbl_person.person_id, tbl_mitarbeiter.mitarbeiter_uid,
 					tbl_lehreinheitmitarbeiter.faktor as faktor, tbl_lehreinheitmitarbeiter.stundensatz as stundensatz,
 					tbl_lehreinheitmitarbeiter.semesterstunden as semesterstunden,
+					CASE WHEN tbl_mitarbeiter.fixangestellt = true THEN 'Ja' ELSE 'Nein' END as fixangestellt,
 					CASE WHEN COALESCE(tbl_lehreinheitmitarbeiter.updateamum, tbl_lehreinheitmitarbeiter.insertamum)>now()-interval '31 days' THEN 't' ELSE 'f' END as geaendert
 				FROM
 					lehre.tbl_lehreinheit, lehre.tbl_lehreinheitmitarbeiter, public.tbl_mitarbeiter,
@@ -228,6 +236,7 @@ if($result_stg = $db->db_query($qry_stg))
 				$liste[$row->mitarbeiter_uid]['titelpre'] = $row->titelpre;
 				$liste[$row->mitarbeiter_uid]['vorname'] = $row->vorname;
 				$liste[$row->mitarbeiter_uid]['nachname'] = $row->nachname;
+				$liste[$row->mitarbeiter_uid]['fixangestellt'] = $row->fixangestellt;
 				$liste[$row->mitarbeiter_uid]['betreuergesamtstunden'] = 0;
 				$liste[$row->mitarbeiter_uid]['betreuergesamtkosten'] = 0;
 				if($row->geaendert=='t')
@@ -236,7 +245,7 @@ if($result_stg = $db->db_query($qry_stg))
 
 			//Alle holen die eine Betreuung aber keinen Lehrauftrag haben
 			$qry = "SELECT 
-						distinct personalnummer, titelpre, vorname, nachname, uid
+						distinct personalnummer, titelpre, vorname, nachname, uid, CASE WHEN fixangestellt = true THEN 'Ja' ELSE 'Nein' END as fixangestellt
 					FROM 
 						lehre.tbl_projektbetreuer, public.tbl_person, public.tbl_benutzer, 
 						public.tbl_mitarbeiter, lehre.tbl_projektarbeit, lehre.tbl_lehreinheit, 
@@ -276,6 +285,7 @@ if($result_stg = $db->db_query($qry_stg))
 						$liste[$row->uid]['titelpre'] = $row->titelpre;
 						$liste[$row->uid]['vorname'] = $row->vorname;
 						$liste[$row->uid]['nachname'] = $row->nachname;
+						$liste[$row->uid]['fixangestellt'] = $row->fixangestellt;
 						$liste[$row->uid]['geaendert']=false;
 						$liste[$row->uid]['gesamtstunden'] = 0;
 						$liste[$row->uid]['gesamtkosten'] = 0;
@@ -290,7 +300,10 @@ if($result_stg = $db->db_query($qry_stg))
 			//Betreuungen fuer Projektarbeiten
 			foreach ($liste as $uid=>$arr)
 			{
-				$qry = "SELECT tbl_projektbetreuer.faktor, tbl_projektbetreuer.stunden, tbl_projektbetreuer.stundensatz, CASE WHEN COALESCE(tbl_projektbetreuer.updateamum, tbl_projektbetreuer.insertamum)>now()-interval '31 days' THEN 't' ELSE 'f' END as geaendert
+				$qry = "SELECT tbl_projektbetreuer.faktor, 
+								tbl_projektbetreuer.stunden, 
+								tbl_projektbetreuer.stundensatz, 
+								CASE WHEN COALESCE(tbl_projektbetreuer.updateamum, tbl_projektbetreuer.insertamum)>now()-interval '31 days' THEN 't' ELSE 'f' END as geaendert
 			        FROM lehre.tbl_projektbetreuer, lehre.tbl_lehreinheit, lehre.tbl_lehrveranstaltung,
 			               public.tbl_benutzer, lehre.tbl_projektarbeit, campus.vw_student
 			        WHERE tbl_projektbetreuer.person_id=tbl_benutzer.person_id AND tbl_benutzer.uid=".$db->db_add_param($uid)." AND
@@ -354,6 +367,9 @@ if($result_stg = $db->db_query($qry_stg))
 				//Nachname
 				$worksheet->write($zeile,++$i,$row['nachname'], $format);
 				$gesamt->write($gesamtsheet_row,$i,$row['nachname'], $format);
+				//Fixangestellt
+				$worksheet->write($zeile,++$i,$row['fixangestellt'], $format);
+				$gesamt->write($gesamtsheet_row,$i,$row['fixangestellt'], $format);
 				//LVStunden
 				$lvstunden = str_replace(',', '.', $row['lvstunden']);
 				$worksheet->write($zeile,++$i,$lvstunden, $format);
@@ -401,8 +417,8 @@ if($result_stg = $db->db_query($qry_stg))
 			}
 
 			//Gesamtkosten anzeigen
-			$worksheet->writeNumber($zeile,10,$gesamtkosten, $format_number_bold);
-			$gesamt->writeNumber($gesamtsheet_row,10,$gesamtkosten, $format_number_bold);
+			$worksheet->writeNumber($zeile,11,$gesamtkosten, $format_number_bold);
+			$gesamt->writeNumber($gesamtsheet_row,11,$gesamtkosten, $format_number_bold);
 		}
 	}
 	
