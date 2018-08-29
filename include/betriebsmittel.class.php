@@ -1233,15 +1233,20 @@ class betriebsmittel extends basis_db
 
         if($result = $this->db_query($qry))
         {
-			$ausgegeben_am = '';
-			while($row = $this->db_fetch_object($result))
-			{
-				if(empty($ausgegeben_am) || (!empty($ausgegeben_am) && $ausgegeben_am < $row->ausgegebenam))
-					$ausgegeben_am = $row->ausgegebenam;
-			}
-			//return latest issue date
-			$this->result = $ausgegeben_am;
-			return true;         
+        	if($this->db_num_rows($result) > 0)
+        	{
+	        	$ausgegeben_am = '';
+				while($row = $this->db_fetch_object($result))
+				{
+					if(empty($ausgegeben_am) || (!empty($ausgegeben_am) && $ausgegeben_am < $row->ausgegebenam))
+						$ausgegeben_am = $row->ausgegebenam;
+				}
+				//return latest issue date
+				$this->result = $ausgegeben_am;
+				return true;
+        	}
+        	else
+        		return false;
         }
 		 else
 		 {
