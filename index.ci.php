@@ -55,6 +55,14 @@
  *
  */
 
+// Loads FHC config files
+require_once 'config/global.config.inc.php';
+require_once 'config/vilesci.config.inc.php';
+
+// Check if the CI_ENVIRONMENT constants is set and eventually use it to set the CI_ENV environment variable
+if (defined('CI_ENVIRONMENT')) $_SERVER['CI_ENV'] = CI_ENVIRONMENT;
+
+// If the CI_ENV environment variable is not set then use "development" as default
 define('ENVIRONMENT', isset($_SERVER['CI_ENV']) ? $_SERVER['CI_ENV'] : 'development');
 
 /*
@@ -65,7 +73,6 @@ define('ENVIRONMENT', isset($_SERVER['CI_ENV']) ? $_SERVER['CI_ENV'] : 'developm
  * Different environments will require different levels of error reporting.
  * By default development will show errors but testing and live will hide them.
  */
-
 switch (ENVIRONMENT)
 {
 	case 'development':
@@ -298,10 +305,6 @@ switch (ENVIRONMENT)
  * And away we go...
  *
  */
-
-// First load the FHC-Config-Files ...
-require_once 'config/global.config.inc.php';
-require_once 'config/vilesci.config.inc.php';
 
 // ... and the vendor autoload
 include_once 'vendor/autoload.php';
