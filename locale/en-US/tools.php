@@ -2,6 +2,9 @@
 
 //Dokumente
 $this->phrasen['tools/dokumente']='Documents';
+$this->phrasen['tools/dokument']='Document';
+$this->phrasen['tools/erstelldatum']='Creation date';
+$this->phrasen['tools/bestaetigungenZeugnisse']='Certificates/Transcripts';
 $this->phrasen['tools/inskriptionsbestaetigung']='Enrollment Confirmation';
 $this->phrasen['tools/studienbeitragFuerSSBezahlt']='tuition fee for semester %1$s paid';
 $this->phrasen['tools/studienbeitragFuerSSNochNichtBezahlt']='tuition fee for semester %1$s not yet paid';
@@ -9,6 +12,10 @@ $this->phrasen['tools/studienerfolgsbestaetigung']='Student progress report';
 $this->phrasen['tools/studiensemesterAuswaehlen']='Please select the corresponding semester';
 $this->phrasen['tools/vorlageWohnsitzfinanzamt']='for submission to local tax office';
 $this->phrasen['tools/studienbuchblatt']='Studienbuchblatt'; //Noch zu übersetzen
+$this->phrasen['tools/alleStudiensemester']='All semester';
+$this->phrasen['tools/abschlussdokumente']='Final documents/Transcripts';
+$this->phrasen['tools/nochKeineAbschlussdokumenteVorhanden']='No final documents available yet';
+$this->phrasen['tools/keinStatusImStudiensemester']='No status found for %1$s. Please select a valid semester from the dropdown.';
 
 //Leistungsbeurteilung
 $this->phrasen['tools/leistungsbeurteilung']='Performance Assessment ';
@@ -18,6 +25,10 @@ $this->phrasen['tools/nochKeineBeurteilungEingetragen']='No grade has been enter
 $this->phrasen['tools/fehlerBeimAuslesenDerNoten']='Error reading the grades.';
 $this->phrasen['tools/benotungsdatumDerZeugnisnote']='Date of grading';
 $this->phrasen['tools/hinweistextMarkierung']='The marking indicates those entries where the grade for the course is different from the grade on the report card.<b>The grade on the report card is the valid one.</b> <br>Should these details not be correct please contact the Administrative Assistant responsible.';
+$this->phrasen['tools/notendurchschnittDerZeugnisnote']='Average of final grade*';
+$this->phrasen['tools/gewichteterNotendurchschnittDerZeugnisnote']='Weighted** average of final grade*';	
+$this->phrasen['tools/legendeGewichteterNotendurchschnitt']='The weighted average grade is calculated using the grade of the course, multiplied with its ECTS, divided by the sum of all ECTS';
+$this->phrasen['tools/legendeNotendurchschnitt']='Please note that extracurricular courses (eg elective courses) may distort the calculated average grade';
 
 //Zahlungen
 $this->phrasen['tools/zahlungen']='Payments';

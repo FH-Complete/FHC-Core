@@ -131,17 +131,22 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 
 				//Wenn das Semester 0 ist, dann wird das Semester aus der Rolle geholt. (Ausnahme: Incoming)
 				//damit bei Outgoing Studenten die im 0. Semester angelegt sind das richtige Semester aufscheint
-				$qry ="SELECT ausbildungssemester as semester FROM public.tbl_prestudentstatus
+				$qry ="SELECT ausbildungssemester as semester, tbl_studienordnung.studiengangbezeichnung, tbl_studienordnung.studiengangbezeichnung_englisch
+ 						FROM public.tbl_prestudentstatus
+						LEFT JOIN lehre.tbl_studienplan USING (studienplan_id)
+						LEFT JOIN lehre.tbl_studienordnung USING (studienordnung_id)
 						WHERE
 						prestudent_id=".$db->db_add_param($row->prestudent_id)." AND
 						studiensemester_kurzbz=".$db->db_add_param($studiensemester_kurzbz)." AND
-						status_kurzbz not in('Incoming','Aufgenommener','Bewerber','Wartender', 'Interessent')
+						tbl_prestudentstatus.status_kurzbz not in('Incoming','Aufgenommener','Bewerber','Wartender', 'Interessent')
 						ORDER BY DATUM DESC LIMIT 1";
 				if($result_sem = $db->db_query($qry))
 				{
 					if($row_sem = $db->db_fetch_object($result_sem))
 					{
 						$row->semester = $row_sem->semester;
+						$row->studiengangbezeichnung = $row_sem->studiengangbezeichnung;
+						$row->studiengangbezeichnung_englisch = $row_sem->studiengangbezeichnung_englisch;
 						$bezeichnung = $row_sem->semester.'. Semester';
 					}
 					else
@@ -150,13 +155,15 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 				else
 					$bezeichnung = '';
 
+				$studiengangbezeichnung = empty($row->studiengangbezeichnung) ? $row->bezeichnung : $row->studiengangbezeichnung;
+				$studiengangbezeichnung_englisch = empty($row->studiengangbezeichnung_englisch) ? $row->english : $row->studiengangbezeichnung_englisch;
 
 				$xml .= "		<studiensemester><![CDATA[".$row->sembezeichnung."]]></studiensemester>";
 				$xml .= "		<stsem><![CDATA[".$row->stsem."]]></stsem>";
 				$xml .=	"		<semester><![CDATA[".$row->semester."]]></semester>";
 				$xml .=	"		<semester_bezeichnung><![CDATA[".$bezeichnung."]]></semester_bezeichnung>";
-				$xml .= "		<studiengang><![CDATA[".$row->bezeichnung."]]></studiengang>";
-				$xml .= "		<studiengang_englisch><![CDATA[".$row->english."]]></studiengang_englisch>";
+				$xml .= "		<studiengang><![CDATA[".$studiengangbezeichnung."]]></studiengang>";
+				$xml .= "		<studiengang_englisch><![CDATA[".$studiengangbezeichnung_englisch."]]></studiengang_englisch>";
 				if($row->typ=='b')
 					$bezeichnung='Bachelor';
 				elseif($row->typ=='m')

@@ -46,7 +46,7 @@ $uid=get_uid();
 
 if(isset($_GET['uid']))
 {
-	// Administratoren duerfen die UID als Parameter uebergeben um die Notenliste
+	// Administratoren duerfen die UID als Parameter uebergeben um die Dokumente
 	// von anderen Personen anzuzeigen
 
 	$rechte = new benutzerberechtigung();
@@ -105,7 +105,7 @@ if(isset($_GET['action']) && $_GET['action']=='download')
 echo '<!DOCTYPE HTML>
 <html>
 <head>
-	<title>'.$p->t('tools/dokumente').'</title>
+	<title>'.$p->t('tools/bestaetigungenZeugnisse').'</title>
 	<meta charset="UTF-8">
 	<link href="../../../skin/style.css.php" rel="stylesheet" type="text/css">';
 	include('../../../include/meta/jquery.php');
@@ -113,25 +113,59 @@ echo '<!DOCTYPE HTML>
 echo '
 	<script language="JavaScript" type="text/javascript">
 
-		$(document).ready(function()
+	$(document).ready(function()
+	{
+		$(".tablesorter").tablesorter(
 		{
-			$("#t1").tablesorter(
-			{
-				sortList: [[0,1]],
-				widgets: ["zebra"]
-			});
+			sortList: [[1,0]],
+			headers: { 0: { sorter: false }},
+			widgets: ["zebra"]
 		});
-
-		function changeSemester(obj)
+		$(".tablesorter2").tablesorter(
 		{
-			self.location = obj.options[obj.selectedIndex].value + "'.$getParam.'";
-		}
+			sortList: [[1,1]],
+			headers: { 0: { sorter: false }},
+			widgets: ["zebra"]
+		});
+	});
+
+	function changeSemester(obj)
+	{
+		self.location = obj.options[obj.selectedIndex].value + "'.$getParam.'";
+	};
+
+	function createStudienerfolg(stsem, language, finanzamtCheckboxId)
+	{
+		var finanzamt = document.getElementById(finanzamtCheckboxId).checked;
+		var xsl = "";
+		
+		if (language == "en")
+			xsl = "StudienerfolgEng";
+		else
+			xsl = "Studienerfolg";
+		
+		if(finanzamt)
+			finanzamt = "&typ=finanzamt";
+		else
+			finanzamt = "";
+		
+		if(stsem == "alle")
+			alle = "&all=1";
+		else
+			alle = "";
+		
+		window.location.href= "../pdfExport.php?xml=studienerfolg.rdf.php&xsl="+xsl+"&ss="+stsem+"&uid='.$uid.'"+finanzamt+alle;
+	};
 	</script>
+	<style>
+	table.tablesorter tbody td
+	{
+		padding: 4px;
+	{
+	</style>
 </head>
 <body>
-<h1>'.$p->t('tools/dokumente').'</h1>
-
-<h2>Bestätigungen</h2>';
+<h1>'.$p->t('tools/bestaetigungenZeugnisse').'</h1>';
 
 $prestudent = new prestudent();
 $prestudent->getPrestudentRolle($student_studiengang->prestudent_id);
@@ -155,8 +189,13 @@ if($stsem == '')
 $stsem_obj->getAll();
 */
 echo $p->t('global/studiensemester');
-echo ' <SELECT name="stsem" onChange="changeSemester(this)">';
-
+echo ' <SELECT name="stsem" id="stsem" onChange="changeSemester(this)">';
+if (!in_array($stsem, $stsem_arr))
+{
+	echo '<OPTION value="dokumente.php?stsem='.$stsem.'" selected>';
+	echo $stsem;
+	echo '</OPTION>';
+}
 foreach ($stsem_arr as $semrow)
 {
 	if ($stsem == $semrow)
@@ -174,61 +213,106 @@ foreach ($stsem_arr as $semrow)
 }
 echo '</SELECT><br /><br />';
 
-$konto = new konto();
-
-$buchungstypen = array();
-if (defined("CIS_DOKUMENTE_STUDIENBEITRAG_TYPEN"))
+// Wenn es für das übergebene Studiensemester keinen PreStudentStatus gibt, werden nur Abschlussdokumente angezeigt 
+if (in_array($stsem, $stsem_arr))
 {
-	$buchungstypen = unserialize (CIS_DOKUMENTE_STUDIENBEITRAG_TYPEN);
-}
-
-$stsem_zahlung = $konto->getLastStSemBuchungstypen($uid, $buchungstypen, $stsem);
-if ($stsem_zahlung != FALSE && $stsem == $stsem_zahlung)
-{
-	$path = "../pdfExport.php?xsl=Inskription&xml=student.rdf.php&ss=".$stsem."&uid=".$uid."&xsl_stg_kz=".$xsl_stg_kz;
-	echo '<a href="'.$path.'">'.$p->t('tools/inskriptionsbestaetigung').'</a>';
-	echo ' - '.$p->t('tools/studienbeitragFuerSSBezahlt',array($stsem));
-	echo '<br /><br />';
-}
-else
-{
-	echo $p->t('tools/inskriptionsbestaetigung');
-	echo ' - '.$p->t('tools/studienbeitragFuerSSNochNichtBezahlt',array($stsem));
-	echo '<br /><br />';
-}
-
-if (defined('CIS_DOKUMENTE_STUDIENBUCHLBATT_DRUCKEN') && CIS_DOKUMENTE_STUDIENBUCHLBATT_DRUCKEN)
-{
+	$konto = new konto();
+	
+	$buchungstypen = array();
+	if (defined("CIS_DOKUMENTE_STUDIENBEITRAG_TYPEN"))
+	{
+		$buchungstypen = unserialize (CIS_DOKUMENTE_STUDIENBEITRAG_TYPEN);
+	}
+	echo '<h2>' . $p->t('tools/inskriptionsbestaetigung') . '</h2>';
+	$stsem_zahlung = $konto->getLastStSemBuchungstypen($uid, $buchungstypen, $stsem);
+	echo '<table class="tablesorter" style="width:auto;">
+			<thead>
+			<tr>
+				<th></th>
+				<th>'.$p->t('global/name').'</th>
+			</tr>
+			</thead>
+			<tbody><tr>';
 	if ($stsem_zahlung != FALSE && $stsem == $stsem_zahlung)
 	{
-		$pfad = "../pdfExport.php?xsl=Studienblatt&xml=studienblatt.xml.php&ss=".$stsem."&uid=".$uid;
-		echo '<a href="'.$pfad.'">'.$p->t('tools/studienbuchblatt').'</a>';
-		echo ' - '.$p->t('tools/studienbeitragFuerSSBezahlt',array($stsem));
+		$path = "../pdfExport.php?xsl=Inskription&xml=student.rdf.php&ss=".$stsem."&uid=".$uid."&xsl_stg_kz=".$xsl_stg_kz;
+		echo '<td><img src="../../../skin/images/pdfpic.gif" /></td>';
+		echo '<td><a href="'.$path.'">'.$p->t('tools/inskriptionsbestaetigung').' '.$stsem.'</a></td>';
 	}
 	else
-		echo $p->t('tools/studienbuchblatt')." - ".$p->t('tools/studienbeitragFuerSSNochNichtBezahlt',array($stsem));
-
-	echo '<br /><br />';
+	{
+		echo '<td colspan="2">'.$p->t('tools/studienbeitragFuerSSNochNichtBezahlt',array($stsem)).'</td>';
+	}
+	echo '</tr></tbody></table>';
+	
+	if (defined('CIS_DOKUMENTE_STUDIENBUCHLBATT_DRUCKEN') && CIS_DOKUMENTE_STUDIENBUCHLBATT_DRUCKEN)
+	{
+		echo '<h2>' . $p->t('tools/studienbuchblatt') . '</h2>';
+		echo '<table class="tablesorter" style="width:auto;">
+			<thead>
+			<tr>
+				<th></th>
+				<th>'.$p->t('global/name').'</th>
+			</tr>
+			</thead>
+			<tbody><tr>';
+		if ($stsem_zahlung != FALSE && $stsem == $stsem_zahlung)
+		{
+			$pfad = "../pdfExport.php?xsl=Studienblatt&xml=studienblatt.xml.php&ss=".$stsem."&uid=".$uid;
+			echo '<td><img src="../../../skin/images/pdfpic.gif" /></td>';
+			echo '<td><a href="'.$pfad.'">'.$p->t('tools/studienbuchblatt').' '.$stsem.'</a></td>';
+		}
+		else
+		{
+			echo '<td colspan="2">'.$p->t('tools/studienbeitragFuerSSNochNichtBezahlt',array($stsem)).'</td>';
+		}
+		echo '</tr></tbody></table>';
+	}
+	
+	if (defined('CIS_DOKUMENTE_STUDIENERFOLGSBESTAETIGUNG_DRUCKEN') && CIS_DOKUMENTE_STUDIENERFOLGSBESTAETIGUNG_DRUCKEN)
+	{
+		echo '<h2>' . $p->t('tools/studienerfolgsbestaetigung') . '</h2>';
+		echo '<table class="tablesorter" style="width:auto;">
+			<thead>
+			<tr>
+				<th></th>
+				<th>'.$p->t('global/name').'</th>
+				<th></th>
+			</tr>
+			</thead>
+			<tbody>';
+		echo '<tr><td><img src="../../../skin/images/pdfpic.gif" /></td>';
+		echo '<td><a href="#" onclick="createStudienerfolg(\''.$stsem.'\', \'de\', \'finanzamtDeutschStudiensemester\')">'.$p->t('tools/studienerfolgsbestaetigung').' '.$stsem.' '.$p->t('global/deutsch').'</a></td>';
+		echo '<td><input type="checkbox" id="finanzamtDeutschStudiensemester"> '.$p->t('tools/vorlageWohnsitzfinanzamt').'</td></tr>';
+		
+		echo '<tr><td><img src="../../../skin/images/pdfpic.gif" /></td>';
+		echo '<td><a href="#" onclick="createStudienerfolg(\'alle\', \'de\', \'finanzamtDeutschAlle\')">'.$p->t('tools/studienerfolgsbestaetigung').' '.$p->t('tools/alleStudiensemester').' '.$p->t('global/deutsch').'</a></td>';
+		echo '<td><input type="checkbox" id="finanzamtDeutschAlle"> '.$p->t('tools/vorlageWohnsitzfinanzamt').'</td></tr>';
+		
+		echo '<tr><td><img src="../../../skin/images/pdfpic.gif" /></td>';
+		echo '<td><a href="#" onclick="createStudienerfolg(\''.$stsem.'\', \'en\', \'finanzamtEnglishStudiensemester\')">'.$p->t('tools/studienerfolgsbestaetigung').' '.$stsem.' '.$p->t('global/englisch').'</a></td>';
+		echo '<td><input type="checkbox" id="finanzamtEnglishStudiensemester"> '.$p->t('tools/vorlageWohnsitzfinanzamt').'</td></tr>';
+		
+		echo '<tr><td><img src="../../../skin/images/pdfpic.gif" /></td>';
+		echo '<td><a href="#" onclick="createStudienerfolg(\'alle\', \'en\', \'finanzamtEnglishAlle\')">'.$p->t('tools/studienerfolgsbestaetigung').' '.$p->t('tools/alleStudiensemester').' '.$p->t('global/englisch').'</a></td>';
+		echo '<td><input type="checkbox" id="finanzamtEnglishAlle"> '.$p->t('tools/vorlageWohnsitzfinanzamt').'</td></tr>';
+		echo '</tbody></table>';
+	}
 }
-
-if (defined('CIS_DOKUMENTE_STUDIENERFOLGSBESTAETIGUNG_DRUCKEN') && CIS_DOKUMENTE_STUDIENERFOLGSBESTAETIGUNG_DRUCKEN)
-{
-	echo "<a href='studienerfolgsbestaetigung.php?".$getParam."' class='Item'>".$p->t('tools/studienerfolgsbestaetigung')." Deutsch</a><br>";
-	echo "<a href='studienerfolgsbestaetigung.php?lang=en".$getParam."' class='Item'>".$p->t('tools/studienerfolgsbestaetigung')." Englisch</a>";
-	echo "<br />";
-}
-echo "<br />";
+else 
+	echo '<p class="error">'.$p->t('tools/keinStatusImStudiensemester',array($stsem)).'</p>';
 
 $akte = new akte();
-if($akte->getArchiv($student_studiengang->person_id, true, true) && count($akte->result)>0)
+echo '<h2>' . $p->t('tools/abschlussdokumente') . '</h2>';
+if($akte->getArchiv($student_studiengang->person_id, null, true) && count($akte->result)>0)
 {
 	echo '
-	<h2>Abschlussdokumente</h2>
-	<table id="t1" style="width:auto;">
+	<table class="tablesorter2" style="width:auto;">
 		<thead>
 		<tr>
-			<th>Erstelldatum</th>
-			<th>Dokument</th>
+			<th></th>
+			<th>'.$p->t('tools/erstelldatum').'</th>
+			<th>'.$p->t('tools/dokument').'</th>
 		</tr>
 		</thead>
 		<tbody>
@@ -240,11 +324,28 @@ if($akte->getArchiv($student_studiengang->person_id, true, true) && count($akte-
 	{
 		$pfad = 'dokumente.php?action=download&id='.$row->akte_id.'&uid='.$uid;
 		echo '<tr>';
+		echo '<td><img src="../../../skin/images/pdfpic.gif" /></td>';
 		echo '<td>'.$datum_obj->formatDatum($row->erstelltam,'d.m.Y').'</td>';
-		echo '<td><a href="'.$pfad.'"><img src="../../../skin/images/pdfpic.gif" /> '.$row->bezeichnung.'</a></td>';
+		echo '<td><a href="'.$pfad.'">'.$row->bezeichnung.'</a></td>';
 		echo '</tr>';
 	}
 
+	echo '</tbody></table>';
+}
+else 
+{
+	echo '
+	<table class="tablesorter2" style="width:auto;">
+		<thead>
+		<tr>
+			<th></th>
+			<th>'.$p->t('tools/erstelldatum').'</th>
+			<th>'.$p->t('tools/dokument').'</th>
+		</tr>
+		</thead>
+		<tbody>
+	';
+	echo '<td colspan="3">'.$p->t('tools/nochKeineAbschlussdokumenteVorhanden').'</td>';
 	echo '</tbody></table>';
 }
 echo '</body>

@@ -136,6 +136,8 @@ if (isset($personToDelete) && isset($personToKeep) && $personToDelete >= 0 && $p
 		$personToDelete_obj = new person();
 		if ($personToDelete_obj->load($personToDelete))
 		{
+			$error = false;
+			$sql_query_upd1 = "BEGIN;";
 			$personToKeep_obj = new person();
 			$personToKeep_obj->load($personToKeep);
 
@@ -145,10 +147,32 @@ if (isset($personToDelete) && isset($personToKeep) && $personToDelete >= 0 && $p
 			{
 				$msg_error[] = 'Beide Personen haben eine Sozialversicherungsnummer oder ein Ersatzkennzeichen und können nicht zusammengelegt werden.<br>
 						Bitte wenden Sie sich an einen Administrator.';
+				$error = true;
 			}
-			else
+			
+			// Wenn zwei gleiche rt_person Einträge vorhanden sind, wird ein Fehler ausgegeben und abgebrochen
+			$reihungstest_personToKeep = new reihungstest();
+			$reihungstest_personToKeep->getReihungstestPerson($personToKeep);
+			$doppelteReihungstestzuordnung = false;
+			
+			foreach ($reihungstest_personToKeep->result as $row)
 			{
-				$sql_query_upd1 = "BEGIN;";
+				$rt_doppelt = new reihungstest();
+				if ($rt_doppelt->checkPersonRtStudienplanExists($personToDelete, $row->reihungstest_id, $row->studienplan_id))
+				{
+					$doppelteReihungstestzuordnung = true;
+					$msg_error[] = "Die Person ".$personToDelete." hat schon eine Reihungstestzuordnung
+									zu Reihungstest ID ".$row->reihungstest_id." im Studienplan ".$row->studienplan_id.".<br>
+									Sie müssen die Datensätze manuell bereinigen, bevor Sie die Personen zusammenlegen können.";
+					$error = true;
+					break;
+				}
+			}
+			if ($doppelteReihungstestzuordnung === false)
+				$sql_query_upd1 .= "UPDATE public.tbl_rt_person SET person_id=" . $db->db_add_param($personToKeep, FHC_INTEGER) . " WHERE person_id=" . $db->db_add_param($personToDelete, FHC_INTEGER) . ";";
+			
+			if ($error == false)
+			{
 				// Wenn bei einer der Personen das Foto gesperrt ist, dann die Sperre uebernehmen
 				if ($personToDelete_obj->foto_sperre)
 					$sql_query_upd1 .= "UPDATE public.tbl_person SET foto_sperre=true WHERE person_id=" . $db->db_add_param($personToKeep, FHC_INTEGER) . ";";
@@ -218,8 +242,8 @@ if (isset($personToDelete) && isset($personToKeep) && $personToDelete >= 0 && $p
 					}
 
 					// Bild in tbl_person auf 240x320 skalieren
-					//$base64_src = resize($base64foto, 240, 320); Auskommentiert bis das auch im Echtsystem geht
-					$base64_src = $base64foto;
+					$base64_src = resize($base64foto, 240, 320);
+
 					$sql_query_upd1 .= "UPDATE public.tbl_person SET foto=" . $db->db_add_param($base64_src) . " WHERE person_id=" . $db->db_add_param($personToKeep, FHC_INTEGER) . ";";
 				}
 
@@ -259,23 +283,6 @@ if (isset($personToDelete) && isset($personToKeep) && $personToDelete >= 0 && $p
 					$zugangscode = $personToKeep_obj->zugangscode;
 				else
 					$zugangscode = $personToKeep_obj->zugangscode;
-
-				// Check ob rt_person-zuordnung schon vorhanden ist
-				// Wenn ja, wird der Eintrag der zu löschenden Person ebenfalls gelöscht
-				$reihungstest_person = new reihungstest();
-
-
-				//if (!$reihungstest_person->getReihungstestPerson($personToKeep))
-				$sql_query_upd1 .= "UPDATE public.tbl_rt_person SET person_id=" . $db->db_add_param($personToKeep, FHC_INTEGER) . " WHERE person_id=" . $db->db_add_param($personToDelete, FHC_INTEGER) . ";";
-				/*else
-				{
-					$sql_query_upd1 .= "DELETE FROM public.tbl_rt_person WHERE person_id=" . $db->db_add_param($personToDelete, FHC_INTEGER) . ";";
-					$reihungstest = new reihungstest($reihungstest_person->result[0]->reihungstest_id);
-					$msg_warning[] = "Das verbliebene Person ".$personToKeep." hat schon eine Reihungstestzuordnung
-										zu Reihungstest ID".$reihungstest->reihungstest_id." am ".$reihungstest->datum."
-										für das ".$reihungstest->studiensemester_kurzbz." im Studiengang ".$reihungstest->studiengang_kz." (Studienplan ".$reihungstest_person->result[0]->studienplan_id.")<br>
-										Die Reihungstestzuordnung von ".$personToDelete." wurde gelöscht";
-				}*/
 
 				$sql_query_upd1 .= "UPDATE addon.tbl_kompetenz SET person_id=" . $db->db_add_param($personToKeep, FHC_INTEGER) . " WHERE person_id=" . $db->db_add_param($personToDelete, FHC_INTEGER) . ";";
 				$sql_query_upd1 .= "UPDATE lehre.tbl_abschlusspruefung SET pruefer1=" . $db->db_add_param($personToKeep, FHC_INTEGER) . " WHERE pruefer1=" . $db->db_add_param($personToDelete, FHC_INTEGER) . ";";
@@ -928,6 +935,13 @@ function resize($base64, $width, $height) // 828 x 1104 -> 240 x 320
 	}
 	function checkPersonen()
 	{
+		// Check, ob jeweils ein Radiobutton ausgewählt wurde 
+		if(!$('input[type=radio][name=radio_1]').is(':checked') || !$('input[type=radio][name=radio_2]').is(':checked')) 
+		{
+			alert('Bitte wählen Sie auf beiden Seiten einen Radio-Button aus');
+			return false;
+		}
+
 		// Wenn die Personen zu unterschiedlich sind, Warnung ausgeben
 		// Prüfen auf Vorname, Nachname, Geburtsdatum
 		var nachnameLinks = $('input[type=radio][name=radio_1]:checked').closest('tr').find('.nachname').text().toLowerCase();

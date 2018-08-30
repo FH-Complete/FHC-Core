@@ -94,7 +94,7 @@ $format_title->setAlign('merge');
 
 //Zeilenueberschriften ausgeben
 $i = 0;
-$zeile = 1;
+$zeile = 0;
 
 $worksheet->write($zeile, $i, "ANREDE", $format_bold);
 $maxlength[$i] = 6;
@@ -108,10 +108,8 @@ $worksheet->write($zeile, ++$i, "TITELPOST", $format_bold);
 $maxlength[$i] = 9;
 $worksheet->write($zeile, ++$i, "EMail Privat", $format_bold);
 $maxlength[$i] = 12;
-$worksheet->write($zeile,++$i,"STRASSE", $format_bold);
-$maxlength[$i]=7;
-$worksheet->write($zeile-1,$i,"Zustelladresse", $format_bold);
-$maxlength[$i]=14;
+$worksheet->write($zeile,++$i,"STRASSE (Zustelladresse)", $format_bold);
+$maxlength[$i]=12;
 $worksheet->write($zeile,++$i,"PLZ", $format_bold);
 $maxlength[$i]=3;
 $worksheet->write($zeile,++$i,"ORT", $format_bold);
@@ -158,7 +156,7 @@ $maxlength[$i] = 16;
 
 $worksheet->write($zeile, ++$i, "STATUS", $format_bold);
 $maxlength[$i] = 6;
-$worksheet->write($zeile, ++$i, "STATI IN ANDEREN STUDIENGÄNGEN", $format_bold);
+$worksheet->write($zeile, ++$i, "STATUS IN ANDEREN STUDIENGÄNGEN", $format_bold);
 $maxlength[$i] = 8;
 $worksheet->write($zeile, ++$i, "EMail Intern", $format_bold);
 $maxlength[$i] = 12;

@@ -1259,4 +1259,35 @@ class reihungstest extends basis_db
 			return false;
 		}
 	}
+	
+	/**
+	 * Prueft ob eine Person-Reihungstest-Studienplan zuteilung existiert (Muss in der DB unique sein)
+	 * @param int $person_id ID der Person.
+	 * @param int $rt_id ID des Reihungstests.
+	 * @param int $studienplan_id Studienplan ID.
+	 * @return boolean true wenn vorhanden, false wenn nicht oder im Fehlerfall
+	 */
+	public function checkPersonRtStudienplanExists($person_id, $rt_id, $studienplan_id)
+	{
+		$qry = "SELECT
+					*
+				FROM
+					public.tbl_rt_person
+				WHERE
+					tbl_rt_person.person_id=".$this->db_add_param($person_id)."
+					AND tbl_rt_person.rt_id=".$this->db_add_param($rt_id)."
+					AND tbl_rt_person.studienplan_id=".$this->db_add_param($studienplan_id);
+		if($result = $this->db_query($qry))
+		{
+			if($this->db_num_rows($result) > 0)
+				return true;
+			else
+				return false;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+	}
 }

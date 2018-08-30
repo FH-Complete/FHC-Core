@@ -407,4 +407,26 @@ class Studiengang_model extends DB_Model
 			array('reihungstest')
 		);
 	}
+
+	/**
+	 * Gets Studiengaenge of a Studiensemesester
+	 * @param $studiensemester_kurzbz
+	 * @return array|null
+	 */
+	public function getStudiengaengeByStudiensemester($studiensemester_kurzbz)
+	{
+		$query = "SELECT
+					distinct tbl_studiengang.*, UPPER(typ::varchar(1) || kurzbz) AS kuerzel
+				FROM
+					public.tbl_studiengang
+					JOIN lehre.tbl_studienordnung USING(studiengang_kz)
+					JOIN lehre.tbl_studienplan USING(studienordnung_id)
+					JOIN lehre.tbl_studienplan_semester USING(studienplan_id)
+				WHERE
+					tbl_studienplan_semester.studiensemester_kurzbz=?
+				ORDER BY
+					typ, kurzbz";
+
+		return $this->execQuery($query, array($studiensemester_kurzbz));
+	}
 }

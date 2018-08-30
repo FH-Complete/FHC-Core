@@ -28,6 +28,7 @@ require_once('../include/datum.class.php');
 require_once('../include/basis_db.class.php');
 require_once('../include/studiengang.class.php');
 require_once('../include/prestudent.class.php');
+require_once('../include/studienordnung.class.php');
 require_once('../include/mitarbeiter.class.php');
 require_once('../include/studiensemester.class.php');
 require_once('../include/student.class.php');
@@ -97,8 +98,23 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		echo '		<geburtsdatum><![CDATA['.$datum->convertISODate($row->gebdatum).']]></geburtsdatum>';
 		echo '		<matrikelnummer>'.TRIM($row->matrikelnr).'</matrikelnummer>';
 		echo '		<studiengang_kz>'.$studiengang_kz.'</studiengang_kz>';
-		echo '		<studiengang_bezeichnung_deutsch><![CDATA['.$row->bezeichnung.']]></studiengang_bezeichnung_deutsch>';
-		echo '		<studiengang_bezeichnung_englisch><![CDATA['.$row->english.']]></studiengang_bezeichnung_englisch>';
+
+		$prestudent = new prestudent($row->prestudent_id);
+		if ($prestudent->getLastStatus($row->prestudent_id, null, 'Student'))
+		{
+			$studienplan_id = $prestudent->studienplan_id;
+			$studienordnung = new studienordnung();
+			if ($studienordnung->getStudienordnungFromStudienplan($studienplan_id))
+			{
+				$studiengangbezeichnung = $studienordnung->__get('studiengangbezeichnung');
+				$studiengangbezeichnung_englisch = $studienordnung->__get('studiengangbezeichnung_englisch');
+			}
+		}
+		$studiengang_bezeichnung = empty($studiengangbezeichnung) ? $row->bezeichnung : $studiengangbezeichnung;
+		$studiengang_bezeichnung_englisch = empty($studiengangbezeichnung_englisch) ? $row->english : $studiengangbezeichnung_englisch;
+
+		echo '		<studiengang_bezeichnung_deutsch><![CDATA['.$studiengang_bezeichnung.']]></studiengang_bezeichnung_deutsch>';
+		echo '		<studiengang_bezeichnung_englisch><![CDATA['.$studiengang_bezeichnung_englisch.']]></studiengang_bezeichnung_englisch>';
 
 		$prestudent = new prestudent();
 		$prestudent->getFirstStatus($row->prestudent_id, 'Student');
