@@ -487,7 +487,7 @@ class zeitaufzeichnung extends basis_db
 		$where = "uid=".$this->db_add_param($user);
 		if ($days!='')
 			$where.= " AND ende>(now() - INTERVAL '".$days." days')";
-		$where_join = "and z.aktivitaet_kurzbz != 'DienstreiseMT' and z.uid=".$this->db_add_param($user);
+		$where_join = "and (z.aktivitaet_kurzbz != 'DienstreiseMT' or z.aktivitaet_kurzbz is null) and z.uid=".$this->db_add_param($user);
 		if ($days!='')
 			$where_join.= " AND z.ende>(now() - INTERVAL '".$days." days')";
 		if ($days=='')
