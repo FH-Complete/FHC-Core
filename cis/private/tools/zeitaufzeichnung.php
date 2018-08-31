@@ -1292,8 +1292,8 @@ if($projekt->getProjekteMitarbeiter($user, true))
 					echo '</td>';
 					echo '<td colspan="2"></td>';
 					echo '<td>';
-					if(!isset($_GET['filter']) && ($datumtag > $sperrdatum))
-						echo '<a href="'.$_SERVER['PHP_SELF'].'?type=edit&zeitaufzeichnung_id='.$dr_arr[$datumtag]['id'].'" class="Item">'.$p->t("global/bearbeiten").'</a>';
+//					if(!isset($_GET['filter']) && ($datumtag > $sperrdatum))
+//						echo '<a href="'.$_SERVER['PHP_SELF'].'?type=edit&zeitaufzeichnung_id='.$dr_arr[$datumtag]['id'].'" class="Item">'.$p->t("global/bearbeiten").'</a>';
 					echo "</td>\n";
 					echo "<td>";
 					if(!isset($_GET['filter']) && ($datumtag > $sperrdatum))
