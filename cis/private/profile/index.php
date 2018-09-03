@@ -294,7 +294,7 @@ if ($type == 'student' && (!defined('CIS_PROFIL_STUDIENINFORMATION_ANZEIGEN') ||
 	$studiengang->load($user->studiengang_kz);
 
 	$prestudent = new prestudent($user->prestudent_id);
-	if ($prestudent->getLastStatus($user->prestudent_id, $prestudent->studiensemester_kurzbz))
+	if ($prestudent->getLastStatus($user->prestudent_id))
 	{
 		$studienplan_id = $prestudent->studienplan_id;
 		$studienordnung = new studienordnung();

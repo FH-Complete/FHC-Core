@@ -137,7 +137,7 @@ else
 		$stg_name = $stg_obj->bezeichnung_arr[$sprache];
 		$prestudent_id = $row->prestudent_id;
 		$prestudent = new prestudent($prestudent_id);
-		if ($prestudent->getLastStatus($prestudent_id, $prestudent->studiensemester_kurzbz))
+		if ($prestudent->getLastStatus($prestudent_id))
 		{
 			$studienplan_id = $prestudent->studienplan_id;
 			$studienordnung = new studienordnung();
