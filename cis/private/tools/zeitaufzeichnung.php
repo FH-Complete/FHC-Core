@@ -91,21 +91,26 @@ $fieldheadings = array(
 if ($rechte->isBerechtigt('basis/servicezeitaufzeichnung'))
 {
 	$za_simple = 0;
-	$activities = 	array('Design', 'Operativ', 'Betrieb',  'Pause', 'LehreIntern', 'LehreExtern', 'Arztbesuch', 'Dienstreise', 'Behoerde', 'Ersatzruhe');
+	$activities = 	array('Design', 'Operativ', 'Betrieb',  'Pause', 'LehreIntern', 'LehreExtern', 'Arztbesuch', 'DienstreiseMT', 'Behoerde', 'Ersatzruhe');
 }
 else
 {
 	$za_simple = 1;
-	$activities = array('Arbeit', 'Pause', 'LehreIntern', 'LehreExtern', 'Arztbesuch', 'Dienstreise', 'Behoerde', 'Ersatzruhe');
+	$activities = array('Arbeit', 'Pause', 'LehreIntern', 'LehreExtern', 'Arztbesuch', 'DienstreiseMT', 'Behoerde', 'Ersatzruhe');
 }
 
 $activities_str = "'".implode("','", $activities)."'";
 
 // definiert bis zu welchem Datum die Eintragung nicht mehr möglich ist
-if (defined('CIS_ZEITAUFZEICHNUNG_GESPERRT_BIS') && CIS_ZEITAUFZEICHNUNG_GESPERRT_BIS != '')
+$zasperre = new zeitaufzeichnung();
+if ($sperrdat = $zasperre->getEintragungGesperrtBisForUser($user))
+	$gesperrt_bis = $sperrdat;
+else if (defined('CIS_ZEITAUFZEICHNUNG_GESPERRT_BIS') && CIS_ZEITAUFZEICHNUNG_GESPERRT_BIS != '')
 	$gesperrt_bis = CIS_ZEITAUFZEICHNUNG_GESPERRT_BIS;
 else
 	$gesperrt_bis = '2015-08-31';
+
+//var_dump($gesperrt_bis);
 
 $sperrdatum = date('c', strtotime($gesperrt_bis));
 
@@ -415,9 +420,13 @@ echo '
 		    bisDatum=Jahr+\'\'+Monat+\'\'+Tag+\'\'+Stunde+\'\'+Minute;
 		    diff=bisDatum-vonDatum;
 
+			a = document.getElementById("aktivitaet");
+			akt = a.options[a.selectedIndex].value;
+			//alert(akt);
+
 			if (bisDatum>vonDatum)
 			{
-				if (diff>9999)
+				if (diff>9999 && akt != "DienstreiseMT")
 				{
 					Check = confirm("'.$p->t("zeitaufzeichnung/zeitraumAuffallendHoch").'");
 					document.getElementById("bis_datum").focus();
@@ -741,7 +750,7 @@ if($projekt->getProjekteMitarbeiter($user, true))
 			// An der FHTW wird ins Moodle verlinkt
 			if (CAMPUS_NAME == 'FH Technikum Wien')
 				echo '<p><a href="https://moodle.technikum-wien.at/course/view.php?id=6251" target="_blank">'.$p->t("zeitaufzeichnung/handbuchZeitaufzeichnung").'</a></p>';
-			else 
+			else
 				echo '<p><a href="../../../cms/dms.php?id='.$p->t("dms_link/handbuchZeitaufzeichnung").'" target="_blank">'.$p->t("zeitaufzeichnung/handbuchZeitaufzeichnung").'</a></p>';
 		}
 		if ($p->t("dms_link/fiktiveNormalarbeitszeit")!='')
@@ -904,7 +913,7 @@ if($projekt->getProjekteMitarbeiter($user, true))
 		//	$qry = "SELECT * FROM fue.tbl_aktivitaet where sort != 5 or sort is null ORDER by sort,beschreibung";
 		if($result = $db->db_query($qry))
 		{
-			echo '<SELECT name="aktivitaet">';
+			echo '<SELECT name="aktivitaet" id="aktivitaet">';
 			if ($za_simple == 0)
 				echo '<OPTION value="">-- '.$p->t('zeitaufzeichnung/keineAuswahl').' --</OPTION>';
 			//else
@@ -1077,6 +1086,11 @@ if($projekt->getProjekteMitarbeiter($user, true))
 	    }
 
 		$summe=0;
+		$dr = new zeitaufzeichnung();
+		$dr->getDienstreisenUser($user);
+		$dr_arr = $dr->result;
+
+		//var_dump($dr->result);
 
 		if(count($za->result)>0)
 		{
@@ -1108,6 +1122,7 @@ if($projekt->getProjekteMitarbeiter($user, true))
 			$wochensaldo = '00:00';
 			$pflichtpause = false;
 
+
 			foreach($za->result as $row)
 			{
 				$datumtag = $datum_obj->formatDatum($row->datum, 'Y-m-d');
@@ -1119,6 +1134,7 @@ if($projekt->getProjekteMitarbeiter($user, true))
 					$tag = $datumtag;
 				if($tag!=$datumtag)
 				{
+
 					//if ($row->uid)
 					//{
 						if ($datum->formatDatum($tag,'N') == '6' || $datum->formatDatum($tag,'N') == '7')
@@ -1188,9 +1204,11 @@ if($projekt->getProjekteMitarbeiter($user, true))
 				        <td '.$style.' align="right"><b>'.$tagessaldo.$erstr.'</b><br>'.date('H:i', ($pausesumme-3600)).'</td>
 				        <td '.$style.' colspan="3" align="right">';
 						if ($tag > $sperrdatum)
-				      	echo '<a href="?von_datum='.$datum->formatDatum($tag,'d.m.Y').'&bis_datum='.$datum->formatDatum($tag,'d.m.Y').'" class="item">&lt;-</a>';
+						echo '<a href="?von_datum='.$datum->formatDatum($tag,'d.m.Y').'&bis_datum='.$datum->formatDatum($tag,'d.m.Y').'" class="item">&lt;-</a>';
 
-				      echo '</td>';
+						echo '</td></tr>';
+
+
 
 						$tag=$datumtag;
 						$tagessumme='00:00';
@@ -1207,6 +1225,9 @@ if($projekt->getProjekteMitarbeiter($user, true))
 					//{
 					//	echo '<tr><td style="background-color:#DCE4EF; font-size: 8pt;" colspan="13"><b>'.$datum->formatDatum($row->datum,'D d.m.Y').'</b></b> <span id="tag_'.$datum->formatDatum($row->datum,'d_m_Y').'"></span></td></tr>';
 					//}
+
+
+
 				}
 				// Nach jeder Woche eine Summenzeile einfuegen und eine neue Tabelle beginnen
 				$datumwoche = $datum_obj->formatDatum($row->datum, 'W');
@@ -1251,6 +1272,37 @@ if($projekt->getProjekteMitarbeiter($user, true))
 					$ersumme = '00:00';
 					$ersumme_woche = '00:00';
 				}
+
+				// Diestreisen NEU
+				if (array_key_exists($datumtag, $dr_arr))
+				{
+					$colspan=($za_simple)?4:7;
+					echo '<tr style="background-color: #aabb99"><td colspan="'.$colspan.'">'.$p->t('zeitaufzeichnung/dienstreise');
+					if (array_key_exists('start', $dr_arr[$datumtag]) && !array_key_exists('ende', $dr_arr[$datumtag]))
+						echo ' '.$p->t('global/beginn');
+					if (array_key_exists('ende', $dr_arr[$datumtag]) && !array_key_exists('start', $dr_arr[$datumtag]))
+						echo ' '.$p->t('global/ende');
+					echo '</td>';
+					echo '<td>';
+					if (array_key_exists('start', $dr_arr[$datumtag]))
+						echo $dr_arr[$datumtag]['start'];
+					echo '</td><td>';
+					if (array_key_exists('ende', $dr_arr[$datumtag]))
+						echo $dr_arr[$datumtag]['ende'];
+					echo '</td>';
+					echo '<td colspan="2"></td>';
+					echo '<td>';
+//					if(!isset($_GET['filter']) && ($datumtag > $sperrdatum))
+//						echo '<a href="'.$_SERVER['PHP_SELF'].'?type=edit&zeitaufzeichnung_id='.$dr_arr[$datumtag]['id'].'" class="Item">'.$p->t("global/bearbeiten").'</a>';
+					echo "</td>\n";
+					echo "<td>";
+					if(!isset($_GET['filter']) && ($datumtag > $sperrdatum))
+						echo '<a href="'.$_SERVER['PHP_SELF'].'?type=delete&zeitaufzeichnung_id='.$dr_arr[$datumtag]['id'].'" class="Item"  onclick="return confdel()">'.$p->t("global/loeschen").'</a>';
+					echo "</td>\n";
+					echo '</tr>';
+					unset($dr_arr[$datumtag]);
+				}
+
 				if ($row->uid)
 				{
 				$wochensumme = $datum_obj->sumZeit($wochensumme, $row->diff);
@@ -1314,8 +1366,11 @@ if($projekt->getProjekteMitarbeiter($user, true))
 				if ($row->aktivitaet_kurzbz == 'LehreExtern')
 					$extlehrearr[] = array("start"=>$row->start, "ende"=>$row->ende, "diff"=>$row->diff);
 				}
+
 		    }
 			echo '';
+
+
 			if ($alle===false)
 			{
 				echo	'
@@ -1456,4 +1511,5 @@ function getZeitaufzeichnung($user, $von, $bis)
 	$za->getListeUserFromTo($user, $von, $bis);
 	return $za;
 }
+
 ?>

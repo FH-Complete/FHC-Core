@@ -25,6 +25,7 @@ require_once('../../../config/global.config.inc.php');
 require_once('../../../include/functions.inc.php');
 require_once('../../../include/globals.inc.php');
 require_once('../../../include/studiengang.class.php');
+require_once('../../../include/studienordnung.class.php');
 require_once('../../../include/person.class.php');
 require_once('../../../include/datum.class.php');
 require_once('../../../include/betriebsmittel.class.php');
@@ -34,6 +35,7 @@ require_once('../../../include/phrasen.class.php');
 require_once('../../../include/betriebsmittel_betriebsmittelstatus.class.php');
 require_once('../../../include/benutzer.class.php');
 require_once('../../../include/mitarbeiter.class.php');
+require_once('../../../include/prestudent.class.php');
 require_once('../../../include/student.class.php');
 require_once('../../../include/kontakt.class.php');
 require_once('../../../include/fotostatus.class.php');
@@ -291,8 +293,21 @@ if ($type == 'student' && (!defined('CIS_PROFIL_STUDIENINFORMATION_ANZEIGEN') ||
 {
 	$studiengang->load($user->studiengang_kz);
 
+	$prestudent = new prestudent($user->prestudent_id);
+	if ($prestudent->getLastStatus($user->prestudent_id))
+	{
+		$studienplan_id = $prestudent->studienplan_id;
+		$studienordnung = new studienordnung();
+		if ($studienordnung->getStudienordnungFromStudienplan($studienplan_id))
+		{
+			$studiengangbezeichnung_sto = $studienordnung->__get('studiengangbezeichnung');
+		}
+	}
+
+	$studiengang_bezeichnung = empty($studiengangbezeichnung_sto) ? $studiengang->bezeichnung : $studiengangbezeichnung_sto;
+
 	echo "
-	".$p->t('global/studiengang').": $studiengang->bezeichnung<br>
+	".$p->t('global/studiengang').": $studiengang_bezeichnung<br>
 	".$p->t('global/semester').": $user->semester <a href='#' onClick='javascript:window.open(\"../stud_in_grp.php?kz=$user->studiengang_kz&sem=$user->semester\",\"_blank\",\"width=600,height=500,location=no,menubar=no,status=no,toolbar=no,scrollbars=yes, resizable=1\");return false;'>".$p->t('benotungstool/liste')."</a><br>
 	".$p->t('global/verband').": $user->verband ".($user->verband!=' '?"<a href='#' onClick='javascript:window.open(\"../stud_in_grp.php?kz=$user->studiengang_kz&sem=$user->semester&verband=$user->verband\",\"_blank\",\"width=600,height=500,location=no,menubar=no,status=no,toolbar=no,scrollbars=yes, resizable=1\");return false;'>".$p->t('benotungstool/liste')."</a>":"")."<br>
 	".$p->t('global/gruppe').": $user->gruppe ".($user->gruppe!=' '?"<a href='#' onClick='javascript:window.open(\"../stud_in_grp.php?kz=$user->studiengang_kz&sem=$user->semester&verband=$user->verband&grp=$user->gruppe\",\"_blank\",\"width=600,height=500,location=no,menubar=no,status=no,toolbar=no,scrollbars=yes, resizable=1\");return false;'>".$p->t('benotungstool/liste')."</a>":"")."<br>";

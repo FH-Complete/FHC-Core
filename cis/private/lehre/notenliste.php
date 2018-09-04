@@ -32,9 +32,11 @@ require_once('../../../include/datum.class.php');
 require_once('../../../include/note.class.php');
 require_once('../../../include/phrasen.class.php');
 require_once('../../../include/studiengang.class.php');
+require_once('../../../include/studienordnung.class.php');
 require_once('../../../include/lehrveranstaltung.class.php');
 require_once('../../../include/pruefung.class.php');
 require_once('../../../include/benutzerberechtigung.class.php');
+require_once('../../../include/prestudent.class.php');
 
 $sprache = getSprache();
 $p = new phrasen($sprache);
@@ -118,7 +120,7 @@ if(!check_student($user))
 }
 else
 {
-	$qry = "SELECT vw_student.vorname, vw_student.nachname, tbl_studiengang.studiengang_kz 
+	$qry = "SELECT vw_student.vorname, vw_student.nachname, vw_student.prestudent_id, tbl_studiengang.studiengang_kz 
 		FROM public.tbl_studiengang JOIN campus.vw_student USING (studiengang_kz) 
 		WHERE campus.vw_student.uid = ".$db->db_add_param($user).";";
 	
@@ -133,6 +135,19 @@ else
 		$stg_obj = new studiengang();
 		$stg_obj->load($row->studiengang_kz);
 		$stg_name = $stg_obj->bezeichnung_arr[$sprache];
+		$prestudent_id = $row->prestudent_id;
+		$prestudent = new prestudent($prestudent_id);
+		if ($prestudent->getLastStatus($prestudent_id))
+		{
+			$studienplan_id = $prestudent->studienplan_id;
+			$studienordnung = new studienordnung();
+			if ($studienordnung->getStudienordnungFromStudienplan($studienplan_id))
+			{
+				$studiengangbezeichnung_sto = $sprache === 'English' ? $studienordnung->__get('studiengangbezeichnung_englisch') : $studienordnung->__get('studiengangbezeichnung');
+			}
+		}
+
+		$studiengang_bezeichnung = empty($studiengangbezeichnung_sto) ? $stg_name : $studiengangbezeichnung_sto;
 	}
 
 	$notenarr=array();
@@ -152,7 +167,7 @@ else
 	
 	echo "<br />";
 	echo "<b>".$p->t('global/name').":</b> $vorname $nachname<br />";
-	echo "<b>".$p->t('global/studiengang').":</b>  $stg_name<br />";
+	echo "<b>".$p->t('global/studiengang').":</b>  $studiengang_bezeichnung<br />";
 	echo "<b>".$p->t('global/studiensemester')."</b> <SELECT name='stsem' onChange=\"MM_jumpMenu('self',this,0)\">";
     echo "<OPTION value='notenliste.php?stsem=alle".$getParam."'>alle Semester</OPTION>";
 	foreach ($stsem_obj->studiensemester as $semrow)

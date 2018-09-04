@@ -487,7 +487,7 @@ class zeitaufzeichnung extends basis_db
 		$where = "uid=".$this->db_add_param($user);
 		if ($days!='')
 			$where.= " AND ende>(now() - INTERVAL '".$days." days')";
-		$where_join = "and z.uid=".$this->db_add_param($user);
+		$where_join = "and (z.aktivitaet_kurzbz != 'DienstreiseMT' or z.aktivitaet_kurzbz is null) and z.uid=".$this->db_add_param($user);
 		if ($days!='')
 			$where_join.= " AND z.ende>(now() - INTERVAL '".$days." days')";
 		if ($days=='')
@@ -530,6 +530,64 @@ class zeitaufzeichnung extends basis_db
 				$obj->datum = $row->dates;
 
 				$this->result[] = $obj;
+	    	}
+	    	return true;
+	    }
+	    else
+	    {
+	    	$this->errormsg = 'Fehler beim Laden der Daten';
+	    	return false;
+	    }
+	}
+
+	/**
+	 * Laedt die Zeitaufzeichnungen eines Users aufgefüllt mit lehren Tagen.
+	 * Default: Die letzten 40 Tage
+	 * @param string $user
+	 * @param integer $days deafult: 40 Tage
+	 */
+	public function getDienstreisenUser($user, $days='40')
+	{
+		$where = "uid=".$this->db_add_param($user);
+		if ($days!='')
+			$where.= " AND ende>(now() - INTERVAL '".$days." days')";
+		$where .= " AND aktivitaet_kurzbz = 'DienstreiseMT'";
+	   $qry = "SELECT
+	    		zeitaufzeichnung_id, start::date as starttag, TO_CHAR(start, 'HH24:MI') as startzeit, ende::date as endtag, TO_CHAR(ende, 'HH24:MI') as endzeit
+	    		FROM campus.tbl_zeitaufzeichnung
+	    		where $where
+				ORDER BY ende DESC
+			  ";
+
+	    if($result = $this->db_query($qry))
+	    {
+			$dr_arr = array();
+	    	while($row = $this->db_fetch_object($result))
+	    	{
+				if (array_key_exists($row->starttag, $dr_arr))
+				{
+	    			$dr_arr[$row->starttag]['start'] = $row->startzeit;
+					$dr_arr[$row->starttag]['id'] = $row->zeitaufzeichnung_id;
+				}
+				else
+				{
+					$dr_arr[$row->starttag] = array();
+					$dr_arr[$row->starttag]['start'] = $row->startzeit;
+					$dr_arr[$row->starttag]['id'] = $row->zeitaufzeichnung_id;
+				}
+				if (array_key_exists($row->endtag, $dr_arr))
+				{
+					$dr_arr[$row->endtag]['ende'] = $row->endzeit;
+					$dr_arr[$row->endtag]['id'] = $row->zeitaufzeichnung_id;
+				}
+				else
+				{
+					$dr_arr[$row->endtag] = array();
+					$dr_arr[$row->endtag]['ende'] = $row->endzeit;
+					$dr_arr[$row->endtag]['id'] = $row->zeitaufzeichnung_id;
+				}
+
+				$this->result = $dr_arr;
 	    	}
 	    	return true;
 	    }
@@ -683,6 +741,49 @@ or not exists
 	    }
 
 	    return $lehre_arr;
+	}
+
+	/**
+	 * Holt das Datum bis zu dem die Eintragung für einen bestimmten User gesperrt ist
+	 * @param string $user
+	 * @return string $tag Y-m-d or false
+	 */
+
+	public function getEintragungGesperrtBisForUser($user)
+	{
+		//check if addon casetime is installed
+		$qrytable = "
+		SELECT EXISTS(
+		    SELECT *
+		    FROM information_schema.tables
+		    WHERE
+		      table_schema = 'addon' AND
+		      table_name = 'tbl_casetime_timesheet'
+		);
+		";
+
+		$res = $this->db_query($qrytable);
+		if ($this->db_fetch_row($res)[0]===true)
+		{
+			//check if sent timesheets for the UID exist
+			$where = "uid=".$this->db_add_param($user);
+
+			$qry = "select max(datum) from addon.tbl_casetime_timesheet where ".$where." and abgeschicktamum is not null";
+
+		    if($result = $this->db_query($qry))
+		    {
+				$datum = $this->db_fetch_object($result);
+				return $datum->max;
+		    }
+		    else
+		    {
+		    	return false;
+		    }
+		}
+		else
+		{
+			return false;
+		}
 	}
 }
 ?>
