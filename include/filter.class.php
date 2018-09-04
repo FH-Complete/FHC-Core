@@ -33,7 +33,7 @@ class filter extends basis_db
 	//Tabellenspalten
 	protected $filter_id;				// integer (PK)
 	protected $kurzbz;					// varchar(32) unique
-	protected $bezeichnung;				// varchar(32)
+	protected $bezeichnung;				// varchar(64) (label shown before filter dropdown)
 	protected $sql;						// text
 	protected $valuename;				// varchar(32)
 	protected $showvalue;				// boolean  (should the value be showed in the input widget
