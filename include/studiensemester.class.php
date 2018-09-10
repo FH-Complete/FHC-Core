@@ -1020,72 +1020,134 @@ class studiensemester extends basis_db
 			$this->errormsg = 'Fehler beim Ermitteln des Studiensemesters';
 			return false;
 		}
-	}    
-    
-    /**
+	}
+	
+	/**
 	 * Gibt das Wintersemester eines Studienjahres zurück (zb WS2017)
+	 *
 	 * @param $studienjahr_kurzbz
 	 * @return boolean true, wenn ein Studiensemester gefunden wurde, sonst false
 	 */
-    public function getWSFromStudienjahr($studienjahr_kurzbz)
-    {       
-         $qry = "
-          SELECT studiensemester_kurzbz
-          FROM tbl_studiensemester 
-          WHERE studienjahr_kurzbz LIKE " . $this->db_add_param($studienjahr_kurzbz) . "
-          AND studiensemester_kurzbz LIKE 'WS%';";
-
-        if ($result = $this->db_query($qry)) 
-        {
-            if($row = $this->db_fetch_object())
+	public function getWSFromStudienjahr($studienjahr_kurzbz)
+	{
+		$qry = "
+			SELECT studiensemester_kurzbz
+			FROM tbl_studiensemester 
+			WHERE studienjahr_kurzbz LIKE " . $this->db_add_param($studienjahr_kurzbz) . "
+			AND studiensemester_kurzbz LIKE 'WS%';";
+		
+		if ($result = $this->db_query($qry))
+		{
+			if ($row = $this->db_fetch_object())
 			{
-                $this->result = $row->studiensemester_kurzbz;
-                return true;
-            }
-            else
-            {
-                $this->errormsg = 'Es wurde kein Wintersemester in diesem Studienjahr gefunden';
-                return false;  
-            }
-        }
-        else
-        {
-            $this->errormsg = 'Fehler beim Laden der Daten';
-            return false;  
-        }
-    }
-    
-     /**
+				$this->result = $row->studiensemester_kurzbz;
+				return true;
+			}
+			else
+			{
+				$this->errormsg = 'Es wurde kein Wintersemester in diesem Studienjahr gefunden';
+				return false;
+			}
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+	}
+	
+	/**
 	 * Gibt das Sommersemester eines Studienjahres zurück (zb SS2018)
+	 *
 	 * @param $studienjahr_kurzbz
 	 * @return boolean true, wenn ein Studiensemester gefunden wurde, sonst false
 	 */
-     public function getSSFromStudienjahr($studienjahr_kurzbz)
-    {       
-         $qry = "
-          SELECT studiensemester_kurzbz
-          FROM tbl_studiensemester 
-          WHERE studienjahr_kurzbz LIKE " . $this->db_add_param($studienjahr_kurzbz) . "
-          AND studiensemester_kurzbz LIKE 'SS%';";
-
-        if ($result = $this->db_query($qry)) 
-        {
-            if($row = $this->db_fetch_object())
+	public function getSSFromStudienjahr($studienjahr_kurzbz)
+	{
+		$qry = "
+			SELECT studiensemester_kurzbz
+			FROM tbl_studiensemester 
+			WHERE studienjahr_kurzbz LIKE " . $this->db_add_param($studienjahr_kurzbz) . "
+			AND studiensemester_kurzbz LIKE 'SS%';";
+		
+		if ($result = $this->db_query($qry))
+		{
+			if ($row = $this->db_fetch_object())
 			{
-                $this->result = $row->studiensemester_kurzbz;
-                return true;
-            }
-            else
-            {
-                $this->errormsg = 'Es wurde kein Sommersemester in diesem Studienjahr gefunden';
-                return false;  
-            }
-        }
-        else
-        {
-            $this->errormsg = 'Fehler beim Laden der Daten';
-            return false;  
-        }
-    }
+				$this->result = $row->studiensemester_kurzbz;
+				return true;
+			}
+			else
+			{
+				$this->errormsg = 'Es wurde kein Sommersemester in diesem Studienjahr gefunden';
+				return false;
+			}
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+	}
+	
+	/**
+	 * Gibt die Studiensemester zwischen $studiensemesterStart und $studiensemesterEnde zurück
+	 * Wenn $inklusive true ist (default), werden auch $studiensemesterStart und $studiensemesterEnde selbst zurückgegeben
+	 *
+	 * @param string $studiensemesterStart
+	 * @param string $studiensemesterEnde
+	 * @param boolean $inklusive Default true.
+	 * @return boolean true, wenn ein Studiensemester gefunden wurde, sonst false
+	 */
+	public function getStudiensemesterBetween($studiensemesterStart, $studiensemesterEnde, $inklusive = true)
+	{
+		if ($studiensemesterStart == '' || $studiensemesterStart == '')
+		{
+			$this->errormsg = 'Es muss ein Wert bei $studiensemesterStart und bei $studiensemesterEnde vorhanden sein';
+			return false;
+		}
+		if ($inklusive = true)
+			$equalSign = '=';
+		else 
+			$equalSign = '';
+		$qry = "
+			SELECT *
+			FROM PUBLIC.tbl_studiensemester
+			WHERE start >" . $equalSign . " (
+					SELECT start
+					FROM PUBLIC.tbl_studiensemester
+					WHERE studiensemester_kurzbz = " . $this->db_add_param($studiensemesterStart) . "
+					)
+				AND ende <" . $equalSign . " (
+					SELECT ende
+					FROM PUBLIC.tbl_studiensemester
+					WHERE studiensemester_kurzbz = " . $this->db_add_param($studiensemesterEnde) . "
+					)
+			ORDER BY start DESC;";
+		
+		if($this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object())
+			{
+				$stsem_obj = new studiensemester();
+				
+				$stsem_obj->studiensemester_kurzbz = $row->studiensemester_kurzbz;
+				$stsem_obj->start = $row->start;
+				$stsem_obj->ende = $row->ende;
+				$stsem_obj->bezeichnung = $row->bezeichnung;
+				$stsem_obj->studienjahr_kurzbz = $row->studienjahr_kurzbz;
+				$stsem_obj->beschreibung = $row->beschreibung;
+				$stsem_obj->onlinebewerbung = $row->onlinebewerbung;
+				
+				$this->studiensemester[] = $stsem_obj;
+			}
+			return true;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Studiensemester';
+			return false;
+		}
+	}
 }
 ?>
