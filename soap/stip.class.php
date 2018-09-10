@@ -512,7 +512,7 @@ class stip extends basis_db
 
 		$obj = new zeugnisnote();
 		$ects=0;
-		if(!$obj->getZeugnisnoten($lehrveranstaltung_id=null, $uid, $studiensemester_kurzbz=null))
+		if(!$obj->getZeugnisnoten(null, $uid, $studiensemester_kurzbz))
 			die('Fehler beim Laden der Noten:'.$obj->errormsg);
 		foreach($obj->result as $row)
 		{
