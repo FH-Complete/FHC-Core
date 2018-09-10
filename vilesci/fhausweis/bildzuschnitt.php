@@ -115,18 +115,10 @@ $PHP_SELF = $_SERVER['PHP_SELF']; ?>
 					height: 400
 				}
 			});
-
-// 			$(".croppie-container").addClass("ready");
-// 			$uploadCrop.croppie("bind",
-// 			{
-// 				url: 'Mani.jpg'
-// 			}).then(function()
-// 			{
-// 				console.log("jQuery bind complete");
-// 			});
 			
 			// Empfehlung von https://www.passbildgroesse.de/ sind 827x1063. Das Seitenverhältnis 828x1104 passt aber besser zum FH-Ausweis
 			$("#fileselect").on("change", function () { readFile(this); });
+			
 			$("#submitimage").on("click", function (ev)
 			{
 				// Check ob File gewählt wurde
@@ -197,8 +189,8 @@ $PHP_SELF = $_SERVER['PHP_SELF']; ?>
 
 		function readFile(input)
 		{
- 			if (input.files && input.files[0])
- 	 		{
+			if (input.files && input.files[0])
+			{
 				var reader = new FileReader();
 
 				reader.onload = function (e)
@@ -206,7 +198,8 @@ $PHP_SELF = $_SERVER['PHP_SELF']; ?>
 					var image = new Image();
 					image.src = e.target.result;
 
-					image.onload = function () {
+					image.onload = function () 
+					{
 						// Check auf Filetype
 						var splittedSource = this.src.split(';'); // base64 String splitten
 						var filetype = splittedSource[0];
@@ -226,6 +219,7 @@ $PHP_SELF = $_SERVER['PHP_SELF']; ?>
 						else
 						{
 							$(".croppie-container").addClass("ready");
+							
 							$uploadCrop.croppie("bind",
 							{
 								url: e.target.result
@@ -300,7 +294,7 @@ if ($person_id != '')
 				echo '<div class=""><img class="croppie-container" src="../../content/bild.php?src='.$typ.'&person_id='.$person_id.'" /></div>';
 				echo'
 						<div class="">
-							<input id="fileselect" type="file" name="file" class="file" />
+							<input id="fileselect" type="file" name="file" class="file" accept=".jpg, .jpeg"/>
 						</div><br>
 						<input id="submitimage" type="button" name="submitimage" value="Upload" class="btn btn-labeled btn-primary">
 						<input type="hidden" name="fileupload" id="fileupload">
@@ -350,78 +344,6 @@ function resize($filename, $width, $height)
 	imagedestroy($image_p);
 	@imagedestroy($image);
 	return $tmpfname;
-}
-
-// Sendet eine Email an die Assistenz, dass ein neues Dokument hochgeladen wurde
-function sendDokumentupload($empfaenger_stgkz, $dokument_kurzbz, $orgform_kurzbz, $studiensemester_kurzbz, $prestudent_id, $dms_id)
-{
-	global $person_id, $p;
-
-	// Array fuer Mailempfaenger. Vorruebergehende Loesung. Kindlm am 28.10.2015
-	$empf_array = array();
-	if (defined('BEWERBERTOOL_UPLOAD_EMPFAENGER'))
-		$empf_array = unserialize(BEWERBERTOOL_UPLOAD_EMPFAENGER);
-
-	$person = new person();
-	$person->load($person_id);
-	$dokumentbezeichnung = '';
-
-	$studiengang = new studiengang();
-	$studiengang->load($empfaenger_stgkz);
-	$typ = new studiengang();
-	$typ->getStudiengangTyp($studiengang->typ);
-
-	$email = $p->t('bewerbung/emailDokumentuploadStart');
-	$email .= '<br><table style="font-size:small"><tbody>';
-	$email .= '<tr><td><b>' . $p->t('global/studiengang') . '</b></td><td>' . $typ->bezeichnung . ' ' . $studiengang->bezeichnung . ($orgform_kurzbz != '' ? ' (' . $orgform_kurzbz . ')' : '') . '</td></tr>';
-	$email .= '<tr><td><b>' . $p->t('global/studiensemester') . '</b></td><td>' . $studiensemester_kurzbz . '</td></tr>';
-	$email .= '<tr><td><b>' . $p->t('global/name') . '</b></td><td>' . $person->vorname . ' ' . $person->nachname . '</td></tr>';
-	$email .= '<tr><td><b>' . $p->t('bewerbung/dokument') . '</b></td><td>';
-	$akte = new akte();
-	$akte->getAkten($person_id, $dokument_kurzbz);
-	foreach ($akte->result as $row)
-	{
-		$dokument = new dokument();
-		$dokument->loadDokumenttyp($row->dokument_kurzbz);
-		if ($row->insertvon == 'online')
-		{
-			if ($row->nachgereicht == true)
-				$email .= '- ' . $dokument->bezeichnung_mehrsprachig[DEFAULT_LANGUAGE] . ' -> ' . $p->t('bewerbung/dokumentWirdNachgereicht') . '<br>';
-			else
-				$email .= '<a href="' . APP_ROOT . 'cms/dms.php?id=' . $dms_id . '">' . $dokument->bezeichnung_mehrsprachig[DEFAULT_LANGUAGE] . ' [' . $row->bezeichnung . ']</a><br>';
-			$dokumentbezeichnung = $dokument->bezeichnung_mehrsprachig[DEFAULT_LANGUAGE];
-		}
-	}
-	$email .= '</td>';
-	$email .= '<tr><td><b>' . $p->t('bewerbung/prestudentID') . '</b></td><td>' . $prestudent_id . '</td></tr>';
-	$email .= '</tbody></table>';
-	$email .= '<br>' . $p->t('bewerbung/emailBodyEnde');
-	
-	// An der FHTW werden alle Mails von Bachelor-Studiengängen an das Infocenter geschickt, solange die Bewerbung noch nicht bestätigt wurde
-	if (CAMPUS_NAME == 'FH Technikum Wien')
-	{
-		if(	defined('BEWERBERTOOL_MAILEMPFANG') && 
-			BEWERBERTOOL_MAILEMPFANG != '' && 
-			$studiengang->typ == 'b')
-		{
-			$empfaenger = BEWERBERTOOL_MAILEMPFANG;
-		}
-		else
-			$empfaenger = getMailEmpfaenger($studiengang->typ, '', $orgform_kurzbz);
-	}
-	else 
-	{
-		$empfaenger = getMailEmpfaenger($empfaenger_stgkz);
-	}
-	
-	$mail = new mail($empfaenger, 'no-reply', $p->t('bewerbung/dokumentuploadZuBewerbung', array(
-		$dokumentbezeichnung
-	)) . ' ' . $person->vorname . ' ' . $person->nachname, 'Bitte sehen Sie sich die Nachricht in HTML Sicht an, um den Link vollständig darzustellen.');
-	$mail->setHTMLContent($email);
-	if (! $mail->send())
-		return false;
-	else
-		return true;
 }
 
 ?>

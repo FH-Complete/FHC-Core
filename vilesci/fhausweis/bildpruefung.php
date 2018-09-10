@@ -479,7 +479,7 @@ if($result = $db->db_query($qry))
 			<tr>
 				<td class="hoverbox">
 					<a href="#">';
-				// Wenn es keine Akte mit Lichtbild gibt, das Foto der Person laden, sonst aus der Akte
+				// Wenn es eine Akte mit Lichtbild gibt, das Foto der Akte laden, sonst aus der Person
 				if ($row->dokument_kurzbz == 'Lichtbil')
 				{
 					echo '	<p class="previewtext">Originalvorschau</p>
