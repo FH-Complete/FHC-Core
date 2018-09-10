@@ -57,4 +57,4 @@ $this->phrasen['zeitaufzeichnung/stunden']='Stunden';
 $this->phrasen['zeitaufzeichnung/taetigkeit']='Tätigkeit';
 $this->phrasen['zeitaufzeichnung/keineprojekte']='keine Projekte vorhanden';
 $this->phrasen['zeitaufzeichnung/summe']='Summe:';
-?>
+$this->phrasen['zeitaufzeichnung/dienstreise']='Dienstreise';

@@ -21,18 +21,19 @@
  * Erstellt eine Liste mit den Noten des eingeloggten Studenten
  * das betreffende Studiensemester kann ausgewaehlt werden
  */
-require_once ('../../../config/cis.config.inc.php');
-require_once ('../../../config/global.config.inc.php');
-require_once ('../../../include/functions.inc.php');
-require_once ('../../../include/studiensemester.class.php');
-require_once ('../../../include/datum.class.php');
-require_once ('../../../include/note.class.php');
-require_once ('../../../include/phrasen.class.php');
-require_once ('../../../include/studiengang.class.php');
-require_once ('../../../include/lehrveranstaltung.class.php');
-require_once ('../../../include/pruefung.class.php');
-require_once ('../../../include/benutzerberechtigung.class.php');
-require_once ('../../../include/prestudent.class.php');
+require_once('../../../config/cis.config.inc.php');
+require_once('../../../config/global.config.inc.php');
+require_once('../../../include/functions.inc.php');
+require_once('../../../include/studiensemester.class.php');
+require_once('../../../include/datum.class.php');
+require_once('../../../include/note.class.php');
+require_once('../../../include/phrasen.class.php');
+require_once('../../../include/studiengang.class.php');
+require_once('../../../include/studienordnung.class.php');
+require_once('../../../include/lehrveranstaltung.class.php');
+require_once('../../../include/pruefung.class.php');
+require_once('../../../include/benutzerberechtigung.class.php');
+require_once('../../../include/prestudent.class.php');
 
 $sprache = getSprache();
 $p = new phrasen($sprache);
@@ -151,6 +152,19 @@ else
 		$stg_obj = new studiengang();
 		$stg_obj->load($row->studiengang_kz);
 		$stg_name = $stg_obj->bezeichnung_arr[$sprache];
+		$prestudent_id = $row->prestudent_id;
+		$prestudent = new prestudent($prestudent_id);
+		if ($prestudent->getLastStatus($prestudent_id))
+		{
+			$studienplan_id = $prestudent->studienplan_id;
+			$studienordnung = new studienordnung();
+			if ($studienordnung->getStudienordnungFromStudienplan($studienplan_id))
+			{
+				$studiengangbezeichnung_sto = $sprache === 'English' ? $studienordnung->__get('studiengangbezeichnung_englisch') : $studienordnung->__get('studiengangbezeichnung');
+			}
+		}
+
+		$studiengang_bezeichnung = empty($studiengangbezeichnung_sto) ? $stg_name : $studiengangbezeichnung_sto;
 	}
 	
 	$notenarr = array();
@@ -178,10 +192,10 @@ else
 	$stsem_obj->getStudiensemesterBetween($firstStudiensemester, $lastStudiensemester);
 	
 	echo "<br />";
-	echo "<b>" . $p->t('global/name') . ":</b> $vorname $nachname<br />";
-	echo "<b>" . $p->t('global/studiengang') . ":</b>  $stg_name<br />";
-	echo "<b>" . $p->t('global/studiensemester') . "</b> <SELECT name='stsem' onChange=\"MM_jumpMenu('self',this,0)\">";
-	echo "<OPTION value='notenliste.php?stsem=alle" . $getParam . "'>alle Semester</OPTION>";
+	echo "<b>".$p->t('global/name').":</b> $vorname $nachname<br />";
+	echo "<b>".$p->t('global/studiengang').":</b>  $studiengang_bezeichnung<br />";
+	echo "<b>".$p->t('global/studiensemester')."</b> <SELECT name='stsem' onChange=\"MM_jumpMenu('self',this,0)\">";
+    echo "<OPTION value='notenliste.php?stsem=alle".$getParam."'>alle Semester</OPTION>";
 	foreach ($stsem_obj->studiensemester as $semrow)
 	{
 		if ($stsem == $semrow->studiensemester_kurzbz)

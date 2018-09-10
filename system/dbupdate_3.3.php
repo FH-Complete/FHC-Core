@@ -2297,6 +2297,31 @@ if($result = @$db->db_query("SELECT * FROM information_schema.role_table_grants 
 	}
 }
 
+// Add UNIQUE constraint on kurzbz from public.tbl_filter
+if($result = @$db->db_query("SELECT conname FROM pg_constraint WHERE conname = 'uk_filter_kurzbz'"))
+{
+	if($db->db_num_rows($result) == 0)
+	{
+		$qry = "ALTER TABLE public.tbl_filter ADD CONSTRAINT uk_filter_kurzbz UNIQUE(kurzbz);";
+
+		if(!$db->db_query($qry))
+			echo '<strong>public.tbl_filter '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>Added UNIQUE constraint on "kurzbz" from public.tbl_filter<br>';
+	}
+}
+
+// Reporting filter: bezeichnung
+if(!$result = @$db->db_query("SELECT bezeichnung FROM public.tbl_filter LIMIT 1"))
+{
+	$qry = "ALTER TABLE public.tbl_filter ADD COLUMN bezeichnung varchar(65);";
+
+	if(!$db->db_query($qry))
+		echo '<strong>public.tbl_filter: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>public.tbl_filter: Spalte bezeichnung hinzugefuegt';
+}
+
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
 
@@ -2462,7 +2487,7 @@ $tabellen=array(
 	"public.tbl_dokumentstudiengang"  => array("dokument_kurzbz","studiengang_kz","ext_id", "onlinebewerbung", "pflicht","beschreibung_mehrsprachig","nachreichbar"),
 	"public.tbl_erhalter"  => array("erhalter_kz","kurzbz","bezeichnung","dvr","logo","zvr"),
 	"public.tbl_fachbereich"  => array("fachbereich_kurzbz","bezeichnung","farbe","studiengang_kz","aktiv","ext_id","oe_kurzbz"),
-	"public.tbl_filter" => array("filter_id","kurzbz","sql","valuename","showvalue","insertamum","insertvon","updateamum","updatevon","type","htmlattr"),
+	"public.tbl_filter" => array("filter_id","kurzbz","sql","valuename","showvalue","insertamum","insertvon","updateamum","updatevon","type","htmlattr", "bezeichnung"),
 	"public.tbl_firma"  => array("firma_id","name","anmerkung","firmentyp_kurzbz","updateamum","updatevon","insertamum","insertvon","ext_id","schule","finanzamt","steuernummer","gesperrt","aktiv","lieferbedingungen","partner_code"),
 	"public.tbl_firma_mobilitaetsprogramm" => array("firma_id","mobilitaetsprogramm_code","ext_id"),
 	"public.tbl_firma_organisationseinheit"  => array("firma_organisationseinheit_id","firma_id","oe_kurzbz","bezeichnung","kundennummer","updateamum","updatevon","insertamum","insertvon","ext_id"),

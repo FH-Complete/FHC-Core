@@ -44,6 +44,7 @@
 	$filter = new filter();
 	$filter->filter_id		= '';
 	$filter->kurzbz			= 'NewFilter';
+	$filter->bezeichnung	= 'New Filter';
 	$filter->sql			= 'SELECT foo AS value, bar AS name FROM foobar WHERE ... ORDER BY name';
 	$filter->valuename		= '';
 	$filter->showvalue		= true;
@@ -68,6 +69,7 @@
 		}
 
 		$filter->kurzbz = $_POST["kurzbz"];
+		$filter->bezeichnung = $_POST["bezeichnung"];
 		$filter->valuename = $_POST["valuename"];
 		$filter->sql = $_POST["sql"];
 		$filter->showvalue = isset($_POST["showvalue"]);
@@ -104,19 +106,21 @@
 	$htmlstr .= "	<table class='detail'>\n";
 	$htmlstr .= "			<tr>\n";
 	$htmlstr .= "				<td>KurzBz</td>\n";
-	$htmlstr .= "				<td><input class='detail' type='text' name='kurzbz' size='16' maxlength='32' value='".$filter->kurzbz."' onchange='submitable()'></td>\n";
+	$htmlstr .= "				<td><input class='detail' type='text' name='kurzbz' size='12' maxlength='24' value='".$filter->kurzbz."' onchange='submitable()'></td>\n";
+	$htmlstr .= "				<td>Bezeichnung</td>\n";
+	$htmlstr .= "				<td><input class='detail' type='text' name='bezeichnung' size='12' maxlength='24' value='".$filter->bezeichnung."' onchange='submitable()'></td>\n";
 	$htmlstr .= "				<td>ValueName</td>\n";
-	$htmlstr .= "				<td><input class='detail' type='text' name='valuename' size='16' maxlength='32' value='".$filter->valuename."' onchange='submitable()'></td>\n";
+	$htmlstr .= "				<td><input class='detail' type='text' name='valuename' size='12' maxlength='24' value='".$filter->valuename."' onchange='submitable()'></td>\n";
 	$htmlstr .= "				<td>Type</td>\n";
-	$htmlstr .= "				<td><input class='detail' type='text' name='type' size='16' maxlength='32' value='".$filter->type."' onchange='submitable()'></td>\n";
+	$htmlstr .= "				<td><input class='detail' type='text' name='type' size='12' maxlength='24' value='".$filter->type."' onchange='submitable()'></td>\n";
 	$htmlstr .= "				<td>ShowValue</td>\n";
 	$htmlstr .= "				<td><input class='detail' type='checkbox' name='showvalue' $chk onchange='submitable()'></td>\n";
 	$htmlstr .= "			</tr>\n";
 	$htmlstr .= "			<tr>\n";
 	$htmlstr .= "				<td valign='top'>SQL</td>\n";
-	$htmlstr .= " 				<td colspan='5'><textarea name='sql' cols='70' rows='6' onchange='submitable()'>".$filter->sql."</textarea></td>\n";
+	$htmlstr .= " 				<td colspan='7'><textarea name='sql' cols='95' rows='6' onchange='submitable()'>".$filter->sql."</textarea></td>\n";
 	$htmlstr .= "				<td valign='top'>HTML-Attributes</td>\n";
-	$htmlstr .= " 				<td colspan='2'><textarea name='htmlattr' cols='70' rows='6' onchange='submitable()'>".$filter->htmlattr."</textarea></td>\n";
+	$htmlstr .= " 				<td colspan='3'><textarea name='htmlattr' cols='70' rows='6' onchange='submitable()'>".$filter->htmlattr."</textarea></td>\n";
 	$htmlstr .= "			</tr>\n";
 	$htmlstr .= "	</table>\n";
 	$htmlstr .= "<br>\n";

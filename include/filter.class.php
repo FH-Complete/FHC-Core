@@ -33,6 +33,7 @@ class filter extends basis_db
 	//Tabellenspalten
 	protected $filter_id;				// integer (PK)
 	protected $kurzbz;					// varchar(32) unique
+	protected $bezeichnung;				// varchar(64) (label shown before filter dropdown)
 	protected $sql;						// text
 	protected $valuename;				// varchar(32)
 	protected $showvalue;				// boolean  (should the value be showed in the input widget
@@ -85,6 +86,7 @@ class filter extends basis_db
 			{
 				$this->filter_id=$row->filter_id;
 				$this->kurzbz=$row->kurzbz;
+				$this->bezeichnung=$row->bezeichnung;
 				$this->sql=$row->sql;
 				$this->valuename=$row->valuename;
 				$this->showvalue=$this->db_parse_bool($row->showvalue);
@@ -125,6 +127,7 @@ class filter extends basis_db
 
 				$obj->filter_id=$row->filter_id;
 				$obj->kurzbz=$row->kurzbz;
+				$obj->bezeichnung=$row->bezeichnung;
 				$obj->sql=$row->sql;
 				$obj->valuename=$row->valuename;
 				$obj->showvalue = $this->db_parse_bool($row->showvalue);
@@ -159,6 +162,22 @@ class filter extends basis_db
 		{
 			if ($filter->kurzbz==$kurzbz)
 				return true;
+		}
+
+		return false;
+	}
+
+	/**
+	 * Filter Bezeichnung des Filters mit einer gegebenen kurzbz holen
+	 * @param $kurzbz kurzbz des Datensatzes, der gefunden werden soll
+	 * @return string|boolean Bezeichnung wenn kurzbz gefunden, false andernfalls
+	 */
+	public function getBezeichnungFromKurzbz($kurzbz)
+	{
+		foreach ($this->result as $filter)
+		{
+			if ($filter->kurzbz==$kurzbz)
+				return $filter->__get('bezeichnung');
 		}
 
 		return false;
@@ -304,9 +323,10 @@ class filter extends basis_db
 		if($this->new)
 		{
 			//Neuen Datensatz einfuegen
-			$qry='INSERT INTO public.tbl_filter (kurzbz, sql, valuename,
+			$qry='INSERT INTO public.tbl_filter (kurzbz, bezeichnung, sql, valuename,
 					showvalue, type, htmlattr, insertamum, insertvon) VALUES ('.
 			      $this->db_add_param($this->kurzbz).', '.
+			      $this->db_add_param($this->bezeichnung).', '.
 			      $this->db_add_param($this->sql).', '.
 			      $this->db_add_param($this->valuename).', '.
 			      $this->db_add_param($this->showvalue, FHC_BOOLEAN).', '.
@@ -326,6 +346,7 @@ class filter extends basis_db
 
 			$qry='UPDATE public.tbl_filter SET'.
 				' kurzbz='.$this->db_add_param($this->kurzbz).', '.
+				' bezeichnung='.$this->db_add_param($this->bezeichnung).', '.
 				' sql='.$this->db_add_param($this->sql).', '.
 				' valuename='.$this->db_add_param($this->valuename).', '.
 				' showvalue='.$this->db_add_param($this->showvalue, FHC_BOOLEAN).', '.
