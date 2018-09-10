@@ -67,7 +67,7 @@
 							echo $lockedby;
 							if ($origin_page == 'index'): ?>
 								&nbsp;&nbsp;
-								<a href="unlockPerson/<?php echo $stammdaten->person_id; ?>?fhc_controller_id=<?php echo $fhc_controller_id; ?>">
+								<a href="unlockPerson/<?php echo $stammdaten->person_id; ?>">
 									<i class="fa fa-sign-out"></i>&nbsp;<?php echo ucfirst($this->p->t('ui', 'freigeben')) ?>
 								</a>
 							<?php endif; ?>
