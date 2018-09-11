@@ -4529,9 +4529,13 @@ function StudentAnrechnungNeu()
 	var col = tree.columns ? tree.columns["student-treecol-studiengang_kz"] : "student-treecol-studiengang_kz";
 	var stg_kz = tree.view.getCellText(tree.currentIndex,col);
 
+    // Prestudent-ID ermitteln
+    var col = tree.columns ? tree.columns["student-treecol-prestudent_id"] : "student-treecol-prestudent_id";
+    var prestudentId = tree.view.getCellText(tree.currentIndex,col);
+
 	//Lehrveranstaltung Drop Down laden
 	var LVDropDown = document.getElementById('student-anrechnungen-menulist-lehrveranstaltung');
-	url="<?php echo APP_ROOT;?>rdf/lehrveranstaltung.rdf.php?stg_kz="+stg_kz+"&"+gettimestamp();
+    url="<?php echo APP_ROOT;?>rdf/lehrveranstaltung_studienplan.rdf.php?&prestudent="+prestudentId+"&"+gettimestamp();
 
 	//Alte DS entfernen
 	var oldDatasources = LVDropDown.database.GetDataSources();
