@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2006 Technikum-Wien
+/* Copyright (C) 2018 Technikum-Wien
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
@@ -15,14 +15,9 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ * Authors: Nikolaus Krondraf <krondraf@technikum-wien.at>
  */
-/*
- * Created on 02.12.2004
- *
- */
+
 // header fuer no cache
 header("Cache-Control: no-cache");
 header("Cache-Control: post-check=0, pre-check=0",false);
@@ -41,8 +36,6 @@ require_once('../include/prestudent.class.php');
 $uid=get_uid();
 
 $error_msg='';
-$db = new basis_db();
-
 $error_msg.=loadVariables($uid);
 
 if (isset($_GET['prestudent']))
@@ -50,54 +43,11 @@ if (isset($_GET['prestudent']))
 else
     die('prestudent is not set!');
 
-if (isset($semester_aktuell))
-	$studiensemester=$semester_aktuell;
-else
-	die('studiensemester is not set!');
-
-if (isset($_GET['stg_kz']))
-	$stg_kz=$_GET['stg_kz'];
-else
-	$stg_kz=null;
-if (isset($_GET['sem']) && is_numeric($_GET['sem']))
-	$sem=$_GET['sem'];
-else
-	$sem=null;
-if(isset($_GET['uid']))
-	$student_uid = $_GET['uid'];
-else
-	$student_uid=null;
-
-if(isset($_GET['lehrveranstaltung_kompatibel_id']))
-{
-	$lehrveranstaltung_kompatibel_id = $_GET['lehrveranstaltung_kompatibel_id'];
-	isset($_GET['self']) ? $self = $_GET['self'] : $self = 1;
-}
-else
-	$lehrveranstaltung_kompatibel_id=null;
-
 $lehrveranstaltung=new lehrveranstaltung();
+$prestudent = new Prestudent();
 
-if($student_uid!='')
-	$lehrveranstaltung->load_lva_student($student_uid);
-elseif($lehrveranstaltung_kompatibel_id!='')
-{
-	// Laedt die Lehrveranstaltung und alle die dazu kompatibel sind
-	$lvid_arr = $lehrveranstaltung->loadLVkompatibel($lehrveranstaltung_kompatibel_id);
-	if($self == 1)
-		$lvid_arr[]=$lehrveranstaltung_kompatibel_id;
-
-	if(isset($_GET['lehrfach_id']))
-		$lvid_arr[]=$_GET['lehrfach_id'];
-	$lehrveranstaltung->loadArray($lvid_arr);
-}
-else
-{
-    $prestudent = new Prestudent();
-    $prestudent->getLastStatus($prestudent_id);
-
-    $lehrveranstaltung->loadLehrveranstaltungStudienplan($prestudent->studienplan_id, $sem);
-}
+$prestudent->getLastStatus($prestudent_id);
+$lehrveranstaltung->loadLehrveranstaltungStudienplan($prestudent->studienplan_id);
 
 $rdf_url='http://www.technikum-wien.at/lehrveranstaltung/';
 
@@ -109,73 +59,8 @@ echo '
 <RDF:Seq about="'.$rdf_url.'liste">
 ';
 
-if(isset($_GET['optional']) && $_GET['optional']=='true')
-{
-	echo'<RDF:li>
-      		<RDF:Description  id="" about="">
-        		<LVA:lehrveranstaltung_id><![CDATA[]]></LVA:lehrveranstaltung_id>
-        		<LVA:kurzbz><![CDATA[]]></LVA:kurzbz>
-        		<LVA:bezeichnung><![CDATA[-- keine Auswahl --]]></LVA:bezeichnung>
-        		<LVA:bezeichnung_english><![CDATA[-- keine Auswahl --]]></LVA:bezeichnung_english>
-        		<LVA:studiengang_kz><![CDATA[]]></LVA:studiengang_kz>
-        		<LVA:semester><![CDATA[0]]></LVA:semester>
-        		<LVA:sprache><![CDATA[]]></LVA:sprache>
-        		<LVA:ects><![CDATA[]]></LVA:ects>
-        		<LVA:semesterstunden><![CDATA[]]></LVA:semesterstunden>
-        		<LVA:anmerkung><![CDATA[]]></LVA:anmerkung>
-        		<LVA:lehre><![CDATA[]]></LVA:lehre>
-        		<LVA:lehreverzeichnis><![CDATA[]]></LVA:lehreverzeichnis>
-        		<LVA:aktiv><![CDATA[]]></LVA:aktiv>
-        		<LVA:planfaktor><![CDATA[]]></LVA:planfaktor>
-        		<LVA:planlektoren><![CDATA[]]></LVA:planlektoren>
-        		<LVA:planpersonalkosten><![CDATA[]]></LVA:planpersonalkosten>
-        		<LVA:plankostenprolektor><![CDATA[]]></LVA:plankostenprolektor>
-        		<LVA:lehrform_kurzbz><![CDATA[]]></LVA:lehrform_kurzbz>
-        		<LVA:orgform_kurzbz><![CDATA[]]></LVA:orgform_kurzbz>
-      		</RDF:Description>
-		</RDF:li>';
-}
-
 foreach ($lehrveranstaltung->lehrveranstaltungen as $row)
 {
-	if(isset($_GET['projektarbeit']) && $row->projektarbeit==false)
-	{
-		if(isset($_GET['withlv']) && $_GET['withlv']==$row->lehrveranstaltung_id)
-		{
-			//Diese LV soll zusaetzlich in der liste aufscheinen unabhaengig ob
-			//Projektarbeit gesetzt ist oder nicht
-		}
-		else
-			continue;
-	}
-
-	if(isset($_GET['genehmigt']))
-	{
-		// Wenn genehmigt Parameter mitgeliefert wird, dann werden nur LVs
-		// geliefert die genehmigten Studienordnungen zugeordnet sind
-		// Module werden nicht geliefert
-		$qry = "SELECT
-					count(*) as anzahl
-				FROM
-					lehre.tbl_studienplan_lehrveranstaltung
-					JOIN lehre.tbl_studienplan USING(studienplan_id)
-					JOIN lehre.tbl_studienordnung USING(studienordnung_id)
-					JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id)
-					JOIN lehre.tbl_lehrtyp USING(lehrtyp_kurzbz)
-				WHERE
-					tbl_studienplan_lehrveranstaltung.lehrveranstaltung_id=".$db->db_add_param($row->lehrveranstaltung_id)."
-					AND tbl_studienordnung.status_kurzbz='approved'
-					AND lehrtyp_kurzbz='lv'";
-		if($result_genehmigt = $db->db_query($qry))
-		{
-			if($row_genehmigt = $db->db_fetch_object($result_genehmigt))
-			{
-				if($row_genehmigt->anzahl==0)
-					continue;
-			}
-		}
-	}
-
 	echo'<RDF:li>
       		<RDF:Description  id="'.$row->lehrveranstaltung_id.'" about="'.$rdf_url.$row->lehrveranstaltung_id.'">
         		<LVA:lehrveranstaltung_id><![CDATA['.$row->lehrveranstaltung_id.']]></LVA:lehrveranstaltung_id>
