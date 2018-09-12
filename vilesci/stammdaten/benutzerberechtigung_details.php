@@ -391,7 +391,20 @@ if (isset($_REQUEST['uid']) || isset($_REQUEST['funktion_kurzbz']))
 					$sel = "";
 				$htmlstr .= "<option id='".$rolle_arr[$i]."' value='".$rolle_arr[$i]."' ".$sel." onclick='disable(\"berechtigung_kurzbz_".$b->benutzerberechtigung_id."\");' >".$rolle_arr[$i]."</option>";
 			}
-			$htmlstr .= "		</select></td>\n";
+			$htmlstr .= "		</select>";
+
+			// Wenn editiert wird, zu der Zeile Springen
+			$htmlstr.="
+			<a name='editrow'>
+			<script language='javascript'>
+			$(document).ready(function()
+			{
+				var url = location.href;
+				location.href = '#editrow'
+				history.replaceState(null,null,url);
+			});
+			</script>";
+			$htmlstr.="</td>\n";
 
 			//Berechtigung
 			$htmlstr .= "		<td name='td_$b->benutzerberechtigung_id'><select name='berechtigung_kurzbz' id='berechtigung_kurzbz_$b->benutzerberechtigung_id' ".($b->rolle_kurzbz!=''?'disabled':'')." onchange='markier(\"td_".$b->benutzerberechtigung_id."\"); setnull(\"rolle_kurzbz_$b->benutzerberechtigung_id\");'>\n";

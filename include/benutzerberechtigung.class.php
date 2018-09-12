@@ -422,6 +422,22 @@ class benutzerberechtigung extends basis_db
 				UNION
 
 				SELECT
+					benutzerberechtigung_id, tbl_benutzerfunktion.uid, tbl_benutzerrolle.funktion_kurzbz,
+					tbl_benutzerrolle.rolle_kurzbz, tbl_rolleberechtigung.berechtigung_kurzbz, tbl_benutzerrolle.art, tbl_rolleberechtigung.art art1,
+					tbl_benutzerfunktion.oe_kurzbz, tbl_benutzerrolle.studiensemester_kurzbz, tbl_benutzerrolle.start,
+					tbl_benutzerrolle.ende, tbl_benutzerrolle.negativ, tbl_benutzerrolle.updateamum, tbl_benutzerrolle.updatevon,
+					tbl_benutzerrolle.insertamum, tbl_benutzerrolle.insertvon,tbl_benutzerrolle.kostenstelle_id,tbl_benutzerrolle.anmerkung
+				FROM
+					system.tbl_benutzerrolle
+					JOIN public.tbl_benutzerfunktion USING(funktion_kurzbz)
+					JOIN system.tbl_rolleberechtigung ON(tbl_benutzerrolle.rolle_kurzbz=tbl_rolleberechtigung.rolle_kurzbz)
+				WHERE tbl_benutzerfunktion.uid=".$this->db_add_param($uid)."
+					AND (tbl_benutzerfunktion.datum_von IS NULL OR tbl_benutzerfunktion.datum_von<=now())
+					AND (tbl_benutzerfunktion.datum_bis IS NULL OR tbl_benutzerfunktion.datum_bis>=now())
+
+				UNION
+
+				SELECT
 					benutzerberechtigung_id, '', tbl_benutzerrolle.funktion_kurzbz,
 					tbl_benutzerrolle.rolle_kurzbz, tbl_benutzerrolle.berechtigung_kurzbz, tbl_benutzerrolle.art, tbl_benutzerrolle.art art1,
 					tbl_benutzerrolle.oe_kurzbz, tbl_benutzerrolle.studiensemester_kurzbz, tbl_benutzerrolle.start,

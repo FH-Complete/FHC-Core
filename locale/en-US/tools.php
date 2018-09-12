@@ -25,10 +25,10 @@ $this->phrasen['tools/nochKeineBeurteilungEingetragen']='No grade has been enter
 $this->phrasen['tools/fehlerBeimAuslesenDerNoten']='Error reading the grades.';
 $this->phrasen['tools/benotungsdatumDerZeugnisnote']='Date of grading';
 $this->phrasen['tools/hinweistextMarkierung']='The marking indicates those entries where the grade for the course is different from the grade on the report card.<b>The grade on the report card is the valid one.</b> <br>Should these details not be correct please contact the Administrative Assistant responsible.';
-$this->phrasen['tools/notendurchschnittDerZeugnisnote']='Average of final grade*';
-$this->phrasen['tools/gewichteterNotendurchschnittDerZeugnisnote']='Weighted** average of final grade*';	
-$this->phrasen['tools/legendeGewichteterNotendurchschnitt']='The weighted average grade is calculated using the grade of the course, multiplied with its ECTS, divided by the sum of all ECTS';
-$this->phrasen['tools/legendeNotendurchschnitt']='Please note that extracurricular courses (eg elective courses) may distort the calculated average grade';
+$this->phrasen['tools/notendurchschnittDerZeugnisnote']='Average grade on the certificate*';
+$this->phrasen['tools/gewichteterNotendurchschnittDerZeugnisnote']='Weighted** grade point average on the certificate*';	
+$this->phrasen['tools/legendeGewichteterNotendurchschnitt']='he weighted grade point average is calculated from the grade of the course multiplied by their ECTS divided by the sum of all ECTS';
+$this->phrasen['tools/legendeNotendurchschnitt']='Please note that extracurricular courses (eg electives) may distort the calculated grade point average';
 
 //Zahlungen
 $this->phrasen['tools/zahlungen']='Payments';

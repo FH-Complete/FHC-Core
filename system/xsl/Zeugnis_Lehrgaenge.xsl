@@ -321,6 +321,9 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
         <style:style style:name="fr3" style:family="graphic" style:parent-style-name="Graphics">
             <style:graphic-properties style:run-through="foreground" style:wrap="run-through" style:number-wrapped-paragraphs="no-limit" style:vertical-pos="bottom" style:vertical-rel="page-content" style:horizontal-pos="from-left" style:horizontal-rel="page-content" style:mirror="none" fo:clip="rect(0cm, 0cm, 0cm, 0cm)" draw:luminance="0%" draw:contrast="0%" draw:red="0%" draw:green="0%" draw:blue="0%" draw:gamma="100%" draw:color-inversion="false" draw:image-opacity="100%" draw:color-mode="standard"/>
         </style:style>
+        <style:style style:name="fr4" style:family="graphic" style:parent-style-name="Graphics">
+			<style:graphic-properties style:vertical-pos="from-top" style:vertical-rel="page" style:horizontal-pos="from-left" style:horizontal-rel="page-content" style:mirror="none" fo:clip="rect(0cm, 0cm, 0cm, 0cm)" draw:luminance="0%" draw:contrast="0%" draw:red="0%" draw:green="0%" draw:blue="0%" draw:gamma="100%" draw:color-inversion="false" draw:image-opacity="100%" draw:color-mode="standard"/>
+		</style:style>
 		<style:style style:name="frSignatur" style:family="graphic" style:parent-style-name="Frame">
 			<style:graphic-properties style:wrap="run-through" style:number-wrapped-paragraphs="no-limit" style:vertical-pos="from-top" style:vertical-rel="paragraph" style:horizontal-pos="from-left" style:horizontal-rel="paragraph" fo:padding="0cm" fo:border="none" style:shadow="none" draw:shadow-opacity="100%" style:mirror="none" fo:clip="rect(0cm, 0cm, 0cm, 0cm)" draw:luminance="0%" draw:contrast="0%" draw:red="0%" draw:green="0%" draw:blue="0%" draw:gamma="100%" draw:color-inversion="false" draw:image-opacity="100%" draw:color-mode="standard"/>
 		</style:style>
@@ -342,9 +345,10 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 			<!-- Wichtig für Mehrfachdruck (mehrere Studenten ausgewählt): Wenn ein Element (in diesem Fall Stempel und Unterschriftenblock) relativ zur SEITE ausgerichtet werden soll, 
 			muss für jedes Dokument (jeder neue Durchlauf der Schleife) ein draw:frame-Tag definiert werden. Diese müssen ALLE VOR den ersten text:p-Elementen stehen.
 			Deshalb wirde erst die Schleife für die draw:frames aufgerufen, dann folg tder Inhalt -->
-			<xsl:if test="position()=1 and not(../signed)">
+			<xsl:if test="position()=1">
 				<xsl:for-each select="../zeugnis">
 					<xsl:variable select="position()" name="number"/><!-- Variable number definieren, die nach jedem Dokument um eines erhöht wird (position) -->
+					<xsl:if test="not(../signed)">
 						<draw:frame draw:style-name="fr1" draw:name="Rahmen{$number}" text:anchor-type="page" text:anchor-page-number="{$number}" svg:y="21.001cm" draw:z-index="0">
 		                <draw:text-box fo:min-height="0.499cm" fo:min-width="2cm">
 		                    <table:table table:name="Tabelle3" table:style-name="Tabelle3">
@@ -380,6 +384,12 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 		            <draw:frame xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0" xmlns:xlink="http://www.w3.org/1999/xlink" draw:style-name="fr3" draw:name="Bild{$number}" text:anchor-type="page" text:anchor-page-number="{$number}" svg:x="5.2cm" svg:width="3.51cm" svg:height="3.51cm" draw:z-index="1">
 		                <draw:image xlink:href="Pictures/10000201000002290000022939997AEC.png" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/>
 		            </draw:frame>
+		        </xsl:if>
+				<xsl:if test="../signed">
+					<draw:frame xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0" xmlns:xlink="http://www.w3.org/1999/xlink" draw:style-name="fr4" draw:name="Logo{$number}" text:anchor-type="page" text:anchor-page-number="{$number}" svg:x="7.1cm" svg:y="1.7cm" svg:width="4.2cm" svg:height="2.16cm" draw:z-index="2">
+						<draw:image xlink:href="Pictures/LogoFHTW.png" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/>
+					</draw:frame>
+				</xsl:if>
 				</xsl:for-each>
 			</xsl:if>
             <text:p text:style-name="Seitenumbruch">ZEUGNIS</text:p>

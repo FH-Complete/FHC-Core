@@ -49,22 +49,24 @@ $datum_obj = new datum();
 	<link rel="stylesheet" href="../../skin/jquery-ui-1.9.2.custom.min.css" type="text/css">
 	<link rel="stylesheet" href="../../vendor/fgelinas/timepicker/jquery.ui.timepicker.css" type="text/css">
 	<link rel="stylesheet" type="text/css" href="../../skin/jquery-ui-1.9.2.custom.min.css">
-<script type="text/javascript" src="../../vendor/jquery/jqueryV1/jquery-1.12.4.min.js"></script>
-<script type="text/javascript" src="../../vendor/christianbach/tablesorter/jquery.tablesorter.min.js"></script>
-<script type="text/javascript" src="../../vendor/components/jqueryui/jquery-ui.min.js"></script>
-<script type="text/javascript" src="../../include/js/jquery.ui.datepicker.translation.js"></script>
-<script type="text/javascript" src="../../vendor/jquery/sizzle/sizzle.js"></script>
-	<script type="text/javascript" src="../../include/js/tablesort/table.js"></script>
 	<script type="text/javascript" src="../../vendor/jquery/jqueryV1/jquery-1.12.4.min.js"></script>
+	<script type="text/javascript" src="../../include/js/jquery.ui.datepicker.translation.js"></script>
+	<script type="text/javascript" src="../../vendor/jquery/sizzle/sizzle.js"></script>
+	<script type="text/javascript" src="../../include/js/tablesort/table.js"></script>
 	<script type="text/javascript" src="../../vendor/christianbach/tablesorter/jquery.tablesorter.min.js"></script>
 	<script type="text/javascript" src="../../vendor/components/jqueryui/jquery-ui.min.js"></script>
-	<script type="text/javascript" src="../../include/js/jquery.ui.datepicker.translation.js"></script>
 	<script type="text/javascript" src="../../vendor/fgelinas/timepicker/jquery.ui.timepicker.js"></script>
 	<script type="text/javascript">
 	$(document).ready(function()
 		{
 			$("#myTable").tablesorter(
 			{
+				// Adding Function for sorting images by title
+				textExtraction:function(s)
+				{
+					if($(s).find('img').length == 0) return $(s).text();
+					return $(s).find('img').attr('title');
+				},
 				sortList: [[0,0],[5,0]],
 				widgets: ['zebra']
 			});
@@ -356,7 +358,7 @@ $datum_obj = new datum();
 			$zukunft=false;
 
 		echo '<tr '.($aktiv==true || $passiv==true?'':'style="color:grey"').'>';
-		echo '<td width="10px" align="center">'.($aktiv==false?($zukunft==true || $passiv==true?'<img title="2 gelb" src="../../skin/images/ampel_gelb.png" alt="ampel_gelb">':'<img title="3 rot" src="../../skin/images/ampel_rot.png" alt="ampel_rot">'):'<img title="1 gruen" src="../../skin/images/ampel_gruen.png" alt="ampel_gruen">').'</td>';
+		echo '<td width="10px" align="center">'.($aktiv==false?($zukunft==true || $passiv==true?'<img title="2" src="../../skin/images/ampel_gelb.png" alt="ampel_gelb">':'<img title="3" src="../../skin/images/ampel_rot.png" alt="ampel_rot">'):'<img title="1" src="../../skin/images/ampel_gruen.png" alt="ampel_gruen">').'</td>';
 		echo '<td>',$db->convert_html_chars($row->infoscreen_content_id),'</td>';
 		echo '<td>',$db->convert_html_chars($row->infoscreen_id),'</td>';
 		echo '<td>',$db->convert_html_chars($row->content_id),'</td>';
