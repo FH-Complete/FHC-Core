@@ -52,11 +52,11 @@ if (isset($_POST['new']))
 	{
 		if(!$rechte->isBerechtigt('lehre/gruppe',null,'sui'))
 			die($rechte->errormsg);
-	
+
 		$e = new benutzergruppe();
 		$uid = $_POST['uid'];
 		if (!$e->load($uid, $kurzbz))
-		{	
+		{
 			$e->new=true;
 			$e->gruppe_kurzbz = $kurzbz;
 			$e->updateamum = date('Y-m-d H:i:s');
@@ -67,12 +67,12 @@ if (isset($_POST['new']))
 			if(!$e->save())
 				die($e->errormsg);
 		}
-		else 
+		else
 		{
 			$errormsg = '<span class="error">Diese Person ist bereits der Gruppe zugeteilt</span>';
 		}
 	}
-	else 
+	else
 		$errormsg = '<span class="error">UID '.$_POST['uid'].' wurde nicht gefunden</span>';
 }
 else if (isset($_GET['type']) && $_GET['type']=='delete')
@@ -110,6 +110,7 @@ if(!$gruppe->load($kurzbz))
 <?php
 echo "<a href='einheit_menu.php?studiengang_kz=$gruppe->studiengang_kz'>Zurück zur &Uuml;bersicht</a><br><br>";
 echo $errormsg;
+$generiertegruppe = $gruppe->generiert;
 if(!$gruppe->generiert)
 {
 	echo '
@@ -145,7 +146,7 @@ if(!$gruppe->generiert)
 	<HR>
 		';
 }
-else 
+else
 {
 	echo '	Name: <input type="text" name="uid" id="uid" disabled="disabled"/>
 			<INPUT type="submit" name="new" value="Hinzuf&uuml;gen"  disabled="disabled">
@@ -185,7 +186,7 @@ else
 			echo "<td>".$row->nachname."</td>";
 			echo "<td>".$row->vorname."</td>";
 			echo "<td>".$row->uid."</td>";
-			if(!$gruppe->generiert && $rechte->isBerechtigt('lehre/gruppe',null,'suid'))
+			if(!$generiertegruppe && $rechte->isBerechtigt('lehre/gruppe',null,'suid'))
 				echo '<td class="button"><a href="einheit_det.php?uid='.$row->uid.'&type=delete&kurzbz='.$kurzbz.'">Delete</a></td>';
 			echo "</tr>\n";
 		}
