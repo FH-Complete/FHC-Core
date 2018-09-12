@@ -1090,7 +1090,7 @@ class mitarbeiter extends benutzer
 	}
 
 	/**
-	 * Gibt ein Array mit den UIDs der Untergebenen zurueck
+	 * Gibt ein Array mit den UIDs der aktiv beschäftigten Untergebenen zurueck
 	 */
 	public function getUntergebene($uid=null)
 	{
@@ -1115,7 +1115,15 @@ class mitarbeiter extends benutzer
 		}
 
 		//Alle Personen holen die dieser Organisationseinheit untergeordnet sind
-		$qry = "SELECT distinct uid FROM public.tbl_benutzerfunktion WHERE ((funktion_kurzbz='oezuordnung' AND (false ";
+		$qry = "
+			SELECT distinct 
+				uid 
+			FROM 
+				public.tbl_benutzerfunktion 
+			JOIN
+				public.tbl_benutzer
+			USING (uid)
+			WHERE ((funktion_kurzbz='oezuordnung' AND (false ";
 
 		if($oe!='')
 			$qry.=" OR oe_kurzbz in($oe)";
@@ -1125,8 +1133,13 @@ class mitarbeiter extends benutzer
 		if($oe!='')
 			$qry.=" OR (funktion_kurzbz='ass' AND oe_kurzbz in($oe))";
 
-		$qry.= ") AND (tbl_benutzerfunktion.datum_von is null OR tbl_benutzerfunktion.datum_von<=now()) AND
-					 (tbl_benutzerfunktion.datum_bis is null OR tbl_benutzerfunktion.datum_bis>=now());";
+		$qry.= ") 
+			AND 
+				(tbl_benutzerfunktion.datum_von is null OR tbl_benutzerfunktion.datum_von<=now()) 
+			AND
+				(tbl_benutzerfunktion.datum_bis is null OR tbl_benutzerfunktion.datum_bis>=now())
+			AND
+				tbl_benutzer.aktiv = 'true';";
 
 		if($this->db_query($qry))
 		{
