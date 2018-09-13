@@ -88,7 +88,7 @@ class Lehrveranstaltung_model extends DB_Model
 
 		$query = "
 
-			SELECT lehrveranstaltung_id, ? || '_' || kuerzel || '_' || lvpostfix AS lvgroupname
+			SELECT lehrveranstaltung_id, ? || '_' || kuerzel || '_' || replace(lvpostfix, ' ', '-') AS lvgroupname
 				FROM(
 						SELECT DISTINCT ON (kuerzel, lvpostfix)
 						  lehrveranstaltung_id,

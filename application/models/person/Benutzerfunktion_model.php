@@ -25,8 +25,10 @@ class Benutzerfunktion_model extends DB_Model
 
 	/**
 	 * Gets all Benutzer for a given OE and specified Benutzerfunktionen
-	 * @param $oe_kurzbz
 	 * @param $funktion_kurzbz string with one benutzerfunktionname or array with one or more
+	 * @param $oe_kurzbz
+	 * @param bool $activeoeonly if true, retrieve only active Organisationseinheiten
+	 * @param bool $activebenonly if true, retrieve only active Benutzer
 	 * @return array|null
 	 */
 	public function getBenutzerFunktionen($funktion_kurzbz, $oe_kurzbz = null, $activeoeonly = false, $activebenonly = false)
@@ -41,7 +43,7 @@ class Benutzerfunktion_model extends DB_Model
 		if ($activebenonly === true)
 			$query .= " JOIN public.tbl_benutzer USING(uid)";
 
-		$query .= "WHERE (datum_von <= NOW() OR datum_von IS NULL) AND (datum_bis >= NOW() OR datum_bis IS NULL)";
+		$query .= " WHERE (datum_von <= NOW() OR datum_von IS NULL) AND (datum_bis >= NOW() OR datum_bis IS NULL)";
 
 		if (is_string($funktion_kurzbz))
 		{
