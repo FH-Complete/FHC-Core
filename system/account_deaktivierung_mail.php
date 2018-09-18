@@ -58,7 +58,7 @@ if($result = $db->db_query($qry))
 			$message .= "	- Ihr Home-Verzeichnis (inkl. aller Dateien) gelöscht werden.\n";
 			$message .= "\n";
 			$message .= "Falls es sich bei der Deaktivierung um einen Irrtum handelt, würden wir Sie bitten, sich umgehend mit den KollegInnen in der Personalabteilung in Verbindung zu setzen: ";
-			$message .= "Frau Maria Meyer-Mölleringhof, meyermoe@technikum-wien.at\n";
+			$message .= "Frau Natalie König, natalie.koenig@technikum-wien.at\n";
 			$message .= "\n";
 			$message .= "Mit freundlichen Grüßen\n";
 			$message .= "\n";
@@ -90,9 +90,9 @@ if($result = $db->db_query($qry))
 			$message .= "\n";
 			$message .= "Falls Sie weiterhin über Neuigkeiten an der FH Technikum Wien informiert werden wollen, können Sie unter www.technikum-wien.at/newsletter den kostenlosen Newsletter abonnieren.\n";
 		}
-		
+
 		$to = $row->uid.'@'.DOMAIN;
-		
+
 		$mail = new mail($to,'no-reply@'.DOMAIN,'Ihr Datensatz wurde deaktiviert! '.$row->uid, $message);
 		$mail->send();
 		$text.= "Warnung zur Accountloeschung wurde an $row->uid verschickt\n";
@@ -159,7 +159,7 @@ if($result = $db->db_query($qry))
 		if($mail->send())
 			$text.="Abbrecher Infomail an $to verschickt\n";
 		else
-			$text.="Fehler beim Versenden des Abbrecher Infomails an $to !\n";  
+			$text.="Fehler beim Versenden des Abbrecher Infomails an $to !\n";
 	}
 }
 
@@ -187,7 +187,7 @@ if($result = $db->db_query($qry))
 		$message .= "1200 Wien \n";
 		$message .= "\n";
 		$message .= "Falls Sie weiterhin über Neuigkeiten an der FH Technikum Wien informiert werden wollen, können Sie unter www.technikum-wien.at/newsletter den kostenlosen Newsletter abonnieren.\n";
-		
+
 		$to = $row->uid.'@'.DOMAIN;
 
 		$mail = new mail($to,'no-reply@'.DOMAIN,'Ihr Datensatz wurde deaktiviert! Letzte Warnung '.$row->uid, $message);
@@ -212,7 +212,7 @@ if($result = $db->db_query($qry))
 		$message .= "	- Ihr Home-Verzeichnis (inkl. aller Dateien) gelöscht werden\n";
 		$message .= "\n";
 		$message .= "Falls es sich bei der Deaktivierung um einen Irrtum handelt, würden wir Sie bitten, sich umgehend mit den KollegInnen in der Personalabteilung in Verbindung zu setzen: ";
-		$message .= "Frau Maria Meyer-Mölleringhof, meyermoe@technikum-wien.at\n";
+		$message .= "Frau Natalie König, natalie.koenig@technikum-wien.at\n";
 		$message .= "\n";
 		$message .= "Mit freundlichen Grüßen\n";
 		$message .= "\n";
@@ -221,9 +221,9 @@ if($result = $db->db_query($qry))
 		$message .= "1200 Wien \n";
 		$message .= "\n";
 		$message .= "Falls Sie weiterhin über Neuigkeiten an der FH Technikum Wien informiert werden wollen, können Sie unter www.technikum-wien.at/newsletter den kostenlosen Newsletter abonnieren.\n";
-		
+
 		$to = $row->uid.'@'.DOMAIN;
-		
+
 		$mail = new mail($to,'no-reply@'.DOMAIN, 'Ihr Datensatz wurde deaktiviert! Letzte Warnung '.$row->uid, $message);
 		$mail->send();
 		$text.= "Letzte Warnung zur Accountloeschung wurde an $row->uid verschickt\n";
