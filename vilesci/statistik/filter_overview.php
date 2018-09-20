@@ -90,6 +90,9 @@ if (!$filter->loadAll())
 						KurzBz
 					</th>
 					<th>
+						Bezeichnung
+					</th>
+					<th>
 						ValueName
 					</th>
 					<th>
@@ -124,6 +127,9 @@ if (!$filter->loadAll())
 							<a href="filter_details.php?filter_id=<?php echo $filter->filter_id ?>" target="frame_filter_details">
 								<?php echo $filter->kurzbz ?>
 							</a>
+						</td>
+						<td>
+							<?php echo $db->convert_html_chars($filter->bezeichnung) ?>
 						</td>
 						<td>
 							<?php echo $db->convert_html_chars($filter->valuename) ?>
