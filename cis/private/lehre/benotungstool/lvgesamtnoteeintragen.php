@@ -82,10 +82,14 @@ $uebung_id = (isset($_GET['uebung_id'])?$_GET['uebung_id']:'');
 $uid = (isset($_GET['uid'])?$_GET['uid']:'');
 
 $noten_anmerkung=array();
+$noten_arr=array();
 $note_obj = new note();
 $note_obj->getAll();
 foreach($note_obj->result as $row)
-	$noten_anmerkung[$row->anmerkung]=$row->note;
+{
+	$noten_anmerkung[$row->anmerkung] = $row->note;
+	$noten_arr[$row->note] = $row;
+}
 
 //Studiensemester laden
 $stsem_obj = new studiensemester();
@@ -238,12 +242,20 @@ if (isset($_REQUEST["submit"]))
 					}
 
 					// Hole Zeugnisnote wenn schon eine eingetragen ist
-					/*
 					if ($zeugnisnote = new zeugnisnote($lvid, $student_uid, $stsem))
+					{
 						$znote = $zeugnisnote->note;
-					else
-						$znote = null;
-					*/
+
+						$notenobj = $noten_arr[$znote];
+
+						// Note nicht speichern wenn Zeugnisnote nicht überschreibbar
+						if (!$notenobj->lkt_ueberschreibbar)
+						{
+							$response .= "\n".$p->t('benotungstool/noteNichtUeberschreibbar', array($matrikelnummer, $notenobj->bezeichnung));
+							continue;
+						}
+					}
+
 					$val=savenote($db,$lvid, $student_uid, $note, $punkte);
 					if($val!='neu' && $val!='update' && $val!='update_f')
 						$response.=$val;

@@ -506,6 +506,17 @@ if(!$result = @$db->db_query("SELECT offiziell FROM lehre.tbl_note LIMIT 1;"))
 		echo '<br>lehre.tbl_note: Spalte offiziell hinzugefuegt!<br>';
 }
 
+// Spalte lkt_ueberschreibbar in lehre.tbl_note
+if(!$result = @$db->db_query("SELECT lkt_ueberschreibbar FROM lehre.tbl_note LIMIT 1;"))
+{
+	$qry = "ALTER TABLE lehre.tbl_note ADD COLUMN lkt_ueberschreibbar boolean NOT NULL DEFAULT true;";
+
+	if(!$db->db_query($qry))
+		echo '<strong>lehre.tbl_note: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>lehre.tbl_note: Spalte lkt_ueberschreibbar hinzugefuegt!<br>';
+}
+
 // Spalte bezeichnung_mehrsprachig in lehre.tbl_note
 if(!$result = @$db->db_query("SELECT bezeichnung_mehrsprachig FROM lehre.tbl_note LIMIT 1"))
 {

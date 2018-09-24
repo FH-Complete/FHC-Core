@@ -42,6 +42,7 @@ class note extends basis_db
 	public $aktiv;						// boolean
 	public $lehre;						// boolean
 	public $offiziell;					// boolean
+	public $lkt_ueberschreibbar;		// boolean
 	public $bezeichnung_mehrsprachig; 	// varchar (64)[]
 
 	/**
@@ -78,7 +79,8 @@ class note extends basis_db
 						notenwert, 
 						aktiv, 
 						lehre, 
-						offiziell, 
+						offiziell,
+						lkt_ueberschreibbar,
 						$bezeichnung_mehrsprachig 
 				FROM 
 					lehre.tbl_note 
@@ -98,6 +100,7 @@ class note extends basis_db
 				$this->lehre = $this->db_parse_bool($row->lehre);
 				$this->aktiv = $this->db_parse_bool($row->aktiv);
 				$this->offiziell = $this->db_parse_bool($row->offiziell);
+				$this->lkt_ueberschreibbar = $this->db_parse_bool($row->lkt_ueberschreibbar);
 				$this->bezeichnung_mehrsprachig = $sprache->parseSprachResult('bezeichnung_mehrsprachig',$row);
 				return true;
 			}
@@ -151,7 +154,7 @@ class note extends basis_db
 				$idx = sprache::$index_arr[$key];
 				$qry .= " bezeichnung_mehrsprachig[$idx],";
 			}
-			$qry .= ' offiziell) VALUES('.
+			$qry .= ' offiziell, lkt_ueberschreibbar) VALUES('.
 				$this->db_add_param($this->note).', '.
 				$this->db_add_param($this->bezeichnung).', '.
 				$this->db_add_param($this->anmerkung).', '.
@@ -163,8 +166,9 @@ class note extends basis_db
 				foreach($this->bezeichnung_mehrsprachig as $key=>$value)
 					$qry .= $this->db_add_param($value).',';
 				
-			$qry .= $this->db_add_param($this->offiziell, FHC_BOOLEAN).');';
-			
+			$qry .= $this->db_add_param($this->offiziell, FHC_BOOLEAN);
+			$qry .= $this->db_add_param($this->lkt_ueberschreibbar, FHC_BOOLEAN).');';
+
 				 
 		}
 		else
@@ -184,7 +188,8 @@ class note extends basis_db
 					$qry .= " bezeichnung_mehrsprachig[$idx]=".$this->db_add_param($value).", ";
 				}
 				
-				$qry .= ' offiziell='.$this->db_add_param($this->offiziell, FHC_BOOLEAN).' '.
+				$qry .= ' offiziell='.$this->db_add_param($this->offiziell, FHC_BOOLEAN).', '.
+				$qry .= ' lkt_ueberschreibbar='.$this->db_add_param($this->lkt_ueberschreibbar, FHC_BOOLEAN).' '.
 				'WHERE note='.$this->db_add_param($this->note).';';
 			
 			
@@ -218,7 +223,8 @@ class note extends basis_db
 						notenwert, 
 						aktiv, 
 						lehre, 
-						offiziell, 
+						offiziell,
+						lkt_ueberschreibbar,
 						$bezeichnung_mehrsprachig 
 				FROM 
 					lehre.tbl_note ";
@@ -242,7 +248,8 @@ class note extends basis_db
 				$n->notenwert = $row->notenwert;
 				$n->aktiv = $this->db_parse_bool($row->aktiv);
 				$n->lehre = $this->db_parse_bool($row->lehre);
-				$n->offiziell = $this->db_parse_bool($row->lehre);
+				$n->offiziell = $this->db_parse_bool($row->offiziell);
+				$n->lkt_ueberschreibbar = $this->db_parse_bool($row->lkt_ueberschreibbar);
 				$n->bezeichnung_mehrsprachig = $sprache->parseSprachResult('bezeichnung_mehrsprachig', $row);
 
 				$this->result[] = $n;
@@ -274,6 +281,7 @@ class note extends basis_db
 						aktiv, 
 						lehre, 
 						offiziell, 
+						lkt_ueberschreibbar,
 						$bezeichnung_mehrsprachig 
 				FROM 
 					lehre.tbl_note 
@@ -299,7 +307,8 @@ class note extends basis_db
 				$n->notenwert = $row->notenwert;
 				$n->aktiv = $this->db_parse_bool($row->aktiv);
 				$n->lehre = $this->db_parse_bool($row->lehre);
-				$n->offiziell = $this->db_parse_bool($row->lehre);
+				$n->offiziell = $this->db_parse_bool($row->offiziell);
+				$n->lkt_ueberschreibbar = $this->db_parse_bool($row->lkt_ueberschreibbar);
 				$n->bezeichnung_mehrsprachig = $sprache->parseSprachResult('bezeichnung_mehrsprachig', $row);
 
 				$this->result[] = $n;
