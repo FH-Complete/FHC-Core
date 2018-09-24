@@ -267,6 +267,8 @@
 		"ml/json-ld": "1.*",
 		"mottie/tablesorter": "^2.29",
 
+		"nategood/httpful": "^0.2.20",
+
 		"netcarver/textile": "^3.5",
 		"nicolaskruchten/pivottable": "^2.15.0",
 

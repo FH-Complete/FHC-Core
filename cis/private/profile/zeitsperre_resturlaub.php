@@ -33,6 +33,7 @@ require_once('../../../include/mitarbeiter.class.php');
 require_once('../../../include/mail.class.php');
 require_once('../../../include/benutzerberechtigung.class.php');
 require_once('../../../include/phrasen.class.php');
+require_once('../../../include/zeitaufzeichnung.class.php');
 
 $sprache = getSprache();
 $p = new phrasen($sprache);
@@ -43,6 +44,8 @@ if (!$db = new basis_db())
 $uid = get_uid();
 
 $PHP_SELF = $_SERVER['PHP_SELF'];
+
+$typen_arr = array("Urlaub", "PflegeU", "ZA", "Krank", "DienstF", "DienstV");
 
 if(isset($_GET['type']))
 	$type=$_GET['type'];
@@ -64,6 +67,17 @@ if(isset($_GET['uid']))
 }
 $datum_obj = new datum();
 $ma= new mitarbeiter();
+
+// definiert bis zu welchem Datum die Eintragung nicht mehr möglich ist
+$zasperre = new zeitaufzeichnung();
+if ($sperrdat = $zasperre->getEintragungGesperrtBisForUser($uid))
+	$gesperrt_bis = $sperrdat;
+else if (defined('CIS_ZEITAUFZEICHNUNG_GESPERRT_BIS') && CIS_ZEITAUFZEICHNUNG_GESPERRT_BIS != '')
+	$gesperrt_bis = CIS_ZEITAUFZEICHNUNG_GESPERRT_BIS;
+else
+	$gesperrt_bis = '2015-08-31';
+
+//echo $gesperrt_bis;
 
 //Stundentabelleholen
 if(! $result_stunde=$db->db_query("SELECT * FROM lehre.tbl_stunde ORDER BY stunde"))
@@ -268,6 +282,8 @@ if(isset($_GET['type']) && ($_GET['type']=='edit_sperre' || $_GET['type']=='new_
 {
 	$error=false;
 	$error_msg='';
+
+
 	//von-datum pruefen
 	if(isset($_POST['vondatum']) && !$datum_obj->checkDatum($_POST['vondatum']))
 	{
@@ -290,6 +306,7 @@ if(isset($_GET['type']) && ($_GET['type']=='edit_sperre' || $_GET['type']=='new_
 		if (@checkdate($date[1], $date[0], $date[2]))
 		{
 			 $vondatum=$date[2].$date[1].$date[0];
+			 $vondatum_iso = $date[2].'-'.$date[1].'-'.$date[0];
 		}
 		else
 		{
@@ -327,7 +344,12 @@ if(isset($_GET['type']) && ($_GET['type']=='edit_sperre' || $_GET['type']=='new_
 		$error_msg .= $p->t('zeitsperre/vonDatumGroesserAlsBisDatum').'! ';
 	}
 
-
+	//von-datum pruefen TODO
+	if($vondatum_iso < $gesperrt_bis && in_array($_POST['zeitsperretyp_kurzbz'],$typen_arr))
+	{
+		$error=true;
+		$error_msg .= $p->t('zeitsperre/vorSperrdatum');
+	}
 
 	$zeitsperre = new zeitsperre();
 
@@ -448,7 +470,11 @@ if(isset($_GET['type']) && $_GET['type']=='delete_sperre')
 	//besitzer dieses datensatzes ist
 	if($zeit->mitarbeiter_uid==$uid)
 	{
-		if($zeit->delete($_GET['id']))
+		if ($zeit->vondatum < $gesperrt_bis  && in_array($zeit->zeitsperretyp_kurzbz,$typen_arr))
+		{
+			echo "<span class='error'>".$p->t('zeitsperre/vorSperrdatum')."</span>";
+		}
+		else if($zeit->delete($_GET['id']))
 		{
 			echo $p->t('global/erfolgreichgelöscht');
 		}
@@ -473,6 +499,7 @@ if($result = $db->db_query($qry))
 		$erreichbarkeit_arr[$row->erreichbarkeit_kurzbz]=$row->beschreibung;
 	}
 }
+
 //liste aller zeitsperren ausgeben
 if(count($zeit->result)>0)
 {
@@ -499,9 +526,13 @@ if(count($zeit->result)>0)
 							<td align='center'>".($row->freigabeamum!=''?'Ja':'')."</td>";
 		if ($row->zeitsperretyp_kurzbz == 'DienstV')
 			$content_table .= '<td>&nbsp;</td>';
+		else if ($row->vondatum < $gesperrt_bis AND in_array($row->zeitsperretyp_kurzbz,$typen_arr))
+			$content_table .= '<td>&nbsp;</td>';
 		else
 			$content_table.="<td><a href='$PHP_SELF?type=edit&id=$row->zeitsperre_id' class='Item'>".$p->t('zeitsperre/edit')."</a></td>";
-		if($row->freigabeamum=='' || $row->zeitsperretyp_kurzbz!='Urlaub')
+		if ($row->vondatum < $gesperrt_bis AND in_array($row->zeitsperretyp_kurzbz,$typen_arr))
+			$content_table .= '<td>&nbsp;</td>';
+		else if($row->freigabeamum=='' || $row->zeitsperretyp_kurzbz!='Urlaub')
 		{
 			$content_table.="\n<td><a href='$PHP_SELF?type=delete_sperre&id=$row->zeitsperre_id' onclick='return conf_del()' class='Item'>".$p->t('zeitsperre/loeschen')."</a></td>";
 		}

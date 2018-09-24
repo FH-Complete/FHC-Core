@@ -987,7 +987,7 @@ if($projekt->getProjekteMitarbeiter($user, true))
 				<input type="text" class="datepicker_datum" id="von_datum" name="von_datum" value="'.$db->convert_html_chars($datum->formatDatum($von, $format='d.m.Y')).'" size="9">
 				<input onchange="checkZeiten()" type="text" class="timepicker" id="von_uhrzeit" name="von_uhrzeit" value="'.$db->convert_html_chars($datum->formatDatum($von, $format='H:i')).'" size="4">
 			</td>';
-		if ($za_simple == 0)
+		if ($za_simple == 0 || $anzprojekte > 0)
 		{
 			echo '
 					<td align="center">

@@ -112,7 +112,10 @@ list(
 	getUserAmpelData($user);
 
 //sort ampeln
-$user_ampel_arr = sortUserAmpelData($user_ampel_arr);
+if (!empty($user_ampel_arr))
+{
+	$user_ampel_arr = sortUserAmpelData($user_ampel_arr);
+}
 
 //filter ampeln for popup (if at least one mandatory, which is neither expired nor before vorlaufzeit)
 if ($is_popup)	
@@ -224,20 +227,27 @@ function getUserAmpelData($user)
 function sortUserAmpelData($user_ampel_arr)
 {
 	//first: sort deadline
+	$deadline_arr = array();
 	foreach ($user_ampel_arr as $key => $val) 
-		$deadline[$key] = $val['deadline'];
+	{
+		$deadline_arr[$key] = $val['deadline'];
+	}
 	
-	array_multisort($deadline, SORT_DESC, $user_ampel_arr);
-		
+	array_multisort($deadline_arr, SORT_DESC, $user_ampel_arr);
+
 	//second: sort inactive after active
 	$active_ampel_arr = array();
 	$inactive_ampel_arr = array();
 	foreach ($user_ampel_arr as $user_ampel)
 	{
 		if ($user_ampel['active'])
+		{
 			$active_ampel_arr[] = $user_ampel;
+		}
 		else
+		{
 			$inactive_ampel_arr[] = $user_ampel;
+		}		
 	}
 	return $user_ampel_arr = array_merge($active_ampel_arr, $inactive_ampel_arr);
 }

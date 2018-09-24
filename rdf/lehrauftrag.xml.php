@@ -68,7 +68,7 @@ else
 $xml = '<?xml version="1.0" encoding="UTF-8" ?><lehrauftraege>';
 $stg_arr = array();
 $studiengang = new studiengang();
-$studiengang->getAll();
+$studiengang->getAll(null, false);
 
 foreach ($studiengang->result as $row)
 	$stg_arr[$row->studiengang_kz] = $row->kuerzel;

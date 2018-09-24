@@ -330,7 +330,7 @@ if (isset($_POST['fileupload']))
 	if (move_uploaded_file($_FILES['userfile']['tmp_name'], $uploadfile))
 	{
 		$dms = new dms();
-		
+
 		if(!$dms->setPermission($uploadfile))
 			echo $dms->errormsg;
 
@@ -1616,7 +1616,7 @@ function drawChangeKategorie($dms_id, $page = NULL, $dpp = NULL)
 		if ($kategorienResult->kategorie_kurzbz == $dms->kategorie_kurzbz)
 			$selected = 'selected';
 
-		echo '<option '.$selected.' value="'.$kategorienResult->kategorie_kurzbz.'">'.$x.$kategorienResult->bezeichnung.' ['.$kategorienResult->kategorie_kurzbz.']</option>';
+		echo '<option '.$selected.' value="'.$kategorienResult->kategorie_kurzbz.'">'.$kategorienResult->bezeichnung.' ['.$kategorienResult->kategorie_kurzbz.']</option>';
 	}
 
 	echo '</select>

@@ -754,7 +754,7 @@ or not exists
 		//check if addon casetime is installed
 		$qrytable = "
 		SELECT EXISTS(
-		    SELECT *
+		    SELECT 1
 		    FROM information_schema.tables
 		    WHERE
 		      table_schema = 'addon' AND
@@ -763,7 +763,7 @@ or not exists
 		";
 
 		$res = $this->db_query($qrytable);
-		if ($this->db_fetch_row($res)[0]===true)
+		if ($this->db_fetch_row($res)[0] == 't')
 		{
 			//check if sent timesheets for the UID exist
 			$where = "uid=".$this->db_add_param($user);
