@@ -325,10 +325,11 @@ class dokument extends basis_db
 	/**
 	 * Laedt alle Dokumente eines Prestudenten die
 	 * er bereits abgegeben hat
-	 * @param prestudent_id
+	 * @param integer prestudent_id
+	 * @param boolean archivdokumente Default true. Wenn false, werden Dokumente, die Archivierbar sind (tbl_vorlage.archivierbar zB Zeugnis, Bescheid, ...) nicht geliefert
 	 * @return true wenn ok, false wenn Fehler
 	 */
-	public function getPrestudentDokumente($prestudent_id)
+	public function getPrestudentDokumente($prestudent_id, $archivdokumente = true)
 	{
 		if(!is_numeric($prestudent_id))
 		{
@@ -336,8 +337,17 @@ class dokument extends basis_db
 			return false;
 		}
 
-		$qry = "SELECT * FROM public.tbl_dokumentprestudent JOIN public.tbl_dokument USING(dokument_kurzbz)
-				WHERE prestudent_id=".$this->db_add_param($prestudent_id, FHC_INTEGER)." ORDER BY dokument_kurzbz;";
+		$qry = "SELECT tbl_dokumentprestudent.* , tbl_dokument.*
+				FROM public.tbl_dokumentprestudent 
+				JOIN public.tbl_dokument USING(dokument_kurzbz)
+				LEFT JOIN public.tbl_vorlage ON (tbl_dokumentprestudent.dokument_kurzbz = tbl_vorlage.vorlage_kurzbz)
+				WHERE prestudent_id=".$this->db_add_param($prestudent_id, FHC_INTEGER);
+		
+		if(!$archivdokumente)
+		{
+			$qry.="	AND (tbl_vorlage.archivierbar = FALSE OR tbl_vorlage.archivierbar IS NULL)";
+		}
+		$qry.="	ORDER BY tbl_dokumentprestudent.dokument_kurzbz";
 
 		if($this->db_query($qry))
 		{
@@ -370,11 +380,12 @@ class dokument extends basis_db
 	/**
 	 * Laedt alle Dokumente fuer einen Stg die der
 	 * Prestudent noch nicht abgegeben hat
-	 * @param studiengang_kz
-	 *		prestudent_id
+	 * @param integer studiengang_kz
+	 * @param integer prestudent_id
+	 * @param boolean archivdokumente Default true. Wenn false, werden Dokumente, die archivierbar sind (tbl_vorlage.archivierbar zB Zeugnis, Bescheid, ...) nicht geliefert
 	 * @return true wenn ok, false wenn Fehler
 	 */
-	public function getFehlendeDokumente($studiengang_kz, $prestudent_id=null)
+	public function getFehlendeDokumente($studiengang_kz, $prestudent_id = null, $archivdokumente = true)
 	{
 		if(!is_null($prestudent_id) && !is_numeric($prestudent_id))
 		{
@@ -388,17 +399,24 @@ class dokument extends basis_db
 			return false;
 		}
 
-		$qry = "SELECT * FROM public.tbl_dokument JOIN public.tbl_dokumentstudiengang USING(dokument_kurzbz)
+		$qry = "SELECT tbl_dokument.* , tbl_dokumentstudiengang.*
+				FROM public.tbl_dokument 
+				JOIN public.tbl_dokumentstudiengang USING(dokument_kurzbz)
+				LEFT JOIN public.tbl_vorlage ON (tbl_dokument.dokument_kurzbz = tbl_vorlage.vorlage_kurzbz)
 				WHERE studiengang_kz=".$this->db_add_param($studiengang_kz, FHC_INTEGER);
 
 		if(!is_null($prestudent_id))
 		{
-			$qry.="	AND dokument_kurzbz NOT IN (
+			$qry.="	AND tbl_dokument.dokument_kurzbz NOT IN (
 					SELECT dokument_kurzbz FROM public.tbl_dokumentprestudent WHERE prestudent_id=".$this->db_add_param($prestudent_id,FHC_INTEGER).")";
 		}
+		if(!$archivdokumente)
+		{
+			$qry.="	AND (tbl_vorlage.archivierbar = FALSE OR tbl_vorlage.archivierbar IS NULL)";
+		}
 
-		$qry.=" ORDER BY dokument_kurzbz;";
-
+		$qry.=" ORDER BY tbl_dokument.dokument_kurzbz;";
+//echo $qry;
 		if($this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object())

@@ -49,7 +49,7 @@ else
 	die('Fehlerhafte Parameteruebergabe');
 
 $dok = new dokument();
-if(!$dok->getPrestudentDokumente($prestudent_id))
+if(!$dok->getPrestudentDokumente($prestudent_id, false))
 	die($dok->errormsg);
 
 $prestudent = new prestudent();
