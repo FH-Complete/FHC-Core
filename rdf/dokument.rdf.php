@@ -56,9 +56,10 @@ else
 	$prestudent_id = null;
 
 $dok = new dokument();
-if(!$dok->getFehlendeDokumente($studiengang_kz, $prestudent_id))
+if(!$dok->getFehlendeDokumente($studiengang_kz, $prestudent_id, false))
 	die($dok->errormsg);
-
+	
+//var_dump($dok);
 $prestudent = new prestudent();
 if(!$prestudent->load($prestudent_id))
 	die($prestudent->errormsg);
