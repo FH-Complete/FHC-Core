@@ -127,7 +127,7 @@ if (isset($_REQUEST['save']))
 			$dms->gruppe_kurzbz = $_POST['gruppe_kurzbz'];
 			$dms->insertamum = date('Y-m-d H:i:s');
 			$dms->insertvon = $user;
-			
+
 			if (! $dms->saveGruppeKategorie())
 				echo '<span class="error">' . $dms->errormsg . '</span>';
 			else
@@ -145,7 +145,7 @@ if (isset($_REQUEST['save']))
 		{
 			// wenn keine auswahl getroffen wurde
 			$kategorie_auswahl = (($_POST['kategorie_parent'] == 'auswahl') ? null : $_POST['kategorie_parent']);
-			
+
 			if ($kategorieSave->loadKategorie($_POST['kategorie_kurzbz']))
 			{
 				// Update
@@ -184,7 +184,7 @@ if (isset($_REQUEST['save']))
 // Löscht eine Kategorie
 if (isset($_REQUEST['delete']))
 {
-	
+
 	if ($method == 'gruppe')
 	{
 		$dms = new dms();
@@ -205,7 +205,7 @@ if (isset($_REQUEST['delete']))
 		}
 		else
 			echo "keine Kategorie übergeben";
-		
+
 		$kategorie_kurzbz = '';
 	}
 }
@@ -270,7 +270,7 @@ switch ($method)
 	case 'gruppe':
 		print_rights($kategorie_kurzbz);
 		break;
-	
+
 	default:
 		drawKategorie($kategorie_kurzbz);
 		break;
@@ -287,7 +287,8 @@ function drawKategorie($kategorie_kurzbz)
 	$kategorie_bezeichnung = '';
 	$disabled = '';
 	$kategorie_berechtigung = '';
-	
+	$kategorie_oe_kurzbz = '';
+
 	if ($kategorie->loadKategorie($kategorie_kurzbz))
 	{
 		// Formular zum Editieren bestehender Kategorien
@@ -297,7 +298,7 @@ function drawKategorie($kategorie_kurzbz)
 		$kategorie_berechtigung = $kategorie->berechtigung_kurzbz;
 		$kategorie_oe_kurzbz = $kategorie->kategorie_oe_kurzbz;
 	}
-	
+
 	$allKategorien = new dms();
 	$allKategorien->getAllKategories();
 	$berechtigungen = new berechtigung();
@@ -305,7 +306,7 @@ function drawKategorie($kategorie_kurzbz)
 	$organisationseinheiten = new organisationseinheit();
 	$organisationseinheiten->getAll(true, null, 'organisationseinheittyp_kurzbz, bezeichnung');
 	$oe_typ = '';
-	
+
 	// var_dump($allKategorien->result);
 	echo '	<form action="' . $_SERVER['PHP_SELF'] . '?save" method="POST" name="form_kategorie">
 				<table border="0">
@@ -341,13 +342,13 @@ function drawKategorie($kategorie_kurzbz)
 							{
 								if ($oe_typ!='')
 									echo '</optgroup>';
-								
+
 								echo '<optgroup label="'.$oe->organisationseinheittyp_kurzbz.'">';
 							}
 							$selected = '';
 							if ($oe->oe_kurzbz == $kategorie_oe_kurzbz)
 								$selected = 'selected';
-					
+
 							echo '<option ' . $selected . ' value="' . $oe->oe_kurzbz . '">'.$oe->organisationseinheittyp_kurzbz.' ' . $oe->bezeichnung . '</option>';
 							$oe_typ = $oe->organisationseinheittyp_kurzbz;
 						}
@@ -362,7 +363,7 @@ function drawKategorie($kategorie_kurzbz)
 							$selected = '';
 							if ($recht->berechtigung_kurzbz == $kategorie_berechtigung)
 								$selected = 'selected';
-					
+
 							echo '<option ' . $selected . ' value="' . $recht->berechtigung_kurzbz . '">' . $recht->berechtigung_kurzbz . '</option>';
 						}
 	echo '				</select>
@@ -427,17 +428,17 @@ function print_rights($kategorie_kurzbz)
 	}
 	else
 		echo 'Diese Seite darf von allen angezeigt werden!<br><br>';
-	
+
 	$gruppe = new gruppe();
 	$gruppe->getgruppe(null, null, null, null, true);
-	
+
 	// Sortieren der Gruppen nach kurzbz
-	function sortGruppen($a, $b) 
-	{ 
-		return strcasecmp($a->gruppe_kurzbz, $b->gruppe_kurzbz); 
+	function sortGruppen($a, $b)
+	{
+		return strcasecmp($a->gruppe_kurzbz, $b->gruppe_kurzbz);
 	}
-	usort($gruppe->result, "sortGruppen"); 
-	
+	usort($gruppe->result, "sortGruppen");
+
 // 	function sortDocuments($a, $b)
 // 	{
 // 		$c = $a->anzahl_akten_formal_geprueft - $b->anzahl_akten_formal_geprueft;
@@ -449,7 +450,7 @@ function print_rights($kategorie_kurzbz)
 // 	}
 // 	if ($dokumente_abzugeben)
 // 		usort($dokumente_abzugeben, "sortDocuments");
-	
+
 	echo '<form action="' . $_SERVER['PHP_SELF'] . '?kategorie_kurzbz=' . $kategorie_kurzbz . '&method=gruppe&save" method="POST">';
 	echo 'Gruppe <select name="gruppe_kurzbz">';
 	foreach ($gruppe->result as $row)
@@ -472,7 +473,7 @@ function print_rights($kategorie_kurzbz)
 function drawKategorieMenue($rows)
 {
 	global $kategorie_kurzbz;
-	
+
 	// echo '<ul>';
 	foreach ($rows as $row)
 	{
@@ -480,12 +481,12 @@ function drawKategorieMenue($rows)
 			$class = 'marked';
 		else
 			$class = '';
-		
+
 		$dms = new dms();
 		$dms->getKategorie($row->kategorie_kurzbz);
-		
+
 		$delete = '<a href="' . $_SERVER['PHP_SELF'] . '?delete&kategorie_kurzbz=' . $row->kategorie_kurzbz . '"><img src="../skin/images/cross.png" height="12px" title="Kategorie löschen" /></a>';
-		
+
 		// Suchen, ob eine Sperre fuer diese Kategorie vorhanden ist
 		$groups = $dms->getLockGroups($row->kategorie_kurzbz);
 		$locked = '';
@@ -498,7 +499,7 @@ function drawKategorieMenue($rows)
 		}
 		if (count($dms->result) > 0)
 		{
-			
+
 			echo '
 			<tr>
 				<td class="tdwidth10" nowrap>&nbsp;</td>
