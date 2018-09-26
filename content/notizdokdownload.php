@@ -22,9 +22,10 @@
  * oder im Filesystem, in diesem Fall ist die Akte mit einer DMS ID verknuepft in welcher der Dateiname steht.
  */
 require_once('../config/vilesci.config.inc.php');
-require_once('../include/dms.class.php'); 
+require_once('../include/dms.class.php');
 require_once('../include/benutzerberechtigung.class.php');
 require_once('../include/functions.inc.php');
+require_once('../include/notiz.class.php');
 
 $user = get_uid();
 $rechte = new benutzerberechtigung();
@@ -34,11 +35,15 @@ if(!$rechte->isBerechtigt('admin') && !$rechte->isBerechtigt('assistenz') && !$r
 
 if(isset($_GET['id']) && is_numeric($_GET['id']))
 {
-	$dms = new dms(); 
-    if(!$dms->load($_GET['id']))
-        die('Kein Dokument vorhanden'); 
+	$notiz = new notiz();
+	if(!$notiz->isNotizDokument($_GET['id']))
+		die('Dokument wurde nicht gefunden oder haengt nicht an einer Notiz');
 
-    $filename=DMS_PATH.$dms->filename; 
+	$dms = new dms();
+    if(!$dms->load($_GET['id']))
+        die('Kein Dokument vorhanden');
+
+    $filename=DMS_PATH.$dms->filename;
 
     if(!isset($_GET['notimeupdate']))
         $dms->touch($dms->dms_id, $dms->version);
@@ -54,7 +59,7 @@ if(isset($_GET['id']) && is_numeric($_GET['id']))
             header('Content-Disposition: inline; filename="'.$dms->name.'"');
             header('Content-Length: ' .filesize($filename));
 
-            while (!feof($handle)) 
+            while (!feof($handle))
             {
                 echo fread($handle, 8192);
             }
