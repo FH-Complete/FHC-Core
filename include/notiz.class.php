@@ -24,7 +24,7 @@ class notiz extends basis_db
 {
 	public $new;
 	public $result=array();
-    public $dokumente=array();
+	public $dokumente=array();
 
 	//Tabellenspalten
 	public $notiz_id;
@@ -40,15 +40,15 @@ class notiz extends basis_db
 	public $updateamum;
 	public $updatevon;
 
-    public $projekt_kurzbz;
-    public $projektphase_id;
-    public $projekttask_id;
-    public $uid;
-    public $person_id;
-    public $prestudent_id;
-    public $bestellung_id;
-    public $lehreinheit_id;
-    public $anrechnung_id;
+	public $projekt_kurzbz;
+	public $projektphase_id;
+	public $projekttask_id;
+	public $uid;
+	public $person_id;
+	public $prestudent_id;
+	public $bestellung_id;
+	public $lehreinheit_id;
+	public $anrechnung_id;
 
 	/**
 	 * Konstruktor
@@ -93,7 +93,7 @@ class notiz extends basis_db
 				$this->insertvon=$row->insertvon;
 				$this->updateamum=$row->updateamum;
 				$this->updatevon=$row->updatevon;
-                $this->getDokumente($row->notiz_id);
+				$this->getDokumente($row->notiz_id);
 
 				return true;
 			}
@@ -123,17 +123,17 @@ class notiz extends basis_db
 			return false;
 		}
 
-        // Dokumente der Notiz löschen
-        $this->getDokumente($notiz_id);
-        if(!empty($this->dokumente))
-        {
-            $dms = new dms();
+		// Dokumente der Notiz löschen
+		$this->getDokumente($notiz_id);
+		if(!empty($this->dokumente))
+		{
+			$dms = new dms();
 
-            foreach($this->dokumente as $dms_id)
-            {
-                $dms->deleteDms($dms_id);
-            }
-        }
+			foreach($this->dokumente as $dms_id)
+			{
+				$dms->deleteDms($dms_id);
+			}
+		}
 
 		$qry = "Delete FROM public.tbl_notiz WHERE notiz_id=".$this->db_add_param($notiz_id, FHC_INTEGER);
 
@@ -267,14 +267,14 @@ class notiz extends basis_db
 		}
 	}
 
-    /**
-     * Speichert ein Dokument zur Notiz
-     * @param int $dms_id
-     * @return boolean
-     */
-    public function saveDokument($dms_id)
-    {
-        $qry = "INSERT INTO public.tbl_notiz_dokument(notiz_id, dms_id) VALUES(".
+	/**
+	 * Speichert ein Dokument zur Notiz
+	 * @param int $dms_id
+	 * @return boolean
+	 */
+	public function saveDokument($dms_id)
+	{
+		$qry = "INSERT INTO public.tbl_notiz_dokument(notiz_id, dms_id) VALUES(".
 				$this->db_add_param($this->notiz_id, FHC_INTEGER).','.
 				$this->db_add_param($dms_id, FHC_INTEGER).');';
 
@@ -287,7 +287,7 @@ class notiz extends basis_db
 			$this->errormsg = 'Fehler beim Speichern der Daten';
 			return false;
 		}
-    }
+	}
 
 	/**
 	 *
@@ -377,7 +377,7 @@ class notiz extends basis_db
 				$obj->insertvon=$row->insertvon;
 				$obj->updateamum=$row->updateamum;
 				$obj->updatevon=$row->updatevon;
-                $obj->getDokumente($row->notiz_id);
+				$obj->getDokumente($row->notiz_id);
 
 				$this->result[] = $obj;
 			}
@@ -404,9 +404,9 @@ class notiz extends basis_db
 					public.tbl_notiz
 					LEFT JOIN public.tbl_notizzuordnung USING(notiz_id)
 				WHERE person_id = ' . $this->db_add_param($person_id, FHC_INTEGER) .
-                ' AND (insertvon = ' . $this->db_add_param('online') .' OR insertvon = ' . $this->db_add_param('online_notiz').')
+				' AND (insertvon = ' . $this->db_add_param('online') .' OR insertvon = ' . $this->db_add_param('online_notiz').')
 
-                ORDER BY notiz_id';
+				ORDER BY notiz_id';
 
 		if($result = $this->db_query($qry))
 		{
@@ -444,7 +444,7 @@ class notiz extends basis_db
 	 * (Name und Adresse der besuchten Schule) in eine Notiz mit
 	 * insertvon = online_ausbildung gespeichert.
 	 * Wird auf UDF umgebaut!
-	 * 
+	 *
 	 * Laedt die Notizen zur Ausbilund vom Bewerbungstool
 	 * @param $person_id int
 	 * @return boolean
@@ -457,8 +457,8 @@ class notiz extends basis_db
 					public.tbl_notiz
 					LEFT JOIN public.tbl_notizzuordnung USING(notiz_id)
 				WHERE person_id = ' . $this->db_add_param($person_id, FHC_INTEGER) .
-                ' AND insertvon = ' . $this->db_add_param('online_ausbildung') .
-                ' ORDER BY notiz_id';
+				' AND insertvon = ' . $this->db_add_param('online_ausbildung') .
+				' ORDER BY notiz_id';
 
 		if($result = $this->db_query($qry))
 		{
@@ -564,13 +564,13 @@ class notiz extends basis_db
 		}
 	}
 
-    /**
-     * Laedt die Dokumente der Notiz
-     * @return boolean
-     */
-    public function getDokumente($notiz_id)
-    {
-        $qry = "SELECT dms_id FROM public.tbl_notiz_dokument WHERE notiz_id=".$this->db_add_param($notiz_id, FHC_INTEGER);
+	/**
+	 * Laedt die Dokumente der Notiz
+	 * @return boolean
+	 */
+	public function getDokumente($notiz_id)
+	{
+		$qry = "SELECT dms_id FROM public.tbl_notiz_dokument WHERE notiz_id=".$this->db_add_param($notiz_id, FHC_INTEGER);
 
 		if($this->db_query($qry))
 		{
@@ -579,12 +579,35 @@ class notiz extends basis_db
 				$this->dokumente[] = $row->dms_id;
 			}
 
-            return true;
+			return true;
 		}
 		else
 		{
 			$this->errormsg = 'Fehler beim Laden der Daten';
 			return false;
 		}
-    }
+	}
+
+	/**
+	 * Prueft ob das Dokument an einer Notiz haengt
+	 * @param $dms_id DMS id des Dokuments.
+	 * @return boolean true wenn das Dokument an einer Notiz hängt, sonst false.
+	 */
+	public function isNotizDokument($dms_id)
+	{
+		$qry = "SELECT * FROM public.tbl_notiz_dokument WHERE dms_id=".$this->db_add_param($dms_id, FHC_INTEGER);
+
+		if($result = $this->db_query($qry))
+		{
+			if($this->db_num_rows($result)>0)
+				return true;
+			else
+				return false;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+	}
 }

@@ -43,37 +43,37 @@ else
 	$akte_id ='';
 
 //if(!isset($_GET['version']))
-//	die('Version muss uebergeben werden'); 
-	
+//	die('Version muss uebergeben werden');
+
 $id = $_GET['id'];
-$version = isset($_GET['version'])?$_GET['version']:null; 
+$version = isset($_GET['version'])?$_GET['version']:null;
 
 if(!is_numeric($id))
 	die('ID ist ungueltig');
-	
+
 if($version!='' && !is_numeric($version))
-	die('Version ist ungueltig'); 
-	
+	die('Version ist ungueltig');
+
 $doc = new dms();
 if(!$doc->load($id,$version))
 	die('Dieses Dokument existiert nicht mehr');
 
 if($doc->isLocked($id))
 {
-	//Wenn person_id aus Session und akte_id uebergeben wurde 
-	//und person_id Besitzer des Dokuments ist (person_id aus tbl_akte) 
+	//Wenn person_id aus Session und akte_id uebergeben wurde
+	//und person_id Besitzer des Dokuments ist (person_id aus tbl_akte)
 	//und das Dokument in der Onlinebewerbung hochgeladen werden kann
 	//darf das Dokument heruntergeladen werden
 	if($person_id!='' && $akte_id!='')
-	{	
+	{
 		$akte = new akte();
 		$akte->load($akte_id);
 		$akte_person = $akte->person_id;
 		$akte_dokument_kurzbz = $akte->dokument_kurzbz;
-		
+
 		$dokumente_person = new dokument();
 		$dokumente_person->getAllDokumenteForPerson($person_id, true);
-		
+
 		$dokumente_arr = array();
 		foreach ($dokumente_person->result AS $row)
 			$dokumente_arr[] .= $row->dokument_kurzbz;
@@ -90,11 +90,23 @@ if($doc->isLocked($id))
 	{
 		//Dokument erfordert Authentifizierung
 		$user = get_uid();
+
+		$rechte = new benutzerberechtigung();
+		$rechte->getBerechtigungen($user);
+
 		if(!$doc->isBerechtigt($id, $user))
 		{
+			// Wenn eine Berechtigung an der Kategorie haengt
+			// dann darf nur mit diesem Recht darauf zugegriffen werden
+			$kategorie = new dms();
+			$kategorie->loadKategorie($doc->kategorie_kurzbz);
+			if($kategorie->berechtigung_kurzbz!='')
+			{
+				if(!$rechte->isBerechtigt($kategorie->berechtigung_kurzbz))
+					die('Sie haben keinen Zugriff auf dieses Dokument');
+			}
+
 			//Globales DMS recht pruefen
-			$rechte = new benutzerberechtigung();
-			$rechte->getBerechtigungen($user);
 			if(!$rechte->isBerechtigt('basis/dms'))
 				die('Sie haben keinen Zugriff auf dieses Dokument');
 		}
@@ -111,12 +123,12 @@ if(file_exists($filename))
 	{
 		if($doc->mimetype=='')
 			$doc->mimetype='application/octetstream';
-		
+
 		header('Content-type: '.$doc->mimetype);
 		header('Content-Disposition: inline; filename="'.$doc->name.'"');
 		header('Content-Length: ' .filesize($filename));
-		
-		while (!feof($handle)) 
+
+		while (!feof($handle))
 		{
 			echo fread($handle, 8192);
 		}
