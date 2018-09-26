@@ -271,12 +271,12 @@ for ($i = 0; $i < count($ztaufdata); $i++)
 				$projectlines[$day]->arbeitszeit -= $projectlines[$day]->arbeitszeit - 6;
 		}
 
-		$projectlines[$day]->arbeitszeit = floor($projectlines[$day]->arbeitszeit * 100) / 100;
+		$projectlines[$day]->arbeitszeit = round($projectlines[$day]->arbeitszeit, 2);
 
 		foreach ($projectlines[$day]->projekte as $name => $project)
 		{
 			$projecthours =& $projectlines[$day]->projekte[$name]->stunden;
-			$projecthours = floor($projecthours * 100) / 100;
+			$projecthours = round($projecthours, 2);
 			if (array_key_exists($name, $monthsums))
 				$monthsums[$name] += $projecthours;
 			else
