@@ -1252,7 +1252,11 @@ if (defined("CIS_GESAMTNOTE_PRUEFUNG_MOODLE_LE_NOTE") && CIS_GESAMTNOTE_PRUEFUNG
 						<input type='hidden' name='student_uid' value='$uid'>";
 
 			// nur überschreibbare Noten können geändert werden
-			$ueberschreibbar = is_null($znote) || $noten_array[$znote]['lkt_ueberschreibbar'];
+			$ueberschreibbar = true;
+
+			if (isset($noten_array[$znote]['lkt_ueberschreibbar']) && $noten_array[$znote]['lkt_ueberschreibbar'] === false)
+				$ueberschreibbar = false;
+
 			// Punkte
 			if (CIS_GESAMTNOTE_PUNKTE)
 			{

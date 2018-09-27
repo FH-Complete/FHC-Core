@@ -246,13 +246,16 @@ if (isset($_REQUEST["submit"]))
 					{
 						$znote = $zeugnisnote->note;
 
-						$notenobj = $noten_arr[$znote];
-
-						// Note nicht speichern wenn Zeugnisnote nicht überschreibbar
-						if (!$notenobj->lkt_ueberschreibbar)
+						if (!empty($znote) && array_key_exists($znote, $noten_arr))
 						{
-							$response .= "\n".$p->t('benotungstool/noteNichtUeberschreibbar', array($matrikelnummer, $notenobj->bezeichnung));
-							continue;
+							$notenobj = $noten_arr[$znote];
+
+							// Note nicht speichern wenn Zeugnisnote nicht überschreibbar
+							if ($notenobj->lkt_ueberschreibbar === false)
+							{
+								$response .= "\n".$p->t('benotungstool/noteNichtUeberschreibbar', array($matrikelnummer, $notenobj->bezeichnung));
+								continue;
+							}
 						}
 					}
 

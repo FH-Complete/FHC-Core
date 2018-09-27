@@ -2913,7 +2913,7 @@ if(!$error)
 							$zeugnisnote->updateamum = date('Y-m-d H:i:s');
 							$zeugnisnote->updatevon = $user;
 							// Noten wie "angerechnet", "nicht erforderlich" werden nicht ueberschrieben
-							if(isset($zeugnisnote->note) && !$noten_ueberschreibbar[$zeugnisnote->note])
+							if(isset($zeugnisnote->note) && array_key_exists($zeugnisnote->note, $noten_ueberschreibbar) && $noten_ueberschreibbar[$zeugnisnote->note] === false)
 							{
 								$notenbez = '"'.$noten_bezeichnung[$zeugnisnote->note].'"';
 								if (!in_array($notenbez, $nueberschreibbarbez))
@@ -3066,7 +3066,7 @@ if(!$error)
 								$zeugnisnote->updateamum = date('Y-m-d H:i:s');
 								$zeugnisnote->updatevon = $user;
 								// Noten wie "angerechnet", "nicht erforderlich" werden nicht ueberschrieben
-								if(isset($zeugnisnote->note) && !$noten_ueberschreibbar[$zeugnisnote->note])
+								if(isset($zeugnisnote->note) && array_key_exists($zeugnisnote->note, $noten_ueberschreibbar) && $noten_ueberschreibbar[$zeugnisnote->note] === false)
 								{
 									$notenbez = '"'.$noten_bezeichnung[$zeugnisnote->note].'"';
 									if (!in_array($notenbez, $nueberschreibbarbez))
