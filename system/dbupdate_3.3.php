@@ -506,17 +506,6 @@ if(!$result = @$db->db_query("SELECT offiziell FROM lehre.tbl_note LIMIT 1;"))
 		echo '<br>lehre.tbl_note: Spalte offiziell hinzugefuegt!<br>';
 }
 
-// Spalte lkt_ueberschreibbar in lehre.tbl_note
-if(!$result = @$db->db_query("SELECT lkt_ueberschreibbar FROM lehre.tbl_note LIMIT 1;"))
-{
-	$qry = "ALTER TABLE lehre.tbl_note ADD COLUMN lkt_ueberschreibbar boolean NOT NULL DEFAULT true;";
-
-	if(!$db->db_query($qry))
-		echo '<strong>lehre.tbl_note: '.$db->db_last_error().'</strong><br>';
-	else
-		echo '<br>lehre.tbl_note: Spalte lkt_ueberschreibbar hinzugefuegt!<br>';
-}
-
 // Spalte bezeichnung_mehrsprachig in lehre.tbl_note
 if(!$result = @$db->db_query("SELECT bezeichnung_mehrsprachig FROM lehre.tbl_note LIMIT 1"))
 {
@@ -2393,6 +2382,18 @@ if(!$result = @$db->db_query("SELECT updateaktivam FROM campus.vw_mitarbeiter LI
 	else
 		echo '<br>campus.vw_mitarbeiter: Spalte updateaktivam, updateaktivon, lastupdate hinzugefuegt';
 }
+
+// Spalte lkt_ueberschreibbar in lehre.tbl_note
+if(!$result = @$db->db_query("SELECT lkt_ueberschreibbar FROM lehre.tbl_note LIMIT 1;"))
+{
+	$qry = "ALTER TABLE lehre.tbl_note ADD COLUMN lkt_ueberschreibbar boolean NOT NULL DEFAULT true;";
+
+	if(!$db->db_query($qry))
+		echo '<strong>lehre.tbl_note: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>lehre.tbl_note: Spalte lkt_ueberschreibbar hinzugefuegt!<br>';
+}
+
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
 
@@ -2514,7 +2515,7 @@ $tabellen=array(
 	"lehre.tbl_notenschluessel" => array("notenschluessel_kurzbz","bezeichnung"),
 	"lehre.tbl_notenschluesselaufteilung" => array("notenschluesselaufteilung_id","notenschluessel_kurzbz","note","punkte"),
 	"lehre.tbl_notenschluesselzuordnung" => array("notenschluesselzuordnung_id","notenschluessel_kurzbz","lehrveranstaltung_id","studienplan_id","oe_kurzbz","studiensemester_kurzbz"),
-	"lehre.tbl_note"  => array("note","bezeichnung","anmerkung","farbe","positiv","notenwert","aktiv","lehre","offiziell","bezeichnung_mehrsprachig"),
+	"lehre.tbl_note"  => array("note","bezeichnung","anmerkung","farbe","positiv","notenwert","aktiv","lehre","offiziell","bezeichnung_mehrsprachig","lkt_ueberschreibbar"),
 	"lehre.tbl_projektarbeit"  => array("projektarbeit_id","projekttyp_kurzbz","titel","lehreinheit_id","student_uid","firma_id","note","punkte","beginn","ende","faktor","freigegeben","gesperrtbis","stundensatz","gesamtstunden","themenbereich","anmerkung","updateamum","updatevon","insertamum","insertvon","ext_id","titel_english","seitenanzahl","abgabedatum","kontrollschlagwoerter","schlagwoerter","schlagwoerter_en","abstract", "abstract_en", "sprache","final"),
 	"lehre.tbl_projektbetreuer"  => array("person_id","projektarbeit_id","betreuerart_kurzbz","note","faktor","name","punkte","stunden","stundensatz","updateamum","updatevon","insertamum","insertvon","ext_id","vertrag_id"),
 	"lehre.tbl_projekttyp"  => array("projekttyp_kurzbz","bezeichnung"),
