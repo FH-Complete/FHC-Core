@@ -25,13 +25,14 @@ class Benutzerfunktion_model extends DB_Model
 
 	/**
 	 * Gets all Benutzer for a given OE and specified Benutzerfunktionen
-	 * @param $funktion_kurzbz string with one benutzerfunktionname or array with one or more
-	 * @param $oe_kurzbz
-	 * @param bool $activeoeonly if true, retrieve only active Organisationseinheiten
-	 * @param bool $activebenonly if true, retrieve only active Benutzer
+	 * @param string $funktion_kurzbz String with one benutzerfunktionname or array with one or more.
+	 * @param string $oe_kurzbz
+	 * @param bool $activeoeonly If true, retrieve only active Organisationseinheiten.
+	 * @param bool $activebenonly If true, retrieve only active Benutzer.
+	 * @param bool $oerecursive If true, retrieve all oes under given oe_kurzbz recursively.
 	 * @return array|null
 	 */
-	public function getBenutzerFunktionen($funktion_kurzbz, $oe_kurzbz = null, $activeoeonly = false, $activebenonly = false)
+	public function getBenutzerFunktionen($funktion_kurzbz, $oe_kurzbz = null, $activeoeonly = false, $activebenonly = false, $oerecursive = false)
 	{
 		$parametersArray = array();
 
@@ -57,7 +58,35 @@ class Benutzerfunktion_model extends DB_Model
 
 		if (is_string($oe_kurzbz))
 		{
-			$query .= " AND tbl_benutzerfunktion.oe_kurzbz = ?";
+			if ($oerecursive === true)
+			{
+				$query .=
+				" AND oe_kurzbz IN
+				  (
+					WITH RECURSIVE oes(oe_kurzbz, oe_parent_kurzbz, aktiv) as
+					(
+					  SELECT oe_kurzbz, oe_parent_kurzbz, aktiv FROM public.tbl_organisationseinheit
+					  WHERE oe_kurzbz=?";
+
+				if ($activeoeonly === true)
+					$query .= " AND aktiv=true";
+
+				$query .=
+					  " UNION ALL
+					  SELECT o.oe_kurzbz, o.oe_parent_kurzbz, o.aktiv FROM public.tbl_organisationseinheit o, oes
+					  WHERE o.oe_parent_kurzbz=oes.oe_kurzbz
+					)
+					SELECT oe_kurzbz
+					FROM oes";
+				if ($activeoeonly === true)
+				{
+					$query .= " WHERE aktiv=true";
+				}
+				$query .= " GROUP BY oe_kurzbz)";
+			}
+			else
+				$query .= " AND tbl_benutzerfunktion.oe_kurzbz = ?";
+
 			$parametersArray[] = $oe_kurzbz;
 		}
 
@@ -71,7 +100,7 @@ class Benutzerfunktion_model extends DB_Model
 			$query .= " AND tbl_organisationseinheit.aktiv";
 		}
 
-		$query .= " ORDER BY funktion_kurzbz, oe_kurzbz, uid";
+		$query .= " ORDER BY oe_kurzbz, funktion_kurzbz, uid";
 
 		return $this->execQuery($query, $parametersArray);
 	}
