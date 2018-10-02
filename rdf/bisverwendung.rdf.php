@@ -84,7 +84,12 @@ function draw_row($row)
 		$hauptberuflich = $row->hauptberuflich?'Ja':'Nein';
 	else
 		$hauptberuflich = '';
-
+	
+	if(is_bool($row->zeitaufzeichnungspflichtig))
+		$zeitaufzeichnungspflichtig = $row->zeitaufzeichnungspflichtig?'Ja':'Nein';
+	else
+		$zeitaufzeichnungspflichtig = '';
+	
 	echo '
       <RDF:li>
          <RDF:Description  id="'.$row->bisverwendung_id.'"  about="'.$rdf_url.'/'.$row->bisverwendung_id.'" >
@@ -113,6 +118,7 @@ function draw_row($row)
             <VERWENDUNG:insertvon><![CDATA['.$row->insertvon.']]></VERWENDUNG:insertvon>
 			<VERWENDUNG:dv_art><![CDATA['.$row->dv_art.']]></VERWENDUNG:dv_art>
 			<VERWENDUNG:inkludierte_lehre><![CDATA['.$row->inkludierte_lehre.']]></VERWENDUNG:inkludierte_lehre>
+			<VERWENDUNG:zeitaufzeichnungspflichtig><![CDATA['.$zeitaufzeichnungspflichtig.']]></VERWENDUNG:zeitaufzeichnungspflichtig>
          </RDF:Description>
       </RDF:li>
       ';

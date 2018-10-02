@@ -2394,6 +2394,43 @@ if(!$result = @$db->db_query("SELECT lkt_ueberschreibbar FROM lehre.tbl_note LIM
 		echo '<br>lehre.tbl_note: Spalte lkt_ueberschreibbar hinzugefuegt!<br>';
 }
 
+
+// ADD COLUMN zeitaufzeichnungspflichtig to bis.tbl_bisverwendung
+// UPDATE zeitaufzeichnungspflichtig in bis.tbl_bisverwendung
+if(!@$db->db_query("SELECT zeitaufzeichnungspflichtig FROM bis.tbl_bisverwendung LIMIT 1"))
+{
+	$qry = "ALTER TABLE bis.tbl_bisverwendung ADD COLUMN zeitaufzeichnungspflichtig boolean;
+		
+			UPDATE 
+				bis.tbl_bisverwendung 
+			SET 
+				zeitaufzeichnungspflichtig=true 
+			FROM 
+				public.tbl_mitarbeiter 
+			WHERE 
+				tbl_bisverwendung.mitarbeiter_uid = tbl_mitarbeiter.mitarbeiter_uid 
+			AND 
+				fixangestellt=true;
+			UPDATE
+				bis.tbl_bisverwendung 
+			SET
+				zeitaufzeichnungspflichtig=false
+			FROM
+				public.tbl_mitarbeiter
+			WHERE
+				tbl_bisverwendung.mitarbeiter_uid = tbl_mitarbeiter.mitarbeiter_uid
+			AND
+				fixangestellt=false;
+				
+			COMMENT ON COLUMN bis.tbl_bisverwendung.zeitaufzeichnungspflichtig IS 'CaseTime Monatslisten mit Vertragsbeginn verpflichtend führen?';";
+
+	if(!$db->db_query($qry))
+		echo '<strong>bis.tbl_bisverwendung '.$db->db_last_error().'</strong><br>';
+		else
+			echo "<br>Spalte zeitaufzeichnungspflichtig in bis.tbl_bisverwendung hinzugefügt"
+				. "<br>Fix angestellte Mitarbeiter auf true gesetzt, alle anderen auf false";
+}
+
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
 
@@ -2410,7 +2447,7 @@ $tabellen=array(
 	"bis.tbl_besqual"  => array("besqualcode","besqualbez"),
 	"bis.tbl_bisfunktion"  => array("bisverwendung_id","studiengang_kz","sws","updateamum","updatevon","insertamum","insertvon","ext_id"),
 	"bis.tbl_bisio"  => array("bisio_id","mobilitaetsprogramm_code","nation_code","von","bis","zweck_code","student_uid","updateamum","updatevon","insertamum","insertvon","ext_id","ort","universitaet","lehreinheit_id"),
-	"bis.tbl_bisverwendung"  => array("bisverwendung_id","ba1code","ba2code","vertragsstunden","beschausmasscode","verwendung_code","mitarbeiter_uid","hauptberufcode","hauptberuflich","habilitation","beginn","ende","updateamum","updatevon","insertamum","insertvon","ext_id","dv_art","inkludierte_lehre"),
+	"bis.tbl_bisverwendung"  => array("bisverwendung_id","ba1code","ba2code","vertragsstunden","beschausmasscode","verwendung_code","mitarbeiter_uid","hauptberufcode","hauptberuflich","habilitation","beginn","ende","updateamum","updatevon","insertamum","insertvon","ext_id","dv_art","inkludierte_lehre","zeitaufzeichnungspflichtig"),
 	"bis.tbl_bundesland"  => array("bundesland_code","kurzbz","bezeichnung"),
 	"bis.tbl_entwicklungsteam"  => array("mitarbeiter_uid","studiengang_kz","besqualcode","beginn","ende","updateamum","updatevon","insertamum","insertvon","ext_id"),
 	"bis.tbl_gemeinde"  => array("gemeinde_id","plz","name","ortschaftskennziffer","ortschaftsname","bulacode","bulabez","kennziffer"),
