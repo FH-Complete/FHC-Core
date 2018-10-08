@@ -16,8 +16,8 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ *		  Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
+ *		  Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
 require_once(dirname(__FILE__).'/person.class.php');
 require_once(dirname(__FILE__).'/log.class.php');
@@ -69,6 +69,7 @@ class prestudent extends person
 	public $zgvdoktornation;
 	public $gsstudientyp_kurzbz='Intern';
 	public $aufnahmegruppe_kurzbz;
+	public $priorisierung = null;
 
 	public $status_kurzbz;
 	public $studiensemester_kurzbz;
@@ -87,12 +88,12 @@ class prestudent extends person
 	public $statusgrund_id;
 	public $rt_stufe;
 
-    public $studiensemester_old = '';
-    public $ausbildungssemester_old = '';
+	public $studiensemester_old = '';
+	public $ausbildungssemester_old = '';
 
-    // ErgebnisArray
-    public $result = array();
-    public $num_rows = 0;
+	// ErgebnisArray
+	public $result = array();
+	public $num_rows = 0;
 
 	/**
 	 * Konstruktor - Uebergibt die Connection und laedt optional einen Prestudent
@@ -108,7 +109,7 @@ class prestudent extends person
 
 	/**
 	 * Laedt Prestudent mit der uebergebenen ID
-	 * @param $prestudent_id ID des Prestudenten der geladen werden soll
+	 * @param integer $prestudent_id ID des Prestudenten der geladen werden soll
 	 */
 	public function load($prestudent_id=null)
 	{
@@ -137,9 +138,9 @@ class prestudent extends person
 				$this->zgvnation = $row->zgvnation;
 				$this->zgvmas_code = $row->zgvmas_code;
 				$this->zgvmaort = $row->zgvmaort;
-                $this->zgvmadatum = $row->zgvmadatum;
-                $this->zgvmanation = $row->zgvmanation;
-                $this->aufnahmeschluessel = $row->aufnahmeschluessel;
+				$this->zgvmadatum = $row->zgvmadatum;
+				$this->zgvmanation = $row->zgvmanation;
+				$this->aufnahmeschluessel = $row->aufnahmeschluessel;
 				$this->facheinschlberuf = $this->db_parse_bool($row->facheinschlberuf);
 				$this->anmeldungreihungstest = $row->anmeldungreihungstest;
 				$this->reihungstestangetreten = $this->db_parse_bool($row->reihungstestangetreten);
@@ -155,14 +156,15 @@ class prestudent extends person
 				$this->ext_id_prestudent = $row->ext_id;
 				$this->dual = $this->db_parse_bool($row->dual);
 				$this->ausstellungsstaat = $row->ausstellungsstaat;
-                $this->zgvdoktor_code = $row->zgvdoktor_code;
-                $this->zgvdoktorort = $row->zgvdoktorort;
-                $this->zgvdoktordatum = $row->zgvdoktordatum;
-                $this->zgvdoktornation = $row->zgvdoktornation;
+				$this->zgvdoktor_code = $row->zgvdoktor_code;
+				$this->zgvdoktorort = $row->zgvdoktorort;
+				$this->zgvdoktordatum = $row->zgvdoktordatum;
+				$this->zgvdoktornation = $row->zgvdoktornation;
 				$this->gsstudientyp_kurzbz = $row->gsstudientyp_kurzbz;
 				$this->aufnahmegruppe_kurzbz = $row->aufnahmegruppe_kurzbz;
+				$this->priorisierung = $row->priorisierung;
 
-                if(!person::load($row->person_id))
+				if(!person::load($row->person_id))
 					return false;
 				else
 					return true;
@@ -223,7 +225,7 @@ class prestudent extends person
 		//if(!person::save())
 		//	return false;
 
-        $this->checkAusstellungsstaat();
+		$this->checkAusstellungsstaat();
 
 		//Variablen auf Gueltigkeit pruefen
 		if(!prestudent::validate())
@@ -237,76 +239,78 @@ class prestudent extends person
 					reihungstest_id, anmeldungreihungstest, reihungstestangetreten, rt_gesamtpunkte,
 					rt_punkte1, rt_punkte2, rt_punkte3, bismelden, insertamum, insertvon,
 					updateamum, updatevon, anmerkung, dual, ausstellungsstaat, mentor,
-					gsstudientyp_kurzbz, aufnahmegruppe_kurzbz) VALUES('.
-			       $this->db_add_param($this->aufmerksamdurch_kurzbz).",".
-			       $this->db_add_param($this->person_id).",".
-			       $this->db_add_param($this->studiengang_kz).",".
-			       $this->db_add_param($this->berufstaetigkeit_code).",".
-			       $this->db_add_param($this->ausbildungcode).",".
-			       $this->db_add_param($this->zgv_code).",".
-			       $this->db_add_param($this->zgvort).",".
-			       $this->db_add_param($this->zgvdatum).",".
-			       $this->db_add_param($this->zgvnation).",".
-			       $this->db_add_param($this->zgvmas_code).",".
-			       $this->db_add_param($this->zgvmaort).",".
-			       $this->db_add_param($this->zgvmadatum).",".
-                   $this->db_add_param($this->zgvmanation).",".
-			       $this->db_add_param($this->aufnahmeschluessel).",".
-			       $this->db_add_param($this->facheinschlberuf, FHC_BOOLEAN).",".
-			       $this->db_add_param($this->reihungstest_id).",".
-			       $this->db_add_param($this->anmeldungreihungstest).",".
-			       $this->db_add_param($this->reihungstestangetreten, FHC_BOOLEAN).",".
-			       $this->db_add_param($this->punkte).",".
-			       $this->db_add_param($this->rt_punkte1).",".
-			       $this->db_add_param($this->rt_punkte2).",".
-			       $this->db_add_param($this->rt_punkte3).",".
-			       $this->db_add_param($this->bismelden, FHC_BOOLEAN).",".
-			       $this->db_add_param($this->insertamum).",".
-			       $this->db_add_param($this->insertvon).",".
-			       $this->db_add_param($this->updateamum).",".
-			       $this->db_add_param($this->updatevon).",".
-			       $this->db_add_param($this->anmerkung).",".
-			       $this->db_add_param($this->dual, FHC_BOOLEAN).",".
-			       $this->db_add_param($this->ausstellungsstaat).",".
-			       $this->db_add_param($this->mentor).",".
-				   $this->db_add_param($this->gsstudientyp_kurzbz).",".
-				   $this->db_add_param($this->aufnahmegruppe_kurzbz).");";
+					gsstudientyp_kurzbz, aufnahmegruppe_kurzbz, priorisierung) VALUES('.
+					$this->db_add_param($this->aufmerksamdurch_kurzbz).",".
+					$this->db_add_param($this->person_id).",".
+					$this->db_add_param($this->studiengang_kz).",".
+					$this->db_add_param($this->berufstaetigkeit_code).",".
+					$this->db_add_param($this->ausbildungcode).",".
+					$this->db_add_param($this->zgv_code).",".
+					$this->db_add_param($this->zgvort).",".
+					$this->db_add_param($this->zgvdatum).",".
+					$this->db_add_param($this->zgvnation).",".
+					$this->db_add_param($this->zgvmas_code).",".
+					$this->db_add_param($this->zgvmaort).",".
+					$this->db_add_param($this->zgvmadatum).",".
+					$this->db_add_param($this->zgvmanation).",".
+					$this->db_add_param($this->aufnahmeschluessel).",".
+					$this->db_add_param($this->facheinschlberuf, FHC_BOOLEAN).",".
+					$this->db_add_param($this->reihungstest_id).",".
+					$this->db_add_param($this->anmeldungreihungstest).",".
+					$this->db_add_param($this->reihungstestangetreten, FHC_BOOLEAN).",".
+					$this->db_add_param($this->punkte).",".
+					$this->db_add_param($this->rt_punkte1).",".
+					$this->db_add_param($this->rt_punkte2).",".
+					$this->db_add_param($this->rt_punkte3).",".
+					$this->db_add_param($this->bismelden, FHC_BOOLEAN).",".
+					$this->db_add_param($this->insertamum).",".
+					$this->db_add_param($this->insertvon).",".
+					$this->db_add_param($this->updateamum).",".
+					$this->db_add_param($this->updatevon).",".
+					$this->db_add_param($this->anmerkung).",".
+					$this->db_add_param($this->dual, FHC_BOOLEAN).",".
+					$this->db_add_param($this->ausstellungsstaat).",".
+					$this->db_add_param($this->mentor).",".
+					$this->db_add_param($this->gsstudientyp_kurzbz).",".
+					$this->db_add_param($this->aufnahmegruppe_kurzbz).",".
+					$this->db_add_param($this->priorisierung).");";
 		}
 		else
 		{
 			$qry = 'UPDATE public.tbl_prestudent SET'.
-			       ' aufmerksamdurch_kurzbz='.$this->db_add_param($this->aufmerksamdurch_kurzbz).",".
-			       ' person_id='.$this->db_add_param($this->person_id).",".
-			       ' studiengang_kz='.$this->db_add_param($this->studiengang_kz).",".
-			       ' berufstaetigkeit_code='.$this->db_add_param($this->berufstaetigkeit_code).",".
-			       ' ausbildungcode='.$this->db_add_param($this->ausbildungcode).",".
-			       ' zgv_code='.$this->db_add_param($this->zgv_code).",".
-			       ' zgvort='.$this->db_add_param($this->zgvort).",".
-			       ' zgvdatum='.$this->db_add_param($this->zgvdatum).",".
-			       ' zgvnation='.$this->db_add_param($this->zgvnation).",".
-			       ' zgvmas_code='.$this->db_add_param($this->zgvmas_code).",".
-			       ' zgvmaort='.$this->db_add_param($this->zgvmaort).",".
-			       ' zgvmadatum='.$this->db_add_param($this->zgvmadatum).",".
-			       ' zgvmanation='.$this->db_add_param($this->zgvmanation).",".
-			       ' aufnahmeschluessel='.$this->db_add_param($this->aufnahmeschluessel).",".
-			       ' facheinschlberuf='.$this->db_add_param($this->facheinschlberuf, FHC_BOOLEAN).",".
-			       ' reihungstest_id='.$this->db_add_param($this->reihungstest_id).",".
-			       ' anmeldungreihungstest='.$this->db_add_param($this->anmeldungreihungstest).",".
-			       ' reihungstestangetreten='.$this->db_add_param($this->reihungstestangetreten, FHC_BOOLEAN).",".
-			       ' rt_gesamtpunkte='.$this->db_add_param($this->punkte).",".
-			       ' rt_punkte1='.$this->db_add_param($this->rt_punkte1).",".
-			       ' rt_punkte2='.$this->db_add_param($this->rt_punkte2).",".
-			       ' rt_punkte3='.$this->db_add_param($this->rt_punkte3).",".
-			       ' bismelden='.$this->db_add_param($this->bismelden, FHC_BOOLEAN).",".
-			       ' updateamum='.$this->db_add_param($this->updateamum).",".
-			       ' updatevon='.$this->db_add_param($this->updatevon).",".
-			       ' anmerkung='.$this->db_add_param($this->anmerkung).",".
-			       ' mentor='.$this->db_add_param($this->mentor).",".
-				   ' gsstudientyp_kurzbz='.$this->db_add_param($this->gsstudientyp_kurzbz).",".
-			       ' dual='.$this->db_add_param($this->dual, FHC_BOOLEAN).",".
-				   ' ausstellungsstaat='.$this->db_add_param($this->ausstellungsstaat).",".
-				   ' aufnahmegruppe_kurzbz='.$this->db_add_param($this->aufnahmegruppe_kurzbz).' '.
-			       " WHERE prestudent_id=".$this->db_add_param($this->prestudent_id).";";
+					' aufmerksamdurch_kurzbz='.$this->db_add_param($this->aufmerksamdurch_kurzbz).",".
+					' person_id='.$this->db_add_param($this->person_id).",".
+					' studiengang_kz='.$this->db_add_param($this->studiengang_kz).",".
+					' berufstaetigkeit_code='.$this->db_add_param($this->berufstaetigkeit_code).",".
+					' ausbildungcode='.$this->db_add_param($this->ausbildungcode).",".
+					' zgv_code='.$this->db_add_param($this->zgv_code).",".
+					' zgvort='.$this->db_add_param($this->zgvort).",".
+					' zgvdatum='.$this->db_add_param($this->zgvdatum).",".
+					' zgvnation='.$this->db_add_param($this->zgvnation).",".
+					' zgvmas_code='.$this->db_add_param($this->zgvmas_code).",".
+					' zgvmaort='.$this->db_add_param($this->zgvmaort).",".
+					' zgvmadatum='.$this->db_add_param($this->zgvmadatum).",".
+					' zgvmanation='.$this->db_add_param($this->zgvmanation).",".
+					' aufnahmeschluessel='.$this->db_add_param($this->aufnahmeschluessel).",".
+					' facheinschlberuf='.$this->db_add_param($this->facheinschlberuf, FHC_BOOLEAN).",".
+					' reihungstest_id='.$this->db_add_param($this->reihungstest_id).",".
+					' anmeldungreihungstest='.$this->db_add_param($this->anmeldungreihungstest).",".
+					' reihungstestangetreten='.$this->db_add_param($this->reihungstestangetreten, FHC_BOOLEAN).",".
+					' rt_gesamtpunkte='.$this->db_add_param($this->punkte).",".
+					' rt_punkte1='.$this->db_add_param($this->rt_punkte1).",".
+					' rt_punkte2='.$this->db_add_param($this->rt_punkte2).",".
+					' rt_punkte3='.$this->db_add_param($this->rt_punkte3).",".
+					' bismelden='.$this->db_add_param($this->bismelden, FHC_BOOLEAN).",".
+					' updateamum='.$this->db_add_param($this->updateamum).",".
+					' updatevon='.$this->db_add_param($this->updatevon).",".
+					' anmerkung='.$this->db_add_param($this->anmerkung).",".
+					' mentor='.$this->db_add_param($this->mentor).",".
+					' gsstudientyp_kurzbz='.$this->db_add_param($this->gsstudientyp_kurzbz).",".
+					' dual='.$this->db_add_param($this->dual, FHC_BOOLEAN).",".
+					' ausstellungsstaat='.$this->db_add_param($this->ausstellungsstaat).",".
+					' aufnahmegruppe_kurzbz='.$this->db_add_param($this->aufnahmegruppe_kurzbz).",".
+					' priorisierung='.$this->db_add_param($this->priorisierung).' '.
+					" WHERE prestudent_id=".$this->db_add_param($this->prestudent_id).";";
 		}
 
 		if($this->db_query($qry))
@@ -365,7 +369,7 @@ class prestudent extends person
 	/**
 	 * Laden aller Prestudenten, die an $datum zum Reihungstest geladen sind.
 	 * da zukünftige Teilnehmer nicht mehr angezeigt werden sollen.
-	 * @param date $datum Datum an dem der Reihungstest stattfindet
+	 * @param string $datum Datum in der Form YYYY-MM-DD an dem der Reihungstest stattfindet
 	 * @return true wenn erfolgreich, false im Fehlerfall
 	 */
 	public function getPrestudentRT($datum)
@@ -544,11 +548,11 @@ class prestudent extends person
 	/**
 	 * Laedt die Interessenten und Bewerber fuer ein bestimmtes Studiensemester
 	 *
-	 * @param $studiensemester_kurzbz Studiensemester fuer das die Int. und Bewerber geladen werden sollen.
-	 * @param $studiengang_kz Kennzahl des Studiengangs.
-	 * @param $semester Ausbildungssemester.
-	 * @param $typ Filter fuer Typ von Interessenten/Bewerber
-	 * @param $orgform Organisationsform.
+	 * @param string $studiensemester_kurzbz Studiensemester fuer das die Int. und Bewerber geladen werden sollen.
+	 * @param integer $studiengang_kz Kennzahl des Studiengangs.
+	 * @param integer $semester Ausbildungssemester.
+	 * @param string $typ Filter fuer Typ von Interessenten/Bewerber
+	 * @param string $orgform Organisationsform.
 	 * @return boolean true wenn erfolgreich, false im Fehlerfall
 	 */
 	public function loadInteressentenUndBewerber($studiensemester_kurzbz, $studiengang_kz, $semester=null, $typ=null, $orgform=null)
@@ -716,6 +720,7 @@ class prestudent extends person
 				$ps->dual = $this->db_parse_bool($row->dual);
 				$ps->gsstudientyp_kurzbz = $row->gsstudientyp_kurzbz;
 				$ps->aufnahmegruppe_kurzbz = $row->aufnahmegruppe_kurzbz;
+				$ps->priorisierung = $row->priorisierung;
 
 				$ps->status_kurzbz = $row->status_kurzbz;
 				$ps->studiensemester_kurzbz = $row->studiensemester_kurzbz;
@@ -874,21 +879,21 @@ class prestudent extends person
 					studiensemester_kurzbz, ausbildungssemester, datum, insertamum, insertvon,
 					updateamum, updatevon, ext_id, orgform_kurzbz, bestaetigtam, bestaetigtvon, anmerkung,
 					bewerbung_abgeschicktamum, studienplan_id, rt_stufe, statusgrund_id) VALUES('.
-			       $this->db_add_param($this->prestudent_id).",".
-			       $this->db_add_param($this->status_kurzbz).",".
-			       $this->db_add_param($this->studiensemester_kurzbz).",".
-			       $this->db_add_param($this->ausbildungssemester).",".
-			       $this->db_add_param($this->datum).",".
-			       $this->db_add_param($this->insertamum).",".
-			       $this->db_add_param($this->insertvon).",".
-			       $this->db_add_param($this->updateamum).",".
-			       $this->db_add_param($this->updatevon).",".
-			       $this->db_add_param($this->ext_id_prestudent).",".
-			       $this->db_add_param($this->orgform_kurzbz).",".
-			       $this->db_add_param($this->bestaetigtam).",".
-			       $this->db_add_param($this->bestaetigtvon).",".
-			       $this->db_add_param($this->anmerkung_status).",".
-			       $this->db_add_param($this->bewerbung_abgeschicktamum).",".
+				   $this->db_add_param($this->prestudent_id).",".
+				   $this->db_add_param($this->status_kurzbz).",".
+				   $this->db_add_param($this->studiensemester_kurzbz).",".
+				   $this->db_add_param($this->ausbildungssemester).",".
+				   $this->db_add_param($this->datum).",".
+				   $this->db_add_param($this->insertamum).",".
+				   $this->db_add_param($this->insertvon).",".
+				   $this->db_add_param($this->updateamum).",".
+				   $this->db_add_param($this->updatevon).",".
+				   $this->db_add_param($this->ext_id_prestudent).",".
+				   $this->db_add_param($this->orgform_kurzbz).",".
+				   $this->db_add_param($this->bestaetigtam).",".
+				   $this->db_add_param($this->bestaetigtvon).",".
+				   $this->db_add_param($this->anmerkung_status).",".
+				   $this->db_add_param($this->bewerbung_abgeschicktamum).",".
 				   $this->db_add_param($this->studienplan_id,FHC_INTEGER).",".
 				   $this->db_add_param($this->rt_stufe,FHC_INTEGER).",".
 					$this->db_add_param($this->statusgrund_id, FHC_INTEGER).");";
@@ -911,20 +916,20 @@ class prestudent extends person
 				}
 			}
 			$qry = 'UPDATE public.tbl_prestudentstatus SET'.
-			       ' ausbildungssemester='.$this->db_add_param($this->ausbildungssemester).",".
-			       ' studiensemester_kurzbz='.$this->db_add_param($this->studiensemester_kurzbz).",".
-			       ' datum='.$this->db_add_param($this->datum).",".
-			       ' updateamum='.$this->db_add_param($this->updateamum).",".
-			       ' updatevon='.$this->db_add_param($this->updatevon).",".
-			       ' bestaetigtam='.$this->db_add_param($this->bestaetigtam).",".
-			       ' bestaetigtvon='.$this->db_add_param($this->bestaetigtvon).",".
-			       ' bewerbung_abgeschicktamum='.$this->db_add_param($this->bewerbung_abgeschicktamum).",".
+				   ' ausbildungssemester='.$this->db_add_param($this->ausbildungssemester).",".
+				   ' studiensemester_kurzbz='.$this->db_add_param($this->studiensemester_kurzbz).",".
+				   ' datum='.$this->db_add_param($this->datum).",".
+				   ' updateamum='.$this->db_add_param($this->updateamum).",".
+				   ' updatevon='.$this->db_add_param($this->updatevon).",".
+				   ' bestaetigtam='.$this->db_add_param($this->bestaetigtam).",".
+				   ' bestaetigtvon='.$this->db_add_param($this->bestaetigtvon).",".
+				   ' bewerbung_abgeschicktamum='.$this->db_add_param($this->bewerbung_abgeschicktamum).",".
 				   ' studienplan_id='.$this->db_add_param($this->studienplan_id, FHC_INTEGER).",".
 				   ' anmerkung='.$this->db_add_param($this->anmerkung_status).",".
-			       ' orgform_kurzbz='.$this->db_add_param($this->orgform_kurzbz).",".
+				   ' orgform_kurzbz='.$this->db_add_param($this->orgform_kurzbz).",".
 				   ' rt_stufe='.$this->db_add_param($this->rt_stufe).",".
 				   ' statusgrund_id='.$this->db_add_param($this->statusgrund_id, FHC_INTEGER)." ".
-			       " WHERE
+				   " WHERE
 						prestudent_id=".$this->db_add_param($this->prestudent_id, FHC_INTEGER, false)."
 						AND status_kurzbz=".$this->db_add_param($this->status_kurzbz, FHC_STRING, false)."
 						AND studiensemester_kurzbz=".$this->db_add_param($this->studiensemester_old, FHC_STRING, false)."
@@ -1072,12 +1077,12 @@ class prestudent extends person
 		}
 
 		$qry = "SELECT tbl_prestudentstatus.*, bezeichnung AS studienplan_bezeichnung,
-                tbl_status.bezeichnung_mehrsprachig
-                FROM public.tbl_prestudentstatus
-                LEFT JOIN lehre.tbl_studienplan USING (studienplan_id)
-                JOIN public.tbl_status USING (status_kurzbz)
-                WHERE tbl_status.status_kurzbz = tbl_prestudentstatus.status_kurzbz
-                AND prestudent_id=".$this->db_add_param($prestudent_id, FHC_INTEGER);
+				tbl_status.bezeichnung_mehrsprachig
+				FROM public.tbl_prestudentstatus
+				LEFT JOIN lehre.tbl_studienplan USING (studienplan_id)
+				JOIN public.tbl_status USING (status_kurzbz)
+				WHERE tbl_status.status_kurzbz = tbl_prestudentstatus.status_kurzbz
+				AND prestudent_id=".$this->db_add_param($prestudent_id, FHC_INTEGER);
 
 		if($studiensemester_kurzbz!='')
 			$qry.=" AND studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz);
@@ -1230,6 +1235,10 @@ class prestudent extends person
 				$obj->zgvdoktor_code = $row->zgvdoktor_code;
 				$obj->zgvdoktorort = $row->zgvdoktorort;
 				$obj->zgvdoktordatum = $row->zgvdoktordatum;
+				$obj->zgvdoktornation = $row->zgvdoktornation;
+				$obj->gsstudientyp_kurzbz = $row->gsstudientyp_kurzbz;
+				$obj->aufnahmegruppe_kurzbz = $row->aufnahmegruppe_kurzbz;
+				$obj->priorisierung = $row->priorisierung;
 
 				$this->result[] = $obj;
 			}
@@ -1299,11 +1308,11 @@ class prestudent extends person
 
 	/**
 	 * Liefert die Anzahl der Bewerber im ausgewaehlten Bereich
-	 * @param $studiensemester_kurzbz Studiensemester
-	 * @param $studiengang_kz Kennzahl des Studienganges (optional)
-	 * @param $orgform_kurzbz Organisationsform (optional)
-	 * @param $ausbildungssemester Ausbildungssemester (optional)
-	 * @return Anzahl der Bewerber oder false im Fehlerfall
+	 * @param string $studiensemester_kurzbz Studiensemester
+	 * @param integer $studiengang_kz Kennzahl des Studienganges (optional)
+	 * @param string $orgform_kurzbz Organisationsform (optional)
+	 * @param integer $ausbildungssemester Ausbildungssemester (optional)
+	 * @return integer Anzahl der Bewerber oder false im Fehlerfall
 	 */
 	public function getAnzBewerber($studiensemester_kurzbz, $studiengang_kz=null, $orgform_kurzbz=null, $ausbildungssemester=null)
 	{
@@ -1346,11 +1355,11 @@ class prestudent extends person
 
 	/**
 	 * Liefert die Anzahl der Interessenten im ausgewaehlten Bereich
-	 * @param $studiensemester_kurzbz Studiensemester
-	 * @param $studiengang_kz Kennzahl des Studienganges (optional)
-	 * @param $orgform_kurzbz Organisationsform (optional)
-	 * @param $ausbildungssemester Ausbildungssemester (optional)
-	 * @return Anzahl der Interessenten oder false im Fehlerfall
+	 * @param string $studiensemester_kurzbz Studiensemester
+	 * @param integer $studiengang_kz Kennzahl des Studienganges (optional)
+	 * @param string $orgform_kurzbz Organisationsform (optional)
+	 * @param integer $ausbildungssemester Ausbildungssemester (optional)
+	 * @return integer Anzahl der Interessenten oder false im Fehlerfall
 	 */
 	public function getAnzInteressenten($studiensemester_kurzbz, $studiengang_kz=null, $orgform_kurzbz=null, $ausbildungssemester=null)
 	{
@@ -1393,11 +1402,11 @@ class prestudent extends person
 
 	/**
 	 * Liefert die Anzahl der Interessenten mit Zugangsvoraussetzung im ausgewaehlten Bereich
-	 * @param $studiensemester_kurzbz Studiensemester
-	 * @param $studiengang_kz Kennzahl des Studienganges (optional)
-	 * @param $orgform_kurzbz Organisationsform (optional)
-	 * @param $ausbildungssemester Ausbildungssemester (optional)
-	 * @return Anzahl der Interessenten mit ZGV oder false im Fehlerfall
+	 * @param string $studiensemester_kurzbz Studiensemester
+	 * @param integer $studiengang_kz Kennzahl des Studienganges (optional)
+	 * @param string $orgform_kurzbz Organisationsform (optional)
+	 * @param integer $ausbildungssemester Ausbildungssemester (optional)
+	 * @return integer Anzahl der Interessenten mit ZGV oder false im Fehlerfall
 	 */
 	public function getAnzInteressentenZGV($studiensemester_kurzbz, $studiengang_kz=null, $orgform_kurzbz=null, $ausbildungssemester=null)
 	{
@@ -1687,10 +1696,10 @@ class prestudent extends person
 	/**
 	 * Anzahl der Abbrecher liefern.<br>
 	 * WM: Kopie von getBewerber() => @TODO: überprüfen!!!
-	 * @param type $studiensemester_kurzbz
-	 * @param type $studiengang_kz
-	 * @param type $orgform_kurzbz
-	 * @param type $ausbildungssemester
+	 * @param string $studiensemester_kurzbz
+	 * @param integer $studiengang_kz
+	 * @param string $orgform_kurzbz
+	 * @param integer $ausbildungssemester
 	 * @return boolean
 	 */
 	public function getAnzAbbrecher($studiensemester_kurzbz, $studiengang_kz=null, $orgform_kurzbz=null, $ausbildungssemester=null)
@@ -1736,10 +1745,10 @@ class prestudent extends person
 	/**
 	 * Anzahl der Studierenden liefern.<br>
 	 * WM: Kopie von getBewerber() => @TODO: überprüfen!!!
-	 * @param type $studiensemester_kurzbz
-	 * @param type $studiengang_kz
-	 * @param type $orgform_kurzbz
-	 * @param type $ausbildungssemester
+	 * @param string $studiensemester_kurzbz
+	 * @param integer $studiengang_kz
+	 * @param string $orgform_kurzbz
+	 * @param integer $ausbildungssemester
 	 * @return boolean
 	 */
 	public function getAnzStudierende($studiensemester_kurzbz, $studiengang_kz=null, $orgform_kurzbz=null, $ausbildungssemester=null)
@@ -1854,7 +1863,7 @@ class prestudent extends person
 				aufnahmeschluessel, facheinschlberuf, anmeldungreihungstest, reihungstestangetreten, reihungstest_id,
 				punkte, rt_punkte1, rt_punkte2, rt_punkte3, bismelden, person_id, anmerkung, mentor, ext_id_prestudent,
 				dual, ausstellungsstaat, zgvdoktor_code, zgvdoktorort, zgvdoktordatum, zgvdoktornation,
-				gsstudientyp_kurzbz, aufnahmegruppe_kurzbz) VALUES('.
+				gsstudientyp_kurzbz, aufnahmegruppe_kurzbz, priorisierung) VALUES('.
 				$this->db_add_param($this->prestudent_id).','.
 				$this->db_add_param($this->aufmerksamdurch_kurzbz).','.
 				$this->db_add_param($this->studiengang_kz).','.
@@ -1889,7 +1898,8 @@ class prestudent extends person
 				$this->db_add_param($this->zgvdoktordatum).','.
 				$this->db_add_param($this->zgvdoktornation).','.
 				$this->db_add_param($this->gsstudientyp_kurzbz).','.
-				$this->db_add_param($this->aufnahmegruppe_kurzbz).');';
+				$this->db_add_param($this->aufnahmegruppe_kurzbz).','.
+				$this->db_add_param($this->priorisierung).');';
 
 			if($log->save(true))
 			{
