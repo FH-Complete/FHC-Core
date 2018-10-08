@@ -304,6 +304,15 @@ else
 
 $akte = new akte();
 echo '<h2>' . $p->t('tools/abschlussdokumente') . '</h2>';
+echo '<table><tr>';
+echo '<td style="	background-color: #fcf8e3; 
+					color: #8a6d3b; 
+					padding: .75rem 1.25rem; 
+					margin-bottom: 1rem; 
+					border: 1px solid #faf2cc; 
+					border-radius: .25rem;">'.$p->t('tools/warnungDruckDigitaleSignatur').'</td>';
+echo '</tr></table>';
+
 if($akte->getArchiv($student_studiengang->person_id, null, true) && count($akte->result)>0)
 {
 	echo '

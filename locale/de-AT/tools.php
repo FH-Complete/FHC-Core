@@ -16,6 +16,7 @@ $this->phrasen['tools/alleStudiensemester']='Alle Studiensemester';
 $this->phrasen['tools/abschlussdokumente']='Abschlussdokumente/Zeugnisse';
 $this->phrasen['tools/nochKeineAbschlussdokumenteVorhanden']='Noch keine Abschlussdokumente vorhanden';
 $this->phrasen['tools/keinStatusImStudiensemester']='Für das übergebene Studiensemester %1$s existiert kein Status. Bitte wählen Sie ein gültiges Studiensemester aus dem DropDown.';
+$this->phrasen['tools/warnungDruckDigitaleSignatur']='<b>Hinweis!</b> Digital signierte Dokumente werden in manchen Browsern und PDF-Readern nicht korrekt angezeigt. <br/>Bitte verwenden Sie den <a href="https://get.adobe.com/de/reader/" target="_blank">Adobe Acrobat Reader</a>, wenn Sie das Dokument ausdrucken möchten.';
 
 //Leistungsbeurteilung
 $this->phrasen['tools/leistungsbeurteilung']='Leistungsbeurteilung';
