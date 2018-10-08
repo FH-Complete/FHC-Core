@@ -2383,6 +2383,55 @@ if(!$result = @$db->db_query("SELECT updateaktivam FROM campus.vw_mitarbeiter LI
 		echo '<br>campus.vw_mitarbeiter: Spalte updateaktivam, updateaktivon, lastupdate hinzugefuegt';
 }
 
+// Spalte lkt_ueberschreibbar in lehre.tbl_note
+if(!$result = @$db->db_query("SELECT lkt_ueberschreibbar FROM lehre.tbl_note LIMIT 1;"))
+{
+	$qry = "ALTER TABLE lehre.tbl_note ADD COLUMN lkt_ueberschreibbar boolean NOT NULL DEFAULT true;";
+
+	if(!$db->db_query($qry))
+		echo '<strong>lehre.tbl_note: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>lehre.tbl_note: Spalte lkt_ueberschreibbar hinzugefuegt!<br>';
+}
+
+
+// ADD COLUMN zeitaufzeichnungspflichtig to bis.tbl_bisverwendung
+// UPDATE zeitaufzeichnungspflichtig in bis.tbl_bisverwendung
+if(!@$db->db_query("SELECT zeitaufzeichnungspflichtig FROM bis.tbl_bisverwendung LIMIT 1"))
+{
+	$qry = "ALTER TABLE bis.tbl_bisverwendung ADD COLUMN zeitaufzeichnungspflichtig boolean;
+		
+			UPDATE 
+				bis.tbl_bisverwendung 
+			SET 
+				zeitaufzeichnungspflichtig=true 
+			FROM 
+				public.tbl_mitarbeiter 
+			WHERE 
+				tbl_bisverwendung.mitarbeiter_uid = tbl_mitarbeiter.mitarbeiter_uid 
+			AND 
+				fixangestellt=true;
+			UPDATE
+				bis.tbl_bisverwendung 
+			SET
+				zeitaufzeichnungspflichtig=false
+			FROM
+				public.tbl_mitarbeiter
+			WHERE
+				tbl_bisverwendung.mitarbeiter_uid = tbl_mitarbeiter.mitarbeiter_uid
+			AND
+				fixangestellt=false;
+				
+			COMMENT ON COLUMN bis.tbl_bisverwendung.zeitaufzeichnungspflichtig IS 'CaseTime Monatslisten mit Vertragsbeginn verpflichtend führen?';";
+
+	if(!$db->db_query($qry))
+		echo '<strong>bis.tbl_bisverwendung '.$db->db_last_error().'</strong><br>';
+		else
+			echo "<br>Spalte zeitaufzeichnungspflichtig in bis.tbl_bisverwendung hinzugefügt"
+				. "<br>Fix angestellte Mitarbeiter auf true gesetzt, alle anderen auf false";
+}
+
+
 // Spalte Priorisierung für tbl_prestudent
 if(!$result = @$db->db_query("SELECT priorisierung FROM public.tbl_prestudent LIMIT 1"))
 {
@@ -2410,7 +2459,7 @@ $tabellen=array(
 	"bis.tbl_besqual"  => array("besqualcode","besqualbez"),
 	"bis.tbl_bisfunktion"  => array("bisverwendung_id","studiengang_kz","sws","updateamum","updatevon","insertamum","insertvon","ext_id"),
 	"bis.tbl_bisio"  => array("bisio_id","mobilitaetsprogramm_code","nation_code","von","bis","zweck_code","student_uid","updateamum","updatevon","insertamum","insertvon","ext_id","ort","universitaet","lehreinheit_id"),
-	"bis.tbl_bisverwendung"  => array("bisverwendung_id","ba1code","ba2code","vertragsstunden","beschausmasscode","verwendung_code","mitarbeiter_uid","hauptberufcode","hauptberuflich","habilitation","beginn","ende","updateamum","updatevon","insertamum","insertvon","ext_id","dv_art","inkludierte_lehre"),
+	"bis.tbl_bisverwendung"  => array("bisverwendung_id","ba1code","ba2code","vertragsstunden","beschausmasscode","verwendung_code","mitarbeiter_uid","hauptberufcode","hauptberuflich","habilitation","beginn","ende","updateamum","updatevon","insertamum","insertvon","ext_id","dv_art","inkludierte_lehre","zeitaufzeichnungspflichtig"),
 	"bis.tbl_bundesland"  => array("bundesland_code","kurzbz","bezeichnung"),
 	"bis.tbl_entwicklungsteam"  => array("mitarbeiter_uid","studiengang_kz","besqualcode","beginn","ende","updateamum","updatevon","insertamum","insertvon","ext_id"),
 	"bis.tbl_gemeinde"  => array("gemeinde_id","plz","name","ortschaftskennziffer","ortschaftsname","bulacode","bulabez","kennziffer"),
@@ -2515,7 +2564,7 @@ $tabellen=array(
 	"lehre.tbl_notenschluessel" => array("notenschluessel_kurzbz","bezeichnung"),
 	"lehre.tbl_notenschluesselaufteilung" => array("notenschluesselaufteilung_id","notenschluessel_kurzbz","note","punkte"),
 	"lehre.tbl_notenschluesselzuordnung" => array("notenschluesselzuordnung_id","notenschluessel_kurzbz","lehrveranstaltung_id","studienplan_id","oe_kurzbz","studiensemester_kurzbz"),
-	"lehre.tbl_note"  => array("note","bezeichnung","anmerkung","farbe","positiv","notenwert","aktiv","lehre","offiziell","bezeichnung_mehrsprachig"),
+	"lehre.tbl_note"  => array("note","bezeichnung","anmerkung","farbe","positiv","notenwert","aktiv","lehre","offiziell","bezeichnung_mehrsprachig","lkt_ueberschreibbar"),
 	"lehre.tbl_projektarbeit"  => array("projektarbeit_id","projekttyp_kurzbz","titel","lehreinheit_id","student_uid","firma_id","note","punkte","beginn","ende","faktor","freigegeben","gesperrtbis","stundensatz","gesamtstunden","themenbereich","anmerkung","updateamum","updatevon","insertamum","insertvon","ext_id","titel_english","seitenanzahl","abgabedatum","kontrollschlagwoerter","schlagwoerter","schlagwoerter_en","abstract", "abstract_en", "sprache","final"),
 	"lehre.tbl_projektbetreuer"  => array("person_id","projektarbeit_id","betreuerart_kurzbz","note","faktor","name","punkte","stunden","stundensatz","updateamum","updatevon","insertamum","insertvon","ext_id","vertrag_id"),
 	"lehre.tbl_projekttyp"  => array("projekttyp_kurzbz","bezeichnung"),

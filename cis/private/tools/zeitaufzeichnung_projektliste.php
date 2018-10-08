@@ -62,13 +62,14 @@ $daysinmonth = cal_days_in_month(CAL_GREGORIAN, $month, $year);
 $date = new datum();
 $ztauf = new zeitaufzeichnung();
 
-$ztauf->getListeUserFromTo($uid, $year.'-'.$month.'-01', $year.'-'.$month.'-'.$daysinmonth);
+$activitiesToIgnore = array('DienstreiseMT');//aktivitaetstypen which shouldn't be added to worktime
+$ztauf->getListeUserFromTo($uid, $year.'-'.$month.'-01', $year.'-'.$month.'-'.$daysinmonth, $activitiesToIgnore);
 
 //objects for one projectline of list (corresponds to one day)
 $projectlines = [];
 $dayStart = $dayEnd = '';
 $projectnames = $tosubtract = $allpauseranges = [];
-$toignore = ['Pause', 'LehreExtern'];
+$activitiesToSubtract = ['Pause', 'LehreExtern'];//aktivitaetstypen which should be subtracted fromworktime
 $ztaufdata = $ztauf->result;
 $monthsums = [0 => 0.00];
 
@@ -94,7 +95,7 @@ for ($i = 0; $i < count($ztaufdata); $i++)
 	//last entry for a day (next entry is different day)
 	$isLastEntry = !array_key_exists($i + 1, $ztaufdata) || intval($date->formatDatum($ztaufdata[$i + 1]->ende, 'd')) != $day;
 
-	if (in_array($ztaufrow->aktivitaet_kurzbz, $toignore))
+	if (in_array($ztaufrow->aktivitaet_kurzbz, $activitiesToSubtract))
 	{
 		$subtraction = new stdClass();
 		$subtraction->start = $ztaufrow->start;
@@ -104,7 +105,7 @@ for ($i = 0; $i < count($ztaufdata); $i++)
 		$tosubtract[] = $subtraction;
 
 		//save all pause ranges
-		if ($ztaufrow->aktivitaet_kurzbz == $toignore[0])
+		if ($ztaufrow->aktivitaet_kurzbz == $activitiesToSubtract[0])
 		{
 			$prevpause = null;
 			if (count($allpauseranges) > 0)
@@ -129,9 +130,9 @@ for ($i = 0; $i < count($ztaufdata); $i++)
 	}
 
 	//save new dayStart (if earlier) or dayEnd (if later)
-	if (($dayStart == '' || $dayStart > $ztaufrow->start) && $ztaufrow->aktivitaet_kurzbz != $toignore[1])
+	if (($dayStart == '' || $dayStart > $ztaufrow->start) && $ztaufrow->aktivitaet_kurzbz != $activitiesToSubtract[1])
 		$dayStart = $ztaufrow->start;
-	if (($dayEnd == '' || $dayEnd < $ztaufrow->ende) && $ztaufrow->aktivitaet_kurzbz != $toignore[1])
+	if (($dayEnd == '' || $dayEnd < $ztaufrow->ende) && $ztaufrow->aktivitaet_kurzbz != $activitiesToSubtract[1])
 		$dayEnd = $ztaufrow->ende;
 
 	if ($isFirstEntry)
@@ -221,12 +222,12 @@ for ($i = 0; $i < count($ztaufdata); $i++)
 		//subtract pauses and LehreExtern from total worktime
 		foreach ($tosubtract as $subtraction)
 		{
-			if ($subtraction->typ == $toignore[0])
+			if ($subtraction->typ == $activitiesToSubtract[0])
 			{
 				$projectlines[$day]->arbeitszeit -= $subtraction->diff;
 				$pauseSubtracted += $subtraction->diff;
 			}
-			elseif ($subtraction->typ == $toignore[1] && $subtraction->start >= $dayStart && $subtraction->ende <= $dayEnd)
+			elseif ($subtraction->typ == $activitiesToSubtract[1] && $subtraction->start >= $dayStart && $subtraction->ende <= $dayEnd)
 			{
 				$projectlines[$day]->arbeitszeit -= $subtraction->diff;
 				$lehreExternExists = true;
@@ -271,12 +272,12 @@ for ($i = 0; $i < count($ztaufdata); $i++)
 				$projectlines[$day]->arbeitszeit -= $projectlines[$day]->arbeitszeit - 6;
 		}
 
-		$projectlines[$day]->arbeitszeit = floor($projectlines[$day]->arbeitszeit * 100) / 100;
+		$projectlines[$day]->arbeitszeit = round($projectlines[$day]->arbeitszeit, 2);
 
 		foreach ($projectlines[$day]->projekte as $name => $project)
 		{
 			$projecthours =& $projectlines[$day]->projekte[$name]->stunden;
-			$projecthours = floor($projecthours * 100) / 100;
+			$projecthours = round($projecthours, 2);
 			if (array_key_exists($name, $monthsums))
 				$monthsums[$name] += $projecthours;
 			else

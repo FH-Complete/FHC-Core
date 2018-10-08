@@ -69,9 +69,25 @@ function MitarbeiterVerwendungInit(mitarbeiter_uid, bisverwendung_id)
 		vertragsstunden = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#vertragsstunden" ));
 		dv_art = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#dv_art" ));
 		inkludierte_lehre = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#inkludierte_lehre" ));
+		zeitaufzeichnungspflichtig = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#zeitaufzeichnungspflichtig" ));
 	}
 	else
 	{
+		//Laden der Daten
+		//Daten holen
+		var url = '<?php echo APP_ROOT ?>rdf/personal.rdf.php?uid='+MitarbeiterVerwendungDetailMitarbeiterUid+'&'+gettimestamp();
+
+		var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].
+	                   getService(Components.interfaces.nsIRDFService);
+
+	    var dsource = rdfService.GetDataSourceBlocking(url);
+
+		var subject = rdfService.GetResource("http://www.technikum-wien.at/mitarbeiter/" + MitarbeiterVerwendungDetailMitarbeiterUid);
+
+		var predicateNS = "http://www.technikum-wien.at/mitarbeiter/rdf";
+
+		fixangestellt = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#fixangestellt" ));
+	
 		//neuer Datensatz wird angelegt
 		MitarbeiterVerwendungDetailNeu='true';
 
@@ -88,6 +104,14 @@ function MitarbeiterVerwendungInit(mitarbeiter_uid, bisverwendung_id)
 		vertragsstunden='38.5';
 		dv_art='';
 		inkludierte_lehre='';
+		if (fixangestellt=='Ja')
+		{
+			zeitaufzeichnungspflichtig='Ja';
+		}
+		else
+		{
+			zeitaufzeichnungspflichtig='Nein';
+		}
 	}
 
 	document.getElementById('mitarbeiter-verwendung-detail-menulist-beschart1').value=ba1code;
@@ -110,6 +134,10 @@ function MitarbeiterVerwendungInit(mitarbeiter_uid, bisverwendung_id)
 	document.getElementById('mitarbeiter-verwendung-detail-textbox-vertragsstunden').value=vertragsstunden;
 	document.getElementById('mitarbeiter-verwendung-detail-textbox-dv_art').value=dv_art;
 	document.getElementById('mitarbeiter-verwendung-detail-textbox-inkludierte_lehre').value=inkludierte_lehre;
+	if(zeitaufzeichnungspflichtig=='Ja')
+		document.getElementById('mitarbeiter-verwendung-detail-checkbox-zeitaufzeichnungspflichtig').checked=true;
+	else
+		document.getElementById('mitarbeiter-verwendung-detail-checkbox-zeitaufzeichnungspflichtig').checked=false;
 
 	MitarbeiterVerwendungDetailToggleHauptberuf();
 	MitarbeiterVerwendungVerwendungChange();

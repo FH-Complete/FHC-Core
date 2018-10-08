@@ -149,6 +149,7 @@ $this->phrasen['benotungstool/pruefungAnlegenFuer']='Prüfung anlegen für';
 $this->phrasen['benotungstool/kreuzerltool']='Kreuzerltool';
 $this->phrasen['benotungstool/studentIstLvNichtZugeordnet']='Der Student %s %s (%s) ist dieser Lehrveranstaltung nicht zugeordnet. Die Note wird nicht uebernommen!';
 $this->phrasen['benotungstool/studentMitMatrikelnummerExistiertNicht']='Student mit Matrikelnummer %s existiert nicht.';
+$this->phrasen['benotungstool/noteNichtUeberschreibbar']='Für Student mit Matrikelnummer %s eingetragene Zeugnisote %s ist nicht überschreibbar';
 $this->phrasen['benotungstool/fehlerhafteNoteBeiStudent']='Fehlerhafte Note bei Student %s %s';
 $this->phrasen['benotungstool/keineKreuzerllistenFuerDieseLehrveranstaltung']='Derzeit gibt es keine Kreuzerllisten für diese Lehrveranstaltung';
 $this->phrasen['benotungstool/notenuebersichtFuer']='Notenübersicht</a> für';

@@ -352,9 +352,10 @@ class zeitaufzeichnung extends basis_db
 	 * @param $user
 	 * @param $from startdatum als String in Form Y-m-d
 	 * @param $to enddatum als String in Form Y-m-d
+	 * @param $excluded_activities zu ignorierende Aktivitätstypen
 	 * @return bool
 	 */
-	public function getListeUserFromTo($user, $from = null, $to = null)
+	public function getListeUserFromTo($user, $from = null, $to = null, $excluded_activities = null)
 	{
 		$where = "uid=".$this->db_add_param($user);
 
@@ -374,6 +375,12 @@ class zeitaufzeichnung extends basis_db
 
 		$where.= " AND ((start >= ".$this->db_add_param($from)."::DATE AND start <= ".$this->db_add_param($to)."::DATE)
 		OR (ende >= ".$this->db_add_param($from)."::DATE AND ende <= ".$this->db_add_param($to)."::DATE))";
+
+		if (!empty($excluded_activities))
+		{
+			$exactstring = is_array($excluded_activities) ? $this->db_implode4SQL($excluded_activities) : $this->db_add_param($excluded_activities);
+			$where .= " AND (aktivitaet_kurzbz NOT IN (" . $exactstring . ") OR aktivitaet_kurzbz IS NULL)";
+		}
 
 		$qry = "SELECT
 	    			*, to_char ((ende-start),'HH24:MI') as diff,

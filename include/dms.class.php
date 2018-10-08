@@ -1179,9 +1179,7 @@ class dms extends basis_db
 	 */
 	function isLocked($dms_id)
 	{
-		$qry = "SELECT 1 FROM
-				(
-				WITH RECURSIVE kategorien(parent_kategorie_kurzbz) as
+		$qry = "WITH RECURSIVE kategorien(parent_kategorie_kurzbz) as
 				(
 					SELECT parent_kategorie_kurzbz FROM campus.tbl_dms_kategorie
 					WHERE kategorie_kurzbz=(SELECT kategorie_kurzbz FROM campus.tbl_dms WHERE dms_id=".$this->db_add_param($dms_id, FHC_INTEGER).")
@@ -1192,12 +1190,20 @@ class dms extends basis_db
 					WHERE k.kategorie_kurzbz=kategorien.parent_kategorie_kurzbz
 
 				)
-				SELECT parent_kategorie_kurzbz
-				FROM kategorien
-				) a
-				JOIN campus.tbl_dms_kategorie_gruppe ON(a.parent_kategorie_kurzbz=kategorie_kurzbz)
+				SELECT
+					1
+				FROM
+					kategorien
+					JOIN campus.tbl_dms_kategorie_gruppe ON(kategorien.parent_kategorie_kurzbz=kategorie_kurzbz)
 				UNION
 				SELECT 1 FROM fue.tbl_projekt_dokument WHERE dms_id=".$this->db_add_param($dms_id, FHC_INTEGER)."
+				UNION
+				SELECT
+					1
+				FROM
+					kategorien
+					JOIN campus.tbl_dms_kategorie ON(kategorien.parent_kategorie_kurzbz=kategorie_kurzbz)
+				WHERE berechtigung_kurzbz is not null
 				;";
 
 		if($result = $this->db_query($qry))

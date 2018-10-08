@@ -1178,7 +1178,7 @@ function MitarbeiterVerwendungBearbeiten()
 	bisverwendung_id=tree.view.getCellText(tree.currentIndex,col);
 
 	//Dialog laden
-	window.open("<?php echo APP_ROOT; ?>content/mitarbeiter/mitarbeiterverwendungdialog.xul.php?mitarbeiter_uid="+mitarbeiter_uid+"&bisverwendung_id="+bisverwendung_id,"popup","chrome, status=no, width=500, height=400, centerscreen, resizable");
+	window.open("<?php echo APP_ROOT; ?>content/mitarbeiter/mitarbeiterverwendungdialog.xul.php?mitarbeiter_uid="+mitarbeiter_uid+"&bisverwendung_id="+bisverwendung_id,"popup","chrome, status=no, width=500, height=500, centerscreen, resizable");
 }
 
 // ****
@@ -1192,7 +1192,7 @@ function MitarbeiterVerwendungNeu()
 	col = tree.columns ? tree.columns["mitarbeiter-treecol-uid"] : "mitarbeiter-treecol-uid";
 	mitarbeiter_uid=tree.view.getCellText(tree.currentIndex,col);
 
-	window.open("<?php echo APP_ROOT; ?>content/mitarbeiter/mitarbeiterverwendungdialog.xul.php?mitarbeiter_uid="+mitarbeiter_uid,"popup","chrome, status=no, width=500, height=350, centerscreen, resizable");
+	window.open("<?php echo APP_ROOT; ?>content/mitarbeiter/mitarbeiterverwendungdialog.xul.php?mitarbeiter_uid="+mitarbeiter_uid,"popup","chrome, status=no, width=500, height=500, centerscreen, resizable");
 }
 
 function MitarbeiterVerwendungSpeichern(dialog, bisverwendung_id, mitarbeiter_uid, neu)
@@ -1209,6 +1209,7 @@ function MitarbeiterVerwendungSpeichern(dialog, bisverwendung_id, mitarbeiter_ui
 	vertragsstunden = dialog.getElementById('mitarbeiter-verwendung-detail-textbox-vertragsstunden').value;
 	dv_art = dialog.getElementById('mitarbeiter-verwendung-detail-textbox-dv_art').value;
 	inkludierte_lehre = dialog.getElementById('mitarbeiter-verwendung-detail-textbox-inkludierte_lehre').value;
+	zeitaufzeichnungspflichtig = dialog.getElementById('mitarbeiter-verwendung-detail-checkbox-zeitaufzeichnungspflichtig').checked;
 
 	if(verwendung_code=='1' || verwendung_code=='5' || verwendung_code=='6')
 	{
@@ -1266,6 +1267,7 @@ function MitarbeiterVerwendungSpeichern(dialog, bisverwendung_id, mitarbeiter_ui
 	req.add('vertragsstunden', vertragsstunden);
 	req.add('dv_art', dv_art);
 	req.add('inkludierte_lehre', inkludierte_lehre);
+	req.add('zeitaufzeichnungspflichtig', zeitaufzeichnungspflichtig);
 
 	var response = req.executePOST();
 

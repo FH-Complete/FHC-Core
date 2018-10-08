@@ -46,6 +46,7 @@ class bisverwendung extends basis_db
 	public $ext_id;
 	public $dv_art;
 	public $inkludierte_lehre;
+	public $zeitaufzeichnungspflichtig;
 
 	public $ba1bez;
 	public $ba2bez;
@@ -120,6 +121,7 @@ class bisverwendung extends basis_db
 				$this->vertragsstunden = $row->vertragsstunden;
 				$this->dv_art = $row->dv_art;
 				$this->inkludierte_lehre = $row->inkludierte_lehre;
+				$this->zeitaufzeichnungspflichtig = $this->db_parse_bool($row->zeitaufzeichnungspflichtig);
 				return true;
 			}
 			else
@@ -207,12 +209,22 @@ class bisverwendung extends basis_db
 			$hauptberuflich = $this->db_add_param($this->hauptberuflich, FHC_BOOLEAN);
 		else
 			$hauptberuflich = 'null';
+		
+		if(is_bool($this->zeitaufzeichnungspflichtig))
+		{
+			$zeitaufzeichnungspflichtig = $this->db_add_param($this->zeitaufzeichnungspflichtig, FHC_BOOLEAN);
+		}
+		else
+		{
+			$zeitaufzeichnungspflichtig = 'null';
+		}
+		
 		if($new)
 		{
 			//Neuen Datensatz anlegen
 			$qry = "BEGIN;INSERT INTO bis.tbl_bisverwendung (ba1code, ba2code, beschausmasscode,
 					verwendung_code, mitarbeiter_uid, hauptberufcode, hauptberuflich, habilitation, beginn, ende, vertragsstunden,
-					updateamum, updatevon, insertamum, insertvon, dv_art, inkludierte_lehre) VALUES (".
+					updateamum, updatevon, insertamum, insertvon, dv_art, inkludierte_lehre, zeitaufzeichnungspflichtig) VALUES (".
 			       $this->db_add_param($this->ba1code, FHC_INTEGER).', '.
 			       $this->db_add_param($this->ba2code, FHC_INTEGER).', '.
 			       $this->db_add_param($this->beschausmasscode, FHC_INTEGER).', '.
@@ -229,7 +241,8 @@ class bisverwendung extends basis_db
 			       $this->db_add_param($this->insertamum).', '.
 			       $this->db_add_param($this->insertvon).', '.
 				   $this->db_add_param($this->dv_art).','.
-				   $this->db_add_param($this->inkludierte_lehre).');';
+				   $this->db_add_param($this->inkludierte_lehre).','.
+				   $zeitaufzeichnungspflichtig. ');';
 
 		}
 		else
@@ -252,7 +265,8 @@ class bisverwendung extends basis_db
 				  " insertamum=".$this->db_add_param($this->insertamum).",".
 				  " insertvon=".$this->db_add_param($this->insertvon).",".
 				  " dv_art=".$this->db_add_param($this->dv_art).",".
-				  " inkludierte_lehre=".$this->db_add_param($this->inkludierte_lehre).
+				  " inkludierte_lehre=".$this->db_add_param($this->inkludierte_lehre).",".
+				  " zeitaufzeichnungspflichtig=". $zeitaufzeichnungspflichtig. 
 				  " WHERE bisverwendung_id=".$this->db_add_param($this->bisverwendung_id, FHC_INTEGER);
 		}
 
@@ -344,6 +358,7 @@ class bisverwendung extends basis_db
 				$obj->vertragsstunden = $row->vertragsstunden;
 				$obj->dv_art = $row->dv_art;
 				$obj->inkludierte_lehre = $row->inkludierte_lehre;
+				$obj->zeitaufzeichnungspflichtig = $this->db_parse_bool($row->zeitaufzeichnungspflichtig);
 
 				$this->result[] = $obj;
 			}
@@ -400,6 +415,7 @@ class bisverwendung extends basis_db
 				$obj->vertragsstunden = $row->vertragsstunden;
 				$obj->dv_art = $row->dv_art;
 				$obj->inkludierte_lehre = $row->inkludierte_lehre;
+				$obj->zeitaufzeichnungspflichtig = $this->db_parse_bool($row->zeitaufzeichnungspflichtig);
 
 				$this->result[] = $obj;
 			}
@@ -450,6 +466,7 @@ class bisverwendung extends basis_db
 				$this->vertragsstunden = $row->vertragsstunden;
 				$this->dv_art = $row->dv_art;
 				$this->inkludierte_lehre = $row->inkludierte_lehre;
+				$this->zeitaufzeichnungspflichtig = $this->db_parse_bool($row->zeitaufzeichnungspflichtig);
 			}
 			return true;
 		}
@@ -502,6 +519,7 @@ class bisverwendung extends basis_db
 				$this->vertragsstunden = $row->vertragsstunden;
 				$this->dv_art = $row->dv_art;
 				$this->inkludierte_lehre = $row->inkludierte_lehre;
+				$this->zeitaufzeichnungspflichtig = $this->db_parse_bool($row->zeitaufzeichnungspflichtig);
 			}
 			return true;
 		}

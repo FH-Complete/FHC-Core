@@ -19,7 +19,7 @@
  */
 /**
  * Menu Addon fuer Urlaube
- * 
+ *
  * Zeigt eine Liste der untergebenen Mitarbeiter mit deren Urlaube
  */
 require_once(dirname(__FILE__).'/menu_addon.class.php');
@@ -33,25 +33,25 @@ class menu_addon_urlaub extends menu_addon
 	public function __construct()
 	{
 		parent::__construct();
-		
+
 		$sprache = getSprache();
 		$user = get_uid();
-		
+
 		$p = new phrasen($sprache);
-		
+
 		//Untergebene holen
 		$mitarbeiter = new mitarbeiter();
 		$mitarbeiter->getUntergebene($user);
 		$untergebene = '';
-				
+
 		foreach ($mitarbeiter->untergebene as $u_uid)
 		{
 			if($untergebene!='')
 				$untergebene.=',';
-				
+
 			$untergebene.="'".addslashes($u_uid)."'";
 		}
-		
+
 		$rechte = new benutzerberechtigung();
 		$rechte->getBerechtigungen($user);
 		if($rechte->isBerechtigt('mitarbeiter/urlaube', null, 'suid'))
@@ -65,14 +65,14 @@ class menu_addon_urlaub extends menu_addon
 				$untergebene.="'".addslashes($row->uid)."'";
 			}
 		}
-		
+
 		if($untergebene!='')
 		{
-			$qry = "SELECT * FROM campus.vw_mitarbeiter WHERE uid in($untergebene) AND aktiv ORDER BY nachname, vorname";
+			$qry = "SELECT * FROM campus.vw_mitarbeiter WHERE uid in($untergebene) AND aktiv AND fixangestellt ORDER BY nachname, vorname";
 
 			$this->linkitem['link']='private/profile/urlaubsfreigabe.php';
 			$this->linkitem['target']='content';
-			
+
 			if($result = $this->db_query($qry))
 			{
 				$this->items[] = array('title'=>$p->t('menu/urlaubAlle'),
@@ -80,28 +80,28 @@ class menu_addon_urlaub extends menu_addon
 					 'link'=>'private/profile/urlaubsfreigabe.php',
 					 'name'=>$p->t('menu/urlaubAlle')
 					);
-				
+
 				while($row = $this->db_fetch_object($result))
 				{
-				
+
 					$name = $row->nachname.' '.$row->vorname.' '.$row->titelpre.' '.$row->titelpost;
 					$title = $row->nachname.' '.$row->vorname.' '.$row->titelpre.' '.$row->titelpost;
-					
+
 					if($row->fixangestellt=='f')
 						$name =  '<span style="color: gray;">'.$name.'</span>';
-					
+
 					$this->items[] = array('title'=>$title,
 					 'target'=>'content',
 					 'link'=>'private/profile/urlaubsfreigabe.php?uid='.$row->uid,
 					 'name'=>$name
 					);
-					
+
 				}
 			}
 		}
 		else
 			$this->link=false;
-		
+
 		$this->output();
 	}
 }

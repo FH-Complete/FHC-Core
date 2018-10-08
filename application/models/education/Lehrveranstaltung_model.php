@@ -14,11 +14,11 @@ class Lehrveranstaltung_model extends DB_Model
 
 	/**
 	 * Gets unique Groupstrings for Lehrveranstaltungen, e.g. WS2018_BIF_1_PRJM_VZ_LV12345
-	 * @param $studiensemester_kurzbz
-	 * @param null $ausbildungssemester
-	 * @param null $studiengang_kz
-	 * @param null $lehrveranstaltung_ids
-	 * @return StdClass
+	 * @param string $studiensemester_kurzbz
+	 * @param string $ausbildungssemester
+	 * @param string $studiengang_kz
+	 * @param string|array $lehrveranstaltung_ids
+	 * @return array|null
 	 */
 	public function getLehrveranstaltungGroupNames($studiensemester_kurzbz, $ausbildungssemester = null, $studiengang_kz = null, $lehrveranstaltung_ids = null)
 	{

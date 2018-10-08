@@ -163,6 +163,10 @@ echo '<?xml-stylesheet href="'.APP_ROOT.'content/datepicker/datepicker.css" type
       			<label value="Inkludierte Lehre" control="mitarbeiter-verwendung-detail-textbox-inkludierte_lehre" />
       			<textbox id="mitarbeiter-verwendung-detail-textbox-inkludierte_lehre" />
       		</row>
+			<row>
+				<label value="Zeitaufzeichnungspflichtig" control="mitarbeiter-verwendung-detail-checkbox-zeitaufzeichnungspflichtig"/>
+      			<checkbox id="mitarbeiter-verwendung-detail-checkbox-zeitaufzeichnungspflichtig"/>
+      		</row>
       		<row>
       			<spacer />
       			<hbox>

@@ -181,6 +181,7 @@ foreach ($noten_obj->result as $row)
 	$noten_array[$row->note]['positiv'] = $row->positiv;
 	$noten_array[$row->note]['aktiv'] = $row->aktiv;
 	$noten_array[$row->note]['lehre'] = $row->lehre;
+	$noten_array[$row->note]['lkt_ueberschreibbar'] = $row->lkt_ueberschreibbar;
 	$noten_array[$row->note]['anmerkung'] = $row->anmerkung;
 	foreach ($sprachen->result AS $s)
 		$noten_array[$row->note]['bezeichnung_mehrsprachig'][$s->sprache] = $row->bezeichnung_mehrsprachig[$s->sprache];
@@ -1249,21 +1250,34 @@ if (defined("CIS_GESAMTNOTE_PRUEFUNG_MOODLE_LE_NOTE") && CIS_GESAMTNOTE_PRUEFUNG
 						action='" . $_SERVER['PHP_SELF'] . "?lvid=$lvid&lehreinheit_id=$lehreinheit_id&stsem=$stsem'>
 						<span id='lvnoteneingabe_" . $uid . "' " . $hide . ">
 						<input type='hidden' name='student_uid' value='$uid'>";
-			
+
+			// nur überschreibbare Noten können geändert werden
+			$ueberschreibbar = true;
+
+			if (isset($noten_array[$znote]['lkt_ueberschreibbar']) && $noten_array[$znote]['lkt_ueberschreibbar'] === false)
+				$ueberschreibbar = false;
+
 			// Punkte
 			if (CIS_GESAMTNOTE_PUNKTE)
 			{
+
 				$htmlstring .= '
 				<input type="text"
 					name="punkte"
 					id="textbox-punkte-' . $i . '"
 					value="' . $punkte_vorschlag . '"
-					size="3"
-					oninput="PunkteEingabe(' . $i . ')"/>';
+					size="3"';
+
+				if ($ueberschreibbar)
+					$htmlstring .= ' oninput="PunkteEingabe(' . $i . ')"';
+				else
+					$htmlstring .= ' disabled="disabled"';
+
+				$htmlstring .= '/>';
 			}
-			
+
 			// Noten DropDown
-			if ($punkte_vorschlag != '' && CIS_GESAMTNOTE_PUNKTE)
+			if (($punkte_vorschlag != '' && CIS_GESAMTNOTE_PUNKTE) || $ueberschreibbar == false)
 				$disabled = 'disabled="disabled"';
 			else
 				$disabled = '';
@@ -1281,10 +1295,13 @@ if (defined("CIS_GESAMTNOTE_PRUEFUNG_MOODLE_LE_NOTE") && CIS_GESAMTNOTE_PRUEFUNG
 			}
 			$htmlstring .= '</select>';
 			$htmlstring .= "
-					<input type='hidden' name='note_orig' value='$note_lv'>
-					<input type='button' id='button-note-save-" . $i . "' value='->' onclick=\"saveLVNote('" . $uid . "');\">
-					</span>
-				</form></td>";
+					<input type='hidden' name='note_orig' value='$note_lv'>";
+			if ($ueberschreibbar)
+			{
+				$htmlstring .= "<input type='button' id='button-note-save-" . $i . "' value='->' onclick=\"saveLVNote('" . $uid . "');\">";
+			}
+			$htmlstring .= "</span>
+						</form></td>";
 		}
 		else
 		{
@@ -1370,13 +1387,18 @@ if (defined("CIS_GESAMTNOTE_PRUEFUNG_MOODLE_LE_NOTE") && CIS_GESAMTNOTE_PRUEFUNG
 					$htmlstring .= '<tr>
 							<td class="td_datum">' . $pr_datum . '</td>
 							<td class="td_note">' . $pr_notenbezeichnung . '</td>
-							<td>
-								<input type="button"
+							<td>';
+					if ($ueberschreibbar)
+					{
+						$htmlstring .=
+						'<input type="button"
 									name="anlegen"
 									value="' . $p->t('global/aendern') . '"
-									onclick="' . $onclick . '">
-							<td>
-					</tr>';
+									onclick="' . $onclick . '">';
+					}
+					$htmlstring .=
+							'<td>
+						</tr>';
 				}
 				$htmlstring .= "</table>";
 				$htmlstring .= "</span>";
@@ -1386,12 +1408,16 @@ if (defined("CIS_GESAMTNOTE_PRUEFUNG_MOODLE_LE_NOTE") && CIS_GESAMTNOTE_PRUEFUNG
 			{
 				if (! is_null($note_lv) || ! is_null($znote))
 				{
-					$htmlstring .= "<td colspan='2'><span id='span_Termin2_" . $uid . "'>
-						<input type='button'
+					$htmlstring .= "<td colspan='2'><span id='span_Termin2_" . $uid . "'>";
+					if ($ueberschreibbar)
+					{
+						$htmlstring .=
+							"<input type='button'
 							name='anlegen'
 							value='" . $p->t('benotungstool/anlegen') . "'
-							onclick='pruefungAnlegen(\"" . $uid . "\",\"\",\"\",\"\",\"\")'>
-						</span></td>";
+							onclick='pruefungAnlegen(\"" . $uid . "\",\"\",\"\",\"\",\"\")'>";
+					}
+					$htmlstring .= "</span></td>";
 				}
 				else
 				{
@@ -1445,7 +1471,7 @@ if (defined("CIS_GESAMTNOTE_PRUEFUNG_MOODLE_LE_NOTE") && CIS_GESAMTNOTE_PRUEFUNG
 			}
 			else
 			{
-				if (! is_null($note_lv) || ! is_null($znote))
+				if ((! is_null($note_lv) || ! is_null($znote)) && $ueberschreibbar)
 				{
 					$htmlstring .= "
 					<td colspan='2'>

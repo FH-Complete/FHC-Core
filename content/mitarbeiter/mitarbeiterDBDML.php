@@ -169,6 +169,12 @@ if(!$error)
 			$verwendung->updatevon = $user;
 			$verwendung->dv_art = $_POST['dv_art'];
 			$verwendung->inkludierte_lehre = $_POST['inkludierte_lehre'];
+			if($_POST['zeitaufzeichnungspflichtig']=='true')
+				$verwendung->zeitaufzeichnungspflichtig = true;
+			elseif($_POST['zeitaufzeichnungspflichtig']=='false')
+				$verwendung->zeitaufzeichnungspflichtig = false;
+			else
+				$verwendung->zeitaufzeichnungspflichtig = '';
 
 			if($verwendung->save())
 			{

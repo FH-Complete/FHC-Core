@@ -2835,12 +2835,22 @@ if(!$error)
 		//Die Daten werden per POST uebermittelt. Es wird ein Feld Anzahl mituebergeben
 		//mit der Anzahl der Felder. Die Felder sind durchnummeriert zB lehreinheit_id_0, lehreinheit_id_1, ...
 		$errormsg = '';
-		$angerechnet=false;
+		$ueberschreibbar=true;
+		$nueberschreibbarbez=array();
 
 		for($i=0;$i<$_POST['anzahl'];$i++)
 		{
 			$lvgesamtnote = new lvgesamtnote();
 			$zeugnisnote = new zeugnisnote();
+			$noten_ueberschreibbar = array();
+			$noten_bezeichnung = array();
+			$note_obj = new note();
+			$note_obj->getAll();
+			foreach($note_obj->result as $row)
+			{
+				$noten_ueberschreibbar[$row->note] = $row->lkt_ueberschreibbar;
+				$noten_bezeichnung[$row->note] = $row->bezeichnung;
+			}
 
 			//Berechtigung pruefen
 			$qry = "SELECT studiengang_kz FROM lehre.tbl_lehrveranstaltung WHERE lehrveranstaltung_id=".$db->db_add_param($_POST['lehrveranstaltung_id_'.$i], FHC_INTEGER);
@@ -2902,10 +2912,13 @@ if(!$error)
 							$zeugnisnote->new = false;
 							$zeugnisnote->updateamum = date('Y-m-d H:i:s');
 							$zeugnisnote->updatevon = $user;
-							//Angerechnete Noten werden nicht ueberschrieben
-							if($zeugnisnote->note=='6') //Angerechnet
+							// Noten wie "angerechnet", "nicht erforderlich" werden nicht ueberschrieben
+							if(isset($zeugnisnote->note) && array_key_exists($zeugnisnote->note, $noten_ueberschreibbar) && $noten_ueberschreibbar[$zeugnisnote->note] === false)
 							{
-								$angerechnet=true;
+								$notenbez = '"'.$noten_bezeichnung[$zeugnisnote->note].'"';
+								if (!in_array($notenbez, $nueberschreibbarbez))
+									$nueberschreibbarbez[] = $notenbez;
+								$ueberschreibbar = false;
 								continue;
 							}
 						}
@@ -2944,9 +2957,9 @@ if(!$error)
 				}
 			}
 		}
-		if($angerechnet)
+		if(!$ueberschreibbar)
 		{
-			$errormsg.="\nAngerechnete Noten wurden nicht ueberschrieben";
+			$errormsg.="\nNote(n) ".implode(', ', $nueberschreibbarbez)." waren nicht ueberschreibbar";
 		}
 
 		if($errormsg=='')
@@ -2961,13 +2974,20 @@ if(!$error)
 		//Die Felder sind durchnummeriert zB matrikelnummer_0, matrikelnummer_1, ...
 		//Die Anzahl der Gesamten Daten wird auch als Parameter uebergeben
 		$errormsg = '';
-		$angerechnet=false;
+		$ueberschreibbar=true;
+		$nueberschreibbarbez=array();
 
 		$noten_anmerkung_arr=array();
+		$noten_ueberschreibbar = array();
+		$noten_bezeichnung = array();
 		$note_obj = new note();
 		$note_obj->getAll();
 		foreach($note_obj->result as $row)
-			$noten_anmerkung_arr[$row->anmerkung]=$row->note;
+		{
+			$noten_ueberschreibbar[$row->note] = $row->lkt_ueberschreibbar;
+			$noten_bezeichnung[$row->note] = $row->bezeichnung;
+			$noten_anmerkung_arr[$row->anmerkung] = $row->note;
+		}
 
 		for($i=0;$i<$_POST['anzahl'];$i++)
 		{
@@ -3045,10 +3065,13 @@ if(!$error)
 								$zeugnisnote->new = false;
 								$zeugnisnote->updateamum = date('Y-m-d H:i:s');
 								$zeugnisnote->updatevon = $user;
-								//Angerechnete Noten werden nicht ueberschrieben
-								if($zeugnisnote->note=='6') //Angerechnet
+								// Noten wie "angerechnet", "nicht erforderlich" werden nicht ueberschrieben
+								if(isset($zeugnisnote->note) && array_key_exists($zeugnisnote->note, $noten_ueberschreibbar) && $noten_ueberschreibbar[$zeugnisnote->note] === false)
 								{
-									$angerechnet=true;
+									$notenbez = '"'.$noten_bezeichnung[$zeugnisnote->note].'"';
+									if (!in_array($notenbez, $nueberschreibbarbez))
+										$nueberschreibbarbez[] = $notenbez;
+									$ueberschreibbar = false;
 									continue;
 								}
 							}
@@ -3100,9 +3123,9 @@ if(!$error)
 				}
 			}
 		}
-		if($angerechnet)
+		if(!$ueberschreibbar)
 		{
-			$errormsg.="\nAngerechnete Noten wurden nicht ueberschrieben";
+			$errormsg.="\nNote(n) ".implode(', ', $nueberschreibbarbez)." waren nicht ueberschreibbar";
 		}
 
 		if($errormsg=='')
