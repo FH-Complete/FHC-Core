@@ -2400,19 +2400,19 @@ if(!$result = @$db->db_query("SELECT lkt_ueberschreibbar FROM lehre.tbl_note LIM
 if(!@$db->db_query("SELECT zeitaufzeichnungspflichtig FROM bis.tbl_bisverwendung LIMIT 1"))
 {
 	$qry = "ALTER TABLE bis.tbl_bisverwendung ADD COLUMN zeitaufzeichnungspflichtig boolean;
-		
-			UPDATE 
-				bis.tbl_bisverwendung 
-			SET 
-				zeitaufzeichnungspflichtig=true 
-			FROM 
-				public.tbl_mitarbeiter 
-			WHERE 
-				tbl_bisverwendung.mitarbeiter_uid = tbl_mitarbeiter.mitarbeiter_uid 
-			AND 
+
+			UPDATE
+				bis.tbl_bisverwendung
+			SET
+				zeitaufzeichnungspflichtig=true
+			FROM
+				public.tbl_mitarbeiter
+			WHERE
+				tbl_bisverwendung.mitarbeiter_uid = tbl_mitarbeiter.mitarbeiter_uid
+			AND
 				fixangestellt=true;
 			UPDATE
-				bis.tbl_bisverwendung 
+				bis.tbl_bisverwendung
 			SET
 				zeitaufzeichnungspflichtig=false
 			FROM
@@ -2421,7 +2421,7 @@ if(!@$db->db_query("SELECT zeitaufzeichnungspflichtig FROM bis.tbl_bisverwendung
 				tbl_bisverwendung.mitarbeiter_uid = tbl_mitarbeiter.mitarbeiter_uid
 			AND
 				fixangestellt=false;
-				
+
 			COMMENT ON COLUMN bis.tbl_bisverwendung.zeitaufzeichnungspflichtig IS 'CaseTime Monatslisten mit Vertragsbeginn verpflichtend führen?';";
 
 	if(!$db->db_query($qry))
@@ -2436,12 +2436,25 @@ if(!@$db->db_query("SELECT zeitaufzeichnungspflichtig FROM bis.tbl_bisverwendung
 if(!$result = @$db->db_query("SELECT priorisierung FROM public.tbl_prestudent LIMIT 1"))
 {
 	$qry = "ALTER TABLE public.tbl_prestudent ADD COLUMN priorisierung smallint;";
-	
+
 	if(!$db->db_query($qry))
 		echo '<strong>public.tbl_prestudent: '.$db->db_last_error().'</strong><br>';
 		else
 			echo '<br>public.tbl_prestudent: Spalte priorisierung hinzugefuegt';
 }
+
+// Spalte lieferant in tbl_firma
+if(!$result = @$db->db_query("SELECT lieferant FROM public.tbl_firma LIMIT 1"))
+{
+	$qry = "ALTER TABLE public.tbl_firma ADD COLUMN lieferant boolean default false;
+	UPDATE public.tbl_firma SET lieferant = true WHERE firmentyp_kurzbz = 'Firma'";
+
+	if(!$db->db_query($qry))
+		echo '<strong>public.tbl_firma: '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>public.tbl_firma: Spalte lieferant hinzugefuegt';
+}
+
 
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
@@ -2609,7 +2622,7 @@ $tabellen=array(
 	"public.tbl_erhalter"  => array("erhalter_kz","kurzbz","bezeichnung","dvr","logo","zvr"),
 	"public.tbl_fachbereich"  => array("fachbereich_kurzbz","bezeichnung","farbe","studiengang_kz","aktiv","ext_id","oe_kurzbz"),
 	"public.tbl_filter" => array("filter_id","kurzbz","sql","valuename","showvalue","insertamum","insertvon","updateamum","updatevon","type","htmlattr", "bezeichnung"),
-	"public.tbl_firma"  => array("firma_id","name","anmerkung","firmentyp_kurzbz","updateamum","updatevon","insertamum","insertvon","ext_id","schule","finanzamt","steuernummer","gesperrt","aktiv","lieferbedingungen","partner_code"),
+	"public.tbl_firma"  => array("firma_id","name","anmerkung","firmentyp_kurzbz","updateamum","updatevon","insertamum","insertvon","ext_id","schule","finanzamt","steuernummer","gesperrt","aktiv","lieferbedingungen","partner_code","lieferant"),
 	"public.tbl_firma_mobilitaetsprogramm" => array("firma_id","mobilitaetsprogramm_code","ext_id"),
 	"public.tbl_firma_organisationseinheit"  => array("firma_organisationseinheit_id","firma_id","oe_kurzbz","bezeichnung","kundennummer","updateamum","updatevon","insertamum","insertvon","ext_id"),
 	"public.tbl_firmentyp"  => array("firmentyp_kurzbz","beschreibung"),

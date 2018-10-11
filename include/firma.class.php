@@ -49,6 +49,7 @@ class firma extends basis_db
 	public $aktiv; 			// boolean
 	public $finanzamt; 		// string
 	public $partner_code;	// varchar(20)
+	public $lieferant;		// boolean
 
 	// firma_organisationseinheit
 	public $oe_kurzbz; 		// string
@@ -110,6 +111,7 @@ class firma extends basis_db
 				$this->aktiv = $this->db_parse_bool($row->aktiv);
 				$this->finanzamt = $row->finanzamt;
 				$this->partner_code = $row->partner_code;
+				$this->lieferant = $this->db_parse_bool($row->lieferant);
 
 				$qry = "SELECT tag FROM public.tbl_firmatag WHERE firma_id=".$this->db_add_param($firma_id,FHC_INTEGER).';';
 				if($resulttag = $this->db_query($qry))
@@ -151,7 +153,7 @@ class firma extends basis_db
 			$this->errormsg = 'Anmerkung darf nicht länger als 256 Zeichen sein';
 			return false;
 		}
-			if(mb_strlen($this->lieferbedingungen)>256)
+		if(mb_strlen($this->lieferbedingungen)>256)
 		{
 			$this->errormsg = 'Lieferbedingungen darf nicht länger als 256 Zeichen sein';
 			return false;
@@ -177,7 +179,7 @@ class firma extends basis_db
 			//Neuen Datensatz einfuegen
 			$qry='INSERT INTO public.tbl_firma (name,  anmerkung, lieferbedingungen,
 					firmentyp_kurzbz, updateamum, updatevon, insertamum, insertvon, schule,steuernummer,
-					gesperrt,aktiv,finanzamt, partner_code) VALUES('.
+					gesperrt,aktiv,finanzamt, partner_code, lieferant) VALUES('.
 				$this->db_add_param($this->name).', '.
 				$this->db_add_param($this->anmerkung).', '.
 				$this->db_add_param($this->lieferbedingungen).', '.
@@ -191,7 +193,8 @@ class firma extends basis_db
 				$this->db_add_param($this->gesperrt, FHC_BOOLEAN).','.
 				$this->db_add_param($this->aktiv, FHC_BOOLEAN).','.
 				$this->db_add_param($this->finanzamt, FHC_INTEGER).','.
-				$this->db_add_param($this->partner_code).'); ';
+				$this->db_add_param($this->partner_code).','.
+				$this->db_add_param($this->lieferant, FHC_INTEGER).'); ';
 		}
 		else
 		{
@@ -216,7 +219,8 @@ class firma extends basis_db
 				'gesperrt='.$this->db_add_param($this->gesperrt, FHC_BOOLEAN).', '.
 				'aktiv='.$this->db_add_param($this->aktiv, FHC_BOOLEAN).', '.
 				'finanzamt='.$this->db_add_param($this->finanzamt, FHC_INTEGER).', '.
-				'partner_code='.$this->db_add_param($this->partner_code).' '.
+				'partner_code='.$this->db_add_param($this->partner_code).', '.
+				'lieferant='.$this->db_add_param($this->lieferant, FHC_BOOLEAN).' '.
 				'WHERE firma_id='.$this->db_add_param($this->firma_id, FHC_INTEGER).';';
 		}
 
@@ -371,7 +375,6 @@ class firma extends basis_db
 	 */
 	public function getAll($firma_search = null)
 	{
-
 		if (!empty($firma_search))
 		{
 			$matchcode=mb_strtoupper(str_replace(array('<','>',' ',';','*','_','-',',',"'",'"'),"%",$firma_search));
@@ -381,7 +384,7 @@ class firma extends basis_db
 
 				SELECT
 					firma_id, name, anmerkung, lieferbedingungen, firmentyp_kurzbz, updateamum, updatevon, insertamum, insertvon,
-					ext_id, schule, steuernummer, gesperrt, aktiv, finanzamt, '1' as sort, partner_code
+					ext_id, schule, steuernummer, gesperrt, aktiv, finanzamt, '1' as sort, partner_code, lieferant
 				FROM public.tbl_firma
 				WHERE
 				UPPER(trim(public.tbl_firma.name)) like '".$this->db_escape($matchcode)."%'
@@ -423,6 +426,7 @@ class firma extends basis_db
 				$fa->aktiv = $this->db_parse_bool($row->aktiv);
 				$fa->finanzamt = $row->finanzamt;
 				$fa->partner_code = $row->partner_code;
+				$fa->lieferant = $this->db_parse_bool($row->lieferant);
 
 				$this->result[] = $fa;
 			}
@@ -501,6 +505,7 @@ class firma extends basis_db
 				$fa->aktiv = $this->db_parse_bool($row->aktiv);
 				$fa->finanzamt = $row->finanzamt;
 				$fa->partner_code = $row->partner_code;
+				$fa->lieferant = $this->db_parse_bool($row->lieferant);
 
 				$this->result[] = $fa;
 			}
@@ -513,7 +518,13 @@ class firma extends basis_db
 		}
 	}
 
-	public function getLatestChanges($tage = 7) {
+	/**
+	 * Laedt alle Firmen die in den letzten Tagen geaendert oder angelegt wurden
+	 * @param $tage integer Anzahl der Tage innerhalb der nach Aenderungen gesucht wird.
+	 * @return boolean true wenn erfolgreich, false im Fehlerfall
+	 */
+	public function getLatestChanges($tage = 7)
+	{
 		$this->result = array();
 		$this->errormsg = '';
 
@@ -549,6 +560,7 @@ class firma extends basis_db
 				$fa->aktiv = $this->db_parse_bool($row->aktiv);
 				$fa->finanzamt = $row->finanzamt;
 				$fa->partner_code = $row->partner_code;
+				$fa->lieferant = $this->db_parse_bool($row->lieferant);
 				$fa->kurzbz = $row->kurzbz;
 				$fa->adresse_id = $row->adresse_id;
 				$fa->standort_id = $row->standort_id;
@@ -576,15 +588,24 @@ class firma extends basis_db
 		}
 	}
 
-	public function getChangesByKW($kw = 0, $jahr = 0) {
+	/**
+	 * Laedt die Firmen die innerhalb einer bestimmten Kalenderwoche geaendert oder angelegt wurden
+	 * @param $kw integer Kalenderwoche.
+	 * @param $jahr Jahr der Kalenderwoche
+	 * @return boolean true wenn erfolgreich, false im Fehlerfall
+	 */
+	public function getChangesByKW($kw = 0, $jahr = 0)
+	{
 		$this->result = array();
 		$this->errormsg = '';
 
-		if ($kw<1 || $kw>53) {
+		if ($kw<1 || $kw>53)
+		{
 			$this->errormsg = 'KW außerhalb gültigem Bereich ('.$kw.')';
 			return false;
 		}
-		if ($jahr<1990) {
+		if ($jahr<1990)
+		{
 			$this->errormsg = 'Jahr außerhalb gültigem Bereich ('.$jahr.')';
 			return false;
 		}
@@ -621,6 +642,7 @@ class firma extends basis_db
 				$fa->aktiv = $this->db_parse_bool($row->aktiv);
 				$fa->finanzamt = $row->finanzamt;
 				$fa->partner_code = $row->partner_code;
+				$fa->lieferant = $this->db_parse_bool($row->lieferant);
 				$fa->kurzbz = $row->kurzbz;
 				$fa->adresse_id = $row->adresse_id;
 				$fa->standort_id = $row->standort_id;
@@ -647,7 +669,6 @@ class firma extends basis_db
 			return false;
 		}
 	}
-
 
 	/**
 	 * Suche nur nach Firmennamen für die abgespeckte Firmenverwaltung
@@ -698,6 +719,7 @@ class firma extends basis_db
 				$fa->aktiv = $this->db_parse_bool($row->aktiv);
 				$fa->finanzamt = $row->finanzamt;
 				$fa->partner_code = $row->partner_code;
+				$fa->lieferant = $this->db_parse_bool($row->lieferant);
 				$fa->kurzbz = $row->kurzbz;
 				$fa->adresse_id = $row->adresse_id;
 				$fa->standort_id = $row->standort_id;
@@ -800,6 +822,7 @@ class firma extends basis_db
 				$fa->aktiv = $this->db_parse_bool($row->aktiv);
 				$fa->finanzamt = $row->finanzamt;
 				$fa->partner_code = $row->partner_code;
+				$fa->lieferant = $this->db_parse_bool($row->lieferant);
 				$fa->kurzbz = $row->kurzbz;
 				$fa->adresse_id = $row->adresse_id;
 				$fa->standort_id = $row->standort_id;
@@ -919,6 +942,7 @@ class firma extends basis_db
 				$fa->aktiv = $this->db_parse_bool($row->aktiv);
 				$fa->finanzamt = $row->finanzamt;
 				$fa->partner_code = $row->partner_code;
+				$fa->lieferant = $this->db_parse_bool($row->lieferant);
 				$fa->oe_kurzbz = $row->oe_kurzbz;
 				$fa->firma_organisationseinheit_id = $row->firma_organisationseinheit_id;
 				$fa->oe_parent_kurzbz = $row->oe_parent_kurzbz;
@@ -1186,6 +1210,7 @@ class firma extends basis_db
 				$fi->aktiv = $this->db_parse_bool($row->aktiv);
 				$fi->finanzamt = $row->finanzamt;
 				$fi->partner_code = $row->partner_code;
+				$fi->lieferant = $this->db_parse_bool($row->lieferant);
 
 				$this->result[] = $fi;
 			}
@@ -1230,6 +1255,7 @@ class firma extends basis_db
 				$obj->aktiv = $this->db_parse_bool($row->aktiv);
 				$obj->finanzamt = $row->finanzamt;
 				$obj->partner_code = $row->partner_code;
+				$obj->lieferant = $this->db_parse_bool($row->lieferant);
 
 				$this->result[] = $obj;
 			}
