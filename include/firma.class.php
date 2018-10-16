@@ -391,7 +391,7 @@ class firma extends basis_db
 				UNION
 				SELECT
 					firma_id, name, anmerkung, lieferbedingungen, firmentyp_kurzbz, updateamum, updatevon, insertamum, insertvon,
-					ext_id, schule, steuernummer, gesperrt, aktiv, finanzamt, '2' as sort, partner_code
+					ext_id, schule, steuernummer, gesperrt, aktiv, finanzamt, '2' as sort, partner_code, lieferant
 				FROM public.tbl_firma
 				WHERE
 				UPPER(trim(public.tbl_firma.name)) like '%".$this->db_escape($matchcode)."%'
