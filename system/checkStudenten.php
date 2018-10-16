@@ -602,6 +602,41 @@ if ($result = $db->db_query($qry))
 	}
 }
 
+/*
+ * Aktive Studierende ohne Matrikelnummer
+ */
+$text .= "<br><br>Studierender hat keine Matrikelnummer<br><br>";
+
+$qry = "
+SELECT
+	distinct on (person_id)
+	tbl_student.student_uid,
+	tbl_prestudent.prestudent_id,
+	tbl_prestudent.studiengang_kz as studiengang
+FROM
+	public.tbl_prestudent
+	JOIN public.tbl_prestudentstatus USING(prestudent_id)
+	JOIN public.tbl_person USING(person_id)
+	JOIN public.tbl_student USING(prestudent_id)
+	JOIN public.tbl_benutzer USING(person_id)
+WHERE
+	status_kurzbz in('Student', 'Diplomand', 'Absolvent', 'Abbrecher')
+	AND tbl_prestudent.bismelden
+	AND tbl_benutzer.aktiv
+	AND tbl_person.matr_nr is null OR tbl_person.matr_nr = ''
+	AND tbl_prestudentstatus.studiensemester_kurzbz=".$db->db_add_param($aktSem);
+
+if ($studiengang_kz != '')
+	$qry .= " AND tbl_prestudent.studiengang_kz=".$db->db_add_param($studiengang_kz, FHC_INTEGER);
+
+if ($result = $db->db_query($qry))
+{
+	while ($row = $db->db_fetch_object($result))
+	{
+		$ausgabe[$row->studiengang][14][] = $row->student_uid;
+	}
+}
+
 // Ausgabe der Studenten
 foreach ($ausgabe as $stg_kz => $value)
 {
@@ -751,6 +786,16 @@ foreach ($ausgabe as $stg_kz => $value)
 						<td colspan='4'><b>Studienplan ist in diesem Semester nicht gültig (nicht BIS relevant)</b></td>
 					</tr>";
 				break;
+			case 14:
+				echo "
+					<tr>
+						<td>&nbsp;</td>
+					</tr>
+					<tr>
+						<td colspan='4'><b>Aktive Studierende ohne Matrikelnummer</b></td>
+					</tr>";
+				break;
+
 			default:
 				echo "<tr><td>&nbsp;</td></tr><tr><td colspan='4'><b>Ungültiger Code</b></td></tr>";
 				break;

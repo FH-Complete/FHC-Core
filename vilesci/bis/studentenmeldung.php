@@ -495,7 +495,7 @@ if(file_exists($eee))
 echo '<table border=1>
 	<tr align=center>
 		<th>UID</th>
-		<th>Matrikelnr</th>
+		<th>PersKZ</th>
 		<th>Nachname</th>
 		<th>Vorname</th>
 		<th>Status</th>
@@ -579,6 +579,14 @@ function GenerateXMLStudentBlock($row)
 	if($row->nachname=='' || $row->nachname==null)
 	{
 		$error_log.=(!empty($error_log)?', ':'')."Nachname ('".$row->nachname."')";
+	}
+	if($row->matr_nr=='')
+	{
+		$error_log.=(!empty($error_log)?', ':'')."Matrikelnummer fehlt";
+	}
+	if($row->matr_nr!='' && $row->matr_nr!=null && mb_strlen(trim($row->matr_nr))!=8)
+	{
+		$error_log.=(!empty($error_log)?', ':'')."Matrikelnummer ('".trim($row->matr_nr)."') ist nicht 8 Zeichen lang";
 	}
 	if($row->svnr!='' && $row->svnr!=null && mb_strlen(trim($row->svnr))!=10)
 	{
@@ -970,6 +978,10 @@ function GenerateXMLStudentBlock($row)
 		$datei.="
 		<StudentIn>
 			<PersKz>".trim($row->matrikelnr)."</PersKz>";
+
+		$datei.="
+			<Matrikelnummer>".$row->matr_nr."</Matrikelnummer>";
+
 		if(!$ausserordentlich)
 		{
 			$datei.="
@@ -979,32 +991,21 @@ function GenerateXMLStudentBlock($row)
 		$datei.="
 			<GeburtsDatum>".date("dmY", $datumobj->mktime_fromdate($row->gebdatum))."</GeburtsDatum>
 			<Geschlecht>".strtoupper($row->geschlecht)."</Geschlecht>";
-		if(($row->svnr!='')&&($row->ersatzkennzeichen!=''))
-		{
-			$datei.="
+		$datei.="
 			<Vorname>".$row->vorname."</Vorname>
 			<Familienname>".$row->nachname."</Familienname>";
+
+		if($row->svnr!='')
+		{
 			$datei.="
 			<SVNR>".$row->svnr."</SVNR>";
+		}
+		if($row->ersatzkennzeichen!='')
+		{
 			$datei.="
 			<ErsKz>".$row->ersatzkennzeichen."</ErsKz>";
 		}
-		else
-		{
-			if($row->svnr!='')
-			{
-				$datei.="
-			<SVNR>".$row->svnr."</SVNR>";
-			}
-			if($row->ersatzkennzeichen!='')
-			{
-				$datei.="
-			<Vorname>".$row->vorname."</Vorname>
-			<Familienname>".$row->nachname."</Familienname>";
-				$datei.="
-			<ErsKz>".$row->ersatzkennzeichen."</ErsKz>";
-			}
-		}
+		
 		$datei.="
 			<StaatsangehoerigkeitCode>".$row->staatsbuergerschaft."</StaatsangehoerigkeitCode>
 			<HeimatPLZ>".$plz."</HeimatPLZ>
