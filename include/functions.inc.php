@@ -30,7 +30,6 @@ require_once(dirname(__FILE__).'/personlog.class.php');
  */
 function get_uid()
 {
-	return 'koenign';
 	$auth = new authentication();
 	return $auth->getUser();
 }
