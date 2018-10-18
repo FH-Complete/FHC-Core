@@ -141,16 +141,13 @@ if(isset($_GET['deletetag']))
 		$errorstr=($errorstr?$errorstr.', ':'').'Fehler beim Loeschen des Tags : Tag fehlt';
 }
 
-?>
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+?><!DOCTYPE HTML>
 <html>
 <head>
 	<title>Firma - Details</title>
-
-	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<meta charset="UTF-8">
 	<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
 	<link rel="stylesheet" href="../../skin/styles/jquery.css" type="text/css">
-<!--	<link rel="stylesheet" href="../../vendor/components/jqueryui/themes/base/jquery-ui.min.css" type="text/css"> -->
 
 	<script src="../../include/js/mailcheck.js" type="text/javascript"></script>
 	<script src="../../include/js/datecheck.js" type="text/javascript"></script>
@@ -159,9 +156,9 @@ if(isset($_GET['deletetag']))
 	<script type="text/javascript" src="../../vendor/christianbach/tablesorter/jquery.tablesorter.min.js"></script>
 	<script type="text/javascript" src="../../vendor/components/jqueryui/jquery-ui.min.js"></script>
 	<script type="text/javascript" src="../../include/js/jquery.ui.datepicker.translation.js"></script>
-    <link rel="stylesheet" type="text/css" href="../../skin/jquery-ui-1.9.2.custom.min.css"/>
+	<link rel="stylesheet" type="text/css" href="../../skin/jquery-ui-1.9.2.custom.min.css"/>
 
-<script type="text/javascript" language="JavaScript1.2">
+	<script type="text/javascript" language="JavaScript1.2">
 		function confdel()
 		{
 			if(confirm("Diesen Datensatz wirklich loeschen?"))
@@ -329,6 +326,10 @@ function getFirmadetail($firma_id, $adresstyp_arr, $user, $neu)
 		$htmlstr.="<td><input ".($firma->schule?' style="background-color: #E3FDEE;" ':' style="background-color: #FFF4F4;" ')."  type='checkbox' name='schule' ".($firma->schule?'checked':'')."> </td>";
 		$htmlstr.="<td>&nbsp;</td>";
 
+		$htmlstr.="<td>Lieferant:</td>";
+		$htmlstr.="<td><input ".($firma->lieferant?' style="background-color: #E3FDEE;" ':' style="background-color: #FFF4F4;" ')."  type='checkbox' name='lieferant' ".($firma->lieferant?'checked':'')."> </td>";
+		$htmlstr.="<td>&nbsp;</td>";
+
 		$htmlstr.="</tr>";
 		$htmlstr.="<tr>";
 		$htmlstr.="<td title='Trennung mehrerer Tags durch ;'>Tags:</td><td><input type='text' id='tags' name='tags' size='32'>";
@@ -448,6 +449,7 @@ function saveFirma($user,$rechte)
 	$firma->aktiv = (isset($_POST['aktiv'])?true:false);
 	$firma->finanzamt = (isset($_POST['finanzamt'])?$_POST['finanzamt']:'');
 	$firma->partner_code = (isset($_POST['partner_code'])?$_POST['partner_code']:'');
+	$firma->lieferant = (isset($_POST['lieferant'])?true:false);
 	$tags = (isset($_POST['tags'])?$_POST['tags']:'');
 
 	if($firma->save())
@@ -747,4 +749,3 @@ function saveAnmerkungen($firma_id,$user, $rechte)
 		return 'Anmerkung gespeichert!';
 
 }
-?>

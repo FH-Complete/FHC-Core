@@ -442,7 +442,15 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
 						<text:p text:style-name="P9"/>
 					</table:table-cell>
 					<table:table-cell table:style-name="Tabelle1.G2" office:value-type="string">
-						<text:p text:style-name="P11">€ <xsl:value-of select="gesamtbetrag" /></text:p>
+						<xsl:choose>
+							<xsl:when test="mitarbeiter/inkludierte_lehre = -1">
+								<text:p text:style-name="P11">€ 0,00</text:p>
+							</xsl:when>
+							<xsl:otherwise>
+								<text:p text:style-name="P11">€ <xsl:value-of select="gesamtbetrag" /></text:p>
+							</xsl:otherwise>
+						</xsl:choose>
+						
 					</table:table-cell>
 				</table:table-row>
 			</table:table>
@@ -514,10 +522,26 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
 			<text:p text:style-name="P3"><xsl:value-of select="stunden" /></text:p>
 		</table:table-cell>
 		<table:table-cell table:style-name="Tabelle1.A2" office:value-type="string">
-			<text:p text:style-name="P2"><xsl:value-of select="satz" /></text:p>
+			<!-- Wenn LektorInnen bei inkludierte_lehre -1 stehen haben, wird am Lehrauftrag bei Stundensatz und Brutto 0 ausgegeben-->
+			<xsl:choose>
+				<xsl:when test="../mitarbeiter/inkludierte_lehre = -1">
+					<text:p text:style-name="P2">0.00</text:p>
+				</xsl:when>
+				<xsl:otherwise>
+					<text:p text:style-name="P2"><xsl:value-of select="satz" /></text:p>
+				</xsl:otherwise>
+			</xsl:choose>			
 		</table:table-cell>
 		<table:table-cell table:style-name="Tabelle1.G2" office:value-type="string">
-			<text:p text:style-name="P3">€ <xsl:value-of select="brutto" /></text:p>
+			<!-- Wenn LektorInnen bei inkludierte_lehre -1 stehen haben, wird am Lehrauftrag bei Stundensatz und Brutto 0 ausgegeben-->
+			<xsl:choose>
+				<xsl:when test="../mitarbeiter/inkludierte_lehre = -1">
+					<text:p text:style-name="P3">€ 0,00</text:p>
+				</xsl:when>
+				<xsl:otherwise>
+					<text:p text:style-name="P3">€ <xsl:value-of select="brutto" /></text:p>
+				</xsl:otherwise>
+			</xsl:choose>			
 		</table:table-cell>
 	</table:table-row>
 </xsl:template>

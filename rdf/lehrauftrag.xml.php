@@ -30,6 +30,7 @@ require_once('../include/studiengang.class.php');
 require_once('../include/lehreinheit.class.php');
 require_once('../include/fachbereich.class.php');
 require_once('../include/mitarbeiter.class.php');
+require_once('../include/bisverwendung.class.php');
 
 if(isset($_SERVER['REMOTE_USER']))
 {
@@ -224,6 +225,10 @@ function drawLehrauftrag($uid)
 				$name_gesamt = trim($row->titelpre.' '.$row->vorname.' '.$row->nachname.' '.$row->titelpost);
 				$zuhanden='';
 			}
+			// Lädt die letzte (aktuellste) Verwendungen eines Mitarbeiters um die inkludierte Lehre auslesen zu können
+			$bis = new bisverwendung();
+			$bis->getLastAktVerwendung($uid);
+
 			$xml.='
 		<mitarbeiter>
 			<titelpre><![CDATA['.$row->titelpre.']]></titelpre>
@@ -237,6 +242,7 @@ function drawLehrauftrag($uid)
 			<ort><![CDATA['.$ort.']]></ort>
 			<svnr><![CDATA['.$row->svnr.']]></svnr>
 			<personalnummer><![CDATA['.$row->personalnummer.']]></personalnummer>
+			<inkludierte_lehre><![CDATA['.$bis->inkludierte_lehre.']]></inkludierte_lehre>
 		</mitarbeiter>';
 		}
 	}

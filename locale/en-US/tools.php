@@ -16,6 +16,7 @@ $this->phrasen['tools/alleStudiensemester']='All semester';
 $this->phrasen['tools/abschlussdokumente']='Final documents/Transcripts';
 $this->phrasen['tools/nochKeineAbschlussdokumenteVorhanden']='No final documents available yet';
 $this->phrasen['tools/keinStatusImStudiensemester']='No status found for %1$s. Please select a valid semester from the dropdown.';
+$this->phrasen['tools/warnungDruckDigitaleSignatur']='<b>Warning!</b> Digitally signed documents are not displayed correctly in some browsers or PDF-readers. <br/>Please use <a href="https://get.adobe.com/de/reader/" target="_blank">Adobe Acrobat Reader</a>, if you want to print out the doument.'; // Nur grob übersetzt
 
 //Leistungsbeurteilung
 $this->phrasen['tools/leistungsbeurteilung']='Performance Assessment ';

@@ -12,10 +12,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+ *
  * Authors: Christian Paminger < christian.paminger@technikum-wien.at >
- * Andreas Oesterreicher < andreas.oesterreicher@technikum-wien.at >
- * Rudolf Hangl < rudolf.hangl@technikum-wien.at >
- * Gerald Simane-Sequens < gerald.simane-sequens@technikum-wien.at >
+ *			Andreas Oesterreicher < andreas.oesterreicher@technikum-wien.at >
+ * 			Rudolf Hangl < rudolf.hangl@technikum-wien.at >
+ * 			Gerald Simane-Sequens < gerald.simane-sequens@technikum-wien.at >
  */
 /**
  * Script zum Zusammenlegen Doppelter Studenten
@@ -149,12 +150,20 @@ if (isset($personToDelete) && isset($personToKeep) && $personToDelete >= 0 && $p
 						Bitte wenden Sie sich an einen Administrator.';
 				$error = true;
 			}
-			
+
+			// Wenn beide Personen eine Matr_nr haben, abbrechen
+			if (($personToDelete_obj->matr_nr != '' && $personToKeep_obj->matr_nr != ''))
+			{
+				$msg_error[] = 'Beide Personen haben eine Matrikelnummer und können nicht zusammengelegt werden.<br>
+						Bitte wenden Sie sich an einen Administrator.';
+				$error = true;
+			}
+
 			// Wenn zwei gleiche rt_person Einträge vorhanden sind, wird ein Fehler ausgegeben und abgebrochen
 			$reihungstest_personToKeep = new reihungstest();
 			$reihungstest_personToKeep->getReihungstestPerson($personToKeep);
 			$doppelteReihungstestzuordnung = false;
-			
+
 			foreach ($reihungstest_personToKeep->result as $row)
 			{
 				$rt_doppelt = new reihungstest();
@@ -170,7 +179,7 @@ if (isset($personToDelete) && isset($personToKeep) && $personToDelete >= 0 && $p
 			}
 			if ($doppelteReihungstestzuordnung === false)
 				$sql_query_upd1 .= "UPDATE public.tbl_rt_person SET person_id=" . $db->db_add_param($personToKeep, FHC_INTEGER) . " WHERE person_id=" . $db->db_add_param($personToDelete, FHC_INTEGER) . ";";
-			
+
 			if ($error == false)
 			{
 				// Wenn bei einer der Personen das Foto gesperrt ist, dann die Sperre uebernehmen
@@ -262,6 +271,12 @@ if (isset($personToDelete) && isset($personToKeep) && $personToDelete >= 0 && $p
 				if ($personToKeep_obj->svnr == '' && $personToDelete_obj->svnr != '')
 					$sozialversicherungsnummer = $personToDelete_obj->svnr;
 
+				$matr_nr = '';
+				if ($personToDelete_obj->matr_nr == '' && $personToKeep_obj->matr_nr != '')
+					$matr_nr = $personToKeep_obj->matr_nr;
+				if ($personToKeep_obj->matr_nr == '' && $personToDelete_obj->matr_nr != '')
+					$matr_nr = $personToDelete_obj->matr_nr;
+
 				// Letztbenutzten Zugangscode abfragen und übernehmen
 				$zugangscode = '';
 				$log = new personlog();
@@ -320,6 +335,9 @@ if (isset($personToDelete) && isset($personToKeep) && $personToDelete >= 0 && $p
 
 				// Zugangscode erst setzen, wenn nur mehr eine Person vorhanden ist
 				$sql_query_upd1 .= "UPDATE public.tbl_person SET zugangscode=" . $db->db_add_param($zugangscode, FHC_STRING) . " WHERE person_id=" . $db->db_add_param($personToKeep, FHC_INTEGER) . ";";
+
+				// Matr_nr erst setzen, wenn nur mehr eine Person vorhanden ist
+				$sql_query_upd1 .= "UPDATE public.tbl_person SET matr_nr=" . $db->db_add_param($matr_nr, FHC_STRING) . " WHERE person_id=" . $db->db_add_param($personToKeep, FHC_INTEGER) . ";";
 
 				if ($db->db_query($sql_query_upd1))
 				{
@@ -935,8 +953,8 @@ function resize($base64, $width, $height) // 828 x 1104 -> 240 x 320
 	}
 	function checkPersonen()
 	{
-		// Check, ob jeweils ein Radiobutton ausgewählt wurde 
-		if(!$('input[type=radio][name=radio_1]').is(':checked') || !$('input[type=radio][name=radio_2]').is(':checked')) 
+		// Check, ob jeweils ein Radiobutton ausgewählt wurde
+		if(!$('input[type=radio][name=radio_1]').is(':checked') || !$('input[type=radio][name=radio_2]').is(':checked'))
 		{
 			alert('Bitte wählen Sie auf beiden Seiten einen Radio-Button aus');
 			return false;

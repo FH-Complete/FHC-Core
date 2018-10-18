@@ -1178,7 +1178,7 @@ function MitarbeiterVerwendungBearbeiten()
 	bisverwendung_id=tree.view.getCellText(tree.currentIndex,col);
 
 	//Dialog laden
-	window.open("<?php echo APP_ROOT; ?>content/mitarbeiter/mitarbeiterverwendungdialog.xul.php?mitarbeiter_uid="+mitarbeiter_uid+"&bisverwendung_id="+bisverwendung_id,"popup","chrome, status=no, width=500, height=400, centerscreen, resizable");
+	window.open("<?php echo APP_ROOT; ?>content/mitarbeiter/mitarbeiterverwendungdialog.xul.php?mitarbeiter_uid="+mitarbeiter_uid+"&bisverwendung_id="+bisverwendung_id,"popup","chrome, status=no, width=500, height=500, centerscreen, resizable");
 }
 
 // ****
@@ -1192,7 +1192,7 @@ function MitarbeiterVerwendungNeu()
 	col = tree.columns ? tree.columns["mitarbeiter-treecol-uid"] : "mitarbeiter-treecol-uid";
 	mitarbeiter_uid=tree.view.getCellText(tree.currentIndex,col);
 
-	window.open("<?php echo APP_ROOT; ?>content/mitarbeiter/mitarbeiterverwendungdialog.xul.php?mitarbeiter_uid="+mitarbeiter_uid,"popup","chrome, status=no, width=500, height=350, centerscreen, resizable");
+	window.open("<?php echo APP_ROOT; ?>content/mitarbeiter/mitarbeiterverwendungdialog.xul.php?mitarbeiter_uid="+mitarbeiter_uid,"popup","chrome, status=no, width=500, height=500, centerscreen, resizable");
 }
 
 function MitarbeiterVerwendungSpeichern(dialog, bisverwendung_id, mitarbeiter_uid, neu)
