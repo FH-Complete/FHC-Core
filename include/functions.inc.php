@@ -1097,4 +1097,18 @@ function PersonLog($person_id, $logtype_kurzbz, $logdata, $taetigkeit_kurzbz, $a
 	$personlog = new personlog();
 	$personlog->log($person_id, $logtype_kurzbz, $logdata, $taetigkeit_kurzbz, $app, $oe_kurzbz, $user);
 }
+
+/** Sets leading zeros to an integer number. 2 digits by default.
+ * 
+ * @param integer $number
+ * @param integer $length
+ * @return integer	
+ */
+function setLeadingZero($number, $length = 2)
+{
+	if (is_int($number))
+	{
+		return str_pad($number, $length, "0", STR_PAD_LEFT);
+	}
+}
 ?>
