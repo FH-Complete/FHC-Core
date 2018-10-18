@@ -1112,20 +1112,4 @@ function setLeadingZero($number, $length = 2)
 	}
 }
 
-/** Converts special chars (Ä,Ö,Ü, €,...) to Windows Charset to be displayed correctly in Excel, Words and others.
- * 
- * @param string $string
- * @return string Windows encoded string.
- */ 
-function convertToWindowsCharset($string) 
-{
-  $charset =  mb_detect_encoding(
-    $string,
-    "UTF-8, ISO-8859-1, ISO-8859-15",
-    true
-  );
- 
-  $string =  mb_convert_encoding($string, "Windows-1252", $charset);
-  return $string;
-}
 ?>
