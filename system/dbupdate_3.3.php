@@ -2455,17 +2455,18 @@ if(!$result = @$db->db_query("SELECT lieferant FROM public.tbl_firma LIMIT 1"))
 			echo '<br>public.tbl_firma: Spalte lieferant hinzugefuegt';
 }
 
-// INSERT, UPDATE und DELETE Berechtigungen fuer web User erteilen fuer tbl_rt_person
+// INSERT, UPDATE und DELETE Berechtigungen fuer web User erteilen fuer tbl_rt_person und SEQUENCE public.tbl_rt_person_rt_person_id_seq 
 if($result = @$db->db_query("SELECT * FROM information_schema.role_table_grants WHERE table_name='tbl_rt_person' AND table_schema='public' AND grantee='web' AND privilege_type='INSERT'"))
 {
 	if($db->db_num_rows($result)==0)
 	{
-		$qry = "GRANT SELECT, INSERT, UPDATE, DELETE ON public.tbl_rt_person TO web;";
+		$qry = "GRANT SELECT, INSERT, UPDATE, DELETE ON public.tbl_rt_person TO web;
+				GRANT SELECT, UPDATE ON SEQUENCE public.tbl_rt_person_rt_person_id_seq TO web;";
 		
 		if(!$db->db_query($qry))
 			echo '<strong>public.tbl_rt_person Berechtigungen: '.$db->db_last_error().'</strong><br>';
-			else
-				echo '<br>INSERT, UPDATE und DELETE Rechte fuer public.tbl_rt_person fuer web user gesetzt ';
+		else
+			echo '<br>INSERT, UPDATE und DELETE Rechte fuer Tabelle public.tbl_rt_person und SELECT, UPDATE Rechte für Sequenz public.tbl_rt_person_rt_person_id_seq fuer web user gesetzt ';
 	}
 }
 
