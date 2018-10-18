@@ -387,8 +387,8 @@ class bisverwendung extends basis_db
 					bis.tbl_bisverwendung
 				WHERE
 					mitarbeiter_uid=".$this->db_add_param($uid)."
-					AND (beginn<=".$this->db_add_param($datum)." OR beginn is null)
-					AND (ende>=".$this->db_add_param($datum_obj->formatDatum($datum,'Y-m-01'))." OR ende is null)
+					AND (beginn<=".$this->db_add_param($datum_obj->formatDatum($datum,'Y-m-d'))." OR beginn is null)
+					AND (ende>=".$this->db_add_param($datum_obj->formatDatum($datum,'Y-m-d'))." OR ende is null)
 				ORDER BY ende desc;";
 
 		if($this->db_query($qry))
