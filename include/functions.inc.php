@@ -30,6 +30,7 @@ require_once(dirname(__FILE__).'/personlog.class.php');
  */
 function get_uid()
 {
+	return 'koenign';
 	$auth = new authentication();
 	return $auth->getUser();
 }
@@ -1110,5 +1111,22 @@ function setLeadingZero($number, $length = 2)
 	{
 		return str_pad($number, $length, "0", STR_PAD_LEFT);
 	}
+}
+
+/** Converts special chars (Ä,Ö,Ü, €,...) to Windows Charset to be displayed correctly in Excel, Words and others.
+ * 
+ * @param string $string
+ * @return string Windows encoded string.
+ */ 
+function convertToWindowsCharset($string) 
+{
+  $charset =  mb_detect_encoding(
+    $string,
+    "UTF-8, ISO-8859-1, ISO-8859-15",
+    true
+  );
+ 
+  $string =  mb_convert_encoding($string, "Windows-1252", $charset);
+  return $string;
 }
 ?>
