@@ -3,8 +3,14 @@
  * NOTE: avoid using this if possible
  */
 $(document).ready(function() {
+	Bootstrapper.bootstraphtml();
+});
+
+var Bootstrapper = {
+	bootstraphtml: function ()
+	{
 		$("input[type=text], select").addClass("form-control");
 		$("button, input[type=button]").addClass("btn btn-default");
 		$("table").addClass("table-condensed");
 	}
-);
+};

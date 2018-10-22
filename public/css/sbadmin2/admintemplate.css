@@ -7,7 +7,31 @@
     border-bottom: 1px solid #eee;
 }
 
-/*change of panel colors (grey) */
+.headerrightform
+{
+    margin: 28px 0 20px -30px;
+    padding: 6.4px 0 9px;
+    border-bottom: 1px solid #eee;
+}
+
+.headerrightform .form-group{
+    margin-bottom: 0;
+    margin-left: 5px;
+}
+
+.headerrightform .form-control{
+    height: 32px;
+    font-size: 13px;
+}
+
+/*heading with colored background*/
+.headercolorbg {
+    background-color: #dfdfdf;
+    padding: 3px 0;
+    border-radius: 5px;
+}
+
+/*change of panel colors (to grey) */
 .panel-primary > .panel-heading, .panel-primary > .panel-collapse > .panel-footer, .panel-primary > .panel-footer{
     color: black;
     background-color: #dfdfdf;

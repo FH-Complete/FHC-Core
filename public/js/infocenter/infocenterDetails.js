@@ -16,21 +16,13 @@ $(document).ready(function ()
 		InfocenterDetails._formatNotizTable();
 		InfocenterDetails._formatLogTable();
 
-		//initialise datepicker
-		$.datepicker.setDefaults($.datepicker.regional['de']);
-		$(".dateinput").datepicker({
-			"dateFormat": "dd.mm.yy"
-		});
-
 		var personid = $("#hiddenpersonid").val();
 
 		//add submit event to message send link
-		$("#sendmsglink").click(
-			function ()
-			{
-				$("#sendmsgform").submit();
-			}
-		);
+		$("#sendmsglink").click(function ()
+		{
+			$("#sendmsgform").submit();
+		});
 
 		//add click events to "formal geprüft" checkboxes
 		$(".prchbox").click(function ()
@@ -41,60 +33,8 @@ $(document).ready(function ()
 			InfocenterDetails.saveFormalGeprueft(personid, akteid, checked)
 		});
 
-		//zgv übernehmen
-		$(".zgvUebernehmen").click(function ()
-		{
-			var btn = $(this);
-			var prestudentid = this.id.substr(this.id.indexOf("_") + 1);
-			$('#zgvUebernehmenNotice').remove();
-			InfocenterDetails.zgvUebernehmen(personid, prestudentid, btn)
-		});
-
-		//zgv speichern
-		$(".zgvform").on('submit', function (e)
-			{
-				e.preventDefault();
-				var formdata = $(this).serializeArray();
-
-				var data = {};
-
-				for (var i = 0; i < formdata.length; i++)
-				{
-					data[formdata[i].name] = formdata[i].value;
-				}
-
-				InfocenterDetails.saveZgv(data);
-			}
-		);
-
-		//show popup with zgvinfo
-		$(".zgvinfo").click(function ()
-			{
-				var prestudentid = this.id.substr(this.id.indexOf("_") + 1);
-				InfocenterDetails.openZgvInfoForPrestudent(prestudentid);
-			}
-		);
-
-		//prevent opening modal when Statusgrund not chosen
-		$(".absageModal").on('show.bs.modal', function (e)
-			{
-				var id = this.id.substr(this.id.indexOf("_") + 1);
-				var statusgrvalue = $("#statusgrselect_" + id + " select[name=statusgrund]").val();
-				if (statusgrvalue === "null")
-				{
-					$("#statusgrselect_" + id).addClass("has-error");
-					return e.preventDefault();
-				}
-			}
-		);
-
-		//remove red mark when statusgrund is selected again
-		$("select[name=statusgrund]").change(
-			function ()
-			{
-				$(this).parent().removeClass("has-error");
-			}
-		);
+		//add click events to zgv Prüfung section
+		InfocenterDetails._addZgvPruefungEvents(personid);
 
 		//save notiz
 		$("#notizform").on("submit", function (e)
@@ -199,6 +139,26 @@ var InfocenterDetails = {
 					}
 				},
 				errorCallback: InfocenterDetails.genericSaveError,
+				veilTimeout: 0
+			}
+		);
+	},
+	saveBewPriorisierung: function(data)
+	{
+		FHC_AjaxClient.ajaxCallPost(
+			CALLED_PATH + '/saveBewPriorisierung',
+			data,
+			{
+				successCallback: function(data, textStatus, jqXHR) {
+					if (data === true)
+					{
+						InfocenterDetails._refreshZgv();
+					}
+					else
+					{
+						alert("error when saving zgv Prio");
+					}
+				},
 				veilTimeout: 0
 			}
 		);
@@ -399,6 +359,117 @@ var InfocenterDetails = {
 
 	// -----------------------------------------------------------------------------------------------------------------
 	// (private) methods executed after ajax (refreshers)
+
+	//adds JQuery events to ZGVprüfung section
+	_addZgvPruefungEvents: function(personid)
+	{
+		//add bootstrap to forms
+		Bootstrapper.bootstraphtml();
+
+		//initialise datepicker
+		$.datepicker.setDefaults($.datepicker.regional['de']);
+		$(".dateinput").datepicker({
+			"dateFormat": "dd.mm.yy"
+		});
+
+		//up/down prioritize Bewerbungen
+		$(".prioup").click(function ()
+		{
+			var prestudentid = this.id.substr(this.id.indexOf("_") + 1);
+			InfocenterDetails._savePrio(prestudentid, -1);
+		});
+		$(".priodown").click(function ()
+		{
+			var prestudentid = this.id.substr(this.id.indexOf("_") + 1);
+			InfocenterDetails._savePrio(prestudentid, 1);
+		});
+
+		//zgv übernehmen
+		$(".zgvUebernehmen").click(function ()
+		{
+			var btn = $(this);
+			var prestudentid = this.id.substr(this.id.indexOf("_") + 1);
+			$('#zgvUebernehmenNotice').remove();
+			InfocenterDetails.zgvUebernehmen(personid, prestudentid, btn);
+		});
+
+		//zgv speichern
+		$(".zgvform").on('submit', function (e)
+			{
+				e.preventDefault();
+				var formdata = $(this).serializeArray();
+
+				var data = {};
+
+				for (var i = 0; i < formdata.length; i++)
+				{
+					data[formdata[i].name] = formdata[i].value;
+				}
+
+				InfocenterDetails.saveZgv(data);
+			}
+		);
+
+		//show popup with zgvinfo
+		$(".zgvinfo").click(function ()
+			{
+				var prestudentid = this.id.substr(this.id.indexOf("_") + 1);
+				InfocenterDetails.openZgvInfoForPrestudent(prestudentid);
+			}
+		);
+
+		//prevent opening modal when Statusgrund not chosen
+		$(".absageModal").on('show.bs.modal', function (e)
+			{
+				var id = this.id.substr(this.id.indexOf("_") + 1);
+				var statusgrvalue = $("#statusgrselect_" + id + " select[name=statusgrund]").val();
+				if (statusgrvalue === "null")
+				{
+					$("#statusgrselect_" + id).addClass("has-error");
+					return e.preventDefault();
+				}
+			}
+		);
+
+		//remove red mark when statusgrund is selected again
+		$("select[name=statusgrund]").change(
+			function ()
+			{
+				$(this).parent().removeClass("has-error");
+			}
+		);
+
+	},
+	_refreshZgv: function()
+	{
+		var personid = $("#hiddenpersonid").val();
+
+		var collapsed = {};
+
+		//save if panel is collapsed to preserve collapse state
+		$("#zgvpruefungen").find(".panel-collapse").each(
+			function()
+			{
+				var collapseid = $(this).prop("id");
+				collapsed[collapseid] = !$(this).hasClass('collapse in');
+			}
+		);
+
+		$("#zgvpruefungen").load(
+			CONTROLLER_URL + '/reloadZgvPruefungen/' + personid + '?fhc_controller_id=' + FHC_AjaxClient.getUrlParameter('fhc_controller_id'),
+			function()
+			{
+				InfocenterDetails._addZgvPruefungEvents(personid);
+				for (var i in collapsed)
+				{
+					if (collapsed[i])
+						$("#"+i).removeClass("in");
+					else
+						$("#"+i).addClass("in");
+				}
+			}
+		);
+	},
 	_refreshLog: function()
 	{
 		var personid = $("#hiddenpersonid").val();
@@ -491,5 +562,13 @@ var InfocenterDetails = {
 	_errorSaveNotiz: function()
 	{
 		$("#notizmsg").text(FHC_PhrasesLib.t('ui', 'fehlerBeimSpeichern'));
+	},
+	_savePrio: function(prestudentid, change)
+	{
+		var data = {
+			"prestudentid": prestudentid,
+			"change": change
+		};
+		InfocenterDetails.saveBewPriorisierung(data);
 	}
 };

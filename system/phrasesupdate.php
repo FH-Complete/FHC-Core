@@ -970,8 +970,28 @@ $phrases = array(
 			)
 		)
 	),
-	
-	
+
+	array(
+		'app' => 'core',
+		'category' => 'global',
+		'phrase' => 'nichtvorhanden',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'n.v.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'n/a',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+
 	//*******************************		CORE/ui
 	array(
 		'app' => 'core',
@@ -2750,6 +2770,26 @@ $phrases = array(
 			array(
 				'sprache' => 'English',
 				'text' => 'parked',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'infocenter',
+		'category' => 'infocenter',
+		'phrase' => 'priorisierung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'prio',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'prio',
 				'description' => '',
 				'insertvon' => 'system'
 			)

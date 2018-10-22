@@ -1,17 +1,30 @@
 <div class="panel-group">
 	<?php
+	$unique_studsemester = array();
+	$first = true;
 	foreach ($zgvpruefungen as $zgvpruefung):
 		$infoonly = $zgvpruefung->infoonly;
+		$studiensemester = isset($zgvpruefung->prestudentstatus->studiensemester_kurzbz) ? $zgvpruefung->prestudentstatus->studiensemester_kurzbz : '';
 		//set bootstrap columns for zgv form
 		$columns = array(4, 3, 2, 3);
 		$headercolumns = array(7, 5);
 		if (!$infoonly && isset($zgvpruefung->prestudentstatus->bewerbungsnachfrist) && isset($zgvpruefung->prestudentstatus->bewerbungstermin))
 		{
-			$headercolumns[0] = 5;
-			$headercolumns[1] = 7;
+			$headercolumns[0] = 4;
+			$headercolumns[1] = 8;
 		}
+
+		if (!$first)
+			echo '<br />';
+
+		if (!in_array($studiensemester, $unique_studsemester)):
+			$unique_studsemester[] = $studiensemester;
+
+			if (!$first)
+				echo '<br/>';
 		?>
-		<br/>
+		<h4 class="headercolorbg text-center"><?php echo $studiensemester; ?></h4>
+		<?php endif; ?>
 		<div class="panel panel-default">
 			<div class="panel-heading">
 				<div class="row">
@@ -22,22 +35,33 @@
 								?></a>
 						</h4>
 					</div>
-					<?php if (isset($zgvpruefung->prestudentstatus->status_kurzbz) && $zgvpruefung->prestudentstatus->status_kurzbz === 'Interessent'/* && !$infoonly*/): ?>
+					<div class="col-xs-<?php echo $headercolumns[1]; ?> text-right">
+					<?php if (isset($zgvpruefung->prestudentstatus->status_kurzbz) && $zgvpruefung->prestudentstatus->status_kurzbz === 'Interessent'): ?>
 						<?php if ($infoonly): ?>
 							<?php if (isset($zgvpruefung->prestudentstatus->bestaetigtam)): ?>
-							<div class="col-xs-<?php echo $headercolumns[1]; ?> text-right">
 								<i class="fa fa-check" style="color: green"></i>
 								<?php echo  $this->p->t('global', 'anStudiengangFreigegeben') ?>
-							</div>
 							<?php endif; ?>
 						<?php else: ?>
-						<div class="col-xs-<?php echo $headercolumns[1]; ?> text-right">
-							<?php echo ucfirst($this->p->t('infocenter','bewerbung')) . ' ' . $this->p->t('global','abgeschickt') . ': '.(isset($zgvpruefung->prestudentstatus->bewerbung_abgeschicktamum) ? '<i class="fa fa-check" style="color:green"></i>' : '<i class="fa fa-times" style="color:red"></i>'); ?>
+							<?php echo ucfirst($this->p->t('infocenter', 'bewerbung')) . ' ' . $this->p->t('global', 'abgeschickt') . ': '.(isset($zgvpruefung->prestudentstatus->bewerbung_abgeschicktamum) ? '<i class="fa fa-check" style="color:green"></i>' : '<i class="fa fa-times" style="color:red"></i>'); ?>
 							<?php echo (isset($zgvpruefung->prestudentstatus->bewerbungsnachfrist) ? ' | ' . $this->p->t('infocenter', 'nachfrist') . ': ' . date_format(date_create($zgvpruefung->prestudentstatus->bewerbungsnachfrist), 'd.m.Y') : ''); ?>
 							<?php echo (isset($zgvpruefung->prestudentstatus->bewerbungstermin) ? ' | ' . $this->p->t('infocenter', 'bewerbungsfrist') . ': ' . date_format(date_create($zgvpruefung->prestudentstatus->bewerbungstermin), 'd.m.Y') : ''); ?>
-						</div>
 						<?php endif; ?>
+						<?php
+							$changeup = isset($zgvpruefung->changeup) && $zgvpruefung->changeup === true;
+							$changedown = isset($zgvpruefung->changedown) && $zgvpruefung->changedown === true;
+							if ($numberinteressenten[$studiensemester] > 1):
+								echo ' | ' . ucfirst($this->p->t('infocenter', 'priorisierung')) . ': ';
+								echo isset($zgvpruefung->priorisierung) ? $zgvpruefung->priorisierung : $this->p->t('global', 'nichtvorhanden');
+								if ($changeup): ?>
+									<span class="fa fa-caret-up prioup" id="prioup_<?php echo $zgvpruefung->prestudent_id ?>" style="font-size: 19px; cursor: pointer;"></span>
+								<?php endif; ?>
+								<?php if ($changedown): ?>
+									<span class="fa fa-caret-down priodown" id="priodown_<?php echo $zgvpruefung->prestudent_id ?>" style="font-size: 19px; cursor: pointer;"></span>
+								<?php endif; ?>
+							<?php endif; ?>
 					<?php endif; ?>
+					</div>
 				</div>
 			</div>
 			<div id="collapse<?php echo $zgvpruefung->prestudent_id ?>"
@@ -49,7 +73,7 @@
 						<div class="row">
 							<div class="col-lg-<?php echo $columns[0] ?>">
 								<div class="form-group">
-									<label><?php echo  ucfirst($this->p->t('global','letzterStatus')) . ':' ?></label>
+									<label><?php echo  ucfirst($this->p->t('global', 'letzterStatus')) . ':' ?></label>
 									<?php
 									if (isset($zgvpruefung->prestudentstatus->status_kurzbz))
 									{
@@ -60,8 +84,8 @@
 							</div>
 							<div class="col-lg-<?php echo $columns[1] ?>">
 								<div class="form-group">
-									<label><?php echo  ucfirst($this->p->t('lehre','studiensemester')) . ':' ?></label>
-									<?php echo isset($zgvpruefung->prestudentstatus->studiensemester_kurzbz) ? $zgvpruefung->prestudentstatus->studiensemester_kurzbz : '' ?>
+									<label><?php echo  ucfirst($this->p->t('lehre', 'studiensemester')) . ':' ?></label>
+									<?php echo $studiensemester ?>
 								</div>
 							</div>
 							<div class="col-lg-<?php echo $columns[2] ?>">
@@ -73,7 +97,7 @@
 							</div>
 							<div class="col-lg-<?php echo $columns[3] ?>">
 								<div class="form-group">
-									<label><?php echo  ucfirst($this->p->t('lehre','organisationsform')) . ':' ?></label>
+									<label><?php echo  ucfirst($this->p->t('lehre', 'organisationsform')) . ':' ?></label>
 									<span style="display: inline-block">
 									<?php
 									$separator = (isset($zgvpruefung->prestudentstatus->orgform)) ? ', ' : '';
@@ -114,7 +138,7 @@
 							</div>
 							<div class="col-lg-<?php echo $columns[1] ?>">
 								<div class="form-group">
-									<label><?php echo  $this->p->t('infocenter', 'zgv') . ' ' . $this->p->t('person','ort') . ':'?></label>
+									<label><?php echo  $this->p->t('infocenter', 'zgv') . ' ' . $this->p->t('person', 'ort') . ':'?></label>
 									<?php if ($infoonly):
 										echo html_escape($zgvpruefung->zgvort);
 									else:
@@ -127,7 +151,7 @@
 							</div>
 							<div class="col-lg-<?php echo $columns[2] ?>">
 								<div class="form-group">
-									<label><?php echo  $this->p->t('infocenter', 'zgv') . ' ' . $this->p->t('global','datum') . ':'?></label>
+									<label><?php echo  $this->p->t('infocenter', 'zgv') . ' ' . $this->p->t('global', 'datum') . ':'?></label>
 									<?php
 									$zgvdatum = isEmptyString($zgvpruefung->zgvdatum) ? "" : date_format(date_create($zgvpruefung->zgvdatum), 'd.m.Y');
 									if ($infoonly):
@@ -143,7 +167,7 @@
 							</div>
 							<div class="col-lg-<?php echo $columns[3] ?>">
 								<div class="form-group">
-									<label><?php echo  $this->p->t('infocenter', 'zgv') . ' ' . $this->p->t('person','nation') . ':'?></label>
+									<label><?php echo  $this->p->t('infocenter', 'zgv') . ' ' . $this->p->t('person', 'nation') . ':'?></label>
 									<?php if ($infoonly)
 										echo $zgvpruefung->zgvnation_bez;
 									else
@@ -173,7 +197,7 @@
 								</div>
 								<div class="col-lg-<?php echo $columns[1] ?>">
 									<div class="form-group">
-										<label><?php echo  $this->p->t('infocenter', 'zgv') . ' ' . $this->p->t('lehre','master') . ' ' . $this->p->t('person','ort') . ':'?></label>
+										<label><?php echo  $this->p->t('infocenter', 'zgv') . ' ' . $this->p->t('lehre', 'master') . ' ' . $this->p->t('person', 'ort') . ':'?></label>
 										<?php if ($infoonly):
 											echo $zgvpruefung->zgvmaort;
 										else:
@@ -186,7 +210,7 @@
 								</div>
 								<div class="col-lg-<?php echo $columns[2] ?>">
 									<div class="form-group">
-										<label><?php echo  $this->p->t('infocenter', 'zgv') . ' ' . $this->p->t('lehre','master') . ' ' . $this->p->t('global','datum') . ':'?></label>
+										<label><?php echo  $this->p->t('infocenter', 'zgv') . ' ' . $this->p->t('lehre', 'master') . ' ' . $this->p->t('global', 'datum') . ':'?></label>
 										<?php
 										$zgvmadatum = isEmptyString($zgvpruefung->zgvmadatum) ? "" : date_format(date_create($zgvpruefung->zgvmadatum), 'd.m.Y');
 										if ($infoonly):
@@ -201,7 +225,7 @@
 									</div>
 								</div>
 								<div class="col-lg-<?php echo $columns[3] ?>">
-									<div class="form-group"><label><?php echo $this->p->t('infocenter', 'zgv') . ' ' . $this->p->t('lehre','master') . ' ' . $this->p->t('person', 'nation') . ':'?></label>
+									<div class="form-group"><label><?php echo $this->p->t('infocenter', 'zgv') . ' ' . $this->p->t('lehre', 'master') . ' ' . $this->p->t('person', 'nation') . ':'?></label>
 										<?php
 										if ($infoonly)
 											echo $zgvpruefung->zgvmanation_bez;
@@ -374,5 +398,8 @@
 				?>
 			</div><!-- /.div collapse -->
 		</div><!-- /.panel -->
-	<?php endforeach; // end foreach zgvpruefungen?>
+	<?php
+		$first = false;
+		endforeach; // end foreach zgvpruefungen
+	?>
 </div><!-- /.panel-group -->

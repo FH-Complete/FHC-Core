@@ -74,6 +74,7 @@ class InfoCenter extends Auth_Controller
 				'saveFormalGeprueft' => 'infocenter:rw',
 				'getLastPrestudentWithZgvJson' => 'infocenter:r',
 				'getZgvInfoForPrestudent' => 'infocenter:r',
+				'saveBewPriorisierung' => 'infocenter:rw',
 				'saveZgvPruefung' => 'infocenter:rw',
 				'saveAbsage' => 'infocenter:rw',
 				'saveFreigabe' => 'infocenter:rw',
@@ -81,6 +82,7 @@ class InfoCenter extends Auth_Controller
 				'updateNotiz' => 'infocenter:rw',
 				'reloadNotizen' => 'infocenter:r',
 				'reloadLogs' => 'infocenter:r',
+				'reloadZgvPruefungen' => 'infocenter:r',
 				'outputAkteContent' => 'infocenter:r',
 				'getParkedDate' => 'infocenter:r',
 				'park' => 'infocenter:rw',
@@ -278,6 +280,22 @@ class InfoCenter extends Auth_Controller
 		}
 
 		$this->load->view('system/infocenter/studiengangZgvInfo.php', $data);
+	}
+
+	/**
+	 * Saves application priority for a prestudent
+	 */
+	public function saveBewPriorisierung()
+	{
+		$prestudent_id = $this->input->post('prestudentid');
+		$change = $this->input->post('change');
+
+		if (!is_numeric($change) || !is_numeric($prestudent_id))
+			$result = error('Parameteres missing');
+		else
+			$result = $this->PrestudentModel->changePrio($prestudent_id, intval($change));
+
+		$this->output->set_content_type('application/json')->set_output(json_encode($result));
 	}
 
 	/**
@@ -541,6 +559,19 @@ class InfoCenter extends Auth_Controller
 	{
 		$logs = $this->personloglib->getLogs($person_id);
 		$this->load->view('system/infocenter/logs.php', array('logs' => $logs));
+	}
+
+	/**
+	 * Loads Zgv Prüfung view for a person, helper for reloading after ajax request
+	 * @param $person_id
+	 */
+	public function reloadZgvPruefungen($person_id)
+	{
+		$prestudentdata = $this->_loadPrestudentData($person_id);
+
+		$prestudentdata[self::FHC_CONTROLLER_ID] = $this->getControllerId();
+
+		$this->load->view('system/infocenter/zgvpruefungen.php', $prestudentdata);
 	}
 
 	/**
@@ -1058,6 +1089,8 @@ class InfoCenter extends Auth_Controller
 			show_error($prestudenten->retval);
 		}
 
+		$interessentenCount = array();
+
 		foreach ($prestudenten->retval as $prestudent)
 		{
 			$prestudent = $this->PrestudentModel->getPrestudentWithZgv($prestudent->prestudent_id);
@@ -1079,41 +1112,119 @@ class InfoCenter extends Auth_Controller
 			//if prestudent is not interessent or is already bestaetigt, then show only as information, non-editable
 			$zgvpruefung->infoonly = !isset($zgvpruefung->prestudentstatus) || isset($zgvpruefung->prestudentstatus->bestaetigtam) || $zgvpruefung->prestudentstatus->status_kurzbz != 'Interessent';
 
+			//numeric application priority and arrows for changing
+			$zgvpruefung->changeup = false;
+			$zgvpruefung->changedown = false;
+
+			if (isset($zgvpruefung->prestudentstatus->status_kurzbz) && $zgvpruefung->prestudentstatus->status_kurzbz == 'Interessent')
+			{
+				if (isset($zgvpruefung->prestudentstatus->studiensemester_kurzbz))
+				{
+					$studiensemester = $zgvpruefung->prestudentstatus->studiensemester_kurzbz;
+					$zgvpruefung->changeup = $this->PrestudentModel->checkPrioChange($zgvpruefung->prestudent_id, $studiensemester, -1);
+					$zgvpruefung->changedown = $this->PrestudentModel->checkPrioChange($zgvpruefung->prestudent_id, $studiensemester, 1);
+					if (array_key_exists($studiensemester, $interessentenCount))
+						$interessentenCount[$studiensemester]++;
+					else
+						$interessentenCount[$studiensemester] = 1;
+				}
+			}
+
 			$zgvpruefungen[] = $zgvpruefung;
 		}
 
-		// Interessenten come first, otherwise by bewerbungsdatum desc, then by prestudent_id desc
-		usort($zgvpruefungen, function ($a, $b) {
-			$bewdatesort = isset($a->prestudentstatus) && isset($b->prestudentstatus) ? strcmp($b->prestudentstatus->bewerbung_abgeschicktamum, $a->prestudentstatus->bewerbung_abgeschicktamum) : 0;
-			$defaultsort = $bewdatesort === 0 ? (int)$b->prestudent_id - (int)$a->prestudent_id : $bewdatesort;
-			if (!isset($a->prestudentstatus->status_kurzbz) || !isset($b->prestudentstatus->status_kurzbz))
-				return $defaultsort;
-			elseif ($a->prestudentstatus->status_kurzbz === 'Interessent' && $b->prestudentstatus->status_kurzbz === 'Interessent')
-			{
-				//infoonly Interessenten come after new Interessenten
-				if ($a->infoonly === $b->infoonly)
-					return $defaultsort;
-				elseif ($a->infoonly)
-					return 1;
-				elseif ($b->infoonly)
-					return -1;
-			}
-			elseif ($a->prestudentstatus->status_kurzbz === 'Interessent')
-				return -1;
-			elseif ($b->prestudentstatus->status_kurzbz === 'Interessent')
-				return 1;
-			else
-				return $defaultsort;
-		});
+		$this->load->model('organisation/studiensemester_model', 'StudiensemesterModel');
+
+		$this->_sortPrestudents($zgvpruefungen);
 
 		$statusgruende = $this->StatusgrundModel->loadWhere(array('status_kurzbz' => 'Abgewiesener'))->retval;
 
 		$data = array (
 			'zgvpruefungen' => $zgvpruefungen,
+			'numberinteressenten' => $interessentenCount,
 			'statusgruende' => $statusgruende
 		);
 
 		return $data;
+	}
+
+	/**
+	 * Helper function for sorting prestudents
+	 * @param $zgvpruefungen
+	 */
+	private function _sortPrestudents(&$zgvpruefungen)
+	{
+		usort($zgvpruefungen, function ($a, $b) {
+			//sort:
+			// 1: Studiensemester
+			if (isset($a->prestudentstatus->studiensemester_kurzbz) || isset($b->prestudentstatus->studiensemester_kurzbz))
+			{
+				if (!isset($a->prestudentstatus->studiensemester_kurzbz))
+					return 1;
+				elseif(!isset($b->prestudentstatus->studiensemester_kurzbz))
+					return -1;
+
+				$starta = $this->StudiensemesterModel->load($a->prestudentstatus->studiensemester_kurzbz);
+				if (!hasData($starta))
+				{
+					show_error($starta->retval);
+				}
+
+				$startb = $this->StudiensemesterModel->load($b->prestudentstatus->studiensemester_kurzbz);
+				if (!hasData($startb))
+				{
+					show_error($startb->retval);
+				}
+
+				$starta = date_format(date_create($starta->retval[0]->start), 'Y-m-d');
+				$startb = date_format(date_create($startb->retval[0]->start), 'Y-m-d');
+
+				if ($starta > $startb)
+					return -1;
+				elseif ($starta < $startb)
+					return 1;
+			}
+			// 2: Status
+			if ($a->prestudentstatus->status_kurzbz !== $b->prestudentstatus->status_kurzbz)
+			{
+				if ($a->prestudentstatus->status_kurzbz === 'Interessent')
+					return -1;
+				elseif ($b->prestudentstatus->status_kurzbz === 'Interessent')
+					return 1;
+			}
+
+			// 3: Priorisierung, Nulls last
+			if (isset($a->priorisierung) || isset($b->priorisierung))
+			{
+				if (!isset($a->priorisierung))
+					return 1;
+				elseif (!isset($b->priorisierung))
+					return -1;
+				elseif ($a->priorisierung > $b->priorisierung)
+					return 1;
+				elseif ($a->priorisierung < $b->priorisierung)
+					return -1;
+			}
+
+			// 4: Bewerbungsdatum
+			$starta = isset($a->prestudentstatus->bewerbung_abgeschicktamum) ? $a->prestudentstatus->bewerbung_abgeschicktamum : null;
+			$startb = isset($b->prestudentstatus->bewerbung_abgeschicktamum) ? $b->prestudentstatus->bewerbung_abgeschicktamum : null;
+
+			if (isset($starta) || isset($startb))
+			{
+				if (!isset($starta))
+					return 1;
+				elseif(!isset($startb))
+					return -1;
+				elseif ($starta > $startb)
+					return -1;
+				elseif ($starta < $startb)
+					return 1;
+			}
+
+			// 5: prestudentid
+			return (int)$b->prestudent_id - (int)$a->prestudent_id;
+		});
 	}
 
 	/**

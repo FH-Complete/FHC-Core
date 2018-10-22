@@ -37,10 +37,11 @@ class Prestudentstatus_model extends DB_Model
 			array_push($parametersArray, $studiensemester_kurzbz);
 			$query .= ' AND studiensemester_kurzbz = ?';
 		}
+
 		if ($status_kurzbz != '')
 		{
 			array_push($parametersArray, $status_kurzbz);
-			$query .= ' AND status_kurzbz = ?';
+			$query .= ' AND tbl_prestudentstatus.status_kurzbz = ?';
 		}
 
 		$query .= ' ORDER BY datum DESC, insertamum DESC, ext_id DESC LIMIT 1';
