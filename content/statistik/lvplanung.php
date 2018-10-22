@@ -25,6 +25,7 @@ require_once('../../include/lehrveranstaltung.class.php');
 require_once('../../include/studiengang.class.php');
 require_once('../../include/person.class.php');
 require_once('../../include/benutzer.class.php');
+require_once('../../include/benutzerberechtigung.class.php');
 
 if(isset($_GET['studiengang_kz']))
 	$studiengang_kz = $_GET['studiengang_kz'];
@@ -43,11 +44,17 @@ else
 
 if(isset($_GET['oe_kurzbz']))
 	$oe_kurzbz = $_GET['oe_kurzbz'];
-else 
+else
 	$oe_kurzbz = '';
 
 $user = get_uid();
 loadVariables($user);
+
+$rechte = new benutzerberechtigung();
+$rechte->getBerechtigungen($user);
+
+if(!$rechte->isBerechtigt('assistenz', null, 's'))
+	die($rechte->errormsg);
 
 $db = new basis_db();
 
@@ -62,6 +69,10 @@ if($studiengang_kz!='')
 {
 	$studiengang = new studiengang();
 	$studiengang->load($studiengang_kz);
+
+	if(!$rechte->isBerechtigt('assistenz', $studiengang->oe_kurzbz, 's'))
+		die($rechte->errormsg);
+
 }
 
 if($mitarbeiter_uid!='')
@@ -159,9 +170,9 @@ $qry = "SELECT
 				tbl_person.person_id=tbl_benutzer.person_id AND
 				lehrfach.oe_kurzbz=".$db->db_add_param($oe_kurzbz)." AND
 				tbl_lehreinheit.studiensemester_kurzbz=".$db->db_add_param($semester_aktuell);
-	$qry.=" ORDER BY tbl_lehrveranstaltung.studiengang_kz, tbl_lehrveranstaltung.semester, tbl_lehrveranstaltung.bezeichnung, tbl_lehrveranstaltung.lehrveranstaltung_id, tbl_lehreinheit.lehreinheit_id";	
+	$qry.=" ORDER BY tbl_lehrveranstaltung.studiengang_kz, tbl_lehrveranstaltung.semester, tbl_lehrveranstaltung.bezeichnung, tbl_lehrveranstaltung.lehrveranstaltung_id, tbl_lehreinheit.lehreinheit_id";
 }
-else 
+else
 	die('Fehlerhafte Parameteruebergabe');
 
 echo '<table class="liste">';
@@ -309,7 +320,7 @@ elseif($oe_kurzbz!='')
 				(tbl_projektbetreuer.faktor*tbl_projektbetreuer.stundensatz*tbl_projektbetreuer.stunden)>0
 				";
 }
-else 
+else
 	die('Something unexpected happend');
 
 if($result = $db->db_query($qry))
@@ -329,7 +340,7 @@ if($result = $db->db_query($qry))
 		echo "<th>Kosten</th>";
 		echo '<th>&nbsp;</th>';
 		echo '</tr>';
-		
+
 		$gesamtkosten_betreuung=0;
 		$stunden_betreuung=0;
 		while($row = $db->db_fetch_object($result))

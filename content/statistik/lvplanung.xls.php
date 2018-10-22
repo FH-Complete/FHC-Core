@@ -27,6 +27,8 @@ require_once('../../include/Excel/excel.php');
 require_once('../../include/person.class.php');
 require_once('../../include/benutzer.class.php');
 require_once('../../include/mitarbeiter.class.php');
+require_once('../../include/organisationseinheit.class.php');
+require_once('../../include/benutzerberechtigung.class.php');
 
 $user = get_uid();
 
@@ -36,118 +38,113 @@ if(isset($_GET['studiensemester_kurzbz']))
 	$studiensemester_kurzbz = $_GET['studiensemester_kurzbz'];
 else if(isset($_POST['studiensemester_kurzbz']))
 	$studiensemester_kurzbz = $_POST['studiensemester_kurzbz'];
-else 
+else
 	die('studiensemester_kurzbz muss uebergeben werden');
-	
+
 if(isset($_GET['studiengang_kz']))
 	$studiengang_kz = $_GET['studiengang_kz'];
-else 
+else
 	$studiengang_kz='';
-	
+
 if(isset($_GET['semester']))
 	$semester = $_GET['semester'];
-else 
+else
 	$semester='';
 
 if(isset($_GET['oe_kurzbz']))
 	$oe_kurzbz = $_GET['oe_kurzbz'];
-else 
+else
 	$oe_kurzbz = '';
-	
+
 if(isset($_GET['uid']))
 	$uid = $_GET['uid'];
-else 
+else
 	$uid = '';
-	
+
 $db = new basis_db();
+
+$rechte = new benutzerberechtigung();
+$rechte->getBerechtigungen($user);
+
+if($studiengang_kz != '')
+{
+	if(!$rechte->isBerechtigt('assistenz', $studiengang_kz, 's'))
+		die($rechte->errormsg);
+}
+elseif($oe_kurzbz!='')
+{
+	if(!$rechte->isBerechtigt('assistenz', $oe_kurzbz, 's'))
+		die($rechte->errormsg);
+}
+else
+{
+	if(!$rechte->isBerechtigt('assistenz', null, 's'))
+		die($rechte->errormsg);
+}
+
+$oetyp = new organisationseinheit();
+$oetyp->getTypen();
+
+foreach($oetyp->result as $row)
+{
+	$oetyp_arr[$row->organisationseinheittyp_kurzbz] = $row->bezeichnung;
+}
+
+$oe = new organisationseinheit();
+$oe->getAll();
+
+foreach($oe->result as $row)
+{
+	$oe_arr[$row->oe_kurzbz] = $oetyp_arr[$row->organisationseinheittyp_kurzbz].' '.$row->bezeichnung;
+}
 
 $stg_obj = new studiengang();
 $stg_obj->getAll('typ, kurzbz', false);
 
 $qry = "
-SELECT (SELECT nachname FROM public.tbl_person JOIN public.tbl_benutzer USING(person_id) 
-		  WHERE uid=COALESCE(tbl_lehrveranstaltung.koordinator, (SELECT uid FROM public.tbl_benutzerfunktion 
-		  								  WHERE fachbereich_kurzbz=tbl_fachbereich.fachbereich_kurzbz AND 
-		  								        tbl_lehrveranstaltung.studiengang_kz=(SELECT studiengang_kz FROM public.tbl_studiengang WHERE oe_kurzbz=tbl_benutzerfunktion.oe_kurzbz LIMIT 1) AND 
-		  								        funktion_kurzbz='fbk' AND
-		  								        (tbl_benutzerfunktion.datum_von is null OR tbl_benutzerfunktion.datum_von<=now()) AND
-												(tbl_benutzerfunktion.datum_bis is null OR tbl_benutzerfunktion.datum_bis>=now()) 
-											LIMIT 1
-		  								   )
-							)
-			) as koordinator,
-	(SELECT vorname FROM public.tbl_person JOIN public.tbl_benutzer USING(person_id) 
-		  WHERE uid=COALESCE(tbl_lehrveranstaltung.koordinator, (SELECT uid FROM public.tbl_benutzerfunktion 
-		  								  WHERE fachbereich_kurzbz=tbl_fachbereich.fachbereich_kurzbz AND 
-		  								        tbl_lehrveranstaltung.studiengang_kz=(SELECT studiengang_kz FROM public.tbl_studiengang WHERE oe_kurzbz=tbl_benutzerfunktion.oe_kurzbz LIMIT 1) AND 
-		  								        funktion_kurzbz='fbk' AND
-		  								        (tbl_benutzerfunktion.datum_von is null OR tbl_benutzerfunktion.datum_von<=now()) AND
-												(tbl_benutzerfunktion.datum_bis is null OR tbl_benutzerfunktion.datum_bis>=now()) 
-											LIMIT 1
-		  								   )
-							)
-			) as vorname,
-
-	lehrfach.bezeichnung as lf_bezeichnung, tbl_lehrveranstaltung.studiengang_kz,
-	tbl_fachbereich.fachbereich_kurzbz as fachbereich_kurzbz, tbl_lehreinheitmitarbeiter.mitarbeiter_uid, 
+SELECT
+	lehrfach.bezeichnung as lf_bezeichnung, tbl_lehrveranstaltung.studiengang_kz, lehrfach.oe_kurzbz as lehrfach_oe_kurzbz,
+	tbl_lehreinheitmitarbeiter.mitarbeiter_uid,
 	tbl_lehrveranstaltung.semester as lv_semester, tbl_lehreinheit.lehreinheit_id, tbl_lehreinheitmitarbeiter.faktor,
-	tbl_lehreinheitmitarbeiter.stundensatz, 
+	tbl_lehreinheitmitarbeiter.stundensatz,
 	tbl_lehreinheitmitarbeiter.semesterstunden lemss, tbl_lehreinheitmitarbeiter.planstunden,
 	tbl_lehreinheit.stundenblockung, tbl_lehreinheit.wochenrythmus, tbl_lehreinheit.raumtyp, tbl_lehreinheit.raumtypalternativ,
 	tbl_lehreinheitmitarbeiter.anmerkung
 	,tbl_lehreinheit.studiensemester_kurzbz
 	,tbl_lehrveranstaltung.ects
-	,tbl_lehrveranstaltung.semesterstunden 
+	,tbl_lehrveranstaltung.semesterstunden
 	,tbl_lehrveranstaltung.semesterstunden  as sws
 	,tbl_lehrveranstaltung.lehrform_kurzbz
 	,tbl_lehrveranstaltung.lehrveranstaltung_id
-	,(SELECT nachname FROM public.tbl_person JOIN public.tbl_benutzer USING(person_id) 
+	,(SELECT nachname FROM public.tbl_person JOIN public.tbl_benutzer USING(person_id)
 		  WHERE uid=(SELECT mitarbeiter_uid FROM lehre.tbl_lehreinheitmitarbeiter  WHERE lehre.tbl_lehreinheitmitarbeiter.lehreinheit_id=lehre.tbl_lehreinheit.lehreinheit_id and lehre.tbl_lehreinheitmitarbeiter.lehrfunktion_kurzbz='LV-Leitung' LIMIT 1)
-		)as lv_leitung	
-	,(SELECT vorname FROM public.tbl_person JOIN public.tbl_benutzer USING(person_id) 
+		)as lv_leitung
+	,(SELECT vorname FROM public.tbl_person JOIN public.tbl_benutzer USING(person_id)
 		  WHERE uid=(SELECT mitarbeiter_uid FROM lehre.tbl_lehreinheitmitarbeiter  WHERE lehre.tbl_lehreinheitmitarbeiter.lehreinheit_id=lehre.tbl_lehreinheit.lehreinheit_id and lehre.tbl_lehreinheitmitarbeiter.lehrfunktion_kurzbz='LV-Leitung' LIMIT 1)
-		)as lv_leitung_vorname	
+		)as lv_leitung_vorname
 	,(SELECT bezeichnung FROM lehre.tbl_lehrform  WHERE lehre.tbl_lehrform.lehrform_kurzbz=tbl_lehrveranstaltung.lehrform_kurzbz LIMIT 1) as lv_type
 	,tbl_lehrveranstaltung.lehrform_kurzbz
-FROM 
-	lehre.tbl_lehrveranstaltung 
-	JOIN lehre.tbl_lehreinheit USING(lehrveranstaltung_id) 
-	JOIN lehre.tbl_lehreinheitmitarbeiter USING(lehreinheit_id) 
+FROM
+	lehre.tbl_lehrveranstaltung
+	JOIN lehre.tbl_lehreinheit USING(lehrveranstaltung_id)
+	JOIN lehre.tbl_lehreinheitmitarbeiter USING(lehreinheit_id)
 	JOIN lehre.tbl_lehrveranstaltung as lehrfach ON(tbl_lehreinheit.lehrfach_id=lehrfach.lehrveranstaltung_id)
-	LEFT JOIN public.tbl_fachbereich ON(lehrfach.oe_kurzbz=tbl_fachbereich.oe_kurzbz)
-WHERE 
-	tbl_lehreinheit.studiensemester_kurzbz=".$db->db_add_param($studiensemester_kurzbz);	
+WHERE
+	tbl_lehreinheit.studiensemester_kurzbz=".$db->db_add_param($studiensemester_kurzbz);
 
-#	,(SELECT lv_semesterstunden FROM campus.vw_lehreinheit WHERE lehrveranstaltung_id=tbl_lehrveranstaltung.lehrveranstaltung_id and lehreinheit_id=lehre.tbl_lehreinheit.lehreinheit_id and studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."' LIMIT 1) as sws	
-	
 if($studiengang_kz!='')
 	$qry.=" AND tbl_lehrveranstaltung.studiengang_kz=".$db->db_add_param($studiengang_kz, FHC_INTEGER);
-	
+
 if($oe_kurzbz!='')
-	$qry.=" AND tbl_fachbereich.oe_kurzbz=".$db->db_add_param($oe_kurzbz);
+	$qry.=" AND lehrfach.oe_kurzbz=".$db->db_add_param($oe_kurzbz);
 
 if($semester!='')
 	$qry.=" AND tbl_lehrveranstaltung.semester=".$db->db_add_param($semester, FHC_INTEGER);
-	
+
 if($uid!='')
 	$qry.=" AND tbl_lehreinheitmitarbeiter.mitarbeiter_uid=".$db->db_add_param($uid);
 
 $qry.=" ORDER BY tbl_lehrveranstaltung.studiengang_kz, tbl_lehrveranstaltung.semester, tbl_lehrveranstaltung.bezeichnung";
-
-/*
-//	exit($qry);
-if($result = $db->db_query($qry))
-{
-	$row = $db->db_fetch_object($result);
-	var_dump($row);
-}
-else
-	echo 'nix<br>';
-var_dump($stg_obj);
-exit;
-*/
-
-
 
 // Creating a workbook
 $workbook = new Spreadsheet_Excel_Writer();
@@ -174,10 +171,8 @@ $zeile=0;
 $spalte=0;
 $worksheet->write($zeile,$spalte,"Studiengang", $format_bold);
 $maxlength[$spalte]=11;
-$worksheet->write($zeile,++$spalte,"Institut", $format_bold);
+$worksheet->write($zeile,++$spalte,"Organisationseinheit", $format_bold);
 $maxlength[$spalte]=8;
-$worksheet->write($zeile,++$spalte,"Koordinator", $format_bold);
-$maxlength[$spalte]=11;
 $worksheet->write($zeile,++$spalte,"Lektor", $format_bold);
 $maxlength[$spalte]=6;
 $worksheet->write($zeile,++$spalte,"Lehrfach", $format_bold);
@@ -227,22 +222,20 @@ if($result = $db->db_query($qry))
 
 		$spalte=0;
 		$zeile++;
-		
+
 		$mitarbeiter = new mitarbeiter();
 		$mitarbeiter->load($row->mitarbeiter_uid);
-		
+
 		//Studiengang
 		$worksheet->write($zeile,$spalte,$stg_obj->kuerzel_arr[$row->studiengang_kz]);
 		if($maxlength[$spalte]<mb_strlen($stg_obj->kuerzel_arr[$row->studiengang_kz]))
 			$maxlength[$spalte]=mb_strlen($stg_obj->kuerzel_arr[$row->studiengang_kz]);
-		//Fachbereich
-		$worksheet->write($zeile,++$spalte,$row->fachbereich_kurzbz);
-		if($maxlength[$spalte]<mb_strlen($row->fachbereich_kurzbz))
-			$maxlength[$spalte]=mb_strlen($row->fachbereich_kurzbz);
-		//Koordinator
-		$worksheet->write($zeile,++$spalte,$row->koordinator.' '.$row->vorname);
-		if($maxlength[$spalte]<mb_strlen($row->koordinator.' '.$row->vorname))
-			$maxlength[$spalte]=mb_strlen($row->koordinator.' '.$row->vorname);
+
+		//Organisationseinheit
+		$worksheet->write($zeile,++$spalte,$oe_arr[$row->lehrfach_oe_kurzbz]);
+		if($maxlength[$spalte]<mb_strlen($oe_arr[$row->lehrfach_oe_kurzbz]))
+			$maxlength[$spalte]=mb_strlen($oe_arr[$row->lehrfach_oe_kurzbz]);
+
 		//Lektor
 		$worksheet->write($zeile,++$spalte,$mitarbeiter->nachname.' '.$mitarbeiter->vorname);
 		if($maxlength[$spalte]<mb_strlen($mitarbeiter->nachname.' '.$mitarbeiter->vorname))
@@ -255,7 +248,7 @@ if($result = $db->db_query($qry))
 		$worksheet->write($zeile,++$spalte,$row->lv_semester);
 		if($maxlength[$spalte]<mb_strlen($row->lv_semester))
 			$maxlength[$spalte]=mb_strlen($row->lv_semester);
-		
+
 		$qry = "SELECT * FROM lehre.tbl_lehreinheitgruppe WHERE lehreinheit_id=".$db->db_add_param($row->lehreinheit_id, FHC_INTEGER);
 		$result_gruppe = $db->db_query($qry);
 		$gruppe = '';
@@ -265,10 +258,10 @@ if($result = $db->db_query($qry))
 				$gruppe.=', ';
 			if($row_gruppe->gruppe_kurzbz!='')
 				$gruppe.=$row_gruppe->gruppe_kurzbz;
-			else 
+			else
 				$gruppe.=trim($stg_obj->kuerzel_arr[$row_gruppe->studiengang_kz].'-'.$row_gruppe->semester.$row_gruppe->verband.$row_gruppe->gruppe);
 		}
-		
+
 		//Gruppen
 		$worksheet->write($zeile,++$spalte,$gruppe);
 		if($maxlength[$spalte]<mb_strlen($gruppe))
@@ -277,9 +270,9 @@ if($result = $db->db_query($qry))
 		$worksheet->write($zeile,++$spalte,$row->lemss);
 		if($maxlength[$spalte]<mb_strlen($row->lemss))
 			$maxlength[$spalte]=mb_strlen($row->lemss);
-		
+
 		$kosten = ($row->stundensatz*$row->lemss*$row->faktor);
-		
+
 		//Kosten
 		$worksheet->write($zeile,++$spalte,$kosten);
 		if($maxlength[$spalte]<mb_strlen($kosten))
@@ -308,8 +301,7 @@ if($result = $db->db_query($qry))
 		$worksheet->write($zeile,++$spalte,$row->anmerkung);
 		if($maxlength[$spalte]<mb_strlen($row->anmerkung))
 			$maxlength[$spalte]=mb_strlen($row->anmerkung);
-			
-// Neu 13.11.2009 sequens
+
 		//LV-Leitung
 		$worksheet->write($zeile,++$spalte,$row->lv_leitung.' '.$row->lv_leitung_vorname);
 		if($maxlength[$spalte]<mb_strlen($row->lv_leitung.' '.$row->lv_leitung_vorname))
@@ -320,22 +312,15 @@ if($result = $db->db_query($qry))
 		if($maxlength[$spalte]<mb_strlen($row->lehrveranstaltung_id))
 			$maxlength[$spalte]=mb_strlen($row->lehrveranstaltung_id);
 
-		//SWS
-
-
-/*		$worksheet->write($zeile,++$spalte,$row->sws);
-		if($maxlength[$spalte]<mb_strlen($row->sws))
-			$maxlength[$spalte]=mb_strlen($row->sws);
-*/
+		//Semesterstunden
 		$semesterstunden = $row->semesterstunden;
 		if ($row->stundensatz==0 || $row->lemss==0 || $row->faktor==0)
 			$semesterstunden = 0;
-		
+
 		$worksheet->write($zeile,++$spalte,$semesterstunden);
 		if($maxlength[$spalte]<mb_strlen($semesterstunden))
 			$maxlength[$spalte]=mb_strlen($semesterstunden);
-			
-			
+
 		//ECTS
 		$worksheet->write($zeile,++$spalte,$row->ects);
 		if($maxlength[$spalte]<mb_strlen($row->ects))
@@ -347,50 +332,27 @@ if($result = $db->db_query($qry))
 		$worksheet->write($zeile,++$spalte,$row->lv_type);
 		if($maxlength[$spalte]<mb_strlen($row->lv_type))
 			$maxlength[$spalte]=mb_strlen($row->lv_type);
-		
+
 	}
-	
+
 	//Betreuungen
 	$qry = "SELECT
-				tbl_lehrveranstaltung.studiengang_kz, fachbereich_kurzbz, 
-				(SELECT nachname FROM public.tbl_person JOIN public.tbl_benutzer USING(person_id) 
-		 		 WHERE uid=COALESCE(tbl_lehrveranstaltung.koordinator, (SELECT uid FROM public.tbl_benutzerfunktion 
-		  								  WHERE fachbereich_kurzbz=tbl_fachbereich.fachbereich_kurzbz AND 
-		  								        tbl_lehrveranstaltung.studiengang_kz=(SELECT studiengang_kz FROM public.tbl_studiengang WHERE oe_kurzbz=tbl_benutzerfunktion.oe_kurzbz LIMIT 1) AND 
-		  								        funktion_kurzbz='fbk' AND 
-		  								        (tbl_benutzerfunktion.datum_von is null OR tbl_benutzerfunktion.datum_von<=now()) AND
-												(tbl_benutzerfunktion.datum_bis is null OR tbl_benutzerfunktion.datum_bis>=now())
-											LIMIT 1
-		  								   )
-							)
-				) as koordinator, 
-				(SELECT vorname FROM public.tbl_person JOIN public.tbl_benutzer USING(person_id) 
-		 		 WHERE uid=COALESCE(tbl_lehrveranstaltung.koordinator, (SELECT uid FROM public.tbl_benutzerfunktion 
-		  								  WHERE fachbereich_kurzbz=tbl_fachbereich.fachbereich_kurzbz AND 
-		  								        tbl_lehrveranstaltung.studiengang_kz=(SELECT studiengang_kz FROM public.tbl_studiengang WHERE oe_kurzbz=tbl_benutzerfunktion.oe_kurzbz LIMIT 1) AND 
-		  								        funktion_kurzbz='fbk' AND 
-		  								        (tbl_benutzerfunktion.datum_von is null OR tbl_benutzerfunktion.datum_von<=now()) AND
-												(tbl_benutzerfunktion.datum_bis is null OR tbl_benutzerfunktion.datum_bis>=now())
-											LIMIT 1
-		  								   )
-							)
-				) as koordinator_vorname, nachname, vorname, lehrfach.bezeichnung, 
-				tbl_lehrveranstaltung.semester, student_uid, stunden, tbl_projektbetreuer.stundensatz, 
+				tbl_lehrveranstaltung.studiengang_kz, lehrfach.oe_kurzbz as lehrfach_oe_kurzbz,
+				nachname, vorname, lehrfach.bezeichnung,
+				tbl_lehrveranstaltung.semester, student_uid, stunden, tbl_projektbetreuer.stundensatz,
 				tbl_projektbetreuer.faktor
 			FROM
-				lehre.tbl_projektarbeit, lehre.tbl_lehreinheit, lehre.tbl_lehrveranstaltung, 
-				lehre.tbl_projektbetreuer, public.tbl_person, lehre.tbl_lehrveranstaltung as lehrfach, public.tbl_fachbereich
+				lehre.tbl_projektarbeit, lehre.tbl_lehreinheit, lehre.tbl_lehrveranstaltung,
+				lehre.tbl_projektbetreuer, public.tbl_person, lehre.tbl_lehrveranstaltung as lehrfach
 			WHERE
 				tbl_projektarbeit.lehreinheit_id=tbl_lehreinheit.lehreinheit_id AND
 				tbl_lehreinheit.lehrveranstaltung_id=tbl_lehrveranstaltung.lehrveranstaltung_id AND
 				tbl_projektarbeit.projektarbeit_id=tbl_projektbetreuer.projektarbeit_id AND
 				tbl_lehreinheit.lehrfach_id=lehrfach.lehrveranstaltung_id AND
-				lehrfach.oe_kurzbz=tbl_fachbereich.oe_kurzbz AND
 				tbl_person.person_id=tbl_projektbetreuer.person_id AND
 				tbl_lehreinheit.studiensemester_kurzbz=".$db->db_add_param($studiensemester_kurzbz)." AND
 				(tbl_projektbetreuer.faktor*tbl_projektbetreuer.stundensatz*tbl_projektbetreuer.stunden)>0
 				";
-
 
 	if($uid!=='')
 	{
@@ -399,11 +361,11 @@ if($result = $db->db_query($qry))
 	}
 
 	if($oe_kurzbz!='')
-		$qry.=" AND tbl_fachbereich.oe_kurzbz=".$db->db_add_param($oe_kurzbz);
-		
+		$qry.=" AND lehrfach.oe_kurzbz=".$db->db_add_param($oe_kurzbz);
+
 	if($studiengang_kz!='')
 		$qry.=" AND tbl_lehrveranstaltung.studiengang_kz=".$db->db_add_param($studiengang_kz, FHC_INTEGER);
-		
+
 	if($result = $db->db_query($qry))
 	{
 		$spalte=0;
@@ -415,20 +377,17 @@ if($result = $db->db_query($qry))
 		{
 			$spalte=0;
 			$zeile++;
-						
+
 			//Studiengang
 			$worksheet->write($zeile,$spalte,$stg_obj->kuerzel_arr[$row->studiengang_kz]);
 			if($maxlength[$spalte]<mb_strlen($stg_obj->kuerzel_arr[$row->studiengang_kz]))
 				$maxlength[$spalte]=mb_strlen($stg_obj->kuerzel_arr[$row->studiengang_kz]);
-				
-			//Fachbereich
-			$worksheet->write($zeile,++$spalte,$row->fachbereich_kurzbz);
-			if($maxlength[$spalte]<mb_strlen($row->fachbereich_kurzbz))
-				$maxlength[$spalte]=mb_strlen($row->fachbereich_kurzbz);
-			//Koordinator
-			$worksheet->write($zeile,++$spalte,$row->koordinator.' '.$row->koordinator_vorname);
-			if($maxlength[$spalte]<mb_strlen($row->koordinator.' '.$row->koordinator_vorname))
-				$maxlength[$spalte]=mb_strlen($row->koordinator.' '.$row->koordinator_vorname);
+
+			//Organisationseinheit
+			$worksheet->write($zeile,++$spalte,$oe_arr[$row->lehrfach_oe_kurzbz]);
+			if($maxlength[$spalte]<mb_strlen($oe_arr[$row->lehrfach_oe_kurzbz]))
+				$maxlength[$spalte]=mb_strlen($oe_arr[$row->lehrfach_oe_kurzbz]);
+
 			//Lektor
 			$worksheet->write($zeile,++$spalte,$row->nachname.' '.$row->vorname);
 			if($maxlength[$spalte]<mb_strlen($row->nachname.' '.$row->vorname))
@@ -441,7 +400,7 @@ if($result = $db->db_query($qry))
 			$worksheet->write($zeile,++$spalte,$row->semester);
 			if($maxlength[$spalte]<mb_strlen($row->semester))
 				$maxlength[$spalte]=mb_strlen($row->semester);
-				
+
 			$benutzer = new benutzer();
 			$benutzer->load($row->student_uid);
 			//Student
@@ -456,10 +415,10 @@ if($result = $db->db_query($qry))
 			$worksheet->write($zeile,++$spalte,$row->stunden*$row->stundensatz*$row->faktor);
 			if($maxlength[$spalte]<mb_strlen($row->stunden*$row->stundensatz*$row->faktor))
 				$maxlength[$spalte]=mb_strlen($row->stunden*$row->stundensatz*$row->faktor);
-				
+
 		}
 	}
-	
+
 	//Die Breite der Spalten setzen
 	foreach($maxlength as $i=>$breite)
 		$worksheet->setColumn($i, $i, $breite+2);
