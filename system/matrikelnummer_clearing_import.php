@@ -53,28 +53,28 @@ if(isset($_FILES['datei']))
 	$dom = new DOMDocument();
 	$dom->load($_FILES['datei']['tmp_name']);
 	$studierende = $dom->getElementsByTagName('studierende');
-	if(isset($studierende[0]))
+	if($studierende->length > 0)
 	{
 		$domnodes_personen = $studierende[0]->getElementsByTagName('personen');
 		foreach($domnodes_personen as $row_person)
 		{
 			$personid_node = $row_person->getElementsByTagName('personId');
-			if(isset($personid_node[0]))
+			if($personid_node->length > 0)
 			{
-				$node_bpk = $personid_node[0]->getElementsByTagName('bpk');
-				$node_personenkennzeichen = $personid_node[0]->getElementsByTagName('personenkennzeichen');
-				$node_matrikelnr = $personid_node[0]->getElementsByTagName('matrikelnummer');
+				$node_bpk = $personid_node->item(0)->getElementsByTagName('bpk');
+				$node_personenkennzeichen = $personid_node->item(0)->getElementsByTagName('personenkennzeichen');
+				$node_matrikelnr = $personid_node->item(0)->getElementsByTagName('matrikelnummer');
 
 				$bpk = '';
 				$personenkennzeichen = '';
 				$matrikelnr = '';
 
-				if (isset($node_bpk[0]))
-					$bpk = $node_bpk[0]->textContent;
-				if (isset($node_personenkennzeichen[0]))
-					$personenkennzeichen = $node_personenkennzeichen[0]->textContent;
-				if (isset($node_matrikelnr[0]))
-					$matrikelnr = $node_matrikelnr[0]->textContent;
+				if ($node_bpk->length > 0)
+					$bpk = $node_bpk->item(0)->textContent;
+				if ($node_personenkennzeichen->length > 0)
+					$personenkennzeichen = $node_personenkennzeichen->item(0)->textContent;
+				if ($node_matrikelnr->length > 0)
+					$matrikelnr = $node_matrikelnr->item(0)->textContent;
 
 				if($personenkennzeichen != '')
 				{
