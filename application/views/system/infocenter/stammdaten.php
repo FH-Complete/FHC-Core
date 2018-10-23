@@ -57,21 +57,23 @@
 			<?php foreach ($stammdaten->kontakte as $kontakt): ?>
 				<tr>
 				<?php if ($kontakt->kontakttyp === 'email'): ?>
-					<td><?php echo  ucfirst($this->p->t('person','email')) ?></td>
-				<?php elseif ($kontakt->kontakttyp === 'telefon'): ?>
-					<td><?php echo  ucfirst($this->p->t('person','telefon')) ?></td>
+					<td><?php echo ucfirst($this->p->t('person', 'email')) ?></td>
+				<?php elseif ($kontakt->kontakttyp === 'telefon' || $kontakt->kontakttyp === 'mobil'): ?>
+					<td><?php echo ucfirst($this->p->t('person', 'telefon')) ?></td>
+				<?php else: ?>
+					<td><?php echo ucfirst($kontakt->kontakttyp) ?></td>
 				<?php endif; ?>
 					<td>
 						<?php echo '<span class="'.$kontakt->kontakttyp.'">';?>
 						<?php if ($kontakt->kontakttyp === 'email'): ?>
-						<a href="mailto:<?php echo $kontakt->kontakt; ?>" target="_top">
+							<a href="mailto:<?php echo $kontakt->kontakt; ?>" target="_top">
 							<?php
 							endif;
 							echo $kontakt->kontakt;
 							if ($kontakt->kontakttyp === 'email'):
 							?>
-						</a>
-					<?php endif; ?>
+							</a>
+							<?php endif; ?>
 					<?php echo '</span>'?>
 					</td>
 					<td><?php echo $kontakt->anmerkung; ?></td>
