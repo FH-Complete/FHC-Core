@@ -699,13 +699,14 @@ class dvb extends basis_db
 			if (!$this->authenticate())
 				return false;
 		}
+		$gebdat = str_replace("-", "", "$person->geburtsdatum");
 
 		$data = '<?xml version="1.0" encoding="UTF-8"?>
 		<matrikelnummernmeldung>
 			<uuid>'.$uuid.'</uuid>
 			<personmeldung>
 				<be>'.$bildungseinrichtung.'</be>
-				<gebdat>'.$person->geburtsdatum.'</gebdat>
+				<gebdat>'.$gebdat.'</gebdat>
 				<geschlecht>'.$person->geschlecht.'</geschlecht>
 				<matrikel>'.$person->matrikelnummer.'</matrikel>';
 		if (isset($person->matura) && $person->matura != '')
