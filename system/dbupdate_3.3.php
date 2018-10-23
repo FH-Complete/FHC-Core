@@ -1550,6 +1550,19 @@ if($result = @$db->db_query("SELECT * FROM information_schema.role_table_grants 
 	}
 }
 
+// Add permission for managing Casetime timesheets
+if ($result = @$db->db_query("SELECT 1 FROM system.tbl_berechtigung WHERE berechtigung_kurzbz = 'addon/casetime_manageTimesheet';"))
+{
+	if ($db->db_num_rows($result) == 0)
+	{
+		$qry = "INSERT INTO system.tbl_berechtigung (berechtigung_kurzbz, beschreibung) VALUES('addon/casetime_manageTimesheet', 'Managen von Casetime timesheets');";
+		if (!$db->db_query($qry))
+			echo '<strong>system.tbl_berechtigung '.$db->db_last_error().'</strong><br>';
+		else
+			echo ' system.tbl_berechtigung: Added permission to manage Casetime timesheets.<br>';
+	}
+}
+
 /**
  * Kommentare fuer Datenbanktabellen
  */
