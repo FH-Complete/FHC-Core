@@ -55,7 +55,7 @@ if(isset($_FILES['datei']))
 	$studierende = $dom->getElementsByTagName('studierende');
 	if($studierende->length > 0)
 	{
-		$domnodes_personen = $studierende[0]->getElementsByTagName('personen');
+		$domnodes_personen = $studierende->item(0)->getElementsByTagName('personen');
 		foreach($domnodes_personen as $row_person)
 		{
 			$personid_node = $row_person->getElementsByTagName('personId');
