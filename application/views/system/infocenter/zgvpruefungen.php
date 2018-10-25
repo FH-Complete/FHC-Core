@@ -5,6 +5,9 @@
 	foreach ($zgvpruefungen as $zgvpruefung):
 		$infoonly = $zgvpruefung->infoonly;
 		$studiensemester = isset($zgvpruefung->prestudentstatus->studiensemester_kurzbz) ? $zgvpruefung->prestudentstatus->studiensemester_kurzbz : '';
+		$studiengangkurzbz = empty($zgvpruefung->prestudentstatus->studiengangkurzbzlang) ? $zgvpruefung->studiengang : $zgvpruefung->prestudentstatus->studiengangkurzbzlang;
+		$studiengangbezeichnung = empty($zgvpruefung->prestudentstatus->studiengangbezeichnung) ? $zgvpruefung->studiengangbezeichnung : $zgvpruefung->prestudentstatus->studiengangbezeichnung;
+
 		//set bootstrap columns for zgv form
 		$columns = array(4, 3, 2, 3);
 		$headercolumns = array(7, 5);
@@ -31,7 +34,8 @@
 					<div class="col-xs-<?php echo $headercolumns[0]; ?>">
 						<h4 class="panel-title">
 							<a data-toggle="collapse"
-							   href="#collapse<?php echo $zgvpruefung->prestudent_id ?>"><?php echo $zgvpruefung->studiengang.' - '.$zgvpruefung->studiengangbezeichnung.' | '.(isset($zgvpruefung->prestudentstatus->status_kurzbz) ? $zgvpruefung->prestudentstatus->status_kurzbz : '');
+							   href="#collapse<?php echo $zgvpruefung->prestudent_id ?>">
+								<?php echo $studiengangkurzbz.' - '.$studiengangbezeichnung.' | '.(isset($zgvpruefung->prestudentstatus->status_kurzbz) ? $zgvpruefung->prestudentstatus->status_kurzbz : '');
 								?></a>
 						</h4>
 					</div>
@@ -125,7 +129,7 @@
 											$zgvinfocolumns = $infoonly ? 4 : 9;
 										?>
 										<div class="col-xs-<?php echo $zgvinfocolumns; ?> text-right zgvinfo" id="zgvinfo_<?php echo $zgvpruefung->prestudent_id ?>">
-											<a href="javascript:void(0)"><i class="fa fa-info-circle"></i> <?php echo  $this->p->t('infocenter', 'zgv') ?> <?php echo $zgvpruefung->studiengang; ?></a>
+											<a href="javascript:void(0)"><i class="fa fa-info-circle"></i> <?php echo  $this->p->t('infocenter', 'zgv') ?> <?php echo $studiengangkurzbz ?></a>
 										</div>
 									</div>
 									<?php if (!$infoonly)

@@ -185,7 +185,6 @@ class Prestudent_model extends DB_Model
 		return $this->execQuery(sprintf($query, is_array($prestudent_id) ? 'IN' : '='), array($prestudent_id));
 	}
 
-
 	/**
 	 * gets extended zgv data (with zgv bezeichnung) for a prestudent
 	 * includes last status, Studiengang, zgv, zgv master
@@ -219,6 +218,17 @@ class Prestudent_model extends DB_Model
 
 		if (count($lastStatus->retval) > 0)
 		{
+			// get Studiengangname from Studienlan and -ordnung
+			$studienordnung = $this->PrestudentstatusModel->getStudienordnungFromPrestudent($prestudent_id);
+			if ($studienordnung->error)
+				return error($studienordnung->retval);
+
+			if (count($studienordnung->retval) > 0)
+			{
+				$lastStatus->retval[0]->studiengangbezeichnung = $studienordnung->retval[0]->studiengangbezeichnung;
+				$lastStatus->retval[0]->studiengangbezeichnung_englisch = $studienordnung->retval[0]->studiengangbezeichnung_englisch;
+			}
+
 			$this->load->model('system/sprache_model', 'SpracheModel');
 			$language = $this->SpracheModel->load($lastStatus->retval[0]->sprache);
 
@@ -380,7 +390,7 @@ class Prestudent_model extends DB_Model
 			}
 		}
 
-		if (($currprio === $priomax && $change < 0)|| ($currprio === $priomin &&  $change > 0))
+		if (($currprio === $priomax && $change < 0) || ($currprio === $priomin && $change > 0))
 		{
 			return false;
 		}
