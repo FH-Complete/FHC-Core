@@ -25,8 +25,13 @@
 
 			if (!$first)
 				echo '<br/>';
+
+			if (isEmptyString($studiensemester)):
 		?>
-		<h4 class="headercolorbg text-center"><?php echo $studiensemester; ?></h4>
+				<h4 class="headercolorbg text-center">ohne Semester</h4>
+			<?php else: ?>
+				<h4 class="headercolorbg text-center"><?php echo $studiensemester; ?></h4>
+			<?php endif; ?>
 		<?php endif; ?>
 		<div class="panel panel-default">
 			<div class="panel-heading">
@@ -54,7 +59,6 @@
 						<?php
 							$changeup = isset($zgvpruefung->changeup) && $zgvpruefung->changeup === true;
 							$changedown = isset($zgvpruefung->changedown) && $zgvpruefung->changedown === true;
-							if ($numberinteressenten[$studiensemester] > 1):
 								echo ' | ' . ucfirst($this->p->t('infocenter', 'priorisierung')) . ': ';
 								echo isset($zgvpruefung->priorisierung) ? $zgvpruefung->priorisierung : $this->p->t('global', 'nichtvorhanden');
 								if ($changeup): ?>
@@ -63,7 +67,6 @@
 								<?php if ($changedown): ?>
 									<span class="fa fa-caret-down priodown" id="priodown_<?php echo $zgvpruefung->prestudent_id ?>" style="font-size: 19px; cursor: pointer;"></span>
 								<?php endif; ?>
-							<?php endif; ?>
 					<?php endif; ?>
 					</div>
 				</div>

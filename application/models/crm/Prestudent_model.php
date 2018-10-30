@@ -362,13 +362,17 @@ class Prestudent_model extends DB_Model
 
 		$bewerberarr = $this->getBewerber($person_id, $studiensemester);
 
+		//Prio can be added when prio is null and there is only one prestudent
+		if (count($bewerberarr) === 1 && !isset($prestudent->retval[0]->priorisierung) && $change < 0)
+			return true;
+
 		if (count($bewerberarr) <= 1)
 			return false;
 
 		if (!isset($prestudent->retval[0]->priorisierung))
 		{
 			if ($change < 0)
-				return true; //null values can be changed to priority numbers, when there are other bewerber
+				return true; //null values can be changed to priority numbers (prority increase)
 			else
 				return false;
 		}
@@ -390,6 +394,7 @@ class Prestudent_model extends DB_Model
 			}
 		}
 
+		//no prio change when prestudent has max or min prio
 		if (($currprio === $priomax && $change < 0) || ($currprio === $priomin && $change > 0))
 		{
 			return false;
@@ -459,7 +464,7 @@ class Prestudent_model extends DB_Model
 
 		if (is_null($prestudent->retval[0]->priorisierung))
 		{
-			//if null value before, add lowest prio
+			//if null value, add as prio 1
 			$newprio = isset($neighbour->priorisierung) ? intval($neighbour->priorisierung) + 1 : 1;
 
 			$result = $this->PrestudentModel->update(
