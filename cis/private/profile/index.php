@@ -24,6 +24,7 @@ require_once('../../../config/cis.config.inc.php');
 require_once('../../../config/global.config.inc.php');
 require_once('../../../include/functions.inc.php');
 require_once('../../../include/globals.inc.php');
+require_once('../../../include/benutzerberechtigung.class.php');
 require_once('../../../include/studiengang.class.php');
 require_once('../../../include/studienordnung.class.php');
 require_once('../../../include/person.class.php');
@@ -230,7 +231,9 @@ echo '</td><td width="30%" valign="top">';
 
 echo '
 		<b>'.($type == "student"?$p->t("profil/student"):$p->t('profil/mitarbeiter')).'</b><br><br>
-		'.$p->t('global/username').': '.$user->uid.'<br>
+		'.$p->t('global/username').': '.$user->uid.'<br>';
+		echo ($type == 'student') ? $p->t('global/matrikelnummer'). ": ". $user->matrikelnr. "<br>" : '';
+echo '
 		'.$p->t('global/anrede').': '.$user->anrede.'<br>
 		'.$p->t('global/titel').': '.$user->titelpre.' <br>';
 
