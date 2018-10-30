@@ -158,7 +158,7 @@ function searchPerson($searchItems)
 		{
 			$bisverwendung = new bisverwendung();
 			$bisverwendung->getLastAktVerwendung($row->uid);
-
+			
 			echo '<tr>';
 			//echo '<td>',$row->titelpre,'</td>';
 			echo '<td>',$row->anrede,'</td>';
@@ -171,8 +171,47 @@ function searchPerson($searchItems)
 			echo '</td>';
 			//echo '<td>',$row->titelpost,'</td>';
 			echo '<td>',($row->studiengang!=''?$row->studiengang:'-'),'</td>';
-			echo '<td>',($row->mitarbeiter_uid==NULL?'StudentIn':'MitarbeiterIn'),'</td>';
-			echo '<td>',($row->telefonklappe!=''?$row->telefonklappe:'-'),'</td>';
+			echo '<td>',($row->mitarbeiter_uid==NULL?'StudentIn':'MitarbeiterIn'),'</td>';	
+			// Display phone number
+			echo '<td>';
+			// * if user has telefonklappe, display it
+			if ($row->telefonklappe != '')
+			{
+				 echo $row->telefonklappe;
+			}
+			// * if user has no telefonklappe, display business handy
+			else
+			{
+				$person = new Person();
+				$person->getPersonFromBenutzer($row->uid);
+				$person_id = $person->person_id;
+				$kontakt = new Kontakt();
+
+				if ($kontakt->load_persKontakttyp($person_id, 'firmenhandy'))
+				{
+					$is_zugestellt = false;
+					foreach ($kontakt->result as $kontakt)
+					{
+						// display business handy only if zustellung is true
+						if ($kontakt->zustellung)
+						{
+							echo $kontakt->kontakt. "<br>";
+							$is_zugestellt = true;
+						}		
+					}
+					// if zustellung is false display '-'
+					if (!$is_zugestellt)
+					{
+						echo '-';
+					}
+				}
+				// * if neither telefonklappe nor business handy, display '-'
+				else
+				{
+					echo '-';
+				}
+			}
+			echo '</td>';			
 			echo '<td>',($row->raum!=''?$row->raum:'-'),'</td>';
 			if($row->alias!='' && !in_array($row->studiengang_kz, $noalias))
 				$mail = $row->alias.'@'.DOMAIN;
@@ -271,9 +310,46 @@ function searchOE($searchItems)
 							echo '<td>'.$bf->bezeichnung;
 								if($bisverwendung->beschausmasscode=='5')
 									echo '<span style="color: orange"> (karenziert)</span>';
-								echo '</td>';
-
-							echo '<td>',($mitarbeiter->telefonklappe!=''?$kontakt->kontakt.'-'.$mitarbeiter->telefonklappe:'-'),'</td>';
+							echo '</td>';
+							
+							// Display phone number
+							echo '<td>';
+								// * if user has telefonklappe, display it
+								if ($mitarbeiter->telefonklappe != '')
+								{
+									 echo $kontakt->kontakt. '-'. $mitarbeiter->telefonklappe;
+								}
+								// * if user has no telefonklappe, display business handy
+								else
+								{
+									$person_id = $person->person_id;
+								
+									if ($kontakt->load_persKontakttyp($person_id, 'firmenhandy'))
+									{
+										$is_zugestellt = false;
+										foreach ($kontakt->result as $kontakt)
+										{
+											// display business handy only if zustellung is true
+											if ($kontakt->zustellung)
+											{
+												echo $kontakt->kontakt. "<br>";
+												$is_zugestellt = true;
+											}		
+										}
+										// if zustellung is false display '-'
+										if (!$is_zugestellt)
+										{
+											echo '-';
+										}			
+									}
+									// * if neither telefonklappe nor business handy, display '-'
+									else
+									{
+										echo '-';
+									}
+								}
+							echo '</td>';						
+							
 							echo '<td>',($mitarbeiter->ort_kurzbz!=''?$mitarbeiter->ort_kurzbz:'-'),'</td>';
 							//if($row->alias!='' && !in_array($row->studiengang_kz, $noalias)) ??? Was macht $noalias?
 							if($person->alias!='')
