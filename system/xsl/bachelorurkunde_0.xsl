@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsl:stylesheet 
-xmlns:fo="http://www.w3.org/1999/XSL/Format" 
-xmlns:xsl="http://www.w3.org/1999/XSL/Transform" 
+<xsl:stylesheet
+xmlns:fo="http://www.w3.org/1999/XSL/Format"
+xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
 version="1.0"
-xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" 
-xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0" 
-xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0" 
-xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0" 
+xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
+xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
+xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
+xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0"
 xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0"
-xmlns:xlink="http://www.w3.org/1999/xlink" 
-xmlns:dc="http://purl.org/dc/elements/1.1/" 
-xmlns:meta="urn:oasis:names:tc:opendocument:xmlns:meta:1.0" 
-xmlns:number="urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0" 
-xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0" 
-xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0" 
+xmlns:xlink="http://www.w3.org/1999/xlink"
+xmlns:dc="http://purl.org/dc/elements/1.1/"
+xmlns:meta="urn:oasis:names:tc:opendocument:xmlns:meta:1.0"
+xmlns:number="urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0"
+xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0"
+xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
 >
 
 <xsl:output method="xml" version="1.0" indent="yes"/>
@@ -53,7 +53,7 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
 			<style:text-properties style:font-name="Arial" fo:font-size="28pt" officeooo:rsid="0006c6a3" officeooo:paragraph-rsid="0006c6a3" style:font-size-asian="28pt" style:font-size-complex="28pt"/>
 		</style:style>
 	</office:automatic-styles>
-	
+
 	<office:body>
 		<xsl:apply-templates select="pruefung"/>
 	</office:body>
@@ -68,15 +68,16 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
 				<text:sequence-decl text:display-outline-level="0" text:name="Text"/>
 				<text:sequence-decl text:display-outline-level="0" text:name="Drawing"/>
 			</text:sequence-decls>
-			
+
 			<text:p text:style-name="Seitenumbruch">Diplom-Urkunde</text:p>
 				<!-- Ueberprueft ob benoetigte Datenfelder leer sind -->
 				<xsl:if test="staatsbuergerschaft = ''"><text:p text:style-name="P4">Staatsbürgerschaft nicht angegeben</text:p></xsl:if>
+				<xsl:if test="pruefungstyp_kurzbz != 'Bachelor'"><text:p text:style-name="P4">Prüfungstyp passt nicht zu diesem Dokumenttyp</text:p></xsl:if>
 				<xsl:if test="datum = ''"><text:p text:style-name="P4">Datum der Abschlussprüfung nicht gesetzt</text:p></xsl:if>
 				<xsl:if test="titel = ''"><text:p text:style-name="P4">Kein akademischer Grad ausgewählt</text:p></xsl:if>
 				<xsl:if test="sponsion = ''"><text:p text:style-name="P4">Sponsionsdatum nicht gesetzt</text:p></xsl:if>
 				<xsl:if test="bescheidbgbl1 = ''"><text:p text:style-name="P4">Bundesgesetzblattnummer (BGBl) beim Studiengang ist nicht gesetzt</text:p></xsl:if>
-			
+
 			<text:p text:style-name="P1"/>
 			<text:p text:style-name="P1"/>
 			<text:p text:style-name="P1"/>
@@ -86,7 +87,7 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
 			<text:p text:style-name="P1"/>
 			<text:p text:style-name="P3"><xsl:value-of select="anrede" /><xsl:text> </xsl:text><xsl:value-of select="name" /></text:p>
 			<text:p text:style-name="P1"/>
-			<text:p text:style-name="P1">geboren am <xsl:value-of select="gebdatum" /> in 
+			<text:p text:style-name="P1">geboren am <xsl:value-of select="gebdatum" /> in
 			<xsl:if test="string-length(gebort)!=0">
 				<xsl:value-of select="gebort" />
 				<xsl:text>, </xsl:text>
@@ -103,15 +104,15 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
 				<xsl:otherwise>
 					<xsl:text>die/der</xsl:text>
 				</xsl:otherwise>
-			</xsl:choose>					
+			</xsl:choose>
 			<xsl:if test="stg_art != 'k'"> den</xsl:if>
-			<xsl:if test="stg_art = 'k'"> das</xsl:if> 
+			<xsl:if test="stg_art = 'k'"> das</xsl:if>
 			Fachhochschul-<xsl:choose>
-				<xsl:when test="stg_art='b'">Bachelor</xsl:when>					
-				<xsl:when test="stg_art='m'">Master</xsl:when>					
-				<xsl:when test="stg_art='d'">Diplom</xsl:when>					
-				<xsl:when test="stg_art='l'">Lehrgang</xsl:when>				
-				<xsl:when test="stg_art='k'">Kurzstudium</xsl:when>								
+				<xsl:when test="stg_art='b'">Bachelor</xsl:when>
+				<xsl:when test="stg_art='m'">Master</xsl:when>
+				<xsl:when test="stg_art='d'">Diplom</xsl:when>
+				<xsl:when test="stg_art='l'">Lehrgang</xsl:when>
+				<xsl:when test="stg_art='k'">Kurzstudium</xsl:when>
 			</xsl:choose>
 			<xsl:if test="stg_art != 'k' or 'l'">-Studiengang</xsl:if></text:p>
 			<text:p text:style-name="P1"/>
