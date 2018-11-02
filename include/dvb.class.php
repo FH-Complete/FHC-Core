@@ -36,6 +36,7 @@ class dvb extends basis_db
 	const DVB_URL_WEBSERVICE_OAUTH = DVB_PORTAL.'/dvb/oauth/token';
 	const DVB_URL_WEBSERVICE_SVNR = DVB_PORTAL.'/rws/0.2/simpleStudentBySozialVersicherungsnummer.xml';
 	const DVB_URL_WEBSERVICE_ERSATZKZ = DVB_PORTAL.'/rws/0.2/simpleStudentByErsatzKennzeichen.xml';
+	const DVB_URL_WEBSERVICE_NACHNAME = DVB_PORTAL.'/rws/0.2/simpleStudentByNachname.xml';
 	const DVB_URL_WEBSERVICE_RESERVIERUNG = DVB_PORTAL.'/dvb/matrikelnummern/1.0/reservierung.xml';
 	const DVB_URL_WEBSERVICE_MELDUNG = DVB_PORTAL.'/dvb/matrikelnummern/1.0/meldung.xml';
 	const DVB_URL_WEBSERVICE_BPK = DVB_PORTAL.'/rws/0.2/pruefeBpk.xml';
@@ -64,9 +65,11 @@ class dvb extends basis_db
 	 * Wenn die Person noch keine Matrikelnummer besitzt, wird eine neue Matrikelnummer
 	 * angefordert und der Person zugeordnet
 	 * @param int $person_id ID der Person.
+	 * @param boolean $softrun Wird dieser Parameter gesetzt, werden nur bestehende Daten abgerufen,
+	 * es werden keine neuen Vergabemeldungen gemacht
 	 * @return boolean true wenn Erfolgreich, false im Fehlerfall
 	 */
-	public function assignMatrikelnummer($person_id)
+	public function assignMatrikelnummer($person_id, $softrun = false)
 	{
 		$person = new person();
 		if (!$person->load($person_id))
@@ -139,6 +142,18 @@ class dvb extends basis_db
 		}
 		else
 		{
+			if($this->existsByName($person_id))
+			{
+				$this->errormsg = 'Namenssuche ergab Treffer -> manuelle Pruefung erforderlich';
+				return ErrorHandler::error();
+			}
+
+			if($softrun == true)
+			{
+				$this->errormsg = 'Nicht gefunden Softrun enabled keine Meldung';
+				return ErrorHandler::error();
+			}
+
 			// Es wurde noch keine Matrikelnummer zu dieser Person zugeordnet
 			// Es wird eine neue Matrikelnummer aus dem Kontingent angefordert
 			// und an die Person vergeben
@@ -211,6 +226,8 @@ class dvb extends basis_db
 					$person_meldung->staat = $person->staatsbuergerschaft;
 					if ($person->svnr != '')
 						$person_meldung->svnr = $person->svnr;
+					else if($person->ersatzkennzeichen != '')
+						$person_meldung->svnr = $person->ersatzkennzeichen;
 
 					// PLZ der Meldeadresse laden
 					$adresse = new adresse();
@@ -1195,6 +1212,161 @@ class dvb extends basis_db
 				}
 			}
 			return ErrorHandler::error();
+		}
+		else
+		{
+			$this->errormsg = 'Request Failed with HTTP Code:'.$curl_info['http_code'].' and Response:'.$response;
+			return ErrorHandler::error();
+		}
+	}
+
+	public function existsByName($person_id)
+	{
+		$person = new person();
+		if($person->load($person_id))
+		{
+			$result = $this->getMatrikelnrByNachname($person->nachname, $person->gebdatum);
+
+			if(ErrorHandler::isSuccess($result) && ErrorHandler::hasData($result)
+				&& isset($result->retval->data)
+				&& is_array($result->retval->data)
+				&& count($result->retval->data)>0)
+			{
+				foreach($result->retval->data as $row)
+				{
+					if(isset($row->vorname) && isset($row->nachname))
+					{
+						if(mb_substr(mb_strtolower($row->vorname),0,5) == mb_substr(mb_strtolower($person->vorname),0,5)
+						&& mb_substr(mb_strtolower($row->nachname),0,10) == mb_substr(mb_strtolower($person->nachname),0,10))
+						{
+							return true;
+						}
+					}
+				}
+				return false;
+			}
+			else
+			{
+				return false;
+			}
+		}
+	}
+
+	/**
+	 * Get Matrikelnummer by Surname
+	 * @param string $nachname Surname of Person.
+	 * @param string $geburtsdatum Date of Birth
+	 * @return Matrikelnummer or false on error.
+	 */
+	public function getMatrikelnrByNachname($nachname, $geburtsdatum)
+	{
+		if ($this->tokenIsExpired())
+		{
+			$result = $this->authenticate();
+			if (ErrorHandler::isError($result))
+				return ErrorHandler::error();
+		}
+
+		$this->debug('getMatrikelnrByNachname');
+
+		$curl = curl_init();
+
+		$geburtsdatum = str_replace("-", "", $geburtsdatum);
+
+		$url = self::DVB_URL_WEBSERVICE_NACHNAME;
+		$url .= '?nachName='.curl_escape($curl, $nachname);
+		$url .= '&geburtsDatum='.curl_escape($curl, $geburtsdatum);
+
+		curl_setopt($curl, CURLOPT_URL, $url);
+		curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+		curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, false);
+		curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
+
+		$headers = array(
+			'Accept: application/json',
+			'Authorization: Bearer '.$this->authentication->access_token,
+			'User-Agent: FHComplete',
+			'Connection: Keep-Alive',
+			'Expect:',
+			'Content-Length: 0'
+		);
+		curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
+
+		$this->debug('Sending Request to '.$url);
+
+		$response = curl_exec($curl);
+		$curl_info = curl_getinfo($curl);
+		curl_close($curl);
+
+		$this->debug('ResponseCode: '.$curl_info['http_code']);
+		$this->debug('ResponseData: '.print_r($response, true));
+
+		if ($curl_info['http_code'] == '200')
+		{
+			/* Example Response:
+			<uni:simpleStudentResponse xmlns:uni="http://www.brz.gv.at/datenverbund-unis">
+				<uni:student inStudienBeitragsPool="false" inGesamtPool="true" gesperrt="false">
+					<uni:matrikelNummer>12345678</uni:matrikelNummer>
+					<uni:vorName>Max</uni:vorName>
+					<uni:personenkennzeichen>sdfaASDAFasdfads+asasdffd=</uni:personenkennzeichen>
+					<uni:nachName>Mustermann</uni:nachName>
+					<uni:geschlecht>M</uni:geschlecht>
+					<uni:geburtsDatum>1999-02-19</uni:geburtsDatum>
+					<uni:staatsAngehoerigkeit>A</uni:staatsAngehoerigkeit>
+				</uni:student>
+			</uni:simpleStudentResponse>
+			*/
+			$dom = new DOMDocument();
+			$dom->loadXML($response);
+			$namespace = 'http://www.brz.gv.at/datenverbund-unis';
+			$domnodes_student = $dom->getElementsByTagNameNS($namespace, 'student');
+
+			$retval = new stdClass();
+			$retval->data = array();
+
+			foreach ($domnodes_student as $row_student)
+			{
+				// Wenn nicht gesperrt und fix vergeben
+				$ingesamtpool = $row_student->getAttribute('inGesamtPool');
+				$gesperrt = $row_student->getAttribute('gesperrt');
+
+				if ($ingesamtpool == 'true' && $gesperrt == 'false')
+				{
+					$data = new stdClass();
+
+					$domnodes_matrikelnummer = $row_student->getElementsByTagNameNS($namespace, 'matrikelNummer');
+					foreach ($domnodes_matrikelnummer as $row)
+					{
+						// MatrikelNr Found
+						$data->matrikelnr = $row->textContent;
+						break;
+					}
+					$domnodes_bpk = $row_student->getElementsByTagNameNS($namespace, 'personenkennzeichen');
+					foreach ($domnodes_bpk as $row)
+					{
+						// BPK Found
+						$data->bpk = $row->textContent;
+						break;
+					}
+					$domnodes = $row_student->getElementsByTagNameNS($namespace, 'vorName');
+					if($domnodes->length>0)
+						$data->vorname = $domnodes->item(0)->textContent;
+					$domnodes = $row_student->getElementsByTagNameNS($namespace, 'nachName');
+					if($domnodes->length>0)
+						$data->nachname = $domnodes->item(0)->textContent;
+					$domnodes = $row_student->getElementsByTagNameNS($namespace, 'geschlecht');
+					if($domnodes->length>0)
+						$data->geschlecht = $domnodes->item(0)->textContent;
+					$domnodes = $row_student->getElementsByTagNameNS($namespace, 'staatsAngehoerigkeit');
+					if($domnodes->length>0)
+						$data->staatsangehoerigkeit = $domnodes->item(0)->textContent;
+
+					$retval->data[] = $data;
+				}
+
+			}
+
+			return ErrorHandler::success($retval);
 		}
 		else
 		{

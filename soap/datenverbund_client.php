@@ -72,6 +72,7 @@ $person_id = filter_input(INPUT_POST, 'person_id');
 			Matrikelnummer nach Ersatzkennzeichen suchen
 			</a>
 		</li>
+		<li><a href="datenverbund_client.php?action=getByNachname">Matrikelnummer nach Nachname suchen</a></li>
 		<li><a href="datenverbund_client.php?action=getReservations">Matrikelnummer Reservierungen anzeigen</a></li>
 		<li><a href="datenverbund_client.php?action=getKontingent">Matrikelnummer Kontingent anfordern</a></li>
 		<li><a href="datenverbund_client.php?action=setMatrikelnummer">Matrikelnummer Vergabe melden</a></li>
@@ -120,6 +121,10 @@ $person_id = filter_input(INPUT_POST, 'person_id');
 
 		case 'getByErsatzkennzeichen':
 			printrow('ersatzkennzeichen', 'Ersatzkennzeichen', $ersatzkennzeichen);
+			break;
+		case 'getByNachname':
+			printrow('nachname', 'Nachname', $nachname);
+			printrow('geburtsdatum', 'Geburtsdatum', $geburtsdatum, ' (Format: YYYYMMDD)', 8);
 			break;
 
 		case 'getReservations':
@@ -206,6 +211,26 @@ if (isset($_REQUEST['submit']))
 				echo '<br><b>Matrikelnummer nicht vorhanden:</b>'.$dvb->errormsg;
 			break;
 
+		case 'getByNachname':
+			$data = $dvb->getMatrikelnrByNachname($_POST['nachname'], $_POST['geburtsdatum']);
+
+			if(ErrorHandler::isSuccess($data) && ErrorHandler::hasData($data))
+			{
+				if(isset($data->retval->data) && is_array($data->retval->data) && count($data->retval->data)>0)
+				{
+					echo '<br><b>Daten gefunden:</b> ';
+					var_dump($data->retval);
+				}
+				else
+				{
+					echo 'keine Einträge gefunden';
+				}
+			}
+			else
+			{
+					echo '<br><b>Matrikelnummer nicht vorhanden:</b>'.$dvb->errormsg;
+			}
+			break;
 		case 'getReservations':
 			 $result = $dvb->getReservations(DVB_BILDUNGSEINRICHTUNG_CODE, $_POST['studienjahr']);
 			 if(ErrorHandler::isSuccess($result) && ErrorHandler::hasData($result))

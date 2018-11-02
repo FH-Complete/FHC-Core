@@ -33,6 +33,7 @@ if (!$db = new basis_db())
 
 $limit = '';
 $debug = false;
+$softrun = false;
 
 // Wenn das Script nicht ueber Commandline gestartet wird, muss eine
 // Authentifizierung stattfinden
@@ -55,6 +56,9 @@ if (php_sapi_name() != 'cli')
 
 	if(isset($_GET['limit']) && is_numeric($_GET['limit']))
 		$limit = $_GET['limit'];
+
+	if(isset($_GET['softrun']))
+		$debug = ($_GET['softrun']=='true'?true:false);
 }
 else
 {
@@ -63,13 +67,16 @@ else
 	// zb php matrikelnummer.php --limit 100 --debug true
 	$longopt = array(
 		"limit:",
-		"debug:"
+		"debug:",
+		"softrun:"
 	);
 	$commandlineparams = getopt('', $longopt);
 	if (isset($commandlineparams['limit']) && is_numeric($commandlineparams['limit']))
 		$limit = $commandlineparams['limit'];
 	if (isset($commandlineparams['debug']))
 		$debug = ($commandlineparams['debug']=='true'?true:false);
+	if (isset($commandlineparams['softrun']))
+		$softrun = ($commandlineparams['softrun']=='true'?true:false);
 }
 
 $matrikelnummer_added = 0;
@@ -77,7 +84,7 @@ $webservice = new dvb(DVB_USERNAME, DVB_PASSWORD, $debug);
 
 $qry = "
 	SELECT
-		distinct person_id
+		distinct person_id, vorname, nachname
 	FROM
 		public.tbl_person
 		JOIN public.tbl_benutzer USING(person_id)
@@ -97,7 +104,8 @@ if ($result = $db->db_query($qry))
 {
 	while($row = $db->db_fetch_object($result))
 	{
-		$data = $webservice->assignMatrikelnummer($row->person_id);
+		echo $nl."Pruefe $row->person_id $row->vorname $row->nachname";
+		$data = $webservice->assignMatrikelnummer($row->person_id, $softrun);
 		if(ErrorHandler::isSuccess($data))
 			echo $nl.$row->person_id.' OK';
 		else
