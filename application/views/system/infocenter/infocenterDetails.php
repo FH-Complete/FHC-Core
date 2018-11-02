@@ -15,7 +15,8 @@
 			'navigationwidget' => true,
 			'customCSSs' => array(
 				'public/css/sbadmin2/admintemplate.css',
-				'public/css/sbadmin2/tablesort_bootstrap.css'
+				'public/css/sbadmin2/tablesort_bootstrap.css',
+				'public/css/infocenter/infocenterDetails.css'
 			),
 			'customJSs' => array(
 				'public/js/bootstrapper.js',

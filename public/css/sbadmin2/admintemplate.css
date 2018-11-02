@@ -66,6 +66,10 @@
     text-decoration: none !important;
 }
 
+.panel-footer.solidtop{
+    border-top: 1px solid #ddd
+}
+
 /*required asterisk for labels for required fields*/
 .label-required:after
 {

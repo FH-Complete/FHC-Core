@@ -225,6 +225,7 @@ class Prestudent_model extends DB_Model
 
 			if (count($studienordnung->retval) > 0)
 			{
+				$lastStatus->retval[0]->studiengangkurzbzlang = $studienordnung->retval[0]->studiengangkurzbzlang;
 				$lastStatus->retval[0]->studiengangbezeichnung = $studienordnung->retval[0]->studiengangbezeichnung;
 				$lastStatus->retval[0]->studiengangbezeichnung_englisch = $studienordnung->retval[0]->studiengangbezeichnung_englisch;
 			}
@@ -290,20 +291,20 @@ class Prestudent_model extends DB_Model
 	}
 
 	/**
-	 * Returns a list with Bewerber (applicants)
+	 * Returns a list with Bewerbungen (applications)
 	 * @param $person_id person who sent application(s)
 	 * @param string $studiensemester_kurzbz
 	 * @param bool $abgeschickt optional, wether application was filled out and sent
 	 * @param bool $bestaetigt optional, wether application was confirmed by infocenter
 	 * @return array with Bewerber
 	 */
-	public function getBewerber($person_id, $studiensemester_kurzbz = null, $abgeschickt = null, $bestaetigt = null)
+	public function getBewerbungen($person_id, $studiensemester_kurzbz = null, $abgeschickt = null, $bestaetigt = null)
 	{
-		$bewerber = array();
+		$bewerbungen = array();
 		$prestudents = $this->loadWhere(array('person_id' => $person_id));
 
 		if (!hasData($prestudents))
-			return $bewerber;
+			return $bewerbungen;
 
 		$this->load->model('crm/prestudentstatus_model', 'PrestudentstatusModel');
 
@@ -333,11 +334,11 @@ class Prestudent_model extends DB_Model
 			if ($bestaetigtcond && $abgeschicktcond)
 			{
 				$prestudent->lastStatus = $lastStatus;
-				$bewerber[] = $prestudent;
+				$bewerbungen[] = $prestudent;
 			}
 		}
 
-		return $bewerber;
+		return $bewerbungen;
 	}
 
 	/**
@@ -360,7 +361,7 @@ class Prestudent_model extends DB_Model
 
 		$person_id = $prestudent->retval[0]->person_id;
 
-		$bewerberarr = $this->getBewerber($person_id, $studiensemester);
+		$bewerberarr = $this->getBewerbungen($person_id, $studiensemester);
 
 		//Prio can be added when prio is null and there is only one prestudent
 		if (count($bewerberarr) === 1 && !isset($prestudent->retval[0]->priorisierung) && $change < 0)
@@ -436,7 +437,7 @@ class Prestudent_model extends DB_Model
 		$difftonext = PHP_INT_MAX;
 		$neighbour = null;
 
-		$bewerberarr = $this->getBewerber($person_id, $studiensemester_kurzbz );
+		$bewerberarr = $this->getBewerbungen($person_id, $studiensemester_kurzbz );
 
 		foreach ($bewerberarr as $bewerber)
 		{

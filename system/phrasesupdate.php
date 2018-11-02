@@ -992,6 +992,27 @@ $phrases = array(
 		)
 	),
 
+	array(
+		'app' => 'core',
+		'category' => 'global',
+		'phrase' => 'ohne',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'ohne',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'without',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+
 	//*******************************		CORE/ui
 	array(
 		'app' => 'core',

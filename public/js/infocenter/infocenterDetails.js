@@ -152,14 +152,13 @@ var InfocenterDetails = {
 				successCallback: function(data, textStatus, jqXHR) {
 					if (data === true)
 					{
-						InfocenterDetails._refreshZgv();
+						InfocenterDetails._refreshZgv(true);
 					}
 					else
 					{
 						alert("error when saving zgv Prio");
 					}
-				},
-				veilTimeout: 0
+				}
 			}
 		);
 	},
@@ -224,6 +223,55 @@ var InfocenterDetails = {
 				},
 				errorCallback: zgvError,
 				veilTimeout: 0
+			}
+		);
+	},
+	saveAbsage: function(data)
+	{
+		FHC_AjaxClient.ajaxCallPost(
+			CALLED_PATH + '/saveAbsage',
+			data,
+			{
+				successCallback: function(data, textStatus, jqXHR) {
+
+					if (FHC_AjaxClient.hasData(data))
+					{
+						InfocenterDetails._refreshZgv();
+						InfocenterDetails._refreshLog();
+					}
+					else
+					{
+						alert("error when saving Absage");
+					}
+				}
+			}
+		);
+	},
+	saveFreigabe: function(data)
+	{
+		FHC_AjaxClient.ajaxCallPost(
+			CALLED_PATH + '/saveFreigabe',
+			data,
+			{
+				successCallback: function(data, textStatus, jqXHR) {
+
+					console.log(data.error);
+					if (FHC_AjaxClient.hasData(data))
+					{
+						InfocenterDetails._refreshZgv();
+						InfocenterDetails._refreshLog();
+					}
+					else if (data.error === 2 && parseInt(data.retval.prestudent_id, 10))
+					{
+						alert("error when setting accepted documents");
+						InfocenterDetails._refreshZgv();
+						InfocenterDetails._refreshLog();
+					}
+					else
+					{
+						alert("error when saving Freigabe");
+					}
+				}
 			}
 		);
 	},
@@ -439,34 +487,62 @@ var InfocenterDetails = {
 			}
 		);
 
+		$(".saveAbsage").click(function()
+			{
+				$(".absageModal").modal("hide");
+				var prestudent_id = this.id.substr(this.id.indexOf("_") + 1);
+				var statusgrund_id = $("#statusgrselect_" + prestudent_id + " select[name=statusgrund]").val();
+				var data = {"prestudent_id": prestudent_id , "statusgrund": statusgrund_id};
+				InfocenterDetails.saveAbsage(data);
+			}
+		);
+
+		$(".saveFreigabe").click(function()
+			{
+				$(".freigabeModal").modal("hide");
+				var prestudent_id = this.id.substr(this.id.indexOf("_") + 1);
+				var data = {"prestudent_id": prestudent_id};
+				InfocenterDetails.saveFreigabe(data);
+			}
+		)
+
 	},
-	_refreshZgv: function()
+	_refreshZgv: function(preserveCollapseState)
 	{
 		var personid = $("#hiddenpersonid").val();
 
 		var collapsed = {};
 
 		//save if panel is collapsed to preserve collapse state
-		$("#zgvpruefungen").find(".panel-collapse").each(
-			function()
-			{
-				var collapseid = $(this).prop("id");
-				collapsed[collapseid] = !$(this).hasClass('collapse in');
-			}
-		);
+		if (preserveCollapseState)
+		{
+			$("#zgvpruefungen").find(".panel-collapse").each(
+				function()
+				{
+					var collapseid = $(this).prop("id");
+					collapsed[collapseid] = !$(this).hasClass('collapse in');
+				}
+			);
+		}
 
+		//show veil until refresh finished?
+		//FHC_AjaxClient.showVeil();
 		$("#zgvpruefungen").load(
 			CONTROLLER_URL + '/reloadZgvPruefungen/' + personid + '?fhc_controller_id=' + FHC_AjaxClient.getUrlParameter('fhc_controller_id'),
 			function()
 			{
 				InfocenterDetails._addZgvPruefungEvents(personid);
-				for (var i in collapsed)
+				if (preserveCollapseState)
 				{
-					if (collapsed[i])
-						$("#"+i).removeClass("in");
-					else
-						$("#"+i).addClass("in");
+					for (var i in collapsed)
+					{
+						if (collapsed[i])
+							$("#"+i).removeClass("in");
+						else
+							$("#"+i).addClass("in");
+					}
 				}
+				//FHC_AjaxClient.hideVeil();
 			}
 		);
 	},
