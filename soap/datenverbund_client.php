@@ -276,7 +276,7 @@ if (isset($_REQUEST['submit']))
 			break;
 	}
 	if (isset($_POST['debug']))
-		echo '<div style="color: gray">'.$dvb->debug_output.'</div>';
+		echo '<div style="color: gray">'.nl2br(htmlentities($dvb->debug_output)).'</div>';
 }
 
 ?>

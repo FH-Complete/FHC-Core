@@ -449,7 +449,7 @@ class dvb extends basis_db
 			else
 			{
 				$this->errormsg = '';
-				return ErrorHandler::success();
+				return ErrorHandler::error();
 			}
 		}
 		else
@@ -606,7 +606,7 @@ class dvb extends basis_db
 			else
 			{
 				$this->errormsg = '';
-				return ErrorHandler::success();
+				return ErrorHandler::error();
 			}
 		}
 		else
