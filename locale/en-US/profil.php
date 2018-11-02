@@ -5,6 +5,7 @@ $this->phrasen['profil/mitarbeiter']='Employee';
 $this->phrasen['profil/meinCis']='My CIS';
 $this->phrasen['profil/bildHochladen']='Upload picture';
 $this->phrasen['profil/email']='eMail';
+$this->phrasen['profil/kontaktPrivat']='Private Contacts';
 $this->phrasen['profil/intern']='Intern';
 $this->phrasen['profil/alias']='Alias';
 $this->phrasen['profil/homepage']='Homepage';
