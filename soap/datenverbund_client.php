@@ -135,7 +135,7 @@ $person_id = filter_input(INPUT_POST, 'person_id');
 			printrow('geschlecht', 'Geschlecht', $geschlecht, 'Format: M | W', 1);
 			printrow('postleitzahl', 'Postleitzahl', $postleitzahl, '', 10);
 			printrow('staat', 'Staat', $staat, '1-3 Stellen Codex (zb A für Österreich)', 3);
-			printrow('svnr', 'SVNR', $staat);
+			printrow('svnr', 'SVNR', $svnr);
 			printrow('matura', 'Maturadatum', $matura, 'Format: YYYYMMDD (optional)', 10);
 			break;
 
