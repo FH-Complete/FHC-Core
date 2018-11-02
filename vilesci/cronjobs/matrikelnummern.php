@@ -26,6 +26,7 @@ require_once(dirname(__FILE__).'/../../include/basis_db.class.php');
 require_once(dirname(__FILE__).'/../../include/dvb.class.php');
 require_once(dirname(__FILE__).'/../../include/benutzerberechtigung.class.php');
 require_once(dirname(__FILE__).'/../../include/datum.class.php');
+require_once(dirname(__FILE__).'/../../include/errorhandler.class.php');
 
 if (!$db = new basis_db())
 	die('Es konnte keine Verbindung zum Server aufgebaut werden.');
@@ -37,6 +38,7 @@ $debug = false;
 // Authentifizierung stattfinden
 if (php_sapi_name() != 'cli')
 {
+	$nl = '<br>';
 	// Benutzerdefinierte Variablen laden
 	$user = get_uid();
 	loadVariables($user);
@@ -56,6 +58,7 @@ if (php_sapi_name() != 'cli')
 }
 else
 {
+	$nl = "\n";
 	// Commandline Paramter parsen bei Aufruf ueber Cronjob
 	// zb php matrikelnummer.php --limit 100 --debug true
 	$longopt = array(
@@ -83,7 +86,8 @@ $qry = "
 		public.tbl_benutzer.aktiv = true
 		AND tbl_person.matr_nr is null
 		AND studiengang_kz<10000
-		AND EXISTS(SELECT 1 FROM public.tbl_prestudent WHERE person_id=tbl_person.person_id AND bismelden=true)";
+		AND EXISTS(SELECT 1 FROM public.tbl_prestudent WHERE person_id=tbl_person.person_id AND bismelden=true)
+		AND (svnr is not null OR ersatzkennzeichen is not null)";
 
 if ($limit != '')
 	$qry.=" LIMIT ".$limit;
@@ -93,10 +97,11 @@ if ($result = $db->db_query($qry))
 {
 	while($row = $db->db_fetch_object($result))
 	{
-		if($webservice->assignMatrikelnummer($row->person_id))
-			echo "\n<br>".$row->person_id.' OK';
+		$data = $webservice->assignMatrikelnummer($row->person_id);
+		if(ErrorHandler::isSuccess($data))
+			echo $nl.$row->person_id.' OK';
 		else
-			echo "\n<br>".$row->person_id.' Failed:'.$webservice->errormsg;
+			echo $nl.$row->person_id.' Failed:'.$webservice->errormsg;
 	}
 }
 if($debug)
