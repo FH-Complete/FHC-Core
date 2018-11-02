@@ -185,7 +185,7 @@ if (isset($_REQUEST['submit']))
 		case 'getBySvnr':
 			$data = $dvb->getMatrikelnrBySVNR($_POST['svnr']);
 
-			if(ErrorHandler::isSuccess($data))
+			if(ErrorHandler::isSuccess($data) && ErrorHandler::hasData($data))
 			{
 					echo '<br><b>Matrikelnummer vorhanden:</b> '.$data->retval->matrikelnummer;
 					if(isset($data->retval->bpk) && $data->retval->bpk!='')
@@ -200,7 +200,7 @@ if (isset($_REQUEST['submit']))
 		case 'getByErsatzkennzeichen':
 			$data = $dvb->getMatrikelnrByErsatzkennzeichen($_POST['ersatzkennzeichen']);
 
-			if (ErrorHandler::isSuccess($data))
+			if (ErrorHandler::isSuccess($data) && ErrorHandler::hasData($data))
 				echo '<br><b>Matrikelnummer vorhanden:</b>'.$data->retval->matrikelnummer;
 			else
 				echo '<br><b>Matrikelnummer nicht vorhanden:</b>'.$dvb->errormsg;
