@@ -170,7 +170,7 @@ class dvb extends basis_db
 			WHERE
 				tbl_prestudent.person_id=".$this->db_add_param($person->person_id)."
 				AND tbl_benutzer.aktiv
-				AND tbl_prestudentstatus.status_kurzbz='Student'
+				AND tbl_prestudentstatus.status_kurzbz in('Student','Incoming')
 				AND tbl_prestudent.bismelden
 			ORDER BY tbl_prestudentstatus.datum desc LIMIT 1
 			";
