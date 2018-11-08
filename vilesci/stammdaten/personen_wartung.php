@@ -152,7 +152,8 @@ if (isset($personToDelete) && isset($personToKeep) && $personToDelete >= 0 && $p
 			}
 
 			// Wenn beide Personen eine Matr_nr haben, abbrechen
-			if (($personToDelete_obj->matr_nr != '' && $personToKeep_obj->matr_nr != ''))
+			if ($personToDelete_obj->matr_nr != '' && $personToKeep_obj->matr_nr != ''
+				&& $personToDelete_obj->matr_nr != $personToKeep_obj->matr_nr)
 			{
 				$msg_error[] = 'Beide Personen haben eine Matrikelnummer und können nicht zusammengelegt werden.<br>
 						Bitte wenden Sie sich an einen Administrator.';
