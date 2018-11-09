@@ -241,6 +241,7 @@ $qryall='
 		JOIN bis.tbl_bisverwendung ON (uid=mitarbeiter_uid)
 	WHERE
 		aktiv=false
+		and bismelden=true
 		AND (ende>now() OR ende IS NULL)
 	GROUP BY uid, nachname, vorname
 	ORDER by nachname, vorname;';
