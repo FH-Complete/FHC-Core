@@ -1117,7 +1117,7 @@ class dvb extends basis_db
 	 * @param $strasse Strasse der Person (optional).
 	 * @return BPK or false on error.
 	 */
-	private function pruefeBPK($geburtsdatum, $vorname, $nachname, $geschlecht, $plz = null, $strasse = null)
+	public function pruefeBPK($geburtsdatum, $vorname, $nachname, $geschlecht, $plz = null, $strasse = null)
 	{
 		if ($this->tokenIsExpired())
 		{
@@ -1211,6 +1211,18 @@ class dvb extends basis_db
 			$dom = new DOMDocument();
 			$dom->loadXML($response);
 			$namespace = 'http://www.brz.gv.at/datenverbund-unis';
+			$domnodes_fehlernummer = $dom->getElementsByTagNameNS($namespace, 'fehlernummer');
+			if($domnodes_fehlernummer->length > 0)
+			{
+				$fehlercode = $domnodes_fehlernummer->item(0)->textContent;
+				if($fehlercode == 'ZD00001')
+				{
+					// Zu viele Requests pro Minute
+					$this->debug('Zu viele Requests pro Minute -> Pause');
+					sleep(30);
+				}
+			}
+
 			$domnodes_bpk = $dom->getElementsByTagNameNS($namespace, 'personenkennzeichen');
 			if($domnodes_bpk->length > 0)
 			{
