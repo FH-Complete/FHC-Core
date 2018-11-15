@@ -609,7 +609,7 @@ $text .= "<br><br>Studierender hat keine Matrikelnummer<br><br>";
 
 $qry = "
 SELECT
-	distinct on (person_id)
+	distinct on (tbl_person.person_id)
 	tbl_student.student_uid,
 	tbl_prestudent.prestudent_id,
 	tbl_prestudent.studiengang_kz as studiengang
@@ -618,7 +618,7 @@ FROM
 	JOIN public.tbl_prestudentstatus USING(prestudent_id)
 	JOIN public.tbl_person USING(person_id)
 	JOIN public.tbl_student USING(prestudent_id)
-	JOIN public.tbl_benutzer USING(person_id)
+	JOIN public.tbl_benutzer ON(tbl_student.student_uid=tbl_benutzer.uid)
 WHERE
 	status_kurzbz in('Student', 'Diplomand', 'Absolvent', 'Abbrecher')
 	AND tbl_prestudent.bismelden

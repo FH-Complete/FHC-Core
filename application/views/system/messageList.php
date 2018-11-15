@@ -47,7 +47,8 @@ $widthColumn = $msgExists === true ? 8 : 12;
 		autoresize_min_height: 140,
 		autoresize_max_height: 495,
 		//callback to avoid conflict with ajax (for getting body of first message)
-		init_instance_callback: "initMsgBody"
+		init_instance_callback: "initMsgBody",
+		responsive: true
 	});
 
 	function initMsgBody()

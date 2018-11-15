@@ -85,6 +85,7 @@ $qry = "
 	WHERE
 		public.tbl_benutzer.aktiv = true
 		AND tbl_person.matr_nr is not null
+		AND tbl_person.bpk is null
 		AND studiengang_kz<10000
 		AND EXISTS(SELECT 1 FROM public.tbl_prestudent WHERE person_id=tbl_person.person_id AND bismelden=true)
 		AND gebdatum is not null";
@@ -93,10 +94,17 @@ if ($limit != '')
 	$qry .= " LIMIT ".$limit;
 
 $db = new basis_db();
+$cnt = 0;
 if ($result = $db->db_query($qry))
 {
 	while ($row = $db->db_fetch_object($result))
 	{
+		$cnt++;
+		// Nach jeweils 25 Requests eine Pause einlegen damit die
+		// Anzahl Requests pro Minute nicht überschritten wird
+		if($cnt%25 == 0)
+			sleep(30);
+
 		echo $nl."Pruefe $row->person_id $row->vorname $row->nachname";
 		$data = $webservice->getBPK($row->person_id);
 		if (ErrorHandler::isSuccess($data))

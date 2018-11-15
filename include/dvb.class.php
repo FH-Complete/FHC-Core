@@ -122,6 +122,30 @@ class dvb extends basis_db
 			return ErrorHandler::error();
 		}
 
+		// Wenn nicht gefunden, wird zusaetzlich noch eine Namenssuche gestartet
+		if ($matrikelnummer == false || $matrikelnummer == '')
+		{
+			$this->debug('Keine Matrikelnummer gefunden -> Suche per Nachname');
+			$nachnameresult = $this->existsByNachname($person_id);
+			if (ErrorHandler::isSuccess($nachnameresult))
+			{
+				if (ErrorHandler::hasData($nachnameresult)
+					&& isset($nachnameresult->retval->matrikelnummer)
+					&& $nachnameresult->retval->matrikelnummer != '')
+				{
+					$this->debug('Nachnamensuche erfolgreich');
+					$matrikelnummer = $nachnameresult->retval->matrikelnummer;
+					if(isset($nachnameresult->retval->bpk))
+						$bpk = $nachnameresult->retval->bpk;
+				}
+				else
+				{
+					$this->errormsg = 'Namenssuche ergab nicht eindeutige Treffer -> manuelle Pruefung ist erforderlich';
+					return ErrorHandler::error();
+				}
+			}
+		}
+
 		if ($matrikelnummer !== false && $matrikelnummer != '')
 		{
 			// Matrikelnummer wurde gefunden
@@ -142,12 +166,6 @@ class dvb extends basis_db
 		}
 		else
 		{
-			if($this->existsByName($person_id))
-			{
-				$this->errormsg = 'Namenssuche ergab Treffer -> manuelle Pruefung erforderlich';
-				return ErrorHandler::error();
-			}
-
 			if($softrun == true)
 			{
 				$this->errormsg = 'Nicht gefunden Softrun enabled keine Meldung';
@@ -1099,7 +1117,7 @@ class dvb extends basis_db
 	 * @param $strasse Strasse der Person (optional).
 	 * @return BPK or false on error.
 	 */
-	private function pruefeBPK($geburtsdatum, $vorname, $nachname, $geschlecht, $plz = null, $strasse = null)
+	public function pruefeBPK($geburtsdatum, $vorname, $nachname, $geschlecht, $plz = null, $strasse = null)
 	{
 		if ($this->tokenIsExpired())
 		{
@@ -1193,6 +1211,18 @@ class dvb extends basis_db
 			$dom = new DOMDocument();
 			$dom->loadXML($response);
 			$namespace = 'http://www.brz.gv.at/datenverbund-unis';
+			$domnodes_fehlernummer = $dom->getElementsByTagNameNS($namespace, 'fehlernummer');
+			if($domnodes_fehlernummer->length > 0)
+			{
+				$fehlercode = $domnodes_fehlernummer->item(0)->textContent;
+				if($fehlercode == 'ZD00001')
+				{
+					// Zu viele Requests pro Minute
+					$this->debug('Zu viele Requests pro Minute -> Pause');
+					sleep(30);
+				}
+			}
+
 			$domnodes_bpk = $dom->getElementsByTagNameNS($namespace, 'personenkennzeichen');
 			if($domnodes_bpk->length > 0)
 			{
@@ -1220,7 +1250,13 @@ class dvb extends basis_db
 		}
 	}
 
-	public function existsByName($person_id)
+	/**
+	 * Prueft ob eine Person aufgrund Nachname und Geburtsdatum gefunden wird
+	 * @param $person_id PersonID der gesuchten Person.
+	 * @return Success wenn gefunden, error wenn nicht gefunden. Hat die Person 100% Uebereinstimmung der Daten
+	 * dann wird auch MatrNr und BPK als Retrun geliefert.
+	 */
+	public function existsByNachname($person_id)
 	{
 		$person = new person();
 		if($person->load($person_id))
@@ -1236,18 +1272,46 @@ class dvb extends basis_db
 				{
 					if(isset($row->vorname) && isset($row->nachname))
 					{
+						$this->debug('Eintrag gefunden -> Pruefe Eindeutigkeit');
+						// Vorpruefung des Datenverbund
 						if(mb_substr(mb_strtolower($row->vorname),0,5) == mb_substr(mb_strtolower($person->vorname),0,5)
 						&& mb_substr(mb_strtolower($row->nachname),0,10) == mb_substr(mb_strtolower($person->nachname),0,10))
 						{
-							return true;
+							// Bei 100% eindeutiger Uebereinstimmung werden die Daten zurueckgeliefert
+							if (mb_strtolower($row->geschlecht) == mb_strtolower($person->geschlecht)
+								&& $row->staatsangehoerigkeit == $person->staatsbuergerschaft
+								&& mb_strtolower($row->nachname) == mb_strtolower($person->nachname)
+								&& (
+									mb_strtolower($row->vorname) == mb_strtolower($person->vorname)
+									||
+									mb_strtolower($row->vorname) == mb_strtolower($person->vorname.' '.$person->vornamen)
+									)
+								&& $row->matrikelnummer != ''
+								&& count($result->retval->data) == 1
+								)
+							{
+								$this->debug('Uebereinstimmung gefunden');
+								$retval = new stdClass();
+								if(isset($row->bpk) && $row->bpk!='')
+									$retval->bpk = $row->bpk;
+								$retval->matrikelnummer = $row->matrikelnummer;
+								return ErrorHandler::success($retval);
+							}
+							else
+							{
+								$this->debug('keine 100% Eindeutigkeit gegeben:'.print_r($result->retval->data,true));
+								// Uebereinstimmung gefunden aber nicht 100% eindeutig
+								return ErrorHandler::success();
+							}
 						}
 					}
 				}
-				return false;
+				$this->debug('Keine Uebereinstimmung per Namenssuche');
+				return ErrorHandler::error();
 			}
 			else
 			{
-				return false;
+				return ErrorHandler::error();
 			}
 		}
 	}
@@ -1338,7 +1402,7 @@ class dvb extends basis_db
 					foreach ($domnodes_matrikelnummer as $row)
 					{
 						// MatrikelNr Found
-						$data->matrikelnr = $row->textContent;
+						$data->matrikelnummer = $row->textContent;
 						break;
 					}
 					$domnodes_bpk = $row_student->getElementsByTagNameNS($namespace, 'personenkennzeichen');

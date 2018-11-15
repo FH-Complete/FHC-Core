@@ -55,6 +55,7 @@ $matura = filter_input(INPUT_POST, 'matura');
 $svnr = filter_input(INPUT_POST, 'svnr');
 $ersatzkennzeichen = filter_input(INPUT_POST, 'ersatzkennzeichen');
 $person_id = filter_input(INPUT_POST, 'person_id');
+$strasse = filter_input(INPUT_POST, 'strasse');
 
 ?><!DOCTYPE html>
 <html>
@@ -78,6 +79,7 @@ $person_id = filter_input(INPUT_POST, 'person_id');
 		<li><a href="datenverbund_client.php?action=setMatrikelnummer">Matrikelnummer Vergabe melden</a></li>
 		<li><a href="datenverbund_client.php?action=assignMatrikelnummer">Gesamtprozess (Abfrage, ggf Vergabemeldung, Speichern bei Person)</a></li>
 		<li><a href="datenverbund_client.php?action=getBPK">BPK ermitteln</a></li>
+		<li><a href="datenverbund_client.php?action=pruefeBPK">BPK ermitteln manuell</a></li>
 	</ul>
 	<?php
 	echo "<br>Portal: ".DVB_PORTAL;
@@ -150,6 +152,16 @@ $person_id = filter_input(INPUT_POST, 'person_id');
 
 		case 'getBPK':
 			printrow('person_id', 'PersonID', $person_id);
+			break;
+
+		case 'pruefeBPK':
+			printrow('nachname', 'Nachname', $nachname, '', 255);
+			printrow('vorname', 'Vorname', $vorname, '', 30);
+			printrow('geburtsdatum', 'Geburtsdatum', $geburtsdatum, 'Format: YYYYMMDD', 10);
+			printrow('geschlecht', 'Geschlecht', $geschlecht, 'Format: M | W', 1);
+			printrow('postleitzahl', 'Postleitzahl', $postleitzahl, 'optional', 10);
+			printrow('strasse', 'Strasse', $strasse, 'optional', 255);
+
 			break;
 
 		default:
@@ -296,6 +308,15 @@ if (isset($_REQUEST['submit']))
 				echo '<br><b>Fehlgeschlagen:</b>'.$dvb->errormsg;
 			break;
 
+		case 'pruefeBPK':
+			$data = $dvb->pruefeBPK($geburtsdatum, $vorname, $nachname, $geschlecht, $postleitzahl, $strasse);
+			if(ErrorHandler::isSuccess($data))
+			{
+				echo '<br><b>OK BPK:</b> '.$data->retval->bpk;
+			}
+			else
+				echo '<br><b>Fehlgeschlagen:</b>'.$dvb->errormsg;
+			break;
 		default:
 			echo "Unknown action";
 			break;

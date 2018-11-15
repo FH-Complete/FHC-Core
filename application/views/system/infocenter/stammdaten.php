@@ -1,6 +1,12 @@
 <div class="row">
 	<div class="col-lg-6 table-responsive">
 		<table class="table">
+			<?php if (!empty($stammdaten->titelpre)): ?>
+			<tr>
+				<td><strong><?php echo  ucfirst($this->p->t('person','titelpre')) ?></strong></td>
+				<td><?php echo $stammdaten->titelpre ?></td>
+			</tr>
+			<?php endif; ?>
 			<tr>
 				<td><strong><?php echo  ucfirst($this->p->t('person','vorname')) ?></strong></td>
 				<td><?php echo $stammdaten->vorname ?></td>
@@ -10,6 +16,12 @@
 				<td>
 					<?php echo $stammdaten->nachname ?></td>
 			</tr>
+			<?php if (!empty($stammdaten->titelpost)): ?>
+				<tr>
+					<td><strong><?php echo  ucfirst($this->p->t('person','titelpost')) ?></strong></td>
+					<td><?php echo $stammdaten->titelpost ?></td>
+				</tr>
+			<?php endif; ?>
 			<tr>
 				<td><strong><?php echo  ucfirst($this->p->t('person','geburtsdatum')) ?></strong></td>
 				<td>
