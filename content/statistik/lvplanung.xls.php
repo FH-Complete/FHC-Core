@@ -97,7 +97,7 @@ foreach($oe->result as $row)
 {
 	$oe_arr[$row->oe_kurzbz] = $oetyp_arr[$row->organisationseinheittyp_kurzbz].' '.$row->bezeichnung;
 }
-
+$oe_arr[''] = '';
 $stg_obj = new studiengang();
 $stg_obj->getAll('typ, kurzbz', false);
 
@@ -206,8 +206,8 @@ $maxlength[$spalte]=9;
 $worksheet->write($zeile,++$spalte,"LV-Nummer", $format_bold);
 $maxlength[$spalte]=9;
 
-$worksheet->write($zeile,++$spalte,"ALVS", $format_bold);
-$maxlength[$spalte]=9;
+$worksheet->write($zeile,++$spalte,"Semesterstunden", $format_bold);
+$maxlength[$spalte]=15;
 
 $worksheet->write($zeile,++$spalte,"ECTS", $format_bold);
 $maxlength[$spalte]=9;
