@@ -74,8 +74,7 @@ class dvb extends basis_db
 		$person = new person();
 		if (!$person->load($person_id))
 		{
-			$this->errormsg = $person->errormsg;
-			return ErrorHandler::error();
+			return ErrorHandler::error($person->errormsg);
 		}
 
 		$matrikelnummer = false;
@@ -85,9 +84,9 @@ class dvb extends basis_db
 		{
 			$data = $this->getMatrikelnrBySVNR($person->svnr);
 
-			if(ErrorHandler::isSuccess($data))
+			if (ErrorHandler::isSuccess($data))
 			{
-				if(ErrorHandler::hasData($data))
+				if (ErrorHandler::hasData($data))
 				{
 					$matrikelnummer = $data->retval->matrikelnummer;
 					$bpk = $data->retval->bpk;
@@ -95,16 +94,15 @@ class dvb extends basis_db
 			}
 			else
 			{
-				$this->logRequest($person, 'getMatrikelnrBySVNR', false);
 				return ErrorHandler::error();
 			}
 		}
 		elseif ($person->ersatzkennzeichen != '')
 		{
 			$data = $this->getMatrikelnrByErsatzkennzeichen($person->ersatzkennzeichen);
-			if(ErrorHandler::isSuccess($data))
+			if (ErrorHandler::isSuccess($data))
 			{
-				if(ErrorHandler::hasData($data))
+				if (ErrorHandler::hasData($data))
 				{
 					$matrikelnummer = $data->retval->matrikelnummer;
 					$bpk = $data->retval->bpk;
@@ -112,14 +110,13 @@ class dvb extends basis_db
 			}
 			else
 			{
-				$this->logRequest($person, 'getMatrikelnrByErsatzkennzeichen', false);
 				return ErrorHandler::error();
 			}
 		}
 		else
 		{
-			$this->errormsg = 'Person braucht SVNR oder Ersatzkennzeichen';
-			return ErrorHandler::error();
+			$errormsg = 'Person braucht SVNR oder Ersatzkennzeichen';
+			return ErrorHandler::error($errormsg);
 		}
 
 		// Wenn nicht gefunden, wird zusaetzlich noch eine Namenssuche gestartet
@@ -135,13 +132,13 @@ class dvb extends basis_db
 				{
 					$this->debug('Nachnamensuche erfolgreich');
 					$matrikelnummer = $nachnameresult->retval->matrikelnummer;
-					if(isset($nachnameresult->retval->bpk))
+					if (isset($nachnameresult->retval->bpk))
 						$bpk = $nachnameresult->retval->bpk;
 				}
 				else
 				{
-					$this->errormsg = 'Namenssuche ergab nicht eindeutige Treffer -> manuelle Pruefung ist erforderlich';
-					return ErrorHandler::error();
+					$errormsg = 'Namenssuche ergab nicht eindeutige Treffer -> manuelle Pruefung ist erforderlich';
+					return ErrorHandler::error($errormsg);
 				}
 			}
 		}
@@ -160,16 +157,15 @@ class dvb extends basis_db
 
 			if ($person->save())
 			{
-				$this->logRequest($person, 'assignExistingMatrikelnummer', true, $matrikelnummer);
 				return ErrorHandler::success();
 			}
 		}
 		else
 		{
-			if($softrun == true)
+			if ($softrun == true)
 			{
-				$this->errormsg = 'Nicht gefunden Softrun enabled keine Meldung';
-				return ErrorHandler::error();
+				$errormsg = 'Nicht gefunden Softrun enabled keine Meldung';
+				return ErrorHandler::error($errormsg);
 			}
 
 			// Es wurde noch keine Matrikelnummer zu dieser Person zugeordnet
@@ -206,15 +202,15 @@ class dvb extends basis_db
 				else
 				{
 					$this->logRequest($person, 'assignNewMatrikelnummer', false);
-					$this->errormsg = 'Fehler beim Ermitteln des Studienjahrs für diese Person';
-					return ErrorHandler::error();
+					$errormsg = 'Fehler beim Ermitteln des Studienjahrs für diese Person';
+					return ErrorHandler::error($errormsg);
 				}
 			}
 			else
 			{
 				$this->logRequest($person, 'assignNewMatrikelnummer', false);
-				$this->errormsg = 'Fehler beim Ermitteln des Studienjahrs für diese Person';
-				return ErrorHandler::error();
+				$errormsg = 'Fehler beim Ermitteln des Studienjahrs für diese Person';
+				return ErrorHandler::error($errormsg);
 			}
 
 			$studienjahr = substr($studiensemester_kurzbz, 4);
@@ -229,7 +225,7 @@ class dvb extends basis_db
 			// Neue Matrikelnummer aus Kontingent anfordern
 			$data = $this->getKontingent(DVB_BILDUNGSEINRICHTUNG_CODE, $studienjahr);
 
-			if(ErrorHandler::isSuccess($data) && ErrorHandler::hasdata($data))
+			if (ErrorHandler::isSuccess($data) && ErrorHandler::hasdata($data))
 			{
 				$kontingent = $data->retval->kontingent;
 
@@ -244,7 +240,7 @@ class dvb extends basis_db
 					$person_meldung->staat = $person->staatsbuergerschaft;
 					if ($person->svnr != '')
 						$person_meldung->svnr = $person->svnr;
-					else if($person->ersatzkennzeichen != '')
+					else if ($person->ersatzkennzeichen != '')
 						$person_meldung->svnr = $person->ersatzkennzeichen;
 
 					// PLZ der Meldeadresse laden
@@ -268,28 +264,27 @@ class dvb extends basis_db
 						$person->matr_nr = $data->retval->matrikelnummer;
 
 						// Wenn ein BPK bei der Meldung ermittelt wurde, dann dieses auch speichern
-						if(ErrorHandler::hasData($data) && isset($data->retval->bpk) && $data->retval->bpk!='')
+						if (ErrorHandler::hasData($data) && isset($data->retval->bpk) && $data->retval->bpk != '')
 						{
 							$person->bpk = $data->retval->bpk;
 						}
 						if ($person->save())
 						{
-							$this->logRequest($person, 'assignNewMatrikelnummer', true, $matrikelnummer);
 							return ErrorHandler::success();
 						}
 					}
 					else
 					{
 						$this->logRequest($person, 'assignNewMatrikelnummer', false, $person_meldung);
-						$this->errormsg .= 'Vergabe fehlgeschlagen';
-						return ErrorHandler::error();
+						$errormsg = 'Vergabe fehlgeschlagen';
+						return ErrorHandler::error($errormsg);
 					}
 				}
 				else
 				{
 					$this->logRequest($person, 'assignNewMatrikelnummer', false, $studienjahr);
-					$this->errormsg .= 'Failed to get Kontingent';
-					return ErrorHandler::error();
+					$errormsg = 'Failed to get Kontingent';
+					return ErrorHandler::error($errormsg);
 				}
 			}
 		}
@@ -473,7 +468,7 @@ class dvb extends basis_db
 				}
 			}
 
-			if($matrikelnr !== false)
+			if ($matrikelnr !== false)
 			{
 				$retval = new stdClass();
 				$retval->matrikelnummer = $matrikelnr;
@@ -489,8 +484,8 @@ class dvb extends basis_db
 		}
 		else
 		{
-			$this->errormsg = 'Request Failed with HTTP Code:'.$curl_info['http_code'].' and Response:'.$response;
-			return ErrorHandler::error();
+			$errormsg = 'Request Failed with HTTP Code:'.$curl_info['http_code'].' and Response:'.$response;
+			return ErrorHandler::error($errormsg);
 		}
 	}
 
@@ -631,7 +626,7 @@ class dvb extends basis_db
 				}
 			}
 
-			if($matrikelnr != '')
+			if ($matrikelnr != '')
 			{
 				$retval = new stdClass();
 				$retval->matrikelnummer = $matrikelnr;
@@ -646,8 +641,8 @@ class dvb extends basis_db
 		}
 		else
 		{
-			$this->errormsg = 'Request Failed with HTTP Code:'.$curl_info['http_code'].' and Response:'.$xml_response;
-			return ErrorHandler::error();
+			$errormsg = 'Request Failed with HTTP Code:'.$curl_info['http_code'].' and Response:'.$xml_response;
+			return ErrorHandler::error($errormsg);
 		}
 	}
 
@@ -725,8 +720,8 @@ class dvb extends basis_db
 		}
 		else
 		{
-			$this->errormsg = 'Request Failed with HTTP Code:'.$curl_info['http_code'].' and Response:'.$response;
-			return ErrorHandler::error();
+			$errormsg = 'Request Failed with HTTP Code:'.$curl_info['http_code'].' and Response:'.$response;
+			return ErrorHandler::error($errormsg);
 		}
 	}
 
@@ -806,8 +801,8 @@ class dvb extends basis_db
 		}
 		else
 		{
-			$this->errormsg = 'Request Failed with HTTP Code:'.$curl_info['http_code'].' and Response:'.$response;
-			return ErrorHandler::error();
+			$errormsg = 'Request Failed with HTTP Code:'.$curl_info['http_code'].' and Response:'.$response;
+			return ErrorHandler::error($errormsg);
 		}
 	}
 
@@ -970,11 +965,11 @@ class dvb extends basis_db
 					 * Das BPK wurde vom Datenverbund versucht zu ermitteln und wird in der Fehlermeldung
 					 * zurückgeliefert. Dieses sollte dann gespeichert werden.
 					 */
-					if($fehlernummer->length>0 && $fehlernummer->item(0)->textContent == 'ED10065')
+					if ($fehlernummer->length>0 && $fehlernummer->item(0)->textContent == 'ED10065')
 					{
 						$this->debug('ED10065 Response');
 						$domnodes_feldinhalt = $row->getElementsByTagName('feldinhalt');
-						if($domnodes_feldinhalt->length > 0 && $domnodes_feldinhalt->item(0)->textContent!='')
+						if ($domnodes_feldinhalt->length > 0 && $domnodes_feldinhalt->item(0)->textContent!='')
 						{
 							$bpk = $domnodes_feldinhalt->item(0)->textContent;
 							$retval = new stdClass();
@@ -998,8 +993,8 @@ class dvb extends basis_db
 		}
 		else
 		{
-			$this->errormsg = 'Request Failed with HTTP Code:'.$curl_info['http_code'].' and Response:'.$response;
-			return ErrorHandler::error();
+			$errormsg = 'Request Failed with HTTP Code:'.$curl_info['http_code'].' and Response:'.$response;
+			return ErrorHandler::error($errormsg);
 		}
 	}
 
@@ -1023,20 +1018,20 @@ class dvb extends basis_db
 
 			if ($person->gebdatum == '')
 			{
-				$this->errormsg = 'Geburtsdatum ist nicht gesetzt';
-				return ErrorHandler::error();
+				$errormsg = 'Geburtsdatum ist nicht gesetzt';
+				return ErrorHandler::error($errormsg);
 			}
 
 			if ($person->vorname == '')
 			{
-				$this->errormsg = 'Vorname ist nicht gesetzt';
-				return ErrorHandler::error();
+				$errormsg = 'Vorname ist nicht gesetzt';
+				return ErrorHandler::error($errormsg);
 			}
 
 			if ($person->nachname == '')
 			{
-				$this->errormsg = 'Nachname ist nicht gesetzt';
-				return ErrorHandler::error();
+				$errormsg = 'Nachname ist nicht gesetzt';
+				return ErrorHandler::error($errormsg);
 			}
 
 			$geburtsdatum = str_replace("-", "", $person->gebdatum);
@@ -1136,10 +1131,10 @@ class dvb extends basis_db
 		$url .= '&nachname='.curl_escape($curl, $nachname);
 		$url .= '&geschlecht='.curl_escape($curl, $geschlecht);
 
-		if(!is_null($plz))
+		if (!is_null($plz))
 			$url .= '&plz='.curl_escape($curl, $plz);
 
-		if(!is_null($strasse))
+		if (!is_null($strasse))
 			$url .= '&strasse='.curl_escape($curl, $strasse);
 
 		curl_setopt($curl, CURLOPT_URL, $url);
@@ -1212,10 +1207,10 @@ class dvb extends basis_db
 			$dom->loadXML($response);
 			$namespace = 'http://www.brz.gv.at/datenverbund-unis';
 			$domnodes_fehlernummer = $dom->getElementsByTagNameNS($namespace, 'fehlernummer');
-			if($domnodes_fehlernummer->length > 0)
+			if ($domnodes_fehlernummer->length > 0)
 			{
 				$fehlercode = $domnodes_fehlernummer->item(0)->textContent;
-				if($fehlercode == 'ZD00001')
+				if ($fehlercode == 'ZD00001')
 				{
 					// Zu viele Requests pro Minute
 					$this->debug('Zu viele Requests pro Minute -> Pause');
@@ -1224,7 +1219,7 @@ class dvb extends basis_db
 			}
 
 			$domnodes_bpk = $dom->getElementsByTagNameNS($namespace, 'personenkennzeichen');
-			if($domnodes_bpk->length > 0)
+			if ($domnodes_bpk->length > 0)
 			{
 				$retval = new stdClass();
 				$retval->bpk = $domnodes_bpk->item(0)->textContent;
@@ -1234,19 +1229,19 @@ class dvb extends basis_db
 			{
 				$retval = new stdClass();
 				$domnodes_personen = $dom->getElementsByTagNameNS($namespace, 'personInfo');
-				if($domnodes_personen->length > 1)
+				if ($domnodes_personen->length > 1)
 				{
 					$retval = new stdClass();
 					$retval->multiple = true;
-					return ErrorHandler::error($retval);
+					return ErrorHandler::error(null, $retval);
 				}
 			}
 			return ErrorHandler::error();
 		}
 		else
 		{
-			$this->errormsg = 'Request Failed with HTTP Code:'.$curl_info['http_code'].' and Response:'.$response;
-			return ErrorHandler::error();
+			$errormsg = 'Request Failed with HTTP Code:'.$curl_info['http_code'].' and Response:'.$response;
+			return ErrorHandler::error($errormsg);
 		}
 	}
 
@@ -1259,22 +1254,22 @@ class dvb extends basis_db
 	public function existsByNachname($person_id)
 	{
 		$person = new person();
-		if($person->load($person_id))
+		if ($person->load($person_id))
 		{
 			$result = $this->getMatrikelnrByNachname($person->nachname, $person->gebdatum);
 
-			if(ErrorHandler::isSuccess($result) && ErrorHandler::hasData($result)
+			if (ErrorHandler::isSuccess($result) && ErrorHandler::hasData($result)
 				&& isset($result->retval->data)
 				&& is_array($result->retval->data)
 				&& count($result->retval->data)>0)
 			{
 				foreach($result->retval->data as $row)
 				{
-					if(isset($row->vorname) && isset($row->nachname))
+					if (isset($row->vorname) && isset($row->nachname))
 					{
 						$this->debug('Eintrag gefunden -> Pruefe Eindeutigkeit');
 						// Vorpruefung des Datenverbund
-						if(mb_substr(mb_strtolower($row->vorname),0,5) == mb_substr(mb_strtolower($person->vorname),0,5)
+						if (mb_substr(mb_strtolower($row->vorname),0,5) == mb_substr(mb_strtolower($person->vorname),0,5)
 						&& mb_substr(mb_strtolower($row->nachname),0,10) == mb_substr(mb_strtolower($person->nachname),0,10))
 						{
 							// Bei 100% eindeutiger Uebereinstimmung werden die Daten zurueckgeliefert
@@ -1292,7 +1287,7 @@ class dvb extends basis_db
 							{
 								$this->debug('Uebereinstimmung gefunden');
 								$retval = new stdClass();
-								if(isset($row->bpk) && $row->bpk!='')
+								if (isset($row->bpk) && $row->bpk!='')
 									$retval->bpk = $row->bpk;
 								$retval->matrikelnummer = $row->matrikelnummer;
 								return ErrorHandler::success($retval);
@@ -1413,16 +1408,16 @@ class dvb extends basis_db
 						break;
 					}
 					$domnodes = $row_student->getElementsByTagNameNS($namespace, 'vorName');
-					if($domnodes->length>0)
+					if ($domnodes->length>0)
 						$data->vorname = $domnodes->item(0)->textContent;
 					$domnodes = $row_student->getElementsByTagNameNS($namespace, 'nachName');
-					if($domnodes->length>0)
+					if ($domnodes->length>0)
 						$data->nachname = $domnodes->item(0)->textContent;
 					$domnodes = $row_student->getElementsByTagNameNS($namespace, 'geschlecht');
-					if($domnodes->length>0)
+					if ($domnodes->length>0)
 						$data->geschlecht = $domnodes->item(0)->textContent;
 					$domnodes = $row_student->getElementsByTagNameNS($namespace, 'staatsAngehoerigkeit');
-					if($domnodes->length>0)
+					if ($domnodes->length > 0)
 						$data->staatsangehoerigkeit = $domnodes->item(0)->textContent;
 
 					$retval->data[] = $data;
@@ -1434,8 +1429,8 @@ class dvb extends basis_db
 		}
 		else
 		{
-			$this->errormsg = 'Request Failed with HTTP Code:'.$curl_info['http_code'].' and Response:'.$response;
-			return ErrorHandler::error();
+			$errormsg = 'Request Failed with HTTP Code:'.$curl_info['http_code'].' and Response:'.$response;
+			return ErrorHandler::error($errormsg);
 		}
 	}
 
