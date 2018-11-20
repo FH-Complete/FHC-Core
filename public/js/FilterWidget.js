@@ -744,7 +744,7 @@ var FHC_FilterWidget = {
 	 */
 	_renderTableDataset: function(data) {
 
-		if (data.hasOwnProperty("checkboxes") && data.checkboxes.trim() != "")
+		if (data.hasOwnProperty("checkboxes") && data.checkboxes!=null && data.checkboxes.trim() != "")
 		{
 			$("#filterTableDataset > thead > tr").append("<th data-filter='false' title='Select'>Select</th>");
 		}
