@@ -1087,7 +1087,7 @@ if($projekt->getProjekteMitarbeiter($user, true))
 
 		$summe=0;
 		$dr = new zeitaufzeichnung();
-		$dr->getDienstreisenUser($user);
+		$dr->getDienstreisenUser($user, 180);
 		$dr_arr = $dr->result;
 
 		//var_dump($dr->result);

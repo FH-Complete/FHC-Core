@@ -210,7 +210,7 @@ if (isset($_REQUEST['submit']))
 			}
 			else
 			{
-					echo '<br><b>Matrikelnummer nicht vorhanden:</b>'.$dvb->errormsg;
+					echo '<br><b>Matrikelnummer nicht vorhanden:</b>'.$data->errormsg;
 			}
 			break;
 
@@ -220,7 +220,7 @@ if (isset($_REQUEST['submit']))
 			if (ErrorHandler::isSuccess($data) && ErrorHandler::hasData($data))
 				echo '<br><b>Matrikelnummer vorhanden:</b>'.$data->retval->matrikelnummer;
 			else
-				echo '<br><b>Matrikelnummer nicht vorhanden:</b>'.$dvb->errormsg;
+				echo '<br><b>Matrikelnummer nicht vorhanden:</b>'.$data->errormsg;
 			break;
 
 		case 'getByNachname':
@@ -240,7 +240,7 @@ if (isset($_REQUEST['submit']))
 			}
 			else
 			{
-					echo '<br><b>Matrikelnummer nicht vorhanden:</b>'.$dvb->errormsg;
+					echo '<br><b>Matrikelnummer nicht vorhanden:</b>'.$data->errormsg;
 			}
 			break;
 		case 'getReservations':
@@ -251,7 +251,7 @@ if (isset($_REQUEST['submit']))
 				if ($reservierteNummern !== false)
 					echo '<br><b>Reservierte Nummern:</b>'.print_r($reservierteNummern, true);
 				else
-					echo '<br><b>Fehlgeschlagen:</b>'.$dvb->errormsg;
+					echo '<br><b>Fehlgeschlagen:</b>'.$data->errormsg;
 			}
 			break;
 
@@ -264,7 +264,7 @@ if (isset($_REQUEST['submit']))
 				if ($kontingent !== false)
 					echo '<br><b>Kontingent:</b>'.print_r($kontingent, true);
 				else
-					echo '<br><b>Fehlgeschlagen:</b>'.$dvb->errormsg;
+					echo '<br><b>Fehlgeschlagen:</b>'.$data->errormsg;
 			}
 			break;
 
@@ -285,7 +285,7 @@ if (isset($_REQUEST['submit']))
 			if (ErrorHandler::isSuccess($result))
 				echo '<br><b>Erfolgreich gemeldet</b>';
 			else
-				echo '<br><b>Fehlgeschlagen:</b>'.$dvb->errormsg;
+				echo '<br><b>Fehlgeschlagen:</b>'.$data->errormsg;
 			break;
 
 		case 'assignMatrikelnummer':
@@ -295,7 +295,7 @@ if (isset($_REQUEST['submit']))
 				echo '<br><b>OK</b>';
 			}
 			else
-				echo '<br><b>Fehlgeschlagen:</b>'.$dvb->errormsg;
+				echo '<br><b>Fehlgeschlagen:</b>'.$data->errormsg;
 			break;
 
 		case 'getBPK':
@@ -305,7 +305,7 @@ if (isset($_REQUEST['submit']))
 				echo '<br><b>OK BPK:</b> '.$data->retval->bpk;
 			}
 			else
-				echo '<br><b>Fehlgeschlagen:</b>'.$dvb->errormsg;
+				echo '<br><b>Fehlgeschlagen:</b>'.$data->errormsg;
 			break;
 
 		case 'pruefeBPK':
@@ -315,7 +315,7 @@ if (isset($_REQUEST['submit']))
 				echo '<br><b>OK BPK:</b> '.$data->retval->bpk;
 			}
 			else
-				echo '<br><b>Fehlgeschlagen:</b>'.$dvb->errormsg;
+				echo '<br><b>Fehlgeschlagen:</b>'.$data->errormsg;
 			break;
 		default:
 			echo "Unknown action";

@@ -300,6 +300,28 @@ $filters = array(
 			}
 		',
 		'oe_kurzbz' => null,
+	),
+	array(
+		'app' => 'core',
+		'dataset_name' => 'overview',
+		'filter_kurzbz' => 'BPKWartung',
+		'description' => '{bPK Uebersicht}',
+		'sort' => 1,
+		'default_filter' => true,
+		'filter' => '
+			{
+				"name": "Fehlende bPK",
+				"columns": [
+					{"name": "person_id"},
+					{"name": "vorname"},
+					{"name": "nachname"},
+					{"name": "svnr"},
+					{"name": "ersatzkennzeichen"}
+				],
+				"filters": []
+			}
+		',
+		'oe_kurzbz' => null,
 	)
 );
 

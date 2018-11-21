@@ -16,27 +16,48 @@ class LogLib
 	const CLASS_POSTFIX = '->';
 	const LINE_SEPARATOR = ':';
 
+	// --------------------------------------------------------------------------------------------------------------
+	// Public methods
+
 	/**
-	 * format
+	 * logDebug
 	 */
-	private function format($class, $function, $line)
+	public function logDebug($message)
 	{
-		$formatted = LogLib::CALLER_PREFIX;
-
-		if (!is_null($class) && $class != '')
-		{
-			$formatted .= $class.LogLib::CLASS_POSTFIX;
-		}
-
-		$formatted .= $function.LogLib::LINE_SEPARATOR.$line.LogLib::CALLER_POSTFIX.' ';
-
-		return $formatted;
+		$this->_log(LogLib::DEBUG, $message);
 	}
 
 	/**
-	 * getCaller
+	 * logInfo
 	 */
-	private function getCaller()
+	public function logInfo($message)
+	{
+		$this->_log(LogLib::INFO, $message);
+	}
+
+	/**
+	 * logError
+	 */
+	public function logError($message)
+	{
+		$this->_log(LogLib::ERROR, $message);
+	}
+
+	// --------------------------------------------------------------------------------------------------------------
+	// Private methods
+
+	/**
+	 * log
+	 */
+	private function _log($level, $message)
+	{
+		log_message($level, $this->_getCaller().$message);
+	}
+
+	/**
+	 * _getCaller
+	 */
+	private function _getCaller()
 	{
 		$classIndex = 3;
 		$functionIndex = 3;
@@ -60,38 +81,23 @@ class LogLib
 			$line = $backtrace_arr[$lineIndex]['line'];
 		}
 
-		return $this->format($class, $function, $line);
+		return $this->_format($class, $function, $line);
 	}
 
 	/**
-	 * log
+	 * format
 	 */
-	private function log($level, $message)
+	private function _format($class, $function, $line)
 	{
-		log_message($level, $this->getCaller().$message);
-	}
+		$formatted = LogLib::CALLER_PREFIX;
 
-	/**
-	 * logDebug
-	 */
-	public function logDebug($message)
-	{
-		$this->log(LogLib::DEBUG, $message);
-	}
+		if (!is_null($class) && $class != '')
+		{
+			$formatted .= $class.LogLib::CLASS_POSTFIX;
+		}
 
-	/**
-	 * logInfo
-	 */
-	public function logInfo($message)
-	{
-		$this->log(LogLib::INFO, $message);
-	}
+		$formatted .= $function.LogLib::LINE_SEPARATOR.$line.LogLib::CALLER_POSTFIX.' ';
 
-	/**
-	 * logError
-	 */
-	public function logError($message)
-	{
-		$this->log(LogLib::ERROR, $message);
+		return $formatted;
 	}
 }

@@ -32,6 +32,7 @@ class ErrorHandler
 	{
 		$data = new stdClass();
 		$data->error = false;
+		$data->errormsg = '';
 		$data->retval = $retval;
 		return $data;
 	}
@@ -41,10 +42,11 @@ class ErrorHandler
 	 * @param $retval object (optional)
 	 * @return result object
 	 */
-	public static function error($retval = '')
+	public static function error($errormsg = '', $retval = '')
 	{
 		$data = new stdClass();
 		$data->error = true;
+		$data->errormsg = $errormsg;
 		$data->retval = $retval;
 		return $data;
 	}
