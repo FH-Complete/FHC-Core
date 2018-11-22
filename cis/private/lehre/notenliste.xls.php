@@ -190,9 +190,9 @@ else
 	$worksheet->write($lines,5,$p->t('global/personenkennzeichen'),$format_border_bottom);
 
 	if(defined('CIS_GESAMTNOTE_PUNKTE') && CIS_GESAMTNOTE_PUNKTE)
-		$worksheet->write($lines,5,$p->t('benotungstool/punkte'),$format_border_bottom);
+		$worksheet->write($lines,6,$p->t('benotungstool/punkte'),$format_border_bottom);
 	else
-		$worksheet->write($lines,5,$p->t('benotungstool/note'),$format_border_bottom);
+		$worksheet->write($lines,6,$p->t('benotungstool/note'),$format_border_bottom);
 
 	$stsem_obj = new studiensemester();
 	$stsem_obj->load($stsem);
