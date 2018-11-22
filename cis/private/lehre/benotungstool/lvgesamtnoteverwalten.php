@@ -803,19 +803,19 @@ if (isset($_REQUEST["freigabe"]) && ($_REQUEST["freigabe"] == 1))
 	{
 		$jetzt = date("Y-m-d H:i:s");
 		$neuenoten = 0;
+
 		$studlist = "<table border='1'>
-			<tr>
-				<td><b>" . $p->t('global/personenkz') . "</b></td>
-				<td><b>" . $p->t('global/nachname') . "</b></td>
-				<td><b>" . $p->t('global/vorname') . "</b></td>";
-		if (defined('CIS_GESAMTNOTE_FREIGABEMAIL_NOTE') && CIS_GESAMTNOTE_FREIGABEMAIL_NOTE)
+		<tr>
+			<td><b>" . $p->t('global/personenkz') . "</b></td>
+			<td><b>" . $p->t('global/nachname') . "</b></td>
+			<td><b>" . $p->t('global/vorname') . "</b></td>";
+
+		if (defined('CIS_GESAMTNOTE_PUNKTE') && CIS_GESAMTNOTE_PUNKTE)
 		{
-			if (defined('CIS_GESAMTNOTE_PUNKTE') && CIS_GESAMTNOTE_PUNKTE)
-			{
-				$studlist .= "<td><b>" . $p->t('benotungstool/punkte') . "</b></td>\n";
-			}
-			$studlist .= "<td><b>" . $p->t('benotungstool/note') . "</b></td>\n";
+			$studlist .= "<td><b>" . $p->t('benotungstool/punkte') . "</b></td>\n";
 		}
+		$studlist .= "<td><b>" . $p->t('benotungstool/note') . "</b></td>\n";
+
 		$studlist .= "<td><b>" . $p->t('benotungstool/bearbeitetvon') . "</b></td></tr>\n";
 
 		// studentenquery
@@ -841,24 +841,25 @@ if (isset($_REQUEST["freigabe"]) && ($_REQUEST["freigabe"] == 1))
 						$lvgesamtnote->freigabedatum = $jetzt;
 						$lvgesamtnote->freigabevon_uid = $user;
 						$lvgesamtnote->save();
+
 						$studlist .= "<tr><td>" . trim($row_stud->matrikelnr) . "</td>";
 						$studlist .= "<td>" . trim($row_stud->nachname) . "</td>";
 						$studlist .= "<td>" . trim($row_stud->vorname) . "</td>";
-						if (defined('CIS_GESAMTNOTE_FREIGABEMAIL_NOTE') && CIS_GESAMTNOTE_FREIGABEMAIL_NOTE)
+
+						if (defined('CIS_GESAMTNOTE_PUNKTE') && CIS_GESAMTNOTE_PUNKTE)
 						{
-							if (defined('CIS_GESAMTNOTE_PUNKTE') && CIS_GESAMTNOTE_PUNKTE)
-							{
-								$studlist .= "<td>";
-								if ($lvgesamtnote->punkte != '')
-									$studlist .= trim(number_format($lvgesamtnote->punkte, 2));
-								$studlist .= "</td>\n";
-							}
-							$studlist .= "<td>" . $noten_array[trim($lvgesamtnote->note)]['bezeichnung_mehrsprachig'][$sprache] . "</td>";
+							$studlist .= "<td>";
+							if ($lvgesamtnote->punkte != '')
+								$studlist .= trim(number_format($lvgesamtnote->punkte, 2));
+							$studlist .= "</td>\n";
 						}
+						$studlist .= "<td>" . $noten_array[trim($lvgesamtnote->note)]['bezeichnung_mehrsprachig'][$sprache] . "</td>";
+
 						$studlist .= "<td>" . $lvgesamtnote->mitarbeiter_uid;
 						if ($lvgesamtnote->updatevon != '')
 							$studlist .= " (" . $lvgesamtnote->updatevon . ")";
 						$studlist .= "</td></tr>\n";
+
 						$neuenoten ++;
 					}
 				}
@@ -883,20 +884,24 @@ if (isset($_REQUEST["freigabe"]) && ($_REQUEST["freigabe"] == 1))
 
 			$mit = new mitarbeiter();
 			$mit->load($user);
+			$name = $mit->anrede.' '.$mit->vorname.' '.$mit->nachname.' ('.$mit->kurzbz.')';
 
-			$freigeber = "<b>" . mb_strtoupper($user) . "</b>";
 			$betreff = 'Notenfreigabe ' . $lv->bezeichnung . ' ' . $lv->orgform_kurzbz . ' - ' . $studienplan_bezeichnung;
 			$mail = new mail($adressen, 'vilesci@' . DOMAIN, $betreff, '');
 			$htmlcontent = "<html>
 				<body>
+					$name hat neue Noten für die Lehrveranstaltung\n\n<br>
 					<b>" . $sg->kuerzel . ' ' . $lv->semester . '.Semester
 					' . $lv->bezeichnung . " " . $lv->orgform_kurzbz . " - " . $stsem . "</b>
-					(" . $lv->semester . ". Sem.)
-					<br><br>" . $p->t('global/benutzer') . " " . $freigeber . " (" . $mit->kurzbz . ")
-					" . $p->t('benotungstool/hatDieLvNotenFuerFolgendeStudenten') . ":
-					<br><br>\n" . $studlist . "
+					<br>eingetragen.\n<br><br>
+					Die Noten können jetzt ins Zeugnis übernommen werden.\n";
+
+			if (defined('CIS_GESAMTNOTE_FREIGABEMAIL_NOTE') && CIS_GESAMTNOTE_FREIGABEMAIL_NOTE)
+				$htmlcontent.= $studlist;
+
+			$htmlcontent.= "
 					<br>Anzahl der Noten:" . $neuenoten . "
-					<br>" . $p->t('abgabetool/mailVerschicktAn') . ": " . $adressen . "
+					<br><br>" . $p->t('abgabetool/mailVerschicktAn') . ": " . $adressen . "
 				</body></html>";
 			$mail->setHTMLContent($htmlcontent);
 			$mail->setReplyTo($lektor_adresse);
