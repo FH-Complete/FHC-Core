@@ -1154,7 +1154,9 @@ function GenerateXMLStudentBlock($row)
 		$datei.="
 		</StudentIn>";
 
-		if($aktstatus=='Student' || $aktstatus=='Diplomand' || $aktstatus=='Praktikant' || $aktstatus=='Outgoing')
+		// Aktive Studierende - keine Incoming, keine Externen GS
+		if(($aktstatus=='Student' || $aktstatus=='Diplomand' || $aktstatus=='Praktikant' || $aktstatus=='Outgoing')
+			&& !($gemeinsamestudien && $kodex_studientyp_array[$row->gsstudientyp_kurzbz]=='E'))
 		{
 			if(!isset($stsem[$storgform][$sem]))
 			{
