@@ -637,6 +637,30 @@ if ($result = $db->db_query($qry))
 	}
 }
 
+/*
+ * Bewerber die nicht zum Reihungstest angetreten gesetzt sind
+ */
+$text .= "<br><br>Studierender hat keine Matrikelnummer<br><br>";
+$lastSem = $studiensemester->getPreviousFrom($aktSem);
+$qry="SELECT vorname, nachname, tbl_prestudent.prestudent_id, studiengang_kz FROM public.tbl_prestudent
+	JOIN public.tbl_prestudentstatus ON(tbl_prestudent.prestudent_id=tbl_prestudentstatus.prestudent_id)
+	JOIN public.tbl_person USING(person_id)
+	LEFT JOIN bis.tbl_orgform USING(orgform_kurzbz)
+	WHERE (studiensemester_kurzbz=".$db->db_add_param($aktSem)." OR studiensemester_kurzbz=".$db->db_add_param($lastSem).")
+	AND tbl_prestudent.studiengang_kz=".$db->db_add_param($studiengang_kz)."
+	AND status_kurzbz='Bewerber' AND reihungstestangetreten=false
+	";
+if ($result = $db->db_query($qry))
+{
+	while ($row = $db->db_fetch_object($result))
+	{
+		$ausgabe[$row->studiengang_kz][15][] = $row->vorname.' '.$row->nachname.
+			' ('.$row->prestudent_id.')';
+		$text .= $row->vorname.' '.$row->nachname.
+			' ('.$row->prestudent_id.')';
+	}
+}
+
 // Ausgabe der Studenten
 foreach ($ausgabe as $stg_kz => $value)
 {
@@ -793,6 +817,15 @@ foreach ($ausgabe as $stg_kz => $value)
 					</tr>
 					<tr>
 						<td colspan='4'><b>Aktive Studierende ohne Matrikelnummer</b></td>
+					</tr>";
+				break;
+			case 15:
+				echo "
+					<tr>
+						<td>&nbsp;</td>
+					</tr>
+					<tr>
+						<td colspan='4'><b>Folgende Personen wurden zu Bewerbern gemacht, sind aber nicht zum Reihungstest angetreten.</b></td>
 					</tr>";
 				break;
 
