@@ -883,7 +883,7 @@ class InfoCenter extends Auth_Controller
 				'filters' => $this->navigationlib->oneLevel(
 					'Filter',					// description
 					'#',						// link
-					(isset($filtersArray['children'])?$filtersArray['children']:''),	// children
+					(isset($filtersArray['children']) ? $filtersArray['children'] : ''), // children
 					'',							// icon
 					true,						// expand
 					null, 						// subscriptDescription
@@ -899,20 +899,18 @@ class InfoCenter extends Auth_Controller
 	/**
 	 * Utility method used to fill elements of the InfoCenter left menu of the main InfoCenter page
 	 */
-	private function _fillFilters($filters, &$tofill)
+	private function _fillFilters($filters, &$toFill)
 	{
-		$toPrint = "%s?%s=%s&%s=%s";
-
 		foreach ($filters as $filterId => $description)
 		{
-			$tofill['children'][] = array(
-				'link' => sprintf(
-					$toPrint,
-					site_url(self::INFOCENTER_URI), 'filter_id', $filterId,
-					FHC_Controller::FHC_CONTROLLER_ID,
-					$this->getControllerId()
-				),
-				'description' => $description
+			$toFill['children'][] = $this->navigationlib->oneLevel(
+				$description,				// description
+				sprintf(
+					'%s?%s=%s',
+					site_url(self::INFOCENTER_URI),
+					'filter_id',
+					$filterId
+				)							// link
 			);
 		}
 	}
@@ -920,20 +918,18 @@ class InfoCenter extends Auth_Controller
 	/**
 	 * Utility method used to fill elements of the InfoCenter left menu of the freigegeben InfoCenter page
 	 */
-	private function _fillFiltersFreigegeben($filters, &$tofill)
+	private function _fillFiltersFreigegeben($filters, &$toFill)
 	{
-		$toPrint = "%s?%s=%s&%s=%s";
-
 		foreach ($filters as $filterId => $description)
 		{
-			$tofill['children'][] = array(
-				'link' => sprintf(
-					$toPrint,
-					site_url(self::INFOCENTER_URI.'/'.self::FREIGEGEBEN_PAGE), 'filter_id', $filterId,
-					FHC_Controller::FHC_CONTROLLER_ID,
-					$this->getControllerId()
-				),
-				'description' => $description
+			$toFill['children'][] = $this->navigationlib->oneLevel(
+				$description,				// description
+				sprintf(
+					'%s?%s=%s',
+					site_url(self::INFOCENTER_URI.'/'.self::FREIGEGEBEN_PAGE),
+					'filter_id',
+					$filterId
+				)							// link
 			);
 		}
 	}
@@ -942,23 +938,26 @@ class InfoCenter extends Auth_Controller
 	 * Utility method used to fill elements of the InfoCenter left menu
 	 * with the list of the custom filter of the authenticated user
 	 */
-	private function _fillCustomFilters($filters, &$tofill)
+	private function _fillCustomFilters($filters, &$toFill)
 	{
-		$toPrint = "%s?%s=%s&%s=%s";
-
 		foreach ($filters as $filterId => $description)
 		{
-			$tofill['children'][] = array(
-				'link' => sprintf(
-					$toPrint,
-					site_url(self::INFOCENTER_URI), 'filter_id', $filterId,
-					FHC_Controller::FHC_CONTROLLER_ID,
-					$this->getControllerId()
-				),
-				'description' => $description,
-				'subscriptDescription' => 'Remove',
-				'subscriptLinkClass' => 'remove-custom-filter',
-				'subscriptLinkValue' => $filterId
+			$toFill['children'][] = $this->navigationlib->oneLevel(
+				$description,				// description
+				sprintf(
+					'%s?%s=%s',
+					site_url(self::INFOCENTER_URI),
+					'filter_id',
+					$filterId
+				),							// link
+				null,						// children
+				'',							// icon
+				false,						// expand
+				'Remove',					// subscriptDescription
+				'remove-custom-filter',		// subscriptLinkClass
+				$filterId,					// subscriptLinkValue
+				null,						// sort
+				null						// requiredPermissions
 			);
 		}
 	}

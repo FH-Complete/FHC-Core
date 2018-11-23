@@ -69,7 +69,7 @@ class NavigationLib
 	public function oneLevel(
 		$description, $link = '#', $children = null, $icon = '', $expand = false,
 		$subscriptDescription = null, $subscriptLinkClass = null, $subscriptLinkValue = null, $target = '',
-		$sort = null, $requiredPermissions = null)
+		$sort = null, $requiredPermissions = null, $subscriptLinkHref = '#')
 	{
 		return array(
 			'description' => $description,
@@ -82,7 +82,8 @@ class NavigationLib
 			'subscriptLinkClass' => $subscriptLinkClass,
 			'subscriptLinkValue' => $subscriptLinkValue,
 			'sort' => $sort,
-			'requiredPermissions' => $requiredPermissions
+			'requiredPermissions' => $requiredPermissions,
+			'subscriptLinkHref' => $subscriptLinkHref
 		);
 	}
 
@@ -235,8 +236,7 @@ class NavigationLib
 						{
 							$extensionArray = array_merge_recursive(
 								$extensionArray,
-								$this->_wildcardsearch($config[$configName],
-								$navigationPage)
+								$this->_wildcardsearch($config[$configName], $navigationPage)
 							);
 						}
 					}
