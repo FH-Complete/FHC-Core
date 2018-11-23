@@ -263,7 +263,6 @@ class FiltersLib
 	public function generateDatasetQuery($query, $filters)
 	{
 		$datasetQuery = 'SELECT * FROM ('.$query.') '.self::DATASET_TABLE_ALIAS;
-		$trimedval = trim($query);
 
 		// If the given query is valid and the parameter filters is an array
 		if (!isEmptyString($query) && $filters != null && is_array($filters))
@@ -366,7 +365,7 @@ class FiltersLib
 	public function removeSelectedField($selectedField)
 	{
 		$removeSelectedField = false;
-		$trimedval = (isset($selectedField)?trim($selectedField):'');
+
 		// Checks the parameter selectedField
 		if (!isEmptyString($selectedField))
 		{
@@ -400,7 +399,7 @@ class FiltersLib
 	public function addSelectedField($selectedField)
 	{
 		$removeSelectedField = false;
-		$trimedval = (isset($selectedField)?trim($selectedField):'');
+
 		// Checks the parameter selectedField
 		if (!isEmptyString($selectedField))
 		{
@@ -429,7 +428,7 @@ class FiltersLib
 	public function removeAppliedFilter($appliedFilter)
 	{
 		$removeAppliedFilter = false;
-		$trimedval = (isset($appliedFilter)?trim($appliedFilter):'');
+
 		// Checks the parameter appliedFilter
 		if (!isEmptyString($appliedFilter))
 		{
@@ -517,7 +516,7 @@ class FiltersLib
 	public function addFilter($filter)
 	{
 		$addFilter = false;
-		$trimedval = (isset($filter)?trim($filter):'');
+
 		// Checks the parameter filter
 		if (!isEmptyString($filter))
 		{
@@ -560,7 +559,7 @@ class FiltersLib
 	public function saveCustomFilter($customFilterDescription)
 	{
 		$saveCustomFilter = false; // by default returns a failure
-		$trimedval = (isset($customFilterDescription)?trim($customFilterDescription):'');
+
 		// Checks parameter customFilterDescription if not valid stop the execution
 		if (isEmptyString($customFilterDescription))
 		{
