@@ -23,6 +23,8 @@ require_once(dirname(__FILE__).'/basis_db.class.php');
 require_once(dirname(__FILE__).'/authentication.class.php');
 require_once(dirname(__FILE__).'/betriebsmittelperson.class.php');
 require_once(dirname(__FILE__).'/personlog.class.php');
+require_once(dirname(__FILE__).'/benutzerberechtigung.class.php');
+require_once(dirname(__FILE__).'/mitarbeiter.class.php');
 
 // Auth: Benutzer des Webportals
 /**
@@ -1109,6 +1111,53 @@ function setLeadingZero($number, $length = 2)
 	if (is_int($number))
 	{
 		return str_pad($number, $length, "0", STR_PAD_LEFT);
+	}
+}
+
+/** Check if uid is a supervisor
+ * 
+ * @param string $uid
+ * @param string $employee_uid
+ * @return boolean True if $uid is direct leader of $employee_uid.
+ */
+function check_isVorgesetzter($uid, $employee_uid)
+{	
+	$mitarbeiter = new Mitarbeiter();
+	$mitarbeiter->getUntergebene($uid);
+	$untergebenen_arr = $mitarbeiter->untergebene;
+	
+	// Check, if uid is an employee of supervisor
+	if (!empty($untergebenen_arr) &&
+		in_array($employee_uid, $untergebenen_arr))
+	{
+		 return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+/** Check if uid is a supervisor on higher oe level
+ * 
+ * @param string $uid
+ * @param string $employee_uid
+ * @return boolean True if $uid is indirect supervisor (leader on higher oe-level)
+ *	of $employee_uid. 
+ */
+function check_isVorgesetzter_indirekt($uid, $employee_uid)
+{
+	$mitarbeiter = new Mitarbeiter();
+	$mitarbeiter->getUntergebene($uid, true);
+	$untergebenen_ofChildOEs_arr = $mitarbeiter->untergebene;
+	
+	if (!empty($untergebenen_ofChildOEs_arr) &&
+		in_array($employee_uid, $untergebenen_ofChildOEs_arr))
+	{
+		return true;
+	}
+	else
+	{
+		return false;
 	}
 }
 
