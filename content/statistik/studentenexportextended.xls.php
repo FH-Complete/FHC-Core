@@ -176,6 +176,8 @@ $worksheet->write($zeile, ++$i, "RT_PUNKTE2", $format_bold);
 $maxlength[$i] = 10;
 $worksheet->write($zeile, ++$i, "RT_GESAMTPUNKTE", $format_bold);
 $maxlength[$i] = 18;
+$worksheet->write($zeile, ++$i, "PRIORITÄT", $format_bold);
+$maxlength[$i] = 8;
 
 // UDF titles
 $udf = new UDF();
@@ -643,6 +645,12 @@ function draw_content($row)
 	if (mb_strlen($row->rt_gesamtpunkte) > $maxlength[$i])
 		$maxlength[$i] = mb_strlen($row->rt_gesamtpunkte);
 	$worksheet->write($zeile, $i, $row->rt_gesamtpunkte);
+	$i++;
+	
+	//RT_Gesamtpunkte
+	if (mb_strlen($row->priorisierung) > $maxlength[$i])
+		$maxlength[$i] = mb_strlen($row->priorisierung);
+		$worksheet->write($zeile, $i, $row->priorisierung);
 	$i++;
 
 	// UDF

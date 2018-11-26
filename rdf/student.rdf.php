@@ -350,6 +350,7 @@ function draw_prestudent($row)
 			<STUDENT:mentor><![CDATA['.$row->mentor.']]></STUDENT:mentor>
 			<STUDENT:gsstudientyp_kurzbz><![CDATA['.$row->gsstudientyp_kurzbz.']]></STUDENT:gsstudientyp_kurzbz>
 			<STUDENT:aufnahmegruppe_kurzbz><![CDATA['.$row->aufnahmegruppe_kurzbz.']]></STUDENT:aufnahmegruppe_kurzbz>
+			<STUDENT:priorisierung><![CDATA['.$row->priorisierung.']]></STUDENT:priorisierung>
 		</RDF:Description>
 	</RDF:li>';
 	}
@@ -471,7 +472,7 @@ if($xmlformat=='rdf')
 			AS email_privat,
 			(SELECT rt_gesamtpunkte as punkte FROM public.tbl_prestudent WHERE prestudent_id=tbl_student.prestudent_id) as punkte,
 			 tbl_prestudent.dual as dual, tbl_prestudent.reihungstest_id, tbl_prestudent.anmeldungreihungstest, p.matr_nr,
-			 tbl_prestudent.gsstudientyp_kurzbz, tbl_prestudent.aufnahmegruppe_kurzbz
+			 tbl_prestudent.gsstudientyp_kurzbz, tbl_prestudent.aufnahmegruppe_kurzbz, tbl_prestudent.priorisierung
 		FROM
 			public.tbl_student
 			JOIN public.tbl_benutzer ON (student_uid=uid)

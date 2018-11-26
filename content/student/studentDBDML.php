@@ -532,6 +532,7 @@ if(!$error)
 				$prestudent->anmerkung = $_POST['anmerkung'];
 				$prestudent->mentor = $_POST['mentor'];
 				$prestudent->gsstudientyp_kurzbz = $_POST['gsstudientyp_kurzbz'];
+				$prestudent->priorisierung = $_POST['priorisierung'];
 				//$prestudent->insertamum = date('Y-m-d H:i:s');
 				//$prestudent->insertvon = $user;
 				$prestudent->updateamum = date('Y-m-d H:i:s');

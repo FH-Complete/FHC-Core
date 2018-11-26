@@ -473,6 +473,10 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 								<label value="Dual" control="student-prestudent-checkbox-dual"/>
 								<checkbox id="student-prestudent-checkbox-dual" checked="false" disabled="true"/>
 							</hbox>
+							<hbox>
+								<label value="Priorität" control="student-prestudent-textbox-priorisierung"/>
+								<textbox id="student-prestudent-textbox-priorisierung" disabled="true"/>
+							</hbox>
 						</row>
 						<row id="student-prestudent-row-mentor">
 						<label value="Mentor" control="student-prestudent-textbox-mentor"/>
