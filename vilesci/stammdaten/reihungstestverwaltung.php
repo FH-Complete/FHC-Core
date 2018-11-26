@@ -53,10 +53,8 @@ require_once('../../include/organisationsform.class.php');
 require_once('../../include/gruppe.class.php');
 require_once('../../include/variable.class.php');
 
-// @todo Allgemein: Beim kopieren auch die Studienplanzuordnungen übernehmen
-//					"Teilgenommen" und "Punkte" werden immer mit false bzw. 0 gespeichert
 
-define('REIHUNGSTEST_ARBEITSPLAETZE_SCHWUND', 5);
+//	"Teilgenommen" und "Punkte" werden immer mit false bzw. 0 gespeichert
 
 if (!$db = new basis_db())
 {
@@ -121,6 +119,9 @@ if(!$rechte->isBerechtigt('lehre/reihungstest'))
 
 $studiengang = new studiengang();
 $studiengang->getAll('typ, kurzbz', false);
+$types = new studiengang();
+$types->getAllTypes();
+$typ = '';
 
 $studiensemester = new Studiensemester();
 $studiensemester->getAll('desc');
@@ -582,6 +583,30 @@ if(isset($_GET['excel']))
 		<script type="text/javascript">
 			$(document).ready(function()
 			{
+				// Set Anmeldefrist 14 Tage vor Testdatum, wenn Testdatum geändert wird
+				$('#rt_datum').change(function()
+				{
+					var testdatum = $(this).val();
+					tag = testdatum.substring(0,2);
+					monat = testdatum.substring(3,5);
+					jahr = testdatum.substring(6,10);
+					var olddate = monat+'/'+tag+'/'+jahr;
+
+					var date = new Date(olddate);
+					var newdate = new Date(date);
+
+					newdate.setDate(newdate.getDate()-14); // 14 Tage abziehen
+
+					var anmeldefrist = new Date(newdate);
+
+					var newTag = anmeldefrist.getDate();
+					var newMonat = anmeldefrist.getMonth()+1; // JavaScript months are 0-11
+					var newJahr = anmeldefrist.getFullYear();
+
+					$('#rt_anmeldefrist').val(newTag + "." + newMonat + "." + newJahr);
+					$('#anmeldefristInfoDiv').html('Die Anmeldefrist wurde automatisch 14 Tage vor Testdatum gesetzt');
+				});
+
 				$(".datepicker_datum").datepicker($.datepicker.regional['de']);
 
 				$( ".timepicker" ).timepicker({
@@ -590,6 +615,16 @@ if(isset($_GET['excel']))
 					minuteText: "Minute",
 					hours: {starts: 7,ends: 22},
 					rows: 4,
+				});
+
+				// Correct width to avoid jump on hover
+				$.extend($.ui.autocomplete.prototype.options, {
+					open: function(event, ui) {
+						$(this).autocomplete("widget").css({
+							"width": ($(".ui-menu-item").width()+ 20 + "px"),
+							"padding-left": "5px"
+							});
+						}
 				});
 
 				$("#ort").autocomplete({
@@ -635,15 +670,26 @@ if(isset($_GET['excel']))
 				});
 
 				$("#studienplan_autocomplete").autocomplete({
-					source: "reihungstestverwaltung_autocomplete.php?autocomplete=studienplan",
+					source: function(request, response) 
+					{
+						$.getJSON("reihungstestverwaltung_autocomplete.php", 
+						{ 
+							autocomplete: 'studienplan',
+							aktiv: 'true',
+							studiensemester_kurzbz: $('#studiensemester_dropdown').val(),
+							term: request.term
+						}, 
+						response);
+					},
 					minLength:2,
 					response: function(event, ui)
 					{
 						//Value und Label fuer die Anzeige setzen
 						for(i in ui.content)
 						{
-							ui.content[i].value=ui.content[i].bezeichnung;
-							ui.content[i].label=ui.content[i].bezeichnung;
+							ui.content[i].value = ui.content[i].bezeichnung;
+							ui.content[i].label = ui.content[i].bezeichnung;
+							ui.content[i].disabled = ui.content[i].disabled;
 						}
 					},
 					select: function(event, ui)
@@ -651,7 +697,16 @@ if(isset($_GET['excel']))
 						//Ausgewaehlte Ressource zuweisen und Textfeld wieder leeren
 						$("#studienplan_id").val(ui.item.studienplan_id);
 					}
-				});
+				}).data("ui-autocomplete")._renderItem = function (ul, item) {
+					//Add the .ui-state-disabled class and don't wrap in <a> if value is empty
+					if(item.disabled == true){
+						return $('<li class="ui-state-disabled" style="opacity: 1; padding: 2px .4em; font-weight: bold">'+item.label+'</li>').appendTo(ul);
+					}else{
+						return $("<li>")
+						.append("<a>" + item.label + "</a>")
+						.appendTo(ul);
+					}
+				};
 
 				// Wenn die Spalten "Absolvierte Tests" oder "Ergebnis" angezeigt werden, wird die Punkteberechnung aktiviert
 				$('#clm_absolviert, #clm_ergebnis').on('click', function()
@@ -675,10 +730,14 @@ if(isset($_GET['excel']))
 							if (localStorage.getItem(i) != null)
 							{
 								$('.'+i).css('display', localStorage.getItem(i));
-								if (localStorage.getItem(i) == 'none')
-									document.getElementById(i).className = 'inactive';
-								else
-									document.getElementById(i).className = 'active';
+								var element =  document.getElementById(i);
+								if (typeof(element) != 'undefined' && element != null)
+								{
+									if (localStorage.getItem(i) == 'none')
+										document.getElementById(i).className = 'inactive';
+									else
+										document.getElementById(i).className = 'active';
+								}
 							}
 						}
 					}
@@ -718,6 +777,13 @@ if(isset($_GET['excel']))
 					$("#"+v.id).checkboxes('range', true);
 				});
 
+				$('.errorMessage').click(function()
+				{
+					$(".errorMessage").fadeTo(500, 0).slideUp(500, function(){
+						$(this).remove();
+					});
+				});
+
 				$('.chkbox').change(function()
 				{
 					if ($("input.chkbox:checked").size() > 0)
@@ -726,6 +792,14 @@ if(isset($_GET['excel']))
 						$("#mailSendButton").html('Mail an alle senden');
 				});
 			});
+
+			window.setTimeout(function()
+			{
+				$(".successMessage").slideUp(500, function()
+				{
+					$(this).remove();
+				});
+			}, 2000);
 
 			function hideColumn(column)
 			{
@@ -891,12 +965,36 @@ if(isset($_GET['excel']))
 		{
 			padding-left: 6px;
 		}
+		.infoDiv
+		{
+			position: fixed;
+			width: 500px;
+			top: 0%;
+			left: 50%;
+			margin-left: -250px; /* Negative half of width. */
+		}
+		.successMessage
+		{
+			color: #155724;
+			background-color: #d4edda;
+			padding: .75rem 1.25rem;
+			border: 1px solid #c3e6cb;
+		}
+		.errorMessage
+		{
+			color: #721c24;
+			background-color: #f8d7da;;
+			padding: .75rem 1.25rem;
+			border: 1px solid #f5c6cb;;
+		}
 		</style>
 	</head>
 	<body class="Background_main">
 	<h2>Reihungstest - Verwaltung</h2>
-<?php
 
+<?php
+$messageSuccess = '';
+$messageError = '';
 // Speichern eines Termines
 if(isset($_POST['speichern']) || isset($_POST['kopieren']))
 {
@@ -921,7 +1019,7 @@ if(isset($_POST['speichern']) || isset($_POST['kopieren']))
 	else
 	{
 		//Neuen Reihungstest anlegen
-		$reihungstest->new=true;
+		$reihungstest->new = true;
 		$reihungstest->insertvon = $user;
 		$reihungstest->insertamum = date('Y-m-d H:i:s');
 	}
@@ -929,13 +1027,22 @@ if(isset($_POST['speichern']) || isset($_POST['kopieren']))
 	//Datum und Uhrzeit pruefen
 	if($_POST['datum']!='' && !$datum_obj->checkDatum($_POST['datum']))
 	{
-		echo '<span class="input_error">Datum ist ungueltig. Das Datum muss im Format DD.MM.JJJJ eingegeben werden<br></span>';
+		$messageError .= '<p>Datum ist ungueltig. Das Datum muss im Format DD.MM.JJJJ eingegeben werden</p>';
 		$error = true;
 	}
 	if($_POST['uhrzeit']!='' && !$datum_obj->checkUhrzeit($_POST['uhrzeit']))
 	{
-		echo '<span class="input_error">Uhrzeit ist ungueltig. Die Uhrzeit muss im Format HH:MM angegeben werden!<br></span>';
+		$messageError .= '<p>Uhrzeit ist ungueltig. Die Uhrzeit muss im Format HH:MM angegeben werden!</p>';
 		$error = true;
+	}
+	// Die Anmeldefrist darf nicht nach dem Testdatum sein
+	if($_POST['anmeldefrist'] != '')
+	{
+		if (strtotime($_POST['anmeldefrist']) > strtotime($_POST['datum']))
+		{
+			$messageError .= '<p>Die Anmeldefrist darf nicht nach dem Testdatum liegen</p>';
+			$error = true;
+		}
 	}
 
 	if(!$error)
@@ -943,19 +1050,20 @@ if(isset($_POST['speichern']) || isset($_POST['kopieren']))
 		if (isset($_POST['kopieren']))
 		{
 			$reihungstest->freigeschaltet = false;
-			$reihungstest->max_teilnehmer = '';
+			$reihungstest->max_teilnehmer = filter_input(INPUT_POST, 'max_teilnehmer', FILTER_VALIDATE_INT);
 			$reihungstest->oeffentlich = false;
 			$reihungstest->stufe = filter_input(INPUT_POST, 'stufe', FILTER_VALIDATE_INT);
 			$reihungstest->aufnahmegruppe_kurzbz = filter_input(INPUT_POST, 'aufnahmegruppe');
 			$reihungstest->anmeldefrist = $datum_obj->formatDatum($_POST['anmeldefrist']);
-			$reihungstest->updateamum = date('Y-m-d H:i:s');
-			$reihungstest->updatevon = $user;
 		}
 		else
 		{
 			$reihungstest->freigeschaltet = isset($_POST['freigeschaltet']);
 			$reihungstest->max_teilnehmer = filter_input(INPUT_POST, 'max_teilnehmer', FILTER_VALIDATE_INT);
-			$reihungstest->oeffentlich = filter_input(INPUT_POST, 'oeffentlich', FILTER_VALIDATE_BOOLEAN);
+			if ($rechte->isBerechtigt('lehre/reihungstestOeffentlich', $_POST['studiengang_kz'], 'suid'))
+			{
+				$reihungstest->oeffentlich = filter_input(INPUT_POST, 'oeffentlich', FILTER_VALIDATE_BOOLEAN);
+			}
 			$reihungstest->stufe = filter_input(INPUT_POST, 'stufe', FILTER_VALIDATE_INT);
 			$reihungstest->aufnahmegruppe_kurzbz = filter_input(INPUT_POST, 'aufnahmegruppe');
 			$reihungstest->anmeldefrist = $datum_obj->formatDatum($_POST['anmeldefrist']);
@@ -976,7 +1084,7 @@ if(isset($_POST['speichern']) || isset($_POST['kopieren']))
 				$ort = new ort();
 
 				if (!$ort->load($_POST['ort_kurzbz']))
-					echo '<span class="input_error">Die Bezeichnung des Ortes ist ungueltig oder wurde nicht gefunden</span>';
+					$messageError .= '<p>Die Bezeichnung des Ortes ist ungueltig oder wurde nicht gefunden</p>';
 				else
 				{
 					if($rechte->isBerechtigt('lehre/reihungstestOrt', null, 'sui'))
@@ -1003,39 +1111,112 @@ if(isset($_POST['speichern']) || isset($_POST['kopieren']))
 
 							if ($add_ort->saveOrtReihungstest())
 							{
-								echo '<b>Daten wurden erfolgreich gespeichert</b> <script>window.opener.StudentReihungstestDropDownRefresh();</script>';
+								$messageSuccess .= '<p><b>Daten wurden erfolgreich gespeichert</b> <script>window.opener.StudentReihungstestDropDownRefresh();</script></p>';
 							}
 							else
-								echo '<span class="input_error">Fehler beim Speichern der Raumzuordnung: '.$db->convert_html_chars($reihungstest->errormsg).'</span>';
+								$messageError .= '<p>Fehler beim Speichern der Raumzuordnung: '.$db->convert_html_chars($reihungstest->errormsg).'</p>';
 						}
 						else
-							echo '<span class="input_error">Der Raum '.$_POST['ort_kurzbz'].' ist bereits diesem Reihungstest zugeteilt</span>';
+							$messageError .= '<p>Der Raum '.$_POST['ort_kurzbz'].' ist bereits diesem Reihungstest zugeteilt</p>';
 					}
 					else
 						die($rechte->errormsg);
 				}
 			}
-			if (isset($_POST['studienplan_id']) && $_POST['studienplan_id']!='')
+			if (isset($_POST['studienplan_id']) && $_POST['studienplan_id'] != '')
 			{
-				$rt_stpl = new reihungstest();
-				$rt_stpl->new = true;
-				$rt_stpl->reihungstest_id = $reihungstest->reihungstest_id;
-				$rt_stpl->studienplan_id = $_POST['studienplan_id'];
-
-				if ($rt_stpl->saveStudienplanReihungstest())
+				$rt_stplaeneArray = array();
+				// Studienpläne laden um nicht doppelt zu speichern
+				$rt_stplaene = new reihungstest();
+				$rt_stplaene->getStudienplaeneReihungstest($reihungstest->reihungstest_id);
+				foreach ($rt_stplaene->result as $key => $value)
 				{
-					echo '<b>Daten wurden erfolgreich gespeichert</b> <script>window.opener.StudentReihungstestDropDownRefresh();</script>';
+					$rt_stplaeneArray[] = $value->studienplan_id;
 				}
-				else
-					echo '<span class="input_error">Fehler beim Speichern des Studienplans: '.$db->convert_html_chars($rt_stpl->errormsg).'</span>';
+
+				// Es können mehrere Studienpläne übergeben werden
+				$studienplaeneArr = explode(',', $_POST['studienplan_id']);
+				$error = false;
+				foreach ($studienplaeneArr AS $studienplan)
+				{
+					$rt_stpl = new reihungstest();
+					$rt_stpl->new = true;
+					$rt_stpl->reihungstest_id = $reihungstest->reihungstest_id;
+					$rt_stpl->studienplan_id = $studienplan;
+					
+					if (!in_array($studienplan, $rt_stplaeneArray))
+					{
+						if (!$rt_stpl->saveStudienplanReihungstest())
+						{
+							$messageError .= '<p>Fehler beim Speichern des Studienplans: '.$db->convert_html_chars($rt_stpl->errormsg).'</p>';
+							$error = true;
+						}
+					}
+				}
+				if ($error == false)
+				{
+					$messageSuccess .= '<p><b>Daten wurden erfolgreich gespeichert</b> <script>window.opener.StudentReihungstestDropDownRefresh();</script></p>';
+				}
 			}
 			$reihungstest_id = $reihungstest->reihungstest_id;
 			$stg_kz = $reihungstest->studiengang_kz;
 			$studiensemester_kurzbz = $reihungstest->studiensemester_kurzbz;
+			// Beim kopieren auch die zugeteilten Studienpläne übernehmen
+			if (isset($_POST['reihungstest_id']) && isset($_POST['kopieren']))
+			{
+				$rt_studienplan = new reihungstest();
+				$rt_studienplan->getStudienplaeneReihungstest($_POST['reihungstest_id']);
+				$error = false;
+				foreach ($rt_studienplan->result as $row) 
+				{
+					$rtKopieStudienplan = new reihungstest();
+					$rtKopieStudienplan->new = true;
+					$rtKopieStudienplan->reihungstest_id = $reihungstest_id;
+					$rtKopieStudienplan->studienplan_id = $row->studienplan_id;
+					if (!$rtKopieStudienplan->saveStudienplanReihungstest())
+						$error = true;
+				}
+				if ($error == true)
+					$messageError .= '<p>Fehler beim übernehmen der Studienpläne</p>';
+			}
+			// Beim kopieren auch die zugeteilten Räume übernehmen
+			if (isset($_POST['reihungstest_id']) && isset($_POST['kopieren']))
+			{
+				$rtOrt = new reihungstest();
+				$rtOrt->getOrteReihungstest($_POST['reihungstest_id']);
+				$error = false;
+				foreach ($rtOrt->result as $row)
+				{
+					$rtKopieOrt = new reihungstest();
+					$rtKopieOrt->new = true;
+					$rtKopieOrt->reihungstest_id = $reihungstest_id;
+					$rtKopieOrt->ort_kurzbz = $row->ort_kurzbz;
+					$rtKopieOrt->uid = '';
+					if (!$rtKopieOrt->saveOrtReihungstest())
+						$error = true;
+				}
+				if ($error == true)
+					$messageError .= '<p>Fehler beim übernehmen der Raumzuteilungen</p>';
+			}
+			if ($reihungstest->new == true)
+			{
+				if (isset($_POST['kopieren']))
+				{
+					$messageSuccess .= '<p>Der Termin wurde erfolgreich kopiert</p>';
+				}
+				else 
+				{
+					$messageSuccess .= '<p>Neuer Reihungstesttermin erfolgreich angelegt</p>';
+				}
+			}
+			else
+			{
+				$messageSuccess .= '<p>Daten wurden erfolgreich gespeichert</p>';
+			}
 		}
 		else
 		{
-			echo '<span class="input_error">Fehler beim Speichern der Daten: '.$db->convert_html_chars($reihungstest->errormsg).'</span>';
+			$messageError .= '<p>Fehler beim Speichern der Daten: '.$db->convert_html_chars($reihungstest->errormsg).'</p>';
 		}
 	}
 	$neu=false;
@@ -1104,15 +1285,15 @@ if(isset($_POST['raumzuteilung_speichern']))
 					$raumzuteilung->reihungstest_id = $load_person->reihungstest_id;
 					$raumzuteilung->person_id = $key;
 					$raumzuteilung->ort_kurzbz = $_POST['raumzuteilung'];
-                    $raumzuteilung->updateamum = date('Y-m-d H:i:s');
-                    $raumzuteilung->updatevon = $user;
+					$raumzuteilung->updateamum = date('Y-m-d H:i:s');
+					$raumzuteilung->updatevon = $user;
 				}
 				else
 					die('PersonID '.$key.' hat keine korrekte Zuordnung -> Abbruch');
 
 				if (!$raumzuteilung->savePersonReihungstest())
 				{
-					echo '<span class="input_error">Fehler beim Speichern der Daten: '.$db->convert_html_chars($reihungstest->errormsg).'</span>';
+					$messageError .= '<p>Fehler beim Speichern der Daten: '.$db->convert_html_chars($reihungstest->errormsg).'<p>';
 				}
 			}
 		}
@@ -1134,16 +1315,16 @@ if(isset($_GET['type']) && $_GET['type']=='savertpunkte')
 		$rtperson->punkte = str_replace(',','.',$rtpunkte);
 		$rtperson->new = false;
 		$rtperson->teilgenommen = true;
-        $rtperson->updateamum = date('Y-m-d H:i:s');
-        $rtperson->updatevon = $user;
+		$rtperson->updateamum = date('Y-m-d H:i:s');
+		$rtperson->updatevon = $user;
 		if(!$rtperson->savePersonReihungstest())
 		{
-			echo '<span class="error">Fehler:'.$rtperson->errormsg.'</span>';
+			$messageError .= '<p>Fehler:'.$rtperson->errormsg.'</p>';
 		}
 	}
 	else
 	{
-		echo '<span class="input_error"><br>Sie haben keine Berechtigung zur Uebernahme der Punkte fuer '.$db->convert_html_chars($row->nachname).' '.$db->convert_html_chars($row->vorname).'</span>';
+		$messageError .= '<p><br>Sie haben keine Berechtigung zur Uebernahme der Punkte fuer '.$db->convert_html_chars($row->nachname).' '.$db->convert_html_chars($row->vorname).'</p>';
 	}
 }
 
@@ -1211,7 +1392,7 @@ if(isset($_GET['type']) && $_GET['type']=='saveallrtpunkte')
 		}
 		if($errormsg!='')
 		{
-			echo '<span class="input_error">'.$db->convert_html_chars($errormsg).'</span>';
+			$messageError .= '<p>'.$db->convert_html_chars($errormsg).'</p>';
 		}
 	}
 }
@@ -1290,7 +1471,7 @@ if(isset($_GET['type']) && $_GET['type']=='verteilen')
 
 							if (!$raumzuteilung->savePersonReihungstest())
 							{
-								echo '<span class="input_error">Fehler beim Speichern der Daten: '.$db->convert_html_chars($raumzuteilung->errormsg).'</span>';
+								$messageError .= '<p>Fehler beim Speichern der Daten: '.$db->convert_html_chars($raumzuteilung->errormsg).'</p>';
 							}
 							$counter++;
 
@@ -1303,7 +1484,7 @@ if(isset($_GET['type']) && $_GET['type']=='verteilen')
 			}
 			else
 			{
-				echo '<span class="error">Nicht genug Raumkapazität vorhanden</span>';
+				$messageError .= '<p>Nicht genug Raumkapazität vorhanden</p>';
 			}
 		}
 
@@ -1379,7 +1560,7 @@ if(isset($_GET['type']) && $_GET['type']=='auffuellen')
 
 					if (!$raumzuteilung->savePersonReihungstest())
 					{
-						echo '<span class="input_error">Fehler beim Speichern der Daten: '.$db->convert_html_chars($raumzuteilung->errormsg).'</span>';
+						$messageError .= '<p>Fehler beim Speichern der Daten: '.$db->convert_html_chars($raumzuteilung->errormsg).'</p>';
 					}
 					$counter++;
 
@@ -1421,7 +1602,7 @@ if(isset($_POST['aufsicht']) && $_POST['aufsicht']!='' && !isset($_POST['kopiere
 
 			$benutzer = new benutzer();
 			if ($uid!='' && !$benutzer->load($uid))
-				echo '<span class="input_error">Die UID '.$value.' konnte nicht gefunden werden</span>';
+				$messageError .= '<p>Die UID '.$value.' konnte nicht gefunden werden</p>';
 			else
 			{
 				$save_aufsicht->new = false;
@@ -1430,7 +1611,7 @@ if(isset($_POST['aufsicht']) && $_POST['aufsicht']!='' && !isset($_POST['kopiere
 				$save_aufsicht->uid = $uid;
 				if (!$save_aufsicht->saveOrtReihungstest())
 				{
-					echo '<span class="input_error">Fehler beim Speichern der Daten: '.$db->convert_html_chars($reihungstest->errormsg).'</span>';
+					$messageError .= '<p>Fehler beim Speichern der Daten: '.$db->convert_html_chars($reihungstest->errormsg).'</p>';
 				}
 			}
 		}
@@ -1455,10 +1636,10 @@ if(isset($_POST['delete_ort']))
 		if (count($delete_ort->result) == 0)
 		{
 			if (!$delete_ort->deleteOrtReihungstest($_POST['reihungstest_id'], $_POST['delete_ort']))
-				echo '<span class="input_error">Fehler beim löschen der Raumzuordnung: '.$db->convert_html_chars($reihungstest->errormsg).'</span>';
+				$messageError .= '<p>Fehler beim löschen der Raumzuordnung: '.$db->convert_html_chars($reihungstest->errormsg).'</p>';
 		}
 		else
-			echo '<span class="input_error">Dem Raum '.$_POST['delete_ort'].' sind noch '.count($delete_ort->result).' Personen zugeteilt. Bitte entfernen Sie zuerst diese Zuteilungen</span>';
+			$messageError .= '<p>Dem Raum '.$_POST['delete_ort'].' sind noch '.count($delete_ort->result).' Personen zugeteilt. Bitte entfernen Sie zuerst diese Zuteilungen</p>';
 
 		$reihungstest_id = $_POST['reihungstest_id'];
 		$studiensemester_kurzbz = $_POST['studiensemester_kurzbz'];
@@ -1473,7 +1654,7 @@ if(isset($_POST['delete_studienplan'])) //@todo: Check, ob Zuordnungen zu diesem
 		$delete_studienplan = new reihungstest();
 
 		if (!$delete_studienplan->deleteStudienplanReihungstest($_POST['reihungstest_id'], $_POST['delete_studienplan']))
-			echo '<span class="input_error">Fehler beim löschen der Studienplanzuteilung: '.$db->convert_html_chars($delete_studienplan->errormsg).'</span>';
+			$messageError .= '<p>Fehler beim löschen der Studienplanzuteilung: '.$db->convert_html_chars($delete_studienplan->errormsg).'</p>';
 
 		$reihungstest_id = $_POST['reihungstest_id'];
 		$studiensemester_kurzbz = $_POST['studiensemester_kurzbz'];
@@ -1488,13 +1669,24 @@ if(isset($_POST['deleteReihungstest'])) //@todo: Check, ob Zuordnungen zu diesem
 		$deleteReihungstest = new reihungstest();
 
 		if (!$deleteReihungstest->delete($_POST['reihungstest_id']))
-			echo '<span class="input_error">Fehler beim löschen des Reihungstests: '.$db->convert_html_chars($deleteReihungstest->errormsg).'</span>';
+			$messageError .= '<p>Fehler beim löschen des Reihungstests: '.$db->convert_html_chars($deleteReihungstest->errormsg).'</p>';
 
 		$reihungstest_id = '';
 		$studiensemester_kurzbz = $_POST['studiensemester_kurzbz'];
 	}
 	$neu = true;
 }
+
+echo '<div class="infoDiv">';
+if ($messageSuccess != '')
+{
+	echo '<div class="successMessage">'.$messageSuccess.'</div>';
+}
+if ($messageError != '')
+{
+	echo '<div class="errorMessage">'.$messageError.'</div>';
+}
+echo '</div>';
 
 echo '<table width="100%"><tr><td>';
 
@@ -1509,14 +1701,25 @@ echo "<OPTION value='".$_SERVER['PHP_SELF']."?stg_kz=-1&studiensemester_kurzbz="
 foreach ($studiengang->result as $row)
 {
 	$stg_arr[$row->studiengang_kz] = $row->kuerzel;
-	if($stg_kz=='')
-		$stg_kz=$row->studiengang_kz;
-	if($row->studiengang_kz==$stg_kz)
-		$selected='selected';
+	
+	if ($typ != $row->typ || $typ == '')
+	{
+		if ($typ != '')
+		{
+			echo '</optgroup>';
+		}
+		echo '<optgroup label="'.($types->studiengang_typ_arr[$row->typ] != ''?$types->studiengang_typ_arr[$row->typ]:$row->typ).'">';
+	}
+	
+	if ($stg_kz == '')
+		$stg_kz = $row->studiengang_kz;
+	if ($row->studiengang_kz == $stg_kz)
+		$selected = 'selected';
 	else
-		$selected='';
-
-	echo "<OPTION value='".$_SERVER['PHP_SELF']."?stg_kz=$row->studiengang_kz&studiensemester_kurzbz=$studiensemester_kurzbz' $selected>".$db->convert_html_chars($row->kuerzel)." (".$db->convert_html_chars($row->bezeichnung).")</OPTION>"."\n";
+		$selected = '';
+	
+	echo "<OPTION value='" . $_SERVER['PHP_SELF'] . "?stg_kz=$row->studiengang_kz&studiensemester_kurzbz=$studiensemester_kurzbz' $selected>" . $db->convert_html_chars($row->kuerzel) . " (" . $db->convert_html_chars($row->bezeichnung) . ")</OPTION>" . "\n";
+	$typ = $row->typ;
 }
 echo "</SELECT>";
 $studienplan_obj = new studienplan();
@@ -1865,20 +2068,23 @@ $studienplaene_list = implode(',', array_keys($studienplaene_arr));
 		<td style="padding-left: 20px; vertical-align: top">
 		<table>
 		<tr>
-			<td class="feldtitel">Anmerkung</td>
+			<td class="feldtitel">Anmerkung (intern)</td>
 			<td><input type="text" size="64" maxlength="64" name="anmerkung" value="<?php echo $db->convert_html_chars($reihungstest->anmerkung) ?>"> (max. 64 Zeichen)</td>
 		</tr>
 		<tr>
 			<td class="feldtitel">Datum</td>
-			<td><input class="datepicker_datum" type="text" name="datum" value="<?php echo $datum_obj->convertISODate($reihungstest->datum) ?>"></td>
+			<td><input id="rt_datum" class="datepicker_datum" type="text" name="datum" value="<?php echo $datum_obj->convertISODate($reihungstest->datum) ?>"></td>
 		</tr>
 		<tr>
 			<td class="feldtitel">Uhrzeit</td>
 			<td><input type="text" class="timepicker" name="uhrzeit" value="<?php echo $db->convert_html_chars($datum_obj->formatDatum($reihungstest->uhrzeit,'H:i')) ?>" placeholder="HH:MM"> (Format: HH:MM)</td>
 		</tr>
 		<tr>
-			<td class="feldtitel">Anmeldefrist</td>
-			<td><input class="datepicker_datum" type="text" name="anmeldefrist" value="<?php echo $datum_obj->convertISODate($reihungstest->anmeldefrist) ?>"></td>
+			<td class="feldtitel">Anmeldefrist (inkl.)</td>
+			<td>
+				<input id="rt_anmeldefrist" class="datepicker_datum" type="text" name="anmeldefrist" value="<?php echo $datum_obj->convertISODate($reihungstest->anmeldefrist) ?>">
+				<span id="anmeldefristInfoDiv" style="color: red;"></span>
+			</td>
 		</tr>
 		<tr>
 			<td class="feldtitel">Max TeilnehmerInnen</td>
@@ -1893,7 +2099,7 @@ $studienplaene_list = implode(',', array_keys($studienplaene_arr));
 				?>
 			</td>
 		</tr>
-		<tr>
+		<tr <?php echo ($rechte->isBerechtigt('lehre/reihungstestOeffentlich', $reihungstest->studiengang_kz, 'suid') ? '' : 'style="display:none"') ?>>
 			<td class="feldtitel">Öffentlich</td>
 			<td>
 				<input type="hidden" name="oeffentlich" value="0">
@@ -1921,7 +2127,7 @@ $studienplaene_list = implode(',', array_keys($studienplaene_arr));
 				<button type="submit" name="speichern"><?php echo $val ?></button>
 				<?php
 					if(!$neu)
-						echo '<button type="submit" name="kopieren" onclick="return confirm (\'Eine Kopie dieses Tests (ohne Raumzuordnung) erstellen?\')">Kopie erstellen</button>';
+						echo '<button type="submit" name="kopieren" onclick="return confirm (\'Eine Kopie dieses Termins erstellen?\')">Kopie erstellen</button>';
 
 					if($rechte->isBerechtigt('lehre/reihungstest', null, 'suid'))
 					{
