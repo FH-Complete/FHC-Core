@@ -506,6 +506,69 @@ class reihungstest extends basis_db
 			return false;
 		}
 	}
+	
+	/**
+	 * Laedt die Anzahl an verfügbaren Plätzen bei einem Reihungstest.
+	 * Wenn max_teilnehmer gesetzt ist, wird dieser Wert zurückgegeben.
+	 * Ansonsten wird die Anzahl der verfügbaren Arbeitspläte aus den zugeteilten Räumen ermittelt. 
+	 * Hier kann optional ein Prozentanteil für den Schwund übergeben werden, der von den verfügbaren Plätzen abgezogen wird. 
+	 * 
+	 * @param integer $reihungstest_id ID des Reihungstests.
+	 * @param integer $anteilSchwund Prozentanteil für den Schwund, der herausgerechnet werden soll
+	 * @return integer Anzahl der Teilnehmer oder false im Fehlerfall
+	 */
+	public function getVerfuegbarePlaetzeReihungstest($reihungstest_id, $anteilSchwund = null)
+	{
+		$qry = "SELECT (
+					CASE 
+						WHEN (
+								SELECT max_teilnehmer
+								FROM PUBLIC.tbl_reihungstest
+								WHERE reihungstest_id = rt.reihungstest_id
+								) IS NOT NULL
+							THEN (
+									SELECT max_teilnehmer
+									FROM PUBLIC.tbl_reihungstest
+									WHERE reihungstest_id = rt.reihungstest_id
+									)
+						ELSE (";
+		if ($anteilSchwund != '' && is_numeric($anteilSchwund))
+		{
+			$qry .= "			SELECT sum(arbeitsplaetze) - (round((sum(arbeitsplaetze)::FLOAT / 100)::FLOAT * " . $anteilSchwund . ")) AS arbeitsplaetze
+								FROM PUBLIC.tbl_rt_ort
+								JOIN PUBLIC.tbl_ort USING (ort_kurzbz)
+								WHERE rt_id = rt.reihungstest_id";
+		}
+		else
+		{
+					$qry .= "	SELECT sum(arbeitsplaetze) AS arbeitsplaetze
+								FROM PUBLIC.tbl_rt_ort
+								JOIN PUBLIC.tbl_ort USING (ort_kurzbz)
+								WHERE rt_id = rt.reihungstest_id";
+		}
+				$qry .= "	)
+						END
+					) AS anzahl_plaetze
+			FROM PUBLIC.tbl_reihungstest rt WHERE reihungstest_id=".$this->db_add_param($reihungstest_id, FHC_INTEGER);
+		
+		if ($result = $this->db_query($qry))
+		{
+			if ($row = $this->db_fetch_object($result))
+			{
+				return $row->anzahl_plaetze;
+			}
+			else
+			{
+				$this->errormsg = 'Fehler beim Laden der verfuegbaren Plaetze';
+				return false;
+			}
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim ausfuehren der Query';
+			return false;
+		}
+	}
 
 	/**
 	 * Loescht einen Rehungstest
@@ -580,17 +643,39 @@ class reihungstest extends basis_db
 
 	/**
 	 * Laedt die Reihungstest Zuordnungen einer Person
+	 * Optional kann ein Studiensemester übergeben werden, in welchem der Reihungstest liegen soll
 	 * @param int $person_id ID der Person.
 	 * @return boolean true wenn erfolgreich, false im Fehlerfall
 	 */
-	public function getReihungstestPerson($person_id)
+	public function getReihungstestPerson($person_id, $studiensemester_kurzbz = null)
 	{
-		$qry = "SELECT
-					*
+		$qry = "SELECT 
+					tbl_rt_person.*,
+					tbl_reihungstest.studiengang_kz,
+					tbl_reihungstest.anmerkung,
+					tbl_reihungstest.datum,
+					tbl_reihungstest.uhrzeit,
+					tbl_reihungstest.ext_id,
+					tbl_reihungstest.max_teilnehmer,
+					tbl_reihungstest.oeffentlich,
+					tbl_reihungstest.freigeschaltet,
+					tbl_reihungstest.studiensemester_kurzbz,
+					tbl_reihungstest.stufe,
+					tbl_reihungstest.anmeldefrist,
+					tbl_reihungstest.aufnahmegruppe_kurzbz
 				FROM
 					public.tbl_rt_person
+				JOIN 
+					public.tbl_reihungstest ON (rt_id=reihungstest_id)
 				WHERE
 					tbl_rt_person.person_id=".$this->db_add_param($person_id);
+		
+		if ($studiensemester_kurzbz != '')
+		{
+			$qry .= " AND tbl_reihungstest.studiensemester_kurzbz =  ".$this->db_add_param($studiensemester_kurzbz);
+		}
+		$qry .= " ORDER BY datum, uhrzeit ASC";
+		
 		if ($result = $this->db_query($qry))
 		{
 			while ($row = $this->db_fetch_object($result))
@@ -605,10 +690,21 @@ class reihungstest extends basis_db
 				$obj->teilgenommen = $this->db_parse_bool($row->teilgenommen);
 				$obj->ort_kurzbz = $row->ort_kurzbz;
 				$obj->punkte = $row->punkte;
-                $obj->insertamum = $row->insertamum;
-                $obj->insertvon = $row->insertvon;
-                $obj->updateamum =$row->updateamum;
-                $obj->updatevon = $row->updatevon;
+				$obj->insertamum = $row->insertamum;
+				$obj->insertvon = $row->insertvon;
+				$obj->updateamum =$row->updateamum;
+				$obj->updatevon = $row->updatevon;
+				$obj->studiengang_kz = $row->studiengang_kz;
+				$obj->anmerkung = $row->anmerkung;
+				$obj->datum = $row->datum;
+				$obj->uhrzeit = $row->uhrzeit;
+				$obj->max_teilnehmer = $row->max_teilnehmer;
+				$obj->oeffentlich = $this->db_parse_bool($row->oeffentlich);
+				$obj->freigeschaltet = $this->db_parse_bool($row->freigeschaltet);
+				$obj->studiensemester_kurzbz = $row->studiensemester_kurzbz;
+				$obj->stufe = $row->stufe;
+				$obj->anmeldefrist = $row->anmeldefrist;
+				$obj->aufnahmegruppe_kurzbz = $row->aufnahmegruppe_kurzbz;
 
 				$this->result[] = $obj;
 			}
