@@ -640,7 +640,7 @@ if ($result = $db->db_query($qry))
 /*
  * Bewerber die nicht zum Reihungstest angetreten gesetzt sind
  */
-$text .= "<br><br>Studierender hat keine Matrikelnummer<br><br>";
+$text .= "<br><br>Bewerber aber kein ReihungstestAngetreten gesetzt<br><br>";
 $lastSem = $studiensemester->getPreviousFrom($aktSem);
 $qry="SELECT vorname, nachname, tbl_prestudent.prestudent_id, studiengang_kz FROM public.tbl_prestudent
 	JOIN public.tbl_prestudentstatus ON(tbl_prestudent.prestudent_id=tbl_prestudentstatus.prestudent_id)
@@ -660,6 +660,38 @@ if ($result = $db->db_query($qry))
 			' ('.$row->prestudent_id.')';
 	}
 }
+
+/*
+ * Nation der Adresse ist ungleich Österreicher, die Gemeinde ist aber in der Gemeinde Tabelle enthalten
+ */
+$text .= "<br><br>Adressnation ausserhalb Österreich mit Gemeinde in Gemeindetabelle<br><br>";
+$lastSem = $studiensemester->getPreviousFrom($aktSem);
+$qry="SELECT tbl_person.vorname, tbl_person.nachname, tbl_prestudent.studiengang_kz, tbl_student.student_uid
+FROM
+	public.tbl_adresse
+	JOIN public.tbl_prestudent USING(person_id)
+	JOIN public.tbl_person USING(person_id)
+	JOIN public.tbl_student USING(prestudent_id)
+	JOIN public.tbl_benutzer ON(uid=student_uid)
+WHERE
+	tbl_adresse.nation!='A'
+	AND tbl_benutzer.aktiv
+	AND gemeinde NOT IN ('Münster')
+	AND EXISTS(SELECT 1 FROM bis.tbl_gemeinde WHERE name = tbl_adresse.gemeinde)
+ORDER BY tbl_prestudent.studiengang_kz, tbl_person.nachname
+";
+
+if ($result = $db->db_query($qry))
+{
+	while ($row = $db->db_fetch_object($result))
+	{
+		$ausgabe[$row->studiengang_kz][16][] = $row->vorname.' '.$row->nachname.
+			' ('.$row->student_uid.')';
+		$text .= $row->vorname.' '.$row->nachname.
+			' ('.$row->student_uid.')';
+	}
+}
+
 
 // Ausgabe der Studenten
 foreach ($ausgabe as $stg_kz => $value)
@@ -828,7 +860,15 @@ foreach ($ausgabe as $stg_kz => $value)
 						<td colspan='4'><b>Folgende Personen wurden zu Bewerbern gemacht, sind aber nicht zum Reihungstest angetreten.</b></td>
 					</tr>";
 				break;
-
+			case 16:
+				echo "
+					<tr>
+						<td>&nbsp;</td>
+					</tr>
+					<tr>
+						<td colspan='4'><b>Folgende Personen haben eine Adresse mit Nation Österreichs, die Gemeinde liegt aber in Österreich</b></td>
+					</tr>";
+				break;
 			default:
 				echo "<tr><td>&nbsp;</td></tr><tr><td colspan='4'><b>Ungültiger Code</b></td></tr>";
 				break;
