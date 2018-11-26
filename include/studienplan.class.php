@@ -1161,8 +1161,11 @@ class studienplan extends basis_db
 	/**
 	 * Sucht nach Studienordnungen, die den Kriterien entsprechen
 	 * @param string $searchItems Array aus Suchstrings
+	 * @param boolean $aktiv Optional. Wenn true werden nur aktive Studienpläne geliefert, wenn false nur inaktive, wenn null (default) alle
+	 * @param string $gueltigInStudiensemester Optional. Studiensemester_kurzbz in welchem der Studienplan gueltig ist
+	 * @return boolean true wenn ok, false im Fehlerfall
 	 */
-	public function searchStudienplaene($searchItems)
+	public function searchStudienplaene($searchItems, $aktiv = null, $gueltigInStudiensemester = null)
 	{
 		$qry= "
 				SELECT DISTINCT
@@ -1178,7 +1181,13 @@ class studienplan extends basis_db
 				JOIN
 					public.tbl_studiensemester ON (tbl_studienordnung.gueltigvon = tbl_studiensemester.studiensemester_kurzbz)
 				WHERE
-					tbl_studienplan.aktiv=true";
+					1=1";
+				
+			if ($aktiv != '' && ($aktiv == true || $aktiv == false))
+				$qry.=" AND tbl_studienplan.aktiv=".$this->db_add_param($aktiv, FHC_BOOLEAN);
+			
+			if ($gueltigInStudiensemester != '')
+				$qry.=" AND tbl_studienplan_semester.studiensemester_kurzbz=".$this->db_add_param($gueltigInStudiensemester);
 
 			foreach($searchItems as $value)
 			$qry.=" AND
@@ -1210,6 +1219,7 @@ class studienplan extends basis_db
 			}
 			return true;
 		}
+		return false;
 	}
 
 	/**
