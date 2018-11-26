@@ -185,7 +185,6 @@ class Prestudent_model extends DB_Model
 		return $this->execQuery(sprintf($query, is_array($prestudent_id) ? 'IN' : '='), array($prestudent_id));
 	}
 
-
 	/**
 	 * gets extended zgv data (with zgv bezeichnung) for a prestudent
 	 * includes last status, Studiengang, zgv, zgv master
@@ -219,6 +218,18 @@ class Prestudent_model extends DB_Model
 
 		if (count($lastStatus->retval) > 0)
 		{
+			// get Studiengangname from Studienlan and -ordnung
+			$studienordnung = $this->PrestudentstatusModel->getStudienordnungFromPrestudent($prestudent_id);
+			if ($studienordnung->error)
+				return error($studienordnung->retval);
+
+			if (count($studienordnung->retval) > 0)
+			{
+				$lastStatus->retval[0]->studiengangkurzbzlang = $studienordnung->retval[0]->studiengangkurzbzlang;
+				$lastStatus->retval[0]->studiengangbezeichnung = $studienordnung->retval[0]->studiengangbezeichnung;
+				$lastStatus->retval[0]->studiengangbezeichnung_englisch = $studienordnung->retval[0]->studiengangbezeichnung_englisch;
+			}
+
 			$this->load->model('system/sprache_model', 'SpracheModel');
 			$language = $this->SpracheModel->load($lastStatus->retval[0]->sprache);
 
@@ -277,5 +288,235 @@ class Prestudent_model extends DB_Model
 		$parametersArray = array($person_id);
 
 		return $this->execQuery($qry, $parametersArray);
+	}
+
+	/**
+	 * Returns a list with Bewerbungen (applications)
+	 * @param $person_id person who sent application(s)
+	 * @param string $studiensemester_kurzbz
+	 * @param bool $abgeschickt optional, wether application was filled out and sent
+	 * @param bool $bestaetigt optional, wether application was confirmed by infocenter
+	 * @return array with Bewerber
+	 */
+	public function getBewerbungen($person_id, $studiensemester_kurzbz = null, $abgeschickt = null, $bestaetigt = null)
+	{
+		$bewerbungen = array();
+		$prestudents = $this->loadWhere(array('person_id' => $person_id));
+
+		if (!hasData($prestudents))
+			return $bewerbungen;
+
+		$this->load->model('crm/prestudentstatus_model', 'PrestudentstatusModel');
+
+		foreach ($prestudents->retval as $prestudent)
+		{
+			$lastStatus = $this->PrestudentstatusModel->getLastStatus($prestudent->prestudent_id, $studiensemester_kurzbz);
+
+			if (!hasData($lastStatus))
+				continue;
+
+			$lastStatus = $lastStatus->retval[0];
+
+			if ($lastStatus->status_kurzbz !== 'Interessent')
+				continue;
+
+			$bewerbung_abgeschicktamum = $lastStatus->bewerbung_abgeschicktamum;
+			$bestaetigtam = $lastStatus->bestaetigtam;
+
+			$abgeschicktcond = true;
+			if (($abgeschickt === false && isset($bewerbung_abgeschicktamum)) || ($abgeschickt === true && !isset($bewerbung_abgeschicktamum)))
+				$abgeschicktcond = false;
+
+			$bestaetigtcond = true;
+			if (($bestaetigt === false && isset($bestaetigtam)) || ($bestaetigt === true && !isset($bestaetigtam)))
+				$bestaetigtcond = false;
+
+			if ($bestaetigtcond && $abgeschicktcond)
+			{
+				$prestudent->lastStatus = $lastStatus;
+				$bewerbungen[] = $prestudent;
+			}
+		}
+
+		return $bewerbungen;
+	}
+
+	/**
+	 * Checks if application priority can be changed for a prestudent
+	 * @param $prestudent_id
+	 * @param $studiensemester Semester in which Prestudent applied
+	 * @param $change increase priority (< 0) or decrease priority (> 0)
+	 * @return bool wether priority can be changed
+	 */
+	public function checkPrioChange($prestudent_id, $studiensemester, $change)
+	{
+		if (!is_numeric($change))
+			return false;
+
+		$this->addSelect('person_id, priorisierung');
+		$prestudent = $this->load($prestudent_id);
+
+		if (!hasData($prestudent))
+			return false;
+
+		$person_id = $prestudent->retval[0]->person_id;
+
+		$bewerberarr = $this->getBewerbungen($person_id, $studiensemester);
+
+		//Prio can be added when prio is null and there is only one prestudent
+		if (count($bewerberarr) === 1 && !isset($prestudent->retval[0]->priorisierung) && $change < 0)
+			return true;
+
+		if (count($bewerberarr) <= 1)
+			return false;
+
+		if (!isset($prestudent->retval[0]->priorisierung))
+		{
+			if ($change < 0)
+				return true; //null values can be changed to priority numbers (prority increase)
+			else
+				return false;
+		}
+
+		$priomin = 0;
+		$priomax = PHP_INT_MAX;
+		$currprio = intval($prestudent->retval[0]->priorisierung);
+
+		foreach ($bewerberarr as $bewerber)
+		{
+			if (is_numeric($bewerber->priorisierung))
+			{
+				$bewprio = intval($bewerber->priorisierung);
+				if ($bewprio < $priomax)
+					$priomax = $bewprio;
+
+				if ($bewprio > $priomin)
+					$priomin = $bewprio;
+			}
+		}
+
+		//no prio change when prestudent has max or min prio
+		if (($currprio === $priomax && $change < 0) || ($currprio === $priomin && $change > 0))
+		{
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * Changes application priority for a prestudent
+	 * Swaps priorities with nearest neighbour (nearest bewerber/prestudent)
+	 * for the same studiensemester in order to move priority up/down
+	 * @param $prestudent_id
+	 * @param $change increase priority (< 0) or decrease priority (> 0)
+	 * @return bool wether change of priority was sucessfull
+	 */
+	public function changePrio($prestudent_id, $change)
+	{
+		$this->addSelect('person_id, priorisierung');
+		$prestudent = $this->load($prestudent_id);
+
+		if (!hasData($prestudent))
+			return false;
+
+		$this->load->model('prestudentstatus_model', 'PrestudentstatusModel');
+		$lastStatus = $this->PrestudentstatusModel->getLastStatus($prestudent_id, null, 'Interessent');
+
+		if (!hasData($lastStatus))
+			return false;
+
+		$studiensemester_kurzbz = $lastStatus->retval[0]->studiensemester_kurzbz;
+
+		if (!$this->checkPrioChange($prestudent_id, $studiensemester_kurzbz, $change))
+			return false;
+
+		$person_id = $prestudent->retval[0]->person_id;
+		$currprio = intval($prestudent->retval[0]->priorisierung);
+
+		$difftonext = PHP_INT_MAX;
+		$neighbour = null;
+
+		$bewerberarr = $this->getBewerbungen($person_id, $studiensemester_kurzbz );
+
+		foreach ($bewerberarr as $bewerber)
+		{
+			if (is_numeric($bewerber->priorisierung))
+			{
+				$bewprio = intval($bewerber->priorisierung);
+
+				$diff = 0;
+				if ($change < 0 && ($bewprio < $currprio || is_null($prestudent->retval[0]->priorisierung))) //prio up
+				{
+					$diff = $currprio - $bewprio;
+				}
+				elseif ($change > 0 && $bewprio > $currprio)
+				{
+					$diff = $bewprio - $currprio;
+				}
+
+				if ($diff !== 0 && $diff < $difftonext)
+				{
+					$difftonext = $diff;
+					$neighbour = $bewerber;
+				}
+			}
+		}
+
+		if (is_null($prestudent->retval[0]->priorisierung))
+		{
+			//if null value, add as prio 1
+			$newprio = isset($neighbour->priorisierung) ? intval($neighbour->priorisierung) + 1 : 1;
+
+			$result = $this->PrestudentModel->update(
+				$prestudent_id,
+				array(
+					'priorisierung' => $newprio
+				)
+			);
+
+			if (isError($result))
+			{
+				return false;
+			}
+			else
+			{
+				return true;
+			}
+		}
+		else
+		{
+			$this->db->trans_start(false);
+			//prio swap
+			$resultFirst = $this->PrestudentModel->update(
+				$prestudent_id,
+				array(
+					'priorisierung' => intval($neighbour->priorisierung)
+				)
+			);
+
+
+			$resultSecond = $this->PrestudentModel->update(
+				$neighbour->prestudent_id,
+				array(
+					'priorisierung' => $currprio
+				)
+			);
+
+			// Transaction complete!
+			$this->db->trans_complete();
+
+			// Check if everything went ok during the transaction
+			if ($this->db->trans_status() === false || isError($resultFirst) || isError($resultSecond))
+			{
+				$this->db->trans_rollback();
+				return false;
+			}
+			else
+			{
+				$this->db->trans_commit();
+				return true;
+			}
+		}
 	}
 }

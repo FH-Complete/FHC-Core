@@ -20,6 +20,7 @@
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at> and
  *			Gerald Simane-Sequens <gerald.simane-sequens@technikum-wien.at>
  * 			Stefan Puraner	<puraner@technikum-wien.at>
+ *			Cristina Hainberger <hainberg@technikum-wien.at>
  */
 /**
  * Klasse Organisationseinheit
@@ -46,6 +47,7 @@ class organisationseinheit extends basis_db
 	
 	public $oe_kurzbz_orig;
 	public $beschreibung;
+	public $oetyp_bezeichnung;
 	
 	
 	/**
@@ -455,6 +457,79 @@ class organisationseinheit extends basis_db
 	}
 	
 	/**
+	 * Get names and types of ALL parent organisational units recursivly for all ascending 
+	 * org units of given organisational unit. (All parent organisational units)
+	 * @param string $oe_kurzbz
+	 * @return boolean True on success. If true, returns object-array with name 
+	 * and types of given organisational unit and of its parent organisational units. 
+	 */
+	public function getParents_withOEType($oe_kurzbz)
+	{
+		$parents=array();
+		
+		$qry="
+			WITH RECURSIVE 
+				oes (oe_kurzbz, oe_parent_kurzbz) AS 
+				(
+					SELECT 
+						oe_kurzbz, 
+						oe_parent_kurzbz,
+						bezeichnung AS oe_bezeichnung,
+						organisationseinheittyp_kurzbz 
+					FROM
+						public.tbl_organisationseinheit 
+					WHERE 
+						oe_kurzbz=".$this->db_add_param($oe_kurzbz)." 
+					AND 
+						aktiv = true
+						
+					UNION ALL
+					
+					SELECT
+						o.oe_kurzbz, 
+						o.oe_parent_kurzbz,
+						o.bezeichnung,
+						o.organisationseinheittyp_kurzbz
+					FROM
+						public.tbl_organisationseinheit o, oes 
+					WHERE 
+						o.oe_kurzbz = oes.oe_parent_kurzbz
+					AND
+						aktiv = true
+				)
+			SELECT
+				oe_kurzbz,
+				oe_bezeichnung,
+				tbl_organisationseinheittyp.bezeichnung AS oe_typ_bezeichnung
+			FROM 
+				oes
+			JOIN
+				public.tbl_organisationseinheittyp
+			USING (organisationseinheittyp_kurzbz)";
+		
+		
+		
+		if($result = $this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object($result))
+			{
+				$obj = new stdClass();
+				
+				$obj->oe_kurzbz = $row->oe_kurzbz;
+				$obj->oe_bezeichnung = $row->oe_bezeichnung;
+				$obj->oe_typ_bezeichnung = (!is_null($row->oe_typ_bezeichnung) ? $row->oe_typ_bezeichnung : '');
+				
+				$this->result[]= $obj;
+			}	
+			return $this->result;
+		}
+		else
+		{
+			$this->errormsg='Fehler beim Laden der Daten';
+			return false;
+		}		
+	}
+	/**
 	 * Prueft ob $child eine Organisationseinheit unterhalb der OE $oe_kurzbz ist
 	 *
 	 * @param $oe_kurzbz parent organisationseinheit
@@ -754,6 +829,48 @@ class organisationseinheit extends basis_db
 			{
 				return array($row->oe_kurzbz, $row->stunden);
 			}
+		}
+	}
+	
+	/**
+	 * Get full term of organisational unit type
+	 * @param string $oetyp_kurzbz
+	 * @return boolean True on success. If true, returns full term of given organisational unit type. 
+	 */
+	public function getOETypBezeichnung($oetyp_kurzbz)
+	{
+		if (isset($oetyp_kurzbz) && !empty($oetyp_kurzbz))
+		{
+			$qry = '
+				SELECT
+					bezeichnung
+				FROM
+					public.tbl_organisationseinheittyp
+				WHERE
+					organisationseinheittyp_kurzbz = '. $this->db_add_param($oetyp_kurzbz). ';';
+			
+			if ($this->db_query($qry))
+			{
+				if ($row = $this->db_fetch_object())
+				{
+					$this->oetyp_bezeichnung = $row->bezeichnung;
+					return true;
+				}
+				else
+				{
+					return false;
+				}			
+			}
+			else
+			{
+				$this->errormsg = "Fehler in der Abfrage zum Einholen OE-Typ Bezeichnung.";
+				return false;
+			}
+		}
+		else 
+		{
+			$this->errormsg = 'OE Typ fehlt bzw. darf nicht leer sein.';
+			return false;
 		}
 	}
 }

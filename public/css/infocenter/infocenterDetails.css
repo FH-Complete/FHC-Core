@@ -1,0 +1,38 @@
+/* styles for infocenter details page */
+
+/* styles for right header of the zgv boxes, which includes infos and priorisierung for each prestudent.*/
+.zgvheaderbeforeprio{
+    margin-right: 2px;
+}
+
+.zgvheaderrightprio{
+    position: relative;
+    margin-right: 8px;
+}
+
+.zgvheaderrightprio button.prio{
+    position: absolute;
+    font-size: 19px;
+    height: 13px;
+    width: 18px;
+    padding: 0 4px;
+}
+
+.zgvheaderrightprio button.prioalone{
+    top: 25%;
+}
+
+.zgvheaderrightprio button.priotogetherup{
+    bottom: 50%;
+}
+
+.zgvheaderrightprio button.priotogetherdown{
+    top: 55%;
+}
+
+.zgvheaderrightprio button.prio .prioarrow{
+    position: absolute;
+    top: -4px;
+    right: 2px;
+    left: 2px;
+}

@@ -1091,8 +1091,12 @@ class mitarbeiter extends benutzer
 
 	/**
 	 * Gibt ein Array mit den UIDs der aktiv beschäftigten Untergebenen zurueck
+	 * @param string $uid	UID.
+	 * @param boolean $include_OE_childs	Wenn true, dann werden auch alle aktiv
+	 * beschäftigten Untergebenen der Kind-OEs des Leiters zurückgegeben.
+	 * @return boolean
 	 */
-	public function getUntergebene($uid=null)
+	public function getUntergebene($uid=null, $include_OE_childs = false)
 	{
 		if (is_null($uid))
 			$uid=$this->uid;
@@ -1113,6 +1117,70 @@ class mitarbeiter extends benutzer
 				$oe.=$this->db_add_param($row->oe_kurzbz);
 			}
 		}
+	
+		// Kinder-Organisationseinheiten holen
+		if ($include_OE_childs == true)
+		{
+			if (!empty($oe))
+			{
+				$child_oe_arr = array();	// array of string child oes
+				
+				$qry = '
+					WITH RECURSIVE 
+						oes (oe_kurzbz, oe_parent_kurzbz) AS 
+						(
+							SELECT
+								oe_kurzbz,
+								oe_parent_kurzbz
+							FROM
+								public.tbl_organisationseinheit
+							WHERE
+								oe_kurzbz IN ('. $oe. ')
+
+							UNION ALL
+
+							SELECT 
+								o.oe_kurzbz,
+								o.oe_parent_kurzbz
+							FROM
+								public.tbl_organisationseinheit o, oes 
+							WHERE
+								o.oe_parent_kurzbz = oes.oe_kurzbz
+						)
+					SELECT
+						oe_kurzbz
+					FROM
+						oes
+					GROUP BY
+						oe_kurzbz';
+
+				if($this->db_query($qry))
+				{			
+					while($row = $this->db_fetch_object())
+					{
+						$child_oe_arr []= $this->db_add_param($row->oe_kurzbz);
+					}
+				}
+			
+				// eliminate duplicates
+				$child_oe_arr = array_unique($child_oe_arr);
+				
+				// check if leader has child oes by comparing the original
+				// string of oes with string of child oes.
+				if ($oe == implode(',', $child_oe_arr))
+				{
+					$this->result ['isIndirectSupervisor']= false;
+				}	
+				else
+				{
+					$this->result ['isIndirectSupervisor']= true;
+				}
+					
+				// overwrite $oe with child oes for further query
+				$oe = implode(',', $child_oe_arr);
+			}	
+		}
+		
 
 		//Alle Personen holen die dieser Organisationseinheit untergeordnet sind
 		$qry = "

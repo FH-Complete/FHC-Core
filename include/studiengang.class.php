@@ -244,31 +244,31 @@ class studiengang extends basis_db
 	}
 
 	/**
-	 * Gibt alle aktiven Studiengaenge und Lehrgaenge (mit Typ) zurueck, bei denen das Attribut onlinebewerbung true ist. 
+	 * Gibt alle aktiven Studiengaenge und Lehrgaenge (mit Typ) zurueck, bei denen das Attribut onlinebewerbung true ist.
 	 *
-	 * @param string $order Spalten, nach denen Sortiert werden soll.<br>Default: tbl_studiengang.typ, tbl_lgartcode.bezeichnung ASC, tbl_studiengang.bezeichnung. 
+	 * @param string $order Spalten, nach denen Sortiert werden soll.<br>Default: tbl_studiengang.typ, tbl_lgartcode.bezeichnung ASC, tbl_studiengang.bezeichnung.
 	 * @return boolean
 	 */
 	public function getAllForOnlinebewerbung($order = 'tbl_studiengang.typ, tbl_lgartcode.bezeichnung ASC, tbl_studiengang.bezeichnung')
 	{
-		$qry = "SELECT  
-					tbl_studiengang.studiengang_kz, 
-					tbl_studiengang.typ, 
+		$qry = "SELECT
+					tbl_studiengang.studiengang_kz,
+					tbl_studiengang.typ,
 					tbl_studiengangstyp.bezeichnung AS typ_bezeichnung,
 					tbl_studiengang.lgartcode,
 					tbl_studiengang.bezeichnung AS studiengangbezeichnung,
 					tbl_studiengang.english AS studiengangbezeichnung_englisch,
-					tbl_organisationseinheit.organisationseinheittyp_kurzbz, 
+					tbl_organisationseinheit.organisationseinheittyp_kurzbz,
 					tbl_organisationseinheit.standort,
 					tbl_lgartcode.bezeichnung AS lehrgangsart
-				FROM public.tbl_studiengang 
-				LEFT JOIN bis.tbl_lgartcode USING (lgartcode) 
+				FROM public.tbl_studiengang
+				LEFT JOIN bis.tbl_lgartcode USING (lgartcode)
 				LEFT JOIN public.tbl_organisationseinheit USING (oe_kurzbz)
 				JOIN public.tbl_organisationseinheittyp USING (organisationseinheittyp_kurzbz)
 				JOIN public.tbl_studiengangstyp USING (typ)
-				WHERE tbl_studiengang.onlinebewerbung IS TRUE 
+				WHERE tbl_studiengang.onlinebewerbung IS TRUE
 				AND tbl_studiengang.aktiv IS TRUE";
-						
+
 		$qry .= " ORDER BY ".$order;
 
 		if(!$result = $this->db_query($qry))
@@ -276,12 +276,12 @@ class studiengang extends basis_db
 			$this->errormsg = 'Datensatz konnte nicht geladen werden';
 			return false;
 		}
-		
+
 		while($row = $this->db_fetch_object($result))
 		{
 			$this->result[] = $row;
 		}
-		
+
 		return true;
 	}
 
@@ -1044,6 +1044,34 @@ class studiengang extends basis_db
 			return false;
 		}
 		return true;
+	}
+
+	/**
+	 * Prueft ob ein Studiengang in einem Studiensemester mehrere Studienplaene mit unterschiedlichen Orgformen hat
+	 * @param $studiengang_kz integer Kennzahl des Studiengangs.
+	 * @param $studiensemester_kurzbz varchar Studiensemester (optional).
+	 * @return true wenn mehrere Orgformen vorhanden sind, false wenn nicht.
+	 */
+	public function isMischform($studiengang_kz, $studiensemester_kurzbz = null)
+	{
+		$qry = "SELECT distinct orgform_kurzbz
+				FROM
+					lehre.tbl_studienplan
+					JOIN lehre.tbl_studienordnung USING(studienordnung_id)
+					JOIN lehre.tbl_studienplan_semester USING(studienplan_id)
+				WHERE
+					studiengang_kz=".$this->db_add_param($studiengang_kz);
+
+		if(!is_null($studiensemester_kurzbz))
+			$qry .= " AND studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz);
+
+		if($result = $this->db_query($qry))
+		{
+			if($this->db_num_rows($result)>1)
+				return true;
+			else
+				return false;
+		}
 	}
 	
 	/**

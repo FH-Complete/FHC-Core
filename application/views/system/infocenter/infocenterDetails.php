@@ -15,7 +15,8 @@
 			'navigationwidget' => true,
 			'customCSSs' => array(
 				'public/css/sbadmin2/admintemplate.css',
-				'public/css/sbadmin2/tablesort_bootstrap.css'
+				'public/css/sbadmin2/tablesort_bootstrap.css',
+				'public/css/infocenter/infocenterDetails.css'
 			),
 			'customJSs' => array(
 				'public/js/bootstrapper.js',
@@ -71,6 +72,8 @@
 									<i class="fa fa-sign-out"></i>&nbsp;<?php echo ucfirst($this->p->t('ui', 'freigeben')) ?>
 								</a>
 							<?php endif; ?>
+						<?php else: ?>
+							&nbsp;
 						<?php endif; ?>
 					</div>
 				</div>
@@ -118,7 +121,7 @@
 									<?php echo $this->p->t('infocenter', 'zgv').' - '.ucfirst($this->p->t('lehre', 'pruefung'))?>
 								</h4>
 							</div>
-							<div class="panel-body">
+							<div class="panel-body" id="zgvpruefungen">
 								<?php $this->load->view('system/infocenter/zgvpruefungen.php'); ?><!-- /.panel-group -->
 							</div><!-- /.main panel body -->
 						</div> <!-- /.main panel-->

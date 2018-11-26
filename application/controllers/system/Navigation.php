@@ -57,7 +57,7 @@ class Navigation extends Auth_Controller
 	// Private methods
 
 	/**
-	 * Loads the FiltersLib with the NAVIGATION_PAGE_PARAM parameter
+	 * Loads the NavigationLib with the NAVIGATION_PAGE_PARAM parameter
 	 * If the parameter NAVIGATION_PAGE_PARAM is not given then the execution of the controller is terminated and
 	 * an error message is printed
 	 */
@@ -76,7 +76,7 @@ class Navigation extends Auth_Controller
 				$navigationPage = $this->input->post(self::NAVIGATION_PAGE_PARAM); // is retrived from the HTTP POST
 			}
 
-			// Loads the FiltersLib that contains all the used logic
+			// Loads the NavigationLib that contains all the used logic
 			$this->load->library('NavigationLib', array(self::NAVIGATION_PAGE_PARAM => $navigationPage));
 		}
 		else // Otherwise an error will be written in the output

@@ -386,6 +386,17 @@ if (!$errorOccurred && $dataPosted)
 
 		<form name="saveLeistungsstipendium" method="post" enctype="multipart/form-data" action="">
 			<table border=0>
+				<tr><td valign="top">CMS-Format</td>
+					<td></td>
+					<td valign="top">
+						Zeichensatz: UTF-8<br>
+						Feldtrenner: ;<br>
+						Texttrenner: "<br>
+						Felder:<br>
+						<pre>Nachname;Vorname;UID/PersKZ;Studiengang;Betrag;Überweisungsdatum
+Dylan;Bob;1234567;MEE;750;03.10.2016</pre>
+					</td>
+				</tr>
 				<tr>
 					<th width="30%">
 					<th width="3%">

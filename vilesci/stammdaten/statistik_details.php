@@ -46,10 +46,10 @@ if(!$rechte->isBerechtigt('basis/statistik', null, 'suid'))
 		<title>Statistik - Details</title>
 		<link rel="stylesheet" href="../../skin/fhcomplete.css" type="text/css">
 		<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
-		<script src="../../include/js/jquery.js" type="text/javascript"></script>	
+		<script src="../../include/js/jquery.js" type="text/javascript"></script>
 		<script type="text/javascript">
 		function addNewContent(bezeichnung)
-		{			
+		{
 			if(bezeichnung == '')
 			{
 				if($( "#bezeichnung" ).val() != '')
@@ -59,12 +59,12 @@ if(!$rechte->isBerechtigt('basis/statistik', null, 'suid'))
 			}
 			else
 				var bez = bezeichnung;
-			
+
 
 			data = {
 						NewContent: "NewContent",
 						titel: bez,
-						templateContent: <?php echo (defined('REPORT_CONTENT_TEMPLATE') && REPORT_CONTENT_TEMPLATE != '' ? REPORT_CONTENT_TEMPLATE : 1); ?>			
+						templateContent: <?php echo (defined('REPORT_CONTENT_TEMPLATE') && REPORT_CONTENT_TEMPLATE != '' ? REPORT_CONTENT_TEMPLATE : 1); ?>
 					};
 
 			$.ajax({
@@ -72,7 +72,7 @@ if(!$rechte->isBerechtigt('basis/statistik', null, 'suid'))
 				data: data,
 				type: "POST",
 				dataType: "json",
-				success: function(data) 
+				success: function(data)
 				{
 					//set contentID into the ContentID input-field
 					$("#content_id").val(data);
@@ -83,7 +83,7 @@ if(!$rechte->isBerechtigt('basis/statistik', null, 'suid'))
 					// disable the contentID add-image
 					$("#content_id").next().css({"pointer-events": "none", "cursor": "default"});
 				},
-				error: function(data) 
+				error: function(data)
 				{
 					alert("ERROR:"+data);
 				}
@@ -105,6 +105,7 @@ if(!$rechte->isBerechtigt('basis/statistik', null, 'suid'))
 		{
 			$statistik_kurzbz = filter_input(INPUT_POST, 'statistik_kurzbz');
 			$exists = false;
+			$statistik->berechtigung_kurzbz='addon/reports';
 		}
 
 		if(isset($_POST['save']))
@@ -190,7 +191,7 @@ EOT;
 						<td><input type="text" name="bezeichnung" size="80" maxlength="256" value="<?php echo $statistik->bezeichnung ?>"></td>
 						<td></td>
 						<td>ContentID</td>
-						<td><input type="text" name="content_id" id="content_id" value="<?php echo $statistik->content_id ?>">						
+						<td><input type="text" name="content_id" id="content_id" value="<?php echo $statistik->content_id ?>">
 							<?php if(!is_null($statistik->content_id)): ?>
 							    <a href="#" style="pointer-events: none; cursor:default;"><img src="../../skin/images/plus.png" height="16px"></a>
 								<a target="_blank" href="<?php echo APP_ROOT ?>cms/admin.php?action=childs&content_id=<?php echo $statistik->content_id ?>&action=content&sprache=<?php echo DEFAULT_LANGUAGE ?>&filter=<?php echo (defined('REPORT_CONTENT_TEMPLATE') ? REPORT_CONTENT_TEMPLATE : $statistik->content_id) ?>">&nbsp;ContentID <?php echo $statistik->content_id?> bearbeiten</a>

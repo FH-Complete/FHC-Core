@@ -152,9 +152,18 @@ if (isset($personToDelete) && isset($personToKeep) && $personToDelete >= 0 && $p
 			}
 
 			// Wenn beide Personen eine Matr_nr haben, abbrechen
-			if (($personToDelete_obj->matr_nr != '' && $personToKeep_obj->matr_nr != ''))
+			if ($personToDelete_obj->matr_nr != '' && $personToKeep_obj->matr_nr != ''
+				&& $personToDelete_obj->matr_nr != $personToKeep_obj->matr_nr)
 			{
 				$msg_error[] = 'Beide Personen haben eine Matrikelnummer und können nicht zusammengelegt werden.<br>
+						Bitte wenden Sie sich an einen Administrator.';
+				$error = true;
+			}
+
+			// Wenn beide Personen ein BPK haben, abbrechen
+			if ($personToDelete_obj->bpk != '' && $personToKeep_obj->bpk != '' && $personToDelete_obj->bpk != $personToKeep_obj->bpk)
+			{
+				$msg_error[] = 'Beide Personen haben unterschiedliche BPK und können nicht zusammengelegt werden.<br>
 						Bitte wenden Sie sich an einen Administrator.';
 				$error = true;
 			}
@@ -276,6 +285,16 @@ if (isset($personToDelete) && isset($personToKeep) && $personToDelete >= 0 && $p
 					$matr_nr = $personToKeep_obj->matr_nr;
 				if ($personToKeep_obj->matr_nr == '' && $personToDelete_obj->matr_nr != '')
 					$matr_nr = $personToDelete_obj->matr_nr;
+				else
+					$matr_nr = $personToKeep_obj->matr_nr;
+
+				$bpk = '';
+				if ($personToDelete_obj->bpk == '' && $personToKeep_obj->bpk != '')
+					$bpk = $personToKeep_obj->bpk;
+				if ($personToKeep_obj->bpk == '' && $personToDelete_obj->bpk != '')
+					$bpk = $personToDelete_obj->bpk;
+				else
+					$bpk = $personToKeep_obj->bpk;
 
 				// Letztbenutzten Zugangscode abfragen und übernehmen
 				$zugangscode = '';
@@ -338,6 +357,9 @@ if (isset($personToDelete) && isset($personToKeep) && $personToDelete >= 0 && $p
 
 				// Matr_nr erst setzen, wenn nur mehr eine Person vorhanden ist
 				$sql_query_upd1 .= "UPDATE public.tbl_person SET matr_nr=" . $db->db_add_param($matr_nr, FHC_STRING) . " WHERE person_id=" . $db->db_add_param($personToKeep, FHC_INTEGER) . ";";
+
+				// BPK erst setzen, wenn nur mehr eine Person vorhanden ist
+				$sql_query_upd1 .= "UPDATE public.tbl_person SET bpk=" . $db->db_add_param($bpk, FHC_STRING) . " WHERE person_id=" . $db->db_add_param($personToKeep, FHC_INTEGER) . ";";
 
 				if ($db->db_query($sql_query_upd1))
 				{

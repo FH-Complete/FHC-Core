@@ -18,7 +18,7 @@
  * Authors: Cristina Hainberger	<hainberg@technikum-wien.at>
  *
  * Beschreibung:
- * The script checks phrases and phrase-texts for actuality in the database. 
+ * The script checks phrases and phrase-texts for actuality in the database.
  * Missing attributes are inserted.
  */
 
@@ -928,7 +928,7 @@ $phrases = array(
 			)
 		)
 	),
-	
+
 	array(
 		'app' => 'core',
 		'category' => 'global',
@@ -949,7 +949,7 @@ $phrases = array(
 			)
 		)
 	),
-	
+
 	array(
 		'app' => 'core',
 		'category' => 'global',
@@ -970,8 +970,49 @@ $phrases = array(
 			)
 		)
 	),
-	
-	
+
+	array(
+		'app' => 'core',
+		'category' => 'global',
+		'phrase' => 'nichtvorhanden',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'n.v.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'n/a',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+
+	array(
+		'app' => 'core',
+		'category' => 'global',
+		'phrase' => 'ohne',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'ohne',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'without',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+
 	//*******************************		CORE/ui
 	array(
 		'app' => 'core',
@@ -1333,8 +1374,8 @@ $phrases = array(
 			)
 		)
 	),
-	
-	
+
+
 	//***************************	CORE/filter
 	array(
 		'app' => 'core',
@@ -1356,7 +1397,7 @@ $phrases = array(
 			)
 		)
 	),
-	
+
 	array(
 		'app' => 'core',
 		'category' => 'filter',
@@ -1377,7 +1418,7 @@ $phrases = array(
 			)
 		)
 	),
-	
+
 	array(
 		'app' => 'core',
 		'category' => 'filter',
@@ -1398,7 +1439,7 @@ $phrases = array(
 			)
 		)
 	),
-	
+
 	array(
 		'app' => 'core',
 		'category' => 'filter',
@@ -1419,10 +1460,10 @@ $phrases = array(
 			)
 		)
 	),
-	
-	
-	
-	
+
+
+
+
 	//****************************	 CORE/person
 	array(
 		'app' => 'core',
@@ -1647,6 +1688,46 @@ $phrases = array(
 	array(
 		'app' => 'core',
 		'category' => 'person',
+		'phrase' => 'ersatzkennzeichen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Ersatzkennzeichen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => '',
+				'description' => 'Replacement Label',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'person',
+		'phrase' => 'bpk',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'bPK',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => '',
+				'description' => 'bPK',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'person',
 		'phrase' => 'geschlecht',
 		'insertvon' => 'system',
 		'phrases' => array(
@@ -1804,7 +1885,87 @@ $phrases = array(
 			)
 		)
 	),
-	
+	array(
+		'app' => 'core',
+		'category' => 'person',
+		'phrase' => 'postleitzahl',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Postleitzahl',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => '',
+				'description' => 'ZIP-Code',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'person',
+		'phrase' => 'strasse',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Strasse',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => '',
+				'description' => 'Street',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'person',
+		'phrase' => 'titelpre',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'TitelPre',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'TitlePre',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'person',
+		'phrase' => 'titelpost',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'TitelPost',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'TitlePost',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+
 	//****************	CORE/lehre
 	array(
 		'app' => 'core',
@@ -1966,9 +2127,9 @@ $phrases = array(
 			)
 		)
 	),
-	
-	
-	
+
+
+
 	//**********************	INFOCENTER/infocenter
 	array(
 		'app' => 'infocenter',
@@ -2600,7 +2761,7 @@ $phrases = array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Bei Freigabe von InteressentInnen wird deren Interessentenstatus bestätigt 
+				'text' => 'Bei Freigabe von InteressentInnen wird deren Interessentenstatus bestätigt
 					und deren Zgvdaten können im Infocenter nicht mehr bearbeitet oder freigegeben werden.<br/>
 					Alle nicht gespeicherten Zgvdaten gehen verloren.<br/>
 					Fortfahren?',
@@ -2756,6 +2917,26 @@ $phrases = array(
 		)
 	),
 	array(
+		'app' => 'infocenter',
+		'category' => 'infocenter',
+		'phrase' => 'priorisierung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'prio',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'prio',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
 		'app' => 'core',
 		'category' => 'global',
 		'phrase' => 'parkdatum',
@@ -2895,19 +3076,19 @@ $phrases = array(
 			)
 		)
 	)
-	
+
 );
 
 
-//*****		CHECK PHRASES & PHRASENTEXTE in German and English. 
+//*****		CHECK PHRASES & PHRASENTEXTE in German and English.
 //*****		INSERT into phrase_tbl if new app + category + phrase found in phrasen-array.
 //*****		INSERT into phrasentext_tbl if new text found in phrasen-phrases-array, conciders every language apart.
 
 foreach ($phrases as $phrase)
 {
-	$qry = "SELECT phrase_id 
+	$qry = "SELECT phrase_id
 			FROM system.tbl_phrase
-			WHERE 
+			WHERE
 				app=". $db->db_add_param($phrase['app']). " AND
 				category=". $db->db_add_param($phrase['category']). " AND
 				phrase=". $db->db_add_param($phrase['phrase']);
@@ -2916,16 +3097,16 @@ foreach ($phrases as $phrase)
 	if ($result = $db->db_query($qry))
 	{
 		$phrase_id = '';
-		
+
 		//phrase not existing -> insert phrase and get last inserted phrase_id
 		if ($db->db_num_rows($result) === 0)
 		{
 			$qry_insert = "INSERT INTO system.tbl_phrase(
-								app, 
-								phrase, 
-								insertamum, 
-								insertvon, 
-								category) 
+								app,
+								phrase,
+								insertamum,
+								insertvon,
+								category)
 							VALUES(".
 								$db->db_add_param($phrase['app']). ','.
 								$db->db_add_param($phrase['phrase']). ','.
@@ -2936,7 +3117,7 @@ foreach ($phrases as $phrase)
 			if ($db->db_query($qry_insert))
 			{
 				$new = true;
-				
+
 				$qry_lastId = "SELECT currval('system.tbl_phrase_phrase_id_seq') as id";
 				if ($db->db_query($qry_lastId))
 				{
@@ -2960,37 +3141,37 @@ foreach ($phrases as $phrase)
 			}
 			echo 'Kategorie/Phrase: '. $phrase['category']. '/'. $phrase['phrase']. ' vorhanden.<br>';
 		}
-		
-	
+
+
 		//***	CHECK PHRASENTEXT
 		//loop through languages
 		foreach ($phrase['phrases'] as $phrase_phrases)
 		{
 			$language = $phrase_phrases['sprache'];
-			
+
 			//query phrasentext in certain language
 			$qry_language =
 				"SELECT *
 				FROM system.tbl_phrasentext
-				WHERE 
+				WHERE
 					phrase_id=". $phrase_id. " AND
 					sprache='". $language. "'";
-			
-			
+
+
 			if ($result_language = $db->db_query($qry_language))
 			{
 				//if phrasentext not existing in certain language -> insert
 				if ($db->db_num_rows($result_language) === 0 && !empty($phrase_phrases['text']))
 				{
 					$qry_insert = "INSERT INTO system.tbl_phrasentext(
-										phrase_id, 
-										sprache, 
+										phrase_id,
+										sprache,
 										orgeinheit_kurzbz,
 										orgform_kurzbz,
 										text,
 										description,
-										insertamum, 
-										insertvon) 
+										insertamum,
+										insertvon)
 									VALUES(".
 										$db->db_add_param($phrase_id, FHC_INTEGER). ','.
 										$db->db_add_param($phrase_phrases['sprache']). ','.

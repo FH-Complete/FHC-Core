@@ -619,7 +619,7 @@ echo '
 					});
 				}
 		});
-		
+
 		// Autocomplete Feld fuer Ressourcen initialisieren
 		$("#input_ressource").autocomplete({
 			source: "coodle_autocomplete.php?work=ressource",
@@ -708,8 +708,8 @@ echo '
 				error: function() {
 					alert("Error fetching data for "+typ+" "+id);
 				},
-				color:"lightgrey"
-				//textColor:"black"
+				color:"lightgrey",
+				textColor:"#777"
 			});
 
 	}

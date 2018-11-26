@@ -9,20 +9,60 @@ $config['navigation_header'] = array(
 			'link' => site_url(''),
 			'icon' => '',
 			'description' => 'FH-Complete',
-			'sort' => 1
+			'sort' => 10
 		),
-		'vilesci' => array(
-			'link' => base_url('vilesci'),
-			'icon' => '',
-			'description' => 'Vilesci',
-			'sort' => 2,
-			'requiredPermissions' => 'basis/vilesci:r'
+		'Organisation' => array(
+			'link' => '#',
+			'icon' => 'sitemap',
+			'description' => 'Organisation',
+			'sort' => 20,
+			'children'=> array(
+				'vilesci' => array(
+					'link' => base_url('vilesci'),
+					'icon' => '',
+					'description' => 'Vilesci',
+					'expand' => true,
+					'sort' => 1,
+					'requiredPermissions' => 'basis/vilesci:r'
+				)
+			)
 		),
-		'cis' => array(
-			'link' => CIS_ROOT,
-			'icon' => '',
-			'description' => 'CIS',
-			'sort' => 3
+		'Lehre' => array(
+			'link' => '#',
+			'icon' => 'graduation-cap',
+			'description' => 'Lehre',
+			'sort' => 30,
+			'children'=> array(
+				'cis' => array(
+					'link' => CIS_ROOT,
+					'icon' => '',
+					'description' => 'CIS',
+					'sort' => 10
+				),
+				'infocenter' => array(
+					'link' => site_url('system/infocenter/InfoCenter'),
+					'icon' => 'info',
+					'description' => 'Infocenter',
+					'expand' => true,
+					'sort' => 20,
+					'requiredPermissions' => 'infocenter:r'
+				),
+			)
+		),
+		'Personen' => array(
+			'link' => '#',
+			'icon' => 'user',
+			'description' => 'Personen',
+			'sort' => 40,
+			'children'=> array(
+				'bpk' => array(
+					'link' => site_url('person/BPKWartung'),
+					'icon' => '',
+					'description' => 'BPK Wartung',
+					'sort' => 10,
+					'requiredPermissions' => 'admin:r'
+				)
+			)
 		)
 	)
 );

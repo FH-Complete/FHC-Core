@@ -26,6 +26,8 @@ class DB_Model extends FHC_Model
 	private $executedQueryMetaData;
 	private $executedQueryListFields;
 
+	private $debugMode;
+
 	/**
 	 * Constructor
 	 */
@@ -42,6 +44,10 @@ class DB_Model extends FHC_Model
 
 		// Loads the UDF library
 		$this->load->library('UDFLib');
+		// Loads the logs library
+		$this->load->library('LogLib');
+
+		$this->debugMode = isset($this->db->db_debug) && $this->db->db_debug === true;
 	}
 
 	// ------------------------------------------------------------------------------------------
@@ -62,7 +68,11 @@ class DB_Model extends FHC_Model
 		if (isError($validate = $this->_manageUDFs($data, $this->dbTable))) return $validate;
 
 		// DB-INSERT
-		if ($this->db->insert($this->dbTable, $data))
+		$insert = $this->db->insert($this->dbTable, $data);
+
+		$this->_logLastQuery();
+
+		if ($insert)
 		{
 			// If the table has a primary key that uses a sequence
 			if ($this->hasSequence === true)
@@ -126,7 +136,11 @@ class DB_Model extends FHC_Model
 		$this->db->where($tmpId);
 
 		// DB-UPDATE
-		if ($this->db->update($this->dbTable, $data))
+		$update = $this->db->update($this->dbTable, $data);
+
+		$this->_logLastQuery();
+
+		if ($update)
 		{
 			return success($id);
 		}
@@ -164,7 +178,11 @@ class DB_Model extends FHC_Model
 		}
 
 		// DB-DELETE
-		if ($this->db->delete($this->dbTable, $tmpId))
+		$delete = $this->db->delete($this->dbTable, $tmpId);
+
+		$this->_logLastQuery();
+
+		if ($delete)
 		{
 			return success($id);
 		}
@@ -201,15 +219,7 @@ class DB_Model extends FHC_Model
 			$tmpId = array($this->pk => $id);
 		}
 
-		// DB-SELECT
-		if ($result = $this->db->get_where($this->dbTable, $tmpId))
-		{
-			return success($this->_toPhp($result));
-		}
-		else
-		{
-			return error($this->db->error(), FHC_DB_ERROR);
-		}
+		return $this->loadWhere($tmpId);
 	}
 
 	/**
@@ -223,7 +233,11 @@ class DB_Model extends FHC_Model
 		if (is_null($this->dbTable)) return error(FHC_MODEL_ERROR, FHC_NODBTABLE);
 
 		// Execute query
-		if ($result = $this->db->get_where($this->dbTable, $where))
+		$result = $this->db->get_where($this->dbTable, $where);
+
+		$this->_logLastQuery();
+
+		if ($result)
 		{
 			return success($this->_toPhp($result));
 		}
@@ -292,6 +306,9 @@ class DB_Model extends FHC_Model
 
 		// Execute the query
 		$resultDB = $this->db->get_where($this->dbTable, $where);
+
+		$this->_logLastQuery();
+
 		// If everything went ok...
 		if ($resultDB)
 		{
@@ -603,7 +620,6 @@ class DB_Model extends FHC_Model
 
 		// Workaround to get metadata from this table
 		$result = $this->db->query(sprintf(DB_Model::QUERY_LIST_FIELDS, $this->dbTable));
-
 		if (is_object($result))
 		{
 			$listFields = $result->list_fields();
@@ -735,6 +751,8 @@ class DB_Model extends FHC_Model
 			{
 				$resultDB = $this->db->query($query);
 			}
+
+			$this->_logLastQuery();
 
 			// If no errors occurred
 			if ($resultDB)
@@ -939,5 +957,13 @@ class DB_Model extends FHC_Model
 					 AND LOWER(table_name) = ?';
 
 		return $this->execQuery($query, array(strtolower($schema), strtolower($table)));
+	}
+
+	/**
+	 *
+	 */
+	private function _logLastQuery()
+	{
+		if ($this->debugMode) $this->loglib->logDebug($this->db->last_query());
 	}
 }

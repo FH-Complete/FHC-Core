@@ -89,6 +89,10 @@ define('CIS_GESAMTNOTE_PRUEFUNG_MOODLE_LE_NOTE', true);
 // Vertraege fuer Pruefungshonorare anzulegen
 define('FAS_GESAMTNOTE_PRUEFUNGSHONORAR',false);
 
+// Gibt an ob die Note im Notenfreigabemail enthalten ist oder nicht
+// Aus Datenschutzgründen ist dies per default deaktiviert
+define('CIS_GESAMTNOTE_FREIGABEMAIL_NOTE', false);
+
 // Grenzwerte für Anwesenheit
 define('FAS_ANWESENHEIT_ROT', 70);
 define('FAS_ANWESENHEIT_GELB', 90);

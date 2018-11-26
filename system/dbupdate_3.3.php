@@ -1522,6 +1522,33 @@ if (!$result = @$db->db_query("SELECT 1 FROM system.tbl_person_lock LIMIT 1"))
 		echo ' system.tbl_person_lock hinzugefügt<br>';
 }
 
+// Spalte bezeichnung_mehrsprachig in public.tbl_kontakttyp
+if(!$result = @$db->db_query("SELECT bezeichnung_mehrsprachig FROM public.tbl_kontakttyp LIMIT 1"))
+{
+	$qry = "ALTER TABLE public.tbl_kontakttyp ADD COLUMN bezeichnung_mehrsprachig varchar(128)[];";
+
+	if(!$db->db_query($qry))
+		echo '<strong>public.tbl_kontakttyp '.$db->db_last_error().'</strong><br>';
+	else
+		echo 'public.tbl_kontakttyp: Spalte bezeichnung_mehrsprachig hinzugefuegt!<br>';
+
+	// Bezeichnung_mehrsprachig aus existierender Bezeichnung vorausfuellen. Ein Eintrag fuer jede Sprache mit Content aktiv.
+	$qry_help = "SELECT index FROM public.tbl_sprache WHERE content=TRUE;";
+	if(!$result = $db->db_query($qry_help))
+		echo '<strong>tbl_kontakttyp bezeichnung_mehrsprachig: Fehler beim ermitteln der Sprachen: '.$db->db_last_error().'</strong>';
+	else
+	{
+		$qry='';
+		while($row = $db->db_fetch_object($result))
+			$qry.= "UPDATE public.tbl_kontakttyp set bezeichnung_mehrsprachig[".$row->index."] = beschreibung;";
+
+		if(!$db->db_query($qry))
+			echo '<strong>Setzen der bezeichnung_mehrsprachig fehlgeschlagen: '.$db->db_last_error().'</strong><br>';
+		else
+			echo 'public.tbl_kontakttyp: bezeichnung_mehrprachig automatisch aus existierender Beschreibung uebernommen<br>';
+	}
+}
+
 // INSERT Berechtigungen fuer web User erteilen fuer tbl_msg_status
 if($result = @$db->db_query("SELECT * FROM information_schema.role_table_grants WHERE table_name='tbl_msg_status' AND table_schema='public' AND grantee='web' AND privilege_type='INSERT'"))
 {
@@ -1549,6 +1576,7 @@ if($result = @$db->db_query("SELECT * FROM information_schema.role_table_grants 
 			echo 'UPDATE Rechte fuer public.tbl_msg_status fuer web user gesetzt ';
 	}
 }
+
 
 /**
  * Kommentare fuer Datenbanktabellen
@@ -2455,14 +2483,14 @@ if(!$result = @$db->db_query("SELECT lieferant FROM public.tbl_firma LIMIT 1"))
 			echo '<br>public.tbl_firma: Spalte lieferant hinzugefuegt';
 }
 
-// INSERT, UPDATE und DELETE Berechtigungen fuer web User erteilen fuer tbl_rt_person und SEQUENCE public.tbl_rt_person_rt_person_id_seq 
+// INSERT, UPDATE und DELETE Berechtigungen fuer web User erteilen fuer tbl_rt_person und SEQUENCE public.tbl_rt_person_rt_person_id_seq
 if($result = @$db->db_query("SELECT * FROM information_schema.role_table_grants WHERE table_name='tbl_rt_person' AND table_schema='public' AND grantee='web' AND privilege_type='INSERT'"))
 {
 	if($db->db_num_rows($result)==0)
 	{
 		$qry = "GRANT SELECT, INSERT, UPDATE, DELETE ON public.tbl_rt_person TO web;
 				GRANT SELECT, UPDATE ON SEQUENCE public.tbl_rt_person_rt_person_id_seq TO web;";
-		
+
 		if(!$db->db_query($qry))
 			echo '<strong>public.tbl_rt_person Berechtigungen: '.$db->db_last_error().'</strong><br>';
 		else
@@ -2647,7 +2675,7 @@ $tabellen=array(
 	"public.tbl_gruppe"  => array("gruppe_kurzbz","studiengang_kz","semester","bezeichnung","beschreibung","sichtbar","lehre","aktiv","sort","mailgrp","generiert","updateamum","updatevon","insertamum","insertvon","ext_id","orgform_kurzbz","gid","content_visible","gesperrt","zutrittssystem","aufnahmegruppe"),
 	"public.tbl_kontakt"  => array("kontakt_id","person_id","kontakttyp","anmerkung","kontakt","zustellung","updateamum","updatevon","insertamum","insertvon","ext_id","standort_id"),
 	"public.tbl_kontaktmedium"  => array("kontaktmedium_kurzbz","beschreibung"),
-	"public.tbl_kontakttyp"  => array("kontakttyp","beschreibung"),
+	"public.tbl_kontakttyp"  => array("kontakttyp","beschreibung","bezeichnung_mehrsprachig"),
 	"public.tbl_konto"  => array("buchungsnr","person_id","studiengang_kz","studiensemester_kurzbz","buchungstyp_kurzbz","buchungsnr_verweis","betrag","buchungsdatum","buchungstext","mahnspanne","updateamum","updatevon","insertamum","insertvon","ext_id","credit_points", "zahlungsreferenz", "anmerkung"),
 	"public.tbl_lehrverband"  => array("studiengang_kz","semester","verband","gruppe","aktiv","bezeichnung","ext_id","orgform_kurzbz","gid"),
 	"public.tbl_log"  => array("log_id","executetime","mitarbeiter_uid","beschreibung","sql","sqlundo"),

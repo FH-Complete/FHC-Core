@@ -18,8 +18,9 @@
  * Authors: Andreas Oesterreicher 	< andreas.oesterreicher@technikum-wien.at >
  */
 /**
- * Erfragt die Matrikelnummern von Personen beim Datenverbund
- * Wenn keine bestehende Matrikelnummer gefunden wird, wird eine neue Matrikelnummer angefordert
+ * Erfragt die BPKs von Personen beim Datenverbund und speichert diese wenn gefunden
+ * Dieses Script sollte nach dem Matrikelnummer Job aufgerufen werden da dieser bereits bpks ermittelt
+ * Dieser Job versucht die BPKs zu holen die nicht automatisch über den Matrikelnummer Job gefunden wurden.
  */
 require_once(dirname(__FILE__).'/../../config/vilesci.config.inc.php');
 require_once(dirname(__FILE__).'/../../include/basis_db.class.php');
@@ -33,7 +34,6 @@ if (!$db = new basis_db())
 
 $limit = '';
 $debug = false;
-$softrun = false;
 
 // Wenn das Script nicht ueber Commandline gestartet wird, muss eine
 // Authentifizierung stattfinden
@@ -56,9 +56,6 @@ if (php_sapi_name() != 'cli')
 
 	if (isset($_GET['limit']) && is_numeric($_GET['limit']))
 		$limit = $_GET['limit'];
-
-	if (isset($_GET['softrun']))
-		$debug = ($_GET['softrun'] == 'true'?true:false);
 }
 else
 {
@@ -67,19 +64,15 @@ else
 	// zb php matrikelnummer.php --limit 100 --debug true
 	$longopt = array(
 		"limit:",
-		"debug:",
-		"softrun:"
+		"debug:"
 	);
 	$commandlineparams = getopt('', $longopt);
 	if (isset($commandlineparams['limit']) && is_numeric($commandlineparams['limit']))
 		$limit = $commandlineparams['limit'];
 	if (isset($commandlineparams['debug']))
 		$debug = ($commandlineparams['debug'] == 'true'?true:false);
-	if (isset($commandlineparams['softrun']))
-		$softrun = ($commandlineparams['softrun'] == 'true'?true:false);
 }
 
-$matrikelnummer_added = 0;
 $webservice = new dvb(DVB_USERNAME, DVB_PASSWORD, $debug);
 
 $qry = "
@@ -91,26 +84,51 @@ $qry = "
 		JOIN public.tbl_student ON(tbl_student.student_uid=tbl_benutzer.uid)
 	WHERE
 		public.tbl_benutzer.aktiv = true
-		AND tbl_person.matr_nr is null
+		AND tbl_person.matr_nr is not null
+		AND tbl_person.bpk is null
 		AND studiengang_kz<10000
 		AND EXISTS(SELECT 1 FROM public.tbl_prestudent WHERE person_id=tbl_person.person_id AND bismelden=true)
-		AND (svnr is not null OR ersatzkennzeichen is not null)";
+		AND gebdatum is not null";
 
 if ($limit != '')
 	$qry .= " LIMIT ".$limit;
 
 $db = new basis_db();
+$cnt = 0;
 if ($result = $db->db_query($qry))
 {
 	while ($row = $db->db_fetch_object($result))
 	{
+		$cnt++;
+		// Nach jeweils 25 Requests eine Pause einlegen damit die
+		// Anzahl Requests pro Minute nicht überschritten wird
+		if($cnt%25 == 0)
+			sleep(30);
+
 		echo $nl."Pruefe $row->person_id $row->vorname $row->nachname";
-		$data = $webservice->assignMatrikelnummer($row->person_id, $softrun);
+		$data = $webservice->getBPK($row->person_id);
 		if (ErrorHandler::isSuccess($data))
-			echo ' OK';
+		{
+			if (ErrorHandler::hasData($data) && isset($data->retval->bpk) && $data->retval->bpk != '')
+			{
+				$person = new person();
+				if ($person->load($row->person_id))
+				{
+					$person->bpk = $data->retval->bpk;
+					if ($person->save())
+						echo ' OK';
+					else
+						echo ' Failed: '.$person->errormsg;
+				}
+			}
+			else
+			{
+				echo 'Failed: BPK Empty';
+			}
+		}
 		else
 			echo ' Failed:'.$webservice->errormsg;
 	}
 }
-if($debug)
+if ($debug)
 	echo $webservice->debug_output;

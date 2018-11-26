@@ -1,6 +1,12 @@
 <div class="row">
 	<div class="col-lg-6 table-responsive">
 		<table class="table">
+			<?php if (!empty($stammdaten->titelpre)): ?>
+			<tr>
+				<td><strong><?php echo  ucfirst($this->p->t('person','titelpre')) ?></strong></td>
+				<td><?php echo $stammdaten->titelpre ?></td>
+			</tr>
+			<?php endif; ?>
 			<tr>
 				<td><strong><?php echo  ucfirst($this->p->t('person','vorname')) ?></strong></td>
 				<td><?php echo $stammdaten->vorname ?></td>
@@ -10,6 +16,12 @@
 				<td>
 					<?php echo $stammdaten->nachname ?></td>
 			</tr>
+			<?php if (!empty($stammdaten->titelpost)): ?>
+				<tr>
+					<td><strong><?php echo  ucfirst($this->p->t('person','titelpost')) ?></strong></td>
+					<td><?php echo $stammdaten->titelpost ?></td>
+				</tr>
+			<?php endif; ?>
 			<tr>
 				<td><strong><?php echo  ucfirst($this->p->t('person','geburtsdatum')) ?></strong></td>
 				<td>
@@ -57,21 +69,23 @@
 			<?php foreach ($stammdaten->kontakte as $kontakt): ?>
 				<tr>
 				<?php if ($kontakt->kontakttyp === 'email'): ?>
-					<td><?php echo  ucfirst($this->p->t('person','email')) ?></td>
-				<?php elseif ($kontakt->kontakttyp === 'telefon'): ?>
-					<td><?php echo  ucfirst($this->p->t('person','telefon')) ?></td>
+					<td><?php echo ucfirst($this->p->t('person', 'email')) ?></td>
+				<?php elseif ($kontakt->kontakttyp === 'telefon' || $kontakt->kontakttyp === 'mobil'): ?>
+					<td><?php echo ucfirst($this->p->t('person', 'telefon')) ?></td>
+				<?php else: ?>
+					<td><?php echo ucfirst($kontakt->kontakttyp) ?></td>
 				<?php endif; ?>
 					<td>
 						<?php echo '<span class="'.$kontakt->kontakttyp.'">';?>
 						<?php if ($kontakt->kontakttyp === 'email'): ?>
-						<a href="mailto:<?php echo $kontakt->kontakt; ?>" target="_top">
+							<a href="mailto:<?php echo $kontakt->kontakt; ?>" target="_top">
 							<?php
 							endif;
 							echo $kontakt->kontakt;
 							if ($kontakt->kontakttyp === 'email'):
 							?>
-						</a>
-					<?php endif; ?>
+							</a>
+							<?php endif; ?>
 					<?php echo '</span>'?>
 					</td>
 					<td><?php echo $kontakt->anmerkung; ?></td>

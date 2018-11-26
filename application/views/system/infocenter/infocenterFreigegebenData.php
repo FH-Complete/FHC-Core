@@ -1,137 +1,114 @@
 <?php
 
-	$APP = 'infocenter';
-	$NOTBEFORE = '2018-03-01 18:00:00';
+	$APP = '\'infocenter\'';
+	$INTERESSENT_STATUS = '\'Interessent\'';
+	$STUDIENGANG_TYP = '\'b\'';
+	$TAETIGKEIT_KURZBZ = '\'bewerbung\', \'kommunikation\'';
+	$LOGDATA_NAME = '\'Login with code\', \'New application\'';
 
 	$filterWidgetArray = array(
 		'query' => '
-		SELECT
+			SELECT
 				p.person_id AS "PersonId",
 				p.vorname AS "Vorname",
 				p.nachname AS "Nachname",
 				p.gebdatum AS "Gebdatum",
 				p.staatsbuergerschaft AS "Nation",
+				pl.zeitpunkt AS "LockDate",
+				pl.lockuser AS "LockUser",
 				(
-					SELECT zeitpunkt
-					FROM system.tbl_log
-					WHERE taetigkeit_kurzbz IN(\'bewerbung\',\'kommunikation\')
-					AND logdata->>\'name\' NOT IN (\'Login with code\', \'New application\')
-					AND person_id = p.person_id
-					ORDER BY zeitpunkt DESC
-					LIMIT 1
+					SELECT l.zeitpunkt
+					  FROM system.tbl_log l
+					 WHERE l.taetigkeit_kurzbz IN('.$TAETIGKEIT_KURZBZ.')
+					   AND l.logdata->>\'name\' NOT IN ('.$LOGDATA_NAME.')
+					   AND l.person_id = p.person_id
+				  ORDER BY l.zeitpunkt DESC
+					 LIMIT 1
 				) AS "LastAction",
 				(
-					SELECT insertvon
-					FROM system.tbl_log
-					WHERE taetigkeit_kurzbz IN(\'bewerbung\',\'kommunikation\')
-					AND logdata->>\'name\' NOT IN (\'Login with code\', \'New application\')
-					AND person_id = p.person_id
-					ORDER BY zeitpunkt DESC
-					LIMIT 1
+					SELECT l.insertvon
+					  FROM system.tbl_log l
+					 WHERE l.taetigkeit_kurzbz IN('.$TAETIGKEIT_KURZBZ.')
+					   AND l.logdata->>\'name\' NOT IN ('.$LOGDATA_NAME.')
+					   AND l.person_id = p.person_id
+				  ORDER BY l.zeitpunkt DESC
+					 LIMIT 1
 				) AS "User/Operator",
 				(
-					SELECT
-						pss.studiensemester_kurzbz
-					FROM
-						public.tbl_prestudentstatus pss
-						INNER JOIN public.tbl_prestudent ps USING(prestudent_id)
-						JOIN public.tbl_studiengang USING(studiengang_kz)
-					WHERE pss.status_kurzbz = \'Interessent\'
-					AND ps.person_id = p.person_id
-					AND tbl_studiengang.typ in(\'b\')
-					AND studiensemester_kurzbz IN (
-						SELECT studiensemester_kurzbz
-						FROM public.tbl_studiensemester
-						WHERE ende >= NOW()
-					)
-					ORDER BY pss.datum DESC, pss.insertamum DESC, pss.ext_id DESC
-					LIMIT 1
+					SELECT pss.studiensemester_kurzbz
+					  FROM public.tbl_prestudentstatus pss
+					  JOIN public.tbl_prestudent ps USING(prestudent_id)
+					  JOIN public.tbl_studiengang sg USING(studiengang_kz)
+					 WHERE pss.status_kurzbz = '.$INTERESSENT_STATUS.'
+					   AND ps.person_id = p.person_id
+					   AND sg.typ IN ('.$STUDIENGANG_TYP.')
+					   AND pss.studiensemester_kurzbz IN (SELECT ss.studiensemester_kurzbz FROM public.tbl_studiensemester ss WHERE ss.ende >= NOW())
+				  ORDER BY pss.datum DESC, pss.insertamum DESC, pss.ext_id DESC
+				 	 LIMIT 1
 				) AS "Studiensemester",
 				(
 					SELECT pss.bewerbung_abgeschicktamum
-					FROM
-						public.tbl_prestudentstatus pss
-						INNER JOIN public.tbl_prestudent ps USING(prestudent_id)
-						JOIN public.tbl_studiengang USING(studiengang_kz)
-					WHERE pss.status_kurzbz = \'Interessent\'
-						AND (pss.bewerbung_abgeschicktamum IS NOT NULL AND pss.bewerbung_abgeschicktamum>=\''.$NOTBEFORE.'\')
-						AND ps.person_id = p.person_id
-						AND tbl_studiengang.typ in(\'b\')
-						AND studiensemester_kurzbz IN (
-							SELECT studiensemester_kurzbz
-							FROM public.tbl_studiensemester
-							WHERE ende >= NOW()
-						)
-					ORDER BY pss.datum DESC, pss.insertamum DESC, pss.ext_id DESC
-					LIMIT 1
+					  FROM public.tbl_prestudentstatus pss
+					  JOIN public.tbl_prestudent ps USING(prestudent_id)
+					  JOIN public.tbl_studiengang sg USING(studiengang_kz)
+					 WHERE pss.status_kurzbz = '.$INTERESSENT_STATUS.'
+					   AND pss.bewerbung_abgeschicktamum IS NOT NULL
+					   AND ps.person_id = p.person_id
+					   AND sg.typ IN ('.$STUDIENGANG_TYP.')
+					   AND pss.studiensemester_kurzbz IN (SELECT ss.studiensemester_kurzbz FROM public.tbl_studiensemester ss WHERE ss.ende >= NOW())
+				  ORDER BY pss.datum DESC, pss.insertamum DESC, pss.ext_id DESC
+					 LIMIT 1
 				) AS "SendDate",
 				(
-					SELECT count(*)
-					FROM
-						public.tbl_prestudentstatus pss
-						INNER JOIN public.tbl_prestudent ps USING(prestudent_id)
-						JOIN public.tbl_studiengang USING(studiengang_kz)
-					WHERE pss.status_kurzbz = \'Interessent\'
-						AND (pss.bewerbung_abgeschicktamum IS NOT NULL AND pss.bewerbung_abgeschicktamum>=\''.$NOTBEFORE.'\')
-						AND ps.person_id = p.person_id
-						AND tbl_studiengang.typ in(\'b\')
-						AND studiensemester_kurzbz IN (
-							SELECT studiensemester_kurzbz
-							FROM public.tbl_studiensemester
-							WHERE ende >= NOW()
-						)
-					LIMIT 1
+					SELECT COUNT(*)
+					  FROM public.tbl_prestudentstatus pss
+					  JOIN public.tbl_prestudent ps USING(prestudent_id)
+					  JOIN public.tbl_studiengang sg USING(studiengang_kz)
+					 WHERE pss.status_kurzbz = '.$INTERESSENT_STATUS.'
+					   AND pss.bewerbung_abgeschicktamum IS NOT NULL
+					   AND ps.person_id = p.person_id
+					   AND sg.typ IN ('.$STUDIENGANG_TYP.')
+					   AND pss.studiensemester_kurzbz IN (SELECT ss.studiensemester_kurzbz FROM public.tbl_studiensemester ss WHERE ss.ende >= NOW())
+					 LIMIT 1
 				) AS "AnzahlAbgeschickt",
-				array_to_string(
-					(
-					SELECT array_agg(distinct UPPER(tbl_studiengang.typ || tbl_studiengang.kurzbz))
-					FROM
-						public.tbl_prestudentstatus pss
-						INNER JOIN public.tbl_prestudent ps USING(prestudent_id)
-						JOIN public.tbl_studiengang USING(studiengang_kz)
-					WHERE pss.status_kurzbz = \'Interessent\'
-						AND (pss.bewerbung_abgeschicktamum IS NOT NULL AND pss.bewerbung_abgeschicktamum>=\''.$NOTBEFORE.'\')
-						AND ps.person_id = p.person_id
-						AND tbl_studiengang.typ in(\'b\')
-						AND studiensemester_kurzbz IN (
-							SELECT studiensemester_kurzbz
-							FROM public.tbl_studiensemester
-							WHERE ende >= NOW()
-						)
-					LIMIT 1
-					),\', \'
-				) AS "StgAbgeschickt",
-				pl.zeitpunkt AS "LockDate",
-				pl.lockuser as "LockUser"
-			FROM public.tbl_person p
-		LEFT JOIN (SELECT person_id, zeitpunkt, uid as lockuser FROM system.tbl_person_lock WHERE app = \''.$APP.'\') pl USING(person_id)
-			WHERE
-				EXISTS(
+				(
+					SELECT ARRAY_TO_STRING(ARRAY_AGG(DISTINCT UPPER(sg.typ || sg.kurzbz)), \', \')
+					  FROM public.tbl_prestudentstatus pss
+					  JOIN public.tbl_prestudent ps USING(prestudent_id)
+					  JOIN public.tbl_studiengang sg USING(studiengang_kz)
+					 WHERE pss.status_kurzbz = '.$INTERESSENT_STATUS.'
+					   AND pss.bewerbung_abgeschicktamum IS NOT NULL
+					   AND ps.person_id = p.person_id
+					   AND sg.typ IN ('.$STUDIENGANG_TYP.')
+					   AND pss.studiensemester_kurzbz IN (SELECT ss.studiensemester_kurzbz FROM public.tbl_studiensemester ss WHERE ss.ende >= NOW())
+					 LIMIT 1
+				) AS "StgAbgeschickt"
+			  FROM public.tbl_person p
+		 LEFT JOIN (
+				SELECT tpl.person_id,
+					   tpl.zeitpunkt,
+					   tpl.uid AS lockuser
+				  FROM system.tbl_person_lock tpl
+				 WHERE tpl.app = '.$APP.'
+			 ) pl USING(person_id)
+			 WHERE
+				EXISTS (
 					SELECT 1
-					FROM
-						public.tbl_prestudent
-						JOIN public.tbl_studiengang USING(studiengang_kz)
-					WHERE
-						person_id=p.person_id
-						AND tbl_studiengang.typ in(\'b\')
-
-						AND EXISTS (
-							SELECT
-								1
-							FROM
-								public.tbl_prestudentstatus
-							WHERE
-								prestudent_id = tbl_prestudent.prestudent_id
-								AND status_kurzbz = \'Interessent\'
-								AND (bestaetigtam IS NOT NULL AND bewerbung_abgeschicktamum >= \''.$NOTBEFORE.'\')
-								AND studiensemester_kurzbz IN (
-									SELECT studiensemester_kurzbz
-									FROM public.tbl_studiensemester
-									WHERE ende >= NOW()
-							)
+					  FROM public.tbl_prestudent ps
+					  JOIN public.tbl_studiengang sg USING(studiengang_kz)
+					WHERE ps.person_id = p.person_id
+					  AND sg.typ IN ('.$STUDIENGANG_TYP.')
+					  AND EXISTS (
+							SELECT 1
+							  FROM public.tbl_prestudentstatus pss
+							 WHERE pss.prestudent_id = ps.prestudent_id
+								AND pss.status_kurzbz = '.$INTERESSENT_STATUS.'
+								AND pss.bestaetigtam IS NOT NULL
+								AND pss.bewerbung_abgeschicktamum IS NOT NULL
+								AND pss.studiensemester_kurzbz IN (SELECT ss.studiensemester_kurzbz FROM public.tbl_studiensemester ss WHERE ss.ende >= NOW())
 					)
 				)
-			ORDER BY "LastAction" DESC
+		ORDER BY "LastAction" DESC
 		',
 		'requiredPermissions' => 'infocenter',
 		'checkboxes' => 'PersonId',
@@ -216,7 +193,7 @@
 		}
 	);
 
-	$filterWidgetArray['app'] = $APP;
+	$filterWidgetArray['app'] = 'infocenter';
 	$filterWidgetArray['datasetName'] = 'freigegeben';
 	$filterWidgetArray['filterKurzbz'] = 'InfoCenterFreigegeben5days';
 	$filterWidgetArray['filter_id'] = $this->input->get('filter_id');

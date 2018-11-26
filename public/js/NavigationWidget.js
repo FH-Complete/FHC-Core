@@ -232,7 +232,7 @@ var FHC_NavigationWidget = {
 
 		if (item["subscriptLinkClass"] != null && item["subscriptDescription"] != null)
 		{
-			strLeftMenu += '<a class="' + item["subscriptLinkClass"] + ' menuSubscriptLink" value="' + item["subscriptLinkValue"] + '" href="#">' +
+			strLeftMenu += '<a class="' + item["subscriptLinkClass"] + ' menuSubscriptLink" value="' + item["subscriptLinkValue"] + '" href="' + item["subscriptLinkHref"] + '">' +
 						' (' + item["subscriptDescription"] + ')' +
 						'</a>';
 			strLeftMenu += '</span>';

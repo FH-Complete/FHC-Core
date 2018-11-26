@@ -29,14 +29,17 @@ require_once(dirname(__FILE__).'/studiensemester.class.php');
 require_once(dirname(__FILE__).'/adresse.class.php');
 require_once(dirname(__FILE__).'/webservicelog.class.php');
 require_once(dirname(__FILE__).'/prestudent.class.php');
+require_once(dirname(__FILE__).'/errorhandler.class.php');
 
 class dvb extends basis_db
 {
 	const DVB_URL_WEBSERVICE_OAUTH = DVB_PORTAL.'/dvb/oauth/token';
 	const DVB_URL_WEBSERVICE_SVNR = DVB_PORTAL.'/rws/0.2/simpleStudentBySozialVersicherungsnummer.xml';
 	const DVB_URL_WEBSERVICE_ERSATZKZ = DVB_PORTAL.'/rws/0.2/simpleStudentByErsatzKennzeichen.xml';
+	const DVB_URL_WEBSERVICE_NACHNAME = DVB_PORTAL.'/rws/0.2/simpleStudentByNachname.xml';
 	const DVB_URL_WEBSERVICE_RESERVIERUNG = DVB_PORTAL.'/dvb/matrikelnummern/1.0/reservierung.xml';
 	const DVB_URL_WEBSERVICE_MELDUNG = DVB_PORTAL.'/dvb/matrikelnummern/1.0/meldung.xml';
+	const DVB_URL_WEBSERVICE_BPK = DVB_PORTAL.'/rws/0.2/pruefeBpk.xml';
 
 	public $authentication;
 	private $username;
@@ -62,41 +65,82 @@ class dvb extends basis_db
 	 * Wenn die Person noch keine Matrikelnummer besitzt, wird eine neue Matrikelnummer
 	 * angefordert und der Person zugeordnet
 	 * @param int $person_id ID der Person.
+	 * @param boolean $softrun Wird dieser Parameter gesetzt, werden nur bestehende Daten abgerufen,
+	 * es werden keine neuen Vergabemeldungen gemacht
 	 * @return boolean true wenn Erfolgreich, false im Fehlerfall
 	 */
-	public function assignMatrikelnummer($person_id)
+	public function assignMatrikelnummer($person_id, $softrun = false)
 	{
 		$person = new person();
 		if (!$person->load($person_id))
 		{
-			$this->errormsg = $person->errormsg;
-			return false;
+			return ErrorHandler::error($person->errormsg);
 		}
+
+		$matrikelnummer = false;
+		$bpk = false;
 
 		if ($person->svnr != '')
 		{
-			$matrikelnummer = $this->getMatrikelnrBySVNR($person->svnr);
+			$data = $this->getMatrikelnrBySVNR($person->svnr);
 
-			if ($matrikelnummer === false && $this->errormsg != '')
+			if (ErrorHandler::isSuccess($data))
 			{
-				$this->logRequest($person, 'getMatrikelnrBySVNR', false);
-				return false;
+				if (ErrorHandler::hasData($data))
+				{
+					$matrikelnummer = $data->retval->matrikelnummer;
+					$bpk = $data->retval->bpk;
+				}
+			}
+			else
+			{
+				return ErrorHandler::error();
 			}
 		}
 		elseif ($person->ersatzkennzeichen != '')
 		{
-			$matrikelnummer = $this->getMatrikelnrByErsatzkennzeichen($person->ersatzkennzeichen);
-
-			if ($matrikelnummer === false && $this->errormsg != '')
+			$data = $this->getMatrikelnrByErsatzkennzeichen($person->ersatzkennzeichen);
+			if (ErrorHandler::isSuccess($data))
 			{
-				$this->logRequest($person, 'getMatrikelnrByErsatzkennzeichen', false);
-				return false;
+				if (ErrorHandler::hasData($data))
+				{
+					$matrikelnummer = $data->retval->matrikelnummer;
+					$bpk = $data->retval->bpk;
+				}
+			}
+			else
+			{
+				return ErrorHandler::error();
 			}
 		}
 		else
 		{
-			$this->errormsg = 'Person braucht SVNR oder Ersatzkennzeichen';
-			return false;
+			$errormsg = 'Person braucht SVNR oder Ersatzkennzeichen';
+			return ErrorHandler::error($errormsg);
+		}
+
+		// Wenn nicht gefunden, wird zusaetzlich noch eine Namenssuche gestartet
+		if ($matrikelnummer == false || $matrikelnummer == '')
+		{
+			$this->debug('Keine Matrikelnummer gefunden -> Suche per Nachname');
+			$nachnameresult = $this->existsByNachname($person_id);
+			if (ErrorHandler::isSuccess($nachnameresult))
+			{
+				if (ErrorHandler::hasData($nachnameresult)
+					&& isset($nachnameresult->retval->matrikelnummer)
+					&& $nachnameresult->retval->matrikelnummer != '')
+				{
+					$this->debug('Nachnamensuche erfolgreich');
+					$matrikelnummer = $nachnameresult->retval->matrikelnummer;
+					if (isset($nachnameresult->retval->bpk))
+						$bpk = $nachnameresult->retval->bpk;
+				}
+				else
+				{
+					$errormsg = 'Namenssuche ergab nicht eindeutige Treffer -> manuelle Pruefung ist erforderlich';
+					return ErrorHandler::error($errormsg);
+				}
+			}
 		}
 
 		if ($matrikelnummer !== false && $matrikelnummer != '')
@@ -104,14 +148,26 @@ class dvb extends basis_db
 			// Matrikelnummer wurde gefunden
 			// Bei Person speichern
 			$person->matr_nr = $matrikelnummer;
+
+			// Wenn ein bPK gefunden wurde dieses auch speichern
+			if ($bpk != '')
+			{
+				$person->bpk = $bpk;
+			}
+
 			if ($person->save())
 			{
-				$this->logRequest($person, 'assignExistingMatrikelnummer', true, $matrikelnummer);
-				return true;
+				return ErrorHandler::success();
 			}
 		}
 		else
 		{
+			if ($softrun == true)
+			{
+				$errormsg = 'Nicht gefunden Softrun enabled keine Meldung';
+				return ErrorHandler::error($errormsg);
+			}
+
 			// Es wurde noch keine Matrikelnummer zu dieser Person zugeordnet
 			// Es wird eine neue Matrikelnummer aus dem Kontingent angefordert
 			// und an die Person vergeben
@@ -128,7 +184,7 @@ class dvb extends basis_db
 			WHERE
 				tbl_prestudent.person_id=".$this->db_add_param($person->person_id)."
 				AND tbl_benutzer.aktiv
-				AND tbl_prestudentstatus.status_kurzbz='Student'
+				AND tbl_prestudentstatus.status_kurzbz in('Student','Incoming')
 				AND tbl_prestudent.bismelden
 			ORDER BY tbl_prestudentstatus.datum desc LIMIT 1
 			";
@@ -146,15 +202,15 @@ class dvb extends basis_db
 				else
 				{
 					$this->logRequest($person, 'assignNewMatrikelnummer', false);
-					$this->errormsg = 'Fehler beim Ermitteln des Studienjahrs für diese Person';
-					return false;
+					$errormsg = 'Fehler beim Ermitteln des Studienjahrs für diese Person';
+					return ErrorHandler::error($errormsg);
 				}
 			}
 			else
 			{
 				$this->logRequest($person, 'assignNewMatrikelnummer', false);
-				$this->errormsg = 'Fehler beim Ermitteln des Studienjahrs für diese Person';
-				return false;
+				$errormsg = 'Fehler beim Ermitteln des Studienjahrs für diese Person';
+				return ErrorHandler::error($errormsg);
 			}
 
 			$studienjahr = substr($studiensemester_kurzbz, 4);
@@ -167,56 +223,69 @@ class dvb extends basis_db
 				$studienjahr = 2018;
 
 			// Neue Matrikelnummer aus Kontingent anfordern
-			$kontingent = $this->getKontingent(DVB_BILDUNGSEINRICHTUNG_CODE, $studienjahr);
+			$data = $this->getKontingent(DVB_BILDUNGSEINRICHTUNG_CODE, $studienjahr);
 
-			if ($kontingent !== false && isset($kontingent[0]))
+			if (ErrorHandler::isSuccess($data) && ErrorHandler::hasdata($data))
 			{
-				$person_meldung = new stdClass();
-				$person_meldung->matrikelnummer = $kontingent[0];
-				$person_meldung->vorname = $person->vorname;
-				$person_meldung->nachname = $person->nachname;
-				$person_meldung->geburtsdatum = $person->gebdatum;
-				$person_meldung->geschlecht = mb_strtoupper($person->geschlecht);
-				$person_meldung->staat = $person->staatsbuergerschaft;
-				if ($person->svnr != '')
-					$person_meldung->svnr = $person->svnr;
+				$kontingent = $data->retval->kontingent;
 
-				// PLZ der Meldeadresse laden
-				$adresse = new adresse();
-				if ($adresse->loadZustellAdresse($person->person_id))
-					$person_meldung->plz = $adresse->plz;
-
-				// ZGV Datum laden falls vorhanden
-				$prestudent = new prestudent();
-				if ($prestudent->load($prestudent_id) && $prestudent->zgvdatum != '')
+				if ($kontingent !== false && isset($kontingent[0]))
 				{
-					$datum_obj = new datum();
-					$person_meldung->matura = $datum_obj->formatDatum($prestudent->zgvdatum, 'Ymd');
-				}
+					$person_meldung = new stdClass();
+					$person_meldung->matrikelnummer = $kontingent[0];
+					$person_meldung->vorname = $person->vorname;
+					$person_meldung->nachname = $person->nachname;
+					$person_meldung->geburtsdatum = $person->gebdatum;
+					$person_meldung->geschlecht = mb_strtoupper($person->geschlecht);
+					$person_meldung->staat = $person->staatsbuergerschaft;
+					if ($person->svnr != '')
+						$person_meldung->svnr = $person->svnr;
+					else if ($person->ersatzkennzeichen != '')
+						$person_meldung->svnr = $person->ersatzkennzeichen;
 
-				// Meldung der Vergabe der Matrikelnummer
-				if ($this->setMatrikelnummer(DVB_BILDUNGSEINRICHTUNG_CODE, $person_meldung))
-				{
-					// Matrikelnummer bei Person speichern
-					$person->matr_nr = $matrikelnummer;
-					if ($person->save())
+					// PLZ der Meldeadresse laden
+					$adresse = new adresse();
+					if ($adresse->loadZustellAdresse($person->person_id))
+						$person_meldung->plz = $adresse->plz;
+
+					// ZGV Datum laden falls vorhanden
+					$prestudent = new prestudent();
+					if ($prestudent->load($prestudent_id) && $prestudent->zgvdatum != '')
 					{
-						$this->logRequest($person, 'assignNewMatrikelnummer', true, $matrikelnummer);
-						return true;
+						$datum_obj = new datum();
+						$person_meldung->matura = $datum_obj->formatDatum($prestudent->zgvdatum, 'Ymd');
+					}
+
+					// Meldung der Vergabe der Matrikelnummer
+					$data = $this->setMatrikelnummer(DVB_BILDUNGSEINRICHTUNG_CODE, $person_meldung);
+					if (ErrorHandler::isSuccess($data))
+					{
+						// Matrikelnummer bei Person speichern
+						$person->matr_nr = $data->retval->matrikelnummer;
+
+						// Wenn ein BPK bei der Meldung ermittelt wurde, dann dieses auch speichern
+						if (ErrorHandler::hasData($data) && isset($data->retval->bpk) && $data->retval->bpk != '')
+						{
+							$person->bpk = $data->retval->bpk;
+						}
+						if ($person->save())
+						{
+							return ErrorHandler::success();
+						}
+					}
+					else
+					{
+						$this->logRequest($person, 'assignNewMatrikelnummer', false, $person_meldung);
+						$errormsg = 'Vergabe fehlgeschlagen';
+						return ErrorHandler::error($errormsg);
 					}
 				}
 				else
 				{
-					$this->logRequest($person, 'assignNewgMatrikelnummer', false, $person_meldung);
-					$this->errormsg .= 'Vergabe fehlgeschlagen';
-					return false;
+					$this->logRequest($person, 'assignNewMatrikelnummer', false, $studienjahr);
+					$errormsg = 'Failed to get Kontingent';
+					return ErrorHandler::error($errormsg);
 				}
-			}
-			else
-			{
-				$this->logRequest($person, 'assignNewgMatrikelnummer', false, $studienjahr);
-				$this->errormsg .= 'Failed to get Kontingent';
-				return false;
 			}
 		}
 	}
@@ -279,13 +348,13 @@ class dvb extends basis_db
 			$this->debug('Access_token:'.$this->authentication->access_token);
 			$this->debug('Scope:'.$this->authentication->scope);
 
-			return true;
+			return ErrorHandler::success();
 		}
 		else
 		{
 			$this->errormsg = 'Authentication failed with HTTP Code:'.$curl_info['http_code'];
 			$this->errormsg .= ' and Response:'.$json_response;
-			return false;
+			return ErrorHandler::error();
 		}
 	}
 
@@ -316,8 +385,9 @@ class dvb extends basis_db
 	{
 		if ($this->tokenIsExpired())
 		{
-			if (!$this->authenticate())
-				return false;
+			$result = $this->authenticate();
+			if (ErrorHandler::isError($result))
+				return ErrorHandler::error();
 		}
 
 		$this->debug('getMatrikelnrBySVNR');
@@ -358,6 +428,7 @@ class dvb extends basis_db
 				<uni:student inStudienBeitragsPool="false" inGesamtPool="true" gesperrt="false">
 					<uni:matrikelNummer>12345678</uni:matrikelNummer>
 					<uni:vorName>Max</uni:vorName>
+					<uni:personenkennzeichen>sdfaASDAFasdfads+asasdffd=</uni:personenkennzeichen>
 					<uni:nachName>Mustermann</uni:nachName>
 					<uni:geschlecht>M</uni:geschlecht>
 					<uni:geburtsDatum>1999-02-19</uni:geburtsDatum>
@@ -369,6 +440,9 @@ class dvb extends basis_db
 			$dom->loadXML($response);
 			$namespace = 'http://www.brz.gv.at/datenverbund-unis';
 			$domnodes_student = $dom->getElementsByTagNameNS($namespace, 'student');
+			$matrikelnr = false;
+			$bpk = false;
+
 			foreach ($domnodes_student as $row_student)
 			{
 				// Wenn nicht gesperrt und fix vergeben
@@ -380,19 +454,38 @@ class dvb extends basis_db
 					$domnodes_matrikelnummer = $row_student->getElementsByTagNameNS($namespace, 'matrikelNummer');
 					foreach ($domnodes_matrikelnummer as $row)
 					{
-						// Found
-						return $row->textContent;
+						// MatrikelNr Found
+						$matrikelnr = $row->textContent;
+						break;
+					}
+					$domnodes_bpk = $row_student->getElementsByTagNameNS($namespace, 'personenkennzeichen');
+					foreach ($domnodes_bpk as $row)
+					{
+						// BPK Found
+						$bpk = $row->textContent;
+						break;
 					}
 				}
 			}
 
-			$this->errormsg = '';
-			return false;
+			if ($matrikelnr !== false)
+			{
+				$retval = new stdClass();
+				$retval->matrikelnummer = $matrikelnr;
+				$retval->bpk = $bpk;
+
+				return ErrorHandler::success($retval);
+			}
+			else
+			{
+				$this->errormsg = '';
+				return ErrorHandler::success();
+			}
 		}
 		else
 		{
-			$this->errormsg = 'Request Failed with HTTP Code:'.$curl_info['http_code'].' and Response:'.$response;
-			return false;
+			$errormsg = 'Request Failed with HTTP Code:'.$curl_info['http_code'].' and Response:'.$response;
+			return ErrorHandler::error($errormsg);
 		}
 	}
 
@@ -405,8 +498,9 @@ class dvb extends basis_db
 	{
 		if ($this->tokenIsExpired())
 		{
-			if (!$this->authenticate())
-				return false;
+			$result = $this->authenticate();
+			if (ErrorHandler::isError($result))
+				return ErrorHandler::error();
 		}
 
 		$this->debug('getMatrikelnrByErsatzkennzeichen');
@@ -503,6 +597,10 @@ class dvb extends basis_db
 			$dom->loadXML($xml_response);
 			$namespace = 'http://www.brz.gv.at/datenverbund-unis';
 			$domnodes_student = $dom->getElementsByTagNameNS($namespace, 'student');
+
+			$matrikelnr = '';
+			$bpk = '';
+
 			foreach ($domnodes_student as $row_student)
 			{
 				// Wenn nicht gesperrt und fix vergeben
@@ -515,18 +613,36 @@ class dvb extends basis_db
 					foreach ($domnodes_matrikelnummer as $row)
 					{
 						// Found
-						return $row->textContent;
+						$matrikelnr = $row->textContent;
+					}
+
+					$domnodes_bpk = $row_student->getElementsByTagNameNS($namespace, 'personenkennzeichen');
+					foreach ($domnodes_bpk as $row)
+					{
+						// BPK Found
+						$bpk = $row->textContent;
+						break;
 					}
 				}
 			}
 
-			$this->errormsg = '';
-			return false;
+			if ($matrikelnr != '')
+			{
+				$retval = new stdClass();
+				$retval->matrikelnummer = $matrikelnr;
+				$retval->bpk = $bpk;
+				return ErrorHandler::success($retval);
+			}
+			else
+			{
+				$this->errormsg = '';
+				return ErrorHandler::success();
+			}
 		}
 		else
 		{
-			$this->errormsg = 'Request Failed with HTTP Code:'.$curl_info['http_code'].' and Response:'.$xml_response;
-			return false;
+			$errormsg = 'Request Failed with HTTP Code:'.$curl_info['http_code'].' and Response:'.$xml_response;
+			return ErrorHandler::error($errormsg);
 		}
 	}
 
@@ -543,8 +659,9 @@ class dvb extends basis_db
 
 		if ($this->tokenIsExpired())
 		{
-			if (!$this->authenticate())
-				return false;
+			$result = $this->authenticate();
+			if (ErrorHandler::isError($result))
+				return ErrorHandler::error();
 		}
 
 		$curl = curl_init();
@@ -597,12 +714,14 @@ class dvb extends basis_db
 			{
 				$reservations[] = $row->textContent;
 			}
-			return $reservations;
+			$retval = new stdClass();
+			$retval->reservations = $reservations;
+			return ErrorHandler::success($retval);
 		}
 		else
 		{
-			$this->errormsg = 'Request Failed with HTTP Code:'.$curl_info['http_code'].' and Response:'.$response;
-			return false;
+			$errormsg = 'Request Failed with HTTP Code:'.$curl_info['http_code'].' and Response:'.$response;
+			return ErrorHandler::error($errormsg);
 		}
 	}
 
@@ -620,8 +739,9 @@ class dvb extends basis_db
 
 		if ($this->tokenIsExpired())
 		{
-			if (!$this->authenticate())
-				return false;
+			$result = $this->authenticate();
+			if (ErrorHandler::isError($result))
+				return ErrorHandler::error();
 		}
 
 		$data = '<?xml version="1.0" encoding="UTF-8"?>
@@ -674,12 +794,15 @@ class dvb extends basis_db
 			{
 				$kontingent[] = $row->textContent;
 			}
-			return $kontingent;
+
+			$retval = new stdClass();
+			$retval->kontingent = $kontingent;
+			return ErrorHandler::success($retval);
 		}
 		else
 		{
-			$this->errormsg = 'Request Failed with HTTP Code:'.$curl_info['http_code'].' and Response:'.$response;
-			return false;
+			$errormsg = 'Request Failed with HTTP Code:'.$curl_info['http_code'].' and Response:'.$response;
+			return ErrorHandler::error($errormsg);
 		}
 	}
 
@@ -696,16 +819,18 @@ class dvb extends basis_db
 
 		if ($this->tokenIsExpired())
 		{
-			if (!$this->authenticate())
-				return false;
+			$result = $this->authenticate();
+			if (ErrorHandler::isError($result))
+				return ErrorHandler::error();
 		}
+		$gebdat = str_replace("-", "", $person->geburtsdatum);
 
 		$data = '<?xml version="1.0" encoding="UTF-8"?>
 		<matrikelnummernmeldung>
 			<uuid>'.$uuid.'</uuid>
 			<personmeldung>
 				<be>'.$bildungseinrichtung.'</be>
-				<gebdat>'.$person->geburtsdatum.'</gebdat>
+				<gebdat>'.$gebdat.'</gebdat>
 				<geschlecht>'.$person->geschlecht.'</geschlecht>
 				<matrikel>'.$person->matrikelnummer.'</matrikel>';
 		if (isset($person->matura) && $person->matura != '')
@@ -791,6 +916,18 @@ class dvb extends basis_db
 					<massnahme>Korrektur der Matrikelnummer</massnahme>
 					<feldinhalt>12345678</feldinhalt>
 				</fehler>
+				<fehler>
+					<fehlernummer>ED10065</fehlernummer>
+					<kategorie>E</kategorie>
+					<datenfeld>bPK</datenfeld>
+					<fehlertext>fehlt oder anders als im Datenverbund ermittelt(Yl329U/jt7fjoo5p+z4lH37ZKrg=)</fehlertext>
+					<massnahme>
+					Zurückgemeldete bPK in den lokalen Datenbestand übernehmen. Fallsim Fehlertext keine bPK enthalten ist,
+					müssen die Personendaten geprüft und ggf. ergänzt werden (Abgleich von Name/Geburtsdatum/Adresse mit dem zentralen
+					Melderegister)
+					</massnahme>
+					<feldinhalt>Yl329keinEchtesbPK4lH37ZKrg=</feldinhalt>
+				</fehler>
 			</fehlerliste>
 		</matrikelnummernmeldungantwort>
 		*/
@@ -807,11 +944,13 @@ class dvb extends basis_db
 			$dom->loadXML($response);
 			$domnodes_fehlerliste = $dom->getElementsByTagName('fehlerliste');
 
-			$fehleranzahl = $domnodes_fehlerliste[0]->getAttribute('fehleranzahl');
+			$fehleranzahl = $domnodes_fehlerliste->item(0)->getAttribute('fehleranzahl');
 			if ($fehleranzahl === '0')
 			{
 				// Keine Fehler -> Meldung erfolgreich
-				return true;
+				$retval = new stdClass();
+				$retval->matrikelnummer = $person->matrikelnummer;
+				return ErrorHandler::success($retval);
 			}
 			else
 			{
@@ -819,18 +958,479 @@ class dvb extends basis_db
 				$domnodes_fehler = $dom->getElementsByTagName('fehler');
 				foreach ($domnodes_fehler as $row)
 				{
-					$datenfeld = $row->getElementsByTagName('datenfeld');
-					$fehlertext = $row->getElementsByTagName('fehlertext');
-					$this->errormsg .= ' Datenfeld:'.$datenfeld[0]->textContent;
-					$this->errormsg .= ' Fehlertext:'.$fehlertext[0]->textContent;
+					$fehlernummer = $row->getElementsByTagName('fehlernummer');
+
+					/**
+					 * Bei Fehlernummer ED10065 wurde die Matrikelnummer korrekt gesetzt.
+					 * Das BPK wurde vom Datenverbund versucht zu ermitteln und wird in der Fehlermeldung
+					 * zurückgeliefert. Dieses sollte dann gespeichert werden.
+					 */
+					if ($fehlernummer->length>0 && $fehlernummer->item(0)->textContent == 'ED10065')
+					{
+						$this->debug('ED10065 Response');
+						$domnodes_feldinhalt = $row->getElementsByTagName('feldinhalt');
+						if ($domnodes_feldinhalt->length > 0 && $domnodes_feldinhalt->item(0)->textContent!='')
+						{
+							$bpk = $domnodes_feldinhalt->item(0)->textContent;
+							$retval = new stdClass();
+							$retval->matrikelnummer = $person->matrikelnummer;
+							$retval->bpk = $bpk;
+							$this->errormsg .= 'ED10065 Response';
+							$this->debug('BPK:'.$bpk);
+							return ErrorHandler::success($retval);
+						}
+					}
+					else
+					{
+						$datenfeld = $row->getElementsByTagName('datenfeld');
+						$fehlertext = $row->getElementsByTagName('fehlertext');
+						$this->errormsg .= ' Datenfeld:'.$datenfeld->item(0)->textContent;
+						$this->errormsg .= ' Fehlertext:'.$fehlertext->item(0)->textContent;
+					}
 				}
-				return false;
+				return ErrorHandler::error();
 			}
 		}
 		else
 		{
-			$this->errormsg = 'Request Failed with HTTP Code:'.$curl_info['http_code'].' and Response:'.$response;
-			return false;
+			$errormsg = 'Request Failed with HTTP Code:'.$curl_info['http_code'].' and Response:'.$response;
+			return ErrorHandler::error($errormsg);
+		}
+	}
+
+	/**
+	 * Get BPK from Person
+	 * @param string $person_id ID of the Person.
+	 * @return BPK or false on error.
+	 */
+	public function getBPK($person_id)
+	{
+		$person = new person();
+		if ($person->load($person_id))
+		{
+			if ($person->bpk != '')
+			{
+				// BPK exisitert bereits
+				$retval = new stdClass();
+				$retval->bpk = $person->bpk;
+				return ErrorHandler::success($retval);
+			}
+
+			if ($person->gebdatum == '')
+			{
+				$errormsg = 'Geburtsdatum ist nicht gesetzt';
+				return ErrorHandler::error($errormsg);
+			}
+
+			if ($person->vorname == '')
+			{
+				$errormsg = 'Vorname ist nicht gesetzt';
+				return ErrorHandler::error($errormsg);
+			}
+
+			if ($person->nachname == '')
+			{
+				$errormsg = 'Nachname ist nicht gesetzt';
+				return ErrorHandler::error($errormsg);
+			}
+
+			$geburtsdatum = str_replace("-", "", $person->gebdatum);
+			$vorname = $person->vorname;
+			$nachname = $person->nachname;
+			$geschlecht = mb_strtoupper($person->geschlecht);
+
+			$adresse = new adresse();
+			$adresse->loadZustellAdresse($person_id);
+
+			/**
+			 * Wenn die Person beim Ersten mal nicht eindeutig gefunden wird,
+			 * dann wird nochmal versucht mit Postleitzahl und ggf ein drittes
+			 * mal mit der Strasse der Person
+			 */
+
+			$try = 1;
+			$plz = null;
+			$strasse = null;
+
+			while ($try <= 3)
+			{
+				if ($try == 2)
+				{
+					$plz = $adresse->plz;
+				}
+				elseif ($try == 3)
+				{
+					$plz = $adresse->plz;
+					$strasse = $adresse->strasse;
+				}
+
+				// Versuchen BPK zu ermitteln
+				$data = $this->pruefeBPK($geburtsdatum, $vorname, $nachname, $geschlecht, $plz, $strasse);
+
+				if (ErrorHandler::isSuccess($data))
+				{
+					// gefunden
+					return ErrorHandler::success($data->retval);
+				}
+				elseif (!ErrorHandler::hasData($data))
+				{
+					// nicht gefunden
+					return ErrorHandler::error();
+				}
+				else
+				{
+					// mehrere gefunden
+					if (isset($data->retval->multiple) && $data->retval->multiple === true)
+					{
+						// ggf nochmal versuchen mit weiteren Parametern
+					}
+					else
+					{
+						return ErrorHandler::error();
+					}
+				}
+				$try++;
+			}
+
+			// nicht eindeutig auffindbar
+			return ErrorHandler::error();
+		}
+		else
+		{
+			$this->errormsg = $person->errormsg;
+			return ErrorHandler::error();
+		}
+	}
+
+	/**
+	 * Get BPK from Person
+	 * @param string $geburtsdatum Geburtsdatum der Person im format YYYYMMDD
+	 * @param $vorname Vorname der Person.
+	 * @param $nachname Nachname der Person.
+	 * @param $geschlecht Geschlecht der Person M | W
+	 * @param $plz Postleitzahl der Person (optional).
+	 * @param $strasse Strasse der Person (optional).
+	 * @return BPK or false on error.
+	 */
+	public function pruefeBPK($geburtsdatum, $vorname, $nachname, $geschlecht, $plz = null, $strasse = null)
+	{
+		if ($this->tokenIsExpired())
+		{
+			$result = $this->authenticate();
+			if (ErrorHandler::isError($result))
+				return ErrorHandler::error();
+		}
+
+		$this->debug('getBPK');
+
+		$curl = curl_init();
+
+		$url = self::DVB_URL_WEBSERVICE_BPK;
+		$url .= '?geburtsDatum='.curl_escape($curl, $geburtsdatum);
+		$url .= '&vorname='.curl_escape($curl, $vorname);
+		$url .= '&nachname='.curl_escape($curl, $nachname);
+		$url .= '&geschlecht='.curl_escape($curl, $geschlecht);
+
+		if (!is_null($plz))
+			$url .= '&plz='.curl_escape($curl, $plz);
+
+		if (!is_null($strasse))
+			$url .= '&strasse='.curl_escape($curl, $strasse);
+
+		curl_setopt($curl, CURLOPT_URL, $url);
+		curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+		curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, false);
+		curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
+
+		$headers = array(
+			'Accept: application/json',
+			'Authorization: Bearer '.$this->authentication->access_token,
+			'User-Agent: FHComplete',
+			'Connection: Keep-Alive',
+			'Expect:',
+			'Content-Length: 0'
+		);
+		curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
+
+		$this->debug('Sending Request to '.$url);
+
+		$response = curl_exec($curl);
+		$curl_info = curl_getinfo($curl);
+		curl_close($curl);
+
+		$this->debug('ResponseCode: '.$curl_info['http_code']);
+		$this->debug('ResponseData: '.print_r($response, true));
+
+		if ($curl_info['http_code'] == '200')
+		{
+			/* Example Response:
+			<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+			<simpleBpkResponse xmlns="http://www.brz.gv.at/datenverbund-unis">
+				<personenkennzeichen>1234567890ABCDEFGH=</personenkennzeichen>
+				<personInfo>
+					<person>
+						<vorname>Max</vorname>
+						<nachname>Mustermann</nachname>
+						<geschlecht>M</geschlecht>
+						<gebdat>19901231</gebdat>
+					</person>
+					<adresse>
+						<ort></ort>
+					</adresse>
+				</personInfo>
+			</simpleBpkResponse>
+
+			Example Error:
+			<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+			<simpleBpkResponse xmlns="http://www.brz.gv.at/datenverbund-unis">
+			<fehlerAntwort>
+				<fehlerliste>
+					<fehler>
+						<fehlernummer>ED10065</fehlernummer>
+						<kategorie>E</kategorie>
+						<datenfeld>bPK</datenfeld>
+						<fehlertext>fehlt oder anders als im Datenverbund ermittelt (keine bPK gefunden)</fehlertext>
+						<massnahme>
+							Zurückgemeldete bPK in den lokalen Datenbestand übernehmen.
+							Falls im Fehlertext keine bPK enthalten ist, müssen die Personendaten geprüft und
+							ggf. ergänzt werden (Abgleich von Name/Geburtsdatum/Adresse
+							mit dem zentralen Melderegister)
+						</massnahme>
+						<feldinhalt>keine bPK gefunden</feldinhalt>
+					</fehler>
+				</fehlerliste>
+			</fehlerAntwort>
+			</simpleBpkResponse>
+			*/
+
+			$dom = new DOMDocument();
+			$dom->loadXML($response);
+			$namespace = 'http://www.brz.gv.at/datenverbund-unis';
+			$domnodes_fehlernummer = $dom->getElementsByTagNameNS($namespace, 'fehlernummer');
+			if ($domnodes_fehlernummer->length > 0)
+			{
+				$fehlercode = $domnodes_fehlernummer->item(0)->textContent;
+				if ($fehlercode == 'ZD00001')
+				{
+					// Zu viele Requests pro Minute
+					$this->debug('Zu viele Requests pro Minute -> Pause');
+					sleep(30);
+				}
+			}
+
+			$domnodes_bpk = $dom->getElementsByTagNameNS($namespace, 'personenkennzeichen');
+			if ($domnodes_bpk->length > 0)
+			{
+				$retval = new stdClass();
+				$retval->bpk = $domnodes_bpk->item(0)->textContent;
+				return ErrorHandler::success($retval);
+			}
+			else
+			{
+				$retval = new stdClass();
+				$domnodes_personen = $dom->getElementsByTagNameNS($namespace, 'personInfo');
+				if ($domnodes_personen->length > 1)
+				{
+					$retval = new stdClass();
+					$retval->multiple = true;
+					return ErrorHandler::error(null, $retval);
+				}
+			}
+			return ErrorHandler::error();
+		}
+		else
+		{
+			$errormsg = 'Request Failed with HTTP Code:'.$curl_info['http_code'].' and Response:'.$response;
+			return ErrorHandler::error($errormsg);
+		}
+	}
+
+	/**
+	 * Prueft ob eine Person aufgrund Nachname und Geburtsdatum gefunden wird
+	 * @param $person_id PersonID der gesuchten Person.
+	 * @return Success wenn gefunden, error wenn nicht gefunden. Hat die Person 100% Uebereinstimmung der Daten
+	 * dann wird auch MatrNr und BPK als Retrun geliefert.
+	 */
+	public function existsByNachname($person_id)
+	{
+		$person = new person();
+		if ($person->load($person_id))
+		{
+			$result = $this->getMatrikelnrByNachname($person->nachname, $person->gebdatum);
+
+			if (ErrorHandler::isSuccess($result) && ErrorHandler::hasData($result)
+				&& isset($result->retval->data)
+				&& is_array($result->retval->data)
+				&& count($result->retval->data)>0)
+			{
+				foreach($result->retval->data as $row)
+				{
+					if (isset($row->vorname) && isset($row->nachname))
+					{
+						$this->debug('Eintrag gefunden -> Pruefe Eindeutigkeit');
+						// Vorpruefung des Datenverbund
+						if (mb_substr(mb_strtolower($row->vorname),0,5) == mb_substr(mb_strtolower($person->vorname),0,5)
+						&& mb_substr(mb_strtolower($row->nachname),0,10) == mb_substr(mb_strtolower($person->nachname),0,10))
+						{
+							// Bei 100% eindeutiger Uebereinstimmung werden die Daten zurueckgeliefert
+							if (mb_strtolower($row->geschlecht) == mb_strtolower($person->geschlecht)
+								&& $row->staatsangehoerigkeit == $person->staatsbuergerschaft
+								&& mb_strtolower($row->nachname) == mb_strtolower($person->nachname)
+								&& (
+									mb_strtolower($row->vorname) == mb_strtolower($person->vorname)
+									||
+									mb_strtolower($row->vorname) == mb_strtolower($person->vorname.' '.$person->vornamen)
+									)
+								&& $row->matrikelnummer != ''
+								&& count($result->retval->data) == 1
+								)
+							{
+								$this->debug('Uebereinstimmung gefunden');
+								$retval = new stdClass();
+								if (isset($row->bpk) && $row->bpk!='')
+									$retval->bpk = $row->bpk;
+								$retval->matrikelnummer = $row->matrikelnummer;
+								return ErrorHandler::success($retval);
+							}
+							else
+							{
+								$this->debug('keine 100% Eindeutigkeit gegeben:'.print_r($result->retval->data,true));
+								// Uebereinstimmung gefunden aber nicht 100% eindeutig
+								return ErrorHandler::success();
+							}
+						}
+					}
+				}
+				$this->debug('Keine Uebereinstimmung per Namenssuche');
+				return ErrorHandler::error();
+			}
+			else
+			{
+				return ErrorHandler::error();
+			}
+		}
+	}
+
+	/**
+	 * Get Matrikelnummer by Surname
+	 * @param string $nachname Surname of Person.
+	 * @param string $geburtsdatum Date of Birth
+	 * @return Matrikelnummer or false on error.
+	 */
+	public function getMatrikelnrByNachname($nachname, $geburtsdatum)
+	{
+		if ($this->tokenIsExpired())
+		{
+			$result = $this->authenticate();
+			if (ErrorHandler::isError($result))
+				return ErrorHandler::error();
+		}
+
+		$this->debug('getMatrikelnrByNachname');
+
+		$curl = curl_init();
+
+		$geburtsdatum = str_replace("-", "", $geburtsdatum);
+
+		$url = self::DVB_URL_WEBSERVICE_NACHNAME;
+		$url .= '?nachName='.curl_escape($curl, $nachname);
+		$url .= '&geburtsDatum='.curl_escape($curl, $geburtsdatum);
+
+		curl_setopt($curl, CURLOPT_URL, $url);
+		curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+		curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, false);
+		curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
+
+		$headers = array(
+			'Accept: application/json',
+			'Authorization: Bearer '.$this->authentication->access_token,
+			'User-Agent: FHComplete',
+			'Connection: Keep-Alive',
+			'Expect:',
+			'Content-Length: 0'
+		);
+		curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
+
+		$this->debug('Sending Request to '.$url);
+
+		$response = curl_exec($curl);
+		$curl_info = curl_getinfo($curl);
+		curl_close($curl);
+
+		$this->debug('ResponseCode: '.$curl_info['http_code']);
+		$this->debug('ResponseData: '.print_r($response, true));
+
+		if ($curl_info['http_code'] == '200')
+		{
+			/* Example Response:
+			<uni:simpleStudentResponse xmlns:uni="http://www.brz.gv.at/datenverbund-unis">
+				<uni:student inStudienBeitragsPool="false" inGesamtPool="true" gesperrt="false">
+					<uni:matrikelNummer>12345678</uni:matrikelNummer>
+					<uni:vorName>Max</uni:vorName>
+					<uni:personenkennzeichen>sdfaASDAFasdfads+asasdffd=</uni:personenkennzeichen>
+					<uni:nachName>Mustermann</uni:nachName>
+					<uni:geschlecht>M</uni:geschlecht>
+					<uni:geburtsDatum>1999-02-19</uni:geburtsDatum>
+					<uni:staatsAngehoerigkeit>A</uni:staatsAngehoerigkeit>
+				</uni:student>
+			</uni:simpleStudentResponse>
+			*/
+			$dom = new DOMDocument();
+			$dom->loadXML($response);
+			$namespace = 'http://www.brz.gv.at/datenverbund-unis';
+			$domnodes_student = $dom->getElementsByTagNameNS($namespace, 'student');
+
+			$retval = new stdClass();
+			$retval->data = array();
+
+			foreach ($domnodes_student as $row_student)
+			{
+				// Wenn nicht gesperrt und fix vergeben
+				$ingesamtpool = $row_student->getAttribute('inGesamtPool');
+				$gesperrt = $row_student->getAttribute('gesperrt');
+
+				if ($ingesamtpool == 'true' && $gesperrt == 'false')
+				{
+					$data = new stdClass();
+
+					$domnodes_matrikelnummer = $row_student->getElementsByTagNameNS($namespace, 'matrikelNummer');
+					foreach ($domnodes_matrikelnummer as $row)
+					{
+						// MatrikelNr Found
+						$data->matrikelnummer = $row->textContent;
+						break;
+					}
+					$domnodes_bpk = $row_student->getElementsByTagNameNS($namespace, 'personenkennzeichen');
+					foreach ($domnodes_bpk as $row)
+					{
+						// BPK Found
+						$data->bpk = $row->textContent;
+						break;
+					}
+					$domnodes = $row_student->getElementsByTagNameNS($namespace, 'vorName');
+					if ($domnodes->length>0)
+						$data->vorname = $domnodes->item(0)->textContent;
+					$domnodes = $row_student->getElementsByTagNameNS($namespace, 'nachName');
+					if ($domnodes->length>0)
+						$data->nachname = $domnodes->item(0)->textContent;
+					$domnodes = $row_student->getElementsByTagNameNS($namespace, 'geschlecht');
+					if ($domnodes->length>0)
+						$data->geschlecht = $domnodes->item(0)->textContent;
+					$domnodes = $row_student->getElementsByTagNameNS($namespace, 'staatsAngehoerigkeit');
+					if ($domnodes->length > 0)
+						$data->staatsangehoerigkeit = $domnodes->item(0)->textContent;
+
+					$retval->data[] = $data;
+				}
+
+			}
+
+			return ErrorHandler::success($retval);
+		}
+		else
+		{
+			$errormsg = 'Request Failed with HTTP Code:'.$curl_info['http_code'].' and Response:'.$response;
+			return ErrorHandler::error($errormsg);
 		}
 	}
 
@@ -855,7 +1455,7 @@ class dvb extends basis_db
 	private function debug($msg)
 	{
 		if ($this->debug)
-			$this->debug_output .= "\n<br>".date('Y-m-d H:i:s').': '.htmlentities($msg);
+			$this->debug_output .= "\n".date('Y-m-d H:i:s').': '.$msg;
 	}
 
 	/**

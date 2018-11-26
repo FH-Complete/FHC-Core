@@ -101,7 +101,7 @@ wird das Ende des Semesters letzten Lehrauftrages herangezogen.
 $qry = "SELECT ma.* FROM
 		(
 		SELECT
-			vorname, nachname, uid, personalnummer, insertamum,anmerkung,
+			vorname, nachname, uid, personalnummer, insertamum, anmerkung, aktiv,
 			(
 				SELECT studiensemester_kurzbz FROM (
 					SELECT
@@ -198,6 +198,7 @@ if ($result = $db->db_query($qry))
 			<th>Nachname</th>
 			<th>Vorname</th>
 			<th>UID</th>
+			<th>Aktiv</th>
 			<th>Personalnummer</th>
 			<th>Anlagedatum</th>
 			<th>Letzer Lehrauftrag</th>
@@ -216,6 +217,7 @@ if ($result = $db->db_query($qry))
 			<td>'.$db->convert_html_chars($row->nachname).'</td>
 			<td>'.$db->convert_html_chars($row->vorname).'</td>
 			<td>'.$db->convert_html_chars($row->uid).'</td>
+			<td>'.($db->db_parse_bool($row->aktiv)?'Ja':'<span style="color:red; font-weight:bold">Nein</span>').'</td>
 			<td>'.$db->convert_html_chars($row->personalnummer).'</td>
 			<td>'.$db->convert_html_chars($datum_obj->formatDatum($row->insertamum,'d.m.Y')).'</td>
 			<td>'.$db->convert_html_chars($row->letzter_lehrauftrag).'</td>

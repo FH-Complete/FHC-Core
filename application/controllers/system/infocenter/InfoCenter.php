@@ -74,6 +74,7 @@ class InfoCenter extends Auth_Controller
 				'saveFormalGeprueft' => 'infocenter:rw',
 				'getLastPrestudentWithZgvJson' => 'infocenter:r',
 				'getZgvInfoForPrestudent' => 'infocenter:r',
+				'saveBewPriorisierung' => 'infocenter:rw',
 				'saveZgvPruefung' => 'infocenter:rw',
 				'saveAbsage' => 'infocenter:rw',
 				'saveFreigabe' => 'infocenter:rw',
@@ -81,6 +82,7 @@ class InfoCenter extends Auth_Controller
 				'updateNotiz' => 'infocenter:rw',
 				'reloadNotizen' => 'infocenter:r',
 				'reloadLogs' => 'infocenter:r',
+				'reloadZgvPruefungen' => 'infocenter:r',
 				'outputAkteContent' => 'infocenter:r',
 				'getParkedDate' => 'infocenter:r',
 				'park' => 'infocenter:rw',
@@ -281,6 +283,22 @@ class InfoCenter extends Auth_Controller
 	}
 
 	/**
+	 * Saves application priority for a prestudent
+	 */
+	public function saveBewPriorisierung()
+	{
+		$prestudent_id = $this->input->post('prestudentid');
+		$change = $this->input->post('change');
+
+		if (!is_numeric($change) || !is_numeric($prestudent_id))
+			$result = error('Parameteres missing');
+		else
+			$result = $this->PrestudentModel->changePrio($prestudent_id, intval($change));
+
+		$this->output->set_content_type('application/json')->set_output(json_encode($result));
+	}
+
+	/**
 	 * Saves a ZGV for a prestudent, includes Ort, Datum, Nation for bachelor and master
 	 * @param $prestudent_id
 	 */
@@ -338,55 +356,50 @@ class InfoCenter extends Auth_Controller
 	 * inserts Studiensemester and Ausbildungssemester for the new Absage of (chronologically) last status.
 	 * @param $prestudent_id
 	 */
-	public function saveAbsage($prestudent_id)
+	public function saveAbsage()
 	{
+		$json = null;
+		$prestudent_id = $this->input->post('prestudent_id');
 		$statusgrund = $this->input->post('statusgrund');
 
 		$lastStatus = $this->PrestudentstatusModel->getLastStatus($prestudent_id);
 
-		if (isError($lastStatus))
+		$this->StatusgrundModel->addSelect('bezeichnung_mehrsprachig');
+		$statusgrresult = $this->StatusgrundModel->load($statusgrund);
+
+		if (hasData($lastStatus) && hasData($statusgrresult))
 		{
-			show_error($lastStatus->retval);
-		}
-
-		//check if still Interessent and not freigegeben yet
-		if (count($lastStatus->retval) > 0 && $lastStatus->retval[0]->status_kurzbz === 'Interessent' && !isset($lastStatus->retval[0]->bestaetigtam))
-		{
-			$result = $this->PrestudentstatusModel->insert(
-				array(
-					'prestudent_id' => $prestudent_id,
-					'studiensemester_kurzbz' => $lastStatus->retval[0]->studiensemester_kurzbz,
-					'ausbildungssemester' => $lastStatus->retval[0]->ausbildungssemester,
-					'datum' => date('Y-m-d'),
-					'orgform_kurzbz' => $lastStatus->retval[0]->orgform_kurzbz,
-					'studienplan_id' => $lastStatus->retval[0]->studienplan_id,
-					'status_kurzbz' => 'Abgewiesener',
-					'statusgrund_id' => $statusgrund,
-					'insertvon' => $this->_uid,
-					'insertamum' => date('Y-m-d H:i:s')
-				)
-			);
-
-			if (isError($result))
+			//check if still Interessent and not freigegeben yet
+			if ($lastStatus->retval[0]->status_kurzbz === 'Interessent' && !isset($lastStatus->retval[0]->bestaetigtam))
 			{
-				show_error($result->retval);
+				$result = $this->PrestudentstatusModel->insert(
+					array(
+						'prestudent_id' => $prestudent_id,
+						'studiensemester_kurzbz' => $lastStatus->retval[0]->studiensemester_kurzbz,
+						'ausbildungssemester' => $lastStatus->retval[0]->ausbildungssemester,
+						'datum' => date('Y-m-d'),
+						'orgform_kurzbz' => $lastStatus->retval[0]->orgform_kurzbz,
+						'studienplan_id' => $lastStatus->retval[0]->studienplan_id,
+						'status_kurzbz' => 'Abgewiesener',
+						'statusgrund_id' => $statusgrund,
+						'insertvon' => $this->_uid,
+						'insertamum' => date('Y-m-d H:i:s')
+					)
+				);
+
+				$json = $result;
+				if (isSuccess($result))
+				{
+					$logdata = $this->_getPersonAndStudiengangFromPrestudent($prestudent_id);
+
+					//statusgrund bezeichnung for logging
+					$statusgrund_bez = $statusgrresult->retval[0]->bezeichnung_mehrsprachig[1];
+
+					$this->_log($logdata['person_id'], 'abgewiesen', array($prestudent_id, $logdata['studiengang_kurzbz'], $statusgrund_bez));
+				}
 			}
-
-			$logdata = $this->_getPersonAndStudiengangFromPrestudent($prestudent_id);
-
-			//statusgrund bezeichnung for logging
-			$this->StatusgrundModel->addSelect('bezeichnung_mehrsprachig');
-			$result = $this->StatusgrundModel->load($statusgrund);
-			if (isError($result))
-			{
-				show_error($result->retval);
-			}
-
-			$statusgrund_bez = $result->retval[0]->bezeichnung_mehrsprachig[1];
-
-			$this->_log($logdata['person_id'], 'abgewiesen', array($prestudent_id, $logdata['studiengang_kurzbz'], $statusgrund_bez));
 		}
-		$this->_redirectToStart($prestudent_id, 'ZgvPruef');
+		$this->output->set_content_type('application/json')->set_output(json_encode($json));
 	}
 
 	/**
@@ -394,16 +407,18 @@ class InfoCenter extends Auth_Controller
 	 * updates bestaetigtam and bestaetigtvon fields of the last status
 	 * @param $prestudent_id
 	 */
-	public function saveFreigabe($prestudent_id)
+	public function saveFreigabe()
 	{
+		$json = null;
+		$prestudent_id = $this->input->post('prestudent_id');
+
 		$lastStatus = $this->PrestudentstatusModel->getLastStatus($prestudent_id);
 
-		if (isError($lastStatus))
-		{
-			show_error($lastStatus->retval);
-		}
+		$logdata = $this->_getPersonAndStudiengangFromPrestudent($prestudent_id);
 
-		if (count($lastStatus->retval) > 0)
+		$akteresult = $this->AkteModel->loadWhere(array('person_id' => $logdata['person_id'], 'formal_geprueft_amum !=' => NULL));
+
+		if (hasData($lastStatus) && isSuccess($akteresult))
 		{
 			$lastStatus = $lastStatus->retval[0];
 
@@ -425,45 +440,36 @@ class InfoCenter extends Auth_Controller
 					)
 				);
 
-				if (isError($result))
+				$json = $result;
+
+				if (isSuccess($result))
 				{
-					show_error($result->retval);
+					$this->load->model('crm/dokumentprestudent_model', 'DokumentprestudentModel');
+
+					//set documents which have been formal geprüft to accepted
+					$dokument_kurzbzs = array();
+
+					foreach ($akteresult->retval as $akte)
+					{
+						$dokument_kurzbzs[] = $akte->dokument_kurzbz;
+					}
+
+					$acceptresult = $this->DokumentprestudentModel->setAcceptedDocuments($prestudent_id, $dokument_kurzbzs);
+
+					//returns null if no documents to accept
+					if ($acceptresult !== null && isError($acceptresult))
+					{
+						$json->error = 2;
+					}
+
+					$this->_log($logdata['person_id'], 'freigegeben', array($prestudent_id, $logdata['studiengang_kurzbz']));
+
+					$this->_sendFreigabeMail($prestudent_id);
 				}
-
-				$this->load->model('crm/dokumentprestudent_model', 'DokumentprestudentModel');
-
-				$logdata = $this->_getPersonAndStudiengangFromPrestudent($prestudent_id);
-
-				//set documents which have been formal geprüft to accepted
-				$result = $this->AkteModel->loadWhere(array('person_id' => $logdata['person_id'], 'formal_geprueft_amum !=' => NULL));
-
-				if (isError($result))
-				{
-					show_error($result->retval);
-				}
-
-				$dokument_kurzbzs = array();
-
-				foreach ($result->retval as $akte)
-				{
-					$dokument_kurzbzs[] = $akte->dokument_kurzbz;
-				}
-
-				$result = $this->DokumentprestudentModel->setAcceptedDocuments($prestudent_id, $dokument_kurzbzs);
-
-				//returns null if no documents to accept
-				if ($result !== null && isError($result))
-				{
-					show_error($result->retval);
-				}
-
-				$this->_sendFreigabeMail($prestudent_id);
-
-				$this->_log($logdata['person_id'], 'freigegeben', array($prestudent_id, $logdata['studiengang_kurzbz']));
 			}
 		}
 
-		$this->_redirectToStart($prestudent_id, 'ZgvPruef');
+		$this->output->set_content_type('application/json')->set_output(json_encode($json));
 	}
 
 	/**
@@ -541,6 +547,19 @@ class InfoCenter extends Auth_Controller
 	{
 		$logs = $this->personloglib->getLogs($person_id);
 		$this->load->view('system/infocenter/logs.php', array('logs' => $logs));
+	}
+
+	/**
+	 * Loads Zgv Prüfung view for a person, helper for reloading after ajax request
+	 * @param $person_id
+	 */
+	public function reloadZgvPruefungen($person_id)
+	{
+		$prestudentdata = $this->_loadPrestudentData($person_id);
+
+		$prestudentdata[self::FHC_CONTROLLER_ID] = $this->getControllerId();
+
+		$this->load->view('system/infocenter/zgvpruefungen.php', $prestudentdata);
 	}
 
 	/**
@@ -864,7 +883,7 @@ class InfoCenter extends Auth_Controller
 				'filters' => $this->navigationlib->oneLevel(
 					'Filter',					// description
 					'#',						// link
-					(isset($filtersArray['children'])?$filtersArray['children']:''),	// children
+					(isset($filtersArray['children']) ? $filtersArray['children'] : ''), // children
 					'',							// icon
 					true,						// expand
 					null, 						// subscriptDescription
@@ -880,20 +899,18 @@ class InfoCenter extends Auth_Controller
 	/**
 	 * Utility method used to fill elements of the InfoCenter left menu of the main InfoCenter page
 	 */
-	private function _fillFilters($filters, &$tofill)
+	private function _fillFilters($filters, &$toFill)
 	{
-		$toPrint = "%s?%s=%s&%s=%s";
-
 		foreach ($filters as $filterId => $description)
 		{
-			$tofill['children'][] = array(
-				'link' => sprintf(
-					$toPrint,
-					site_url(self::INFOCENTER_URI), 'filter_id', $filterId,
-					FHC_Controller::FHC_CONTROLLER_ID,
-					$this->getControllerId()
-				),
-				'description' => $description
+			$toFill['children'][] = $this->navigationlib->oneLevel(
+				$description,				// description
+				sprintf(
+					'%s?%s=%s',
+					site_url(self::INFOCENTER_URI),
+					'filter_id',
+					$filterId
+				)							// link
 			);
 		}
 	}
@@ -901,20 +918,18 @@ class InfoCenter extends Auth_Controller
 	/**
 	 * Utility method used to fill elements of the InfoCenter left menu of the freigegeben InfoCenter page
 	 */
-	private function _fillFiltersFreigegeben($filters, &$tofill)
+	private function _fillFiltersFreigegeben($filters, &$toFill)
 	{
-		$toPrint = "%s?%s=%s&%s=%s";
-
 		foreach ($filters as $filterId => $description)
 		{
-			$tofill['children'][] = array(
-				'link' => sprintf(
-					$toPrint,
-					site_url(self::INFOCENTER_URI.'/'.self::FREIGEGEBEN_PAGE), 'filter_id', $filterId,
-					FHC_Controller::FHC_CONTROLLER_ID,
-					$this->getControllerId()
-				),
-				'description' => $description
+			$toFill['children'][] = $this->navigationlib->oneLevel(
+				$description,				// description
+				sprintf(
+					'%s?%s=%s',
+					site_url(self::INFOCENTER_URI.'/'.self::FREIGEGEBEN_PAGE),
+					'filter_id',
+					$filterId
+				)							// link
 			);
 		}
 	}
@@ -923,23 +938,26 @@ class InfoCenter extends Auth_Controller
 	 * Utility method used to fill elements of the InfoCenter left menu
 	 * with the list of the custom filter of the authenticated user
 	 */
-	private function _fillCustomFilters($filters, &$tofill)
+	private function _fillCustomFilters($filters, &$toFill)
 	{
-		$toPrint = "%s?%s=%s&%s=%s";
-
 		foreach ($filters as $filterId => $description)
 		{
-			$tofill['children'][] = array(
-				'link' => sprintf(
-					$toPrint,
-					site_url(self::INFOCENTER_URI), 'filter_id', $filterId,
-					FHC_Controller::FHC_CONTROLLER_ID,
-					$this->getControllerId()
-				),
-				'description' => $description,
-				'subscriptDescription' => 'Remove',
-				'subscriptLinkClass' => 'remove-custom-filter',
-				'subscriptLinkValue' => $filterId
+			$toFill['children'][] = $this->navigationlib->oneLevel(
+				$description,				// description
+				sprintf(
+					'%s?%s=%s',
+					site_url(self::INFOCENTER_URI),
+					'filter_id',
+					$filterId
+				),							// link
+				null,						// children
+				'',							// icon
+				false,						// expand
+				'Remove',					// subscriptDescription
+				'remove-custom-filter',		// subscriptLinkClass
+				$filterId,					// subscriptLinkValue
+				null,						// sort
+				null						// requiredPermissions
 			);
 		}
 	}
@@ -1058,6 +1076,8 @@ class InfoCenter extends Auth_Controller
 			show_error($prestudenten->retval);
 		}
 
+		$interessentenCount = array();
+
 		foreach ($prestudenten->retval as $prestudent)
 		{
 			$prestudent = $this->PrestudentModel->getPrestudentWithZgv($prestudent->prestudent_id);
@@ -1079,41 +1099,126 @@ class InfoCenter extends Auth_Controller
 			//if prestudent is not interessent or is already bestaetigt, then show only as information, non-editable
 			$zgvpruefung->infoonly = !isset($zgvpruefung->prestudentstatus) || isset($zgvpruefung->prestudentstatus->bestaetigtam) || $zgvpruefung->prestudentstatus->status_kurzbz != 'Interessent';
 
+			//numeric application priority and arrows for changing
+			$zgvpruefung->changeup = false;
+			$zgvpruefung->changedown = false;
+
+			if (isset($zgvpruefung->prestudentstatus->status_kurzbz) && $zgvpruefung->prestudentstatus->status_kurzbz == 'Interessent')
+			{
+				if (isset($zgvpruefung->prestudentstatus->studiensemester_kurzbz))
+				{
+					$studiensemester = $zgvpruefung->prestudentstatus->studiensemester_kurzbz;
+					$zgvpruefung->changeup = $this->PrestudentModel->checkPrioChange($zgvpruefung->prestudent_id, $studiensemester, -1);
+					$zgvpruefung->changedown = $this->PrestudentModel->checkPrioChange($zgvpruefung->prestudent_id, $studiensemester, 1);
+					if (array_key_exists($studiensemester, $interessentenCount))
+						$interessentenCount[$studiensemester]++;
+					else
+						$interessentenCount[$studiensemester] = 1;
+				}
+			}
+
 			$zgvpruefungen[] = $zgvpruefung;
 		}
 
-		// Interessenten come first, otherwise by bewerbungsdatum desc, then by prestudent_id desc
-		usort($zgvpruefungen, function ($a, $b) {
-			$bewdatesort = isset($a->prestudentstatus) && isset($b->prestudentstatus) ? strcmp($b->prestudentstatus->bewerbung_abgeschicktamum, $a->prestudentstatus->bewerbung_abgeschicktamum) : 0;
-			$defaultsort = $bewdatesort === 0 ? (int)$b->prestudent_id - (int)$a->prestudent_id : $bewdatesort;
-			if (!isset($a->prestudentstatus->status_kurzbz) || !isset($b->prestudentstatus->status_kurzbz))
-				return $defaultsort;
-			elseif ($a->prestudentstatus->status_kurzbz === 'Interessent' && $b->prestudentstatus->status_kurzbz === 'Interessent')
-			{
-				//infoonly Interessenten come after new Interessenten
-				if ($a->infoonly === $b->infoonly)
-					return $defaultsort;
-				elseif ($a->infoonly)
-					return 1;
-				elseif ($b->infoonly)
-					return -1;
-			}
-			elseif ($a->prestudentstatus->status_kurzbz === 'Interessent')
-				return -1;
-			elseif ($b->prestudentstatus->status_kurzbz === 'Interessent')
-				return 1;
-			else
-				return $defaultsort;
-		});
+		$this->load->model('organisation/studiensemester_model', 'StudiensemesterModel');
+
+		$this->_sortPrestudents($zgvpruefungen);
 
 		$statusgruende = $this->StatusgrundModel->loadWhere(array('status_kurzbz' => 'Abgewiesener'))->retval;
 
 		$data = array (
 			'zgvpruefungen' => $zgvpruefungen,
+			'numberinteressenten' => $interessentenCount,
 			'statusgruende' => $statusgruende
 		);
 
 		return $data;
+	}
+
+	/**
+	 * Helper function for sorting prestudents
+	 * @param $zgvpruefungen
+	 */
+	private function _sortPrestudents(&$zgvpruefungen)
+	{
+		usort($zgvpruefungen, function ($a, $b) {
+			//sort:
+			// 1: Studiensemester
+			if (isset($a->prestudentstatus->studiensemester_kurzbz) || isset($b->prestudentstatus->studiensemester_kurzbz))
+			{
+				if (!isset($a->prestudentstatus->studiensemester_kurzbz))
+					return 1;
+				elseif(!isset($b->prestudentstatus->studiensemester_kurzbz))
+					return -1;
+
+				$starta = $this->StudiensemesterModel->load($a->prestudentstatus->studiensemester_kurzbz);
+				if (!hasData($starta))
+				{
+					show_error($starta->retval);
+				}
+
+				$startb = $this->StudiensemesterModel->load($b->prestudentstatus->studiensemester_kurzbz);
+				if (!hasData($startb))
+				{
+					show_error($startb->retval);
+				}
+
+				$starta = date_format(date_create($starta->retval[0]->start), 'Y-m-d');
+				$startb = date_format(date_create($startb->retval[0]->start), 'Y-m-d');
+
+				if ($starta > $startb)
+					return -1;
+				elseif ($starta < $startb)
+					return 1;
+			}
+			// 2: Status
+			if (isset($a->prestudentstatus->status_kurzbz) || isset($a->prestudentstatus->status_kurzbz))
+			{
+				if (!isset($b->prestudentstatus->status_kurzbz))
+					return -1;
+				elseif (!isset ($a->prestudentstatus->status_kurzbz))
+					return 1;
+				elseif ($a->prestudentstatus->status_kurzbz !== $b->prestudentstatus->status_kurzbz)
+				{
+					if ($a->prestudentstatus->status_kurzbz === 'Interessent')
+						return -1;
+					elseif ($b->prestudentstatus->status_kurzbz === 'Interessent')
+						return 1;
+				}
+			}
+
+			// 3: Priorisierung, Nulls last
+			if (isset($a->priorisierung) || isset($b->priorisierung))
+			{
+				if (!isset($a->priorisierung))
+					return 1;
+				elseif (!isset($b->priorisierung))
+					return -1;
+				elseif ($a->priorisierung > $b->priorisierung)
+					return 1;
+				elseif ($a->priorisierung < $b->priorisierung)
+					return -1;
+			}
+
+			// 4: Bewerbungsdatum
+			$starta = isset($a->prestudentstatus->bewerbung_abgeschicktamum) ? $a->prestudentstatus->bewerbung_abgeschicktamum : null;
+			$startb = isset($b->prestudentstatus->bewerbung_abgeschicktamum) ? $b->prestudentstatus->bewerbung_abgeschicktamum : null;
+
+			if (isset($starta) || isset($startb))
+			{
+				if (!isset($starta))
+					return 1;
+				elseif(!isset($startb))
+					return -1;
+				elseif ($starta > $startb)
+					return -1;
+				elseif ($starta < $startb)
+					return 1;
+			}
+
+			// 5: prestudentid
+			return (int)$b->prestudent_id - (int)$a->prestudent_id;
+		});
 	}
 
 	/**

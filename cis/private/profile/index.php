@@ -24,6 +24,7 @@ require_once('../../../config/cis.config.inc.php');
 require_once('../../../config/global.config.inc.php');
 require_once('../../../include/functions.inc.php');
 require_once('../../../include/globals.inc.php');
+require_once('../../../include/benutzerberechtigung.class.php');
 require_once('../../../include/studiengang.class.php');
 require_once('../../../include/studienordnung.class.php');
 require_once('../../../include/person.class.php');
@@ -42,6 +43,7 @@ require_once('../../../include/fotostatus.class.php');
 require_once('../../../include/addon.class.php');
 require_once('../../../include/gruppe.class.php');
 require_once('../../../include/adresse.class.php');
+require_once('../../../include/benutzerberechtigung.class.php');
 
 $sprache = getSprache();
 $p = new phrasen($sprache);
@@ -51,14 +53,21 @@ if (!$db = new basis_db())
 
 $uid = get_uid();
 
+$rechte = new benutzerberechtigung();
+$rechte->getBerechtigungen($uid);
+
 $datum_obj = new datum();
 
-$ansicht = false; //Wenn ein anderer User sich das Profil ansieht (Bei Personensuche)
-if (isset($_GET['uid']))
+// Wenn ein anderer User sich das Profil ansieht (Bei Personensuche) sollen bestimmte persönliche Daten nicht angezeigt werden
+// außer der User selber oder berechtigte Personen
+$ansicht = false;
+if (isset($_GET['uid']) && $_GET['uid'] != $uid)
 {
 	$uid = stripslashes($_GET['uid']);
 	$ansicht = true;
 }
+if ($rechte->isBerechtigt('basis/kontakt'))
+	$ansicht = false;
 
 if (!$ansicht && isset($_GET['action']))
 {
@@ -230,7 +239,10 @@ echo '</td><td width="30%" valign="top">';
 
 echo '
 		<b>'.($type == "student"?$p->t("profil/student"):$p->t('profil/mitarbeiter')).'</b><br><br>
-		'.$p->t('global/username').': '.$user->uid.'<br>
+		'.$p->t('global/username').': '.$user->uid.'<br>';
+if ($type == 'student' && $person->matr_nr)
+	echo $p->t('global/matrikelnummer'). ": ". $person->matr_nr. "<br>";
+echo '
 		'.$p->t('global/anrede').': '.$user->anrede.'<br>
 		'.$p->t('global/titel').': '.$user->titelpre.' <br>';
 
@@ -326,6 +338,16 @@ if ($type == 'mitarbeiter')
 		echo $p->t('profil/telefonTw').": $vorwahl - $user->telefonklappe<BR>";
 		//echo $p->t('profil/faxTw').": $vorwahl - 99 $user->telefonklappe<BR>";
 	}
+	else {
+		$kontakt = new kontakt();
+		$kontakt->load_pers($user->person_id);
+		foreach($kontakt->result as $k)
+		{
+			if ($k->kontakttyp == 'firmenhandy')
+				echo $p->t('profil/telefonTw').': '.$k->kontakt.'<br>';
+		}
+
+	}
 	if ($user->ort_kurzbz != '')
 		echo $p->t('profil/buero').': '.$user->ort_kurzbz.'<br>';
 }
@@ -400,9 +422,24 @@ if (!$ansicht)
 	$kontakt = new kontakt();
 	$kontakt->load_pers($user->person_id);
 	usort($kontakt->result, "sortKontakt");
+	echo '<table>';
 
 	foreach($kontakt->result as $k)
 	{
+		if ($k->kontakttyp != 'firmenhandy' && $k->kontakttyp != 'hidden')
+		{
+			if ($k->zustellung)
+				$zustellung = '&#10003;';
+			else
+				$zustellung = '&#10007;';
+			echo '<tr>';
+			echo '<td>'.$k->bezeichnung_mehrsprachig[$sprache].'</td>';
+			echo '<td>'.$k->kontakt.'</td>';
+			echo '<td>'.$k->anmerkung.'</td>';
+			echo '<td>'.$zustellung.'</td>';
+			echo '</tr>';
+		}
+		/*
 		if ($k->zustellung === TRUE)
 		{
 			switch($k->kontakttyp)
@@ -420,7 +457,9 @@ if (!$ansicht)
 				break;
 			}
 		}
+		*/
 	}
+	echo '</table>';
 }
 
 if ($user->homepage != '')

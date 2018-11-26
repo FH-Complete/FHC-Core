@@ -300,7 +300,9 @@ if($result = $db->db_query($qry))
 	//Bewerberblock bei Ausserordentlichen nicht anzeigen
 	if($stg_kz!=('9'.$erhalter))
 	{
-		if($orgform_code==3)
+		$stg_obj = new studiengang();
+
+		if($orgform_code==3 || $stg_obj->isMischform($stg_kz,$ssem) || $stg_obj->isMischform($stg_kz,$psem))
 		{
 			$orgcodes = array_unique($orgform_code_array);
 			//Mischform
@@ -1005,7 +1007,7 @@ function GenerateXMLStudentBlock($row)
 			$datei.="
 			<ErsKz>".$row->ersatzkennzeichen."</ErsKz>";
 		}
-		
+
 		$datei.="
 			<StaatsangehoerigkeitCode>".$row->staatsbuergerschaft."</StaatsangehoerigkeitCode>
 			<HeimatPLZ>".$plz."</HeimatPLZ>
@@ -1152,7 +1154,9 @@ function GenerateXMLStudentBlock($row)
 		$datei.="
 		</StudentIn>";
 
-		if($aktstatus=='Student' || $aktstatus=='Diplomand' || $aktstatus=='Praktikant' || $aktstatus=='Outgoing')
+		// Aktive Studierende - keine Incoming, keine Externen GS
+		if(($aktstatus=='Student' || $aktstatus=='Diplomand' || $aktstatus=='Praktikant' || $aktstatus=='Outgoing')
+			&& !($gemeinsamestudien && $kodex_studientyp_array[$row->gsstudientyp_kurzbz]=='E'))
 		{
 			if(!isset($stsem[$storgform][$sem]))
 			{

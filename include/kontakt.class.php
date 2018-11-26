@@ -24,6 +24,7 @@
  * @create 20-12-2006
  */
 require_once(dirname(__FILE__).'/basis_db.class.php');
+require_once(dirname(__FILE__).'/sprache.class.php');
 
 class kontakt extends basis_db
 {
@@ -281,7 +282,7 @@ class kontakt extends basis_db
 		$qry = "SELECT tbl_kontakt.*, tbl_firma.name as firma_name, tbl_firma.firma_id
 				FROM public.tbl_kontakt LEFT JOIN public.tbl_standort USING(standort_id) LEFT JOIN public.tbl_firma USING(firma_id) WHERE person_id=".$this->db_add_param($person_id, FHC_INTEGER)."
 				AND kontakttyp =".$this->db_add_param($kontakttyp, FHC_STRING);
-		
+
 		if ($order != null)
 			$qry .= " ORDER BY ".$order;
 
@@ -332,9 +333,10 @@ class kontakt extends basis_db
 			$this->errormsg = 'Person_id ist ungueltig';
 			return false;
 		}
-
-		$qry = "SELECT tbl_kontakt.*, tbl_firma.name as firma_name, tbl_firma.firma_id
-				FROM public.tbl_kontakt LEFT JOIN public.tbl_standort USING(standort_id) LEFT JOIN public.tbl_firma USING(firma_id) WHERE person_id=".$this->db_add_param($person_id, FHC_INTEGER).';';
+		$sprache = new sprache();
+		$bezeichnung_mehrsprachig = $sprache->getSprachQuery('bezeichnung_mehrsprachig');
+		$qry = "SELECT tbl_kontakt.*, tbl_firma.name as firma_name, tbl_firma.firma_id, tbl_kontakttyp.beschreibung as kontakttyp_name, $bezeichnung_mehrsprachig
+				FROM public.tbl_kontakt JOIN tbl_kontakttyp USING (kontakttyp) LEFT JOIN public.tbl_standort USING(standort_id) LEFT JOIN public.tbl_firma USING(firma_id) WHERE person_id=".$this->db_add_param($person_id, FHC_INTEGER).';';
 
 		if($this->db_query($qry))
 		{
@@ -356,6 +358,8 @@ class kontakt extends basis_db
 				$obj->insertamum = $row->insertamum;
 				$obj->insertvon = $row->insertvon;
 				$obj->ext_id = $row->ext_id;
+				$obj->kontakttyp_name = $row->kontakttyp_name;
+				$obj->bezeichnung_mehrsprachig = $sprache->parseSprachResult('bezeichnung_mehrsprachig',$row);
 
 				$this->result[] = $obj;
 			}
@@ -512,15 +516,15 @@ class kontakt extends basis_db
 			return false;
 		}
 	}
-	
+
 	/**
 	 * Sucht nach Kontaktdaten, die den Suchkriterien entsprechen
-	 * @param string $searchstring 	String, nach dem gesucht werden soll. 
+	 * @param string $searchstring 	String, nach dem gesucht werden soll.
 	 * 								Wenn $typ = nummer ist, werden eventuelle nicht-numerische Zeichen mit preg_replace entfernt,
 	 * 								und es wird nach den Typen "telefon","mobil","so.tel","firmenhandy" und "notfallkontakt" gesucht
 	 * @param string $typ Optional. Kontakttyp. Möglich sind <b>"nummer"</b>,"telefon","mobil","so.tel","firmenhandy","firmenhandy","email","fax" und "homepage".
 	 * 								Wenn $typ = nummer ist, werden eventuelle nicht-numerische Zeichen mit preg_replace entfernt,
-	 * 								und es wird nach den Typen "telefon","mobil","so.tel","firmenhandy" und "notfallkontakt" gesucht 
+	 * 								und es wird nach den Typen "telefon","mobil","so.tel","firmenhandy" und "notfallkontakt" gesucht
 	 * @return boolean
 	 */
 	public function searchKontakt ($searchstring, $typ = '')
@@ -534,18 +538,18 @@ class kontakt extends basis_db
 				return false;
 			}
 		}
-		$qry = "SELECT 
+		$qry = "SELECT
 					*
-				FROM 
+				FROM
 					public.tbl_kontakt
-				WHERE 
+				WHERE
 					1=1";
-		
+
 		if ($typ == 'nummer')
 			$qry .= " AND regexp_replace(kontakt , '[^0-9]', '', 'g') LIKE ('%".$this->db_escape($searchstring)."%')";
 		else
 			$qry .= " AND LOWER (kontakt) LIKE LOWER ('%".$this->db_escape($searchstring)."%')";
-		
+
 		if ($typ != '' && $typ != 'nummer')
 			$qry .= " AND kontakttyp=".$this->db_add_param($typ);
 
@@ -554,7 +558,7 @@ class kontakt extends basis_db
 			while($row = $this->db_fetch_object())
 			{
 				$obj = new kontakt();
-	
+
 				$obj->kontakt_id = $row->kontakt_id;
 				$obj->person_id = $row->person_id;
 				$obj->standort_id = $row->standort_id;
@@ -567,10 +571,10 @@ class kontakt extends basis_db
 				$obj->insertamum = $row->insertamum;
 				$obj->insertvon = $row->insertvon;
 				$obj->ext_id = $row->ext_id;
-	
+
 				$this->result[] = $obj;
 			}
-	
+
 			return true;
 		}
 		else

@@ -62,7 +62,7 @@ $daysinmonth = cal_days_in_month(CAL_GREGORIAN, $month, $year);
 $date = new datum();
 $ztauf = new zeitaufzeichnung();
 
-$activitiesToIgnore = array('DienstreiseMT');//aktivitaetstypen which shouldn't be added to worktime
+$activitiesToIgnore = array('DienstreiseMT', 'Ersatzruhe');//aktivitaetstypen which shouldn't be added to worktime
 $ztauf->getListeUserFromTo($uid, $year.'-'.$month.'-01', $year.'-'.$month.'-'.$daysinmonth, $activitiesToIgnore);
 
 //objects for one projectline of list (corresponds to one day)

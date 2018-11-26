@@ -22,7 +22,6 @@
 require_once('../../config/vilesci.config.inc.php');
 require_once('../../include/functions.inc.php');
 require_once('../../include/studiengang.class.php');
-require_once('../../include/fachbereich.class.php');
 require_once('../../include/Excel/excel.php');
 require_once('../../include/benutzerberechtigung.class.php');
 
@@ -45,24 +44,31 @@ $stg_arr = array();
 foreach ($studiengang->result as $row)
 	$stg_arr[$row->studiengang_kz] = $row->kuerzel.' ('.$row->kurzbzlang.')';
 
-$fachbereich = new fachbereich();
-$fachbereich->getAll();
+$oe_obj = new organisationseinheit();
+$oe_obj->getTypen();
+foreach($oe_obj->result as $row)
+{
+	$oetyp_arr[$row->organisationseinheittyp_kurzbz] = $row->bezeichnung;
+}
 
-$fb_arr = array();
-foreach ($fachbereich->result as $row)
-	$fb_arr[$row->fachbereich_kurzbz]=$row->bezeichnung;
+$oe_obj = new organisationseinheit();
+$oe_obj->getAll();
+
+$oe_arr = array();
+$oe_arr['']='Nicht Zugewiesen';
+foreach ($oe_obj->result as $row)
+	$oe_arr[$row->oe_kurzbz]=$oetyp_arr[$row->organisationseinheittyp_kurzbz].' '.$row->bezeichnung;
 
 $db = new basis_db();
-// ALVS pro Fachbereich
+// ALVS pro OE
 $qry = "
 SELECT * FROM (
 	SELECT
-		fachbereich_kurzbz, tbl_lehrveranstaltung.studiengang_kz, geschlecht,sum(tbl_lehreinheitmitarbeiter.semesterstunden) as semesterstunden
+		lehrfach.oe_kurzbz as lehrfach_oe_kurzbz, tbl_lehrveranstaltung.studiengang_kz, geschlecht,sum(tbl_lehreinheitmitarbeiter.semesterstunden) as semesterstunden
 	FROM
 		lehre.tbl_lehreinheit,
 		lehre.tbl_lehrveranstaltung,
 		lehre.tbl_lehrveranstaltung as lehrfach,
-		public.tbl_fachbereich,
 		lehre.tbl_lehreinheitmitarbeiter,
 		public.tbl_benutzer,
 		public.tbl_person
@@ -73,28 +79,27 @@ SELECT * FROM (
 		tbl_lehreinheitmitarbeiter.mitarbeiter_uid = tbl_benutzer.uid AND
 		tbl_benutzer.person_id = tbl_person.person_id AND
 		tbl_lehreinheitmitarbeiter.semesterstunden<>0 AND
-		tbl_fachbereich.oe_kurzbz=lehrfach.oe_kurzbz AND
 		faktor<>0 AND
 		stundensatz<>0 AND
 		tbl_lehreinheitmitarbeiter.lehreinheit_id=tbl_lehreinheit.lehreinheit_id
-	GROUP BY fachbereich_kurzbz, geschlecht, tbl_lehrveranstaltung.studiengang_kz
+	GROUP BY lehrfach.oe_kurzbz, geschlecht, tbl_lehrveranstaltung.studiengang_kz
 	) as a JOIN public.tbl_studiengang USING(studiengang_kz)
-ORDER BY typ, tbl_studiengang.kurzbz, fachbereich_kurzbz
+ORDER BY typ, tbl_studiengang.kurzbz, lehrfach_oe_kurzbz
 ";
 
 if(!$db->db_query($qry))
 	die('Fehler bei Datenbankabfrage');
 
-$fachbereiche = array();
+$organisationseinheiten = array();
 
 while($row = $db->db_fetch_object())
 {
-	if(!in_array($row->fachbereich_kurzbz, $fachbereiche))
-		$fachbereiche[] = $row->fachbereich_kurzbz;
-	$data[$row->studiengang_kz][$row->fachbereich_kurzbz][$row->geschlecht]=$row->semesterstunden;
+	if(!in_array($row->lehrfach_oe_kurzbz, $organisationseinheiten))
+		$organisationseinheiten[] = $row->lehrfach_oe_kurzbz;
+	$data[$row->studiengang_kz][$row->lehrfach_oe_kurzbz][$row->geschlecht]=$row->semesterstunden;
 }
 
-sort($fachbereiche);
+sort($organisationseinheiten);
 
 //Betreuerstunden
 $qry = "
@@ -138,7 +143,6 @@ if($format=='xls')
 	//Formate Definieren
 	$format_bold =& $workbook->addFormat();
 	$format_bold->setBold();
-	//$format_bold->setBorder(1);
 
 	$format_border =& $workbook->addFormat();
 	$format_border->setBorder(1);
@@ -147,19 +151,19 @@ if($format=='xls')
 	$format_rotate->setTextRotation(270);
 	$format_rotate->setAlign("center");
 	$format_rotate->setBold();
-	
+
 	$format_m_w =& $workbook->addFormat();
 	$format_m_w->setAlign("center");
 	$format_m_w->setBold();
-	
+
 	$format_data =& $workbook->addFormat();
 	$format_data->setNumFormat("0.00");
-	
+
 	$format_bold_data =& $workbook->addFormat();
 	$format_bold_data->setBold();
 	$format_bold_data->setNumFormat("0.00");
 	$format_bold_data->setVAlign("vcenter");
-	
+
 	$format_bold_center_data =& $workbook->addFormat();
 	$format_bold_center_data->setBold();
 	$format_bold_center_data->setNumFormat("0.00");
@@ -168,59 +172,45 @@ if($format=='xls')
 	$spalte=0;
 	$zeile=0;
 
-
 	$worksheet->write($zeile,$spalte,$stsem, $format_bold);
 	$maxlength[$spalte]=13;
-	$summe_fb = array();
-	foreach ($fachbereiche as $fb)
+	$summe_oe = array();
+	foreach ($organisationseinheiten as $oe)
 	{
 		$zeile=0;
-		$worksheet->write($zeile,++$spalte,$fb_arr[$fb], $format_rotate);
+		$worksheet->write($zeile,++$spalte,$oe_arr[$oe], $format_rotate);
 		$worksheet->mergeCells($zeile,$spalte,0,$spalte+1);
-		$fachbereiche[$fb]=$spalte;
-		
+		$organisationseinheiten_idx[$oe]=$spalte;
+
 		$worksheet->write(++$zeile,$spalte,'m',$format_m_w);
 		$worksheet->write($zeile,++$spalte,'w',$format_m_w);
-		
-		//$fachbereiche[$fb]=$spalte;
-		$summe_fb[$fb]=array();
-		//++$spalte;
+
+		$summe_oe[$oe]=array();
+
 		$maxlength[$spalte]=7;
 		$maxlength[$spalte-1]=7;
 	}
 	$zeile=0;
 	$worksheet->write($zeile,++$spalte,'Betreuungen', $format_rotate);
 	$worksheet->mergeCells($zeile,$spalte,0,$spalte+1);
-	
+
 	$worksheet->write(++$zeile,$spalte,'m',$format_m_w);
 	$worksheet->write($zeile,++$spalte,'w',$format_m_w);
-	
+
 	$maxlength[$spalte]=7;
 	$maxlength[$spalte-1]=7;
-	
-	$fachbereiche['betreuungen']=$spalte-1;
-	//$maxlength[$spalte]=3;
-	$summe_fb['betreuungen']=array();
-	//++$spalte;
-	
+
+	$organisationseinheiten_idx['betreuungen']=$spalte-1;
+	$summe_oe['betreuungen']=array();
+
 	$zeile=0;
 	$worksheet->write($zeile,++$spalte,'Summe', $format_rotate);
 	$worksheet->mergeCells($zeile,$spalte,0,$spalte+2);
 	$worksheet->write(++$zeile,$spalte,'m',$format_m_w);
 	$worksheet->write($zeile,++$spalte,'w',$format_m_w);
 	$worksheet->write($zeile,++$spalte,'Gesamt',$format_m_w);
-	
+
 	$maxspalten=$spalte;
-	
-	/*++$zeile;
-	$spalte=0;
-	foreach ($fachbereiche as $fb)
-	{
-		$worksheet->write($zeile,++$spalte,'m');
-		$worksheet->write($zeile,++$spalte,'w');
-		//$fachbereiche[$fb]=$spalte;
-		//++$spalte;
-	}*/
 
 	if(isset($data))
 	{
@@ -231,27 +221,23 @@ if($format=='xls')
 			$worksheet->write($zeile,$spalte,$stg_arr[$key], $format_bold);
 			$summe_m=0;
 			$summe_w=0;
-			foreach ($data[$key] as $fb=>$stunden)
+			foreach ($data[$key] as $oe=>$stunden)
 			{
 				if(!isset($stunden['m']))
 					$stunden['m']=0;
 				$summe_m+=$stunden['m'];
-				if(!isset($summe_fb[$fb]['m']))
-					$summe_fb[$fb]['m']=0;
-				$summe_fb[$fb]['m']+=$stunden['m'];
-				$worksheet->write($zeile,$fachbereiche[$fb],$stunden['m'],$format_data);
-				//if($maxlength[$fachbereiche[$fb]]<strlen($stunden['m']))
-				//	$maxlength[$fachbereiche[$fb]]=strlen($stunden['m']);
-				
+				if(!isset($summe_oe[$oe]['m']))
+					$summe_oe[$oe]['m']=0;
+				$summe_oe[$oe]['m']+=$stunden['m'];
+				$worksheet->write($zeile,$organisationseinheiten_idx[$oe],$stunden['m'],$format_data);
+
 				if(!isset($stunden['w']))
 					$stunden['w']=0;
 				$summe_w+=$stunden['w'];
-				if(!isset($summe_fb[$fb]['w']))
-					$summe_fb[$fb]['w']=0;
-				$summe_fb[$fb]['w']+=$stunden['w'];
-				$worksheet->write($zeile,$fachbereiche[$fb]+1,$stunden['w'],$format_data);
-				//if($maxlength[$fachbereiche[$fb]]<strlen($stunden['w']))
-				//	$maxlength[$fachbereiche[$fb]]=strlen($stunden['w']);
+				if(!isset($summe_oe[$oe]['w']))
+					$summe_oe[$oe]['w']=0;
+				$summe_oe[$oe]['w']+=$stunden['w'];
+				$worksheet->write($zeile,$organisationseinheiten_idx[$oe]+1,$stunden['w'],$format_data);
 			}
 			$worksheet->write($zeile,$maxspalten-2,number_format($summe_m,2,'.',''), $format_bold_data);
 			$worksheet->write($zeile,$maxspalten-1,number_format($summe_w,2,'.',''), $format_bold_data);
@@ -264,20 +250,20 @@ if($format=='xls')
 	$zeile++;
 	$worksheet->write($zeile,0,'Summe', $format_bold_data);
 	$worksheet->mergeCells($zeile,0,$zeile+1,0);
-	//foreach ($summe_fb as $fb=>$summe)
-	foreach ($summe_fb as $fb=>$summe)
+
+	foreach ($summe_oe as $oe=>$summe)
 	{
 		if(!isset($summe['m']))
 			$summe['m']=0;
 		if(!isset($summe['w']))
 			$summe['w']=0;
-		
-		if(isset($fachbereiche[$fb]))
-			$worksheet->write($zeile,$fachbereiche[$fb],number_format($summe['m'],2,'.',''), $format_bold_center_data);
-			$worksheet->write($zeile,$fachbereiche[$fb]+1,number_format($summe['w'],2,'.',''), $format_bold_center_data);
+
+		if(isset($organisationseinheiten_idx[$oe]))
+			$worksheet->write($zeile,$organisationseinheiten_idx[$oe],number_format($summe['m'],2,'.',''), $format_bold_center_data);
+			$worksheet->write($zeile,$organisationseinheiten_idx[$oe]+1,number_format($summe['w'],2,'.',''), $format_bold_center_data);
 			$gesamt = $summe['m']+$summe['w'];
-			$worksheet->write(++$zeile,$fachbereiche[$fb],number_format($gesamt,2,'.',''), $format_bold_center_data);
-			$worksheet->mergeCells($zeile,$fachbereiche[$fb],$zeile,$fachbereiche[$fb]+1);
+			$worksheet->write(++$zeile,$organisationseinheiten_idx[$oe],number_format($gesamt,2,'.',''), $format_bold_center_data);
+			$worksheet->mergeCells($zeile,$organisationseinheiten_idx[$oe],$zeile,$organisationseinheiten_idx[$oe]+1);
 			--$zeile;
 	}
 
@@ -303,72 +289,70 @@ else
 	}
 	td
 	{
-		
+
 	}
 	</style>
 	</head>
 	<body class="Background_main">';
 
-
-
 	echo "<h2>ALVS $stsem</h2>";
 
 	echo '<table class="liste" style="border: 1px solid black" rules="all" cellspacing="0">';
 	echo '<tr class="liste"><th>'.$stsem.'</th>';
-	$summe_fb = array();
+	$summe_oe = array();
 
-	foreach ($fachbereiche as $fb)
+	foreach ($organisationseinheiten as $oe)
 	{
-		echo "<th colspan='2'>".$fb_arr[$fb]."</th>";
-		$summe_fb[$fb]=array();
+		echo "<th colspan='2'>".$oe_arr[$oe]."</th>";
+		$summe_oe[$oe]=array();
 	}
 	echo "<th colspan='2'>Betreuungen</th>";
-	$summe_fb['betreuungen']=array();
+	$summe_oe['betreuungen']=array();
 	echo "<th colspan='3'>Summe</th>";
 	echo "</tr>";
 	// Spalten m/w
 	echo '<tr class="liste"><td>&nbsp;</td>';
-	foreach ($fachbereiche as $fb)
+	foreach ($organisationseinheiten as $oe)
 	{
 		echo "<td style='text-align:center; font-weight: bold; width: 50%'>m</td><td style='text-align:center; font-weight: bold;'>w</td>";
 	}
 	echo "<td style='text-align:center; font-weight: bold; width: 33%'>m</td>";
 	echo "<td style='text-align:center; font-weight: bold; width: 33%'>w</td>";
-	//$summe_fb['betreuungen']=0;
+
 	echo "<td style='text-align:center; font-weight: bold; width: 33%'>m</td>";
 	echo "<td style='text-align:center; font-weight: bold; width: 33%'>w</td>";
 	echo "<td style='text-align:center; font-weight: bold'>Gesamt</td>";
 	echo "</tr>";
 
-	// Für jeden Fachbereich eine Variable definieren
-	foreach ($fachbereiche as $fb)
+	// Für jede OE eine Variable definieren
+	foreach ($organisationseinheiten as $oe)
 	{
-		$summe_fb[$fb]["m"] = 0;
-		$summe_fb[$fb]["w"] = 0;
+		$summe_oe[$oe]["m"] = 0;
+		$summe_oe[$oe]["w"] = 0;
 	}
-	$summe_fb['betreuungen']['m'] = 0;
-	$summe_fb['betreuungen']['w'] = 0;
+	$summe_oe['betreuungen']['m'] = 0;
+	$summe_oe['betreuungen']['w'] = 0;
 	foreach ($data as $key=>$val)
 	{
 		echo "<tr>";
 		echo "<td>".$stg_arr[$key]."</td>";
 		$summe_m =0;
 		$summe_w =0;
-		foreach ($fachbereiche as $fb)
+		foreach ($organisationseinheiten as $oe)
 		{
-			if(isset($data[$key][$fb]["m"]))
+			if(isset($data[$key][$oe]["m"]))
 			{
-				$summe_m+=$data[$key][$fb]["m"];
-				$summe_fb[$fb]["m"]+=$data[$key][$fb]["m"];
-				echo "<td>".$data[$key][$fb]["m"]."</td>";
+				$summe_m+=$data[$key][$oe]["m"];
+				$summe_oe[$oe]["m"]+=$data[$key][$oe]["m"];
+				echo "<td>".$data[$key][$oe]["m"]."</td>";
 			}
 			else
 				echo "<td>&nbsp;</td>";
-			if(isset($data[$key][$fb]["w"]))
+			if(isset($data[$key][$oe]["w"]))
 			{
-				$summe_w+=$data[$key][$fb]["w"];
-				$summe_fb[$fb]["w"]+=$data[$key][$fb]["w"];
-				echo "<td>".$data[$key][$fb]["w"]."</td>";
+				$summe_w+=$data[$key][$oe]["w"];
+				$summe_oe[$oe]["w"]+=$data[$key][$oe]["w"];
+				echo "<td>".$data[$key][$oe]["w"]."</td>";
 			}
 			else
 				echo "<td>&nbsp;</td>";
@@ -376,7 +360,7 @@ else
 		if(isset($data[$key]['betreuungen']['m']))
 		{
 			echo "<td>".number_format($data[$key]['betreuungen']['m'],2)."</td>";
-			$summe_fb['betreuungen']['m']+=$data[$key]['betreuungen']['m'];
+			$summe_oe['betreuungen']['m']+=$data[$key]['betreuungen']['m'];
 			$summe_m+=$data[$key]['betreuungen']['m'];
 		}
 		else
@@ -384,7 +368,7 @@ else
 		if(isset($data[$key]['betreuungen']['w']))
 		{
 			echo "<td>".number_format($data[$key]['betreuungen']['w'],2)."</td>";
-			$summe_fb['betreuungen']['w']+=$data[$key]['betreuungen']['w'];
+			$summe_oe['betreuungen']['w']+=$data[$key]['betreuungen']['w'];
 			$summe_w+=$data[$key]['betreuungen']['w'];
 		}
 		else
@@ -398,44 +382,44 @@ else
 
 	echo "<tr>";
 	echo "<td rowspan='2'>Summe</td>";
-	foreach ($fachbereiche as $fb)
+	foreach ($organisationseinheiten as $oe)
 	{
-		if(isset($summe_fb[$fb]["m"]))
-			echo "<td style='text-align:center; font-weight: bold'>".$summe_fb[$fb]["m"]."</td>";
+		if(isset($summe_oe[$oe]["m"]))
+			echo "<td style='text-align:center; font-weight: bold'>".$summe_oe[$oe]["m"]."</td>";
 		else
 			echo "<td>&nbsp;</td>";
-		if(isset($summe_fb[$fb]["w"]))
-			echo "<td style='text-align:center; font-weight: bold'>".$summe_fb[$fb]["w"]."</td>";
+		if(isset($summe_oe[$oe]["w"]))
+			echo "<td style='text-align:center; font-weight: bold'>".$summe_oe[$oe]["w"]."</td>";
 		else
 			echo "<td>&nbsp;</td>";
 	}
-	if(isset($summe_fb['betreuungen']['m']))
-		echo "<td style='text-align:center; font-weight: bold'>".number_format($summe_fb['betreuungen']['m'],2)."</td>";
+	if(isset($summe_oe['betreuungen']['m']))
+		echo "<td style='text-align:center; font-weight: bold'>".number_format($summe_oe['betreuungen']['m'],2)."</td>";
 	else
 		echo "<td>&nbsp;</td>";
-	if(isset($summe_fb['betreuungen']['w']))
-		echo "<td style='text-align:center; font-weight: bold'>".number_format($summe_fb['betreuungen']['w'],2)."</td>";
+	if(isset($summe_oe['betreuungen']['w']))
+		echo "<td style='text-align:center; font-weight: bold'>".number_format($summe_oe['betreuungen']['w'],2)."</td>";
 	else
 		echo "<td>&nbsp;</td>";
 	echo "<td colspan='3'>&nbsp;</td>";
 	echo "</tr>";
-	
+
 	echo "<tr>";
 	//echo "<td></td>";
-	foreach ($fachbereiche as $fb)
+	foreach ($organisationseinheiten as $oe)
 	{
-		if(isset($summe_fb[$fb]["m"]) || isset($summe_fb[$fb]["w"]))
-			echo "<td colspan='2' style='text-align:center; font-weight: bold'>".($summe_fb[$fb]["m"] + $summe_fb[$fb]["w"])."</td>";
+		if(isset($summe_oe[$oe]["m"]) || isset($summe_oe[$oe]["w"]))
+			echo "<td colspan='2' style='text-align:center; font-weight: bold'>".($summe_oe[$oe]["m"] + $summe_oe[$oe]["w"])."</td>";
 		else
 			echo "<td colspan='2'>&nbsp;</td>";
 	}
-	if(isset($summe_fb['betreuungen']['m']) || isset($summe_fb['betreuungen']['w']))
-		echo "<td colspan='2' style='text-align:center; font-weight: bold'>".number_format(($summe_fb['betreuungen']['m'] + $summe_fb['betreuungen']['w']),2)."</td>";
+	if(isset($summe_oe['betreuungen']['m']) || isset($summe_oe['betreuungen']['w']))
+		echo "<td colspan='2' style='text-align:center; font-weight: bold'>".number_format(($summe_oe['betreuungen']['m'] + $summe_oe['betreuungen']['w']),2)."</td>";
 	else
 		echo "<td colspan='2'>&nbsp;</td>";
 	echo "<td colspan='3'>&nbsp;</td>";
 	echo "</tr>";
-	
+
 	echo '</table>';
 	echo '</body>
 	</html>';

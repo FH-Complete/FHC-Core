@@ -21,7 +21,7 @@ class Buchungstyp extends APIv1_Controller
 	 */
 	public function __construct()
 	{
-		parent::__construct(array('Buchungstyp' => 'basis/buchungstyp:rw');
+		parent::__construct(array('Buchungstyp' => 'basis/buchungstyp:rw'));
 		// Load model BuchungstypModel
 		$this->load->model('crm/buchungstyp_model', 'BuchungstypModel');
 

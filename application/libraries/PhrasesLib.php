@@ -194,7 +194,6 @@ class PhrasesLib
 			{
 				$_phrase = $this->_phrases[$i]; // single phrase
 
-				$trimedval = trim($_phrase->text);
 				// If the single phrase match the given parameters and is not an empty string
 				if ($_phrase->category == $category
 					&& $_phrase->phrase == $phrase
