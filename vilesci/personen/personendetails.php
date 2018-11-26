@@ -51,10 +51,45 @@ echo '<html>
 	<head>
 		<title>PreInteressenten</title>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-		<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
-		<link rel="stylesheet" href="../../include/js/tablesort/table.css" type="text/css">
-		<script src="../../include/js/tablesort/table.js" type="text/javascript"></script>
-	</head>
+		<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">';
+		include('../../include/meta/jquery.php');
+		include('../../include/meta/jquery-tablesorter.php');
+echo '</head>
+	<script language="JavaScript" type="text/javascript">
+	// Add parser through the tablesorter addParser method for sorting Studiensemester
+	$.tablesorter.addParser({ 
+		// set a unique id 
+		id: "studiensemester", 
+		is: function(s) { 
+			// return false so this parser is not auto detected 
+			return false; 
+		}, 
+		format: function(s) { 
+			// format data for normalization 
+			var result = s.substr(2) + s.substr(0, 2);
+			return result;
+		}, 
+		// set type, either numeric or text 
+		type: "text" 
+	});
+
+	$(document).ready(function() 
+	{ 
+		$(".tablesorter").tablesorter(
+		{
+			widgets: ["zebra"]
+		}); 
+		$("#tablePreStudent").tablesorter(
+		{
+			headers: { 
+				1: { 
+					sorter:"studiensemester" 
+				}},
+			sortList: [[1,1],[2,0],[3,0]],
+			widgets: ["zebra"]
+		}); 
+	});
+	</script>
 	<body class="Background_main">
 	';
 
@@ -88,7 +123,7 @@ echo '<br><a href="../fhausweis/search.php?person_id='.$person->person_id.'">Sta
 $kontakt = new kontakt();
 $kontakt->load_pers($person->person_id);
 echo '<h3>Kontaktdaten</h3>';
-echo '<table class="liste table-autosort:0 table-stripeclass:alternate table-autostripe">
+echo '<table class="tablesorter" data-sortlist="[[2,0],[0,0]]">
 		<thead>
 			<tr>
 				<th>Typ</th>
@@ -105,7 +140,7 @@ foreach ($kontakt->result as $row)
 	echo "<td>$row->kontakt</td>";
 	echo "<td>".($row->zustellung?'Ja':'Nein')."</td>";
 	echo "<td>$row->anmerkung</td>";
-	echo '<tr>';
+	echo '</tr>';
 }
 echo '</tbody></table>';
 
@@ -121,8 +156,22 @@ foreach($nation->nation as $row)
 $adresstyp_arr = array(''=>'','h'=>'Hauptwohnsitz','n'=>'Nebenwohnsitz','f'=>'Firma');
 
 // *** ADRESSEN ***
-echo "<h3>Adressen:</h3>";
-echo "<table class='liste'><tr><th>Strasse</th><th>Plz</th><th>Ort</th><th>Gemeinde</th><th>Nation</th><th>Typ</th><th>Heimat</th><th>Zustellung</th><th>Firma</th></tr>";
+echo '<h3>Adressen:</h3>';
+echo '<table class="tablesorter" data-sortlist="[[7,0],[0,0]]">
+		<thead>
+		<tr>
+			<th>Strasse</th>
+			<th>Plz</th>
+			<th>Ort</th>
+			<th>Gemeinde</th>
+			<th>Nation</th>
+			<th>Typ</th>
+			<th>Heimat</th>
+			<th>Zustellung</th>
+			<th>Firma</th>
+		</tr>
+		</thead>
+		<tbody>';
 $adresse_obj = new adresse();
 $adresse_obj->load_pers($person->person_id);
 
@@ -143,14 +192,14 @@ foreach ($adresse_obj->result as $row)
 		$firma->load($row->firma_id);
 	echo "<td>".$firma->name."</td>";
 }
-echo '</table>';
+echo '</tbody></table>';
 
 $preinteressent = new preinteressent();
 $preinteressent->getPreinteressenten($person->person_id);
 if(count($preinteressent->result)>0)
 {
 	echo '<br><h2>Preinteressent</h2>';
-	echo '<table class="liste table-autosort:0 table-stripeclass:alternate table-autostripe">
+	echo '<table class="tablesorter" data-sortlist="[[0,0]]">
 			<thead>
 				<tr>
 					<th>ID</th>
@@ -219,7 +268,7 @@ $preincoming->loadFromPerson($person->person_id);
 if(count($preincoming->result)>0)
 {
 	echo '<br><h2>Preincoming</h2>';
-	echo '<table class="liste table-autosort:0 table-stripeclass:alternate table-autostripe">
+	echo '<table class="tablesorter" data-sortlist="[[0,0]]">
 			<thead>
 				<tr>
 					<th>ID</th>
@@ -245,11 +294,15 @@ $prestudent->getPrestudenten($person->person_id);
 if(count($prestudent->result)>0)
 {
 	echo '<br><h2>Pre-/Studenten</h2>';
-	echo '<table class="liste table-autosort:0 table-stripeclass:alternate table-autostripe">
+	echo '<table id="tablePreStudent">
 			<thead>
 				<tr>
 					<th>ID</th>
+					<th>Studiensemester</th>
+					<th>Priorität</th>
 					<th>Studiengang</th>
+					<th>Organisationsform</th>
+					<th>Studienplan</th>
 					<th>Reihungstest</th>
 					<th>UID</th>
 					<th>Gruppe</th>
@@ -258,9 +311,15 @@ if(count($prestudent->result)>0)
 			</thead><tbody>';
 	foreach ($prestudent->result as $row)
 	{
+		$prestudentLastStatus = new prestudent();
+		$prestudentLastStatus->getLastStatus($row->prestudent_id);
 		echo '<tr>';
 		echo "<td>$row->prestudent_id</td>";
+		echo "<td>$prestudentLastStatus->studiensemester_kurzbz</td>";
+		echo "<td>$row->priorisierung</td>";
 		echo "<td>".$studiengang->kuerzel_arr[$row->studiengang_kz]."</td>";
+		echo "<td>$prestudentLastStatus->orgform_kurzbz</td>";
+		echo "<td>$prestudentLastStatus->studienplan_bezeichnung</td>";
 		echo "<td>".($row->reihungstestangetreten?'Ja':'Nein')."</td>";
 		$uid='';
 		$gruppe='';
@@ -282,9 +341,7 @@ if(count($prestudent->result)>0)
 		}
 		echo "<td>$uid</td>";
 		echo "<td>$gruppe</td>";
-		$prestudent1 = new prestudent();
-		$prestudent1->getLastStatus($row->prestudent_id);
-		echo "<td>$prestudent1->status_kurzbz ".($prestudent1->ausbildungssemester!=''?"($prestudent1->ausbildungssemester. Semester)":'')."</td>";
+		echo "<td>$prestudentLastStatus->status_kurzbz ".($prestudentLastStatus->ausbildungssemester!=''?"($prestudentLastStatus->ausbildungssemester. Semester)":'')."</td>";
 		echo '</tr>';
 	}
 	echo '</tbody></table>';
@@ -296,7 +353,7 @@ if($result = $db->db_query($qry))
 	if($db->db_num_rows($result)>0)
 	{
 		echo '<br><h2>Mitarbeiter</h2>';
-		echo '<table class="liste table-autosort:0 table-stripeclass:alternate table-autostripe">
+		echo '<table class="tablesorter" data-sortlist="[[0,0]]">
 			<thead>
 				<tr>
 					<th>UID</th>
