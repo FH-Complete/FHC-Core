@@ -155,8 +155,8 @@ if($result_stg = $db->db_query($qry_stg))
 
 		$i=0;
 		$gesamtsheet_row++;
-		$gesamt->write(0,0,'', $format_colored);
-		$gesamt->write(0,1,'Kennzeichnet Änderungen am Lehrauftrag innerhalb der letzten 31 Tage', $format_normal);
+		//$gesamt->write(0,0,"", $format_colored); Mag er nicht. Wirft Fehler in MS Excel
+		//$gesamt->write(0,1,"Kennzeichnet Änderungen am Lehrauftrag innerhalb der letzten 31 Tage", $format_normal); Mag er nicht. Wirft Fehler in MS Excel
 		$worksheet->write(0,0,'Erstellt am '.date('d.m.Y').' '.$semester_aktuell.' '.$studiengang->kuerzel, $format_bold);
 		$gesamt->write($gesamtsheet_row,0,'Erstellt am '.date('d.m.Y').' '.$semester_aktuell.' '.$studiengang->kuerzel, $format_bold);
 		$gesamtsheet_row+=2;
