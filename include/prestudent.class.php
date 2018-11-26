@@ -1927,4 +1927,43 @@ class prestudent extends person
 			return false;
 		}
 	}
+	
+	/**
+	 * Liefert die höchste Priorität des PreStudenten einer Person in einem Studiensemester
+	 * @param integer $person_id Person ID deren höchste Priorität geladen werden soll
+	 * @param string $studiensemester_kurzbz Studiensemester dessen höchste Priorität geladen werden soll
+	 * @return integer Zahl der höchsten Priorität oder false im Fehlerfall
+	 */
+	public function getHoechstePriorisierungPersonStudiensemester($person_id, $studiensemester_kurzbz)
+	{
+		$qry = "SELECT
+					priorisierung
+				FROM
+					public.tbl_prestudent
+					JOIN public.tbl_prestudentstatus USING(prestudent_id)
+				WHERE
+					tbl_prestudent.person_id=".$this->db_add_param($person_id, FHC_INTEGER)."
+					AND tbl_prestudentstatus.status_kurzbz='Interessent'
+					AND tbl_prestudentstatus.studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz)."
+				ORDER BY priorisierung DESC NULLS LAST LIMIT 1";
+					
+		if($result = $this->db_query($qry))
+		{
+			if($row = $this->db_fetch_object($result))
+			{
+				return $row->priorisierung;
+			}
+			else
+			{
+				$this->errormsg = 'Fehler beim Laden der Daten';
+				return false;
+			}
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+					
+	}
 }
