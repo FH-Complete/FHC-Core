@@ -436,7 +436,7 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
 					</table:table-cell>
 					<table:table-cell table:style-name="Tabelle1.G2" office:value-type="string">
 						<xsl:choose>
-							<xsl:when test="mitarbeiter/inkludierte_lehre = -1">
+							<xsl:when test="mitarbeiter/inkludierte_lehre != ''">
 								<text:p text:style-name="P11">€ 0,00</text:p>
 							</xsl:when>
 							<xsl:otherwise>
@@ -514,9 +514,9 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
 			<text:p text:style-name="P3"><xsl:value-of select="stunden" /></text:p>
 		</table:table-cell>
 		<table:table-cell table:style-name="Tabelle1.A2" office:value-type="string">
-			<!-- Wenn LektorInnen bei inkludierte_lehre -1 stehen haben, wird am Lehrauftrag bei Stundensatz und Brutto 0 ausgegeben-->
+			<!-- Wenn LektorInnen bei inkludierte_lehre einen Wert stehen haben, wird am Lehrauftrag bei Stundensatz und Brutto 0 ausgegeben-->
 			<xsl:choose>
-				<xsl:when test="../mitarbeiter/inkludierte_lehre = -1">
+				<xsl:when test="../mitarbeiter/inkludierte_lehre != ''">
 					<text:p text:style-name="P2">0.00</text:p>
 				</xsl:when>
 				<xsl:otherwise>
@@ -525,9 +525,9 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
 			</xsl:choose>
 		</table:table-cell>
 		<table:table-cell table:style-name="Tabelle1.G2" office:value-type="string">
-			<!-- Wenn LektorInnen bei inkludierte_lehre -1 stehen haben, wird am Lehrauftrag bei Stundensatz und Brutto 0 ausgegeben-->
+			<!-- Wenn LektorInnen bei inkludierte_lehre einen Wert stehen haben, wird am Lehrauftrag bei Stundensatz und Brutto 0 ausgegeben-->
 			<xsl:choose>
-				<xsl:when test="../mitarbeiter/inkludierte_lehre = -1">
+				<xsl:when test="../mitarbeiter/inkludierte_lehre != ''">
 					<text:p text:style-name="P3">€ 0,00</text:p>
 				</xsl:when>
 				<xsl:otherwise>
