@@ -180,12 +180,13 @@ class organisationseinheit extends basis_db
 	}
 	
 	/**
-	 * Liefert die ChildNodes einer Organisationseinheit
+	 * Liefert die ChildNodes einer Organisationseinheit. Optional kann ein Typ übergeben werden, welchem das Child entspricht
 	 *
-	 * @param $oe_kurzbz
+	 * @param string $oe_kurzbz
+	 * @param string $organisationseinheittyp_kurzbz
 	 * @return Array mit den Childs inkl dem Uebergebenen Element
 	 */
-	public function getChilds($oe_kurzbz)
+	public function getChilds($oe_kurzbz, $organisationseinheittyp_kurzbz = null)
 	{
 		$childs[] = $oe_kurzbz;
 		
@@ -196,15 +197,20 @@ class organisationseinheit extends basis_db
 			$qry = "
 			WITH RECURSIVE oes(oe_kurzbz, oe_parent_kurzbz) as 
 			(
-				SELECT oe_kurzbz, oe_parent_kurzbz FROM public.tbl_organisationseinheit 
+				SELECT oe_kurzbz, oe_parent_kurzbz, organisationseinheittyp_kurzbz FROM public.tbl_organisationseinheit 
 				WHERE oe_kurzbz=".$this->db_add_param($oe_kurzbz)."
 				UNION ALL
-				SELECT o.oe_kurzbz, o.oe_parent_kurzbz FROM public.tbl_organisationseinheit o, oes 
+				SELECT o.oe_kurzbz, o.oe_parent_kurzbz, o.organisationseinheittyp_kurzbz FROM public.tbl_organisationseinheit o, oes 
 				WHERE o.oe_parent_kurzbz=oes.oe_kurzbz
 			)
-			SELECT oe_kurzbz
-			FROM oes
-			GROUP BY oe_kurzbz;";
+			SELECT oe_kurzbz, organisationseinheittyp_kurzbz
+			FROM oes";
+			
+			if ($organisationseinheittyp_kurzbz != '')
+			{
+				$qry .= " WHERE organisationseinheittyp_kurzbz = ".$this->db_add_param($organisationseinheittyp_kurzbz);
+			}
+			$qry .= " GROUP BY oe_kurzbz, organisationseinheittyp_kurzbz;";
 			if($myresult = $this->db_query($qry))
 			{
 				while($row = $this->db_fetch_object($myresult))
