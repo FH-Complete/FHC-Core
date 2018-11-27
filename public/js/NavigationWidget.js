@@ -201,7 +201,7 @@ var FHC_NavigationWidget = {
 	 */
 	_buildLeftMenuStructure: function(item, depth = 1) {
 
-		strLeftMenu = "";
+		var strLeftMenu = "";
 		var expanded = item["expand"] != null && item["expand"] === true ? ' active' : "";
 
 		strLeftMenu += '<li class="' + expanded + '">';
@@ -214,7 +214,9 @@ var FHC_NavigationWidget = {
 		var target = "";
 		if (item["target"] != null) target = item["target"];
 
-		strLeftMenu += '<a href="' + item["link"] + '"' + expanded + ' target="' + target + '">';
+		var link = FHC_NavigationWidget._generateLink(item["link"]);
+
+		strLeftMenu += '<a href="' + link + '"' + expanded + ' target="' + target + '">';
 
 		if (item["icon"] != "undefined")
 		{
@@ -269,6 +271,27 @@ var FHC_NavigationWidget = {
 	 */
 	_getNavigationWidgetCalled: function() {
 		return FHC_JS_DATA_STORAGE_OBJECT.called_path + "/" + FHC_JS_DATA_STORAGE_OBJECT.called_method;
+	},
+
+	/**
+	 * Generates the menu entry link within the fhc_controller_id if present
+	 */
+	_generateLink: function(itemLink) {
+
+		// Copys the link as it is
+		var link = itemLink;
+		// Gets the fhc_controller_id from URL if present
+		var fhc_controller_id = FHC_AjaxClient.getUrlParameter(FHC_CONTROLLER_ID);
+
+		// If the fhc_controller_id URL parameter is present
+		// and the given itemLink is not equal to # and does not contain already the parameter fhc_controller_id
+		if (fhc_controller_id != null && itemLink != "#" && itemLink.indexOf(FHC_CONTROLLER_ID) == -1)
+		{
+			link += itemLink.indexOf("?") == -1 ? "?" : "&"; // gets the right character to be concatenated
+			link += FHC_CONTROLLER_ID + "=" + fhc_controller_id; // adds the fhc_controller_id parameter
+		}
+
+		return link;
 	}
 };
 
