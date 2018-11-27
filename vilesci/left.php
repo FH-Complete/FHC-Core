@@ -26,19 +26,19 @@
  * Die Menuepunkt mit den zugehoerigen Links befinden sich in einem
  * Array welches includiert wird.
  */
-	require_once('../config/vilesci.config.inc.php');
- 	require('../include/functions.inc.php');
- 	require('../include/benutzerberechtigung.class.php');
- 	require_once('../include/'.EXT_FKT_PATH.'/vilesci_menu_main.inc.php');
+require_once('../config/vilesci.config.inc.php');
+require_once('../include/functions.inc.php');
+require_once('../include/benutzerberechtigung.class.php');
+require_once('../include/'.EXT_FKT_PATH.'/vilesci_menu_main.inc.php');
 
-	if (!$uid = get_uid())
-			die('Keine UID gefunden !  <a href="javascript:history.back()">Zur&uuml;ck</a>');
-			
-	
-	$berechtigung=new benutzerberechtigung();
-	$berechtigung->getBerechtigungen($uid);
+if (!$uid = get_uid())
+	die('Keine UID gefunden !  <a href="javascript:history.back()">Zur&uuml;ck</a>');
 
-	
+
+$berechtigung=new benutzerberechtigung();
+$berechtigung->getBerechtigungen($uid);
+
+
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
@@ -83,11 +83,11 @@
 if(isset($_GET['categorie']))
 {
 	$categorie=$_GET['categorie'];
-	
+
 	function checkpermission($permissions)
 	{
 		global $berechtigung;
-		
+
 		$permission=false;
 		foreach ($permissions as $perm)
 		{
@@ -101,8 +101,8 @@ if(isset($_GET['categorie']))
 	/*
 	if ($berechtigung->isBerechtigt('admin'))
 	{
-	
-	
+
+
 		echo '
 		<div class="logo">
 			<div>
@@ -111,29 +111,29 @@ if(isset($_GET['categorie']))
 			<div>
 				<a href="https://sdtools.technikum-wien.at" target="main"><img src="../skin/images/application_go.png" alt="go" border="0">&nbsp;SDTools</a>
 			</div>
-		</div>		
+		</div>
 			';
-			
-	
+
+
 	}*/
 	$menu = $menu[$categorie];
 	echo '<h2>'.$menu['name'].'</h2>';
 	$umbruch=true;
-	
+
 	foreach($menu AS $m1)
 	{
 		if (is_array($m1) && isset($m1['name']))
 		{
 			if (isset($m1['permissions']) && !checkpermission($m1['permissions']))
 				continue;
-			
+
 			if (isset($m1['link']))
 				echo '<a href="'.$m1['link'].'" ';
 			if (isset($m1['target']))
 				echo 'target="'.$m1['target'].'" ';
 			if (isset($m1['link']))
 				echo '>';
-			
+
 			if (isset($m1['name']) && !isset($m1['link']) )
 			{
 				if($umbruch)
@@ -142,10 +142,10 @@ if(isset($_GET['categorie']))
 			}
 			else
 				echo $m1['name'];
-				
+
 			if (isset($m1['link']))
 				echo '</a>';
-			
+
 			$umbruch=true;
 			foreach($m1 AS $m2)
 			{
@@ -166,8 +166,8 @@ if(isset($_GET['categorie']))
 					$umbruch=false;
 				}
 			}
-			
-	
+
+
 				echo '<br>';
 		}
 	}

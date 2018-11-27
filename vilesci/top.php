@@ -26,20 +26,20 @@
  * Die Menuepunkt mit den zugehoerigen Links befinden sich in einem
  * Array welches includiert wird.
  */
-	require_once('../config/vilesci.config.inc.php');
- 	require('../include/functions.inc.php');
- 	require('../include/benutzerberechtigung.class.php');
- 	require_once('../include/'.EXT_FKT_PATH.'/vilesci_menu_main.inc.php');
+require_once('../config/vilesci.config.inc.php');
+require_once('../include/functions.inc.php');
+require_once('../include/benutzerberechtigung.class.php');
+require_once('../include/'.EXT_FKT_PATH.'/vilesci_menu_main.inc.php');
 
-	if (!$uid = get_uid())
-			die('Keine UID gefunde !  <a href="javascript:history.back()">Zur&uuml;ck</a>');
-			
-	
-	$berechtigung=new benutzerberechtigung();
-	$berechtigung->getBerechtigungen($uid);
-	if (!($berechtigung->isBerechtigt('basis/vilesci', null, 's')))
-		die ('Keine Berechtigung!');
-	
+if (!$uid = get_uid())
+	die('Keine UID gefunde !  <a href="javascript:history.back()">Zur&uuml;ck</a>');
+
+
+$berechtigung=new benutzerberechtigung();
+$berechtigung->getBerechtigungen($uid);
+if (!($berechtigung->isBerechtigt('basis/vilesci', null, 's')))
+	die ('Keine Berechtigung!');
+
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
@@ -60,7 +60,7 @@
 function checkpermission($permissions)
 {
 	global $berechtigung;
-	
+
 	$permission=false;
 	foreach ($permissions as $perm)
 	{
@@ -86,9 +86,9 @@ foreach($menu AS $m)
 
 	if (isset($m['permissions']) && !checkpermission($m['permissions']))
 		continue;
-	
+
 	echo '<td style="padding-left: 20px; padding-right: 20px; text-align: center">';
-	
+
 	if($firstcat=='' && isset($m['link']) && $m['target']=='nav')
 		$firstcat=$m['link'];
 	if (isset($m['link']))
@@ -104,16 +104,16 @@ foreach($menu AS $m)
 	}
 	if (isset($m['name']))
 		echo '<strong>'.$m['name'].'</strong>';
-		
+
 	if (isset($m['link']))
 		echo '</a>';
-		
+
 	if ($hide)
 		$display='none';
 	else
 		$display='block';
 	echo "\n<DIV >\n".'<SPAN id="'.$m['name'].'" style="display:'.$display.'">';
-	
+
 	echo "\n</SPAN>\n</DIV>\n";
 	echo '</td>';
 }
