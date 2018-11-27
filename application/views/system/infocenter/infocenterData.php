@@ -230,11 +230,12 @@
 
 			/* NOTE: Dont use $this here for PHP Version compatibility */
 			$datasetRaw->{'Details'} = sprintf(
-				'<a href="%s?person_id=%s&origin_page=%s&fhc_controller_id=%s">Details</a>',
+				'<a href="%s?person_id=%s&origin_page=%s&fhc_controller_id=%s&prev_filter_id=%s">Details</a>',
 				site_url('system/infocenter/InfoCenter/showDetails'),
 				$datasetRaw->{'PersonId'},
 				'index',
-				(isset($_GET['fhc_controller_id'])?$_GET['fhc_controller_id']:'')
+				(isset($_GET['fhc_controller_id']) ? $_GET['fhc_controller_id'] : ''),
+				(isset($_GET['filter_id']) ? $_GET['filter_id'] : '')
 			);
 
 			if ($datasetRaw->{'SendDate'} == null)

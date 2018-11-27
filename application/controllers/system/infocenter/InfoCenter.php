@@ -20,6 +20,9 @@ class InfoCenter extends Auth_Controller
 	const NAVIGATION_PAGE = 'navigation_page';
 	const ORIGIN_PAGE = 'origin_page';
 
+	const FILTER_ID = 'filter_id';
+	const PREV_FILTER_ID = 'prev_filter_id';
+
 	private $_uid; // contains the UID of the logged user
 
 	// Used to log with PersonLogLib
@@ -772,8 +775,27 @@ class InfoCenter extends Auth_Controller
 			$this->_fillCustomFilters($listCustomFilters, $filtersArray['personal']);
 		}
 
+		$freigegebenLink = site_url('system/infocenter/InfoCenter/freigegeben');
+		$currentFilterId = $this->input->get(self::FILTER_ID);
+		if (isset($currentFilterId))
+		{
+			$freigegebenLink .= '?'.self::PREV_FILTER_ID.'='.$currentFilterId;
+		}
+
 		$this->navigationlib->setSessionMenu(
 			array(
+				'freigegeben' => $this->navigationlib->oneLevel(
+					'Freigegeben',		// description
+					$freigegebenLink,	// link
+					null,				// children
+					'thumbs-up',		// icon
+					null,				// subscriptDescription
+					false,				// expand
+					null,				// subscriptLinkClass
+					null, 				// subscriptLinkValue
+					'', 				// target
+					1   				// sort
+				),
 				'filters' => $this->navigationlib->oneLevel(
 					'Filter',		// description
 					'#',			// link
@@ -805,12 +827,18 @@ class InfoCenter extends Auth_Controller
 			$link = site_url(self::INFOCENTER_URI.'/'.self::FREIGEGEBEN_PAGE);
 		}
 
+		$prevFilterId = $this->input->get(self::PREV_FILTER_ID);
+		if (isset($prevFilterId))
+		{
+			$link .= '?'.self::FILTER_ID.'='.$prevFilterId;
+		}
+
 		$this->navigationlib->setSessionMenu(
 			array(
 				'back' => $this->navigationlib->oneLevel(
-					'Zurück',	// description
+					'Zurück',		// description
 					$link,			// link
-					array(),		// children
+					null,			// children
 					'angle-left',	// icon
 					true,			// expand
 					null, 			// subscriptDescription
@@ -878,8 +906,27 @@ class InfoCenter extends Auth_Controller
 			$this->_fillCustomFilters($listCustomFilters, $filtersArray['children']['personal']);
 		}
 
+		$homeLink = site_url('system/infocenter/InfoCenter/index');
+		$prevFilterId = $this->input->get(self::PREV_FILTER_ID);
+		if (isset($prevFilterId))
+		{
+			$homeLink .= '?'.self::FILTER_ID.'='.$prevFilterId;
+		}
+
 		$this->navigationlib->setSessionMenu(
 			array(
+				'freigegeben' => $this->navigationlib->oneLevel(
+					'Home',		// description
+					$homeLink,			// link
+					null,				// children
+					'angle-left',		// icon
+					null,				// subscriptDescription
+					false,				// expand
+					null,				// subscriptLinkClass
+					null, 				// subscriptLinkValue
+					'', 				// target
+					1   				// sort
+				),
 				'filters' => $this->navigationlib->oneLevel(
 					'Filter',					// description
 					'#',						// link
@@ -908,7 +955,7 @@ class InfoCenter extends Auth_Controller
 				sprintf(
 					'%s?%s=%s',
 					site_url(self::INFOCENTER_URI),
-					'filter_id',
+					self::FILTER_ID,
 					$filterId
 				)							// link
 			);
@@ -927,7 +974,7 @@ class InfoCenter extends Auth_Controller
 				sprintf(
 					'%s?%s=%s',
 					site_url(self::INFOCENTER_URI.'/'.self::FREIGEGEBEN_PAGE),
-					'filter_id',
+					self::FILTER_ID,
 					$filterId
 				)							// link
 			);
@@ -947,7 +994,7 @@ class InfoCenter extends Auth_Controller
 				sprintf(
 					'%s?%s=%s',
 					site_url(self::INFOCENTER_URI),
-					'filter_id',
+					self::FILTER_ID,
 					$filterId
 				),							// link
 				null,						// children
