@@ -318,7 +318,6 @@ if (isset($personToDelete) && isset($personToKeep) && $personToDelete >= 0 && $p
 				else
 					$zugangscode = $personToKeep_obj->zugangscode;
 
-				$sql_query_upd1 .= "UPDATE addon.tbl_kompetenz SET person_id=" . $db->db_add_param($personToKeep, FHC_INTEGER) . " WHERE person_id=" . $db->db_add_param($personToDelete, FHC_INTEGER) . ";";
 				$sql_query_upd1 .= "UPDATE lehre.tbl_abschlusspruefung SET pruefer1=" . $db->db_add_param($personToKeep, FHC_INTEGER) . " WHERE pruefer1=" . $db->db_add_param($personToDelete, FHC_INTEGER) . ";";
 				$sql_query_upd1 .= "UPDATE lehre.tbl_abschlusspruefung SET pruefer2=" . $db->db_add_param($personToKeep, FHC_INTEGER) . " WHERE pruefer2=" . $db->db_add_param($personToDelete, FHC_INTEGER) . ";";
 				$sql_query_upd1 .= "UPDATE lehre.tbl_abschlusspruefung SET pruefer3=" . $db->db_add_param($personToKeep, FHC_INTEGER) . " WHERE pruefer3=" . $db->db_add_param($personToDelete, FHC_INTEGER) . ";";
