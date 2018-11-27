@@ -24,6 +24,14 @@ $config['navigation_header'] = array(
 					'expand' => true,
 					'sort' => 1,
 					'requiredPermissions' => 'basis/vilesci:r'
+				),
+				'reihungstest' => array(
+					'link' => site_url('organisation/Reihungstest'),
+					'icon' => 'list-ol',
+					'description' => 'Reihungstests',
+					'expand' => true,
+					'sort' => 1,
+					'requiredPermissions' => 'infocenter:r'
 				)
 			)
 		),
@@ -145,5 +153,22 @@ $config['navigation_menu']['system/infocenter/InfoCenter/freigegeben'] = array(
 		'description' => 'Home',
 		'icon' => 'angle-left',
 		'sort' => 1
+	)
+);
+
+$config['navigation_menu']['organisation/Reihungstest/index'] = array(
+	'reihungstestverwalung' => array(
+		'link' => base_url('vilesci/stammdaten/reihungstestverwaltung.php'),
+		'description' => 'Reihungstestverwaltung',
+		'icon' => 'cogs',
+		'sort' => 1,
+		'target' => '_blank'
+	),
+	'auswertung' => array(
+		'link' => CIS_ROOT.'/cis/testtool/admin/auswertung.php',
+		'description' => 'Auswertung',
+		'icon' => 'list-alt',
+		'sort' => 1,
+		'target' => '_blank'
 	)
 );

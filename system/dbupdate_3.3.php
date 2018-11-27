@@ -2498,6 +2498,21 @@ if($result = @$db->db_query("SELECT * FROM information_schema.role_table_grants 
 	}
 }
 
+// App 'reihungstest' hinzufügen
+if($result = $db->db_query("SELECT 1 FROM system.tbl_app WHERE app='reihungstest'"))
+{
+	if($db->db_num_rows($result)==0)
+	{
+
+		$qry = "INSERT INTO system.tbl_app(app) VALUES('reihungstest');";
+
+		if(!$db->db_query($qry))
+			echo '<strong>App: '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>Neue App reihungstest in system.tbl_app hinzugefügt';
+	}
+}
+
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
 

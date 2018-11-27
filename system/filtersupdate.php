@@ -322,6 +322,28 @@ $filters = array(
 			}
 		',
 		'oe_kurzbz' => null,
+	),
+	array(
+		'app' => 'reihungstest',
+		'dataset_name' => 'overview',
+		'filter_kurzbz' => 'Reihungstest',
+		'description' => '{Reihungstest Übersicht}',
+		'sort' => 1,
+		'default_filter' => true,
+		'filter' => '
+			{
+				"name": "Reihungstest",
+				"columns": [
+					{"name": "fakultaet"},
+					{"name": "datum"},
+					{"name": "oeffentlich"},
+					{"name": "studiengaenge"},
+					{"name": "freie_plaetze"}
+				],
+				"filters": []
+			}
+		',
+		'oe_kurzbz' => null,
 	)
 );
 

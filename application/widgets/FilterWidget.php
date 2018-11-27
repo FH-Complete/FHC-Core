@@ -399,11 +399,11 @@ class FilterWidget extends Widget
 			// Basic conversions
 			if (is_bool($columnValue))
 			{
-				$rawDatasetRow->{$columnValue} = $columnValue === true ? 'true' : 'false';
+				$rawDatasetRow->{$columnName} = ($columnValue === true ? 'true' : 'false');
 			}
-			elseif (DateTime::createFromFormat('Y-m-d G:i:s', $columnValue) !== false)
+			elseif (DateTime::createFromFormat('Y-m-d H:i:s', $columnValue) !== false)
 			{
-				$rawDatasetRow->{$columnValue} = date(self::DEFAULT_DATE_FORMAT, strtotime($columnValue));
+				$rawDatasetRow->{$columnName} = date(self::DEFAULT_DATE_FORMAT, strtotime($columnValue));
 			}
 		}
 

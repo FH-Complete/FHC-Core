@@ -495,7 +495,13 @@ var FHC_FilterWidget = {
  					filter_page: FHC_FilterWidget.getFilterPage()
  				},
  				{
- 					successCallback: refreshSideMenuHook // NOTE: to be checked
+ 					successCallback: function(data, textStatus, jqXHR) {
+						// If a success and refreshSideMenuHook is a valid function then call it to refresh the side menu
+						if (typeof refreshSideMenuHook == "function")
+						{
+							refreshSideMenuHook();
+						}
+					}
  				}
  			);
  		}
