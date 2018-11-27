@@ -25,6 +25,8 @@ require_once('../config/vilesci.config.inc.php');
 require_once('../include/functions.inc.php');
 require_once('../include/benutzerberechtigung.class.php');
 
+ini_set('max_execution_time', 300);
+
 $uid = get_uid();
 $db = new basis_db();
 $rechte = new benutzerberechtigung();
