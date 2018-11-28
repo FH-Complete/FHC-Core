@@ -214,6 +214,9 @@
 			ucfirst($this->p->t('person', 'nachname')),
 			ucfirst($this->p->t('person', 'geburtsdatum')),
 			ucfirst($this->p->t('person', 'nation')),
+			ucfirst($this->p->t('global', 'sperrdatum')),
+			ucfirst($this->p->t('global', 'gesperrtVon')),
+			ucfirst($this->p->t('global', 'parkdatum')),
 			ucfirst($this->p->t('global', 'letzteAktion')),
 			ucfirst($this->p->t('global', 'letzterBearbeiter')),
 			ucfirst($this->p->t('lehre', 'studiensemester')),
@@ -221,10 +224,7 @@
 			ucfirst($this->p->t('global', 'abgeschickt')).' ('.$this->p->t('global', 'anzahl').')',
 			ucfirst($this->p->t('lehre', 'studiengang')).' ('.$this->p->t('global', 'gesendet').')',
 			ucfirst($this->p->t('lehre', 'studiengang')).' ('.$this->p->t('global', 'nichtGesendet').')',
-			ucfirst($this->p->t('lehre', 'studiengang')).' ('.$this->p->t('global', 'aktiv').')',
-			ucfirst($this->p->t('global', 'sperrdatum')),
-			ucfirst($this->p->t('global', 'gesperrtVon')),
-			ucfirst($this->p->t('global', 'parkdatum'))
+			ucfirst($this->p->t('lehre', 'studiengang')).' ('.$this->p->t('global', 'aktiv').')'
 		),
 		'formatRow' => function($datasetRaw) {
 

@@ -119,14 +119,14 @@
 			'Nachname',
 			'GebDatum',
 			'Nation',
+			'Sperrdatum',
+			'GesperrtVon',
 			'Letzte Aktion',
 			'Letzter Bearbeiter',
 			'StSem',
 			'GesendetAm',
 			'NumAbgeschickt',
-			'Studiengänge',
-			'Sperrdatum',
-			'GesperrtVon'
+			'Studiengänge'
 		),
 		'formatRow' => function($datasetRaw) {
 
