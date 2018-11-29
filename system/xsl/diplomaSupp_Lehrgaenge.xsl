@@ -2304,7 +2304,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 			<text:p text:style-name="Standard">See following pages</text:p>
 
 		<text:p text:style-name="P56">ANHANG: Angaben zum nationalen Hochschulsystem</text:p>
-		<text:p text:style-name="P74">Stand: 1. September 2014</text:p>
+		<text:p text:style-name="P74">Stand: 1. März 2017</text:p>
 		<text:p text:style-name="P41">Der postsekundäre Sektor in Österreich</text:p>
 		<text:list xml:id="list2030519318" text:style-name="WW8Num16">
 		<text:list-item>
@@ -2315,7 +2315,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 		<text:list-item>
 			<text:list>
 			<text:list-item>
-				<text:p text:style-name="P49">die Öffentlichen Universitäten, erhalten vom Staat;</text:p>
+				<text:p text:style-name="P49">die öffentlichen Universitäten, erhalten vom Staat;</text:p>
 			</text:list-item>
 			<text:list-item>
 				<text:p text:style-name="P49">die Privatuniversitäten, erhalten von privaten Trägern mit staatlicher Akkreditierung;</text:p>
@@ -2376,11 +2376,11 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 			<text:p text:style-name="P54">In Fachhochschul-Studiengängen wird, analog zu den Universitätsstudien, ein <text:span text:style-name="T15">Fachhochschul-Diplomgrad</text:span> ("Diplom-Ingenieur/in (FH)" im ingenieurwissenschaftlichen Bereich bzw. "Magister/Magistra (FH)" in den anderen Bereichen; 240 bis 300 ECTS-Credits) verliehen.</text:p>
 		</text:list-item>
 		</text:list>
-		<text:p text:style-name="P24">Einige Studien für das Lehramt werden gemeinsam zwischen Universitäten und Pädagogischen Hochschulen eingerichtet.</text:p>
+		<text:p text:style-name="P24">Die Studien für das Lehramt werden gemeinsam zwischen Universitäten und Pädagogischen Hochschulen eingerichtet.</text:p>
 		<text:p text:style-name="P16"/>
 		<text:p text:style-name="P24">Die Inhaber/innen dieser Diplomgrade oder Mastergrade (einschließlich Fachhochschul-Diplomgraden oder Fachhochschul-Mastergraden) sind zur Zulassung zum Doktoratsstudium an einer Universität berechtigt. Der <text:span text:style-name="T15">Doktorgrad</text:span> mit dem Wortlaut "Doktor/in ..." oder "Doctor of Philosophy" ("PhD") wird nach einem mindestens dreijährigen Studium verliehen.</text:p>
 		<text:p text:style-name="P24"/>
-		<text:p text:style-name="P25"><text:span text:style-name="T14">Neben den ordentlichen Studien, die oben beschrieben wurden, gibt es auch außerordentliche Studien, die an Universitäten entweder ein Universitätslehrgang oder der Besuch einzelner Lehrveranstaltungen, im Fachhochschulbereich ein Lehrgang zur Weiterbildung und an Pädagogischen Hochschulen ein Hochschullehrgang sein können.</text:span></text:p>
+		<text:p text:style-name="P25"><text:span text:style-name="T14">Neben den ordentlichen Studien, die oben beschrieben wurden, gibt es auch außerordentliche Studien, die an Universitäten entweder ein Universitätslehrgang oder der Besuch einzelner Lehrveranstaltungen, im Fachhochschulbereich ein Lehrgang zur Weiterbildung oder der Besuch einzelner Lehrveranstaltungen und an Pädagogischen Hochschulen ein Hochschullehrgang sein können.</text:span></text:p>
 		<text:p text:style-name="P24"/>
 		<text:p text:style-name="P41">Bachelorstudium</text:p>
 		<text:p text:style-name="P24">Die Zulassung zu einem Bachelorstudium erfolgt auf der Grundlage eines österreichischen oder gleichwertigen ausländischen Reifezeugnisses, eines Zeugnisses über die Studienberechtigungsprüfung oder eines Zeugnisses über die Berufsreifeprüfung, in künstlerischen Studien auf der Grundlage einer Zulassungsprüfung. Die Zulassung zu einem Fachhochschul-Bachelorstudiengang kann auch auf der Grundlage einer einschlägigen beruflichen Qualifikation erfolgen. In einigen Bachelorstudien an Universitäten, in den meisten Fachhochschul-Bachelorstudiengängen und in Bachelorstudien an Pädagogischen Hochschulen findet ein Auswahlverfahren statt.</text:p> 
@@ -2394,6 +2394,9 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 		<text:p text:style-name="P24">Die Zulassung zu einem Diplomstudium erfolgt auf der Grundlage eines österreichischen oder gleichwertigen ausländischen Reifezeugnisses, eines Zeugnisses über die Studienberechtigungsprüfung oder eines Zeugnisses über die Berufsreifeprüfung, in künstlerischen Studien auf der Grundlage einer Zulassungsprüfung. Die Zulassung zu einem Fachhochschul-Diplomstudiengang kann auch auf der Grundlage einer einschlägigen beruflichen Qualifikation erfolgen. In einigen Studien (z.B. Humanmedizin und Zahnmedizin sowie in Fachhochschul-Diplomstudiengängen) findet ein Auswahlverfahren statt.</text:p> 
 		<text:p text:style-name="P24">Das Studium kann in Studienabschnitte unterteilt sein. Die Dauer jedes Studienabschnitts, die Fächer und ihre Inhalte sind im Curriculum festgelegt. Sie gliedern sich in Pflichtfächer und Wahlfächer. Jeder Studienabschnitt wird mit einer Diplomprüfung abgeschlossen. Fachhochschul-Diplomstudiengänge und einige Diplomstudien an Universitäten umfassen ein angeleitetes Praktikum. Die Zulassung zur letzten Diplomprüfung setzt die Approbation der Diplomarbeit voraus.</text:p>
 		<text:p text:style-name="P24"/>
+		<text:p text:style-name="P24"/>
+		<text:p text:style-name="P24"/>
+		<text:p text:style-name="P24"/>
 		<text:p text:style-name="P41">Doktoratsstudium</text:p>
 		<text:p text:style-name="P24">Die Zulassung zu einem Doktoratsstudium an einer Universität erfolgt auf der Grundlage eines abgeschlossenen facheinschlägigen Diplom- oder Masterstudiums.</text:p>
 		<text:p text:style-name="P24">Die Inhalte und Anforderungen sind im Curriculum festgelegt. Das Hauptgewicht liegt auf der Anfertigung einer Dissertation als Ergebnis einer selbstständigen wissenschaftlichen Forschungsleistung. Das Studium wird mit der Approbation der Dissertation und einem Rigorosum/einer Defensio abgeschlossen.</text:p>
@@ -2401,8 +2404,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 		<text:p text:style-name="P24"/>
 		<text:p text:style-name="P41">Leistungsbewertung und Notensystem (Österreichische Notenskala)</text:p>
 		<text:p text:style-name="P24">Entsprechend den in den Curricula geregelten Prüfungsmodalitäten kann die Bewertung der Leistungen in der Form mündlicher oder schriftlicher Prüfungen oder von Projektarbeiten erfolgen. Mündliche Prüfungen sind grundsätzlich öffentlich.</text:p>
-		<text:p text:style-name="P14"/>
-		<text:p text:style-name="P24">Österreichische Beurteilung:</text:p>
+		<text:p text:style-name="P24"/>
 		<table:table table:name="Table10" table:style-name="Table10">
 		<table:table-column table:style-name="Table10.A"/>
 		<table:table-column table:style-name="Table10.B"/>
@@ -2501,11 +2503,11 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 		<text:p text:style-name="P73">Abteilung VI/7</text:p>
 		<text:p text:style-name="P8"/>
 		<text:p text:style-name="P56">APPENDIX: Information on the Austrian higher education system</text:p>
-		<text:p text:style-name="P76">As of 1<text:span text:style-name="T5">st</text:span> September 2014</text:p>
+		<text:p text:style-name="P76">As of 1<text:span text:style-name="T5">st</text:span> March 2017</text:p>
 		<text:p text:style-name="P39">Post-secondary Education in Austria</text:p>
 		<text:list xml:id="list1050643529" text:continue-numbering="true" text:style-name="WW8Num16">
 		<text:list-item>
-			<text:p text:style-name="P53">The Austrian post-secondary <text:span text:style-name="T14">university level sector</text:span> (<text:span text:style-name="T15">Hochschulsektor</text:span>) consists of</text:p>
+			<text:p text:style-name="P53">The Austrian post-secondary <text:span text:style-name="T14">university sector</text:span> (<text:span text:style-name="T15">Hochschulsektor</text:span>) consists of</text:p>
 		</text:list-item>
 		</text:list>
 		<text:list xml:id="list695069009" text:continue-list="list282475735" text:style-name="WW8Num13">
@@ -2515,13 +2517,13 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 				<text:p text:style-name="P50">Public universities (<text:span text:style-name="T15">Universitäten</text:span>), maintained by the state;</text:p>
 			</text:list-item>
 			<text:list-item>
-				<text:p text:style-name="P50">Private universities (<text:span text:style-name="T15">Privatuniversitäten</text:span>), operated by private organizations with state accreditation;</text:p>
+				<text:p text:style-name="P50">Private universities (<text:span text:style-name="T15">Privatuniversitäten</text:span>), operated by private organisations with state accreditation;</text:p>
 			</text:list-item>
 			<text:list-item>
 				<text:p text:style-name="P50">Maintainers of university of applied sciences degree programmes (<text:span text:style-name="T15">Fachhochschul-Studiengänge</text:span>) incorporated upon the basis of private or public law and subsidised by the state, with state accreditation (some of which are entitled to use the designation <text:span text:style-name="T15">Fachhochschule</text:span>);</text:p>
 			</text:list-item>
 			<text:list-item>
-				<text:p text:style-name="P50">University colleges of education (<text:span text:style-name="T15">Pädagogische Hochschulen</text:span>) maintained by the state or operated by private organizations with state accreditation;</text:p>
+				<text:p text:style-name="P50">University colleges of education (<text:span text:style-name="T15">Pädagogische Hochschulen</text:span>) maintained by the state or operated by private organisations with state accreditation;</text:p>
 			</text:list-item>
 			<text:list-item>
 				<text:p text:style-name="P50">The Institute of Science and Technology Austria;</text:p>
@@ -2557,36 +2559,39 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 		</text:list-item>
 		</text:list>
 		<text:p text:style-name="P15"/>
-		<text:p text:style-name="P17">The following text addresses exclusively the university level sector.</text:p>
+		<text:p text:style-name="P17">The following text addresses exclusively the university sector.</text:p>
 		<text:p text:style-name="P17"/>
 		<text:p text:style-name="P39">Overall Structure of University Level Higher Education</text:p>
-		<text:p text:style-name="P17">There are currently two different systems of degree programs in Austria: a newer system, based on the European Higher Education Area (Bologna process), and a former one, dating from before the European Higher Education Area.</text:p>
+		<text:p text:style-name="P17">There are currently two different systems of degree programmes in Austria: a newer system, based on the European Higher Education Area (Bologna process), and a former one, dating from before the European Higher Education Area.</text:p>
 		<text:p text:style-name="P15"/>
 		<text:list xml:id="list1119633922" text:continue-list="list471845522" text:style-name="WW8Num16">
 		<text:list-item>
-			<text:p text:style-name="P53">The <text:span text:style-name="T14">new system</text:span> is based on the distinction between undergraduate and graduate studies. Upon completion of an undergraduate program (<text:span text:style-name="T15">Bachelorstudium</text:span> at universities and university colleges of education or, respectively, <text:span text:style-name="T15">Fachhochschul-Bachelorstudiengang</text:span> at universities of applied sciences, comprising 180 to 240 ECTS credits), a bachelor’s degree (designation: "Bachelor of/in ..." ) is awarded. Upon completion of a graduate program (<text:span text:style-name="T15">Masterstudium</text:span> at universities and university colleges of education or, respectively, <text:span text:style-name="T15">Fachhochschul-Masterstudiengang</text:span> at universities of applied sciences, comprising 60 to 120 ECTS credits), a master’s degree (designation: "Master of/in ..." ) is awarded. In the fields of engineering, the designation of the master’s degree can also be "Diplom-Ingenieur/in".</text:p>
+			<text:p text:style-name="P53">The <text:span text:style-name="T14">new system</text:span> is based on the distinction between undergraduate and graduate studies. Upon completion of an undergraduate programme (<text:span text:style-name="T15">Bachelorstudium</text:span> at universities and university colleges of education or, respectively, <text:span text:style-name="T15">Fachhochschul-Bachelorstudiengang</text:span> at universities of applied sciences, comprising 180 to 240 ECTS credits), a bachelor’s degree (designation: "Bachelor of/in ..." ) is awarded. Upon completion of a graduate program (<text:span text:style-name="T15">Masterstudium</text:span> at universities and university colleges of education or, respectively, <text:span text:style-name="T15">Fachhochschul-Masterstudiengang</text:span> at universities of applied sciences, comprising 60 to 120 ECTS credits), a master’s degree (designation: "Master of/in ..." ) is awarded. In the fields of engineering, the designation of the master’s degree can also be "Diplom-Ingenieur/in".</text:p>
 		</text:list-item>
 		<text:list-item>
-			<text:p text:style-name="P53">Under the auspices of the <text:span text:style-name="T14">older system</text:span> of diploma degree programs (<text:span text:style-name="T15">Diplomstudien</text:span>), the first degree awarded is the diploma degree (<text:span text:style-name="T15">Diplomgrad</text:span>). An Austrian higher secondary school leaving certificate or its equivalent is the general qualification necessary for enrolling in a diploma degree programme; conclusion of a diploma degree programme entitles degree holders to enroll in doctoral programmes. A diploma degree (<text:span text:style-name="T15">Diplomgrad</text:span>) is awarded by Austrian universities after a course of study consisting of 240 to 360 ECTS credits. Full degree titles are gender specific designations: <text:span text:style-name="T15">Magister</text:span> for men; <text:span text:style-name="T15">Magistra</text:span> for women. Degree titles also include a general description of the field of study in which they were obtained, e.g. <text:span text:style-name="T15">Magister philosophiae</text:span>. In the fields of engineering, the degree titles are <text:span text:style-name="T15">Diplom-Ingenieur/in</text:span>. 
+			<text:p text:style-name="P53">Under the auspices of the <text:span text:style-name="T14">older system</text:span> of diploma degree programmes (<text:span text:style-name="T15">Diplomstudien</text:span>), the first degree awarded is the diploma degree (<text:span text:style-name="T15">Diplomgrad</text:span>). An Austrian higher secondary school leaving certificate or its equivalent is the general qualification necessary for enrolling in a diploma degree programme; conclusion of a diploma degree programme entitles degree holders to enrol in doctoral programmes. A diploma degree (<text:span text:style-name="T15">Diplomgrad</text:span>) is awarded by Austrian universities after a course of study consisting of 240 to 360 ECTS credits. Full degree titles are gender specific designations: <text:span text:style-name="T15">Magister</text:span> for men; <text:span text:style-name="T15">Magistra</text:span> for women. Degree titles also include a general description of the field of study in which they were obtained, e.g. <text:span text:style-name="T15">Magister philosophiae</text:span>. In the fields of engineering, the degree titles are <text:span text:style-name="T15">Diplom-Ingenieur/in</text:span>. 
 											Degrees awarded in medicine and dentistry are exceptions to the above. The first degrees awarded after the completion of these degree programmes consisting of 360 ECTS credits are <text:span text:style-name="T15">Doctor medicinae universae</text:span> and <text:span text:style-name="T15">Doctor medicinae dentalis</text:span>, respectively.</text:p>
 			<text:p text:style-name="P53">Graduates of university of applied sciences programmes that consist of 240 to 300 ECTS credits are awarded, analogous to university studies, a university of applied science diploma degree (<text:span text:style-name="T15">Fachhochschul-Diplomgrad</text:span>) contingent upon <text:soft-page-break/>discipline: either a <text:span text:style-name="T15">Diplom-Ingenieur/in (FH)</text:span> for fields of engineering or <text:span text:style-name="T15">Magister/Magistra (FH)</text:span> in other fields of study.</text:p>
 		</text:list-item>
 		</text:list>
 		<text:p text:style-name="P17"/>
-		<text:p text:style-name="P17">Some study programmes for teachers’ qualifications are offered jointly between universities and university colleges of education.</text:p>	 
+		<text:p text:style-name="P17">The study programmes for teachers’ qualifications are offered jointly between universities and university colleges of education.</text:p>	 
 		<text:p text:style-name="P17"/>
-		<text:p text:style-name="P17">Recipients of these diploma degrees from the old system or master’s degrees from the new system (including the ones awarded in both cases by the universities of applied sciences) are entitled to enroll in doctoral programmes (<text:span text:style-name="T15">Doktoratsstudium</text:span>) at universities. A doctoral degree with the designation either <text:span text:style-name="T15">"Doktor/in"</text:span> or "Doctor of Philosophy" (PhD) is awarded upon completion of a doctoral programme with a minimum duration of three years.</text:p>
+		<text:p text:style-name="P17">Recipients of the diploma degrees from the old system or master’s degrees from the new system (including the ones awarded in both cases by the universities of applied sciences) are entitled to enrol in doctoral programmes (<text:span text:style-name="T15">Doktoratsstudium</text:span>) at universities. A doctoral degree with the designation either <text:span text:style-name="T15">"Doktor/in"</text:span> or "Doctor of Philosophy" (PhD) is awarded upon completion of a doctoral programme with a minimum duration of three years.</text:p>
 		<text:p text:style-name="P17"/>
 		<text:p text:style-name="P17"><text:span text:style-name="T14">In addition to the degree programmes (<text:span text:style-name="T15">ordentliche Studien</text:span>) described above, non-consecutive certificate programmes (<text:span text:style-name="T15">außerordentliche Studien</text:span>) are offered, for example in the form of university programmes for further education (<text:span text:style-name="T15">Universitätslehrgänge</text:span>) or individual units / modules in scientific subjects, both at universities; certificate university of applied sciences programmes for further education (<text:span text:style-name="T15">Lehrgänge zur Weiterbildung</text:span>) or individual units / modules in scientific subjects at universities of applied sciences; and certificate university college programmes for further education (<text:span text:style-name="T15">Hochschullehrgänge</text:span>) at university colleges of education.</text:span></text:p>
 		<text:p text:style-name="P17"/>
 		<text:p text:style-name="P39">Bachelor Programme (<text:span text:style-name="T15">Bachelorstudium</text:span>)</text:p>
 		<text:p text:style-name="P17">Admission to a bachelor programme is granted upon the basis on the Austrian higher secondary school leaving certificate (<text:span text:style-name="T15">Reifezeugnis</text:span>), its foreign equivalent, or the successful completion of a special university entrance qualification examination (<text:span text:style-name="T15">Studienberechtigungsprüfung</text:span>). Students of compulsory lower schools who have completed additional schooling in the form of apprenticeships as skilled workers may take a vocationally <text:soft-page-break/>based examination acknowledged as equivalent to the higher secondary school leaving certificate (<text:span text:style-name="T15">Berufsreifeprüfung</text:span>). Admission to bachelor programmes in the arts is based on aptitude ascertained by admission examinations. Admission to university of applied sciences bachelor programmes is also possible on the basis of previous vocational or technical experience and qualifications of applicants. In some university bachelor programmes, in most university of applied sciences bachelor programmes and in bachelor programmes at university colleges of education, admission is based on a selective admission process.</text:p>
-		<text:p text:style-name="P17">Areas/Modules of study (<text:span text:style-name="T15">Fächer/Module</text:span>) are specified in curricula. As a rule, the completion of two substantial bachelor papers or projects (<text:span text:style-name="T15">Bachelorarbeiten</text:span>) are required for awarding the degree. University of applied sciences bachelor programmes, bachelor programmes at university college and some bachelor programmes at universities include an internship or practical training. The program can concludes with a bachelor examination (<text:span text:style-name="T15">Bachelorprüfung</text:span>). </text:p>
+		<text:p text:style-name="P17">Areas/Modules of study (<text:span text:style-name="T15">Fächer/Module</text:span>) are specified in curricula. As a rule, the completion of two substantial bachelor papers or projects (<text:span text:style-name="T15">Bachelorarbeiten</text:span>) are required for awarding the degree. University of applied sciences bachelor programmes, bachelor programmes at university college and some bachelor programmes at universities include an internship or practical training. The program can conclude with a bachelor examination (<text:span text:style-name="T15">Bachelorprüfung</text:span>). </text:p>
 		<text:p text:style-name="P17"/>
 		<text:p text:style-name="P40">Master Programme (<text:span text:style-name="T15">Masterstudium</text:span>)</text:p>
-		<text:p text:style-name="P17">Admission to a master programme is granted on the basis of the successful completion of a subject-relevant bachelor programme (<text:span text:style-name="T15">Bachelorstudium</text:span>), or an equivalent post-secondary qualification. In some master programmes admission is based on a selective admission process.</text:p>
+		<text:p text:style-name="P17">Admission to a master programme is granted on the basis of the successful completion of a subject-relevant bachelor programme, or an equivalent post-secondary qualification. In some master programmes admission is based on a selective admission process.</text:p>
 		<text:p text:style-name="P17">Areas/modules of study (<text:span text:style-name="T15">Fächer/Module</text:span>) are specified in curricula. A core requirement is the completion of a master thesis (<text:span text:style-name="T15">Masterarbeit</text:span>). This degree programme concludes with a master examination (<text:span text:style-name="T15">Masterprüfung</text:span>). The approval of the master thesis (<text:span text:style-name="T15">Masterarbeit</text:span>) is a prerequisite for admission to this examination.</text:p>
-		<text:p text:style-name="P17"/>
+		<text:p text:style-name="P24"/>
+		<text:p text:style-name="P24"/>
+		<text:p text:style-name="P24"/>
+		<text:p text:style-name="P24"/>
 		<text:p text:style-name="P40">Diploma Programme (<text:span text:style-name="T15">Diplomstudium = old system</text:span>)</text:p>
 		<text:p text:style-name="P17">Admission to a diploma programme is granted upon the basis of the Austrian higher secondary school leaving certificate (<text:span text:style-name="T15">Reifezeugnis</text:span>), its foreign equivalent, or the successful completion of a special university entrance qualification examination (<text:span text:style-name="T15">Studienberechtigungsprüfung</text:span>). Students of compulsory lower schools who have completed additional schooling in the form of apprenticeships as skilled workers also may take a vocationally based examination acknowledged as equivalent to the higher secondary school leaving certificate (<text:span text:style-name="T15">Berufsreifeprüfung</text:span>). Admission to diploma programmes in the arts is based on aptitude ascertained by admission examinations. Admission to university of applied sciences diploma programmes may also take place upon the basis of previous vocational or technical experience and qualifications of applicants. In some fields of study (e.g. Human Medicine and Dentistry, and university of applied sciences diploma programmes) admission is based on a selective admission process.</text:p>
 		<text:p text:style-name="P17">A degree programme may be divided into stages (<text:span text:style-name="T15">Studienabschnitte</text:span>). The length of each stage of the degree programme as well as the areas of study (<text:span text:style-name="T15">Fächer</text:span>) and content required are articulated in curricula that distinguish between required subjects (<text:span text:style-name="T15">Pflichtfächer</text:span>) and electives (<text:span text:style-name="T15">Wahlfächer</text:span>). Each stage concludes with a diploma examination (<text:span text:style-name="T15">Diplomprüfung</text:span>). University of applied sciences diploma programmes and some diploma programmes at universities include an internship or practical training. The approval of a diploma thesis (<text:span text:style-name="T15">Diplomarbeit</text:span>) is a prerequisite for admission to the concluding diploma examination.</text:p>
@@ -2594,7 +2599,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 		<text:p text:style-name="P40">Doctoral Programme (<text:span text:style-name="T15">Doktoratsstudium</text:span>)</text:p>
 		<text:p text:style-name="P17">Admission to a doctoral programme at a university is granted on the basis of the successful completion of a subject-relevant diploma or master programme.</text:p>
 		<text:p text:style-name="P17">Contents and requirements of study are specified in curricula with the focus on the doctoral thesis (<text:span text:style-name="T15">Dissertation</text:span>) as the result of independent research. This degree programme concludes with the approval of the dissertation and with a comprehensive doctoral examination (<text:span text:style-name="T15">Rigorosum</text:span>) or a <text:span text:style-name="T15">defensio</text:span>.</text:p>
-		<text:p text:style-name="P17">At universities of applied sciences an at university colleges of education no doctoral degree programs are offered.</text:p>
+		<text:p text:style-name="P17">At universities of applied sciences and at university colleges of education no doctoral degree programmes are offered.</text:p>
 		<text:p text:style-name="P17"/>
 		<text:p text:style-name="P39">Evaluation of performance and grading system (Austrian grading scale) </text:p>
 		<text:p text:style-name="P17">According to the modalities for examinations outlined in the curricula, achievement may be assessed by oral and written exams or project related work. In principle oral examinations are open to the public.</text:p>
@@ -2671,13 +2676,13 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 		<text:p text:style-name="P17"/>
 		
 		
-		<text:p text:style-name="P75">Noten für Gesamtprüfungen, d.h. Prüfungen, die aus mehreren Fächern bestehen:</text:p>
+		<text:p text:style-name="P75">Grades for comprehensive examinations, i.e. examinations covering materials from various subjects:</text:p>
 		<table:table table:name="Table15" table:style-name="Table15">
 		 <table:table-column table:style-name="Table15.B" />
 		 <table:table-column table:style-name="Table15.C" />
 		 <table:table-row>
 			<table:table-cell table:style-name="Table15.A1" office:value-type="string">
-				 <text:p text:style-name="P32">positiv:</text:p>
+				 <text:p text:style-name="P32">positive:</text:p>
 			</table:table-cell>
 			<table:table-cell table:style-name="Table15.A1" office:value-type="string">
 				 <text:p text:style-name="P32"><text:span text:style-name="T15">mit Auszeichnung bestanden</text:span> (pass with distinction)</text:p>
@@ -2687,7 +2692,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 		 </table:table-row>
 		 <table:table-row>
 			<table:table-cell table:style-name="Table15.A1" office:value-type="string">
-				 <text:p text:style-name="P32">negativ:</text:p>
+				 <text:p text:style-name="P32">negative:</text:p>
 			</table:table-cell>
 			<table:table-cell table:style-name="Table15.A1" office:value-type="string">
 				 <text:p text:style-name="P32"><text:span text:style-name="T15">nicht bestanden</text:span> (insufficient)</text:p>
@@ -2696,8 +2701,8 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 		</table:table>
 		<text:p text:style-name="P17"/>
 		<text:p text:style-name="P75">Source:</text:p>
-		<text:p text:style-name="P75">Federal Ministry of Science, Research and Economy</text:p>
-		<text:p text:style-name="P75">Unit VI/7</text:p>
+		<text:p text:style-name="P75">Federal Ministry of Science, Research and Economy, Unit VI/7</text:p>
+<!--		<text:p text:style-name="P75">Unit VI/7</text:p>-->
 		
 		<text:p text:style-name="P48">
 		<draw:frame xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0" xmlns:xlink="http://www.w3.org/1999/xlink" draw:style-name="fr2" draw:name="graphics3" text:anchor-type="paragraph" svg:width="17cm" svg:height="24.042cm" draw:z-index="14" >
