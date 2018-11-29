@@ -1188,7 +1188,7 @@ class InfoCenter extends Auth_Controller
 	 */
 	private function _sortPrestudents(&$zgvpruefungen)
 	{
-		usort($zgvpruefungen, function ($a, $b) {
+		@usort($zgvpruefungen, function ($a, $b) {
 			//sort:
 			// 1: Studiensemester
 			if (isset($a->prestudentstatus->studiensemester_kurzbz) || isset($b->prestudentstatus->studiensemester_kurzbz))
