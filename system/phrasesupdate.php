@@ -851,6 +851,26 @@ $phrases = array(
 	array(
 		'app' => 'core',
 		'category' => 'global',
+		'phrase' => 'zumReihungstestFreigegeben',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'zum Reihungstest freigegeben',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'approved for placement test',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'global',
 		'phrase' => 'nachricht',
 		'insertvon' => 'system',
 		'phrases' => array(
@@ -1117,6 +1137,26 @@ $phrases = array(
 	array(
 		'app' => 'core',
 		'category' => 'ui',
+		'phrase' => 'freigabeart',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Freigabeart',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Approval type',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
 		'phrase' => 'freigabeAnStudiengang',
 		'insertvon' => 'system',
 		'phrases' => array(
@@ -1128,7 +1168,27 @@ $phrases = array(
 			),
 			array(
 				'sprache' => 'English',
-				'text' => '',
+				'text' => 'Approve for study program',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'freigabeZumReihungstest',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Freigabe zum Reihungstest',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Approve for placement test',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -2727,7 +2787,7 @@ $phrases = array(
 			),
 			array(
 				'sprache' => 'English',
-				'text' => '',
+				'text' => 'reject applicant',
 				'description' => '',
 				'insertvon' => 'system'
 			)

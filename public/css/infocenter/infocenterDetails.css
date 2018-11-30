@@ -36,3 +36,33 @@
     right: 2px;
     left: 2px;
 }
+
+.ausbildungssemselect{
+   width: 40px !important;
+    margin-top: -5px;
+    padding: 4px;
+}
+
+.frgstatusgrselect{
+    margin-top: 2px;
+}
+
+#scrollToTop{
+    display: none;
+    position: fixed;
+    bottom: 1%;
+    right: 0.3%;
+    z-index: 99;
+    border: none;
+    outline: none;
+    background-color: #dfdfdf;
+    color: black;
+    cursor: pointer;
+    padding: 10px;
+    border-radius: 10px;
+    font-size: 14px;
+}
+
+#scrollToTop:hover{
+    background-color: lightgrey;
+}

@@ -98,6 +98,7 @@
 					</td>
 					<td>
 						<?php echo isset($adresse) ? $adresse->strasse.', '.$adresse->plz.' '.$adresse->ort : '' ?>
+						<?php echo isset($adresse->nationkurztext) ? '<br />'.$adresse->nationkurztext : '' ?>
 					</td>
 					<td>
 						<?php echo ($adresse->heimatadresse === true ? 'Heimatadresse' : '').

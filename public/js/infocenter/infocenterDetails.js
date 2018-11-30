@@ -1,6 +1,9 @@
 
-const CONTROLLER_URL = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router + "/"+FHC_JS_DATA_STORAGE_OBJECT.called_path;
+const BASE_URL = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
 const CALLED_PATH = FHC_JS_DATA_STORAGE_OBJECT.called_path;
+const CONTROLLER_URL = BASE_URL + "/"+CALLED_PATH;
+const FREIGABE_MESSAGE_VORLAGE = "InfocenterRTfreigegeben";
+const FREIGABE_MESSAGE_VORLAGE_QUER = "InfocenterRTfreigegQuer";
 
 /**
  * javascript file for infocenterDetails page
@@ -10,9 +13,8 @@ $(document).ready(function ()
 		//initialise table sorter
 		Tablesort.addTablesorter("doctable", [[2, 1], [1, 0]], ["zebra"]);
 		Tablesort.addTablesorter("nachgdoctable", [[2, 0], [1, 1]], ["zebra"]);
-		Tablesort.addTablesorter("msgtable", [[0, 1], [2, 0]], ["zebra", "filter"], 2);
-		Tablesort.tablesortAddPager("msgtable", "msgpager", 14);
 
+		InfocenterDetails._formatMessageTable();
 		InfocenterDetails._formatNotizTable();
 		InfocenterDetails._formatLogTable();
 
@@ -35,6 +37,8 @@ $(document).ready(function ()
 
 		//add click events to zgv Prüfung section
 		InfocenterDetails._addZgvPruefungEvents(personid);
+
+		MessageList.initMessageList();
 
 		//save notiz
 		$("#notizform").on("submit", function (e)
@@ -89,6 +93,25 @@ $(document).ready(function ()
 
 		//check if person is parked and display it
 		InfocenterDetails.getParkedDate(personid);
+
+		if ($(document).scrollTop() > 20)
+			$("#scrollToTop").show();
+
+		//scroll to top button
+		$(window).scroll(function()
+			{
+				if ($(document).scrollTop() > 20)
+					$("#scrollToTop").show();
+				else
+					$("#scrollToTop").hide();
+			}
+		);
+
+		$("#scrollToTop").click(function()
+			{
+				$('html,body').animate({scrollTop:0},250,'linear');
+			}
+		)
 
 	});
 
@@ -213,16 +236,15 @@ var InfocenterDetails = {
 
 					if (FHC_AjaxClient.hasData(data))
 					{
-						InfocenterDetails._refreshLog();
 						$("#zgvSpeichern_" + prestudentid).before("<span id='zgvSpeichernNotice' class='text-success'>" + FHC_PhrasesLib.t('ui', 'gespeichert') + "</span>&nbsp;&nbsp;");
+						InfocenterDetails._refreshLog();
 					}
 					else
 					{
 						zgvError();
 					}
 				},
-				errorCallback: zgvError,
-				veilTimeout: 0
+				errorCallback: zgvError
 			}
 		);
 	},
@@ -247,19 +269,40 @@ var InfocenterDetails = {
 			}
 		);
 	},
-	saveFreigabe: function(data)
+	saveFreigabe: function(data, rtfreigabe)
 	{
+		var callback = null;
+
 		FHC_AjaxClient.ajaxCallPost(
 			CALLED_PATH + '/saveFreigabe',
 			data,
 			{
 				successCallback: function(data, textStatus, jqXHR) {
 
-					console.log(data.error);
 					if (FHC_AjaxClient.hasData(data))
 					{
-						InfocenterDetails._refreshZgv();
-						InfocenterDetails._refreshLog();
+						if (rtfreigabe)
+						{
+							FHC_AjaxClient.showVeil();
+							callback = function ()
+							{
+								InfocenterDetails.sendFreigabeMessage(data.retval.prestudent_id);
+							};
+						}
+						else
+						{
+							callback = function ()
+							{
+								InfocenterDetails._refreshLog();
+							};
+						}
+
+
+						InfocenterDetails._refreshZgv(
+							false,
+							//send message only after refresh to have current Ausbildungssemester
+							callback
+						);
 					}
 					else if (data.error === 2 && parseInt(data.retval.prestudent_id, 10))
 					{
@@ -404,6 +447,30 @@ var InfocenterDetails = {
 			}
 		);
 	},
+	sendFreigabeMessage: function(prestudentid)
+	{
+		var ausbildungssem = $("#ausbildungssem_"+prestudentid).val();
+		var vorlage_kurzbz = isNaN(ausbildungssem) || parseInt(ausbildungssem) === 1 ? FREIGABE_MESSAGE_VORLAGE : FREIGABE_MESSAGE_VORLAGE_QUER;
+
+		FHC_AjaxClient.ajaxCallPost(
+			'system/Messages/sendJson',
+			{
+				"prestudents": prestudentid,
+				"vorlage_kurzbz": vorlage_kurzbz,
+				"oe_kurzbz": 'infocenter',
+				"msgvars": {
+					'rtlink': FHC_JS_DATA_STORAGE_OBJECT.app_root + 'addons/bewerbung/cis/registration.php?active=aufnahme',
+					'ausbildungssemester': ausbildungssem
+				}
+			},
+			{
+				successCallback: function(data, textStatus, jqXHR) {
+					InfocenterDetails._refreshMessages();
+					InfocenterDetails._refreshLog();
+				}
+			}
+		);
+	},
 
 	// -----------------------------------------------------------------------------------------------------------------
 	// (private) methods executed after ajax (refreshers)
@@ -424,12 +491,20 @@ var InfocenterDetails = {
 		$(".prioup").click(function ()
 		{
 			var prestudentid = this.id.substr(this.id.indexOf("_") + 1);
-			InfocenterDetails._savePrio(prestudentid, -1);
+			var data = {
+				"prestudentid": prestudentid,
+				"change": -1
+			};
+			InfocenterDetails.saveBewPriorisierung(data);
 		});
 		$(".priodown").click(function ()
 		{
 			var prestudentid = this.id.substr(this.id.indexOf("_") + 1);
-			InfocenterDetails._savePrio(prestudentid, 1);
+			var data = {
+				"prestudentid": prestudentid,
+				"change": 1
+			};
+			InfocenterDetails.saveBewPriorisierung(data);
 		});
 
 		//zgv übernehmen
@@ -466,21 +541,45 @@ var InfocenterDetails = {
 			}
 		);
 
-		//prevent opening modal when Statusgrund not chosen
-		$(".absageModal").on('show.bs.modal', function (e)
+		$(".freigabebtn").click(function()
 			{
-				var id = this.id.substr(this.id.indexOf("_") + 1);
-				var statusgrvalue = $("#statusgrselect_" + id + " select[name=statusgrund]").val();
-				if (statusgrvalue === "null")
+				var prestudentid = this.id.substr(this.id.indexOf("_") + 1);
+				InfocenterDetails._toggleFreigabeDialog(prestudentid, true);//true - Reihungstestfreigabe
+			}
+		);
+
+		$(".freigabebtnstg").click(function()
+			{
+				var prestudentid = this.id.substr(this.id.indexOf("_") + 1);
+				var statusgrel = $("#frgstatusgrselect_"+prestudentid+" select[name=frgstatusgrund]");
+				var statusgrund_id = statusgrel.val();
+				var statusgrund = statusgrel.find("option:selected").text();
+
+				if (statusgrund_id === 'null')
 				{
-					$("#statusgrselect_" + id).addClass("has-error");
-					return e.preventDefault();
+					$("#frgstatusgrselect_" + prestudentid).addClass("has-error");
+				}
+				else
+				{
+					var rtfreigabe = false;//no Reihungstestfreigabe
+					InfocenterDetails._toggleFreigabeDialog(prestudentid, rtfreigabe, statusgrund);
 				}
 			}
 		);
 
+		$(".absageBtn").click(function()
+			{
+				var prestudentid = this.id.substr(this.id.indexOf("_") + 1);
+				var statusgrund = $("#absgstatusgrselect_" + prestudentid + " select[name=absgstatusgrund]").val();
+				if (statusgrund === "null")
+					$("#absgstatusgrselect_" + prestudentid).addClass("has-error");
+				else
+					$("#absageModal_"+prestudentid).modal("show");
+			}
+		);
+
 		//remove red mark when statusgrund is selected again
-		$("select[name=statusgrund]").change(
+		$("select[name=absgstatusgrund],select[name=frgstatusgrund]").change(
 			function ()
 			{
 				$(this).parent().removeClass("has-error");
@@ -491,7 +590,7 @@ var InfocenterDetails = {
 			{
 				$(".absageModal").modal("hide");
 				var prestudent_id = this.id.substr(this.id.indexOf("_") + 1);
-				var statusgrund_id = $("#statusgrselect_" + prestudent_id + " select[name=statusgrund]").val();
+				var statusgrund_id = $("#absgstatusgrselect_" + prestudent_id + " select[name=absgstatusgrund]").val();
 				var data = {"prestudent_id": prestudent_id , "statusgrund": statusgrund_id};
 				InfocenterDetails.saveAbsage(data);
 			}
@@ -502,12 +601,21 @@ var InfocenterDetails = {
 				$(".freigabeModal").modal("hide");
 				var prestudent_id = this.id.substr(this.id.indexOf("_") + 1);
 				var data = {"prestudent_id": prestudent_id};
+				InfocenterDetails.saveFreigabe(data, true);
+			}
+		);
+
+		$(".saveStgFreigabe").click(function()
+			{
+				$(".freigabeModal").modal("hide");
+				var prestudent_id = this.id.substr(this.id.indexOf("_") + 1);
+				var statusgrund_id = $("#frgstatusgrselect_" + prestudent_id + " select[name=frgstatusgrund]").val();
+				var data = {"prestudent_id": prestudent_id, "statusgrund_id": statusgrund_id};
 				InfocenterDetails.saveFreigabe(data);
 			}
 		)
-
 	},
-	_refreshZgv: function(preserveCollapseState)
+	_refreshZgv: function(preserveCollapseState, callback)
 	{
 		var personid = $("#hiddenpersonid").val();
 
@@ -525,8 +633,6 @@ var InfocenterDetails = {
 			);
 		}
 
-		//show veil until refresh finished?
-		//FHC_AjaxClient.showVeil();
 		$("#zgvpruefungen").load(
 			CONTROLLER_URL + '/reloadZgvPruefungen/' + personid + '?fhc_controller_id=' + FHC_AjaxClient.getUrlParameter('fhc_controller_id'),
 			function()
@@ -542,7 +648,21 @@ var InfocenterDetails = {
 							$("#"+i).addClass("in");
 					}
 				}
-				//FHC_AjaxClient.hideVeil();
+
+				// variable callback executed after refresh
+				if (callback)
+					callback();
+			}
+		);
+	},
+	_refreshMessages: function()
+	{
+		var personid = $("#hiddenpersonid").val();
+		$("#messagelist").load(
+			CONTROLLER_URL + '/reloadMessages/' + personid + '?fhc_controller_id=' + FHC_AjaxClient.getUrlParameter('fhc_controller_id'),
+			function () {
+				MessageList.initMessageList();
+				InfocenterDetails._formatMessageTable();
 			}
 		);
 	},
@@ -556,12 +676,6 @@ var InfocenterDetails = {
 				InfocenterDetails._formatLogTable()
 			}
 		);
-	},
-	_formatLogTable: function()
-	{
-		Tablesort.addTablesorter("logtable", [[0, 1]], ["filter"], 2);
-		Tablesort.tablesortAddPager("logtable", "logpager", 22);
-		$("#logtable").addClass("table-condensed");
 	},
 	_refreshNotizen: function()
 	{
@@ -622,11 +736,44 @@ var InfocenterDetails = {
 			);
 		}
 	},
+	_formatMessageTable: function()
+	{
+		Tablesort.addTablesorter("msgtable", [[0, 1], [2, 0]], ["zebra", "filter"], 2);
+		Tablesort.tablesortAddPager("msgtable", "msgpager", 14);
+	},
 	_formatNotizTable: function()
 	{
 		Tablesort.addTablesorter("notiztable", [[0, 1]], ["filter"], 2);
 		Tablesort.tablesortAddPager("notiztable", "notizpager", 11);
 		$("#notiztable").addClass("table-condensed");
+	},
+	_formatLogTable: function()
+	{
+		Tablesort.addTablesorter("logtable", [[0, 1]], ["filter"], 2);
+		Tablesort.tablesortAddPager("logtable", "logpager", 22);
+		$("#logtable").addClass("table-condensed");
+	},
+	_toggleFreigabeDialog: function(prestudentid, rtfreigabe, statusgrund)
+	{
+		var statusgrundspan = $("#freigabeModalStgr_"+prestudentid);
+		var freigabebtn = $("#saveFreigabe_"+prestudentid);
+		var stgfreigabebtn = $("#saveStgFreigabe_"+prestudentid);
+
+		if (rtfreigabe)
+		{
+			statusgrundspan.text(" - Reihungstest");
+			freigabebtn.show();
+			stgfreigabebtn.hide();
+		}
+		else
+		{
+			if (statusgrund !== "undefined" && statusgrund !== null)
+				statusgrundspan.text(" - "+statusgrund);
+			freigabebtn.hide();
+			stgfreigabebtn.show();
+		}
+
+		$("#freigabeModal_"+prestudentid).modal("show");
 	},
 	_resetNotizFields: function()
 	{
@@ -638,13 +785,5 @@ var InfocenterDetails = {
 	_errorSaveNotiz: function()
 	{
 		$("#notizmsg").text(FHC_PhrasesLib.t('ui', 'fehlerBeimSpeichern'));
-	},
-	_savePrio: function(prestudentid, change)
-	{
-		var data = {
-			"prestudentid": prestudentid,
-			"change": change
-		};
-		InfocenterDetails.saveBewPriorisierung(data);
 	}
 };

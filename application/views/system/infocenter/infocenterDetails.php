@@ -21,6 +21,7 @@
 			'customJSs' => array(
 				'public/js/bootstrapper.js',
 				'public/js/tablesort/tablesort.js',
+				'public/js/messaging/messageList.js',
 				'public/js/infocenter/infocenterDetails.js'
 			),
 			'phrases' => array(
@@ -139,7 +140,7 @@
 								</h4>
 							</div>
 							<div class="panel-body">
-								<div class="row">
+								<div class="row" id="messagelist">
 									<?php
 									$this->load->view('system/messageList.php', $messages);
 									?>
@@ -184,6 +185,7 @@
 		</div> <!-- ./container-fluid-->
 	</div> <!-- ./page-wrapper-->
 </div> <!-- ./wrapper -->
+<button id="scrollToTop" title="Go to top"><i class="fa fa-chevron-up"></i></button>
 </body>
 
 <?php $this->load->view('templates/FHC-Footer'); ?>
