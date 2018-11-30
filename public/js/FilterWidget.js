@@ -9,6 +9,23 @@
  * @since	Version 1.0.0
  */
 
+ /**
+ * Global function used by FilterWidget JS to refresh the side menu
+ * NOTE: it is called from the FilterWidget JS therefore must be a global function
+ *		It may be overwritten by a custom refreshSideMenuHook included in a javascript which will be loaded after this one
+ *		The given parameters, filter_page and navigation_page, are required
+ */
+function refreshSideMenuHook()
+{
+	FHC_NavigationWidget.refreshSideMenuHook(
+		'system/Filters/setNavigationMenu',
+		{
+			filter_page: FHC_FilterWidget.getFilterPage(),
+			navigation_page: FHC_NavigationWidget.getNavigationPage()
+		}
+	);
+}
+
 /**
  * Global function used by NavigationWidget JS to bind events to side menu elements
  * NOTE: it is called from the NavigationWidget JS therefore must be a global function

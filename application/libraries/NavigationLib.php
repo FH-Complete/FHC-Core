@@ -170,14 +170,11 @@ class NavigationLib
 	{
 		$session = $this->getSessionMenu();
 
-		if (!isset($session[$this->_navigationPage]))
-		{
-			$session[$this->_navigationPage] = array();
-		}
+		if ($session == null) $session = array();
 
-		$session[$this->_navigationPage][$name] = $value;
+		$session[$name] = $value;
 
-		setElementSession(self::SESSION_NAME, self::SESSION_MENU_NAME, $session); // stores the single value
+		setElementSession(self::SESSION_NAME, self::SESSION_MENU_NAME, array($this->_navigationPage => $session)); // stores the single value
 	}
 
 	/**
@@ -187,14 +184,11 @@ class NavigationLib
 	{
 		$session = $this->getSessionHeader();
 
-		if (!isset($session[$this->_navigationPage]))
-		{
-			$session[$this->_navigationPage] = array();
-		}
+		if ($session == null) $session = array();
 
-		$session[$this->_navigationPage][$name] = $value;
+		$session[$name] = $value;
 
-		setElementSession(self::SESSION_NAME, self::SESSION_HEADER_NAME, $session); // stores the single value
+		setElementSession(self::SESSION_NAME, self::SESSION_HEADER_NAME, array($this->_navigationPage => $session)); // stores the single value
 	}
 
 	//------------------------------------------------------------------------------------------------------------------

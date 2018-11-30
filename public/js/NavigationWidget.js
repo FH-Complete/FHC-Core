@@ -25,7 +25,7 @@ var FHC_NavigationWidget = {
 		FHC_AjaxClient.ajaxCallGet(
 			'system/Navigation/header',
 			{
-				navigation_page: FHC_NavigationWidget._getNavigationWidgetCalled()
+				navigation_page: FHC_NavigationWidget.getNavigationPage()
 			},
 			{
 				successCallback: function(data, textStatus, jqXHR) {
@@ -54,7 +54,7 @@ var FHC_NavigationWidget = {
 		FHC_AjaxClient.ajaxCallGet(
 			'system/Navigation/menu',
 			{
-				navigation_page: FHC_NavigationWidget._getNavigationWidgetCalled()
+				navigation_page: FHC_NavigationWidget.getNavigationPage()
 			},
 			{
 				successCallback: function(data, textStatus, jqXHR) {
@@ -87,13 +87,20 @@ var FHC_NavigationWidget = {
 	/**
 	 * Calls URL to retrive a refreshed menu array
 	 */
-	refreshSideMenuHook: function(url) {
+	refreshSideMenuHook: function(url, params = null) {
+
+		var callParameters = {};
+
+		if (params != null && typeof params == "object")
+		{
+			callParameters = params;
+		}
+
+		callParameters.navigation_page = FHC_NavigationWidget.getNavigationPage();
 
 		FHC_AjaxClient.ajaxCallGet(
 			url,
-			{
-				navigation_page: FHC_NavigationWidget._getNavigationWidgetCalled()
-			},
+			callParameters,
 			{
 				successCallback: function(data, textStatus, jqXHR) {
 					FHC_NavigationWidget.renderSideMenu();
@@ -103,6 +110,14 @@ var FHC_NavigationWidget = {
 				}
 			}
 		);
+	},
+
+	/**
+	 * Returns the URI of the caller
+	 */
+	getNavigationPage: function() {
+
+		return FHC_JS_DATA_STORAGE_OBJECT.called_path + "/" + FHC_JS_DATA_STORAGE_OBJECT.called_method;
 	},
 
 	//------------------------------------------------------------------------------------------------------------------
@@ -264,13 +279,6 @@ var FHC_NavigationWidget = {
 		strLeftMenu += '</li>';
 
 		return strLeftMenu;
-	},
-
-	/**
-	 * Returns the URI of the caller
-	 */
-	_getNavigationWidgetCalled: function() {
-		return FHC_JS_DATA_STORAGE_OBJECT.called_path + "/" + FHC_JS_DATA_STORAGE_OBJECT.called_method;
 	},
 
 	/**

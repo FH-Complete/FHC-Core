@@ -5,10 +5,14 @@
 /**
 * Global function used by FilterWidget JS to refresh the side menu
 * NOTE: it is called from the FilterWidget JS therefore must be a global function
+* 		To be called only if the page has a customized menu (currently only index)
 */
-function refreshSideMenuHook()
+if (FHC_JS_DATA_STORAGE_OBJECT.called_method == 'index')
 {
-	FHC_NavigationWidget.refreshSideMenuHook('system/infocenter/InfoCenter/setNavigationMenuArrayJson');
+	function refreshSideMenuHook()
+	{
+		FHC_NavigationWidget.refreshSideMenuHook('system/infocenter/InfoCenter/setNavigationMenuArrayJson');
+	}
 }
 
 /**

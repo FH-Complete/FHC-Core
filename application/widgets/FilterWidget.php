@@ -43,6 +43,8 @@ class FilterWidget extends Widget
 	private $_hideHeader;
 	private $_hideSave;
 
+	private $_customMenu; // if true then method _setFilterMenu is NOT called
+
 	private static $_FilterWidgetInstance; // static property that contains the instance of itself
 
 	/**
@@ -60,7 +62,13 @@ class FilterWidget extends Widget
 
 		// Let's start if it's allowed
 		// NOTE: If it is NOT allowed then no data are loaded
-		if ($this->filterslib->isAllowed($this->_requiredPermissions)) $this->_startFilterWidget();
+		if ($this->filterslib->isAllowed($this->_requiredPermissions))
+		{
+			$this->_startFilterWidget();
+
+			// If a custom menu is not used, then default menu is used
+			if ($this->_customMenu != true) $this->_setFilterMenu();
+		}
 	}
 
 	//------------------------------------------------------------------------------------------------------------------
@@ -144,6 +152,7 @@ class FilterWidget extends Widget
 		$this->_checkboxes = null;
 		$this->_hideHeader = null;
 		$this->_hideSave = null;
+		$this->_customMenu = null;
 
 		// Retrived the required permissions parameter if present
 		if (isset($args[FiltersLib::REQUIRED_PERMISSIONS_PARAMETER]))
@@ -223,6 +232,11 @@ class FilterWidget extends Widget
 		if (isset($args[FiltersLib::HIDE_SAVE]) && is_bool($args[FiltersLib::HIDE_SAVE]))
 		{
 			$this->_hideSave = $args[FiltersLib::HIDE_SAVE];
+		}
+
+		if (isset($args[FiltersLib::CUSTOM_MENU]) && is_bool($args[FiltersLib::CUSTOM_MENU]))
+		{
+			$this->_customMenu = $args[FiltersLib::CUSTOM_MENU];
 		}
 	}
 
@@ -362,6 +376,17 @@ class FilterWidget extends Widget
 		// To be always stored in the session, otherwise is not possible to load data from Filters controller
 		// NOTE: must the latest operation to be performed in the session to be shure that is always present
 		$this->filterslib->setElementSession(FiltersLib::REQUIRED_PERMISSIONS_PARAMETER, $this->_requiredPermissions);
+	}
+
+	/**
+	 *
+	 */
+	private function _setFilterMenu()
+	{
+		// Generates the filters structure array
+		$filterMenu = $this->filterslib->generateFilterMenu(
+			$this->router->directory.$this->router->class.'/'.$this->router->method
+		);
 	}
 
 	/**

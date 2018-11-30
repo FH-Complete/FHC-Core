@@ -201,6 +201,18 @@ class Filters extends FHC_Controller
 		}
 	}
 
+
+	/**
+	 * Define the navigation menu for the current filter widget
+	 */
+	public function setNavigationMenu()
+	{
+		// Generates the filters structure array
+		$filterMenu = $this->filterslib->generateFilterMenu($this->input->get(FiltersLib::NAVIGATION_PAGE));
+
+		$this->outputJsonSuccess('Success');
+	}
+
 	//------------------------------------------------------------------------------------------------------------------
 	// Private methods
 
