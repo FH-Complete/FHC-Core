@@ -829,6 +829,7 @@ var FHC_FilterWidget = {
 			&& $("#filterTableDataset").hasClass("table-condensed"))
 		{
 			$("#filterTableDataset").tablesorter({
+				dateFormat: "ddmmyyyy",
 				widgets: ["zebra", "filter"],
 				widgetOptions: {
 					filter_saveFilters : true
