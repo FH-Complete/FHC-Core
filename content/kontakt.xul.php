@@ -87,7 +87,7 @@ $uid = get_uid();
 						class="sortDirectionIndicator"
 						sort="rdf:http://www.technikum-wien.at/adresse/rdf#gemeinde" onclick="KontaktAdresseTreeSort()"/>
 					<splitter class="tree-splitter"/>
-					<treecol id="kontakt-adressen-treecol-nation" label="Nation" flex="1" hidden="true"
+					<treecol id="kontakt-adressen-treecol-nation" label="Nation" flex="1" hidden="false"
 						class="sortDirectionIndicator"
 						sort="rdf:http://www.technikum-wien.at/adresse/rdf#nation" onclick="KontaktAdresseTreeSort()"/>
 					<splitter class="tree-splitter"/>
