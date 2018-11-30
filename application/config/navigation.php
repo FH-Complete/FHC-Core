@@ -30,7 +30,7 @@ $config['navigation_header'] = array(
 					'icon' => 'list-ol',
 					'description' => 'Reihungstests',
 					'expand' => true,
-					'sort' => 1,
+					'sort' => 10,
 					'requiredPermissions' => 'infocenter:r'
 				)
 			)
