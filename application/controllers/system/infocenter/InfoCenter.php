@@ -856,89 +856,30 @@ class InfoCenter extends Auth_Controller
 	 */
 	private function _setNavigationMenuFreigegeben()
 	{
+		// Loads NavigationLib
 		$this->load->library('NavigationLib', array(self::NAVIGATION_PAGE => self::INFOCENTER_URI.'/'.self::FREIGEGEBEN_PAGE));
 
-		$listFilters = array();
-		$listCustomFilters = array();
-
-		$filters = $this->FiltersModel->getFilterList('infocenter', 'freigegeben', '%InfoCenterFreigegeben%');
-		if (hasData($filters))
-		{
-			for ($filtersCounter = 0; $filtersCounter < count($filters->retval); $filtersCounter++)
-			{
-				$filter = $filters->retval[$filtersCounter];
-
-				$listFilters[$filter->filter_id] = $filter->description[0];
-			}
-		}
-
-		$customFilters = $this->FiltersModel->getCustomFiltersList('infocenter', 'freigegeben', $this->_uid);
-		if (hasData($customFilters))
-		{
-			for ($filtersCounter = 0; $filtersCounter < count($customFilters->retval); $filtersCounter++)
-			{
-				$filter = $customFilters->retval[$filtersCounter];
-
-				$listCustomFilters[$filter->filter_id] = $filter->description[0];
-			}
-		}
-
-		$filtersArray = array();
-		$filtersArray['children'] = array();
-
-		$this->_fillFiltersFreigegeben($listFilters, $filtersArray);
-
-		if (count($listCustomFilters) > 0)
-		{
-			$filtersArray['children']['personal'] = $this->navigationlib->oneLevel(
-				'Personal filters',	// description
-				'#',				// link
-				array(),			// children
-				'',					// icon
-				true,				// expand
-				null,				// subscriptDescription
-				null,				// subscriptLinkClass
-				null,				// subscriptLinkValue
-				'', 				// target
-				15 					// sort
-			);
-
-			$this->_fillCustomFilters($listCustomFilters, $filtersArray['children']['personal']);
-		}
-
-		$homeLink = site_url('system/infocenter/InfoCenter/index');
+		// Generate the home link with the eventually loaded filter
+		$homeLink = site_url(self::INFOCENTER_URI.'/'.self::INDEX_PAGE);
 		$prevFilterId = $this->input->get(self::PREV_FILTER_ID);
 		if (isset($prevFilterId))
 		{
 			$homeLink .= '?'.self::FILTER_ID.'='.$prevFilterId;
 		}
 
-		$this->navigationlib->setSessionMenu(
-			array(
-				'freigegeben' => $this->navigationlib->oneLevel(
-					'Home',		// description
-					$homeLink,			// link
-					null,				// children
-					'angle-left',		// icon
-					null,				// subscriptDescription
-					false,				// expand
-					null,				// subscriptLinkClass
-					null, 				// subscriptLinkValue
-					'', 				// target
-					1   				// sort
-				),
-				'filters' => $this->navigationlib->oneLevel(
-					'Filter',					// description
-					'#',						// link
-					(isset($filtersArray['children']) ? $filtersArray['children'] : ''), // children
-					'',							// icon
-					true,						// expand
-					null, 						// subscriptDescription
-					null, 						// subscriptLinkClass
-					null, 						// subscriptLinkValue
-					'', 						// target
-					10 							// sort
-				)
+		$this->navigationlib->setElementSessionMenu(
+			self::FREIGEGEBEN_PAGE,
+			$this->navigationlib->oneLevel(
+				'Home',		// description
+				$homeLink,			// link
+				null,				// children
+				'angle-left',		// icon
+				null,				// subscriptDescription
+				false,				// expand
+				null,				// subscriptLinkClass
+				null, 				// subscriptLinkValue
+				'', 				// target
+				1   				// sort
 			)
 		);
 	}

@@ -53,6 +53,8 @@ class FiltersLib
 	const HIDE_HEADER = 'hideHeader';
 	const HIDE_SAVE = 'hideSave';
 
+	const CUSTOM_MENU = 'customMenu'; // ...to specify if the menu for this filter is custom (true) or not (false)
+
 	// Filter operations values
 	const OP_EQUAL = 'equal';
 	const OP_NOT_EQUAL = 'nequal';
@@ -75,6 +77,15 @@ class FiltersLib
 
 	const PERMISSION_FILTER_METHOD = 'FilterWidget'; // Name for fake method to be checked by the PermissionLib
 	const PERMISSION_TYPE = 'rw';
+
+	// Name and array keys of the filters menu array
+	const NAV_MENU_FILTER_KEY = 'filters';
+	const NAV_MENU_FILTER_NAME = 'Filters';
+	const NAV_MENU_CUSTOM_FILTER_KEY = 'personal_filters';
+	const NAV_MENU_CUSTOM_FILTER_NAME = 'Personal filters';
+
+	// Navigation page parameter name
+	const NAVIGATION_PAGE = 'navigation_page';
 
 	private $_ci; // Code igniter instance
 	private $_filterUniqueId; // unique id for this filter widget
@@ -666,6 +677,99 @@ class FiltersLib
 		}
 
 		return $removeCustomFilter;
+	}
+
+	/**
+	 * Generates the filters menu structure array and stores it into the session
+	 */
+	public function generateFilterMenu($navigationPage)
+	{
+		// Loads the NavigationLib for the current page (given as parameter)
+		$this->_ci->load->library('NavigationLib', array(FiltersLib::NAVIGATION_PAGE => $navigationPage));
+
+		$filterMenu = null;
+		$currentMenu = $this->_ci->navigationlib->getSessionMenu(); // The navigation menu currently stored in session
+
+		$session = $this->getSession(); // The filter currently stored in session (the one that is currently used)
+		if ($session != null)
+		{
+			// Loads the Fitlers model
+			$this->_ci->load->model('system/Filters_model', 'FiltersModel');
+
+			// Loads all the filters related to this page (same dataset_name and same app name)
+			$filters = $this->_ci->FiltersModel->getFiltersByAppDatasetName(
+				$session[self::APP_PARAMETER], $session[self::DATASET_NAME_PARAMETER]
+			);
+
+			// If filters were loaded
+			if (hasData($filters))
+			{
+				$childrenArray = array(); // contains all the children elements in a menu entry
+				$childrenPersonalArray = array(); // contains all the children elements in menu enty for personal filters
+
+				// Loops through loaded filters
+				foreach ($filters->retval as $filter)
+				{
+					// Generate a menu entry
+					$menuEntry = $this->_ci->navigationlib->oneLevel(
+						$filter->description[0], // description
+						sprintf(
+							'%s?%s=%s',
+							site_url($this->_ci->router->directory.$this->_ci->router->class.'/'.$this->_ci->router->method),
+							self::FILTER_ID,
+							$filter->filter_id
+						) // link
+					);
+
+					// If it is NOT a personal filter
+					if ($filter->person_id == null)
+					{
+						$childrenArray[] = $menuEntry; // adds to filters menu array
+					}
+					else // otherwise
+					{
+						$menuEntry['subscriptDescription'] = 'Remove';
+						$menuEntry['subscriptLinkClass'] = 'remove-custom-filter';
+						$menuEntry['subscriptLinkValue'] = $filter->filter_id;
+						$childrenPersonalArray[] = $menuEntry; // adds to personal filters menu array
+					}
+				}
+
+				// If personal filters are present then add the menu entry for them
+				if (count($childrenPersonalArray) > 0)
+				{
+					$childrenArray[self::NAV_MENU_CUSTOM_FILTER_KEY] = $this->_ci->navigationlib->oneLevel(
+							self::NAV_MENU_CUSTOM_FILTER_NAME,		// description
+							'#',									// link
+							$childrenPersonalArray,					// children
+							'',										// icon
+							true,									// expand
+							null, 									// subscriptDescription
+							null, 									// subscriptLinkClass
+							null, 									// subscriptLinkValue
+							'', 									// target
+							20 										// sort
+					);
+				}
+
+				// Adds menu entry for all the filters
+				$filterMenu = $this->_ci->navigationlib->oneLevel(
+					self::NAV_MENU_FILTER_NAME,		// description
+					'#',							// link
+					$childrenArray,					// children
+					'',								// icon
+					true,							// expand
+					null,							// subscriptDescription
+					null,							// subscriptLinkClass
+					null, 							// subscriptLinkValue
+					'', 							// target
+					10 								// sort
+				);
+
+				// Sets in the session only the element related to the filters menu
+				$this->_ci->navigationlib->setElementSessionMenu(FiltersLib::NAV_MENU_FILTER_KEY, $filterMenu);
+			}
+		}
 	}
 
 	//------------------------------------------------------------------------------------------------------------------

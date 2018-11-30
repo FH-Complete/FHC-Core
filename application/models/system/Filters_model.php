@@ -17,6 +17,8 @@ class Filters_model extends DB_Model
 	 */
 	public function getFilterList($app, $dataset_name, $filter_kurzbz)
 	{
+		$this->resetQuery(); // reset any previous built query
+
 		$this->addSelect('filter_id, description');
 		$this->addOrder('sort', 'ASC');
 
@@ -36,6 +38,8 @@ class Filters_model extends DB_Model
 	 */
 	public function getCustomFiltersList($app, $dataset_name, $uid)
 	{
+		$this->resetQuery(); // reset any previous built query
+
 		$this->addSelect('filter_id, description');
 		$this->addJoin('public.tbl_benutzer', 'person_id');
 		$this->addOrder('sort', 'ASC');
@@ -45,6 +49,25 @@ class Filters_model extends DB_Model
 			'dataset_name' => $dataset_name,
 			'array_length(description, 1) >' => 0,
 			'uid' => $uid
+		);
+
+		return $this->loadWhere($filterParametersArray);
+	}
+
+	/**
+	 * Loads all filters by their app and dataset_name
+	 */
+	public function getFiltersByAppDatasetName($app, $dataset_name)
+	{
+		$this->resetQuery(); // reset any previous built query
+
+		$this->addSelect('filter_id, person_id, description');
+		$this->addOrder('person_id', 'DESC'); // sort descending on column person_id
+		$this->addOrder('sort', 'ASC'); // sort on column sort
+
+		$filterParametersArray = array(
+			'app' => $app,
+			'dataset_name' => $dataset_name
 		);
 
 		return $this->loadWhere($filterParametersArray);
