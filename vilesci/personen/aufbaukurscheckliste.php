@@ -20,48 +20,54 @@
  *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
  *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
- 
- 
+
+
 /**
  * Zeit eine Liste mit allen Dualen Studenten die noch nicht im
  * Aufbaukurs-Studiengang angelegt wurden
  */
+require_once('../../config/vilesci.config.inc.php');
+require_once('../../config/global.config.inc.php');
+require_once('../../include/functions.inc.php');
+require_once('../../include/basis_db.class.php');
+require_once('../../include/studiensemester.class.php');
+require_once('../../include/datum.class.php');
+require_once('../../include/benutzerberechtigung.class.php');
 
-		require_once('../../config/vilesci.config.inc.php');
-		require_once('../../include/basis_db.class.php');
-		if (!$db = new basis_db())
-				die('Es konnte keine Verbindung zum Server aufgebaut werden.');
-			
-			
-	require_once('../../include/studiensemester.class.php');
-	require_once('../../include/datum.class.php');
+$uid = get_uid();
+$rechte = new benutzerberechtigung();
+$rechte->getBerechtigungen($uid);
 
+if(!$rechte->isBerechtigt('assistenz',STUDIENGANG_KZ_QUALIFIKATIONKURSE,'suid'))
+	die($rechte->errormsg);
+
+if (!$db = new basis_db())
+	die('Es konnte keine Verbindung zum Server aufgebaut werden.');
 
 $datum_obj = new datum();
 $stsem_obj = new studiensemester();
 $stsem = $stsem_obj->getaktorNext();
 
-echo '
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+echo '<!DOCTYPE HTML">
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<link href="../../skin/vilesci.css" rel="stylesheet" type="text/css">
-<title>Aufbaukurs - Checkliste</title>
+	<meta charset="UTF-8">
+	<link href="../../skin/vilesci.css" rel="stylesheet" type="text/css">
+	<title>Qualifikationskurs - Checkliste</title>
 </head>
 <body>
-<h2>Aufbaukurs - Checkliste</h2>
-Die folgenden Personen sind als dual markiert, wurden aber noch nicht in den Aufbaukurs übernommen:<br><br>
+<h2>Qualifikationskurs - Checkliste</h2>
+Die folgenden Personen sind als dual markiert, wurden aber noch nicht in den Qualifikationskurs übernommen:<br><br>
 ';
 
-$qry = "SELECT 
+$qry = "SELECT
 			nachname, vorname, gebdatum, UPPER(tbl_studiengang.typ::varchar(1) || tbl_studiengang.kurzbz) as stgkurzbz
-		FROM 
-			public.tbl_person 
-			JOIN public.tbl_prestudent USING(person_id) 
+		FROM
+			public.tbl_person
+			JOIN public.tbl_prestudent USING(person_id)
 			JOIN public.tbl_studiengang USING(studiengang_kz)
-		WHERE 
-		person_id NOT IN(SELECT person_id FROM public.tbl_prestudent WHERE studiengang_kz=10002)
+		WHERE
+		person_id NOT IN(SELECT person_id FROM public.tbl_prestudent WHERE studiengang_kz=".STUDIENGANG_KZ_QUALIFIKATIONKURSE.")
 		AND dual
 		ORDER BY nachname, vorname";
 
@@ -73,21 +79,21 @@ if($result = $db->db_query($qry))
 
 	echo '<table>';
 	echo '<tr class="liste"><th>Nachname</th><th>Vorname</th><th>GebDatum</th><th>Stg</th></tr>';
-	
+
 	while($row = $db->db_fetch_object($result))
 	{
 		$i++;
 		echo '<tr class="liste'.($i%2).'">';
-		
+
 		echo "<td>$row->nachname</td>";
 		echo "<td>$row->vorname</td>";
 		echo "<td>".$datum_obj->formatDatum($row->gebdatum,'d.m.Y')."</td>";
 		echo "<td>$row->stgkurzbz</td>";
-		echo "<td><a href='import/interessentenimport.php?nachname=$row->nachname&vorname=$row->vorname&studiengang_kz=10002&ausbildungssemester=2&studiensemester_kurzbz=$stsem' target='_blank'>anlegen</a></td>";
-				
+		echo "<td><a href='import/interessentenimport.php?nachname=$row->nachname&vorname=$row->vorname&studiengang_kz=".STUDIENGANG_KZ_QUALIFIKATIONKURSE."&ausbildungssemester=2&studiensemester_kurzbz=$stsem' target='_blank'>anlegen</a></td>";
+
 		echo '</tr>';
 	}
-	
+
 	echo '</table>';
 	echo '<br>Anzahl:'. ($result?$db->db_num_rows($result):0);
 }
