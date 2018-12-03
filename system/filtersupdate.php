@@ -272,6 +272,10 @@ $filters = array(
 						"option": "days",
 						"condition": "5",
 						"operation": "lt"
+					},
+					{
+						"name": "ReihungstestAngetreten",
+						"operation": "false"
 					}
 				]
 			}
@@ -296,7 +300,12 @@ $filters = array(
 					{"name": "User/Operator"},
 					{"name": "LockUser"}
 				],
-				"filters": []
+				"filters": [
+					{
+						"name": "ReihungstestAngetreten",
+						"operation": "false"
+					}
+				]
 			}
 		',
 		'oe_kurzbz' => null,
@@ -341,6 +350,68 @@ $filters = array(
 					{"name": "freie_plaetze"}
 				],
 				"filters": []
+			}
+		',
+		'oe_kurzbz' => null,
+	),
+	array(
+		'app' => 'infocenter',
+		'dataset_name' => 'reihungstestAbsolviert',
+		'filter_kurzbz' => 'InfoCenterReihungstestAbsolviert5days',
+		'description' => '{"Letzten 5 Tage"}',
+		'sort' => 1,
+		'default_filter' => true,
+		'filter' => '
+			{
+				"name": "Reihungstest absolviert - Letzten 5 Tage",
+				"columns": [
+					{"name": "Vorname"},
+					{"name": "Nachname"},
+					{"name": "StgAbgeschickt"},
+					{"name": "LastAction"},
+					{"name": "User/Operator"},
+					{"name": "LockUser"}
+				],
+				"filters": [
+					{
+						"name": "ReihungstestDatum",
+						"option": "days",
+						"condition": "5",
+						"operation": "lt"
+					},
+					{
+						"name": "ReihungstestAngetreten",
+						"operation": "true"
+					}
+				]
+			}
+		',
+		'oe_kurzbz' => null,
+	),
+	array(
+		'app' => 'infocenter',
+		'dataset_name' => 'reihungstestAbsolviert',
+		'filter_kurzbz' => 'InfoCenterReihungstestAbsolviertAlle',
+		'description' => '{Alle}',
+		'sort' => 2,
+		'default_filter' => false,
+		'filter' => '
+			{
+				"name": "Reihungstest absolviert - Alle",
+				"columns": [
+					{"name": "Vorname"},
+					{"name": "Nachname"},
+					{"name": "StgAbgeschickt"},
+					{"name": "LastAction"},
+					{"name": "User/Operator"},
+					{"name": "LockUser"}
+				],
+				"filters": [
+					{
+						"name": "ReihungstestAngetreten",
+						"operation": "true"
+					}
+				]
 			}
 		',
 		'oe_kurzbz' => null,

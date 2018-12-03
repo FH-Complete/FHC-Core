@@ -126,7 +126,25 @@
 				   AND pss.studiensemester_kurzbz IN (SELECT ss.studiensemester_kurzbz FROM public.tbl_studiensemester ss WHERE ss.ende >= NOW())
 			  ORDER BY pss.datum DESC, pss.insertamum DESC, pss.ext_id DESC
 				 LIMIT 1
-			) AS "ReihungstestApplied"
+			) AS "ReihungstestApplied",
+			(
+				SELECT rtp.datum
+				  FROM public.tbl_prestudentstatus pss
+				  JOIN public.tbl_prestudent ps USING(prestudent_id)
+			 LEFT JOIN (
+					SELECT rtp.person_id,
+						   rt.studiensemester_kurzbz,
+						   rt.datum
+					  FROM public.tbl_rt_person rtp
+		   			  JOIN tbl_reihungstest rt ON(rtp.rt_id = rt.reihungstest_id)
+					 WHERE rt.stufe = 1
+				) rtp ON(rtp.person_id = ps.person_id AND rtp.studiensemester_kurzbz = pss.studiensemester_kurzbz)
+				 WHERE pss.status_kurzbz = '.$INTERESSENT_STATUS.'
+				   AND ps.person_id = p.person_id
+				   AND pss.studiensemester_kurzbz IN (SELECT ss.studiensemester_kurzbz FROM public.tbl_studiensemester ss WHERE ss.ende >= NOW())
+			  ORDER BY pss.datum DESC, pss.insertamum DESC, pss.ext_id DESC
+				 LIMIT 1
+			) AS "ReihungstestDatum"
 		  FROM public.tbl_person p
 	 LEFT JOIN (
 			SELECT tpl.person_id,
@@ -157,8 +175,8 @@
 	$filterWidgetArray = array(
 		'query' => $query,
 		'app' => InfoCenter::APP,
-		'datasetName' => 'freigegeben',
-		'filterKurzbz' => 'InfoCenterFreigegeben5days',
+		'datasetName' => 'reihungstestAbsolviert',
+		'filterKurzbz' => 'InfoCenterReihungstestAbsolviert5days',
 		'filter_id' => $this->input->get('filter_id'),
 		'requiredPermissions' => 'infocenter',
 		'checkboxes' => 'PersonId',
@@ -179,7 +197,8 @@
 			'Studiengänge',
 			'Statusgrund',
 			'Reihungstest angetreten',
-			'Reihungstest angemeldet'
+			'Reihungstest angemeldet',
+			'Reihungstest datum'
 		),
 		'formatRow' => function($datasetRaw) {
 
@@ -252,6 +271,15 @@
 			else
 			{
 				$datasetRaw->{'ReihungstestApplied'} = 'No';
+			}
+
+			if ($datasetRaw->{'ReihungstestDatum'} == null)
+			{
+				$datasetRaw->{'ReihungstestDatum'} = '-';
+			}
+			else
+			{
+				$datasetRaw->{'ReihungstestDatum'} = date_format(date_create($datasetRaw->{'ReihungstestDatum'}),'Y-m-d H:i');
 			}
 
 			return $datasetRaw;

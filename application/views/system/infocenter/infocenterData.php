@@ -206,7 +206,7 @@
 
 	$filterWidgetArray = array(
 		'query' => $query,
-		'app' => 'infocenter',
+		'app' => InfoCenter::APP,
 		'datasetName' => 'overview',
 		'filterKurzbz' => 'InfoCenterSentApplicationAll',
 		'filter_id' => $this->input->get('filter_id'),

@@ -15,6 +15,7 @@ class InfoCenter extends Auth_Controller
 	const INFOCENTER_URI = 'system/infocenter/InfoCenter'; // URL prefix for this controller
 	const INDEX_PAGE = 'index';
 	const FREIGEGEBEN_PAGE = 'freigegeben';
+	const REIHUNGSTESTABSOLVIERT_PAGE = 'reihungstestAbsolviert';
 	const SHOW_DETAILS_PAGE = 'showDetails';
 
 	const NAVIGATION_PAGE = 'navigation_page';
@@ -72,6 +73,7 @@ class InfoCenter extends Auth_Controller
 			array(
 				'index' => 'infocenter:r',
 				'freigegeben' => 'infocenter:r',
+				'reihungstestAbsolviert' => 'infocenter:r',
 				'showDetails' => 'infocenter:r',
 				'unlockPerson' => 'infocenter:rw',
 				'saveFormalGeprueft' => 'infocenter:rw',
@@ -144,9 +146,19 @@ class InfoCenter extends Auth_Controller
 	 */
 	public function freigegeben()
 	{
-		$this->_setNavigationMenuFreigegeben(); // define the navigation menu for this page
+		$this->_setNavigationMenu(self::FREIGEGEBEN_PAGE); // define the navigation menu for this page
 
 		$this->load->view('system/infocenter/infocenterFreigegeben.php');
+	}
+
+	/**
+	 *
+	 */
+	public function reihungstestAbsolviert()
+	{
+		$this->_setNavigationMenu(self::REIHUNGSTESTABSOLVIERT_PAGE); // define the navigation menu for this page
+
+		$this->load->view('system/infocenter/infocenterReihungstestAbsolviert.php');
 	}
 
 	/**
@@ -661,9 +673,13 @@ class InfoCenter extends Auth_Controller
 		{
 			$this->_setNavigationMenuIndex();
 		}
-		else
+		elseif (strpos($navigation_page, self::FREIGEGEBEN_PAGE) !== false)
 		{
-			$this->_setNavigationMenuFreigegeben();
+			$this->_setNavigationMenu(self::FREIGEGEBEN_PAGE);
+		}
+		elseif (strpos($navigation_page, self::REIHUNGSTESTABSOLVIERT_PAGE) !== false)
+		{
+			$this->_setNavigationMenu(self::REIHUNGSTESTABSOLVIERT_PAGE);
 		}
 
 		$this->outputJsonSuccess('success');
@@ -775,11 +791,13 @@ class InfoCenter extends Auth_Controller
 			$this->_fillCustomFilters($listCustomFilters, $filtersArray['personal']);
 		}
 
-		$freigegebenLink = site_url('system/infocenter/InfoCenter/freigegeben');
+		$freigegebenLink = site_url(self::INFOCENTER_URI.'/'.self::FREIGEGEBEN_PAGE);
+		$reihungstestAbsolviertLink = site_url(self::INFOCENTER_URI.'/'.self::REIHUNGSTESTABSOLVIERT_PAGE);
 		$currentFilterId = $this->input->get(self::FILTER_ID);
 		if (isset($currentFilterId))
 		{
 			$freigegebenLink .= '?'.self::PREV_FILTER_ID.'='.$currentFilterId;
+			$reihungstestAbsolviertLink .= '?'.self::PREV_FILTER_ID.'='.$currentFilterId;
 		}
 
 		$this->navigationlib->setSessionMenu(
@@ -796,8 +814,20 @@ class InfoCenter extends Auth_Controller
 					'', 				// target
 					1   				// sort
 				),
+				'reihungstestAbsolviert' => $this->navigationlib->oneLevel(
+					'Reihungstest Absolviert',		// description
+					$reihungstestAbsolviertLink,				// link
+					null,				// children
+					'',					// icon
+					null,				// subscriptDescription
+					false,				// expand
+					null,				// subscriptLinkClass
+					null, 				// subscriptLinkValue
+					'', 				// target
+					2   				// sort
+				),
 				'filters' => $this->navigationlib->oneLevel(
-					'Filter',		// description
+					'Filters',		// description
 					'#',			// link
 					$filtersArray,	// children
 					'',				// icon
@@ -854,10 +884,10 @@ class InfoCenter extends Auth_Controller
 	/**
 	 *  Define the navigation menu for the freigegeben page
 	 */
-	private function _setNavigationMenuFreigegeben()
+	private function _setNavigationMenu($page)
 	{
 		// Loads NavigationLib
-		$this->load->library('NavigationLib', array(self::NAVIGATION_PAGE => self::INFOCENTER_URI.'/'.self::FREIGEGEBEN_PAGE));
+		$this->load->library('NavigationLib', array(self::NAVIGATION_PAGE => self::INFOCENTER_URI.'/'.$page));
 
 		// Generate the home link with the eventually loaded filter
 		$homeLink = site_url(self::INFOCENTER_URI.'/'.self::INDEX_PAGE);
@@ -868,9 +898,9 @@ class InfoCenter extends Auth_Controller
 		}
 
 		$this->navigationlib->setElementSessionMenu(
-			self::FREIGEGEBEN_PAGE,
+			$page,
 			$this->navigationlib->oneLevel(
-				'Home',		// description
+				'Home',				// description
 				$homeLink,			// link
 				null,				// children
 				'angle-left',		// icon
