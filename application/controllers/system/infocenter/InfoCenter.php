@@ -49,7 +49,7 @@ class InfoCenter extends Auth_Controller
 		'freigegeben' => array(
 			'logtype' => 'Processstate',
 			'name' => 'Interessent confirmed',
-			'message' => 'Status Interessent for prestudentid %s was confirmed for degree program %s'
+			'message' => 'Status Interessent for prestudentid %s was confirmed for degree program %s%s'
 		),
 		'savenotiz' => array(
 			'logtype' => 'Action',
@@ -512,7 +512,18 @@ class InfoCenter extends Auth_Controller
 						$json->error = 2;
 					}
 
-					$this->_log($logdata['person_id'], 'freigegeben', array($prestudent_id, $logdata['studiengang_kurzbz']));
+					$logparams = array($prestudent_id, $logdata['studiengang_kurzbz'], '');
+
+					if (isset($statusgrund_id))
+					{
+						$this->StatusgrundModel->addSelect('bezeichnung_mehrsprachig');
+						$statusgrund_kurzbz = $this->StatusgrundModel->load($statusgrund_id);
+
+						if (hasData($statusgrund_kurzbz))
+							$logparams[2] = ', confirmation type '.$statusgrund_kurzbz->retval[0]->bezeichnung_mehrsprachig[0];
+					}
+
+					$this->_log($logdata['person_id'], 'freigegeben', $logparams);
 
 					$this->_sendFreigabeMail($prestudent_id);
 				}
