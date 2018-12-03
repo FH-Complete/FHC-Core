@@ -66,7 +66,7 @@ var InfocenterPersonDataset = {
 							// Count Records after Filtering
 							$("#filterTableDataset").bind("filterEnd", function() {
 								var cnt = $("#filterTableDataset tr:visible").length - 2;
-								$("#filterTableDatasetCntFiltered").html(cnt + ' / ');
+								$(".filterTableDatasetCntFiltered").html(cnt + ' / ');
 							});
 
 							$("#datasetActionsTop, #datasetActionsBottom").append(
@@ -74,7 +74,7 @@ var InfocenterPersonDataset = {
 								"<div class='col-xs-6'>" + selectAllHtml + "&nbsp;&nbsp;" + actionHtml + "</div>"+
 								"<div class='col-xs-4'>" + legendHtml + "</div>"+
 								"<div class='col-xs-2 text-right'>" +
-								"<span id='filterTableDatasetCntFiltered'></span>" +
+								"<span class='filterTableDatasetCntFiltered'></span>" +
 								countHtml +	"</div>"+
 								"<div class='clearfix'></div>"+
 								"</div>"

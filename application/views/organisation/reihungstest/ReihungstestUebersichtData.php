@@ -2,7 +2,7 @@
 	$schwund = 0;
 	if(defined('REIHUNGSTEST_ARBEITSPLAETZE_SCHWUND') && !is_null(REIHUNGSTEST_ARBEITSPLAETZE_SCHWUND))
 		$schwund = REIHUNGSTEST_ARBEITSPLAETZE_SCHWUND;
-	
+
 	$filterWidgetArray = array(
 		'query' => "
 		SELECT
@@ -18,7 +18,8 @@
 			studiengaenge,
 			fakultaet,
 			max_plaetze - anzahl_angemeldet as freie_plaetze,
-			raeume
+			raeume,
+			rt_studiengang
 		FROM
 		(
 			SELECT
@@ -99,15 +100,13 @@
 					public.tbl_rt_ort
 				WHERE
 					tbl_rt_ort.rt_id = tbl_reihungstest.reihungstest_id
-				) as raeume
+				) as raeume,
+				upper(tbl_studiengang.typ || tbl_studiengang.kurzbz) as rt_studiengang
 			FROM
 				public.tbl_reihungstest
+				LEFT JOIN public.tbl_studiengang using(studiengang_kz)
 			WHERE
 				datum>now()-'2 weeks'::interval
-				AND NOT EXISTS(
-					SELECT 1 FROM public.tbl_studiengang
-					WHERE studiengang_kz=tbl_reihungstest.studiengang_kz AND tbl_studiengang.typ='m'
-				)
 			ORDER BY datum desc
 		) data
 		",
@@ -126,7 +125,8 @@
 			'Teilnehmer Stg',
 			'Fakultät',
 			'Freie Plätze',
-			'Räume'
+			'Räume',
+			'Reihungstest-Studiengang'
 		),
 		'formatRow' => function($datasetRaw) {
 			/* NOTE: Dont use $this here for PHP Version compatibility */

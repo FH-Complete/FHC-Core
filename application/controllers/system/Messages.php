@@ -15,6 +15,7 @@ class Messages extends Auth_Controller
 			array(
 				'write' => array('basis/message:rw', 'infocenter:rw'),
 				'send' => array('basis/message:rw', 'infocenter:rw'),
+				'sendJson' => array('basis/message:rw', 'infocenter:rw'),
 				'getVorlage' => array('basis/message:r', 'infocenter:r'),
 				'parseMessageText' => array('basis/message:r', 'infocenter:r'),
 				'getMessageFromIds' => array('basis/message:r', 'infocenter:r')
@@ -191,24 +192,57 @@ class Messages extends Auth_Controller
 	 */
 	public function send($sender_id = null)
 	{
+		$result = $this->_execSend($sender_id);
+
+		if (isSuccess($result))
+		{
+			echo "Messages sent successfully";
+		}
+		else
+		{
+			echo "Error when sending message";
+		}
+	}
+
+	/**
+	 * Send message, response is in JSON format
+	 * @param $sender_id
+	 */
+	public function sendJson($sender_id = null)
+	{
+		$result = $this->_execSend($sender_id);
+
+		$this->output
+			->set_content_type('application/json')
+			->set_output(json_encode($result));
+	}
+
+	/**
+	 * Executes message sending
+	 * @param $sender_id
+	 * @return array wether execution was successfull - error or success
+	 */
+	private function _execSend($sender_id)
+	{
 		if ($sender_id === null)
 		{
 			$user_person = $this->PersonModel->getByUid($this->uid);
 
 			if (!hasData($user_person))
 			{
-				show_error('no sender');
+				return error('no sender');
 			}
 			$sender_id = $user_person->retval[0]->person_id;
 		}
-
-		$error = false;
 
 		$subject = $this->input->post('subject');
 		$body = $this->input->post('body');
 		$prestudents = $this->input->post('prestudents');
 		$persons = $this->input->post('persons');
 		$relationmessage_id = $this->input->post('relationmessage_id');
+		$vorlage_kurzbz = $this->input->post('vorlage_kurzbz');
+		$oe_kurzbz = $this->input->post('oe_kurzbz');
+		$msgvars = $this->input->post('msgvars');
 
 		if (!isset($relationmessage_id) || $relationmessage_id == '')
 		{
@@ -240,10 +274,8 @@ class Messages extends Auth_Controller
 					$dataArray[$newKey] = $dataArray[$key];
 				}
 
-				$parsedText = $this->messagelib->parseMessageText($body, $dataArray);
-
-				$oe_kurzbz = null;
-				if (hasData($prestudentsData))
+				// if oe not given, get from prestudent
+				if (isEmptyString($oe_kurzbz) && hasData($prestudentsData))
 				{
 					for ($p = 0; $p < count($prestudentsData->retval); $p++)
 					{
@@ -254,12 +286,29 @@ class Messages extends Auth_Controller
 					}
 				}
 
-				$msg = $this->messagelib->sendMessage($sender_id, $dataArray['person_id'], $subject, $parsedText, PRIORITY_NORMAL, $relationmessage_id, $oe_kurzbz);
+				// send without vorlage
+				if (isEmptyString($vorlage_kurzbz))
+				{
+					$parsedText = $this->messagelib->parseMessageText($body, $dataArray);
+					$msg = $this->messagelib->sendMessage($sender_id, $dataArray['person_id'], $subject, $parsedText, PRIORITY_NORMAL, $relationmessage_id, $oe_kurzbz);
+				}
+				// send with vorlage
+				else
+				{
+					if (isset($msgvars) && is_array($msgvars))
+					{
+						//additional message variables
+						foreach ($msgvars as $key => $msgvar)
+						{
+							$dataArray[$key] = $msgvar;
+						}
+					}
+					$msg = $this->messagelib->sendMessageVorlage($sender_id, $dataArray['person_id'], $vorlage_kurzbz, $oe_kurzbz, $dataArray);
+				}
+
 				if ($msg->error)
 				{
-					show_error($msg->retval);
-					$error = true;
-					break;
+					return error($msg->msg);
 				}
 
 				// Loads the person log library
@@ -279,12 +328,9 @@ class Messages extends Auth_Controller
 					null,
 					$this->uid
 				);
-			}
-		}
 
-		if (!$error)
-		{
-			echo "Messages sent successfully";
+				return success($msg->retval);
+			}
 		}
 	}
 
@@ -383,8 +429,10 @@ class Messages extends Auth_Controller
 	 * @param $msg_id
 	 * @param $receiver_id
 	 */
-	public function getMessageFromIds($msg_id, $receiver_id)
+	public function getMessageFromIds()
 	{
+		$msg_id = $this->input->get('msg_id');
+		$receiver_id = $this->input->get('receiver_id');
 		$msg = $this->messagelib->getMessage($msg_id, $receiver_id);
 
 		$this->output

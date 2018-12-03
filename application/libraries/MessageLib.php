@@ -315,7 +315,8 @@ class MessageLib
 						{
 							// Parses template text
 							$parsedText = $this->ci->vorlagelib->parseVorlagetext($result->retval[0]->text, $data);
-							$subject = $result->retval[0]->subject;
+							// Parses subject
+							$subject = $this->ci->vorlagelib->parseVorlagetext($result->retval[0]->subject, $data);
 
 							// Save message
 							$result = $this->_saveMessage($sender_id, $receiver_id, $subject, $parsedText, $relationmessage_id, $oe_kurzbz);

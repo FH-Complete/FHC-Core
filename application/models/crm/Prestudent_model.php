@@ -228,8 +228,10 @@ class Prestudent_model extends DB_Model
 				$lastStatus->retval[0]->studiengangkurzbzlang = $studienordnung->retval[0]->studiengangkurzbzlang;
 				$lastStatus->retval[0]->studiengangbezeichnung = $studienordnung->retval[0]->studiengangbezeichnung;
 				$lastStatus->retval[0]->studiengangbezeichnung_englisch = $studienordnung->retval[0]->studiengangbezeichnung_englisch;
+				$lastStatus->retval[0]->regelstudiendauer = $studienordnung->retval[0]->regelstudiendauer;
 			}
 
+			//get Sprache
 			$this->load->model('system/sprache_model', 'SpracheModel');
 			$language = $this->SpracheModel->load($lastStatus->retval[0]->sprache);
 

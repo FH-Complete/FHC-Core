@@ -173,6 +173,8 @@ class Person_model extends DB_Model
 		if($kontakte->error)
 			return error($kontakte->retval);
 		$where = $zustellung_only === true ? array('person_id' => $person_id, 'zustelladresse' => true) : array('person_id' => $person_id);
+		$this->AdresseModel->addSelect('public.tbl_adresse.*, bis.tbl_nation.kurztext AS nationkurztext');
+		$this->AdresseModel->addJoin('bis.tbl_nation', 'tbl_adresse.nation = tbl_nation.nation_code', 'LEFT');
 		$adressen = $this->AdresseModel->loadWhere($where);
 		if($adressen->error)
 			return error($adressen->retval);

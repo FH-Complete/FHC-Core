@@ -9,7 +9,8 @@
 		$studiengangbezeichnung = empty($zgvpruefung->prestudentstatus->studiengangbezeichnung) ? $zgvpruefung->studiengangbezeichnung : $zgvpruefung->prestudentstatus->studiengangbezeichnung;
 
 		//set bootstrap columns for zgv form
-		$columns = array(4, 3, 2, 3);
+		$columns = array(3, 3, 3, 3);
+
 		$headercolumns = array(7, 5);
 		if (!$infoonly && isset($zgvpruefung->prestudentstatus->bewerbungsnachfrist) && isset($zgvpruefung->prestudentstatus->bewerbungstermin))
 		{
@@ -54,7 +55,11 @@
 						<?php if ($infoonly): ?>
 							<?php if (isset($zgvpruefung->prestudentstatus->bestaetigtam)): ?>
 								<i class="fa fa-check" style="color: green"></i>
-								<?php echo  $this->p->t('global', 'anStudiengangFreigegeben') ?>
+								<?php if (isset($zgvpruefung->prestudentstatus->statusgrund_id))
+										echo  $this->p->t('global', 'anStudiengangFreigegeben').(isset($zgvpruefung->prestudentstatus->bezeichnung_statusgrund[0]) ? ' ('.$zgvpruefung->prestudentstatus->bezeichnung_statusgrund[0].')' : '');
+									else
+										echo  $this->p->t('global', 'zumReihungstestFreigegeben');
+									?>
 							<?php endif; ?>
 						<?php else: ?>
 							<?php echo ucfirst($this->p->t('infocenter', 'bewerbung')) . ' ' . $this->p->t('global', 'abgeschickt') . ': '.(isset($zgvpruefung->prestudentstatus->bewerbung_abgeschicktamum) ? '<i class="fa fa-check" style="color:green"></i>' : '<i class="fa fa-times" style="color:red"></i>'); ?>
@@ -112,10 +117,22 @@
 								</div>
 							</div>
 							<div class="col-lg-<?php echo $columns[2] ?>">
-								<div class="form-group">
-									<label><span style="display: inline-block">Ausbildungs</span><span
-											style="display: inline-block">semester: </span></label>
-									<?php echo isset($zgvpruefung->prestudentstatus->ausbildungssemester) ? $zgvpruefung->prestudentstatus->ausbildungssemester : '' ?>
+								<div class="form-group form-inline">
+									<label style="float: left"><span style="display: inline-block">Ausbildungs</span><span
+											style="display: inline-block">semester:&nbsp;</span></label>
+									<?php if (isset($zgvpruefung->prestudentstatus->ausbildungssemester)): ?>
+										<?php if ($infoonly): ?>
+											<input id="ausbildungssem_<?php echo $zgvpruefung->prestudent_id ?>" value="<?php echo $zgvpruefung->prestudentstatus->ausbildungssemester?>" type="hidden">
+											<?php echo $zgvpruefung->prestudentstatus->ausbildungssemester?>
+										<?php else:?>
+											<select class="ausbildungssemselect" name="ausbildungssemester" id="ausbildungssem_<?php echo $zgvpruefung->prestudent_id ?>">
+												<?php $maxsemester = isset($zgvpruefung->prestudentstatus->regelstudiendauer) ? intval($zgvpruefung->prestudentstatus->regelstudiendauer) : 10 ?>
+													<?php for ($i = 1; $i <= $maxsemester; $i++): ?>
+														<option value="<?php echo $i ?>"<?php echo $i === intval($zgvpruefung->prestudentstatus->ausbildungssemester) ? ' selected' : '' ?>><?php echo $i ?></option>
+													<?php endfor; ?>
+											</select>
+										<?php endif; ?>
+									<?php endif; ?>
 								</div>
 							</div>
 							<div class="col-lg-<?php echo $columns[3] ?>">
@@ -286,24 +303,22 @@
 					?>
 					<div class="panel-footer solidtop">
 						<div class="row">
-							<div class="col-lg-6 text-left">
+							<div class="col-lg-3 text-left">
 								<div class="form-inline">
-									<div class="input-group" id="statusgrselect_<?php echo $zgvpruefung->prestudent_id ?>">
-										<select name="statusgrund"
+									<div class="input-group" id="absgstatusgrselect_<?php echo $zgvpruefung->prestudent_id ?>">
+										<select name="absgstatusgrund"
 												class="d-inline float-right"
 												required>
 											<option value="null"
 													selected="selected"><?php echo ucfirst($this->p->t('infocenter', 'absagegrund')) . '...' ?>
 											</option>
-											<?php foreach ($statusgruende as $statusgrund): ?>
+											<?php foreach ($abwstatusgruende as $statusgrund): ?>
 												<option value="<?php echo $statusgrund->statusgrund_id ?>"><?php echo $statusgrund->bezeichnung_mehrsprachig[0] ?></option>
 											<?php endforeach ?>
 										</select>
 										<span class="input-group-btn">
-											<button id="absageBtn" type="button"
-													class="btn btn-default"
-													data-toggle="modal"
-													data-target="#absageModal_<?php echo $zgvpruefung->prestudent_id ?>">
+											<button type="button"
+													class="btn btn-default absageBtn" id="absagebtn_<?php echo $zgvpruefung->prestudent_id ?>">
 												<?php echo  $this->p->t('ui', 'absagen') ?>
 											</button>
 										</span>
@@ -345,7 +360,6 @@
 									</div>
 								</div>
 							</div><!-- /.column-absage -->
-							<div class="col-lg-6 text-right">
 								<?php
 								$disabled = $disabledTxt = '';
 								if (isEmptyString($zgvpruefung->prestudentstatus->bewerbung_abgeschicktamum))
@@ -360,14 +374,34 @@
 									$disabledTxt = 'Nur Bachelorstudiengänge können freigegeben werden.';;
 								}
 								?>
-								<div>
-									<button type="button" class="btn btn-default" <?php echo $disabled ?>
-											data-toggle="modal"
-											data-target="#freigabeModal_<?php echo $zgvpruefung->prestudent_id ?>"
-											data-toggle="tooltip" title="<?php echo $disabledTxt ?>">
+							<div class="col-lg-3">
+								<div class="form-inline">
+									<div class="input-group frgstatusgrselect" id="frgstatusgrselect_<?php echo $zgvpruefung->prestudent_id ?>">
+										<select name="frgstatusgrund"
+												class="d-inline float-right input-sm"
+												<?php echo $disabled ?>
+												required>
+											<option value="null"
+													selected="selected"><?php echo ucfirst($this->p->t('ui', 'freigabeart')) . '...' ?>
+											</option>
+											<?php foreach ($intstatusgruende as $statusgrund): ?>
+												<option value="<?php echo $statusgrund->statusgrund_id ?>"><?php echo $statusgrund->bezeichnung_mehrsprachig[0] ?></option>
+											<?php endforeach ?>
+										</select>
+										<span class="input-group-btn">
+											<button class="btn btn-sm freigabebtnstg" <?php echo $disabled ?> id="freigabebtnstg_<?php echo $zgvpruefung->prestudent_id ?>"
+													data-toggle="tooltip" title="<?php echo $disabledTxt ?>">
 												<?php echo  $this->p->t('ui', 'freigabeAnStudiengang') ?>
-									</button>
+											</button>
+										</span>
+									</div>
 								</div>
+							</div>
+							<div class="col-lg-6 text-right">
+									<button type="button" id="freigabebtn_<?php echo $zgvpruefung->prestudent_id ?>" class="btn btn-default freigabebtn" <?php echo $disabled ?>
+											data-toggle="tooltip" title="<?php echo $disabledTxt ?>">
+										<?php echo  $this->p->t('ui', 'freigabeZumReihungstest') ?>
+									</button>
 							</div>
 							<div class="modal fade freigabeModal" id="freigabeModal_<?php echo $zgvpruefung->prestudent_id ?>" tabindex="-1"
 								 role="dialog"
@@ -382,7 +416,9 @@
 											</button>
 											<h4 class="modal-title"
 												id="freigabeModalLabel">
-												<?php echo $this->p->t('infocenter', 'freigabeBestaetigen') ?></h4>
+												<?php echo $this->p->t('infocenter', 'freigabeBestaetigen') ?>
+												<span id="freigabeModalStgr_<?php echo $zgvpruefung->prestudent_id ?>"></span>
+											</h4>
 										</div>
 										<div class="modal-body">
 											<?php echo $this->p->t('infocenter', 'interessentFreigebenTxt') ?>
@@ -396,6 +432,10 @@
 													class="btn btn-primary saveFreigabe" id="saveFreigabe_<?php echo $zgvpruefung->prestudent_id ?>">
 												<?php echo $this->p->t('infocenter', 'interessentFreigeben') ?>
 											</button>
+											<button type="button"
+													class="btn btn-primary saveStgFreigabe" id="saveStgFreigabe_<?php echo $zgvpruefung->prestudent_id ?>">
+												<?php echo $this->p->t('infocenter', 'interessentFreigeben') ?>
+											</button>
 										</div>
 									</div><!-- /.modal-content -->
 								</div><!-- /.modal-dialog -->
@@ -407,7 +447,13 @@
 						<div class="row">
 							<div class="col-lg-12 text-left">
 								<?php echo isset($zgvpruefung->prestudentstatus->bestaetigtam) ? '<i class="fa fa-check" style="color: green"></i>' : '<i class="fa fa-check" style="color: red"></i>' ?>
-								<label><?php echo  $this->p->t('global', 'anStudiengangFreigegeben') ?></label>
+								<label>
+									<?php if (isset($zgvpruefung->prestudentstatus->statusgrund_id))
+											echo  $this->p->t('global', 'anStudiengangFreigegeben').(isset($zgvpruefung->prestudentstatus->bezeichnung_statusgrund[0]) ? ' ('.$zgvpruefung->prestudentstatus->bezeichnung_statusgrund[0].')' : '');
+										else
+											echo  $this->p->t('global', 'zumReihungstestFreigegeben');
+									?>
+								</label>
 							</div>
 						</div><!-- /.row -->
 					</div><!-- /.panel-footer -->

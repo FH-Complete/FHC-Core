@@ -11,6 +11,7 @@ class InfoCenter extends Auth_Controller
 	// App and Verarbeitungstaetigkeit name for logging
 	const APP = 'infocenter';
 	const TAETIGKEIT = 'bewerbung';
+	const FREIGABE_MAIL_VORLAGE = 'InfocenterMailFreigabeAssistenz';
 
 	const INFOCENTER_URI = 'system/infocenter/InfoCenter'; // URL prefix for this controller
 	const INDEX_PAGE = 'index';
@@ -85,9 +86,10 @@ class InfoCenter extends Auth_Controller
 				'saveFreigabe' => 'infocenter:rw',
 				'saveNotiz' => 'infocenter:rw',
 				'updateNotiz' => 'infocenter:rw',
+				'reloadZgvPruefungen' => 'infocenter:r',
+				'reloadMessages' => 'infocenter:r',
 				'reloadNotizen' => 'infocenter:r',
 				'reloadLogs' => 'infocenter:r',
-				'reloadZgvPruefungen' => 'infocenter:r',
 				'outputAkteContent' => 'infocenter:r',
 				'getParkedDate' => 'infocenter:r',
 				'park' => 'infocenter:rw',
@@ -319,12 +321,16 @@ class InfoCenter extends Auth_Controller
 	 */
 	public function saveZgvPruefung()
 	{
+		$json = null;
+
 		$prestudent_id = $this->input->post('prestudentid');
 
 		if (isEmptyString($prestudent_id))
-			$result = error('Prestudentid missing');
+			$json = error('Prestudentid missing');
 		else
 		{
+			$ausbildungssemester = $this->input->post('ausbildungssemester');
+
 			// zgvdata
 			// Check for string null, in case dropdown changed to default value
 			$zgv_code = $this->input->post('zgv') === 'null' ? null : $this->input->post('zgv');
@@ -333,14 +339,28 @@ class InfoCenter extends Auth_Controller
 			$zgvdatum = isEmptyString($zgvdatum) ? null : date_format(date_create($zgvdatum), 'Y-m-d');
 			$zgvnation_code = $this->input->post('zgvnation') === 'null' ? null : $this->input->post('zgvnation');
 
-			//zgvmasterdata
+			// zgvmasterdata
 			$zgvmas_code = $this->input->post('zgvmas') === 'null' ? null : $this->input->post('zgvmas');
 			$zgvmaort = $this->input->post('zgvmaort');
 			$zgvmadatum = $this->input->post('zgvmadatum');
 			$zgvmadatum = isEmptyString($zgvmadatum) ? null : date_format(date_create($zgvmadatum), 'Y-m-d');
 			$zgvmanation_code = $this->input->post('zgvmanation') === 'null' ? null : $this->input->post('zgvmanation');
 
-			$result = $this->PrestudentModel->update(
+			$lastStatus = $this->PrestudentstatusModel->getLastStatus($prestudent_id, '', 'Interessent');
+
+			$semresult = null;
+
+			if (hasData($lastStatus))
+			{
+				$semresult = $this->PrestudentstatusModel->update(
+					array('prestudent_id' => $lastStatus->retval[0]->prestudent_id,
+						  'status_kurzbz' => $lastStatus->retval[0]->status_kurzbz,
+						  'studiensemester_kurzbz' => $lastStatus->retval[0]->studiensemester_kurzbz),
+					array('ausbildungssemester' => $ausbildungssemester)
+				);
+			}
+
+			$prestresult = $this->PrestudentModel->update(
 				$prestudent_id,
 				array(
 					'zgv_code' => $zgv_code,
@@ -355,7 +375,14 @@ class InfoCenter extends Auth_Controller
 				)
 			);
 
-			if (isSuccess($result))
+			if (isError($prestresult))
+				$json = error('Error when updating Prestudent!');
+			elseif (isError($semresult))
+				$json = error('Error when updating Ausbildungssemester!');
+			else
+				$json = success('Zgv saved successfully!');
+
+			if (isSuccess($semresult) || isSuccess($prestresult))
 			{
 				//get extended Prestudent data for logging
 				$logdata = $this->_getPersonAndStudiengangFromPrestudent($prestudent_id);
@@ -363,7 +390,7 @@ class InfoCenter extends Auth_Controller
 				$this->_log($logdata['person_id'], 'savezgv', array($logdata['studiengang_kurzbz'], $prestudent_id));
 			}
 		}
-		$this->output->set_content_type('application/json')->set_output(json_encode($result));
+		$this->output->set_content_type('application/json')->set_output(json_encode($json));
 	}
 
 	/**
@@ -426,6 +453,7 @@ class InfoCenter extends Auth_Controller
 	{
 		$json = null;
 		$prestudent_id = $this->input->post('prestudent_id');
+		$statusgrund_id = $this->input->post('statusgrund_id');
 
 		$lastStatus = $this->PrestudentstatusModel->getLastStatus($prestudent_id);
 
@@ -440,6 +468,18 @@ class InfoCenter extends Auth_Controller
 			//check if still Interessent and not freigegeben yet
 			if ($lastStatus->status_kurzbz === 'Interessent' && !isset($lastStatus->bestaetigtam))
 			{
+				$statusdata = array(
+					'bestaetigtvon' => $this->_uid,
+					'bestaetigtam' => date('Y-m-d'),
+					'updatevon' => $this->_uid,
+					'updateamum' => date('Y-m-d H:i:s')
+				);
+
+				if (isset($statusgrund_id) && is_numeric($statusgrund_id))
+				{
+					$statusdata['statusgrund_id'] = $statusgrund_id;
+				}
+
 				$result = $this->PrestudentstatusModel->update(
 					array(
 						'prestudent_id' => $prestudent_id,
@@ -447,12 +487,7 @@ class InfoCenter extends Auth_Controller
 						'studiensemester_kurzbz' => $lastStatus->studiensemester_kurzbz,
 						'ausbildungssemester' => $lastStatus->ausbildungssemester
 					),
-					array(
-						'bestaetigtvon' => $this->_uid,
-						'bestaetigtam' => date('Y-m-d'),
-						'updatevon' => $this->_uid,
-						'updateamum' => date('Y-m-d H:i:s')
-					)
+					$statusdata
 				);
 
 				$json = $result;
@@ -471,7 +506,7 @@ class InfoCenter extends Auth_Controller
 
 					$acceptresult = $this->DokumentprestudentModel->setAcceptedDocuments($prestudent_id, $dokument_kurzbzs);
 
-					//returns null if no documents to accept
+					// acceptresult returns null if no documents to accept
 					if ($acceptresult !== null && isError($acceptresult))
 					{
 						$json->error = 2;
@@ -539,6 +574,29 @@ class InfoCenter extends Auth_Controller
 	}
 
 	/**
+	 * Loads Zgv Prüfung view for a person, helper for reloading after ajax request
+	 * @param $person_id
+	 */
+	public function reloadZgvPruefungen($person_id)
+	{
+		$prestudentdata = $this->_loadPrestudentData($person_id);
+
+		$prestudentdata[self::FHC_CONTROLLER_ID] = $this->getControllerId();
+
+		$this->load->view('system/infocenter/zgvpruefungen.php', $prestudentdata);
+	}
+
+	/**
+	 * Loads Messages view for a person, helper for reloading after ajax request
+	 * @param $person_id
+	 */
+	public function reloadMessages($person_id)
+	{
+		$messages = $this->MessageModel->getMessagesOfPerson($person_id, 1);
+		$this->load->view('system/messageList.php', array('messages' => $messages->retval));
+	}
+
+	/**
 	 * Loads Notizen view for a person, helper for reloading after ajax request
 	 * @param $person_id
 	 */
@@ -562,19 +620,6 @@ class InfoCenter extends Auth_Controller
 	{
 		$logs = $this->personloglib->getLogs($person_id);
 		$this->load->view('system/infocenter/logs.php', array('logs' => $logs));
-	}
-
-	/**
-	 * Loads Zgv Prüfung view for a person, helper for reloading after ajax request
-	 * @param $person_id
-	 */
-	public function reloadZgvPruefungen($person_id)
-	{
-		$prestudentdata = $this->_loadPrestudentData($person_id);
-
-		$prestudentdata[self::FHC_CONTROLLER_ID] = $this->getControllerId();
-
-		$this->load->view('system/infocenter/zgvpruefungen.php', $prestudentdata);
 	}
 
 	/**
@@ -1117,7 +1162,7 @@ class InfoCenter extends Auth_Controller
 			//if prestudent is not interessent or is already bestaetigt, then show only as information, non-editable
 			$zgvpruefung->infoonly = !isset($zgvpruefung->prestudentstatus) || isset($zgvpruefung->prestudentstatus->bestaetigtam) || $zgvpruefung->prestudentstatus->status_kurzbz != 'Interessent';
 
-			//numeric application priority and arrows for changing
+			//numeric application priority
 			$zgvpruefung->changeup = false;
 			$zgvpruefung->changedown = false;
 
@@ -1138,16 +1183,16 @@ class InfoCenter extends Auth_Controller
 			$zgvpruefungen[] = $zgvpruefung;
 		}
 
-		$this->load->model('organisation/studiensemester_model', 'StudiensemesterModel');
-
 		$this->_sortPrestudents($zgvpruefungen);
 
-		$statusgruende = $this->StatusgrundModel->loadWhere(array('status_kurzbz' => 'Abgewiesener'))->retval;
+		$abwstatusgruende = $this->StatusgrundModel->loadWhere(array('status_kurzbz' => 'Abgewiesener'))->retval;
+		$intstatusgruende = $this->StatusgrundModel->loadWhere(array('status_kurzbz' => 'Interessent'))->retval;
 
 		$data = array (
 			'zgvpruefungen' => $zgvpruefungen,
 			'numberinteressenten' => $interessentenCount,
-			'statusgruende' => $statusgruende
+			'abwstatusgruende' => $abwstatusgruende,
+			'intstatusgruende' => $intstatusgruende
 		);
 
 		return $data;
@@ -1159,6 +1204,8 @@ class InfoCenter extends Auth_Controller
 	 */
 	private function _sortPrestudents(&$zgvpruefungen)
 	{
+		$this->load->model('organisation/studiensemester_model', 'StudiensemesterModel');
+
 		@usort($zgvpruefungen, function ($a, $b) {
 			//sort:
 			// 1: Studiensemester
@@ -1237,30 +1284,6 @@ class InfoCenter extends Auth_Controller
 			// 5: prestudentid
 			return (int)$b->prestudent_id - (int)$a->prestudent_id;
 		});
-	}
-
-	/**
-	 * Helper function for redirecting to initial page for person from a prestudent-specific page
-	 * @param $prestudent_id
-	 * @param $section optional section of the page to go to
-	 */
-	private function _redirectToStart($prestudent_id, $section = '')
-	{
-		$this->PrestudentModel->addSelect('person_id');
-		$person_id = $this->PrestudentModel->load($prestudent_id)->retval[0]->person_id;
-
-		redirect(
-			sprintf(
-				'/%s/%s?%s=%s&%s=%s#%s',
-				self::INFOCENTER_URI,
-				self::SHOW_DETAILS_PAGE,
-				'person_id',
-				$person_id,
-				self::FHC_CONTROLLER_ID,
-				$this->getControllerId(),
-				$section
-			)
-		);
 	}
 
 	/**
@@ -1401,12 +1424,8 @@ class InfoCenter extends Auth_Controller
 			'dokumente_nachgereicht' => $dokumenteNachzureichenMail
 		);
 
-		$this->load->library('parser');
-		$this->load->library('MailLib');
 		$this->load->library('LogLib');
-
-		//parse freigabe html email template, wordwrap wraps text so no display errors
-		$email = wordwrap($this->parser->parse('templates/mailtemplates/interessentFreigabe', $data, true), 70);
+		$this->load->helper('hlp_sancho');
 
 		$subject = ($person->geschlecht == 'm' ? 'Interessent ' : 'Interessentin ').$person->vorname.' '.$person->nachname.' für '.$prestudent->studiengangbezeichnung.$orgform.' freigegeben';
 
@@ -1415,10 +1434,12 @@ class InfoCenter extends Auth_Controller
 		if (!isEmptyString($receiver))
 		{
 			//Freigabeinformationmail sent from default system mail to studiengang mail(s)
-			$sent = $this->maillib->send('', $receiver, $subject, $email, '', null, null, 'Bitte sehen Sie sich die Nachricht in HTML Sicht an, um den Inhalt vollständig darzustellen.');
-
-			if (!$sent)
-				$this->loglib->logError('Error when sending Freigabe mail');
+			sendSanchoMail(
+				self::FREIGABE_MAIL_VORLAGE,
+				$data,
+				$receiver,
+				$subject
+			);
 		}
 		else
 		{
