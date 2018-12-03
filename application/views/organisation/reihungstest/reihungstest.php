@@ -16,9 +16,7 @@
 				'ui' => array('bitteEintragWaehlen')
 			),
 			'customCSSs' => 'public/css/sbadmin2/tablesort_bootstrap.css',
-			'customJSs' => array(
-				'public/js/bootstrapper.js',
-				'public/js/reihungstest/reihungstest.js')
+			'customJSs' => array('public/js/bootstrapper.js')
 		)
 	);
 ?>
