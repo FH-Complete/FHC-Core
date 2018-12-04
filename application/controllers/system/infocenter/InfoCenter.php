@@ -912,6 +912,10 @@ class InfoCenter extends Auth_Controller
 		{
 			$link = site_url(self::INFOCENTER_URI.'/'.self::FREIGEGEBEN_PAGE);
 		}
+		if ($origin_page == self::REIHUNGSTESTABSOLVIERT_PAGE)
+		{
+			$link = site_url(self::INFOCENTER_URI.'/'.self::REIHUNGSTESTABSOLVIERT_PAGE);
+		}
 
 		$prevFilterId = $this->input->get(self::PREV_FILTER_ID);
 		if (isset($prevFilterId))

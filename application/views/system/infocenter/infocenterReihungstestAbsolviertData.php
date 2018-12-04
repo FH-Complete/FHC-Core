@@ -207,7 +207,7 @@
 				'<a href="%s?person_id=%s&origin_page=%s&fhc_controller_id=%s&prev_filter_id=%s">Details</a>',
 				site_url('system/infocenter/InfoCenter/showDetails'),
 				$datasetRaw->{'PersonId'},
-				'freigegeben',
+				'reihungstestAbsolviert',
 				(isset($_GET['fhc_controller_id']) ? $_GET['fhc_controller_id'] : ''),
 				(isset($_GET['filter_id']) ? $_GET['filter_id'] : '')
 			);
