@@ -100,6 +100,12 @@ $db = new basis_db();
 					<textbox multiline="true" rows="10" id="interessent-dokumente-dialog-textbox-anmerkung" />
 				</row>
 				<row id="interessent-dokumente-dialog-row-anmerkung" hidden="false">
+					<label value="Nachreichung am" control="student-detail-textbox-nachgereicht_am"/>
+					<hbox>
+						<box class="Datum" id="interessent-dokumente-dialog-textbox-nachgereicht_am"/>
+					</hbox>
+				</row>
+				<row id="interessent-dokumente-dialog-row-save" hidden="false">
 					<spacer />
 					<hbox>
 						<spacer flex="1" />
