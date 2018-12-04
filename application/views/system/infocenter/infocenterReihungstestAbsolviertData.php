@@ -112,7 +112,7 @@
 				 LIMIT 1
 			) AS "ReihungstestAngetreten",
 			(
-				SELECT CASE WHEN(pss.prestudent_id IS NULL) THEN FALSE ELSE TRUE END
+				SELECT CASE WHEN(rtp.person_id IS NULL) THEN FALSE ELSE TRUE END
 				  FROM public.tbl_prestudentstatus pss
 				  JOIN public.tbl_prestudent ps USING(prestudent_id)
 			 LEFT JOIN (
@@ -200,7 +200,7 @@
 			'Statusgrund',
 			'Reihungstest angetreten',
 			'Reihungstest angemeldet',
-			'Reihungstest datum'
+			'Reihungstest Datum'
 		),
 		'formatRow' => function($datasetRaw) {
 
@@ -259,20 +259,20 @@
 
 			if ($datasetRaw->{'ReihungstestAngetreten'} == 'true')
 			{
-				$datasetRaw->{'ReihungstestAngetreten'} = 'Yes';
+				$datasetRaw->{'ReihungstestAngetreten'} = 'Ja';
 			}
 			else
 			{
-				$datasetRaw->{'ReihungstestAngetreten'} = 'No';
+				$datasetRaw->{'ReihungstestAngetreten'} = 'Nein';
 			}
 
 			if ($datasetRaw->{'ReihungstestApplied'} == 'true')
 			{
-				$datasetRaw->{'ReihungstestApplied'} = 'Yes';
+				$datasetRaw->{'ReihungstestApplied'} = 'Ja';
 			}
 			else
 			{
-				$datasetRaw->{'ReihungstestApplied'} = 'No';
+				$datasetRaw->{'ReihungstestApplied'} = 'Nein';
 			}
 
 			if ($datasetRaw->{'ReihungstestDatum'} == null)
@@ -281,7 +281,7 @@
 			}
 			else
 			{
-				$datasetRaw->{'ReihungstestDatum'} = date_format(date_create($datasetRaw->{'ReihungstestDatum'}),'Y-m-d H:i');
+				$datasetRaw->{'ReihungstestDatum'} = date_format(date_create($datasetRaw->{'ReihungstestDatum'}),'d.m.Y');
 			}
 
 			return $datasetRaw;
