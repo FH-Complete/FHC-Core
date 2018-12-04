@@ -859,7 +859,7 @@ class InfoCenter extends Auth_Controller
 		$this->navigationlib->setSessionMenu(
 			array(
 				'freigegeben' => $this->navigationlib->oneLevel(
-					'Freigegeben',		// description
+					'zum RT Freigegeben',		// description
 					$freigegebenLink,	// link
 					null,				// children
 					'thumbs-up',		// icon
@@ -871,10 +871,10 @@ class InfoCenter extends Auth_Controller
 					1   				// sort
 				),
 				'reihungstestAbsolviert' => $this->navigationlib->oneLevel(
-					'Reihungstest Absolviert',		// description
+					'Reihungstest absolviert',		// description
 					$reihungstestAbsolviertLink,				// link
 					null,				// children
-					'',					// icon
+					'check',					// icon
 					null,				// subscriptDescription
 					false,				// expand
 					null,				// subscriptLinkClass

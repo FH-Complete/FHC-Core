@@ -145,7 +145,14 @@
 				   AND pss.studiensemester_kurzbz IN (SELECT ss.studiensemester_kurzbz FROM public.tbl_studiensemester ss WHERE ss.ende >= NOW())
 			  ORDER BY pss.datum DESC, pss.insertamum DESC, pss.ext_id DESC
 				 LIMIT 1
-			) AS "ReihungstestDatum"
+			) AS "ReihungstestDatum",
+			(
+				SELECT ps.zgvnation
+				FROM public.tbl_prestudent ps
+				 WHERE ps.person_id = p.person_id
+			  ORDER BY ps.zgvnation DESC NULLS LAST, ps.prestudent_id DESC
+				 LIMIT 1
+			) AS "ZGVNation"
 		  FROM public.tbl_person p
 	 LEFT JOIN (
 			SELECT tpl.person_id,
@@ -200,7 +207,8 @@
 			'Statusgrund',
 			'Reihungstest angetreten',
 			'Reihungstest angemeldet',
-			'Reihungstest Datum'
+			'Reihungstest Datum',
+			'ZGV Nation'
 		),
 		'formatRow' => function($datasetRaw) {
 
@@ -284,6 +292,10 @@
 				$datasetRaw->{'ReihungstestDatum'} = date_format(date_create($datasetRaw->{'ReihungstestDatum'}),'d.m.Y');
 			}
 
+			if ($datasetRaw->{'ZGVNation'} == null)
+			{
+				$datasetRaw->{'ZGVNation'} = '-';
+			}
 			return $datasetRaw;
 		},
 		'markRow' => function($datasetRaw) {
