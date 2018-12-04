@@ -24,7 +24,6 @@ require_once(dirname(__FILE__).'/authentication.class.php');
 require_once(dirname(__FILE__).'/betriebsmittelperson.class.php');
 require_once(dirname(__FILE__).'/personlog.class.php');
 require_once(dirname(__FILE__).'/benutzerberechtigung.class.php');
-require_once(dirname(__FILE__).'/mitarbeiter.class.php');
 
 // Auth: Benutzer des Webportals
 /**
@@ -1101,10 +1100,10 @@ function PersonLog($person_id, $logtype_kurzbz, $logdata, $taetigkeit_kurzbz, $a
 }
 
 /** Sets leading zeros to an integer number. 2 digits by default.
- * 
+ *
  * @param integer $number
  * @param integer $length
- * @return integer	
+ * @return integer
  */
 function setLeadingZero($number, $length = 2)
 {
