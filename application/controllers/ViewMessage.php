@@ -202,6 +202,9 @@ class ViewMessage extends FHC_Controller
 					$oe_kurzbz,
 					$insertvon
 				);
+
+				//unpark bewerber after he sends message
+				$this->personloglib->unPark($sender_id);
 			}
 		}
 
