@@ -81,4 +81,27 @@ class ReihungstestLib
 		
 		return false;
 	}
+	
+	/**
+	 * Checks if there are active studyplans which have no public placement tests assigned yet.
+	 * Only check studyplans that are
+	 *	- bachelor, 
+	 *	- active, 
+	 *	- set as online application
+	 *  - valid for 1st term
+	 * @return type
+	 */
+	public function checkMissingReihungstest()
+	{
+		return $this->ci->ReihungstestModel->checkMissingReihungstest();
+	}
+	
+	/**	Gets amount of free places.
+	 *  Retrieves faculty and amount of free places for each public placement test date.
+	 * @return array
+	 */
+	public function getFreePlaces()
+	{
+		return $this->ci->ReihungstestModel->getFreePlaces();
+	}
 }

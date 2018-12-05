@@ -141,6 +141,8 @@ define('MAIL_IT', 'invalid@example.com');
 define('MAIL_SUPPORT', 'invalid@example.com');
 // Lehrgaenge
 define('MAIL_LG', 'invalid@example.com');
+// Infocenter
+define('MAIL_INFOCENTER','invalid@example.com');
 
 // Default Anmerkung fuer neue Lehreinheiten
 // Beispiel: 'Abhaengigkeiten von anderen LV\'s\n\nSpez. Software/Equipment:\n\n'
