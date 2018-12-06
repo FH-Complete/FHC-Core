@@ -40,8 +40,8 @@ class ReihungstestJob extends FHC_Controller
 		
 		$this->VILESCI_RT_VERWALTUNGS_URL = site_url(). "/organisation/Reihungstest";
 		
-		// Load libraries
-		$this->load->library('ReihungstestLib');
+		// Load models
+		$this->load->model('crm/Reihungstest_model', 'ReihungstestModel');
 
 		// Load helpers
 		$this->load->helper('hlp_sancho_helper');
@@ -63,7 +63,7 @@ class ReihungstestJob extends FHC_Controller
 	public function runReihungstestJob()
 	{
 		// Get study plans that have no assigned placement tests yet
-		$result = $this->reihungstestlib->checkMissingReihungstest();
+		$result = $this->ReihungstestModel->checkMissingReihungstest();
 
 		$missing_rt_arr = array();
 		if (hasData($result))
@@ -76,7 +76,7 @@ class ReihungstestJob extends FHC_Controller
 		}
 		
 		// Get free places
-		$result = $this->reihungstestlib->getFreePlaces();
+		$result = $this->ReihungstestModel->getFreePlaces();
 				
 		$free_places_arr = array();
 		if (hasData($result))
@@ -108,7 +108,7 @@ class ReihungstestJob extends FHC_Controller
 	 * Returns associative array with data as needed in the reihungstest job template.
 	 * @param array $missing_rt_arr	Array with studienpläne, which have no assigned placement tests.
 	 * @param array $free_places_arr Array with info and amount of free placement test places.
-	 * @return array
+	 * @return array 
 	 */
 	private function _getContentData($missing_rt_arr, $free_places_arr)
 	{

@@ -41,6 +41,12 @@ class Reihungstest_model extends DB_Model
 	
 	/**
 	 * Checks if there are active studyplans which have no public placement tests assigned yet.
+	 * Only check assignment to studyplans that are
+	 *	- Bachelor, 
+	 *	- active, 
+	 *	- set as online application
+	 *  - valid for 1st terms
+	 * @return array Returns object array with studyplans that have no public placement tests assigned yet.
 	 */
 	public function checkMissingReihungstest()
 	{
@@ -70,6 +76,8 @@ class Reihungstest_model extends DB_Model
 					public.tbl_studiengang
 					USING (studiengang_kz)
 				WHERE
+					tbl_studiengang.aktiv = \'t\'
+						AND
 					tbl_studiensemester.onlinebewerbung = \'t\'
 				AND
 					tbl_studienplan.onlinebewerbung_studienplan = \'t\'
@@ -97,8 +105,10 @@ class Reihungstest_model extends DB_Model
 		return $this->execQuery($query);
 	}
 	
-	/**	Gets amount of free places.
-	 *  Retrieves faculty and amount of free places for each public placement test date.
+	/**	
+	 *  Gets amount of free places.
+	 * @return array Returns object array with faculty and amount of free places
+	 * for each public actual placement test date.
 	 */
 	public function getFreePlaces()
 	{
