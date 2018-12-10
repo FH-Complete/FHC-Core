@@ -796,16 +796,17 @@ class prestudent extends person
 
 	/**
 	 * Prueft ob eine Person bereits einen PreStudentstatus-Eintrag
-	 * fuer einen Studiengang und optional ein Studiensemester und optional ein Status_kurzbz besitzt
+	 * fuer einen Studiengang, optional ein Studiensemester, optional eine Status_kurzbz und optional einen Studienplan besitzt
 	 * @param integer $person_id
 	 * @param integer $studiengang_kz
 	 * @param string $studiensemester_kurzbz Optional.
 	 * @param string $status_kurzbz Optional.
+	 * @param integer $studienplan_id Optional.
 	 * @return true wenn vorhanden
 	 *		 false wenn nicht vorhanden
 	 *		 false und errormsg wenn Fehler aufgetreten ist
 	 */
-	public function existsPrestudentstatus($person_id, $studiengang_kz, $studiensemester_kurzbz = null, $status_kurzbz = null)
+	public function existsPrestudentstatus($person_id, $studiengang_kz, $studiensemester_kurzbz = null, $status_kurzbz = null, $studienplan_id = null)
 	{
 		if(!is_numeric($person_id))
 		{
@@ -829,6 +830,9 @@ class prestudent extends person
 		
 		if ($status_kurzbz != '')
 			$qry .= " AND status_kurzbz=".$this->db_add_param($status_kurzbz);
+		
+		if ($studienplan_id != '')
+			$qry .= " AND studienplan_id=".$this->db_add_param($studienplan_id);
 
 		if($this->db_query($qry))
 		{
@@ -1185,6 +1189,7 @@ class prestudent extends person
 
 	/**
 	 * Laedt alle Prestudenten der Person
+	 * @param integer $person_id
 	 * @return true wenn ok, false wenn Fehler
 	 */
 	public function getPrestudenten($person_id)
@@ -1195,7 +1200,13 @@ class prestudent extends person
 			return false;
 		}
 
-		$qry = "SELECT * FROM public.tbl_prestudent WHERE person_id=".$this->db_add_param($person_id, FHC_INTEGER)." ORDER BY prestudent_id";
+		$qry = "SELECT 
+					* 
+				FROM 
+					public.tbl_prestudent 
+				WHERE 
+					person_id=".$this->db_add_param($person_id, FHC_INTEGER)." 
+				ORDER BY prestudent_id";
 
 		if($this->db_query($qry))
 		{
@@ -1929,15 +1940,17 @@ class prestudent extends person
 	}
 	
 	/**
-	 * Liefert die höchste Priorität des PreStudenten einer Person in einem Studiensemester
+	 * Liefert die Priorität des PreStudenten einer Person in einem Studiensemester
+	 * Per Default wird die Höchste Priorisierung (ORDER BY DESC NULLS LAST) zurueckgegeben.
 	 * @param integer $person_id Person ID deren höchste Priorität geladen werden soll
 	 * @param string $studiensemester_kurzbz Studiensemester dessen höchste Priorität geladen werden soll
-	 * @return integer Zahl der höchsten Priorität oder false im Fehlerfall
+	 * @param string $order Default höchste Priorisierung (priorisierung DESC NULLS LAST)
+	 * @return object mit priorisierung und studiengang_kz oder false im Fehlerfall
 	 */
-	public function getHoechstePriorisierungPersonStudiensemester($person_id, $studiensemester_kurzbz)
+	public function getPriorisierungPersonStudiensemester($person_id, $studiensemester_kurzbz, $order = "priorisierung DESC NULLS LAST")
 	{
 		$qry = "SELECT
-					priorisierung
+					priorisierung, studiengang_kz
 				FROM
 					public.tbl_prestudent
 					JOIN public.tbl_prestudentstatus USING(prestudent_id)
@@ -1945,13 +1958,16 @@ class prestudent extends person
 					tbl_prestudent.person_id=".$this->db_add_param($person_id, FHC_INTEGER)."
 					AND tbl_prestudentstatus.status_kurzbz='Interessent'
 					AND tbl_prestudentstatus.studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz)."
-				ORDER BY priorisierung DESC NULLS LAST LIMIT 1";
+				ORDER BY ".$order." 
+				LIMIT 1";
 					
 		if($result = $this->db_query($qry))
 		{
 			if($row = $this->db_fetch_object($result))
 			{
-				return $row->priorisierung;
+				$this->priorisierung = $row->priorisierung;
+				$this->studiengang_kz = $row->studiengang_kz;
+				return true;
 			}
 			else
 			{

@@ -52,6 +52,7 @@ require_once('../../include/sprache.class.php');
 require_once('../../include/organisationsform.class.php');
 require_once('../../include/gruppe.class.php');
 require_once('../../include/variable.class.php');
+require_once('../../include/mail.class.php');
 
 
 //	"Teilgenommen" und "Punkte" werden immer mit false bzw. 0 gespeichert
@@ -583,6 +584,25 @@ if(isset($_GET['excel']))
 		<script type="text/javascript">
 			$(document).ready(function()
 			{
+				// Check, ob Räume zugeteilt sind oder max_teilnehmer gesetzt ist, wenn "öffentlich" gesetzt wird
+				$('#rt_form').submit(function()
+				{
+					if ($('#oeffentlich').is(":checked"))
+					{
+						if ($('.ort_listitem').length == 0 && $('#max_teilnehmer').val() == '' && $('#ort').val() == '')
+							confirm('Wenn der Reihungstest "Öffentlich" ist, sollten Räume zugeteilt sein, oder "Max TeilnehmerInnen" gesetzt sein');
+					}
+				});
+
+				if ($('#oeffentlich').is(":checked") && $('.ort_listitem').length == 0 && $('#max_teilnehmer').val() == '' && $('#ort').val() == '')
+				{
+					$('#messageDiv').html('Wenn der Reihungstest "Öffentlich" ist, sollten Räume zugeteilt sein, oder "Max TeilnehmerInnen" gesetzt sein');
+				}
+				else
+				{
+					$('#messageDiv').html();
+				}
+
 				// Set Anmeldefrist 14 Tage vor Testdatum, wenn Testdatum geändert wird
 				$('#rt_datum').change(function()
 				{
@@ -947,7 +967,16 @@ if(isset($_GET['excel']))
 			display: inline-block;
 			vertical-align: middle;
 		}
-		.listitem
+		.studienplan_listitem
+		{
+			background-color: lightgray;
+			padding: 0 5px 0 6px;
+			border-radius: 3px;
+			-webkit-border-radius: 3px;
+			-moz-border-radius: 3px;
+			vertical-align: middle;
+		}
+		.ort_listitem
 		{
 			background-color: lightgray;
 			padding: 0 5px 0 6px;
@@ -983,9 +1012,9 @@ if(isset($_GET['excel']))
 		.errorMessage
 		{
 			color: #721c24;
-			background-color: #f8d7da;;
+			background-color: #f8d7da;
 			padding: .75rem 1.25rem;
-			border: 1px solid #f5c6cb;;
+			border: 1px solid #f5c6cb;
 		}
 		</style>
 	</head>
@@ -1062,7 +1091,7 @@ if(isset($_POST['speichern']) || isset($_POST['kopieren']))
 			$reihungstest->max_teilnehmer = filter_input(INPUT_POST, 'max_teilnehmer', FILTER_VALIDATE_INT);
 			if ($rechte->isBerechtigt('lehre/reihungstestOeffentlich', $_POST['studiengang_kz'], 'suid'))
 			{
-				$reihungstest->oeffentlich = filter_input(INPUT_POST, 'oeffentlich', FILTER_VALIDATE_BOOLEAN);
+				$reihungstest->oeffentlich = (isset($_POST['oeffentlich']) ? true : false);
 			}
 			$reihungstest->stufe = filter_input(INPUT_POST, 'stufe', FILTER_VALIDATE_INT);
 			$reihungstest->aufnahmegruppe_kurzbz = filter_input(INPUT_POST, 'aufnahmegruppe');
@@ -1375,8 +1404,8 @@ if(isset($_GET['type']) && $_GET['type']=='saveallrtpunkte')
 						$reihungstest->teilgenommen = true;
 						$reihungstest->save(false);
 						$reihungstest->new = false;
-                        $reihungstest->updateamum = date('Y-m-d H:i:s');
-                        $reihungstest->updatevon = $user;
+						$reihungstest->updateamum = date('Y-m-d H:i:s');
+						$reihungstest->updatevon = $user;
 
 						if(!$reihungstest->savePersonReihungstest())
 						{
@@ -1395,6 +1424,99 @@ if(isset($_GET['type']) && $_GET['type']=='saveallrtpunkte')
 			$messageError .= '<p>'.$db->convert_html_chars($errormsg).'</p>';
 		}
 	}
+}
+
+
+// Informiert die Studiengangsassistenz über das Ende des Tests
+if(isset($_GET['type']) && $_GET['type']=='informAssistance')
+{
+	// Alle Studiengänge holen, bei denen der Bewerber Interessent ist, die Bewerbung abgeschickt hat und bestätigt wurde
+	// Mail an alle diese Studiengänge senden
+	
+	$reihungstest = new reihungstest($reihungstest_id);
+	$reihungstest->getPersonenReihungstest($reihungstest_id);
+	$preStudentenArray = array();
+	
+	foreach ($reihungstest->result AS $row)
+	{
+		$prestudent = new prestudent();
+		$prestudent->getPrestudenten($row->person_id);
+		
+		foreach ($prestudent->result AS $prest)
+		{
+			$prestudentrolle = new prestudent();
+			$prestudentrolle->getLastStatus($prest->prestudent_id, $reihungstest->studiensemester_kurzbz, 'Interessent');
+			$stg = new studiengang($prest->studiengang_kz);
+			$hoechtePrestPrio = new prestudent();
+			$hoechtePrestPrio->getPriorisierungPersonStudiensemester($prest->person_id, $reihungstest->studiensemester_kurzbz, 'priorisierung ASC NULLS LAST');
+			
+			if ($prestudentrolle->bewerbung_abgeschicktamum != ''
+				&& $prestudentrolle->bestaetigtam != ''
+				&& $prestudentrolle->bestaetigtvon != ''
+				&& $stg->typ == 'b')
+			{
+				$preStudentenArray[$prest->studiengang_kz][] = array(	'prestudent_id' => $prest->prestudent_id, 
+																		'priorisierung' => $prest->priorisierung,
+																		'hoechstePrio' => $hoechtePrestPrio->priorisierung,
+																		'studiengangHoechstePrio' => $hoechtePrestPrio->studiengang_kz
+				);
+			}
+		}
+	}
+
+	foreach ($preStudentenArray AS $studiengang_kz => $prestudentPrioPair)
+	{
+		$empfaenger = getMailEmpfaenger($studiengang_kz);
+		$mailtext = 'Folgende InteressentInnen für das '.$reihungstest->studiensemester_kurzbz.' haben am Reihungstest '.$datum_obj->convertISODate($reihungstest->datum).' '.$datum_obj->formatDatum($reihungstest->uhrzeit,'H:i').' Uhr teilgenommen';
+		// Wenn MAIL_DEBUG aktiv ist, zeige auch den Empfänger an
+		if(defined('MAIL_DEBUG') && MAIL_DEBUG != '')
+		{
+			$mailtext .= '<br><br>Empfänger: '.$empfaenger.'<br><br>';
+		}
+		$mailtext .= 'Vorname, Nachname, Priorisierung (höchste Prio, Prio in diesem Studiengang)<br>';
+		foreach ($prestudentPrioPair AS $value)
+		{
+			$mailtext .= 'ID:'.$value['prestudent_id'].' Prio:'.$value['priorisierung'].' Studiengang mit der höchsten Priorität: '.$value['studiengangHoechstePrio'].'<br>';
+		}
+		
+		$mailtext .= '<br><a href="'.APP_ROOT.'cis/testtool/admin/auswertung.php?reihungstest='.$reihungstest_id.'&studiengang='.$studiengang_kz.'">Link zur Auswertung</a>';
+		
+		$mailtext = wordwrap($mailtext, 70); // Bricht den Code um, da es sonst zu Anzeigefehlern im Mail kommen kann
+		
+		$mail = new mail($empfaenger, 'no-reply', 'Reihungstest-Auswertung', 'Bitte sehen Sie sich die Nachricht in HTML Sicht an, um den Link vollständig darzustellen.');
+		$mail->setHTMLContent($mailtext);
+		if (!$mail->send())
+		{
+			$messageError .= '<p>Fehler beim Senden der Nachricht an: '.$empfaenger.'</p>';
+		}
+		else
+		{
+			$messageSuccess .= '<p>Nachricht erfolgreich verschickt an: '.$empfaenger.'</p>';
+		}
+	}
+		
+	/*$empfaenger = getMailEmpfaenger($prest->studiengang_kz);
+	 $mailtext = 'Folgende InteressentInnen für das '.$reihungstest->studiensemester_kurzbz.' haben am Reihungstest '.$datum_obj->convertISODate($reihungstest->datum).' '.$datum_obj->formatDatum($reihungstest->uhrzeit,'H:i').' Uhr teilgenommen';
+	 // Wenn MAIL_DEBUG aktiv ist, zeige auch den Empfänger an
+	 if(defined('MAIL_DEBUG') && MAIL_DEBUG != '')
+	 {
+	 $mailtext .= '<br><br>Empfänger: '.$empfaenger.'<br><br>';
+	 }
+	 $mailtext .= 'Vorname, Nachname, Priorisierung (höchste Prio, Prio in diesem Studiengang)';
+	 $mailtext .= '<a href="'.APP_ROOT.'cis/testtool/admin/auswertung.php?reihungstest='.$reihungstest_id.'&studiengang='.$prest->studiengang_kz.'">Link zur Auswertung</a>';
+	 
+	 $mailtext = wordwrap($mailtext, 70); // Bricht den Code um, da es sonst zu Anzeigefehlern im Mail kommen kann
+	 
+	 $mail = new mail($empfaenger, 'no-reply', 'Reihungstest-Auswertung', 'Bitte sehen Sie sich die Nachricht in HTML Sicht an, um den Link vollständig darzustellen.');
+	 $mail->setHTMLContent($mailtext);
+	 if (!$mail->send())
+	 {
+	 $messageError .= '<p>Fehler beim Senden der Nachricht an: '.$empfaenger.'</p>';
+	 }
+	 else
+	 {
+	 $messageSuccess .= '<p>Nachricht erfolgreich verschickt an: '.$empfaenger.'</p>';
+	 }*/
 }
 
 // Verteilt alle BewerberInnen gleichmaessig auf die Raeume
@@ -1461,8 +1583,8 @@ if(isset($_GET['type']) && $_GET['type']=='verteilen')
 								$raumzuteilung->reihungstest_id = $load_person->reihungstest_id;
 								$raumzuteilung->person_id = $row->person_id;
 								$raumzuteilung->ort_kurzbz = $ort->ort_kurzbz;
-                                $raumzuteilung->updateamum = date('Y-m-d H:i:s');
-                                $raumzuteilung->updatevon = $user;
+								$raumzuteilung->updateamum = date('Y-m-d H:i:s');
+								$raumzuteilung->updatevon = $user;
 							}
 							else
 							{
@@ -1552,8 +1674,8 @@ if(isset($_GET['type']) && $_GET['type']=='auffuellen')
 						$raumzuteilung->reihungstest_id = $load_person->reihungstest_id;
 						$raumzuteilung->person_id = $row->person_id;
 						$raumzuteilung->ort_kurzbz = $ort->ort_kurzbz;
-                        $raumzuteilung->updateamum = date('Y-m-d H:i:s');
-                        $raumzuteilung->updatevon = $user;
+						$raumzuteilung->updateamum = date('Y-m-d H:i:s');
+						$raumzuteilung->updatevon = $user;
 					}
 					else
 						die('Personen zuteilung nicht gefunden');
@@ -1874,15 +1996,21 @@ $studienplaene_list = implode(',', array_keys($studienplaene_arr));
 			<td>
 				<select name='stufe'>
 				<option value=''>-- keine Auswahl --</option>
-					<?php for($i=1; $i<=3; $i++)
-					{
-						if($reihungstest->stufe==$i)
-							$selected = 'selected="selected"';
-						else
-							$selected = ''; ?>
-
-						<option value="<?php echo $i ?>" <?php echo $selected ?>><?php echo $i ?></option>
-					<?php } ?>
+					<?php 
+							// An der FHTW wird eine Beschreibung neben der Stufe angezeigt
+							if (defined('DOMAIN') && DOMAIN == 'technikum-wien.at')
+							{
+								echo '<option value="1" '.($reihungstest->stufe == 1 ? 'selected' : '').'>1 (Computertest)</option>';
+								echo '<option value="2" '.($reihungstest->stufe == 2 ? 'selected' : '').'>2 (Interview)</option>';
+								echo '<option value="3" '.($reihungstest->stufe == 3 ? 'selected' : '').'>3</option>';
+							}
+							else 
+							{
+								echo '<option value="1" '.($reihungstest->stufe == 1 ? 'selected' : '').'>1</option>';
+								echo '<option value="2" '.($reihungstest->stufe == 2 ? 'selected' : '').'>2</option>';
+								echo '<option value="3" '.($reihungstest->stufe == 3 ? 'selected' : '').'>3</option>';
+							}
+					?>
 				</select>
 				&nbsp;&nbsp;Studiensemester
 				<select id='studiensemester_dropdown' name='studiensemester_kurzbz'>
@@ -2006,7 +2134,7 @@ $studienplaene_list = implode(',', array_keys($studienplaene_arr));
 					$studienplan->loadStudienplan($row->studienplan_id);
 
 					echo '<tr><td>&nbsp;</td>';
-					echo '<td class="listitem">'.$studienplan->bezeichnung.' ('.$studienplan->studienplan_id.')</td>';
+					echo '<td class="studienplan_listitem">'.$studienplan->bezeichnung.' ('.$studienplan->studienplan_id.')</td>';
 					echo '<td><button type="submit" name="delete_studienplan" value="'.$row->studienplan_id.'"><img src="../../skin/images/delete_x.png" alt="Studienplan entfernen" height="13px"></button></td>';
 					echo '</tr>';
 				}
@@ -2043,7 +2171,7 @@ $studienplaene_list = implode(',', array_keys($studienplaene_arr));
 					$anzeigename = '';
 
 				echo '<tr><td>&nbsp;</td>';
-				echo '<td class="listitem">'.$row->ort_kurzbz.' ('.$orte_array[$row->ort_kurzbz].' Arbeitsplätze';
+				echo '<td class="ort_listitem">'.$row->ort_kurzbz.' ('.$orte_array[$row->ort_kurzbz].' Arbeitsplätze';
 				if(defined('REIHUNGSTEST_ARBEITSPLAETZE_SCHWUND') && REIHUNGSTEST_ARBEITSPLAETZE_SCHWUND > 0)
 					echo '*';
 				echo ')';
@@ -2102,9 +2230,9 @@ $studienplaene_list = implode(',', array_keys($studienplaene_arr));
 		<tr <?php echo ($rechte->isBerechtigt('lehre/reihungstestOeffentlich', $reihungstest->studiengang_kz, 'suid') ? '' : 'style="display:none"') ?>>
 			<td class="feldtitel">Öffentlich</td>
 			<td>
-				<input type="hidden" name="oeffentlich" value="0">
-				<input type="checkbox" name="oeffentlich" value="1" <?php echo $reihungstest->oeffentlich ? 'checked="checked"' : '' ?>>
+				<input id="oeffentlich" type="checkbox" name="oeffentlich" value="1" <?php echo $reihungstest->oeffentlich ? 'checked="checked"' : '' ?>>
 				(Für Bewerber sichtbar/auswählbar)
+				<span id="messageDiv" style="color: red;"></span>
 			</td>
 		</tr>
 		<tr>
@@ -2155,14 +2283,15 @@ if($reihungstest_id!='')
 {
 	echo '<a class="buttongreen" href="'.$_SERVER['PHP_SELF'].'?reihungstest_id='.$reihungstest_id.'&excel=true">Excel Export</a>';
 	echo '<a class="buttongreen" href="'.$_SERVER['PHP_SELF'].'?reihungstest_id='.$reihungstest_id.'&type=saveallrtpunkte">Punkte ins FAS &uuml;bertragen</a>';
-	echo '<a class="buttongreen" href="#" onclick="SendMail()" id="mailSendButton">Mail an alle senden</a>';
+	echo '<a class="buttongreen" href="#" onclick="SendMail()" id="mailSendButton">Mail an alle BewerberInnen senden</a>';
 }
 echo '<a class="buttongreen" href="../../cis/testtool/admin/auswertung.php?'.($reihungstest_id!=''?"reihungstest=$reihungstest_id":'').'" target="_blank">Auswertung</a>';
 echo '<a class="buttonorange" href="reihungstest_zusammenlegung.php">Anmeldungen zusammenlegen</a>';
 if($rechte->isBerechtigt('basis/testtool', null, 'suid'))
 {
-	echo '<a class="buttonorange" href="reihungstest_administration.php">Administration</a><br>';
+	echo '<a class="buttonorange" href="reihungstest_administration.php">Administration</a>';
 }
+//echo '<a class="buttonorange" href="'.$_SERVER['PHP_SELF'].'?reihungstest_id='.$reihungstest_id.'&stg_kz='.$reihungstest->studiengang_kz.'&studiensemester_kurzbz='.$reihungstest->studiensemester_kurzbz.'&type=informAssistance">Assistenz über Testende informieren</a><br>';
 echo '</td></tr>';
 echo '</td></tr></table>';
 if($reihungstest_id!='')
@@ -2267,7 +2396,7 @@ if($reihungstest_id!='')
 	echo '<div id="clm_ergebnis" class="active" onclick="hideColumn(\'clm_ergebnis\')">Ergebnis <span class="wait"></span></div>';
 	echo '<div id="clm_fas" class="active" onclick="hideColumn(\'clm_fas\')">FAS</div>';
 	echo '</td></tr></table>';
-    echo '</div>';
+	echo '</div>';
 	echo '<br>';
 
 
@@ -2275,7 +2404,7 @@ if($reihungstest_id!='')
 
 	$cnt = 0;
 
-    //TABLE OHNE RAUMZUTEILUNG
+	//TABLE OHNE RAUMZUTEILUNG
 	if ($orte_zuteilung_array['ohne']>0)
 	{
 		echo '<div style="vertical-align: top">';
@@ -2313,118 +2442,131 @@ if($reihungstest_id!='')
 
 		foreach ($result_arr AS $row)
 		{
-                    $rt_in_anderen_stg='';
-                    $rtergebnis = '';
-                    $rt_prestudent_arr = array();
+					$rt_in_anderen_stg='';
+					$rtergebnis = '';
+					$rt_prestudent_arr = array();
 
-                    if($punkteberechnung == 'true')
-                    {
-                      //Daten für Spalte bereits absolvierte Verfahren
-                      $qry = "SELECT
-                                distinct tbl_reihungstest.reihungstest_id,
-                                tbl_pruefling.pruefling_id,
-                                tbl_prestudent.prestudent_id,
-                                tbl_rt_person.person_id
-                                FROM
-                                public.tbl_rt_person
-                                JOIN lehre.tbl_studienplan USING(studienplan_id)
-                                JOIN lehre.tbl_studienordnung USING(studienordnung_id)
-                                JOIN public.tbl_prestudent USING(person_id)
-                                JOIN public.tbl_prestudentstatus USING(studienplan_id, prestudent_id)
-                                JOIN public.tbl_reihungstest ON(tbl_reihungstest.reihungstest_id=tbl_rt_person.rt_id)
-                                LEFT JOIN testtool.tbl_pruefling using(prestudent_id) WHERE
-                                (tbl_rt_person.anmeldedatum is null OR tbl_rt_person.anmeldedatum<=tbl_reihungstest.datum)
-                                AND tbl_reihungstest.datum >=(SELECT min(begintime)::date FROM testtool.tbl_pruefling_frage WHERE pruefling_id=tbl_pruefling.pruefling_id AND tbl_reihungstest.datum>=begintime-'1 days'::interval)                                    AND (tbl_reihungstest.stufe is null or tbl_reihungstest.stufe=1)
-                                AND person_id=".$db->db_add_param($row->person_id, FHC_INTEGER);
+					if($punkteberechnung == 'true')
+					{
+					  //Daten für Spalte bereits absolvierte Verfahren
+					  $qry = "	SELECT DISTINCT tbl_reihungstest.reihungstest_id,
+									tbl_pruefling.pruefling_id,
+									tbl_prestudent.prestudent_id,
+									tbl_rt_person.person_id
+								FROM PUBLIC.tbl_rt_person
+								JOIN lehre.tbl_studienplan USING (studienplan_id)
+								JOIN lehre.tbl_studienordnung USING (studienordnung_id)
+								JOIN PUBLIC.tbl_prestudent USING (person_id)
+								JOIN PUBLIC.tbl_prestudentstatus USING (
+										studienplan_id,
+										prestudent_id
+										)
+								JOIN PUBLIC.tbl_reihungstest ON (tbl_reihungstest.reihungstest_id = tbl_rt_person.rt_id)
+								LEFT JOIN testtool.tbl_pruefling using (prestudent_id)
+								WHERE (
+										tbl_rt_person.anmeldedatum IS NULL
+										OR tbl_rt_person.anmeldedatum <= tbl_reihungstest.datum
+										)
+									AND tbl_reihungstest.datum >= (
+										SELECT min(begintime)::DATE
+										FROM testtool.tbl_pruefling_frage
+										WHERE pruefling_id = tbl_pruefling.pruefling_id
+											AND tbl_reihungstest.datum >= begintime - '1 days'::interval
+										)
+									AND (
+										tbl_reihungstest.stufe IS NULL
+										OR tbl_reihungstest.stufe = 1
+										)
+									AND person_id = ".$db->db_add_param($row->person_id, FHC_INTEGER);
 
-                        if($result = $db->db_query($qry))
-                        {
-                            while($obj = $db->db_fetch_object($result))
-                            {
-                                array_push($rt_prestudent_arr, $obj);
-                            }
-                        }
+						if($result = $db->db_query($qry))
+						{
+							while($obj = $db->db_fetch_object($result))
+							{
+								array_push($rt_prestudent_arr, $obj);
+							}
+						}
 
-                        //Ergebnis ermitteln
-                        if(defined('FAS_REIHUNGSTEST_PUNKTE') && FAS_REIHUNGSTEST_PUNKTE)
-                                $rtergebnis = $pruefling->getReihungstestErgebnisPrestudent($row->prestudent_id, true, $reihungstest->reihungstest_id);
-                        else
-                                $rtergebnis = $pruefling->getReihungstestErgebnisPrestudent($row->prestudent_id, false, $reihungstest->reihungstest_id);
+						//Ergebnis ermitteln
+						if(defined('FAS_REIHUNGSTEST_PUNKTE') && FAS_REIHUNGSTEST_PUNKTE)
+								$rtergebnis = $pruefling->getReihungstestErgebnisPrestudent($row->prestudent_id, true, $reihungstest->reihungstest_id);
+						else
+								$rtergebnis = $pruefling->getReihungstestErgebnisPrestudent($row->prestudent_id, false, $reihungstest->reihungstest_id);
 
 
-                        //Ausgabe für bereits absolvierte Verfahren
-                        foreach($rt_prestudent_arr as $item)
-                        {
-                            $pruefling->getPruefling($item->prestudent_id);
-                            $rt = new Reihungstest();
-                            $rt->load($item->reihungstest_id);
-                            $rt_letztes_login = $datum_obj->formatDatum($pruefling->registriert, 'Y-m-d');
-                            $rt_antrittstermin = $datum_obj->formatDatum($rt->datum, 'Y-m-d');
+						//Ausgabe für bereits absolvierte Verfahren
+						foreach($rt_prestudent_arr as $item)
+						{
+							$pruefling->getPruefling($item->prestudent_id);
+							$rt = new Reihungstest();
+							$rt->load($item->reihungstest_id);
+							$rt_letztes_login = $datum_obj->formatDatum($pruefling->registriert, 'Y-m-d');
+							$rt_antrittstermin = $datum_obj->formatDatum($rt->datum, 'Y-m-d');
 
-                          //Wenn bereits absolvierte Verfahren vorhanden
-                            if($item->prestudent_id != $row->prestudent_id || $rt_letztes_login < $rt_antrittstermin)
-                            {
-                                if(defined('FAS_REIHUNGSTEST_PUNKTE') && FAS_REIHUNGSTEST_PUNKTE)
-                                    $erg = $pruefling->getReihungstestErgebnisPrestudent($item->prestudent_id, true, $item->reihungstest_id);
-                                else
-                                    $erg = $pruefling->getReihungstestErgebnisPrestudent($item->prestudent_id, false, $item->reihungstest_id);
+						  //Wenn bereits absolvierte Verfahren vorhanden
+							if($item->prestudent_id != $row->prestudent_id || $rt_letztes_login < $rt_antrittstermin)
+							{
+								if(defined('FAS_REIHUNGSTEST_PUNKTE') && FAS_REIHUNGSTEST_PUNKTE)
+									$erg = $pruefling->getReihungstestErgebnisPrestudent($item->prestudent_id, true, $item->reihungstest_id);
+								else
+									$erg = $pruefling->getReihungstestErgebnisPrestudent($item->prestudent_id, false, $item->reihungstest_id);
 
-                                if($erg !== false)
-                                {
-                                    $rt_in_anderen_stg .= number_format($erg, 2).((FAS_REIHUNGSTEST_PUNKTE) ? ' Punkte' : ' %').' im Studiengang '.$studiengang->kuerzel_arr[$pruefling->studiengang_kz].'<br>';
+								if($erg !== false)
+								{
+									$rt_in_anderen_stg .= number_format($erg, 2).((FAS_REIHUNGSTEST_PUNKTE) ? ' Punkte' : ' %').' im Studiengang '.$studiengang->kuerzel_arr[$pruefling->studiengang_kz].'<br>';
 
-                                    if ($item->prestudent_id == $row->prestudent_id && $rt_letztes_login < $rt_antrittstermin)
-                                    {
-                                        $rt_in_anderen_stg .= '(Letzter '.$studiengang->kuerzel_arr[$pruefling->studiengang_kz].'-Antritt: '.$datum_obj->formatDatum($rt_letztes_login, 'd.m.Y');
-                                        if($rechte->isBerechtigt('basis/testtool', null, 'suid'))
-                                        	$rt_in_anderen_stg .= ',<br><a href="reihungstest_administration.php">absolvierte RT-Gebiete entsperren</a>';
-                                        $rt_in_anderen_stg .= ')<br>';
-                                    }
-                                }
-                            }
-                        }
-                    }
+									if ($item->prestudent_id == $row->prestudent_id && $rt_letztes_login < $rt_antrittstermin)
+									{
+										$rt_in_anderen_stg .= '(Letzter '.$studiengang->kuerzel_arr[$pruefling->studiengang_kz].'-Antritt: '.$datum_obj->formatDatum($rt_letztes_login, 'd.m.Y');
+										if($rechte->isBerechtigt('basis/testtool', null, 'suid'))
+											$rt_in_anderen_stg .= ',<br><a href="reihungstest_administration.php">absolvierte RT-Gebiete entsperren</a>';
+										$rt_in_anderen_stg .= ')<br>';
+									}
+								}
+							}
+						}
+					}
 
-                    if ($row->ort_kurzbz == '')
-                    {
-                            if(isset($studienplaene_arr[$row->studienplan_id]))
-                                    $studienplan_bezeichnung = $studienplaene_arr[$row->studienplan_id];
-                            else
-                            {
-                                    $studienplan_obj = new studienplan();
-                                    $studienplan_obj->loadStudienplan($row->studienplan_id);
-                                    $studienplan_bezeichnung = $studienplan_obj->bezeichnung;
-                                    $studienplaene_arr[$row->studienplan_id]=$studienplan_obj->bezeichnung;
-                            }
-                            echo '
-                                    <tr>
-                                            <td style="text-align: center"><input type="checkbox" class="chkbox" id="checkbox_'.$row->person_id.'" name="checkbox['.$row->person_id.']"></td>
-                                            <td style="display: table-cell" class="clm_prestudent_id">'.$db->convert_html_chars($row->prestudent_id).'</td>
-                                            <td style="display: table-cell" class="clm_person_id">'.$db->convert_html_chars($row->person_id).'</td>
-                                            <td>'.$db->convert_html_chars($row->nachname).'</td>
-                                            <td>'.$db->convert_html_chars($row->vorname).'</td>
-                                            <td style="display: table-cell" class="clm_geschlecht">'.$db->convert_html_chars($row->geschlecht).'</td>
-                                            <td style="display: table-cell" class="clm_studiengang">'.$db->convert_html_chars($stg_arr[$row->studiengang_kz]).'</td>
-                                            <td style="display: table-cell" class="clm_orgform">'.$db->convert_html_chars($row->orgform_kurzbz!=''?$row->orgform_kurzbz:' ').'</td>
-                                            <td style="display: table-cell" class="clm_studienplan">'.$db->convert_html_chars($studienplan_bezeichnung).' ('.$row->studienplan_id.')</td>
-                                            <td style="display: table-cell" class="clm_einstiegssemester">'.$db->convert_html_chars($row->ausbildungssemester).'</td>
-                                            <td style="display: table-cell" class="clm_geburtsdatum">'.$db->convert_html_chars($row->gebdatum!=''?$datum_obj->convertISODate($row->gebdatum):' ').'</td>
-                                            <td style="display: table-cell; text-align: center" class="clm_email"><a href="mailto:'.$db->convert_html_chars($row->email).'"><img src="../../skin/images/button_mail.gif" name="mail"></a></td>
-                                            <td style="display: table-cell" class="clm_absolviert">'.$rt_in_anderen_stg.'</td>
-                                            <td style="display: table-cell; align: right" class="clm_ergebnis">'.($rtergebnis == '' || $rtergebnis===false?'-':number_format($rtergebnis,2,'.','')).' %</td>
-                                            <td style="display: table-cell; align: right" class="clm_fas">';
-                                            if($rtergebnis!==false && $rtergebnis != '' && $row->punkte=='')
-                                                    echo '<a href="'.$_SERVER['PHP_SELF'].'?reihungstest_id='.$reihungstest_id.'&stg_kz='.$stg_kz.'&type=savertpunkte&rt_person_id='.$row->rt_person_id.'&rtpunkte='.$rtergebnis.'" >&uuml;bertragen</a>';
-                                            else
-                                            {
-                                                    if($row->punkte!='')
-                                                            echo number_format($row->punkte,2,'.','');
-                                            }
-                                            echo '</td>
-                                    </tr>';
+					if ($row->ort_kurzbz == '')
+					{
+							if(isset($studienplaene_arr[$row->studienplan_id]))
+									$studienplan_bezeichnung = $studienplaene_arr[$row->studienplan_id];
+							else
+							{
+									$studienplan_obj = new studienplan();
+									$studienplan_obj->loadStudienplan($row->studienplan_id);
+									$studienplan_bezeichnung = $studienplan_obj->bezeichnung;
+									$studienplaene_arr[$row->studienplan_id]=$studienplan_obj->bezeichnung;
+							}
+							echo '
+									<tr>
+										<td style="text-align: center"><input type="checkbox" class="chkbox" id="checkbox_'.$row->person_id.'" name="checkbox['.$row->person_id.']"></td>
+										<td style="display: table-cell" class="clm_prestudent_id">'.$db->convert_html_chars($row->prestudent_id).'</td>
+										<td style="display: table-cell" class="clm_person_id">'.$db->convert_html_chars($row->person_id).'</td>
+										<td>'.$db->convert_html_chars($row->nachname).'</td>
+										<td>'.$db->convert_html_chars($row->vorname).'</td>
+										<td style="display: table-cell" class="clm_geschlecht">'.$db->convert_html_chars($row->geschlecht).'</td>
+										<td style="display: table-cell" class="clm_studiengang">'.$db->convert_html_chars($stg_arr[$row->studiengang_kz]).'</td>
+										<td style="display: table-cell" class="clm_orgform">'.$db->convert_html_chars($row->orgform_kurzbz!=''?$row->orgform_kurzbz:' ').'</td>
+										<td style="display: table-cell" class="clm_studienplan">'.$db->convert_html_chars($studienplan_bezeichnung).' ('.$row->studienplan_id.')</td>
+										<td style="display: table-cell" class="clm_einstiegssemester">'.$db->convert_html_chars($row->ausbildungssemester).'</td>
+										<td style="display: table-cell" class="clm_geburtsdatum">'.$db->convert_html_chars($row->gebdatum!=''?$datum_obj->convertISODate($row->gebdatum):' ').'</td>
+										<td style="display: table-cell; text-align: center" class="clm_email"><a href="mailto:'.$db->convert_html_chars($row->email).'"><img src="../../skin/images/button_mail.gif" name="mail"></a></td>
+										<td style="display: table-cell" class="clm_absolviert">'.$rt_in_anderen_stg.'</td>
+										<td style="display: table-cell; align: right" class="clm_ergebnis">'.($rtergebnis == '' || $rtergebnis===false?'-':number_format($rtergebnis,2,'.','')).' %</td>
+										<td style="display: table-cell; align: right" class="clm_fas">';
+										if($rtergebnis!==false && $rtergebnis != '' && $row->punkte=='')
+												echo '<a href="'.$_SERVER['PHP_SELF'].'?reihungstest_id='.$reihungstest_id.'&stg_kz='.$stg_kz.'&type=savertpunkte&rt_person_id='.$row->rt_person_id.'&rtpunkte='.$rtergebnis.'" >&uuml;bertragen</a>';
+										else
+										{
+												if($row->punkte!='')
+														echo number_format($row->punkte,2,'.','');
+										}
+										echo '</td>
+									</tr>';
 
-                            $mailto.= ($mailto!=''?',':'').$row->email;
-                    }
+							$mailto.= ($mailto!=''?',':'').$row->email;
+					}
 		}
 		echo '</tbody></table>';
 
@@ -2442,188 +2584,255 @@ if($reihungstest_id!='')
 		echo '<button type="submit" name="raumzuteilung_speichern">Speichern</button>';
 
 		echo '</form>';
-        echo '</div>';
+		echo '</div>';
 
-        echo '<br>';
+		echo '<br>';
 	}
 
-        foreach ($orte->result AS $ort)
-        {
-            $cnt++;
-            if ($orte_array[$ort->ort_kurzbz] - $orte_zuteilung_array[$ort->ort_kurzbz] < 0)
-                $style = 'text-align: center; margin: 0 5px 0 5px; color: red';
-            else
-                $style = 'text-align: center; margin: 0 5px 0 5px;';
+		foreach ($orte->result AS $ort)
+		{
+			$cnt++;
+			if ($orte_array[$ort->ort_kurzbz] - $orte_zuteilung_array[$ort->ort_kurzbz] < 0)
+				$style = 'text-align: center; margin: 0 5px 0 5px; color: red';
+			else
+				$style = 'text-align: center; margin: 0 5px 0 5px;';
 
-            //TABLE MIT RAUMZUTEILUNG
-            if ($orte_zuteilung_array[$ort->ort_kurzbz] > 0)
-            {
-                echo '<div style="vertical-align: top">';
-                echo '<div style="'.$style.'"><b>Mit Raumzuteilung in '.$ort->ort_kurzbz.' ('.$orte_zuteilung_array[$ort->ort_kurzbz].'/'.$orte_array[$ort->ort_kurzbz].')</b></div>';
-                echo '<form id="raumzuteilung_form['.$ort->ort_kurzbz.']" method="POST" action="'.$_SERVER['PHP_SELF'].'?stg_kz='.$stg_kz.'&reihungstest_id='.$reihungstest->reihungstest_id.'&studiensemester_kurzbz='.$studiensemester_kurzbz.'">';
-                echo '<input type="hidden" value="'.$reihungstest->reihungstest_id.'" name="reihungstest_id">';
-                echo '<table class="tablesorter" id="t'.$cnt.'">
-                    <thead>
-                        <tr class="liste">
-                            <th style="text-align: center">
-                            <nobr>
-                                    <a href="#" data-toggle="checkboxes" data-action="toggle" id="toggle_t'.$cnt.'"><img src="../../skin/images/checkbox_toggle.png" name="toggle"></a>
-                                    <a href="#" data-toggle="checkboxes" data-action="uncheck" id="uncheck_t'.$cnt.'"><img src="../../skin/images/checkbox_uncheck.png" name="toggle"></a>
-                            </nobr>
-                            </th>
-                            <th style="display: table-cell" class="clm_prestudent_id" title="PrestudentID">Prestudent ID</th>
-                            <th style="display: table-cell" class="clm_person_id" title="PersonID">Person ID</th>
-                            <th>Nachname</th>
-                            <th>Vorname</th>
-                            <th style="display: table-cell" class="clm_geschlecht">Geschlecht</th>
-                            <th style="display: table-cell" class="clm_studiengang">Studiengang</th>
-                            <th style="display: table-cell" class="clm_orgform">OrgForm</th>
-                            <th style="display: table-cell" class="clm_studienplan">Studienplan</th>
-                            <th style="display: table-cell" class="clm_einstiegssemester">Einstiegssemester</th>
-                            <th style="display: table-cell" class="clm_geburtsdatum">Geburtsdatum</th>
-                            <th style="display: table-cell" class="clm_email">EMail</th>
-                            <th style="display: table-cell" class="clm_absolviert">bereits absolvierte Verfahren</th>
-                            <th style="display: table-cell" class="clm_ergebnis">Ergebnis</th>
-                            <th style="display: table-cell" class="clm_fas">FAS</th>
-                        </tr>
-                    </thead>
-                <tbody>';
+			//TABLE MIT RAUMZUTEILUNG
+			if ($orte_zuteilung_array[$ort->ort_kurzbz] > 0)
+			{
+				echo '<div style="vertical-align: top">';
+				echo '<div style="'.$style.'"><b>Mit Raumzuteilung in '.$ort->ort_kurzbz.' ('.$orte_zuteilung_array[$ort->ort_kurzbz].'/'.$orte_array[$ort->ort_kurzbz].')</b></div>';
+				echo '<form id="raumzuteilung_form['.$ort->ort_kurzbz.']" method="POST" action="'.$_SERVER['PHP_SELF'].'?stg_kz='.$stg_kz.'&reihungstest_id='.$reihungstest->reihungstest_id.'&studiensemester_kurzbz='.$studiensemester_kurzbz.'">';
+				echo '<input type="hidden" value="'.$reihungstest->reihungstest_id.'" name="reihungstest_id">';
+				echo '<table class="tablesorter" id="t'.$cnt.'">
+					<thead>
+						<tr class="liste">
+							<th style="text-align: center">
+							<nobr>
+									<a href="#" data-toggle="checkboxes" data-action="toggle" id="toggle_t'.$cnt.'"><img src="../../skin/images/checkbox_toggle.png" name="toggle"></a>
+									<a href="#" data-toggle="checkboxes" data-action="uncheck" id="uncheck_t'.$cnt.'"><img src="../../skin/images/checkbox_uncheck.png" name="toggle"></a>
+							</nobr>
+							</th>
+							<th style="display: table-cell" class="clm_prestudent_id" title="PrestudentID">Prestudent ID</th>
+							<th style="display: table-cell" class="clm_person_id" title="PersonID">Person ID</th>
+							<th>Nachname</th>
+							<th>Vorname</th>
+							<th style="display: table-cell" class="clm_geschlecht">Geschlecht</th>
+							<th style="display: table-cell" class="clm_studiengang">Studiengang</th>
+							<th style="display: table-cell" class="clm_orgform">OrgForm</th>
+							<th style="display: table-cell" class="clm_studienplan">Studienplan</th>
+							<th style="display: table-cell" class="clm_einstiegssemester">Einstiegssemester</th>
+							<th style="display: table-cell" class="clm_geburtsdatum">Geburtsdatum</th>
+							<th style="display: table-cell" class="clm_email">EMail</th>
+							<th style="display: table-cell" class="clm_absolviert">bereits absolvierte Verfahren</th>
+							<th style="display: table-cell" class="clm_ergebnis">Ergebnis</th>
+							<th style="display: table-cell" class="clm_fas">FAS</th>
+						</tr>
+					</thead>
+				<tbody>';
 
-                $cnt_personen = 0;
+				$cnt_personen = 0;
 
-                foreach ($result_arr AS $row)
-                {
-                    $rt_in_anderen_stg='';
-                    $rtergebnis = '';
-                    $rt_prestudent_arr = array();
+				foreach ($result_arr AS $row)
+				{
+					$rt_in_anderen_stg='';
+					$rtergebnis = '';
+					$rt_prestudent_arr = array();
 
-                    if($punkteberechnung == 'true')
-                    {
-                        //Daten für Spalte bereits absolvierte Verfahren
-                        $qry = "SELECT
-                        distinct tbl_reihungstest.reihungstest_id,
-                        tbl_pruefling.pruefling_id,
-                        tbl_prestudent.prestudent_id,
-                        tbl_rt_person.person_id
-                        FROM
-                        public.tbl_rt_person
-                        JOIN lehre.tbl_studienplan USING(studienplan_id)
-                        JOIN lehre.tbl_studienordnung USING(studienordnung_id)
-                        JOIN public.tbl_prestudent USING(person_id)
-                        JOIN public.tbl_prestudentstatus USING(studienplan_id, prestudent_id)
-                        JOIN public.tbl_reihungstest ON(tbl_reihungstest.reihungstest_id=tbl_rt_person.rt_id)
-                        LEFT JOIN testtool.tbl_pruefling using(prestudent_id) WHERE
-                        (tbl_rt_person.anmeldedatum is null OR tbl_rt_person.anmeldedatum<=tbl_reihungstest.datum)
-                        AND tbl_reihungstest.datum >=(SELECT min(begintime)::date FROM testtool.tbl_pruefling_frage WHERE pruefling_id=tbl_pruefling.pruefling_id AND tbl_reihungstest.datum>=begintime-'1 days'::interval)                                    AND (tbl_reihungstest.stufe is null or tbl_reihungstest.stufe=1)
-                        AND person_id=".$db->db_add_param($row->person_id, FHC_INTEGER);
+					if($punkteberechnung == 'true')
+					{
+						//Daten für Spalte bereits absolvierte Verfahren
+						$qry = "SELECT DISTINCT tbl_reihungstest.reihungstest_id,
+									tbl_pruefling.pruefling_id,
+									tbl_prestudent.prestudent_id,
+									tbl_rt_person.person_id
+								FROM PUBLIC.tbl_rt_person
+								JOIN lehre.tbl_studienplan USING (studienplan_id)
+								JOIN lehre.tbl_studienordnung USING (studienordnung_id)
+								JOIN PUBLIC.tbl_prestudent USING (person_id)
+								JOIN PUBLIC.tbl_prestudentstatus USING (
+										studienplan_id,
+										prestudent_id
+										)
+								JOIN PUBLIC.tbl_reihungstest ON (tbl_reihungstest.reihungstest_id = tbl_rt_person.rt_id)
+								LEFT JOIN testtool.tbl_pruefling using (prestudent_id)
+								WHERE (
+										tbl_rt_person.anmeldedatum IS NULL
+										OR tbl_rt_person.anmeldedatum <= tbl_reihungstest.datum
+										)
+									AND tbl_reihungstest.datum >= (
+										SELECT min(begintime)::DATE
+										FROM testtool.tbl_pruefling_frage
+										WHERE pruefling_id = tbl_pruefling.pruefling_id
+											AND tbl_reihungstest.datum >= begintime - '1 days'::interval
+										)
+									AND (
+										tbl_reihungstest.stufe IS NULL
+										OR tbl_reihungstest.stufe = 1
+										)
+									AND person_id = ".$db->db_add_param($row->person_id, FHC_INTEGER);
 
-                        if($result = $db->db_query($qry))
-                        {
-                            while($obj = $db->db_fetch_object($result))
-                            {
-                                array_push($rt_prestudent_arr, $obj);
-                            }
-                        }
+						if($result = $db->db_query($qry))
+						{
+							while($obj = $db->db_fetch_object($result))
+							{
+								array_push($rt_prestudent_arr, $obj);
+							}
+						}
 
-                        //Ergebnis ermitteln
-                        if(defined('FAS_REIHUNGSTEST_PUNKTE') && FAS_REIHUNGSTEST_PUNKTE)
-                            $rtergebnis = $pruefling->getReihungstestErgebnisPrestudent($row->prestudent_id, true, $reihungstest->reihungstest_id);
-                        else
-                            $rtergebnis = $pruefling->getReihungstestErgebnisPrestudent($row->prestudent_id, false, $reihungstest->reihungstest_id);
+						//Ergebnis ermitteln
+						if(defined('FAS_REIHUNGSTEST_PUNKTE') && FAS_REIHUNGSTEST_PUNKTE)
+							$rtergebnis = $pruefling->getReihungstestErgebnisPrestudent($row->prestudent_id, true, $reihungstest->reihungstest_id);
+						else
+							$rtergebnis = $pruefling->getReihungstestErgebnisPrestudent($row->prestudent_id, false, $reihungstest->reihungstest_id);
 
-                         //Ausgabe für bereits absolvierte Verfahren
-                        foreach($rt_prestudent_arr as $item)
-                        {
-                            $pruefling->getPruefling($item->prestudent_id);
-                            $rt = new Reihungstest();
-                            $rt->load($item->reihungstest_id);
-                            $rt_letztes_login = $datum_obj->formatDatum($pruefling->registriert, 'Y-m-d');
-                            $rt_antrittstermin = $datum_obj->formatDatum($rt->datum, 'Y-m-d');
+						 //Ausgabe für bereits absolvierte Verfahren
+						foreach($rt_prestudent_arr as $item)
+						{
+							$pruefling->getPruefling($item->prestudent_id);
+							$rt = new Reihungstest();
+							$rt->load($item->reihungstest_id);
+							$rt_letztes_login = $datum_obj->formatDatum($pruefling->registriert, 'Y-m-d');
+							$rt_antrittstermin = $datum_obj->formatDatum($rt->datum, 'Y-m-d');
 
-                            //Wenn bereits absolvierte Verfahren vorhanden
-                            if($item->prestudent_id != $row->prestudent_id || $rt_letztes_login < $rt_antrittstermin)
-                            {
-                                if(defined('FAS_REIHUNGSTEST_PUNKTE') && FAS_REIHUNGSTEST_PUNKTE)
-                                    $erg = $pruefling->getReihungstestErgebnisPrestudent($item->prestudent_id, true, $item->reihungstest_id);
-                                else
-                                    $erg = $pruefling->getReihungstestErgebnisPrestudent($item->prestudent_id, false, $item->reihungstest_id);
+							//Wenn bereits absolvierte Verfahren vorhanden
+							if($item->prestudent_id != $row->prestudent_id || $rt_letztes_login < $rt_antrittstermin)
+							{
+								if(defined('FAS_REIHUNGSTEST_PUNKTE') && FAS_REIHUNGSTEST_PUNKTE)
+									$erg = $pruefling->getReihungstestErgebnisPrestudent($item->prestudent_id, true, $item->reihungstest_id);
+								else
+									$erg = $pruefling->getReihungstestErgebnisPrestudent($item->prestudent_id, false, $item->reihungstest_id);
 
-                                if($erg!==false)
-                                {
-                                    $rt_in_anderen_stg .= number_format($erg, 2).((FAS_REIHUNGSTEST_PUNKTE) ? ' Punkte' : ' %').' im Studiengang '.$studiengang->kuerzel_arr[$pruefling->studiengang_kz].'<br>';
+								if($erg!==false)
+								{
+									$rt_in_anderen_stg .= number_format($erg, 2).((FAS_REIHUNGSTEST_PUNKTE) ? ' Punkte' : ' %').' im Studiengang '.$studiengang->kuerzel_arr[$pruefling->studiengang_kz].'<br>';
 
-                                    if ($item->prestudent_id == $row->prestudent_id && $rt_letztes_login < $rt_antrittstermin)
-                                    {
-                                        $rt_in_anderen_stg .= '(Letzter '.$studiengang->kuerzel_arr[$pruefling->studiengang_kz].'-Antritt: '.$datum_obj->formatDatum($rt_letztes_login, 'd.m.Y').',<br>';
-                                        $rt_in_anderen_stg .= '<a href="reihungstest_administration.php">absolvierte RT-Gebiete entsperren</a>)<br>';
-                                    }
-                                }
-                            }
-                        }
-                    }
-                        if ($row->ort_kurzbz == $ort->ort_kurzbz)
-                        {
-                            if(isset($studienplaene_arr[$row->studienplan_id]))
-                                $studienplan_bezeichnung = $studienplaene_arr[$row->studienplan_id];
-                            else
-                            {
-                                $studienplan_obj = new studienplan();
-                                $studienplan_obj->loadStudienplan($row->studienplan_id);
-                                $studienplan_bezeichnung = $studienplan_obj->bezeichnung;
-                                $studienplaene_arr[$row->studienplan_id]=$studienplan_obj->bezeichnung;
-                            }
+									if ($item->prestudent_id == $row->prestudent_id && $rt_letztes_login < $rt_antrittstermin)
+									{
+										$rt_in_anderen_stg .= '(Letzter '.$studiengang->kuerzel_arr[$pruefling->studiengang_kz].'-Antritt: '.$datum_obj->formatDatum($rt_letztes_login, 'd.m.Y').',<br>';
+										$rt_in_anderen_stg .= '<a href="reihungstest_administration.php">absolvierte RT-Gebiete entsperren</a>)<br>';
+									}
+								}
+							}
+						}
+					}
+						if ($row->ort_kurzbz == $ort->ort_kurzbz)
+						{
+							if(isset($studienplaene_arr[$row->studienplan_id]))
+								$studienplan_bezeichnung = $studienplaene_arr[$row->studienplan_id];
+							else
+							{
+								$studienplan_obj = new studienplan();
+								$studienplan_obj->loadStudienplan($row->studienplan_id);
+								$studienplan_bezeichnung = $studienplan_obj->bezeichnung;
+								$studienplaene_arr[$row->studienplan_id]=$studienplan_obj->bezeichnung;
+							}
 
-                            $cnt_personen++;
-                            echo '
-                                <tr>
-                                    <td style="text-align: center"><input class="chkbox" type="checkbox" id="checkbox_'.$row->person_id.'" name="checkbox['.$row->person_id.']"></td>
-                                    <td style="display: table-cell" class="clm_prestudent_id">'.$db->convert_html_chars($row->prestudent_id).'</td>
-                                    <td style="display: table-cell" class="clm_person_id">'.$db->convert_html_chars($row->person_id).'</td>
-                                    <td>'.$db->convert_html_chars($row->nachname).'</td>
-                                    <td>'.$db->convert_html_chars($row->vorname).'</td>
-                                    <td style="display: table-cell" class="clm_geschlecht">'.$db->convert_html_chars($row->geschlecht).'</td>
-                                    <td style="display: table-cell" class="clm_studiengang">'.$db->convert_html_chars($stg_arr[$row->studiengang_kz]).'</td>
-                                    <td style="display: table-cell" class="clm_orgform">'.$db->convert_html_chars($row->orgform_kurzbz!=''?$row->orgform_kurzbz:' ').'</td>
-                                    <td style="display: table-cell" class="clm_studienplan">'.$db->convert_html_chars($studienplan_bezeichnung).' ('.$row->studienplan_id.')</td>
-                                    <td style="display: table-cell" class="clm_einstiegssemester">'.$db->convert_html_chars($row->ausbildungssemester).'</td>
-                                    <td style="display: table-cell" class="clm_geburtsdatum">'.$db->convert_html_chars($row->gebdatum!=''?$datum_obj->convertISODate($row->gebdatum):' ').'</td>
-                                    <td style="display: table-cell; text-align: center" class="clm_email"><a href="mailto:'.$db->convert_html_chars($row->email).'"><img src="../../skin/images/button_mail.gif" name="mail"></a></td>
-                                    <td style="display: table-cell;" class="clm_absolviert">'.$rt_in_anderen_stg.'</td>
-                                    <td style="display: table-cell; align: right" class="clm_ergebnis">'.($rtergebnis==0?'-':number_format($rtergebnis,2,'.','')).' %</td>
-                                    <td style="display: table-cell; align: right" class="clm_fas">';
-                                    if($rtergebnis!==false && $rtergebnis != '' && $row->punkte=='')
-                                        echo '<a href="'.$_SERVER['PHP_SELF'].'?reihungstest_id='.$reihungstest_id.'&stg_kz='.$stg_kz.'&type=savertpunkte&rt_person_id='.$row->rt_person_id.'&rtpunkte='.$rtergebnis.'" >&uuml;bertragen</a>';
-                                    else
-                                    {
-                                        if($row->punkte!='')
-                                            echo number_format($row->punkte,2,'.','');
-                                    }
-                                    echo '</td>
-                                </tr>';
+							$cnt_personen++;
+							echo '
+								<tr>
+									<td style="text-align: center"><input class="chkbox" type="checkbox" id="checkbox_'.$row->person_id.'" name="checkbox['.$row->person_id.']"></td>
+									<td style="display: table-cell" class="clm_prestudent_id">'.$db->convert_html_chars($row->prestudent_id).'</td>
+									<td style="display: table-cell" class="clm_person_id">'.$db->convert_html_chars($row->person_id).'</td>
+									<td>'.$db->convert_html_chars($row->nachname).'</td>
+									<td>'.$db->convert_html_chars($row->vorname).'</td>
+									<td style="display: table-cell" class="clm_geschlecht">'.$db->convert_html_chars($row->geschlecht).'</td>
+									<td style="display: table-cell" class="clm_studiengang">'.$db->convert_html_chars($stg_arr[$row->studiengang_kz]).'</td>
+									<td style="display: table-cell" class="clm_orgform">'.$db->convert_html_chars($row->orgform_kurzbz!=''?$row->orgform_kurzbz:' ').'</td>
+									<td style="display: table-cell" class="clm_studienplan">'.$db->convert_html_chars($studienplan_bezeichnung).' ('.$row->studienplan_id.')</td>
+									<td style="display: table-cell" class="clm_einstiegssemester">'.$db->convert_html_chars($row->ausbildungssemester).'</td>
+									<td style="display: table-cell" class="clm_geburtsdatum">'.$db->convert_html_chars($row->gebdatum!=''?$datum_obj->convertISODate($row->gebdatum):' ').'</td>
+									<td style="display: table-cell; text-align: center" class="clm_email"><a href="mailto:'.$db->convert_html_chars($row->email).'"><img src="../../skin/images/button_mail.gif" name="mail"></a></td>
+									<td style="display: table-cell;" class="clm_absolviert">'.$rt_in_anderen_stg.'</td>
+									<td style="display: table-cell; align: right" class="clm_ergebnis">'.($rtergebnis==0?'-':number_format($rtergebnis,2,'.','')).' %</td>
+									<td style="display: table-cell; align: right" class="clm_fas">';
+									if($rtergebnis!==false && $rtergebnis != '' && $row->punkte=='')
+										echo '<a href="'.$_SERVER['PHP_SELF'].'?reihungstest_id='.$reihungstest_id.'&stg_kz='.$stg_kz.'&type=savertpunkte&rt_person_id='.$row->rt_person_id.'&rtpunkte='.$rtergebnis.'" >&uuml;bertragen</a>';
+									else
+									{
+										if($row->punkte!='')
+											echo number_format($row->punkte,2,'.','');
+									}
+									echo '</td>
+								</tr>';
 
-                            $mailto.= ($mailto!=''?',':'').$row->email;
-                        }
-                }
-                    echo '</tbody></table>';
+							$mailto.= ($mailto!=''?',':'').$row->email;
+						}
+				}
+					echo '</tbody></table>';
 
-                    echo '<select name="raumzuteilung">';
-                    echo '<option value="">Zuteilung entfernen</option>';
-                    foreach ($orte->result AS $item)
-                    {
-                            if($item->ort_kurzbz==$ort->ort_kurzbz)
-                                    $selected = 'selected="selected"';
-                            else
-                                    $selected = '';
-                            echo '<option value="'.$item->ort_kurzbz.'" '.$selected.'>'.$item->ort_kurzbz.'</option>';
-                    }
-                    echo '</select>';
-                    echo '<button type="submit" name="raumzuteilung_speichern">Speichern</button>';
+					echo '<select name="raumzuteilung">';
+					echo '<option value="">Zuteilung entfernen</option>';
+					foreach ($orte->result AS $item)
+					{
+							if($item->ort_kurzbz==$ort->ort_kurzbz)
+									$selected = 'selected="selected"';
+							else
+									$selected = '';
+							echo '<option value="'.$item->ort_kurzbz.'" '.$selected.'>'.$item->ort_kurzbz.'</option>';
+					}
+					echo '</select>';
+					echo '<button type="submit" name="raumzuteilung_speichern">Speichern</button>';
 
-                    echo '</form>';
-                    echo '</div>';
-            }
-        }
-} ?>
+					echo '</form>';
+					echo '</div>';
+			}
+		}
+} 
+
+/**
+ * Liefert die interne Empfangsadresse des Studiengangs fuer den Mailversand.
+ * Wenn BEWERBERTOOL_MAILEMPFANG gesetzt ist, wird diese genommen,
+ * sonst diejenige aus BEWERBERTOOL_BEWERBUNG_EMPFAENGER,
+ * sonst die Mailadresse des Studiengangs
+ *
+ * @param integer $studiengang_kz
+ * @param integer $studienplan_id
+ * @param string $orgform_kurzbz
+ * @return string mit den Mailadressen sonst false
+ */
+function getMailEmpfaenger($studiengang_kz, $studienplan_id = null, $orgform_kurzbz = null)
+{
+	$studiengang = new studiengang($studiengang_kz);
+	
+	if ($studienplan_id != '')
+	{
+		$studienplan = new studienplan();
+		$studienplan->loadStudienplan($studienplan_id);
+	}
+	
+	$empf_array = array();
+	$empfaenger = '';
+	if(defined('BEWERBERTOOL_BEWERBUNG_EMPFAENGER'))
+		$empf_array = unserialize(BEWERBERTOOL_BEWERBUNG_EMPFAENGER);
+		
+	// Umgehung für FHTW. Ausprogrammiert im Code
+	if(defined('BEWERBERTOOL_MAILEMPFANG') && BEWERBERTOOL_MAILEMPFANG != '')
+	{
+		$empfaenger = BEWERBERTOOL_MAILEMPFANG;
+	}
+	elseif(isset($empf_array[$studiengang_kz]))
+	{
+		// Pfuschloesung, damit bei BIF Dual die Mail an info.bid geht
+		if ($studiengang_kz == 257)
+		{
+			if ((isset($studienplan) && $studienplan->orgform_kurzbz == 'DUA') ||
+				($orgform_kurzbz != '' && $orgform_kurzbz == 'DUA'))
+				$empfaenger = 'info.bid@technikum-wien.at';
+		}
+		else
+			$empfaenger = $empf_array[$studiengang_kz];
+	}
+	else
+		$empfaenger = $studiengang->email;
+		
+	if ($empfaenger != '')
+		return $empfaenger;
+	else
+		return false;
+}
+
+?>
 
 	</body>
 </html>

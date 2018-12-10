@@ -757,7 +757,7 @@ class FiltersLib
 					self::NAV_MENU_FILTER_NAME,		// description
 					'#',							// link
 					$childrenArray,					// children
-					'',								// icon
+					'filter',								// icon
 					true,							// expand
 					null,							// subscriptDescription
 					null,							// subscriptLinkClass

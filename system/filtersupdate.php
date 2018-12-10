@@ -264,7 +264,8 @@ $filters = array(
 					{"name": "StgAbgeschickt"},
 					{"name": "LastAction"},
 					{"name": "User/Operator"},
-					{"name": "LockUser"}
+					{"name": "LockUser"},
+					{"name": "Statusgrund"}
 				],
 				"filters": [
 					{
@@ -298,7 +299,8 @@ $filters = array(
 					{"name": "StgAbgeschickt"},
 					{"name": "LastAction"},
 					{"name": "User/Operator"},
-					{"name": "LockUser"}
+					{"name": "LockUser"},
+					{"name": "Statusgrund"}
 				],
 				"filters": [
 					{
