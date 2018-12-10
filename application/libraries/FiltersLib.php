@@ -313,6 +313,8 @@ class FiltersLib
 
 		if ($datasetQuery != null)
 		{
+			$this->_ci->load->model('system/Filters_model', 'FiltersModel');
+
 			// Execute the given SQL statement suppressing error messages
 			$dataset = @$this->_ci->FiltersModel->execReadOnlyQuery($datasetQuery);
 		}
@@ -715,7 +717,7 @@ class FiltersLib
 						$filter->description[0], // description
 						sprintf(
 							'%s?%s=%s',
-							site_url($this->_ci->router->directory.$this->_ci->router->class.'/'.$this->_ci->router->method),
+							site_url($navigationPage),
 							self::FILTER_ID,
 							$filter->filter_id
 						) // link
@@ -815,6 +817,8 @@ class FiltersLib
 	private function _getDatasetQueryCondition($filterDefinition)
 	{
 		$condition = ''; // starts building the condition
+
+		$this->_ci->load->model('system/Filters_model', 'FiltersModel');
 
 		// "operation" is a required property for the applied filter definition
 		if (!isEmptyString($filterDefinition->operation))
