@@ -2,8 +2,9 @@
 const BASE_URL = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
 const CALLED_PATH = FHC_JS_DATA_STORAGE_OBJECT.called_path;
 const CONTROLLER_URL = BASE_URL + "/"+CALLED_PATH;
-const FREIGABE_MESSAGE_VORLAGE = "InfocenterRTfreigegeben";
-const FREIGABE_MESSAGE_VORLAGE_QUER = "InfocenterRTfreigegQuer";
+const RTFREIGABE_MESSAGE_VORLAGE = "InfocenterRTfreigegeben";
+const RTFREIGABE_MESSAGE_VORLAGE_QUER = "InfocenterRTfreigegQuer";
+const STGFREIGABE_MESSAGE_VORLAGE = "InfocenterSTGfreigegeben";
 
 /**
  * javascript file for infocenterDetails page
@@ -271,8 +272,6 @@ var InfocenterDetails = {
 	},
 	saveFreigabe: function(data, rtfreigabe)
 	{
-		var callback = null;
-
 		FHC_AjaxClient.ajaxCallPost(
 			CALLED_PATH + '/saveFreigabe',
 			data,
@@ -281,28 +280,8 @@ var InfocenterDetails = {
 
 					if (FHC_AjaxClient.hasData(data))
 					{
-						if (rtfreigabe)
-						{
-							FHC_AjaxClient.showVeil();
-							callback = function ()
-							{
-								InfocenterDetails.sendFreigabeMessage(data.retval.prestudent_id);
-							};
-						}
-						else
-						{
-							callback = function ()
-							{
-								InfocenterDetails._refreshLog();
-							};
-						}
-
-
-						InfocenterDetails._refreshZgv(
-							false,
-							//send message only after refresh to have current Ausbildungssemester
-							callback
-						);
+						FHC_AjaxClient.showVeil();
+						InfocenterDetails.initFrgMessageSend(data.retval.prestudent_id, rtfreigabe);
 					}
 					else if (data.error === 2 && parseInt(data.retval.prestudent_id, 10))
 					{
@@ -447,10 +426,67 @@ var InfocenterDetails = {
 			}
 		);
 	},
-	sendFreigabeMessage: function(prestudentid)
+	initFrgMessageSend: function(prestudentid, rtfreigabe)
 	{
-		var ausbildungssem = $("#ausbildungssem_"+prestudentid).val();
-		var vorlage_kurzbz = isNaN(ausbildungssem) || parseInt(ausbildungssem) === 1 ? FREIGABE_MESSAGE_VORLAGE : FREIGABE_MESSAGE_VORLAGE_QUER;
+		var callback = function ()
+		{
+			// check if a prestudent in same semester is already freigegeben - then not send message again
+			var freigegeben = false;
+			var prestudentids = $(".prestudentidinput");
+
+			if (prestudentids.length > 1)
+			{
+				prestudentids.each(function()
+					{
+						var id = $(this).val();
+
+						if (parseInt(id) !== parseInt(prestudentid))
+						{
+							if ($("#studiensemester_"+id).val() === $("#studiensemester_"+prestudentid).val() && $("#isfreigegeben_"+id).val() === "1")
+							{
+								freigegeben = true;
+								return false;
+							}
+						}
+					}
+				);
+			}
+
+			if (freigegeben)
+			{
+				InfocenterDetails._refreshLog();
+			}
+			else
+			{
+				var ausbildungssem = $("#ausbildungssem_" + prestudentid).val();
+				var vorlage_kurzbz = null;
+				var msgvars = {};
+
+				if (rtfreigabe)
+				{
+					vorlage_kurzbz = isNaN(ausbildungssem) || parseInt(ausbildungssem) === 1 ? RTFREIGABE_MESSAGE_VORLAGE : RTFREIGABE_MESSAGE_VORLAGE_QUER;
+					msgvars = {
+						'rtlink': FHC_JS_DATA_STORAGE_OBJECT.app_root + 'addons/bewerbung/cis/registration.php?active=aufnahme',
+						'ausbildungssemester': ausbildungssem
+					}
+				}
+				else
+				{
+					vorlage_kurzbz = STGFREIGABE_MESSAGE_VORLAGE;
+				}
+				InfocenterDetails.sendFreigabeMessage(prestudentid, vorlage_kurzbz, msgvars);
+			}
+			FHC_AjaxClient.hideVeil();
+		};
+
+		InfocenterDetails._refreshZgv(
+			false,
+			//send message only after refresh to have current Ausbildungssemester
+			callback
+		);
+	},
+	sendFreigabeMessage: function(prestudentid, vorlage_kurzbz, msgvars)
+	{
 
 		FHC_AjaxClient.ajaxCallPost(
 			'system/Messages/sendJson',
@@ -458,10 +494,7 @@ var InfocenterDetails = {
 				"prestudents": prestudentid,
 				"vorlage_kurzbz": vorlage_kurzbz,
 				"oe_kurzbz": 'infocenter',
-				"msgvars": {
-					'rtlink': FHC_JS_DATA_STORAGE_OBJECT.app_root + 'addons/bewerbung/cis/registration.php?active=aufnahme',
-					'ausbildungssemester': ausbildungssem
-				}
+				"msgvars": msgvars
 			},
 			{
 				successCallback: function(data, textStatus, jqXHR) {
