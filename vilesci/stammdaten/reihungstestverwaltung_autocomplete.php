@@ -213,7 +213,7 @@ if (isset($_REQUEST['autocomplete']) && $_REQUEST['autocomplete'] == 'studienpla
 	foreach ($studienordnung->result as $row_status)
 		$status_arr[$row_status->status_kurzbz] = $row_status->bezeichnung;
 	
-	if (count($studienplan->result) == 0)
+	if (count($studienplan->result) == 0 && empty($result_obj))
 	{
 		// Wenn für das übergbene Studiensemester kein Studienplan gefunden wird, wird nochmal ohne Studiensemester gesucht
 		$studienplan->searchStudienplaene($searchItems, $aktiv);
@@ -246,9 +246,9 @@ if (isset($_REQUEST['autocomplete']) && $_REQUEST['autocomplete'] == 'studienpla
 	else 
 	{
 		$item['studienplan_id'] = '';
-		$item['bezeichnung'] = 'Kein passender Studienplan gefunden';
+		$item['bezeichnung'] = 'Kein passender Studienplan für "' . implode(', ', $searchItems) . '" gefunden';
 		$item['status'] = '';
-		$item['disabled'] = false;
+		$item['disabled'] = true;
 		$result_obj[] = $item;
 	}
 	echo json_encode($result_obj);
