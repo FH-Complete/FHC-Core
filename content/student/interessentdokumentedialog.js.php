@@ -31,29 +31,30 @@ var glob_akte_id;
 function InteressentDokumenteDialogInit(prestudent_id, akte_id)
 {
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
-	
+
 	if(akte_id!='')
-	{		
+	{
 		glob_prestudent_id = prestudent_id;
 		glob_akte_id = akte_id;
 
 		//Daten holen
 		var url = '<?php echo APP_ROOT ?>rdf/akte.rdf.php?akte_id='+akte_id+'&'+gettimestamp();
-			
+
 		var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].
 	                   getService(Components.interfaces.nsIRDFService);
-	    
+
 	    var dsource = rdfService.GetDataSourceBlocking(url);
-	    
+
 		var subject = rdfService.GetResource("http://www.technikum-wien.at/akte/" + akte_id);
-	
+
 		var predicateNS = "http://www.technikum-wien.at/akte/rdf";
-	
-		//RDF parsen	
+
+		//RDF parsen
 		var titel_intern = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#titel_intern" ));
 		var anmerkung_intern = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#anmerkung_intern" ));
 		var anmerkung = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#anmerkung" ));
 		var nachgereicht = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#nachgereicht" ));
+		var nachgereicht_am = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#nachgereicht_am" ));
 		var dokument_kurzbz = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#dokument_kurzbz" ));
 		var dokument_bezeichnung = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#dokument_bezeichnung" ));
 	}
@@ -67,7 +68,7 @@ function InteressentDokumenteDialogInit(prestudent_id, akte_id)
 		menuentry.setAttribute("label",dokument_bezeichnung);
 		dokumentemenue.appendChild(menuentry);
 	}
-		
+
 	document.getElementById('interessent-dokumente-dialog-textbox-titel').value=titel_intern;
 	document.getElementById('interessent-dokumente-dialog-textbox-anmerkung').value=anmerkung_intern;
 
@@ -78,6 +79,8 @@ function InteressentDokumenteDialogInit(prestudent_id, akte_id)
 		document.getElementById('interessent-dokumente-dialog-label-nachgereicht').value='Dokument wird nachgereicht';
 	else
 		document.getElementById('interessent-dokumente-dialog-label-nachgereicht').value='';
+
+	document.getElementById('interessent-dokumente-dialog-textbox-nachgereicht_am').value=ConvertDateToGerman(nachgereicht_am);
 }
 
 // ****

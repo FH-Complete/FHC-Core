@@ -23,7 +23,7 @@ if (! defined('BASEPATH')) exit('No direct script access allowed');
 // Functions needed in the view FHC-Header
 // ------------------------------------------------------------------------
 
-const DEFAULT_SANCHO_HEADER_IMG = 'sancho_header_du_hast_neue_nachrichten.jpg';
+const DEFAULT_SANCHO_HEADER_IMG = 'sancho_header_DEFAULT.jpg';
 
 /**
  * Send single Mail with Sancho Design and Layout.

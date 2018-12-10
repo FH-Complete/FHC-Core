@@ -97,6 +97,7 @@ foreach ($akten->result as $row)
 			<AKTE:titel_intern><![CDATA['.$row->titel_intern.']]></AKTE:titel_intern>
 			<AKTE:anmerkung><![CDATA['.$row->anmerkung.']]></AKTE:anmerkung>
 			<AKTE:nachgereicht><![CDATA['.($row->nachgereicht?'Ja':'Nein').']]></AKTE:nachgereicht>
+			<AKTE:nachgereicht_am><![CDATA['.$row->nachgereicht_am.']]></AKTE:nachgereicht_am>
 			<AKTE:signiert><![CDATA['.($row->signiert?'Ja':'Nein').']]></AKTE:signiert>
 			<AKTE:stud_selfservice><![CDATA['.($row->stud_selfservice?'Ja':'Nein').']]></AKTE:stud_selfservice>
 		</RDF:Description>

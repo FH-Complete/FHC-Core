@@ -968,7 +968,7 @@ if(!$error)
 	elseif(isset($_POST['type']) && $_POST['type']=='returnDeletePrestudent')
 	{
 		//Prueft, wie viele Prestudentrolle-Eintraege noch vorhanden sind und gibt diese Anzahl als Wert zurueck
-	
+
 		if(isset($_POST['prestudent_id']) && is_numeric($_POST['prestudent_id']))
 		{
 			$qry = "SELECT count(*) as anzahl FROM public.tbl_prestudentstatus WHERE prestudent_id=".$db->db_add_param($_POST['prestudent_id'], FHC_INTEGER);
@@ -2200,6 +2200,7 @@ if(!$error)
 				$akte->anmerkung_intern = $_POST['anmerkung_intern'];
 				$akte->titel_intern = $_POST['titel_intern'];
 				$akte->dokument_kurzbz = $_POST['dokument_kurzbz'];
+				$akte->nachgereicht_am = $_POST['nachgereicht_am'];
 				$akte->updateamum = date('Y-m-d H:i:s');
 				$akte->updatevon = $user;
 
@@ -2257,8 +2258,8 @@ if(!$error)
 									else
 									{
 										// Log schreiben
-										$logdata_dms = (array)$dms; 
-										$logdata = var_export($logdata_dms, true); 
+										$logdata_dms = (array)$dms;
+										$logdata = var_export($logdata_dms, true);
 										$log = new log();
 										$log->executetime = date('Y-m-d H:i:s');
 										$log->mitarbeiter_uid = $user;
@@ -2268,8 +2269,8 @@ if(!$error)
 										$log->save(true);
 									}
 									// Log schreiben
-									$logdata_akte = (array)$akte; 
-									$logdata = var_export($logdata_akte, true); 
+									$logdata_akte = (array)$akte;
+									$logdata = var_export($logdata_akte, true);
 									$log = new log();
 									$log->executetime = date('Y-m-d H:i:s');
 									$log->mitarbeiter_uid = $user;
@@ -3972,7 +3973,7 @@ if(!$error)
 			$errormsg  = 'Fehlerhafte Parameteruebergabe';
 		}
 	}
-    
+
     //******** AUFNAHMETERMINE *****
 	elseif(isset($_POST['type']) && $_POST['type']=='AufnahmeTermineSave')  // **** AufnahmeTermine **** //
 	{
@@ -4007,10 +4008,10 @@ if(!$error)
 					$studienplan_id = $_POST['studienplan_id'];
 
 					$reihungstest = new reihungstest();
-                    
+
 					if($rt_person_id!='')
 					{
-						$reihungstest->loadReihungstestPerson($rt_person_id);                     
+						$reihungstest->loadReihungstestPerson($rt_person_id);
 					}
 					else
 					{
@@ -4043,7 +4044,7 @@ if(!$error)
 					$reihungstest->studienplan_id = $studienplan_id;
                     ($reihungstest->new) ? $reihungstest->insertamum = date('Y-m-d H:i:s'): $reihungstest->updateamum = date('Y-m-d H:i:s');
                     ($reihungstest->new) ? $reihungstest->insertvon = $user : $reihungstest->updatevon = $user;
-                                                      
+
 					if($reihungstest->savePersonReihungstest())
 					{
 						$return = true;
@@ -4188,7 +4189,7 @@ if(!$error)
 			$return = false;
 			$errormsg  = 'Fehlerhafte Parameteruebergabe';
 		}
-	}    
+	}
 	elseif(isset($_POST['type']) && $_POST['type']=='AufnahmeTermineBerechneGesamtpunkte')
 	{
 		//Speichert einen Aufnahmetermin einer Person

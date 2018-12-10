@@ -170,6 +170,28 @@ function ConvertDateToISO(datum)
 }
 
 // ****
+// * Wandelt ein Datum ins ISO Format um
+// * aus 2007-02-31 wird 31.2.2007
+// ****
+function ConvertDateToGerman(datum)
+{
+	if(datum!='')
+	{
+		arr = datum.split('-');
+
+		if(arr[1].length==1)
+			arr[1]='0'+arr[1];
+
+		if(arr[2].length==1)
+			arr[2]='0'+arr[2];
+
+		return arr[2]+'.'+arr[1]+'.'+arr[0];
+	}
+	else
+		return '';
+}
+
+// ****
 // * Liefert die Daten aus der Zwischenablage
 // ****
 function getDataFromClipboard()
@@ -281,7 +303,7 @@ function getMultipleTreeCellText(tree, col)
 			returnArray.push(getTreeCellText(tree, col, v));
 		}
 	}
-	
+
 	return returnArray;
 }
 
@@ -295,18 +317,18 @@ function openWindowPostArray(action, dataName, data)
 {
 	var FORM_HEAD = "<form id='postform-form' name='postfrm' action='' method='POST'>\n";
 	var FORM_FOOT = "</form>";
-	
+
 	var inputsHidden = "";
-	
+
 	for (var i = 0; i < data.length; i++)
 	{
 		inputsHidden += "	<input type='hidden' name='" + dataName + "[]' value='" + data[i] + "' />\n";
 	}
-	
+
 	var newwindow = window.open("", "FAS");
 	newwindow.document.getElementsByTagName('body')[0].innerHTML = FORM_HEAD + inputsHidden + FORM_FOOT;
 	newwindow.document.getElementById('postform-form').action = action;
-	
+
 	newwindow.document.postfrm.submit();
 }
 

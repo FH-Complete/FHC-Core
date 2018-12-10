@@ -128,7 +128,7 @@ function InteressentDokumenteAdd()
   		tree.view.selection.getRangeAt(t,start,end);
 		for (var v = start.value; v <= end.value; v++)
 		{
-			dok = getTreeCellText(tree, "interessent-dokumente-tree-nichtabgegeben-dokument_kurzbz", v);			
+			dok = getTreeCellText(tree, "interessent-dokumente-tree-nichtabgegeben-dokument_kurzbz", v);
 			paramList += ';'+dok;
 		}
 	}
@@ -137,7 +137,7 @@ function InteressentDokumenteAdd()
 	prestudent_id = document.getElementById('student-prestudent-textbox-prestudent_id').value
 
 	studiengang_kz = document.getElementById('student-prestudent-menulist-studiengang_kz').value
-	
+
 	if(paramList!='')
 	{
 		var url = '<?php echo APP_ROOT ?>content/student/studentDBDML.php';
@@ -207,7 +207,7 @@ function InteressentDokumenteRemove()
 	//Prestudent_id holen
 	prestudent_id = document.getElementById('student-prestudent-textbox-prestudent_id').value;
 	studiengang_kz = document.getElementById('student-prestudent-menulist-studiengang_kz').value;
-	
+
 	if(paramList!='')
 	{
 		var url = '<?php echo APP_ROOT ?>content/student/studentDBDML.php';
@@ -354,10 +354,10 @@ function ShowDokument()
 		i = tree.currentIndex;
 	else
 		i = 0;
-		
+
 	col = tree.columns ? tree.columns["interessent-dokumente-tree-nichtabgegeben-akte_id"] : "interessent-dokumente-tree-nichtabgegeben-akte_id";
 	var akte_id=tree.view.getCellText(tree.currentIndex,col);
-    
+
     window.open("<?php echo APP_ROOT; ?>content/akte.php?akte_id="+akte_id,"","chrome, status=no, width=500, height=350, centerscreen, resizable");
 }
 function ShowDokumentAbgegeben()
@@ -368,10 +368,10 @@ function ShowDokumentAbgegeben()
 		i = tree.currentIndex;
 	else
 		i = 0;
-		
+
 	col = tree.columns ? tree.columns["interessent-dokumente-tree-abgegeben-akte_id"] : "interessent-dokumente-tree-abgegeben-akte_id";
 	var akte_id=tree.view.getCellText(tree.currentIndex,col);
-    
+
     window.open("<?php echo APP_ROOT; ?>content/akte.php?akte_id="+akte_id,"","chrome, status=no, width=500, height=350, centerscreen, resizable");
 }
 
@@ -384,7 +384,7 @@ function InteressentDokumenteUpload()
 		window.open("<?php echo APP_ROOT; ?>content/akteupload.php?person_id="+person_id ,"","chrome, status=no, width=800, height=350, centerscreen, resizable");
 	}
 	else
-		alert("kein Student ausgewählt"); 
+		alert("kein Student ausgewählt");
 }
 
 function InteressentDokumenteFilter()
@@ -398,7 +398,7 @@ function InteressentDokumenteFilter()
 		alert('Bitte einen Studiengang/Semester waehlen');
 		return;
 	}
-	
+
     // Progressmeter starten. Ab jetzt keine 'return's mehr.
     document.getElementById('statusbar-progressmeter').setAttribute('mode','undetermined');
     //globalProgressmeter.StartPM();
@@ -476,6 +476,8 @@ function InteressentDokumenteDialogSpeichern(dialog, prestudent_id, akte_id)
 	var titel_intern=dialog.getElementById('interessent-dokumente-dialog-textbox-titel').value;
 	var anmerkung_intern=dialog.getElementById('interessent-dokumente-dialog-textbox-anmerkung').value;
 	var dokument_kurzbz=dialog.getElementById('interessent-dokumente-dialog-menulist-dokument_kurzbz').value;
+	var nachgereicht_am=dialog.getElementById('interessent-dokumente-dialog-textbox-nachgereicht_am').value;
+
 	var url = '<?php echo APP_ROOT ?>content/student/studentDBDML.php';
 	var req = new phpRequest(url,'','');
 
@@ -485,7 +487,8 @@ function InteressentDokumenteDialogSpeichern(dialog, prestudent_id, akte_id)
 	req.add('akte_id', akte_id);
 	req.add('titel_intern', titel_intern);
 	req.add('anmerkung_intern', anmerkung_intern);
-	req.add('dokument_kurzbz',dokument_kurzbz);
+	req.add('dokument_kurzbz', dokument_kurzbz);
+	req.add('nachgereicht_am', ConvertDateToISO(nachgereicht_am));
 
 	var response = req.executePOST();
 
@@ -549,7 +552,7 @@ function InteressentDokumenteAbgegebenEntfernen()
 	var tree = document.getElementById('interessent-dokumente-tree-abgegeben');
 	var akte_id = getTreeCellText(tree, 'interessent-dokumente-tree-abgegeben-akte_id', tree.currentIndex);
 	prestudent_id = document.getElementById('student-prestudent-textbox-prestudent_id').value;
-	
+
 	if(confirm('Dieses Dokument wirklich loeschen?'))
 	{
 		InteressentDokumentEntfernen(akte_id, prestudent_id);
@@ -599,7 +602,7 @@ function InteressentDokumenteAbgegebenUpload()
 		window.open("<?php echo APP_ROOT; ?>content/akteupload.php?person_id="+person_id+"&dokument_kurzbz="+dokument_kurzbz ,"Upload","width=800, height=350, centerscreen, resizable");
 	}
 	else
-		alert("kein Student ausgewählt"); 
+		alert("kein Student ausgewählt");
 }
 function InteressentDokumenteNichtabgegebenUpload()
 {
@@ -613,7 +616,7 @@ function InteressentDokumenteNichtabgegebenUpload()
 		window.open("<?php echo APP_ROOT; ?>content/akteupload.php?person_id="+person_id+"&dokument_kurzbz="+dokument_kurzbz ,"Upload","width=800, height=350, centerscreen, resizable");
 	}
 	else
-		alert("kein Student ausgewählt"); 
+		alert("kein Student ausgewählt");
 }
 
 function InteressentDokumenteTreeNichtAbgegebenPopupShowing()

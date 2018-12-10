@@ -857,9 +857,20 @@ class InfoCenter extends Auth_Controller
 		}
 
 		$this->navigationlib->setSessionMenu(
-			array(
+			array('filters' => $this->navigationlib->oneLevel(
+					'Filters',		// description
+					'#',			// link
+					$filtersArray,	// children
+					'filter',				// icon
+					true,			// expand
+					null,			// subscriptDescription
+					null,			// subscriptLinkClass
+					null, 			// subscriptLinkValue
+					'', 			// target
+					1 				// sort
+				),
 				'freigegeben' => $this->navigationlib->oneLevel(
-					'zum RT Freigegeben',		// description
+					'zum RT freigegeben',		// description
 					$freigegebenLink,	// link
 					null,				// children
 					'thumbs-up',		// icon
@@ -868,7 +879,7 @@ class InfoCenter extends Auth_Controller
 					null,				// subscriptLinkClass
 					null, 				// subscriptLinkValue
 					'', 				// target
-					1   				// sort
+					10   				// sort
 				),
 				'reihungstestAbsolviert' => $this->navigationlib->oneLevel(
 					'Reihungstest absolviert',		// description
@@ -880,19 +891,7 @@ class InfoCenter extends Auth_Controller
 					null,				// subscriptLinkClass
 					null, 				// subscriptLinkValue
 					'', 				// target
-					2   				// sort
-				),
-				'filters' => $this->navigationlib->oneLevel(
-					'Filters',		// description
-					'#',			// link
-					$filtersArray,	// children
-					'',				// icon
-					true,			// expand
-					null,			// subscriptDescription
-					null,			// subscriptLinkClass
-					null, 			// subscriptLinkValue
-					'', 			// target
-					10 				// sort
+					20   				// sort
 				)
 			)
 		);
@@ -951,6 +950,8 @@ class InfoCenter extends Auth_Controller
 
 		// Generate the home link with the eventually loaded filter
 		$homeLink = site_url(self::INFOCENTER_URI.'/'.self::INDEX_PAGE);
+		$freigegebenLink = site_url(self::INFOCENTER_URI.'/'.self::FREIGEGEBEN_PAGE);
+		$absolviertLink = site_url(self::INFOCENTER_URI.'/'.self::REIHUNGSTESTABSOLVIERT_PAGE);
 		$prevFilterId = $this->input->get(self::PREV_FILTER_ID);
 		if (isset($prevFilterId))
 		{
@@ -958,20 +959,57 @@ class InfoCenter extends Auth_Controller
 		}
 
 		$this->navigationlib->setElementSessionMenu(
-			$page,
+			'uebersicht',
 			$this->navigationlib->oneLevel(
-				'Home',				// description
+				'Infocenter Übersicht',		// description
 				$homeLink,			// link
 				null,				// children
-				'angle-left',		// icon
+				'info',				// icon
 				null,				// subscriptDescription
 				false,				// expand
 				null,				// subscriptLinkClass
 				null, 				// subscriptLinkValue
 				'', 				// target
-				1   				// sort
+				20   				// sort
 			)
 		);
+
+		if($page == self::REIHUNGSTESTABSOLVIERT_PAGE)
+		{
+			$this->navigationlib->setElementSessionMenu(
+				'freigegeben',
+				$this->navigationlib->oneLevel(
+					'zum RT freigegeben',		// description
+					$freigegebenLink,	// link
+					null,				// children
+					'thumbs-up',		// icon
+					null,				// subscriptDescription
+					false,				// expand
+					null,				// subscriptLinkClass
+					null, 				// subscriptLinkValue
+					'', 				// target
+					30   				// sort
+				)
+			);
+		}
+		if($page == self::FREIGEGEBEN_PAGE)
+		{
+			$this->navigationlib->setElementSessionMenu(
+				'reihungstestAbsolviert',
+				$this->navigationlib->oneLevel(
+					'Reihungstest absolviert',		// description
+					$absolviertLink,	// link
+					null,				// children
+					'check',			// icon
+					null,				// subscriptDescription
+					false,				// expand
+					null,				// subscriptLinkClass
+					null, 				// subscriptLinkValue
+					'', 				// target
+					30   				// sort
+				)
+			);
+		}
 	}
 
 	/**
@@ -986,25 +1024,6 @@ class InfoCenter extends Auth_Controller
 				sprintf(
 					'%s?%s=%s',
 					site_url(self::INFOCENTER_URI),
-					self::FILTER_ID,
-					$filterId
-				)							// link
-			);
-		}
-	}
-
-	/**
-	 * Utility method used to fill elements of the InfoCenter left menu of the freigegeben InfoCenter page
-	 */
-	private function _fillFiltersFreigegeben($filters, &$toFill)
-	{
-		foreach ($filters as $filterId => $description)
-		{
-			$toFill['children'][] = $this->navigationlib->oneLevel(
-				$description,				// description
-				sprintf(
-					'%s?%s=%s',
-					site_url(self::INFOCENTER_URI.'/'.self::FREIGEGEBEN_PAGE),
 					self::FILTER_ID,
 					$filterId
 				)							// link
