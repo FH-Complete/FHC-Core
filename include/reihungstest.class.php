@@ -1386,4 +1386,38 @@ class reihungstest extends basis_db
 			return false;
 		}
 	}
+	
+	/**
+	 * Laedt alle person_ids, die einem Reihungstest zugeteilt sind
+	 * @param integer $reihungstest_id ID des Reihungstests.
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	public function getPersonenReihungstest($reihungstest_id)
+	{
+		$qry = "SELECT
+					person_id
+				FROM
+					public.tbl_rt_person
+				WHERE
+					tbl_rt_person.rt_id=".$this->db_add_param($reihungstest_id)."
+				ORDER BY
+					person_id";
+		if ($result = $this->db_query($qry))
+		{
+			while ($row = $this->db_fetch_object($result))
+			{
+				$obj = new stdClass();
+				
+				$obj->person_id = $row->person_id;
+				
+				$this->result[] = $obj;
+			}
+			return true;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+	}
 }
