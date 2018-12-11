@@ -5,6 +5,7 @@
 	$STUDIENGANG_TYP = '\'b\'';
 	$TAETIGKEIT_KURZBZ = '\'bewerbung\', \'kommunikation\'';
 	$LOGDATA_NAME = '\'Login with code\', \'New application\'';
+	$REJECTED_STATUS = '\'Abgewiesener\'';
 
 	$query = '
 		SELECT
@@ -159,6 +160,12 @@
 							AND pss.bestaetigtam IS NOT NULL
 							AND pss.bewerbung_abgeschicktamum IS NOT NULL
 							AND pss.studiensemester_kurzbz IN (SELECT ss.studiensemester_kurzbz FROM public.tbl_studiensemester ss WHERE ss.ende >= NOW())
+				AND NOT EXISTS (
+					   SELECT 1
+						 FROM tbl_prestudentstatus spss
+						WHERE spss.prestudent_id = ps.prestudent_id
+						  AND spss.status_kurzbz = '.$REJECTED_STATUS.'
+					)
 				)
 			)
 	ORDER BY "LastAction" DESC';
