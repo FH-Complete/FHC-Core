@@ -43,6 +43,7 @@
 				 WHERE pss.status_kurzbz = '.$INTERESSENT_STATUS.'
 				   AND ps.person_id = p.person_id
 				   AND sg.typ IN ('.$STUDIENGANG_TYP.')
+				   AND pss.bestaetigtam is not null
 				   AND pss.studiensemester_kurzbz IN (SELECT ss.studiensemester_kurzbz FROM public.tbl_studiensemester ss WHERE ss.ende >= NOW())
 			  ORDER BY pss.datum DESC, pss.insertamum DESC, pss.ext_id DESC
 				 LIMIT 1
@@ -70,6 +71,12 @@
 				   AND ps.person_id = p.person_id
 				   AND sg.typ IN ('.$STUDIENGANG_TYP.')
 				   AND pss.studiensemester_kurzbz IN (SELECT ss.studiensemester_kurzbz FROM public.tbl_studiensemester ss WHERE ss.ende >= NOW())
+				   AND NOT EXISTS (
+   					   SELECT 1
+   						 FROM tbl_prestudentstatus spss
+   						WHERE spss.prestudent_id = ps.prestudent_id
+   						  AND spss.status_kurzbz = '.$REJECTED_STATUS.'
+   					)
 				 LIMIT 1
 			) AS "AnzahlAbgeschickt",
 			(
