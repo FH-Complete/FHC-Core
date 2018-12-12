@@ -329,8 +329,8 @@ class Messages extends Auth_Controller
 					$this->uid
 				);
 
-				return success($msg->retval);
 			}
+			return success('success');
 		}
 	}
 
