@@ -42,7 +42,7 @@ $prestudent_arr = explode(";",$prestudent_arr);
 
 $db = new basis_db();
 
-echo "<?xml version='1.0' encoding='UTF-8' standalone='yes'?>\n"; 
+echo "<?xml version='1.0' encoding='UTF-8' standalone='yes'?>\n";
 echo "<ausbildungsvertraege>\n";
 
 $uid = isset($uid_arr[1])?$uid_arr[1]:$uid_arr[0];
@@ -56,19 +56,19 @@ if($student_help->load($uid))
 	switch($studiengang->typ)
 	{
 		case 'b':
-			$studTyp = 'Bachelor'; 
-			$titel_kurzbz = 'BSc'; 
-			break; 
-		case 'm': 
-			$studTyp = 'Master'; 
-			$titel_kurzbz ='MSc'; 
-			break; 
+			$studTyp = 'Bachelor';
+			$titel_kurzbz = 'BSc';
+			break;
+		case 'm':
+			$studTyp = 'Master';
+			$titel_kurzbz ='MSc';
+			break;
 		case 'd':
-			$studTyp = 'Diplom'; 
-			break; 
-		default: 
-			$studTyp =''; 
-			$titel_kurzbz = ''; 
+			$studTyp = 'Diplom';
+			break;
+		default:
+			$studTyp ='';
+			$titel_kurzbz = '';
 	}
 
 	$prestudent = new prestudent($student_help->prestudent_id);
@@ -94,8 +94,8 @@ foreach($uid_arr as $uid)
 {
 	if($uid=='')
 		continue;
-		 
-	echo "\t<ausbildungsvertrag>\n"; 
+
+	echo "\t<ausbildungsvertrag>\n";
 
 	$student = new student();
 	if($student->load($uid))
@@ -124,7 +124,7 @@ foreach($uid_arr as $uid)
 		$studiengang_bezeichnung_englisch = empty($studiengangbezeichnung_englisch) ? $studiengang->english : $studiengangbezeichnung_englisch;
 
 		$svnr = ($student->svnr == '')?'Ersatzkennzeichen: '.$student->ersatzkennzeichen:$student->svnr;
-			
+
 		//Wenn Lehrgang, dann Erhalter-KZ vor die Studiengangs-Kz hängen
 		if ($studiengang->studiengang_kz<0)
 		{
@@ -254,7 +254,7 @@ foreach($uid_arr as $uid)
 		else
 			$orgform = $studiengang->orgform_kurzbz;
 		echo "\t\t<orgform>".$orgform."</orgform>\n";
-	} 
+	}
 	echo "\t</ausbildungsvertrag>\n";
 }
 
@@ -309,7 +309,7 @@ foreach($prestudent_arr as $prest_id)
 {
 	if($prest_id=='')
 		continue;
-			
+
 		echo "\t<ausbildungsvertrag>\n";
 
 		$prestudent = new prestudent();
@@ -327,7 +327,7 @@ foreach($prestudent_arr as $prest_id)
 				$lehrgangstyp = new studiengang();
 				$lehrgangstyp->loadLehrgangstyp($studiengang->lgartcode);
 
-				if ($prestudent->getLastStatus($student->prestudent_id, null, 'Student'))
+				if ($prestudent->getLastStatus($prestudent->prestudent_id, null, 'Student'))
 				{
 					$studienplan_id = $prestudent->studienplan_id;
 					$studienordnung = new studienordnung();
@@ -341,18 +341,18 @@ foreach($prestudent_arr as $prest_id)
 				$studiengang_bezeichnung_englisch = empty($studiengangbezeichnung_englisch) ? $studiengang->english : $studiengangbezeichnung_englisch;
 
 				$svnr = ($person->svnr == '')?($person->ersatzkennzeichen != ''?'Ersatzkennzeichen: '.$person->ersatzkennzeichen:''):$person->svnr;
-	
+
 				//Wenn Lehrgang, dann Erhalter-KZ vor die Studiengangs-Kz hängen
 				if ($studiengang->studiengang_kz<0)
 				{
 					$stg = new studiengang();
 					$stg->load($studiengang->studiengang_kz);
-	
+
 					$studiengang_kz = sprintf("%03s", $stg->erhalter_kz).sprintf("%04s", abs($studiengang->studiengang_kz));
 				}
 				else
 					$studiengang_kz = sprintf("%04s", abs($studiengang->studiengang_kz));
-	
+
 					echo "\t\t<quote>1</quote>\n";
 					echo "\t\t<anrede>".$person->anrede."</anrede>\n";
 					echo "\t\t<vorname>".$person->vorname." ".$person->vornamen."</vorname>\n";
@@ -371,25 +371,25 @@ foreach($prestudent_arr as $prest_id)
 					echo "\t\t<studiengangSprache>".$studiengang->sprache."</studiengangSprache>";
 					echo "\t\t<lgartcode>".$lehrgangstyp->lgartcode."</lgartcode>";
 					echo "\t\t<lgartBezeichnung>".$lehrgangstyp->bezeichnung."</lgartBezeichnung>";
-	
+
 					echo "\t\t<aktuellesJahr>".date('Y')."</aktuellesJahr>";
-					
+
 					$prestudent_orgform = new prestudent();
 					$prestudent_orgform->getLastStatus($prest_id, null, null);
-						
+
 					if($prestudent_orgform->orgform_kurzbz!='')
 						$orgform = $prestudent_orgform->orgform_kurzbz;
 					else
 						$orgform = $studiengang->orgform_kurzbz;
-						
+
 					echo "\t\t<orgform>".$orgform."</orgform>\n";
-					
+
 					//Sprache des Studienplans holen
 					$studienplan = new studienplan();
 					$studienplan->loadStudienplan($prestudent_orgform->studienplan_id);
-					
+
 					echo "\t\t<studienplan_sprache>".$studienplan->sprache."</studienplan_sprache>\n";
-					
+
 					// check ob Quereinsteiger
 					$ausbildungssemester = ($prestudent_orgform->ausbildungssemester!='')?$prestudent_orgform->ausbildungssemester:'1';
 					echo "\t\t<semesterStudent>".$ausbildungssemester."</semesterStudent>";
@@ -399,12 +399,12 @@ foreach($prestudent_arr as $prest_id)
 					$studiensemester_beginn = new studiensemester();
 					$studienbeginn = ($prestudent->getFirstStatus($prest_id, 'Student'))?$prestudent->studiensemester_kurzbz:'';
 					$studiensemester_beginn->load($studienbeginn);
-					
+
 					echo "\t\t<studiensemester_beginn>".$studiensemester_beginn->bezeichnung."</studiensemester_beginn>";
-					
+
 					$studiensemester_endedatum = new studiensemester();
 					$studiensemester_endedatum->load($studiensemester_endedatum->getaktorNext(1));
-					
+
 					echo "\t\t<studiensemester_endedatum>".date('d.m.Y',strtotime($studiensemester_endedatum->ende))."</studiensemester_endedatum>";
 
 					switch($studiengang->typ)
@@ -424,28 +424,28 @@ foreach($prestudent_arr as $prest_id)
 							$studTyp ='';
 							$titel_kurzbz = '';
 					}
-	
+
 					echo "\t\t<titel_kurzbz>".$titel_kurzbz."</titel_kurzbz>\n";
 					echo "\t\t<studiengang_typ>".$studTyp."</studiengang_typ>\n";
 					echo "\t\t<studiengang_sprache>".$studiengang->sprache."</studiengang_sprache>\n";
 					echo "\t\t<studiengang_maxsemester>".$studiengang->max_semester."</studiengang_maxsemester>\n";
 					echo "\t\t<studiengang_anzahljahre>".($studiengang->max_semester/2)."</studiengang_anzahljahre>\n";
-					
+
 					//Wenn Quereinsteiger stimmt studiengang_maxsemester nicht mit der tatsaechlichen Ausbildungsdauer ueberein
 					$student_maxsemester = ($studiengang->max_semester-$ausbildungssemester)+1;
 					echo "\t\t<student_maxsemester>".$student_maxsemester."</student_maxsemester>\n";
 					echo "\t\t<student_anzahljahre>".($student_maxsemester/2)."</student_anzahljahre>\n";
-					
+
 					//Bis die Akadgrad-Tabelle an die Studienordnung angepasst ist, wird der Akadgrad hier ermittelt
-					
+
 					$akadgrad_titel = '';
 					$akadgrad_kurzbz = '';
-					
-					$qry = "SELECT * FROM lehre.tbl_akadgrad 
-							WHERE studiengang_kz=".$db->db_add_param($studiengang->studiengang_kz, FHC_INTEGER)." 
+
+					$qry = "SELECT * FROM lehre.tbl_akadgrad
+							WHERE studiengang_kz=".$db->db_add_param($studiengang->studiengang_kz, FHC_INTEGER)."
 							AND (geschlecht=".$db->db_add_param($person->geschlecht, FHC_STRING)." OR geschlecht IS NULL)
 							LIMIT 1";
-					
+
 					if($db->db_query($qry))
 					{
 						if($row = $db->db_fetch_object())
@@ -454,15 +454,15 @@ foreach($prestudent_arr as $prest_id)
 							$akadgrad_kurzbz = $row->akadgrad_kurzbz;
 						}
 					}
-						
+
 					echo "\t\t<akadgrad>".$akadgrad_titel."</akadgrad>\n";
 					echo "\t\t<akadgrad_kurzbz>".$akadgrad_kurzbz."</akadgrad_kurzbz>\n";
-						
+
 					echo "\t\t<datum_aktuell>".$datum_aktuell."</datum_aktuell>\n";
-	
+
 					$adresse = new adresse();
 					$adresse->load_pers($person->person_id);
-						
+
 					foreach($adresse->result as $row_adresse)
 					{
 						if($row_adresse->zustelladresse)
@@ -477,6 +477,6 @@ foreach($prestudent_arr as $prest_id)
 		}
 		echo "\t</ausbildungsvertrag>\n";
 }
-echo "</ausbildungsvertraege>"; 
+echo "</ausbildungsvertraege>";
 
 ?>
