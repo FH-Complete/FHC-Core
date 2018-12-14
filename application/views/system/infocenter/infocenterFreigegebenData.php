@@ -5,6 +5,7 @@
 	$STUDIENGANG_TYP = '\'b\'';
 	$TAETIGKEIT_KURZBZ = '\'bewerbung\', \'kommunikation\'';
 	$LOGDATA_NAME = '\'Login with code\', \'New application\'';
+	$REJECTED_STATUS = '\'Abgewiesener\'';
 
 	$query = '
 		SELECT
@@ -42,6 +43,7 @@
 				 WHERE pss.status_kurzbz = '.$INTERESSENT_STATUS.'
 				   AND ps.person_id = p.person_id
 				   AND sg.typ IN ('.$STUDIENGANG_TYP.')
+				   AND pss.bestaetigtam is not null
 				   AND pss.studiensemester_kurzbz IN (SELECT ss.studiensemester_kurzbz FROM public.tbl_studiensemester ss WHERE ss.ende >= NOW())
 			  ORDER BY pss.datum DESC, pss.insertamum DESC, pss.ext_id DESC
 				 LIMIT 1
@@ -69,13 +71,20 @@
 				   AND ps.person_id = p.person_id
 				   AND sg.typ IN ('.$STUDIENGANG_TYP.')
 				   AND pss.studiensemester_kurzbz IN (SELECT ss.studiensemester_kurzbz FROM public.tbl_studiensemester ss WHERE ss.ende >= NOW())
+				   AND NOT EXISTS (
+   					   SELECT 1
+   						 FROM tbl_prestudentstatus spss
+   						WHERE spss.prestudent_id = ps.prestudent_id
+   						  AND spss.status_kurzbz = '.$REJECTED_STATUS.'
+   					)
 				 LIMIT 1
 			) AS "AnzahlAbgeschickt",
 			(
-				SELECT ARRAY_TO_STRING(ARRAY_AGG(DISTINCT UPPER(sg.typ || sg.kurzbz || \':\' || sg.orgform_kurzbz)), \', \')
+				SELECT ARRAY_TO_STRING(ARRAY_AGG(DISTINCT UPPER(sg.typ || sg.kurzbz || \':\' || sp.orgform_kurzbz)), \', \')
 				  FROM public.tbl_prestudentstatus pss
 				  JOIN public.tbl_prestudent ps USING(prestudent_id)
 				  JOIN public.tbl_studiengang sg USING(studiengang_kz)
+				  JOIN lehre.tbl_studienplan sp USING(studienplan_id)
 				 WHERE pss.status_kurzbz = '.$INTERESSENT_STATUS.'
 				   AND pss.bewerbung_abgeschicktamum IS NOT NULL
 				   AND ps.person_id = p.person_id
@@ -158,6 +167,12 @@
 							AND pss.bestaetigtam IS NOT NULL
 							AND pss.bewerbung_abgeschicktamum IS NOT NULL
 							AND pss.studiensemester_kurzbz IN (SELECT ss.studiensemester_kurzbz FROM public.tbl_studiensemester ss WHERE ss.ende >= NOW())
+				AND NOT EXISTS (
+					   SELECT 1
+						 FROM tbl_prestudentstatus spss
+						WHERE spss.prestudent_id = ps.prestudent_id
+						  AND spss.status_kurzbz = '.$REJECTED_STATUS.'
+					)
 				)
 			)
 	ORDER BY "LastAction" DESC';

@@ -154,6 +154,7 @@ class Notiz_model extends DB_Model
 	{
 		// Join with the table public.tbl_notizzuordnung using notiz_id
 		$this->addJoin('public.tbl_notizzuordnung', 'notiz_id');
+		$this->addOrder('insertamum', 'DESC');
 
 		return $this->loadWhere(array('person_id' => $person_id, 'titel' => $titel));
 	}

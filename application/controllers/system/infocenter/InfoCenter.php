@@ -1390,11 +1390,16 @@ class InfoCenter extends Auth_Controller
 		$interessentbez = $person->geschlecht == 'm' ? 'Ein Interessent' : 'Eine Interessentin';
 		$sprache = $prestudentstatus->sprachedetails->bezeichnung[0];
 		$orgform = $prestudentstatus->orgform != '' ? ' ('.$prestudentstatus->orgform.')' : '';
-		$geschlecht = $person->geschlecht == 'm' ? 'm&auml;nnlich' : 'weiblich';
-		$geburtsdatum = date('d.m.Y', strtotime($person->gebdatum));
-		$zgvort = !isEmptyString($prestudent->zgvort) ? ' in '.$prestudent->zgvort : '';
+		$statusgrund = isset($prestudentstatus->statusgrund_id) ?
+			'<tr>
+				<td><b>Statusgrund</b></td>
+				<td>'.$prestudentstatus->bezeichnung_statusgrund[0].'</td>
+			</tr>' : '';
+		//$geschlecht = $person->geschlecht == 'm' ? 'm&auml;nnlich' : 'weiblich';
+		//$geburtsdatum = date('d.m.Y', strtotime($person->gebdatum));
+		/*$zgvort = !isEmptyString($prestudent->zgvort) ? ' in '.$prestudent->zgvort : '';
 		$zgvnation = !isEmptyString($prestudent->zgvnation_bez) ? ', '.$prestudent->zgvnation_bez : '';
-		$zgvdatum = !isEmptyString($prestudent->zgvdatum) ? ', am '.date_format(date_create($prestudent->zgvdatum), 'd.m.Y') : '';
+		$zgvdatum = !isEmptyString($prestudent->zgvdatum) ? ', am '.date_format(date_create($prestudent->zgvdatum), 'd.m.Y') : '';*/
 
 		$dokumenteNachzureichenMail = $dokumenteMail = array();
 		//convert documents to array so they can be parsed, and keeping only needed fields
@@ -1425,16 +1430,6 @@ class InfoCenter extends Auth_Controller
 		}
 		$notizentext .= '</ul>';
 
-		$mailadresse = '';
-		foreach ($person->kontakte as $kontakt)
-		{
-			if ($kontakt->kontakttyp === 'email')
-			{
-				$mailadresse = $kontakt->kontakt;
-				break;
-			}
-		}
-
 		$data = array
 		(
 			'interessentbez' => $interessentbez,
@@ -1442,20 +1437,21 @@ class InfoCenter extends Auth_Controller
 			'studiengangtypbez' => $prestudent->studiengangtyp_bez,
 			'orgform' => $orgform,
 			'studiensemester' => $prestudentstatus->studiensemester_kurzbz,
+			'ausbildungssemester' => $prestudentstatus->ausbildungssemester,
 			'sprache' => $sprache,
-			'geschlecht' => $geschlecht,
 			'vorname' => $person->vorname,
 			'nachname' => $person->nachname,
-			'gebdatum' => $geburtsdatum,
-			'mailadresse' => $mailadresse,
 			'prestudentid' => $prestudent_id,
-			'zgvbez' => $prestudent->zgv_bez,
+			'statusgrund' => $statusgrund,
+			/*'zgvbez' => $prestudent->zgv_bez,
 			'zgvort' => $zgvort,
 			'zgvdatum' => $zgvdatum,
 			'zgvnation' => $zgvnation,
+			*/
 			'notizentext' => $notizentext,
 			'dokumente' => $dokumenteMail,
-			'dokumente_nachgereicht' => $dokumenteNachzureichenMail
+			'dokumente_nachgereicht' => $dokumenteNachzureichenMail,
+			'persondetailslink' => APP_ROOT.'vilesci/personen/personendetails.php?id='.$person_id
 		);
 
 		$this->load->library('LogLib');

@@ -97,7 +97,10 @@
 				<div class="panel-body">
 					<form method="post"
 						  action="#" class="zgvform">
-						<input type="hidden" name="prestudentid" value="<?php echo $zgvpruefung->prestudent_id  ?>">
+						<input type="hidden" name="prestudentid" value="<?php echo $zgvpruefung->prestudent_id ?>" class="prestudentidinput">
+						<input type="hidden" name="studiensemester" value="<?php echo $studiensemester ?>" id="studiensemester_<?php echo $zgvpruefung->prestudent_id  ?>">
+						<input type="hidden" name="isfreigegeben" class="isfreigegeben"
+							   value="<?php echo isset($zgvpruefung->prestudentstatus->bestaetigtam) && $zgvpruefung->prestudentstatus->status_kurzbz === 'Interessent' && $zgvpruefung->studiengangtyp === 'b' ? 1 : 0 ?>" id="isfreigegeben_<?php echo $zgvpruefung->prestudent_id  ?>">
 						<div class="row">
 							<div class="col-lg-<?php echo $columns[0] ?>">
 								<div class="form-group">
@@ -118,8 +121,7 @@
 							</div>
 							<div class="col-lg-<?php echo $columns[2] ?>">
 								<div class="form-group form-inline">
-									<label style="float: left"><span style="display: inline-block">Ausbildungs</span><span
-											style="display: inline-block">semester:&nbsp;</span></label>
+									<label><?php echo  ucfirst($this->p->t('lehre', 'ausbildungssemester')) . ':' ?></label>
 									<?php if (isset($zgvpruefung->prestudentstatus->ausbildungssemester)): ?>
 										<?php if ($infoonly): ?>
 											<input id="ausbildungssem_<?php echo $zgvpruefung->prestudent_id ?>" value="<?php echo $zgvpruefung->prestudentstatus->ausbildungssemester?>" type="hidden">
@@ -303,7 +305,7 @@
 					?>
 					<div class="panel-footer solidtop">
 						<div class="row">
-							<div class="col-lg-3 text-left">
+							<div class="col-lg-4 text-left">
 								<div class="form-inline">
 									<div class="input-group" id="absgstatusgrselect_<?php echo $zgvpruefung->prestudent_id ?>">
 										<select name="absgstatusgrund"
@@ -374,11 +376,11 @@
 									$disabledTxt = 'Nur Bachelorstudiengänge können freigegeben werden.';;
 								}
 								?>
-							<div class="col-lg-3">
+							<div class="col-lg-8 text-right">
 								<div class="form-inline">
 									<div class="input-group frgstatusgrselect" id="frgstatusgrselect_<?php echo $zgvpruefung->prestudent_id ?>">
 										<select name="frgstatusgrund"
-												class="d-inline float-right input-sm"
+												class="d-inline float-right"
 												<?php echo $disabled ?>
 												required>
 											<option value="null"
@@ -389,19 +391,19 @@
 											<?php endforeach ?>
 										</select>
 										<span class="input-group-btn">
-											<button class="btn btn-sm freigabebtnstg" <?php echo $disabled ?> id="freigabebtnstg_<?php echo $zgvpruefung->prestudent_id ?>"
+											<button class="btn btn-default freigabebtnstg" <?php echo $disabled ?> id="freigabebtnstg_<?php echo $zgvpruefung->prestudent_id ?>"
 													data-toggle="tooltip" title="<?php echo $disabledTxt ?>">
 												<?php echo  $this->p->t('ui', 'freigabeAnStudiengang') ?>
 											</button>
 										</span>
 									</div>
+									<div class="input-group" id="igrfrgbtn">
+										<button type="button" id="freigabebtn_<?php echo $zgvpruefung->prestudent_id ?>" class="btn btn-default freigabebtn" <?php echo $disabled ?>
+												data-toggle="tooltip" title="<?php echo $disabledTxt ?>">
+											<?php echo  $this->p->t('ui', 'freigabeZumReihungstest') ?>
+										</button>
+									</div>
 								</div>
-							</div>
-							<div class="col-lg-6 text-right">
-									<button type="button" id="freigabebtn_<?php echo $zgvpruefung->prestudent_id ?>" class="btn btn-default freigabebtn" <?php echo $disabled ?>
-											data-toggle="tooltip" title="<?php echo $disabledTxt ?>">
-										<?php echo  $this->p->t('ui', 'freigabeZumReihungstest') ?>
-									</button>
 							</div>
 							<div class="modal fade freigabeModal" id="freigabeModal_<?php echo $zgvpruefung->prestudent_id ?>" tabindex="-1"
 								 role="dialog"

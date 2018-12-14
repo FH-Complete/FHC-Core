@@ -312,6 +312,8 @@ class FilterWidget extends Widget
 					{
 						$this->_formatDataset($dataset); // marks rows using markRow and format rowns using formatRow
 
+						$this->load->model('system/Filters_model', 'FiltersModel');
+
 						// Set the new dataset and its attributes in the session
 						$this->filterslib->setElementSession(FiltersLib::SESSION_METADATA, $this->FiltersModel->getExecutedQueryMetaData());
 						$this->filterslib->setElementSession(FiltersLib::SESSION_ROW_NUMBER, count($dataset->retval));
@@ -349,6 +351,8 @@ class FilterWidget extends Widget
 				if (!isError($dataset))
 				{
 					$this->_formatDataset($dataset); // marks rows using markRow and format rowns using formatRow
+
+					$this->load->model('system/Filters_model', 'FiltersModel');
 
 					// Stores an array that contains all the data useful for
 					$this->filterslib->setSession(
