@@ -37,22 +37,21 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<link rel="stylesheet" href="../../../skin/fhcomplete.css" type="text/css"/>
-	<link rel="stylesheet" href="../../../skin/style.css.php" rel="stylesheet" type="text/css">
-	<link rel="stylesheet" href="../../../skin/tablesort.css" type="text/css"/>
-	<link rel="stylesheet" href="../../../skin/jquery.css" type="text/css"/>
-	<link rel="stylesheet" type="text/css" href="../../../skin/jquery-ui-1.9.2.custom.min.css">
-<script type="text/javascript" src="../../../vendor/jquery/jqueryV1/jquery-1.12.4.min.js"></script>
-<script type="text/javascript" src="../../../vendor/christianbach/tablesorter/jquery.tablesorter.min.js"></script>
-<script type="text/javascript" src="../../../vendor/components/jqueryui/jquery-ui.min.js"></script>
-<script type="text/javascript" src="../../../include/js/jquery.ui.datepicker.translation.js"></script>
-<script type="text/javascript" src="../../../vendor/jquery/sizzle/sizzle.js"></script> 
+	<link rel="stylesheet" href="../../../skin/style.css.php" rel="stylesheet" type="text/css">';
+
+	include('../../../include/meta/jquery.php');
+	include('../../../include/meta/jquery-tablesorter.php');
+
+	echo '
 	<title>',$p->t('tools/ampelsystem'),'</title>
-	
+
 	<script type="text/javascript">
 	$(document).ready(function() 
 	{ 
-	    $("#myTable").tablesorter(
+		$("#myTable").tablesorter(
 		{
+			imgAttr: "alt",
+			headers: {0 : { sorter: "image" }},
 			sortList: [[0,1],[1,0],[2,0]],
 			widgets: [\'zebra\']
 		}); 
@@ -169,10 +168,10 @@ $ampel = new ampel();
 if(!$ampel->loadAmpelMitarbeiter($oe_arr, $ampel_id))
 	die('Fehler:'.$ampel->errormsg);
 
-if($ampel_id!='')
+if($ampel_id != '')
 {
 	$ampel_aktuell = new ampel($ampel_id);
-	echo $ampel_aktuell->beschreibung[$sprache];
+	echo '<div style="padding: 10px; border: 1px solid #ccc; border-radius: 5px; background-color: #efefef"><h3>Ampeltext:</h3>'.$ampel_aktuell->beschreibung[$sprache].'</div>';
 }
 
 echo '
@@ -192,7 +191,9 @@ echo '	</tr>
 	</thead>
 	<tbody>
 ';
-
+$anzahlRot = 0;
+$anzahlGelb = 0;
+$anzahlGruen = 0;
 foreach($ampel->result as $row)
 {
 	$ts_deadline = $datum_obj->mktime_fromdate($row->deadline);
@@ -201,11 +202,17 @@ foreach($ampel->result as $row)
 	$ts_now = $datum_obj->mktime_fromdate(date('Y-m-d'));
 	
 	if($ts_vorlaufzeit<=$ts_now && $ts_now<=$ts_deadline)
+	{
 		$ampelstatus='gelb';
+	}
 	elseif($ts_now>$ts_deadline)
+	{
 		$ampelstatus='rot';
+	}
 	elseif($ts_now<$ts_deadline && $ts_vorlaufzeit>=$ts_now)
+	{
 		$ampelstatus='gruen';
+	}
 	
 	//if($bestaetigt = $ampel->isBestaetigt($user,$row->ampel_id))
 	//	$ampelstatus='';
@@ -222,16 +229,20 @@ foreach($ampel->result as $row)
 	switch($ampelstatus)
 	{
 		case 'rot':
-			$status= '<img name="C" src="../../../skin/images/ampel_rot.png">';
+			$status= '<img alt="C" src="../../../skin/images/ampel_rot.png">';
+			$anzahlRot++;
 			break;
 		case 'gelb':
-			$status= '<img name="B" src="../../../skin/images/ampel_gelb.png">';
+			$status= '<img alt="B" src="../../../skin/images/ampel_gelb.png">';
+			$anzahlGelb++;
 			break;
 		case 'gruen':
-			$status= '<img name="B" src="../../../skin/images/ampel_gruen.png">';
+			$status= '<img alt="B" src="../../../skin/images/ampel_gruen.png">';
+			$anzahlGruen++;
 			break;
 		default:
-			$status= '<img name="A" src="../../../skin/images/ampel_gruen.png">';
+			$status= '<img alt="A" src="../../../skin/images/ampel_gruen.png">';
+			$anzahlGruen++;
 			break;
 	}
 	echo $status;
@@ -242,7 +253,8 @@ foreach($ampel->result as $row)
 		//$beschreibung = $row->beschreibung[DEFAULT_LANGUAGE];
 	echo '<td>'.$beschreibung.'</td>';
 	
-	$name = $row->titelpre.' '.$row->vorname.' '.$row->nachname.' '.$row->titelpost;
+	//$name = $row->titelpre.' '.$row->vorname.' '.$row->nachname.' '.$row->titelpost;
+	$name = $row->nachname.' '.$row->vorname.($row->titelpre != '' || $row->titelpost !='' ? ' ('.$row->titelpre.' '.$row->titelpost.')' : '');
 	echo '<td>'.$name.'</td>';
 	$institut = $row->oe_kurzbz;
 	echo '<td>'.$institut.'</td>';
@@ -268,7 +280,10 @@ foreach($ampel->result as $row)
 	echo '</tr>';
 }
 echo '</tbody></table>';
-
+echo '<br>';
+echo 'Anzahl rot: '.$anzahlRot.'<br>';
+echo 'Anzahl gelb: '.$anzahlGelb.'<br>';
+echo 'Anzahl grün: '.$anzahlGruen.'<br>';
 echo '</body>
 </html>';
 ?>
