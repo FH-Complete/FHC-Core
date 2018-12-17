@@ -110,7 +110,7 @@
 			ORDER BY datum desc
 		) data
 		",
-		'requiredPermissions' => 'admin',
+		'requiredPermissions' => 'infocenter',
 		'additionalColumns' => array('Details'),
 		'columnsAliases' => array(
 			'ReihungstestID',
