@@ -39,6 +39,15 @@
 				 LIMIT 1
 			) AS "LastAction",
 			(
+				SELECT l.taetigkeit_kurzbz
+				  FROM system.tbl_log l
+				 WHERE l.taetigkeit_kurzbz IN('.$TAETIGKEIT_KURZBZ.')
+				   AND l.logdata->>\'name\' NOT IN ('.$LOGDATA_NAME.')
+				   AND l.person_id = p.person_id
+			  ORDER BY l.zeitpunkt DESC
+				 LIMIT 1
+			) AS "LastActionType",
+			(
 				SELECT l.insertvon
 				  FROM system.tbl_log l
 				 WHERE l.taetigkeit_kurzbz IN ('.$TAETIGKEIT_KURZBZ.')
@@ -237,6 +246,7 @@
 			ucfirst($this->p->t('global', 'gesperrtVon')),
 			ucfirst($this->p->t('global', 'parkdatum')),
 			ucfirst($this->p->t('global', 'letzteAktion')),
+			'Aktionstyp',
 			ucfirst($this->p->t('global', 'letzterBearbeiter')),
 			ucfirst($this->p->t('lehre', 'studiensemester')),
 			ucfirst($this->p->t('global', 'gesendetAm')),

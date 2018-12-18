@@ -253,8 +253,8 @@ $filters = array(
 		'dataset_name' => 'freigegeben',
 		'filter_kurzbz' => 'InfoCenterFreigegeben5days',
 		'description' => '{"5 Tage Letzte Aktion"}',
-		'sort' => 1,
-		'default_filter' => true,
+		'sort' => 2,
+		'default_filter' => false,
 		'filter' => '
 			{
 				"name": "Freigegeben - 5 Tage Letzte Aktion",
@@ -288,8 +288,8 @@ $filters = array(
 		'dataset_name' => 'freigegeben',
 		'filter_kurzbz' => 'InfoCenterFreigegebenAlle',
 		'description' => '{Alle}',
-		'sort' => 2,
-		'default_filter' => false,
+		'sort' => 1,
+		'default_filter' => true,
 		'filter' => '
 			{
 				"name": "Freigegeben - Alle",
@@ -298,9 +298,12 @@ $filters = array(
 					{"name": "Nachname"},
 					{"name": "StgAbgeschickt"},
 					{"name": "LastAction"},
+					{"name": "LastActionType"},
 					{"name": "User/Operator"},
 					{"name": "LockUser"},
-					{"name": "Statusgrund"}
+					{"name": "Statusgrund"},
+					{"name": "Studiensemester"},
+					{"name": "ReihungstestApplied"}
 				],
 				"filters": [
 					{
@@ -347,9 +350,12 @@ $filters = array(
 				"columns": [
 					{"name": "fakultaet"},
 					{"name": "datum"},
+					{"name": "uhrzeit"},
 					{"name": "oeffentlich"},
 					{"name": "studiengaenge"},
-					{"name": "freie_plaetze"}
+					{"name": "freie_plaetze"},
+					{"name": "anzahl_angemeldet"},
+					{"name": "rt_studiengang"}
 				],
 				"filters": []
 			}
@@ -361,8 +367,8 @@ $filters = array(
 		'dataset_name' => 'reihungstestAbsolviert',
 		'filter_kurzbz' => 'InfoCenterReihungstestAbsolviert5days',
 		'description' => '{"Letzten 5 Tage"}',
-		'sort' => 1,
-		'default_filter' => true,
+		'sort' => 2,
+		'default_filter' => false,
 		'filter' => '
 			{
 				"name": "Reihungstest absolviert - Letzten 5 Tage",
@@ -395,8 +401,8 @@ $filters = array(
 		'dataset_name' => 'reihungstestAbsolviert',
 		'filter_kurzbz' => 'InfoCenterReihungstestAbsolviertAlle',
 		'description' => '{Alle}',
-		'sort' => 2,
-		'default_filter' => false,
+		'sort' => 1,
+		'default_filter' => true,
 		'filter' => '
 			{
 				"name": "Reihungstest absolviert - Alle",

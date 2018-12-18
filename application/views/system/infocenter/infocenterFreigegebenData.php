@@ -27,6 +27,15 @@
 				 LIMIT 1
 			) AS "LastAction",
 			(
+				SELECT l.taetigkeit_kurzbz
+				  FROM system.tbl_log l
+				 WHERE l.taetigkeit_kurzbz IN('.$TAETIGKEIT_KURZBZ.')
+				   AND l.logdata->>\'name\' NOT IN ('.$LOGDATA_NAME.')
+				   AND l.person_id = p.person_id
+			  ORDER BY l.zeitpunkt DESC
+				 LIMIT 1
+			) AS "LastActionType",
+			(
 				SELECT l.insertvon
 				  FROM system.tbl_log l
 				 WHERE l.taetigkeit_kurzbz IN('.$TAETIGKEIT_KURZBZ.')
@@ -181,7 +190,6 @@
 		'query' => $query,
 		'app' => InfoCenter::APP,
 		'datasetName' => 'freigegeben',
-		'filterKurzbz' => 'InfoCenterFreigegeben5days',
 		'filter_id' => $this->input->get('filter_id'),
 		'requiredPermissions' => 'infocenter',
 		'checkboxes' => 'PersonId',
@@ -196,6 +204,7 @@
 			'Sperrdatum',
 			'GesperrtVon',
 			'Letzte Aktion',
+			'Aktionstyp',
 			'Letzter Bearbeiter',
 			'StSem',
 			'GesendetAm',
@@ -278,7 +287,6 @@
 			{
 				$datasetRaw->{'ReihungstestApplied'} = 'Nein';
 			}
-
 			if ($datasetRaw->{'ZGVNation'} == null)
 			{
 				$datasetRaw->{'ZGVNation'} = '-';

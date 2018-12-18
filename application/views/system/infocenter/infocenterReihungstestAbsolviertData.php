@@ -184,7 +184,6 @@
 		'query' => $query,
 		'app' => InfoCenter::APP,
 		'datasetName' => 'reihungstestAbsolviert',
-		'filterKurzbz' => 'InfoCenterReihungstestAbsolviert5days',
 		'filter_id' => $this->input->get('filter_id'),
 		'requiredPermissions' => 'infocenter',
 		'checkboxes' => 'PersonId',

@@ -28,7 +28,7 @@
 				/* Plaetze aus Termin oder zugeteilten Raeumen minus Schwund */
 				COALESCE(
 					max_teilnehmer,
-					(SELECT sum(arbeitsplaetze) - ceil(sum(arbeitsplaetze)/100.0*".$schwund.")
+					(SELECT sum(arbeitsplaetze) - sum(ceil(arbeitsplaetze/100.0*".$schwund."))
 					FROM
 						public.tbl_rt_ort
 						JOIN public.tbl_ort ON(tbl_rt_ort.ort_kurzbz=tbl_ort.ort_kurzbz)
