@@ -29,11 +29,10 @@ $uid = get_uid();
 $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($uid);
 
-if(!$rechte->isBerechtigt('basis/vilesci'))
+if(!$rechte->isBerechtigt('basis/fas'))
 	die('Sie haben keine Berechtigung für diese Seite');
 
-$oes = $rechte->getOEkurzbz();
-
+$oes = $rechte->getOEkurzbz('assistenz');
 $oe=new organisationseinheit();
 $oe->loadArray($oes, 'bezeichnung, organisationseinheittyp_kurzbz', true);
 
@@ -41,7 +40,7 @@ $oRdf = new rdf('OE','http://www.technikum-wien.at/organisationseinheit');
 $oRdf->sendHeader();
 
 foreach($oe->result as $row)
-{	
+{
 	if($row->lehre)
 	{
 		$i=$oRdf->newObjekt($row->oe_kurzbz);
@@ -49,7 +48,7 @@ foreach($oe->result as $row)
 		$oRdf->obj[$i]->setAttribut('bezeichnung',$row->bezeichnung,true);
 		$oRdf->obj[$i]->setAttribut('typ',$row->organisationseinheittyp_kurzbz,true);
 		$oRdf->obj[$i]->setAttribut('uid','',true);
-	
+
 		$oRdf->addSequence($row->oe_kurzbz);
 	}
 }
