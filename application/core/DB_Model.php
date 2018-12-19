@@ -42,6 +42,8 @@ class DB_Model extends FHC_Model
 		// Loads DB conns and confs
 		$this->load->database($dbtype);
 
+		$this->load->model('system/UDF_model', 'UDFModel');
+
 		// Loads the UDF library
 		$this->load->library('UDFLib');
 		// Loads the logs library
@@ -681,7 +683,16 @@ class DB_Model extends FHC_Model
 	 */
 	public function hasUDF()
 	{
-		return $this->fieldExists(UDFLib::COLUMN_NAME);
+		if($this->fieldExists(UDFLib::COLUMN_NAME))
+		{
+			$resultUDFsDefinitions = $this->UDFModel->getUDFsDefinitions($this->dbTable);
+			if (hasData($resultUDFsDefinitions))
+				return true;
+			else
+				return false;
+		}
+		else
+			return false;
 	}
 
 	/**
