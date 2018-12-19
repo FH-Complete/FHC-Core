@@ -595,7 +595,7 @@ elseif ($aktion=='lva_stpl_del_multi' || $aktion=='lva_stpl_del_single')
 {
 	if($rechte->isBerechtigt('lehre/lvplan',null,'uid'))
 	{
-		$result_semester = $db->db_query("SELECT start,ende FROM public.tbl_studiensemester WHERE studiensemester_kurzbz='".addslashes($semester_aktuell)."';");
+		$result_semester = $db->db_query("SELECT start,ende FROM public.tbl_studiensemester WHERE studiensemester_kurzbz=".$db->db_add_param($semester_aktuell).";");
 		if ($db->db_num_rows()>0)
 		{
 			$start=date('Y-m-d',$datum);
@@ -643,7 +643,7 @@ if (!isset($semesterplan) || !$semesterplan)
 	$begin=$ende=$datum;
 else
 {
-	$db->db_query("SELECT start,ende FROM public.tbl_studiensemester WHERE studiensemester_kurzbz='".addslashes($semester_aktuell)."';");
+	$db->db_query("SELECT start,ende FROM public.tbl_studiensemester WHERE studiensemester_kurzbz=".$db->db_add_param($semester_aktuell).";");
 	if ($db->db_num_rows()>0)
 	{
 		$row = $db->db_fetch_object();
