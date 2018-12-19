@@ -209,7 +209,7 @@ class bisverwendung extends basis_db
 			$hauptberuflich = $this->db_add_param($this->hauptberuflich, FHC_BOOLEAN);
 		else
 			$hauptberuflich = 'null';
-		
+
 		if(is_bool($this->zeitaufzeichnungspflichtig))
 		{
 			$zeitaufzeichnungspflichtig = $this->db_add_param($this->zeitaufzeichnungspflichtig, FHC_BOOLEAN);
@@ -218,7 +218,7 @@ class bisverwendung extends basis_db
 		{
 			$zeitaufzeichnungspflichtig = 'null';
 		}
-		
+
 		if($new)
 		{
 			//Neuen Datensatz anlegen
@@ -266,7 +266,7 @@ class bisverwendung extends basis_db
 				  " insertvon=".$this->db_add_param($this->insertvon).",".
 				  " dv_art=".$this->db_add_param($this->dv_art).",".
 				  " inkludierte_lehre=".$this->db_add_param($this->inkludierte_lehre).",".
-				  " zeitaufzeichnungspflichtig=". $zeitaufzeichnungspflichtig. 
+				  " zeitaufzeichnungspflichtig=". $zeitaufzeichnungspflichtig.
 				  " WHERE bisverwendung_id=".$this->db_add_param($this->bisverwendung_id, FHC_INTEGER);
 		}
 
@@ -406,6 +406,64 @@ class bisverwendung extends basis_db
 				$obj->hauptberufcode = $row->hauptberufcode;
                 $obj->hauptberuflich = $this->db_parse_bool($row->hauptberuflich);
                 $obj->habilitation = $this->db_parse_bool($row->habilitation);
+				$obj->beginn = $row->beginn;
+				$obj->ende = $row->ende;
+				$obj->updatevon = $row->updatevon;
+				$obj->updateamum = $row->updateamum;
+				$obj->insertamum = $row->insertamum;
+				$obj->insertvon = $row->insertvon;
+				$obj->vertragsstunden = $row->vertragsstunden;
+				$obj->dv_art = $row->dv_art;
+				$obj->inkludierte_lehre = $row->inkludierte_lehre;
+				$obj->zeitaufzeichnungspflichtig = $this->db_parse_bool($row->zeitaufzeichnungspflichtig);
+
+				$this->result[] = $obj;
+			}
+			return true;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler bei der Datenbankabfrage';
+			return false;
+		}
+	}
+
+	/**
+	 * Laedt alle Verwendungen eines Mitarbeiters deren Datumsbereich das Monat einschliesst
+	 * @param $uid UID des Mitarbeiters
+	 * @param $datum Monat in dem die Verwendung liegen soll
+	 * @return true wenn ok, false wenn Fehler
+	 */
+	public function getVerwendungDatumMonat($uid, $datum)
+	{
+		$datum_obj = new datum();
+
+		$qry = "SELECT
+					*
+				FROM
+					bis.tbl_bisverwendung
+				WHERE
+					 mitarbeiter_uid=".$this->db_add_param($uid)."
+					 AND ((beginn<=".$this->db_add_param($datum_obj->formatDatum($datum,'Y-m-d'))." OR beginn is null)
+					 AND (ende>=".$this->db_add_param($datum_obj->formatDatum($datum,'Y-m-d'))." OR ende is null)
+					 or  (EXTRACT(MONTH FROM Date ".$this->db_add_param($datum_obj->formatDatum($datum,'Y-m-d')).") = EXTRACT(MONTH FROM ende) and EXTRACT(Year FROM Date ".$this->db_add_param($datum_obj->formatDatum($datum,'Y-m-d')).") = EXTRACT(Year FROM ende)))
+				ORDER BY ende desc;";
+
+		if($this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object())
+			{
+				$obj = new bisverwendung();
+
+				$obj->bisverwendung_id = $row->bisverwendung_id;
+				$obj->ba1code = $row->ba1code;
+				$obj->ba2code = $row->ba2code;
+				$obj->beschausmasscode = $row->beschausmasscode;
+				$obj->verwendung_code = $row->verwendung_code;
+				$obj->mitarbeiter_uid = $row->mitarbeiter_uid;
+				$obj->hauptberufcode = $row->hauptberufcode;
+				$obj->hauptberuflich = $this->db_parse_bool($row->hauptberuflich);
+				$obj->habilitation = $this->db_parse_bool($row->habilitation);
 				$obj->beginn = $row->beginn;
 				$obj->ende = $row->ende;
 				$obj->updatevon = $row->updatevon;
