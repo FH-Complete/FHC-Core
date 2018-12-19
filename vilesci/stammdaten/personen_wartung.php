@@ -207,14 +207,14 @@ if (isset($personToDelete) && isset($personToKeep) && $personToDelete >= 0 && $p
 				elseif ($personToDelete_obj->foto != '' && $personToKeep_obj->foto != '')
 				{
 					$akte1 = new akte();
-					$akte1->getAkten($personToDelete, 'Lichtbil');
+					$akte1->getAkten($personToDelete, 'Lichtbil', null, null, true);
 					if (isset($akte1->result[0]->insertamum))
 						$insertamum1 = $akte1->result[0]->insertamum;
 					else
 						$insertamum1 = 0;
 
 					$akte2 = new akte();
-					$akte2->getAkten($personToKeep, 'Lichtbil');
+					$akte2->getAkten($personToKeep, 'Lichtbil', null, null, true);
 					if (isset($akte2->result[0]->insertamum))
 						$insertamum2 = $akte2->result[0]->insertamum;
 					else
