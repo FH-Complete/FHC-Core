@@ -75,7 +75,8 @@ SELECT DISTINCT ON (matrikelnr) matrikelnr AS personenkennzeichen,
 	(SELECT plz FROM public.tbl_adresse WHERE person_id=public.tbl_person.person_id ORDER BY heimatadresse desc LIMIT 1) AS heimat_plz,
 	(SELECT gemeinde FROM public.tbl_adresse WHERE person_id=public.tbl_person.person_id ORDER BY heimatadresse desc LIMIT 1) AS heimat_ort,
 	(SELECT strasse FROM public.tbl_adresse WHERE person_id=public.tbl_person.person_id ORDER BY heimatadresse desc LIMIT 1) AS heimat_strasse,
-	tbl_person.person_id
+	tbl_person.person_id,
+	tbl_person.bpk
 FROM public.tbl_person
 	JOIN public.tbl_konto as ka using(person_id)
 	JOIN public.tbl_konto as kb using(person_id)
@@ -123,6 +124,25 @@ if($result = $db->db_query($qry))
 		else
 			$studiengang_kz[] = sprintf('%1$04d',$row->studiengang_kz);
 
+		/* Spaltenbeschreibung:
+		 0. Code der Bildungseinrichtung
+		 1. Name der Bildungseinrichtung
+		 2. bildungseinrichtungsspezifisches Personenkennzeichen oder Matrikelnummer
+		 3. SVNR oder Ersatzkennzeichen
+		 4. Geburtsdatum
+		 5. Familienname
+		 6. Vorname
+		 7. Studiencodes (durch Semikolon getrennt falls mehrere)
+		 8. Plz (Anschrift am Studienort)
+		 9. Ort (Anschrift am Studienort)
+		 10. Strasse und Hausnummer (Anschrift am Studienort)
+		 11. Plz (Anschrift am Heimatort)
+		 12. Ort (Anschrift am Heimatort)
+		 13. Strasse und Hausnummer (Anschrift am Heimatort)
+		 14. E-Mail
+		 15. bPK BF
+		*/
+
 		$data_row = array(
 			sprintf('%1$03d',$erhalter_row->erhalter_kz),
 			$erhalter_row->bezeichnung,
@@ -139,7 +159,8 @@ if($result = $db->db_query($qry))
 			$row->heimat_plz,
 			$row->heimat_ort,
 			$row->heimat_strasse,
-			$row->student_uid.'@'.DOMAIN
+			$row->student_uid.'@'.DOMAIN,
+			$row->bpk
 			);
 
 	}
@@ -148,4 +169,3 @@ if($result = $db->db_query($qry))
 
 	echo implode('|',$data_row)."|\r\n";
 }
-
