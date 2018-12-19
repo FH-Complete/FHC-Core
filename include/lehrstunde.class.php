@@ -302,6 +302,10 @@ class lehrstunde extends basis_db
 		// Personendaten
 		if ($type=='student')
 		{
+			if(defined('LVPLAN_LOAD_UEBER_SEMESTERHAELFTE') && LVPLAN_LOAD_UEBER_SEMESTERHAELFTE === true)
+				$lvplan_load_ueber_semesterhaelfte = true;
+			else
+				$lvplan_load_ueber_semesterhaelfte = false;
 			// Bei Studierenden wird das passende Studiensemester ermittelt und das dazupassende
 			// naechstliegende Dadurch wird sichergestellt, dass Einheiten aus den Vorsemestern
 			// zB fuer Nachpruefungen oder Einheiten aus den Folgesemestern die vorgezogen werden
@@ -310,16 +314,34 @@ class lehrstunde extends basis_db
 			{
 				$studiensemester_obj = new studiensemester();
 				$this->ss = $studiensemester_obj->getSemesterFromDatum($datum_von,true);
-				$this->ssnext = $studiensemester_obj->getNearestTo($this->ss,$datum_von);
+
+				if($lvplan_load_ueber_semesterhaelfte)
+				{
+					$this->ssnext = $studiensemester_obj->getNextFrom($this->ss);
+					$this->ssprev = $studiensemester_obj->getPreviousFrom($this->ss);
+				}
+				else
+					$this->ssnext = $studiensemester_obj->getNearestTo($this->ss,$datum_von);
 			}
 			if(!isset($this->ssnext))
 				$this->ssnext = $this->ss;
 
-			// Lehrverbandszuordnungen der betreffenden Studiensemester laden
-			$sql_query="SELECT studiengang_kz, semester, verband, gruppe
-				FROM public.tbl_studentlehrverband
-				WHERE student_uid=".$this->db_add_param($uid)."
-				AND studiensemester_kurzbz in(".$this->db_add_param($this->ss).",".$this->db_add_param($this->ssnext).")";
+			if($lvplan_load_ueber_semesterhaelfte)
+			{
+				$sql_query="SELECT studiengang_kz, semester, verband, gruppe
+					FROM public.tbl_studentlehrverband
+					WHERE student_uid=".$this->db_add_param($uid)."
+					AND studiensemester_kurzbz in(".$this->db_add_param($this->ss).",".$this->db_add_param($this->ssnext).",".$this->db_add_param($this->ssprev).")
+					order by semester desc limit 2";
+			}
+			else
+			{
+				// Lehrverbandszuordnungen der betreffenden Studiensemester laden
+				$sql_query="SELECT studiengang_kz, semester, verband, gruppe
+					FROM public.tbl_studentlehrverband
+					WHERE student_uid=".$this->db_add_param($uid)."
+					AND studiensemester_kurzbz in(".$this->db_add_param($this->ss).",".$this->db_add_param($this->ssnext).")";
+			}
 
 			$verbaende=array();
 			if($this->db_query($sql_query))
@@ -342,15 +364,31 @@ class lehrstunde extends basis_db
 				return -2;
 			}
 			// Spezialgruppen ermitteln zu denen die Person zugeteilt ist
-			$sql_query="SELECT
-					gruppe_kurzbz
-				FROM
-					public.tbl_benutzergruppe
-				WHERE
-					uid=".$this->db_add_param($uid)."
-					AND (studiensemester_kurzbz=".$this->db_add_param($this->ss)."
-						OR studiensemester_kurzbz=".$this->db_add_param($this->ssnext)."
-						OR studiensemester_kurzbz IS NULL)";
+			if($lvplan_load_ueber_semesterhaelfte)
+			{
+				$sql_query="SELECT
+						gruppe_kurzbz
+					FROM
+						public.tbl_benutzergruppe
+					WHERE
+						uid=".$this->db_add_param($uid)."
+						AND (studiensemester_kurzbz=".$this->db_add_param($this->ss)."
+							OR studiensemester_kurzbz=".$this->db_add_param($this->ssnext)."
+							OR studiensemester_kurzbz=".$this->db_add_param($this->ssprev)."
+							OR studiensemester_kurzbz IS NULL)";
+			}
+			else
+			{
+				$sql_query="SELECT
+						gruppe_kurzbz
+					FROM
+						public.tbl_benutzergruppe
+					WHERE
+						uid=".$this->db_add_param($uid)."
+						AND (studiensemester_kurzbz=".$this->db_add_param($this->ss)."
+							OR studiensemester_kurzbz=".$this->db_add_param($this->ssnext)."
+							OR studiensemester_kurzbz IS NULL)";
+			}
 
 			if (!$result_einheit=$this->db_query($sql_query))
 			{
@@ -381,7 +419,7 @@ class lehrstunde extends basis_db
 							AND (studiensemester_kurzbz=".$this->db_add_param($this->ss)."
 								OR studiensemester_kurzbz=".$this->db_add_param($this->ssnext)."
 								OR studiensemester_kurzbz IS NULL)";
-			
+
 			if (!$result_einheit=$this->db_query($sql_query))
 			{
 				$this->errormsg=$this->db_last_error($this->conn);
