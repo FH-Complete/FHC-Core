@@ -105,8 +105,8 @@ $filters = array(
 					{"name": "Nation"},
 					{"name": "LastAction"},
 					{"name": "User/Operator"},
-					{"name": "LockUser"
-					},
+					{"name": "LastActionType"},
+					{"name": "LockUser"},
 					{"name": "StgNichtAbgeschickt"},
 					{"name": "StgAbgeschickt"},
 					{"name": "StgAktiv"},
