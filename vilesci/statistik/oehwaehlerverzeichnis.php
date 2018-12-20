@@ -108,7 +108,7 @@ if($result = $db->db_query($qry))
 			// Personen die in mehreren Studiengaengen gleichzeitig studieren werden nur einmal in die Liste aufgenommen
 			// dabei werden beide Personenkennzeichen und Studiengangskennzahlen mit ; getrennt
 			$data_row[2]=implode(';',$personenkennzeichen);
-			$data_row[8]=implode(';',$studiengang_kz);
+			$data_row[7]=implode(';',$studiengang_kz);
 
 			echo implode('|',$data_row)."|\r\n";
 			$data_row = array();
@@ -151,7 +151,6 @@ if($result = $db->db_query($qry))
 			$datum_obj->formatDatum($row->gebdatum,'Ymd'),
 			$row->nachname,
 			$row->vorname,
-			($row->geschlecht=='m'?'M':($row->geschlecht=='w'?'W':'X')),
 			null,
 			$row->zustell_plz,
 			$row->zustell_ort,
@@ -165,7 +164,7 @@ if($result = $db->db_query($qry))
 
 	}
 	$data_row[2]=implode(';',$personenkennzeichen);
-	$data_row[8]=implode(';',$studiengang_kz);
+	$data_row[7]=implode(';',$studiengang_kz);
 
 	echo implode('|',$data_row)."|\r\n";
 }
