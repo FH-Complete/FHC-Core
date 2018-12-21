@@ -20,7 +20,7 @@
 
 /*
  * Dieses Skript durchläuft alle Dateien vom Typ .sql im Ordner system/sql.
- * Wenn von diesen SQLs Datensätze retourniert werden oder Fehler auftreten, werden diese in ein Mail gepackt und an MAIL_ADMIN geschickt.
+ * Wenn von diesen SQLs Datensätze retourniert werden (die nicht NULL sind) oder Fehler auftreten, werden diese in ein Mail gepackt und an MAIL_ADMIN geschickt.
  */
 
 require_once('../config/global.config.inc.php');
@@ -90,7 +90,7 @@ if (($files = glob($slq_import_path.'/*.sql')) != false)
 			$sql = $sql .= '; ';
 
 		// Wenn Fehler auftritt, diesen ins Mail schreiben
-		if (! $result = $db->db_query ($sql))
+		if (! @$result = $db->db_query ($sql))
 		{
 			$mailcontent .= '<h3>Die Abfrage der Datei "'.$filename.'" hat folgenden Fehler geliefert:</h3>';
 			$mailcontent .= '<span class="error">'.$db->db_last_error () . '</span><br>';
@@ -98,8 +98,8 @@ if (($files = glob($slq_import_path.'/*.sql')) != false)
 			continue;
 		}
 		
-		// Wenn rows vom SQL zurückkommen, diese ins Mail schreiben
-		if ($db->db_num_rows($result) > 0)
+		// Wenn mehr als eine row vom SQL zurückkommen und diese nicht NULL ist, diese ins Mail schreiben
+		if ($db->db_num_rows($result) > 1 || ($db->db_num_rows($result) == 1 && $db->db_fetch_row($result)[0] != ''))
 		{
 			$mailcontent .= '<h3>Die Abfrage der Datei "'.$filename.'" hat folgendes Ergebnis geliefert:</h3>';
 
@@ -109,14 +109,17 @@ if (($files = glob($slq_import_path.'/*.sql')) != false)
 			
 			$mailcontent .= '<table class="table"><thead><tr>';
 			$array = array();
+			$result = $db->db_query ($sql);
 			$object = $db->db_fetch_object($result);
 			$row_array = get_object_vars($object);
+
 			foreach($row_array AS $key => $value)
 			{
 				$mailcontent .= '<th>'.$key.'</th>';
 			}
 			$mailcontent .= '</tr></thead><tbody>';
 			$counter = 0; // Wenn mehr als 1000 Datensätze retourniert werden, abbrechen
+			
 			$result = $db->db_query ($sql);
 			while($row = $db->db_fetch_object($result))
 			{
