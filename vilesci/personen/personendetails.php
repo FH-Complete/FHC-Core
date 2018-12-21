@@ -54,7 +54,7 @@ echo '<html>
 		<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">';
 		include('../../include/meta/jquery.php');
 		include('../../include/meta/jquery-tablesorter.php');
-echo '</head>
+echo '</head>'; ?>
 	<script language="JavaScript" type="text/javascript">
 	// Add parser through the tablesorter addParser method for sorting Studiensemester
 	$.tablesorter.addParser({ 
@@ -79,20 +79,31 @@ echo '</head>
 		{
 			widgets: ["zebra"]
 		}); 
-		$("#tablePreStudent").tablesorter(
+		$(".tablePreStudent").tablesorter(
 		{
 			headers: { 
 				1: { 
-					sorter:"studiensemester" 
+					sorter:"insertamum" 
 				}},
 			sortList: [[1,1],[2,0],[3,0]],
+			widgets: ["zebra"]
+		}); 
+		$(".tableKontakt").tablesorter(
+		{
+			headers:
+			{
+				3:
+				{
+					sorter: "shortDate", dateFormat: "yyyy-mm-dd"
+				}
+			},
+			sortList: [[0,0],[2,0],[3,1]],
 			widgets: ["zebra"]
 		}); 
 	});
 	</script>
 	<body class="Background_main">
-	';
-
+<?php 
 if(!$rechte->isBerechtigt('admin') &&
    !$rechte->isBerechtigt('preinteressent') &&
    !$rechte->isBerechtigt('assistenz'))
@@ -108,6 +119,25 @@ $person = new person();
 if(!$person->load($id))
 	die('Person wurde nicht gefunden');
 
+// Erste Mailadresse (jüngstes Insertdatum) auslesen, da für Bewerbungstool-Login benötigt
+$kontakt = new kontakt();
+$kontakt->load_pers($person->person_id);
+$insertdatum = '';
+$email = '';
+foreach ($kontakt->result as $row)
+{
+	if ($row->kontakttyp == "email")
+	{
+		if ($insertdatum == '' || $row->insertamum > $insertdatum)
+		{
+			$email = $row->kontakt;
+			$insertdatum = $row->insertamum;
+		}
+	}
+	else 
+		continue;
+}
+
 //PERSON
 echo '<h2>Person</h2>';
 echo '<table cellspacing="3px">';
@@ -116,19 +146,19 @@ echo "<tr><td align='right'>Name:</td><td> $person->titelpre $person->nachname $
 echo "<tr><td align='right'>Geburtsdatum:</td><td> ".$datum_obj->formatDatum($person->gebdatum,'d.m.Y')."</td></tr>";
 echo "<tr><td align='right'>Geschlecht:</td><td> ".$person->geschlecht."</td></tr>";
 echo "<tr valign='top'><td align='right'>Anmerkung:</td><td width='800px'> ".$db->convert_html_chars($person->anmerkungen)."</td></tr>";
-echo "<tr valign='top'><td align='right'>Zugangscode:</td><td width='800px'>".(in_array('bewerbung', (explode(';', ACTIVE_ADDONS)))?"<a href='".CIS_ROOT."addons/bewerbung/cis/registration.php?code=".$db->convert_html_chars($person->zugangscode)."' target='_blank'>".$db->convert_html_chars($person->zugangscode)."</a>":$db->convert_html_chars($person->zugangscode))."</td></tr>";
+echo "<tr valign='top'><td align='right'>Zugangscode:</td><td width='800px'>".(in_array('bewerbung', (explode(';', ACTIVE_ADDONS)))?"<a href='".CIS_ROOT."addons/bewerbung/cis/registration.php?code=".$db->convert_html_chars($person->zugangscode)."&emailAdresse=".$email."' target='_blank'>".$db->convert_html_chars($person->zugangscode)."</a>":$db->convert_html_chars($person->zugangscode))."</td></tr>";
 echo '</table>';
 
 echo '<br><a href="../fhausweis/search.php?person_id='.$person->person_id.'">Statusinformation - FH Ausweis</a><br>';
-$kontakt = new kontakt();
-$kontakt->load_pers($person->person_id);
+
 echo '<h3>Kontaktdaten</h3>';
-echo '<table class="tablesorter" data-sortlist="[[2,0],[0,0]]">
+echo '<table class="tableKontakt">
 		<thead>
 			<tr>
 				<th>Typ</th>
 				<th>Kontakt</th>
 				<th>Zustellung</th>
+				<th>Eingefügt am</th>
 				<th>Anmerkung</th>
 			</tr>
 		</thead>
@@ -137,8 +167,9 @@ foreach ($kontakt->result as $row)
 {
 	echo '<tr>';
 	echo "<td>$row->kontakttyp</td>";
-	echo "<td>$row->kontakt</td>";
+	echo '<td>'.($row->kontakttyp == "email" ? '<a href="mailto:'.$row->kontakt.'">'.$row->kontakt.'</a>' : $row->kontakt).'</td>';
 	echo "<td>".($row->zustellung?'Ja':'Nein')."</td>";
+	echo "<td>".$datum_obj->formatDatum($row->insertamum, 'Y-m-d H:i:s')."</td>";
 	echo "<td>$row->anmerkung</td>";
 	echo '</tr>';
 }
@@ -194,6 +225,9 @@ foreach ($adresse_obj->result as $row)
 }
 echo '</tbody></table>';
 
+
+/* PreInteressenten deprecated*/
+/*
 $preinteressent = new preinteressent();
 $preinteressent->getPreinteressenten($person->person_id);
 if(count($preinteressent->result)>0)
@@ -260,8 +294,10 @@ if(count($preinteressent->result)>0)
 	}
 	echo '</tbody></table>';
 }
-
-//PreIncoming
+*/
+			
+//PreIncoming deprecated
+/*
 $preincoming = new preincoming();
 $preincoming->loadFromPerson($person->person_id);
 
@@ -286,15 +322,48 @@ if(count($preincoming->result)>0)
 		echo '</tr>';
 	}
 	echo '</tbody></table>';
-}
+}*/
 
 //Prestudent
 $prestudent = new prestudent();
 $prestudent->getPrestudenten($person->person_id);
+foreach ($prestudent->result as $row)
+{
+	$prestudentLastStatus = new prestudent();
+	$prestudentLastStatus->getLastStatus($row->prestudent_id);
+	$row->studiensemester_kurzbz = $prestudentLastStatus->studiensemester_kurzbz;
+	$row->ausbildungssemester = $prestudentLastStatus->ausbildungssemester;
+	$row->datum = $prestudentLastStatus->datum;
+	$row->orgform_kurzbz = $prestudentLastStatus->orgform_kurzbz;
+	$row->studienplan_bezeichnung = $prestudentLastStatus->studienplan_bezeichnung;
+}
+
+// Sortiert PreStudenten nach Studiensemester
+function sortPrestudents($a, $b)
+{
+	$c = substr($b->studiensemester_kurzbz, 2) - substr($a->studiensemester_kurzbz, 2);
+	$c .= strcmp(substr($b->studiensemester_kurzbz, 0, 2), substr($a->studiensemester_kurzbz, 0, 2));
+	return $c;
+}
+
+usort($prestudent->result, "sortPrestudents");
+
+//var_dump($prestudent->result);
+$studiensemester_kurzbz = '';
+$stdsem = '';
 if(count($prestudent->result)>0)
 {
 	echo '<br><h2>Pre-/Studenten</h2>';
-	echo '<table id="tablePreStudent">
+	foreach ($prestudent->result as $row)
+	{
+		if ($studiensemester_kurzbz == '' || $studiensemester_kurzbz != $row->studiensemester_kurzbz)
+		{
+			if ($studiensemester_kurzbz != $row->studiensemester_kurzbz)
+			{
+				echo '</tbody></table>';
+			}
+			echo '<h3>'.$row->studiensemester_kurzbz.'</h3>';
+			echo '<table class="tablePreStudent" id="tablePreStudent_'.$row->studiensemester_kurzbz.'">
 			<thead>
 				<tr>
 					<th>ID</th>
@@ -303,23 +372,20 @@ if(count($prestudent->result)>0)
 					<th>Studiengang</th>
 					<th>Organisationsform</th>
 					<th>Studienplan</th>
-					<th>Reihungstest</th>
+					<th>Reihung absolviert</th>
 					<th>UID</th>
 					<th>Gruppe</th>
 					<th>Status</th>
 				</tr>
 			</thead><tbody>';
-	foreach ($prestudent->result as $row)
-	{
-		$prestudentLastStatus = new prestudent();
-		$prestudentLastStatus->getLastStatus($row->prestudent_id);
+		}
 		echo '<tr>';
 		echo "<td>$row->prestudent_id</td>";
-		echo "<td>$prestudentLastStatus->studiensemester_kurzbz</td>";
+		echo "<td>$row->studiensemester_kurzbz</td>";
 		echo "<td>$row->priorisierung</td>";
 		echo "<td>".$studiengang->kuerzel_arr[$row->studiengang_kz]."</td>";
-		echo "<td>$prestudentLastStatus->orgform_kurzbz</td>";
-		echo "<td>$prestudentLastStatus->studienplan_bezeichnung</td>";
+		echo "<td>$row->orgform_kurzbz</td>";
+		echo "<td>$row->studienplan_bezeichnung</td>";
 		echo "<td>".($row->reihungstestangetreten?'Ja':'Nein')."</td>";
 		$uid='';
 		$gruppe='';
@@ -341,8 +407,10 @@ if(count($prestudent->result)>0)
 		}
 		echo "<td>$uid</td>";
 		echo "<td>$gruppe</td>";
-		echo "<td>$prestudentLastStatus->status_kurzbz ".($prestudentLastStatus->ausbildungssemester!=''?"($prestudentLastStatus->ausbildungssemester. Semester)":'')."</td>";
+		echo "<td>$row->status_kurzbz ".($row->ausbildungssemester!=''?"($row->ausbildungssemester. Semester)":'')."</td>";
 		echo '</tr>';
+		
+		$studiensemester_kurzbz = $row->studiensemester_kurzbz;
 	}
 	echo '</tbody></table>';
 }
