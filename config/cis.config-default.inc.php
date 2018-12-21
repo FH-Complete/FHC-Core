@@ -50,6 +50,8 @@ define('XML_ROOT','http://www.fhcomplete.org/build/rdf/');
 define('APP_ROOT','http://www.fhcomplete.org/build/');
 // Pfad zu Document Root
 define('DOC_ROOT','/var/www/html/build/');
+// URL zu Vilesci Root
+define('VILESCI_ROOT','http://www.fhcomplete.org/build/');
 
 // Externe Funktionen - Unterordner im Include-Verzeichnis
 define('EXT_FKT_PATH','tw');
