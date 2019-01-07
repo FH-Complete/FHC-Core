@@ -475,7 +475,14 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 							</hbox>
 							<hbox>
 								<label value="Priorität" control="student-prestudent-textbox-priorisierung"/>
-								<textbox id="student-prestudent-textbox-priorisierung" disabled="true"/>
+								<?php 
+									$readonly = 'readonly="true"';
+									$rechte = new benutzerberechtigung();
+									$rechte->getBerechtigungen($user);
+									if($rechte->isBerechtigt('basis/prestudent'))
+										$readonly = '';
+								?>
+								<textbox id="student-prestudent-textbox-priorisierung" disabled="true" <?php echo $readonly ?>/>
 							</hbox>
 						</row>
 						<row id="student-prestudent-row-mentor">
