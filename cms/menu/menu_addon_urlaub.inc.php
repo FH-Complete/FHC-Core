@@ -49,7 +49,7 @@ class menu_addon_urlaub extends menu_addon
 			if($untergebene!='')
 				$untergebene.=',';
 
-			$untergebene.="'".addslashes($u_uid)."'";
+			$untergebene.="'".$this->db_escape($u_uid)."'";
 		}
 
 		$rechte = new benutzerberechtigung();
@@ -62,7 +62,7 @@ class menu_addon_urlaub extends menu_addon
 			{
 				if($untergebene!='')
 					$untergebene.=',';
-				$untergebene.="'".addslashes($row->uid)."'";
+				$untergebene.="'".$this->db_escape($row->uid)."'";
 			}
 		}
 

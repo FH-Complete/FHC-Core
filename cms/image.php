@@ -26,9 +26,9 @@ if (!$db = new basis_db())
 
 if(isset($_GET['src']) && $_GET['src']=='flag' && isset($_GET['sprache']))
 {
-	$qry = "SELECT flagge as bild FROM public.tbl_sprache WHERE sprache='".addslashes($_GET['sprache'])."'";
+	$qry = "SELECT flagge as bild FROM public.tbl_sprache WHERE sprache=".$db->db_add_param($_GET['sprache']);
 }
-else 
+else
 	die('Unkown type');
 
 //Header fuer Bild schicken
@@ -38,5 +38,3 @@ $row = $db->db_fetch_object($result);
 //base64 zurueckwandeln und ausgeben
 echo base64_decode($row->bild);
 ?>
-	
-
