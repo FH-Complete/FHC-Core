@@ -1,6 +1,6 @@
 <?php
-$this->phrasen['global/studiengang']='Degree-Program';
-$this->phrasen['global/studienrichtung']='Degree-Program';
+$this->phrasen['global/studiengang']='Degree Program';
+$this->phrasen['global/studienrichtung']='Degree Program';
 $this->phrasen['global/institut']='Institute';
 $this->phrasen['global/semester']='Semester';
 $this->phrasen['global/studiensemester']='Semester';
@@ -92,7 +92,7 @@ $this->phrasen['global/code']='Code';
 $this->phrasen['global/adresse']='Address';
 $this->phrasen['global/hauptwohnsitz']='Principal residence';
 $this->phrasen['global/nebenwohnsitz']='Secondary residence';
-$this->phrasen['global/emailAdresse']='E-Mail Adress';
+$this->phrasen['global/emailAdresse']='E-Mail Address';
 $this->phrasen['global/mail']='Mail';
 $this->phrasen['global/telefon']='Telephone';
 $this->phrasen['global/telefonnummer']='Telephone number';

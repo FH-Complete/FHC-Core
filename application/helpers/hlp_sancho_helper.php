@@ -24,6 +24,7 @@ if (! defined('BASEPATH')) exit('No direct script access allowed');
 // ------------------------------------------------------------------------
 
 const DEFAULT_SANCHO_HEADER_IMG = 'sancho_header_DEFAULT.jpg';
+const DEFAULT_SANCHO_FOOTER_IMG = 'sancho_footer_DEFAULT.jpg';
 
 /**
  * Send single Mail with Sancho Design and Layout.
@@ -35,14 +36,14 @@ const DEFAULT_SANCHO_HEADER_IMG = 'sancho_header_DEFAULT.jpg';
  * @param string $headerImg	Filename of the specific Sancho header image.
  * @return void
  */
-function sendSanchoMail($vorlage_kurzbz, $vorlage_data, $to, $subject, $headerImg = DEFAULT_SANCHO_HEADER_IMG)
+function sendSanchoMail($vorlage_kurzbz, $vorlage_data, $to, $subject, $headerImg = DEFAULT_SANCHO_HEADER_IMG, $footerImg = DEFAULT_SANCHO_FOOTER_IMG)
 {
 	$ci =& get_instance();
 	$ci->load->library('email');
 	$ci->load->library('MailLib');
 
 	$sanchoHeader_img = 'skin/images/sancho/'. $headerImg;
-	$sanchoFooter_img = 'skin/images/sancho/sancho_footer.jpg';
+	$sanchoFooter_img = 'skin/images/sancho/'. $footerImg;
 
 	// Embed sancho header and footer image
 	// reset important to ensure embedding of images when called in a loop
