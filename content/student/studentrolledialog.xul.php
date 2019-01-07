@@ -30,6 +30,7 @@ require_once('../../config/global.config.inc.php');
 require_once('../../include/person.class.php');
 require_once('../../include/prestudent.class.php');
 require_once('../../include/studienplan.class.php');
+require_once('../../include/benutzerberechtigung.class.php');
 
 echo '<?xml version="1.0" encoding="UTF-8"?>'."\n";
 
@@ -68,6 +69,7 @@ if($prestudent_id!='')
 	$nachname = $prestudent->nachname;
 }
 $db = new basis_db();
+$user=get_uid();
 ?>
 
 <window id="student-rolle-dialog" title="Status"
@@ -184,6 +186,17 @@ $db = new basis_db();
 				<row>
 					<label value="Bestätigt am" control="student-rolle-datum-bestaetigt_datum"/>
 					<box class='Datum' id="student-rolle-datum-bestaetigt_datum" />
+				</row>
+				<?php 
+						$readonly = 'readonly="true"';
+						$rechte = new benutzerberechtigung();
+						$rechte->getBerechtigungen($user);
+						if($rechte->isBerechtigt('basis/prestudentstatus'))
+							$readonly = '';
+					?>
+				<row>
+					<label value="Bewerbung abgeschickt am" control="student-rolle-datum-bewerbung_abgeschicktamum"/>
+					<textbox id="student-rolle-datum-bewerbung_abgeschicktamum" <?php echo $readonly ?>/>
 				</row>
 				<row>
 					<label value="Studienplan" control="student-rolle-menulist-studienplan"/>

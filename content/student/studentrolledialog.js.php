@@ -56,6 +56,7 @@ function StudentRolleInit(prestudent_id, status_kurzbz, studiensemester_kurzbz, 
 		//RDF parsen
 		var datum = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#datum" ));
 		var bestaetigt_datum = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#bestaetigt_am" ));
+		var bewerbung_abgeschicktamum = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#bewerbung_abgeschicktamum" ));
 		var orgform_kurzbz = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#orgform_kurzbz" ));
 		var studienplan_id = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#studienplan_id" ));
 		var anmerkung= getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#anmerkung" ));
@@ -78,6 +79,7 @@ function StudentRolleInit(prestudent_id, status_kurzbz, studiensemester_kurzbz, 
 		var ausbildungssemester='1';
 		var datum = '<?php echo date('d.m.Y') ?>';
 		var bestaetigt_datum = '<?php echo date('d.m.Y') ?>';
+		var bewerbung_abgeschicktamum = '';
 		var orgform_kurzbz = '';
 		var studienplan_id = '';
 		var anmerkung = '';
@@ -92,6 +94,7 @@ function StudentRolleInit(prestudent_id, status_kurzbz, studiensemester_kurzbz, 
 	document.getElementById('student-rolle-menulist-ausbildungssemester').value=ausbildungssemester;
 	document.getElementById('student-rolle-datum-datum').value=datum;
 	document.getElementById('student-rolle-datum-bestaetigt_datum').value=bestaetigt_datum;
+	document.getElementById('student-rolle-datum-bewerbung_abgeschicktamum').value=bewerbung_abgeschicktamum;
 	document.getElementById('student-rolle-menulist-orgform_kurzbz').value=orgform_kurzbz;
 	MenulistSelectItemOnValue('student-rolle-menulist-studienplan', studienplan_id);
 	document.getElementById('student-rolle-textbox-anmerkung').value=anmerkung;

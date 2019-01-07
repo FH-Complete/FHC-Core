@@ -1896,6 +1896,7 @@ function StudentRolleSpeichern(dialog, studiensemester_old, ausbildungssemester_
 	anmerkung = dialog.getElementById('student-rolle-textbox-anmerkung').value;
 	rt_stufe = dialog.getElementById('student-rolle-menulist-stufe').value;
 	statusgrund_id = dialog.getElementById('student-rolle-menulist-statusgrund').value;
+	bewerbung_abgeschicktamum = dialog.getElementById('student-rolle-datum-bewerbung_abgeschicktamum').value;
 
 	if(!CheckDatum(datum))
 	{
@@ -1906,6 +1907,29 @@ function StudentRolleSpeichern(dialog, studiensemester_old, ausbildungssemester_
 	{
 		alert('Bestaetigungsdatum ist ungueltig');
 		return false;
+	}
+
+	// Convert bewerbung_abgeschicktamum to ISO-Date
+	if(bewerbung_abgeschicktamum != '')
+	{
+		if(bewerbung_abgeschicktamum.length != 19)
+		{
+			bewerbung_abgeschicktamum = '';
+		}
+		else
+		{
+			datepart = bewerbung_abgeschicktamum.substring(0, 10);
+			timepart = bewerbung_abgeschicktamum.substring(11);
+			arr = datepart.split('.');
+	
+			if(arr[0].length==1)
+				arr[0]='0'+arr[0];
+	
+			if(arr[1].length==1)
+				arr[1]='0'+arr[1];
+	
+			bewerbung_abgeschicktamum = arr[2]+'-'+arr[1]+'-'+arr[0]+' '+timepart;
+		}
 	}
 
 	var url = '<?php echo APP_ROOT ?>content/student/studentDBDML.php';
@@ -1926,6 +1950,7 @@ function StudentRolleSpeichern(dialog, studiensemester_old, ausbildungssemester_
 	req.add('anmerkung', anmerkung);
 	req.add('rt_stufe', rt_stufe);
 	req.add('statusgrund_id', statusgrund_id);
+	req.add('bewerbung_abgeschicktamum', bewerbung_abgeschicktamum);
 
 	var response = req.executePOST();
 

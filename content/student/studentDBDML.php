@@ -1209,7 +1209,8 @@ if(!$error)
 						$rolle->bestaetigtam = $_POST['bestaetigtam'];
 						if($_POST['bestaetigtam']=='')
 							$rolle->bestaetigtvon = null;
-
+						
+						$rolle->bewerbung_abgeschicktamum = $_POST['bewerbung_abgeschicktamum'];
 						$rolle->orgform_kurzbz = $_POST['orgform_kurzbz'];
 						$rolle->studienplan_id = $_POST['studienplan_id'];
 						$rolle->anmerkung_status = $_POST['anmerkung'];
