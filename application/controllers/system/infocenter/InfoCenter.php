@@ -1468,7 +1468,9 @@ class InfoCenter extends Auth_Controller
 				self::FREIGABE_MAIL_VORLAGE,
 				$data,
 				$receiver,
-				$subject
+				$subject,
+				'sancho_header_min_bw.jpg',
+				'sancho_footer_min_bw.jpg'
 			);
 		}
 		else
