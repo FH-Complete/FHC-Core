@@ -66,7 +66,9 @@
 			</tr>
 			</thead>
 			<tbody>
-			<?php foreach ($stammdaten->kontakte as $kontakt): ?>
+			<?php 
+			$lastMailAdress = '';
+			foreach ($stammdaten->kontakte as $kontakt): ?>
 				<tr>
 				<?php if ($kontakt->kontakttyp === 'email'): ?>
 					<td><?php echo ucfirst($this->p->t('person', 'email')) ?></td>
@@ -79,7 +81,7 @@
 						<?php echo '<span class="'.$kontakt->kontakttyp.'">';?>
 						<?php if ($kontakt->kontakttyp === 'email'): ?>
 							<a href="mailto:<?php echo $kontakt->kontakt; ?>" target="_top">
-							<?php
+							<?php $lastMailAdress = $kontakt->kontakt;
 							endif;
 							echo $kontakt->kontakt;
 							if ($kontakt->kontakttyp === 'email'):
@@ -121,7 +123,7 @@
 			</div>
 			<?php if (isset($stammdaten->zugangscode)): ?>
 				<div class="col-xs-6 text-right">
-					<a href="<?php echo CIS_ROOT.'addons/bewerbung/cis/registration.php?code='.html_escape($stammdaten->zugangscode) ?>"
+					<a href="<?php echo CIS_ROOT.'addons/bewerbung/cis/registration.php?code='.html_escape($stammdaten->zugangscode).'&emailAdresse='.$lastMailAdress ?>"
 					   target='_blank'><i class="glyphicon glyphicon-new-window"></i>&nbsp;<?php echo  $this->p->t('infocenter','zugangBewerbung') ?></a>
 				</div>
 			<?php endif; ?>
