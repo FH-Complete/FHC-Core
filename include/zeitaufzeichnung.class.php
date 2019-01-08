@@ -135,15 +135,19 @@ class zeitaufzeichnung extends basis_db
 			return false;
 
 		// check ob identischer eintrag existiert
-		$check_qry = 'SELECT count(*) from campus.tbl_zeitaufzeichnung where uid='.$this->db_add_param($this->uid).' and start = '.$this->db_add_param($this->start).' and ende = '.$this->db_add_param($this->ende);
-		if($this->db_query($check_qry) && $this->new)
+		// DienstreiseMT-Einträge sind hier ausgenommen da eintägige Dienstreisen mit der identen Arbeitszeit eingetragen werden könnten
+		if ($this->aktivitaet_kurzbz != 'DienstreiseMT')
 		{
-			if($row = $this->db_fetch_object())
+			$check_qry = 'SELECT count(*) from campus.tbl_zeitaufzeichnung where uid='.$this->db_add_param($this->uid).' and aktivitaet_kurzbz != \'DienstreiseMT\' and start = '.$this->db_add_param($this->start).' and ende = '.$this->db_add_param($this->ende);
+			if($this->db_query($check_qry) && $this->new)
 			{
-				if ($row->count)
+				if($row = $this->db_fetch_object())
 				{
-					$this->errormsg = 'Identischer Eintrag existiert!';
-					return false;
+					if ($row->count)
+					{
+						$this->errormsg = 'Identischer Eintrag existiert!';
+						return false;
+					}
 				}
 			}
 		}
