@@ -329,10 +329,12 @@ class lehrstunde extends basis_db
 			if($lvplan_load_ueber_semesterhaelfte)
 			{
 				$sql_query="SELECT studiengang_kz, semester, verband, gruppe
-					FROM public.tbl_studentlehrverband
-					WHERE student_uid=".$this->db_add_param($uid)."
-					AND studiensemester_kurzbz in(".$this->db_add_param($this->ss).",".$this->db_add_param($this->ssnext).",".$this->db_add_param($this->ssprev).")
-					order by semester desc limit 2";
+     				FROM
+						public.tbl_studentlehrverband
+     					JOIN public.tbl_studiensemester USING(studiensemester_kurzbz)
+     				WHERE student_uid=".$this->db_add_param($uid)."
+     					AND studiensemester_kurzbz in(".$this->db_add_param($this->ss).",".$this->db_add_param($this->ssnext).",".$this->db_add_param($this->ssprev).")
+     				ORDER BY start desc LIMIT 2";
 			}
 			else
 			{
