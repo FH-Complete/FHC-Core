@@ -325,7 +325,7 @@ var InfocenterDetails = {
 			}
 		);
 	},
-	saveNotiz: function(data)
+	saveNotiz: function(personid, data)
 	{
 		FHC_AjaxClient.ajaxCallPost(
 			CALLED_PATH + '/saveNotiz/' + encodeURIComponent(personid),
