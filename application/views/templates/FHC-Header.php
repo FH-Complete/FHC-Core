@@ -26,6 +26,7 @@
 	$navigationwidget = isset($navigationwidget) ? $navigationwidget : false;
 	$sbadmintemplate = isset($sbadmintemplate) ? $sbadmintemplate : false;
 	$tablesorter = isset($tablesorter) ? $tablesorter : false;
+	$pivotui = isset($pivotui) ? $pivotui : false;
 	$tinymce = isset($tinymce) ? $tinymce : false;
 ?>
 
@@ -58,6 +59,12 @@
 			{
 				generateCSSsInclude('vendor/mottie/tablesorter/dist/css/theme.default.min.css');
 				generateCSSsInclude('vendor/mottie/tablesorter/dist/css/jquery.tablesorter.pager.min.css');
+			}
+
+			// PivotUI CSS
+			if ($pivotui === true)
+			{
+				generateCSSsInclude('vendor/nicolaskruchten/pivottable/dist/pivot.min.css');
 			}
 
 			// SB Admin 2 template CSS
@@ -119,6 +126,12 @@
 				generateJSsInclude('vendor/mottie/tablesorter/dist/js/jquery.tablesorter.min.js');
 				generateJSsInclude('vendor/mottie/tablesorter/dist/js/jquery.tablesorter.widgets.min.js');
 				generateJSsInclude('vendor/mottie/tablesorter/dist/js/extras/jquery.tablesorter.pager.min.js');
+			}
+
+			// PivotUI CSS
+			if ($pivotui === true)
+			{
+				generateJSsInclude('vendor/nicolaskruchten/pivottable/dist/pivot.min.js');
 			}
 
 			// Tinymce JS

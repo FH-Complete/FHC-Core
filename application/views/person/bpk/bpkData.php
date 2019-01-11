@@ -13,6 +13,7 @@
 				person_id=tbl_person.person_id AND tbl_benutzer.aktiv=true)
 		',
 		'requiredPermissions' => 'admin',
+		'datasetRepresentation' => 'tablesorter',
 		'additionalColumns' => array('Details'),
 		'columnsAliases' => array(
 			'PersonID',

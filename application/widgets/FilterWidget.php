@@ -8,7 +8,8 @@ class FilterWidget extends Widget
 	// Paths of the views
 	const WIDGET_URL_FILTER = 'widgets/filter/filter';
 	const WIDGET_URL_SELECT_FIELDS = 'widgets/filter/selectFields';
-	const WIDGET_URL_TABLE_DATASET = 'widgets/filter/tableDataset';
+	const WIDGET_URL_DATASET_TABLESORTER = 'widgets/filter/tableDataset';
+	const WIDGET_URL_DATASET_PIVOTUI = 'widgets/filter/pivotUIDataset';
 	const WIDGET_URL_SELECT_FILTERS = 'widgets/filter/selectFilters';
 	const WIDGET_URL_SAVE_FILTER = 'widgets/filter/saveFilter';
 
@@ -44,6 +45,9 @@ class FilterWidget extends Widget
 	private $_hideSave;
 
 	private $_customMenu; // if true then method _setFilterMenu is NOT called
+
+	private $_datasetRepresentation; // dataset representation (ex: tablesorter, pivotUI, ...)
+	private $_datasetRepresentationOptions; // dataset representation options for tablesorter, pivotUI, ...
 
 	private static $_FilterWidgetInstance; // static property that contains the instance of itself
 
@@ -119,11 +123,19 @@ class FilterWidget extends Widget
 	}
 
 	/**
-	 * Loads the view related to the table dataset
+	 * Loads the view related to the dataset, here is decided how to represent the dataset (ex: tablesorter, pivotUI, ...)
 	 */
-	public static function loadViewTableDataset()
+	public static function loadViewDataset()
 	{
-		self::_loadView(self::WIDGET_URL_TABLE_DATASET);
+		if (self::$_FilterWidgetInstance->_datasetRepresentation == FiltersLib::DATASET_REP_TABLESORTER)
+		{
+			self::_loadView(self::WIDGET_URL_DATASET_TABLESORTER);
+		}
+
+		if (self::$_FilterWidgetInstance->_datasetRepresentation == FiltersLib::DATASET_REP_PIVOTUI)
+		{
+			self::_loadView(self::WIDGET_URL_DATASET_PIVOTUI);
+		}
 	}
 
 	//------------------------------------------------------------------------------------------------------------------
@@ -153,6 +165,8 @@ class FilterWidget extends Widget
 		$this->_hideHeader = null;
 		$this->_hideSave = null;
 		$this->_customMenu = null;
+		$this->_datasetRepresentation = null;
+		$this->_datasetRepresentationOptions = null;
 
 		// Retrived the required permissions parameter if present
 		if (isset($args[FiltersLib::REQUIRED_PERMISSIONS_PARAMETER]))
@@ -234,9 +248,24 @@ class FilterWidget extends Widget
 			$this->_hideSave = $args[FiltersLib::HIDE_SAVE];
 		}
 
+		// If a custom menu is set
 		if (isset($args[FiltersLib::CUSTOM_MENU]) && is_bool($args[FiltersLib::CUSTOM_MENU]))
 		{
 			$this->_customMenu = $args[FiltersLib::CUSTOM_MENU];
+		}
+
+		// To specify how to represent the dataset (ex: tablesorter, pivotUI, ...)
+		if (isset($args[FiltersLib::DATASET_REPRESENTATION])
+			&& ($args[FiltersLib::DATASET_REPRESENTATION] == FiltersLib::DATASET_REP_TABLESORTER
+			|| $args[FiltersLib::DATASET_REPRESENTATION] == FiltersLib::DATASET_REP_PIVOTUI))
+		{
+			$this->_datasetRepresentation = $args[FiltersLib::DATASET_REPRESENTATION];
+		}
+
+		// To specify options for the dataset representation (ex: tablesorter, pivotUI, ...)
+		if (isset($args[FiltersLib::DATASET_REP_OPTIONS]) && !isEmptyString($args[FiltersLib::DATASET_REP_OPTIONS]))
+		{
+			$this->_datasetRepresentationOptions = $args[FiltersLib::DATASET_REP_OPTIONS];
 		}
 	}
 
@@ -247,7 +276,7 @@ class FilterWidget extends Widget
 	{
 		if (!is_array($args) || (is_array($args) && count($args) == 0))
 		{
-			show_error('Second parameter of the widget call must be a not empty associative array');
+			show_error('Second parameter of the widget call must be a NOT empty associative array');
 		}
 		else
 		{
@@ -259,12 +288,25 @@ class FilterWidget extends Widget
 					FiltersLib::FILTER_ID.'" must be specified'
 				);
 			}
-			else
+
+			if (!isset($args[FiltersLib::QUERY_PARAMETER]))
 			{
-				if (!isset($args[FiltersLib::QUERY_PARAMETER]))
-				{
-					show_error('The parameters "'.FiltersLib::QUERY_PARAMETER.'" must be specified');
-				}
+				show_error('The parameters "'.FiltersLib::QUERY_PARAMETER.'" must be specified');
+			}
+
+			if (!isset($args[FiltersLib::DATASET_REPRESENTATION]))
+			{
+				show_error('The parameter "'.FiltersLib::DATASET_REPRESENTATION.'" must be specified');
+			}
+
+			if (isset($args[FiltersLib::DATASET_REPRESENTATION])
+				&& $args[FiltersLib::DATASET_REPRESENTATION] != FiltersLib::DATASET_REP_TABLESORTER
+				&& $args[FiltersLib::DATASET_REPRESENTATION] != FiltersLib::DATASET_REP_PIVOTUI)
+			{
+				show_error(
+					'The parameter "'.FiltersLib::DATASET_REPRESENTATION.
+					'" must be IN ("'.FiltersLib::DATASET_REP_TABLESORTER.'", "'.FiltersLib::DATASET_REP_PIVOTUI.'")'
+				);
 			}
 		}
 	}
@@ -370,7 +412,9 @@ class FilterWidget extends Widget
 							FiltersLib::SESSION_METADATA => $this->FiltersModel->getExecutedQueryMetaData(), // the metadata of the dataset
 							FiltersLib::SESSION_ROW_NUMBER => count($dataset->retval), // the number of loaded rows by this filter
 							FiltersLib::SESSION_DATASET => $dataset->retval, // the entire dataset
-							FiltersLib::SESSION_RELOAD_DATASET => false // if the dataset must be reloaded, not needed the first time
+							FiltersLib::SESSION_RELOAD_DATASET => false, // if the dataset must be reloaded, not needed the first time
+							FiltersLib::SESSION_DATASET_REPRESENTATION => $this->_datasetRepresentation, // the choosen dataset representation
+							FiltersLib::SESSION_DATASET_REP_OPTIONS => $this->_datasetRepresentationOptions // the choosen dataset representation options
 						)
 					);
 				}

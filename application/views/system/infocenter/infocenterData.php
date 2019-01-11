@@ -232,6 +232,7 @@
 		'filterKurzbz' => 'InfoCenterSentApplicationAll',
 		'filter_id' => $this->input->get('filter_id'),
 		'requiredPermissions' => 'infocenter',
+		'datasetRepresentation' => 'tablesorter',
 		'customMenu' => true,
 		'checkboxes' => 'PersonId',
 		'additionalColumns' => array('Details'),
