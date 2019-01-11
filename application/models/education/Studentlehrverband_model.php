@@ -10,5 +10,6 @@ class Studentlehrverband_model extends DB_Model
 		parent::__construct();
 		$this->dbTable = 'public.tbl_studentlehrverband';
 		$this->pk = array('studiensemester_kurzbz', 'student_uid');
+		$this->hasSequence = false;
 	}
 }
