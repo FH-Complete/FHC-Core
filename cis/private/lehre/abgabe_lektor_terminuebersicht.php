@@ -33,20 +33,19 @@ $datum_obj = new datum();
 $sprache = getSprache();
 $p = new phrasen($sprache);
 
-echo '
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+echo '<!DOCTYPE HTML>
 <head>
 	<title>Termin&uuml;bersicht</title>
-	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<meta charset="UTF-8">
 	<link href="../../../skin/style.css.php" rel="stylesheet" type="text/css">
 	<link href="../../../skin/tablesort.css" rel="stylesheet" type="text/css"/>
 
 	<link rel="stylesheet" type="text/css" href="../../../skin/jquery-ui-1.9.2.custom.min.css">
-<script type="text/javascript" src="../../../vendor/jquery/jqueryV1/jquery-1.12.4.min.js"></script>
-<script type="text/javascript" src="../../../vendor/christianbach/tablesorter/jquery.tablesorter.min.js"></script>
-<script type="text/javascript" src="../../../vendor/components/jqueryui/jquery-ui.min.js"></script>
-<script type="text/javascript" src="../../../include/js/jquery.ui.datepicker.translation.js"></script>
-<script type="text/javascript" src="../../../vendor/jquery/sizzle/sizzle.js"></script>
+	<script type="text/javascript" src="../../../vendor/jquery/jqueryV1/jquery-1.12.4.min.js"></script>
+	<script type="text/javascript" src="../../../vendor/christianbach/tablesorter/jquery.tablesorter.min.js"></script>
+	<script type="text/javascript" src="../../../vendor/components/jqueryui/jquery-ui.min.js"></script>
+	<script type="text/javascript" src="../../../include/js/jquery.ui.datepicker.translation.js"></script>
+	<script type="text/javascript" src="../../../vendor/jquery/sizzle/sizzle.js"></script>
 	<script type="text/javascript" src="../../../vendor/jquery-archive/jquery-metadata/jquery.metadata.js"></script>
 	<script type="text/javascript" src="../../../vendor/christianbach/tablesorter/jquery.tablesorter.min.js"></script>
 
@@ -101,7 +100,7 @@ $sql_query = "
 		JOIN public.tbl_studiengang ON(tbl_lehrveranstaltung.studiengang_kz=tbl_studiengang.studiengang_kz)
 		JOIN campus.tbl_paabgabetyp USING(paabgabetyp_kurzbz)
 	WHERE
-		tbl_projektbetreuer.person_id='".addslashes($lektor->person_id)."' AND tbl_paabgabe.datum>=now() AND bn_student.aktiv
+		tbl_projektbetreuer.person_id=".$db->db_add_param($lektor->person_id)." AND tbl_paabgabe.datum>=now() AND bn_student.aktiv
 	ORDER BY tbl_paabgabe.datum
 	";
 

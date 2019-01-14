@@ -92,11 +92,11 @@ if($aktion!='zip')
 		<link rel="stylesheet" href="../../../skin/style.css.php" type="text/css">
 		<link rel="stylesheet" href="../../../skin/tablesort.css" type="text/css"/>
 		<link rel="stylesheet" type="text/css" href="../../../skin/jquery-ui-1.9.2.custom.min.css">
-<script type="text/javascript" src="../../../vendor/jquery/jqueryV1/jquery-1.12.4.min.js"></script>
-<script type="text/javascript" src="../../../vendor/christianbach/tablesorter/jquery.tablesorter.min.js"></script>
-<script type="text/javascript" src="../../../vendor/components/jqueryui/jquery-ui.min.js"></script>
-<script type="text/javascript" src="../../../include/js/jquery.ui.datepicker.translation.js"></script>
-<script type="text/javascript" src="../../../vendor/jquery/sizzle/sizzle.js"></script>
+		<script type="text/javascript" src="../../../vendor/jquery/jqueryV1/jquery-1.12.4.min.js"></script>
+		<script type="text/javascript" src="../../../vendor/christianbach/tablesorter/jquery.tablesorter.min.js"></script>
+		<script type="text/javascript" src="../../../vendor/components/jqueryui/jquery-ui.min.js"></script>
+		<script type="text/javascript" src="../../../include/js/jquery.ui.datepicker.translation.js"></script>
+		<script type="text/javascript" src="../../../vendor/jquery/sizzle/sizzle.js"></script>
 		<script src="../../../vendor/components/jqueryui/jquery-ui.min.js" type="text/javascript"></script>
 		<script language="JavaScript" type="text/javascript">
 		$(document).ready(function()
@@ -138,7 +138,7 @@ if($aktion!='zip')
 	}
 	echo "</SELECT>";
 
-	$qry_termin="	SELECT distinct campus.tbl_paabgabe.datum as termin , to_char(campus.tbl_paabgabe.datum, 'DD-MM-YYYY') as termin_anzeige
+	$qry_termin="	SELECT distinct campus.tbl_paabgabe.datum as termin , to_char(campus.tbl_paabgabe.datum, 'DD.MM.YYYY') as termin_anzeige
 					FROM lehre.tbl_projektarbeit
 							JOIN campus.tbl_paabgabe USING(projektarbeit_id)
 							LEFT JOIN public.tbl_benutzer ON(uid=student_uid)
@@ -148,12 +148,12 @@ if($aktion!='zip')
 							LEFT JOIN public.tbl_studiengang USING(studiengang_kz)
 							WHERE (projekttyp_kurzbz='Bachelor' OR projekttyp_kurzbz='Diplom')
 						";
-					//AND public.tbl_benutzer.aktiv
-			if ($stg_kz!='')
-				$qry_termin.=" AND public.tbl_studiengang.studiengang_kz=".$db->db_add_param($stg_kz, FHC_INTEGER);
-			if ($abgabetyp!='')
-				$qry_termin.=" AND campus.tbl_paabgabe.paabgabetyp_kurzbz=".$db->db_add_param($abgabetyp);
-			$qry_termin.=" ORDER BY termin desc";
+
+	if ($stg_kz!='')
+		$qry_termin.=" AND public.tbl_studiengang.studiengang_kz=".$db->db_add_param($stg_kz, FHC_INTEGER);
+	if ($abgabetyp!='')
+		$qry_termin.=" AND campus.tbl_paabgabe.paabgabetyp_kurzbz=".$db->db_add_param($abgabetyp);
+	$qry_termin.=" ORDER BY termin desc";
 
 	echo '&nbsp;'.$p->t('abgabetool/termin').'&nbsp;<select name="termin" id="termin">
 				<option value=""  '. (!isset($_REQUEST['termin']) || empty($termin)?' selected ':'') .'>-'.$p->t('global/alle').'-</option> ';
@@ -196,8 +196,6 @@ if($aktion!='zip')
 	echo "&nbsp;<INPUT type='submit' name='ok' value='".$p->t('global/anzeigen')."' onclick=\"f=document.abgabeFrm;f.aktion.value='';\">&nbsp;<INPUT type='button' value='ZIP' onclick=\"f=document.abgabeFrm;f.aktion.value='zip';f.submit();\"></FORM><br>";
 	}
 
-##if($stg_kz!='' || $abgabetyp!='' || $termin!='')
-
 if(isset($_REQUEST['ok']) || (isset($_REQUEST['aktion']) && $_REQUEST['aktion']=='zip'))
 {
 
@@ -211,7 +209,8 @@ if(isset($_REQUEST['ok']) || (isset($_REQUEST['aktion']) && $_REQUEST['aktion']=
 	{
 		$qry="";
 
-		$qry.="	SELECT public.tbl_studiengang.bezeichnung as stgbez, campus.tbl_paabgabe.datum as termin,* FROM lehre.tbl_projektarbeit
+		$qry.="	SELECT public.tbl_studiengang.bezeichnung as stgbez, campus.tbl_paabgabe.datum as termin,*
+			FROM lehre.tbl_projektarbeit
 			JOIN campus.tbl_paabgabe USING(projektarbeit_id)
 			LEFT JOIN public.tbl_benutzer ON(uid=student_uid)
 			LEFT JOIN public.tbl_person ON(tbl_benutzer.person_id=tbl_person.person_id)
@@ -309,8 +308,7 @@ else
 	chdir(PAABGABE_PATH);
 	$zipausgabe=tempnam("/tmp", "PAA").".zip";
 	exec("zip ".$zipausgabe." ".$zipfile);
-	//echo $zipausgabe;
-	//echo "<br>zip -r ".$zipausgabe." ".$zipfile;
+
 	if(file_exists($zipausgabe))
 	{
 		header('Content-Type: application/octet-stream');

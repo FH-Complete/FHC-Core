@@ -355,7 +355,12 @@ if ((isset($wmonat) || isset($wmonat))&&(isset($wjahr) || isset($wjahr)))
 	{
 		$wbis=date("Y-m-d",mktime(0, 0, 0, ($wmonat+2) , (7-($ttt['wday']==0?7:$ttt['wday'])), $jahre[$wjahr]));
 	}
-	$qry="SELECT * FROM campus.tbl_zeitsperre WHERE zeitsperretyp_kurzbz='Urlaub' AND mitarbeiter_uid='".addslashes($uid)."' AND (vondatum<='".addslashes($wbis)."' AND bisdatum>'".addslashes($wvon)."') ";
+	$qry="SELECT * FROM campus.tbl_zeitsperre
+		WHERE zeitsperretyp_kurzbz='Urlaub'
+		 AND mitarbeiter_uid=".$db->db_add_param($uid)."
+		 AND (vondatum<=".$db->db_add_param($wbis)."
+		 AND bisdatum>".$db->db_add_param($wvon).") ";
+
 	//echo "<br>"."db:".$qry;
 	if($result = $db->db_query($qry))
 	{
@@ -412,8 +417,7 @@ if ((isset($wmonat) || isset($wmonat))&&(isset($wjahr) || isset($wjahr)))
 $PHP_SELF = $_SERVER['PHP_SELF'];
 
 $datum_obj = new datum();
-?>
-<!DOCTYPE HTML>
+?><!DOCTYPE HTML>
 <html>
 	<head>
 		<meta charset="UTF-8">

@@ -112,19 +112,19 @@ require_once('../../../include/benutzerberechtigung.class.php');
 	$result=$db->db_query($sql_query);
 	$num_rows=$db->db_num_rows($result);
 
-	echo '
+	echo '<!DOCTYPE html>
 	<html>
 	<head>
-		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<meta charset="UTF-8">
 		<title>'.$p->t('lvaliste/titel').'</title>
 		<link rel="stylesheet" href="../../../skin/style.css.php" type="text/css">
 		<link rel="stylesheet" href="../../../skin/jquery.css" type="text/css"/>
 		<link rel="stylesheet" type="text/css" href="../../../skin/jquery-ui-1.9.2.custom.min.css">
-<script type="text/javascript" src="../../../vendor/jquery/jqueryV1/jquery-1.12.4.min.js"></script>
-<script type="text/javascript" src="../../../vendor/christianbach/tablesorter/jquery.tablesorter.min.js"></script>
-<script type="text/javascript" src="../../../vendor/components/jqueryui/jquery-ui.min.js"></script>
-<script type="text/javascript" src="../../../include/js/jquery.ui.datepicker.translation.js"></script>
-<script type="text/javascript" src="../../../vendor/jquery/sizzle/sizzle.js"></script>
+		<script type="text/javascript" src="../../../vendor/jquery/jqueryV1/jquery-1.12.4.min.js"></script>
+		<script type="text/javascript" src="../../../vendor/christianbach/tablesorter/jquery.tablesorter.min.js"></script>
+		<script type="text/javascript" src="../../../vendor/components/jqueryui/jquery-ui.min.js"></script>
+		<script type="text/javascript" src="../../../include/js/jquery.ui.datepicker.translation.js"></script>
+		<script type="text/javascript" src="../../../vendor/jquery/sizzle/sizzle.js"></script>
 		<link rel="stylesheet" href="../../../skin/tablesort.css" type="text/css"/>
 		<script language="Javascript">
 		<!--
@@ -230,7 +230,7 @@ require_once('../../../include/benutzerberechtigung.class.php');
 			echo '<td><a href="mailto:'.$row->email.'">'.$row->stg_kurzbz.'</a></td>';
 			echo '<td>'.$row->semester.'</td>';
 
-			$qry ="SELECT * FROM lehre.tbl_lehreinheitgruppe WHERE lehreinheit_id='".addslashes($row->lehreinheit_id)."'";
+			$qry ="SELECT * FROM lehre.tbl_lehreinheitgruppe WHERE lehreinheit_id=".$db->db_add_param($row->lehreinheit_id);
 			$gruppe='';
 			if($result_grp = $db->db_query($qry))
 			{

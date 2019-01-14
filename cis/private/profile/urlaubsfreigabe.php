@@ -180,7 +180,7 @@ function draw_monat($monat)
 	if($uid=='')
 		$qry.=" AND mitarbeiter_uid in($untergebene)";
 	else
-		$qry.=" AND mitarbeiter_uid='".addslashes($uid)."'";
+		$qry.=" AND mitarbeiter_uid=".$db->db_add_param($uid);
 	$qry.="ORDER BY vondatum, mitarbeiter_uid";
 
 	if($result = $db->db_query($qry))
