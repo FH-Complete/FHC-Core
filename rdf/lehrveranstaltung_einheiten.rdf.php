@@ -355,7 +355,16 @@ $oRdf->sendHeader();
 			$row_lf = $db->db_fetch_object($result_lf);
 
 			//Gruppen holen
-			$qry = "SELECT upper(tbl_studiengang.typ::varchar(1) || tbl_studiengang.kurzbz) as kuerzel, * FROM lehre.tbl_lehreinheitgruppe LEFT JOIN public.tbl_studiengang USING(studiengang_kz) WHERE lehreinheit_id='$row_le->lehreinheit_id'";
+			$qry = "SELECT
+					upper(tbl_studiengang.typ::varchar(1) || tbl_studiengang.kurzbz) as kuerzel,
+					tbl_lehreinheitgruppe.*,
+					tbl_gruppe.direktinskription
+					FROM
+						lehre.tbl_lehreinheitgruppe
+						LEFT JOIN public.tbl_studiengang USING(studiengang_kz)
+						LEFT JOIN public.tbl_gruppe USING(gruppe_kurzbz)
+					WHERE lehreinheit_id=".$db->db_add_param($row_le->lehreinheit_id);
+
 			$result_grp = $db->db_query($qry);
 			$grp='';
 			while($row_grp = $db->db_fetch_object($result_grp))
@@ -363,7 +372,11 @@ $oRdf->sendHeader();
 				if($row_grp->gruppe_kurzbz=='')
 					$grp.=' '.$row_grp->kuerzel.trim($row_grp->semester).trim($row_grp->verband).trim($row_grp->gruppe);
 				else
-					$grp.=' '.$row_grp->gruppe_kurzbz;
+				{
+					// Direkte Gruppen werden nicht angezeigt
+					if(!$db->db_parse_bool($row_grp->direktinskription))
+						$grp.=' '.$row_grp->gruppe_kurzbz;
+				}
 			}
 			//Lektoren und Stunden holen
 			$qry = "SELECT kurzbz, semesterstunden, planstunden FROM lehre.tbl_lehreinheitmitarbeiter JOIN public.tbl_mitarbeiter USING(mitarbeiter_uid) WHERE lehreinheit_id='$row_le->lehreinheit_id'";
@@ -377,7 +390,17 @@ $oRdf->sendHeader();
 				$semesterstunden.=$row_lkt->semesterstunden.' ';
 				$planstunden.=$row_lkt->planstunden.' ';
 			}
-			$qry = "SELECT tbl_fachbereich.bezeichnung FROM public.tbl_fachbereich, lehre.tbl_lehrveranstaltung as lehrfach, lehre.tbl_lehreinheit WHERE tbl_fachbereich.oe_kurzbz=lehrfach.oe_kurzbz AND lehrfach.lehrveranstaltung_id=tbl_lehreinheit.lehrfach_id AND tbl_lehreinheit.lehreinheit_id=".$db->db_add_param($row_le->lehreinheit_id, FHC_INTEGER);
+			$qry = "SELECT
+					tbl_organisationseinheit.bezeichnung
+				FROM
+					public.tbl_organisationseinheit,
+					lehre.tbl_lehrveranstaltung as lehrfach,
+					lehre.tbl_lehreinheit
+				WHERE
+					tbl_organisationseinheit.oe_kurzbz = lehrfach.oe_kurzbz
+					AND lehrfach.lehrveranstaltung_id = tbl_lehreinheit.lehrfach_id
+					AND tbl_lehreinheit.lehreinheit_id = ".$db->db_add_param($row_le->lehreinheit_id, FHC_INTEGER);
+
 			$fachbereich='';
 			if($result_fb = $db->db_query($qry))
 				if($row_fb = $db->db_fetch_object($result_fb))

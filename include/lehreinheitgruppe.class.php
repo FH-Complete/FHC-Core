@@ -418,5 +418,51 @@ class lehreinheitgruppe extends basis_db
 			return false;
 		}
 	}
+
+	/**
+	 * Prueft ob zu der Lehreinheit bereits eine direkte Gruppe zugeordnet ist
+	 * @param $lehreinheit_id ID der lehreinheit
+	 * @return true und objekt mit Gruppe falls vorhanden oder false im fehlerfall
+	 */
+	public function getDirectGroup($lehreinheit_id)
+	{
+		$qry = "
+			SELECT
+				tbl_lehreinheitgruppe.*
+			FROM
+				lehre.tbl_lehreinheitgruppe
+				JOIN public.tbl_gruppe USING(gruppe_kurzbz)
+			WHERE
+				tbl_gruppe.direktinskription
+				AND tbl_lehreinheitgruppe.lehreinheit_id=".$this->db_add_param($lehreinheit_id);
+
+		if($result = $this->db_query($qry))
+		{
+			if($row = $this->db_fetch_object($result))
+			{
+				$this->lehreinheitgruppe_id = $row->lehreinheitgruppe_id;
+				$this->lehreinheit_id = $row->lehreinheit_id;
+				$this->studiengang_kz = $row->studiengang_kz;
+				$this->semester = $row->semester;
+				$this->verband = $row->verband;
+				$this->gruppe = $row->gruppe;
+				$this->gruppe_kurzbz = $row->gruppe_kurzbz;
+				$this->updateamum = $row->updateamum;
+				$this->updatevon = $row->updatevon;
+				$this->insertamum = $row->insertamum;
+				$this->insertvon = $row->insertvon;
+				$this->ext_id = $row->ext_id;
+
+				return true;
+			}
+			else
+				return false;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+	}
 }
 ?>

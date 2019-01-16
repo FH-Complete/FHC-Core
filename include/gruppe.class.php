@@ -48,6 +48,7 @@ class gruppe extends basis_db
 	public $gesperrt=false;		// boolean
 	public $zutrittssystem=false;	// boolean
 	public $aufnahmegruppe=false; // boolean
+	public $direktinskription=false;
 
 	/**
 	 * Konstruktor - Laedt optional eine Gruppe
@@ -142,6 +143,7 @@ class gruppe extends basis_db
 				$this->gesperrt = $this->db_parse_bool($row->gesperrt);
 				$this->zutrittssystem = $this->db_parse_bool($row->zutrittssystem);
 				$this->aufnahmegruppe = $this->db_parse_bool($row->aufnahmegruppe);
+				$this->direktinskription = $this->db_parse_bool($row->direktinskription);
 				return true;
 			}
 			else
@@ -192,6 +194,7 @@ class gruppe extends basis_db
 				$grp_obj->gesperrt = $this->db_parse_bool($row->gesperrt);
 				$grp_obj->zutrittssystem = $this->db_parse_bool($row->zutrittssystem);
 				$grp_obj->aufnahmegruppe = $this->db_parse_bool($row->aufnahmegruppe);
+				$grp_obj->direktinskription = $this->db_parse_bool($row->direktinskription);
 
 				$this->result[] = $grp_obj;
 			}
@@ -289,6 +292,7 @@ class gruppe extends basis_db
 				$grp_obj->gesperrt = $this->db_parse_bool($row->gesperrt);
 				$grp_obj->zutrittssystem = $this->db_parse_bool($row->zutrittssystem);
 				$grp_obj->aufnahmegruppe = $this->db_parse_bool($row->aufnahmegruppe);
+				$grp_obj->direktinskription = $this->db_parse_bool($row->direktinskription);
 
 				$this->result[] = $grp_obj;
 			}
@@ -358,6 +362,11 @@ class gruppe extends basis_db
 			$this->errormsg = 'Aktiv muss ein boolscher Wert sein';
 			return false;
 		}
+		if(!is_bool($this->direktinskription))
+		{
+			$this->errormsg = 'direktinskription muss ein boolscher Wert sein';
+			return false;
+		}
 		if(mb_strlen($this->updatevon)>32)
 		{
 			$this->errormsg = 'Updatevon darf nicht laenger als 32 Zeichen sein';
@@ -397,7 +406,7 @@ class gruppe extends basis_db
 			$qry = 'INSERT INTO public.tbl_gruppe (gruppe_kurzbz, studiengang_kz, bezeichnung, semester, sort,
 											mailgrp, beschreibung, sichtbar, generiert, aktiv, lehre, content_visible,
 											updateamum, updatevon, insertamum, insertvon, orgform_kurzbz, gesperrt,
-											zutrittssystem, aufnahmegruppe)
+											zutrittssystem, aufnahmegruppe, direktinskription)
 					VALUES('.$this->db_add_param($kurzbz).','.
 					$this->db_add_param($this->studiengang_kz).','.
 					$this->db_add_param($this->bezeichnung).','.
@@ -417,7 +426,8 @@ class gruppe extends basis_db
 					$this->db_add_param($this->orgform_kurzbz).','.
 					$this->db_add_param($this->gesperrt, FHC_BOOLEAN).','.
 					$this->db_add_param($this->zutrittssystem, FHC_BOOLEAN).','.
-					$this->db_add_param($this->aufnahmegruppe, FHC_BOOLEAN).');';
+					$this->db_add_param($this->aufnahmegruppe, FHC_BOOLEAN).','.
+					$this->db_add_param($this->direktinskription, FHC_BOOLEAN).');';
 		}
 		else
 		{
@@ -438,7 +448,9 @@ class gruppe extends basis_db
 				' orgform_kurzbz='.$this->db_add_param($this->orgform_kurzbz).', '.
 				' gesperrt='.$this->db_add_param($this->gesperrt, FHC_BOOLEAN).', '.
 				' zutrittssystem='.$this->db_add_param($this->zutrittssystem, FHC_BOOLEAN).', '.
-				' aufnahmegruppe='.$this->db_add_param($this->aufnahmegruppe, FHC_BOOLEAN).' ';
+				' aufnahmegruppe='.$this->db_add_param($this->aufnahmegruppe, FHC_BOOLEAN).', '.
+				' direktinskription='.$this->db_add_param($this->direktinskription, FHC_BOOLEAN).' ';
+
 			if($this->gruppe_kurbzNeu != null)
 			{
 				$qry.=', gruppe_kurzbz='.$this->db_add_param($this->gruppe_kurbzNeu).' ';
@@ -538,6 +550,7 @@ class gruppe extends basis_db
 				$grp_obj->gesperrt = $this->db_parse_bool($row->gesperrt);
 				$grp_obj->zutrittssystem = $this->db_parse_bool($row->zutrittssystem);
 				$grp_obj->aufnahmegruppe = $this->db_parse_bool($row->aufnahmegruppe);
+				$grp_obj->direktinskription = $this->db_parse_bool($row->direktinskription);
 
 				$this->result[] = $grp_obj;
 			}
@@ -612,6 +625,7 @@ class gruppe extends basis_db
 				$grp_obj->gesperrt = $this->db_parse_bool($row->gesperrt);
 				$grp_obj->zutrittssystem = $this->db_parse_bool($row->zutrittssystem);
 				$grp_obj->aufnahmegruppe = $this->db_parse_bool($row->aufnahmegruppe);
+				$grp_obj->direktinskription = $this->db_parse_bool($row->direktinskription);
 
 				$this->result[] = $grp_obj;
 			}
@@ -623,20 +637,20 @@ class gruppe extends basis_db
 			return false;
 		}
 	}
-	
+
 	/**
 	 * Sucht nach Gruppen in gruppe_kurzbz, bezeichnung und beschreibung.
 	 *
 	 * @param array $searchItems Array mit Suchbegriffen, nach denen gesucht werden soll
 	 * @param boolean $aktiv (optional). Default true. Wenn false werden nur inaktive gruppen geladen, wenn null dann alle
 	 * @param integer $limit (optional). Limit an Ergebnissen
-	 * 
+	 *
 	 * @return true, wenn erfolgreich, false im Fehlerfall
 	 */
 	public function searchGruppen($searchItems, $aktiv = true, $limit = null)
 	{
-		$qry = "SELECT 
-				* 
+		$qry = "SELECT
+				*
 				FROM
 					public.tbl_gruppe
 				WHERE";
@@ -661,7 +675,7 @@ class gruppe extends basis_db
 			while($row = $this->db_fetch_object($result))
 			{
 				$grp_obj = new gruppe();
-				
+
 				$grp_obj->gruppe_kurzbz = $row->gruppe_kurzbz;
 				$grp_obj->studiengang_kz = $row->studiengang_kz;
 				$grp_obj->bezeichnung = $row->bezeichnung;
@@ -682,7 +696,8 @@ class gruppe extends basis_db
 				$grp_obj->gesperrt = $this->db_parse_bool($row->gesperrt);
 				$grp_obj->zutrittssystem = $this->db_parse_bool($row->zutrittssystem);
 				$grp_obj->aufnahmegruppe = $this->db_parse_bool($row->aufnahmegruppe);
-				
+				$grp_obj->direktinskription = $this->db_parse_bool($row->direktinskription);
+
 				$this->result[] = $grp_obj;
 			}
 			$this->errormsg = $qry;

@@ -619,7 +619,7 @@ class student extends benutzer
 						nachname, vorname, vornamen, gebdatum, gebort, gebzeit, anmerkung, homepage, svnr,
 						ersatzkennzeichen, familienstand, geschlecht, anzahlkinder, tbl_person.aktiv, kurzbeschreibung,
 						tbl_benutzer.aktiv as bnaktiv, tbl_student.studiengang_kz, tbl_student.semester, tbl_student.verband,
-						tbl_student.gruppe, tbl_student.prestudent_id
+						tbl_student.gruppe, tbl_student.prestudent_id, tbl_benutzer.uid
 					  FROM
 					  	public.tbl_person
 						JOIN public.tbl_benutzer USING(person_id)
@@ -671,6 +671,7 @@ class student extends benutzer
 				$l->verband = $row->verband;
 				$l->gruppe = $row->gruppe;
 				$l->prestudent_id = $row->prestudent_id;
+				$l->uid = $row->uid;
 				$this->result[]=$l;
 			}
 		}
@@ -823,7 +824,7 @@ class student extends benutzer
 			return false;
 		}
 	}
-	
+
 	/**
 	 * Checkt, ob ein Student schon BIS-Gemeldet wurde.
 	 *
@@ -846,13 +847,13 @@ class student extends benutzer
 		$datumNovemberVorjahr = date('Y', strtotime("-1 year")).'-11-15';
 		$datumApril = date('Y').'-04-15';
 		$datumNovember = date('Y').'-11-15';
-		
+
 		$timestampNovemberVorjahr = strtotime(date('Y', strtotime("-1 year")).'-11-15');
 		$timestampApril = strtotime(date('Y').'-04-15');
 		$timestampNovember = strtotime(date('Y').'-11-15');
 
 		$heute = time();
-		
+
 		if ($heute - $timestampNovemberVorjahr >= $heute - $timestampApril &&
 			$heute - $timestampApril < 0)
 			$datumLetzteMeldung = $datumNovemberVorjahr;
@@ -861,7 +862,7 @@ class student extends benutzer
 			$datumLetzteMeldung = $datumApril;
 		else
 			$datumLetzteMeldung = $datumNovember;
-		
+
 		if($result = $this->db_query($qry))
 		{
 			if($this->db_num_rows($result) > 0)
@@ -871,7 +872,7 @@ class student extends benutzer
 					// Wenn der Studentenstatus kleiner oder gleich dem Datum der letzten Meldung ist, wurde der Student gemeldet
 					if (strtotime($row->datum) <= strtotime($datumLetzteMeldung))
 						return true;
-					else 
+					else
 						return false;
 				}
 				else
@@ -880,7 +881,7 @@ class student extends benutzer
 					return null;
 				}
 			}
-			else 
+			else
 				return null;
 		}
 		else

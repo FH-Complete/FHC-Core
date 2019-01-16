@@ -70,6 +70,11 @@ foreach ($DAO_obj->lehreinheitgruppe as $row)
 		$bezeichnung = $row->gruppe_kurzbz;
 		$gruppe = new gruppe();
 		$gruppe->load($row->gruppe_kurzbz);
+
+		// Direkte Gruppen werden uebersprungen
+		if($gruppe->direktinskription)
+			continue;
+
 		$beschreibung = $gruppe->bezeichnung;
 
 		$qry_verplant = "SELECT 1 FROM lehre.tbl_stundenplandev
