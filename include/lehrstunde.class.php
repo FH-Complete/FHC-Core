@@ -728,7 +728,13 @@ class lehrstunde extends basis_db
 
 		// Datenbank abfragen
 		$sql_query="SELECT $stpl_id AS id, lektor, stg_kurzbz, ort_kurzbz, semester, verband, gruppe, gruppe_kurzbz, datum, stunde FROM $stpl_table
-				WHERE datum=".$this->db_add_param($this->datum)." AND stunde=".$this->db_add_param($this->stunde)." AND (ort_kurzbz=".$this->db_add_param($this->ort_kurzbz)." ";
+				WHERE datum=".$this->db_add_param($this->datum)." AND stunde=".$this->db_add_param($this->stunde);
+
+		// Direkte Lehreinheitsgruppen kollidieren nicht
+		$sql_query.=" AND NOT EXISTS(SELECT 1 FROM public.tbl_gruppe WHERE gruppe_kurzbz = ".$stpl_table.".gruppe_kurzbz AND direktinskription=true)";
+
+		$sql_query.= " AND (ort_kurzbz=".$this->db_add_param($this->ort_kurzbz)." ";
+
 		if (!in_array($this->lektor_uid,unserialize(KOLLISIONSFREIE_USER)))
 			$sql_query.=" OR (uid=".$this->db_add_param($this->lektor_uid)." AND uid not in (".$this->db_implode4SQL(unserialize(KOLLISIONSFREIE_USER))."))";
 
@@ -776,7 +782,7 @@ class lehrstunde extends basis_db
 		else
 		{
 			$row = $this->db_fetch_object($erg_stpl);
-			$this->errormsg="Kollision ($stpl_table): $row->id|$row->lektor|$row->ort_kurzbz|$row->stg_kurzbz-$row->semester$row->verband$row->gruppe$row->gruppe_kurzbz - $row->datum/$row->stunde"; //\n".$sql_query
+			$this->errormsg="Kollision ($stpl_table): $row->id|$row->lektor|$row->ort_kurzbz|$row->stg_kurzbz-$row->semester$row->verband$row->gruppe$row->gruppe_kurzbz - $row->datum/$row->stunde\n"; //\n".$sql_query
 			return true;
 		}
 	}

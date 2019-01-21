@@ -44,6 +44,7 @@ require_once(dirname(__FILE__).'/sprache.class.php');
 require_once(dirname(__FILE__).'/functions.inc.php');
 require_once(dirname(__FILE__).'/betriebsmittel.class.php');
 require_once(dirname(__FILE__).'/lehrveranstaltung.class.php');
+require_once(dirname(__FILE__).'/gruppe.class.php');
 
 class wochenplan extends basis_db
 {
@@ -1279,6 +1280,13 @@ class wochenplan extends basis_db
 					foreach ($this->std_plan[$i][$j] as $lehrstunde)
 					{
 						$a_unr[]=$lehrstunde->unr;
+						if($lehrstunde->gruppe_kurzbz!='')
+						{
+							$gruppe = new gruppe();
+							$gruppe->load($lehrstunde->gruppe_kurzbz);
+							if($gruppe->direktinskription)
+								continue;
+						}
 						$a_lvb[$lehrstunde->unr][]=$lehrstunde->sem.$lehrstunde->ver.$lehrstunde->grp;
 					}
 
@@ -1348,7 +1356,8 @@ class wochenplan extends basis_db
 							foreach ($a_unr as $unr)
 							{
 								$lvb_unr_arr[$a]=$unr;
-								$lvb[$a++]=$a_lvb[$unr];
+								if(isset($a_lvb[$unr]))
+									$lvb[$a++]=$a_lvb[$unr];
 							}
 							for ($a=0;$a<count($lvb)-1;$a++)
 								for ($b=0;$b<count($lvb[$a]);$b++)
@@ -1945,11 +1954,34 @@ class wochenplan extends basis_db
 			$raumtyp[$i]=$row->raumtyp;
 			$raumtypalt[$i]=$row->raumtypalternativ;
 			if ($row->gruppe_kurzbz!=null && $row->gruppe_kurzbz!='')
+			{
 				$gruppe[$i]=$row->gruppe_kurzbz;
-			@$lehrverband[$i]->stg_kz=$row->studiengang_kz;
-			$lehrverband[$i]->sem=$row->semester;
-			$lehrverband[$i]->ver=$row->verband;
-			$lehrverband[$i]->grp=$row->gruppe;
+
+				// Direktinskriptionsgruppen von der Kollisionspruefung ausnehmen
+				$grp_obj = new gruppe();
+				$grp_obj->load($row->gruppe_kurzbz);
+				if ($grp_obj->direktinskription)
+					$direktinskription = true;
+				else
+					$direktinskription = false;
+			}
+			else
+				$direktinskription = false;
+
+			if (!$direktinskription)
+			{
+				// Wenn direktinskriptionsgruppe dann wird Studiengang und Semester nicht
+				// gesetzt da dies sonst kollidiert
+				// Bei normalen Spezialgruppen wir dieser trotzdem gesetzt damit Verbandsgruppen
+				// mit Spezialgruppen des selben Studiengangs kollidieren
+				if(!isset($lehrverband[$i]))
+					$lehrverband[$i] = new stdClass();
+
+				$lehrverband[$i]->stg_kz=$row->studiengang_kz;
+				$lehrverband[$i]->sem=$row->semester;
+				$lehrverband[$i]->ver=$row->verband;
+				$lehrverband[$i]->grp=$row->gruppe;
+			}
 			$lektor[$i]=$row->lektor_uid;
 			$verplant[$i]=$row->verplant;
 			$planstunden[$i]=$row->planstunden;
@@ -2018,7 +2050,13 @@ class wochenplan extends basis_db
 		{
 			$gruppe=array_unique($gruppe);
 			foreach ($gruppe as $g)
-				$gruppen.=" OR gruppe_kurzbz=".$this->db_add_param($g);
+			{
+				// Gruppen fuer direkte inskription kollidieren nicht
+				/*$grp_obj = new gruppe();
+				$grp_obj->load($g);
+				if($grp_obj->direktinskription==false)*/
+					$gruppen.=" OR gruppe_kurzbz=".$this->db_add_param($g);
+			}
 		}
 
 		//Lehrverband
@@ -2092,6 +2130,7 @@ class wochenplan extends basis_db
 				($lkt $gruppen OR ($lvb) )";
 			if (is_numeric($unr))
 				$sql_query.=" AND unr!=".$this->db_add_param($unr);
+			$sql_query.=" AND NOT EXISTS(SELECT 1 FROM public.tbl_gruppe WHERE gruppe_kurzbz=".$stpl_table.".gruppe_kurzbz and direktinskription=true)";
 
 			if (!$this->db_query($sql_query))
 			{

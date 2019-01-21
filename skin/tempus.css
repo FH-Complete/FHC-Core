@@ -162,6 +162,7 @@ toolbarbutton.stplweekoverlay-toolbarbutton:hover
 	color: #AAAAAA;
 	visibility:hidden;
 	font-size: small;
+	margin-top: 10px;
 }
 
 treechildren::-moz-tree-row(makeItred)
