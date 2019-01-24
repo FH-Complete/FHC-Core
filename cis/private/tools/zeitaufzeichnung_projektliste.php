@@ -69,7 +69,7 @@ $ztauf->getListeUserFromTo($uid, $year.'-'.$month.'-01', $year.'-'.$month.'-'.$d
 $projectlines = [];
 $dayStart = $dayEnd = '';
 $projectnames = $tosubtract = $allpauseranges = [];
-$activitiesToSubtract = ['Pause', 'LehreExtern'];//aktivitaetstypen which should be subtracted fromworktime
+$activitiesToSubtract = ['Pause', 'LehreExtern', 'Arztbesuch', 'Behoerde'];//aktivitaetstypen which should be subtracted fromworktime
 $ztaufdata = $ztauf->result;
 $monthsums = [0 => 0.00];
 
@@ -231,6 +231,10 @@ for ($i = 0; $i < count($ztaufdata); $i++)
 			{
 				$projectlines[$day]->arbeitszeit -= $subtraction->diff;
 				$lehreExternExists = true;
+			}
+			elseif ($subtraction->typ == $activitiesToSubtract[2] || $subtraction->typ == $activitiesToSubtract[3])
+			{
+				$projectlines[$day]->arbeitszeit -= $subtraction->diff;
 			}
 		}
 
