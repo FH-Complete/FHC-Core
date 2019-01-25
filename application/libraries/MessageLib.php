@@ -39,6 +39,9 @@ class MessageLib
 		$this->ci->lang->load('message');
 	}
 
+	//------------------------------------------------------------------------------------------------------------------
+	// Public methods
+
 	/**
 	 * getMessage() - returns the specified received message for a specified person
 	 */
@@ -750,7 +753,37 @@ class MessageLib
 		return $sent;
 	}
 
-	// ------------------------------------------------------------------------
+	/**
+	 * parseMessageText
+	 */
+	public function parseMessageText($text, $data = array())
+	{
+		return $this->ci->parser->parse_string($text, $data, true);
+	}
+
+	/**
+	 * Gets data for Person from view vw_msg_vars_person
+	 * @param $person_id
+	 */
+	public function getMessageVarsPerson()
+	{
+		$variablesArray = array();
+		$variables = $this->ci->MessageModel->getMessageVarsPerson();
+
+		if (hasData($variables))
+		{
+			// Skip person_id
+			for ($i = 1; $i < count($variables->retval); $i++)
+			{
+				$variablesArray['{'.str_replace(' ', '_', strtolower($variables->retval[$i])).'}'] = $variables->retval[$i];
+			}
+			array_shift($variables->retval); // Remove person_id
+		}
+
+		return $variablesArray;
+	}
+
+	//------------------------------------------------------------------------------------------------------------------
 	// Private methods
 
 	/**
@@ -931,13 +964,5 @@ class MessageLib
 	private function _success($retval = '', $code = null)
 	{
 		return success($retval, $code, MessageLib::MSG_INDX_PREFIX);
-	}
-
-	/**
-	 *
-	 */
-	public function parseMessageText($text, $data = array())
-	{
-		return $this->ci->parser->parse_string($text, $data, true);
 	}
 }

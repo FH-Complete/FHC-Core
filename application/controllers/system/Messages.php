@@ -4,8 +4,6 @@ if (! defined('BASEPATH')) exit('No direct script access allowed');
 
 class Messages extends Auth_Controller
 {
-	private $uid; // contains the UID of the logged user
-
 	/**
 	 *
 	 */
@@ -28,43 +26,37 @@ class Messages extends Auth_Controller
 		// Loads the widget library
 		$this->load->library('WidgetLib');
 
+		$this->load->model('system/Message_model', 'MessageModel');
 		$this->load->model('person/Person_model', 'PersonModel');
 
 		$this->loadPhrases(
 			array(
 				'global',
-				'person',
-				'lehre',
-				'ui',
-				'infocenter'
+				'ui'
 			)
 		);
-
-		$this->_setAuthUID(); // sets property uid
 	}
 
+	// -----------------------------------------------------------------------------------------------------------------
+	// Public methods
+
 	/**
-	 * write
+	 * Write
 	 */
-	public function write($sender_id = null, $msg_id = null, $receiver_id = null)
+	public function write()
 	{
-		if ($sender_id === null)
+		$sender_id = null;
+		$recipients = $this->input->post('person_id');
+
+		$authUser = $this->PersonModel->getByUid(getAuthUID());
+		if (isError($authUser))
 		{
-			$user_person = $this->PersonModel->getByUid($this->uid);
-
-			if (isError($user_person))
-			{
-				show_error($user_person->retval);
-			}
-			$sender_id = $user_person->retval[0]->person_id;
+			show_error($authUser->retval);
 		}
-
-		$prestudent_id = $this->input->post('prestudent_id');
-		$person_id = $this->input->post('person_id');
-		$personOnly = false;
-
-		if (isset($person_id) && !isset($prestudent_id))
-			$personOnly = true;
+		elseif (hasData($authUser))
+		{
+			$sender_id = $authUser->retval[0]->person_id;
+		}
 
 		$msg = null;
 
@@ -87,10 +79,8 @@ class Messages extends Auth_Controller
 
 		// Get variables
 		$this->load->model('system/Message_model', 'MessageModel');
-		if ($personOnly === true)
-			$this->getPersonMsgData($person_id, $variablesArray, $msgVarsData);
-		else
-			$this->getPrestudentMsgData($prestudent_id, $variablesArray, $msgVarsData);
+
+		$this->getPersonMsgData($person_id, $variablesArray, $msgVarsData);
 
 		// Organisation units used to get the templates
 		$oe_kurzbz = array(); // A person can have more organisation units
@@ -122,69 +112,7 @@ class Messages extends Auth_Controller
 			'personOnly' => $personOnly//indicates if sent only to persons
 		);
 
-		$v = $this->load->view('system/messageWrite', $data);
-	}
-
-	/**
-	 * gets Message Variables and their data for Prestudent
-	 * @param $prestudent_id
-	 * @param $variablesArray to be filled with variable names
-	 * @param $msgVarsData to be filled with variable data
-	 */
-	private function getPrestudentMsgData($prestudent_id, &$variablesArray, &$msgVarsData)
-	{
-		$msgVarsData = $this->MessageModel->getMsgVarsDataByPrestudentId($prestudent_id);
-		if ($msgVarsData->error)
-		{
-			show_error($msgVarsData->retval);
-		}
-
-		if (!hasData($variables = $this->MessageModel->getMessageVars()))
-		{
-			unset($variables);
-		}
-		else
-		{
-			$variablesArray = array();
-			// Skip person_id and prestudent_id
-			for ($i = 2; $i < count($variables->retval); $i++)
-			{
-				$variablesArray['{'.str_replace(" ", "_", strtolower($variables->retval[$i])).'}'] = $variables->retval[$i];
-			}
-		}
-
-		array_shift($variables->retval); // Remove person_id
-		array_shift($variables->retval); // Remove prestudent_id
-	}
-
-	/**
-	 * gets Message Variables and their data for Person
-	 * @param $person_id
-	 * @param $variablesArray to be filled with variable names
-	 * @param $msgVarsData to be filled with variable data
-	 */
-	private function getPersonMsgData($person_id, &$variablesArray, &$msgVarsData)
-	{
-		$msgVarsData = $this->MessageModel->getMsgVarsDataByPersonId($person_id);
-		if ($msgVarsData->error)
-		{
-			show_error($msgVarsData->retval);
-		}
-
-		if (!hasData($variables = $this->MessageModel->getMessageVarsPerson()))
-		{
-			unset($variables);
-		}
-		else
-		{
-			$variablesArray = array();
-			// Skip person_id
-			for ($i = 1; $i < count($variables->retval); $i++)
-			{
-				$variablesArray['{'.str_replace(" ", "_", strtolower($variables->retval[$i])).'}'] = $variables->retval[$i];
-			}
-			array_shift($variables->retval); // Remove person_id
-		}
+		$this->load->view('system/messageWrite', $data);
 	}
 
 	/**
@@ -226,7 +154,7 @@ class Messages extends Auth_Controller
 	{
 		if ($sender_id === null)
 		{
-			$user_person = $this->PersonModel->getByUid($this->uid);
+			$user_person = $this->PersonModel->getByUid(getAuthUID());
 
 			if (!hasData($user_person))
 			{
@@ -326,46 +254,12 @@ class Messages extends Auth_Controller
 					'kommunikation',
 					'core',
 					null,
-					$this->uid
+					getAuthUID()
 				);
 
 			}
 			return success('success');
 		}
-	}
-
-	/**
-	 * getPersonId
-	 */
-	private function getPersonId()
-	{
-		$person_id = null;
-
-		if ($this->input->get('person_id') !== null)
-		{
-			$person_id = $this->input->get('person_id');
-		}
-		elseif ($this->input->post('person_id') !== null)
-		{
-			$person_id = $this->input->get('person_id');
-		}
-
-		if (!is_numeric($person_id))
-		{
-			show_error('Person_id is not numeric');
-		}
-
-		return $person_id;
-	}
-
-	/**
-	 * Retrieve the UID of the logged user and checks if it is valid
-	 */
-	private function _setAuthUID()
-	{
-		$this->uid = getAuthUID();
-
-		if (!$this->uid) show_error('User authentification failed');
 	}
 
 	/**
@@ -440,4 +334,92 @@ class Messages extends Auth_Controller
 			->set_output(json_encode(array($msg->retval[0])));
 	}
 
+	// -----------------------------------------------------------------------------------------------------------------
+	// Private methods
+
+	/**
+	 * gets Message Variables and their data for Prestudent
+	 * @param $prestudent_id
+	 * @param $variablesArray to be filled with variable names
+	 * @param $msgVarsData to be filled with variable data
+	 */
+	private function getPrestudentMsgData($prestudent_id, &$variablesArray, &$msgVarsData)
+	{
+		$msgVarsData = $this->MessageModel->getMsgVarsDataByPrestudentId($prestudent_id);
+		if ($msgVarsData->error)
+		{
+			show_error($msgVarsData->retval);
+		}
+
+		if (!hasData($variables = $this->MessageModel->getMessageVars()))
+		{
+			unset($variables);
+		}
+		else
+		{
+			$variablesArray = array();
+			// Skip person_id and prestudent_id
+			for ($i = 2; $i < count($variables->retval); $i++)
+			{
+				$variablesArray['{'.str_replace(" ", "_", strtolower($variables->retval[$i])).'}'] = $variables->retval[$i];
+			}
+		}
+
+		array_shift($variables->retval); // Remove person_id
+		array_shift($variables->retval); // Remove prestudent_id
+	}
+
+	/**
+	 * gets Message Variables and their data for Person
+	 * @param $person_id
+	 * @param $variablesArray to be filled with variable names
+	 * @param $msgVarsData to be filled with variable data
+	 */
+	private function getPersonMsgData($person_id, &$variablesArray, &$msgVarsData)
+	{
+		$msgVarsData = $this->MessageModel->getMsgVarsDataByPersonId($person_id);
+		if ($msgVarsData->error)
+		{
+			show_error($msgVarsData->retval);
+		}
+
+		if (!hasData($variables = $this->MessageModel->getMessageVarsPerson()))
+		{
+			unset($variables);
+		}
+		else
+		{
+			$variablesArray = array();
+			// Skip person_id
+			for ($i = 1; $i < count($variables->retval); $i++)
+			{
+				$variablesArray['{'.str_replace(" ", "_", strtolower($variables->retval[$i])).'}'] = $variables->retval[$i];
+			}
+			array_shift($variables->retval); // Remove person_id
+		}
+	}
+
+	/**
+	 * getPersonId
+	 */
+	private function getPersonId()
+	{
+		$person_id = null;
+
+		if ($this->input->get('person_id') !== null)
+		{
+			$person_id = $this->input->get('person_id');
+		}
+		elseif ($this->input->post('person_id') !== null)
+		{
+			$person_id = $this->input->get('person_id');
+		}
+
+		if (!is_numeric($person_id))
+		{
+			show_error('Person_id is not numeric');
+		}
+
+		return $person_id;
+	}
 }
