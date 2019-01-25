@@ -741,20 +741,34 @@ class lehrstunde extends basis_db
 		//Wenn eine Kollisionspruefung auf Studentenebene durchgefuehrt wird, werden die LVB nicht gecheckt
 		if($kollision_student=='false')
 		{
-			$sql_query.=" OR (studiengang_kz=".$this->db_add_param($this->studiengang_kz)." AND semester=".$this->db_add_param($this->sem);
+			// Direkte Gruppen kollidieren nicht
+			$direktgruppe = false;
 			if($this->gruppe_kurzbz!=null && $this->gruppe_kurzbz!='' && $this->gruppe_kurzbz!=' ')
 			{
-				$sql_query.=" OR (gruppe_kurzbz=".$this->db_add_param($this->gruppe_kurzbz).")";
+				$grp_obj = new gruppe();
+				$grp_obj->load($this->gruppe_kurzbz);
+				if($grp_obj->direktinskription)
+				{
+					$direktgruppe = true;
+				}
 			}
-			else
+			if(!$direktgruppe)
 			{
-				if ($this->ver!=null && $this->ver!='' && $this->ver!=' ')
-					$sql_query.=" AND (verband=".$this->db_add_param($this->ver)." OR verband IS NULL OR verband='' OR verband=' ')";
-				if ($this->grp!=null && $this->grp!='' && $this->grp!=' ')
-					$sql_query.=" AND (gruppe=".$this->db_add_param($this->grp)." OR gruppe IS NULL OR gruppe='' OR gruppe=' ')";
-			}
+				$sql_query.=" OR (studiengang_kz=".$this->db_add_param($this->studiengang_kz)." AND semester=".$this->db_add_param($this->sem);
+				if($this->gruppe_kurzbz!=null && $this->gruppe_kurzbz!='' && $this->gruppe_kurzbz!=' ')
+				{
+					$sql_query.=" OR (gruppe_kurzbz=".$this->db_add_param($this->gruppe_kurzbz).")";
+				}
+				else
+				{
+					if ($this->ver!=null && $this->ver!='' && $this->ver!=' ')
+						$sql_query.=" AND (verband=".$this->db_add_param($this->ver)." OR verband IS NULL OR verband='' OR verband=' ')";
+					if ($this->grp!=null && $this->grp!='' && $this->grp!=' ')
+						$sql_query.=" AND (gruppe=".$this->db_add_param($this->grp)." OR gruppe IS NULL OR gruppe='' OR gruppe=' ')";
+				}
 
-			$sql_query.=")";
+				$sql_query.=")";
+			}
 		}
 		$sql_query.=") AND unr!=".$this->db_add_param($this->unr);
 
