@@ -2124,10 +2124,14 @@ class wochenplan extends basis_db
 				}
 			}
 
+			if($lvb!='')
+				$orlvb = "OR ($lvb)";
+			else
+				$orlvb = '';
 			// Stundenplanabfrage bauen (Wo ist Kollision?)
 			$sql_query="SELECT DISTINCT datum, stunde FROM $stpl_table
 				WHERE datum>=".$this->db_add_param($datum_begin)." AND datum<".$this->db_add_param($datum_end)." AND
-				($lkt $gruppen OR ($lvb) )";
+				($lkt $gruppen $orlvb )";
 			if (is_numeric($unr))
 				$sql_query.=" AND unr!=".$this->db_add_param($unr);
 			$sql_query.=" AND NOT EXISTS(SELECT 1 FROM public.tbl_gruppe WHERE gruppe_kurzbz=".$stpl_table.".gruppe_kurzbz and direktinskription=true)";
