@@ -176,10 +176,17 @@ function NotePruefungAnlegen($studiensemester_kurzbz, $student_uid, $lehrveranst
 
 	// Lehreinheit ermitteln
 	$error = false;
-	$qry = "SELECT lehreinheit_id FROM campus.vw_student_lehrveranstaltung "
-		 . "WHERE uid=".$db->db_add_param($student_uid)." AND lehrveranstaltung_id=".$db->db_add_param($lehrveranstaltung_id)." "
-		 . "ORDER BY lehreinheit_id ASC "
-		 . "LIMIT 1";
+	$qry = "
+		SELECT
+			lehreinheit_id
+		FROM
+			campus.vw_student_lehrveranstaltung
+		WHERE
+			uid=".$db->db_add_param($student_uid)."
+		 	AND lehrveranstaltung_id=".$db->db_add_param($lehrveranstaltung_id)."
+			AND studiensemester_kurzbz=".$db->db_add_param($studiensemester_kurzbz)."
+		ORDER BY lehreinheit_id ASC
+		LIMIT 1";
 
 	if($result = $db->db_query($qry))
 	{
@@ -1209,7 +1216,7 @@ if(!$error)
 						$rolle->bestaetigtam = $_POST['bestaetigtam'];
 						if($_POST['bestaetigtam']=='')
 							$rolle->bestaetigtvon = null;
-						
+
 						$rolle->bewerbung_abgeschicktamum = $_POST['bewerbung_abgeschicktamum'];
 						$rolle->orgform_kurzbz = $_POST['orgform_kurzbz'];
 						$rolle->studienplan_id = $_POST['studienplan_id'];

@@ -4,6 +4,7 @@ const CALLED_PATH = FHC_JS_DATA_STORAGE_OBJECT.called_path;
 const CONTROLLER_URL = BASE_URL + "/"+CALLED_PATH;
 const RTFREIGABE_MESSAGE_VORLAGE = "InfocenterRTfreigegeben";
 const RTFREIGABE_MESSAGE_VORLAGE_QUER = "InfocenterRTfreigegQuer";
+const RTFREIGABE_MESSAGE_VORLAGE_QUER_KURZ = "InfocenterRTfreigegQuerKurz";
 const STGFREIGABE_MESSAGE_VORLAGE = "InfocenterSTGfreigegeben";
 
 /**
@@ -277,6 +278,9 @@ var InfocenterDetails = {
 					{
 						FHC_AjaxClient.showVeil();
 						InfocenterDetails.initFrgMessageSend(data.retval.prestudent_id, rtfreigabe);
+						InfocenterDetails._refreshZgv();
+						FHC_AjaxClient.hideVeil();
+						InfocenterDetails._refreshLog();
 					}
 					else if (data.error === 2 && parseInt(data.retval.prestudent_id, 10))
 					{
@@ -460,48 +464,98 @@ var InfocenterDetails = {
 			}
 		);
 	},
+	getPrestudentData: function(personid, callback)
+	{
+		FHC_AjaxClient.ajaxCallGet(
+			CALLED_PATH + "/getPrestudentData/"+encodeURIComponent(personid),
+			null,
+			{
+				successCallback: callback,
+				veilTimeout: 0
+			}
+		);
+	},
 	initFrgMessageSend: function(prestudentid, rtfreigabe)
 	{
-		var callback = function ()
+		var callback = function (data)
 		{
+			if (data == null)
+				return;
+
 			// check if a prestudent in same semester is already freigegeben - then not send message again
 			var freigegeben = false;
-			var prestudentids = $(".prestudentidinput");
+			var receiverPrestudentstatus = null;
 
-			if (prestudentids.length > 1)
+			//get prestudentstatus of message receiver
+			for(var i = 0; i < data.length; i++)
 			{
-				prestudentids.each(function()
-					{
-						var id = $(this).val();
-
-						if (parseInt(id) !== parseInt(prestudentid))
-						{
-							if ($("#studiensemester_"+id).val() === $("#studiensemester_"+prestudentid).val() && $("#isfreigegeben_"+id).val() === "1")
-							{
-								freigegeben = true;
-								return false;
-							}
-						}
-					}
-				);
+				if (data[i].prestudentstatus.prestudent_id === prestudentid)
+				{
+					receiverPrestudentstatus = data[i].prestudentstatus;
+					break;
+				}
 			}
+
+			if (receiverPrestudentstatus == null)
+				return;
+
+			//check other prestudentstati wether already freigegeben
+			for(var j = 0; j < data.length; j++)
+			{
+				var prestudent = data[j];
+				var prestudentstatus = prestudent.prestudentstatus;
+				var id = prestudentstatus.prestudent_id;
+
+				if (id !== prestudentid)
+				{
+					if (receiverPrestudentstatus.studiensemester_kurzbz === prestudentstatus.studiensemester_kurzbz
+						&& prestudentstatus.bestaetigtam !== null && prestudentstatus.status_kurzbz === "Interessent"
+						&& prestudent.studiengangtyp === "b")
+					{
+						freigegeben = true;
+						break;
+					}
+				}
+			}
+
+			var ausbildungssemester = receiverPrestudentstatus.ausbildungssemester;
+			var studiengangbezeichnung = receiverPrestudentstatus.studiengangbezeichnung;
+			var studiengangbezeichnung_englisch = receiverPrestudentstatus.studiengangbezeichnung_englisch;
+			var msgvars = {};
 
 			if (freigegeben)
 			{
 				InfocenterDetails._refreshLog();
+				//if already freigegeben, still send (shorter) message if Quereinsteiger
+				if (ausbildungssemester > 1)
+				{
+					msgvars = {
+						'ausbildungssemester': ausbildungssemester,
+						'studiengangbezeichnung': studiengangbezeichnung,
+						'studiengangbezeichnung_englisch': studiengangbezeichnung_englisch
+					};
+					InfocenterDetails.sendFreigabeMessage(prestudentid, RTFREIGABE_MESSAGE_VORLAGE_QUER_KURZ, msgvars);
+				}
 			}
 			else
 			{
-				var ausbildungssem = $("#ausbildungssem_" + prestudentid).val();
 				var vorlage_kurzbz = null;
-				var msgvars = {};
 
 				if (rtfreigabe)
 				{
-					vorlage_kurzbz = isNaN(ausbildungssem) || parseInt(ausbildungssem) === 1 ? RTFREIGABE_MESSAGE_VORLAGE : RTFREIGABE_MESSAGE_VORLAGE_QUER;
-					msgvars = {
-						'rtlink': FHC_JS_DATA_STORAGE_OBJECT.app_root + 'addons/bewerbung/cis/registration.php?active=aufnahme',
-						'ausbildungssemester': ausbildungssem
+					if (ausbildungssemester > 1)
+					{
+						vorlage_kurzbz =  RTFREIGABE_MESSAGE_VORLAGE_QUER;
+						msgvars = {
+							/*'rtlink': FHC_JS_DATA_STORAGE_OBJECT.app_root + 'addons/bewerbung/cis/registration.php?active=aufnahme',*/
+							'ausbildungssemester': ausbildungssemester,
+							'studiengangbezeichnung': studiengangbezeichnung,
+							'studiengangbezeichnung_englisch': studiengangbezeichnung_englisch
+						}
+					}
+					else
+					{
+						vorlage_kurzbz =  RTFREIGABE_MESSAGE_VORLAGE;
 					}
 				}
 				else
@@ -510,18 +564,16 @@ var InfocenterDetails = {
 				}
 				InfocenterDetails.sendFreigabeMessage(prestudentid, vorlage_kurzbz, msgvars);
 			}
-			FHC_AjaxClient.hideVeil();
 		};
 
-		InfocenterDetails._refreshZgv(
-			false,
-			//send message only after refresh to have current Ausbildungssemester
-			callback
-		);
+		var personid = $("#hiddenpersonid").val();
+
+		InfocenterDetails.getPrestudentData(
+			personid, callback
+		)
 	},
 	sendFreigabeMessage: function(prestudentid, vorlage_kurzbz, msgvars)
 	{
-
 		FHC_AjaxClient.ajaxCallPost(
 			'system/Messages/sendJson',
 			{
@@ -668,7 +720,7 @@ var InfocenterDetails = {
 				$(".freigabeModal").modal("hide");
 				var prestudent_id = this.id.substr(this.id.indexOf("_") + 1);
 				var data = {"prestudent_id": prestudent_id};
-				InfocenterDetails.saveFreigabe(data, true);
+				InfocenterDetails.saveFreigabe(data, true);//Reihungstestfreigabe
 			}
 		);
 
@@ -678,17 +730,17 @@ var InfocenterDetails = {
 				var prestudent_id = this.id.substr(this.id.indexOf("_") + 1);
 				var statusgrund_id = $("#frgstatusgrselect_" + prestudent_id + " select[name=frgstatusgrund]").val();
 				var data = {"prestudent_id": prestudent_id, "statusgrund_id": statusgrund_id};
-				InfocenterDetails.saveFreigabe(data);
+				InfocenterDetails.saveFreigabe(data);//Studiengangfreigabe
 			}
 		)
 	},
-	_refreshZgv: function(preserveCollapseState, callback)
+	_refreshZgv: function(preserveCollapseState)
 	{
 		var personid = $("#hiddenpersonid").val();
 
 		var collapsed = {};
 
-		//save if panel is collapsed to preserve collapse state
+		//check if panel is collapsed to preserve collapse state
 		if (preserveCollapseState)
 		{
 			$("#zgvpruefungen").find(".panel-collapse").each(
@@ -715,10 +767,6 @@ var InfocenterDetails = {
 							$("#"+i).addClass("in");
 					}
 				}
-
-				// variable callback executed after refresh
-				if (callback)
-					callback();
 			}
 		);
 	},
