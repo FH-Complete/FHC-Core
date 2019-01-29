@@ -526,7 +526,7 @@ class lehreinheit extends basis_db
 					WHERE datum=".$this->db_add_param($datum)." AND stunde=".$this->db_add_param($stunde);
 
 			// Direkte Lehreinheitsgruppen kollidieren nicht
-			$sql_query.=" AND NOT EXISTS(SELECT 1 FROM public.tbl_gruppe g WHERE g.gruppe_kurzbz=gruppe_kurzbz AND direktinskription=true)";
+			$sql_query.=" AND NOT EXISTS(SELECT 1 FROM public.tbl_gruppe g WHERE g.gruppe_kurzbz=$stpl_table.gruppe_kurzbz AND direktinskription=true)";
 			if (is_numeric($this->unr))
 				$sql_query.=" AND unr!=".$this->db_add_param($this->unr)." AND (1=2 ";
 
