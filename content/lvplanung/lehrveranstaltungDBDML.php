@@ -1539,13 +1539,16 @@ if(!$error)
 				// es wird eine erstellt und zugewiesen
 				$gruppe_kurzbz = 'LE_'.$lehreinheit_id;
 
+				$stg_obj = new studiengang();
+				$stg_obj->load($lva->studiengang_kz);
+				$bezeichnung = $stg_obj->kuerzel.' '.$lva->semester.' '.$lva->kurzbz;
 				$gruppe = new gruppe();
 				if(!$gruppe->load($gruppe_kurzbz))
 				{
 					$gruppe->gruppe_kurzbz = $gruppe_kurzbz;
 					$gruppe->studiengang_kz = $lva->studiengang_kz;
 					$gruppe->semester = $lva->semester;
-					$gruppe->bezeichnung = 'LE_'.$lehreinheit_id;
+					$gruppe->bezeichnung = $bezeichnung;
 					$gruppe->aktiv = true;
 					$gruppe->mailgrp = false;
 					$gruppe->sichtbar = true;
@@ -1561,10 +1564,9 @@ if(!$error)
 						$return = false;
 					}
 				}
-				error_log("grp:".$gruppe_kurzbz);
+
 				if ($gruppe_kurzbz != '')
 				{
-					error_log("drin");
 					$lehreinheitgruppe = new lehreinheitgruppe();
 
 					$lehreinheitgruppe->lehreinheit_id = $lehreinheit_id;
@@ -1578,18 +1580,12 @@ if(!$error)
 						$gruppe_kurzbz = '';
 						$return = false;
 						$errormsg = $lehreinheitgruppe->errormsg;;
-						error_log("fail");
-					}
-					else
-					{
-						error_log("ok");
 					}
 				}
 			}
-			error_log("nachher");
+
 			if ($gruppe_kurzbz != '')
 			{
-				error_log("drin2");
 				$benutzergruppe = new benutzergruppe();
 				if (!$benutzergruppe->load($uid, $gruppe_kurzbz, $lehreinheit->studiensemester_kurzbz))
 				{
@@ -1611,7 +1607,6 @@ if(!$error)
 				}
 				else
 				{
-					error_log("Load Failed:".$uid.' '.$gruppe_kurzbz.' '.$lehreinheit->studiensemester_kurzbz);
 					$errormsg = $benutzergruppe->errormsg;
 					$return = false;
 				}

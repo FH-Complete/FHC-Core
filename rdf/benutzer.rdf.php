@@ -49,22 +49,25 @@ $studiengang->getAll(null, false);
 $oRdf->sendHeader();
 $db = new basis_db();
 
-$i=0;
-foreach($benutzer->result as $row)
+if(count($benutzer->result) > 0)
 {
-	if(isset($studiengang->kuerzel_arr[$row->studiengang_kz]))
-		$stg = $studiengang->kuerzel_arr[$row->studiengang_kz];
-	else
-		$stg = '';
+	$i=0;
+	foreach($benutzer->result as $row)
+	{
+		if(isset($studiengang->kuerzel_arr[$row->studiengang_kz]))
+			$stg = $studiengang->kuerzel_arr[$row->studiengang_kz];
+		else
+			$stg = '';
 
-	$i=$oRdf->newObjekt($i);
-	$oRdf->obj[$i]->setAttribut('uid',$row->uid,true);
-	$oRdf->obj[$i]->setAttribut('vorname',$row->vorname,true);
-	$oRdf->obj[$i]->setAttribut('nachname',$row->nachname,true);
-	$oRdf->obj[$i]->setAttribut('studiengang',$stg,true);
-	$oRdf->obj[$i]->setAttribut('semester',$row->semester,true);
-	$oRdf->addSequence($i);
-	$i++;
+		$i=$oRdf->newObjekt($i);
+		$oRdf->obj[$i]->setAttribut('uid',$row->uid,true);
+		$oRdf->obj[$i]->setAttribut('vorname',$row->vorname,true);
+		$oRdf->obj[$i]->setAttribut('nachname',$row->nachname,true);
+		$oRdf->obj[$i]->setAttribut('studiengang',$stg,true);
+		$oRdf->obj[$i]->setAttribut('semester',$row->semester,true);
+		$oRdf->addSequence($i);
+		$i++;
+	}
 }
 $oRdf->sendRdfText();
 ?>
