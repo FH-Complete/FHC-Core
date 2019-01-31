@@ -365,14 +365,14 @@ else
 	    					class="sortDirectionIndicator"
 	    					sort="rdf:http://www.technikum-wien.at/student/rdf#aufnahmegruppe_kurzbz" onclick="StudentTreeSort()"/>
 	    				<splitter class="tree-splitter"/>
-						<treecol id="student-treecol-rt_datum" label="RT Datum" flex="1" hidden="true" persist="hidden, width, ordinal"
+						<!--<treecol id="student-treecol-rt_datum" label="RT Datum" flex="1" hidden="true" persist="hidden, width, ordinal"
 							class="sortDirectionIndicator"
 							sort="rdf:http://www.technikum-wien.at/student/rdf#rt_datum" onclick="StudentTreeSort()"/>
 						<splitter class="tree-splitter"/>
 						<treecol id="student-treecol-rt_anmeldung" label="RT Anmeldung" flex="1" hidden="true" persist="hidden, width, ordinal"
 							class="sortDirectionIndicator"
 							sort="rdf:http://www.technikum-wien.at/student/rdf#rt_anmeldung" onclick="StudentTreeSort()"/>
-						<splitter class="tree-splitter"/>
+						<splitter class="tree-splitter"/>-->
 	    				<treecol id="student-treecol-dual" label="Dual" flex="1" hidden="true" persist="hidden, width, ordinal"
 	    					class="sortDirectionIndicator"
 	    					sort="rdf:http://www.technikum-wien.at/student/rdf#dual_bezeichnung" onclick="StudentTreeSort()"/>
@@ -391,7 +391,7 @@ else
 	    				<splitter class="tree-splitter"/>
 	    				<treecol id="student-treecol-priorisierung" label="Priorität" flex="1" hidden="false" persist="hidden, width, ordinal"
 	    					class="sortDirectionIndicator"
-	    					sort="rdf:http://www.technikum-wien.at/student/rdf#priorisierung" onclick="StudentTreeSort()"/>
+	    					sort="rdf:http://www.technikum-wien.at/student/rdf#priorisierung_realtiv" onclick="StudentTreeSort()"/>
 	    				<splitter class="tree-splitter"/>
 						<treecol id="student-treecol-mentor" label="Mentor" flex="1" hidden="true" persist="hidden, width, ordinal"
 						class="sortDirectionIndicator"
@@ -446,13 +446,13 @@ else
 									<treecell properties="Aktiv_rdf:http://www.technikum-wien.at/student/rdf#aktiv" label="rdf:http://www.technikum-wien.at/student/rdf#punkte3" />
 									-->
 									<treecell properties="Aktiv_rdf:http://www.technikum-wien.at/student/rdf#aktiv" label="rdf:http://www.technikum-wien.at/student/rdf#aufnahmegruppe_kurzbz" />
-									<treecell properties="Aktiv_rdf:http://www.technikum-wien.at/student/rdf#aktiv" label="rdf:http://www.technikum-wien.at/student/rdf#rt_datum" />
-									<treecell properties="Aktiv_rdf:http://www.technikum-wien.at/student/rdf#aktiv" label="rdf:http://www.technikum-wien.at/student/rdf#rt_anmeldung" />
+									<!--<treecell properties="Aktiv_rdf:http://www.technikum-wien.at/student/rdf#aktiv" label="rdf:http://www.technikum-wien.at/student/rdf#rt_datum" />
+									<treecell properties="Aktiv_rdf:http://www.technikum-wien.at/student/rdf#aktiv" label="rdf:http://www.technikum-wien.at/student/rdf#rt_anmeldung" />-->
 	           							<treecell properties="Aktiv_rdf:http://www.technikum-wien.at/student/rdf#aktiv" label="rdf:http://www.technikum-wien.at/student/rdf#dual_bezeichnung" />
 									<treecell properties="Aktiv_rdf:http://www.technikum-wien.at/student/rdf#aktiv" label="rdf:http://www.technikum-wien.at/student/rdf#matr_nr" />
 									<treecell properties="Aktiv_rdf:http://www.technikum-wien.at/student/rdf#aktiv" label="rdf:http://www.technikum-wien.at/student/rdf#studienplan_bezeichnung" />
 									<treecell properties="Aktiv_rdf:http://www.technikum-wien.at/student/rdf#aktiv" label="rdf:http://www.technikum-wien.at/student/rdf#prestudent_id" />
-									<treecell properties="Aktiv_rdf:http://www.technikum-wien.at/student/rdf#aktiv" label="rdf:http://www.technikum-wien.at/student/rdf#priorisierung" />
+									<treecell properties="Aktiv_rdf:http://www.technikum-wien.at/student/rdf#aktiv" label="rdf:http://www.technikum-wien.at/student/rdf#priorisierung_realtiv" />
 									<treecell properties="Aktiv_rdf:http://www.technikum-wien.at/student/rdf#aktiv" label="rdf:http://www.technikum-wien.at/student/rdf#mentor" />
 									<treecell properties="Aktiv_rdf:http://www.technikum-wien.at/student/rdf#aktiv" label="rdf:http://www.technikum-wien.at/student/rdf#aktiv" />
 									<treecell properties="Aktiv_rdf:http://www.technikum-wien.at/student/rdf#aktiv" label="rdf:http://www.technikum-wien.at/student/rdf#geburtsdatum_iso" />
