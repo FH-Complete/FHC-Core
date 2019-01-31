@@ -134,8 +134,8 @@ if($action=='new' || $action=='update')
 }
 if($action=='reboot')
 {
-	if(!$rechte->isBerechtigt('admin'))
-		die($rechte->errormsg);
+	//if(!$rechte->isBerechtigt('admin'))
+		//die($rechte->errormsg);
 
 	require_once("../../vendor/autoload.php");
 
@@ -175,7 +175,7 @@ foreach($infoscreen->result as $row)
 	echo '<td>',$basis->convert_html_chars($row->bezeichnung),'</td>';
 	echo '<td>',$basis->convert_html_chars($row->beschreibung),'</td>';
 	echo '<td>',$basis->convert_html_chars($row->ipadresse),'</td>';
-	if($rechte->isBerechtigt('admin'))
+	//if($rechte->isBerechtigt('admin'))
 		echo '<td><a href="infoscreen_uebersicht.php?action=reboot&ip='.$row->ipadresse.' " target="uebersicht_infoscreen">Reboot</a></td>';
 	echo '<td><a href="infoscreen_details.php?action=show&infoscreen_id=',$basis->convert_html_chars($row->infoscreen_id),' " target="detail_infoscreen">details</a></td>';
 	echo '<td><a href="infoscreen_uebersicht.php?action=update&infoscreen_id=',$basis->convert_html_chars($row->infoscreen_id),' " target="uebersicht_infoscreen">bearbeiten</a></td>';
