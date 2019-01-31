@@ -566,14 +566,15 @@ if(isset($_GET['excel']))
 		<title>Reihungstest</title>
 		<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
 		<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
-
-		<script type="text/javascript" src="../../vendor/jquery/jqueryV1/jquery-1.12.4.min.js"></script>
+		
+		<?php 
+			include('../../include/meta/jquery.php');
+			include('../../include/meta/jquery-tablesorter.php');
+		?>
 
 		<script type="text/javascript" src="../../include/js/jquery.ui.datepicker.translation.js"></script>
 		<script type="text/javascript" src="../../vendor/jquery/sizzle/sizzle.js"></script>
 
-		<script type="text/javascript" src="../../vendor/christianbach/tablesorter/jquery.tablesorter.min.js"></script>
-		<link rel="stylesheet" href="../../skin/tablesort.css" type="text/css"/>
 		<link href="../../skin/jquery-ui-1.9.2.custom.min.css" rel="stylesheet" type="text/css">
 		<script type="text/javascript" src="../../vendor/components/jqueryui/jquery-ui.min.js"></script>
  		<script src="../../vendor/rmariuzzo/jquery-checkboxes/dist/jquery.checkboxes-1.0.7.min.js" type="text/javascript"></script>
@@ -771,7 +772,7 @@ if(isset($_GET['excel']))
 				{
 					$("#"+v.id).tablesorter(
 					{
-						widgets: ["zebra"],
+						widgets: ["zebra", "filter", "stickyHeaders"],
 						sortList: [[3,0],[4,0]],
 						headers: {0: { sorter: false}}
 					});
