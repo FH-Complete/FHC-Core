@@ -109,7 +109,7 @@ class Studiensemester_model extends DB_Model
 	 */
 	public function getAusbildungssemesterByStudiensemesterAndStudiengang($studiensemester_kurzbz, $studiengang_kz)
 	{
-		$query = "SELECT DISTINCT semester 
+		$query = "SELECT DISTINCT semester
 							FROM lehre.tbl_studienplan
 							JOIN lehre.tbl_studienordnung USING(studienordnung_id)
 							JOIN lehre.tbl_studienplan_semester USING(studienplan_id)
@@ -131,14 +131,29 @@ class Studiensemester_model extends DB_Model
 		if (date_format(date_create($from), 'Y-m-d') > (date_format(date_create($to), 'Y-m-d')))
 			return success(array());
 
-		$query = "SELECT * 
+		$query = "SELECT *
 							FROM public.tbl_studiensemester
-							WHERE 
+							WHERE
 							  (ende > ?::date AND start < ?::date)
 							  OR start = ?::date
 							  OR ende = ?::date
 							ORDER BY start DESC";
 
 		return $this->execQuery($query, array($from, $to, $from, $to));
+	}
+
+	/**
+	 * Liefert das Studiensemester das aktuell am naehesten zu $studiensemester_kurzbz liegt
+	 *
+	 * @param $studiensemester_kurzbz
+	 * @return array | null
+	 */
+	public function getNearestFrom($studiensemester_kurzbz)
+	{
+		$query = "SELECT studiensemester_kurzbz, start, ende FROM public.vw_studiensemester
+				WHERE studiensemester_kurzbz <> ?
+		        ORDER BY delta LIMIT 1";
+
+		return $this->execQuery($query, array($studiensemester_kurzbz));
 	}
 }
