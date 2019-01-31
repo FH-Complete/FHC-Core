@@ -143,6 +143,7 @@ $this->phrasen['global/hilfe']='Help';
 $this->phrasen['global/benutzer']='User';
 $this->phrasen['global/anleitung']='Manual';
 $this->phrasen['global/bericht']='Report';
+$this->phrasen['global/fixangestellt']='Salaried';
 
 // Statusmeldungen
 $this->phrasen['global/erfolgreichgespeichert']='Successfully saved';
