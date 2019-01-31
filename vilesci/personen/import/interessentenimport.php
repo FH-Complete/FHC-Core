@@ -38,6 +38,7 @@ require_once('../../../include/student.class.php');
 require_once('../../../include/lehrverband.class.php');
 require_once('../../../include/nation.class.php');
 require_once('../../../include/studienplan.class.php');
+require_once('../../../include/organisationsform.class.php');
 
 $db = new basis_db();
 $user=get_uid();
@@ -582,7 +583,15 @@ if($studiensemester_kurzbz == '')
 	}
 	else
 	{
-		$studiensemester_kurzbz = $stsem->getaktorNext();
+		if(date('m')=='9')
+		{
+			$studiensemester_kurzbz = $stsem->getaktorNext();
+		}
+		else
+		{
+			$stsem->getNextStudiensemester('WS');
+			$studiensemester_kurzbz = $stsem->studiensemester_kurzbz;
+		}
 	}
 
 }
@@ -670,6 +679,8 @@ if(isset($_POST['save']))
 	}
 	else
 	{
+		$zugangscode = substr(md5(openssl_random_pseudo_bytes(20)), 0, 15);
+		
 		$person->new = true;
 		$person->anrede = $anrede;
 		$person->titelpre = $titel;
@@ -684,7 +695,7 @@ if(isset($_POST['save']))
 		$person->aktiv = true;
 		$person->insertamum = date('Y-m-d H:i:s');
 		$person->insertvon = $user;
-        $person->zugangscode= uniqid();
+		$person->zugangscode= $zugangscode;
 		if($person->save())
 		{
 			$error=false;
@@ -1124,18 +1135,34 @@ echo '</td></tr>';
 echo '<tr><td>Ausbildungsart</td><td><input type="text" id="ausbildungsart" name="ausbildungsart" value="'.$ausbildungsart.'" /></td></tr>';
 echo '<tr><td>Anmerkungen</td><td><textarea id="anmerkung" name="anmerkungen">'.$anmerkungen.'</textarea></td></tr>';
 echo '<tr><td>Studiengang *</td><td><SELECT id="studiengang_kz" name="studiengang_kz" onchange="loadStudienplanData()">';
+echo '<OPTION value="">-- keine Auswahl --</OPTION>';
 $stg_obj = new studiengang();
 $stg_obj->getAll('typ, kurzbz');
+$types = new studiengang();
+$types->getAllTypes();
+$typ = '';
 foreach ($stg_obj->result as $row)
 {
+	if ($typ != $row->typ || $typ == '')
+	{
+		if ($typ != '')
+		{
+			echo '</optgroup>';
+		}
+		echo '<optgroup label="'.($types->studiengang_typ_arr[$row->typ] != ''?$types->studiengang_typ_arr[$row->typ]:$row->typ).'">';
+	}
 	if($rechte->isBerechtigt('admin', $row->studiengang_kz, 'suid') || $rechte->isBerechtigt('assistenz', $row->studiengang_kz, 'suid'))
-		echo '<OPTION value="'.$row->studiengang_kz.'" '.($row->studiengang_kz==$studiengang_kz?'selected':'').'>'.$row->kuerzel.'</OPTION>';
+	{
+		echo '<OPTION value="'.$row->studiengang_kz.'" '.($row->studiengang_kz==$studiengang_kz?'selected':'').'>'.$row->kuerzel.' ('.$row->bezeichnung.')</OPTION>';
+	}
+	
+	$typ = $row->typ;
 }
 echo '</SELECT>';
 echo '</td></tr>';
 echo '<tr><td>Studiensemester *</td><td><SELECT id="studiensemester_kurzbz" name="studiensemester_kurzbz" onchange="loadStudienplanData()">';
 $stsem = new studiensemester();
-$stsem->getAll();
+$stsem->getPlusMinus(10, 2, 'start ASC');
 foreach ($stsem->studiensemester as $row)
 	echo '<OPTION value="'.$row->studiensemester_kurzbz.'" '.($row->studiensemester_kurzbz==$studiensemester_kurzbz?'selected':'').'>'.$row->studiensemester_kurzbz.'</OPTION>';
 echo '</SELECT>';
@@ -1145,17 +1172,20 @@ for ($i=1;$i<9;$i++)
 	echo '<OPTION value="'.$i.'" '.($i==$ausbildungssemester?'selected':'').'>'.$i.'. Semester</OPTION>';
 echo '</SELECT>';
 echo '</td></tr>';
-echo '<tr><td>OrgForm</td><td><SELECT id="orgform_kurzbz" name="orgform_kurzbz" onchange="loadStudienplanData()">';
+echo '<tr><td>OrgForm</td><td>';
+
+echo '<SELECT id="orgform_kurzbz" name="orgform_kurzbz" onchange="loadStudienplanData()">';
+
 echo '<OPTION value="">-- keine Auswahl --</OPTION>';
-$qry = "SELECT orgform_kurzbz, bezeichnung FROM bis.tbl_orgform WHERE rolle ORDER BY bezeichnung";
-if($result = $db->db_query($qry))
+$orgformen = new organisationsform();
+$orgformen->getOrgformLV();
+foreach ($orgformen->result AS $orgform_row)
 {
-	while($row = $db->db_fetch_object($result))
-	{
-		echo '<OPTION value="'.$row->orgform_kurzbz.'" '.($orgform_kurzbz==$row->orgform_kurzbz?'selected':'').'>'.$row->bezeichnung.'</OPTION>';
-	}
+	echo '<OPTION value="'.$orgform_row->orgform_kurzbz.'" '.($orgform_kurzbz==$orgform_row->orgform_kurzbz?'selected':'').'>'.$orgform_row->orgform_kurzbz.' - '.$orgform_row->bezeichnung.'</OPTION>';
 }
+
 echo '</SELECT>';
+
 echo '</td></tr>';
 echo "\n";
 echo '<tr><td>Studienplan</td><td><div id="studienplandiv">';
