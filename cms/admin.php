@@ -144,7 +144,8 @@ if(isset($_POST['NewContent']))
 		protect: [ /\<\/?(audio[^>]+|audio)\>/g, 	// Protect <audio...> und </audio>],
 		           /\<\/?(source[^>]+)\>/g, 		// Protect <source...>],
 		        	/\<\/?(video[^>]+|video)\>/g 	// Protect <video...> und </video>],
-			   		],  
+			   		],
+		valid_elements: "*[*]", // Allow all attributes in all Tags. Documentation see: https://www.tiny.cloud/docs-3x/reference/configuration/Configuration3x@valid_elements/
 		   		
 		file_browser_callback: "FHCFileBrowser",
 		
