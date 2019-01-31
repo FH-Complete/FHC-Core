@@ -114,7 +114,9 @@ echo '
 <script>
 	function delPerson(type, info)
 	{
-		if(!confirm("Sind Sie sich sicher?"))
+		if(!confirm("!!!ACHTUNG!!!\nDie Aktion löscht alle Daten der Person im System.\n"
+					+"Das betrifft auch alle PreStudierenden- sowie ggf. MitarbeiterInnen-Daten\n\n"
+					+"Sind Sie sich sicher?"))
 			return;
 
 
@@ -233,13 +235,14 @@ if($searchstr!='')
 		echo $db->db_num_rows($result).' Person(en) gefunden<br><br>';
 		echo '<table>';
 		echo '<tr class="liste" align="center">';
-		echo "<td colspan='5'><b>Person</b></td>";
+		echo "<td colspan='6'><b>Person</b></td>";
 		echo "<td colspan='4'><b>Benutzer</b></td>";
 		echo "<td colspan='4'><b>Mitarbeiter</b></td>";
 		echo "<td colspan='4'><b>Student</b></td>";
 		if($admin){echo "<td><b></b></td>";}
 		echo '</tr>';
 		echo '<tr class="liste" align="center">';
+		echo "<td><b>Person ID</b></td>";
 		echo "<td><b>Nachname</b></td>";
 		echo "<td><b>Vorname</b></td>";
 		echo "<td><b>Gebdatum</b></td>";
@@ -268,6 +271,7 @@ if($searchstr!='')
 				if($row_person = $db->db_fetch_object($result_person))
 				{
 					echo '<tr class="liste1">';
+					echo "<td>$row_person->person_id</td>";
 					echo "<td><a href='personen_details.php?person_id=$row_person->person_id'>$row_person->nachname</a></td>";
 					echo "<td>$row_person->vorname</td>";
 					echo "<td>".($row_person->gebdatum!=''?$datum_obj->convertISODate($row_person->gebdatum):'')."</td>";
@@ -302,6 +306,7 @@ if($searchstr!='')
 							while($row_mitarbeiter = $db->db_fetch_object($result_mitarbeiter))
 							{
 								$content.= '<tr >';
+								$content.= '<td></td>';
 								$content.= '<td></td>';
 								$content.= '<td></td>';
 								$content.= '<td></td>';
@@ -349,6 +354,7 @@ if($searchstr!='')
 								$student->getLastStatus($row_student->prestudent_id);
 
 								$content.= '<tr>';
+								$content.= '<td></td>';
 								$content.= '<td></td>';
 								$content.= '<td></td>';
 								$content.= '<td></td>';
@@ -1132,12 +1138,30 @@ function casDeletePerson($db, $person_id, $trans=true)
 		if(!$db->db_query($qry))
 			$error = true;
 	}
+	
+	if(!$error)
+	{
+		$qry = '
+			DELETE FROM public.tbl_msg_recipient
+				WHERE person_id='.$db->db_add_param($person_id, FHC_INTEGER);
+		if(!$db->db_query($qry))
+			$error = true;
+	}
 
 	if(!$error)
 	{
 		$qry = '
 			DELETE FROM public.tbl_msg_status
 				WHERE message_id IN (SELECT message_id FROM tbl_msg_message WHERE person_id='.$db->db_add_param($person_id, FHC_INTEGER) . ')';
+		if(!$db->db_query($qry))
+			$error = true;
+	}
+	
+	if(!$error)
+	{
+		$qry = '
+			DELETE FROM public.tbl_msg_status
+				WHERE person_id='.$db->db_add_param($person_id, FHC_INTEGER);
 		if(!$db->db_query($qry))
 			$error = true;
 	}
@@ -1150,12 +1174,39 @@ function casDeletePerson($db, $person_id, $trans=true)
 		if(!$db->db_query($qry))
 			$error = true;
 	}
+	
+	if(!$error)
+	{
+		$qry = '
+			DELETE FROM public.tbl_adresse
+				WHERE person_id='.$db->db_add_param($person_id, FHC_INTEGER);
+		if(!$db->db_query($qry))
+			$error = true;
+	}
 
 	if(!$error)
 	{
 		$qry = '
 			DELETE FROM public.tbl_akte
 				WHERE uid IN (SELECT uid FROM public.tbl_benutzer WHERE person_id='.$db->db_add_param($person_id, FHC_INTEGER).')';
+		if(!$db->db_query($qry))
+			$error = true;
+	}
+	
+	if(!$error)
+	{
+		$qry = '
+			DELETE FROM public.tbl_akte
+				WHERE person_id='.$db->db_add_param($person_id, FHC_INTEGER);
+		if(!$db->db_query($qry))
+			$error = true;
+	}
+	
+	if(!$error)
+	{
+		$qry = '
+			DELETE FROM public.tbl_preincoming
+				WHERE person_id='.$db->db_add_param($person_id, FHC_INTEGER);
 		if(!$db->db_query($qry))
 			$error = true;
 	}
@@ -1258,6 +1309,24 @@ function casDeletePerson($db, $person_id, $trans=true)
 		$qry = '
 			DELETE FROM campus.tbl_contentlog
 				WHERE uid IN (SELECT uid FROM public.tbl_benutzer WHERE person_id='.$db->db_add_param($person_id, FHC_INTEGER).')';
+		if(!$db->db_query($qry))
+			$error = true;
+	}
+	
+	if(!$error)
+	{
+		$qry = '
+			DELETE FROM system.tbl_person_lock
+				WHERE person_id='.$db->db_add_param($person_id, FHC_INTEGER);
+		if(!$db->db_query($qry))
+			$error = true;
+	}
+	
+	if(!$error)
+	{
+		$qry = '
+			DELETE FROM system.tbl_log
+				WHERE person_id='.$db->db_add_param($person_id, FHC_INTEGER);
 		if(!$db->db_query($qry))
 			$error = true;
 	}
@@ -1478,6 +1547,20 @@ function casDeletePerson($db, $person_id, $trans=true)
 		if(!$db->db_query($qry))
 			$error = true;
 	}
+	
+	if(!$error)
+	{
+		$qry = '
+			WITH deleted_rows AS (
+				DELETE FROM public.tbl_notizzuordnung
+				WHERE person_id='.$db->db_add_param($person_id, FHC_INTEGER).'
+				RETURNING notiz_id
+			)
+			DELETE FROM public.tbl_notiz
+				WHERE notiz_id IN (SELECT notiz_id FROM deleted_rows)';
+		if(!$db->db_query($qry))
+			$error = true;
+	}
 
 	if(!$error)
 	{
@@ -1537,6 +1620,33 @@ function casDeletePerson($db, $person_id, $trans=true)
 				JOIN tbl_student ON (tbl_prestudent.prestudent_id = tbl_student.prestudent_id)
 				JOIN tbl_benutzer ON (tbl_student.student_uid = tbl_benutzer.uid)
 			WHERE tbl_benutzer.person_id = ' . $db->db_add_param($person_id, FHC_INTEGER).'
+		';
+		$resultPs = $db->db_query($queryPs);
+		if(!$resultPs)
+		{
+			$error = true;
+		}
+		else
+		{
+			while($row = $db->db_fetch_object($resultPs))
+			{
+				if(!$error)
+				{
+					if(!casDeletePrestudent($db, $row->prestudent_id, false))
+					{
+						$error = true;
+					}
+				}
+				else { break; }
+			}
+		}
+	}
+	
+	if(!$error)
+	{
+		$queryPs = '
+			SELECT tbl_prestudent.prestudent_id FROM tbl_prestudent
+			WHERE person_id = ' . $db->db_add_param($person_id, FHC_INTEGER).'
 		';
 		$resultPs = $db->db_query($queryPs);
 		if(!$resultPs)
