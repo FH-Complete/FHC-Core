@@ -7,6 +7,7 @@
 			'bootstrap' => true,
 			'fontawesome' => true,
 			'jqueryui' => true,
+			'dialoglib' => true,
 			'ajaxlib' => true,
 			'tablesorter' => true,
 			'tinymce' => true,
