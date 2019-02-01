@@ -16,6 +16,7 @@
 
 	// By default set the parameters to false
 	$addons = isset($addons) ? $addons : false;
+	$dialoglib = isset($dialoglib) ? $dialoglib : false;
 	$ajaxlib = isset($ajaxlib) ? $ajaxlib : false;
 	$bootstrap = isset($bootstrap) ? $bootstrap : false;
 	$filterwidget = isset($filterwidget) ? $filterwidget : false;
@@ -72,6 +73,9 @@
 
 			// --------------------------------------------------------------------------------------------------------
 			// From public folder
+
+			// DialogLib CSS
+			if ($dialoglib === true) generateCSSsInclude('public/css/DialogLib.css');
 
 			// AjaxLib CSS
 			if ($ajaxlib === true) generateCSSsInclude('public/css/AjaxLib.css');
@@ -138,6 +142,9 @@
 
 			// --------------------------------------------------------------------------------------------------------
 			// From public folder
+
+			// DialogLib JS
+			if ($dialoglib === true) generateJSsInclude('public/js/DialogLib.js');
 
 			// AjaxLib JS
 			// NOTE: must be called before including others JS libraries that use it

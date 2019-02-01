@@ -119,7 +119,7 @@ $(document).ready(function ()
 var InfocenterDetails = {
 
 	genericSaveError: function() {
-		alert("error when saving");
+		FHC_DialogLib.alertError("error when saving");
 	},
 	openZgvInfoForPrestudent: function(prestudent_id)
 	{
@@ -174,14 +174,11 @@ var InfocenterDetails = {
 			data,
 			{
 				successCallback: function(data, textStatus, jqXHR) {
-					if (data === true)
+					if (data !== true)
 					{
-						InfocenterDetails._refreshZgv(true);
+						FHC_DialogLib.alertError("error when saving ZGV prio");
 					}
-					else
-					{
-						alert("error when saving zgv Prio");
-					}
+					InfocenterDetails._refreshZgv(true);
 				}
 			}
 		);
@@ -264,7 +261,7 @@ var InfocenterDetails = {
 					}
 					else
 					{
-						alert("error when saving Absage");
+						FHC_DialogLib.alertError("error when saving Absage");
 					}
 				}
 			}
@@ -285,13 +282,13 @@ var InfocenterDetails = {
 					}
 					else if (data.error === 2 && parseInt(data.retval.prestudent_id, 10))
 					{
-						alert("error when setting accepted documents");
+						FHC_DialogLib.alertError("error when setting accepted documents");
 						InfocenterDetails._refreshZgv();
 						InfocenterDetails._refreshLog();
 					}
 					else
 					{
-						alert("error when saving Freigabe");
+						FHC_DialogLib.alertError("error when saving Freigabe");
 					}
 				}
 			}
