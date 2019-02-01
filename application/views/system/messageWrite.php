@@ -2,7 +2,7 @@
 $this->load->view(
 	'templates/FHC-Header',
 	array(
-		'title' => 'MessageReply',
+		'title' => 'Write a message',
 		'jquery' => true,
 		'bootstrap' => true,
 		'fontawesome' => true,
@@ -129,8 +129,7 @@ $this->load->view(
 											<label><?php echo ucfirst($this->p->t('global', 'empfaenger')).': '; ?></label>
 											<select id="recipients">
 												<?php
-													if (count($recipients) > 1)
-														echo '<option value="-1">Select...</option>';
+													if (count($recipients) > 1) echo '<option value="-1">Select...</option>';
 
 													foreach ($recipients as $receiver)
 													{
@@ -158,7 +157,7 @@ $this->load->view(
 					?>
 
 					<?php
-						for ($i = 0; $i < count($recipients); $i++)
+						foreach ($recipients as $receiver)
 						{
 							echo '<input type="hidden" name="persons[]" value="'.$receiver->person_id.'">'."\n";
 						}
