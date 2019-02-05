@@ -21,8 +21,8 @@
  *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
 /*******************************************************************************************************
- *		Autocomplete 
- * 		projektabgabe ermöglicht den Download aller Abgaben eines Stg. 
+ *		Autocomplete
+ * 		projektabgabe ermöglicht den Download aller Abgaben eines Stg.
  * 			fuer Diplom- und Bachelorarbeiten
  *******************************************************************************************************/
 	header( 'Expires:  -1' );
@@ -34,24 +34,24 @@
 	require_once('../../../config/cis.config.inc.php');
 	require_once('../../../include/basis_db.class.php');
 	require_once('../../../include/benutzerberechtigung.class.php');
-	require_once('../../../include/functions.inc.php');	
+	require_once('../../../include/functions.inc.php');
 	require_once('../../../include/phrasen.class.php');
-	
+
 	$sprache = getSprache();
 	$p = new phrasen($sprache);
-	
+
 	if (!$db = new basis_db())
 		die($p->t('global/fehlerBeimOeffnenDerDatenbankverbindung'));
-	
+
 	if (!$uid = get_uid())
 		die('Keine UID gefunden !  <a href="javascript:history.back()">Zur&uuml;ck</a>');
 
 	$rechte =  new benutzerberechtigung();
-	$rechte->getBerechtigungen($uid);	
+	$rechte->getBerechtigungen($uid);
 	$berechtigung_kurzbz = 'lehre/abgabetool:download';
 	if(!$rechte->isBerechtigt('admin') && !$rechte->isBerechtigt($berechtigung_kurzbz))
 		die($p->t('global/fehlerBeimErmittelnDerUID'));
-		
+
 // ------------------------------------------------------------------------------------------
 // Initialisierung
 // ------------------------------------------------------------------------------------------
@@ -63,12 +63,12 @@
 
   	$stg_kz=trim(isset($_REQUEST['stg_kz'])?$_REQUEST['stg_kz']:'');
   	$abgabetyp=trim(isset($_REQUEST['abgabetyp'])?$_REQUEST['abgabetyp']:'');
-	
+
   	$work=trim(isset($_REQUEST['work'])?$_REQUEST['work']:(isset($_REQUEST['ajax'])?$_REQUEST['ajax']:false));
 	$work=strtolower($work);
 
 # Direktaufruf Test	$work='work_termin_select';
-	
+
 // ------------------------------------------------------------------------------------------
 //	Datenlesen
 // ------------------------------------------------------------------------------------------
@@ -81,27 +81,25 @@ cellSeparator (default value: "|")
 	switch ($work)
 	{
 		case 'work_termin_select':
-			
-			$qry="	SELECT distinct campus.tbl_paabgabe.datum as termin , to_char(campus.tbl_paabgabe.datum, 'DD.MM.YYYY') as termin_anzeige 
-					FROM lehre.tbl_projektarbeit 
+
+			$qry="	SELECT distinct campus.tbl_paabgabe.datum as termin , to_char(campus.tbl_paabgabe.datum, 'DD.MM.YYYY') as termin_anzeige
+					FROM lehre.tbl_projektarbeit
 							JOIN campus.tbl_paabgabe USING(projektarbeit_id)
-							LEFT JOIN public.tbl_benutzer ON(uid=student_uid) 
+							LEFT JOIN public.tbl_benutzer ON(uid=student_uid)
 							LEFT JOIN public.tbl_person ON(tbl_benutzer.person_id=tbl_person.person_id)
-							LEFT JOIN lehre.tbl_lehreinheit USING(lehreinheit_id) 
-							LEFT JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id) 
+							LEFT JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
+							LEFT JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id)
 							LEFT JOIN public.tbl_studiengang USING(studiengang_kz)
-							WHERE (projekttyp_kurzbz='Bachelor' OR projekttyp_kurzbz='Diplom') 
-							AND public.tbl_benutzer.aktiv 
-							AND lehre.tbl_projektarbeit.note IS NULL 
+							WHERE (projekttyp_kurzbz='Bachelor' OR projekttyp_kurzbz='Diplom')
 						";
 			if ($stg_kz!='')
-				$qry.=" AND public.tbl_studiengang.studiengang_kz='".addslashes($stg_kz)."'";
+				$qry.=" AND public.tbl_studiengang.studiengang_kz=".$db->db_add_param($stg_kz);
 			if ($abgabetyp!='')
-				$qry.=" AND campus.tbl_paabgabe.paabgabetyp_kurzbz='".addslashes($abgabetyp)."'";
-			$qry.=" ORDER BY termin desc";	
-				
+				$qry.=" AND campus.tbl_paabgabe.paabgabetyp_kurzbz=".$db->db_add_param($abgabetyp);
+			$qry.=" ORDER BY termin desc";
+
 			$pArt='';
-			$pDistinct=false; 
+			$pDistinct=false;
 			$pFields='';
 			$pTable='';
 			$matchcode='';
@@ -109,15 +107,15 @@ cellSeparator (default value: "|")
 			$pOrder='';
 			$pLimit='';
 			$pSql=$qry;
-			$json=array();	
+			$json=array();
 			array_push($json, array ('oTermin' => '','oTerminAnzeige' => '-'.$p->t('global/alle').'-' ));
 			if (!$oRresult=$db->SQL($pArt,$pDistinct,$pFields,$pTable,$pWhere,$pOrder,$pLimit,$pSql))
 			{
 				array_push($json, array ('oTermin' => '','oTerminAnzeige' => $db->errormsg ));
-			}	
+			}
 			else if ($oRresult)
 			{
-				for ($i=0;$i<count($oRresult);$i++) 
+				for ($i=0;$i<count($oRresult);$i++)
 				{
 					array_push($json, array ('oTermin' => $oRresult[$i]->termin,'oTerminAnzeige' => $oRresult[$i]->termin_anzeige ));
 				}
@@ -125,10 +123,10 @@ cellSeparator (default value: "|")
 			else
 			{
 				array_push($json, array ('oTermin' => '','oTerminAnzeige' => 'Fehler' ));
-			}	
+			}
 			echo json_encode($json);
 			break;
-			
+
 	    default:
    	   		echo " Funktion $work fehlt! ";
 			break;

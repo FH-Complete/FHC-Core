@@ -28,20 +28,20 @@ require_once('../../../include/functions.inc.php');
 require_once('../../../include/basis_db.class.php');
 require_once('../../../include/phrasen.class.php');
 require_once('../../../include/person.class.php');
-	
-$sprache = getSprache(); 
+
+$sprache = getSprache();
 $p=new phrasen($sprache);
 
 if (isset($_GET['zeilenhoehe']) && is_numeric($_GET['zeilenhoehe']))
 	$zeilenhoehe = $_GET['zeilenhoehe'];
 else
 	$zeilenhoehe = 28;
-	
+
 if (isset($_GET['gruppiert']) && ($_GET['gruppiert']=='on'))
 	$gruppiert = true;
 else
 	$gruppiert = false;
-	
+
 if (isset($_GET['gst_extra']) && ($_GET['gst_extra']=='on'))
 	$gst_extra = true;
 else
@@ -56,14 +56,12 @@ if (!$user=get_uid())
 if(check_lektor($user))
        $is_lector=true;
   else
-       $is_lector=false;     
+       $is_lector=false;
 
-?>
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
-"http://www.w3.org/TR/html4/loose.dtd">
+?><!DOCTYPE HTML>
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta charset="utf-8">
 <link href="../../../skin/style.css.php" rel="stylesheet" type="text/css">
 <link rel="stylesheet" type="text/css" href="../../../skin/jquery-ui-1.9.2.custom.min.css">
 <script type="text/javascript" src="../../../vendor/jquery/jqueryV1/jquery-1.12.4.min.js"></script>
@@ -79,13 +77,13 @@ if(check_lektor($user))
 	{
 		window.location.reload();
 	}
-	$(document).ready(function() 
-	{ 
+	$(document).ready(function()
+	{
 		$("#t1").tablesorter(
 		{
 			sortList: [[0,0]],
 			widgets: ["zebra"]
-		}); 
+		});
 		$("#t2").tablesorter(
 		{
 			sortList: [[0,0]],
@@ -120,12 +118,12 @@ if(check_lektor($user))
 		{
 			sortList: [[0,0]],
 			widgets: ["zebra"]
-		});	
+		});
 		$("#t11").tablesorter(
 		{
 			sortList: [[0,0]],
 			widgets: ["zebra"]
-		});	
+		});
 	});
 -->
 </script>
@@ -134,11 +132,11 @@ td,th
 {
 	font-size: 18px;
 }
-@media print 
+@media print
 {
 	#nachname,#vorname,#durchwahl,#raum,#person
 	{
-		background-image: none; 
+		background-image: none;
 		padding-left: 3px;
 	}
 	#formular
@@ -156,7 +154,7 @@ td,th
 		Zeilenhöhe: <input type="text" size="3" maxlength="3" id="zeilenhoehe" name="zeilenhoehe" value="<?php echo $zeilenhoehe; ?>">px&nbsp;&nbsp;
 		Geschäftsstelle extra:<input type="checkbox" id="gst_extra" name="gst_extra" <?php echo ($gst_extra==true?'checked="checked"':''); ?>> &nbsp;&nbsp;
 		Gruppiert nach Standort:<input type="checkbox" id="gruppiert" name="gruppiert" <?php echo ($gruppiert==true?'checked="checked"':''); ?>> &nbsp;&nbsp;
-		
+
 		<input type="submit" value="OK">
 		</form>
 		</span>
@@ -169,19 +167,19 @@ td,th
 <?php
 	if ($gst_extra==true || $gruppiert == true)
 	{
-		$sql_query = "	SELECT vw_mitarbeiter.person_id, vw_mitarbeiter.vorname, vw_mitarbeiter.nachname, vw_mitarbeiter.telefonklappe, vw_mitarbeiter.ort_kurzbz, vw_mitarbeiter.standort_id, tbl_person.foto_sperre 
+		$sql_query = "	SELECT vw_mitarbeiter.person_id, vw_mitarbeiter.vorname, vw_mitarbeiter.nachname, vw_mitarbeiter.telefonklappe, vw_mitarbeiter.ort_kurzbz, vw_mitarbeiter.standort_id, tbl_person.foto_sperre
 						FROM campus.vw_mitarbeiter JOIN public.tbl_person USING (person_id) WHERE telefonklappe!='' AND standort_id is not null AND vw_mitarbeiter.aktiv=true AND vw_mitarbeiter.standort_id!='4' ORDER BY standort_id, nachname, vorname";
 	}
-	else 
+	else
 	{
-		$sql_query = "	SELECT vw_mitarbeiter.person_id, vw_mitarbeiter.vorname, vw_mitarbeiter.nachname, vw_mitarbeiter.telefonklappe, vw_mitarbeiter.ort_kurzbz, vw_mitarbeiter.standort_id, tbl_person.foto_sperre 
+		$sql_query = "	SELECT vw_mitarbeiter.person_id, vw_mitarbeiter.vorname, vw_mitarbeiter.nachname, vw_mitarbeiter.telefonklappe, vw_mitarbeiter.ort_kurzbz, vw_mitarbeiter.standort_id, tbl_person.foto_sperre
 						FROM campus.vw_mitarbeiter JOIN public.tbl_person USING (person_id) WHERE telefonklappe!='' AND standort_id is not null AND vw_mitarbeiter.aktiv=true ORDER BY standort_id, nachname, vorname";
 	}
-					
+
 	$result = $db->db_query($sql_query);
 	$laststandort='0';
 	$i=1;
-	
+
 	if ($gruppiert == false)
 	{
 		echo '
@@ -189,7 +187,7 @@ td,th
 					<td colspan="3"><h2>'.$p->t("telefonverzeichnis/titelTelefonverzeichnis").' '.CAMPUS_NAME.'</h2></td>
 				</tr>
 				<tr>
-				<td>					
+				<td>
 					<table class="tablesorter" id="t'.$i.'">
 					<thead>
 						<!--<th id="person">'.$p->t("global/person").'</th>-->
@@ -199,10 +197,10 @@ td,th
 						<th id="raum">'.$p->t("lvplan/raum").'</th>
 					</thead>
 					<tbody>';
-		
+
 		while($row = $db->db_fetch_object($result))
 		{
-			echo '			
+			echo '
 			<tr>
 				<!--<td>';
 				/*if ($row->foto_sperre!="t")
@@ -210,7 +208,7 @@ td,th
 					//echo '<img id="personimage" src="../../public/bild.php?src=person&person_id='.$row->person_id.'" alt="'.$row->person_id.'" height="80px" width="60px">';
 				}
 				else
-				{ 
+				{
 					//echo '<img id="personimage" src="../../../skin/images/profilbild_dummy.jpg" alt="Dummy Picture" height="80px" width="60px">';
 				}*/
 				echo '</td>-->
@@ -227,7 +225,7 @@ td,th
 					';
 		$i++;
 	}
-	else 
+	else
 	{
 		while($row = $db->db_fetch_object($result))
 		{
@@ -244,7 +242,7 @@ td,th
 				}
 				$laststandort = $row->standort_id;
 				$qry_standort = "SELECT tbl_kontakt.kontakt as nummer, tbl_firma.name as name FROM public.tbl_standort JOIN public.tbl_firma USING(firma_id) JOIN public.tbl_kontakt USING(standort_id)
-						WHERE standort_id='".addslashes($row->standort_id)."'  AND kontakttyp='telefon'";
+						WHERE standort_id=".$db->db_add_param($row->standort_id)."  AND kontakttyp='telefon'";
 				if($result_standort = $db->db_query($qry_standort))
 				{
 					if($row_standort = $db->db_fetch_object($result_standort))
@@ -267,18 +265,8 @@ td,th
 					}
 				}
 			}
-			echo '			
+			echo '
 			<tr>
-				<!--<td>';
-				if ($row->foto_sperre!="t")
-				{
-					//echo '<img id="personimage" src="../../public/bild.php?src=person&person_id='.$row->person_id.'" alt="'.$row->person_id.'" height="80px" width="60px">';
-				}
-				else
-				{ 
-					//echo '<img id="personimage" src="../../../skin/images/profilbild_dummy.jpg" alt="Dummy Picture" height="80px" width="60px">';
-				}
-				echo '</td>-->
 				<td style="padding-top: 0; padding-bottom: 0; vertical-align: middle;" height="'.$zeilenhoehe.'">'.$row->nachname.'</td>
 				<td style="padding-top: 0; padding-bottom: 0; vertical-align: middle;">'.$row->vorname.'</td>
 				<td style="padding-top: 0; padding-bottom: 0; vertical-align: middle;">'.$row->telefonklappe.'</td>
@@ -292,20 +280,20 @@ td,th
 		</td>
 	</tr>
 	</table>';
-	
+
 	if ($gst_extra==true || $gruppiert == true)
 	{
-		$sql_query = "	SELECT vw_mitarbeiter.person_id, vw_mitarbeiter.vorname, vw_mitarbeiter.nachname, vw_mitarbeiter.telefonklappe, vw_mitarbeiter.ort_kurzbz, vw_mitarbeiter.standort_id, tbl_person.foto_sperre 
+		$sql_query = "	SELECT vw_mitarbeiter.person_id, vw_mitarbeiter.vorname, vw_mitarbeiter.nachname, vw_mitarbeiter.telefonklappe, vw_mitarbeiter.ort_kurzbz, vw_mitarbeiter.standort_id, tbl_person.foto_sperre
 						FROM campus.vw_mitarbeiter JOIN public.tbl_person USING (person_id) WHERE telefonklappe!='' AND standort_id is not null AND vw_mitarbeiter.aktiv=true AND vw_mitarbeiter.standort_id='4' ORDER BY standort_id, nachname, vorname";
 		$result = $db->db_query($sql_query);
 		$laststandort='0';
-		
+
 			echo '
 					<tr>
 						<td colspan="3"><h2>'.$p->t("telefonverzeichnis/titelTelefonverzeichnis").' Geschäftsstelle: +43 1 588 39</h2></td>
 					</tr>
 					<tr>
-					<td>					
+					<td>
 						<table class="tablesorter" id="t'.$i.'">
 						<thead>
 							<!--<th id="person">'.$p->t("global/person").'</th>-->
@@ -315,10 +303,10 @@ td,th
 							<th id="raum">'.$p->t("lvplan/raum").'</th>
 						</thead>
 						<tbody>';
-			
+
 			while($row = $db->db_fetch_object($result))
 			{
-				echo '			
+				echo '
 				<tr>
 					<!--<td>';
 					/*if ($row->foto_sperre!="t")
@@ -326,7 +314,7 @@ td,th
 						//echo '<img id="personimage" src="../../public/bild.php?src=person&person_id='.$row->person_id.'" alt="'.$row->person_id.'" height="80px" width="60px">';
 					}
 					else
-					{ 
+					{
 						//echo '<img id="personimage" src="../../../skin/images/profilbild_dummy.jpg" alt="Dummy Picture" height="80px" width="60px">';
 					}*/
 					echo '</td>-->
@@ -389,18 +377,13 @@ td,th
 					</tr>
 					';
 				}
-				
+
 				if($laststandort!='')
 				{
 					echo '</tbody></table>';
 				}
 			}
 			?>
-		</table>
-		</td>
-	</tr>
 	</table>
-</td>
-</table>
 </body>
 </html>

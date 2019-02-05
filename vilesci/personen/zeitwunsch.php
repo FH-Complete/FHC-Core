@@ -52,7 +52,7 @@ $uid_benutzer = get_uid();
 
 $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($uid_benutzer);
-if(!$rechte->isBerechtigt('mitarbeiter', null, 'suid'))
+if(!$rechte->isBerechtigt('mitarbeiter', null, 's'))
 	die($rechte->errormsg);
 
 $datum_obj = new datum();
@@ -66,6 +66,9 @@ $updatevon = 0;
 	// Zeitwuensche speichern
 	if (isset($_POST['save']))
 	{
+		if(!$rechte->isBerechtigt('mitarbeiter', null, 'suid'))
+			die($rechte->errormsg);
+
 		for ($t=1;$t<7;$t++)
 			for ($i=0;$i<$num_rows_stunde;$i++)
 			{
