@@ -18,15 +18,16 @@
 	$addons = isset($addons) ? $addons : false;
 	$ajaxlib = isset($ajaxlib) ? $ajaxlib : false;
 	$bootstrap = isset($bootstrap) ? $bootstrap : false;
+	$dialoglib = isset($dialoglib) ? $dialoglib : false;
 	$filterwidget = isset($filterwidget) ? $filterwidget : false;
 	$fontawesome = isset($fontawesome) ? $fontawesome : false;
 	$jquery = isset($jquery) ? $jquery : false;
 	$jqueryui = isset($jqueryui) ? $jqueryui : false;
 	$jquerytreetable = isset($jquerytreetable) ? $jquerytreetable : false;
 	$navigationwidget = isset($navigationwidget) ? $navigationwidget : false;
+	$pivotui = isset($pivotui) ? $pivotui : false;
 	$sbadmintemplate = isset($sbadmintemplate) ? $sbadmintemplate : false;
 	$tablesorter = isset($tablesorter) ? $tablesorter : false;
-	$pivotui = isset($pivotui) ? $pivotui : false;
 	$tinymce = isset($tinymce) ? $tinymce : false;
 ?>
 
@@ -45,21 +46,17 @@
 			// --------------------------------------------------------------------------------------------------------
 			// From vendor folder
 
-			// jQuery UI CSS
-			if ($jqueryui === true) generateCSSsInclude('vendor/components/jqueryui/themes/base/jquery-ui.min.css');
-
 			// Bootstrap CSS
 			if ($bootstrap === true) generateCSSsInclude('vendor/twbs/bootstrap/dist/css/bootstrap.min.css');
 
+			// jQuery UI CSS
+			if ($jqueryui === true) generateCSSsInclude('vendor/components/jqueryui/themes/base/jquery-ui.min.css');
+
+			// jQuery treetable
+			if ($jquerytreetable === true) generateCSSsInclude('vendor/ludo/jquery-treetable/css/jquery.treetable.css');
+
 			// Font Awesome CSS
 			if ($fontawesome === true) generateCSSsInclude('vendor/components/font-awesome/css/font-awesome.min.css');
-
-			// Table sorter CSS
-			if ($tablesorter === true)
-			{
-				generateCSSsInclude('vendor/mottie/tablesorter/dist/css/theme.default.min.css');
-				generateCSSsInclude('vendor/mottie/tablesorter/dist/css/jquery.tablesorter.pager.min.css');
-			}
 
 			// PivotUI CSS
 			if ($pivotui === true)
@@ -74,14 +71,21 @@
 				generateCSSsInclude('vendor/BlackrockDigital/startbootstrap-sb-admin-2/dist/css/sb-admin-2.min.css');
 			}
 
-			// jQuery treetable
-			if ($jquerytreetable === true) generateCSSsInclude('vendor/ludo/jquery-treetable/css/jquery.treetable.css');
+			// Table sorter CSS
+			if ($tablesorter === true)
+			{
+				generateCSSsInclude('vendor/mottie/tablesorter/dist/css/theme.default.min.css');
+				generateCSSsInclude('vendor/mottie/tablesorter/dist/css/jquery.tablesorter.pager.min.css');
+			}
 
 			// --------------------------------------------------------------------------------------------------------
 			// From public folder
 
 			// AjaxLib CSS
 			if ($ajaxlib === true) generateCSSsInclude('public/css/AjaxLib.css');
+
+			// DialogLib CSS
+			if ($dialoglib === true) generateCSSsInclude('public/css/DialogLib.css');
 
 			// FilterWidget CSS
 			if ($filterwidget === true) generateCSSsInclude('public/css/FilterWidget.css');
@@ -107,6 +111,9 @@
 			// --------------------------------------------------------------------------------------------------------
 			// From vendor folder
 
+			// Bootstrap JS
+			if ($bootstrap === true) generateJSsInclude('vendor/twbs/bootstrap/dist/js/bootstrap.min.js');
+
 			// jQuery V3
 			if ($jquery === true) generateJSsInclude('vendor/components/jquery/jquery.min.js');
 
@@ -117,8 +124,15 @@
 				generateJSsInclude('vendor/components/jqueryui/ui/i18n/datepicker-de.js'); // datepicker german language file
 			}
 
-			// Bootstrap JS
-			if ($bootstrap === true) generateJSsInclude('vendor/twbs/bootstrap/dist/js/bootstrap.min.js');
+			// jQuery treetable
+			// NOTE: keep it after jQuery includes
+			if ($jquerytreetable === true) generateJSsInclude('vendor/ludo/jquery-treetable/jquery.treetable.js');
+
+			// PivotUI CSS
+			if ($pivotui === true)
+			{
+				generateJSsInclude('vendor/nicolaskruchten/pivottable/dist/pivot.min.js');
+			}
 
 			// Table sorter JS
 			if ($tablesorter === true)
@@ -126,12 +140,6 @@
 				generateJSsInclude('vendor/mottie/tablesorter/dist/js/jquery.tablesorter.min.js');
 				generateJSsInclude('vendor/mottie/tablesorter/dist/js/jquery.tablesorter.widgets.min.js');
 				generateJSsInclude('vendor/mottie/tablesorter/dist/js/extras/jquery.tablesorter.pager.min.js');
-			}
-
-			// PivotUI CSS
-			if ($pivotui === true)
-			{
-				generateJSsInclude('vendor/nicolaskruchten/pivottable/dist/pivot.min.js');
 			}
 
 			// Tinymce JS
@@ -146,18 +154,15 @@
 				generateBackwardCompatibleJSMsIe('vendor/scottjehl/Respond/dest/respond.min.js');
 			}
 
-			// jQuery treetable
-			if ($jquerytreetable === true) generateJSsInclude('vendor/ludo/jquery-treetable/jquery.treetable.js');
-
 			// --------------------------------------------------------------------------------------------------------
 			// From public folder
+
+			// DialogLib JS
+			if ($dialoglib === true) generateJSsInclude('public/js/DialogLib.js');
 
 			// AjaxLib JS
 			// NOTE: must be called before including others JS libraries that use it
 			if ($ajaxlib === true) generateJSsInclude('public/js/AjaxLib.js');
-
-			// PhrasesLib JS
-			if ($phrases != null) generateJSsInclude('public/js/PhrasesLib.js');
 
 			// FilterWidget JS
 			if ($filterwidget === true) generateJSsInclude('public/js/FilterWidget.js');
@@ -165,10 +170,15 @@
 			// NavigationWidget JS
 			if ($navigationwidget === true) generateJSsInclude('public/js/NavigationWidget.js');
 
+			// PhrasesLib JS
+			if ($phrases != null) generateJSsInclude('public/js/PhrasesLib.js');
+
 			// Load addon hooks JS
+			// NOTE: keep it as the latest but one
 			if ($addons === true) generateAddonsJSsInclude($calledPath.'/'.$calledMethod);
 
 			// Eventually required JS
+			// NOTE: keep it as the latest
 			generateJSsInclude($customJSs);
 		?>
 
