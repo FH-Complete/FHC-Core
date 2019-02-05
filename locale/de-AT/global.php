@@ -144,6 +144,7 @@ $this->phrasen['global/hilfe']='Hilfe';
 $this->phrasen['global/benutzer']='Benutzer';
 $this->phrasen['global/anleitung']='Anleitung';
 $this->phrasen['global/bericht']='Bericht';
+$this->phrasen['global/fixangestellt']='Fixangestellt';
 
 // Statusmeldungen
 $this->phrasen['global/erfolgreichgespeichert']='Erfolgreich gespeichert';

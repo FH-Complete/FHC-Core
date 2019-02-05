@@ -447,6 +447,8 @@ if(isset($_POST['save']))
 	}
 	else
 	{
+		$zugangscode = substr(md5(openssl_random_pseudo_bytes(20)), 0, 15);
+		
 		$person->new = true;
 		$person->anrede = $anrede;
 		$person->titelpre = $titel;
@@ -462,7 +464,7 @@ if(isset($_POST['save']))
 		$person->geburtsnation = 'A';
 		$person->staatsbuergerschaft = 'A';
 		$person->familienstand = 'l';
-        $person->zugangscode= uniqid();
+		$person->zugangscode= $zugangscode;
 
 		if($person->save())
 		{

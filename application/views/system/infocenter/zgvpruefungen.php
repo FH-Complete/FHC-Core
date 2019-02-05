@@ -98,9 +98,6 @@
 					<form method="post"
 						  action="#" class="zgvform">
 						<input type="hidden" name="prestudentid" value="<?php echo $zgvpruefung->prestudent_id ?>" class="prestudentidinput">
-						<input type="hidden" name="studiensemester" value="<?php echo $studiensemester ?>" id="studiensemester_<?php echo $zgvpruefung->prestudent_id  ?>">
-						<input type="hidden" name="isfreigegeben" class="isfreigegeben"
-							   value="<?php echo isset($zgvpruefung->prestudentstatus->bestaetigtam) && $zgvpruefung->prestudentstatus->status_kurzbz === 'Interessent' && $zgvpruefung->studiengangtyp === 'b' ? 1 : 0 ?>" id="isfreigegeben_<?php echo $zgvpruefung->prestudent_id  ?>">
 						<div class="row">
 							<div class="col-lg-<?php echo $columns[0] ?>">
 								<div class="form-group">

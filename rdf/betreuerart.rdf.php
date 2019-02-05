@@ -24,7 +24,7 @@ require_once('../include/basis_db.class.php');
 $oRdf = new rdf('BETREUERART','http://www.technikum-wien.at/betreuerart');
 $oRdf->sendHeader();
 
-$qry = "SELECT * FROM lehre.tbl_betreuerart ORDER BY betreuerart_kurzbz";
+$qry = "SELECT * FROM lehre.tbl_betreuerart ORDER BY aktiv DESC, beschreibung";
 $db = new basis_db();
 if($db->db_query($qry))
 {
@@ -34,6 +34,7 @@ if($db->db_query($qry))
 		//$oRdf->obj[$i]->setAttribut('id',$row->betreuerart_kurzbz,false);
 		$oRdf->obj[$i]->setAttribut('betreuerart_kurzbz',$row->betreuerart_kurzbz,true);
 		$oRdf->obj[$i]->setAttribut('beschreibung',$row->beschreibung,true);
+		$oRdf->obj[$i]->setAttribut('aktiv',($db->db_parse_bool($row->aktiv)?'true':'false'),true);
 		
 		$oRdf->addSequence($row->betreuerart_kurzbz);
 	}

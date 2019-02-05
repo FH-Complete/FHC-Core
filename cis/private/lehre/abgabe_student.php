@@ -109,7 +109,11 @@ $sql_query = "SELECT (SELECT nachname FROM public.tbl_person  WHERE person_id=tb
 		LEFT JOIN public.tbl_studiengang USING(studiengang_kz)
 		LEFT JOIN lehre.tbl_projekttyp USING (projekttyp_kurzbz)
 		WHERE (projekttyp_kurzbz='Bachelor' OR projekttyp_kurzbz='Diplom') 
-		AND (tbl_projektbetreuer.betreuerart_kurzbz='Betreuer' OR tbl_projektbetreuer.betreuerart_kurzbz='Begutachter' OR tbl_projektbetreuer.betreuerart_kurzbz='Erstbetreuer' OR tbl_projektbetreuer.betreuerart_kurzbz='Erstbegutachter') 
+		AND (tbl_projektbetreuer.betreuerart_kurzbz='Betreuer' 
+			OR tbl_projektbetreuer.betreuerart_kurzbz='Begutachter' 
+			OR tbl_projektbetreuer.betreuerart_kurzbz='Erstbetreuer' 
+			OR tbl_projektbetreuer.betreuerart_kurzbz='Erstbegutachter'
+			OR tbl_projektbetreuer.betreuerart_kurzbz='Zweitbegutachter') 
 		AND tbl_projektarbeit.student_uid=".$db->db_add_param($uid)." 
 		AND public.tbl_benutzer.aktiv 
 		AND lehre.tbl_projektarbeit.note IS NULL 

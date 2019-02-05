@@ -44,7 +44,7 @@ echo '
 ';
 
 //Daten holen
-$qry = 'SELECT * FROM lehre.tbl_projekttyp ORDER BY bezeichnung';
+$qry = 'SELECT * FROM lehre.tbl_projekttyp ORDER BY aktiv DESC, bezeichnung';
 $db = new basis_db();
 
 if($db->db_query($qry))
@@ -56,6 +56,7 @@ if($db->db_query($qry))
 		         <RDF:Description  id="'.$row->projekttyp_kurzbz.'"  about="'.$rdf_url.'/'.$row->projekttyp_kurzbz.'" >
 					<TYP:projekttyp_kurzbz><![CDATA['.$row->projekttyp_kurzbz.']]></TYP:projekttyp_kurzbz>
 					<TYP:bezeichnung><![CDATA['.$row->bezeichnung.']]></TYP:bezeichnung>
+					<TYP:aktiv><![CDATA['.($db->db_parse_bool($row->aktiv)?'true':'false').']]></TYP:aktiv>
 		         </RDF:Description>
 		      </RDF:li>';
 	}

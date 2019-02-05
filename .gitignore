@@ -33,3 +33,4 @@ tests/codeception/tests/unit.suite.yml
 /sparks/*
 /webdav/google.php
 system/sql/
+.ptp-sync*

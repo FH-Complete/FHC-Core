@@ -346,7 +346,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 		</table:table-row>
 		<table:table-row table:style-name="Tabelle1.1">
 			<table:table-cell table:style-name="Tabelle1.A2" table:number-columns-spanned="2" office:value-type="string">
-			<text:p text:style-name="P3">Topic and Assessment of Bachelor Paper 1</text:p>
+			<text:p text:style-name="P3">Topic and Assessment of Bachelor Paper</text:p>
 			</table:table-cell>
 			<table:covered-table-cell/>
 			<table:table-cell table:style-name="Tabelle1.B5" table:number-columns-spanned="5" office:value-type="string">
@@ -364,29 +364,11 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 		</table:table-row>
 		<table:table-row table:style-name="Tabelle1.1">
 			<table:table-cell table:style-name="Tabelle1.A2" table:number-columns-spanned="2" office:value-type="string">
-			<text:p text:style-name="P3">Topic and Assessment of Bachelor Paper 2</text:p>
-			</table:table-cell>
-			<table:covered-table-cell/>
-			<table:table-cell table:style-name="Tabelle1.B5" table:number-columns-spanned="5" office:value-type="string">
-			<text:p text:style-name="P5"><xsl:value-of select="themenbereich_2" /></text:p>
-			</table:table-cell>
-			<table:covered-table-cell/>
-			<table:covered-table-cell/>
-			<table:covered-table-cell/>
-			<table:covered-table-cell/>
-			<table:table-cell table:style-name="Tabelle1.C2" office:value-type="string">
-			<text:p text:style-name="P5">Grade</text:p>
-			<text:p text:style-name="P5">(Information)</text:p>
-			<text:p text:style-name="P5"><xsl:value-of select="note2" /></text:p>
-			</table:table-cell>
-		</table:table-row>
-		<table:table-row table:style-name="Tabelle1.1">
-			<table:table-cell table:style-name="Tabelle1.A2" table:number-columns-spanned="2" office:value-type="string">
 			<text:p text:style-name="P5">Subject of the Examination</text:p>
 			</table:table-cell>
 			<table:covered-table-cell/>
 			<table:table-cell table:style-name="Tabelle1.C2" table:number-columns-spanned="6" office:value-type="string">
-			<text:p text:style-name="P5">Presentation and Examination interview on the Bachelor Paper and its links to subjects of the curriculum</text:p>
+			<text:p text:style-name="P5">Presentation and Examination interview on the Bachelor Paper</text:p>
 			</table:table-cell>
 			<table:covered-table-cell/>
 			<table:covered-table-cell/>
@@ -401,18 +383,13 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 			<table:covered-table-cell/>
 			<table:table-cell table:style-name="Tabelle1.C2" table:number-columns-spanned="6" office:value-type="string">
 			<text:p text:style-name="P4">
-				<draw:custom-shape text:anchor-type="char" draw:z-index="6" draw:name="Rechteck 8" draw:style-name="gr1" draw:text-style-name="P22" svg:width="0.445cm" svg:height="0.445cm" svg:x="10.456cm" svg:y="0.1cm">
+				<draw:custom-shape text:anchor-type="char" draw:z-index="6" draw:name="Rechteck 8" draw:style-name="gr1" draw:text-style-name="P22" svg:width="0.445cm" svg:height="0.445cm" svg:x="10.456cm" svg:y="0.05cm">
 				<text:p/>
 				<draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:type="rectangle" draw:enhanced-path="M 0 0 L 21600 0 21600 21600 0 21600 0 0 Z N"/>
 				</draw:custom-shape>Presentation of the Bachelor Paper
 			</text:p>
-			<text:p text:style-name="P4">Examination interview on the Bachelor Paper and its links to</text:p>
-			<text:p text:style-name="P5">
-				<draw:custom-shape text:anchor-type="char" draw:z-index="5" draw:name="Rechteck 10" draw:style-name="gr1" draw:text-style-name="P22" svg:width="0.445cm" svg:height="0.445cm" svg:x="10.456cm" svg:y="-0.092cm">
-				<text:p/>
-				<draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:type="rectangle" draw:enhanced-path="M 0 0 L 21600 0 21600 21600 0 21600 0 0 Z N"/>
-				</draw:custom-shape>subjects of the curriculum
-			</text:p>
+			<text:p text:style-name="P4"><draw:custom-shape text:anchor-type="char" draw:z-index="5" draw:name="Rechteck 10" draw:style-name="gr1" draw:text-style-name="P22" svg:width="0.445cm" svg:height="0.445cm" svg:x="10.456cm" svg:y="0.05cm"><draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:type="rectangle" draw:enhanced-path="M 0 0 L 21600 0 21600 21600 0 21600 0 0 Z N"/>
+				</draw:custom-shape>Examination interview on the Bachelor Paper</text:p>
 			</table:table-cell>
 			<table:covered-table-cell/>
 			<table:covered-table-cell/>
@@ -423,14 +400,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 		<table:table-row table:style-name="Tabelle1.1">
 			<table:table-cell table:style-name="Tabelle1.A1" table:number-columns-spanned="8" office:value-type="string">
 			<text:p text:style-name="P5">
-				<draw:custom-shape text:anchor-type="char" draw:z-index="8" draw:name="Rechteck 10" draw:style-name="gr2" draw:text-style-name="P22" svg:width="0.359cm" svg:height="0.35cm" svg:x="14.566cm" svg:y="0.07cm">
-					<text:p/>
-					<draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:type="rectangle" draw:enhanced-path="M 0 0 L 21600 0 21600 21600 0 21600 0 0 Z N"/>
-				</draw:custom-shape>
-				<draw:custom-shape text:anchor-type="char" draw:z-index="7" draw:name="Rechteck 10" draw:style-name="gr2" draw:text-style-name="P22" svg:width="0.355cm" svg:height="0.35cm" svg:x="10.8cm" svg:y="0.07cm">
-					<text:p/>
-					<draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:type="rectangle" draw:enhanced-path="M 0 0 L 21600 0 21600 21600 0 21600 0 0 Z N"/>
-				</draw:custom-shape>Notes on the presentation of the Bachelor Paper – Bachelor Paper 1 <text:s text:c="8"/>/ Bachelor Paper 2 </text:p>
+				Notes on the presentation of the Bachelor Paper</text:p>
 			</table:table-cell>
 			<table:covered-table-cell/>
 			<table:covered-table-cell/>

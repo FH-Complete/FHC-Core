@@ -2513,10 +2513,44 @@ if($result = $db->db_query("SELECT 1 FROM system.tbl_app WHERE app='reihungstest
 	}
 }
 
+// Spalte aktiv für tbl_betreuerart
+if(!$result = @$db->db_query("SELECT aktiv FROM lehre.tbl_betreuerart LIMIT 1"))
+{
+	$qry = "ALTER TABLE lehre.tbl_betreuerart ADD COLUMN aktiv boolean NOT NULL DEFAULT TRUE;";
+	
+	if(!$db->db_query($qry))
+		echo '<strong>lehre.tbl_betreuerart: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>lehre.tbl_betreuerart: Spalte aktiv hinzugefuegt';
+}
+
+// Spalte aktiv für tbl_projekttyp
+if(!$result = @$db->db_query("SELECT aktiv FROM lehre.tbl_projekttyp LIMIT 1"))
+{
+	$qry = "ALTER TABLE lehre.tbl_projekttyp ADD COLUMN aktiv boolean NOT NULL DEFAULT TRUE;";
+	
+	if(!$db->db_query($qry))
+		echo '<strong>lehre.tbl_projekttyp: '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>lehre.tbl_projekttyp: Spalte aktiv hinzugefuegt';
+}
+
+// Remove NOT NULL constraint on aufmerksamdurch_kurzbz on public.tbl_prestudent
+if($result = @$db->db_query("SELECT is_nullable FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = 'public' AND TABLE_NAME = 'tbl_prestudent' AND COLUMN_NAME = 'aufmerksamdurch_kurzbz' AND is_nullable = 'NO'"))
+{
+	if($db->db_num_rows($result) > 0)
+	{
+		$qry = "ALTER TABLE public.tbl_prestudent ALTER COLUMN aufmerksamdurch_kurzbz DROP NOT NULL;";
+		
+		if(!$db->db_query($qry))
+			echo '<strong>public.tbl_prestudent '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>Removed NOT NULL constraint on "aufmerksamdurch_kurzbz" from public.tbl_prestudent<br>';
+	}
+}
+
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
-
-echo '<br><br><br>';
 
 $tabellen=array(
 	"bis.tbl_bisorgform" => array("bisorgform_kurzbz","code","bezeichnung"),
@@ -2616,7 +2650,7 @@ $tabellen=array(
 	"lehre.tbl_akadgrad"  => array("akadgrad_id","akadgrad_kurzbz","studiengang_kz","titel","geschlecht"),
 	"lehre.tbl_anrechnung"  => array("anrechnung_id","prestudent_id","lehrveranstaltung_id","begruendung_id","lehrveranstaltung_id_kompatibel","genehmigt_von","insertamum","insertvon","updateamum","updatevon","ext_id"),
 	"lehre.tbl_anrechnung_begruendung"  => array("begruendung_id","bezeichnung"),
-	"lehre.tbl_betreuerart"  => array("betreuerart_kurzbz","beschreibung"),
+	"lehre.tbl_betreuerart"  => array("betreuerart_kurzbz","beschreibung","aktiv"),
 	"lehre.tbl_ferien"  => array("bezeichnung","studiengang_kz","vondatum","bisdatum"),
 	"lehre.tbl_lehreinheit"  => array("lehreinheit_id","lehrveranstaltung_id","studiensemester_kurzbz","lehrfach_id","lehrform_kurzbz","stundenblockung","wochenrythmus","start_kw","raumtyp","raumtypalternativ","sprache","lehre","anmerkung","unr","lvnr","updateamum","updatevon","insertamum","insertvon","ext_id","lehrfach_id_old","gewicht"),
 	"lehre.tbl_lehreinheitgruppe"  => array("lehreinheitgruppe_id","lehreinheit_id","studiengang_kz","semester","verband","gruppe","gruppe_kurzbz","updateamum","updatevon","insertamum","insertvon","ext_id"),
@@ -2637,7 +2671,7 @@ $tabellen=array(
 	"lehre.tbl_note"  => array("note","bezeichnung","anmerkung","farbe","positiv","notenwert","aktiv","lehre","offiziell","bezeichnung_mehrsprachig","lkt_ueberschreibbar"),
 	"lehre.tbl_projektarbeit"  => array("projektarbeit_id","projekttyp_kurzbz","titel","lehreinheit_id","student_uid","firma_id","note","punkte","beginn","ende","faktor","freigegeben","gesperrtbis","stundensatz","gesamtstunden","themenbereich","anmerkung","updateamum","updatevon","insertamum","insertvon","ext_id","titel_english","seitenanzahl","abgabedatum","kontrollschlagwoerter","schlagwoerter","schlagwoerter_en","abstract", "abstract_en", "sprache","final"),
 	"lehre.tbl_projektbetreuer"  => array("person_id","projektarbeit_id","betreuerart_kurzbz","note","faktor","name","punkte","stunden","stundensatz","updateamum","updatevon","insertamum","insertvon","ext_id","vertrag_id"),
-	"lehre.tbl_projekttyp"  => array("projekttyp_kurzbz","bezeichnung"),
+	"lehre.tbl_projekttyp"  => array("projekttyp_kurzbz","bezeichnung","aktiv"),
 	"lehre.tbl_pruefung"  => array("pruefung_id","lehreinheit_id","student_uid","mitarbeiter_uid","note","pruefungstyp_kurzbz","datum","anmerkung","insertamum","insertvon","updateamum","updatevon","ext_id","pruefungsanmeldung_id","vertrag_id", "punkte"),
 	"lehre.tbl_pruefungstyp"  => array("pruefungstyp_kurzbz","beschreibung","abschluss","sort"),
 	"lehre.tbl_studienordnung"  => array("studienordnung_id","studiengang_kz","version","gueltigvon","gueltigbis","bezeichnung","ects","studiengangbezeichnung","studiengangbezeichnung_englisch","studiengangkurzbzlang","akadgrad_id","insertamum","insertvon","updateamum","updatevon","ext_id", "status_kurzbz", "standort_id"),
@@ -2803,6 +2837,7 @@ $tabellen=array(
 $tabs=array_keys($tabellen);
 //print_r($tabs);
 $i=0;
+$errors = 0;
 foreach ($tabellen AS $attribute)
 {
 	$sql_attr='';
@@ -2811,11 +2846,18 @@ foreach ($tabellen AS $attribute)
 	$sql_attr=substr($sql_attr, 0, -1);
 
 	if (!@$db->db_query('SELECT '.$sql_attr.' FROM '.$tabs[$i].' LIMIT 1;'))
+	{
 		echo '<BR><strong>'.$tabs[$i].': '.$db->db_last_error().' </strong><BR>';
-	else
-		echo $tabs[$i].': OK - ';
+		$errors++;
+	}
+	/*else
+		echo $tabs[$i].': OK - ';*/
 	flush();
 	$i++;
+}
+if ($errors == 0)
+{
+	echo '<strong>Keine Fehler aufgetreten</strong>';
 }
 
 echo '<H2>Gegenpruefung!</H2>';

@@ -346,7 +346,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 		</table:table-row>
 		<table:table-row table:style-name="Tabelle1.1">
 			<table:table-cell table:style-name="Tabelle1.A2" table:number-columns-spanned="2" office:value-type="string">
-			<text:p text:style-name="P3">Thema und Beurteilung der Bachelorarbeit 1</text:p>
+			<text:p text:style-name="P3">Thema und Beurteilung der Bachelorarbeit</text:p>
 			</table:table-cell>
 			<table:covered-table-cell/>
 			<table:table-cell table:style-name="Tabelle1.B5" table:number-columns-spanned="5" office:value-type="string">
@@ -364,29 +364,11 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 		</table:table-row>
 		<table:table-row table:style-name="Tabelle1.1">
 			<table:table-cell table:style-name="Tabelle1.A2" table:number-columns-spanned="2" office:value-type="string">
-			<text:p text:style-name="P3">Thema und Beurteilung der Bachelorarbeit 2</text:p>
-			</table:table-cell>
-			<table:covered-table-cell/>
-			<table:table-cell table:style-name="Tabelle1.B5" table:number-columns-spanned="5" office:value-type="string">
-			<text:p text:style-name="P5"><xsl:value-of select="themenbereich_2" /></text:p>
-			</table:table-cell>
-			<table:covered-table-cell/>
-			<table:covered-table-cell/>
-			<table:covered-table-cell/>
-			<table:covered-table-cell/>
-			<table:table-cell table:style-name="Tabelle1.C2" office:value-type="string">
-			<text:p text:style-name="P5">Note</text:p>
-			<text:p text:style-name="P5">(Information)</text:p>
-			<text:p text:style-name="P5"><xsl:value-of select="note2" /></text:p>
-			</table:table-cell>
-		</table:table-row>
-		<table:table-row table:style-name="Tabelle1.1">
-			<table:table-cell table:style-name="Tabelle1.A2" table:number-columns-spanned="2" office:value-type="string">
 			<text:p text:style-name="P5">Prüfungsgegenstand</text:p>
 			</table:table-cell>
 			<table:covered-table-cell/>
 			<table:table-cell table:style-name="Tabelle1.C2" table:number-columns-spanned="6" office:value-type="string">
-			<text:p text:style-name="P5">Prüfungsgespräch über die Bachelorarbeit und deren Querverbindungen zu Fächern des Studienplans</text:p>
+			<text:p text:style-name="P5">Prüfungsgespräch über die Bachelorarbeit</text:p>
 			</table:table-cell>
 			<table:covered-table-cell/>
 			<table:covered-table-cell/>
@@ -400,9 +382,8 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 			</table:table-cell>
 			<table:covered-table-cell/>
 			<table:table-cell table:style-name="Tabelle1.C2" table:number-columns-spanned="6" office:value-type="string">
-			<text:p text:style-name="P4"><draw:custom-shape text:anchor-type="char" draw:z-index="6" draw:name="Rechteck 8" draw:style-name="gr1" draw:text-style-name="P22" svg:width="0.445cm" svg:height="0.445cm" svg:x="10.456cm" svg:y="0.1cm"><text:p/><draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:type="rectangle" draw:enhanced-path="M 0 0 L 21600 0 21600 21600 0 21600 0 0 Z N"/></draw:custom-shape>Präsentation der Bachelorarbeit</text:p>
-			<text:p text:style-name="P4">Prüfungsgespräch über die <text:span text:style-name="T1">Bachelorarbeit und Querverbindungen</text:span></text:p>
-			<text:p text:style-name="P5"><draw:custom-shape text:anchor-type="char" draw:z-index="5" draw:name="Rechteck 10" draw:style-name="gr1" draw:text-style-name="P22" svg:width="0.445cm" svg:height="0.445cm" svg:x="10.456cm" svg:y="-0.092cm"><text:p/><draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:type="rectangle" draw:enhanced-path="M 0 0 L 21600 0 21600 21600 0 21600 0 0 Z N"/></draw:custom-shape>zu Fächern des Studienplans</text:p>
+			<text:p text:style-name="P4"><draw:custom-shape text:anchor-type="char" draw:z-index="6" draw:name="Rechteck 8" draw:style-name="gr1" draw:text-style-name="P22" svg:width="0.445cm" svg:height="0.445cm" svg:x="10.456cm" svg:y="0.05cm"><text:p/><draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:type="rectangle" draw:enhanced-path="M 0 0 L 21600 0 21600 21600 0 21600 0 0 Z N"/></draw:custom-shape>Präsentation der Bachelorarbeit</text:p>
+			<text:p text:style-name="P4"><draw:custom-shape text:anchor-type="char" draw:z-index="5" draw:name="Rechteck 10" draw:style-name="gr1" draw:text-style-name="P22" svg:width="0.445cm" svg:height="0.445cm" svg:x="10.456cm" svg:y="0.05cm"><text:p/><draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:type="rectangle" draw:enhanced-path="M 0 0 L 21600 0 21600 21600 0 21600 0 0 Z N"/></draw:custom-shape>Prüfungsgespräch über die Bachelorarbeit</text:p>
 			</table:table-cell>
 			<table:covered-table-cell/>
 			<table:covered-table-cell/>
@@ -412,7 +393,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 		</table:table-row>
 		<table:table-row table:style-name="Tabelle1.1">
 			<table:table-cell table:style-name="Tabelle1.A1" table:number-columns-spanned="8" office:value-type="string">
-			<text:p text:style-name="P5"><draw:custom-shape text:anchor-type="char" draw:z-index="8" draw:name="Rechteck 10" draw:style-name="gr2" draw:text-style-name="P22" svg:width="0.359cm" svg:height="0.35cm" svg:x="13.566cm" svg:y="0.07cm"><text:p/><draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:type="rectangle" draw:enhanced-path="M 0 0 L 21600 0 21600 21600 0 21600 0 0 Z N"/></draw:custom-shape><draw:custom-shape text:anchor-type="char" draw:z-index="7" draw:name="Rechteck 10" draw:style-name="gr2" draw:text-style-name="P22" svg:width="0.355cm" svg:height="0.35cm" svg:x="10.035cm" svg:y="0.07cm"><text:p/><draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:type="rectangle" draw:enhanced-path="M 0 0 L 21600 0 21600 21600 0 21600 0 0 Z N"/></draw:custom-shape>Notizen zur Präsentation der Bachelorarbeit – Bachelorarbeit 1 <text:s text:c="8"/>/ Bachelorarbeit 2 </text:p>
+			<text:p text:style-name="P5">Notizen zur Präsentation der Bachelorarbeit</text:p>
 			</table:table-cell>
 			<table:covered-table-cell/>
 			<table:covered-table-cell/>

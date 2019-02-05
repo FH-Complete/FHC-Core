@@ -544,7 +544,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 			ab dem 
 		</xsl:otherwise>
 	</xsl:choose>
-3. Semester gleichzeitig mit der Studiengebühr vor Beginn des Semesters zu entrichten.</text:p>
+3. Semester gleichzeitig mit dem Studienbeitrag vor Beginn des Semesters zu entrichten.</text:p>
 		<text:p text:style-name="P5">Bei Vertragsauflösung vor Studienabschluss aus Gründen, die die Studentin bzw. der Student zu vertreten hat, oder auf deren bzw. dessen Wunsch, wird der Unkostenbeitrag zur Abdeckung der dem Erhalter erwachsenen administrativen Zusatzkosten einbehalten.</text:p>
 		
 		<text:p text:style-name="P32">6.2.6 Lehr- und Lernbehelfe</text:p>

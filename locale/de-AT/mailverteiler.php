@@ -30,4 +30,9 @@ $this->phrasen['mailverteiler/bestaetige']='Bestätige';
 $this->phrasen['mailverteiler/personenImVerteiler']='Personen im Mailverteiler';
 $this->phrasen['mailverteiler/oeffnenFehlgeschlagen']='Beim Freischalten des Verteilers ist ein Fehler aufgetreten.<br>Bitte informieren Sie den Administrator';
 $this->phrasen['mailverteiler/verteilerGenerieren']='Verteiler für Gruppe <b>%1$s</b> generieren';
+$this->phrasen['mailverteiler/anleitungstextMailPersInGroup']='Hier haben Sie die Möglichkeit, eine E-Mail an eine Teilmenge des Mailverteilers zu schicken. <br>
+					Sie können die Liste mit den Textfeldern und Dropdowns bei den Überschriften filtern. Markieren Sie danach jene Personen, denen Sie eine E-Mail schicken wollen.
+					<br><br><b>Hinweis:</b> Aus technischen Gründen werden die Empfänger ab einer bestimmten Anzahl auf mehrere E-Mail-Fenster aufgeteilt';
+$this->phrasen['mailverteiler/mailAnMarkierteSenden']='Mail an alle markierten senden';
+$this->phrasen['mailverteiler/mailAnAlleSenden']='Mail an alle senden';
 ?>
