@@ -119,4 +119,26 @@ class Studiensemester_model extends DB_Model
 
 		return $this->execQuery($query, array($studiensemester_kurzbz, $studiengang_kz));
 	}
+
+	/**
+	 * Gets all Studiensemester between two dates
+	 * @param $from
+	 * @param $to
+	 * @return array|null
+	 */
+	public function getByDate($from, $to)
+	{
+		if (date_format(date_create($from), 'Y-m-d') > (date_format(date_create($to), 'Y-m-d')))
+			return success(array());
+
+		$query = "SELECT * 
+							FROM public.tbl_studiensemester
+							WHERE 
+							  (ende > ?::date AND start < ?::date)
+							  OR start = ?::date
+							  OR ende = ?::date
+							ORDER BY start DESC";
+
+		return $this->execQuery($query, array($from, $to, $from, $to));
+	}
 }

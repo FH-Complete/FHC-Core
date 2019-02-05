@@ -9,7 +9,8 @@ class Benutzer_model extends DB_Model
 	{
 		parent::__construct();
 		$this->dbTable = 'public.tbl_benutzer';
-		$this->pk = 'uid';
+		$this->pk = array('uid');
+		$this->hasSequence = false;
 	}
 
 	public function getFromPersonId($person_id)
