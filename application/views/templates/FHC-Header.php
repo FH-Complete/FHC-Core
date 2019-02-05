@@ -46,11 +46,11 @@
 			// --------------------------------------------------------------------------------------------------------
 			// From vendor folder
 
-			// Bootstrap CSS
-			if ($bootstrap === true) generateCSSsInclude('vendor/twbs/bootstrap/dist/css/bootstrap.min.css');
-
 			// jQuery UI CSS
 			if ($jqueryui === true) generateCSSsInclude('vendor/components/jqueryui/themes/base/jquery-ui.min.css');
+
+			// Bootstrap CSS
+			if ($bootstrap === true) generateCSSsInclude('vendor/twbs/bootstrap/dist/css/bootstrap.min.css');
 
 			// jQuery treetable
 			if ($jquerytreetable === true) generateCSSsInclude('vendor/ludo/jquery-treetable/css/jquery.treetable.css');
@@ -111,9 +111,6 @@
 			// --------------------------------------------------------------------------------------------------------
 			// From vendor folder
 
-			// Bootstrap JS
-			if ($bootstrap === true) generateJSsInclude('vendor/twbs/bootstrap/dist/js/bootstrap.min.js');
-
 			// jQuery V3
 			if ($jquery === true) generateJSsInclude('vendor/components/jquery/jquery.min.js');
 
@@ -123,6 +120,9 @@
 				generateJSsInclude('vendor/components/jqueryui/jquery-ui.min.js');
 				generateJSsInclude('vendor/components/jqueryui/ui/i18n/datepicker-de.js'); // datepicker german language file
 			}
+
+			// Bootstrap JS
+			if ($bootstrap === true) generateJSsInclude('vendor/twbs/bootstrap/dist/js/bootstrap.min.js');
 
 			// jQuery treetable
 			// NOTE: keep it after jQuery includes
