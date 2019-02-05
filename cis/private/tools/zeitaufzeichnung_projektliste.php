@@ -232,7 +232,7 @@ for ($i = 0; $i < count($ztaufdata); $i++)
 				$projectlines[$day]->arbeitszeit -= $subtraction->diff;
 				$lehreExternExists = true;
 			}
-			else
+			elseif ($subtraction->typ == $activitiesToSubtract[2] || $subtraction->typ == $activitiesToSubtract[3])
 			{
 				$projectlines[$day]->arbeitszeit -= $subtraction->diff;
 			}
