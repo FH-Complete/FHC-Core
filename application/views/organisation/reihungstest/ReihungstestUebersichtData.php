@@ -111,6 +111,7 @@
 		) data
 		",
 		'requiredPermissions' => 'infocenter',
+		'datasetRepresentation' => 'tablesorter',
 		'additionalColumns' => array('Details'),
 		'columnsAliases' => array(
 			'ReihungstestID',

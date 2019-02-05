@@ -20,6 +20,8 @@ class FiltersLib
 	const SESSION_DATASET = 'dataset';
 	const SESSION_ROW_NUMBER = 'rowNumber';
 	const SESSION_RELOAD_DATASET = 'reloadDataset';
+	const SESSION_DATASET_REPRESENTATION = 'datasetRepresentation';
+	const SESSION_DATASET_REP_OPTIONS = 'datasetRepresentationOptions';
 
 	// Alias for the dynamic table used to retrive the dataset
 	const DATASET_TABLE_ALIAS = 'datasetFilterTable';
@@ -54,6 +56,14 @@ class FiltersLib
 	const HIDE_SAVE = 'hideSave';
 
 	const CUSTOM_MENU = 'customMenu'; // ...to specify if the menu for this filter is custom (true) or not (false)
+
+	// ...to specify how to represent the dataset (ex: tablesorter, pivotUI, ...)
+	const DATASET_REPRESENTATION = 'datasetRepresentation';
+	const DATASET_REP_OPTIONS = 'datasetRepOptions';
+
+	// Different dataset representations
+	const DATASET_REP_TABLESORTER = 'tablesorter';
+	const DATASET_REP_PIVOTUI = 'pivotUI';
 
 	// Filter operations values
 	const OP_EQUAL = 'equal';

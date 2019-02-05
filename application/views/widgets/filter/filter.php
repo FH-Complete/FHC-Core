@@ -46,7 +46,7 @@
 
 		<!-- Filter table -->
 		<div>
-			<?php FilterWidget::loadViewTableDataset(); ?>
+			<?php FilterWidget::loadViewDataset(); ?>
 		</div>
 
 		<!-- Filter info bottom -->

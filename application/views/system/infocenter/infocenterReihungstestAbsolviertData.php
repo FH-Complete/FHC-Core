@@ -186,6 +186,7 @@
 		'datasetName' => 'reihungstestAbsolviert',
 		'filter_id' => $this->input->get('filter_id'),
 		'requiredPermissions' => 'infocenter',
+		'datasetRepresentation' => 'tablesorter',
 		'checkboxes' => 'PersonId',
 		'additionalColumns' => array('Details'),
 		'columnsAliases' => array(

@@ -16,7 +16,6 @@
 
 	// By default set the parameters to false
 	$addons = isset($addons) ? $addons : false;
-	$dialoglib = isset($dialoglib) ? $dialoglib : false;
 	$ajaxlib = isset($ajaxlib) ? $ajaxlib : false;
 	$bootstrap = isset($bootstrap) ? $bootstrap : false;
 	$filterwidget = isset($filterwidget) ? $filterwidget : false;
@@ -27,6 +26,7 @@
 	$navigationwidget = isset($navigationwidget) ? $navigationwidget : false;
 	$sbadmintemplate = isset($sbadmintemplate) ? $sbadmintemplate : false;
 	$tablesorter = isset($tablesorter) ? $tablesorter : false;
+	$pivotui = isset($pivotui) ? $pivotui : false;
 	$tinymce = isset($tinymce) ? $tinymce : false;
 ?>
 
@@ -61,6 +61,12 @@
 				generateCSSsInclude('vendor/mottie/tablesorter/dist/css/jquery.tablesorter.pager.min.css');
 			}
 
+			// PivotUI CSS
+			if ($pivotui === true)
+			{
+				generateCSSsInclude('vendor/nicolaskruchten/pivottable/dist/pivot.min.css');
+			}
+
 			// SB Admin 2 template CSS
 			if ($sbadmintemplate === true)
 			{
@@ -73,9 +79,6 @@
 
 			// --------------------------------------------------------------------------------------------------------
 			// From public folder
-
-			// DialogLib CSS
-			if ($dialoglib === true) generateCSSsInclude('public/css/DialogLib.css');
 
 			// AjaxLib CSS
 			if ($ajaxlib === true) generateCSSsInclude('public/css/AjaxLib.css');
@@ -125,6 +128,12 @@
 				generateJSsInclude('vendor/mottie/tablesorter/dist/js/extras/jquery.tablesorter.pager.min.js');
 			}
 
+			// PivotUI CSS
+			if ($pivotui === true)
+			{
+				generateJSsInclude('vendor/nicolaskruchten/pivottable/dist/pivot.min.js');
+			}
+
 			// Tinymce JS
 			if ($tinymce === true) generateJSsInclude('vendor/tinymce/tinymce/tinymce.min.js');
 
@@ -142,9 +151,6 @@
 
 			// --------------------------------------------------------------------------------------------------------
 			// From public folder
-
-			// DialogLib JS
-			if ($dialoglib === true) generateJSsInclude('public/js/DialogLib.js');
 
 			// AjaxLib JS
 			// NOTE: must be called before including others JS libraries that use it
