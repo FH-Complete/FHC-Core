@@ -45,9 +45,11 @@ $(document).ready(function ()
 		$("#notizform").on("submit", function (e)
 			{
 				e.preventDefault();
-				var notizId = $("#notizform :input[name='hiddenNotizId']").val();
+				var notizid = $("#notizform :input[name='hiddenNotizId']").val();
 				var formdata = $(this).serializeArray();
 				var data = {};
+
+				data.person_id = personid;
 
 				for (var i = 0; i < formdata.length; i++)
 				{
@@ -56,9 +58,9 @@ $(document).ready(function ()
 
 				$("#notizmsg").empty();
 
-				if (notizId !== '')
+				if (notizid !== '')
 				{
-					InfocenterDetails.updateNotiz(notizId, personid, data);
+					InfocenterDetails.updateNotiz(notizid, data);
 				}
 				else
 				{
@@ -72,16 +74,9 @@ $(document).ready(function ()
 			{
 				$("#notizmsg").empty();
 
-				var notizId = $(this).find("td:eq(3)").html();
-				var notizTitle = $(this).find("td:eq(1)").text();
-				var notizContent = this.title;
+				var notizid = $(this).find("td.hiddennotizid").html();
 
-				$("#notizform label:first").text(FHC_PhrasesLib.t('infocenter', 'notizAendern')).css("color", "red");
-				$("#notizform :input[type='reset']").css("display", "inline-block");
-
-				$("#notizform :input[name='hiddenNotizId']").val(notizId);
-				$("#notizform :input[name='notiztitel']").val(notizTitle);
-				$("#notizform :input[name='notiz']").val(notizContent);
+				InfocenterDetails.getNotiz(notizid);
 			}
 		);
 
@@ -119,7 +114,7 @@ $(document).ready(function ()
 var InfocenterDetails = {
 
 	genericSaveError: function() {
-		FHC_DialogLib.alertError("error when saving");
+		alert("error when saving");
 	},
 	openZgvInfoForPrestudent: function(prestudent_id)
 	{
@@ -174,11 +169,14 @@ var InfocenterDetails = {
 			data,
 			{
 				successCallback: function(data, textStatus, jqXHR) {
-					if (data !== true)
+					if (data === true)
 					{
-						FHC_DialogLib.alertError("error when saving ZGV prio");
+						InfocenterDetails._refreshZgv(true);
 					}
-					InfocenterDetails._refreshZgv(true);
+					else
+					{
+						alert("error when saving zgv Prio");
+					}
 				}
 			}
 		);
@@ -261,7 +259,7 @@ var InfocenterDetails = {
 					}
 					else
 					{
-						FHC_DialogLib.alertError("error when saving Absage");
+						alert("error when saving Absage");
 					}
 				}
 			}
@@ -282,15 +280,48 @@ var InfocenterDetails = {
 					}
 					else if (data.error === 2 && parseInt(data.retval.prestudent_id, 10))
 					{
-						FHC_DialogLib.alertError("error when setting accepted documents");
+						alert("error when setting accepted documents");
 						InfocenterDetails._refreshZgv();
 						InfocenterDetails._refreshLog();
 					}
 					else
 					{
-						FHC_DialogLib.alertError("error when saving Freigabe");
+						alert("error when saving Freigabe");
 					}
 				}
+			}
+		);
+	},
+	getNotiz: function(notiz_id)
+	{
+		FHC_AjaxClient.ajaxCallGet(
+			CALLED_PATH + '/getNotiz',
+			{
+				"notiz_id": notiz_id
+			},
+			{
+				successCallback: function(data, textStatus, jqXHR) {
+					if (FHC_AjaxClient.hasData(data))
+					{
+						var notiz = data.retval[0];
+
+						$("#notizform label:first").text(FHC_PhrasesLib.t('infocenter', 'notizAendern')).css("color", "red");
+						$("#notizform :input[type='reset']").css("display", "inline-block");
+
+						$("#notizform :input[name='hiddenNotizId']").val(notiz_id);
+						$("#notizform :input[name='notiztitel']").val(notiz.titel);
+						$("#notizform :input[name='notiz']").val(notiz.text);
+					}
+					else
+					{
+						InfocenterDetails._notizError('fehlerBeimLesen');
+					}
+				},
+				errorCallback: function()
+				{
+					InfocenterDetails._notizError('fehlerBeimLesen');
+				},
+				veilTimeout: 0
 			}
 		);
 	},
@@ -308,18 +339,21 @@ var InfocenterDetails = {
 					}
 					else
 					{
-						InfocenterDetails._errorSaveNotiz();
+						InfocenterDetails._notizError('fehlerBeimSpeichern');
 					}
 				},
-				errorCallback: InfocenterDetails._errorSaveNotiz,
+				errorCallback: function()
+				{
+					InfocenterDetails._notizError('fehlerBeimSpeichern');
+				},
 				veilTimeout: 0
 			}
 		);
 	},
-	updateNotiz: function(notizId, personId, data)
+	updateNotiz: function(notizid, data)
 	{
 		FHC_AjaxClient.ajaxCallPost(
-			CALLED_PATH + '/updateNotiz/' + encodeURIComponent(notizId) + "/" + encodeURIComponent(personId),
+			CALLED_PATH + '/updateNotiz/' + encodeURIComponent(notizid),
 			data,
 			{
 				successCallback: function(data, textStatus, jqXHR) {
@@ -331,10 +365,13 @@ var InfocenterDetails = {
 					}
 					else
 					{
-						InfocenterDetails._errorSaveNotiz();
+						InfocenterDetails._notizError('fehlerBeimSpeichern');
 					}
 				},
-				errorCallback: InfocenterDetails._errorSaveNotiz,
+				errorCallback: function()
+				{
+					InfocenterDetails._notizError('fehlerBeimSpeichern');
+				},
 				veilTimeout: 0
 			}
 		);
@@ -812,8 +849,8 @@ var InfocenterDetails = {
 		$("#notizform label:first").text(FHC_PhrasesLib.t('infocenter', 'notizHinzufuegen')).css("color", "black");
 		$("#notizform :input[type='reset']").css("display", "none");
 	},
-	_errorSaveNotiz: function()
+	_notizError: function(phrasename)
 	{
-		$("#notizmsg").text(FHC_PhrasesLib.t('ui', 'fehlerBeimSpeichern'));
+		$("#notizmsg").text(FHC_PhrasesLib.t('ui', phrasename));
 	}
 };

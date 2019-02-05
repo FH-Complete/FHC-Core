@@ -84,6 +84,7 @@ class InfoCenter extends Auth_Controller
 				'saveZgvPruefung' => 'infocenter:rw',
 				'saveAbsage' => 'infocenter:rw',
 				'saveFreigabe' => 'infocenter:rw',
+				'getNotiz' => 'infocenter:r',
 				'saveNotiz' => 'infocenter:rw',
 				'updateNotiz' => 'infocenter:rw',
 				'reloadZgvPruefungen' => 'infocenter:r',
@@ -534,6 +535,20 @@ class InfoCenter extends Auth_Controller
 	}
 
 	/**
+	 * Gets a Notiz
+	 */
+	public function getNotiz()
+	{
+		$notiz_id = $this->input->get('notiz_id');
+
+		$result = $this->NotizModel->load(
+			$notiz_id
+		);
+
+		$this->output->set_content_type('application/json')->set_output(json_encode($result));
+	}
+
+	/**
 	 * Saves a new Notiz for a person
 	 * @param $person_id
 	 */
@@ -557,10 +572,10 @@ class InfoCenter extends Auth_Controller
 	 * Updates a new Notiz for a person
 	 * @param int $notiz_id
 	 * @param int $person_id
-	 * @return bool true if success
 	 */
-	public function updateNotiz($notiz_id, $person_id)
+	public function updateNotiz($notiz_id)
 	{
+		$person_id = $this->input->post('person_id');
 		$titel = $this->input->post('notiztitel');
 		$text = $this->input->post('notiz');
 
