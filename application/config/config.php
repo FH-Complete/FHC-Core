@@ -347,6 +347,7 @@ $config['encryption_key'] = '';
 | 'sess_time_to_update'
 |
 |	How many seconds between CI regenerating the session ID.
+|	NOTE: Keep it as it is to prevent security issues (https://en.wikipedia.org/wiki/Session_fixation)
 |
 | 'sess_regenerate_destroy'
 |
@@ -359,8 +360,8 @@ $config['encryption_key'] = '';
 |
 */
 $config['sess_driver'] = 'files';
-$config['sess_cookie_name'] = 'ci_session';
-$config['sess_expiration'] = 7200;
+$config['sess_cookie_name'] = 'sess_ci_session';
+$config['sess_expiration'] = 1800; // Session expires every 30 minutes
 $config['sess_save_path'] = NULL;
 $config['sess_match_ip'] = FALSE;
 $config['sess_time_to_update'] = 300;
