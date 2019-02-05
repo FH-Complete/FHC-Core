@@ -114,6 +114,11 @@ class Prestudentstatus extends FHC_Controller
 									$row_status->person_id,
 									$row_status->studienplan_id,
 									$studienplan->retval[0]->studienplan_id);
+
+								$this->correctReihungstestStudienplan(
+									$row_status->studiensemester_kurzbz,
+									$row_status->studienplan_id,
+									$studienplan->retval[0]->studienplan_id);
 							}
 						}
 					}
@@ -180,6 +185,51 @@ class Prestudentstatus extends FHC_Controller
 
 				if(!hasData($rt_studienplan))
 				{
+					$this->RtStudienplanModel->insert(array(
+						"reihungstest_id" => $row_rt->reihungstest_id,
+						"studienplan_id" => $studienplan_id
+					));
+				}
+			}
+		}
+	}
+
+	/**
+	 * When a degree Programm gets a new Studyplan the Placementtests are updated and the
+	 * new studyplan is added
+	 * @param $studiensemester Studiensemester_kurzbz.
+	 * @param $studienplan_id_old Id of the old studyplan
+	 * @param $studienplan_id id of the new studyplan
+	 */
+	private function correctReihungstestStudienplan($studiensemester, $studienplan_id_old, $studienplan_id)
+	{
+		$this->load->model('crm/RtStudienplan_model', 'RtStudienplanModel');
+
+		$this->RtStudienplanModel->resetQuery();
+		// Correct also Assignments to Placement test
+		$this->RtStudienplanModel->addJoin(
+			'public.tbl_reihungstest',
+			'tbl_reihungstest.reihungstest_id = tbl_rt_studienplan.reihungstest_id'
+		);
+
+		$rt = $this->RtStudienplanModel->loadWhere(array(
+			"studienplan_id" => $studienplan_id_old,
+			"tbl_reihungstest.studiensemester_kurzbz" => $studiensemester
+			));
+
+		if(hasData($rt))
+		{
+			foreach($rt->retval as $row_rt)
+			{
+				// Add new Studyplan to RtStudienplan if missing
+				$rt_studienplan = $this->RtStudienplanModel->loadWhere(array(
+					"reihungstest_id" => $row_rt->reihungstest_id,
+					"studienplan_id" => $studienplan_id
+				));
+
+				if(!hasData($rt_studienplan))
+				{
+					echo "Adding StudienplanId: $studienplan_id to ReihungstestId: $row_rt->reihungstest_id";
 					$this->RtStudienplanModel->insert(array(
 						"reihungstest_id" => $row_rt->reihungstest_id,
 						"studienplan_id" => $studienplan_id
