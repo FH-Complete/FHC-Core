@@ -78,6 +78,7 @@ class InfoCenter extends Auth_Controller
 				'showDetails' => 'infocenter:r',
 				'unlockPerson' => 'infocenter:rw',
 				'saveFormalGeprueft' => 'infocenter:rw',
+				'getPrestudentData' => 'infocenter:r',
 				'getLastPrestudentWithZgvJson' => 'infocenter:r',
 				'getZgvInfoForPrestudent' => 'infocenter:r',
 				'saveBewPriorisierung' => 'infocenter:rw',
@@ -261,6 +262,17 @@ class InfoCenter extends Auth_Controller
 		}
 
 		$this->output->set_content_type('application/json')->set_output(json_encode($json));
+	}
+
+	/**
+	 * Gets prestudent data for a person in json format
+	 * @param $person_id
+	 */
+	public function getPrestudentData($person_id)
+	{
+		$prestudentdata = $this->_loadPrestudentData($person_id);
+
+		$this->output->set_content_type('application/json')->set_output(json_encode($prestudentdata['zgvpruefungen']));
 	}
 
 	/**
