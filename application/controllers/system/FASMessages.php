@@ -63,7 +63,7 @@ class FASMessages extends Auth_Controller
  			'isAdmin' => $isAdmin
  		);
 
- 		$this->load->view('system/messageWrite', $data);
+ 		$this->load->view('system/messages/messageWrite', $data);
  	}
 
 	/**
@@ -109,7 +109,7 @@ class FASMessages extends Auth_Controller
  			'isAdmin' => $isAdmin
  		);
 
- 		$this->load->view('system/messageWrite', $data);
+ 		$this->load->view('system/messages/messageWrite', $data);
  	}
 
 	// -----------------------------------------------------------------------------------------------------------------

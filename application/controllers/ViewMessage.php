@@ -81,7 +81,7 @@ class ViewMessage extends FHC_Controller
 				'href' => $href
 			);
 
-			$this->load->view('system/messageHTML.php', $data);
+			$this->load->view('system/messages/messageHTML.php', $data);
 		}
 	}
 
@@ -94,7 +94,7 @@ class ViewMessage extends FHC_Controller
 
 		if (isEmptyString($token))
 		{
-			show_error('no token supplied');
+			show_error('No token supplied');
 		}
 
 		$msg = null;
@@ -104,7 +104,7 @@ class ViewMessage extends FHC_Controller
 
 		if (!hasData($msg))
 		{
-			show_error('no message found');
+			show_error('No message found');
 		}
 
 		$msg = $msg->retval[0];
@@ -114,7 +114,7 @@ class ViewMessage extends FHC_Controller
 
 		if (!hasData($receiverData))
 		{
-			show_error('no sender found');
+			show_error('No sender found');
 		}
 
 		$data = array (
@@ -123,7 +123,7 @@ class ViewMessage extends FHC_Controller
 			'token' => $token
 		);
 
-		$this->load->view('system/messageWriteReply', $data);
+		$this->load->view('system/messages/messageWriteReply', $data);
 	}
 
 	/**
@@ -210,7 +210,7 @@ class ViewMessage extends FHC_Controller
 
 		if (!$error)
 		{
-			$this->load->view('system/messageSent');
+			$this->load->view('system/messages/messageSent');
 		}
 	}
 }

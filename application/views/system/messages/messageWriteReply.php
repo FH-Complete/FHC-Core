@@ -26,7 +26,7 @@ $href = site_url().'/ViewMessage/sendReply';
 				</div>
 			</div>
 			<form id="sendForm" method="post" action="<?php echo $href; ?>">
-				<?php $this->load->view('system/messageForm.php'); ?>
+				<?php $this->load->view('system/messages/messageForm.php'); ?>
 				<?php
 				for ($i = 0; $i < count($receivers); $i++)
 				{

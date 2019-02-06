@@ -760,7 +760,15 @@ class MessageLib
 	 */
 	public function parseMessageText($text, $data = array())
 	{
-		return $this->_ci->parser->parse_string($text, $data, true);
+		$tmpData = array();
+
+		// Replaces data array keys to a lowercase without spaces string
+		foreach ($data as $key => $val)
+		{
+			$tmpData[str_replace(' ', '_', strtolower($key))] = $data[$key];
+		}
+
+		return $this->_ci->parser->parse_string($text, $tmpData, true);
 	}
 
 	/**

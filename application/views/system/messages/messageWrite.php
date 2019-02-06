@@ -4,7 +4,9 @@ $this->load->view(
 	array(
 		'title' => 'Write a message',
 		'jquery' => true,
+		'jqueryui' => true,
 		'bootstrap' => true,
+		'ajaxlib' => true,
 		'fontawesome' => true,
 		'tinymce' => true,
 		'sbadmintemplate' => true,

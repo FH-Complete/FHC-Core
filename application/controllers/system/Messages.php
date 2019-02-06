@@ -66,7 +66,7 @@ class Messages extends Auth_Controller
 			'isAdmin' => $isAdmin
 		);
 
-		$this->load->view('system/messageWrite', $data);
+		$this->load->view('system/messages/messageWrite', $data);
 	}
 
 	/**
@@ -146,11 +146,6 @@ class Messages extends Auth_Controller
 			{
 				$parsedText = "";
 				$dataArray = (array)$data->retval[$i];
-				foreach ($dataArray as $key => $val)
-				{
-					$newKey = str_replace(" ", "_", strtolower($key));
-					$dataArray[$newKey] = $dataArray[$key];
-				}
 
 				// if oe not given, get from prestudent
 				if (isEmptyString($oe_kurzbz) && hasData($prestudentsData))
@@ -175,7 +170,7 @@ class Messages extends Auth_Controller
 				{
 					if (isset($msgvars) && is_array($msgvars))
 					{
-						//additional message variables
+						// additional message variables
 						foreach ($msgvars as $key => $msgvar)
 						{
 							$dataArray[$key] = $msgvar;
@@ -208,6 +203,7 @@ class Messages extends Auth_Controller
 				);
 
 			}
+
 			return success('success');
 		}
 	}
@@ -218,14 +214,27 @@ class Messages extends Auth_Controller
 	public function getVorlage()
 	{
 		$vorlage_kurzbz = $this->input->get('vorlage_kurzbz');
+		$result = null;
 
-		if (isset($vorlage_kurzbz))
+		if (!isEmptyString($vorlage_kurzbz))
 		{
 			$this->load->model('system/Vorlagestudiengang_model', 'VorlagestudiengangModel');
 			$this->VorlagestudiengangModel->addOrder('version','DESC');
-			$result = $this->VorlagestudiengangModel->loadWhere(array('vorlage_kurzbz' => $vorlage_kurzbz));
 
-			$this->outputJsonSuccess($result);
+			$result = $this->VorlagestudiengangModel->loadWhere(array('vorlage_kurzbz' => $vorlage_kurzbz));
+		}
+		else
+		{
+			$result = error('The given vorlage_kurzbz is not valid');
+		}
+
+		if (isError($result) || !hasData($result))
+		{
+			$this->outputJsonError($result->retval);
+		}
+		else
+		{
+			$this->outputJsonSuccess($result->retval);
 		}
 	}
 
@@ -234,7 +243,6 @@ class Messages extends Auth_Controller
 	 */
 	public function parseMessageText()
 	{
-		$prestudent_id = $this->input->get('prestudent_id');
 		$person_id = $this->input->get('person_id');
 		$text = $this->input->get('text');
 		$parsedText = '';
@@ -244,25 +252,18 @@ class Messages extends Auth_Controller
 		{
 			$data = $this->MessageModel->getMsgVarsDataByPersonId($person_id);
 		}
-		elseif (is_numeric($prestudent_id))
+		else
 		{
-			$data = $this->MessageModel->getMsgVarsDataByPrestudentId($prestudent_id);
+			$data = error('The given person_id is not a valid number');
 		}
 
-		if (is_error($data) || !hasData($data))
+		if (isError($data) || !hasData($data))
 		{
 			$this->outputJsonError($data->retval);
 		}
 		else
 		{
-			$dataArray = (array)$data->retval[0];
-			foreach ($dataArray as $key => $val)
-			{
-				$newKey = str_replace(" ", "_", strtolower($key));
-				$dataArray[$newKey] = $dataArray[$key];
-			}
-
-			$parsedText = $this->messagelib->parseMessageText($text, $dataArray);
+			$parsedText = $this->messagelib->parseMessageText($text, (array)$data->retval[0]);
 
 			$this->outputJsonSuccess($parsedText);
 		}

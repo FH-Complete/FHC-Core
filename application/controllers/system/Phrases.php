@@ -16,7 +16,6 @@ class Phrases extends Auth_Controller
 				'view' => 'system/phrase:r',
 				'deltext' => 'system/phrase:rw',
 				'edit' => 'system/phrase:rw',
-				'write' => 'system/phrase:rw',
 				'save' => 'system/phrase:rw',
 				'newText' => 'system/phrase:rw',
 				'editText' => 'system/phrase:rw',
@@ -113,19 +112,6 @@ class Phrases extends Auth_Controller
 		);
 
 		$this->load->view('system/phrases/phrasesEdit', $data);
-	}
-
-	/**
-	 *
-	 */
-	public function write()
-	{
-		$data = array(
-			'subject' => 'TestSubject',
-			'body' => 'TestDevelopmentBodyText'
-		);
-
-		$this->load->view('system/messageWrite', $data);
 	}
 
 	/**

@@ -1,4 +1,6 @@
-const CONTROLLER_URL = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router + "/system/Messages";
+/**
+ * JS used by view system/messages/messageWrite
+ */
 
 function tinymcePreviewSetContent()
 {
@@ -17,22 +19,26 @@ function tinymcePreviewSetContent()
 
 function parseMessageText(receiver_id, text)
 {
-	$.ajax({
-		dataType: "json",
-		url: CONTROLLER_URL + "/parseMessageText",
-		data: {
-			"person_id": receiver_id,
-			"text": text
-		},
-		success: function(data, textStatus, jqXHR)
+	FHC_AjaxClient.ajaxCallGet(
+		"system/Messages/parseMessageText",
 		{
-			tinyMCE.get("tinymcePreview").setContent(data);
+			person_id: receiver_id,
+			text: text
 		},
-		error: function(jqXHR, textStatus, errorThrown)
 		{
-			alert(textStatus + " - " + errorThrown + " - " + jqXHR.responseText);
+			successCallback: function(data, textStatus, jqXHR) {
+
+				if (FHC_AjaxClient.hasData(data))
+				{
+					tinyMCE.get("tinymcePreview").setContent(FHC_AjaxClient.getData(data));
+				}
+				else if (FHC_AjaxClient.isError(data))
+				{
+					alert(data.retval);
+				}
+			}
 		}
-	});
+	);
 }
 
 $(document).ready(function ()
@@ -100,24 +106,28 @@ $(document).ready(function ()
 	{
 		$("#vorlageDnD").change(function ()
 		{
-			if (this.value != '')
+			var vorlage_kurzbz = this.value;
+
+			if (vorlage_kurzbz != '')
 			{
-				$.ajax({
-					dataType: "json",
-					url: CONTROLLER_URL + "/getVorlage",
-					data: {
-						"vorlage_kurzbz": this.value
-					},
-					success: function(data, textStatus, jqXHR)
+				FHC_AjaxClient.ajaxCallGet(
+					"system/Messages/getVorlage",
 					{
-						tinyMCE.get("bodyTextArea").setContent(data.retval[0].text);
-						$("#subject").val(data.retval[0].subject);
+						vorlage_kurzbz: vorlage_kurzbz
 					},
-					error: function(jqXHR, textStatus, errorThrown)
 					{
-						alert(textStatus + " - " + errorThrown);
+						successCallback: function(data, textStatus, jqXHR) {
+
+							if (FHC_AjaxClient.hasData(data))
+							{
+								var msg = FHC_AjaxClient.getData(data);
+
+								tinyMCE.get("bodyTextArea").setContent(msg[0].text);
+								$("#subject").val(msg[0].subject);
+							}
+						}
 					}
-				});
+				);
 			}
 		});
 	}
