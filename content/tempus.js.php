@@ -473,7 +473,7 @@ function SyncLVPlan()
 // ****
 function OpenManualTempus()
 {
-	window.open('<?php echo APP_ROOT ?>content/Tempus.pdf','Manual');
+	window.open('https://fhcomplete.technikum-wien.at/dokuwiki/doku.php?id=tempus:allgemeines','Manual');
 }
 
 // ****
