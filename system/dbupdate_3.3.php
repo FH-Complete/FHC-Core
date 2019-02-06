@@ -2517,7 +2517,7 @@ if($result = $db->db_query("SELECT 1 FROM system.tbl_app WHERE app='reihungstest
 if(!$result = @$db->db_query("SELECT aktiv FROM lehre.tbl_betreuerart LIMIT 1"))
 {
 	$qry = "ALTER TABLE lehre.tbl_betreuerart ADD COLUMN aktiv boolean NOT NULL DEFAULT TRUE;";
-	
+
 	if(!$db->db_query($qry))
 		echo '<strong>lehre.tbl_betreuerart: '.$db->db_last_error().'</strong><br>';
 	else
@@ -2528,7 +2528,7 @@ if(!$result = @$db->db_query("SELECT aktiv FROM lehre.tbl_betreuerart LIMIT 1"))
 if(!$result = @$db->db_query("SELECT aktiv FROM lehre.tbl_projekttyp LIMIT 1"))
 {
 	$qry = "ALTER TABLE lehre.tbl_projekttyp ADD COLUMN aktiv boolean NOT NULL DEFAULT TRUE;";
-	
+
 	if(!$db->db_query($qry))
 		echo '<strong>lehre.tbl_projekttyp: '.$db->db_last_error().'</strong><br>';
 		else
@@ -2541,12 +2541,143 @@ if($result = @$db->db_query("SELECT is_nullable FROM INFORMATION_SCHEMA.COLUMNS 
 	if($db->db_num_rows($result) > 0)
 	{
 		$qry = "ALTER TABLE public.tbl_prestudent ALTER COLUMN aufmerksamdurch_kurzbz DROP NOT NULL;";
-		
+
 		if(!$db->db_query($qry))
 			echo '<strong>public.tbl_prestudent '.$db->db_last_error().'</strong><br>';
 		else
 			echo '<br>Removed NOT NULL constraint on "aufmerksamdurch_kurzbz" from public.tbl_prestudent<br>';
 	}
+}
+
+if(!$result = @$db->db_query('SELECT "Zugangscode" FROM public.vw_msg_vars LIMIT 1'))
+{
+	// CREATE OR REPLACE VIEW public.vw_msg_vars and grants privileges
+	$qry = '
+	CREATE OR REPLACE VIEW public.vw_msg_vars AS (
+		SELECT DISTINCT ON(p.person_id, pr.prestudent_id) p.person_id,
+			   pr.prestudent_id AS prestudent_id,
+			   p.nachname AS "Nachname",
+			   p.vorname AS "Vorname",
+			   p.anrede AS "Anrede",
+			   a.strasse AS "Strasse",
+			   a.ort AS "Ort",
+			   a.plz AS "PLZ",
+			   a.gemeinde AS "Gemeinde",
+			   a.langtext AS "Nation",
+			   ke.kontakt AS "Email",
+			   kt.kontakt AS "Telefon",
+			   s.bezeichnung AS "Studiengang DE",
+			   s.english AS "Studiengang EN",
+			   st.bezeichnung AS "Typ",
+			   orgform_kurzbz AS "Orgform",
+			   p.zugangscode AS "Zugangscode"
+		  FROM public.tbl_person p
+	 LEFT JOIN (
+					SELECT person_id,
+						   kontakt
+					  FROM public.tbl_kontakt
+					 WHERE zustellung = TRUE
+					   AND kontakttyp = \'email\'
+				  ORDER BY kontakt_id DESC
+			) ke USING(person_id)
+	 LEFT JOIN (
+					SELECT person_id,
+						   kontakt
+					  FROM public.tbl_kontakt
+					 WHERE zustellung = TRUE
+					   AND kontakttyp IN (\'telefon\', \'mobil\')
+				  ORDER BY kontakt_id DESC
+			) kt USING(person_id)
+	 LEFT JOIN (
+					SELECT person_id,
+						   strasse,
+						   ort,
+						   plz,
+						   gemeinde,
+						   langtext
+					  FROM public.tbl_adresse
+				 LEFT JOIN bis.tbl_nation ON(bis.tbl_nation.nation_code = public.tbl_adresse.nation)
+					 WHERE public.tbl_adresse.heimatadresse = TRUE
+				  ORDER BY adresse_id DESC
+			) a USING(person_id)
+			LEFT JOIN public.tbl_prestudent pr USING(person_id)
+			INNER JOIN public.tbl_studiengang s USING(studiengang_kz)
+			INNER JOIN public.tbl_studiengangstyp st USING(typ)
+		 WHERE p.aktiv = TRUE
+	  ORDER BY p.person_id ASC, pr.prestudent_id ASC
+	);
+	';
+
+	if(!$db->db_query($qry))
+		echo '<strong>public.vw_msg_vars: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>public.vw_msg_vars zugangscode added';
+}
+
+if(!$result = @$db->db_query('SELECT "Zugangscode" FROM public.vw_msg_vars_person LIMIT 1'))
+{
+	// CREATE OR REPLACE VIEW public.vw_msg_vars and grants privileges
+	$qry = '
+		CREATE OR REPLACE VIEW public.vw_msg_vars_person AS (
+		SELECT DISTINCT ON(p.person_id) p.person_id,
+						   p.nachname AS "Nachname",
+						   p.vorname AS "Vorname",
+						   p.anrede AS "Anrede",
+						   a.strasse AS "Strasse",
+						   a.ort AS "Ort",
+						   a.plz AS "PLZ",
+						   a.gemeinde AS "Gemeinde",
+						   a.langtext AS "Nation",
+						   ke.kontakt AS "Email",
+						   kt.kontakt AS "Telefon",
+							( SELECT tbl_studiensemester.bezeichnung
+							       FROM tbl_studiensemester
+							      WHERE "substring"(tbl_studiensemester.studiensemester_kurzbz::text, 1, 2) = \'WS\'::text AND (tbl_studiensemester.start >= now() AND tbl_studiensemester.ende >= now() OR tbl_studiensemester.start <= now() AND tbl_studiensemester.ende >= now())
+							      ORDER BY tbl_studiensemester.start
+							     LIMIT 1) AS "WS naechstes",
+							( SELECT tbl_studiensemester.bezeichnung
+							       FROM tbl_studiensemester
+							      WHERE "substring"(tbl_studiensemester.studiensemester_kurzbz::text, 1, 2) = \'WS\'::text AND (tbl_studiensemester.start >= now() AND tbl_studiensemester.ende >= now() OR tbl_studiensemester.start <= now() AND tbl_studiensemester.ende >= now())
+							      ORDER BY tbl_studiensemester.start
+							     OFFSET 1
+							     LIMIT 1) AS "WS uebernaechstes",
+							p.zugangscode as "Zugangscode"
+					  FROM public.tbl_person p
+				 LEFT JOIN (
+								SELECT person_id,
+									   kontakt
+								  FROM public.tbl_kontakt
+								 WHERE zustellung = TRUE
+								   AND kontakttyp = \'email\'
+							  ORDER BY kontakt_id DESC
+						) ke USING(person_id)
+				 LEFT JOIN (
+								SELECT person_id,
+									   kontakt
+								  FROM public.tbl_kontakt
+								 WHERE zustellung = TRUE
+								   AND kontakttyp IN (\'telefon\', \'mobil\')
+							  ORDER BY kontakt_id DESC
+						) kt USING(person_id)
+				 LEFT JOIN (
+								SELECT person_id,
+									   strasse,
+									   ort,
+									   plz,
+									   gemeinde,
+									   langtext
+								  FROM public.tbl_adresse
+							 LEFT JOIN bis.tbl_nation ON(bis.tbl_nation.nation_code = public.tbl_adresse.nation)
+								 WHERE public.tbl_adresse.heimatadresse = TRUE
+							  ORDER BY adresse_id DESC
+						) a USING(person_id)
+				  ORDER BY p.person_id ASC
+		);';
+
+	if(!$db->db_query($qry))
+		echo '<strong>public.vw_msg_vars_person: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>public.vw_msg_vars_person zugangscode added';
 }
 
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
