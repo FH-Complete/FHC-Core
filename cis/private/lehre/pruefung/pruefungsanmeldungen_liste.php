@@ -248,7 +248,7 @@ $rechte->getBerechtigungen($uid);
 				{
 				$date = $datum->formatDatum($prfTermin->von, "Y-m-d H:i:s");
 				$date = strtotime($date);
-				$date = $date+(60*$pruefungsintervall*($count));
+				$date = $date+(60*$pruefungsintervall*($anmeldung->reihung-1));
 				$date = $datum->formatDatum($prfTermin->von,"d.m.Y").' - '.date("H:i",$date);
 				$count++;
 				}
