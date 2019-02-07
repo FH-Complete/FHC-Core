@@ -2549,9 +2549,9 @@ if($result = @$db->db_query("SELECT is_nullable FROM INFORMATION_SCHEMA.COLUMNS 
 	}
 }
 
+// Spalte Zugangscode zu vw_msg_vars hinzufügen
 if(!$result = @$db->db_query('SELECT "Zugangscode" FROM public.vw_msg_vars LIMIT 1'))
 {
-	// CREATE OR REPLACE VIEW public.vw_msg_vars and grants privileges
 	$qry = '
 	CREATE OR REPLACE VIEW public.vw_msg_vars AS (
 		SELECT DISTINCT ON(p.person_id, pr.prestudent_id) p.person_id,
@@ -2614,9 +2614,9 @@ if(!$result = @$db->db_query('SELECT "Zugangscode" FROM public.vw_msg_vars LIMIT
 		echo '<br>public.vw_msg_vars zugangscode added';
 }
 
+// Spalte Zugangscode zu vw_msg_vars_person hinzufügen
 if(!$result = @$db->db_query('SELECT "Zugangscode" FROM public.vw_msg_vars_person LIMIT 1'))
 {
-	// CREATE OR REPLACE VIEW public.vw_msg_vars and grants privileges
 	$qry = '
 		CREATE OR REPLACE VIEW public.vw_msg_vars_person AS (
 		SELECT DISTINCT ON(p.person_id) p.person_id,
@@ -2678,6 +2678,42 @@ if(!$result = @$db->db_query('SELECT "Zugangscode" FROM public.vw_msg_vars_perso
 		echo '<strong>public.vw_msg_vars_person: '.$db->db_last_error().'</strong><br>';
 	else
 		echo '<br>public.vw_msg_vars_person zugangscode added';
+}
+
+// Spalte Zugangscode zu vw_msg_vars_person hinzufügen
+// Fachbereich entfernen
+if(!$result = @$db->db_query('SELECT lehrfach_oe_kurzbz FROM campus.vw_lehreinheit LIMIT 1'))
+{
+	$qry = "
+		DROP VIEW campus.vw_lehreinheit;
+		CREATE OR REPLACE VIEW campus.vw_lehreinheit as
+		SELECT
+		tbl_lehrveranstaltung.studiengang_kz AS lv_studiengang_kz, tbl_lehrveranstaltung.semester AS lv_semester, tbl_lehrveranstaltung.kurzbz AS lv_kurzbz, tbl_lehrveranstaltung.bezeichnung AS lv_bezeichnung, tbl_lehrveranstaltung.ects AS lv_ects, tbl_lehrveranstaltung.lehreverzeichnis AS lv_lehreverzeichnis,
+		tbl_lehrveranstaltung.planfaktor AS lv_planfaktor, tbl_lehrveranstaltung.planlektoren AS lv_planlektoren, tbl_lehrveranstaltung.planpersonalkosten AS lv_planpersonalkosten, tbl_lehrveranstaltung.plankostenprolektor AS lv_plankostenprolektor, tbl_lehrveranstaltung.orgform_kurzbz AS lv_orgform_kurzbz,
+		tbl_lehreinheit.lehreinheit_id, tbl_lehreinheit.lehrveranstaltung_id, tbl_lehreinheit.studiensemester_kurzbz, tbl_lehreinheit.lehrform_kurzbz, tbl_lehreinheit.stundenblockung, tbl_lehreinheit.wochenrythmus, tbl_lehreinheit.start_kw, tbl_lehreinheit.raumtyp, tbl_lehreinheit.raumtypalternativ, tbl_lehreinheit.lehre,
+		tbl_lehreinheit.unr, tbl_lehreinheit.lvnr, tbl_lehreinheitmitarbeiter.lehrfunktion_kurzbz, tbl_lehreinheit.insertamum, tbl_lehreinheit.insertvon, tbl_lehreinheit.updateamum, tbl_lehreinheit.updatevon,
+		lehrfach.lehrveranstaltung_id AS lehrfach_id,
+		lehrfach.oe_kurzbz as lehrfach_oe_kurzbz,
+		lehrfach.kurzbz AS lehrfach, lehrfach.bezeichnung AS lehrfach_bez, lehrfach.farbe,
+		tbl_lehrveranstaltung.aktiv, lehrfach.sprache, tbl_lehreinheitmitarbeiter.mitarbeiter_uid, tbl_lehreinheitmitarbeiter.semesterstunden, tbl_lehrveranstaltung.semesterstunden AS lv_semesterstunden, tbl_lehreinheitmitarbeiter.planstunden, tbl_lehreinheitmitarbeiter.stundensatz, tbl_lehreinheitmitarbeiter.faktor,
+		tbl_lehreinheit.anmerkung, tbl_mitarbeiter.kurzbz AS lektor, tbl_lehreinheitgruppe.studiengang_kz, tbl_lehreinheitgruppe.semester, tbl_lehreinheitgruppe.verband, tbl_lehreinheitgruppe.gruppe, tbl_lehreinheitgruppe.gruppe_kurzbz,
+		tbl_studiengang.kurzbz AS stg_kurzbz, tbl_studiengang.kurzbzlang AS stg_kurzbzlang, tbl_studiengang.bezeichnung AS stg_bez, tbl_studiengang.typ AS stg_typ, tbl_lehreinheitmitarbeiter.anmerkung AS anmerkunglektor, tbl_lehrveranstaltung.lehrform_kurzbz AS lv_lehrform_kurzbz,
+		tbl_lehrveranstaltung.bezeichnung_english AS lv_bezeichnung_english, tbl_lehrveranstaltung.lehrtyp_kurzbz
+		   FROM lehre.tbl_lehreinheit
+		   JOIN lehre.tbl_lehrveranstaltung USING (lehrveranstaltung_id)
+		   JOIN lehre.tbl_lehrveranstaltung lehrfach ON (tbl_lehreinheit.lehrfach_id=lehrfach.lehrveranstaltung_id)
+		   JOIN lehre.tbl_lehreinheitmitarbeiter USING (lehreinheit_id)
+		   JOIN public.tbl_mitarbeiter USING (mitarbeiter_uid)
+		   JOIN lehre.tbl_lehreinheitgruppe USING (lehreinheit_id)
+		   JOIN public.tbl_studiengang ON tbl_lehreinheitgruppe.studiengang_kz = tbl_studiengang.studiengang_kz;
+		GRANT SELECT ON campus.vw_lehreinheit TO admin;
+		GRANT SELECT ON campus.vw_lehreinheit TO vilesci;
+		GRANT SELECT ON campus.vw_lehreinheit TO web;
+	";
+	if(!$db->db_query($qry))
+		echo '<strong>campus.vw_lehreinheit: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>campus.vw_lehreinheit lehrfach_oe_kurzbz added, fachbereich_kurzbz removed';
 }
 
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
