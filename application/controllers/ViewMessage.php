@@ -210,7 +210,7 @@ class ViewMessage extends FHC_Controller
 
 		if (!$error)
 		{
-			$this->load->view('system/messages/messageSent');
+			$this->load->view('system/messages/messageReplySent');
 		}
 	}
 }

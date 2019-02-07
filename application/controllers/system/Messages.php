@@ -76,14 +76,7 @@ class Messages extends Auth_Controller
 	{
 		$result = $this->_execSend();
 
-		if (isSuccess($result))
-		{
-			echo "Messages sent successfully";
-		}
-		else
-		{
-			echo "Error when sending message";
-		}
+		$this->load->view('system/messages/messageSent', array('success' => isSuccess($result)));
 	}
 
 	/**

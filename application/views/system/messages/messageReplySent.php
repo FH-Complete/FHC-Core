@@ -17,26 +17,20 @@
 		<div id="page-wrapper">
 			<div class="container-fluid">
 
-			<?php
-				if ($success)
-				{
-			?>
-
 				<div class="row">
 
 					<div class="col-xs-6">
-						<h3 class="page-header text-right"></h3>
+						<h3 class="page-header text-right">Thank you for getting in touch!</h3>
 					</div>
 
 					<div class="col-xs-6">
-						<h3 class="page-header"></h3>
+						<h3 class="page-header">Danke für die Kontaktaufnahme!</h3>
 					</div>
 
 				</div>
 
 				<div class="row">
 					<div class="col-lg-12">
-
 						<div class="panel panel-success">
 							<div class="panel-heading">
 								<div class="row">
@@ -48,8 +42,25 @@
 									</div>
 								</div>
 							</div>
-
 							<div class="panel-body">
+								<div class="row">
+									<div class="col-xs-6 text-right">
+										<span class="rwd-line">
+											Thank you for your message.
+										</span>
+										<span class="rwd-line">
+											We will get back to you shortly.
+										</span>
+									</div>
+									<div class="col-xs-6">
+										<span class="rwd-line">
+											Herzlichen Dank für Ihre Nachricht.
+										</span>
+										<span class="rwd-line">
+											Wir werden uns schnellstmöglich um Ihr Anliegen kümmern.
+										</span>
+									</div>
+								</div>
 
 								<br>
 
@@ -61,12 +72,18 @@
 										Sie können dieses Fenster schließen.
 									</div>
 								</div>
-
 								<br>
-
+								<div class="row">
+									<div class="col-xs-6 text-right">
+										Your InfoCenter@FHTW Team
+									</div>
+									<div class="col-xs-6">
+										Ihr InfoCenter@FHTW Team
+									</div>
+								</div>
+								<br>
 							</div>
 						</div>
-
 						<div class="row">
 							<div class="col-xs-12 text-center">
 								<p class="signatureblock">
@@ -76,14 +93,8 @@
 								</p>
 							</div>
 						</div>
-
 					</div>
 				</div>
-
-			<?php
-				}
-			?>
-
 			</div>
 		</div>
 	</div>
