@@ -83,6 +83,21 @@ function hasData($result)
 }
 
 /**
+ * Returns the property retval if $result contains data
+ */
+function getData($result)
+{
+	$data = null;
+
+	if (hasData($result))
+	{
+		$data = $result->retval;
+	}
+
+	return $data;
+}
+
+/**
  * Checks if the result represents an error
  * Wrapper function of isSuccess, more readable code
  * Bob Dylan: ...there's no success like failure. And that failure's no success at all.
