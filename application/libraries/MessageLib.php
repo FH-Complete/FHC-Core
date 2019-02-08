@@ -54,9 +54,7 @@ class MessageLib
 		if (!is_numeric($person_id))
 			return $this->_error('', MSG_ERR_INVALID_RECIPIENTS);
 
-		$msg = $this->_ci->RecipientModel->getMessage($msg_id, $person_id);
-
-		return $msg;
+		return $this->_ci->RecipientModel->getMessage($msg_id, $person_id);
 	}
 
 	/**
@@ -67,9 +65,7 @@ class MessageLib
 		if (isEmptyString($uid))
 			return $this->_error('', MSG_ERR_INVALID_MSG_ID);
 
-		$msg = $this->_ci->RecipientModel->getMessagesByUID($uid, $oe_kurzbz, $all);
-
-		return $msg;
+		return $this->_ci->RecipientModel->getMessagesByUID($uid, $oe_kurzbz, $all);
 	}
 
 	/**
@@ -80,9 +76,7 @@ class MessageLib
 		if (!is_numeric($person_id))
 			return $this->_error('', MSG_ERR_INVALID_MSG_ID);
 
-		$msg = $this->_ci->RecipientModel->getMessagesByPerson($person_id, $oe_kurzbz, $all);
-
-		return $msg;
+		return $this->_ci->RecipientModel->getMessagesByPerson($person_id, $oe_kurzbz, $all);
 	}
 
 	/**
@@ -93,9 +87,7 @@ class MessageLib
 		if (!is_numeric($person_id))
 			return $this->_error('', MSG_ERR_INVALID_MSG_ID);
 
-		$msg = $this->_ci->MessageModel->getMessagesByPerson($person_id, $oe_kurzbz, $all);
-
-		return $msg;
+		return $this->_ci->MessageModel->getMessagesByPerson($person_id, $oe_kurzbz, $all);
 	}
 
 	/**
@@ -149,9 +141,7 @@ class MessageLib
 		if (!is_numeric($person_id))
 			return $this->_error('', MSG_ERR_INVALID_RECIPIENTS);
 
-		$msg = $this->_ci->RecipientModel->getCountUnreadMessages($person_id, $oe_kurzbz);
-
-		return $msg;
+		return $this->_ci->RecipientModel->getCountUnreadMessages($person_id, $oe_kurzbz);
 	}
 
 	/**
@@ -780,7 +770,11 @@ class MessageLib
 		$variablesArray = array();
 		$variables = $this->_ci->MessageModel->getMessageVarsPerson();
 
-		if (hasData($variables))
+		if (isError($variables))
+		{
+			show_error($variables->retval);
+		}
+		elseif (hasData($variables))
 		{
 			// Skip person_id
 			for ($i = 1; $i < count($variables->retval); $i++)
@@ -824,13 +818,20 @@ class MessageLib
 	{
 		$this->_ci->load->model('system/Benutzerrolle_model', 'BenutzerrolleModel');
  		$isAdmin = $this->_ci->BenutzerrolleModel->isAdminByPersonId($sender_id);
-
  		if (isError($isAdmin))
  		{
  			show_error($isAdmin->retval);
  		}
 
 		return $isAdmin->retval;
+	}
+
+	/**
+	 *
+	 */
+	public function send()
+	{
+
 	}
 
 	//------------------------------------------------------------------------------------------------------------------
