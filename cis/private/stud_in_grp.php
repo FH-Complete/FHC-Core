@@ -56,13 +56,13 @@ echo '<!DOCTYPE HTML>
 								}
 				})
 				// Set number of result rows after filtering
-				.bind("filterEnd",function(e, t) 
+				.bind("filterEnd",function(e, t)
 				{
 					var rows = $('table.hasFilters tbody tr:visible').length;
 					$("#rowCounter").html(rows);
 				});
-				
-				$("#toggle").on("click", function(e) 
+
+				$("#toggle").on("click", function(e)
 				{
 					$("#table").checkboxes("toggle");
 					e.preventDefault();
@@ -72,7 +72,7 @@ echo '<!DOCTYPE HTML>
 						$("#mailSendButton").html('<?php echo $p->t('mailverteiler/mailAnAlleSenden'); ?>');
 				});
 
-				$("#uncheck").on("click", function(e) 
+				$("#uncheck").on("click", function(e)
 				{
 					$("#table").checkboxes("uncheck");
 					e.preventDefault();
@@ -175,7 +175,7 @@ if (isset($_GET['all']))
 else
 {
 	$qry = "SELECT
-				vorname, nachname, uid
+				vorname, nachname, uid, geschlecht
 			FROM
 				campus.vw_student
 			WHERE
