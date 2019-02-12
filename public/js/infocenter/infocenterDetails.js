@@ -480,7 +480,8 @@ var InfocenterDetails = {
 				return;
 
 			// check if a prestudent in same semester is already freigegeben - then not send message again
-			var freigegeben = false;
+			var rtFreigegeben = false;
+			var stgFreigegeben = false;
 			var receiverPrestudentstatus = null;
 
 			//get prestudentstatus of message receiver
@@ -509,8 +510,15 @@ var InfocenterDetails = {
 						&& prestudentstatus.bestaetigtam !== null && prestudentstatus.status_kurzbz === "Interessent"
 						&& prestudent.studiengangtyp === "b")
 					{
-						freigegeben = true;
-						break;
+						if (prestudentstatus.statusgrund_id === null)
+						{
+							rtFreigegeben = true;
+							break;
+						}
+						else if($.isNumeric(prestudentstatus.statusgrund_id))
+						{
+							stgFreigegeben = true;
+						}
 					}
 				}
 			}
@@ -520,46 +528,51 @@ var InfocenterDetails = {
 			var studiengangbezeichnung_englisch = receiverPrestudentstatus.studiengangbezeichnung_englisch;
 			var msgvars = {};
 
-			if (freigegeben)
+			if (rtfreigabe)
 			{
-				InfocenterDetails._refreshLog();
-				//if already freigegeben, still send (shorter) message if Quereinsteiger
-				if (ausbildungssemester > 1)
+				if (rtFreigegeben)
 				{
-					msgvars = {
-						'ausbildungssemester': ausbildungssemester,
-						'studiengangbezeichnung': studiengangbezeichnung,
-						'studiengangbezeichnung_englisch': studiengangbezeichnung_englisch
-					};
-					InfocenterDetails.sendFreigabeMessage(prestudentid, RTFREIGABE_MESSAGE_VORLAGE_QUER_KURZ, msgvars);
-				}
-			}
-			else
-			{
-				var vorlage_kurzbz = null;
-
-				if (rtfreigabe)
-				{
+					//if already for RT freigegeben, still send short message if Quereinsteiger
 					if (ausbildungssemester > 1)
 					{
-						vorlage_kurzbz =  RTFREIGABE_MESSAGE_VORLAGE_QUER;
 						msgvars = {
-							/*'rtlink': FHC_JS_DATA_STORAGE_OBJECT.app_root + 'addons/bewerbung/cis/registration.php?active=aufnahme',*/
 							'ausbildungssemester': ausbildungssemester,
 							'studiengangbezeichnung': studiengangbezeichnung,
 							'studiengangbezeichnung_englisch': studiengangbezeichnung_englisch
-						}
+						};
+
+						InfocenterDetails.sendFreigabeMessage(prestudentid, RTFREIGABE_MESSAGE_VORLAGE_QUER_KURZ, msgvars);
+					}
+				}
+				else //not already for RT freigegeben - send RTfreigabe message
+				{
+					var vorlage = null;
+					//send Quereinstiegsmessage if later Ausbildungssemester
+					if (ausbildungssemester > 1)
+					{
+						msgvars = {
+							'ausbildungssemester': ausbildungssemester,
+							'studiengangbezeichnung': studiengangbezeichnung,
+							'studiengangbezeichnung_englisch': studiengangbezeichnung_englisch
+						};
+						vorlage = RTFREIGABE_MESSAGE_VORLAGE_QUER
 					}
 					else
 					{
-						vorlage_kurzbz =  RTFREIGABE_MESSAGE_VORLAGE;
+						//send normal RTfreigabe message
+						vorlage = RTFREIGABE_MESSAGE_VORLAGE
 					}
+
+					InfocenterDetails.sendFreigabeMessage(prestudentid, vorlage, msgvars);
 				}
-				else
+			}
+			else if (rtfreigabe === false)
+			{
+				// if Freigabe to Studiengang, send StgFreigabe Message if not already sent
+				if (!stgFreigegeben)
 				{
-					vorlage_kurzbz = STGFREIGABE_MESSAGE_VORLAGE;
+					InfocenterDetails.sendFreigabeMessage(prestudentid, STGFREIGABE_MESSAGE_VORLAGE, msgvars);
 				}
-				InfocenterDetails.sendFreigabeMessage(prestudentid, vorlage_kurzbz, msgvars);
 			}
 		};
 
@@ -727,7 +740,7 @@ var InfocenterDetails = {
 				var prestudent_id = this.id.substr(this.id.indexOf("_") + 1);
 				var statusgrund_id = $("#frgstatusgrselect_" + prestudent_id + " select[name=frgstatusgrund]").val();
 				var data = {"prestudent_id": prestudent_id, "statusgrund_id": statusgrund_id};
-				InfocenterDetails.saveFreigabe(data);//Studiengangfreigabe
+				InfocenterDetails.saveFreigabe(data, false);//Studiengangfreigabe
 			}
 		)
 	},
