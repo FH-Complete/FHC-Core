@@ -2525,10 +2525,211 @@ if(!$result = @$db->db_query("SELECT direktinskription FROM public.tbl_gruppe LI
 			echo '<br>public.tbl_gruppe: Spalte direktinskription hinzugefuegt';
 }
 
+// Spalte aktiv für tbl_betreuerart
+if(!$result = @$db->db_query("SELECT aktiv FROM lehre.tbl_betreuerart LIMIT 1"))
+{
+	$qry = "ALTER TABLE lehre.tbl_betreuerart ADD COLUMN aktiv boolean NOT NULL DEFAULT TRUE;";
+
+	if(!$db->db_query($qry))
+		echo '<strong>lehre.tbl_betreuerart: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>lehre.tbl_betreuerart: Spalte aktiv hinzugefuegt';
+}
+
+// Spalte aktiv für tbl_projekttyp
+if(!$result = @$db->db_query("SELECT aktiv FROM lehre.tbl_projekttyp LIMIT 1"))
+{
+	$qry = "ALTER TABLE lehre.tbl_projekttyp ADD COLUMN aktiv boolean NOT NULL DEFAULT TRUE;";
+
+	if(!$db->db_query($qry))
+		echo '<strong>lehre.tbl_projekttyp: '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>lehre.tbl_projekttyp: Spalte aktiv hinzugefuegt';
+}
+
+// Remove NOT NULL constraint on aufmerksamdurch_kurzbz on public.tbl_prestudent
+if($result = @$db->db_query("SELECT is_nullable FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = 'public' AND TABLE_NAME = 'tbl_prestudent' AND COLUMN_NAME = 'aufmerksamdurch_kurzbz' AND is_nullable = 'NO'"))
+{
+	if($db->db_num_rows($result) > 0)
+	{
+		$qry = "ALTER TABLE public.tbl_prestudent ALTER COLUMN aufmerksamdurch_kurzbz DROP NOT NULL;";
+
+		if(!$db->db_query($qry))
+			echo '<strong>public.tbl_prestudent '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>Removed NOT NULL constraint on "aufmerksamdurch_kurzbz" from public.tbl_prestudent<br>';
+	}
+}
+
+// Spalte Zugangscode zu vw_msg_vars hinzufügen
+if(!$result = @$db->db_query('SELECT "Zugangscode" FROM public.vw_msg_vars LIMIT 1'))
+{
+	$qry = '
+	CREATE OR REPLACE VIEW public.vw_msg_vars AS (
+		SELECT DISTINCT ON(p.person_id, pr.prestudent_id) p.person_id,
+			   pr.prestudent_id AS prestudent_id,
+			   p.nachname AS "Nachname",
+			   p.vorname AS "Vorname",
+			   p.anrede AS "Anrede",
+			   a.strasse AS "Strasse",
+			   a.ort AS "Ort",
+			   a.plz AS "PLZ",
+			   a.gemeinde AS "Gemeinde",
+			   a.langtext AS "Nation",
+			   ke.kontakt AS "Email",
+			   kt.kontakt AS "Telefon",
+			   s.bezeichnung AS "Studiengang DE",
+			   s.english AS "Studiengang EN",
+			   st.bezeichnung AS "Typ",
+			   orgform_kurzbz AS "Orgform",
+			   p.zugangscode AS "Zugangscode"
+		  FROM public.tbl_person p
+	 LEFT JOIN (
+					SELECT person_id,
+						   kontakt
+					  FROM public.tbl_kontakt
+					 WHERE zustellung = TRUE
+					   AND kontakttyp = \'email\'
+				  ORDER BY kontakt_id DESC
+			) ke USING(person_id)
+	 LEFT JOIN (
+					SELECT person_id,
+						   kontakt
+					  FROM public.tbl_kontakt
+					 WHERE zustellung = TRUE
+					   AND kontakttyp IN (\'telefon\', \'mobil\')
+				  ORDER BY kontakt_id DESC
+			) kt USING(person_id)
+	 LEFT JOIN (
+					SELECT person_id,
+						   strasse,
+						   ort,
+						   plz,
+						   gemeinde,
+						   langtext
+					  FROM public.tbl_adresse
+				 LEFT JOIN bis.tbl_nation ON(bis.tbl_nation.nation_code = public.tbl_adresse.nation)
+					 WHERE public.tbl_adresse.heimatadresse = TRUE
+				  ORDER BY adresse_id DESC
+			) a USING(person_id)
+			LEFT JOIN public.tbl_prestudent pr USING(person_id)
+			INNER JOIN public.tbl_studiengang s USING(studiengang_kz)
+			INNER JOIN public.tbl_studiengangstyp st USING(typ)
+		 WHERE p.aktiv = TRUE
+	  ORDER BY p.person_id ASC, pr.prestudent_id ASC
+	);
+	';
+
+	if(!$db->db_query($qry))
+		echo '<strong>public.vw_msg_vars: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>public.vw_msg_vars zugangscode added';
+}
+
+// Spalte Zugangscode zu vw_msg_vars_person hinzufügen
+if(!$result = @$db->db_query('SELECT "Zugangscode" FROM public.vw_msg_vars_person LIMIT 1'))
+{
+	$qry = '
+		CREATE OR REPLACE VIEW public.vw_msg_vars_person AS (
+		SELECT DISTINCT ON(p.person_id) p.person_id,
+						   p.nachname AS "Nachname",
+						   p.vorname AS "Vorname",
+						   p.anrede AS "Anrede",
+						   a.strasse AS "Strasse",
+						   a.ort AS "Ort",
+						   a.plz AS "PLZ",
+						   a.gemeinde AS "Gemeinde",
+						   a.langtext AS "Nation",
+						   ke.kontakt AS "Email",
+						   kt.kontakt AS "Telefon",
+							( SELECT tbl_studiensemester.bezeichnung
+							       FROM tbl_studiensemester
+							      WHERE "substring"(tbl_studiensemester.studiensemester_kurzbz::text, 1, 2) = \'WS\'::text AND (tbl_studiensemester.start >= now() AND tbl_studiensemester.ende >= now() OR tbl_studiensemester.start <= now() AND tbl_studiensemester.ende >= now())
+							      ORDER BY tbl_studiensemester.start
+							     LIMIT 1) AS "WS naechstes",
+							( SELECT tbl_studiensemester.bezeichnung
+							       FROM tbl_studiensemester
+							      WHERE "substring"(tbl_studiensemester.studiensemester_kurzbz::text, 1, 2) = \'WS\'::text AND (tbl_studiensemester.start >= now() AND tbl_studiensemester.ende >= now() OR tbl_studiensemester.start <= now() AND tbl_studiensemester.ende >= now())
+							      ORDER BY tbl_studiensemester.start
+							     OFFSET 1
+							     LIMIT 1) AS "WS uebernaechstes",
+							p.zugangscode as "Zugangscode"
+					  FROM public.tbl_person p
+				 LEFT JOIN (
+								SELECT person_id,
+									   kontakt
+								  FROM public.tbl_kontakt
+								 WHERE zustellung = TRUE
+								   AND kontakttyp = \'email\'
+							  ORDER BY kontakt_id DESC
+						) ke USING(person_id)
+				 LEFT JOIN (
+								SELECT person_id,
+									   kontakt
+								  FROM public.tbl_kontakt
+								 WHERE zustellung = TRUE
+								   AND kontakttyp IN (\'telefon\', \'mobil\')
+							  ORDER BY kontakt_id DESC
+						) kt USING(person_id)
+				 LEFT JOIN (
+								SELECT person_id,
+									   strasse,
+									   ort,
+									   plz,
+									   gemeinde,
+									   langtext
+								  FROM public.tbl_adresse
+							 LEFT JOIN bis.tbl_nation ON(bis.tbl_nation.nation_code = public.tbl_adresse.nation)
+								 WHERE public.tbl_adresse.heimatadresse = TRUE
+							  ORDER BY adresse_id DESC
+						) a USING(person_id)
+				  ORDER BY p.person_id ASC
+		);';
+
+	if(!$db->db_query($qry))
+		echo '<strong>public.vw_msg_vars_person: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>public.vw_msg_vars_person zugangscode added';
+}
+
+// Spalte Zugangscode zu vw_msg_vars_person hinzufügen
+// Fachbereich entfernen
+if(!$result = @$db->db_query('SELECT lehrfach_oe_kurzbz FROM campus.vw_lehreinheit LIMIT 1'))
+{
+	$qry = "
+		DROP VIEW campus.vw_lehreinheit;
+		CREATE OR REPLACE VIEW campus.vw_lehreinheit as
+		SELECT
+		tbl_lehrveranstaltung.studiengang_kz AS lv_studiengang_kz, tbl_lehrveranstaltung.semester AS lv_semester, tbl_lehrveranstaltung.kurzbz AS lv_kurzbz, tbl_lehrveranstaltung.bezeichnung AS lv_bezeichnung, tbl_lehrveranstaltung.ects AS lv_ects, tbl_lehrveranstaltung.lehreverzeichnis AS lv_lehreverzeichnis,
+		tbl_lehrveranstaltung.planfaktor AS lv_planfaktor, tbl_lehrveranstaltung.planlektoren AS lv_planlektoren, tbl_lehrveranstaltung.planpersonalkosten AS lv_planpersonalkosten, tbl_lehrveranstaltung.plankostenprolektor AS lv_plankostenprolektor, tbl_lehrveranstaltung.orgform_kurzbz AS lv_orgform_kurzbz,
+		tbl_lehreinheit.lehreinheit_id, tbl_lehreinheit.lehrveranstaltung_id, tbl_lehreinheit.studiensemester_kurzbz, tbl_lehreinheit.lehrform_kurzbz, tbl_lehreinheit.stundenblockung, tbl_lehreinheit.wochenrythmus, tbl_lehreinheit.start_kw, tbl_lehreinheit.raumtyp, tbl_lehreinheit.raumtypalternativ, tbl_lehreinheit.lehre,
+		tbl_lehreinheit.unr, tbl_lehreinheit.lvnr, tbl_lehreinheitmitarbeiter.lehrfunktion_kurzbz, tbl_lehreinheit.insertamum, tbl_lehreinheit.insertvon, tbl_lehreinheit.updateamum, tbl_lehreinheit.updatevon,
+		lehrfach.lehrveranstaltung_id AS lehrfach_id,
+		lehrfach.oe_kurzbz as lehrfach_oe_kurzbz,
+		lehrfach.kurzbz AS lehrfach, lehrfach.bezeichnung AS lehrfach_bez, lehrfach.farbe,
+		tbl_lehrveranstaltung.aktiv, lehrfach.sprache, tbl_lehreinheitmitarbeiter.mitarbeiter_uid, tbl_lehreinheitmitarbeiter.semesterstunden, tbl_lehrveranstaltung.semesterstunden AS lv_semesterstunden, tbl_lehreinheitmitarbeiter.planstunden, tbl_lehreinheitmitarbeiter.stundensatz, tbl_lehreinheitmitarbeiter.faktor,
+		tbl_lehreinheit.anmerkung, tbl_mitarbeiter.kurzbz AS lektor, tbl_lehreinheitgruppe.studiengang_kz, tbl_lehreinheitgruppe.semester, tbl_lehreinheitgruppe.verband, tbl_lehreinheitgruppe.gruppe, tbl_lehreinheitgruppe.gruppe_kurzbz,
+		tbl_studiengang.kurzbz AS stg_kurzbz, tbl_studiengang.kurzbzlang AS stg_kurzbzlang, tbl_studiengang.bezeichnung AS stg_bez, tbl_studiengang.typ AS stg_typ, tbl_lehreinheitmitarbeiter.anmerkung AS anmerkunglektor, tbl_lehrveranstaltung.lehrform_kurzbz AS lv_lehrform_kurzbz,
+		tbl_lehrveranstaltung.bezeichnung_english AS lv_bezeichnung_english, tbl_lehrveranstaltung.lehrtyp_kurzbz
+		   FROM lehre.tbl_lehreinheit
+		   JOIN lehre.tbl_lehrveranstaltung USING (lehrveranstaltung_id)
+		   JOIN lehre.tbl_lehrveranstaltung lehrfach ON (tbl_lehreinheit.lehrfach_id=lehrfach.lehrveranstaltung_id)
+		   JOIN lehre.tbl_lehreinheitmitarbeiter USING (lehreinheit_id)
+		   JOIN public.tbl_mitarbeiter USING (mitarbeiter_uid)
+		   JOIN lehre.tbl_lehreinheitgruppe USING (lehreinheit_id)
+		   JOIN public.tbl_studiengang ON tbl_lehreinheitgruppe.studiengang_kz = tbl_studiengang.studiengang_kz;
+		GRANT SELECT ON campus.vw_lehreinheit TO admin;
+		GRANT SELECT ON campus.vw_lehreinheit TO vilesci;
+		GRANT SELECT ON campus.vw_lehreinheit TO web;
+	";
+	if(!$db->db_query($qry))
+		echo '<strong>campus.vw_lehreinheit: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>campus.vw_lehreinheit lehrfach_oe_kurzbz added, fachbereich_kurzbz removed';
+}
+
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
-
-echo '<br><br><br>';
 
 $tabellen=array(
 	"bis.tbl_bisorgform" => array("bisorgform_kurzbz","code","bezeichnung"),
@@ -2628,7 +2829,7 @@ $tabellen=array(
 	"lehre.tbl_akadgrad"  => array("akadgrad_id","akadgrad_kurzbz","studiengang_kz","titel","geschlecht"),
 	"lehre.tbl_anrechnung"  => array("anrechnung_id","prestudent_id","lehrveranstaltung_id","begruendung_id","lehrveranstaltung_id_kompatibel","genehmigt_von","insertamum","insertvon","updateamum","updatevon","ext_id"),
 	"lehre.tbl_anrechnung_begruendung"  => array("begruendung_id","bezeichnung"),
-	"lehre.tbl_betreuerart"  => array("betreuerart_kurzbz","beschreibung"),
+	"lehre.tbl_betreuerart"  => array("betreuerart_kurzbz","beschreibung","aktiv"),
 	"lehre.tbl_ferien"  => array("bezeichnung","studiengang_kz","vondatum","bisdatum"),
 	"lehre.tbl_lehreinheit"  => array("lehreinheit_id","lehrveranstaltung_id","studiensemester_kurzbz","lehrfach_id","lehrform_kurzbz","stundenblockung","wochenrythmus","start_kw","raumtyp","raumtypalternativ","sprache","lehre","anmerkung","unr","lvnr","updateamum","updatevon","insertamum","insertvon","ext_id","lehrfach_id_old","gewicht"),
 	"lehre.tbl_lehreinheitgruppe"  => array("lehreinheitgruppe_id","lehreinheit_id","studiengang_kz","semester","verband","gruppe","gruppe_kurzbz","updateamum","updatevon","insertamum","insertvon","ext_id"),
@@ -2649,7 +2850,7 @@ $tabellen=array(
 	"lehre.tbl_note"  => array("note","bezeichnung","anmerkung","farbe","positiv","notenwert","aktiv","lehre","offiziell","bezeichnung_mehrsprachig","lkt_ueberschreibbar"),
 	"lehre.tbl_projektarbeit"  => array("projektarbeit_id","projekttyp_kurzbz","titel","lehreinheit_id","student_uid","firma_id","note","punkte","beginn","ende","faktor","freigegeben","gesperrtbis","stundensatz","gesamtstunden","themenbereich","anmerkung","updateamum","updatevon","insertamum","insertvon","ext_id","titel_english","seitenanzahl","abgabedatum","kontrollschlagwoerter","schlagwoerter","schlagwoerter_en","abstract", "abstract_en", "sprache","final"),
 	"lehre.tbl_projektbetreuer"  => array("person_id","projektarbeit_id","betreuerart_kurzbz","note","faktor","name","punkte","stunden","stundensatz","updateamum","updatevon","insertamum","insertvon","ext_id","vertrag_id"),
-	"lehre.tbl_projekttyp"  => array("projekttyp_kurzbz","bezeichnung"),
+	"lehre.tbl_projekttyp"  => array("projekttyp_kurzbz","bezeichnung","aktiv"),
 	"lehre.tbl_pruefung"  => array("pruefung_id","lehreinheit_id","student_uid","mitarbeiter_uid","note","pruefungstyp_kurzbz","datum","anmerkung","insertamum","insertvon","updateamum","updatevon","ext_id","pruefungsanmeldung_id","vertrag_id", "punkte"),
 	"lehre.tbl_pruefungstyp"  => array("pruefungstyp_kurzbz","beschreibung","abschluss","sort"),
 	"lehre.tbl_studienordnung"  => array("studienordnung_id","studiengang_kz","version","gueltigvon","gueltigbis","bezeichnung","ects","studiengangbezeichnung","studiengangbezeichnung_englisch","studiengangkurzbzlang","akadgrad_id","insertamum","insertvon","updateamum","updatevon","ext_id", "status_kurzbz", "standort_id"),
@@ -2815,6 +3016,7 @@ $tabellen=array(
 $tabs=array_keys($tabellen);
 //print_r($tabs);
 $i=0;
+$errors = 0;
 foreach ($tabellen AS $attribute)
 {
 	$sql_attr='';
@@ -2823,11 +3025,18 @@ foreach ($tabellen AS $attribute)
 	$sql_attr=substr($sql_attr, 0, -1);
 
 	if (!@$db->db_query('SELECT '.$sql_attr.' FROM '.$tabs[$i].' LIMIT 1;'))
+	{
 		echo '<BR><strong>'.$tabs[$i].': '.$db->db_last_error().' </strong><BR>';
-	else
-		echo $tabs[$i].': OK - ';
+		$errors++;
+	}
+	/*else
+		echo $tabs[$i].': OK - ';*/
 	flush();
 	$i++;
+}
+if ($errors == 0)
+{
+	echo '<strong>Keine Fehler aufgetreten</strong>';
 }
 
 echo '<H2>Gegenpruefung!</H2>';

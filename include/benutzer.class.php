@@ -30,6 +30,8 @@ class benutzer extends person
 	public $bn_ext_id;
 	public $aktivierungscode;
 	public $result = array();
+	public $updateaktivam;
+	public $updateaktivvon;
 
 	/**
 	 * Konstruktor - Uebergibt die Connection und laedt optional einen Benutzer
@@ -65,6 +67,8 @@ class benutzer extends person
 				$this->bnaktiv = $this->db_parse_bool($row->aktiv);
 				$this->alias = $row->alias;
 				$this->aktivierungscode = $row->aktivierungscode;
+				$this->updateaktivam = $row->updateaktivam;
+				$this->updateaktivvon = $row->updateaktivvon;
 
 				if(!person::load($row->person_id))
 					return false;

@@ -164,6 +164,11 @@ if($typ=='xls')
 	$format_bold_center->setAlign('center');
 	$format_bold_center->setBorder(1);
 	
+	$format_bold_left =& $workbook->addFormat();
+	$format_bold_left->setBold();
+	$format_bold_left->setAlign('left');
+	$format_bold_left->setBorder(1);
+	
 	$format_number =& $workbook->addFormat();
 	$format_number->setNumFormat('0.00');
 	$format_number->setBorder(1);
@@ -208,9 +213,13 @@ if($typ=='xls')
 	$maxlength[$spalte]=10;
 	$worksheet->write($zeile,++$spalte,'Vorname', $format_bold);
 	$maxlength[$spalte]=10;
+	$worksheet->write($zeile, ++$spalte, 'V', $format_bold);
+	$maxlength[$spalte] = 2;
+	$worksheet->write($zeile, ++$spalte, 'G', $format_bold);
+	$maxlength[$spalte] = 2;
 	$worksheet->write($zeile,++$spalte,'Personenkennzeichen', $format_bold);
-	$maxlength[$spalte]=20;
-	$maxheaderheight=20;
+	$maxlength[$spalte] = 20;
+	$maxheaderheight = 20;
 	
 	while($row_lva = $db->db_fetch_object($result_lva))
 	{
@@ -252,7 +261,9 @@ if($typ=='xls')
 		$worksheet->write($zeile,++$spalte,$row_student->vorname, $format_bold);
 		if($maxlength[$spalte]<strlen($row_student->vorname))
 			$maxlength[$spalte]=strlen($row_student->vorname);
-		$worksheet->write($zeile,++$spalte,$row_student->matrikelnr, $format_bold);
+		$worksheet->write($zeile, ++$spalte, $row_student->verband, $format_bold);
+		$worksheet->write($zeile, ++$spalte, $row_student->gruppe, $format_bold_left);
+		$worksheet->write($zeile, ++$spalte,$row_student->matrikelnr, $format_bold);
 				
 		//Alle Zeugnisnoten des Studierenden holen
 		$noten = array();
@@ -341,7 +352,7 @@ if($typ=='xls')
 	}
 	
 	$zeile++;
-	$spalte=2;
+	$spalte = 4;
 	$worksheet->write($zeile,$spalte,'Notendurchschnitt', $format_bold);
 	
 	$summe_schnitt=0;
@@ -385,8 +396,10 @@ if($typ=='xls')
 	//Zellen der 1. Zeile verbinden
 	$worksheet->setMerge(0,0,0,$spalte);
 	
-	//Hoehe der 2. Zeile anpassen damit die LVs alle sichtbar sind
-	$worksheet->setRow(1,$maxheaderheight*5);
+	//Hoehe der 2. Zeile anpassen damit die LVs alle sichtbar sind, aber nicht größer als 300
+	if ($maxheaderheight * 5 > 300)
+		$maxheaderheight = 60;
+	$worksheet->setRow(1, $maxheaderheight * 5);
 	
 	//Ausdruck auf 1 Seite anpassen
 	$worksheet->fitToPages(1,1);

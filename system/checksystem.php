@@ -92,6 +92,7 @@ $beschreibung=1;
 $berechtigungen = array(
 	array('admin','Super User Rechte'),
 	array('assistenz','Assistenz'),
+	array('student','Defaultberechtigung für Studierende'),
 	array('basis/addon','Addons verwalten'),
 	array('basis/ampel','Ampeln Administrieren'),
 	array('basis/ampeluebersicht','Ampel Übersicht für Leiter'),

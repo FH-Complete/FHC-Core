@@ -9,6 +9,7 @@
 	$LOGDATA_NAME_PARKED = '\'Parked\'';
 	$LOGTYPE_KURZBZ = '\'Processstate\'';
 	$STATUS_KURZBZ = '\'Wartender\', \'Bewerber\', \'Aufgenommener\', \'Student\'';
+	$ADDITIONAL_STG = '10021,10027';
 
 	$query = '
 		WITH currentOrNextStudiensemester AS (
@@ -64,7 +65,10 @@
 				 WHERE pss.status_kurzbz = '.$INTERESSENT_STATUS.'
 				   AND pss.bestaetigtam IS NULL
 				   AND ps.person_id = p.person_id
-				   AND sg.typ IN ('.$STUDIENGANG_TYP.')
+				   AND (sg.typ IN ('.$STUDIENGANG_TYP.')
+				   		OR
+						sg.studiengang_kz in('.$ADDITIONAL_STG.')
+					   )
 				   AND NOT EXISTS (
 					   SELECT 1
 						 FROM tbl_prestudentstatus spss
@@ -83,7 +87,10 @@
 				   AND pss.bewerbung_abgeschicktamum IS NOT NULL
 				   AND pss.bestaetigtam IS NULL
 				   AND ps.person_id = p.person_id
-				   AND sg.typ IN ('.$STUDIENGANG_TYP.')
+				   AND (sg.typ IN ('.$STUDIENGANG_TYP.')
+					   OR
+					   sg.studiengang_kz in('.$ADDITIONAL_STG.')
+					   )
 				   AND pss.studiensemester_kurzbz IN (SELECT cnss.studiensemester_kurzbz FROM currentOrNextStudiensemester cnss)
 				   AND NOT EXISTS (
 					   SELECT 1
@@ -104,7 +111,11 @@
 				   AND pss.bewerbung_abgeschicktamum IS NOT NULL
 				   AND pss.bestaetigtam IS NULL
 				   AND ps.person_id = p.person_id
-				   AND sg.typ IN ('.$STUDIENGANG_TYP.')
+				   AND (
+					   sg.typ IN ('.$STUDIENGANG_TYP.')
+					   OR
+					   sg.studiengang_kz in('.$ADDITIONAL_STG.')
+					   )
 				   AND pss.studiensemester_kurzbz IN (SELECT cnss.studiensemester_kurzbz FROM currentOrNextStudiensemester cnss)
 				   AND NOT EXISTS (
 						SELECT 1
@@ -125,7 +136,10 @@
 				   AND pss.bewerbung_abgeschicktamum IS NOT NULL
 				   AND pss.bestaetigtam IS NULL
 				   AND ps.person_id = p.person_id
-				   AND sg.typ IN ('.$STUDIENGANG_TYP.')
+				   AND (sg.typ IN ('.$STUDIENGANG_TYP.')
+					   OR
+					   sg.studiengang_kz in('.$ADDITIONAL_STG.')
+					   )
 				   AND pss.studiensemester_kurzbz IN (SELECT cnss.studiensemester_kurzbz FROM currentOrNextStudiensemester cnss)
 				   AND NOT EXISTS (
 					   SELECT 1
@@ -146,7 +160,10 @@
 				   AND pss.bewerbung_abgeschicktamum IS NULL
 				   AND pss.bestaetigtam IS NULL
 				   AND ps.person_id = p.person_id
-				   AND sg.typ IN ('.$STUDIENGANG_TYP.')
+				   AND (sg.typ IN ('.$STUDIENGANG_TYP.')
+					   OR
+					   sg.studiengang_kz in('.$ADDITIONAL_STG.')
+					   )
 				   AND pss.studiensemester_kurzbz IN (SELECT cnss.studiensemester_kurzbz FROM currentOrNextStudiensemester cnss)
 				   AND NOT EXISTS (
 					  SELECT 1
@@ -166,7 +183,10 @@
 				 WHERE pss.status_kurzbz IN ('.$STATUS_KURZBZ.')
 				   AND pss.bewerbung_abgeschicktamum IS NULL
 				   AND ps.person_id = p.person_id
-				   AND sg.typ IN ('.$STUDIENGANG_TYP.')
+				   AND (sg.typ IN ('.$STUDIENGANG_TYP.')
+					   OR
+					   sg.studiengang_kz in('.$ADDITIONAL_STG.')
+					   )
 				   AND pss.studiensemester_kurzbz IN (SELECT ss.studiensemester_kurzbz FROM public.tbl_studiensemester ss WHERE ss.start >= NOW())
 				   AND NOT EXISTS (
 					   SELECT 1
@@ -206,7 +226,10 @@
 				  FROM public.tbl_prestudent sps
 				  JOIN public.tbl_studiengang ssg USING(studiengang_kz)
 				 WHERE sps.person_id = p.person_id
-				   AND ssg.typ IN ('.$STUDIENGANG_TYP.')
+				   AND (ssg.typ IN ('.$STUDIENGANG_TYP.')
+					   OR
+					   ssg.studiengang_kz in('.$ADDITIONAL_STG.')
+					   )
 				   AND '.$INTERESSENT_STATUS.' = (
 						SELECT spss.status_kurzbz
 						  FROM public.tbl_prestudentstatus spss

@@ -279,7 +279,7 @@ function StudentProjektarbeitTreeSelectID()
 	//In der globalen Variable ist die zu selektierende Eintrag gespeichert
 	if(StudentProjektarbeitSelectID!=null)
 	{
-	   	for(var i=0;i<items;i++)
+	   	for(var i = 0;i < items; i++)
 	   	{
 	   		//ID der row holen
 			col = tree.columns ? tree.columns["student-projektarbeit-tree-projektarbeit_id"] : "student-projektarbeit-tree-projektarbeit_id";
@@ -727,7 +727,7 @@ function StudentProjektbetreuerTreeSelectID()
 	//In der globalen Variable ist die zu selektierende Eintrag gespeichert
 	if(StudentProjektbetreuerSelectPersonID!=null)
 	{
-	   	for(var i=0;i<items;i++)
+	   	for(var i = 0;i < items; i++)
 	   	{
 	   		//ID der row holen
 			col = tree.columns ? tree.columns["student-projektbetreuer-tree-projektarbeit_id"] : "student-projektbetreuer-tree-projektarbeit_id";
@@ -864,19 +864,31 @@ function StudentProjektbetreuerDetailReset()
 	document.getElementById('student-projektbetreuer-textbox-faktor').value='1';
 	document.getElementById('student-projektbetreuer-textbox-name').value='';
 	document.getElementById('student-projektbetreuer-menulist-note').value='';
-	document.getElementById('student-projektbetreuer-menulist-betreuerart').value='Betreuer';
+	
 	document.getElementById('student-projektbetreuer-textbox-punkte').value='0.0';
+
 	if(document.getElementById('student-projektarbeit-menulist-projekttyp').value=='Diplom')
 	{
 		document.getElementById('student-projektbetreuer-textbox-stunden').value='5.0';
+		document.getElementById('student-projektbetreuer-menulist-betreuerart').value='Erstbegutachter';
 	}
 	else if(document.getElementById('student-projektarbeit-menulist-projekttyp').value=='Bachelor')
 	{
 		document.getElementById('student-projektbetreuer-textbox-stunden').value='3.0';
+		document.getElementById('student-projektbetreuer-menulist-betreuerart').value='Begutachter';
+	}
+	else if(document.getElementById('student-projektarbeit-menulist-projekttyp').value=='Praktikum')
+	{
+		document.getElementById('student-projektbetreuer-menulist-betreuerart').value='BetreuerPraktik';
+	}
+	else if(document.getElementById('student-projektarbeit-menulist-projekttyp').value=='Projekt')
+	{
+		document.getElementById('student-projektbetreuer-menulist-betreuerart').value='BetreuerProjekt';
 	}
 	else
 	{
 		document.getElementById('student-projektbetreuer-textbox-stunden').value='0.0';
+		document.getElementById('student-projektbetreuer-menulist-betreuerart').value='Begutachter';
 	}
 	document.getElementById('student-projektbetreuer-textbox-stundensatz').value='80.0';
 	document.getElementById('student-projektbetreuer-menulist-person').value='';

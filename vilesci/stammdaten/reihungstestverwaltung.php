@@ -566,14 +566,15 @@ if(isset($_GET['excel']))
 		<title>Reihungstest</title>
 		<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
 		<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
-
-		<script type="text/javascript" src="../../vendor/jquery/jqueryV1/jquery-1.12.4.min.js"></script>
+		
+		<?php 
+			include('../../include/meta/jquery.php');
+			include('../../include/meta/jquery-tablesorter.php');
+		?>
 
 		<script type="text/javascript" src="../../include/js/jquery.ui.datepicker.translation.js"></script>
 		<script type="text/javascript" src="../../vendor/jquery/sizzle/sizzle.js"></script>
 
-		<script type="text/javascript" src="../../vendor/christianbach/tablesorter/jquery.tablesorter.min.js"></script>
-		<link rel="stylesheet" href="../../skin/tablesort.css" type="text/css"/>
 		<link href="../../skin/jquery-ui-1.9.2.custom.min.css" rel="stylesheet" type="text/css">
 		<script type="text/javascript" src="../../vendor/components/jqueryui/jquery-ui.min.js"></script>
  		<script src="../../vendor/rmariuzzo/jquery-checkboxes/dist/jquery.checkboxes-1.0.7.min.js" type="text/javascript"></script>
@@ -771,7 +772,7 @@ if(isset($_GET['excel']))
 				{
 					$("#"+v.id).tablesorter(
 					{
-						widgets: ["zebra"],
+						widgets: ["zebra", "filter", "stickyHeaders"],
 						sortList: [[3,0],[4,0]],
 						headers: {0: { sorter: false}}
 					});
@@ -970,7 +971,7 @@ if(isset($_GET['excel']))
 		.studienplan_listitem
 		{
 			background-color: lightgray;
-			padding: 0 5px 0 6px;
+			padding: 2px 5px 2px 6px;
 			border-radius: 3px;
 			-webkit-border-radius: 3px;
 			-moz-border-radius: 3px;
@@ -979,7 +980,7 @@ if(isset($_GET['excel']))
 		.ort_listitem
 		{
 			background-color: lightgray;
-			padding: 0 5px 0 6px;
+			padding: 2px 5px 2px 6px;
 			border-radius: 3px;
 			-webkit-border-radius: 3px;
 			-moz-border-radius: 3px;
@@ -1027,12 +1028,6 @@ $messageError = '';
 // Speichern eines Termines
 if(isset($_POST['speichern']) || isset($_POST['kopieren']))
 {
-
-	if(!$rechte->isBerechtigt('lehre/reihungstest', null, 'sui'))
-	{
-		die($rechte->errormsg);
-	}
-
 	$reihungstest = new reihungstest();
 
 	if(isset($_POST['reihungstest_id']) && $_POST['reihungstest_id']!='' && !isset($_POST['kopieren']))
@@ -1051,6 +1046,13 @@ if(isset($_POST['speichern']) || isset($_POST['kopieren']))
 		$reihungstest->new = true;
 		$reihungstest->insertvon = $user;
 		$reihungstest->insertamum = date('Y-m-d H:i:s');
+	}
+	
+	// OE über Studiengang des Reihungstests laden und Berechtigung prüfen
+	$stg_rechtecheck = new studiengang($reihungstest->studiengang_kz);
+	if(!$rechte->isBerechtigt('lehre/reihungstest', $stg_rechtecheck->oe_kurzbz, 'sui'))
+	{
+		die($rechte->errormsg);
 	}
 
 	//Datum und Uhrzeit pruefen
@@ -1089,7 +1091,7 @@ if(isset($_POST['speichern']) || isset($_POST['kopieren']))
 		{
 			$reihungstest->freigeschaltet = isset($_POST['freigeschaltet']);
 			$reihungstest->max_teilnehmer = filter_input(INPUT_POST, 'max_teilnehmer', FILTER_VALIDATE_INT);
-			if ($rechte->isBerechtigt('lehre/reihungstestOeffentlich', $_POST['studiengang_kz'], 'suid'))
+			if ($rechte->isBerechtigt('lehre/reihungstestOeffentlich', $stg_rechtecheck->oe_kurzbz, 'suid'))
 			{
 				$reihungstest->oeffentlich = (isset($_POST['oeffentlich']) ? true : false);
 			}
@@ -1116,7 +1118,7 @@ if(isset($_POST['speichern']) || isset($_POST['kopieren']))
 					$messageError .= '<p>Die Bezeichnung des Ortes ist ungueltig oder wurde nicht gefunden</p>';
 				else
 				{
-					if($rechte->isBerechtigt('lehre/reihungstestOrt', null, 'sui'))
+					if($rechte->isBerechtigt('lehre/reihungstestOrt', $stg_rechtecheck->oe_kurzbz, 'sui'))
 					{
 						$orte_zugeteilt = new reihungstest();
 						$orte_zugeteilt->getOrteReihungstest($reihungstest->reihungstest_id);
@@ -1281,11 +1283,6 @@ if ($reihungstest_id != '' || isset($_POST['reihungstest_id']))
 
 if(isset($_POST['raumzuteilung_speichern']))
 {
-	if(!$rechte->isBerechtigt('lehre/reihungstest', null, 'su'))
-	{
-		die($rechte->errormsg);
-	}
-
 	$raumzuteilung = new reihungstest();
 
 	if(isset($_POST['reihungstest_id']) && $_POST['reihungstest_id']!='')
@@ -1295,6 +1292,14 @@ if(isset($_POST['raumzuteilung_speichern']))
 		{
 			die($raumzuteilung->errormsg);
 		}
+		
+		// OE über Studiengang des Reihungstests laden und Berechtigung prüfen
+		$stg_rechtecheck = new studiengang($raumzuteilung->studiengang_kz);
+		if(!$rechte->isBerechtigt('lehre/reihungstest', $stg_rechtecheck->oe_kurzbz, 'su'))
+		{
+			die($rechte->errormsg);
+		}
+		
 		if (isset($_POST['checkbox']))
 		{
 			$person_ids = $_POST['checkbox'];
@@ -1522,13 +1527,15 @@ if(isset($_GET['type']) && $_GET['type']=='informAssistance')
 // Verteilt alle BewerberInnen gleichmaessig auf die Raeume
 if(isset($_GET['type']) && $_GET['type']=='verteilen')
 {
-	if(!$rechte->isBerechtigt('lehre/reihungstest', null, 'sui'))
-	{
-		die($rechte->errormsg);
-	}
-
 	if($reihungstest_id!='')
 	{
+		$rt_rechtecheck = new reihungstest($reihungstest_id);
+		// OE über Studiengang des Reihungstests laden und Berechtigung prüfen
+		$stg_rechtecheck = new studiengang($rt_rechtecheck->studiengang_kz);
+		if(!$rechte->isBerechtigt('lehre/reihungstest', $stg_rechtecheck->oe_kurzbz, 'sui'))
+		{
+			die($rechte->errormsg);
+		}
 		$errormsg='';
 		$qry = "SELECT
 					person_id,
@@ -1617,13 +1624,16 @@ if(isset($_GET['type']) && $_GET['type']=='verteilen')
 // Fuellt die Raeume aufsteigend mit BewerberInnen an
 if(isset($_GET['type']) && $_GET['type']=='auffuellen')
 {
-	if(!$rechte->isBerechtigt('lehre/reihungstest', null, 'sui'))
-	{
-		die($rechte->errormsg);
-	}
-
 	if($reihungstest_id!='')
 	{
+		$rt_rechtecheck = new reihungstest($reihungstest_id);
+		// OE über Studiengang des Reihungstests laden und Berechtigung prüfen
+		$stg_rechtecheck = new studiengang($rt_rechtecheck->studiengang_kz);
+		if(!$rechte->isBerechtigt('lehre/reihungstest', $stg_rechtecheck->oe_kurzbz, 'sui'))
+		{
+			die($rechte->errormsg);
+		}
+		
 		$orte = new Reihungstest();
 		$orte->getOrteReihungstest($reihungstest_id);
 
@@ -1699,16 +1709,18 @@ if(isset($_GET['type']) && $_GET['type']=='auffuellen')
 
 if(isset($_POST['aufsicht']) && $_POST['aufsicht']!='' && !isset($_POST['kopieren']))
 {
-
-	if(!$rechte->isBerechtigt('lehre/reihungstest', null, 'su'))
-	{
-		die($rechte->errormsg);
-	}
-
 	$save_aufsicht = new reihungstest();
 
 	if(isset($_POST['reihungstest_id']) && $_POST['reihungstest_id']!='')
 	{
+		$rt_rechtecheck = new reihungstest($_POST['reihungstest_id']);
+		// OE über Studiengang des Reihungstests laden und Berechtigung prüfen
+		$stg_rechtecheck = new studiengang($rt_rechtecheck->studiengang_kz);
+		if(!$rechte->isBerechtigt('lehre/reihungstest', $stg_rechtecheck->oe_kurzbz, 'su'))
+		{
+			die($rechte->errormsg);
+		}
+		
 		//Reihungstest laden
 		if(!$save_aufsicht->load($_POST['reihungstest_id']))
 		{
@@ -1745,13 +1757,16 @@ if(isset($_POST['aufsicht']) && $_POST['aufsicht']!='' && !isset($_POST['kopiere
 
 if(isset($_POST['delete_ort']))
 {
-	if(!$rechte->isBerechtigt('lehre/reihungstestOrt', null, 'suid'))
-	{
-		die($rechte->errormsg);
-	}
-
 	if(isset($_POST['reihungstest_id']) && $_POST['reihungstest_id']!='')
 	{
+		$rt_rechtecheck = new reihungstest($_POST['reihungstest_id']);
+		// OE über Studiengang des Reihungstests laden und Berechtigung prüfen
+		$stg_rechtecheck = new studiengang($rt_rechtecheck->studiengang_kz);
+		if(!$rechte->isBerechtigt('lehre/reihungstestOrt', $stg_rechtecheck->oe_kurzbz, 'suid'))
+		{
+			die($rechte->errormsg);
+		}
+		
 		$delete_ort = new reihungstest();
 		$delete_ort->getPersonReihungstestOrt($_POST['reihungstest_id'], $_POST['delete_ort']);
 
@@ -2067,6 +2082,7 @@ $studienplaene_list = implode(',', array_keys($studienplaene_arr));
 				</tr>';
 		}
 
+		$stg_rechtecheck = new studiengang($reihungstest->studiengang_kz);
 		if($neu)
 		{
 			echo '<tr>';
@@ -2123,9 +2139,17 @@ $studienplaene_list = implode(',', array_keys($studienplaene_arr));
 			{
 				//echo '<td><table>';
 				echo '<td>';
-				echo '<input id="studienplan_id" type="hidden" name="studienplan_id" value="">';
-				echo '<input id="studienplan_autocomplete" type="text" name="studienplan" size="40" placeholder="Weiterer Studienplan" value="">';
-				echo '<button type="submit" name="speichern"><img src="../../skin/images/list-add.png" alt="Studienplan hinzufügen" height="13px"></button></td>';
+				if ($rechte->isBerechtigt('lehre/reihungstest', $stg_rechtecheck->oe_kurzbz, 'sui'))
+				{
+					echo '<input id="studienplan_id" type="hidden" name="studienplan_id" value="">';
+					echo '<input id="studienplan_autocomplete" type="text" name="studienplan" size="40" placeholder="Weiterer Studienplan" value="">';
+					echo '<button type="submit" name="speichern"><img src="../../skin/images/list-add.png" alt="Studienplan hinzufügen" height="13px"></button>';
+				}
+				else
+				{
+					echo 'Keine Berechtigung zum Zuteilen von Studienplänen';
+				}
+				echo '</td>';
 				echo '</tr>';
 
 				foreach ($studienplaene->result AS $row)
@@ -2135,7 +2159,10 @@ $studienplaene_list = implode(',', array_keys($studienplaene_arr));
 
 					echo '<tr><td>&nbsp;</td>';
 					echo '<td class="studienplan_listitem">'.$studienplan->bezeichnung.' ('.$studienplan->studienplan_id.')</td>';
-					echo '<td><button type="submit" name="delete_studienplan" value="'.$row->studienplan_id.'"><img src="../../skin/images/delete_x.png" alt="Studienplan entfernen" height="13px"></button></td>';
+					if ($rechte->isBerechtigt('lehre/reihungstest', $stg_rechtecheck->oe_kurzbz, 'suid'))
+					{
+						echo '<td><button type="submit" name="delete_studienplan" value="'.$row->studienplan_id.'"><img src="../../skin/images/delete_x.png" alt="Studienplan entfernen" height="13px"></button></td>';
+					}
 					echo '</tr>';
 				}
 				//echo '</table></td>';
@@ -2149,7 +2176,8 @@ $studienplaene_list = implode(',', array_keys($studienplaene_arr));
 		{
 			echo '<tr><td class="feldtitel">Ort</td>';
 			//echo '<td>';
-			if ($rechte->isBerechtigt('lehre/reihungstestOrt', null, 'sui'))
+
+			if ($rechte->isBerechtigt('lehre/reihungstestOrt', $stg_rechtecheck->oe_kurzbz, 'sui'))
 			{
 				echo '<td><input id="ort" type="text" name="ort_kurzbz" placeholder="Ort eingeben" value="">';
 				echo '<button type="submit" name="speichern"><img src="../../skin/images/list-add.png" alt="Ort hinzufügen" height="13px"></button></td>';
@@ -2157,7 +2185,7 @@ $studienplaene_list = implode(',', array_keys($studienplaene_arr));
 			}
 			else
 			{
-				echo '<td colspan="2">Keine Berechtigung zum zuteilen von Räumen</td>';
+				echo '<td colspan="2">Keine Berechtigung zum Zuteilen von Räumen</td>';
 			}
 			$orte = new Reihungstest();
 			$orte->getOrteReihungstest($reihungstest->reihungstest_id);
@@ -2175,9 +2203,14 @@ $studienplaene_list = implode(',', array_keys($studienplaene_arr));
 				if(defined('REIHUNGSTEST_ARBEITSPLAETZE_SCHWUND') && REIHUNGSTEST_ARBEITSPLAETZE_SCHWUND > 0)
 					echo '*';
 				echo ')';
-				echo ' <input type="text" id="aufsicht_'.$row->ort_kurzbz.'" class="aufsicht_uid" name="aufsicht['.$row->ort_kurzbz.']" value="'.$anzeigename.'" placeholder="Aufsichtsperson" size="32">';
-				if ($rechte->isBerechtigt('lehre/reihungstestOrt', null, 'suid'))
+				if ($rechte->isBerechtigt('lehre/reihungstestOrt', $stg_rechtecheck->oe_kurzbz, 'sui'))
+				{
+					echo ' <input type="text" id="aufsicht_'.$row->ort_kurzbz.'" class="aufsicht_uid" name="aufsicht['.$row->ort_kurzbz.']" value="'.$anzeigename.'" placeholder="Aufsichtsperson" size="32">';
+				}
+				if ($rechte->isBerechtigt('lehre/reihungstestOrt',  $stg_rechtecheck->oe_kurzbz, 'suid'))
+				{
 					echo '</td><td><button type="submit" name="delete_ort" value="'.$row->ort_kurzbz.'"><img src="../../skin/images/delete_x.png" alt="Ort hinzufügen" height="13px"></button>';
+				}
 				echo '</td></tr>';
 				$arbeitsplaetze_sum = $arbeitsplaetze_sum + $orte_array[$row->ort_kurzbz];
 			}
@@ -2227,7 +2260,7 @@ $studienplaene_list = implode(',', array_keys($studienplaene_arr));
 				?>
 			</td>
 		</tr>
-		<tr <?php echo ($rechte->isBerechtigt('lehre/reihungstestOeffentlich', $reihungstest->studiengang_kz, 'suid') ? '' : 'style="display:none"') ?>>
+		<tr <?php echo ($rechte->isBerechtigt('lehre/reihungstestOeffentlich', $stg_rechtecheck->oe_kurzbz, 'suid') ? '' : 'style="display:none"') ?>>
 			<td class="feldtitel">Öffentlich</td>
 			<td>
 				<input id="oeffentlich" type="checkbox" name="oeffentlich" value="1" <?php echo $reihungstest->oeffentlich ? 'checked="checked"' : '' ?>>
@@ -2245,19 +2278,24 @@ $studienplaene_list = implode(',', array_keys($studienplaene_arr));
 		<tr>
 			<td>&nbsp;</td>
 		</tr>
-		<?php if(!$neu)
-				$val = 'Änderung Speichern';
-			else
-				$val = 'Neu anlegen'; ?>
 		<tr>
 			<td></td>
 			<td>
-				<button type="submit" name="speichern"><?php echo $val ?></button>
-				<?php
+				<?php 	
 					if(!$neu)
-						echo '<button type="submit" name="kopieren" onclick="return confirm (\'Eine Kopie dieses Termins erstellen?\')">Kopie erstellen</button>';
-
-					if($rechte->isBerechtigt('lehre/reihungstest', null, 'suid'))
+					{
+						if($rechte->isBerechtigt('lehre/reihungstest',  $stg_rechtecheck->oe_kurzbz, 'sui'))
+						{
+							echo '<button type="submit" name="speichern">Änderung Speichern</button>';
+							echo '<button type="submit" name="kopieren" onclick="return confirm (\'Eine Kopie dieses Termins erstellen?\')">Kopie erstellen</button>';
+						}
+					}
+					else
+					{
+						echo '<button type="submit" name="speichern">Neu anlegen</button>';
+					}
+					
+					if($rechte->isBerechtigt('lehre/reihungstest',  $stg_rechtecheck->oe_kurzbz, 'suid'))
 					{
 						$anzahl_teilnehmer = new reihungstest();
 						$anzahl_teilnehmer = $anzahl_teilnehmer->getTeilnehmerAnzahl($reihungstest_id);

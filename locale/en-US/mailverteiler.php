@@ -29,4 +29,7 @@ $this->phrasen['mailverteiler/bestaetige']='Confirm';
 $this->phrasen['mailverteiler/personenImVerteiler']='People in this mailing list';
 $this->phrasen['mailverteiler/oeffnenFehlgeschlagen']='Failed to open mailing list.<br>Please inform your administrator.';
 $this->phrasen['mailverteiler/verteilerGenerieren']='Generate mailing list for <b>%1$s</b>';
+$this->phrasen['mailverteiler/anleitungstextMailPersInGroup']='You have the option to filter the list and send an e-mail to the selected persons then.';
+$this->phrasen['mailverteiler/mailAnMarkierteSenden']='Send e-mail to selected persons';
+$this->phrasen['mailverteiler/mailAnAlleSenden']='Send e-mail to all persons';
 ?>

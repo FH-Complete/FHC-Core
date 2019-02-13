@@ -260,6 +260,8 @@ function draw_content($row)
 	$prestudent->getLastStatus($row->prestudent_id);
 	$status = $prestudent->status_kurzbz;
 	$orgform = $prestudent->orgform_kurzbz;
+	$prio_relativ  = new prestudent();
+	$prio_relativ = $prio_relativ->getRelativePriorisierungFromAbsolut($row->prestudent_id, $row->priorisierung);
 
 	$i = 0;
 
@@ -647,10 +649,11 @@ function draw_content($row)
 	$worksheet->write($zeile, $i, $row->rt_gesamtpunkte);
 	$i++;
 	
-	//RT_Gesamtpunkte
-	if (mb_strlen($row->priorisierung) > $maxlength[$i])
-		$maxlength[$i] = mb_strlen($row->priorisierung);
-		$worksheet->write($zeile, $i, $row->priorisierung);
+	//Priorisierung
+	$prio = $prio_relativ.' ('.$row->priorisierung.')';
+	if (mb_strlen($prio) > $maxlength[$i])
+		$maxlength[$i] = mb_strlen($prio);
+		$worksheet->write($zeile, $i, $prio);
 	$i++;
 
 	// UDF

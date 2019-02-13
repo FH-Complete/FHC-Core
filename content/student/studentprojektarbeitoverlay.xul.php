@@ -182,14 +182,24 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 						<row>
 							<label value="Typ" control="student-projektarbeit-menulist-projekttyp"/>
 							<menulist id="student-projektarbeit-menulist-projekttyp" disabled="true"
-							          datasources="<?php echo APP_ROOT ?>rdf/projekttyp.rdf.php" flex="1"
-							          ref="http://www.technikum-wien.at/projekttyp/liste" >
+										xmlns:TYP="http://www.technikum-wien.at/projekttyp/rdf#"
+										datasources="<?php echo APP_ROOT ?>rdf/projekttyp.rdf.php" flex="1"
+										ref="http://www.technikum-wien.at/projekttyp/liste" >
 								<template>
-									<menupopup>
-										<menuitem value="rdf:http://www.technikum-wien.at/projekttyp/rdf#projekttyp_kurzbz"
-							        		      label="rdf:http://www.technikum-wien.at/projekttyp/rdf#bezeichnung"
-										  		  uri="rdf:*"/>
+									<rule TYP:aktiv='false'>
+										<menupopup>
+											<menuitem value="rdf:http://www.technikum-wien.at/projekttyp/rdf#projekttyp_kurzbz"
+														label="rdf:http://www.technikum-wien.at/projekttyp/rdf#bezeichnung"
+														uri="rdf:*" style="text-decoration:line-through;"/>
 										</menupopup>
+									</rule>
+									<rule>
+										<menupopup>
+											<menuitem value="rdf:http://www.technikum-wien.at/projekttyp/rdf#projekttyp_kurzbz"
+														label="rdf:http://www.technikum-wien.at/projekttyp/rdf#bezeichnung"
+														uri="rdf:*"/>
+										</menupopup>
+									</rule>
 								</template>
 							</menulist>
 						</row>
@@ -437,14 +447,24 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 							<row>
 								<label value="Art" control="student-projektbetreuer-menulist-betreuerart"/>
 								<menulist id="student-projektbetreuer-menulist-betreuerart" disabled="true"
-								          datasources="<?php echo APP_ROOT ?>rdf/betreuerart.rdf.php" flex="1"
-								          ref="http://www.technikum-wien.at/betreuerart" >
+											xmlns:BETREUERART="http://www.technikum-wien.at/betreuerart/rdf#"
+											datasources="<?php echo APP_ROOT ?>rdf/betreuerart.rdf.php" flex="1"
+											ref="http://www.technikum-wien.at/betreuerart" >
 									<template>
-										<menupopup>
-											<menuitem value="rdf:http://www.technikum-wien.at/betreuerart/rdf#betreuerart_kurzbz"
-								        		      label="rdf:http://www.technikum-wien.at/betreuerart/rdf#beschreibung"
-											  		  uri="rdf:*"/>
-										</menupopup>
+										<rule BETREUERART:aktiv='false'>
+											<menupopup>
+												<menuitem value="rdf:http://www.technikum-wien.at/betreuerart/rdf#betreuerart_kurzbz"
+														label="rdf:http://www.technikum-wien.at/betreuerart/rdf#beschreibung"
+														uri="rdf:*" style="text-decoration:line-through;"/>
+											</menupopup>
+										</rule>
+										<rule>
+											<menupopup>
+												<menuitem value="rdf:http://www.technikum-wien.at/betreuerart/rdf#betreuerart_kurzbz"
+														label="rdf:http://www.technikum-wien.at/betreuerart/rdf#beschreibung"
+														uri="rdf:*"/>
+											</menupopup>
+										</rule>
 									</template>
 								</menulist>
 							</row>

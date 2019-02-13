@@ -1,0 +1,40 @@
+.gradetable > thead > tr > th{
+	border-bottom: 1px solid black;
+}
+.gradetable > tbody > tr > td{
+	border-bottom: 1px solid #eeeeee;
+}
+.gradetable > tfoot > tr > th {
+	border-top: 1px solid black;
+}
+.gradelist_row_lv {
+}
+.gradelist_row_modul > td {
+	border-bottom: 1px solid black;
+	background-color: #eeeeee;
+}
+
+.gradelist_row_grade_positiv {
+	color: green;
+}
+.gradelist_row_grade_negativ {
+	color: red;
+}
+.gradelist_row_depth_1 > td:first-child {
+	padding-left: 15px !important;
+}
+.gradelist_row_depth_2 > td:first-child {
+	padding-left: 30px !important;
+}
+.gradelist_row_depth_3 > td:first-child {
+	padding-left: 45px !important;
+}
+.gradelist_row_depth_4 > td:first-child {
+	padding-left: 60px !important;
+}
+.gradelist_row_depth_5 > td:first-child {
+	padding-left: 75px !important;
+}
+.gradelist_row_depth_6 > td:first-child {
+	padding-left: 90px !important;
+}

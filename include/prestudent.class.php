@@ -1982,4 +1982,62 @@ class prestudent extends person
 		}
 					
 	}
+	
+	/**
+	 * Liefert die relative Priorität (zB 1, 2, 3) eines PreStudenten Anhand seiner absoluten Priorität (zB 9, 10, 11)
+
+	 * @param integer $prestudent_id PrestudentID deren relative Priorität ermittelt werden soll
+	 * @param string $priorisierungAbsolut Absolute Priorität deren relative Platzierung ermittelt werden soll
+
+	 * @return integer Relative Platzierung des PreStudenten oder false im Fehlerfall
+	 */
+	public function getRelativePriorisierungFromAbsolut($prestudent_id, $priorisierungAbsolut)
+	{
+		$qry = "SELECT count(*) AS prio_relativ
+				FROM (
+					SELECT *,
+						(
+							SELECT status_kurzbz
+							FROM PUBLIC.tbl_prestudentstatus
+							WHERE prestudent_id = pss.prestudent_id
+							ORDER BY datum DESC,
+								tbl_prestudentstatus.insertamum DESC LIMIT 1
+							) AS laststatus
+					FROM PUBLIC.tbl_prestudent pss
+					JOIN PUBLIC.tbl_prestudentstatus USING (prestudent_id)
+					WHERE person_id = (
+							SELECT person_id
+							FROM PUBLIC.tbl_prestudent
+							WHERE prestudent_id = ".$this->db_add_param($prestudent_id, FHC_INTEGER)."
+							)
+						AND studiensemester_kurzbz = (
+							SELECT studiensemester_kurzbz
+							FROM PUBLIC.tbl_prestudentstatus
+							WHERE prestudent_id = ".$this->db_add_param($prestudent_id, FHC_INTEGER)."
+								AND status_kurzbz = 'Interessent' LIMIT 1
+							)
+						AND status_kurzbz = 'Interessent'
+					) prest
+				WHERE laststatus NOT IN ('Abbrecher', 'Abgewiesener', 'Absolvent')
+				AND priorisierung <= ".$this->db_add_param($priorisierungAbsolut, FHC_INTEGER);
+		
+		if($result = $this->db_query($qry))
+		{
+			if($row = $this->db_fetch_object($result))
+			{
+				return $row->prio_relativ;
+			}
+			else
+			{
+				$this->errormsg = 'Fehler beim Laden der Daten';
+				return false;
+			}
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+		
+	}
 }
