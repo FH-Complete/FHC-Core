@@ -1653,16 +1653,41 @@ if(!$error)
 						if (!isset($benutzergruppe->uids))
 						{
 							// Gruppe ist leer und kann entfernt werden
+
 							// von der Lehreinheit entfernen
 							$lehreinheitgruppe_del = new lehreinheitgruppe();
 							$lehreinheitgruppe_del->delete($lehreinheitgruppe->lehreinheitgruppe_id);
 
 							// aus Stundenplan entfernen
-							// TODO
 
-							// Gruppe löschen
-							$gruppe = new gruppe();
-							$gruppe->delete($gruppe_kurzbz);
+							// Wenn die Gruppe schon verplant wurde dann zuerst aus StundenplanDEV entfernen
+							// Gruppe kann dann nicht geloescht werden da diese ja noch in tbl_stundenplan verlinkt ist
+							$qry = "
+								SELECT
+									*
+								FROM
+									lehre.tbl_stundenplandev
+								WHERE
+									gruppe_kurzbz=".$db->db_add_param($gruppe_kurzbz)."
+								LIMIT 1";
+
+							if ($result = $db->db_query($qry))
+							{
+								if ($db->db_num_rows($result) > 0)
+								{
+									$qry = "
+										DELETE FROM lehre.tbl_stundenplandev
+										WHERE gruppe_kurzbz=".$db->db_add_param($gruppe_kurzbz);
+									
+									$db->db_query($qry);
+								}
+								else
+								{
+									// Gruppe löschen
+									$gruppe = new gruppe();
+									$gruppe->delete($gruppe_kurzbz);
+								}
+							}
 
 							$return = true;
 						}
