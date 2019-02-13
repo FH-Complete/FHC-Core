@@ -1077,6 +1077,26 @@ function StatistikPrintNotenspiegelErweitert(typ)
 	window.open('<?php echo APP_ROOT ?>content/statistik/notenspiegel_erweitert.php?studiengang_kz='+studiengang_kz+'&semester='+semester+'&typ='+typ+'&orgform='+orgform,'Notenspiegel');
 }
 
+function StatistikPrintNotenspiegelStudent()
+{
+	var tree = document.getElementById('student-tree');
+	var data='';
+	//Wenn nichts markiert wurde -> alle exportieren
+	if(tree.currentIndex==-1)
+	{
+		alert("Bitte zuerst einen Studenten markieren");
+		return;
+	}
+
+	var student_uid = getTreeCellText(tree, 'student-treecol-uid', tree.currentIndex);
+	if (student_uid == '')
+	{
+		alert('Markierte Person ist kein Student');
+		return;
+	}
+	window.open('<?php echo APP_ROOT ?>index.ci.php/person/gradelist/index/'+student_uid,'Notenspiegel');
+}
+
 // ****
 // * Liefert eine statistik ueber die Anzahl der Interessenten/Bewerber Studenten
 // ****

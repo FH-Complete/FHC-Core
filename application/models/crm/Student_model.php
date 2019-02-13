@@ -14,13 +14,13 @@ class Student_model extends DB_Model
 	}
 
 	// ****
-// * Generiert die Matrikelnummer
-// * FORMAT: 0710254001
-// * 07 = Jahr
-// * 1/2/0  = WS/SS/incoming
-// * 0254 = Studiengangskennzahl vierstellig
-// * 001 = Laufende Nummer
-// ****
+	// * Generiert die Matrikelnummer
+	// * FORMAT: 0710254001
+	// * 07 = Jahr
+	// * 1/2/0  = WS/SS/incoming
+	// * 0254 = Studiengangskennzahl vierstellig
+	// * 001 = Laufende Nummer
+	// ****
 	public function generateMatrikelnummer($studiengang_kz, $studiensemester_kurzbz)
 	{
 		$jahr = mb_substr($studiensemester_kurzbz, 4);

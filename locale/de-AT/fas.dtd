@@ -114,6 +114,10 @@
 <!ENTITY menu-statistic-notenspiegel.label		"Notenspiegel HTML">
 <!ENTITY menu-statistic-notenspiegel.accesskey	"H">
 
+<!ENTITY menu-statistic-notenspiegel-student.key			"S">
+<!ENTITY menu-statistic-notenspiegel-student.label		"Notenspiegel Student">
+<!ENTITY menu-statistic-notenspiegel-student.accesskey	"S">
+
 <!ENTITY menu-statistic-substatistik-bewerberstatistik.label		"BewerberInnenstatistik">
 <!ENTITY menu-statistic-substatistik-bewerberstatistik.accesskey	"B">
 
