@@ -1537,7 +1537,7 @@ if(!$error)
 			{
 				// Es gibt keine direkte Gruppe zu dieser LE
 				// es wird eine erstellt und zugewiesen
-				$gruppe_kurzbz = 'LE_'.$lehreinheit_id;
+				$gruppe_kurzbz = 'GRP_'.$lehreinheit_id;
 
 				$stg_obj = new studiengang();
 				$stg_obj->load($lva->studiengang_kz);
