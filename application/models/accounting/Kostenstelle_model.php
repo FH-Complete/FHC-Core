@@ -13,12 +13,12 @@ class Kostenstelle_model extends DB_Model
 	}
 
 	/**
-	 * Gets all active Kostenstellen for a geschaeftsjahr, as determined by the geschaeftsjahrvon and bis fields
+	 * Gets Kostenstellen for a geschaeftsjahr, as determined by the geschaeftsjahrvon and bis fields
 	 * Gets Kostenstellen of current Geschaeftsjahr if Geschaeftsjahr not specified
 	 * @param $geschaeftsjahr
 	 * @return array|null Kostenstellen or empty array if no geschaeftsjahr found
 	 */
-	public function getActiveKostenstellenForGeschaeftsjahr($geschaeftsjahr = null)
+	public function getKostenstellenForGeschaeftsjahr($geschaeftsjahr = null)
 	{
 		$this->load->model('organisation/geschaeftsjahr_model', 'GeschaeftsjahrModel');
 
@@ -47,12 +47,12 @@ class Kostenstelle_model extends DB_Model
 	}
 
 	/**
-	 * Gets all active Kostenstellen for a geschaeftsjahr, as determined by the geschaeftsjahrvon and bis fields, together with their oe,
+	 * Gets Kostenstellen for a geschaeftsjahr, as determined by the geschaeftsjahrvon and bis fields, together with their oe,
 	 * hierarchally sorted, gets Kostenstellen of current Geschaeftsjahr if Geschaeftsjahr not specified
 	 * @param null $geschaeftsjahr
 	 * @return array|null
 	 */
-	public function getActiveKostenstellenForGeschaeftsjahrWithOe($geschaeftsjahr = null)
+	public function getKostenstellenForGegitschaeftsjahrWithOe($geschaeftsjahr = null)
 	{
 		$this->load->model('organisation/geschaeftsjahr_model', 'GeschaeftsjahrModel');
 
