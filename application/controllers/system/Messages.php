@@ -108,6 +108,7 @@ class Messages extends Auth_Controller
 		$this->load->model('crm/Prestudent_model', 'PrestudentModel');
 		$prestudentsData = $this->PrestudentModel->getOrganisationunits($prestudents);
 
+		// Adds the organisation unit to each prestudent
 		if (isEmptyString($oe_kurzbz) && hasData($msgVarsData) && hasData($prestudentsData))
 		{
 			for ($i = 0; $i < count($msgVarsData->retval); $i++)
@@ -124,7 +125,6 @@ class Messages extends Auth_Controller
 		}
 
 		$send = $this->_send($msgVarsData, null, $oe_kurzbz, $vorlage_kurzbz, $msgVars);
-
 		if (isError($send))
 		{
 			$this->outputJsonError($send->retval);
@@ -154,7 +154,7 @@ class Messages extends Auth_Controller
 
 		$sender_id = getData($authUser)[0]->person_id;
 
-		// send message(s)
+		// Send message(s)
 		if (hasData($msgVarsData))
 		{
 			// Loads the person log library
@@ -163,7 +163,7 @@ class Messages extends Auth_Controller
 			for ($i = 0; $i < count($msgVarsData->retval); $i++)
 			{
 				$parsedText = "";
-				$msgVarsDataArray = (array)$msgVarsData->retval[$i];
+				$msgVarsDataArray = $this->_replaceKeys((array)$msgVarsData->retval[$i]); // replaces array keys
 
 				// Send without vorlage
 				if (isEmptyString($vorlage_kurzbz))
@@ -187,7 +187,7 @@ class Messages extends Auth_Controller
 
 				if (isError($msg)) return $msg;
 
-				//write log entry
+				// Write log entry
 				$personLog = $this->personloglib->log(
 					$msgVarsDataArray['person_id'],
 					'Action',
@@ -266,7 +266,7 @@ class Messages extends Auth_Controller
 		}
 		else
 		{
-			$parsedText = $this->messagelib->parseMessageText($text, (array)$data->retval[0]);
+			$parsedText = $this->messagelib->parseMessageText($text, $this->_replaceKeys((array)$data->retval[0]));
 
 			$this->outputJsonSuccess($parsedText);
 		}
@@ -319,5 +319,21 @@ class Messages extends Auth_Controller
 		if (!hasData($authUser)) $authUser = error('The current logged user person_id is not defined');
 
 		return $authUser;
+	}
+
+	/**
+	 *
+	 */
+	private function _replaceKeys($data)
+	{
+		$tmpData = array();
+
+		// Replaces data array keys to a lowercase without spaces string
+		foreach ($data as $key => $val)
+		{
+			$tmpData[str_replace(' ', '_', strtolower($key))] = $val;
+		}
+
+		return $tmpData;
 	}
 }
