@@ -631,7 +631,7 @@ class InfoCenter extends Auth_Controller
 	public function reloadMessages($person_id)
 	{
 		$messages = $this->MessageModel->getMessagesOfPerson($person_id, 1);
-		$this->load->view('system/messageList.php', array('messages' => $messages->retval));
+		$this->load->view('system/messages/messageList.php', array('messages' => $messages->retval));
 	}
 
 	/**

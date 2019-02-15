@@ -124,6 +124,7 @@ class Messages extends Auth_Controller
 		}
 
 		$send = $this->_send($msgVarsData, null, $oe_kurzbz, $vorlage_kurzbz, $msgVars);
+
 		if (isError($send))
 		{
 			$this->outputJsonError($send->retval);
@@ -148,6 +149,7 @@ class Messages extends Auth_Controller
 		$body = $this->input->post('body');
 
 		$authUser = $this->_getAuthUser();
+
 		if (isError($authUser)) return $authUser;
 
 		$sender_id = getData($authUser)[0]->person_id;
@@ -172,7 +174,7 @@ class Messages extends Auth_Controller
 				// Send with vorlage
 				else
 				{
-					if (isset($msgVars) && is_array($msgVars))
+					if (is_array($msgVars))
 					{
 						// Additional message variables
 						foreach ($msgVars as $key => $msgvar)
@@ -186,7 +188,7 @@ class Messages extends Auth_Controller
 				if (isError($msg)) return $msg;
 
 				//write log entry
-				$this->personloglib->log(
+				$personLog = $this->personloglib->log(
 					$msgVarsDataArray['person_id'],
 					'Action',
 					array(
@@ -201,7 +203,11 @@ class Messages extends Auth_Controller
 				);
 			}
 
-			return success('success');
+			return success('Messages sent successfully');
+		}
+		else
+		{
+			return $msgVarsData;
 		}
 	}
 

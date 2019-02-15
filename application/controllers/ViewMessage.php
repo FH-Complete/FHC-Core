@@ -134,8 +134,6 @@ class ViewMessage extends FHC_Controller
 		$this->load->model('system/Message_model', 'MessageModel');
 		$this->load->library('MessageLib');
 
-		$error = false;
-
 		$subject = $this->input->post('subject');
 		$body = $this->input->post('body');
 		$persons = $this->input->post('persons');
@@ -145,7 +143,6 @@ class ViewMessage extends FHC_Controller
 		if (!isset($relationmessage_id) || $relationmessage_id == '' || !isset($token) || $token == '')
 		{
 			show_error('Error while sending reply');
-			$error = true;
 		}
 
 		$relationmsg = $this->MessageTokenModel->getMessageByToken($token);
@@ -154,7 +151,6 @@ class ViewMessage extends FHC_Controller
 		if (!hasData($relationmsg) || $relationmessage_id !== $relationmsg->retval[0]->message_id)
 		{
 			show_error('Error while sending reply');
-			$error = true;
 		}
 
 		// get sender (receiver of previous msg)
@@ -166,20 +162,16 @@ class ViewMessage extends FHC_Controller
 		// send message(s)
 		if (hasData($data))
 		{
+			// Loads the person log library
+			$this->load->library('PersonLogLib');
+
 			for ($i = 0; $i < count($data->retval); $i++)
 			{
 				$dataArray = (array)$data->retval[$i];
 
 				$msg = $this->messagelib->sendMessage($sender_id, $dataArray['person_id'], $subject, $body, PRIORITY_NORMAL, $relationmessage_id, null);
-				if ($msg->error)
-				{
-					show_error($msg->retval);
-					$error = true;
-					break;
-				}
 
-				// Loads the person log library
-				$this->load->library('PersonLogLib');
+				if ($msg->error) show_error($msg->retval);
 
 				// Write log entry for sender
 				$logtype_kurzbz = 'Action';
@@ -193,7 +185,8 @@ class ViewMessage extends FHC_Controller
 				$oe_kurzbz = null;
 				$insertvon = 'online';
 
-				$this->personloglib->log(
+				// Logs person data
+				$personLog = $this->personloglib->log(
 					$sender_id,
 					$logtype_kurzbz,
 					$logdata,
@@ -203,14 +196,11 @@ class ViewMessage extends FHC_Controller
 					$insertvon
 				);
 
-				//unpark bewerber after he sends message
-				$this->personloglib->unPark($sender_id);
+				// Unpark bewerber after he sends message
+				$personLog = $this->personloglib->unPark($sender_id);
 			}
 		}
 
-		if (!$error)
-		{
-			$this->load->view('system/messages/messageReplySent');
-		}
+		$this->load->view('system/messages/messageReplySent');
 	}
 }
