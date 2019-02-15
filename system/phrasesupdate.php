@@ -1519,7 +1519,6 @@ $phrases = array(
 			)
 		)
 	),
-
 	array(
 		'app' => 'core',
 		'category' => 'filter',
@@ -1540,9 +1539,6 @@ $phrases = array(
 			)
 		)
 	),
-
-
-
 
 	//****************************	 CORE/person
 	array(
@@ -2207,8 +2203,126 @@ $phrases = array(
 			)
 		)
 	),
-
-
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'ects',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'ECTS',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'ECTS',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'notendurchschnitt',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Notendurchschnitt',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Grade average',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'gewichteternotendurchschnitt',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'gewichteter Notendurchschnitt',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'weighted grade point average',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'note',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Note',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Grade',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'lehrveranstaltung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Lehrveranstaltung',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Course',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'nichtstudienplanrelevanteKurse',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Nicht studienplanrelevante Lehrveranstaltung',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'additional Courses',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
 
 	//**********************	INFOCENTER/infocenter
 	array(

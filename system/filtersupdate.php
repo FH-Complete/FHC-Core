@@ -36,6 +36,7 @@ $filters = array(
 					{"name": "StgAbgeschickt"},
 					{"name": "Studiensemester"},
 					{"name": "LastAction"},
+					{"name": "LastActionType"},
 					{"name": "User/Operator"},
 					{"name": "LockUser"}
 				],
@@ -68,6 +69,7 @@ $filters = array(
 					{"name": "StgAbgeschickt"},
 					{"name": "Studiensemester"},
 					{"name": "LastAction"},
+					{"name": "LastActionType"},
 					{"name": "User/Operator"},
 					{"name": "LockUser"}
 				],

@@ -6,6 +6,7 @@
 	$TAETIGKEIT_KURZBZ = '\'bewerbung\', \'kommunikation\'';
 	$LOGDATA_NAME = '\'Login with code\', \'New application\'';
 	$REJECTED_STATUS = '\'Abgewiesener\'';
+	$ADDITIONAL_STG = '10021,10027';
 
 	$query = '
 		SELECT
@@ -51,7 +52,10 @@
 				  JOIN public.tbl_studiengang sg USING(studiengang_kz)
 				 WHERE pss.status_kurzbz = '.$INTERESSENT_STATUS.'
 				   AND ps.person_id = p.person_id
-				   AND sg.typ IN ('.$STUDIENGANG_TYP.')
+				   AND (sg.typ IN ('.$STUDIENGANG_TYP.')
+					    OR
+					    sg.studiengang_kz in('.$ADDITIONAL_STG.')
+					    )
 				   AND pss.bestaetigtam is not null
 				   AND pss.studiensemester_kurzbz IN (SELECT ss.studiensemester_kurzbz FROM public.tbl_studiensemester ss WHERE ss.ende >= NOW())
 			  ORDER BY pss.datum DESC, pss.insertamum DESC, pss.ext_id DESC
@@ -65,7 +69,10 @@
 				 WHERE pss.status_kurzbz = '.$INTERESSENT_STATUS.'
 				   AND pss.bewerbung_abgeschicktamum IS NOT NULL
 				   AND ps.person_id = p.person_id
-				   AND sg.typ IN ('.$STUDIENGANG_TYP.')
+				   AND (sg.typ IN ('.$STUDIENGANG_TYP.')
+					    OR
+					    sg.studiengang_kz in('.$ADDITIONAL_STG.')
+					   )
 				   AND pss.studiensemester_kurzbz IN (SELECT ss.studiensemester_kurzbz FROM public.tbl_studiensemester ss WHERE ss.ende >= NOW())
 			  ORDER BY pss.datum DESC, pss.insertamum DESC, pss.ext_id DESC
 				 LIMIT 1
@@ -78,7 +85,10 @@
 				 WHERE pss.status_kurzbz = '.$INTERESSENT_STATUS.'
 				   AND pss.bewerbung_abgeschicktamum IS NOT NULL
 				   AND ps.person_id = p.person_id
-				   AND sg.typ IN ('.$STUDIENGANG_TYP.')
+				   AND (sg.typ IN ('.$STUDIENGANG_TYP.')
+					    OR
+					    sg.studiengang_kz in('.$ADDITIONAL_STG.')
+					   )
 				   AND pss.studiensemester_kurzbz IN (SELECT ss.studiensemester_kurzbz FROM public.tbl_studiensemester ss WHERE ss.ende >= NOW())
 				   AND NOT EXISTS (
    					   SELECT 1
@@ -97,7 +107,10 @@
 				 WHERE pss.status_kurzbz = '.$INTERESSENT_STATUS.'
 				   AND pss.bewerbung_abgeschicktamum IS NOT NULL
 				   AND ps.person_id = p.person_id
-				   AND sg.typ IN ('.$STUDIENGANG_TYP.')
+				   AND (sg.typ IN ('.$STUDIENGANG_TYP.')
+					    OR
+					    sg.studiengang_kz in('.$ADDITIONAL_STG.')
+					   )
 				   AND pss.studiensemester_kurzbz IN (SELECT ss.studiensemester_kurzbz FROM public.tbl_studiensemester ss WHERE ss.ende >= NOW())
 				 LIMIT 1
 			) AS "StgAbgeschickt",
@@ -167,7 +180,10 @@
 				  FROM public.tbl_prestudent ps
 				  JOIN public.tbl_studiengang sg USING(studiengang_kz)
 				WHERE ps.person_id = p.person_id
-				  AND sg.typ IN ('.$STUDIENGANG_TYP.')
+				  AND (sg.typ IN ('.$STUDIENGANG_TYP.')
+					   OR
+					   sg.studiengang_kz in('.$ADDITIONAL_STG.')
+					  )
 				  AND EXISTS (
 						SELECT 1
 						  FROM public.tbl_prestudentstatus pss
