@@ -631,7 +631,7 @@ class InfoCenter extends Auth_Controller
 	public function reloadMessages($person_id)
 	{
 		$messages = $this->MessageModel->getMessagesOfPerson($person_id, 1);
-		$this->load->view('system/messageList.php', array('messages' => $messages->retval));
+		$this->load->view('system/messages/messageList.php', array('messages' => $messages->retval));
 	}
 
 	/**
@@ -1166,8 +1166,6 @@ class InfoCenter extends Auth_Controller
 			show_error($user_person->retval);
 		}
 
-		$messagelink = site_url('/system/Messages/write/'.$user_person->retval[0]->person_id);
-
 		$data = array (
 			'lockedby' => $lockedby,
 			'lockedbyother' => $lockedbyother,
@@ -1177,8 +1175,7 @@ class InfoCenter extends Auth_Controller
 			'messages' => $messages->retval,
 			'logs' => $logs,
 			'notizen' => $notizen->retval,
-			'notizenbewerbung' => $notizen_bewerbung->retval,
-			'messagelink' => $messagelink
+			'notizenbewerbung' => $notizen_bewerbung->retval
 		);
 
 		return $data;

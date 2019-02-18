@@ -25,7 +25,10 @@ var FHC_PhrasesLib = {
 	 * @param {Object} params : parameters to be replaced instead of {<parameter name>} in phraseObj.text
 	 * @returns {String} : phrase-text
 	 */
-	t: function(category, phrase, params = {}) {
+	t: function(category, phrase, params) {
+
+		if (typeof(params)=='undefined')
+			 params = {};
 
 		// Checks if FHC_JS_PHRASES_STORAGE_OBJECT is an array
 		if ($.isArray(FHC_JS_PHRASES_STORAGE_OBJECT))

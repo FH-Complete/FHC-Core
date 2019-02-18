@@ -143,7 +143,7 @@
 							<div class="panel-body">
 								<div class="row" id="messagelist">
 									<?php
-									$this->load->view('system/messageList.php', $messages);
+									$this->load->view('system/messages/messageList.php', $messages);
 									?>
 								</div>
 							</div>

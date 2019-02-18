@@ -19,6 +19,10 @@
     border-bottom: #ccc 2px solid !important;
 }
 
+/* Remove black border at top of table footer */
+.tablesorter-default tfoot > tr > th {
+	border-top: #ccc 2px solid !important;
+}
 /* set colors of zebra widget */
 table.tablesorter tbody tr.even td, table.tablesorter tbody tr.even:hover, table.tablesorter tbody tr.even td:hover{
     background-color: #ffff;

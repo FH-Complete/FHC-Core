@@ -104,7 +104,7 @@ function MessagesNewMessage()
 	{
 		var prestudentIdArray = getMultipleTreeCellText(tree, 'student-treecol-prestudent_id');
 
-		var action = '<?php echo APP_ROOT ?>index.ci.php/system/Messages/write/' + MessageSenderPersonID;
+		var action = '<?php echo APP_ROOT ?>index.ci.php/system/FASMessages/write/' + MessageSenderPersonID;
 
 		openWindowPostArray(action, 'prestudent_id', prestudentIdArray);
 	}
@@ -128,7 +128,7 @@ function MessagesSendAnswer()
 		var RecipientID = getTreeCellText(messagesTree, 'messages-tree-recipient_id', messagesTree.currentIndex);
 		var prestudentIdArray = new Array(getTreeCellText(studentsTree, 'student-treecol-prestudent_id', studentsTree.currentIndex));
 
-		var action = '<?php echo APP_ROOT ?>index.ci.php/system/Messages/write/' + MessageSenderPersonID + '/' + MessageId + '/' + RecipientID;
+		var action = '<?php echo APP_ROOT ?>index.ci.php/system/FASMessages/writeReply/' + MessageSenderPersonID + '/' + MessageId + '/' + RecipientID;
 
 		openWindowPostArray(action, 'prestudent_id', prestudentIdArray);
 	}
@@ -137,7 +137,7 @@ function MessagesSendAnswer()
 function MessageAuswahl()
 {
 	var tree=document.getElementById('messages-tree');
-	if(tree.currentIndex==-1)
+	if (tree.currentIndex == -1)
 	{
 		alert("Bitte markieren Sie zuerst eine Nachricht");
 	}
@@ -146,7 +146,7 @@ function MessageAuswahl()
 		var text = getTreeCellText(tree, 'messages-tree-body', tree.currentIndex);
 		var recipient_id = getTreeCellText(tree, 'messages-tree-recipient_id', tree.currentIndex);
 		// Antworten ist nur moeglich wenn die Message vom User kommt
-		if(recipient_id==MessagePersonID)
+		if (recipient_id == MessagePersonID)
 		{
 			document.getElementById('messages-tree-popup-answer').disabled=true;
 			document.getElementById('messages-button-answer').disabled=true;
