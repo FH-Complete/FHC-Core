@@ -205,8 +205,10 @@ echo '
 //Foto anzeigen
 $benutzer = new benutzer();
 $benutzer->load($uid);
+
 $person = new person();
 $person->load($benutzer->person_id);
+//var_dump($person);
 if ($person->foto != '')
 {
 	if (!($ansicht && $user->foto_sperre))
@@ -238,7 +240,7 @@ if (!$ansicht)
 echo '</td><td width="30%" valign="top">';
 
 echo '
-		<b>'.($type == "student"?$p->t("profil/student"):$p->t('profil/mitarbeiter')).'</b><br><br>
+		<b>'.($type == "student"?$p->t("profil/student") : ($user->fixangestellt ? $p->t('profil/mitarbeiter') : $p->t('personensuche/mitarbeiterInExtern'))).'</b><br><br>
 		'.$p->t('global/username').': '.$user->uid.'<br>';
 if ($type == 'student' && $person->matr_nr)
 	echo $p->t('global/matrikelnummer'). ": ". $person->matr_nr. "<br>";

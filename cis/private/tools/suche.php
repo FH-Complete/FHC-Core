@@ -158,7 +158,7 @@ function searchPerson($searchItems)
 		{
 			$bisverwendung = new bisverwendung();
 			$bisverwendung->getLastAktVerwendung($row->uid);
-			
+
 			echo '<tr>';
 			//echo '<td>',$row->titelpre,'</td>';
 			echo '<td>',$row->anrede,'</td>';
@@ -171,7 +171,7 @@ function searchPerson($searchItems)
 			echo '</td>';
 			//echo '<td>',$row->titelpost,'</td>';
 			echo '<td>',($row->studiengang!=''?$row->studiengang:'-'),'</td>';
-			echo '<td>',($row->mitarbeiter_uid==NULL?'StudentIn':'MitarbeiterIn'),'</td>';	
+			echo '<td>',($row->mitarbeiter_uid==NULL ? $p->t('personensuche/studentIn') : ($row->fixangestellt=='t' ? $p->t('personensuche/mitarbeiterIn') : $p->t('personensuche/mitarbeiterInExtern'))),'</td>';
 			// Display phone number
 			echo '<td>';
 			// * if user has telefonklappe, display it
@@ -197,7 +197,7 @@ function searchPerson($searchItems)
 						{
 							echo $kontakt->kontakt. "<br>";
 							$is_zugestellt = true;
-						}		
+						}
 					}
 					// if zustellung is false display '-'
 					if (!$is_zugestellt)
@@ -211,7 +211,7 @@ function searchPerson($searchItems)
 					echo '-';
 				}
 			}
-			echo '</td>';			
+			echo '</td>';
 			echo '<td>',($row->raum!=''?$row->raum:'-'),'</td>';
 			if($row->alias!='' && !in_array($row->studiengang_kz, $noalias))
 				$mail = $row->alias.'@'.DOMAIN;
@@ -311,7 +311,7 @@ function searchOE($searchItems)
 								if($bisverwendung->beschausmasscode=='5')
 									echo '<span style="color: orange"> (karenziert)</span>';
 							echo '</td>';
-							
+
 							// Display phone number
 							echo '<td>';
 								// * if user has telefonklappe, display it
@@ -323,7 +323,7 @@ function searchOE($searchItems)
 								else
 								{
 									$person_id = $person->person_id;
-								
+
 									if ($kontakt->load_persKontakttyp($person_id, 'firmenhandy'))
 									{
 										$is_zugestellt = false;
@@ -334,13 +334,13 @@ function searchOE($searchItems)
 											{
 												echo $kontakt->kontakt. "<br>";
 												$is_zugestellt = true;
-											}		
+											}
 										}
 										// if zustellung is false display '-'
 										if (!$is_zugestellt)
 										{
 											echo '-';
-										}			
+										}
 									}
 									// * if neither telefonklappe nor business handy, display '-'
 									else
@@ -348,8 +348,8 @@ function searchOE($searchItems)
 										echo '-';
 									}
 								}
-							echo '</td>';						
-							
+							echo '</td>';
+
 							echo '<td>',($mitarbeiter->ort_kurzbz!=''?$mitarbeiter->ort_kurzbz:'-'),'</td>';
 							//if($row->alias!='' && !in_array($row->studiengang_kz, $noalias)) ??? Was macht $noalias?
 							if($person->alias!='')
