@@ -204,8 +204,8 @@ class Prestudent_model extends DB_Model
 		$this->addJoin('bis.tbl_nation zgvmanat', 'zgvmanation = zgvmanat.nation_code', 'LEFT');
 
 		$prestudent = $this->load($prestudent_id);
-		if($prestudent->error)
-			return error($prestudent->retval);
+		if (!hasData($prestudent))
+			return error('prestudent could not be loaded');
 
 		//Prestudentstatus
 		$this->load->model('crm/prestudentstatus_model', 'PrestudentstatusModel');
@@ -225,6 +225,7 @@ class Prestudent_model extends DB_Model
 
 			if (count($studienordnung->retval) > 0)
 			{
+				$lastStatus->retval[0]->studiengang_kz = $studienordnung->retval[0]->studiengang_kz;
 				$lastStatus->retval[0]->studiengangkurzbzlang = $studienordnung->retval[0]->studiengangkurzbzlang;
 				$lastStatus->retval[0]->studiengangbezeichnung = $studienordnung->retval[0]->studiengangbezeichnung;
 				$lastStatus->retval[0]->studiengangbezeichnung_englisch = $studienordnung->retval[0]->studiengangbezeichnung_englisch;
@@ -233,6 +234,7 @@ class Prestudent_model extends DB_Model
 
 			//get Sprache
 			$this->load->model('system/sprache_model', 'SpracheModel');
+			$this->SpracheModel->addSelect('sprache, locale, bezeichnung');
 			$language = $this->SpracheModel->load($lastStatus->retval[0]->sprache);
 
 			if ($language->error)

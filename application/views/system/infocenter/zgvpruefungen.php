@@ -2,11 +2,34 @@
 	<?php
 	$unique_studsemester = array();
 	$first = true;
+	$fit_programme_studiengaenge = array(10021, 10027);
 	foreach ($zgvpruefungen as $zgvpruefung):
 		$infoonly = $zgvpruefung->infoonly;
+		$studiengangkurzbz = $studiengangbezeichnung = $studiengangtyp = '';
+
 		$studiensemester = isset($zgvpruefung->prestudentstatus->studiensemester_kurzbz) ? $zgvpruefung->prestudentstatus->studiensemester_kurzbz : '';
-		$studiengangkurzbz = empty($zgvpruefung->prestudentstatus->studiengangkurzbzlang) ? $zgvpruefung->studiengang : $zgvpruefung->prestudentstatus->studiengangkurzbzlang;
-		$studiengangbezeichnung = empty($zgvpruefung->prestudentstatus->studiengangbezeichnung) ? $zgvpruefung->studiengangbezeichnung : $zgvpruefung->prestudentstatus->studiengangbezeichnung;
+		$studiengang_kz = isset($zgvpruefung->studiengang_kz) ? $zgvpruefung->studiengang_kz : '';
+		$studiengangtyp = isset($zgvpruefung->studiengangtyp) ? $zgvpruefung->studiengangtyp : '';
+
+		if (empty($zgvpruefung->prestudentstatus->studiengangkurzbzlang))
+		{
+			if (!empty($zgvpruefung->studiengang))
+				$studiengangkurzbz = $zgvpruefung->studiengang;
+		}
+		else
+		{
+			$studiengangkurzbz = $zgvpruefung->prestudentstatus->studiengangkurzbzlang;
+		}
+
+		if (empty($zgvpruefung->prestudentstatus->studiengangbezeichnung))
+		{
+			if (!empty($zgvpruefung->studiengangbezeichnung))
+				$studiengangbezeichnung = $zgvpruefung->studiengangbezeichnung;
+		}
+		else
+		{
+			$studiengangbezeichnung = $zgvpruefung->prestudentstatus->studiengangbezeichnung;
+		}
 
 		//set bootstrap columns for zgv form
 		$columns = array(3, 3, 3, 3);
@@ -219,7 +242,7 @@
 							</div>
 						</div>
 						<!-- show only master zgv if master studiengang - start -->
-						<?php if ($zgvpruefung->studiengangtyp === 'm') : ?>
+						<?php if ($studiengangtyp === 'm') : ?>
 							<div class="row">
 								<div class="col-lg-<?php echo $columns[0] ?>">
 									<div class="form-group"><label><?php echo  $this->p->t('infocenter', 'zgv') . ' ' . $this->p->t('lehre','master') . ':'?></label>
@@ -360,17 +383,24 @@
 								</div>
 							</div><!-- /.column-absage -->
 								<?php
-								$disabled = $disabledTxt = '';
+								$disabled = $disabledStg = $disabledTxt = $disabledStgTxt = '';
 								if (isEmptyString($zgvpruefung->prestudentstatus->bewerbung_abgeschicktamum))
 								{
-									$disabled = 'disabled';
-									$disabledTxt = 'Die Bewerbung muss erst abgeschickt worden sein.';
+									$disabled = $disabledStg = 'disabled';
+									$disabledTxt = $disabledStgTxt = 'Die Bewerbung muss erst abgeschickt worden sein.';
 								}
 
-								if ($zgvpruefung->studiengangtyp !== 'b')
+								if ($studiengangtyp !== 'b')
 								{
 									$disabled = 'disabled';
-									$disabledTxt = 'Nur Bachelorstudiengänge können freigegeben werden.';;
+									$disabledTxt = 'Nur Bachelorstudiengänge können freigegeben werden.';
+
+									// FIT-Lehrgänge: exceptions, can be freigegeben in Infocenter
+									if (!in_array($studiengang_kz, $fit_programme_studiengaenge))
+									{
+										$disabledStg = 'disabled';
+										$disabledStgTxt = 'Nur Bachelorstudiengänge können freigegeben werden.';
+									}
 								}
 								?>
 							<div class="col-lg-8 text-right">
@@ -378,7 +408,7 @@
 									<div class="input-group frgstatusgrselect" id="frgstatusgrselect_<?php echo $zgvpruefung->prestudent_id ?>">
 										<select name="frgstatusgrund"
 												class="d-inline float-right"
-												<?php echo $disabled ?>
+												<?php echo $disabledStg ?>
 												required>
 											<option value="null"
 													selected="selected"><?php echo ucfirst($this->p->t('ui', 'freigabeart')) . '...' ?>
@@ -388,8 +418,8 @@
 											<?php endforeach ?>
 										</select>
 										<span class="input-group-btn">
-											<button class="btn btn-default freigabebtnstg" <?php echo $disabled ?> id="freigabebtnstg_<?php echo $zgvpruefung->prestudent_id ?>"
-													data-toggle="tooltip" title="<?php echo $disabledTxt ?>">
+											<button class="btn btn-default freigabebtnstg" <?php echo $disabledStg ?> id="freigabebtnstg_<?php echo $zgvpruefung->prestudent_id ?>"
+													data-toggle="tooltip" title="<?php echo $disabledStgTxt ?>">
 												<?php echo  $this->p->t('ui', 'freigabeAnStudiengang') ?>
 											</button>
 										</span>

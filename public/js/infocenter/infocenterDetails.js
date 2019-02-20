@@ -7,6 +7,8 @@ const RTFREIGABE_MESSAGE_VORLAGE_QUER = "InfocenterRTfreigegQuer";
 const RTFREIGABE_MESSAGE_VORLAGE_QUER_KURZ = "InfocenterRTfreigegQuerKurz";
 const STGFREIGABE_MESSAGE_VORLAGE = "InfocenterSTGfreigegeben";
 
+const FIT_PROGRAMM_STUDIENGAENGE = [10021, 10027];
+
 /**
  * javascript file for infocenterDetails page
  */
@@ -507,17 +509,26 @@ var InfocenterDetails = {
 				if (id !== prestudentid)
 				{
 					if (receiverPrestudentstatus.studiensemester_kurzbz === prestudentstatus.studiensemester_kurzbz
-						&& prestudentstatus.bestaetigtam !== null && prestudentstatus.status_kurzbz === "Interessent"
-						&& prestudent.studiengangtyp === "b")
+						&& prestudentstatus.bestaetigtam !== null && prestudentstatus.status_kurzbz === "Interessent")
 					{
-						if (prestudentstatus.statusgrund_id === null)
+						if (prestudent.studiengangtyp === "b")
 						{
-							rtFreigegeben = true;
-							break;
+							if (prestudentstatus.statusgrund_id === null)
+							{
+								rtFreigegeben = true;
+							}
+							else if ($.isNumeric(prestudentstatus.statusgrund_id))
+							{
+								stgFreigegeben = true;
+							}
 						}
-						else if($.isNumeric(prestudentstatus.statusgrund_id))
+						// special case FIT programme Freigabe (stgtyp not bachelor) - STG Freigabe possible
+						else if ($.inArray(parseInt(prestudent.studiengang_kz), FIT_PROGRAMM_STUDIENGAENGE) >= 0)
 						{
-							stgFreigegeben = true;
+							if ($.isNumeric(prestudentstatus.statusgrund_id))
+							{
+								stgFreigegeben = true;
+							}
 						}
 					}
 				}
