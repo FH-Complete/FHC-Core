@@ -146,10 +146,7 @@ var FHC_AjaxClient = {
 
 		if (jQuery.type(response) == "object" && response.hasOwnProperty(CODE))
 	    {
-	        if (response.error == SUCCESS)
-	        {
-	            isSuccess = true;
-	        }
+	        code = response.error;
 	    }
 
 		return code;

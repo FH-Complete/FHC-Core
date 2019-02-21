@@ -849,13 +849,21 @@ class studiensemester extends basis_db
 
 	/**
 	 * Laedt die Studiensemester die fuer die Onlinebewerbung aktiviert sind
-	 *
+	 * @param string $art   Optional.
+	 *                      Wenn art=WS dann wird das naechste Wintersemester geliefert.
+	 *                      Wenn art=SS dann wird das naechste Sommersemester geliefert.
 	 * @return true wenn ok, sonst false
 	 */
-	public function getStudiensemesterOnlinebewerbung()
+	public function getStudiensemesterOnlinebewerbung($art = '')
 	{
-		$qry = "SELECT * FROM public.tbl_studiensemester WHERE onlinebewerbung=true
-				ORDER BY start";
+		$qry = "SELECT * FROM public.tbl_studiensemester WHERE onlinebewerbung=true";
+
+		if($art == 'WS' || $art == 'SS' )
+		{
+			$qry .= " AND substring(studiensemester_kurzbz from 1 for 2)=" . $this->db_add_param($art);
+		}
+
+		$qry.= " ORDER BY start";
 
 		if($this->db_query($qry))
 		{
