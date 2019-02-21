@@ -291,7 +291,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 			echo '		<niveau_deutsch>Doktoratsstudium (UNESCO ISCED 8)</niveau_deutsch>';
 			echo '		<niveau_englisch>University doctoral studies (UNESCO ISCED 8)</niveau_englisch>';
 		}
-		elseif($row->typ=='l' || $row->typ=='k')
+		elseif($row->typ=='l' || $row->typ=='k' || $row->typ=='e')
 		{
 			echo '		<niveau_code>UNESCO ISCED 7</niveau_code>';
 			echo '		<niveau_deutsch>Lehrgang zur Weiterbildung nach §9 FHStG idgF.</niveau_deutsch>';
