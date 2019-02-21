@@ -527,7 +527,7 @@ class InfoCenter extends Auth_Controller
 
 					$logparams = array($prestudent_id, $logdata['studiengang_kurzbz'], '');
 
-					if (isset($statusgrund_id))
+					if (isset($statusgrund_id) && is_numeric($statusgrund_id))
 					{
 						$this->StatusgrundModel->addSelect('bezeichnung_mehrsprachig');
 						$statusgrund_kurzbz = $this->StatusgrundModel->load($statusgrund_id);
