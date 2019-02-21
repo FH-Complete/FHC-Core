@@ -93,8 +93,6 @@
 			// NavigationWidget CSS
 			if ($navigationwidget === true) generateCSSsInclude('public/css/NavigationWidget.css');
 
-			generateCSSsInclude('public/css/fhcomplete.css');
-
 			// Eventually required CSS
 			generateCSSsInclude($customCSSs); // Eventually required CSS
 

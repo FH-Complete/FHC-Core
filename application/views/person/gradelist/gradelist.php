@@ -9,7 +9,8 @@
 			'fontawesome' => true,
 			'ajaxlib' => true,
 			'customCSSs' => array(
-				'public/css/tools/gradelist.css'
+				'public/css/tools/gradelist.css',
+				'public/css/fhcomplete.css'
 			),
 			'customJSs' => array(
 				'public/js/bootstrapper.js'
