@@ -29,7 +29,7 @@ const DEFAULT_SANCHO_FOOTER_IMG = 'sancho_footer_DEFAULT.jpg';
 /**
  * Send single Mail with Sancho Design and Layout.
  * @param string $vorlage_kurzbz Name of the template for specific mail content.
- * @param array $vorlage_data Associative array with specific mail content varibales
+ * @param array $vorlage_data Associative array with specific mail content variables
  *  to be replaced in the content template.
  * @param string $to Email-adress.
  * @param string $subject Subject of mail.

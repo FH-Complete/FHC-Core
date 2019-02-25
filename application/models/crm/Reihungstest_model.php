@@ -224,4 +224,270 @@ class Reihungstest_model extends DB_Model
 		
 		return $this->execQuery($query);
 	}
+	
+	/**
+	 * Checks if a registration date (Anmeldefrist) of a placement test has been reached yesterday.
+	 * @param integer $studiengang_kz Optional. Kennzahl of degree program whose registration date should be checked.
+	 * @return array Returns object array with reihungstest_ids whose registration date has been reached yesterday.
+	 */
+	public function checkReachedRegistrationDate($studiengang_kz = null)
+	{
+		$query = '
+			SELECT *
+			FROM PUBLIC.tbl_reihungstest
+			WHERE anmeldefrist = (
+					SELECT CURRENT_DATE - 1
+					)
+			';
+		
+		$parametersArray = array();
+		
+		if (!isEmptyString($studiengang_kz))
+		{
+			$query .= ' AND studiengang_kz = ?';
+			array_push($parametersArray, $studiengang_kz);
+		}
+
+		return $this->execQuery($query, $parametersArray);
+	}
+	
+	/**
+	 * Loads all applicants of a placement test for runZentraleReihungstestAnmeldefristAssistenzJob
+	 * @param integer $reihungstest_id ID of placement test
+	 * @return array Returns object array with data of applicants.
+	 */
+	public function getApplicantsOfPlacementTestForCronjob($reihungstest_id)
+	{
+		$query = '
+			SELECT tbl_rt_person.person_id,
+				ps.prestudent_id,
+				tbl_studienplan.orgform_kurzbz,
+				tbl_prestudentstatus.studienplan_id,
+				tbl_prestudentstatus.ausbildungssemester,
+				nachname,
+				vorname,
+				tbl_zgv.zgv_kurzbz,
+				ps.studiengang_kz,
+				CASE WHEN tbl_prestudentstatus.statusgrund_id=9
+				THEN \'Ja\'
+				ELSE \'Nein\'
+				END AS "qualifikationskurs",
+				(
+					SELECT count(*) AS prio_relativ
+					FROM (
+						SELECT *,
+							(
+								SELECT status_kurzbz
+								FROM PUBLIC.tbl_prestudentstatus
+								WHERE prestudent_id = pst.prestudent_id
+								ORDER BY datum DESC,
+									tbl_prestudentstatus.insertamum DESC LIMIT 1
+								) AS laststatus
+						FROM PUBLIC.tbl_prestudent pst
+						JOIN PUBLIC.tbl_prestudentstatus USING (prestudent_id)
+						WHERE person_id = (
+								SELECT person_id
+								FROM PUBLIC.tbl_prestudent
+								WHERE prestudent_id = ps.prestudent_id
+								)
+							AND studiensemester_kurzbz = (
+								SELECT studiensemester_kurzbz
+								FROM PUBLIC.tbl_prestudentstatus
+								WHERE prestudent_id = ps.prestudent_id
+									AND status_kurzbz = \'Interessent\' LIMIT 1
+								)
+							AND status_kurzbz = \'Interessent\'
+						) prest
+					WHERE laststatus NOT IN (\'Abbrecher\', \'Abgewiesener\', \'Absolvent\')
+						AND priorisierung <= (
+							SELECT priorisierung
+							FROM PUBLIC.tbl_prestudent
+							WHERE prestudent_id = ps.prestudent_id
+							)
+					) AS "prioritaet",
+				(
+					SELECT kontakt
+					FROM PUBLIC.tbl_kontakt
+					WHERE kontakttyp = \'email\'
+						AND zustellung = true
+						AND person_id = tbl_rt_person.person_id
+					ORDER BY insertamum DESC,
+						updateamum DESC LIMIT 1
+					) AS "email"
+			FROM PUBLIC.tbl_rt_person
+			JOIN PUBLIC.tbl_person ON (tbl_rt_person.person_id = tbl_person.person_id)
+			JOIN PUBLIC.tbl_reihungstest rt ON (rt_id = reihungstest_id)
+			JOIN PUBLIC.tbl_prestudent ps ON (ps.person_id = tbl_rt_person.person_id)
+			JOIN PUBLIC.tbl_prestudentstatus USING (prestudent_id)
+			JOIN lehre.tbl_studienplan ON (tbl_prestudentstatus.studienplan_id = tbl_studienplan.studienplan_id)
+			LEFT JOIN bis.tbl_zgv ON (ps.zgv_code = tbl_zgv.zgv_code)
+			WHERE rt_id = ?
+				AND get_rolle_prestudent(prestudent_id, rt.studiensemester_kurzbz) = \'Interessent\'
+				AND tbl_prestudentstatus.studiensemester_kurzbz = rt.studiensemester_kurzbz
+				AND bewerbung_abgeschicktamum IS NOT NULL
+				AND bestaetigtam IS NOT NULL
+			ORDER BY studiengang_kz, 
+				orgform_kurzbz, 
+				prioritaet, 
+				nachname, 
+				vorname, 
+				person_id
+			';
+
+		return $this->execQuery($query, array($reihungstest_id));
+	}
+
+	/**
+	 * Checks if an Applicant was assigned to a plament test after Anmeldefrist and before Test-Date
+	 * @param integer $studiengang_kz Kennzahl of degree program those tests should be checked
+	 * @return array Returns object array with data of applicants.
+	 */
+	public function getApplicantAssignedAfterDate($studiengang_kz)
+	{
+		$query = '
+			SELECT tbl_rt_person.person_id,
+				ps.prestudent_id,
+				rt.datum,
+				rt.uhrzeit,
+				tbl_studienplan.orgform_kurzbz,
+				tbl_prestudentstatus.studienplan_id,
+				tbl_prestudentstatus.ausbildungssemester,
+				nachname,
+				vorname,
+				tbl_zgv.zgv_kurzbz,
+				ps.studiengang_kz,
+				CASE WHEN tbl_prestudentstatus.statusgrund_id=9
+				THEN \'Ja\'
+				ELSE \'Nein\'
+				END AS "qualifikationskurs",
+				(
+					SELECT count(*) AS prio_relativ
+					FROM (
+						SELECT *,
+							(
+								SELECT status_kurzbz
+								FROM PUBLIC.tbl_prestudentstatus
+								WHERE prestudent_id = pst.prestudent_id
+								ORDER BY datum DESC,
+									tbl_prestudentstatus.insertamum DESC LIMIT 1
+								) AS laststatus
+						FROM PUBLIC.tbl_prestudent pst
+						JOIN PUBLIC.tbl_prestudentstatus USING (prestudent_id)
+						WHERE person_id = (
+								SELECT person_id
+								FROM PUBLIC.tbl_prestudent
+								WHERE prestudent_id = ps.prestudent_id
+								)
+							AND studiensemester_kurzbz = (
+								SELECT studiensemester_kurzbz
+								FROM PUBLIC.tbl_prestudentstatus
+								WHERE prestudent_id = ps.prestudent_id
+									AND status_kurzbz = \'Interessent\' LIMIT 1
+								)
+							AND status_kurzbz = \'Interessent\'
+						) prest
+					WHERE laststatus NOT IN (\'Abbrecher\', \'Abgewiesener\', \'Absolvent\')
+						AND priorisierung <= (
+							SELECT priorisierung
+							FROM PUBLIC.tbl_prestudent
+							WHERE prestudent_id = ps.prestudent_id
+							)
+					) AS "prioritaet",
+				(
+					SELECT kontakt
+					FROM PUBLIC.tbl_kontakt
+					WHERE kontakttyp = \'email\'
+						AND zustellung = true
+						AND person_id = tbl_rt_person.person_id
+					ORDER BY insertamum DESC,
+						updateamum DESC LIMIT 1
+					) AS "email"
+			FROM PUBLIC.tbl_rt_person
+			JOIN PUBLIC.tbl_person ON (tbl_rt_person.person_id = tbl_person.person_id)
+			JOIN PUBLIC.tbl_reihungstest rt ON (rt_id = reihungstest_id)
+			JOIN PUBLIC.tbl_prestudent ps ON (ps.person_id = tbl_rt_person.person_id)
+			JOIN PUBLIC.tbl_prestudentstatus USING (prestudent_id)
+			JOIN lehre.tbl_studienplan ON (tbl_prestudentstatus.studienplan_id = tbl_studienplan.studienplan_id)
+			LEFT JOIN bis.tbl_zgv ON (ps.zgv_code = tbl_zgv.zgv_code)
+			WHERE rt.studiengang_kz = ?
+				AND get_rolle_prestudent(prestudent_id, rt.studiensemester_kurzbz) = \'Interessent\'
+				AND tbl_prestudentstatus.studiensemester_kurzbz = rt.studiensemester_kurzbz
+				AND bewerbung_abgeschicktamum IS NOT NULL
+				AND bestaetigtam IS NOT NULL
+				AND anmeldefrist < (SELECT CURRENT_DATE)
+				AND rt.datum > (SELECT CURRENT_DATE)
+				--AND tbl_rt_person.insertamum > anmeldefrist
+				--AND tbl_rt_person.insertamum < rt.datum
+				AND tbl_rt_person.insertamum::date = (SELECT CURRENT_DATE -1)
+			ORDER BY studiengang_kz,
+				orgform_kurzbz,
+				prioritaet,
+				nachname,
+				vorname,
+				person_id
+			';
+
+		return $this->execQuery($query, array($studiengang_kz));
+	}
+
+	/**
+ * Loads all applicants of a placement test
+ * @param integer $reihungstest_id ID of placement test
+ * @return array Returns object array with data of applicants.
+ */
+	public function getApplicantsOfPlacementTest($reihungstest_id)
+	{
+		$query = '
+			SELECT DISTINCT tbl_rt_person.person_id,
+				anrede,
+				nachname,
+				vorname,
+				(
+					SELECT kontakt
+					FROM PUBLIC.tbl_kontakt
+					WHERE kontakttyp = \'email\'
+						AND zustellung = true
+						AND person_id = tbl_rt_person.person_id
+					ORDER BY insertamum DESC,
+						updateamum DESC LIMIT 1
+					) AS "email",
+				tbl_ort.planbezeichnung,
+				tbl_ort.lageplan
+			FROM PUBLIC.tbl_rt_person
+			JOIN PUBLIC.tbl_person ON (tbl_rt_person.person_id = tbl_person.person_id)
+			JOIN PUBLIC.tbl_reihungstest rt ON (rt_id = reihungstest_id)
+			JOIN PUBLIC.tbl_prestudent ps ON (ps.person_id = tbl_rt_person.person_id)
+			JOIN PUBLIC.tbl_prestudentstatus USING (prestudent_id)
+			LEFT JOIN bis.tbl_zgv ON (ps.zgv_code = tbl_zgv.zgv_code)
+			LEFT JOIN PUBLIC.tbl_ort ON (tbl_rt_person.ort_kurzbz = tbl_ort.ort_kurzbz)
+			WHERE rt_id = ?
+				AND get_rolle_prestudent(prestudent_id, rt.studiensemester_kurzbz) = \'Interessent\'
+				AND tbl_prestudentstatus.studiensemester_kurzbz = rt.studiensemester_kurzbz
+				AND bewerbung_abgeschicktamum IS NOT NULL
+				AND bestaetigtam IS NOT NULL
+			ORDER BY nachname,
+				vorname,
+				person_id
+			';
+
+		return $this->execQuery($query, array($reihungstest_id));
+	}
+
+	/**
+	 * Loads all placement tests of the given day and optional degree program
+	 * @param string $date Date of the tests to be loaded (YYYY-MM-DD)
+	 * @param integer $studiengang_kz Optional. Kennzahl of degree program to load
+	 * @return array Returns object array with data of applicants.
+	 */
+	public function getTestsOnDate($date, $studiengang_kz = null)
+	{
+		$query = '
+			SELECT *
+			FROM PUBLIC.tbl_reihungstest
+			WHERE datum = ?
+				AND studiengang_kz = ?
+			';
+
+		return $this->execQuery($query, array($date, $studiengang_kz));
+	}
 }

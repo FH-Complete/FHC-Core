@@ -42,6 +42,7 @@ class ReihungstestJob extends FHC_Controller
 		
 		// Load models
 		$this->load->model('crm/Reihungstest_model', 'ReihungstestModel');
+		$this->load->model('organisation/Studiengang_model', 'StudiengangModel');
 
 		// Load helpers
 		$this->load->helper('hlp_sancho_helper');
@@ -102,6 +103,304 @@ class ReihungstestJob extends FHC_Controller
 		}
 	}
 	
+	public function runZentraleReihungstestAnmeldefristAssistenzJob()
+	{
+		// Get placement tests where registration date was yesterday
+		$result = $this->ReihungstestModel->checkReachedRegistrationDate(11000);
+		
+		$reachedRegistration_rt_arr = array();
+
+		if (hasData($result))
+		{
+			$reachedRegistration_rt_arr = $result->retval;
+		}
+		elseif (isError($result))
+		{
+			show_error($result->error);
+		}
+
+		$applicants_arr = array();
+
+		foreach ($reachedRegistration_rt_arr as $reihungstest)
+		{
+			$applicants = $this->ReihungstestModel->getApplicantsOfPlacementTestForCronjob($reihungstest->reihungstest_id);
+
+			if (hasData($applicants))
+			{
+				$applicants_arr = $applicants->retval;
+			}
+			elseif (isError($applicants))
+			{
+				show_error($applicants->error);
+			}
+
+			// Get all Bachelor-Degree-Programs with Mailadress
+			$bachelorStudiengeange = $this->StudiengangModel->loadStudiengaengeFromTyp('b');
+
+			if (hasData($bachelorStudiengeange))
+			{
+				$bachelorStudiengeange_arr = $bachelorStudiengeange->retval;
+			}
+			elseif (isError($bachelorStudiengeange))
+			{
+				show_error($bachelorStudiengeange->error);
+			}
+
+			// If a person ist an applicant of this degree-program send mail with application data
+			// Otherwise inform assistant, that no applicant is registered in this test
+			foreach ($bachelorStudiengeange_arr as $bachelorStudiengang)
+			{
+				$studiengang_kuerzel = strtoupper($bachelorStudiengang->typ.$bachelorStudiengang->kurzbz);
+				$applicants_list = '';
+				$applicantCounter = 0;
+				$rowstyle = 'style="background-color: #EEEEEE; padding: 4px;"';
+				$mailReceipients = ''; // String with all mailadresses
+				$mailcontent_data_arr = array();
+				foreach ($applicants_arr as $applicant)
+				{
+					if ($bachelorStudiengang->studiengang_kz == $applicant->studiengang_kz)
+					{
+						$mailReceipients .=  $applicant->email. ';';
+						$applicantCounter ++;
+						$applicants_list .= ' 
+							<tr '.$rowstyle.'>
+							<td>'. $applicant->orgform_kurzbz. '</td>
+							<td>'. $applicant->ausbildungssemester. '</td>
+							<td>'. $applicant->nachname. '</td>
+							<td>'. $applicant->vorname. '</td>
+							<td>'. $applicant->zgv_kurzbz. '</td>
+							<td>'. $applicant->prioritaet. '</td>
+							<td>'. $applicant->qualifikationskurs. '</td>
+							<td><a href="mailto:'. $applicant->email. '">'. $applicant->email. '</a></td>
+							</tr>
+						';
+					}
+				}
+				if ($applicantCounter == 0)
+				{
+					$mailcontent = '<p style="font-family: verdana, sans-serif;">Der Anmeldeschluss für den zentralen Reihungstest am ' . date_format(date_create($reihungstest->datum), 'd.m.Y') . ' um ' . $reihungstest->uhrzeit . ' Uhr wurde gestern erreicht.</p>';
+					$mailcontent .= '<p style="font-family: verdana, sans-serif;"><b>Für den Studiengang '.$studiengang_kuerzel.' nehmen keine InteressentInnen an diesem Reihungstest teil</b></p>';
+				}
+				else
+				{
+					$headerstyle = 'style="background: #DCE4EF; border: 1px solid #FFF; padding: 4px; text-align: left;"';
+
+					$mailcontent = '<p style="font-family: verdana, sans-serif;">Der Anmeldeschluss für den zentralen Reihungstest am ' . date_format(date_create($reihungstest->datum), 'd.m.Y') . ' um ' . $reihungstest->uhrzeit . ' Uhr wurde gestern erreicht.</p>';
+					$mailcontent .= '
+					<p style="font-family: verdana, sans-serif;">Folgende ' . $applicantCounter . ' InteressentInnen des Studiengangs ' . $studiengang_kuerzel . ' nehmen daran teil:</p>
+					<table width="100%" style="cellpadding: 3px; font-family: verdana, sans-serif; border: 1px solid #000000;">
+						<thead>
+						<th '.$headerstyle.'>OrgForm</th>
+						<th '.$headerstyle.'>Semester</th>
+						<th '.$headerstyle.'>Nachname</th>
+						<th '.$headerstyle.'>Vorname</th>
+						<th '.$headerstyle.'>ZGV</th>
+						<th '.$headerstyle.'>Priorität</th>
+						<th '.$headerstyle.'>Qualikurs</th>
+						<th '.$headerstyle.'>E-Mail</th>
+						</thead>
+						<tbody>
+						';
+					$mailcontent .= $applicants_list;
+					$mailcontent .= '
+					</tbody>
+					</table>				
+					';
+					$mailcontent .= '<p style="font-family: verdana, sans-serif;"><a href="mailto:?bcc=' . $mailReceipients . '">Mail an alle schicken</a></p>';
+				}
+				$mailcontent_data_arr['table'] = $mailcontent;
+				//$mailcontent_data_arr['link'] = $this->VILESCI_RT_VERWALTUNGS_URL;
+				//var_dump($mailcontent_data_arr);
+				// Send email in Sancho design
+				if (!isEmptyString($mailcontent))
+				{
+					sendSanchoMail(
+						'Sancho_ReihungstestteilnehmerJob',
+						$mailcontent_data_arr,
+						array($bachelorStudiengang->email,'kindlm@technikum-wien.at'),
+						'Anmeldeschluss Reihungstest ' . date_format(date_create($reihungstest->datum), 'd.m.Y') . ' ' . $reihungstest->uhrzeit . ' Uhr',
+						'sancho_header_min_bw.jpg',
+						'sancho_footer_min_bw.jpg');
+				}
+			}
+		}
+	}
+
+	// Checks, if an applicant was assigned to a test after Anmeldefrist
+	public function runZentraleReihungstestNachtraeglichHinzugefuegtJob()
+	{
+		// Get applicants that have been added to a test after Anmeldefrist
+		$result = $this->ReihungstestModel->getApplicantAssignedAfterDate(11000);
+
+		$applicants_after_anmeldefrist_arr = array();
+
+		if (hasData($result))
+		{
+			$applicants_after_anmeldefrist_arr = $result->retval;
+		}
+		elseif (isError($result))
+		{
+			show_error($result->error);
+		}
+
+		$studiengang = '';
+		$mailReceipients = ''; // String with all mailadresses
+		$mailcontent_data_arr = array();
+		$headerstyle = 'style="background: #DCE4EF; border: 1px solid #FFF; padding: 4px; text-align: left;"';
+		$rowstyle = 'style="background-color: #EEEEEE; padding: 4px;"';
+		$mailcontent = '';
+		$applicants_list = '';
+
+		if (count($applicants_after_anmeldefrist_arr) > 0)
+		{
+			foreach ($applicants_after_anmeldefrist_arr as $applicant)
+			{
+				if ($studiengang != $applicant->studiengang_kz)
+				{
+					if ($studiengang != '' && $studiengang != $applicant->studiengang_kz)
+					{
+						$bachelorStudiengang = $this->StudiengangModel->load($studiengang);
+						$mailcontent .= $applicants_list;
+						$mailcontent .= '</tbody></table>';
+						$mailcontent .= '<p style="font-family: verdana, sans-serif;"><a href="mailto:?bcc=' . $mailReceipients . '">Mail an alle schicken</a></p>';
+						$mailcontent_data_arr['table'] = $mailcontent;
+						sendSanchoMail(
+							'Sancho_ReihungstestteilnehmerJob',
+							$mailcontent_data_arr,
+							array($bachelorStudiengang->retval[0]->email,'kindlm@technikum-wien.at'),
+							'InteressentIn nach Reihungstest-Anmeldeschluss hinzugefügt',
+							'sancho_header_min_bw.jpg',
+							'sancho_footer_min_bw.jpg');
+						$applicants_list = '';
+						$mailcontent_data_arr = array();
+					}
+
+					$mailcontent = '<p style="font-family: verdana, sans-serif;">Folgende InteressentInnen wurden <b>nach</b> der Anmeldefrist zu einem Reihungstest hinzugefügt.</p>';
+					$mailcontent .= '
+					<table width="100%" style="cellpadding: 3px; font-family: verdana, sans-serif; border: 1px solid #000000;">
+						<thead>
+						<th ' . $headerstyle . '>Datum des Tests</th>
+						<th ' . $headerstyle . '>Uhrzeit des Tests</th>
+						<th ' . $headerstyle . '>OrgForm</th>
+						<th ' . $headerstyle . '>Semester</th>
+						<th ' . $headerstyle . '>Nachname</th>
+						<th ' . $headerstyle . '>Vorname</th>
+						<th ' . $headerstyle . '>ZGV</th>
+						<th ' . $headerstyle . '>Priorität</th>
+						<th ' . $headerstyle . '>Qualikurs</th>
+						<th ' . $headerstyle . '>E-Mail</th>
+						</thead>
+						<tbody>
+						';
+				}
+
+				$studiengang = $applicant->studiengang_kz;
+				$mailReceipients .= $applicant->email . ';';
+				$applicants_list .= ' 
+						<tr ' . $rowstyle . '>
+						<td>' . date_format(date_create($applicant->datum), 'd.m.Y') . '</td>
+						<td>' . $applicant->uhrzeit . '</td>
+						<td>' . $applicant->orgform_kurzbz . '</td>
+						<td>' . $applicant->ausbildungssemester . '</td>
+						<td>' . $applicant->nachname . '</td>
+						<td>' . $applicant->vorname . '</td>
+						<td>' . $applicant->zgv_kurzbz . '</td>
+						<td>' . $applicant->prioritaet . '</td>
+						<td>' . $applicant->qualifikationskurs . '</td>
+						<td><a href="mailto:' . $applicant->email . '">' . $applicant->email . '</a></td>
+						</tr>
+					';
+			};
+			$bachelorStudiengang = $this->StudiengangModel->load($studiengang);
+			$mailcontent .= $applicants_list;
+			$mailcontent .= '</tbody></table>';
+			$mailcontent .= '<p style="font-family: verdana, sans-serif;"><a href="mailto:?bcc=' . $mailReceipients . '">Mail an alle schicken</a></p>';
+			$mailcontent_data_arr['table'] = $mailcontent;
+			sendSanchoMail(
+				'Sancho_ReihungstestteilnehmerJob',
+				$mailcontent_data_arr,
+				array($bachelorStudiengang->retval[0]->email,'kindlm@technikum-wien.at'),
+				'InteressentIn nach Reihungstest-Anmeldeschluss hinzugefügt',
+				'sancho_header_min_bw.jpg',
+				'sancho_footer_min_bw.jpg');
+		}
+	}
+
+	public function runRemindApplicantsOfPlacementTestJob()
+	{
+		// Get placement tests with testdate within 3 working days
+
+		// Check if today +3 days is working day
+		$todayPlus3 = date('Y-m-d', strtotime("+3 days"));
+
+		if (getWorkingDays($todayPlus3, $todayPlus3) == 0)
+		{
+			// If not increase counting days till next working day
+			for ($i = 3; $i < 100; $i++)
+			{
+				$dateToCheck = date('Y-m-d', strtotime("+".$i." days"));
+				if (getWorkingDays($dateToCheck, $dateToCheck) == 1)
+				{
+					$nextWorkingDay = $dateToCheck;
+					break;
+				}
+			}
+		}
+		else
+		{
+			$nextWorkingDay = date('Y-m-d', strtotime("+3 days"));
+		}
+
+		// Check if a placement test happens on $nextWorkingDay
+		$result = $this->ReihungstestModel->getTestsOnDate($nextWorkingDay, 11000);
+
+		$testsOndate = array();
+
+		if (hasData($result))
+		{
+			$testsOndate = $result->retval;
+		}
+		elseif (isError($result))
+		{
+			show_error($result->error);
+		}
+
+		$applicants_arr = array();
+
+		foreach ($testsOndate as $reihungstest)
+		{
+			// Loads applicants of a test
+			$applicants = $this->ReihungstestModel->getApplicantsOfPlacementTest($reihungstest->reihungstest_id);
+
+			if (hasData($applicants))
+			{
+				$applicants_arr = $applicants->retval;
+			}
+			elseif (isError($applicants))
+			{
+				show_error($applicants->error);
+			}
+
+			foreach ($applicants_arr as $applicant)
+			{
+				$mailcontent_data_arr = array();
+				$mailcontent_data_arr['anrede'] = $applicant->anrede;
+				$mailcontent_data_arr['nachname'] = $applicant->nachname;
+				$mailcontent_data_arr['vorname'] = $applicant->vorname;
+				$mailcontent_data_arr['rt_datum'] = date_format(date_create($reihungstest->datum), 'd.m.Y');
+				$mailcontent_data_arr['rt_uhrzeit'] = date_format(date_create($reihungstest->uhrzeit), 'H:i');
+				$mailcontent_data_arr['rt_raum'] = $applicant->planbezeichnung;
+				$mailcontent_data_arr['wegbeschreibung'] = $applicant->lageplan;
+
+				sendSanchoMail(
+					'Sancho_RemindApplicantsOfTest',
+					$mailcontent_data_arr,
+					array($applicant->email,'kindlm@technikum-wien.at'),
+					'Ihre Anmeldung zum Reihungstest - Reminder / Your registration for the placement test - Reminder');
+			}
+		}
+	}
+	
 	// ------------------------------------------------------------------------
 	// Private methods
 	/**
@@ -118,7 +417,8 @@ class ReihungstestJob extends FHC_Controller
 		// Prepare HTML table with study plans that have no placement tests yet
 		if (!empty($missing_rt_arr))
 		{
-			$studienplan_list = '
+			$studienplan_list
+				= '
 				<table'. $style_tbl2.'>
 			';
 			
