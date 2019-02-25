@@ -33,6 +33,7 @@ class ViewMessage extends FHC_Controller
 
 		// Load model MessageToken_model, not calling the authentication system
 		$this->load->model('system/MessageToken_model', 'MessageTokenModel');
+		$this->load->model('CL/Messages_model', 'CLMessagesModel');
 	}
 
 	/**
@@ -45,10 +46,10 @@ class ViewMessage extends FHC_Controller
 
 		if ($msg->error)
 		{
-			show_error($msg->retval);
+			show_error(getData($msg));
 		}
 
-		if (is_array($msg->retval) && count($msg->retval) > 0)
+		if (is_array(getData($msg)) && count(getData($msg)) > 0)
 		{
 			$setReadMessageStatusByToken = $this->MessageTokenModel->setReadMessageStatusByToken($token);
 
@@ -57,8 +58,8 @@ class ViewMessage extends FHC_Controller
 				show_error($msg->$setReadMessageStatusByToken);
 			}
 
-			$sender_id = $msg->retval[0]->sender_id;
-			$receiver_id = $msg->retval[0]->receiver_id;
+			$sender_id = getData($msg)[0]->sender_id;
+			$receiver_id = getData($msg)[0]->receiver_id;
 			$sender = $this->MessageTokenModel->getSenderData($sender_id);
 
 			// To decide how to change the redirection
@@ -75,8 +76,8 @@ class ViewMessage extends FHC_Controller
 
 			$data = array (
 				'sender_id' => $sender_id,
-				'sender' => $sender->retval[0],
-				'message' => $msg->retval[0],
+				'sender' => getData($sender)[0],
+				'message' => getData($msg)[0],
 				'isEmployee' => $isEmployee,
 				'href' => $href
 			);
@@ -101,24 +102,22 @@ class ViewMessage extends FHC_Controller
 
 		// Get message data if possible
 		$msg = $this->MessageTokenModel->getMessageByToken($token);
-
 		if (!hasData($msg))
 		{
 			show_error('No message found');
 		}
 
-		$msg = $msg->retval[0];
+		$msg = getData($msg)[0];
 
 		// Get variables
 		$receiverData = $this->MessageTokenModel->getPersonData($msg->sender_id);
-
 		if (!hasData($receiverData))
 		{
 			show_error('No sender found');
 		}
 
 		$data = array (
-			'receivers' => $receiverData->retval,
+			'receivers' => getData($receiverData),
 			'message' => $msg,
 			'token' => $token
 		);
@@ -127,13 +126,10 @@ class ViewMessage extends FHC_Controller
 	}
 
 	/**
-	 * send reply
+	 * Send a reply
 	 */
 	public function sendReply()
 	{
-		$this->load->model('system/Message_model', 'MessageModel');
-		$this->load->library('MessageLib');
-
 		$subject = $this->input->post('subject');
 		$body = $this->input->post('body');
 		$persons = $this->input->post('persons');
@@ -145,60 +141,10 @@ class ViewMessage extends FHC_Controller
 			show_error('Error while sending reply');
 		}
 
-		$relationmsg = $this->MessageTokenModel->getMessageByToken($token);
-
-		// check if correct message
-		if (!hasData($relationmsg) || $relationmessage_id !== $relationmsg->retval[0]->message_id)
+		$sendReply = $this->CLMessagesModel->sendReply($subject, $body, $persons, $relationmessage_id, $token);
+		if (isError($sendReply))
 		{
-			show_error('Error while sending reply');
-		}
-
-		// get sender (receiver of previous msg)
-		$sender_id = $relationmsg->retval[0]->receiver_id;
-
-		// get message data of persons
-		$data = $this->MessageTokenModel->getPersonData($persons);
-
-		// send message(s)
-		if (hasData($data))
-		{
-			// Loads the person log library
-			$this->load->library('PersonLogLib');
-
-			for ($i = 0; $i < count($data->retval); $i++)
-			{
-				$dataArray = (array)$data->retval[$i];
-
-				$msg = $this->messagelib->sendMessage($sender_id, $dataArray['person_id'], $subject, $body, PRIORITY_NORMAL, $relationmessage_id, null);
-
-				if ($msg->error) show_error($msg->retval);
-
-				// Write log entry for sender
-				$logtype_kurzbz = 'Action';
-				$logdata = array(
-					'name' => 'Message sent',
-					'message' => 'Message sent from person '.$sender_id.' to '.$dataArray['person_id'].', messageid '.$msg->retval,
-					'success' => 'true'
-				);
-				$taetigkeit_kurzbz = 'kommunikation';
-				$app = 'core';
-				$oe_kurzbz = null;
-				$insertvon = 'online';
-
-				// Logs person data
-				$personLog = $this->personloglib->log(
-					$sender_id,
-					$logtype_kurzbz,
-					$logdata,
-					$taetigkeit_kurzbz,
-					$app,
-					$oe_kurzbz,
-					$insertvon
-				);
-
-				// Unpark bewerber after he sends message
-				$personLog = $this->personloglib->unPark($sender_id);
-			}
+			show_error(getData($sendReply));
 		}
 
 		$this->load->view('system/messages/messageReplySent');

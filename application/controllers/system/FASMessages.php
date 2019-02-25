@@ -48,16 +48,16 @@ class FASMessages extends Auth_Controller
 		$msgVarsData = $this->_getMsgVarsData($prestudent_id);
 
 		// Retrieves message vars for a person from view view vw_msg_vars_person
-		$variablesArray = $this->messagelib->getMessageVarsPerson();
+		$variablesArray = $this->_getMessageVarsPerson();
 
  		// Organisation units used to get the templates
-		$oe_kurzbz = $this->messagelib->getOeKurzbz($sender_id);
+		$oe_kurzbz = $this->_getOeKurzbz($sender_id);
 
  		// Admin or commoner?
- 		$isAdmin = $this->messagelib->getIsAdmin($sender_id);
+ 		$isAdmin = $this->_getIsAdmin($sender_id);
 
  		$data = array(
- 			'recipients' => $msgVarsData->retval,
+ 			'recipients' => getData($msgVarsData),
  			'variables' => $variablesArray,
  			'oe_kurzbz' => $oe_kurzbz, // used to get the templates
  			'isAdmin' => $isAdmin
@@ -93,16 +93,16 @@ class FASMessages extends Auth_Controller
 		$msgVarsData = $this->_getMsgVarsData($prestudent_id);
 
 		// Retrieves message vars for a person from view view vw_msg_vars_person
-		$variablesArray = $this->messagelib->getMessageVarsPerson();
+		$variablesArray = $this->_getMessageVarsPerson();
 
  		// Organisation units used to get the templates
-		$oe_kurzbz = $this->messagelib->getOeKurzbz($sender_id);
+		$oe_kurzbz = $this->_getOeKurzbz($sender_id);
 
  		// Admin or commoner?
- 		$isAdmin = $this->messagelib->getIsAdmin($sender_id);
+ 		$isAdmin = $this->_getIsAdmin($sender_id);
 
  		$data = array(
- 			'recipients' => $msgVarsData->retval,
+ 			'recipients' => getData($msgVarsData),
  			'message' => $msg,
  			'variables' => $variablesArray,
  			'oe_kurzbz' => $oe_kurzbz, // used to get the templates
@@ -123,7 +123,7 @@ class FASMessages extends Auth_Controller
 		$msg = $this->messagelib->getMessage($msg_id, $receiver_id);
 		if (isError($msg))
 		{
-			show_error($msg->retval);
+			show_error(getData($msg));
 		}
 		elseif (!hasData($msg))
 		{
@@ -131,7 +131,7 @@ class FASMessages extends Auth_Controller
 		}
 		else
 		{
-			$msg = $msg->retval[0];
+			$msg = getData($msg)[0];
 		}
 
 		return $msg;
@@ -147,9 +147,45 @@ class FASMessages extends Auth_Controller
 
 		if (isError($msgVarsData))
 		{
-			show_error($msgVarsData->retval);
+			show_error(getData($msgVarsData));
 		}
 
 		return $msgVarsData;
+	}
+
+	/**
+	 * Wrapper method to call messagelib->getMessageVarsPerson
+	 */
+	private function _getMessageVarsPerson()
+	{
+		$variables = $this->messagelib->getMessageVarsPerson();
+
+		if (isError($variables)) show_error(getData($variables));
+
+		return getData($variables);
+	}
+
+	/**
+	 * Wrapper method to call messagelib->getOeKurzbz
+	 */
+	private function _getOeKurzbz($sender_id)
+	{
+		$oe_kurzbz = $this->messagelib->getOeKurzbz($sender_id);
+
+		if (isError($oe_kurzbz)) show_error(getData($oe_kurzbz));
+
+		return getData($oe_kurzbz);
+	}
+
+	/**
+	 * Wrapper method to call messagelib->getIsAdmin
+	 */
+	private function _getIsAdmin($sender_id)
+	{
+		$isAdmin = $this->messagelib->getIsAdmin($sender_id);
+
+		if (isError($isAdmin)) show_error(getData($isAdmin));
+
+		return getData($isAdmin);
 	}
 }
