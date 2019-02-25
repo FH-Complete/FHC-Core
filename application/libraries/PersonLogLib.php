@@ -42,11 +42,7 @@ class PersonLogLib
 			'insertvon' => $user
 		);
 
-		$result = $this->ci->PersonLogModel->insert($data);
-		if (isSuccess($result))
-			return true;
-		else
-			show_error($result->retval);
+		return $this->ci->PersonLogModel->insert($data);
 	}
 
 	/**
@@ -120,10 +116,9 @@ class PersonLogLib
 	 */
 	public function unPark($person_id)
 	{
-		$result = $this->ci->PersonLogModel->getLogsInFuture($person_id);
-
 		$deleted = array();
 
+		$result = $this->ci->PersonLogModel->getLogsInFuture($person_id);
 		if (hasData($result))
 		{
 			foreach ($result->retval as $log)
@@ -133,12 +128,22 @@ class PersonLogLib
 				{
 					$delresult = $this->ci->PersonLogModel->deleteLog($log->log_id);
 					if (isSuccess($delresult))
+					{
 						$deleted[] = $log->log_id;
+					}
+					else
+					{
+						return $delresult;
+					}
 				}
 			}
 		}
+		else
+		{
+			return $result;
+		}
 
-		return $deleted;
+		return success($deleted);
 	}
 
 	/**

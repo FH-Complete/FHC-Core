@@ -760,23 +760,23 @@ class MessageLib
 	public function getMessageVarsPerson()
 	{
 		$variablesArray = array();
-		$variables = $this->_ci->MessageModel->getMessageVarsPerson();
 
+		$variables = $this->_ci->MessageModel->getMessageVarsPerson();
 		if (isError($variables))
 		{
-			show_error($variables->retval);
+			return $variables;
 		}
 		elseif (hasData($variables))
 		{
+			$tmpVariablesArray = getData($variables);
 			// Skip person_id
-			for ($i = 1; $i < count($variables->retval); $i++)
+			for ($i = 1; $i < count($tmpVariablesArray); $i++)
 			{
-				$variablesArray['{'.str_replace(' ', '_', strtolower($variables->retval[$i])).'}'] = $variables->retval[$i];
+				$variablesArray['{'.str_replace(' ', '_', strtolower($tmpVariablesArray[$i])).'}'] = $tmpVariablesArray[$i];
 			}
-			array_shift($variables->retval); // Remove person_id
 		}
 
-		return $variablesArray;
+		return success($variablesArray);
 	}
 
 	/**
@@ -787,20 +787,21 @@ class MessageLib
 		$oe_kurzbz = array();
 
 		$this->_ci->load->model('person/Benutzerfunktion_model', 'BenutzerfunktionModel');
- 		$benutzerResult = $this->_ci->BenutzerfunktionModel->getByPersonId($sender_id);
-		if (isError($benutzerResult))
+
+ 		$benutzer = $this->_ci->BenutzerfunktionModel->getByPersonId($sender_id);
+		if (isError($benutzer))
 		{
-			show_error($benutzerResult->retval);
+			return $benutzer;
 		}
- 		elseif (hasData($benutzerResult))
+ 		elseif (hasData($benutzer))
  		{
- 			foreach ($benutzerResult->retval as $val)
+ 			foreach (getData($benutzer) as $val)
  			{
  				$oe_kurzbz[] = $val->oe_kurzbz;
  			}
  		}
 
-		return $oe_kurzbz;
+		return success($oe_kurzbz);
 	}
 
 	/**
@@ -809,13 +810,8 @@ class MessageLib
 	public function getIsAdmin($sender_id)
 	{
 		$this->_ci->load->model('system/Benutzerrolle_model', 'BenutzerrolleModel');
- 		$isAdmin = $this->_ci->BenutzerrolleModel->isAdminByPersonId($sender_id);
- 		if (isError($isAdmin))
- 		{
- 			show_error($isAdmin->retval);
- 		}
 
-		return $isAdmin->retval;
+ 		return $this->_ci->BenutzerrolleModel->isAdminByPersonId($sender_id);
 	}
 
 	//------------------------------------------------------------------------------------------------------------------

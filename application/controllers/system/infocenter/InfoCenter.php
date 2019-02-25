@@ -722,8 +722,14 @@ class InfoCenter extends Auth_Controller
 		$person_id = $this->input->post('person_id');
 
 		$result = $this->personloglib->unPark($person_id);
-
-		$this->output->set_content_type('application/json')->set_output(json_encode($result));
+		if (isError($result))
+		{
+			$this->outputJsonError($result);
+		}
+		else
+		{
+			$this->output->set_content_type('application/json')->set_output(json_encode(getData($result)));
+		}
 	}
 
 	/**

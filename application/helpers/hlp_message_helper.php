@@ -69,12 +69,15 @@ function isSuccess($result)
 }
 
 /**
- * Checks if the result represents a success and also if it contains data from DB
+ * Checks if the result represents a success and also if it contains valid data
  */
 function hasData($result)
 {
-	if (isSuccess($result) && isset($result->retval) &&
-		is_array($result->retval) && count($result->retval) > 0)
+	if (isSuccess($result) && isset($result->retval)
+		&& (!isEmptyArray($result->retval)
+		|| !isEmptyString($result->retval)
+		|| is_numeric($result->retval)
+		|| is_object($result->retval)))
 	{
 		return true;
 	}
