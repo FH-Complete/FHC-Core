@@ -47,6 +47,9 @@ class vorlage extends basis_db
 	public $vorlagestudiengang_id;			// bigint
 	public $anmerkung_vorlagestudiengang;	// text
 	public $aktiv;							// boolean
+	public $sprache;                        // varchar(16)
+	public $subject;                        // text
+	public $orgform_kurzbz;                 // varchar(3)
 
 	public $archivierbar = false;
 	public $signierbar = false;
@@ -223,6 +226,9 @@ class vorlage extends basis_db
 				$this->berechtigung = $row->berechtigung;
 				$this->anmerkung_vorlagestudiengang = $row->anmerkung_vorlagestudiengang;
 				$this->aktiv = $this->db_parse_bool($row->aktiv);
+				$this->sprache = $row->sprache;
+				$this->subject = $row->subject;
+				$this->orgform_kurzbz = $row->orgform_kurzbz;
 				return true;
 			}
 			else
@@ -276,6 +282,9 @@ class vorlage extends basis_db
 				$obj->berechtigung = $row->berechtigung;
 				$obj->anmerkung_vorlagestudiengang = $row->anmerkung_vorlagestudiengang;
 				$obj->aktiv = $this->db_parse_bool($row->aktiv);
+				$obj->sprache = $row->sprache;
+				$obj->subject = $row->subject;
+				$obj->orgform_kurzbz = $row->orgform_kurzbz;
 
 				$this->result[]= $obj;
 			}
@@ -336,7 +345,7 @@ class vorlage extends basis_db
 
 		if($new)
 		{
-			$qry = "INSERT INTO public.tbl_vorlagestudiengang(vorlage_kurzbz,studiengang_kz,version,text,oe_kurzbz,style,berechtigung,anmerkung_vorlagestudiengang,aktiv) VALUES(".
+			$qry = "INSERT INTO public.tbl_vorlagestudiengang(vorlage_kurzbz,studiengang_kz,version,text,oe_kurzbz,style,berechtigung,anmerkung_vorlagestudiengang,aktiv,sprache,subject,orgform_kurzbz) VALUES(".
 					$this->db_add_param($this->vorlage_kurzbz).','.
 					$this->db_add_param($this->studiengang_kz).','.
 					$this->db_add_param($this->version).','.
@@ -345,7 +354,10 @@ class vorlage extends basis_db
 					$this->db_add_param($this->style).','.
 					$this->db_add_param($this->berechtigung).','.
 					$this->db_add_param($this->anmerkung_vorlagestudiengang).','.
-					$this->db_add_param($this->aktiv, FHC_BOOLEAN).');';
+					$this->db_add_param($this->aktiv, FHC_BOOLEAN).','.
+					$this->db_add_param($this->sprache).','.
+					$this->db_add_param($this->subject).','.
+					$this->db_add_param($this->orgform_kurzbz).');';
 		}
 		else
 		{
@@ -358,7 +370,10 @@ class vorlage extends basis_db
 							style='.$this->db_add_param($this->style).',
 							berechtigung='.$this->db_add_param($this->berechtigung).',
 							aktiv='.$this->db_add_param($this->aktiv, FHC_BOOLEAN).',
-							anmerkung_vorlagestudiengang='.$this->db_add_param($this->anmerkung_vorlagestudiengang).'
+							anmerkung_vorlagestudiengang='.$this->db_add_param($this->anmerkung_vorlagestudiengang).',
+							sprache='.$this->db_add_param($this->sprache).',
+							subject='.$this->db_add_param($this->subject).',
+							orgform_kurzbz='.$this->db_add_param($this->orgform_kurzbz).'
 					WHERE vorlagestudiengang_id='.$this->db_add_param($this->vorlagestudiengang_id).';';
 		}
 
@@ -508,6 +523,9 @@ class vorlage extends basis_db
 				$this->berechtigung = $this->db_parse_array($row->berechtigung);
 				$this->anmerkung_vorlagestudiengang = $row->anmerkung_vorlagestudiengang;
 				$this->aktiv = $this->db_parse_bool($row->aktiv);
+				$this->sprache = $row->sprache;
+				$this->subject = $row->subject;
+				$this->orgform_kurzbz = $row->orgform_kurzbz;
 
 				return true;
 			}
