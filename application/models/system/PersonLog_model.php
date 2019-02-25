@@ -1,19 +1,13 @@
 <?php
-/**
- * PersonLog Extends from CI_Model instead of DB_Model
- * to be able to write Log without a loggedin User!
- */
-class PersonLog_model extends CI_Model
-{
-	private $dbTable;
 
+class PersonLog_model extends DB_Model
+{
 	/**
 	 * Constructor
 	 */
 	public function __construct()
 	{
 		parent::__construct();
-		$this->load->database();
 
 		$this->dbTable = 'system.tbl_log';
 	}
@@ -91,7 +85,7 @@ class PersonLog_model extends CI_Model
 		$this->db->order_by('zeitpunkt', 'DESC');
 		$this->db->order_by('log_id', 'DESC');
 
-		$where = "logtype_kurzbz = 'Processstate' 
+		$where = "logtype_kurzbz = 'Processstate'
 					AND person_id=".$this->db->escape($person_id)."
 					AND zeitpunkt >= now()";
 

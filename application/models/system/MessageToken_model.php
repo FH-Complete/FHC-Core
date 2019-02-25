@@ -1,27 +1,16 @@
 <?php
 
-/**
- * This model was implemented to let to operate with messages
- * without authentication. It's ugly but useful.
- */
-class MessageToken_model extends CI_Model
+class MessageToken_model extends DB_Model
 {
 	/**
 	 * Constructor
-	 * NOTE: here are loaded libs, models, helpers, etc. because MessageToken_model extends directly the CI_Model
 	 */
 	public function __construct()
 	{
 		parent::__construct();
 
-		// Loads config file message
+		// Loads message configuration
 		$this->config->load('message');
-
-		// Load return message helper
-		$this->load->helper('hlp_message');
-
-		// Loads the database object
-		$this->load->database();
 	}
 
 	/**
