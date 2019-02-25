@@ -56,6 +56,11 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 		</menupopup>
 	</popupset>
 	<popupset>
+		<menupopup id="lehrveranstaltung-detail-gruppe-direkt-tree-popup">
+			<menuitem label="Entfernen" oncommand="LeGruppeDirektDel();" />
+		</menupopup>
+	</popupset>
+	<popupset>
 		<menupopup id="lehrveranstaltung-lektor-tree-popup">
 			<menuitem label="Entfernen" oncommand="LeMitarbeiterDel();" />
 			<?php
@@ -244,60 +249,118 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 	</hbox>
 
 	<!-- ************* GRUPPEN ************** -->
-	<label id="lehrveranstaltung-detail-label-lehreinheitgruppe" value="Gruppen" />
-	<vbox flex="1">
+	<vbox flex="1" id="lehrveranstaltung-detail-gruppen-box">
 		<hbox flex="7">
-			<tree id="lehrveranstaltung-detail-tree-lehreinheitgruppe" seltype="single" hidecolumnpicker="false" flex="1" disabled="false"
-				  datasources="rdf:null"
-				  ref="http://www.technikum-wien.at/lehreinheitgruppe/liste"
-				  flags="dont-build-content"
-				  style="border: 1px solid black; min-height: 100px;"
-				  ondragdrop="nsDragAndDrop.drop(event,LeLvbgrpDDObserver)"
-				  ondrop="nsDragAndDrop.drop(event,LeLvbgrpDDObserver)"
-				  ondragover="nsDragAndDrop.dragOver(event,LeLvbgrpDDObserver)"
-  				  ondragenter="nsDragAndDrop.dragEnter(event,LeLvbgrpDDObserver)"
-				  ondragexit="nsDragAndDrop.dragExit(event,LeLvbgrpDDObserver)"
-				  context="lehrveranstaltung-detail-gruppe-tree-popup"
-				  onkeypress="LvDetailGruppenTreeKeyPress(event)"
-			>
-				<treecols>
-					<treecol id="lehrveranstaltung-lehreinheitgruppe-treecol-bezeichnung" label="Bezeichnung" flex="4" hidden="false"  persist="hidden, width, ordinal"
-							 class="sortDirectionIndicator"
-							 sort="rdf:http://www.technikum-wien.at/lehreinheitgruppe/rdf#bezeichnung" />
-					<splitter class="tree-splitter"/>
-					<treecol id="lehrveranstaltung-lehreinheitgruppe-treecol-beschreibung" label="Beschreibung" flex="2" hidden="true"  persist="hidden, width, ordinal"
-							 class="sortDirectionIndicator"
-							 sort="rdf:http://www.technikum-wien.at/lehreinheitgruppe/rdf#beschreibung" />
-					<treecol id="lehrveranstaltung-lehreinheitgruppe-treecol-studiengang" label="Studiengang" flex="2" hidden="true"  persist="hidden, width, ordinal"
-							 class="sortDirectionIndicator"
-							 sort="rdf:http://www.technikum-wien.at/lehreinheitgruppe/rdf#studiengang_bezeichnung" />
-					<treecol id="lehrveranstaltung-lehreinheitgruppe-treecol-semester" label="Semester" flex="2" hidden="true"  persist="hidden, width, ordinal"
-							 class="sortDirectionIndicator"
-							 sort="rdf:http://www.technikum-wien.at/lehreinheitgruppe/rdf#semester" />
-					<treecol id="lehrveranstaltung-lehreinheitgruppe-treecol-lehreinheitgruppe_id" label="ID" flex="2" hidden="true"  persist="hidden, width, ordinal"
-							 class="sortDirectionIndicator"
-							 sort="rdf:http://www.technikum-wien.at/lehreinheitgruppe/rdf#lehreinheitgruppe_id" />
-					 <treecol id="lehrveranstaltung-lehreinheitgruppe-treecol-verplant" label="verplant" flex="1" hidden="false"  persist="hidden, width, ordinal"
- 							 class="sortDirectionIndicator"
- 							 sort="rdf:http://www.technikum-wien.at/lehreinheitgruppe/rdf#verplant" />
-				</treecols>
-				<template>
-					<rule>
-						<treechildren>
-							<treeitem uri="rdf:*">
-								<treerow>
-									<treecell label="rdf:http://www.technikum-wien.at/lehreinheitgruppe/rdf#bezeichnung"   />
-									<treecell label="rdf:http://www.technikum-wien.at/lehreinheitgruppe/rdf#beschreibung"   />
-									<treecell label="rdf:http://www.technikum-wien.at/lehreinheitgruppe/rdf#studiengang_bezeichnung"   />
-									<treecell label="rdf:http://www.technikum-wien.at/lehreinheitgruppe/rdf#semester"   />
-									<treecell label="rdf:http://www.technikum-wien.at/lehreinheitgruppe/rdf#lehreinheitgruppe_id"   />
-									<treecell src="../skin/images/verplant_rdf:http://www.technikum-wien.at/lehreinheitgruppe/rdf#verplant^.png"   />
-				 				</treerow>
-				 			</treeitem>
-				 		</treechildren>
-				 	</rule>
-				</template>
-			</tree>
+			<vbox flex="2">
+				<label id="lehrveranstaltung-detail-label-lehreinheitgruppe" value="Gruppen" />
+				<tree id="lehrveranstaltung-detail-tree-lehreinheitgruppe" seltype="single" hidecolumnpicker="false" flex="1" disabled="false"
+					  datasources="rdf:null"
+					  ref="http://www.technikum-wien.at/lehreinheitgruppe/liste"
+					  flags="dont-build-content"
+					  style="border: 1px solid black; min-height: 100px;"
+					  ondragdrop="nsDragAndDrop.drop(event,LeLvbgrpDDObserver)"
+					  ondrop="nsDragAndDrop.drop(event,LeLvbgrpDDObserver)"
+					  ondragover="nsDragAndDrop.dragOver(event,LeLvbgrpDDObserver)"
+						  ondragenter="nsDragAndDrop.dragEnter(event,LeLvbgrpDDObserver)"
+					  ondragexit="nsDragAndDrop.dragExit(event,LeLvbgrpDDObserver)"
+					  context="lehrveranstaltung-detail-gruppe-tree-popup"
+					  onkeypress="LvDetailGruppenTreeKeyPress(event)"
+				>
+					<treecols>
+						<treecol id="lehrveranstaltung-lehreinheitgruppe-treecol-bezeichnung" label="Bezeichnung" flex="4" hidden="false"  persist="hidden, width, ordinal"
+								 class="sortDirectionIndicator"
+								 sort="rdf:http://www.technikum-wien.at/lehreinheitgruppe/rdf#bezeichnung" />
+						<splitter class="tree-splitter"/>
+						<treecol id="lehrveranstaltung-lehreinheitgruppe-treecol-beschreibung" label="Beschreibung" flex="2" hidden="true"  persist="hidden, width, ordinal"
+								 class="sortDirectionIndicator"
+								 sort="rdf:http://www.technikum-wien.at/lehreinheitgruppe/rdf#beschreibung" />
+						<treecol id="lehrveranstaltung-lehreinheitgruppe-treecol-studiengang" label="Studiengang" flex="2" hidden="true"  persist="hidden, width, ordinal"
+								 class="sortDirectionIndicator"
+								 sort="rdf:http://www.technikum-wien.at/lehreinheitgruppe/rdf#studiengang_bezeichnung" />
+						<treecol id="lehrveranstaltung-lehreinheitgruppe-treecol-semester" label="Semester" flex="2" hidden="true"  persist="hidden, width, ordinal"
+								 class="sortDirectionIndicator"
+								 sort="rdf:http://www.technikum-wien.at/lehreinheitgruppe/rdf#semester" />
+						<treecol id="lehrveranstaltung-lehreinheitgruppe-treecol-lehreinheitgruppe_id" label="ID" flex="2" hidden="true"  persist="hidden, width, ordinal"
+								 class="sortDirectionIndicator"
+								 sort="rdf:http://www.technikum-wien.at/lehreinheitgruppe/rdf#lehreinheitgruppe_id" />
+						 <treecol id="lehrveranstaltung-lehreinheitgruppe-treecol-verplant" label="verplant" flex="1" hidden="false"  persist="hidden, width, ordinal"
+									 class="sortDirectionIndicator"
+									 sort="rdf:http://www.technikum-wien.at/lehreinheitgruppe/rdf#verplant" />
+					</treecols>
+					<template>
+						<rule>
+							<treechildren>
+								<treeitem uri="rdf:*">
+									<treerow>
+										<treecell label="rdf:http://www.technikum-wien.at/lehreinheitgruppe/rdf#bezeichnung"   />
+										<treecell label="rdf:http://www.technikum-wien.at/lehreinheitgruppe/rdf#beschreibung"   />
+										<treecell label="rdf:http://www.technikum-wien.at/lehreinheitgruppe/rdf#studiengang_bezeichnung"   />
+										<treecell label="rdf:http://www.technikum-wien.at/lehreinheitgruppe/rdf#semester"   />
+										<treecell label="rdf:http://www.technikum-wien.at/lehreinheitgruppe/rdf#lehreinheitgruppe_id"   />
+										<treecell src="../skin/images/verplant_rdf:http://www.technikum-wien.at/lehreinheitgruppe/rdf#verplant^.png"   />
+					 				</treerow>
+					 			</treeitem>
+					 		</treechildren>
+					 	</rule>
+					</template>
+				</tree>
+			</vbox>
+			<spacer flex="1"/>
+			<vbox flex="2">
+				<label id="lehrveranstaltung-detail-label-lehreinheitgruppe-direkt" value="Direkt zugeordnete Personen" />
+				<tree id="lehrveranstaltung-detail-tree-lehreinheitgruppe-direkt" seltype="single" hidecolumnpicker="false" flex="1" disabled="false"
+					  datasources="rdf:null"
+					  ref="http://www.technikum-wien.at/lehreinheitdirekt"
+					  flags="dont-build-content"
+					  style="border: 1px solid black; min-height: 100px;"
+					  context="lehrveranstaltung-detail-gruppe-direkt-tree-popup"
+				>
+					<treecols>
+						<treecol id="lehrveranstaltung-lehreinheitgruppedirekt-treecol-uid" label="UID" flex="4" hidden="false"  persist="hidden, width, ordinal"
+								 class="sortDirectionIndicator"
+								 sort="rdf:http://www.technikum-wien.at/lehreinheitdirekt/rdf#uid" />
+						<splitter class="tree-splitter"/>
+						<treecol id="lehrveranstaltung-lehreinheitgruppedirekt-treecol-vorname" label="Vorname" flex="2" hidden="false"  persist="hidden, width, ordinal"
+								 class="sortDirectionIndicator"
+								 sort="rdf:http://www.technikum-wien.at/lehreinheitdirekt/rdf#vorname" />
+						<treecol id="lehrveranstaltung-lehreinheitgruppedirekt-treecol-nachname" label="Nachname" flex="2" hidden="false"  persist="hidden, width, ordinal"
+								 class="sortDirectionIndicator"
+								 sort="rdf:http://www.technikum-wien.at/lehreinheitdirekt/rdf#nachname" />
+						 <treecol id="lehrveranstaltung-lehreinheitgruppedirekt-treecol-gruppe_kurzbz" label="Gruppe" flex="2" hidden="true"  persist="hidden, width, ordinal"
+								 class="sortDirectionIndicator"
+								 sort="rdf:http://www.technikum-wien.at/lehreinheitdirekt/rdf#gruppe_kurzbz" />
+					</treecols>
+					<template>
+						<rule>
+							<treechildren>
+								<treeitem uri="rdf:*">
+									<treerow>
+										<treecell label="rdf:http://www.technikum-wien.at/lehreinheitdirekt/rdf#uid"   />
+										<treecell label="rdf:http://www.technikum-wien.at/lehreinheitdirekt/rdf#vorname"   />
+										<treecell label="rdf:http://www.technikum-wien.at/lehreinheitdirekt/rdf#nachname"   />
+										<treecell label="rdf:http://www.technikum-wien.at/lehreinheitdirekt/rdf#gruppe_kurzbz"   />
+									</treerow>
+								</treeitem>
+							</treechildren>
+						</rule>
+					</template>
+				</tree>
+				<hbox>
+					<menulist id="lehrveranstaltung-lehreinheitgruppedirekt-textbox-user"
+						editable="true" datasources="rdf:null" flex="1"
+						ref="http://www.technikum-wien.at/benutzer"
+						oninput="LeGruppeDirektLoad(this)">
+							<template>
+								<menupopup>
+									<menuitem value="rdf:http://www.technikum-wien.at/benutzer/rdf#uid"
+										label="rdf:http://www.technikum-wien.at/benutzer/rdf#nachname rdf:http://www.technikum-wien.at/benutzer/rdf#vorname rdf:http://www.technikum-wien.at/benutzer/rdf#uid rdf:http://www.technikum-wien.at/benutzer/rdf#studiengang rdf:http://www.technikum-wien.at/benutzer/rdf#semester"
+										uri="rdf:*"/>
+								</menupopup>
+							</template>
+					</menulist>
+					<button label="zuordnen" oncommand="LeGruppeDirektAdd()" />
+				</hbox>
+			</vbox>
 			<spacer flex="2"/>
 		</hbox>
 		<spacer flex="1"/>

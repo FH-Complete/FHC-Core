@@ -429,4 +429,23 @@ class Studiengang_model extends DB_Model
 
 		return $this->execQuery($query, array($studiensemester_kurzbz));
 	}
+
+	/**
+	 * Loads degree programs of the given type
+	 * @param string $typ Type of degree programs to be loaded
+	 * @return array
+	 */
+	public function loadStudiengaengeFromTyp($typ)
+	{
+		$query = "SELECT
+					distinct tbl_studiengang.*
+				FROM
+					public.tbl_studiengang
+				WHERE
+					tbl_studiengang.typ=?
+				ORDER BY
+					kurzbz";
+
+		return $this->execQuery($query, array($typ));
+	}
 }

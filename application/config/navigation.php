@@ -1,6 +1,4 @@
 <?php
-
-// --------------------------------------------------------------------------------------------------------------------
 // Header menu
 
 $config['navigation_header'] = array(
@@ -22,16 +20,8 @@ $config['navigation_header'] = array(
 					'icon' => '',
 					'description' => 'Vilesci',
 					'expand' => true,
-					'sort' => 1,
-					'requiredPermissions' => 'basis/vilesci:r'
-				),
-				'reihungstest' => array(
-					'link' => site_url('organisation/Reihungstest'),
-					'icon' => 'list-ol',
-					'description' => 'Reihungstests',
-					'expand' => true,
 					'sort' => 10,
-					'requiredPermissions' => 'infocenter:r'
+					'requiredPermissions' => 'basis/vilesci:r'
 				)
 			)
 		),
@@ -47,12 +37,18 @@ $config['navigation_header'] = array(
 					'description' => 'CIS',
 					'sort' => 10
 				),
-				'infocenter' => array(
-					'link' => site_url('system/infocenter/InfoCenter'),
-					'icon' => 'info',
-					'description' => 'Infocenter',
+				'reihungstest' => array(
+					'link' => site_url('organisation/Reihungstest'),
+					'description' => 'Reihungstests',
 					'expand' => true,
 					'sort' => 20,
+					'requiredPermissions' => 'infocenter:r'
+				),
+				'infocenter' => array(
+					'link' => site_url('system/infocenter/InfoCenter'),
+					'description' => 'Infocenter',
+					'expand' => true,
+					'sort' => 30,
 					'requiredPermissions' => 'infocenter:r'
 				),
 			)
@@ -67,6 +63,23 @@ $config['navigation_header'] = array(
 					'link' => site_url('person/BPKWartung'),
 					'icon' => '',
 					'description' => 'BPK Wartung',
+					'sort' => 10,
+					'requiredPermissions' => 'admin:r'
+				)
+			)
+		),
+		'Administration' => array(
+			'link' => '#',
+			'icon' => 'gear',
+			'description' => 'Administration',
+			'expand' => false,
+			'sort' => 50,
+			'requiredPermissions' => 'admin:r',
+			'children'=> array(
+				'extensions' => array(
+					'link' => site_url('system/extensions/Manager'),
+					'description' => 'Extensions Manager',
+					'expand' => true,
 					'sort' => 10,
 					'requiredPermissions' => 'admin:r'
 				)
@@ -86,55 +99,6 @@ $config['navigation_menu']['Vilesci/index'] = array(
 		'description' => 'Dashboard',
 		'icon' => 'dashboard',
 		'sort' => 1
-	),
-	'lehre' => array(
-		'link' => '#',
-		'icon' => 'graduation-cap',
-		'description' => 'Lehre',
-		'expand' => true,
-		'sort' => 2,
-		'children'=> array(
-			'cis' => array(
-				'link' => CIS_ROOT,
-				'icon' => '',
-				'description' => 'CIS',
-				'expand' => true,
-				'sort' => 1
-			),
-			'infocenter' => array(
-				'link' => site_url('system/infocenter/InfoCenter'),
-				'icon' => 'info',
-				'description' => 'Infocenter',
-				'expand' => true,
-				'sort' => 2,
-				'requiredPermissions' => 'infocenter:r'
-			),
-		)
-	),
-	'administration' => array(
-		'link' => '#',
-		'icon' => 'gear',
-		'description' => 'Administration',
-		'expand' => false,
-		'sort' => 3,
-		'children'=> array(
-			'vilesci' => array(
-				'link' => base_url('vilesci'),
-				'icon' => '',
-				'description' => 'Vilesci',
-				'expand' => true,
-				'sort' => 1,
-				'requiredPermissions' => 'basis/vilesci:r'
-			),
-			'extensions' => array(
-				'link' => site_url('system/extensions/Manager'),
-				'icon' => 'cubes',
-				'description' => 'Extensions Manager',
-				'expand' => true,
-				'sort' => 2,
-				'requiredPermissions' => 'admin:r'
-			)
-		)
 	)
 );
 

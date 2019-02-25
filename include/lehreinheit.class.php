@@ -524,6 +524,9 @@ class lehreinheit extends basis_db
 			//Gruppen / Verbaende pruefen
 			$sql_query="SELECT $stpl_id, studiengang_kz, semester, verband, gruppe_kurzbz, stunde, gruppe FROM $stpl_table
 					WHERE datum=".$this->db_add_param($datum)." AND stunde=".$this->db_add_param($stunde);
+
+			// Direkte Lehreinheitsgruppen kollidieren nicht
+			$sql_query.=" AND NOT EXISTS(SELECT 1 FROM public.tbl_gruppe g WHERE g.gruppe_kurzbz=$stpl_table.gruppe_kurzbz AND direktinskription=true)";
 			if (is_numeric($this->unr))
 				$sql_query.=" AND unr!=".$this->db_add_param($this->unr)." AND (1=2 ";
 
@@ -532,7 +535,9 @@ class lehreinheit extends basis_db
 				$sql_query.=" OR ((studiengang_kz=".$this->db_add_param($this->studiengang_kz[$anz])." AND semester=".$this->db_add_param($this->semester[$anz]).")";
 
 				if ($this->gruppe_kurzbz[$anz]!=null && $this->gruppe_kurzbz[$anz]!='' && $this->gruppe_kurzbz[$anz]!=' ')
+				{
 					$sql_query.=" OR (gruppe_kurzbz=".$this->db_add_param($this->gruppe_kurzbz[$anz]).")";
+				}
 				else
 				{
 					if ($this->verband[$anz]!=null && $this->verband[$anz]!='' && $this->verband[$anz]!=' ')

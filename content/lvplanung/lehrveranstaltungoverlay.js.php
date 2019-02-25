@@ -29,6 +29,7 @@ require_once('../../config/vilesci.config.inc.php');
 var LeDetailLehrfach_id; //Lehrfach_id die nach dem Laden markiert werden soll
 var LeDetailLehrfach_label; //Bezeichnung des Lehrfachs das markiert werden soll
 var LeDetailGruppeDatasource; //Datasource fuer Gruppen DropDown
+var LeDetailGruppeDirektDatasource; //Datasource fuer Direkt-Gruppen DropDown
 var LeDetailLektorDatasource; //Datasource fuer Lektren DropDown
 var LvAngebotGruppenDatasource; //Datasource fuer LV-Angebot Gruppen
 var LvSelectLehreinheit_id; //Lehreinheit_id die nach dem Rebuild des Trees markiert werden soll
@@ -335,8 +336,7 @@ function LeNeu()
 	document.getElementById('lehrveranstaltung-tabbox').selectedIndex=0;
 
 	//Lektor-Tab und GruppenTree ausblenden
-	document.getElementById('lehrveranstaltung-detail-tree-lehreinheitgruppe').hidden=true;
-	document.getElementById('lehrveranstaltung-detail-label-lehreinheitgruppe').hidden=true;
+	document.getElementById('lehrveranstaltung-detail-gruppen-box').hidden=true;
 	document.getElementById('lehrveranstaltung-tab-lektor').collapsed=true;
 
 	//Lehrveranstaltungs_id holen
@@ -613,6 +613,7 @@ function LeDetailDisableFields(val)
 	document.getElementById('lehrveranstaltung-detail-textbox-unr').disabled=val;
 	document.getElementById('lehrveranstaltung-detail-textbox-lehrveranstaltung').disabled=val;
 	document.getElementById('lehrveranstaltung-detail-textbox-gewicht').disabled=val;
+	document.getElementById('lehrveranstaltung-lehreinheitgruppedirekt-textbox-user').disabled=val;
 }
 
 // ****
@@ -725,8 +726,7 @@ function LeAuswahl()
 	//Felder bei Lektorenzuordnung deaktivieren
 	LeMitarbeiterDisableFields(true);
 
-	document.getElementById('lehrveranstaltung-detail-tree-lehreinheitgruppe').hidden=false;
-	document.getElementById('lehrveranstaltung-detail-label-lehreinheitgruppe').hidden=false;
+	document.getElementById('lehrveranstaltung-detail-gruppen-box').hidden=false;
 	document.getElementById('lehrveranstaltung-tab-lektor').collapsed=false;
 
 	lehrveranstaltungNotenTreeloaded=false;
@@ -987,11 +987,58 @@ function LeAuswahl()
 		debug(e);
 	}
 
+	//Lehreinheitgruppe Direktzuordnung tree setzen
+	url='<?php echo APP_ROOT; ?>rdf/lehreinheit_direkt.rdf.php?lehreinheit_id='+lehreinheit_id+"&"+gettimestamp();
+
+	try
+	{
+		direkttree = document.getElementById('lehrveranstaltung-detail-tree-lehreinheitgruppe-direkt');
+
+		//Alte DS entfernen
+		var oldDatasources = direkttree.database.GetDataSources();
+		while(oldDatasources.hasMoreElements())
+		{
+			direkttree.database.RemoveDataSource(oldDatasources.getNext());
+		}
+		//Refresh damit die entfernten DS auch wirklich entfernt werden
+		direkttree.builder.rebuild();
+
+		var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
+		LeDetailGruppeDirektDatasource = rdfService.GetDataSource(url);
+		LeDetailGruppeDirektDatasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
+		LeDetailGruppeDirektDatasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
+		direkttree.database.AddDataSource(LeDetailGruppeDirektDatasource);
+	}
+	catch(e)
+	{
+		debug(e);
+	}
+
 	// Notizen Laden
 	var lehreinheitnotiz = document.getElementById('lehrveranstaltung-box-notizen');
 	lehreinheitnotiz.LoadNotizTree('','','','','','','','',lehreinheit_id);
 }
 
+function LvDetailsGetCurrentLehreinheitId()
+{
+	var tree = document.getElementById('lehrveranstaltung-tree');
+
+	if (tree.currentIndex==-1)
+		return;
+	try
+	{
+		//Ausgewaehlte Lehreinheit holen
+		var col = tree.columns ? tree.columns["lehrveranstaltung-treecol-lehreinheit_id"] : "lehrveranstaltung-treecol-lehreinheit_id";
+		var lehreinheit_id=tree.view.getCellText(tree.currentIndex,col);
+
+		if(lehreinheit_id!='')
+			return lehreinheit_id;
+	}
+	catch(e)
+	{}
+
+	return false;
+}
 //******** LehreinheitMitarbeiter **********//
 
 // ****
@@ -1303,6 +1350,151 @@ function LeLektorTreeRefresh()
 }
 
 // ************* GRUPPEN ******************** //
+
+// ****
+// * Laedt das Dropdown fuer die Auswahl der Benutzer
+// *  bei direkter Gruppenzuordnung
+// ****
+function LeGruppeDirektLoad(menulist, filter)
+{
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+
+	if(typeof(filter) == 'undefined')
+		v = menulist.value;
+	else
+		v = filter;
+
+	if(v.length > 2)
+	{
+		var url = '<?php echo APP_ROOT; ?>rdf/benutzer.rdf.php?filter=' + encodeURIComponent(v) + '&' + gettimestamp();
+
+		var oldDatasources = menulist.database.GetDataSources();
+		while(oldDatasources.hasMoreElements())
+		{
+			menulist.database.RemoveDataSource(oldDatasources.getNext());
+		}
+
+		//Refresh damit die entfernten DS auch wirklich entfernt werden
+		menulist.builder.rebuild();
+
+		var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
+		if(typeof(filter) == 'undefined')
+			var datasource = rdfService.GetDataSource(url);
+		else
+			var datasource = rdfService.GetDataSourceBlocking(url);
+
+		datasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
+		datasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
+		menulist.database.AddDataSource(datasource);
+		if(typeof(filter) != 'undefined')
+			menulist.builder.rebuild();
+	}
+}
+// ****
+// * Loescht eine Person die direkt zu einer Lehreinheit zugeordnet ist
+// *****
+function LeGruppeDirektDel()
+{
+	tree = document.getElementById('lehrveranstaltung-detail-tree-lehreinheitgruppe-direkt');
+
+	//Nachsehen ob Gruppe markiert wurde
+	var idx;
+	if(tree.currentIndex>=0)
+		idx = tree.currentIndex;
+	else
+	{
+		alert('Bitte zuerst einen Eintrag markieren');
+		return false;
+	}
+
+	try
+	{
+		var col = tree.columns ? tree.columns["lehrveranstaltung-lehreinheitgruppedirekt-treecol-gruppe_kurzbz"] : "lehrveranstaltung-lehreinheitgruppedirekt-treecol-gruppe_kurzbz";
+		var gruppe_kurzbz=tree.view.getCellText(idx,col);
+		var col = tree.columns ? tree.columns["lehrveranstaltung-lehreinheitgruppedirekt-treecol-uid"] : "lehrveranstaltung-lehreinheitgruppedirekt-treecol-uid";
+		var uid=tree.view.getCellText(idx,col);
+		var lehreinheit_id = LvDetailsGetCurrentLehreinheitId();
+	}
+	catch(e)
+	{
+		alert(e);
+		return false;
+	}
+
+	var req = new phpRequest('lvplanung/lehrveranstaltungDBDML.php','','');
+	neu = document.getElementById('lehrveranstaltung-detail-checkbox-new').checked;
+
+	req.add('type', 'lehreinheit_gruppe_direkt_del');
+	req.add('gruppe_kurzbz', gruppe_kurzbz);
+	req.add('uid', uid);
+	req.add('lehreinheit_id', lehreinheit_id);
+
+	var response = req.executePOST();
+	var val =  new ParseReturnValue(response)
+
+	if (!val.dbdml_return)
+	{
+		alert(val.dbdml_errormsg)
+	}
+	else
+	{
+		//Refresh des Trees
+		LeDetailGruppeDirektTreeRefresh();
+	}
+}
+
+// ****
+// * Fuegt eine Person zu einer Lehreinheit hinzu
+// * Zuordnung erfolgt ueber eine direkte Gruppenzuordnung
+// ****
+function LeGruppeDirektAdd()
+{
+	var user = MenulistGetSelectedValue('lehrveranstaltung-lehreinheitgruppedirekt-textbox-user');
+	var lehreinheit_id = LvDetailsGetCurrentLehreinheitId();
+
+	if(lehreinheit_id=='')
+	{
+		alert("Lehreinheit wurde nicht gefunden. Daten wurden nicht gespeichert!");
+		return;
+	}
+
+	var req = new phpRequest('lvplanung/lehrveranstaltungDBDML.php','','');
+
+	req.add('type', 'lehreinheit_direkt_user_add');
+	req.add('lehreinheit_id', lehreinheit_id);
+	req.add('uid', user);
+
+	var response = req.executePOST();
+	var val =  new ParseReturnValue(response)
+
+	if (!val.dbdml_return)
+	{
+		alert(val.dbdml_errormsg)
+	}
+	else
+	{
+		//Refresh des Trees
+		LeDetailGruppeDirektTreeRefresh();
+	}
+}
+
+// ****
+// * Refresht den Tree mit den direkt Zugeordneten Personen
+// ****
+function LeDetailGruppeDirektTreeRefresh()
+{
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+	try
+	{
+		LeDetailGruppeDirektDatasource.Refresh(true); //Blocking
+		gruppentree = document.getElementById('lehrveranstaltung-detail-tree-lehreinheitgruppe-direkt');
+		gruppentree.builder.rebuild();
+	}
+	catch(e)
+	{
+		debug(e);
+	}
+}
 
 // ****
 // * Loescht die Zuordnung einer Gruppe zu einer

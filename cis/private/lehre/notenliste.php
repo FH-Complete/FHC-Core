@@ -184,30 +184,51 @@ else
 	
 	// Erstes und letztes Studiensemester mit Studenten-Status ermitteln
 	$prestudent = new prestudent();
-	$prestudent->getFirstStatus($prestudent_id, 'Student');
-	$firstStudiensemester = $prestudent->studiensemester_kurzbz;
-	$prestudent->getLastStatus($prestudent_id, null, 'Student');
-	$lastStudiensemester = $prestudent->studiensemester_kurzbz;
-	
+	// Wenn Incoming, dann Incomingstatus laden, sonst Studentenstatus
+	$prestudent->getPrestudentRolle($prestudent_id, 'Incoming');
+	if(count($prestudent->result) > 0)
+	{
+		$prestudent->getFirstStatus($prestudent_id, 'Incoming');
+		$firstStudiensemester = $prestudent->studiensemester_kurzbz;
+		$prestudent->getLastStatus($prestudent_id, null, 'Incoming');
+		$lastStudiensemester = $prestudent->studiensemester_kurzbz;
+	}
+	else
+	{
+		$prestudent->getFirstStatus($prestudent_id, 'Student');
+		$firstStudiensemester = $prestudent->studiensemester_kurzbz;
+		$prestudent->getLastStatus($prestudent_id, null, 'Student');
+		$lastStudiensemester = $prestudent->studiensemester_kurzbz;
+	}
+
 	$stsem_obj->getStudiensemesterBetween($firstStudiensemester, $lastStudiensemester);
 	
 	echo "<br />";
 	echo "<b>".$p->t('global/name').":</b> $vorname $nachname<br />";
 	echo "<b>".$p->t('global/studiengang').":</b>  $studiengang_bezeichnung<br />";
 	echo "<b>".$p->t('global/studiensemester')."</b> <SELECT name='stsem' onChange=\"MM_jumpMenu('self',this,0)\">";
-    echo "<OPTION value='notenliste.php?stsem=alle".$getParam."'>alle Semester</OPTION>";
+    echo "<OPTION value='notenliste.php?stsem=alle".$getParam."'>".$p->t('news/allesemester')."</OPTION>";
+	$notenImAktuellenStSem = false;
 	foreach ($stsem_obj->studiensemester as $semrow)
 	{
 		if ($stsem == $semrow->studiensemester_kurzbz)
+		{
 			echo "<OPTION value='notenliste.php?stsem=" . $semrow->studiensemester_kurzbz . $getParam . "' selected>$semrow->studiensemester_kurzbz</OPTION>";
+			$notenImAktuellenStSem = true;
+		}
 		else
+		{
 			echo "<OPTION value='notenliste.php?stsem=" . $semrow->studiensemester_kurzbz . $getParam . "'>$semrow->studiensemester_kurzbz</OPTION>";
+		}
 	}
 	echo "</SELECT><br />";
 	
 	// echo "Datum: ".date('d.m.Y')."<br />";
 	echo "<br />";
-	
+	if ($notenImAktuellenStSem == false)
+	{
+		$stsem = 'alle';
+	}
 	// Lehrveranstaltungen und Noten holen
 	if ($stsem != "alle")
 	{

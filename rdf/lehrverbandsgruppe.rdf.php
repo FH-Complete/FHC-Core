@@ -98,11 +98,19 @@ if (count($berechtigt_studiengang)>0)
 	if (isset($_GET['studiengang_kz']))
 		$stg_kz_query='AND tbl_lehrverband.studiengang_kz='.$dbo->db_add_param($_GET['studiengang_kz'], FHC_INTEGER);
 
-	$sql_query="SELECT tbl_lehrverband.studiengang_kz, tbl_studiengang.bezeichnung, kurzbz,kurzbzlang, typ, tbl_lehrverband.semester, verband, gruppe, gruppe_kurzbz, tbl_lehrverband.bezeichnung AS lvb_bezeichnung, tbl_gruppe.bezeichnung AS grp_bezeichnung
-				FROM (public.tbl_studiengang JOIN public.tbl_lehrverband USING (studiengang_kz))
-					LEFT OUTER JOIN public.tbl_gruppe  ON (tbl_lehrverband.studiengang_kz=tbl_gruppe.studiengang_kz AND tbl_lehrverband.semester=tbl_gruppe.semester AND (tbl_lehrverband.verband='') AND tbl_gruppe.lehre AND tbl_gruppe.aktiv)
-				WHERE tbl_lehrverband.aktiv $stg_kz_query
-				ORDER BY erhalter_kz,typ, kurzbz, semester,verband,gruppe, gruppe_kurzbz;";
+	$sql_query="
+	SELECT
+		tbl_lehrverband.studiengang_kz, tbl_studiengang.bezeichnung, kurzbz,kurzbzlang, typ,
+		tbl_lehrverband.semester, verband, gruppe, gruppe_kurzbz,
+		tbl_lehrverband.bezeichnung AS lvb_bezeichnung, tbl_gruppe.bezeichnung AS grp_bezeichnung
+	FROM
+		(public.tbl_studiengang JOIN public.tbl_lehrverband USING (studiengang_kz))
+		LEFT OUTER JOIN public.tbl_gruppe ON (tbl_lehrverband.studiengang_kz=tbl_gruppe.studiengang_kz AND tbl_lehrverband.semester=tbl_gruppe.semester AND (tbl_lehrverband.verband='') AND tbl_gruppe.lehre AND tbl_gruppe.aktiv)
+	WHERE
+		(tbl_gruppe.direktinskription is null or tbl_gruppe.direktinskription=false)
+		AND tbl_lehrverband.aktiv $stg_kz_query
+	ORDER BY
+		erhalter_kz,typ, kurzbz, semester,verband,gruppe, gruppe_kurzbz;";
 }
 else
 {
@@ -326,7 +334,7 @@ function draw_orgformsubmenu($stg_kz, $orgform)
 	$data = array();
 	$qry = "SELECT semester, verband, gruppe,'' as gruppe_kurzbz, bezeichnung, null as sort FROM public.tbl_lehrverband WHERE orgform_kurzbz=".$stg_obj->db_add_param($orgform)." AND studiengang_kz=".$stg_obj->db_add_param($stg_kz)." AND aktiv
 			UNION
-			SELECT semester, '' as verband, '' as gruppe, gruppe_kurzbz, bezeichnung, sort FROM public.tbl_gruppe WHERE studiengang_kz=".$stg_obj->db_add_param($stg_kz)." AND orgform_kurzbz=".$stg_obj->db_add_param($orgform)." AND lehre AND sichtbar
+			SELECT semester, '' as verband, '' as gruppe, gruppe_kurzbz, bezeichnung, sort FROM public.tbl_gruppe WHERE studiengang_kz=".$stg_obj->db_add_param($stg_kz)." AND orgform_kurzbz=".$stg_obj->db_add_param($orgform)." AND lehre AND sichtbar AND aktiv AND NOT direktinskription
 			UNION
 			SELECT semester, verband, gruppe,'' as gruppe_kurzbz, bezeichnung, null as sort FROM public.tbl_lehrverband WHERE studiengang_kz=".$stg_obj->db_add_param($stg_kz)." AND semester=0 AND aktiv
 			ORDER BY semester, verband, gruppe, sort, gruppe_kurzbz";
@@ -555,7 +563,7 @@ while ($row=$dbo->db_fetch_object())
 				<VERBAND:stsem><![CDATA[<?php echo $stsem->studiensemester_kurzbz; ?>]]></VERBAND:stsem>
 				<VERBAND:typ><![CDATA[reihungstestnichtangemeldet]]></VERBAND:typ>
 			</RDF:Description>
-			
+
 			<RDF:Description RDF:about="<?php echo $rdf_url.$stg_kurzbz.'/'.$stsem->studiensemester_kurzbz.'/interessenten/reihungstestangemeldet'; ?>" >
 				<VERBAND:name><![CDATA[Reihungstest angemeldet]]></VERBAND:name>
 				<VERBAND:stg><![CDATA[<?php echo $stg_kurzbz; ?>]]></VERBAND:stg>

@@ -31,6 +31,8 @@ require_once('../../include/benutzerberechtigung.class.php');
 require_once('../../include/organisationseinheit.class.php');
 require_once('../../include/studiengang.class.php');
 require_once('../../include/dokument.class.php');
+require_once('../../include/sprache.class.php');
+require_once('../../include/organisationsform.class.php');
 
 if (!$db = new basis_db())
 {
@@ -43,6 +45,8 @@ $oe_auswahl = (isset($_REQUEST['oe_auswahl']) ? $_REQUEST['oe_auswahl'] : $oe_ku
 $vorlage_kurzbz = (isset($_REQUEST['vorlage_kurzbz']) ? $_REQUEST['vorlage_kurzbz'] : null);
 $vorlagestudiengang_id = (isset($_REQUEST['vorlagestudiengang_id']) ? $_REQUEST['vorlagestudiengang_id'] : null);
 $neu = (isset($_REQUEST['neu']) ? true : false);
+$templatesprache = (isset($_REQUEST['templatesprache']) ? $_REQUEST['templatesprache'] : DEFAULT_LANGUAGE);
+$orgform_template = (isset($_REQUEST['orgform_template']) ? $_REQUEST['orgform_template'] : null);
 
 $studiengang = new studiengang();
 $studiengang->load('0');
@@ -67,6 +71,7 @@ echo '<!DOCTYPE HTML>
 		<script type="text/javascript" src="../../vendor/jquery/jqueryV1/jquery-1.12.4.min.js"></script>
 		<script type="text/javascript" src="../../vendor/christianbach/tablesorter/jquery.tablesorter.min.js"></script>
 		<script type="text/javascript" src="../../vendor/jquery/sizzle/sizzle.js"></script>
+		<script type="text/javascript" src="../../include/tiny_mce/tiny_mce.js"></script>
 		<script type="text/javascript">
 			$(document).ready(function()
 			{
@@ -79,14 +84,50 @@ echo '<!DOCTYPE HTML>
 			function confdel(val1,val2)
 			{
 				return confirm("Wollen Sie die Vorlage "+val1+" Version "+val2+" wirklich loeschen?");
-			}
+			};
+			tinyMCE.init({
+				mode: \'specific_textareas\',
+				editor_selector: "mceEditor",
+				theme: "advanced",
+				language: "de",
+				file_browser_callback: "FHCFileBrowser",
+				plugins: "spellchecker,pagebreak,style,layer,table,advhr,advimage,advlink,inlinepopups,searchreplace,print,contextmenu,paste,directionality,fullscreen,noneditable,visualchars,nonbreaking",
+				// Theme options
+				theme_advanced_buttons1: "code, bold,italic,underline,strikethrough,|,justifyleft,justifycenter,justifyright,justifyfull,|,formatselect,fontsizeselect",
+				theme_advanced_buttons2 : "cut,copy,paste,pastetext,pasteword,|,search,replace,|,bullist,numlist,|,outdent,indent,blockquote,|,undo,redo,|,link,unlink,anchor,image,cleanup,|,forecolor,backcolor",
+				theme_advanced_buttons3 : "tablecontrols,|,hr,removeformat,visualaid,|,sub,sup,|,charmap,|,print,|,ltr,rtl,|,fullscreen",
+				theme_advanced_toolbar_location: "top",
+				theme_advanced_toolbar_align: "center",
+				theme_advanced_statusbar_location: "bottom",
+				theme_advanced_resizing: true,
+				force_br_newlines: true,
+				force_p_newlines: false,
+				forced_root_block: \'\',
+				editor_deselector: "mceNoEditor",
+				content_css : "../../skin/styles/tinymce.css"
+			});
 		</script>
+		<style>
+		textarea
+		{
+			font-family: Tahoma, Arial, Helvetica, Verdana, Geneva, sans-serif; 
+			font-size: small;
+		}
+		#tinymce
+		{
+			font-size: 14px;
+		}
+		body
+		{
+			font-size: 14px;
+		}
+		</style>
 	</head>
 	<body class="Background_main">
 		<h2>Dokumentvorlagen Verwaltung</h2>';
 
 // Speichern einer Dokumentvorlage
-if(isset($_POST['speichern']))
+if(isset($_POST['speichern']) || isset($_POST['kopieren']))
 {
 
 	if(!$rechte->isBerechtigt('basis/dokumente', $oe_kurzbz, 'sui'))
@@ -106,11 +147,21 @@ if(isset($_POST['speichern']))
 
 		$dokumentvorlage->new=false;
 		$dokumentvorlage->vorlagestudiengang_id = $_POST['vorlagestudiengang_id'];
+		$dokumentvorlage->version = $_POST['version'];
 	}
 	else
 	{
 		//Neue Vorlage anlegen
 		$dokumentvorlage->new=true;
+		$dokumentvorlage->version = $_POST['version'];
+	}
+
+	if (isset($_POST['kopieren']))
+	{
+		$newVersion = new vorlage();
+		$newVersion = ($newVersion->getMaxVersion($_POST['oe_kurzbz'], $_POST['vorlage_kurzbz']))+1;
+		$dokumentvorlage->new=true;
+		$dokumentvorlage->version = $newVersion;
 	}
 
 	$studiengang = new studiengang();
@@ -123,13 +174,15 @@ if(isset($_POST['speichern']))
 
 	$dokumentvorlage->vorlage_kurzbz = $_POST['vorlage_kurzbz'];
 	$dokumentvorlage->studiengang_kz = $studiengang_kz;
-	$dokumentvorlage->version = $_POST['version'];
 	$dokumentvorlage->text = $_POST['content'];
 	$dokumentvorlage->oe_kurzbz = $_POST['oe_kurzbz'];
 	$dokumentvorlage->style = $_POST['style'];
 	$dokumentvorlage->berechtigung = $_POST['berechtigung'];
 	$dokumentvorlage->anmerkung_vorlagestudiengang = $_POST['anmerkung'];
 	$dokumentvorlage->aktiv = isset($_POST['aktiv']);
+	$dokumentvorlage->sprache = $templatesprache;
+	$dokumentvorlage->subject = $_POST['subject'];
+	$dokumentvorlage->orgform_kurzbz = $orgform_template;
 
 	if($dokumentvorlage->saveVorlageOE())
 	{
@@ -334,7 +387,7 @@ elseif (isset($_GET['vorlageBearbeiten']))
 					<tr>
 						<td>Vorlagenkurzbezeichnung</td>
 						<td>
-							<input type="text" size="50" maxlength="32" name="updateVorlage_vorlage_kurzbz" value="'.$db->convert_html_chars($vorlage->vorlage_kurzbz).'" disabled>
+							<input type="text" size="50" maxlength="32" name="updateVorlage_vorlage_kurzbz" value="'.$db->convert_html_chars($vorlage->vorlage_kurzbz).'">
 						</td>
 					</tr>
 					<tr>
@@ -392,7 +445,8 @@ elseif (isset($_GET['vorlageBearbeiten']))
 					<tr>
 						<td></td>
 						<td>
-							<input type="submit" value="Änderungen speichern">
+							<input type="submit" style="padding: 2px 4px" name="updateVorlage_speichern" value="Änderungen Speichern">&nbsp;&nbsp;
+							<input type="submit" style="padding: 2px 4px" name="updateVorlage_kopieren" value="Kopie anlegen">
 						</td>
 					</tr>
 				</table>
@@ -420,7 +474,16 @@ else
 	elseif (isset($_GET['updateVorlage']) && $_GET['updateVorlage'] == 'true')
 	{
 		$updatevorlage = new vorlage();
-		$updatevorlage->loadVorlage($_GET['vorlage_kurzbz']);
+
+		if (isset($_POST['updateVorlage_speichern']))
+		{
+			$updatevorlage->loadVorlage($_GET['vorlage_kurzbz']);
+		}
+		else
+		{
+			$updatevorlage->vorlage_kurzbz = htmlspecialchars($_POST['updateVorlage_vorlage_kurzbz']);
+		}
+
 		$updatevorlage->bezeichnung = htmlspecialchars($_POST['updateVorlage_bezeichnung']);
 		$updatevorlage->anmerkung = htmlspecialchars($_POST['updateVorlage_anmerkung']);
 		$updatevorlage->mimetype = htmlspecialchars($_POST['updateVorlage_mimetype']);
@@ -428,11 +491,14 @@ else
 		$updatevorlage->archivierbar = isset($_POST['updateVorlage_archivierbar']);
 		$updatevorlage->signierbar = isset($_POST['updateVorlage_signierbar']);
 		$updatevorlage->stud_selfservice = isset($_POST['updateVorlage_stud_selfservice']);
-		if (!($updatevorlage->saveVorlage()))
+		if (!($updatevorlage->saveVorlage((isset ($_POST['updateVorlage_kopieren']) ? true : false))))
 		{
 			echo 'Fehler beim Speichern';
 		}
 	}
+
+	$vorlageOeVorlagedata = new $vorlage();
+	$vorlageOeVorlagedata->loadVorlage($vorlageOE->vorlage_kurzbz);
 
 	echo '
 		<form method="POST" action="'.$_SERVER['PHP_SELF'].'">
@@ -498,16 +564,64 @@ else
 					<td><input type="text" size="4" maxlength="3" name="version" id="version" value="'.$db->convert_html_chars($vorlageOE->version).'"></td>
 				</tr>
 				<tr>
-					<td>Content (XML)</td>
-					<td><textarea cols="80" rows="8" name="content">'.$db->convert_html_chars($vorlageOE->text).'</textarea></td>
+					<td>Content</td>
+					<td><textarea ' . ($vorlageOeVorlagedata->mimetype == 'text/html'?'class="mceEditor" cols="200" rows="20"':'cols="200" rows="10"') . ' name="content">'.$db->convert_html_chars($vorlageOE->text).'</textarea></td>
 				</tr>
 				<tr>
-					<td>Style (XML)</td>
-					<td><textarea cols="80" rows="8" name="style">'.$db->convert_html_chars($vorlageOE->style).'</textarea></td>
+					<td>Style</td>
+					<td><textarea ' . ($vorlageOeVorlagedata->mimetype == 'text/html'?'cols="200" rows="5"':'cols="200" rows="10"') . ' name="style">'.$db->convert_html_chars($vorlageOE->style).'</textarea></td>
 				</tr>
 				<tr>
 					<td>Berechtigung</td>
-					<td><input type="text" size="64" maxlength="64" name="berechtigung" value="'.$db->convert_html_chars($vorlageOE->berechtigung).'"></td>
+					<td><input type="text" size="80" maxlength="32" name="berechtigung" value="'.$db->convert_html_chars($vorlageOE->berechtigung).'"></td>
+				</tr>
+				<tr>
+					<td>Betreff</td>
+					<td><input type="text" size="80" name="subject" value="'.$db->convert_html_chars($vorlageOE->subject).'"></td>
+				</tr>
+				<tr>
+					<td>Organisationsform</td>
+					<td>';
+					echo '<SELECT name="orgform_template"><option value=""></option>';
+
+					$orgform = new organisationsform();
+					$orgform->getOrgformLV();
+					foreach ($orgform->result as $of)
+					{
+						if($vorlageOE->orgform_kurzbz == $of->orgform_kurzbz)
+							$selected = 'selected';
+						else
+							$selected = '';
+
+						echo '<OPTION value="'.$db->convert_html_chars($of->orgform_kurzbz).'" '.$selected.'>'.$db->convert_html_chars($of->orgform_kurzbz).' - '.$db->convert_html_chars($of->bezeichnung).'</OPTION>';
+					}
+					echo '</SELECT>
+				</tr>
+					<tr>
+					<td>Sprache</td>
+					<td>';
+					//OE-Dropdown
+					$sprachen = new sprache();
+					$sprachen->getAll(true);
+
+					echo "<SELECT name='templatesprache'>";
+					echo '<OPTION value="" '.($vorlageOE->sprache == ''?'selected':'').'></OPTION>';
+
+					foreach ($sprachen->result as $row)
+					{
+						//Wenn keine Sprache uebergeben wurde, nimm die Defaultsprache
+						if($row->sprache == $vorlageOE->sprache)
+							$selected = 'selected';
+						else
+							$selected = '';
+
+						$style = '';
+
+						echo '<OPTION value="'.$row->sprache.'" '.$selected.'>'.$row->sprache.'</OPTION>';
+						echo "\n";
+					}
+					echo '</SELECT>
+					</td>
 				</tr>
 				<tr>
 					<td>Anmerkung</td>
@@ -517,19 +631,26 @@ else
 					<td>Aktiv</td>
 					<td><input type="checkbox" name="aktiv" id="aktiv" '.($vorlageOE->aktiv==true?'checked="checked"':'').'></td>
 				</tr>';
-			if(!$neu)
-				$val = 'Änderung Speichern';
-			else
-				$val = 'Neu anlegen';
+				echo '<tr><td>&nbsp;</td></tr>';
 
 			echo '<tr>
 					<td></td>
 					<td>
 						<input type="hidden" value="'.$vorlageOE->vorlagestudiengang_id.'" name="vorlagestudiengang_id" />
-						<input type="hidden" value="'.$oe_auswahl.'" name="oe_auswahl" />
+						<input type="hidden" value="'.$oe_auswahl.'" name="oe_auswahl" />';
 
-						<input type="submit" name="speichern" value="'.$val.'">
-					</td>
+						
+						if(!$neu)
+						{
+							echo '<input type="submit" style="padding: 2px 4px" name="speichern" value="Änderung Speichern">&nbsp;&nbsp;';
+							echo '<input type="submit" style="padding: 2px 4px" name="kopieren" value="Kopie anlegen">';
+						}
+						else
+						{
+							echo '<input type="submit" name="speichern" value="Neu anlegen">';
+						}
+
+			echo '	</td>
 				</tr>
 			</table>
 		</form>';

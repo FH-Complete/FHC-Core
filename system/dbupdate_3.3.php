@@ -2513,6 +2513,18 @@ if($result = $db->db_query("SELECT 1 FROM system.tbl_app WHERE app='reihungstest
 	}
 }
 
+// Spalte direktinskription fuer public.tbl_gruppe
+if(!$result = @$db->db_query("SELECT direktinskription FROM public.tbl_gruppe LIMIT 1"))
+{
+	$qry = "ALTER TABLE public.tbl_gruppe ADD COLUMN direktinskription boolean NOT NULL DEFAULT FALSE;
+	COMMENT ON COLUMN public.tbl_gruppe.direktinskription IS 'Verwendung fuer direkte Zuweisung zu Lehreinheit'";
+
+	if(!$db->db_query($qry))
+		echo '<strong>public.tbl_gruppe: '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>public.tbl_gruppe: Spalte direktinskription hinzugefuegt';
+}
+
 // Spalte aktiv für tbl_betreuerart
 if(!$result = @$db->db_query("SELECT aktiv FROM lehre.tbl_betreuerart LIMIT 1"))
 {
@@ -2888,7 +2900,7 @@ $tabellen=array(
 	"public.tbl_fotostatus"  => array("fotostatus_kurzbz","beschreibung"),
 	"public.tbl_funktion"  => array("funktion_kurzbz","beschreibung","aktiv","fachbereich","semester"),
 	"public.tbl_geschaeftsjahr"  => array("geschaeftsjahr_kurzbz","start","ende","bezeichnung"),
-	"public.tbl_gruppe"  => array("gruppe_kurzbz","studiengang_kz","semester","bezeichnung","beschreibung","sichtbar","lehre","aktiv","sort","mailgrp","generiert","updateamum","updatevon","insertamum","insertvon","ext_id","orgform_kurzbz","gid","content_visible","gesperrt","zutrittssystem","aufnahmegruppe"),
+	"public.tbl_gruppe"  => array("gruppe_kurzbz","studiengang_kz","semester","bezeichnung","beschreibung","sichtbar","lehre","aktiv","sort","mailgrp","generiert","updateamum","updatevon","insertamum","insertvon","ext_id","orgform_kurzbz","gid","content_visible","gesperrt","zutrittssystem","aufnahmegruppe","direktinskription"),
 	"public.tbl_kontakt"  => array("kontakt_id","person_id","kontakttyp","anmerkung","kontakt","zustellung","updateamum","updatevon","insertamum","insertvon","ext_id","standort_id"),
 	"public.tbl_kontaktmedium"  => array("kontaktmedium_kurzbz","beschreibung"),
 	"public.tbl_kontakttyp"  => array("kontakttyp","beschreibung","bezeichnung_mehrsprachig"),

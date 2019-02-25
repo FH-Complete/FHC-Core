@@ -139,22 +139,41 @@ else
 		$p2id='';
 		$stgbez=$row->stgbez;
 		//Betreuer suchen
-		$qry_betr="SELECT trim(COALESCE(nachname,'')||', '||COALESCE(titelpre,'')||' '||COALESCE(vorname,'')||' '||COALESCE(titelpost,'')) as first, '' as second,
-		public.tbl_mitarbeiter.mitarbeiter_uid, '' as kontakt, public.tbl_person.person_id
-		FROM public.tbl_person JOIN lehre.tbl_projektbetreuer ON(lehre.tbl_projektbetreuer.person_id=public.tbl_person.person_id)
-		LEFT JOIN public.tbl_benutzer ON(public.tbl_benutzer.person_id=public.tbl_person.person_id)
-		LEFT JOIN public.tbl_mitarbeiter ON(public.tbl_benutzer.uid=public.tbl_mitarbeiter.mitarbeiter_uid)
-		WHERE projektarbeit_id=".$db->db_add_param($row->projektarbeit_id, FHC_INTEGER)."
-		AND (tbl_projektbetreuer.betreuerart_kurzbz='Erstbegutachter' OR tbl_projektbetreuer.betreuerart_kurzbz='Betreuer')
-		UNION
-		SELECT '' as first, trim(COALESCE(nachname,'')||', '||COALESCE(titelpre,'')||' '||COALESCE(vorname,'')||' '||COALESCE(titelpost,'')) as second,
-		public.tbl_mitarbeiter.mitarbeiter_uid,
-		(SELECT kontakt FROM public.tbl_kontakt WHERE person_id=tbl_person.person_id AND kontakttyp='email' AND zustellung LIMIT 1) as kontakt, public.tbl_person.person_id
-		FROM public.tbl_person JOIN lehre.tbl_projektbetreuer ON(lehre.tbl_projektbetreuer.person_id=public.tbl_person.person_id)
-		LEFT JOIN public.tbl_benutzer ON(public.tbl_benutzer.person_id=public.tbl_person.person_id)
-		LEFT JOIN public.tbl_mitarbeiter ON(public.tbl_benutzer.uid=public.tbl_mitarbeiter.mitarbeiter_uid)
-		WHERE projektarbeit_id=".$db->db_add_param($row->projektarbeit_id, FHC_INTEGER)."
-		AND tbl_projektbetreuer.betreuerart_kurzbz='Zweitbegutachter'
+		$qry_betr="SELECT trim(COALESCE(nachname, '') || ', ' || COALESCE(titelpre, '') || ' ' || COALESCE(vorname, '') || ' ' || COALESCE(titelpost, '')) AS first,
+						'' AS second,
+						PUBLIC.tbl_mitarbeiter.mitarbeiter_uid,
+						'' AS kontakt,
+						PUBLIC.tbl_person.person_id
+					FROM PUBLIC.tbl_person
+					JOIN lehre.tbl_projektbetreuer ON (lehre.tbl_projektbetreuer.person_id = PUBLIC.tbl_person.person_id)
+					LEFT JOIN PUBLIC.tbl_benutzer ON (PUBLIC.tbl_benutzer.person_id = PUBLIC.tbl_person.person_id)
+					LEFT JOIN PUBLIC.tbl_mitarbeiter ON (PUBLIC.tbl_benutzer.uid = PUBLIC.tbl_mitarbeiter.mitarbeiter_uid)
+					WHERE projektarbeit_id = ".$db->db_add_param($row->projektarbeit_id, FHC_INTEGER)."
+						AND (
+							tbl_projektbetreuer.betreuerart_kurzbz = 'Erstbegutachter'
+							OR tbl_projektbetreuer.betreuerart_kurzbz = 'Betreuer'
+							OR tbl_projektbetreuer.betreuerart_kurzbz = 'Begutachter'
+							)
+					
+					UNION
+					
+					SELECT '' AS first,
+						trim(COALESCE(nachname, '') || ', ' || COALESCE(titelpre, '') || ' ' || COALESCE(vorname, '') || ' ' || COALESCE(titelpost, '')) AS second,
+						PUBLIC.tbl_mitarbeiter.mitarbeiter_uid,
+						(
+							SELECT kontakt
+							FROM PUBLIC.tbl_kontakt
+							WHERE person_id = tbl_person.person_id
+								AND kontakttyp = 'email'
+								AND zustellung LIMIT 1
+							) AS kontakt,
+						PUBLIC.tbl_person.person_id
+					FROM PUBLIC.tbl_person
+					JOIN lehre.tbl_projektbetreuer ON (lehre.tbl_projektbetreuer.person_id = PUBLIC.tbl_person.person_id)
+					LEFT JOIN PUBLIC.tbl_benutzer ON (PUBLIC.tbl_benutzer.person_id = PUBLIC.tbl_person.person_id)
+					LEFT JOIN PUBLIC.tbl_mitarbeiter ON (PUBLIC.tbl_benutzer.uid = PUBLIC.tbl_mitarbeiter.mitarbeiter_uid)
+					WHERE projektarbeit_id = ".$db->db_add_param($row->projektarbeit_id, FHC_INTEGER)."
+						AND tbl_projektbetreuer.betreuerart_kurzbz = 'Zweitbegutachter'
 		";
 
 		if(!$betr=$db->db_query($qry_betr))
@@ -382,7 +401,7 @@ function btserienmail(trenner, stgbez)
 	jQuery.each(lektoren, function(index, personen) {
 		if(personen.type=='hidden' && personen.name.substr(0,3)=="b1_" && personen.value!='')
 		{
-			var id = "m1_"+personen.name.substr(3);
+			var id = "mc_"+personen.name.substr(3);
 			if(document.getElementById(id).checked)
 			{
 				temp=personen.value.split(trenner);
@@ -404,7 +423,7 @@ function btserienmail(trenner, stgbez)
 		}
 		if(personen.type=='hidden' && personen.name.substr(0,3)=="b2_" && personen.value!='')
 		{
-			var id = "m2_"+personen.name.substr(3);
+			var id = "mc_"+personen.name.substr(3);
 			if(document.getElementById(id).checked)
 			{
 				temp=personen.value.split(trenner);

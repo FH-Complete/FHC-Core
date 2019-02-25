@@ -329,6 +329,12 @@ foreach($addon_obj->result as $addon)
 		               label     = "&menu-statistic-lehrauftragsliste.label;"
 		               command   =  "menu-statistic-lehrauftragsliste:command"
 		               accesskey = "&menu-statistic-lehrauftragsliste.accesskey;"/>
+                    <menuitem
+                        id        =  "menu-extras-lektorenzuordnunginstitute"
+                        key       =  "menu-extras-lektorenzuordnunginstitute:key"
+                        label     = "&menu-extras-lektorenzuordnunginstitute.label;"
+                        command   =  "menu-extras-lektorenzuordnunginstitute:command"
+                        accesskey = "&menu-extras-lektorenzuordnunginstitute.accesskey;"/>
 				</menupopup>
           	</menu>
           	<!-- *** Student *** -->
@@ -839,12 +845,6 @@ foreach($addon_obj->result as $addon)
                label     = "&menu-extras-lehrfachverwaltung.label;"
                command   =  "menu-extras-lehrfachverwaltung:command"
                accesskey = "&menu-extras-lehrfachverwaltung.accesskey;"/> -->
-             <menuitem
-               id        =  "menu-extras-lektorenzuordnunginstitute"
-               key       =  "menu-extras-lektorenzuordnunginstitute:key"
-               label     = "&menu-extras-lektorenzuordnunginstitute.label;"
-               command   =  "menu-extras-lektorenzuordnunginstitute:command"
-               accesskey = "&menu-extras-lektorenzuordnunginstitute.accesskey;"/>
              <menuitem
                id        =  "menu-extras-preinteressentenuebernahme"
                key       =  "menu-extras-preinteressentenuebernahme:key"
