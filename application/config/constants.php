@@ -1,9 +1,10 @@
 <?php
-if (! defined('BASEPATH')) exit('No direct script access allowed');
+
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 /*
 |--------------------------------------------------------------------------
-| FH-Complete Constants
+| FH-Complete constants
 |--------------------------------------------------------------------------
 |
 | These constants are used for internal messages. It are also be used
@@ -21,7 +22,7 @@ define('FHC_NOPK', 7); 			// No primary key
 
 /*
 |--------------------------------------------------------------------------
-| File and Directory Modes
+| File and directory modes
 |--------------------------------------------------------------------------
 |
 | These prefs are used when checking and setting modes when working
@@ -39,7 +40,7 @@ define('DIR_WRITE_MODE', 0755);
 
 /*
 |--------------------------------------------------------------------------
-| File Stream Modes
+| File stream modes
 |--------------------------------------------------------------------------
 |
 | These modes are used when working with fopen()/popen()
@@ -56,7 +57,7 @@ define('FOPEN_READ_WRITE_CREATE_STRICT', 'x+b');
 
 /*
 |--------------------------------------------------------------------------
-| Display Debug backtrace
+| Display debug backtrace
 |--------------------------------------------------------------------------
 |
 | If set to TRUE, a backtrace will be displayed along with php errors. If
@@ -66,10 +67,9 @@ define('FOPEN_READ_WRITE_CREATE_STRICT', 'x+b');
 */
 define('SHOW_DEBUG_BACKTRACE', TRUE);
 
-
 /*
 |--------------------------------------------------------------------------
-| Exit Status Codes
+| Exit status codes
 |--------------------------------------------------------------------------
 |
 | Used to indicate the conditions under which the script is exit()ing.
@@ -79,17 +79,6 @@ define('SHOW_DEBUG_BACKTRACE', TRUE);
 | chosen for the least overlap with these conventions, while still
 | leaving room for others to be defined in future versions and user
 | applications.
-|
-| The three main conventions used for determining exit status codes
-| are as follows:
-|
-|    Standard C/C++ Library (stdlibc):
-|       http://www.gnu.org/software/libc/manual/html_node/Exit-Status.html
-|       (This link also contains other GNU-specific conventions)
-|    BSD sysexits.h:
-|       http://www.gsp.com/cgi-bin/man.cgi?section=3&topic=sysexits
-|    Bash scripting:
-|       http://tldp.org/LDP/abs/html/exitcodes.html
 |
 */
 define('EXIT_SUCCESS', 0); // no errors
@@ -112,3 +101,62 @@ define('EXIT_VALIDATION_UDF_NOT_VALID_VAL',	17); // UDF validation has been fail
 
 define('EXIT_AUTO_MIN', 1000); // lowest automatically-assigned error code
 define('EXIT_AUTO_MAX', 2000); // highest automatically-assigned error code
+
+/*
+|--------------------------------------------------------------------------
+| Email constants
+|--------------------------------------------------------------------------
+*/
+define('EMAIL_CONFIG_INDEX', 'mail');
+
+/*
+|--------------------------------------------------------------------------
+| Messaging system constants
+|--------------------------------------------------------------------------
+*/
+// Email kontakt type
+define('EMAIL_KONTAKT_TYPE', 'email');
+// tbl_msg_recipient->sentInfo separator
+define('SENT_INFO_NEWLINE', '\n');
+
+// Message statuses
+define('MSG_STATUS_UNREAD',		0);
+define('MSG_STATUS_READ',		1);
+define('MSG_STATUS_ARCHIVED',	2);
+define('MSG_STATUS_DELETED',	3);
+
+// Priority
+define('PRIORITY_LOW',		1);
+define('PRIORITY_NORMAL',	2);
+define('PRIORITY_HIGH',		3);
+define('PRIORITY_URGENT',	4);
+
+// Status return message codes
+define('MSG_SUCCESS',	0);
+define('MSG_ERROR',		1);
+
+define('MSG_MESSAGE_SENT',		10);
+define('MSG_STATUS_UPDATE',		11);
+
+define('MSG_PARTICIPANT_ADDED',			30);
+define('MSG_ERR_PARTICIPANT_EXISTS',	31);
+define('MSG_ERR_PARTICIPANT_NONSYSTEM',	32);
+define('MSG_PARTICIPANT_REMOVED',		33);
+
+define('MSG_ERR_SUBJECT_EMPTY',			40);
+define('MSG_ERR_BODY_EMPTY',			41);
+define('MSG_ERR_TEMPLATE_NOT_FOUND',	42);
+define('MSG_ERR_DELIVERY_MESSAGE',		43);
+define('MSG_ERR_CONTACT_NOT_FOUND',		44);
+define('MSG_ERR_OU_CONTACTS_NOT_FOUND',	45);
+
+define('MSG_ERR_INVALID_USER_ID',		100);
+define('MSG_ERR_INVALID_MSG_ID',		101);
+define('MSG_ERR_INVALID_THREAD_ID',		102);
+define('MSG_ERR_INVALID_STATUS_ID',		103);
+define('MSG_ERR_INVALID_SENDER_ID',		104);
+define('MSG_ERR_INVALID_RECIPIENTS',	105);
+define('MSG_ERR_INVALID_RECEIVER_ID',	106);
+define('MSG_ERR_INVALID_OU',			107);
+define('MSG_ERR_INVALID_TEMPLATE',		108);
+define('MSG_ERR_INVALID_TOKEN',			109);

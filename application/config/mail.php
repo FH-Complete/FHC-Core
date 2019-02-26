@@ -1,7 +1,6 @@
 <?php
 
-// Define constants
-define('EMAIL_CONFIG_INDEX', 'mail');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 // Define configuration parameters
 $config['email_number_to_sent'] = 1000; // Number of emails to sent each time sendAll is called
