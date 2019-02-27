@@ -1799,8 +1799,8 @@ abstract class REST_Controller extends CI_Controller {
             return FALSE;
         }
 
-        $auth_library_class = strtolower($this->config->item('auth_library_class'));
-        $auth_library_function = strtolower($this->config->item('auth_library_function'));
+        $auth_library_class = $this->config->item('auth_library_class');
+        $auth_library_function = $this->config->item('auth_library_function');
 
         if (empty($auth_library_class))
         {
@@ -1814,15 +1814,12 @@ abstract class REST_Controller extends CI_Controller {
             return FALSE;
         }
 
-		// Loads authentication library
-		$this->load->library('AuthLib');
-
         if (is_callable([$auth_library_class, $auth_library_function]) === FALSE)
         {
-            $this->load->library($auth_library_class);
+            $this->load->library($auth_library_class, array(false));
         }
 
-        return $this->{$auth_library_class}->$auth_library_function($username, $password);
+        return $this->{strtolower($auth_library_class)}->$auth_library_function($username, $password);
     }
 
     /**

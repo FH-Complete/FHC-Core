@@ -22,6 +22,52 @@ define('FHC_NOPK', 7); 			// No primary key
 
 /*
 |--------------------------------------------------------------------------
+| Exit status codes
+|--------------------------------------------------------------------------
+|
+| Used to indicate the conditions under which the script is exit()ing.
+| While there is no universal standard for error codes, there are some
+| broad conventions.  Three such conventions are mentioned below, for
+| those who wish to make use of them.  The CodeIgniter defaults were
+| chosen for the least overlap with these conventions, while still
+| leaving room for others to be defined in future versions and user
+| applications.
+|
+*/
+define('EXIT_SUCCESS', 0); // no errors
+define('EXIT_ERROR', 1); // generic error
+define('EXIT_MODEL', 2); // model error
+define('EXIT_CONFIG', 3); // configuration error
+define('EXIT_UNKNOWN_FILE', 4); // file not found
+define('EXIT_UNKNOWN_CLASS', 5); // unknown class
+define('EXIT_UNKNOWN_METHOD', 6); // unknown class member
+define('EXIT_USER_INPUT', 7); // invalid user input
+define('EXIT_DATABASE', 8); // database error
+define('EXIT_VALIDATION_UDF',				10); // UDF validation has been failed
+define('EXIT_VALIDATION_UDF_MIN_VALUE',		11); // UDF validation has been failed -> MIN VALUE
+define('EXIT_VALIDATION_UDF_MAX_VALUE',		12); // UDF validation has been failed -> MAX VALUE
+define('EXIT_VALIDATION_UDF_MIN_LENGTH',	13); // UDF validation has been failed -> MIN LENGTH
+define('EXIT_VALIDATION_UDF_MAX_LENGTH',	14); // UDF validation has been failed -> MAX LENGTH
+define('EXIT_VALIDATION_UDF_REGEX',			15); // UDF validation has been failed -> REGEX
+define('EXIT_VALIDATION_UDF_REQUIRED',		16); // UDF validation has been failed -> REQUIRED
+define('EXIT_VALIDATION_UDF_NOT_VALID_VAL',	17); // UDF validation has been failed -> Not valid value, object or array
+
+define('EXIT_AUTO_MIN', 1000); // lowest automatically-assigned error code
+define('EXIT_AUTO_MAX', 2000); // highest automatically-assigned error code
+
+/*
+|--------------------------------------------------------------------------
+| Authentication constants
+|--------------------------------------------------------------------------
+*/
+// Authentication methods
+define('AUTH_SESSION', 'session');
+define('AUTH_LDAP', 'ldap');
+define('AUTH_DB', 'database');
+define('AUTH_SSO', 'sso');
+
+/*
+|--------------------------------------------------------------------------
 | File and directory modes
 |--------------------------------------------------------------------------
 |
@@ -66,41 +112,6 @@ define('FOPEN_READ_WRITE_CREATE_STRICT', 'x+b');
 |
 */
 define('SHOW_DEBUG_BACKTRACE', TRUE);
-
-/*
-|--------------------------------------------------------------------------
-| Exit status codes
-|--------------------------------------------------------------------------
-|
-| Used to indicate the conditions under which the script is exit()ing.
-| While there is no universal standard for error codes, there are some
-| broad conventions.  Three such conventions are mentioned below, for
-| those who wish to make use of them.  The CodeIgniter defaults were
-| chosen for the least overlap with these conventions, while still
-| leaving room for others to be defined in future versions and user
-| applications.
-|
-*/
-define('EXIT_SUCCESS', 0); // no errors
-define('EXIT_ERROR', 1); // generic error
-define('EXIT_MODEL', 2); // model error
-define('EXIT_CONFIG', 3); // configuration error
-define('EXIT_UNKNOWN_FILE', 4); // file not found
-define('EXIT_UNKNOWN_CLASS', 5); // unknown class
-define('EXIT_UNKNOWN_METHOD', 6); // unknown class member
-define('EXIT_USER_INPUT', 7); // invalid user input
-define('EXIT_DATABASE', 8); // database error
-define('EXIT_VALIDATION_UDF',				10); // UDF validation has been failed
-define('EXIT_VALIDATION_UDF_MIN_VALUE',		11); // UDF validation has been failed -> MIN VALUE
-define('EXIT_VALIDATION_UDF_MAX_VALUE',		12); // UDF validation has been failed -> MAX VALUE
-define('EXIT_VALIDATION_UDF_MIN_LENGTH',	13); // UDF validation has been failed -> MIN LENGTH
-define('EXIT_VALIDATION_UDF_MAX_LENGTH',	14); // UDF validation has been failed -> MAX LENGTH
-define('EXIT_VALIDATION_UDF_REGEX',			15); // UDF validation has been failed -> REGEX
-define('EXIT_VALIDATION_UDF_REQUIRED',		16); // UDF validation has been failed -> REQUIRED
-define('EXIT_VALIDATION_UDF_NOT_VALID_VAL',	17); // UDF validation has been failed -> Not valid value, object or array
-
-define('EXIT_AUTO_MIN', 1000); // lowest automatically-assigned error code
-define('EXIT_AUTO_MAX', 2000); // highest automatically-assigned error code
 
 /*
 |--------------------------------------------------------------------------

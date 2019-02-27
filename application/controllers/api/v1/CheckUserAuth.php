@@ -1,20 +1,6 @@
 <?php
-/**
- * FH-Complete
- *
- * @package		FHC-API
- * @author		FHC-Team
- * @copyright	Copyright (c) 2016, fhcomplete.org
- * @license		GPLv3
- * @link		http://fhcomplete.org
- * @since		Version 1.0
- * @filesource
- */
-// ------------------------------------------------------------------------
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
-
-require_once APPPATH.'/libraries/REST_Controller.php';
 
 class CheckUserAuth extends REST_Controller
 {
@@ -24,6 +10,10 @@ class CheckUserAuth extends REST_Controller
 	public function __construct()
 	{
 		parent::__construct();
+
+		// Loads helper message to manage returning messages
+		// NOTE: loaded here because it does not extend the APIv1_Controller
+		$this->load->helper('hlp_message');
 	}
 
 	/**
@@ -36,7 +26,7 @@ class CheckUserAuth extends REST_Controller
 
 		if (isset($username) && isset($password))
 		{
-			$result = $this->authlib->CheckUserAuthByUsernamePassword($username, $password);
+			$result = $this->authlib->checkUserAuthByUsernamePassword($username, $password);
 
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
@@ -63,18 +53,18 @@ class CheckUserAuth extends REST_Controller
 		// If username and password are given then check authentication using them
 		if (isset($username) && isset($password))
 		{
-			$result = $this->authlib->CheckUserAuthByUsernamePassword($username, $password, true);
+			$result = $this->authlib->checkUserAuthByUsernamePassword($username, $password, true);
 		}
 		elseif (isset($code) || isset($email))
 		{
 			// If code and email are given then check authentication using them
 			if (isset($code) && isset($email))
 			{
-				$result = $this->authlib->CheckUserAuthByCodeEmail($code, $email);
+				$result = $this->authlib->checkUserAuthByCodeEmail($code, $email);
 			}
 			else // otherwise check authentication using only code
 			{
-				$result = $this->authlib->CheckUserAuthByCode($code);
+				$result = $this->authlib->checkUserAuthByCode($code);
 			}
 		}
 

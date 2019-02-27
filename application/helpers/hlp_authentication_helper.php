@@ -1,61 +1,22 @@
 <?php
 
-/**
- * FH-Complete
- *
- * @package	FHC-Helper
- * @author	FHC-Team
- * @copyright	Copyright (c) 2016 fhcomplete.org
- * @license	GPLv3
- * @link	https://fhcomplete.org
- * @since	Version 1.0.0
- * @filesource
- */
-
-if (! defined('BASEPATH')) exit('No direct script access allowed');
-
-require_once FHCPATH.'include/authentication.class.php';
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 // ------------------------------------------------------------------------
 // Functions needed to manage the user authentication
 // ------------------------------------------------------------------------
 
-if ( ! function_exists('auth'))
-{
-	/**
-	 * Auth Username, Password over FH-Complete
-	 *
-	 * @param	string	$username
-	 * @param	string	$password
-	 * @return	bool
-	 */
-	function auth($username, $password)
-	{
-		$auth = new authentication();
-		if ($auth->checkpassword($username, $password))
-		{
-			echo 'Auth-Method-False';
-			return true;
-		}
-		else
-		{
-			echo 'Auth-Method-False';
-			return false;
-		}
-	}
-}
-
 /**
- * Look if User is logged in and return uid
- * it tries to work always with CI session
- * Otherwise return false
+ * It calls the AuthLib, if the user is NOT logged then the login page is shown
+ * If the user is alredy logged, then it is possible to access to the authentication object
+ * that contains the username of the logged user
  *
- * @return	string or (bool)false
-*/
+ * @return string or null
+ */
 function getAuthUID()
 {
 	$ci =& get_instance(); // get CI instance
 	$ci->load->library('AuthLib'); // load authentication library
 
-	return $ci->authlib->getUser();
+	return ($ci->authlib->getAuthObj())->{AuthLib::AO_USERNAME};
 }

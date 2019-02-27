@@ -65,7 +65,7 @@ class PermissionLib
 		{
 			// API Caller rights initialization
 			self::$bb = new benutzerberechtigung();
-			self::$bb->getBerechtigungen($this->_ci->authlib->getUser());
+			self::$bb->getBerechtigungen(($this->_ci->authlib->getAuthObj())->{AuthLib::AO_USERNAME});
 		}
 	}
 
