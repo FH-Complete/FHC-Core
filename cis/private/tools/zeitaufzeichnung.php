@@ -91,12 +91,12 @@ $fieldheadings = array(
 if ($rechte->isBerechtigt('basis/servicezeitaufzeichnung'))
 {
 	$za_simple = 0;
-	$activities = 	array('Design', 'Operativ', 'Betrieb',  'Pause', 'LehreIntern', 'LehreExtern', 'Arztbesuch', 'DienstreiseMT', 'Behoerde', 'Ersatzruhe');
+	$activities = 	array('Design', 'Operativ', 'Betrieb',  'Pause', 'LehreIntern', 'Arztbesuch', 'DienstreiseMT', 'Behoerde', 'Ersatzruhe');
 }
 else
 {
 	$za_simple = 1;
-	$activities = array('Arbeit', 'Pause', 'LehreIntern', 'LehreExtern', 'Arztbesuch', 'DienstreiseMT', 'Behoerde', 'Ersatzruhe');
+	$activities = array('Arbeit', 'Pause', 'LehreIntern', 'Arztbesuch', 'DienstreiseMT', 'Behoerde', 'Ersatzruhe');
 }
 
 $activities_str = "'".implode("','", $activities)."'";
