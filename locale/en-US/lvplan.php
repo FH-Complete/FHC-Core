@@ -97,4 +97,5 @@ $this->phrasen['lvplan/status']='Status';
 $this->phrasen['lvplan/automatischeMail']='This is an automatic email!';
 $this->phrasen['lvplan/folgendeAenderungen']='There have been the following changes in your Schedule:';
 $this->phrasen['lvplan/reserviertInDev']='not<br>available';
+$this->phrasen['lvplan/raumNichtReservierbar']='Reservation is disabled for this room.';
 ?>

@@ -37,7 +37,7 @@ $datum_obj = new datum();
 $rechte =  new benutzerberechtigung();
 $rechte->getBerechtigungen($uid);
 
-if(!$rechte->isBerechtigt('lehre/reservierung', null, 'sui'))
+if(!$rechte->isBerechtigt('lehre/reservierungAdvanced', null, 'sui'))
 	die('<span class="error">Sie haben keine Berechtigung für diese Seite</span>');
 
 $stgid=(isset($_REQUEST['stgid'])?$_REQUEST['stgid']:0);
@@ -247,7 +247,7 @@ echo '
   <hr>
 </form>';
 
-if($rechte->isBerechtigt('lehre/reservierung', null, 'sui'))
+if($rechte->isBerechtigt('lehre/reservierungAdvanced', null, 'sui'))
 {
 	if ($type=="save")
 	{

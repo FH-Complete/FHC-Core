@@ -645,6 +645,7 @@ class wochenplan extends basis_db
 			die($this->db_last_error());
 		$result_stunde = $this->db_result;
 		$num_rows_stunde = $this->db_num_rows($result_stunde);
+		$raumReservierbar = true;
 
 		$stundenplandev_belegt = array();
 		// Formularbeginn wenn Lektor
@@ -670,7 +671,10 @@ class wochenplan extends basis_db
 				}
 			}
 			else
-				$raumres=false;
+			{
+				$raumres = false;
+				$raumReservierbar = false;
+			}
 		}
 
 		//Tabelle zeichnen
@@ -696,6 +700,8 @@ class wochenplan extends basis_db
 		if (!date("w",$this->datum))
 			$this->datum=jump_day($this->datum,1);
 		$datum=$datum_mon=$this->datum;
+		$rechte = new benutzerberechtigung();
+		$rechte->getBerechtigungen($user_uid);
 
 		for ($i=1; $i<=TAGE_PRO_WOCHE; $i++)
 		{
@@ -887,7 +893,7 @@ class wochenplan extends basis_db
 						}
 
 						// Ausgabe einer Stunde im Raster (HTML)
-						echo '				<td nowrap valign="top">';
+						echo '				<td nowrap valign="top" align="center">';
 
 						foreach($uEinheiten as $key=>$uEinheit)
 						{
@@ -945,6 +951,8 @@ class wochenplan extends basis_db
 							}
 							echo '</A></DIV>';
 						}
+						if ($rechte->isBerechtigt('lehre/reservierungAdvanced', null, 'sui'))
+							echo '<INPUT type="checkbox" name="reserve'.$i.'_'.$j.'" value="'.date("Y-m-d",$datum).'">';
 						echo '</td>'.$this->crlf;
 					}
 				}
@@ -977,9 +985,6 @@ class wochenplan extends basis_db
 			echo '<br><table><tr>';
 			echo '	<td>'.$p->t('global/titel').':</td><td><input onchange="if (this.value.length>0 && document.getElementById(\'beschreibung\').value.length<1) {document.getElementById(\'beschreibung\').value=document.getElementById(\'titel\').value;document.getElementById(\'beschreibung\').focus();};" type="text" id="titel"  name="titel" size="10" maxlength="10" value="" /></td> '.$this->crlf;
 			echo '	<td>'.$p->t('global/beschreibung').':</td><td colspan="6"> <input onchange="if (this.value.length<1 && document.getElementById(\'titel\').value.length>0) {alert(\'Achtung! Speichern nur mit Beschreibung moeglich!\');this.focus();};" type="text" id="beschreibung" name="beschreibung" size="20" maxlength="32" value=""  /> </td>'.$this->crlf;
-
-			$rechte = new benutzerberechtigung();
-			$rechte->getBerechtigungen($user_uid);
 
 			//Pruefen ob die erweiterte Reservierungsrechte vorhanden sind
 			if ($rechte->isBerechtigt('lehre/reservierung', null, 'sui'))
@@ -1108,6 +1113,12 @@ class wochenplan extends basis_db
 
 			echo '</tr></table></form>';
 			echo ' <a href="stpl_reserve_list.php">'.$p->t('lvplan/reservierungenLoeschen').' </a>';
+		}
+		elseif ($this->type=='ort' && $raumReservierbar == false)
+		{
+			echo '<table><tr><td><br>';
+			echo '<span style="color: orange">'.$p->t('lvplan/raumNichtReservierbar').'</span>';
+			echo '</td></tr></table>';
 		}
 		else
 		{
