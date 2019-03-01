@@ -103,12 +103,18 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
 		<style:style style:name="Tabelle1.A1" style:family="table-cell">
 			<style:table-cell-properties fo:padding="0.097cm" fo:border-left="0.05pt solid #000000" fo:border-right="none" fo:border-top="0.05pt solid #000000" fo:border-bottom="0.05pt solid #000000"/>
 		</style:style>
+        <style:style style:name="Tabelle1.A1_2" style:family="table-cell">
+            <style:table-cell-properties fo:padding="0.097cm" fo:border-left="0.05pt solid #000000" fo:border-right="0.05pt solid #000000" fo:border-top="0.05pt solid #000000" fo:border-bottom="0.05pt solid #000000"/>
+        </style:style>
 		<style:style style:name="Tabelle1.G1" style:family="table-cell">
 			<style:table-cell-properties fo:padding="0.097cm" fo:border="0.05pt solid #000000"/>
 		</style:style>
 		<style:style style:name="Tabelle1.A2" style:family="table-cell">
 			<style:table-cell-properties fo:padding-left="0.07cm" fo:padding-right="0.07cm" fo:padding-top="0.05cm" fo:padding-bottom="0.05cm" fo:border-left="0.05pt solid #000000" fo:border-right="none" fo:border-top="none" fo:border-bottom="0.05pt solid #000000"/>
 		</style:style>
+        <style:style style:name="Tabelle1.A2_2" style:family="table-cell">
+            <style:table-cell-properties fo:padding-left="0.07cm" fo:padding-right="0.07cm" fo:padding-top="0.05cm" fo:padding-bottom="0.05cm" fo:border-left="0.05pt solid #000000" fo:border-right="0.05pt solid #000000" fo:border-top="none" fo:border-bottom="0.05pt solid #000000"/>
+        </style:style>
 		<style:style style:name="Tabelle1.G2" style:family="table-cell">
 			<style:table-cell-properties fo:padding-left="0.07cm" fo:padding-right="0.07cm" fo:padding-top="0.05cm" fo:padding-bottom="0.05cm" fo:border-left="0.05pt solid #000000" fo:border-right="0.05pt solid #000000" fo:border-top="none" fo:border-bottom="0.05pt solid #000000"/>
 		</style:style>
@@ -386,8 +392,16 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
 				<table:table-column table:style-name="Tabelle1.C"/>
 				<table:table-column table:style-name="Tabelle1.D"/>
 				<table:table-column table:style-name="Tabelle1.E"/>
-				<table:table-column table:style-name="Tabelle1.F"/>
-				<table:table-column table:style-name="Tabelle1.G"/>
+                <!-- Wenn LektorInnen bei inkludierte_lehre einen Wert stehen haben, werden die Spalten "Satz" und "Brutto" nicht angezeigt -->
+                <xsl:choose>
+                    <xsl:when test="mitarbeiter/inkludierte_lehre != ''">
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <table:table-column table:style-name="Tabelle1.F"/>
+                        <table:table-column table:style-name="Tabelle1.G"/>
+                    </xsl:otherwise>
+                </xsl:choose>
+
 				<table:table-row>
 					<table:table-cell table:style-name="Tabelle1.A1" office:value-type="string">
 						<text:p text:style-name="P12">ID</text:p>
@@ -402,15 +416,34 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
 						<text:p text:style-name="P10">Gruppe<text:span text:style-name="T2">(n)</text:span>
 						</text:p>
 					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle1.A1" office:value-type="string">
-						<text:p text:style-name="P13">Std.</text:p>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle1.A1" office:value-type="string">
-						<text:p text:style-name="P10">Satz</text:p>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle1.G1" office:value-type="string">
-						<text:p text:style-name="P10">Brutto</text:p>
-					</table:table-cell>
+                    <!-- Wenn LektorInnen bei inkludierte_lehre einen Wert stehen haben, wird die Spalte "Satz" nicht angezeigt
+                        Deshalb braucht die Spalte "Std" einen border auf der rechten Seite (deshalb anderer style_name) -->
+                    <xsl:choose>
+                        <xsl:when test="mitarbeiter/inkludierte_lehre != ''">
+                            <table:table-cell table:style-name="Tabelle1.A1_2" office:value-type="string">
+                                <text:p text:style-name="P13">Std.</text:p>
+                            </table:table-cell>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <table:table-cell table:style-name="Tabelle1.A1" office:value-type="string">
+                                <text:p text:style-name="P13">Std.</text:p>
+                            </table:table-cell>
+                        </xsl:otherwise>
+                    </xsl:choose>
+					<!-- Wenn LektorInnen bei inkludierte_lehre einen Wert stehen haben, werden die Spalten "Satz" und "Brutto" nicht angezeigt -->
+					<xsl:choose>
+						<xsl:when test="mitarbeiter/inkludierte_lehre != ''">
+							<!--<text:p text:style-name="P10">Satz</text:p>-->
+						</xsl:when>
+						<xsl:otherwise>
+							<table:table-cell table:style-name="Tabelle1.A1" office:value-type="string">
+								<text:p text:style-name="P10">Satz</text:p>
+							</table:table-cell>
+							<table:table-cell table:style-name="Tabelle1.G1" office:value-type="string">
+								<text:p text:style-name="P10">Brutto</text:p>
+							</table:table-cell>
+						</xsl:otherwise>
+					</xsl:choose>
 				</table:table-row>
 
 				<xsl:apply-templates select="lehreinheit"/>
@@ -428,22 +461,35 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
 					<table:table-cell table:style-name="Tabelle1.A2" office:value-type="string">
 						<text:p text:style-name="P11">Summe:</text:p>
 					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle1.A2" office:value-type="string">
-						<text:p text:style-name="P11"><xsl:value-of select="gesamtstunden" /></text:p>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle1.A2" office:value-type="string">
-						<text:p text:style-name="P9"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle1.G2" office:value-type="string">
-						<xsl:choose>
-							<xsl:when test="mitarbeiter/inkludierte_lehre != ''">
-								<text:p text:style-name="P11">€ 0,00</text:p>
-							</xsl:when>
-							<xsl:otherwise>
+                    <!-- Wenn LektorInnen bei inkludierte_lehre einen Wert stehen haben, wird die Spalte "Satz" nicht angezeigt
+                       Deshalb braucht die Spalte "Summe" einen border auf der rechten Seite (deshalb anderer style_name) -->
+                    <xsl:choose>
+                        <xsl:when test="mitarbeiter/inkludierte_lehre != ''">
+                            <table:table-cell table:style-name="Tabelle1.A2_2" office:value-type="string">
+                                <text:p text:style-name="P11"><xsl:value-of select="gesamtstunden" /></text:p>
+                            </table:table-cell>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <table:table-cell table:style-name="Tabelle1.A2" office:value-type="string">
+                                <text:p text:style-name="P11"><xsl:value-of select="gesamtstunden" /></text:p>
+                            </table:table-cell>
+                        </xsl:otherwise>
+                    </xsl:choose>
+
+					<!-- Wenn LektorInnen bei inkludierte_lehre einen Wert stehen haben, wird die Spalte Bruttosumme nicht angezeigt -->
+					<xsl:choose>
+						<xsl:when test="mitarbeiter/inkludierte_lehre != ''">
+							<!--<text:p text:style-name="P2">0.00</text:p>-->
+						</xsl:when>
+						<xsl:otherwise>
+                            <table:table-cell table:style-name="Tabelle1.A2" office:value-type="string">
+                                <text:p text:style-name="P9"/>
+                            </table:table-cell>
+                            <table:table-cell table:style-name="Tabelle1.G2" office:value-type="string">
 								<text:p text:style-name="P11">€ <xsl:value-of select="gesamtbetrag" /></text:p>
-							</xsl:otherwise>
-						</xsl:choose>
-					</table:table-cell>
+							</table:table-cell>
+						</xsl:otherwise>
+					</xsl:choose>
 				</table:table-row>
 			</table:table>
 			<text:p text:style-name="P19"/>
@@ -510,31 +556,44 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
 			<xsl:apply-templates select="gruppen_getrennt"/>
 
 		</table:table-cell>
-		<table:table-cell table:style-name="Tabelle1.A2" office:value-type="string">
-			<text:p text:style-name="P3"><xsl:value-of select="stunden" /></text:p>
-		</table:table-cell>
-		<table:table-cell table:style-name="Tabelle1.A2" office:value-type="string">
-			<!-- Wenn LektorInnen bei inkludierte_lehre einen Wert stehen haben, wird am Lehrauftrag bei Stundensatz und Brutto 0 ausgegeben-->
-			<xsl:choose>
-				<xsl:when test="../mitarbeiter/inkludierte_lehre != ''">
-					<text:p text:style-name="P2">0.00</text:p>
-				</xsl:when>
-				<xsl:otherwise>
+        <!-- Wenn LektorInnen bei inkludierte_lehre einen Wert stehen haben, wird die Spalte "Satz" nicht angezeigt
+                Deshalb braucht die Spalte "Std" einen border auf der rechten Seite (deshalb anderer style_name) -->
+        <xsl:choose>
+            <xsl:when test="../mitarbeiter/inkludierte_lehre != ''">
+                <table:table-cell table:style-name="Tabelle1.A2_2" office:value-type="string">
+                    <text:p text:style-name="P3"><xsl:value-of select="stunden" /></text:p>
+                </table:table-cell>
+            </xsl:when>
+            <xsl:otherwise>
+                <table:table-cell table:style-name="Tabelle1.A2" office:value-type="string">
+                    <text:p text:style-name="P3"><xsl:value-of select="stunden" /></text:p>
+                 </table:table-cell>
+            </xsl:otherwise>
+        </xsl:choose>
+
+		<!-- Wenn LektorInnen bei inkludierte_lehre einen Wert stehen haben, wird die Spalte "Satz" nicht angezeigt -->
+		<xsl:choose>
+			<xsl:when test="../mitarbeiter/inkludierte_lehre != ''">
+				<!--<text:p text:style-name="P2">0.00</text:p>-->
+			</xsl:when>
+			<xsl:otherwise>
+				<table:table-cell table:style-name="Tabelle1.A2" office:value-type="string">
 					<text:p text:style-name="P2"><xsl:value-of select="satz" /></text:p>
-				</xsl:otherwise>
-			</xsl:choose>
-		</table:table-cell>
-		<table:table-cell table:style-name="Tabelle1.G2" office:value-type="string">
-			<!-- Wenn LektorInnen bei inkludierte_lehre einen Wert stehen haben, wird am Lehrauftrag bei Stundensatz und Brutto 0 ausgegeben-->
-			<xsl:choose>
-				<xsl:when test="../mitarbeiter/inkludierte_lehre != ''">
-					<text:p text:style-name="P3">€ 0,00</text:p>
-				</xsl:when>
-				<xsl:otherwise>
+				</table:table-cell>
+			</xsl:otherwise>
+		</xsl:choose>
+
+		<!-- Wenn LektorInnen bei inkludierte_lehre einen Wert stehen haben, wird die Spalte "Brutto" nicht angezeigt -->
+		<xsl:choose>
+			<xsl:when test="../mitarbeiter/inkludierte_lehre != ''">
+				<!--<text:p text:style-name="P3">€ 0,00</text:p>-->
+			</xsl:when>
+			<xsl:otherwise>
+				<table:table-cell table:style-name="Tabelle1.G2" office:value-type="string">
 					<text:p text:style-name="P3">€ <xsl:value-of select="brutto" /></text:p>
-				</xsl:otherwise>
-			</xsl:choose>
-		</table:table-cell>
+				</table:table-cell>
+			</xsl:otherwise>
+		</xsl:choose>
 	</table:table-row>
 </xsl:template>
 
