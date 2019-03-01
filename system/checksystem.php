@@ -156,6 +156,7 @@ $berechtigungen = array(
 	array('lehre/reihungstestOrt','Erlaubt die Zuteilung von Raeumen zu Reihungstests'),
 	array('lehre/reservierung','erweiterte Reservierung inkl. Lektorauswahl, Stg, Sem und Gruppe'),
 	array('lehre/reservierung:begrenzt','normale Raumreservierung im CIS'),
+	array('lehre/reservierungAdvanced','Unbegrenztes Einfügen von Reservierungen auch über bestehende'),
 	array('lehre/studienordnung','Studienordnung'),
 	array('lehre/studienordnungInaktiv','Studienordnung Inaktiv'),
 	array('lehre/studienplan','Studienplan'),

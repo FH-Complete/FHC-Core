@@ -2728,6 +2728,21 @@ if(!$result = @$db->db_query('SELECT lehrfach_oe_kurzbz FROM campus.vw_lehreinhe
 		echo '<br>campus.vw_lehreinheit lehrfach_oe_kurzbz added, fachbereich_kurzbz removed';
 }
 
+// Berechtigungen fuer web User auf testtool.tbl_kategorie
+if($result = @$db->db_query("SELECT * FROM information_schema.role_table_grants WHERE table_name='tbl_kategorie' AND table_schema='testtool' AND grantee='web' AND privilege_type='SELECT'"))
+{
+	if($db->db_num_rows($result)==0)
+	{
+
+		$qry = "GRANT SELECT, INSERT, UPDATE, DELETE ON testtool.tbl_kategorie TO web;";
+
+		if(!$db->db_query($qry))
+			echo '<strong>Testtool Berechtigungen: '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>Web User fuer testtool.tbl_kategorie berechtigt';
+	}
+}
+
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
 
