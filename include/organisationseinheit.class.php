@@ -137,6 +137,7 @@ class organisationseinheit extends basis_db
 			$this->mailverteiler = $this->db_parse_bool($row->mailverteiler);
 			$this->lehre = $this->db_parse_bool($row->lehre);
             $this->standort_id = $row->standort_id;
+			$this->freigabegrenze = $row->freigabegrenze;
 		}
 		else
 		{

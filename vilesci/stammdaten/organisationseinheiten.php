@@ -41,14 +41,14 @@ echo '
 <html>
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-		<link href="../../skin/vilesci.css" rel="stylesheet" type="text/css">
-		<link rel="stylesheet" type="text/css" href="../../skin/jquery-ui-1.9.2.custom.min.css">
-		<script type="text/javascript" src="../../vendor/jquery/jqueryV1/jquery-1.12.4.min.js"></script>
-		<script type="text/javascript" src="../../vendor/christianbach/tablesorter/jquery.tablesorter.min.js"></script>
-		<script type="text/javascript" src="../../vendor/components/jqueryui/jquery-ui.min.js"></script>
+		<link href="../../skin/vilesci.css" rel="stylesheet" type="text/css">';
+
+		include('../../include/meta/jquery.php');
+		include('../../include/meta/jquery-tablesorter.php');
+
+echo '	<script type="text/javascript" src="../../vendor/components/jqueryui/jquery-ui.min.js"></script>
 		<script type="text/javascript" src="../../include/js/jquery.ui.datepicker.translation.js"></script>
 		<script type="text/javascript" src="../../vendor/jquery/sizzle/sizzle.js"></script>
-
 		<script language="Javascript">
 			$(function() {
 				$("a.ui-widget-content").draggable({revert: true, helper: \'clone\'});
@@ -66,7 +66,6 @@ echo '
 						window.location.href="'.$_SERVER['PHP_SELF'].'?action=updateparent&kurzbz="+kurzbz+"&parent_kurzbz="+parent_kurzbz;
 					}
 				});
-
 			});
 		</script>
 		<style>
@@ -95,7 +94,9 @@ echo '
 <h2>Organisationseinheiten</h2>
 <table width="100%">
 	<tr>
-		<td><span style="font-size: small">Zuordnung kann per Drag&amp;Drop geändert werden!</font></td>
+		<td><span style="font-size: small">Zuordnung kann per Drag&amp;Drop geändert werden!</span><br>
+		€...Freigabegrenze hinterlegt (siehe Tooltip)<br>
+		<span style="color: green">L</span>...Leitung hinterlegt (siehe Tooltip)</td>
 		<td align="right"><a href="'.$_SERVER['PHP_SELF'].'?action=neu">Neue Organisationseinheit anlegen</a></td>
 	</tr>
 </table>
@@ -368,12 +369,43 @@ function display($arr)
 				echo '<br>';
 		}
 		//echo '<span class="ui-widget-content" style=" padding: 0px; margin:0px;'.$aktivstyle.'" >';
-		echo '<a href="'.$_SERVER['PHP_SELF'].'?action=edit&kurzbz='.$obj->oe_kurzbz.'" style="'.$aktivstyle.'" class="Item ui-widget-content" id="'.$obj->oe_kurzbz.'">';
-		echo $obj->organisationseinheittyp_kurzbz.' - ';
 		if($obj->organisationseinheittyp_kurzbz=='Institut')
-			echo $obj->oe_kurzbz;
+		{
+			$bezeichnung = substr($obj->organisationseinheittyp_kurzbz, 0, 1).substr($obj->organisationseinheittyp_kurzbz, -1).' - '.$obj->oe_kurzbz;
+		}
 		else
-			echo $obj->bezeichnung;
+		{
+			$bezeichnung = substr($obj->organisationseinheittyp_kurzbz, 0, 1).substr($obj->organisationseinheittyp_kurzbz, -1).' - '.$obj->bezeichnung;
+		}
+		$leitung = array();
+		$bnfunktion = new benutzerfunktion();
+		$bnfunktion->getBenutzerFunktionen('Leitung', $obj->oe_kurzbz);
+		foreach ($bnfunktion->result AS $funktion)
+		{
+			$mitarbeiter = new mitarbeiter($funktion->uid);
+			$leitung[] = $mitarbeiter->vorname.' '.$mitarbeiter->nachname;
+		}
+		$leitung = array_unique($leitung);
+		$title = $obj->organisationseinheittyp_kurzbz.' - '.$obj->bezeichnung;
+		if (count($leitung) > 0)
+		{
+			$bezeichnung .= ' <span style="color: green">L</span>';
+			$title .= "\nLeitung(en): ".implode(',',$leitung); // Keep double-quotes to display linebreak in title-attribute
+		}
+		if ($obj->freigabegrenze != '')
+		{
+			$bezeichnung .= ' <span title="Freigabegrenze €'.$obj->freigabegrenze.'" style="color: black">€</span>';
+			$title .= "\nFreigabegrenze: €".$obj->freigabegrenze; // Keep double-quotes to display linebreak in title-attribute
+		}
+
+
+
+		echo '<a    href="'.$_SERVER['PHP_SELF'].'?action=edit&kurzbz='.$obj->oe_kurzbz.'" 
+					style="'.$aktivstyle.'" 
+					class="Item ui-widget-content" 
+					title="'.$title.'" 
+					id="'.$obj->oe_kurzbz.'">';
+		echo $bezeichnung;
 		echo '</a>';
 		//echo '</span>';
 		if(is_array($val) && count($val)>0)
