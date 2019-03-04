@@ -18,7 +18,7 @@ if (! defined('BASEPATH'))
 class ReihungstestJob extends FHC_Controller
 {
 	private $VILESCI_RT_VERWALTUNGS_URL;
-	
+
 	/**
 	 * Constructor
 	 */
@@ -37,12 +37,14 @@ class ReihungstestJob extends FHC_Controller
 			echo "Jobs must be run from the CLI";
 			exit;
 		}
-		
+
 		$this->VILESCI_RT_VERWALTUNGS_URL = site_url(). "/organisation/Reihungstest";
-		
+
 		// Load models
 		$this->load->model('crm/Reihungstest_model', 'ReihungstestModel');
+		$this->load->model('crm/RtStudienplan_model', 'RtStudienplanModel');
 		$this->load->model('organisation/Studiengang_model', 'StudiengangModel');
+		$this->load->model('organisation/Studienplan_model', 'StudienplanModel');
 
 		// Load helpers
 		$this->load->helper('hlp_sancho_helper');
@@ -60,7 +62,7 @@ class ReihungstestJob extends FHC_Controller
 
 		echo $result. PHP_EOL;
 	}
-	
+
 	public function runReihungstestJob()
 	{
 		// Get study plans that have no assigned placement tests yet
@@ -75,10 +77,10 @@ class ReihungstestJob extends FHC_Controller
 		{
 			show_error($result->error);
 		}
-		
+
 		// Get free places
 		$result = $this->ReihungstestModel->getFreePlaces();
-				
+
 		$free_places_arr = array();
 		if (hasData($result))
 		{
@@ -88,10 +90,10 @@ class ReihungstestJob extends FHC_Controller
 		{
 			show_error($result->error);
 		}
-		
+
 		// Prepare data for mail template 'ReihungstestJob'
 		$content_data_arr = $this->_getContentData($missing_rt_arr, $free_places_arr);
-		
+
 		// Send email in Sancho design
 		if (!empty($missing_rt_arr) || !empty($free_places_arr))
 		{
@@ -102,12 +104,12 @@ class ReihungstestJob extends FHC_Controller
 				'Support für die Reihungstest-Verwaltung');
 		}
 	}
-	
+
 	public function runZentraleReihungstestAnmeldefristAssistenzJob()
 	{
 		// Get placement tests where registration date was yesterday
 		$result = $this->ReihungstestModel->checkReachedRegistrationDate(11000);
-		
+
 		$reachedRegistration_rt_arr = array();
 
 		if (hasData($result))
@@ -162,7 +164,7 @@ class ReihungstestJob extends FHC_Controller
 					{
 						$mailReceipients .=  $applicant->email. ';';
 						$applicantCounter ++;
-						$applicants_list .= ' 
+						$applicants_list .= '
 							<tr '.$rowstyle.'>
 							<td>'. $applicant->orgform_kurzbz. '</td>
 							<td>'. $applicant->ausbildungssemester. '</td>
@@ -204,7 +206,7 @@ class ReihungstestJob extends FHC_Controller
 					$mailcontent .= $applicants_list;
 					$mailcontent .= '
 					</tbody>
-					</table>				
+					</table>
 					';
 					$mailcontent .= '<p style="font-family: verdana, sans-serif;"><a href="mailto:?bcc=' . $mailReceipients . '">Mail an alle schicken</a></p>';
 				}
@@ -296,7 +298,7 @@ class ReihungstestJob extends FHC_Controller
 
 				$studiengang = $applicant->studiengang_kz;
 				$mailReceipients .= $applicant->email . ';';
-				$applicants_list .= ' 
+				$applicants_list .= '
 						<tr ' . $rowstyle . '>
 						<td>' . date_format(date_create($applicant->datum), 'd.m.Y') . '</td>
 						<td>' . $applicant->uhrzeit . '</td>
@@ -400,20 +402,20 @@ class ReihungstestJob extends FHC_Controller
 			}
 		}
 	}
-	
+
 	// ------------------------------------------------------------------------
 	// Private methods
 	/**
 	 * Returns associative array with data as needed in the reihungstest job template.
 	 * @param array $missing_rt_arr	Array with studienpläne, which have no assigned placement tests.
 	 * @param array $free_places_arr Array with info and amount of free placement test places.
-	 * @return array 
+	 * @return array
 	 */
 	private function _getContentData($missing_rt_arr, $free_places_arr)
 	{
 		$style_tbl1 = ' cellpadding="0" cellspacing="10" width="100%" style="font-family: courier, verdana, sans-serif; font-size: 0.95em; border: 1px solid #000000;" ';
 		$style_tbl2 = ' cellpadding="0" cellspacing="20" width="100%" style="font-family: courier, verdana, sans-serif; font-size: 0.95em; border: 1px solid #000000;" ';
-		
+
 		// Prepare HTML table with study plans that have no placement tests yet
 		if (!empty($missing_rt_arr))
 		{
@@ -421,27 +423,27 @@ class ReihungstestJob extends FHC_Controller
 				= '
 				<table'. $style_tbl2.'>
 			';
-			
+
 			foreach ($missing_rt_arr as $rt)
 			{
-				$studienplan_list .= ' 
+				$studienplan_list .= '
 					<tr><td>'. $rt->bezeichnung. '</td></tr>
 				';
 			}
-			
-			$studienplan_list .= ' 
+
+			$studienplan_list .= '
 				</table>
 			';
 		}
 		else
 		{
 			$studienplan_list = '
-				<table'. $style_tbl1.'>					
+				<table'. $style_tbl1.'>
 					<tr><td>Alles okay! Alle Studienpläne haben zumindest einen Reihungstest.</td></tr>
 				</table>
 			';
 		}
-		
+
 		// Prepare HTML table with information and amount of free places
 		if (!empty($free_places_arr))
 		{
@@ -453,21 +455,21 @@ class ReihungstestJob extends FHC_Controller
 						<th>Freie Plätze</th>
 					</tr>
 			';
-			
+
 			foreach ($free_places_arr as $free_place)
 			{
 				$datum = new DateTime($free_place->datum);
 				$style_alarm = ($free_place->freie_plaetze <= 5) ? ' style=" color: red; font-weight: bold" ' : '';	// mark if <=5 free places
-				
+
 				$freie_plaetze_list .= '
 					<tr>
 						<td width="350">'. $free_place->fakultaet. '</td>
 						<td align="center">'. $datum->format('d.m.Y'). '</td>
 						<td align="center"'. $style_alarm.'>'. $free_place->freie_plaetze. '</td>
 					</tr>
-				';			
+				';
 			}
-			
+
 			$freie_plaetze_list .= '
 				</table>
 			';
@@ -475,12 +477,12 @@ class ReihungstestJob extends FHC_Controller
 		else
 		{
 			$freie_plaetze_list = '
-				<table'. $style_tbl1.'>						
+				<table'. $style_tbl1.'>
 					<tr><td>Es gibt heute keine Ergebnisse zu freien Reihungstestplätze.</td></tr>
 				</table>
 			';
 		}
-			
+
 		// Set associative array with the prepared HTML tables and URL be used by the template's variables
 		$content_data_arr['studienplan_list'] = $studienplan_list;
 		$content_data_arr['freie_plaetze_list'] = $freie_plaetze_list;
@@ -489,5 +491,84 @@ class ReihungstestJob extends FHC_Controller
 
 		return $content_data_arr;
 	}
-}
 
+	/**
+	 * Checks the upcoming placement tests if there are correct studyplans assigned
+	 * If there are invalid studyplans assigned (outdated because there exists a new version),
+	 * it tries to find a better one and assigns it additionaly
+	 */
+	public function correctStudienplan()
+	{
+		// get all placement tests with incorrect studyplan
+		$qry = "
+		SELECT
+			tbl_reihungstest.reihungstest_id,
+			tbl_studienplan.studienplan_id,
+			tbl_reihungstest.studiensemester_kurzbz,
+			tbl_studienordnung.studiengang_kz
+		FROM
+			public.tbl_reihungstest
+			JOIN public.tbl_rt_studienplan ON(tbl_rt_studienplan.reihungstest_id=tbl_reihungstest.reihungstest_id)
+			JOIN lehre.tbl_studienplan USING(studienplan_id)
+			JOIN lehre.tbl_studienordnung USING(studienordnung_id)
+		WHERE
+			NOT EXISTS(
+				SELECT 1 FROM lehre.tbl_studienplan_semester
+				WHERE studienplan_id=tbl_rt_studienplan.studienplan_id
+					AND tbl_studienplan_semester.studiensemester_kurzbz=tbl_reihungstest.studiensemester_kurzbz
+			)
+			AND tbl_reihungstest.datum >= now()
+			AND NOT EXISTS(
+				SELECT
+					1
+				FROM
+					public.tbl_rt_studienplan rtstp
+					JOIN lehre.tbl_studienplan stp USING(studienplan_id)
+					JOIN lehre.tbl_studienordnung sto USING(studienordnung_id)
+					JOIN lehre.tbl_studienplan_semester stpsem USING(studienplan_id)
+				WHERE
+					sto.studiengang_kz=tbl_studienordnung.studiengang_kz
+					AND rtstp.reihungstest_id=tbl_reihungstest.reihungstest_id
+					AND stpsem.studiensemester_kurzbz=tbl_reihungstest.studiensemester_kurzbz
+			)
+		";
+
+		$db = new DB_Model();
+		$result_rt = $db->execReadOnlyQuery($qry);
+
+		if(hasdata($result_rt))
+		{
+			foreach ($result_rt->retval as $row_rt)
+			{
+				// find an active studyplan for the same degree program with is valid in this semester
+				$result_stpl = $this->StudienplanModel->getStudienplaeneBySemester(
+					$row_rt->studiengang_kz,
+					$row_rt->studiensemester_kurzbz
+				);
+
+				if(hasData($result_stpl))
+				{
+					foreach($result_stpl->retval as $row_stpl)
+					{
+						// Add new Studyplan to RtStudienplan if missing
+						$rt_studienplan = $this->RtStudienplanModel->loadWhere(array(
+							"reihungstest_id" => $row_rt->reihungstest_id,
+							"studienplan_id" => $row_stpl->studienplan_id
+						));
+
+						if(!hasData($rt_studienplan))
+						{
+							echo "\nAdding StudienplanId: $row_stpl->studienplan_id";
+							echo " to ReihungstestId: $row_rt->reihungstest_id";
+
+							$this->RtStudienplanModel->insert(array(
+								"reihungstest_id" => $row_rt->reihungstest_id,
+								"studienplan_id" => $row_stpl->studienplan_id
+							));
+						}
+					}
+				}
+			}
+		}
+	}
+}
