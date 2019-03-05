@@ -38,6 +38,7 @@ class service extends basis_db
 	public $design_uid;		// varchar(32)
 	public $betrieb_uid;	// varchar(32)
 	public $operativ_uid;	// varchar(32)
+	public $servicekategorie_kurzbz; // varchar(32)
 
 	/**
 	 * Konstruktor - Laedt optional ein Service
@@ -81,6 +82,7 @@ class service extends basis_db
 				$this->design_uid = $row->design_uid;
 				$this->betrieb_uid = $row->betrieb_uid;
 				$this->operativ_uid = $row->operativ_uid;
+				$this->servicekategorie_kurzbz = $row->servicekategorie_kurzbz;
 
 				return true;
 			}
@@ -119,6 +121,7 @@ class service extends basis_db
 				$obj->design_uid = $row->design_uid;
 				$obj->betrieb_uid = $row->betrieb_uid;
 				$obj->operativ_uid = $row->operativ_uid;
+				$obj->servicekategorie_kurzbz = $row->servicekategorie_kurzbz;
 
 				$this->result[] = $obj;
 			}
@@ -159,6 +162,7 @@ class service extends basis_db
 				$obj->design_uid = $row->design_uid;
 				$obj->betrieb_uid = $row->betrieb_uid;
 				$obj->operativ_uid = $row->operativ_uid;
+				$obj->servicekategorie_kurzbz = $row->servicekategorie_kurzbz;
 
 				$this->result[] = $obj;
 			}
@@ -223,6 +227,7 @@ class service extends basis_db
 				$obj->design_uid = $row->design_uid;
 				$obj->betrieb_uid = $row->betrieb_uid;
 				$obj->operativ_uid = $row->operativ_uid;
+				$obj->servicekategorie_kurzbz = $row->servicekategorie_kurzbz;
 
 				$this->result[] = $obj;
 			}
@@ -275,6 +280,7 @@ class service extends basis_db
 				$obj->design_uid = $row->design_uid;
 				$obj->betrieb_uid = $row->betrieb_uid;
 				$obj->operativ_uid = $row->operativ_uid;
+				$obj->servicekategorie_kurzbz = $row->servicekategorie_kurzbz;
 
 				$this->result[] = $obj;
 			}
@@ -328,6 +334,7 @@ class service extends basis_db
 				$obj->design_uid = $row->design_uid;
 				$obj->betrieb_uid = $row->betrieb_uid;
 				$obj->operativ_uid = $row->operativ_uid;
+				$obj->servicekategorie_kurzbz = $row->servicekategorie_kurzbz;
 
 				$this->result[] = $obj;
 			}
@@ -363,7 +370,8 @@ class service extends basis_db
 
 		if($new)
 		{
-			$qry = "BEGIN;INSERT INTO public.tbl_service (bezeichnung, beschreibung, oe_kurzbz, content_id, ext_id, design_uid, betrieb_uid, operativ_uid)
+			$qry = "BEGIN;INSERT INTO public.tbl_service (bezeichnung, beschreibung, oe_kurzbz, content_id, ext_id,
+					design_uid, betrieb_uid, operativ_uid, servicekategorie_kurzbz)
 					VALUES(".
 				$this->db_add_param($this->bezeichnung).','.
 				$this->db_add_param($this->beschreibung).','.
@@ -372,7 +380,8 @@ class service extends basis_db
 				$this->db_add_param($this->ext_id).','.
 				$this->db_add_param($this->design_uid).','.
 				$this->db_add_param($this->betrieb_uid).','.
-				$this->db_add_param($this->operativ_uid).');';
+				$this->db_add_param($this->operativ_uid).','.
+				$this->db_add_param($this->servicekategorie_kurzbz).');';
 		}
 		else
 		{
@@ -384,7 +393,8 @@ class service extends basis_db
 				' ext_id = '.$this->db_add_param($this->ext_id).','.
 				' design_uid = '.$this->db_add_param($this->design_uid).','.
 				' betrieb_uid = '.$this->db_add_param($this->betrieb_uid).','.
-				' operativ_uid = '.$this->db_add_param($this->operativ_uid).
+				' operativ_uid = '.$this->db_add_param($this->operativ_uid).','.
+				' servicekategorie_kurzbz = '.$this->db_add_param($this->servicekategorie_kurzbz).
 				' WHERE service_id='.$this->db_add_param($this->service_id, FHC_INTEGER).';';
 		}
 
@@ -444,6 +454,27 @@ class service extends basis_db
 		else
 		{
 			$this->errormsg = 'Fehler beim Loeschen des Service';
+			return false;
+		}
+	}
+
+	public function getKategorieArray()
+	{
+		$kategorien = array();
+
+		$qry = 'SELECT * FROM public.tbl_servicekategorie ORDER BY sort';
+
+		if($result = $this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object($result))
+			{
+				$kategorien[$row->servicekategorie_kurzbz] = $row->bezeichnung;
+			}
+			return $kategorien;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
 			return false;
 		}
 	}
