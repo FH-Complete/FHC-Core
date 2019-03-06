@@ -421,6 +421,96 @@ class prestudent extends person
 	}
 
 	/**
+	 * Laedt über einen Prestudenten alle anderen Prestudenten einer Person, die aktuell an STG interessiert sind.
+	 * @integer $prestudent_id Prestudent ID, über die alle weiteren Prestudenten ermittelt werden sollen.
+	 * @boolean $prio Wenn true, dann wird nur der Prestudent mit dem am höchsten priorisierten Studiengang zurückgegeben.
+	 * return Objekt-Array mit allen Prestudenten einer Person, die aktuell an STG interessiert sind.
+	 */
+	public function getActualInteressenten($prestudent_id, $prio = false)
+	{
+		if (is_numeric($prestudent_id))
+		{
+			$qry = "
+			SELECT DISTINCT ON (priorisierung, prestudent_id) 
+				priorisierung,
+				prestudent_id, 
+				studienplan_id,
+				studiengang_kz,
+				ausbildungssemester
+			FROM
+				public.tbl_prestudentstatus
+			JOIN
+				public.tbl_prestudent USING (prestudent_id)
+			WHERE 
+				tbl_prestudent.person_id = (
+				SELECT
+						person_id
+					FROM
+						public.tbl_prestudent
+					WHERE
+						prestudent_id = ". $this->db_add_param($prestudent_id). "
+				)
+		
+			-- Filter only future studiensemester (incl. actual one)
+			AND
+				studiensemester_kurzbz IN (
+			SELECT 
+						studiensemester_kurzbz
+					FROM
+						public.tbl_studiensemester 
+					WHERE 
+						ende > now()
+				)
+			
+			AND 
+				status_kurzbz = 'Interessent'
+	
+			-- Order to get the very last status and highest prio on top
+			ORDER BY
+				priorisierung NULLS LAST,   
+				prestudent_id,
+				datum DESC,
+				tbl_prestudentstatus.insertamum DESC, 
+				tbl_prestudentstatus.ext_id DESC
+			" ;
+
+			if ($prio)
+			{
+				$qry .= "
+				 LIMIT 1
+				";
+			}
+
+			if($this->db_query($qry))
+			{
+				while($row = $this->db_fetch_object())
+				{
+					$obj = new stdClass();
+
+					$obj->prestudent_id = $row->prestudent_id;
+					$obj->studienplan_id = $row->studienplan_id;
+					$obj->studiengang_kz = $row->studiengang_kz;
+					$obj->ausbildungssemester = $row->ausbildungssemester;
+
+					$this->result[] = $obj;
+				}
+				return true;
+			}
+			else
+			{
+				$this->errormsg = 'Fehler beim Laden der Daten';
+				return false;
+			}
+		}
+		else
+		{
+			$this->errormsg = 'prestudent_id muss numerisch sein.';
+			return false;
+		}
+	}
+
+
+	/**
 	 * Laedt die Rolle(n) eines Prestudenten
 	 */
 	public function getPrestudentRolle($prestudent_id, $status_kurzbz=null, $studiensemester_kurzbz=null, $order="datum, insertamum", $ausbildungssemester=null)
