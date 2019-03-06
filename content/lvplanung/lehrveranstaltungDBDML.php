@@ -1698,7 +1698,7 @@ if(!$error)
 					}
 					else
 					{
-						$errormsg = $benutergruppe->errormsg;
+						$errormsg = $benutzergruppe->errormsg;
 						$return = false;
 					}
 				}
