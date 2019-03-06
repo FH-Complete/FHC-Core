@@ -302,60 +302,63 @@ if (in_array($stsem, $stsem_arr))
 else 
 	echo '<p class="error">'.$p->t('tools/keinStatusImStudiensemester',array($stsem)).'</p>';
 
-$akte = new akte();
-echo '<h2>' . $p->t('tools/abschlussdokumente') . '</h2>';
-echo '<table><tr>';
-echo '<td style="	background-color: #fcf8e3; 
-					color: #8a6d3b; 
-					padding: .75rem 1.25rem; 
-					margin-bottom: 1rem; 
-					border: 1px solid #faf2cc; 
-					border-radius: .25rem;">'.$p->t('tools/warnungDruckDigitaleSignatur').'</td>';
-echo '</tr></table>';
-
-if($akte->getArchiv($student_studiengang->person_id, null, true) && count($akte->result)>0)
+if (!defined('CIS_DOKUMENTE_SELFSERVICE') || CIS_DOKUMENTE_SELFSERVICE)
 {
-	echo '
-	<table class="tablesorter2" style="width:auto;">
-		<thead>
-		<tr>
-			<th></th>
-			<th>'.$p->t('tools/erstelldatum').'</th>
-			<th>'.$p->t('tools/dokument').'</th>
-		</tr>
-		</thead>
-		<tbody>
-	';
+	$akte = new akte();
+	echo '<h2>' . $p->t('tools/abschlussdokumente') . '</h2>';
+	echo '<table><tr>';
+	echo '<td style="	background-color: #fcf8e3; 
+						color: #8a6d3b; 
+						padding: .75rem 1.25rem; 
+						margin-bottom: 1rem; 
+						border: 1px solid #faf2cc; 
+						border-radius: .25rem;">'.$p->t('tools/warnungDruckDigitaleSignatur').'</td>';
+	echo '</tr></table>';
 
-	$datum_obj = new datum();
-
-	foreach($akte->result as $row)
+	if($akte->getArchiv($student_studiengang->person_id, null, true) && count($akte->result)>0)
 	{
-		$pfad = 'dokumente.php?action=download&id='.$row->akte_id.'&uid='.$uid;
-		echo '<tr>';
-		echo '<td><img src="../../../skin/images/pdfpic.gif" /></td>';
-		echo '<td>'.$datum_obj->formatDatum($row->erstelltam,'d.m.Y').'</td>';
-		echo '<td><a href="'.$pfad.'">'.$row->bezeichnung.'</a></td>';
-		echo '</tr>';
-	}
+		echo '
+		<table class="tablesorter2" style="width:auto;">
+			<thead>
+			<tr>
+				<th></th>
+				<th>'.$p->t('tools/erstelldatum').'</th>
+				<th>'.$p->t('tools/dokument').'</th>
+			</tr>
+			</thead>
+			<tbody>
+		';
 
-	echo '</tbody></table>';
-}
-else 
-{
-	echo '
-	<table class="tablesorter2" style="width:auto;">
-		<thead>
-		<tr>
-			<th></th>
-			<th>'.$p->t('tools/erstelldatum').'</th>
-			<th>'.$p->t('tools/dokument').'</th>
-		</tr>
-		</thead>
-		<tbody>
-	';
-	echo '<td colspan="3">'.$p->t('tools/nochKeineAbschlussdokumenteVorhanden').'</td>';
-	echo '</tbody></table>';
+		$datum_obj = new datum();
+
+		foreach($akte->result as $row)
+		{
+			$pfad = 'dokumente.php?action=download&id='.$row->akte_id.'&uid='.$uid;
+			echo '<tr>';
+			echo '<td><img src="../../../skin/images/pdfpic.gif" /></td>';
+			echo '<td>'.$datum_obj->formatDatum($row->erstelltam,'d.m.Y').'</td>';
+			echo '<td><a href="'.$pfad.'">'.$row->bezeichnung.'</a></td>';
+			echo '</tr>';
+		}
+
+		echo '</tbody></table>';
+	}
+	else 
+	{
+		echo '
+		<table class="tablesorter2" style="width:auto;">
+			<thead>
+			<tr>
+				<th></th>
+				<th>'.$p->t('tools/erstelldatum').'</th>
+				<th>'.$p->t('tools/dokument').'</th>
+			</tr>
+			</thead>
+			<tbody>
+		';
+		echo '<td colspan="3">'.$p->t('tools/nochKeineAbschlussdokumenteVorhanden').'</td>';
+		echo '</tbody></table>';
+	}
 }
 echo '</body>
 </html>
