@@ -27,6 +27,8 @@ require_once('../../include/person.class.php');
 require_once('../../include/prestudent.class.php');
 require_once('../../include/pruefling.class.php');
 require_once('../../include/studiengang.class.php');
+require_once('../../include/studienplan.class.php');
+require_once('../../include/ablauf.class.php');
 require_once('../../include/reihungstest.class.php');
 require_once('../../include/sprache.class.php');
 require_once '../../include/phrasen.class.php';
@@ -174,10 +176,51 @@ if (isset($_POST['prestudent']) && isset($gebdatum))
 				$_SESSION['sprache']=$stg_obj->sprache;
 
 				$_SESSION['semester']=$semester;
+
+				// STG und Studienplan mit der höchsten Prio ermitteln
+				$ps->getActualInteressenten($_POST['prestudent'], true);
+				$firstPrio_studienplan_id = array_column($ps->result, 'studienplan_id');
+				$firstPrio_studienplan_id = array_shift($firstPrio_studienplan_id);
+				$firstPrio_studiengang_kz =  array_column($ps->result, 'studiengang_kz');
+				$firstPrio_studiengang_kz = array_shift($firstPrio_studiengang_kz);
+
+
+				// Sprachvorgaben zu STG mit höchster Prio ermitteln
+
+                // * 1. Sprache über Ablauf Vorgaben ermitteln
+				$ablauf = new Ablauf();
+				$ablauf->getAblaufVorgabeStudiengang($firstPrio_studiengang_kz);
+				$rt_sprache = $ablauf->result[0]->sprache;
+
+				// * 2. falls keine Sprache vorhanden -> Sprache über Studienplan ermitteln
+				if (empty($rt_sprache))
+                {
+                    $stpl = new Studienplan();
+                    $stpl->loadStudienplan($firstPrio_studienplan_id);
+                    $rt_sprache = $stpl->sprache;
+
+                }
+
+				// * 3. falls keine Sprache vorhanden -> Sprache über Studiengang ermitteln
+				if (empty($rt_sprache))
+				{
+					$stg = new Studiengang($firstPrio_studiengang_kz);
+					$rt_sprache = $stg->sprache;
+				}
+
+				// * 4. Sprache setzen. Falls keine Sprache vorhanden -> DEFAULT language verwenden
+				if (empty($rt_sprache))
+				{
+					$_SESSION['sprache'] = DEFAULT_LANGUAGE;
+				}
+				else
+                {
+					$_SESSION['sprache'] = $rt_sprache;
+                }
 			}
 			else
-			{
-				echo '<span class="error">'.$p->t('testtool/reihungstestNichtFreigeschalten').'</span>';
+            {
+                echo '<span class="error">'.$p->t('testtool/reihungstestNichtFreigeschalten').'</span>';
 			}
 		}
 		else
@@ -311,12 +354,17 @@ if(isset($_POST['save']) && isset($_SESSION['prestudent_id']))
 		$typ = new studiengang($prestudent->studiengang_kz);
 		$typ->getStudiengangTyp($stg_obj->typ);
 
-		//Sprachwahl des Studiengangs
-		$qry = "SELECT sprachwahl FROM testtool.tbl_ablauf_vorgaben WHERE studiengang_kz=".$db->db_add_param($prestudent->studiengang_kz)." LIMIT 1";
-		$result = $db->db_query($qry);
-		$sprachwahl = $db->db_fetch_object($result);
-		$sprachwahl = $db->db_parse_bool($sprachwahl->sprachwahl);
-                
+        // STG mit der höchsten Prio ermitteln
+        $ps = new Prestudent();
+		$ps->getActualInteressenten($prestudent_id, true);
+		$firstPrio_studiengang_kz = array_column($ps->result, 'studiengang_kz');
+		$firstPrio_studiengang_kz = array_shift($firstPrio_studiengang_kz);
+
+        // Sprachwahl zu STG mit höchster Prio ermitteln
+		$ablauf = new Ablauf();
+		$ablauf->getAblaufVorgabeStudiengang($firstPrio_studiengang_kz);
+		$sprachwahl = $ablauf->result[0]->sprachwahl;
+
                 //Prestudent Informationen und Logout 
 		echo '<form method="GET">';
 		echo '<br>'.$p->t('testtool/begruessungstext').' <br/><br/>';
@@ -339,7 +387,7 @@ if(isset($_POST['save']) && isset($_SESSION['prestudent_id']))
 			echo '</table>';
 			echo '</FORM>';
 
-			//Wenn die Sprachwahl fuer diesen Studiengang aktiviert ist, dann die Sprachen anzeigen
+			//Wenn die Sprachwahl fuer den priorisierten Studiengang aktiviert ist, dann die Sprachen anzeigen
 			if($sprachwahl==true)
 			{
 				//Liste der Sprachen, die in den Gebieten vorkommen koennen
