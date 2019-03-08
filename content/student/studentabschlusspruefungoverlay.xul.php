@@ -293,7 +293,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 						<box class="Datum" id="student-abschlusspruefung-datum-datum" disabled="true"/>
 					</vbox>
 				</row>
-				<row>
+				<row id="student-abschlusspruefung-datum-uhrzeit-row">
 					<vbox>
 						<label value="Uhrzeit" control="student-abschlusspruefung-datum-uhrzeit" />
 					</vbox>
