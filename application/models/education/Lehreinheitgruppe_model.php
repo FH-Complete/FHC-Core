@@ -24,7 +24,8 @@ class Lehreinheitgruppe_model extends DB_Model
 	public function getDirectGroup($lehreinheit_id)
 	{
 		$this->addJoin('public.tbl_gruppe', 'gruppe_kurzbz');
-		return $this->loadWhere(array(
+		return $this->loadWhere(
+			array(
 			'tbl_gruppe.direktinskription' => true,
 			'lehreinheit_id' => $lehreinheit_id
 			)
@@ -58,21 +59,21 @@ class Lehreinheitgruppe_model extends DB_Model
 	 */
 	public function direktUserAdd($uid, $lehreinheit_id)
 	{
-		$result = success('User added successfully');
+		$result = success('User added successfully to group');
 		$directgroup = $this->getDirectGroup($lehreinheit_id);
 		$lehreinheit = $this->LehreinheitModel->load($lehreinheit_id);
 		$loggedInUser = getAuthUID();
 
-		if (hasData($directgroup))
+		if (hasData($lehreinheit))
 		{
-			$gruppe_kurzbz = $directgroup->retval[0]->gruppe_kurzbz;
-		}
-		else
-		{
-			// Es gibt keine direkte Gruppe zu dieser LE
-			// es wird eine erstellt und zugewiesen
-			if (hasData($lehreinheit))
+			if (hasData($directgroup))
 			{
+				$gruppe_kurzbz = $directgroup->retval[0]->gruppe_kurzbz;
+			}
+			else
+			{
+				// Es gibt keine direkte Gruppe zu dieser LE
+				// es wird eine erstellt und zugewiesen
 				$lva = $this->LehrveranstaltungModel->load($lehreinheit->retval[0]->lehrveranstaltung_id);
 
 				if (hasData($lva))
@@ -84,7 +85,7 @@ class Lehreinheitgruppe_model extends DB_Model
 					{
 						$gruppe_kurzbz = 'GRP_'.$lehreinheit_id;
 						$studiengangdata = $studiengang->retval[0];
-						$kuerzel = mb_strtoupper($studiengangdata->typ . $studiengangdata->kurzbz);
+						$kuerzel = mb_strtoupper($studiengangdata->typ.$studiengangdata->kurzbz);
 						$bezeichnung = $kuerzel.' '.$lvadata->semester.' '.$lvadata->kurzbz;
 
 						$gruppe = $this->GruppeModel->load($gruppe_kurzbz);
@@ -116,7 +117,7 @@ class Lehreinheitgruppe_model extends DB_Model
 						$lehreinheitgruppedata = array(
 							'lehreinheit_id' => $lehreinheit->retval[0]->lehreinheit_id,
 							'gruppe_kurzbz' => $gruppe_kurzbz,
-							'studiengang_kz' =>  $lvadata->studiengang_kz,
+							'studiengang_kz' => $lvadata->studiengang_kz,
 							'semester' => $lvadata->semester,
 							'insertamum' => date('Y-m-d H:i:s'),
 							'insertvon' => $loggedInUser
@@ -129,20 +130,15 @@ class Lehreinheitgruppe_model extends DB_Model
 					}
 				}
 			}
-			else
-			{
-				return error('No Lehreinheit found');
-			}
-		}
 
-		if (hasData($lehreinheit))
-		{
-			$benutzergruppe = $this->BenutzergruppeModel->load(array('uid' => $uid,
-																	 'gruppe_kurzbz' => $gruppe_kurzbz));
-
-			if (!hasData($benutzergruppe))
+			if (isset($gruppe_kurzbz) && !isEmptyString($gruppe_kurzbz))
 			{
-				if (isset($gruppe_kurzbz) && !isEmptyString($gruppe_kurzbz))
+				$benutzergruppe = $this->BenutzergruppeModel->load(array(
+					'uid' => $uid,
+					'gruppe_kurzbz' => $gruppe_kurzbz
+				));
+
+				if (!hasData($benutzergruppe))
 				{
 					$benutzergruppedata = array(
 						'uid' => $uid,
@@ -159,6 +155,11 @@ class Lehreinheitgruppe_model extends DB_Model
 				}
 			}
 		}
+		else
+		{
+			return error('No Lehreinheit found');
+		}
+
 		return $result;
 	}
 
@@ -171,19 +172,24 @@ class Lehreinheitgruppe_model extends DB_Model
 	public function direktUserDelete($uid, $lehreinheit_id)
 	{
 		$result = success('User deleted successfully');
-		$directgroup = $this->getDirectGroup($lehreinheit_id);
 		$lehreinheit = $this->LehreinheitModel->load($lehreinheit_id);
 
 		if (hasData($lehreinheit))
 		{
+			$directgroup = $this->getDirectGroup($lehreinheit_id);
 			if (hasData($directgroup))
 			{
 				$gruppe_kurzbz = $directgroup->retval[0]->gruppe_kurzbz;
+				// delete benutzer assignment
 				$deleteresp = $this->BenutzergruppeModel->delete(array('uid' => $uid, 'gruppe_kurzbz' => $gruppe_kurzbz));
 
 				if (hasData($deleteresp))
 				{
-					$uids = $this->BenutzergruppeModel->load(array($gruppe_kurzbz, $lehreinheit->retval[0]->studiensemester_kurzbz));
+					$uids = $this->BenutzergruppeModel->loadWhere(
+						array(
+							'gruppe_kurzbz' => $gruppe_kurzbz,
+							'studiensemester_kurzbz' => $lehreinheit->retval[0]->studiensemester_kurzbz)
+					);
 
 					if (isSuccess($uids) && !hasData($uids))
 					{
@@ -217,12 +223,22 @@ class Lehreinheitgruppe_model extends DB_Model
 							}
 							else
 							{
-								// delete group if not in Studienplandev. If in Studienplan, deleted next day after cronjob.
-								$gruppedelres = $this->GruppeModel->delete($gruppe_kurzbz);
+								$lehreinheitgrupperes = $this->load(array('gruppe_kurzbz' => $gruppe_kurzbz));
 
-								if (!hasData($gruppedelres))
+								if (isSuccess($lehreinheitgrupperes) && !hasData($lehreinheitgrupperes))
 								{
-									$result = error('Gruppe could not be deleted');
+									$benutzergruppegrupperes = $this->BenutzergruppeModel->load(array('gruppe_kurzbz' => $gruppe_kurzbz));
+
+									if (isSuccess($benutzergruppegrupperes) && !hasData($benutzergruppegrupperes))
+									{
+										// delete group if not in Studienplandev. If in Studienplan, deleted next day after cronjob.
+										$gruppedelres = $this->GruppeModel->delete($gruppe_kurzbz);
+
+										if (!hasData($gruppedelres))
+										{
+											$result = error('Gruppe could not be deleted');
+										}
+									}
 								}
 							}
 						}
@@ -230,10 +246,6 @@ class Lehreinheitgruppe_model extends DB_Model
 						{
 							$result = error('Error when querying Studienplan');
 						}
-					}
-					else
-					{
-						$result = error('There are still users in the Benutzergruppe. Could not be deleted.');
 					}
 				}
 				else
