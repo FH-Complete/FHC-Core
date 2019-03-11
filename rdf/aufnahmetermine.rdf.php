@@ -18,6 +18,7 @@
  * Authors: Andreas Oesterreicher <oesi@technikum-wien.at>
  */
 require_once('../config/vilesci.config.inc.php');
+require_once('../config/global.config.inc.php');
 require_once('../include/rdf.class.php');
 require_once('../include/basis_db.class.php');
 require_once('../include/functions.inc.php');
@@ -25,6 +26,7 @@ require_once('../include/benutzerberechtigung.class.php');
 require_once('../include/datum.class.php');
 require_once('../include/benutzer.class.php');
 require_once('../include/prestudent.class.php');
+require_once('../include/pruefling.class.php');
 require_once('../include/reihungstest.class.php');
 require_once('../include/studienplan.class.php');
 require_once('../include/studienordnung.class.php');
@@ -92,6 +94,36 @@ if($prestudent_id!='')
 			$zuordnung_fuer_selben_studiengang[] = $row->rt_person_id;
 			$stsem_arr[] = $reihungstest_obj_arr[$row->reihungstest_id]->studiensemester_kurzbz;
 		}
+
+		// Reale (nicht von Assistenz überarbeitete) Gesamtpunkte des RT laden; ggf. ohne bestimmte Fragengebiete
+		$pruefling = new Pruefling();
+
+		// * Gesamtpunkte inklusive alle Fragengebiete
+		$endpunkte_inkl_gebiete = 0;
+		$endpunkte_exkl_gebiete = 0;
+		if(defined('FAS_REIHUNGSTEST_PUNKTE') && FAS_REIHUNGSTEST_PUNKTE)
+		{
+			$endpunkte_inkl_gebiete = $pruefling->getReihungstestErgebnisPerson($row->person_id, true, $row->reihungstest_id);
+		}
+		else
+		{
+			$endpunkte_inkl_gebiete = $pruefling->getReihungstestErgebnisPerson($row->person_id, false, $row->reihungstest_id);
+		}
+		// * ggf. Gesamtpunkte exklusive bestimmte Fragengebiete
+		if (defined('FAS_REIHUNGSTEST_EXCLUDE_GEBIETE') && !empty(FAS_REIHUNGSTEST_EXCLUDE_GEBIETE))
+		{
+			if(defined('FAS_REIHUNGSTEST_PUNKTE') && FAS_REIHUNGSTEST_PUNKTE)
+			{
+				$endpunkte_exkl_gebiete = $pruefling->getReihungstestErgebnisPerson($row->person_id, true, $row->reihungstest_id, true);
+			}
+			else
+			{
+				$endpunkte_exkl_gebiete = $pruefling->getReihungstestErgebnisPerson($row->person_id, false, $row->reihungstest_id, true);
+			}
+		}
+
+		$row->endpunkte_inkl_gebiete = round($endpunkte_inkl_gebiete, 2);
+		$row->endpunkte_exkl_gebiete = round($endpunkte_exkl_gebiete, 2);
 	}
 	if(count($stsem_arr) > 0)
 	{
@@ -111,6 +143,38 @@ elseif($rt_person_id!='')
 	{
 		$reihungstest_obj_arr[$reihungstest->reihungstest_id] = new reihungstest();
 		$reihungstest_obj_arr[$reihungstest->reihungstest_id]->load($reihungstest->reihungstest_id);
+
+		// Reale (nicht von Assistenz überarbeitete) Gesamtpunkte des RT laden; ggf. ohne bestimmte Fragengebiete
+		$pruefling = new Pruefling();
+
+		// * Gesamtpunkte inklusive alle Fragengebiete
+		$endpunkte_inkl_gebiete = 0;
+		$endpunkte_exkl_gebiete = 0;
+		if(defined('FAS_REIHUNGSTEST_PUNKTE') && FAS_REIHUNGSTEST_PUNKTE)
+		{
+			$endpunkte_inkl_gebiete = $pruefling->getReihungstestErgebnisPerson($reihungstest->person_id, true, $reihungstest->reihungstest_id);
+		}
+		else
+		{
+			$endpunkte_inkl_gebiete = $pruefling->getReihungstestErgebnisPerson($reihungstest->person_id, false, $reihungstest->reihungstest_id);
+		}
+		// * ggf. Gesamtpunkte exklusive bestimmte Fragengebiete
+		if (defined('FAS_REIHUNGSTEST_EXCLUDE_GEBIETE') && !empty(FAS_REIHUNGSTEST_EXCLUDE_GEBIETE))
+		{
+			if(defined('FAS_REIHUNGSTEST_PUNKTE') && FAS_REIHUNGSTEST_PUNKTE)
+			{
+				$endpunkte_exkl_gebiete = $pruefling->getReihungstestErgebnisPerson($reihungstest->person_id, true, $reihungstest->reihungstest_id, true);
+			}
+			else
+			{
+				$endpunkte_exkl_gebiete = $pruefling->getReihungstestErgebnisPerson($reihungstest->person_id, false, $reihungstest->reihungstest_id, true);
+			}
+		}
+
+
+		$reihungstest->endpunkte_inkl_gebiete = round($endpunkte_inkl_gebiete, 2);
+		$reihungstest->endpunkte_exkl_gebiete = round($endpunkte_exkl_gebiete, 2);
+
 		drawrow($reihungstest);
 	}
 	else
@@ -162,6 +226,8 @@ function drawrow($row)
 	$oRdf->obj[$i]->setAttribut('studiensemester',$reihungstest_obj->studiensemester_kurzbz,true);
 	$oRdf->obj[$i]->setAttribut('datum',$datum_obj->formatDatum($reihungstest_obj->datum,'d.m.Y'),true);
 	$oRdf->obj[$i]->setAttribut('datum_iso',$reihungstest_obj->datum,true);
+	$oRdf->obj[$i]->setAttribut('endpunkte_inkl_gebiete', $row->endpunkte_inkl_gebiete, true);
+	$oRdf->obj[$i]->setAttribut('endpunkte_exkl_gebiete', $row->endpunkte_exkl_gebiete, true);
 
 	// Es wird der neueste Reihungstest im Studiengang des Prestudenten markiert damit im FAS erkennbar ist welches
 	// Eintraege zur Punkteberechnung verwendet werden
