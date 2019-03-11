@@ -313,12 +313,25 @@ class pruefling extends basis_db
 	 * @param $person_id ID der Person.
 	 * @param $punkte Wenn true werden Punkte geliefert, sonst Prozentsumme.
 	 * @param $reihungstest_id ID des Reihungstests.
+	 * @param $has_excluded_gebiete Wenn true werden die Punkte der Fragengebiete, die im config-array
+	 * definiert sind, bei der Berechnung der Endpunkte nicht berücksichtigt.
 	 * @return Endpunkte des Reihungstests oder False wenn keine Punkte vorhanden
 	 */
-	public function getReihungstestErgebnisPerson($person_id, $punkte=false, $reihungstest_id=null)
+	public function getReihungstestErgebnisPerson($person_id, $punkte=false, $reihungstest_id=null, $has_excluded_gebiete = false)
 	{
 		$qry = "SELECT * FROM testtool.vw_auswertung
 				WHERE person_id=".$this->db_add_param($person_id, FHC_INTEGER);
+
+		if ($has_excluded_gebiete)
+		{
+			if (defined('FAS_REIHUNGSTEST_EXCLUDE_GEBIETE') && !empty(FAS_REIHUNGSTEST_EXCLUDE_GEBIETE))
+			{
+				$exclude_gebiet_id_arr = FAS_REIHUNGSTEST_EXCLUDE_GEBIETE;
+				$exclude_gebiet_id_toString = implode(', ', $exclude_gebiet_id_arr);
+				$qry .= " AND gebiet_id NOT IN (". $exclude_gebiet_id_toString. ")";
+			}
+		}
+
 		$ergebnis=0;
 
 		if(!is_null($reihungstest_id))

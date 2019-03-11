@@ -104,6 +104,10 @@ define('FAS_PRUEFUNG_BEI_NOTENEINGABE_ANLEGEN',false);
 //oder Prozentpunkte uebernommen werden true=Punkte, false=Prozentpunkte
 define('FAS_REIHUNGSTEST_PUNKTE', false);
 
+// Legt fest, welche Reihungstestgebiete bei der Berechnung der Gesamtpunkte NICHT einbezogen werden.
+// array(gebiet_id1, gebiet_id2,...)
+define('FAS_REIHUNGSTEST_EXCLUDE_GEBIETE', array());
+
 // Legt fest ob Messages im FAS angezeigt werden true|false
 define('FAS_MESSAGES',false);
 
