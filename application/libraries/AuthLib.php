@@ -9,6 +9,8 @@ class AuthLib
 
 	// Config entry name
 	const AUTHENTICATION_FOREIGN_METHODS = 'authentication_foreign_methods';
+	const AUTHENTICATION_LOGIN = 'authentication_login';
+	const AUTHENTICATION_LOGIN_PAGES = 'authentication_login_pages';
 
 	// Login object properties
 	const AO_PERSON_ID = 'person_id';
@@ -56,8 +58,7 @@ class AuthLib
 	}
 
 	/**
-	 * Checks the authentication of an addon
-	 * returns TRUE if valid, otherwise FALSE
+	 * Checks the authentication of an addon. Returns TRUE if valid, otherwise FALSE
 	 */
 	public function basicAuthentication($username, $password)
 	{
@@ -140,7 +141,7 @@ class AuthLib
 			// Clean the entire session -> fully logged out
 			cleanSession(AuthLib::SESSION_NAME);
 		}
-		else // LoginAs functionality in use
+		else // loginAs functionality in use
 		{
 			// Copy the origin authentication object as the authentication object in session
 			// The LoginAs account is logged out
@@ -249,7 +250,7 @@ class AuthLib
 
 			// Retrieves user data using its own person_id
 			$personResult = $this->_ci->PersonModel->load($_SESSION['bewerbung/personId']);
-			if (hasData($personResult)) // Found!
+			if (hasData($personResult)) // found!
 			{
 				$person = getData($personResult)[0];
 
@@ -259,7 +260,7 @@ class AuthLib
 					AUTH_SUCCESS
 				);
 			}
-			elseif (isError($person)) // Blocking error
+			elseif (isError($person)) // blocking error
 			{
 				$bt = $person; // return it!
 			}
@@ -298,7 +299,7 @@ class AuthLib
 					AUTH_SUCCESS
 				);
 			}
-			elseif (isError($personResult)) // Blocking error
+			elseif (isError($personResult)) // blocking error
 			{
 				$hta = $personResult; // return it!
 			}
@@ -331,17 +332,17 @@ class AuthLib
 					$ldapModel->close(); // close the previous connection
 					$ldap = success('Authenticated'); // authenticated!
 				}
-				else // Error
+				else // blocking error
 				{
 					$ldap = $ldapConnection;
 				}
 			}
-			else // Error
+			else // blocking error
 			{
 				$ldap = $userDN;
 			}
 		}
-		else // Error
+		else // blocking error
 		{
 			$ldap = $ldapConnection;
 		}
@@ -400,8 +401,29 @@ class AuthLib
 	 */
 	private function _storeAuthObj($authObj)
 	{
-		setSessionElement(self::SESSION_NAME, self::SESSION_AUTH_OBJ, $authObj);
-		setSessionElement(self::SESSION_NAME, self::SESSION_AUTH_OBJ_ORIGIN, $authObj);
+		setSessionElement(self::SESSION_NAME, self::SESSION_AUTH_OBJ, $authObj); // authentication object
+		setSessionElement(self::SESSION_NAME, self::SESSION_AUTH_OBJ_ORIGIN, $authObj); // authentication original object
+	}
+
+	/**
+	 * Redirect the user's browser to the configured login page
+	 */
+	private function _redirectToLogin()
+	{
+		$al = $this->_ci->config->item(self::AUTHENTICATION_LOGIN); // selected login method
+		$alp = $this->_ci->config->item(self::AUTHENTICATION_LOGIN_PAGES); // login pages configuration array
+
+		// If the configuration is valid
+		if (!isEmptyArray($alp) && isset($alp[$al]))
+		{
+			header('HTTP/1.1 301 Moved Permanently'); // permanent redirection
+			header('Location: '.site_url().$alp[$al]); // redirect to the configured login page
+			exit(); // stops execution!
+		}
+		else
+		{
+			$this->_showError('No valid login page was set'); // display a generic error message and logs the occurred error
+		}
 	}
 
 	/**
@@ -416,16 +438,15 @@ class AuthLib
 			$auth = $this->_checkForeignAuthentication();
 			if (hasData($auth)) // Authenticated with a foreign authentication method
 			{
-				$this->_storeAuthObj(getData($auth)); // Store the session authentication object
+				$this->_storeAuthObj(getData($auth)); // store the session authentication object
 			}
-			elseif (getCode($auth) == AUTH_NOT_AUTHENTICATED) // If no foreign authentication was found
+			elseif (getCode($auth) == AUTH_NOT_AUTHENTICATED) // if no foreign authentication was found...
 			{
-				// TODO: ask for a login
-				exit;
+				$this->_redirectToLogin(); // ...then redirect to login page
 			}
-			elseif (isError($auth)) // If an error occurred
+			elseif (isError($auth)) // blocking error
 			{
-				$this->_showError(getData($auth)); // display the occurred error
+				$this->_showError(getData($auth)); // display a generic error message and logs the occurred error
 			}
 		}
 		// else the user is already logged, then continue with the execution

@@ -15,9 +15,6 @@ class Login extends FHC_Controller
         parent::__construct();
     }
 
-	//------------------------------------------------------------------------------------------------------------------
-	// Public methods
-
 	/**
 	 * To login into the system with username and password as credentials
 	 */

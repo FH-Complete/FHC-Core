@@ -8,13 +8,13 @@ if (!defined('BASEPATH')) exit('No direct script access allowed');
 $config['authentication_foreign_methods'] = array(AUTH_BT, AUTH_HBALDAP);
 
 // Login method
-$config['authentication_login'] = AUTH_DB;
+$config['authentication_login'] = AUTH_LDAP;
 
 // Array of login pages
 $config['authentication_login_pages'] = array(
-	AUTH_DB => 'system/Login/emailCode',
-	AUTH_LDAP => 'system/Login/usernamePassword',
-	AUTH_SSO => 'system/Login/sso'
+	AUTH_DB => '/system/Login/emailCode',
+	AUTH_LDAP => '/system/Login/usernamePassword',
+	AUTH_SSO => '/system/Login/sso'
 );
 
 // List of permissions that are allowed to perform loginAs
