@@ -16,7 +16,6 @@ if (!defined('BASEPATH')) exit('No direct script access allowed');
 function getAuthUID()
 {
 	$ci =& get_instance(); // get CI instance
-	$ci->load->library('AuthLib'); // load authentication library
 
 	return ($ci->authlib->getAuthObj())->{AuthLib::AO_USERNAME};
 }

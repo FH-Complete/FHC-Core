@@ -1,5 +1,8 @@
 <?php
 
+/**
+ * REST_Controller takes care about authentication and it loads the AuthLib
+ */
 class APIv1_Controller extends REST_Controller
 {
 	/**
@@ -8,12 +11,6 @@ class APIv1_Controller extends REST_Controller
     public function __construct($requiredPermissions)
     {
         parent::__construct();
-
-		// Loads helper message to manage returning messages
-		$this->load->helper('hlp_message');
-
-		// Loads helper with generic utility function
-		$this->load->helper('hlp_common');
 
 		// Loads permission lib
 		$this->load->library('PermissionLib');

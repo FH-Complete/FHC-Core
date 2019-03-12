@@ -11,14 +11,14 @@ if (!defined('BASEPATH')) exit('No direct script access allowed');
 | and translated in the language files.
 |
 */
-define('FHC_SUCCESS', 0); 		// General Success Message
-define('FHC_ERROR', 1); 		// General Error Message
-define('FHC_MODEL_ERROR', 2); 	// Model Error
-define('FHC_DB_ERROR', 3);		// Database Error
-define('FHC_NODBTABLE', 4); 	// No DB-Table is set
-define('FHC_NORIGHT', 5); 	    // No rights
-define('FHC_INVALIDID', 6); 	// Invalid or no ID (key)
-define('FHC_NOPK', 7); 			// No primary key
+define('FHC_SUCCESS',		0);		// General Success Message
+define('FHC_ERROR',			1); 	// General Error Message
+define('FHC_MODEL_ERROR',	2); 	// Model Error
+define('FHC_DB_ERROR',		3);		// Database Error
+define('FHC_NODBTABLE',		4); 	// No DB-Table is set
+define('FHC_NORIGHT',		5);		// No rights
+define('FHC_INVALIDID',		6); 	// Invalid or no ID (key)
+define('FHC_NOPK',			7);		// No primary key
 
 /*
 |--------------------------------------------------------------------------
@@ -60,11 +60,19 @@ define('EXIT_AUTO_MAX', 2000); // highest automatically-assigned error code
 | Authentication constants
 |--------------------------------------------------------------------------
 */
-// Authentication methods
-define('AUTH_SESSION', 'session');
-define('AUTH_LDAP', 'ldap');
-define('AUTH_DB', 'database');
-define('AUTH_SSO', 'sso');
+// Foreign authentication methods
+define('AUTH_HBALDAP',	'httpBasicAuthLDAP');
+define('AUTH_BT',		'bewerbung');
+
+// Login methods
+define('AUTH_LDAP',	'ldap');
+define('AUTH_DB',	'database');
+define('AUTH_SSO',	'sso');
+
+// Authentication return codes
+define('AUTH_SUCCESS',				0);
+define('AUTH_NOT_AUTHENTICATED',	1);
+define('AUTH_INVALID_CREDENTIALS',	2);
 
 /*
 |--------------------------------------------------------------------------

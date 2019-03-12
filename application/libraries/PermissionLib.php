@@ -42,7 +42,6 @@ class PermissionLib
 	const WRITE_HTTP_METHOD = 'POST';
 
 	private $_ci; // CI instance
-	private $acl; // conversion array from a source to a permission
 	private static $bb; // benutzerberechtigung
 
 	/**
@@ -54,12 +53,6 @@ class PermissionLib
 		// Loads CI instance
 		$this->_ci =& get_instance();
 
-		// Loads the array of resources
-		$this->acl = $this->_ci->config->item('fhc_acl');
-
-		// Loads authentication library
-		$this->_ci->load->library('AuthLib');
-
 		// If it's NOT called from command line
 		if (!is_cli())
 		{
@@ -67,21 +60,6 @@ class PermissionLib
 			self::$bb = new benutzerberechtigung();
 			self::$bb->getBerechtigungen(($this->_ci->authlib->getAuthObj())->{AuthLib::AO_USERNAME});
 		}
-	}
-
-	/**
-	 * Get a permission by a given source
-	 */
-	public function getBerechtigungKurzbz($sourceName)
-	{
-		$returnValue = null;
-
-		if (isset($this->acl[$sourceName]))
-		{
-			$returnValue = $this->acl[$sourceName];
-		}
-
-		return $returnValue;
 	}
 
 	/**

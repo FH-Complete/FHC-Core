@@ -69,6 +69,16 @@ function isSuccess($result)
 }
 
 /**
+ * Checks if the result represents an error
+ * Wrapper function of isSuccess, more readable code
+ * Bob Dylan: ...there's no success like failure. And that failure's no success at all.
+ */
+function isError($result)
+{
+	return !isSuccess($result);
+}
+
+/**
  * Checks if the result represents a success and also if it contains valid data
  */
 function hasData($result)
@@ -86,7 +96,7 @@ function hasData($result)
 }
 
 /**
- * Returns the property retval if $result contains data
+ * Returns the property retval if $result contains data, otherwise null
  */
 function getData($result)
 {
@@ -101,11 +111,16 @@ function getData($result)
 }
 
 /**
- * Checks if the result represents an error
- * Wrapper function of isSuccess, more readable code
- * Bob Dylan: ...there's no success like failure. And that failure's no success at all.
+ * Returns the property fhcCode if present, otherwise null
  */
-function isError($result)
+function getCode($result)
 {
-	return !isSuccess($result);
+	$code = null;
+
+	if (isset($result->fhcCode))
+	{
+		$code = $result->fhcCode;
+	}
+
+	return $code;
 }
