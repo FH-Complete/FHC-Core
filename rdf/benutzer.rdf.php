@@ -41,7 +41,7 @@ if (mb_strlen($filter) < 3)
 	die('Filter muss mindestens 3 Zeichen lang sein');
 
 $benutzer = new student();
-$benutzer->getTab($filter);
+$benutzer->getTab($filter, 'nachname, vorname');
 
 $studiengang = new studiengang();
 $studiengang->getAll(null, false);

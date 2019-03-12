@@ -1457,6 +1457,11 @@ function LeGruppeDirektAdd()
 		alert("Lehreinheit wurde nicht gefunden. Daten wurden nicht gespeichert!");
 		return;
 	}
+	if(user == '')
+	{
+		alert("Bitte wählen sie zuerst einen Eintrag aus");
+		return;
+	}
 
 	var req = new phpRequest('lvplanung/lehrveranstaltungDBDML.php','','');
 
