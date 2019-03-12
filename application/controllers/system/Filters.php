@@ -21,6 +21,9 @@ class Filters extends FHC_Controller
     {
         parent::__construct();
 
+		// Loads authentication library and starts authentication
+		$this->load->library('AuthLib');
+
 		// Loads the FiltersLib with HTTP GET/POST parameters
 		$this->_loadFiltersLib();
 
@@ -45,7 +48,7 @@ class Filters extends FHC_Controller
 	public function rowNumber()
 	{
 		$rowNumber = 0;
-		$dataset = $this->filterslib->getElementSession(FiltersLib::SESSION_DATASET);
+		$dataset = $this->filterslib->getSessionElement(FiltersLib::SESSION_DATASET);
 
 		if (isset($dataset) && is_array($dataset))
 		{

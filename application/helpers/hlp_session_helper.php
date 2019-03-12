@@ -1,21 +1,14 @@
 <?php
 
-/**
- * FH-Complete
- *
- * @package		FHC-Helper
- * @author		FHC-Team
- * @copyright	Copyright (c) 2016 fhcomplete.org
- * @license		GPLv3
- * @since		Version 1.0.0
- */
-
-if (! defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 // -------------------------------------------------------------------------------------------------------
 // Collection of functions to handle comfortably the php session.
 // It works keeping a different session name for each functionality (ex. FilterWidget and NavigationWidget)
+// It also starts the PHP session
 // -------------------------------------------------------------------------------------------------------
+
+session_start(); // starts the session (old good PHP session!)
 
 /**
  * Returns the whole session by its name given as parameter
@@ -25,7 +18,7 @@ function getSession($sessionName)
 {
 	$session = null;
 
-	// If it is present a session for this filter
+	// If it is present a session with the given name
 	if (isset($_SESSION[$sessionName]))
 	{
 		$session = $_SESSION[$sessionName];
@@ -35,16 +28,16 @@ function getSession($sessionName)
 }
 
 /**
- * Returns one element specified by the paraemter name, from the session specified by the parameters sessionName
+ * Returns one element specified by the paraemter $elementName, from the session specified by the parameters sessionName
  * If it's not present the a null value is returned
  */
-function getElementSession($sessionName, $name)
+function getSessionElement($sessionName, $elementName)
 {
-	$session = getSession($sessionName); // get the whole session for this filter
+	$session = getSession($sessionName); // get the whole session with the given name
 
-	if (isset($session[$name]))
+	if (isset($session[$elementName]))
 	{
-		return $session[$name];
+		return $session[$elementName];
 	}
 
 	return null;
@@ -66,9 +59,9 @@ function setSession($sessionName, $data)
 }
 
 /**
- * Sets one element of the session specified by the parameters sessionName
+ * Sets one element ($elementName) of the session specified by the parameters sessionName
  */
-function setElementSession($sessionName, $name, $value)
+function setSessionElement($sessionName, $elementName, $value)
 {
 	// If is NOT already present into the session
 	if (!isset($_SESSION[$sessionName])
@@ -77,5 +70,30 @@ function setElementSession($sessionName, $name, $value)
 		$_SESSION[$sessionName] = array(); // then create it
 	}
 
-	$_SESSION[$sessionName][$name] = $value; // stores the single value
+	$_SESSION[$sessionName][$elementName] = $value; // stores the single value
+}
+
+/**
+ * Clean the whole session specified by the parameters sessionName
+ */
+function cleanSession($sessionName)
+{
+	// If it is present a session with the given name
+	if (isset($_SESSION[$sessionName]))
+	{
+		unset($_SESSION[$sessionName]);
+	}
+}
+
+/**
+ * Clean one element ($elementName) of the session specified by the parameters sessionName
+ */
+function cleanSessionElement($sessionName, $elementName)
+{
+	$session = getSession($sessionName); // get the whole session with the given name
+
+	if (isset($session[$elementName]))
+	{
+		unset($session[$elementName]);
+	}
 }

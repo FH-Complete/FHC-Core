@@ -991,7 +991,7 @@ class InfoCenter extends Auth_Controller
 			$homeLink .= '?'.self::FILTER_ID.'='.$prevFilterId;
 		}
 
-		$this->navigationlib->setElementSessionMenu(
+		$this->navigationlib->setSessionElementMenu(
 			'uebersicht',
 			$this->navigationlib->oneLevel(
 				'Infocenter Übersicht',		// description
@@ -1009,7 +1009,7 @@ class InfoCenter extends Auth_Controller
 
 		if($page == self::REIHUNGSTESTABSOLVIERT_PAGE)
 		{
-			$this->navigationlib->setElementSessionMenu(
+			$this->navigationlib->setSessionElementMenu(
 				'freigegeben',
 				$this->navigationlib->oneLevel(
 					'zum RT freigegeben',		// description
@@ -1027,7 +1027,7 @@ class InfoCenter extends Auth_Controller
 		}
 		if($page == self::FREIGEGEBEN_PAGE)
 		{
-			$this->navigationlib->setElementSessionMenu(
+			$this->navigationlib->setSessionElementMenu(
 				'reihungstestAbsolviert',
 				$this->navigationlib->oneLevel(
 					'Reihungstest absolviert',		// description

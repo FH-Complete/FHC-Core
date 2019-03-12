@@ -92,7 +92,7 @@ class NavigationLib
 	 */
 	public function getSessionMenu()
 	{
-		$session = getElementSession(self::SESSION_NAME, self::SESSION_MENU_NAME);
+		$session = getSessionElement(self::SESSION_NAME, self::SESSION_MENU_NAME);
 
 		if (isset($session[$this->_navigationPage]))
 		{
@@ -107,7 +107,7 @@ class NavigationLib
 	 */
 	public function getSessionHeader()
 	{
-		$session = getElementSession(self::SESSION_NAME, self::SESSION_HEADER_NAME);
+		$session = getSessionElement(self::SESSION_NAME, self::SESSION_HEADER_NAME);
 
 		if (isset($session[$this->_navigationPage]))
 		{
@@ -120,7 +120,7 @@ class NavigationLib
 	/**
 	 * Wrapper method to the session helper funtions to retrive one element from the session of this navigation widget
 	 */
-	public function getElementSessionMenu($name)
+	public function getSessionElementMenu($name)
 	{
 		$session = $this->getSessionMenu();
 
@@ -135,7 +135,7 @@ class NavigationLib
 	/**
 	 * Wrapper method to the session helper funtions to retrive one element from the session of this navigation widget
 	 */
-	public function getElementSessionHeader($name)
+	public function getSessionElementHeader($name)
 	{
 		$session = $this->getSessionHeader();
 
@@ -152,7 +152,7 @@ class NavigationLib
 	 */
 	public function setSessionMenu($data)
 	{
-		setElementSession(self::SESSION_NAME, self::SESSION_MENU_NAME, array($this->_navigationPage => $data));
+		setSessionElement(self::SESSION_NAME, self::SESSION_MENU_NAME, array($this->_navigationPage => $data));
 	}
 
 	/**
@@ -160,13 +160,13 @@ class NavigationLib
 	 */
 	public function setSessionHeader($data)
 	{
-		setElementSession(self::SESSION_NAME, self::SESSION_HEADER_NAME, array($this->_navigationPage => $data));
+		setSessionElement(self::SESSION_NAME, self::SESSION_HEADER_NAME, array($this->_navigationPage => $data));
 	}
 
 	/**
 	 * Wrapper method to the session helper funtions to set one element in the session for this navigation widget
 	 */
-	public function setElementSessionMenu($name, $value)
+	public function setSessionElementMenu($name, $value)
 	{
 		$session = $this->getSessionMenu();
 
@@ -174,13 +174,13 @@ class NavigationLib
 
 		$session[$name] = $value;
 
-		setElementSession(self::SESSION_NAME, self::SESSION_MENU_NAME, array($this->_navigationPage => $session)); // stores the single value
+		setSessionElement(self::SESSION_NAME, self::SESSION_MENU_NAME, array($this->_navigationPage => $session)); // stores the single value
 	}
 
 	/**
 	 * Wrapper method to the session helper funtions to set one element in the session for this navigation widget
 	 */
-	public function setElementSessionHeader($name, $value)
+	public function setSessionElementHeader($name, $value)
 	{
 		$session = $this->getSessionHeader();
 
@@ -188,7 +188,7 @@ class NavigationLib
 
 		$session[$name] = $value;
 
-		setElementSession(self::SESSION_NAME, self::SESSION_HEADER_NAME, array($this->_navigationPage => $session)); // stores the single value
+		setSessionElement(self::SESSION_NAME, self::SESSION_HEADER_NAME, array($this->_navigationPage => $session)); // stores the single value
 	}
 
 	//------------------------------------------------------------------------------------------------------------------

@@ -323,7 +323,7 @@ class FilterWidget extends Widget
 		if ($session != null)
 		{
 			// Retrive the filterId stored in the session
-			$sessionFilterId = $this->filterslib->getElementSession(FiltersLib::FILTER_ID);
+			$sessionFilterId = $this->filterslib->getSessionElement(FiltersLib::FILTER_ID);
 
 			// If the filter loaded in session is NOT the same that is being requested then empty the session
 			if ($this->_filterId != $sessionFilterId)
@@ -334,16 +334,16 @@ class FilterWidget extends Widget
 			else // else if the filter loaded in session is the same that is being requested
 			{
 				// Get SESSION_RELOAD_DATASET from the session
-				$reloadDataset = $this->filterslib->getElementSession(FiltersLib::SESSION_RELOAD_DATASET);
+				$reloadDataset = $this->filterslib->getSessionElement(FiltersLib::SESSION_RELOAD_DATASET);
 				if ($reloadDataset === true) // if it's value is very true then reload the dataset
 				{
 					// Set as false to stop changing the dataset
-					$this->filterslib->setElementSession(FiltersLib::SESSION_RELOAD_DATASET, false);
+					$this->filterslib->setSessionElement(FiltersLib::SESSION_RELOAD_DATASET, false);
 
 					// Generate dataset query using filters from the session
 					$datasetQuery = $this->filterslib->generateDatasetQuery(
 						$this->_query,
-						$this->filterslib->getElementSession(FiltersLib::SESSION_FILTERS)
+						$this->filterslib->getSessionElement(FiltersLib::SESSION_FILTERS)
 					);
 
 					// Then retrive dataset from DB
@@ -357,9 +357,9 @@ class FilterWidget extends Widget
 						$this->load->model('system/Filters_model', 'FiltersModel');
 
 						// Set the new dataset and its attributes in the session
-						$this->filterslib->setElementSession(FiltersLib::SESSION_METADATA, $this->FiltersModel->getExecutedQueryMetaData());
-						$this->filterslib->setElementSession(FiltersLib::SESSION_ROW_NUMBER, count($dataset->retval));
-						$this->filterslib->setElementSession(FiltersLib::SESSION_DATASET, $dataset->retval);
+						$this->filterslib->setSessionElement(FiltersLib::SESSION_METADATA, $this->FiltersModel->getExecutedQueryMetaData());
+						$this->filterslib->setSessionElement(FiltersLib::SESSION_ROW_NUMBER, count($dataset->retval));
+						$this->filterslib->setSessionElement(FiltersLib::SESSION_DATASET, $dataset->retval);
 					}
 				}
 			}
@@ -423,7 +423,7 @@ class FilterWidget extends Widget
 
 		// To be always stored in the session, otherwise is not possible to load data from Filters controller
 		// NOTE: must the latest operation to be performed in the session to be shure that is always present
-		$this->filterslib->setElementSession(FiltersLib::REQUIRED_PERMISSIONS_PARAMETER, $this->_requiredPermissions);
+		$this->filterslib->setSessionElement(FiltersLib::REQUIRED_PERMISSIONS_PARAMETER, $this->_requiredPermissions);
 	}
 
 	/**

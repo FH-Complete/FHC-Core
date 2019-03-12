@@ -129,7 +129,7 @@ class FiltersLib
 
 		// Gets the required permissions from the session if they are not provided as parameter
 		$rq = $requiredPermissions;
-		if ($rq == null) $rq = $this->getElementSession(self::REQUIRED_PERMISSIONS_PARAMETER);
+		if ($rq == null) $rq = $this->getSessionElement(self::REQUIRED_PERMISSIONS_PARAMETER);
 
 		return $this->_ci->permissionlib->hasAtLeastOne($rq, self::PERMISSION_FILTER_METHOD, self::PERMISSION_TYPE);
 	}
@@ -139,15 +139,15 @@ class FiltersLib
 	 */
 	public function getSession()
 	{
-		return getElementSession(self::SESSION_NAME, $this->_filterUniqueId);
+		return getSessionElement(self::SESSION_NAME, $this->_filterUniqueId);
 	}
 
 	/**
 	 * Wrapper method to the session helper funtions to retrive one element from the session of this filter
 	 */
-	public function getElementSession($name)
+	public function getSessionElement($name)
 	{
-		$session = getElementSession(self::SESSION_NAME, $this->_filterUniqueId);
+		$session = getSessionElement(self::SESSION_NAME, $this->_filterUniqueId);
 
 		if (isset($session[$name]))
 		{
@@ -162,19 +162,19 @@ class FiltersLib
 	 */
 	public function setSession($data)
 	{
-		setElementSession(self::SESSION_NAME, $this->_filterUniqueId, $data);
+		setSessionElement(self::SESSION_NAME, $this->_filterUniqueId, $data);
 	}
 
 	/**
 	 * Wrapper method to the session helper funtions to set one element in the session for this filter
 	 */
-	public function setElementSession($name, $value)
+	public function setSessionElement($name, $value)
 	{
-		$session = getElementSession(self::SESSION_NAME, $this->_filterUniqueId);
+		$session = getSessionElement(self::SESSION_NAME, $this->_filterUniqueId);
 
 		$session[$name] = $value;
 
-		setElementSession(self::SESSION_NAME, $this->_filterUniqueId, $session); // stores the single value
+		setSessionElement(self::SESSION_NAME, $this->_filterUniqueId, $session); // stores the single value
 	}
 
 	/**
@@ -368,12 +368,12 @@ class FiltersLib
 		if (isset($selectedFields) && is_array($selectedFields) && count($selectedFields) > 0)
 		{
 			// Retrives all the used fields by the current filter
-			$fields = $this->getElementSession(self::SESSION_FIELDS);
+			$fields = $this->getSessionElement(self::SESSION_FIELDS);
 
 			// Checks that the given selected fields are present in all the used fields by the current filter
 			if (!array_diff($selectedFields, $fields))
 			{
-				$this->setElementSession(self::SESSION_SELECTED_FIELDS, $selectedFields); // write changes into the session
+				$this->setSessionElement(self::SESSION_SELECTED_FIELDS, $selectedFields); // write changes into the session
 
 				$sortSelectedFields = true;
 			}
@@ -393,9 +393,9 @@ class FiltersLib
 		if (!isEmptyString($selectedField))
 		{
 			// Retrives all the used fields by the current filter
-			$fields = $this->getElementSession(self::SESSION_FIELDS);
+			$fields = $this->getSessionElement(self::SESSION_FIELDS);
 			// Retrives the selected fields by the current filter
-			$selectedFields = $this->getElementSession(self::SESSION_SELECTED_FIELDS);
+			$selectedFields = $this->getSessionElement(self::SESSION_SELECTED_FIELDS);
 
 			// Checks that the given selected field is present in the list of all the used fields by the current filter
 			if (in_array($selectedField, $fields))
@@ -407,7 +407,7 @@ class FiltersLib
 					array_splice($selectedFields, $pos, 1);
 				}
 
-				$this->setElementSession(self::SESSION_SELECTED_FIELDS, $selectedFields); // write changes into the session
+				$this->setSessionElement(self::SESSION_SELECTED_FIELDS, $selectedFields); // write changes into the session
 
 				$removeSelectedField = true;
 			}
@@ -427,16 +427,16 @@ class FiltersLib
 		if (!isEmptyString($selectedField))
 		{
 			// Retrives all the used fields by the current filter
-			$fields = $this->getElementSession(self::SESSION_FIELDS);
+			$fields = $this->getSessionElement(self::SESSION_FIELDS);
 			// Retrives the selected fields by the current filter
-			$selectedFields = $this->getElementSession(self::SESSION_SELECTED_FIELDS);
+			$selectedFields = $this->getSessionElement(self::SESSION_SELECTED_FIELDS);
 
 			// Checks that the given selected field is present in the list of all the used fields by the current filter
 			if (in_array($selectedField, $fields))
 			{
 				array_push($selectedFields, $selectedField); // place the new filed at the end of the selected fields list
 
-				$this->setElementSession(self::SESSION_SELECTED_FIELDS, $selectedFields); // write changes into the session
+				$this->setSessionElement(self::SESSION_SELECTED_FIELDS, $selectedFields); // write changes into the session
 
 				$removeSelectedField = true;
 			}
@@ -456,9 +456,9 @@ class FiltersLib
 		if (!isEmptyString($appliedFilter))
 		{
 			// Retrives all the used fields by the current filter
-			$fields = $this->getElementSession(self::SESSION_FIELDS);
+			$fields = $this->getSessionElement(self::SESSION_FIELDS);
 			// Retrives the applied filters by the current filter
-			$filters = $this->getElementSession(self::SESSION_FILTERS);
+			$filters = $this->getSessionElement(self::SESSION_FILTERS);
 
 			// Checks that the given applied filter is present in the list of all the used fields by the current filter
 			if (in_array($appliedFilter, $fields))
@@ -471,8 +471,8 @@ class FiltersLib
 				}
 
 				 // Write changes into the session
-				$this->setElementSession(self::SESSION_FILTERS, $filters);
-				$this->setElementSession(self::SESSION_RELOAD_DATASET, true); // the dataset must be reloaded
+				$this->setSessionElement(self::SESSION_FILTERS, $filters);
+				$this->setSessionElement(self::SESSION_RELOAD_DATASET, true); // the dataset must be reloaded
 
 				$removeAppliedFilter = true;
 			}
@@ -492,7 +492,7 @@ class FiltersLib
 		if (isset($appliedFilters) && is_array($appliedFilters)
 			&& isset($appliedFiltersOperations) && is_array($appliedFiltersOperations))
 		{
-			$fields = $this->getElementSession(self::SESSION_FIELDS); // Retrives all the used fields by the current filter
+			$fields = $this->getSessionElement(self::SESSION_FIELDS); // Retrives all the used fields by the current filter
 
 			// Checks that the given applied filters are present in all the used fields by the current filter
 			if (!array_diff($appliedFilters, $fields))
@@ -523,8 +523,8 @@ class FiltersLib
 				}
 
 				// Write changes into the session
-				$this->setElementSession(self::SESSION_FILTERS, $filters);
-				$this->setElementSession(self::SESSION_RELOAD_DATASET, true); // the dataset must be reloaded
+				$this->setSessionElement(self::SESSION_FILTERS, $filters);
+				$this->setSessionElement(self::SESSION_RELOAD_DATASET, true); // the dataset must be reloaded
 
 				$applyFilters = true;
 			}
@@ -544,9 +544,9 @@ class FiltersLib
 		if (!isEmptyString($filter))
 		{
 			// Retrives all the used fields by the current filter
-			$fields = $this->getElementSession(self::SESSION_FIELDS);
+			$fields = $this->getSessionElement(self::SESSION_FIELDS);
 			// Retrives the applied filters by the current filter
-			$filters = $this->getElementSession(self::SESSION_FILTERS);
+			$filters = $this->getSessionElement(self::SESSION_FILTERS);
 
 			// Checks that the given applied filter is present in the list of all the used fields by the current filter
 			if (in_array($filter, $fields))
@@ -567,7 +567,7 @@ class FiltersLib
 					array_push($filters, $filterDefinition);
 				}
 
-				$this->setElementSession(self::SESSION_FILTERS, $filters); // write changes into the session
+				$this->setSessionElement(self::SESSION_FILTERS, $filters); // write changes into the session
 
 				$addFilter = true;
 			}
@@ -606,8 +606,8 @@ class FiltersLib
 
 			// Loads the definition to check if is already present in the DB
 			$definition = $this->_ci->FiltersModel->loadWhere(array(
-				'app' => $this->getElementSession(self::APP_PARAMETER),
-				'dataset_name' => $this->getElementSession(self::DATASET_NAME_PARAMETER),
+				'app' => $this->getSessionElement(self::APP_PARAMETER),
+				'dataset_name' => $this->getSessionElement(self::DATASET_NAME_PARAMETER),
 				'description' => $descPGArray,
 				'person_id' => $authPersonId
 			));
@@ -618,7 +618,7 @@ class FiltersLib
 
 			// Generates the "column" property
 			$jsonDeifinition->columns = array();
-			$selectedFields = $this->getElementSession(self::SESSION_SELECTED_FIELDS); // retrived the selected fields
+			$selectedFields = $this->getSessionElement(self::SESSION_SELECTED_FIELDS); // retrived the selected fields
 			for ($i = 0; $i < count($selectedFields); $i++)
 			{
 				// Each element is an object with a property called "name"
@@ -627,7 +627,7 @@ class FiltersLib
 			}
 
 			// List of applied filters
-			$jsonDeifinition->filters = $this->getElementSession(self::SESSION_FILTERS);
+			$jsonDeifinition->filters = $this->getSessionElement(self::SESSION_FILTERS);
 
 			// If it is already present
 			if (hasData($definition))
@@ -635,8 +635,8 @@ class FiltersLib
 				// update it
 				$this->_ci->FiltersModel->update(
 					array(
-						'app' => $this->getElementSession(self::APP_PARAMETER),
-						'dataset_name' => $this->getElementSession(self::DATASET_NAME_PARAMETER),
+						'app' => $this->getSessionElement(self::APP_PARAMETER),
+						'dataset_name' => $this->getSessionElement(self::DATASET_NAME_PARAMETER),
 						'description' => $descPGArray,
 						'person_id' => $authPersonId
 					),
@@ -651,8 +651,8 @@ class FiltersLib
 			{
 				$this->_ci->FiltersModel->insert(
 					array(
-						'app' => $this->getElementSession(self::APP_PARAMETER),
-						'dataset_name' => $this->getElementSession(self::DATASET_NAME_PARAMETER),
+						'app' => $this->getSessionElement(self::APP_PARAMETER),
+						'dataset_name' => $this->getSessionElement(self::DATASET_NAME_PARAMETER),
 						'filter_kurzbz' => uniqid($authPersonId, true),
 						'description' => $descPGArray,
 						'person_id' => $authPersonId,
@@ -779,7 +779,7 @@ class FiltersLib
 				);
 
 				// Sets in the session only the element related to the filters menu
-				$this->_ci->navigationlib->setElementSessionMenu(FiltersLib::NAV_MENU_FILTER_KEY, $filterMenu);
+				$this->_ci->navigationlib->setSessionElementMenu(FiltersLib::NAV_MENU_FILTER_KEY, $filterMenu);
 			}
 		}
 	}
