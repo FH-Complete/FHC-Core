@@ -20,6 +20,7 @@ class Login extends FHC_Controller
 	 */
 	public function usernamePassword()
 	{
+		$this->load->view('system/login/usernamePassword');
 	}
 
 	/**

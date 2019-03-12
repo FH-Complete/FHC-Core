@@ -89,7 +89,7 @@ class LDAP_Model extends FHC_Model
 	 */
 	public function getUserDN($username)
 	{
-		$userDN = error('No user DN were found');
+		$userDN = error('No user DN were found', LDAP_NO_USER_DN);
 
 		// Tries to search for a user DN using the given username
 		$searchResultIdentifier = @ldap_search(
@@ -108,9 +108,13 @@ class LDAP_Model extends FHC_Model
 		{
 			$userDN = error(ldap_error($this->_connection));
 		}
-		elseif ($countEntries != 1) // 0 or > 1
+		elseif ($countEntries == 0)
 		{
-			$userDN = error('None or too many user DN were found');
+			$userDN = error('No user DN were found', LDAP_NO_USER_DN);
+		}
+		elseif ($countEntries > 1)
+		{
+			$userDN = error('Too many users DN were found', LDAP_TOO_MANY_USER_DN);
 		}
 		else // One entry was found
 		{

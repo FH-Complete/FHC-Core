@@ -227,7 +227,7 @@ class AuthLib
 		// Prints date and time
 		$this->_ci->eprintflib->printInfo('Date and time: '.date('Y.m.d H:i:s'));
 
-		$this->_ci->loglib->logError($errorMessage);
+		$this->_ci->loglib->logError($errorMessage); // CI log error
 
 		exit; // immediately terminate the execution
 	}
@@ -301,11 +301,23 @@ class AuthLib
 			}
 			elseif (isError($personResult)) // blocking error
 			{
-				$hta = $personResult; // return it!
+				$hta = $personResult; // to be displayed
 			}
 		}
 
-		return $hta;
+		// Invalid credentials
+		// NOTE: this is a corner case because of the HTTP basic authentication
+		if (getCode($hta) == AUTH_NOT_AUTHENTICATED || getCode($hta) == AUTH_INVALID_CREDENTIALS
+			|| getCode($hta) == LDAP_NO_USER_DN || getCode($hta) == LDAP_TOO_MANY_USER_DN)
+		{
+			$this->_showInvalidAuthentication(); // this also stop the execution
+		}
+		elseif (isError($hta)) // display error and stop execution
+		{
+			$this->_showError(getData($hta));
+		}
+
+		return $hta; // if success then is returned!
 	}
 
 	/**
@@ -330,7 +342,7 @@ class AuthLib
 				if (isSuccess($ldapConnection)) // connected!
 				{
 					$ldapModel->close(); // close the previous connection
-					$ldap = success('Authenticated'); // authenticated!
+					$ldap = success('Authenticated', AUTH_SUCCESS); // authenticated!
 				}
 				else // blocking error
 				{
@@ -354,6 +366,8 @@ class AuthLib
 	 * Tries to find if the user is already logged via a foreign authentication method
 	 * using a list of foreign authentication methods provided with the configurations
 	 * If the user is logged via a foreign authentication method then an authentication object is returned
+	 * NOTE: _checkHBALDAPAuthentication is the last to be called and it is a corner case due the HTTP basic
+	 *		authentication mechanism, and it does not return anything
 	 */
 	private function _checkForeignAuthentication()
 	{
@@ -372,13 +386,6 @@ class AuthLib
 				case AUTH_HBALDAP: // HTTP basic authentication + LDAP
 					$auth = $this->_checkHBALDAPAuthentication();
 					break;
-			}
-
-			// Invalid credentials
-			// NOTE: this is a corner case because of the HTTP basic authentication
-			if (getCode($auth) == AUTH_INVALID_CREDENTIALS)
-			{
-				$this->_showInvalidAuthentication(); // this also stop the execution
 			}
 
 			// If not authenticated with this method...
@@ -416,7 +423,7 @@ class AuthLib
 		// If the configuration is valid
 		if (!isEmptyArray($alp) && isset($alp[$al]))
 		{
-			header('HTTP/1.1 301 Moved Permanently'); // permanent redirection
+			header('HTTP/1.1 302 Moved temporary'); // temporary redirection
 			header('Location: '.site_url().$alp[$al]); // redirect to the configured login page
 			exit(); // stops execution!
 		}
