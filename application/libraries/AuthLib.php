@@ -52,34 +52,60 @@ class AuthLib
 	}
 
 	/**
+	 * The logged user is able to get the identity of another user if it is allowed
+	 */
+	public function loginAS($uid)
+	{
+		$loginAS = error('Not authenticated', AUTH_NOT_AUTHENTICATED); // not authenticated by default
+
+		// - A user must be already logged
+		// - The uid must be NOT an empty string
+		// - The current user should NOT be already logged as the given uid
+		if ($this->_isLogged() && !isEmptyString($uid) && $this->getAuthObj()->username != $uid)
+		{
+			$this->_ci->load->library('PermissionLib'); // Loads permissions library
+
+			// Checks if the logged user is allowed to obtain the new identity
+			if ($this->_ci->permissionlib->isEntitledLoginAS($uid))
+			{
+				// Create the authentication object with new identity data
+				$loginAS = $this->_createAuthObjByPerson(array('uid' => $uid));
+				if (isSuccess($loginAS))
+				{
+					// Store the new authentication object in authentication session
+					setSessionElement(self::SESSION_NAME, self::SESSION_AUTH_OBJ, getData($loginAS));
+				}
+			}
+		}
+
+		return $loginAS;
+	}
+
+	/**
 	 * Logs out the current logged user
 	 * If the user is using the LoginAs functionality then it is logged out from the acquired user
 	 * and its original one is restored
 	 */
 	public function logout()
 	{
-		$authObj = getSessionElement(AuthLib::SESSION_NAME, AuthLib::SESSION_AUTH_OBJ);
-		$authObjOrigin =getSessionElement(AuthLib::SESSION_NAME, AuthLib::SESSION_AUTH_OBJ_ORIGIN);
+		$authObj = getSessionElement(self::SESSION_NAME, self::SESSION_AUTH_OBJ);
+		$authObjOrigin = getSessionElement(self::SESSION_NAME, self::SESSION_AUTH_OBJ_ORIGIN);
 
 		// NOT logged in
 		if ($authObj == null || $authObjOrigin == null) return;
 
 		// LoginAs functionality NOT in use
-		if ($authObj->{AuthLib::AO_PERSON_ID} == $authObjOrigin->{AuthLib::AO_PERSON_ID})
+		if ($authObj->{self::AO_PERSON_ID} == $authObjOrigin->{self::AO_PERSON_ID})
 		{
 			// Clean the entire session -> fully logged out
-			cleanSession(AuthLib::SESSION_NAME);
+			cleanSession(self::SESSION_NAME);
 		}
 		else // loginAs functionality in use
 		{
 			// Copy the origin authentication object as the authentication object in session
 			// The LoginAs account is logged out
 			// The user is again connected with its real account
-			setSessionElement(
-				AuthLib::SESSION_NAME,
-				AuthLib::SESSION_AUTH_OBJ,
-				getSessionElement(self::SESSION_NAME, self::SESSION_AUTH_OBJ_ORIGIN)
-			);
+			setSessionElement(self::SESSION_NAME, self::SESSION_AUTH_OBJ, $authObjOrigin);
 		}
 	}
 
@@ -89,7 +115,7 @@ class AuthLib
 	public function loginLDAP($username, $password)
 	{
 		// If already logged do NOT check another time, returns the authentication object
-		if ($this->_isLogged()) return $this->getAuthObj();
+		if ($this->_isLogged()) return success($this->getAuthObj(), AUTH_SUCCESS);
 
 		// Otherwise checks the given credentials
 		$loginUP = $this->_checkLDAPAuthentication($username, $password);

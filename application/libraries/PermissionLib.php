@@ -41,6 +41,11 @@ class PermissionLib
 	const READ_HTTP_METHOD = 'GET';
 	const WRITE_HTTP_METHOD = 'POST';
 
+	// Configuration entries
+	const LOGINAS_ALLOWED = 'permission_loginas_allowed';
+	const LOGINAS_BLACKLIST = 'permission_loginas_blacklist';
+	const LOGINAS_USERS_BLACKLIST = 'permission_loginas_users_blacklist';
+
 	private $_ci; // CI instance
 	private static $bb; // benutzerberechtigung
 
@@ -53,6 +58,8 @@ class PermissionLib
 		// Loads CI instance
 		$this->_ci =& get_instance();
 
+		$this->_ci->config->load('permission'); // Loads permission configuration
+
 		// If it's NOT called from command line
 		if (!is_cli())
 		{
@@ -61,6 +68,9 @@ class PermissionLib
 			self::$bb->getBerechtigungen(($this->_ci->authlib->getAuthObj())->{AuthLib::AO_USERNAME});
 		}
 	}
+
+	//------------------------------------------------------------------------------------------------------------------
+	// Public methods
 
 	/**
 	 * Checks user's (API caller) rights
@@ -223,5 +233,78 @@ class PermissionLib
 		}
 
 		return $isAllowed;
+	}
+
+	/**
+	 * Checks if it is possible for the logged user to gain the identity of the required user specified by the given uid
+	 */
+	public function isEntitledLoginAS($uid)
+	{
+		return !$this->_inLAUsersBlacklist($uid) && !$this->_hasLANotAllowedPermissions($uid) && $this->_hasLAPermissions();
+	}
+
+	//------------------------------------------------------------------------------------------------------------------
+	// Private methods
+
+	/**
+	 * Checks if the given uid is in the users blacklist
+	 */
+	private function _inLAUsersBlacklist($uid)
+	{
+		// List of users whose identity cannot be obtained with loginAs
+		$loginASUsersBl = $this->_ci->config->item(self::LOGINAS_USERS_BLACKLIST);
+
+		// Given uid in user blacklist?
+		if (in_array($uid, $loginASUsersBl))
+		{
+			return true;
+		}
+
+		return false;
+	}
+
+	/**
+	 * Checks if the user whose identity is to be obtained does not have a NOT allowed permission
+	 */
+	private function _hasLANotAllowedPermissions($uid)
+	{
+		// List of permissions that cannot be gained with loginAs
+		$loginASBl = $this->_ci->config->item(self::LOGINAS_BLACKLIST);
+
+		$bb = new benutzerberechtigung();
+		$bb->getBerechtigungen($uid); // gets all the permissions for the target user
+
+		// Loops through NOT allowed permissions
+		foreach ($loginASBl as $notAllowedPermission)
+		{
+			// Target user has a NOT allowed permission?
+			if ($bb->isBerechtigt($notAllowedPermission))
+			{
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * Checks if the current logged user has the permission to perform a login as
+	 */
+	private function _hasLAPermissions()
+	{
+		// List of permissions that are allowed to perform loginAs
+		$loginASAllowed = $this->_ci->config->item(self::LOGINAS_ALLOWED);
+
+		// Loops through allowed permissions
+		foreach ($loginASAllowed as $allowedPermission)
+		{
+			// The logged user has a loginAS  permission?
+			if (self::$bb->isBerechtigt($allowedPermission))
+			{
+				return true;
+			}
+		}
+
+		return false;
 	}
 }

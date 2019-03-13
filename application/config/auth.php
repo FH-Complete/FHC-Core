@@ -16,9 +16,3 @@ $config['authentication_login_pages'] = array(
 	AUTH_LDAP => '/system/Login/usernamePassword',
 	AUTH_SSO => '/system/Login/sso'
 );
-
-// List of permissions that are allowed to perform loginAs
-$config['authentication_loginas_perms'] = array('admin', 'infocenter');
-
-// List of permissions that cannot be gained with loginAs
-$config['authentication_loginas_blacklist'] = array('admin');
