@@ -154,6 +154,39 @@ class AuthLib
 		}
 	}
 
+	/**
+	 * Login a user with the given username and password using LDAP
+	 */
+	public function loginLDAP($username, $password)
+	{
+		$loginUP = $this->_checkLDAPAuthentication($username, $password);
+		if (isSuccess($loginUP))
+		{
+			$this->_ci->PersonModel->resetQuery(); // Reset an eventually already built query
+
+			// Retrieves user data from DB using the UID
+			$personResult = $this->_ci->PersonModel->getByUid($username);
+			if (hasData($personResult))
+			{
+				$person = getData($personResult)[0];
+
+				// Stores used data into the authentication object and then into a success object
+				$loginUP = success(
+					$this->_createAuthObj($person->person_id, $person->vorname, $person->nachname, $username),
+					AUTH_SUCCESS
+				);
+
+				$this->_storeAuthObj(getData($loginUP));
+			}
+			elseif (isError($personResult)) // blocking error
+			{
+				$loginUP = $personResult; // to be displayed
+			}
+		}
+
+		return $loginUP;
+	}
+
 	//------------------------------------------------------------------------------------------------------------------
 	// Private methods
 
