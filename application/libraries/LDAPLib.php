@@ -1,6 +1,6 @@
 <?php
 
-class LDAP_Model extends FHC_Model
+class LDAPLib
 {
 	const LDAP_CONF_FILE = 'ldap'; // LDAP config file name
 
@@ -29,8 +29,6 @@ class LDAP_Model extends FHC_Model
 	 */
 	public function __construct()
 	{
-		parent::__construct();
-
 		$this->_connection = null;
 		$this->_workingConfigArray = null;
 		$this->_ldapConfigArray = null;

@@ -36,12 +36,6 @@ class AuthLib
 		// Gets CI instance
 		$this->_ci =& get_instance();
 
-		// Loads auth configuration
-		$this->_ci->config->load('auth');
-
-		// Load model PersonModel
-		$this->_ci->load->model('person/person_model', 'PersonModel');
-
 		if ($authenticate === true) $this->_authenticate(); // if required -> authenticate the current user
 	}
 
@@ -55,71 +49,6 @@ class AuthLib
 	public function getAuthObj()
 	{
 		return getSessionElement(self::SESSION_NAME, self::SESSION_AUTH_OBJ);
-	}
-
-	/**
-	 * Checks the authentication of an addon. Returns TRUE if valid, otherwise FALSE
-	 */
-	public function basicAuthentication($username, $password)
-	{
-		return isSuccess($this->_checkLDAPAuthentication($username, $password));
-	}
-
-	/**
-	 * Checks if the given username and password of a final user are valid
-	 */
-	public function checkUserAuthByUsernamePassword($username, $password, $keys = false)
-	{
-		$result = error(false);
-
-		if (isset($username) && isset($password))
-		{
-			if (isSuccess($this->_checkLDAPAuthentication($username, $password)))
-			{
-				if ($keys === true)
-				{
-					$result = $this->_getFinalUserBasicDataByUID($username);
-				}
-				else
-				{
-					$result = success(true);
-				}
-			}
-		}
-
-		return $result;
-	}
-
-	/**
-	 * Checks if the given code of a final user is valid
-	 */
-	public function checkUserAuthByCode($code)
-	{
-		$result = error(false);
-
-		$person = $this->_ci->PersonModel->loadWhere(array('zugangscode' => $code));
-		if (hasData($person))
-		{
-			$result = $this->_getFinalUserBasicDataByPersonID($person->retval[0]->person_id);
-		}
-
-		return $result;
-	}
-
-	/**
-	 * Checks if the given code and email of a final user are valid
-	 */
-	public function checkUserAuthByCodeEmail($code, $email)
-	{
-		$result = error(false);
-
-		$person = $this->_ci->PersonModel->getPersonKontaktByZugangscode($code, $email);
-		if (hasData($person))
-		{
-			$result = $this->_getFinalUserBasicDataByPersonID($person->retval[0]->person_id);
-		}
-
-		return $result;
 	}
 
 	/**
@@ -159,32 +88,54 @@ class AuthLib
 	 */
 	public function loginLDAP($username, $password)
 	{
+		// If already logged do NOT check another time, returns the authentication object
+		if ($this->_isLogged()) return $this->getAuthObj();
+
+		// Otherwise checks the given credentials
 		$loginUP = $this->_checkLDAPAuthentication($username, $password);
 		if (isSuccess($loginUP))
 		{
-			$this->_ci->PersonModel->resetQuery(); // Reset an eventually already built query
+			$loginUP = $this->_createAuthObjByPerson(array('uid' => $username));
 
-			// Retrieves user data from DB using the UID
-			$personResult = $this->_ci->PersonModel->getByUid($username);
-			if (hasData($personResult))
-			{
-				$person = getData($personResult)[0];
-
-				// Stores used data into the authentication object and then into a success object
-				$loginUP = success(
-					$this->_createAuthObj($person->person_id, $person->vorname, $person->nachname, $username),
-					AUTH_SUCCESS
-				);
-
-				$this->_storeAuthObj(getData($loginUP));
-			}
-			elseif (isError($personResult)) // blocking error
-			{
-				$loginUP = $personResult; // to be displayed
-			}
+			// If were possible to retrieve user's data without failing,
+			// then stores the authentication object into authentication session
+			if (isSuccess($loginUP)) $this->_storeAuthObj(getData($loginUP));
 		}
 
 		return $loginUP;
+	}
+
+	/**
+	 * Checks the authentication of an addon. Returns TRUE if valid, otherwise FALSE
+	 */
+	public function basicAuthentication($username, $password)
+	{
+		return isSuccess($this->_checkLDAPAuthentication($username, $password));
+	}
+
+	/**
+	 * Checks if the given username and password of a final user are valid
+	 */
+	public function checkUserAuthByUsernamePassword($username, $password, $keys = false)
+	{
+		$result = error(false);
+
+		if (isset($username) && isset($password))
+		{
+			if (isSuccess($this->_checkLDAPAuthentication($username, $password)))
+			{
+				if ($keys === true)
+				{
+					$result = $this->_getFinalUserBasicDataByUID($username);
+				}
+				else
+				{
+					$result = success(true);
+				}
+			}
+		}
+
+		return $result;
 	}
 
 	//------------------------------------------------------------------------------------------------------------------
@@ -204,9 +155,9 @@ class AuthLib
 			$authObj = new stdClass();
 
 			$authObj->{self::AO_PERSON_ID} = $person_id;
-			$authObj->{self::AO_NAME} = $name;
-			$authObj->{self::AO_SURNAME} = $surname;
 			$authObj->{self::AO_USERNAME} = $username;
+			$authObj->{self::AO_SURNAME} = $surname;
+			$authObj->{self::AO_NAME} = $name;
 		}
 
 		return $authObj;
@@ -276,27 +227,7 @@ class AuthLib
 		// Checks if an authentication were performed via BT
 		if (isset($_SESSION['bewerbung/personId']) && is_numeric($_SESSION['bewerbung/personId']) && isset($_SESSION['bewerbung/user']))
 		{
-			$this->_ci->PersonModel->resetQuery(); // Reset an eventually already built query
-
-			// Then retrieves the person data from DB using the person_id
-			$this->_ci->PersonModel->addSelect('vorname, nachname');
-
-			// Retrieves user data using its own person_id
-			$personResult = $this->_ci->PersonModel->load($_SESSION['bewerbung/personId']);
-			if (hasData($personResult)) // found!
-			{
-				$person = getData($personResult)[0];
-
-				// Stores used data into the authentication object and then into a success object
-				$bt = success(
-					$this->_createAuthObj($_SESSION['bewerbung/personId'], $person->vorname, $person->nachname),
-					AUTH_SUCCESS
-				);
-			}
-			elseif (isError($person)) // blocking error
-			{
-				$bt = $person; // return it!
-			}
+			$bt = $this->_createAuthObjByPerson(array('person_id' => $_SESSION['bewerbung/personId']));
 		}
 
 		return $bt;
@@ -318,24 +249,7 @@ class AuthLib
 		}
 		else // otherwise
 		{
-			$this->_ci->PersonModel->resetQuery(); // Reset an eventually already built query
-
-			// Retrieves user data from DB using the UID
-			$personResult = $this->_ci->PersonModel->getByUid($_SERVER['PHP_AUTH_USER']);
-			if (hasData($personResult))
-			{
-				$person = getData($personResult)[0];
-
-				// Stores used data into the authentication object and then into a success object
-				$hta = success(
-					$this->_createAuthObj($person->person_id, $person->vorname, $person->nachname, $_SERVER['PHP_AUTH_USER']),
-					AUTH_SUCCESS
-				);
-			}
-			elseif (isError($personResult)) // blocking error
-			{
-				$hta = $personResult; // to be displayed
-			}
+			$hta = $this->_createAuthObjByPerson(array('uid' => $_SERVER['PHP_AUTH_USER']));
 		}
 
 		// Invalid credentials
@@ -359,22 +273,23 @@ class AuthLib
 	private function _checkLDAPAuthentication($username, $password)
 	{
 		$ldap = error('Not authenticated', AUTH_NOT_AUTHENTICATED); // by default is NOT authenticated
-		$ldapModel = new LDAP_Model(); // LDAP model handles the LDAP connection
 
-		$ldapConnection = $ldapModel->connect(); // connect!
+		$this->_ci->load->library('LDAPLib'); // Loads the LDAP library
+
+		$ldapConnection = $this->_ci->ldaplib->connect(); // connect!
 		if (isSuccess($ldapConnection)) // connected!!
 		{
 			// Get the user DN from LDAP
-			$userDN = $ldapModel->getUserDN($username);
+			$userDN = $this->_ci->ldaplib->getUserDN($username);
 			if (isSuccess($userDN)) // got it!
 			{
-				$ldapModel->close(); // close the previous LDAP connection
+				$this->_ci->ldaplib->close(); // close the previous LDAP connection
 
 				// Connects to LDAP using the last working configuration + the retrieved user DN + the provided password
-				$ldapConnection = $ldapModel->connectUsernamePassword(getData($userDN), $password);
+				$ldapConnection = $this->_ci->ldaplib->connectUsernamePassword(getData($userDN), $password);
 				if (isSuccess($ldapConnection)) // connected!
 				{
-					$ldapModel->close(); // close the previous connection
+					$this->_ci->ldaplib->close(); // close the previous connection
 					$ldap = success('Authenticated', AUTH_SUCCESS); // authenticated!
 				}
 				else // blocking error
@@ -474,6 +389,8 @@ class AuthLib
 		// If NOT logged
 		if (!$this->_isLogged())
 		{
+			$this->_ci->config->load('auth'); // Loads auth configuration
+
 			// Checks if already logged with a foreign authentication method
 			$auth = $this->_checkForeignAuthentication();
 			if (hasData($auth)) // Authenticated with a foreign authentication method
@@ -493,6 +410,44 @@ class AuthLib
 	}
 
 	/**
+	 * It uses the given query where clause to select data for a user and then stores these data into a authentication object
+	 */
+	private function _createAuthObjByPerson($queryParamsArray)
+	{
+		$authObj = error('No user data found'); // pessimistic as usual
+
+		$this->_ci->load->model('person/person_model', 'PersonModel'); // Loads model PersonModel
+
+		$this->_ci->PersonModel->resetQuery(); // Reset an eventually already built query
+
+		// Needed information
+		$this->_ci->PersonModel->addSelect('person_id, vorname, nachname, uid');
+		// Retrieves the uid if it is possible
+		$this->_ci->PersonModel->addJoin('public.tbl_benutzer', 'person_id', 'LEFT');
+
+		$queryParamsArray['tbl_person.aktiv'] = true; // only active users!
+
+		// Execute query with where clause
+		$personResult = $this->_ci->PersonModel->loadWhere($queryParamsArray);
+		if (hasData($personResult))
+		{
+			$person = getData($personResult)[0];
+
+			// Stores user data into the authentication object and then into a success object
+			$authObj = success(
+				$this->_createAuthObj($person->person_id, $person->vorname, $person->nachname, $person->uid),
+				AUTH_SUCCESS
+			);
+		}
+		elseif (isError($personResult)) // blocking error
+		{
+			$authObj = $personResult; // to be returned
+		}
+
+		return $authObj;
+	}
+
+	/**
 	 * Returns all the keys with which is possible to obtain personal data about a final user
 	 * using the given username (uid)
 	 */
@@ -506,23 +461,13 @@ class AuthLib
 		$benutzer = $this->_ci->BenutzerModel->load($uid);
 		if (hasData($benutzer))
 		{
-			$finalUserBasicDataByUID = $this->_getFinalUserBasicDataByPersonID($benutzer->retval[0]->person_id);
+			$finalUserBasicDataByPersonID = new stdClass();
+			// Store the person_id and eventually all the uid and prestudent_id related to this final user
+			$finalUserBasicDataByPersonID->person_id = $benutzer->retval[0]->person_id;
+
+			$finalUserBasicDataByUID = success($finalUserBasicDataByPersonID);
 		}
 
 		return $finalUserBasicDataByUID;
-	}
-
-	/**
-	 * Returns all the keys with which is possible to obtain personal data about a final user
-	 * using the given person_id
-	 */
-	private function _getFinalUserBasicDataByPersonID($person_id)
-	{
-		$finalUserBasicDataByPersonID = new stdClass(); // returned object
-
-		// Store the person_id and eventually all the uid and prestudent_id related to this final user
-		$finalUserBasicDataByPersonID->person_id = $person_id;
-
-		return success($finalUserBasicDataByPersonID);
 	}
 }

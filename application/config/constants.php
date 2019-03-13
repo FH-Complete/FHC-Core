@@ -79,8 +79,8 @@ define('AUTH_INVALID_CREDENTIALS',	2);
 | LDAP constants
 |--------------------------------------------------------------------------
 */
-define('LDAP_NO_USER_DN', 10);
-define('LDAP_TOO_MANY_USER_DN', 11);
+define('LDAP_NO_USER_DN',			10);
+define('LDAP_TOO_MANY_USER_DN',		11);
 
 /*
 |--------------------------------------------------------------------------
