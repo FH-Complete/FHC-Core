@@ -342,20 +342,34 @@ class pruefling extends basis_db
 			// die den Reihungstest oefter im selben Studiengang gemacht haben nicht das
 			// Ergebniss der beiden Tests summiert bekommen
 			// Im Zweifelsfall wird der neuere Reihungstest genommen
-			$qry.= " AND prestudent_id = (
-				SELECT
-					prestudent_id
-				FROM
-					public.tbl_rt_person
-					JOIN public.tbl_reihungstest ON(rt_id=reihungstest_id)
-					JOIN public.tbl_prestudent USING(person_id)
-					JOIN public.tbl_prestudentstatus USING(prestudent_id, studienplan_id)
-				WHERE
-					tbl_rt_person.person_id=".$this->db_add_param($person_id, FHC_INTEGER)."
-					AND tbl_rt_person.rt_id=".$this->db_add_param($reihungstest_id, FHC_INTEGER)."
-					AND tbl_prestudentstatus.status_kurzbz='Interessent'
-				ORDER BY
-					tbl_reihungstest.datum desc LIMIT 1)";
+			$qry.= " 
+				AND 
+					prestudent_id = (
+						SELECT
+							prestudent_id
+						FROM
+							public.tbl_rt_person
+						JOIN 
+							public.tbl_prestudent USING(person_id)
+						JOIN
+							public.tbl_prestudentstatus USING (prestudent_id)
+						JOIN 
+							tbl_reihungstest ON (
+								tbl_rt_person.rt_id = tbl_reihungstest.reihungstest_id
+								AND 
+								tbl_prestudentstatus.studiensemester_kurzbz = tbl_reihungstest.studiensemester_kurzbz
+							)
+						WHERE
+							tbl_rt_person.person_id = ".$this->db_add_param($person_id, FHC_INTEGER)."
+						AND 
+							tbl_rt_person.rt_id = ".$this->db_add_param($reihungstest_id, FHC_INTEGER)."
+						AND 
+							tbl_prestudentstatus.status_kurzbz='Interessent'
+						AND
+							(tbl_reihungstest.stufe = 1 OR tbl_reihungstest.stufe IS NULL)
+						ORDER BY
+							tbl_reihungstest.datum desc LIMIT 1
+					)";
 		}
 
 		if($result = $this->db_query($qry))
