@@ -189,7 +189,7 @@ $worksheet->write($zeile,++$spalte,"Planstunden", $format_bold);
 $maxlength[$spalte]=11;
 $worksheet->write($zeile,++$spalte,"Stundenblockung", $format_bold);
 $maxlength[$spalte]=15;
-$worksheet->write($zeile,++$spalte,"Wochenrythmus", $format_bold);
+$worksheet->write($zeile,++$spalte,"Wochenrhythmus", $format_bold);
 $maxlength[$spalte]=13;
 $worksheet->write($zeile,++$spalte,"Raum", $format_bold);
 $maxlength[$spalte]=4;

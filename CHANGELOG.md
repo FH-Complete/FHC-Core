@@ -18,6 +18,7 @@
 - **[CORE]** Infocenter Seite hinzugefügt zur zentralen Verwaltung und ZGV Prüfung von Interessenten
 - **[CORE]** Unterstützung für Matrikelnummern und BPK - Anbindung an den Datenverbund
 - **[CORE]** Digitale Signatur für Dokumente
+- **[FAS]** Direkte Zuordnung von Personen zu Lehreinheiten für Wiederholer, Incoming, etc
 
 ### CHANGED
 - **[CORE]** Berechtigungsprüfung wurde angepasst damit deaktivierte Benutzer keine Berechtigungen mehr haben

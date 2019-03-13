@@ -210,6 +210,9 @@ define('CIS_DOKUMENTE_STUDIENBUCHLBATT_DRUCKEN',true);
 //Gibt an, ob die Studienerfolgsbestätigung im CIS gedruckt werden kann
 define('CIS_DOKUMENTE_STUDIENERFOLGSBESTAETIGUNG_DRUCKEN',true);
 
+//Gibt an, ob die archivierten Self-Service Dokumente im CIS heruntergeladen werden koennen
+define('CIS_DOKUMENTE_SELFSERVICE', true);
+
 //**** INFOSCREEN ****
 //Gibt an, ob der Lageplan im Infoterminal angezeigt werden soll.
 define('CIS_INFOSCREEN_LAGEPLAN_ANZEIGEN',true);

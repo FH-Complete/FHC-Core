@@ -184,7 +184,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/lvplanung/stpl-details-overlay.xul
 	    			<row>
 	    				<label value="rdf:http://www.technikum-wien.at/lehreinheit-lvplan/rdf#lektor" />
 	    				<label value="WR: rdf:http://www.technikum-wien.at/lehreinheit-lvplan/rdf#wochenrythmus Bl: rdf:http://www.technikum-wien.at/lehreinheit-lvplan/rdf#stundenblockung"
-	    					tooltiptext="Wochenrythmus" />
+	    					tooltiptext="Wochenrhythmus" />
 	    			</row>
 	    			<row>
 	    				<label value="Offen: rdf:http://www.technikum-wien.at/lehreinheit-lvplan/rdf#offenestunden / rdf:http://www.technikum-wien.at/lehreinheit-lvplan/rdf#semesterstunden"

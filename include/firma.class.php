@@ -194,7 +194,7 @@ class firma extends basis_db
 				$this->db_add_param($this->aktiv, FHC_BOOLEAN).','.
 				$this->db_add_param($this->finanzamt, FHC_INTEGER).','.
 				$this->db_add_param($this->partner_code).','.
-				$this->db_add_param($this->lieferant, FHC_INTEGER).'); ';
+				$this->db_add_param($this->lieferant, FHC_BOOLEAN).'); ';
 		}
 		else
 		{

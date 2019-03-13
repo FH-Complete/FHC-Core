@@ -438,7 +438,6 @@ $oRdf->sendHeader();
 			$oRdf->obj[$i]->setAttribut('startkw',$row_le->start_kw);
 			$oRdf->obj[$i]->setAttribut('raumtyp',$row_le->raumtyp);
 			$oRdf->obj[$i]->setAttribut('raumtypalternativ',$row_le->raumtypalternativ);
-			$oRdf->obj[$i]->setAttribut('anmerkung',$row_le->anmerkung);
 			$oRdf->obj[$i]->setAttribut('unr',$row_le->unr);
 			$oRdf->obj[$i]->setAttribut('lvnr',$row_le->lvnr);
 			$oRdf->obj[$i]->setAttribut('gruppen',$grp);

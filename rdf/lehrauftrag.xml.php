@@ -419,7 +419,7 @@ function drawLehrauftrag($uid)
 
 				$lv[$anzahl_lvs]['lehreinheit_id'] = (isset($row->projektarbeit_id)?$kuerzel.$row->projektarbeit_id:' ');
 				$lv[$anzahl_lvs]['lehrveranstaltung'] = 'Betreuung '.$row->vorname.' '.$row->nachname;
-				$lv[$anzahl_lvs]['fachbereich'] = (isset($row->oe_kurzbz) && array_key_exists($row->oe_kurzbz, $fb_arr)?$fb_arr[$row->oe_kurzbz]:' ');
+				$lv[$anzahl_lvs]['fachbereich'] = (isset($row->oe_kurzbz) && array_key_exists($row->oe_kurzbz, $oe_arr)?$oe_arr[$row->oe_kurzbz]:' ');
 				$lv[$anzahl_lvs]['gruppe'] = ' ';
 				$lv[$anzahl_lvs]['stunden'] = (isset($row->stunden)?number_format($row->stunden,2):' ');
 				$lv[$anzahl_lvs]['satz'] = (isset($row->stundensatz)?$row->stundensatz:' ');

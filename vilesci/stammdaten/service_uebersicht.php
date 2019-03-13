@@ -107,6 +107,8 @@ echo '</SELECT>
 <input type="submit" value="Filtern" />
 </form>';
 
+$servicekategorie_arr = $service->getKategorieArray();
+
 if($oe_kurzbz!='')
 {
 	if(!$service->getServicesOrganisationseinheit($oe_kurzbz))
@@ -124,8 +126,7 @@ echo '<table class="tablesorter" id="myTable">
 			<th>Bezeichnung</th>
 			<th>Beschreibung</th>
 			<th>Organisationseinheit</th>
-			<th>Content_ID</th>
-			<th>Ext_ID</th>
+			<th>Kategorie</th>
 			<th>Design</th>
 			<th>Betrieb</th>
 			<th>Operativ</th>
@@ -141,8 +142,8 @@ foreach($service->result as $row)
 	echo '<td>',$row->bezeichnung,'</td>';
 	echo '<td>',$row->beschreibung,'</td>';
 	echo '<td>',$row->oe_kurzbz,'</td>';
-	echo '<td>',$row->content_id,'</td>';
-	echo '<td>',$row->ext_id,'</td>';
+	$title = (isset($servicekategorie_arr[$row->servicekategorie_kurzbz])?$servicekategorie_arr[$row->servicekategorie_kurzbz]:'');
+	echo '<td><span title="'.$service->convert_html_chars($title).'">',$row->servicekategorie_kurzbz,'</span></td>';
 	echo '<td>',$row->design_uid,'</td>';
 	echo '<td>',$row->betrieb_uid,'</td>';
 	echo '<td>',$row->operativ_uid,'</td>';

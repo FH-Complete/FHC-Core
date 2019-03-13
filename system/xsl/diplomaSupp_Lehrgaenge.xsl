@@ -1104,7 +1104,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 	</style:style>
 	<style:style style:name="P55" style:family="paragraph" style:parent-style-name="Heading_20_4" style:master-page-name="Standard">
 		<style:text-properties style:use-window-font-color="true"/>
-	</style:style> 
+	</style:style>
 	<style:style style:name="P56" style:family="paragraph" style:parent-style-name="Heading_20_4" style:master-page-name="Convert_20_1">
 		<style:paragraph-properties style:page-number="auto"/>
 		<style:text-properties style:use-window-font-color="true" fo:language="en" fo:country="US"/>
@@ -1282,7 +1282,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 	</office:document-content>
  </xsl:template>
 <xsl:template match="supplement">
-		
+
 		<text:sequence-decls xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0" xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0" xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0" xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0" xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0">
 		<text:sequence-decl text:display-outline-level="0" text:name="Illustration"/>
 		<text:sequence-decl text:display-outline-level="0" text:name="Table"/>
@@ -2383,15 +2383,15 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 		<text:p text:style-name="P25"><text:span text:style-name="T14">Neben den ordentlichen Studien, die oben beschrieben wurden, gibt es auch außerordentliche Studien, die an Universitäten entweder ein Universitätslehrgang oder der Besuch einzelner Lehrveranstaltungen, im Fachhochschulbereich ein Lehrgang zur Weiterbildung oder der Besuch einzelner Lehrveranstaltungen und an Pädagogischen Hochschulen ein Hochschullehrgang sein können.</text:span></text:p>
 		<text:p text:style-name="P24"/>
 		<text:p text:style-name="P41">Bachelorstudium</text:p>
-		<text:p text:style-name="P24">Die Zulassung zu einem Bachelorstudium erfolgt auf der Grundlage eines österreichischen oder gleichwertigen ausländischen Reifezeugnisses, eines Zeugnisses über die Studienberechtigungsprüfung oder eines Zeugnisses über die Berufsreifeprüfung, in künstlerischen Studien auf der Grundlage einer Zulassungsprüfung. Die Zulassung zu einem Fachhochschul-Bachelorstudiengang kann auch auf der Grundlage einer einschlägigen beruflichen Qualifikation erfolgen. In einigen Bachelorstudien an Universitäten, in den meisten Fachhochschul-Bachelorstudiengängen und in Bachelorstudien an Pädagogischen Hochschulen findet ein Auswahlverfahren statt.</text:p> 
+		<text:p text:style-name="P24">Die Zulassung zu einem Bachelorstudium erfolgt auf der Grundlage eines österreichischen oder gleichwertigen ausländischen Reifezeugnisses, eines Zeugnisses über die Studienberechtigungsprüfung oder eines Zeugnisses über die Berufsreifeprüfung, in künstlerischen Studien auf der Grundlage einer Zulassungsprüfung. Die Zulassung zu einem Fachhochschul-Bachelorstudiengang kann auch auf der Grundlage einer einschlägigen beruflichen Qualifikation erfolgen. In einigen Bachelorstudien an Universitäten, in den meisten Fachhochschul-Bachelorstudiengängen und in Bachelorstudien an Pädagogischen Hochschulen findet ein Auswahlverfahren statt.</text:p>
 		<text:p text:style-name="P24">Die Fächer/Module und ihre Inhalte sind im Curriculum festgelegt. In der Regel sind zwei Bachelorarbeiten im Rahmen von Lehrveranstaltungen abzufassen. Fachhochschul-Bachelorstudiengänge, Bachelorstudien an Pädagogischen Hochschulen und einige Bachelorstudien an Universitäten umfassen ein angeleitetes Praktikum. Das Studium kann mit einer Bachelorprüfung abgeschlossen werden.</text:p>
 		<text:p text:style-name="P24"/>
 		<text:p text:style-name="P41"><text:soft-page-break/>Masterstudium</text:p>
-		<text:p text:style-name="P24">Die Zulassung zu einem Masterstudium erfolgt auf der Grundlage eines abgeschlossenen facheinschlägigen Bachelorstudiums oder gleichwertigen postsekundären Abschlusses. In einigen Studien findet ein Auswahlverfahren statt</text:p> 
+		<text:p text:style-name="P24">Die Zulassung zu einem Masterstudium erfolgt auf der Grundlage eines abgeschlossenen facheinschlägigen Bachelorstudiums oder gleichwertigen postsekundären Abschlusses. In einigen Studien findet ein Auswahlverfahren statt</text:p>
 		<text:p text:style-name="P24">Die Fächer/Module und ihre Inhalte sind im Curriculum festgelegt. Ein Schwerpunkt des Studiums liegt auf der Erstellung der Masterarbeit. Das Studium wird mit einer Masterprüfung abgeschlossen. Die Zulassung zur Masterprüfung setzt die Approbation der Masterarbeit voraus.</text:p>
 		<text:p text:style-name="P24"/>
 		<text:p text:style-name="P41">Diplomstudium</text:p>
-		<text:p text:style-name="P24">Die Zulassung zu einem Diplomstudium erfolgt auf der Grundlage eines österreichischen oder gleichwertigen ausländischen Reifezeugnisses, eines Zeugnisses über die Studienberechtigungsprüfung oder eines Zeugnisses über die Berufsreifeprüfung, in künstlerischen Studien auf der Grundlage einer Zulassungsprüfung. Die Zulassung zu einem Fachhochschul-Diplomstudiengang kann auch auf der Grundlage einer einschlägigen beruflichen Qualifikation erfolgen. In einigen Studien (z.B. Humanmedizin und Zahnmedizin sowie in Fachhochschul-Diplomstudiengängen) findet ein Auswahlverfahren statt.</text:p> 
+		<text:p text:style-name="P24">Die Zulassung zu einem Diplomstudium erfolgt auf der Grundlage eines österreichischen oder gleichwertigen ausländischen Reifezeugnisses, eines Zeugnisses über die Studienberechtigungsprüfung oder eines Zeugnisses über die Berufsreifeprüfung, in künstlerischen Studien auf der Grundlage einer Zulassungsprüfung. Die Zulassung zu einem Fachhochschul-Diplomstudiengang kann auch auf der Grundlage einer einschlägigen beruflichen Qualifikation erfolgen. In einigen Studien (z.B. Humanmedizin und Zahnmedizin sowie in Fachhochschul-Diplomstudiengängen) findet ein Auswahlverfahren statt.</text:p>
 		<text:p text:style-name="P24">Das Studium kann in Studienabschnitte unterteilt sein. Die Dauer jedes Studienabschnitts, die Fächer und ihre Inhalte sind im Curriculum festgelegt. Sie gliedern sich in Pflichtfächer und Wahlfächer. Jeder Studienabschnitt wird mit einer Diplomprüfung abgeschlossen. Fachhochschul-Diplomstudiengänge und einige Diplomstudien an Universitäten umfassen ein angeleitetes Praktikum. Die Zulassung zur letzten Diplomprüfung setzt die Approbation der Diplomarbeit voraus.</text:p>
 		<text:p text:style-name="P24"/>
 		<text:p text:style-name="P24"/>
@@ -2569,13 +2569,13 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 			<text:p text:style-name="P53">The <text:span text:style-name="T14">new system</text:span> is based on the distinction between undergraduate and graduate studies. Upon completion of an undergraduate programme (<text:span text:style-name="T15">Bachelorstudium</text:span> at universities and university colleges of education or, respectively, <text:span text:style-name="T15">Fachhochschul-Bachelorstudiengang</text:span> at universities of applied sciences, comprising 180 to 240 ECTS credits), a bachelor’s degree (designation: "Bachelor of/in ..." ) is awarded. Upon completion of a graduate program (<text:span text:style-name="T15">Masterstudium</text:span> at universities and university colleges of education or, respectively, <text:span text:style-name="T15">Fachhochschul-Masterstudiengang</text:span> at universities of applied sciences, comprising 60 to 120 ECTS credits), a master’s degree (designation: "Master of/in ..." ) is awarded. In the fields of engineering, the designation of the master’s degree can also be "Diplom-Ingenieur/in".</text:p>
 		</text:list-item>
 		<text:list-item>
-			<text:p text:style-name="P53">Under the auspices of the <text:span text:style-name="T14">older system</text:span> of diploma degree programmes (<text:span text:style-name="T15">Diplomstudien</text:span>), the first degree awarded is the diploma degree (<text:span text:style-name="T15">Diplomgrad</text:span>). An Austrian higher secondary school leaving certificate or its equivalent is the general qualification necessary for enrolling in a diploma degree programme; conclusion of a diploma degree programme entitles degree holders to enrol in doctoral programmes. A diploma degree (<text:span text:style-name="T15">Diplomgrad</text:span>) is awarded by Austrian universities after a course of study consisting of 240 to 360 ECTS credits. Full degree titles are gender specific designations: <text:span text:style-name="T15">Magister</text:span> for men; <text:span text:style-name="T15">Magistra</text:span> for women. Degree titles also include a general description of the field of study in which they were obtained, e.g. <text:span text:style-name="T15">Magister philosophiae</text:span>. In the fields of engineering, the degree titles are <text:span text:style-name="T15">Diplom-Ingenieur/in</text:span>. 
+			<text:p text:style-name="P53">Under the auspices of the <text:span text:style-name="T14">older system</text:span> of diploma degree programmes (<text:span text:style-name="T15">Diplomstudien</text:span>), the first degree awarded is the diploma degree (<text:span text:style-name="T15">Diplomgrad</text:span>). An Austrian higher secondary school leaving certificate or its equivalent is the general qualification necessary for enrolling in a diploma degree programme; conclusion of a diploma degree programme entitles degree holders to enrol in doctoral programmes. A diploma degree (<text:span text:style-name="T15">Diplomgrad</text:span>) is awarded by Austrian universities after a course of study consisting of 240 to 360 ECTS credits. Full degree titles are gender specific designations: <text:span text:style-name="T15">Magister</text:span> for men; <text:span text:style-name="T15">Magistra</text:span> for women. Degree titles also include a general description of the field of study in which they were obtained, e.g. <text:span text:style-name="T15">Magister philosophiae</text:span>. In the fields of engineering, the degree titles are <text:span text:style-name="T15">Diplom-Ingenieur/in</text:span>.
 											Degrees awarded in medicine and dentistry are exceptions to the above. The first degrees awarded after the completion of these degree programmes consisting of 360 ECTS credits are <text:span text:style-name="T15">Doctor medicinae universae</text:span> and <text:span text:style-name="T15">Doctor medicinae dentalis</text:span>, respectively.</text:p>
 			<text:p text:style-name="P53">Graduates of university of applied sciences programmes that consist of 240 to 300 ECTS credits are awarded, analogous to university studies, a university of applied science diploma degree (<text:span text:style-name="T15">Fachhochschul-Diplomgrad</text:span>) contingent upon <text:soft-page-break/>discipline: either a <text:span text:style-name="T15">Diplom-Ingenieur/in (FH)</text:span> for fields of engineering or <text:span text:style-name="T15">Magister/Magistra (FH)</text:span> in other fields of study.</text:p>
 		</text:list-item>
 		</text:list>
 		<text:p text:style-name="P17"/>
-		<text:p text:style-name="P17">The study programmes for teachers’ qualifications are offered jointly between universities and university colleges of education.</text:p>	 
+		<text:p text:style-name="P17">The study programmes for teachers’ qualifications are offered jointly between universities and university colleges of education.</text:p>
 		<text:p text:style-name="P17"/>
 		<text:p text:style-name="P17">Recipients of the diploma degrees from the old system or master’s degrees from the new system (including the ones awarded in both cases by the universities of applied sciences) are entitled to enrol in doctoral programmes (<text:span text:style-name="T15">Doktoratsstudium</text:span>) at universities. A doctoral degree with the designation either <text:span text:style-name="T15">"Doktor/in"</text:span> or "Doctor of Philosophy" (PhD) is awarded upon completion of a doctoral programme with a minimum duration of three years.</text:p>
 		<text:p text:style-name="P17"/>
@@ -2674,8 +2674,8 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 		</table:table-row>
 		</table:table>
 		<text:p text:style-name="P17"/>
-		
-		
+
+
 		<text:p text:style-name="P75">Grades for comprehensive examinations, i.e. examinations covering materials from various subjects:</text:p>
 		<table:table table:name="Table15" table:style-name="Table15">
 		 <table:table-column table:style-name="Table15.B" />
@@ -2703,13 +2703,13 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 		<text:p text:style-name="P75">Source:</text:p>
 		<text:p text:style-name="P75">Federal Ministry of Science, Research and Economy, Unit VI/7</text:p>
 <!--		<text:p text:style-name="P75">Unit VI/7</text:p>-->
-		
+
 		<text:p text:style-name="P48">
 		<draw:frame xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0" xmlns:xlink="http://www.w3.org/1999/xlink" draw:style-name="fr2" draw:name="graphics3" text:anchor-type="paragraph" svg:width="17cm" svg:height="24.042cm" draw:z-index="14" >
 			<draw:image xlink:href="Pictures/100000000000092300000CECE56EC0B3.tif" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/>
 		</draw:frame>
 		</text:p>
-		
+
 
 		<text:p><text:span text:style-name="T12">TRANSCRIPT OF RECORDS</text:span></text:p>
 
@@ -2793,7 +2793,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 		<text:soft-page-break/>
 		</text:p>
 		<text:p text:style-name="P22"/>
-		<xsl:if test="abschlusspruefungsdatum != ''">
+		<xsl:if test="abschlusspruefungsdatum != '' and pruefungstyp_kurzbz!='lgabschluss'">
 			<table:table table:name="Table16" table:style-name="Table16">
 			<table:table-column table:style-name="Table16.A" table:number-columns-repeated="2" />
 			<table:table-row>
@@ -2943,4 +2943,3 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 	</xsl:template>
 
 </xsl:stylesheet>
-

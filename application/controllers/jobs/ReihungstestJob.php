@@ -42,7 +42,9 @@ class ReihungstestJob extends FHC_Controller
 
 		// Load models
 		$this->load->model('crm/Reihungstest_model', 'ReihungstestModel');
+		$this->load->model('crm/RtStudienplan_model', 'RtStudienplanModel');
 		$this->load->model('organisation/Studiengang_model', 'StudiengangModel');
+		$this->load->model('organisation/Studienplan_model', 'StudienplanModel');
 
 		// Load helpers
 		$this->load->helper('hlp_sancho_helper');
@@ -488,5 +490,86 @@ class ReihungstestJob extends FHC_Controller
 		;
 
 		return $content_data_arr;
+	}
+
+
+	/**
+	 * Checks the upcoming placement tests if there are correct studyplans assigned
+	 * If there are invalid studyplans assigned (outdated because there exists a new version),
+	 * it tries to find a better one and assigns it additionaly
+	 */
+	public function correctStudienplan()
+	{
+		// get all placement tests with incorrect studyplan
+		$qry = "
+		SELECT
+			tbl_reihungstest.reihungstest_id,
+			tbl_studienplan.studienplan_id,
+			tbl_reihungstest.studiensemester_kurzbz,
+			tbl_studienordnung.studiengang_kz
+		FROM
+			public.tbl_reihungstest
+			JOIN public.tbl_rt_studienplan ON(tbl_rt_studienplan.reihungstest_id=tbl_reihungstest.reihungstest_id)
+			JOIN lehre.tbl_studienplan USING(studienplan_id)
+			JOIN lehre.tbl_studienordnung USING(studienordnung_id)
+		WHERE
+			NOT EXISTS(
+				SELECT 1 FROM lehre.tbl_studienplan_semester
+				WHERE studienplan_id=tbl_rt_studienplan.studienplan_id
+					AND tbl_studienplan_semester.studiensemester_kurzbz=tbl_reihungstest.studiensemester_kurzbz
+			)
+			AND tbl_reihungstest.datum >= now()
+			AND NOT EXISTS(
+				SELECT
+					1
+				FROM
+					public.tbl_rt_studienplan rtstp
+					JOIN lehre.tbl_studienplan stp USING(studienplan_id)
+					JOIN lehre.tbl_studienordnung sto USING(studienordnung_id)
+					JOIN lehre.tbl_studienplan_semester stpsem USING(studienplan_id)
+				WHERE
+					sto.studiengang_kz=tbl_studienordnung.studiengang_kz
+					AND rtstp.reihungstest_id=tbl_reihungstest.reihungstest_id
+					AND stpsem.studiensemester_kurzbz=tbl_reihungstest.studiensemester_kurzbz
+			)
+		";
+
+		$db = new DB_Model();
+		$result_rt = $db->execReadOnlyQuery($qry);
+
+		if(hasdata($result_rt))
+		{
+			foreach ($result_rt->retval as $row_rt)
+			{
+				// find an active studyplan for the same degree program with is valid in this semester
+				$result_stpl = $this->StudienplanModel->getStudienplaeneBySemester(
+					$row_rt->studiengang_kz,
+					$row_rt->studiensemester_kurzbz
+				);
+
+				if(hasData($result_stpl))
+				{
+					foreach($result_stpl->retval as $row_stpl)
+					{
+						// Add new Studyplan to RtStudienplan if missing
+						$rt_studienplan = $this->RtStudienplanModel->loadWhere(array(
+							"reihungstest_id" => $row_rt->reihungstest_id,
+							"studienplan_id" => $row_stpl->studienplan_id
+						));
+
+						if(!hasData($rt_studienplan))
+						{
+							echo "\nAdding StudienplanId: $row_stpl->studienplan_id";
+							echo " to ReihungstestId: $row_rt->reihungstest_id";
+
+							$this->RtStudienplanModel->insert(array(
+								"reihungstest_id" => $row_rt->reihungstest_id,
+								"studienplan_id" => $row_stpl->studienplan_id
+							));
+						}
+					}
+				}
+			}
+		}
 	}
 }

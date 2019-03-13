@@ -228,7 +228,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 					<textbox id="lehrveranstaltung-detail-textbox-startkw" width="50" disabled="true"/>
 					<label value="     Stundenblockung " />
 					<textbox id="lehrveranstaltung-detail-textbox-stundenblockung" width="50" disabled="true" />
-					<label value="     Wochenrythmus " />
+					<label value="     Wochenrhythmus " />
 					<textbox id="lehrveranstaltung-detail-textbox-wochenrythmus" width="50" disabled="true"/>
 				</hbox>
 

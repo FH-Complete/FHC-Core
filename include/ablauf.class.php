@@ -567,7 +567,7 @@ class ablauf extends basis_db
 				$obj->ablauf_vorgaben_id = $row->ablauf_vorgaben_id;
 				$obj->studiengang_kz = $row->studiengang_kz;
 				$obj->sprache = $row->sprache;
-				$obj->sprachwahl = $row->sprachwahl;
+				$obj->sprachwahl = $this->db_parse_bool($row->sprachwahl);
 				$obj->content_id = $row->content_id;
 
 				$this->result[]= $obj;

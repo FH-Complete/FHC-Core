@@ -42,9 +42,8 @@ $fehler = '';
 function verifyData($parameters)
 {
 	global $fehler;
-	class foo{};
 
-	$obj = new foo();
+	$obj = new stdClass();
 
 	if (!$db = new basis_db())
 		die('Es konnte keine Verbindung zum Server aufgebaut werden.');
@@ -53,7 +52,7 @@ function verifyData($parameters)
 	$log = new webservicelog();
 	$log->request_data = file_get_contents('php://input');
 	$log->webservicetyp_kurzbz = 'wienerlinien';
-	$log->request_id = $parameters->token;
+	$log->request_id = $parameters->Token;
 	$log->beschreibung = "Semesterticketanfrage";
 	$log->save(true);
 
@@ -64,21 +63,53 @@ function verifyData($parameters)
 	}
 	else
 	{
+		// nach Personenkennzeichen suchen
 		$student = new student();
 		$student_uid = $student->getUidFromMatrikelnummer($parameters->Matrikelnummer);
+		$studenten_arr = array();
 
-		// überprüfe ob Benutzer aktiv ist
-		$benutzer = new benutzer();
-		$benutzer->load($student_uid);
-		if(!$benutzer->bnaktiv)
+		if($student_uid !== false)
 		{
-			$obj->result = 'false';
-			$obj->fehler ='1';
-			return $obj;
+			// überprüfe ob Benutzer aktiv ist
+			$benutzer = new benutzer();
+			$benutzer->load($student_uid);
+			if(!$benutzer->bnaktiv)
+			{
+				$obj->result = 'false';
+				$obj->fehler ='1';
+				return $obj;
+			}
+			$person = new person();
+			if(!$person->load($benutzer->person_id))
+			{
+				$obj->result = 'false';
+				$obj->fehler ='3';
+				return $obj;
+			}
+			$studenten_arr[] = $student_uid;
+		}
+		else
+		{
+			// nach richtiger Matrikelnummer suchen
+			$person = new person();
+			if(!$person->getPersonByMatrNr($parameters->Matrikelnummer))
+			{
+				$obj->result = 'false';
+				$obj->fehler = '9';
+				return $obj;
+			}
+
+			// Aktive Accounts der Person laden
+			$benutzer = new benutzer();
+			$benutzer->getBenutzerFromPerson($person->person_id);
+			foreach($benutzer->result as $row)
+			{
+				$studenten_arr[] = $row->uid;
+			}
 		}
 
 		// überprüfe vorname
-		if($benutzer->vorname != $parameters->Vorname)
+		if($person->vorname != $parameters->Vorname)
 		{
 			// es wurde keine übereinstimmung gefunden
 			$obj->result = 'false';
@@ -86,7 +117,7 @@ function verifyData($parameters)
 			return $obj;
 		}
 
-		if($benutzer->nachname != $parameters->Name)
+		if($person->nachname != $parameters->Name)
 		{
 			// es wurde keine übereinstimmung gefunden
 			$obj->result = 'false';
@@ -96,7 +127,7 @@ function verifyData($parameters)
 
 		// Überprüfe PLZ
 		$adresse = new adresse();
-		$adresse->load_pers($benutzer->person_id);
+		$adresse->load_pers($person->person_id);
 
 		$foundAdr = false;
 		foreach($adresse->result as $adr)
@@ -113,8 +144,6 @@ function verifyData($parameters)
 		}
 
 		// Überprüfe Geburtsdatum
-		$person = new person();
-		$person->load($benutzer->person_id);
 		if($person->gebdatum != $parameters->Geburtsdatum)
 		{
 			$obj->result = 'false';
@@ -122,57 +151,59 @@ function verifyData($parameters)
 			return $obj;
 		}
 
-		// hole prestudentID
-		$student->load($student_uid);
-		if($student->prestudent_id == '')
+		foreach($studenten_arr as $student_uid)
 		{
-			// es wurde kein student gefunden
-			$obj->result = 'false';
-			$obj->fehler = '3';
-			return $obj;
-		}
+			// hole prestudentID
+			if(!$student->load($student_uid))
+				continue;
 
-		// Übergabe von studiensemester -> z.b 11W, 12S auf WS2011, SS2012
-		$year = mb_substr($parameters->Semesterkuerzel, 0,2);
-		$semester = mb_substr($parameters->Semesterkuerzel,2,1);
-		if($semester == 'S')
-		{
-			$semester = 'SS';
-		}
-		else if($semester == 'W')
-		{
-			$semester= 'WS';
-		}
-		else
-		{
-			// ungültiges Semester
-			$obj->result = 'false';
-			$obj->fehler = '8';
-			return $obj;
-		}
-		$studiensemester = $semester.'20'.$year;
-
-		// letzten Status holen
-		$qry = "Select public.get_rolle_prestudent ('".$student->prestudent_id."', '".$studiensemester."')";
-
-		if($db->db_query($qry))
-		{
-			if($row = $db->db_fetch_object())
+			// Übergabe von studiensemester -> z.b 11W, 12S auf WS2011, SS2012
+			$year = mb_substr($parameters->Semesterkuerzel, 0,2);
+			$semester = mb_substr($parameters->Semesterkuerzel,2,1);
+			if($semester == 'S')
 			{
-				$status=$row->get_rolle_prestudent;
+				$semester = 'SS';
+			}
+			else if($semester == 'W')
+			{
+				$semester= 'WS';
+			}
+			else
+			{
+				// ungültiges Semester
+				$obj->result = 'false';
+				$obj->fehler = '8';
+				return $obj;
+			}
+			$studiensemester = $semester.'20'.$year;
+
+			// letzten Status holen
+			$qry = "Select public.get_rolle_prestudent ('".$student->prestudent_id."', '".$studiensemester."')";
+
+			if($db->db_query($qry))
+			{
+				if($row = $db->db_fetch_object())
+				{
+					$status=$row->get_rolle_prestudent;
+				}
+			}
+			// Status Student und Diplomand gültig
+			if($status == 'Student' || $status == 'Diplomand')
+			{
+				$obj->result = 'true';
+				$obj->fehler = '';
+				return $obj;
+			}
+			else
+			{
+				continue;
 			}
 		}
-		// Status Student und Diplomand gültig
-		if($status == 'Student' || $status == 'Diplomand')
-		{
-			$obj->result = 'true';
-			$obj->fehler = '';
-		}
-		else
-		{
-			$obj->result = 'false';
-			$obj->fehler ='1';
-		}
+
+		// es wurde kein passender student gefunden
+		$obj->result = 'false';
+		$obj->fehler = '1';
+		return $obj;
 	}
 	return $obj;
 }

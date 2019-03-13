@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet xmlns:fo="http://www.w3.org/1999/XSL/Format" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0"
-xmlns:xlink="http://www.w3.org/1999/xlink" 
+xmlns:xlink="http://www.w3.org/1999/xlink"
 xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0" xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0" xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0" xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0"
 >
 
@@ -342,7 +342,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
                 <text:sequence-decl text:display-outline-level="0" text:name="Text"/>
                 <text:sequence-decl text:display-outline-level="0" text:name="Drawing"/>
             </text:sequence-decls>
-			<!-- Wichtig für Mehrfachdruck (mehrere Studenten ausgewählt): Wenn ein Element (in diesem Fall Stempel und Unterschriftenblock) relativ zur SEITE ausgerichtet werden soll, 
+			<!-- Wichtig für Mehrfachdruck (mehrere Studenten ausgewählt): Wenn ein Element (in diesem Fall Stempel und Unterschriftenblock) relativ zur SEITE ausgerichtet werden soll,
 			muss für jedes Dokument (jeder neue Durchlauf der Schleife) ein draw:frame-Tag definiert werden. Diese müssen ALLE VOR den ersten text:p-Elementen stehen.
 			Deshalb wirde erst die Schleife für die draw:frames aufgerufen, dann folg tder Inhalt -->
 			<xsl:if test="position()=1">
@@ -454,15 +454,15 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
                     <table:table-cell table:style-name="Tabelle1.D7" office:value-type="string">
                         <text:p text:style-name="P9">-</text:p>
                     </table:table-cell>
-                </table:table-row>            
-                <xsl:apply-templates select="fussnote"/> 
+                </table:table-row>
+                <xsl:apply-templates select="fussnote"/>
             </table:table>
             <text:p text:style-name="P26"/>
             <text:p text:style-name="P22">Notenstufen:<text:tab/>Sehr gut (1), Gut (2), Befriedigend (3), Genügend (4), Nicht genügend (5), mit Erfolg teilgenommen (met), nicht teilgenommen (nt), teilgenommen(tg),</text:p>
             <text:p text:style-name="P22">
                 <text:tab/>angerechnet (ar), nicht beurteilt (nb), bestanden (b), erfolgreich absolviert (ea), nicht erfolgreich absolviert (nea)</text:p>
             <text:p text:style-name="P7"/>
-            <xsl:if test="abschlusspruefung_typ">
+            <xsl:if test="abschlusspruefung_typ and abschlusspruefung_typ!='lgabschluss'">
 	            <table:table table:name="Tabelle2" table:style-name="Tabelle2">
 	                <table:table-column table:style-name="Tabelle2.A"/>
 	                <table:table-column table:style-name="Tabelle2.B"/>
@@ -480,7 +480,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 							<xsl:if test="abschlusspruefung_typ='Diplom'" >
 								<text:p text:style-name="P8">Masterprüfung vom <xsl:value-of select="abschlusspruefung_datum" /></text:p>
 							</xsl:if>
-							
+
 	                    </table:table-cell>
 	                    <table:table-cell table:style-name="Tabelle2.B2" office:value-type="string">
 	                        <text:p text:style-name="P8"><xsl:value-of select="abschlusspruefung_note" /></text:p>

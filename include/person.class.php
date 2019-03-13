@@ -994,4 +994,33 @@ class person extends basis_db
 			return false;
 		}
 	}
+
+	/**
+	 * Laedt eine Person anhand der Matrikelnummer
+	 *
+	 * @param $matr_nr Matrikelnummer
+	 * @return boolean true wenn ok, false im Fehlerfall.
+	 */
+	public function getPersonByMatrNr($matr_nr)
+	{
+		$qry = "SELECT person_id FROM public.tbl_person WHERE matr_nr=".$this->db_add_param($matr_nr);
+
+		if($result = $this->db_query($qry))
+		{
+			if($row = $this->db_fetch_object($result))
+			{
+				return $this->load($row->person_id);
+			}
+			else
+			{
+				$this->errormsg = 'Person nicht gefunden';
+				return false;
+			}
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+	}
 }

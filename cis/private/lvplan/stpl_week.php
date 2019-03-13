@@ -40,6 +40,9 @@ if (!$db = new basis_db())
 
 $uid=get_uid();
 
+$rechte = new benutzerberechtigung();
+$rechte->getBerechtigungen($uid);
+
 // Variablen uebernehmen
 if (isset($_GET['type']))
 	$type=$_GET['type'];
@@ -331,12 +334,12 @@ if (isset($reserve) && $raumres)
 				$stpl = new stundenplan('stundenplan');
 				$stpldev = new stundenplan('stundenplandev');
 
-				if(!$stpl->isBelegt($ort_kurzbz, $datum_res, $stunde)
-				&& !$stpldev->isBelegt($ort_kurzbz, $datum_res, $stunde))
+				if((!$stpl->isBelegt($ort_kurzbz, $datum_res, $stunde)
+				&& !$stpldev->isBelegt($ort_kurzbz, $datum_res, $stunde))  || $rechte->isBerechtigt('lehre/reservierungAdvanced'))
 				{
 					$reservierung = new reservierung();
 
-					if(!$reservierung->isReserviert($ort_kurzbz, $datum_res, $stunde))
+					if(!$reservierung->isReserviert($ort_kurzbz, $datum_res, $stunde) || $rechte->isBerechtigt('lehre/reservierungAdvanced'))
 					{
 						if (empty($_REQUEST['titel']) && empty($_REQUEST['beschreibung']))
 							echo "<br>".$p->t('lvplan/titelUndBeschreibungFehlt')."! <br>";

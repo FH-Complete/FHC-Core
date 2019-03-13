@@ -549,7 +549,7 @@ elseif ($aktion=='lva_multi_set')
 		if (count($wochenrythmus)==1)
 			$wochenrythmus=$wr;
 		else
-			$error_msg.='Wochenrythmus ist nicht eindeutig!';
+			$error_msg.='Wochenrhythmus ist nicht eindeutig!';
 		$count=0;
 		$rest=$offenestunden;
 		if ($rest<=0)

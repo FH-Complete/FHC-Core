@@ -70,7 +70,7 @@ if(isset($_GET['sprache_user']))
 		setSpracheUser(DEFAULT_LANGUAGE);
 }
 
-$sprache_user = getSpracheUser(); 
+$sprache_user = getSpracheUser();
 $p = new phrasen($sprache_user);
 $sprache = getSprache();
 
@@ -103,7 +103,130 @@ if (isset($_SESSION['pruefling_id']))
 	
 	$sprache_mehrsprachig = new sprache();
 	$bezeichnung_mehrsprachig = $sprache_mehrsprachig->getSprachQuery('bezeichnung_mehrsprachig');
-	$qry = "SELECT vw_ablauf.*, ".$bezeichnung_mehrsprachig." FROM testtool.vw_ablauf JOIN testtool.tbl_gebiet USING (gebiet_id) WHERE studiengang_kz=".$db->db_add_param($_SESSION['studiengang_kz'])." ORDER BY semester,reihung";
+
+	/**
+	 * Spaltennamen-Aliase extrahieren um sie im Outer-Select verwenden zu können
+     * $bezeichnung_mehrsprachig liefert: bezeichnung_mehrsprachig[1] as bezeichnung_mehrsprachig_1,...
+     * $bezeichnung_mehrsprachig_sel liefert: bezeichnung_mehrsprachig_1, bezeichnung_mehrsprachig_2,...
+	 */
+	$bezeichnung_mehrsprachig_sel = explode(",", $bezeichnung_mehrsprachig);
+	foreach ($bezeichnung_mehrsprachig_sel as &$bm)
+    {
+        $bm = strrchr($bm, ' as ');
+    }
+	$bezeichnung_mehrsprachig_sel = implode(', ', $bezeichnung_mehrsprachig_sel);
+
+	/**
+	 * Reihungstestgebiete der Person ermitteln; Zusammenfassen, falls RT für mehrere Studien
+     * 1. Aktuelle Prestudenten zur Person über den Prüfling ermitteln,
+     * 2. Einstiegssemester (Erstsemester/Quereinsteiger) und Studienplan pro Prestudent ermitteln,
+     * 3. RT-Gebiete falls vorhanden über Studienplan, sonst über STG ermitteln
+     * 4. Für Quereinsteiger zusätzlich auch Erstsemestrigen-Gebiete
+	 */
+	$qry = "
+        WITH prestudent_data AS
+        (
+        SELECT DISTINCT ON (prestudent_id) 
+	        prestudent_id, 
+	        studienplan_id,
+            studiengang_kz,
+	        ausbildungssemester AS semester
+        FROM
+	        public.tbl_prestudentstatus
+        JOIN
+	        public.tbl_prestudent USING (prestudent_id)
+        WHERE 
+	        tbl_prestudent.person_id = (
+		        SELECT
+			        person_id
+		        FROM
+			        public.tbl_prestudent
+		        WHERE
+			        prestudent_id = ".$db->db_add_param($_SESSION['prestudent_id'])."
+	        )
+	
+        -- Filter only future studiensemester (incl. actual one)
+        AND
+	        studiensemester_kurzbz IN (
+		        SELECT 
+			        studiensemester_kurzbz
+		        FROM
+			        public.tbl_studiensemester 
+		        WHERE 
+			        ende > now()
+	        )
+		
+        AND 
+	        status_kurzbz = 'Interessent'
+
+        -- Order to get last semester when using distinct on
+        ORDER BY
+	        prestudent_id,
+	        datum DESC,
+	        tbl_prestudentstatus.insertamum DESC, 
+	        tbl_prestudentstatus.ext_id DESC
+        )
+
+
+        SELECT DISTINCT
+	        semester,
+	        gebiet_id,
+	        bezeichnung,
+            ". $bezeichnung_mehrsprachig_sel. "
+        FROM
+        (
+	        (SELECT 
+                prestudent_data.semester AS ps_sem,
+		        gebiet_id,
+		        bezeichnung,
+		        tbl_ablauf.studienplan_id,
+		        tbl_ablauf.studiengang_kz,
+		        tbl_ablauf.semester,
+		        tbl_ablauf.reihung,
+		        ".$bezeichnung_mehrsprachig. "
+	        FROM 
+		        prestudent_data
+	        JOIN 
+		        testtool.tbl_ablauf USING (studiengang_kz)
+	        JOIN 
+		        testtool.tbl_gebiet USING (gebiet_id)
+	        WHERE
+		        (prestudent_data.semester= 1 AND tbl_ablauf.semester = 1)
+	        OR
+		        (prestudent_data.semester= 3 AND tbl_ablauf.semester IN (1,3))
+	        )
+
+	        UNION
+
+	        (
+	        SELECT 
+	            prestudent_data.semester AS ps_sem,
+		        gebiet_id,
+		        bezeichnung,
+		        tbl_ablauf.studienplan_id,
+		        tbl_ablauf.studiengang_kz,
+		        tbl_ablauf.semester,
+		        tbl_ablauf.reihung,
+		        ". $bezeichnung_mehrsprachig. "
+	        FROM 
+		        prestudent_data
+	        JOIN 
+		        testtool.tbl_ablauf USING (studienplan_id)
+	        JOIN 
+		        testtool.tbl_gebiet USING (gebiet_id)
+	        WHERE
+		        (prestudent_data.semester= 1 AND tbl_ablauf.semester = 1)
+	        OR
+		        (prestudent_data.semester= 3 AND tbl_ablauf.semester IN (1,3))
+	        ) 
+	
+            ORDER BY
+                reihung
+        ) temp
+
+        ORDER BY
+	        semester
+        ";
 
 	$result = $db->db_query($qry);
 	$lastsemester = '';

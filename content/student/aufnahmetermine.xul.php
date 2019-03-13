@@ -293,7 +293,19 @@ echo ']>
 											<toolbarbutton id="aufnahmetermine-button-reihungstest-punktesync" image="../../skin/images/transmit.png" tooltiptext="Reihungstest Ergebnis holen" onclick="AufnahemTermineReihungstestPunkteTransmit()"/>
 											<spacer flex="1" />
 										</hbox>
-									</row>
+                                    </row>
+                                    <row>
+                                        <label value="Punkte inkl. Physik" control="aufnahmetermine-textbox-endpunkte-inkl-gebiete" />
+                                        <hbox>
+                                            <textbox id="aufnahmetermine-textbox-endpunkte-inkl-gebiete" readonly="true" maxlength="8" size="6"/>
+                                        </hbox>
+                                    </row>
+                                    <row>
+                                        <label value="Punkte exkl. Physik" control="aufnahmetermine-textbox-endpunkte-exkl-gebiete" />
+                                        <hbox>
+                                           <textbox id="aufnahmetermine-textbox-endpunkte-exkl-gebiete" readonly="true" maxlength="8" size="6"/>
+                                        </hbox>
+                                    </row>
 								</rows>
 							</grid>
 							<hbox>

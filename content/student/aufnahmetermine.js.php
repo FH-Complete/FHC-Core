@@ -242,6 +242,8 @@ function AufnahmeTermineAuswahl()
 	var teilgenommen = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#teilgenommen" ));
 	var punkte = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#punkte" ));
 	var studienplan_id = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#studienplan_id" ));
+    var endpunkte_inkl_gebiete = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#endpunkte_inkl_gebiete" ));
+    var endpunkte_exkl_gebiete = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#endpunkte_exkl_gebiete" ));
 
 	document.getElementById('aufnahmetermine-textbox-rt_person_id').value=rt_person_id;
 	document.getElementById('aufnahmetermine-textbox-person_id').value=person_id;
@@ -255,6 +257,8 @@ function AufnahmeTermineAuswahl()
 		document.getElementById('aufnahmetermine-checkbox-teilgenommen').checked=false;
 	document.getElementById('aufnahmetermine-textbox-punkte').value=punkte;
 	document.getElementById('aufnahmetermine-menulist-studienplan').value=studienplan_id;
+    document.getElementById('aufnahmetermine-textbox-endpunkte-inkl-gebiete').value = endpunkte_inkl_gebiete;
+    document.getElementById('aufnahmetermine-textbox-endpunkte-exkl-gebiete').value = endpunkte_exkl_gebiete;
 }
 
 function AufnahmeTermineNeu()

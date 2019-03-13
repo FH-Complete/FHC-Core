@@ -45,6 +45,9 @@ define('CIS_ROOT', 'http://www.fhcomlete.org/build/');
 // Externe Funktionen - Unterordner im Include-Verzeichnis
 define('EXT_FKT_PATH', 'tw');
 
+// Bezeichnung des Campus
+define('CAMPUS_NAME','');
+
 // Fuer Mails etc
 define('DOMAIN', 'example.com');
 

@@ -132,8 +132,10 @@ class Lehrveranstaltung_model extends DB_Model
 			UPPER(tbl_studiengang.typ::varchar(1) || tbl_studiengang.kurzbz) as kuerzel, tbl_studiengang.orgform_kurzbz, vw_student_lehrveranstaltung.semester, vw_student_lehrveranstaltung.studiensemester_kurzbz, vw_student_lehrveranstaltung.bezeichnung
 
 		FROM
-			campus.vw_student_lehrveranstaltung JOIN public.tbl_benutzer USING(uid)
-			JOIN public.tbl_person USING(person_id) LEFT JOIN public.tbl_student ON(uid=student_uid)
+			campus.vw_student_lehrveranstaltung
+			JOIN public.tbl_benutzer USING(uid)
+			JOIN public.tbl_person USING(person_id)
+			LEFT JOIN public.tbl_student ON(uid=student_uid)
 			LEFT JOIN public.tbl_mitarbeiter ON(uid=mitarbeiter_uid)
 			LEFT JOIN public.tbl_studentlehrverband USING(student_uid,studiensemester_kurzbz)
 			LEFT JOIN lehre.tbl_zeugnisnote on(vw_student_lehrveranstaltung.lehrveranstaltung_id=tbl_zeugnisnote.lehrveranstaltung_id AND tbl_zeugnisnote.student_uid=tbl_student.student_uid AND tbl_zeugnisnote.studiensemester_kurzbz=tbl_studentlehrverband.studiensemester_kurzbz)
@@ -170,5 +172,35 @@ class Lehrveranstaltung_model extends DB_Model
 					ORDER BY lvleiter DESC, nachname, vorname";
 
 		return $this->execQuery($query, array($lehrveranstaltung_id, $studiensemester_kurzbz));
+	}
+
+	/**
+	 * Gets Lehrveranstaltungen of a student
+	 * @param $student_uid
+	 * @param null $studiensemester_kurzbz
+	 * @return array|null
+	 */
+	public function getLvsByStudent($student_uid, $studiensemester_kurzbz = null)
+	{
+		$params = array($student_uid);
+
+		$qry = "SELECT * FROM lehre.tbl_lehrveranstaltung
+				WHERE lehrveranstaltung_id IN(SELECT lehrveranstaltung_id FROM campus.vw_student_lehrveranstaltung
+											  WHERE uid=?";
+		if (isset($studiensemester_kurzbz))
+		{
+			$qry .= " AND studiensemester_kurzbz=?";
+			$params[] = $studiensemester_kurzbz;
+		}
+		$qry .= ") OR lehrveranstaltung_id IN(SELECT lehrveranstaltung_id FROM lehre.tbl_zeugnisnote WHERE student_uid=?";
+		$params[] = $student_uid;
+		if (isset($studiensemester_kurzbz))
+		{
+			$qry .= " AND studiensemester_kurzbz=?";
+			$params[] = $studiensemester_kurzbz;
+		}
+		$qry .= ") ORDER BY semester, bezeichnung";
+
+		return $this->execQuery($qry, $params);
 	}
 }

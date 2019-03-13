@@ -864,7 +864,7 @@ function StudentProjektbetreuerDetailReset()
 	document.getElementById('student-projektbetreuer-textbox-faktor').value='1';
 	document.getElementById('student-projektbetreuer-textbox-name').value='';
 	document.getElementById('student-projektbetreuer-menulist-note').value='';
-	
+
 	document.getElementById('student-projektbetreuer-textbox-punkte').value='0.0';
 
 	if(document.getElementById('student-projektarbeit-menulist-projekttyp').value=='Diplom')
@@ -874,7 +874,7 @@ function StudentProjektbetreuerDetailReset()
 	}
 	else if(document.getElementById('student-projektarbeit-menulist-projekttyp').value=='Bachelor')
 	{
-		document.getElementById('student-projektbetreuer-textbox-stunden').value='3.0';
+		document.getElementById('student-projektbetreuer-textbox-stunden').value='4.0';
 		document.getElementById('student-projektbetreuer-menulist-betreuerart').value='Begutachter';
 	}
 	else if(document.getElementById('student-projektarbeit-menulist-projekttyp').value=='Praktikum')

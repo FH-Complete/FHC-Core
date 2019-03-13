@@ -2728,6 +2728,45 @@ if(!$result = @$db->db_query('SELECT lehrfach_oe_kurzbz FROM campus.vw_lehreinhe
 		echo '<br>campus.vw_lehreinheit lehrfach_oe_kurzbz added, fachbereich_kurzbz removed';
 }
 
+// Berechtigungen fuer web User auf testtool.tbl_kategorie
+if($result = @$db->db_query("SELECT * FROM information_schema.role_table_grants WHERE table_name='tbl_kategorie' AND table_schema='testtool' AND grantee='web' AND privilege_type='SELECT'"))
+{
+	if($db->db_num_rows($result)==0)
+	{
+
+		$qry = "GRANT SELECT, INSERT, UPDATE, DELETE ON testtool.tbl_kategorie TO web;";
+
+		if(!$db->db_query($qry))
+			echo '<strong>Testtool Berechtigungen: '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>Web User fuer testtool.tbl_kategorie berechtigt';
+	}
+}
+
+// Kategorisierung von Services
+if(!$result = @$db->db_query("SELECT * FROM public.tbl_servicekategorie LIMIT 1"))
+{
+	$qry = "CREATE TABLE public.tbl_servicekategorie(
+			servicekategorie_kurzbz varchar(32) NOT NULL,
+			bezeichnung varchar(256),
+			sort smallint
+		);
+		ALTER TABLE public.tbl_servicekategorie ADD CONSTRAINT pk_servicekategorie PRIMARY KEY (servicekategorie_kurzbz);
+		GRANT SELECT ON public.tbl_servicekategorie TO vilesci;
+		GRANT SELECT ON public.tbl_servicekategorie TO web;
+		ALTER TABLE public.tbl_service ADD COLUMN servicekategorie_kurzbz varchar(32);
+		ALTER TABLE public.tbl_service ADD CONSTRAINT fk_service_servicekategorie FOREIGN KEY (servicekategorie_kurzbz) REFERENCES public.tbl_servicekategorie (servicekategorie_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;
+		INSERT INTO public.tbl_servicekategorie(servicekategorie_kurzbz, bezeichnung, sort) VALUES('kritisch','Kritisch', 1);
+		INSERT INTO public.tbl_servicekategorie(servicekategorie_kurzbz, bezeichnung, sort) VALUES('normal','für täglichen Betrieb nicht kritisch', 2);
+		INSERT INTO public.tbl_servicekategorie(servicekategorie_kurzbz, bezeichnung, sort) VALUES('unkritisch','unkritisch für Lehrbetrieb', 3);
+		";
+
+	if(!$db->db_query($qry))
+		echo '<strong>Servicekategorie: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Servicekategorie zu Services hinzugefügt';
+}
+
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
 
@@ -2941,7 +2980,8 @@ $tabellen=array(
 	"public.tbl_status"  => array("status_kurzbz","beschreibung","anmerkung","ext_id","bezeichnung_mehrsprachig"),
 	"public.tbl_status_grund" => array("statusgrund_id","status_kurzbz","aktiv","bezeichnung_mehrsprachig","beschreibung"),
 	"public.tbl_semesterwochen"  => array("semester","studiengang_kz","wochen"),
-	"public.tbl_service" => array("service_id", "bezeichnung","beschreibung","ext_id","oe_kurzbz","content_id","design_uid","betrieb_uid","operativ_uid"),
+	"public.tbl_service" => array("service_id", "bezeichnung","beschreibung","ext_id","oe_kurzbz","content_id","design_uid","betrieb_uid","operativ_uid","servicekategorie_kurzbz"),
+	"public.tbl_servicekategorie" => array("servicekategorie_kurzbz", "bezeichnung","sort"),
 	"public.tbl_sprache"  => array("sprache","locale","flagge","index","content","bezeichnung"),
 	"public.tbl_standort"  => array("standort_id","adresse_id","kurzbz","bezeichnung","insertvon","insertamum","updatevon","updateamum","ext_id", "firma_id","code"),
 	"public.tbl_statistik"  => array("statistik_kurzbz","bezeichnung","url","gruppe","sql","content_id","insertamum","insertvon","updateamum","updatevon","berechtigung_kurzbz","publish","preferences"),

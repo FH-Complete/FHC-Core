@@ -98,6 +98,7 @@ $datum_obj = new datum();
 		$betrieb_uid = (isset($_POST['betrieb_uid'])?$_POST['betrieb_uid']:'');
 		$operativ_uid = (isset($_POST['operativ_uid'])?$_POST['operativ_uid']:'');
 		$ext_id = (isset($_POST['ext_id'])?$_POST['ext_id']:die('ext_id fehlt'));
+		$servicekategorie_kurzbz = (isset($_POST['servicekategorie_kurzbz'])?$_POST['servicekategorie_kurzbz']:'');
 		$new = (isset($_POST['new'])?$_POST['new']:'true');
 		if($new=='true')
 		{
@@ -116,6 +117,7 @@ $datum_obj = new datum();
 		$service->ext_id = $ext_id;
 		$service->oe_kurzbz = $oe_kurzbz;
 		$service->content_id = $content_id;
+		$service->servicekategorie_kurzbz = $servicekategorie_kurzbz;
 
 		if ($design_uid != '' || $betrieb_uid != '' || $operativ_uid != '')
 		{
@@ -182,6 +184,8 @@ $datum_obj = new datum();
 			break;
 	}
 
+	$servicekategorie_arr = $service->getKategorieArray();
+
 	echo '<form action="'.$_SERVER['PHP_SELF'].'?action=save" method="POST">';
 	echo '<input type="hidden" name="new" value="'.htmlspecialchars($new).'">';
 	echo '<input type="hidden" name="service_id" value="'.htmlspecialchars($service->service_id).'">';
@@ -213,6 +217,23 @@ $datum_obj = new datum();
 	echo '   <td>Beschreibung</td>';
 	echo '   <td><textarea name="beschreibung" cols="60" rows="5">'.htmlspecialchars($service->beschreibung).'</textarea></td>';
 	echo '</tr>';
+	echo '<tr>';
+	echo '   <td>Kategorie&nbsp;</td>';
+	echo '   <td>';
+	echo '<SELECT name="servicekategorie_kurzbz">';
+	echo '<OPTION value="">-- keine Auswahl --</OPTION>';
+	foreach($servicekategorie_arr as $key=>$value)
+	{
+		if($key==$service->servicekategorie_kurzbz)
+			$selected='selected';
+		else
+			$selected='';
+
+		echo '<OPTION value="'.$key.'" '.$selected.'>'.$value.'</OPTION>';
+	}
+
+	echo '</SELECT>';
+	echo ' </td>';
 	echo '<tr valign="top">';
 	echo '   <td>Design</td>';
 	echo '   <td><input type="text" id="design_uid" name="design_uid" class="benutzer_uid" size="32" maxlength="32" value="'.htmlspecialchars($service->design_uid).'"></td>';
