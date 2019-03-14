@@ -16,3 +16,6 @@ $config['authentication_login_pages'] = array(
 	AUTH_LDAP => '/system/Login/usernamePassword',
 	AUTH_SSO => '/system/Login/sso'
 );
+
+// Logout page
+$config['authentication_logout_page'] = '/system/Logout';

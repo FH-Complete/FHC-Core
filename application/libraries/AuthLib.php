@@ -11,6 +11,7 @@ class AuthLib
 	const AUTHENTICATION_FOREIGN_METHODS = 'authentication_foreign_methods';
 	const AUTHENTICATION_LOGIN = 'authentication_login';
 	const AUTHENTICATION_LOGIN_PAGES = 'authentication_login_pages';
+	const AUTHENTICATION_LOGOUT_PAGE = 'authentication_logout_page';
 
 	// Login object properties
 	const AO_PERSON_ID = 'person_id';
@@ -22,6 +23,7 @@ class AuthLib
 	const SESSION_NAME = 'AUTH';
 	const SESSION_AUTH_OBJ = 'AUTH_OBJ';
 	const SESSION_AUTH_OBJ_ORIGIN = 'AUTH_OBJ_ORIGIN';
+	const SESSION_LANDING_PAGE = 'LANDING_PAGE';
 
 	private $_ci; // CI instance
 
@@ -125,10 +127,36 @@ class AuthLib
 
 			// If were possible to retrieve user's data without failing,
 			// then stores the authentication object into authentication session
-			if (isSuccess($loginUP)) $this->_storeAuthObj(getData($loginUP));
+			if (isSuccess($loginUP)) $this->_storeSessionAuthObj(getData($loginUP));
 		}
 
 		return $loginUP;
+	}
+
+	/**
+	 * Redirect to the previously stored landing page
+	 */
+	public function redirectToLandingPage($altLandingPage = null)
+	{
+		// Tries to get the previously stored landing page
+		$landingPage = getSessionElement(self::SESSION_NAME, self::SESSION_LANDING_PAGE);
+		if ($landingPage == null) // if not present
+		{
+			// If it was given a valid alternative landing page
+			if (!isEmptyString($altLandingPage))
+			{
+				$landingPage = $altLandingPage;
+			}
+			else
+			{
+				$landingPage = site_url(); // use the default home page
+			}
+		}
+
+		// Clean the previously stored landing page
+		cleanSessionElement(self::SESSION_NAME, self::SESSION_LANDING_PAGE);
+
+		$this->_redirectTemporarily($landingPage); // redirect to landing page
 	}
 
 	/**
@@ -380,10 +408,25 @@ class AuthLib
 	/**
 	 * Stores the authentication object into the authentication session
 	 */
-	private function _storeAuthObj($authObj)
+	private function _storeSessionAuthObj($authObj)
 	{
 		setSessionElement(self::SESSION_NAME, self::SESSION_AUTH_OBJ, $authObj); // authentication object
 		setSessionElement(self::SESSION_NAME, self::SESSION_AUTH_OBJ_ORIGIN, $authObj); // authentication original object
+	}
+
+	/**
+	 * Stores the user accessed point into the authentication session
+	 */
+	private function _storeSessionLandingPage($loginPage, $logoutPage)
+	{
+		// Build the curret URL (user access point)
+		$currentURL = current_url().(!isEmptyString($_SERVER['QUERY_STRING']) ? '?'.$_SERVER['QUERY_STRING'] : '');
+
+		// If the access point is not the login page or the logout page
+		if ($currentURL != site_url($loginPage) && $currentURL != site_url($logoutPage))
+		{
+			setSessionElement(self::SESSION_NAME, self::SESSION_LANDING_PAGE, $currentURL);
+		}
 	}
 
 	/**
@@ -392,14 +435,15 @@ class AuthLib
 	private function _redirectToLogin()
 	{
 		$al = $this->_ci->config->item(self::AUTHENTICATION_LOGIN); // selected login method
-		$alp = $this->_ci->config->item(self::AUTHENTICATION_LOGIN_PAGES); // login pages configuration array
+		$alip = $this->_ci->config->item(self::AUTHENTICATION_LOGIN_PAGES); // login pages configuration array
+		$alop = $this->_ci->config->item(self::AUTHENTICATION_LOGOUT_PAGE); // logout page configuration
 
 		// If the configuration is valid
-		if (!isEmptyArray($alp) && isset($alp[$al]))
+		if (!isEmptyArray($alip) && isset($alip[$al]))
 		{
-			header('HTTP/1.1 302 Moved temporary'); // temporary redirection
-			header('Location: '.site_url().$alp[$al]); // redirect to the configured login page
-			exit(); // stops execution!
+			$this->_storeSessionLandingPage($alip[$al], $alop); // stores in session the user access point
+
+			$this->_redirectTemporarily(site_url($alip[$al])); // redirect to login page
 		}
 		else
 		{
@@ -421,7 +465,7 @@ class AuthLib
 			$auth = $this->_checkForeignAuthentication();
 			if (hasData($auth)) // Authenticated with a foreign authentication method
 			{
-				$this->_storeAuthObj(getData($auth)); // store the session authentication object
+				$this->_storeSessionAuthObj(getData($auth)); // store the session authentication object
 			}
 			elseif (getCode($auth) == AUTH_NOT_AUTHENTICATED) // if no foreign authentication was found...
 			{
@@ -471,6 +515,17 @@ class AuthLib
 		}
 
 		return $authObj;
+	}
+
+	/**
+	 * HTTP temporary redirection
+	 */
+	private function _redirectTemporarily($url)
+	{
+		// Temporary redirection
+		header('HTTP/1.1 302 Moved temporary');
+		header('Location: '.$url); // redirect to the given URL
+		exit(); // stops execution!
 	}
 
 	/**

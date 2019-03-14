@@ -90,10 +90,8 @@ function cleanSession($sessionName)
  */
 function cleanSessionElement($sessionName, $elementName)
 {
-	$session = getSession($sessionName); // get the whole session with the given name
-
-	if (isset($session[$elementName]))
+	if (isset($_SESSION[$sessionName][$elementName]))
 	{
-		unset($session[$elementName]);
+		unset($_SESSION[$sessionName][$elementName]);
 	}
 }

@@ -15,7 +15,7 @@ $this->load->view(
 ?>
 <body>
 	<?php
-		$href = site_url().'/ViewMessage/sendReply';
+		$href = site_url('/ViewMessage/sendReply');
 	?>
 	<div id="wrapper">
 		<div id="page-wrapper">
