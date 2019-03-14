@@ -26,6 +26,7 @@ require_once('../../config/global.config.inc.php');
 require_once('../../include/basis_db.class.php');
 require_once('../../include/sprache.class.php');
 require_once '../../include/phrasen.class.php';
+require_once '../../include/studiengang.class.php';
 
 if (!$db = new basis_db())
 	die('Fehler beim Oeffnen der Datenbankverbindung');
@@ -100,7 +101,10 @@ if (isset($_SESSION['pruefling_id']))
 			echo '<tr><td style="padding-left: 20px;"><a href="../../cms/content.php?content_id='.$content_id->content_id.'&sprache='.$sprache.'" target="content">'.$p->t('testtool/einleitung').'</a></td></tr>';	
 	echo '<tr><td>&nbsp;</td></tr>';
 	echo '<tr><td style="padding-left: 20px;" nowrap>';
-	
+
+	$studiengang_kz = (isset($_SESSION['studiengang_kz'])) ? $_SESSION['studiengang_kz'] : '';
+	$stg = new Studiengang($studiengang_kz);
+
 	$sprache_mehrsprachig = new sprache();
 	$bezeichnung_mehrsprachig = $sprache_mehrsprachig->getSprachQuery('bezeichnung_mehrsprachig');
 
@@ -130,11 +134,17 @@ if (isset($_SESSION['pruefling_id']))
 	        prestudent_id, 
 	        studienplan_id,
             studiengang_kz,
+            typ,
+			tbl_studiengangstyp.bezeichnung AS typ_bz,
 	        ausbildungssemester AS semester
         FROM
 	        public.tbl_prestudentstatus
         JOIN
 	        public.tbl_prestudent USING (prestudent_id)
+        JOIN
+            public.tbl_studiengang USING (studiengang_kz)
+        JOIN
+            public.tbl_studiengangstyp USING (typ)
         WHERE 
 	        tbl_prestudent.person_id = (
 		        SELECT
@@ -157,7 +167,22 @@ if (isset($_SESSION['pruefling_id']))
 	        )
 		
         AND 
-	        status_kurzbz = 'Interessent'
+	        status_kurzbz = 'Interessent'";
+
+            /*  If the logged-in prestudents study is a Bachelor-study, filter only Bachelor-studies */
+			if ($stg->typ == 'b')
+			{
+				$qry .= "
+				 	AND tbl_studiengang.typ = 'b'";
+			}
+			/* If the logged-in prestudents study is NOT a Bachelor-study, get only the specific study */
+			else
+			{
+				$qry .= "
+				 	AND tbl_studiengang.studiengang_kz = ". $studiengang_kz;
+			}
+
+			$qry .= "
 
         -- Order to get last semester when using distinct on
         ORDER BY

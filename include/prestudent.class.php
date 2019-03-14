@@ -426,7 +426,7 @@ class prestudent extends person
 	 * @boolean $prio Wenn true, dann wird nur der Prestudent mit dem am höchsten priorisierten Studiengang zurückgegeben.
 	 * return Objekt-Array mit allen Prestudenten einer Person, die aktuell an STG interessiert sind.
 	 */
-	public function getActualInteressenten($prestudent_id, $prio = false)
+	public function getActualInteressenten($prestudent_id, $prio = false, $typ = NULL, $studiengang_kz = NULL)
 	{
 		if (is_numeric($prestudent_id))
 		{
@@ -436,11 +436,17 @@ class prestudent extends person
 				prestudent_id, 
 				studienplan_id,
 				studiengang_kz,
+				typ,
+				tbl_studiengangstyp.bezeichnung AS typ_bz,
 				ausbildungssemester
 			FROM
 				public.tbl_prestudentstatus
 			JOIN
 				public.tbl_prestudent USING (prestudent_id)
+			JOIN
+				public.tbl_studiengang USING (studiengang_kz)
+			JOIN
+				public.tbl_studiengangstyp USING (typ)
 			WHERE 
 				tbl_prestudent.person_id = (
 				SELECT
@@ -450,8 +456,8 @@ class prestudent extends person
 					WHERE
 						prestudent_id = ". $this->db_add_param($prestudent_id). "
 				)
-		
-			-- Filter only future studiensemester (incl. actual one)
+					
+			/* Filter only future studiensemester (incl. actual one) */
 			AND
 				studiensemester_kurzbz IN (
 			SELECT 
@@ -461,12 +467,25 @@ class prestudent extends person
 					WHERE 
 						ende > now()
 				)
-			
+		
 			AND 
-				status_kurzbz = 'Interessent'
-	
-			-- Order to get the very last status and highest prio on top
-			ORDER BY
+				status_kurzbz = 'Interessent'";
+
+			if (!is_null($typ) && is_string($typ))
+			{
+				$qry .= "
+				 	AND tbl_studiengang.typ = ". $this->db_add_param($typ);
+			}
+
+			if (!is_null($studiengang_kz) && is_numeric($studiengang_kz))
+			{
+				$qry .= "
+				 	AND tbl_studiengang.studiengang_kz = ". $this->db_add_param($studiengang_kz);
+			}
+
+			$qry .= "
+			  -- Order to get the very last status and highest prio on top
+			 ORDER BY
 				priorisierung NULLS LAST,   
 				prestudent_id,
 				datum DESC,
@@ -481,6 +500,8 @@ class prestudent extends person
 				";
 			}
 
+			//echo "<br>". $qry;
+
 			if($this->db_query($qry))
 			{
 				while($row = $this->db_fetch_object())
@@ -490,6 +511,8 @@ class prestudent extends person
 					$obj->prestudent_id = $row->prestudent_id;
 					$obj->studienplan_id = $row->studienplan_id;
 					$obj->studiengang_kz = $row->studiengang_kz;
+					$obj->typ = $row->typ;
+					$obj->typ_bz = $row->typ_bz;
 					$obj->ausbildungssemester = $row->ausbildungssemester;
 
 					$this->result[] = $obj;

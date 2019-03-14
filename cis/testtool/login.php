@@ -19,6 +19,7 @@
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>,
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>,
  *          Manfred Kindl <manfred.kindl@technikum-wien.at>
+ *          Cristina Hainberger <hainberg@technikum-wien.at>
  */
 
 require_once('../../config/cis.config.inc.php');
@@ -356,22 +357,60 @@ if(isset($_POST['save']) && isset($_SESSION['prestudent_id']))
 
         // STG mit der höchsten Prio ermitteln
         $ps = new Prestudent();
-		$ps->getActualInteressenten($prestudent_id, true);
-		$firstPrio_studiengang_kz = array_column($ps->result, 'studiengang_kz');
-		$firstPrio_studiengang_kz = array_shift($firstPrio_studiengang_kz);
+
+        //  * wenn STG des eingeloggten Prestudenten vom Typ Bachelor ist, dann höchste Prio aller
+        //  Bachelor-STG ermitteln, an denen die Person noch interessiert ist
+        if ($typ->typ == 'b')
+        {
+            $ps->getActualInteressenten($prestudent_id, true, 'b');
+            $firstPrio_studiengang_kz = array_column($ps->result, 'studiengang_kz');
+            $firstPrio_studiengang_kz = array_shift($firstPrio_studiengang_kz);
+		}
+        // * sonst STG der session übernehmem
+        else
+        {
+			$firstPrio_studiengang_kz = $prestudent->studiengang_kz;
+        }
 
         // Sprachwahl zu STG mit höchster Prio ermitteln
 		$ablauf = new Ablauf();
 		$ablauf->getAblaufVorgabeStudiengang($firstPrio_studiengang_kz);
 		$sprachwahl = $ablauf->result[0]->sprachwahl;
 
-                //Prestudent Informationen und Logout 
+		//Prestudent Informationen und Logout
 		echo '<form method="GET">';
 		echo '<br>'.$p->t('testtool/begruessungstext').' <br/><br/>';
 		echo '<b>'.$p->t('zeitaufzeichnung/id').'</b>: '.$_SESSION['prestudent_id'].'<br/>';
 		echo '<b>'.$p->t('global/name').'</b>: '.$_SESSION['vorname'].' '.$_SESSION['nachname'].'<br/>';
 		echo '<b>'.$p->t('global/geburtsdatum').'</b>: '.$date->formatDatum($_SESSION['gebdatum'],'d.m.Y').'<br/>';
-		echo '<b>'.$p->t('global/studiengang').'</b>: '.$typ->bezeichnung.' '.($sprache_user=='English'?$stg_obj->english:$stg_obj->bezeichnung).'<br/><br/>';
+
+		//  * wenn Prestudent an mehreren Bachelor-Studiengängen interessiert ist, dann alle STG anführen
+		if ($typ->typ == 'b')
+        {
+			$ps_arr = new Prestudent();
+			$ps_arr->getActualInteressenten($prestudent_id, false, 'b');
+
+			if (count($ps_arr->result) > 1)
+            {
+				echo '<b>'.$p->t('global/studiengang'). "</b>: <br><br>";
+				foreach ($ps_arr->result as $ps_obj)
+				{
+					$stg = new Studiengang($ps_obj->studiengang_kz);
+					echo "<li>". $ps_obj->typ_bz .' '. ($sprache_user == 'English' ? $stg->english : $stg->bezeichnung). '<br/>'. "</li>";
+				}
+				echo "<br>";
+            }
+			//  * wenn Prestudent nur an einem Bachelor-Studiengang interessiert ist, dann nur den einen STG anführen
+			else
+            {
+				echo '<b>'.$p->t('global/studiengang').'</b>: '. $typ->bezeichnung.' '.($sprache_user=='English'?$stg_obj->english:$stg_obj->bezeichnung).'<br/><br/>';
+            }
+        }
+		//  * wenn Prestudent an einem Master-Studiengang interessiert ist, dann nur den einen STG anführen
+		else
+        {
+			echo '<b>'.$p->t('global/studiengang').'</b>: '.$typ->bezeichnung.' '.($sprache_user=='English'?$stg_obj->english:$stg_obj->bezeichnung).'<br/><br/>';
+        }
 		echo '<INPUT type="submit" value="Logout" name="logout" />';
 		echo '</form>';
 		echo '<br><br>';
