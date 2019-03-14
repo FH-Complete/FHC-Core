@@ -91,14 +91,14 @@ if (isset($_SESSION['pruefling_id']))
 	//content_id fuer Einfuehrung auslesen
 	$qry = "SELECT content_id FROM testtool.tbl_ablauf_vorgaben WHERE studiengang_kz=".$db->db_add_param($_SESSION['studiengang_kz'])." LIMIT 1";
 	$result = $db->db_query($qry);
-	
+
 	echo '<table width="100%" border="0" cellspacing="0" cellpadding="0" style="border-right-width:1px;border-right-color:#BCBCBC;">';
 	echo '<tr><td style="padding-left: 20px;" nowrap>
 			<a href="login.php" target="content">'.$p->t('testtool/startseite').'</a>
 		</td></tr>';
 	if ($content_id = $db->db_fetch_object($result))
 		if($content_id->content_id!='')
-			echo '<tr><td style="padding-left: 20px;"><a href="../../cms/content.php?content_id='.$content_id->content_id.'&sprache='.$sprache.'" target="content">'.$p->t('testtool/einleitung').'</a></td></tr>';	
+			echo '<tr><td style="padding-left: 20px;"><a href="../../cms/content.php?content_id='.$content_id->content_id.'&sprache='.$sprache.'" target="content">'.$p->t('testtool/einleitung').'</a></td></tr>';
 	echo '<tr><td>&nbsp;</td></tr>';
 	echo '<tr><td style="padding-left: 20px;" nowrap>';
 
@@ -130,8 +130,8 @@ if (isset($_SESSION['pruefling_id']))
 	$qry = "
         WITH prestudent_data AS
         (
-        SELECT DISTINCT ON (prestudent_id) 
-	        prestudent_id, 
+        SELECT DISTINCT ON (prestudent_id)
+	        prestudent_id,
 	        studienplan_id,
             studiengang_kz,
             typ,
@@ -145,7 +145,7 @@ if (isset($_SESSION['pruefling_id']))
             public.tbl_studiengang USING (studiengang_kz)
         JOIN
             public.tbl_studiengangstyp USING (typ)
-        WHERE 
+        WHERE
 	        tbl_prestudent.person_id = (
 		        SELECT
 			        person_id
@@ -154,19 +154,19 @@ if (isset($_SESSION['pruefling_id']))
 		        WHERE
 			        prestudent_id = ".$db->db_add_param($_SESSION['prestudent_id'])."
 	        )
-	
+
         -- Filter only future studiensemester (incl. actual one)
         AND
 	        studiensemester_kurzbz IN (
-		        SELECT 
+		        SELECT
 			        studiensemester_kurzbz
 		        FROM
-			        public.tbl_studiensemester 
-		        WHERE 
+			        public.tbl_studiensemester
+		        WHERE
 			        ende > now()
 	        )
-		
-        AND 
+
+        AND
 	        status_kurzbz = 'Interessent'";
 
             /*  If the logged-in prestudents study is a Bachelor-study, filter only Bachelor-studies */
@@ -188,7 +188,7 @@ if (isset($_SESSION['pruefling_id']))
         ORDER BY
 	        prestudent_id,
 	        datum DESC,
-	        tbl_prestudentstatus.insertamum DESC, 
+	        tbl_prestudentstatus.insertamum DESC,
 	        tbl_prestudentstatus.ext_id DESC
         )
 
@@ -200,7 +200,7 @@ if (isset($_SESSION['pruefling_id']))
             ". $bezeichnung_mehrsprachig_sel. "
         FROM
         (
-	        (SELECT 
+	        (SELECT
                 prestudent_data.semester AS ps_sem,
 		        gebiet_id,
 		        bezeichnung,
@@ -209,11 +209,11 @@ if (isset($_SESSION['pruefling_id']))
 		        tbl_ablauf.semester,
 		        tbl_ablauf.reihung,
 		        ".$bezeichnung_mehrsprachig. "
-	        FROM 
+	        FROM
 		        prestudent_data
-	        JOIN 
+	        JOIN
 		        testtool.tbl_ablauf USING (studiengang_kz)
-	        JOIN 
+	        JOIN
 		        testtool.tbl_gebiet USING (gebiet_id)
 	        WHERE
 		        (prestudent_data.semester= 1 AND tbl_ablauf.semester = 1)
@@ -224,7 +224,7 @@ if (isset($_SESSION['pruefling_id']))
 	        UNION
 
 	        (
-	        SELECT 
+	        SELECT
 	            prestudent_data.semester AS ps_sem,
 		        gebiet_id,
 		        bezeichnung,
@@ -233,18 +233,18 @@ if (isset($_SESSION['pruefling_id']))
 		        tbl_ablauf.semester,
 		        tbl_ablauf.reihung,
 		        ". $bezeichnung_mehrsprachig. "
-	        FROM 
+	        FROM
 		        prestudent_data
-	        JOIN 
+	        JOIN
 		        testtool.tbl_ablauf USING (studienplan_id)
-	        JOIN 
+	        JOIN
 		        testtool.tbl_gebiet USING (gebiet_id)
 	        WHERE
 		        (prestudent_data.semester= 1 AND tbl_ablauf.semester = 1)
 	        OR
 		        (prestudent_data.semester= 3 AND tbl_ablauf.semester IN (1,3))
-	        ) 
-	
+	        )
+
             ORDER BY
                 reihung
         ) temp
@@ -255,7 +255,7 @@ if (isset($_SESSION['pruefling_id']))
 
 	$result = $db->db_query($qry);
 	$lastsemester = '';
-	
+
 	while($row = $db->db_fetch_object($result))
 	{
 		//Jedes Semester in einer eigenen Tabelle anzeigen
@@ -267,7 +267,7 @@ if (isset($_SESSION['pruefling_id']))
 				echo '</table>';
 			}
 			$lastsemester = $row->semester;
-			
+
 			echo '<table border="0" cellspacing="0" cellpadding="0" id="Gebiet" style="display: visible; border-collapse: separate; border-spacing: 0 6px;">';
 			echo '<tr><td class="HeaderTesttool">'.$row->semester.'. '.$p->t('testtool/semester').' '.($row->semester!='1'?$p->t('testtool/quereinstieg'):'').'</td></tr>';
 		}
@@ -276,9 +276,9 @@ if (isset($_SESSION['pruefling_id']))
 		{
 			//Status der Gebiete Pruefen
 			$gebiet->load($row->gebiet_id);
-			
+
 			$qry = "SELECT extract('epoch' from '".$gebiet->zeit."'-(now()-min(begintime))) as time
-					FROM testtool.tbl_pruefling_frage JOIN testtool.tbl_frage USING(frage_id) 
+					FROM testtool.tbl_pruefling_frage JOIN testtool.tbl_frage USING(frage_id)
 					WHERE gebiet_id=".$db->db_add_param($row->gebiet_id)." AND pruefling_id=".$db->db_add_param($_SESSION['pruefling_id']);
 			if($result_time = $db->db_query($qry))
 			{
@@ -326,7 +326,7 @@ if (isset($_SESSION['pruefling_id']))
 					<!--<td width="10" class="ItemTesttoolRight" nowrap>&nbsp;</td>-->
 					</tr>';
 		}
-		else 
+		else
 		{
 			echo '<tr>
 						<td nowrap>

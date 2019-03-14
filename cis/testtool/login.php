@@ -191,7 +191,10 @@ if (isset($_POST['prestudent']) && isset($gebdatum))
                 // * 1. Sprache über Ablauf Vorgaben ermitteln
 				$ablauf = new Ablauf();
 				$ablauf->getAblaufVorgabeStudiengang($firstPrio_studiengang_kz);
-				$rt_sprache = $ablauf->result[0]->sprache;
+				$rt_sprache = '';
+
+				if(isset($ablauf->result[0]))
+					$rt_sprache = $ablauf->result[0]->sprache;
 
 				// * 2. falls keine Sprache vorhanden -> Sprache über Studienplan ermitteln
 				if (empty($rt_sprache))
@@ -258,8 +261,8 @@ if(isset($_SESSION['prestudent_id']) && !isset($_SESSION['pruefling_id']))
 	if(!$pruefling->getPruefling($_SESSION['prestudent_id']))
 		$pruefling->new = true;
         else
-            $pruefling->new = false; 
-   
+            $pruefling->new = false;
+
 		$pruefling->studiengang_kz = $_SESSION['studiengang_kz'];
 		$pruefling->semester = $_SESSION['semester'];
 
@@ -272,7 +275,7 @@ if(isset($_SESSION['prestudent_id']) && !isset($_SESSION['pruefling_id']))
 			$reload_parent=true;
 		}
 }
-                 
+
 if(isset($_POST['save']) && isset($_SESSION['prestudent_id']))
 {
 	$pruefling = new pruefling();
@@ -283,7 +286,7 @@ if(isset($_POST['save']) && isset($_SESSION['prestudent_id']))
 			$pruefling->new=false;
 	else
 		$pruefling->new=true;
-        
+
 	$pruefling->studiengang_kz = $_SESSION['studiengang_kz'];
 	$pruefling->idnachweis = isset($_POST['idnachweis'])?$_POST['idnachweis']:'';
 	$pruefling->registriert = date('Y-m-d H:i:s');
@@ -328,7 +331,7 @@ if(isset($_POST['save']) && isset($_SESSION['prestudent_id']))
 				defaultDate: "-6570",
 				maxDate: -5110,
 				yearRange: "-60:+00",
-				});';                              
+				});';
 		?>
 
 	});
@@ -336,7 +339,7 @@ if(isset($_POST['save']) && isset($_SESSION['prestudent_id']))
 <?php
 	if($reload_parent)
 		echo '<script language="Javascript">parent.menu.location.reload();</script>';  //CRIS:  nach reload()ein ; ergänzt
-         
+
 	if($reload)
 		echo "<script language=\"Javascript\">parent.location.reload();</script>";
 ?>
@@ -344,8 +347,8 @@ if(isset($_POST['save']) && isset($_SESSION['prestudent_id']))
 
 <body>
 <?php	echo '<h1>'.$p->t('testtool/startseite').'</h1>';
-        
-//REIHUNGSTEST STARTSEITE (nach Login)                              
+
+//REIHUNGSTEST STARTSEITE (nach Login)
 	if (isset($prestudent_id))
 	{
 
@@ -363,8 +366,14 @@ if(isset($_POST['save']) && isset($_SESSION['prestudent_id']))
         if ($typ->typ == 'b')
         {
             $ps->getActualInteressenten($prestudent_id, true, 'b');
-            $firstPrio_studiengang_kz = array_column($ps->result, 'studiengang_kz');
-            $firstPrio_studiengang_kz = array_shift($firstPrio_studiengang_kz);
+			foreach($ps->result as $row_prio)
+			{
+				if(isset($row_prio->studiengang_kz))
+				{
+					$firstPrio_studiengang_kz = $row_prio->studiengang_kz;
+					break;
+				}
+			}
 		}
         // * sonst STG der session übernehmem
         else
@@ -414,7 +423,7 @@ if(isset($_POST['save']) && isset($_SESSION['prestudent_id']))
 		echo '<INPUT type="submit" value="Logout" name="logout" />';
 		echo '</form>';
 		echo '<br><br>';
-                            
+
 		if($pruefling->getPruefling($prestudent_id))
 		{
 			echo '<FORM accept-charset="UTF-8"   action="'. $_SERVER['PHP_SELF'].'"  method="post" enctype="multipart/form-data">';
@@ -485,8 +494,8 @@ if(isset($_POST['save']) && isset($_SESSION['prestudent_id']))
 		echo '</SELECT>';
 		echo '&nbsp; '.$p->t('global/geburtsdatum').': ';
 		echo '<input type="text" id="datepicker" size="12" name="gebdatum" value="'.$date->formatDatum($gebdatum,'d.m.Y').'">';
-		echo '&nbsp; <INPUT type="submit" value="'.$p->t('testtool/login').'" />';   
-		echo '</form>';  
+		echo '&nbsp; <INPUT type="submit" value="'.$p->t('testtool/login').'" />';
+		echo '</form>';
 
 		echo '<br /><br /><br />
 		<center>
