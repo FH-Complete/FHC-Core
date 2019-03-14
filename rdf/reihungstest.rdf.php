@@ -115,6 +115,37 @@ foreach ($rt->result as $row)
 	}
 
 	$bezeichnung = $row->studiensemester_kurzbz.' St.'.$row->stufe.' '.(array_key_exists($row->studiengang_kz, $stg)?$stg[$row->studiengang_kz].' ':'').$row->datum.' '.$row->uhrzeit.' '.$row->ort_kurzbz.' '.$row->anmerkung.$freieplaetze;
+
+
+	// Convert date string into timestamp
+	$unixTimestamp = strtotime($row->datum);
+
+	// Get the day of the week
+	$dayOfWeek = date("l", $unixTimestamp);
+	switch($dayOfWeek)
+	{
+		case 'Monday':
+			$dayOfWeek = 'Mo';
+			break;
+		case 'Tuesday':
+			$dayOfWeek = 'Di';
+			break;
+		case 'Wednesday':
+			$dayOfWeek = 'Mi';
+			break;
+		case 'Thursday':
+			$dayOfWeek = 'Do';
+			break;
+		case 'Friday':
+			$dayOfWeek = 'Fr';
+			break;
+		case 'Saturday':
+			$dayOfWeek = 'Sa';
+			break;
+		case 'Sunday':
+			$dayOfWeek = 'So';
+			break;
+	}
 ?>
 	<RDF:li>
 		<RDF:Description  id="<?php echo $row->reihungstest_id; ?>"  about="<?php echo $rdf_url.'/'.$row->reihungstest_id; ?>" >
@@ -124,7 +155,7 @@ foreach ($rt->result as $row)
 			<RT:anmerkung><![CDATA[<?php echo $row->anmerkung;  ?>]]></RT:anmerkung>
 			<RT:datum><![CDATA[<?php echo $row->datum;  ?>]]></RT:datum>
 			<RT:uhrzeit><![CDATA[<?php echo $row->uhrzeit;  ?>]]></RT:uhrzeit>
-			<RT:bezeichnung><![CDATA[<?php echo $bezeichnung;  ?>]]></RT:bezeichnung>
+			<RT:bezeichnung><![CDATA[<?php echo $bezeichnung. ' ('. $dayOfWeek. ')' ;  ?>]]></RT:bezeichnung>
 		</RDF:Description>
 	</RDF:li>
 <?php
