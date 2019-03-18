@@ -179,12 +179,26 @@ if (isset($_POST['prestudent']) && isset($gebdatum))
 				$_SESSION['semester']=$semester;
 
 				// STG und Studienplan mit der höchsten Prio ermitteln
-				$ps->getActualInteressenten($_POST['prestudent'], true);
-				$firstPrio_studienplan_id = array_column($ps->result, 'studienplan_id');
-				$firstPrio_studienplan_id = array_shift($firstPrio_studienplan_id);
-				$firstPrio_studiengang_kz =  array_column($ps->result, 'studiengang_kz');
-				$firstPrio_studiengang_kz = array_shift($firstPrio_studiengang_kz);
+				$firstPrio_studienplan_id = '';
+				$firstPrio_studiengang_kz = '';
 
+				$ps->getActualInteressenten($_POST['prestudent'], true);
+				foreach($ps->result as $row)
+				{
+					if(isset($row->studiengang_kz))
+					{
+						$firstPrio_studienplan_id = $row->studienplan_id;
+						break;
+					}
+				}
+				foreach($ps->result as $row)
+				{
+					if(isset($row->studiengang_kz))
+					{
+						$firstPrio_studiengang_kz = $row->studiengang_kz;
+						break;
+					}
+				}
 
 				// Sprachvorgaben zu STG mit höchster Prio ermitteln
 
@@ -193,8 +207,10 @@ if (isset($_POST['prestudent']) && isset($gebdatum))
 				$ablauf->getAblaufVorgabeStudiengang($firstPrio_studiengang_kz);
 				$rt_sprache = '';
 
-				if(isset($ablauf->result[0]))
+				if(!empty($ablauf->result[0]))
+				{
 					$rt_sprache = $ablauf->result[0]->sprache;
+				}
 
 				// * 2. falls keine Sprache vorhanden -> Sprache über Studienplan ermitteln
 				if (empty($rt_sprache))
@@ -202,7 +218,6 @@ if (isset($_POST['prestudent']) && isset($gebdatum))
                     $stpl = new Studienplan();
                     $stpl->loadStudienplan($firstPrio_studienplan_id);
                     $rt_sprache = $stpl->sprache;
-
                 }
 
 				// * 3. falls keine Sprache vorhanden -> Sprache über Studiengang ermitteln
