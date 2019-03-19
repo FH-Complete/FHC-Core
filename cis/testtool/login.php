@@ -376,6 +376,9 @@ if(isset($_POST['save']) && isset($_SESSION['prestudent_id']))
         // STG mit der höchsten Prio ermitteln
         $ps = new Prestudent();
 
+        //  * prinzipiell STG der session übernehmem
+		$firstPrio_studiengang_kz = $prestudent->studiengang_kz;;
+
         //  * wenn STG des eingeloggten Prestudenten vom Typ Bachelor ist, dann höchste Prio aller
         //  Bachelor-STG ermitteln, an denen die Person noch interessiert ist
         if ($typ->typ == 'b')
@@ -390,16 +393,14 @@ if(isset($_POST['save']) && isset($_SESSION['prestudent_id']))
 				}
 			}
 		}
-        // * sonst STG der session übernehmem
-        else
-        {
-			$firstPrio_studiengang_kz = $prestudent->studiengang_kz;
-        }
 
         // Sprachwahl zu STG mit höchster Prio ermitteln
 		$ablauf = new Ablauf();
-		$ablauf->getAblaufVorgabeStudiengang($firstPrio_studiengang_kz);
-		$sprachwahl = $ablauf->result[0]->sprachwahl;
+        $sprachwahl = false;
+		if ($ablauf->getAblaufVorgabeStudiengang($firstPrio_studiengang_kz) && is_bool($ablauf->result[0]->sprachwahl))
+        {
+           $sprachwahl = $ablauf->result[0]->sprachwahl;
+        }
 
 		//Prestudent Informationen und Logout
 		echo '<form method="GET">';
