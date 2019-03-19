@@ -80,7 +80,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/lvplanung/stpl-semester-overlay.xu
 	seltype="single" hidecolumnpicker="false" flex="1"
 	datasources="../rdf/ort.rdf.php" ref="http://www.technikum-wien.at/ort/alle-orte">
 	<treecols>
-	    <treecol id="raumtyp" label="Raumtyp" flex="2" primary="true" persist="hidden, width, ordinal"/>
+	    <treecol id="raumtyp" label="Raumtyp" flex="3" primary="true" persist="hidden, width, ordinal"/>
 	    <splitter class="tree-splitter"/>
 	    <treecol id="ort_kurzbz" label="Raum" flex="4" hidden="true" persist="hidden, width, ordinal"/>
 	    <splitter class="tree-splitter"/>
@@ -88,13 +88,15 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/lvplanung/stpl-semester-overlay.xu
 	    <splitter class="tree-splitter"/>
 	     <treecol id="ort_bezeichnung" label="Bezeichnung" flex="3" hidden="true" persist="hidden, width, ordinal"/>
 	    <splitter class="tree-splitter"/>
-	    <treecol id="max_person" label="MaxP" flex="1" hidden="true" persist="hidden, width, ordinal"/>
+	    <treecol id="max_person" label="MP" tooltiptext="Max. Personenanzahl" flex="1" hidden="false" persist="hidden, width, ordinal"/>
 	    <splitter class="tree-splitter"/>
 	    <treecol id="raumtypen" label="Raumtypen" flex="1" hidden="true" persist="hidden, width, ordinal"/>
 	    <splitter class="tree-splitter"/>
 	    <treecol id="stockwerk" label="Stockwerk" flex="1" hidden="true" persist="hidden, width, ordinal"/>
 	    <splitter class="tree-splitter"/>
 	    <treecol id="planbezeichnung" label="Planbezeichnung" flex="1" hidden="true" persist="hidden, width, ordinal"/>
+        <splitter class="tree-splitter"/>
+        <treecol id="arbeitsplaetze" label="AP" tooltiptext="Arbeitsplätze" flex="1" hidden="false" persist="hidden, width, ordinal"/>
 	</treecols>
 
 	<template>
@@ -110,6 +112,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/lvplanung/stpl-semester-overlay.xu
 	           <treecell label="rdf:http://www.technikum-wien.at/ort/rdf#raumtypen"/>
 	           <treecell label="rdf:http://www.technikum-wien.at/ort/rdf#stockwerk"/>
 	           <treecell label="rdf:http://www.technikum-wien.at/ort/rdf#planbezeichnung"/>
+	           <treecell label="rdf:http://www.technikum-wien.at/ort/rdf#arbeitsplaetze"/>
 	         </treerow>
 	       </treeitem>
 	      </treechildren>
