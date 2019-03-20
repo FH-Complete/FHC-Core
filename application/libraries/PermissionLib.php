@@ -123,10 +123,11 @@ class PermissionLib
 	public function isEntitled($requiredPermissions, $calledMethod)
 	{
 		$checkPermissions = false;
-		$requestMethod = $_SERVER['REQUEST_METHOD'];
 
 		// If it's called from command line than it's trusted
 		if (is_cli()) return true;
+
+		$requestMethod = $_SERVER['REQUEST_METHOD'];
 
 		// Checks if the parameter $requiredPermissions is set, is an array and contains at least one element
 		if (isset($requiredPermissions) && !isEmptyArray($requiredPermissions))
