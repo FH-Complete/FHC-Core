@@ -20,6 +20,7 @@
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
 require_once(dirname(__FILE__).'/basis_db.class.php');
+require_once(dirname(__FILE__).'/ablauf.class.php');
 
 class pruefling extends basis_db
 {
@@ -308,100 +309,140 @@ class pruefling extends basis_db
 
 	/**
 	 * Berechnet das Reihungstestergebnis fuer eine Person und ggf Reihungstest
-	 * ACHTUNG - Diese Funktion liefert keine zuverlaessigen Ergebnisse wenn keine ReihungstestID uebergeben wird
-	 * und die Person mehrere Reihungstests absolviert hat!
 	 * @param $person_id ID der Person.
 	 * @param $punkte Wenn true werden Punkte geliefert, sonst Prozentsumme.
 	 * @param $reihungstest_id ID des Reihungstests.
 	 * @param $has_excluded_gebiete Wenn true werden die Punkte der Fragengebiete, die im config-array
 	 * definiert sind, bei der Berechnung der Endpunkte nicht berücksichtigt.
+	 * @param $studiengang_kz Wenn eine Studiengangskennzahl übergeben wird, dann werden nur die Punkte der
+	 * Basis-Fragengebiete (ohne Quereinsteiger) bei der Berechnung der Endpunkte berücksichtigt.
 	 * @return Endpunkte des Reihungstests oder False wenn keine Punkte vorhanden
 	 */
-	public function getReihungstestErgebnisPerson($person_id, $punkte=false, $reihungstest_id=null, $has_excluded_gebiete = false)
+	public function getReihungstestErgebnisPerson($person_id, $punkte=false, $reihungstest_id, $has_excluded_gebiete = false, $studiengang_kz = null)
 	{
-		$qry = "SELECT * FROM testtool.vw_auswertung
-				WHERE person_id=".$this->db_add_param($person_id, FHC_INTEGER);
-
-		if ($has_excluded_gebiete)
+		if(is_numeric($reihungstest_id))
 		{
-			if (defined('FAS_REIHUNGSTEST_EXCLUDE_GEBIETE') && !empty(FAS_REIHUNGSTEST_EXCLUDE_GEBIETE))
+			$ergebnis=0;
+
+			$qry = "
+				SELECT DISTINCT ON (vw_auswertung_ablauf.gebiet_id) gebiet_id,
+					vw_auswertung_ablauf.*, 
+					tbl_studiengang.typ
+				FROM 
+					testtool.vw_auswertung_ablauf
+				JOIN 
+					public.tbl_studiengang ON vw_auswertung_ablauf.stg_kurzbz = tbl_studiengang.kurzbzlang
+				WHERE 
+					reihungstest_id = ".$this->db_add_param($reihungstest_id, FHC_INTEGER);
+
+			//	Ggf. die Basis-Fragengebiete ermitteln (ohne Quereinsteigergebiete)
+			if (is_numeric($studiengang_kz))
 			{
-				$exclude_gebiet_id_arr = FAS_REIHUNGSTEST_EXCLUDE_GEBIETE;
-				$exclude_gebiet_id_toString = implode(', ', $exclude_gebiet_id_arr);
-				$qry .= " AND gebiet_id NOT IN (". $exclude_gebiet_id_toString. ")";
+				$ablauf = new Ablauf();
+				$ablauf->getAblaufGebiete($studiengang_kz, NULL, 1);
+				$basis_gebiet_id_arr = array();
+				$basis_gebiet_id_toString = '';
+
+				foreach ($ablauf->result as $obj)
+				{
+					$basis_gebiet_id_arr []= $obj->gebiet_id;
+				}
+				$basis_gebiet_id_toString = implode(', ', $basis_gebiet_id_arr);
+
+				if (!empty($basis_gebiet_id_toString))
+				{
+					$qry .= "
+					AND 
+						gebiet_id IN (". $basis_gebiet_id_toString. ") 
+				";
+				}
 			}
-		}
 
-		$ergebnis=0;
-
-		if(!is_null($reihungstest_id))
-		{
-			$qry.=" AND reihungstest_id=".$this->db_add_param($reihungstest_id, FHC_INTEGER);
-
-			// Quercheck der PrestudentID ueber den Status damit bei Personen
-			// die den Reihungstest oefter im selben Studiengang gemacht haben nicht das
-			// Ergebniss der beiden Tests summiert bekommen
-			// Im Zweifelsfall wird der neuere Reihungstest genommen
-			$qry.= " 
-				AND 
-					prestudent_id = (
-						SELECT
-							prestudent_id
-						FROM
-							public.tbl_rt_person
-						JOIN 
-							public.tbl_prestudent USING(person_id)
-						JOIN
-							public.tbl_prestudentstatus USING (prestudent_id)
-						JOIN 
-							tbl_reihungstest ON (
-								tbl_rt_person.rt_id = tbl_reihungstest.reihungstest_id
-								AND 
-								tbl_prestudentstatus.studiensemester_kurzbz = tbl_reihungstest.studiensemester_kurzbz
-							)
-						WHERE
-							tbl_rt_person.person_id = ".$this->db_add_param($person_id, FHC_INTEGER)."
+			// Ggf. Fragengebiete exkludieren
+			if ($has_excluded_gebiete)
+			{
+				if (defined('FAS_REIHUNGSTEST_EXCLUDE_GEBIETE') && !empty(FAS_REIHUNGSTEST_EXCLUDE_GEBIETE))
+				{
+					$exclude_gebiet_id_arr = FAS_REIHUNGSTEST_EXCLUDE_GEBIETE;
+					$exclude_gebiet_id_toString = implode(', ', $exclude_gebiet_id_arr);
+					$qry .= " 
 						AND 
-							tbl_rt_person.rt_id = ".$this->db_add_param($reihungstest_id, FHC_INTEGER)."
+							gebiet_id NOT IN (". $exclude_gebiet_id_toString. ")
 						AND 
-							tbl_prestudentstatus.status_kurzbz='Interessent'
-						AND
-							(tbl_reihungstest.stufe = 1 OR tbl_reihungstest.stufe IS NULL)
-						ORDER BY
-							tbl_reihungstest.datum desc LIMIT 1
-					)";
-		}
+							typ = 'b' 
+					";
+				}
+			}
 
-		if($result = $this->db_query($qry))
-		{
-			// Wenn keine Eintraege vorhanden dann false
-			if($this->db_num_rows($result)==0)
+			/**
+			 * Quercheck der PrestudentID ueber den Status damit bei Personen
+			 * die den Reihungstest oefter im selben Studiengang gemacht haben nicht das
+			 * Ergebniss der beiden Tests summiert bekommen
+			 * Im Zweifelsfall wird der neuere Reihungstest genommen */
+			$qry .= "
+				AND prestudent_id = (
+					SELECT
+						prestudent_id
+					FROM
+						public.tbl_rt_person
+					JOIN 
+						public.tbl_prestudent USING(person_id)
+					JOIN
+						public.tbl_prestudentstatus USING (prestudent_id, studienplan_id)
+					JOIN 
+						tbl_reihungstest ON (
+							tbl_rt_person.rt_id = tbl_reihungstest.reihungstest_id			
+						)
+					WHERE
+						tbl_rt_person.person_id = ".$this->db_add_param($person_id, FHC_INTEGER)."
+					AND 
+						tbl_rt_person.rt_id = ".$this->db_add_param($reihungstest_id, FHC_INTEGER)."
+					AND 
+						tbl_prestudentstatus.status_kurzbz='Interessent'
+					AND
+						(tbl_reihungstest.stufe = 1 OR tbl_reihungstest.stufe IS NULL)
+					ORDER BY
+						tbl_reihungstest.datum desc LIMIT 1
+				)
+			";
+
+			if($result = $this->db_query($qry))
+			{
+				// Wenn keine Eintraege vorhanden dann false
+				if($this->db_num_rows($result)==0)
+					return false;
+
+				while($row = $this->db_fetch_object($result))
+				{
+					//wenn maxpunkte ueberschritten wurde -> 100%
+					if($row->punkte>=$row->maxpunkte)
+					{
+						$prozent=100;
+						$row->punkte = $row->maxpunkte;
+					}
+					else
+						$prozent = ($row->punkte/$row->maxpunkte)*100;
+
+					if($punkte)
+					{
+						$ergebnis +=$row->punkte;
+					}
+
+					else
+						$ergebnis+=$prozent*$row->gewicht;
+				}
+				return $ergebnis;
+			}
+			else
+			{
+				$this->errormsg = 'Fehler bei einer Abfrage';
 				return false;
-
-			while($row = $this->db_fetch_object($result))
-			{
-				//wenn maxpunkte ueberschritten wurde -> 100%
-				if($row->punkte>=$row->maxpunkte)
-				{
-					$prozent=100;
-					$row->punkte = $row->maxpunkte;
-				}
-				else
-					$prozent = ($row->punkte/$row->maxpunkte)*100;
-
-				if($punkte)
-				{
-					$ergebnis +=$row->punkte;
-				}
-
-				else
-					$ergebnis+=$prozent*$row->gewicht;
 			}
-			return $ergebnis;
+
 		}
 		else
 		{
-			$this->errormsg = 'Fehler bei einer Abfrage';
+			$this->errormsg = 'reihungstest_id muss numerisch sein';
 			return false;
 		}
 	}
