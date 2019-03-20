@@ -174,6 +174,9 @@ define('VIEW_BEGIN', 'vw_');
 //Legt fest ob die Personalnummer beim Anlegen NULL sein soll
 define('FAS_PERSONALNUMMER_GENERATE_NULL', false);
 
+// Legt fest ob Felder mit Reihgungstest-Basispunkten im Reiter Aufnahme-Termine angezeigt werden
+define('FAS_REIHUNGSTEST_PUNKTE_BASISGEBIET_ANZEIGEN', false);
+
 // API Informationen
 define('FHC_REST_API_KEY', 'testapikey@fhcomplete.org');
 define('FHC_REST_USER', 'username');
