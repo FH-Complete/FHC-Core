@@ -281,7 +281,13 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 			</text:sequence-decls>
 			<text:p text:style-name="P15">LEHRVERANSTALTUNGSZEUGNIS</text:p>
 			<text:p text:style-name="P16"/>
-			<text:p text:style-name="P16"><xsl:value-of select="lv_studiengang_art"/>-Studiengang</text:p>
+			<!-- Beim Campus International wird der Text "Studiengang" nicht angedruckt -->
+			<xsl:choose>
+				<xsl:when test="lv_studiengang_kennzahl=10006"></xsl:when>
+				<xsl:otherwise>
+					<text:p text:style-name="P16"><xsl:value-of select="lv_studiengang_art"/>-Studiengang</text:p>
+				</xsl:otherwise>
+			</xsl:choose>
 			<text:p text:style-name="P5"><xsl:value-of select="lv_studiengang_bezeichnung"/></text:p>
 			<text:p text:style-name="P1"/>
 			<text:p text:style-name="P1"/>
@@ -289,7 +295,16 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 			<text:p text:style-name="P1"/>
 			<text:p text:style-name="P1"/>
 			<text:p text:style-name="P2">Personenkennzeichen: <xsl:value-of select="matrikelnr"/></text:p>
-			<text:p text:style-name="P2">Kennzahl des Studienganges: <xsl:value-of select="lv_studiengang_kennzahl"/></text:p>
+			<!-- Beim Campus International wird die Studiengangskennzahl nicht angedruckt -->
+			<xsl:choose>
+				<xsl:when test="lv_studiengang_kennzahl=10006">
+					<text:p text:style-name="P2"/>
+				</xsl:when>
+				<xsl:otherwise>
+					<text:p text:style-name="P2">Kennzahl des Studienganges: <xsl:value-of select="lv_studiengang_kennzahl"/></text:p>
+				</xsl:otherwise>
+			</xsl:choose>
+
 			<text:p text:style-name="P3"/>
 			<text:p text:style-name="P3"/>
 			<text:p text:style-name="P3"/>
@@ -442,7 +457,16 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 								</table:table-cell>
 								<table:table-cell table:style-name="Tabelle3.C2" office:value-type="string">
 									<text:p text:style-name="P14"><xsl:value-of select="studiengangsleiter" /></text:p>
-									<text:p text:style-name="P23">Studiengangsleitung</text:p>
+									<!-- Beim Campus International wird statt Studiengangsleitung, Head of International Office angedruckt -->
+									<xsl:choose>
+										<xsl:when test="lv_studiengang_kennzahl=10006">
+											<text:p text:style-name="P23">Head of International Office</text:p>
+										</xsl:when>
+										<xsl:otherwise>
+											<text:p text:style-name="P23">Studiengangsleitung</text:p>
+										</xsl:otherwise>
+									</xsl:choose>
+
 								</table:table-cell>
 							</table:table-row>
 						</table:table>

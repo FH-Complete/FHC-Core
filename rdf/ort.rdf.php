@@ -88,6 +88,7 @@ for ($i=0;$i<$num_rows;$i++)
     				<ORT:stockwerk></ORT:stockwerk>
     				<ORT:raumtypen>'.$ort->raumtyp_kurzbz.'</ORT:raumtypen>
     				<ORT:planbezeichnung>'.$ort->planbezeichnung.'</ORT:planbezeichnung>
+    				<ORT:arbeitsplaetze></ORT:arbeitsplaetze>
       			</RDF:Description>';
 	$descr.='<RDF:Description RDF:about="'.$rdf_url.$ort->raumtyp_kurzbz.'/'.$ort->ort_kurzbz.'" >
         			<ORT:raumtyp>'.$ort->ort_kurzbz."</ORT:raumtyp>
@@ -98,6 +99,7 @@ for ($i=0;$i<$num_rows;$i++)
         			<ORT:stockwerk>".$ort->stockwerk."</ORT:stockwerk>
         			<ORT:raumtypen>".$raumtypen."</ORT:raumtypen>
         			<ORT:planbezeichnung>".$ort->planbezeichnung."</ORT:planbezeichnung>
+        			<ORT:arbeitsplaetze>".$ort->arbeitsplaetze."</ORT:arbeitsplaetze>
       			</RDF:Description>\n";
 
 	if ($lastTYP!=$currentTYP)

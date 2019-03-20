@@ -179,19 +179,38 @@ if (isset($_POST['prestudent']) && isset($gebdatum))
 				$_SESSION['semester']=$semester;
 
 				// STG und Studienplan mit der höchsten Prio ermitteln
-				$ps->getActualInteressenten($_POST['prestudent'], true);
-				$firstPrio_studienplan_id = array_column($ps->result, 'studienplan_id');
-				$firstPrio_studienplan_id = array_shift($firstPrio_studienplan_id);
-				$firstPrio_studiengang_kz =  array_column($ps->result, 'studiengang_kz');
-				$firstPrio_studiengang_kz = array_shift($firstPrio_studiengang_kz);
+				$firstPrio_studienplan_id = '';
+				$firstPrio_studiengang_kz = '';
 
+				$ps->getActualInteressenten($_POST['prestudent'], true);
+				foreach($ps->result as $row)
+				{
+					if(isset($row->studiengang_kz))
+					{
+						$firstPrio_studienplan_id = $row->studienplan_id;
+						break;
+					}
+				}
+				foreach($ps->result as $row)
+				{
+					if(isset($row->studiengang_kz))
+					{
+						$firstPrio_studiengang_kz = $row->studiengang_kz;
+						break;
+					}
+				}
 
 				// Sprachvorgaben zu STG mit höchster Prio ermitteln
 
                 // * 1. Sprache über Ablauf Vorgaben ermitteln
 				$ablauf = new Ablauf();
 				$ablauf->getAblaufVorgabeStudiengang($firstPrio_studiengang_kz);
-				$rt_sprache = $ablauf->result[0]->sprache;
+				$rt_sprache = '';
+
+				if(!empty($ablauf->result[0]))
+				{
+					$rt_sprache = $ablauf->result[0]->sprache;
+				}
 
 				// * 2. falls keine Sprache vorhanden -> Sprache über Studienplan ermitteln
 				if (empty($rt_sprache))
@@ -199,7 +218,6 @@ if (isset($_POST['prestudent']) && isset($gebdatum))
                     $stpl = new Studienplan();
                     $stpl->loadStudienplan($firstPrio_studienplan_id);
                     $rt_sprache = $stpl->sprache;
-
                 }
 
 				// * 3. falls keine Sprache vorhanden -> Sprache über Studiengang ermitteln
@@ -258,8 +276,8 @@ if(isset($_SESSION['prestudent_id']) && !isset($_SESSION['pruefling_id']))
 	if(!$pruefling->getPruefling($_SESSION['prestudent_id']))
 		$pruefling->new = true;
         else
-            $pruefling->new = false; 
-   
+            $pruefling->new = false;
+
 		$pruefling->studiengang_kz = $_SESSION['studiengang_kz'];
 		$pruefling->semester = $_SESSION['semester'];
 
@@ -272,7 +290,7 @@ if(isset($_SESSION['prestudent_id']) && !isset($_SESSION['pruefling_id']))
 			$reload_parent=true;
 		}
 }
-                 
+
 if(isset($_POST['save']) && isset($_SESSION['prestudent_id']))
 {
 	$pruefling = new pruefling();
@@ -283,7 +301,7 @@ if(isset($_POST['save']) && isset($_SESSION['prestudent_id']))
 			$pruefling->new=false;
 	else
 		$pruefling->new=true;
-        
+
 	$pruefling->studiengang_kz = $_SESSION['studiengang_kz'];
 	$pruefling->idnachweis = isset($_POST['idnachweis'])?$_POST['idnachweis']:'';
 	$pruefling->registriert = date('Y-m-d H:i:s');
@@ -328,7 +346,7 @@ if(isset($_POST['save']) && isset($_SESSION['prestudent_id']))
 				defaultDate: "-6570",
 				maxDate: -5110,
 				yearRange: "-60:+00",
-				});';                              
+				});';
 		?>
 
 	});
@@ -336,7 +354,7 @@ if(isset($_POST['save']) && isset($_SESSION['prestudent_id']))
 <?php
 	if($reload_parent)
 		echo '<script language="Javascript">parent.menu.location.reload();</script>';  //CRIS:  nach reload()ein ; ergänzt
-         
+
 	if($reload)
 		echo "<script language=\"Javascript\">parent.location.reload();</script>";
 ?>
@@ -344,8 +362,8 @@ if(isset($_POST['save']) && isset($_SESSION['prestudent_id']))
 
 <body>
 <?php	echo '<h1>'.$p->t('testtool/startseite').'</h1>';
-        
-//REIHUNGSTEST STARTSEITE (nach Login)                              
+
+//REIHUNGSTEST STARTSEITE (nach Login)
 	if (isset($prestudent_id))
 	{
 
@@ -358,24 +376,31 @@ if(isset($_POST['save']) && isset($_SESSION['prestudent_id']))
         // STG mit der höchsten Prio ermitteln
         $ps = new Prestudent();
 
+        //  * prinzipiell STG der session übernehmem
+		$firstPrio_studiengang_kz = $prestudent->studiengang_kz;;
+
         //  * wenn STG des eingeloggten Prestudenten vom Typ Bachelor ist, dann höchste Prio aller
         //  Bachelor-STG ermitteln, an denen die Person noch interessiert ist
         if ($typ->typ == 'b')
         {
             $ps->getActualInteressenten($prestudent_id, true, 'b');
-            $firstPrio_studiengang_kz = array_column($ps->result, 'studiengang_kz');
-            $firstPrio_studiengang_kz = array_shift($firstPrio_studiengang_kz);
+			foreach($ps->result as $row_prio)
+			{
+				if(isset($row_prio->studiengang_kz))
+				{
+					$firstPrio_studiengang_kz = $row_prio->studiengang_kz;
+					break;
+				}
+			}
 		}
-        // * sonst STG der session übernehmem
-        else
-        {
-			$firstPrio_studiengang_kz = $prestudent->studiengang_kz;
-        }
 
         // Sprachwahl zu STG mit höchster Prio ermitteln
 		$ablauf = new Ablauf();
-		$ablauf->getAblaufVorgabeStudiengang($firstPrio_studiengang_kz);
-		$sprachwahl = $ablauf->result[0]->sprachwahl;
+        $sprachwahl = false;
+		if ($ablauf->getAblaufVorgabeStudiengang($firstPrio_studiengang_kz) && is_bool($ablauf->result[0]->sprachwahl))
+        {
+           $sprachwahl = $ablauf->result[0]->sprachwahl;
+        }
 
 		//Prestudent Informationen und Logout
 		echo '<form method="GET">';
@@ -414,7 +439,7 @@ if(isset($_POST['save']) && isset($_SESSION['prestudent_id']))
 		echo '<INPUT type="submit" value="Logout" name="logout" />';
 		echo '</form>';
 		echo '<br><br>';
-                            
+
 		if($pruefling->getPruefling($prestudent_id))
 		{
 			echo '<FORM accept-charset="UTF-8"   action="'. $_SERVER['PHP_SELF'].'"  method="post" enctype="multipart/form-data">';
@@ -485,8 +510,8 @@ if(isset($_POST['save']) && isset($_SESSION['prestudent_id']))
 		echo '</SELECT>';
 		echo '&nbsp; '.$p->t('global/geburtsdatum').': ';
 		echo '<input type="text" id="datepicker" size="12" name="gebdatum" value="'.$date->formatDatum($gebdatum,'d.m.Y').'">';
-		echo '&nbsp; <INPUT type="submit" value="'.$p->t('testtool/login').'" />';   
-		echo '</form>';  
+		echo '&nbsp; <INPUT type="submit" value="'.$p->t('testtool/login').'" />';
+		echo '</form>';
 
 		echo '<br /><br /><br />
 		<center>
