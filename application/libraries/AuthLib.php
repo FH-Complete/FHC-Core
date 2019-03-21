@@ -182,6 +182,14 @@ class AuthLib
 	 */
 	public function redirectToLandingPage($altLandingPage = null)
 	{
+		$this->_redirectTemporarily($this->getLandingPage($altLandingPage)); // redirect to landing page
+	}
+
+	/**
+	 * Returns the landing page
+	 */
+	public function getLandingPage($altLandingPage = null)
+	{
 		// Tries to get the previously stored landing page
 		$landingPage = getSessionElement(self::SESSION_NAME, self::SESSION_LANDING_PAGE);
 		if ($landingPage == null) // if not present
@@ -200,7 +208,7 @@ class AuthLib
 		// Clean the previously stored landing page
 		cleanSessionElement(self::SESSION_NAME, self::SESSION_LANDING_PAGE);
 
-		$this->_redirectTemporarily($landingPage); // redirect to landing page
+		return $landingPage;
 	}
 
 	/**
