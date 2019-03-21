@@ -995,9 +995,9 @@ function StudentAbschlusspruefungPrintUrkundeMultiple(event, sprache)
 		return false;
 	}
 
-	if(pruefungstyp_kurzbz=='Bachelor' && sprache=='deutsch')
+	if((pruefungstyp_kurzbz=='Bachelor' || pruefungstyp_kurzbz=='lgabschluss') && sprache=='deutsch')
 		xsl='Bakkurkunde';
-	else if(pruefungstyp_kurzbz=='Bachelor' && sprache=='englisch')
+	else if((pruefungstyp_kurzbz=='Bachelor' || pruefungstyp_kurzbz=='lgabschluss') && sprache=='englisch')
 		xsl='BakkurkundeEng';
 	else if(pruefungstyp_kurzbz=='Diplom' && sprache=='deutsch')
 		xsl='Diplomurkunde';

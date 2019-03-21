@@ -244,6 +244,7 @@ function AufnahmeTermineAuswahl()
 	var studienplan_id = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#studienplan_id" ));
     var endpunkte_inkl_gebiete = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#endpunkte_inkl_gebiete" ));
     var endpunkte_exkl_gebiete = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#endpunkte_exkl_gebiete" ));
+    var typ = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#typ" ));
 
 	document.getElementById('aufnahmetermine-textbox-rt_person_id').value=rt_person_id;
 	document.getElementById('aufnahmetermine-textbox-person_id').value=person_id;
@@ -259,6 +260,24 @@ function AufnahmeTermineAuswahl()
 	document.getElementById('aufnahmetermine-menulist-studienplan').value=studienplan_id;
     document.getElementById('aufnahmetermine-textbox-endpunkte-inkl-gebiete').value = endpunkte_inkl_gebiete;
     document.getElementById('aufnahmetermine-textbox-endpunkte-exkl-gebiete').value = endpunkte_exkl_gebiete;
+
+    // Sichtbarkeit der RT-Vergleichsergebnispunkte (ohne Quereinsteiger)
+    var basisgebiet_punkte_anzeigen = <?php echo FAS_REIHUNGSTEST_PUNKTE_BASISGEBIET_ANZEIGEN ? 'true' : 'false' ?>;
+
+    //  * Generell Anzeige nur wenn über config-Datei gesetzt ist
+    if (basisgebiet_punkte_anzeigen)
+    {
+        //  * für Bachelor-Studiengänge anzeigen
+        if (typ == 'b')
+        {
+            document.getElementById('aufnahmetermine-groupbox-vergleich-endpunkte').hidden = false;
+        }
+        //  * für Master-Studiengänge verstecken
+        else if (typ == 'm')
+        {
+            document.getElementById('aufnahmetermine-groupbox-vergleich-endpunkte').hidden = true;
+        }
+    }
 }
 
 function AufnahmeTermineNeu()
