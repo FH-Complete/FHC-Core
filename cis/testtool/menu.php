@@ -155,7 +155,7 @@ if (isset($_SESSION['pruefling_id']))
 			        prestudent_id = ".$db->db_add_param($_SESSION['prestudent_id'])."
 	        )
 
-        -- Filter only future studiensemester (incl. actual one)
+        /* Filter only future studiensemester (incl. actual one) */
         AND
 	        studiensemester_kurzbz IN (
 		        SELECT
@@ -184,7 +184,7 @@ if (isset($_SESSION['pruefling_id']))
 
 			$qry .= "
 
-        -- Order to get last semester when using distinct on
+        /* Order to get last semester when using distinct on */
         ORDER BY
 	        prestudent_id,
 	        datum DESC,
@@ -197,6 +197,7 @@ if (isset($_SESSION['pruefling_id']))
 	        semester,
 	        gebiet_id,
 	        bezeichnung,
+	        reihung,
             ". $bezeichnung_mehrsprachig_sel. "
         FROM
         (
@@ -250,7 +251,8 @@ if (isset($_SESSION['pruefling_id']))
         ) temp
 
         ORDER BY
-	        semester
+	        semester,
+	        reihung
         ";
 
 	$result = $db->db_query($qry);

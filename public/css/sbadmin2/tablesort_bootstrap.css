@@ -19,21 +19,25 @@
     border-bottom: #ccc 2px solid !important;
 }
 
+/* hide filtering headers if disabled */
+.tablesorter thead .disabled {display: none}
+
 /* Remove black border at top of table footer */
 .tablesorter-default tfoot > tr > th {
 	border-top: #ccc 2px solid !important;
 }
+
 /* set colors of zebra widget */
-table.tablesorter tbody tr.even td, table.tablesorter tbody tr.even:hover, table.tablesorter tbody tr.even td:hover{
+table.tablesorter tbody tr.even td, table.tablesorter tbody tr.even:hover, table.tablesorter tbody tr.even td:hover {
     background-color: #ffff;
 }
 
-table.tablesorter tbody tr.odd td, table.tablesorter tbody tr.odd:hover, table.tablesorter tbody tr.odd td:hover{
+table.tablesorter tbody tr.odd td, table.tablesorter tbody tr.odd:hover, table.tablesorter tbody tr.odd td:hover {
     background-color: #f5f5f5;
 }
 
 /* colors for hover over table rows and clicked rows*/
-table.tablesort-hover tr:hover, .tablesort-active{
+table.tablesort-hover tr:hover, .tablesort-active {
     background-color: #dfdfdf !important;
 }
 
@@ -44,8 +48,8 @@ table.tablesort-hover tr:hover, .tablesort-active{
 
 /* Make filter row more condensed */
 .tablesorter-default input.tablesorter-filter, .tablesorter-default select.tablesorter-filter {
-    margin: 0px auto;
-    padding: 0px;
+    margin: 0 auto;
+    padding: 0;
 }
 
 /* Add cursor pointer for pager icons */
@@ -59,6 +63,6 @@ table.tablesort-hover tr:hover, .tablesort-active{
 }
 
 /* bring datepicker to front */
-#ui-datepicker-div{
+#ui-datepicker-div {
     z-index: 9999 !important;
 }

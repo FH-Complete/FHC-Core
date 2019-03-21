@@ -81,10 +81,15 @@ class Manager extends Auth_Controller
 	}
 
 	/**
-	 *
+	 * Installiert eine Extension.
+	 * Es wird davon ausgegangen, dass die Extension ueber einen Fileupload hochgeladen wird.
+	 * alternativ kann hier auch der Name und Filename uebergeben werden um die installation ueber
+	 * die Commandline ohne Upload durchzufuehren.
+	 * @param $extensioName string Name der Extension
+	 * @param $filename Url Encoded Pfad zum tgz File der Extension
 	 */
-	public function uploadExtension()
+	public function uploadExtension($extensionName = null, $filename = null)
 	{
-		$this->extensionslib->installExtension();
+		$this->extensionslib->installExtension($extensionName, urldecode($filename));
 	}
 }

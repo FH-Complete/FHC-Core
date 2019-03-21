@@ -153,6 +153,7 @@ if(isset($_REQUEST['format']) && $_REQUEST['format']=='xls')
 			{
 				$wt=date('N',$ts);
 				$grund=$zs->getTyp($ts);
+				$grund = (!empty($grund)) ? $p->t('zeitsperre/abwesend') : '';	// anonymize reason
 				$erbk=html_entity_decode($zs->getErreichbarkeit($ts));
 				$vertretung=$zs->getVertretung($ts);
 				$zelleninhalt = ($grund!=''?(($grund!=''?substr($p->t('zeitsperre/grund'),0,1).': ':'').$grund. "\n"):'');
@@ -238,6 +239,7 @@ else
 				else
 					$class='';
 				$grund=$zs->getTyp($ts);
+				$grund = (!empty($grund)) ? $p->t('zeitsperre/abwesend') : '';	// anonymize reason
 				$erbk=$zs->getErreichbarkeit($ts);
 				$vertretung=$zs->getVertretung($ts);
 				echo '<td '.$class.' style="white-space: nowrap;">'.($grund!=''?'<span title="'.$p->t('zeitsperre/grund').'">'.substr($p->t('zeitsperre/grund'),0,1).'</span>: ':'').$grund;

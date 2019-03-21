@@ -59,17 +59,29 @@ class ExtensionsLib
 
 	/**
 	 * Main method to install an extension
+	 * If no filename / Extensionname is provided the extension should be uploaded via webupload
+	 *
+	 * @param $extensionName string Name of Extension (optional)
+	 * @param $filename Path to tgz Extension File (optional)
 	 */
-	public function installExtension()
+	public function installExtension($extensionName = null, $filename = null)
 	{
 		$extensionDB = null; // contains data from DB about an extension
 		$extensionJson = null; // contains the extension.json data
 
 		$this->_printInfo('WARNING!!! Please do not change page or stop this procedure before it is finished');
 
-		$this->_loadUploadLibrary(); // loads CI upload library
-
-		$uploadData = $this->_uploadExtension(); // perform the upload of the file and returns info about it
+		if (!is_null($extensionName) && !is_null($filename))
+		{
+			$uploadData = new stdClass();
+			$uploadData->fullPath = $filename;
+			$uploadData->extensionName = $extensionName;
+		}
+		else
+		{
+			$this->_loadUploadLibrary(); // loads CI upload library
+			$uploadData = $this->_uploadExtension(); // perform the upload of the file and returns info about it
+		}
 
 		if ($uploadData != null) // if no error occurred
 		{

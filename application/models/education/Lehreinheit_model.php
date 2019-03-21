@@ -47,7 +47,12 @@ class Lehreinheit_model extends DB_Model
 					// add lehreinheitgruppen, each lehreinheitid
 					// having (maybe multiple) lehreinheitgruppen
 					$letoadd->lehreinheitgruppen = array();
+
+					$this->LehreinheitgruppeModel->addSelect('lehre.tbl_lehreinheitgruppe.*, tbl_gruppe.bezeichnung, tbl_gruppe.direktinskription');
+					$this->LehreinheitgruppeModel->addJoin('public.tbl_gruppe', 'gruppe_kurzbz', 'LEFT');
+
 					$lehreinheitgruppen = $this->LehreinheitgruppeModel->loadWhere(array('lehreinheit_id' => $le->lehreinheit_id));
+
 					if (hasData($lehreinheitgruppen))
 					{
 						foreach ($lehreinheitgruppen->retval as $lehreinheitgruppe)
@@ -55,7 +60,9 @@ class Lehreinheit_model extends DB_Model
 							$letoadd->lehreinheitgruppen[] = array(
 								'semester' => $lehreinheitgruppe->semester,
 								'verband' => $lehreinheitgruppe->verband,
-								'gruppe' => $lehreinheitgruppe->gruppe
+								'gruppe' => $lehreinheitgruppe->gruppe,
+								'gruppe_kurzbz' => $lehreinheitgruppe->gruppe_kurzbz,
+								'direktinskription' => $lehreinheitgruppe->direktinskription
 							);
 						}
 					}
@@ -77,5 +84,23 @@ class Lehreinheit_model extends DB_Model
 		}
 
 		return $lehreinheiten;
+	}
+
+	/**
+	 * Gets students of a Lehreinheit
+	 * @param int $lehreinheit_id
+	 * @return array
+	 */
+	public function getStudenten($lehreinheit_id)
+	{
+		$query = 'SELECT uid, vorname, nachname '
+			. 'FROM campus.vw_student_lehrveranstaltung '
+			. 'JOIN campus.vw_student '
+			. 'USING (uid) '
+			. 'WHERE lehreinheit_id = ?'
+			. ' ORDER BY nachname';
+
+
+		return $this->execQuery($query, array($lehreinheit_id));
 	}
 }

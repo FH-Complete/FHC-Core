@@ -28,6 +28,7 @@ require_once('../../config/global.config.inc.php');
 require_once('../../include/functions.inc.php');
 require_once('../../include/variable.class.php');
 require_once('../../include/prestudent.class.php');
+require_once('../../include/studiengang.class.php');
 
 $user=get_uid();
 $variable = new variable();
@@ -294,18 +295,24 @@ echo ']>
 											<spacer flex="1" />
 										</hbox>
                                     </row>
-                                    <row>
-                                        <label value="Punkte inkl. Physik" control="aufnahmetermine-textbox-endpunkte-inkl-gebiete" />
-                                        <hbox>
-                                            <textbox id="aufnahmetermine-textbox-endpunkte-inkl-gebiete" readonly="true" maxlength="8" size="6"/>
-                                        </hbox>
-                                    </row>
-                                    <row>
-                                        <label value="Punkte exkl. Physik" control="aufnahmetermine-textbox-endpunkte-exkl-gebiete" />
-                                        <hbox>
-                                           <textbox id="aufnahmetermine-textbox-endpunkte-exkl-gebiete" readonly="true" maxlength="8" size="6"/>
-                                        </hbox>
-                                    </row>
+                                    <groupbox id="aufnahmetermine-groupbox-vergleich-endpunkte" hidden="true">
+                                        <caption label="Vergleichswerte Reihungstestpunkte (Basisgebiete)"></caption>
+                                        <vbox style="padding: 10px;">
+                                            <spacer resize='none' height='10' flex="1"/>
+                                            <row>
+                                                <label value="Reihungstestpunkte (inkl. Physik)" control="aufnahmetermine-textbox-endpunkte-inkl-gebiete" style="margin-right: 7px;"/>
+                                                <hbox>
+                                                    <textbox id="aufnahmetermine-textbox-endpunkte-inkl-gebiete" readonly="true" maxlength="8" size="6" flex="1"/>
+                                                </hbox>
+                                            </row>
+                                            <row>
+                                                <label value="Reihungstestpunkte (exkl. Physik)" control="aufnahmetermine-textbox-endpunkte-exkl-gebiete" />
+                                                <hbox>
+                                                   <textbox id="aufnahmetermine-textbox-endpunkte-exkl-gebiete" readonly="true" maxlength="8" size="6" flex="1"/>
+                                                </hbox>
+                                            </row>
+                                        </vbox>
+                                    </groupbox>
 								</rows>
 							</grid>
 							<hbox>
