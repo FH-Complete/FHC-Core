@@ -251,7 +251,7 @@ if (isset($_REQUEST['submit']))
 				if ($reservierteNummern !== false)
 					echo '<br><b>Reservierte Nummern:</b>'.print_r($reservierteNummern, true);
 				else
-					echo '<br><b>Fehlgeschlagen:</b>'.$data->errormsg;
+					echo '<br><b>Fehlgeschlagen:</b>'.$result->errormsg;
 			}
 			break;
 
@@ -264,7 +264,7 @@ if (isset($_REQUEST['submit']))
 				if ($kontingent !== false)
 					echo '<br><b>Kontingent:</b>'.print_r($kontingent, true);
 				else
-					echo '<br><b>Fehlgeschlagen:</b>'.$data->errormsg;
+					echo '<br><b>Fehlgeschlagen:</b>'.$result->errormsg;
 			}
 			break;
 
@@ -285,7 +285,7 @@ if (isset($_REQUEST['submit']))
 			if (ErrorHandler::isSuccess($result))
 				echo '<br><b>Erfolgreich gemeldet</b>';
 			else
-				echo '<br><b>Fehlgeschlagen:</b>'.$data->errormsg;
+				echo '<br><b>Fehlgeschlagen:</b>'.$result->errormsg;
 			break;
 
 		case 'assignMatrikelnummer':
@@ -295,7 +295,7 @@ if (isset($_REQUEST['submit']))
 				echo '<br><b>OK</b>';
 			}
 			else
-				echo '<br><b>Fehlgeschlagen:</b>'.$data->errormsg;
+				echo '<br><b>Fehlgeschlagen:</b>'.$result->errormsg;
 			break;
 
 		case 'getBPK':
