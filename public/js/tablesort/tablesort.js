@@ -6,15 +6,26 @@ var Tablesort = {
 	 * @param widgets optional widgets like zebra or filter
 	 * @param minrows optional minimal amount of rows for filter row to be shown (only relevant for filter widget)
 	 */
-	addTablesorter: function (tableid, sortList, widgets, minrows)
+	addTablesorter: function (tableid, sortList, widgets, minrows, additionalParams)
 	{
-		$("#" + tableid).tablesorter(
+		var tablesorterobj =
 			{
 				theme: "default",
 				dateFormat: "ddmmyyyy",
 				sortList: sortList,
 				widgets: widgets
+			};
+
+		if (typeof additionalParams === 'object')
+		{
+			for (var key in additionalParams)
+			{
+				tablesorterobj[key] = additionalParams[key];
 			}
+		}
+
+		$("#" + tableid).tablesorter(
+			tablesorterobj
 		);
 
 		if ($("#" + tableid + " tr.tablesorter-filter-row").length)
