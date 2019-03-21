@@ -45,6 +45,7 @@ class PermissionLib
 	const LOGINAS_ALLOWED = 'permission_loginas_allowed';
 	const LOGINAS_BLACKLIST = 'permission_loginas_blacklist';
 	const LOGINAS_USERS_BLACKLIST = 'permission_loginas_users_blacklist';
+	const LOGINAS_PERSONIDS_BLACKLIST = 'permission_loginas_personids_blacklist';
 
 	private $_ci; // CI instance
 	private static $bb; // benutzerberechtigung
@@ -238,9 +239,18 @@ class PermissionLib
 	/**
 	 * Checks if it is possible for the logged user to gain the identity of the required user specified by the given uid
 	 */
-	public function isEntitledLoginAS($uid)
+	public function isEntitledLoginASByUID($uid)
 	{
 		return !$this->_inLAUsersBlacklist($uid) && !$this->_hasLANotAllowedPermissions($uid) && $this->_hasLAPermissions();
+	}
+
+	/**
+	 * Checks if it is possible for the logged user to gain the identity of the required user specified by the given person id
+	 * NOTE: does NOT check permission for the given user because usually this users do NOT have any uid
+	 */
+	public function isEntitledLoginASByPersonId($person_id)
+	{
+		return !$this->_inLAPersonIdsBlacklist($person_id) && $this->_hasLAPermissions();
 	}
 
 	//------------------------------------------------------------------------------------------------------------------
@@ -251,16 +261,17 @@ class PermissionLib
 	 */
 	private function _inLAUsersBlacklist($uid)
 	{
-		// List of users whose identity cannot be obtained with loginAs
-		$loginASUsersBl = $this->_ci->config->item(self::LOGINAS_USERS_BLACKLIST);
-
 		// Given uid in user blacklist?
-		if (in_array($uid, $loginASUsersBl))
-		{
-			return true;
-		}
+		return in_array($uid, $this->_ci->config->item(self::LOGINAS_USERS_BLACKLIST));
+	}
 
-		return false;
+	/**
+	 * Checks if the given person id is in the person ids blacklist
+	 */
+	private function _inLAPersonIdsBlacklist($person_id)
+	{
+		// Given person id in person ids blacklist?
+		return in_array($person_id, $this->_ci->config->item(self::LOGINAS_PERSONIDS_BLACKLIST));
 	}
 
 	/**

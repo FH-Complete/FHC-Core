@@ -44,7 +44,7 @@ class LDAPLib
 	 * The first that works is used and stored in property _workingConfigArray
 	 * The LDAP connection link is stored in _connection
 	 */
-	public function connect()
+	public function anonymousConnect()
 	{
 		$connect = error('Did not found a working LDAP configuration');
 
@@ -67,10 +67,12 @@ class LDAPLib
 	}
 
 	/**
-	 * Tries to reconnect using the given username and password and the last working configuration
+	 * Tries to connect using the given username and password and the last working configuration with anonymous connection
 	 */
 	public function connectUsernamePassword($username, $password)
 	{
+		if (isEmptyString($username) || isEmptyString($password)) return error('Wrong username and password');
+
 		return $this->_connect($this->_workingConfigArray, $username, $password);
 	}
 

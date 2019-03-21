@@ -54,29 +54,73 @@ class AuthLib
 	}
 
 	/**
-	 * The logged user is able to get the identity of another user if it is allowed
+	 * The logged user is able, if it is allowed, to get the identity of another user by its given uid
 	 */
-	public function loginAS($uid)
+	public function loginASByUID($uid)
 	{
 		$loginAS = error('Not authenticated', AUTH_NOT_AUTHENTICATED); // not authenticated by default
 
-		// - A user must be already logged
-		// - The uid must be NOT an empty string
-		// - The current user should NOT be already logged as the given uid
-		if ($this->_isLogged() && !isEmptyString($uid) && $this->getAuthObj()->username != $uid)
+		// A user must be already logged
+		if ($this->_isLogged())
 		{
-			$this->_ci->load->library('PermissionLib'); // Loads permissions library
-
-			// Checks if the logged user is allowed to obtain the new identity
-			if ($this->_ci->permissionlib->isEntitledLoginAS($uid))
+			// - The uid must be NOT an empty string
+			// - The current user should NOT be already logged as the given uid
+			if (!isEmptyString($uid) && $this->getAuthObj()->username != $uid)
 			{
-				// Create the authentication object with new identity data
-				$loginAS = $this->_createAuthObjByPerson(array('uid' => $uid));
-				if (isSuccess($loginAS))
+				$this->_ci->load->library('PermissionLib'); // Loads permissions library
+
+				// Checks if the logged user is allowed to obtain the new identity
+				if ($this->_ci->permissionlib->isEntitledLoginASByUID($uid))
 				{
-					// Store the new authentication object in authentication session
-					setSessionElement(self::SESSION_NAME, self::SESSION_AUTH_OBJ, getData($loginAS));
+					// Create the authentication object with new identity data
+					$loginAS = $this->_createAuthObjByPerson(array('uid' => $uid));
+					if (isSuccess($loginAS))
+					{
+						// Store the new authentication object in authentication session
+						setSessionElement(self::SESSION_NAME, self::SESSION_AUTH_OBJ, getData($loginAS));
+					}
 				}
+			}
+			else
+			{
+				$loginAS = error('The given uid is not valid', AUTH_INVALID_CREDENTIALS);
+			}
+		}
+
+		return $loginAS;
+	}
+
+	/**
+	 * The logged user is able, if it is allowed, to get the identity of another user by its given person id
+	 */
+	public function loginASByPersonId($person_id)
+	{
+		$loginAS = error('Not authenticated', AUTH_NOT_AUTHENTICATED); // not authenticated by default
+
+		// A user must be already logged
+		if ($this->_isLogged())
+		{
+			// - The person id must be a number
+			// - The current user should NOT be already logged as the given person id
+			if (is_numeric($person_id) && $this->getAuthObj()->person_id != $person_id)
+			{
+				$this->_ci->load->library('PermissionLib'); // Loads permissions library
+
+				// Checks if the logged user is allowed to obtain the new identity
+				if ($this->_ci->permissionlib->isEntitledLoginASByPersonId($person_id))
+				{
+					// Create the authentication object with new identity data
+					$loginAS = $this->_createAuthObjByPerson(array('person_id' => $person_id));
+					if (isSuccess($loginAS))
+					{
+						// Store the new authentication object in authentication session
+						setSessionElement(self::SESSION_NAME, self::SESSION_AUTH_OBJ, getData($loginAS));
+					}
+				}
+			}
+			else
+			{
+				$loginAS = error('The given person id is not valid', AUTH_INVALID_CREDENTIALS);
 			}
 		}
 
@@ -296,7 +340,8 @@ class AuthLib
 		$hta = error('Not authenticated', AUTH_NOT_AUTHENTICATED); // by default is NOT authenticated
 
 		// Checks if an HTTP basic authentication is active and checks credentials using LDAP
-		if (!isset($_SERVER['PHP_AUTH_USER']) || isError($hta = $this->_checkLDAPAuthentication($_SERVER['PHP_AUTH_USER'], $_SERVER['PHP_AUTH_PW'])))
+		if (!isset($_SERVER['PHP_AUTH_USER'])
+			|| isError($hta = $this->_checkLDAPAuthentication($_SERVER['PHP_AUTH_USER'], $_SERVER['PHP_AUTH_PW'])))
 		{
 			// If NOT send the header to perform an HTTP basic authentication
 			header('WWW-Authenticate: Basic realm="'.AUTH_NAME.'"');
@@ -330,14 +375,14 @@ class AuthLib
 
 		$this->_ci->load->library('LDAPLib'); // Loads the LDAP library
 
-		$ldapConnection = $this->_ci->ldaplib->connect(); // connect!
+		$ldapConnection = $this->_ci->ldaplib->anonymousConnect(); // connect anonymously!
 		if (isSuccess($ldapConnection)) // connected!!
 		{
 			// Get the user DN from LDAP
 			$userDN = $this->_ci->ldaplib->getUserDN($username);
 			if (isSuccess($userDN)) // got it!
 			{
-				$this->_ci->ldaplib->close(); // close the previous LDAP connection
+				$this->_ci->ldaplib->close(); // close the previous LDAP anonymous connection
 
 				// Connects to LDAP using the last working configuration + the retrieved user DN + the provided password
 				$ldapConnection = $this->_ci->ldaplib->connectUsernamePassword(getData($userDN), $password);
