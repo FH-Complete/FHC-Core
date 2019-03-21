@@ -43,4 +43,5 @@ $this->phrasen['zeitsperre/legendeVertretung']='S...Substitute';
 $this->phrasen['zeitsperre/legendeDurchwahl']='(123)...Extension';
 $this->phrasen['zeitsperre/vertretungNichtKorrekt']='The selected substitute is invalid. Please check the substitute an try again.';
 $this->phrasen['zeitsperre/vorSperrdatum']='Date is before last open timesheet date';
+$this->phrasen['zeitsperre/abwesend']='absent';
 ?>

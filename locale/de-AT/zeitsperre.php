@@ -43,4 +43,5 @@ $this->phrasen['zeitsperre/legendeVertretung']='V...Vertretung';
 $this->phrasen['zeitsperre/legendeDurchwahl']='(123)...Durchwahl';
 $this->phrasen['zeitsperre/vertretungNichtKorrekt']='Die angegebene Vertretung kann nicht gefunden werden. Bitte prüfen Sie die Vertretung und versuchen Sie es erneut.';
 $this->phrasen['zeitsperre/vorSperrdatum']='Datum liegt vor dem Sperrdatum der Zeitliste';
+$this->phrasen['zeitsperre/abwesend']='Abwesend';
 ?>
