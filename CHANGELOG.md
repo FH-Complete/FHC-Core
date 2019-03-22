@@ -48,7 +48,8 @@
 	lehre.tbl_zeugnis, fue.tbl_scrumsprint, fue.tbl_scrumteam, wawi.tbl_aufteilung, wawi.tbl_aufteilung_default,
 	testtool.tbl_kategorie, testtool.tbl_kriterien, public.tbl_prestudent.rt_punkte1, public.tbl_prestudent.rt_punkte2
 	public.tbl_prestudent.rt_punkte3, public.tbl_prestudent.anmeldungreihungstest, public.tbl_prestudent.reihungstest_id
-	public.tbl_prestudent.ausstellungsstaat, public.tbl_prestudent.aufnahmeschluessel, lehre.tbl_lehrveranstaltung.old_lehrfach_id
+	public.tbl_prestudent.ausstellungsstaat, public.tbl_prestudent.aufnahmeschluessel, lehre.tbl_lehrveranstaltung.old_lehrfach_id, lehre.tbl_projektarbeit.gesamtstunden, lehre.tbl_projektarbeit.faktor,
+	lehre.tbl_projektarbeit.stundensatz
 - **[CORE]** LV-Infos werden mit der kommenden Version aus dem Core entfernt - Dies ist jetzt ein Addon
 - **[CORE]** WaWi wird mit der kommenden Version aus dem Core entfernt- Dies ist jetzt ein Addon
 - **[CIS]** Benotungstool/Kreuzerltool wird mit der kommenden Version aus dem Core entfernt

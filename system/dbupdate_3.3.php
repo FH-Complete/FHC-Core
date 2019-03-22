@@ -2767,6 +2767,32 @@ if(!$result = @$db->db_query("SELECT * FROM public.tbl_servicekategorie LIMIT 1"
 		echo '<br>Servicekategorie zu Services hinzugefügt';
 }
 
+$qry_column_desc = "
+	SELECT
+		pgd.description
+	FROM
+		pg_catalog.pg_statio_all_tables as st
+		JOIN pg_catalog.pg_description pgd ON (pgd.objoid=st.relid)
+		JOIN information_schema.columns c ON (pgd.objsubid=c.ordinal_position AND  c.table_schema=st.schemaname AND c.table_name=st.relname)
+	WHERE
+		table_schema = 'lehre' AND table_name = 'tbl_projektarbeit' AND column_name='faktor'";
+if($result = $db->db_query($qry_column_desc))
+{
+	if($db->db_num_rows($result)==0)
+	{
+		$qry = "
+			COMMENT ON COLUMN lehre.tbl_projektarbeit.faktor IS 'DEPRECATED';
+			COMMENT ON COLUMN lehre.tbl_projektarbeit.stundensatz IS 'DEPRECATED';
+			COMMENT ON COLUMN lehre.tbl_projektarbeit.gesamtstunden IS 'DEPRECATED';
+			";
+
+		if(!$db->db_query($qry))
+			echo '<strong>tbl_projektarbeit Comment: '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>tbl_projektarbeit: faktor, stundensatz und gesamtstunden als deprecated markiert';
+	}
+}
+
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
 
