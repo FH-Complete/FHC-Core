@@ -173,7 +173,6 @@ foreach($addon_obj->result as $addon)
   <command id="menu-bis-studenten-checkstudent:command" oncommand="BISStudentenPlausicheck();"/>
   <command id="menu-help-about:command" oncommand="OpenAboutDialog()"/>
   <command id="menu-help-manual:command" oncommand="OpenManual()"/>
-  <command id="menu-help-todo:command" oncommand="OpenToDoDialog()"/>
 </commandset>
 
 <keyset id="mainkeys">
@@ -899,12 +898,6 @@ foreach($addon_obj->result as $addon)
                label     = "&menu-help-manual.label;"
                command   =  "menu-help-manual:command"
                accesskey = "&menu-help-manual.accesskey;"/>
-            <menuitem
-               id        =  "menu-help-todo"
-               key       =  "menu-help-todo:key"
-               label     = "&menu-help-todo.label;"
-               command   =  "menu-help-todo:command"
-               accesskey = "&menu-help-todo.accesskey;"/>
             <menuitem
                id        =  "menu-help-about"
                key       =  "menu-help-about:key"
