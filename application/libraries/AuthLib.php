@@ -106,15 +106,32 @@ class AuthLib
 			{
 				$this->_ci->load->library('PermissionLib'); // Loads permissions library
 
-				// Checks if the logged user is allowed to obtain the new identity
+				// Checks if the logged user is allowed to obtain the new identity by its person id
 				if ($this->_ci->permissionlib->isEntitledLoginASByPersonId($person_id))
 				{
 					// Create the authentication object with new identity data
 					$loginAS = $this->_createAuthObjByPerson(array('person_id' => $person_id));
-					if (isSuccess($loginAS))
+					if (isSuccess($loginAS)) // if successfully created
 					{
-						// Store the new authentication object in authentication session
-						setSessionElement(self::SESSION_NAME, self::SESSION_AUTH_OBJ, getData($loginAS));
+						$authObj = getData($loginAS); // get the authenticate object
+						if ($authObj->{self::AO_USERNAME} != null) // if the username is present
+						{
+							// Checks if the logged user is allowed to obtain the new identity by its uid
+							if ($this->_ci->permissionlib->isEntitledLoginASByUID($authObj->{self::AO_USERNAME}))
+							{
+								// Store the new authentication object in authentication session
+								setSessionElement(self::SESSION_NAME, self::SESSION_AUTH_OBJ, $authObj);
+							}
+							else // if does NOT have permissions
+							{
+								$loginAS = error('Not authenticated', AUTH_NOT_AUTHENTICATED);
+							}
+						}
+						else // otherwise it's NOT possible to check other permissions
+						{
+							// Store the new authentication object in authentication session
+							setSessionElement(self::SESSION_NAME, self::SESSION_AUTH_OBJ, $authObj);
+						}
 					}
 				}
 			}
