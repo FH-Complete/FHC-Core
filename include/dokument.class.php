@@ -826,6 +826,7 @@ class dokument extends basis_db
 			{
 				return true;
 			}
+			return false;
 		}
 	}
 	
