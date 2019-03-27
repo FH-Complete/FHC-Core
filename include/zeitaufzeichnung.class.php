@@ -674,10 +674,10 @@ or not exists
 	{
 		$where = "uid=".$this->db_add_param($user);
 		$where_sem = "studiensemester_kurzbz=".$this->db_add_param($sem);
-		$lehre_arr = array("LehreIntern"=>0, "LehreExtern"=>0, "LehreAuftraege"=>0);
+		$lehre_arr = array("Lehre"=>0, "LehreExtern"=>0, "LehreAuftraege"=>0);
 
 		$qry = "
-		select sum(extract(epoch from ende-start))/3600 as lehre, aktivitaet_kurzbz from campus.tbl_zeitaufzeichnung where $where and aktivitaet_kurzbz in ('LehreIntern', 'LehreExtern') and start > (select start from public.tbl_studiensemester where $where_sem) group by aktivitaet_kurzbz
+		select sum(extract(epoch from ende-start))/3600 as lehre, aktivitaet_kurzbz from campus.tbl_zeitaufzeichnung where $where and aktivitaet_kurzbz in ('Lehre', 'LehreExtern') and start > (select start from public.tbl_studiensemester where $where_sem) group by aktivitaet_kurzbz
 		";
 
 	    if($result = $this->db_query($qry))
