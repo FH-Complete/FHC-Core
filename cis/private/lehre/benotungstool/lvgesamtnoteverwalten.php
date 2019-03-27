@@ -805,10 +805,24 @@ if (isset($_REQUEST["freigabe"]) && ($_REQUEST["freigabe"] == 1))
 		$neuenoten = 0;
 
 		$studlist = "<table border='1'>
-		<tr>
-			<td><b>" . $p->t('global/personenkz') . "</b></td>
-			<td><b>" . $p->t('global/nachname') . "</b></td>
-			<td><b>" . $p->t('global/vorname') . "</b></td>";
+		<tr>";
+
+		// entweder personenbezogene Daten einbinden
+		if (defined('CIS_GESAMTNOTE_FREIGABEMAIL_NOTE') && CIS_GESAMTNOTE_FREIGABEMAIL_NOTE)
+        {
+            $studlist .= "
+                <td><b>" . $p->t('global/personenkz') . "</b></td>
+			    <td><b>" . $p->t('global/nachname') . "</b></td>
+			    <td><b>" . $p->t('global/vorname') . "</b></td>
+            ";
+        }
+		// oder anonymisiert nur die UIDs einbinden
+		else
+        {
+			$studlist .= "
+                <td><b>" . $p->t('global/uid') . "</b></td>
+            ";
+		}
 
 		if (defined('CIS_GESAMTNOTE_PUNKTE') && CIS_GESAMTNOTE_PUNKTE)
 		{
@@ -842,9 +856,16 @@ if (isset($_REQUEST["freigabe"]) && ($_REQUEST["freigabe"] == 1))
 						$lvgesamtnote->freigabevon_uid = $user;
 						$lvgesamtnote->save();
 
-						$studlist .= "<tr><td>" . trim($row_stud->matrikelnr) . "</td>";
-						$studlist .= "<td>" . trim($row_stud->nachname) . "</td>";
-						$studlist .= "<td>" . trim($row_stud->vorname) . "</td>";
+						if (defined('CIS_GESAMTNOTE_FREIGABEMAIL_NOTE') && CIS_GESAMTNOTE_FREIGABEMAIL_NOTE)
+						{
+							$studlist .= "<tr><td>" . trim($row_stud->matrikelnr) . "</td>";
+							$studlist .= "<td>" . trim($row_stud->nachname) . "</td>";
+							$studlist .= "<td>" . trim($row_stud->vorname) . "</td>";
+						}
+						else
+                        {
+							$studlist .= "<tr><td>" . trim($row_stud->uid) . "</td>";
+                        }
 
 						if (defined('CIS_GESAMTNOTE_PUNKTE') && CIS_GESAMTNOTE_PUNKTE)
 						{
@@ -896,8 +917,7 @@ if (isset($_REQUEST["freigabe"]) && ($_REQUEST["freigabe"] == 1))
 					<br>eingetragen.\n<br><br>
 					Die Noten können jetzt ins Zeugnis übernommen werden.\n";
 
-			if (defined('CIS_GESAMTNOTE_FREIGABEMAIL_NOTE') && CIS_GESAMTNOTE_FREIGABEMAIL_NOTE)
-				$htmlcontent.= $studlist;
+            $htmlcontent .= $studlist;
 
 			$htmlcontent.= "
 					<br>Anzahl der Noten:" . $neuenoten . "
