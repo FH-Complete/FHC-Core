@@ -363,7 +363,8 @@ class pruefling extends basis_db
 			{
 				if (defined('FAS_REIHUNGSTEST_EXCLUDE_GEBIETE') && !empty(FAS_REIHUNGSTEST_EXCLUDE_GEBIETE))
 				{
-					$exclude_gebiet_id_arr = FAS_REIHUNGSTEST_EXCLUDE_GEBIETE;
+					$excluded_gebiete = unserialize(FAS_REIHUNGSTEST_EXCLUDE_GEBIETE);
+					$exclude_gebiet_id_arr = $excluded_gebiete;
 					$exclude_gebiet_id_toString = implode(', ', $exclude_gebiet_id_arr);
 					$qry .= " 
 						AND 

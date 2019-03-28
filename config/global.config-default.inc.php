@@ -106,7 +106,7 @@ define('FAS_REIHUNGSTEST_PUNKTE', false);
 
 // Legt fest, welche Reihungstestgebiete bei der Berechnung der Gesamtpunkte NICHT einbezogen werden.
 // array(gebiet_id1, gebiet_id2,...)
-define('FAS_REIHUNGSTEST_EXCLUDE_GEBIETE', array());
+define('FAS_REIHUNGSTEST_EXCLUDE_GEBIETE', serialize(array()));
 
 // Legt fest ob Messages im FAS angezeigt werden true|false
 define('FAS_MESSAGES',false);
