@@ -656,6 +656,62 @@ if(!@$db->db_query("SELECT updateamum FROM public.tbl_rt_person LIMIT 1"))
 		echo '<br>Spalte updateamum in public.tbl_rt_person hinzugefügt';
 }
 
+// ADD COLUMN studiengang_kz to testtool.vw_auswertung_ablauf
+if(!$result = @$db->db_query("SELECT studiengang_kz FROM testtool.vw_auswertung_ablauf LIMIT 1"))
+{
+	// CREATE OR REPLACE VIEW testtool.vw_auswertung_ablauf and grants privileges
+	$qry = '
+		CREATE OR REPLACE VIEW testtool.vw_auswertung_ablauf AS (
+			SELECT 
+				tbl_gebiet.gebiet_id,
+				tbl_gebiet.bezeichnung AS gebiet,
+				tbl_ablauf.reihung,
+				tbl_gebiet.maxpunkte,
+				tbl_pruefling.pruefling_id,
+				tbl_pruefling.prestudent_id,
+				tbl_person.vorname,
+				tbl_person.nachname,
+				tbl_person.gebdatum,
+				tbl_person.geschlecht,
+				tbl_pruefling.semester,
+				upper(tbl_studiengang.typ::character varying(1)::text || tbl_studiengang.kurzbz::text) AS stg_kurzbz,
+				tbl_studiengang.bezeichnung AS stg_bez,
+				tbl_pruefling.registriert,
+				tbl_pruefling.idnachweis,
+				( SELECT sum(tbl_vorschlag.punkte) AS sum
+					   FROM testtool.tbl_vorschlag
+						 JOIN testtool.tbl_antwort USING (vorschlag_id)
+						 JOIN testtool.tbl_frage USING (frage_id)
+					  WHERE tbl_antwort.pruefling_id = tbl_pruefling.pruefling_id AND tbl_frage.gebiet_id = tbl_gebiet.gebiet_id
+				) AS punkte,
+				tbl_rt_person.rt_id AS reihungstest_id,
+				tbl_ablauf.gewicht,
+				tbl_studiengang.studiengang_kz
+			FROM 
+				testtool.tbl_pruefling
+			 JOIN testtool.tbl_ablauf ON tbl_ablauf.studiengang_kz = tbl_pruefling.studiengang_kz
+			 JOIN testtool.tbl_gebiet USING (gebiet_id)
+			 JOIN public.tbl_prestudent USING (prestudent_id)
+			 JOIN public.tbl_person USING (person_id)
+			 JOIN public.tbl_rt_person USING (person_id)
+			 JOIN lehre.tbl_studienplan ON tbl_studienplan.studienplan_id = tbl_rt_person.studienplan_id
+			 JOIN lehre.tbl_studienordnung ON tbl_studienordnung.studienordnung_id = tbl_studienplan.studienordnung_id
+			 JOIN public.tbl_studiengang ON tbl_prestudent.studiengang_kz = tbl_studiengang.studiengang_kz
+			WHERE NOT (tbl_ablauf.gebiet_id IN 
+				( 
+				SELECT tbl_kategorie.gebiet_id 
+				FROM testtool.tbl_kategorie
+				)
+			) AND tbl_studienordnung.studiengang_kz = tbl_pruefling.studiengang_kz
+           )';
+
+	if(!$db->db_query($qry))
+		echo '<strong>testtool.vw_auswertung_ablauf: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>testtool.vw_auswertung_ablauf view created';
+}
+
+
 // ADD COLUMN updatevon to public.tbl_rt_person
 if(!@$db->db_query("SELECT updatevon FROM public.tbl_rt_person LIMIT 1"))
 {

@@ -331,7 +331,7 @@ class pruefling extends basis_db
 				FROM 
 					testtool.vw_auswertung_ablauf
 				JOIN 
-					public.tbl_studiengang ON vw_auswertung_ablauf.stg_kurzbz = tbl_studiengang.kurzbzlang
+					public.tbl_studiengang USING (studiengang_kz)
 				WHERE 
 					reihungstest_id = ".$this->db_add_param($reihungstest_id, FHC_INTEGER);
 
@@ -405,7 +405,6 @@ class pruefling extends basis_db
 						tbl_reihungstest.datum desc LIMIT 1
 				)
 			";
-
 			if($result = $this->db_query($qry))
 			{
 				// Wenn keine Eintraege vorhanden dann false
