@@ -474,10 +474,29 @@ class Reihungstest_model extends DB_Model
 	}
 
 	/**
+	 * Loads the date of the next placement test to the given degree program
+	 * @param integer $studiengang_kz Kennzahl of degree program to load the next placement test date
+	 * @return string Returns date of the next placement test
+	 */
+	public function getNextPlacementtestDate($studiengang_kz)
+	{
+		$query = '
+			SELECT *
+			FROM PUBLIC.tbl_reihungstest
+			WHERE studiengang_kz = ?
+			AND datum > now()
+			ORDER BY datum ASC
+			LIMIT 1
+			';
+
+		return $this->execQuery($query, array($studiengang_kz));
+	}
+
+	/**
 	 * Loads all placement tests of the given day and optional degree program
 	 * @param string $date Date of the tests to be loaded (YYYY-MM-DD)
 	 * @param integer $studiengang_kz Optional. Kennzahl of degree program to load
-	 * @return array Returns object array with data of applicants.
+	 * @return array Returns object array with data of placement tests
 	 */
 	public function getTestsOnDate($date, $studiengang_kz = null)
 	{
