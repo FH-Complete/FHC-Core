@@ -815,22 +815,22 @@ if (isset($_REQUEST["freigabe"]) && ($_REQUEST["freigabe"] == 1))
 			    <td><b>" . $p->t('global/nachname') . "</b></td>
 			    <td><b>" . $p->t('global/vorname') . "</b></td>
             ";
-        }
+
+            if (defined('CIS_GESAMTNOTE_PUNKTE') && CIS_GESAMTNOTE_PUNKTE)
+            {
+                $studlist .= "<td><b>" . $p->t('benotungstool/punkte') . "</b></td>\n";
+            }
+            $studlist .= "<td><b>" . $p->t('benotungstool/note') . "</b></td>\n";
+
+            $studlist .= "<td><b>" . $p->t('benotungstool/bearbeitetvon') . "</b></td></tr>\n";
+		}
 		// oder anonymisiert nur die UIDs einbinden
 		else
-        {
+		{
 			$studlist .= "
-                <td><b>" . $p->t('global/uid') . "</b></td>
+                <td><b>" . $p->t('global/uid') . "</b></td></tr>\n
             ";
 		}
-
-		if (defined('CIS_GESAMTNOTE_PUNKTE') && CIS_GESAMTNOTE_PUNKTE)
-		{
-			$studlist .= "<td><b>" . $p->t('benotungstool/punkte') . "</b></td>\n";
-		}
-		$studlist .= "<td><b>" . $p->t('benotungstool/note') . "</b></td>\n";
-
-		$studlist .= "<td><b>" . $p->t('benotungstool/bearbeitetvon') . "</b></td></tr>\n";
 
 		// studentenquery
 		$qry_stud = "SELECT
@@ -861,25 +861,25 @@ if (isset($_REQUEST["freigabe"]) && ($_REQUEST["freigabe"] == 1))
 							$studlist .= "<tr><td>" . trim($row_stud->matrikelnr) . "</td>";
 							$studlist .= "<td>" . trim($row_stud->nachname) . "</td>";
 							$studlist .= "<td>" . trim($row_stud->vorname) . "</td>";
+
+                            if (defined('CIS_GESAMTNOTE_PUNKTE') && CIS_GESAMTNOTE_PUNKTE)
+                            {
+                                $studlist .= "<td>";
+                                if ($lvgesamtnote->punkte != '')
+                                    $studlist .= trim(number_format($lvgesamtnote->punkte, 2));
+                                $studlist .= "</td>\n";
+                            }
+                            $studlist .= "<td>" . $noten_array[trim($lvgesamtnote->note)]['bezeichnung_mehrsprachig'][$sprache] . "</td>";
+
+                            $studlist .= "<td>" . $lvgesamtnote->mitarbeiter_uid;
+                            if ($lvgesamtnote->updatevon != '')
+                                $studlist .= " (" . $lvgesamtnote->updatevon . ")";
+                            $studlist .= "</td></tr>\n";
 						}
 						else
-                        {
-							$studlist .= "<tr><td>" . trim($row_stud->uid) . "</td>";
-                        }
-
-						if (defined('CIS_GESAMTNOTE_PUNKTE') && CIS_GESAMTNOTE_PUNKTE)
 						{
-							$studlist .= "<td>";
-							if ($lvgesamtnote->punkte != '')
-								$studlist .= trim(number_format($lvgesamtnote->punkte, 2));
-							$studlist .= "</td>\n";
+							$studlist .= "<tr><td>" . trim($row_stud->uid) . "</td></tr>\n";
 						}
-						$studlist .= "<td>" . $noten_array[trim($lvgesamtnote->note)]['bezeichnung_mehrsprachig'][$sprache] . "</td>";
-
-						$studlist .= "<td>" . $lvgesamtnote->mitarbeiter_uid;
-						if ($lvgesamtnote->updatevon != '')
-							$studlist .= " (" . $lvgesamtnote->updatevon . ")";
-						$studlist .= "</td></tr>\n";
 
 						$neuenoten ++;
 					}
