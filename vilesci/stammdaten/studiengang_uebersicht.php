@@ -57,7 +57,6 @@ require_once('../../include/benutzerberechtigung.class.php');
 	//$htmlstr = "<table class='liste sortable'>\n";
 	$htmlstr = '';
 	$htmlstr .= '<input type="button" value="Neu" onClick="parent.detail_studiengang.location=\'studiengang_details.php\'">
-		<br><br><input type="button" value="Reset Filter" class="resetsaved">
 		<form name="formular"><input type="hidden" name="check" value=""></form><table class="tablesorter" id="t1">
 		<thead><tr>
 			<th onmouseup="document.formular.check.value=0">Kz</th>
@@ -117,16 +116,8 @@ $(document).ready(function()
 		$("#t1").tablesorter(
 		{
 			sortList: [[3,0],[1,0]],
-			widgets: ["saveSort", "zebra", "filter", "stickyHeaders"],
-			headers: {6:{sorter:false}},
-			widgetOptions : {filter_saveFilters : true}
-		}); 
-
-		$('.resetsaved').click(function()
-		{
-			$("#t1").trigger("filterReset");
-			location.reload();
-			return false;
+			widgets: ["zebra", "filter", "stickyHeaders"],
+			headers: {6:{sorter:false}}
 		});
 	} 
 );
