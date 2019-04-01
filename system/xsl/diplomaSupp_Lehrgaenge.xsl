@@ -2788,7 +2788,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 		<text:p text:style-name="P15"/>
 		<text:p text:style-name="P23">¹ Type: Laboratory (LAB), Lecture (VO), Integrated Course (ILV), Seminar (SE), Tutorial (TUT), Project (PRJ), Exercise (UE), Distance Learning (FL), Other (SO)</text:p>
 		<text:p text:style-name="P23">² 1 Semester period per week = 45 minutes</text:p>
-		<text:p text:style-name="P23">³ Grading Scheme: excellent (1), good (2), satisfactory (3), sufficient (4), insufficient (5), not graded (nb), Credit based on previous experience/work (ar), successfully completed (ea), not successfully completed (nea), Participated with success (met), participated (tg)</text:p>
+		<text:p text:style-name="P23">³ Grading Scheme: excellent (1), good (2), satisfactory (3), sufficient (4), Credit based on previous experience/work (ar), successfully completed (ea), Participated with success (met), participated (tg)</text:p>
 		<text:p text:style-name="P18">
 		<text:soft-page-break/>
 		</text:p>
@@ -2908,38 +2908,40 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 
 	</xsl:template>
 	<xsl:template match="lv">
-	<table:table-row xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0" xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0" xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0" xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0" table:style-name="Table12.1">
-		<table:table-cell table:style-name="Table12.A5" office:value-type="string">
-		<text:p text:style-name="P20">
-			<xsl:value-of select="benotungsdatum"/>
-		</text:p>
-		</table:table-cell>
-		<table:table-cell table:style-name="Table12.B5" office:value-type="string">
-		<text:p text:style-name="P58">
-			<xsl:value-of select="bezeichnung_englisch"/>
-		</text:p>
-		</table:table-cell>
-		<table:table-cell table:style-name="Table12.C5" office:value-type="string">
-		<text:p text:style-name="P65">
-			<xsl:value-of select="lehrform_kurzbz"/>
-		</text:p>
-		</table:table-cell>
-		<table:table-cell table:style-name="Table12.D5" office:value-type="string">
-		<text:p text:style-name="P65">
-			<xsl:value-of select="sws_lv"/>
-		</text:p>
-		</table:table-cell>
-		<table:table-cell table:style-name="Table12.E5" office:value-type="string">
-		<text:p text:style-name="P65">
-			<xsl:value-of select="ects"/>
-		</text:p>
-		</table:table-cell>
-		<table:table-cell table:style-name="Table12.F5" office:value-type="string">
-		<text:p text:style-name="P65">
-			<xsl:value-of select="note"/>
-		</text:p>
-		</table:table-cell>
-	</table:table-row>
+    <xsl:if test="note_positiv='1'">
+        <table:table-row xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0" xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0" xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0" xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0" table:style-name="Table12.1">
+            <table:table-cell table:style-name="Table12.A5" office:value-type="string">
+            <text:p text:style-name="P20">
+                <xsl:value-of select="benotungsdatum"/>
+            </text:p>
+            </table:table-cell>
+            <table:table-cell table:style-name="Table12.B5" office:value-type="string">
+            <text:p text:style-name="P58">
+                <xsl:value-of select="bezeichnung_englisch"/>
+            </text:p>
+            </table:table-cell>
+            <table:table-cell table:style-name="Table12.C5" office:value-type="string">
+            <text:p text:style-name="P65">
+                <xsl:value-of select="lehrform_kurzbz"/>
+            </text:p>
+            </table:table-cell>
+            <table:table-cell table:style-name="Table12.D5" office:value-type="string">
+            <text:p text:style-name="P65">
+                <xsl:value-of select="sws_lv"/>
+            </text:p>
+            </table:table-cell>
+            <table:table-cell table:style-name="Table12.E5" office:value-type="string">
+            <text:p text:style-name="P65">
+                <xsl:value-of select="ects"/>
+            </text:p>
+            </table:table-cell>
+            <table:table-cell table:style-name="Table12.F5" office:value-type="string">
+            <text:p text:style-name="P65">
+                <xsl:value-of select="note"/>
+            </text:p>
+            </table:table-cell>
+        </table:table-row>
+	</xsl:if>
 	</xsl:template>
 
 </xsl:stylesheet>

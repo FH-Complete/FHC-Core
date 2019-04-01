@@ -476,9 +476,9 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
             </table:table>
             <text:p text:style-name="P26"/>
             <text:p text:style-name="P22">¹ 1 Semester period per week = 45 minutes</text:p>
-            <text:p text:style-name="P22">² Grades:<text:tab/>excellent (1), good (2), satisfactory (3), sufficient (4), insufficient (5), not graded (nb), Credit based on previous experience/work (ar),</text:p>
+            <text:p text:style-name="P22">² Grades:<text:tab/>excellent (1), good (2), satisfactory (3), sufficient (4), Credit based on previous experience/work (ar), Participated with success (met), passed (b),</text:p>
             <text:p text:style-name="P22">
-                <text:tab/>Participated with success (met), passed (b), successfully completed (ea), not successfully completed (nea), did not participate (nt), participated(tg)</text:p>
+                <text:tab/>successfully completed (ea), participated (tg)</text:p>
             <text:p text:style-name="P7"/>
             <xsl:if test="abschlusspruefung_typ and abschlusspruefung_typ!='lgabschluss'">
 	            <table:table table:name="Tabelle2" table:style-name="Tabelle2">
@@ -519,68 +519,70 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
         </office:text>
 </xsl:template>
 <xsl:template match="unterrichtsfach">
-<table:table-row>
-    <table:table-cell table:style-name="Tabelle1.A7" office:value-type="string">
-    	<xsl:choose>
-			<xsl:when test="bisio_von">
-                        <text:p text:style-name="P12">International Semester Abroad: <xsl:value-of select="bisio_von"/>-<xsl:value-of select="bisio_bis"/>, at <xsl:value-of select="bisio_ort"/>, <xsl:value-of select="bisio_universitaet"/></text:p>
-                        <text:p text:style-name="P12">All credits earned during the International Semester Abroad (ISA) are fully credited for the
-                        <xsl:value-of select="../semester"/>
-							<xsl:choose>
-								<xsl:when test="../semester=1">
-									<xsl:text>st</xsl:text>
-								</xsl:when>
-								<xsl:when test="../semester=2">
-									<xsl:text>nd</xsl:text>
-								</xsl:when>
-								<xsl:when test="../semester=3">
-									<xsl:text>rd</xsl:text>
-								</xsl:when>
-								<xsl:otherwise>
-									<xsl:text>th</xsl:text>
-								</xsl:otherwise>
-							</xsl:choose>
-                        semester at the UAS Technikum Wien. (see Transcript of Records)</text:p>
-			</xsl:when>
-			<xsl:otherwise>
-			<text:p text:style-name="P10">
-				<xsl:choose>
-					<xsl:when test="string-length(bezeichnung_englisch)!=0">
-						<xsl:value-of select="bezeichnung_englisch"/>
-					</xsl:when>
-					<xsl:otherwise>
-						<xsl:text>[ACHTUNG: Keine englische Bezeichung für "</xsl:text><xsl:value-of select="bezeichnung"/><xsl:text>" in der Datenbank!]</xsl:text>
-					</xsl:otherwise>
-				</xsl:choose>
-			</text:p>
-			</xsl:otherwise>
-		</xsl:choose>
-    </table:table-cell>
-    <table:table-cell table:style-name="Tabelle1.B2" office:value-type="string">
-        <text:p text:style-name="P9">
-        <xsl:if test="sws_lv=''">
-			<xsl:text>-</xsl:text>
-		</xsl:if>
-		<xsl:value-of select="sws_lv"/>
-        </text:p>
-    </table:table-cell>
-    <table:table-cell table:style-name="Tabelle1.C2" office:value-type="string">
-        <text:p text:style-name="P9">
-	        <xsl:if test="ects=''">
-				<xsl:text>-</xsl:text>
-			</xsl:if>
-			<xsl:value-of select="ects"/>
-		</text:p>
-    </table:table-cell>
-    <table:table-cell table:style-name="Tabelle1.D2" office:value-type="string">
-        <text:p text:style-name="P9">
-	        <xsl:if test="note=''">
-				<xsl:text>-</xsl:text>
-			</xsl:if>
-			<xsl:value-of select="note"/>
-		</text:p>
-    </table:table-cell>
-</table:table-row>
+<xsl:if test="note_positiv='1'">
+    <table:table-row>
+        <table:table-cell table:style-name="Tabelle1.A7" office:value-type="string">
+            <xsl:choose>
+                <xsl:when test="bisio_von">
+                            <text:p text:style-name="P12">International Semester Abroad: <xsl:value-of select="bisio_von"/>-<xsl:value-of select="bisio_bis"/>, at <xsl:value-of select="bisio_ort"/>, <xsl:value-of select="bisio_universitaet"/></text:p>
+                            <text:p text:style-name="P12">All credits earned during the International Semester Abroad (ISA) are fully credited for the
+                            <xsl:value-of select="../semester"/>
+                                <xsl:choose>
+                                    <xsl:when test="../semester=1">
+                                        <xsl:text>st</xsl:text>
+                                    </xsl:when>
+                                    <xsl:when test="../semester=2">
+                                        <xsl:text>nd</xsl:text>
+                                    </xsl:when>
+                                    <xsl:when test="../semester=3">
+                                        <xsl:text>rd</xsl:text>
+                                    </xsl:when>
+                                    <xsl:otherwise>
+                                        <xsl:text>th</xsl:text>
+                                    </xsl:otherwise>
+                                </xsl:choose>
+                            semester at the UAS Technikum Wien. (see Transcript of Records)</text:p>
+                </xsl:when>
+                <xsl:otherwise>
+                <text:p text:style-name="P10">
+                    <xsl:choose>
+                        <xsl:when test="string-length(bezeichnung_englisch)!=0">
+                            <xsl:value-of select="bezeichnung_englisch"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:text>[ACHTUNG: Keine englische Bezeichung für "</xsl:text><xsl:value-of select="bezeichnung"/><xsl:text>" in der Datenbank!]</xsl:text>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </text:p>
+                </xsl:otherwise>
+            </xsl:choose>
+        </table:table-cell>
+        <table:table-cell table:style-name="Tabelle1.B2" office:value-type="string">
+            <text:p text:style-name="P9">
+            <xsl:if test="sws_lv=''">
+                <xsl:text>-</xsl:text>
+            </xsl:if>
+            <xsl:value-of select="sws_lv"/>
+            </text:p>
+        </table:table-cell>
+        <table:table-cell table:style-name="Tabelle1.C2" office:value-type="string">
+            <text:p text:style-name="P9">
+                <xsl:if test="ects=''">
+                    <xsl:text>-</xsl:text>
+                </xsl:if>
+                <xsl:value-of select="ects"/>
+            </text:p>
+        </table:table-cell>
+        <table:table-cell table:style-name="Tabelle1.D2" office:value-type="string">
+            <text:p text:style-name="P9">
+                <xsl:if test="note=''">
+                    <xsl:text>-</xsl:text>
+                </xsl:if>
+                <xsl:value-of select="note"/>
+            </text:p>
+        </table:table-cell>
+    </table:table-row>
+</xsl:if>
 </xsl:template>
 <xsl:template match="fussnote">
 <table:table-row>
