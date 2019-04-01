@@ -459,9 +459,12 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 			<xsl:apply-templates select="fussnote"/> 
 		</table:table>
 		<text:p text:style-name="P26"/>
-		<text:p text:style-name="P22">Notenstufen:<text:tab/>Sehr gut (1), Gut (2), Befriedigend (3), Genügend (4), Nicht genügend (5), mit Erfolg teilgenommen (met), nicht teilgenommen (nt), teilgenommen(tg),</text:p>
+		<text:p text:style-name="P22">Notenstufen:<text:tab/>Sehr gut (1), Gut (2), Befriedigend (3), Genügend (4), mit Erfolg teilgenommen (met), teilgenommen (tg),
+			angerechnet (ar), bestanden (b),
+		</text:p>
 		<text:p text:style-name="P22">
-			<text:tab/>angerechnet (ar), nicht beurteilt (nb), bestanden (b), erfolgreich absolviert (ea), nicht erfolgreich absolviert (nea)</text:p>
+			<text:tab/>erfolgreich absolviert (ea)
+		</text:p>
 		<text:p text:style-name="P7"/>
 		<xsl:if test="abschlusspruefung_typ">
 			<table:table table:name="Tabelle2" table:style-name="Tabelle2">
@@ -481,7 +484,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 						<xsl:if test="abschlusspruefung_typ='Diplom'" >
 							<text:p text:style-name="P8">Masterprüfung vom <xsl:value-of select="abschlusspruefung_datum" /></text:p>
 						</xsl:if>
-						
+
 					</table:table-cell>
 					<table:table-cell table:style-name="Tabelle2.B2" office:value-type="string">
 						<text:p text:style-name="P8"><xsl:value-of select="abschlusspruefung_note" /></text:p>
@@ -502,43 +505,45 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 	</office:text>
 </xsl:template>
 <xsl:template match="unterrichtsfach">
-<table:table-row>
-	<table:table-cell table:style-name="Tabelle1.A7" office:value-type="string">
-		<xsl:choose>
-			<xsl:when test="bisio_von">
-						<text:p text:style-name="P12">Auslandsaufenthalt: <xsl:value-of select="bisio_von"/>-<xsl:value-of select="bisio_bis"/>, <xsl:value-of select="bisio_ort"/>, <xsl:value-of select="bisio_universitaet"/></text:p>
-						<text:p text:style-name="P12">Die im Ausland absolvierten Lehrveranstaltungen werden für das <xsl:value-of select="../semester"/>. Semester des Studiums an der Fachhochschule Technikum Wien angerechnet (Details siehe Transcript of Records der Gasthochschule).</text:p>
-			</xsl:when>
-			<xsl:otherwise>
-				<text:p text:style-name="P10"><xsl:value-of select="bezeichnung"/></text:p>
-			</xsl:otherwise>
-		</xsl:choose>
-	</table:table-cell>
-	<table:table-cell table:style-name="Tabelle1.B2" office:value-type="string">
-		<text:p text:style-name="P9">
-		<xsl:if test="sws_lv=''">
-			<xsl:text>-</xsl:text>
-		</xsl:if>
-		<xsl:value-of select="sws_lv"/>
-		</text:p>
-	</table:table-cell>
-	<table:table-cell table:style-name="Tabelle1.C2" office:value-type="string">
-		<text:p text:style-name="P9">
-			<xsl:if test="ects=''">
+<xsl:if test="note_positiv='1'">
+	<table:table-row>
+		<table:table-cell table:style-name="Tabelle1.A7" office:value-type="string">
+			<xsl:choose>
+				<xsl:when test="bisio_von">
+							<text:p text:style-name="P12">Auslandsaufenthalt: <xsl:value-of select="bisio_von"/>-<xsl:value-of select="bisio_bis"/>, <xsl:value-of select="bisio_ort"/>, <xsl:value-of select="bisio_universitaet"/></text:p>
+							<text:p text:style-name="P12">Die im Ausland absolvierten Lehrveranstaltungen werden für das <xsl:value-of select="../semester"/>. Semester des Studiums an der Fachhochschule Technikum Wien angerechnet (Details siehe Transcript of Records der Gasthochschule).</text:p>
+				</xsl:when>
+				<xsl:otherwise>
+					<text:p text:style-name="P10"><xsl:value-of select="bezeichnung"/></text:p>
+				</xsl:otherwise>
+			</xsl:choose>
+		</table:table-cell>
+		<table:table-cell table:style-name="Tabelle1.B2" office:value-type="string">
+			<text:p text:style-name="P9">
+			<xsl:if test="sws_lv=''">
 				<xsl:text>-</xsl:text>
 			</xsl:if>
-			<xsl:value-of select="ects"/>
-		</text:p>
-	</table:table-cell>
-	<table:table-cell table:style-name="Tabelle1.D2" office:value-type="string">
-		<text:p text:style-name="P9">
-			<xsl:if test="note=''">
-				<xsl:text>-</xsl:text>
-			</xsl:if>
-			<xsl:value-of select="note"/>
-		</text:p>
-	</table:table-cell>
-</table:table-row>
+			<xsl:value-of select="sws_lv"/>
+			</text:p>
+		</table:table-cell>
+		<table:table-cell table:style-name="Tabelle1.C2" office:value-type="string">
+			<text:p text:style-name="P9">
+				<xsl:if test="ects=''">
+					<xsl:text>-</xsl:text>
+				</xsl:if>
+				<xsl:value-of select="ects"/>
+			</text:p>
+		</table:table-cell>
+		<table:table-cell table:style-name="Tabelle1.D2" office:value-type="string">
+			<text:p text:style-name="P9">
+				<xsl:if test="note=''">
+					<xsl:text>-</xsl:text>
+				</xsl:if>
+				<xsl:value-of select="note"/>
+			</text:p>
+		</table:table-cell>
+	</table:table-row>
+	</xsl:if>
 </xsl:template>
 <xsl:template match="fussnote">
 <table:table-row>
