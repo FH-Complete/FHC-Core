@@ -173,6 +173,8 @@ if($result_stg = $db->db_query($qry_stg))
 		$gesamt->write($gesamtsheet_row,$i,"Familienname", $format_bold);
 		$worksheet->write(2,++$i,"Fixangestellt", $format_bold);
 		$gesamt->write($gesamtsheet_row,$i,"Fixangestellt", $format_bold);
+		$worksheet->write(2,++$i,"Disz. Zuordnung", $format_bold);
+		$gesamt->write($gesamtsheet_row,$i,"Disz. Zuordnung", $format_bold);
 		$worksheet->write(2,++$i,"LV-Stunden", $format_bold);
 		$gesamt->write($gesamtsheet_row,$i,"LV-Stunden", $format_bold);
 		$worksheet->write(2,++$i,"LV-Kosten", $format_bold);
@@ -193,6 +195,14 @@ if($result_stg = $db->db_query($qry_stg))
 					tbl_lehreinheitmitarbeiter.faktor as faktor, tbl_lehreinheitmitarbeiter.stundensatz as stundensatz,
 					tbl_lehreinheitmitarbeiter.semesterstunden as semesterstunden,
 					CASE WHEN tbl_mitarbeiter.fixangestellt = true THEN 'Ja' ELSE 'Nein' END as fixangestellt,
+					(SELECT tbl_organisationseinheit.organisationseinheittyp_kurzbz||' '||tbl_organisationseinheit.bezeichnung
+						FROM public.tbl_benutzerfunktion 
+						JOIN public.tbl_organisationseinheit USING (oe_kurzbz)
+						WHERE funktion_kurzbz='oezuordnung'
+						AND (datum_von IS NULL OR datum_von <= now())
+						AND (datum_bis IS NULL OR datum_bis >= now())
+						AND tbl_benutzerfunktion.uid = tbl_benutzer.uid
+						LIMIT 1) AS oezuordnung,
 					CASE WHEN COALESCE(tbl_lehreinheitmitarbeiter.updateamum, tbl_lehreinheitmitarbeiter.insertamum)>now()-interval '31 days' THEN 't' ELSE 'f' END as geaendert
 				FROM
 					lehre.tbl_lehreinheit, lehre.tbl_lehreinheitmitarbeiter, public.tbl_mitarbeiter,
@@ -237,6 +247,7 @@ if($result_stg = $db->db_query($qry_stg))
 				$liste[$row->mitarbeiter_uid]['vorname'] = $row->vorname;
 				$liste[$row->mitarbeiter_uid]['nachname'] = $row->nachname;
 				$liste[$row->mitarbeiter_uid]['fixangestellt'] = $row->fixangestellt;
+				$liste[$row->mitarbeiter_uid]['oezuordnung'] = $row->oezuordnung;
 				$liste[$row->mitarbeiter_uid]['betreuergesamtstunden'] = 0;
 				$liste[$row->mitarbeiter_uid]['betreuergesamtkosten'] = 0;
 				if($row->geaendert=='t')
@@ -245,7 +256,15 @@ if($result_stg = $db->db_query($qry_stg))
 
 			//Alle holen die eine Betreuung aber keinen Lehrauftrag haben
 			$qry = "SELECT 
-						distinct personalnummer, titelpre, vorname, nachname, uid, CASE WHEN fixangestellt = true THEN 'Ja' ELSE 'Nein' END as fixangestellt
+						distinct personalnummer, titelpre, vorname, nachname, uid, CASE WHEN fixangestellt = true THEN 'Ja' ELSE 'Nein' END as fixangestellt,
+						(SELECT tbl_organisationseinheit.organisationseinheittyp_kurzbz||' '||tbl_organisationseinheit.bezeichnung
+						FROM public.tbl_benutzerfunktion 
+						JOIN public.tbl_organisationseinheit USING (oe_kurzbz)
+						WHERE funktion_kurzbz='oezuordnung'
+						AND (datum_von IS NULL OR datum_von <= now())
+						AND (datum_bis IS NULL OR datum_bis >= now())
+						AND tbl_benutzerfunktion.uid = tbl_benutzer.uid
+						LIMIT 1) AS oezuordnung
 					FROM 
 						lehre.tbl_projektbetreuer, public.tbl_person, public.tbl_benutzer, 
 						public.tbl_mitarbeiter, lehre.tbl_projektarbeit, lehre.tbl_lehreinheit, 
@@ -286,6 +305,7 @@ if($result_stg = $db->db_query($qry_stg))
 						$liste[$row->uid]['vorname'] = $row->vorname;
 						$liste[$row->uid]['nachname'] = $row->nachname;
 						$liste[$row->uid]['fixangestellt'] = $row->fixangestellt;
+						$liste[$row->uid]['oezuordnung'] = $row->oezuordnung;
 						$liste[$row->uid]['geaendert']=false;
 						$liste[$row->uid]['gesamtstunden'] = 0;
 						$liste[$row->uid]['gesamtkosten'] = 0;
@@ -370,6 +390,9 @@ if($result_stg = $db->db_query($qry_stg))
 				//Fixangestellt
 				$worksheet->write($zeile,++$i,$row['fixangestellt'], $format);
 				$gesamt->write($gesamtsheet_row,$i,$row['fixangestellt'], $format);
+				//OE-Zuordnung
+				$worksheet->write($zeile,++$i,$row['oezuordnung'], $format);
+				$gesamt->write($gesamtsheet_row,$i,$row['oezuordnung'], $format);
 				//LVStunden
 				$lvstunden = str_replace(',', '.', $row['lvstunden']);
 				$worksheet->write($zeile,++$i,$lvstunden, $format);
