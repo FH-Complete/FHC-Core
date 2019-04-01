@@ -240,13 +240,13 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		switch($row->orgform_kurzbz)
 		{
 			case 'BB':	echo '		<studienart>Berufsbegleitendes Studium / Part-time degree programm</studienart>';
-						break;
+				break;
 			case 'VZ':	echo '		<studienart>Vollzeitstudium / Full-time degree programm</studienart>';
-						break;
+				break;
 			case 'DL':	echo '		<studienart>Fernstudium / Distance Learning</studienart>';
-						break;
+				break;
 			default:	echo '		<studienart></studienart>';
-						break;
+				break;
 		}
 
 		if($row->typ=='d')
@@ -606,7 +606,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 
 			$sqlStudent = new student();
 
-			echo "   <semesterKurzbz>Semester $start | $semester_kurzbz</semesterKurzbz>";
+			echo "   <semesterKurzbz>Semester $start</semesterKurzbz>";
 
 			// alle lvs im semester holen
 			// Ohne LVs an denen ein Auslandssemester haengt. Diese werden spaeter separat geholt
@@ -617,7 +617,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 				tbl_lehrveranstaltung.bezeichnung, COALESCE(tbl_lehrveranstaltung.bezeichnung_english,
 				tbl_lehrveranstaltung.bezeichnung) as bezeichnung_english, tbl_lehrveranstaltung.semester,
 				tbl_lehrveranstaltung.semesterstunden, tbl_lehrveranstaltung.ects, zeugnis.studiensemester_kurzbz,
-				zeugnis.note, note.bezeichnung note_bezeichnung, note.anmerkung, note.offiziell, sort, tbl_lehrveranstaltung.sws
+				zeugnis.note, note.bezeichnung note_bezeichnung, note.anmerkung, note.offiziell, note.positiv, sort, tbl_lehrveranstaltung.sws
 			FROM
 				lehre.tbl_zeugnisnote zeugnis
 				JOIN lehre.tbl_note note USING(note)
@@ -654,6 +654,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 						$arrayLvAusbildungssemester[$row_stud->lehrveranstaltung_id]['sws_lv'] = $row_stud->sws;
 						$arrayLvAusbildungssemester[$row_stud->lehrveranstaltung_id]['studiensemester_kurzbz'] = $row_stud->studiensemester_kurzbz;
 						$arrayLvAusbildungssemester[$row_stud->lehrveranstaltung_id]['note'] = $db->db_parse_bool($row_stud->offiziell) ?  $row_stud->anmerkung : "";
+						$arrayLvAusbildungssemester[$row_stud->lehrveranstaltung_id]['note_positiv'] = $db->db_parse_bool($row_stud->positiv);
 						$arrayLvAusbildungssemester[$row_stud->lehrveranstaltung_id]['sort'] = $row_stud->sort;
 						$ects_total += $row_stud->ects;
 						$semester_ects +=$row_stud->ects;
@@ -677,6 +678,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 							$arrayLvAusbildungssemester[$row_stud->lehrveranstaltung_id]['sws_lv'] = $row_stud->sws;
 							$arrayLvAusbildungssemester[$row_stud->lehrveranstaltung_id]['studiensemester_kurzbz'] = $row_stud->studiensemester_kurzbz;
 							$arrayLvAusbildungssemester[$row_stud->lehrveranstaltung_id]['note'] = $db->db_parse_bool($row_stud->offiziell) ?  $row_stud->anmerkung : "";
+							$arrayLvAusbildungssemester[$row_stud->lehrveranstaltung_id]['note_positiv'] = $db->db_parse_bool($row_stud->positiv);
 							$arrayLvAusbildungssemester[$row_stud->lehrveranstaltung_id]['sort'] = $row_stud->sort;
 						}
 					}
@@ -716,9 +718,9 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 					{
 						while($row_lehrform = $db->db_fetch_object($result_lehrform))
 						{	if($y != 0)
-								$lehrform_kurzbz = $lehrform_kurzbz.', '.$row_lehrform->lehrform_kurzbz;
-							else
-								$lehrform_kurzbz = $row_lehrform->lehrform_kurzbz;
+							$lehrform_kurzbz = $lehrform_kurzbz.', '.$row_lehrform->lehrform_kurzbz;
+						else
+							$lehrform_kurzbz = $row_lehrform->lehrform_kurzbz;
 							$y++;
 						}
 					}
@@ -807,38 +809,39 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 					$note_eintragen->load($row_stud->note);
 
 					$test = false;
-					}
 				}
+			}
 
-				foreach($arrayLvAusbildungssemester as $lv_test)
-				{
-					$sws = number_format(sprintf('%.1F',$lv_test['sws']),2);
-					$sws_lv = number_format(sprintf('%.1F',$lv_test['sws_lv']),2);
+			foreach($arrayLvAusbildungssemester as $lv_test)
+			{
+				$sws = number_format(sprintf('%.1F',$lv_test['sws']),2);
+				$sws_lv = number_format(sprintf('%.1F',$lv_test['sws_lv']),2);
 
-					if($sws == '0.0')
-						$sws = '';
-					if($sws_lv == '0.0')
-						$sws_lv = '';
+				if($sws == '0.0')
+					$sws = '';
+				if($sws_lv == '0.0')
+					$sws_lv = '';
 
-					echo '<lv>
-							<lehrform_kurzbz>'.$lv_test['lehrform_kurzbz'].'</lehrform_kurzbz>
-							<benotungsdatum>'.$lv_test['benotungsdatum'].'</benotungsdatum>
-							<sws>'.$sws.'</sws>
-							<sws_lv>'.$sws_lv.'</sws_lv>
-							<semester>'.$lv_test['semester'].'</semester>
-							<kurzbz>'.$lv_test['kurzbz'].'</kurzbz>
-							<stsem>'.$lv_test['studiensemester_kurzbz'].'</stsem>
-							<bezeichnung><![CDATA['.$lv_test['bezeichnung'].']]></bezeichnung>
-							<bezeichnung_englisch><![CDATA['.$lv_test['bezeichnung_englisch'].']]></bezeichnung_englisch>
-							<ects>'.$lv_test['ects'].'</ects>
-							<semesterstunden>'.$lv_test['semesterstunden'].'</semesterstunden>
-							<note>'.$lv_test['note'].'</note>
-							<lv_id>'.$lv_test['lehrveranstaltung_id'].'</lv_id>
-						</lv>';
-				}
+				echo '<lv>
+						<lehrform_kurzbz>'.$lv_test['lehrform_kurzbz'].'</lehrform_kurzbz>
+						<benotungsdatum>'.$lv_test['benotungsdatum'].'</benotungsdatum>
+						<sws>'.$sws.'</sws>
+						<sws_lv>'.$sws_lv.'</sws_lv>
+						<semester>'.$lv_test['semester'].'</semester>
+						<kurzbz>'.$lv_test['kurzbz'].'</kurzbz>
+						<stsem>'.$lv_test['studiensemester_kurzbz'].'</stsem>
+						<bezeichnung><![CDATA['.$lv_test['bezeichnung'].']]></bezeichnung>
+						<bezeichnung_englisch><![CDATA['.$lv_test['bezeichnung_englisch'].']]></bezeichnung_englisch>
+						<ects>'.$lv_test['ects'].'</ects>
+						<semesterstunden>'.$lv_test['semesterstunden'].'</semesterstunden>
+						<note>'.$lv_test['note'].'</note>
+						<note_positiv>'.$lv_test['note_positiv'].'</note_positiv>
+						<lv_id>'.$lv_test['lehrveranstaltung_id'].'</lv_id>
+					</lv>';
+			}
 
-				// Ist er Outgoing in diesem semester
-				$qry_outgoing = "
+			// Ist er Outgoing in diesem semester
+			$qry_outgoing = "
 					SELECT
 						studiensemester_kurzbz, ort, ects, semesterstunden, von, bis,
 						universitaet, lehrveranstaltung_id, tbl_lehrveranstaltung.sws,
@@ -852,20 +855,20 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 					WHERE
 						student_uid = ".$db->db_add_param($uid_arr[$i]);
 
-				if($result_outgoing = $db->db_query($qry_outgoing))
+			if($result_outgoing = $db->db_query($qry_outgoing))
+			{
+				if($row_outgoing = $db->db_fetch_object($result_outgoing))
 				{
-					if($row_outgoing = $db->db_fetch_object($result_outgoing))
+					// Outgoing eintrag ist vorhanden
+					if(in_array($row_outgoing->studiensemester_kurzbz, $aktuellesSemester))
 					{
-						// Outgoing eintrag ist vorhanden
-						if(in_array($row_outgoing->studiensemester_kurzbz, $aktuellesSemester))
-						{
-							$note_outgoing = 'ar';
-							$benotungsdatum_outgoing = '';
-							$lehrform_kurzbz_outgoing = '';
+						$note_outgoing = 'ar';
+						$benotungsdatum_outgoing = '';
+						$lehrform_kurzbz_outgoing = '';
 
-							$qry_outgoing_note = "
+						$qry_outgoing_note = "
 								SELECT
-									anmerkung, offiziell, benotungsdatum, lehrform_kurzbz
+									anmerkung, offiziell, positiv, benotungsdatum, lehrform_kurzbz
 								FROM
 									lehre.tbl_zeugnisnote
 									JOIN tbl_lehrveranstaltung using(lehrveranstaltung_id)
@@ -874,53 +877,54 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 									lehrveranstaltung_id = ".$db->db_add_param($row_outgoing->lehrveranstaltung_id)."
 									AND student_uid = ".$db->db_add_param($uid_arr[$i]);
 
-							if($result_outgoing_note = $db->db_query($qry_outgoing_note))
+						if($result_outgoing_note = $db->db_query($qry_outgoing_note))
+						{
+							if($row_outgoing_note = $db->db_fetch_object($result_outgoing_note))
 							{
-								if($row_outgoing_note = $db->db_fetch_object($result_outgoing_note))
-								{
-									$note_outgoing = $db->db_parse_bool($row_outgoing_note->offiziell) ? $row_outgoing_note->anmerkung : "";
-									$benotungsdatum_outgoing = $datum->formatDatum($row_outgoing_note->benotungsdatum,'d/m/Y');
-									$lehrform_kurzbz_outgoing = $row_outgoing_note->lehrform_kurzbz;
-								}
+								$note_outgoing = $db->db_parse_bool($row_outgoing_note->offiziell) ? $row_outgoing_note->anmerkung : "";
+								$note_positiv_outgoing = $db->db_parse_bool($row_outgoing_note->positiv);
+								$benotungsdatum_outgoing = $datum->formatDatum($row_outgoing_note->benotungsdatum,'d/m/Y');
+								$lehrform_kurzbz_outgoing = $row_outgoing_note->lehrform_kurzbz;
 							}
+						}
 
-							$datum = new datum();
-							$datum_von = $datum->formatDatum($row_outgoing->von, 'Y.m.d');
-							$datum_bis = $datum->formatDatum($row_outgoing->bis, 'Y.m.d');
-							$auslandssemester_start = 'th'; //Zur englischen Nummerierung der Semester (1st, 2nd, 3rd, 4th, ...)
+						$datum = new datum();
+						$datum_von = $datum->formatDatum($row_outgoing->von, 'Y.m.d');
+						$datum_bis = $datum->formatDatum($row_outgoing->bis, 'Y.m.d');
+						$auslandssemester_start = 'th'; //Zur englischen Nummerierung der Semester (1st, 2nd, 3rd, 4th, ...)
 
-							$sws = number_format(sprintf('%.1F',($row_outgoing->semesterstunden/$wochen)),2);
-							if($sws == '0.0')
-								$sws = '';
+						$sws = number_format(sprintf('%.1F',($row_outgoing->semesterstunden/$wochen)),2);
+						if($sws == '0.0')
+							$sws = '';
 
-							$sws_lv = number_format(sprintf('%.1F',($row_outgoing->sws)),2);
-							if($sws_lv == '0.0')
-								$sws_lv = '';
+						$sws_lv = number_format(sprintf('%.1F',($row_outgoing->sws)),2);
+						if($sws_lv == '0.0')
+							$sws_lv = '';
 
-							switch ($start)
-							{
-								case '1':
-									$auslandssemester_start = 'st';
-									break;
-								case '2':
-									$auslandssemester_start = 'nd';
-									break;
-								case '3':
-									$auslandssemester_start = 'rd';
-									break;
-								default:
-									$auslandssemester_start = 'th';
-									break;
-							}
+						switch ($start)
+						{
+							case '1':
+								$auslandssemester_start = 'st';
+								break;
+							case '2':
+								$auslandssemester_start = 'nd';
+								break;
+							case '3':
+								$auslandssemester_start = 'rd';
+								break;
+							default:
+								$auslandssemester_start = 'th';
+								break;
+						}
 
-							if($row_outgoing->projektarbeitstitel != '')
-							{
-								$projektarbeitszusatz = 'Thesis: "'.$row_outgoing->projektarbeitstitel.'"';
-							}
-							else
-								$projektarbeitszusatz = '';
+						if($row_outgoing->projektarbeitstitel != '')
+						{
+							$projektarbeitszusatz = 'Thesis: "'.$row_outgoing->projektarbeitstitel.'"';
+						}
+						else
+							$projektarbeitszusatz = '';
 
-							echo '<lv>
+						echo '<lv>
 								<lehrform_kurzbz></lehrform_kurzbz>
 								<benotungsdatum>'.$benotungsdatum_outgoing.'</benotungsdatum>
 								<sws>'.$sws.'</sws>
@@ -933,23 +937,24 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 								<ects>'.$row_outgoing->ects.'</ects>
 								<semesterstunden>'.$row_outgoing->semesterstunden.'</semesterstunden>
 								<note>'.$note_outgoing.'</note>
+								<note_positiv>'.$note_positiv_outgoing.'</note_positiv>
 								<lv_id></lv_id>
 							</lv>';
 
-							$ects_total +=$row_outgoing->ects;
-							$semester_ects+=$row_outgoing->ects;
-						}
+						$ects_total +=$row_outgoing->ects;
+						$semester_ects+=$row_outgoing->ects;
 					}
 				}
-				echo '<ects_gesamt>'.$semester_ects.'</ects_gesamt>';
-				echo "</semesters>";
 			}
-			echo "</studiensemester>";
-			echo " <ects_total>$ects_total</ects_total>";
-			echo '	</supplement>';
+			echo '<ects_gesamt>'.$semester_ects.'</ects_gesamt>';
+			echo "</semesters>";
 		}
+		echo "</studiensemester>";
+		echo " <ects_total>$ects_total</ects_total>";
+		echo '	</supplement>';
+	}
 }
-	echo "</supplements>";
+echo "</supplements>";
 
 // die beiden noten werden verglichen und die mit höherer priorität(niedrigerer index) wird genommen
 // return true wenn neue note genommen werden soll

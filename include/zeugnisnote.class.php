@@ -281,6 +281,7 @@ class zeugnisnote extends basis_db
 					   vw_student_lehrveranstaltung.bezeichnung as lehrveranstaltung_bezeichnung,
 					   vw_student_lehrveranstaltung.bezeichnung_english as lehrveranstaltung_bezeichnung_english,
 					   tbl_note.bezeichnung as note_bezeichnung,
+					   tbl_note.positiv as note_positiv,
 					   tbl_zeugnisnote.bemerkung as bemerkung,
 					   vw_student_lehrveranstaltung.sort,
 					   vw_student_lehrveranstaltung.zeugnis,
@@ -301,7 +302,7 @@ class zeugnisnote extends basis_db
 				SELECT lehre.tbl_lehrveranstaltung.lehrveranstaltung_id,student_uid AS uid,studiensemester_kurzbz, note, punkte,
 					uebernahmedatum, benotungsdatum,lehre.tbl_lehrveranstaltung.ects,lehre.tbl_lehrveranstaltung.semesterstunden, tbl_zeugnisnote.updateamum, tbl_zeugnisnote.updatevon, tbl_zeugnisnote.insertamum,
 					tbl_zeugnisnote.insertvon, tbl_zeugnisnote.ext_id, lehre.tbl_lehrveranstaltung.bezeichnung as lehrveranstaltung_bezeichnung, lehre.tbl_lehrveranstaltung.bezeichnung_english as lehrveranstaltung_bezeichnung_english,
-					tbl_note.bezeichnung as note_bezeichnung, tbl_zeugnisnote.bemerkung as bemerkung, tbl_lehrveranstaltung.sort, tbl_lehrveranstaltung.zeugnis, tbl_lehrveranstaltung.studiengang_kz,
+					tbl_note.bezeichnung as note_bezeichnung, tbl_note.positiv as note_positiv, tbl_zeugnisnote.bemerkung as bemerkung, tbl_lehrveranstaltung.sort, tbl_lehrveranstaltung.zeugnis, tbl_lehrveranstaltung.studiengang_kz,
 					tbl_lehrveranstaltung.lehrform_kurzbz as lv_lehrform_kurzbz, tbl_lehrveranstaltung.sws
 				FROM
 					lehre.tbl_zeugnisnote
@@ -329,6 +330,7 @@ class zeugnisnote extends basis_db
 				$obj->insertvon = $row->insertvon;
 				$obj->ext_id = $row->ext_id;
 				$obj->note_bezeichnung = $row->note_bezeichnung;
+				$obj->note_positiv = $this->db_parse_bool($row->note_positiv);
 				$obj->lehrveranstaltung_bezeichnung = $row->lehrveranstaltung_bezeichnung;
 				$obj->lehrveranstaltung_bezeichnung_english = $row->lehrveranstaltung_bezeichnung_english;
 				$obj->bemerkung = $row->bemerkung;
