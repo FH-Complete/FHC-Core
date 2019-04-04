@@ -192,17 +192,17 @@
 			<text:p text:style-name="P7">
 				<xsl:choose>
 					<xsl:when test="foto_gesperrt='f' and foto_url != ''">
-						<draw:frame draw:style-name="fr2" draw:name="Bild" text:anchor-type="as-char" svg:width="2.57cm" svg:height="3.431cm" draw:z-index="1">
+						<draw:frame draw:style-name="fr2" draw:name="Bild" text:anchor-type="as-char" svg:width="2.39cm" svg:height="3.20cm" draw:z-index="1">
 							<draw:image xlink:href="{foto_url}" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/>
 						</draw:frame>
 					</xsl:when>
 					<xsl:when test="foto_gesperrt='t'">
-						<draw:frame draw:style-name="fr2" draw:name="Bild2" text:anchor-type="as-char" svg:width="2.57cm" svg:height="3.431cm" draw:z-index="0">
+						<draw:frame draw:style-name="fr2" draw:name="Bild2" text:anchor-type="as-char" svg:width="2.39cm" svg:height="3.20cm" draw:z-index="0">
 							<draw:image xlink:href="Pictures/dummyfoto_bildVonUserGesperrt.jpg" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/>
 						</draw:frame>
 					</xsl:when>
 					<xsl:when test="foto_url=''">
-						<draw:frame draw:style-name="fr2" draw:name="dummy" text:anchor-type="as-char" svg:width="2.57cm" svg:height="3.431cm" draw:z-index="0">
+						<draw:frame draw:style-name="fr2" draw:name="dummy" text:anchor-type="as-char" svg:width="2.39cm" svg:height="3.20cm" draw:z-index="0">
 							<draw:image xlink:href="Pictures/dummyfoto_keinBildVorhanden.jpg" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/>
 						</draw:frame>
 					</xsl:when>
