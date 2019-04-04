@@ -662,7 +662,7 @@ if ($result = $db->db_query($qry))
 }
 
 /*
- * Nation der Adresse ist ungleich Österreicher, die Gemeinde ist aber in der Gemeinde Tabelle enthalten
+ * Nation der Adresse ist ungleich Österreich, die Gemeinde ist aber in der Gemeinde Tabelle enthalten
  */
 $text .= "<br><br>Adressnation ausserhalb Österreich mit Gemeinde in Gemeindetabelle<br><br>";
 $lastSem = $studiensemester->getPreviousFrom($aktSem);
@@ -689,6 +689,47 @@ if ($result = $db->db_query($qry))
 			' ('.$row->student_uid.')';
 		$text .= $row->vorname.' '.$row->nachname.
 			' ('.$row->student_uid.')';
+	}
+}
+
+/*
+ *	 Personen ohne Abschlussstatus
+ */
+$text .= "<br><br>Suche Personen ohne Abschlussstatus.<br><br>";
+
+$qry = "
+SELECT
+	distinct tbl_prestudent.prestudent_id, tbl_person.vorname, tbl_person.nachname, tbl_prestudent.studiengang_kz as studiengang
+FROM
+	public.tbl_prestudent
+	JOIN public.tbl_person USING(person_id)
+WHERE
+	NOT EXISTS(
+		SELECT
+			1
+		FROM
+			public.tbl_prestudentstatus ps
+			JOIN public.tbl_studiensemester USING(studiensemester_kurzbz)
+		WHERE
+			prestudent_id=tbl_prestudent.prestudent_id
+			AND tbl_studiensemester.ende>now()
+	)
+	AND '2018-01-01'<(SELECT max(datum) FROM public.tbl_prestudentstatus WHERE prestudent_id=tbl_prestudent.prestudent_id)
+	AND NOT EXISTS(SELECT 1 FROM public.tbl_prestudentstatus ps
+		WHERE
+			prestudent_id=tbl_prestudent.prestudent_id
+			AND status_kurzbz IN('Abbrecher','Abgewiesener','Absolvent','Incoming')
+	)";
+
+if ($studiengang_kz != '')
+	$qry .= " AND tbl_prestudent.studiengang_kz=".$db->db_add_param($studiengang_kz, FHC_INTEGER);
+
+if ($result = $db->db_query($qry))
+{
+	while ($row = $db->db_fetch_object($result))
+	{
+		$ausgabe[$row->studiengang][17][] = $row->vorname.' '.$row->nachname.' (PreStudent '.$row->prestudent_id.')';
+		$text .= $row->vorname.' '.$row->nachname.' (PreStudent '.$row->prestudent_id.")<br>";
 	}
 }
 
@@ -867,6 +908,15 @@ foreach ($ausgabe as $stg_kz => $value)
 					</tr>
 					<tr>
 						<td colspan='4'><b>Folgende Personen haben eine Adresse mit Nation Österreichs, die Gemeinde liegt aber in Österreich</b></td>
+					</tr>";
+				break;
+			case 17:
+				echo "
+					<tr>
+						<td>&nbsp;</td>
+					</tr>
+					<tr>
+						<td colspan='4'><b>Folgende Personen haben keinen Endstatus (Absolvent, Abbrecher oder Abgewiesener) (nicht BIS relevant)</b></td>
 					</tr>";
 				break;
 			default:
