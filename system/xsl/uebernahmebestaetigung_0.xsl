@@ -194,7 +194,6 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
 			<text:p text:style-name="P6"/>
 			<text:p text:style-name="P6">Name:<text:tab/><xsl:value-of select="name_gesamt" />
 			</text:p>
-			<text:p text:style-name="P6">Geburtsdatum:<text:tab/><xsl:value-of select="geburtsdatum" /></text:p>
 			<text:p text:style-name="P6"/>
 			<table:table table:name="Tabelle2" table:style-name="Tabelle2">
 				<table:table-column table:style-name="Tabelle2.A"/>
