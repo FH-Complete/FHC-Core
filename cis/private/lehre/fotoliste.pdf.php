@@ -109,7 +109,7 @@ if ($result = $db->db_query($qry)) {
         $stg_typ = $row->stg_typ;
         //collect all gruppenkürzel
         if ($row->gruppe_kurzbz == '')
-            $gruppen_string = trim($row->kuerzel . '-' . $row->semester);
+            $gruppen_string = trim($row->kuerzel . '-' . $row->semester . $row->verband . $row->gruppe);
         else
             $gruppen_string = $row->gruppe_kurzbz;
 
