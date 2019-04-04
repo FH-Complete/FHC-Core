@@ -175,6 +175,8 @@ if($result_stg = $db->db_query($qry_stg))
 		$gesamt->write($gesamtsheet_row,$i,"Fixangestellt", $format_bold);
 		$worksheet->write(2,++$i,"Disz. Zuordnung", $format_bold);
 		$gesamt->write($gesamtsheet_row,$i,"Disz. Zuordnung", $format_bold);
+		$worksheet->write(2,++$i,"Department", $format_bold);
+		$gesamt->write($gesamtsheet_row,$i,"Department", $format_bold);
 		$worksheet->write(2,++$i,"LV-Stunden", $format_bold);
 		$gesamt->write($gesamtsheet_row,$i,"LV-Stunden", $format_bold);
 		$worksheet->write(2,++$i,"LV-Kosten", $format_bold);
@@ -189,35 +191,103 @@ if($result_stg = $db->db_query($qry_stg))
 		$gesamt->write($gesamtsheet_row,$i,"Gesamtkosten", $format_bold);
 		
 		//Daten holen
-		$qry = "SELECT
-					tbl_lehreinheit.*, tbl_person.vorname, tbl_person.nachname, tbl_person.titelpre,
-					tbl_mitarbeiter.personalnummer, tbl_person.person_id, tbl_mitarbeiter.mitarbeiter_uid,
-					tbl_lehreinheitmitarbeiter.faktor as faktor, tbl_lehreinheitmitarbeiter.stundensatz as stundensatz,
-					tbl_lehreinheitmitarbeiter.semesterstunden as semesterstunden,
-					CASE WHEN tbl_mitarbeiter.fixangestellt = true THEN 'Ja' ELSE 'Nein' END as fixangestellt,
-					(SELECT tbl_organisationseinheit.organisationseinheittyp_kurzbz||' '||tbl_organisationseinheit.bezeichnung
-						FROM public.tbl_benutzerfunktion 
-						JOIN public.tbl_organisationseinheit USING (oe_kurzbz)
-						WHERE funktion_kurzbz='oezuordnung'
-						AND (datum_von IS NULL OR datum_von <= now())
-						AND (datum_bis IS NULL OR datum_bis >= now())
-						AND tbl_benutzerfunktion.uid = tbl_benutzer.uid
-						LIMIT 1) AS oezuordnung,
-					CASE WHEN COALESCE(tbl_lehreinheitmitarbeiter.updateamum, tbl_lehreinheitmitarbeiter.insertamum)>now()-interval '31 days' THEN 't' ELSE 'f' END as geaendert
-				FROM
-					lehre.tbl_lehreinheit, lehre.tbl_lehreinheitmitarbeiter, public.tbl_mitarbeiter,
-					public.tbl_benutzer, public.tbl_person, lehre.tbl_lehrveranstaltung
-				WHERE
-					tbl_person.person_id = tbl_benutzer.person_id AND
-					tbl_benutzer.uid=tbl_mitarbeiter.mitarbeiter_uid AND
-					tbl_lehreinheitmitarbeiter.mitarbeiter_uid=tbl_mitarbeiter.mitarbeiter_uid AND
-					tbl_lehreinheit.lehreinheit_id=tbl_lehreinheitmitarbeiter.lehreinheit_id AND
-					tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id AND
-					studiengang_kz=".$db->db_add_param($studiengang_kz)." AND studiensemester_kurzbz=".$db->db_add_param($semester_aktuell)." AND
-					tbl_lehreinheitmitarbeiter.semesterstunden<>0 AND tbl_lehreinheitmitarbeiter.semesterstunden is not null
-					AND tbl_lehreinheitmitarbeiter.stundensatz<>0 AND tbl_lehreinheitmitarbeiter.faktor<>0
-					AND EXISTS (SELECT lehreinheit_id FROM lehre.tbl_lehreinheitgruppe WHERE lehreinheit_id=tbl_lehreinheit.lehreinheit_id)
-					ORDER BY nachname, vorname, tbl_mitarbeiter.mitarbeiter_uid";
+		$qry = "SELECT tbl_lehreinheit.*,
+					tbl_person.vorname,
+					tbl_person.nachname,
+					tbl_person.titelpre,
+					tbl_mitarbeiter.personalnummer,
+					tbl_person.person_id,
+					tbl_mitarbeiter.mitarbeiter_uid,
+					tbl_lehreinheitmitarbeiter.faktor AS faktor,
+					tbl_lehreinheitmitarbeiter.stundensatz AS stundensatz,
+					tbl_lehreinheitmitarbeiter.semesterstunden AS semesterstunden,
+					CASE 
+						WHEN tbl_mitarbeiter.fixangestellt = true
+							THEN 'Ja'
+						ELSE 'Nein'
+						END AS fixangestellt,
+					(
+						SELECT tbl_organisationseinheit.organisationseinheittyp_kurzbz || ' ' || tbl_organisationseinheit.bezeichnung
+						FROM PUBLIC.tbl_benutzerfunktion
+						JOIN PUBLIC.tbl_organisationseinheit USING (oe_kurzbz)
+						WHERE funktion_kurzbz = 'oezuordnung'
+							AND (
+								datum_von IS NULL
+								OR datum_von <= now()
+								)
+							AND (
+								datum_bis IS NULL
+								OR datum_bis >= now()
+								)
+							AND tbl_benutzerfunktion.uid = tbl_benutzer.uid LIMIT 1
+						) AS oezuordnung,
+					(
+						WITH RECURSIVE meine_oes(oe_kurzbz, oe_parent_kurzbz, organisationseinheittyp_kurzbz) AS (
+								SELECT oe_kurzbz,
+									oe_parent_kurzbz,
+									organisationseinheittyp_kurzbz
+								FROM PUBLIC.tbl_organisationseinheit
+								WHERE oe_kurzbz IN (
+										SELECT oe_kurzbz
+										FROM PUBLIC.tbl_benutzerfunktion
+										WHERE funktion_kurzbz = 'oezuordnung'
+											AND (
+												datum_von IS NULL
+												OR datum_von <= now()
+												)
+											AND (
+												datum_bis IS NULL
+												OR datum_bis >= now()
+												)
+											AND tbl_benutzerfunktion.uid = tbl_benutzer.uid LIMIT 1
+										)
+									AND aktiv = true
+								
+								UNION ALL
+								
+								SELECT o.oe_kurzbz,
+									o.oe_parent_kurzbz,
+									o.organisationseinheittyp_kurzbz
+								FROM PUBLIC.tbl_organisationseinheit o,
+									meine_oes
+								WHERE o.oe_kurzbz = meine_oes.oe_parent_kurzbz
+									AND aktiv = true
+								)
+						SELECT ARRAY_TO_STRING(ARRAY_AGG(DISTINCT tbl_organisationseinheit.bezeichnung), ', ')
+						FROM meine_oes
+						JOIN PUBLIC.tbl_organisationseinheit USING (oe_kurzbz)
+						WHERE meine_oes.organisationseinheittyp_kurzbz = 'Department'
+						) AS department,
+					CASE 
+						WHEN COALESCE(tbl_lehreinheitmitarbeiter.updateamum, tbl_lehreinheitmitarbeiter.insertamum) > now() - interval '31 days'
+							THEN 't'
+						ELSE 'f'
+						END AS geaendert
+				FROM lehre.tbl_lehreinheit,
+					lehre.tbl_lehreinheitmitarbeiter,
+					PUBLIC.tbl_mitarbeiter,
+					PUBLIC.tbl_benutzer,
+					PUBLIC.tbl_person,
+					lehre.tbl_lehrveranstaltung
+				WHERE tbl_person.person_id = tbl_benutzer.person_id
+					AND tbl_benutzer.uid = tbl_mitarbeiter.mitarbeiter_uid
+					AND tbl_lehreinheitmitarbeiter.mitarbeiter_uid = tbl_mitarbeiter.mitarbeiter_uid
+					AND tbl_lehreinheit.lehreinheit_id = tbl_lehreinheitmitarbeiter.lehreinheit_id
+					AND tbl_lehrveranstaltung.lehrveranstaltung_id = tbl_lehreinheit.lehrveranstaltung_id
+					AND studiengang_kz = ".$db->db_add_param($studiengang_kz)."
+					AND studiensemester_kurzbz = ".$db->db_add_param($semester_aktuell)."
+					AND tbl_lehreinheitmitarbeiter.semesterstunden <> 0
+					AND tbl_lehreinheitmitarbeiter.semesterstunden IS NOT NULL
+					AND tbl_lehreinheitmitarbeiter.stundensatz <> 0
+					AND tbl_lehreinheitmitarbeiter.faktor <> 0
+					AND EXISTS (
+						SELECT lehreinheit_id
+						FROM lehre.tbl_lehreinheitgruppe
+						WHERE lehreinheit_id = tbl_lehreinheit.lehreinheit_id
+						)
+				ORDER BY nachname,
+					vorname,
+					tbl_mitarbeiter.mitarbeiter_uid";
 
 		if($result = $db->db_query($qry))
 		{
@@ -248,6 +318,7 @@ if($result_stg = $db->db_query($qry_stg))
 				$liste[$row->mitarbeiter_uid]['nachname'] = $row->nachname;
 				$liste[$row->mitarbeiter_uid]['fixangestellt'] = $row->fixangestellt;
 				$liste[$row->mitarbeiter_uid]['oezuordnung'] = $row->oezuordnung;
+				$liste[$row->mitarbeiter_uid]['department'] = $row->department;
 				$liste[$row->mitarbeiter_uid]['betreuergesamtstunden'] = 0;
 				$liste[$row->mitarbeiter_uid]['betreuergesamtkosten'] = 0;
 				if($row->geaendert=='t')
@@ -264,7 +335,44 @@ if($result_stg = $db->db_query($qry_stg))
 						AND (datum_von IS NULL OR datum_von <= now())
 						AND (datum_bis IS NULL OR datum_bis >= now())
 						AND tbl_benutzerfunktion.uid = tbl_benutzer.uid
-						LIMIT 1) AS oezuordnung
+						LIMIT 1) AS oezuordnung,
+						(
+						WITH RECURSIVE meine_oes(oe_kurzbz, oe_parent_kurzbz, organisationseinheittyp_kurzbz) AS (
+								SELECT oe_kurzbz,
+									oe_parent_kurzbz,
+									organisationseinheittyp_kurzbz
+								FROM PUBLIC.tbl_organisationseinheit
+								WHERE oe_kurzbz IN (
+										SELECT oe_kurzbz
+										FROM PUBLIC.tbl_benutzerfunktion
+										WHERE funktion_kurzbz = 'oezuordnung'
+											AND (
+												datum_von IS NULL
+												OR datum_von <= now()
+												)
+											AND (
+												datum_bis IS NULL
+												OR datum_bis >= now()
+												)
+											AND tbl_benutzerfunktion.uid = tbl_benutzer.uid LIMIT 1
+										)
+									AND aktiv = true
+								
+								UNION ALL
+								
+								SELECT o.oe_kurzbz,
+									o.oe_parent_kurzbz,
+									o.organisationseinheittyp_kurzbz
+								FROM PUBLIC.tbl_organisationseinheit o,
+									meine_oes
+								WHERE o.oe_kurzbz = meine_oes.oe_parent_kurzbz
+									AND aktiv = true
+								)
+						SELECT ARRAY_TO_STRING(ARRAY_AGG(DISTINCT tbl_organisationseinheit.bezeichnung), ', ')
+						FROM meine_oes
+						JOIN PUBLIC.tbl_organisationseinheit USING (oe_kurzbz)
+						WHERE meine_oes.organisationseinheittyp_kurzbz = 'Department'
+						) AS department
 					FROM 
 						lehre.tbl_projektbetreuer, public.tbl_person, public.tbl_benutzer, 
 						public.tbl_mitarbeiter, lehre.tbl_projektarbeit, lehre.tbl_lehreinheit, 
@@ -306,6 +414,7 @@ if($result_stg = $db->db_query($qry_stg))
 						$liste[$row->uid]['nachname'] = $row->nachname;
 						$liste[$row->uid]['fixangestellt'] = $row->fixangestellt;
 						$liste[$row->uid]['oezuordnung'] = $row->oezuordnung;
+						$liste[$row->uid]['department'] = $row->department;
 						$liste[$row->uid]['geaendert']=false;
 						$liste[$row->uid]['gesamtstunden'] = 0;
 						$liste[$row->uid]['gesamtkosten'] = 0;
@@ -393,6 +502,9 @@ if($result_stg = $db->db_query($qry_stg))
 				//OE-Zuordnung
 				$worksheet->write($zeile,++$i,$row['oezuordnung'], $format);
 				$gesamt->write($gesamtsheet_row,$i,$row['oezuordnung'], $format);
+				//Department der OE-Zuordnung
+				$worksheet->write($zeile,++$i,$row['department'], $format);
+				$gesamt->write($gesamtsheet_row,$i,$row['department'], $format);
 				//LVStunden
 				$lvstunden = str_replace(',', '.', $row['lvstunden']);
 				$worksheet->write($zeile,++$i,$lvstunden, $format);
