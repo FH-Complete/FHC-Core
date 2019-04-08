@@ -14,6 +14,7 @@ class Lehreinheit_model extends DB_Model
 		$this->load->model('education/lehrveranstaltung_model', 'LehrveranstaltungModel');
 		$this->load->model('education/lehreinheitgruppe_model', 'LehreinheitgruppeModel');
 		$this->load->model('education/lehreinheitmitarbeiter_model', 'LehreinheitmitarbeiterModel');
+		$this->load->model('organisation/studiengang_model', 'StudiengangModel');
 	}
 
 	/**
@@ -57,13 +58,22 @@ class Lehreinheit_model extends DB_Model
 					{
 						foreach ($lehreinheitgruppen->retval as $lehreinheitgruppe)
 						{
-							$letoadd->lehreinheitgruppen[] = array(
-								'semester' => $lehreinheitgruppe->semester,
-								'verband' => $lehreinheitgruppe->verband,
-								'gruppe' => $lehreinheitgruppe->gruppe,
-								'gruppe_kurzbz' => $lehreinheitgruppe->gruppe_kurzbz,
-								'direktinskription' => $lehreinheitgruppe->direktinskription
-							);
+							$studiengangresponse = $this->StudiengangModel->load($lehreinheitgruppe->studiengang_kz);
+							if (hasData($studiengangresponse))
+							{
+								$studiengang = $studiengangresponse->retval[0];
+								$stgkuerzel = mb_strtoupper($studiengang->typ . $studiengang->kurzbz);
+
+									$letoadd->lehreinheitgruppen[] = array(
+										'semester' => $lehreinheitgruppe->semester,
+										'verband' => $lehreinheitgruppe->verband,
+										'gruppe' => $lehreinheitgruppe->gruppe,
+										'gruppe_kurzbz' => $lehreinheitgruppe->gruppe_kurzbz,
+										'direktinskription' => $lehreinheitgruppe->direktinskription,
+										'studiengang_kz' => $lehreinheitgruppe->studiengang_kz,
+										'studiengang_kuerzel' => $stgkuerzel
+									);
+							}
 						}
 					}
 
