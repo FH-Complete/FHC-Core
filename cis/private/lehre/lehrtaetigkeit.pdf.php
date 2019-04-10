@@ -79,6 +79,11 @@ foreach($active_semester_arr as $active_semester)
 		$le_id_arr[]= $le->lehreinheit_id;
 	}
 
+	// * get begin- and end date of studiensemester
+	$ss = new Studiensemester($active_semester);
+	$studiensemester_start_date = $ss->start;
+	$studiensemester_end_date = $ss->ende;
+
 	// * get total amount of semesterstunden of the lehreinheiten, where stundensatz > 0
 	$total_semesterstunden = 0;
 	foreach ($le_id_arr as $le_id)
@@ -90,13 +95,18 @@ foreach($active_semester_arr as $active_semester)
 		}
 	}
 
-	// * store term and total amount of semesterstunden
-	$semesterstunden_per_semester []= (
-		array(
-			'studiensemester_kurzbz'=> $active_semester,
-			'total_semesterstunden' => $total_semesterstunden
-		)
-	);
+	// * store data only if semesterstunden > 0
+	if ($total_semesterstunden > 0)
+	{
+		$semesterstunden_per_semester []= (
+			array(
+				'studiensemester_kurzbz'=> $active_semester,
+				'total_semesterstunden' => $total_semesterstunden,
+				'studiensemester_start_date' => $studiensemester_start_date,
+				'studiensemester_end_date' => $studiensemester_end_date
+			)
+		);
+	}
 }
 
 // Get the lectors projektarbeitstunden per semester
@@ -105,6 +115,7 @@ $pb = new Projektbetreuer();
 $pb->getAllProjects($person_id);
 $project_arr = $pb->result;
 
+// * for each project
 foreach ($project_arr as $project)
 {
 	$pa_id = $project->projektarbeit_id;
@@ -114,10 +125,13 @@ foreach ($project_arr as $project)
 	$pa = new Projektarbeit($pa_id);
 	$le = new Lehreinheit($pa->lehreinheit_id);
 	$studiensemester_kurzbz = $le->studiensemester_kurzbz;
+
+	// * get begin- and end date of studiensemester
 	$ss = new Studiensemester($studiensemester_kurzbz);
 	$studiensemester_start_date = $ss->start;
+	$studiensemester_end_date = $ss->ende;
 
-	// Sum up semesterstunden by studiensemester
+	// Get total amount of semesterstunden by studiensemester
 	// * check if studiensemester already exists. If so, get array index.
 	$studiensemester_index = array_search($studiensemester_kurzbz, array_map(function($val) {
 		return $val['studiensemester_kurzbz'];
@@ -136,17 +150,12 @@ foreach ($project_arr as $project)
 			array(
 				'studiensemester_kurzbz'=> $studiensemester_kurzbz,
 				'total_semesterstunden' => $projektstunden,
-				'studiensemester_start_date' => $studiensemester_start_date	// store start date to sort array by date afterwards
+				'studiensemester_start_date' => $studiensemester_start_date,
+				'studiensemester_end_date' => $studiensemester_end_date
 			)
 		);
 	}
 }
-
-// Sort projektstunden per semester by date
-usort($projektstunden_per_semester, function($a, $b)
-{
-	return strtotime($a['studiensemester_start_date']) - strtotime($b['studiensemester_start_date']);
-});
 
 // Merge lehreinheit- and projektarbeitstunden arrays
 foreach ($projektstunden_per_semester as $item)
@@ -168,11 +177,19 @@ foreach ($projektstunden_per_semester as $item)
 		$semesterstunden_per_semester []= (
 			array(
 				'studiensemester_kurzbz'=> $item['studiensemester_kurzbz'],
-				'total_semesterstunden' => intval($item['total_semesterstunden'])
+				'total_semesterstunden' => intval($item['total_semesterstunden']),
+				'studiensemester_start_date' => $item['studiensemester_start_date'],
+				'studiensemester_end_date' =>  $item['studiensemester_end_date']
 			)
 		);
 	}
 }
+
+// Sort lehreinheit- and projektarbeitstunden array by date
+usort($semesterstunden_per_semester, function($a, $b)
+{
+	return strtotime($a['studiensemester_start_date']) - strtotime($b['studiensemester_start_date']);
+});
 
 // Split studiensemester array into actual studiensemester array and former studiensemester array
 // * get actual studiensemester
@@ -182,59 +199,35 @@ $actual_studiensemester_index = array_search($actual_studiensemester, array_map(
 	return $val['studiensemester_kurzbz'];
 }, $semesterstunden_per_semester
 ));
-// * split former from actual studiensemester
+
+// * if lector is teaching actually, split former teaching activities from actual teaching activities of actual studiensemester
 $semesterstunden_of_actual_semester = array();
 if ($actual_studiensemester_index !== false)
 {
 	$semesterstunden_of_actual_semester = array_slice($semesterstunden_per_semester, $actual_studiensemester_index);	// array with actual + future semester
-	$semesterstunden_of_actual_semester = array_pop($semesterstunden_of_actual_semester);	// array with actual semester only
 	$semesterstunden_per_semester = array_slice($semesterstunden_per_semester, 0, $actual_studiensemester_index);	// array with all former semester
 }
 
-// Begin and ending date over all existing contracts
-$verwendung = new Bisverwendung();
-$verwendung->getVerwendung($uid);
-$verwendung_arr = $verwendung->result;
-
-//	* begin date of first contract
-$earliest_verwendung = current($verwendung_arr);
-$begin_date = !is_null($earliest_verwendung->beginn) ? new DateTime($earliest_verwendung->beginn) : null;
-
-//	* end date of last contract
-$latest_verwendung = end($verwendung_arr);
-$end_date = !is_null($latest_verwendung->ende) ? new DateTime($latest_verwendung->ende) : null;
-
 // Semester begin and ending date of lehreinheit- and projektarbeit studiensemester
 //	* begin date of first lehreinheit- and projektarbeit studiensemester
-$earliest_ss = current($semesterstunden_per_semester)['studiensemester_kurzbz'];
-$ss = new Studiensemester($earliest_ss);
-$begin_date_ss = !is_null($ss->start) ? new DateTime($ss->start) : null;
+$earliest_ss = current($semesterstunden_per_semester)['studiensemester_start_date'];
+$begin_date = !is_null($earliest_ss) ? new DateTime($earliest_ss) : null;
 
 //	* end date of last lehreinheit- and projektarbeit studiensemester
+// * if lector is teaching on actual studiensemester, get end date of actual studiensemester
 $latest_ss = !empty($semesterstunden_of_actual_semester)
-	? end($semesterstunden_of_actual_semester)['studiensemester_kurzbz']
-	: end($semesterstunden_per_semester)['studiensemester_kurzbz'];
-$ss = new Studiensemester($latest_ss);
-$end_date_ss = !is_null($ss->ende) ? new DateTime($ss->ende) : null;
-
-/**
- * Reset begin and ending date if necessary
- * Basically use contracts begin and ending date, but reset if lehrtaetigkeit is shorter.
- * */
-//	* if semester begin > begin date
-If (!is_null($begin_date_ss) && ($begin_date_ss > $begin_date))
-{
-	// * begin date = semester begin
-	$begin_date = clone $begin_date_ss;
-}
-//	* if semester end < end date
-If (!is_null($end_date_ss) && !is_null($end_date) && ($end_date_ss < $end_date))
-{
-	// * end date = semester end
-	$end_date = clone $end_date_ss;
-}
+	? current($semesterstunden_of_actual_semester)['studiensemester_end_date']
+// * else get end date of the last of his teaching studiensemester
+	: end($semesterstunden_per_semester)['studiensemester_end_date'];
+$end_date = !is_null($latest_ss) ? new DateTime($latest_ss) : null;
 
 $actual_date = new DateTime();
+
+// if the lector is still employed, reset the end date to null
+if ($end_date > $actual_date)
+{
+	$end_date = null;
+}
 
 $data = array (
 	'anrede' => $anrede,
@@ -242,25 +235,26 @@ $data = array (
 	'birthday' => $birthday_date->format('d.m.Y'),
 	'begin_date' => !is_null($begin_date) ? $begin_date->format('d.m.Y') : '',
 	'end_date' =>  !is_null($end_date) ? $end_date->format('d.m.Y') : '',	// empty, if lector is still employed
-	'total_ss_actual_semester' => $semesterstunden_of_actual_semester,	// empty, if lehrauftraege in the past only,
+	'total_ss_actual_semester' => current($semesterstunden_of_actual_semester),	// empty, if lector has no lehreinheit- or projektarbeitsstunden at the actual studiensemester
 	'actual_date' => $actual_date->format('d.m.Y')
 );
 
+// Put semesterstunden per semester array in correct format for xsl template
 if (!empty($semesterstunden_per_semester))
 {
-	foreach ($semesterstunden_per_semester as $item)
+	foreach ($semesterstunden_per_semester as &$item)
 	{
 		$data[]= array('total_ss_per_semester'=>
-						   array(
-							   'studiensemester_kurzbz'=> $item['studiensemester_kurzbz'],
-							   'total_semesterstunden' => $item['total_semesterstunden']
-						   )
+		   array(
+			   'studiensemester_kurzbz'=> $item['studiensemester_kurzbz'],
+			   'total_semesterstunden' => $item['total_semesterstunden']
+		   )
 		);
 	}
 }
 else
 {
-	$data[]= array('total_ss_per_semester'=> '');	// empty if lector has no lehreinheit- or projektarbeitsstunden
+	$data[]= array('total_ss_per_semester'=> '');	// empty if lector has no lehreinheit- or projektarbeitsstunden in the past (before the actual studiensemester)
 }
 
 // Add data to lehrtaetigkeit.xsl
