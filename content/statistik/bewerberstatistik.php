@@ -1085,15 +1085,15 @@ if (isset($_GET['excel']))
 				$worksheet2->write($zeile, ++$i, $row->interessenten_w, $$format);
 				if (strlen($row->interessenten_w) > $maxlength[$i])
 					$maxlength[$i] = mb_strlen($row->interessenten_w);
-				$worksheet2->write($zeile, ++$i, "k.A.", $$format);
-				if (strlen("k.A.") > $maxlength[$i])
-					$maxlength[$i] = mb_strlen("k.A.");
-				$worksheet2->write($zeile, ++$i, "k.A.", $$format);
-				if (strlen("k.A.") > $maxlength[$i])
-					$maxlength[$i] = mb_strlen("k.A.");
-				$worksheet2->write($zeile, ++$i, "k.A.", $$format);
-				if (strlen("k.A.") > $maxlength[$i])
-					$maxlength[$i] = mb_strlen("k.A.");
+				$worksheet2->write($zeile, ++$i, "k.A.*", $$format);
+				if (strlen("k.A.*") > $maxlength[$i])
+					$maxlength[$i] = mb_strlen("k.A.*");
+				$worksheet2->write($zeile, ++$i, "k.A.*", $$format);
+				if (strlen("k.A.*") > $maxlength[$i])
+					$maxlength[$i] = mb_strlen("k.A.*");
+				$worksheet2->write($zeile, ++$i, "k.A.*", $$format);
+				if (strlen("k.A.*") > $maxlength[$i])
+					$maxlength[$i] = mb_strlen("k.A.*");
 				$worksheet2->write($zeile, ++$i, $row->interessentenrtanmeldung, $$format);
 				if (strlen($row->interessentenrtanmeldung) > $maxlength[$i])
 					$maxlength[$i] = mb_strlen($row->interessentenrtanmeldung);
@@ -1188,15 +1188,15 @@ if (isset($_GET['excel']))
 			$worksheet2->write($zeile, ++$i, $interessenten_w_sum, $format_bold);
 			if (strlen($interessenten_w_sum) > $maxlength[$i])
 				$maxlength[$i] = mb_strlen($interessenten_w_sum);
-			$worksheet2->write($zeile, ++$i, "k.A.", $format_bold);
-			if (strlen("k.A.") > $maxlength[$i])
-				$maxlength[$i] = mb_strlen("k.A.");
-			$worksheet2->write($zeile, ++$i, "k.A.", $format_bold);
-			if (strlen("k.A.") > $maxlength[$i])
-				$maxlength[$i] = mb_strlen("k.A.");
-			$worksheet2->write($zeile, ++$i, "k.A.", $format_bold);
-			if (strlen("k.A.") > $maxlength[$i])
-				$maxlength[$i] = mb_strlen("k.A.");
+			$worksheet2->write($zeile, ++$i, "k.A.*", $format_bold);
+			if (strlen("k.A.*") > $maxlength[$i])
+				$maxlength[$i] = mb_strlen("k.A.*");
+			$worksheet2->write($zeile, ++$i, "k.A.*", $format_bold);
+			if (strlen("k.A.*") > $maxlength[$i])
+				$maxlength[$i] = mb_strlen("k.A.*");
+			$worksheet2->write($zeile, ++$i, "k.A.*", $format_bold);
+			if (strlen("k.A.*") > $maxlength[$i])
+				$maxlength[$i] = mb_strlen("k.A.*");
 			$worksheet2->write($zeile, ++$i, $interessentenrtanmeldung_sum, $format_bold);
 			if (strlen($interessentenrtanmeldung_sum) > $maxlength[$i])
 				$maxlength[$i] = mb_strlen($interessentenrtanmeldung_sum);
@@ -1253,7 +1253,9 @@ if (isset($_GET['excel']))
 				$maxlength[$i] = mb_strlen($student3sem_w_sum);
 		}
 		//Verteilung
-		$zeile = $zeile + 3;
+		$zeile = $zeile + 2;
+		$worksheet2->write($zeile, 0, '* für ZGV liegen zum Stichtag keine historischen Daten vor');
+		$zeile = $zeile + 2;
 		$i = 0;
 		$worksheet2->write($zeile, 0, 'Verteilung'.$stsem, $format_bold);
 		$worksheet2->mergeCells($zeile, $i, $zeile, $i + 1);
@@ -2060,7 +2062,7 @@ else
 						<tr>
 							<th class='table-sortable:default'>Studiengang</th>
 							<th class='table-sortable:numeric'>InteressentInnen (m/w)</th>
-							<th class='table-sortable:numeric'>InteressentInnen mit ZGV (m/w)</th>
+							<th class='table-sortable:numeric'>InteressentInnen mit ZGV (m/w) *</th>
 							<th class='table-sortable:numeric'>InteressentInnen mit RT Anmeldung (m/w)</th>
 							<th class='table-sortable:numeric'>BewerberIn (m/w)</th>
 							<th class='table-sortable:numeric'>Aufgenommene (m/w)</th>
@@ -2099,7 +2101,7 @@ else
 				$content .= '<tr>';
 				$content .= "<td>".mb_strtoupper($row->typ.$row->kurzbz)." ($row->kurzbzlang)</td>";
 				$content .= "<td align='center'>$row->interessenten ($row->interessenten_m / $row->interessenten_w)</td>";
-				$content .= "<td align='center'>k.A.</td>";
+				$content .= "<td align='center'>k.A.*</td>";
 				$content .= "<td align='center'>$row->interessentenrtanmeldung ($row->interessentenrtanmeldung_m / $row->interessentenrtanmeldung_w)</td>";
 				$content .= "<td align='center'>$row->bewerber ($row->bewerber_m / $row->bewerber_w)</td>";
 				$content .= "<td align='center'>$row->aufgenommener ($row->aufgenommener_m / $row->aufgenommener_w)</td>";
@@ -2136,7 +2138,7 @@ else
 			$content .= '</tbody><tfoot style="font-weight: bold;"><tr>';
 			$content .= "<td>Summe</td>";
 			$content .= "<td align='center'>$interessenten_sum ($interessenten_m_sum / $interessenten_w_sum)</td>";
-			$content .= "<td align='center'>k.A.</td>";
+			$content .= "<td align='center'>k.A.*</td>";
 			$content .= "<td align='center'>$interessentenrt_sum ($interessentenrt_m_sum / $interessentenrt_w_sum)</td>";
 			$content .= "<td align='center'>$bewerber_sum ($bewerber_m_sum / $bewerber_w_sum)</td>";
 			$content .= "<td align='center'>$aufgenommener_sum ($aufgenommener_m_sum / $aufgenommener_w_sum)</td>";
@@ -2146,6 +2148,7 @@ else
 			$content .= "</tr>";
 			$content .= '</tfoot></table>';
 
+			$content .= "<br />* für ZGV liegen zum Stichtag keine historischen Daten vor";
 			//Verteilung
 			$content .= '<br><h2>Verteilung '.$stsem.'</h2><br>';
 			$qry = "SELECT
