@@ -240,9 +240,9 @@ class Lehrveranstaltung_model extends DB_Model
 								WITH gueltige_studienplaene AS (
 									SELECT studienplan_id, semester
 									FROM lehre.tbl_studienplan
-									  JOIN lehre.tbl_studienplan_semester USING(studienplan_id)
+									JOIN lehre.tbl_studienplan_semester USING(studienplan_id)
 									WHERE tbl_studienplan.aktiv
-										  AND lehre.tbl_studienplan_semester.studiensemester_kurzbz = ?
+									AND lehre.tbl_studienplan_semester.studiensemester_kurzbz = ?
 								)
 								SELECT 1
 								FROM lehre.tbl_studienplan_lehrveranstaltung
@@ -251,6 +251,7 @@ class Lehrveranstaltung_model extends DB_Model
 										  (SELECT semester FROM gueltige_studienplaene
 											 WHERE gueltige_studienplaene.studienplan_id = tbl_studienplan_lehrveranstaltung.studienplan_id)
 									  AND tbl_studienplan_lehrveranstaltung.lehrveranstaltung_id = lv.lehrveranstaltung_id
+									  AND tbl_studienplan_lehrveranstaltung.export
 							)
 							OR EXISTS (SELECT 1 FROM lehre.tbl_lehreinheit WHERE lehrveranstaltung_id = lv.lehrveranstaltung_id AND studiensemester_kurzbz = ?)
 						  )
