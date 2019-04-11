@@ -1231,11 +1231,18 @@ class wochenplan extends basis_db
 						//Wenn eine Zeitsperre eingetragen ist, dann diese im Tooltiptext anzeigen
 						$zeitsperre = new zeitsperre();
 						$zeitsperre->getSperreByDate($this->pers_uid, date('Y-m-d',$datum), $j);
+						$datum_obj = new datum();
 						foreach($zeitsperre->result as $sperren)
 						{
 							if ($tooltip!='')
 								$tooltip.=', ';
-							$tooltip.=$sperren->zeitsperretyp_kurzbz.' - '.$sperren->bezeichnung;
+							$aenderungsdatum = $sperren->insertamum;
+							if($sperren->updateamum>$sperren->insertamum)
+								$aenderungsdatum = $sperren->updateamum;
+							$updateinfo = '';
+							if ($aenderungsdatum != '')
+								$updateinfo = ' (letzte Änderung: '.$datum_obj->formatDatum($aenderungsdatum,'d.m.Y H:i').')';
+							$tooltip.=$sperren->zeitsperretyp_kurzbz.' - '.$sperren->bezeichnung.$updateinfo;
 						}
 					}
 				}

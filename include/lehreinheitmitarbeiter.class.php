@@ -474,7 +474,7 @@ class lehreinheitmitarbeiter extends basis_db
 	public function getLehreinheiten($mitarbeiter_uid, $studiensemester_kurzbz)
 	{
 		$qry = 'SELECT
-					DISTINCT lehreinheit_id, lv_bezeichnung, lv_kurzbz, unr, lv_lehrform_kurzbz, stg_kurzbzlang,
+					DISTINCT lehreinheit_id, lehrveranstaltung_id, lv_bezeichnung, lv_kurzbz, unr, lv_lehrform_kurzbz, stg_kurzbzlang,
 					lv_semester, lehrform_kurzbz
 				FROM
 					campus.vw_lehreinheit

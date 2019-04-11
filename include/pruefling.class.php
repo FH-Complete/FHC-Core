@@ -400,8 +400,6 @@ class pruefling extends basis_db
 						tbl_rt_person.rt_id = ".$this->db_add_param($reihungstest_id, FHC_INTEGER)."
 					AND 
 						tbl_prestudentstatus.status_kurzbz='Interessent'
-					AND
-						(tbl_reihungstest.stufe = 1 OR tbl_reihungstest.stufe IS NULL)
 					ORDER BY
 						tbl_reihungstest.datum desc LIMIT 1
 				)
