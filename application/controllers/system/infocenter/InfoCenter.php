@@ -1463,7 +1463,7 @@ class InfoCenter extends Auth_Controller
 		$data = array
 		(
 			'interessentbez' => $interessentbez,
-			'studiengangbez' => $prestudent->studiengangbezeichnung,
+			'studiengangbez' => $prestudentstatus->studiengangbezeichnung,
 			'studiengangtypbez' => $prestudent->studiengangtyp_bez,
 			'orgform' => $orgform,
 			'studiensemester' => $prestudentstatus->studiensemester_kurzbz,
@@ -1487,7 +1487,7 @@ class InfoCenter extends Auth_Controller
 		$this->load->library('LogLib');
 		$this->load->helper('hlp_sancho');
 
-		$subject = ($person->geschlecht == 'm' ? 'Interessent ' : 'Interessentin ').$person->vorname.' '.$person->nachname.' für '.$prestudent->studiengangbezeichnung.$orgform.' freigegeben';
+		$subject = ($person->geschlecht == 'm' ? 'Interessent ' : 'Interessentin ').$person->vorname.' '.$person->nachname.' für '.$prestudentstatus->studiengangbezeichnung.$orgform.' freigegeben';
 
 		$receiver = $prestudent->studiengangmail;
 

@@ -385,6 +385,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 						$xml .= "\n			<unterrichtsfach>";
 						$xml .= "				<bezeichnung><![CDATA[".$bezeichnung."]]></bezeichnung>";
 						$xml .= "				<bezeichnung_englisch><![CDATA[".$bezeichnung_englisch."]]></bezeichnung_englisch>";
+						$xml .= "				<note_positiv><![CDATA[".$row->note_positiv."]]></note_positiv>";
 						$xml .= "				<note><![CDATA[".$note2."]]></note>";
 						$xml .= "				<sws><![CDATA[".($row->semesterstunden==0?'':number_format(sprintf('%.1F',$row->semesterstunden/$wochen),1))."]]></sws>";
 						$xml .= "				<sws_lv><![CDATA[".($row->sws==0?'':number_format(sprintf('%.1F',$row->sws),1))."]]></sws_lv>";

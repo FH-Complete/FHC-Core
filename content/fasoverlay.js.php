@@ -1527,14 +1527,6 @@ function OpenManual()
 }
 
 // ****
-// * Oeffnet die ToDo Liste
-// ****
-function OpenToDoDialog()
-{
-	window.open('http://fhcomplete.technikum-wien.at/mantis/login.php?username=anonymous&return=%2Fmantis%2Froadmap_page.php%3F','_blank');
-}
-
-// ****
 // * Oeffnet ALVS-Statistik
 // ****
 function StatistikPrintALVSStatistik(format)

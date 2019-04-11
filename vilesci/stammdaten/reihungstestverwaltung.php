@@ -954,14 +954,14 @@ if(isset($_GET['excel']))
 				};
 
 				// Wenn die Spalten "Absolvierte Tests" oder "Ergebnis" angezeigt werden, wird die Punkteberechnung aktiviert
-				$('#clm_absolviert, #clm_ergebnis').on('click', function()
+				$('#clm_absolviert').on('click', function()
 				{
-					if (<?php echo json_encode($punkteberechnung);?> == 'false' && (document.getElementById('clm_absolviert').className == 'inactive' || document.getElementById('clm_ergebnis').className == 'inactive'))
+					if (<?php echo json_encode($punkteberechnung);?> == 'false' && ($('#clm_absolviert').attr('class') == 'active'))
 					{
 						$('.wait').html('...loading...');
 						window.location.href = "<?php echo $_SERVER['PHP_SELF'].'?stg_kz='.$stg_kz.'&reihungstest_id='.$reihungstest_id.'&studiensemester_kurzbz='.$studiensemester_kurzbz.'&punkteberechnung=true';?>";
 					}
-					else if (<?php echo json_encode($punkteberechnung);?> == 'true' && document.getElementById('clm_absolviert').className == 'inactive' && document.getElementById('clm_ergebnis').className == 'inactive')
+					else if (<?php echo json_encode($punkteberechnung);?> == 'true' && $('#clm_absolviert').attr('class') == 'inactive')
 						window.location.href = "<?php echo $_SERVER['PHP_SELF'].'?stg_kz='.$stg_kz.'&reihungstest_id='.$reihungstest_id.'&studiensemester_kurzbz='.$studiensemester_kurzbz.'&punkteberechnung=false';?>";
 				});
 
@@ -983,7 +983,8 @@ if(isset($_GET['excel']))
 									"filter_clm_studienplan",
 									"filter_clm_einstiegssemester",
 									"filter_clm_geburtsdatum",
-									"filter_clm_email"]}
+									"filter_clm_email",
+									"filter_clm_absolviert"]}
 						});
 
 					$("#toggle_"+v.id).on('click', function(e) {
@@ -1021,7 +1022,8 @@ if(isset($_GET['excel']))
 							'clm_studienplan',
 							'clm_einstiegssemester',
 							'clm_geburtsdatum',
-							'clm_email'];
+							'clm_email',
+							'clm_absolviert'];
 						for (var i in arr)
 						{
 							i = arr[i];
@@ -1036,6 +1038,13 @@ if(isset($_GET['excel']))
 										document.getElementById(i).className = 'inactive';
 									else
 										document.getElementById(i).className = 'active';
+								}
+								// Wenn punkteberechnung true, wird spalte clm_absolviert anzezeigt
+								if(<?php echo json_encode($punkteberechnung);?> == 'true' && i == 'clm_absolviert')
+								{
+									$('.'+i).css('display', 'table-cell');
+									$('.filter_'+i).parent().css('display', 'table-cell');
+									document.getElementById(i).className = 'active';
 								}
 							}
 						}
@@ -2633,7 +2642,7 @@ if($reihungstest_id!='')
 	echo '<div id="clm_einstiegssemester" class="active" onclick="hideColumn(\'clm_einstiegssemester\')">Einstiegssemester</div>';
 	echo '<div id="clm_geburtsdatum" class="active" onclick="hideColumn(\'clm_geburtsdatum\')">Geburtsdatum</div>';
 	echo '<div id="clm_email" class="active" onclick="hideColumn(\'clm_email\')">EMail</div>';
-	//echo '<div id="clm_absolviert" class="active" onclick="hideColumn(\'clm_absolviert\')">Absolvierte Tests <span class="wait"></span></div>';
+	echo '<div id="clm_absolviert" class="active" onclick="hideColumn(\'clm_absolviert\')">Absolvierte Tests <span class="wait"></span></div>';
 	//echo '<div id="clm_ergebnis" class="active" onclick="hideColumn(\'clm_ergebnis\')">Ergebnis <span class="wait"></span></div>';
 	//echo '<div id="clm_fas" class="active" onclick="hideColumn(\'clm_fas\')">FAS</div>';
 	echo '</td></tr></table>';
@@ -2674,8 +2683,8 @@ if($reihungstest_id!='')
 					<th style="display: table-cell" class="clm_einstiegssemester">Einstiegssemester</th>
 					<th style="display: table-cell" class="clm_geburtsdatum">Geburtsdatum</th>
 					<th style="display: table-cell" class="clm_email">EMail</th>
-					<!--<th style="display: table-cell" class="clm_absolviert">bereits absolvierte Verfahren</th>
-					<th style="display: table-cell" class="clm_ergebnis">Ergebnis</th>
+					<th style="display: table-cell" class="clm_absolviert">bereits absolvierte Verfahren</th>
+					<!--<th style="display: table-cell" class="clm_ergebnis">Ergebnis</th>
 					<th style="display: table-cell" class="clm_fas">FAS</th>-->
 				</tr>
 				</thead>
@@ -2793,6 +2802,7 @@ if($reihungstest_id!='')
 										<td style="display: table-cell" class="clm_einstiegssemester">'.$db->convert_html_chars($row->ausbildungssemester).'</td>
 										<td style="display: table-cell" class="clm_geburtsdatum">'.$db->convert_html_chars($row->gebdatum!=''?$datum_obj->convertISODate($row->gebdatum):' ').'</td>
 										<td style="display: table-cell; text-align: center" class="clm_email"><a href="mailto:'.$db->convert_html_chars($row->email).'"><img src="../../skin/images/button_mail.gif" name="mail"></a></td>
+										<td style="display: table-cell;" class="clm_absolviert">'.$rt_in_anderen_stg.'</td>
 									</tr>';
 
 							$mailto.= ($mailto!=''?',':'').$row->email;
@@ -2855,8 +2865,8 @@ if($reihungstest_id!='')
 							<th style="display: table-cell" class="clm_einstiegssemester">Einstiegssemester</th>
 							<th style="display: table-cell" class="clm_geburtsdatum">Geburtsdatum</th>
 							<th style="display: table-cell" class="clm_email">EMail</th>
-							<!--<th style="display: table-cell" class="clm_absolviert">bereits absolvierte Verfahren</th>
-							<th style="display: table-cell" class="clm_ergebnis">Ergebnis</th>
+							<th style="display: table-cell" class="clm_absolviert">bereits absolvierte Verfahren</th>
+							<!--<th style="display: table-cell" class="clm_ergebnis">Ergebnis</th>
 							<th style="display: table-cell" class="clm_fas">FAS</th>-->
 						</tr>
 					</thead>
@@ -2973,9 +2983,9 @@ if($reihungstest_id!='')
 									<td style="display: table-cell" class="clm_studienplan">'.$db->convert_html_chars($studienplan_bezeichnung).' ('.$row->studienplan_id.')</td>
 									<td style="display: table-cell" class="clm_einstiegssemester">'.$db->convert_html_chars($row->ausbildungssemester).'</td>
 									<td style="display: table-cell" class="clm_geburtsdatum">'.$db->convert_html_chars($row->gebdatum!=''?$datum_obj->convertISODate($row->gebdatum):' ').'</td>
-									<td style="display: table-cell; text-align: center" class="clm_email"><a href="mailto:'.$db->convert_html_chars($row->email).'"><img src="../../skin/images/button_mail.gif" name="mail"></a></td>';
-							/*echo	'<td style="display: table-cell;" class="clm_absolviert">'.$rt_in_anderen_stg.'</td>
-									<td style="display: table-cell; align: right" class="clm_ergebnis">'.($rtergebnis==0?'-':number_format($rtergebnis,2,'.','')).' %</td>
+									<td style="display: table-cell; text-align: center" class="clm_email"><a href="mailto:'.$db->convert_html_chars($row->email).'"><img src="../../skin/images/button_mail.gif" name="mail"></a></td>
+									<td style="display: table-cell;" class="clm_absolviert">'.$rt_in_anderen_stg.'</td>';
+							/*echo	'<td style="display: table-cell; align: right" class="clm_ergebnis">'.($rtergebnis==0?'-':number_format($rtergebnis,2,'.','')).' %</td>
 									<td style="display: table-cell; align: right" class="clm_fas">';
 									if($rtergebnis!==false && $rtergebnis != '' && $row->punkte=='')
 										echo '<a href="'.$_SERVER['PHP_SELF'].'?reihungstest_id='.$reihungstest_id.'&stg_kz='.$stg_kz.'&type=savertpunkte&rt_person_id='.$row->rt_person_id.'&rtpunkte='.$rtergebnis.'" >&uuml;bertragen</a>';

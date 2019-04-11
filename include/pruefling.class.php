@@ -331,7 +331,7 @@ class pruefling extends basis_db
 				FROM 
 					testtool.vw_auswertung_ablauf
 				JOIN 
-					public.tbl_studiengang ON vw_auswertung_ablauf.stg_kurzbz = tbl_studiengang.kurzbzlang
+					public.tbl_studiengang USING (studiengang_kz)
 				WHERE 
 					reihungstest_id = ".$this->db_add_param($reihungstest_id, FHC_INTEGER);
 
@@ -363,7 +363,8 @@ class pruefling extends basis_db
 			{
 				if (defined('FAS_REIHUNGSTEST_EXCLUDE_GEBIETE') && !empty(FAS_REIHUNGSTEST_EXCLUDE_GEBIETE))
 				{
-					$exclude_gebiet_id_arr = FAS_REIHUNGSTEST_EXCLUDE_GEBIETE;
+					$excluded_gebiete = unserialize(FAS_REIHUNGSTEST_EXCLUDE_GEBIETE);
+					$exclude_gebiet_id_arr = $excluded_gebiete;
 					$exclude_gebiet_id_toString = implode(', ', $exclude_gebiet_id_arr);
 					$qry .= " 
 						AND 
@@ -399,13 +400,10 @@ class pruefling extends basis_db
 						tbl_rt_person.rt_id = ".$this->db_add_param($reihungstest_id, FHC_INTEGER)."
 					AND 
 						tbl_prestudentstatus.status_kurzbz='Interessent'
-					AND
-						(tbl_reihungstest.stufe = 1 OR tbl_reihungstest.stufe IS NULL)
 					ORDER BY
 						tbl_reihungstest.datum desc LIMIT 1
 				)
 			";
-
 			if($result = $this->db_query($qry))
 			{
 				// Wenn keine Eintraege vorhanden dann false

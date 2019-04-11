@@ -607,33 +607,35 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
 			</table:table>
 			<text:p text:style-name="P19"/>
 			<text:p text:style-name="P20">Benotung:<text:tab/>
-				<text:span text:style-name="T9">Sehr gut (1), Gut (2), Befriedigend (3), Genügend (4), Nicht genügend (5), mit Erfolg teilgenommen (met), nicht teilgenommen (nt), <text:tab/>teilgenommen(tg), angerechnet (ar), nicht beurteilt (nb), bestanden (b), erfolgreich absolviert (ea), nicht erfolgreich absolviert (nea)</text:span>
+				<text:span text:style-name="T9">Sehr gut (1), Gut (2), Befriedigend (3), Genügend (4), mit Erfolg teilgenommen (met), teilgenommen (tg), angerechnet (ar), <text:tab/>bestanden (b), erfolgreich absolviert (ea)</text:span>
 			</text:p>
 		</office:text>
 </xsl:template>
 <xsl:template match="unterrichtsfach">
-	<table:table-row table:style-name="Tabelle3.1">
-		<table:table-cell table:style-name="Tabelle3.A2" office:value-type="string">
-			<text:p text:style-name="P26"><xsl:value-of select="bezeichnung" /></text:p>
-		</table:table-cell>
-		<table:table-cell table:style-name="Tabelle3.A2" office:value-type="string">
-			<text:p text:style-name="P27"><xsl:value-of select="../studiensemester_kurzbz" /></text:p>
-		</table:table-cell>
-		<table:table-cell table:style-name="Tabelle3.A2" office:value-type="string">
-			<text:p text:style-name="P27"><xsl:value-of select="../semester" /></text:p>
-		</table:table-cell>
-		<table:table-cell table:style-name="Tabelle3.A2" office:value-type="string">
-			<text:p text:style-name="P27"><xsl:value-of select="sws_lv" /></text:p>
-		</table:table-cell>
-		<table:table-cell table:style-name="Tabelle3.A2" office:value-type="string">
-			<text:p text:style-name="P27"><xsl:value-of select="ects" /></text:p>
-		</table:table-cell>
-		<table:table-cell table:style-name="Tabelle3.A2" office:value-type="string">
-			<text:p text:style-name="P27"><xsl:value-of select="benotungsdatum" /></text:p>
-		</table:table-cell>
-		<table:table-cell table:style-name="Tabelle3.G2" office:value-type="string">
-			<text:p text:style-name="P27"><xsl:value-of select="note" /></text:p>
-		</table:table-cell>
-	</table:table-row>
+	<xsl:if test="note_positiv='1'">
+		<table:table-row table:style-name="Tabelle3.1">
+			<table:table-cell table:style-name="Tabelle3.A2" office:value-type="string">
+				<text:p text:style-name="P26"><xsl:value-of select="bezeichnung" /></text:p>
+			</table:table-cell>
+			<table:table-cell table:style-name="Tabelle3.A2" office:value-type="string">
+				<text:p text:style-name="P27"><xsl:value-of select="../studiensemester_kurzbz" /></text:p>
+			</table:table-cell>
+			<table:table-cell table:style-name="Tabelle3.A2" office:value-type="string">
+				<text:p text:style-name="P27"><xsl:value-of select="../semester" /></text:p>
+			</table:table-cell>
+			<table:table-cell table:style-name="Tabelle3.A2" office:value-type="string">
+				<text:p text:style-name="P27"><xsl:value-of select="sws_lv" /></text:p>
+			</table:table-cell>
+			<table:table-cell table:style-name="Tabelle3.A2" office:value-type="string">
+				<text:p text:style-name="P27"><xsl:value-of select="ects" /></text:p>
+			</table:table-cell>
+			<table:table-cell table:style-name="Tabelle3.A2" office:value-type="string">
+				<text:p text:style-name="P27"><xsl:value-of select="benotungsdatum" /></text:p>
+			</table:table-cell>
+			<table:table-cell table:style-name="Tabelle3.G2" office:value-type="string">
+				<text:p text:style-name="P27"><xsl:value-of select="note" /></text:p>
+			</table:table-cell>
+		</table:table-row>
+	</xsl:if>
 </xsl:template>
 </xsl:stylesheet>

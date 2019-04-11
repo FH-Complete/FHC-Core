@@ -707,6 +707,181 @@ if (isset($_POST['method']) && $_POST['method'] == 'addPerson')
 	}
 }
 
+// Überträgt die Punkte ins FAS und setzt optional Reihungstest angetreten und Bewerberstatus
+$punkteUebertragen = filter_input(INPUT_POST, 'punkteUebertragen', FILTER_VALIDATE_BOOLEAN);
+if ($punkteUebertragen)
+{
+	if (isset($_POST['reihungstest_id']) &&	is_numeric($_POST['reihungstest_id']))
+	{
+		$reihungstest = new reihungstest($_POST['reihungstest_id']);
+		$msg_warning = '';
+		$msg_error = '';
+		$count_success_punkte = 0;
+		$count_success_gesamtpunkte = 0;
+		$count_success_bewerber = 0;
+
+		if (isset($_POST['prestudentPunkteArr']))
+		{
+			foreach ($_POST['prestudentPunkteArr'] AS $key => $array)
+			{
+				$prestudentrolle = new prestudent($array['prestudent_id']);
+				$prestudentrolle->getLastStatus($array['prestudent_id'], null, 'Interessent');
+
+				if (!$rechte->isBerechtigt('lehre/reihungstest', $prestudentrolle->studiengang_kz, 'sui'))
+				{
+					$msg_error .= '<br>Sie haben keine Rechte, um für diesen Studiengang Ergebnisse ins FAS zu übertragen';
+					continue;
+				}
+				// Checken, ob Person-Reihungstest-Studienplan zuteilung existiert
+				if ($reihungstest->checkPersonRtStudienplanExists($prestudentrolle->person_id, $_POST['reihungstest_id'], $prestudentrolle->studienplan_id))
+				{
+					$setRTPunkte = new reihungstest();
+					$setRTPunkte->getPersonReihungstest($prestudentrolle->person_id, $_POST['reihungstest_id'], $prestudentrolle->studienplan_id);
+
+					// Check, ob Punkte schon befüllt sind
+					if ($setRTPunkte->punkte == '')
+					{
+						$setRTPunkte->new = false;
+						$setRTPunkte->punkte = number_format($array['ergebnis'], 4);
+						$setRTPunkte->updateamum = date('Y-m-d H:i:s');
+						$setRTPunkte->updatevon = $user;
+
+						if (!$setRTPunkte->savePersonReihungstest())
+						{
+							$msg_error .= '<br>Fehler beim speichern der Reihungstestpunkte für Prestudent '.$array['prestudent_id'].': ' . $setRTPunkte->errormsg;
+						}
+						else
+						{
+							$count_success_punkte ++;
+						}
+					}
+					else
+					{
+						$msg_warning .= '<br>Der Prestudent '.$array['prestudent_id'].' hat bereits Punkte eingetragen.';
+					}
+				}
+				else
+				{
+					$setRTPunkte = new reihungstest();
+					$setRTPunkte->getPersonReihungstest($prestudentrolle->person_id, $_POST['reihungstest_id']);
+
+					// Check, ob Punkte schon befüllt sind
+					if ($setRTPunkte->punkte == '')
+					{
+						$setRTPunkte->new = true;
+						$setRTPunkte->studienplan_id = $prestudentrolle->studienplan_id;
+						$setRTPunkte->punkte = number_format($array['ergebnis'], 4);
+						$setRTPunkte->insertamum = date('Y-m-d H:i:s');
+						$setRTPunkte->insertvon = $user;
+
+						if (!$setRTPunkte->savePersonReihungstest())
+						{
+							$msg_error .= '<br>Fehler beim speichern der Reihungstestpunkte für Prestudent ' . $array['prestudent_id'] . ': ' . $setRTPunkte->errormsg;
+						}
+						else
+						{
+							$count_success_punkte ++;
+						}
+					}
+					else
+					{
+						$msg_warning .= '<br>Der Prestudent '.$array['prestudent_id'].' hat bereits Punkte eingetragen.';
+					}
+				}
+
+				$gesamtpunkteSetzen = filter_input(INPUT_POST, 'gesamtpunkteSetzen', FILTER_VALIDATE_BOOLEAN);
+				// Wenn gesamtpunkteSetzen true ist, auch die Gesamtpunkte für den Prestudenten setzen
+				if ($gesamtpunkteSetzen)
+				{
+					$prestudent = new prestudent($array['prestudent_id']);
+
+					// Check, ob Punkte schon befüllt sind
+					if ($prestudent->punkte == '')
+					{
+						$prestudent->new = false;
+						$prestudent->punkte = number_format($array['ergebnis'], 4);
+						$prestudent->reihungstestangetreten = true;
+						$setRTPunkte->updateamum = date('Y-m-d H:i:s');
+						$setRTPunkte->updatevon = $user;
+
+						if (!$prestudent->save())
+						{
+							$msg_error .= '<br>Fehler beim setzen der Gesamtpunkte für Prestudent '.$array['prestudent_id'].': ' . $prestudent->errormsg;
+						}
+						else
+						{
+							$count_success_gesamtpunkte++;
+						}
+					}
+					else
+					{
+						$msg_warning .= '<br>Der Prestudent '.$array['prestudent_id'].' hat bereits Gesamtpunkte eingetragen.';
+					}
+				}
+
+				$zuBewerberMachen = filter_input(INPUT_POST, 'zuBewerberMachen', FILTER_VALIDATE_BOOLEAN);
+				// Wenn zuBewerberMachen true ist, wird der Prestudent auch zum Bewerber gemacht
+				if ($zuBewerberMachen)
+				{
+					$prestudent = new prestudent($array['prestudent_id']);
+
+					// Checken, ob schon Bewerberstatus vorhanden ist
+					if (!$prestudent->load_rolle($array['prestudent_id'], 'Bewerber', $prestudentrolle->studiensemester_kurzbz, $prestudentrolle->ausbildungssemester))
+					{
+						$prestudent->new = true;
+						$prestudent->prestudent_id = $array['prestudent_id'];
+						$prestudent->status_kurzbz = 'Bewerber';
+						$prestudent->studiensemester_kurzbz = $prestudentrolle->studiensemester_kurzbz;
+						$prestudent->ausbildungssemester = $prestudentrolle->ausbildungssemester;
+						$prestudent->datum =date('Y-m-d');
+						$prestudent->insertamum = date('Y-m-d H:i:s');
+						$prestudent->insertvon = $user;
+						$prestudent->orgform_kurzbz = $prestudentrolle->orgform_kurzbz;
+						$prestudent->bestaetigtam = $prestudentrolle->bestaetigtam;
+						$prestudent->bestaetigtvon = $prestudentrolle->bestaetigtvon;
+						$prestudent->bewerbung_abgeschicktamum = $prestudentrolle->bewerbung_abgeschicktamum;
+						$prestudent->studienplan_id = $prestudentrolle->studienplan_id;
+
+						if (!$prestudent->save_rolle())
+						{
+							$msg_error .= '<br>Fehler beim speichern des Bewerberstatus für Prestudent '.$array['prestudent_id'].': ' . $prestudent->errormsg;
+						}
+						else
+						{
+							$count_success_bewerber++;
+						}
+					}
+					else
+					{
+						$msg_warning .= '<br>Der Prestudent '.$array['prestudent_id'].' hat bereits einen Bewerberstatus';
+					}
+				}
+			}
+		}
+
+		$msg_success = '';
+		if ($count_success_punkte > 0)
+		{
+			$msg_success .= $count_success_punkte.' Punkte erfolgreich ins FAS übertragen';
+		}
+		if ($count_success_gesamtpunkte > 0)
+		{
+			$msg_success .= '<br>'.$count_success_gesamtpunkte.' Gesamtpunkte erfolgreich gesetzt';
+		}
+		if ($count_success_bewerber > 0)
+		{
+			$msg_success .= '<br>'.$count_success_bewerber.' Prestudenten zu Bewerber gemacht';
+		}
+
+		echo json_encode(array(
+				'status' => 'ok',
+				'msg_success' => $msg_success,
+				'msg_warning' => $msg_warning,
+				'msg_error' => $msg_error));
+			exit();
+	}
+}
+
 function sortByField($multArray, $sortField, $desc = true)
 {
 	$tmpKey = '';
@@ -919,7 +1094,8 @@ if (isset($_REQUEST['reihungstest']))
 			tbl_gebiet.gebiet_id,
 			tbl_gebiet.bezeichnung AS gebiet,
 			tbl_ablauf.reihung,
-			tbl_ablauf.studiengang_kz
+			tbl_ablauf.studiengang_kz,
+			tbl_ablauf.semester
 		FROM PUBLIC.tbl_rt_person
 		JOIN PUBLIC.tbl_person ON (tbl_rt_person.person_id = tbl_person.person_id)
 		JOIN PUBLIC.tbl_prestudent ps ON (ps.person_id = tbl_rt_person.person_id)
@@ -933,7 +1109,7 @@ if (isset($_REQUEST['reihungstest']))
 		LEFT JOIN testtool.tbl_gebiet USING (gebiet_id)
 		WHERE 1=1
 			--AND get_rolle_prestudent(prestudent_id, rt.studiensemester_kurzbz) = 'Interessent'
-			AND tbl_prestudentstatus.studiensemester_kurzbz = rt.studiensemester_kurzbz
+			--AND tbl_prestudentstatus.studiensemester_kurzbz = rt.studiensemester_kurzbz
 			--AND bewerbung_abgeschicktamum IS NOT NULL
 			--AND bestaetigtam IS NOT NULL
 			AND NOT (testtool.tbl_ablauf.gebiet_id IN ( SELECT testtool.tbl_kategorie.gebiet_id FROM testtool.tbl_kategorie))";
@@ -960,14 +1136,14 @@ if (isset($_REQUEST['reihungstest']))
 	if ($semester != '')
 	{
 		$query .= " AND tbl_ablauf.semester=" . $db->db_add_param($semester, FHC_INTEGER);
-		$query .= " AND tbl_prestudentstatus.ausbildungssemester = " . $db->db_add_param($semester, FHC_INTEGER);
+		//$query .= " AND tbl_prestudentstatus.ausbildungssemester = " . $db->db_add_param($semester, FHC_INTEGER);
 	}
 	if ($prestudent_id != '')
 	{
 		$query .= " AND ps.prestudent_id=" . $db->db_add_param($prestudent_id, FHC_INTEGER);
 	}
 	//$query .= " AND nachname='Al-Mafrachi'";
-	$query .= " ORDER BY tbl_ablauf.studiengang_kz, reihung";
+	$query .= " ORDER BY tbl_ablauf.studiengang_kz, tbl_ablauf.semester, reihung";
 
 	if (!($result = $db->db_query($query)))
 	{
@@ -986,131 +1162,162 @@ if (isset($_REQUEST['reihungstest']))
 	// Alle Ergebnisse laden
 	$query = "
 		SELECT DISTINCT tbl_rt_person.person_id,
-	gebdatum,
-	tbl_person.geschlecht,
-	nachname,
-	vorname,
-	UPPER(tbl_studiengang.typ || tbl_studiengang.kurzbz) AS stg_kurzbz,
-	tbl_studiengang.bezeichnung AS stg_bez,
-	tbl_studienplan.orgform_kurzbz,
-	tbl_gebiet.maxpunkte,
-	tbl_prestudentstatus.ausbildungssemester,
-	tbl_ablauf.gewicht,
-	tbl_ort.planbezeichnung AS raum,
-	ps.prestudent_id,
-	tbl_zgv.zgv_kurzbz,
-	ps.zgv_code,
-	ps.zgvmas_code,
-	(
-		SELECT count(*) AS prio_relativ
-		FROM (
-			SELECT *,
-				(
-					SELECT status_kurzbz
-					FROM PUBLIC.tbl_prestudentstatus
-					WHERE prestudent_id = pst.prestudent_id
-					ORDER BY datum DESC,
-						tbl_prestudentstatus.insertamum DESC LIMIT 1
-					) AS laststatus
-			FROM PUBLIC.tbl_prestudent pst
-			JOIN PUBLIC.tbl_prestudentstatus USING (prestudent_id)
-			WHERE person_id = (
-					SELECT person_id
-					FROM PUBLIC.tbl_prestudent
-					WHERE prestudent_id = ps.prestudent_id
-					)
-				AND studiensemester_kurzbz = (
-					SELECT studiensemester_kurzbz
-					FROM PUBLIC.tbl_prestudentstatus
-					WHERE prestudent_id = ps.prestudent_id
-						AND status_kurzbz = 'Interessent' LIMIT 1
-					)
-				AND status_kurzbz = 'Interessent'
-			) prest
-		WHERE laststatus NOT IN ('Abbrecher', 'Abgewiesener', 'Absolvent')
-			AND priorisierung <= (
-				SELECT priorisierung
-				FROM PUBLIC.tbl_prestudent
-				WHERE prestudent_id = ps.prestudent_id
-				)
-		) AS prioritaet,
-	(
-		SELECT kontakt
-		FROM PUBLIC.tbl_kontakt
-		WHERE kontakttyp = 'email'
-			AND zustellung = true
-			AND person_id = tbl_rt_person.person_id
-		ORDER BY insertamum DESC,
-			updateamum DESC LIMIT 1
-		) AS email,
-	CASE 
-		WHEN tbl_studiengang.typ = 'b'
-			AND EXISTS(
-				SELECT 1
-				FROM testtool.tbl_pruefling
-				WHERE prestudent_id = ps.prestudent_id
-				)
-			THEN (
-					SELECT sum(testtool.tbl_vorschlag.punkte) AS sum
-					FROM testtool.tbl_vorschlag
-					JOIN testtool.tbl_antwort USING (vorschlag_id)
-					JOIN testtool.tbl_frage USING (frage_id)
-					WHERE testtool.tbl_antwort.pruefling_id = tbl_pruefling.pruefling_id
-						AND testtool.tbl_frage.gebiet_id = tbl_gebiet.gebiet_id
-					)
-		ELSE (
-				SELECT sum(testtool.tbl_vorschlag.punkte) AS sum
-				FROM testtool.tbl_vorschlag
-				JOIN testtool.tbl_antwort USING (vorschlag_id)
-				JOIN testtool.tbl_frage USING (frage_id)
-				WHERE testtool.tbl_antwort.pruefling_id = (
-						SELECT pruefling_id
-						FROM testtool.tbl_pruefling
-						WHERE prestudent_id = (
-								SELECT prestudent_id
-								FROM PUBLIC.tbl_prestudent
-								JOIN PUBLIC.tbl_prestudentstatus USING (prestudent_id)
-								JOIN PUBLIC.tbl_studiengang USING (studiengang_kz)
-								JOIN testtool.tbl_pruefling USING (prestudent_id)
-								WHERE person_id = tbl_rt_person.person_id
-									AND tbl_studiengang.typ = 'b'
-									AND status_kurzbz = 'Interessent'
-									AND studiensemester_kurzbz = rt.studiensemester_kurzbz
-								ORDER BY registriert DESC LIMIT 1
-								)
+			gebdatum,
+			tbl_person.geschlecht,
+			nachname,
+			vorname,
+			UPPER(tbl_studiengang.typ || tbl_studiengang.kurzbz) AS stg_kurzbz,
+			tbl_studiengang.bezeichnung AS stg_bez,
+			tbl_studienplan.orgform_kurzbz,
+			tbl_gebiet.maxpunkte,
+			tbl_prestudentstatus.ausbildungssemester,
+			tbl_ablauf.gewicht,
+			tbl_ort.planbezeichnung AS raum,
+			ps.prestudent_id,
+			tbl_zgv.zgv_kurzbz,
+			ps.zgv_code,
+			ps.zgvmas_code,
+			tbl_rt_person.teilgenommen,
+			CASE 
+				WHEN tbl_prestudentstatus.statusgrund_id = 9
+					AND tbl_prestudentstatus.status_kurzbz = 'Interessent'
+					THEN true
+				ELSE false
+				END AS qualifikationskurs,
+			(
+				SELECT count(*) AS prio_relativ
+				FROM (
+					SELECT *,
+						(
+							SELECT status_kurzbz
+							FROM PUBLIC.tbl_prestudentstatus
+							WHERE prestudent_id = pst.prestudent_id
+							ORDER BY datum DESC,
+								tbl_prestudentstatus.insertamum DESC LIMIT 1
+							) AS laststatus
+					FROM PUBLIC.tbl_prestudent pst
+					JOIN PUBLIC.tbl_prestudentstatus USING (prestudent_id)
+					WHERE person_id = (
+							SELECT person_id
+							FROM PUBLIC.tbl_prestudent
+							WHERE prestudent_id = ps.prestudent_id
+							)
+						AND studiensemester_kurzbz = (
+							SELECT studiensemester_kurzbz
+							FROM PUBLIC.tbl_prestudentstatus
+							WHERE prestudent_id = ps.prestudent_id
+								AND status_kurzbz = 'Interessent' LIMIT 1
+							)
+						AND status_kurzbz = 'Interessent'
+					) prest
+				WHERE laststatus NOT IN ('Abbrecher', 'Abgewiesener', 'Absolvent')
+					AND priorisierung <= (
+						SELECT priorisierung
+						FROM PUBLIC.tbl_prestudent
+						WHERE prestudent_id = ps.prestudent_id
 						)
-					AND testtool.tbl_frage.gebiet_id = tbl_gebiet.gebiet_id
+				) AS prioritaet,
+			(
+				SELECT kontakt
+				FROM PUBLIC.tbl_kontakt
+				WHERE kontakttyp = 'email'
+					AND zustellung = true
+					AND person_id = tbl_rt_person.person_id
+				ORDER BY insertamum DESC,
+					updateamum DESC LIMIT 1
+				) AS email,
+			CASE 
+				WHEN /*tbl_studiengang.typ = 'b'
+					AND*/ EXISTS (
+						SELECT 1
+						FROM testtool.tbl_pruefling
+						WHERE prestudent_id = ps.prestudent_id
+						)
+					THEN (
+							SELECT sum(testtool.tbl_vorschlag.punkte) AS sum
+							FROM testtool.tbl_vorschlag
+							JOIN testtool.tbl_antwort USING (vorschlag_id)
+							JOIN testtool.tbl_frage USING (frage_id)
+							WHERE testtool.tbl_antwort.pruefling_id = tbl_pruefling.pruefling_id
+								AND testtool.tbl_frage.gebiet_id = tbl_gebiet.gebiet_id
+							)
+				ELSE (
+						SELECT sum(testtool.tbl_vorschlag.punkte) AS sum
+						FROM testtool.tbl_vorschlag
+						JOIN testtool.tbl_antwort USING (vorschlag_id)
+						JOIN testtool.tbl_frage USING (frage_id)
+						WHERE testtool.tbl_antwort.pruefling_id = (
+								SELECT pruefling_id
+								FROM testtool.tbl_pruefling
+								WHERE prestudent_id = (
+										SELECT prestudent_id
+										FROM PUBLIC.tbl_prestudent
+										JOIN PUBLIC.tbl_prestudentstatus USING (prestudent_id)
+										JOIN PUBLIC.tbl_studiengang USING (studiengang_kz)
+										JOIN testtool.tbl_pruefling USING (prestudent_id)
+										WHERE person_id = tbl_rt_person.person_id
+											AND tbl_studiengang.typ = 'b'
+											--AND status_kurzbz = 'Interessent'
+											AND studiensemester_kurzbz = rt.studiensemester_kurzbz
+										ORDER BY registriert DESC LIMIT 1
+										)
+								)
+							AND testtool.tbl_frage.gebiet_id = tbl_gebiet.gebiet_id
+						)
+				END AS punkte,
+			tbl_gebiet.gebiet_id,
+			tbl_gebiet.bezeichnung AS gebiet,
+			tbl_pruefling.idnachweis,
+			tbl_pruefling.registriert,
+			get_rolle_prestudent(prestudent_id, rt.studiensemester_kurzbz) AS letzter_status
+		FROM PUBLIC.tbl_rt_person
+		JOIN PUBLIC.tbl_person ON (tbl_rt_person.person_id = tbl_person.person_id)
+		JOIN PUBLIC.tbl_prestudent ps ON (ps.person_id = tbl_rt_person.person_id)
+		JOIN PUBLIC.tbl_reihungstest rt ON (tbl_rt_person.rt_id = rt.reihungstest_id)
+		JOIN PUBLIC.tbl_prestudentstatus USING (prestudent_id)
+		JOIN PUBLIC.tbl_studiengang ON (ps.studiengang_kz = tbl_studiengang.studiengang_kz)
+		LEFT JOIN lehre.tbl_studienplan ON (tbl_prestudentstatus.studienplan_id = tbl_studienplan.studienplan_id)
+		LEFT JOIN bis.tbl_zgv ON (ps.zgv_code = tbl_zgv.zgv_code)
+		LEFT JOIN PUBLIC.tbl_ort ON (tbl_rt_person.ort_kurzbz = tbl_ort.ort_kurzbz)
+		LEFT JOIN testtool.tbl_pruefling USING (prestudent_id)
+		LEFT JOIN testtool.tbl_ablauf ON (testtool.tbl_ablauf.studiengang_kz = ps.studiengang_kz)
+		LEFT JOIN testtool.tbl_gebiet USING (gebiet_id)
+		WHERE 1 = 1
+			--AND get_rolle_prestudent(prestudent_id, rt.studiensemester_kurzbz) NOT IN ('Abgewiesener') /*Wenn einkommentiert, kommen zB bei alten Bewerbungen keine Ergebnisse*/ 
+			AND tbl_prestudentstatus.studiensemester_kurzbz IN (
+				SELECT studiensemester_kurzbz
+				FROM PUBLIC.tbl_studiensemester
+				WHERE studiensemester_kurzbz = rt.studiensemester_kurzbz
+				
+				UNION
+				
+				(
+					SELECT studiensemester_kurzbz
+					FROM PUBLIC.tbl_studiensemester
+					WHERE ende <= (
+							SELECT start
+							FROM PUBLIC.tbl_studiensemester
+							WHERE studiensemester_kurzbz = rt.studiensemester_kurzbz
+							)
+					ORDER BY ende DESC LIMIT 1
+					)
+				
+				UNION
+				
+				(
+					SELECT studiensemester_kurzbz
+					FROM PUBLIC.tbl_studiensemester
+					WHERE start >= (
+							SELECT ende
+							FROM PUBLIC.tbl_studiensemester
+							WHERE studiensemester_kurzbz = rt.studiensemester_kurzbz
+							)
+					ORDER BY start ASC LIMIT 1
+					)
 				)
-		END AS punkte,
-		/*(SELECT sum(testtool.tbl_vorschlag.punkte) AS sum
-					FROM testtool.tbl_vorschlag
-					JOIN testtool.tbl_antwort USING (vorschlag_id)
-					JOIN testtool.tbl_frage USING (frage_id)
-					WHERE testtool.tbl_antwort.pruefling_id = tbl_pruefling.pruefling_id
-						AND testtool.tbl_frage.gebiet_id = tbl_gebiet.gebiet_id
-					) AS punkte,*/
-	tbl_gebiet.gebiet_id,
-	tbl_gebiet.bezeichnung AS gebiet,
-	tbl_pruefling.idnachweis,
-	tbl_pruefling.registriert
-FROM PUBLIC.tbl_rt_person
-JOIN PUBLIC.tbl_person ON (tbl_rt_person.person_id = tbl_person.person_id)
-JOIN PUBLIC.tbl_prestudent ps ON (ps.person_id = tbl_rt_person.person_id)
-JOIN PUBLIC.tbl_reihungstest rt ON (tbl_rt_person.rt_id = rt.reihungstest_id)
-JOIN PUBLIC.tbl_prestudentstatus USING (prestudent_id)
-JOIN PUBLIC.tbl_studiengang ON (ps.studiengang_kz = tbl_studiengang.studiengang_kz)
-LEFT JOIN lehre.tbl_studienplan ON (tbl_prestudentstatus.studienplan_id = tbl_studienplan.studienplan_id)
-LEFT JOIN bis.tbl_zgv ON (ps.zgv_code = tbl_zgv.zgv_code)
-LEFT JOIN PUBLIC.tbl_ort ON (tbl_rt_person.ort_kurzbz = tbl_ort.ort_kurzbz)
-LEFT JOIN testtool.tbl_pruefling USING (prestudent_id)
-LEFT JOIN testtool.tbl_ablauf ON (testtool.tbl_ablauf.studiengang_kz = ps.studiengang_kz)
-LEFT JOIN testtool.tbl_gebiet USING (gebiet_id)
-WHERE 1 = 1
-	AND get_rolle_prestudent(prestudent_id, rt.studiensemester_kurzbz) = 'Interessent' 
-	AND tbl_prestudentstatus.studiensemester_kurzbz = rt.studiensemester_kurzbz
-	AND bewerbung_abgeschicktamum IS NOT NULL 
-	AND bestaetigtam IS NOT NULL 
-	AND tbl_gebiet.gebiet_id != 7
+			AND bewerbung_abgeschicktamum IS NOT NULL
+			AND bestaetigtam IS NOT NULL
+			AND tbl_gebiet.gebiet_id != 7
 		";
 	if ($reihungstest != '')
 	{
@@ -1135,7 +1342,7 @@ WHERE 1 = 1
 	if ($semester != '')
 	{
 		$query .= " AND tbl_ablauf.semester=" . $db->db_add_param($semester, FHC_INTEGER);
-		$query .= " AND tbl_prestudentstatus.ausbildungssemester = " . $db->db_add_param($semester, FHC_INTEGER);
+		//$query .= " AND tbl_prestudentstatus.ausbildungssemester = " . $db->db_add_param($semester, FHC_INTEGER);
 	}
 	if ($prestudent_id != '')
 	{
@@ -1168,6 +1375,7 @@ WHERE 1 = 1
 		$ergebnis[$row->prestudent_id]->nachname = $row->nachname;
 		$ergebnis[$row->prestudent_id]->vorname = $row->vorname;
 		$ergebnis[$row->prestudent_id]->gebdatum = $row->gebdatum;
+		$ergebnis[$row->prestudent_id]->email = $row->email;
 		$ergebnis[$row->prestudent_id]->geschlecht = $row->geschlecht;
 		$ergebnis[$row->prestudent_id]->idnachweis = $row->idnachweis;
 		$ergebnis[$row->prestudent_id]->registriert = $row->registriert;
@@ -1179,6 +1387,9 @@ WHERE 1 = 1
 		$ergebnis[$row->prestudent_id]->raum = $row->raum;
 		$ergebnis[$row->prestudent_id]->prioritaet = ($row->prioritaet != '' ? $row->prioritaet : '');
 		$ergebnis[$row->prestudent_id]->orgform = $row->orgform_kurzbz;
+		$ergebnis[$row->prestudent_id]->teilgenommen = $db->db_parse_bool($row->teilgenommen);
+		$ergebnis[$row->prestudent_id]->qualifikationskurs = $db->db_parse_bool($row->qualifikationskurs);
+		$ergebnis[$row->prestudent_id]->letzter_status = $row->letzter_status;
 
 		if (!isset($ergebnis[$row->prestudent_id]->gebiet[$row->gebiet_id]))
 		{
@@ -1555,17 +1766,17 @@ if (isset($_REQUEST['format']) && $_REQUEST['format'] == 'xls')
 		$worksheetOhnePhsyik->write(0, ++$spalte, 'S', $format_bold);
 		$worksheetOhnePhsyik->mergeCells(0, 8, 1, 8);
 		$maxlength[8] = 2;
-		$worksheet->write(0, ++$spalte, 'OrgForm', $format_bold);
-		$worksheet->mergeCells(0, 9, 1, 9);
+		$worksheetOhnePhsyik->write(0, ++$spalte, 'OrgForm', $format_bold);
+		$worksheetOhnePhsyik->mergeCells(0, 9, 1, 9);
 		$maxlength[9] = 8;
-		$worksheet->write(0, ++$spalte, 'Prio', $format_bold);
-		$worksheet->mergeCells(0, 10, 1, 10);
+		$worksheetOhnePhsyik->write(0, ++$spalte, 'Prio', $format_bold);
+		$worksheetOhnePhsyik->mergeCells(0, 10, 1, 10);
 		$maxlength[10] = 5;
-		$worksheet->write(0, ++$spalte, 'ZGV', $format_bold);
-		$worksheet->mergeCells(0, 11, 1, 11);
+		$worksheetOhnePhsyik->write(0, ++$spalte, 'ZGV', $format_bold);
+		$worksheetOhnePhsyik->mergeCells(0, 11, 1, 11);
 		$maxlength[11] = 20;
-		$worksheet->write(0, ++$spalte, 'ZGV MA', $format_bold);
-		$worksheet->mergeCells(0, 12, 1, 12);
+		$worksheetOhnePhsyik->write(0, ++$spalte, 'ZGV MA', $format_bold);
+		$worksheetOhnePhsyik->mergeCells(0, 12, 1, 12);
 		$maxlength[12] = 20;
 
 		$spalte = 11;
@@ -1630,8 +1841,8 @@ if (isset($_REQUEST['format']) && $_REQUEST['format'] == 'xls')
 				$worksheetOhnePhsyik->write($zeile, ++$spalte, $erg->stg_kurzbz);
 				$worksheetOhnePhsyik->write($zeile, ++$spalte, $erg->stg_bez);
 				$worksheetOhnePhsyik->write($zeile, ++$spalte, $erg->ausbildungssemester);
-				$worksheet->write($zeile, ++$spalte, $erg->orgform);
-				$worksheet->write($zeile, ++$spalte, $erg->prioritaet);
+				$worksheetOhnePhsyik->write($zeile, ++$spalte, $erg->orgform);
+				$worksheetOhnePhsyik->write($zeile, ++$spalte, $erg->prioritaet);
 				$worksheetOhnePhsyik->write($zeile, ++$spalte, $zgv_arr[$erg->zgv]);
 				$worksheetOhnePhsyik->write($zeile, ++$spalte, $zgvma_arr[$erg->zgvma]);
 				foreach ($gebiet AS $gbt)
@@ -1867,8 +2078,8 @@ else
 		$("#auswertung_table").tablesorter(
 		{			
 			widgets: ["zebra", "filter", "columnSelector"],
-			sortList: [[12,1],[2,0],[3,0]],
-			headers: {0: { sorter: false, filter: false}, 4: { dateFormat: "ddmmyyyy" }}
+			sortList: [[16,1],[3,0],[4,0]],
+			headers: {0: { sorter: false, filter: false}, 2: { sorter: false, filter: false}, 4: { dateFormat: "ddmmyyyy" }}
 			/*widgetOptions : {
 				columnSelector_container : $("#columnSelector"),
 				columnSelector_saveColumns: true}			*/
@@ -1886,12 +2097,28 @@ else
 		{
 			$("#auswertung_table").checkboxes("toggle");
 			e.preventDefault();
+			if ($("input.prestudentCheckbox:checked").length > 0)
+				$("#mailSendButton").html("Mail an markierte senden");
+			else
+				$("#mailSendButton").html("Mail an alle senden");
 		});
 
 		$("#uncheck_table").on("click", function(e) 
 		{
 			$("#auswertung_table").checkboxes("uncheck");
 			e.preventDefault();
+			if ($("input.prestudentCheckbox:checked").length > 0)
+				$("#mailSendButton").html("Mail an markierte senden");
+			else
+				$("#mailSendButton").html("Mail an alle senden");
+		});
+		
+		$(".prestudentCheckbox").change(function()
+		{
+			if ($("input.prestudentCheckbox:checked").length > 0)
+				$("#mailSendButton").html("Mail an markierte senden");
+			else
+				$("#mailSendButton").html("Mail an alle senden");
 		});
 						
 		$("#auswertung_table").checkboxes("range", true);
@@ -1915,6 +2142,11 @@ else
 		{
 			$(".loaderIcon").show();
 		});
+		
+		$("#showUebertragenOptionsButton").on("click", function(e) 
+		{
+			$("#uebertragenOptions").toggle(300);
+		});
 	});
 	
 	function deleteResult(prestudent_id, gebiet_id, name, gebiet_bezeichnung)
@@ -1934,7 +2166,7 @@ else
 				dataType: "json",
 				success: function(data)
 				{
-					if(data.status!="ok")
+					if(data.status !== "ok")
 					{
 						$("#msgbox").attr("class","alert alert-danger");
 						$("#msgbox").show();
@@ -1973,7 +2205,7 @@ else
 				dataType: "json",
 				success: function(data)
 				{
-					if(data.status!="ok")
+					if(data.status !== "ok")
 					{
 						$("#msgbox").attr("class","alert alert-danger");
 						$("#msgbox").show();
@@ -1981,7 +2213,7 @@ else
 					}
 					else
 					{
-						$("#row_"+prestudent_id).find("td.punkte").each (function() 
+						$("#row_"+prestudent_id).find("td.punkte, td.col_gesamtpunkte_ohne_physik").each (function() 
 						{
 						  $(this).html("");
 						});
@@ -2014,7 +2246,7 @@ else
 			dataType: "json",
 			success: function(data)
 			{
-				if(data.status!="ok")
+				if(data.status !== "ok")
 				{
 					$("#msgbox").attr("class","alert alert-danger");
 					$("#msgbox").show();
@@ -2050,7 +2282,7 @@ else
 	function testende(reihungstest)
 	{
 		var selected = [];
-		if ($("input.prestudentCheckbox:checked").length == 0)
+		if ($("input.prestudentCheckbox:checked").length === 0)
 		{
 			alert("Bitte wählen Sie mindestens einen Eintrag aus der Liste");
 			return false;
@@ -2059,9 +2291,11 @@ else
 		{
 			if (confirm("Setzt bei allen markierten Personen \'Zum Reihungstest angetreten\' und informiert die entsprechende Studiengangsassistenz. Wollen Sie fortfahren?"))
 			{
-				$("input.prestudentCheckbox:checked").each(function() {
-				selected.push($(this).attr("name"));
-			    });
+				$("input.prestudentCheckbox:checked").each(function() 
+				{
+					selected.push($(this).attr("name"));
+				});
+				
 				$(".loaderIcon").show();
 				
 				data = {
@@ -2077,7 +2311,7 @@ else
 					dataType: "json",
 					success: function(data)
 					{
-						if(data.status!="ok")
+						if(data.status !== "ok")
 						{
 							$("#msgbox").attr("class","alert alert-danger");
 							$("#msgbox").show();
@@ -2101,20 +2335,164 @@ else
 				});
 			}
 		}
-		
-		
-    
-		
 	}
+	function sendMail()
+	{
+		// Wenn Checkboxen markiert sind, an diese senden, sonst an alle
+		if ($("input.prestudentCheckbox:checked").length > 0)
+		{
+			var elements = $("input.prestudentCheckbox:checked");
+		}
+		else
+		{
+			var elements = $("input.prestudentCheckbox:visible");
+		}
+
+		var mailadressen = "";
+		var adresse = "";
+		var counter = 0;
+		var adresseArray = [];
+
+		// Schleife ueber die einzelnen Elemente
+		// Aus Spamgründen dürfen je Nachricht maximal 100 Empfänger enthalten sein
+		// Deshalb wird nach 100 Einträgen ein neues window.location.href erzeugt
+		// Außerdem darf die URL nicht länger als 1988 Zeichen (2000 - 12 Zeichen URL-Prefix) sein.
+		$.each(elements, function(index, item)
+		{
+			adresse = $(this).closest("tr").find("td.clm_email a:first").attr("href");
+			adresse = adresse.replace(/^mailto?:/, "");
+			
+			if($.inArray(adresse, adresseArray) === -1)
+			{
+				if (counter > 0 && (counter % 100 === 0) || (adresseArray.join(";").length + adresse.length > 1988))
+				{
+					window.location.href = "mailto:?bcc="+adresseArray.join(";");
+					adresseArray = [];
+					adresseArray.push(adresse);
+					counter = 0;
+				}
+				else
+				{
+					adresseArray.push(adresse);
+				}
+				counter ++;
+			}			
+		});
+		window.location.href = "mailto:?bcc="+adresseArray.join(";");
+	}
+	function checkAllWithResult()
+	{
+		// Schleife ueber die einzelnen Elemente
+		$(".col_gesamtpunkte_ohne_physik").each(function()
+		{
+			if ($(this).text().trim() !== "")
+			{
+				$(this).parents("tr").find("input[type=checkbox]").prop("checked", true);
+			}
+			else
+			{
+				$(this).parents("tr").find("input[type=checkbox]").prop("checked", false);
+			}
+		});
+		if ($("input.prestudentCheckbox:checked").length > 0)
+			$("#mailSendButton").html("Mail an markierte senden");
+		else
+			$("#mailSendButton").html("Mail an alle senden");
+	}
+	function punkteUebertragen(reihungstest)
+	{
+		var prestudentPunkteArr = [];
+		var gesamtpunkteSetzen = false;
+		var zuBewerberMachen = false;
+		if ($("input.prestudentCheckbox:checked").length === 0)
+		{
+			alert("Bitte wählen Sie mindestens einen Eintrag aus der Liste");
+			return false;
+		}
+		else
+		{
+			//if (confirm("Setzt bei allen markierten Personen \'Zum Reihungstest angetreten\' und informiert die entsprechende Studiengangsassistenz. Wollen Sie fortfahren?"))
+			{
+				$("input.prestudentCheckbox:checked").each(function() 
+				{
+					if ($("#uebertragenOptionPhysik:checked").length === 1)
+					{
+						prestudentPunkteArr.push({
+				 		    prestudent_id: $(this).attr("name"), 
+							ergebnis:  $(this).parents("tr").find(".erg_gesamt_mit_physik").text()
+				 		});
+					}
+					else
+					{
+						prestudentPunkteArr.push({
+				 		    prestudent_id: $(this).attr("name"), 
+							ergebnis:  $(this).parents("tr").find(".erg_gesamt_ohne_physik").text()
+				 		});
+					}
+			    });
+			    
+				$(".loaderIcon").show();
+				if ($("#uebertragenOptionGesamtpunkte:checked").length === 1)
+				{
+					gesamtpunkteSetzen = true;
+				}
+				if ($("#uebertragenOptionBewerber:checked").length === 1)
+				{
+					zuBewerberMachen = true;
+				}
+				
+				data = {
+					reihungstest_id: reihungstest,
+					prestudentPunkteArr: prestudentPunkteArr,
+					gesamtpunkteSetzen: gesamtpunkteSetzen,
+					zuBewerberMachen: zuBewerberMachen,
+					punkteUebertragen: true
+				};
+	
+				$.ajax({
+					url: "auswertung_fhtw.php",
+					data: data,
+					type: "POST",
+					dataType: "json",
+					success: function(data)
+					{
+						$("#msgbox").html("");
+						if(data["msg_success"] !== "")
+						{
+							$("#msgbox").attr("class","alert alert-success");
+							$(".loaderIcon").hide();
+							$("#msgbox").show();
+							$("#msgbox").append(data["msg_success"]);
+						}
+						if(data["msg_warning"] !== "")
+						{
+							$("#msgbox").attr("class","alert alert-warning");
+							$(".loaderIcon").hide();
+							$("#msgbox").show();
+							$("#msgbox").append(data["msg_warning"]);
+							//$("#msgbox").html(data["msg"]).delay(2000).fadeOut();
+						}
+						if(data["msg_error"] !== "")
+						{
+							$("#msgbox").attr("class","alert alert-danger");
+							$(".loaderIcon").hide();
+							$("#msgbox").show();
+							$("#msgbox").append(data["msg_error"]);
+						}
+					},
+					error: function(data)
+					{
+						$("#msgbox").attr("class","alert alert-danger");
+						$("#msgbox").show();
+						$("#msgbox").html(data["msg"]);
+					}
+				});
+			}
+		}
+	}
+	  
 	</script>
 	<style>
-	.msgbox
-	{
-		color: #155724;
-		background-color: #d4edda;
-		padding: .75rem 1.25rem;
-		border: 1px solid #c3e6cb;
-	}
 	.info
 	{
 		color: #0c5460;
@@ -2187,14 +2565,14 @@ else
 	<div class="container-fluid">
 	<h3>Auswertung Reihungstest</h3>
 	<div class="row">
-	<div class="col-xs-8 col-lg-6">
+	<div class="col-md-6">
 			<form method="POST">
 			<table><tr><td>
 			<table class="table table-bordered" style="margin-bottom: 0">
 			<tr>
 			<td style="white-space:nowrap; padding: 10px;">
 				Reihungstest wählen:
-					<SELECT id="reihungstest" name="reihungstest">
+					<SELECT id="reihungstest" name="reihungstest" style="width: 60%">
 					<OPTION value="">-- keine Auswahl --</OPTION>';
 	$selected = '';
 	$select = false;
@@ -2270,7 +2648,7 @@ else
 	}
 	echo '</SELECT>';
 
-	echo ' von Datum: <INPUT class="datepicker_datum" type="text" name="datum_von" maxlength="10" size="10" value="' . $datum_obj->formatDatum($datum_von, 'd.m.Y') . '" />&nbsp;';
+	echo 'von Datum: <INPUT class="datepicker_datum" type="text" name="datum_von" maxlength="10" size="10" value="' . $datum_obj->formatDatum($datum_von, 'd.m.Y') . '" />&nbsp;';
 	echo 'bis Datum: <INPUT class="datepicker_datum" type="text" name="datum_bis" maxlength="10" size="10" value="' . $datum_obj->formatDatum($datum_bis, 'd.m.Y') . '" />';
 	echo '</td></tr>';
 	echo '<tr><td>';
@@ -2288,52 +2666,8 @@ else
 									class="btn btn-primary"
 									role="button">
 										<span class="glyphicon glyphicon-export"></span> Excel</a>';
-	echo '</td></tr></table></form></div>
-			<div class="col-xs-4 col-lg-6">
-			';
-	echo '	';
-	$displayWarning = false;
-	$displayInfo = false;
-	if (isset($rtest[$reihungstest]) && $rtest[$reihungstest]->freigeschaltet === false)
-	{
-		$displayWarning = true;
-		$displayInfo = false;
-	}
-	elseif (isset($rtest[$reihungstest]) && $rtest[$reihungstest]->freigeschaltet === true)
-	{
-		$displayWarning = false;
-		$displayInfo = true;
-	}
-	echo '	<div id="freischaltenWarning" class="alert alert-warning" style="display: '.($displayWarning ? 'block' : 'none').'">Dieser Reihungstest wurde noch nicht freigeschaltet 
-				<button class="btn btn-warning" onclick="freischalten('.$reihungstest.', true)">Jetzt freischalten</button>
-			</div>';
-	echo '	<div id="freischaltenInfo" class="alert alert-info" style="display: '.($displayInfo ? 'block' : 'none').'">Dieser Reihungstest ist freigeschaltet. Bitte sperren Sie ihn nach dem Test 
-				<button class="btn btn-info" onclick="freischalten('.$reihungstest.', false)">Jetzt sperren</button>
-			</div>';
-	if ($messageSuccess != '' || $messageError != '')
-	{
-		$display = '';
-		if ($messageSuccess != '')
-		{
-			$class = 'class="alert alert-success"';
-			$message = $messageSuccess;
-		}
-		elseif ($messageError != '')
-		{
-			$class = 'class="alert alert-danger"';
-			$message = $messageError;
-		}
-	}
-	else
-	{
-		$display = 'style="display: none"';
-		$class = 'class="alert alert-success"';
-		$message = '';
-	}
-	echo '	<div id="msgbox" '.$class.' '.$display.'>'.$message.'</div>';
-	echo ' <div class="loaderIcon center-block" style="display: none; margin-top: 10px"></div>';
-	echo '	</div>';
-	echo '</div><div class="row"><div class="col-xs-6">';
+	echo '</td></tr></table></form>';
+	echo '<div class="row"><div class="col-xs-12">';
 	echo 'Auswahl: <strong>';
 	if (isset ($_REQUEST['studiengang']) && $_REQUEST['studiengang'] != '')
 	{
@@ -2372,7 +2706,15 @@ else
 			$berechtigteOes[] = $stg->oe_kurzbz;
 		}
 	}
-	echo '<form class="form-inline" role="form" method="post" action="' . basename(__FILE__) . '?studiengang=' . $studiengang . '&semester=' . $semester . '&datum_von=' . $datum_von . '&datum_bis=' . $datum_bis . '&prestudent_id=' . $prestudent_id . '&reihungstest=' . $reihungstest . '"><div class="row" style="">';
+	echo '<form class="form-inline" role="form" method="post" action="' . basename(__FILE__) . '?
+				studiengang=' . $studiengang . '&
+				semester=' . $semester . '&
+				datum_von=' . $datum_von . '&
+				datum_bis=' . $datum_bis . '&
+				prestudent_id=' . $prestudent_id . '&
+				reihungstest=' . $reihungstest . '">
+		<div class="row" style="">';
+	echo '<div class="col-xs-12">';
 	if ($reihungstest != '')
 	{
 		$disabled = false;
@@ -2385,46 +2727,100 @@ else
 	// Nur aktiv, wenn Reihungstest ausgewählt
 	if ($rechte->isBerechtigtMultipleOe('lehre/reihungstestAufsicht', $berechtigteOes, 'su'))
 	{
-
-		echo '<div class="col-xs-6"><button '.($disabled ? 'disabled' : '').' type="button" class="btn btn-primary" onclick="testende('.$reihungstest.')" title="'.($disabled ? 'Nur aktiv bei ausgewähltem Reihungstesttermin' : 'Informiert die Assistenz über das Testende (alle markierten)').'">Testende</button>';
+		echo '<button '.($disabled ? 'disabled' : '').' type="button" class="btn btn-primary" onclick="testende('.$reihungstest.')" title="'.($disabled ? 'Nur aktiv bei ausgewähltem Reihungstesttermin' : 'Informiert die Assistenz über das Testende (alle markierten)').'">Testende...</button>';
 	}
-	/*echo '
-			<br>
-			<button id="columnSelector" type="button" class="btn btn-default">
-				  Select Column
-			</button>
-			<div class="hidden">
-			  <div id="popover-target"></div>
-			</div>
-				';*/
 
 	// Input um Personen hinzuzufügen
 	// Nur aktiv, wenn Reihungstest ausgewählt
 	if ($rechte->isBerechtigt('lehre/reihungstestAufsicht', null, 'sui'))
 	{
 		echo '
-				
-					<!--<form method="post" action="' . basename(__FILE__) . '?studiengang=' . $studiengang . '&semester=' . $semester . '&datum_von=' . $datum_von . '&datum_bis=' . $datum_bis . '&prestudent_id=' . $prestudent_id . '&reihungstest=' . $reihungstest . '">-->
-						<div class="input-group">
-							<input '.($disabled ? 'disabled' : '').' type="text" maxlength="128" id="zuteilungAutocomplete" class="form-control" placeholder="Person zuteilen" title="'.($disabled ? 'Nur aktiv bei ausgewähltem Reihungstesttermin' : '').'">
-							<input type="hidden" name="prestudentToAdd" id="zuteilungAutocompleteHidden" value="">
-							<input type="hidden" name="method" value="addPerson">
-							<input type="hidden" name="reihungstest_id" id="zuteilungAutocompleteHidden" value="' . $reihungstest . '">
-							<span class="input-group-btn">
-								<button '.($disabled ? 'disabled' : '').' type="submit" class="btn btn-primary" name="addPersonToTestButton" value="Zuteilen" title="'.($disabled ? 'Nur aktiv bei ausgewähltem Reihungstesttermin' : '').'">
-									Zuteilen
-								</button>
-							</span>
-						</div>
-					<!--</form>-->
-				
+				<div class="input-group" style="margin-left: 10px">
+					<input '.($disabled ? 'disabled' : '').' type="text" maxlength="128" id="zuteilungAutocomplete" class="form-control" placeholder="Person zuteilen" title="'.($disabled ? 'Nur aktiv bei ausgewähltem Reihungstesttermin' : '').'">
+					<input type="hidden" name="prestudentToAdd" id="zuteilungAutocompleteHidden" value="">
+					<input type="hidden" name="method" value="addPerson">
+					<input type="hidden" name="reihungstest_id" id="zuteilungAutocompleteHidden" value="' . $reihungstest . '">
+					<span class="input-group-btn">
+						<button '.($disabled ? 'disabled' : '').' type="submit" class="btn btn-primary" name="addPersonToTestButton" value="Zuteilen" title="'.($disabled ? 'Nur aktiv bei ausgewähltem Reihungstesttermin' : '').'">
+							Zuteilen
+						</button>
+					</span>
+				</div>				
 		';
 	}
 	if ($rechte->isBerechtigt('lehre/reihungstestAufsicht', null, 'suid'))
 	{
-		echo '<button type="button" class="btn btn-warning" id="toggleDelete">Löschoptionen anzeigen</button></div></div></form>';
+		echo '<button type="button" style="margin-left: 10px" class="btn btn-warning" id="toggleDelete">Löschoptionen anzeigen...</button>';
 	}
-	echo '<div class="col-xs-6"></div>';
+	echo '<br><br>';
+	echo '<button type="button" class="btn btn-primary btn-xs" onclick="sendMail()" id="mailSendButton">Mail an alle senden</button>';
+	echo '<button type="button" class="btn btn-primary btn-xs" onclick="checkAllWithResult()" id="" style="margin-left: 10px">Alle mit Ergebnis markieren</button>';
+	echo '<button type="button" class="btn btn-primary btn-xs" id="showUebertragenOptionsButton" style="margin-left: 10px">Punkte ins FAS übertragen...</button>';
+	echo '</div></div></form>';
+	echo '	<form class="form" role="form">
+			<div class="panel panel-default" id="uebertragenOptions" style="display: none">
+			 <div class="panel-body">
+				 <div class="checkbox">
+				  <label><input type="checkbox" id="uebertragenOptionPhysik" value="">Mit Physik</label>
+				</div>
+				<div class="checkbox">
+				  <label><input type="checkbox" id="uebertragenOptionGesamtpunkte" value="">"Gesamtpunkte" und "Reihungsverfahren absolviert" setzen</label>
+				</div>
+				<div class="checkbox">
+				  <label><input type="checkbox" id="uebertragenOptionBewerber" value="">Zu Bewerber machen</label>
+				</div>
+				<button type="button" class="btn btn-success" onclick="punkteUebertragen('.$reihungstest.')" id="punkteUebertragenButton" style="margin-left: 10px">Jetzt übertragen</button>
+			</div>
+			</div>
+			</form>';
+
+	echo '</div>
+			<div class="col-md-6">';
+	echo '	';
+	$displayWarning = false;
+	$displayInfo = false;
+	if (isset($rtest[$reihungstest]) && $rtest[$reihungstest]->freigeschaltet === false)
+	{
+		$displayWarning = true;
+		$displayInfo = false;
+	}
+	elseif (isset($rtest[$reihungstest]) && $rtest[$reihungstest]->freigeschaltet === true)
+	{
+		$displayWarning = false;
+		$displayInfo = true;
+	}
+	echo '	<div id="freischaltenWarning" class="alert alert-warning" style="display: '.($displayWarning ? 'block' : 'none').'">Um den Reihungstest starten zu können, muss dieser freigeschaltet werden  
+				<button class="btn btn-warning" onclick="freischalten('.$reihungstest.', true)">Jetzt freischalten</button>
+			</div>';
+	echo '	<div id="freischaltenInfo" class="alert alert-info" style="display: '.($displayInfo ? 'block' : 'none').'">Dieser Reihungstest ist freigeschaltet. Bitte sperren Sie ihn nach dem Test 
+				<button class="btn btn-info" onclick="freischalten('.$reihungstest.', false)">Jetzt sperren</button>
+			</div>';
+	if ($messageSuccess != '' || $messageError != '')
+	{
+		$display = '';
+		if ($messageSuccess != '')
+		{
+			$class = 'class="alert alert-success"';
+			$message = $messageSuccess;
+		}
+		elseif ($messageError != '')
+		{
+			$class = 'class="alert alert-danger"';
+			$message = $messageError;
+		}
+	}
+	else
+	{
+		$display = 'style="display: none"';
+		$class = 'class="alert alert-success"';
+		$message = '';
+	}
+	echo '	<div id="msgbox" '.$class.' '.$display.'>'.$message.'</div>';
+	echo ' <div class="loaderIcon center-block" style="display: none; margin-top: 10px"></div>';
+	echo '	</div>';
+	echo '</div>';
+
+	//echo '<div class="col-xs-4"></div>';
 	if (isset($_REQUEST['reihungstest']))
 	{
 		echo '
@@ -2437,13 +2833,14 @@ else
 						<a href="#" data-toggle="checkboxes" data-action="uncheck" id="uncheck_table"><img src="../../skin/images/checkbox_uncheck.png" name="toggle"></a>
 					</nobr>
 				</th>
-				<th rowspan="2">PrestudentIn_ID</th>
+				<th rowspan="2">PreId</th>
+				<th rowspan="2"><span class="glyphicon glyphicon-envelope"></span></th>
 				<th rowspan="2">Nachname</th>
 				<th rowspan="2">Vornamen</th>
 				<th rowspan="2">GebDatum</th>
 				<th rowspan="2" style="width: 20px">G</th>
-				<!--<th rowspan="2">ZGV</th>
-				<th rowspan="2">ZGV MA</th>-->
+				<th rowspan="2">ZGV</th>
+				<th rowspan="2">ZGV MA</th>
 				<!--<th rowspan="2">Registriert</th>-->
 				<th rowspan="2">STG</th>
 				<!--<th rowspan="2">Studiengang</th>-->
@@ -2451,6 +2848,7 @@ else
 				<th title="Organisationsform" rowspan="2">OF</th>
 				<th title="Priorität" rowspan="2" style="width: 20px">Prio</th>
 				<th rowspan="2">Raum</th>
+				<th title="Teilgenommen" rowspan="2">TG</th>
 				<th colspan="2">Gesamt mit Physik</th>
 				<th colspan="2">Gesamt ohne Physik</th>';
 
@@ -2478,33 +2876,49 @@ else
 		{
 			foreach ($ergb AS $erg)
 			{
+				$inaktiv = '';
+				if ($erg->letzter_status == 'Abgewiesener')
+				{
+					$inaktiv = 'text-muted';
+				}
 				echo "<tr id='row_".$erg->prestudent_id."'>
-						<td style='text-align: center'>
+						<td style='text-align: center' class='".$inaktiv."'>
 							<input type='checkbox' id='checkbox_$erg->prestudent_id' class='prestudentCheckbox' name='$erg->prestudent_id'>
 						</td>
-						<td>$erg->prestudent_id <a href=".APP_ROOT."cis/testtool/admin/auswertung_detail_prestudent.php?prestudent_id=$erg->prestudent_id target='blank'>Details</a></td>
-						<td>$erg->nachname</td>
-						<td>$erg->vorname</td>
-						<td>" . $datum_obj->formatDatum($erg->gebdatum, 'd.m.Y') . "</td>
-						<td>$erg->geschlecht</td>
-						<!--<td>" . $zgv_arr[$erg->zgv] . "</td>
-						<td>" . $zgvma_arr[$erg->zgvma] . "</td>-->
+						<!--<td>$erg->prestudent_id <a href=".APP_ROOT."cis/testtool/admin/auswertung_detail_prestudent.php?prestudent_id=$erg->prestudent_id target='blank'>Details</a></td>-->
+						<td class='".$inaktiv."'>$erg->prestudent_id</td>
+						<td class='clm_email ".$inaktiv."'><a href='mailto:$erg->email'><span class='glyphicon glyphicon-envelope'></span></a></td>
+						<td class='".$inaktiv."'>".$erg->nachname." ".($erg->qualifikationskurs == true ? "<span title='Qualifikationskurs' style='color: red'>(Q)</span>" : "")."</td>
+						<td class='".$inaktiv."'>$erg->vorname</td>
+						<td class='".$inaktiv."'>" . $datum_obj->formatDatum($erg->gebdatum, 'd.m.Y') . "</td>
+						<td class='".$inaktiv."'>$erg->geschlecht</td>
+						<td class='".$inaktiv."' nowrap>" . $zgv_arr[$erg->zgv] . "</td>
+						<td class='".$inaktiv."' nowrap>" . $zgvma_arr[$erg->zgvma] . "</td>
 						<!--<td>$erg->registriert</td>-->
-						<td>$erg->stg_kurzbz</td>
+						<td class='".$inaktiv."'>$erg->stg_kurzbz</td>
 						<!--<td>$erg->stg_bez</td>-->
-						<td>$erg->ausbildungssemester</td>
-						<td>$erg->orgform</td>
-						<td>$erg->prioritaet</td>
-						<td>$erg->raum</td>";
+						<td class='".$inaktiv."'>$erg->ausbildungssemester</td>
+						<td class='".$inaktiv."'>$erg->orgform</td>
+						<td class='".$inaktiv."'>$erg->prioritaet</td>
+						<td class='".$inaktiv."'>$erg->raum</td>
+						<td class='".$inaktiv."'>".($erg->teilgenommen == true ? "<span class='glyphicon glyphicon-ok'></span>" : "")."</td>";
 				//<td>$erg->idnachweis</td>
-				echo '	<td style="text-align: right; padding-right: 3px" class="punkte" nowrap><span class="punkteSpan"><b>' . ($erg->gesamtpunkte != '' ? number_format($erg->gesamtpunkte, 2, ',', ' ') : '') . '</b></span><span class="deleteSpan"  style="display: none">';
-				//if ($erg->gesamtpunkte != '')
+				echo '	<td style="text-align: right; padding-right: 3px" class="punkte '.$inaktiv.'" nowrap>';
+				// Punkte können nur gelöscht werden, solange "Zum Reihungstest angetreten" nicht gesetzt ist
+				if ($erg->teilgenommen == false || $rechte->isBerechtigt('admin'))
 				{
-					echo '  <a href="#" onclick="deleteAllResults(' . $erg->prestudent_id . ', \'' . $erg->vorname . ' ' . $erg->nachname . '\');">
-								<span class="glyphicon glyphicon-remove" style="color: #c82333;"></span>
-							</a>';
+					echo '  <span class="punkteSpan"><b>' . ($erg->gesamtpunkte != '' ? number_format($erg->gesamtpunkte, 2, ',', ' ') : '') . '</b></span>
+							<span class="deleteSpan"  style="display: none">
+								<a href="#" onclick="deleteAllResults(' . $erg->prestudent_id . ', \'' . $erg->vorname . ' ' . $erg->nachname . '\');">
+									<span class="glyphicon glyphicon-remove" style="color: #c82333;"></span>
+								</a>
+							</span>';
 				}
-				echo '	</span></td>';
+				else
+				{
+					echo '  <span class=""><b>' . ($erg->gesamtpunkte != '' ? number_format($erg->gesamtpunkte, 2, ',', ' ') : '') . '</b></span>';
+				}
+				echo '	</td>';
 				if (!isset($erg->gesamtpunkte_ohne_physik))
 				{
 					$erg->gesamtpunkte_ohne_physik = '';
@@ -2513,9 +2927,17 @@ else
 				{
 					$erg->gesamt_ohne_physik = '';
 				}
-				echo '	<td style="text-align: right; padding-right: 3px" class="punkte" nowrap><b>' . ($erg->gesamt != '' ? number_format($erg->gesamt, 2, ',', ' ') : '') . '</b></td>';
-				echo '	<td style="text-align: right; padding-right: 3px" class="punkte" nowrap><b>' . ($erg->gesamtpunkte_ohne_physik != '' ? number_format($erg->gesamtpunkte_ohne_physik, 2, ',', ' ') : '') . '</b></td>';
-				echo '	<td style="text-align: right; padding-right: 3px" class="punkte" nowrap><b>' . ($erg->gesamt_ohne_physik != '' ? number_format($erg->gesamt_ohne_physik, 2, ',', ' ') : '') . '</b></td>';
+				echo '	<td style="text-align: right; padding-right: 3px" class="punkte '.$inaktiv.'" nowrap>
+							<b>' . ($erg->gesamt != '' ? number_format($erg->gesamt, 2, ',', ' ') : '') . '</b>
+							<span class="erg_gesamt_mit_physik" style="display: none">'.$erg->gesamt.'</span>
+						</td>';
+				echo '	<td style="text-align: right; padding-right: 3px" class="col_gesamtpunkte_ohne_physik '.$inaktiv.'" nowrap>
+							<b>' . ($erg->gesamtpunkte_ohne_physik != '' ? number_format($erg->gesamtpunkte_ohne_physik, 2, ',', ' ') : '') . '</b>
+						</td>';
+				echo '	<td style="text-align: right; padding-right: 3px" class="punkte '.$inaktiv.'" nowrap>
+							<b>' . ($erg->gesamt_ohne_physik != '' ? number_format($erg->gesamt_ohne_physik, 2, ',', ' ') : '') . '</b>
+							<span class="erg_gesamt_ohne_physik" style="display: none">'.$erg->gesamt_ohne_physik.'</span>
+						</td>';
 				foreach ($gebiet AS $gbt)
 				{
 					if (isset($erg->gebiet[$gbt->gebiet_id]))
@@ -2530,15 +2952,24 @@ else
 							$style = 'style="text-align: right; padding-right: 3px"';
 						}
 
-						echo '<td ' . $style . ' class="pst_' . $erg->prestudent_id . '_gbt_' . $gbt->gebiet_id . ' punkte" nowrap><span class="punkteSpan">' . ($erg->gebiet[$gbt->gebiet_id]->punkte != '' ? number_format($erg->gebiet[$gbt->gebiet_id]->punkte, 2, ',', ' ') : '') . '</span><span class="deleteSpan"  style="display: none">';
-						if ($erg->gebiet[$gbt->gebiet_id]->punkte != '')
+						echo '<td ' . $style . ' class="pst_' . $erg->prestudent_id . '_gbt_' . $gbt->gebiet_id . ' punkte '.$inaktiv.'" nowrap>
+								';
+						// Punkte können nur gelöscht werden, solange "Zum Reihungstest angetreten" nicht gesetzt ist
+						if ($erg->teilgenommen == false || $rechte->isBerechtigt('admin'))
 						{
-							echo '  <a href="#" onclick="deleteResult(' . $erg->prestudent_id . ',' . $gbt->gebiet_id . ', \'' . $erg->vorname . ' ' . $erg->nachname . '\', \'' . $gbt->name . '\');">
-										<span class="glyphicon glyphicon-remove" style="color: #e0a800;"></span>
-									</a>';
+							echo '  <span class="punkteSpan">' . ($erg->gebiet[$gbt->gebiet_id]->punkte != '' ? number_format($erg->gebiet[$gbt->gebiet_id]->punkte, 2, ',', ' ') : '') . '</span>
+									<span class="deleteSpan"  style="display: none">
+										<a href="#" onclick="deleteResult(' . $erg->prestudent_id . ',' . $gbt->gebiet_id . ', \'' . $erg->vorname . ' ' . $erg->nachname . '\', \'' . $gbt->name . '\');">
+											<span class="glyphicon glyphicon-remove" style="color: #e0a800;"></span>
+										</a>
+									</span>';
 						}
-						echo '</span</td>';
-						echo '<td ' . $style . ' class="pst_' . $erg->prestudent_id . '_gbt_' . $gbt->gebiet_id . ' punkte" nowrap>' . ($erg->gebiet[$gbt->gebiet_id]->prozent != '' ? number_format($erg->gebiet[$gbt->gebiet_id]->prozent, 2, ',', ' ') . ' %' : '') . '</td>';
+						else
+						{
+							echo '  <span class="">' . ($erg->gebiet[$gbt->gebiet_id]->punkte != '' ? number_format($erg->gebiet[$gbt->gebiet_id]->punkte, 2, ',', ' ') : '') . '</span>';
+						}
+						echo '</td>';
+						echo '<td ' . $style . ' class="pst_' . $erg->prestudent_id . '_gbt_' . $gbt->gebiet_id . ' punkte '.$inaktiv.'" nowrap>' . ($erg->gebiet[$gbt->gebiet_id]->prozent != '' ? number_format($erg->gebiet[$gbt->gebiet_id]->prozent, 2, ',', ' ') . ' %' : '') . '</td>';
 					}
 					else
 					{

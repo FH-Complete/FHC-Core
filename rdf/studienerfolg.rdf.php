@@ -242,6 +242,7 @@ function draw_studienerfolg($uid, $studiensemester_kurzbz)
 				$xml .= "				<bezeichnung_englisch><![CDATA[".$row->lehrveranstaltung_bezeichnung_english."]]></bezeichnung_englisch>";
 				$xml .= "				<note>".$note."</note>";
 				$xml .= "				<note_idx>".$row->note."</note_idx>";
+				$xml .= "				<note_positiv>".$row->note_positiv."</note_positiv>";
 				$sws = sprintf('%.1F',$row->semesterstunden/$wochen);
 				$xml .= "				<sws>".$sws."</sws>";
 				$sws_lv = sprintf('%.1F',$row->sws);

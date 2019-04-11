@@ -344,6 +344,13 @@ if (isset($_GET['type']) && $_GET['type'] == 'getstudienplancontent' && isset($_
 			$( "#studienplandiv" ).html(html);
 		});
 	}
+
+	function changeGebnation()
+	{
+		var nation = document.getElementById('adresse_nation').value;
+		document.getElementById('geburtsnation').value = nation;
+		document.getElementById('staatsbuergerschaft').value = nation;
+	}
 	</script>
 </head>
 <body>
@@ -416,6 +423,8 @@ if ($gemeinde == '' && $ort != '')
 	$ort = '';
 }
 $email = (isset($_REQUEST['email'])?$_REQUEST['email']:'');
+$geburtsnation = (isset($_REQUEST['geburtsnation'])?$_REQUEST['geburtsnation']:'A');
+$staatsbuergerschaft = (isset($_REQUEST['staatsbuergerschaft'])?$_REQUEST['staatsbuergerschaft']:'A');
 $telefon = (isset($_REQUEST['telefon'])?$_REQUEST['telefon']:'');
 $mobil = (isset($_REQUEST['mobil'])?$_REQUEST['mobil']:'');
 $letzteausbildung = (isset($_REQUEST['letzteausbildung'])?$_REQUEST['letzteausbildung']:'');
@@ -551,8 +560,8 @@ if (isset($_POST['save']))
 		$person->vornamen = $vornamen;
 		$person->geschlecht = $geschlecht;
 		$person->gebdatum = $datum_obj->formatDatum($geburtsdatum,'Y-m-d');
-		$person->geburtsnation = 'A';
-		$person->staatsbuergerschaft = 'A';
+		$person->geburtsnation = $geburtsnation;
+		$person->staatsbuergerschaft = $staatsbuergerschaft;
 		$person->aktiv = true;
 		$person->insertamum = date('Y-m-d H:i:s');
 		$person->insertvon = $user;
@@ -928,7 +937,7 @@ echo '<tr><td>Anrede</td><td><input type="text" id="anrede" name="anrede" maxlen
 echo '<tr><td>Titel(Pre)</td><td><input type="text" id="titel" name="titel" maxlength="64" value="'.$titel.'" /></td></tr>';
 echo '<tr><td>Vorname </td><td><input type="text" id="vorname" maxlength="32" name="vorname" value="'.$vorname.'" /></td></tr>';
 echo '<tr><td>Weitere Vornamen </td><td><input type="text" id="vornamen" maxlength="32" name="vornamen" value="'.$vornamen.'" /></td></tr>';
-echo '<tr><td>Nachname *</td><td><input type="text" maxlength="64" id="nachname" name="nachname" value="'.$nachname.'" /></td></tr>';
+echo '<tr><td>Nachname *</td><td><input type="text" maxlength="64" id="nachname" name="nachname" value="'.$nachname.'" required="required" autofocus/></td></tr>';
 echo '<tr><td>Titel(Post)</td><td><input type="text" id="titelpost" name="titelpost" maxlength="64" value="'.$titelpost.'" /></td></tr>';
 echo '<tr><td>Geschlecht *</td><td><SELECT id="geschlecht" name="geschlecht">';
 echo '<OPTION value="m" '.($geschlecht=='m'?'selected':'').'>m&auml;nnlich</OPTION>';
@@ -943,7 +952,7 @@ if (isset($adresse_nation) && $adresse_nation == 'A' && isset($plz) && $plz > 10
 	$nationstyle = 'style="border: 1px solid red"';
 else
 	$nationstyle = '';
-echo '<tr><td>Nation</td><td><SELECT name="adresse_nation" id="adresse_nation" onchange="loadGemeindeData()" '.$nationstyle.'>';
+echo '<tr><td>Land</td><td><SELECT name="adresse_nation" id="adresse_nation" onchange="loadGemeindeData();changeGebnation()" '.$nationstyle.'>';
 $nation =  new nation();
 $nation->getAll();
 foreach ($nation->nation as $row)
@@ -989,6 +998,30 @@ echo '<div style="display: none;" id="ueb1"><input type="radio" id="ueberschreib
 echo '<div style="display: none;" id="ueb2"><input type="radio" id="ueberschreiben2" name="ueberschreiben" value="Nein" onclick="disablefields2(false)" checked>Adresse hinzufügen</div>';
 echo '<div style="display: none;" id="ueb3"><input type="radio" id="ueberschreiben3" name="ueberschreiben" value="" onclick="disablefields2(true)">Adresse nicht anlegen</div>';
 echo '</fieldset></td></tr>';
+echo '<tr><td>Geburtsnation</td><td><SELECT name="geburtsnation" id="geburtsnation">';
+$nation =  new nation();
+$nation->getAll();
+foreach ($nation->nation as $row)
+{
+	if ($row->code == $geburtsnation)
+		$selected = 'selected';
+	else
+		$selected = '';
+	echo "<option value='$row->code' $selected>$row->langtext</option>";
+}
+echo '</SELECT></td></tr>';
+echo '<tr><td>Staatsbürgerschaft</td><td><SELECT name="staatsbuergerschaft" id="staatsbuergerschaft">';
+$nation =  new nation();
+$nation->getAll();
+foreach ($nation->nation as $row)
+{
+	if ($row->code == $staatsbuergerschaft)
+		$selected = 'selected';
+	else
+		$selected = '';
+	echo "<option value='$row->code' $selected>$row->langtext</option>";
+}
+echo '</SELECT></td></tr>';
 echo '<tr><td>EMail</td><td><input type="text" id="email" maxlength="128" name="email" value="'.$email.'" /></td></tr>';
 echo '<tr><td>Telefon</td><td><input type="text" id="telefon" maxlength="128" name="telefon" value="'.$telefon.'" /></td></tr>';
 echo '<tr><td>Mobil</td><td><input type="text" id="mobil" maxlength="128" name="mobil" value="'.$mobil.'" /></td></tr>';

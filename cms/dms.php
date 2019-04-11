@@ -64,7 +64,7 @@ if($doc->isLocked($id))
 	//und person_id Besitzer des Dokuments ist (person_id aus tbl_akte)
 	//und das Dokument in der Onlinebewerbung hochgeladen werden kann
 	//darf das Dokument heruntergeladen werden
-	if($person_id!='' && $akte_id!='')
+	if($person_id != '' && $akte_id != '')
 	{
 		$akte = new akte();
 		$akte->load($akte_id);
@@ -102,15 +102,15 @@ if($doc->isLocked($id))
 			// dann darf nur mit diesem Recht darauf zugegriffen werden
 			$kategorie = new dms();
 			$kategorie->loadKategorie($doc->kategorie_kurzbz);
-			if($kategorie->berechtigung_kurzbz!='')
+			if($kategorie->berechtigung_kurzbz != '')
 			{
 				if(!$rechte->isBerechtigt($kategorie->berechtigung_kurzbz))
-					die('Sie haben keinen Zugriff auf dieses Dokument');
+					die($rechte->errormsg);
 			}
 
 			//Globales DMS recht pruefen
 			if(!$rechte->isBerechtigt('basis/dms'))
-				die('Sie haben keinen Zugriff auf dieses Dokument');
+				die($rechte->errormsg);
 		}
 	}
 }

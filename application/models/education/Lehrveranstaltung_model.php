@@ -203,4 +203,65 @@ class Lehrveranstaltung_model extends DB_Model
 
 		return $this->execQuery($qry, $params);
 	}
+
+	/**
+	 * Gets valid Lehrveranstaltungen with incoming places for a Studiensemester.
+	 * Only
+	 * 1. Lvs with incoming places > 0
+	 * 2. Studienplan valid in current semester or with Lehrauftrag (i.e. assigned Lehreinheit)
+	 * @param $studiensemester_kurzbz
+	 * @return object
+	 */
+	public function getLvsWithIncomingPlaces($studiensemester_kurzbz)
+	{
+		$this->load->model('organisation/Studiensemester_model', 'StudiensemesterModel');
+
+		$studsemres = $this->StudiensemesterModel->load($studiensemester_kurzbz);
+
+		if (!hasData($studsemres))
+			return success(array());
+
+		$parametersarray = array($studiensemester_kurzbz, $studsemres->retval[0]->studienjahr_kurzbz, $studiensemester_kurzbz, $studiensemester_kurzbz);
+
+		$query = "
+			SELECT * FROM (
+				SELECT DISTINCT ON (lv.lehrveranstaltung_id) lv.lehrveranstaltung_id, lv.bezeichnung AS lv_bezeichnung, lv.kurzbz AS lv_kurzbz, lv.sprache, lv.ects, lv.lehre,
+				lv.lehreverzeichnis, lv.sws, lv.lvs, lv.alvs, lv.lvps, lv.las, lv.incoming, lv.lehrform_kurzbz, lv.orgform_kurzbz AS lv_orgform, lv.semester,
+				? AS studiensemester_kurzbz, ? AS studienjahr_kurzbz, UPPER(stg.typ::VARCHAR(1) || stg.kurzbz) AS studiengang_kuerzel,
+				stg.bezeichnung AS studiengang_bezeichnung, stg.english AS studiengang_bezeichnung_english, stg.typ, stg.orgform_kurzbz AS studiengang_orgform,
+				tbl_sprache.locale, CASE WHEN lv.orgform_kurzbz NOTNULL THEN lv.orgform_kurzbz ELSE stg.orgform_kurzbz END AS orgform_kurzbz
+				FROM lehre.tbl_lehrveranstaltung lv
+				JOIN public.tbl_studiengang stg ON lv.studiengang_kz = stg.studiengang_kz
+				JOIN public.tbl_sprache ON lv.sprache = tbl_sprache.sprache
+				WHERE lv.lehrtyp_kurzbz != 'modul'
+						  AND (
+							EXISTS
+							(
+								WITH gueltige_studienplaene AS (
+									SELECT studienplan_id, semester
+									FROM lehre.tbl_studienplan
+									JOIN lehre.tbl_studienplan_semester USING(studienplan_id)
+									WHERE tbl_studienplan.aktiv
+									AND lehre.tbl_studienplan_semester.studiensemester_kurzbz = ?
+								)
+								SELECT 1
+								FROM lehre.tbl_studienplan_lehrveranstaltung
+								WHERE tbl_studienplan_lehrveranstaltung.studienplan_id IN (SELECT studienplan_id FROM gueltige_studienplaene)
+									  AND tbl_studienplan_lehrveranstaltung.semester IN
+										  (SELECT semester FROM gueltige_studienplaene
+											 WHERE gueltige_studienplaene.studienplan_id = tbl_studienplan_lehrveranstaltung.studienplan_id)
+									  AND tbl_studienplan_lehrveranstaltung.lehrveranstaltung_id = lv.lehrveranstaltung_id
+									  AND tbl_studienplan_lehrveranstaltung.export
+							)
+							OR EXISTS (SELECT 1 FROM lehre.tbl_lehreinheit WHERE lehrveranstaltung_id = lv.lehrveranstaltung_id AND studiensemester_kurzbz = ?)
+						  )
+				AND lv.incoming > 0
+				AND lv.aktiv
+				AND (stg.typ IN ('b', 'm') OR stg.studiengang_kz = 10006)-- ECI Studiengang Campus International
+			) lvs
+			ORDER BY studiengang_kuerzel, orgform_kurzbz, lv_bezeichnung, lehrform_kurzbz, lehrveranstaltung_id;
+		";
+
+		return $this->execQuery($query, $parametersarray);
+	}
 }

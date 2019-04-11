@@ -193,7 +193,8 @@ if (isset($_SESSION['pruefling_id']))
         )
 
 
-        SELECT DISTINCT
+        SELECT DISTINCT ON 
+            (gebiet_id, semester)
 	        semester,
 	        gebiet_id,
 	        bezeichnung,
@@ -252,6 +253,7 @@ if (isset($_SESSION['pruefling_id']))
 
         ORDER BY
 	        semester,
+	        gebiet_id,
 	        reihung
         ";
 

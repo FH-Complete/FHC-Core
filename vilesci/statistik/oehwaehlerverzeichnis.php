@@ -110,7 +110,7 @@ if($result = $db->db_query($qry))
 			$data_row[2]=implode(';',$personenkennzeichen);
 			$data_row[7]=implode(';',$studiengang_kz);
 
-			echo implode('|',$data_row)."|\r\n";
+			echo implode('|',$data_row)."\r\n";
 			$data_row = array();
 			$personenkennzeichen = array();
 			$studiengang_kz = array();
@@ -166,5 +166,5 @@ if($result = $db->db_query($qry))
 	$data_row[2]=implode(';',$personenkennzeichen);
 	$data_row[7]=implode(';',$studiengang_kz);
 
-	echo implode('|',$data_row)."|\r\n";
+	echo implode('|',$data_row)."\r\n";
 }

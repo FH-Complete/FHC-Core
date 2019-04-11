@@ -262,7 +262,7 @@ function AufnahmeTermineAuswahl()
     document.getElementById('aufnahmetermine-textbox-endpunkte-exkl-gebiete').value = endpunkte_exkl_gebiete;
 
     // Sichtbarkeit der RT-Vergleichsergebnispunkte (ohne Quereinsteiger)
-    var basisgebiet_punkte_anzeigen = <?php echo FAS_REIHUNGSTEST_PUNKTE_BASISGEBIET_ANZEIGEN ? 'true' : 'false' ?>;
+    var basisgebiet_punkte_anzeigen = <?php echo (defined('FAS_REIHUNGSTEST_PUNKTE_BASISGEBIET_ANZEIGEN') && FAS_REIHUNGSTEST_PUNKTE_BASISGEBIET_ANZEIGEN) ? 'true' : 'false' ?>;
 
     //  * Generell Anzeige nur wenn über config-Datei gesetzt ist
     if (basisgebiet_punkte_anzeigen)

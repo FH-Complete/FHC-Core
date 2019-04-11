@@ -600,41 +600,44 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
 			</table:table>
 			<text:p text:style-name="P19"/>
 			<text:p text:style-name="P20">¹ 1 Semester period per week = 45 minutes</text:p>
-			<text:p text:style-name="P20">² Grades:<text:tab/>excellent (1), very good (2), good (3), satisfactory (4), fail (5), not graded (nb), Credit based on previous experience/work (ar),<text:tab/>Participated with success (met), passed (b), successfully completed (ea), not successfully completed (nea), did not participate (nt), <text:tab/>participated(tg)</text:p>			
+			<text:p text:style-name="P20">² Grades:<text:tab/>excellent (1), very good (2), good (3), satisfactory (4), Credit based on previous experience/work (ar),</text:p>
+			<text:p text:style-name="P20"><text:tab/>Participated with success (met), passed (b), successfully completed (ea), participated (tg)</text:p>
 		</office:text>
 </xsl:template>
 <xsl:template match="unterrichtsfach">
-	<table:table-row table:style-name="Tabelle3.1">
-		<table:table-cell table:style-name="Tabelle3.A2" office:value-type="string">
-			<text:p text:style-name="P26">
-				<xsl:choose>
-					<xsl:when test="string-length(bezeichnung_englisch)!=0">
-						<xsl:value-of select="bezeichnung_englisch"/>
-					</xsl:when>
-					<xsl:otherwise>
-						<xsl:text>[ACHTUNG: Keine englische Bezeichung für "</xsl:text><xsl:value-of select="bezeichnung"/><xsl:text>" in der Datenbank!]</xsl:text>
-					</xsl:otherwise>
-				</xsl:choose>
-			</text:p>
-		</table:table-cell>
-		<table:table-cell table:style-name="Tabelle3.A2" office:value-type="string">
-			<text:p text:style-name="P27"><xsl:value-of select="../studiensemester_kurzbz" /></text:p>
-		</table:table-cell>
-		<table:table-cell table:style-name="Tabelle3.A2" office:value-type="string">
-			<text:p text:style-name="P27"><xsl:value-of select="../semester" /></text:p>
-		</table:table-cell>
-		<table:table-cell table:style-name="Tabelle3.A2" office:value-type="string">
-			<text:p text:style-name="P27"><xsl:value-of select="sws_lv" /></text:p>
-		</table:table-cell>
-		<table:table-cell table:style-name="Tabelle3.A2" office:value-type="string">
-			<text:p text:style-name="P27"><xsl:value-of select="ects" /></text:p>
-		</table:table-cell>
-		<table:table-cell table:style-name="Tabelle3.A2" office:value-type="string">
-			<text:p text:style-name="P27"><xsl:value-of select="benotungsdatum" /></text:p>
-		</table:table-cell>
-		<table:table-cell table:style-name="Tabelle3.G2" office:value-type="string">
-			<text:p text:style-name="P27"><xsl:value-of select="note" /></text:p>
-		</table:table-cell>
-	</table:table-row>
+	<xsl:if test="note_positiv='1'">
+		<table:table-row table:style-name="Tabelle3.1">
+			<table:table-cell table:style-name="Tabelle3.A2" office:value-type="string">
+				<text:p text:style-name="P26">
+					<xsl:choose>
+						<xsl:when test="string-length(bezeichnung_englisch)!=0">
+							<xsl:value-of select="bezeichnung_englisch"/>
+						</xsl:when>
+						<xsl:otherwise>
+							<xsl:text>[ACHTUNG: Keine englische Bezeichung für "</xsl:text><xsl:value-of select="bezeichnung"/><xsl:text>" in der Datenbank!]</xsl:text>
+						</xsl:otherwise>
+					</xsl:choose>
+				</text:p>
+			</table:table-cell>
+			<table:table-cell table:style-name="Tabelle3.A2" office:value-type="string">
+				<text:p text:style-name="P27"><xsl:value-of select="../studiensemester_kurzbz" /></text:p>
+			</table:table-cell>
+			<table:table-cell table:style-name="Tabelle3.A2" office:value-type="string">
+				<text:p text:style-name="P27"><xsl:value-of select="../semester" /></text:p>
+			</table:table-cell>
+			<table:table-cell table:style-name="Tabelle3.A2" office:value-type="string">
+				<text:p text:style-name="P27"><xsl:value-of select="sws_lv" /></text:p>
+			</table:table-cell>
+			<table:table-cell table:style-name="Tabelle3.A2" office:value-type="string">
+				<text:p text:style-name="P27"><xsl:value-of select="ects" /></text:p>
+			</table:table-cell>
+			<table:table-cell table:style-name="Tabelle3.A2" office:value-type="string">
+				<text:p text:style-name="P27"><xsl:value-of select="benotungsdatum" /></text:p>
+			</table:table-cell>
+			<table:table-cell table:style-name="Tabelle3.G2" office:value-type="string">
+				<text:p text:style-name="P27"><xsl:value-of select="note" /></text:p>
+			</table:table-cell>
+		</table:table-row>
+	</xsl:if>
 </xsl:template>
 </xsl:stylesheet>
