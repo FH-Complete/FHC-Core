@@ -80,6 +80,10 @@ class AuthLib
 						setSessionElement(self::SESSION_NAME, self::SESSION_AUTH_OBJ, getData($loginAS));
 					}
 				}
+				else
+				{
+					$loginAS = error('It is not allowed to switch to this user', AUTH_NOT_AUTHENTICATED); // not authenticated by default
+				}
 			}
 			else
 			{

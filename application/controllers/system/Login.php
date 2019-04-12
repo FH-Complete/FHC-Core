@@ -55,14 +55,7 @@ class Login extends FHC_Controller
 		$this->load->library('AuthLib');
 
 		$loginAS = $this->authlib->loginASByUID($uid);
-		if (isSuccess($loginAS))
-		{
-			$this->outputJsonSuccess(true); // obtained!
-		}
-		else
-		{
-			$this->outputJsonSuccess(getCode($loginAS)); // returns the error code
-		}
+		$this->outputJson($loginAS); // returns the error code
 	}
 
 	/**
