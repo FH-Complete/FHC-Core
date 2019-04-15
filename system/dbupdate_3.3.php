@@ -2849,6 +2849,21 @@ if($result = $db->db_query($qry_column_desc))
 	}
 }
 
+// App 'budget' hinzufügen
+if($result = $db->db_query("SELECT 1 FROM system.tbl_app WHERE app='budget'"))
+{
+	if($db->db_num_rows($result)==0)
+	{
+
+		$qry = "INSERT INTO system.tbl_app(app) VALUES('budget');";
+
+		if(!$db->db_query($qry))
+			echo '<strong>App: '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>Neue App budget in system.tbl_app hinzugefügt';
+	}
+}
+
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
 

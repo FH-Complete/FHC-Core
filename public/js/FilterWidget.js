@@ -851,6 +851,12 @@ var FHC_FilterWidget = {
 				for (var i = 0; i < data.dataset.length; i++)
 				{
 					var record = data.dataset[i];
+
+					if ($.isEmptyObject(record))
+					{
+						continue;
+					}
+
 					var strHtml = "<tr class='" + record.MARK_ROW_CLASS + "'>";
 
 					if (data.checkboxes != null && data.checkboxes != "")
