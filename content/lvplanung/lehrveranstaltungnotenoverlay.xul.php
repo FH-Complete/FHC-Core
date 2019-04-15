@@ -49,7 +49,8 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/bindings.css\" type=\"text/css
 	<menupopup id="lehrveranstaltung-noten-tree-popup">
 		<menuitem label="Entfernen" oncommand="LehrveranstaltungNotenDelete();" id="lehrveranstaltung-noten-tree-popup-delete" hidden="false"/>
 		<menuitem label="Freifaecher-Zertifikat erstellen" oncommand="LehrveranstaltungFFZertifikatPrint(event);" id="lehrveranstaltung-noten-tree-popup-ffzertifikat" hidden="false"/>
-		<menuitem label="Lehrveranstaltungszeugnis erstellen" oncommand="LehrveranstaltungLVZeugnisPrint(event);" id="lehrveranstaltung-noten-tree-popup-lvzeugnis" hidden="false"/>
+		<menuitem label="Lehrveranstaltungszeugnis Deutsch erstellen" oncommand="LehrveranstaltungLVZeugnisPrint(event, 'German');" id="lehrveranstaltung-noten-tree-popup-lvzeugnis" hidden="false"/>
+		<menuitem label="Lehrveranstaltungszeugnis Englisch erstellen" oncommand="LehrveranstaltungLVZeugnisPrint(event, 'English');" id="lehrveranstaltung-noten-tree-popup-lvzeugnis-englisch" hidden="false"/>
 	</menupopup>
 </popupset>
 <hbox flex="1" style="margin-top: 10px;">

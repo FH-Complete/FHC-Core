@@ -427,7 +427,7 @@ function StudentFFZertifikatPrint(event)
 //****
 //* Erstellt ein Lehrveranstaltungszeugnis fuer die LV
 //****
-function StudentLVZeugnisPrint(event)
+function StudentLVZeugnisPrint(event, sprache)
 {
 //	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 	var tree = document.getElementById('student-noten-tree');
@@ -451,8 +451,11 @@ function StudentLVZeugnisPrint(event)
 	else
 		var output='pdf';
 
-
-	url =  '<?php echo APP_ROOT; ?>content/pdfExport.php?xml=lehrveranstaltungszeugnis.rdf.php&xsl=LVZeugnis&stg_kz='+stg_kz+'&uid=;'+uid+'&output='+output+'&ss='+stsem+'&lvid='+lvid+'&'+gettimestamp();
+	var xsl = 'LVZeugnis';
+	if (sprache == 'English')
+		xsl = 'LVZeugnisEng';
+	
+	url =  '<?php echo APP_ROOT; ?>content/pdfExport.php?xml=lehrveranstaltungszeugnis.rdf.php&xsl='+xsl+'&stg_kz='+stg_kz+'&uid=;'+uid+'&output='+output+'&ss='+stsem+'&lvid='+lvid+'&'+gettimestamp();
 
 	window.location.href = url;
 }
@@ -1921,13 +1924,13 @@ function StudentRolleSpeichern(dialog, studiensemester_old, ausbildungssemester_
 			datepart = bewerbung_abgeschicktamum.substring(0, 10);
 			timepart = bewerbung_abgeschicktamum.substring(11);
 			arr = datepart.split('.');
-	
+
 			if(arr[0].length==1)
 				arr[0]='0'+arr[0];
-	
+
 			if(arr[1].length==1)
 				arr[1]='0'+arr[1];
-	
+
 			bewerbung_abgeschicktamum = arr[2]+'-'+arr[1]+'-'+arr[0]+' '+timepart;
 		}
 	}
