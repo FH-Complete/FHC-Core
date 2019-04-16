@@ -118,9 +118,6 @@ $(document).ready(function ()
 
 var InfocenterDetails = {
 
-	genericSaveError: function() {
-		FHC_DialogLib.alertError("error when saving");
-	},
 	openZgvInfoForPrestudent: function(prestudent_id)
 	{
 		var screenwidth = screen.width;
@@ -141,15 +138,16 @@ var InfocenterDetails = {
 			},
 			{
 				successCallback: function(data, textStatus, jqXHR) {
-					if (data !== false)
+					if (FHC_AjaxClient.hasData(data))
 					{
-						if (data === null)
+						var timestamp = data.retval[0];
+						if (timestamp === "")
 						{
 							$("#formalgeprueftam_" + akteid).text("");
 						}
 						else
 						{
-							var fgdatum = $.datepicker.parseDate("yy-mm-dd", data);
+							var fgdatum = $.datepicker.parseDate("yy-mm-dd", timestamp);
 							var gerfgdatum = $.datepicker.formatDate("dd.mm.yy", fgdatum);
 							$("#formalgeprueftam_" + akteid).text(gerfgdatum);
 						}
@@ -159,10 +157,10 @@ var InfocenterDetails = {
 					}
 					else
 					{
-						InfocenterDetails.genericSaveError();
+						InfocenterDetails._genericSaveError();
 					}
 				},
-				errorCallback: InfocenterDetails.genericSaveError,
+				errorCallback: InfocenterDetails._genericSaveError,
 				veilTimeout: 0
 			}
 		);
@@ -174,12 +172,13 @@ var InfocenterDetails = {
 			data,
 			{
 				successCallback: function(data, textStatus, jqXHR) {
-					if (data !== true)
+					if (!FHC_AjaxClient.hasData(data) || data.retval[0] !== true)
 					{
-						FHC_DialogLib.alertError("error when saving ZGV prio");
+						InfocenterDetails._genericSaveError();
 					}
 					InfocenterDetails._refreshZgv(true);
-				}
+				},
+				errorCallback: InfocenterDetails._genericSaveError
 			}
 		);
 	},
@@ -212,6 +211,10 @@ var InfocenterDetails = {
 					{
 						btn.after("&nbsp;&nbsp;<span id='zgvUebernehmenNotice' class='text-warning'>keine ZGV vorhanden</span>");
 					}
+				},
+				errorCallback: function()
+				{
+					FHC_DialogLib.alertError('Error when getting last ZGV');
 				},
 				veilTimeout: 0
 			}
@@ -261,9 +264,10 @@ var InfocenterDetails = {
 					}
 					else
 					{
-						FHC_DialogLib.alertError("error when saving Absage");
+						InfocenterDetails._genericSaveError();
 					}
-				}
+				},
+				errorCallback: InfocenterDetails._genericSaveError
 			}
 		);
 	},
@@ -273,27 +277,29 @@ var InfocenterDetails = {
 			CALLED_PATH + '/saveFreigabe',
 			{"prestudent_id": freigabeData.prestudent_id, "statusgrund_id": freigabeData.statusgrund_id},
 			{
-				successCallback: function(freigabeResponseData, textStatus, jqXHR) {
+				successCallback: function(data, textStatus, jqXHR) {
 
-					if (FHC_AjaxClient.hasData(freigabeResponseData))
+					if (FHC_AjaxClient.hasData(data))
 					{
+						var freigabeResponseData = FHC_AjaxClient.getData(data);
+
+						if (freigabeResponseData.nonCriticalErrors && freigabeResponseData.nonCriticalErrors.length > 0
+							&& typeof freigabeResponseData.nonCriticalErrors == "string")
+						{
+							FHC_DialogLib.alertWarning(freigabeResponseData.nonCriticalErrors);
+						}
 						FHC_AjaxClient.showVeil();
 						InfocenterDetails.initFrgMessageSend(freigabeData);
 						InfocenterDetails._refreshZgv();
 						FHC_AjaxClient.hideVeil();
 						InfocenterDetails._refreshLog();
 					}
-					else if (freigabeResponseData.error === 2 && parseInt(freigabeResponseData.retval.prestudent_id, 10))
-					{
-						FHC_DialogLib.alertError("error when setting accepted documents");
-						InfocenterDetails._refreshZgv();
-						InfocenterDetails._refreshLog();
-					}
 					else
 					{
-						FHC_DialogLib.alertError("error when saving Freigabe");
+						InfocenterDetails._genericSaveError();
 					}
-				}
+				},
+				errorCallback: InfocenterDetails._genericSaveError
 			}
 		);
 	},
@@ -388,12 +394,16 @@ var InfocenterDetails = {
 			null,
 			{
 				successCallback: function(data, textStatus, jqXHR) {
-					if (data)
+					if (FHC_AjaxClient.hasData(data))
 					{
-						var engdate = $.datepicker.parseDate("yy-mm-dd", data);
+						var engdate = $.datepicker.parseDate("yy-mm-dd", FHC_AjaxClient.getData(data)[0]);
 						var gerdate = $.datepicker.formatDate("dd.mm.yy", engdate);
 						$("#parkdate").val(gerdate);
 					}
+				},
+				errorCallback: function()
+				{
+					FHC_DialogLib.alertError("error when getting Studienjahr end");
 				},
 				veilTimeout: 0
 			}
@@ -406,10 +416,18 @@ var InfocenterDetails = {
 			null,
 			{
 				successCallback: function(data, textStatus, jqXHR) {
-					InfocenterDetails._refreshParking(data);
-					InfocenterDetails._refreshLog();
-					if (data === null)
-						InfocenterDetails.getStudienjahrEnd();
+					if (FHC_AjaxClient.hasData(data))
+					{
+						var parkedDate = FHC_AjaxClient.getData(data)[0];
+						InfocenterDetails._refreshParking(parkedDate);
+						InfocenterDetails._refreshLog();
+						if (parkedDate === null)
+							InfocenterDetails.getStudienjahrEnd();
+					}
+				},
+				errorCallback: function()
+				{
+					FHC_DialogLib.alertError("error when getting parked status");
 				},
 				veilTimeout: 0
 			}
@@ -450,13 +468,12 @@ var InfocenterDetails = {
 			},
 			{
 				successCallback: function(data, textStatus, jqXHR) {
-					if (Array.isArray(data))
+					if (FHC_AjaxClient.hasData(data))
 					{
-						if (data.length > 0)
-							InfocenterDetails.getParkedDate(personid);
-						else
-							$("#unparkmsg").removeClass().addClass("text-warning").text(FHC_PhrasesLib.t('infocenter', 'nichtsZumAusparken'));
+						InfocenterDetails.getParkedDate(personid);
 					}
+					else
+						$("#unparkmsg").removeClass().addClass("text-warning").text(FHC_PhrasesLib.t('infocenter', 'nichtsZumAusparken'));
 				},
 				errorCallback: function(){
 					$("#unparkmsg").removeClass().addClass("text-danger").text(FHC_PhrasesLib.t('infocenter', 'fehlerBeimAusparken'));
@@ -472,32 +489,39 @@ var InfocenterDetails = {
 			null,
 			{
 				successCallback: callback,
+				errorCallback: function()
+				{
+					FHC_DialogLib.alertError("error when getting prestudent data")
+				},
 				veilTimeout: 0
 			}
 		);
 	},
 	initFrgMessageSend: function(freigabedata)
 	{
-		var callback = function (data)
+		var personid = $("#hiddenpersonid").val();
+
+		var callback = function (prestudentresponse)
 		{
-			if (data == null)
+			if (!FHC_AjaxClient.hasData(prestudentresponse))
 				return;
+
+			var prestudentdata = prestudentresponse.retval;
 
 			var prestudent_id = freigabedata.prestudent_id;
 			var statusgrund_id = freigabedata.statusgrund_id;
 			var rtfreigabe = !$.isNumeric(statusgrund_id);
 
-			// check if a prestudent in same semester is already freigegeben - then not send message again
 			var rtFreigegeben = false;
 			var stgFreigegeben = false;
 			var receiverPrestudentstatus = null;
 
 			//get prestudentstatus of message receiver
-			for(var i = 0; i < data.length; i++)
+			for(var i = 0; i < prestudentdata.length; i++)
 			{
-				if (data[i].prestudentstatus.prestudent_id === prestudent_id)
+				if (prestudentdata[i].prestudentstatus.prestudent_id === prestudent_id)
 				{
-					receiverPrestudentstatus = data[i].prestudentstatus;
+					receiverPrestudentstatus = prestudentdata[i].prestudentstatus;
 					break;
 				}
 			}
@@ -506,19 +530,20 @@ var InfocenterDetails = {
 				return;
 
 			//check other prestudentstati wether already freigegeben
-			for(var j = 0; j < data.length; j++)
+			for(var j = 0; j < prestudentdata.length; j++)
 			{
-				var prestudent = data[j];
+				var prestudent = prestudentdata[j];
 				var prestudentstatus = prestudent.prestudentstatus;
 				var id = prestudentstatus.prestudent_id;
 
 				if (id !== prestudent_id)
 				{
 					var fitfreigegeben = $.inArray(prestudentstatus.bezeichnung_statusgrund[0], STGFREIGABE_MESSAGESEND_EXCEPTIONS) >= 0;
+					var fitstg = $.inArray(parseInt(prestudent.studiengang_kz), FIT_PROGRAMM_STUDIENGAENGE) >= 0;
 
 					if (receiverPrestudentstatus.studiensemester_kurzbz === prestudentstatus.studiensemester_kurzbz
 						&& prestudentstatus.bestaetigtam !== null && prestudentstatus.status_kurzbz === "Interessent"
-						&& (prestudent.studiengangtyp === "b"))
+						&& (prestudent.studiengangtyp === "b" || fitstg))
 					{
 						if (prestudentstatus.statusgrund_id === null)
 						{
@@ -579,7 +604,7 @@ var InfocenterDetails = {
 			{
 				var statusgrundbez = freigabedata.statusgrundbezeichnung ? freigabedata.statusgrundbezeichnung : "";
 
-				// if Freigabe to Studiengang, send StgFreigabe Message if not already sent
+				//if Freigabe to Studiengang, send StgFreigabe Message if not already sent
 				if (!stgFreigegeben && $.inArray(statusgrundbez, STGFREIGABE_MESSAGESEND_EXCEPTIONS) < 0)
 				{
 					InfocenterDetails.sendFreigabeMessage(prestudent_id, STGFREIGABE_MESSAGE_VORLAGE, msgvars);
@@ -587,11 +612,9 @@ var InfocenterDetails = {
 			}
 		};
 
-		var personid = $("#hiddenpersonid").val();
-
 		InfocenterDetails.getPrestudentData(
 			personid, callback
-		)
+		);
 	},
 	sendFreigabeMessage: function(prestudentid, vorlage_kurzbz, msgvars)
 	{
@@ -607,6 +630,9 @@ var InfocenterDetails = {
 				successCallback: function(data, textStatus, jqXHR) {
 					InfocenterDetails._refreshMessages();
 					InfocenterDetails._refreshLog();
+				},
+				errorCallback: function() {
+					FHC_DialogLib.alertWarning("Freigabe message could not be sent");
 				}
 			}
 		);
@@ -684,7 +710,8 @@ var InfocenterDetails = {
 		$(".freigabebtn").click(function()
 			{
 				var prestudentid = this.id.substr(this.id.indexOf("_") + 1);
-				InfocenterDetails._toggleFreigabeDialog(prestudentid, true);//true - Reihungstestfreigabe
+				//true - Reihungstestfreigabe
+				InfocenterDetails._toggleFreigabeDialog(prestudentid, true);
 			}
 		);
 
@@ -695,14 +722,14 @@ var InfocenterDetails = {
 				var statusgrund_id = statusgrel.val();
 				var statusgrund = statusgrel.find("option:selected").text();
 
-				if (statusgrund_id === 'null')
+				if (!$.isNumeric(statusgrund_id))
 				{
 					$("#frgstatusgrselect_" + prestudentid).addClass("has-error");
 				}
 				else
 				{
-					var rtfreigabe = false;//no Reihungstestfreigabe
-					InfocenterDetails._toggleFreigabeDialog(prestudentid, rtfreigabe, statusgrund);
+					//false - no Reihungstestfreigabe
+					InfocenterDetails._toggleFreigabeDialog(prestudentid, false, statusgrund);
 				}
 			}
 		);
@@ -923,5 +950,8 @@ var InfocenterDetails = {
 	_notizError: function(phrasename)
 	{
 		$("#notizmsg").text(FHC_PhrasesLib.t('ui', phrasename));
+	},
+	_genericSaveError: function() {
+		FHC_DialogLib.alertError("error when saving!");
 	}
 };
