@@ -17,36 +17,36 @@ var FHC_DialogLib = {
 	 */
 	alertSuccess: function(message)
 	{
-		var html = "<p class='dialogmessage'><i class='glyphicon glyphicon-ok-sign'></i>&nbsp;&nbsp;"+message+"</p>";
-		FHC_DialogLib.alertDefault('Success', html);
-		$(".ui-dialog-titlebar").addClass("alert-success text-center");
-		$(".glyphicon-ok-sign").css("color", "#3c763d");
-		FHC_DialogLib._formatShortDialog();
+		FHC_DialogLib._displayDialog('Success', message, 'ok-sign', 'alert-success');
 	},
+
 	/**
 	 * Show error message as jQueryUI alert. Works only with bootstrap.
 	 * @param message
 	 */
 	alertError: function(message)
 	{
-		var html = "<p class='dialogmessage'><i class='glyphicon glyphicon-warning-sign'></i>&nbsp;&nbsp;"+message+"</p>";
-		FHC_DialogLib.alertDefault('Error occured', html);
-		$(".ui-dialog-titlebar").addClass("alert-danger text-center");
-		$(".glyphicon-warning-sign").css("color", "#a94442");
-		FHC_DialogLib._formatShortDialog();
+		FHC_DialogLib._displayDialog('Error occured', message, 'warning-sign', 'alert-danger');
 	},
+
+	/**
+	 * Show warning message as jQueryUI alert. Works only with bootstrap.
+	 * @param message
+	 */
+	alertWarning: function(message)
+	{
+		FHC_DialogLib._displayDialog('Warning', message, 'warning-sign', 'alert-warning');
+	},
+
 	/**
 	 * Show info message as jQueryUI alert. Works only with bootstrap.
 	 * @param message
 	 */
 	alertInfo: function(message)
 	{
-		var html = "<p class='dialogmessage'><i class='glyphicon glyphicon-info-sign'></i>&nbsp;&nbsp;"+message+"</p>";
-		FHC_DialogLib.alertDefault('Info', html);
-		$(".ui-dialog-titlebar").addClass("alert-info text-center");
-		$(".glyphicon-info-sign").css("color", "#245269");
-		FHC_DialogLib._formatShortDialog();
+		FHC_DialogLib._displayDialog('Info', message, 'info-sign', 'alert-info');
 	},
+
 	/**
 	 * Default jQueryUI alert
 	 * @param title shown as message box heading
@@ -79,6 +79,24 @@ var FHC_DialogLib = {
 			}]
 		});
 	},
+
+	/**
+	 * displays the dialog box
+	 * @param heading
+	 * @param message
+	 * @param icon
+	 * @param colorClass for heading and icon
+	 * @private
+	 */
+	_displayDialog: function(heading, message, icon, colorClass)
+	{
+		var html = "<p class='dialogmessage'><i class='glyphicon glyphicon-"+icon+"'></i>&nbsp;&nbsp;"+message+"</p>";
+		FHC_DialogLib.alertDefault(heading, html);
+		$(".ui-dialog-titlebar").addClass(colorClass+" text-center");
+		$(".glyphicon-"+icon).addClass(colorClass);
+		FHC_DialogLib._formatShortDialog();
+	},
+
 	/**
 	 * formats jQueryUI messagebox as "short", i.e. containing only one line of text,
 	 * centers the text
@@ -90,6 +108,7 @@ var FHC_DialogLib = {
 		$(".ui-dialog-buttonpane.ui-widget-content").css("padding", ".3em .4em .5em .4em");
 		$(".ui-dialog .ui-dialog-content").css("padding", "0");
 		$(".ui-dialog-buttonset button").css("margin", "0");
+		$(".dialogmessage i.glyphicon").css("background-color", "transparent");
 	}
 
 };
