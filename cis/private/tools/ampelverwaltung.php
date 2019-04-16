@@ -124,10 +124,10 @@ if ($is_popup)
 	$user_ampel_arr,
 	$cnt_ueberfaellig_und_verpflichtend) =		//counts mandatory, overdue (not expired), unconfirmed, not before vorlaufzeit
 	getPopupUserAmpelData($user_ampel_arr);
-}	
+}
 
 //filter ampeln of actual term (if radiobutton is set to aktuell)
-if ($show == 'aktuell')
+if (!$is_popup && $show == 'aktuell')
 	$user_ampel_arr = getActualUserAmpelData($user_ampel_arr, $semester_start);
 
 
@@ -361,7 +361,7 @@ function typeWrite(span){
 				<div>
 					<img src="../../../skin/images/sancho/sancho_header_du_hast_verpflichtende_ampeln.jpg" alt="sancho_verpflichtende_ampeln" style="width: 100%;">
 				</div>			
-				<p><br><br></p>';		
+				<p><br><br></p>';
 		}	
 	}
 	?>
@@ -401,7 +401,7 @@ function typeWrite(span){
 				$cnt_active++;
 	}
 	
-	if ($cnt_active == 0)
+	if ($cnt_active == 0 && !$is_popup)
 	{
 		echo '
 			<div class="panel">

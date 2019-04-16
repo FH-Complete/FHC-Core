@@ -333,5 +333,63 @@ class projektbetreuer extends basis_db
 			return false;
 		}
 	}
+
+	/**
+	 * Retrieves all projektarbeiten by person (only with stundensatz > 0)
+	 * @param $person_id
+	 * @return boolean If succeeded true and result-array with objects of each projektarbeit of the person.
+	 */
+	public function getAllProjects($person_id)
+	{
+		if (isset($person_id) && is_numeric($person_id))
+		{
+			$qry = '
+				SELECT
+					*
+				FROM
+					lehre.tbl_projektbetreuer
+				WHERE
+					(stundensatz IS NOT NULL) AND (stundensatz > 0)
+				AND 
+					person_id =' . $this->db_add_param($person_id, FHC_INTEGER);
+
+			if ($this->db_query($qry))
+			{
+				while ($row = $this->db_fetch_object())
+				{
+					$obj = new projektbetreuer();
+
+					$obj->person_id = $row->person_id;
+					$obj->projektarbeit_id = $row->projektarbeit_id;
+					$obj->note = $row->note;
+					$obj->betreuerart_kurzbz = $row->betreuerart_kurzbz;
+					$obj->faktor = $row->faktor;
+					$obj->name = $row->name;
+					$obj->punkte = $row->punkte;
+					$obj->stunden = $row->stunden;
+					$obj->stundensatz = $row->stundensatz;
+					$obj->updateamum = $row->updateamum;
+					$obj->updatevon = $row->updatevon;
+					$obj->insertamum = $row->insertamum;
+					$obj->insertvon = $row->insertvon;
+					$obj->ext_id = $row->ext_id;
+					$obj->vertrag_id = $row->vertrag_id;
+
+					$this->result[] = $obj;
+				}
+				return true;
+			}
+			else
+			{
+				$this->errormsg = 'Fehler bei einer Abfrage';
+				return false;
+			}
+		}
+		else
+		{
+			$this->errormsg = 'Person_id fehlt oder nicht numerisch.';
+			return false;
+		}
+	}
 }
 ?>

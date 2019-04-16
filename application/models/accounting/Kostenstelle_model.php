@@ -52,7 +52,7 @@ class Kostenstelle_model extends DB_Model
 	 * @param null $geschaeftsjahr
 	 * @return array|null
 	 */
-	public function getKostenstellenForGegitschaeftsjahrWithOe($geschaeftsjahr = null)
+	public function getKostenstellenForGeschaeftsjahrWithOe($geschaeftsjahr = null)
 	{
 		$this->load->model('organisation/geschaeftsjahr_model', 'GeschaeftsjahrModel');
 
@@ -104,6 +104,31 @@ class Kostenstelle_model extends DB_Model
 		{
 			return success(array());
 		}
+	}
+
+	/**
+	 * Gets all Kostenstellen for which logged in user is berechtigt.
+	 * @param null $berechtigung_kurzbz
+	 * @param null $art
+	 * @return array
+	 */
+	public function getKostenstellenBerechtigt($berechtigung_kurzbz = null, $art = null)
+	{
+		$allkostenstellen = $this->load();
+		$kostenstellen = array();
+
+		if (hasData($allkostenstellen))
+		{
+			foreach ($allkostenstellen->retval as $kostenstelle)
+			{
+				if ($this->permissionlib->isBerechtigt($berechtigung_kurzbz, $art, null, $kostenstelle->kostenstelle_id))
+				{
+					$kostenstellen[] = $kostenstelle;
+				}
+			}
+		}
+
+		return success($kostenstellen);
 	}
 
 	/**

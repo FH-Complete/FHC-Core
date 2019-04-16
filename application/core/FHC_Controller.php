@@ -96,7 +96,7 @@ class FHC_Controller extends CI_Controller
 	 */
 	protected function outputJsonSuccess($mixed)
 	{
-		$this->_outputJson(success($mixed));
+		$this->outputJson(success($mixed));
 	}
 
 	/**
@@ -105,7 +105,7 @@ class FHC_Controller extends CI_Controller
 	 */
 	protected function outputJsonError($mixed)
 	{
-		$this->_outputJson(error($mixed));
+		$this->outputJson(error($mixed));
 	}
 
 	/**
@@ -119,13 +119,10 @@ class FHC_Controller extends CI_Controller
 		exit;
 	}
 
-	//------------------------------------------------------------------------------------------------------------------
-	// Private methods
-
 	/**
 	 * Utility method to output using JSON as content type
 	 */
-	private function _outputJson($mixed)
+	protected function outputJson($mixed)
 	{
 		$this->output->set_content_type('application/json')->set_output(json_encode($mixed));
 	}

@@ -3269,6 +3269,46 @@ $phrases = array(
 				'insertvon' => 'system'
 			)
 		)
+	),
+	array(
+		'app' => 'infocenter',
+		'category' => 'infocenter',
+		'phrase' => 'bewerbungMussAbgeschickt',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Die Bewerbung muss erst abgeschickt worden sein.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'The application needs to be sent first.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'infocenter',
+		'category' => 'infocenter',
+		'phrase' => 'nurBachelorFreigeben',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Nur Bachelorstudiengänge können freigegeben werden.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Only bachelor programmes can be approved.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
 	)
 
 );

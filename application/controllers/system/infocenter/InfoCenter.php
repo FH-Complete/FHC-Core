@@ -234,7 +234,7 @@ class InfoCenter extends Auth_Controller
 		$akte_id = $this->input->post('akte_id');
 		$formalgeprueft = $this->input->post('formal_geprueft');
 
-		$json = false;
+		$json = null;
 
 		if (isset($akte_id) && isset($formalgeprueft) && isset($person_id))
 		{
@@ -247,7 +247,7 @@ class InfoCenter extends Auth_Controller
 
 				if (isSuccess($result))
 				{
-					$json = $timestamp;
+					$json = is_null($timestamp) ? '' : $timestamp;
 
 					$this->_log(
 						$person_id,
@@ -261,7 +261,7 @@ class InfoCenter extends Auth_Controller
 			}
 		}
 
-		$this->output->set_content_type('application/json')->set_output(json_encode($json));
+		$this->outputJsonSuccess(array($json));
 	}
 
 	/**
@@ -272,7 +272,7 @@ class InfoCenter extends Auth_Controller
 	{
 		$prestudentdata = $this->_loadPrestudentData($person_id);
 
-		$this->output->set_content_type('application/json')->set_output(json_encode($prestudentdata['zgvpruefungen']));
+		$this->outputJsonSuccess($prestudentdata['zgvpruefungen']);
 	}
 
 	/**
@@ -283,7 +283,7 @@ class InfoCenter extends Auth_Controller
 	{
 		$prestudent = $this->PrestudentModel->getLastPrestudent($person_id, true);
 
-		$this->output->set_content_type('application/json')->set_output(json_encode($prestudent));
+		$this->outputJson($prestudent);
 	}
 
 	/**
@@ -299,10 +299,10 @@ class InfoCenter extends Auth_Controller
 		$studiengangbezeichnung = $prestudentdata['studiengang_bezeichnung'];
 
 		$data = array(
-					'studiengang_bezeichnung' => $studiengangbezeichnung,
-					'studiengang_kurzbz' => $studiengangkurzbz,
-					'data' => null
-				);
+			'studiengang_bezeichnung' => $studiengangbezeichnung,
+			'studiengang_kurzbz' => $studiengangkurzbz,
+			'data' => null
+		);
 
 		if (hasData($studienordnung))
 		{
@@ -319,13 +319,14 @@ class InfoCenter extends Auth_Controller
 	{
 		$prestudent_id = $this->input->post('prestudentid');
 		$change = $this->input->post('change');
+		$json = false;
 
-		if (!is_numeric($change) || !is_numeric($prestudent_id))
-			$result = error('Parameteres missing');
-		else
-			$result = $this->PrestudentModel->changePrio($prestudent_id, intval($change));
+		if (is_numeric($change) || is_numeric($prestudent_id))
+		{
+			$json = $this->PrestudentModel->changePrio($prestudent_id, intval($change));
+		}
 
-		$this->output->set_content_type('application/json')->set_output(json_encode($result));
+		$this->outputJsonSuccess(array($json));
 	}
 
 	/**
@@ -403,7 +404,8 @@ class InfoCenter extends Auth_Controller
 				$this->_log($logdata['person_id'], 'savezgv', array($logdata['studiengang_kurzbz'], $prestudent_id));
 			}
 		}
-		$this->output->set_content_type('application/json')->set_output(json_encode($json));
+
+		$this->outputJson($json);
 	}
 
 	/**
@@ -454,7 +456,8 @@ class InfoCenter extends Auth_Controller
 				}
 			}
 		}
-		$this->output->set_content_type('application/json')->set_output(json_encode($json));
+
+		$this->outputJson($json);
 	}
 
 	/**
@@ -521,9 +524,7 @@ class InfoCenter extends Auth_Controller
 
 					// acceptresult returns null if no documents to accept
 					if ($acceptresult !== null && isError($acceptresult))
-					{
-						$json->error = 2;
-					}
+						$json->retval['nonCriticalErrors'] = 'error when accepting documents in FAS';
 
 					$logparams = array($prestudent_id, $logdata['studiengang_kurzbz'], '');
 
@@ -543,7 +544,7 @@ class InfoCenter extends Auth_Controller
 			}
 		}
 
-		$this->output->set_content_type('application/json')->set_output(json_encode($json));
+		$this->outputJson($json);
 	}
 
 	/**
@@ -557,7 +558,7 @@ class InfoCenter extends Auth_Controller
 			$notiz_id
 		);
 
-		$this->output->set_content_type('application/json')->set_output(json_encode($result));
+		$this->outputJson($result);
 	}
 
 	/**
@@ -577,7 +578,7 @@ class InfoCenter extends Auth_Controller
 			$this->_log($person_id, 'savenotiz', array($titel));
 		}
 
-		$this->output->set_content_type('application/json')->set_output(json_encode($result));
+		$this->outputJson($result);
 	}
 
 	/**
@@ -608,7 +609,7 @@ class InfoCenter extends Auth_Controller
 			$this->_log($person_id, 'updatenotiz', array($titel));
 		}
 
-		$this->output->set_content_type('application/json')->set_output(json_encode($result));
+		$this->outputJson($result);
 	}
 
 	/**
@@ -696,9 +697,9 @@ class InfoCenter extends Auth_Controller
 	 */
 	public function getParkedDate($person_id)
 	{
-		$result = $this->personloglib->getParkedDate($person_id);
+		$parkedDate = $this->personloglib->getParkedDate($person_id);
 
-		$this->output->set_content_type('application/json')->set_output(json_encode($result));
+		$this->outputJsonSuccess(array($parkedDate));
 	}
 
 	/**
@@ -711,7 +712,7 @@ class InfoCenter extends Auth_Controller
 
 		$result = $this->personloglib->park($person_id, date_format(date_create($date), 'Y-m-d'), self::TAETIGKEIT, self::APP, null, $this->_uid);
 
-		$this->output->set_content_type('application/json')->set_output(json_encode($result));
+		$this->outputJson($result);
 	}
 
 	/**
@@ -722,14 +723,8 @@ class InfoCenter extends Auth_Controller
 		$person_id = $this->input->post('person_id');
 
 		$result = $this->personloglib->unPark($person_id);
-		if (isError($result))
-		{
-			$this->outputJsonError($result);
-		}
-		else
-		{
-			$this->output->set_content_type('application/json')->set_output(json_encode(getData($result)));
-		}
+
+		$this->outputJson($result);
 	}
 
 	/**
@@ -741,14 +736,14 @@ class InfoCenter extends Auth_Controller
 
 		$result = $this->StudienjahrModel->getCurrStudienjahr();
 
-		$json = false;
+		$json = null;
 
 		if (hasData($result))
 		{
 			$json = $result->retval[0]->ende;
 		}
 
-		$this->output->set_content_type('application/json')->set_output(json_encode($json));
+		$this->outputJsonSuccess(array($json));
 	}
 
 	/**
@@ -1254,7 +1249,6 @@ class InfoCenter extends Auth_Controller
 
 		$data = array (
 			'zgvpruefungen' => $zgvpruefungen,
-			'numberinteressenten' => $interessentenCount,
 			'abwstatusgruende' => $abwstatusgruende,
 			'intstatusgruende' => $intstatusgruende
 		);
