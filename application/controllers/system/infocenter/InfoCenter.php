@@ -1153,7 +1153,7 @@ class InfoCenter extends Auth_Controller
 			show_error($notizen->retval);
 		}
 
-		$notizen_bewerbung = $this->NotizModel->getNotizByTitel($person_id, 'Anmerkung zur Bewerbung');
+		$notizen_bewerbung = $this->NotizModel->getNotizByTitel($person_id, 'Anmerkung zur Bewerbung%');
 
 		if (isError($notizen_bewerbung))
 		{
