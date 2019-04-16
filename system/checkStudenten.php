@@ -907,7 +907,7 @@ foreach ($ausgabe as $stg_kz => $value)
 						<td>&nbsp;</td>
 					</tr>
 					<tr>
-						<td colspan='4'><b>Folgende Personen haben eine Adresse mit Nation Österreichs, die Gemeinde liegt aber in Österreich</b></td>
+						<td colspan='4'><b>Folgende Personen haben eine Adresse mit einer Nation <b>außerhalb</b> Österreichs, die Gemeinde liegt aber <b>in</b> Österreich</b></td>
 					</tr>";
 				break;
 			case 17:
