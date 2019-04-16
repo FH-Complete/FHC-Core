@@ -2662,6 +2662,7 @@ else
 										&datum_bis=' . $datum_bis . '
 										&prestudent_id=' . $prestudent_id . '
 										&reihungstest=' . $reihungstest . '
+										&orgform_kurzbz=' . $orgform_kurzbz . '
 										&format=xls"
 									class="btn btn-primary"
 									role="button">
