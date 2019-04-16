@@ -392,7 +392,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 					</draw:frame>
 				</xsl:if>
 			</xsl:for-each>
-		</xsl:if>
+			</xsl:if>
 		<text:p text:style-name="Seitenumbruch">ZEUGNIS</text:p>
 		<text:p text:style-name="P6">
 			<xsl:choose>
