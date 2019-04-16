@@ -43,6 +43,7 @@ class bewerbungstermin extends basis_db
 	public $updateamum;		//  timestamp
 	public $updatevon;		//  bigint
 	public $studienplan_id;	// integer
+	public $nationengruppe_kurzbz;	// varchar (16)
 
 	/**
 	 * Konstruktor
@@ -88,6 +89,7 @@ class bewerbungstermin extends basis_db
 				$this->updateamum = $row->updateamum;
 				$this->updatevon = $row->updatevon;
 				$this->studienplan_id = $row->studienplan_id;
+				$this->nationengruppe_kurzbz = $row->nationengruppe_kurzbz;
 				return true;
 			}
 			else
@@ -107,11 +109,12 @@ class bewerbungstermin extends basis_db
 	 * Liefert die Bewerbungstermine eines Studiengangs
 	 * @param integer $studiengang_kz. Kennzahl des Studiengangs, dessen Bewerbungstermine geladen werden sollen
 	 * @param string $studiensemester_kurzbz. Optional. Default NULL. Studiensemester, dessen Bewerbungstermine geladen werden sollen
-	 * @param $sort. Optional. Default NULL. Sortierung der Ergebnisse
-	 * @param $studienplan_id. Optional. Default NULL. Studienplan ID, dessen Bewerbungstermine geladen werden sollen
+	 * @param string $sort. Optional. Default NULL. Sortierung der Ergebnisse
+	 * @param integer $studienplan_id. Optional. Default NULL. Studienplan ID, dessen Bewerbungstermine geladen werden sollen
+	 * @param string $nationengruppe_kurzbz. Optional. Default NULL. Wenn gesetzt, werden die Bewerbungstermine dieser Nationengruppe geladen, wenn 0 werden alle NULL-Werte geladen, wenn NULL, wird der Parameter gar nicht geladen
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	public function getBewerbungstermine($studiengang_kz, $studiensemester_kurzbz = null, $sort = null, $studienplan_id = null)
+	public function getBewerbungstermine($studiengang_kz, $studiensemester_kurzbz = null, $sort = null, $studienplan_id = null, $nationengruppe_kurzbz = null)
 	{
 		$qry = "SELECT
 					tbl_bewerbungstermine.*,
@@ -122,18 +125,30 @@ class bewerbungstermin extends basis_db
 				WHERE
 					studiengang_kz=".$this->db_add_param($studiengang_kz, FHC_INTEGER);
 
-		if($studiensemester_kurzbz!=null)
+		if($studiensemester_kurzbz != '')
 			$qry.=" AND studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz);
 
-		if($studienplan_id!=null)
+		if($studienplan_id != '')
 			$qry.=" AND studienplan_id=".$this->db_add_param($studienplan_id);
+
+		if($nationengruppe_kurzbz !== '')
+		{
+			if($nationengruppe_kurzbz === 0)
+			{
+				$qry.=" AND nationengruppe_kurzbz IS NULL";
+			}
+			elseif($nationengruppe_kurzbz != '')
+			{
+				$qry.=" AND nationengruppe_kurzbz=".$this->db_add_param($nationengruppe_kurzbz);
+			}
+		}
 
 		if($sort != null)
 		{
 		    $qry.=" ORDER BY ".$sort;
 		}
 		$qry.=";";
-
+//echo $qry;
 		if($this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object())
@@ -154,6 +169,7 @@ class bewerbungstermin extends basis_db
 				$obj->updatevon = $row->updatevon;
 				$obj->studienplan_id = $row->studienplan_id;
 				$obj->stpl_bezeichnung = $row->stpl_bezeichnung;
+				$obj->nationengruppe_kurzbz = $row->nationengruppe_kurzbz;
 
 				$this->result[] = $obj;
 			}
@@ -190,7 +206,7 @@ class bewerbungstermin extends basis_db
 		{
 			//Neuen Datensatz einfuegen
 
-			$qry='BEGIN; INSERT INTO public.tbl_bewerbungstermine(studiensemester_kurzbz, studiengang_kz, beginn, ende, nachfrist, nachfrist_ende, anmerkung, insertamum, insertvon, studienplan_id) VALUES('.
+			$qry='BEGIN; INSERT INTO public.tbl_bewerbungstermine(studiensemester_kurzbz, studiengang_kz, beginn, ende, nachfrist, nachfrist_ende, anmerkung, insertamum, insertvon, nationengruppe_kurzbz, studienplan_id) VALUES('.
 			     $this->db_add_param($this->studiensemester_kurzbz).', '.
 			     $this->db_add_param($this->studiengang_kz, FHC_INTEGER).', '.
 			     $this->db_add_param($this->beginn).', '.
@@ -199,6 +215,7 @@ class bewerbungstermin extends basis_db
 			     $this->db_add_param($this->nachfrist_ende).', '.
 			     $this->db_add_param($this->anmerkung).', now(),'.
 			     $this->db_add_param($this->insertvon).','.
+			     $this->db_add_param($this->nationengruppe_kurzbz).','.
 			     $this->db_add_param($this->studienplan_id, FHC_INTEGER).');';
 		}
 		else
@@ -213,6 +230,7 @@ class bewerbungstermin extends basis_db
 				'anmerkung='.$this->db_add_param($this->anmerkung).', '.
 				'updateamum= now(), '.
 				'updatevon='.$this->db_add_param($this->updatevon).', '.
+				'nationengruppe_kurzbz='.$this->db_add_param($this->nationengruppe_kurzbz).', '.
 				'studienplan_id='.$this->db_add_param($this->studienplan_id, FHC_INTEGER).' '.
 				'WHERE bewerbungstermin_id='.$this->db_add_param($this->bewerbungstermin_id, FHC_INTEGER, false).';';
 		}
