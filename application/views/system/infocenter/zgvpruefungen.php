@@ -387,19 +387,19 @@
 								if (isEmptyString($zgvpruefung->prestudentstatus->bewerbung_abgeschicktamum))
 								{
 									$disabled = $disabledStg = 'disabled';
-									$disabledTxt = $disabledStgTxt = 'Die Bewerbung muss erst abgeschickt worden sein.';
+									$disabledTxt = $disabledStgTxt = $this->p->t('infocenter', 'bewerbungMussAbgeschickt');
 								}
 
 								if ($studiengangtyp !== 'b')
 								{
 									$disabled = 'disabled';
-									$disabledTxt = 'Nur Bachelorstudiengänge können freigegeben werden.';
+									$disabledTxt = $this->p->t('infocenter', 'nurBachelorFreigeben');
 
 									// FIT-Lehrgänge: exceptions, can be freigegeben in Infocenter
 									if (!in_array($studiengang_kz, $fit_programme_studiengaenge))
 									{
 										$disabledStg = 'disabled';
-										$disabledStgTxt = 'Nur Bachelorstudiengänge können freigegeben werden.';
+										$disabledStgTxt = $this->p->t('infocenter', 'nurBachelorFreigeben');
 									}
 								}
 								?>

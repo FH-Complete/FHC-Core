@@ -738,7 +738,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
         </text:p>
       </style:header>
       <style:footer>
-        <text:p text:style-name="MP2">Ausbildungsvertrag<text:tab/><text:tab/><text:span text:style-name="Page_20_Number"><text:page-number text:select-page="current">6</text:page-number></text:span></text:p>
+        <text:p text:style-name="MP2">Ausbildungsvertrag 2019/20<text:tab/><text:tab/><text:span text:style-name="Page_20_Number"><text:page-number text:select-page="current">6</text:page-number></text:span></text:p>
         <text:p text:style-name="Footer">
           <text:span text:style-name="Page_20_Number">
             <text:span text:style-name="MT3"><xsl:value-of select="studiengang_typ"/>-Studiengang</text:span>
@@ -759,7 +759,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
         </text:p>
       </style:header>
       <style:footer>
-        <text:p text:style-name="MP2">Ausbildungsvertrag<text:tab/><text:tab/><text:span text:style-name="Page_20_Number"><text:page-number text:select-page="current">1</text:page-number></text:span></text:p>
+        <text:p text:style-name="MP2">Ausbildungsvertrag 2019/20<text:tab/><text:tab/><text:span text:style-name="Page_20_Number"><text:page-number text:select-page="current">1</text:page-number></text:span></text:p>
         <text:p text:style-name="Footer">
           <text:span text:style-name="Page_20_Number">
             <text:span text:style-name="MT3"><xsl:value-of select="studiengang_typ"/>-Studiengang</text:span>

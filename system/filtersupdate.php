@@ -425,6 +425,40 @@ $filters = array(
 			}
 		',
 		'oe_kurzbz' => null,
+	),
+	array(
+		'app' => 'budget',
+		'dataset_name' => 'budgetoverview',
+		'filter_kurzbz' => 'BudgetUebersicht',
+		'description' => '{Budgetanträge Übersicht}',
+		'sort' => 1,
+		'default_filter' => true,
+		'filter' => '
+			{
+				"name": "Budgetanträge",
+				"columns": [
+					{"name": "Budgetantrag"},
+					{"name": "Kostenstelle"},
+					{"name": "Organisationseinheit"},
+					{"name": "Geschäftsjahr"},
+					{"name": "Budgetstatus"},
+					{"name": "Betrag"}
+				],
+				"filters": [
+					{
+						"name": "Budgetstatus",
+						"condition": "Freigegeben",
+						"operation": "ncontains"
+					},
+					{
+						"name": "Geschäftsjahr",
+						"condition": "GJ2019-2020",
+						"operation": "contains"
+					}
+				]
+			}
+		',
+		'oe_kurzbz' => null,
 	)
 );
 

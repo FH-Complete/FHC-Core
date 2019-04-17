@@ -2849,6 +2849,70 @@ if($result = $db->db_query($qry_column_desc))
 	}
 }
 
+// App 'budget' hinzufügen
+if($result = $db->db_query("SELECT 1 FROM system.tbl_app WHERE app='budget'"))
+{
+	if($db->db_num_rows($result)==0)
+	{
+
+		$qry = "INSERT INTO system.tbl_app(app) VALUES('budget');";
+
+		if(!$db->db_query($qry))
+			echo '<strong>App: '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>Neue App budget in system.tbl_app hinzugefügt';
+	}
+}
+
+// Neue Tabelle Nationengruppe
+if (!$result = @$db->db_query("SELECT 1 FROM bis.tbl_nationengruppe LIMIT 1"))
+{
+	$qry = "CREATE TABLE bis.tbl_nationengruppe
+			(
+				nationengruppe_kurzbz character varying(16) NOT NULL,
+				nationengruppe_bezeichnung character varying(128),
+				aktiv boolean DEFAULT TRUE
+			);
+
+			GRANT SELECT, INSERT, UPDATE, DELETE ON bis.tbl_nationengruppe TO vilesci;
+			GRANT SELECT ON bis.tbl_nationengruppe TO web;
+
+			ALTER TABLE bis.tbl_nationengruppe ADD CONSTRAINT pk_nationengruppe_nationengruppe_kurzbz PRIMARY KEY (nationengruppe_kurzbz);";
+
+	if (!$db->db_query($qry))
+		echo '<strong>bis.tbl_nationengruppe '.$db->db_last_error().'</strong><br>';
+	else
+		echo 'Neue Tabelle: bis.tbl_nationengruppe<br>';
+}
+
+// Spalte nationengruppe_kurzbz für tbl_nation
+if(!$result = @$db->db_query("SELECT nationengruppe_kurzbz FROM bis.tbl_nation LIMIT 1"))
+{
+	$qry = "ALTER TABLE bis.tbl_nation ADD COLUMN nationengruppe_kurzbz character varying(16);
+
+			ALTER TABLE bis.tbl_nation ADD CONSTRAINT fk_tbl_nation_nationengruppe_kurzbz FOREIGN KEY (nationengruppe_kurzbz) REFERENCES bis.tbl_nationengruppe(nationengruppe_kurzbz) ON UPDATE CASCADE ON DELETE RESTRICT;";
+
+	if(!$db->db_query($qry))
+		echo '<strong>bis.tbl_nation: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>bis.tbl_nation: Spalte nationengruppe_kurzbz hinzugefuegt';
+}
+
+// Spalte nationengruppe_kurzbz für tbl_bewerbungstermine
+if(!$result = @$db->db_query("SELECT nationengruppe_kurzbz FROM public.tbl_bewerbungstermine LIMIT 1"))
+{
+	$qry = "ALTER TABLE public.tbl_bewerbungstermine ADD COLUMN nationengruppe_kurzbz character varying(16);
+
+			ALTER TABLE public.tbl_bewerbungstermine ADD CONSTRAINT fk_tbl_bewerbungstermine_nationengruppe_kurzbz FOREIGN KEY (nationengruppe_kurzbz) REFERENCES bis.tbl_nationengruppe(nationengruppe_kurzbz) ON UPDATE CASCADE ON DELETE RESTRICT;";
+
+	if(!$db->db_query($qry))
+		echo '<strong>public.tbl_bewerbungstermine: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>public.tbl_bewerbungstermine: Spalte nationengruppe_kurzbz hinzugefuegt';
+}
+
+
+
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
 
@@ -2875,7 +2939,8 @@ $tabellen=array(
 	"bis.tbl_mobilitaet" => array("mobilitaet_id","prestudent_id","mobilitaetstyp_kurzbz","studiensemester_kurzbz","mobilitaetsprogramm_code","gsprogramm_id","firma_id","status_kurzbz","ausbildungssemester","insertvon","insertamum","updatevon","updateamum"),
 	"bis.tbl_mobilitaetstyp" => array("mobilitaetstyp_kurzbz","bezeichnung","aktiv"),
 	"bis.tbl_mobilitaetsprogramm"  => array("mobilitaetsprogramm_code","kurzbz","beschreibung","sichtbar","sichtbar_outgoing"),
-	"bis.tbl_nation"  => array("nation_code","entwicklungsstand","eu","ewr","kontinent","kurztext","langtext","engltext","sperre"),
+	"bis.tbl_nation"  => array("nation_code","entwicklungsstand","eu","ewr","kontinent","kurztext","langtext","engltext","sperre","nationengruppe_kurzbz"),
+	"bis.tbl_nationengruppe"  => array("nationengruppe_kurzbz","nationengruppe_bezeichnung","aktiv"),
 	"bis.tbl_orgform"  => array("orgform_kurzbz","code","bezeichnung","rolle","bisorgform_kurzbz"),
 	"bis.tbl_verwendung"  => array("verwendung_code","verwendungbez"),
 	"bis.tbl_zgv"  => array("zgv_code","zgv_bez","zgv_kurzbz","bezeichnung"),
@@ -3005,7 +3070,7 @@ $tabellen=array(
 	"public.tbl_benutzer"  => array("uid","person_id","aktiv","alias","insertamum","insertvon","updateamum","updatevon","ext_id","updateaktivvon","updateaktivam","aktivierungscode"),
 	"public.tbl_benutzerfunktion"  => array("benutzerfunktion_id","fachbereich_kurzbz","uid","oe_kurzbz","funktion_kurzbz","semester", "datum_von","datum_bis", "updateamum","updatevon","insertamum","insertvon","ext_id","bezeichnung","wochenstunden"),
 	"public.tbl_benutzergruppe"  => array("uid","gruppe_kurzbz","studiensemester_kurzbz","updateamum","updatevon","insertamum","insertvon","ext_id"),
-	"public.tbl_bewerbungstermine" => array("bewerbungstermin_id","studiengang_kz","studiensemester_kurzbz","beginn","ende","nachfrist","nachfrist_ende","anmerkung", "insertamum", "insertvon", "updateamum", "updatevon","studienplan_id"),
+	"public.tbl_bewerbungstermine" => array("bewerbungstermin_id","studiengang_kz","studiensemester_kurzbz","beginn","ende","nachfrist","nachfrist_ende","anmerkung", "insertamum", "insertvon", "updateamum", "updatevon","studienplan_id","nationengruppe_kurzbz"),
 	"public.tbl_buchungstyp"  => array("buchungstyp_kurzbz","beschreibung","standardbetrag","standardtext","aktiv","credit_points"),
 	"public.tbl_dokument"  => array("dokument_kurzbz","bezeichnung","ext_id","bezeichnung_mehrsprachig","dokumentbeschreibung_mehrsprachig","ausstellungsdetails"),
 	"public.tbl_dokumentprestudent"  => array("dokument_kurzbz","prestudent_id","mitarbeiter_uid","datum","updateamum","updatevon","insertamum","insertvon","ext_id"),

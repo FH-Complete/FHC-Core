@@ -147,6 +147,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 			$sws = $lvrow->semesterstunden/$wochen;
 			$ects = $lvrow->ects;
 			$lvbezeichnung = $lvrow->bezeichnung;
+			$lvbezeichnung_eng = $lvrow->bezeichnung_english;
 			$lvstg = $lvrow->studiengang_kz;
 			$sws_lv = $lvrow->sws;
 		}
@@ -168,6 +169,26 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 			for ($i = 0; $i < sizeof($lehrziele_arr); $i++)
 			{
 				$lehrziele .= $lehrziele_arr[$i].'\n';
+			}
+		}
+	}
+
+	$lehrinhalte_eng = '';
+	$lehrziele_eng = '';
+	$infoqry = "SELECT * FROM campus.tbl_lvinfo WHERE sprache='English' AND lehrveranstaltung_id = ".$db->db_add_param($lehrveranstaltung_id, FHC_INTEGER);
+	if($db->db_query($infoqry))
+	{
+		if ($inforow = $db->db_fetch_object())
+		{
+			$lehrinhalte_eng_arr = explode("<br>",$inforow->lehrinhalte);
+			for ($i = 0; $i < sizeof($lehrinhalte_arr); $i++)
+			{
+				$lehrinhalte_eng .= $lehrinhalte_eng_arr[$i].'\n';
+			}
+			$lehrziele_eng_arr = explode("<br>",$inforow->lehrziele);
+			for ($i = 0; $i < sizeof($lehrziele_eng_arr); $i++)
+			{
+				$lehrziele_eng .= $lehrziele_eng_arr[$i].'\n';
 			}
 		}
 	}
@@ -231,6 +252,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		$xml .= "\n		<studiengangsleiter>".$stgl."</studiengangsleiter>";
 		$datum_aktuell = date('d.m.Y');
 		$xml .= "\n		<ort_datum>Wien, am ".$datum_aktuell."</ort_datum>";
+		$xml .= "\n		<datum_aktuell>".$datum_aktuell."</datum_aktuell>";
 
 
 		$obj = new zeugnisnote();
@@ -259,11 +281,13 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		else
 			$stg_art='';
 		$xml .= "				<lv_studiengang_bezeichnung>".$stg->bezeichnung."</lv_studiengang_bezeichnung>";
+		$xml .= "				<lv_studiengang_bezeichnung_eng>".$stg->english."</lv_studiengang_bezeichnung_eng>";
 		$xml .= "				<lv_studiengang_art>".$stg_art."</lv_studiengang_art>";
 		$xml .= "				<lv_studiengang_typ>".$stg->typ."</lv_studiengang_typ>";
 		$xml .= "				<lv_studiengang_kennzahl>".sprintf('%04s',$lvstg)."</lv_studiengang_kennzahl>";
 
 		$xml .= "				<bezeichnung><![CDATA[".$lvbezeichnung."]]></bezeichnung>";
+		$xml .= "				<bezeichnung_eng><![CDATA[".$lvbezeichnung_eng."]]></bezeichnung_eng>";
 		$xml .= "				<note>".$note."</note>";
 		$xml .= "				<note_bezeichnung>".$note_bezeichnung."</note_bezeichnung>";
 		$xml .= "				<sws>".($sws==0?'':number_format(sprintf('%.1F',$sws),1))."</sws>";
@@ -272,6 +296,8 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		$xml .= "				<lvleiter>".$leiter_titel." ".$leiter_vorname." ".$leiter_nachname.($leiter_titelpost!=''?', '.$leiter_titelpost:'')."</lvleiter>";
 		$xml .= "				<lehrinhalte><![CDATA[".clearHtmlTags($lehrinhalte)."]]></lehrinhalte>";
 		$xml .= "				<lehrziele><![CDATA[".clearHtmlTags($lehrziele)."]]></lehrziele>";
+		$xml .= "				<lehrinhalte_eng><![CDATA[".clearHtmlTags($lehrinhalte_eng)."]]></lehrinhalte_eng>";
+		$xml .= "				<lehrziele_eng><![CDATA[".clearHtmlTags($lehrziele_eng)."]]></lehrziele_eng>";
 
 		$xml .= "	</zertifikat>";
 	}

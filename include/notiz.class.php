@@ -393,20 +393,25 @@ class notiz extends basis_db
 	/**
 	 *
 	 * Laedt die Notizen vom Bewerbungstool
-	 * @param $person_id int
+	 * @param integer $person_id
+	 * @param integer $prestudent_id
 	 * @return boolean
 	 */
-	public function getBewerbungstoolNotizen($person_id)
+	public function getBewerbungstoolNotizen($person_id, $prestudent_id = null)
 	{
-		$qry = 'SELECT
+		$qry = "SELECT
 					*
 				FROM
 					public.tbl_notiz
 					LEFT JOIN public.tbl_notizzuordnung USING(notiz_id)
-				WHERE person_id = ' . $this->db_add_param($person_id, FHC_INTEGER) .
-				' AND (insertvon = ' . $this->db_add_param('online') .' OR insertvon = ' . $this->db_add_param('online_notiz').')
+				WHERE (insertvon = 'online' OR insertvon = 'online_notiz')
+				AND person_id = ".$this->db_add_param($person_id, FHC_INTEGER);
+		if ($prestudent_id != '')
+		{
+			$qry .= " AND prestudent_id = ".$this->db_add_param($prestudent_id, FHC_INTEGER);
+		}
 
-				ORDER BY notiz_id';
+		$qry .= " ORDER BY notiz_id";
 
 		if($result = $this->db_query($qry))
 		{

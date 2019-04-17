@@ -68,9 +68,13 @@
 						if (isset($lockedby)):
 							echo $this->p->t('global', 'wirdBearbeitetVon').': ';
 							echo $lockedby;
-							if ($origin_page == 'index'): ?>
+							if ($origin_page == 'index'):
+								$unlockpath = 'unlockPerson/'.$stammdaten->person_id;
+								$unlockpath .= '?fhc_controller_id='.$fhc_controller_id;
+								$unlockpath .= '&filter_id='.$prev_filter_id;
+						?>
 								&nbsp;&nbsp;
-								<a href="unlockPerson/<?php echo $stammdaten->person_id; ?>">
+								<a href="<?php echo $unlockpath; ?>">
 									<i class="fa fa-sign-out"></i>&nbsp;<?php echo ucfirst($this->p->t('ui', 'freigeben')) ?>
 								</a>
 							<?php endif; ?>

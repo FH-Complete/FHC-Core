@@ -2264,7 +2264,7 @@ function LehrveranstaltungFFZertifikatPrint(event)
 // ****
 // * Erstellt ein Lehrveranstaltungszeugnis fuer die LV
 // ****
-function LehrveranstaltungLVZeugnisPrint(event)
+function LehrveranstaltungLVZeugnisPrint(event, sprache)
 {
 	tree = document.getElementById('lehrveranstaltung-noten-tree');
 	//Alle markierten Noten holen
@@ -2299,9 +2299,13 @@ function LehrveranstaltungLVZeugnisPrint(event)
 	else
 		var output='pdf';
 
-	url =  '<?php echo APP_ROOT; ?>content/pdfExport.php?xml=lehrveranstaltungszeugnis.rdf.php&xsl=LVZeugnis&stg_kz='+stg_kz+'&uid='+paramList+'&output='+output+'&ss='+ss+'&lvid='+lvid+'&'+gettimestamp();
+	var xsl = 'LVZeugnis';
+
+	if (sprache == 'English')
+		xsl = 'LVZeugnisEng';
+
+	url =  '<?php echo APP_ROOT; ?>content/pdfExport.php?xml=lehrveranstaltungszeugnis.rdf.php&xsl='+xsl+'&stg_kz='+stg_kz+'&uid='+paramList+'&output='+output+'&ss='+ss+'&lvid='+lvid+'&'+gettimestamp();
 	window.location.href = url;
-	//prompt('test:',url);
 }
 
 // ****

@@ -48,6 +48,7 @@ class FilterWidget extends Widget
 
 	private $_datasetRepresentation; // dataset representation (ex: tablesorter, pivotUI, ...)
 	private $_datasetRepresentationOptions; // dataset representation options for tablesorter, pivotUI, ...
+	private $_reloadDataset; // Force Reload of Dataset
 
 	private static $_FilterWidgetInstance; // static property that contains the instance of itself
 
@@ -156,6 +157,7 @@ class FilterWidget extends Widget
 		$this->_datasetName = null;
 		$this->_filterKurzbz = null;
 		$this->_filterId = null;
+		$this->_reloadDataset = null;
 		$this->_query = null;
 		$this->_additionalColumns = null;
 		$this->_columnsAliases = null;
@@ -199,6 +201,11 @@ class FilterWidget extends Widget
 		if (isset($args[FiltersLib::QUERY_PARAMETER]))
 		{
 			$this->_query = $args[FiltersLib::QUERY_PARAMETER];
+		}
+
+		if (isset($args[FiltersLib::DATASET_RELOAD_PARAMETER]))
+		{
+			$this->_reloadDataset = $args[FiltersLib::DATASET_RELOAD_PARAMETER];
 		}
 
 		// Parameter is used to add extra columns to the dataset
@@ -334,8 +341,10 @@ class FilterWidget extends Widget
 			else // else if the filter loaded in session is the same that is being requested
 			{
 				// Get SESSION_RELOAD_DATASET from the session
-				$reloadDataset = $this->filterslib->getSessionElement(FiltersLib::SESSION_RELOAD_DATASET);
-				if ($reloadDataset === true) // if it's value is very true then reload the dataset
+				$sessionReloadDataset = $this->filterslib->getSessionElement(FiltersLib::SESSION_RELOAD_DATASET);
+
+				// if Filter changed or reload is forced by parameter then reload the Dataset
+				if ($this->_reloadDataset === true || $sessionReloadDataset === true)
 				{
 					// Set as false to stop changing the dataset
 					$this->filterslib->setSessionElement(FiltersLib::SESSION_RELOAD_DATASET, false);

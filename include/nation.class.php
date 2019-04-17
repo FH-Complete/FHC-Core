@@ -41,6 +41,7 @@ class nation extends basis_db
 	public $kurztext;
 	public $langtext;
 	public $engltext;
+	public $nationengruppe_kurzbz;
 
 	/**
 	 * Konstruktor
@@ -83,6 +84,7 @@ class nation extends basis_db
 			$this->kurztext = $row->kurztext;
 			$this->langtext = $row->langtext;
 			$this->engltext = $row->engltext;
+			$this->nationengruppe_kurzbz = $row->nationengruppe_kurzbz;
 		}
 		else
 		{
@@ -131,6 +133,7 @@ class nation extends basis_db
 			$nation->kurztext = $row->kurztext;
 			$nation->langtext = $row->langtext;
 			$nation->engltext = $row->engltext;
+			$nation->nationengruppe_kurzbz = $row->nationengruppe_kurzbz;
 
 			$this->nation[] = $nation;
 		}
@@ -146,7 +149,7 @@ class nation extends basis_db
 	{
 
 
-		$qry='INSERT INTO bis.tbl_nation (nation_code, entwicklungsstand, eu, ewr, kontinent, kurztext, langtext, engltext, sperre) VALUES('.
+		$qry='INSERT INTO bis.tbl_nation (nation_code, entwicklungsstand, eu, ewr, kontinent, kurztext, langtext, engltext, nationengruppe_kurzbz, sperre) VALUES('.
 			$this->db_add_param($this->code).', '.
 			$this->db_add_param($this->entwicklungsstand).', '.
 			$this->db_add_param($this->eu, FHC_BOOLEAN).', '.
@@ -155,6 +158,7 @@ class nation extends basis_db
 			$this->db_add_param($this->kurztext).', '.
 			$this->db_add_param($this->langtext).', '.
 			$this->db_add_param($this->engltext).', '.
+			$this->db_add_param($this->nationengruppe_kurzbz).', '.
 			$this->db_add_param($this->sperre, FHC_BOOLEAN).');';
 
 
