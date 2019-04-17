@@ -831,7 +831,7 @@ function GenerateXMLStudentBlock($row)
 				LEFT JOIN public.tbl_firma USING(firma_id)
 			WHERE
 				prestudent_id=".$db->db_add_param($row->prestudent_id)."
-				AND studiensemester_kurzbz=".$db->db_add_param($aktstatus_stsem)."
+				AND (studiensemester_kurzbz=".$db->db_add_param($aktstatus_stsem)." OR (studiensemester_kurzbz=".$db->db_add_param($psem)." AND status_kurzbz = 'Absolvent'))
 			ORDER BY tbl_mobilitaet.insertamum DESC limit 1;";
 
 	$studtyp = '';
