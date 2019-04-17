@@ -207,6 +207,7 @@ class InfoCenter extends Auth_Controller
 
 		$data[self::FHC_CONTROLLER_ID] = $this->getControllerId();
 		$data[self::ORIGIN_PAGE] = $origin_page;
+		$data[self::PREV_FILTER_ID] = $this->input->get(self::PREV_FILTER_ID);
 
 		$this->load->view('system/infocenter/infocenterDetails.php', $data);
 	}
@@ -222,7 +223,18 @@ class InfoCenter extends Auth_Controller
 		if (isError($result))
 			show_error($result->retval);
 
-		redirect('/'.self::INFOCENTER_URI.'?'.self::FHC_CONTROLLER_ID.'='.$this->getControllerId());
+		$redirectLink = '/'.self::INFOCENTER_URI.'?'.self::FHC_CONTROLLER_ID.'='.$this->getControllerId();
+
+		// Force reload of Dataset after Unlock
+		$redirectLink .= '&reloadDataset=true';
+
+		$currentFilterId = $this->input->get(self::FILTER_ID);
+		if (isset($currentFilterId))
+		{
+			$redirectLink .= '&'.self::FILTER_ID.'='.$currentFilterId;
+		}
+
+		redirect($redirectLink);
 	}
 
 	/**

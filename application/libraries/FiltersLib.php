@@ -35,6 +35,7 @@ class FiltersLib
 	const APP_PARAMETER = 'app';
 	const DATASET_NAME_PARAMETER = 'datasetName';
 	const FILTER_KURZBZ_PARAMETER = 'filterKurzbz';
+	const DATASET_RELOAD_PARAMETER = 'reloadDataset';
 
 	// ...to specify permissions that are needed to use this FilterWidget
 	const REQUIRED_PERMISSIONS_PARAMETER = 'requiredPermissions';
