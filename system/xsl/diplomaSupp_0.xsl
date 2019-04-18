@@ -2772,7 +2772,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 			</text:p>
 			</table:table-cell>
 			<table:table-cell table:style-name="Table12.E5" office:value-type="string">
-			<text:p text:style-name="P65"><xsl:value-of select="ects_total"/></text:p>
+			<text:p text:style-name="P65"><xsl:value-of select="ects_total_positiv"/></text:p>
 			</table:table-cell>
 			<table:table-cell table:style-name="Table12.F5" office:value-type="string">
 			<text:p text:style-name="P65">
@@ -2890,7 +2890,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 		</table:table-cell>
 		<table:table-cell table:style-name="Table12.E5" office:value-type="string">
 		<text:p text:style-name="P65">
-			<xsl:value-of select="ects_gesamt"/>
+			<xsl:value-of select="ects_gesamt_positiv"/>
 		</text:p>
 		</table:table-cell>
 		<table:table-cell table:style-name="Table12.F5" office:value-type="string">

@@ -554,11 +554,13 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		echo "  <gradePrevLastYearEa>".sprintf("%01.1f",($noteArrayPrev[12]/$noten_anzahl*100))."</gradePrevLastYearEa>";
 
 		$ects_total = 0;
+		$ects_total_positiv = 0;
 
 		echo "<studiensemester>";
 		for($start = $semesterNumberStart; $start <= $semesterNumberEnd; $start++)
 		{
 			$semester_ects = 0;
+			$semester_ects_positiv = 0;
 			echo "<semesters>";
 
 			// alle semester für das ausbildungssemester holen
@@ -658,6 +660,11 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 						$arrayLvAusbildungssemester[$row_stud->lehrveranstaltung_id]['sort'] = $row_stud->sort;
 						$ects_total += $row_stud->ects;
 						$semester_ects +=$row_stud->ects;
+						if ($arrayLvAusbildungssemester[$row_stud->lehrveranstaltung_id]['note_positiv'] === true)
+						{
+							$ects_total_positiv += $row_stud->ects;
+							$semester_ects_positiv += $row_stud->ects;
+						}
 					}
 					else
 					{
@@ -943,14 +950,21 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 
 						$ects_total +=$row_outgoing->ects;
 						$semester_ects+=$row_outgoing->ects;
+						if ($note_positiv_outgoing === true)
+						{
+							$ects_total_positiv += $row_outgoing->ects;
+							$semester_ects_positiv += $row_outgoing->ects;
+						}
 					}
 				}
 			}
 			echo '<ects_gesamt>'.$semester_ects.'</ects_gesamt>';
+			echo '<ects_gesamt_positiv>'.$semester_ects_positiv.'</ects_gesamt_positiv>';
 			echo "</semesters>";
 		}
 		echo "</studiensemester>";
 		echo " <ects_total>$ects_total</ects_total>";
+		echo " <ects_total_positiv>$ects_total_positiv</ects_total_positiv>";
 		echo '	</supplement>';
 	}
 }

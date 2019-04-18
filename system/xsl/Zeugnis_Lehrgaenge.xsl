@@ -449,7 +449,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
                         <text:p text:style-name="P13">-</text:p>
                     </table:table-cell>
                     <table:table-cell table:style-name="Tabelle1.C7" office:value-type="string">
-                        <text:p text:style-name="P13"><xsl:value-of select="ects_gesamt"/></text:p>
+                        <text:p text:style-name="P13"><xsl:value-of select="ects_gesamt_positiv"/></text:p>
                     </table:table-cell>
                     <table:table-cell table:style-name="Tabelle1.D7" office:value-type="string">
                         <text:p text:style-name="P9">-</text:p>

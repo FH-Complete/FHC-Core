@@ -572,10 +572,10 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
 						<text:p text:style-name="P25"/>
 					</table:table-cell>
 					<table:table-cell table:style-name="Tabelle3.A2" office:value-type="string">
-						<text:p text:style-name="P23"><xsl:value-of select="gesamtstunden_lv" /></text:p>
+						<text:p text:style-name="P23"><xsl:value-of select="gesamtstunden_lv_positiv" /></text:p>
 					</table:table-cell>
 					<table:table-cell table:style-name="Tabelle3.A2" office:value-type="string">
-						<text:p text:style-name="P23"><xsl:value-of select="gesamtects" /></text:p>
+						<text:p text:style-name="P23"><xsl:value-of select="gesamtects_positiv" /></text:p>
 					</table:table-cell>
 					<table:table-cell table:style-name="Tabelle3.A2" office:value-type="string">
 						<text:p text:style-name="P23">Schnitt:</text:p>

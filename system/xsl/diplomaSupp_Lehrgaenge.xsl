@@ -1652,10 +1652,10 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 			</table:table-cell>
 			<table:table-cell table:style-name="Table4.C3" office:value-type="string">
 			<text:p text:style-name="P44">
-				<text:span text:style-name="Tabelleninhalt"><xsl:value-of select="semester"/> Semester | <xsl:value-of select="jahre"/> Jahre | <xsl:value-of select="ects_total"/> ECTS</text:span>
+				<text:span text:style-name="Tabelleninhalt"><xsl:value-of select="semester"/> Semester | <xsl:value-of select="jahre"/> Jahre | <xsl:value-of select="ects_total_positiv"/> ECTS</text:span>
 			</text:p>
 			<text:p text:style-name="P44">
-				<text:span text:style-name="Tabelleninhalt"><xsl:value-of select="semester"/> semester(s) | <xsl:value-of select="jahre"/> year(s) | <xsl:value-of select="ects_total"/> ECTS</text:span>
+				<text:span text:style-name="Tabelleninhalt"><xsl:value-of select="semester"/> semester(s) | <xsl:value-of select="jahre"/> year(s) | <xsl:value-of select="ects_total_positiv"/> ECTS</text:span>
 			</text:p>
 			</table:table-cell>
 		</table:table-row>
@@ -2896,7 +2896,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 		</table:table-cell>
 		<table:table-cell table:style-name="Table12.E5" office:value-type="string">
 		<text:p text:style-name="P65">
-			<xsl:value-of select="ects_gesamt"/>
+			<xsl:value-of select="ects_gesamt_positiv"/>
 		</text:p>
 		</table:table-cell>
 		<table:table-cell table:style-name="Table12.F5" office:value-type="string">
