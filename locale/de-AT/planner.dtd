@@ -1,5 +1,5 @@
-<!ENTITY window.title			"Planner"> 
-<!ENTITY window.version			"3.2a"> 
+<!ENTITY window.title			"Planner">
+<!ENTITY window.version			"3.3"> 
 
 
 <!ENTITY menu-file.label              	"Datei">
