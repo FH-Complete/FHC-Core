@@ -4,7 +4,7 @@
 	$INTERESSENT_STATUS = '\'Interessent\'';
 	$STUDIENGANG_TYP = '\'b\'';
 	$TAETIGKEIT_KURZBZ = '\'bewerbung\', \'kommunikation\'';
-	$LOGDATA_NAME = '\'Login with code\', \'New application\'';
+	$LOGDATA_NAME = '\'Login with code\', \'Login with user\', \'New application\'';
 	$ADDITIONAL_STG = '10021,10027';
 
 	$query = '
