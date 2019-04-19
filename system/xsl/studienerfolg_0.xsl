@@ -581,7 +581,7 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
 						<text:p text:style-name="P23">Schnitt:</text:p>
 					</table:table-cell>
 					<table:table-cell table:style-name="Tabelle3.G2" office:value-type="string">
-						<text:p text:style-name="P23"><xsl:value-of select="schnitt" /></text:p>
+						<text:p text:style-name="P23"><xsl:value-of select="schnitt_positiv" /></text:p>
 					</table:table-cell>
 				</table:table-row>
 			</table:table>

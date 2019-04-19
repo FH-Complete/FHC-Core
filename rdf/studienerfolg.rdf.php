@@ -215,7 +215,9 @@ function draw_studienerfolg($uid, $studiensemester_kurzbz)
 	$gesamtects=0;
 	$gesamtects_positiv=0;
 	$notensumme=0;
+	$notensumme_positiv=0;
 	$anzahl=0;
+	$anzahl_positiv=0;
 
 	foreach ($obj->result as $row)
 	{
@@ -269,6 +271,11 @@ function draw_studienerfolg($uid, $studiensemester_kurzbz)
 				{
 					$notensumme += $note_wert[$row->note];
 					$anzahl++;
+					if ($row->note_positiv)
+					{
+						$notensumme_positiv += $note_wert[$row->note];
+						$anzahl_positiv++;
+					}
 				}
 			}
 		}
@@ -281,6 +288,14 @@ function draw_studienerfolg($uid, $studiensemester_kurzbz)
 	}
 	else
 		$schnitt = 0;
+
+	if($anzahl_positiv!=0)
+	{
+		$schnitt_positiv = ($notensumme_positiv/$anzahl_positiv);
+	}
+	else
+		$schnitt_positiv = 0;
+
 	$xml .= "		<gesamtstunden>".$gesamtstunden."</gesamtstunden>";
 	$xml .= "		<gesamtstunden_positiv>".$gesamtstunden_positiv."</gesamtstunden_positiv>";
 	$xml .= "		<gesamtstunden_lv>".$gesamtstunden_lv."</gesamtstunden_lv>";
@@ -288,6 +303,7 @@ function draw_studienerfolg($uid, $studiensemester_kurzbz)
 	$xml .= "		<gesamtects>$gesamtects</gesamtects>";
 	$xml .= "		<gesamtects_positiv>$gesamtects_positiv</gesamtects_positiv>";
 	$xml .= "		<schnitt>".sprintf('%.2f',$schnitt)."</schnitt>";
+	$xml .= "		<schnitt_positiv>".sprintf('%.2f',$schnitt_positiv)."</schnitt_positiv>";
 	$xml .= "	</studienerfolg>";
 }
 
