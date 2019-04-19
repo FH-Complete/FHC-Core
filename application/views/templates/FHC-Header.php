@@ -23,6 +23,7 @@
 	$fontawesome = isset($fontawesome) ? $fontawesome : false;
 	$jquery = isset($jquery) ? $jquery : false;
 	$jqueryui = isset($jqueryui) ? $jqueryui : false;
+	$jquerycheckboxes = isset($jquerycheckboxes) ? $jquerycheckboxes : false;
 	$jquerytreetable = isset($jquerytreetable) ? $jquerytreetable : false;
 	$navigationwidget = isset($navigationwidget) ? $navigationwidget : false;
 	$pivotui = isset($pivotui) ? $pivotui : false;
@@ -118,6 +119,12 @@
 			{
 				generateJSsInclude('vendor/components/jqueryui/jquery-ui.min.js');
 				generateJSsInclude('vendor/components/jqueryui/ui/i18n/datepicker-de.js'); // datepicker german language file
+			}
+
+			// jQuery checkboxes
+			if ($jquerycheckboxes === true)
+			{
+				generateJSsInclude('vendor/rmariuzzo/jquery-checkboxes/dist/jquery.checkboxes-1.0.7.min.js');
 			}
 
 			// Bootstrap JS

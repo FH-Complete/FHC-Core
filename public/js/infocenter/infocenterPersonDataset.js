@@ -22,7 +22,6 @@ var InfocenterPersonDataset = {
 
 	/**
 	 * adds person table additional actions html (above and beneath it)
-	 /*
 	 */
 	appendTableActionsHtml: function()
 	{

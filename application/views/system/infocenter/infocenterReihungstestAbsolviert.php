@@ -5,6 +5,7 @@
 			'title' => 'Info Center',
 			'jquery' => true,
 			'jqueryui' => true,
+			'jquerycheckboxes' => true,
 			'bootstrap' => true,
 			'fontawesome' => true,
 			'sbadmintemplate' => true,

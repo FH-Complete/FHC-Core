@@ -848,6 +848,13 @@ var FHC_FilterWidget = {
 		{
 			if (data.hasOwnProperty("dataset") && $.isArray(data.dataset))
 			{
+				if (data.checkboxes != null && data.checkboxes != "")
+				{
+					// select checkbox range with shift key
+					if (typeof $("#filterTableDataset").checkboxes === 'function')
+						$("#filterTableDataset").checkboxes("range", true);
+				}
+
 				for (var i = 0; i < data.dataset.length; i++)
 				{
 					var record = data.dataset[i];
