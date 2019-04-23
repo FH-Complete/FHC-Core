@@ -87,7 +87,7 @@ function saveNotiz($username, $passwort, $notiz)
 	$notiz_obj->ende = $notiz->ende;
 	$notiz_obj->erledigt=($notiz->erledigt=='true'?true:false);
 	$notiz_obj->updateamum = date('Y-m-d H:i:s');
-	$notiz_obj->updatevon = $username;
+	$notiz_obj->updatevon = $user;
 
 	if($notiz_obj->save())
 	{
@@ -151,11 +151,11 @@ function deleteDokument($username, $passwort, $dms_id)
 	if(!$rechte->isBerechtigt('basis/notiz', null, 'suid'))
 		return new SoapFault("Server", "Sie haben keine Berechtigung zum Loeschen von Dokumenten");
 
-    $dms = new dms();
-    if($dms->deleteDms($dms_id))
-        return "OK";
-    else
-        return new SoapFault("Server", $dms->errormsg);
+	$dms = new dms();
+	if($dms->deleteDms($dms_id))
+		return "OK";
+	else
+		return new SoapFault("Server", $dms->errormsg);
 }
 
 /**
@@ -178,6 +178,8 @@ function setErledigt($notiz_id, $erledigt)
 	if($notiz->load($notiz_id))
 	{
 		$notiz->erledigt=$erledigt;
+		$notiz->updateamum = date('Y-m-d H:i:s');
+		$notiz->updatevon = $user;
 
 		if($notiz->save())
 		{
