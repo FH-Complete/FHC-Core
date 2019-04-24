@@ -29,7 +29,7 @@ class ical extends basis_db
 	public $result = array();
 	public $dtresult = array();
 
-	
+
 	/**
 	 * Konstruktor
 	 */
@@ -40,18 +40,31 @@ class ical extends basis_db
 
 	/**
 	 * Importiert ein FreeBusy File
-	 * 
+	 *
 	 * @param $ical
 	 * @param $typ
 	 */
 	public function importFreeBusy($ical, $typ)
 	{
 		$rows = explode("\n",$ical);
-		
+
 		$idx = count($this->result);
 		$status=0;
 		$dtstart='';
 		$dtend='';
+
+		/*
+		 * Google Kalender schreibt kein FreeBusy sondern anonymisiert die Kalendereintraege
+		 * Daher gibt es dort kein Beginn / Ende von VFREEBUSY
+		 */
+		if($typ == 'Google')
+		{
+			$status = 1;
+			if(!isset($this->result[$idx]))
+				$this->result[$idx]='';
+			$this->result[$idx].= "BEGIN:VFREEBUSY\n";
+		}
+
 		foreach($rows as $row)
 		{
 			if(mb_strstr($row,'BEGIN:VFREEBUSY'))
@@ -59,7 +72,7 @@ class ical extends basis_db
 				$status=1;
 				if(!isset($this->result[$idx]))
 					$this->result[$idx]='';
-				$this->result[$idx].=$row."\n";				
+				$this->result[$idx].=$row."\n";
 			}
 			elseif(mb_strstr($row,'END:VFREEBUSY'))
 			{
@@ -71,11 +84,11 @@ class ical extends basis_db
 			{
 				if($typ=='Google')
 				{
-					// VEVENT mit UTC Timestamps 
+					// VEVENT mit UTC Timestamps
 					if(mb_strstr($row,'DTSTART:'))
 					{
 						$dtstart = $this->ConvertTimezoneUTC(mb_substr($row,8,-1));
-					} 
+					}
 					elseif(mb_strstr($row,'DTEND:'))
 					{
 						$dtend = $this->ConvertTimezoneUTC(mb_substr($row,6));
@@ -107,7 +120,7 @@ class ical extends basis_db
 						$dtstart = $this->ConvertTimezoneUTC(mb_substr($row, 0, $slashpos));
 						$dtend = $this->ConvertTimezoneUTC(mb_substr($row, $slashpos+1));
 						$this->dtresult[]=array('dtstart'=>trim($dtstart),'dtend'=>trim($dtend));
-						
+
 						$dtstart = $this->ConvertTimezoneUTC($dtstart);
 						$dtend = $this->ConvertTimezoneUTC($dtend);
 						$this->result[$idx].='FREEBUSY:'.$dtstart.'/'.$dtend."\n";
@@ -144,8 +157,16 @@ class ical extends basis_db
 				}
 			}
 		}
+		if($typ == 'Google')
+		{
+			$status = 0;
+			if(!isset($this->result[$idx]))
+				$this->result[$idx]='';
+			$this->result[$idx].= "END:VFREEBUSY\n";
+			$idx++;
+		}
 	}
-	
+
 	/**
 	 * Liefert die FreeBusy Eintraege
 	 */
@@ -153,17 +174,17 @@ class ical extends basis_db
 	{
 		return implode($this->result);
 	}
-	
+
 	/**
 	 * Importiert ein FreeBusy File
-	 * 
+	 *
 	 * @param $ical
 	 * @param $typ
 	 */
 	public function parseFreeBusy($ical)
 	{
 		$rows = explode("\n",$ical);
-		
+
 		$idx = count($this->result);
 		$status=0;
 		$dtstart='';
@@ -176,7 +197,7 @@ class ical extends basis_db
 				$doppelpunktpos = mb_strpos($row, ':');
 				$row = mb_substr($row, $doppelpunktpos+1);
 				$len = mb_strlen($row);
-				
+
 				$slashpos = mb_strpos($row, '/');
 				$dtstart = mb_substr($row, 0, $len-$slashpos-1);
 				$dtend = mb_substr($row, $slashpos+1);
@@ -186,10 +207,10 @@ class ical extends basis_db
 			}
 		}
 	}
-	
+
 	/**
-	 * 
-	 * Konvertiert die Zeitzone eines XMLRPC (Compact) datetimes von Europe/Vienna auf UTC 
+	 *
+	 * Konvertiert die Zeitzone eines XMLRPC (Compact) datetimes von Europe/Vienna auf UTC
 	 * @param $datetime (zB 20080701T093807Z)
 	 */
 	function ConvertTimezoneUTC($datetime)
@@ -204,15 +225,15 @@ class ical extends basis_db
 			//Default
 			$timezone = new DateTimeZone('Europe/Vienna');
 		}
-		
+
 		$date = new DateTime($datetime, $timezone);
 		$date->setTimezone(new DateTimeZone('UTC'));
 		return $date->format('Ymd\THis').'Z';
 	}
-	
+
 	/**
-	 * 
-	 * Konvertiert die Zeitzone eines XMLRPC (Compact) datetimes von Europe/Vienna auf UTC 
+	 *
+	 * Konvertiert die Zeitzone eines XMLRPC (Compact) datetimes von Europe/Vienna auf UTC
 	 * @param $datetime (zB 20080701T093807Z)
 	 */
 	function ConvertTimezoneLocal($datetime)
@@ -227,7 +248,7 @@ class ical extends basis_db
 			//Default
 			$timezone = new DateTimeZone('Europe/Vienna');
 		}
-		
+
 		$date = new DateTime($datetime, $timezone);
 		$date->setTimezone(new DateTimeZone('Europe/Vienna'));
 		return $date->format('Ymd\THis');
