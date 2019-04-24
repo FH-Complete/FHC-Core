@@ -9,6 +9,8 @@ $this->phrasen['testtool/willkommenstext']='Welcome to the placement test.<br />
 											We wish you a good start to your studies.';
 $this->phrasen['testtool/nameAuswaehlen']='Choose name...';
 $this->phrasen['testtool/quereinstieg']='(Lateral entry)';
+$this->phrasen['testtool/quereinsteiger']='Lateral entry';
+$this->phrasen['testtool/basic']='Basic';
 $this->phrasen['testtool/semester']='Semester';
 $this->phrasen['testtool/reihungstestNichtFreigeschalten']='The entrance examination assigned has not yet been activated.';
 $this->phrasen['testtool/reihungstestKannNichtGeladenWerden']='The entrance examination assigned to you can not be loaded.';
