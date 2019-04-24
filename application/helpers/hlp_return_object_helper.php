@@ -20,23 +20,30 @@
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
 // -------------------------------------------------------------------------------------------------------
-// Collection of functions to handle successful and error messages that methods and functions can return
+// Collection of functions to handle success and error objects that methods and functions can return
 // -------------------------------------------------------------------------------------------------------
+
+/**
+ * Used to create a return object, should not be used directly
+ */
+function _createReturnObject($code, $error, $retval)
+{
+	$returnObject = new stdClass();
+	$returnObject->code = $code;
+	$returnObject->error = $error;
+	$returnObject->retval = $retval;
+
+	return $returnObject;
+}
 
 /**
  * Success
  *
  * @return  array
  */
-function success($retval, $code = null, $msg_indx_prefix = 'fhc_')
+function success($retval = null, $code = null)
 {
-	$success = new stdClass();
-	$success->error = EXIT_SUCCESS;
-	$success->fhcCode = $code;
-	if (!is_null($code)) $success->msg = lang($msg_indx_prefix . $code);
-	$success->retval = $retval;
-
-	return $success;
+	return _createReturnObject($code, EXIT_SUCCESS, $retval);
 }
 
 /**
@@ -44,15 +51,9 @@ function success($retval, $code = null, $msg_indx_prefix = 'fhc_')
  *
  * @return  array
  */
-function error($retval = '', $code = null, $msg_indx_prefix = 'fhc_')
+function error($retval = null, $code = null)
 {
-	$error = new stdClass();
-	$error->error = EXIT_ERROR;
-	$error->fhcCode = $code;
-	if (!is_null($code)) $error->msg = lang($msg_indx_prefix . $code);
-	$error->retval = $retval;
-
-	return $error;
+	return _createReturnObject($code, EXIT_ERROR, $retval);
 }
 
 /**
@@ -111,15 +112,15 @@ function getData($result)
 }
 
 /**
- * Returns the property fhcCode if present, otherwise null
+ * Returns the property code if present, otherwise null
  */
 function getCode($result)
 {
 	$code = null;
 
-	if (isset($result->fhcCode))
+	if (isset($result->code))
 	{
-		$code = $result->fhcCode;
+		$code = $result->code;
 	}
 
 	return $code;
