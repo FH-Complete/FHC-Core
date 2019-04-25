@@ -403,7 +403,7 @@ if(isset($_POST['save']) && isset($_SESSION['prestudent_id']))
            $sprachwahl = $ablauf->result[0]->sprachwahl;
         }
 
-		//Prestudent Informationen und Logout
+		//Prestudent Informationen
 		echo '<form method="GET">';
 		echo '<br>'.$p->t('testtool/begruessungstext').' <br/><br/>';
 		echo '<b>'.$p->t('zeitaufzeichnung/id').'</b>: '.$_SESSION['prestudent_id'].'<br/>';
@@ -462,7 +462,6 @@ if(isset($_POST['save']) && isset($_SESSION['prestudent_id']))
         {
 			echo '<b>'.$p->t('global/studiengang').'</b>: '.$typ->bezeichnung.' '.($sprache_user=='English'?$stg_obj->english:$stg_obj->bezeichnung).'<br/><br/>';
         }
-		echo '<INPUT type="submit" value="Logout" name="logout" />';
 		echo '</form>';
 		echo '<br><br>';
 

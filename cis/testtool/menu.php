@@ -97,7 +97,7 @@ if (isset($_SESSION['pruefling_id']))
 
 // Link zur Startseite
 	echo '<tr><td class="ItemTesttool" style="margin-left: 20px;" nowrap>
-			<a class="ItemTesttool" href="login.php" target="content">'.$p->t('testtool/startseite').'</a>
+			<a class="ItemTesttool navButton" href="login.php" target="content">'.$p->t('testtool/startseite').'</a>
 		</td></tr>';
 
 // Link zur Einleitung
@@ -105,7 +105,7 @@ if (isset($_SESSION['pruefling_id']))
 		if($content_id->content_id!='')
 			echo '
                 <tr><td class="ItemTesttool" style="margin-left: 20px;" nowrap>
-                    <a class="ItemTesttool" href="../../cms/content.php?content_id='.$content_id->content_id.'&sprache='.$sprache.'" target="content">'.$p->t('testtool/einleitung').'</a>
+                    <a class="ItemTesttool navButton" href="../../cms/content.php?content_id='.$content_id->content_id.'&sprache='.$sprache.'" target="content">'.$p->t('testtool/einleitung').'</a>
                 </td></tr>';
 
 	echo '<tr><td style="padding-left: 20px;" nowrap>';
@@ -383,6 +383,12 @@ if (isset($_SESSION['pruefling_id']))
 		}
 	}
 	echo '</table>';
+
+	// Link zum Logout
+	echo '<tr><td class="ItemTesttool" style="margin-left: 20px;" nowrap>
+			<a class="ItemTesttool navButton" href="login.php?logout" target="content">Logout</a>
+		</td></tr>';
+
 	echo '</td></tr></table>';
 }
 else

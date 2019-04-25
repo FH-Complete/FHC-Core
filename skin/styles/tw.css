@@ -214,6 +214,13 @@ a.ItemTesttool
 	display:block;
 	padding: 5px 10px 5px 10px;
 }
+
+a.ItemTesttool.navButton
+{
+	background-color: #0a629c;
+	color: white;
+	padding: 10px;
+}
 a.ItemTesttoolAktiv
 {
 	color: #000;
@@ -237,6 +244,12 @@ a:hover.ItemTesttool
 	line-height: 25px;
 	text-decoration: none;
 	padding: 5px 10px 5px 10px;
+}
+a:hover.ItemTesttool.navButton
+{
+	background-color: steelblue;
+	color: white;
+	padding: 10px;
 }
 a.HyperItem /* ? */
 {
