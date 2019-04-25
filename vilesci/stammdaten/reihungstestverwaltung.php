@@ -2594,9 +2594,11 @@ if($reihungstest_id!='')
 		JOIN public.tbl_person USING (person_id)
 		JOIN public.tbl_prestudent ON (tbl_rt_person.person_id=tbl_prestudent.person_id)
 	WHERE
-		rt_id = ".$db->db_add_param($reihungstest_id, FHC_INTEGER);
-
-	$qry .= " AND tbl_rt_person.studienplan_id IN(SELECT studienplan_id FROM public.tbl_prestudentstatus where prestudent_id=tbl_prestudent.prestudent_id)
+		rt_id = ".$db->db_add_param($reihungstest_id, FHC_INTEGER)." 
+	AND tbl_rt_person.studienplan_id IN (
+		SELECT studienplan_id 
+		FROM public.tbl_prestudentstatus 
+		WHERE prestudent_id=tbl_prestudent.prestudent_id)
 	ORDER BY ort_kurzbz NULLS FIRST,nachname,vorname";
 
 	$mailto = '';
