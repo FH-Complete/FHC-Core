@@ -552,8 +552,8 @@ if($result_stg = $db->db_query($qry_stg))
 			}
 
 			//Gesamtkosten anzeigen
-			$worksheet->writeNumber($zeile,11,$gesamtkosten, $format_number_bold);
-			$gesamt->writeNumber($gesamtsheet_row,11,$gesamtkosten, $format_number_bold);
+			$worksheet->writeNumber($zeile,13,$gesamtkosten, $format_number_bold);
+			$gesamt->writeNumber($gesamtsheet_row,13,$gesamtkosten, $format_number_bold);
 		}
 	}
 	
