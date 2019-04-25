@@ -72,8 +72,7 @@ class VorlageLib
 	 */
 	public function getVorlagetextByVorlage($vorlage_kurzbz)
 	{
-		if (isEmptyString($vorlage_kurzbz))
-			return error($this->ci->lang->line('fhc_'.FHC_INVALIDID, false));
+		if (isEmptyString($vorlage_kurzbz)) return error('Not a valid vorlage_kurzbz');
 
 		$vorlage = $this->ci->VorlageStudiengangModel->loadWhere(array('vorlage_kurzbz' => $vorlage_kurzbz));
 		return $vorlage;
@@ -90,8 +89,7 @@ class VorlageLib
 	 */
 	public function loadVorlagetext($vorlage_kurzbz, $oe_kurzbz = null, $orgform_kurzbz = null, $sprache = null)
 	{
-		if (isEmptyString($vorlage_kurzbz))
-			return error($this->ci->lang->line('fhc_'.FHC_INVALIDID, false));
+		if (isEmptyString($vorlage_kurzbz)) return error('Not a valid vorlage_kurzbz');
 
 		// Try to search the template with the given vorlage_kurzbz and other parameters if present
 		$queryParameters = array("vorlage_kurzbz" => $vorlage_kurzbz, "aktiv" => true);
@@ -200,9 +198,8 @@ class VorlageLib
 	 */
 	public function parseVorlagetext($text, $data = array())
 	{
-		if (isEmptyString($text))
-			return error($this->ci->lang->line('fhc_'.FHC_INVALIDID, false));
-		$text = $this->ci->parser->parse_string($text, $data, true);
-		return $text;
+		if (isEmptyString($text)) return error('Not a valid text');
+
+		return $this->ci->parser->parse_string($text, $data, true);
 	}
 }

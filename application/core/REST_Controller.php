@@ -361,7 +361,7 @@ abstract class REST_Controller extends CI_Controller {
     protected function early_checks()
     {
 		// Loads helper message to manage returning messages
-		$this->load->helper('hlp_message');
+		$this->load->helper('hlp_return_object');
 
 		// Loads helper with generic utility function
 		$this->load->helper('hlp_common');

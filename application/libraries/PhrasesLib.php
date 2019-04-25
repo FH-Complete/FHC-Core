@@ -82,8 +82,7 @@ class PhrasesLib
      */
     public function getPhrasentextById($phrasentext_id)
 	{
-        if (isEmptyString($phrasentext_id))
-        	return error($this->_ci->lang->line('fhc_'.FHC_INVALIDID, false));
+        if (isEmptyString($phrasentext_id)) return error('Not a valid phrasentext_id');
 
         return $this->_ci->PhrasentextModel->load($phrasentext_id);
     }
@@ -170,8 +169,7 @@ class PhrasesLib
      */
     public function parseVorlagetext($text, $data = array())
 	{
-        if (isEmptyString($text))
-        	return error($this->_ci->lang->line('fhc_'.FHC_INVALIDID, false));
+        if (isEmptyString($text)) return error('Not a valid text');
 
 		return $this->_ci->parser->parse_string($text, $data, true);
     }

@@ -21,7 +21,7 @@ class FHC_Controller extends CI_Controller
 		$this->_controllerId = null; // set _controllerId as null by default
 
 		// Loads helper message to manage returning messages
-		$this->load->helper('hlp_message');
+		$this->load->helper('hlp_return_object');
 
 		// Loads helper with generic utility function
 		$this->load->helper('hlp_common');

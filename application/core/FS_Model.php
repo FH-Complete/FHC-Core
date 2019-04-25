@@ -1,6 +1,6 @@
 <?php
 
-class FS_Model extends FHC_Model
+class FS_Model extends CI_Model
 {
 	protected $filepath;  // Path of the file
 
@@ -25,10 +25,10 @@ class FS_Model extends FHC_Model
 	public function read($filename)
 	{
 		// Check Class-Attributes
-		if (is_null($this->filepath)) return error(FHC_MODEL_ERROR, FHC_ERROR);
+		if (is_null($this->filepath)) return error(EXIT_MODEL, EXIT_ERROR);
 
 		// Check method parameters
-		if (is_null($filename)) return error(FHC_MODEL_ERROR, FHC_ERROR);
+		if (is_null($filename)) return error(EXIT_MODEL, EXIT_ERROR);
 
 		if (!is_null($data = $this->filesystemlib->read($this->filepath, $filename)))
 		{
@@ -36,7 +36,7 @@ class FS_Model extends FHC_Model
 		}
 		else
 		{
-			return error(FHC_MODEL_ERROR, FHC_ERROR);
+			return error(EXIT_MODEL, EXIT_ERROR);
 		}
 	}
 
@@ -49,19 +49,19 @@ class FS_Model extends FHC_Model
 	public function write($filename, $content)
 	{
 		// Check Class-Attributes
-		if (is_null($this->filepath)) return error(FHC_MODEL_ERROR, FHC_ERROR);
+		if (is_null($this->filepath)) return error(EXIT_MODEL, EXIT_ERROR);
 
 		// Check method parameters
-		if (is_null($filename)) return error(FHC_MODEL_ERROR, FHC_ERROR);
-		if (is_null($content)) return error(FHC_MODEL_ERROR, FHC_ERROR);
+		if (is_null($filename)) return error(EXIT_MODEL, EXIT_ERROR);
+		if (is_null($content)) return error(EXIT_MODEL, EXIT_ERROR);
 
 		if ($this->filesystemlib->write($this->filepath, $filename, base64_decode($content)) === true)
 		{
-			return success(FHC_SUCCESS);
+			return success();
 		}
 		else
 		{
-			return error(FHC_MODEL_ERROR, FHC_ERROR);
+			return error(EXIT_MODEL, EXIT_ERROR);
 		}
 	}
 
@@ -74,19 +74,19 @@ class FS_Model extends FHC_Model
 	public function append($filename, $content)
 	{
 		// Check Class-Attributes
-		if (is_null($this->filepath)) return error(FHC_MODEL_ERROR, FHC_ERROR);
+		if (is_null($this->filepath)) return error(EXIT_MODEL, EXIT_ERROR);
 
 		// Check method parameters
-		if (is_null($content)) return error(FHC_MODEL_ERROR, FHC_ERROR);
-		if (is_null($filename)) return error(FHC_MODEL_ERROR, FHC_ERROR);
+		if (is_null($content)) return error(EXIT_MODEL, EXIT_ERROR);
+		if (is_null($filename)) return error(EXIT_MODEL, EXIT_ERROR);
 
 		if ($this->filesystemlib->append($this->filepath, $filename, base64_decode($content)) === true)
 		{
-			return success(FHC_SUCCESS);
+			return success();
 		}
 		else
 		{
-			return error(FHC_MODEL_ERROR, FHC_ERROR);
+			return error(EXIT_MODEL, EXIT_ERROR);
 		}
 	}
 
@@ -99,18 +99,18 @@ class FS_Model extends FHC_Model
 	public function remove($filename)
 	{
 		// Check Class-Attributes
-		if (is_null($this->filepath)) return error(FHC_MODEL_ERROR, FHC_ERROR);
+		if (is_null($this->filepath)) return error(EXIT_MODEL, EXIT_ERROR);
 
 		// Check method parameters
-		if (is_null($filename)) return error(FHC_MODEL_ERROR, FHC_ERROR);
+		if (is_null($filename)) return error(EXIT_MODEL, EXIT_ERROR);
 
 		if ($this->filesystemlib->remove($this->filepath, $filename) === true)
 		{
-			return success(FHC_SUCCESS);
+			return success();
 		}
 		else
 		{
-			return error(FHC_MODEL_ERROR, FHC_ERROR);
+			return error(EXIT_MODEL, EXIT_ERROR);
 		}
 	}
 
@@ -123,19 +123,19 @@ class FS_Model extends FHC_Model
 	public function rename($filename, $newFilename)
 	{
 		// Check Class-Attributes
-		if (is_null($this->filepath)) return error(FHC_MODEL_ERROR, FHC_ERROR);
+		if (is_null($this->filepath)) return error(EXIT_MODEL, EXIT_ERROR);
 
 		// Check method parameters
-		if (is_null($filename)) return error(FHC_MODEL_ERROR, FHC_ERROR);
-		if (is_null($newFilename)) return error(FHC_MODEL_ERROR, FHC_ERROR);
+		if (is_null($filename)) return error(EXIT_MODEL, EXIT_ERROR);
+		if (is_null($newFilename)) return error(EXIT_MODEL, EXIT_ERROR);
 
 		if ($this->filesystemlib->rename($this->filepath, $filename, $this->filepath, $newFilename) === true)
 		{
-			return success(FHC_SUCCESS);
+			return success();
 		}
 		else
 		{
-			return error(FHC_MODEL_ERROR, FHC_ERROR);
+			return error(EXIT_MODEL, EXIT_ERROR);
 		}
 	}
 }

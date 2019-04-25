@@ -151,7 +151,7 @@ class Message_model extends DB_Model
 		}
 		else
 		{
-			return error($this->db->error(), FHC_DB_ERROR);
+			return error($this->db->error(), EXIT_DATABASE);
 		}
 	}
 
@@ -168,7 +168,7 @@ class Message_model extends DB_Model
 		}
 		else
 		{
-			return error($this->db->error(), FHC_DB_ERROR);
+			return error($this->db->error(), EXIT_DATABASE);
 		}
 	}
 
