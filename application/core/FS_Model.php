@@ -17,7 +17,7 @@ class FS_Model extends CI_Model
 		$this->filepath = $filepath;
 	}
 
-	/** ---------------------------------------------------------------
+	/**
 	 * Read data from file system
 	 *
 	 * @return array
@@ -25,10 +25,10 @@ class FS_Model extends CI_Model
 	public function read($filename)
 	{
 		// Check Class-Attributes
-		if (is_null($this->filepath)) return error(EXIT_MODEL, EXIT_ERROR);
+		if (is_null($this->filepath)) return error('The given filepath in not valid', EXIT_ERROR);
 
 		// Check method parameters
-		if (is_null($filename)) return error(EXIT_MODEL, EXIT_ERROR);
+		if (is_null($filename)) return error('The given filename is not valid', EXIT_ERROR);
 
 		if (!is_null($data = $this->filesystemlib->read($this->filepath, $filename)))
 		{
@@ -36,11 +36,11 @@ class FS_Model extends CI_Model
 		}
 		else
 		{
-			return error(EXIT_MODEL, EXIT_ERROR);
+			return error('An error occurred while reading a file', EXIT_ERROR);
 		}
 	}
 
-	/** ---------------------------------------------------------------
+	/**
 	 * Writing data to file system
 	 *
 	 * @param   string $fileContent File content
@@ -49,11 +49,11 @@ class FS_Model extends CI_Model
 	public function write($filename, $content)
 	{
 		// Check Class-Attributes
-		if (is_null($this->filepath)) return error(EXIT_MODEL, EXIT_ERROR);
+		if (is_null($this->filepath)) return error('The given filepath in not valid', EXIT_ERROR);
 
 		// Check method parameters
-		if (is_null($filename)) return error(EXIT_MODEL, EXIT_ERROR);
-		if (is_null($content)) return error(EXIT_MODEL, EXIT_ERROR);
+		if (is_null($content)) return error('The given file content is not valid', EXIT_ERROR);
+		if (is_null($filename)) return error('The given filename is not valid', EXIT_ERROR);
 
 		if ($this->filesystemlib->write($this->filepath, $filename, base64_decode($content)) === true)
 		{
@@ -61,11 +61,11 @@ class FS_Model extends CI_Model
 		}
 		else
 		{
-			return error(EXIT_MODEL, EXIT_ERROR);
+			return error('An error occurred while writing a file', EXIT_ERROR);
 		}
 	}
 
-	/** ---------------------------------------------------------------
+	/**
 	 * Append data to a file
 	 *
 	 * @param   array $data File content
@@ -74,11 +74,11 @@ class FS_Model extends CI_Model
 	public function append($filename, $content)
 	{
 		// Check Class-Attributes
-		if (is_null($this->filepath)) return error(EXIT_MODEL, EXIT_ERROR);
+		if (is_null($this->filepath)) return error('The given filepath in not valid', EXIT_ERROR);
 
 		// Check method parameters
-		if (is_null($content)) return error(EXIT_MODEL, EXIT_ERROR);
-		if (is_null($filename)) return error(EXIT_MODEL, EXIT_ERROR);
+		if (is_null($content)) return error('The given file content is not valid', EXIT_ERROR);
+		if (is_null($filename)) return error('The given filename is not valid', EXIT_ERROR);
 
 		if ($this->filesystemlib->append($this->filepath, $filename, base64_decode($content)) === true)
 		{
@@ -86,11 +86,11 @@ class FS_Model extends CI_Model
 		}
 		else
 		{
-			return error(EXIT_MODEL, EXIT_ERROR);
+			return error('An error occurred while appending to a file', EXIT_ERROR);
 		}
 	}
 
-	/** ---------------------------------------------------------------
+	/**
 	 * Delete data from file system
 	 *
 	 * @param   string $id  Primary Key for DELETE
@@ -99,10 +99,10 @@ class FS_Model extends CI_Model
 	public function remove($filename)
 	{
 		// Check Class-Attributes
-		if (is_null($this->filepath)) return error(EXIT_MODEL, EXIT_ERROR);
+		if (is_null($this->filepath)) return error('The given filepath in not valid', EXIT_ERROR);
 
 		// Check method parameters
-		if (is_null($filename)) return error(EXIT_MODEL, EXIT_ERROR);
+		if (is_null($filename)) return error('The given filename is not valid', EXIT_ERROR);
 
 		if ($this->filesystemlib->remove($this->filepath, $filename) === true)
 		{
@@ -110,11 +110,11 @@ class FS_Model extends CI_Model
 		}
 		else
 		{
-			return error(EXIT_MODEL, EXIT_ERROR);
+			return error('An error occurred while removing a file', EXIT_ERROR);
 		}
 	}
 
-	/** ---------------------------------------------------------------
+	/**
 	 * Rename a file
 	 *
 	 * @param   string $id  Primary Key for DELETE
@@ -123,11 +123,11 @@ class FS_Model extends CI_Model
 	public function rename($filename, $newFilename)
 	{
 		// Check Class-Attributes
-		if (is_null($this->filepath)) return error(EXIT_MODEL, EXIT_ERROR);
+		if (is_null($this->filepath)) return error('The given filepath in not valid', EXIT_ERROR);
 
 		// Check method parameters
-		if (is_null($filename)) return error(EXIT_MODEL, EXIT_ERROR);
-		if (is_null($newFilename)) return error(EXIT_MODEL, EXIT_ERROR);
+		if (is_null($filename)) return error('The given filename is not valid', EXIT_ERROR);
+		if (is_null($newFilename)) return error('The given new filename is not valid', EXIT_ERROR);
 
 		if ($this->filesystemlib->rename($this->filepath, $filename, $this->filepath, $newFilename) === true)
 		{
@@ -135,7 +135,7 @@ class FS_Model extends CI_Model
 		}
 		else
 		{
-			return error(EXIT_MODEL, EXIT_ERROR);
+			return error('An error occurred while renaming a file', EXIT_ERROR);
 		}
 	}
 }
