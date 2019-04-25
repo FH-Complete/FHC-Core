@@ -84,7 +84,7 @@ session_start();
 <link href="../../skin/style.css.php" rel="stylesheet" type="text/css">
 </head>
 
-<body>
+<body scroll="no" style="margin-top: 40px; overflow: hidden">
 <?php
 if (isset($_SESSION['pruefling_id']))
 {
@@ -92,14 +92,22 @@ if (isset($_SESSION['pruefling_id']))
 	$qry = "SELECT content_id FROM testtool.tbl_ablauf_vorgaben WHERE studiengang_kz=".$db->db_add_param($_SESSION['studiengang_kz'])." LIMIT 1";
 	$result = $db->db_query($qry);
 
-	echo '<table width="100%" border="0" cellspacing="0" cellpadding="0" style="border-right-width:1px;border-right-color:#BCBCBC;">';
-	echo '<tr><td style="padding-left: 20px;" nowrap>
-			<a href="login.php" target="content">'.$p->t('testtool/startseite').'</a>
+	echo '<table width="100%" border="0" cellspacing="0" cellpadding="0" style="border-right-width:1px;border-right-color:#BCBCBC; border-collapse: separate;
+    border-spacing: 0 3px;">';
+
+// Link zur Startseite
+	echo '<tr><td class="ItemTesttool" style="margin-left: 20px;" nowrap>
+			<a class="ItemTesttool" href="login.php" target="content">'.$p->t('testtool/startseite').'</a>
 		</td></tr>';
+
+// Link zur Einleitung
 	if ($content_id = $db->db_fetch_object($result))
 		if($content_id->content_id!='')
-			echo '<tr><td style="padding-left: 20px;"><a href="../../cms/content.php?content_id='.$content_id->content_id.'&sprache='.$sprache.'" target="content">'.$p->t('testtool/einleitung').'</a></td></tr>';
-	echo '<tr><td>&nbsp;</td></tr>';
+			echo '
+                <tr><td class="ItemTesttool" style="margin-left: 20px;" nowrap>
+                    <a class="ItemTesttool" href="../../cms/content.php?content_id='.$content_id->content_id.'&sprache='.$sprache.'" target="content">'.$p->t('testtool/einleitung').'</a>
+                </td></tr>';
+
 	echo '<tr><td style="padding-left: 20px;" nowrap>';
 
 	$studiengang_kz = (isset($_SESSION['studiengang_kz'])) ? $_SESSION['studiengang_kz'] : '';
@@ -284,7 +292,7 @@ if (isset($_SESSION['pruefling_id']))
 			}
 			$lastsemester = $row->semester;
 
-			echo '<table border="0" cellspacing="0" cellpadding="0" id="Gebiet" style="display: visible; border-collapse: separate; border-spacing: 0 6px;">';
+			echo '<table border="0" cellspacing="0" cellpadding="0" id="Gebiet" style="display: visible; border-collapse: separate; border-spacing: 0 3px;">';
 			/*echo '<tr><td class="HeaderTesttool">'.$row->semester.'. '.$p->t('testtool/semester').' '.($row->semester!='1'?$p->t('testtool/quereinstieg'):'').'</td></tr>';*/
 			echo '<tr><td class="HeaderTesttool">'. ($row->semester == '1' ? strtoupper($p->t('testtool/basic')) : strtoupper($p->t('testtool/quereinsteiger'))).'</td></tr>';
 		}
@@ -294,7 +302,7 @@ if (isset($_SESSION['pruefling_id']))
 		{
 			if($quereinsteiger_stg != $row->studiengang_kz_list)
 			{
-			    echo "<br>"; // Abstand zwischen Erstsemester- und Quereinstiegs-Gebietsblock
+			    //echo "<br>"; // Abstand zwischen Erstsemester- und Quereinstiegs-Gebietsblock
 				$quereinsteiger_stg = $row->studiengang_kz_list;
 				$quereinsteiger_stg_arr = explode(',', $row->studiengang_kz_list);
 				$quereinsteiger_stg_string = '';
