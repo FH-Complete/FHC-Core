@@ -1,5 +1,6 @@
 <?php
-if (! defined('BASEPATH')) exit('No direct script access allowed');
+
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 /*
 |--------------------------------------------------------------------------
@@ -11,19 +12,7 @@ if (! defined('BASEPATH')) exit('No direct script access allowed');
 | and disable it back when you're done.
 |
 */
-$config['migration_enabled'] = TRUE;
-
-/*
-|--------------------------------------------------------------------------
-| Migrations version
-|--------------------------------------------------------------------------
-|
-| This is used to set migration version that the file system should be on.
-| If you run $this->migration->current() this is the version that schema will
-| be upgraded / downgraded to.
-|
-*/
-$config['migration_version'] = '014';
+$config['migration_enabled'] = FALSE;
 
 /*
 |--------------------------------------------------------------------------
@@ -41,7 +30,7 @@ $config['migration_version'] = '014';
 |       defaults to 'sequential' for backward compatibility with CI2.
 |
 */
-$config['migration_type'] = 'sequential';
+$config['migration_type'] = 'timestamp';
 
 /*
 |--------------------------------------------------------------------------
@@ -55,8 +44,7 @@ $config['migration_type'] = 'sequential';
 | will migrate up. This must be set.
 |
 */
-//$config['migration_table'] = 'system.ci_migrations'; // A missing feature or a bug cannot use another schema than public. Bug: tableExists only looks in the public schema.
-$config['migration_table'] = 'ci_migrations';
+$config['migration_table'] = 'migrations';
 
 /*
 |--------------------------------------------------------------------------
@@ -71,6 +59,18 @@ $config['migration_table'] = 'ci_migrations';
 |
 */
 $config['migration_auto_latest'] = FALSE;
+
+/*
+|--------------------------------------------------------------------------
+| Migrations version
+|--------------------------------------------------------------------------
+|
+| This is used to set migration version that the file system should be on.
+| If you run $this->migration->current() this is the version that schema will
+| be upgraded / downgraded to.
+|
+*/
+$config['migration_version'] = 0;
 
 /*
 |--------------------------------------------------------------------------
