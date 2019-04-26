@@ -1362,11 +1362,13 @@ if (isset($_REQUEST['reihungstest']))
 		die($db->db_last_error());
 	}
 
+	$gebiete_arr = array();
 	while ($row = $db->db_fetch_object($result))
 	{
 		if (!isset($ergebnis[$row->prestudent_id]))
 		{
 			$ergebnis[$row->prestudent_id] = new stdClass();
+			$gebiete_arr[$row->prestudent_id] = array();
 		}
 
 		$ergebnis[$row->prestudent_id]->prestudent_id = $row->prestudent_id;
@@ -1423,78 +1425,54 @@ if (isset($_REQUEST['reihungstest']))
 		$ergebnis[$row->prestudent_id]->gebiet[$row->gebiet_id]->prozent = $prozent;
 		$ergebnis[$row->prestudent_id]->gebiet[$row->gebiet_id]->punkte = $punkte;
 
-		// Gesamtpunkte mit Physik
-		if (isset($ergebnis[$row->prestudent_id]->gesamt))
-		{
-			$ergebnis[$row->prestudent_id]->gesamt += $prozent * $row->gewicht;
-		}
-		else
-		{
-			$ergebnis[$row->prestudent_id]->gesamt = $prozent * $row->gewicht;
-		}
+		// Bei Auswertungen ohne rt_id kann es vorkommen, dass Datensätze Doppelt sind
+		// Bei der Summe darf ein Gebiet jedenfalls nur einmal summiert werden
 
-		if (isset($ergebnis[$row->prestudent_id]->gesamtpunkte))
+		if (!in_array($row->gebiet_id, $gebiete_arr[$row->prestudent_id]))
 		{
-			$ergebnis[$row->prestudent_id]->gesamtpunkte += $punkte;
-		}
-		else
-		{
-			$ergebnis[$row->prestudent_id]->gesamtpunkte = $punkte;
-		}
+			$gebiete_arr[$row->prestudent_id][] = $row->gebiet_id;
 
-		// Gesamtpunkte ohne Physik
-		if ($row->gebiet_id != 10)
-		{
-			if (isset($ergebnis[$row->prestudent_id]->gesamt_ohne_physik))
+			// Gesamtpunkte mit Physik
+			if (isset($ergebnis[$row->prestudent_id]->gesamt))
 			{
-				$ergebnis[$row->prestudent_id]->gesamt_ohne_physik += $prozent * $row->gewicht;
+				$ergebnis[$row->prestudent_id]->gesamt += $prozent * $row->gewicht;
 			}
 			else
 			{
-				$ergebnis[$row->prestudent_id]->gesamt_ohne_physik = $prozent * $row->gewicht;
+				$ergebnis[$row->prestudent_id]->gesamt = $prozent * $row->gewicht;
 			}
 
-			if (isset($ergebnis[$row->prestudent_id]->gesamtpunkte_ohne_physik))
+			if (isset($ergebnis[$row->prestudent_id]->gesamtpunkte))
 			{
-				$ergebnis[$row->prestudent_id]->gesamtpunkte_ohne_physik += $punkte;
+				$ergebnis[$row->prestudent_id]->gesamtpunkte += $punkte;
 			}
 			else
 			{
-				$ergebnis[$row->prestudent_id]->gesamtpunkte_ohne_physik = $punkte;
+				$ergebnis[$row->prestudent_id]->gesamtpunkte = $punkte;
+			}
+
+			// Gesamtpunkte ohne Physik
+			if ($row->gebiet_id != 10)
+			{
+				if (isset($ergebnis[$row->prestudent_id]->gesamt_ohne_physik))
+				{
+					$ergebnis[$row->prestudent_id]->gesamt_ohne_physik += $prozent * $row->gewicht;
+				}
+				else
+				{
+					$ergebnis[$row->prestudent_id]->gesamt_ohne_physik = $prozent * $row->gewicht;
+				}
+
+				if (isset($ergebnis[$row->prestudent_id]->gesamtpunkte_ohne_physik))
+				{
+					$ergebnis[$row->prestudent_id]->gesamtpunkte_ohne_physik += $punkte;
+				}
+				else
+				{
+					$ergebnis[$row->prestudent_id]->gesamtpunkte_ohne_physik = $punkte;
+				}
 			}
 		}
-
-		// Wenn Person ID gleich ist und kein Ergebnis vorhanden ist, jenes eines anderen PreStudenten dieser Person anzeigen
-		/*if ($ergebnis[$row->prestudent_id]->gebiet[$row->gebiet_id]->punkte == '')
-		{
-			foreach ($ergebnis as $erg)
-			{
-				if ($row->person_id == $erg->person_id && isset($erg->gebiet[$row->gebiet_id]->punkte) && $erg->gebiet[$row->gebiet_id]->punkte != '')
-				{
-					$ergebnis[$row->prestudent_id]->gebiet[$row->gebiet_id]->punkte = $erg->gebiet[$row->gebiet_id]->punkte;
-				}
-				if ($row->person_id == $erg->person_id && isset($erg->gebiet[$row->gebiet_id]->prozent) && $erg->gebiet[$row->gebiet_id]->prozent != '')
-				{
-					$ergebnis[$row->prestudent_id]->gebiet[$row->gebiet_id]->prozent = $erg->gebiet[$row->gebiet_id]->prozent;
-				}
-				if ($row->person_id == $erg->person_id && $erg->gesamt != '')
-				{
-					$ergebnis[$row->prestudent_id]->gesamt = $erg->gesamt;
-				}
-				if ($row->person_id == $erg->person_id && $erg->gesamtpunkte != '')
-				{
-					$ergebnis[$row->prestudent_id]->gesamtpunkte = $erg->gesamtpunkte;
-				}
-				if ($row->person_id == $erg->person_id && $erg->gesamt_ohne_physik != '')
-				{
-					$ergebnis[$row->prestudent_id]->gesamt_ohne_physik = $erg->gesamt_ohne_physik;
-				}
-				if ($row->person_id == $erg->person_id && $erg->gesamtpunkte_ohne_physik != '')
-				{
-					$ergebnis[$row->prestudent_id]->gesamtpunkte_ohne_physik = $erg->gesamtpunkte_ohne_physik;
-				}
-			}
-		}*/
 	}
 
 	$ergb = $ergebnis;
