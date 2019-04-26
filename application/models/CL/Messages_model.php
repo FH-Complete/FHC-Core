@@ -1,10 +1,10 @@
 <?php
 
 /**
- * This model extends CI_Model because here is just implemented logic
+ * This model extends FHC_Model because here is just implemented logic
  * It does not represent a resource (ex. like models that extend DB_Model)
  */
-class Messages_model extends CI_Model
+class Messages_model extends FHC_Model
 {
 	/**
 	 * Constructor

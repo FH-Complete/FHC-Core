@@ -29,7 +29,7 @@ class Dokumentprestudent extends APIv1_Controller
 			)
 		);
 		// Load model DokumentprestudentModel
-		$this->load->model('crm/dokumentprestudent_model', 'DokumentprestudentModel');
+		$this->load->model('crm/Dokumentprestudent_model', 'DokumentprestudentModel');
 	}
 
 	/**

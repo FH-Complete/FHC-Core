@@ -11,7 +11,7 @@ class Notiz_model extends DB_Model
 		$this->dbTable = 'public.tbl_notiz';
 		$this->pk = 'notiz_id';
 	}
-
+	
 	// ------------------------------------------------------------------------------------------------------
 	/**
 	 * Get a specialization for a prestudent
@@ -20,10 +20,10 @@ class Notiz_model extends DB_Model
 	{
 		// Join with the table public.tbl_notizzuordnung using notiz_id
 		$this->addJoin('public.tbl_notizzuordnung', 'notiz_id');
-
+		
 		return $this->NotizModel->loadWhere(array('prestudent_id' => $prestudent_id, 'titel' => $titel));
 	}
-
+	
 	/**
 	 * Remove a specialization
 	 */
@@ -31,31 +31,31 @@ class Notiz_model extends DB_Model
 	{
 		// Loads model Notizzuordnung_model
 		$this->load->model('person/Notizzuordnung_model', 'NotizzuordnungModel');
-
+		
 		// Start DB transaction
 		$this->db->trans_start(false);
-
+		
 		$result = $this->delete(array('notiz_id' => $notiz_id));
 		if (isSuccess($result))
 		{
 			$result = $this->NotizzuordnungModel->delete(array('notiz_id' => $notiz_id));
 		}
-
+		
 		// Transaction complete!
 		$this->db->trans_complete();
-
+		
 		// Check if everything went ok during the transaction
 		if ($this->db->trans_status() === false || isError($result))
 		{
 			$this->db->trans_rollback();
-			$result = error('An error occurred while removing a specialization', EXIT_ERROR);
+			$result = error($result->msg, EXIT_ERROR);
 		}
 		else
 		{
 			$this->db->trans_commit();
 			$result = success('Specialization successfully removed');
 		}
-
+		
 		return $result;
 	}
 
@@ -66,32 +66,32 @@ class Notiz_model extends DB_Model
 	{
 		// Loads model Notizzuordnung_model
 		$this->load->model('person/Notizzuordnung_model', 'NotizzuordnungModel');
-
+		
 		// Start DB transaction
 		$this->db->trans_start(false);
-
+		
 		$result = $this->insert(array('titel' => $titel, 'text' => $text, 'erledigt' => true));
 		$notiz_id = $result->retval;
 		if (isSuccess($result))
 		{
 			$result = $this->NotizzuordnungModel->insert(array('notiz_id' => $notiz_id, 'prestudent_id' => $prestudent_id));
 		}
-
+		
 		// Transaction complete!
 		$this->db->trans_complete();
-
+		
 		// Check if everything went ok during the transaction
 		if ($this->db->trans_status() === false || isError($result))
 		{
 			$this->db->trans_rollback();
-			$result = error('An error occurred while adding a specialization', EXIT_ERROR);
+			$result = error($result->msg, EXIT_ERROR);
 		}
 		else
 		{
 			$this->db->trans_commit();
 			$result = success($notiz_id);
 		}
-
+		
 		return $result;
 	}
 
@@ -122,7 +122,7 @@ class Notiz_model extends DB_Model
 		if ($this->db->trans_status() === false || isError($result))
 		{
 			$this->db->trans_rollback();
-			$result = error('An error occurred while adding a note for a person', EXIT_ERROR);
+			$result = error($result->msg, EXIT_ERROR);
 		}
 		else
 		{

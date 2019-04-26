@@ -23,17 +23,17 @@ class Nation extends APIv1_Controller
 	{
 		parent::__construct(array('Nation' => 'basis/nation:r', 'All' => 'basis/nation:r'));
 		// Load model NationModel
-		$this->load->model('codex/nation_model', 'NationModel');
+		$this->load->model('codex/Nation_model', 'NationModel');
 	}
-	
+
 	public function getNation()
     {
 		$nation_code = $this->get("nation_code");
-		
+
 		if (isset($nation_code))
 		{
 			$result = $this->NationModel->loadWhere(array('nation_code' => $nation_code));
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -41,7 +41,7 @@ class Nation extends APIv1_Controller
 			$this->response();
 		}
     }
-	
+
 	public function getAll()
 	{
 		if (!$this->get('orderEnglish'))
@@ -52,7 +52,7 @@ class Nation extends APIv1_Controller
 		{
 			$result = $this->NationModel->addOrder('engltext');
 		}
-		
+
 		if (isSuccess($result))
 		{
 			if ($this->get('ohnesperre'))
@@ -64,7 +64,7 @@ class Nation extends APIv1_Controller
 				$result = $this->NationModel->load();
 			}
 		}
-		
+
 		$this->response($result, REST_Controller::HTTP_OK);
 	}
 }
