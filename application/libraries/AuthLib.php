@@ -237,7 +237,7 @@ class AuthLib
 	 */
 	public function basicAuthentication($username, $password)
 	{
-		return isSuccess($this->_checkLDAPAuthentication($username, $password));
+		return isSuccess($this->loginLDAP($username, $password));
 	}
 
 	/**

@@ -627,7 +627,7 @@ abstract class REST_Controller extends CI_Controller {
             {
                 $this->_log_request();
             }
-//echo 'RestKey: '.$this->rest->key;
+
             $this->response([
                     $this->config->item('rest_status_field_name') => FALSE,
                     $this->config->item('rest_message_field_name') => sprintf($this->lang->line('text_rest_invalid_api_key'), $this->rest->key)
