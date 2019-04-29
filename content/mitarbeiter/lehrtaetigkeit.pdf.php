@@ -18,18 +18,19 @@
  * Authors: Cristina Hainberger		hainberg@technikum-wien.at>.
  */
 
-require_once('../../../config/cis.config.inc.php');
-require_once('../../../include/dokument_export.class.php');
-require_once('../../../include/functions.inc.php');
-require_once('../../../include/person.class.php');
-require_once('../../../include/lehreinheitmitarbeiter.class.php');
-require_once('../../../include/lehreinheit.class.php');
-require_once('../../../include/projektbetreuer.class.php');
-require_once('../../../include/projektarbeit.class.php');
-require_once('../../../include/bisverwendung.class.php');
-require_once('../../../include/studiensemester.class.php');
-require_once('../../../include/phrasen.class.php');
-require_once('../../../include/benutzerberechtigung.class.php');
+require_once('../../config/cis.config.inc.php');
+require_once('../../include/dokument_export.class.php');
+require_once('../../include/functions.inc.php');
+require_once('../../include/person.class.php');
+require_once('../../include/lehreinheitmitarbeiter.class.php');
+require_once('../../include/lehreinheit.class.php');
+require_once('../../include/projektbetreuer.class.php');
+require_once('../../include/projektarbeit.class.php');
+require_once('../../include/bisverwendung.class.php');
+require_once('../../include/studiensemester.class.php');
+require_once('../../include/phrasen.class.php');
+require_once('../../include/benutzerberechtigung.class.php');
+
 
 $user = get_uid();
 $sprache = getSprache();
