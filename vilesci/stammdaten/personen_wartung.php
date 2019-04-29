@@ -226,8 +226,8 @@ if (isset($personToDelete) && isset($personToKeep) && $personToDelete >= 0 && $p
 						$akteInhalt = $akte1->result[0]->inhalt;
 						$akteDMS = $akte1->result[0]->dms_id;
 						// Bestehende Fotohistorie löschen und jene vom neuen Foto übernehmen
-						$sql_query_upd1 .= "DELETE FROM public.tbl_person_fotostatus WHERE person_id=" . $db->db_add_param($akte2->result[0]->person_id, FHC_INTEGER) . ";";
-						$sql_query_upd1 .= "UPDATE public.tbl_person_fotostatus SET person_id=" . $db->db_add_param($akte2->result[0]->person_id, FHC_INTEGER) . " WHERE person_id=" . $db->db_add_param($akte1->result[0]->person_id, FHC_INTEGER) . ";";
+						$sql_query_upd1 .= "DELETE FROM public.tbl_person_fotostatus WHERE person_id=" . $db->db_add_param($personToKeep, FHC_INTEGER) . ";";
+						$sql_query_upd1 .= "UPDATE public.tbl_person_fotostatus SET person_id=" . $db->db_add_param($personToKeep, FHC_INTEGER) . " WHERE person_id=" . $db->db_add_param($personToDelete, FHC_INTEGER) . ";";
 						$msg_warning[] = "Das Foto von Person ".$personToDelete." war aktueller und wurde übernommen";
 					}
 					elseif ($insertamum1 < $insertamum2)
@@ -235,7 +235,7 @@ if (isset($personToDelete) && isset($personToKeep) && $personToDelete >= 0 && $p
 						$akteInhalt = $akte2->result[0]->inhalt;
 						$akteDMS = $akte2->result[0]->dms_id;
 						// Bestehende Fotohistorie löschen und jene vom neuen Foto übernehmen
-						$sql_query_upd1 .= "DELETE FROM public.tbl_person_fotostatus WHERE person_id=" . $db->db_add_param($akte1->result[0]->person_id, FHC_INTEGER) . ";";
+						$sql_query_upd1 .= "DELETE FROM public.tbl_person_fotostatus WHERE person_id=" . $db->db_add_param($personToDelete, FHC_INTEGER) . ";";
 						$msg_warning[] = "Das Foto von Person ".$personToKeep." war aktueller und wurde übernommen";
 					}
 					else
@@ -245,11 +245,11 @@ if (isset($personToDelete) && isset($personToKeep) && $personToDelete >= 0 && $p
 					}
 					// Wenn Inhalt vorhanden, diesen laden, sonst aus DMS
 					$base64foto = '';
-					if ($akteInhalt != '')
+					if (isset($akteInhalt) && $akteInhalt != '')
 					{
 						$base64foto = $akteInhalt;
 					}
-					elseif ($akteDMS != '')
+					elseif (isset($akteDMS) && $akteDMS != '')
 					{
 						$dms = new dms();
 						if ($dms->load($akteDMS))
@@ -713,7 +713,7 @@ if (isset($personToDelete) && isset($personToKeep) && $personToDelete >= 0 && $p
 														$prestudentenArray[$previousKey]['zgvmadatum'] = $zgvmadatum = $value['zgvmadatum'];
 														$prestudentenArray[$previousKey]['zgvmanation'] = $zgvmanation = $value['zgvmanation'];
 														// Wenn kein Status außer Interessent und Abgewiesener mehr vorhanden ist, löschen
-														if (!isset($statusArrayWichtige[$value->prestudent_id]))
+														if (!isset($statusArrayWichtige[$value['prestudent_id']]))
 														{
 															unset($prestudentenArray[$key]);
 															$prestudentLoeschArray[] = $value['prestudent_id'];
@@ -730,7 +730,7 @@ if (isset($personToDelete) && isset($personToKeep) && $personToDelete >= 0 && $p
 														$warningList['zgvUnklar'][$prestudentId][$i]['zgvmadatum'] = $value['zgvmadatum'];
 														$warningList['zgvUnklar'][$prestudentId][$i]['zgvmanation'] = $value['zgvmanation'];
 														// Wenn kein Status außer Interessent und Abgewiesener mehr vorhanden ist, löschen
-														if (!isset($statusArrayWichtige[$value->prestudent_id]))
+														if (!isset($statusArrayWichtige[$value['prestudent_id']]))
 														{
 															unset($prestudentenArray[$key]);
 															$prestudentLoeschArray[] = $value['prestudent_id'];

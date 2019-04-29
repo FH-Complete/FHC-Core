@@ -5,6 +5,8 @@
  */
 class APIv1_Controller extends REST_Controller
 {
+	private $_requiredPermissions;
+
 	/**
 	 * Standard constructor for all the RESTful resources
 	 */
@@ -12,24 +14,35 @@ class APIv1_Controller extends REST_Controller
     {
         parent::__construct();
 
-		// Loads permission lib
-		$this->load->library('PermissionLib');
+		$this->_requiredPermissions = $requiredPermissions;
 
 		log_message('debug', 'Called API: '.$_SERVER['PHP_SELF'].'?'.$_SERVER['QUERY_STRING']);
-
-		$this->_isAllowed($requiredPermissions);
     }
 
 	/**
-	 * Checks if the caller is allowed to access to this content with the given permissions
-	 * If it is not allowed will set the HTTP header with code 401
-	 * Wrapper for permissionlib->isEntitled
+	 * This method is automatically called by CodeIgniter after the execution of the constructor is completed
+	 * - Cheks if the AuthLib was loaded, if not it means that the authentication failed
+	 * - Loads the permsission lib and calls permissionlib->isEntitled
+	 * - Checks if the caller is allowed to access to this content with the given permissions
+	 *	 if it is not allowed will set the HTTP header with code 401
+	 * - Calls the parent (REST_Controller) _remap method to performs other checks
 	 */
-	private function _isAllowed($requiredPermissions)
+	public function _remap($object_called, $arguments)
 	{
-		if (!$this->permissionlib->isEntitled($requiredPermissions, $this->router->method))
+		if (isset($this->authlib)) // if set then the authentication is ok
 		{
-			$this->response(error('You are not allowed to access to this content'), REST_Controller::HTTP_UNAUTHORIZED);
+			// Loads permission lib
+			$this->load->library('PermissionLib');
+
+			// Cheks if the user has the permission to call a method
+			if (!$this->permissionlib->isEntitled($this->_requiredPermissions, $this->router->method))
+			{
+				// If not...
+				$this->response(error('You are not allowed to access to this content'), REST_Controller::HTTP_UNAUTHORIZED);
+			}
 		}
+
+		// Finally calls the parent _remap to perform other checks
+		parent::_remap($object_called, $arguments);
 	}
 }

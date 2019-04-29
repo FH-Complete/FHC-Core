@@ -119,6 +119,27 @@ if(isset($_GET['type']) && $_GET['type']=='getortcontent' && isset($_GET['plz'])
 	echo getOrtDropDown($_GET['plz'], $_GET['gemeinde']);
 	exit;
 }
+
+// Checken der UID mit Ajax
+if(isset($_POST['checkUID']))
+{
+	$uid = filter_input(INPUT_POST, 'uid');
+	$bn = new benutzer();
+
+	if($bn->uid_exists($uid))
+	{
+		echo json_encode(array(
+			'status'=>'fehler',
+			'msg'=>'UID ist bereits vorhanden'));
+	}
+	else
+	{
+		echo json_encode(array(
+			'status'=>'ok',
+			'msg'=>''));
+	}
+	exit();
+}
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
@@ -215,6 +236,48 @@ function checkInput1()
 		return false;
 	}
 	return true;
+}
+
+function checkWunschUid()
+{
+	// Set UID lower case and remove whitespaces and -
+	uid = $("#wunschUid").val().toLowerCase();
+	uid = uid.replace(/\s+/g, '');
+	uid = uid.replace('-', '');
+
+	$("#wunschUid").val(uid);
+
+	if (uid != '')
+	{
+		data = {
+			uid: uid,
+			checkUID: true
+		};
+
+		$.ajax({
+			url: 'mitarbeiterimport.php',
+			data: data,
+			type: 'POST',
+			dataType: "json",
+			success: function(data)
+			{
+				if(data.status != 'ok')
+				{
+					$("#checkUID").css( "color", "red" );
+					$("#checkUID").html('UID bereits vorhanden');
+				}
+				else
+				{
+					$("#checkUID").css( "color", "green" );
+					$("#checkUID").html('UID verfügbar');
+				}
+			},
+			error: function(data)
+			{
+				alert(data.msg)
+			}
+		});
+	}
 }
 
 // **************************************
@@ -353,7 +416,7 @@ function GeschlechtChange()
 }
 </script>
 </head>
-<body>
+<body style="padding: 10px">
 <h1>MitarbeiterIn anlegen</h1>
 <?php
 //Berechtigung pruefen
@@ -408,11 +471,16 @@ $svnr = (isset($_POST['svnr'])?$_POST['svnr']:'');
 $lektor = (isset($_POST['lektor'])?true:false);
 $fixangestellt = (isset($_POST['fixangestellt'])?true:false);
 if(!isset($_POST['svnr']))
+{
 	$lektor = true;
+	$fixangestellt = true;
+}
+
 $ersatzkennzeichen = (isset($_POST['ersatzkennzeichen'])?$_POST['ersatzkennzeichen']:'');
 //end Parameter
 $geburtsdatum_error=false;
 $personalnummer = (isset($_POST['personalnummer'])?trim($_POST['personalnummer']):'');
+$wunschUid = (isset($_POST['wunschUid'])?trim($_POST['wunschUid']):'');
 
 // *** Speichern der Daten ***
 if(isset($_POST['save']))
@@ -486,12 +554,17 @@ if(isset($_POST['save']))
 
 		$uid = generateMitarbeiterUID($vorname_clean, $nachname_clean, $lektor, $fixangestellt);
 
+		if ($wunschUid != '')
+		{
+			$uid = $wunschUid;
+		}
+
 		$bn = new benutzer();
 
 		if($bn->uid_exists($uid))
 		{
 			$error = true;
-			$errormsg = 'Es konnte keine UID ermittelt werden';
+			$errormsg = 'Die UID '.$uid.' existiert bereits';
 		}
 	}
 
@@ -758,22 +831,27 @@ else
 <!--Formularfelder-->
 <table>
 <?php
-echo '<tr><td>Anrede</td><td><input type="text" id="anrede" name="anrede" maxlength="16" value="'.$anrede.'" onblur="AnredeChange()"/></td></tr>';
-echo '<tr><td>Titel(Pre)</td><td><input type="text" id="titel" name="titel" maxlength="64" value="'.$titel.'" /></td></tr>';
-echo '<tr><td>Vorname</td><td><input type="text" id="vorname" maxlength="32" name="vorname" value="'.$vorname.'" /></td></tr>';
-echo '<tr><td>Weitere Vornamen</td><td><input type="text" id="vornamen" maxlength="32" name="vornamen" value="'.$vornamen.'" /></td></tr>';
-echo '<tr><td>Nachname *</td><td><input type="text" maxlength="64" id="nachname" name="nachname" value="'.$nachname.'" /></td></tr>';
-echo '<tr><td>Titel(Post)</td><td><input type="text" id="titelpost" name="titelpost" maxlength="64" value="'.$titelpost.'" /></td></tr>';
+echo '<tr><td>Wunsch-UID</td><td><input type="text" name="wunschUid" id="wunschUid" maxlength="32" size="30" value="'.$wunschUid.'" />
+		<span style="padding: 0 3px" id="checkUID"></span>
+		<button type="button" title="Prüft, ob die UID schon vorhanden ist. Keine Sonderzeichen, Umlaute oder Leerzeichen in der UID" href="#" onclick="checkWunschUid()"> Check UID </button> (optional, max. 32)
+		</td></tr>';
+echo '<tr><td>Anrede</td><td><input type="text" id="anrede" name="anrede" maxlength="16" size="30" value="'.$anrede.'" onblur="AnredeChange()"/></td></tr>';
+echo '<tr><td>Titel(Pre)</td><td><input type="text" id="titel" name="titel" maxlength="64" size="30" value="'.$titel.'" /></td></tr>';
+echo '<tr><td>Vorname</td><td><input type="text" id="vorname" maxlength="32" name="vorname" size="30" value="'.$vorname.'" />
+		&nbsp;&nbsp;Weitere Vornamen&nbsp;<input type="text" id="vornamen" maxlength="32" size="30" name="vornamen" value="'.$vornamen.'" /></td></tr>';
+//echo '<tr></tr>';
+echo '<tr><td>Nachname *</td><td><input type="text" maxlength="64" size="30" id="nachname" name="nachname" value="'.$nachname.'" /></td></tr>';
+echo '<tr><td>Titel(Post)</td><td><input type="text" id="titelpost" name="titelpost" maxlength="64" size="30" value="'.$titelpost.'" /></td></tr>';
 echo '<tr><td>Geschlecht *</td><td><SELECT id="geschlecht" name="geschlecht" onchange="GeschlechtChange()">';
 echo '<OPTION value="m" '.($geschlecht=='m'?'selected':'').'>m&auml;nnlich</OPTION>';
 echo '<OPTION value="w" '.($geschlecht=='w'?'selected':'').'>weiblich</OPTION>';
 echo '<OPTION value="u" '.($geschlecht=='u'?'selected':'').'>unbekannt</OPTION>';
 echo '</SELECT>';
 echo '</td></tr>';
-echo '<tr><td>SVNR</td><td><input type="text" id="svnr" size="16" maxlength="16" name="svnr" value="'.$svnr.'" onblur="GeburtsdatumEintragen()" /></td></tr>';
-echo '<tr><td>Ersatzkennzeichen</td><td><input type="text" id="ersatzkennzeichen" size="10" maxlength="10" name="ersatzkennzeichen" value="'.$ersatzkennzeichen.'" /></td></tr>';
-echo '<tr><td>Geburtsdatum *</td><td><input type="text" id="geburtsdatum" size="10" maxlength="10" name="geburtsdatum" value="'.$geburtsdatum.'" /> (Format: TT.MM.JJJJ)</td></tr>';
-echo '<tr><td colspan="2"><fieldset><legend>Adresse</legend><table>';
+echo '<tr><td>SVNR</td><td><input type="text" id="svnr" size="30" maxlength="16" name="svnr" value="'.$svnr.'" onblur="GeburtsdatumEintragen()" /></td></tr>';
+echo '<tr><td>Ersatzkennzeichen</td><td><input type="text" id="ersatzkennzeichen" size="30" maxlength="10" name="ersatzkennzeichen" value="'.$ersatzkennzeichen.'" /></td></tr>';
+echo '<tr><td>Geburtsdatum *</td><td><input type="text" id="geburtsdatum" size="30" maxlength="10" name="geburtsdatum" value="'.$geburtsdatum.'" /> (Format: TT.MM.JJJJ)</td></tr>';
+echo '<tr><td>&nbsp;</td></tr>';
 echo '<tr><td>Nation</td><td><SELECT name="adresse_nation" id="adresse_nation" onchange="loadGemeindeData()">';
 $nation =  new nation();
 $nation->getAll();
@@ -786,8 +864,8 @@ foreach ($nation->nation as $row)
 	echo "<option value='$row->code' $selected>$row->langtext</option>";
 }
 echo '</SELECT></td></tr>';
-echo '<tr><td>Postleitzahl</td><td><input type="text" size="5" maxlength="16" id="plz" name="plz" value="'.$plz.'" onblur="loadGemeindeData()" /></td></tr>';
-echo '<tr><td>Adresse</td><td><input type="text" id="adresse" maxlength="256"  size="40" name="adresse" value="'.$adresse.'" /></td></tr>';
+echo '<tr><td>Postleitzahl</td><td><input type="text" size="10" maxlength="16" id="plz" name="plz" value="'.$plz.'" onblur="loadGemeindeData()" /></td></tr>';
+echo '<tr><td>Adresse</td><td><input type="text" id="adresse" maxlength="256"  size="30" name="adresse" value="'.$adresse.'" /></td></tr>';
 echo '<tr><td>Gemeinde</td><td><div id="gemeindediv">';
 //wenn die Nation Oesterreich ist, dann wird ein DropDown fuer Gemeinde und Ort angezeigt.
 //wenn die Nation nicht Oesterreich ist, werden nur textfelder angezeigt
@@ -814,15 +892,15 @@ if($adresse_nation=='A' && $plz!='')
 	echo getOrtDropDown($plz, $gemeinde);
 }
 echo '</div><input type="'.($adresse_nation=='A'?'hidden':'text').'" id="adresse-ort-textfeld" maxlength="256" name="ort_txt" value="'.$ort.'"/></td></tr>';
-
-echo '</table>';
+echo '<tr><td>&nbsp;</td></tr>';
+//echo '</table>';
 echo '<div style="display: none;" id="ueb1"><input type="radio" id="ueberschreiben1" name="ueberschreiben" value="Ja" onclick="disablefields2(false)">Bestehende Adresse überschreiben</div>';
 echo '<div style="display: none;" id="ueb2"><input type="radio" id="ueberschreiben2" name="ueberschreiben" value="Nein" onclick="disablefields2(false)" checked>Adresse hinzufügen</div>';
 echo '<div style="display: none;" id="ueb3"><input type="radio" id="ueberschreiben3" name="ueberschreiben" value="" onclick="disablefields2(true)">Adresse nicht anlegen</div>';
-echo '</fieldset></td></tr>';
-echo '<tr><td>EMail</td><td><input type="text" id="email" maxlength="128" name="email" value="'.$email.'" /></td></tr>';
-echo '<tr><td>Telefon</td><td><input type="text" id="telefon" maxlength="128" name="telefon" value="'.$telefon.'" /></td></tr>';
-echo '<tr><td>Mobil</td><td><input type="text" id="mobil" maxlength="128" name="mobil" value="'.$mobil.'" /></td></tr>';
+echo '</td></tr>';
+echo '<tr><td>EMail</td><td><input type="text" id="email" maxlength="128" size="30" name="email" value="'.$email.'" /></td></tr>';
+echo '<tr><td>Telefon</td><td><input type="text" id="telefon" maxlength="128" size="30" name="telefon" value="'.$telefon.'" /></td></tr>';
+echo '<tr><td>Mobil</td><td><input type="text" id="mobil" maxlength="128" size="30" name="mobil" value="'.$mobil.'" /></td></tr>';
 echo '<tr><td>Letzte Ausbildung</td><td><SELECT id="letzteausbildung" name="letzteausbildung">';
 echo '<OPTION value="">-- keine Auswahl --</OPTION>';
 $qry = "SELECT * FROM bis.tbl_ausbildung ORDER BY ausbildungcode";
@@ -837,8 +915,8 @@ echo '</SELECT>';
 echo '</td></tr>';
 echo '<tr><td>Lektor</td><td><input type="checkbox" name="lektor" '.($lektor?'checked':'').' /></td></tr>';
 echo '<tr><td>Fixangestellt</td><td><input type="checkbox" name="fixangestellt" '.($fixangestellt?'checked':'').' /></td></tr>';
-echo '<tr><td>Personalnummer</td><td><input type="text" name="personalnummer" size="4" value="'.$personalnummer.'" /> (optional)</td></tr>';
-echo '<tr><td>Anmerkungen</td><td><textarea id="anmerkung" name="anmerkungen">'.$anmerkungen.'</textarea></td></tr>';
+echo '<tr><td>Personalnummer</td><td><input type="text" name="personalnummer" size="10" value="'.$personalnummer.'" /> (optional)</td></tr>';
+echo '<tr><td>Anmerkungen</td><td><textarea id="anmerkung" name="anmerkungen" cols="25">'.$anmerkungen.'</textarea></td></tr>';
 echo '<tr><td></td><td>';
 
 if(($geburtsdatum=='' && $vorname=='' && $nachname=='') || $geburtsdatum_error)
