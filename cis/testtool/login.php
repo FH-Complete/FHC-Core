@@ -504,8 +504,12 @@ if (isset($prestudent_id))
     //  * wenn Prestudent an einem Master-Studiengang interessiert ist, dann nur den einen STG anführen
     else
     {
-        echo '<pre>', print_r($typ,1),'</pre>';
+        // Letzten Status für des Prestudenten einholen
+        $ps_master = new Prestudent();
+		$ps_master->getLastStatus($prestudent_id);
         echo '<td>'. $typ->bezeichnung.' '.($sprache_user=='English'?$stg_obj->english:$stg_obj->bezeichnung).'</td>';
+		echo '<td>'. $ps_master->status_kurzbz.'</td>';
+		echo '<td>Basic</td>';
     }
 
     echo ' 				 
