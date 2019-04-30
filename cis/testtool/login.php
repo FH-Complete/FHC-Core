@@ -353,15 +353,16 @@ if(isset($_POST['save']) && isset($_SESSION['prestudent_id']))
 	</script>
 <?php
 	if($reload_parent)
-		echo '<script language="Javascript">parent.menu.location.reload();</script>';  //CRIS:  nach reload()ein ; ergänzt
+		echo '<script language="Javascript">parent.menu.location.reload();</script>';
 
 	if($reload)
 		echo "<script language=\"Javascript\">parent.location.reload();</script>";
 ?>
 </head>
 
-<body>
-<?php	echo '<h1>'.$p->t('testtool/startseite').'</h1>';
+<body scroll="no" style="margin-top: 40px; padding: 0px 50px 0px 50px; overflow: hidden">
+<?php
+//echo '<h1>'.$p->t('testtool/startseite').'</h1>';
 
 //REIHUNGSTEST STARTSEITE (nach Login)
 	if (isset($prestudent_id))
@@ -402,7 +403,7 @@ if(isset($_POST['save']) && isset($_SESSION['prestudent_id']))
            $sprachwahl = $ablauf->result[0]->sprachwahl;
         }
 
-		//Prestudent Informationen und Logout
+		//Prestudent Informationen
 		echo '<form method="GET">';
 		echo '<br>'.$p->t('testtool/begruessungstext').' <br/><br/>';
 		echo '<b>'.$p->t('zeitaufzeichnung/id').'</b>: '.$_SESSION['prestudent_id'].'<br/>';
@@ -418,10 +419,35 @@ if(isset($_POST['save']) && isset($_SESSION['prestudent_id']))
 			if (count($ps_arr->result) > 1)
             {
 				echo '<b>'.$p->t('global/studiengang'). "</b>: <br><br>";
+
+				// Jeweils letzten Status ermitteln (ob Interessent oder Abgewiesener)
+				foreach ($ps_arr->result as $ps_obj)
+				{
+					$ps_tmp = new Prestudent();
+					$ps_tmp->getLastStatus($ps_obj->prestudent_id);
+
+					$ps_obj->lastStatus = $ps_tmp->status_kurzbz; // letzten Status dem result array hinzufügen
+				}
+
+				// Falls Status 'Abgewiesene' vorhanden, nach hinten reihen
+				usort($ps_arr->result, function($a, $b){
+				    return strcmp($b->lastStatus, $a->lastStatus); // Order by DESC
+                });
+
 				foreach ($ps_arr->result as $ps_obj)
 				{
 					$stg = new Studiengang($ps_obj->studiengang_kz);
-					echo "<li>". $ps_obj->typ_bz .' '. ($sprache_user == 'English' ? $stg->english : $stg->bezeichnung). '<br/>'. "</li>";
+
+					if($ps_obj->lastStatus == 'Interessent')
+					{
+						echo "<li>". $ps_obj->typ_bz .' '. ($sprache_user == 'English' ? $stg->english : $stg->bezeichnung). '<br/>'. "</li>";
+					}
+					// wenn letzter Status 'Abgewiesener' ist, dann als solchen kennzeichnen
+                    elseif($ps_obj->lastStatus == 'Abgewiesener')
+					{
+						echo "<li style='color: grey'>". $ps_obj->typ_bz .' '. ($sprache_user == 'English' ? $stg->english : $stg->bezeichnung). ' (- abgewiesen -)<br/>'. "</li>";
+					}
+
 				}
 				echo "<br>";
             }
@@ -436,7 +462,6 @@ if(isset($_POST['save']) && isset($_SESSION['prestudent_id']))
         {
 			echo '<b>'.$p->t('global/studiengang').'</b>: '.$typ->bezeichnung.' '.($sprache_user=='English'?$stg_obj->english:$stg_obj->bezeichnung).'<br/><br/>';
         }
-		echo '<INPUT type="submit" value="Logout" name="logout" />';
 		echo '</form>';
 		echo '<br><br>';
 

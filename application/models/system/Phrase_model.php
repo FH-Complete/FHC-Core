@@ -57,7 +57,7 @@ class Phrase_model extends DB_Model
 
 	/**
 	 * Loads phrases using category(s) and language as keys
-	 * The retrived fields are category, phrase, orgeinheit_kurzbz, orgform_kurzbz and text
+	 * The retrieved fields are category, phrase, orgeinheit_kurzbz, orgform_kurzbz and text
 	 * They are ordered by p.category, p.phrase, pt.orgeinheit_kurzbz DESC and pt.orgform_kurzbz DESC'
 	 */
 	public function getPhrasesByCategoryAndLanguage($categories, $language)

@@ -5,7 +5,7 @@ if (! defined('BASEPATH')) exit('No direct script access allowed');
 class PhrasesLib
 {
 	private $_ci; // Code igniter instance
-	private $_phrases; // Contains the retrived phrases
+	private $_phrases; // Contains the retrieved phrases
 
 	/**
 	 * Loads parser library
@@ -88,7 +88,7 @@ class PhrasesLib
     }
 
 	/**
-     * getPhrases() - Retrives phrases from the DB
+     * getPhrases() - Retrieves phrases from the DB
 	 * The given parameter are the same needed to read from the table system.tb_phrase
      */
     public function getPhrases($app, $sprache, $phrase = null, $orgeinheit_kurzbz = null, $orgform_kurzbz = null, $blockTags = null)
@@ -175,7 +175,7 @@ class PhrasesLib
     }
 
 	/**
-	 * Retrives a phrases from the the property _phrases with the given parameters
+	 * Retrieves a phrases from the the property _phrases with the given parameters
 	 * It also replace parameters inside the phrase if they are provided
 	 * @param string $category Category name which is used to categorize the phrase.
 	 * @param string $phrase Phrase name.
@@ -239,7 +239,7 @@ class PhrasesLib
 					$categories = array($categories);
 				}
 
-				// Retrives the language of the logged user
+				// Retrieves the language of the logged user
 				$language = getUserLanguage(count($parameters) == 2 ? $parameters[1] : null);
 
 				// If only categories is not an empty array then loads phrases

@@ -170,13 +170,13 @@ class FilterWidget extends Widget
 		$this->_datasetRepresentation = null;
 		$this->_datasetRepresentationOptions = null;
 
-		// Retrived the required permissions parameter if present
+		// Retrieved the required permissions parameter if present
 		if (isset($args[FiltersLib::REQUIRED_PERMISSIONS_PARAMETER]))
 		{
 			$this->_requiredPermissions = $args[FiltersLib::REQUIRED_PERMISSIONS_PARAMETER];
 		}
 
-		// Parameters needed to retrive univocally a filter from DB
+		// Parameters needed to retrieve univocally a filter from DB
 		if (isset($args[FiltersLib::APP_PARAMETER]))
 		{
 			$this->_app = $args[FiltersLib::APP_PARAMETER];
@@ -197,7 +197,7 @@ class FilterWidget extends Widget
 			$this->_filterId = $args[FiltersLib::FILTER_ID];
 		}
 
-		// How to retrive data for the filter: SQL statement or a result from DB
+		// How to retrieve data for the filter: SQL statement or a result from DB
 		if (isset($args[FiltersLib::QUERY_PARAMETER]))
 		{
 			$this->_query = $args[FiltersLib::QUERY_PARAMETER];
@@ -329,7 +329,7 @@ class FilterWidget extends Widget
 		// If session is NOT empty -> a filter was already loaded
 		if ($session != null)
 		{
-			// Retrive the filterId stored in the session
+			// Retrieve the filterId stored in the session
 			$sessionFilterId = $this->filterslib->getSessionElement(FiltersLib::FILTER_ID);
 
 			// If the filter loaded in session is NOT the same that is being requested then empty the session
@@ -355,7 +355,7 @@ class FilterWidget extends Widget
 						$this->filterslib->getSessionElement(FiltersLib::SESSION_FILTERS)
 					);
 
-					// Then retrive dataset from DB
+					// Then retrieve dataset from DB
 					$dataset = $this->filterslib->getDataset($datasetQuery);
 
 					// Save changes into session if data are valid
@@ -392,7 +392,7 @@ class FilterWidget extends Widget
 				// Generate dataset query
 				$datasetQuery = $this->filterslib->generateDatasetQuery($this->_query, $parsedFilterJson->filters);
 
-				// Then retrive dataset from DB
+				// Then retrieve dataset from DB
 				$dataset = $this->filterslib->getDataset($datasetQuery);
 
 				// Try to load the name of the filter using the PhrasesLib
@@ -448,7 +448,7 @@ class FilterWidget extends Widget
 
 	/**
 	 * Calls the method _markRow and _formatRow to marks rows using markRow and format rowns using formatRow
-	 * NOTE: this method operates directly on the retrived dataset: parameter passed by reference
+	 * NOTE: this method operates directly on the retrieved dataset: parameter passed by reference
 	 */
 	private function _formatDataset(&$rawDataset)
 	{
@@ -471,7 +471,7 @@ class FilterWidget extends Widget
 	 * - converts booleans into strings "true" and "false"
 	 * - format dates using the format string defined in DEFAULT_DATE_FORMAT
 	 * Calls the parameter formatRow if it was given and if it is a valid funtion
-	 * NOTE: this method operates directly on the retrived dataset: parameter passed by reference
+	 * NOTE: this method operates directly on the retrieved dataset: parameter passed by reference
 	 */
 	private function _formatRow(&$rawDatasetRow)
 	{
@@ -514,7 +514,7 @@ class FilterWidget extends Widget
 	}
 
 	/**
-	 * Utility method that retrives the name of the columns present in a filter JSON definition
+	 * Utility method that retrieves the name of the columns present in a filter JSON definition
 	 */
 	private function _getColumnsNames($columns)
 	{

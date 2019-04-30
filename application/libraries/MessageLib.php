@@ -294,7 +294,7 @@ class MessageLib
 				$result = $this->_ci->PersonModel->load($receiver_id);
 				if (hasData($result))
 				{
-					// Retrives the language of the logged user
+					// Retrieves the language of the logged user
 					$sprache = getUserLanguage();
 
 					// Loads template data

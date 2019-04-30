@@ -17,10 +17,9 @@
  *
  * Authors: Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>
  */
-if (! defined('BASEPATH'))
-	exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class LVPlanJob extends FHC_Controller
+class LVPlanJob extends CLI_Controller
 {
 	/**
 	 * Initialize LVPlanJob Class
@@ -29,32 +28,7 @@ class LVPlanJob extends FHC_Controller
 	 */
 	public function __construct()
 	{
-		// An empty array as parameter will ensure that this controller is ONLY callable from command line
-		parent::__construct(array());
-
-		if ($this->input->is_cli_request())
-		{
-			$cli = true;
-		}
-		else
-		{
-			$this->output->set_status_header(403, 'Jobs must be run from the CLI');
-			echo "Jobs must be run from the CLI";
-			exit;
-		}
-	}
-
-	/**
-	 * Main function index as help
-	 *
-	 * @return	void
-	 */
-	public function index()
-	{
-		$result = "The following are the available command line interface commands\n\n";
-		$result .= "php ".$this->config->item('index_page')." jobs/LVPlanJob AddDirectGroups";
-
-		echo $result.PHP_EOL;
+		parent::__construct();
 	}
 
 	/**

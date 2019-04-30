@@ -100,7 +100,7 @@ class PermissionLib
 	 * - convert the required permissions to an array if needed
 	 * - loops through the required permissions
 	 * - checks if the permission is well formatted
-	 * - retrives permission and required access type from the $requiredPermissions array
+	 * - retrieves permission and required access type from the $requiredPermissions array
 	 * - checks if the required access type is compliant with the HTTP method (GET => r, POST => w)
 	 * - if the user has one of the permissions than exit the loop
 	 * - checks if the user has the same required permissiond with the same required access type
@@ -142,7 +142,7 @@ class PermissionLib
 							// Checks if the permission is well formatted
 							if (strpos($permissions[$pCounter], PermissionLib::PERMISSION_SEPARATOR) !== false)
 							{
-								// Retrives permission and required access type from the $requiredPermissions array
+								// Retrieves permission and required access type from the $requiredPermissions array
 								list($permission, $requiredAccessType) = explode(PermissionLib::PERMISSION_SEPARATOR, $permissions[$pCounter]);
 
 								$accessType = '';

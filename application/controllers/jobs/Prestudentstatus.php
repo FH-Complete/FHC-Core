@@ -7,8 +7,7 @@ if (! defined('BASEPATH'))
  * Database Class
  *
  */
-
-class Prestudentstatus extends FHC_Controller
+class Prestudentstatus extends CLI_Controller
 {
 	/**
 	 * Initialize Prestudentstatus Class
@@ -17,32 +16,7 @@ class Prestudentstatus extends FHC_Controller
 	 */
 	public function __construct()
 	{
-		// An empty array as parameter will ensure that this controller is ONLY callable from command line
-		parent::__construct(array());
-
-		if ($this->input->is_cli_request())
-		{
-			$cli = true;
-		}
-		else
-		{
-			$this->output->set_status_header(403, 'Jobs must be run from the CLI');
-			echo "Jobs must be run from the CLI";
-			exit;
-		}
-	}
-
-	/**
-	 * Main function index as help
-	 *
-	 * @return	void
-	 */
-	public function index()
-	{
-		$result = "The following are the available command line interface commands\n\n";
-		$result .= "php ".$this->config->item('index_page')." jobs/Prestudentstatus CorrectStudienplan";
-
-		echo $result.PHP_EOL;
+		parent::__construct();
 	}
 
 	/**

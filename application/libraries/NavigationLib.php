@@ -88,7 +88,7 @@ class NavigationLib
 	}
 
 	/**
-	 * Wrapper method to the session helper funtions to retrive the whole session for this navigation widget
+	 * Wrapper method to the session helper funtions to retrieve the whole session for this navigation widget
 	 */
 	public function getSessionMenu()
 	{
@@ -103,7 +103,7 @@ class NavigationLib
 	}
 
 	/**
-	 * Wrapper method to the session helper funtions to retrive the whole session for this navigation widget
+	 * Wrapper method to the session helper funtions to retrieve the whole session for this navigation widget
 	 */
 	public function getSessionHeader()
 	{
@@ -118,7 +118,7 @@ class NavigationLib
 	}
 
 	/**
-	 * Wrapper method to the session helper funtions to retrive one element from the session of this navigation widget
+	 * Wrapper method to the session helper funtions to retrieve one element from the session of this navigation widget
 	 */
 	public function getSessionElementMenu($name)
 	{
@@ -133,7 +133,7 @@ class NavigationLib
 	}
 
 	/**
-	 * Wrapper method to the session helper funtions to retrive one element from the session of this navigation widget
+	 * Wrapper method to the session helper funtions to retrieve one element from the session of this navigation widget
 	 */
 	public function getSessionElementHeader($name)
 	{

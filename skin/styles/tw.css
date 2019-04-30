@@ -210,14 +210,21 @@ a:hover /*link ohne Item-Definition*/
 a.ItemTesttool
 {
 	color: #000;
-	/*line-height: 25px;*/
+	line-height: 25px;
 	display:block;
 	padding: 5px 10px 5px 10px;
+}
+
+a.ItemTesttool.navButton
+{
+	background-color: #0a629c;
+	color: white;
+	padding: 10px;
 }
 a.ItemTesttoolAktiv
 {
 	color: #000;
-	/*line-height: 25px;*/
+	line-height: 25px;
 	display:block;
 	padding: 5px 10px 5px 10px;
 	text-decoration: none;
@@ -225,7 +232,7 @@ a.ItemTesttoolAktiv
 a.ItemTesttoolBeendet
 {
 	color: #C7C8C9;
-	/*line-height: 25px;*/
+	line-height: 25px;
 	display:block;
 	padding: 5px 10px 5px 10px;
 	cursor: default;
@@ -234,9 +241,15 @@ a.ItemTesttoolBeendet
 a:hover.ItemTesttool
 {
 	color: #000;
-	/*line-height: 25px;*/
+	line-height: 25px;
 	text-decoration: none;
 	padding: 5px 10px 5px 10px;
+}
+a:hover.ItemTesttool.navButton
+{
+	background-color: steelblue;
+	color: white;
+	padding: 10px;
 }
 a.HyperItem /* ? */
 {
@@ -430,7 +443,18 @@ td.HeaderTesttool /*fuer die Button-Optik beim Testtool*/
 	white-space:nowrap;
 	line-height: 25px;
 	box-shadow: inset 0 0 2px #FFFFFF;
-	padding: 0 10px 0 10px;
+	padding: 10px;
+}
+td.HeaderTesttoolSTG /*fuer die Button-Optik der Quereinstiegs-Studiengänge beim Testtool*/
+{
+	color: #00639C;
+	border: 2px solid #00639C;
+	padding: 10px;
+	max-width: 100px;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: normal;
+	font-weight: bold;
 }
 td.Inaktiv  /*fuer Inaktive Items bei der Raumbeschreibung */
 {

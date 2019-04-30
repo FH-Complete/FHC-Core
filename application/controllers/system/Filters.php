@@ -35,7 +35,7 @@ class Filters extends FHC_Controller
 	// Public methods
 
 	/**
-	 * Retrives data about the current filter from the session and will be written on the output in JSON format
+	 * Retrieves data about the current filter from the session and will be written on the output in JSON format
 	 */
 	public function getFilter()
 	{
@@ -43,7 +43,7 @@ class Filters extends FHC_Controller
 	}
 
 	/**
-	 * Retrives the number of records present in the current dataset and will be written on the output in JSON format
+	 * Retrieves the number of records present in the current dataset and will be written on the output in JSON format
 	 */
 	public function rowNumber()
 	{
@@ -243,11 +243,11 @@ class Filters extends FHC_Controller
 			// If it is present in the HTTP GET
 			if (isset($_GET[self::FILTER_PAGE_PARAM]))
 			{
-				$filterPage = $this->input->get(self::FILTER_PAGE_PARAM); // is retrived from the HTTP GET
+				$filterPage = $this->input->get(self::FILTER_PAGE_PARAM); // is retrieved from the HTTP GET
 			}
 			elseif (isset($_POST[self::FILTER_PAGE_PARAM])) // Else if it is present in the HTTP POST
 			{
-				$filterPage = $this->input->post(self::FILTER_PAGE_PARAM); // is retrived from the HTTP POST
+				$filterPage = $this->input->post(self::FILTER_PAGE_PARAM); // is retrieved from the HTTP POST
 			}
 
 			// Loads the FiltersLib that contains all the used logic

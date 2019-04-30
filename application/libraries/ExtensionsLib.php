@@ -7,7 +7,7 @@ if (! defined('BASEPATH')) exit('No direct script access allowed');
  */
 class ExtensionsLib
 {
-	const SQL_DIRECTORY = 'sql'; // directory where to retrive SQL scripts
+	const SQL_DIRECTORY = 'sql'; // directory where to retrieve SQL scripts
 	const SQL_FILE_EXTENSION = '.sql'; // SQL scripts file extension
 
 	const FILE_INPUT_NAME = 'extension'; // name of the HTTP parameter containing the archive data
@@ -200,7 +200,7 @@ class ExtensionsLib
 	}
 
 	/**
-	 * Retrive the list of all the installed extensions
+	 * Retrieve the list of all the installed extensions
 	 */
 	public function getInstalledExtensions()
 	{
@@ -253,7 +253,7 @@ class ExtensionsLib
 		// If the upload was a success
 		if ($this->_ci->upload->do_upload(ExtensionsLib::FILE_INPUT_NAME))
 		{
-			$uploadData = $this->_ci->upload->data(); // retrives data about the uploaded file
+			$uploadData = $this->_ci->upload->data(); // retrieves data about the uploaded file
 			// Checks the file extension
 			$uploadedFileExtension = '.'.pathinfo($uploadData['full_path'], PATHINFO_EXTENSION);
 			if (!in_array($uploadedFileExtension, $this->ARCHIVE_EXTENSIONS))

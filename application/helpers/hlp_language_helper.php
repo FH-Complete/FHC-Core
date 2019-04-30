@@ -17,8 +17,8 @@ if (! defined('BASEPATH')) exit('No direct script access allowed');
 // ------------------------------------------------------------------------
 
 /**
- * Function to retrive the language of the logged user
- * If is not possible to retrive it, then the default system language is returnd
+ * Function to retrieve the language of the logged user
+ * If is not possible to retrieve it, then the default system language is returnd
  * If as parameter is given a valid language the it's returned useful to avoid
  * to write the same control structures for the language
  */
@@ -28,9 +28,9 @@ function getUserLanguage($language = null)
 
 	$ci =& get_instance(); // get CI instance
 
-	// Use the default system language, if it's possible retrives the language for the logged user
+	// Use the default system language, if it's possible retrieves the language for the logged user
 	$language = DEFAULT_LANGUAGE;
-	// Checks if the user is authenticated to retrive the users's language
+	// Checks if the user is authenticated to retrieve the users's language
 	// NOTE: this helper could be called when the user is not logged in the system
 	// 		so this is why is checked if the function getAuthUID exists
 	if (function_exists('getAuthUID'))

@@ -69,11 +69,11 @@ class Navigation extends Auth_Controller
 			// If it is present in the HTTP GET
 			if (isset($_GET[self::NAVIGATION_PAGE_PARAM]))
 			{
-				$navigationPage = $this->input->get(self::NAVIGATION_PAGE_PARAM); // is retrived from the HTTP GET
+				$navigationPage = $this->input->get(self::NAVIGATION_PAGE_PARAM); // is retrieved from the HTTP GET
 			}
 			elseif (isset($_POST[self::NAVIGATION_PAGE_PARAM])) // Else if it is present in the HTTP POST
 			{
-				$navigationPage = $this->input->post(self::NAVIGATION_PAGE_PARAM); // is retrived from the HTTP POST
+				$navigationPage = $this->input->post(self::NAVIGATION_PAGE_PARAM); // is retrieved from the HTTP POST
 			}
 
 			// Loads the NavigationLib that contains all the used logic

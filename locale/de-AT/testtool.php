@@ -9,6 +9,8 @@ $this->phrasen['testtool/willkommenstext']='Herzlich Willkommen zum Reihungstest
 											Wir wünschen Ihnen einen erfolgreichen Start ins Studium.';
 $this->phrasen['testtool/nameAuswaehlen']='Name auswählen...';
 $this->phrasen['testtool/quereinstieg']='(Quereinstieg)';
+$this->phrasen['testtool/quereinsteiger']='Quereinsteiger';
+$this->phrasen['testtool/basic']='Basic';
 $this->phrasen['testtool/semester']='Semester';
 $this->phrasen['testtool/reihungstestNichtFreigeschalten']='Der zuteilte Reihungstest ist noch nicht freigeschaltet';
 $this->phrasen['testtool/reihungstestKannNichtGeladenWerden']='Der Reihungstest dem Sie zugeteilt sind, kann nicht geladen werden';
