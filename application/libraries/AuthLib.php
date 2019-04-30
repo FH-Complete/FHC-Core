@@ -305,7 +305,7 @@ class AuthLib
 	 */
 	private function _showInvalidAuthentication()
 	{
-		header('HTTP/1.0 401 Unauthorized'); // set the HTTP header as unauthorized
+		$this->_ci->output->set_status_header(REST_Controller::HTTP_UNAUTHORIZED); // set the HTTP header as unauthorized
 		unset($_SERVER['PHP_AUTH_USER']);
 
 		$this->_ci->load->library('EPrintfLib'); // loads the EPrintfLib to format the output
@@ -325,6 +325,8 @@ class AuthLib
 	 */
 	private function _showError($errorMessage)
 	{
+		$this->_ci->output->set_status_header(REST_Controller::HTTP_UNAUTHORIZED); // set the HTTP header as unauthorized
+
 		$this->_ci->load->library('EPrintfLib'); // loads the EPrintfLib to format the output
 		$this->_ci->load->library('LogLib'); // Loads the logs library
 
