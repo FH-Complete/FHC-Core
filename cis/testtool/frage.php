@@ -182,7 +182,7 @@ echo '
 	</script>
 </head>
 
-<body class='testtool-content' style="margin-top: 20px;">
+<body class='testtool-content'>
 <?php
 if(!isset($_SESSION['pruefling_id']))
 	die($p->t('testtool/bitteZuerstAnmelden'));

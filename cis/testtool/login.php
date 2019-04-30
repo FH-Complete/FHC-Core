@@ -407,7 +407,7 @@ if (isset($prestudent_id))
 
     //Prestudent Informationen
     echo '
-        <h1>'. $p->t('testtool/begruessungstext'). '</h1><br/>
+        <h1 style="margin-top: -20px;">'. $p->t('testtool/begruessungstext'). '</h1><br/>
         <p>'. $p->t('testtool/anmeldedaten'). '</p><br/>   
     ';
 
