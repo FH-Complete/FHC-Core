@@ -23,7 +23,7 @@ class FiltersLib
 	const SESSION_DATASET_REPRESENTATION = 'datasetRepresentation';
 	const SESSION_DATASET_REP_OPTIONS = 'datasetRepresentationOptions';
 
-	// Alias for the dynamic table used to retrive the dataset
+	// Alias for the dynamic table used to retrieve the dataset
 	const DATASET_TABLE_ALIAS = 'datasetFilterTable';
 
 	// Parameters names...
@@ -40,7 +40,7 @@ class FiltersLib
 	// ...to specify permissions that are needed to use this FilterWidget
 	const REQUIRED_PERMISSIONS_PARAMETER = 'requiredPermissions';
 
-	// ...stament to retrive the dataset
+	// ...stament to retrieve the dataset
 	const QUERY_PARAMETER = 'query';
 
 	// ...to specify more columns or aliases for them
@@ -136,7 +136,7 @@ class FiltersLib
 	}
 
 	/**
-	 * Wrapper method to the session helper funtions to retrive the whole session for this filter
+	 * Wrapper method to the session helper funtions to retrieve the whole session for this filter
 	 */
 	public function getSession()
 	{
@@ -144,7 +144,7 @@ class FiltersLib
 	}
 
 	/**
-	 * Wrapper method to the session helper funtions to retrive one element from the session of this filter
+	 * Wrapper method to the session helper funtions to retrieve one element from the session of this filter
 	 */
 	public function getSessionElement($name)
 	{
@@ -192,7 +192,7 @@ class FiltersLib
 		$this->_ci->FiltersModel->addJoin('public.tbl_benutzer', 'person_id', 'LEFT'); // left join with benutzer table
 		$this->_ci->FiltersModel->addSelect('system.tbl_filters.*'); // select only from table filters
 		$this->_ci->FiltersModel->addOrder('sort', 'ASC'); // sort on column sort
-		$this->_ci->FiltersModel->addLimit(1); // if more than one filter is set as default only one will be retrived
+		$this->_ci->FiltersModel->addLimit(1); // if more than one filter is set as default only one will be retrieved
 
 		$definition = null;
 		$whereParameters = null; // where clause parameters
@@ -206,7 +206,7 @@ class FiltersLib
 		}
 		else
 		{
-			// If we can univocally retrive a filter
+			// If we can univocally retrieve a filter
 			if ($app != null && $datasetName != null && $filterKurzbz != null)
 			{
 				$whereParameters = array(
@@ -280,7 +280,7 @@ class FiltersLib
 	}
 
 	/**
-	 * Generate the query to retrive the dataset for a filter
+	 * Generate the query to retrieve the dataset for a filter
 	 */
 	public function generateDatasetQuery($query, $filters)
 	{
@@ -316,7 +316,7 @@ class FiltersLib
 	}
 
 	/**
-	 * Retrives the dataset from the DB
+	 * Retrieves the dataset from the DB
 	 */
 	public function getDataset($datasetQuery)
 	{
@@ -368,7 +368,7 @@ class FiltersLib
 		// Checks the parameter selectedFields
 		if (isset($selectedFields) && is_array($selectedFields) && count($selectedFields) > 0)
 		{
-			// Retrives all the used fields by the current filter
+			// Retrieves all the used fields by the current filter
 			$fields = $this->getSessionElement(self::SESSION_FIELDS);
 
 			// Checks that the given selected fields are present in all the used fields by the current filter
@@ -393,9 +393,9 @@ class FiltersLib
 		// Checks the parameter selectedField
 		if (!isEmptyString($selectedField))
 		{
-			// Retrives all the used fields by the current filter
+			// Retrieves all the used fields by the current filter
 			$fields = $this->getSessionElement(self::SESSION_FIELDS);
-			// Retrives the selected fields by the current filter
+			// Retrieves the selected fields by the current filter
 			$selectedFields = $this->getSessionElement(self::SESSION_SELECTED_FIELDS);
 
 			// Checks that the given selected field is present in the list of all the used fields by the current filter
@@ -427,9 +427,9 @@ class FiltersLib
 		// Checks the parameter selectedField
 		if (!isEmptyString($selectedField))
 		{
-			// Retrives all the used fields by the current filter
+			// Retrieves all the used fields by the current filter
 			$fields = $this->getSessionElement(self::SESSION_FIELDS);
-			// Retrives the selected fields by the current filter
+			// Retrieves the selected fields by the current filter
 			$selectedFields = $this->getSessionElement(self::SESSION_SELECTED_FIELDS);
 
 			// Checks that the given selected field is present in the list of all the used fields by the current filter
@@ -456,9 +456,9 @@ class FiltersLib
 		// Checks the parameter appliedFilter
 		if (!isEmptyString($appliedFilter))
 		{
-			// Retrives all the used fields by the current filter
+			// Retrieves all the used fields by the current filter
 			$fields = $this->getSessionElement(self::SESSION_FIELDS);
-			// Retrives the applied filters by the current filter
+			// Retrieves the applied filters by the current filter
 			$filters = $this->getSessionElement(self::SESSION_FILTERS);
 
 			// Checks that the given applied filter is present in the list of all the used fields by the current filter
@@ -493,7 +493,7 @@ class FiltersLib
 		if (isset($appliedFilters) && is_array($appliedFilters)
 			&& isset($appliedFiltersOperations) && is_array($appliedFiltersOperations))
 		{
-			$fields = $this->getSessionElement(self::SESSION_FIELDS); // Retrives all the used fields by the current filter
+			$fields = $this->getSessionElement(self::SESSION_FIELDS); // Retrieves all the used fields by the current filter
 
 			// Checks that the given applied filters are present in all the used fields by the current filter
 			if (!array_diff($appliedFilters, $fields))
@@ -544,9 +544,9 @@ class FiltersLib
 		// Checks the parameter filter
 		if (!isEmptyString($filter))
 		{
-			// Retrives all the used fields by the current filter
+			// Retrieves all the used fields by the current filter
 			$fields = $this->getSessionElement(self::SESSION_FIELDS);
-			// Retrives the applied filters by the current filter
+			// Retrieves the applied filters by the current filter
 			$filters = $this->getSessionElement(self::SESSION_FILTERS);
 
 			// Checks that the given applied filter is present in the list of all the used fields by the current filter
@@ -619,7 +619,7 @@ class FiltersLib
 
 			// Generates the "column" property
 			$jsonDeifinition->columns = array();
-			$selectedFields = $this->getSessionElement(self::SESSION_SELECTED_FIELDS); // retrived the selected fields
+			$selectedFields = $this->getSessionElement(self::SESSION_SELECTED_FIELDS); // retrieved the selected fields
 			for ($i = 0; $i < count($selectedFields); $i++)
 			{
 				// Each element is an object with a property called "name"

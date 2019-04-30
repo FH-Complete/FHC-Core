@@ -200,7 +200,7 @@ class Person_model extends DB_Model
 	}
 
 	/**
-	 * Retrives the language of the user by the UID
+	 * Retrieves the language of the user by the UID
 	 * Gets all the persons related to the given UID and starting from the most recent person in DB
 	 * tries to find a valid language (!= null), if found is returned, otherwise is returned the
 	 * default global language of the system

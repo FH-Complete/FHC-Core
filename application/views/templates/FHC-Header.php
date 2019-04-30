@@ -2,7 +2,7 @@
 
 	if (! defined('BASEPATH')) exit('No direct script access allowed');
 
-	// Retrives the name of the index page, the URL path of the called controller and the called controller
+	// Retrieves the name of the index page, the URL path of the called controller and the called controller
 	// NOTE: placed here because it doesn't work inside functions
 	$indexPage = $this->config->item('index_page');
 	$calledPath = $this->router->directory.$this->router->class;
