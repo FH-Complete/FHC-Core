@@ -339,7 +339,7 @@ if (isset($_SESSION['pruefling_id']))
 					{
 						//Gebiet gestartet aber noch nicht zu ende
 						$style='';
-						$class='ItemTesttoolAktiv';
+						$class='ItemTesttool ItemTesttoolAktiv';
 					}
 					else
 					{
