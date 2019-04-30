@@ -353,7 +353,7 @@ if (isset($_SESSION['pruefling_id']))
 						{
 							//Gebiet ist zu Ende
 							$style='';
-							$class='ItemTesttoolBeendet';
+							$class='ItemTesttool ItemTesttoolBeendet';
 						}
 					}
 				}
