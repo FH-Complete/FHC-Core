@@ -11,12 +11,13 @@
  * @filesource
  */
 
-if (! defined('BASEPATH'))
-	exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class AmpelMail extends FHC_Controller
+class AmpelMail extends CLI_Controller
 {
-	private $CIS_AMPELVERWALTUNG_URL;
+	const CIS_AMPELVERWALTUNG_URL = CIS_ROOT. "cis/index.php?menu=".
+		CIS_ROOT. "cis/menu.php?content_id=&content=".
+		CIS_ROOT. "cis/private/tools/ampelverwaltung.php";
 
 	/**
 	 * Constructor
@@ -25,39 +26,12 @@ class AmpelMail extends FHC_Controller
 	{
 		parent::__construct();
 
-		// Allow script execution only from CLI
-		if ($this->input->is_cli_request())
-		{
-			$cli = true;
-		}
-		else
-		{
-			$this->output->set_status_header(403, 'Jobs must be run from the CLI');
-			echo "Jobs must be run from the CLI";
-			exit;
-		}
-		$this->CIS_AMPELVERWALTUNG_URL = CIS_ROOT. "cis/index.php?menu=".
-			CIS_ROOT. "cis/menu.php?content_id=&content=".
-			CIS_ROOT. "cis/private/tools/ampelverwaltung.php";
+		// Load helpers
+		$this->load->helper('hlp_sancho');
+
 		// Load models
 		$this->load->model('content/Ampel_model', 'AmpelModel');
 		$this->load->model('person/Person_model', 'PersonModel');
-
-		// Load helpers
-		$this->load->helper('hlp_sancho');
-	}
-
-	/**
-	 * Main function index as help
-	 *
-	 * @return	void
-	 */
-	public function index()
-	{
-		$result = "The following are the available command line interface commands\n\n";
-		$result .= "php index.ci.php jobs/AmpelMail generateAmpelMail";
-
-		echo $result. PHP_EOL;
 	}
 
 	/**
@@ -210,7 +184,7 @@ class AmpelMail extends FHC_Controller
 				'uid' => $uid,
 				'firstName' => $firstName,
 				'ampel_list' => $html_text,
-				'link' => $this->CIS_AMPELVERWALTUNG_URL
+				'link' => self::CIS_AMPELVERWALTUNG_URL
 			);
 		}
 		return $ampel_data_arr;

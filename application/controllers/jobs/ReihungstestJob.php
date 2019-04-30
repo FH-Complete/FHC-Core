@@ -1,31 +1,15 @@
 <?php
 
-if (! defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class ReihungstestJob extends FHC_Controller
+class ReihungstestJob extends CLI_Controller
 {
-	private $VILESCI_RT_VERWALTUNGS_URL;
-
 	/**
 	 * Constructor
 	 */
 	public function __construct()
 	{
 		parent::__construct();
-
-		// Allow script execution only from CLI
-		if ($this->input->is_cli_request())
-		{
-			$cli = true;
-		}
-		else
-		{
-			$this->output->set_status_header(403, 'Jobs must be run from the CLI');
-			echo "Jobs must be run from the CLI";
-			exit;
-		}
-
-		$this->VILESCI_RT_VERWALTUNGS_URL = site_url('/organisation/Reihungstest');
 
 		// Load models
 		$this->load->model('crm/Reihungstest_model', 'ReihungstestModel');
@@ -38,18 +22,8 @@ class ReihungstestJob extends FHC_Controller
 	}
 
 	/**
-	 * Main function index as help
-	 *
-	 * @return	void
+	 * runReihungstestJob
 	 */
-	public function index()
-	{
-		$result = "The following are the available command line interface commands\n\n";
-		$result .= "php index.ci.php jobs/ReihungstestJob runReihungstestInfo";
-
-		echo $result. PHP_EOL;
-	}
-
 	public function runReihungstestJob()
 	{
 		// Get study plans that have no assigned placement tests yet
@@ -92,6 +66,9 @@ class ReihungstestJob extends FHC_Controller
 		}
 	}
 
+	/**
+	 * runZentraleReihungstestAnmeldefristAssistenzJob
+	 */
 	public function runZentraleReihungstestAnmeldefristAssistenzJob()
 	{
 		// Get placement tests where registration date was yesterday
@@ -198,7 +175,6 @@ class ReihungstestJob extends FHC_Controller
 					$mailcontent .= '<p style="font-family: verdana, sans-serif;"><a href="mailto:?bcc=' . $mailReceipients . '">Mail an alle schicken</a></p>';
 				}
 				$mailcontent_data_arr['table'] = $mailcontent;
-				//$mailcontent_data_arr['link'] = $this->VILESCI_RT_VERWALTUNGS_URL;
 
 				// Send email in Sancho design
 				if (!isEmptyString($mailcontent))
@@ -215,7 +191,9 @@ class ReihungstestJob extends FHC_Controller
 		}
 	}
 
-	// Checks, if an applicant was assigned to a test after Anmeldefrist
+	/**
+	 * Checks, if an applicant was assigned to a test after Anmeldefrist
+	 */
 	public function runZentraleReihungstestNachtraeglichHinzugefuegtJob()
 	{
 		// Get applicants that have been added to a test after Anmeldefrist
@@ -315,6 +293,9 @@ class ReihungstestJob extends FHC_Controller
 		}
 	}
 
+	/**
+	 * runRemindApplicantsOfPlacementTestJob
+	 */
 	public function runRemindApplicantsOfPlacementTestJob()
 	{
 		// Get placement tests with testdate within 3 working days
@@ -473,8 +454,7 @@ class ReihungstestJob extends FHC_Controller
 		// Set associative array with the prepared HTML tables and URL be used by the template's variables
 		$content_data_arr['studienplan_list'] = $studienplan_list;
 		$content_data_arr['freie_plaetze_list'] = $freie_plaetze_list;
-		$content_data_arr['link'] = $this->VILESCI_RT_VERWALTUNGS_URL;
-		;
+		$content_data_arr['link'] = site_url('/organisation/Reihungstest');
 
 		return $content_data_arr;
 	}
