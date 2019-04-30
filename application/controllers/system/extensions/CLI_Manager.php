@@ -13,6 +13,12 @@ class CLI_Manager extends CLI_Controller
 	public function __construct()
     {
         parent::__construct();
+
+		// Load helpers to upload files
+		$this->load->helper('form');
+
+		// Loads the extensions library
+		$this->load->library('ExtensionsLib');
 	}
 
 	/**
