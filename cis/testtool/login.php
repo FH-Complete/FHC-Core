@@ -318,10 +318,13 @@ if(isset($_POST['save']) && isset($_SESSION['prestudent_id']))
 <html>
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <link rel="stylesheet" href="../../vendor/twbs/bootstrap/dist/css/bootstrap.min.css" type="text/css"/>
 	<link href="../../skin/style.css.php" rel="stylesheet" type="text/css">
 	<link rel="stylesheet" href="../../skin/jquery.css" type="text/css"/>
-	<script type="text/javascript" src="../../include/js/jquery1.9.min.js"></script>
+    <script type="text/javascript" src="../../include/js/jquery1.9.min.js"></script>
 	<link rel="stylesheet" type="text/css" href="../../skin/jquery-ui-1.9.2.custom.min.css"/>
+    <script type="text/javascript" src="../../vendor/components/jquery/jquery.min.js"></script>
+    <script type="text/javascript" src="../../vendor/twbs/bootstrap/dist/js/bootstrap.min.js"></script>
 	<script type="text/javascript">
 	$(document).ready(function()
 	{
@@ -360,189 +363,251 @@ if(isset($_POST['save']) && isset($_SESSION['prestudent_id']))
 ?>
 </head>
 
-<body scroll="no" style="margin-top: 40px; padding: 0px 50px 0px 50px; overflow: hidden">
+<body scroll="no" class='testtool-content'>
 <?php
-//echo '<h1>'.$p->t('testtool/startseite').'</h1>';
 
 //REIHUNGSTEST STARTSEITE (nach Login)
-	if (isset($prestudent_id))
-	{
+if (isset($prestudent_id))
+{
 
-		$prestudent = new prestudent($prestudent_id);
-		$stg_obj = new studiengang($prestudent->studiengang_kz);
-		$pruefling = new pruefling();
-		$typ = new studiengang($prestudent->studiengang_kz);
-		$typ->getStudiengangTyp($stg_obj->typ);
+    $prestudent = new prestudent($prestudent_id);
+    $stg_obj = new studiengang($prestudent->studiengang_kz);
+    $pruefling = new pruefling();
+    $typ = new studiengang($prestudent->studiengang_kz);
+    $typ->getStudiengangTyp($stg_obj->typ);
 
-        // STG mit der höchsten Prio ermitteln
-        $ps = new Prestudent();
+    // STG mit der höchsten Prio ermitteln
+    $ps = new Prestudent();
 
-        //  * prinzipiell STG der session übernehmem
-		$firstPrio_studiengang_kz = $prestudent->studiengang_kz;;
+    //  * prinzipiell STG der session übernehmem
+    $firstPrio_studiengang_kz = $prestudent->studiengang_kz;;
 
-        //  * wenn STG des eingeloggten Prestudenten vom Typ Bachelor ist, dann höchste Prio aller
-        //  Bachelor-STG ermitteln, an denen die Person noch interessiert ist
-        if ($typ->typ == 'b')
+    //  * wenn STG des eingeloggten Prestudenten vom Typ Bachelor ist, dann höchste Prio aller
+    //  Bachelor-STG ermitteln, an denen die Person noch interessiert ist
+    if ($typ->typ == 'b')
+    {
+        $ps->getActualInteressenten($prestudent_id, true, 'b');
+        foreach($ps->result as $row_prio)
         {
-            $ps->getActualInteressenten($prestudent_id, true, 'b');
-			foreach($ps->result as $row_prio)
-			{
-				if(isset($row_prio->studiengang_kz))
-				{
-					$firstPrio_studiengang_kz = $row_prio->studiengang_kz;
-					break;
-				}
-			}
-		}
-
-        // Sprachwahl zu STG mit höchster Prio ermitteln
-		$ablauf = new Ablauf();
-        $sprachwahl = false;
-		if ($ablauf->getAblaufVorgabeStudiengang($firstPrio_studiengang_kz) && is_bool($ablauf->result[0]->sprachwahl))
-        {
-           $sprachwahl = $ablauf->result[0]->sprachwahl;
-        }
-
-		//Prestudent Informationen
-		echo '<form method="GET">';
-		echo '<br>'.$p->t('testtool/begruessungstext').' <br/><br/>';
-		echo '<b>'.$p->t('zeitaufzeichnung/id').'</b>: '.$_SESSION['prestudent_id'].'<br/>';
-		echo '<b>'.$p->t('global/name').'</b>: '.$_SESSION['vorname'].' '.$_SESSION['nachname'].'<br/>';
-		echo '<b>'.$p->t('global/geburtsdatum').'</b>: '.$date->formatDatum($_SESSION['gebdatum'],'d.m.Y').'<br/>';
-
-		//  * wenn Prestudent an mehreren Bachelor-Studiengängen interessiert ist, dann alle STG anführen
-		if ($typ->typ == 'b')
-        {
-			$ps_arr = new Prestudent();
-			$ps_arr->getActualInteressenten($prestudent_id, false, 'b');
-
-			if (count($ps_arr->result) > 1)
+            if(isset($row_prio->studiengang_kz))
             {
-				echo '<b>'.$p->t('global/studiengang'). "</b>: <br><br>";
-
-				// Jeweils letzten Status ermitteln (ob Interessent oder Abgewiesener)
-				foreach ($ps_arr->result as $ps_obj)
-				{
-					$ps_tmp = new Prestudent();
-					$ps_tmp->getLastStatus($ps_obj->prestudent_id);
-
-					$ps_obj->lastStatus = $ps_tmp->status_kurzbz; // letzten Status dem result array hinzufügen
-				}
-
-				// Falls Status 'Abgewiesene' vorhanden, nach hinten reihen
-				usort($ps_arr->result, function($a, $b){
-				    return strcmp($b->lastStatus, $a->lastStatus); // Order by DESC
-                });
-
-				foreach ($ps_arr->result as $ps_obj)
-				{
-					$stg = new Studiengang($ps_obj->studiengang_kz);
-
-					if($ps_obj->lastStatus == 'Interessent')
-					{
-						echo "<li>". $ps_obj->typ_bz .' '. ($sprache_user == 'English' ? $stg->english : $stg->bezeichnung). '<br/>'. "</li>";
-					}
-					// wenn letzter Status 'Abgewiesener' ist, dann als solchen kennzeichnen
-                    elseif($ps_obj->lastStatus == 'Abgewiesener')
-					{
-						echo "<li style='color: grey'>". $ps_obj->typ_bz .' '. ($sprache_user == 'English' ? $stg->english : $stg->bezeichnung). ' (- abgewiesen -)<br/>'. "</li>";
-					}
-
-				}
-				echo "<br>";
-            }
-			//  * wenn Prestudent nur an einem Bachelor-Studiengang interessiert ist, dann nur den einen STG anführen
-			else
-            {
-				echo '<b>'.$p->t('global/studiengang').'</b>: '. $typ->bezeichnung.' '.($sprache_user=='English'?$stg_obj->english:$stg_obj->bezeichnung).'<br/><br/>';
+                $firstPrio_studiengang_kz = $row_prio->studiengang_kz;
+                break;
             }
         }
-		//  * wenn Prestudent an einem Master-Studiengang interessiert ist, dann nur den einen STG anführen
-		else
+    }
+
+    // Sprachwahl zu STG mit höchster Prio ermitteln
+    $ablauf = new Ablauf();
+    $sprachwahl = false;
+    if ($ablauf->getAblaufVorgabeStudiengang($firstPrio_studiengang_kz) && is_bool($ablauf->result[0]->sprachwahl))
+    {
+       $sprachwahl = $ablauf->result[0]->sprachwahl;
+    }
+
+    //Prestudent Informationen
+    echo '
+        <h1>'. $p->t('testtool/begruessungstext'). '</h1><br/>
+        <p>'. $p->t('testtool/anmeldedaten'). '</p><br/>   
+    ';
+
+    echo '
+      <table class="table table-bordered">
+            <tr>
+                <td style="width: 50%;"><strong>'.$p->t('zeitaufzeichnung/id').'</strong></td>
+                <td>'.$_SESSION['prestudent_id'].'</td>
+            </tr>
+            <tr>
+                <td><strong>'.$p->t('global/name').'</strong></td>
+                <td>'.$_SESSION['vorname'].' '.$_SESSION['nachname'].'</td>
+            </tr>
+            <tr>
+                <td><strong>'.$p->t('global/geburtsdatum').'</strong></td>
+                <td>'.$date->formatDatum($_SESSION["gebdatum"],"d.m.Y").'</td>
+            </tr>
+      </table>
+    ';
+	echo '<br>';
+    echo '
+         <p>Für folgende Studiengänge haben Sie sich zum Reihungstest angemeldet:</p><br>
+
+         <table class="table table-bordered">
+            <tr>
+                <thead>
+                    <th>Studiengang</th>
+                    <th>Status</th>
+                    <th>Reihungstest</th>
+                </thead>
+            </tr>
+         ';
+
+    //  * wenn Prestudent an mehreren Bachelor-Studiengängen interessiert ist, dann alle STG anführen
+    if ($typ->typ == 'b')
+    {
+        $ps_arr = new Prestudent();
+        $ps_arr->getActualInteressenten($prestudent_id, false, 'b');
+
+        if (count($ps_arr->result) > 1)
         {
-			echo '<b>'.$p->t('global/studiengang').'</b>: '.$typ->bezeichnung.' '.($sprache_user=='English'?$stg_obj->english:$stg_obj->bezeichnung).'<br/><br/>';
+            // Jeweils letzten Status ermitteln (ob Interessent oder Abgewiesener)
+            foreach ($ps_arr->result as $ps_obj)
+            {
+                $ps_tmp = new Prestudent();
+                $ps_tmp->getLastStatus($ps_obj->prestudent_id);
+
+                $ps_obj->lastStatus = $ps_tmp->status_kurzbz; // letzten Status dem result array hinzufügen
+            }
+
+            // Falls Status 'Abgewiesene' vorhanden, nach hinten reihen
+            usort($ps_arr->result, function($a, $b){
+                return strcmp($b->lastStatus, $a->lastStatus); // Order by DESC
+            });
+
+            foreach ($ps_arr->result as $ps_obj)
+            {
+                echo '<tr>';
+                $stg = new Studiengang($ps_obj->studiengang_kz);
+
+                if($ps_obj->lastStatus == "Interessent")
+                {
+                    echo '<td style="width: 50%;">'. $ps_obj->typ_bz .' '. ($sprache_user == 'English' ? $stg->english : $stg->bezeichnung). '</td>';
+                    if($ps_obj->ausbildungssemester == '1')
+                    {
+                        echo '<td>Regulärer Einstieg (1. Semester)</td>';
+						echo '<td>Basic</td>';
+                    }
+                    elseif($ps_obj->ausbildungssemester == '3')
+                    {
+                        echo '<td>Quereinsteiger (3.Semester)</td>';
+						echo '<td>Basic + Quereinsteiger</td>';
+                    }
+                }
+                // wenn letzter Status \'Abgewiesener\' ist, dann als solchen kennzeichnen
+                elseif($ps_obj->lastStatus == "Abgewiesener")
+                {
+                    echo '
+                        <td class="text-muted">'. $ps_obj->typ_bz .' '. ($sprache_user == 'English' ? $stg->english : $stg->bezeichnung). '</td>
+                        <td class="text-muted">'. $ps_obj->lastStatus. '</td>
+                        <td class="text-muted">-</td>
+                    ';
+                }
+                echo '</tr>';
+
+            }
         }
-		echo '</form>';
-		echo '<br><br>';
+        //  * wenn Prestudent nur an einem Bachelor-Studiengang interessiert ist, dann nur den einen STG anführen
+        else
+        {
+            echo '<td>'. $typ->bezeichnung.' '.($sprache_user=='English'?$stg_obj->english:$stg_obj->bezeichnung).'</td>>';
+        }
+    }
+    //  * wenn Prestudent an einem Master-Studiengang interessiert ist, dann nur den einen STG anführen
+    else
+    {
+        echo '<pre>', print_r($typ,1),'</pre>';
+        echo '<td>'. $typ->bezeichnung.' '.($sprache_user=='English'?$stg_obj->english:$stg_obj->bezeichnung).'</td>';
+    }
 
-		if($pruefling->getPruefling($prestudent_id))
-		{
-			echo '<FORM accept-charset="UTF-8"   action="'. $_SERVER['PHP_SELF'].'"  method="post" enctype="multipart/form-data">';
-			echo '<input type="hidden" name="pruefling_id" value="'.$pruefling->pruefling_id.'">';
-			echo '<table>';
-			//echo '<tr><td>'.$p->t('global/semester').':</td><td><input type="text" name="semester" size="1" maxlength="1" value="'.$pruefling->semester.'">&nbsp;<input type="submit" name="save" value="Semester ändern"></td></tr>';
-			//echo '<tr><td>ID Nachweis:</td><td><INPUT type="text" maxsize="50" name="idnachweis" value="'.$pruefling->idnachweis.'"></td></tr>';
-			//echo '<tr><td></td><td><input type="submit" name="save" value="Semester ändern"></td>';
-			echo '</table>';
-			echo '</FORM>';
+    echo ' 				 
+         </table>
+        ';
 
-			//Wenn die Sprachwahl fuer den priorisierten Studiengang aktiviert ist, dann die Sprachen anzeigen
-			if($sprachwahl==true)
-			{
-				//Liste der Sprachen, die in den Gebieten vorkommen koennen
-				$qry = "SELECT distinct sprache
-						FROM
-							testtool.tbl_pruefling
-							JOIN testtool.tbl_ablauf USING(studiengang_kz)
-							JOIN testtool.tbl_frage USING(gebiet_id)
-							JOIN testtool.tbl_frage_sprache USING(frage_id)
-						WHERE
-							tbl_pruefling.pruefling_id=".$db->db_add_param($pruefling->pruefling_id)."
-						ORDER BY sprache DESC";
-				echo $p->t('testtool/spracheDerTestfragen').':';
-				if($result = $db->db_query($qry))
+    echo '<br>';
+
+    if($pruefling->getPruefling($prestudent_id))
+    {
+        echo '<FORM accept-charset="UTF-8"   action="'. $_SERVER['PHP_SELF'].'"  method="post" enctype="multipart/form-data">';
+        echo '<input type="hidden" name="pruefling_id" value="'.$pruefling->pruefling_id.'">';
+        echo '<table>';
+        //echo '<tr><td>'.$p->t('global/semester').':</td><td><input type="text" name="semester" size="1" maxlength="1" value="'.$pruefling->semester.'">&nbsp;<input type="submit" name="save" value="Semester ändern"></td></tr>';
+        //echo '<tr><td>ID Nachweis:</td><td><INPUT type="text" maxsize="50" name="idnachweis" value="'.$pruefling->idnachweis.'"></td></tr>';
+        //echo '<tr><td></td><td><input type="submit" name="save" value="Semester ändern"></td>';
+        echo '</table>';
+        echo '</FORM>';
+
+        //Wenn die Sprachwahl fuer den priorisierten Studiengang aktiviert ist, dann die Sprachen anzeigen
+        if($sprachwahl==true)
+        {
+            //Liste der Sprachen, die in den Gebieten vorkommen koennen
+            $qry = "SELECT distinct sprache
+                    FROM
+                        testtool.tbl_pruefling
+                        JOIN testtool.tbl_ablauf USING(studiengang_kz)
+                        JOIN testtool.tbl_frage USING(gebiet_id)
+                        JOIN testtool.tbl_frage_sprache USING(frage_id)
+                    WHERE
+                        tbl_pruefling.pruefling_id=".$db->db_add_param($pruefling->pruefling_id)."
+                    ORDER BY sprache DESC";
+
+            if($result = $db->db_query($qry))
+            {
+				echo '
+                    <p>'. $p->t('testtool/spracheDerTestfragen').':</p><br>
+                    
+                    <div class="btn-group btn-group-justified" role="group" style="width: 50%">          
+                ';
+
+				while($row = $db->db_fetch_object($result))
 				{
-					while($row = $db->db_fetch_object($result))
-					{
-						if($_SESSION['sprache']==$row->sprache)
-							$selected='style="border:1px solid black;"';
-						else
-							$selected='';
-						echo " <a href='".$_SERVER['PHP_SELF']."?type=sprachechange&sprache=$row->sprache' class='Item' $selected><img src='bild.php?src=flag&amp;sprache=$row->sprache' alt='$row->sprache' title='$row->sprache'/></a>";
-					}
+					$selected = ($_SESSION['sprache'] == $row->sprache) ? 'active' : '';
+					echo "
+                        <div class='btn-group' role='group'> 
+                            <a role='button' class='btn btn-default $selected' href='". $_SERVER['PHP_SELF']. "?type=sprachechange&sprache=". $row->sprache. "'>$row->sprache</a>
+                        </div>
+                    ";
 				}
-			}
-			echo '<br><br><br><b>'.$p->t('testtool/klickenSieAufEinTeilgebiet').'</b>';
-			if($pruefling->pruefling_id!='')
-			{
-				$_SESSION['pruefling_id']=$pruefling->pruefling_id;
-				echo '<script language="Javascript">parent.menu.location.reload()</script>';
-			}
-		}
-		else
-		{
-			echo '<span class="error">'.$p->t('testtool/keinPrueflingseintragVorhanden').'</span>';
-		}
-	}
-	else
-	{
-            //LOGIN FORM (Startseite vor Login)
-		$prestudent_id_dummy_student = (defined('PRESTUDENT_ID_DUMMY_STUDENT')?PRESTUDENT_ID_DUMMY_STUDENT:'');
+				echo '</div>';
+            }
+        }
 
-		echo '<form method="post">
-				<SELECT name="prestudent">';
-		echo '<OPTION value="'.$prestudent_id_dummy_student.'">'.$p->t('testtool/nameAuswaehlen').'</OPTION>\n';
-		foreach($ps->result as $prestd)
-		{
-			$stg = new studiengang();
-			$stg->load($prestd->studiengang_kz);
-			if(isset($_POST['prestudent']) && $prestd->prestudent_id==$_POST['prestudent'])
-				$selected = 'selected';
-			else
-				$selected='';
-			echo '<OPTION value="'.$prestd->prestudent_id.'" '.$selected.'>'.$prestd->nachname.' '.$prestd->vorname.' ('.(strtoupper($stg->typ.$stg->kurzbz)).')</OPTION>\n';
-		}
-		echo '</SELECT>';
-		echo '&nbsp; '.$p->t('global/geburtsdatum').': ';
-		echo '<input type="text" id="datepicker" size="12" name="gebdatum" value="'.$date->formatDatum($gebdatum,'d.m.Y').'">';
-		echo '&nbsp; <INPUT type="submit" value="'.$p->t('testtool/login').'" />';
-		echo '</form>';
+        echo '<br><br>';
+        echo '
+            <div class="well well-lg text-center">
+                <strong>'.$p->t('testtool/klickenSieAufEinTeilgebiet').'</strong>
+            </div>
+       ';
 
-		echo '<br /><br /><br />
-		<center>
-		<span style="font-size: 1.2em; font-style: italic;">'.$p->t('testtool/willkommenstext').'</span>
-		</center>';
-	}
+        if($pruefling->pruefling_id!='')
+        {
+            $_SESSION['pruefling_id']=$pruefling->pruefling_id;
+            echo '<script language="Javascript">parent.menu.location.reload()</script>';
+        }
+    }
+    else
+    {
+        echo '<span class="error">'.$p->t('testtool/keinPrueflingseintragVorhanden').'</span>';
+    }
+}
+else
+{
+        //LOGIN FORM (Startseite vor Login)
+    $prestudent_id_dummy_student = (defined('PRESTUDENT_ID_DUMMY_STUDENT')?PRESTUDENT_ID_DUMMY_STUDENT:'');
+
+    echo '<form method="post">
+            <SELECT name="prestudent">';
+    echo '<OPTION value="'.$prestudent_id_dummy_student.'">'.$p->t('testtool/nameAuswaehlen').'</OPTION>\n';
+    foreach($ps->result as $prestd)
+    {
+        $stg = new studiengang();
+        $stg->load($prestd->studiengang_kz);
+        if(isset($_POST['prestudent']) && $prestd->prestudent_id==$_POST['prestudent'])
+            $selected = 'selected';
+        else
+            $selected='';
+        echo '<OPTION value="'.$prestd->prestudent_id.'" '.$selected.'>'.$prestd->nachname.' '.$prestd->vorname.' ('.(strtoupper($stg->typ.$stg->kurzbz)).')</OPTION>\n';
+    }
+    echo '</SELECT>';
+    echo '&nbsp; '.$p->t('global/geburtsdatum').': ';
+    echo '<input type="text" id="datepicker" size="12" name="gebdatum" value="'.$date->formatDatum($gebdatum,'d.m.Y').'">';
+    echo '<INPUT type="submit" value="'.$p->t('testtool/login').'" />';
+    echo '</form>';
+
+    echo '<br /><br /><br />
+    <center>
+    <span style="font-size: 1.2em; font-style: italic;">'.$p->t('testtool/willkommenstextTitel').'</span><br><br>
+    <span style="font-size: 1.2em; font-style: italic;">'.$p->t('testtool/willkommenstext').'</span>
+    </center>';
+}
 ?>
 
 </body>

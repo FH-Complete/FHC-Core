@@ -84,7 +84,7 @@ session_start();
 <link href="../../skin/style.css.php" rel="stylesheet" type="text/css">
 </head>
 
-<body scroll="no" style="margin-top: 40px; overflow: hidden">
+<body scroll="no">
 <?php
 if (isset($_SESSION['pruefling_id']))
 {
@@ -102,12 +102,16 @@ if (isset($_SESSION['pruefling_id']))
 
 // Link zur Einleitung
 	if ($content_id = $db->db_fetch_object($result))
+    {
 		if($content_id->content_id!='')
+        {
 			echo '
                 <tr><td class="ItemTesttool" style="margin-left: 20px;" nowrap>
                     <a class="ItemTesttool navButton" href="../../cms/content.php?content_id='.$content_id->content_id.'&sprache='.$sprache.'" target="content">'.$p->t('testtool/einleitung').'</a>
-                </td></tr>';
-
+                </td></tr>
+            ';
+        }
+    }
 	echo '<tr><td style="padding-left: 20px;" nowrap>';
 
 	$studiengang_kz = (isset($_SESSION['studiengang_kz'])) ? $_SESSION['studiengang_kz'] : '';
