@@ -315,77 +315,114 @@ class ReihungstestJob extends FHC_Controller
 		}
 	}
 
-	public function runRemindApplicantsOfPlacementTestJob()
+	/*
+	 * Sends an email to all applicants of a placement test to remind them 3 working days before
+	 *
+	 * @param integer $degreeProgram. Kennzahl of Degree Program to check
+	 * @param string $bcc. Optional. BCC-Mailadress to send the Mails to
+	 * @param string $from. Optional. Sender-Mailadress shown to recipient
+	 */
+	public function remindApplicantsOfPlacementTest()
 	{
-		// Get placement tests with testdate within 3 working days
+		$degreeProgram = $this->input->get('degreeprogram');
+		$bcc = $this->input->get('bcc');
+		$from = $this->input->get('from');
 
-		// Check if today +3 days is working day
-		$todayPlus3 = date('Y-m-d', strtotime("+3 days"));
-
-		if (getWorkingDays($todayPlus3, $todayPlus3) == 0)
+		// Encode Params
+		if ($bcc != '')
 		{
-			// If not increase counting days till next working day
-			for ($i = 3; $i < 100; $i++)
+			$bcc = urldecode($bcc);
+		}
+		if ($from != '')
+		{
+			$from = urldecode($from);
+		}
+
+		// Get placement tests with testdate within the next 2 weeks
+		$resultNextTestDates = $this->ReihungstestModel->getNextPlacementtests($degreeProgram, 14);
+		if (hasData($resultNextTestDates))
+		{
+			$nextTestDates = $resultNextTestDates->retval;
+			$enddate = '';
+			// Loop through the dates
+			foreach ($nextTestDates as $testDates)
 			{
-				$dateToCheck = date('Y-m-d', strtotime("+".$i." days"));
-				if (getWorkingDays($dateToCheck, $dateToCheck) == 1)
+				$workingdays = 0;
+				$testsOndate = array();
+
+				// Deduct days till 3 working days are reached
+				for ($i = 1; ; $i++)
 				{
-					$nextWorkingDay = $dateToCheck;
-					break;
+					if (isDateWorkingDay($testDates->datum, $i) === true)
+					{
+						$workingdays++;
+					}
+					if ($workingdays == 3)
+					{
+						$enddate = date("Y-m-d", strtotime("$testDates->datum -".$i." days"));
+						break;
+					}
+					else
+					{
+						continue;
+					}
 				}
-			}
-		}
-		else
-		{
-			$nextWorkingDay = date('Y-m-d', strtotime("+3 days"));
-		}
 
-		// Check if a placement test happens on $nextWorkingDay
-		$result = $this->ReihungstestModel->getTestsOnDate($nextWorkingDay, 11000);
+				// If $enddate is today -> load all tests of $testDates->datum
+				if (date("Y-m-d", strtotime($enddate)) == date('Y-m-d'))
+				{
+					$resultTestsOnDate = $this->ReihungstestModel->getTestsOnDate($testDates->datum, $degreeProgram);
 
-		$testsOndate = array();
+					if (hasData($resultTestsOnDate))
+					{
+						$testsOndate = $resultTestsOnDate->retval;
+					}
+					elseif (isError($resultTestsOnDate))
+					{
+						show_error($resultTestsOnDate->error);
+					}
+				}
 
-		if (hasData($result))
-		{
-			$testsOndate = $result->retval;
-		}
-		elseif (isError($result))
-		{
-			show_error($result->error);
-		}
+				if (!isEmptyArray($testsOndate))
+				{
+					foreach ($testsOndate as $reihungstest)
+					{
+						// Loads applicants of a test
+						$applicants = $this->ReihungstestModel->getApplicantsOfPlacementTest($reihungstest->reihungstest_id);
 
-		$applicants_arr = array();
+						if (hasData($applicants))
+						{
+							$applicants_arr = $applicants->retval;
+						}
+						elseif (isError($applicants))
+						{
+							show_error($applicants->error);
+						}
 
-		foreach ($testsOndate as $reihungstest)
-		{
-			// Loads applicants of a test
-			$applicants = $this->ReihungstestModel->getApplicantsOfPlacementTest($reihungstest->reihungstest_id);
+						foreach ($applicants_arr as $applicant)
+						{
+							$mailcontent_data_arr = array();
+							$mailcontent_data_arr['anrede'] = $applicant->anrede;
+							$mailcontent_data_arr['nachname'] = $applicant->nachname;
+							$mailcontent_data_arr['vorname'] = $applicant->vorname;
+							$mailcontent_data_arr['rt_datum'] = date_format(date_create($reihungstest->datum), 'd.m.Y');
+							$mailcontent_data_arr['rt_uhrzeit'] = date_format(date_create($reihungstest->uhrzeit), 'H:i');
+							$mailcontent_data_arr['rt_raum'] = $applicant->planbezeichnung;
+							$mailcontent_data_arr['wegbeschreibung'] = $applicant->lageplan;
 
-			if (hasData($applicants))
-			{
-				$applicants_arr = $applicants->retval;
-			}
-			elseif (isError($applicants))
-			{
-				show_error($applicants->error);
-			}
-
-			foreach ($applicants_arr as $applicant)
-			{
-				$mailcontent_data_arr = array();
-				$mailcontent_data_arr['anrede'] = $applicant->anrede;
-				$mailcontent_data_arr['nachname'] = $applicant->nachname;
-				$mailcontent_data_arr['vorname'] = $applicant->vorname;
-				$mailcontent_data_arr['rt_datum'] = date_format(date_create($reihungstest->datum), 'd.m.Y');
-				$mailcontent_data_arr['rt_uhrzeit'] = date_format(date_create($reihungstest->uhrzeit), 'H:i');
-				$mailcontent_data_arr['rt_raum'] = $applicant->planbezeichnung;
-				$mailcontent_data_arr['wegbeschreibung'] = $applicant->lageplan;
-
-				sendSanchoMail(
-					'Sancho_RemindApplicantsOfTest',
-					$mailcontent_data_arr,
-					array($applicant->email,'kindlm@technikum-wien.at'),
-					'Ihre Anmeldung zum Reihungstest - Reminder / Your registration for the placement test - Reminder');
+							sendSanchoMail(
+								'Sancho_RemindApplicantsOfTest',
+								$mailcontent_data_arr,
+								$applicant->email,
+								'Ihre Anmeldung zum Reihungstest - Reminder / Your registration for the placement test - Reminder',
+								DEFAULT_SANCHO_HEADER_IMG,
+								DEFAULT_SANCHO_FOOTER_IMG,
+								$from,
+								'',
+								$bcc);
+						}
+					}
+				}
 			}
 		}
 	}

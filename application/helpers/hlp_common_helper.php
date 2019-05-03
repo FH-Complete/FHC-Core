@@ -169,98 +169,58 @@ function isEmptyArray($array)
 }
 
 /**
- * The function returns the number of business days between two dates and it skips the (static) holidays
- * @param string $startDate Date (YYYY-MM-DD) to start counting from (included)
- * @param string $endDate Date (YYYY-MM-DD) to end counting (included)
- * @param array $dynamic_holidays Optional. Static holidays that have the same date every year are included automatically.
- *                                You can give an array with dates (YYYY-MM-DD) that should be included furthermore
- * @return integer Number of working days between $startDate and $endDate
+ * The function checks if a date is a working day (true) or a holiday (false)
+ * @param string $date Date (YYYY-MM-DD) to check if working day or holiday
+ * @param string $days Optional. Number of days to deduct from $date
+ * @return boolean True, if $date is a working day, false if not
  */
-function getWorkingDays($startDate, $endDate, $dynamic_holidays = array())
+function isDateWorkingDay($date, $days = null)
 {
-	//Get year of $startDate
-	$startYear = substr($startDate, 0, 4);
-	//Get year of $endDate
-	$endYear = substr($endDate, 0, 4);
-
-	$datediff = $endYear - $startYear;
+	// Array of static Austrian holidays
 	$austrian_holidays = array();
-	for ($i = 0; $i <= $datediff; $i++)
+	//Get year of $resultDate
+	$startYear = substr($date, 0, 4);
+
+	$austrian_holidays[] = $startYear.'-01-01'; // Neujahr
+	$austrian_holidays[] = $startYear.'-01-06'; // 3 Könige
+	$austrian_holidays[] = $startYear.'-05-01'; // Staatsfeiertag
+	$austrian_holidays[] = $startYear.'-08-15'; // Maria Himmelfahrt
+	$austrian_holidays[] = $startYear.'-10-26'; // Nationalfeiertag
+	$austrian_holidays[] = $startYear.'-11-01'; // Allerheiligen
+	$austrian_holidays[] = $startYear.'-12-08'; // Maria Empfängnis
+	$austrian_holidays[] = $startYear.'-12-25'; // Weihnachten
+	$austrian_holidays[] = $startYear.'-12-26'; // Stefanitag
+
+	$ostersonntag = date("Y-m-d", easter_date($startYear));
+
+	//Ostermontag
+	$austrian_holidays[] = date("Y-m-d", strtotime($ostersonntag. "+ 1 days")); // Ostersonntag + 1
+
+	//Christi Himmelfahrt
+	$austrian_holidays[] = date("Y-m-d", strtotime($ostersonntag. "+ 39 days")); // Ostersonntag + 39
+
+	//Pfingstmontag
+	$austrian_holidays[] = date("Y-m-d", strtotime($ostersonntag. "+ 50 days")); // Ostersonntag + 50
+
+	//Fronleichnam
+	$austrian_holidays[] = date("Y-m-d", strtotime($ostersonntag. "+ 60 days")); // Ostersonntag + 60
+
+	if ($days != '')
 	{
-		$austrian_holidays[] = $startYear.'-01-01'; // Neujahr
-		$austrian_holidays[] = $startYear.'-01-06'; // 3 Könige
-		$austrian_holidays[] = $startYear.'-05-01'; // Staatsfeiertag
-		$austrian_holidays[] = $startYear.'-08-15'; // Maria Himmelfahrt
-		$austrian_holidays[] = $startYear.'-10-26'; // Nationalfeiertag
-		$austrian_holidays[] = $startYear.'-11-01'; // Allerheiligen
-		$austrian_holidays[] = $startYear.'-12-08'; // Maria Empfängnis
-		$austrian_holidays[] = $startYear.'-12-25'; // Weihnachten
-		$austrian_holidays[] = $startYear.'-12-26'; // Stefanitag
-		$startYear++;
+		if (date("w", strtotime("$date -".$days." days")) == 0
+			|| date("w", strtotime("$date -".$days." days")) == 6
+			|| in_array(date("Y-m-d", strtotime("$date -".$days." days")), $austrian_holidays))
+			return false;
+		else
+			return true;
 	}
-	if (count($dynamic_holidays) > 0)
+	else
 	{
-		$austrian_holidays = array_merge($austrian_holidays, $dynamic_holidays);
+		if (date("w", strtotime($date)) == 0
+			|| date("w", strtotime($date)) == 6
+			|| in_array(date("Y-m-d", strtotime($date)), $austrian_holidays))
+			return false;
+		else
+			return true;
 	}
-	// do strtotime calculations just once
-	$endDate = strtotime($endDate);
-	$startDate = strtotime($startDate);
-
-	//The total number of days between the two dates. We compute the no. of seconds and divide it to 60*60*24
-	//We add one to inlude both dates in the interval.
-	$days = ($endDate - $startDate) / 86400 + 1;
-
-	$no_full_weeks = floor($days / 7);
-	$no_remaining_days = fmod($days, 7);
-
-	//It will return 1 if it's Monday,.. ,7 for Sunday
-	$the_first_day_of_week = date("N", $startDate);
-	$the_last_day_of_week = date("N", $endDate);
-
-	//---->The two can be equal in leap years when february has 29 days, the equal sign is added here
-	//In the first case the whole interval is within a week, in the second case the interval falls in two weeks.
-	if ($the_first_day_of_week <= $the_last_day_of_week)
-	{
-		if ($the_first_day_of_week <= 6 && 6 <= $the_last_day_of_week) $no_remaining_days--;
-		if ($the_first_day_of_week <= 7 && 7 <= $the_last_day_of_week) $no_remaining_days--;
-	}
-	else {
-		// (edit by Tokes to fix an edge case where the start day was a Sunday
-		// and the end day was NOT a Saturday)
-
-		// the day of the week for start is later than the day of the week for end
-		if ($the_first_day_of_week == 7) {
-			// if the start date is a Sunday, then we definitely subtract 1 day
-			$no_remaining_days--;
-
-			if ($the_last_day_of_week == 6) {
-				// if the end date is a Saturday, then we subtract another day
-				$no_remaining_days--;
-			}
-		}
-		else {
-			// the start date was a Saturday (or earlier), and the end date was (Mon..Fri)
-			// so we skip an entire weekend and subtract 2 days
-			$no_remaining_days -= 2;
-		}
-	}
-
-	//The no. of business days is: (number of weeks between the two dates) * (5 working days) + the remainder
-	//---->february in none leap years gave a remainder of 0 but still calculated weekends between first and last day, this is one way to fix it
-	$workingDays = $no_full_weeks * 5;
-	if ($no_remaining_days > 0 )
-	{
-		$workingDays += $no_remaining_days;
-	}
-
-	//We subtract the holidays
-	foreach($austrian_holidays as $key=>$value)
-	{
-		$time_stamp=strtotime($value);
-		//If the holiday doesn't fall in weekend
-		if ($startDate <= $time_stamp && $time_stamp <= $endDate && date("N",$time_stamp) != 6 && date("N",$time_stamp) != 7)
-			$workingDays--;
-	}
-
-	return $workingDays;
 }
