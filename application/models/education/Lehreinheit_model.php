@@ -103,13 +103,12 @@ class Lehreinheit_model extends DB_Model
 	 */
 	public function getStudenten($lehreinheit_id)
 	{
-		$query = 'SELECT uid, vorname, nachname '
+		$query = 'SELECT uid, vorname, nachname, prestudent_id '
 			. 'FROM campus.vw_student_lehrveranstaltung '
 			. 'JOIN campus.vw_student '
 			. 'USING (uid) '
 			. 'WHERE lehreinheit_id = ?'
 			. ' ORDER BY nachname';
-
 
 		return $this->execQuery($query, array($lehreinheit_id));
 	}

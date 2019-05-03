@@ -704,7 +704,7 @@ class DB_Model extends FHC_Model
 	}
 
 	/**
-	 * Get meda data info about the retrived fields after having executed a query
+	 * Get meda data info about the retrieved fields after having executed a query
 	 */
 	public function getExecutedQueryMetaData()
 	{
@@ -861,7 +861,7 @@ class DB_Model extends FHC_Model
 			$toBeConverterdArray = array(); // Fields to be converted
 
 			$this->executedQueryMetaData = $result->field_data(); // Fields information
-			$this->executedQueryListFields = $result->list_fields(); // List of the retrived fields
+			$this->executedQueryListFields = $result->list_fields(); // List of the retrieved fields
 
 			for ($i = 0; $i < count($this->executedQueryMetaData); $i++) // Looking for booleans and arrays
 			{

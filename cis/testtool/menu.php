@@ -84,7 +84,7 @@ session_start();
 <link href="../../skin/style.css.php" rel="stylesheet" type="text/css">
 </head>
 
-<body>
+<body scroll="no">
 <?php
 if (isset($_SESSION['pruefling_id']))
 {
@@ -92,14 +92,26 @@ if (isset($_SESSION['pruefling_id']))
 	$qry = "SELECT content_id FROM testtool.tbl_ablauf_vorgaben WHERE studiengang_kz=".$db->db_add_param($_SESSION['studiengang_kz'])." LIMIT 1";
 	$result = $db->db_query($qry);
 
-	echo '<table width="100%" border="0" cellspacing="0" cellpadding="0" style="border-right-width:1px;border-right-color:#BCBCBC;">';
-	echo '<tr><td style="padding-left: 20px;" nowrap>
-			<a href="login.php" target="content">'.$p->t('testtool/startseite').'</a>
+	echo '<table width="100%" border="0" cellspacing="0" cellpadding="0" style="border-right-width:1px;border-right-color:#BCBCBC; border-collapse: separate;
+    border-spacing: 0 3px;">';
+
+// Link zur Startseite
+	echo '<tr><td class="ItemTesttool" style="margin-left: 20px;" nowrap>
+			<a class="ItemTesttool navButton" href="login.php" target="content">'.$p->t('testtool/startseite').'</a>
 		</td></tr>';
+
+// Link zur Einleitung
 	if ($content_id = $db->db_fetch_object($result))
+    {
 		if($content_id->content_id!='')
-			echo '<tr><td style="padding-left: 20px;"><a href="../../cms/content.php?content_id='.$content_id->content_id.'&sprache='.$sprache.'" target="content">'.$p->t('testtool/einleitung').'</a></td></tr>';
-	echo '<tr><td>&nbsp;</td></tr>';
+        {
+			echo '
+                <tr><td class="ItemTesttool" style="margin-left: 20px;" nowrap>
+                    <a class="ItemTesttool navButton" href="../../cms/content.php?content_id='.$content_id->content_id.'&sprache='.$sprache.'" target="content">'.$p->t('testtool/einleitung').'</a>
+                </td></tr>
+            ';
+        }
+    }
 	echo '<tr><td style="padding-left: 20px;" nowrap>';
 
 	$studiengang_kz = (isset($_SESSION['studiengang_kz'])) ? $_SESSION['studiengang_kz'] : '';
@@ -197,59 +209,70 @@ if (isset($_SESSION['pruefling_id']))
             (gebiet_id, semester)
 	        semester,
 	        gebiet_id,
+	        STRING_AGG(studiengang_kz::TEXT, ', ' ORDER BY studiengang_kz) AS studiengang_kz_list,
 	        bezeichnung,
 	        reihung,
             ". $bezeichnung_mehrsprachig_sel. "
-        FROM
-        (
-	        (SELECT
-                prestudent_data.semester AS ps_sem,
-		        gebiet_id,
-		        bezeichnung,
-		        tbl_ablauf.studienplan_id,
-		        tbl_ablauf.studiengang_kz,
-		        tbl_ablauf.semester,
-		        tbl_ablauf.reihung,
-		        ".$bezeichnung_mehrsprachig. "
-	        FROM
-		        prestudent_data
-	        JOIN
-		        testtool.tbl_ablauf USING (studiengang_kz)
-	        JOIN
-		        testtool.tbl_gebiet USING (gebiet_id)
-	        WHERE
-		        (prestudent_data.semester= 1 AND tbl_ablauf.semester = 1)
-	        OR
-		        (prestudent_data.semester= 3 AND tbl_ablauf.semester IN (1,3))
-	        )
-
-	        UNION
-
-	        (
-	        SELECT
-	            prestudent_data.semester AS ps_sem,
-		        gebiet_id,
-		        bezeichnung,
-		        tbl_ablauf.studienplan_id,
-		        tbl_ablauf.studiengang_kz,
-		        tbl_ablauf.semester,
-		        tbl_ablauf.reihung,
-		        ". $bezeichnung_mehrsprachig. "
-	        FROM
-		        prestudent_data
-	        JOIN
-		        testtool.tbl_ablauf USING (studienplan_id)
-	        JOIN
-		        testtool.tbl_gebiet USING (gebiet_id)
-	        WHERE
-		        (prestudent_data.semester= 1 AND tbl_ablauf.semester = 1)
-	        OR
-		        (prestudent_data.semester= 3 AND tbl_ablauf.semester IN (1,3))
-	        )
-
-            ORDER BY
-                reihung
-        ) temp
+        FROM (
+            SELECT
+                *
+            FROM (    
+                (SELECT
+                    prestudent_data.semester AS ps_sem,
+                    gebiet_id,
+                    bezeichnung,
+                    tbl_ablauf.studienplan_id,
+                    tbl_ablauf.studiengang_kz,
+                    tbl_ablauf.semester,
+                    tbl_ablauf.reihung,
+                    ".$bezeichnung_mehrsprachig. "
+                FROM
+                    prestudent_data
+                JOIN
+                    testtool.tbl_ablauf USING (studiengang_kz)
+                JOIN
+                    testtool.tbl_gebiet USING (gebiet_id)
+                WHERE
+                    (prestudent_data.semester= 1 AND tbl_ablauf.semester = 1)
+                OR
+                    (prestudent_data.semester= 3 AND tbl_ablauf.semester IN (1,3))
+                )
+    
+                UNION
+    
+                (
+                SELECT
+                    prestudent_data.semester AS ps_sem,
+                    gebiet_id,
+                    bezeichnung,
+                    tbl_ablauf.studienplan_id,
+                    tbl_ablauf.studiengang_kz,
+                    tbl_ablauf.semester,
+                    tbl_ablauf.reihung,
+                    ". $bezeichnung_mehrsprachig. "
+                FROM
+                    prestudent_data
+                JOIN
+                    testtool.tbl_ablauf USING (studienplan_id)
+                JOIN
+                    testtool.tbl_gebiet USING (gebiet_id)
+                WHERE
+                    (prestudent_data.semester= 1 AND tbl_ablauf.semester = 1)
+                OR
+                    (prestudent_data.semester= 3 AND tbl_ablauf.semester IN (1,3))
+                )
+            ) temp
+        ) temp2
+        
+        GROUP BY
+            semester,
+             gebiet_id,
+             bezeichnung,
+	         reihung,
+             bezeichnung_mehrsprachig_1,
+             bezeichnung_mehrsprachig_2,
+             bezeichnung_mehrsprachig_3,
+             bezeichnung_mehrsprachig_4
 
         ORDER BY
 	        semester,
@@ -259,6 +282,7 @@ if (isset($_SESSION['pruefling_id']))
 
 	$result = $db->db_query($qry);
 	$lastsemester = '';
+	$quereinsteiger_stg = '';
 
 	while($row = $db->db_fetch_object($result))
 	{
@@ -272,9 +296,32 @@ if (isset($_SESSION['pruefling_id']))
 			}
 			$lastsemester = $row->semester;
 
-			echo '<table border="0" cellspacing="0" cellpadding="0" id="Gebiet" style="display: visible; border-collapse: separate; border-spacing: 0 6px;">';
-			echo '<tr><td class="HeaderTesttool">'.$row->semester.'. '.$p->t('testtool/semester').' '.($row->semester!='1'?$p->t('testtool/quereinstieg'):'').'</td></tr>';
+			echo '<table border="0" cellspacing="0" cellpadding="0" id="Gebiet" style="display: visible; border-collapse: separate; border-spacing: 0 3px;">';
+			/*echo '<tr><td class="HeaderTesttool">'.$row->semester.'. '.$p->t('testtool/semester').' '.($row->semester!='1'?$p->t('testtool/quereinstieg'):'').'</td></tr>';*/
+			echo '<tr><td class="HeaderTesttool">'. ($row->semester == '1' ? strtoupper($p->t('testtool/basic')) : strtoupper($p->t('testtool/quereinsteiger'))).'</td></tr>';
 		}
+
+		// Bei Quereinstiegsgebieten nach STG clustern und die STG anzeigen
+		if($row->semester != '1')
+		{
+			if($quereinsteiger_stg != $row->studiengang_kz_list)
+			{
+			    //echo "<br>"; // Abstand zwischen Erstsemester- und Quereinstiegs-Gebietsblock
+				$quereinsteiger_stg = $row->studiengang_kz_list;
+				$quereinsteiger_stg_arr = explode(',', $row->studiengang_kz_list);
+				$quereinsteiger_stg_string = '';
+				$cnt = 0;
+				foreach ($quereinsteiger_stg_arr as $qe_stg)
+                {
+                    $stg = new Studiengang($qe_stg);
+					$quereinsteiger_stg_string .= ($cnt > 0) ? ",<br>" : '';
+                    $quereinsteiger_stg_string .= $stg->bezeichnung;
+                    $cnt++;
+                }
+                echo '<tr><td class="HeaderTesttoolSTG">'. $quereinsteiger_stg_string. '</td></tr>';
+			}
+		}
+
 		$gebiet = new gebiet();
 		if($gebiet->check_gebiet($row->gebiet_id))
 		{
@@ -292,7 +339,7 @@ if (isset($_SESSION['pruefling_id']))
 					{
 						//Gebiet gestartet aber noch nicht zu ende
 						$style='';
-						$class='ItemTesttoolAktiv';
+						$class='ItemTesttool ItemTesttoolAktiv';
 					}
 					else
 					{
@@ -306,7 +353,7 @@ if (isset($_SESSION['pruefling_id']))
 						{
 							//Gebiet ist zu Ende
 							$style='';
-							$class='ItemTesttoolBeendet';
+							$class='ItemTesttool ItemTesttoolBeendet';
 						}
 					}
 				}
@@ -340,6 +387,12 @@ if (isset($_SESSION['pruefling_id']))
 		}
 	}
 	echo '</table>';
+
+	// Link zum Logout
+	echo '<tr><td class="ItemTesttool" style="margin-left: 20px;" nowrap>
+			<a class="ItemTesttool navButton" href="login.php?logout" target="content">Logout</a>
+		</td></tr>';
+
 	echo '</td></tr></table>';
 }
 else

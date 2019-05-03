@@ -219,7 +219,7 @@
             </text:p>
             <text:p text:style-name="P1"/>
             <text:p text:style-name="P1"/>
-            <text:p text:style-name="P2">Wien, 04.04.2019</text:p>
+            <text:p text:style-name="P2">Wien, <xsl:value-of select="actual_date" /></text:p>
         </office:text>
     </office:body>
 </office:document-content>

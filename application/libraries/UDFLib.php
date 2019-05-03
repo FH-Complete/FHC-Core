@@ -43,7 +43,7 @@ class UDFLib
 
 	const CHKBOX_TYPE = 'checkbox'; // UDF checkbox type
 
-	const PHRASES_APP_NAME = 'core'; // Name of the app parameter used to retrive phrases
+	const PHRASES_APP_NAME = 'core'; // Name of the app parameter used to retrieve phrases
 
 	private $_ci; // Code igniter instance
 
@@ -620,7 +620,7 @@ class UDFLib
 		{
 			$parameters = $jsonSchema->{UDFLib::LIST_VALUES}->enum;
 		}
-		// If the list of values to show should be retrived with a SQL statement
+		// If the list of values to show should be retrieved with a SQL statement
 		elseif (isset($jsonSchema->{UDFLib::LIST_VALUES}->sql))
 		{
 			// UDFModel is loaded in method _loadUDF that is called before the current method

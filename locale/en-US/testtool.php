@@ -4,11 +4,13 @@ $this->phrasen['testtool/login']='Login';
 $this->phrasen['testtool/tag']='Day';
 $this->phrasen['testtool/monat']='Month';
 $this->phrasen['testtool/jahr']='Year';
-$this->phrasen['testtool/willkommenstext']='Welcome to the placement test.<br /><br />
-											Please wait for the tutor\'s instructions before you log in.<br /><br />
+$this->phrasen['testtool/willkommenstextTitel']='Welcome to the placement test.';
+$this->phrasen['testtool/willkommenstext']='Please wait for the tutor\'s instructions before you log in.<br /><br />
 											We wish you a good start to your studies.';
 $this->phrasen['testtool/nameAuswaehlen']='Choose name...';
 $this->phrasen['testtool/quereinstieg']='(Lateral entry)';
+$this->phrasen['testtool/quereinsteiger']='Lateral entry';
+$this->phrasen['testtool/basic']='Basic';
 $this->phrasen['testtool/semester']='Semester';
 $this->phrasen['testtool/reihungstestNichtFreigeschalten']='The entrance examination assigned has not yet been activated.';
 $this->phrasen['testtool/reihungstestKannNichtGeladenWerden']='The entrance examination assigned to you can not be loaded.';
@@ -18,7 +20,8 @@ $this->phrasen['testtool/klickenSieAufEinTeilgebiet']='Select a topic on the lef
 $this->phrasen['testtool/gebietStarten']='Start section';
 $this->phrasen['testtool/startseite']='Startpage';
 $this->phrasen['testtool/zurueckZurStartseite']='Back to startpage';;
-$this->phrasen['testtool/begruessungstext']='Welcome to the placement test of the UAS Technikum Wien. <br/>You are logged in with the following data:';
+$this->phrasen['testtool/begruessungstext']='Welcome to the placement test of the UAS Technikum Wien!';
+$this->phrasen['testtool/anmeldedaten']= "You are logged in with the following data:";
 $this->phrasen['testtool/keineAntwort']='No Answer';
 $this->phrasen['testtool/speichernUndWeiter']='Save and next';
 $this->phrasen['testtool/alleFragenBeantwortet']='CONGRATULATIONS!\n\nYou have answered all the questions in the time allowed.\n Use the remaining time to check your answers or continue to the next section.';

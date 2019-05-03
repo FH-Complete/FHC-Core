@@ -34,7 +34,7 @@ class Auth_Controller extends FHC_Controller
 		// Checks if this user is entitled to access to this content
 		if (!$this->permissionlib->isEntitled($requiredPermissions, $this->router->method))
 		{
-			header('HTTP/1.0 401 Unauthorized'); // set the HTTP header as unauthorized
+			$this->output->set_status_header(REST_Controller::HTTP_UNAUTHORIZED); // set the HTTP header as unauthorized
 
 			$this->load->library('EPrintfLib'); // loads the EPrintfLib to format the output
 

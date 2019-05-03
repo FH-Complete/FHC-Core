@@ -477,12 +477,14 @@ function drawTree($tree, $depth)
 				}
 				else
 				{
-					echo '<span>'.$p->t('studienplan/offen').'</span>';
+					if ($row_tree->benotung)
+						echo '<span>'.$p->t('studienplan/offen').'</span>';
 				}
 			}
 			else
 			{
-				echo '<span>'.$p->t('studienplan/offen').'</span>';
+				if ($row_tree->benotung)
+					echo '<span>'.$p->t('studienplan/offen').'</span>';
 			}
 		}
 		//check if compatible course has grade
@@ -498,7 +500,8 @@ function drawTree($tree, $depth)
 			}
 			else
 			{
-				echo '<span>'.$p->t('studienplan/offen').'</span>';
+				if ($row_tree->benotung)
+					echo '<span>'.$p->t('studienplan/offen').'</span>';
 			}
 		}
 		echo '</td>';
@@ -729,7 +732,8 @@ function checkKompatibleLvs($kompatibleLVs, $student, $row_tree, $noten_arr, $no
 			}
 			else
 			{
-				echo '<span>'.$p->t('studienplan/offen').'</span>';
+				if ($row_tree->benotung)
+					echo '<span>'.$p->t('studienplan/offen').'</span>';
 			}
 		}
 	}
