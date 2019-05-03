@@ -447,7 +447,17 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
                     </table:table-cell>
                     <table:table-cell table:style-name="Tabelle3.A1" office:value-type="string">
                         <text:p text:style-name="P2">
-                            <text:span text:style-name="T4"><xsl:value-of select="studiensemester_beginn"/></text:span></text:p>
+                            <text:span text:style-name="T4">
+                                <!-- Deutsches "Sommersemester" auf englisches "Summersemester" ändern -->
+                                <xsl:choose>
+                                    <xsl:when test="substring(studiensemester_beginn, 1, 6)='Sommer'">
+                                        Summer<xsl:value-of select="substring(studiensemester_beginn,7)" />
+                                    </xsl:when>
+                                    <xsl:otherwise>
+                                        <xsl:value-of select="studiensemester_beginn"/>
+                                    </xsl:otherwise>
+                                </xsl:choose>
+                            </text:span></text:p>
                     </table:table-cell>
                 </table:table-row>
                 <table:table-row table:style-name="Tabelle3.1">
@@ -456,7 +466,17 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
                     </table:table-cell>
                     <table:table-cell table:style-name="Tabelle3.A1" office:value-type="string">
                         <text:p text:style-name="P2">
-                            <text:span text:style-name="T4"><xsl:value-of select="studiensemester_aktuell"/></text:span></text:p>
+                            <text:span text:style-name="T4">
+                                <!-- Deutsches "Sommersemester" auf englisches "Summersemester" ändern -->
+                                <xsl:choose>
+                                    <xsl:when test="substring(studiensemester_aktuell, 1, 6)='Sommer'">
+                                        Summer<xsl:value-of select="substring(studiensemester_aktuell,7)" />
+                                    </xsl:when>
+                                    <xsl:otherwise>
+                                        <xsl:value-of select="studiensemester_aktuell"/>
+                                    </xsl:otherwise>
+                                </xsl:choose>
+                            </text:span></text:p>
                     </table:table-cell>
                 </table:table-row>
                 <table:table-row table:style-name="Tabelle3.1">
@@ -502,7 +522,17 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
                     </table:table-cell>
                     <table:table-cell table:style-name="Tabelle3.A1" office:value-type="string">
                         <text:p text:style-name="P2">
-                            <text:span text:style-name="T4"><xsl:value-of select="voraussichtlichLetztesStudiensemester"/></text:span></text:p>
+                            <text:span text:style-name="T4">
+                                <!-- Deutsches "Sommersemester" auf englisches "Summersemester" ändern -->
+                                <xsl:choose>
+                                    <xsl:when test="substring(voraussichtlichLetztesStudiensemester, 1, 6)='Sommer'">
+                                        Summer<xsl:value-of select="substring(voraussichtlichLetztesStudiensemester,7)" />
+                                    </xsl:when>
+                                    <xsl:otherwise>
+                                        <xsl:value-of select="voraussichtlichLetztesStudiensemester"/>
+                                    </xsl:otherwise>
+                                </xsl:choose>
+                            </text:span></text:p>
                     </table:table-cell>
                 </table:table-row>
                 <table:table-row table:style-name="Tabelle3.1">
