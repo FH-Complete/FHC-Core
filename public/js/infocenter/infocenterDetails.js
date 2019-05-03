@@ -560,6 +560,7 @@ var InfocenterDetails = {
 			var ausbildungssemester = receiverPrestudentstatus.ausbildungssemester;
 			var studiengangbezeichnung = receiverPrestudentstatus.studiengangbezeichnung;
 			var studiengangbezeichnung_englisch = receiverPrestudentstatus.studiengangbezeichnung_englisch;
+			var orgform = typeof receiverPrestudentstatus.orgform === 'string' ? receiverPrestudentstatus.orgform : receiverPrestudentstatus.orgform_kurzbz;
 			var msgvars = {};
 
 			if (rtfreigabe)
@@ -572,7 +573,8 @@ var InfocenterDetails = {
 						msgvars = {
 							'ausbildungssemester': ausbildungssemester,
 							'studiengangbezeichnung': studiengangbezeichnung,
-							'studiengangbezeichnung_englisch': studiengangbezeichnung_englisch
+							'studiengangbezeichnung_englisch': studiengangbezeichnung_englisch,
+							'orgform': orgform
 						};
 
 						InfocenterDetails.sendFreigabeMessage(prestudent_id, RTFREIGABE_MESSAGE_VORLAGE_QUER_KURZ, msgvars);
@@ -587,7 +589,8 @@ var InfocenterDetails = {
 						msgvars = {
 							'ausbildungssemester': ausbildungssemester,
 							'studiengangbezeichnung': studiengangbezeichnung,
-							'studiengangbezeichnung_englisch': studiengangbezeichnung_englisch
+							'studiengangbezeichnung_englisch': studiengangbezeichnung_englisch,
+							'orgform': orgform
 						};
 						vorlage = RTFREIGABE_MESSAGE_VORLAGE_QUER
 					}
