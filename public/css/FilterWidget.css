@@ -22,15 +22,23 @@
 
 .drag-and-drop-fields-area {
 	height: 50px;
+	display: inline;
 }
 
 .drag-and-drop-fields-span {
 	border: 1px solid black;
 	border-radius: 7px;
-	margin-left: 3px;
-	margin-right: 3px;
-	padding: 10px;
+	/*margin-left: 3px;*/
+	margin-right: 6px;
+	margin-bottom: 10px;
+	padding: 5px 10px;
 	top: 10px;
+	display: inline-block;
+}
+
+.add-filter-div
+{
+	margin-top: 10px;
 }
 
 .drag-and-drop-fields-span:hover {
