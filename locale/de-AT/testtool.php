@@ -8,6 +8,8 @@ $this->phrasen['testtool/willkommenstextTitel']='Herzlich Willkommen zum Reihung
 $this->phrasen['testtool/willkommenstext']='Bitte warten Sie mit dem Login auf die Anweisung der Aufsichtsperson.<br /><br />
 											Wir wünschen Ihnen einen erfolgreichen Start ins Studium.';
 $this->phrasen['testtool/nameAuswaehlen']='Name auswählen...';
+$this->phrasen['testtool/reihungstest']= 'Reihungstest';
+$this->phrasen['testtool/regulaererEinstieg']='Regulärer Einstieg';
 $this->phrasen['testtool/quereinstieg']='(Quereinstieg)';
 $this->phrasen['testtool/quereinsteiger']='Quereinsteiger';
 $this->phrasen['testtool/basic']='Basic';
@@ -43,4 +45,5 @@ $this->phrasen['testtool/dieseFrageIstNichtFuerSieBestimmt']='Diese Frage ist ni
 $this->phrasen['testtool/fehlerBeimSpeichernDerErstansicht']='Fehler beim Speichern der Erstansicht';
 $this->phrasen['testtool/startDrueckenUmZuBeginnen']='Um dieses Teilgebiet zu starten, drücken Sie bitte links oben auf <b>Gebiet starten</b>.';
 $this->phrasen['testtool/keinPrueflingseintragVorhanden']='Kein Prüflingseintrag vorhanden';
+$this->phrasen['testtool/fuerFolgendeStgAngemeldet']='Für folgende Studiengänge haben Sie sich angemeldet:';
 ?>

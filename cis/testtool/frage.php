@@ -361,7 +361,6 @@ if($result_pruefling = $db->db_query($qry_pruefling))
 {
 	if($row_pruefling = $db->db_fetch_object($result_pruefling))
 	{
-		/*$info = "$row_pruefling->vorname $row_pruefling->nachname, $row_pruefling->bezeichnung $row_pruefling->stg_bez";*/
 		$info = "$row_pruefling->vorname $row_pruefling->nachname";
 	}
 }
@@ -401,7 +400,6 @@ if($levelgebiet)
 		</tr>
 	</table>';
 	$fortschrittsbalken .= '<span class="smallb"><b> '.$aktuell.' / '.$max.'</b> ['.number_format($psolved,1,'.','').'%]</span>';
-	
 }
 //Zeit des Gebietes holen
 echo '

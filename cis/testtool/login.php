@@ -429,25 +429,26 @@ if (isset($prestudent_id))
     ';
 	echo '<br>';
     echo '
-         <p>Für folgende Studiengänge haben Sie sich zum Reihungstest angemeldet:</p><br>
-
-         <table class="table table-bordered">
-            <tr>
-                <thead>
-                    <th>Studiengang</th>
+         <p>'. $p->t('testtool/fuerFolgendeStgAngemeldet'). '</p><br>
+         
+         <table class="table table-bordered">        
+            <thead>
+                <tr>
+                    <th>'. $p->t('global/studiengang'). '</th>
                     <th>Status</th>
-                    <th>Reihungstest</th>
-                </thead>
-            </tr>
+                    <th>'. $p->t('testtool/reihungstest'). '</th>
+                 </tr>
+            </thead>    
+            <tbody>  
          ';
 
-    //  * wenn Prestudent an mehreren Bachelor-Studiengängen interessiert ist, dann alle STG anführen
+    //  * wenn Prestudent an 1 - n Bachelor-Studiengängen interessiert ist, dann STG anführen
     if ($typ->typ == 'b')
     {
-        $ps_arr = new Prestudent();
-        $ps_arr->getActualInteressenten($prestudent_id, false, 'b');
+		$ps_arr = new Prestudent();
+		$ps_arr->getActualInteressenten($prestudent_id, false, 'b');
 
-        if (count($ps_arr->result) > 1)
+        if (count($ps_arr->result) > 0)
         {
             // Jeweils letzten Status ermitteln (ob Interessent oder Abgewiesener)
             foreach ($ps_arr->result as $ps_obj)
@@ -473,13 +474,13 @@ if (isset($prestudent_id))
                     echo '<td style="width: 50%;">'. $ps_obj->typ_bz .' '. ($sprache_user == 'English' ? $stg->english : $stg->bezeichnung). '</td>';
                     if($ps_obj->ausbildungssemester == '1')
                     {
-                        echo '<td>Regulärer Einstieg (1. Semester)</td>';
+                        echo '<td>'. $p->t('testtool/regulaererEinstieg'). ' (1. Semester)</td>';
 						echo '<td>Basic</td>';
                     }
                     elseif($ps_obj->ausbildungssemester == '3')
                     {
-                        echo '<td>Quereinsteiger (3.Semester)</td>';
-						echo '<td>Basic + Quereinsteiger</td>';
+                        echo '<td>'. $p->t('testtool/Quereinsteiger'). ' (3.Semester)</td>';
+						echo '<td>Basic + '. $p->t('testtool/Quereinsteiger'). '</td>';
                     }
                 }
                 // wenn letzter Status \'Abgewiesener\' ist, dann als solchen kennzeichnen
@@ -492,13 +493,7 @@ if (isset($prestudent_id))
                     ';
                 }
                 echo '</tr>';
-
             }
-        }
-        //  * wenn Prestudent nur an einem Bachelor-Studiengang interessiert ist, dann nur den einen STG anführen
-        else
-        {
-            echo '<td>'. $typ->bezeichnung.' '.($sprache_user=='English'?$stg_obj->english:$stg_obj->bezeichnung).'</td>>';
         }
     }
     //  * wenn Prestudent an einem Master-Studiengang interessiert ist, dann nur den einen STG anführen
@@ -512,9 +507,10 @@ if (isset($prestudent_id))
 		echo '<td>Basic</td>';
     }
 
-    echo ' 				 
-         </table>
-        ';
+    echo ' 
+        </tbody>				 
+     </table>
+    ';
 
     echo '<br>';
 
@@ -547,16 +543,27 @@ if (isset($prestudent_id))
             {
 				echo '
                     <p>'. $p->t('testtool/spracheDerTestfragen').':</p><br>
-                    
                     <div class="btn-group btn-group-justified" role="group" style="width: 50%">          
                 ';
 
 				while($row = $db->db_fetch_object($result))
 				{
 					$selected = ($_SESSION['sprache'] == $row->sprache) ? 'active' : '';
+					$row_sprache = $row->sprache;
+					if ($sprache_user == 'German')
+                    {
+                        if($row->sprache == 'English')
+                        {
+							$row_sprache = 'Englisch';
+                        }
+                        elseif ($row->sprache == 'German')
+                        {
+							$row_sprache = 'Deutsch';
+                        }
+                    }
 					echo "
                         <div class='btn-group' role='group'> 
-                            <a role='button' class='btn btn-default $selected' href='". $_SERVER['PHP_SELF']. "?type=sprachechange&sprache=". $row->sprache. "'>$row->sprache</a>
+                            <a role='button' class='btn btn-default $selected' href='". $_SERVER['PHP_SELF']. "?type=sprachechange&sprache=". $row->sprache. "'>$row_sprache</a>
                         </div>
                     ";
 				}
