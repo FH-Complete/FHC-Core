@@ -560,7 +560,7 @@ var InfocenterDetails = {
 			var ausbildungssemester = receiverPrestudentstatus.ausbildungssemester;
 			var studiengangbezeichnung = receiverPrestudentstatus.studiengangbezeichnung;
 			var studiengangbezeichnung_englisch = receiverPrestudentstatus.studiengangbezeichnung_englisch;
-			var orgform = typeof receiverPrestudentstatus.orgform === 'string' ? receiverPrestudentstatus.orgform : receiverPrestudentstatus.orgform_kurzbz;
+			var orgform = typeof receiverPrestudentstatus.orgform === 'string' ? receiverPrestudentstatus.orgform : "";
 			var msgvars = {};
 
 			if (rtfreigabe)
