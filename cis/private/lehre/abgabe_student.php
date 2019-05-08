@@ -36,7 +36,7 @@ $p = new phrasen($sprache);
 
 if (!$db = new basis_db())
 	die($p->t('global/fehlerBeimOeffnenDerDatenbankverbindung'));
-	
+
 $getuid=get_uid();
 $uid=$getuid;
 
@@ -46,31 +46,31 @@ if(isset($_GET['uid']))
 	$uid = $_GET['uid'];
 	//Rechte Pruefen
 	$allowed=false;
-	
+
 	$student = new student();
 	if(!$student->load($uid))
 		die($p->t('global/fehlerBeimErmittelnDerUID'));
-	
+
 	$stg_obj = new studiengang();
 	if(!$stg_obj->load($student->studiengang_kz))
 		die($p->t('global/fehlerBeimLesenAusDatenbank'));
-	
+
 	//Berechtigung ueber das Berechtigungssystem
 	$rechte = new benutzerberechtigung();
 	$rechte->getBerechtigungen($getuid);
 	if($rechte->isBerechtigt('lehre/abgabetool',$stg_obj->oe_kurzbz,'s'))
 		$allowed=true;
-	
+
 	//oder Lektor mit Betreuung dieses Studenten
 	$qry = "SELECT 1
-			FROM 
-				lehre.tbl_projektarbeit 
-				JOIN lehre.tbl_projektbetreuer USING(projektarbeit_id) 
+			FROM
+				lehre.tbl_projektarbeit
+				JOIN lehre.tbl_projektbetreuer USING(projektarbeit_id)
 				JOIN campus.vw_benutzer on(vw_benutzer.person_id=tbl_projektbetreuer.person_id)
 			WHERE
 				tbl_projektarbeit.student_uid=".$db->db_add_param($uid)." AND
 				vw_benutzer.uid=".$db->db_add_param($getuid).";";
-	
+
 	if($result = $db->db_query($qry))
 	{
 		if($db->db_num_rows($result)>0)
@@ -78,11 +78,11 @@ if(isset($_GET['uid']))
 			$allowed=true;
 		}
 	}
-	
+
 	if(!$allowed)
 	{
 		die($p->t('abgabetool/keineBerechtigungStudentenansicht'));
-	}	
+	}
 }
 $htmlstr = '';
 $htmlstr1 = '';
@@ -90,33 +90,32 @@ $vorname='';
 $nachname='';
 $zweitbetreuer = '';
 
-$sql_query = "SELECT (SELECT nachname FROM public.tbl_person  WHERE person_id=tbl_projektbetreuer.person_id) AS bnachname, 
-			(SELECT vorname FROM public.tbl_person WHERE person_id=tbl_projektbetreuer.person_id) AS bvorname, 
-			(SELECT titelpre FROM public.tbl_person WHERE person_id=tbl_projektbetreuer.person_id) AS btitelpre, 
-			(SELECT titelpost FROM public.tbl_person WHERE person_id=tbl_projektbetreuer.person_id) AS btitelpost, 
+$sql_query = "SELECT (SELECT nachname FROM public.tbl_person  WHERE person_id=tbl_projektbetreuer.person_id) AS bnachname,
+			(SELECT vorname FROM public.tbl_person WHERE person_id=tbl_projektbetreuer.person_id) AS bvorname,
+			(SELECT titelpre FROM public.tbl_person WHERE person_id=tbl_projektbetreuer.person_id) AS btitelpre,
+			(SELECT titelpost FROM public.tbl_person WHERE person_id=tbl_projektbetreuer.person_id) AS btitelpost,
 			(SELECT person_id FROM lehre.tbl_projektbetreuer WHERE projektarbeit_id=tbl_projektarbeit.projektarbeit_id
 			AND betreuerart_kurzbz IN ('Zweitbetreuer', 'Zweitbegutachter') LIMIT 1) AS zweitbetreuer_person_id,
 			(SELECT betreuerart_kurzbz FROM lehre.tbl_projektbetreuer WHERE projektarbeit_id=tbl_projektarbeit.projektarbeit_id
 			AND betreuerart_kurzbz IN ('Zweitbetreuer', 'Zweitbegutachter') LIMIT 1) AS zweitbetreuer_betreuerart_kurzbz,
-			tbl_projektbetreuer.person_id AS betreuer_person_id, 
-			tbl_projekttyp.bezeichnung AS prjbez, * 
-		FROM lehre.tbl_projektarbeit 
-		LEFT JOIN lehre.tbl_projektbetreuer USING(projektarbeit_id) 
-		LEFT JOIN public.tbl_benutzer ON(uid=student_uid) 
-		LEFT JOIN public.tbl_person ON(tbl_benutzer.person_id=tbl_person.person_id) 
-		LEFT JOIN lehre.tbl_lehreinheit USING(lehreinheit_id) 
-		LEFT JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id) 
+			tbl_projektbetreuer.person_id AS betreuer_person_id,
+			tbl_projekttyp.bezeichnung AS prjbez, *
+		FROM lehre.tbl_projektarbeit
+		LEFT JOIN lehre.tbl_projektbetreuer USING(projektarbeit_id)
+		LEFT JOIN public.tbl_benutzer ON(uid=student_uid)
+		LEFT JOIN public.tbl_person ON(tbl_benutzer.person_id=tbl_person.person_id)
+		LEFT JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
+		LEFT JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id)
 		LEFT JOIN public.tbl_studiengang USING(studiengang_kz)
 		LEFT JOIN lehre.tbl_projekttyp USING (projekttyp_kurzbz)
-		WHERE (projekttyp_kurzbz='Bachelor' OR projekttyp_kurzbz='Diplom') 
-		AND (tbl_projektbetreuer.betreuerart_kurzbz='Betreuer' 
-			OR tbl_projektbetreuer.betreuerart_kurzbz='Begutachter' 
-			OR tbl_projektbetreuer.betreuerart_kurzbz='Erstbetreuer' 
-			OR tbl_projektbetreuer.betreuerart_kurzbz='Erstbegutachter'
-			OR tbl_projektbetreuer.betreuerart_kurzbz='Zweitbegutachter') 
-		AND tbl_projektarbeit.student_uid=".$db->db_add_param($uid)." 
-		AND public.tbl_benutzer.aktiv 
-		AND lehre.tbl_projektarbeit.note IS NULL 
+		WHERE (projekttyp_kurzbz='Bachelor' OR projekttyp_kurzbz='Diplom')
+		AND (tbl_projektbetreuer.betreuerart_kurzbz='Betreuer'
+			OR tbl_projektbetreuer.betreuerart_kurzbz='Begutachter'
+			OR tbl_projektbetreuer.betreuerart_kurzbz='Erstbetreuer'
+			OR tbl_projektbetreuer.betreuerart_kurzbz='Erstbegutachter')
+		AND tbl_projektarbeit.student_uid=".$db->db_add_param($uid)."
+		AND public.tbl_benutzer.aktiv
+		AND lehre.tbl_projektarbeit.note IS NULL
 		ORDER BY studiensemester_kurzbz desc, tbl_lehrveranstaltung.kurzbz";
 
 //AND tbl_projektarbeit.student_uid='$getuid' 'ie07m102';
@@ -161,8 +160,8 @@ else
 		$htmlstr .= "       <td>".strtoupper($row->typ.$row->kurzbz)."</td>\n";
 		$htmlstr .= "	   <td align= center>";
 
-		$qry_betr="SELECT mitarbeiter_uid FROM public.tbl_person 
-			JOIN public.tbl_benutzer USING(person_id) 
+		$qry_betr="SELECT mitarbeiter_uid FROM public.tbl_person
+			JOIN public.tbl_benutzer USING(person_id)
 			JOIN public.tbl_mitarbeiter ON(uid=mitarbeiter_uid)
 			WHERE person_id=".$db->db_add_param($row->betreuer_person_id, FHC_INTEGER).";";
 		if($result_betr=$db->db_query($qry_betr))
@@ -171,7 +170,7 @@ else
 			{
 				$htmlstr.="<a href='mailto:$row_betr->mitarbeiter_uid@".DOMAIN."?subject=Betreuung%20".$row->prjbez."%20von%20".$row->vorname."%20".$row->nachname."'><img src='../../../skin/images/email.png' alt='email' title='".$p->t('abgabetool/emailAnBetreuer')."'></a>";
 			}
-			else 
+			else
 			{
 				$htmlstr.="UID unknown!";
 			}
@@ -201,14 +200,14 @@ echo '
 <script type="text/javascript" src="../../../vendor/jquery/sizzle/sizzle.js"></script>
 	<link rel="stylesheet" href="../../../skin/tablesort.css" type="text/css"/>
 	<script language="JavaScript" type="text/javascript">
-		$(document).ready(function() 
-		{ 
+		$(document).ready(function()
+		{
 			$("#t1").tablesorter(
 			{
 				sortList: [[4,0]],
 				widgets: ["zebra"]
-			}); 
-			
+			});
+
 		});
 	</script>
 </head>
@@ -217,7 +216,7 @@ echo '
 
 	echo '<h1><div style="float:left">'.$p->t('abgabetool/ueberschrift');
 	if(trim($uid)!='')
-		echo " ($uid $vorname $nachname)</div> <div style='text-align:right'><a href='../../../cms/dms.php?id=".$p->t('dms_link/abgabetoolStudentHandbuch')."' target='_blank'><img src='../../../skin/images/information.png' alt='Anleitung' title='Anleitung BaDa-Abgabe' border=0>&nbsp;".$p->t('global/handbuch')."</a></div>";
+		echo " ($uid $vorname $nachname)</div> <div style='text-align:right'><a href='".$p->t('dms_link/abgabetoolStudentHandbuch')."' target='_blank'><img src='../../../skin/images/information.png' alt='Anleitung' title='Anleitung Abgabetool' border=0>&nbsp;".$p->t('global/handbuch')."</a></div>";
 	echo '</h1>';
     echo $htmlstr;
     echo '</body>

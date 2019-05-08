@@ -22,7 +22,7 @@
  */
 /*******************************************************************************************************
  *				abgabe_lektor
- * 		abgabe_lektor ist die Lektorenmaske des Abgabesystems 
+ * 		abgabe_lektor ist die Lektorenmaske des Abgabesystems
  * 			fuer Diplom- und Bachelorarbeiten
  *******************************************************************************************************/
 
@@ -37,7 +37,7 @@ require_once('../../../include/benutzerberechtigung.class.php');
 
 if (!$db = new basis_db())
 	die('Fehler beim Herstellen der Datenbankverbindung');
-	
+
 $getuid=get_uid();
 $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($getuid);
@@ -55,29 +55,29 @@ $p = new phrasen($sprache);
 $htmlstr = "";
 
 $showall=isset($_GET['showall']);
-	
-$sql_query = "SELECT 
+
+$sql_query = "SELECT
 				*
-			FROM 
+			FROM
 			(SELECT tbl_person.vorname, tbl_person.nachname, tbl_studiengang.typ, tbl_studiengang.kurzbz,
 			tbl_projektarbeit.projekttyp_kurzbz, tbl_projekttyp.bezeichnung, tbl_projektarbeit.titel, tbl_projektarbeit.projektarbeit_id,
 			tbl_projektbetreuer.betreuerart_kurzbz, tbl_benutzer.uid, tbl_student.matrikelnr, tbl_lehreinheit.studiensemester_kurzbz
-			 FROM lehre.tbl_projektarbeit LEFT JOIN lehre.tbl_projektbetreuer using(projektarbeit_id) 
+			 FROM lehre.tbl_projektarbeit LEFT JOIN lehre.tbl_projektbetreuer using(projektarbeit_id)
 			LEFT JOIN public.tbl_benutzer on(uid=student_uid)
 			LEFT JOIN public.tbl_student on(public.tbl_benutzer.uid=public.tbl_student.student_uid)
 			LEFT JOIN public.tbl_person on(tbl_benutzer.person_id=tbl_person.person_id)
-			LEFT JOIN lehre.tbl_lehreinheit using(lehreinheit_id) 
-			LEFT JOIN lehre.tbl_lehrveranstaltung using(lehrveranstaltung_id) 
+			LEFT JOIN lehre.tbl_lehreinheit using(lehreinheit_id)
+			LEFT JOIN lehre.tbl_lehrveranstaltung using(lehrveranstaltung_id)
 			LEFT JOIN public.tbl_studiengang on(lehre.tbl_lehrveranstaltung.studiengang_kz=public.tbl_studiengang.studiengang_kz)
 			LEFT JOIN lehre.tbl_projekttyp USING (projekttyp_kurzbz)
 			WHERE (projekttyp_kurzbz='Bachelor' OR projekttyp_kurzbz='Diplom')
-			AND tbl_projektbetreuer.person_id IN (SELECT person_id FROM public.tbl_benutzer 
-				WHERE public.tbl_benutzer.person_id=lehre.tbl_projektbetreuer.person_id 
+			AND tbl_projektbetreuer.person_id IN (SELECT person_id FROM public.tbl_benutzer
+				WHERE public.tbl_benutzer.person_id=lehre.tbl_projektbetreuer.person_id
 				AND public.tbl_benutzer.uid=".$db->db_add_param($getuid).")
 			".($showall?'':' AND public.tbl_benutzer.aktiv AND lehre.tbl_projektarbeit.note IS NULL ')."
-			AND (betreuerart_kurzbz='Betreuer' OR betreuerart_kurzbz='Begutachter' OR betreuerart_kurzbz='Erstbegutachter' 
-				OR betreuerart_kurzbz='Zweitbegutachter' OR betreuerart_kurzbz='Erstbetreuer') 
-			ORDER BY tbl_projektarbeit.projektarbeit_id, betreuerart_kurzbz desc) as xy 
+			AND (betreuerart_kurzbz='Betreuer' OR betreuerart_kurzbz='Begutachter' OR betreuerart_kurzbz='Erstbegutachter'
+				OR betreuerart_kurzbz='Zweitbegutachter' OR betreuerart_kurzbz='Erstbetreuer')
+			ORDER BY tbl_projektarbeit.projektarbeit_id, betreuerart_kurzbz desc) as xy
 		ORDER BY nachname";
 
 if(!$erg=$db->db_query($sql_query))
@@ -141,22 +141,22 @@ echo '
 				return true;
 			return false;
 		}
-		
-		$(document).ready(function() 
-		{ 
+
+		$(document).ready(function()
+		{
 			$("#t1").tablesorter(
 			{
 				sortList: [[4,0]],
 				widgets: ["zebra"]
-			}); 
-			
+			});
+
 		});
 		</script>
 	</head>
 
 <body>';
 
-echo "<h1><div style='float: left'>".$p->t('abgabetool/ueberschrift')." ($getuid) </div><div style='text-align:right'><a href='../../../cms/dms.php?id=".$p->t('dms_link/abgabetoolLektorHandbuch')."' target='_blank'><img src='../../../skin/images/information.png' alt='Anleitung' title='Anleitung BaDa-Abgabe' border=0>&nbsp;".$p->t('global/handbuch')."</a></div></h1>";
+echo "<h1><div style='float: left'>".$p->t('abgabetool/ueberschrift')." ($getuid) </div><div style='text-align:right'><a href='".$p->t('dms_link/abgabetoolLektorHandbuch')."' target='_blank'><img src='../../../skin/images/information.png' alt='Anleitung' title='Anleitung Abgabetool' border=0>&nbsp;".$p->t('global/handbuch')."</a></div></h1>";
 
 echo $htmlstr;
 
