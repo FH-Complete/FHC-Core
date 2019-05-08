@@ -7,9 +7,6 @@ $this->phrasen['dms_link/cisHandbuch']='825'; //CIS-Handbuch, welches im Head-Fr
 $this->phrasen['dms_link/benotungstoolHandbuch']='824'; //Handbuch Benotungstool
 $this->phrasen['dms_link/moodleHandbuch']='33'; //Moodle Handbuch
 $this->phrasen['dms_link/moodleHandbuch24']='1426'; //Moodle Handbuch
-$this->phrasen['dms_link/abgabetoolLektorHandbuch']='874'; //Abgabetool Handbuch fuer LektorInnen
-$this->phrasen['dms_link/abgabetoolStudentHandbuch']='875'; //Abgabetool Handbuch fuer Studierende
-$this->phrasen['dms_link/abgabetoolAssistenzHandbuch']='874'; //Abgabetool Handbuch fuer Assistenz
 $this->phrasen['dms_link/iconPDF']='46'; //PDF Icon
 $this->phrasen['dms_link/bedienungsanleitungMailverteiler']='1474'; //Bedienungsanleitung Mailverteiler
 $this->phrasen['dms_link/berechtigungskonzeptMailverteiler']='1475'; //Berechtigungskonzept Mailverteiler
@@ -31,4 +28,7 @@ $this->phrasen['dms_link/anleitungMailverteiler']='7578'; //Anleitung für die B
 
 //Links auf externe Seiten
 $this->phrasen['dms_link/dokuwikiGesamtnote']='http://fhcomplete.technikum-wien.at/dokuwiki/doku.php?id=cis:gesamtnote'; //Link ins Dokuwiki zur Anleitung Gesamtnote
+$this->phrasen['dms_link/abgabetoolLektorHandbuch']='https://fhcomplete.technikum-wien.at/dokuwiki/doku.php?id=cis:abgabetool_fuer_lektoren'; //Abgabetool Handbuch fuer LektorInnen
+$this->phrasen['dms_link/abgabetoolStudentHandbuch']='https://fhcomplete.technikum-wien.at/dokuwiki/doku.php?id=cis:abgabetool_fuer_studierende'; //Abgabetool Handbuch fuer Studierende
+$this->phrasen['dms_link/abgabetoolAssistenzHandbuch']='https://fhcomplete.technikum-wien.at/dokuwiki/doku.php?id=cis:abgabetool_fuer_lektoren'; //Abgabetool Handbuch fuer Assistenz
 ?>

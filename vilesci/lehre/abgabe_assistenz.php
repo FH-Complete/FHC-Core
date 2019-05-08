@@ -105,7 +105,7 @@ if(!$erg=$db->db_query($sql_query))
 else
 {
 	//$htmlstr .= "<form name='formular'><input type='hidden' name='check' value=''></form>";
-	$htmlstr .= "<form name='multitermin' action='abgabe_assistenz_multitermin.php' title='Serientermin' target='al_detail' method='POST'>";
+	$htmlstr .= "<form name='multitermin' action='abgabe_assistenz_multitermin.php' target='al_detail' method='POST'>";
 	//$htmlstr .= "<table id='t1' class='liste table-autosort:5 table-stripeclass:alternate table-autostripe'>\n";
 	$htmlstr .= "<table id='t1' class='tablesorter'>\n";
 	$htmlstr .= "<thead><tr class='liste'>\n";
@@ -154,9 +154,9 @@ else
 							OR tbl_projektbetreuer.betreuerart_kurzbz = 'Betreuer'
 							OR tbl_projektbetreuer.betreuerart_kurzbz = 'Begutachter'
 							)
-					
+
 					UNION
-					
+
 					SELECT '' AS first,
 						trim(COALESCE(nachname, '') || ', ' || COALESCE(titelpre, '') || ' ' || COALESCE(vorname, '') || ' ' || COALESCE(titelpost, '')) AS second,
 						PUBLIC.tbl_mitarbeiter.mitarbeiter_uid,
@@ -451,7 +451,7 @@ function btserienmail(trenner, stgbez)
 
 <body class="background_main">
 <?php
-echo "<h2><div style='float:left'>Bachelor-/Masterarbeitsbetreuungen (Studiengang $stg_kz, $stgbez)</div><div style='text-align: right;'><a href='../../cms/dms.php?id=".$p->t('dms_link/abgabetoolAssistenzHandbuch')."' target='_blank'><img src='../../skin/images/information.png' alt='Anleitung' title='Anleitung BaDa-Abgabe' border=0>&nbsp;Handbuch</a></div></h2>";
+echo "<h2><div style='float:left'>Bachelor-/Masterarbeitsbetreuungen (Studiengang $stg_kz, $stgbez)</div><div style='text-align: right;'><a href='".$p->t('dms_link/abgabetoolAssistenzHandbuch')."' target='_blank'><img src='../../skin/images/information.png' alt='Anleitung' title='Anleitung Abgabetool' border=0>&nbsp;Handbuch</a></div></h2>";
 
 echo $htmlstr;
 ?>

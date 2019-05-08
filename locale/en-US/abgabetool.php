@@ -69,10 +69,12 @@ $this->phrasen['abgabetool/fehlerTerminVorbei']='The deadline for this upload ha
 $this->phrasen['abgabetool/eidesstattlicheErklaerung']='I confirm that this paper is entirely my own work.
 All sources and quotations have been fully acknowledged in the appropriate places with adequate footnotes and citations.
 Quotations have been properly acknowledged and marked with appropriate punctuation. The works consulted are listed in the bibliography.
-This paper has not been submitted to another examination panel in the same or a similar form, and has not been published.<br>
+This paper has not been submitted to another examination panel in the same or a similar form, and has not been published.<br><br>
 I grant the University Of Applied Sciences Technikum Wien the right to store the uploaded file(s) in electronic form and to make them publicly available in data networks.
 I further grant the University of Applied Sciences Technikum Wien the right to convert the file(s) for long term preservation purposes.
-I declare that copyright and licensing issues related to my work have been resolved and that therefore no rights on the part of any third parties impede the publication.';
+I declare that copyright and licensing issues related to my work have been resolved and that therefore no rights on the part of any third parties impede the publication.<br><br>
+Bei den Master Arbeiten dürfen ausschließlich Dokumente hochgeladen werden, bei denen die `Eidesstattliche Erklärung´ nicht unterschrieben ist (Datenschutz).
+Sollten Sie trotzdem die `Eidesstattliche Erklärung´ samt Unterschrift hochladen, wird seitens der FH Technikum Wien davon ausgegangen, dass Sie keinen Wert auf Schutz Ihrer Unterschrift legen.';
 $this->phrasen['abgabetool/gelesenUndAkzeptiert']='Read and accepted';
 $this->phrasen['abgabetool/erklaerungNichtAkzeptiert']='Declaration not accepted';
 $this->phrasen['abgabetool/downloadProjektarbeit']='Download File';
