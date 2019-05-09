@@ -577,11 +577,10 @@ if (isset($prestudent_id))
                 <strong>'.$p->t('testtool/klickenSieAufEinTeilgebiet').'</strong>
             </div>
        ';
-
         if($pruefling->pruefling_id!='')
         {
             $_SESSION['pruefling_id']=$pruefling->pruefling_id;
-            echo '<script language="Javascript">parent.menu.location.reload()</script>';
+            //echo '<script language="Javascript">parent.menu.location.reload()</script>';
         }
     }
     else
