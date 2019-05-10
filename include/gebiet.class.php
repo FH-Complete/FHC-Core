@@ -825,5 +825,68 @@ class gebiet extends basis_db
 			return true;
 		}
 	}
+
+	/**
+	 * Prueft, ob das Gebiet zumindest eine Frage oder einen Vorschlag im MathML Format hat.
+	 * @param $gebiet_id
+	 * return true, wenn Gebiet eine/n Frage/Vorschlag im MathML Format enthält.
+	 */
+	public function hasMathML($gebiet_id)
+	{
+		if (is_numeric($gebiet_id))
+		{
+			$qry = '
+            WITH 
+               fragen AS (
+                  SELECT DISTINCT
+                     frage_id
+                  FROM
+                     testtool.tbl_frage
+                  JOIN
+                     testtool.tbl_gebiet USING (gebiet_id)
+                  WHERE
+                     tbl_gebiet.gebiet_id = '. $this->db_add_param($gebiet_id, FHC_INTEGER). '
+               ),          
+               vorschlaege AS (
+                  SELECT DISTINCT
+                     vorschlag_id
+                  FROM
+                     testtool.tbl_vorschlag
+                  JOIN
+                     fragen USING (frage_id)
+               )
+               
+            SELECT
+               1
+            FROM
+               testtool.tbl_frage_sprache
+            JOIN
+               fragen USING (frage_id)
+            WHERE
+               SUBSTRING(text, \'MathML\') IS NOT NULL
+               
+            UNION
+            
+            SELECT
+               1
+            FROM
+               testtool.tbl_vorschlag_sprache
+            JOIN
+               vorschlaege USING (vorschlag_id)
+            WHERE
+               SUBSTRING(text, \'MathML\') IS NOT NULL
+         ';
+
+			if($result = $this->db_query($qry))
+			{
+				return ($this->db_num_rows($result) > 0);
+			}
+		}
+		else
+		{
+			$this->errormsg = 'Eine numerische gebiet_id muss übergeben werden.';
+			return false;
+		}
+	}
 }
 ?>

@@ -4,10 +4,12 @@ $this->phrasen['testtool/login']='Login';
 $this->phrasen['testtool/tag']='Tag';
 $this->phrasen['testtool/monat']='Monat';
 $this->phrasen['testtool/jahr']='Jahr';
-$this->phrasen['testtool/willkommenstext']='Herzlich Willkommen zum Reihungstest.<br /><br />
-											Bitte warten Sie mit dem Login auf die Anweisung der Aufsichtsperson.<br /><br />
+$this->phrasen['testtool/willkommenstextTitel']='Herzlich Willkommen zum Reihungstest';
+$this->phrasen['testtool/willkommenstext']='Bitte warten Sie mit dem Login auf die Anweisung der Aufsichtsperson.<br /><br />
 											Wir wünschen Ihnen einen erfolgreichen Start ins Studium.';
 $this->phrasen['testtool/nameAuswaehlen']='Name auswählen...';
+$this->phrasen['testtool/reihungstest']= 'Reihungstest';
+$this->phrasen['testtool/regulaererEinstieg']='Regulärer Einstieg';
 $this->phrasen['testtool/quereinstieg']='(Quereinstieg)';
 $this->phrasen['testtool/quereinsteiger']='Quereinsteiger';
 $this->phrasen['testtool/basic']='Basic';
@@ -16,11 +18,12 @@ $this->phrasen['testtool/reihungstestNichtFreigeschalten']='Der zuteilte Reihung
 $this->phrasen['testtool/reihungstestKannNichtGeladenWerden']='Der Reihungstest dem Sie zugeteilt sind, kann nicht geladen werden';
 $this->phrasen['testtool/geburtsdatumStimmtNichtUeberein']='Ihr Geburtsdatum stimmt nicht mit unseren Daten überein. Bitte wenden Sie sich an die Aufsichtsperson';
 $this->phrasen['testtool/home']='Home';
-$this->phrasen['testtool/klickenSieAufEinTeilgebiet']='Klicken Sie links auf ein Teilgebiet';
+$this->phrasen['testtool/klickenSieAufEinTeilgebiet']='Zum Starten klicken Sie bitte links auf ein Teilgebiet.<br>Wir wünschen Ihnen viel Erfolg!';
 $this->phrasen['testtool/gebietStarten']='Gebiet starten';
 $this->phrasen['testtool/startseite']='Startseite';
 $this->phrasen['testtool/zurueckZurStartseite']='Zurück zur Startseite';
-$this->phrasen['testtool/begruessungstext']='Willkommen zum Reihungstest der Fachhochschule Technikum Wien. Sie sind mit folgenden Daten angemeldet:';
+$this->phrasen['testtool/begruessungstext']="Willkommen zum Reihungstest der Fachhochschule Technikum Wien!";
+$this->phrasen['testtool/anmeldedaten']= "Sie sind mit folgenden Daten angemeldet:";
 $this->phrasen['testtool/keineAntwort']='Keine Antwort';
 $this->phrasen['testtool/speichernUndWeiter']='Speichern und weiter';
 $this->phrasen['testtool/alleFragenBeantwortet']='GLÜCKWUNSCH! \n\nSie haben alle Fragen in der zur Verfügung stehenden Zeit beantwortet. \nNutzen Sie die verbleibende Zeit, um Ihre Antworten zu kontrollieren oder fahren Sie mit dem nächsten Teilgebiet fort';
@@ -42,4 +45,5 @@ $this->phrasen['testtool/dieseFrageIstNichtFuerSieBestimmt']='Diese Frage ist ni
 $this->phrasen['testtool/fehlerBeimSpeichernDerErstansicht']='Fehler beim Speichern der Erstansicht';
 $this->phrasen['testtool/startDrueckenUmZuBeginnen']='Um dieses Teilgebiet zu starten, drücken Sie bitte links oben auf <b>Gebiet starten</b>.';
 $this->phrasen['testtool/keinPrueflingseintragVorhanden']='Kein Prüflingseintrag vorhanden';
+$this->phrasen['testtool/fuerFolgendeStgAngemeldet']='Für folgende Studiengänge haben Sie sich angemeldet:';
 ?>

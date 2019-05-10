@@ -4,10 +4,12 @@ $this->phrasen['testtool/login']='Login';
 $this->phrasen['testtool/tag']='Day';
 $this->phrasen['testtool/monat']='Month';
 $this->phrasen['testtool/jahr']='Year';
-$this->phrasen['testtool/willkommenstext']='Welcome to the placement test.<br /><br />
-											Please wait for the tutor\'s instructions before you log in.<br /><br />
+$this->phrasen['testtool/willkommenstextTitel']='Welcome to the placement test.';
+$this->phrasen['testtool/willkommenstext']='Please wait for the tutor\'s instructions before you log in.<br /><br />
 											We wish you a good start to your studies.';
 $this->phrasen['testtool/nameAuswaehlen']='Choose name...';
+$this->phrasen['testtool/reihungstest']= 'Placement test';
+$this->phrasen['testtool/regulaererEinstieg']='Regular entry';
 $this->phrasen['testtool/quereinstieg']='(Lateral entry)';
 $this->phrasen['testtool/quereinsteiger']='Lateral entry';
 $this->phrasen['testtool/basic']='Basic';
@@ -16,11 +18,12 @@ $this->phrasen['testtool/reihungstestNichtFreigeschalten']='The entrance examina
 $this->phrasen['testtool/reihungstestKannNichtGeladenWerden']='The entrance examination assigned to you can not be loaded.';
 $this->phrasen['testtool/geburtsdatumStimmtNichtUeberein']='Your date of birth does not correspond to the data we have. Please speak to the supervisor. ';
 $this->phrasen['testtool/home']='Home';
-$this->phrasen['testtool/klickenSieAufEinTeilgebiet']='Select a topic on the left side';
+$this->phrasen['testtool/klickenSieAufEinTeilgebiet']='Select a topic on the left side.<br>';
 $this->phrasen['testtool/gebietStarten']='Start section';
 $this->phrasen['testtool/startseite']='Startpage';
 $this->phrasen['testtool/zurueckZurStartseite']='Back to startpage';;
-$this->phrasen['testtool/begruessungstext']='Welcome to the placement test of the UAS Technikum Wien. <br/>You are logged in with the following data:';
+$this->phrasen['testtool/begruessungstext']='Welcome to the placement test of the UAS Technikum Wien!';
+$this->phrasen['testtool/anmeldedaten']= "You are logged in with the following data:";
 $this->phrasen['testtool/keineAntwort']='No Answer';
 $this->phrasen['testtool/speichernUndWeiter']='Save and next';
 $this->phrasen['testtool/alleFragenBeantwortet']='CONGRATULATIONS!\n\nYou have answered all the questions in the time allowed.\n Use the remaining time to check your answers or continue to the next section.';
@@ -42,4 +45,5 @@ $this->phrasen['testtool/dieseFrageIstNichtFuerSieBestimmt']='This question is n
 $this->phrasen['testtool/fehlerBeimSpeichernDerErstansicht']='Error in saving the initial view';
 $this->phrasen['testtool/startDrueckenUmZuBeginnen']='To start this section, please click on <b>Start section</b> in the top left corner.';
 $this->phrasen['testtool/keinPrueflingseintragVorhanden']='No candidate entry available.';
+$this->phrasen['testtool/fuerFolgendeStgAngemeldet']='You have applied for the following degree programs:';
 ?>

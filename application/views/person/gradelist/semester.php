@@ -38,7 +38,13 @@
 					<thead>
 						<tr>
 							<th><?php echo $this->p->t('lehre','lehrveranstaltung');?></th>
-							<th><?php echo $this->p->t('lehre','ects');?></th>
+							<th style="text-align: right"><?php echo $this->p->t('lehre','ects');?></th>
+							<!--
+							<th>SWS</th>
+							<th>Lehrform</th>
+							<th>Pflichtfach</th>
+							<th>Zeugnis</th>
+							-->
 							<th><?php echo $this->p->t('lehre','note');?></th>
 						</tr>
 					</thead>
@@ -79,6 +85,12 @@
 						<tr>
 							<th><?php echo $this->p->t('lehre','lehrveranstaltung');?></th>
 							<th><?php echo $this->p->t('lehre','ects');?></th>
+							<!--
+							<th>SWS</th>
+							<th>Lehrform</th>
+							<th>Pflichtfach</th>
+							<th>Zeugnis</th>
+							-->
 							<th><?php echo $this->p->t('lehre','note');?></th>
 						</tr>
 					</thead>

@@ -474,22 +474,23 @@ class Reihungstest_model extends DB_Model
 	}
 
 	/**
-	 * Loads the date of the next placement test to the given degree program
-	 * @param integer $studiengang_kz Kennzahl of degree program to load the next placement test date
-	 * @return string Returns date of the next placement test
+	 * Loads the dates of the next placement tests within $days days to the given degree program
+	 * @param integer $studiengang_kz Kennzahl of degree program to load the next placement tests
+	 * @param integer $days Number of days in the future to load
+	 * @return string Returns dates of the next placement test
 	 */
-	public function getNextPlacementtestDate($studiengang_kz)
+	public function getNextPlacementtests($studiengang_kz, $days)
 	{
 		$query = '
 			SELECT *
 			FROM PUBLIC.tbl_reihungstest
 			WHERE studiengang_kz = ?
 			AND datum > now()
+			AND datum <= now() + interval ?
 			ORDER BY datum ASC
-			LIMIT 1
 			';
 
-		return $this->execQuery($query, array($studiengang_kz));
+		return $this->execQuery($query, array($studiengang_kz, $days.' days'));
 	}
 
 	/**

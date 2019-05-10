@@ -2341,12 +2341,12 @@ $studienplaene_list = implode(',', array_keys($studienplaene_arr));
 				if ($rechte->isBerechtigt('lehre/reihungstest', $stg_rechtecheck->oe_kurzbz, 'sui'))
 				{
 					echo '<input id="studienplan_id" type="hidden" name="studienplan_id" value="">';
-					echo '<input id="studienplan_autocomplete" type="text" name="studienplan" size="40" placeholder="Weiterer Studienplan" value="">';
+					echo '<input id="studienplan_autocomplete" type="text" name="studienplan" size="50" placeholder="Weiterer Studienplan" value="">';
 					echo '<button type="submit" name="speichern"><img src="../../skin/images/list-add.png" alt="Studienplan hinzufügen" height="13px"></button>';
 				}
 				else
 				{
-					echo 'Keine Berechtigung zum Zuteilen von Studienplänen';
+					echo '<input id="studienplan_autocomplete" type="text" name="studienplan" size="50" placeholder="Keine Berechtigung zum Zuteilen von Studienplänen" value="" disabled>';
 				}
 				echo '</td>';
 				echo '</tr>';
@@ -2384,7 +2384,7 @@ $studienplaene_list = implode(',', array_keys($studienplaene_arr));
 			}
 			else
 			{
-				echo '<td colspan="2">Keine Berechtigung zum Zuteilen von Räumen</td>';
+				echo '<td colspan="2"><input id="ort" type="text" name="ort_kurzbz" size="50" placeholder="Keine Berechtigung zum Zuteilen von Räumen" value="" disabled></td>';
 			}
 			$orte = new Reihungstest();
 			$orte->getOrteReihungstest($reihungstest->reihungstest_id);

@@ -133,6 +133,11 @@ class Gradelist extends Auth_Controller
 			if (in_array($row_status->status_kurzbz,
 				array('Student','Diplomand','Incoming','Abbrecher','Unterbrecher','Absolvent')))
 			{
+				// Wenn das Semester schon vorhanden ist dann ueberspringen
+				// (bei mehreren Statuseintraegen im selben Semester (zB Absolvent / Diplomand)
+				if(isset($courses['semester'][$row_status->studiensemester_kurzbz]))
+					continue;
+
 				// LVs fuer das Semester holen lt Studienplan
 				$lvtree = $this->studienplanlib->getLehrveranstaltungTree(
 							$row_status->studienplan_id,
@@ -184,7 +189,10 @@ class Gradelist extends Auth_Controller
 				$courses['semester'][$row_noten->studiensemester_kurzbz]['lvs_nonstpl'][] = array(
 					'lehrveranstaltung_id' => $row_noten->lehrveranstaltung_id,
 					'lehrtyp_kurzbz' => $result_lv->retval[0]->lehrtyp_kurzbz,
+					'lehrform_kurzbz' => $result_lv->retval[0]->lehrform_kurzbz,
 					'pflicht' => false,
+					'sws' => $result_lv->retval[0]->sws,
+					'zeugnis' => $result_lv->retval[0]->zeugnis,
 					'bezeichnung' => $result_lv->retval[0]->bezeichnung,
 					'ects' => $result_lv->retval[0]->ects,
 					'note' => $row_noten->note,
@@ -316,7 +324,7 @@ class Gradelist extends Auth_Controller
 				);
 			}
 
-			if ($row['childs'])
+			if (isset($row['childs']))
 			{
 				$childgrades = $this->getGrades($row['childs']);
 				$grades = array_merge($grades, $childgrades);

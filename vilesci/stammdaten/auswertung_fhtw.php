@@ -828,27 +828,43 @@ if ($punkteUebertragen)
 					// Checken, ob schon Bewerberstatus vorhanden ist
 					if (!$prestudent->load_rolle($array['prestudent_id'], 'Bewerber', $prestudentrolle->studiensemester_kurzbz, $prestudentrolle->ausbildungssemester))
 					{
-						$prestudent->new = true;
-						$prestudent->prestudent_id = $array['prestudent_id'];
-						$prestudent->status_kurzbz = 'Bewerber';
-						$prestudent->studiensemester_kurzbz = $prestudentrolle->studiensemester_kurzbz;
-						$prestudent->ausbildungssemester = $prestudentrolle->ausbildungssemester;
-						$prestudent->datum =date('Y-m-d');
-						$prestudent->insertamum = date('Y-m-d H:i:s');
-						$prestudent->insertvon = $user;
-						$prestudent->orgform_kurzbz = $prestudentrolle->orgform_kurzbz;
-						$prestudent->bestaetigtam = $prestudentrolle->bestaetigtam;
-						$prestudent->bestaetigtvon = $prestudentrolle->bestaetigtvon;
-						$prestudent->bewerbung_abgeschicktamum = $prestudentrolle->bewerbung_abgeschicktamum;
-						$prestudent->studienplan_id = $prestudentrolle->studienplan_id;
-
-						if (!$prestudent->save_rolle())
+						// Checken, ob Abgewiesener-Status vorhanden ist
+						if (!$prestudent->load_rolle($array['prestudent_id'], 'Abgewiesener', $prestudentrolle->studiensemester_kurzbz, $prestudentrolle->ausbildungssemester))
 						{
-							$msg_error .= '<br>Fehler beim speichern des Bewerberstatus für Prestudent '.$array['prestudent_id'].': ' . $prestudent->errormsg;
+							// Um einen Bewerberstatus zu setzen, muss "reihungstestangetreten" true sein
+							if ($prestudent->reihungstestangetreten == true)
+							{
+								$prestudent->new = true;
+								$prestudent->prestudent_id = $array['prestudent_id'];
+								$prestudent->status_kurzbz = 'Bewerber';
+								$prestudent->studiensemester_kurzbz = $prestudentrolle->studiensemester_kurzbz;
+								$prestudent->ausbildungssemester = $prestudentrolle->ausbildungssemester;
+								$prestudent->datum = date('Y-m-d');
+								$prestudent->insertamum = date('Y-m-d H:i:s');
+								$prestudent->insertvon = $user;
+								$prestudent->orgform_kurzbz = $prestudentrolle->orgform_kurzbz;
+								$prestudent->bestaetigtam = '';
+								$prestudent->bestaetigtvon = '';
+								$prestudent->bewerbung_abgeschicktamum = '';
+								$prestudent->studienplan_id = $prestudentrolle->studienplan_id;
+
+								if (!$prestudent->save_rolle())
+								{
+									$msg_error .= '<br>Fehler beim speichern des Bewerberstatus für Prestudent '.$array['prestudent_id'].': '.$prestudent->errormsg;
+								}
+								else
+								{
+									$count_success_bewerber++;
+								}
+							}
+							else
+							{
+								$msg_error .= '<br>Fehler beim speichern des Bewerberstatus für Prestudent '.$array['prestudent_id'].'. Zuerst muss "Reihungstestverfahren absolviert" gesetzt sein.';
+							}
 						}
 						else
 						{
-							$count_success_bewerber++;
+							$msg_error .= '<br>Fehler beim speichern des Bewerberstatus für Prestudent '.$array['prestudent_id'].'. Es ist bereits ein Abgewiesener-Status vorhanden';
 						}
 					}
 					else
@@ -2125,6 +2141,30 @@ else
 		{
 			$("#uebertragenOptions").toggle(300);
 		});
+		
+		if($("#uebertragenOptionGesamtpunkte").not(":checked"))
+		{
+			$("#div_checkbox_bewerber").addClass("disabled");
+			$("#div_checkbox_bewerber").find("label").addClass("text-muted");
+			$("#div_checkbox_bewerber").find("label").prop("title", "Erst \"Gesamtpunkte\" und \"Reihungsverfahren absolviert\" setzen");
+			$("#uebertragenOptionBewerber").prop("disabled", true);
+		}
+		$("#uebertragenOptionGesamtpunkte").on("click", function(e) 
+		{
+			if($(this).is(":checked"))
+			{
+				$("#div_checkbox_bewerber").removeClass("disabled");
+				$("#div_checkbox_bewerber").find("label").removeClass("text-muted");
+				$("#uebertragenOptionBewerber").prop("disabled", false);
+			}
+			else
+			{
+				$("#div_checkbox_bewerber").addClass("disabled");
+				$("#div_checkbox_bewerber").find("label").addClass("text-muted");
+				$("#div_checkbox_bewerber").find("label").prop("title", "Erst \"Gesamtpunkte\" und \"Reihungsverfahren absolviert\" setzen");
+				$("#uebertragenOptionBewerber").prop("disabled", true);
+			}
+		});
 	});
 	
 	function deleteResult(prestudent_id, gebiet_id, name, gebiet_bezeichnung)
@@ -2385,6 +2425,11 @@ else
 		if ($("input.prestudentCheckbox:checked").length === 0)
 		{
 			alert("Bitte wählen Sie mindestens einen Eintrag aus der Liste");
+			return false;
+		}
+		else if ($("#uebertragenOptionBewerber:checked").length === 1 && $("#uebertragenOptionGesamtpunkte:checked").length !== 1)
+		{
+			alert("Um den Bewerberstatus setzen zu können, muss \"Gesamtpunkte\" und \"Reihungsverfahren absolviert\" gesetzt sein");
 			return false;
 		}
 		else
@@ -2745,8 +2790,8 @@ else
 				<div class="checkbox">
 				  <label><input type="checkbox" id="uebertragenOptionGesamtpunkte" value="">"Gesamtpunkte" und "Reihungsverfahren absolviert" setzen</label>
 				</div>
-				<div class="checkbox">
-				  <label><input type="checkbox" id="uebertragenOptionBewerber" value="">Zu Bewerber machen</label>
+				<div id="div_checkbox_bewerber" class="checkbox">
+				  <label class="checkbox_bewerber"><input type="checkbox" id="uebertragenOptionBewerber" value="">Zu Bewerber machen</label>
 				</div>
 				<button type="button" class="btn btn-success" onclick="punkteUebertragen('.$reihungstest.')" id="punkteUebertragenButton" style="margin-left: 10px">Jetzt übertragen</button>
 			</div>

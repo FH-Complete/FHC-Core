@@ -25,6 +25,12 @@ body.main /* Workaround fuer Farbverlauf im IE statt ShadowBox */
 	padding:0px;
 	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#cccccc',endColorstr='#ffffff');
 }
+body.testtool-content
+{
+	/*/padding: 0px 50px 0px 50px;*/
+	overflow: hidden;
+	width: 50%;
+}
 html
 {
 	height: 100%;
@@ -80,6 +86,11 @@ ul li
 li.ui-menu-item
 {
 	list-style-image:none;
+}
+.btn-testtool
+{
+	width: 200px;
+	margin-top: 20px;
 }
 #menue
 {

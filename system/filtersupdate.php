@@ -353,6 +353,7 @@ $filters = array(
 					{"name": "fakultaet"},
 					{"name": "datum"},
 					{"name": "uhrzeit"},
+					{"name": "anmeldefrist"},					
 					{"name": "oeffentlich"},
 					{"name": "studiengaenge"},
 					{"name": "freie_plaetze"},

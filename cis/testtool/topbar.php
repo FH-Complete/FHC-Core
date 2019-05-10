@@ -69,7 +69,6 @@ if(isset($_GET['sprache_user']))
 $sprache_user = getSpracheUser(); 
 
 $p = new phrasen($sprache_user);
-
 ?>
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
@@ -77,7 +76,11 @@ $p = new phrasen($sprache_user);
 
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
 	<link href="../../skin/style.css.php" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="../../vendor/twbs/bootstrap/dist/css/bootstrap.min.css" type="text/css"/>
+    <script type="text/javascript" src="../../vendor/components/jquery/jquery.min.js"></script>
+    <script type="text/javascript" src="../../vendor/twbs/bootstrap/dist/js/bootstrap.min.js"></script>
 </head>
 <script type="text/javascript">
 function changeSprache(sprache)
@@ -99,17 +102,22 @@ function changeSprache(sprache)
 echo '	<table style="background-image: url(../../skin/images/header_testtool.png); background-repeat: repeat-x;" width="100%" height="100%" cellspacing="0" cellpadding="0">
 		<tr>
     		<td valign="top" align="left">
-    			<a href="index.html" target="_top"><img class="header_logo" style="min-height:80%; left: 16px; top: 10%;" src="../../skin/styles/'.DEFAULT_STYLE.'/logo_250x130.png" alt="logo"></a>
+    			<a href="index.html" target="_top"><img class="header_logo" style="min-height:65%; left: 16px; top: 10%;" src="../../skin/styles/'.DEFAULT_STYLE.'/logo_250x130.png" alt="logo"></a>
     		</td>
-    		<td align="right">
-    		<select style="text-align: left; color: #0086CC; border: 1;" name="select">';
-			$sprache = new sprache();
-			$sprache->getAll(true);
-			foreach($sprache->result as $row)
-			{
-				echo ' <option onclick="changeSprache(\''.$row->sprache.'\'); return false;" '.($row->sprache==$sprache_user?'selected':'').'>'.($row->bezeichnung_arr[getSprache()]).'&nbsp;&nbsp;</option>';
-			}
-			echo '	</select>&nbsp;&nbsp;</div>
+    		<td valign="middle">
+    		<div class="form-group form-inline pull-right">
+               <!-- <label for="select-sprache">Sprache Menü:&nbsp;&nbsp;</label>-->
+                <select id="select-sprache" class="form-control" style="width: 170px; margin-right: 50px;" onchange="if (typeof(this.value) != \'undefined\') changeSprache(this.value)">';
+                $sprache = new sprache();
+                $sprache->getAll(true);
+                foreach($sprache->result as $row)
+                {
+                    echo ' <option value="'. $row->sprache. '" '.($row->sprache==$sprache_user?'selected':'').'>'.($row->bezeichnung_arr[getSprache()]).'&nbsp;&nbsp;</option>';
+                }
+                echo '
+                </select>
+            </div>
+            </td>
   		</tr>
 		</table>';
 ?>

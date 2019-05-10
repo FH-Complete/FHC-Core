@@ -32,7 +32,10 @@ class StudienplanLib
 					$treeitem = array(
 						'lehrveranstaltung_id' => $row->lehrveranstaltung_id,
 						'lehrtyp_kurzbz' => $row->lehrtyp_kurzbz,
+						'lehrform_kurzbz' => $row->lehrform_kurzbz,
+						'sws' => $row->sws,
 						'pflicht' => $row->pflicht,
+						'zeugnis' => $row->zeugnis,
 						'bezeichnung' => $row->bezeichnung,
 						'ects' => $row->ects
 					);
@@ -57,7 +60,10 @@ class StudienplanLib
 				$treeitem = array(
 					'lehrveranstaltung_id' => $row->lehrveranstaltung_id,
 					'lehrtyp_kurzbz' => $row->lehrtyp_kurzbz,
+					'lehrform_kurzbz' => $row->lehrform_kurzbz,
+					'sws' => $row->sws,
 					'pflicht' => $row->pflicht,
+					'zeugnis' => $row->zeugnis,
 					'bezeichnung' => $row->bezeichnung,
 					'ects' => $row->ects
 				);

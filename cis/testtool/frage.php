@@ -109,7 +109,10 @@ echo '
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 	<meta http-equiv="Content-Type" content="text/xhtml; charset=UTF-8" />
+    <link rel="stylesheet" href="../../vendor/twbs/bootstrap/dist/css/bootstrap.min.css" type="text/css"/>
 	<link href="../../skin/style.css.php" rel="stylesheet" type="text/css" />
+    <script type="text/javascript" src="../../vendor/components/jquery/jquery.min.js"></script>
+    <script type="text/javascript" src="../../vendor/twbs/bootstrap/dist/js/bootstrap.min.js"></script>
 	<script language="Javascript" type="text/javascript">
 	//<![CDATA[
 	function killChildNodes(an_element)
@@ -179,7 +182,7 @@ echo '
 	</script>
 </head>
 
-<body>
+<body class='testtool-content'>
 <?php
 if(!isset($_SESSION['pruefling_id']))
 	die($p->t('testtool/bitteZuerstAnmelden'));
@@ -358,7 +361,7 @@ if($result_pruefling = $db->db_query($qry_pruefling))
 {
 	if($row_pruefling = $db->db_fetch_object($result_pruefling))
 	{
-		$info = "$row_pruefling->vorname $row_pruefling->nachname, $row_pruefling->bezeichnung $row_pruefling->stg_bez";
+		$info = "$row_pruefling->vorname $row_pruefling->nachname";
 	}
 }
 
@@ -397,16 +400,35 @@ if($levelgebiet)
 		</tr>
 	</table>';
 	$fortschrittsbalken .= '<span class="smallb"><b> '.$aktuell.' / '.$max.'</b> ['.number_format($psolved,1,'.','').'%]</span>';
-	
 }
 //Zeit des Gebietes holen
-echo '<table width="100%"><tr><td valign="top" width="50%">'.$info.'</td><td align="center">'.$fortschrittsbalken.'</td><td width="50%"></td></tr><tr><td colspan="3">';
+echo '
+    <table width="100%">
+        <tr>
+            <td valign="top" width="50%">TeilnehmerIn: '.$info.'</td>
+        </tr>
+        <tr>
+            <td align="center">'.$fortschrittsbalken.'</td>
+        </tr>
+        <tr>
+            <td width="50%"></td>
+        </tr>
+        <tr>
+            <td>';
 
 if($demo)
 {
 	//Wenn es sich um ein Demobeispiel handelt, dann wird die Maximale Gesamtzeit angezeigt
-	echo "<input type=\"button\" value=\"".$p->t("testtool/gebietStarten")."\" onclick=\"GebietStarten('".$db->convert_html_chars($gebiet->bezeichnung)."','".$stunde."','".$minute."','".$sekunde."','".$gebiet_id."')\" /> ";
-	echo '<center>'.$p->t('testtool/bearbeitungszeit').': '.$stunde.'h '.$minute.'m '.$sekunde.'s</center>';
+	echo
+        $p->t('testtool/bearbeitungszeit').': '.$stunde.'h '.$minute.'m '.$sekunde.'s';
+	echo '
+            </td>
+        </tr>
+        <tr>
+            <td>
+    ';
+	echo "
+	    <input type=\"button\" class='btn btn-default btn-testtool' value=\"".$p->t("testtool/gebietStarten")."\" onclick=\"GebietStarten('".$db->convert_html_chars($gebiet->bezeichnung)."','".$stunde."','".$minute."','".$sekunde."','".$gebiet_id."')\" /> ";
 }
 else
 {
@@ -630,7 +652,7 @@ if($frage->frage_id!='')
 	
 	if(!$demo)
 	{
-		echo '<input style="width:180px; white-space:normal" type="submit" name="submitantwort" value="'.$p->t('testtool/speichernUndWeiter').'" />';
+		echo '<input style="width:180px; white-space:normal" class="btn btn-default btn-testtool" type="submit" name="submitantwort" value="'.$p->t('testtool/speichernUndWeiter').'" />';
 	}
 	else
 	{
@@ -639,7 +661,7 @@ if($frage->frage_id!='')
 
 		if($nextfrage)
 		{
-			echo " <a href='$PHP_SELF?gebiet_id=$gebiet_id&amp;frage_id=$nextfrage' class='Item'>".$p->t("testtool/demo")."</a>";
+			echo " <a href='$PHP_SELF?gebiet_id=$gebiet_id&amp;frage_id=$nextfrage' role='button' class='btn btn-default btn-testtool'>".$p->t("testtool/demo")."</a>";
 		}
 		else
 		{
@@ -655,7 +677,7 @@ if($frage->frage_id!='')
 				if($row->anzahl>1)
 				{
 					//Bei Demos den Weiter-Button nur anzeigen, wenn ausser der Startseite noch andere Demoseiten vorhanden sind
-					echo " <a href='$PHP_SELF?gebiet_id=$gebiet_id' class='Item'>".$p->t("testtool/zurueckZurStartseite")."</a>";
+					echo " <a href='$PHP_SELF?gebiet_id=$gebiet_id' role='button' class='btn btn-default btn-testtool'>".$p->t("testtool/zurueckZurStartseite")."</a>";
 				}
 			}
 		}
@@ -669,9 +691,6 @@ else
 	//Wenn kein Demo vorhanden ist
 	echo "<br/><br/><br/><center><b>".$p->t("testtool/startDrueckenUmZuBeginnen")."</b></center>";
 }
-
-
-
 
 ?>
 

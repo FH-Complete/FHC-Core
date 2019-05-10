@@ -84,7 +84,7 @@ session_start();
 <link href="../../skin/style.css.php" rel="stylesheet" type="text/css">
 </head>
 
-<body scroll="no" style="margin-top: 40px; overflow: hidden">
+<body scroll="no">
 <?php
 if (isset($_SESSION['pruefling_id']))
 {
@@ -102,12 +102,16 @@ if (isset($_SESSION['pruefling_id']))
 
 // Link zur Einleitung
 	if ($content_id = $db->db_fetch_object($result))
+    {
 		if($content_id->content_id!='')
+        {
 			echo '
                 <tr><td class="ItemTesttool" style="margin-left: 20px;" nowrap>
                     <a class="ItemTesttool navButton" href="../../cms/content.php?content_id='.$content_id->content_id.'&sprache='.$sprache.'" target="content">'.$p->t('testtool/einleitung').'</a>
-                </td></tr>';
-
+                </td></tr>
+            ';
+        }
+    }
 	echo '<tr><td style="padding-left: 20px;" nowrap>';
 
 	$studiengang_kz = (isset($_SESSION['studiengang_kz'])) ? $_SESSION['studiengang_kz'] : '';
@@ -279,7 +283,7 @@ if (isset($_SESSION['pruefling_id']))
 	$result = $db->db_query($qry);
 	$lastsemester = '';
 	$quereinsteiger_stg = '';
-
+    $gebiet_hasMathML = false; // true, wenn irgendein Gebiet eine/n Frage/Vorschlag im MathML-Format enthält
 	while($row = $db->db_fetch_object($result))
 	{
 		//Jedes Semester in einer eigenen Tabelle anzeigen
@@ -319,6 +323,13 @@ if (isset($_SESSION['pruefling_id']))
 		}
 
 		$gebiet = new gebiet();
+
+		// Prüfen, ob das Gebiet eine/n Frage/Vorschlag im MathML-Format enthält
+        if (!$gebiet_hasMathML) // sobald nur ein MathML Format gefunden, variable nicht mehr überschreiben
+        {
+            $gebiet_hasMathML = $gebiet->hasMathML($row->gebiet_id);
+        }
+
 		if($gebiet->check_gebiet($row->gebiet_id))
 		{
 			//Status der Gebiete Pruefen
@@ -335,7 +346,7 @@ if (isset($_SESSION['pruefling_id']))
 					{
 						//Gebiet gestartet aber noch nicht zu ende
 						$style='';
-						$class='ItemTesttoolAktiv';
+						$class='ItemTesttool ItemTesttoolAktiv';
 					}
 					else
 					{
@@ -349,7 +360,7 @@ if (isset($_SESSION['pruefling_id']))
 						{
 							//Gebiet ist zu Ende
 							$style='';
-							$class='ItemTesttoolBeendet';
+							$class='ItemTesttool ItemTesttoolBeendet';
 						}
 					}
 				}
@@ -397,4 +408,29 @@ else
 }
 ?>
 </body>
+
+<script type="text/javascript">
+
+    // Get users Browser
+    var ua = navigator.userAgent;
+
+    // If Browser is any other than Mozilla Firefox and the test includes any MathML,
+    // show message to use Mozilla Firefox
+    if ((ua.indexOf("Firefox") > -1) == false)
+    {
+        let hasMathML = "<?php echo $gebiet_hasMathML; ?>";
+        let userLang = "<?php echo $sprache_user; ?>";
+        if (hasMathML == true)
+        {
+            if (userLang == 'German')
+            {
+                alert('BITTE VERWENDEN SIE DEN MOZILLA FIREFOX BROWSER!\n(Manche Prüfungsfragen werden sonst nicht korrekt dargestellt.)');
+            }
+            else if(userLang == 'English')
+            {
+                alert('PLEASE USE MOZILLA FIREFOX BROWSER!\n(Ohterwise some exam items will not be displayed correctly.)');
+            }
+        }
+    }
+</script>
 </html>
