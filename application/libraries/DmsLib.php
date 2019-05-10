@@ -199,7 +199,7 @@ class DmsLib
 			if ($this->ci->db->trans_status() === false || isError($result))
 			{
 				$this->ci->db->trans_rollback();
-				$result = error($result->msg, EXIT_ERROR);
+				$result = error('An error occurred while performing a delete operation', EXIT_ERROR);
 			}
 			else
 			{

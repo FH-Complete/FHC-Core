@@ -30,7 +30,7 @@ class Bewerbungstermine extends APIv1_Controller
 			)
 		);
 		// Load model BewerbungstermineModel
-		$this->load->model('crm/bewerbungstermine_model', 'BewerbungstermineModel');
+		$this->load->model('crm/Bewerbungstermine_model', 'BewerbungstermineModel');
 
 
 	}

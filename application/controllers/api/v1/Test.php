@@ -2,8 +2,6 @@
 
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
-require_once APPPATH.'/libraries/REST_Controller.php';
-
 /**
  * Testing class for REST calls and authentication
  */
@@ -14,7 +12,7 @@ class Test extends REST_Controller
 		parent::__construct();
 
 		// Loads helper message to manage returning messages
-		$this->load->helper('hlp_message');
+		$this->load->helper('hlp_return_object');
     }
 
 	/**

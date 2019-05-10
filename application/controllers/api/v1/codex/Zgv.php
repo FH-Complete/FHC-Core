@@ -23,7 +23,7 @@ class Zgv extends APIv1_Controller
 	{
 		parent::__construct(array('Zgv' => 'basis/zgv:rw'));
 		// Load model ZgvModel
-		$this->load->model('codex/zgv_model', 'ZgvModel');
+		$this->load->model('codex/Zgv_model', 'ZgvModel');
 	}
 
 	/**

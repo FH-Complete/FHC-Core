@@ -1,6 +1,6 @@
 <?php
 
-class DB_Model extends FHC_Model
+class DB_Model extends CI_Model
 {
 	// Default schema used by the models
 	const DEFAULT_SCHEMA = 'public';
@@ -64,7 +64,7 @@ class DB_Model extends FHC_Model
 	public function insert($data)
 	{
 		// Check class properties
-		if (is_null($this->dbTable)) return error(FHC_MODEL_ERROR, FHC_NODBTABLE);
+		if (is_null($this->dbTable)) return error('The given database table name is not valid', EXIT_MODEL);
 
 		// If this table has UDF and the validation of them is ok
 		if (isError($validate = $this->_manageUDFs($data, $this->dbTable))) return $validate;
@@ -100,7 +100,7 @@ class DB_Model extends FHC_Model
 		}
 		else
 		{
-			return error($this->db->error(), FHC_DB_ERROR);
+			return error($this->db->error(), EXIT_DATABASE);
 		}
 	}
 
@@ -114,8 +114,8 @@ class DB_Model extends FHC_Model
 	public function update($id, $data)
 	{
 		// Check class properties
-		if (is_null($this->pk)) return error(FHC_MODEL_ERROR, FHC_NOPK);
-		if (is_null($this->dbTable)) return error(FHC_MODEL_ERROR, FHC_NODBTABLE);
+		if (is_null($this->pk)) return error('The given primary key is not valid', EXIT_MODEL);
+		if (is_null($this->dbTable)) return error('The given database table name is not valid', EXIT_MODEL);
 
 		// If this table has UDF and the validation of them is ok
 		if (isError($validate = $this->_manageUDFs($data, $this->dbTable, $id))) return $validate;
@@ -148,7 +148,7 @@ class DB_Model extends FHC_Model
 		}
 		else
 		{
-			return error($this->db->error(), FHC_DB_ERROR);
+			return error($this->db->error(), EXIT_DATABASE);
 		}
 	}
 
@@ -161,8 +161,8 @@ class DB_Model extends FHC_Model
 	public function delete($id)
 	{
 		// Check class properties
-		if (is_null($this->dbTable)) return error(FHC_MODEL_ERROR, FHC_NODBTABLE);
-		if (is_null($this->pk)) return error(FHC_MODEL_ERROR, FHC_NOPK);
+		if (is_null($this->pk)) return error('The given primary key is not valid', EXIT_MODEL);
+		if (is_null($this->dbTable)) return error('The given database table name is not valid', EXIT_MODEL);
 
 		$tmpId = $id;
 
@@ -190,7 +190,7 @@ class DB_Model extends FHC_Model
 		}
 		else
 		{
-			return error($this->db->error(), FHC_DB_ERROR);
+			return error($this->db->error(), EXIT_DATABASE);
 		}
 	}
 
@@ -203,8 +203,8 @@ class DB_Model extends FHC_Model
 	public function load($id = null)
 	{
 		// Check class properties
-		if (is_null($this->pk)) return error(FHC_MODEL_ERROR, FHC_NOPK);
-		if (is_null($this->dbTable)) return error(FHC_MODEL_ERROR, FHC_NODBTABLE);
+		if (is_null($this->pk)) return error('The given primary key is not valid', EXIT_MODEL);
+		if (is_null($this->dbTable)) return error('The given database table name is not valid', EXIT_MODEL);
 
 		$tmpId = $id;
 
@@ -232,7 +232,7 @@ class DB_Model extends FHC_Model
 	public function loadWhere($where = null)
 	{
 		// Check class properties
-		if (is_null($this->dbTable)) return error(FHC_MODEL_ERROR, FHC_NODBTABLE);
+		if (is_null($this->dbTable)) return error('The given database table name is not valid', EXIT_MODEL);
 
 		// Execute query
 		$result = $this->db->get_where($this->dbTable, $where);
@@ -245,7 +245,7 @@ class DB_Model extends FHC_Model
 		}
 		else
 		{
-			return error($this->db->error(), FHC_DB_ERROR);
+			return error($this->db->error(), EXIT_DATABASE);
 		}
 	}
 
@@ -264,7 +264,7 @@ class DB_Model extends FHC_Model
 	public function loadTree($mainTable, $sideTables, $where = null, $sideTablesAliases = null)
 	{
 		// Check class properties
-		if (is_null($this->dbTable)) return error(FHC_MODEL_ERROR, FHC_NODBTABLE);
+		if (is_null($this->dbTable)) return error('The given database table name is not valid', EXIT_MODEL);
 
 		// List of tables on which it will work
 		$tables = array_merge(array($mainTable), $sideTables);
@@ -405,12 +405,12 @@ class DB_Model extends FHC_Model
 			|| is_null($cond)
 			|| !in_array($type, array('', 'LEFT', 'RIGHT', 'OUTER', 'INNER', 'LEFT OUTER', 'RIGHT OUTER')))
 		{
-			return error(FHC_MODEL_ERROR, FHC_MODEL_ERROR);
+			return error('The joining operation type is not valid', EXIT_MODEL);
 		}
 
 		$this->db->join($joinTable, $cond, $type);
 
-		return success(true);
+		return success();
 	}
 
 	/**
@@ -420,12 +420,13 @@ class DB_Model extends FHC_Model
 	 */
 	public function addOrder($field = null, $type = 'ASC')
 	{
-		// Check class properties and parameters
-		if (is_null($field) || !in_array($type, array('ASC', 'DESC'))) return error(FHC_MODEL_ERROR, FHC_MODEL_ERROR);
+		// Check parameters
+		if (is_null($field)) return error('The field parameter is not valid', EXIT_MODEL);
+		if (!in_array($type, array('ASC', 'DESC'))) return error('The order type is not valid', EXIT_MODEL);
 
 		$this->db->order_by($field, $type);
 
-		return success(true);
+		return success();
 	}
 
 	/**
@@ -435,12 +436,12 @@ class DB_Model extends FHC_Model
 	 */
 	public function addSelect($select, $escape = true)
 	{
-		// Check class properties and parameters
-		if (is_null($select) || $select == '') return error(FHC_MODEL_ERROR, FHC_MODEL_ERROR);
+		// Check parameters
+		if (is_null($select) || $select == '') return error('The select parameter is not valid', EXIT_MODEL);
 
 		$this->db->select($select, $escape);
 
-		return success(true);
+		return success();
 	}
 
 	/**
@@ -461,7 +462,8 @@ class DB_Model extends FHC_Model
 	public function addLimit($start = null, $end = null)
 	{
 		// Check class properties and parameters
-		if (!is_numeric($start) || (is_numeric($start) && $start <= 0)) return error(FHC_MODEL_ERROR, FHC_MODEL_ERROR);
+		if (!is_numeric($start) || (is_numeric($start) && $start <= 0))
+			return error('The start parameter is not valid', EXIT_MODEL);
 
 		if (is_numeric($end) && $end > $start)
 		{
@@ -472,7 +474,7 @@ class DB_Model extends FHC_Model
 			$this->db->limit($start);
 		}
 
-		return success(true);
+		return success();
 	}
 
 	/**
@@ -485,7 +487,7 @@ class DB_Model extends FHC_Model
 		$tmpTable = trim($table);
 
 		// Check parameters
-		if (isEmptyString($tmpTable)) return error(FHC_MODEL_ERROR, FHC_MODEL_ERROR);
+		if (isEmptyString($tmpTable)) return error('The table parameter is not valid', EXIT_MODEL);
 
 		if (!isEmptyString($alias))
 		{
@@ -494,7 +496,7 @@ class DB_Model extends FHC_Model
 
 		$this->db->from($tmpTable);
 
-		return success(true);
+		return success();
 	}
 
 	/**
@@ -509,12 +511,12 @@ class DB_Model extends FHC_Model
 			|| (is_array($fields) && count($fields) == 0)
 			|| (is_string($fields) && $fields == ''))
 		{
-			return error(FHC_MODEL_ERROR, FHC_MODEL_ERROR);
+			return error('The fields parameter is not valid', EXIT_MODEL);
 		}
 
 		$this->db->group_by($fields);
 
-		return success(true);
+		return success();
 	}
 
 	/**
@@ -772,7 +774,7 @@ class DB_Model extends FHC_Model
 			}
 			else
 			{
-				$result = error($this->db->error(), FHC_DB_ERROR);
+				$result = error($this->db->error(), EXIT_DATABASE);
 			}
 		}
 
@@ -827,7 +829,7 @@ class DB_Model extends FHC_Model
 	 */
 	private function _manageUDFs(&$data, $schemaAndTable, $id = null)
 	{
-		$manageUDFs = success(true);
+		$manageUDFs = success();
 
 		if ($this->hasUDF())
 		{

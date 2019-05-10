@@ -31,7 +31,7 @@
 			{
 				foreach ($error as $fieldError)
 				{
-					echo $fieldError->msg . ' -> ' . $fieldError->retval . '<br>';
+					echo $fieldError->code . ': ' . $fieldError->retval . '<br>';
 				}
 			}
 		}

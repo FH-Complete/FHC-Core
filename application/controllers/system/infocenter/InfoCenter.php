@@ -102,15 +102,15 @@ class InfoCenter extends Auth_Controller
 		);
 
 		// Loads models
-		$this->load->model('crm/akte_model', 'AkteModel');
-		$this->load->model('crm/prestudent_model', 'PrestudentModel');
-		$this->load->model('crm/prestudentstatus_model', 'PrestudentstatusModel');
-		$this->load->model('crm/statusgrund_model', 'StatusgrundModel');
-		$this->load->model('person/notiz_model', 'NotizModel');
-		$this->load->model('person/person_model', 'PersonModel');
-		$this->load->model('system/message_model', 'MessageModel');
-		$this->load->model('system/filters_model', 'FiltersModel');
-		$this->load->model('system/personLock_model', 'PersonLockModel');
+		$this->load->model('crm/Akte_model', 'AkteModel');
+		$this->load->model('crm/Prestudent_model', 'PrestudentModel');
+		$this->load->model('crm/Prestudentstatus_model', 'PrestudentstatusModel');
+		$this->load->model('crm/Statusgrund_model', 'StatusgrundModel');
+		$this->load->model('person/Notiz_model', 'NotizModel');
+		$this->load->model('person/Person_model', 'PersonModel');
+		$this->load->model('system/Message_model', 'MessageModel');
+		$this->load->model('system/Filters_model', 'FiltersModel');
+		$this->load->model('system/PersonLock_model', 'PersonLockModel');
 
 		// Loads libraries
 		$this->load->library('PersonLogLib');
@@ -522,7 +522,7 @@ class InfoCenter extends Auth_Controller
 
 				if (isSuccess($result))
 				{
-					$this->load->model('crm/dokumentprestudent_model', 'DokumentprestudentModel');
+					$this->load->model('crm/Dokumentprestudent_model', 'DokumentprestudentModel');
 
 					//set documents which have been formal geprüft to accepted
 					$dokument_kurzbzs = array();

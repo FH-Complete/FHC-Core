@@ -23,7 +23,7 @@ class Notizzuordnung extends APIv1_Controller
 	{
 		parent::__construct(array('Notizzuordnung' => 'basis/notizzuordnung:rw'));
 		// Load model NotizzuordnungModel
-		$this->load->model('person/notizzuordnung_model', 'NotizzuordnungModel');
+		$this->load->model('person/Notizzuordnung_model', 'NotizzuordnungModel');
 
 
 	}
