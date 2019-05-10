@@ -7,6 +7,12 @@ else
 	<tr class="gradelist_row_<?php echo $course['lehrtyp_kurzbz']; ?> gradelist_row_depth_<?php echo $depth; ?>">
 		<td><?php echo $course['bezeichnung']; ?></td>
 		<td align="right"><?php echo (isset($course['ects'])?$course['ects']:''); ?></td>
+		<!--
+		<td align="right"><?php echo (isset($course['sws'])?$course['sws']:''); ?></td>
+		<td align="right"><?php echo (isset($course['lehrform_kurzbz'])?$course['lehrform_kurzbz']:''); ?></td>
+		<td align="right"><?php echo (isset($course['pflicht'])?($course['pflicht']?'Ja':'Nein'):''); ?></td>
+		<td align="right"><?php echo (isset($course['zeugnis'])?($course['zeugnis']?'Ja':'Nein'):''); ?></td>
+		-->
 		<td class="<?php echo $gradeclass; ?>">
 			<?php
 			if (isset($course['note']) && isset($grades[$course['note']]['anmerkung']))
