@@ -1,7 +1,7 @@
 <?php
+
 class Sprache_model extends DB_Model
 {
-
 	/**
 	 * Constructor
 	 */
