@@ -30,10 +30,10 @@
 		{
 			"type": "package",
 			"package": {
-				"name": "codeigniter-restserver",
-				"version": "2.6",
+				"name": "alvaro-prieto/colResizable",
+				"version": "1.6",
 				"dist": {
-					"url": "https://github.com/chriskacerguis/codeigniter-restserver/archive/master.zip",
+					"url": "https://github.com/alvaro-prieto/colResizable/archive/1.6.zip",
 					"type": "zip"
 				}
 			}
@@ -41,21 +41,10 @@
 		{
 			"type": "package",
 			"package": {
-				"name": "jsoneditor",
-				"version": "5.5.6",
+				"name": "BlackrockDigital/startbootstrap-sb-admin-2",
+				"version": "3.3.7.1",
 				"dist": {
-					"url": "https://github.com/josdejong/jsoneditor/archive/v5.5.6.zip",
-					"type": "zip"
-				}
-			}
-		},
-		{
-			"type": "package",
-			"package": {
-				"name": "json-forms",
-				"version": "1.4.0",
-				"dist": {
-					"url": "https://github.com/brutusin/json-forms/archive/v1.4.0.zip",
+					"url": "https://github.com/BlackrockDigital/startbootstrap-sb-admin-2/archive/v3.3.7+1.zip",
 					"type": "zip"
 				}
 			}
@@ -71,13 +60,37 @@
 				}
 			}
 		},
+
 		{
 			"type": "package",
 			"package": {
-				"name": "rmariuzzo/jquery-checkboxes",
-				"version": "1.0.7",
+				"name": "fgelinas/timepicker",
+				"version": "0.3.3",
+				"source": {
+					"url": "https://github.com/fgelinas/timepicker",
+					"type": "git",
+					"reference": "9aebe413b784696639220bc36b7c1e8a30fda129"
+				}
+			}
+		},
+		{
+			"type": "package",
+			"package": {
+				"name": "joeldbirch/superfish",
+				"version": "1.7.9",
 				"dist": {
-					"url": "https://github.com/rmariuzzo/checkboxes.js/archive/v1.0.7.zip",
+					"url": "https://github.com/joeldbirch/superfish/archive/v1.7.9.zip",
+					"type": "zip"
+				}
+			}
+		},
+		{
+			"type": "package",
+			"package": {
+				"name": "jquery/sizzle",
+				"version": "1.0",
+				"dist": {
+					"url": "https://github.com/jquery/sizzle/archive/1.0.0.zip",
 					"type": "zip"
 				}
 			}
@@ -107,54 +120,22 @@
 		{
 			"type": "package",
 			"package": {
-				"name": "fgelinas/timepicker",
-				"version": "0.3.3",
-				"dist": {
-					"url": "https://fgelinas.com/code/timepicker/releases/jquery-ui-timepicker-0.3.3.zip",
-					"type": "zip"
-				}
-			}
-		},
-		{
-			"type": "package",
-			"package": {
-				"name": "alvaro-prieto/colResizable",
-				"version": "1.6",
-				"dist": {
-					"url": "https://github.com/alvaro-prieto/colResizable/archive/1.6.zip",
-					"type": "zip"
-				}
-			}
-		},
-		{
-			"type": "package",
-			"package": {
-				"name": "tapmodo/Jcrop",
-				"version": "2.0.4",
-				"dist": {
-					"url": "https://github.com/tapmodo/Jcrop/archive/v2.0.4.zip",
-					"type": "zip"
-				}
-			}
-		},
-		{
-			"type": "package",
-			"package": {
-				"name": "joeldbirch/superfish",
-				"version": "1.7.9",
-				"dist": {
-					"url": "https://github.com/joeldbirch/superfish/archive/v1.7.9.zip",
-					"type": "zip"
-				}
-			}
-		},
-		{
-			"type": "package",
-			"package": {
-				"name": "jquery/sizzle",
+				"name": "jquery-archive/jquery-metadata",
 				"version": "1.0",
+				"source": {
+					"url": "https://github.com/jquery-archive/jquery-metadata.git",
+					"type": "git",
+					"reference": "e5a9e4315675bf4d68716872ca754e858088f8ab"
+				}
+			}
+		},
+		{
+			"type": "package",
+			"package": {
+				"name": "json-forms",
+				"version": "1.4.0",
 				"dist": {
-					"url": "https://github.com/jquery/sizzle/archive/1.0.0.zip",
+					"url": "https://github.com/brutusin/json-forms/archive/v1.4.0.zip",
 					"type": "zip"
 				}
 			}
@@ -162,21 +143,10 @@
 		{
 			"type": "package",
 			"package": {
-				"name": "nicolaskruchten/pivottable",
-				"version": "2.15.0",
+				"name": "jsoneditor",
+				"version": "5.5.6",
 				"dist": {
-					"url": "https://github.com/nicolaskruchten/pivottable/archive/v2.15.0.zip",
-					"type": "zip"
-				}
-			}
-		},
-		{
-			"type": "package",
-			"package": {
-				"name": "BlackrockDigital/startbootstrap-sb-admin-2",
-				"version": "3.3.7.1",
-				"dist": {
-					"url": "https://github.com/BlackrockDigital/startbootstrap-sb-admin-2/archive/v3.3.7+1.zip",
+					"url": "https://github.com/josdejong/jsoneditor/archive/v5.5.6.zip",
 					"type": "zip"
 				}
 			}
@@ -195,6 +165,28 @@
 		{
 			"type": "package",
 			"package": {
+				"name": "nicolaskruchten/pivottable",
+				"version": "2.15.0",
+				"dist": {
+					"url": "https://github.com/nicolaskruchten/pivottable/archive/v2.15.0.zip",
+					"type": "zip"
+				}
+			}
+		},
+		{
+			"type": "package",
+			"package": {
+				"name": "rmariuzzo/jquery-checkboxes",
+				"version": "1.0.7",
+				"dist": {
+					"url": "https://github.com/rmariuzzo/checkboxes.js/archive/v1.0.7.zip",
+					"type": "zip"
+				}
+			}
+		},
+		{
+			"type": "package",
+			"package": {
 				"name": "scottjehl/Respond",
 				"version": "1.4.2",
 				"dist": {
@@ -206,12 +198,11 @@
 		{
 			"type": "package",
 			"package": {
-				"name": "jquery-archive/jquery-metadata",
-				"version": "1.0",
-				"source": {
-					"url": "https://github.com/jquery-archive/jquery-metadata.git",
-					"type": "git",
-					"reference": "e5a9e4315675bf4d68716872ca754e858088f8ab"
+				"name": "tapmodo/Jcrop",
+				"version": "2.0.4",
+				"dist": {
+					"url": "https://github.com/tapmodo/Jcrop/archive/v2.0.4.zip",
+					"type": "zip"
 				}
 			}
 		},
@@ -229,7 +220,7 @@
 		}
 	],
 	"require": {
-		"php": ">=5.4.0",
+		"php": ">=5.6.40",
 
 		"afarkas/html5shiv": "^3.7",
 		"alvaro-prieto/colResizable": "^1.6",
@@ -239,7 +230,6 @@
 
 		"christianbach/tablesorter": "^1.0",
 		"codeigniter/framework": "3.*",
-		"codeigniter-restserver": "2.6",
 		"components/jquery": "^3.2",
 		"components/jqueryui": "^1.12",
 		"components/font-awesome": "^4.7",
@@ -255,7 +245,6 @@
 		"jquery/jqueryV2": "^2.2",
 		"jquery/sizzle": "^1.0",
 		"jquery-archive/jquery-metadata": "^1.0",
-
 		"json-forms": "1.4.0",
 		"jsoneditor": "5.5.6",
 
@@ -268,9 +257,10 @@
 		"mottie/tablesorter": "^2.29",
 
 		"nategood/httpful": "^0.2.20",
-
 		"netcarver/textile": "^3.5",
 		"nicolaskruchten/pivottable": "^2.15.0",
+
+		"phpseclib/phpseclib": "^2.0",
 
 		"rmariuzzo/jquery-checkboxes": "1.0.7",
 		"rougin/combustor": "1.1.*",
@@ -286,8 +276,7 @@
 		"zetacomponents/workflow": "1.*",
 		"zetacomponents/document": "1.*",
 		"zetacomponents/workflow-database-tiein": "1.*",
-		"zetacomponents/workflow-event-log-tiein": "1.*",
-		"phpseclib/phpseclib": "^2.0"
+		"zetacomponents/workflow-event-log-tiein": "1.*"
 	},
 	"require-dev": {
 		"squizlabs/php_codesniffer": "2.*"
