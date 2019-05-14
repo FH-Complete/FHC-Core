@@ -177,12 +177,24 @@ if (isset($_POST['prestudent']) && isset($gebdatum))
 				$_SESSION['sprache']=$stg_obj->sprache;
 
 				$_SESSION['semester']=$semester;
+                $stg_obj->getStudiengangTyp($stg_obj->typ);
 
 				// STG und Studienplan mit der höchsten Prio ermitteln
 				$firstPrio_studienplan_id = '';
 				$firstPrio_studiengang_kz = '';
 
-				$ps->getActualInteressenten($_POST['prestudent'], true);
+                //  * wenn STG des eingeloggten Prestudenten vom Typ Bachelor ist, dann höchste Prio aller
+                //  Bachelor-STG ermitteln, an denen die Person noch interessiert ist
+                //  Wenn STG vom Typ Master, dann wird als firstPrio der STPL bzw. der STG des MasterSTG gesetzt.
+                if ($stg_obj->typ == 'b')
+                {
+                    $ps->getActualInteressenten($_POST['prestudent'], true);
+                }
+                elseif ($stg_obj->typ == 'm')
+                {
+                    $ps->getActualInteressenten($_POST['prestudent'], false, 'm', $studiengang);
+                }
+
 				foreach($ps->result as $row)
 				{
 					if(isset($row->studiengang_kz))
