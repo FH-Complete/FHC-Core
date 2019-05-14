@@ -150,7 +150,7 @@ if (isset($_SESSION['pruefling_id']))
 			tbl_studiengangstyp.bezeichnung AS typ_bz,
 	        ausbildungssemester AS semester
         FROM
-	        public.tbl_prestudentstatus
+	        public.tbl_prestudentstatus AS ps_status
         JOIN
 	        public.tbl_prestudent USING (prestudent_id)
         JOIN
@@ -178,6 +178,18 @@ if (isset($_SESSION['pruefling_id']))
 			        ende > now()
 	        )
 
+        /* Filter out all Abgewiesene */
+        AND NOT EXISTS (
+            SELECT 
+                1 
+            FROM
+                tbl_prestudentstatus
+            WHERE 
+                status_kurzbz = 'Abgewiesener' 
+            AND 
+                prestudent_id = ps_status.prestudent_id
+        )
+
         AND
 	        status_kurzbz = 'Interessent'";
 
@@ -200,8 +212,8 @@ if (isset($_SESSION['pruefling_id']))
         ORDER BY
 	        prestudent_id,
 	        datum DESC,
-	        tbl_prestudentstatus.insertamum DESC,
-	        tbl_prestudentstatus.ext_id DESC
+	        ps_status.insertamum DESC,
+	        ps_status.ext_id DESC
         )
 
 
@@ -211,7 +223,7 @@ if (isset($_SESSION['pruefling_id']))
 	        gebiet_id,
 	        STRING_AGG(studiengang_kz::TEXT, ', ' ORDER BY studiengang_kz) AS studiengang_kz_list,
 	        bezeichnung,
-	        reihung,
+	        MIN(reihung) AS reihung,
             ". $bezeichnung_mehrsprachig_sel. "
         FROM (
             SELECT
@@ -268,7 +280,6 @@ if (isset($_SESSION['pruefling_id']))
             semester,
              gebiet_id,
              bezeichnung,
-	         reihung,
              bezeichnung_mehrsprachig_1,
              bezeichnung_mehrsprachig_2,
              bezeichnung_mehrsprachig_3,
@@ -276,8 +287,7 @@ if (isset($_SESSION['pruefling_id']))
 
         ORDER BY
 	        semester,
-	        gebiet_id,
-	        reihung
+	        gebiet_id
         ";
 
 	$result = $db->db_query($qry);
