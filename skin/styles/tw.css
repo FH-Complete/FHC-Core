@@ -407,6 +407,12 @@ TABLE#tabterm
 {
 	margin:auto;
 }
+
+.well
+{
+	background-color: white;
+	border: 2px solid #add4ea;
+}
 td.rand /* Seitenraender des CIS */
 {
 	font-size: 11px;
@@ -458,8 +464,8 @@ td.HeaderTesttool /*fuer die Button-Optik beim Testtool*/
 }
 td.HeaderTesttoolSTG /*fuer die Button-Optik der Quereinstiegs-Studiengänge beim Testtool*/
 {
-	color: #00639C;
-	border: 2px solid #00639C;
+	color: white;
+	border: 2px solid #add4ea;
 	padding: 10px;
 	max-width: 100px;
 	overflow: hidden;

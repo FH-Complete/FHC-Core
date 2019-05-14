@@ -436,7 +436,6 @@ if (isset($prestudent_id))
                 <tr>
                     <th>'. $p->t('global/studiengang'). '</th>
                     <th>Status</th>
-                    <th>'. $p->t('testtool/reihungstest'). '</th>
                  </tr>
             </thead>    
             <tbody>  
@@ -457,13 +456,13 @@ if (isset($prestudent_id))
                 $ps_tmp->getLastStatus($ps_obj->prestudent_id);
 
                 $ps_obj->lastStatus = $ps_tmp->status_kurzbz; // letzten Status dem result array hinzufügen
+                $ps_obj->status_mehrsprachig = $ps_tmp->status_mehrsprachig;
             }
 
             // Falls Status 'Abgewiesene' vorhanden, nach hinten reihen
             usort($ps_arr->result, function($a, $b){
                 return strcmp($b->lastStatus, $a->lastStatus); // Order by DESC
             });
-
             foreach ($ps_arr->result as $ps_obj)
             {
                 echo '<tr>';
@@ -475,12 +474,10 @@ if (isset($prestudent_id))
                     if($ps_obj->ausbildungssemester == '1')
                     {
                         echo '<td>'. $p->t('testtool/regulaererEinstieg'). ' (1. Semester)</td>';
-						echo '<td>Basic</td>';
                     }
                     elseif($ps_obj->ausbildungssemester == '3')
                     {
-                        echo '<td>'. $p->t('testtool/Quereinsteiger'). ' (3.Semester)</td>';
-						echo '<td>Basic + '. $p->t('testtool/Quereinsteiger'). '</td>';
+                        echo '<td>'. $p->t('testtool/quereinstieg'). ' (3.Semester)</td>';
                     }
                 }
                 // wenn letzter Status \'Abgewiesener\' ist, dann als solchen kennzeichnen
@@ -488,8 +485,7 @@ if (isset($prestudent_id))
                 {
                     echo '
                         <td class="text-muted">'. $ps_obj->typ_bz .' '. ($sprache_user == 'English' ? $stg->english : $stg->bezeichnung). '</td>
-                        <td class="text-muted">'. $ps_obj->lastStatus. '</td>
-                        <td class="text-muted">-</td>
+                        <td class="text-muted">'. $ps_obj->status_mehrsprachig[$sprache_user]. '</td>
                     ';
                 }
                 echo '</tr>';
@@ -503,8 +499,7 @@ if (isset($prestudent_id))
         $ps_master = new Prestudent();
 		$ps_master->getLastStatus($prestudent_id);
         echo '<td>'. $typ->bezeichnung.' '.($sprache_user=='English'?$stg_obj->english:$stg_obj->bezeichnung).'</td>';
-		echo '<td>'. $ps_master->status_kurzbz.'</td>';
-		echo '<td>Basic</td>';
+		echo '<td>'. $ps_master->status_mehrsprachig[$sprache_user]. '</td>';
     }
 
     echo ' 
