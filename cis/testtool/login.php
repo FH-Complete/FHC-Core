@@ -434,7 +434,7 @@ if (isset($prestudent_id))
          <table class="table table-bordered">        
             <thead>
                 <tr>
-                    <th>'. $p->t('global/studiengang'). '</th>
+                    <th style="width: 50%;">'. $p->t('global/studiengang'). '</th>
                     <th>Status</th>
                  </tr>
             </thead>    

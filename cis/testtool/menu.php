@@ -82,6 +82,9 @@ session_start();
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <link href="../../skin/style.css.php" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="../../vendor/twbs/bootstrap/dist/css/bootstrap.min.css" type="text/css"/>
+    <script type="text/javascript" src="../../vendor/components/jquery/jquery.min.js"></script>
+    <script type="text/javascript" src="../../vendor/twbs/bootstrap/dist/js/bootstrap.min.js"></script>
 </head>
 
 <body scroll="no">
@@ -106,7 +109,7 @@ if (isset($_SESSION['pruefling_id']))
 		if($content_id->content_id!='')
         {
 			echo '
-                <tr><td class="ItemTesttool" style="margin-left: 20px;" nowrap>
+                <tr id="tr-einleitung"><td class="ItemTesttool" style="margin-left: 20px;" nowrap>
                     <a class="ItemTesttool navButton" href="../../cms/content.php?content_id='.$content_id->content_id.'&sprache='.$sprache.'" target="content">'.$p->t('testtool/einleitung').'</a>
                 </td></tr>
             ';
@@ -228,7 +231,7 @@ if (isset($_SESSION['pruefling_id']))
         FROM (
             SELECT
                 *
-            FROM (    
+            FROM ( 
                 (SELECT
                     prestudent_data.semester AS ps_sem,
                     gebiet_id,
@@ -294,6 +297,7 @@ if (isset($_SESSION['pruefling_id']))
 	$lastsemester = '';
 	$quereinsteiger_stg = '';
     $gebiet_hasMathML = false; // true, wenn irgendein Gebiet eine/n Frage/Vorschlag im MathML-Format enthält
+    $invalid_gebiete = false;
 	while($row = $db->db_fetch_object($result))
 	{
 		//Jedes Semester in einer eigenen Tabelle anzeigen
@@ -394,11 +398,7 @@ if (isset($_SESSION['pruefling_id']))
 		}
 		else
 		{
-			echo '<tr>
-						<td nowrap>
-							<span class="error">&nbsp;'.$row->gebiet_bez.' (invalid)</span>
-						</td>
-					</tr>';
+			$invalid_gebiete = true;
 		}
 	}
 	echo '</table>';
@@ -440,5 +440,20 @@ else
             }
         }
     }
+
+    // Error massage if check_gebiet function returns false
+    $(function() {
+        var invalid_gebiete = "<?php echo $invalid_gebiete; ?>";
+        if(invalid_gebiete == true)
+        {
+            $('#tr-einleitung').append('' +
+                '<tr><td>' +
+                '<div class="alert alert-danger small" style="margin-left: 20px; margin-bottom:-3px; width: 170px; margin-top: 3px;" role="alert">' +
+                '<span class="text-uppercase"><strong><?php echo $p->t("errors/achtung"); ?></strong></span><br>' +
+                '<?php echo $p->t("testtool/invalideGebiete"); ?>' +
+                '</div>' +
+                '</td></tr>');
+        }
+    });
 </script>
 </html>

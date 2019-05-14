@@ -46,4 +46,5 @@ $this->phrasen['testtool/fehlerBeimSpeichernDerErstansicht']='Fehler beim Speich
 $this->phrasen['testtool/startDrueckenUmZuBeginnen']='Um dieses Teilgebiet zu starten, drücken Sie bitte links oben auf <b>Gebiet starten</b>.';
 $this->phrasen['testtool/keinPrueflingseintragVorhanden']='Kein Prüflingseintrag vorhanden';
 $this->phrasen['testtool/fuerFolgendeStgAngemeldet']='Für folgende Studiengänge haben Sie sich angemeldet:';
+$this->phrasen['testtool/invalideGebiete']='Ein oder mehrere Fragengebiet/e inkorrekt!<br>Bitte melden Sie dies der Betreuungsperson.';
 ?>

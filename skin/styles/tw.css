@@ -461,6 +461,7 @@ td.HeaderTesttool /*fuer die Button-Optik beim Testtool*/
 	line-height: 25px;
 	box-shadow: inset 0 0 2px #FFFFFF;
 	padding: 10px;
+	width: 170px;
 }
 td.HeaderTesttoolSTG /*fuer die Button-Optik der Quereinstiegs-Studiengänge beim Testtool*/
 {
