@@ -57,6 +57,7 @@ $this->phrasen['lvplan/raumsuche']='';
 $this->phrasen['lvplan/raumtyp']='';
 $this->phrasen['lvplan/reservierungen']='';
 $this->phrasen['lvplan/reservierungenLoeschen']='';
+$this->phrasen['lvplan/meineReservierungenAnzeigen']='';
 $this->phrasen['lvplan/reservierungsliste']='';
 $this->phrasen['lvplan/reservierungWurdeGeloescht']='';
 $this->phrasen['lvplan/saal']='';
