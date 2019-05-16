@@ -278,9 +278,6 @@
 		"zetacomponents/workflow-database-tiein": "1.*",
 		"zetacomponents/workflow-event-log-tiein": "1.*"
 	},
-	"require-dev": {
-		"squizlabs/php_codesniffer": "2.*"
-	},
 	"config": {
 		"bin-dir": "vendor/bin"
 	}
