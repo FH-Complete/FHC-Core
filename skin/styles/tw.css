@@ -642,12 +642,38 @@ TABLE.stdplan TD
 {
 	background-color: #E9ECEE;
 }
+
+/*reservation delete-"x"*/
+TABLE.stdplan div.reservdelete {
+	text-align: right;
+	margin-bottom:-4px;
+	padding-top: 2px;
+	padding-right: 2px;
+}
+
 .row-even { /*liste1*/
  background-color:#f2f2f2;
 }
 
 .row-odd { /*liste0*/
   background-color:#ffffff;
+}
+
+/*lecturer reservation rows*/
+td.lecturercell {
+	border: 1px solid;
+}
+
+td.lecturercell div.lecturercellname {
+	width: 95%;
+	float: left;
+}
+
+td.lecturercell div.lecturercelldelete {
+	width: 5%;
+	float: left;
+	text-align: right;
+	cursor: pointer;
 }
 
 /*
