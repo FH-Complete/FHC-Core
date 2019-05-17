@@ -65,6 +65,7 @@ require_once('../../include/benutzerberechtigung.class.php');
 			<th>Typ</th>
 			<th>Bezeichnung</th>
 			<th>Englisch</th>
+			<th>Lehrgangsart</th>
 			<th data-placeholder="t or f">Aktiv</th>
 			<th>Email</th>
 		</tr></thead><tbody>
@@ -72,6 +73,8 @@ require_once('../../include/benutzerberechtigung.class.php');
 	$i = 0;
 	foreach ($sg->result as $stg)
 	{
+		$lehrgangsart = new studiengang();
+		$lehrgangsart->loadLehrgangstyp($stg->lgartcode);
 		//$htmlstr .= "   <tr class='liste". ($i%2) ."'>\n";
 		$htmlstr .= "   <tr>\n";
 		$htmlstr .= "	<td><a href='studiengang_details.php?studiengang_kz=".$stg->studiengang_kz."' target='detail_studiengang'>".$stg->studiengang_kz."</a></td>\n";
@@ -80,6 +83,7 @@ require_once('../../include/benutzerberechtigung.class.php');
 		$htmlstr .= "	<td>".$stg->typ."</td>\n";
 		$htmlstr .= "	<td><a href='studiengang_details.php?studiengang_kz=".$stg->studiengang_kz."' target='detail_studiengang'>".$stg->bezeichnung."</a></td>\n";
 		$htmlstr .= "	<td>".$stg->english."</td>\n";
+		$htmlstr .= "	<td>".$lehrgangsart->bezeichnung."</td>\n";
 		
 		if($stg->aktiv)
 			$aktivbild = "true.png";	
