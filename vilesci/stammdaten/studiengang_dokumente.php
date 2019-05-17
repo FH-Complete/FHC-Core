@@ -34,6 +34,7 @@ $dokument_kurzbz = isset($_REQUEST['dokument_kurzbz']) ? $_REQUEST['dokument_kur
 $onlinebewerbung = isset($_REQUEST['onlinebewerbung']);
 $pflicht = isset($_POST['pflicht']);
 $nachreichbar = isset($_POST['nachreichbar']);
+$stufe = isset($_REQUEST['stufe']) ? $_REQUEST['stufe'] : '';
 
 $sprache = new sprache();
 $sprache->getAll(true, 'index');
@@ -64,6 +65,7 @@ if($action == 'add')
 		$dokument->onlinebewerbung = $onlinebewerbung;
         $dokument->pflicht = $pflicht;
         $dokument->nachreichbar = $nachreichbar;
+		$dokument->stufe = $stufe;
 
 		$beschreibung_mehrsprachig = array();
 		foreach($sprache->result as $row_sprache)
@@ -453,6 +455,7 @@ else
 			echo'	<th class="sorter-false" style="text-align: center">Online-Bewerbung</th>
 					<th class="sorter-false" style="text-align: center">Pflicht</th>
 					<th class="sorter-false" style="text-align: center">Nachreichbar</th>
+					<th class="sorter-false" style="text-align: center">Stufe</th>
 					<th class="sorter-false"></th>';
 		}
 		echo'</tr>
@@ -491,6 +494,7 @@ else
 				echo'	<td style="text-align: center"><a href="'.$_SERVER['PHP_SELF'].'?action=toggleonline&dokument_kurzbz='.$dok->dokument_kurzbz.'&stg_kz='.$stg_kz.'"><img src="../../skin/images/'.$checked_onlinebewerbung.'.png" /></a></td>
 						<td style="text-align: center"><a href="'.$_SERVER['PHP_SELF'].'?action=togglepflicht&dokument_kurzbz='.$dok->dokument_kurzbz.'&stg_kz='.$stg_kz.'"><img src="../../skin/images/'.$checked_pflicht.'.png" /></a></td>
 						<td style="text-align: center"><a href="'.$_SERVER['PHP_SELF'].'?action=togglenachreichbar&dokument_kurzbz='.$dok->dokument_kurzbz.'&stg_kz='.$stg_kz.'"><img src="../../skin/images/'.$checked_nachreichbar.'.png" /></a></td>
+						<td style="text-align: center">'.$dok->stufe.'</td>
 						<td style="text-align: center">';
 						if($rechte->isBerechtigt('assistenz', $stg_kz, 'su'))
 							echo '<a href="'.$_SERVER['PHP_SELF'].'?action=edit&dokument_kurzbz='.$dok->dokument_kurzbz.'&stg_kz='.$stg_kz.'"><img src="../../skin/images/edit.png" title="Zuordnung bearbeiten" size="17px" /></a>';
@@ -545,6 +549,9 @@ else
 					</td>
 					<td  class="normal" style="text-align: center" valign="top">
 						<input type="checkbox" name="nachreichbar" '.($dok_stg->nachreichbar?'checked="checked"':'').'>
+					</td>
+					<td class="normal" style="text-align: center" valign="top">
+						<input type="text" style="width: 30px" name="stufe" value="'.$dok_stg->stufe.'">
 					</td>
 					<td  class="normal" valign="top"><input type="submit" name="add" value="Speichern"></td>
 				</tr>

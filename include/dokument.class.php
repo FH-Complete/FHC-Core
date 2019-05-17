@@ -36,6 +36,7 @@ class dokument extends basis_db
 	public $bezeichnung_mehrsprachig;
 	public $dokumentbeschreibung_mehrsprachig;
 	public $ausstellungsdetails = false;
+	public $stufe;
 
 	public $prestudent_id;
 	public $mitarbeiter_uid;
@@ -428,6 +429,7 @@ class dokument extends basis_db
 				$dok->nachreichbar = $this->db_parse_bool($row->nachreichbar);
 				$dok->onlinebewerbung = $this->db_parse_bool($row->onlinebewerbung);
 				$dok->ausstellungsdetails = $this->db_parse_bool($row->ausstellungsdetails);
+				$dok->stufe = $row->stufe;
 				$this->result[] = $dok;
 			}
 			return true;
@@ -467,6 +469,7 @@ class dokument extends basis_db
 				$dok->nachreichbar = $this->db_parse_bool($row->nachreichbar);
 				$dok->onlinebewerbung = $this->db_parse_bool($row->onlinebewerbung);
 				$dok->ausstellungsdetails = $this->db_parse_bool($row->ausstellungsdetails);
+				$dok->stufe = $row->stufe;
 
 				$this->result[] = $dok;
 			}
@@ -545,6 +548,7 @@ class dokument extends basis_db
 				$this->pflicht = $this->db_parse_bool($row->pflicht);
 				$this->nachreichbar = $this->db_parse_bool($row->nachreichbar);
 				$this->beschreibung_mehrsprachig = $sprache->parseSprachResult('beschreibung_mehrsprachig',$row);
+				$this->stufe = $row->stufe;
 				return true;
 			}
 			else
@@ -605,7 +609,7 @@ class dokument extends basis_db
 				$qry.=" beschreibung_mehrsprachig[$idx],";
 			}
 
-			$qry.=' pflicht, nachreichbar, onlinebewerbung)
+			$qry.=' pflicht, nachreichbar, onlinebewerbung, stufe)
 				VALUES ('.
 					$this->db_add_param($this->dokument_kurzbz).','.
 					$this->db_add_param($this->studiengang_kz,FHC_INTEGER).',';
@@ -615,7 +619,8 @@ class dokument extends basis_db
 
 			$qry.=	$this->db_add_param($this->pflicht,FHC_BOOLEAN).','.
 					$this->db_add_param($this->nachreichbar,FHC_BOOLEAN).','.
-					$this->db_add_param($this->onlinebewerbung,FHC_BOOLEAN).')';
+					$this->db_add_param($this->onlinebewerbung,FHC_BOOLEAN).','.
+					$this->db_add_param($this->stufe,FHC_INTEGER).')';
 		}
 		else
 		{
@@ -628,7 +633,8 @@ class dokument extends basis_db
 				$qry.=" beschreibung_mehrsprachig[$idx]=".$this->db_add_param($value).",";
 			}
 			$qry.='		pflicht='.$this->db_add_param($this->pflicht, FHC_BOOLEAN).',
-						nachreichbar='.$this->db_add_param($this->nachreichbar, FHC_BOOLEAN).'
+						nachreichbar='.$this->db_add_param($this->nachreichbar, FHC_BOOLEAN).',
+						stufe='.$this->db_add_param($this->stufe, FHC_INTEGER).'
 					WHERE
 						dokument_kurzbz='.$this->db_add_param($this->dokument_kurzbz).'
 						AND studiengang_kz='.$this->db_add_param($this->studiengang_kz);
@@ -714,6 +720,7 @@ class dokument extends basis_db
 				$dok->dokumentbeschreibung_mehrsprachig = $sprache->parseSprachResult('dokumentbeschreibung_mehrsprachig', $row);
 				$dok->beschreibung_mehrsprachig = $sprache->parseSprachResult('beschreibung_mehrsprachig', $row);
 				$dok->ausstellungsdetails = $this->db_parse_bool($row->ausstellungsdetails);
+				$dok->stufe = $row->stufe;
 
 				$this->result[] = $dok;
 			}
