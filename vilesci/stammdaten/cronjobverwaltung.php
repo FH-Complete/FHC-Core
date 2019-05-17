@@ -258,7 +258,7 @@ if(isset($_GET['type']) && ($_GET['type']=='edit' || $_GET['type']=='new'))
 				<td><label for="titel">Titel</label></td>
 				<td><input type="text" name="titel" id="titel" maxlength="64" value="'.htmlspecialchars($cj->titel).'"></td>
 				<td><label for="beschreibung">Beschreibung</label></td>
-				<td colspan="8"><input type="text" name="beschreibung" id="beschreibung" size="80" value="'.htmlspecialchars($cj->beschreibung).'"></td>				
+				<td colspan="10"><input type="text" name="beschreibung" id="beschreibung" size="80" value="'.htmlspecialchars($cj->beschreibung).'"></td>				
 			</tr>
 			<tr>
 				<td><label for="server_kurzbz">Server</label></td>
@@ -287,7 +287,7 @@ if(isset($_GET['type']) && ($_GET['type']=='edit' || $_GET['type']=='new'))
 				<td><label for="file">Datei
 					<img src="../../skin/images/information.png" title="absoluter Pfad im Filesystem zB /var/www/vilesci/job.php" />
 					</label></td>
-				<td colspan="8"><input type="text" size="80" id="file" name="file" value="'.htmlspecialchars($cj->file).'"></td>
+				<td colspan="10"><input type="text" size="200" id="file" name="file" value="'.htmlspecialchars($cj->file).'"></td>
 			</tr>
 			<tr>
 				<td><label for="jahr">Jahr</label></td>
@@ -322,6 +322,7 @@ if(isset($_GET['type']) && ($_GET['type']=='edit' || $_GET['type']=='new'))
 				<td><input type="text" name="stunde" id="stunde" maxlength="4" size="4" value="'.htmlspecialchars($cj->stunde).'"></td>
 				<td><label for="minute">Minute</label></td>
 				<td><input type="text" name="minute" id="minute" maxlength="4" size="4" value="'.htmlspecialchars($cj->minute).'"></td>
+				<td style="width: 500px"></td>
 			</tr>
 			<tr>
 				<td><label for="aktiv">Aktiv</label></td>
