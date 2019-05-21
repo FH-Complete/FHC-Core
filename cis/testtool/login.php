@@ -120,8 +120,12 @@ if (isset($_POST['prestudent']) && isset($gebdatum))
 		$rt = new reihungstest();
 
 		// Wenns der Dummy ist dann extra laden
+		// An der FHTW gibt es 3 Testuser für den Camus International
 		$prestudent_id_dummy_student = (defined('PRESTUDENT_ID_DUMMY_STUDENT')?PRESTUDENT_ID_DUMMY_STUDENT:'');
-		if($prestudent_id_dummy_student==$ps->prestudent_id)
+		if($prestudent_id_dummy_student==$ps->prestudent_id ||
+			(CAMPUS_NAME == 'FH Technikum Wien' && $ps->prestudent_id == 30891) ||
+			(CAMPUS_NAME == 'FH Technikum Wien' && $ps->prestudent_id == 30890) ||
+			(CAMPUS_NAME == 'FH Technikum Wien' && $ps->prestudent_id == 30889))
 		{
 			$rt->getReihungstestPerson($ps->person_id);
 			if(isset($rt->result[0]))
@@ -612,6 +616,13 @@ else
         else
             $selected='';
         echo '<OPTION value="'.$prestd->prestudent_id.'" '.$selected.'>'.$prestd->nachname.' '.$prestd->vorname.' ('.(strtoupper($stg->typ.$stg->kurzbz)).')</OPTION>\n';
+    }
+    // An der FHTW gibt es 3 Testuser für den Camus International
+    if (CAMPUS_NAME == 'FH Technikum Wien')
+    {
+	    echo '<OPTION value="30891">Testuser Campus International 01</OPTION>\n';
+	    echo '<OPTION value="30890">Testuser Campus International 02</OPTION>\n';
+	    echo '<OPTION value="30889">Testuser Campus International 03</OPTION>\n';
     }
     echo '</SELECT>';
     echo '&nbsp; '.$p->t('global/geburtsdatum').': ';

@@ -545,7 +545,10 @@ if(isset($_POST['save']) || isset($_POST['edit']) || isset($_POST['import']))
 								$zeit->aktivitaet_kurzbz = $data[1];
 								$zeit->start = $datum->formatDatum($data[2], $format='Y-m-d H:i:s');
 								$zeit->ende = $datum->formatDatum($data[3], $format='Y-m-d H:i:s');
-								$zeit->beschreibung = $data[4];
+								if (isset($data[4]))
+									$zeit->beschreibung = $data[4];
+								if (isset($data[5]))
+									$zeit->service_id = $data[5];
 								$tag = $datum->formatDatum($data[2], $format='Y-m-d');
 
 								if(!in_array($tag, $importtage_array))

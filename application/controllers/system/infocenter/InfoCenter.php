@@ -65,6 +65,9 @@ class InfoCenter extends Auth_Controller
 		)
 	);
 
+	// Statusgruende for which no Studiengangsfreigabemessage should be sent
+	private $_statusgruendeNoStgFreigabeMessage = array('FIT Programm', 'FIT program', 'FIT programme');
+
 	/**
 	 * Constructor
 	 */
@@ -1210,18 +1213,16 @@ class InfoCenter extends Auth_Controller
 			show_error($prestudenten->retval);
 		}
 
-		$interessentenCount = array();
-
 		foreach ($prestudenten->retval as $prestudent)
 		{
-			$prestudent = $this->PrestudentModel->getPrestudentWithZgv($prestudent->prestudent_id);
+			$prestudentWithZgv = $this->PrestudentModel->getPrestudentWithZgv($prestudent->prestudent_id);
 
-			if (isError($prestudent))
+			if (isError($prestudentWithZgv))
 			{
-				show_error($prestudent->retval);
+				show_error($prestudentWithZgv->retval);
 			}
 
-			$zgvpruefung = $prestudent->retval[0];
+			$zgvpruefung = $prestudentWithZgv->retval[0];
 
 			if (isset($zgvpruefung->prestudentstatus))
 			{
@@ -1233,7 +1234,39 @@ class InfoCenter extends Auth_Controller
 			//if prestudent is not interessent or is already bestaetigt, then show only as information, non-editable
 			$zgvpruefung->infoonly = !isset($zgvpruefung->prestudentstatus) || isset($zgvpruefung->prestudentstatus->bestaetigtam) || $zgvpruefung->prestudentstatus->status_kurzbz != 'Interessent';
 
-			//numeric application priority
+			//wether prestudent was freigegeben for RT/Stg
+			$zgvpruefung->isRtFreigegeben = false;
+			$zgvpruefung->isStgFreigegeben = false;
+			$zgvpruefung->sendStgFreigabeMsg = true;//wether Stgudiengangfreigabemessage can be sent (for "exceptions", Studiengänge with no message sending)
+			$this->PrestudentstatusModel->addSelect('bestaetigtam, statusgrund_id, tbl_status_grund.bezeichnung_mehrsprachig AS bezeichnung_statusgrund');
+			$this->PrestudentstatusModel->addJoin('public.tbl_status_grund', 'statusgrund_id', 'LEFT');
+			$isFreigegeben = $this->PrestudentstatusModel->loadWhere(array('studiensemester_kurzbz' => $zgvpruefung->prestudentstatus->studiensemester_kurzbz,
+														  'tbl_prestudentstatus.status_kurzbz' => 'Interessent', 'prestudent_id' => $prestudent->prestudent_id));
+
+
+			if (hasData($isFreigegeben))
+			{
+				foreach ($isFreigegeben->retval as $prestudentstatus)
+				{
+					if (isset($prestudentstatus->bestaetigtam))
+					{
+						//if statusgrund set - RTfreigabe, otherwise Stgfreigabe
+						if (isset($prestudentstatus->statusgrund_id))
+						{
+							if (isset($prestudentstatus->bezeichnung_statusgrund[0])
+								&& in_array($prestudentstatus->bezeichnung_statusgrund[0], $this->_statusgruendeNoStgFreigabeMessage))
+								$zgvpruefung->sendStgFreigabeMsg = false;
+							else
+								$zgvpruefung->isStgFreigegeben = true;
+
+						}
+						else
+							$zgvpruefung->isRtFreigegeben = true;
+					}
+				}
+			}
+
+			//application priority change possible?
 			$zgvpruefung->changeup = false;
 			$zgvpruefung->changedown = false;
 
@@ -1244,10 +1277,6 @@ class InfoCenter extends Auth_Controller
 					$studiensemester = $zgvpruefung->prestudentstatus->studiensemester_kurzbz;
 					$zgvpruefung->changeup = $this->PrestudentModel->checkPrioChange($zgvpruefung->prestudent_id, $studiensemester, -1);
 					$zgvpruefung->changedown = $this->PrestudentModel->checkPrioChange($zgvpruefung->prestudent_id, $studiensemester, 1);
-					if (array_key_exists($studiensemester, $interessentenCount))
-						$interessentenCount[$studiensemester]++;
-					else
-						$interessentenCount[$studiensemester] = 1;
 				}
 			}
 

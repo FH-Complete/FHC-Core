@@ -279,9 +279,14 @@ class kontakt extends basis_db
 			return false;
 		}
 
-		$qry = "SELECT tbl_kontakt.*, tbl_firma.name as firma_name, tbl_firma.firma_id
-				FROM public.tbl_kontakt LEFT JOIN public.tbl_standort USING(standort_id) LEFT JOIN public.tbl_firma USING(firma_id) WHERE person_id=".$this->db_add_param($person_id, FHC_INTEGER)."
-				AND kontakttyp =".$this->db_add_param($kontakttyp, FHC_STRING);
+		$qry = "SELECT tbl_kontakt.*,
+					tbl_firma.NAME AS firma_name,
+					tbl_firma.firma_id
+				FROM PUBLIC.tbl_kontakt
+				LEFT JOIN PUBLIC.tbl_standort USING (standort_id)
+				LEFT JOIN PUBLIC.tbl_firma USING (firma_id)
+				WHERE person_id = ".$this->db_add_param($person_id, FHC_INTEGER)."
+					AND kontakttyp = ".$this->db_add_param($kontakttyp, FHC_STRING);
 
 		if ($order != null)
 			$qry .= " ORDER BY ".$order;
