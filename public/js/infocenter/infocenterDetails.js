@@ -9,7 +9,6 @@ const STGFREIGABE_MESSAGE_VORLAGE = "InfocenterSTGfreigegeben";
 
 //Statusgründe for which no Studiengang Freigabe Message should be sent
 const FIT_PROGRAMM_STUDIENGAENGE = [10021, 10027];
-const STGFREIGABE_MESSAGESEND_EXCEPTIONS = ["FIT Programm", "FIT program", "FIT programme"];
 
 /**
  * javascript file for infocenterDetails page
@@ -510,10 +509,11 @@ var InfocenterDetails = {
 
 			var prestudent_id = freigabedata.prestudent_id;
 			var statusgrund_id = freigabedata.statusgrund_id;
-			var rtfreigabe = !$.isNumeric(statusgrund_id);
+			var rtfreigabe = !$.isNumeric(statusgrund_id);//no Statusgrund - RT Freigabe
 
 			var rtFreigegeben = false;
 			var stgFreigegeben = false;
+			var receiverPrestudent = null;
 			var receiverPrestudentstatus = null;
 
 			//get prestudentstatus of message receiver
@@ -521,12 +521,13 @@ var InfocenterDetails = {
 			{
 				if (prestudentdata[i].prestudentstatus.prestudent_id === prestudent_id)
 				{
-					receiverPrestudentstatus = prestudentdata[i].prestudentstatus;
+					receiverPrestudent = prestudentdata[i];
+					receiverPrestudentstatus = receiverPrestudent.prestudentstatus;
 					break;
 				}
 			}
 
-			if (receiverPrestudentstatus == null)
+			if (receiverPrestudent == null || receiverPrestudentstatus == null)
 				return;
 
 			//check other prestudentstati wether already freigegeben
@@ -536,20 +537,18 @@ var InfocenterDetails = {
 				var prestudentstatus = prestudent.prestudentstatus;
 				var id = prestudentstatus.prestudent_id;
 
-				if (id !== prestudent_id)
+				if (id !== prestudent_id) //exclude receiver prestudentstatus
 				{
-					var fitfreigegeben = $.inArray(prestudentstatus.bezeichnung_statusgrund[0], STGFREIGABE_MESSAGESEND_EXCEPTIONS) >= 0;
 					var fitstg = $.inArray(parseInt(prestudent.studiengang_kz), FIT_PROGRAMM_STUDIENGAENGE) >= 0;
 
 					if (receiverPrestudentstatus.studiensemester_kurzbz === prestudentstatus.studiensemester_kurzbz
-						&& prestudentstatus.bestaetigtam !== null && prestudentstatus.status_kurzbz === "Interessent"
 						&& (prestudent.studiengangtyp === "b" || fitstg))
 					{
-						if (prestudentstatus.statusgrund_id === null)
+						if (prestudent.isRtFreigegeben)
 						{
 							rtFreigegeben = true;
 						}
-						else if ($.isNumeric(prestudentstatus.statusgrund_id) && !fitfreigegeben)
+						else if (prestudent.isStgFreigegeben)
 						{
 							stgFreigegeben = true;
 						}
@@ -603,12 +602,10 @@ var InfocenterDetails = {
 					InfocenterDetails.sendFreigabeMessage(prestudent_id, vorlage, msgvars);
 				}
 			}
-			else if (rtfreigabe === false)
+			else
 			{
-				var statusgrundbez = freigabedata.statusgrundbezeichnung ? freigabedata.statusgrundbezeichnung : "";
-
-				//if Freigabe to Studiengang, send StgFreigabe Message if not already sent
-				if (!stgFreigegeben && $.inArray(statusgrundbez, STGFREIGABE_MESSAGESEND_EXCEPTIONS) < 0)
+				//if Freigabe to Studiengang, send StgFreigabe Message if not already sent and allowed to send
+				if (!stgFreigegeben && receiverPrestudent.sendStgFreigabeMsg === true)
 				{
 					InfocenterDetails.sendFreigabeMessage(prestudent_id, STGFREIGABE_MESSAGE_VORLAGE, msgvars);
 				}
