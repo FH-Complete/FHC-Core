@@ -243,7 +243,7 @@ function draw_content($row)
 		$stgl .= trim(($i>0?', ':'').$stgl_ma->titelpre.' '.$stgl_ma->vorname.' '.$stgl_ma->nachname.' '.$stgl_ma->titelpost);
 		$i++;
 	}
-	
+
 	// Anzahl Notizen der Person laden
 	$notiz = new notiz();
 	$anzahl_notizen = $notiz->getAnzahlNotizen(null, null, null, null, null, $row->person_id, null, null, null, null, null);
@@ -635,7 +635,7 @@ if($xmlformat=='rdf')
 		$searchItems = explode(' ',TRIM(str_replace(',', '', $filter),' 	!.?'));
 		$kriterienliste = array("#email","#name","#pid","#preid","#tel", "#ref");
 		$suchkriterium = '';
-		
+
 		// Wenn der erste Array-Eintrag einem kriterium der $kriterienliste entspricht -> in $suchkriterium speichern und aus Array entfernen
 		if (isset($searchItems[0]) && in_array($searchItems[0], $kriterienliste))
 		{
@@ -696,7 +696,7 @@ if($xmlformat=='rdf')
 							$prestudent_temp = new prestudent($prest->prestudent_id);
 							$student = new student();
 							$uid = $student->getUid($prestudent_temp->prestudent_id);
-				
+
 							if($uid!='' && $uid != false)
 							{
 								if(!$student->load($uid, $studiensemester_kurzbz))
@@ -722,7 +722,7 @@ if($xmlformat=='rdf')
 				$qry = "SELECT prestudent_id
 					FROM
 						public.tbl_person JOIN public.tbl_prestudent USING (person_id) LEFT JOIN public.tbl_student USING (prestudent_id)
-					WHERE 
+					WHERE
 						UPPER(nachname) = UPPER(".$db->db_add_param($searchItems_string_orig).") OR
 						UPPER(vorname) = UPPER(".$db->db_add_param($searchItems_string_orig).") OR
 						UPPER(vorname || ' ' || nachname) = UPPER(".$db->db_add_param($searchItems_string_orig).") OR
@@ -761,14 +761,14 @@ if($xmlformat=='rdf')
 				$searchItems_string_orig = implode(' ', $searchItems);
 				$searchItems_string = generateSpecialCharacterString($searchItems_string_orig);
 
-				$qry = "SELECT 
+				$qry = "SELECT
 							prestudent_id
 						FROM
 							public.tbl_person JOIN public.tbl_prestudent USING (person_id) LEFT JOIN public.tbl_student USING (prestudent_id)
-						WHERE 
-							1=1 
+						WHERE
+							1=1
 						AND";
-				
+
 				// Wenn der urspruengliche Suchbegriff NICHT numerisch ist, Namenssuche durchführen
 				if (!is_numeric($searchItems_string_orig))
 				{
@@ -782,8 +782,9 @@ if($xmlformat=='rdf')
 						$qry .= "	person_id = ".$db->db_add_param($searchItems_string_orig).";";
 					elseif ($suchkriterium == '#preid')
 						$qry .= "	prestudent_id = ".$db->db_add_param($searchItems_string_orig).";";
-					else 
+					else
 						$qry .= "	matrikelnr = ".$db->db_add_param($searchItems_string_orig)." OR
+									matr_nr = ".$db->db_add_param($searchItems_string_orig)." OR
 									svnr = ".$db->db_add_param($searchItems_string_orig).";";
 				}
 				if($db->db_query($qry))
