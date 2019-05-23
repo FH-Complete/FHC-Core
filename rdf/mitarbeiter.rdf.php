@@ -103,6 +103,10 @@ function draw_row($mitarbeiter)
 {
 	global $rdf_url;
 
+	if (is_bool($mitarbeiter->fixangestellt))
+		$fixangestellt = ($mitarbeiter->fixangestellt == true?'Ja':'Nein');
+	else
+		$fixangestellt = '';
 	echo '
 	<RDF:Description about="'.$rdf_url.$mitarbeiter->uid.'" >
     	<MITARBEITER:uid><![CDATA['.$mitarbeiter->uid.']]></MITARBEITER:uid>
@@ -113,6 +117,7 @@ function draw_row($mitarbeiter)
 		<MITARBEITER:nachname><![CDATA['.$mitarbeiter->nachname.']]></MITARBEITER:nachname>
 		<MITARBEITER:kurzbz><![CDATA['.$mitarbeiter->kurzbz.']]></MITARBEITER:kurzbz>
 		<MITARBEITER:aktiv><![CDATA['.($mitarbeiter->aktiv == true?'aktiv':'inaktiv').']]></MITARBEITER:aktiv>
+		<MITARBEITER:fixangestellt><![CDATA['.$fixangestellt.']]></MITARBEITER:fixangestellt>
 		<MITARBEITER:studiengang_kz></MITARBEITER:studiengang_kz>
   	</RDF:Description>
   	';
