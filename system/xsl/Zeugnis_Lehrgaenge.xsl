@@ -399,9 +399,9 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 						<xsl:value-of select="stsem"/>
 					</xsl:when>
 					<xsl:otherwise>
-						<xsl:value-of select="semester_bezeichnung"/>
-						<xsl:text> (</xsl:text>
 						<xsl:value-of select="stsem"/>
+						<xsl:text> (</xsl:text>
+						<xsl:value-of select="semester_bezeichnung"/>
 						<xsl:text>)</xsl:text>
 					</xsl:otherwise>
 				</xsl:choose>
