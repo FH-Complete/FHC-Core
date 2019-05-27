@@ -19,7 +19,6 @@ class CallerLib
 	private static $RESOURCES_BLACK_LIST = array(
 		'CallerLib', // disabled self loading
 		'LogLib', // hardly usefull and virtually dangerous
-		'MigrationLib', // virtually dangerous, DB manipulation
 		'FilesystemLib', // virtually dangerous, direct access to file system
 		'PermissionLib', // usefull?
 		'PersonLogLib'
