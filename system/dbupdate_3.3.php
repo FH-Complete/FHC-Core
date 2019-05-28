@@ -662,7 +662,7 @@ if(!$result = @$db->db_query("SELECT studiengang_kz FROM testtool.vw_auswertung_
 	// CREATE OR REPLACE VIEW testtool.vw_auswertung_ablauf and grants privileges
 	$qry = '
 		CREATE OR REPLACE VIEW testtool.vw_auswertung_ablauf AS (
-			SELECT 
+			SELECT
 				tbl_gebiet.gebiet_id,
 				tbl_gebiet.bezeichnung AS gebiet,
 				tbl_ablauf.reihung,
@@ -687,7 +687,7 @@ if(!$result = @$db->db_query("SELECT studiengang_kz FROM testtool.vw_auswertung_
 				tbl_rt_person.rt_id AS reihungstest_id,
 				tbl_ablauf.gewicht,
 				tbl_studiengang.studiengang_kz
-			FROM 
+			FROM
 				testtool.tbl_pruefling
 			 JOIN testtool.tbl_ablauf ON tbl_ablauf.studiengang_kz = tbl_pruefling.studiengang_kz
 			 JOIN testtool.tbl_gebiet USING (gebiet_id)
@@ -697,9 +697,9 @@ if(!$result = @$db->db_query("SELECT studiengang_kz FROM testtool.vw_auswertung_
 			 JOIN lehre.tbl_studienplan ON tbl_studienplan.studienplan_id = tbl_rt_person.studienplan_id
 			 JOIN lehre.tbl_studienordnung ON tbl_studienordnung.studienordnung_id = tbl_studienplan.studienordnung_id
 			 JOIN public.tbl_studiengang ON tbl_prestudent.studiengang_kz = tbl_studiengang.studiengang_kz
-			WHERE NOT (tbl_ablauf.gebiet_id IN 
-				( 
-				SELECT tbl_kategorie.gebiet_id 
+			WHERE NOT (tbl_ablauf.gebiet_id IN
+				(
+				SELECT tbl_kategorie.gebiet_id
 				FROM testtool.tbl_kategorie
 				)
 			) AND tbl_studienordnung.studiengang_kz = tbl_pruefling.studiengang_kz
@@ -941,20 +941,6 @@ if ($result = @$db->db_query("SELECT 1 FROM system.tbl_berechtigung WHERE berech
 			echo ' system.tbl_berechtigung: Added permission for extensions<br>';
 	}
 }
-
-// GRANT SELECT ON campus.vw_student TO web;
-$qry = 'GRANT SELECT ON campus.vw_student TO web;';
-if (!$db->db_query($qry))
-	echo '<strong>campus.vw_student '.$db->db_last_error().'</strong><br>';
-else
-	echo '<br>Granted privileges to <strong>web</strong> on campus.vw_student';
-
-// GRANT SELECT, UPDATE, INSERT, DELETE ON TABLE campus.vw_student TO vilesci;
-$qry = 'GRANT SELECT, UPDATE, INSERT, DELETE ON campus.vw_student TO vilesci;';
-if(!$db->db_query($qry))
-	echo '<strong>campus.vw_student: '.$db->db_last_error().'</strong><br>';
-else
-	echo '<br>Granted privileges to <strong>vilesci</strong> on campus.vw_student';
 
 // End extensions
 //---------------------------------------------------------------------------------------------------------------------
