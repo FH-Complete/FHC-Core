@@ -31,9 +31,11 @@
 					</div>
 				</div>
 				<div>
-					<b><?php echo $this->p->t('lehre', 'notendurchschnitt'); ?>:</b>
+					<b><?php echo $this->p->t('lehre', 'notendurchschnitt'); ?>
+						<img src="../../../../skin/images/information.png" title="<?php echo htmlentities($this->p->t('lehre', 'info_notendurchschnitt')); ?>" />:</b>
 					<?php echo $courses['overall']['notendurchschnitt'] ?><br>
-					<b><?php echo $this->p->t('lehre', 'gewichteternotendurchschnitt'); ?>:</b>
+					<b><?php echo $this->p->t('lehre', 'gewichteternotendurchschnitt'); ?>
+						<img src="../../../../skin/images/information.png" title="<?php echo htmlentities($this->p->t('lehre', 'info_notendurchschnitt_gewichtet')); ?>" />:</b>
 					<?php echo $courses['overall']['notendurchschnittgewichtet'] ?><br>
 					<b><?php echo $this->p->t('lehre', 'ects'); ?>:</b>
 					<?php echo $courses['overall']['ectssumme_positiv'] ?><br>

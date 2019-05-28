@@ -16,9 +16,11 @@
 
 .gradelist_row_grade_positiv {
 	color: green;
+	font-weight: bold;
 }
 .gradelist_row_grade_negativ {
 	color: red;
+	font-weight: bold;
 }
 .gradelist_row_depth_1 > td:first-child {
 	padding-left: 15px !important;
