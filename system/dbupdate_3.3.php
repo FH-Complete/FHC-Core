@@ -942,6 +942,20 @@ if ($result = @$db->db_query("SELECT 1 FROM system.tbl_berechtigung WHERE berech
 	}
 }
 
+// GRANT SELECT ON campus.vw_student TO web;
+$qry = 'GRANT SELECT ON campus.vw_student TO web;';
+if (!$db->db_query($qry))
+	echo '<strong>campus.vw_student '.$db->db_last_error().'</strong><br>';
+else
+	echo '<br>Granted privileges to <strong>web</strong> on campus.vw_student';
+
+// GRANT SELECT, UPDATE, INSERT, DELETE ON TABLE campus.vw_student TO vilesci;
+$qry = 'GRANT SELECT, UPDATE, INSERT, DELETE ON campus.vw_student TO vilesci;';
+if(!$db->db_query($qry))
+	echo '<strong>campus.vw_student: '.$db->db_last_error().'</strong><br>';
+else
+	echo '<br>Granted privileges to <strong>vilesci</strong> on campus.vw_student';
+
 // End extensions
 //---------------------------------------------------------------------------------------------------------------------
 
