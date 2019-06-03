@@ -2911,7 +2911,32 @@ if(!$result = @$db->db_query("SELECT nationengruppe_kurzbz FROM public.tbl_bewer
 		echo '<br>public.tbl_bewerbungstermine: Spalte nationengruppe_kurzbz hinzugefuegt';
 }
 
+// Spalte bezeichnung_mehrsprachig in bis.tbl_orgform
+if(!$result = @$db->db_query("SELECT bezeichnung_mehrsprachig FROM bis.tbl_orgform LIMIT 1"))
+{
+	$qry = "ALTER TABLE bis.tbl_orgform ADD COLUMN bezeichnung_mehrsprachig varchar(255)[];";
 
+	if(!$db->db_query($qry))
+		echo '<strong>bis.tbl_orgform '.$db->db_last_error().'</strong><br>';
+	else
+		echo 'bis.tbl_orgform: Spalte bezeichnung_mehrsprachig hinzugefuegt!<br>';
+
+	// Bezeichnung_mehrsprachig aus existierender Bezeichnung vorausfuellen. Ein Eintrag fuer jede Sprache mit Content aktiv.
+	$qry_help = "SELECT index FROM public.tbl_sprache WHERE content=TRUE;";
+	if(!$result = $db->db_query($qry_help))
+		echo '<strong>tbl_orgform bezeichnung_mehrsprachig: Fehler beim ermitteln der Sprachen: '.$db->db_last_error().'</strong>';
+	else
+	{
+		$qry='';
+		while($row = $db->db_fetch_object($result))
+			$qry.= "UPDATE bis.tbl_orgform set bezeichnung_mehrsprachig[".$row->index."] = bezeichnung;";
+
+		if(!$db->db_query($qry))
+			echo '<strong>Setzen der bezeichnung_mehrsprachig fehlgeschlagen: '.$db->db_last_error().'</strong><br>';
+		else
+			echo 'bis.tbl_orgform: bezeichnung_mehrprachig automatisch aus existierender Bezeichnung uebernommen<br>';
+	}
+}
 
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
@@ -2941,7 +2966,7 @@ $tabellen=array(
 	"bis.tbl_mobilitaetsprogramm"  => array("mobilitaetsprogramm_code","kurzbz","beschreibung","sichtbar","sichtbar_outgoing"),
 	"bis.tbl_nation"  => array("nation_code","entwicklungsstand","eu","ewr","kontinent","kurztext","langtext","engltext","sperre","nationengruppe_kurzbz"),
 	"bis.tbl_nationengruppe"  => array("nationengruppe_kurzbz","nationengruppe_bezeichnung","aktiv"),
-	"bis.tbl_orgform"  => array("orgform_kurzbz","code","bezeichnung","rolle","bisorgform_kurzbz"),
+	"bis.tbl_orgform"  => array("orgform_kurzbz","code","bezeichnung","rolle","bisorgform_kurzbz","bezeichnung_mehrsprachig"),
 	"bis.tbl_verwendung"  => array("verwendung_code","verwendungbez"),
 	"bis.tbl_zgv"  => array("zgv_code","zgv_bez","zgv_kurzbz","bezeichnung"),
 	"bis.tbl_zgvmaster"  => array("zgvmas_code","zgvmas_bez","zgvmas_kurzbz","bezeichnung"),
