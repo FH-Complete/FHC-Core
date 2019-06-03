@@ -27,9 +27,8 @@ body.main /* Workaround fuer Farbverlauf im IE statt ShadowBox */
 }
 body.testtool-content
 {
-	/*/padding: 0px 50px 0px 50px;*/
-	overflow: hidden;
-	width: 50%;
+	width: 65%;
+	margin-left: 3%;
 }
 html
 {

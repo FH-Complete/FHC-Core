@@ -561,7 +561,6 @@ if($frage->frage_id!='')
 	}
 	if(!$demo && !$levelgebiet)
 		echo " </tr></table>";
-	
 	echo '<br/><br/><br/><br/>';
 	//Bild und Text der Frage anzeigen
 	if($frage->bild!='')
@@ -577,17 +576,19 @@ if($frage->frage_id!='')
 					</div>
 				</audio>';
 	}
-	echo "$frage->text<br/><br/>\n";
+	echo "$frage->text<br/><br/><br/><br/>\n";
 
 	//Vorschlaege laden
 	$vs = new vorschlag();
 	$vs->getVorschlag($frage->frage_id, $_SESSION['sprache'], $gebiet->zufallvorschlag);
 	$letzte = $frage->getNextFrage($gebiet_id, $_SESSION['pruefling_id'], $frage_id, $demo);
 	echo "<form action=\"$PHP_SELF?gebiet_id=$gebiet_id&amp;frage_id=$frage->frage_id\" method=\"POST\" ".(!$letzte && !$levelgebiet?"onsubmit=\"letzteFrage()\"":"").">";
-	echo '<table cellspacing="30px">';
-	echo '<tr>';
+	echo '<table class = "table">';
+	echo '<tr style="height: 70px;">';
 	$anzahl = 1;
 	$beantwortet = false;
+	$cnt = 0; // counter für foreach-Schleife
+    $len = count($vs->result);
 	
 	//Antworten laden falls bereits vorhanden
 	$antwort = new antwort();
@@ -634,11 +635,13 @@ if($frage->frage_id!='')
 		echo "</td>";
 		$anzahl++;
 
-		if($anzahl>$gebiet->antwortenprozeile)
+		if($anzahl>$gebiet->antwortenprozeile && ($cnt < $len-1))
 		{
-			echo '</tr><tr>';
+			echo '</tr><tr style="height: 70px;">';
 			$anzahl=1;
 		}
+
+		$cnt++;
 	}
 	
 	//wenn singleresponse und keine Levels und vorschlaege vorhanden sind, dann gibt es auch die 
