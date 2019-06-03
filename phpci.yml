@@ -69,10 +69,10 @@ setup: # First!
         - "tar cfzP /tmp/FHC-Core-DSMS.tgz /tmp/FHC-Core-DSMS/"
         - "tar cfzP /tmp/FHC-Core-Nextcloud.tgz /tmp/FHC-Core-Nextcloud/"
         # Install extensions
-        - "php index.ci.php system/extensions/CLI_Manager uploadExtension FHC-Core-MobilityOnline /tmp/FHC-Core-MobilityOnline.tgz"
-        - "php index.ci.php system/extensions/CLI_Manager uploadExtension FHC-Core-Budget /tmp/FHC-Core-Budget.tgz"
-        - "php index.ci.php system/extensions/CLI_Manager uploadExtension FHC-Core-DSMS /tmp/FHC-Core-DSMS.tgz"
-        - "php index.ci.php system/extensions/CLI_Manager uploadExtension FHC-Core-Nextcloud /tmp/FHC-Core-Nextcloud.tgz"
+        #- "php index.ci.php system/extensions/CLI_Manager uploadExtension FHC-Core-MobilityOnline /tmp/FHC-Core-MobilityOnline.tgz"
+        #- "php index.ci.php system/extensions/CLI_Manager uploadExtension FHC-Core-Budget /tmp/FHC-Core-Budget.tgz"
+        #- "php index.ci.php system/extensions/CLI_Manager uploadExtension FHC-Core-DSMS /tmp/FHC-Core-DSMS.tgz"
+        #- "php index.ci.php system/extensions/CLI_Manager uploadExtension FHC-Core-Nextcloud /tmp/FHC-Core-Nextcloud.tgz"
         # Remove temporary files
         - "rm -fR /tmp/FHC-Core-MobilityOnline*"
         - "rm -fR /tmp/FHC-Core-Budget*"
@@ -94,10 +94,10 @@ test: # Run tests
     php_code_sniffer: # Code sniffer
         standard: "tests/codesniffer/FHComplete"
         allow_failures: true
-    codeception: # Codeception
-        config: "tests/codeception/"
-        path: "tests/codeception/_output/"
-        allow_failures: true
+    #codeception: # Codeception
+    #    config: "tests/codeception/"
+    #    path: "tests/codeception/_output/"
+    #    allow_failures: true
 
 failure: # On failure
     email: # Send an email to warn the team
