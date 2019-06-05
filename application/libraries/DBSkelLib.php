@@ -11,29 +11,45 @@ class DBSkelLib
 	const CONF_ENABLED = 'dbskel_enabled';
 	const CONF_MODE = 'dbskel_mode';
 
+	const SEPARATOR = ':'; // Step parameter character separator
+
 	// Run modes
 	const RUN_MODE_DRYRUN = 'dryrun'; // run without changing the database, useful for testing
 	const RUN_MODE_NEW = 'new'; // build a new database or if database is already present creates only new objects
 	const RUN_MODE_DIFF = 'diff'; // like new, but it also remove object from database that are NOT present in configuration files
 
+	const STEP_SCHEMA = 1;
+	const STEP_SEQUENCES = 2;
+	const STEP_TABLES = 3;
+	const STEP_CONSTRAINTS = 4;
+	const STEP_VIEWS = 5;
+	const STEP_FUNCTIONS = 6;
+	const STEP_GRANTS = 7;
+	const STEP_EXTRA = 8;
+
+	const MAX_STEPS = 8; // Maximum number of steps
+
 	// Configuration file names
 	const SCHEMA_FILENAME = 'schema.sql'; // File name that contains schema creation SQL and SQL to comment a schema
 	const SEQUENCES_FILENAME = 'sequences.php'; // PHP file that contains all the sequences
 	const TABLE_PREFIX = 'TBL-'; // Table file prefix
+	const CONSTRAINTS_FILENAME = 'constraints.php'; // PHP file that contains all the constraints
 	const VIEWS_FILENAME = 'views.php'; // PHP file that contains all the views
 	const FUNCTIONS_FILENAME = 'functions.php'; // PHP file that contains all the functions
 	const GRANTS_FILENAME = 'grants.sql'; // Grants SQL file name
 	const EXTRA_FILENAME = 'extra.sql'; // Extra SQL file name
 
-	// JSON file extension
-	const JSON_EXT = '.json';
+	// PHP file extension
+	const PHP_EXT = '.php';
 
-	// Directory that containts the database skel
+	// Directory that contains the database skel
 	const DBSKEL_DIR = APPPATH.'dbskel/';
 
-	// Tables JSON properties name
-	const JSON_NAME = 'name';
-	const JSON_SQL = 'sql';
+	// Table properties
+	const T_COMMENT = 'comment';
+	const T_TYPE = 'type';
+	const T_NULL = 'null';
+	const T_DEFAULT = 'default';
 
 	private $_ci; // Code igniter instance
 
@@ -61,22 +77,42 @@ class DBSkelLib
 	 * Starts the DBSkel procedure
 	 * Returns false on failure and true on success
 	 * All errors/warnings/infos are printed here using EPrintfLib
+	 * Accept the step parameter that can be used to run only a wanted step
 	 */
-	public function start()
+	public function start($steps, $selectedDirectories)
 	{
 		$start = false;
 
 		// Checks if DBSkel is enabled
 		if ($this->_ci->config->item(self::CONF_ENABLED) === true)
 		{
-			// Gets all the directories in application/dbskel
-			$start = $this->_processDirectories(glob(self::DBSKEL_DIR.'*', GLOB_ONLYDIR));
+			// Checks if the given steps parameter is fine
+			if ($this->_checkParameterStep($steps))
+			{
+				$this->_printSchemaSeparator();
 
-			$this->_printSchemaSeparator();
+				$this->_printRunningMode();
+
+				// By default perform all steps
+				$stepsArray = range(1, self::MAX_STEPS);
+				// If steps parameter is given then use it to select the steps to be performed
+				if ($steps != null) $stepsArray = explode(self::SEPARATOR, $steps);
+
+				// Gets all the directories in application/dbskel
+				$directories = glob(self::DBSKEL_DIR.'*', GLOB_ONLYDIR);
+
+				// Checks if the selectedDirectories parameter is fine
+				if ($this->_checkParameterSelectedDirectories($selectedDirectories, $directories))
+				{
+					$start = $this->_processDirectories($directories, $stepsArray);
+
+					$this->_printSchemaSeparator();
+				}
+			}
 		}
 		else
 		{
-			$this->_printMessage('DBSkel is NOT enabled');
+			$this->_printInfo('DBSkel is NOT enabled');
 		}
 
 		return $start;
@@ -88,7 +124,7 @@ class DBSkelLib
 	/**
 	 * Process every single directory present in dbskel directory
 	 */
-	private function _processDirectories($directories)
+	private function _processDirectories($directories, $stepsArray)
 	{
 		$processDirectories = false; // failure by default
 
@@ -103,44 +139,73 @@ class DBSkelLib
 			// NOTE: the order in which these methods are called has a meaning!
 			// If a step fails then the loop is stopped
 
-			// 1 - Checks file naming convention in current directory
-			// NOTE: no need to check a failure! NOT a blocking check!!
+			// 0 - Checks file naming convention in current directory
+			// NOTE: no need to check a failure! NOT a blocking check!! Always performed!!!
 			$this->_checkFilenaming($directory);
 
 			$this->_printFileSeparator();
 
-			// 2 - Process schema file
-			if (!$this->_processSchemaFile($directory)) break;
+			// 1 - Process schema file
+			if (in_array(self::STEP_SCHEMA, $stepsArray))
+			{
+				if (!$this->_processSchemaFile($directory)) break;
 
-			$this->_printFileSeparator();
+				$this->_printFileSeparator();
+			}
 
-			// 3 - Process sequence file
-			if (!$this->_processSequencesFile($directory)) break;
+			// 2 - Process sequence file
+			if (in_array(self::STEP_SEQUENCES, $stepsArray))
+			{
+				if (!$this->_processSequencesFile($directory)) break;
 
-			$this->_printFileSeparator();
+				$this->_printFileSeparator();
+			}
 
-			// 4 - Process table files
-			if (!$this->_processTableFiles($directory)) break;
+			// 3 - Process table files
+			if (in_array(self::STEP_TABLES, $stepsArray))
+			{
+				if (!$this->_processTableFiles($directory)) break;
 
-			$this->_printFileSeparator();
+				$this->_printFileSeparator();
+			}
+
+			// 4 - Process constraints
+			if (in_array(self::STEP_CONSTRAINTS, $stepsArray))
+			{
+				if (!$this->_processConstraintsFile($directory)) break;
+
+				$this->_printFileSeparator();
+			}
 
 			// 5 - Process views file
-			if (!$this->_processViewsFile($directory)) break;
+			if (in_array(self::STEP_VIEWS, $stepsArray))
+			{
+				if (!$this->_processViewsFile($directory)) break;
 
-			$this->_printFileSeparator();
+				$this->_printFileSeparator();
+			}
 
 			// 6 - Process functions file
-			if (!$this->_processFunctionsFile($directory)) break;
+			if (in_array(self::STEP_FUNCTIONS, $stepsArray))
+			{
+				if (!$this->_processFunctionsFile($directory)) break;
 
-			$this->_printFileSeparator();
+				$this->_printFileSeparator();
+			}
 
 			// 7 - Process grants file
-			if (!$this->_processGrantsFile($directory)) break;
+			if (in_array(self::STEP_GRANTS, $stepsArray))
+			{
+				if (!$this->_processGrantsFile($directory)) break;
 
-			$this->_printFileSeparator();
+				$this->_printFileSeparator();
+			}
 
-			// 7 - Process extra file
-			if (!$this->_processExtraFile($directory)) break;
+			// 8 - Process extra file
+			if (in_array(self::STEP_EXTRA, $stepsArray))
+			{
+				if (!$this->_processExtraFile($directory)) break;
+			}
 
 			$processDirectories = true; // If all the steps ends successfully
 
@@ -177,7 +242,8 @@ class DBSkelLib
 		return $fileName == self::SCHEMA_FILENAME // Schema file
 			|| $fileName == self::SEQUENCES_FILENAME // Sequences file
 			|| (substr($fileName, 0, strlen(self::TABLE_PREFIX)) == self::TABLE_PREFIX
-				&& substr($fileName, -5, strlen(self::JSON_EXT)) == self::JSON_EXT) // Table files
+				&& substr($fileName, -4, strlen(self::PHP_EXT)) == self::PHP_EXT) // Table files
+			|| $fileName == self::CONSTRAINTS_FILENAME // Constraints file
 			|| $fileName == self::VIEWS_FILENAME // Views file
 			|| $fileName == self::FUNCTIONS_FILENAME // Function file
 			|| $fileName == self::GRANTS_FILENAME // Grants file
@@ -217,8 +283,8 @@ class DBSkelLib
 
 	/**
 	 * Process sequences file
-	 * - Looks for sequences present in current schema, then sequences that are not present in php file are dropped
-	 * - Looks for sequences present in php files, then sequences that are not present in database are installed
+	 * - Looks for sequences present in current schema, then sequences that are NOT present in php file are dropped (diff mode only)
+	 * - Looks for sequences present in php files, then sequences that are NOT present in database are installed
 	 */
 	private function _processSequencesFile($directory)
 	{
@@ -233,7 +299,7 @@ class DBSkelLib
 			//...process it!
 			require_once($files[0]); // Read sequences file
 			$schema = basename($directory); // retrieves schema name from directory path
-			$dbSequencesArray = $this->_listSequencesBySchema($schema); // get list of sequences currently present in DB
+			$dbSequencesArray = $this->_listSequencesBySchema($schema); // get list of sequences currently present in DB schema
 
 			// Loops through list of sequences currently present in database
 			foreach ($dbSequencesArray as $dbSequence)
@@ -243,7 +309,7 @@ class DBSkelLib
 				{
 					if ($this->_isDryrunMode()) // If dry run mode enabled
 					{
-						$this->_printInfo('Dry run >> sequence '.$dbSequence.' not found in sequences file >> would be removed in diff mode');
+						$this->_printInfo('Dry run >> sequence '.$dbSequence.' NOT found in sequences file >> would be removed in diff mode');
 					}
 					elseif ($this->_isDiffMode()) // only if in diff mode
 					{
@@ -269,7 +335,7 @@ class DBSkelLib
 				{
 					if ($this->_isDryrunMode()) // If dry run mode enabled
 					{
-						$this->_printInfo('Dry run >> sequence '.$sequenceName.' not found database >> would be added in new and diff mode');
+						$this->_printInfo('Dry run >> sequence '.$sequenceName.' NOT found database >> would be added in new and diff mode');
 					}
 					else
 					{
@@ -284,6 +350,10 @@ class DBSkelLib
 							$this->_printMessage('Sequence added successfully: '.$sequenceName);
 						}
 					}
+				}
+				else
+				{
+					$this->_printMessage('Sequence already present in database: '.$sequenceName);
 				}
 			}
 		}
@@ -301,12 +371,101 @@ class DBSkelLib
 	private function _processTableFiles($directory)
 	{
 		// Looks for table files
-		$files = array_filter(glob($directory.'/'.self::TABLE_PREFIX.'*'.self::JSON_EXT), 'is_file');
+		$files = array_filter(glob($directory.'/'.self::TABLE_PREFIX.'*'.self::PHP_EXT), 'is_file');
 
 		// If table files are found...
 		if (count($files) > 0)
 		{
 			//...process them!
+			$schema = basename($directory); // retrieves schema name from directory path
+			$dbTablesArray = $this->_listTablesBySchema($schema); // get list of tables currently present in DB schema
+
+			// For each table file
+			foreach ($files as $file)
+			{
+				$this->_printMessage('Found table file: '.$file);
+
+				require_once($file); // Read table file
+
+				// Loops through list of tables currently present in database
+				foreach ($dbTablesArray as $dbTable)
+				{
+					// If NOT in new mode and if the table present in database is NOT present in the php table file
+					if (!$this->_isNewMode() && !array_key_exists($dbTable, $tableArray))
+					{
+						if ($this->_isDryrunMode()) // If dry run mode enabled
+						{
+							$this->_printInfo('Dry run >> table '.$dbTable.' NOT found in table file >> would be removed in diff mode');
+						}
+						elseif ($this->_isDiffMode()) // only if in diff mode
+						{
+							// Then drop it! If it fails then ends execution
+							if (!$this->_execQuery(sprintf('DROP TABLE %s.%s', $schema, $dbTable)))
+							{
+								$this->_printError('Error occurred while dropping table: '.$dbTable);
+								return false;
+							}
+							else
+							{
+								$this->_printMessage('Table dropped successfully: '.$dbTable);
+							}
+						}
+					}
+				}
+
+				// Retrieves all the elements from the $tableArray except the element 'comment'
+				$tableElements = array_keys(array_diff_key($tableArray, array(self::T_COMMENT => null)));
+				if (is_array($tableElements) && count($tableElements) == 1) // If there is only one element left...
+				{
+					$tableName = $tableElements[0]; // ...then it is the name of the table
+
+					// If the table from php file is NOT present in database
+					if (!in_array($tableName, $dbTablesArray))
+					{
+						if ($this->_isDryrunMode()) // If dry run mode enabled
+						{
+							$this->_printInfo('Dry run >> table '.$tableName.' would be created in new and diff mode');
+						}
+						else // new and diff mode
+						{
+							// Then create the new table! If it fails then ends execution
+							if ($this->_createTable($schema, $tableArray))
+							{
+								$this->_printMessage('Table created successfully: '.$tableName);
+							}
+							else
+							{
+								$this->_printError('Error occurred while creating a new table: '.$tableName);
+								return false;
+							}
+						}
+					}
+					else // if table is already present in database
+					{
+						if ($this->_isNewMode()) // only if in new mode
+						{
+							$this->_printMessage('Table already present in database: '.$tableName);
+						}
+						elseif ($this->_isDiffMode()) // only if in diff mode
+						{
+							// Then diff the already present table with the one from php file! If it fails then ends execution
+							if ($this->_diffTable($schema, $tableArray))
+							{
+								$this->_printMessage('Table diff success: '.$tableName);
+							}
+							else
+							{
+								$this->_printError('Error occurred while diff table: '.$tableName);
+								return false;
+							}
+						}
+					}
+				}
+				else // otherwise the array present in the php table file is not well formatted
+				{
+					$this->_printError('Table file with a bad format is going to be ignored: '.$file);
+				}
+			}
 		}
 		else
 		{
@@ -317,8 +476,95 @@ class DBSkelLib
 	}
 
 	/**
+	 * Process constraints file
+	 * - Looks for constraints present in current schema, then constraints that are NOT present in php file are dropped (diff mode only)
+	 * - Looks for constraints present in php files, then constraints that are NOT present in database are installed
+	 */
+	private function _processConstraintsFile($directory)
+	{
+		// Looks for a constraints file
+		$files = array_filter(glob($directory.'/'.self::CONSTRAINTS_FILENAME), 'is_file');
+
+		// If a constraints file is found...
+		if (count($files) > 0)
+		{
+			$this->_printMessage('Found constraints file: '.$files[0]);
+
+			//...process it!
+			require_once($files[0]); // Read constraints file
+			$schema = basename($directory); // retrieves schema name from directory path
+			$dbConstraintsArray = $this->_listConstraintsBySchema($schema); // get list of constraints currently present in DB schema
+			$dbConstraintsNamesArray = array(); // Contains only the names of the constraints
+
+			// Loops through list of constraints currently present in database
+			foreach ($dbConstraintsArray as $dbConstraint)
+			{
+				$dbConstraintsNamesArray[] = $dbConstraint['name']; // Copy only the name of the constraint
+
+				// If NOT in new mode and if the constraint present in database is NOT present in the list of constraints from php file
+				if (!$this->_isNewMode() && !array_key_exists($dbConstraint['name'], $constraintsArray))
+				{
+					if ($this->_isDryrunMode()) // If dry run mode enabled
+					{
+						$this->_printInfo('Dry run >> constraint '.$dbConstraint['name'].' NOT found in constraints file >> would be removed in diff mode');
+					}
+					elseif ($this->_isDiffMode()) // only if in diff mode
+					{
+						// Then drop it and objects that depends on it from database! If it fails then ends execution
+						if (!$this->_execQuery(sprintf('ALTER TABLE %s.%s DROP CONSTRAINT %s', $schema, $dbConstraint['table'], $dbConstraint['name'])))
+						{
+							$this->_printError('Error occurred while dropping constraint: '.$dbConstraint['name']);
+							return false;
+						}
+						else
+						{
+							$this->_printMessage('Constraint dropped successfully: '.$dbConstraint['name']);
+						}
+					}
+				}
+			}
+
+			// Loops through list of constraints from php file
+			foreach ($constraintsArray as $constraintName => $constraintSQL)
+			{
+				// If the constraint from php file is NOT present in database
+				if (!in_array($constraintName, $dbConstraintsNamesArray))
+				{
+					if ($this->_isDryrunMode()) // If dry run mode enabled
+					{
+						$this->_printInfo('Dry run >> constraint '.$constraintName.' would be added in new and diff mode');
+					}
+					else
+					{
+						// Then install it! If it fails then ends execution
+						if (!$this->_execQuery($constraintSQL))
+						{
+							$this->_printError('Error occurred while adding constraint: '.$constraintName);
+							return false;
+						}
+						else
+						{
+							$this->_printMessage('Constraint added successfully: '.$constraintName);
+						}
+					}
+				}
+				else
+				{
+					$this->_printMessage('Constraint already present in database: '.$constraintName);
+				}
+			}
+		}
+		else
+		{
+			$this->_printMessage('No constraints file found');
+		}
+
+		return true; // If ends of procedure with no failures or no files are found then is a success
+	}
+
+	/**
 	 * Process views file
-	 * - Looks for views present in current schema, then views that are not present in php file are dropped
+	 * - Looks for views present in current schema, then views that are NOT present in php file are dropped (diff mode only)
 	 * - Looks for views present in php files and install them all
 	 */
 	private function _processViewsFile($directory)
@@ -334,7 +580,7 @@ class DBSkelLib
 			//...process it!
 			require_once($files[0]); // Read views file
 			$schema = basename($directory); // retrieves schema name from directory path
-			$dbViewsArray = $this->_listViewsBySchema($schema); // get list of views currently present in DB
+			$dbViewsArray = $this->_listViewsBySchema($schema); // get list of views currently present in DB schema
 
 			// Loops through list of views currently present in database
 			foreach ($dbViewsArray as $dbView)
@@ -344,7 +590,7 @@ class DBSkelLib
 				{
 					if ($this->_isDryrunMode()) // If dry run mode enabled
 					{
-						$this->_printInfo('Dry run >> view '.$dbView.' not found in views file >> would be removed in diff mode');
+						$this->_printInfo('Dry run >> view '.$dbView.' NOT found in views file >> would be removed in diff mode');
 					}
 					elseif ($this->_isDiffMode()) // only if in diff mode
 					{
@@ -394,6 +640,8 @@ class DBSkelLib
 
 	/**
 	 * Process functions file
+	 * - Looks for functions present in current schema, then functions that are NOT present in php file are dropped (diff mode only)
+	 * - Looks for functions present in php files and install them all
 	 */
 	private function _processFunctionsFile($directory)
 	{
@@ -408,7 +656,7 @@ class DBSkelLib
 			//...process it!
 			require_once($files[0]); // Read functions file
 			$schema = basename($directory); // retrieves schema name from directory path
-			$dbFunctionsArray = $this->_listFunctionsBySchema($schema); // get list of functions currently present in DB
+			$dbFunctionsArray = $this->_listFunctionsBySchema($schema); // get list of functions currently present in DB schema
 
 			// Loops through list of functions currently present in database
 			foreach ($dbFunctionsArray as $dbFunction)
@@ -418,7 +666,7 @@ class DBSkelLib
 				{
 					if ($this->_isDryrunMode()) // If dry run mode enabled
 					{
-						$this->_printInfo('Dry run >> function '.$dbFunction.' not found in fucntions file >> would be removed in diff mode');
+						$this->_printInfo('Dry run >> function '.$dbFunction.' NOT found in fucntions file >> would be removed in diff mode');
 					}
 					elseif ($this->_isDiffMode()) // only if in diff mode
 					{
@@ -556,7 +804,7 @@ class DBSkelLib
 	}
 
 	/**
-	 *
+	 * Checks if the running mode is 'dryrun'
 	 */
 	private function _isDryrunMode()
 	{
@@ -564,7 +812,7 @@ class DBSkelLib
 	}
 
 	/**
-	 *
+	 * Checks if the running mode is 'diff'
 	 */
 	private function _isDiffMode()
 	{
@@ -572,11 +820,78 @@ class DBSkelLib
 	}
 
 	/**
-	 *
+	 * Checks if the running mode is 'new'
 	 */
 	private function _isNewMode()
 	{
 		return $this->_ci->config->item(self::CONF_MODE) == self::RUN_MODE_NEW;
+	}
+
+	/**
+	 * Checks if the parameter step is correct
+	 */
+	private function _checkParameterStep($steps)
+	{
+		if ($steps != null) // if it was given
+		{
+			$stepsArray = explode(self::SEPARATOR, $steps); // split the string in an array
+			foreach ($stepsArray as $step)
+			{
+				if (!is_numeric($step)) // if it is not a number
+				{
+					$this->_ci->eprintflib->printError('The given parameter must be a number or a string in the following format: 1:3:5');
+					return false;
+				}
+				elseif ($step > self::MAX_STEPS) // if it is a number but > MAX_STEPS
+				{
+					$this->_ci->eprintflib->printError('The maximun value fot this parameter is: '.self::MAX_STEPS);
+					return false;
+				}
+				elseif ($step < 1) // if it is a number but < 1
+				{
+					$this->_ci->eprintflib->printError('The minimum value fot this parameter is 1');
+					return false;
+				}
+			}
+		}
+
+		return true;
+	}
+
+	/**
+	 * Checks if the parameter selectedDirectories is correct and stores the result in $directories
+	 */
+	private function _checkParameterSelectedDirectories($selectedDirectories, &$directories)
+	{
+		if ($selectedDirectories != null)
+		{
+			$selectedDirectoriesArray = explode(self::SEPARATOR, $selectedDirectories);
+
+			$found = true;
+
+			foreach ($selectedDirectoriesArray as $key => $value)
+			{
+				$selectedDirectoriesArray[$key] = self::DBSKEL_DIR.$value;
+
+				if (!in_array(self::DBSKEL_DIR.$value, $directories))
+				{
+					$found = false;
+					break;
+				}
+			}
+
+			if ($found)
+			{
+				$directories = $selectedDirectoriesArray;
+			}
+			else
+			{
+				$this->_printError('One or more of the given directories does NOT exist');
+				return false;
+			}
+		}
+
+		return true;
 	}
 
 	//------------------------------------------------------------------------------------------------------------------
@@ -602,12 +917,14 @@ class DBSkelLib
 	}
 
 	/**
-	 *
+	 * Retrieves all the sequences present in the given database schema
 	 */
 	private function _listSequencesBySchema($schema)
 	{
 		$sequencesArray = array();
-		$query = sprintf('SELECT sequence_name FROM information_schema.sequences WHERE sequence_schema = \'%s\'', $schema);
+		$query = sprintf('SELECT sequence_name
+							FROM information_schema.sequences
+						   WHERE sequence_schema = \'%s\'', $schema);
 
 		if ($sequences = @$this->_ci->db->query($query))
 		{
@@ -621,12 +938,63 @@ class DBSkelLib
 	}
 
 	/**
-	 *
+	 * Retrieves all the tables present in the given database schema
+	 */
+	private function _listTablesBySchema($schema)
+	{
+		$tablesArray = array();
+		$query = sprintf('SELECT table_name
+							FROM information_schema.tables
+						   WHERE table_type = \'BASE TABLE\'
+						   	 AND table_schema = \'%s\'', $schema);
+
+		if ($tables = @$this->_ci->db->query($query))
+		{
+			foreach ($tables->result() as $table)
+			{
+				$tablesArray[] = $table->table_name;
+			}
+		}
+
+		return $tablesArray;
+	}
+
+	/**
+	 * Retrieves all the constraints present in the given database schema
+	 * Returns an array with all the constraints, each element of the array is an array with two elements:
+	 * - name: the name of the constraint
+	 * - table: the name of the table where the constraint is applied
+	 * NOTE: does not retrieve NOT NULL constraints
+	 */
+	private function _listConstraintsBySchema($schema)
+	{
+		$constraintsArray = array();
+		$query = sprintf('SELECT constraint_name,
+								table_name
+							FROM information_schema.table_constraints
+						   WHERE table_schema = \'%s\'
+						     AND constraint_name NOT LIKE \'%%_not_null\'', $schema); // avoid to retrieve NOT NULL constraints
+
+		if ($constraints = @$this->_ci->db->query($query))
+		{
+			foreach ($constraints->result() as $constraint)
+			{
+				$constraintsArray[] = array('name' => $constraint->constraint_name, 'table' => $constraint->table_name);
+			}
+		}
+
+		return $constraintsArray;
+	}
+
+	/**
+	 * Retrieves all the views present in the given database schema
 	 */
 	private function _listViewsBySchema($schema)
 	{
 		$viewsArray = array();
-		$query = sprintf('SELECT table_name FROM information_schema.views WHERE table_schema = \'%s\'', $schema);
+		$query = sprintf('SELECT table_name
+							FROM information_schema.views
+						   WHERE table_schema = \'%s\'', $schema);
 
 		if ($views = @$this->_ci->db->query($query))
 		{
@@ -640,464 +1008,164 @@ class DBSkelLib
 	}
 
 	/**
-	 *
+	 * Retrieves all the functions present in the given database schema
 	 */
 	private function _listFunctionsBySchema($schema)
 	{
 		$functionsArray = array();
-		$query = sprintf('SELECT p.proname as "view_name"
-							FROM pg_catalog.pg_proc p
-     				   LEFT JOIN pg_catalog.pg_namespace n ON n.oid = p.pronamespace
-					   	   WHERE n.nspname <> \'pg_catalog\'
-      						 AND n.nspname <> \'information_schema\'
-							 AND n.nspname = \'%s\'', $schema);
+		$query = sprintf('SELECT routine_name
+							FROM information_schema.routines
+						   WHERE specific_schema != \'pg_catalog\'
+						     AND specific_schema != \'information_schema\'
+							 AND routine_schema = \'%s\'', $schema);
 
 		if ($functions = @$this->_ci->db->query($query))
 		{
 			foreach ($functions->result() as $function)
 			{
-				$functionsArray[] = $function->view_name;
+				$functionsArray[] = $function->routine_name;
 			}
 		}
 
 		return $functionsArray;
 	}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 	/**
-	 * Check if a column exists in a table and schema
+	 * Retrieves all the columns from a database table
 	 */
-	private function _columnExists($name, $schema, $table)
+	private function _listColumns($schema, $table)
 	{
-		$query = sprintf('SELECT %s FROM %s.%s LIMIT 1', $name, $schema, $table);
+		$columnsArray = array();
+		$query = sprintf('SELECT *
+							FROM information_schema.columns
+						   WHERE table_schema = \'%s\'
+	  			   			 AND table_name   = \'%s\'', $schema, $table);
 
-		if (@$this->_ci->db->simple_query($query))
+		if ($columns = @$this->_ci->db->query($query))
 		{
-			return true;
-		}
-
-		return false;
-	}
-
-	/**
-	 * Print an info about the starting of method up
-	 */
-	private function _startUP()
-	{
-		$this->eprintflib->printMessage(
-			sprintf('%s Start method up of class %s %s', EPrintfLib::SEPARATOR, get_called_class(), EPrintfLib::SEPARATOR)
-		);
-	}
-
-	/**
-	 * Print an info about the ending of method up
-	 */
-	private function _endUP()
-	{
-		$this->eprintflib->printMessage(
-			sprintf('%s End method up of class %s %s', EPrintfLib::SEPARATOR, get_called_class(), EPrintfLib::SEPARATOR)
-		);
-	}
-
-	/**
-	 * Print an info about the starting of method down
-	 */
-	private function _startDown()
-	{
-		$this->eprintflib->printMessage(
-			sprintf('%s Start method down of class %s %s', EPrintfLib::SEPARATOR, get_called_class(), EPrintfLib::SEPARATOR)
-		);
-	}
-
-	/**
-	 * Print an info about the ending of method down
-	 */
-	private function _endDown()
-	{
-		$this->eprintflib->printMessage(
-			sprintf('%s End method down of class %s %s', EPrintfLib::SEPARATOR, get_called_class(), EPrintfLib::SEPARATOR)
-		);
-	}
-
-	/**
-	 * Adds a column, with attributes, to a table and schema
-	 */
-    private function _addColumn($schema, $table, $fields)
-	{
-		foreach ($fields as $name => $definition)
-		{
-			if (!$this->columnExists($name, $schema, $table))
+			foreach ($columns->result() as $column)
 			{
-				if ($this->_ci->dbforge->add_column($schema.'.'.$table, array($name => $definition)))
-				{
-					$this->eprintflib->printMessage(sprintf('Column %s.%s.%s of type %s added', $schema, $table, $name, $definition['type']));
-				}
-				else
-				{
-					$this->eprintflib->printError(sprintf('Error while adding column %s.%s.%s of type %s', $schema, $table, $name, $definition['type']));
-				}
-			}
-			else
-			{
-				$this->eprintflib->printMessage(sprintf('Column %s.%s.%s already exists', $schema, $table, $name));
+				$columnsArray[] = $column->routine_name;
 			}
 		}
+
+		return $columnsArray;
 	}
 
 	/**
-	 * Modifies a column, and its attributes, of a table and schema
+	 * Creates a new table in database using the given schema and an array that defines the table structure
 	 */
-	private function _modifyColumn($schema, $table, $fields)
+	private function _createTable($schema, $tableArray)
 	{
-		foreach ($fields as $name => $definition)
-		{
-			if ($this->columnExists($name, $schema, $table))
-			{
-				if ($this->_ci->dbforge->modify_column($schema.'.'.$table, array($name => $definition)))
-				{
-					$this->eprintflib->printMessage(sprintf('Column %s.%s.%s has been modified', $schema, $table, $name));
-				}
-				else
-				{
-					$this->eprintflib->printError(sprintf('Error while modifying column %s.%s.%s', $schema, $table, $name));
-				}
-			}
-			else
-			{
-				$this->eprintflib->printMessage(sprintf('Column %s.%s.%s does NOTt exist', $schema, $table, $name));
-			}
-		}
-	}
+		$tableName = '';
+		$tableComment = '';
+		$tableStructure = null;
 
-	/**
-	 * Drops a column from a table and schema
-	 */
-	private function _dropColumn($schema, $table, $field)
-	{
-		if ($this->columnExists($field, $schema, $table))
+		// For each element of the table array from the php file
+		foreach ($tableArray as $key => $value)
 		{
-			if ($this->_ci->dbforge->drop_column($schema.'.'.$table, $field))
+			if ($key == self::T_COMMENT) // If it is the comment element
 			{
-				$this->eprintflib->printMessage(sprintf('Column %s.%s.%s has been dropped', $schema, $table, $field));
+				$tableComment = $value;
 			}
-			else
+			else // otherwise is the table structure element
 			{
-				$this->eprintflib->printError(sprintf('Error while dropping column %s.%s.%s', $schema, $table, $field));
+				$tableName = $key;
+				$tableStructure = $value;
 			}
 		}
-		else
-		{
-			$this->eprintflib->printMessage(sprintf('Column %s.%s.%s does NOT t exist', $schema, $table, $field));
-		}
-	}
 
-	/**
-	 * Sets a column as primary key of a table and schema
-	 */
-	private function _addPrimaryKey($schema, $table, $name, $fields)
-	{
-		$stringFields = null;
+		// Query to create a table
+		$query = sprintf('CREATE TABLE %s.%s (', $schema, $tableName);
+		// Query to comment the table and its columns
+		$queryComment = sprintf('COMMENT ON TABLE %s.%s IS \'%s\';', $schema, $tableName, $tableComment);
 
-		if (is_array($fields))
+		// For each element of the table structure
+		foreach ($tableStructure as $colName => $colStructure)
 		{
-			if (count($fields) > 0)
+			$notNull = ''; // by default the column could be null
+			if (isset($colStructure[self::T_NULL]) && $colStructure[self::T_NULL] === false)
 			{
-				$stringFields = '';
-				for ($i = 0; $i < count($fields); $i++)
-				{
-					$stringFields .= $fields[$i];
-					if ($i != count($fields) - 1)
-					{
-						$stringFields .= ', ';
-					}
-				}
-				$query = sprintf('ALTER TABLE %s.%s ADD CONSTRAINT %s PRIMARY KEY (%s)', $schema, $table, $name, $stringFields);
+				$notNull = 'NOT NULL'; // set to NOT NULL
+			}
+
+			$default = ''; // by default there is no default for a column
+			if (isset($colStructure[self::T_DEFAULT]))
+			{
+				$default = 'DEFAULT '.$colStructure[self::T_DEFAULT]; // set as given by the table structure
+			}
+
+			// Part of the query related to this column
+			$query .= sprintf('%s %s %s %s,', $colName, $colStructure[self::T_TYPE], $notNull, $default);
+
+			// If a comment is present for this column then the query is built
+			if (isset($colStructure[self::T_COMMENT]))
+			{
+				$queryComment .= sprintf('COMMENT ON COLUMN %s.%s.%s IS \'%s\';', $schema, $tableName, $colName, $colStructure[self::T_COMMENT]);
 			}
 		}
-		else
-		{
-			$query = sprintf('ALTER TABLE %s.%s ADD CONSTRAINT %s PRIMARY KEY (%s)', $schema, $table, $name, $fields);
-		}
 
-		if (@$this->_ci->db->simple_query($query))
-		{
-			$this->eprintflib->printMessage(sprintf('Added primary key %s on table %s.%s', $name, $schema, $table));
-		}
-		else
-		{
-			$this->eprintflib->printError(sprintf('Adding primary key %s on table %s.%s', $name, $schema, $table));
-		}
+		// Removes the last comma from the query
+		$query = substr($query, 0, strlen($query) - 1);
+
+		// Close the round bracket
+		$query .= ');';
+
+		return $this->_execQuery($query.$queryComment); // executes query and returns its result
 	}
 
 	/**
-	 * Sets a column as foreign key of a table and schema
+	 * TODO
+	 * Changes the structure of a table using the given schema and an array that defines the table structure
 	 */
-	private function _addForeingKey($schema, $table, $name, $field, $schemaDest, $tableDest, $fieldDest, $attributes)
+	private function _diffTable($schema, $tableArray)
 	{
-		$query = sprintf(
-			'ALTER TABLE %s.%s ADD CONSTRAINT %s FOREIGN KEY (%s) REFERENCES %s.%s (%s) %s',
-			$schema,
-			$table,
-			$name,
-			$field,
-			$schemaDest,
-			$tableDest,
-			$fieldDest,
-			$attributes
-		);
+		$tableName = '';
+		$tableComment = '';
+		$tableStructure = null;
 
-		if (@$this->_ci->db->simple_query($query))
+		// For each element of the table array from the php file
+		foreach ($tableArray as $key => $value)
 		{
-			$this->eprintflib->printMessage(sprintf('Added foreign key %s on table %s.%s', $name, $schema, $table));
-		}
-		else
-		{
-			$this->eprintflib->printError(sprintf('Adding foreign key %s on table %s.%s', $name, $schema, $table));
-		}
-	}
-
-	/**
-	 * Sets a column as unique key of a table and schema
-	 */
-	private function _addUniqueKey($schema, $table, $name, $fields)
-	{
-		$stringFields = null;
-
-		if (is_array($fields))
-		{
-			if (count($fields) > 0)
+			if ($key == self::T_COMMENT) // If it is the comment element
 			{
-				$stringFields = '';
-				for ($i = 0; $i < count($fields); $i++)
-				{
-					$stringFields .= $fields[$i];
-					if ($i != count($fields) - 1)
-					{
-						$stringFields .= ', ';
-					}
-				}
-				$query = sprintf('CREATE UNIQUE INDEX %s ON %s.%s (%s)', $name, $schema, $table, $stringFields);
+				$tableComment = $value;
+			}
+			else // otherwise is the table structure element
+			{
+				$tableName = $key;
+				$tableStructure = $value;
 			}
 		}
-		else
-		{
-			$query = sprintf('CREATE UNIQUE INDEX %s ON %s.%s (%s)', $name, $schema, $table, $fields);
-		}
 
-		if (@$this->_ci->db->simple_query($query))
-		{
-			$this->eprintflib->printMessage(sprintf('Added unique key %s on table %s.%s', $name, $schema, $table));
-		}
-		else
-		{
-			$this->eprintflib->printError(sprintf('Adding unique key %s on table %s.%s', $name, $schema, $table));
-		}
-	}
+		// Query to alter the table
+		$query = '';
+		// Query to comment the table and its columns
+		$queryComment = sprintf('COMMENT ON TABLE %s.%s IS \'%s\';', $schema, $tableName, $tableComment);
 
-	/**
-	 * Grants permissions to a user on a table and schema
-	 */
-	private function _grantTable($permissions, $schema, $table, $user)
-	{
-		$stringPermission = null;
-
-		if (is_array($permissions))
+		// For each element of the table structure
+		foreach ($tableStructure as $colName => $colStructure)
 		{
-			if (count($permissions) > 0)
+			$notNull = ''; // by default the column could be null
+			if (isset($colStructure[self::T_NULL]) && $colStructure[self::T_NULL] === false)
 			{
-				$stringPermission = '';
-				for ($i = 0; $i < count($permissions); $i++)
-				{
-					$stringPermission .= $permissions[$i];
-					if ($i != count($permissions) - 1)
-					{
-						$stringPermission .= ', ';
-					}
-				}
-				$query = sprintf('GRANT %s ON TABLE %s.%s TO %s', $stringPermission, $schema, $table, $user);
+				$notNull = 'NOT NULL'; // set to NOT NULL
 			}
-		}
-		else
-		{
-			$query = sprintf('GRANT %s ON TABLE %s.%s TO %s', $permissions, $schema, $table, $user);
-		}
 
-		if (@$this->_ci->db->simple_query($query))
-		{
-			$this->eprintflib->printMessage(
-				sprintf(
-					'Granted permissions %s on table %s.%s to user %s',
-					is_null($stringPermission) ? $permissions : $stringPermission,
-					$schema,
-					$table,
-					$user
-				)
-			);
-		}
-		else
-		{
-			$this->eprintflib->printError(
-				sprintf(
-					'Granting permissions %s on table %s.%s to user %s',
-					is_null($stringPermission) ? $permissions : $stringPermission,
-					$schema,
-					$table,
-					$user
-				)
-			);
-		}
-	}
-
-	/**
-	 * Creates a table in a schema with columns
-	 */
-	private function _createTable($schema, $table, $fields)
-	{
-		$this->_ci->dbforge->add_field($fields);
-
-		if ($this->_ci->dbforge->create_table($schema.'.'.$table, true))
-		{
-			$this->eprintflib->printMessage(sprintf('Table %s.%s created or existing', $schema, $table));
-		}
-		else
-		{
-			$this->eprintflib->printError(sprintf('Creating table %s.%s', $schema, $table));
-		}
-	}
-
-	/**
-	 * Drops a table from a schema
-	 */
-	private function _dropTable($schema, $table)
-	{
-		if ($this->_ci->dbforge->drop_table($schema.'.'.$table))
-		{
-			$this->eprintflib->printMessage(sprintf('Table %s.%s has been dropped', $schema, $table));
-		}
-		else
-		{
-			$this->eprintflib->printError(sprintf('Dropping table %s.%s', $schema, $table));
-		}
-	}
-
-	/**
-	 * Initializes a sequence with the max value of a column
-	 */
-	private function _initializeSequence($schemaSrc, $sequence, $schemaDst, $table, $field)
-	{
-		$query = sprintf('SELECT SETVAL(\'%s.%s\', (SELECT MAX(%s) FROM %s.%s))', $schemaSrc, $sequence, $field, $schemaDst, $table);
-
-		if (@$this->_ci->db->simple_query($query))
-		{
-			$this->eprintflib->printMessage(sprintf('Sequence %s.%s has been initialized', $schemaSrc, $sequence));
-		}
-		else
-		{
-			$this->eprintflib->printError(sprintf('Initializing sequence %s.%s', $schemaSrc, $sequence));
-		}
-	}
-
-	/**
-	 * Add comment to a column
-	 */
-	private function _commentOnColumn($schema, $table, $field, $comment)
-	{
-		$query = sprintf('COMMENT ON COLUMN %s.%s.%s IS ?', $schema, $table, $field);
-
-		if (@$this->_ci->db->query($query, array($comment)))
-		{
-			$this->eprintflib->printMessage(sprintf('Comment added to %s.%s.%s', $schema, $table, $field));
-		}
-		else
-		{
-			$this->eprintflib->printError(sprintf('Error while adding comment to %s.%s.%s', $schema, $table, $field));
-		}
-	}
-
-	/**
-	 * Add comment to a table
-	 */
-	private function _commentOnTable($schema, $table, $comment)
-	{
-		$query = sprintf('COMMENT ON TABLE %s.%s IS ?', $schema, $table, $field);
-
-		if (@$this->_ci->db->query($query, array($comment)))
-		{
-			$this->eprintflib->printMessage(sprintf('Comment added to %s.%s', $schema, $table));
-		}
-		else
-		{
-			$this->eprintflib->printError(sprintf('Error while adding comment to %s.%s', $schema, $table));
-		}
-	}
-	/**
-	 * Grants permissions to a user on a sequence
-	 */
-	private function _grantSequence($permissions, $schema, $sequence, $user)
-	{
-		$stringPermission = null;
-
-		if (is_array($permissions))
-		{
-			if (count($permissions) > 0)
+			$default = ''; // by default there is no default for a column
+			if (isset($colStructure[self::T_DEFAULT]))
 			{
-				$stringPermission = '';
-				for ($i = 0; $i < count($permissions); $i++)
-				{
-					$stringPermission .= $permissions[$i];
-					if ($i != count($permissions) - 1)
-					{
-						$stringPermission .= ', ';
-					}
-				}
-				$query = sprintf('GRANT %s ON SEQUENCE %s.%s TO %s', $stringPermission, $schema, $sequence, $user);
+				$default = 'DEFAULT '.$colStructure[self::T_DEFAULT]; // set as given by the table structure
 			}
-		}
-		else
-		{
-			$query = sprintf('GRANT %s ON SEQUENCE %s.%s TO %s', $permissions, $schema, $sequence, $user);
-		}
 
-		if (@$this->_ci->db->simple_query($query))
-		{
-			$this->eprintflib->printMessage(
-				sprintf(
-					'Granted permissions %s on sequence %s.%s to user %s',
-					is_null($stringPermission) ? $permissions : $stringPermission,
-					$schema,
-					$sequence,
-					$user
-				)
-			);
-		}
-		else
-		{
-			$this->eprintflib->printError(
-				sprintf(
-					'Granting permissions %s on sequence %s.%s to user %s',
-					is_null($stringPermission) ? $permissions : $stringPermission,
-					$schema,
-					$sequence,
-					$user
-				)
-			);
+			// Part of the query related to this column
+			$query .= sprintf('%s %s %s %s,', $colName, $colStructure[self::T_TYPE], $notNull, $default);
+
+			// If a comment is present for this column then the query is built
+			if (isset($colStructure[self::T_COMMENT]))
+			{
+				$queryComment .= sprintf('COMMENT ON COLUMN %s.%s.%s IS \'%s\';', $schema, $tableName, $colName, $colStructure[self::T_COMMENT]);
+			}
 		}
 	}
 
@@ -1142,5 +1210,15 @@ class DBSkelLib
 	private function _printFileSeparator()
 	{
 		$this->_printMessage('--------------------------------------------------------------------------------------------');
+	}
+
+	/**
+	 *
+	 */
+	private function _printRunningMode()
+	{
+		if ($this->_isDryrunMode()) $this->_printInfo('>> DBSkel is running in dry run mode <<');
+		elseif ($this->_isNewMode()) $this->_printInfo('>> DBSkel is running in new mode <<');
+		elseif ($this->_isDiffMode()) $this->_printInfo('>> DBSkel is running in diff mode <<');
 	}
 }
