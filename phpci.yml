@@ -92,9 +92,19 @@ test: # Run tests
         - "design"
         allow_failures: true
     php_cpd: # Copy/paste detector
+        ignore:
+        - "rdf"
+        - "config"
+        - "locale"
+        - "application/config"
+        - "application/views"
         allow_failures: true
     php_code_sniffer: # Code sniffer
         standard: "tests/codesniffer/FHComplete"
+        ignore:
+        - "rdf"
+        - "locale"
+        - "application/views"
         allowed_warnings: -1 # Warnings are ignored for a successful build
         allow_failures: true
     #codeception: # Codeception
