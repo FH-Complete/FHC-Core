@@ -98,6 +98,9 @@ test: # Run tests
         - "locale"
         - "application/config"
         - "application/views"
+        # Global ignore is overwritten by the specific one
+        - "vendor"
+        - "tests"
         allow_failures: true
     php_code_sniffer: # Code sniffer
         standard: "tests/codesniffer/FHComplete"
