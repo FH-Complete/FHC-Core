@@ -310,7 +310,7 @@ if (isset($_SESSION['pruefling_id']))
 			$lastsemester = $row->semester;
 
 			echo '<table border="0" cellspacing="0" cellpadding="0" id="Gebiet" style="display: visible; border-collapse: separate; border-spacing: 0 3px;">';
-			echo '<tr><td class="HeaderTesttool">'. ($row->semester == '1' ? strtoupper($p->t('testtool/basic')) : strtoupper($p->t('testtool/quereinstieg'))).'</td></tr>';
+			echo '<tr><td class="HeaderTesttool">'. ($row->semester == '1' ? $p->t('testtool/basisgebiete') : $p->t('testtool/quereinstiegsgebiete')).'</td></tr>';
 		}
 
 		// Bei Quereinstiegsgebieten nach STG clustern und die STG anzeigen
@@ -330,10 +330,9 @@ if (isset($_SESSION['pruefling_id']))
                     $quereinsteiger_stg_string .= $stg->bezeichnung;
                     $cnt++;
                 }
-                echo '<tr><td bgcolor="#add4ea" class="HeaderTesttoolSTG">'. $quereinsteiger_stg_string. '</td></tr>';
+                echo '<tr><td bgcolor="#73a9d6" class="HeaderTesttoolSTG">'. $quereinsteiger_stg_string. '</td></tr>';
 			}
-		}
-
+        }
 		$gebiet = new gebiet();
 
 		// Prüfen, ob das Gebiet eine/n Frage/Vorschlag im MathML-Format enthält
