@@ -14,7 +14,6 @@ setup: # First!
         - "DROP DATABASE IF EXISTS fhcomplete;"
         - "CREATE DATABASE fhcomplete;"
     composer: # Run composer to install all the required 3rd party software
-        action: "install"
     shell:
         # Install addons
         - "git clone --quiet https://github.com/FH-Complete/FHC-AddOn-Abrechnung.git %BUILD_PATH%/addons/abrechnung"
@@ -85,14 +84,18 @@ setup: # First!
         - "ln -s %BUILD_PATH% ../fhcomplete"
 
 test: # Run tests
-    php_parallel_lint: # Lint
-        allow_failures: true
+    php_parallel_lint: # Lint cannot fail!
     php_mess_detector: # Mess detector
+        rules:
+        - "unusedcode"
+        - "codesize"
+        - "design"
         allow_failures: true
     php_cpd: # Copy/paste detector
         allow_failures: true
     php_code_sniffer: # Code sniffer
         standard: "tests/codesniffer/FHComplete"
+        allowed_warnings: -1 # Warnings are ignored for a successful build
         allow_failures: true
     #codeception: # Codeception
     #    config: "tests/codeception/"

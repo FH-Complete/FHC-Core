@@ -590,11 +590,11 @@ function saveAnmeldung(lehrveranstaltung_id, termin_id)
 		success: function(data){
 			if(data.error === 'false')
 			{
-				messageBox("message", data.result, "green", "highlight", 1000);
+				messageBox("message", data.result, "green", "highlight", 10000);
 			}
 			else
 			{
-				messageBox("message", data.errormsg, "red", "highlight", 1000);
+				messageBox("message", data.errormsg, "red", "highlight", 10000);
 			}
 			resetForm();
 
@@ -635,11 +635,11 @@ function stornoAnmeldung(pruefungsanmeldung_id)
 			success: function(data){
 				if(data.error === 'false')
 				{
-					messageBox("message", data.result, "green", "highlight", 1000);
+					messageBox("message", data.result, "green", "highlight", 10000);
 				}
 				else
 				{
-					messageBox("message", data.errormsg, "red", "highlight", 1000);
+					messageBox("message", data.errormsg, "red", "highlight", 10000);
 				}
 
 				refresh();
