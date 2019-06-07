@@ -25,11 +25,6 @@ body.main /* Workaround fuer Farbverlauf im IE statt ShadowBox */
 	padding:0px;
 	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#cccccc',endColorstr='#ffffff');
 }
-body.testtool-content
-{
-	width: 65%;
-	margin-left: 3%;
-}
 html
 {
 	height: 100%;
@@ -465,13 +460,12 @@ td.HeaderTesttool /*fuer die Button-Optik beim Testtool*/
 td.HeaderTesttoolSTG /*fuer die Button-Optik der Quereinstiegs-Studiengänge beim Testtool*/
 {
 	color: white;
-	border: 2px solid #add4ea;
+	border: 2px solid #73a9d6;
 	padding: 10px;
 	max-width: 100px;
 	overflow: hidden;
 	text-overflow: ellipsis;
 	white-space: normal;
-	font-weight: bold;
 }
 td.Inaktiv  /*fuer Inaktive Items bei der Raumbeschreibung */
 {
@@ -520,7 +514,6 @@ div.TesttoolTitle /* Ueberschrift auf den Titelfolien */
 	font-family: Helvetica, Arial, sans-serif;
 	text-transform: uppercase;
 	color: #FFFFFF;
-	display: table;
 	white-space: nowrap;
 	text-shadow: -1px 0 #00639C, 0 1px #00639C, 1px 0 #00639C, 0 -1px #00639C;
 	margin: 0 0 20px 0;
