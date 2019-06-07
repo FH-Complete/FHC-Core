@@ -52,52 +52,64 @@ if($studiensemester_kurzbz != -1)
 	{
 		$summe_m=0;
 		$summe_w=0;
-		$rest_m=0; 
+		$rest_m=0;
 		$rest_w=0;
-		
+
 		//Studiengaenge, die zuvor abgeschlossen wurden
-	
-		$qry_master="SELECT DISTINCT count(*)as count ,studiengang_kz, typ, geschlecht, tbl_studiengang.bezeichnung as bez, tbl_studiengang.kurzbz  
-		FROM public.tbl_person JOIN public.tbl_prestudent ON(public.tbl_person.person_id=public.tbl_prestudent.person_id) 
-		JOIN public.tbl_prestudentstatus ON(public.tbl_prestudent.prestudent_id=public.tbl_prestudentstatus.prestudent_id) 
-		JOIN public.tbl_studiengang USING(studiengang_kz) 
-		WHERE status_kurzbz='Absolvent' AND typ!='m' AND studiengang_kz<10000 
-			AND public.tbl_person.person_id IN(SELECT public.tbl_person.person_id FROM public.tbl_person 
-			JOIN public.tbl_prestudent ON(public.tbl_person.person_id=public.tbl_prestudent.person_id) 
-			JOIN public.tbl_prestudentstatus ON(public.tbl_prestudent.prestudent_id=public.tbl_prestudentstatus.prestudent_id) 
-			WHERE studiengang_kz='".addslashes($row_stg->studiengang_kz)."' 
-			AND studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."' 
-			AND status_kurzbz='Student' 
-			AND ausbildungssemester='1') 
-		GROUP BY studiengang_kz, typ, geschlecht, public.tbl_studiengang.bezeichnung, tbl_studiengang.kurzbz ORDER BY count desc";
-		
+
+		$qry_master = "
+		SELECT
+			DISTINCT count(*) as count , studiengang_kz, typ, geschlecht,
+			tbl_studiengang.bezeichnung as bez, tbl_studiengang.kurzbz
+		FROM
+			public.tbl_person JOIN public.tbl_prestudent ON(public.tbl_person.person_id=public.tbl_prestudent.person_id)
+			JOIN public.tbl_prestudentstatus ON(public.tbl_prestudent.prestudent_id=public.tbl_prestudentstatus.prestudent_id)
+			JOIN public.tbl_studiengang USING(studiengang_kz)
+		WHERE
+			status_kurzbz='Absolvent'
+			AND typ!='m' AND studiengang_kz<10000
+			AND public.tbl_person.person_id IN(
+				SELECT
+					public.tbl_person.person_id
+				FROM
+					public.tbl_person
+					JOIN public.tbl_prestudent ON(public.tbl_person.person_id=public.tbl_prestudent.person_id)
+					JOIN public.tbl_prestudentstatus ON(public.tbl_prestudent.prestudent_id=public.tbl_prestudentstatus.prestudent_id)
+					WHERE studiengang_kz=".$db->db_add_param($row_stg->studiengang_kz)."
+					AND studiensemester_kurzbz=".$db->db_add_param($studiensemester_kurzbz)."
+					AND status_kurzbz='Student'
+					AND ausbildungssemester='1'
+				)
+		GROUP BY studiengang_kz, typ, geschlecht, public.tbl_studiengang.bezeichnung, tbl_studiengang.kurzbz
+		ORDER BY count desc";
+
 		//Anzahl der Studenten ohne Abschluss an der FHTW
-		
+
 		//Anzahl der Studenten im 1.Semester des MasterStg
-		$qry_anzahl="SELECT count(*) as anzahl FROM public.tbl_person 
-			JOIN public.tbl_prestudent ON(public.tbl_person.person_id=public.tbl_prestudent.person_id) 
-			JOIN public.tbl_prestudentstatus ON(public.tbl_prestudent.prestudent_id=public.tbl_prestudentstatus.prestudent_id) 
-			WHERE studiengang_kz='".addslashes($row_stg->studiengang_kz)."' 
-			AND studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."' 
-			AND status_kurzbz='Student' 
+		$qry_anzahl="SELECT count(*) as anzahl FROM public.tbl_person
+			JOIN public.tbl_prestudent ON(public.tbl_person.person_id=public.tbl_prestudent.person_id)
+			JOIN public.tbl_prestudentstatus ON(public.tbl_prestudent.prestudent_id=public.tbl_prestudentstatus.prestudent_id)
+			WHERE studiengang_kz=".$db->db_add_param($row_stg->studiengang_kz)."
+			AND studiensemester_kurzbz=".$db->db_add_param($studiensemester_kurzbz)."
+			AND status_kurzbz='Student'
 			AND ausbildungssemester='1'
 			AND geschlecht='m'";
 		if(!$result_anzahl=$db->db_query($qry_anzahl))
 			die($db->db_last_error());
 		$row_anzahl_m=$db->db_fetch_object($result_anzahl);
-		
-		$qry_anzahl="SELECT count(*) as anzahl FROM public.tbl_person 
-			JOIN public.tbl_prestudent ON(public.tbl_person.person_id=public.tbl_prestudent.person_id) 
-			JOIN public.tbl_prestudentstatus ON(public.tbl_prestudent.prestudent_id=public.tbl_prestudentstatus.prestudent_id) 
-			WHERE studiengang_kz='".addslashes($row_stg->studiengang_kz)."' 
-			AND studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."' 
-			AND status_kurzbz='Student' 
+
+		$qry_anzahl="SELECT count(*) as anzahl FROM public.tbl_person
+			JOIN public.tbl_prestudent ON(public.tbl_person.person_id=public.tbl_prestudent.person_id)
+			JOIN public.tbl_prestudentstatus ON(public.tbl_prestudent.prestudent_id=public.tbl_prestudentstatus.prestudent_id)
+			WHERE studiengang_kz=".$db->db_add_param($row_stg->studiengang_kz)."
+			AND studiensemester_kurzbz=".$db->db_add_param($studiensemester_kurzbz)."
+			AND status_kurzbz='Student'
 			AND ausbildungssemester='1'
 			AND geschlecht='w'";
 		if(!$result_anzahl=$db->db_query($qry_anzahl))
 			die($db->db_last_error());
 		$row_anzahl_w=$db->db_fetch_object($result_anzahl);
-		
+
 		$ausgabe .= "<TABLE width=90% style='border:3px solid #D3DCE3;border-spacing:0pt;-moz-border-radius-topleft:10px;-moz-border-radius-topright:10px;-khtml-border-radius-topleft:10px;-khtml-border-radius-topright:10px;' align='center'>";
 		$ausgabe .= "<TR style='color:#000000; background-color:#D3DCE3;font: bold 1.2em arial;'><TD colspan='4'>&nbsp;&nbsp;&nbsp;";
 		$ausgabe .= "<a href='bama_studentenstrom.svg.php?stsem=WS2008&studiengang_kz=".$row_stg->studiengang_kz."&typ=m&kurz=".$row_stg->kurzbz."' target='_blank'>";
@@ -111,7 +123,7 @@ if($studiensemester_kurzbz != -1)
 		$ausgabe .= "<TH width='5%' style='background-color:#dddddd;border:1px solid #D3DCE3;'>Gesamt</TH>";
 		$ausgabe .= "<TH width='10%' style='background-color:#dddddd;border:1px solid #D3DCE3;'>Prozent M</TH>";
 		$ausgabe .= "<TH width='10%' style='background-color:#dddddd;border:1px solid #D3DCE3;'>Prozent W</TH>";
-		
+
 		$result_master=$db->db_query($qry_master);
 		$i=0;
 		$help=array();
@@ -121,10 +133,10 @@ if($studiensemester_kurzbz != -1)
 				$help[$row_master->studiengang_kz]['bez']=$row_master->bez;
 				if($row_master->geschlecht=='m')
 					$help[$row_master->studiengang_kz]['count_m']=$row_master->count;
-				else 
+				else
 					$help[$row_master->studiengang_kz]['count_w']=$row_master->count;
 		}
-		foreach ($help AS $key=>$row)	
+		foreach ($help AS $key=>$row)
 		{
 			if (!isset($row['count_m']))
 				$row['count_m']=0;
@@ -140,12 +152,12 @@ if($studiensemester_kurzbz != -1)
 			$ausgabe .= "<TD style='border:1px solid #D3DCE3;'align='center'>".($row['count_w']+$row['count_m'])."</TD>";
 			if ($row_anzahl_m->anzahl==0)
 				$prozent=0;
-			else 
+			else
 				$prozent=round((100/$row_anzahl_m->anzahl)*$row['count_m'],2);
 			$ausgabe .= "<TD style='border:1px solid #D3DCE3;'align='center'>".$prozent."%</TD>";
 			if ($row_anzahl_w->anzahl==0)
 				$prozent=0;
-			else 
+			else
 				$prozent=round((100/$row_anzahl_w->anzahl)*$row['count_w'],2);
 			$ausgabe .= "<TD style='border:1px solid #D3DCE3;'align='center'>".$prozent."%</TD>";
 			$ausgabe .= "</TR>";
@@ -166,12 +178,12 @@ if($studiensemester_kurzbz != -1)
 			$ausgabe .= "<TD style='border:1px solid #D3DCE3;' align='center'>".($rest_w+$rest_m)."</TD>";
 			if ($row_anzahl_m->anzahl==0)
 				$prozent=0;
-			else 
+			else
 				$prozent=round((100/$row_anzahl_m->anzahl)*$rest_m,2);
 			$ausgabe .= "<TD style='border:1px solid #D3DCE3;' align='center'>".$prozent."%</TD>";
 			if ($row_anzahl_w->anzahl==0)
 				$prozent=0;
-			else 
+			else
 				$prozent=round((100/$row_anzahl_w->anzahl)*$rest_w,2);
 			$ausgabe .= "<TD style='border:1px solid #D3DCE3;' align='center'>".$prozent."%</TD>";
 			$ausgabe .= "</TR>";
@@ -179,7 +191,7 @@ if($studiensemester_kurzbz != -1)
 		//$ausgabe .="</TABLE>".$summe."+".$rest."=".($summe+$rest)."=".$row_anzahl->anzahl."?<BR><BR>";
 		$ausgabe .="</TABLE><BR><BR>";
 	}
-	
+
 	$ausgabe .= "<BR><BR><H2>Bachelor-Studiengänge: (SS".substr($studiensemester_kurzbz,-4)."/$studiensemester_kurzbz)</H2>";
 	$qry_stg="SELECT * FROM public.tbl_studiengang WHERE typ='b' ORDER by bezeichnung,studiengang_kz";
 	$result_stg=$db->db_query($qry_stg);
@@ -187,48 +199,51 @@ if($studiensemester_kurzbz != -1)
 	{
 		$summe_m=0;
 		$summe_w=0;
-		$rest_m=0; 
+		$rest_m=0;
 		$rest_w=0;
-		
+
 		//Master-Studiengänge, die noch besucht wurden
-		$qry_bachelor="SELECT DISTINCT count(*)as count, studiengang_kz, typ, geschlecht, bezeichnung as bez, kurzbz FROM 
-		(SELECT DISTINCT ON(public.tbl_person.person_id, studiengang_kz) studiengang_kz,typ,geschlecht,tbl_studiengang.bezeichnung, tbl_studiengang.kurzbz   
-		FROM public.tbl_person JOIN public.tbl_prestudent ON(public.tbl_person.person_id=public.tbl_prestudent.person_id) 
-		JOIN public.tbl_prestudentstatus ON(public.tbl_prestudent.prestudent_id=public.tbl_prestudentstatus.prestudent_id) 
-		JOIN public.tbl_studiengang USING(studiengang_kz) 
-		WHERE status_kurzbz='Student' AND typ='m' 
-			AND public.tbl_person.person_id IN(SELECT public.tbl_person.person_id FROM public.tbl_person 
-			JOIN public.tbl_prestudent ON(public.tbl_person.person_id=public.tbl_prestudent.person_id) 
-			JOIN public.tbl_prestudentstatus ON(public.tbl_prestudent.prestudent_id=public.tbl_prestudentstatus.prestudent_id) 
-			WHERE studiengang_kz='".addslashes($row_stg->studiengang_kz)."'  
+		$qry_bachelor="SELECT DISTINCT count(*)as count, studiengang_kz, typ, geschlecht, bezeichnung as bez, kurzbz FROM
+		(SELECT DISTINCT ON(public.tbl_person.person_id, studiengang_kz) studiengang_kz,typ,geschlecht,tbl_studiengang.bezeichnung, tbl_studiengang.kurzbz
+		FROM public.tbl_person JOIN public.tbl_prestudent ON(public.tbl_person.person_id=public.tbl_prestudent.person_id)
+		JOIN public.tbl_prestudentstatus ON(public.tbl_prestudent.prestudent_id=public.tbl_prestudentstatus.prestudent_id)
+		JOIN public.tbl_studiengang USING(studiengang_kz)
+		WHERE status_kurzbz='Student' AND typ='m'
+			AND public.tbl_person.person_id IN(SELECT public.tbl_person.person_id FROM public.tbl_person
+			JOIN public.tbl_prestudent ON(public.tbl_person.person_id=public.tbl_prestudent.person_id)
+			JOIN public.tbl_prestudentstatus ON(public.tbl_prestudent.prestudent_id=public.tbl_prestudentstatus.prestudent_id)
+			WHERE studiengang_kz=".$db->db_add_param($row_stg->studiengang_kz)."
 			AND status_kurzbz='Absolvent'
-			AND (studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."' OR studiensemester_kurzbz='SS".substr($studiensemester_kurzbz,-4)."') )) as b 
+			AND (studiensemester_kurzbz=".$db->db_add_param($studiensemester_kurzbz)."
+			OR studiensemester_kurzbz='SS".substr($studiensemester_kurzbz,-4)."') )) as b
 		GROUP BY studiengang_kz, typ, geschlecht, bezeichnung, kurzbz ORDER BY count desc";
-		
+
 		//Anzahl der Studenten ohne weitere Masterstudien am FHTW
 
-		
+
 		//Anzahl der Absolventen des Studiengangs
-		$qry_anzahl="SELECT count(*) as anzahl FROM public.tbl_person 
-			JOIN public.tbl_prestudent ON(public.tbl_person.person_id=public.tbl_prestudent.person_id) 
-			JOIN public.tbl_prestudentstatus ON(public.tbl_prestudent.prestudent_id=public.tbl_prestudentstatus.prestudent_id) 
-			WHERE studiengang_kz='".addslashes($row_stg->studiengang_kz)."' 
+		$qry_anzahl="SELECT count(*) as anzahl FROM public.tbl_person
+			JOIN public.tbl_prestudent ON(public.tbl_person.person_id=public.tbl_prestudent.person_id)
+			JOIN public.tbl_prestudentstatus ON(public.tbl_prestudent.prestudent_id=public.tbl_prestudentstatus.prestudent_id)
+			WHERE studiengang_kz=".$db->db_add_param($row_stg->studiengang_kz)."
 			AND status_kurzbz='Absolvent'
-			AND (studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."' OR studiensemester_kurzbz='SS".substr($studiensemester_kurzbz,-4)."')
+			AND (studiensemester_kurzbz=".$db->db_add_param($studiensemester_kurzbz)."
+				OR studiensemester_kurzbz='SS".substr($studiensemester_kurzbz,-4)."')
 			AND geschlecht='m'";
 		$result_anzahl=$db->db_query($qry_anzahl);
 		$row_anzahl_m=$db->db_fetch_object($result_anzahl);
-		
-		$qry_anzahl="SELECT count(*) as anzahl FROM public.tbl_person 
-			JOIN public.tbl_prestudent ON(public.tbl_person.person_id=public.tbl_prestudent.person_id) 
-			JOIN public.tbl_prestudentstatus ON(public.tbl_prestudent.prestudent_id=public.tbl_prestudentstatus.prestudent_id) 
-			WHERE studiengang_kz='".addslashes($row_stg->studiengang_kz)."' 
+
+		$qry_anzahl="SELECT count(*) as anzahl FROM public.tbl_person
+			JOIN public.tbl_prestudent ON(public.tbl_person.person_id=public.tbl_prestudent.person_id)
+			JOIN public.tbl_prestudentstatus ON(public.tbl_prestudent.prestudent_id=public.tbl_prestudentstatus.prestudent_id)
+			WHERE studiengang_kz=".$db->db_add_param($row_stg->studiengang_kz)."
 			AND status_kurzbz='Absolvent'
-			AND (studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."' OR studiensemester_kurzbz='SS".substr($studiensemester_kurzbz,-4)."')
+			AND (studiensemester_kurzbz=".$db->db_add_param($studiensemester_kurzbz)."
+				OR studiensemester_kurzbz='SS".substr($studiensemester_kurzbz,-4)."')
 			AND geschlecht='w'";
 		$result_anzahl=$db->db_query($qry_anzahl);
 		$row_anzahl_w=$db->db_fetch_object($result_anzahl);
-					
+
 		$ausgabe .= "<TABLE width=90% style='border:3px solid #D3DCE3;border-spacing:0pt;-moz-border-radius-topleft:10px;-moz-border-radius-topright:10px;-khtml-border-radius-topleft:10px;-khtml-border-radius-topright:10px;' align='center'>";
 		$ausgabe .= "<TR style='color:#000000; background-color:#D3DCE3;font: bold 1.2em arial;'>";
 		$ausgabe .= "<TD colspan='4'>&nbsp;&nbsp;&nbsp;";
@@ -254,10 +269,10 @@ if($studiensemester_kurzbz != -1)
 				$help[$row_bachelor->studiengang_kz]['bez']=$row_bachelor->bez;
 				if($row_bachelor->geschlecht=='m')
 					$help[$row_bachelor->studiengang_kz]['count_m']=$row_bachelor->count;
-				else 
+				else
 					$help[$row_bachelor->studiengang_kz]['count_w']=$row_bachelor->count;
 		}
-		foreach ($help AS $key=>$row)	
+		foreach ($help AS $key=>$row)
 		{
 			if (!isset($row['count_m']))
 				$row['count_m']=0;
@@ -273,12 +288,12 @@ if($studiensemester_kurzbz != -1)
 			$ausgabe .= "<TD style='border:1px solid #D3DCE3;'align='center'>".($row['count_w']+$row['count_m'])."</TD>";
 			if ($row_anzahl_m->anzahl==0)
 				$prozent=0;
-			else 
+			else
 				$prozent=round((100/$row_anzahl_m->anzahl)*$row['count_m'],2);
 			$ausgabe .= "<TD style='border:1px solid #D3DCE3;'align='center'>".$prozent."%</TD>";
 			if ($row_anzahl_w->anzahl==0)
 				$prozent=0;
-			else 
+			else
 				$prozent=round((100/$row_anzahl_w->anzahl)*$row['count_w'],2);
 			$ausgabe .= "<TD style='border:1px solid #D3DCE3;'align='center'>".$prozent."%</TD>";
 			$ausgabe .= "</TR>";
@@ -286,7 +301,7 @@ if($studiensemester_kurzbz != -1)
 			$summe_w += $row['count_w'];
 			$i++;
 		}
-		
+
 		//$rest=$row_rest->rest;
 		$rest_m=$row_anzahl_m->anzahl-$summe_m;
 		$rest_w=$row_anzahl_w->anzahl-$summe_w;
@@ -300,22 +315,22 @@ if($studiensemester_kurzbz != -1)
 			$ausgabe .= "<TD style='border:1px solid #D3DCE3;' align='center'>".($rest_w+$rest_m)."</TD>";
 			if ($row_anzahl_m->anzahl==0)
 				$prozent=0;
-			else 
+			else
 				$prozent=round((100/$row_anzahl_m->anzahl)*$rest_m,2);
 			$ausgabe .= "<TD style='border:1px solid #D3DCE3;' align='center'>".$prozent."%</TD>";
 			if ($row_anzahl_w->anzahl==0)
 				$prozent=0;
-			else 
+			else
 				$prozent=round((100/$row_anzahl_w->anzahl)*$rest_w,2);
 			$ausgabe .= "<TD style='border:1px solid #D3DCE3;' align='center'>".$prozent."%</TD>";
 			$ausgabe .= "</TR>";
 
 		$ausgabe .="</TABLE><BR><BR>";
 	}
-	
+
 }
 
-	
+
 echo '
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 <html>
@@ -340,19 +355,19 @@ while ($row_sem=$db->db_fetch_object($result_sem))
 	{
 		$selected="selected='selected'";
 	}
-	else 
+	else
 	{
 		$selected='';
 	}
 	$htmlstr .= "<option $selected value='".$row_sem->studiensemester_kurzbz."'>".$row_sem->bezeichnung."</option>";
-}		
+}
 $htmlstr .= "</select>\n";
 $htmlstr .= "<input type='submit' name='speichern' value='OK' title='Studiensemester bestimmen'>";
 $htmlstr .= "</form>\n";
 
 	echo $htmlstr;
 	echo $ausgabe;
-	
+
 echo "Anmerkungen:<br><br>Doppelvorkommen von Studierenden führt zu Verfaelschungen bei der Anzahl der 'Externen':<br>
 - AbsolventInnen bzw. Studierende in verschiedenen Studiengaengen.<br>
 - Doppelteintragungen: z.B. nach Abbruch neu inskribiert";
