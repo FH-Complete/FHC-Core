@@ -46,6 +46,7 @@ $uid=(isset($_GET['uid'])?$_GET['uid']:'');
 $fachbereich_kurzbz=(isset($_GET['fachbereich_kurzbz'])?$_GET['fachbereich_kurzbz']:'');
 $orgform=(isset($_GET['orgform'])?$_GET['orgform']:'');
 $oe_kurzbz = (isset($_GET['oe_kurzbz'])?$_GET['oe_kurzbz']:'');
+$filter = (isset($_GET['filter'])?$_GET['filter']:'');
 
 loadVariables($user);
 
@@ -166,6 +167,36 @@ elseif($oe_kurzbz!='') // Alle LVs einer Organisationseinheit
 
 	if(isset($sem) && $sem!='')
 		$qry.=" AND tbl_lehrveranstaltung.semester=".$db->db_add_param($sem);
+}
+elseif($filter != '')
+{
+	$additionalfilter = '';
+	if(is_numeric($filter))
+	{
+		$additionalfilter.= " OR lehrveranstaltung_id=".$db->db_add_param($filter)."
+			OR lehreinheit_id=".$db->db_add_param($filter);
+	}
+		
+	$qry = "
+		SELECT
+				distinct on(lehrveranstaltung_id)
+				lv_studiengang_kz, lv_semester, lv_kurzbz, lv_bezeichnung, lv_ects,
+				lv_lehreverzeichnis, lv_planfaktor, lv_planlektoren, lv_planpersonalkosten,
+				lv_plankostenprolektor, lv_orgform_kurzbz, lehrveranstaltung_id,
+				lehrform_kurzbz, lv_lehrform_kurzbz, lv_bezeichnung_english, studiengang_kz, semester, anmerkung, sprache, semesterstunden,
+				lehre, aktiv,
+				'' as studienplan_id, '' as studienplan_bezeichnung,
+				(SELECT lehrtyp_kurzbz FROM lehre.tbl_lehrveranstaltung WHERE lehrveranstaltung_id=vw_lehreinheit.lehrveranstaltung_id) as lehrtyp_kurzbz
+			FROM
+				campus.vw_lehreinheit
+			WHERE
+				studiensemester_kurzbz=".$db->db_add_param($semester_aktuell)."
+			 	AND
+				(lv_bezeichnung like '%".$db->db_escape($filter)."%'
+				OR lv_bezeichnung_english like '%".$db->db_escape($filter)."%'
+				$additionalfilter
+				)
+		";
 }
 else
 {
