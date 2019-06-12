@@ -2938,6 +2938,31 @@ if(!$result = @$db->db_query("SELECT bezeichnung_mehrsprachig FROM bis.tbl_orgfo
 	}
 }
 
+// Add column oe_kurzbz to public.tbl_msg_recipient
+if(!$result = @$db->db_query("SELECT oe_kurzbz FROM public.tbl_msg_recipient LIMIT 1"))
+{
+	$qry = 'ALTER TABLE public.tbl_msg_recipient ADD COLUMN oe_kurzbz character varying(32);';
+	if(!$db->db_query($qry))
+		echo '<strong>public.tbl_msg_recipient: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Added column oe_kurzbz to table public.tbl_msg_recipient';
+
+	// FOREIGN KEY fk_tbl_msg_recipient_oe_kurzbz: public.tbl_msg_recipient.oe_kurzbz references public.tbl_organisationseinheit.oe_kurzbz
+	if ($result = @$db->db_query("SELECT conname FROM pg_constraint WHERE conname = 'fk_tbl_msg_recipient_oe_kurzbz'"))
+	{
+		if ($db->db_num_rows($result) == 0)
+		{
+			$qry = "ALTER TABLE public.tbl_msg_recipient ADD CONSTRAINT fk_tbl_msg_recipient_oe_kurzbz FOREIGN KEY (oe_kurzbz)
+					REFERENCES public.tbl_organisationseinheit(oe_kurzbz) ON UPDATE CASCADE ON DELETE RESTRICT;";
+
+			if (!$db->db_query($qry))
+				echo '<strong>public.tbl_msg_recipient: '.$db->db_last_error().'</strong><br>';
+			else
+				echo '<br>public.tbl_msg_recipient: added foreign key on column oe_kurzbz referenced to public.tbl_organisationseinheit(oe_kurzbz)';
+		}
+	}
+}
+
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
 
@@ -3121,7 +3146,7 @@ $tabellen=array(
 	"public.tbl_mitarbeiter"  => array("mitarbeiter_uid","personalnummer","telefonklappe","kurzbz","lektor","fixangestellt","bismelden","stundensatz","ausbildungcode","ort_kurzbz","standort_id","anmerkung","insertamum","insertvon","updateamum","updatevon","ext_id","kleriker"),
 	"public.tbl_msg_attachment" => array("attachment_id","message_id","name","filename"),
 	"public.tbl_msg_message" => array("message_id","person_id","subject","body","priority","relationmessage_id","oe_kurzbz","insertamum","insertvon"),
-	"public.tbl_msg_recipient" => array("message_id","person_id","token","sent","sentinfo","insertamum","insertvon"),
+	"public.tbl_msg_recipient" => array("message_id","person_id","token","sent","sentinfo","insertamum","insertvon","oe_kurzbz"),
 	"public.tbl_msg_status" => array("message_id","person_id","status","statusinfo","insertamum","insertvon","updateamum","updatevon"),
 	"public.tbl_notiz"  => array("notiz_id","titel","text","verfasser_uid","bearbeiter_uid","start","ende","erledigt","insertamum","insertvon","updateamum","updatevon","ext_id"),
 	"public.tbl_notizzuordnung"  => array("notizzuordnung_id","notiz_id","projekt_kurzbz","projektphase_id","projekttask_id","uid","person_id","prestudent_id","bestellung_id","lehreinheit_id","ext_id","anrechnung_id"),

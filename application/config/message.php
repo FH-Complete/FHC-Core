@@ -12,7 +12,7 @@ $config['message_html_view_url'] = '/ViewMessage/toHTML/';
 
 // Change this to CIS Server (https://cis.example.com/index.ci.php) if you are sending Messages from Vilesci
 $config['message_server'] = site_url();
-$config['assistent_function'] = 'ass';
+$config['ou_receivers'] = array('ass');
 
 $config['message_redirect_url'] = array();
 $config['message_redirect_url']['fallback'] = site_url('ViewMessage/writeReply');

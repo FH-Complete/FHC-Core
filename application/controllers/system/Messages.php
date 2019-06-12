@@ -5,7 +5,7 @@ if (! defined('BASEPATH')) exit('No direct script access allowed');
 class Messages extends Auth_Controller
 {
 	/**
-	 *
+	 * MessageLib is loaded by CLMessagesModel
 	 */
 	public function __construct()
 	{
@@ -19,9 +19,6 @@ class Messages extends Auth_Controller
 				'getMessageFromIds' => array('basis/message:r', 'infocenter:r')
 			)
 		);
-
-		// Loads the message library
-		$this->load->library('MessageLib');
 
 		// Loads the widget library
 		$this->load->library('WidgetLib');
@@ -38,30 +35,26 @@ class Messages extends Auth_Controller
 	}
 
 	// -----------------------------------------------------------------------------------------------------------------
-	// Public methods
+	// Public methods - HTML output
 
 	/**
-	 * Write a new message
+	 * Initialize all the parameters used by view system/messages/messageWrite
+	 * to build a GUI used to write a messate to user/s
 	 */
 	public function write()
 	{
-		$person_id = $this->input->post('person_id');
-		$sender_id = null;
+		$persons = $this->input->post('person_id');
 
 		$authUser = $this->CLMessagesModel->getAuthUser();
-		if (isError($authUser))
-		{
-			show_error(getData($authUser));
-		}
-		else
-		{
-			$sender_id = getData($authUser)[0]->person_id;
-		}
+		if (isError($authUser)) show_error(getData($authUser));
 
-		$msgVarsData = $this->MessageModel->getMsgVarsDataByPersonId($person_id);
+		$sender_id = getData($authUser)[0]->person_id;
+
+		// Retrieves person information
+		$msgVarsData = $this->MessageModel->getMsgVarsDataByPersonId($persons);
 		if (isError($msgVarsData)) show_error(getData($msgVarsData));
 
-		// Retrieves message vars for a person from view view vw_msg_vars_person
+		// Retrieves message vars from view vw_msg_vars_person
 		$variables = $this->messagelib->getMessageVarsPerson();
 		if (isError($variables)) show_error(getData($variables));
 
@@ -73,33 +66,43 @@ class Messages extends Auth_Controller
 		$isAdmin = $this->messagelib->getIsAdmin($sender_id);
 		if (isError($isAdmin)) show_error(getData($isAdmin));
 
-		$data = array (
-			'recipients' => getData($msgVarsData),
-			'variables' => getData($variables),
-			'oe_kurzbz' => getData($oe_kurzbz), // used to get the templates
-			'isAdmin' => getData($isAdmin)
+		$this->load->view(
+			'system/messages/messageWrite',
+			array (
+				'recipients' => getData($msgVarsData), // recipients data
+				'variables' => getData($variables), // message vars
+				'oe_kurzbz' => getData($oe_kurzbz), // used to get the templates
+				'isAdmin' => getData($isAdmin) // is admin?
+			)
 		);
-
-		$this->load->view('system/messages/messageWrite', $data);
 	}
 
 	/**
-	 * Send message
+	 * Send a new message or reply to user/s
+	 * If a relationmessage_id this message is a reply to another one
 	 */
 	public function send()
 	{
 		$persons = $this->input->post('persons');
 		$relationmessage_id = $this->input->post('relationmessage_id');
 
+		// Retrieves message vars data for the fiven user/s
 		$msgVarsData = $this->MessageModel->getMsgVarsDataByPersonId($persons);
 
+		// Send the message
 		$send = $this->CLMessagesModel->send($msgVarsData, $relationmessage_id);
 
 		$this->load->view('system/messages/messageSent', array('success' => isSuccess($send)));
 	}
 
+	// -----------------------------------------------------------------------------------------------------------------
+	// Public methods - JSON output
+
 	/**
-	 * Send message, response is in JSON format
+	 * Send a new message
+	 * - The recipients are prestudents
+	 * - An email template with message var may be provided
+	 * - A global organisation unit may be provided, otherwise is used the prestudent one
 	 */
 	public function sendJson()
 	{
@@ -120,23 +123,19 @@ class Messages extends Auth_Controller
 		}
 
 		$send = $this->CLMessagesModel->send($msgVarsData, null, $oe_kurzbz, $vorlage_kurzbz, $msgVars);
-		if (isError($send))
-		{
-			$this->outputJsonError(getData($send));
-		}
-		else
-		{
-			$this->outputJsonSuccess(getData($send));
-		}
+
+		$this->outputJson(getData($send));
 	}
 
 	/**
-	 * getVorlage
+	 * Returns an object that represent a template store in database
+	 * If no templates are found with the given parameter or the given parameter is an empty string,
+	 * then an error is returned
 	 */
 	public function getVorlage()
 	{
 		$vorlage_kurzbz = $this->input->get('vorlage_kurzbz');
-		$result = null;
+		$result = error('The given vorlage_kurzbz is not valid');
 
 		if (!isEmptyString($vorlage_kurzbz))
 		{
@@ -144,10 +143,6 @@ class Messages extends Auth_Controller
 			$this->VorlagestudiengangModel->addOrder('version','DESC');
 
 			$result = $this->VorlagestudiengangModel->loadWhere(array('vorlage_kurzbz' => $vorlage_kurzbz));
-		}
-		else
-		{
-			$result = error('The given vorlage_kurzbz is not valid');
 		}
 
 		if (isError($result) || !hasData($result))
@@ -161,40 +156,37 @@ class Messages extends Auth_Controller
 	}
 
 	/**
-	 * parseMessageText
+	 * Parse the given given text using data from the given user
+	 * Use the CI parser which performs simple text substitution for pseudo-variable
 	 */
 	public function parseMessageText()
 	{
 		$person_id = $this->input->get('person_id');
 		$text = $this->input->get('text');
-		$parsedText = '';
-		$data = null;
+		$msgVarsData = error('The given person_id is not a valid number');
 
 		if (is_numeric($person_id))
 		{
-			$data = $this->MessageModel->getMsgVarsDataByPersonId($person_id);
+			$msgVarsData = $this->MessageModel->getMsgVarsDataByPersonId($person_id);
+		}
+
+		if (isError($msgVarsData) || !hasData($msgVarsData))
+		{
+			$this->outputJsonError(getData($msgVarsData));
 		}
 		else
 		{
-			$data = error('The given person_id is not a valid number');
-		}
-
-		if (isError($data) || !hasData($data))
-		{
-			$this->outputJsonError(getData($data));
-		}
-		else
-		{
-			$parsedText = $this->messagelib->parseMessageText($text, $this->CLMessagesModel->replaceKeys((array)getData($data)[0]));
-
-			$this->outputJsonSuccess($parsedText);
+			$this->outputJsonSuccess(
+				parseText(
+					$text,
+					$this->CLMessagesModel->replaceKeys((array)getData($msgVarsData)[0])
+				)
+			);
 		}
 	}
 
 	/**
 	 * Outputs message data for a message (identified my msg id and receiver id) in JSON format
-	 * @param $msg_id
-	 * @param $receiver_id
 	 */
 	public function getMessageFromIds()
 	{
@@ -203,8 +195,13 @@ class Messages extends Auth_Controller
 
 		$msg = $this->messagelib->getMessage($msg_id, $receiver_id);
 
-		$this->output
-			->set_content_type('application/json')
-			->set_output(json_encode(array(getData($msg)[0])));
+		if (isError($msg) || !hasData($msg))
+		{
+			$this->outputJson(array());
+		}
+		else
+		{
+			$this->outputJson(array(getData($msg)[0]));
+		}
 	}
 }

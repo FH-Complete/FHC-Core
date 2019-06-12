@@ -14,22 +14,25 @@
 
 if (!defined("BASEPATH")) exit("No direct script access allowed");
 
-class MailJob extends Auth_Controller
+class MailJob extends CLI_Controller
 {
 	/**
 	 * API constructor
 	 */
 	public function __construct()
 	{
-		// An empty array as parameter will ensure that this controller is ONLY callable from command line
-		parent::__construct(array());
+		parent::__construct();
 
 		// Loads MessageLib
 		$this->load->library('MessageLib');
 	}
 
+	/**
+	 * Send all not sent messages
+	 * Parameters are used to overrride messages and mail configuration
+	 */
 	public function sendMessages($numberToSent = null, $numberPerTimeRange = null, $email_time_range = null, $email_from_system = null)
 	{
-		$this->messagelib->sendAll($numberToSent, $numberPerTimeRange, $email_time_range, $email_from_system);
+		$this->messagelib->sendAllNotices($numberToSent, $numberPerTimeRange, $email_time_range, $email_from_system);
 	}
 }
