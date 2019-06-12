@@ -301,7 +301,7 @@ class akte extends basis_db
 	 * @param string $order Sortierreihenfolge im SQL
 	 * @return true wenn ok, sonst false
 	 */
-	public function getAkten($person_id, $dokument_kurzbz=null, $stg_kz = null, $prestudent_id = null, $returnInhalt = false, $order = 'erstelltam')
+	public function getAkten($person_id, $dokument_kurzbz = null, $stg_kz = null, $prestudent_id = null, $returnInhalt = false, $order = 'erstelltam')
 	{
 		$qry = "SELECT
 					akte_id, person_id, dokument_kurzbz, mimetype, erstelltam, gedruckt, titel_intern, anmerkung_intern,
@@ -309,20 +309,28 @@ class akte extends basis_db
 					CASE WHEN inhalt is not null THEN true ELSE false END as inhalt_vorhanden,
 					nachgereicht_am, ausstellungsnation, formal_geprueft_amum, archiv, signiert, stud_selfservice";
 		if($returnInhalt === true)
-			$qry.=",inhalt ";
+		{
+			$qry .= ",inhalt ";
+		}
 		
 		$qry.=" FROM public.tbl_akte WHERE person_id=".$this->db_add_param($person_id, FHC_INTEGER);
-		if($dokument_kurzbz!=null)
-			$qry.=" AND dokument_kurzbz=".$this->db_add_param($dokument_kurzbz);
+		if($dokument_kurzbz != '')
+		{
+			$qry .= " AND dokument_kurzbz=".$this->db_add_param($dokument_kurzbz);
+		}
 		if($stg_kz != null && $prestudent_id != null)
-			$qry.=" AND dokument_kurzbz not in (SELECT dokument_kurzbz FROM public.tbl_dokument JOIN public.tbl_dokumentstudiengang USING(dokument_kurzbz)
+		{
+			$qry .= " AND dokument_kurzbz not in (SELECT dokument_kurzbz FROM public.tbl_dokument JOIN public.tbl_dokumentstudiengang USING(dokument_kurzbz)
 				WHERE studiengang_kz= ".$this->db_add_param($stg_kz).") AND dokument_kurzbz NOT IN ('Zeugnis','DiplSupp','Bescheid') AND dokument_kurzbz NOT IN
 				(SELECT dokument_kurzbz FROM public.tbl_dokumentprestudent JOIN public.tbl_dokument USING(dokument_kurzbz)
 				WHERE prestudent_id=".$this->db_add_param($prestudent_id).")";
+		}
 
 		if ($order != '')
-			$qry.=" ORDER BY ".$order;
-
+		{
+			$qry .= " ORDER BY ".$order;
+		}
+		//echo $qry;
 		$this->errormsg = $qry;
 
 		if($this->db_query($qry))
