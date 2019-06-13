@@ -31,8 +31,8 @@ class MailJob extends CLI_Controller
 	 * Send all not sent messages
 	 * Parameters are used to overrride messages and mail configuration
 	 */
-	public function sendMessages($numberToSent = null, $numberPerTimeRange = null, $email_time_range = null, $email_from_system = null)
+	public function sendMessages($numberToSent = null, $numberPerTimeRange = null, $emailTimeRange = null, $emailFromSystem = null)
 	{
-		$this->messagelib->sendAllNotices($numberToSent, $numberPerTimeRange, $email_time_range, $email_from_system);
+		$this->messagelib->sendAllNotices($numberToSent, $numberPerTimeRange, $emailTimeRange, $emailFromSystem);
 	}
 }

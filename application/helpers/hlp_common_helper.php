@@ -263,3 +263,25 @@ function parseTemplate($template, $data)
 
 	return $ci->parser->parse($template, $data, true);
 }
+
+/**
+ * Terminate immediately the execution of the current script.
+ * If message parameter is given then:
+ * - logs the given message in CI logs
+ * - prints the given message to standard output
+ * Otherwise terminate with the generic error
+ */
+function terminateWithError($message = null)
+{
+	if (!isEmptyString($message))
+	{
+		$ci =& get_instance(); // get CI instance
+		$ci->load->library('LogLib'); // Loads LogLib
+
+		$ci->loglib->logError($message);
+
+		exit($message);
+	}
+
+	exit(EXIT_ERROR);
+}

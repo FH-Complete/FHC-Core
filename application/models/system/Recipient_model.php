@@ -205,7 +205,7 @@ class Recipient_model extends DB_Model
 	 * @param limit specifies the number of messages to get
 	 * @param message_id specifies a single message
 	 */
-	public function getMessages($kontaktType, $limit = 1, $message_id = null)
+	public function getMessages($kontaktType, $message_id = null, $limit = 1)
 	{
 		$query = 'SELECT mm.message_id,
 						 ks.kontakt as sender,
@@ -219,10 +219,10 @@ class Recipient_model extends DB_Model
 						 mr.sentinfo
 					FROM public.tbl_msg_recipient mr INNER JOIN public.tbl_msg_message mm USING (message_id)
 						LEFT JOIN (
-							SELECT person_id, kontakt FROM public.tbl_kontakt WHERE kontakttyp = ?
+							SELECT person_id, kontakt FROM public.tbl_kontakt WHERE zustellung = true AND kontakttyp = ?
 						) ks ON (ks.person_id = mm.person_id)
 						LEFT JOIN (
-							SELECT person_id, kontakt FROM public.tbl_kontakt WHERE kontakttyp = ?
+							SELECT person_id, kontakt FROM public.tbl_kontakt WHERE zustellung = true AND kontakttyp = ?
 						) kr ON (kr.person_id = mr.person_id)
 						LEFT JOIN (
 							SELECT b.person_id,
@@ -235,14 +235,15 @@ class Recipient_model extends DB_Model
 								   m.mitarbeiter_uid
 							  FROM public.tbl_benutzer b INNER JOIN public.tbl_mitarbeiter m ON(b.uid = m.mitarbeiter_uid)
 							 WHERE b.aktiv = TRUE
-						) ms ON (ms.person_id = mm.person_id)';
+						) ms ON (ms.person_id = mm.person_id)
+					WHERE mr.sent IS NULL';
 
 		$parametersArray = array($kontaktType, $kontaktType);
 
 		if (is_numeric($message_id))
 		{
 			array_push($parametersArray, $message_id);
-			$query .= ' WHERE mm.message_id = ?';
+			$query .= ' AND mm.message_id = ?';
 		}
 
 		$query .= ' ORDER BY mr.insertamum ASC';

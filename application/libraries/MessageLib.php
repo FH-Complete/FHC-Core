@@ -36,8 +36,6 @@ class MessageLib
 		// Loads message configuration
 		$this->_ci->config->load('message');
 
-		// Loads LogLib
-		$this->_ci->load->library('LogLib');
 		// Loads VorlageLib
 		$this->_ci->load->library('VorlageLib');
 		// Loads Mail library
@@ -140,188 +138,27 @@ class MessageLib
 	// Public methods called by a job
 
 	/**
-	 * Gets all the messages from DB and sends them via email
+	 * Gets all NOT sent messages from DB and sends for each of them the notice email
+	 * Does not return anything, it logs info and errors on CI logs and in tbl_msg_recipient table
+	 * Wrapper for _sendNotice.
 	 */
-	public function sendAllNotices($numberToSent = null, $numberPerTimeRange = null, $email_time_range = null, $email_from_system = null)
+	public function sendAllNotices($numberToSent, $numberPerTimeRange, $emailTimeRange, $emailFromSystem)
 	{
-		$sent = true; // optimistic expectation
+		// Overrides MailLib configs with the given parameters
+		$this->_ci->maillib->overrideConfigs($numberToSent, $numberPerTimeRange, $emailTimeRange, $emailFromSystem);
 
-		// Gets standard configs
-		$cfg = $this->_ci->maillib->getConfigs();
-		$cfg->email_number_to_sent = $numberToSent;
-		$cfg->email_number_per_time_range = $numberPerTimeRange;
-		$cfg->email_time_range = $email_time_range;
-		$cfg->email_from_system = $email_from_system;
-
-		// Overrides configs with the parameters
-		$this->_ci->maillib->overrideConfigs($cfg);
-
-		// Gets a number ($this->_ci->maillib->getMaxEmailToSent()) of unsent messages from DB
-		// having EMAIL_KONTAKT_TYPE as relative contact type
-		$result = $this->_ci->RecipientModel->getMessages(
+		// Retrieves a certain amount of NOT sent messages, the amount is given by maillib->email_number_to_sent
+		$messagesResult = $this->_ci->RecipientModel->getMessages(
 			self::EMAIL_KONTAKT_TYPE,
-			$this->_ci->maillib->getConfigs()->email_number_to_sent
+			null,
+			$this->_ci->maillib->getEmailNumberToSent()
 		);
-		// Checks if errors were occurred
-		if (isSuccess($result))
-		{
-			// If data are present
-			if (is_array($result->retval) && count($result->retval) > 0)
-			{
-				// Iterating through the result set, if no errors occurred in the previous iteration
-				for ($i = 0; $i < count($result->retval) && $sent; $i++)
-				{
-					// If the person has an email account
-					if ((!is_null($result->retval[$i]->receiver) && $result->retval[$i]->receiver != '')
-						|| (!is_null($result->retval[$i]->employeecontact) && $result->retval[$i]->employeecontact != ''))
-					{
-						$href = $this->_ci->config->item(self::CFG_MESSAGE_SERVER).$this->_ci->config->item(self::CFG_MESSAGE_HTML_VIEW_URL).$result->retval[$i]->token;
 
-						$vorlage = $this->_ci->vorlagelib->loadVorlagetext(self::NOTICE_TEMPLATE_HTML);
+		if (isError($messagesResult)) terminateWithError(getData($messagesResult)); // If an error occurred then log it and terminate
 
-						if(hasData($vorlage))
-						{
-							// Using a template for the html email body
-							$body = parseText(
-								$vorlage->retval[0]->text,
-								array(
-									'href' => $href,
-									'subject' => $result->retval[$i]->subject,
-									'body' => $result->retval[$i]->body
-								)
-							);
-						}
-						else
-						{
-							// Using a template for the html email body
-							$body = $this->_ci->parser->parse(
-								'templates/mailHTML',
-								array(
-									'href' => $href,
-									'subject' => $result->retval[$i]->subject,
-									'body' => $result->retval[$i]->body
-								),
-								true
-							);
-						}
-						if (is_null($body) || $body == '')
-						{
-							$this->_ci->loglib->logError('Error while parsing the mail template');
-						}
+		$sendNotice = $this->_sendNotice(getData($messagesResult));
 
-						$vorlage = $this->_ci->vorlagelib->loadVorlagetext(self::NOTICE_TEMPLATE_TXT);
-						if(hasData($vorlage))
-						{
-							// Using a template for the plain text email body
-							$altBody = parseText(
-								$vorlage->retval[0]->text,
-								array(
-									'href' => $href,
-									'subject' => $result->retval[$i]->subject,
-									'body' => $result->retval[$i]->body
-								)
-							);
-						}
-						else
-						{
-							// Using a template for the plain text email body
-							$altBody = $this->_ci->parser->parse(
-								'templates/mailTXT',
-								array(
-									'href' => $href,
-									'subject' => $result->retval[$i]->subject,
-									'body' => $result->retval[$i]->body
-								),
-								true
-							);
-						}
-						if (is_null($altBody) || $altBody == '')
-						{
-							$this->_ci->loglib->logError('Error while parsing the mail template');
-						}
-
-						// If the sender is not an employee, then system-sender is used if empty
-						$sender = '';
-						if (!is_null($result->retval[0]->senderemployeecontact) && $result->retval[0]->senderemployeecontact != '')
-						{
-							$sender = $result->retval[0]->senderemployeecontact.'@'.DOMAIN;
-						}
-
-						$receiverContact = $result->retval[$i]->receiver;
-						if (!is_null($result->retval[$i]->employeecontact) && $result->retval[$i]->employeecontact != '')
-						{
-							$receiverContact = $result->retval[$i]->employeecontact.'@'.DOMAIN;
-						}
-
-						// Sending email
-						$sent = $this->_ci->maillib->send(
-							$sender,
-							$receiverContact,
-							$result->retval[$i]->subject,
-							$body,
-							null,
-							null,
-							null,
-							$altBody
-						);
-						// If errors were occurred while sending the email
-						if (!$sent)
-						{
-							$this->_ci->loglib->logError('Error while sending an email');
-							// Writing errors in tbl_msg_recipient
-							$sme = $this->_setSentError(
-								$result->retval[$i]->message_id,
-								$result->retval[$i]->receiver_id,
-								'Error while sending an email',
-								$result->retval[$i]->sentinfo
-							);
-							if (!$sme)
-							{
-								$this->_ci->loglib->logError('Error while updating DB');
-							}
-						}
-						else
-						{
-							// Setting the message as sent in DB
-							$sent = $this->_setSentSuccess($result->retval[$i]->message_id, $result->retval[$i]->receiver_id);
-							// If some errors occurred
-							if (!$sent)
-							{
-								$this->_ci->loglib->logError('Error while updating DB');
-							}
-						}
-					}
-					else
-					{
-						$this->_ci->loglib->logError('This person does not have an email account');
-						// Writing errors in tbl_msg_recipient
-						$sme = $this->_setSentError(
-							$result->retval[$i]->message_id,
-							$result->retval[$i]->receiver_id,
-							'This person does not have an email account',
-							$result->retval[$i]->sentinfo
-						);
-						if (!$sme)
-						{
-							$this->_ci->loglib->logError('Error while updating DB');
-						}
-						$sent = true; // Non blocking error
-					}
-				}
-			}
-			else
-			{
-				$this->_ci->loglib->logInfo('There are no email to be sent');
-				$sent = false;
-			}
-		}
-		else
-		{
-			$this->_ci->loglib->logError('Something went wrong while getting data from DB');
-			$sent = false;
-		}
-
-		return $sent;
+		if (isError($sendNotice)) terminateWithError(getData($sendNotice)); // If an error occurred then log it and terminate
 	}
 
 	//------------------------------------------------------------------------------------------------------------------
@@ -423,13 +260,13 @@ class MessageLib
 	{
 		if (isEmptyString($token)) return error('The given token is not valid', MSG_ERR_INVALID_TOKEN);
 
-		$result = $this->_ci->RecipientModel->getMessageByToken($token);
-		if (hasData($result))
+		$messageTokenResult = $this->_ci->RecipientModel->getMessageByToken($token);
+		if (hasData($messageTokenResult))
 		{
 			// Searches for a status that is NOT unread
 			$found = false;
 
-			foreach (getData($result) as $message)
+			foreach (getData($messageTokenResult) as $message)
 			{
 				if ($message->status > MSG_STATUS_UNREAD)
 				{
@@ -442,18 +279,18 @@ class MessageLib
 			if (!$found)
 			{
 				$statusData = array(
-					'message_id' => getData($result)[0]->message_id,
-					'person_id' => getData($result)[0]->receiver_id,
+					'message_id' => getData($messageTokenResult)[0]->message_id,
+					'person_id' => getData($messageTokenResult)[0]->receiver_id,
 					'status' => MSG_STATUS_READ
 				);
 
-				$resultIns = $this->_ci->MsgStatusModel->insert($statusData);
+				$messageTokenResultIns = $this->_ci->MsgStatusModel->insert($statusData);
 				// If an error occured while writing on data base, then return it
-				if (isError($resultIns)) $result = $resultIns;
+				if (isError($messageTokenResultIns)) $messageTokenResult = $messageTokenResultIns;
 			}
 		}
 
-		return $result;
+		return $messageTokenResult;
 	}
 
 	/**
@@ -480,8 +317,8 @@ class MessageLib
 		$this->_ci->MsgStatusModel->resetQuery(); // Reset an eventually already buit query
 
 		// Searches if the status is already present
-		$result = $this->_ci->MsgStatusModel->load(array($message_id, $person_id, $status));
-		if (!hasData($result)) // if not found
+		$updMessageStatusResult = $this->_ci->MsgStatusModel->load(array($message_id, $person_id, $status));
+		if (!hasData($updMessageStatusResult)) // if not found
 		{
 			// Insert the new status
 			$statusKey = array(
@@ -489,10 +326,10 @@ class MessageLib
 				'person_id' => $person_id,
 				'status' => $status
 			);
-			$result = $this->_ci->MsgStatusModel->insert($statusKey);
+			$updMessageStatusResult = $this->_ci->MsgStatusModel->insert($statusKey);
 		}
 
-		return $result;
+		return $updMessageStatusResult;
 	}
 
 	//------------------------------------------------------------------------------------------------------------------
@@ -580,10 +417,10 @@ class MessageLib
 			'oe_kurzbz' => $senderOU
 		);
 
-		$result = $this->_ci->MessageModel->insert($messageData);
-		if (isSuccess($result))
+		$saveMessageResult = $this->_ci->MessageModel->insert($messageData);
+		if (isSuccess($saveMessageResult))
 		{
-			$messageId = getData($result); // Gets the message id generated by database
+			$messageId = getData($saveMessageResult); // Gets the message id generated by database
 
 			// Store message information in tbl_msg_recipient
 			$recipientData = array(
@@ -593,8 +430,8 @@ class MessageLib
 				'oe_kurzbz' => $receiverOU
 			);
 
-			$result = $this->_ci->RecipientModel->insert($recipientData);
-			if (isSuccess($result))
+			$saveMessageResult = $this->_ci->RecipientModel->insert($recipientData);
+			if (isSuccess($saveMessageResult))
 			{
 				// Store message information in tbl_msg_status
 				$statusData = array(
@@ -602,24 +439,24 @@ class MessageLib
 					'person_id' => $receiver_id,
 					'status' => MSG_STATUS_UNREAD
 				);
-				$result = $this->_ci->MsgStatusModel->insert($statusData);
+				$saveMessageResult = $this->_ci->MsgStatusModel->insert($statusData);
 			}
 		}
 
 		$this->_ci->db->trans_complete(); // Ends database transaction
 
 		// If the transaction failed...
-		if ($this->_ci->db->trans_status() === false || isError($result))
+		if ($this->_ci->db->trans_status() === false || isError($saveMessageResult))
 		{
 			$this->_ci->db->trans_rollback(); // ...then rollback
 		}
 		else // otherwise commit...
 		{
 			$this->_ci->db->trans_commit();
-			$result = success($messageId); // ...and returns the message id
+			$saveMessageResult = success($messageId); // ...and returns the message id
 		}
 
-		return $result;
+		return $saveMessageResult;
 	}
 
 	/**
@@ -651,20 +488,14 @@ class MessageLib
 	 * Returns the notice body. Tries to use the template present in database and then falling back
 	 * on the one present in filesystem. If both fail then an error is returned
 	 */
-	private function _getNoticeBody($viewMessageLink, $subject, $body, $dbTemplateName, $fsTemplateName)
+	private function _getNoticeBody($dbEmailNoticeTemplate, $fsEmailNoticeTemplate, $viewMessageLink, $subject, $body)
 	{
-		$noticeBody = null;
+		$noticeBody = null; // pessimistic expectation
 
-		$vorlageResult = $this->_ci->vorlagelib->loadVorlagetext($dbTemplateName);
-
-		if (isError($vorlageResult)) return $vorlageResult;
-
-		if (hasData($vorlageResult))
+		if (!isEmptyString($dbEmailNoticeTemplate))
 		{
-			$vorlage = getData($vorlageResult)[0];
-
 			$noticeBody = parseText(
-				$vorlage->text,
+				$dbEmailNoticeTemplate,
 				array(
 					'href' => $viewMessageLink,
 					'subject' => $subject,
@@ -674,8 +505,8 @@ class MessageLib
 		}
 		else
 		{
-			$noticeBody = parseTemplate(
-				$fsTemplateName,
+			$noticeBody = parseText(
+				$fsEmailNoticeTemplate,
 				array(
 					'href' => $viewMessageLink,
 					'subject' => $subject,
@@ -690,105 +521,110 @@ class MessageLib
 	}
 
 	/**
-	 * Returns the notice HTML body try to using the template present in database and then falling back
-	 * on the one present in filesystem. If both fail then an error is returned
-	 */
-	private function _getNoticeHTMLBody($viewMessageLink, $subject, $body)
-	{
-		return $this->_getNoticeBody($viewMessageLink, $subject, $body, self::NOTICE_TEMPLATE_HTML, self::NOTICE_TEMPLATE_FALLBACK_HTML);
-	}
-
-	/**
-	 * Returns the notice TXT body try to using the template present in database and then falling back
-	 * on the one present in filesystem. If both fail then an error is returned
-	 */
-	private function _getNoticeTXTBody($viewMessageLink, $subject, $body)
-	{
-		return $this->_getNoticeBody($viewMessageLink, $subject, $body, self::NOTICE_TEMPLATE_TXT, self::NOTICE_TEMPLATE_FALLBACK_TXT);
-	}
-
-	/**
 	 * Sends a notice email that notices to a user about a new received message
+	 * It gets just one message. Wrapper for _sendNotice.
 	 */
-	private function _sendNotice($message_id)
+	private function _sendOneNotice($message_id)
 	{
 		// Get the message and related data (sender, recipient, etc...)
 		$messageResult = $this->_ci->RecipientModel->getMessages(
 			self::EMAIL_KONTAKT_TYPE,
-			1,
 			$message_id
 		);
 
 		if (isError($messageResult)) return $messageResult; // if an error occured then return it
 		if (!hasData($messageResult)) return error('No data found with the given message id'); // if no data found then return an error
 
-		$messageData = getData($messageResult)[0]; // Message data from database
+		return $this->_sendNotice(getData($messageResult));
+	}
 
-		// Checks if this person has a valid email address where to send the notice email
-		if (isEmptyString($messageData->receiver) && isEmptyString($messageData->employeecontact))
+	/**
+	 * Core method to send one or more email notices for one or more messages
+	 */
+	private function _sendNotice($messagesResult)
+	{
+		// Prefix for all links that will be subsequently generated
+		$prefixLink = $this->_ci->config->item(self::CFG_MESSAGE_SERVER).$this->_ci->config->item(self::CFG_MESSAGE_HTML_VIEW_URL);
+
+		// Loads all the needed templates for HTML and plain text. Main templates from database, fallback templates from file system
+		$dbEmailNoticeTemplateHTML = $this->_loadDbNoticeEmailTemplate(self::NOTICE_TEMPLATE_HTML);
+		$dbEmailNoticeTemplateTXT = $this->_loadDbNoticeEmailTemplate(self::NOTICE_TEMPLATE_TXT);
+		$fsEmailNoticeTemplateHTML = $this->_loadFsNoticeEmailTemplate(self::NOTICE_TEMPLATE_FALLBACK_HTML);
+		$fsEmailNoticeTemplateTXT = $this->_loadFsNoticeEmailTemplate(self::NOTICE_TEMPLATE_FALLBACK_TXT);
+
+		// Loops through all the messages to be sent
+		foreach ($messagesResult as $messageData)
 		{
-			// Set in database why this email is NOT going to be send
-			$sse = $this->_setSentError(
-				$message_id,
-				$messageData->receiver_id,
-				'This person does not have an email account',
-				$messageData->sentinfo
+			// Checks if this person has a valid email address where to send the notice email
+			if (isEmptyString($messageData->receiver) && isEmptyString($messageData->employeecontact))
+			{
+				// Set in database why this email is NOT going to be send
+				$sse = $this->_setSentError(
+					$messageData->message_id,
+					$messageData->receiver_id,
+					'This person does not have an email account',
+					$messageData->sentinfo
+				);
+
+				// If database error occurred then return it
+				if (isError($sse)) return $sse;
+
+				continue; // Skip the rest, continue with the next one
+			}
+
+			// Create a link to the controller to view the message using a token
+			$viewMessageLink = $prefixLink.$messageData->token;
+
+			// Generates notice email body in HTML and plain text version.
+			// If an error occured during the generation then the error itself is returned
+			$noticeHTMLBody = $this->_getNoticeBody(
+				$dbEmailNoticeTemplateHTML, $fsEmailNoticeTemplateHTML, $viewMessageLink, $messageData->subject, $messageData->body
+			);
+			if (isError($noticeHTMLBody)) return $noticeHTMLBody;
+			$noticeTXTBody = $this->_getNoticeBody(
+				$dbEmailNoticeTemplateTXT, $fsEmailNoticeTemplateTXT, $viewMessageLink, $messageData->subject, $messageData->body
+			);
+			if (isError($noticeTXTBody)) return $noticeTXTBody;
+
+			// If an employeecontact contact is present then use it, otherwise use the personal contacts
+			$receiverContact = $messageData->receiver;
+			if (!isEmptyString($messageData->employeecontact)) $receiverContact = $messageData->employeecontact.'@'.DOMAIN;
+
+			// Sending email
+			$sent = $this->_ci->maillib->send(
+				null,
+				$receiverContact,
+				$messageData->subject,
+				getData($noticeHTMLBody),
+				null,
+				null,
+				null,
+				getData($noticeTXTBody)
 			);
 
-			// If database error occurred then return it, otherwise return a logic error
-			return isError($sse) ? $sse : error('This person does not have an email account');
+			// If errors occurred while sending the email
+			if (!$sent)
+			{
+				// Set in database why this email is NOT going to be send
+				$sse = $this->_setSentError(
+					$messageData->message_id,
+					$messageData->receiver_id,
+					'An error occurred while sending the email',
+					$messageData->sentinfo
+				);
+
+				// If database error occurred then return it, otherwise return a logic error
+				return isError($sse) ? $sse : error('An error occurred while sending the email');
+			}
+			else // success!
+			{
+				// Set in database that the notice email was succesfully sent
+				$sss = $this->_setSentSuccess($messageData->message_id, $messageData->receiver_id);
+				if (isError($sss)) return $sss; // If database error occurred then return it
+			}
 		}
 
-		// Create a link to the controller to view the message using a token
-		$viewMessageLink = $this->_ci->config->item(self::CFG_MESSAGE_SERVER).
-			$this->_ci->config->item(self::CFG_MESSAGE_HTML_VIEW_URL).
-			$messageData->token;
-
-		// Generates notice email body in HTML and plain text version.
-		// If an error occured during the generation then the error itself is returned
-		$noticeHTMLBody = $this->_getNoticeHTMLBody($viewMessageLink, $messageData->subject, $messageData->body);
-		if (isError($noticeHTMLBody)) return $noticeHTMLBody;
-		$noticeTXTBody = $this->_getNoticeTXTBody($viewMessageLink, $messageData->subject, $messageData->body);
-		if (isError($noticeTXTBody)) return $noticeTXTBody;
-
-		// If an employeecontact contact is present then use it, otherwise use the personal contacts
-		$receiverContact = $messageData->receiver;
-		if (!isEmptyString($messageData->employeecontact)) $receiverContact = $messageData->employeecontact.'@'.DOMAIN;
-
-		// Sending email
-		$sent = $this->_ci->maillib->send(
-			null,
-			$receiverContact,
-			$messageData->subject,
-			getData($noticeHTMLBody),
-			null,
-			null,
-			null,
-			getData($noticeTXTBody)
-		);
-
-		// If errors occurred while sending the email
-		if (!$sent)
-		{
-			// Set in database why this email is NOT going to be send
-			$sse = $this->_setSentError(
-				$message_id,
-				$messageData->receiver_id,
-				'An error occurred while sending the email',
-				$messageData->sentinfo
-			);
-
-			// If database error occurred then return it, otherwise return a logic error
-			return isError($sse) ? $sse : error('An error occurred while sending the email');
-		}
-		else // success!
-		{
-			// Set in database that the notice email was succesfully sent
-			$sss = $this->_setSentSuccess($message_id, $messageData->receiver_id);
-			if (isError($sss)) return $sss; // If database error occurred then return it
-		}
-
-		return success('Notice email sent successfully');
+		return success('Notice emails sent successfully');
 	}
 
 	/**
@@ -841,7 +677,7 @@ class MessageLib
 			foreach ($savedMessages as $message_id)
 			{
 				// Send message notice via email!
-				$sendNotice = $this->_sendNotice($message_id);
+				$sendNotice = $this->_sendOneNotice($message_id);
 				// If an error occurred then return it
 				if (isError($sendNotice)) return $sendNotice;
 			}
@@ -863,5 +699,31 @@ class MessageLib
 		$ouResults = $this->_ci->OrganisationseinheitModel->loadWhere(array('oe_kurzbz' => $ou));
 
 		return hasData($ouResults);
+	}
+
+	/**
+	 * Loads a the specified template from database
+	 * Returns null if not found or on failure
+	 */
+	private function _loadDbNoticeEmailTemplate($dbTemplateName)
+	{
+		$emailNoticeTemplate = null;
+
+		$vorlageResult = $this->_ci->vorlagelib->loadVorlagetext($dbTemplateName);
+
+		if (hasData($vorlageResult))
+		{
+			$emailNoticeTemplate = getData($vorlageResult)[0]->text;
+		}
+
+		return $emailNoticeTemplate;
+	}
+
+	/**
+	 * Loads a the specified template from database
+	 */
+	private function _loadFsNoticeEmailTemplate($fsTemplateName)
+	{
+		return $this->_ci->load->view($fsTemplateName, null, true);
 	}
 }

@@ -110,43 +110,34 @@ class MailLib
 	}
 
 	/**
-	 * To ovveride the configurations
+	 * Overrides configuration parameters
+	 * If the given parameters are not null or empty strings then they are used to override
+	 * the following properties of this object:
+	 * - email_number_to_sent
+	 * - email_number_per_time_range
+	 * - email_time_range
+	 * - email_from_system
 	 */
-	public function overrideConfigs($cfg)
+	public function overrideConfigs($numberToSent, $numberPerTimeRange, $emailTimeRange, $emailFromSystem)
 	{
-		if (!is_null($cfg))
+		if (is_numeric($numberToSent)) $this->email_number_to_sent = $numberToSent;
+
+		if (is_numeric($numberPerTimeRange)) $this->email_number_per_time_range = $numberPerTimeRange;
+
+		if (is_numeric($emailTimeRange)) $this->email_time_range = $emailTimeRange;
+
+		if (!isEmptyString($emailFromSystem) && filter_var($emailFromSystem, FILTER_VALIDATE_EMAIL))
 		{
-			if (isset($cfg->email_number_to_sent) && is_numeric($cfg->email_number_to_sent))
-			{
-				$this->email_number_to_sent = $cfg->email_number_to_sent;
-			}
-			if (isset($cfg->email_number_per_time_range) && is_numeric($cfg->email_number_per_time_range))
-			{
-				$this->email_number_per_time_range = $cfg->email_number_per_time_range;
-			}
-			if (isset($cfg->email_time_range) && is_numeric($cfg->email_time_range))
-			{
-				$this->email_time_range = $cfg->email_time_range;
-			}
-			if (isset($cfg->email_from_system) && filter_var($cfg->email_from_system, FILTER_VALIDATE_EMAIL))
-			{
-				$this->email_from_system = $cfg->email_from_system;
-			}
+			$this->email_from_system = $emailFromSystem;
 		}
 	}
 
 	/**
-	 * Returns the current configuration
+	 * Returns value of property email_number_to_sent
 	 */
-	public function getConfigs()
+	public function getEmailNumberToSent()
 	{
-		$cfg = new stdClass();
-		$cfg->email_number_to_sent = $this->email_number_to_sent;
-		$cfg->email_number_per_time_range = $this->email_number_per_time_range;
-		$cfg->email_time_range = $this->email_time_range;
-		$cfg->email_from_system = $this->email_from_system;
-
-		return $cfg;
+		return $this->email_number_to_sent;
 	}
 
 	/**
