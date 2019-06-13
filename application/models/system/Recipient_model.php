@@ -242,7 +242,7 @@ class Recipient_model extends DB_Model
 		if (is_numeric($message_id))
 		{
 			array_push($parametersArray, $message_id);
-			$query .= ' AND mm.message_id = ?';
+			$query .= ' WHERE mm.message_id = ?';
 		}
 
 		$query .= ' ORDER BY mr.insertamum ASC';

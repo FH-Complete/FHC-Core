@@ -38,19 +38,29 @@ class Messages_model extends CI_Model
 
 		$sender_id = getData($authUser)[0]->person_id;
 
+
 		// Send message(s)
 		if (hasData($msgVarsData))
 		{
 			for ($i = 0; $i < count(getData($msgVarsData)); $i++)
 			{
-				$parsedText = "";
+				$parsedText = '';
 				$msgVarsDataArray = $this->replaceKeys((array)getData($msgVarsData)[$i]); // replaces array keys
 
 				// Send without vorlage
 				if (isEmptyString($vorlage_kurzbz))
 				{
-					$parsedText = $this->messagelib->parseMessageText($body, $msgVarsDataArray);
-					$msg = $this->messagelib->sendMessage($sender_id, $msgVarsDataArray['person_id'], $subject, $parsedText, PRIORITY_NORMAL, $relationmessage_id, $oe_kurzbz);
+					$parsedText = parseText($body, $msgVarsDataArray);
+
+					$msg = $this->messagelib->sendMessageUser(
+						$msgVarsDataArray['person_id'],	// receiverPersonId
+						$subject,						// subject
+						$parsedText,					// body
+						$sender_id,						// sender_id
+						$oe_kurzbz,						// senderOU
+						$relationmessage_id,			// relationmessage_id
+						MSG_PRIORITY_NORMAL				// priority
+					);
 				}
 				// Send with vorlage
 				else
@@ -63,7 +73,15 @@ class Messages_model extends CI_Model
 							$msgVarsDataArray[$key] = $msgvar;
 						}
 					}
-					$msg = $this->messagelib->sendMessageVorlage($sender_id, $msgVarsDataArray['person_id'], $vorlage_kurzbz, $oe_kurzbz, $msgVarsDataArray);
+
+					$msg = $this->messagelib->sendMessageUserTemplate(
+						$msgVarsDataArray['person_id'],			// receiversPersonId
+						$vorlage_kurzbz,						// vorlage
+						$msgVarsDataArray,						// parseData
+						null,									// orgform
+						$sender_id,								// sender_id
+						$oe_kurzbz								// senderOU
+					);
 				}
 
 				if (isError($msg)) return $msg;
@@ -95,7 +113,7 @@ class Messages_model extends CI_Model
 	}
 
 	/**
-	 * Send a reply
+	 * Send a reply to a message accessed using a token
 	 */
 	public function sendReply($subject, $body, $persons, $relationmessage_id, $token)
 	{
@@ -116,7 +134,16 @@ class Messages_model extends CI_Model
 			{
 				$dataArray = (array)getData($data)[$i];
 
-				$msg = $this->messagelib->sendMessage($sender_id, $dataArray['person_id'], $subject, $body, PRIORITY_NORMAL, $relationmessage_id, null);
+				$msg = $this->messagelib->sendMessageUser(
+					$dataArray['person_id'],		// receiverPersonId
+					$subject,						// subject
+					$body,							// body
+					$sender_id,						// sender_id
+					null,							// senderOU
+					$relationmessage_id,			// relationmessage_id
+					MSG_PRIORITY_NORMAL				// priority
+				);
+
 				if (isError($msg)) return $msg;
 
 				// Logs person data
