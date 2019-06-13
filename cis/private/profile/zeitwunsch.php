@@ -29,6 +29,8 @@ require_once('../../../include/globals.inc.php');
 require_once('../../../include/functions.inc.php');
 require_once('../../../include/datum.class.php');
 require_once('../../../include/zeitwunsch.class.php');
+require_once('../../../include/studiensemester.class.php');
+require_once('../../../include/zeitaufzeichnung_gd.class.php');
 require_once('../../../include/benutzer.class.php');
 require_once('../../../include/phrasen.class.php');
 require_once('../../../include/sprache.class.php');
@@ -106,6 +108,28 @@ $wunsch = $zw->zeitwunsch;
 $person = new benutzer();
 if(!$person->load($uid))
 	die($person->errormsg);
+
+// Nächstes Studiensemester
+$ss = new Studiensemester();
+$ss->getNextStudiensemester();
+$next_ss = $ss->studiensemester_kurzbz;
+
+// Erklärung zu Pausen bei geteilten Arbeitszeiten speichern
+if (isset($_GET['selbstverwaltete-pause']) && !empty($_GET['submit']))
+{
+    $selbstverwaltete_pause = ($_GET['selbstverwaltete-pause'] == 'yes') ? true : false;
+
+    $zeitaufzeichnung_gd = new Zeitaufzeichnung_gd();
+    $zeitaufzeichnung_gd->uid = $uid;
+    $zeitaufzeichnung_gd->studiensemester_kurzbz = $next_ss;
+    $zeitaufzeichnung_gd->selbstverwaltete_pause = $selbstverwaltete_pause;
+
+    if (!$zeitaufzeichnung_gd->save())
+    {
+        echo $zeitaufzeichnung_gd->errormsg;
+    }
+
+}
 
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
@@ -206,12 +230,30 @@ if(!$person->load($uid))
 			?>
 
 			</FORM>
-			<hr><?php
-			$href = "<a href='zeitsperre_resturlaub.php' class='Item'>";
-			echo $p->t('zeitwunsch/formularZumEintragenDerZeitsperren', array($href));
-			?>
-			</a>
-			<h3><?php echo $p->t('zeitwunsch/erklärung');?>:</h3>
+
+            <!--Erklärung zu Pausen bei geteilten Arbeitszeiten-->
+            <br>
+            <fieldset style="padding: 10px;">
+                <form action="">
+                    <h3>Erklärung zu Pausen bei geteilten Arbeitszeiten</h3><br>
+                    <p>
+                        Ich kenne die <a>arbeitsrechtlichen Betriebsvereinbarungen</a> zur Pauseneinhaltung bei geteilten Arbeitszeiten.<br>
+                        Für das kommende Studiensemester <?php echo $next_ss ?> erkläre ich mich einverstanden, meine Pausen selbst zu verwalten.
+                        <input type="radio" name="selbstverwaltete-pause" value="yes">ja
+                        <input type="radio" name="selbstverwaltete-pause" value="no">nein<br><br>
+                        <input type="submit" name="submit" value="<?php echo $p->t('global/speichern') ?>" style="float: right">
+                    </p>
+                </form>
+            </fieldset>
+            <br><br>
+
+			<h2><?php echo $p->t('zeitwunsch/erklärung');?>:</h2>
+
+            <?php
+            $href = "<a href='zeitsperre_resturlaub.php' class='Item'>";
+            echo $p->t('zeitwunsch/formularZumEintragenDerZeitsperren', array($href));
+            ?>
+            </a>
 			<P><?php echo $p->t('zeitwunsch/kontrollierenSieIhreZeitwuensche');?>!<BR><BR>
 			</P>
 			<TABLE align=center>
