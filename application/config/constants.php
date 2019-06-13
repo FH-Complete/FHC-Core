@@ -125,11 +125,6 @@ define('EMAIL_CONFIG_INDEX', 'mail');
 | Messaging system constants
 |--------------------------------------------------------------------------
 */
-// Email kontakt type
-define('EMAIL_KONTAKT_TYPE', 'email');
-// tbl_msg_recipient->sentInfo separator
-define('SENT_INFO_NEWLINE', '\n');
-
 // Message statuses
 define('MSG_STATUS_UNREAD',		0);
 define('MSG_STATUS_READ',		1);

@@ -205,7 +205,7 @@ class Recipient_model extends DB_Model
 	 * @param limit specifies the number of messages to get
 	 * @param message_id specifies a single message
 	 */
-	public function getMessages($kontaktType, $sent, $limit = null, $message_id = null)
+	public function getMessages($kontaktType, $limit = 1, $message_id = null)
 	{
 		$query = 'SELECT mm.message_id,
 						 ks.kontakt as sender,
@@ -239,17 +239,7 @@ class Recipient_model extends DB_Model
 
 		$parametersArray = array($kontaktType, $kontaktType);
 
-		if (is_null($sent) || $sent == '')
-		{
-			$query .= ' WHERE mr.sent IS NULL';
-		}
-		else
-		{
-			array_push($parametersArray, $sent);
-			$query .= ' WHERE mr.sent = ?';
-		}
-
-		if (!is_null($message_id))
+		if (is_numeric($message_id))
 		{
 			array_push($parametersArray, $message_id);
 			$query .= ' AND mm.message_id = ?';
@@ -257,7 +247,7 @@ class Recipient_model extends DB_Model
 
 		$query .= ' ORDER BY mr.insertamum ASC';
 
-		if (!is_null($limit))
+		if (is_numeric($limit))
 		{
 			$query .= ' LIMIT ?';
 			array_push($parametersArray, $limit);

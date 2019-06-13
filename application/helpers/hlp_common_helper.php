@@ -241,7 +241,7 @@ function isDateWorkingDay($date, $days = null)
 }
 
 /**
- * Parse the given given text using the given data parameter
+ * Parse the given text using the given data parameter
  * Use the CI parser which performs simple text substitution for pseudo-variable
  */
 function parseText($text, $data)
@@ -250,4 +250,16 @@ function parseText($text, $data)
 	$ci->load->library('parser'); // Loads CI parser library
 
 	return $ci->parser->parse_string($text, $data, true);
+}
+
+/**
+ * Parse the given template using the given data parameter
+ * Use the CI parser which performs simple text substitution for pseudo-variable
+ */
+function parseTemplate($template, $data)
+{
+	$ci =& get_instance(); // get CI instance
+	$ci->load->library('parser'); // Loads CI parser library
+
+	return $ci->parser->parse($template, $data, true);
 }
