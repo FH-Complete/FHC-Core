@@ -441,7 +441,7 @@ elseif (isset($reserve) && $raumres)
 							$reservierung->insertamum=date('Y-m-d H:i:s');
 							$reservierung->insertvon=$uid;
 
-							if(!empty($_REQUEST['lecturer_uids'] && isset($_REQUEST['studiengang_kz'])))
+							if(isset($_REQUEST['lecturer_uids']) && !empty($_REQUEST['lecturer_uids'] && isset($_REQUEST['studiengang_kz'])))
 							{
 								$lecturer_uids = $_REQUEST['lecturer_uids'];
 								foreach ($lecturer_uids as $lecturer_uid)
