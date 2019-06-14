@@ -96,36 +96,7 @@ class Messages extends Auth_Controller
 	}
 
 	// -----------------------------------------------------------------------------------------------------------------
-	// Public methods - JSON output
-
-	/**
-	 * Send a new message
-	 * - The recipients are prestudents
-	 * - An email template with message var may be provided
-	 * - A global organisation unit may be provided, otherwise is used the prestudent one
-	 */
-	public function sendJson()
-	{
-		$prestudents = $this->input->post('prestudents');
-		$vorlage_kurzbz = $this->input->post('vorlage_kurzbz');
-		$oe_kurzbz = $this->input->post('oe_kurzbz');
-		$msgVars = $this->input->post('msgvars');
-
-		$msgVarsData = $this->MessageModel->getMsgVarsDataByPrestudentId($prestudents);
-
-		$this->load->model('crm/Prestudent_model', 'PrestudentModel');
-		$prestudentsData = $this->PrestudentModel->getOrganisationunits($prestudents);
-
-		// Adds the organisation unit to each prestudent
-		if (isEmptyString($oe_kurzbz) && hasData($msgVarsData) && hasData($prestudentsData))
-		{
-			$this->CLMessagesModel->addOeToPrestudents($msgVarsData, $prestudentsData);
-		}
-
-		$send = $this->CLMessagesModel->send($msgVarsData, null, $oe_kurzbz, $vorlage_kurzbz, $msgVars);
-
-		$this->outputJson(getData($send));
-	}
+	// Public methods - JSON output - called by this controller and FASMessages (view system/messages/messageWrite)
 
 	/**
 	 * Returns an object that represent a template store in database
@@ -185,6 +156,9 @@ class Messages extends Auth_Controller
 		}
 	}
 
+	// -----------------------------------------------------------------------------------------------------------------
+	// Public methods - JSON output - called by infocenter
+
 	/**
 	 * Outputs message data for a message (identified my msg id and receiver id) in JSON format
 	 */
@@ -203,5 +177,34 @@ class Messages extends Auth_Controller
 		{
 			$this->outputJson(array(getData($msg)[0]));
 		}
+	}
+
+	/**
+	 * Send a new message
+	 * - The recipients are prestudents
+	 * - An email template with message var may be provided
+	 * - A global organisation unit may be provided, otherwise is used the prestudent one
+	 */
+	public function sendJson()
+	{
+		$prestudents = $this->input->post('prestudents');
+		$vorlage_kurzbz = $this->input->post('vorlage_kurzbz');
+		$oe_kurzbz = $this->input->post('oe_kurzbz');
+		$msgVars = $this->input->post('msgvars');
+
+		$msgVarsData = $this->MessageModel->getMsgVarsDataByPrestudentId($prestudents);
+
+		$this->load->model('crm/Prestudent_model', 'PrestudentModel');
+		$prestudentsData = $this->PrestudentModel->getOrganisationunits($prestudents);
+
+		// Adds the organisation unit to each prestudent
+		if (isEmptyString($oe_kurzbz) && hasData($msgVarsData) && hasData($prestudentsData))
+		{
+			$this->CLMessagesModel->addOeToPrestudents($msgVarsData, $prestudentsData);
+		}
+
+		$send = $this->CLMessagesModel->send($msgVarsData, null, $oe_kurzbz, $vorlage_kurzbz, $msgVars);
+
+		$this->outputJson(getData($send));
 	}
 }
