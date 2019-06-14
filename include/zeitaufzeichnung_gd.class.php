@@ -39,6 +39,49 @@ class zeitaufzeichnung_gd extends basis_db
         parent::__construct();
     }
 
+	/**
+     * Loads etry for specific user and semester
+     * @return boolean  True, if saving succeeded.
+     */
+    public function load($user, $sem)
+    {
+        if ($user && $sem)
+        {
+            $qry = '
+                SELECT * FROM campus.tbl_zeitaufzeichnung_gd
+                    WHERE uid = '.$this->db_add_param($user).
+					' AND studiensemester_kurzbz = ' . $this->db_add_param($sem) .
+					'limit 1';
+
+			if(!$this->db_query($qry))
+			{
+				$this->errormsg = 'Fehler bei einer Datenbankabfrage';
+				return false;
+			}
+			if($row = $this->db_fetch_object())
+			{
+				$this->zeitaufzeichnung_gd_id = $row->zeitaufzeichnung_gd_id;
+				$this->uid = $row->uid;
+				$this->studiensemester_kurzbz = $row->studiensemester_kurzbz;
+				$this->insertamum = $row->insertamum;
+				$this->insertvon = $row->insertvon;
+				$this->updateamum = $row->updateamum;
+				$this->updatevon = $row->updatevon;
+				$this->selbstverwaltete_pause = $row->selbstverwaltete_pause;
+			}
+			else
+			{
+				$this->errormsg = 'Es ist kein Datensatz vorhanden';
+				return false;
+			}
+        }
+        else
+        {
+            $this->errormsg = 'Falsche Parameterübergabe';
+            return false;
+        }
+    }
+
     /**
      * Saves decision about self-managing breaks during parted working times.
      * @return boolean  True, if saving succeeded.
@@ -49,7 +92,7 @@ class zeitaufzeichnung_gd extends basis_db
             is_string($this->studiensemester_kurzbz) &&
             is_bool($this->selbstverwaltete_pause))
         {
-            $qry = '
+			$qry = '
                 INSERT INTO campus.tbl_zeitaufzeichnung_gd (
                     uid,
                     studiensemester_kurzbz,
@@ -59,7 +102,7 @@ class zeitaufzeichnung_gd extends basis_db
                 VALUES ('.
                     $this->db_add_param($this->uid). ', '.
                     $this->db_add_param($this->studiensemester_kurzbz). ', '.
-                    $this->db_add_param($this->selbstverwaltete_pause). ', '.
+                    $this->db_add_param($this->selbstverwaltete_pause, FHC_BOOLEAN). ', '.
                     $this->db_add_param($this->uid). '
                 );
             ';

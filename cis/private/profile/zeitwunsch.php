@@ -239,9 +239,23 @@ if (isset($_GET['selbstverwaltete-pause']) && !empty($_GET['submit']))
                     <p>
                         Ich kenne die <a>arbeitsrechtlichen Betriebsvereinbarungen</a> zur Pauseneinhaltung bei geteilten Arbeitszeiten.<br>
                         Für das kommende Studiensemester <?php echo $next_ss ?> erkläre ich mich einverstanden, meine Pausen selbst zu verwalten.
-                        <input type="radio" name="selbstverwaltete-pause" value="yes">ja
-                        <input type="radio" name="selbstverwaltete-pause" value="no">nein<br><br>
-                        <input type="submit" name="submit" value="<?php echo $p->t('global/speichern') ?>" style="float: right">
+						<?php
+						$gd = new zeitaufzeichnung_gd();
+						$gd->load($uid, $next_ss);
+						if ( ! $gd->uid )
+						{
+                        	echo '<input type="radio" name="selbstverwaltete-pause" value="yes">ja
+                        		<input type="radio" name="selbstverwaltete-pause" value="no">nein<br><br>
+                        		<input type="submit" name="submit" value="'.$p->t('global/speichern').'" style="float: right">
+								';
+						}
+						else
+						{
+							echo '<br><br>Zustimmung für '.$next_ss.': '.$gd->selbstverwaltete_pause;
+						}
+						//var_dump($gd);
+						?>
+
                     </p>
                 </form>
             </fieldset>
