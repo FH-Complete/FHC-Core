@@ -424,6 +424,8 @@ class prestudent extends person
 	 * Laedt über einen Prestudenten alle anderen Prestudenten einer Person, die aktuell an STG interessiert sind.
 	 * @integer $prestudent_id Prestudent ID, über die alle weiteren Prestudenten ermittelt werden sollen.
 	 * @boolean $prio Wenn true, dann wird nur der Prestudent mit dem am höchsten priorisierten Studiengang zurückgegeben.
+     * @string $typ Ergebnis nach STG-Typ filtern.
+     * @string $studiengang_kz Ergebnis nach STG-Kennzahl filtern.
 	 * return Objekt-Array mit allen Prestudenten einer Person, die aktuell an STG interessiert sind.
 	 */
 	public function getActualInteressenten($prestudent_id, $prio = false, $typ = NULL, $studiengang_kz = NULL)

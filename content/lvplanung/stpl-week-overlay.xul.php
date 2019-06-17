@@ -110,7 +110,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/lvplanung/stpl-details-overlay.xul
 			/>
 			<textbox id="tempus-lva-filter" size="10" oninput="onLVAFilter()" flex="1"/>
 		</toolbar>
-		
+
 </toolbox>
 
 <vbox id="vboxLehrveranstalungPlanung" style="overflow:auto;margin:0px;" flex="1"
@@ -182,7 +182,10 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/lvplanung/stpl-details-overlay.xul
 	       				/>
 	    			</row>
 	    			<row>
-	    				<label value="rdf:http://www.technikum-wien.at/lehreinheit-lvplan/rdf#lektor" />
+	    				<hbox>
+							<label value="rdf:http://www.technikum-wien.at/lehreinheit-lvplan/rdf#lektor" />
+							<label value="rdf:http://www.technikum-wien.at/lehreinheit-lvplan/rdf#fixangestellt_info" class="tempus_lektor_fix_info"/>
+						</hbox>
 	    				<label value="WR: rdf:http://www.technikum-wien.at/lehreinheit-lvplan/rdf#wochenrythmus Bl: rdf:http://www.technikum-wien.at/lehreinheit-lvplan/rdf#stundenblockung"
 	    					tooltiptext="Wochenrhythmus" />
 	    			</row>
@@ -199,7 +202,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/lvplanung/stpl-details-overlay.xul
 	    			</row>
 	    		</rows>
 	    	</grid>
-	    	
+
 	    </rule>
 	</template>
 </vbox>
@@ -249,7 +252,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/lvplanung/stpl-details-overlay.xul
 				id="toolbarTimeTableSort-stundenASC"
 				tooltiptext="Offenen Stunden aufsteigend"
 			/>
-			
+
 		</toolbar>
 </toolbox>
 </vbox>

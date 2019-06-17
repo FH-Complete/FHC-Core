@@ -529,7 +529,7 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
 			</table:table>
 			<text:p text:style-name="P6"/>
 			<text:p text:style-name="P6"/>
-			<text:p text:style-name="P18">The following courses have been completed:</text:p>
+			<text:p text:style-name="P18">In the study semester <xsl:value-of select="studiensemester_kurzbz" /> the following courses were successfully completed:</text:p>
 			<text:p text:style-name="P3"/>
 			<table:table table:name="Tabelle3" table:style-name="Tabelle3">
 				<table:table-column table:style-name="Tabelle3.A"/>
@@ -568,7 +568,7 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
 						<text:p text:style-name="P22">Total:</text:p>
 					</table:table-cell>
 					<table:table-cell table:style-name="Tabelle3.A2" office:value-type="string">
-						<text:p text:style-name="P23"><xsl:value-of select="studiensemester_kurzbz" /></text:p>
+						<text:p text:style-name="P23"></text:p>
 					</table:table-cell>
 					<table:table-cell table:style-name="Tabelle3.A2" office:value-type="string">
 						<text:p text:style-name="P25"/>

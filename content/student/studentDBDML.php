@@ -4027,6 +4027,7 @@ if(!$error)
 					}
 
 					$warnung_zu_viele_teilnehmer = false;
+					$warnung_raumzuordnungentfernt = false;
 					if($reihungstest->reihungstest_id != $rt_id)
 					{
 						// Wenn ein neuer Reihungstesttermin ausgewählt wird, dann wird geprueft ob
@@ -4043,6 +4044,12 @@ if(!$error)
 						}
 						if($max_teilnehmer!='' && $aktuelle_anzahl >= $max_teilnehmer)
 							$warnung_zu_viele_teilnehmer = true;
+
+						if ($reihungstest->ort_kurzbz != '')
+						{
+							$reihungstest->ort_kurzbz = '';
+							$warnung_raumzuordnungentfernt = true;
+						}
 					}
 					$reihungstest->reihungstest_id = $rt_id;
 					$reihungstest->person_id = $person_id;
@@ -4063,8 +4070,15 @@ if(!$error)
 						{
 							$return = false;
 							$error = true;
-							$errormsg = 'Achtung - die Maximalanzahl der Teilnehmer wurde überschritten;'.
-							' Prüfen Sie ob genug Platz zur Verfügung steht - Zuteilung wurde erfolgreich gespeichert';
+							$errormsg .= ' - Achtung - die Maximalanzahl der Teilnehmer wurde überschritten;'.
+							' Prüfen Sie ob genug Platz zur Verfügung steht';
+						}
+						if ($warnung_raumzuordnungentfernt)
+						{
+							$return = false;
+							$error = true;
+							$errormsg .= ' - Achtung - Die Person war bereits einem Raum für den Reihungstest zugeordnet.'.
+							'Die Raumzuordnung wurde entfernt.';
 						}
 					}
 					else

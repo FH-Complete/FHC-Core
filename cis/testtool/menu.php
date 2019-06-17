@@ -82,6 +82,9 @@ session_start();
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <link href="../../skin/style.css.php" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="../../vendor/twbs/bootstrap/dist/css/bootstrap.min.css" type="text/css"/>
+    <script type="text/javascript" src="../../vendor/components/jquery/jquery.min.js"></script>
+    <script type="text/javascript" src="../../vendor/twbs/bootstrap/dist/js/bootstrap.min.js"></script>
 </head>
 
 <body scroll="no">
@@ -106,7 +109,7 @@ if (isset($_SESSION['pruefling_id']))
 		if($content_id->content_id!='')
         {
 			echo '
-                <tr><td class="ItemTesttool" style="margin-left: 20px;" nowrap>
+                <tr id="tr-einleitung"><td class="ItemTesttool" style="margin-left: 20px;" nowrap>
                     <a class="ItemTesttool navButton" href="../../cms/content.php?content_id='.$content_id->content_id.'&sprache='.$sprache.'" target="content">'.$p->t('testtool/einleitung').'</a>
                 </td></tr>
             ';
@@ -150,7 +153,7 @@ if (isset($_SESSION['pruefling_id']))
 			tbl_studiengangstyp.bezeichnung AS typ_bz,
 	        ausbildungssemester AS semester
         FROM
-	        public.tbl_prestudentstatus
+	        public.tbl_prestudentstatus AS ps_status
         JOIN
 	        public.tbl_prestudent USING (prestudent_id)
         JOIN
@@ -178,6 +181,18 @@ if (isset($_SESSION['pruefling_id']))
 			        ende > now()
 	        )
 
+        /* Filter out all Abgewiesene */
+        AND NOT EXISTS (
+            SELECT 
+                1 
+            FROM
+                tbl_prestudentstatus
+            WHERE 
+                status_kurzbz = 'Abgewiesener' 
+            AND 
+                prestudent_id = ps_status.prestudent_id
+        )
+
         AND
 	        status_kurzbz = 'Interessent'";
 
@@ -200,8 +215,8 @@ if (isset($_SESSION['pruefling_id']))
         ORDER BY
 	        prestudent_id,
 	        datum DESC,
-	        tbl_prestudentstatus.insertamum DESC,
-	        tbl_prestudentstatus.ext_id DESC
+	        ps_status.insertamum DESC,
+	        ps_status.ext_id DESC
         )
 
 
@@ -211,12 +226,12 @@ if (isset($_SESSION['pruefling_id']))
 	        gebiet_id,
 	        STRING_AGG(studiengang_kz::TEXT, ', ' ORDER BY studiengang_kz) AS studiengang_kz_list,
 	        bezeichnung,
-	        reihung,
+	        MIN(reihung) AS reihung,
             ". $bezeichnung_mehrsprachig_sel. "
         FROM (
             SELECT
                 *
-            FROM (    
+            FROM ( 
                 (SELECT
                     prestudent_data.semester AS ps_sem,
                     gebiet_id,
@@ -268,7 +283,6 @@ if (isset($_SESSION['pruefling_id']))
             semester,
              gebiet_id,
              bezeichnung,
-	         reihung,
              bezeichnung_mehrsprachig_1,
              bezeichnung_mehrsprachig_2,
              bezeichnung_mehrsprachig_3,
@@ -276,14 +290,14 @@ if (isset($_SESSION['pruefling_id']))
 
         ORDER BY
 	        semester,
-	        gebiet_id,
-	        reihung
+	        gebiet_id
         ";
 
 	$result = $db->db_query($qry);
 	$lastsemester = '';
 	$quereinsteiger_stg = '';
-
+    $gebiet_hasMathML = false; // true, wenn irgendein Gebiet eine/n Frage/Vorschlag im MathML-Format enthält
+    $invalid_gebiete = false;
 	while($row = $db->db_fetch_object($result))
 	{
 		//Jedes Semester in einer eigenen Tabelle anzeigen
@@ -291,14 +305,12 @@ if (isset($_SESSION['pruefling_id']))
 		{
 			if($lastsemester!='')
 			{
-				//echo '<tr><td>&nbsp;</td></tr>';
 				echo '</table>';
 			}
 			$lastsemester = $row->semester;
 
 			echo '<table border="0" cellspacing="0" cellpadding="0" id="Gebiet" style="display: visible; border-collapse: separate; border-spacing: 0 3px;">';
-			/*echo '<tr><td class="HeaderTesttool">'.$row->semester.'. '.$p->t('testtool/semester').' '.($row->semester!='1'?$p->t('testtool/quereinstieg'):'').'</td></tr>';*/
-			echo '<tr><td class="HeaderTesttool">'. ($row->semester == '1' ? strtoupper($p->t('testtool/basic')) : strtoupper($p->t('testtool/quereinsteiger'))).'</td></tr>';
+			echo '<tr><td class="HeaderTesttool">'. ($row->semester == '1' ? $p->t('testtool/basisgebiete') : $p->t('testtool/quereinstiegsgebiete')).'</td></tr>';
 		}
 
 		// Bei Quereinstiegsgebieten nach STG clustern und die STG anzeigen
@@ -318,11 +330,17 @@ if (isset($_SESSION['pruefling_id']))
                     $quereinsteiger_stg_string .= $stg->bezeichnung;
                     $cnt++;
                 }
-                echo '<tr><td class="HeaderTesttoolSTG">'. $quereinsteiger_stg_string. '</td></tr>';
+                echo '<tr><td bgcolor="#73a9d6" class="HeaderTesttoolSTG">'. $quereinsteiger_stg_string. '</td></tr>';
 			}
-		}
-
+        }
 		$gebiet = new gebiet();
+
+		// Prüfen, ob das Gebiet eine/n Frage/Vorschlag im MathML-Format enthält
+        if (!$gebiet_hasMathML) // sobald nur ein MathML Format gefunden, variable nicht mehr überschreiben
+        {
+            $gebiet_hasMathML = $gebiet->hasMathML($row->gebiet_id);
+        }
+
 		if($gebiet->check_gebiet($row->gebiet_id))
 		{
 			//Status der Gebiete Pruefen
@@ -379,11 +397,7 @@ if (isset($_SESSION['pruefling_id']))
 		}
 		else
 		{
-			echo '<tr>
-						<td nowrap>
-							<span class="error">&nbsp;'.$row->gebiet_bez.' (invalid)</span>
-						</td>
-					</tr>';
+			$invalid_gebiete = true;
 		}
 	}
 	echo '</table>';
@@ -401,4 +415,44 @@ else
 }
 ?>
 </body>
+
+<script type="text/javascript">
+
+    // Get users Browser
+    var ua = navigator.userAgent;
+
+    // If Browser is any other than Mozilla Firefox and the test includes any MathML,
+    // show message to use Mozilla Firefox
+    if ((ua.indexOf("Firefox") > -1) == false)
+    {
+        let hasMathML = "<?php echo $gebiet_hasMathML; ?>";
+        let userLang = "<?php echo $sprache_user; ?>";
+        if (hasMathML == true)
+        {
+            if (userLang == 'German')
+            {
+                alert('BITTE VERWENDEN SIE DEN MOZILLA FIREFOX BROWSER!\n(Manche Prüfungsfragen werden sonst nicht korrekt dargestellt.)');
+            }
+            else if(userLang == 'English')
+            {
+                alert('PLEASE USE MOZILLA FIREFOX BROWSER!\n(Ohterwise some exam items will not be displayed correctly.)');
+            }
+        }
+    }
+
+    // Error massage if check_gebiet function returns false
+    $(function() {
+        var invalid_gebiete = "<?php echo $invalid_gebiete; ?>";
+        if(invalid_gebiete == true)
+        {
+            $('#tr-einleitung').append('' +
+                '<tr><td>' +
+                '<div class="alert alert-danger small" style="margin-left: 20px; margin-bottom:-3px; width: 170px; margin-top: 3px;" role="alert">' +
+                '<span class="text-uppercase"><strong><?php echo $p->t("errors/achtung"); ?></strong></span><br>' +
+                '<?php echo $p->t("testtool/invalideGebiete"); ?>' +
+                '</div>' +
+                '</td></tr>');
+        }
+    });
+</script>
 </html>

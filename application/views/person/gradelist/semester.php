@@ -38,7 +38,13 @@
 					<thead>
 						<tr>
 							<th><?php echo $this->p->t('lehre','lehrveranstaltung');?></th>
-							<th><?php echo $this->p->t('lehre','ects');?></th>
+							<th><?php echo $this->p->t('lehre','kurzbz');?></th>
+							<th><?php echo $this->p->t('lehre','semester');?></th>
+							<th><?php echo $this->p->t('lehre','lehrform');?></th>
+							<th style="text-align: right"><?php echo $this->p->t('lehre','ects');?></th>
+							<th style="text-align: right"><?php echo $this->p->t('lehre','sws');?></th>
+							<th><?php echo $this->p->t('lehre','pflichtfach');?></th>
+							<th><?php echo $this->p->t('lehre','zeugnis');?></th>
 							<th><?php echo $this->p->t('lehre','note');?></th>
 						</tr>
 					</thead>
@@ -53,6 +59,9 @@
 					<tfoot>
 						<tr>
 							<th></th>
+							<th></th>
+							<th></th>
+							<th></th>
 							<th style="text-align: right">
 								<?php
 								echo (isset($semesterdata['ectssumme_positiv'])?$semesterdata['ectssumme_positiv']:'');
@@ -65,6 +74,20 @@
 								}
 								?>
 							</th>
+							<th style="text-align: right">
+								<?php
+								echo (isset($semesterdata['swssumme_positiv'])?$semesterdata['swssumme_positiv']:'');
+
+								if (isset($semesterdata['swssumme'])
+								 && isset($semesterdata['swssumme_positiv'])
+								 && $semesterdata['swssumme'] != $semesterdata['swssumme_positiv'])
+								{
+									echo ' ('.$semesterdata['swssumme'].')';
+								}
+								?>
+							</th>
+							<th></th>
+							<th></th>
 							<th></th>
 						</tr>
 					</tfoot>
@@ -78,7 +101,13 @@
 					<thead>
 						<tr>
 							<th><?php echo $this->p->t('lehre','lehrveranstaltung');?></th>
+							<th><?php echo $this->p->t('lehre','kurzbz');?></th>
+							<th><?php echo $this->p->t('lehre','semester');?></th>
+							<th><?php echo $this->p->t('lehre','lehrform');?></th>
 							<th><?php echo $this->p->t('lehre','ects');?></th>
+							<th><?php echo $this->p->t('lehre','sws');?></th>
+							<th><?php echo $this->p->t('lehre','pflichtfach');?></th>
+							<th><?php echo $this->p->t('lehre','zeugnis');?></th>
 							<th><?php echo $this->p->t('lehre','note');?></th>
 						</tr>
 					</thead>
@@ -96,7 +125,13 @@
 					<tfoot>
 						<tr>
 							<th></th>
+							<th></th>
+							<th></th>
+							<th></th>
 							<th style="text-align: right"><?php echo (isset($semesterdata['ectssumme_nonstpl'])?number_format($semesterdata['ectssumme_nonstpl'],2):''); ?></th>
+							<th style="text-align: right"><?php echo (isset($semesterdata['swssumme_nonstpl'])?number_format($semesterdata['swssumme_nonstpl'],2):''); ?></th>
+							<th></th>
+							<th></th>
 							<th></th>
 						</tr>
 					</tfoot>

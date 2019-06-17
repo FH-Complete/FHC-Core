@@ -834,27 +834,44 @@ if ($punkteUebertragen)
 							// Um einen Bewerberstatus zu setzen, muss "reihungstestangetreten" true sein
 							if ($prestudent->reihungstestangetreten == true)
 							{
-								$prestudent->new = true;
-								$prestudent->prestudent_id = $array['prestudent_id'];
-								$prestudent->status_kurzbz = 'Bewerber';
-								$prestudent->studiensemester_kurzbz = $prestudentrolle->studiensemester_kurzbz;
-								$prestudent->ausbildungssemester = $prestudentrolle->ausbildungssemester;
-								$prestudent->datum = date('Y-m-d');
-								$prestudent->insertamum = date('Y-m-d H:i:s');
-								$prestudent->insertvon = $user;
-								$prestudent->orgform_kurzbz = $prestudentrolle->orgform_kurzbz;
-								$prestudent->bestaetigtam = '';
-								$prestudent->bestaetigtvon = '';
-								$prestudent->bewerbung_abgeschicktamum = '';
-								$prestudent->studienplan_id = $prestudentrolle->studienplan_id;
-
-								if (!$prestudent->save_rolle())
+								// Um einen Bewerberstatus zu setzen, muss die ZGV ausgefüllt sein
+								if ($prestudent->zgv_code != '')
 								{
-									$msg_error .= '<br>Fehler beim speichern des Bewerberstatus für Prestudent '.$array['prestudent_id'].': '.$prestudent->errormsg;
+									$studiengang = new studiengang($prestudent->studiengang_kz);
+									// Bei Mastern muss auch die ZGV-Master ausgefüllt sein
+									if ($studiengang->typ == 'm' && $prestudent->zgvmas_code == '')
+									{
+										$msg_error .= '<br>Fehler beim speichern des Bewerberstatus für Prestudent '.$array['prestudent_id'].'. Es muss zuerst eine Master-ZGV eingetragen sein.';
+									}
+									else
+									{
+										$prestudent->new = true;
+										$prestudent->prestudent_id = $array['prestudent_id'];
+										$prestudent->status_kurzbz = 'Bewerber';
+										$prestudent->studiensemester_kurzbz = $prestudentrolle->studiensemester_kurzbz;
+										$prestudent->ausbildungssemester = $prestudentrolle->ausbildungssemester;
+										$prestudent->datum = date('Y-m-d');
+										$prestudent->insertamum = date('Y-m-d H:i:s');
+										$prestudent->insertvon = $user;
+										$prestudent->orgform_kurzbz = $prestudentrolle->orgform_kurzbz;
+										$prestudent->bestaetigtam = '';
+										$prestudent->bestaetigtvon = '';
+										$prestudent->bewerbung_abgeschicktamum = '';
+										$prestudent->studienplan_id = $prestudentrolle->studienplan_id;
+
+										if (!$prestudent->save_rolle())
+										{
+											$msg_error .= '<br>Fehler beim speichern des Bewerberstatus für Prestudent '.$array['prestudent_id'].': '.$prestudent->errormsg;
+										}
+										else
+										{
+											$count_success_bewerber++;
+										}
+									}
 								}
 								else
 								{
-									$count_success_bewerber++;
+									$msg_error .= '<br>Fehler beim speichern des Bewerberstatus für Prestudent '.$array['prestudent_id'].'. Es muss zuerst eine ZGV eingetragen sein.';
 								}
 							}
 							else

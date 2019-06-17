@@ -120,8 +120,12 @@ if (isset($_POST['prestudent']) && isset($gebdatum))
 		$rt = new reihungstest();
 
 		// Wenns der Dummy ist dann extra laden
+		// An der FHTW gibt es 3 Testuser für den Camus International
 		$prestudent_id_dummy_student = (defined('PRESTUDENT_ID_DUMMY_STUDENT')?PRESTUDENT_ID_DUMMY_STUDENT:'');
-		if($prestudent_id_dummy_student==$ps->prestudent_id)
+		if($prestudent_id_dummy_student==$ps->prestudent_id ||
+			(CAMPUS_NAME == 'FH Technikum Wien' && $ps->prestudent_id == 30891) ||
+			(CAMPUS_NAME == 'FH Technikum Wien' && $ps->prestudent_id == 30890) ||
+			(CAMPUS_NAME == 'FH Technikum Wien' && $ps->prestudent_id == 30889))
 		{
 			$rt->getReihungstestPerson($ps->person_id);
 			if(isset($rt->result[0]))
@@ -177,12 +181,24 @@ if (isset($_POST['prestudent']) && isset($gebdatum))
 				$_SESSION['sprache']=$stg_obj->sprache;
 
 				$_SESSION['semester']=$semester;
+                $stg_obj->getStudiengangTyp($stg_obj->typ);
 
 				// STG und Studienplan mit der höchsten Prio ermitteln
 				$firstPrio_studienplan_id = '';
 				$firstPrio_studiengang_kz = '';
 
-				$ps->getActualInteressenten($_POST['prestudent'], true);
+                //  * wenn STG des eingeloggten Prestudenten vom Typ Bachelor ist, dann höchste Prio aller
+                //  Bachelor-STG ermitteln, an denen die Person noch interessiert ist
+                //  Wenn STG vom Typ Master, dann wird als firstPrio der STPL bzw. der STG des MasterSTG gesetzt.
+                if ($stg_obj->typ == 'b')
+                {
+                    $ps->getActualInteressenten($_POST['prestudent'], true);
+                }
+                elseif ($stg_obj->typ == 'm')
+                {
+                    $ps->getActualInteressenten($_POST['prestudent'], false, 'm', $studiengang);
+                }
+
 				foreach($ps->result as $row)
 				{
 					if(isset($row->studiengang_kz))
@@ -363,7 +379,10 @@ if(isset($_POST['save']) && isset($_SESSION['prestudent_id']))
 ?>
 </head>
 
-<body scroll="no" class='testtool-content'>
+<body scroll="no">
+    <div class="row">
+        <div class="col-xs-10 col-sm-9 col-lg-6">
+
 <?php
 
 //REIHUNGSTEST STARTSEITE (nach Login)
@@ -429,25 +448,25 @@ if (isset($prestudent_id))
     ';
 	echo '<br>';
     echo '
-         <p>Für folgende Studiengänge haben Sie sich zum Reihungstest angemeldet:</p><br>
-
-         <table class="table table-bordered">
-            <tr>
-                <thead>
-                    <th>Studiengang</th>
+         <p>'. $p->t('testtool/fuerFolgendeStgAngemeldet'). '</p><br>
+         
+         <table class="table table-bordered">        
+            <thead>
+                <tr>
+                    <th style="width: 50%;">'. $p->t('global/studiengang'). '</th>
                     <th>Status</th>
-                    <th>Reihungstest</th>
-                </thead>
-            </tr>
+                 </tr>
+            </thead>    
+            <tbody>  
          ';
 
-    //  * wenn Prestudent an mehreren Bachelor-Studiengängen interessiert ist, dann alle STG anführen
+    //  * wenn Prestudent an 1 - n Bachelor-Studiengängen interessiert ist, dann STG anführen
     if ($typ->typ == 'b')
     {
-        $ps_arr = new Prestudent();
-        $ps_arr->getActualInteressenten($prestudent_id, false, 'b');
+		$ps_arr = new Prestudent();
+		$ps_arr->getActualInteressenten($prestudent_id, false, 'b');
 
-        if (count($ps_arr->result) > 1)
+        if (count($ps_arr->result) > 0)
         {
             // Jeweils letzten Status ermitteln (ob Interessent oder Abgewiesener)
             foreach ($ps_arr->result as $ps_obj)
@@ -456,13 +475,13 @@ if (isset($prestudent_id))
                 $ps_tmp->getLastStatus($ps_obj->prestudent_id);
 
                 $ps_obj->lastStatus = $ps_tmp->status_kurzbz; // letzten Status dem result array hinzufügen
+                $ps_obj->status_mehrsprachig = $ps_tmp->status_mehrsprachig;
             }
 
             // Falls Status 'Abgewiesene' vorhanden, nach hinten reihen
             usort($ps_arr->result, function($a, $b){
                 return strcmp($b->lastStatus, $a->lastStatus); // Order by DESC
             });
-
             foreach ($ps_arr->result as $ps_obj)
             {
                 echo '<tr>';
@@ -473,13 +492,11 @@ if (isset($prestudent_id))
                     echo '<td style="width: 50%;">'. $ps_obj->typ_bz .' '. ($sprache_user == 'English' ? $stg->english : $stg->bezeichnung). '</td>';
                     if($ps_obj->ausbildungssemester == '1')
                     {
-                        echo '<td>Regulärer Einstieg (1. Semester)</td>';
-						echo '<td>Basic</td>';
+                        echo '<td>'. $p->t('testtool/regulaererEinstieg'). ' (1. Semester)</td>';
                     }
                     elseif($ps_obj->ausbildungssemester == '3')
                     {
-                        echo '<td>Quereinsteiger (3.Semester)</td>';
-						echo '<td>Basic + Quereinsteiger</td>';
+                        echo '<td>'. $p->t('testtool/quereinstieg'). ' (3.Semester)</td>';
                     }
                 }
                 // wenn letzter Status \'Abgewiesener\' ist, dann als solchen kennzeichnen
@@ -487,18 +504,11 @@ if (isset($prestudent_id))
                 {
                     echo '
                         <td class="text-muted">'. $ps_obj->typ_bz .' '. ($sprache_user == 'English' ? $stg->english : $stg->bezeichnung). '</td>
-                        <td class="text-muted">'. $ps_obj->lastStatus. '</td>
-                        <td class="text-muted">-</td>
+                        <td class="text-muted">'. $ps_obj->status_mehrsprachig[$sprache_user]. '</td>
                     ';
                 }
                 echo '</tr>';
-
             }
-        }
-        //  * wenn Prestudent nur an einem Bachelor-Studiengang interessiert ist, dann nur den einen STG anführen
-        else
-        {
-            echo '<td>'. $typ->bezeichnung.' '.($sprache_user=='English'?$stg_obj->english:$stg_obj->bezeichnung).'</td>>';
         }
     }
     //  * wenn Prestudent an einem Master-Studiengang interessiert ist, dann nur den einen STG anführen
@@ -508,13 +518,13 @@ if (isset($prestudent_id))
         $ps_master = new Prestudent();
 		$ps_master->getLastStatus($prestudent_id);
         echo '<td>'. $typ->bezeichnung.' '.($sprache_user=='English'?$stg_obj->english:$stg_obj->bezeichnung).'</td>';
-		echo '<td>'. $ps_master->status_kurzbz.'</td>';
-		echo '<td>Basic</td>';
+		echo '<td>'. $ps_master->status_mehrsprachig[$sprache_user]. '</td>';
     }
 
-    echo ' 				 
-         </table>
-        ';
+    echo ' 
+        </tbody>				 
+     </table>
+    ';
 
     echo '<br>';
 
@@ -547,17 +557,28 @@ if (isset($prestudent_id))
             {
 				echo '
                     <p>'. $p->t('testtool/spracheDerTestfragen').':</p><br>
-                    
-                    <div class="btn-group btn-group-justified" role="group" style="width: 50%">          
+                    <div class="btn-group btn-group-justified" role="group">          
                 ';
 
 				while($row = $db->db_fetch_object($result))
 				{
 					$selected = ($_SESSION['sprache'] == $row->sprache) ? 'active' : '';
+					$row_sprache = $row->sprache;
+					if ($sprache_user == 'German')
+                    {
+                        if($row->sprache == 'English')
+                        {
+							$row_sprache = 'Englisch';
+                        }
+                        elseif ($row->sprache == 'German')
+                        {
+							$row_sprache = 'Deutsch';
+                        }
+                    }
 					echo "
-                        <div class='btn-group' role='group'> 
-                            <a role='button' class='btn btn-default $selected' href='". $_SERVER['PHP_SELF']. "?type=sprachechange&sprache=". $row->sprache. "'>$row->sprache</a>
-                        </div>
+                          <div class='btn-group' role='group'> 
+                            <a role='button' class='btn btn-default $selected' href='". $_SERVER['PHP_SELF']. "?type=sprachechange&sprache=". $row->sprache. "'>$row_sprache</a>
+                          </div>                     
                     ";
 				}
 				echo '</div>';
@@ -570,11 +591,10 @@ if (isset($prestudent_id))
                 <strong>'.$p->t('testtool/klickenSieAufEinTeilgebiet').'</strong>
             </div>
        ';
-
         if($pruefling->pruefling_id!='')
         {
             $_SESSION['pruefling_id']=$pruefling->pruefling_id;
-            echo '<script language="Javascript">parent.menu.location.reload()</script>';
+            //echo '<script language="Javascript">parent.menu.location.reload()</script>';
         }
     }
     else
@@ -600,6 +620,13 @@ else
             $selected='';
         echo '<OPTION value="'.$prestd->prestudent_id.'" '.$selected.'>'.$prestd->nachname.' '.$prestd->vorname.' ('.(strtoupper($stg->typ.$stg->kurzbz)).')</OPTION>\n';
     }
+    // An der FHTW gibt es 3 Testuser für den Camus International
+    if (CAMPUS_NAME == 'FH Technikum Wien')
+    {
+	    echo '<OPTION value="30891">Testuser Campus International 01</OPTION>\n';
+	    echo '<OPTION value="30890">Testuser Campus International 02</OPTION>\n';
+	    echo '<OPTION value="30889">Testuser Campus International 03</OPTION>\n';
+    }
     echo '</SELECT>';
     echo '&nbsp; '.$p->t('global/geburtsdatum').': ';
     echo '<input type="text" id="datepicker" size="12" name="gebdatum" value="'.$date->formatDatum($gebdatum,'d.m.Y').'">';
@@ -613,6 +640,7 @@ else
     </center>';
 }
 ?>
-
+    </div><!--/.col-->
+</div><!--/.row-->
 </body>
 </html>

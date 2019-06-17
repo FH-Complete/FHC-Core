@@ -327,7 +327,7 @@ if ($type == 'student' && (!defined('CIS_PROFIL_STUDIENINFORMATION_ANZEIGEN') ||
 	".$p->t('global/gruppe').": $user->gruppe ".($user->gruppe!=' '?"<a href='#' onClick='javascript:window.open(\"../stud_in_grp.php?kz=$user->studiengang_kz&sem=$user->semester&verband=$user->verband&grp=$user->gruppe\",\"_blank\",\"width=600,height=500,location=no,menubar=no,status=no,toolbar=no,scrollbars=yes, resizable=1\");return false;'>".$p->t('benotungstool/liste')."</a>":"")."<br>";
 
 	if ($user->studiengang_kz<10000)
-		echo $p->t('profil/martrikelnummer').": $user->matrikelnr<br />";
+		echo $p->t('global/personenkennzeichen').": $user->matrikelnr<br />";
 }
 
 if ($type == 'mitarbeiter')

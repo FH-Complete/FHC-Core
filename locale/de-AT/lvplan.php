@@ -10,6 +10,7 @@ $this->phrasen['lvplan/saal']='Saal';
 $this->phrasen['lvplan/lektor']='LektorIn';
 $this->phrasen['lvplan/reservierungsliste']='Reservierungsliste';
 $this->phrasen['lvplan/reservierungenLoeschen']='Reservierungen löschen';
+$this->phrasen['lvplan/meineReservierungenAnzeigen']='Meine Reservierungen anzeigen';
 $this->phrasen['lvplan/raumsuche']='Raumsuche';
 $this->phrasen['lvplan/lehrverband']='Lehr-Verband';
 $this->phrasen['lvplan/stg']='Stg';

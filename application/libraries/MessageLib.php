@@ -36,9 +36,6 @@ class MessageLib
 		$this->_ci->load->model('system/MsgStatus_model', 'MsgStatusModel');
 		$this->_ci->load->model('system/Recipient_model', 'RecipientModel');
 		$this->_ci->load->model('system/Attachment_model', 'AttachmentModel');
-
-		// Loads phrases
-		$this->_ci->lang->load('message');
 	}
 
 	//------------------------------------------------------------------------------------------------------------------
@@ -970,7 +967,7 @@ class MessageLib
 		if ($this->_ci->db->trans_status() === false || isError($result))
 		{
 			$this->_ci->db->trans_rollback();
-			$result = $this->_error($result->msg, EXIT_ERROR);
+			$result = $this->_error('An error occurred while saving a message', EXIT_ERROR);
 		}
 		else
 		{
@@ -984,16 +981,16 @@ class MessageLib
 	/**
 	 * Wrapper for function error
 	 */
-	private function _error($retval = '', $code = null)
+	private function _error($retval, $code)
 	{
-		return error($retval, $code, MessageLib::MSG_INDX_PREFIX);
+		return error($retval, $code);
 	}
 
 	/**
 	 * Wrapper for function success
 	 */
-	private function _success($retval = '', $code = null)
+	private function _success($retval, $code = null)
 	{
-		return success($retval, $code, MessageLib::MSG_INDX_PREFIX);
+		return success($retval, $code);
 	}
 }

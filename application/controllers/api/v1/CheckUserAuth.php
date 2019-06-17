@@ -13,7 +13,7 @@ class CheckUserAuth extends REST_Controller
 
 		// Loads helper message to manage returning messages
 		// NOTE: loaded here because it does not extend the APIv1_Controller
-		$this->load->helper('hlp_message');
+		$this->load->helper('hlp_return_object');
 	}
 
 	/**

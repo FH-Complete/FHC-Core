@@ -65,6 +65,13 @@ class InfoCenter extends Auth_Controller
 		)
 	);
 
+	// Name of Interessentenstatus
+	const INTERESSENTSTATUS = 'Interessent';
+	const ABGEWIESENERSTATUS = 'Abgewiesener';
+
+	// Statusgruende for which no Studiengangsfreigabemessage should be sent
+	private $_statusgruendeNoStgFreigabeMessage = array('FIT Programm', 'FIT program', 'FIT programme');
+
 	/**
 	 * Constructor
 	 */
@@ -102,15 +109,15 @@ class InfoCenter extends Auth_Controller
 		);
 
 		// Loads models
-		$this->load->model('crm/akte_model', 'AkteModel');
-		$this->load->model('crm/prestudent_model', 'PrestudentModel');
-		$this->load->model('crm/prestudentstatus_model', 'PrestudentstatusModel');
-		$this->load->model('crm/statusgrund_model', 'StatusgrundModel');
-		$this->load->model('person/notiz_model', 'NotizModel');
-		$this->load->model('person/person_model', 'PersonModel');
-		$this->load->model('system/message_model', 'MessageModel');
-		$this->load->model('system/filters_model', 'FiltersModel');
-		$this->load->model('system/personLock_model', 'PersonLockModel');
+		$this->load->model('crm/Akte_model', 'AkteModel');
+		$this->load->model('crm/Prestudent_model', 'PrestudentModel');
+		$this->load->model('crm/Prestudentstatus_model', 'PrestudentstatusModel');
+		$this->load->model('crm/Statusgrund_model', 'StatusgrundModel');
+		$this->load->model('person/Notiz_model', 'NotizModel');
+		$this->load->model('person/Person_model', 'PersonModel');
+		$this->load->model('system/Message_model', 'MessageModel');
+		$this->load->model('system/Filters_model', 'FiltersModel');
+		$this->load->model('system/PersonLock_model', 'PersonLockModel');
 
 		// Loads libraries
 		$this->load->library('PersonLogLib');
@@ -168,7 +175,6 @@ class InfoCenter extends Auth_Controller
 	/**
 	 * Personal details page of the InfoCenter tool
 	 * Initialization function, gets person and prestudent data and loads the view with the data
-	 * @param $person_id
 	 */
 	public function showDetails()
 	{
@@ -343,7 +349,6 @@ class InfoCenter extends Auth_Controller
 
 	/**
 	 * Saves a ZGV for a prestudent, includes Ort, Datum, Nation for bachelor and master
-	 * @param $prestudent_id
 	 */
 	public function saveZgvPruefung()
 	{
@@ -372,7 +377,7 @@ class InfoCenter extends Auth_Controller
 			$zgvmadatum = isEmptyString($zgvmadatum) ? null : date_format(date_create($zgvmadatum), 'Y-m-d');
 			$zgvmanation_code = $this->input->post('zgvmanation') === 'null' ? null : $this->input->post('zgvmanation');
 
-			$lastStatus = $this->PrestudentstatusModel->getLastStatus($prestudent_id, '', 'Interessent');
+			$lastStatus = $this->PrestudentstatusModel->getLastStatus($prestudent_id, '', self::INTERESSENTSTATUS);
 
 			$semresult = null;
 
@@ -423,7 +428,6 @@ class InfoCenter extends Auth_Controller
 	/**
 	 * Saves Absage for Prestudent including the reason for the Absage (statusgrund).
 	 * inserts Studiensemester and Ausbildungssemester for the new Absage of (chronologically) last status.
-	 * @param $prestudent_id
 	 */
 	public function saveAbsage()
 	{
@@ -439,7 +443,7 @@ class InfoCenter extends Auth_Controller
 		if (hasData($lastStatus) && hasData($statusgrresult))
 		{
 			//check if still Interessent and not freigegeben yet
-			if ($lastStatus->retval[0]->status_kurzbz === 'Interessent' && !isset($lastStatus->retval[0]->bestaetigtam))
+			if ($lastStatus->retval[0]->status_kurzbz === self::INTERESSENTSTATUS && !isset($lastStatus->retval[0]->bestaetigtam))
 			{
 				$result = $this->PrestudentstatusModel->insert(
 					array(
@@ -449,7 +453,7 @@ class InfoCenter extends Auth_Controller
 						'datum' => date('Y-m-d'),
 						'orgform_kurzbz' => $lastStatus->retval[0]->orgform_kurzbz,
 						'studienplan_id' => $lastStatus->retval[0]->studienplan_id,
-						'status_kurzbz' => 'Abgewiesener',
+						'status_kurzbz' => self::ABGEWIESENERSTATUS,
 						'statusgrund_id' => $statusgrund,
 						'insertvon' => $this->_uid,
 						'insertamum' => date('Y-m-d H:i:s')
@@ -475,7 +479,6 @@ class InfoCenter extends Auth_Controller
 	/**
 	 * Saves Freigabe of a Prestudent to the Studiengang.
 	 * updates bestaetigtam and bestaetigtvon fields of the last status
-	 * @param $prestudent_id
 	 */
 	public function saveFreigabe()
 	{
@@ -494,7 +497,7 @@ class InfoCenter extends Auth_Controller
 			$lastStatus = $lastStatus->retval[0];
 
 			//check if still Interessent and not freigegeben yet
-			if ($lastStatus->status_kurzbz === 'Interessent' && !isset($lastStatus->bestaetigtam))
+			if ($lastStatus->status_kurzbz === self::INTERESSENTSTATUS && !isset($lastStatus->bestaetigtam))
 			{
 				$statusdata = array(
 					'bestaetigtvon' => $this->_uid,
@@ -522,7 +525,7 @@ class InfoCenter extends Auth_Controller
 
 				if (isSuccess($result))
 				{
-					$this->load->model('crm/dokumentprestudent_model', 'DokumentprestudentModel');
+					$this->load->model('crm/Dokumentprestudent_model', 'DokumentprestudentModel');
 
 					//set documents which have been formal geprüft to accepted
 					$dokument_kurzbzs = array();
@@ -596,7 +599,6 @@ class InfoCenter extends Auth_Controller
 	/**
 	 * Updates a new Notiz for a person
 	 * @param int $notiz_id
-	 * @param int $person_id
 	 */
 	public function updateNotiz($notiz_id)
 	{
@@ -1210,44 +1212,79 @@ class InfoCenter extends Auth_Controller
 			show_error($prestudenten->retval);
 		}
 
-		$interessentenCount = array();
-
 		foreach ($prestudenten->retval as $prestudent)
 		{
-			$prestudent = $this->PrestudentModel->getPrestudentWithZgv($prestudent->prestudent_id);
+			$prestudentWithZgv = $this->PrestudentModel->getPrestudentWithZgv($prestudent->prestudent_id);
 
-			if (isError($prestudent))
+			if (isError($prestudentWithZgv))
 			{
-				show_error($prestudent->retval);
+				show_error($prestudentWithZgv->retval);
 			}
 
-			$zgvpruefung = $prestudent->retval[0];
+			$zgvpruefung = $prestudentWithZgv->retval[0];
 
 			if (isset($zgvpruefung->prestudentstatus))
 			{
+				//get orgform for german and english
+				if (isset($zgvpruefung->prestudentstatus->bezeichnung_orgform) && is_array($zgvpruefung->prestudentstatus->bezeichnung_orgform))
+				{
+					$zgvpruefung->prestudentstatus->bezeichnung_orgform_german = getPhraseByLanguage($zgvpruefung->prestudentstatus->bezeichnung_orgform, 'German');
+					$zgvpruefung->prestudentstatus->bezeichnung_orgform_english = getPhraseByLanguage($zgvpruefung->prestudentstatus->bezeichnung_orgform, 'English');
+				}
+
 				$position = strpos($zgvpruefung->prestudentstatus->anmerkung, 'Alt:');
 
 				//parse Anmerkung for Alternative (Prio is given in orgform and sprache anyway)
 				$zgvpruefung->prestudentstatus->alternative = is_numeric($position) ? substr($zgvpruefung->prestudentstatus->anmerkung, $position) : null;
 			}
 			//if prestudent is not interessent or is already bestaetigt, then show only as information, non-editable
-			$zgvpruefung->infoonly = !isset($zgvpruefung->prestudentstatus) || isset($zgvpruefung->prestudentstatus->bestaetigtam) || $zgvpruefung->prestudentstatus->status_kurzbz != 'Interessent';
+			$zgvpruefung->infoonly = !isset($zgvpruefung->prestudentstatus)
+				|| isset($zgvpruefung->prestudentstatus->bestaetigtam)
+				|| $zgvpruefung->prestudentstatus->status_kurzbz != self::INTERESSENTSTATUS;
 
-			//numeric application priority
+			//wether prestudent was freigegeben for RT/Stg
+			$zgvpruefung->isRtFreigegeben = false;
+			$zgvpruefung->isStgFreigegeben = false;
+			$zgvpruefung->sendStgFreigabeMsg = true;//wether Stgudiengangfreigabemessage can be sent (for "exceptions", Studiengänge with no message sending)
+			$this->PrestudentstatusModel->addSelect('bestaetigtam, statusgrund_id, tbl_status_grund.bezeichnung_mehrsprachig AS bezeichnung_statusgrund');
+			$this->PrestudentstatusModel->addJoin('public.tbl_status_grund', 'statusgrund_id', 'LEFT');
+			$isFreigegeben = $this->PrestudentstatusModel->loadWhere(array('studiensemester_kurzbz' => $zgvpruefung->prestudentstatus->studiensemester_kurzbz,
+														  'tbl_prestudentstatus.status_kurzbz' => self::INTERESSENTSTATUS, 'prestudent_id' => $prestudent->prestudent_id));
+
+
+			if (hasData($isFreigegeben))
+			{
+				foreach ($isFreigegeben->retval as $prestudentstatus)
+				{
+					if (isset($prestudentstatus->bestaetigtam))
+					{
+						//if statusgrund set - RTfreigabe, otherwise Stgfreigabe
+						if (isset($prestudentstatus->statusgrund_id))
+						{
+							if (isset($prestudentstatus->bezeichnung_statusgrund[0])
+								&& in_array($prestudentstatus->bezeichnung_statusgrund[0], $this->_statusgruendeNoStgFreigabeMessage))
+								$zgvpruefung->sendStgFreigabeMsg = false;
+							else
+								$zgvpruefung->isStgFreigegeben = true;
+
+						}
+						else
+							$zgvpruefung->isRtFreigegeben = true;
+					}
+				}
+			}
+
+			//application priority change possible?
 			$zgvpruefung->changeup = false;
 			$zgvpruefung->changedown = false;
 
-			if (isset($zgvpruefung->prestudentstatus->status_kurzbz) && $zgvpruefung->prestudentstatus->status_kurzbz == 'Interessent')
+			if (isset($zgvpruefung->prestudentstatus->status_kurzbz) && $zgvpruefung->prestudentstatus->status_kurzbz == self::INTERESSENTSTATUS)
 			{
 				if (isset($zgvpruefung->prestudentstatus->studiensemester_kurzbz))
 				{
 					$studiensemester = $zgvpruefung->prestudentstatus->studiensemester_kurzbz;
 					$zgvpruefung->changeup = $this->PrestudentModel->checkPrioChange($zgvpruefung->prestudent_id, $studiensemester, -1);
 					$zgvpruefung->changedown = $this->PrestudentModel->checkPrioChange($zgvpruefung->prestudent_id, $studiensemester, 1);
-					if (array_key_exists($studiensemester, $interessentenCount))
-						$interessentenCount[$studiensemester]++;
-					else
-						$interessentenCount[$studiensemester] = 1;
 				}
 			}
 
@@ -1256,8 +1293,8 @@ class InfoCenter extends Auth_Controller
 
 		$this->_sortPrestudents($zgvpruefungen);
 
-		$abwstatusgruende = $this->StatusgrundModel->loadWhere(array('status_kurzbz' => 'Abgewiesener'))->retval;
-		$intstatusgruende = $this->StatusgrundModel->loadWhere(array('status_kurzbz' => 'Interessent'))->retval;
+		$abwstatusgruende = $this->StatusgrundModel->loadWhere(array('status_kurzbz' => self::ABGEWIESENERSTATUS))->retval;
+		$intstatusgruende = $this->StatusgrundModel->loadWhere(array('status_kurzbz' => self::INTERESSENTSTATUS))->retval;
 
 		$data = array (
 			'zgvpruefungen' => $zgvpruefungen,
@@ -1315,9 +1352,9 @@ class InfoCenter extends Auth_Controller
 					return 1;
 				elseif ($a->prestudentstatus->status_kurzbz !== $b->prestudentstatus->status_kurzbz)
 				{
-					if ($a->prestudentstatus->status_kurzbz === 'Interessent')
+					if ($a->prestudentstatus->status_kurzbz === self::INTERESSENTSTATUS)
 						return -1;
-					elseif ($b->prestudentstatus->status_kurzbz === 'Interessent')
+					elseif ($b->prestudentstatus->status_kurzbz === self::INTERESSENTSTATUS)
 						return 1;
 				}
 			}

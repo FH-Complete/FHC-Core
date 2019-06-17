@@ -83,7 +83,6 @@ printValue("php-xsl", extension_loaded('xsl'));
 printValue("php-gd", extension_loaded('gd'));
 printValue("php-pgsql", extension_loaded('pgsql'));
 printValue("php-ldap", extension_loaded('ldap'));
-printValue("php-mcrypt", extension_loaded('mcrypt'));
 printValue("php-mbstring", extension_loaded('mbstring'));
 printValue("php-soap", extension_loaded('soap'));
 printValue("php-curl", extension_loaded('curl'));

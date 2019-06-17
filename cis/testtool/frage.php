@@ -182,7 +182,7 @@ echo '
 	</script>
 </head>
 
-<body class='testtool-content'>
+<body>
 <?php
 if(!isset($_SESSION['pruefling_id']))
 	die($p->t('testtool/bitteZuerstAnmelden'));
@@ -361,7 +361,6 @@ if($result_pruefling = $db->db_query($qry_pruefling))
 {
 	if($row_pruefling = $db->db_fetch_object($result_pruefling))
 	{
-		/*$info = "$row_pruefling->vorname $row_pruefling->nachname, $row_pruefling->bezeichnung $row_pruefling->stg_bez";*/
 		$info = "$row_pruefling->vorname $row_pruefling->nachname";
 	}
 }
@@ -401,7 +400,6 @@ if($levelgebiet)
 		</tr>
 	</table>';
 	$fortschrittsbalken .= '<span class="smallb"><b> '.$aktuell.' / '.$max.'</b> ['.number_format($psolved,1,'.','').'%]</span>';
-	
 }
 //Zeit des Gebietes holen
 echo '
@@ -514,7 +512,6 @@ if($frage->frage_id!='')
 			}
 		}
 	}
-	echo '<center>';
 	//Kopfzeile mit Weiter Button und Sprung direkt zu einer Frage
 	if(!$demo && !$levelgebiet)
 	{
@@ -522,7 +519,10 @@ if($frage->frage_id!='')
 				FROM testtool.tbl_pruefling_frage JOIN testtool.tbl_frage USING(frage_id) 
 				WHERE gebiet_id=".$db->db_add_param($gebiet_id, FHC_INTEGER)." AND pruefling_id=".$db->db_add_param($_SESSION['pruefling_id'], FHC_INTEGER)." AND demo=false ORDER BY nummer";
 
-		echo " <table><tr>";
+		echo "
+            <table class='table' style='margin-top: 20px; margin-bottom: 40px;'>
+                <tr class='text-center'>
+        ";
 		//Nummern der Fragen Anzeigen
 		$result = $db->db_query($qry);
 		while($row = $db->db_fetch_object($result))
@@ -530,9 +530,9 @@ if($frage->frage_id!='')
 			$antwort = new antwort();
 			$antwort->getAntwort($_SESSION['pruefling_id'],$row->frage_id);
 			if($row->frage_id==$frage_id)
-				echo " <a href='#' target='_self'><td style='width:12px; text-align:center; padding:2px; box-shadow: 0px 0px 3px 3px #888888;".(count($antwort->result)!=0?"background-color:lightblue;":"")."'>".($row->nummer<10?" ":"")."$row->nummer</td></a>";
+				echo "<a href='#' target='_self'><td style='width:20px; text-align:center; padding:5px; box-shadow: 0px 0px 3px 3px #888888;".(count($antwort->result)!=0?"background-color:lightblue;":"")."'>".($row->nummer<10?" ":"")."$row->nummer</td></a>";
 			else
-				echo " <a href='$PHP_SELF?gebiet_id=$gebiet_id&amp;frage_id=$row->frage_id'><td style='width:12px; text-align:center; padding:2px; box-shadow: 0px 0px 3px 0px #888888;".(count($antwort->result)!=0?"background-color:lightblue;":"")."'>$row->nummer</td></a>";
+				echo " <a href='$PHP_SELF?gebiet_id=$gebiet_id&amp;frage_id=$row->frage_id'><td style='width:20px; text-align:center; padding:5px; box-shadow: 0px 0px 3px 0px #888888;".(count($antwort->result)!=0?"background-color:lightblue;":"")."'>$row->nummer</td></a>";
 		}
 		//echo " </tr></table>";
 	}
@@ -554,7 +554,6 @@ if($frage->frage_id!='')
 		else
 		{
 			if(!$demo)
-			//else
 			{
 				//Wenns der letzte Eintrag ist, wieder zum ersten springen
 				echo " <a href='$PHP_SELF?gebiet_id=$gebiet_id' class='Item'>".$p->t('testtool/blaettern')." &gt;&gt;</a>";
@@ -563,33 +562,61 @@ if($frage->frage_id!='')
 	}
 	if(!$demo && !$levelgebiet)
 		echo " </tr></table>";
-	
-	echo '<br/><br/><br/><br/>';
+
+	echo '
+        <br/>
+        <div class="row">
+            <div class="col-xs-12 col-lg-offset-1 col-lg-10">
+    ';
+
 	//Bild und Text der Frage anzeigen
 	if($frage->bild!='')
-		echo "<img class='testtoolfrage' src='bild.php?src=frage&amp;frage_id=$frage->frage_id&amp;sprache=".$_SESSION['sprache']."' /><br/><br/>\n";
-	
+    {
+       echo '
+            <div class="row text-center">
+                <img class="testtoolfrage" src="bild.php?src=frage&amp;frage_id='. $frage->frage_id.'&amp;sprache='. $_SESSION["sprache"].'"></img><br/><br/><br/> 
+            </div>      
+        ';
+    }
 	$timestamp = time();
+
 	//Sound einbinden
 	if($frage->audio!='')
 	{
-		echo '	<audio src="sound.php?src=frage&amp;frage_id='.$frage->frage_id.'&amp;sprache='.$_SESSION['sprache'].'&amp;'.$timestamp.'" controls="controls" type="audio/ogg">
-					<div>
-						<p>Ihr Browser unterstützt dieses Audioelement leider nicht.</p>
-					</div>
-				</audio>';
+		echo '	
+            <div class="row text-center">
+                <audio src="sound.php?src=frage&amp;frage_id='.$frage->frage_id.'&amp;sprache='.$_SESSION['sprache'].'&amp;'.$timestamp.'" controls="controls" type="audio/ogg">
+                     <div>
+                           <p>Ihr Browser unterstützt dieses Audioelement leider nicht.</p>
+                     </div>
+                </audio>       
+            </div>
+        ';
 	}
-	echo "$frage->text<br/><br/>\n";
 
-	//Vorschlaege laden
+    $display_well = $frage->nummer == 0 ? '' : 'well'; // don't style frage 0 because this is always the introduction to gebiet
+    echo '
+        <div class="row">
+            <div class="col-xs-offset-1 col-xs-10 col-sm-offset-2 col-sm-8"> 
+                <div class="'. $display_well. ' text-center">'. $frage->text. '</div>
+            </div>      
+        </div>      
+    ';
+
+    //Vorschlaege laden
 	$vs = new vorschlag();
 	$vs->getVorschlag($frage->frage_id, $_SESSION['sprache'], $gebiet->zufallvorschlag);
 	$letzte = $frage->getNextFrage($gebiet_id, $_SESSION['pruefling_id'], $frage_id, $demo);
 	echo "<form action=\"$PHP_SELF?gebiet_id=$gebiet_id&amp;frage_id=$frage->frage_id\" method=\"POST\" ".(!$letzte && !$levelgebiet?"onsubmit=\"letzteFrage()\"":"").">";
-	echo '<table cellspacing="30px">';
-	echo '<tr>';
+	echo '
+	    <div class="row text-center">
+            <table class="table" style="width: 600px; margin-left: auto; margin-right: auto;">
+                <tr>
+    ';
 	$anzahl = 1;
 	$beantwortet = false;
+	$cnt = 0; // counter für foreach-Schleife
+    $len = count($vs->result);
 	
 	//Antworten laden falls bereits vorhanden
 	$antwort = new antwort();
@@ -598,7 +625,7 @@ if($frage->frage_id!='')
 	//Vorschlaege anzeigen
 	foreach ($vs->result as $vorschlag)
 	{
-		echo "\n<td align='center' valign='top'>";
+		echo "<td valign='top' style='padding: 25px;'>";
 		
 		//Bei multipleresponse checkboxen anzeigen ansonsten radiobuttons
 		if($gebiet->multipleresponse)
@@ -636,22 +663,24 @@ if($frage->frage_id!='')
 		echo "</td>";
 		$anzahl++;
 
-		if($anzahl>$gebiet->antwortenprozeile)
+		if($anzahl>$gebiet->antwortenprozeile && ($cnt < $len-1))
 		{
 			echo '</tr><tr>';
 			$anzahl=1;
 		}
+
+		$cnt++;
 	}
-	
+
 	//wenn singleresponse und keine Levels und vorschlaege vorhanden sind, dann gibt es auch die 
 	//moeglichkeit fuer keine Antwort
 	if(!$gebiet->multipleresponse && !$levelgebiet && count($vs->result)>0)
 	{
-		echo "<td align='center' valign='top'>";
+		echo "<td valign='top' style='padding: 25px;'>";
 		echo '<input type="radio" class="button_style" name="vorschlag_id[]" value="" '.($beantwortet==false?'checked="checked"':'').'/><br /><font color="#acacac">'.$p->t('testtool/keineAntwort').'</font></td>';
 	}
 	echo '</tr></table>';
-	
+
 	if(!$demo)
 	{
 		echo '<input style="width:180px; white-space:normal" class="btn btn-default btn-testtool" type="submit" name="submitantwort" value="'.$p->t('testtool/speichernUndWeiter').'" />';
@@ -684,17 +713,19 @@ if($frage->frage_id!='')
 			}
 		}
 	}
+    echo '    
+        </div>  <!--/.row-->
+    ';
 	echo "</form>";
-	echo '<br/><br/><br/>';
-	echo '</center>';
+	echo '<br/><br/><br/><br/><br/>';
 }
 else
 {
 	//Wenn kein Demo vorhanden ist
-	echo "<br/><br/><br/><center><b>".$p->t("testtool/startDrueckenUmZuBeginnen")."</b></center>";
+	echo "<br/><br/><center><b>".$p->t("testtool/startDrueckenUmZuBeginnen")."</b></center>";
 }
-
 ?>
-
+        </div><!--/.col-->
+    </div><!--/.row-->
 </body>
 </html>

@@ -37,7 +37,9 @@ class StudienplanLib
 						'pflicht' => $row->pflicht,
 						'zeugnis' => $row->zeugnis,
 						'bezeichnung' => $row->bezeichnung,
-						'ects' => $row->ects
+						'kurzbz' => $row->kurzbz,
+						'ects' => $row->ects,
+						'semester' => $row->semester
 					);
 					$childs = $this->getChildElements($row->studienplan_lehrveranstaltung_id);
 					if(is_array($childs) && count($childs) > 0)
@@ -65,7 +67,9 @@ class StudienplanLib
 					'pflicht' => $row->pflicht,
 					'zeugnis' => $row->zeugnis,
 					'bezeichnung' => $row->bezeichnung,
-					'ects' => $row->ects
+					'kurzbz' => $row->kurzbz,
+					'ects' => $row->ects,
+					'semester' => $row->semester
 				);
 				$childs = $this->getChildElements($row->studienplan_lehrveranstaltung_id);
 				if(is_array($childs))

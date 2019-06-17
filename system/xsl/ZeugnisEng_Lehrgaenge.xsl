@@ -402,6 +402,8 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 						<xsl:value-of select="stsem"/>
 					</xsl:when>
 					<xsl:otherwise>
+						<xsl:value-of select="stsem"/>
+						<xsl:text> (</xsl:text>
 						<xsl:value-of select="semester"/>
 						<xsl:choose>
 							<xsl:when test="semester=1">
@@ -417,9 +419,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 								<xsl:text>th</xsl:text>
 							</xsl:otherwise>
 						</xsl:choose>
-						<xsl:text> Semester (</xsl:text>
-						<xsl:value-of select="stsem"/>
-						<xsl:text>)</xsl:text>
+						<xsl:text> Semester)</xsl:text>
 					</xsl:otherwise>
 				</xsl:choose>
             </text:p>
@@ -519,7 +519,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
         </office:text>
 </xsl:template>
 <xsl:template match="unterrichtsfach">
-<xsl:if test="note_positiv='1'">
+<xsl:if test="note_positiv='1' or note=''">
     <table:table-row>
         <table:table-cell table:style-name="Tabelle1.A7" office:value-type="string">
             <xsl:choose>

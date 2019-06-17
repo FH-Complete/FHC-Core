@@ -10,6 +10,7 @@
 	$LOGTYPE_KURZBZ = '\'Processstate\'';
 	$STATUS_KURZBZ = '\'Wartender\', \'Bewerber\', \'Aufgenommener\', \'Student\'';
 	$ADDITIONAL_STG = '10021,10027';
+	$AKTE_TYP = '\'identity\', \'zgv_bakk\'';
 
 	$query = '
 		WITH currentOrNextStudiensemester AS (
@@ -48,6 +49,14 @@
 			  ORDER BY l.zeitpunkt DESC
 				 LIMIT 1
 			) AS "LastActionType",
+			(
+				SELECT count(akte_id)
+				  FROM public.tbl_akte a
+				 WHERE
+				   a.person_id = p.person_id
+				 AND
+				  a.dokument_kurzbz in ('.$AKTE_TYP.')
+			) AS "AnzahlAkte",
 			(
 				SELECT l.insertvon
 				  FROM system.tbl_log l
@@ -134,7 +143,7 @@
 				  JOIN lehre.tbl_studienplan sp USING(studienplan_id)
 				 WHERE pss.status_kurzbz = '.$INTERESSENT_STATUS.'
 				   AND pss.bewerbung_abgeschicktamum IS NOT NULL
-				   AND pss.bestaetigtam IS NULL
+				 -- AND pss.bestaetigtam IS NULL
 				   AND ps.person_id = p.person_id
 				   AND (sg.typ IN ('.$STUDIENGANG_TYP.')
 					   OR
@@ -272,6 +281,7 @@
 			ucfirst($this->p->t('global', 'parkdatum')),
 			ucfirst($this->p->t('global', 'letzteAktion')),
 			'Aktionstyp',
+			'AnzahlAktePflicht',
 			ucfirst($this->p->t('global', 'letzterBearbeiter')),
 			ucfirst($this->p->t('lehre', 'studiensemester')),
 			ucfirst($this->p->t('global', 'gesendetAm')),

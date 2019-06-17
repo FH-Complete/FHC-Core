@@ -69,10 +69,12 @@ $this->phrasen['abgabetool/fehlerTerminVorbei']='Die Abgabefrist für diesen Ter
 
 $this->phrasen['abgabetool/eidesstattlicheErklaerung']='Ich erkläre hiermit an Eides statt, dass ich die vorliegende Arbeit selbständig angefertigt habe.
 Die aus fremden Quellen direkt oder indirekt übernommenen Gedanken sind als solche kenntlich gemacht.
-Die Arbeit wurde bisher weder in gleicher noch in ähnlicher Form einer anderen Prüfungsbehörde vorgelegt und auch noch nicht veröffentlicht.<br>
-Ich räume der Fachhochschule Technikum Wien das Recht ein, das/die übermittelte/n Dokument/e elektronisch zu speichern und in Datennetzen öffentlich zugänglich zu machen.
+Die Arbeit wurde bisher weder in gleicher noch in ähnlicher Form einer anderen Prüfungsbehörde vorgelegt und auch noch nicht veröffentlicht.<br><br>
+Ich räume der Fachhochschule Technikum Wien das Recht ein, das/die übermittelte/n Dokument/e elektronisch zu speichern und - im Falle von Masterarbeiten - in Datennetzen öffentlich zugänglich zu machen.
 Ich räume der Fachhochschule Technikum Wien ferner das Recht zur Konvertierung zum Zwecke der Langzeitarchivierung unter Beachtung der Bewahrung des Inhalts ein.
-Ich erkläre außerdem, dass von mir die urheber- und lizenzrechtliche Seite (Copyright) geklärt wurde und Rechte Dritter der Publikation nicht entgegenstehen.';
+Ich erkläre außerdem, dass von mir die urheber- und lizenzrechtliche Seite (Copyright) geklärt wurde und Rechte Dritter der Publikation nicht entgegenstehen.<br><br>
+Bei den Master Arbeiten dürfen ausschließlich Dokumente hochgeladen werden, bei denen die `Eidesstattliche Erklärung´ nicht unterschrieben ist (Datenschutz).
+Sollten Sie trotzdem die `Eidesstattliche Erklärung´ samt Unterschrift hochladen, wird seitens der FH Technikum Wien davon ausgegangen, dass Sie keinen Wert auf Schutz Ihrer Unterschrift legen.';
 $this->phrasen['abgabetool/gelesenUndAkzeptiert']='Gelesen und akzeptiert';
 $this->phrasen['abgabetool/erklaerungNichtAkzeptiert']='Erklärung nicht akzeptiert';
 $this->phrasen['abgabetool/downloadProjektarbeit']='Dokument herunterladen';

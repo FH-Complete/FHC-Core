@@ -346,7 +346,7 @@ function LoadGruppe(type)
 
 		if ($raumres)
 		{
-			echo '<BR><BR><A class="Item" href="stpl_reserve_list.php">'.$p->t("lvplan/reservierungenLoeschen").'</A><BR>';
+			echo '<BR><BR><A class="Item" href="stpl_reserve_list.php">'.$p->t("lvplan/meineReservierungenAnzeigen").'</A><BR>';
 		}
 
 		echo'</td>

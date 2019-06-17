@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "e5e3e110545316baa4087a8e1a283a7c",
-    "content-hash": "e191f9af8e2103de78eaa130122ec72b",
+    "hash": "ddbbad487c655512e6983408339cb85f",
+    "content-hash": "b5902c71fe21cd14397101dba5a3080c",
     "packages": [
         {
             "name": "BlackrockDigital/startbootstrap-sb-admin-2",
@@ -90,28 +90,17 @@
             "time": "2016-09-02 11:31:54"
         },
         {
-            "name": "codeigniter-restserver",
-            "version": "2.6",
-            "dist": {
-                "type": "zip",
-                "url": "https://github.com/chriskacerguis/codeigniter-restserver/archive/master.zip",
-                "reference": null,
-                "shasum": null
-            },
-            "type": "library"
-        },
-        {
             "name": "codeigniter/framework",
-            "version": "3.1.9",
+            "version": "3.1.10",
             "source": {
                 "type": "git",
                 "url": "https://github.com/bcit-ci/CodeIgniter.git",
-                "reference": "30e2eafa86c4c7b6b39cea3e7089a90df9f603fb"
+                "reference": "c576995304fc3609cca0b7b92d1b2cd611ec82f5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/bcit-ci/CodeIgniter/zipball/30e2eafa86c4c7b6b39cea3e7089a90df9f603fb",
-                "reference": "30e2eafa86c4c7b6b39cea3e7089a90df9f603fb",
+                "url": "https://api.github.com/repos/bcit-ci/CodeIgniter/zipball/c576995304fc3609cca0b7b92d1b2cd611ec82f5",
+                "reference": "c576995304fc3609cca0b7b92d1b2cd611ec82f5",
                 "shasum": ""
             },
             "require": {
@@ -131,7 +120,7 @@
             ],
             "description": "The CodeIgniter framework",
             "homepage": "https://codeigniter.com",
-            "time": "2018-06-12 13:45:46"
+            "time": "2019-01-16 15:49:35"
         },
         {
             "name": "components/angular.js",
@@ -664,11 +653,10 @@
         {
             "name": "fgelinas/timepicker",
             "version": "0.3.3",
-            "dist": {
-                "type": "zip",
-                "url": "https://fgelinas.com/code/timepicker/releases/jquery-ui-timepicker-0.3.3.zip",
-                "reference": null,
-                "shasum": null
+            "source": {
+                "type": "git",
+                "url": "https://github.com/fgelinas/timepicker",
+                "reference": "9aebe413b784696639220bc36b7c1e8a30fda129"
             },
             "type": "library"
         },
@@ -1060,17 +1048,16 @@
         },
         {
             "name": "ml/json-ld",
-            "version": "1.0.8",
-            "target-dir": "ML/JsonLD",
+            "version": "1.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/lanthaler/JsonLD.git",
-                "reference": "da8efc590273f0420e79cb110778508875690bde"
+                "reference": "b5f82820c255cb64067b1c7adbb819cad4afa70a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/lanthaler/JsonLD/zipball/da8efc590273f0420e79cb110778508875690bde",
-                "reference": "da8efc590273f0420e79cb110778508875690bde",
+                "url": "https://api.github.com/repos/lanthaler/JsonLD/zipball/b5f82820c255cb64067b1c7adbb819cad4afa70a",
+                "reference": "b5f82820c255cb64067b1c7adbb819cad4afa70a",
                 "shasum": ""
             },
             "require": {
@@ -1084,8 +1071,8 @@
             },
             "type": "library",
             "autoload": {
-                "psr-0": {
-                    "ML\\JsonLD": ""
+                "psr-4": {
+                    "ML\\JsonLD\\": ""
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -1106,20 +1093,20 @@
                 "JSON-LD",
                 "jsonld"
             ],
-            "time": "2018-01-28 12:53:52"
+            "time": "2018-11-18 20:26:18"
         },
         {
             "name": "mottie/tablesorter",
-            "version": "v2.30.7",
+            "version": "v2.31.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Mottie/tablesorter.git",
-                "reference": "90f7326819c573ee5ab333f4a0672623d7c52e1e"
+                "reference": "fa56764ad5630ed3ab9da4a30fdb8dd34bfbaf1f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Mottie/tablesorter/zipball/90f7326819c573ee5ab333f4a0672623d7c52e1e",
-                "reference": "90f7326819c573ee5ab333f4a0672623d7c52e1e",
+                "url": "https://api.github.com/repos/Mottie/tablesorter/zipball/fa56764ad5630ed3ab9da4a30fdb8dd34bfbaf1f",
+                "reference": "fa56764ad5630ed3ab9da4a30fdb8dd34bfbaf1f",
                 "shasum": ""
             },
             "require": {
@@ -1157,7 +1144,7 @@
                 "sorting",
                 "table"
             ],
-            "time": "2018-07-10 13:32:19"
+            "time": "2018-11-20 21:54:28"
         },
         {
             "name": "nategood/httpful",
@@ -1211,36 +1198,36 @@
         },
         {
             "name": "netcarver/textile",
-            "version": "v3.6.0",
+            "version": "v3.7.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/textile/php-textile.git",
-                "reference": "bac6381fcab28cf6b6ae3d0e61b6a8c8d6adca13"
+                "reference": "377933125dd30d708804c545bf33da87a3c1b0f4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/textile/php-textile/zipball/bac6381fcab28cf6b6ae3d0e61b6a8c8d6adca13",
-                "reference": "bac6381fcab28cf6b6ae3d0e61b6a8c8d6adca13",
+                "url": "https://api.github.com/repos/textile/php-textile/zipball/377933125dd30d708804c545bf33da87a3c1b0f4",
+                "reference": "377933125dd30d708804c545bf33da87a3c1b0f4",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.3.0"
             },
             "require-dev": {
-                "phpunit/phpunit": "3.7.*",
-                "satooshi/php-coveralls": "0.6.*",
-                "squizlabs/php_codesniffer": "1.5.*",
+                "php-coveralls/php-coveralls": "2.1.*",
+                "phpunit/phpunit": "5.7.*",
+                "squizlabs/php_codesniffer": "3.*",
                 "symfony/yaml": "2.4.*"
             },
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "3.6-dev"
+                    "dev-master": "3.7-dev"
                 }
             },
             "autoload": {
-                "psr-0": {
-                    "Netcarver\\Textile": "src/"
+                "psr-4": {
+                    "Netcarver\\Textile\\": "src/Netcarver/Textile/"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -1260,7 +1247,7 @@
                 "plaintext",
                 "textile"
             ],
-            "time": "2016-11-17 14:18:12"
+            "time": "2019-01-26 17:03:58"
         },
         {
             "name": "nicolaskruchten/pivottable",
@@ -1275,16 +1262,16 @@
         },
         {
             "name": "phpseclib/phpseclib",
-            "version": "2.0.11",
+            "version": "2.0.15",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpseclib/phpseclib.git",
-                "reference": "7053f06f91b3de78e143d430e55a8f7889efc08b"
+                "reference": "11cf67cf78dc4acb18dc9149a57be4aee5036ce0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpseclib/phpseclib/zipball/7053f06f91b3de78e143d430e55a8f7889efc08b",
-                "reference": "7053f06f91b3de78e143d430e55a8f7889efc08b",
+                "url": "https://api.github.com/repos/phpseclib/phpseclib/zipball/11cf67cf78dc4acb18dc9149a57be4aee5036ce0",
+                "reference": "11cf67cf78dc4acb18dc9149a57be4aee5036ce0",
                 "shasum": ""
             },
             "require": {
@@ -1363,20 +1350,20 @@
                 "x.509",
                 "x509"
             ],
-            "time": "2018-04-15 16:55:05"
+            "time": "2019-03-10 16:53:45"
         },
         {
             "name": "psr/log",
-            "version": "1.0.2",
+            "version": "1.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-fig/log.git",
-                "reference": "4ebe3a8bf773a19edfe0a84b6585ba3d401b724d"
+                "reference": "6c001f1daafa3a3ac1d8ff69ee4db8e799a654dd"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-fig/log/zipball/4ebe3a8bf773a19edfe0a84b6585ba3d401b724d",
-                "reference": "4ebe3a8bf773a19edfe0a84b6585ba3d401b724d",
+                "url": "https://api.github.com/repos/php-fig/log/zipball/6c001f1daafa3a3ac1d8ff69ee4db8e799a654dd",
+                "reference": "6c001f1daafa3a3ac1d8ff69ee4db8e799a654dd",
                 "shasum": ""
             },
             "require": {
@@ -1410,7 +1397,7 @@
                 "psr",
                 "psr-3"
             ],
-            "time": "2016-10-10 12:19:37"
+            "time": "2018-11-20 15:27:04"
         },
         {
             "name": "rdlowrey/auryn",
@@ -1724,12 +1711,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/rougin/spark-plug.git",
-                "reference": "1e62ad1b2d206e0e82978da4259616315e680023"
+                "reference": "71b7bafacf2854d4dc296cfdf354a6cf54417f9b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/rougin/spark-plug/zipball/1e62ad1b2d206e0e82978da4259616315e680023",
-                "reference": "1e62ad1b2d206e0e82978da4259616315e680023",
+                "url": "https://api.github.com/repos/rougin/spark-plug/zipball/71b7bafacf2854d4dc296cfdf354a6cf54417f9b",
+                "reference": "71b7bafacf2854d4dc296cfdf354a6cf54417f9b",
                 "shasum": ""
             },
             "require": {
@@ -1790,16 +1777,16 @@
         },
         {
             "name": "symfony/console",
-            "version": "v2.8.44",
+            "version": "v2.8.50",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/console.git",
-                "reference": "0c1fcbb9afb5cff992c982ff99c0434f0146dcfc"
+                "reference": "cbcf4b5e233af15cd2bbd50dee1ccc9b7927dc12"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/console/zipball/0c1fcbb9afb5cff992c982ff99c0434f0146dcfc",
-                "reference": "0c1fcbb9afb5cff992c982ff99c0434f0146dcfc",
+                "url": "https://api.github.com/repos/symfony/console/zipball/cbcf4b5e233af15cd2bbd50dee1ccc9b7927dc12",
+                "reference": "cbcf4b5e233af15cd2bbd50dee1ccc9b7927dc12",
                 "shasum": ""
             },
             "require": {
@@ -1847,7 +1834,7 @@
             ],
             "description": "Symfony Console Component",
             "homepage": "https://symfony.com",
-            "time": "2018-07-26 11:13:39"
+            "time": "2018-11-20 15:55:20"
         },
         {
             "name": "symfony/debug",
@@ -1908,16 +1895,16 @@
         },
         {
             "name": "symfony/polyfill-ctype",
-            "version": "v1.9.0",
+            "version": "v1.11.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/polyfill-ctype.git",
-                "reference": "e3d826245268269cd66f8326bd8bc066687b4a19"
+                "reference": "82ebae02209c21113908c229e9883c419720738a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/polyfill-ctype/zipball/e3d826245268269cd66f8326bd8bc066687b4a19",
-                "reference": "e3d826245268269cd66f8326bd8bc066687b4a19",
+                "url": "https://api.github.com/repos/symfony/polyfill-ctype/zipball/82ebae02209c21113908c229e9883c419720738a",
+                "reference": "82ebae02209c21113908c229e9883c419720738a",
                 "shasum": ""
             },
             "require": {
@@ -1929,7 +1916,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "1.9-dev"
+                    "dev-master": "1.11-dev"
                 }
             },
             "autoload": {
@@ -1962,20 +1949,20 @@
                 "polyfill",
                 "portable"
             ],
-            "time": "2018-08-06 14:22:27"
+            "time": "2019-02-06 07:57:58"
         },
         {
             "name": "symfony/polyfill-mbstring",
-            "version": "v1.9.0",
+            "version": "v1.11.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/polyfill-mbstring.git",
-                "reference": "d0cd638f4634c16d8df4508e847f14e9e43168b8"
+                "reference": "fe5e94c604826c35a32fa832f35bd036b6799609"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/polyfill-mbstring/zipball/d0cd638f4634c16d8df4508e847f14e9e43168b8",
-                "reference": "d0cd638f4634c16d8df4508e847f14e9e43168b8",
+                "url": "https://api.github.com/repos/symfony/polyfill-mbstring/zipball/fe5e94c604826c35a32fa832f35bd036b6799609",
+                "reference": "fe5e94c604826c35a32fa832f35bd036b6799609",
                 "shasum": ""
             },
             "require": {
@@ -1987,7 +1974,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "1.9-dev"
+                    "dev-master": "1.11-dev"
                 }
             },
             "autoload": {
@@ -2021,20 +2008,20 @@
                 "portable",
                 "shim"
             ],
-            "time": "2018-08-06 14:22:27"
+            "time": "2019-02-06 07:57:58"
         },
         {
             "name": "symfony/yaml",
-            "version": "v2.8.44",
+            "version": "v2.8.50",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/yaml.git",
-                "reference": "fbf876678e29dc634430dcf0096e216eb0004467"
+                "reference": "02c1859112aa779d9ab394ae4f3381911d84052b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/yaml/zipball/fbf876678e29dc634430dcf0096e216eb0004467",
-                "reference": "fbf876678e29dc634430dcf0096e216eb0004467",
+                "url": "https://api.github.com/repos/symfony/yaml/zipball/02c1859112aa779d9ab394ae4f3381911d84052b",
+                "reference": "02c1859112aa779d9ab394ae4f3381911d84052b",
                 "shasum": ""
             },
             "require": {
@@ -2071,7 +2058,7 @@
             ],
             "description": "Symfony Yaml Component",
             "homepage": "https://symfony.com",
-            "time": "2018-07-26 09:03:18"
+            "time": "2018-11-11 11:18:13"
         },
         {
             "name": "tapmodo/Jcrop",
@@ -2086,16 +2073,16 @@
         },
         {
             "name": "tinymce/tinymce",
-            "version": "4.8.1",
+            "version": "4.9.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/tinymce/tinymce-dist.git",
-                "reference": "66308359bd3ff09996ed0e4121ca777c7f4ab508"
+                "reference": "3a997f24eb54d890b1c88f22cff03092e0b73378"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/tinymce/tinymce-dist/zipball/66308359bd3ff09996ed0e4121ca777c7f4ab508",
-                "reference": "66308359bd3ff09996ed0e4121ca777c7f4ab508",
+                "url": "https://api.github.com/repos/tinymce/tinymce-dist/zipball/3a997f24eb54d890b1c88f22cff03092e0b73378",
+                "reference": "3a997f24eb54d890b1c88f22cff03092e0b73378",
                 "shasum": ""
             },
             "type": "component",
@@ -2128,7 +2115,7 @@
                 "tinymce",
                 "wysiwyg"
             ],
-            "time": "2018-07-26 06:38:42"
+            "time": "2019-03-20 13:56:58"
         },
         {
             "name": "tomazdragar/SimpleCropper",
@@ -2142,16 +2129,16 @@
         },
         {
             "name": "twbs/bootstrap",
-            "version": "v3.3.7",
+            "version": "v3.4.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/twbs/bootstrap.git",
-                "reference": "0b9c4a4007c44201dce9a6cc1a38407005c26c86"
+                "reference": "68b0d231a13201eb14acd3dc84e51543d16e5f7e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/twbs/bootstrap/zipball/0b9c4a4007c44201dce9a6cc1a38407005c26c86",
-                "reference": "0b9c4a4007c44201dce9a6cc1a38407005c26c86",
+                "url": "https://api.github.com/repos/twbs/bootstrap/zipball/68b0d231a13201eb14acd3dc84e51543d16e5f7e",
+                "reference": "68b0d231a13201eb14acd3dc84e51543d16e5f7e",
                 "shasum": ""
             },
             "replace": {
@@ -2160,7 +2147,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "3.3.x-dev"
+                    "dev-master": "3.4.x-dev"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -2178,7 +2165,7 @@
                 }
             ],
             "description": "The most popular front-end framework for developing responsive, mobile first projects on the web.",
-            "homepage": "http://getbootstrap.com",
+            "homepage": "https://getbootstrap.com/",
             "keywords": [
                 "JS",
                 "css",
@@ -2189,35 +2176,35 @@
                 "responsive",
                 "web"
             ],
-            "time": "2016-07-25 15:51:55"
+            "time": "2019-02-13 15:55:38"
         },
         {
             "name": "twig/twig",
-            "version": "v1.35.4",
+            "version": "v1.41.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/twigphp/Twig.git",
-                "reference": "7e081e98378a1e78c29cc9eba4aefa5d78a05d2a"
+                "reference": "575cd5028362da591facde1ef5d7b94553c375c9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/twigphp/Twig/zipball/7e081e98378a1e78c29cc9eba4aefa5d78a05d2a",
-                "reference": "7e081e98378a1e78c29cc9eba4aefa5d78a05d2a",
+                "url": "https://api.github.com/repos/twigphp/Twig/zipball/575cd5028362da591facde1ef5d7b94553c375c9",
+                "reference": "575cd5028362da591facde1ef5d7b94553c375c9",
                 "shasum": ""
             },
             "require": {
-                "php": ">=5.3.3",
+                "php": ">=5.4.0",
                 "symfony/polyfill-ctype": "^1.8"
             },
             "require-dev": {
                 "psr/container": "^1.0",
                 "symfony/debug": "^2.7",
-                "symfony/phpunit-bridge": "^3.3"
+                "symfony/phpunit-bridge": "^3.4.19|^4.1.8"
             },
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "1.35-dev"
+                    "dev-master": "1.41-dev"
                 }
             },
             "autoload": {
@@ -2255,7 +2242,7 @@
             "keywords": [
                 "templating"
             ],
-            "time": "2018-07-13 07:12:17"
+            "time": "2019-05-14 11:59:08"
         },
         {
             "name": "zetacomponents/base",
@@ -2643,93 +2630,14 @@
             "time": "2007-12-17 09:04:44"
         }
     ],
-    "packages-dev": [
-        {
-            "name": "squizlabs/php_codesniffer",
-            "version": "2.9.1",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/squizlabs/PHP_CodeSniffer.git",
-                "reference": "dcbed1074f8244661eecddfc2a675430d8d33f62"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/squizlabs/PHP_CodeSniffer/zipball/dcbed1074f8244661eecddfc2a675430d8d33f62",
-                "reference": "dcbed1074f8244661eecddfc2a675430d8d33f62",
-                "shasum": ""
-            },
-            "require": {
-                "ext-simplexml": "*",
-                "ext-tokenizer": "*",
-                "ext-xmlwriter": "*",
-                "php": ">=5.1.2"
-            },
-            "require-dev": {
-                "phpunit/phpunit": "~4.0"
-            },
-            "bin": [
-                "scripts/phpcs",
-                "scripts/phpcbf"
-            ],
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "2.x-dev"
-                }
-            },
-            "autoload": {
-                "classmap": [
-                    "CodeSniffer.php",
-                    "CodeSniffer/CLI.php",
-                    "CodeSniffer/Exception.php",
-                    "CodeSniffer/File.php",
-                    "CodeSniffer/Fixer.php",
-                    "CodeSniffer/Report.php",
-                    "CodeSniffer/Reporting.php",
-                    "CodeSniffer/Sniff.php",
-                    "CodeSniffer/Tokens.php",
-                    "CodeSniffer/Reports/",
-                    "CodeSniffer/Tokenizers/",
-                    "CodeSniffer/DocGenerators/",
-                    "CodeSniffer/Standards/AbstractPatternSniff.php",
-                    "CodeSniffer/Standards/AbstractScopeSniff.php",
-                    "CodeSniffer/Standards/AbstractVariableSniff.php",
-                    "CodeSniffer/Standards/IncorrectPatternException.php",
-                    "CodeSniffer/Standards/Generic/Sniffs/",
-                    "CodeSniffer/Standards/MySource/Sniffs/",
-                    "CodeSniffer/Standards/PEAR/Sniffs/",
-                    "CodeSniffer/Standards/PSR1/Sniffs/",
-                    "CodeSniffer/Standards/PSR2/Sniffs/",
-                    "CodeSniffer/Standards/Squiz/Sniffs/",
-                    "CodeSniffer/Standards/Zend/Sniffs/"
-                ]
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "BSD-3-Clause"
-            ],
-            "authors": [
-                {
-                    "name": "Greg Sherwood",
-                    "role": "lead"
-                }
-            ],
-            "description": "PHP_CodeSniffer tokenizes PHP, JavaScript and CSS files and detects violations of a defined set of coding standards.",
-            "homepage": "http://www.squizlabs.com/php-codesniffer",
-            "keywords": [
-                "phpcs",
-                "standards"
-            ],
-            "time": "2017-05-22 02:43:20"
-        }
-    ],
+    "packages-dev": [],
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": [],
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
-        "php": ">=5.4.0"
+        "php": ">=5.6.40"
     },
     "platform-dev": []
 }

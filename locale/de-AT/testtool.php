@@ -8,9 +8,13 @@ $this->phrasen['testtool/willkommenstextTitel']='Herzlich Willkommen zum Reihung
 $this->phrasen['testtool/willkommenstext']='Bitte warten Sie mit dem Login auf die Anweisung der Aufsichtsperson.<br /><br />
 											Wir wünschen Ihnen einen erfolgreichen Start ins Studium.';
 $this->phrasen['testtool/nameAuswaehlen']='Name auswählen...';
-$this->phrasen['testtool/quereinstieg']='(Quereinstieg)';
+$this->phrasen['testtool/reihungstest']= 'Reihungstest';
+$this->phrasen['testtool/regulaererEinstieg']='Regulärer Einstieg';
+$this->phrasen['testtool/quereinstieg']='Quereinstieg';
+$this->phrasen['testtool/quereinstiegsgebiete']='Quereinstiegsgebiete';
 $this->phrasen['testtool/quereinsteiger']='Quereinsteiger';
 $this->phrasen['testtool/basic']='Basic';
+$this->phrasen['testtool/basisgebiete']='Basisgebiete';
 $this->phrasen['testtool/semester']='Semester';
 $this->phrasen['testtool/reihungstestNichtFreigeschalten']='Der zuteilte Reihungstest ist noch nicht freigeschaltet';
 $this->phrasen['testtool/reihungstestKannNichtGeladenWerden']='Der Reihungstest dem Sie zugeteilt sind, kann nicht geladen werden';
@@ -43,4 +47,6 @@ $this->phrasen['testtool/dieseFrageIstNichtFuerSieBestimmt']='Diese Frage ist ni
 $this->phrasen['testtool/fehlerBeimSpeichernDerErstansicht']='Fehler beim Speichern der Erstansicht';
 $this->phrasen['testtool/startDrueckenUmZuBeginnen']='Um dieses Teilgebiet zu starten, drücken Sie bitte links oben auf <b>Gebiet starten</b>.';
 $this->phrasen['testtool/keinPrueflingseintragVorhanden']='Kein Prüflingseintrag vorhanden';
+$this->phrasen['testtool/fuerFolgendeStgAngemeldet']='Für folgende Studiengänge haben Sie sich angemeldet:';
+$this->phrasen['testtool/invalideGebiete']='Ein oder mehrere Fragengebiet/e inkorrekt!<br>Bitte melden Sie dies der Betreuungsperson.';
 ?>

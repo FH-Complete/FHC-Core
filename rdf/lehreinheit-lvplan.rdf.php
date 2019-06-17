@@ -36,6 +36,7 @@ require_once('../config/vilesci.config.inc.php');
 require_once('../include/functions.inc.php');
 require_once('../include/lehreinheit.class.php');
 require_once('../include/notiz.class.php');
+require_once('../include/mitarbeiter.class.php');
 
 $uid=get_uid();
 $error_msg='';
@@ -162,6 +163,18 @@ if ($anz>0)
 		// Lektoren
 		$lektor='';
 		$l->lektor=array_unique($l->lektor);
+
+		$fixangestellt = false;
+		foreach ($l->lektor_uid as $lktuid)
+		{
+			$ma = new mitarbeiter();
+			$ma->load($lktuid);
+			if ($ma->fixangestellt)
+			{
+				$fixangestellt = true;
+				break;
+			}
+		}
 		sort($l->lektor);
 		foreach($l->lektor as $lv)
 			$lektor.=$lv.' ';
@@ -266,6 +279,7 @@ if ($anz>0)
 			   		<LVA:lvnr>'.$lvnr.'</LVA:lvnr>
 					<LVA:unr>'.$l->unr.'</LVA:unr>
 					<LVA:lektor>'.$lektor.'</LVA:lektor>
+					<LVA:fixangestellt_info>'.($fixangestellt?'Fix':'Frei').'</LVA:fixangestellt_info>
 					<LVA:lehrfach_id>'.$l->lehrfach_id.'</LVA:lehrfach_id>
 					<LVA:studiengang_kz>'.$l->stg_kz[0].'</LVA:studiengang_kz>
 					<LVA:fachbereich_kurzbz>'.$l->fachbereich.'</LVA:fachbereich_kurzbz>

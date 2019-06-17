@@ -29,7 +29,7 @@ require_once('../include/mail.class.php');
 
 $db = new basis_db();
 
-$qry = "SELECT distinct email FROM public.tbl_studiengang WHERE studiengang_kz!=0 AND email is not null";
+$qry = "SELECT distinct email FROM public.tbl_studiengang WHERE studiengang_kz!=0 AND email is not null AND aktiv";
 
 $message = "Dies ist eine automatische eMail!\n\nAm 20. jedes Monats wird die Lehrauftragsliste automatisch an die Geschäftsführung geschickt. Bitte führen Sie bis dahin noch alle anstehenden Korrekturen durch!\n\nBesten Dank,\nGeschäftsführung";
 $subject = "Erinnerung Lehrauftragsliste";

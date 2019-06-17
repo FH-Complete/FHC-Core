@@ -10,6 +10,7 @@ $this->phrasen['lvplan/saal']='Room';
 $this->phrasen['lvplan/lektor']='Lector';
 $this->phrasen['lvplan/reservierungsliste']='Reservation list';
 $this->phrasen['lvplan/reservierungenLoeschen']='Delete room reservations';
+$this->phrasen['lvplan/meineReservierungenAnzeigen']='Show my room reservations';
 $this->phrasen['lvplan/raumsuche']='Room search';
 $this->phrasen['lvplan/lehrverband']='Teaching Group';
 $this->phrasen['lvplan/stg']='Dp'; //Degree Program

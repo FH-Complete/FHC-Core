@@ -855,11 +855,17 @@ function encryptData($value,$key)
 		return false;
 	}
 
-	$text = $value;
-	$iv_size = mcrypt_get_iv_size(MCRYPT_RIJNDAEL_256, MCRYPT_MODE_ECB);
-	$iv = mcrypt_create_iv($iv_size, MCRYPT_RAND);
-	$crypttext = mcrypt_encrypt(MCRYPT_RIJNDAEL_256, $key, $text, MCRYPT_MODE_ECB, $iv);
-	return trim(safe_b64encode($crypttext));
+	require_once(dirname(__FILE__)."/../vendor/autoload.php");
+
+	$cipher = new phpseclib\Crypt\Rijndael(phpseclib\Crypt\Rijndael::MODE_ECB);
+	$cipher->setKey($key);
+	$cipher->disablePadding();
+	$length = strlen($value);
+	$pad = 32 - ($length % 32);
+	$value = str_pad($value, $length + $pad, chr(0));
+	$cipher->setBlockLength(256);
+
+	return trim(safe_b64encode($cipher->encrypt($value)));
 }
 
 function decryptData($value,$key)
@@ -869,11 +875,14 @@ function decryptData($value,$key)
 		return false;
 	}
 
+	require_once(dirname(__FILE__)."/../vendor/autoload.php");
 	$crypttext = safe_b64decode($value);
-	$iv_size = mcrypt_get_iv_size(MCRYPT_RIJNDAEL_256, MCRYPT_MODE_ECB);
-	$iv = mcrypt_create_iv($iv_size, MCRYPT_RAND);
-	$decrypttext = mcrypt_decrypt(MCRYPT_RIJNDAEL_256, $key, $crypttext, MCRYPT_MODE_ECB, $iv);
-	return trim($decrypttext);
+	$cipher = new phpseclib\Crypt\Rijndael(phpseclib\Crypt\Rijndael::MODE_ECB);
+	$cipher->disablePadding();
+	$cipher->setBlockLength(256);
+	$cipher->setKey($key);
+
+	return trim($cipher->decrypt($crypttext));
 }
 
 function clearHtmlTags($text)

@@ -50,6 +50,9 @@ define('CIS_LVALISTE_NOTENEINGABE_ANZEIGEN',true);
 // Anzeige des LV-Plan Links bei globaler Suche
 define('CIS_SUCHE_LVPLAN_ANZEIGEN',true);
 
+// Anzeige des Links zum Profil von Personen bei globaler Suche
+define('CIS_SUCHE_PROFIL_ANZEIGEN',true);
+
 // Soll geprueft werden ob das Passwort innerhalb des letzten Jahres geaendert wurde true|false
 // Wenn dies nicht geaendert wurde wird nach dem Login auf die Passwort aendern Seite umgeleitet
 define('CIS_CHECK_PASSWORD_CHANGE',false);
