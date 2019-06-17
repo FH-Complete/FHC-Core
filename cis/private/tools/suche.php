@@ -163,7 +163,11 @@ function searchPerson($searchItems)
 			//echo '<td>',$row->titelpre,'</td>';
 			echo '<td>',$row->anrede,'</td>';
 			echo '<td>',$row->vorname,'</td>';
-			echo '<td><a href="../profile/index.php?uid=',$row->uid,'" title="',$row->titelpre,' ',$row->vorname,' ',$row->nachname,' ',$row->titelpost,'">',$row->nachname,'</a>';
+			echo '<td>';
+			if(!defined('CIS_SUCHE_PROFIL_ANZEIGEN') || CIS_SUCHE_PROFIL_ANZEIGEN)
+				echo '<a href="../profile/index.php?uid=',$row->uid,'" title="',$row->titelpre,' ',$row->vorname,' ',$row->nachname,' ',$row->titelpost,'">',$row->nachname,'</a>';
+			else
+				echo $row->nachname;
 			if($row->aktiv==false)
 				echo '<span style="color: red"> (ausgeschieden)</span>';
 			elseif($bisverwendung->beschausmasscode=='5')
