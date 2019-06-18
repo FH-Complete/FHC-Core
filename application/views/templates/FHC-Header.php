@@ -30,6 +30,7 @@
 	$sbadmintemplate = isset($sbadmintemplate) ? $sbadmintemplate : false;
 	$tablesorter = isset($tablesorter) ? $tablesorter : false;
 	$tinymce = isset($tinymce) ? $tinymce : false;
+	$widgets = isset($widgets) ? $widgets : false;
 ?>
 
 <!-- Header start -->
@@ -93,6 +94,9 @@
 
 			// NavigationWidget CSS
 			if ($navigationwidget === true) generateCSSsInclude('public/css/NavigationWidget.css');
+
+			// HTML Widget CSS
+			if ($widgets === true) generateCSSsInclude('public/css/Widgets.css');
 
 			// Eventually required CSS
 			generateCSSsInclude($customCSSs); // Eventually required CSS

@@ -2,7 +2,7 @@
 	$this->load->view(
 		'templates/FHC-Header',
 		array(
-			'title' => 'MessageSent',
+			'title' => 'Message sent successfully',
 			'jquery' => true,
 			'bootstrap' => true,
 			'fontawesome' => true,
@@ -16,11 +16,6 @@
 	<div id="wrapper">
 		<div id="page-wrapper">
 			<div class="container-fluid">
-
-			<?php
-				if ($success)
-				{
-			?>
 
 				<div class="row">
 
@@ -79,11 +74,6 @@
 
 					</div>
 				</div>
-
-			<?php
-				}
-			?>
-
 			</div>
 		</div>
 	</div>

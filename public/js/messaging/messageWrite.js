@@ -1,5 +1,5 @@
 /**
- * JS used by view system/messages/messageWrite
+ * JS used by view system/messages/htmlWriteTemplate
  */
 
 function tinymcePreviewSetContent()

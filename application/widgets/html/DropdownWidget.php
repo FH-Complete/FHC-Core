@@ -17,32 +17,32 @@ class DropdownWidget extends HTMLWidget
 	const SELECTED_ELEMENT = 'selectedElement';
 	// Default HTML value
 	const HTML_DEFAULT_VALUE = 'null';
-	
+
 	const SIZE = 'size'; // size of the dropdown
 	const MULTIPLE = 'multiple'; // multiple attribute
-	
+
 	// Alias of $this->_args[HTMLWidget::HTML_ARG_NAME] for a better code readability
     protected $htmlParameters;
-	
+
 	/**
-	 * 
+	 *
 	 */
 	public function __construct($name, $args = array(), $htmlArgs = array())
 	{
 		parent::__construct($name, $args, $htmlArgs);
-		
+
 		// If the selectd element is not set then set it to HTML_DEFAULT_VALUE
 		if (!isset($this->_args[DropdownWidget::SELECTED_ELEMENT]))
 		{
 			$this->_args[DropdownWidget::SELECTED_ELEMENT] = DropdownWidget::HTML_DEFAULT_VALUE;
 		}
-		
+
 		$this->htmlParameters =& $this->_args[HTMLWidget::HTML_ARG_NAME]; // Reference for a better code readability
-		
+
 		// By default is not a multiple dropdown
 		unset($this->htmlParameters[DropdownWidget::MULTIPLE]);
 	}
-	
+
     /**
      * Set this dropdown as multiple:
      * - Setting the multiple attribute
@@ -53,23 +53,23 @@ class DropdownWidget extends HTMLWidget
 		$this->htmlParameters[DropdownWidget::MULTIPLE] = DropdownWidget::MULTIPLE;
 		$this->htmlParameters[HTMLWidget::HTML_NAME] .= '[]';
     }
-    
+
     /**
      * Checks if this object is a multiple dropdown
 	 */
     public function isMultipleDropdown()
     {
 		$isMultipleDropdown = false;
-		
+
 		if (isset($this->htmlParameters[DropdownWidget::MULTIPLE])
 			&& $this->htmlParameters[DropdownWidget::MULTIPLE] == DropdownWidget::MULTIPLE)
 		{
 			$isMultipleDropdown = true;
 		}
-		
+
 		return $isMultipleDropdown;
     }
-    
+
     /**
 	 * Add the correct select to the model used to load a list of elemets for this dropdown
 	 * @param model $model the model used to load elements
@@ -88,7 +88,7 @@ class DropdownWidget extends HTMLWidget
 			)
 		);
 	}
-    
+
 	/**
 	 * Set the array used to populate the dropdown
 	 * @param array $elements list used to populate this dropdown
@@ -102,7 +102,7 @@ class DropdownWidget extends HTMLWidget
 	)
 	{
 		$tmpElements = array();
-		
+
 		if (isError($elements))
 		{
 			if (is_object($elements) && isset($elements->retval))
@@ -133,11 +133,11 @@ class DropdownWidget extends HTMLWidget
 			{
 				$tmpElements = $elements->retval;
 			}
-			
+
 			$this->_args[DropdownWidget::WIDGET_DATA_ELEMENTS_ARRAY_NAME] = $tmpElements;
 		}
 	}
-	
+
 	/**
      * Adds an element to the beginning of the array
      */
@@ -146,17 +146,17 @@ class DropdownWidget extends HTMLWidget
 		$element = new stdClass();
 		$element->{DropdownWidget::ID_FIELD} = $id;
 		$element->{DropdownWidget::DESCRIPTION_FIELD} = $stdDescription;
-		
+
 		if (!hasData($elements))
 		{
 			$element->{DropdownWidget::DESCRIPTION_FIELD} = $noDataDescription;
 		}
-		
+
 		array_unshift($elements->retval, $element);
-		
+
 		return $elements->retval;
 	}
-	
+
 	/**
 	 * Loads the dropdown view with all the elements to be displayed
 	 */

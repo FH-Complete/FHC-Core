@@ -22,3 +22,8 @@ input[type=text] {
 #sendButton {
     width: 120px;
 }
+
+/* Overwrites the Widget.css class */
+div .width-150px {
+	width: 200px;
+}

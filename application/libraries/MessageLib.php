@@ -49,7 +49,6 @@ class MessageLib
 
 		// Loads extra models
 		$this->_ci->load->model('person/Person_model', 'PersonModel');
-		$this->_ci->load->model('system/Benutzerrolle_model', 'BenutzerrolleModel');
 		$this->_ci->load->model('person/Benutzerfunktion_model', 'BenutzerfunktionModel');
 		$this->_ci->load->model('organisation/Organisationseinheit_model', 'OrganisationseinheitModel');
 	}
@@ -206,14 +205,6 @@ class MessageLib
  		}
 
 		return $benutzer; // otherwise returns the error
-	}
-
-	/**
-	 * Admin or commoner?
-	 */
-	public function getIsAdmin($sender_id)
-	{
- 		return $this->_ci->BenutzerrolleModel->isAdminByPersonId($sender_id);
 	}
 
 	//------------------------------------------------------------------------------------------------------------------
@@ -629,6 +620,7 @@ class MessageLib
 
 	/**
 	 * Sends new message core method, may be wrapped by other methods.
+	 * If success then returns an array of successfully saved message ids
 	 */
 	private function _sendMessage(
 		$receivers, $receiversOU, $subject, $body, $sender_id, $senderOU, $relationmessage_id, $priority, $multiPartMime
@@ -658,11 +650,7 @@ class MessageLib
 			);
 			if (isSuccess($saveMessageResult)) // If successfully saved
 			{
-				// If the system is configured to send messages immediately
-				if ($this->_ci->config->item(self::CFG_SEND_IMMEDIATELY) === true)
-				{
-					$savedMessages[] = getData($saveMessageResult); // store the message id of the saved message
-				}
+				$savedMessages[] = getData($saveMessageResult); // store the message id of the saved message
 			}
 			else
 			{
@@ -683,7 +671,7 @@ class MessageLib
 			}
 		}
 
-		return success('Message sent successfully');
+		return success($savedMessages);
 	}
 
 	/**

@@ -176,6 +176,17 @@
 		{
 			"type": "package",
 			"package": {
+				"name": "olifolkerd/tabulator",
+				"version": "4.2.7",
+				"dist": {
+					"url": "https://github.com/olifolkerd/tabulator/archive/4.2.7.zip",
+					"type": "zip"
+				}
+			}
+		},
+		{
+			"type": "package",
+			"package": {
 				"name": "rmariuzzo/jquery-checkboxes",
 				"version": "1.0.7",
 				"dist": {
@@ -259,6 +270,8 @@
 		"nategood/httpful": "^0.2.20",
 		"netcarver/textile": "^3.5",
 		"nicolaskruchten/pivottable": "^2.15.0",
+
+		"olifolkerd/tabulator": "4.2.7",
 
 		"phpseclib/phpseclib": "^2.0",
 

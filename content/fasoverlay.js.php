@@ -1250,7 +1250,7 @@ function MessageNew()
 	{
 		var prestudentIdArray = getMultipleTreeCellText(tree, 'student-treecol-prestudent_id');
 
-		var action = '<?php echo APP_ROOT ?>index.ci.php/system/FASMessages/write/' + <?php echo $benutzer->person_id; ?>;
+		var action = '<?php echo APP_ROOT ?>index.ci.php/system/FASMessages/writeTemplate/' + <?php echo $benutzer->person_id; ?>;
 
 		openWindowPostArray(action, 'prestudent_id', prestudentIdArray);
 	}

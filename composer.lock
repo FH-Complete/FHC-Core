@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "ddbbad487c655512e6983408339cb85f",
-    "content-hash": "b5902c71fe21cd14397101dba5a3080c",
+    "hash": "df6059a4bee974ecf5447aad8a8b1e15",
+    "content-hash": "2111c73853dbc47938c3f31dbc349883",
     "packages": [
         {
             "name": "BlackrockDigital/startbootstrap-sb-admin-2",
@@ -1198,16 +1198,16 @@
         },
         {
             "name": "netcarver/textile",
-            "version": "v3.7.1",
+            "version": "v3.7.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/textile/php-textile.git",
-                "reference": "377933125dd30d708804c545bf33da87a3c1b0f4"
+                "reference": "c24d68d9f4d099f9c2434e71024f2a6140dc1594"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/textile/php-textile/zipball/377933125dd30d708804c545bf33da87a3c1b0f4",
-                "reference": "377933125dd30d708804c545bf33da87a3c1b0f4",
+                "url": "https://api.github.com/repos/textile/php-textile/zipball/c24d68d9f4d099f9c2434e71024f2a6140dc1594",
+                "reference": "c24d68d9f4d099f9c2434e71024f2a6140dc1594",
                 "shasum": ""
             },
             "require": {
@@ -1247,7 +1247,7 @@
                 "plaintext",
                 "textile"
             ],
-            "time": "2019-01-26 17:03:58"
+            "time": "2019-06-08 17:57:17"
         },
         {
             "name": "nicolaskruchten/pivottable",
@@ -1261,17 +1261,28 @@
             "type": "library"
         },
         {
+            "name": "olifolkerd/tabulator",
+            "version": "4.2.7",
+            "dist": {
+                "type": "zip",
+                "url": "https://github.com/olifolkerd/tabulator/archive/4.2.7.zip",
+                "reference": null,
+                "shasum": null
+            },
+            "type": "library"
+        },
+        {
             "name": "phpseclib/phpseclib",
-            "version": "2.0.15",
+            "version": "2.0.18",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpseclib/phpseclib.git",
-                "reference": "11cf67cf78dc4acb18dc9149a57be4aee5036ce0"
+                "reference": "60519001db8d791215a822efd366d24cafee9e63"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpseclib/phpseclib/zipball/11cf67cf78dc4acb18dc9149a57be4aee5036ce0",
-                "reference": "11cf67cf78dc4acb18dc9149a57be4aee5036ce0",
+                "url": "https://api.github.com/repos/phpseclib/phpseclib/zipball/60519001db8d791215a822efd366d24cafee9e63",
+                "reference": "60519001db8d791215a822efd366d24cafee9e63",
                 "shasum": ""
             },
             "require": {
@@ -1350,7 +1361,7 @@
                 "x.509",
                 "x509"
             ],
-            "time": "2019-03-10 16:53:45"
+            "time": "2019-06-13 06:15:54"
         },
         {
             "name": "psr/log",
@@ -2180,16 +2191,16 @@
         },
         {
             "name": "twig/twig",
-            "version": "v1.41.0",
+            "version": "v1.42.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/twigphp/Twig.git",
-                "reference": "575cd5028362da591facde1ef5d7b94553c375c9"
+                "reference": "671347603760a88b1e7288aaa9378f33687d7edf"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/twigphp/Twig/zipball/575cd5028362da591facde1ef5d7b94553c375c9",
-                "reference": "575cd5028362da591facde1ef5d7b94553c375c9",
+                "url": "https://api.github.com/repos/twigphp/Twig/zipball/671347603760a88b1e7288aaa9378f33687d7edf",
+                "reference": "671347603760a88b1e7288aaa9378f33687d7edf",
                 "shasum": ""
             },
             "require": {
@@ -2199,12 +2210,12 @@
             "require-dev": {
                 "psr/container": "^1.0",
                 "symfony/debug": "^2.7",
-                "symfony/phpunit-bridge": "^3.4.19|^4.1.8"
+                "symfony/phpunit-bridge": "^3.4.19|^4.1.8|^5.0"
             },
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "1.41-dev"
+                    "dev-master": "1.42-dev"
                 }
             },
             "autoload": {
@@ -2242,7 +2253,7 @@
             "keywords": [
                 "templating"
             ],
-            "time": "2019-05-14 11:59:08"
+            "time": "2019-06-04 11:31:08"
         },
         {
             "name": "zetacomponents/base",
