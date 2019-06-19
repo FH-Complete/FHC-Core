@@ -20,7 +20,7 @@ function tinymcePreviewSetContent()
 function parseMessageText(receiver_id, text)
 {
 	FHC_AjaxClient.ajaxCallGet(
-		"system/Messages/parseMessageText",
+		"system/messages/Messages/parseMessageText",
 		{
 			person_id: receiver_id,
 			text: text
@@ -111,7 +111,7 @@ $(document).ready(function ()
 			if (vorlage_kurzbz != '')
 			{
 				FHC_AjaxClient.ajaxCallGet(
-					"system/Messages/getVorlage",
+					"system/messages/Messages/getVorlage",
 					{
 						vorlage_kurzbz: vorlage_kurzbz
 					},

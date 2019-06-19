@@ -113,7 +113,7 @@
 		</table>
 		<div class="row">
 			<div class="col-xs-6">
-				<form id="sendmsgform" method="post" action="<?php echo site_url('/system/Messages/writeTemplate'); ?>" target="_blank">
+				<form id="sendmsgform" method="post" action="<?php echo site_url('/system/messages/Messages/writeTemplate'); ?>" target="_blank">
 					<input type="hidden" name="person_id" value="<?php echo $stammdaten->person_id ?>">
 					<a id="sendmsglink" href="javascript:void(0);">
 						<i class="fa fa-envelope"></i>&nbsp;<?php echo $this->p->t('ui','nachrichtSenden'); ?>

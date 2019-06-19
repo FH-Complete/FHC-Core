@@ -104,7 +104,7 @@ function MessagesNewMessage()
 	{
 		var prestudentIdArray = getMultipleTreeCellText(tree, 'student-treecol-prestudent_id');
 
-		var action = '<?php echo APP_ROOT ?>index.ci.php/system/FASMessages/writeTemplate';
+		var action = '<?php echo APP_ROOT ?>index.ci.php/system/messages/FASMessages/writeTemplate';
 
 		openWindowPostArray(action, 'prestudent_id', prestudentIdArray);
 	}
@@ -128,7 +128,7 @@ function MessagesSendAnswer()
 		var RecipientID = getTreeCellText(messagesTree, 'messages-tree-recipient_id', messagesTree.currentIndex);
 		var prestudentIdArray = new Array(getTreeCellText(studentsTree, 'student-treecol-prestudent_id', studentsTree.currentIndex));
 
-		var action = '<?php echo APP_ROOT ?>index.ci.php/system/FASMessages/writeReplyTemplate/' + MessageId + '/' + RecipientID;
+		var action = '<?php echo APP_ROOT ?>index.ci.php/system/messages/FASMessages/writeReplyTemplate/' + MessageId + '/' + RecipientID;
 
 		openWindowPostArray(action, 'prestudent_id', prestudentIdArray);
 	}

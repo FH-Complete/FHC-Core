@@ -29,7 +29,7 @@
 						</h3>
 					</div>
 				</div>
-				<form id="sendForm" method="post" action="<?php echo site_url('/system/Messages/sendImplicitTemplate'); ?>">
+				<form id="sendForm" method="post" action="<?php echo site_url('/system/messages/Messages/sendImplicitTemplate'); ?>">
 					<div class="row">
 						<div class="form-group">
 							<div class="col-lg-1 msgfieldcol-left">

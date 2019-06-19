@@ -54,7 +54,7 @@ var MessageList = {
 		var recid = id.substr(id.indexOf('_') + 1);
 
 		FHC_AjaxClient.ajaxCallGet(
-			'system/Messages/getMessageFromIds',
+			'system/messages/Messages/getMessageFromIds',
 			{
 				"msg_id": msgid,
 				"receiver_id": recid

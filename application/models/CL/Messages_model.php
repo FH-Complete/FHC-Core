@@ -283,7 +283,7 @@ class Messages_model extends CI_Model
 	}
 
 	//------------------------------------------------------------------------------------------------------------------
-	// Public methods called by controller system/Messages
+	// Public methods called by controller system/messages/Messages
 
 	/**
 	 * Returns an object that represent a template store in database
