@@ -2,7 +2,7 @@
 	$this->load->view(
 		'templates/FHC-Header',
 		array(
-			'title' => 'Write a message',
+			'title' => 'Write a new message or reply using templates',
 			'jquery' => true,
 			'jqueryui' => true,
 			'bootstrap' => true,

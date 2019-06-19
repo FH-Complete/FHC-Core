@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "df6059a4bee974ecf5447aad8a8b1e15",
-    "content-hash": "2111c73853dbc47938c3f31dbc349883",
+    "hash": "e3de1eee238160400fb63f68735b4144",
+    "content-hash": "5b71e8a3c356d52e43d788eb6f018151",
     "packages": [
         {
             "name": "BlackrockDigital/startbootstrap-sb-admin-2",
@@ -1094,6 +1094,17 @@
                 "jsonld"
             ],
             "time": "2018-11-18 20:26:18"
+        },
+        {
+            "name": "moment/momentjs",
+            "version": "2.24.0",
+            "dist": {
+                "type": "zip",
+                "url": "https://github.com/moment/moment/archive/2.24.0.zip",
+                "reference": null,
+                "shasum": null
+            },
+            "type": "library"
         },
         {
             "name": "mottie/tablesorter",
@@ -2191,16 +2202,16 @@
         },
         {
             "name": "twig/twig",
-            "version": "v1.42.1",
+            "version": "v1.42.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/twigphp/Twig.git",
-                "reference": "671347603760a88b1e7288aaa9378f33687d7edf"
+                "reference": "21707d6ebd05476854805e4f91b836531941bcd4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/twigphp/Twig/zipball/671347603760a88b1e7288aaa9378f33687d7edf",
-                "reference": "671347603760a88b1e7288aaa9378f33687d7edf",
+                "url": "https://api.github.com/repos/twigphp/Twig/zipball/21707d6ebd05476854805e4f91b836531941bcd4",
+                "reference": "21707d6ebd05476854805e4f91b836531941bcd4",
                 "shasum": ""
             },
             "require": {
@@ -2253,7 +2264,7 @@
             "keywords": [
                 "templating"
             ],
-            "time": "2019-06-04 11:31:08"
+            "time": "2019-06-18 15:35:16"
         },
         {
             "name": "zetacomponents/base",

@@ -25,10 +25,12 @@
 	$jqueryui = isset($jqueryui) ? $jqueryui : false;
 	$jquerycheckboxes = isset($jquerycheckboxes) ? $jquerycheckboxes : false;
 	$jquerytreetable = isset($jquerytreetable) ? $jquerytreetable : false;
+	$momentjs = isset($momentjs) ? $momentjs : false;
 	$navigationwidget = isset($navigationwidget) ? $navigationwidget : false;
 	$pivotui = isset($pivotui) ? $pivotui : false;
 	$sbadmintemplate = isset($sbadmintemplate) ? $sbadmintemplate : false;
 	$tablesorter = isset($tablesorter) ? $tablesorter : false;
+	$tabulator = isset($tabulator) ? $tabulator : false;
 	$tinymce = isset($tinymce) ? $tinymce : false;
 	$widgets = isset($widgets) ? $widgets : false;
 ?>
@@ -61,10 +63,7 @@
 			if ($fontawesome === true) generateCSSsInclude('vendor/components/font-awesome/css/font-awesome.min.css');
 
 			// PivotUI CSS
-			if ($pivotui === true)
-			{
-				generateCSSsInclude('vendor/nicolaskruchten/pivottable/dist/pivot.min.css');
-			}
+			if ($pivotui === true) generateCSSsInclude('vendor/nicolaskruchten/pivottable/dist/pivot.min.css');
 
 			// SB Admin 2 template CSS
 			if ($sbadmintemplate === true)
@@ -79,6 +78,9 @@
 				generateCSSsInclude('vendor/mottie/tablesorter/dist/css/theme.default.min.css');
 				generateCSSsInclude('vendor/mottie/tablesorter/dist/css/jquery.tablesorter.pager.min.css');
 			}
+
+			// Tabulator CSS
+			if ($tabulator === true) generateCSSsInclude('vendor/olifolkerd/tabulator/dist/css/bootstrap/tabulator_bootstrap.min.css');
 
 			// --------------------------------------------------------------------------------------------------------
 			// From public folder
@@ -100,6 +102,7 @@
 
 			// Eventually required CSS
 			generateCSSsInclude($customCSSs); // Eventually required CSS
+
 
 			// --------------------------------------------------------------------------------------------------------
 			// Javascripts
@@ -126,10 +129,7 @@
 			}
 
 			// jQuery checkboxes
-			if ($jquerycheckboxes === true)
-			{
-				generateJSsInclude('vendor/rmariuzzo/jquery-checkboxes/dist/jquery.checkboxes-1.0.7.min.js');
-			}
+			if ($jquerycheckboxes === true) generateJSsInclude('vendor/rmariuzzo/jquery-checkboxes/dist/jquery.checkboxes-1.0.7.min.js');
 
 			// Bootstrap JS
 			if ($bootstrap === true) generateJSsInclude('vendor/twbs/bootstrap/dist/js/bootstrap.min.js');
@@ -138,11 +138,16 @@
 			// NOTE: keep it after jQuery includes
 			if ($jquerytreetable === true) generateJSsInclude('vendor/ludo/jquery-treetable/jquery.treetable.js');
 
-			// PivotUI CSS
-			if ($pivotui === true)
+			// MomentJS
+			if ($momentjs === true)
 			{
-				generateJSsInclude('vendor/nicolaskruchten/pivottable/dist/pivot.min.js');
+				generateJSsInclude('vendor/moment/momentjs/min/moment.min.js');
+				generateJSsInclude('vendor/moment/momentjs/locale/de-at.js');
+				generateJSsInclude('vendor/moment/momentjs/locale/en-ie.js');
 			}
+
+			// PivotUI JS
+			if ($pivotui === true) generateJSsInclude('vendor/nicolaskruchten/pivottable/dist/pivot.min.js');
 
 			// Table sorter JS
 			if ($tablesorter === true)
@@ -151,6 +156,9 @@
 				generateJSsInclude('vendor/mottie/tablesorter/dist/js/jquery.tablesorter.widgets.min.js');
 				generateJSsInclude('vendor/mottie/tablesorter/dist/js/extras/jquery.tablesorter.pager.min.js');
 			}
+
+			// Tabulator JS
+			if ($tabulator === true) generateJSsInclude('vendor/olifolkerd/tabulator/dist/js/tabulator.min.js');
 
 			// Tinymce JS
 			if ($tinymce === true) generateJSsInclude('vendor/tinymce/tinymce/tinymce.min.js');

@@ -2,7 +2,7 @@
 	$this->load->view(
 		'templates/FHC-Header',
 		array(
-			'title' => 'MessageSent',
+			'title' => 'Read a message',
 			'jquery' => true,
 			'bootstrap' => true,
 			'fontawesome' => true,

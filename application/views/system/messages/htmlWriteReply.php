@@ -2,7 +2,7 @@
 	$this->load->view(
 		'templates/FHC-Header',
 		array(
-			'title' => 'MessageReply',
+			'title' => 'Reply to a message',
 			'jquery' => true,
 			'bootstrap' => true,
 			'fontawesome' => true,

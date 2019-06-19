@@ -30,7 +30,7 @@ class Messages extends Auth_Controller
 	}
 
 	// -----------------------------------------------------------------------------------------------------------------
-	// Public methods - HTML output
+	// Methods with HTML output
 
 	/**
 	 * Initialize all the parameters used by view system/messages/htmlWriteTemplate
@@ -71,7 +71,7 @@ class Messages extends Auth_Controller
 	}
 
 	// -----------------------------------------------------------------------------------------------------------------
-	// Public methods - JSON output - called by this controller and FASMessages (view system/messages/htmlWriteTemplate)
+	// Methods with JSON output called by this controller and FASMessages (view system/messages/htmlWriteTemplate)
 
 	/**
 	 * Returns an object that represent a template store in database
@@ -98,7 +98,7 @@ class Messages extends Auth_Controller
 	}
 
 	// -----------------------------------------------------------------------------------------------------------------
-	// Public methods - JSON output - called by infocenter
+	// Methods with JSON output called by infocenter
 
 	/**
 	 * Outputs message data for a message (identified my msg id and receiver id) in JSON format
