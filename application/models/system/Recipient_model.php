@@ -25,7 +25,8 @@ class Recipient_model extends DB_Model
 						 ks.kontakt,
 						 p.nachname,
 						 p.vorname,
-						 b.uid
+						 b.uid,
+						 mr.sent
 					FROM public.tbl_msg_recipient mr INNER JOIN public.tbl_msg_message mm USING (message_id)
 						INNER JOIN public.tbl_person p ON (mm.person_id = p.person_id)
 						LEFT JOIN public.tbl_benutzer b ON (mr.person_id = b.person_id)

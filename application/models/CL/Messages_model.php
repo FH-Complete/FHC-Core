@@ -8,7 +8,9 @@
 class Messages_model extends CI_Model
 {
 	const REPLY_SUBJECT_PREFIX = 'Re: ';
-	const REPLY_BODY_PREFIX = '<br><br>-------------------------------------------------------------------------------';
+	const REPLY_BODY_FORMAT = '<br><br><blockquote><i>On %s %s %s wrote:</i></blockquote><blockquote style="border-left:2px solid; padding-left: 8px">%s</blockquote>';
+
+	const NO_AUTH_UID = 'online'; // hard coded uid if no authentication is performed
 
 	/**
 	 * Constructor
@@ -33,6 +35,87 @@ class Messages_model extends CI_Model
 
 	//------------------------------------------------------------------------------------------------------------------
 	// Public methods
+
+	/**
+	 * Prepares data for the view system/messages/htmlRead using a token that identifies a single message
+	 */
+	public function prepareHtmlRead($token)
+	{
+		if (isEmptyString($token)) show_error('The given token is not valid');
+
+		// Retrieves message using the given token
+		$messageResult = $this->MessageTokenModel->getMessageByToken($token);
+		if (isError($messageResult)) show_error(getData($messageResult));
+		if (!hasData($messageResult)) show_error('No message found with the given token');
+
+		$message = getData($messageResult)[0]; // Found message data
+
+		// Set message as read
+		$srmsbtResult = $this->MessageTokenModel->setReadMessageStatusByToken($token);
+		if (isError($srmsbtResult)) show_error(getData($srmsbtResult));
+
+		// Retrieves message sender information
+		$senderResult = $this->MessageTokenModel->getSenderData($message->sender_id);
+		if (isError($senderResult)) show_error(getData($senderResult));
+		if (!hasData($senderResult)) show_error('No sender information found');
+
+		$sender = getData($senderResult)[0]; // Found sender data
+
+		// Check if the receiver is an employee
+		$isEmployee = false; // not by default
+		$isEmployeeResult = $this->MessageTokenModel->isEmployee($message->receiver_id);
+		if (isError($isEmployeeResult)) show_error(getData($isEmployeeResult));
+		if (hasData($isEmployeeResult)) $isEmployee = true;
+
+		// If the sender is an employee and are present configurations to reply
+		$hrefReply = '';
+		if ($isEmployee && !isEmptyString($this->config->item(MessageLib::CFG_REDIRECT_VIEW_MESSAGE_URL)))
+		{
+			$hrefReply = $this->config->item(MessageLib::CFG_MESSAGE_SERVER).
+				$this->config->item(MessageLib::CFG_REDIRECT_VIEW_MESSAGE_URL).
+				$token;
+		}
+
+		return array (
+			'sender' => $sender,
+			'message' => $message,
+			'hrefReply' => $hrefReply
+		);
+	}
+
+	/**
+	 * Prepares data for the view system/messages/htmlWriteReply using a token that identifies a single message
+	 */
+	public function prepareHtmlWriteReply($token)
+	{
+		if (isEmptyString($token)) show_error('The given token is not valid');
+
+		// Retrieves message using the given token
+		$messageResult = $this->MessageTokenModel->getMessageByToken($token);
+		if (isError($messageResult)) show_error(getData($messageResult));
+		if (!hasData($messageResult)) show_error('No message found with the given token');
+
+		$message = getData($messageResult)[0]; // Found message data
+
+		// Retrieves message sender information
+		$senderResult = $this->MessageTokenModel->getSenderData($message->sender_id);
+		if (isError($senderResult)) show_error(getData($senderResult));
+		if (!hasData($senderResult)) show_error('No sender information found');
+
+		$sender = getData($senderResult)[0]; // Found sender data
+
+		$replySubject = self::REPLY_SUBJECT_PREFIX.$message->subject;
+		$replyBody = $this->_getReplyBody($message->body, $sender->vorname, $sender->nachname, $message->sent);
+
+		return array (
+			'receiver' => $sender->vorname.' '.$sender->nachname, // yep! the sender of the sent message is the receiver of the reply message
+			'subject' => $replySubject,
+			'body' => $replyBody,
+			'receiver_id' => $message->sender_id,
+			'relationmessage_id' => $message->message_id,
+			'token' => $token
+		);
+	}
 
 	/**
 	 * Prepares data for the view system/messages/htmlWriteTemplate using person ids as main parameter
@@ -158,62 +241,45 @@ class Messages_model extends CI_Model
 	}
 
 	/**
-	 * Send a reply to a message accessed using a token
+	 * Send a reply to a single recipient for a message identified by a token (no templates are used)
 	 */
-	public function sendReply($subject, $body, $persons, $relationmessage_id, $token)
+	public function sendReply($receiver_id, $subject, $body, $relationmessage_id, $token)
 	{
-		$relationmsg = $this->MessageTokenModel->getMessageByToken($token);
-		if (!hasData($relationmsg) || $relationmessage_id !== getData($relationmsg)[0]->message_id)
+		// Retrieves message sender information
+		$senderResult = $this->MessageTokenModel->getSenderData($receiver_id);
+		if (isError($senderResult)) show_error(getData($senderResult));
+		if (!hasData($senderResult)) show_error('No sender information found');
+
+		$sender = getData($senderResult)[0]; // Found sender data
+
+		$messageResult = $this->MessageTokenModel->getMessageByToken($token);
+		if (isError($messageResult)) show_error(getData($messageResult));
+		// Security check! It is possible to reply only to a received message!!
+		if (!hasData($messageResult) || $relationmessage_id != getData($messageResult)[0]->message_id)
 		{
-			show_error('Error while sending reply');
+			show_error('An error occurred while sending your message, please contact the site administrator');
 		}
 
-		// Get sender (receiver of previous msg)
-		$sender_id = getData($relationmsg)[0]->receiver_id;
+		$sender_id = getData($messageResult)[0]->receiver_id;
 
-		// Get message data of persons
-		$data = $this->MessageTokenModel->getPersonData($persons);
-		if (hasData($data))
-		{
-			for ($i = 0; $i < count(getData($data)); $i++)
-			{
-				$dataArray = (array)getData($data)[$i];
+		$message = $this->messagelib->sendMessageUser(
+			$receiver_id,			// receiverPersonId
+			$subject,				// subject
+			$body,					// body
+			$sender_id,				// sender_id, the receiver of the previous message is the sender of the current one
+			null,					// senderOU
+			$relationmessage_id,	// relationmessage_id
+			MSG_PRIORITY_NORMAL		// priority
+		);
 
-				$msg = $this->messagelib->sendMessageUser(
-					$dataArray['person_id'],		// receiverPersonId
-					$subject,						// subject
-					$body,							// body
-					$sender_id,						// sender_id
-					null,							// senderOU
-					$relationmessage_id,			// relationmessage_id
-					MSG_PRIORITY_NORMAL				// priority
-				);
+		if (isError($message)) return $message;
+		if (!hasData($message)) return error('No messages were saved in database');
 
-				if (isError($msg)) return $msg;
+		// Write log entry
+		$personLog = $this->_personLog($sender_id, $receiver_id, getData($message)[0]);
+		if (isError($personLog)) return $personLog;
 
-				// Logs person data
-				$personLog = $this->personloglib->log(
-					$sender_id,
-					'Action',
-					array(
-						'name' => 'Message sent',
-						'message' => 'Message sent from person '.$sender_id.' to '.$dataArray['person_id'].', messageid '.getData($msg),
-						'success' => 'true'
-					),
-					'kommunikation',
-					'core',
-					null,
-					'online'
-				);
-
-				// Unpark bewerber after he sends message
-				$personLog = $this->personloglib->unPark($sender_id);
-
-				if (isError($personLog)) return $personLog;
-			}
-		}
-
-		return success('Reply sent');
+		return success('Messages sent successfully');
 	}
 
 	//------------------------------------------------------------------------------------------------------------------
@@ -339,7 +405,11 @@ class Messages_model extends CI_Model
 	 */
 	private function _personLog($sender_id, $receiver_id, $message_id)
 	{
-		$_personLog = $this->personloglib->log(
+		// In case the message is accessed via ViewMessage controller -> no authentication
+		// If no authentication is performed then use a hard coded uid
+		$loggedUserUID = function_exists('getAuthUID') ? getAuthUID() : self::NO_AUTH_UID;
+
+		return $this->personloglib->log(
 			$receiver_id,
 			'Action',
 			array(
@@ -350,10 +420,19 @@ class Messages_model extends CI_Model
 			'kommunikation',
 			'core',
 			null,
-			getAuthUID()
+			$loggedUserUID
 		);
+	}
 
-		return $_personLog;
+	/**
+	 *
+	 */
+	private function _getReplyBody($body, $receiverName, $receiverSurname, $sentDate)
+	{
+		return sprintf(
+			self::REPLY_BODY_FORMAT,
+			date_format(date_create($sentDate), 'd.m.Y H:i'), $receiverName, $receiverSurname, $body
+		);
 	}
 
 	/**
@@ -407,7 +486,7 @@ class Messages_model extends CI_Model
 			$message = getData($messageResult)[0];
 
 			$replySubject = self::REPLY_SUBJECT_PREFIX.$message->subject;
-			$replyBody = self::REPLY_BODY_PREFIX.$message->body;
+			$replyBody = $this->_getReplyBody($message->body, $receiver->Vorname, $receiver->Nachname, $message->sent);
 			$relationmessage = '<input type="hidden" name="relationmessage_id" value="'.$message_id.'">';
 		}
 

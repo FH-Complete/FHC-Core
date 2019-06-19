@@ -16,14 +16,10 @@ if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 /**
  * Handles sending messages with token
- * NOTE: in this controller is not possible to include/call everything
- * that automatically call the authentication system, like the most of models or libraries
+ * NOTE: it extends FHC_Controller instead of Auth_Controller because authentication is not needed
  */
 class ViewMessage extends FHC_Controller
 {
-	/**
-	 * API constructor
-	 */
 	public function __construct()
 	{
 		parent::__construct();
@@ -32,121 +28,48 @@ class ViewMessage extends FHC_Controller
 		$this->config->load('message');
 
 		// Load model MessageToken_model, not calling the authentication system
-		$this->load->model('system/MessageToken_model', 'MessageTokenModel');
 		$this->load->model('CL/Messages_model', 'CLMessagesModel');
 	}
 
 	/**
-	 * Using the MessageTokenModel instead of MessageLib to allow
-	 * viewing the message without prompting the login
+	 * Display a message in read mode only using the specified token
 	 */
 	public function toHTML($token)
 	{
-		$msg = $this->MessageTokenModel->getMessageByToken($token);
-
-		if ($msg->error)
-		{
-			show_error(getData($msg));
-		}
-
-		if (is_array(getData($msg)) && count(getData($msg)) > 0)
-		{
-			$setReadMessageStatusByToken = $this->MessageTokenModel->setReadMessageStatusByToken($token);
-
-			if (isError($setReadMessageStatusByToken))
-			{
-				show_error($msg->$setReadMessageStatusByToken);
-			}
-
-			$sender_id = getData($msg)[0]->sender_id;
-			$receiver_id = getData($msg)[0]->receiver_id;
-			$sender = $this->MessageTokenModel->getSenderData($sender_id);
-
-			// To decide how to change the redirection
-			$isEmployee = $this->MessageTokenModel->isEmployee($receiver_id);
-			if (!is_bool($isEmployee) && isError($isEmployee))
-			{
-				show_error($isEmployee);
-			}
-
-			if($this->config->item('redirect_view_message_url') != '')
-				$href = $this->config->item('message_server').$this->config->item('redirect_view_message_url').$token;
-			else
-				$href = '';
-
-			$data = array (
-				'sender_id' => $sender_id,
-				'sender' => getData($sender)[0],
-				'message' => getData($msg)[0],
-				'isEmployee' => $isEmployee,
-				'href' => $href
-			);
-
-			$this->load->view('system/messages/messageHTML.php', $data);
-		}
+		// Loads the view to read a received message using its token as identifier
+		$this->load->view('system/messages/htmlRead', $this->CLMessagesModel->prepareHtmlRead($token));
 	}
 
 	/**
-	 * write the reply
+	 * Write a reply message to a received one using its token as identifier
 	 */
 	public function writeReply()
 	{
-		$token = $this->input->get('token');
+		$token = $this->input->get('token'); // gets received message token
 
-		if (isEmptyString($token))
-		{
-			show_error('No token supplied');
-		}
-
-		$msg = null;
-
-		// Get message data if possible
-		$msg = $this->MessageTokenModel->getMessageByToken($token);
-		if (!hasData($msg))
-		{
-			show_error('No message found');
-		}
-
-		$msg = getData($msg)[0];
-
-		// Get variables
-		$receiverData = $this->MessageTokenModel->getPersonData($msg->sender_id);
-		if (!hasData($receiverData))
-		{
-			show_error('No sender found');
-		}
-
-		$data = array (
-			'receivers' => getData($receiverData),
-			'message' => $msg,
-			'token' => $token
-		);
-
-		$this->load->view('system/messages/messageWriteReply', $data);
+		// Loads the view to write a reply message
+		$this->load->view('system/messages/htmlWriteReply', $this->CLMessagesModel->prepareHtmlWriteReply($token));
 	}
 
 	/**
-	 * Send a reply
+	 * Send a reply message (no templates are used)
 	 */
 	public function sendReply()
 	{
 		$subject = $this->input->post('subject');
 		$body = $this->input->post('body');
-		$persons = $this->input->post('persons');
+		$receiver_id = $this->input->post('receiver_id');
 		$relationmessage_id = $this->input->post('relationmessage_id');
 		$token = $this->input->post('token');
 
-		if (!isset($relationmessage_id) || $relationmessage_id == '' || !isset($token) || $token == '')
+		$sendReply = $this->CLMessagesModel->sendReply($receiver_id, $subject, $body, $relationmessage_id, $token);
+		if (isSuccess($sendReply))
 		{
-			show_error('Error while sending reply');
+			$this->load->view('system/messages/htmlSuccess');
 		}
-
-		$sendReply = $this->CLMessagesModel->sendReply($subject, $body, $persons, $relationmessage_id, $token);
-		if (isError($sendReply))
+		else
 		{
-			show_error(getData($sendReply));
+			$this->load->view('system/messages/htmlError');
 		}
-
-		$this->load->view('system/messages/messageReplySent');
 	}
 }

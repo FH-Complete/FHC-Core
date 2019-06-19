@@ -13,6 +13,7 @@ class MessageLib
 	const CFG_MESSAGE_SERVER = 'message_server';
 	const CFG_MESSAGE_HTML_VIEW_URL = 'message_html_view_url';
 	const CFG_OU_RECEIVERS = 'ou_receivers';
+	const CFG_REDIRECT_VIEW_MESSAGE_URL = 'redirect_view_message_url';
 
 	// Templates names
 	const NOTICE_TEMPLATE_HTML = 'MessageMailHTML';

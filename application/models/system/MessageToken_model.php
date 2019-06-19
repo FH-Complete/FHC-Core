@@ -152,45 +152,7 @@ class MessageToken_model extends DB_Model
 			 LEFT JOIN public.tbl_mitarbeiter m ON(b.uid = m.mitarbeiter_uid)
 				 WHERE p.person_id = ?';
 
-		$result = $this->db->query($sql, array($person_id));
-
-		// If no errors occurred
-		if ($result)
-		{
-			return success($result->result());
-		}
-		else
-		{
-			return error($this->db->error());
-		}
-	}
-
-	/**
-	 * Get data of a person
-	 */
-	public function getPersonData($person_id)
-	{
-		$sql = 'SELECT person_id,
-					   vorname as "Vorname",
-					   nachname as "Nachname",
-					   anrede as "Anrede",
-					   titelpost as "TitelPost",
-					   titelpre as "TitelPre",
-					   vornamen as "Vornamen"
-				  FROM public.tbl_person
-				 WHERE person_id %s ?';
-
-		$result = $this->db->query(sprintf($sql, is_array($person_id) ? 'IN' : '='), array($person_id));
-
-		// If no errors occurred
-		if ($result)
-		{
-			return success($result->result());
-		}
-		else
-		{
-			return error($this->db->error());
-		}
+		return $this->execQuery($sql, array($person_id));
 	}
 
 	/**
@@ -205,30 +167,7 @@ class MessageToken_model extends DB_Model
 				 WHERE p.person_id = ?
 				   AND b.aktiv = TRUE';
 
-		$result = $this->db->query($sql, array($person_id));
-
-		// If no errors occurred
-		if ($result)
-		{
-			// If data are present
-			if (is_array($result->result()) && count($result->result()) > 0)
-			{
-				$personresults = $result->result();
-				$person = $personresults[0];
-
-				// If it is an employee
-				if ($person->mitarbeiter_uid != null)
-				{
-					return true;
-				}
-			}
-
-			return false;
-		}
-		else
-		{
-			return error($this->db->error());
-		}
+		return $this->execQuery($sql, array($person_id));
 	}
 
 	/**

@@ -1,4 +1,4 @@
-	<?php
+<?php
 	$this->load->view(
 		'templates/FHC-Header',
 		array(
@@ -10,7 +10,7 @@
 			'customCSSs' => array('public/css/sbadmin2/admintemplate_contentonly.css', 'public/css/messaging/messageReply.css')
 		)
 	);
-	?>
+?>
 	<body>
 		<div id="wrapper">
 			<div id="page-wrapper">
@@ -24,7 +24,9 @@
 						<div class="col-xs-12">
 							<div class="panel panel-success">
 								<div class="panel-heading text-center">
+
 									<?php echo $message->subject; ?>
+
 								</div>
 								<div class="panel-body">
 									<table class="table table-condensed table-bordered" id="msgtable" align="center">
@@ -33,7 +35,9 @@
 												<b>From:</b>
 											</td>
 											<td>
+
 												<?php echo $sender->vorname.' '.$sender->nachname; ?>
+
 											</td>
 										</tr>
 										<tr>
@@ -41,7 +45,9 @@
 												<b>Subject:</b>
 											</td>
 											<td>
+
 												<?php echo $message->subject; ?>
+
 											</td>
 										</tr>
 										<tr>
@@ -49,7 +55,9 @@
 												<b>Message:</b>
 											</td>
 											<td>
+
 												<?php echo $message->body; ?>
+
 											</td>
 										</tr>
 									</table>
@@ -57,11 +65,15 @@
 								<div class="panel-footer">
 									<div class="row">
 										<div class="col-xs-12 text-center">
-											<?php if ($isEmployee === false && $href != ''): ?>
-												<button class="btn btn-default" id="replybutton" onclick="location.href='<?php echo $href; ?>';">
+
+											<?php if (!isEmptyString($hrefReply)): ?>
+
+												<button class="btn btn-default" id="replybutton" onclick="location.href='<?php echo $hrefReply; ?>';">
 													<i class="fa fa-reply"></i>&nbsp;Reply
 												</button>
+
 											<?php endif; ?>
+
 										</div>
 									</div>
 								</div>
@@ -72,4 +84,5 @@
 			</div>
 		</div>
 	</body>
-	<?php $this->load->view("templates/FHC-Footer"); ?>
+
+<?php $this->load->view("templates/FHC-Footer"); ?>
