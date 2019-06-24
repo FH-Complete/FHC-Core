@@ -4,10 +4,12 @@
 		array(
 			'title' => 'Read personal messages',
 			'jquery' => true,
+			'jqueryui' => true,
 			'bootstrap' => true,
 			'momentjs' => true,
 			'tabulator' => true,
 			'ajaxlib' => true,
+			'dialoglib' => true,
 			'customJSs' => array('public/js/messaging/messageClient.js')
 		)
 	);

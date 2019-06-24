@@ -37,6 +37,67 @@ class Messages_model extends CI_Model
 	// Public methods
 
 	/**
+	 *
+	 */
+	public function prepareAjaxRead()
+	{
+		$jsonNestedData = error('Something did not go as it should');
+
+		$loggedUserName = getAuthFirstname().' '.getAuthSurname();
+
+		if (isEmptyString($loggedUserName)) $loggedUserName = 'Me';
+
+		$receivedMessagesResult = $this->RecipientModel->getReceivedMessages(getAuthPersonId());
+		if (isError($receivedMessagesResult)) return $receivedMessagesResult;
+
+		$sentMessagesResult = $this->RecipientModel->getSentMessages(getAuthPersonId());
+		if (isError($sentMessagesResult)) return $sentMessagesResult;
+
+		if (hasData($receivedMessagesResult))
+		{
+			$jsonArray = array();
+
+			foreach (getData($receivedMessagesResult) as $receivedMessage)
+			{
+				$jsonRecord = new stdClass();
+				$jsonRecord->subject = $receivedMessage->subject;
+				$jsonRecord->from = $receivedMessage->vorname.' '.$receivedMessage->nachname;
+				$sentDate = new DateTime($receivedMessage->sent);
+				$jsonRecord->sent = $sentDate->format('d/m/Y H:i:s');
+				$jsonRecord->status = $receivedMessage->status;
+
+				if (hasData($sentMessagesResult))
+				{
+					$jsonChildrenArray = array();
+
+					foreach (getData($sentMessagesResult) as $sentMessage)
+					{
+						if ($receivedMessage->relationmessage_id == $sentMessage->message_id)
+						{
+							$jsonChildrenRecord = new stdClass();
+							$jsonChildrenRecord->subject = $sentMessage->subject;
+							$jsonChildrenRecord->from = $loggedUserName;
+							$sentDate = new DateTime($sentMessage->sent);
+							$jsonChildrenRecord->sent = $sentDate->format('d/m/Y H:i:s');
+							$jsonChildrenRecord->status = $sentMessage->status;
+
+							$jsonChildrenArray[] = $jsonChildrenRecord;
+						}
+					}
+
+					if (!isEmptyArray($jsonChildrenArray)) $jsonRecord->_children = $jsonChildrenArray;
+				}
+
+				$jsonArray[] = $jsonRecord;
+			}
+
+			$jsonNestedData = success(json_encode($jsonArray));
+		}
+
+		return $jsonNestedData;
+	}
+
+	/**
 	 * Prepares data for the view system/messages/htmlRead using a token that identifies a single message
 	 */
 	public function prepareHtmlRead($token)
@@ -148,11 +209,8 @@ class Messages_model extends CI_Model
 	public function sendImplicitTemplate($persons, $subject, $body, $relationmessage_id = null)
 	{
 		// Retrieves the sender id
-		$authUser = $this->_getAuthUser();
-		if (isError($authUser)) show_error(getData($authUser));
-		if (!hasData($authUser)) show_error('The current logged user person_id is not defined');
-
-		$sender_id = getData($authUser)[0]->person_id;
+		$sender_id = getAuthPersonId();
+		if (!is_numeric($sender_id)) show_error('The current logged user person_id is not defined');
 
 		// Retrieves message vars data for the given user/s
 		$msgVarsData = $this->MessageModel->getMsgVarsDataByPersonId($persons);
@@ -194,11 +252,8 @@ class Messages_model extends CI_Model
 	public function sendExplicitTemplate($prestudents, $oe_kurzbz, $vorlage_kurzbz, $msgVars)
 	{
 		// Retrieves the sender id
-		$authUser = $this->_getAuthUser();
-		if (isError($authUser)) show_error(getData($authUser));
-		if (!hasData($authUser)) show_error('The current logged user person_id is not defined');
-
-		$sender_id = getData($authUser)[0]->person_id;
+		$sender_id = getAuthPersonId();
+		if (!is_numeric($sender_id)) show_error('The current logged user person_id is not defined');
 
 		// Retrieves message vars data for the given user/s
 		$msgVarsData = $this->MessageModel->getMsgVarsDataByPrestudentId($prestudents);
@@ -357,17 +412,6 @@ class Messages_model extends CI_Model
 	// Private methods
 
 	/**
-	 * Returns the current authenticated person object
-	 */
-	private function _getAuthUser()
-	{
-		$this->load->model('person/Person_model', 'PersonModel');
-		$authUser = $this->PersonModel->getByUid(getAuthUID());
-
-		return $authUser;
-	}
-
-	/**
 	 * Replaces data array keys to a lowercase string with underscores instead of spaces
 	 */
 	private function _lowerReplaceSpaceArrayKeys($data)
@@ -407,7 +451,7 @@ class Messages_model extends CI_Model
 	{
 		// In case the message is accessed via ViewMessage controller -> no authentication
 		// If no authentication is performed then use a hard coded uid
-		$loggedUserUID = function_exists('getAuthUID') ? getAuthUID() : self::NO_AUTH_UID;
+		$loggedUserUID = isLogged() ? getAuthUID() : self::NO_AUTH_UID;
 
 		return $this->personloglib->log(
 			$receiver_id,
@@ -508,11 +552,8 @@ class Messages_model extends CI_Model
 
 		// ---------------------------------------------------------------------------------------
 		// Retrieves the sender id
-		$authUser = $this->_getAuthUser();
-		if (isError($authUser)) show_error(getData($authUser));
-		if (!hasData($authUser)) show_error('The current logged user person_id is not defined');
-
-		$sender_id = getData($authUser)[0]->person_id;
+		$sender_id = getAuthPersonId();
+		if (!is_numeric($sender_id)) show_error('The current logged user person_id is not defined');
 
 		// ---------------------------------------------------------------------------------------
  		// Organisation units and a boolean (true if the sender is administrator) are used to get the templates

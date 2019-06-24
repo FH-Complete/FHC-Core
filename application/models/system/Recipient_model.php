@@ -299,4 +299,63 @@ class Recipient_model extends DB_Model
 
 		return $this->execQuery($sql, $parametersArray);
 	}
+
+	/**
+	 *
+	 */
+	public function getReceivedMessages($person_id)
+	{
+		$sql = 'SELECT mr.message_id,
+						mm.relationmessage_id,
+						mm.subject,
+						mm.body,
+						mr.sent,
+						p.vorname,
+						p.nachname,
+						MAX(ms.status) AS status
+				  FROM public.tbl_msg_recipient mr
+				  JOIN public.tbl_msg_message mm ON (mm.message_id = mr.message_id)
+				  JOIN public.tbl_msg_status ms ON (ms.message_id = mr.message_id AND ms.person_id = mr.person_id)
+				  JOIN public.tbl_person p ON (p.person_id = mm.person_id)
+				 WHERE mr.person_id = ?
+				   AND mr.sent IS NOT NULL
+				   AND mr.sentinfo IS NULL
+			  GROUP BY mr.message_id,
+			  			mm.relationmessage_id,
+						mm.subject,
+						mm.body,
+						mr.sent,
+						p.vorname,
+						p.nachname
+			  ORDER BY mr.sent DESC';
+
+		return $this->execQuery($sql, array($person_id));
+	}
+
+	/**
+	 *
+	 */
+	public function getSentMessages($person_id)
+	{
+		$sql = 'SELECT mm.message_id,
+						mm.relationmessage_id,
+						mm.subject,
+						mm.body,
+						mr.sent,
+						MAX(ms.status) AS status
+				  FROM public.tbl_msg_message mm
+				  JOIN public.tbl_msg_recipient mr ON (mr.message_id = mm.message_id)
+				  JOIN public.tbl_msg_status ms ON (ms.message_id = mm.message_id AND mr.person_id = mr.person_id)
+				 WHERE mm.person_id = ?
+				   AND mr.sent IS NOT NULL
+				   AND mr.sentinfo IS NULL
+			  GROUP BY mm.message_id,
+			  			mm.relationmessage_id,
+						mm.subject,
+						mm.body,
+						mr.sent
+			  ORDER BY mr.sent DESC';
+
+		return $this->execQuery($sql, array($person_id));
+	}
 }
