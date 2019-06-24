@@ -111,7 +111,7 @@ if (!$searchPerson && !$searchOrt && !$searchDms && !$searchContent && !$searchO
 
 function searchPerson($searchItems)
 {
-	global $db, $p, $noalias;
+	global $db, $p, $noalias, $uid;
 	$bn = new benutzer();
 	$bn->search($searchItems, 21);
 
@@ -164,10 +164,18 @@ function searchPerson($searchItems)
 			echo '<td>',$row->anrede,'</td>';
 			echo '<td>',$row->vorname,'</td>';
 			echo '<td>';
-			if(!defined('CIS_SUCHE_PROFIL_ANZEIGEN') || CIS_SUCHE_PROFIL_ANZEIGEN)
+			if(!defined('CIS_SUCHE_PROFIL_ANZEIGEN'))
 				echo '<a href="../profile/index.php?uid=',$row->uid,'" title="',$row->titelpre,' ',$row->vorname,' ',$row->nachname,' ',$row->titelpost,'">',$row->nachname,'</a>';
+			else if(!CIS_SUCHE_PROFIL_ANZEIGEN)
+			{
+				$mitarbeiter = new Mitarbeiter($uid);
+				if($mitarbeiter->errormsg === NULL)
+					echo '<a href="../profile/index.php?uid=',$row->uid,'" title="',$row->titelpre,' ',$row->vorname,' ',$row->nachname,' ',$row->titelpost,'">',$row->nachname,'</a>';
+				else
+					echo $row->nachname;
+			}
 			else
-				echo $row->nachname;
+				echo '<a href="../profile/index.php?uid=',$row->uid,'" title="',$row->titelpre,' ',$row->vorname,' ',$row->nachname,' ',$row->titelpost,'">',$row->nachname,'</a>';
 			if($row->aktiv==false)
 				echo '<span style="color: red"> (ausgeschieden)</span>';
 			elseif($bisverwendung->beschausmasscode=='5')
