@@ -123,8 +123,13 @@ if (isset($_GET['selbstverwaltete-pause']) && !empty($_GET['submit']))
     $zeitaufzeichnung_gd->uid = $uid;
     $zeitaufzeichnung_gd->studiensemester_kurzbz = $next_ss;
     $zeitaufzeichnung_gd->selbstverwaltete_pause = $selbstverwaltete_pause;
-
-    if (!$zeitaufzeichnung_gd->save())
+	$za_gd = new Zeitaufzeichnung_gd();
+	$za_gd->load($uid, $next_ss);
+	if ($za_gd->uid)
+	{
+		echo 'Bereits eingetragen';
+	}
+    else if (!$zeitaufzeichnung_gd->save())
     {
         echo $zeitaufzeichnung_gd->errormsg;
     }
@@ -167,8 +172,45 @@ if (isset($_GET['selbstverwaltete-pause']) && !empty($_GET['submit']))
 	</head>
 
 	<body>
+
 	<div class="flexcroll" style="outline: none;">
 	<table>
+
+		<!--Erklärung zu Pausen bei geteilten Arbeitszeiten-->
+		<tr>
+			<td>
+				<h1>Zustimmung zu selbstverwalteten Pausen</h1>
+
+			<form action="">
+				<h3>Erklärung zu Pausen bei geteilten Arbeitszeiten</h3><br>
+				<p>
+					Ich bin mit der Verplanung meiner Lehre in getrennten Blöcken (Vormittags und Abends) einverstanden und berücksichtige bei der Einteilung meiner Pause,<br>
+					dass ich die tägliche Höchstgrenze laut AZG (10 Stunden) nicht überschreite. Diese Zustimmung gilt jeweils für ein Semester.
+					<?php
+					$gd = new zeitaufzeichnung_gd();
+					$gd->load($uid, $next_ss);
+					if ( ! $gd->uid )
+					{
+						echo '<br><br><h3>Für das kommende Studiensemester '.$next_ss.' erkläre ich mich einverstanden, meine Pausen entsprechend selbst zu verwalten: ';
+						echo '<input type="radio" name="selbstverwaltete-pause" value="yes">ja';
+						echo '<input type="radio" name="selbstverwaltete-pause" value="no">nein';
+						echo '</h3><br><br><input type="submit" name="submit" value="'.$p->t('global/speichern').'" style="float: right"><br>';
+					}
+					else
+					{
+						$zustimmung = ($gd->selbstverwaltete_pause) ? ' erteilt' : 'abgelehnt';
+						echo '<br><br><h3>Zustimmung für '.$next_ss.': '.$zustimmung.' am '.$datum_obj->formatDatum($gd->insertamum,'d.m.Y H:i:s').'</h3>';
+					}
+					//var_dump($gd);
+					?>
+
+				</p>
+			</form>
+
+		<br><hr>
+		</td>
+	</tr>
+
 	  <tr>
 	    <td>
 	    <h1><?php echo $p->t('zeitwunsch/zeitwunsch');?></h1>
@@ -231,35 +273,7 @@ if (isset($_GET['selbstverwaltete-pause']) && !empty($_GET['submit']))
 
 			</FORM>
 
-            <!--Erklärung zu Pausen bei geteilten Arbeitszeiten-->
-            <br>
-            <fieldset style="padding: 10px;">
-                <form action="">
-                    <h3>Erklärung zu Pausen bei geteilten Arbeitszeiten</h3><br>
-                    <p>
-                        Ich kenne die <a>arbeitsrechtlichen Betriebsvereinbarungen</a> zur Pauseneinhaltung bei geteilten Arbeitszeiten.<br>
-                        Für das kommende Studiensemester <?php echo $next_ss ?> erkläre ich mich einverstanden, meine Pausen selbst zu verwalten.
-						<?php
-						$gd = new zeitaufzeichnung_gd();
-						$gd->load($uid, $next_ss);
-						if ( ! $gd->uid )
-						{
-                        	echo '<input type="radio" name="selbstverwaltete-pause" value="yes">ja
-                        		<input type="radio" name="selbstverwaltete-pause" value="no">nein<br><br>
-                        		<input type="submit" name="submit" value="'.$p->t('global/speichern').'" style="float: right">
-								';
-						}
-						else
-						{
-							echo '<br><br>Zustimmung für '.$next_ss.': '.$gd->selbstverwaltete_pause;
-						}
-						//var_dump($gd);
-						?>
-
-                    </p>
-                </form>
-            </fieldset>
-            <br><br>
+			<br>
 
 			<h2><?php echo $p->t('zeitwunsch/erklärung');?>:</h2>
 

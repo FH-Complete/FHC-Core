@@ -2975,7 +2975,7 @@ if ($result = $db->db_query("SELECT 0 FROM pg_class WHERE relname = 'tbl_zeitauf
 // Create TABLE campus.tbl_zeitaufzeichnung_gd
 if(!@$db->db_query("SELECT 0 FROM campus.tbl_zeitaufzeichnung_gd WHERE 0 = 1")) {
 	$qry = '
-		CREATE TABLE campus.tbl_zeitaufzeichnung_gd 
+		CREATE TABLE campus.tbl_zeitaufzeichnung_gd
 		(
 			zeitaufzeichnung_gd_id integer     NOT NULL DEFAULT NEXTVAL(\'campus.tbl_zeitaufzeichnung_gd_id_seq\'::regclass),
 			uid                    varchar(32) NOT NULL,
@@ -2986,15 +2986,16 @@ if(!@$db->db_query("SELECT 0 FROM campus.tbl_zeitaufzeichnung_gd WHERE 0 = 1")) 
 			updateamum             TIMESTAMP,
 			updatevon              varchar(32)
 		);
-		
+
 		ALTER TABLE campus.tbl_zeitaufzeichnung_gd ADD CONSTRAINT pk_zeitaufzeichnung_gd_zeitaufzeichnung_gd_id PRIMARY KEY (zeitaufzeichnung_gd_id);
-		
+
 		ALTER TABLE campus.tbl_zeitaufzeichnung_gd ADD CONSTRAINT fk_zeitaufzeichnung_gd_uid FOREIGN KEY (uid) REFERENCES public.tbl_benutzer(uid) ON UPDATE CASCADE ON DELETE RESTRICT;
 		ALTER TABLE campus.tbl_zeitaufzeichnung_gd ADD CONSTRAINT fk_zeitaufzeichnung_gd_studiensemester_kurzbz FOREIGN KEY (studiensemester_kurzbz) REFERENCES public.tbl_studiensemester(studiensemester_kurzbz) ON UPDATE CASCADE ON DELETE RESTRICT;
-		
+		ALTER TABLE campus.tbl_zeitaufzeichnung_gd ADD CONSTRAINT uk_uid_stsem UNIQUE (uid, studiensemester_kurzbz);
+
 		COMMENT ON TABLE campus.tbl_zeitaufzeichnung_gd IS \'Table to manage the lectors parted working times; gd = Geteilte Dienste\';
 		COMMENT ON COLUMN campus.tbl_zeitaufzeichnung_gd.selbstverwaltete_pause IS \'Lectors (dis-)agreement to self-manage breaks\';
-		
+
 		';
 	if (!$db->db_query($qry))
 		echo '<strong>campus.tbl_zeitaufzeichnung_gd ' . $db->db_last_error() . '</strong><br>';
