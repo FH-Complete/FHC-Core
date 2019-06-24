@@ -72,33 +72,33 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www
 	};
 
 	// Add parser through the tablesorter addParser method for sorting Studiensemester
-	$.tablesorter.addParser({ 
-		// set a unique id 
-		id: "studiensemester", 
-		is: function(s) { 
-			// return false so this parser is not auto detected 
-			return false; 
-		}, 
-		format: function(s) { 
-			// format data for normalization 
+	$.tablesorter.addParser({
+		// set a unique id
+		id: "studiensemester",
+		is: function(s) {
+			// return false so this parser is not auto detected
+			return false;
+		},
+		format: function(s) {
+			// format data for normalization
 			var result = s.substr(2) + s.substr(0, 2);
 			return result;
-		}, 
-		// set type, either numeric or text 
-		type: "text" 
-	}); 
+		},
+		// set type, either numeric or text
+		type: "text"
+	});
 
-	$(document).ready(function() 
-	{ 
+	$(document).ready(function()
+	{
 		$("#notenliste").tablesorter(
 		{
-			headers: { 
-				1: { 
-					sorter:"studiensemester" 
+			headers: {
+				1: {
+					sorter:"studiensemester"
 				}},
 			' . ($stsem == 'alle' ? 'sortList: [[1,0],[4,0]],' : 'sortList: [[3,0]],') . '
 			widgets: ["zebra"]
-		}); 
+		});
 	});
 	</script>
 </head>
@@ -112,7 +112,7 @@ if (isset($_GET['uid']))
 {
 	// Administratoren duerfen die UID als Parameter uebergeben um die Notenliste
 	// von anderen Personen anzuzeigen
-	
+
 	$rechte = new benutzerberechtigung();
 	$rechte->getBerechtigungen($user);
 	if ($rechte->isBerechtigt('admin'))
@@ -136,16 +136,16 @@ if (! check_student($user))
 }
 else
 {
-	$qry = "SELECT vw_student.vorname, vw_student.nachname, vw_student.prestudent_id, tbl_studiengang.studiengang_kz 
-		FROM public.tbl_studiengang JOIN campus.vw_student USING (studiengang_kz) 
+	$qry = "SELECT vw_student.vorname, vw_student.nachname, vw_student.prestudent_id, tbl_studiengang.studiengang_kz
+		FROM public.tbl_studiengang JOIN campus.vw_student USING (studiengang_kz)
 		WHERE campus.vw_student.uid = " . $db->db_add_param($user) . ";";
-	
+
 	if (! $result = $db->db_query($qry))
 		die($p->t('tools/studentWurdeNichtGefunden'));
 	else
 	{
 		$row = $db->db_fetch_object($result);
-		
+
 		$vorname = $row->vorname;
 		$nachname = $row->nachname;
 		$prestudent_id = $row->prestudent_id;
@@ -166,7 +166,7 @@ else
 
 		$studiengang_bezeichnung = empty($studiengangbezeichnung_sto) ? $stg_name : $studiengangbezeichnung_sto;
 	}
-	
+
 	$notenarr = array();
 	$note = new note();
 	$note->getAll();
@@ -177,11 +177,11 @@ else
 	}
 
 	// Aktuelles Studiensemester ermitteln
-	
+
 	$stsem_obj = new studiensemester();
 	if ($stsem == '')
 		$stsem = $stsem_obj->getaktorNext();
-	
+
 	// Erstes und letztes Studiensemester mit Studenten-Status ermitteln
 	$prestudent = new prestudent();
 	// Wenn Incoming, dann Incomingstatus laden, sonst Studentenstatus
@@ -202,7 +202,7 @@ else
 	}
 
 	$stsem_obj->getStudiensemesterBetween($firstStudiensemester, $lastStudiensemester);
-	
+
 	echo "<br />";
 	echo "<b>".$p->t('global/name').":</b> $vorname $nachname<br />";
 	echo "<b>".$p->t('global/studiengang').":</b>  $studiengang_bezeichnung<br />";
@@ -222,7 +222,7 @@ else
 		}
 	}
 	echo "</SELECT><br />";
-	
+
 	// echo "Datum: ".date('d.m.Y')."<br />";
 	echo "<br />";
 	if ($notenImAktuellenStSem == false)
@@ -237,24 +237,27 @@ else
 	}
 	else
 		$sqlFilter = "";
-	
+
 	$qry = "SELECT
-				tbl_lehrveranstaltung.lehrveranstaltung_id, tbl_zeugnisnote.note, tbl_zeugnisnote.punkte,
-				tbl_lvgesamtnote.note as lvnote, tbl_lvgesamtnote.punkte as lvpunkte,
-				tbl_zeugnisnote.benotungsdatum, tbl_lvgesamtnote.freigabedatum, 
-				tbl_lvgesamtnote.benotungsdatum as lvbenotungsdatum,
-				tbl_zeugnisnote.studiensemester_kurzbz AS studiensemester_zeugnis, tbl_lvgesamtnote.studiensemester_kurzbz  AS studiensemester_lvnote,
-				tbl_lehrveranstaltung.zeugnis, tbl_lehrveranstaltung.ects
-			FROM
-				lehre.tbl_lehrveranstaltung, lehre.tbl_zeugnisnote
-			LEFT OUTER JOIN
-				campus.tbl_lvgesamtnote
-			USING (lehrveranstaltung_id, student_uid, studiensemester_kurzbz)
-			WHERE
-				tbl_zeugnisnote.student_uid = " . $db->db_add_param($user) . $sqlFilter . "
-			AND	tbl_lehrveranstaltung.lehrveranstaltung_id = tbl_zeugnisnote.lehrveranstaltung_id
-			ORDER BY bezeichnung";
-	
+			tbl_lehrveranstaltung.lehrveranstaltung_id, tbl_zeugnisnote.note, tbl_zeugnisnote.punkte,
+			tbl_lvgesamtnote.note as lvnote, tbl_lvgesamtnote.punkte as lvpunkte,
+			tbl_zeugnisnote.benotungsdatum, tbl_lvgesamtnote.freigabedatum,
+			tbl_lvgesamtnote.benotungsdatum as lvbenotungsdatum,
+			tbl_zeugnisnote.studiensemester_kurzbz AS studiensemester_zeugnis, tbl_lvgesamtnote.studiensemester_kurzbz  AS studiensemester_lvnote,
+			tbl_lehrveranstaltung.zeugnis, tbl_lehrveranstaltung.ects
+		FROM
+			lehre.tbl_lehrveranstaltung, lehre.tbl_zeugnisnote
+			LEFT OUTER JOIN campus.tbl_lvgesamtnote USING (lehrveranstaltung_id, student_uid, studiensemester_kurzbz)
+			LEFT OUTER JOIN lehre.tbl_note on tbl_zeugnisnote.note = tbl_note.note
+		WHERE
+			tbl_zeugnisnote.student_uid = " . $db->db_add_param($user) . $sqlFilter . "
+			AND	tbl_lehrveranstaltung.lehrveranstaltung_id = tbl_zeugnisnote.lehrveranstaltung_id";
+
+	if(defined('CIS_NOTENLISTE_OFFIZIELL_ANZEIGEN') && CIS_NOTENLISTE_OFFIZIELL_ANZEIGEN)
+		$qry .= " AND tbl_note.offiziell = true";
+
+	$qry .= " ORDER BY tbl_lehrveranstaltung.bezeichnung";
+
 	if ($result = $db->db_query($qry))
 	{
 		// Tabelle anzeigen
@@ -264,15 +267,15 @@ else
 					<th>" . $p->t('global/lehrveranstaltung') . "</th>";
 		if ($stsem == "alle")
 			$tblHead .= "<th>" . $p->t('global/studiensemester') . "</th>";
-		
+
 			$tblHead .= "<th>" . $p->t('benotungstool/lvNote') . "</th>";
 		if (defined('CIS_GESAMTNOTE_PUNKTE') && CIS_GESAMTNOTE_PUNKTE)
 			$tblHead .= "<th>" . $p->t('benotungstool/punkte') . "</th>";
-		
+
 			$tblHead .= "	<th>" . $p->t('benotungstool/zeugnisnote') . "</th>";
 		if (defined('CIS_GESAMTNOTE_PUNKTE') && CIS_GESAMTNOTE_PUNKTE)
 			$tblHead .= "<th>" . $p->t('benotungstool/punkte') . "</th>";
-		
+
 		$tblHead .= "
 					<th>" . $p->t('tools/benotungsdatumDerZeugnisnote') . "</th>
 					<th>" . $p->t('benotungstool/pruefung') . "</th>
@@ -281,19 +284,19 @@ else
 		$tblBody = "<tbody>";
 		$i = 0;
 		$legende = false;
-		$notenSummenArray = array(); 
+		$notenSummenArray = array();
 		while ($row = $db->db_fetch_object($result))
 		{
 			$lv_obj = new lehrveranstaltung();
 			$lv_obj->load($row->lehrveranstaltung_id);
-			
+
 			$i ++;
 			$tblBody .= "<tr><td>" . $lv_obj->bezeichnung_arr[$sprache] . ($lv_obj->lehrform_kurzbz != "" && $lv_obj->lehrform_kurzbz != " - " ? " (" . $lv_obj->lehrform_kurzbz . ")" : "") . "</td>";
 			if ($stsem == "alle")
 				$tblBody .= "<td>" . ($row->studiensemester_zeugnis != '' ? $row->studiensemester_zeugnis : $row->studiensemester_lvnote) . "</th>";
-			
+
 			$tblBody .= "<td>";
-			
+
 			// Nur freigegebene Noten anzeigen
 			if ($row->freigabedatum >= $row->lvbenotungsdatum)
 			{
@@ -301,7 +304,7 @@ else
 					$tblBody .= $notenarr[$row->lvnote]['bezeichnung'];
 				else
 					$tblBody .= $row->lvnote;
-				
+
 				// Nur Noten, die aufs Zeugnis gedruckt werden für Durchschnittsberechnung addieren
 				if ($row->zeugnis == true)
 				{
@@ -310,14 +313,14 @@ else
 				}
 			}
 			$tblBody .= "</td>";
-			
+
 			// LV Gesamtnote Punkte
 			if (defined('CIS_GESAMTNOTE_PUNKTE') && CIS_GESAMTNOTE_PUNKTE)
 			{
 				$lvpunkte = ($row->lvpunkte != '' ? (float) $row->lvpunkte : '');
 				$tblBody .= "<td>" . $lvpunkte . "</td>";
 			}
-			
+
 			if ($row->note != $row->lvnote && $row->lvnote != NULL)
 			{
 				$markier = " style='background-color: #FFD999;'";
@@ -326,25 +329,25 @@ else
 			else
 				$markier = "";
 			$tblBody .= "<td " . $markier . ">";
-			
+
 			if (isset($notenarr[$row->note]))
 				$tblBody .= $notenarr[$row->note]['bezeichnung'];
 			else
 				$tblBody .= $row->note;
-			
+
 			$tblBody .= "</td>";
-			
+
 			if (defined('CIS_GESAMTNOTE_PUNKTE') && CIS_GESAMTNOTE_PUNKTE)
 			{
 				$punkte = ($row->punkte != '' ? ((float) $row->punkte) : '');
 				$tblBody .= "<td>" . $punkte . "</td>";
 			}
-			
+
 			$tblBody .= '<td>' . $datum_obj->formatDatum($row->benotungsdatum, 'Y-m-d') . '</td>';
-			
+
 			$pruefung = new pruefung();
 			$pruefung->getPruefungen($user, null, $row->lehrveranstaltung_id, $stsem);
-			
+
 			if (count($pruefung->result) > 0)
 			{
 				$tblBody .= '<td>';
@@ -354,19 +357,19 @@ else
 						$note = $notenarr[$row->note]['bezeichnung'];
 					else
 						$note = $row->note;
-					
+
 					if ($row->punkte != '')
 						$punkte = ' (' . (float) $row->punkte . ')';
 					else
 						$punkte = '';
-					
+
 					$tblBody .= $row->pruefungstyp_beschreibung . ' ' . $datum_obj->formatDatum($row->datum, 'd.m.Y') . ' ' . $note . $punkte . '<br>';
 				}
 				$tblBody .= '</td>';
 			}
 			else
 				$tblBody .= '<td></td>';
-			
+
 			$tblBody .= "</tr>";
 		}
 		// Durchschnitt und gewichteten Durchschnitt berechnen
@@ -387,34 +390,34 @@ else
 
 		$tblBody .= "</tbody>";
 		$tblFoot = "<tfoot>";
-		
+
 		if ($anzahlLv != 0)
 			$notenDurchschnitt = round($notenSumme / $anzahlLv, 2);
 		else
 			$notenDurchschnitt = 0;
-		
+
 		if ($ectsSumme != 0)
 			$notenDurchschnittGewichtet = round($notenSummeGewichtet / $ectsSumme, 2);
 		else
 			$notenDurchschnittGewichtet = 0;
-			
+
 		$tblFoot .= '<tr>';
 		$tblFoot .= '<td colspan="'.($stsem == "alle" ? 3 : 2).'" align="right"><b>' . $p->t("tools/notendurchschnittDerZeugnisnote") . '</b></td>';
 		$tblFoot .= '<td style="background-color: #EEEEEE;">'.$notenDurchschnitt.'</td>';
 		$tblFoot .= '<td colspan="2"></td>';
 		$tblFoot .= "</tr>";
-	
+
 		$tblFoot .= '<tr>';
 		$tblFoot .= '<td colspan="'.($stsem == "alle" ? 3 : 2).'" align="right"><b>' . $p->t("tools/gewichteterNotendurchschnittDerZeugnisnote") . '</b></td>';
 		$tblFoot .= '<td style="background-color: #EEEEEE;">'.$notenDurchschnittGewichtet.'</td>';
 		$tblFoot .= '<td colspan="2"></td>';
-		
+
 		$tblFoot .= "</tr>";
-		
+
 		$tblFoot .= "</tfoot>";
-		
+
 		$tbl .= $tblHead.$tblFoot.$tblBody;
-		
+
 		$tbl .= "<table><tbody><tr><td width='20' style='text-align: right;'>*</td><td>" . $p->t('tools/legendeNotendurchschnitt') . "</td></tr>";
 		$tbl .= "<tr><td width='20' style='text-align: right;'>**</td><td>" . $p->t('tools/legendeGewichteterNotendurchschnitt') . "</td></tr>";
 		if ($legende)

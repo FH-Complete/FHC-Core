@@ -96,6 +96,9 @@ define('FAS_GESAMTNOTE_PRUEFUNGSHONORAR',false);
 // Aus Datenschutzgründen ist dies per default deaktiviert
 define('CIS_GESAMTNOTE_FREIGABEMAIL_NOTE', false);
 
+// Gibt an ob in der Notenliste der Studierenden nur offizielle Noten oder alle angezeigt werden
+define('CIS_NOTENLISTE_OFFIZIELL_ANZEIGEN', false);
+
 // Grenzwerte für Anwesenheit
 define('FAS_ANWESENHEIT_ROT', 70);
 define('FAS_ANWESENHEIT_GELB', 90);
@@ -126,6 +129,7 @@ define('CIS_LVPLAN_PERSONENAUSWAHL_ANZEIGEN',true);
 define('CIS_LVPLAN_LEHRVERBANDAUSWAHL_ANZEIGEN',true);
 define('CIS_LVPLAN_ARCHIVAUSWAHL_ANZEIGEN',true);
 define('CIS_LVPLAN_ZUSATZMENUE_ANZEIGEN',true);
+define('CIS_LVPLAN_SAALPLAN_ANZEIGEN',true);
 
 //Anmerkung bei Unterrichtseinheiten im LV-Plan anzeigen. Anmerkungen bei LV-Plan Sync mitkopieren.
 define('LVPLAN_ANMERKUNG_ANZEIGEN',true);
@@ -241,7 +245,7 @@ define('LOG_CONTENT', false);
 // ContentID of default content-template for reports. New contents will be childs of this.
 define('REPORT_CONTENT_TEMPLATE', '');
 
-// Schwund in %, der bei Arbeitsplätzen herausgerechnet werden soll. 
+// Schwund in %, der bei Arbeitsplätzen herausgerechnet werden soll.
 // zB 5. Dann werden bei 20 Plätzen 5% Schwund herausgerechnet und nur 19 Plätze zurückgegeben
 define('REIHUNGSTEST_ARBEITSPLAETZE_SCHWUND', 0);
 
