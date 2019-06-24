@@ -606,9 +606,10 @@ function saveAnmeldung($aktStudiensemester = null, $uid = null)
 
 	foreach ($prestudent->result as $ps)
 	{
-		if ($ps->getLaststatus($ps->prestudent_id, $stdsem_lv_besuch))
+		// prüfen ob Student zum Zeitpunkt der LV oder zumindest irgendwann Student im Studiengang war/ist
+		if ($ps->getLaststatus($ps->prestudent_id, $stdsem_lv_besuch) || $ps->studiengang_kz == $studiengang_kz)
 		{
-			if (($ps->status_kurzbz == "Student") || ($ps->status_kurzbz == "Unterbrecher"))
+			if (($ps->status_kurzbz == "Student") || ($ps->status_kurzbz == "Unterbrecher") || ($ps->status_kurzbz == ""))
 			{
 				array_push($prestudenten, $ps);
 			}

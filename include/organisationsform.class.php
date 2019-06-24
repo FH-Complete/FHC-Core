@@ -30,6 +30,8 @@ class organisationsform extends basis_db
 	public $code;
 	public $bezeichnung;
 	public $rolle;
+	public $bisorgform_kurzbz;
+	public $bezeichnung_mehrsprachig;
 
 	public $result = array();
 
@@ -37,9 +39,12 @@ class organisationsform extends basis_db
 	 *
 	 * Konstruktor
 	 */
-	public function __construct()
+	public function __construct($orgform_kurzbz = null)
 	{
 		parent::__construct();
+
+		if($orgform_kurzbz != null)
+			$this->load($orgform_kurzbz);
 	}
 
 	/**
@@ -48,7 +53,16 @@ class organisationsform extends basis_db
 	 */
 	public function load($orgform_kurzbz)
 	{
-		$qry = "SELECT * FROM bis.tbl_orgform WHERE orgform_kurzbz=".$this->db_add_param($orgform_kurzbz).';';
+		$sprache = new sprache();
+		$bezeichnung_mehrsprachig = $sprache->getSprachQuery('bezeichnung_mehrsprachig');
+		$qry = "SELECT 	orgform_kurzbz,
+						code,
+						bezeichnung,
+						rolle,
+						bisorgform_kurzbz,
+						$bezeichnung_mehrsprachig
+ 				FROM bis.tbl_orgform 
+ 				WHERE orgform_kurzbz=".$this->db_add_param($orgform_kurzbz).';';
 
 		if($this->db_query($qry))
 		{
@@ -58,6 +72,8 @@ class organisationsform extends basis_db
 				$this->code = $row->code;
 				$this->bezeichnung = $row->bezeichnung;
 				$this->rolle = $this->db_parse_bool($row->rolle);
+				$this->bisorgform_kurzbz = $row->bisorgform_kurzbz;
+				$this->bezeichnung_mehrsprachig = $sprache->parseSprachResult('bezeichnung_mehrsprachig',$row);
 			}
 		}
 		else
@@ -73,7 +89,15 @@ class organisationsform extends basis_db
 	 */
 	public function getAll()
 	{
-		$qry = "SELECT * FROM bis.tbl_orgform";
+		$sprache = new sprache();
+		$bezeichnung_mehrsprachig = $sprache->getSprachQuery('bezeichnung_mehrsprachig');
+		$qry = "SELECT 	orgform_kurzbz,
+						code,
+						bezeichnung,
+						rolle,
+						bisorgform_kurzbz,
+						$bezeichnung_mehrsprachig 
+				FROM bis.tbl_orgform";
 
 		if($this->db_query($qry))
 		{
@@ -85,6 +109,8 @@ class organisationsform extends basis_db
 				$orgform->code = $row->code;
 				$orgform->bezeichnung = $row->bezeichnung;
 				$orgform->rolle = $this->db_parse_bool($row->rolle);
+				$orgform->bisorgform_kurzbz = $row->bisorgform_kurzbz;
+				$orgform->bezeichnung_mehrsprachig = $sprache->parseSprachResult('bezeichnung_mehrsprachig',$row);
 
 				$this->result[] = $orgform;
 			}
@@ -133,9 +159,16 @@ class organisationsform extends basis_db
 	 */
 	public function getOrgformLV()
 	{
-		$qry = "SELECT *
-				  FROM bis.tbl_orgform
-				 WHERE orgform_kurzbz NOT IN ('VBB', 'ZGS')
+		$sprache = new sprache();
+		$bezeichnung_mehrsprachig = $sprache->getSprachQuery('bezeichnung_mehrsprachig');
+		$qry = "SELECT 	orgform_kurzbz,
+						code,
+						bezeichnung,
+						rolle,
+						bisorgform_kurzbz,
+						$bezeichnung_mehrsprachig 
+				FROM bis.tbl_orgform
+				WHERE orgform_kurzbz NOT IN ('VBB', 'ZGS')
 			  ORDER BY orgform_kurzbz";
 
 		if ($result = $this->db_query($qry))
@@ -148,6 +181,8 @@ class organisationsform extends basis_db
 				$orgform->code = $row->code;
 				$orgform->bezeichnung = $row->bezeichnung;
 				$orgform->rolle = $row->rolle;
+				$orgform->bisorgform_kurzbz = $row->bisorgform_kurzbz;
+				$orgform->bezeichnung_mehrsprachig = $sprache->parseSprachResult('bezeichnung_mehrsprachig',$row);
 
 				$this->result[] = $orgform;
 			}
