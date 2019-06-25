@@ -683,8 +683,7 @@ echo '
 								19: {sorter: false, filter: false},
 								20: {sorter: false, filter: false},
 								21: {sorter: false, filter: false}},
-					widgetOptions : {filter_saveFilters : true,
-									filter_functions : {
+					widgetOptions : {filter_functions : {
 										// Add select menu to this column
 										10 : {
 										"True" : function(e, n, f, i, $r, c, data) { return /t/.test(e); },
@@ -704,13 +703,6 @@ echo '
 										}
 									}
 								}
-				}); 
-		
-				$(\'.resetsaved\').click(function()
-				{
-					$("#t1").trigger("filterReset");
-					location.reload();
-					return false;
 				});
 			});
 
@@ -990,7 +982,6 @@ if ($result_lv!=0)
 
 	$num_rows=$db->db_num_rows($result_lv);
 	echo '<h3>&Uuml;bersicht - '.$num_rows.' LVAs</h3>
-	<button type="button" class="resetsaved" title="Reset Filter">Reset Filter</button>
 	<table class="tablesorter" id="t1">
 	<thead>
 	<tr>';

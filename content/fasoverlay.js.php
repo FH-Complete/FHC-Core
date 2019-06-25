@@ -1077,7 +1077,7 @@ function StatistikPrintNotenspiegelErweitert(typ)
 	window.open('<?php echo APP_ROOT ?>content/statistik/notenspiegel_erweitert.php?studiengang_kz='+studiengang_kz+'&semester='+semester+'&typ='+typ+'&orgform='+orgform,'Notenspiegel');
 }
 
-function StatistikPrintNotenspiegelStudent()
+function StatistikPrintStudienverlaufStudent()
 {
 	var tree = document.getElementById('student-tree');
 	var data='';
@@ -1094,7 +1094,7 @@ function StatistikPrintNotenspiegelStudent()
 		alert('Markierte Person ist kein Student');
 		return;
 	}
-	window.open('<?php echo APP_ROOT ?>index.ci.php/person/gradelist/index/'+student_uid,'Notenspiegel');
+	window.open('<?php echo APP_ROOT ?>index.ci.php/person/gradelist/index/'+student_uid,'Studienverlauf');
 }
 
 // ****
