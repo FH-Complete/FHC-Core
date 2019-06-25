@@ -1348,7 +1348,7 @@ if (isset($_REQUEST['reihungstest']))
 					ORDER BY start ASC LIMIT 1
 					)
 				)
-			AND bewerbung_abgeschicktamum IS NOT NULL
+			/*AND bewerbung_abgeschicktamum IS NOT NULL*/ /* Leider gibt es bestaetigte Bewerbungen, die nie abgeschickt wurden */ 
 			AND bestaetigtam IS NOT NULL
 			AND tbl_gebiet.gebiet_id != 7
 		";
