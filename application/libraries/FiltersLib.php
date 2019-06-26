@@ -108,9 +108,6 @@ class FiltersLib
 	{
 		$this->_ci =& get_instance(); // get code igniter instance
 
-		// Loads authentication helper
-		$this->_ci->load->helper('hlp_authentication'); // NOTE: needed to load custom filters do not remove!
-
 		$this->_filterUniqueId = $this->_getFilterUniqueId($params); // sets the id for the related filter widget
 	}
 
@@ -185,11 +182,8 @@ class FiltersLib
 	{
 		// Loads the needed models
 		$this->_ci->load->model('system/Filters_model', 'FiltersModel');
-		$this->_ci->load->model('person/Benutzer_model', 'BenutzerModel'); // to get the default custom filter
-
 		$this->_ci->FiltersModel->resetQuery(); // reset any previous built query
 
-		$this->_ci->FiltersModel->addJoin('public.tbl_benutzer', 'person_id', 'LEFT'); // left join with benutzer table
 		$this->_ci->FiltersModel->addSelect('system.tbl_filters.*'); // select only from table filters
 		$this->_ci->FiltersModel->addOrder('sort', 'ASC'); // sort on column sort
 		$this->_ci->FiltersModel->addLimit(1); // if more than one filter is set as default only one will be retrieved
@@ -223,7 +217,7 @@ class FiltersLib
 				$whereParameters = array(
 					'app' => $app,
 					'dataset_name' => $datasetName,
-					'uid' => getAuthUID(),
+					'person_id' => getAuthPersonId(),
 					'default_filter' => true
 				);
 
@@ -260,10 +254,10 @@ class FiltersLib
 		$jsonEncodedFilter = null;
 
 		// If the definition contains data and they are valid
-		if (hasData($definition) && isset($definition->retval[0]->filter) && trim($definition->retval[0]->filter) != '')
+		if (hasData($definition) && isset(getData($definition)[0]->filter) && trim(getData($definition)[0]->filter) != '')
 		{
 			// Get the json definition of the filter
-			$tmpJsonEncodedFilter = json_decode($definition->retval[0]->filter);
+			$tmpJsonEncodedFilter = json_decode(getData($definition)[0]->filter);
 
 			// Checks required filter's properies
 			if (isset($tmpJsonEncodedFilter->name)
@@ -585,87 +579,76 @@ class FiltersLib
 		$saveCustomFilter = false; // by default returns a failure
 
 		// Checks parameter customFilterDescription if not valid stop the execution
-		if (isEmptyString($customFilterDescription))
-		{
-			return $saveCustomFilter;
-		}
+		if (isEmptyString($customFilterDescription)) return $saveCustomFilter;
 
 		$this->_ci->load->model('system/Filters_model', 'FiltersModel'); // to load the filter definitions
-		$this->_ci->load->model('person/Benutzer_model', 'BenutzerModel'); // to get the person_id of the authenticated user
-
 		$this->_ci->FiltersModel->resetQuery(); // reset any previous built query
-		$this->_ci->BenutzerModel->resetQuery(); // reset any previous built query
 
-		// Loads data for the authenticated user
-		$authBenutzer = $this->_ci->BenutzerModel->loadWhere(array('uid' => getAuthUID()));
-		if (hasData($authBenutzer)) // if data are found
+		// person_id of the authenticated user
+		$authPersonId = getAuthPersonId();
+		// Postgres array for the description
+		$descPGArray = str_replace('%desc%', $customFilterDescription, '{"%desc%", "%desc%", "%desc%", "%desc%"}');
+
+		// Loads the definition to check if is already present in the DB
+		$definition = $this->_ci->FiltersModel->loadWhere(array(
+			'app' => $this->getSessionElement(self::APP_PARAMETER),
+			'dataset_name' => $this->getSessionElement(self::DATASET_NAME_PARAMETER),
+			'description' => $descPGArray,
+			'person_id' => $authPersonId
+		));
+
+		// New definition to be json encoded
+		$jsonDeifinition = new stdClass();
+		$jsonDeifinition->name = $customFilterDescription; // name of the filter
+
+		// Generates the "column" property
+		$jsonDeifinition->columns = array();
+		$selectedFields = $this->getSessionElement(self::SESSION_SELECTED_FIELDS); // retrieved the selected fields
+		for ($i = 0; $i < count($selectedFields); $i++)
 		{
-			// person_id of the authenticated user
-			$authPersonId = $authBenutzer->retval[0]->person_id;
-			// Postgres array for the description
-			$descPGArray = str_replace('%desc%', $customFilterDescription, '{"%desc%", "%desc%", "%desc%", "%desc%"}');
+			// Each element is an object with a property called "name"
+			$jsonDeifinition->columns[$i] = new stdClass();
+			$jsonDeifinition->columns[$i]->name = $selectedFields[$i];
+		}
 
-			// Loads the definition to check if is already present in the DB
-			$definition = $this->_ci->FiltersModel->loadWhere(array(
-				'app' => $this->getSessionElement(self::APP_PARAMETER),
-				'dataset_name' => $this->getSessionElement(self::DATASET_NAME_PARAMETER),
-				'description' => $descPGArray,
-				'person_id' => $authPersonId
-			));
+		// List of applied filters
+		$jsonDeifinition->filters = $this->getSessionElement(self::SESSION_FILTERS);
 
-			// New definition to be json encoded
-			$jsonDeifinition = new stdClass();
-			$jsonDeifinition->name = $customFilterDescription; // name of the filter
+		// If it is already present
+		if (hasData($definition))
+		{
+			// update it
+			$this->_ci->FiltersModel->update(
+				array(
+					'app' => $this->getSessionElement(self::APP_PARAMETER),
+					'dataset_name' => $this->getSessionElement(self::DATASET_NAME_PARAMETER),
+					'description' => $descPGArray,
+					'person_id' => $authPersonId
+				),
+				array(
+					'filter' => json_encode($jsonDeifinition)
+				)
+			);
 
-			// Generates the "column" property
-			$jsonDeifinition->columns = array();
-			$selectedFields = $this->getSessionElement(self::SESSION_SELECTED_FIELDS); // retrieved the selected fields
-			for ($i = 0; $i < count($selectedFields); $i++)
-			{
-				// Each element is an object with a property called "name"
-				$jsonDeifinition->columns[$i] = new stdClass();
-				$jsonDeifinition->columns[$i]->name = $selectedFields[$i];
-			}
+			$saveCustomFilter = true;
+		}
+		else // otherwise insert a new one
+		{
+			$this->_ci->FiltersModel->insert(
+				array(
+					'app' => $this->getSessionElement(self::APP_PARAMETER),
+					'dataset_name' => $this->getSessionElement(self::DATASET_NAME_PARAMETER),
+					'filter_kurzbz' => uniqid($authPersonId, true),
+					'description' => $descPGArray,
+					'person_id' => $authPersonId,
+					'sort' => null,
+					'default_filter' => false,
+					'filter' => json_encode($jsonDeifinition),
+					'oe_kurzbz' => null
+				)
+			);
 
-			// List of applied filters
-			$jsonDeifinition->filters = $this->getSessionElement(self::SESSION_FILTERS);
-
-			// If it is already present
-			if (hasData($definition))
-			{
-				// update it
-				$this->_ci->FiltersModel->update(
-					array(
-						'app' => $this->getSessionElement(self::APP_PARAMETER),
-						'dataset_name' => $this->getSessionElement(self::DATASET_NAME_PARAMETER),
-						'description' => $descPGArray,
-						'person_id' => $authPersonId
-					),
-					array(
-						'filter' => json_encode($jsonDeifinition)
-					)
-				);
-
-				$saveCustomFilter = true;
-			}
-			else // otherwise insert a new one
-			{
-				$this->_ci->FiltersModel->insert(
-					array(
-						'app' => $this->getSessionElement(self::APP_PARAMETER),
-						'dataset_name' => $this->getSessionElement(self::DATASET_NAME_PARAMETER),
-						'filter_kurzbz' => uniqid($authPersonId, true),
-						'description' => $descPGArray,
-						'person_id' => $authPersonId,
-						'sort' => null,
-						'default_filter' => false,
-						'filter' => json_encode($jsonDeifinition),
-						'oe_kurzbz' => null
-					)
-				);
-
-				$saveCustomFilter = true;
-			}
+			$saveCustomFilter = true;
 		}
 
 		return $saveCustomFilter;
@@ -721,7 +704,7 @@ class FiltersLib
 				$childrenPersonalArray = array(); // contains all the children elements in menu enty for personal filters
 
 				// Loops through loaded filters
-				foreach ($filters->retval as $filter)
+				foreach (getData($filters) as $filter)
 				{
 					// Generate a menu entry
 					$menuEntry = $this->_ci->navigationlib->oneLevel(

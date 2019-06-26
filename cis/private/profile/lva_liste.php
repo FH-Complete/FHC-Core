@@ -223,9 +223,9 @@ require_once('../../../include/benutzerberechtigung.class.php');
 			echo '<td>'.$row->lehrfach.'</td>';
 			echo '<td>'.$row->le_lehrform_kurzbz.'</td>';
 			if ($row->lehrfach_bez!=$row->lv_bezeichnung)
-				echo '<td>'.$row->lv_bezeichnung.' ('.$p->t('lvaliste/lehrfach').': '.$row->lehrfach_bez.')</td>';
+				echo '<td><a href="../lehre/lesson.php?lvid='.$row->lehrveranstaltung_id.'&studiensemester_kurzbz='.$stdsem.'">'.$row->lv_bezeichnung.' ('.$p->t('lvaliste/lehrfach').': '.$row->lehrfach_bez.')</a></td>';
 			else
-				echo '<td>'.$row->lv_bezeichnung.'</td>';
+				echo '<td><a href="../lehre/lesson.php?lvid='.$row->lehrveranstaltung_id.'&studiensemester_kurzbz='.$stdsem.'">'.$row->lv_bezeichnung.'</a></td>';
 			echo '<td>'.$row->lektor.'</td>';
 			echo '<td><a href="mailto:'.$row->email.'">'.$row->stg_kurzbz.'</a></td>';
 			echo '<td>'.$row->semester.'</td>';
@@ -304,15 +304,16 @@ require_once('../../../include/benutzerberechtigung.class.php');
 				tbl_lehrveranstaltung.bezeichnung, tbl_projektarbeit.titel,
 				(SELECT nachname || ' ' || vorname FROM public.tbl_benutzer JOIN public.tbl_person USING(person_id)
 				 WHERE uid=student_uid) as student, tbl_lehrveranstaltung.studiengang_kz, tbl_lehrveranstaltung.semester,
-				 tbl_studiengang.email
+				 tbl_studiengang.email, tbl_betreuerart.beschreibung AS beutreuerart_beschreibung
 			FROM
-				lehre.tbl_lehreinheit, lehre.tbl_lehrveranstaltung, lehre.tbl_projektarbeit, lehre.tbl_projektbetreuer, public.tbl_studiengang
+				lehre.tbl_lehreinheit, lehre.tbl_lehrveranstaltung, lehre.tbl_projektarbeit, lehre.tbl_projektbetreuer, public.tbl_studiengang, lehre.tbl_betreuerart
 			WHERE
 				tbl_lehreinheit.lehreinheit_id=tbl_projektarbeit.lehreinheit_id AND
 				tbl_lehreinheit.lehrveranstaltung_id=tbl_lehrveranstaltung.lehrveranstaltung_id AND
 				tbl_lehreinheit.studiensemester_kurzbz=".$db->db_add_param($stdsem)." AND
 				tbl_projektarbeit.projektarbeit_id=tbl_projektbetreuer.projektarbeit_id AND
 				tbl_lehrveranstaltung.studiengang_kz=tbl_studiengang.studiengang_kz AND
+				tbl_projektbetreuer.betreuerart_kurzbz=tbl_betreuerart.betreuerart_kurzbz AND
 				tbl_projektbetreuer.person_id=".$db->db_add_param($mitarbeiter->person_id, FHC_INTEGER);
 
 	$stg_obj = new studiengang();
@@ -330,6 +331,7 @@ require_once('../../../include/benutzerberechtigung.class.php');
 			echo '<th>'.$p->t('lvaliste/semester').'</th>';
 			echo '<th>'.$p->t('lvaliste/lvBezeichnung').'</th>';
 			echo '<th>'.$p->t('lvaliste/student').'</th>';
+			echo '<th>'.$p->t('lvaliste/betreuungsart').'</th>';
 			echo '<th>'.$p->t('lvaliste/titelProjektarbeit').'</th>';
 			echo '</tr></thead><tbody>';
 			while($row = $db->db_fetch_object($result))
@@ -339,6 +341,7 @@ require_once('../../../include/benutzerberechtigung.class.php');
 				echo '<td>'.$row->semester.'</td>';
 				echo '<td>'.$row->bezeichnung.'</td>';
 				echo '<td>'.$row->student.'</td>';
+				echo '<td>'.$row->beutreuerart_beschreibung.'</td>';
 				echo '<td>'.$row->titel.'</td>';
 
 				echo '</tr>';

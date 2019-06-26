@@ -292,7 +292,7 @@ class dokument_export
 
 				if($ret!=0)
 				{
-					$this->errormsg = 'Dokumentenkonvertierung ist derzeit nicht möglich. Bitte informieren Sie den Administrator';
+					$this->errormsg = 'Dokumentenkonvertierung ist derzeit nicht möglich. Bitte versuchen Sie es in einer Minute erneut oder kontaktieren Sie einen Administrator';
 					return false;
 				}
 				break;
@@ -465,7 +465,7 @@ class dokument_export
 
 		if($ret!=0)
 		{
-			$this->errormsg = 'Dokumentenkonvertierung ist derzeit nicht möglich. Bitte informieren Sie den Administrator';
+			$this->errormsg = 'Dokumentenkonvertierung ist derzeit nicht möglich. Bitte versuchen Sie es in einer Minute erneut oder kontaktieren Sie einen Administrator';
 			return false;
 		}
 

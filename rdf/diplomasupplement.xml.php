@@ -669,6 +669,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 					else
 					{
 						$note_alt = $arrayLvAusbildungssemester[$row_stud->lehrveranstaltung_id]['note'];
+						$note_alt_positiv = $arrayLvAusbildungssemester[$row_stud->lehrveranstaltung_id]['note_positiv'];
 						$note_neu = $row_stud->anmerkung;
 
 						// alte oder neue note besser
@@ -687,6 +688,13 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 							$arrayLvAusbildungssemester[$row_stud->lehrveranstaltung_id]['note'] = $db->db_parse_bool($row_stud->offiziell) ?  $row_stud->anmerkung : "";
 							$arrayLvAusbildungssemester[$row_stud->lehrveranstaltung_id]['note_positiv'] = $db->db_parse_bool($row_stud->positiv);
 							$arrayLvAusbildungssemester[$row_stud->lehrveranstaltung_id]['sort'] = $row_stud->sort;
+
+							// ects dazuzählen wenn alte Note negativ, neue positiv
+							if ($arrayLvAusbildungssemester[$row_stud->lehrveranstaltung_id]['note_positiv'] === true && $note_alt_positiv !== true)
+							{
+								$ects_total_positiv += $row_stud->ects;
+								$semester_ects_positiv += $row_stud->ects;
+							}
 						}
 					}
 
