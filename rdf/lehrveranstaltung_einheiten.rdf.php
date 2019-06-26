@@ -176,7 +176,7 @@ elseif($filter != '')
 		$additionalfilter.= " OR lehrveranstaltung_id=".$db->db_add_param($filter)."
 			OR lehreinheit_id=".$db->db_add_param($filter);
 	}
-		
+
 	$qry = "
 		SELECT
 				distinct on(lehrveranstaltung_id)
@@ -192,8 +192,8 @@ elseif($filter != '')
 			WHERE
 				studiensemester_kurzbz=".$db->db_add_param($semester_aktuell)."
 			 	AND
-				(lv_bezeichnung like '%".$db->db_escape($filter)."%'
-				OR lv_bezeichnung_english like '%".$db->db_escape($filter)."%'
+				(lower(lv_bezeichnung) like '%".$db->db_escape(mb_strtolower($filter))."%'
+				OR lower(lv_bezeichnung_english) like '%".$db->db_escape(mb_strtolower($filter))."%'
 				$additionalfilter
 				)
 		";

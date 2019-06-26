@@ -520,7 +520,7 @@ function LehrveranstaltungSuche()
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 	try
 	{
-		url = '<?php echo APP_ROOT; ?>rdf/lehrveranstaltung_einheiten.rdf.php?filter='+filter+'&'+gettimestamp();
+		url = '<?php echo APP_ROOT; ?>rdf/lehrveranstaltung_einheiten.rdf.php?filter='+encodeURIComponent(filter)+'&'+gettimestamp();
 		var treeLV=document.getElementById('lehrveranstaltung-tree');
 
 		try
