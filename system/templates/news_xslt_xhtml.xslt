@@ -163,8 +163,7 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 	<xsl:template match="cis_ext_menu">
 			<xsl:variable name="kurzbz" select="kurzbz"></xsl:variable>
 			<xsl:variable name="stg_kz" select="stg_kz"></xsl:variable>
-			<td class="menubox">	
-			<p><xsl:text> </xsl:text><a href="../documents/{kurzbz}/lehrziele/" class="Item" target="_blank"><xsl:value-of select="lehrziele_name" /></a></p>
+			<td class="menubox">
 			<p><xsl:text> </xsl:text><a href="https://moodle.technikum-wien.at/course/view.php?idnumber=dl{$stg_kz}" class="Item" target="_blank"><xsl:value-of select="download_name" /></a></p>
 			</td>
 	</xsl:template>

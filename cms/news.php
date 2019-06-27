@@ -436,7 +436,6 @@ function getStgContent($studiengang_kz, $semester, $sprache)
 	if(CIS_EXT_MENU)
 	{
 		$xml.='<cis_ext_menu>
-			<lehrziele_name><![CDATA['.$p->t('global/lehrziele').']]></lehrziele_name>
 			<download_name><![CDATA['.$p->t('global/allgemeinerdownload').']]></download_name>
 			<kurzbz><![CDATA['.strtolower($studiengang->kuerzel).']]></kurzbz>
 			<kurzbzlang><![CDATA['.strtolower($studiengang->kurzbzlang).']]></kurzbzlang>
