@@ -316,7 +316,7 @@ class Recipient_model extends DB_Model
 				  FROM public.tbl_msg_recipient mr
 				  JOIN public.tbl_msg_message mm ON (mm.message_id = mr.message_id)
 				  JOIN public.tbl_msg_status ms ON (ms.message_id = mr.message_id AND ms.person_id = mr.person_id)
-				  JOIN public.tbl_person p ON (p.person_id = mm.person_id)
+				  JOIN public.tbl_person p ON (p.person_id = mr.person_id)
 				 WHERE mr.person_id = ?
 				   AND mr.sent IS NOT NULL
 				   AND mr.sentinfo IS NULL
@@ -333,8 +333,8 @@ class Recipient_model extends DB_Model
 						mm.subject,
 						mm.body,
 						mrou.sent AS sent,
-						p.vorname,
-						p.nachname,
+						pr.vorname,
+						pr.nachname,
 						MAX(ms.status) AS status
 				  FROM public.tbl_person p
 				  JOIN public.tbl_benutzer b ON (b.person_id = p.person_id)
@@ -342,6 +342,7 @@ class Recipient_model extends DB_Model
 				  JOIN public.tbl_msg_recipient mrou ON (mrou.oe_kurzbz = bf.oe_kurzbz)
 				  JOIN public.tbl_msg_message mm ON (mm.message_id = mrou.message_id)
 				  JOIN public.tbl_msg_status ms ON (ms.message_id = mrou.message_id AND ms.person_id = mrou.person_id)
+				  JOIN public.tbl_person pr ON (pr.person_id = mrou.person_id)
 				 WHERE p.person_id = ?
 				   AND mrou.sent IS NOT NULL
 				   AND mrou.sentinfo IS NULL
@@ -350,8 +351,8 @@ class Recipient_model extends DB_Model
 						mm.subject,
 						mm.body,
 						mrou.sent,
-						p.vorname,
-						p.nachname
+						pr.vorname,
+						pr.nachname
 			  ORDER BY sent DESC';
 
 		return $this->execQuery($sql, array($person_id, $functions, $person_id));

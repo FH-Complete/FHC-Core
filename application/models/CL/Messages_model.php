@@ -124,7 +124,7 @@ class Messages_model extends CI_Model
 				$jsonRecord->message_id = $sentMessage->message_id;
 				$jsonRecord->subject = $sentMessage->subject;
 				$jsonRecord->body = $sentMessage->body;
-				$jsonRecord->from = $sentMessage->vorname.' '.$sentMessage->nachname;
+				$jsonRecord->to = $sentMessage->vorname.' '.$sentMessage->nachname;
 				$sentDate = new DateTime($sentMessage->sent);
 				$jsonRecord->sent = $sentDate->format('d/m/Y H:i:s');
 				$jsonRecord->status = $sentMessage->status;

@@ -102,6 +102,7 @@ $(document).ready(function () {
 		columns: [
 			{title: "Subject", field: "subject", width: 700, responsive: 0},
 			{title: "From", field: "from", width: 400},
+			{title: "To", field: "to", width: 400},
 			{title: "Date", field: "sent", sorter: "datetime", width: 150}
 		],
 		rowClick: changeTinyMCE
