@@ -732,6 +732,7 @@ if ($punkteUebertragen)
 					$msg_error .= '<br>Sie haben keine Rechte, um für diesen Studiengang Ergebnisse ins FAS zu übertragen';
 					continue;
 				}
+
 				// Checken, ob Person-Reihungstest-Studienplan zuteilung existiert
 				if ($reihungstest->checkPersonRtStudienplanExists($prestudentrolle->person_id, $_POST['reihungstest_id'], $prestudentrolle->studienplan_id))
 				{
@@ -763,12 +764,16 @@ if ($punkteUebertragen)
 				else
 				{
 					$setRTPunkte = new reihungstest();
-					$setRTPunkte->getPersonReihungstest($prestudentrolle->person_id, $_POST['reihungstest_id']);
+					$setRTPunkte->getPersonReihungstest($prestudentrolle->person_id, $_POST['reihungstest_id'], $prestudentrolle->studienplan_id);
 
 					// Check, ob Punkte schon befüllt sind
 					if ($setRTPunkte->punkte == '')
 					{
 						$setRTPunkte->new = true;
+						$setRTPunkte->person_id = $prestudentrolle->person_id;
+						$setRTPunkte->reihungstest_id = $_POST['reihungstest_id'];
+						$setRTPunkte->anmeldedatum = '';
+						$setRTPunkte->ort_kurzbz = '';
 						$setRTPunkte->studienplan_id = $prestudentrolle->studienplan_id;
 						$setRTPunkte->punkte = number_format($array['ergebnis'], 4);
 						$setRTPunkte->insertamum = date('Y-m-d H:i:s');
@@ -2364,6 +2369,7 @@ else
 					error: function(data)
 					{
 						$("#msgbox").attr("class","alert alert-danger");
+						$(".loaderIcon").hide();
 						$("#msgbox").show();
 						$("#msgbox").html(data["msg"]);
 					}
@@ -2451,83 +2457,80 @@ else
 		}
 		else
 		{
-			//if (confirm("Setzt bei allen markierten Personen \'Zum Reihungstest angetreten\' und informiert die entsprechende Studiengangsassistenz. Wollen Sie fortfahren?"))
+			$("input.prestudentCheckbox:checked").each(function() 
 			{
-				$("input.prestudentCheckbox:checked").each(function() 
+				if ($("#uebertragenOptionPhysik:checked").length === 1)
 				{
-					if ($("#uebertragenOptionPhysik:checked").length === 1)
-					{
-						prestudentPunkteArr.push({
-				 		    prestudent_id: $(this).attr("name"), 
-							ergebnis:  $(this).parents("tr").find(".erg_gesamt_mit_physik").text()
-				 		});
-					}
-					else
-					{
-						prestudentPunkteArr.push({
-				 		    prestudent_id: $(this).attr("name"), 
-							ergebnis:  $(this).parents("tr").find(".erg_gesamt_ohne_physik").text()
-				 		});
-					}
-			    });
-			    
-				$(".loaderIcon").show();
-				if ($("#uebertragenOptionGesamtpunkte:checked").length === 1)
-				{
-					gesamtpunkteSetzen = true;
+					prestudentPunkteArr.push({
+			            prestudent_id: $(this).attr("name"), 
+						ergebnis:  $(this).parents("tr").find(".erg_gesamt_mit_physik").text()
+			        });
 				}
-				if ($("#uebertragenOptionBewerber:checked").length === 1)
+				else
 				{
-					zuBewerberMachen = true;
+					prestudentPunkteArr.push({
+			            prestudent_id: $(this).attr("name"), 
+						ergebnis:  $(this).parents("tr").find(".erg_gesamt_ohne_physik").text()
+			        });
 				}
-				
-				data = {
-					reihungstest_id: reihungstest,
-					prestudentPunkteArr: prestudentPunkteArr,
-					gesamtpunkteSetzen: gesamtpunkteSetzen,
-					zuBewerberMachen: zuBewerberMachen,
-					punkteUebertragen: true
-				};
+		    });
+		    
+			$(".loaderIcon").show();
+			if ($("#uebertragenOptionGesamtpunkte:checked").length === 1)
+			{
+				gesamtpunkteSetzen = true;
+			}
+			if ($("#uebertragenOptionBewerber:checked").length === 1)
+			{
+				zuBewerberMachen = true;
+			}
+			
+			data = {
+				reihungstest_id: reihungstest,
+				prestudentPunkteArr: prestudentPunkteArr,
+				gesamtpunkteSetzen: gesamtpunkteSetzen,
+				zuBewerberMachen: zuBewerberMachen,
+				punkteUebertragen: true
+			};
 	
-				$.ajax({
-					url: "auswertung_fhtw.php",
-					data: data,
-					type: "POST",
-					dataType: "json",
-					success: function(data)
+			$.ajax({
+				url: "auswertung_fhtw.php",
+				data: data,
+				type: "POST",
+				dataType: "json",
+				success: function(data)
+				{
+					$("#msgbox").html("");
+					if(data["msg_success"] !== "")
 					{
-						$("#msgbox").html("");
-						if(data["msg_success"] !== "")
-						{
-							$("#msgbox").attr("class","alert alert-success");
-							$(".loaderIcon").hide();
-							$("#msgbox").show();
-							$("#msgbox").append(data["msg_success"]);
-						}
-						if(data["msg_warning"] !== "")
-						{
-							$("#msgbox").attr("class","alert alert-warning");
-							$(".loaderIcon").hide();
-							$("#msgbox").show();
-							$("#msgbox").append(data["msg_warning"]);
-							//$("#msgbox").html(data["msg"]).delay(2000).fadeOut();
-						}
-						if(data["msg_error"] !== "")
-						{
-							$("#msgbox").attr("class","alert alert-danger");
-							$(".loaderIcon").hide();
-							$("#msgbox").show();
-							$("#msgbox").append(data["msg_error"]);
-						}
-					},
-					error: function(data)
+						$("#msgbox").attr("class","alert alert-success");
+						$(".loaderIcon").hide();
+						$("#msgbox").show();
+						$("#msgbox").append(data["msg_success"]);
+					}
+					if(data["msg_warning"] !== "")
+					{
+						$("#msgbox").attr("class","alert alert-warning");
+						$(".loaderIcon").hide();
+						$("#msgbox").show();
+						$("#msgbox").append(data["msg_warning"]);
+						//$("#msgbox").html(data["msg"]).delay(2000).fadeOut();
+					}
+					if(data["msg_error"] !== "")
 					{
 						$("#msgbox").attr("class","alert alert-danger");
+						$(".loaderIcon").hide();
 						$("#msgbox").show();
-						$("#msgbox").html(data["msg"]);
+						$("#msgbox").append(data["msg_error"]);
 					}
-				});
-			}
+				},
+				error: function(data)
+				{
+					$("#msgbox").attr("class","alert alert-danger");
+					$("#msgbox").show();
+					$("#msgbox").html(data["msg"]);
+				}
+			});
 		}
 	}
 	  

@@ -368,7 +368,7 @@ if (isset($reservtodelete))
 		{
 			if ($reservierung->load($delete_id))
 			{
-				if ($reservberechtigt || $reservierung->uid==$uid || $reservierung->insertvon==$uid)
+				if ($reservberechtigt && ($reservierung->insertvon==$uid || $reservierung->uid==$uid))
 				{
 					if($reservierung->delete($delete_id))
 						$reservdelcount++;

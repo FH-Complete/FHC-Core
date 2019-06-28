@@ -2754,7 +2754,7 @@ class wochenplan extends basis_db
 		{
 			while ($row = $this->db_fetch_object($result))
 			{
-				if ($reservberechtigt || $row->uid == $user_uid || $row->insertvon == $user_uid)
+				if ($reservberechtigt && ($row->uid == $user_uid || $row->insertvon == $user_uid))
 				{
 					$deleteberechtigt = true;
 					$reservtodelete[] = $row->reservierung_id;
