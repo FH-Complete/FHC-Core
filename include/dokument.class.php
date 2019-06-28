@@ -845,7 +845,7 @@ class dokument extends basis_db
 	 */
 	public function getStudiengaengeDokument($dokument_kurzbz, $person_id = null)
 	{
-		$qry = "	SELECT DISTINCT studiengang_kz,typ||kurzbz AS kuerzel, bezeichnung, english , stufe
+		$qry = "	SELECT DISTINCT studiengang_kz,typ||kurzbz AS kuerzel, bezeichnung, english, stufe
 					FROM public.tbl_dokumentstudiengang
 					JOIN public.tbl_prestudent USING (studiengang_kz)
 					JOIN public.tbl_prestudentstatus USING (prestudent_id)
