@@ -128,7 +128,9 @@ class MessageLib
 		// If the recipient is an organisation unit that would be possible to send the same message (same message id)
 		// to the entire organisation unit (one to many functionality)
 		// In this case the receiver id is a the one present in message configuration
-		$receivers = success(array($this->_ci->config->item(self::CFG_SYSTEM_PERSON_ID)));
+		$receiver = new stdClass();
+		$receiver->person_id = $this->_ci->config->item(self::CFG_SYSTEM_PERSON_ID);
+		$receivers = success(array($receiver));
 
 		// Send the message and return the result
 		return $this->_sendMessage($receivers, $receiversOU, $subject, $body, $sender_id, $senderOU, $relationmessage_id, $priority, $multiPartMime);
@@ -371,24 +373,6 @@ class MessageLib
 		{
 			return error('The given person id is not valid', MSG_ERR_INVALID_RECIPIENTS);
 		}
-	}
-
-	/**
-	 * Gets the receivers id that are enabled to read messages for that oe_kurzbz
-	 */
-	private function _getReceiversByOekurzbz($oe_kurzbz)
-	{
-		// Load Benutzerfunktion_model
-		$this->_ci->load->model('person/Benutzerfunktion_model', 'BenutzerfunktionModel');
-		// Join with table public.tbl_benutzer on field uid
-		$this->_ci->BenutzerfunktionModel->addJoin('public.tbl_benutzer', 'uid');
-		// Get all the valid receivers id using the oe_kurzbz
-		$receivers = $this->_ci->BenutzerfunktionModel->loadWhere(
-			'oe_kurzbz = '.$this->_ci->db->escape($oe_kurzbz).
-			' AND funktion_kurzbz = '.$this->_ci->db->escape($this->_ci->config->item(self::CFG_OU_RECEIVERS)).
-			' AND (NOW() BETWEEN COALESCE(datum_von, NOW()) AND COALESCE(datum_bis, NOW()))'
-		);
-		return $receivers;
 	}
 
 	/**

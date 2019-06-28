@@ -303,13 +303,13 @@ class Recipient_model extends DB_Model
 	/**
 	 *
 	 */
-	public function getReceivedMessages($person_id)
+	public function getReceivedMessages($person_id, $functions)
 	{
 		$sql = 'SELECT mr.message_id,
 						mm.relationmessage_id,
 						mm.subject,
 						mm.body,
-						mr.sent,
+						mr.sent AS sent,
 						p.vorname,
 						p.nachname,
 						MAX(ms.status) AS status
@@ -327,9 +327,34 @@ class Recipient_model extends DB_Model
 						mr.sent,
 						p.vorname,
 						p.nachname
-			  ORDER BY mr.sent DESC';
+				 UNION
+				SELECT mrou.message_id,
+						mm.relationmessage_id,
+						mm.subject,
+						mm.body,
+						mrou.sent AS sent,
+						p.vorname,
+						p.nachname,
+						MAX(ms.status) AS status
+				  FROM public.tbl_person p
+				  JOIN public.tbl_benutzer b ON (b.person_id = p.person_id)
+				  JOIN (SELECT uid, oe_kurzbz FROM public.tbl_benutzerfunktion WHERE funktion_kurzbz IN ?) bf ON (bf.uid = b.uid)
+				  JOIN public.tbl_msg_recipient mrou ON (mrou.oe_kurzbz = bf.oe_kurzbz)
+				  JOIN public.tbl_msg_message mm ON (mm.message_id = mrou.message_id)
+				  JOIN public.tbl_msg_status ms ON (ms.message_id = mrou.message_id AND ms.person_id = mrou.person_id)
+				 WHERE p.person_id = ?
+				   AND mrou.sent IS NOT NULL
+				   AND mrou.sentinfo IS NULL
+			  GROUP BY mrou.message_id,
+			  			mm.relationmessage_id,
+						mm.subject,
+						mm.body,
+						mrou.sent,
+						p.vorname,
+						p.nachname
+			  ORDER BY sent DESC';
 
-		return $this->execQuery($sql, array($person_id));
+		return $this->execQuery($sql, array($person_id, $functions, $person_id));
 	}
 
 	/**
@@ -342,10 +367,13 @@ class Recipient_model extends DB_Model
 						mm.subject,
 						mm.body,
 						mr.sent,
+						p.vorname,
+						p.nachname,
 						MAX(ms.status) AS status
 				  FROM public.tbl_msg_message mm
 				  JOIN public.tbl_msg_recipient mr ON (mr.message_id = mm.message_id)
 				  JOIN public.tbl_msg_status ms ON (ms.message_id = mm.message_id AND mr.person_id = mr.person_id)
+				  JOIN public.tbl_person p ON (p.person_id = mr.person_id)
 				 WHERE mm.person_id = ?
 				   AND mr.sent IS NOT NULL
 				   AND mr.sentinfo IS NULL
@@ -353,7 +381,9 @@ class Recipient_model extends DB_Model
 			  			mm.relationmessage_id,
 						mm.subject,
 						mm.body,
-						mr.sent
+						mr.sent,
+						p.vorname,
+						p.nachname
 			  ORDER BY mr.sent DESC';
 
 		return $this->execQuery($sql, array($person_id));

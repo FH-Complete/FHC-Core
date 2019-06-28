@@ -1,6 +1,6 @@
-/**
- * JS used by view system/messages/htmlWriteTemplate
- */
+// ********************************************************
+// JS used by view system/messages/htmlWriteTemplate
+// ********************************************************
 
 function tinymcePreviewSetContent()
 {
@@ -52,12 +52,12 @@ $(document).ready(function ()
 	});
 
 	tinymce.init({
+		selector: "#tinymcePreview",
+		plugins: "autoresize",
 		menubar: false,
 		toolbar: false,
 		statusbar: false,
 		readonly: 1,
-		selector: "#tinymcePreview",
-		plugins: "autoresize",
 		autoresize_min_height: 150,
 		autoresize_bottom_margin: 10
 	});

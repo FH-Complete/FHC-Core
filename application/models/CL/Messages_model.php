@@ -28,9 +28,10 @@ class Messages_model extends CI_Model
 
 		// Loads model MessageToken_model
 		$this->load->model('system/MessageToken_model', 'MessageTokenModel');
-
 		// Loads model Benutzerrolle_model
 		$this->load->model('system/Benutzerrolle_model', 'BenutzerrolleModel');
+		// Loads model Prestudent_model
+		$this->load->model('crm/Prestudent_model', 'PrestudentModel');
 	}
 
 	//------------------------------------------------------------------------------------------------------------------
@@ -39,19 +40,41 @@ class Messages_model extends CI_Model
 	/**
 	 *
 	 */
-	public function prepareAjaxRead()
+	public function prepareAjaxWrite()
 	{
-		$jsonNestedData = error('Something did not go as it should');
+		$ouResult = $this->PrestudentModel->getOrganisationunitsByPersonId(getAuthPersonId());
+
+		if (isError($ouResult)) show_error('An error occurred while loading this page, please contact the site administrator');
+
+		$ouOptions = '<option value="0">Select...</option>';
+
+		if (hasData($ouResult))
+		{
+			foreach (getData($ouResult) as $ou)
+			{
+				$ouOptions .= sprintf("\n".'<option value="%s">%s</option>', $ou->oe_kurzbz, $ou->bezeichnung);
+			}
+		}
+
+		return array('organisationUnitOptions' => $ouOptions);
+	}
+
+	/**
+	 *
+	 */
+	public function prepareAjaxReadReceived()
+	{
+		$jsonResult = error('Something did not go as it should');
 
 		$loggedUserName = getAuthFirstname().' '.getAuthSurname();
 
 		if (isEmptyString($loggedUserName)) $loggedUserName = 'Me';
 
-		$receivedMessagesResult = $this->RecipientModel->getReceivedMessages(getAuthPersonId());
+		$receivedMessagesResult = $this->RecipientModel->getReceivedMessages(
+			getAuthPersonId(),
+			$this->config->item(MessageLib::CFG_OU_RECEIVERS)
+		);
 		if (isError($receivedMessagesResult)) return $receivedMessagesResult;
-
-		$sentMessagesResult = $this->RecipientModel->getSentMessages(getAuthPersonId());
-		if (isError($sentMessagesResult)) return $sentMessagesResult;
 
 		if (hasData($receivedMessagesResult))
 		{
@@ -60,41 +83,59 @@ class Messages_model extends CI_Model
 			foreach (getData($receivedMessagesResult) as $receivedMessage)
 			{
 				$jsonRecord = new stdClass();
+				$jsonRecord->message_id = $receivedMessage->message_id;
 				$jsonRecord->subject = $receivedMessage->subject;
+				$jsonRecord->body = $receivedMessage->body;
 				$jsonRecord->from = $receivedMessage->vorname.' '.$receivedMessage->nachname;
 				$sentDate = new DateTime($receivedMessage->sent);
 				$jsonRecord->sent = $sentDate->format('d/m/Y H:i:s');
 				$jsonRecord->status = $receivedMessage->status;
 
-				if (hasData($sentMessagesResult))
-				{
-					$jsonChildrenArray = array();
+				$jsonArray[] = $jsonRecord;
+			}
 
-					foreach (getData($sentMessagesResult) as $sentMessage)
-					{
-						if ($receivedMessage->relationmessage_id == $sentMessage->message_id)
-						{
-							$jsonChildrenRecord = new stdClass();
-							$jsonChildrenRecord->subject = $sentMessage->subject;
-							$jsonChildrenRecord->from = $loggedUserName;
-							$sentDate = new DateTime($sentMessage->sent);
-							$jsonChildrenRecord->sent = $sentDate->format('d/m/Y H:i:s');
-							$jsonChildrenRecord->status = $sentMessage->status;
+			$jsonResult = success(json_encode($jsonArray));
+		}
 
-							$jsonChildrenArray[] = $jsonChildrenRecord;
-						}
-					}
+		return $jsonResult;
+	}
 
-					if (!isEmptyArray($jsonChildrenArray)) $jsonRecord->_children = $jsonChildrenArray;
-				}
+	/**
+	 *
+	 */
+	public function prepareAjaxReadSent()
+	{
+		$jsonResult = error('Something did not go as it should');
+
+		$loggedUserName = getAuthFirstname().' '.getAuthSurname();
+
+		if (isEmptyString($loggedUserName)) $loggedUserName = 'Me';
+
+		$sentMessagesResult = $this->RecipientModel->getSentMessages(getAuthPersonId());
+		if (isError($sentMessagesResult)) return $sentMessagesResult;
+
+		if (hasData($sentMessagesResult))
+		{
+			$jsonArray = array();
+
+			foreach (getData($sentMessagesResult) as $sentMessage)
+			{
+				$jsonRecord = new stdClass();
+				$jsonRecord->message_id = $sentMessage->message_id;
+				$jsonRecord->subject = $sentMessage->subject;
+				$jsonRecord->body = $sentMessage->body;
+				$jsonRecord->from = $sentMessage->vorname.' '.$sentMessage->nachname;
+				$sentDate = new DateTime($sentMessage->sent);
+				$jsonRecord->sent = $sentDate->format('d/m/Y H:i:s');
+				$jsonRecord->status = $sentMessage->status;
 
 				$jsonArray[] = $jsonRecord;
 			}
 
-			$jsonNestedData = success(json_encode($jsonArray));
+			$jsonResult = success(json_encode($jsonArray));
 		}
 
-		return $jsonNestedData;
+		return $jsonResult;
 	}
 
 	/**
@@ -260,7 +301,6 @@ class Messages_model extends CI_Model
 		if (isError($msgVarsData)) show_error(getData($msgVarsData));
 		if (!hasData($msgVarsData)) show_error('No recipients were given');
 
-		$this->load->model('crm/Prestudent_model', 'PrestudentModel');
 		$prestudentsData = $this->PrestudentModel->getOrganisationunits($prestudents);
 
 		// Adds the organisation unit to each prestudent
@@ -332,6 +372,34 @@ class Messages_model extends CI_Model
 
 		// Write log entry
 		$personLog = $this->_personLog($sender_id, $receiver_id, getData($message)[0]);
+		if (isError($personLog)) return $personLog;
+
+		return success('Messages sent successfully');
+	}
+
+	/**
+	 * Send a message to an organisation unit
+	 */
+	public function sendToOrganisationUnit($receiverOU, $subject, $body)
+	{
+		if (isEmptyString($receiverOU)) return error('Not a valid organisation unit');
+		if (isEmptyString($subject)) return error('Subject is an empty string');
+		if (isEmptyString($body)) return error('Body is an empty string');
+
+		$sender_id = getAuthPersonId();
+
+		$message = $this->messagelib->sendMessageOU(
+			$receiverOU,			// receiverPersonId
+			$subject,				// subject
+			$body,					// body
+			$sender_id				// sender_id
+		);
+
+		if (isError($message)) return $message;
+		if (!hasData($message)) return error('No messages were saved in database');
+
+		// Write log entry
+		$personLog = $this->_personLog($sender_id, $this->config->item(MessageLib::CFG_SYSTEM_PERSON_ID), getData($message)[0], $receiverOU);
 		if (isError($personLog)) return $personLog;
 
 		return success('Messages sent successfully');
@@ -447,18 +515,21 @@ class Messages_model extends CI_Model
 	/**
 	 * Perform a person log after a message is sent
 	 */
-	private function _personLog($sender_id, $receiver_id, $message_id)
+	private function _personLog($sender_id, $receiver_id, $message_id, $receiverOU = null)
 	{
 		// In case the message is accessed via ViewMessage controller -> no authentication
 		// If no authentication is performed then use a hard coded uid
 		$loggedUserUID = isLogged() ? getAuthUID() : self::NO_AUTH_UID;
+
+		$message = 'Message sent from person '.$sender_id.' to '.$receiver_id.', message id: '.$message_id;
+		if (!isEmptyString($receiverOU)) $message .= ', receiverOU: '.$receiverOU;
 
 		return $this->personloglib->log(
 			$receiver_id,
 			'Action',
 			array(
 				'name' => 'Message sent',
-				'message' => 'Message sent from person '.$sender_id.' to '.$receiver_id.', message id: '.$message_id,
+				'message' => $message,
 				'success' => 'true'
 			),
 			'kommunikation',

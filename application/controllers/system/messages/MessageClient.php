@@ -8,8 +8,11 @@ class MessageClient extends Auth_Controller
 	{
 		parent::__construct(
 			array(
-				'read' => array('basis/message:r'),
-				'listMessages' => array('basis/message:r')
+				'read' => array('basis/person:r'),
+				'write' => array('basis/person:r'),
+				'listReceivedMessages' => array('basis/person:r'),
+				'listSentMessages' => array('basis/person:r'),
+				'sendMessageToOU' => array('basis/person:r')
 			)
 		);
 
@@ -27,13 +30,39 @@ class MessageClient extends Auth_Controller
 	}
 
 	/**
-	 * Returns JSON that that contains all the received messages by the currently logged user
-	 * This JSON structure is nested data used by tabulator
+	 * Starts the GUI used to write a personal message to an organisation unit
 	 */
-	public function listMessages()
+	public function write()
 	{
-		$jsonNestedData = $this->CLMessagesModel->prepareAjaxRead();
+		// Loads the view to write a message
+		$this->load->view('system/messages/ajaxWrite', $this->CLMessagesModel->prepareAjaxWrite());
+	}
 
-		$this->outputJson($jsonNestedData);
+	/**
+	 * Returns JSON that that contains all the received messages by the currently logged user
+	 */
+	public function listReceivedMessages()
+	{
+		$this->outputJson($this->CLMessagesModel->prepareAjaxReadReceived());
+	}
+
+	/**
+	 * Returns JSON that that contains all the sent messages by the currently logged user
+	 */
+	public function listSentMessages()
+	{
+		$this->outputJson($this->CLMessagesModel->prepareAjaxReadSent());
+	}
+
+	/**
+	 *
+	 */
+	public function sendMessageToOU()
+	{
+		$receiverOU = $this->input->post('receiverOU');
+		$subject = $this->input->post('subject');
+		$body = $this->input->post('body');
+
+		$this->outputJson($this->CLMessagesModel->sendToOrganisationUnit($receiverOU, $subject, $body));
 	}
 }

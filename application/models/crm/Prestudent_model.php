@@ -523,4 +523,20 @@ class Prestudent_model extends DB_Model
 			}
 		}
 	}
+
+	/**
+	 * Get organisation units for all the prestudents of a person
+	 */
+	public function getOrganisationunitsByPersonId($person_id)
+	{
+		$query = 'SELECT o.oe_kurzbz, o.bezeichnung
+					FROM public.tbl_prestudent p
+			  		JOIN public.tbl_studiengang s USING(studiengang_kz)
+					JOIN public.tbl_organisationseinheit o USING(oe_kurzbz)
+				   WHERE p.person_id = ?
+				GROUP BY o.oe_kurzbz, o.bezeichnung
+				ORDER BY o.bezeichnung';
+
+		return $this->execQuery($query, array($person_id));
+	}
 }
