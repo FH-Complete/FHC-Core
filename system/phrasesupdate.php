@@ -2425,7 +2425,7 @@ $phrases = array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Notendurchschnitt über alle Noten (inkl. negative)',
+				'text' => 'Notendurchschnitt über alle studienplanrelevanten Noten (inkl. negative)',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -2439,7 +2439,7 @@ $phrases = array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Notendurchschnitt über alle Noten (inkl. negative) gewichtet nach ECTS der LV.  = (Summe (Note der LV * ECTS der LV))/Gesamtsumme der ECTS',
+				'text' => 'Notendurchschnitt über alle studienplanrelevanten Noten (inkl. negative) gewichtet nach ECTS der LV.  = (Summe (Note der LV * ECTS der LV))/Gesamtsumme der ECTS',
 				'description' => '',
 				'insertvon' => 'system'
 			)
