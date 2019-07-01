@@ -100,7 +100,7 @@ function draw_content_xml($row)
 	$akadgrad = new akadgrad($row->akadgrad_id);
 	$vorsitz_geschlecht = '';
 
-	if ($prestudent->getLastStatus($student->prestudent_id, null, 'Absolvent'))
+	if ($prestudent->getLastStatus($student->prestudent_id))
 	{
 		$studienplan_id = $prestudent->studienplan_id;
 		$studienordnung = new studienordnung();

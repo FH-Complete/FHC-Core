@@ -223,9 +223,9 @@ require_once('../../../include/benutzerberechtigung.class.php');
 			echo '<td>'.$row->lehrfach.'</td>';
 			echo '<td>'.$row->le_lehrform_kurzbz.'</td>';
 			if ($row->lehrfach_bez!=$row->lv_bezeichnung)
-				echo '<td>'.$row->lv_bezeichnung.' ('.$p->t('lvaliste/lehrfach').': '.$row->lehrfach_bez.')</td>';
+				echo '<td><a href="../lehre/lesson.php?lvid='.$row->lehrveranstaltung_id.'&studiensemester_kurzbz='.$stdsem.'">'.$row->lv_bezeichnung.' ('.$p->t('lvaliste/lehrfach').': '.$row->lehrfach_bez.')</a></td>';
 			else
-				echo '<td>'.$row->lv_bezeichnung.'</td>';
+				echo '<td><a href="../lehre/lesson.php?lvid='.$row->lehrveranstaltung_id.'&studiensemester_kurzbz='.$stdsem.'">'.$row->lv_bezeichnung.'</a></td>';
 			echo '<td>'.$row->lektor.'</td>';
 			echo '<td><a href="mailto:'.$row->email.'">'.$row->stg_kurzbz.'</a></td>';
 			echo '<td>'.$row->semester.'</td>';
