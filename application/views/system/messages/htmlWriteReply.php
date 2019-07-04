@@ -8,7 +8,7 @@
 			'fontawesome' => true,
 			'tinymce' => true,
 			'sbadmintemplate' => true,
-			'customCSSs' => array('public/css/sbadmin2/admintemplate_contentonly.css', 'public/css/messaging/messageWrite.css'),
+			'customCSSs' => array('public/css/sbadmin2/admintemplate_contentonly.css', 'public/css/messaging/message.css'),
 			'customJSs' => array('public/js/bootstrapper.js', 'public/js/messaging/messageWriteReply.js')
 		)
 	);

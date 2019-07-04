@@ -80,7 +80,14 @@
 			}
 
 			// Tabulator CSS
-			if ($tabulator === true) generateCSSsInclude('vendor/olifolkerd/tabulator/dist/css/bootstrap/tabulator_bootstrap.min.css');
+			if ($tabulator === true)
+			{
+				generateCSSsInclude('vendor/olifolkerd/tabulator/dist/css/bootstrap/tabulator_bootstrap.min.css');
+				generateCSSsInclude('public/css/Tabulator.css');
+			}
+
+			// Tinymce CSS
+			if ($tinymce === true) generateCSSsInclude('public/css/TinyMCE.css');
 
 			// --------------------------------------------------------------------------------------------------------
 			// From public folder

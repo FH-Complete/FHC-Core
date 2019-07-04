@@ -7,7 +7,7 @@
 			'bootstrap' => true,
 			'fontawesome' => true,
 			'sbadmintemplate' => true,
-			'customCSSs' => array('public/css/sbadmin2/admintemplate_contentonly.css', 'public/css/messaging/messageSent.css')
+			'customCSSs' => array('public/css/sbadmin2/admintemplate_contentonly.css', 'public/css/messaging/message.css')
 		)
 	);
 ?>

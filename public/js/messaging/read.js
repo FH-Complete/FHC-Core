@@ -85,11 +85,9 @@ function rowClick(e, row)
  */
 function toggleMessages()
 {
-	//
-	if ($(this)[0].className.search("active") == -1)
-	{
-		$(this)[0].id == "r" ? getReceivedMessages() : getSentMessages();
-	}
+	$(this)[0].id == "received" ? getReceivedMessages() : getSentMessages();
+
+	tableMessageLst.redraw(); // redraw table after its content is changed
 }
 
 /**
@@ -158,18 +156,20 @@ $(document).ready(function () {
 	tableMessageLst = new Tabulator("#lstMessagesPanel", {
 		height: "400px",
 		pagination: "local",
+		layout: "fitColumns",
+		layoutColumnsOnNewData: true,
 		columns: [
-			{title: "Subject", field: "subject", width: 700, responsive: 0},
-			{title: "From", field: "from", width: 400, visible: false},
-			{title: "To", field: "to", width: 400, visible: false},
-			{title: "Date", field: "sent", sorter: "datetime", width: 150}
+			{title: "Subject", field: "subject", responsive: 0},
+			{title: "From", field: "from", visible: false},
+			{title: "To", field: "to", visible: false},
+			{title: "Date", field: "sent", sorter: "datetime"}
 		],
 		rowClick: rowClick,
 		rowFormatter: rowFormatter
 	});
 
 	// Bind radio buttons click event with toggleMessages function
-	$(".toggleMessages .btn").click(toggleMessages);
+	$("#toggleMessages input").click(toggleMessages);
 
 	// First retrieve the received message and populate the tabulator
 	getReceivedMessages();

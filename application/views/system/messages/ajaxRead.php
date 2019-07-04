@@ -13,21 +13,20 @@
 			'ajaxlib' => true,
 			'dialoglib' => true,
 			'tinymce' => true,
-			'customJSs' => array('public/js/messaging/read.js')
+			'customCSSs' => array('public/css/sbadmin2/admintemplate_contentonly.css', 'public/css/messaging/message.css'),
+			'customJSs' => array('public/js/bootstrapper.js', 'public/js/messaging/read.js')
 		)
 	);
 ?>
 	<body>
-		<div class="toggleMessages">
-			<div class="btn-group btn-group-toggle" data-toggle="buttons">
-				<label class="btn btn-secondary active" id="r">
-					<input type="radio" autocomplete="off" checked> Received
-				</label>
-				<label class="btn btn-secondary" id="s">
-					<input type="radio" autocomplete="off"> Sent
-				</label>
+		<fieldset>
+			<div id="toggleMessages" class="toggle">
+				<input type="radio" name="toggleMessages" id="received" checked>
+				<label for="received">Received</label>
+				<input type="radio" name="toggleMessages" id="sent">
+				<label for="sent">Sent</label>
 			</div>
-		</div>
+		</fieldset>
 		<div id="lstMessagesPanel"></div>
 		<div id="readMessagePanel"></div>
 	</body>
