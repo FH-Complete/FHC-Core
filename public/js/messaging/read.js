@@ -18,6 +18,9 @@ function readMessagesGenericError()
  */
 function getReceivedMessages()
 {
+	tableMessageLst.hideColumn("to");
+	tableMessageLst.showColumn("from");
+
 	_getMessages(FHC_JS_DATA_STORAGE_OBJECT.called_path + "/listReceivedMessages");
 }
 
@@ -26,6 +29,9 @@ function getReceivedMessages()
  */
 function getSentMessages()
 {
+	tableMessageLst.hideColumn("from");
+	tableMessageLst.showColumn("to");
+
 	_getMessages(FHC_JS_DATA_STORAGE_OBJECT.called_path + "/listSentMessages");
 }
 
@@ -154,8 +160,8 @@ $(document).ready(function () {
 		pagination: "local",
 		columns: [
 			{title: "Subject", field: "subject", width: 700, responsive: 0},
-			{title: "From", field: "from", width: 400},
-			{title: "To", field: "to", width: 400},
+			{title: "From", field: "from", width: 400, visible: false},
+			{title: "To", field: "to", width: 400, visible: false},
 			{title: "Date", field: "sent", sorter: "datetime", width: 150}
 		],
 		rowClick: rowClick,
