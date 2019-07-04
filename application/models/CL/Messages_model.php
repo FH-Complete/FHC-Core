@@ -2,13 +2,23 @@
 
 /**
  * Messages GUI logic
- * This model extends CI_Model because here is just implemented logic
- * It does not represent a resource (ex. like models that extend DB_Model)
+ * - This model extends CI_Model because here is just implemented logic
+ * - It does not represent a resource (ex. like models that extend DB_Model)
  */
 class Messages_model extends CI_Model
 {
-	const REPLY_SUBJECT_PREFIX = 'Re: ';
-	const REPLY_BODY_FORMAT = '<br><br><blockquote><i>On %s %s %s wrote:</i></blockquote><blockquote style="border-left:2px solid; padding-left: 8px">%s</blockquote>';
+	const REPLY_SUBJECT_PREFIX = 'Re: '; // reply subject prefix
+	// To quote a reply body message
+	const REPLY_BODY_FORMAT = '<br>
+		<br>
+		<blockquote>
+			<i>
+				On %s %s %s wrote:
+			</i>
+		</blockquote>
+		<blockquote style="border-left:2px solid; padding-left: 8px">
+			%s
+		</blockquote>';
 
 	const NO_AUTH_UID = 'online'; // hard coded uid if no authentication is performed
 
@@ -38,7 +48,28 @@ class Messages_model extends CI_Model
 	// Public methods
 
 	/**
-	 *
+	 * Set a message as read by its id ($message_id + $person_id)
+	 */
+	public function setMessageRead($message_id, $person_id)
+	{
+		// Checks parameters
+		if (!is_numeric($message_id) || !is_numeric($person_id)) return error('Invalid setMessageRead parameters');
+
+		// Loads needed models
+		$this->load->model('system/MsgStatus_model', 'MsgStatusModel');
+
+		// Set date used to insert
+		$statusData = array(
+			'message_id' => $message_id,
+			'person_id' => $person_id,
+			'status' => MSG_STATUS_READ
+		);
+
+		return $this->MsgStatusModel->insert($statusData); // insert and return result
+	}
+
+	/**
+	 * Prepares data for the view system/messages/ajaxWrite
 	 */
 	public function prepareAjaxWrite()
 	{
@@ -60,26 +91,31 @@ class Messages_model extends CI_Model
 	}
 
 	/**
-	 *
+	 * Prepares data for the view system/messages/ajaxRead
+	 * If everything is fine returns a list of received messages (objects)
 	 */
 	public function prepareAjaxReadReceived()
 	{
-		$jsonResult = error('Something did not go as it should');
-
+		// Name and surname of the logged user
 		$loggedUserName = getAuthFirstname().' '.getAuthSurname();
 
+		// If empty then use a hard coded one
 		if (isEmptyString($loggedUserName)) $loggedUserName = 'Me';
 
+		// Retrieves received messages for the logged user and its organisation units
 		$receivedMessagesResult = $this->RecipientModel->getReceivedMessages(
 			getAuthPersonId(),
 			$this->config->item(MessageLib::CFG_OU_RECEIVERS)
 		);
+		// If an error occurred return it
 		if (isError($receivedMessagesResult)) return $receivedMessagesResult;
 
+		// If data were found
 		if (hasData($receivedMessagesResult))
 		{
-			$jsonArray = array();
+			$jsonArray = array(); // array that contains all the received messages
 
+			// Collect'em all in the array $jsonArray
 			foreach (getData($receivedMessagesResult) as $receivedMessage)
 			{
 				$jsonRecord = new stdClass();
@@ -90,34 +126,38 @@ class Messages_model extends CI_Model
 				$sentDate = new DateTime($receivedMessage->sent);
 				$jsonRecord->sent = $sentDate->format('d/m/Y H:i:s');
 				$jsonRecord->status = $receivedMessage->status;
+				$jsonRecord->statusPersonId = $receivedMessage->statuspersonid;
 
 				$jsonArray[] = $jsonRecord;
 			}
 
-			$jsonResult = success(json_encode($jsonArray));
+			return success(json_encode($jsonArray)); // return as an json encoded string
 		}
 
-		return $jsonResult;
+		return success('No messages were found'); // NOT a blocking error
 	}
 
 	/**
-	 *
+	 * Prepares data for the view system/messages/ajaxRead
+	 * If everything is fine returns a list of sent messages (objects)
 	 */
 	public function prepareAjaxReadSent()
 	{
-		$jsonResult = error('Something did not go as it should');
-
+		// Name and surname of the logged user
 		$loggedUserName = getAuthFirstname().' '.getAuthSurname();
 
+		// If empty then use a hard coded one
 		if (isEmptyString($loggedUserName)) $loggedUserName = 'Me';
 
+		// Retrieves sent messages from the logged user
 		$sentMessagesResult = $this->RecipientModel->getSentMessages(getAuthPersonId());
-		if (isError($sentMessagesResult)) return $sentMessagesResult;
+		if (isError($sentMessagesResult)) return $sentMessagesResult; // If an error occurred return it
 
 		if (hasData($sentMessagesResult))
 		{
-			$jsonArray = array();
+			$jsonArray = array();// array that contains all the sent messages
 
+			// Collect'em all in the array $jsonArray
 			foreach (getData($sentMessagesResult) as $sentMessage)
 			{
 				$jsonRecord = new stdClass();
@@ -128,14 +168,15 @@ class Messages_model extends CI_Model
 				$sentDate = new DateTime($sentMessage->sent);
 				$jsonRecord->sent = $sentDate->format('d/m/Y H:i:s');
 				$jsonRecord->status = $sentMessage->status;
+				$jsonRecord->statusPersonId = $sentMessage->statuspersonid;
 
 				$jsonArray[] = $jsonRecord;
 			}
 
-			$jsonResult = success(json_encode($jsonArray));
+			return success(json_encode($jsonArray)); // return as an json encoded string
 		}
 
-		return $jsonResult;
+		return success('No messages were found'); // NOT a blocking error
 	}
 
 	/**
@@ -540,7 +581,7 @@ class Messages_model extends CI_Model
 	}
 
 	/**
-	 *
+	 * Quotes the previous message body
 	 */
 	private function _getReplyBody($body, $receiverName, $receiverSurname, $sentDate)
 	{

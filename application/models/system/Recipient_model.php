@@ -301,18 +301,21 @@ class Recipient_model extends DB_Model
 	}
 
 	/**
-	 *
+	 * - Gets the directly recieved messages using the given person id
+	 * - Gets the recieved messages from an organisation unit where this person plays a role given by the parameter functions
 	 */
 	public function getReceivedMessages($person_id, $functions)
 	{
-		$sql = 'SELECT mr.message_id,
+		$sql = '-- Messages sent directly to the person
+				SELECT mr.message_id,
 						mm.relationmessage_id,
 						mm.subject,
 						mm.body,
 						mr.sent AS sent,
 						p.vorname,
 						p.nachname,
-						MAX(ms.status) AS status
+						MAX(ms.status) AS status,
+						ms.person_id AS statusPersonId
 				  FROM public.tbl_msg_recipient mr
 				  JOIN public.tbl_msg_message mm ON (mm.message_id = mr.message_id)
 				  JOIN public.tbl_msg_status ms ON (ms.message_id = mr.message_id AND ms.person_id = mr.person_id)
@@ -326,8 +329,10 @@ class Recipient_model extends DB_Model
 						mm.body,
 						mr.sent,
 						p.vorname,
-						p.nachname
+						p.nachname,
+						ms.person_id
 				 UNION
+				-- Messages sent to a person that belongs to the recipient organisation unit
 				SELECT mrou.message_id,
 						mm.relationmessage_id,
 						mm.subject,
@@ -335,7 +340,8 @@ class Recipient_model extends DB_Model
 						mrou.sent AS sent,
 						pr.vorname,
 						pr.nachname,
-						MAX(ms.status) AS status
+						MAX(ms.status) AS status,
+						ms.person_id AS statusPersonId
 				  FROM public.tbl_person p
 				  JOIN public.tbl_benutzer b ON (b.person_id = p.person_id)
 				  JOIN (SELECT uid, oe_kurzbz FROM public.tbl_benutzerfunktion WHERE funktion_kurzbz IN ?) bf ON (bf.uid = b.uid)
@@ -352,14 +358,15 @@ class Recipient_model extends DB_Model
 						mm.body,
 						mrou.sent,
 						pr.vorname,
-						pr.nachname
+						pr.nachname,
+						ms.person_id
 			  ORDER BY sent DESC';
 
 		return $this->execQuery($sql, array($person_id, $functions, $person_id));
 	}
 
 	/**
-	 *
+	 * Gets all the sent message by the given person
 	 */
 	public function getSentMessages($person_id)
 	{
@@ -370,7 +377,8 @@ class Recipient_model extends DB_Model
 						mr.sent,
 						p.vorname,
 						p.nachname,
-						MAX(ms.status) AS status
+						MAX(ms.status) AS status,
+						ms.person_id AS statusPersonId
 				  FROM public.tbl_msg_message mm
 				  JOIN public.tbl_msg_recipient mr ON (mr.message_id = mm.message_id)
 				  JOIN public.tbl_msg_status ms ON (ms.message_id = mm.message_id AND mr.person_id = mr.person_id)
@@ -384,7 +392,8 @@ class Recipient_model extends DB_Model
 						mm.body,
 						mr.sent,
 						p.vorname,
-						p.nachname
+						p.nachname,
+						ms.person_id
 			  ORDER BY mr.sent DESC';
 
 		return $this->execQuery($sql, array($person_id));

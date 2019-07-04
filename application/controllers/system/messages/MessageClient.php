@@ -12,7 +12,8 @@ class MessageClient extends Auth_Controller
 				'write' => array('basis/person:r'),
 				'listReceivedMessages' => array('basis/person:r'),
 				'listSentMessages' => array('basis/person:r'),
-				'sendMessageToOU' => array('basis/person:r')
+				'sendMessageToOU' => array('basis/person:r'),
+				'setMessageRead' => array('basis/person:r')
 			)
 		);
 
@@ -55,7 +56,7 @@ class MessageClient extends Auth_Controller
 	}
 
 	/**
-	 *
+	 * Sends a message to an organisation unit
 	 */
 	public function sendMessageToOU()
 	{
@@ -64,5 +65,16 @@ class MessageClient extends Auth_Controller
 		$body = $this->input->post('body');
 
 		$this->outputJson($this->CLMessagesModel->sendToOrganisationUnit($receiverOU, $subject, $body));
+	}
+
+	/**
+	 * Set a message as read
+	 */
+	public function setMessageRead()
+	{
+		$message_id = $this->input->post('message_id');
+		$statusPersonId = $this->input->post('statusPersonId');
+
+		$this->outputJson($this->CLMessagesModel->setMessageRead($message_id, $statusPersonId));
 	}
 }
