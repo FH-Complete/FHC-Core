@@ -180,7 +180,7 @@ if (isset($_GET['selbstverwaltete-pause']) && !empty($_GET['submit']))
 
 	<div class="flexcroll" style="outline: none;">
 	<table>
-<?php if($fixangestellt): ?>
+<?php if($fixangestellt && (defined('CIS_ZEITWUNSCH_GD') && CIS_ZEITWUNSCH_GD)): ?>
 		<!--Erklärung zu Pausen bei geteilten Arbeitszeiten-->
 		<tr>
 			<td>
@@ -188,15 +188,8 @@ if (isset($_GET['selbstverwaltete-pause']) && !empty($_GET['submit']))
 
 			<form action="">
 				<p>
-					Ich bin mit der Verplanung meiner Lehre in getrennten Blöcken (vormittags und abends an einem Tag) einverstanden.
-					<br>Diese Zustimmung gilt jeweils für ein Semester.
-					<br><br>
-					Erklärung zu täglichen Ruhepausen bei geteilter Arbeitszeit: Die Verplanung bei geteilter Arbeitszeit hat eine Auswirkung
-					<br>auf die zeitliche Gestaltung/Lage der täglichen Ruhepausen.
-					<br><br>
-					Ich berücksichtige bei der Einteilung meiner täglichen Ruhepause, dass ich die tägliche Höchstgrenze der Arbeitszeit
-					<br>von 10 Stunden laut Arbeitszeitgesetz nicht überschritten wird.
 					<?php
+					echo $p->t('zeitwunsch/geteilteArbeitszeit');
 					$gd = new zeitaufzeichnung_gd();
 					$gd->load($uid, $next_ss);
 					if ( ! $gd->uid )
