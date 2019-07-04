@@ -2908,7 +2908,6 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 
 	</xsl:template>
 	<xsl:template match="lv">
-		<xsl:if test="note_positiv='1'">
 			<table:table-row xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0" xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0" xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0" xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0" table:style-name="Table12.1">
 				<table:table-cell table:style-name="Table12.A5" office:value-type="string">
                 <text:p text:style-name="P20">
@@ -2941,7 +2940,6 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
                 </text:p>
 				</table:table-cell>
 			</table:table-row>
-		</xsl:if>
 	</xsl:template>
 
 </xsl:stylesheet>
