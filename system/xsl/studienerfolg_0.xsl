@@ -526,7 +526,7 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
 			</table:table>
 			<text:p text:style-name="P6"/>
 			<text:p text:style-name="P6"/>
-			<text:p text:style-name="P18">Folgende Prüfungen wurden abgelegt:</text:p>
+			<text:p text:style-name="P18">Im Studiensemester <xsl:value-of select="studiensemester_kurzbz" /> wurden folgende Lehrveranstaltungen erfolgreich absolviert:</text:p>
 			<text:p text:style-name="P3"/>
 			<table:table table:name="Tabelle3" table:style-name="Tabelle3">
 				<table:table-column table:style-name="Tabelle3.A"/>
@@ -563,10 +563,10 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
 
 				<table:table-row table:style-name="Tabelle3.1">
 					<table:table-cell table:style-name="Tabelle3.A2" office:value-type="string">
-						<text:p text:style-name="P22">Semestersumme:</text:p>
+						<text:p text:style-name="P22">Summe:</text:p>
 					</table:table-cell>
 					<table:table-cell table:style-name="Tabelle3.A2" office:value-type="string">
-						<text:p text:style-name="P23"><xsl:value-of select="studiensemester_kurzbz" /></text:p>
+						<text:p text:style-name="P23"></text:p>
 					</table:table-cell>
 					<table:table-cell table:style-name="Tabelle3.A2" office:value-type="string">
 						<text:p text:style-name="P25"/>

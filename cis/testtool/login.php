@@ -379,7 +379,10 @@ if(isset($_POST['save']) && isset($_SESSION['prestudent_id']))
 ?>
 </head>
 
-<body scroll="no" class='testtool-content'>
+<body scroll="no">
+    <div class="row">
+        <div class="col-xs-10 col-sm-9 col-lg-6">
+
 <?php
 
 //REIHUNGSTEST STARTSEITE (nach Login)
@@ -554,7 +557,7 @@ if (isset($prestudent_id))
             {
 				echo '
                     <p>'. $p->t('testtool/spracheDerTestfragen').':</p><br>
-                    <div class="btn-group btn-group-justified" role="group" style="width: 50%">          
+                    <div class="btn-group btn-group-justified" role="group">          
                 ';
 
 				while($row = $db->db_fetch_object($result))
@@ -573,9 +576,9 @@ if (isset($prestudent_id))
                         }
                     }
 					echo "
-                        <div class='btn-group' role='group'> 
+                          <div class='btn-group' role='group'> 
                             <a role='button' class='btn btn-default $selected' href='". $_SERVER['PHP_SELF']. "?type=sprachechange&sprache=". $row->sprache. "'>$row_sprache</a>
-                        </div>
+                          </div>                     
                     ";
 				}
 				echo '</div>';
@@ -637,6 +640,7 @@ else
     </center>';
 }
 ?>
-
+    </div><!--/.col-->
+</div><!--/.row-->
 </body>
 </html>

@@ -198,8 +198,10 @@ $worksheet->write($zeile,$spalte,"Studiengang", $format_bold);
 $maxlength[$spalte]=11;
 $worksheet->write($zeile,++$spalte,"Organisationseinheit", $format_bold);
 $maxlength[$spalte]=25;
-$worksheet->write($zeile,++$spalte,"Lektor", $format_bold);
+$worksheet->write($zeile,++$spalte,"LektorIn", $format_bold);
 $maxlength[$spalte]=6;
+$worksheet->write($zeile,++$spalte,"Fixangestellt", $format_bold);
+$maxlength[$spalte]=10;
 $worksheet->write($zeile,++$spalte,"Bezeichnung", $format_bold);
 $maxlength[$spalte]=25;
 $worksheet->write($zeile,++$spalte,"Semester", $format_bold);
@@ -267,6 +269,11 @@ if($result = $db->db_query($qry))
 		$worksheet->write($zeile,++$spalte,$mitarbeiter->nachname.' '.$mitarbeiter->vorname);
 		if($maxlength[$spalte]<mb_strlen($mitarbeiter->nachname.' '.$mitarbeiter->vorname))
 			$maxlength[$spalte]=mb_strlen($mitarbeiter->nachname.' '.$mitarbeiter->vorname);
+
+		//Fixangestellt
+		$worksheet->write($zeile,++$spalte,($mitarbeiter->fixangestellt ? 'Ja' : 'Nein'));
+		if($maxlength[$spalte]<mb_strlen($mitarbeiter->fixangestellt ? 'Ja' : 'Nein'))
+			$maxlength[$spalte]=mb_strlen($mitarbeiter->fixangestellt ? 'Ja' : 'Nein');
 
 		//Lehrfach
 		$worksheet->write($zeile,++$spalte,$row->lf_bezeichnung);
@@ -380,7 +387,8 @@ if($result = $db->db_query($qry))
 				student_uid,
 				stunden,
 				tbl_projektbetreuer.stundensatz,
-				tbl_projektbetreuer.faktor
+				tbl_projektbetreuer.faktor,
+				tbl_projektbetreuer.person_id
 			FROM lehre.tbl_projektarbeit,
 				lehre.tbl_lehreinheit,
 				lehre.tbl_lehrveranstaltung,
@@ -419,6 +427,39 @@ if($result = $db->db_query($qry))
 			$spalte=0;
 			$zeile++;
 
+			$benutzer = new benutzer();
+			$benutzer->getBenutzerFromPerson($row->person_id, false);
+			if (count($benutzer->result) > 0)
+			{
+				foreach ($benutzer->result AS $bn)
+				{
+					$mitarbeiter = new mitarbeiter($bn->uid);
+					if ($mitarbeiter->load($bn->uid))
+					{
+						if ($mitarbeiter->fixangestellt)
+						{
+							$fixangestellt = 'Ja';
+							break;
+						}
+						else
+						{
+							$fixangestellt = 'Nein';
+							break;
+						}
+					}
+					else
+					{
+						continue;
+					}
+
+				}
+			}
+			else
+			{
+				$fixangestellt = 'Extern';
+			}
+
+
 			//Studiengang
 			$worksheet->write($zeile,$spalte,$stg_obj->kuerzel_arr[$row->studiengang_kz]);
 			if($maxlength[$spalte]<mb_strlen($stg_obj->kuerzel_arr[$row->studiengang_kz]))
@@ -433,6 +474,9 @@ if($result = $db->db_query($qry))
 			$worksheet->write($zeile,++$spalte,$row->nachname.' '.$row->vorname);
 			//if($maxlength[$spalte]<mb_strlen($row->nachname.' '.$row->vorname))
 				//$maxlength[$spalte]=mb_strlen($row->nachname.' '.$row->vorname);
+
+			//Fixangestellt
+			$worksheet->write($zeile,++$spalte,$fixangestellt);
 
 			//Lehrfach
 			$worksheet->write($zeile,++$spalte,$row->bezeichnung);

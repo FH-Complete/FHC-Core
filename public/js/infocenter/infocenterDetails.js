@@ -531,7 +531,7 @@ var InfocenterDetails = {
 				return;
 
 			//check other prestudentstati wether already freigegeben
-			for(var j = 0; j < prestudentdata.length; j++)
+			for (var j = 0; j < prestudentdata.length; j++)
 			{
 				var prestudent = prestudentdata[j];
 				var prestudentstatus = prestudent.prestudentstatus;
@@ -559,7 +559,28 @@ var InfocenterDetails = {
 			var ausbildungssemester = receiverPrestudentstatus.ausbildungssemester;
 			var studiengangbezeichnung = receiverPrestudentstatus.studiengangbezeichnung;
 			var studiengangbezeichnung_englisch = receiverPrestudentstatus.studiengangbezeichnung_englisch;
-			var orgform = typeof receiverPrestudentstatus.orgform === 'string' ? receiverPrestudentstatus.orgform : "";
+
+			var orgform_deutsch, orgform_englisch;
+			orgform_deutsch = orgform_englisch = "";
+
+			if (typeof receiverPrestudentstatus.bezeichnung_orgform_german === 'string')
+			{
+				orgform_deutsch = receiverPrestudentstatus.bezeichnung_orgform_german.toLowerCase();
+			}
+
+			if (typeof receiverPrestudentstatus.bezeichnung_orgform_english === 'string')
+			{
+				orgform_englisch = receiverPrestudentstatus.bezeichnung_orgform_english.toLowerCase();
+			}
+
+			var quereinstiegsmsgvars = {
+				'ausbildungssemester': ausbildungssemester,
+				'studiengangbezeichnung': studiengangbezeichnung,
+				'studiengangbezeichnung_englisch': studiengangbezeichnung_englisch,
+				'orgform_deutsch': orgform_deutsch,
+				'orgform_englisch': orgform_englisch
+			};
+
 			var msgvars = {};
 
 			if (rtfreigabe)
@@ -569,13 +590,7 @@ var InfocenterDetails = {
 					//if already for RT freigegeben, still send short message if Quereinsteiger
 					if (ausbildungssemester > 1)
 					{
-						msgvars = {
-							'ausbildungssemester': ausbildungssemester,
-							'studiengangbezeichnung': studiengangbezeichnung,
-							'studiengangbezeichnung_englisch': studiengangbezeichnung_englisch,
-							'orgform': orgform
-						};
-
+						msgvars = quereinstiegsmsgvars;
 						InfocenterDetails.sendFreigabeMessage(prestudent_id, RTFREIGABE_MESSAGE_VORLAGE_QUER_KURZ, msgvars);
 					}
 				}
@@ -585,12 +600,7 @@ var InfocenterDetails = {
 					//send Quereinstiegsmessage if later Ausbildungssemester
 					if (ausbildungssemester > 1)
 					{
-						msgvars = {
-							'ausbildungssemester': ausbildungssemester,
-							'studiengangbezeichnung': studiengangbezeichnung,
-							'studiengangbezeichnung_englisch': studiengangbezeichnung_englisch,
-							'orgform': orgform
-						};
+						msgvars = quereinstiegsmsgvars;
 						vorlage = RTFREIGABE_MESSAGE_VORLAGE_QUER
 					}
 					else
