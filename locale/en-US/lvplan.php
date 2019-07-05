@@ -23,7 +23,6 @@ $this->phrasen['lvplan/fehlerUndFeedback']='Send Feedback';
 $this->phrasen['lvplan/lvKoordinationsstelle']='Course-Coordination Office';
 $this->phrasen['lvplan/reservierungen']='Reservations';
 $this->phrasen['lvplan/reservierungWurdeGeloescht'] = 'Reservation successfully deleted';
-$this->phrasen['lvplan/alleReservierungenAnzeigen']='Show all reservations';
 $this->phrasen['lvplan/alleReservierungen']='All reservations';
 $this->phrasen['lvplan/zurReservierung']='Reservation';
 $this->phrasen['lvplan/raum']='Room';

@@ -504,7 +504,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
         </office:text>
 </xsl:template>
 <xsl:template match="unterrichtsfach">
-<xsl:if test="note_positiv='1' or note=''">
+<xsl:if test="note_positiv='1'">
     <table:table-row>
         <table:table-cell table:style-name="Tabelle1.A7" office:value-type="string">
             <xsl:choose>

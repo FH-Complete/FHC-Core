@@ -79,6 +79,8 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/lvplanung/lehrveranstaltungnotenov
 					<menuitem id="lehrveranstaltung-toolbar-filter-ausbildungssemester-10" type="radio" label="10. Semester" oncommand="FilterLehrveranstaltungAusbsem('10')" disabled="false"/>
 			    </menupopup>
 			</toolbarbutton>
+			<textbox id="lehrveranstaltung-toolbar-textbox-suche" control="lehrveranstaltung-toolbar-button-search" onkeypress="LehrveranstaltungSearchFieldKeyPress(event)" style="width: 300px" />
+			<button id="lehrveranstaltung-toolbar-button-search" oncommand="LehrveranstaltungSuche()" label="Suchen"/>
 			<spacer flex="1" />
 			<toolbarbutton id="lehrveranstaltung-toolbar-opensubtrees" label="Aufklappen" tooltiptext="Klappt die Untermenüs auf - mehrmaliges klicken möglich um weiter aufzuklappen" oncommand="LvTreeOpenAllSubtrees()" disabled="false" image="../skin/images/tree-diagramm.png" />
 			</toolbar>

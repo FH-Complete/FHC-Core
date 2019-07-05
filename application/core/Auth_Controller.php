@@ -14,9 +14,6 @@ class Auth_Controller extends FHC_Controller
 		// Loads authentication library and starts authentication
 		$this->load->library('AuthLib');
 
-		// Loads authentication helper
-		$this->load->helper('hlp_authentication');
-
 		// Checks if the caller is allowed to access to this content
 		$this->_isAllowed($requiredPermissions);
 	}

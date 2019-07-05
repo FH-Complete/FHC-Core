@@ -166,8 +166,8 @@
                     </xsl:when>
                     <xsl:otherwise>
                         seit <xsl:value-of select="begin_date" />
-                        für die FH Technikum Wien als Hochschullehrer tätig ist.
-                        Seine Tätigkeit umfasst die Konzeption, Organisation und Abhaltung von Lehrveranstaltungen.
+                        für die FH Technikum Wien als HochschullektorIn tätig ist.
+                        Die Tätigkeit umfasst die Konzeption, Organisation und Abhaltung von Lehrveranstaltungen.
                     </xsl:otherwise>
                 </xsl:choose>
             </text:p>
