@@ -68,6 +68,7 @@ class zeitaufzeichnung_gd extends basis_db
 				$this->updateamum = $row->updateamum;
 				$this->updatevon = $row->updatevon;
 				$this->selbstverwaltete_pause = $this->db_parse_bool($row->selbstverwaltete_pause);
+				return true;
 			}
 			else
 			{
