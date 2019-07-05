@@ -40,8 +40,8 @@ $filter = filter_input(INPUT_GET,'filter');
 if (mb_strlen($filter) < 3)
 	die('Filter muss mindestens 3 Zeichen lang sein');
 
-$benutzer = new student();
-$benutzer->getTab($filter, 'nachname, vorname');
+$benutzer = new benutzer();
+$benutzer->search(array($filter));
 
 $studiengang = new studiengang();
 $studiengang->getAll(null, false);
@@ -49,22 +49,37 @@ $studiengang->getAll(null, false);
 $oRdf->sendHeader();
 $db = new basis_db();
 
-if(count($benutzer->result) > 0)
+if (count($benutzer->result) > 0)
 {
-	$i=0;
-	foreach($benutzer->result as $row)
+	$i = 0;
+	foreach ($benutzer->result as $row)
 	{
-		if(isset($studiengang->kuerzel_arr[$row->studiengang_kz]))
-			$stg = $studiengang->kuerzel_arr[$row->studiengang_kz];
+		$stud = new student();
+		if ($stud->load($row->uid))
+		{
+			if (isset($studiengang->kuerzel_arr[$stud->studiengang_kz]))
+			{
+				$stg = $studiengang->kuerzel_arr[$stud->studiengang_kz];
+				$semester = $stud->semester;
+			}
+			else
+			{
+				$stg = '';
+				$semester = '';
+			}
+		}
 		else
+		{
 			$stg = '';
+			$semester = '';
+		}
 
-		$i=$oRdf->newObjekt($i);
-		$oRdf->obj[$i]->setAttribut('uid',$row->uid,true);
-		$oRdf->obj[$i]->setAttribut('vorname',$row->vorname,true);
-		$oRdf->obj[$i]->setAttribut('nachname',$row->nachname,true);
-		$oRdf->obj[$i]->setAttribut('studiengang',$stg,true);
-		$oRdf->obj[$i]->setAttribut('semester',$row->semester,true);
+		$i = $oRdf->newObjekt($i);
+		$oRdf->obj[$i]->setAttribut('uid', $row->uid, true);
+		$oRdf->obj[$i]->setAttribut('vorname', $row->vorname, true);
+		$oRdf->obj[$i]->setAttribut('nachname', $row->nachname, true);
+		$oRdf->obj[$i]->setAttribut('studiengang', $stg, true);
+		$oRdf->obj[$i]->setAttribut('semester', $semester, true);
 		$oRdf->addSequence($i);
 		$i++;
 	}
