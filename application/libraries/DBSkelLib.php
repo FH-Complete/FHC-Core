@@ -442,23 +442,10 @@ class DBSkelLib
 					}
 					else // if table is already present in database
 					{
-						if ($this->_isNewMode()) // only if in new mode
-						{
-							$this->_printMessage('Table already present in database: '.$tableName);
-						}
-						elseif ($this->_isDiffMode()) // only if in diff mode
-						{
-							// Then diff the already present table with the one from php file! If it fails then ends execution
-							if ($this->_diffTable($schema, $tableArray))
-							{
-								$this->_printMessage('Table diff success: '.$tableName);
-							}
-							else
-							{
-								$this->_printError('Error occurred while diff table: '.$tableName);
-								return false;
-							}
-						}
+						$this->_printMessage('Table already present in database: '.$tableName);
+
+						// Manage the differences between the table present in database and the one present in php file
+						return $this->_manageTableColumns($schema, $tableArray);
 					}
 				}
 				else // otherwise the array present in the php table file is not well formatted
@@ -1036,10 +1023,15 @@ class DBSkelLib
 	private function _listColumns($schema, $table)
 	{
 		$columnsArray = array();
-		$query = sprintf('SELECT *
+		$query = sprintf('SELECT column_name AS name,
+								data_type AS type,
+								column_default AS default,
+								is_nullable AS nullable,
+								character_maximum_length AS string_length,
+								numeric_precision AS number_length
 							FROM information_schema.columns
 						   WHERE table_schema = \'%s\'
-	  			   			 AND table_name   = \'%s\'', $schema, $table);
+	  			   			 AND table_name = \'%s\'', $schema, $table);
 
 		if ($columns = @$this->_ci->db->query($query))
 		{
@@ -1118,7 +1110,7 @@ class DBSkelLib
 	 * TODO
 	 * Changes the structure of a table using the given schema and an array that defines the table structure
 	 */
-	private function _diffTable($schema, $tableArray)
+	private function _manageTableColumns($schema, $tableArray)
 	{
 		$tableName = '';
 		$tableComment = '';
@@ -1138,10 +1130,27 @@ class DBSkelLib
 			}
 		}
 
-		// Query to alter the table
-		$query = '';
-		// Query to comment the table and its columns
+		// Comments the table
 		$queryComment = sprintf('COMMENT ON TABLE %s.%s IS \'%s\';', $schema, $tableName, $tableComment);
+		if ($this->_isDryrunMode())
+		{
+			$this->_printInfo('Dry run >> table .'$tableName'. would be commented with: '.$queryComment);
+		}
+		else // new and diff mode
+		{
+			if (!$this->_execQuery($queryComment))
+			{
+				$this->_printError('Error occurred while commenting table: '.$tableName);
+				return false;
+			}
+			else
+			{
+				$this->_printMessage('Table successfully commented: '.$tableName);
+			}
+		}
+
+		// Retrieves the list of columns and their attributes from database
+		$dbTableColumns = $this->_listColumns($schema, $tableName);
 
 		// For each element of the table structure
 		foreach ($tableStructure as $colName => $colStructure)
@@ -1159,14 +1168,32 @@ class DBSkelLib
 			}
 
 			// Part of the query related to this column
-			$query .= sprintf('%s %s %s %s,', $colName, $colStructure[self::T_TYPE], $notNull, $default);
+			$query = sprintf('%s %s %s %s,', $colName, $colStructure[self::T_TYPE], $notNull, $default);
 
-			// If a comment is present for this column then the query is built
+			// Comments a column
 			if (isset($colStructure[self::T_COMMENT]))
 			{
-				$queryComment .= sprintf('COMMENT ON COLUMN %s.%s.%s IS \'%s\';', $schema, $tableName, $colName, $colStructure[self::T_COMMENT]);
+				if ($this->_isDryrunMode())
+				{
+					$this->_printInfo('Dry run >> column '$tableName.'.'.$colName.' would be commented with: '.$colStructure[self::T_COMMENT]);
+				}
+				else // new and diff mode
+				{
+					$queryComment = sprintf('COMMENT ON COLUMN %s.%s.%s IS \'%s\';', $schema, $tableName, $colName, $colStructure[self::T_COMMENT]);
+					if (!$this->_execQuery($queryComment))
+					{
+						$this->_printError('Error occurred while commenting column: '.$tableName.'.'.$colName);
+						return false;
+					}
+					else
+					{
+						$this->_printMessage('Column successfully commented: '.$tableName.'.'.$colName);
+					}
+				}
 			}
 		}
+
+		return true;
 	}
 
 	//------------------------------------------------------------------------------------------------------------------

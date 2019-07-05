@@ -1,7 +1,7 @@
 <?php
 
 $tableArray = array(
-	'tbl_aktivitaet_test' => array(
+	'tbl_aktivitaet' => array(
 		'aktivitaet_kurzbz' => array(
 			'comment' => 'I guess this is the PK',
 			'type' => 'character varying(16)',
