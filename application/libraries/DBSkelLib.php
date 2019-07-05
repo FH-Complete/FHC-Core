@@ -32,7 +32,7 @@ class DBSkelLib
 	// Configuration file names
 	const SCHEMA_FILENAME = 'schema.sql'; // File name that contains schema creation SQL and SQL to comment a schema
 	const SEQUENCES_FILENAME = 'sequences.php'; // PHP file that contains all the sequences
-	const TABLE_PREFIX = 'TBL-'; // Table file prefix
+	const TABLE_PREFIX = 'TBL_'; // Table file prefix
 	const CONSTRAINTS_FILENAME = 'constraints.php'; // PHP file that contains all the constraints
 	const VIEWS_FILENAME = 'views.php'; // PHP file that contains all the views
 	const FUNCTIONS_FILENAME = 'functions.php'; // PHP file that contains all the functions
