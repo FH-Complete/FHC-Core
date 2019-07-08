@@ -81,6 +81,8 @@ foreach($vertrag->result as $row)
 	$oRdf->obj[$i]->setAttribut('anmerkung',$row->anmerkung,true);
 	$oRdf->obj[$i]->setAttribut('vertragsdatum_iso',$row->vertragsdatum,true);
 	$oRdf->obj[$i]->setAttribut('vertragsdatum',$datum_obj->formatDatum($row->vertragsdatum,'d.m.Y'),true);
+	$oRdf->obj[$i]->setAttribut('vertragsstunden',$row->vertragsstunden, true);
+	$oRdf->obj[$i]->setAttribut('vertragsstunden_studiensemester_kurzbz',$row->vertragsstunden_studiensemester_kurzbz, true);
 
 	$oRdf->addSequence($row->vertrag_id);
 }

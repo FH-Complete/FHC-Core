@@ -142,6 +142,8 @@ class vertrag extends basis_db
 				$obj->anmerkung = $row->anmerkung;
 				$obj->vertragsdatum = $row->vertragsdatum;
 				$obj->lehrveranstaltung_id = $row->lehrveranstaltung_id;
+				$obj->vertragsstunden = $row->vertragsstunden;
+				$obj->vertragsstunden_studiensemester_kurzbz = $row->vertragsstunden_studiensemester_kurzbz;
 
 				$obj->vertragstyp_bezeichnung = $row->vertragstyp_bezeichnung;
 
