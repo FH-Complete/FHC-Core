@@ -1134,7 +1134,7 @@ class DBSkelLib
 		$queryComment = sprintf('COMMENT ON TABLE %s.%s IS \'%s\';', $schema, $tableName, $tableComment);
 		if ($this->_isDryrunMode())
 		{
-			$this->_printInfo('Dry run >> table .'$tableName'. would be commented with: '.$queryComment);
+			$this->_printInfo('Dry run >> table '.$tableName.' would be commented with: '.$queryComment);
 		}
 		else // new and diff mode
 		{
@@ -1175,7 +1175,7 @@ class DBSkelLib
 			{
 				if ($this->_isDryrunMode())
 				{
-					$this->_printInfo('Dry run >> column '$tableName.'.'.$colName.' would be commented with: '.$colStructure[self::T_COMMENT]);
+					$this->_printInfo('Dry run >> column '.$tableName.'.'.$colName.' would be commented with: '.$colStructure[self::T_COMMENT]);
 				}
 				else // new and diff mode
 				{
