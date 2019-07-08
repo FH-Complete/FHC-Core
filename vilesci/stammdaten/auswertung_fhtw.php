@@ -743,7 +743,7 @@ if ($punkteUebertragen)
 					if ($setRTPunkte->punkte == '')
 					{
 						$setRTPunkte->new = false;
-						$setRTPunkte->punkte = number_format($array['ergebnis'], 4);
+						$setRTPunkte->punkte = number_format(floatval($array['ergebnis']), 4);
 						$setRTPunkte->updateamum = date('Y-m-d H:i:s');
 						$setRTPunkte->updatevon = $user;
 
@@ -775,7 +775,7 @@ if ($punkteUebertragen)
 						$setRTPunkte->anmeldedatum = '';
 						$setRTPunkte->ort_kurzbz = '';
 						$setRTPunkte->studienplan_id = $prestudentrolle->studienplan_id;
-						$setRTPunkte->punkte = number_format($array['ergebnis'], 4);
+						$setRTPunkte->punkte = number_format(floatval($array['ergebnis']), 4);
 						$setRTPunkte->insertamum = date('Y-m-d H:i:s');
 						$setRTPunkte->insertvon = $user;
 

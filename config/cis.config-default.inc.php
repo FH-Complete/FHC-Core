@@ -245,4 +245,8 @@ define('CIS_LVMENUE_CUTLENGTH', 21);
 
 // Gibt an, auf welche Seite TicketIds ala #1234 im Jahresplan verlinkt werden zB zur Verlinkung in Bugtracker
 define('JAHRESPLAN_TICKET_LINK','https://bug.technikum-wien.at/otrs/index.pl?Action=AgentTicketZoom;TicketNumber=');
+
+//Gibt an ob der Block zu Verplanung in geteilter Arbeitszeit bei den Zeitwünschen angezeigt wird. Default: false
+define('CIS_ZEITWUNSCH_GD', false);
+
 ?>

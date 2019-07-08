@@ -14,7 +14,7 @@ $this->phrasen['zeitwunsch/bedeutung']='Bedeutung';
 $this->phrasen['zeitwunsch/hierMoechteIchUnterrichten']='Hier möchte ich unterrichten';
 $this->phrasen['zeitwunsch/hierKannIchUnterrichten']='Hier kann ich unterrichten';
 $this->phrasen['zeitwunsch/nurInNotfaellen']='Hier unterrichte ich nur ungern';
-$this->phrasen['zeitwunsch/hierAufGarKeinenFall']='Hier kann ich gar nicht unterrichten'; 
+$this->phrasen['zeitwunsch/hierAufGarKeinenFall']='Hier kann ich gar nicht unterrichten';
 $this->phrasen['zeitwunsch/folgendePunkteSindZuBeachten']='Folgende Punkte sind zu beachten';
 $this->phrasen['zeitwunsch/verwendenSieDenWertNur']='Verwenden Sie den Wert -2 nur, wenn Sie zu dieser Stunde wirklich nicht können, um eine bessere Optimierung zu ermöglichen.';
 $this->phrasen['zeitwunsch/sperrenSieNurTermine']='Markieren Sie mit den Werten -1 und -2 bitte nur Termine, die für die Lehre an der FH <u>nicht</u> in Frage kommen. <br/>Die Zeitsperren sind <u>nicht</u> dafür gedacht, bereits zugesagte Stunden für bestimmte Studiengänge zu reservieren.';
@@ -22,4 +22,5 @@ $this->phrasen['zeitwunsch/esSolltenFuerJedeStunde']='Es sollten für jede Stund
 $this->phrasen['zeitwunsch/erklaerung']='Erklärung';
 $this->phrasen['zeitwunsch/beiProblemenWendenSieSichAn']='Bei Problemen wenden Sie sich bitte an die';
 $this->phrasen['zeitwunsch/profil']='Profil';
+$this->phrasen['zeitwunsch/geteilteArbeitszeit']='Ich bin mit der Verplanung meiner Lehre in getrennten Blöcken am Tagesrand einverstanden.';
 ?>

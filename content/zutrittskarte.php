@@ -40,6 +40,7 @@ require_once('../include/studiengang.class.php');
 require_once('../include/benutzerfunktion.class.php');
 require_once('../include/organisationseinheit.class.php');
 require_once('../include/dokument_export.class.php');
+require_once('../include/person.class.php');
 
 $user = get_uid();
 $db = new basis_db();
@@ -232,6 +233,8 @@ foreach ($uid_arr as $uid)
 			$konto = new konto();
 			$studiengang = new studiengang();
 			$studiengang->load($student->studiengang_kz);
+			$person = new person();
+			$person->getPersonFromBenutzer($uid);
 
 			$stsem_obj = new studiensemester();
 			$stsem = $stsem_obj->getaktorNext();
@@ -265,6 +268,7 @@ foreach ($uid_arr as $uid)
 					'studiengang' => $studiengang->kurzbzlang,
 					'gebdatum' => $datum_obj->formatDatum($bn->gebdatum, 'd.m.Y'),
 					'matrikelnummer' => $student->matrikelnr,
+					'matr_nr' => $person->matr_nr,
 					'ausstellungsdatum' => date('M.Y'),
 					'gueltigbis' => $datum_obj->formatDatum($gueltigbis, 'd.m.Y')
 				);
