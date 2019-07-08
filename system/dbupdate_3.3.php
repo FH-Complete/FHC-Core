@@ -2938,6 +2938,37 @@ if(!$result = @$db->db_query("SELECT bezeichnung_mehrsprachig FROM bis.tbl_orgfo
 	}
 }
 
+// Spalte vertragsstunden für tbl_vertrag
+if(!$result = @$db->db_query("SELECT vertragsstunden FROM lehre.tbl_vertrag LIMIT 1"))
+{
+	$qry = "ALTER TABLE lehre.tbl_vertrag ADD COLUMN vertragsstunden NUMERIC(5,2);";
+
+	if(!$db->db_query($qry))
+		echo '<strong>lehre.tbl_vertrag: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>lehre.tbl_vertrag: Spalte vertragsstunden hinzugefuegt';
+}
+
+// Spalte vertragsstunden_studiensemester_kurzbz für tbl_vertrag
+if(!$result = @$db->db_query("SELECT vertragsstunden_studiensemester_kurzbz FROM lehre.tbl_vertrag LIMIT 1"))
+{
+	$qry = "
+		ALTER TABLE lehre.tbl_vertrag 
+			ADD COLUMN vertragsstunden_studiensemester_kurzbz VARCHAR(16);
+			
+		ALTER TABLE lehre.tbl_vertrag
+			ADD CONSTRAINT fk_vertrag_vertragsstunden_studiensemester_kurzbz 
+				FOREIGN KEY (vertragsstunden_studiensemester_kurzbz) 
+					REFERENCES public.tbl_studiensemester (studiensemester_kurzbz) 
+					ON UPDATE CASCADE ON DELETE RESTRICT;
+	";
+
+	if(!$db->db_query($qry))
+		echo '<strong>lehre.tbl_vertrag: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>lehre.tbl_vertrag: Spalte vertragsstunden_studiensemester_kurzbz hinzugefuegt';
+}
+
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
 
@@ -3075,7 +3106,7 @@ $tabellen=array(
 	"lehre.tbl_stundenplan"  => array("stundenplan_id","unr","mitarbeiter_uid","datum","stunde","ort_kurzbz","gruppe_kurzbz","titel","anmerkung","lehreinheit_id","studiengang_kz","semester","verband","gruppe","fix","updateamum","updatevon","insertamum","insertvon"),
 	"lehre.tbl_stundenplandev"  => array("stundenplandev_id","lehreinheit_id","unr","studiengang_kz","semester","verband","gruppe","gruppe_kurzbz","mitarbeiter_uid","ort_kurzbz","datum","stunde","titel","anmerkung","fix","updateamum","updatevon","insertamum","insertvon","ext_id"),
 	"lehre.tbl_stundenplan_betriebsmittel" => array("stundenplan_betriebsmittel_id","betriebsmittel_id","stundenplandev_id","anmerkung","insertamum","insertvon"),
-	"lehre.tbl_vertrag"  => array("vertrag_id","person_id","vertragstyp_kurzbz","bezeichnung","betrag","insertamum","insertvon","updateamum","updatevon","ext_id","anmerkung","vertragsdatum","lehrveranstaltung_id"),
+	"lehre.tbl_vertrag"  => array("vertrag_id","person_id","vertragstyp_kurzbz","bezeichnung","betrag","insertamum","insertvon","updateamum","updatevon","ext_id","anmerkung","vertragsdatum","lehrveranstaltung_id", "vertragsstunden", "vertragsstunden_studiensemester_kurzbz"),
 	"lehre.tbl_vertrag_vertragsstatus"  => array("vertragsstatus_kurzbz","vertrag_id","uid","datum","ext_id","insertamum","insertvon","updateamum","updatevon"),
 	"lehre.tbl_vertragstyp"  => array("vertragstyp_kurzbz","bezeichnung"),
 	"lehre.tbl_vertragsstatus"  => array("vertragsstatus_kurzbz","bezeichnung"),
