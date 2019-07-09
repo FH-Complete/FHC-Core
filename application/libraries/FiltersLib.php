@@ -65,6 +65,7 @@ class FiltersLib
 	// Different dataset representations
 	const DATASET_REP_TABLESORTER = 'tablesorter';
 	const DATASET_REP_PIVOTUI = 'pivotUI';
+	const DATASET_REP_TABULATOR = 'tabulator';
 
 	// Filter operations values
 	const OP_EQUAL = 'equal';

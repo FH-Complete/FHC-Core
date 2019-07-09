@@ -10,6 +10,7 @@ class FilterWidget extends Widget
 	const WIDGET_URL_SELECT_FIELDS = 'widgets/filter/selectFields';
 	const WIDGET_URL_DATASET_TABLESORTER = 'widgets/filter/tableDataset';
 	const WIDGET_URL_DATASET_PIVOTUI = 'widgets/filter/pivotUIDataset';
+	const WIDGET_URL_DATASET_TABULATOR = 'widgets/filter/tabulatorDataset';
 	const WIDGET_URL_SELECT_FILTERS = 'widgets/filter/selectFilters';
 	const WIDGET_URL_SAVE_FILTER = 'widgets/filter/saveFilter';
 
@@ -136,6 +137,11 @@ class FilterWidget extends Widget
 		if (self::$_FilterWidgetInstance->_datasetRepresentation == FiltersLib::DATASET_REP_PIVOTUI)
 		{
 			self::_loadView(self::WIDGET_URL_DATASET_PIVOTUI);
+		}
+
+		if (self::$_FilterWidgetInstance->_datasetRepresentation == FiltersLib::DATASET_REP_TABULATOR)
+		{
+			self::_loadView(self::WIDGET_URL_DATASET_TABULATOR);
 		}
 	}
 
@@ -264,7 +270,8 @@ class FilterWidget extends Widget
 		// To specify how to represent the dataset (ex: tablesorter, pivotUI, ...)
 		if (isset($args[FiltersLib::DATASET_REPRESENTATION])
 			&& ($args[FiltersLib::DATASET_REPRESENTATION] == FiltersLib::DATASET_REP_TABLESORTER
-			|| $args[FiltersLib::DATASET_REPRESENTATION] == FiltersLib::DATASET_REP_PIVOTUI))
+			|| $args[FiltersLib::DATASET_REPRESENTATION] == FiltersLib::DATASET_REP_PIVOTUI
+			|| $args[FiltersLib::DATASET_REPRESENTATION] == FiltersLib::DATASET_REP_TABULATOR))
 		{
 			$this->_datasetRepresentation = $args[FiltersLib::DATASET_REPRESENTATION];
 		}
@@ -308,11 +315,15 @@ class FilterWidget extends Widget
 
 			if (isset($args[FiltersLib::DATASET_REPRESENTATION])
 				&& $args[FiltersLib::DATASET_REPRESENTATION] != FiltersLib::DATASET_REP_TABLESORTER
-				&& $args[FiltersLib::DATASET_REPRESENTATION] != FiltersLib::DATASET_REP_PIVOTUI)
+				&& $args[FiltersLib::DATASET_REPRESENTATION] != FiltersLib::DATASET_REP_PIVOTUI
+				&& $args[FiltersLib::DATASET_REPRESENTATION] != FiltersLib::DATASET_REP_TABULATOR)
 			{
 				show_error(
 					'The parameter "'.FiltersLib::DATASET_REPRESENTATION.
-					'" must be IN ("'.FiltersLib::DATASET_REP_TABLESORTER.'", "'.FiltersLib::DATASET_REP_PIVOTUI.'")'
+					'" must be IN ("'
+						.FiltersLib::DATASET_REP_TABLESORTER.'", "'
+						.FiltersLib::DATASET_REP_PIVOTUI.'", "'
+						.FiltersLib::DATASET_REP_TABULATOR.'")'
 				);
 			}
 		}

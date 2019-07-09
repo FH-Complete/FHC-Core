@@ -69,6 +69,7 @@ function sideMenuHook()
 // Success
 const DATASET_REP_TABLESORTER = "tablesorter";
 const DATASET_REP_PIVOTUI = "pivotUI";
+const DATASET_REP_TABULATOR = "tabulator";
 
 /**
  * FHC_FilterWidget this object is used to render the GUI of a filter widget and to operate with it
@@ -163,6 +164,12 @@ var FHC_FilterWidget = {
 		if (FHC_FilterWidget._datasetRepresentation == DATASET_REP_PIVOTUI)
 		{
 			$("#filterPivotUI").html("");
+		}
+
+		// If the choosen dataset representation is tabulator
+		if (FHC_FilterWidget._datasetRepresentation == DATASET_REP_TABULATOR)
+		{
+			$("#filterTabulator").html("");
 		}
 	},
 
@@ -812,6 +819,12 @@ var FHC_FilterWidget = {
 		{
 			FHC_FilterWidget._renderDatasetPivotUI(data); // ...render the pivotUI GUI
 		}
+
+		// If the choosen dataset representation is tabulator then...
+		if (FHC_FilterWidget._datasetRepresentation == DATASET_REP_TABULATOR)
+		{
+			FHC_FilterWidget._renderDatasetTabulator(data); // ...render the tabulator GUI
+		}
 	},
 
 	/**
@@ -935,24 +948,21 @@ var FHC_FilterWidget = {
 	},
 
 	/**
+	 * Tablesorter filter local storage clean
+	 */
+	_cleanTablesorterLocalStorage: function() {
+
+		$("#filterTableDataset").trigger("filterResetSaved");
+	},
+
+	/**
 	 * Renders the pivotUI for the FilterWidget
 	 * The data to be displayed are retrived from the parameter data
 	 */
 	_renderDatasetPivotUI: function(data) {
 
-		var options = {}; // eventually contains options fot the pivotUI
-
-		// Checks if options were given
-		if (data.hasOwnProperty("datasetRepresentationOptions") && data.datasetRepresentationOptions != "")
-		{
-			var tmpOptions = eval("(" + data.datasetRepresentationOptions + ")"); // and converts them from string to javascript code
-
-			// If it is an object then can be used
-			if (typeof tmpOptions == "object")
-			{
-				options = tmpOptions;
-			}
-		}
+		// Checks if options were given and returns them
+		var options = FHC_FilterWidget._getRepresentationOptions(data);
 
 		// Manipulation for the representation!
 		var arrayFieldsToDisplay = FHC_FilterWidget._getFieldsToDisplay(data);
@@ -1038,11 +1048,137 @@ var FHC_FilterWidget = {
 	},
 
 	/**
-	 * Tablesorter filter local storage clean
+	 * Renders the tabulator for the FilterWidget
+	 * The data to be displayed are retrived from the parameter data
 	 */
-	_cleanTablesorterLocalStorage: function() {
+	_renderDatasetTabulator: function(data) {
 
-		$("#filterTableDataset").trigger("filterResetSaved");
+		// Checks if options were given and returns them
+		var options = FHC_FilterWidget._getRepresentationOptions(data);
+
+		// Manipulation for the representation!
+		var arrayFieldsToDisplay = FHC_FilterWidget._getFieldsToDisplayTabulator(data);
+
+		if (arrayFieldsToDisplay.length > 0)
+		{
+			// ...if there are data to be displayed...
+			if (data.hasOwnProperty("dataset") && $.isArray(data.dataset))
+			{
+				if (options == null) options = {};
+
+				options.columns = arrayFieldsToDisplay;
+				options.data = data.dataset;
+
+				// Renders the tabulator
+				var filterTabulator = new Tabulator("#filterTabulator", options);
+			}
+		}
+	},
+
+	/**
+	 * Retrives the fields to be displayed from the data parameter, if aliases are present then they are used
+	 */
+	_getFieldsToDisplay: function(data) {
+
+		var arrayFieldsToDisplay = [];
+
+		if (data.hasOwnProperty("selectedFields") && $.isArray(data.selectedFields))
+		{
+			if (data.hasOwnProperty("columnsAliases") && $.isArray(data.columnsAliases))
+			{
+				for (var sfc = 0; sfc < data.selectedFields.length; sfc++)
+				{
+					for (var fc = 0; fc < data.fields.length; fc++)
+					{
+						if (data.selectedFields[sfc] == data.fields[fc])
+						{
+							arrayFieldsToDisplay[sfc] = data.columnsAliases[fc];
+						}
+					}
+				}
+			}
+			else
+			{
+				arrayFieldsToDisplay = data.selectedFields;
+			}
+		}
+
+		return arrayFieldsToDisplay;
+	},
+
+	/**
+	 * Retrives the fields to be displayed from the data parameter, if aliases are present then they are used
+	 */
+	_getFieldsToDisplayTabulator: function(data) {
+
+		var fieldsToDisplayTabulator = [];
+
+		if (data.hasOwnProperty("selectedFields") && $.isArray(data.selectedFields))
+		{
+			for (var sfc = 0; sfc < data.selectedFields.length; sfc++)
+			{
+				for (var fc = 0; fc < data.fields.length; fc++)
+				{
+					if (data.selectedFields[sfc] == data.fields[fc])
+					{
+						// Build the array of objects (columns) used by tabulator and store it in tabulatorColumns
+						var tmpColumnObj = {}; // New object that represents a column
+
+						if (data.hasOwnProperty("columnsAliases") && $.isArray(data.columnsAliases))
+						{
+							tmpColumnObj.title = data.columnsAliases[fc];
+						}
+						else
+						{
+							tmpColumnObj.title = data.selectedFields[sfc];
+						}
+
+						tmpColumnObj.field = data.selectedFields[sfc];
+
+						fieldsToDisplayTabulator.push(tmpColumnObj); // Add tmpColumnObj to tabulatorColumns
+					}
+				}
+			}
+		}
+
+		// If additional columns are present...
+		if (data.hasOwnProperty("additionalColumns") && data.additionalColumns != null && $.isArray(data.additionalColumns))
+		{
+			// ...loops through them
+			$.each(data.additionalColumns, function(i, additionalColumn) {
+
+				var tmpColumnObj = {}; // New object that represents a column
+
+				tmpColumnObj.title = additionalColumn;
+				tmpColumnObj.field = additionalColumn;
+
+				fieldsToDisplayTabulator.push(tmpColumnObj); // Add tmpColumnObj to tabulatorColumns
+			});
+		}
+
+		return fieldsToDisplayTabulator;
+	},
+
+	/**
+	 * Gets options for the representation
+	 */
+	_getRepresentationOptions: function(data) {
+
+		var options = {}; // eventually contains options fot the representation
+
+		// Checks if options were given
+		if (data.hasOwnProperty("datasetRepresentationOptions") && data.datasetRepresentationOptions != "")
+		{
+			var tmpOptions = eval("(" + data.datasetRepresentationOptions + ")"); // and converts them from string to javascript code
+
+			// If it is an object then can be used
+			if (typeof tmpOptions == "object")
+			{
+				options = tmpOptions;
+			}
+		}
+
+		return options;
 	},
 
 	/**
