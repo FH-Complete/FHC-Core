@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "ddbbad487c655512e6983408339cb85f",
-    "content-hash": "b5902c71fe21cd14397101dba5a3080c",
+    "hash": "e3de1eee238160400fb63f68735b4144",
+    "content-hash": "5b71e8a3c356d52e43d788eb6f018151",
     "packages": [
         {
             "name": "BlackrockDigital/startbootstrap-sb-admin-2",
@@ -1096,6 +1096,17 @@
             "time": "2018-11-18 20:26:18"
         },
         {
+            "name": "moment/momentjs",
+            "version": "2.24.0",
+            "dist": {
+                "type": "zip",
+                "url": "https://github.com/moment/moment/archive/2.24.0.zip",
+                "reference": null,
+                "shasum": null
+            },
+            "type": "library"
+        },
+        {
             "name": "mottie/tablesorter",
             "version": "v2.31.1",
             "source": {
@@ -1198,16 +1209,16 @@
         },
         {
             "name": "netcarver/textile",
-            "version": "v3.7.1",
+            "version": "v3.7.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/textile/php-textile.git",
-                "reference": "377933125dd30d708804c545bf33da87a3c1b0f4"
+                "reference": "c24d68d9f4d099f9c2434e71024f2a6140dc1594"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/textile/php-textile/zipball/377933125dd30d708804c545bf33da87a3c1b0f4",
-                "reference": "377933125dd30d708804c545bf33da87a3c1b0f4",
+                "url": "https://api.github.com/repos/textile/php-textile/zipball/c24d68d9f4d099f9c2434e71024f2a6140dc1594",
+                "reference": "c24d68d9f4d099f9c2434e71024f2a6140dc1594",
                 "shasum": ""
             },
             "require": {
@@ -1247,7 +1258,7 @@
                 "plaintext",
                 "textile"
             ],
-            "time": "2019-01-26 17:03:58"
+            "time": "2019-06-08 17:57:17"
         },
         {
             "name": "nicolaskruchten/pivottable",
@@ -1261,17 +1272,28 @@
             "type": "library"
         },
         {
+            "name": "olifolkerd/tabulator",
+            "version": "4.2.7",
+            "dist": {
+                "type": "zip",
+                "url": "https://github.com/olifolkerd/tabulator/archive/4.2.7.zip",
+                "reference": null,
+                "shasum": null
+            },
+            "type": "library"
+        },
+        {
             "name": "phpseclib/phpseclib",
-            "version": "2.0.15",
+            "version": "2.0.20",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpseclib/phpseclib.git",
-                "reference": "11cf67cf78dc4acb18dc9149a57be4aee5036ce0"
+                "reference": "d6819a55b05e123db1e881d8b230d57f912126be"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpseclib/phpseclib/zipball/11cf67cf78dc4acb18dc9149a57be4aee5036ce0",
-                "reference": "11cf67cf78dc4acb18dc9149a57be4aee5036ce0",
+                "url": "https://api.github.com/repos/phpseclib/phpseclib/zipball/d6819a55b05e123db1e881d8b230d57f912126be",
+                "reference": "d6819a55b05e123db1e881d8b230d57f912126be",
                 "shasum": ""
             },
             "require": {
@@ -1350,7 +1372,7 @@
                 "x.509",
                 "x509"
             ],
-            "time": "2019-03-10 16:53:45"
+            "time": "2019-06-23 16:33:11"
         },
         {
             "name": "psr/log",
@@ -2073,16 +2095,16 @@
         },
         {
             "name": "tinymce/tinymce",
-            "version": "4.9.4",
+            "version": "4.9.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/tinymce/tinymce-dist.git",
-                "reference": "3a997f24eb54d890b1c88f22cff03092e0b73378"
+                "reference": "5c6d8f4a6dda33b379068bb12678a2b2b2271fb4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/tinymce/tinymce-dist/zipball/3a997f24eb54d890b1c88f22cff03092e0b73378",
-                "reference": "3a997f24eb54d890b1c88f22cff03092e0b73378",
+                "url": "https://api.github.com/repos/tinymce/tinymce-dist/zipball/5c6d8f4a6dda33b379068bb12678a2b2b2271fb4",
+                "reference": "5c6d8f4a6dda33b379068bb12678a2b2b2271fb4",
                 "shasum": ""
             },
             "type": "component",
@@ -2115,7 +2137,7 @@
                 "tinymce",
                 "wysiwyg"
             ],
-            "time": "2019-03-20 13:56:58"
+            "time": "2019-07-03 01:28:44"
         },
         {
             "name": "tomazdragar/SimpleCropper",
@@ -2180,16 +2202,16 @@
         },
         {
             "name": "twig/twig",
-            "version": "v1.41.0",
+            "version": "v1.42.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/twigphp/Twig.git",
-                "reference": "575cd5028362da591facde1ef5d7b94553c375c9"
+                "reference": "21707d6ebd05476854805e4f91b836531941bcd4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/twigphp/Twig/zipball/575cd5028362da591facde1ef5d7b94553c375c9",
-                "reference": "575cd5028362da591facde1ef5d7b94553c375c9",
+                "url": "https://api.github.com/repos/twigphp/Twig/zipball/21707d6ebd05476854805e4f91b836531941bcd4",
+                "reference": "21707d6ebd05476854805e4f91b836531941bcd4",
                 "shasum": ""
             },
             "require": {
@@ -2199,12 +2221,12 @@
             "require-dev": {
                 "psr/container": "^1.0",
                 "symfony/debug": "^2.7",
-                "symfony/phpunit-bridge": "^3.4.19|^4.1.8"
+                "symfony/phpunit-bridge": "^3.4.19|^4.1.8|^5.0"
             },
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "1.41-dev"
+                    "dev-master": "1.42-dev"
                 }
             },
             "autoload": {
@@ -2242,7 +2264,7 @@
             "keywords": [
                 "templating"
             ],
-            "time": "2019-05-14 11:59:08"
+            "time": "2019-06-18 15:35:16"
         },
         {
             "name": "zetacomponents/base",

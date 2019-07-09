@@ -25,10 +25,12 @@
 	$jqueryui = isset($jqueryui) ? $jqueryui : false;
 	$jquerycheckboxes = isset($jquerycheckboxes) ? $jquerycheckboxes : false;
 	$jquerytreetable = isset($jquerytreetable) ? $jquerytreetable : false;
+	$momentjs = isset($momentjs) ? $momentjs : false;
 	$navigationwidget = isset($navigationwidget) ? $navigationwidget : false;
 	$pivotui = isset($pivotui) ? $pivotui : false;
 	$sbadmintemplate = isset($sbadmintemplate) ? $sbadmintemplate : false;
 	$tablesorter = isset($tablesorter) ? $tablesorter : false;
+	$tabulator = isset($tabulator) ? $tabulator : false;
 	$tinymce = isset($tinymce) ? $tinymce : false;
 ?>
 
@@ -77,6 +79,13 @@
 			{
 				generateCSSsInclude('vendor/mottie/tablesorter/dist/css/theme.default.min.css');
 				generateCSSsInclude('vendor/mottie/tablesorter/dist/css/jquery.tablesorter.pager.min.css');
+			}
+
+			// Tabulator CSS
+			if ($tabulator === true)
+			{
+				generateCSSsInclude('vendor/olifolkerd/tabulator/dist/css/bootstrap/tabulator_bootstrap.min.css');
+				generateCSSsInclude('public/css/Tabulator.css');
 			}
 
 			// --------------------------------------------------------------------------------------------------------
@@ -134,6 +143,14 @@
 			// NOTE: keep it after jQuery includes
 			if ($jquerytreetable === true) generateJSsInclude('vendor/ludo/jquery-treetable/jquery.treetable.js');
 
+			// MomentJS
+			if ($momentjs === true)
+			{
+				generateJSsInclude('vendor/moment/momentjs/min/moment.min.js');
+				generateJSsInclude('vendor/moment/momentjs/locale/de-at.js');
+				generateJSsInclude('vendor/moment/momentjs/locale/en-ie.js');
+			}
+
 			// PivotUI CSS
 			if ($pivotui === true)
 			{
@@ -147,6 +164,9 @@
 				generateJSsInclude('vendor/mottie/tablesorter/dist/js/jquery.tablesorter.widgets.min.js');
 				generateJSsInclude('vendor/mottie/tablesorter/dist/js/extras/jquery.tablesorter.pager.min.js');
 			}
+
+			// Tabulator JS
+			if ($tabulator === true) generateJSsInclude('vendor/olifolkerd/tabulator/dist/js/tabulator.min.js');
 
 			// Tinymce JS
 			if ($tinymce === true) generateJSsInclude('vendor/tinymce/tinymce/tinymce.min.js');
