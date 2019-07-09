@@ -49,6 +49,8 @@ class FilterWidget extends Widget
 
 	private $_datasetRepresentation; // dataset representation (ex: tablesorter, pivotUI, ...)
 	private $_datasetRepresentationOptions; // dataset representation options for tablesorter, pivotUI, ...
+	private $_datasetRepFieldsDefs; // dataset representation attributes for each record field
+
 	private $_reloadDataset; // Force Reload of Dataset
 
 	private static $_FilterWidgetInstance; // static property that contains the instance of itself
@@ -175,6 +177,7 @@ class FilterWidget extends Widget
 		$this->_customMenu = null;
 		$this->_datasetRepresentation = null;
 		$this->_datasetRepresentationOptions = null;
+		$this->_datasetRepFieldsDefs = null;
 
 		// Retrieved the required permissions parameter if present
 		if (isset($args[FiltersLib::REQUIRED_PERMISSIONS_PARAMETER]))
@@ -280,6 +283,12 @@ class FilterWidget extends Widget
 		if (isset($args[FiltersLib::DATASET_REP_OPTIONS]) && !isEmptyString($args[FiltersLib::DATASET_REP_OPTIONS]))
 		{
 			$this->_datasetRepresentationOptions = $args[FiltersLib::DATASET_REP_OPTIONS];
+		}
+
+		// To specify how to represent each record field
+		if (isset($args[FiltersLib::DATASET_REP_FIELDS_DEFS]) && !isEmptyString($args[FiltersLib::DATASET_REP_FIELDS_DEFS]))
+		{
+			$this->_datasetRepFieldsDefs = $args[FiltersLib::DATASET_REP_FIELDS_DEFS];
 		}
 	}
 
@@ -434,7 +443,8 @@ class FilterWidget extends Widget
 							FiltersLib::SESSION_DATASET => $dataset->retval, // the entire dataset
 							FiltersLib::SESSION_RELOAD_DATASET => false, // if the dataset must be reloaded, not needed the first time
 							FiltersLib::SESSION_DATASET_REPRESENTATION => $this->_datasetRepresentation, // the choosen dataset representation
-							FiltersLib::SESSION_DATASET_REP_OPTIONS => $this->_datasetRepresentationOptions // the choosen dataset representation options
+							FiltersLib::SESSION_DATASET_REP_OPTIONS => $this->_datasetRepresentationOptions, // the choosen dataset representation options
+							FiltersLib::SESSION_DATASET_REP_FIELDS_DEFS => $this->_datasetRepFieldsDefs // the choosen dataset representation record fields definition
 						)
 					);
 				}

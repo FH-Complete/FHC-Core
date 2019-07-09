@@ -22,6 +22,7 @@ class FiltersLib
 	const SESSION_RELOAD_DATASET = 'reloadDataset';
 	const SESSION_DATASET_REPRESENTATION = 'datasetRepresentation';
 	const SESSION_DATASET_REP_OPTIONS = 'datasetRepresentationOptions';
+	const SESSION_DATASET_REP_FIELDS_DEFS = 'datasetRepresentationFieldsDefinitions';
 
 	// Alias for the dynamic table used to retrieve the dataset
 	const DATASET_TABLE_ALIAS = 'datasetFilterTable';
@@ -61,6 +62,7 @@ class FiltersLib
 	// ...to specify how to represent the dataset (ex: tablesorter, pivotUI, ...)
 	const DATASET_REPRESENTATION = 'datasetRepresentation';
 	const DATASET_REP_OPTIONS = 'datasetRepOptions';
+	const DATASET_REP_FIELDS_DEFS = 'datasetRepFieldsDefs';
 
 	// Different dataset representations
 	const DATASET_REP_TABLESORTER = 'tablesorter';

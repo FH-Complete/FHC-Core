@@ -833,7 +833,7 @@ var FHC_FilterWidget = {
 	 */
 	_renderDatasetTablesorter: function(data) {
 
-		if (data.hasOwnProperty("checkboxes") && data.checkboxes!=null && data.checkboxes.trim() != "")
+		if (data.hasOwnProperty("checkboxes") && data.checkboxes != null && data.checkboxes.trim() != "")
 		{
 			$("#filterTableDataset > thead > tr").append("<th data-filter='false' title='Select'>Select</th>");
 		}
@@ -1055,18 +1055,20 @@ var FHC_FilterWidget = {
 
 		// Checks if options were given and returns them
 		var options = FHC_FilterWidget._getRepresentationOptions(data);
+		// Checks if record fields definitions were given and returns them
+		var recordFieldsDefinitions = FHC_FilterWidget._getRepresentationFieldsDefinitions(data);
 
 		// Manipulation for the representation!
-		var arrayFieldsToDisplay = FHC_FilterWidget._getFieldsToDisplayTabulator(data);
+		var arrayTabulatorColumns = FHC_FilterWidget._getTabulatorColumns(data, recordFieldsDefinitions);
 
-		if (arrayFieldsToDisplay.length > 0)
+		if (arrayTabulatorColumns.length > 0)
 		{
 			// ...if there are data to be displayed...
 			if (data.hasOwnProperty("dataset") && $.isArray(data.dataset))
 			{
 				if (options == null) options = {};
 
-				options.columns = arrayFieldsToDisplay;
+				options.columns = arrayTabulatorColumns;
 				options.data = data.dataset;
 
 				// Renders the tabulator
@@ -1109,7 +1111,7 @@ var FHC_FilterWidget = {
 	/**
 	 * Retrives the fields to be displayed from the data parameter, if aliases are present then they are used
 	 */
-	_getFieldsToDisplayTabulator: function(data) {
+	_getTabulatorColumns: function(data, recordFieldsDefinitions) {
 
 		var fieldsToDisplayTabulator = [];
 
@@ -1124,16 +1126,23 @@ var FHC_FilterWidget = {
 						// Build the array of objects (columns) used by tabulator and store it in tabulatorColumns
 						var tmpColumnObj = {}; // New object that represents a column
 
+						// If was given a definition for this field then use it!
+						if (recordFieldsDefinitions.hasOwnProperty(data.selectedFields[sfc]))
+						{
+							tmpColumnObj = recordFieldsDefinitions[data.selectedFields[sfc]];
+						}
+
+						tmpColumnObj.field = data.selectedFields[sfc]; // Field name to be linked with dataset field name
+
+						// If there is an alias for this field use it to give a title to this field (header)
 						if (data.hasOwnProperty("columnsAliases") && $.isArray(data.columnsAliases))
 						{
 							tmpColumnObj.title = data.columnsAliases[fc];
 						}
-						else
+						else // otherwise use the field name itself
 						{
 							tmpColumnObj.title = data.selectedFields[sfc];
 						}
-
-						tmpColumnObj.field = data.selectedFields[sfc];
 
 						fieldsToDisplayTabulator.push(tmpColumnObj); // Add tmpColumnObj to tabulatorColumns
 					}
@@ -1149,8 +1158,14 @@ var FHC_FilterWidget = {
 
 				var tmpColumnObj = {}; // New object that represents a column
 
-				tmpColumnObj.title = additionalColumn;
-				tmpColumnObj.field = additionalColumn;
+				// If was given a definition for this field then use it!
+				if (recordFieldsDefinitions.hasOwnProperty(additionalColumn))
+				{
+					tmpColumnObj = recordFieldsDefinitions[additionalColumn];
+				}
+
+				tmpColumnObj.title = additionalColumn; // Give a title to this field (header)
+				tmpColumnObj.field = additionalColumn; // Field name to be linked with dataset field name
 
 				fieldsToDisplayTabulator.push(tmpColumnObj); // Add tmpColumnObj to tabulatorColumns
 			});
@@ -1179,6 +1194,28 @@ var FHC_FilterWidget = {
 		}
 
 		return options;
+	},
+
+	/**
+	 * Gets record fields definitions to represent the dataset
+	 */
+	_getRepresentationFieldsDefinitions: function(data) {
+
+		var fieldsDefinitions = {}; // eventually contains record fields definitions
+
+		// Checks if record fields definitions was given as parameter
+		if (data.hasOwnProperty("datasetRepresentationFieldsDefinitions") && data.datasetRepresentationFieldsDefinitions != "")
+		{
+			var tmpFDefs = eval("(" + data.datasetRepresentationFieldsDefinitions + ")"); // and converts them from string to javascript code
+
+			// If it is an object then can be used
+			if (typeof tmpFDefs == "object")
+			{
+				fieldsDefinitions = tmpFDefs;
+			}
+		}
+
+		return fieldsDefinitions;
 	},
 
 	/**
