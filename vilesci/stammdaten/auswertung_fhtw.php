@@ -484,6 +484,13 @@ if ($testende)
 			foreach ($_POST['prestudent_ids'] AS $prest)
 			{
 				$prestudentrolle = new prestudent($prest);
+				// Wenn der letzte Status Abgewiesener ist, wird der Bewerber ignoriert
+				$prestudentrolle->getLastStatus($prest, $reihungstest->studiensemester_kurzbz);
+				if ($prestudentrolle->status_kurzbz == 'Abgewiesener')
+				{
+					continue;
+				}
+				// Letzten Interessentenstatus laden
 				$prestudentrolle->getLastStatus($prest, $reihungstest->studiensemester_kurzbz, 'Interessent');
 				$stg = new studiengang($prestudentrolle->studiengang_kz);
 
@@ -764,6 +771,13 @@ if ($punkteUebertragen)
 				else
 				{
 					$setRTPunkte = new reihungstest();
+					$ort_kurzbz = '';
+					// Checken, ob schon irgendeine Raumzuteilung existiert (Check ohne Studienplan) und diese ggf. übernehmen
+					$setRTPunkte->getPersonReihungstest($prestudentrolle->person_id, $_POST['reihungstest_id']);
+					if ($setRTPunkte->ort_kurzbz != '')
+					{
+						$ort_kurzbz = $setRTPunkte->ort_kurzbz;
+					}
 					$setRTPunkte->getPersonReihungstest($prestudentrolle->person_id, $_POST['reihungstest_id'], $prestudentrolle->studienplan_id);
 
 					// Check, ob Punkte schon befüllt sind
@@ -773,7 +787,7 @@ if ($punkteUebertragen)
 						$setRTPunkte->person_id = $prestudentrolle->person_id;
 						$setRTPunkte->reihungstest_id = $_POST['reihungstest_id'];
 						$setRTPunkte->anmeldedatum = '';
-						$setRTPunkte->ort_kurzbz = '';
+						$setRTPunkte->ort_kurzbz = $ort_kurzbz;
 						$setRTPunkte->studienplan_id = $prestudentrolle->studienplan_id;
 						$setRTPunkte->punkte = number_format(floatval($array['ergebnis']), 4);
 						$setRTPunkte->insertamum = date('Y-m-d H:i:s');
@@ -1372,10 +1386,6 @@ if (isset($_REQUEST['reihungstest']))
 	if ($datum_bis != '')
 	{
 		$query .= " AND rt.datum <= " . $db->db_add_param($datum_bis);
-	}
-	if ($studiengang != '')
-	{
-		$query .= " AND ps.studiengang_kz = " . $db->db_add_param($studiengang, FHC_INTEGER);
 	}
 	if ($semester != '')
 	{
