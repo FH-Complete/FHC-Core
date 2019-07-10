@@ -350,6 +350,12 @@ function AufnahemTermineReihungstestPunkteTransmit()
 	}
 }
 
+function setEndpunkteAsPunkte(id)
+{
+	var punkte = document.getElementById(id).value;
+	document.getElementById('aufnahmetermine-textbox-punkte').value = punkte;
+}
+
 /**
  * Speichert einen AufnahmeTermin
  */
