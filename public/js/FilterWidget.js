@@ -79,7 +79,8 @@ var FHC_FilterWidget = {
 	//------------------------------------------------------------------------------------------------------------------
 	// Properties
 
-	_datasetRepresentation: null, //
+	_datasetRepresentation: null, // contains the current data representation
+	_filterTabulator: null, // stores the tabulator object (if used, otherwise is null)
 
 	//------------------------------------------------------------------------------------------------------------------
 	// Public methods
@@ -269,7 +270,7 @@ var FHC_FilterWidget = {
 		// If the choosen dataset representation is tablesorter
 		if (FHC_FilterWidget._datasetRepresentation == DATASET_REP_TABLESORTER)
 		{
-			FHC_FilterWidget._disableTableSorter(); // disable the tablesorter
+			FHC_FilterWidget._disableTablesorter(); // disable the tablesorter
 		}
 	},
 
@@ -931,7 +932,7 @@ var FHC_FilterWidget = {
 				}
 			});
 
-			// Reset filter storage if there is a filter id in url TODO: find better solution
+			// Reset filter storage if there is a filter id in url
 			var filter_id = FHC_AjaxClient.getUrlParameter("filter_id");
 			if (typeof filter_id !== "undefined") FHC_FilterWidget._cleanTablesorterLocalStorage();
 
@@ -942,7 +943,7 @@ var FHC_FilterWidget = {
 	/**
 	 * Disable the tablesorter
 	 */
-	_disableTableSorter: function() {
+	_disableTablesorter: function() {
 
 		$("#filterTableDataset").trigger("disable");
 	},
@@ -1072,40 +1073,9 @@ var FHC_FilterWidget = {
 				options.data = data.dataset;
 
 				// Renders the tabulator
-				var filterTabulator = new Tabulator("#filterTabulator", options);
+				FHC_FilterWidget._filterTabulator = new Tabulator("#filterTabulator", options);
 			}
 		}
-	},
-
-	/**
-	 * Retrives the fields to be displayed from the data parameter, if aliases are present then they are used
-	 */
-	_getFieldsToDisplay: function(data) {
-
-		var arrayFieldsToDisplay = [];
-
-		if (data.hasOwnProperty("selectedFields") && $.isArray(data.selectedFields))
-		{
-			if (data.hasOwnProperty("columnsAliases") && $.isArray(data.columnsAliases))
-			{
-				for (var sfc = 0; sfc < data.selectedFields.length; sfc++)
-				{
-					for (var fc = 0; fc < data.fields.length; fc++)
-					{
-						if (data.selectedFields[sfc] == data.fields[fc])
-						{
-							arrayFieldsToDisplay[sfc] = data.columnsAliases[fc];
-						}
-					}
-				}
-			}
-			else
-			{
-				arrayFieldsToDisplay = data.selectedFields;
-			}
-		}
-
-		return arrayFieldsToDisplay;
 	},
 
 	/**
@@ -1127,7 +1097,7 @@ var FHC_FilterWidget = {
 						var tmpColumnObj = {}; // New object that represents a column
 
 						// If was given a definition for this field then use it!
-						if (recordFieldsDefinitions.hasOwnProperty(data.selectedFields[sfc]))
+						if (recordFieldsDefinitions != null && recordFieldsDefinitions.hasOwnProperty(data.selectedFields[sfc]))
 						{
 							tmpColumnObj = recordFieldsDefinitions[data.selectedFields[sfc]];
 						}
@@ -1159,7 +1129,7 @@ var FHC_FilterWidget = {
 				var tmpColumnObj = {}; // New object that represents a column
 
 				// If was given a definition for this field then use it!
-				if (recordFieldsDefinitions.hasOwnProperty(additionalColumn))
+				if (recordFieldsDefinitions != null && recordFieldsDefinitions.hasOwnProperty(additionalColumn))
 				{
 					tmpColumnObj = recordFieldsDefinitions[additionalColumn];
 				}
