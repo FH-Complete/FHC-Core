@@ -5,7 +5,7 @@ if (! defined('BASEPATH')) exit('No direct script access allowed');
 /**
  * FilterWidget logic
  */
-class FiltersLib
+class FilterWidgetLib
 {
 	// Session parameters names
 	const SESSION_NAME = 'FHC_FILTER_WIDGET'; // Filter session name
@@ -684,7 +684,7 @@ class FiltersLib
 	public function generateFilterMenu($navigationPage)
 	{
 		// Loads the NavigationLib for the current page (given as parameter)
-		$this->_ci->load->library('NavigationLib', array(FiltersLib::NAVIGATION_PAGE => $navigationPage));
+		$this->_ci->load->library('NavigationLib', array(FilterWidgetLib::NAVIGATION_PAGE => $navigationPage));
 
 		$filterMenu = null;
 		$currentMenu = $this->_ci->navigationlib->getSessionMenu(); // The navigation menu currently stored in session
@@ -766,7 +766,7 @@ class FiltersLib
 				);
 
 				// Sets in the session only the element related to the filters menu
-				$this->_ci->navigationlib->setSessionElementMenu(FiltersLib::NAV_MENU_FILTER_KEY, $filterMenu);
+				$this->_ci->navigationlib->setSessionElementMenu(FilterWidgetLib::NAV_MENU_FILTER_KEY, $filterMenu);
 			}
 		}
 	}

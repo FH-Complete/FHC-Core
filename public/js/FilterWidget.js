@@ -18,7 +18,7 @@
 function refreshSideMenuHook()
 {
 	FHC_NavigationWidget.refreshSideMenuHook(
-		'system/Filters/setNavigationMenu',
+		'widgets/Filters/setNavigationMenu',
 		{
 			filter_page: FHC_FilterWidget.getFilterPage(),
 			navigation_page: FHC_NavigationWidget.getNavigationPage()
@@ -37,7 +37,7 @@ function sideMenuHook()
 
 		// Ajax call to remove a custom filter
 		FHC_AjaxClient.ajaxCallPost(
-			"system/Filters/removeCustomFilter",
+			"widgets/Filters/removeCustomFilter",
 			{
 				filter_id: $(this).attr("value"), // filter_id of the filter to be removed
 				filter_page: FHC_FilterWidget.getFilterPage()
@@ -181,7 +181,7 @@ var FHC_FilterWidget = {
 	_getFilter: function(renderFunction) {
 
 		FHC_AjaxClient.ajaxCallGet(
-			"system/Filters/getFilter",
+			"widgets/Filters/getFilter",
 			{
 				filter_page: FHC_FilterWidget.getFilterPage()
 			},
@@ -376,7 +376,7 @@ var FHC_FilterWidget = {
 			});
 
 			FHC_AjaxClient.ajaxCallPost(
-				"system/Filters/sortSelectedFields",
+				"widgets/Filters/sortSelectedFields",
 				{
 					selectedFields: arrayDndId,
 					filter_page: FHC_FilterWidget.getFilterPage()
@@ -397,7 +397,7 @@ var FHC_FilterWidget = {
 	_revomeSelectedFieldsEvent: function(event) {
 
  		FHC_AjaxClient.ajaxCallPost(
- 			"system/Filters/removeSelectedField",
+ 			"widgets/Filters/removeSelectedField",
  			{
  				selectedField: $(this).attr("fieldToRemove"),
  				filter_page: FHC_FilterWidget.getFilterPage()
@@ -437,7 +437,7 @@ var FHC_FilterWidget = {
 	_addFieldEvent: function(event) {
 
 		FHC_AjaxClient.ajaxCallPost(
-			"system/Filters/addSelectedField",
+			"widgets/Filters/addSelectedField",
 			{
 				selectedField: $(this).val(),
 				filter_page: FHC_FilterWidget.getFilterPage()
@@ -469,7 +469,7 @@ var FHC_FilterWidget = {
 		});
 
 		FHC_AjaxClient.ajaxCallPost(
-			"system/Filters/applyFilters",
+			"widgets/Filters/applyFilters",
 			{
 				appliedFilters: appliedFilters,
 				appliedFiltersOperations: appliedFiltersOperations,
@@ -491,7 +491,7 @@ var FHC_FilterWidget = {
 	_removeAppliedFiltersEvent: function(event) {
 
 		FHC_AjaxClient.ajaxCallPost(
-			"system/Filters/removeAppliedFilter",
+			"widgets/Filters/removeAppliedFilter",
 			{
 				appliedFilter: $(this).attr("filterToRemove"),
 				filter_page: FHC_FilterWidget.getFilterPage()
@@ -510,7 +510,7 @@ var FHC_FilterWidget = {
 	_addFilterEvent: function(event) {
 
  		FHC_AjaxClient.ajaxCallPost(
- 			"system/Filters/addFilter",
+ 			"widgets/Filters/addFilter",
  			{
  				filter: $(this).val(),
  				filter_page: FHC_FilterWidget.getFilterPage()
@@ -552,7 +552,7 @@ var FHC_FilterWidget = {
  		if ($("#customFilterDescription").val() != "")
  		{
  			FHC_AjaxClient.ajaxCallPost(
- 				"system/Filters/saveCustomFilter",
+ 				"widgets/Filters/saveCustomFilter",
  				{
  					customFilterDescription: $("#customFilterDescription").val(),
  					filter_page: FHC_FilterWidget.getFilterPage()

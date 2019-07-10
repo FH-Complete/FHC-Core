@@ -3,7 +3,7 @@
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
 /**
- * This controller operates between (interface) the JS (GUI) and the FiltersLib (back-end)
+ * This controller operates between (interface) the JS (GUI) and the FilterWidgetLib (back-end)
  * Provides data to the ajax get calls about the filter
  * Accepts ajax post calls to change the filter data
  * This controller works with JSON calls on the HTTP GET or POST and the output is always JSON
@@ -15,7 +15,7 @@ class Filters extends FHC_Controller
 	const FILTER_PAGE_PARAM = 'filter_page';
 
 	/**
-	 * Calls the parent's constructor and loads the FiltersLib
+	 * Calls the parent's constructor and loads the FilterWidgetLib
 	 */
 	public function __construct()
     {
@@ -24,8 +24,8 @@ class Filters extends FHC_Controller
 		// Loads authentication library and starts authentication
 		$this->load->library('AuthLib');
 
-		// Loads the FiltersLib with HTTP GET/POST parameters
-		$this->_loadFiltersLib();
+		// Loads the FilterWidgetLib with HTTP GET/POST parameters
+		$this->_loadFilterWidgetLib();
 
 		// Checks if the caller is allow to read this data
 		$this->_isAllowed();
@@ -39,7 +39,7 @@ class Filters extends FHC_Controller
 	 */
 	public function getFilter()
 	{
-		$this->outputJsonSuccess($this->filterslib->getSession());
+		$this->outputJsonSuccess($this->filterwidgetlib->getSession());
 	}
 
 	/**
@@ -48,7 +48,7 @@ class Filters extends FHC_Controller
 	public function rowNumber()
 	{
 		$rowNumber = 0;
-		$dataset = $this->filterslib->getSessionElement(FiltersLib::SESSION_DATASET);
+		$dataset = $this->filterwidgetlib->getSessionElement(FilterWidgetLib::SESSION_DATASET);
 
 		if (isset($dataset) && is_array($dataset))
 		{
@@ -66,7 +66,7 @@ class Filters extends FHC_Controller
 	{
 		$selectedFields = $this->input->post('selectedFields');
 
-		if ($this->filterslib->sortSelectedFields($selectedFields) == true)
+		if ($this->filterwidgetlib->sortSelectedFields($selectedFields) == true)
 		{
 			$this->getFilter();
 		}
@@ -84,7 +84,7 @@ class Filters extends FHC_Controller
 	{
 		$selectedField = $this->input->post('selectedField');
 
-		if ($this->filterslib->removeSelectedField($selectedField) == true)
+		if ($this->filterwidgetlib->removeSelectedField($selectedField) == true)
 		{
 			$this->getFilter();
 		}
@@ -101,7 +101,7 @@ class Filters extends FHC_Controller
 	{
 		$selectedField = $this->input->post('selectedField');
 
-		if ($this->filterslib->addSelectedField($selectedField) == true)
+		if ($this->filterwidgetlib->addSelectedField($selectedField) == true)
 		{
 			$this->getFilter();
 		}
@@ -118,7 +118,7 @@ class Filters extends FHC_Controller
 	{
 		$appliedFilter = $this->input->post('appliedFilter');
 
-		if ($this->filterslib->removeAppliedFilter($appliedFilter) == true)
+		if ($this->filterwidgetlib->removeAppliedFilter($appliedFilter) == true)
 		{
 			$this->outputJsonSuccess('Removed');
 		}
@@ -138,7 +138,7 @@ class Filters extends FHC_Controller
 		$appliedFiltersConditions = $this->input->post('appliedFiltersConditions');
 		$appliedFiltersOptions = $this->input->post('appliedFiltersOptions');
 
-		if ($this->filterslib->applyFilters(
+		if ($this->filterwidgetlib->applyFilters(
 				$appliedFilters,
 				$appliedFiltersOperations,
 				$appliedFiltersConditions,
@@ -160,7 +160,7 @@ class Filters extends FHC_Controller
 	{
 		$filter = $this->input->post('filter');
 
-		if ($this->filterslib->addFilter($filter) == true)
+		if ($this->filterwidgetlib->addFilter($filter) == true)
 		{
 			$this->getFilter();
 		}
@@ -177,7 +177,7 @@ class Filters extends FHC_Controller
 	{
 		$customFilterDescription = $this->input->post('customFilterDescription');
 
-		if ($this->filterslib->saveCustomFilter($customFilterDescription) == true)
+		if ($this->filterwidgetlib->saveCustomFilter($customFilterDescription) == true)
 		{
 			$this->outputJsonSuccess('Saved');
 		}
@@ -194,7 +194,7 @@ class Filters extends FHC_Controller
 	{
 		$filter_id = $this->input->post('filter_id');
 
-		if ($this->filterslib->removeCustomFilter($filter_id) == true)
+		if ($this->filterwidgetlib->removeCustomFilter($filter_id) == true)
 		{
 			$this->outputJsonSuccess('Removed');
 		}
@@ -211,7 +211,7 @@ class Filters extends FHC_Controller
 	public function setNavigationMenu()
 	{
 		// Generates the filters structure array
-		$filterMenu = $this->filterslib->generateFilterMenu($this->input->get(FiltersLib::NAVIGATION_PAGE));
+		$filterMenu = $this->filterwidgetlib->generateFilterMenu($this->input->get(FilterWidgetLib::NAVIGATION_PAGE));
 
 		$this->outputJsonSuccess('Success');
 	}
@@ -224,18 +224,18 @@ class Filters extends FHC_Controller
 	 */
 	private function _isAllowed()
 	{
-		if (!$this->filterslib->isAllowed())
+		if (!$this->filterwidgetlib->isAllowed())
 		{
 			$this->terminateWithJsonError('You are not allowed to access to this content');
 		}
 	}
 
 	/**
-	 * Loads the FiltersLib with the FILTER_PAGE_PARAM parameter
+	 * Loads the FilterWidgetLib with the FILTER_PAGE_PARAM parameter
 	 * If the parameter FILTER_PAGE_PARAM is not given then the execution of the controller is terminated and
 	 * an error message is printed
 	 */
-	private function _loadFiltersLib()
+	private function _loadFilterWidgetLib()
 	{
 		// If the parameter FILTER_PAGE_PARAM is present in the HTTP GET or POST
 		if (isset($_GET[self::FILTER_PAGE_PARAM]) || isset($_POST[self::FILTER_PAGE_PARAM]))
@@ -250,8 +250,8 @@ class Filters extends FHC_Controller
 				$filterPage = $this->input->post(self::FILTER_PAGE_PARAM); // is retrieved from the HTTP POST
 			}
 
-			// Loads the FiltersLib that contains all the used logic
-			$this->load->library('FiltersLib', array(self::FILTER_PAGE_PARAM => $filterPage));
+			// Loads the FilterWidgetLib that contains all the used logic
+			$this->load->library('FilterWidgetLib', array(self::FILTER_PAGE_PARAM => $filterPage));
 		}
 		else // Otherwise an error will be written in the output
 		{
