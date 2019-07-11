@@ -54,7 +54,9 @@ class FilterWidgetLib
 	const MARK_ROW = 'markRow';
 
 	// ...to hide the options for a filter
-	const HIDE_HEADER = 'hideHeader';
+	const HIDE_OPTIONS = 'hideOptions';
+	const HIDE_SELECT_FIELDS = 'hideSelectFields';
+	const HIDE_SELECT_FILTERS = 'hideSelectFilters';
 	const HIDE_SAVE = 'hideSave';
 
 	const CUSTOM_MENU = 'customMenu'; // ...to specify if the menu for this filter is custom (true) or not (false)

@@ -7,6 +7,7 @@ class FilterWidget extends Widget
 {
 	// Paths of the views
 	const WIDGET_URL_FILTER = 'widgets/filter/filter';
+	const WIDGET_URL_FILTER_OPTIONS = 'widgets/filter/filterOptions';
 	const WIDGET_URL_SELECT_FIELDS = 'widgets/filter/selectFields';
 	const WIDGET_URL_DATASET_TABLESORTER = 'widgets/filter/tableDataset';
 	const WIDGET_URL_DATASET_PIVOTUI = 'widgets/filter/pivotUIDataset';
@@ -41,9 +42,11 @@ class FilterWidget extends Widget
 	// To have a column in the GUI with checkboxes to select rows in the table
 	private $_checkboxes;
 
-	// To hide the GUI to operate or save the filter widget
-	private $_hideHeader;
-	private $_hideSave;
+	// To hide the GUI to operate with the filter widget or to save a custom filter
+	private $_hideOptions; // if true hides all the options
+	private $_hideSelectFields; // if true hides the fields selection
+	private $_hideSelectFilters; // if true hides the filters selections
+	private $_hideSave; // if true hides the GUI to save a custom filter
 
 	private $_customMenu; // if true then method _setFilterMenu is NOT called
 
@@ -94,11 +97,22 @@ class FilterWidget extends Widget
 	// Public static methods used to load views and to access statically to some properies of the FilterWidget
 
 	/**
+	 * Loads the view related to the filter options
+	 */
+	public static function loadViewFilterOptions()
+	{
+		if (self::$_FilterWidgetInstance->_hideOptions != true)
+		{
+			self::_loadView(self::WIDGET_URL_FILTER_OPTIONS);
+		}
+	}
+
+	/**
 	 * Loads the view related to the selected fields
 	 */
 	public static function loadViewSelectFields()
 	{
-		if (self::$_FilterWidgetInstance->_hideHeader != true)
+		if (self::$_FilterWidgetInstance->_hideSelectFields != true)
 		{
 			self::_loadView(self::WIDGET_URL_SELECT_FIELDS);
 		}
@@ -109,7 +123,7 @@ class FilterWidget extends Widget
 	 */
 	public static function loadViewSelectFilters()
 	{
-		if (self::$_FilterWidgetInstance->_hideHeader != true)
+		if (self::$_FilterWidgetInstance->_hideSelectFilters != true)
 		{
 			self::_loadView(self::WIDGET_URL_SELECT_FILTERS);
 		}
@@ -172,7 +186,9 @@ class FilterWidget extends Widget
 		$this->_formatRow = null;
 		$this->_markRow = null;
 		$this->_checkboxes = null;
-		$this->_hideHeader = null;
+		$this->_hideOptions = null;
+		$this->_hideSelectFields = null;
+		$this->_hideSelectFilters = null;
 		$this->_hideSave = null;
 		$this->_customMenu = null;
 		$this->_datasetRepresentation = null;
@@ -252,10 +268,22 @@ class FilterWidget extends Widget
 			$this->_checkboxes = $args[FilterWidgetLib::CHECKBOXES];
 		}
 
-		// To specify if the header to operate with the FilterWidget is shown or not
-		if (isset($args[FilterWidgetLib::HIDE_HEADER]) && is_bool($args[FilterWidgetLib::HIDE_HEADER]))
+		// To specify if the filter options are shown ot not
+		if (isset($args[FilterWidgetLib::HIDE_OPTIONS]) && is_bool($args[FilterWidgetLib::HIDE_OPTIONS]))
 		{
-			$this->_hideHeader = $args[FilterWidgetLib::HIDE_HEADER];
+			$this->_hideOptions = $args[FilterWidgetLib::HIDE_OPTIONS];
+		}
+
+		// To specify if the form to select fields is shown or not
+		if (isset($args[FilterWidgetLib::HIDE_SELECT_FIELDS]) && is_bool($args[FilterWidgetLib::HIDE_SELECT_FIELDS]))
+		{
+			$this->_hideSelectFields = $args[FilterWidgetLib::HIDE_SELECT_FIELDS];
+		}
+
+		// To specify if the form to select filters is shown or not
+		if (isset($args[FilterWidgetLib::HIDE_SELECT_FILTERS]) && is_bool($args[FilterWidgetLib::HIDE_SELECT_FILTERS]))
+		{
+			$this->_hideSelectFilters = $args[FilterWidgetLib::HIDE_SELECT_FILTERS];
 		}
 
 		// To specify if the form to save a custom FilterWidget is shown or not
