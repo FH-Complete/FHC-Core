@@ -341,7 +341,6 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 		</style:page-layout>
 		<style:page-layout style:name="Mpm2">
 			<style:page-layout-properties fo:page-width="21.001cm" fo:page-height="29.7cm" style:num-format="1" style:print-orientation="portrait" fo:margin-top="5.001cm" fo:margin-bottom="4.001cm" fo:margin-left="2cm" fo:margin-right="2cm" fo:border="none" fo:padding="0cm" style:shadow="none" fo:background-color="transparent" style:writing-mode="lr-tb" style:footnote-max-height="0cm">
-				<!-- <style:background-image xlink:href="Pictures/100002010000031B00000463F98C50C4.png" xlink:type="simple" xlink:actuate="onLoad" style:repeat="stretch"/>-->
 				<style:columns fo:column-count="1" fo:column-gap="0cm"/>
 				<style:footnote-sep style:width="0.018cm" style:line-style="solid" style:adjustment="left" style:rel-width="25%" style:color="#000000"/>
 			</style:page-layout-properties>

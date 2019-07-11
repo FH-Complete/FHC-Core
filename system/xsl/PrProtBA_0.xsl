@@ -234,7 +234,6 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 		</text:sequence-decls>
 		<text:p text:style-name="P24"/>
 		<text:p text:style-name="P25">Protokoll kommissionelle Bachelorprüfung</text:p>
-		<text:p text:style-name="P1">abgehalten am FH-Bachelorstudiengang <xsl:value-of select="stg_bezeichnung" />, StgKz <xsl:value-of select="studiengang_kz" /></text:p>
 		<text:p text:style-name="P1"/>
 		<text:p text:style-name="P2"><xsl:value-of select="titelpre" /><xsl:text> </xsl:text><xsl:value-of select="vorname" /><xsl:text> </xsl:text><xsl:value-of select="nachname" /><xsl:text> </xsl:text><xsl:value-of select="titelpost" /></text:p>
 		<text:p text:style-name="P1">Personenkennzeichen: <xsl:value-of select="matrikelnr" /></text:p>
@@ -325,27 +324,6 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 		</table:table-row>
 		<table:table-row table:style-name="Tabelle1.1">
 			<table:table-cell table:style-name="Tabelle1.A2" table:number-columns-spanned="2" office:value-type="string">
-			<text:p text:style-name="P5">Prüfungsantritt</text:p>
-			</table:table-cell>
-			<table:covered-table-cell/>
-			<table:table-cell table:style-name="Tabelle1.C2" table:number-columns-spanned="6" office:value-type="string">
-			<text:p text:style-name="P16">
-					<draw:custom-shape text:anchor-type="char" draw:z-index="9" draw:name="Rechteck 1" draw:style-name="gr1" draw:text-style-name="P22" svg:width="0.362cm" svg:height="0.373cm" svg:x="1.7cm" svg:y="0.05cm">
-					<draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:mirror-horizontal="false" draw:mirror-vertical="false" draw:type="rectangle" draw:enhanced-path="M 0 0 L 21600 0 21600 21600 0 21600 0 0 Z N"/></draw:custom-shape>
-					<draw:custom-shape text:anchor-type="char" draw:z-index="10" draw:name="Rechteck 1" draw:style-name="gr1" draw:text-style-name="P22" svg:width="0.362cm" svg:height="0.373cm" svg:x="5.334cm" svg:y="0.05cm"><text:p/>
-					<draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:mirror-horizontal="false" draw:mirror-vertical="false" draw:type="rectangle" draw:enhanced-path="M 0 0 L 21600 0 21600 21600 0 21600 0 0 Z N"/></draw:custom-shape>
-					<draw:custom-shape text:anchor-type="char" draw:z-index="11" draw:name="Rechteck 1" draw:style-name="gr1" draw:text-style-name="P22" svg:width="0.362cm" svg:height="0.373cm" svg:x="8.952cm" svg:y="0.05cm"><text:p/>
-					<draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:mirror-horizontal="false" draw:mirror-vertical="false" draw:type="rectangle" draw:enhanced-path="M 0 0 L 21600 0 21600 21600 0 21600 0 0 Z N"/></draw:custom-shape>
-					Erstantritt <text:s text:c="8"/>/ 1. Wiederholung <text:s text:c="7"/>/ 2. Wiederholung</text:p>
-			</table:table-cell>
-			<table:covered-table-cell/>
-			<table:covered-table-cell/>
-			<table:covered-table-cell/>
-			<table:covered-table-cell/>
-			<table:covered-table-cell/>
-		</table:table-row>
-		<table:table-row table:style-name="Tabelle1.1">
-			<table:table-cell table:style-name="Tabelle1.A2" table:number-columns-spanned="2" office:value-type="string">
 			<text:p text:style-name="P3">Thema und Beurteilung der Bachelorarbeit</text:p>
 			</table:table-cell>
 			<table:covered-table-cell/>
@@ -361,35 +339,6 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 			<text:p text:style-name="P5">(Information)</text:p>
 			<text:p text:style-name="P5"><xsl:value-of select="note" /></text:p>
 			</table:table-cell>
-		</table:table-row>
-		<table:table-row table:style-name="Tabelle1.1">
-			<table:table-cell table:style-name="Tabelle1.A2" table:number-columns-spanned="2" office:value-type="string">
-			<text:p text:style-name="P5">Prüfungsgegenstand</text:p>
-			</table:table-cell>
-			<table:covered-table-cell/>
-			<table:table-cell table:style-name="Tabelle1.C2" table:number-columns-spanned="6" office:value-type="string">
-			<text:p text:style-name="P5">Prüfungsgespräch über die Bachelorarbeit</text:p>
-			</table:table-cell>
-			<table:covered-table-cell/>
-			<table:covered-table-cell/>
-			<table:covered-table-cell/>
-			<table:covered-table-cell/>
-			<table:covered-table-cell/>
-		</table:table-row>
-		<table:table-row table:style-name="Tabelle1.1">
-			<table:table-cell table:style-name="Tabelle1.A2" table:number-columns-spanned="2" office:value-type="string">
-			<text:p text:style-name="P5">Prüfungsteil/e in Englisch (Optional - entsprechend der Vorgabe des Studiengangs):</text:p>
-			</table:table-cell>
-			<table:covered-table-cell/>
-			<table:table-cell table:style-name="Tabelle1.C2" table:number-columns-spanned="6" office:value-type="string">
-			<text:p text:style-name="P4"><draw:custom-shape text:anchor-type="char" draw:z-index="6" draw:name="Rechteck 8" draw:style-name="gr1" draw:text-style-name="P22" svg:width="0.445cm" svg:height="0.445cm" svg:x="10.456cm" svg:y="0.05cm"><text:p/><draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:type="rectangle" draw:enhanced-path="M 0 0 L 21600 0 21600 21600 0 21600 0 0 Z N"/></draw:custom-shape>Präsentation der Bachelorarbeit</text:p>
-			<text:p text:style-name="P4"><draw:custom-shape text:anchor-type="char" draw:z-index="5" draw:name="Rechteck 10" draw:style-name="gr1" draw:text-style-name="P22" svg:width="0.445cm" svg:height="0.445cm" svg:x="10.456cm" svg:y="0.05cm"><text:p/><draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:type="rectangle" draw:enhanced-path="M 0 0 L 21600 0 21600 21600 0 21600 0 0 Z N"/></draw:custom-shape>Prüfungsgespräch über die Bachelorarbeit</text:p>
-			</table:table-cell>
-			<table:covered-table-cell/>
-			<table:covered-table-cell/>
-			<table:covered-table-cell/>
-			<table:covered-table-cell/>
-			<table:covered-table-cell/>
 		</table:table-row>
 		<table:table-row table:style-name="Tabelle1.1">
 			<table:table-cell table:style-name="Tabelle1.A1" table:number-columns-spanned="8" office:value-type="string">
@@ -501,25 +450,6 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 			</table:table-cell>
 			<table:covered-table-cell/>
 			<table:covered-table-cell/>
-			<table:covered-table-cell/>
-			<table:covered-table-cell/>
-			<table:covered-table-cell/>
-			<table:covered-table-cell/>
-			<table:covered-table-cell/>
-		</table:table-row>
-		<table:table-row table:style-name="Tabelle1.15">
-			<table:table-cell table:style-name="Tabelle1.A2" table:number-columns-spanned="3" office:value-type="string">
-			<text:p text:style-name="P10">Beurteilung des Prüfungsgesprächs nach </text:p>
-			<text:p text:style-name="P10">fachlicher Korrektheit, Vollständigkeit, Strukturiertheit und sprachlicher Qualität.</text:p>
-			</table:table-cell>
-			<table:covered-table-cell/>
-			<table:covered-table-cell/>
-			<table:table-cell table:style-name="Tabelle1.C2" table:number-columns-spanned="5" office:value-type="string">
-			<text:p text:style-name="P5"><draw:custom-shape text:anchor-type="char" draw:z-index="2" draw:name="Rechteck 3" draw:style-name="gr1" draw:text-style-name="P22" svg:width="0.445cm" svg:height="0.445cm" svg:x="8.925cm" svg:y="0.056cm"><text:p/><draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:mirror-horizontal="false" draw:mirror-vertical="false" draw:type="rectangle" draw:enhanced-path="M 0 0 L 21600 0 21600 21600 0 21600 0 0 Z N"/></draw:custom-shape>(+++) mit ausgezeichnetem Erfolg bestanden</text:p>
-			<text:p text:style-name="P5"><draw:custom-shape text:anchor-type="char" draw:z-index="12" draw:name="Rechteck 5" draw:style-name="gr1" draw:text-style-name="P22" svg:width="0.445cm" svg:height="0.445cm" svg:x="8.925cm" svg:y="0.078cm"><text:p/><draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:type="rectangle" draw:enhanced-path="M 0 0 L 21600 0 21600 21600 0 21600 0 0 Z N"/></draw:custom-shape>(++) mit gutem Erfolg bestanden</text:p>
-			<text:p text:style-name="P5"><draw:custom-shape text:anchor-type="char" draw:z-index="3" draw:name="Rechteck 4" draw:style-name="gr1" draw:text-style-name="P22" svg:width="0.445cm" svg:height="0.445cm" svg:x="8.925cm" svg:y="0.074cm"><text:p/><draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:type="rectangle" draw:enhanced-path="M 0 0 L 21600 0 21600 21600 0 21600 0 0 Z N"/></draw:custom-shape>(+) bestanden</text:p>
-			<text:p text:style-name="P5"><draw:custom-shape text:anchor-type="char" draw:z-index="4" draw:name="Rechteck 7" draw:style-name="gr1" draw:text-style-name="P22" svg:width="0.445cm" svg:height="0.445cm" svg:x="8.925cm" svg:y="0.051cm"><text:p/><draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:type="rectangle" draw:enhanced-path="M 0 0 L 21600 0 21600 21600 0 21600 0 0 Z N"/></draw:custom-shape>(-) nicht bestanden</text:p>
-			</table:table-cell>
 			<table:covered-table-cell/>
 			<table:covered-table-cell/>
 			<table:covered-table-cell/>

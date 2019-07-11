@@ -473,7 +473,6 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
 				<text:span text:style-name="T5">Student progress report</text:span>
 			</text:p>
 			<xsl:if test="finanzamt != ''">
-				<text:p text:style-name="P10">(For submission to local tax office in accordance with the Family Welfare Act 1967 section 2.1 lit.b)</text:p>
 			</xsl:if>
 			<table:table table:name="Tabelle1" table:style-name="Tabelle1">
 				<table:table-column table:style-name="Tabelle1.A"/>
@@ -602,14 +601,11 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
 					</table:table-cell>
 					<table:table-cell table:style-name="Tabelle4.B1" office:value-type="string">
 						<text:p text:style-name="P5">
-							<text:span text:style-name="T7">Digitally created - valid without signature and stamp</text:span>
 						</text:p>
 					</table:table-cell>
 				</table:table-row>
 			</table:table>
 			<text:p text:style-name="P19"/>
-			<text:p text:style-name="P20">¹ 1 Semester period per week = 45 minutes</text:p>
-			<text:p text:style-name="P20">² Grades:<text:tab/>excellent (1), very good (2), good (3), satisfactory (4), Credit based on previous experience/work (ar),</text:p><text:p text:style-name="P20"><text:tab/>Participated with success (met), passed (b), successfully completed (ea), participated (tg)</text:p>
 		</office:text>
 </xsl:template>
 <xsl:template match="unterrichtsfach">

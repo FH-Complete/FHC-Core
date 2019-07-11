@@ -160,14 +160,11 @@
                 geboren am <xsl:value-of select="birthday" />,
                 <xsl:choose>
                     <xsl:when test="end_date != ''">
-                        in der Zeit von <xsl:value-of select="begin_date" /> bis <xsl:value-of select="end_date" />
-                        für die FH Technikum Wien als Hochschullehrer tätig war.
-                        Seine Tätigkeit umfasste die Konzeption, Organisation und Abhaltung von Lehrveranstaltungen.
+                        in der Zeit von <xsl:value-of select="begin_date" /> bis <xsl:value-of select="end_date" /> als Hochschullehrer tätig war.
                     </xsl:when>
                     <xsl:otherwise>
                         seit <xsl:value-of select="begin_date" />
-                        für die FH Technikum Wien als Hochschullehrer tätig ist.
-                        Seine Tätigkeit umfasst die Konzeption, Organisation und Abhaltung von Lehrveranstaltungen.
+                        als Hochschullehrer tätig ist.
                     </xsl:otherwise>
                 </xsl:choose>
             </text:p>
@@ -206,7 +203,6 @@
             </xsl:if>
             <text:p text:style-name="P1"/>
             <text:p text:style-name="P1"/>
-            <text:p text:style-name="P1">FACHHOCHSCHULE TECHNIKUM WIEN</text:p>
             <text:p text:style-name="P1"/>
             <text:p text:style-name="P1"/>
             <text:p text:style-name="P1"/>

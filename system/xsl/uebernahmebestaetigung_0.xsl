@@ -175,14 +175,9 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
 				<text:sequence-decl text:display-outline-level="0" text:name="Drawing"/>
 			</text:sequence-decls>
 			<text:p text:style-name="P11"/>
-			<text:p text:style-name="P12">Höchstädtplatz 6</text:p>
-			<text:p text:style-name="P12">1200 Wien</text:p>
 			<text:p text:style-name="P12"/>
 			<text:p text:style-name="P12">Datum: <xsl:value-of select="datum" /><text:line-break/>
 			</text:p>
-			<text:p text:style-name="P12">www.technikum-wien.at</text:p>
-			<text:p text:style-name="P12">ZVR 074476426</text:p>
-			<text:p text:style-name="P12">DVR 0928381</text:p>
 			<text:p text:style-name="P12"/>
 			<text:p text:style-name="P12"/>
 			<text:p text:style-name="P9">

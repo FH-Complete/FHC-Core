@@ -296,11 +296,11 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
 			</table:table>
 			<text:p text:style-name="P4"/>
 			<text:p text:style-name="P4"/>
-			<text:p text:style-name="P4">(i) ... Incoming</text:p>
-			<text:p text:style-name="P4">(o) ... Outgoing</text:p>
-			<text:p text:style-name="P4">(ar) ... angerechnet</text:p>
-			<text:p text:style-name="P4">(ma) ... MitarbeiterIn</text:p>
-			<text:p text:style-name="P4">(a.o.) ... Außerordentliche/r HörerIn</text:p>
+			<text:p text:style-name="P4"></text:p>
+			<text:p text:style-name="P4"></text:p>
+			<text:p text:style-name="P4"></text:p>
+			<text:p text:style-name="P4"></text:p>
+			<text:p text:style-name="P4"></text:p>
 			<text:p text:style-name="P4"/>
 			<text:p text:style-name="P5">
 				<xsl:choose>
@@ -312,7 +312,7 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
 					</xsl:otherwise>
 				</xsl:choose>
 			</text:p>
-			<text:p text:style-name="P4">Fehlt ein/e Student/in länger als 2 Wochen, bitte um einen deutlichen Vermerk auf der Anwesenheitsliste. Die Anwesenheitsliste bitte am Ende des Monats im Sekretariat abgeben! Bitte achten Sie darauf, dass Sie nur VOLLSTÄNDIG AUSGEFÜLLTE LISTEN abgeben!</text:p>
+			<text:p text:style-name="P4">Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren,</text:p>
 		</office:text>
 	</office:body>
 </office:document-content>

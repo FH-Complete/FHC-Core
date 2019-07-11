@@ -354,7 +354,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 					<xsl:text>ordentliche/r Student/in </xsl:text>
 				</xsl:otherwise>
 			</xsl:choose>
-			folgende Lehrveranstaltung an der FH Technikum Wien absolviert:</text:p>
+			folgende Lehrveranstaltung absolviert:</text:p>
 			<text:p text:style-name="P19"/>
 			<table:table table:name="Tabelle1" table:style-name="Tabelle1">
 				<table:table-column table:style-name="Tabelle1.A"/>
@@ -418,9 +418,6 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 			</table:table-row>
 			</table:table>
 			<text:p text:style-name="P6"/>
-			<text:p text:style-name="P25">¹ 1 Semester period per week = 45 minutes</text:p>
-			<text:p text:style-name="P25">² Grades:<text:tab/>excellent (1), good (2), satisfactory (3), sufficient (4), Credit based on previous experience/work (ar), Participated with success (met), passed (b),</text:p>
-			<text:p text:style-name="P25"><text:tab/>successfully completed (ea), participated (tg)</text:p>
 			<text:p text:style-name="P20"/>
 			<text:p text:style-name="P21"/>
 			<text:p text:style-name="P22">After passing this course successfully students are able to ...</text:p>
