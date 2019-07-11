@@ -60,6 +60,7 @@ class FilterWidgetLib
 	const HIDE_SAVE = 'hideSave';
 
 	const CUSTOM_MENU = 'customMenu'; // ...to specify if the menu for this filter is custom (true) or not (false)
+	const HIDE_MENU = 'hideMenu'; // ...to specify if the menu should be shown or not
 
 	// ...to specify how to represent the dataset (ex: tablesorter, pivotUI, ...)
 	const DATASET_REPRESENTATION = 'datasetRepresentation';

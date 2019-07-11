@@ -33,34 +33,38 @@ function refreshSideMenuHook()
  */
 function sideMenuHook()
 {
-	$(".remove-custom-filter").click(function() {
+	// If menu is present
+	if (FHC_FilterWidget._hideMenu != true)
+	{
+		$(".remove-custom-filter").click(function() {
 
-		// Ajax call to remove a custom filter
-		FHC_AjaxClient.ajaxCallPost(
-			"widgets/Filters/removeCustomFilter",
-			{
-				filter_id: $(this).attr("value"), // filter_id of the filter to be removed
-				filter_page: FHC_FilterWidget.getFilterPage()
-			},
-			{
-				successCallback: function(data, textStatus, jqXHR) {
+			// Ajax call to remove a custom filter
+			FHC_AjaxClient.ajaxCallPost(
+				"widgets/Filters/removeCustomFilter",
+				{
+					filter_id: $(this).attr("value"), // filter_id of the filter to be removed
+					filter_page: FHC_FilterWidget.getFilterPage()
+				},
+				{
+					successCallback: function(data, textStatus, jqXHR) {
 
-					if (FHC_AjaxClient.isError(data))
-					{
-						console.log(FHC_AjaxClient.getError(data));
-					}
-					else
-					{
-						// If a success and refreshSideMenuHook is a valid function then call it to refresh the side menu
-						if (typeof refreshSideMenuHook == "function")
+						if (FHC_AjaxClient.isError(data))
 						{
-							refreshSideMenuHook();
+							console.log(FHC_AjaxClient.getError(data));
+						}
+						else
+						{
+							// If a success and refreshSideMenuHook is a valid function then call it to refresh the side menu
+							if (typeof refreshSideMenuHook == "function")
+							{
+								refreshSideMenuHook();
+							}
 						}
 					}
 				}
-			}
-		);
-	});
+			);
+		});
+	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------
@@ -215,6 +219,7 @@ var FHC_FilterWidget = {
 		FHC_FilterWidget._initSessionStorage(); // initialize the session storage
 
 		FHC_FilterWidget._setDatasetRepresentation(data); // set what type of dataset representation was choosen
+		FHC_FilterWidget._setHideMenu(data); // sets the _hideMenu property
 
 		FHC_FilterWidget._turnOffEvents(); // turns all the events off
 		FHC_FilterWidget._resetGUI(); // Reset the entire GUI
@@ -559,10 +564,13 @@ var FHC_FilterWidget = {
  				},
  				{
  					successCallback: function(data, textStatus, jqXHR) {
-						// If a success and refreshSideMenuHook is a valid function then call it to refresh the side menu
-						if (typeof refreshSideMenuHook == "function")
+						if (FHC_FilterWidget._hideMenu != true)
 						{
-							refreshSideMenuHook();
+							// If a success and refreshSideMenuHook is a valid function then call it to refresh the side menu
+							if (typeof refreshSideMenuHook == "function")
+							{
+								refreshSideMenuHook();
+							}
 						}
 					}
  				}
@@ -1196,6 +1204,17 @@ var FHC_FilterWidget = {
 		if (data.hasOwnProperty("datasetRepresentation"))
 		{
 			FHC_FilterWidget._datasetRepresentation = data.datasetRepresentation;
+		}
+	},
+
+	/**
+	 * Set what type of dataset representation was choosen
+	 */
+	_setHideMenu: function(data) {
+
+		if (data.hasOwnProperty("hideMenu"))
+		{
+			FHC_FilterWidget._hideMenu = data.hideMenu;
 		}
 	}
 

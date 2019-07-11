@@ -8,13 +8,11 @@
 
 		<?php FilterWidget::loadViewFilterOptions(); ?>
 
-		<br>
-
 		<!-- Filter info top -->
 		<div id="datasetActionsTop"></div>
 
 		<!-- Filter table -->
-		<div>
+		<div id="divFilterWidgetDataset" app="<?php echo $app; ?>" dataset="<?php echo $dataset; ?>" filterid="<?php echo $filterid; ?>">
 			<?php FilterWidget::loadViewDataset(); ?>
 		</div>
 

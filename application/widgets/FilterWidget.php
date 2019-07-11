@@ -48,6 +48,7 @@ class FilterWidget extends Widget
 	private $_hideSelectFilters; // if true hides the filters selections
 	private $_hideSave; // if true hides the GUI to save a custom filter
 
+	private $_hideMenu; // if true then the menu is not shown
 	private $_customMenu; // if true then method _setFilterMenu is NOT called
 
 	private $_datasetRepresentation; // dataset representation (ex: tablesorter, pivotUI, ...)
@@ -78,7 +79,7 @@ class FilterWidget extends Widget
 			$this->_startFilterWidget();
 
 			// If a custom menu is not used, then default menu is used
-			if ($this->_customMenu != true) $this->_setFilterMenu();
+			if ($this->_hideMenu != true && $this->_customMenu != true) $this->_setFilterMenu();
 		}
 	}
 
@@ -90,7 +91,11 @@ class FilterWidget extends Widget
 	 */
 	public function display($widgetData)
 	{
-		$this->view(self::WIDGET_URL_FILTER); // GUI starts here
+		$this->view(self::WIDGET_URL_FILTER, array(
+			'app' => $this->_app,
+			'dataset' => $this->_datasetName,
+			'filterid' => $this->_filterId
+		)); // GUI starts here
 	}
 
 	//------------------------------------------------------------------------------------------------------------------
@@ -190,6 +195,7 @@ class FilterWidget extends Widget
 		$this->_hideSelectFields = null;
 		$this->_hideSelectFilters = null;
 		$this->_hideSave = null;
+		$this->_hideMenu = null;
 		$this->_customMenu = null;
 		$this->_datasetRepresentation = null;
 		$this->_datasetRepresentationOptions = null;
@@ -292,6 +298,12 @@ class FilterWidget extends Widget
 			$this->_hideSave = $args[FilterWidgetLib::HIDE_SAVE];
 		}
 
+		// If the menu should be shown or not
+		if (isset($args[FilterWidgetLib::HIDE_MENU]) && is_bool($args[FilterWidgetLib::HIDE_MENU]))
+		{
+			$this->_hideMenu = $args[FilterWidgetLib::HIDE_MENU];
+		}
+
 		// If a custom menu is set
 		if (isset($args[FilterWidgetLib::CUSTOM_MENU]) && is_bool($args[FilterWidgetLib::CUSTOM_MENU]))
 		{
@@ -335,7 +347,7 @@ class FilterWidget extends Widget
 				&& !isset($args[FilterWidgetLib::FILTER_ID]))
 			{
 				show_error(
-					'The parameters ("'.FilterWidgetLib::APP_PARAMETER.'" and "'.FilterWidgetLib::DATASET_NAME_PARAMETER.') OR "'.
+					'The parameters ("'.FilterWidgetLib::APP_PARAMETER.'" AND "'.FilterWidgetLib::DATASET_NAME_PARAMETER.') OR "'.
 					FilterWidgetLib::FILTER_ID.'" must be specified'
 				);
 			}
