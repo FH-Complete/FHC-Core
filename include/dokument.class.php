@@ -859,6 +859,8 @@ class dokument extends basis_db
 					$stg_obj->kuerzel = $row->kuerzel;
 					$stg_obj->bezeichnung = $row->bezeichnung;
 					$stg_obj->studiengang_kz = $row->studiengang_kz;
+					$stg_obj->english = $row->english;
+					$stg_obj->stufe = $row->stufe;
 	
 					$this->result[] = $stg_obj;
 				}
