@@ -1000,7 +1000,7 @@ if(isset($_GET['excel']))
 					$("#"+v.id).tablesorter(
 						{
 							widgets: ["zebra", "filter", "stickyHeaders"],
-							sortList: [[3,0],[4,0]],
+							sortList: [[2,0],[3,0]],
 							headers: {0: { sorter: false}},
 							widgetOptions: {filter_cssFilter: [
 									"filter_clm_null",
