@@ -90,7 +90,7 @@ class FilterWidgetLib
 
 	const FILTER_PHRASES_CATEGORY = 'FilterWidget'; // The category used to store phrases for the FilterWidget
 
-	const FILTER_PAGE_PARAM = 'filter_page'; // Filter page parameter name
+	const FILTER_UNIQUE_ID = 'filterUniqueId'; // Filter page parameter name
 
 	const PERMISSION_FILTER_METHOD = 'FilterWidget'; // Name for fake method to be checked by the PermissionLib
 	const PERMISSION_TYPE = 'rw';
@@ -113,8 +113,6 @@ class FilterWidgetLib
 	public function __construct($params = null)
 	{
 		$this->_ci =& get_instance(); // get code igniter instance
-
-		$this->_filterUniqueId = $this->_getFilterUniqueId($params); // sets the id for the related filter widget
 	}
 
 	//------------------------------------------------------------------------------------------------------------------
@@ -782,19 +780,34 @@ class FilterWidgetLib
 	 * NOTE: The default value is the URI where the FilterWidget is called
 	 * If the fhc_controller_id is present then is also used
 	 */
-	private function _getFilterUniqueId($params)
+	public function setFilterUniqueIdByParams($params)
 	{
 		if ($params != null
 			&& is_array($params)
-			&& isset($params[self::FILTER_PAGE_PARAM])
-			&& !isEmptyString($params[self::FILTER_PAGE_PARAM]))
+			&& isset($params[self::FILTER_UNIQUE_ID])
+			&& !isEmptyString($params[self::FILTER_UNIQUE_ID]))
 		{
-			$filterUniqueId = $params[self::FILTER_PAGE_PARAM];
+			$filterUniqueId = $params[self::FILTER_UNIQUE_ID];
 		}
 		else
 		{
 			// Gets the current page URI
 			$filterUniqueId = $this->_ci->router->directory.$this->_ci->router->class.'/'.$this->_ci->router->method;
+		}
+
+		if ($params != null
+			&& is_array($params)
+			&& (isset($params[self::APP_PARAMETER]) || isset($params[self::DATASET_NAME_PARAMETER]) || isset($params[self::FILTER_ID])))
+		{
+			$app = '';
+			$dataset = '';
+			$filterid = '';
+
+			if (isset($params[self::APP_PARAMETER])) $app = $params[self::APP_PARAMETER];
+			if (isset($params[self::DATASET_NAME_PARAMETER])) $dataset = $params[self::DATASET_NAME_PARAMETER];
+			if (isset($params[self::FILTER_ID])) $filterid = $params[self::FILTER_ID];
+
+			$filterUniqueId .= '/'.$app.':'.$dataset.':'.$filterid;
 		}
 
 		// If the FHC_CONTROLLER_ID parameter is present in the HTTP GET
@@ -807,7 +820,25 @@ class FilterWidgetLib
 			$filterUniqueId .= '/'.$this->_ci->input->post(self::FHC_CONTROLLER_ID); // then use it
 		}
 
-		return $filterUniqueId;
+		$this->_filterUniqueId = $filterUniqueId;
+	}
+
+	/**
+	 *
+	 */
+	public function setFilterUniqueId($filterUniqueId)
+	{
+		// If the FHC_CONTROLLER_ID parameter is present in the HTTP GET
+		if (isset($_GET[self::FHC_CONTROLLER_ID]))
+		{
+			$filterUniqueId .= '/'.$this->_ci->input->get(self::FHC_CONTROLLER_ID); // then use it
+		}
+		elseif (isset($_POST[self::FHC_CONTROLLER_ID])) // else if the FHC_CONTROLLER_ID parameter is present in the HTTP POST
+		{
+			$filterUniqueId .= '/'.$this->_ci->input->post(self::FHC_CONTROLLER_ID); // then use it
+		}
+
+		$this->_filterUniqueId = $filterUniqueId;
 	}
 
 	/**

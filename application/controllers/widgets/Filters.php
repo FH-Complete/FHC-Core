@@ -12,7 +12,7 @@ if (! defined('BASEPATH')) exit('No direct script access allowed');
  */
 class Filters extends FHC_Controller
 {
-	const FILTER_PAGE_PARAM = 'filter_page';
+	const FILTER_UNIQUE_ID = 'filterUniqueId';
 
 	/**
 	 * Calls the parent's constructor and loads the FilterWidgetLib
@@ -231,31 +231,33 @@ class Filters extends FHC_Controller
 	}
 
 	/**
-	 * Loads the FilterWidgetLib with the FILTER_PAGE_PARAM parameter
-	 * If the parameter FILTER_PAGE_PARAM is not given then the execution of the controller is terminated and
+	 * Loads the FilterWidgetLib with the FILTER_UNIQUE_ID parameter
+	 * If the parameter FILTER_UNIQUE_ID is not given then the execution of the controller is terminated and
 	 * an error message is printed
 	 */
 	private function _loadFilterWidgetLib()
 	{
-		// If the parameter FILTER_PAGE_PARAM is present in the HTTP GET or POST
-		if (isset($_GET[self::FILTER_PAGE_PARAM]) || isset($_POST[self::FILTER_PAGE_PARAM]))
+		// If the parameter FILTER_UNIQUE_ID is present in the HTTP GET or POST
+		if (isset($_GET[self::FILTER_UNIQUE_ID]) || isset($_POST[self::FILTER_UNIQUE_ID]))
 		{
 			// If it is present in the HTTP GET
-			if (isset($_GET[self::FILTER_PAGE_PARAM]))
+			if (isset($_GET[self::FILTER_UNIQUE_ID]))
 			{
-				$filterPage = $this->input->get(self::FILTER_PAGE_PARAM); // is retrieved from the HTTP GET
+				$filterUniqueId = $this->input->get(self::FILTER_UNIQUE_ID); // is retrieved from the HTTP GET
 			}
-			elseif (isset($_POST[self::FILTER_PAGE_PARAM])) // Else if it is present in the HTTP POST
+			elseif (isset($_POST[self::FILTER_UNIQUE_ID])) // Else if it is present in the HTTP POST
 			{
-				$filterPage = $this->input->post(self::FILTER_PAGE_PARAM); // is retrieved from the HTTP POST
+				$filterUniqueId = $this->input->post(self::FILTER_UNIQUE_ID); // is retrieved from the HTTP POST
 			}
 
 			// Loads the FilterWidgetLib that contains all the used logic
-			$this->load->library('FilterWidgetLib', array(self::FILTER_PAGE_PARAM => $filterPage));
+			$this->load->library('FilterWidgetLib');
+
+			$this->filterwidgetlib->setFilterUniqueId($filterUniqueId);
 		}
 		else // Otherwise an error will be written in the output
 		{
-			$this->terminateWithJsonError('Parameter "'.self::FILTER_PAGE_PARAM.'" not provided!');
+			$this->terminateWithJsonError('Parameter "'.self::FILTER_UNIQUE_ID.'" not provided!');
 		}
 	}
 }
