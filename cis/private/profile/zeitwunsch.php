@@ -29,7 +29,10 @@ require_once('../../../include/globals.inc.php');
 require_once('../../../include/functions.inc.php');
 require_once('../../../include/datum.class.php');
 require_once('../../../include/zeitwunsch.class.php');
+require_once('../../../include/studiensemester.class.php');
+require_once('../../../include/zeitaufzeichnung_gd.class.php');
 require_once('../../../include/benutzer.class.php');
+require_once('../../../include/mitarbeiter.class.php');
 require_once('../../../include/phrasen.class.php');
 require_once('../../../include/sprache.class.php');
 
@@ -45,6 +48,7 @@ $uid = get_uid();
 
 if(!check_lektor($uid))
 	die($p->t('global/keineBerechtigungFuerDieseSeite'));
+
 
 $PHP_SELF = $_SERVER['PHP_SELF'];
 
@@ -107,6 +111,36 @@ $person = new benutzer();
 if(!$person->load($uid))
 	die($person->errormsg);
 
+$ma = new mitarbeiter($uid);
+$fixangestellt = $ma->fixangestellt;
+
+// Nächstes Studiensemester
+$ss = new Studiensemester();
+$ss->getNextStudiensemester();
+$next_ss = $ss->studiensemester_kurzbz;
+
+// Erklärung zu Pausen bei geteilten Arbeitszeiten speichern
+if (isset($_GET['selbstverwaltete-pause']) && !empty($_GET['submit']))
+{
+    $selbstverwaltete_pause = ($_GET['selbstverwaltete-pause'] == 'yes') ? true : false;
+
+    $zeitaufzeichnung_gd = new Zeitaufzeichnung_gd();
+    $zeitaufzeichnung_gd->uid = $uid;
+    $zeitaufzeichnung_gd->studiensemester_kurzbz = $next_ss;
+    $zeitaufzeichnung_gd->selbstverwaltete_pause = $selbstverwaltete_pause;
+	$za_gd = new Zeitaufzeichnung_gd();
+	$za_gd->load($uid, $next_ss);
+	if ($za_gd->uid)
+	{
+		echo 'Bereits eingetragen';
+	}
+    else if (!$zeitaufzeichnung_gd->save())
+    {
+        echo $zeitaufzeichnung_gd->errormsg;
+    }
+
+}
+
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
@@ -143,8 +177,42 @@ if(!$person->load($uid))
 	</head>
 
 	<body>
+
 	<div class="flexcroll" style="outline: none;">
 	<table>
+<?php if($fixangestellt && (defined('CIS_ZEITWUNSCH_GD') && CIS_ZEITWUNSCH_GD)): ?>
+		<!--Erklärung zu Pausen bei geteilten Arbeitszeiten-->
+		<tr>
+			<td>
+				<h1>Zustimmung zur Verplanung in geteilter Arbeitszeit</h1>
+
+			<form action="">
+				<p>
+					<?php
+					echo $p->t('zeitwunsch/geteilteArbeitszeit');
+					$gd = new zeitaufzeichnung_gd();
+					$gd->load($uid, $next_ss);
+					if ( ! $gd->uid )
+					{
+						echo '<br><br><h3>Zustimmung für '.$next_ss.': ';
+						echo '<input type="radio" name="selbstverwaltete-pause" value="yes">ja';
+						echo '<input type="radio" name="selbstverwaltete-pause" value="no">nein';
+						echo '</h3><br><br><input type="submit" name="submit" value="'.$p->t('global/speichern').'" style="float: right"><br>';
+					}
+					else
+					{
+						$zustimmung = ($gd->selbstverwaltete_pause) ? ' erteilt' : 'abgelehnt';
+						echo '<br><br><h3>Zustimmung für '.$next_ss.': '.$zustimmung.' am '.$datum_obj->formatDatum($gd->insertamum,'d.m.Y H:i:s').'</h3>';
+					}
+					//var_dump($gd);
+					?>
+
+				</p>
+			</form>
+		<br><hr>
+		</td>
+	</tr>
+<?php endif; ?>
 	  <tr>
 	    <td>
 	    <h1><?php echo $p->t('zeitwunsch/zeitwunsch');?></h1>
@@ -206,12 +274,16 @@ if(!$person->load($uid))
 			?>
 
 			</FORM>
-			<hr><?php
-			$href = "<a href='zeitsperre_resturlaub.php' class='Item'>";
-			echo $p->t('zeitwunsch/formularZumEintragenDerZeitsperren', array($href));
-			?>
-			</a>
-			<h3><?php echo $p->t('zeitwunsch/erklärung');?>:</h3>
+
+			<br>
+
+			<h2><?php echo $p->t('zeitwunsch/erklärung');?>:</h2>
+
+            <?php
+            $href = "<a href='zeitsperre_resturlaub.php' class='Item'>";
+            echo $p->t('zeitwunsch/formularZumEintragenDerZeitsperren', array($href));
+            ?>
+            </a>
 			<P><?php echo $p->t('zeitwunsch/kontrollierenSieIhreZeitwuensche');?>!<BR><BR>
 			</P>
 			<TABLE align=center>

@@ -233,7 +233,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 								<template>
 									<menupopup>
 										<menuitem value="rdf:http://www.technikum-wien.at/lehrveranstaltung/rdf#lehrveranstaltung_id"
-							        		      label="rdf:http://www.technikum-wien.at/lehrveranstaltung/rdf#bezeichnung rdf:http://www.technikum-wien.at/lehrveranstaltung/rdf#orgform_kurzbz (rdf:http://www.technikum-wien.at/lehrveranstaltung/rdf#semester Sem)"
+							        		      label="rdf:http://www.technikum-wien.at/lehrveranstaltung/rdf#bezeichnung rdf:http://www.technikum-wien.at/lehrveranstaltung/rdf#orgform_kurzbz (rdf:http://www.technikum-wien.at/lehrveranstaltung/rdf#semester Sem) ID: rdf:http://www.technikum-wien.at/lehrveranstaltung/rdf#lehrveranstaltung_id"
 										  		  uri="rdf:*"/>
 									</menupopup>
 								</template>
@@ -247,7 +247,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 								<template>
 									<menupopup>
 										<menuitem value="rdf:http://www.technikum-wien.at/lehreinheit/rdf#lehreinheit_id"
-							        		      label="rdf:http://www.technikum-wien.at/lehreinheit/rdf#bezeichnung rdf:http://www.technikum-wien.at/lehreinheit/rdf#studiensemester_kurzbz"
+							        		      label="rdf:http://www.technikum-wien.at/lehreinheit/rdf#bezeichnung rdf:http://www.technikum-wien.at/lehreinheit/rdf#studiensemester_kurzbz ID: rdf:http://www.technikum-wien.at/lehreinheit/rdf#lehreinheit_id"
 										  		  uri="rdf:*"/>
 									</menupopup>
 								</template>

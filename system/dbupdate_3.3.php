@@ -2952,7 +2952,7 @@ if(!$result = @$db->db_query("SELECT vertragsstunden FROM lehre.tbl_vertrag LIMI
 // Spalte vertragsstunden_studiensemester_kurzbz für tbl_vertrag
 if(!$result = @$db->db_query("SELECT vertragsstunden_studiensemester_kurzbz FROM lehre.tbl_vertrag LIMIT 1"))
 {
-	$qry = "
+    $qry = "
 		ALTER TABLE lehre.tbl_vertrag 
 			ADD COLUMN vertragsstunden_studiensemester_kurzbz VARCHAR(16);
 			
@@ -2963,10 +2963,90 @@ if(!$result = @$db->db_query("SELECT vertragsstunden_studiensemester_kurzbz FROM
 					ON UPDATE CASCADE ON DELETE RESTRICT;
 	";
 
-	if(!$db->db_query($qry))
-		echo '<strong>lehre.tbl_vertrag: '.$db->db_last_error().'</strong><br>';
+    if (!$db->db_query($qry))
+        echo '<strong>lehre.tbl_vertrag: ' . $db->db_last_error() . '</strong><br>';
+    else
+        echo '<br>lehre.tbl_vertrag: Spalte vertragsstunden_studiensemester_kurzbz hinzugefuegt';
+}
+
+// Create SEQUENCE tbl_zeitaufzeichnung_gd_id
+if ($result = $db->db_query("SELECT 0 FROM pg_class WHERE relname = 'tbl_zeitaufzeichnung_gd_id_seq'"))
+{
+	if ($db->db_num_rows($result) == 0)
+	{
+		$qry = '
+			CREATE SEQUENCE campus.tbl_zeitaufzeichnung_gd_id_seq
+			    START WITH 1
+			    INCREMENT BY 1
+			    NO MAXVALUE
+			    NO MINVALUE
+			    CACHE 1;
+			';
+		if (!$db->db_query($qry))
+			echo '<strong>campus.tbl_zeitaufzeichnung_gd_id_seq '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>Created sequence: campus.tbl_zeitaufzeichnung_gd_id_seq';
+
+		// GRANT SELECT, UPDATE ON SEQUENCE campus.tbl_zeitaufzeichnung_gd_id_seq TO web;
+		$qry = 'GRANT SELECT, UPDATE ON SEQUENCE campus.tbl_zeitaufzeichnung_gd_id_seq TO web;';
+		if (!$db->db_query($qry))
+			echo '<strong>campus.tbl_zeitaufzeichnung_gd_id_seq '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>Granted privileges to <strong>vilesci</strong> on campus.tbl_zeitaufzeichnung_gd_id_seq';
+
+		// GRANT SELECT, UPDATE ON SEQUENCE campus.tbl_zeitaufzeichnung_gd_id_seq TO vilesci;
+		$qry = 'GRANT SELECT, UPDATE ON SEQUENCE campus.tbl_zeitaufzeichnung_gd_id_seq TO vilesci;';
+		if (!$db->db_query($qry))
+			echo '<strong>campus.tbl_zeitaufzeichnung_gd_id_seq '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>Granted privileges to <strong>vilesci</strong> on campus.tbl_zeitaufzeichnung_gd_id_seq';
+	}
+}
+
+// Create TABLE campus.tbl_zeitaufzeichnung_gd
+if(!@$db->db_query("SELECT 0 FROM campus.tbl_zeitaufzeichnung_gd WHERE 0 = 1")) {
+	$qry = '
+		CREATE TABLE campus.tbl_zeitaufzeichnung_gd
+		(
+			zeitaufzeichnung_gd_id integer     NOT NULL DEFAULT NEXTVAL(\'campus.tbl_zeitaufzeichnung_gd_id_seq\'::regclass),
+			uid                    varchar(32) NOT NULL,
+			studiensemester_kurzbz varchar(16) NOT NULL,
+			selbstverwaltete_pause boolean     NOT NULL,
+			insertamum             TIMESTAMP            DEFAULT NOW(),
+			insertvon              varchar(32),
+			updateamum             TIMESTAMP,
+			updatevon              varchar(32)
+		);
+
+		ALTER TABLE campus.tbl_zeitaufzeichnung_gd ADD CONSTRAINT pk_zeitaufzeichnung_gd_zeitaufzeichnung_gd_id PRIMARY KEY (zeitaufzeichnung_gd_id);
+
+		ALTER TABLE campus.tbl_zeitaufzeichnung_gd ADD CONSTRAINT fk_zeitaufzeichnung_gd_uid FOREIGN KEY (uid) REFERENCES public.tbl_benutzer(uid) ON UPDATE CASCADE ON DELETE RESTRICT;
+		ALTER TABLE campus.tbl_zeitaufzeichnung_gd ADD CONSTRAINT fk_zeitaufzeichnung_gd_studiensemester_kurzbz FOREIGN KEY (studiensemester_kurzbz) REFERENCES public.tbl_studiensemester(studiensemester_kurzbz) ON UPDATE CASCADE ON DELETE RESTRICT;
+		ALTER TABLE campus.tbl_zeitaufzeichnung_gd ADD CONSTRAINT uk_zeitaufzeichnung_gd_uid_stsem UNIQUE (uid, studiensemester_kurzbz);
+
+		COMMENT ON TABLE campus.tbl_zeitaufzeichnung_gd IS \'Table to manage the lectors parted working times; gd = Geteilte Dienste\';
+		COMMENT ON COLUMN campus.tbl_zeitaufzeichnung_gd.selbstverwaltete_pause IS \'Lectors (dis-)agreement to self-manage breaks\';
+
+		';
+	if (!$db->db_query($qry))
+		echo '<strong>campus.tbl_zeitaufzeichnung_gd ' . $db->db_last_error() . '</strong><br>';
 	else
-		echo '<br>lehre.tbl_vertrag: Spalte vertragsstunden_studiensemester_kurzbz hinzugefuegt';
+		echo '<br>Created table campus.tbl_zeitaufzeichnung_gd';
+
+
+	// GRANT SELECT, UPDATE, INSERT, DELETE ON TABLE campus.tbl_zeitaufzeichnung_gd TO web;
+	$qry = 'GRANT SELECT, UPDATE, INSERT, DELETE ON TABLE campus.tbl_zeitaufzeichnung_gd TO web;';
+	if (!$db->db_query($qry))
+		echo '<strong>campus.tbl_zeitaufzeichnung_gd ' . $db->db_last_error() . '</strong><br>';
+	else
+		echo '<br>Granted privileges to <strong>web</strong> on campus.tbl_zeitaufzeichnung_gd';
+
+	// GRANT SELECT, UPDATE, INSERT, DELETE ON TABLE campus.tbl_zeitaufzeichnung_gd TO vilesci;
+	$qry = 'GRANT SELECT, UPDATE, INSERT, DELETE ON TABLE campus.tbl_zeitaufzeichnung_gd TO vilesci;';
+	if (!$db->db_query($qry))
+		echo '<strong>campus.tbl_zeitaufzeichnung_gd ' . $db->db_last_error() . '</strong><br>';
+	else
+		echo '<br>Granted privileges to <strong>vilesci</strong> on campus.tbl_zeitaufzeichnung_gd';
 }
 
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
@@ -3053,6 +3133,7 @@ $tabellen=array(
 	"campus.tbl_veranstaltung"  => array("veranstaltung_id","titel","beschreibung","veranstaltungskategorie_kurzbz","inhalt","start","ende","freigabevon","freigabeamum","updateamum","updatevon","insertamum","insertvon"),
 	"campus.tbl_veranstaltungskategorie"  => array("veranstaltungskategorie_kurzbz","bezeichnung","bild","farbe"),
 	"campus.tbl_zeitaufzeichnung"  => array("zeitaufzeichnung_id","uid","aktivitaet_kurzbz","projekt_kurzbz","start","ende","beschreibung","oe_kurzbz_1","oe_kurzbz_2","insertamum","insertvon","updateamum","updatevon","ext_id","service_id","kunde_uid"),
+	"campus.tbl_zeitaufzeichnung_gd"  => array("zeitaufzeichnung_gd_id","uid","studiensemester_kurzbz","selbstverwaltete_pause","insertamum","insertvon","updateamum","updatevon"),
 	"campus.tbl_zeitsperre"  => array("zeitsperre_id","zeitsperretyp_kurzbz","mitarbeiter_uid","bezeichnung","vondatum","vonstunde","bisdatum","bisstunde","vertretung_uid","updateamum","updatevon","insertamum","insertvon","erreichbarkeit_kurzbz","freigabeamum","freigabevon"),
 	"campus.tbl_zeitsperretyp"  => array("zeitsperretyp_kurzbz","beschreibung","farbe"),
 	"campus.tbl_zeitwunsch"  => array("stunde","mitarbeiter_uid","tag","gewicht","updateamum","updatevon","insertamum","insertvon"),
@@ -3262,7 +3343,7 @@ $i=0;
 $errors = 0;
 foreach ($tabellen AS $attribute)
 {
-	$sql_attr='';
+	$sql_attr = '';
 	foreach($attribute AS $attr)
 		$sql_attr.='"'.$attr.'",';
 	$sql_attr=substr($sql_attr, 0, -1);

@@ -367,7 +367,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 		<text:p text:style-name="P2"/>
 		<text:p text:style-name="P6">Familienname: <text:tab/><xsl:value-of select="nachname"/></text:p>
 		<text:p text:style-name="P6">Vorname: <text:tab/><xsl:value-of select="vorname"/></text:p>
-		<text:p text:style-name="P6">Akademische/r Titel: <text:tab/>		
+		<text:p text:style-name="P6">Akademische/r Titel: <text:tab/>
 		<xsl:choose>
 			<xsl:when test="titelpre!='' or titelpost!=''">
 			<xsl:value-of select="titelpre"/><xsl:value-of select="titelpost"/>
@@ -390,7 +390,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 			</text:list>
 		</text:list-item>
 		</text:list>
-		<text:p text:style-name="P5">Studienort sind die Räumlichkeiten der FH Technikum Wien, 1200 Wien, Höchstädtplatz und 1210 Wien, Giefinggasse. Bei Bedarf kann der Erhalter einen anderen Studienort in Wien festlegen, außerhochschulische Aktivitäten (zB Exkursionen) können auch außerhalb von Wien stattfinden.</text:p>
+		<text:p text:style-name="P5">Studienort sind die Räumlichkeiten der FH Technikum Wien, 1200 Wien, Standort Höchstädtplatz und 1210 Wien, Standort Giefinggasse. Bei Bedarf kann der Erhalter einen anderen Studienort in Wien festlegen, außerhochschulische Aktivitäten (zB Exkursionen) können auch außerhalb von Wien stattfinden.</text:p>
 		<text:p text:style-name="P36"/>
 		<text:list xml:id="list932404618" text:continue-numbering="true" text:style-name="WW8Num7">
 		<text:list-item>
@@ -436,8 +436,6 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 		</text:list>
 		<text:p text:style-name="P27"><text:bookmark-start text:name="_Ref78865698"/>5.1 Rechte<text:bookmark-end text:name="_Ref78865698"/></text:p>
 		<text:p text:style-name="P5">Der Erhalter führt eine periodische Überprüfung des die Lehrveranstaltungen anbietenden Studiengangs im Hinblick auf Relevanz und Aktualität durch und ist im Einvernehmen mit dem FH-Kollegium berechtigt, daraus Änderungen im Lehrangebot des Studienganges abzuleiten.</text:p>
-		<text:p text:style-name="P5"/>
-		<text:p text:style-name="P5">Der Erhalter ist berechtigt, die Daten der/des ao. Studierenden an den FH Technikum Wien Alumni Club zu übermitteln. Der Alumni Club ist der AbsolventInnenverein der FH Technikum Wien. Er hat zum Ziel, AbsolventInnen, Studierende und Lehrende miteinander zu vernetzen sowie AbsolventInnen laufend über Aktivitäten an der FH Technikum Wien zu informieren. Einer Zusendung von Informationen durch den Alumni Club kann jederzeit widersprochen werden.</text:p>
 		<text:list xml:id="list1539722475" text:style-name="WW8Num4">
 		<text:list-header>
 			<text:p text:style-name="P39"/>
@@ -475,7 +473,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 		<text:p text:style-name="P14"/>
 		<text:p text:style-name="P28">6.2 Pflichten</text:p>
 		<text:p text:style-name="P29">6.2.1 Einhaltung studienrelevanter Bestimmungen</text:p>
-		<text:p text:style-name="P5">Die ao. Studentin bzw der ao. Student ist verpflichtet, insbesondere folgende Bestimmungen einzuhalten:</text:p>
+		<text:p text:style-name="P5">Folgende Bestimmungen sind Bestandteil des Ausbildungsvertrags und von der ao. StudentIn/dem Studenten einzuhalten:</text:p>
 		<text:list xml:id="list2358297635" text:continue-list="list1245891399" text:style-name="WW8Num4">
 			<text:list-item>
 				<text:p text:style-name="P40">Studienordnung und Studienrechtliche Bestimmungen / Prüfungsordnung idgF</text:p>
@@ -494,7 +492,25 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 			</text:list-item>
 		</text:list>
 		<text:p text:style-name="P5"/>
-		<text:p text:style-name="P5">Diese Dokumente sind öffentlich zugänglich unter www.technikum-wien.at.</text:p>
+		<text:p text:style-name="P5">Diese Dokumente sind öffentlich zugänglich unter www.technikum-wien.at und nach Erhalt der Zugangsdaten auch im Intranet
+			<text:span text:style-name="T10"><text:span text:style-name="T10">abrufbar</text:span>
+				<text:span text:style-name="Footnote_20_Symbol">
+					<text:span text:style-name="T10">
+						<text:note text:id="ftn1" text:note-class="footnote">
+							<text:note-citation text:label="1">1</text:note-citation>
+							<text:note-body>
+								<text:p text:style-name="Standard">
+									<text:span text:style-name="T4">
+										<text:s/>
+									</text:span>
+									<text:span text:style-name="T5">https://www.technikum-wien.at/ueber-uns/satzung-und-leitbild-der-fh-technikum-wien/ oder CIS – Dokumente – Satzung</text:span>
+								</text:p>
+							</text:note-body>
+						</text:note>
+					</text:span>
+				</text:span>
+			</text:span>
+			 und werden bei den Einführungsveranstaltungen vorgestellt.</text:p>
 		<text:p text:style-name="P29">6.2.2 Studienbeitrag</text:p>
 		<text:p text:style-name="P5">Die ao. Studentin bzw. der ao. Student ist verpflichtet, vor Beginn jedes Semesters bis zum jeweils bekannt gegebenen Termin einen Studienbeitrag gemäß Fachhochschul-Studiengesetz idgF in der Höhe von derzeit € 363,36 netto pro Semester zu entrichten. Im Falle einer Erhöhung des gesetzlichen Studienbeitragssatzes erhöht sich der angeführte Betrag entsprechend. Die vollständige Bezahlung des Studienbeitrags ist Voraussetzung für die Aufnahme bzw. die Fortsetzung des ao. Studiums. Bei Nichtantritt des ao. Studiums oder Abbruch zu Beginn oder während des Semesters verfällt der Studienbeitrag.</text:p>
 		<text:p text:style-name="P31">6.2.3 ÖH-Beitrag</text:p>
@@ -503,15 +519,18 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 		<text:p text:style-name="P41">Pro Semester ist ein Unkostenbeitrag zu entrichten. Die Höhe des Unkostenbeitrages beträgt € 75,– pro Semester. Eine allfällige Anpassung wird durch Aushang bekannt gemacht. Der Unkostenbeitrag ist gleichzeitig mit dem Studienbeitrag vor Beginn des Semesters zu entrichten. Bei Vertragsauflösung vor dem Ende der besuchten Lehrveranstaltungen aus Gründen, die die ao. Studentin bzw. der ao. Student zu vertreten hat, oder auf deren bzw. dessen Wunsch, wird der Unkostenbeitrag zur Abdeckung der dem Erhalter erwachsenen administrativen Zusatzkosten einbehalten.</text:p>
 		<text:p text:style-name="P32">6.2.5 Lehr- und Lernbehelfe</text:p>
 		<text:p text:style-name="P8">Die Anschaffung unterrichtsbezogener Literatur und individueller Lernbehelfe ist durch den Unkostenbeitrag nicht abgedeckt. Eventuelle zusätzliche Kosten, die sich beispielsweise durch die lehrveranstaltungsbezogene, gemeinsame Anschaffung von Lehr- bzw. Lernbehelfen (Skripten, CDs, Bücher, Projektmaterialien, Kopierpapier etc.) oder durch Exkursionen ergeben, werden von jedem Studiengang individuell eingehoben.</text:p>
-		<text:p text:style-name="P32">6.2.6 Beibringung persönlicher Daten</text:p>
-		<text:p text:style-name="P35">Die ao. Studentin bzw. der ao. Student ist verpflichtet, persönliche Daten beizubringen, die auf Grund eines Gesetzes, einer Verordnung oder eines Bescheides vom Erhalter erfasst werden müssen oder zur Erfüllung des Ausbildungsvertrages bzw für den Studienbetrieb unerlässlich sind.</text:p>
-		<text:p text:style-name="P32">6.2.7 Aktualisierung eigener Daten und Bezug von Informationen</text:p>
+		<text:p text:style-name="P32">6.2.6 Beibringung und Aktualisierung von personenbezogenen Daten</text:p>
+		<text:p text:style-name="P35">Die ao. Studentin bzw. der ao. Student ist verpflichtet, personenbezogene Daten beizubringen, die auf Grund eines Gesetzes, einer Verordnung oder eines Bescheides vom Erhalter erfasst werden müssen oder zur Erfüllung des Ausbildungsvertrages bzw. für den Studienbetrieb unerlässlich sind.</text:p>
 		<text:p text:style-name="P35">Die ao. Studentin bzw. der ao. Student hat unaufgefordert dafür zu sorgen, dass die von ihr/ihm beigebrachten Daten aktuell sind. Änderungen sind der Studiengangsassistenz unverzüglich schriftlich mitzuteilen. Darüber hinaus trifft sie/ihn die Pflicht, sich von studienbezogenen Informationen, die ihr/ihm an die vom Erhalter zur Verfügung gestellte Emailadresse zugestellt werden, in geeigneter Weise Kenntnis zu verschaffen.</text:p>
+		<text:p text:style-name="P35">Es ist der ao. Studentin/dem ao. Studenten untersagt, die Daten des von der FH zur Verfügung gestellten Studierendenaccounts weiterzugeben.</text:p>
+		<text:p text:style-name="P32">6.2.7 Bezug von Informationen durch die FH Gruppe</text:p>
+		<text:p text:style-name="P35">Der Erhalter ist berechtigt, die Daten der/des ao. Studierenden an den FH Technikum Wien Alumni Club zu übermitteln. Der Alumni Club ist der AbsolventInnenverein der FH Technikum Wien. Er hat zum Ziel, AbsolventInnen, Studierende und Lehrende miteinander zu vernetzen sowie AbsolventInnen laufend über Aktivitäten an der FH Technikum Wien zu informieren. Einer Zusendung von Informationen durch den Alumni Club kann jederzeit widersprochen werden.</text:p>
+		<text:p text:style-name="P35">Der/die ao. Studierende stimmt zu, dass ihm/ihr Informationen der FH Gruppe (FH Technikum Wien, Technikum Wien GmbH sowie Technikum Wien Alumni Club) zur Pflege der Kontakte per E-Mail zugestellt werden (§ 107 TKG 2003 idgF). Ein Abbestellen dieser Informationen ist jederzeit möglich.</text:p>
 		<text:p text:style-name="P32">6.2.8 Verwertungsrechte</text:p>
 		<text:p text:style-name="P35">Sofern nicht im Einzelfall andere Regelungen zwischen dem Erhalter und der ao. Studentin oder dem ao. Studenten getroffen wurden, ist die ao. Studentin oder der ao. Student verpflichtet, dem Erhalter die Rechte an Forschungs- und Entwicklungsergebnissen, die im Rahmen von geförderten Projekten geschaffen wurden, auf dessen schriftliche Anfrage hin einzuräumen.</text:p>
 		<text:p text:style-name="P32">6.2.9 Aufzeichnungen und Mitschnitte</text:p>
-		<text:p text:style-name="P35">Es ist der/dem ao. Studierenden ausdrücklich untersagt, Lehrveranstaltungen als Ganzes oder nur Teile davon aufzuzeichnen und/oder mitzuschneiden (z.B. durch Film- und/oder Tonaufnahmen oder sonstige hierfür geeignete audiovisuelle Mittel). Darüber hinaus ist jede Form der öffentlichen Zurverfügungstellung (drahtlos oder drahtgebunden) der vorgenannten Aufnahmen z.B. in sozialen Netzwerken wie Facebook, StudiVZ etc, aber auch auf Youtube usw. oder durch sonstige für diese Zwecke geeignete Kommunikationsmittel untersagt. Diese Regelungen gelten sinngemäß auch für Skripten, sonstige Lernbehelfe und Prüfungsangaben.</text:p>
-		<text:p text:style-name="P35">Ausgenommen hiervon ist eine Aufzeichnung zu ausschließlichen Lern-, Studien- und Forschungszwecken und zum privaten Gebrauch, sofern hierfür der/die Vortragende vorab ausdrücklich seine/ihre schriftliche Zustimmung erteilt hat.</text:p>
+		<text:p text:style-name="P35">Es ist der/dem ao. Studierenden ausdrücklich untersagt, Lehrveranstaltungen als Ganzes oder nur Teile davon aufzuzeichnen und/oder mitzuschneiden (z.B. durch Film- und/oder Tonaufnahmen oder sonstige hierfür geeignete audiovisuelle Mittel) oder in Lehrveranstaltungen zu fotografieren. Darüber hinaus ist jede Form der öffentlichen Zurverfügungstellung (drahtlos oder drahtgebunden) der vorgenannten Aufnahmen z.B. in sozialen Netzwerken wie Facebook, StudiVZ etc, aber auch auf Youtube usw. oder durch sonstige für diese Zwecke geeignete Kommunikationsmittel untersagt. Diese Regelungen gelten sinngemäß auch für Skripten, sonstige Lernbehelfe und Prüfungsangaben.</text:p>
+		<text:p text:style-name="P35">Ausgenommen hiervon ist eine Aufzeichnung zu ausschließlichen Lern-, Studien- und Forschungszwecken und zum privaten Gebrauch, sofern hierfür der/die Vortragende und alle auf diesen Aufnahmen erkennbaren Personen vorab ausdrücklich seine/ihre schriftliche Zustimmung erteilt hat.</text:p>
 		<text:p text:style-name="P31">6.2.10 Geheimhaltungspflicht<text:bookmark-end text:name="_Ref78867653"/></text:p>
 		<text:p text:style-name="P5">Die ao. Studentin bzw. der ao. Student ist zur Geheimhaltung von Forschungs- und Entwicklungsaktivitäten und -ergebnissen gegenüber Dritten verpflichtet.</text:p>
 		<text:p text:style-name="P31">6.2.11 Unfallmeldung</text:p>
@@ -540,7 +559,25 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 		<text:p text:style-name="P5">Der Erhalter kann die ao. Studentin bzw. den ao. Studenten aus wichtigem Grund mit sofortiger Wirkung vom weiteren Besuch einer bestimmten Lehrveranstaltung ausschließen, und zwar beispielsweise wegen</text:p>
 		<text:list xml:id="list1474649563" text:continue-list="list1358297633" text:style-name="WW8Num4">
 		<text:list-item>
-			<text:p text:style-name="P40">nicht genügender Leistung im Sinne der Prüfungsordnung;</text:p>
+			<text:p text:style-name="P40">nicht genügender Leistung im Sinne der
+				<text:span text:style-name="T10"><text:span text:style-name="T10">Prüfungsordnung</text:span>
+					<text:span text:style-name="Footnote_20_Symbol">
+						<text:span text:style-name="T10">
+							<text:note text:id="ftn1" text:note-class="footnote">
+								<text:note-citation text:label="2">2</text:note-citation>
+								<text:note-body>
+									<text:p text:style-name="Standard">
+										<text:span text:style-name="T4">
+											<text:s/>
+										</text:span>
+										<text:span text:style-name="T5"> https://www.technikum-wien.at/ueber-uns/satzung-und-leitbild-der-fh-technikum-wien/ oder CIS – Dokumente - Satzung</text:span>
+									</text:p>
+									<text:p text:style-name="P10"/>
+								</text:note-body>
+							</text:note>
+						</text:span>
+					</text:span>
+				</text:span>;</text:p>
 		</text:list-item>
 		<text:list-item>
 			<text:p text:style-name="P40">mehrmaligem unentschuldigten Verletzen der Anwesenheitspflicht ;</text:p>
@@ -592,9 +629,9 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 			</text:list>
 		</text:list-item>
 		</text:list>
-		<text:p text:style-name="P5">Das gesamte Studienprogramm wird in englischer Sprache angeboten. Die ao. Studentin bzw. der ao. Student erklärt, die englische Sprache in Wort und Schrift in dem für eine akademische Ausbildung erforderlichen Ausmaß zu beherrschen.</text:p>
+		<text:p text:style-name="P5">Falls das gesamte Studienprogramm in englischer Sprache angeboten wird, erklärt die ao. Studentin bzw. der ao. Student, die englische Sprache in Wort und Schrift in dem für eine akademische Ausbildung erforderlichen Ausmaß zu beherrschen.</text:p>
 		<text:p text:style-name="P17"/>
-		<text:p text:style-name="P5">Ao. Studierende des Studiengangs sind verpflichtet, eine EDV-Ausstattung zu beschaffen und zu unterhalten, die es ermöglicht, an den Fernlehrelementen teilzunehmen. Die gesamten Kosten der Anschaffung und des Betriebs (inkl. Kosten für Internet) trägt der ao. Student bzw. die ao. Studentin.</text:p>
+		<text:p text:style-name="P5">Ao. Studierende sind verpflichtet, eine EDV-Ausstattung zu beschaffen und zu unterhalten, die es ermöglicht, an den Fernlehrelementen teilzunehmen. Die gesamten Kosten der Anschaffung und des Betriebs (inkl. Kosten für Internet und e-mail) trägt der ao. Student bzw. die ao. Studentin.</text:p>
 		<text:p text:style-name="P5"/>
 	</xsl:if>
 
@@ -622,8 +659,6 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 		<text:p text:style-name="P5">Der Ausbildungsvertrag ist gebührenfrei.</text:p>
 		<text:p text:style-name="P5"/>
 		<text:p text:style-name="P5"/>
-		<text:p text:style-name="P5"/>
-		<text:p text:style-name="P5"/>
 		<text:p text:style-name="P18"><text:tab/><text:tab/><text:tab/><text:tab/><text:tab/><text:tab/><text:s text:c="8"/>Wien, <xsl:value-of select="datum_aktuell"/></text:p>
 		<table:table table:name="Tabelle1" table:style-name="Tabelle1">
 		<table:table-column table:style-name="Tabelle1.A"/>
@@ -638,7 +673,6 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 			</table:table-cell>
 			<table:table-cell table:style-name="Tabelle1.A1" office:value-type="string">
 			<text:p text:style-name="P19">Ort, Datum</text:p>
-			<text:p text:style-name="P19"/>
 			<text:p text:style-name="P19"/>
 			<text:p text:style-name="P19"/>
 			<text:p text:style-name="P19"/>

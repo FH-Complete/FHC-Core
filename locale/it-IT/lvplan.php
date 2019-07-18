@@ -2,7 +2,6 @@
 $this->phrasen['lvplan/aktuelleKW']='numero di settimana attuale';
 $this->phrasen['lvplan/alleRaeume']='tutte le sale';
 $this->phrasen['lvplan/alleReservierungen']='tutte le prenotazioni';
-$this->phrasen['lvplan/alleReservierungenAnzeigen']='mostra tutte le prenotazioni';
 $this->phrasen['lvplan/anleitungLVPlanSync']='';
 $this->phrasen['lvplan/anzahlPersonen']='';
 $this->phrasen['lvplan/bereitsReserviert']='';

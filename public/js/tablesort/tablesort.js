@@ -5,9 +5,18 @@ var Tablesort = {
 	 * @param sortList columns to sort by, as array of arrays (each array contains column number and 1/0 for asc/desc order)
 	 * @param widgets optional widgets like zebra or filter
 	 * @param minrows optional minimal amount of rows for filter row to be shown (only relevant for filter widget)
+	 * @param additionalParams any additional parameters as JS object
 	 */
 	addTablesorter: function (tableid, sortList, widgets, minrows, additionalParams)
 	{
+		if (typeof $("#" + tableid)[0] === "undefined")
+			return;
+
+		if ($("#" + tableid)[0].hasInitialized)
+		{
+			$("#" + tableid).trigger("destroy");
+		}
+
 		var tablesorterobj =
 			{
 				theme: "default",
