@@ -48,6 +48,15 @@ if ($studiengang_kz != '')
 		$oe_studiengang = '';
 }
 
+if (isset($_GET['searchItems']))
+{
+	$searchItems = explode(' ', trim($_GET['searchItems']));
+}
+else
+{
+	$searchItems = array();
+}
+
 if (isset($_GET['sem']))
 
 	$sem=$_GET['sem'];
@@ -167,7 +176,7 @@ else
 
 function printDropDown()
 {
-	global $rechte, $studiengang_kz;
+	global $rechte, $studiengang_kz, $searchItems;
 	//Studiengang Drop Down anzeigen
 	$types = new studiengang();
 	$types->getAllTypes();
@@ -199,7 +208,10 @@ function printDropDown()
 		}
 	}
 
-	echo '</SELECT><input type="submit" value="Anzeigen" />';
+	echo '</SELECT>';
+	echo '<br>oder</br>';
+	echo 'Suche: <input name="searchItems" type="text" size="50" value="'.implode(' ',$searchItems).'"/>';
+	echo '<input type="submit" value="Anzeigen" />';
 	echo '</form>';
 }
 function doSave()
@@ -408,13 +420,22 @@ function doEdit($kurzbz,$new=false)
 
 function getUebersicht()
 {
-	global $studiengang_kz, $semester, $rechte;
+	global $studiengang_kz, $semester, $rechte, $searchItems;
 	if (!$db = new basis_db())
 			die('Es konnte keine Verbindung zum Server aufgebaut werden.');
 
 	$gruppe=new gruppe();
+	// Wenn $searchstring gesetz ist, nach gruppe suchen, sonst gruppe mit $studiengang_kz un $semester laden
+	if (!empty($searchItems))
+	{
+		$gruppe->searchGruppen($searchItems, null, null);
+	}
+	else
+	{
+		$gruppe->getgruppe($studiengang_kz,$semester);
+	}
 	// Array mit allen Einheiten holen
-	$gruppe->getgruppe($studiengang_kz,$semester);
+
 
 	echo '<h3>&Uuml;bersicht</h3>';
 	echo '<button type="button" class="resetsaved" title="Reset Filter">Reset Filter</button>';
