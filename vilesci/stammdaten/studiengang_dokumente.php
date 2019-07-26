@@ -228,10 +228,25 @@ echo '<!DOCTYPE HTML>
 	<script type="text/javascript">
 		$(document).ready(function()
 		{
+			$.tablesorter.addParser({
+	        // set a unique id
+			id: "stufe",
+			is: function(s) {
+				// return false so this parser is not auto detected
+				return false;
+			},
+			format: function(s, table, cell) 
+			{
+				return $("input", cell).val();
+			},
+			// set type, either numeric or text
+			type: "numeric"
+		});
 			$("#t1").tablesorter(
 			{
 				sortList: [[0,0]],
-				widgets: ["zebra"]
+				widgets: ["zebra"],
+				headers: {7:{sorter: "stufe"}}
 			});
 			$("#t2").tablesorter(
 			{
@@ -529,10 +544,10 @@ else
 		}
 		if($rechte->isBerechtigt('assistenz', $stg_kz, 'su'))
 		{
-			echo'	<th class="sorter-false" style="text-align: center">Online-Bewerbung</th>
-					<th class="sorter-false" style="text-align: center">Pflicht</th>
-					<th class="sorter-false" style="text-align: center">Nachreichbar</th>
-					<th class="sorter-false" style="text-align: center">Stufe</th>
+			echo'	<th style="text-align: center">Online-Bewerbung</th>
+					<th style="text-align: center">Pflicht</th>
+					<th style="text-align: center">Nachreichbar</th>
+					<th style="text-align: center">Stufe</th>
 					<th class="sorter-false"></th>';
 		}
 		echo'</tr>
@@ -568,9 +583,24 @@ else
 			}
 			if($rechte->isBerechtigt('assistenz', $stg_kz, 'su'))
 			{
-				echo'	<td style="text-align: center"><a href="'.$_SERVER['PHP_SELF'].'?action=toggleonline&dokument_kurzbz='.$dok->dokument_kurzbz.'&stg_kz='.$stg_kz.'"><img src="../../skin/images/'.$checked_onlinebewerbung.'.png" /></a></td>
-						<td style="text-align: center"><a href="'.$_SERVER['PHP_SELF'].'?action=togglepflicht&dokument_kurzbz='.$dok->dokument_kurzbz.'&stg_kz='.$stg_kz.'"><img src="../../skin/images/'.$checked_pflicht.'.png" /></a></td>
-						<td style="text-align: center"><a href="'.$_SERVER['PHP_SELF'].'?action=togglenachreichbar&dokument_kurzbz='.$dok->dokument_kurzbz.'&stg_kz='.$stg_kz.'"><img src="../../skin/images/'.$checked_nachreichbar.'.png" /></a></td>
+				echo'	<td style="text-align: center">
+							<div style="display: none">'.$checked_onlinebewerbung.'</div>
+							<a href="'.$_SERVER['PHP_SELF'].'?action=toggleonline&dokument_kurzbz='.$dok->dokument_kurzbz.'&stg_kz='.$stg_kz.'">
+								<img src="../../skin/images/'.$checked_onlinebewerbung.'.png" />
+							</a>
+						</td>
+						<td style="text-align: center">
+							<div style="display: none">'.$checked_pflicht.'</div>
+							<a href="'.$_SERVER['PHP_SELF'].'?action=togglepflicht&dokument_kurzbz='.$dok->dokument_kurzbz.'&stg_kz='.$stg_kz.'">
+								<img src="../../skin/images/'.$checked_pflicht.'.png" />
+							</a>
+						</td>
+						<td style="text-align: center">
+							<div style="display: none">'.$checked_nachreichbar.'</div>
+							<a href="'.$_SERVER['PHP_SELF'].'?action=togglenachreichbar&dokument_kurzbz='.$dok->dokument_kurzbz.'&stg_kz='.$stg_kz.'">
+								<img src="../../skin/images/'.$checked_nachreichbar.'.png" />
+							</a>
+						</td>
 						<td style="text-align: left; width: 60px">
 							<input style="width: 30px" type="text" id="stufe_'.$dok->dokument_kurzbz.'" value="'.$dok->stufe.'" tabindex="1" onchange="changeStufe(\''.$dok->dokument_kurzbz.'\')">
 							<span id="feedbackSpanTrue_'.$dok->dokument_kurzbz.'" style="display: none"><img style="width: 16px" src="../../skin/images/true.png" /></span>
