@@ -746,13 +746,13 @@ class dms extends basis_db
 				JOIN campus.tbl_dms_version USING(dms_id)
 				JOIN campus.tbl_dms_kategorie USING (kategorie_kurzbz)";
 		// Wenn erstes Zeichen # ist, dieses wegkürzen und checken ob der Rest numerisch ist. Dann nach eindeutiger ID suchen
-		if (substr($suchstring, 0, 1) == '#')
+		/*if (substr($suchstring, 0, 1) == '#')
 		{
 			$suchstring = substr($suchstring, 1);
 			if (is_numeric($suchstring))
 				$qry .= " WHERE tbl_dms.dms_id = ".$this->db_add_param($suchstring, FHC_INTEGER);
 		}
-		else
+		else*/
 		{
 			$qry .= " 	WHERE lower(name) like lower('%".$this->db_escape($suchstring)."%')
 						OR lower(tbl_dms_version.beschreibung) like lower('%".$this->db_escape($suchstring)."%')
