@@ -1,9 +1,11 @@
 <?php
 
+if (! defined('BASEPATH')) exit('No direct script access allowed');
+
 /**
- * REST_Controller takes care about authentication and it loads the AuthLib
+ *
  */
-class APIv1_Controller extends REST_Controller
+class APIv1_Controller extends RESTFul_Controller
 {
 	private $_requiredPermissions;
 
@@ -21,13 +23,14 @@ class APIv1_Controller extends REST_Controller
 
 	/**
 	 * This method is automatically called by CodeIgniter after the execution of the constructor is completed
-	 * - Cheks if the AuthLib was loaded, if not it means that the authentication failed
+	 * - Cheks if the Authlib was loaded, if not it means that the authentication failed
 	 * - Loads the permsission lib and calls permissionlib->isEntitled
 	 * - Checks if the caller is allowed to access to this content with the given permissions
 	 *	 if it is not allowed will set the HTTP header with code 401
 	 * - Calls the parent (REST_Controller) _remap method to performs other checks
+	 * NOTE: this methods override the parent method!!!
 	 */
-	public function _remap($object_called, $arguments)
+	public function _remap($object_called, $arguments = [])
 	{
 		if (isset($this->authlib)) // if set then the authentication is ok
 		{

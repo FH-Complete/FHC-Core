@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "ddbbad487c655512e6983408339cb85f",
-    "content-hash": "b5902c71fe21cd14397101dba5a3080c",
+    "hash": "44a02c1e72626f05e682de2030c8adad",
+    "content-hash": "e0898c2ba3d18593851989029e54bedb",
     "packages": [
         {
             "name": "BlackrockDigital/startbootstrap-sb-admin-2",
@@ -70,6 +70,45 @@
                 "shasum": null
             },
             "type": "library"
+        },
+        {
+            "name": "chriskacerguis/codeigniter-restserver",
+            "version": "3.0.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/chriskacerguis/codeigniter-restserver.git",
+                "reference": "3a5ba0dffdebd24cc215ef714b72208c88304203"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/chriskacerguis/codeigniter-restserver/zipball/3a5ba0dffdebd24cc215ef714b72208c88304203",
+                "reference": "3a5ba0dffdebd24cc215ef714b72208c88304203",
+                "shasum": ""
+            },
+            "require": {
+                "codeigniter/framework": "^3.0.4",
+                "php": ">=5.4.0"
+            },
+            "type": "library",
+            "autoload": {
+                "classmap": [
+                    "application/libraries/Format.php",
+                    "application/libraries/REST_Controller.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Chris Kacerguis",
+                    "role": "Developer"
+                }
+            ],
+            "description": "REST Server for the CodeIgniter framework",
+            "homepage": "https://github.com/chriskacerguis/codeigniter-restserver",
+            "time": "2017-09-23 16:44:55"
         },
         {
             "name": "christianbach/tablesorter",
@@ -1305,28 +1344,28 @@
             "authors": [
                 {
                     "name": "Jim Wigginton",
-                    "email": "terrafrost@php.net",
-                    "role": "Lead Developer"
+                    "role": "Lead Developer",
+                    "email": "terrafrost@php.net"
                 },
                 {
                     "name": "Patrick Monnerat",
-                    "email": "pm@datasphere.ch",
-                    "role": "Developer"
+                    "role": "Developer",
+                    "email": "pm@datasphere.ch"
                 },
                 {
                     "name": "Andreas Fischer",
-                    "email": "bantu@phpbb.com",
-                    "role": "Developer"
+                    "role": "Developer",
+                    "email": "bantu@phpbb.com"
                 },
                 {
                     "name": "Hans-Jürgen Petrich",
-                    "email": "petrich@tronic-media.com",
-                    "role": "Developer"
+                    "role": "Developer",
+                    "email": "petrich@tronic-media.com"
                 },
                 {
                     "name": "Graham Campbell",
-                    "email": "graham@alt-three.com",
-                    "role": "Developer"
+                    "role": "Developer",
+                    "email": "graham@alt-three.com"
                 }
             ],
             "description": "PHP Secure Communications Library - Pure-PHP implementations of RSA, AES, SSH2, SFTP, X.509 etc.",
