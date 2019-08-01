@@ -400,28 +400,23 @@ $filters = array(
 		'oe_kurzbz' => null,
 	),
 	array(
-		'app' => 'infocenter',
-		'dataset_name' => 'reihungstestAbsolviert',
-		'filter_kurzbz' => 'InfoCenterReihungstestAbsolviertAlle',
+		'app' => 'lehrauftrag',
+		'dataset_name' => 'lehrauftragOrder',
+		'filter_kurzbz' => 'LehrauftragOrder',
 		'description' => '{Alle}',
 		'sort' => 1,
 		'default_filter' => true,
 		'filter' => '
 			{
-				"name": "Reihungstest absolviert - Alle",
 				"columns": [
-					{"name": "Vorname"},
-					{"name": "Nachname"},
-					{"name": "StgAbgeschickt"},
-					{"name": "LastAction"},
-					{"name": "User/Operator"},
-					{"name": "LockUser"}
-				],
-				"filters": [
-					{
-						"name": "ReihungstestAngetreten",
-						"operation": "true"
-					}
+					{"name": "Lehrveranstaltung"},
+					{"name": "Organisationseinheit"},
+					{"name": "Lektor"},
+					{"name": "Stunden"},
+					{"name": "Betrag"},
+					{"name": "Bestellung STG"},
+					{"name": "Erteilung Department"},
+					{"name": "Akzeptiert von Lektor"}
 				]
 			}
 		',
@@ -460,7 +455,41 @@ $filters = array(
 			}
 		',
 		'oe_kurzbz' => null,
-	)
+	),
+    array(
+        'app' => 'budget',
+        'dataset_name' => 'budgetoverview',
+        'filter_kurzbz' => 'BudgetUebersicht',
+        'description' => '{Budgetanträge Übersicht}',
+        'sort' => 1,
+        'default_filter' => true,
+        'filter' => '
+			{
+				"name": "Budgetanträge",
+				"columns": [
+					{"name": "Budgetantrag"},
+					{"name": "Kostenstelle"},
+					{"name": "Organisationseinheit"},
+					{"name": "Geschäftsjahr"},
+					{"name": "Budgetstatus"},
+					{"name": "Betrag"}
+				],
+				"filters": [
+					{
+						"name": "Budgetstatus",
+						"condition": "Freigegeben",
+						"operation": "ncontains"
+					},
+					{
+						"name": "Geschäftsjahr",
+						"condition": "GJ2019-2020",
+						"operation": "contains"
+					}
+				]
+			}
+		',
+        'oe_kurzbz' => null,
+    )
 );
 
 // Loop through the filters array

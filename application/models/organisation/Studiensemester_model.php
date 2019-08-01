@@ -13,6 +13,22 @@ class Studiensemester_model extends DB_Model
 		$this->hasSequence = false;
 	}
 
+	// Get next study semester
+	public function getNext()
+    {
+        $query = '
+            SELECT *
+            FROM
+                public.tbl_studiensemester
+            WHERE
+                start > now()
+            ORDER BY start
+            LIMIT 1;
+        ';
+
+        return $this->execQuery($query);
+    }
+
 	/**
 	 * getLastOrAktSemester
 	 */
