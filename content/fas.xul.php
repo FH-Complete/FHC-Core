@@ -110,7 +110,7 @@ foreach($addon_obj->result as $addon)
   <command id="menu-statistic-notenspiegel:command" oncommand="StatistikPrintNotenspiegel('html');"/>
   <command id="menu-statistic-notenspiegel-excel:command" oncommand="StatistikPrintNotenspiegel('xls');"/>
   <command id="menu-statistic-notenspiegel-excel-erweitert:command" oncommand="StatistikPrintNotenspiegelErweitert('xls');"/>
-  <command id="menu-statistic-notenspiegel-student:command" oncommand="StatistikPrintNotenspiegelStudent();"/>
+  <command id="menu-statistic-studienverlauf-student:command" oncommand="StatistikPrintStudienverlaufStudent();"/>
   <command id="menu-statistic-substatistik-studentenprosemester-excel:command" oncommand="StatistikPrintStudentenProSemester('xls');"/>
   <command id="menu-statistic-substatistik-studentenprosemester-html:command" oncommand="StatistikPrintStudentenProSemester('');"/>
   <command id="menu-statistic-substatistik-alvsstatistik-excel:command" oncommand="StatistikPrintALVSStatistik('xls');"/>
@@ -377,14 +377,14 @@ foreach($addon_obj->result as $addon)
 			               label     = "&menu-statistic-notenspiegel.label;"
 			               command   =  "menu-statistic-notenspiegel:command"
 			               accesskey = "&menu-statistic-notenspiegel.accesskey;"/>
-						<menuitem
-   			               id        =  "menu-statistic-notenspiegel-student"
-   			               key       =  "menu-statistic-notenspiegel-student:key"
-   			               label     = "&menu-statistic-notenspiegel-student.label;"
-   			               command   =  "menu-statistic-notenspiegel-student:command"
-   			               accesskey = "&menu-statistic-notenspiegel-student.accesskey;"/>
 					</menupopup>
 				</menu>
+				<menuitem
+				   id        =  "menu-statistic-studienverlauf-student"
+				   key       =  "menu-statistic-studienverlauf-student:key"
+				   label     = "&menu-statistic-studienverlauf-student.label;"
+				   command   =  "menu-statistic-studienverlauf-student:command"
+				   accesskey = "&menu-statistic-studienverlauf-student.accesskey;"/>
             	</menupopup>
           	</menu>
 			<!-- *** Statistik *** -->

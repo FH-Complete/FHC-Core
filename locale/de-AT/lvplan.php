@@ -23,7 +23,6 @@ $this->phrasen['lvplan/fehlerUndFeedback']='Feedback geben';
 $this->phrasen['lvplan/lvKoordinationsstelle']='LV-Koordinationsstelle';
 $this->phrasen['lvplan/reservierungen']='Reservierungen';
 $this->phrasen['lvplan/reservierungWurdeGeloescht']='Reservierung wurde geloescht';
-$this->phrasen['lvplan/alleReservierungenAnzeigen']='Alle Reservierungen anzeigen';
 $this->phrasen['lvplan/alleReservierungen']='Alle Reservierungen';
 $this->phrasen['lvplan/zurReservierung']='Zur Reservierung';
 $this->phrasen['lvplan/raum']='Raum';

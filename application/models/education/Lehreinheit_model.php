@@ -28,6 +28,7 @@ class Lehreinheit_model extends DB_Model
 	{
 		$lehreinheiten = array();
 
+		$this->addOrder('lehreinheit_id');
 		$les = $this->loadWhere(
 			array('lehrveranstaltung_id' => $lehrveranstaltung_id,
 				  'studiensemester_kurzbz' => $studiensemester)
@@ -62,17 +63,17 @@ class Lehreinheit_model extends DB_Model
 							if (hasData($studiengangresponse))
 							{
 								$studiengang = $studiengangresponse->retval[0];
-								$stgkuerzel = mb_strtoupper($studiengang->typ . $studiengang->kurzbz);
+								$stgkuerzel = mb_strtoupper($studiengang->typ.$studiengang->kurzbz);
 
-									$letoadd->lehreinheitgruppen[] = array(
-										'semester' => $lehreinheitgruppe->semester,
-										'verband' => $lehreinheitgruppe->verband,
-										'gruppe' => $lehreinheitgruppe->gruppe,
-										'gruppe_kurzbz' => $lehreinheitgruppe->gruppe_kurzbz,
-										'direktinskription' => $lehreinheitgruppe->direktinskription,
-										'studiengang_kz' => $lehreinheitgruppe->studiengang_kz,
-										'studiengang_kuerzel' => $stgkuerzel
-									);
+								$letoadd->lehreinheitgruppen[] = array(
+									'semester' => $lehreinheitgruppe->semester,
+									'verband' => $lehreinheitgruppe->verband,
+									'gruppe' => $lehreinheitgruppe->gruppe,
+									'gruppe_kurzbz' => $lehreinheitgruppe->gruppe_kurzbz,
+									'direktinskription' => $lehreinheitgruppe->direktinskription,
+									'studiengang_kz' => $lehreinheitgruppe->studiengang_kz,
+									'studiengang_kuerzel' => $stgkuerzel
+								);
 							}
 						}
 					}

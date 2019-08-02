@@ -59,7 +59,7 @@ class CalendarQueryValidator {
 
         foreach($filters as $filter) {
 
-            $isDefined = isset($parent->$filter['name']);
+            $isDefined = isset($parent->{$filter['name']});
 
             if ($filter['is-not-defined']) {
 
@@ -75,7 +75,7 @@ class CalendarQueryValidator {
             }
 
             if ($filter['time-range']) {
-                foreach($parent->$filter['name'] as $subComponent) {
+                foreach($parent->{$filter['name']} as $subComponent) {
                     if ($this->validateTimeRange($subComponent, $filter['time-range']['start'], $filter['time-range']['end'])) {
                         continue 2;
                     }

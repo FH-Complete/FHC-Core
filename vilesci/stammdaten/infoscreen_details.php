@@ -46,17 +46,44 @@ $datum_obj = new datum();
 	<link rel="stylesheet" href="../../skin/tablesort.css" type="text/css"/>
 	<link rel="stylesheet" href="../../skin/fhcomplete.css" type="text/css">
 	<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
+
+	<?php
+	include('../../include/meta/jquery.php');
+	include('../../include/meta/jquery-tablesorter.php');
+	?>
+
 	<link rel="stylesheet" href="../../skin/jquery-ui-1.9.2.custom.min.css" type="text/css">
 	<link rel="stylesheet" href="../../vendor/fgelinas/timepicker/jquery.ui.timepicker.css" type="text/css">
-	<link rel="stylesheet" type="text/css" href="../../skin/jquery-ui-1.9.2.custom.min.css">
-	<script type="text/javascript" src="../../vendor/jquery/jqueryV1/jquery-1.12.4.min.js"></script>
+<!--	<link rel="stylesheet" type="text/css" href="../../skin/jquery-ui-1.9.2.custom.min.css">-->
+<!--	<script type="text/javascript" src="../../vendor/jquery/jqueryV1/jquery-1.12.4.min.js"></script>-->
 	<script type="text/javascript" src="../../include/js/jquery.ui.datepicker.translation.js"></script>
-	<script type="text/javascript" src="../../vendor/jquery/sizzle/sizzle.js"></script>
-	<script type="text/javascript" src="../../include/js/tablesort/table.js"></script>
-	<script type="text/javascript" src="../../vendor/christianbach/tablesorter/jquery.tablesorter.min.js"></script>
+<!--	<script type="text/javascript" src="../../vendor/jquery/sizzle/sizzle.js"></script>-->
+<!--	<script type="text/javascript" src="../../include/js/tablesort/table.js"></script>-->
+<!--	<script type="text/javascript" src="../../vendor/christianbach/tablesorter/jquery.tablesorter.min.js"></script>-->
 	<script type="text/javascript" src="../../vendor/components/jqueryui/jquery-ui.min.js"></script>
 	<script type="text/javascript" src="../../vendor/fgelinas/timepicker/jquery.ui.timepicker.js"></script>
 	<script type="text/javascript">
+	$.tablesorter.addParser({
+		id: "customDate",
+		is: function(s) {
+			//return false;
+			//use the above line if you don't want table sorter to auto detected this parser
+			//else use the below line.
+			//attention: doesn't check for invalid stuff
+			//2009-77-77 77:77:77.0 would also be matched
+			//if that doesn't suit you alter the regex to be more restrictive
+			//return /\d{1,4}-\d{1,2}-\d{1,2} \d{1,2}:\d{1,2}:\d{1,2}\.\d+/.test(s);
+			return /\d{1,2}.\d{1,2}.\d{1,4} \d{1,2}:\d{1,2}/.test(s);
+		},
+		format: function(s) {
+			s = s.replace(/\-/g," ");
+			s = s.replace(/:/g," ");
+			s = s.replace(/\./g," ");
+			s = s.split(" ");
+			return $.tablesorter.formatFloat(new Date(s[2], s[1]-1, s[0], s[3], s[4]).getTime());
+		},
+		type: "numeric"
+	});
 	$(document).ready(function()
 		{
 			$("#myTable").tablesorter(
@@ -68,7 +95,10 @@ $datum_obj = new datum();
 					return $(s).find('img').attr('title');
 				},
 				sortList: [[0,0],[5,0]],
-				widgets: ['zebra']
+				widgets: ['zebra', 'filter', 'stickyHeaders'],
+				headers: { 9: { filter: false,  sorter: false }, 5: { sorter: "customDate"}, 6: { sorter: "customDate"}}
+
+
 			});
 
 			$( ".datepicker_datum" ).datepicker({

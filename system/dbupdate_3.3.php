@@ -2991,7 +2991,7 @@ if(!@$db->db_query("SELECT 0 FROM campus.tbl_zeitaufzeichnung_gd WHERE 0 = 1")) 
 
 		ALTER TABLE campus.tbl_zeitaufzeichnung_gd ADD CONSTRAINT fk_zeitaufzeichnung_gd_uid FOREIGN KEY (uid) REFERENCES public.tbl_benutzer(uid) ON UPDATE CASCADE ON DELETE RESTRICT;
 		ALTER TABLE campus.tbl_zeitaufzeichnung_gd ADD CONSTRAINT fk_zeitaufzeichnung_gd_studiensemester_kurzbz FOREIGN KEY (studiensemester_kurzbz) REFERENCES public.tbl_studiensemester(studiensemester_kurzbz) ON UPDATE CASCADE ON DELETE RESTRICT;
-		ALTER TABLE campus.tbl_zeitaufzeichnung_gd ADD CONSTRAINT uk_uid_stsem UNIQUE (uid, studiensemester_kurzbz);
+		ALTER TABLE campus.tbl_zeitaufzeichnung_gd ADD CONSTRAINT uk_zeitaufzeichnung_gd_uid_stsem UNIQUE (uid, studiensemester_kurzbz);
 
 		COMMENT ON TABLE campus.tbl_zeitaufzeichnung_gd IS \'Table to manage the lectors parted working times; gd = Geteilte Dienste\';
 		COMMENT ON COLUMN campus.tbl_zeitaufzeichnung_gd.selbstverwaltete_pause IS \'Lectors (dis-)agreement to self-manage breaks\';

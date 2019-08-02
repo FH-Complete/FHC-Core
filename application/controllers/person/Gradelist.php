@@ -46,6 +46,9 @@ class Gradelist extends Auth_Controller
 			$this->_grades[$row->note]['anmerkung'] = $row->anmerkung;
 			$this->_grades[$row->note]['notenwert'] = $row->notenwert;
 		}
+		$this->_grades['']['positiv'] = false;
+		$this->_grades['']['anmerkung'] = '';
+		$this->_grades['']['notenwert'] = 0;
 	}
 
 	/**
@@ -382,6 +385,15 @@ class Gradelist extends Auth_Controller
 			{
 				$grades[] = array(
 					'note' => $row['note'],
+					'ects' => $row['ects'],
+					'sws' => $row['sws']
+				);
+			}
+			elseif (isset($row['zugeordnet']) && $row['zugeordnet'] == true && $row['lehrtyp_kurzbz']=='lv')
+			{
+				// ECTS und SWS mitzaehlen wenn die Person zugeordnet ist auch wenn noch keine Noten vorhanden ist.
+				$grades[] = array(
+					'note' => '',
 					'ects' => $row['ects'],
 					'sws' => $row['sws']
 				);

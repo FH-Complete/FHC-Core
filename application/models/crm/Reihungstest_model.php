@@ -349,6 +349,7 @@ class Reihungstest_model extends DB_Model
 				ps.prestudent_id,
 				rt.datum,
 				rt.uhrzeit,
+				rt.reihungstest_id,
 				tbl_studienplan.orgform_kurzbz,
 				tbl_prestudentstatus.studienplan_id,
 				tbl_prestudentstatus.ausbildungssemester,

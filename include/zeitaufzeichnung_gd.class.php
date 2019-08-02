@@ -41,7 +41,7 @@ class zeitaufzeichnung_gd extends basis_db
 
 	/**
      * Loads entry for specific user and semester
-     * @return boolean  True, if saving succeeded.
+     * @return boolean  True, if entry is found.
      */
     public function load($user, $sem)
     {
@@ -68,6 +68,7 @@ class zeitaufzeichnung_gd extends basis_db
 				$this->updateamum = $row->updateamum;
 				$this->updatevon = $row->updatevon;
 				$this->selbstverwaltete_pause = $this->db_parse_bool($row->selbstverwaltete_pause);
+				return true;
 			}
 			else
 			{

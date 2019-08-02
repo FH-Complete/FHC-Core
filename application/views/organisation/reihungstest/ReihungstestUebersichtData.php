@@ -140,6 +140,10 @@
 			{
 				$datasetRaw->{'anmeldefrist'} = '-';
 			}
+			else
+			{
+				$datasetRaw->{'anmeldefrist'} = date_format(date_create($datasetRaw->{'anmeldefrist'}), 'd.m.Y');
+			}
 			if ($datasetRaw->{'max_plaetze'} == null)
 			{
 				$datasetRaw->{'max_plaetze'} = '-';

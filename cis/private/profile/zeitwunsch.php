@@ -32,6 +32,7 @@ require_once('../../../include/zeitwunsch.class.php');
 require_once('../../../include/studiensemester.class.php');
 require_once('../../../include/zeitaufzeichnung_gd.class.php');
 require_once('../../../include/benutzer.class.php');
+require_once('../../../include/mitarbeiter.class.php');
 require_once('../../../include/phrasen.class.php');
 require_once('../../../include/sprache.class.php');
 
@@ -47,6 +48,7 @@ $uid = get_uid();
 
 if(!check_lektor($uid))
 	die($p->t('global/keineBerechtigungFuerDieseSeite'));
+
 
 $PHP_SELF = $_SERVER['PHP_SELF'];
 
@@ -108,6 +110,9 @@ $wunsch = $zw->zeitwunsch;
 $person = new benutzer();
 if(!$person->load($uid))
 	die($person->errormsg);
+
+$ma = new mitarbeiter($uid);
+$fixangestellt = $ma->fixangestellt;
 
 // Nächstes Studiensemester
 $ss = new Studiensemester();
@@ -175,23 +180,21 @@ if (isset($_GET['selbstverwaltete-pause']) && !empty($_GET['submit']))
 
 	<div class="flexcroll" style="outline: none;">
 	<table>
-
+<?php if($fixangestellt && (defined('CIS_ZEITWUNSCH_GD') && CIS_ZEITWUNSCH_GD)): ?>
 		<!--Erklärung zu Pausen bei geteilten Arbeitszeiten-->
 		<tr>
 			<td>
-				<h1>Zustimmung zu selbstverwalteten Pausen</h1>
+				<h1>Zustimmung zur Verplanung in geteilter Arbeitszeit</h1>
 
 			<form action="">
-				<h3>Erklärung zu Pausen bei geteilten Arbeitszeiten</h3><br>
 				<p>
-					Ich bin mit der Verplanung meiner Lehre in getrennten Blöcken (Vormittags und Abends) einverstanden und berücksichtige bei der Einteilung meiner Pause,<br>
-					dass ich die tägliche Höchstgrenze laut AZG (10 Stunden) nicht überschreite. Diese Zustimmung gilt jeweils für ein Semester.
 					<?php
+					echo $p->t('zeitwunsch/geteilteArbeitszeit');
 					$gd = new zeitaufzeichnung_gd();
 					$gd->load($uid, $next_ss);
 					if ( ! $gd->uid )
 					{
-						echo '<br><br><h3>Für das kommende Studiensemester '.$next_ss.' erkläre ich mich einverstanden, meine Pausen entsprechend selbst zu verwalten: ';
+						echo '<br><br><h3>Zustimmung für '.$next_ss.': ';
 						echo '<input type="radio" name="selbstverwaltete-pause" value="yes">ja';
 						echo '<input type="radio" name="selbstverwaltete-pause" value="no">nein';
 						echo '</h3><br><br><input type="submit" name="submit" value="'.$p->t('global/speichern').'" style="float: right"><br>';
@@ -206,11 +209,10 @@ if (isset($_GET['selbstverwaltete-pause']) && !empty($_GET['submit']))
 
 				</p>
 			</form>
-
 		<br><hr>
 		</td>
 	</tr>
-
+<?php endif; ?>
 	  <tr>
 	    <td>
 	    <h1><?php echo $p->t('zeitwunsch/zeitwunsch');?></h1>
