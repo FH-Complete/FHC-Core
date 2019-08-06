@@ -259,8 +259,4 @@ define('STATUSGRUND_ID_EINSTIEG_SOMMERSEMESTER', null);
 
 // Studiengangs_kz des Studiengangs "Qualifikationskurse". Der Studiengang hat eine Sonderstellung zB für das Bewerbungstool.
 define('STUDIENGANG_KZ_QUALIFIKATIONKURSE', null);
-
-// EinsteigerInnen ins Sommersemester werden mit einem Statusgrund versehen.
-// Die ID dieses Statusgrundes kann hier eingegeben werden. Es wird zB vom Infocenter-Tool gesetzt und im Bewerbungstool abgefragt
-define('STATUSGRUND_ID_EINSTIEG_SOMMERSEMESTER', null);
 ?>
