@@ -228,8 +228,6 @@ $rechte->getBerechtigungen($uid);
 		<thead>
 			<tr>
 			<th>#</th>
-			<th><?php echo $p->t('global/vorname'); ?></th>
-			<th><?php echo $p->t('global/nachname'); ?></th>
 			<th><?php echo $p->t('pruefung/matrikelnummer'); ?></th>
             <th><?php echo $p->t('pruefung/studiengangAbkuerzung'); ?></th>
 			<th><?php echo $p->t('global/datum'); ?></th>
@@ -262,8 +260,6 @@ $rechte->getBerechtigungen($uid);
 				}
 				echo '<tr>';
 				echo '<td>'.$count.'</td>';
-				echo '<td>'.$student->vorname.'</td>';
-				echo '<td>'.$student->nachname.'</td>';
 				echo '<td>'.$student->matr_nr.'</td>';
                 echo '<td>'.$studiengang->kurzbzlang.'</td>';
 				echo '<td>'.$date.'</td>';
