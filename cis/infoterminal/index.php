@@ -20,6 +20,8 @@
  *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
  *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
+session_start();
+
 	require_once('../../config/cis.config.inc.php');
 	require_once('../../include/wochenplan.class.php');
 	require_once('../../include/benutzerberechtigung.class.php');

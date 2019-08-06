@@ -53,6 +53,7 @@ $this->phrasen['pruefung/bestaetigt'] = 'bestätigt';
 $this->phrasen['pruefung/statusAenderungVon'] = 'Satusänderung von';
 $this->phrasen['pruefung/reihungSpeichern'] = 'Reihung speichern';
 $this->phrasen['pruefung/listeDrucken'] = 'Liste drucken';
+$this->phrasen['pruefung/listeOhneNamenDrucken'] = 'Liste ohne Namen drucken';
 $this->phrasen['pruefung/pruefungsraum'] = 'Prüfungsraum: ';
 $this->phrasen['pruefung/pruefungsort'] = 'Prüfungsort ';
 $this->phrasen['pruefung/imBuero'] = ' im Büro';
@@ -109,7 +110,8 @@ $this->phrasen['pruefung/keineLehreinheitenVorhanden'] = 'Keine Lehreinheiten vo
 $this->phrasen['pruefung/keineAnmeldungenVorhanden'] = 'Keine Anmeldungen vorhanden.';
 $this->phrasen['pruefung/derLektor'] = 'Lektor';
 $this->phrasen['pruefung/dieKommission'] = 'Kommission';
-$this->phrasen['pruefung/matrikelnummer'] = 'Personenkennzeichen';
+$this->phrasen['pruefung/matrikelnummer'] = 'Matrikelnummer';
+$this->phrasen['pruefung/studiengangAbkuerzung'] = 'Stg.';
 
 // anmeldungen Verwalten
 $this->phrasen['pruefung/anmeldungenVerwaltenTitle'] = 'Prüfungsanmeldung Verwaltung';
