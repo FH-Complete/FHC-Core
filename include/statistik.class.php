@@ -164,9 +164,9 @@ class statistik extends basis_db
 	public function getGruppe($gruppe,$publish=null)
 	{
 		$qry = "SELECT * FROM public.tbl_statistik WHERE gruppe=".$this->db_add_param($gruppe);
-		if ($publish==true)
+		if ($publish===true)
 			$qry.=' AND publish ';
-		elseif ($publish==false)
+		elseif ($publish===false)
 			$qry.=' AND NOT publish ';
 		$qry.=' ORDER BY bezeichnung;';
 
