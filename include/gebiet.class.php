@@ -368,12 +368,9 @@ class gebiet extends basis_db
 				$qry = "SELECT count(*) as anzahl FROM testtool.tbl_frage WHERE gebiet_id=".$this->db_add_param($gebiet_id, FHC_INTEGER)." AND not demo AND level is not null GROUP BY level";
 				if($this->db_query($qry))
 				{
-					if($row = $this->db_fetch_object())
+					if($this->db_num_rows() > $this->maxfragen)
 					{
-						if($row->anzahl>$this->maxfragen)
-						{
-							//$this->errormsg .= "Wenn Levelgleichverteilung gesetzt ist, muss maxfragen groesser als die Anzahl der verwendeten Levels sein\n";
-						}
+						$this->errormsg .= "Wenn Levelgleichverteilung gesetzt ist, muss maxfragen groesser als die Anzahl der verwendeten Levels sein\n";
 					}
 				}
 			}

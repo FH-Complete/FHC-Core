@@ -3019,6 +3019,17 @@ if(!@$db->db_query("SELECT 0 FROM campus.tbl_zeitaufzeichnung_gd WHERE 0 = 1")) 
 
 }
 
+// Add column Stufe to tbl_dokumentstudiengang
+if(!$result = @$db->db_query("SELECT stufe FROM public.tbl_dokumentstudiengang LIMIT 1"))
+{
+	$qry = "ALTER TABLE public.tbl_dokumentstudiengang ADD COLUMN stufe smallint;";
+
+	if(!$db->db_query($qry))
+		echo '<strong>public.tbl_dokumentstudiengang: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>public.tbl_dokumentstudiengang: Spalte stufe hinzugefuegt';
+}
+
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
 
@@ -3181,7 +3192,7 @@ $tabellen=array(
 	"public.tbl_buchungstyp"  => array("buchungstyp_kurzbz","beschreibung","standardbetrag","standardtext","aktiv","credit_points"),
 	"public.tbl_dokument"  => array("dokument_kurzbz","bezeichnung","ext_id","bezeichnung_mehrsprachig","dokumentbeschreibung_mehrsprachig","ausstellungsdetails"),
 	"public.tbl_dokumentprestudent"  => array("dokument_kurzbz","prestudent_id","mitarbeiter_uid","datum","updateamum","updatevon","insertamum","insertvon","ext_id"),
-	"public.tbl_dokumentstudiengang"  => array("dokument_kurzbz","studiengang_kz","ext_id", "onlinebewerbung", "pflicht","beschreibung_mehrsprachig","nachreichbar"),
+	"public.tbl_dokumentstudiengang"  => array("dokument_kurzbz","studiengang_kz","ext_id", "onlinebewerbung", "pflicht","beschreibung_mehrsprachig","nachreichbar","stufe"),
 	"public.tbl_erhalter"  => array("erhalter_kz","kurzbz","bezeichnung","dvr","logo","zvr"),
 	"public.tbl_fachbereich"  => array("fachbereich_kurzbz","bezeichnung","farbe","studiengang_kz","aktiv","ext_id","oe_kurzbz"),
 	"public.tbl_filter" => array("filter_id","kurzbz","sql","valuename","showvalue","insertamum","insertvon","updateamum","updatevon","type","htmlattr", "bezeichnung"),
