@@ -68,24 +68,22 @@ function onLektorRefresh()
 {
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 	var treeLektorenTree=document.getElementById('tree-lektor');
+	// Input-Feld leeren
+	document.getElementById('tempus-lektor-filter').value = '';
 	//var datasources=vboxLehrveranstalungPlanung.getAttribute('datasources');
 	var url = '<?php echo APP_ROOT; ?>rdf/mitarbeiter.rdf.php?user=user&'+gettimestamp();
 
 	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
 	var datasource = rdfService.GetDataSource(url);
-	var oldDatasources = treeLektorenTree.GetDataSources();
+	var oldDatasources = treeLektorenTree.database.GetDataSources();
 
 	datasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
 	datasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
 
-	treeLektorenTree.database.RemoveDataSource(oldDatasources);
+	treeLektorenTree.database.RemoveDataSource(oldDatasources.getNext());
 	treeLektorenTree.database.AddDataSource(datasource);
-	if(typeof(filter)!='undefined')
-		treeLektorenTree.builder.rebuild();
+	treeLektorenTree.builder.rebuild();
 
-	//vboxLehrveranstalungPlanung.setAttribute('datasources',datasources+"&bla=");
-
-	//datasources="rdf:null" ref="http://www.technikum-wien.at/mitarbeiter/liste"
 }
 
 // Lektorenliste filtern
