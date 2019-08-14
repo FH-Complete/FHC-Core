@@ -455,7 +455,7 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
 			</xsl:choose>-->
 			Lehrgangs zur Weiterbildung.
 		</text:p>
-		<text:p text:style-name="P4">Dieser Lehrgang wird in Kooperation mit der Technikum Wien GmbH organisiert und durchgeführt. Es gelten die AGB der Technikum Wien GmbH, diese sind unter https://academy.technikum-wien.at/agb jederzeit abrufbar.
+		<text:p text:style-name="P4">Dieser Lehrgang wird von der Technikum Wien GmbH in Kooperation mit der FH Technikum Wien organisiert und durchgeführt. Es gelten die AGB der Technikum Wien GmbH, diese sind unter https://academy.technikum-wien.at/agb jederzeit abrufbar.
 		</text:p>
 		<text:p text:style-name="P13"/>
 		<text:list xml:id="list305698312" text:continue-numbering="false" text:style-name="WW8Num7">
@@ -478,7 +478,7 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
 			</text:list>
 		</text:list-item>
 		</text:list>
-		<text:p text:style-name="P5">Die Ausbildung erfolgt auf Grundlage des Fachhochschul-Studiengesetzes, BGBI. Nr. 340/1993 idgF und des Hochschul-Qualitätssicherungsgesetzes, BGBI. Nr. 74/2011 idgF, des genehmigten Lehrgangantrags durch das Fachhoschul-Kollegium und der Satzung der Fachhoschule Technikum Wien idgF.</text:p>
+		<text:p text:style-name="P5">Die Ausbildung erfolgt auf Grundlage des Fachhochschul-Studiengesetzes, BGBI. Nr. 340/1993 idgF. und des Hochschul-Qualitätssicherungsgesetzes, BGBI. Nr. 74/2011 idgF., des genehmigten Lehrgangantrags durch das Fachhoschul-Kollegium und der Satzung der Fachhoschule Technikum Wien idgF.</text:p>
 		<text:p text:style-name="P14"/>
 		<text:list xml:id="list636990326" text:continue-numbering="true" text:style-name="WW8Num7">
 		<text:list-item>
@@ -598,8 +598,7 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
 					</text:note-body>
 				</text:note>
 			</text:span>
-		</text:span>
-			.
+		</text:span>.
 		</text:span>
 		</text:p>
 		<text:p text:style-name="P29">
@@ -705,7 +704,7 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
 		</text:list-item>
 		</text:list>
 		<text:p text:style-name="P5">
-			Ao. Studierende des Lehrgangs sind verpflichtet, eine EDV-Ausstattung zu beschaffen und zu unterhalten, die es ermöglicht, an den Fernlehreelementen teilzunehmen. Die gesamten Kosten der Anschaffung und des Betriebs (inkl. Kosten für Internet und E-Mail) trägt der ao. Student bzw. die ao. Studentin.
+			Ao. Studierende des Lehrgangs sind verpflichtet, eine EDV-Ausstattung zu beschaffen und zu unterhalten, die es ermöglicht, an den Fernlehrelementen teilzunehmen. Die gesamten Kosten der Anschaffung und des Betriebs (inkl. Kosten für Internet und E-Mail) trägt der ao. Student bzw. die ao. Studentin.
 		</text:p>
 		<text:p text:style-name="P5"/>
 
