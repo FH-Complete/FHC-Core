@@ -3049,6 +3049,49 @@ if(!@$db->db_query("SELECT 0 FROM campus.tbl_zeitaufzeichnung_gd WHERE 0 = 1")) 
 		echo '<br>Granted privileges to <strong>vilesci</strong> on campus.tbl_zeitaufzeichnung_gd';
 }
 
+
+// Insert 'bestellt' to tbl_vertragsstatus
+if($result = @$db->db_query("SELECT 1 FROM lehre.tbl_vertragsstatus WHERE vertragsstatus_kurzbz = 'bestellt';"))
+{
+	if($db->db_num_rows($result) == 0)
+	{
+		$qry = "INSERT INTO lehre.tbl_vertragsstatus(vertragsstatus_kurzbz, bezeichnung) VALUES('bestellt', 'Bestellt');";
+
+		if(!$db->db_query($qry))
+			echo '<strong>lehre.tbl_vertragsstatus '.$db->db_last_error().'</strong><br>';
+		else
+			echo 'lehre.tbl_vertragsstatus: Added value \'bestellt\'<br>';
+	}
+}
+
+// Insert 'erteilt' to tbl_vertragsstatus
+if($result = @$db->db_query("SELECT 1 FROM lehre.tbl_vertragsstatus WHERE vertragsstatus_kurzbz = 'erteilt';"))
+{
+	if($db->db_num_rows($result) == 0)
+	{
+		$qry = "INSERT INTO lehre.tbl_vertragsstatus(vertragsstatus_kurzbz, bezeichnung) VALUES('erteilt', 'Erteilt');";
+
+		if(!$db->db_query($qry))
+			echo '<strong>lehre.tbl_vertragsstatus '.$db->db_last_error().'</strong><br>';
+		else
+			echo 'lehre.tbl_vertragsstatus: Added value \'erteilt\'<br>';
+	}
+}
+
+// Insert 'akzeptiert' to tbl_vertragsstatus
+if($result = @$db->db_query("SELECT 1 FROM lehre.tbl_vertragsstatus WHERE vertragsstatus_kurzbz = 'akzeptiert';"))
+{
+	if($db->db_num_rows($result) == 0)
+	{
+		$qry = "INSERT INTO lehre.tbl_vertragsstatus(vertragsstatus_kurzbz, bezeichnung) VALUES('akzeptiert', 'Akzeptiert');";
+
+		if(!$db->db_query($qry))
+			echo '<strong>lehre.tbl_vertragsstatus '.$db->db_last_error().'</strong><br>';
+		else
+			echo 'lehre.tbl_vertragsstatus: Added value \'akzeptiert\'<br>';
+	}
+}
+
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
 
