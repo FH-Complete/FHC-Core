@@ -183,13 +183,13 @@ if (isset($_SESSION['pruefling_id']))
 
         /* Filter out all Abgewiesene */
         AND NOT EXISTS (
-            SELECT 
-                1 
+            SELECT
+                1
             FROM
                 tbl_prestudentstatus
-            WHERE 
-                status_kurzbz = 'Abgewiesener' 
-            AND 
+            WHERE
+                status_kurzbz = 'Abgewiesener'
+            AND
                 prestudent_id = ps_status.prestudent_id
         )
 
@@ -220,7 +220,7 @@ if (isset($_SESSION['pruefling_id']))
         )
 
 
-        SELECT DISTINCT ON 
+        SELECT DISTINCT ON
             (gebiet_id, semester)
 	        semester,
 	        gebiet_id,
@@ -231,7 +231,7 @@ if (isset($_SESSION['pruefling_id']))
         FROM (
             SELECT
                 *
-            FROM ( 
+            FROM (
                 (SELECT
                     prestudent_data.semester AS ps_sem,
                     gebiet_id,
@@ -252,9 +252,9 @@ if (isset($_SESSION['pruefling_id']))
                 OR
                     (prestudent_data.semester= 3 AND tbl_ablauf.semester IN (1,3))
                 )
-    
+
                 UNION
-    
+
                 (
                 SELECT
                     prestudent_data.semester AS ps_sem,
@@ -278,7 +278,7 @@ if (isset($_SESSION['pruefling_id']))
                 )
             ) temp
         ) temp2
-        
+
         GROUP BY
             semester,
              gebiet_id,
@@ -425,7 +425,7 @@ else
     // show message to use Mozilla Firefox
     if ((ua.indexOf("Firefox") > -1) == false)
     {
-        let hasMathML = "<?php echo $gebiet_hasMathML; ?>";
+        let hasMathML = "<?php echo (isset($gebiet_hasMathML)?$gebiet_hasMathML:''); ?>";
         let userLang = "<?php echo $sprache_user; ?>";
         if (hasMathML == true)
         {
@@ -442,7 +442,7 @@ else
 
     // Error massage if check_gebiet function returns false
     $(function() {
-        var invalid_gebiete = "<?php echo $invalid_gebiete; ?>";
+        var invalid_gebiete = "<?php echo (isset($invalid_gebiete)?$invalid_gebiete:''); ?>";
         if(invalid_gebiete == true)
         {
             $('#tr-einleitung').append('' +
