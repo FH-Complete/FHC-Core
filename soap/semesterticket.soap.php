@@ -52,7 +52,7 @@ function verifyData($parameters)
 	$log = new webservicelog();
 	$log->request_data = file_get_contents('php://input');
 	$log->webservicetyp_kurzbz = 'wienerlinien';
-	$log->request_id = $parameters->Token;
+	$log->request_id = $parameters->token;
 	$log->beschreibung = "Semesterticketanfrage";
 	$log->save(true);
 
