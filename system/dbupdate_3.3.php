@@ -1366,6 +1366,21 @@ if($result = $db->db_query("SELECT 1 FROM system.tbl_app WHERE app='bewerbung'")
 	}
 }
 
+// App 'lehrauftrag' hinzufügen
+if($result = $db->db_query("SELECT 1 FROM system.tbl_app WHERE app='lehrauftrag'"))
+{
+	if($db->db_num_rows($result)==0)
+	{
+
+		$qry = "INSERT INTO system.tbl_app(app) VALUES('lehrauftrag');";
+
+		if(!$db->db_query($qry))
+			echo '<strong>App: '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>Neue App lehrauftrag in system.tbl_app hinzugefügt';
+	}
+}
+
 // Archiv boolean fuer public.tbl_akte
 if(!@$db->db_query("SELECT archiv FROM public.tbl_akte LIMIT 1"))
 {
