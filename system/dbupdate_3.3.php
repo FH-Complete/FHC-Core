@@ -3107,6 +3107,34 @@ if($result = @$db->db_query("SELECT 1 FROM lehre.tbl_vertragsstatus WHERE vertra
 	}
 }
 
+// Add permission to order lehrauftrag (lehrauftrag_bestellen)
+if($result = @$db->db_query("SELECT 1 FROM system.tbl_berechtigung WHERE berechtigung_kurzbz = 'lehre/lehrauftrag_bestellen';"))
+{
+	if($db->db_num_rows($result) == 0)
+	{
+		$qry = "INSERT INTO system.tbl_berechtigung(berechtigung_kurzbz, beschreibung) VALUES('lehre/lehrauftrag_bestellen', 'Lehrauftrag bestellen');";
+
+		if(!$db->db_query($qry))
+			echo '<strong>system.tbl_berechtigung '.$db->db_last_error().'</strong><br>';
+		else
+			echo ' system.tbl_berechtigung: Added permission for lehre/lehrauftrag_bestellen<br>';
+	}
+}
+
+// Add permission to approve lehrauftrag (lehrauftrag_erteilen)
+if($result = @$db->db_query("SELECT 1 FROM system.tbl_berechtigung WHERE berechtigung_kurzbz = 'lehre/lehrauftrag_erteilen';"))
+{
+	if($db->db_num_rows($result) == 0)
+	{
+		$qry = "INSERT INTO system.tbl_berechtigung(berechtigung_kurzbz, beschreibung) VALUES('lehre/lehrauftrag_erteilen', 'Lehrauftrag erteilen');";
+
+		if(!$db->db_query($qry))
+			echo '<strong>system.tbl_berechtigung '.$db->db_last_error().'</strong><br>';
+		else
+			echo ' system.tbl_berechtigung: Added permission for lehre/lehrauftrag_erteilen<br>';
+	}
+}
+
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
 
