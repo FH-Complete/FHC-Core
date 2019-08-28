@@ -113,3 +113,19 @@
 #applyFilter, #saveCustomFilterButton {
 	width: 100px;
 }
+
+.text-red {
+	color: red;
+}
+
+.text-orange {
+	color: orange;
+}
+
+.text-blue {
+	color: blue;
+}
+
+.text-green {
+	color: green;
+}

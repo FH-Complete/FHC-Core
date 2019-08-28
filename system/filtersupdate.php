@@ -353,7 +353,7 @@ $filters = array(
 					{"name": "fakultaet"},
 					{"name": "datum"},
 					{"name": "uhrzeit"},
-					{"name": "anmeldefrist"},					
+					{"name": "anmeldefrist"},
 					{"name": "oeffentlich"},
 					{"name": "studiengaenge"},
 					{"name": "freie_plaetze"},
@@ -457,6 +457,28 @@ $filters = array(
 						"operation": "contains"
 					}
 				]
+			}
+		',
+		'oe_kurzbz' => null,
+	),
+	array(
+		'app' => 'core',
+		'dataset_name' => 'jobslogs',
+		'filter_kurzbz' => 'all',
+		'description' => '{All logs produced by jobs}',
+		'sort' => 1,
+		'default_filter' => true,
+		'filter' => '
+			{
+				"name": "All jobs viewer",
+				"columns": [
+					{"name": "RequestId"},
+					{"name": "ExecutionTime"},
+					{"name": "ExecutedBy"},
+					{"name": "Description"},
+					{"name": "Data"}
+				],
+				"filters": []
 			}
 		',
 		'oe_kurzbz' => null,

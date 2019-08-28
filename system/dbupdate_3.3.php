@@ -3030,6 +3030,20 @@ if(!$result = @$db->db_query("SELECT stufe FROM public.tbl_dokumentstudiengang L
 		echo '<br>public.tbl_dokumentstudiengang: Spalte stufe hinzugefuegt';
 }
 
+// Add new webservice type in system.tbl_webservicetyp
+if ($result = @$db->db_query("SELECT 1 FROM system.tbl_webservicetyp WHERE webservicetyp_kurzbz = 'job';"))
+{
+	if ($db->db_num_rows($result) == 0)
+	{
+		$qry = "INSERT INTO system.tbl_webservicetyp(webservicetyp_kurzbz, beschreibung) VALUES('job', 'Cronjob');";
+
+		if (!$db->db_query($qry))
+			echo '<strong>system.tbl_webservicetyp '.$db->db_last_error().'</strong><br>';
+		else
+			echo ' system.tbl_webservicetyp: Added webservice type "job"<br>';
+	}
+}
+
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
 
