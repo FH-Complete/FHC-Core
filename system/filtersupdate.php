@@ -408,16 +408,21 @@ $filters = array(
 		'default_filter' => true,
 		'filter' => '
 			{
+			    "name": "Lehrauftragsstatus",
 				"columns": [
-					{"name": "Lehrveranstaltung"},
+				    {"name": "LE-ID"},
+				    {"name": "Typ"},
+					{"name": "Auftrag"},
 					{"name": "Organisationseinheit"},
+					{"name": "Gruppe"},
 					{"name": "Lektor"},
 					{"name": "Stunden"},
 					{"name": "Betrag"},
-					{"name": "Bestellung STG"},
-					{"name": "Erteilung Department"},
-					{"name": "Akzeptiert von Lektor"}
-				]
+					{"name": "Bestellt"},
+					{"name": "Erteilt"},
+					{"name": "Akzeptiert"}
+				],
+				"filters": []
 			}
 		',
 		'oe_kurzbz' => null,
