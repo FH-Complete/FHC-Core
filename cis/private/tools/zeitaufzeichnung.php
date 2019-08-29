@@ -828,90 +828,6 @@ if($projekt->getProjekteMitarbeiter($user, true))
 			echo '</form>';
 		}
 
-		//Projekte werden nicht angezeigt wenn es keine gibt
-		if($anzprojekte > 0)
-		{
-			//Projekt
-			echo '<tr>
-				<td>'.$p->t("zeitaufzeichnung/projekt").'</td>
-				<td colspan="4"><SELECT name="projekt" id="projekt">
-					<OPTION value="">-- '.$p->t('zeitaufzeichnung/keineAuswahl').' --</OPTION>';
-
-			sort($projekt->result);
-			foreach ($projekt->result as $row_projekt)
-			{
-				if ($projekt_kurzbz == $row_projekt->projekt_kurzbz || $filter == $row_projekt->projekt_kurzbz)
-					$selected = 'selected';
-				else
-					$selected = '';
-
-				echo '<option value="'.$db->convert_html_chars($row_projekt->projekt_kurzbz).'" '.$selected.'>'.$db->convert_html_chars($row_projekt->titel).'</option>';
-			}
-			echo '</SELECT><!--<input type="button" value="'.$p->t("zeitaufzeichnung/uebersicht").'" onclick="loaduebersicht();">--></td>';
-			echo '</tr>';
-		}
-		if($za_simple >= 0)
-		{
-		//OE_KURZBZ_1
-		echo '<tr><td nowrap>'.$p->t("zeitaufzeichnung/organisationseinheiten").'</td>
-			<td colspan="3"><SELECT style="width:200px;" name="oe_kurzbz_1">';
-		$oe = new organisationseinheit();
-		$oe->getFrequent($user,'180','3',true);
-		$trennlinie = true;
-
-		echo '<option value="">-- '.$p->t("zeitaufzeichnung/keineAuswahl").' --</option>';
-
-		foreach ($oe->result as $row)
-		{
-			if($row->oe_kurzbz == $oe_kurzbz_1)
-				$selected = 'selected';
-			else
-				$selected = '';
-			if($row->aktiv)
-				$class='';
-			else
-				$class='class="inaktiv"';
-
-			if ($row->anzahl =='0' && $trennlinie==true)
-			{
-				echo '<OPTION value="" disabled="disabled">------------------------</OPTION>';
-				$trennlinie = false;
-			}
-			echo '<option value="'.$db->convert_html_chars($row->oe_kurzbz).'" '.$selected.' '.$class.'>'.$db->convert_html_chars($row->bezeichnung.' ('.$row->organisationseinheittyp_kurzbz).')</option>';
-		}
-		echo '</SELECT>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
-		if($za_simple == 0)
-		{
-			//OE_KURZBZ_2
-			echo '<SELECT style="width:200px;" name="oe_kurzbz_2">';
-			echo '<option value="">-- '.$p->t("zeitaufzeichnung/keineAuswahl").' --</option>';
-
-			$trennlinie = true;
-
-			foreach ($oe->result as $row)
-			{
-				if($oe_kurzbz_2 == $row->oe_kurzbz)
-					$selected = 'selected';
-				else
-					$selected = '';
-
-				if($row->aktiv)
-					$class='';
-				else
-					$class='class="inaktiv"';
-
-				if ($row->anzahl =='0' && $trennlinie==true)
-				{
-					echo '<OPTION value="" disabled="disabled">------------------------</OPTION>';
-					$trennlinie = false;
-				}
-				echo '<option value="'.$db->convert_html_chars($row->oe_kurzbz).'" '.$selected.' '.$class.'>'.$db->convert_html_chars($row->bezeichnung.' ('.$row->organisationseinheittyp_kurzbz).')</option>';
-			}
-			echo '</SELECT>';
-		}
-		echo '</td></tr>';
-		}
-
 		//Aktivitaet
 		echo '<tr>';
 		echo '<td>'.$p->t("zeitaufzeichnung/aktivitaet").'</td><td colspan="4">';
@@ -939,49 +855,139 @@ if($projekt->getProjekteMitarbeiter($user, true))
 		}
 		echo '</td></tr>';
 
+
+		if($za_simple >= 0)
+		{
+			$oestyle = '';
+			if($za_simple == 0)
+				$oestyle = 'style="width:200px;"';
+
+			//OE_KURZBZ_1
+			echo '<tr><td nowrap>'.$p->t("zeitaufzeichnung/organisationseinheiten").'</td>
+				<td colspan="3"><SELECT '.$oestyle.' name="oe_kurzbz_1">';
+			$oe = new organisationseinheit();
+			$oe->getFrequent($user,'180','3',true);
+			$trennlinie = true;
+
+			echo '<option value="">-- '.$p->t("zeitaufzeichnung/keineAuswahl").' --</option>';
+
+			foreach ($oe->result as $row)
+			{
+				if($row->oe_kurzbz == $oe_kurzbz_1)
+					$selected = 'selected';
+				else
+					$selected = '';
+				if($row->aktiv)
+					$class='';
+				else
+					$class='class="inaktiv"';
+
+				if ($row->anzahl =='0' && $trennlinie==true)
+				{
+					echo '<OPTION value="" disabled="disabled">------------------------</OPTION>';
+					$trennlinie = false;
+				}
+				echo '<option value="'.$db->convert_html_chars($row->oe_kurzbz).'" '.$selected.' '.$class.'>'.$db->convert_html_chars($row->bezeichnung.' ('.$row->organisationseinheittyp_kurzbz).')</option>';
+			}
+			echo '</SELECT>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
+			if($za_simple == 0)
+			{
+				//OE_KURZBZ_2
+				echo '<SELECT style="width:200px;" name="oe_kurzbz_2">';
+				echo '<option value="">-- '.$p->t("zeitaufzeichnung/keineAuswahl").' --</option>';
+
+				$trennlinie = true;
+
+				foreach ($oe->result as $row)
+				{
+					if($oe_kurzbz_2 == $row->oe_kurzbz)
+						$selected = 'selected';
+					else
+						$selected = '';
+
+					if($row->aktiv)
+						$class='';
+					else
+						$class='class="inaktiv"';
+
+					if ($row->anzahl =='0' && $trennlinie==true)
+					{
+						echo '<OPTION value="" disabled="disabled">------------------------</OPTION>';
+						$trennlinie = false;
+					}
+					echo '<option value="'.$db->convert_html_chars($row->oe_kurzbz).'" '.$selected.' '.$class.'>'.$db->convert_html_chars($row->bezeichnung.' ('.$row->organisationseinheittyp_kurzbz).')</option>';
+				}
+				echo '</SELECT>';
+			}
+			echo '</td></tr>';
+		}
+
+		//Projekte werden nicht angezeigt wenn es keine gibt
+		if($anzprojekte > 0)
+		{
+			//Projekt
+			echo '<tr>
+				<td>'.$p->t("zeitaufzeichnung/projekt").'</td>
+				<td colspan="4"><SELECT name="projekt" id="projekt">
+					<OPTION value="">-- '.$p->t('zeitaufzeichnung/keineAuswahl').' --</OPTION>';
+
+			sort($projekt->result);
+			foreach ($projekt->result as $row_projekt)
+			{
+				if ($projekt_kurzbz == $row_projekt->projekt_kurzbz || $filter == $row_projekt->projekt_kurzbz)
+					$selected = 'selected';
+				else
+					$selected = '';
+
+				echo '<option value="'.$db->convert_html_chars($row_projekt->projekt_kurzbz).'" '.$selected.'>'.$db->convert_html_chars($row_projekt->titel).'</option>';
+			}
+			echo '</SELECT><!--<input type="button" value="'.$p->t("zeitaufzeichnung/uebersicht").'" onclick="loaduebersicht();">--></td>';
+			echo '</tr>';
+		}
+
 		if ($za_simple == 0)
 		{
-		// Service
-		echo '<tr>
-			<td>'.$p->t('zeitaufzeichnung/service').'</td>
-			<td colspan="4"><SELECT name="service_id">
-			<OPTION value="">-- '.$p->t('zeitaufzeichnung/keineAuswahl').' --</OPTION>';
-		$trennlinie = true;
-		$service = new service();
-		$service->getFrequentServices($user, '180','3');
-		foreach($service->result as $row)
-		{
-			if($row->service_id==$service_id)
-				$selected='selected';
-			else
-				$selected='';
-
-			if ($row->anzahl =='0' && $trennlinie==true)
+			// Service
+			echo '<tr>
+				<td>'.$p->t('zeitaufzeichnung/service').'</td>
+				<td colspan="4"><SELECT name="service_id">
+				<OPTION value="">-- '.$p->t('zeitaufzeichnung/keineAuswahl').' --</OPTION>';
+			$trennlinie = true;
+			$service = new service();
+			$service->getFrequentServices($user, '180','3');
+			foreach($service->result as $row)
 			{
-				echo '<OPTION value="" disabled="disabled">------------------------</OPTION>';
-				$trennlinie = false;
+				if($row->service_id==$service_id)
+					$selected='selected';
+				else
+					$selected='';
+
+				if ($row->anzahl =='0' && $trennlinie==true)
+				{
+					echo '<OPTION value="" disabled="disabled">------------------------</OPTION>';
+					$trennlinie = false;
+				}
+				echo '<OPTION title="'.$db->convert_html_chars($row->beschreibung).'" value="'.$db->convert_html_chars($row->service_id).'" '.$selected.'>'.$db->convert_html_chars($row->bezeichnung.' ('.$row->oe_kurzbz.')').'</OPTION>';
 			}
-			echo '<OPTION title="'.$db->convert_html_chars($row->beschreibung).'" value="'.$db->convert_html_chars($row->service_id).'" '.$selected.'>'.$db->convert_html_chars($row->bezeichnung.' ('.$row->oe_kurzbz.')').'</OPTION>';
-		}
-		echo '</SELECT></td>
+			echo '</SELECT></td>
+				</tr>';
+
+			// person für Kundenvoransicht laden
+			$kunde_name = '';
+			if($kunde_uid != '')
+			{
+				$user_kunde = new benutzer();
+
+				if($user_kunde->load($kunde_uid))
+					$kunde_name=$user_kunde->vorname.' '.$user_kunde->nachname;
+			}
+			echo '
+			<tr>
+				<td>'.$p->t("zeitaufzeichnung/kunde").'</td>
+				<td colspan="3"><input type="text" id="kunde_name" value="'.$kunde_name.'" placeholder="'.$p->t("zeitaufzeichnung/nameEingeben").'"><input type ="hidden" id="kunde_uid" name="kunde_uid" value="'.$kunde_uid.'"> '.$p->t("zeitaufzeichnung/oderKartennummerOptional").'
+				<input type="text" id="kartennummer" name="kartennummer" placeholder="'.$p->t("zeitaufzeichnung/kartennummer").'"></td>
 			</tr>';
-
-        // person für Kundenvoransicht laden
-        $kunde_name = '';
-        if($kunde_uid != '')
-        {
-            $user_kunde = new benutzer();
-
-            if($user_kunde->load($kunde_uid))
-                $kunde_name=$user_kunde->vorname.' '.$user_kunde->nachname;
-        }
-        echo '
-        <tr>
-            <td>'.$p->t("zeitaufzeichnung/kunde").'</td>
-            <td colspan="3"><input type="text" id="kunde_name" value="'.$kunde_name.'" placeholder="'.$p->t("zeitaufzeichnung/nameEingeben").'"><input type ="hidden" id="kunde_uid" name="kunde_uid" value="'.$kunde_uid.'"> '.$p->t("zeitaufzeichnung/oderKartennummerOptional").'
-            <input type="text" id="kartennummer" name="kartennummer" placeholder="'.$p->t("zeitaufzeichnung/kartennummer").'"></td>
-        </tr>';
-		echo '<tr><td colspan="4">&nbsp;</td></tr>';
+			echo '<tr><td colspan="4">&nbsp;</td></tr>';
 		}
 
 		//Start/Ende
