@@ -10,9 +10,8 @@ class Studiengang_widget extends DropdownWidget
 		
 		$this->addSelectToModel($this->StudiengangModel, 'studiengang_kz', '\'(\' || kurzbzlang || \') \' || tbl_studiengang.bezeichnung');
 
-
-		// If a specific array of studiengaenge is privided, set the condition to retrieve them
-		if (isset($widgetData['studiengang']))
+		// If 'studiengang' (array of specific studiengaenge) is given, retrieve these studiengaenge only
+		if (isset($widgetData['studiengang']) && !empty($widgetData['studiengang']))
         {
             $condition = '
                 studiengang_kz IN ('. implode(',', $widgetData['studiengang']) . ') AND
@@ -28,7 +27,7 @@ class Studiengang_widget extends DropdownWidget
         $this->setElementsArray(
             $this->StudiengangModel->loadWhere($condition),
             true,
-            'Select a studiengang...',
+            $this->p->t('ui', 'bitteEintragWaehlen'),
             'No studiengaenge found'
         );
 
