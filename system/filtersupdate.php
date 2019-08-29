@@ -408,9 +408,9 @@ $filters = array(
 		'default_filter' => true,
 		'filter' => '
 			{
-			    "name": "Lehrauftragsstatus",
+			    "name": "",
 				"columns": [
-				    {"name": "LE-ID"},
+				    {"name": "LE_ID"},
 				    {"name": "Typ"},
 					{"name": "Auftrag"},
 					{"name": "Organisationseinheit"},

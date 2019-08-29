@@ -1,10 +1,9 @@
 <?php
 
-// if (! defined('BASEPATH')) exit('No direct script access allowed');
-
+if (! defined('BASEPATH')) exit('No direct script access allowed');
 
 /**
- * This controller Lehrauftrag displays all Lehrauftraege within a study semester.
+ * The controller Lehrauftrag displays all Lehrauftraege within a study semester.
  * Heads of degree programs can order Lehrauftraege, which subsequently will generate the corresponding contracts
  * automatically.
  * Department leaders can approve the ordered Lehrauftraege.
@@ -13,6 +12,7 @@ class Lehrauftrag extends Auth_Controller
 {
     const APP = 'lehrauftrag';
     const LEHRAUFTRAG_URI = 'lehre/lehrauftrag/Lehrauftrag';    // URL prefix for this controller
+    const BERECHTIGUNG_LEHRAUFTRAG_BESTELLEN = 'lehre/lehrauftrag_bestellen';
 
     private $_uid;  // uid of the logged user
 
@@ -21,24 +21,19 @@ class Lehrauftrag extends Auth_Controller
      */
     public function __construct()
     {
-        // TODO: adapt permissions!
         // Set required permissions
         parent::__construct(
             array(
-                'index' => 'infocenter:r'
+                'index' => 'lehre/lehrauftrag_bestellen:r'
             )
         );
 
         // Load models
-        $this->load->model('education/Lehreinheit_model', 'LehreinheitModel');
-        $this->load->model('education/Lehreinheitmitarbeiter_model', 'LehreinheitmitarbeiterModel');
         $this->load->model('organisation/Studiensemester_model', 'StudiensemesterModel');
-//        $this->load->model('organisation/Studiengang_model', 'StudiengangModel'); // TODO: delete?
-        $this->load->model('person/Benutzerfunktion_model', 'BenutzerfunktionModel');
 
-        // TODO: check: WidgetLib notwendig?
         // Load libraries
         $this->load->library('WidgetLib');
+        $this->load->library('PermissionLib');
 
         // Load language phrases
         $this->loadPhrases(
@@ -50,9 +45,6 @@ class Lehrauftrag extends Auth_Controller
 
         $this->_setAuthUID(); // sets property uid
 
-        //TODO: delete test user
-        //$this->_uid = 'testuser';
-
         $this->setControllerId(); // sets the controller id
     }
 
@@ -63,31 +55,21 @@ class Lehrauftrag extends Auth_Controller
      */
     public function index()
     {
-        echo '<pre>', print_r($_GET, 1), '</pre>';
-        $studiengang_kz = $this->input->get('studiengang');
-        $studiensemester_kurzbz = $this->input->get('studiensemester');
+        // Set studiengang selected for studiengang dropdown
+        $studiengang_kz = $this->input->get('studiengang'); // if provided by selected studiengang
+        $studiengang_kz = ($studiengang_kz == 'null' ? null : $studiengang_kz);
 
-        // Set studiengang variable
-        if (!isset($studiengang_kz) || !is_numeric($studiengang_kz))
+        // Retrieve studiengaenge the user is entitled for to populate studiengang dropdown
+        if (!$studiengang_kz_arr = $this->permissionlib->getSTG_isEntitledFor(self::BERECHTIGUNG_LEHRAUFTRAG_BESTELLEN))
         {
-            $benutzerfunktion = $this->BenutzerfunktionModel->getSTGLByUID($this->_uid);
-
-            $studiengang_kz_arr = array();
-            if (hasData($benutzerfunktion))
-            {
-                foreach ($benutzerfunktion->retval as $benutzerfkt)
-                {
-                    $studiengang_kz_arr[] = $benutzerfkt->studiengang_kz;
-                }
-            }
-            elseif (isError($benutzerfunktion))
-            {
-                show_error($benutzerfunktion->error);
-            }
+            show_error('Fehler bei Berechtigungsprüfung');
         }
 
-        // Set studiensemester variable
-        if (!isset($studiensemester_kurzbz) || !is_string($studiensemester_kurzbz))
+
+        // Set studiensemester selected for studiengang dropdown
+        $studiensemester_kurzbz = $this->input->get('studiensemester'); // if provided by selected studiensemester
+
+        if (is_null($studiensemester_kurzbz)) // else set next studiensemester as default value
         {
             $studiensemester = $this->StudiensemesterModel->getNext();
             if (hasData($studiensemester))
@@ -99,13 +81,15 @@ class Lehrauftrag extends Auth_Controller
                 show_error($studiensemester->error);
             }
         }
+
         $view_data = array(
+            'studiengang_selected' => $studiengang_kz,
             'studiengang' => $studiengang_kz_arr,
-            'studiensemester' => $studiensemester_kurzbz
+            'studiensemester_selected' => $studiensemester_kurzbz
         );
+
         $this->load->view('lehre/lehrauftrag/lehrauftrag.php', $view_data);
     }
-
 
 
     // -----------------------------------------------------------------------------------------------------------------

@@ -3450,7 +3450,27 @@ $phrases = array(
 				'insertvon' => 'system'
 			)
 		)
-	)
+	),
+    array(
+        'app' => 'core',
+        'category' => 'global',
+        'phrase' => 'lehrauftraege',
+        'insertvon' => 'system',
+        'phrases' => array(
+            array(
+                'sprache' => 'German',
+                'text' => 'Lehraufträge',
+                'description' => '',
+                'insertvon' => 'system'
+            ),
+            array(
+                'sprache' => 'English',
+                'text' => 'Lectureships',
+                'description' => '',
+                'insertvon' => 'system'
+            )
+        )
+    )
 
 );
 
