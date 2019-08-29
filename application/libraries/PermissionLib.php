@@ -254,6 +254,26 @@ class PermissionLib
 		return !$this->_inLAPersonIdsBlacklist($person_id) && $this->_hasLAPermissions();
 	}
 
+    /**
+     * Returns the study programs the person is entitled for.
+     * @param null $berechtigung_kurzbz If given, only study programs are retrieved according to organisational units
+     * assigned to that permission.
+     * @return array|bool array of studiengang_kz the person is entitled for. False on error.
+     */
+    public function getSTG_isEntitledFor($berechtigung_kurzbz = null)
+    {
+        $studiengang_kz_arr = array();
+
+        if (self::$bb->getStgKz($berechtigung_kurzbz))
+        {
+            return $studiengang_kz_arr =  self::$bb->getStgKz($berechtigung_kurzbz);
+        }
+        else
+        {
+            return false;
+        }
+    }
+
 	//------------------------------------------------------------------------------------------------------------------
 	// Private methods
 
