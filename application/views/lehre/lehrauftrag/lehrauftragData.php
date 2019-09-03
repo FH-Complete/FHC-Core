@@ -151,28 +151,48 @@ $filterWidgetArray = array(
         return $datasetRaw;
     },
     'datasetRepOptions' => '{
-        height: 700,            
+        height: 700,   
+        layout:"fitColumns",            // fit columns to width of table
+	    responsiveLayout:"hide",        // hide columns that dont fit on the table       
         selectable: true,               // allows row selection
         selectableRangeMode: "click",   // allows range selection using shift end click on end of range
-        movableColumns: true,           // allows changing column
-        pagination: "local",            // paginates the data
-	    paginationSize: 15              // rows allowed per page
+        selectablePersistence:false,    // deselect previously selected rows when table is filtered, sorted or paginated
+        movableColumns: true,           // allows changing column    
+	    headerFilterPlaceholder: " "
     }', // tabulator properties
     'datasetRepFieldsDefs' => '{
-        LE_ID: {headerFilter:"input", headerFilterPlaceholder:" "},
-        Typ: {headerFilter:"input", headerFilterPlaceholder:" "},
-        Auftrag: {headerFilter:"input", headerFilterPlaceholder:" "},
-        Organisationseinheit: {headerFilter:"input", headerFilterPlaceholder:" "},
-        Gruppe: {headerFilter:"input", headerFilterPlaceholder:" "},
-        Lektor: {headerFilter:"input", headerFilterPlaceholder:" "},
-        Stunden: {align:"right", headerFilter:"input", headerFilterPlaceholder:" "}, 
-        Betrag: {align:"right", headerFilter:"input", headerFilterPlaceholder:">=", headerFilterFunc:">="},
-        Bestellt: {align:"center", headerFilter:"input", headerFilterPlaceholder:" "}, 
-        Erteilt: {align:"center", headerFilter:"input", headerFilterPlaceholder:" "},
-        Akzeptiert: {align:"center", headerFilter:"input", headerFilterPlaceholder:" "}
+        LE_ID: {headerFilter:"input", bottomCalc:"count"},
+        Typ: {headerFilter:"input"},
+        Auftrag: {headerFilter:"input"},
+        Organisationseinheit: {headerFilter:"input"},
+        Gruppe: {headerFilter:"input"},
+        Lektor: {headerFilter:"input"},
+        Stunden: {align:"right", headerFilter:"input", bottomCalc:"sum", bottomCalcParams:{precision:1}}, 
+        Betrag: {align:"right", headerFilter:"input", headerFilterPlaceholder:">=", headerFilterFunc:">=", bottomCalc:"sum", bottomCalcParams:{precision:2}},
+        Bestellt: {align:"center", headerFilter:"input"}, 
+        Erteilt: {align:"center", headerFilter:"input"},
+        Akzeptiert: {align:"center", headerFilter:"input"}
     }', // col properties
 );
 
 echo $this->widgetlib->widget('FilterWidget', $filterWidgetArray);
 
 ?>
+
+
+<script type="text/javascript">
+    $(function() {
+        // NOTE: $("#filterTabulator").tabulator gives access to Tabulator object
+        var selector = $("#filterTabulator");
+
+        // Select all (filtered) rows
+        $("#select-all").click(function(){
+            selector.tabulator("selectRow", true); // true selects all filtered rows
+        });
+
+        // Deselect all (filtered) rows
+        $("#deselect-all").click(function(){
+            selector.tabulator("deselectRow");
+        });
+    });
+</script>

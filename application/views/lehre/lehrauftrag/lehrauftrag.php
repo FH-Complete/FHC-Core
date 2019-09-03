@@ -27,7 +27,7 @@ $this->load->view(
 <body>
 <div id="page-wrapper">
     <div class="container-fluid">
-        <form id="formLehrauftrag" class="form-inline" action="" method="get">
+<!--        <form id="formLehrauftrag" class="form-inline" action="" method="get">-->
             <div class="row">
                 <div class="col-lg-12">
                     <h3 class="page-header">
@@ -35,7 +35,7 @@ $this->load->view(
                     </h3>
                 </div>
                 <div class="col-lg-12">
-                   <!-- <form id="formLehrauftrag" class="form-inline" action="" method="get">-->
+                    <form id="formLehrauftrag" class="form-inline" action="" method="get">
                         <div class="form-group">
                             <?php
                             echo $this->widgetlib->widget(
@@ -66,22 +66,31 @@ $this->load->view(
                             ?>
                         </div>
                         <button type="submit" name="submit" value="anzeigen" class="btn btn-default form-group">Anzeigen</button>
-                    <!--</form>-->
+                    </form>
                 </div>
-            </div>
-
-            <div class="row">
-                <?php $this->load->view('lehre/lehrauftrag/lehrauftragData.php'); ?>
             </div>
 
             <div class="row">
                 <div class="col-lg-12">
-                   <!-- <form id="formLehrauftragBestellen" class="form-inline" action="" method="get">-->
-                        <button type="submit" name="submit" value="bestellen" class="btn btn-default form-group pull-right">Lehrauftrag bestellen</button>
-                   <!-- </form>-->
+                    <?php $this->load->view('lehre/lehrauftrag/lehrauftragData.php'); ?>
                 </div>
             </div>
-        </form>
+
+<!--            <div class="row">-->
+<!--                <div class="col-lg-12">-->
+<!--                   <!-- <form id="formLehrauftragBestellen" class="form-inline" action="" method="get">-->
+<!--                        <button type="submit" id="submitBestellen" name="submit" value="bestellen" class="btn btn-primary form-group pull-right">Lehrauftrag bestellen</button>-->
+<!--                   <!-- </form>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--        </form>-->
+        <div class="row">
+            <div class="col-lg-12">
+                <button id="order-lehrauftraege" type="submit" id="submitBestellen" name="submit" value="bestellen" class="btn btn-primary form-group pull-right">Lehrauftrag bestellen</button>
+                <button id="select-all" class="btn btn-default">Alle auswählen</button>
+                <button id="deselect-all" class="btn btn-default">Alle abwählen</button>
+            </div>
+        </div>
     </div>
 </div>
 </body>
