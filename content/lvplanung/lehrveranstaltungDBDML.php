@@ -1550,8 +1550,8 @@ if(!$error)
 					$gruppe->semester = $lva->semester;
 					$gruppe->bezeichnung = $bezeichnung;
 					$gruppe->aktiv = true;
-					$gruppe->mailgrp = false;
-					$gruppe->sichtbar = true;
+					$gruppe->mailgrp = true;
+					$gruppe->sichtbar = false;
 					$gruppe->generiert = false;
 					$gruppe->insertamum = date('Y-m-d H:i:s');
 					$gruppe->insertvon = $user;
@@ -1678,7 +1678,7 @@ if(!$error)
 									$qry = "
 										DELETE FROM lehre.tbl_stundenplandev
 										WHERE gruppe_kurzbz=".$db->db_add_param($gruppe_kurzbz);
-									
+
 									$db->db_query($qry);
 								}
 								else
