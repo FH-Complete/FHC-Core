@@ -1,5 +1,5 @@
 # FH-Complete
 
-* [FH-Complete Homepage](http://www.fhcomplete.org)
-* [Wiki](http://fhcomplete.technikum-wien.at/dokuwiki/)
+* [FH-Complete Homepage](https://www.fhcomplete.org)
+* [Wiki](https://wiki.fhcomplete.org/)
 * [Changelog](CHANGELOG.md)

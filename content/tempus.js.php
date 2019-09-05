@@ -36,7 +36,7 @@ function Progressmeter(progress_id)
 	var runningprogress=0;
     this.StopPM=StopPM;
     this.StartPM=StartPM;
-    
+
     function StartPM()
     {
         // Progressmeter starten.
@@ -49,7 +49,7 @@ function Progressmeter(progress_id)
     	runningprogress--;
     	if(runningprogress<0)
     		runningprogress=0;
-    	
+
         // Progressmeter stoppen wenn alle fertig sind
         if(runningprogress==0)
 			document.getElementById(id).setAttribute('mode','determined');
@@ -70,7 +70,7 @@ function closeWindow()
 	}
 
 	MitarbeiterDetailValueChanged=false;
-	
+
 	window.close();
 }
 
@@ -128,7 +128,7 @@ function loadURL(event)
 // ****
 function stpltableChange(db_stpl_table)
 {
-	variableChange('db_stpl_table', null, db_stpl_table);	
+	variableChange('db_stpl_table', null, db_stpl_table);
 	return true;
 }
 
@@ -143,7 +143,7 @@ function studiensemesterChange(stsem, wert)
 		if(typeof(stsem)=='undefined')
 		{
 			var items = document.getElementsByTagName('menuitem');
-			
+
 			for(i in items)
 			{
 				if(items[i].id=='menu-properies-studiensemester-name' && items[i].getAttribute("checked")=='true')
@@ -157,7 +157,7 @@ function studiensemesterChange(stsem, wert)
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 
 	// Request absetzen
-	
+
 	var url = '<?php echo APP_ROOT ?>content/fasDBDML.php';
 
 	var req = new phpRequest(url,'','');
@@ -165,7 +165,7 @@ function studiensemesterChange(stsem, wert)
 	req.add('type', 'variablechange');
 	req.add('stsem', stsem);
 	req.add('wert', wert);
-	
+
 	var response = req.executePOST();
 
 	var val =  new ParseReturnValue(response)
@@ -184,7 +184,7 @@ function studiensemesterChange(stsem, wert)
    		document.getElementById("statusbarpanel-semester").label = val.dbdml_data;
    		//Menue setzen
    		var items = document.getElementsByTagName('menuitem');
-			
+
 		for(i in items)
 		{
 			if(items[i].label==val.dbdml_data && items[i].id=='menu-properies-studiensemester-name')
@@ -201,7 +201,7 @@ function studiensemesterChange(stsem, wert)
    		}
    		catch(e)
    		{}
-   		
+
    		try
    		{
    			LvTreeRefresh();
@@ -209,7 +209,7 @@ function studiensemesterChange(stsem, wert)
    		catch(e)
    		{}
 	}
-   
+
 	return true;
 }
 
@@ -219,9 +219,9 @@ function studiensemesterChange(stsem, wert)
 function variableChangeValue(variable)
 {
 	var variablevalue = getvariable(variable);
-	
+
 	if(variablevalue = prompt('Bitte geben Sie den neuen Wert fuer '+variable+' ein', variablevalue))
-	{	
+	{
 		variableChange(variable, '', variablevalue);
 	}
 }
@@ -244,7 +244,7 @@ function variableChange(variable, id, wert)
 {
 	if(id!=null)
 		item = document.getElementById(id);
-	
+
 	if(typeof(wert)==='undefined')
 	{
 		if(item.getAttribute('checked')=='true')
@@ -254,11 +254,11 @@ function variableChange(variable, id, wert)
 	}
 	else
 		checked=wert;
-	
+
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 
 	// Request absetzen
-	
+
 	var url = '<?php echo APP_ROOT ?>content/fasDBDML.php';
 
 	var req = new phpRequest(url,'','');
@@ -266,7 +266,7 @@ function variableChange(variable, id, wert)
 	req.add('type', 'variablechange');
 	req.add('name', variable);
 	req.add('wert', checked);
-	
+
 	var response = req.executePOST();
 
 	var val =  new ParseReturnValue(response)
@@ -312,7 +312,7 @@ function updateignorekollision()
 		panel.style.backgroundColor='';
 		panel.style.MozAppearance = "none"
 		document.getElementById('menu-prefs-ignore_kollision').setAttribute('checked','false');
-	}		
+	}
 }
 
 // ****
@@ -332,7 +332,7 @@ function updatedbstpltable()
 	{
 		panel.style.backgroundColor='';
 		panel.style.MozAppearance = "none"
-	}		
+	}
 }
 
 
@@ -348,7 +348,7 @@ function getStudiensemesterVariable()
 		document.getElementById("statusbarpanel-semester").label = stsem;
 		//Menue setzen
 		var items = document.getElementsByTagName('menuitem');
-		
+
 		for(i in items)
 		{
 			if(items[i].label==stsem && items[i].id=='menu-properies-studiensemester-name')
@@ -357,7 +357,7 @@ function getStudiensemesterVariable()
 				break;
 			}
 		}
-		
+
 		//Ansichten Refreshen
 		try
 		{
@@ -365,7 +365,7 @@ function getStudiensemesterVariable()
 		}
 		catch(e)
 		{}
-		
+
 		try
 		{
 			LvTreeRefresh();
@@ -473,7 +473,7 @@ function SyncLVPlan()
 // ****
 function OpenManualTempus()
 {
-	window.open('https://fhcomplete.technikum-wien.at/dokuwiki/doku.php?id=tempus:allgemeines','Manual');
+	window.open('https://wiki.fhcomplete.org/doku.php?id=tempus:allgemeines','Manual');
 }
 
 // ****

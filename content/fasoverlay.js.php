@@ -1573,7 +1573,7 @@ function OpenAboutDialog()
 // ****
 function OpenManual()
 {
-	window.open('http://fhcomplete.technikum-wien.at/dokuwiki/doku.php?','_blank');
+	window.open('https://wiki.fhcomplete.org/doku.php?','_blank');
 }
 
 // ****
