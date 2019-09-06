@@ -114,9 +114,9 @@
 		<!ENTITY menu-statistic-notenspiegel.label		"Notenspiegel HTML">
 		<!ENTITY menu-statistic-notenspiegel.accesskey	"H">
 
-		<!ENTITY menu-statistic-studienverlauf-student.key			"S">
-		<!ENTITY menu-statistic-studienverlauf-student.label		"Studienverlauf">
-		<!ENTITY menu-statistic-studienverlauf-student.accesskey	"S">
+<!ENTITY menu-statistic-studienverlauf-student.key			"S">
+<!ENTITY menu-statistic-studienverlauf-student.label		"Studienverlauf">
+<!ENTITY menu-statistic-studienverlauf-student.accesskey	"S">
 
 		<!ENTITY menu-statistic-substatistik-bewerberstatistik.label		"BewerberInnenstatistik">
 		<!ENTITY menu-statistic-substatistik-bewerberstatistik.accesskey	"B">

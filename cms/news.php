@@ -130,7 +130,7 @@ if($studiengang_kz!=0)
 {
 	$stg_obj = new studiengang();
 	$stg_obj->load($studiengang_kz);
-	$xml.='<studiengang_bezeichnung>'.$stg_obj->bezeichnung.'</studiengang_bezeichnung>';
+	$xml .= '<studiengang_bezeichnung><![CDATA['. $stg_obj->bezeichnung. ']]></studiengang_bezeichnung>';
 }
 
 if($titel!='')

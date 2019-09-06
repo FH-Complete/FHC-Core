@@ -164,7 +164,8 @@
                     </xsl:when>
                     <xsl:otherwise>
                         seit <xsl:value-of select="begin_date" />
-                        als Hochschullehrer tätig ist.
+                        für die FH Technikum Wien als HochschullektorIn tätig ist.
+                        Die Tätigkeit umfasst die Konzeption, Organisation und Abhaltung von Lehrveranstaltungen.
                     </xsl:otherwise>
                 </xsl:choose>
             </text:p>

@@ -1826,10 +1826,17 @@ function StudentPrestudentRolleBestaetigen()
 	var studiensemester_kurzbz = getTreeCellText(tree, 'student-prestudent-tree-rolle-studiensemester_kurzbz', tree.currentIndex);
 	var prestudent_id = getTreeCellText(tree, 'student-prestudent-tree-rolle-prestudent_id', tree.currentIndex);
 	var ausbildungssemester = getTreeCellText(tree, 'student-prestudent-tree-rolle-ausbildungssemester', tree.currentIndex);
+	var bewerbung_abgeschicktamum = getTreeCellText(tree, 'student-prestudent-tree-rolle-bewerbung_abgeschicktamum', tree.currentIndex);
 
 	studiengang_kz = document.getElementById('student-prestudent-menulist-studiengang_kz').value;
 	if(confirm('Diesen Status bestaetigen?'))
 	{
+		// Status darf nur bestaetig werden, wenn Bewerbung schon abgeschickt wurde
+		if (bewerbung_abgeschicktamum=='')
+		{
+			alert('Die Bewerbung wurde noch nicht abgeschickt und kann deshalb nicht bestätigt werden');
+			return false;
+		}
 		var url = '<?php echo APP_ROOT ?>content/student/studentDBDML.php';
 		var req = new phpRequest(url,'','');
 

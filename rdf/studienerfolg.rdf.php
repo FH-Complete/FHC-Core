@@ -249,10 +249,10 @@ function draw_studienerfolg($uid, $studiensemester_kurzbz)
 				$xml .= "				<note_idx>".$row->note."</note_idx>";
 				$xml .= "				<note_positiv>".$row->note_positiv."</note_positiv>";
 				$sws = sprintf('%.1F',$row->semesterstunden/$wochen);
-				$xml .= "				<sws>".$sws."</sws>";
+				$xml .= "				<sws>".number_format($sws,2)."</sws>";
 				$sws_lv = sprintf('%.1F',$row->sws);
-				$xml .= "				<sws_lv>".$sws_lv."</sws_lv>";
-				$xml .= "				<ects>".$row->ects."</ects>";
+				$xml .= "				<sws_lv>".number_format($sws_lv,2)."</sws_lv>";
+				$xml .= "				<ects>".number_format($row->ects,2)."</ects>";
 				$xml .= "				<lehrform><![CDATA[".$row->lv_lehrform_kurzbz."]]></lehrform>";
 				if($row->benotungsdatum!='')
 					$xml .= "				<benotungsdatum>".date('d.m.Y',$datum->mktime_fromtimestamp($row->benotungsdatum))."</benotungsdatum>";
@@ -298,10 +298,10 @@ function draw_studienerfolg($uid, $studiensemester_kurzbz)
 
 	$xml .= "		<gesamtstunden>".$gesamtstunden."</gesamtstunden>";
 	$xml .= "		<gesamtstunden_positiv>".$gesamtstunden_positiv."</gesamtstunden_positiv>";
-	$xml .= "		<gesamtstunden_lv>".$gesamtstunden_lv."</gesamtstunden_lv>";
-	$xml .= "		<gesamtstunden_lv_positiv>".$gesamtstunden_lv_positiv."</gesamtstunden_lv_positiv>";
-	$xml .= "		<gesamtects>$gesamtects</gesamtects>";
-	$xml .= "		<gesamtects_positiv>$gesamtects_positiv</gesamtects_positiv>";
+	$xml .= "		<gesamtstunden_lv>".number_format($gesamtstunden_lv,2)."</gesamtstunden_lv>";
+	$xml .= "		<gesamtstunden_lv_positiv>".number_format($gesamtstunden_lv_positiv,2)."</gesamtstunden_lv_positiv>";
+	$xml .= "		<gesamtects>".number_format($gesamtects,2)."</gesamtects>";
+	$xml .= "		<gesamtects_positiv>".number_format($gesamtects_positiv,2)."</gesamtects_positiv>";
 	$xml .= "		<schnitt>".sprintf('%.2f',$schnitt)."</schnitt>";
 	$xml .= "		<schnitt_positiv>".sprintf('%.2f',$schnitt_positiv)."</schnitt_positiv>";
 	$xml .= "	</studienerfolg>";

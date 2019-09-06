@@ -503,6 +503,56 @@ function onVerbandSelect(event)
 	}
 }
 
+// ****
+// * Wenn im Suchfeld Enter gedrueckt wird, dann die Suchfunktion starten
+// ****
+function LehrveranstaltungSearchFieldKeyPress(event)
+{
+	if(event.keyCode==13) //Enter
+		LehrveranstaltungSuche();
+}
+
+function LehrveranstaltungSuche()
+{
+	var filter = document.getElementById("lehrveranstaltung-toolbar-textbox-suche").value;
+	// Lehrveranstaltung
+	document.getElementById('statusbar-progressmeter').setAttribute('mode','undetermined');
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+	try
+	{
+		url = '<?php echo APP_ROOT; ?>rdf/lehrveranstaltung_einheiten.rdf.php?filter='+encodeURIComponent(filter)+'&'+gettimestamp();
+		var treeLV=document.getElementById('lehrveranstaltung-tree');
+
+		try
+		{
+			LvTreeDatasource.removeXMLSinkObserver(LvTreeSinkObserver);
+			treeLV.builder.removeListener(LvTreeListener);
+		}
+		catch(e)
+		{}
+
+		//Alte DS entfernen
+		var oldDatasources = treeLV.database.GetDataSources();
+		while(oldDatasources.hasMoreElements())
+		{
+			treeLV.database.RemoveDataSource(oldDatasources.getNext());
+		}
+
+		var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
+		LvTreeDatasource = rdfService.GetDataSource(url);
+		LvTreeDatasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
+		LvTreeDatasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
+		treeLV.database.AddDataSource(LvTreeDatasource);
+		LvTreeDatasource.addXMLSinkObserver(LvTreeSinkObserver);
+		treeLV.builder.addListener(LvTreeListener);
+		document.getElementById('lehrveranstaltung-toolbar-lehrauftrag').hidden=true;
+	}
+	catch(e)
+	{
+		debug(e);
+	}
+}
+
 function onFachbereichSelect(event)
 {
 	var tree=document.getElementById('tree-fachbereich');
@@ -1077,7 +1127,7 @@ function StatistikPrintNotenspiegelErweitert(typ)
 	window.open('<?php echo APP_ROOT ?>content/statistik/notenspiegel_erweitert.php?studiengang_kz='+studiengang_kz+'&semester='+semester+'&typ='+typ+'&orgform='+orgform,'Notenspiegel');
 }
 
-function StatistikPrintNotenspiegelStudent()
+function StatistikPrintStudienverlaufStudent()
 {
 	var tree = document.getElementById('student-tree');
 	var data='';
@@ -1094,7 +1144,7 @@ function StatistikPrintNotenspiegelStudent()
 		alert('Markierte Person ist kein/e StudentIn');
 		return;
 	}
-	window.open('<?php echo APP_ROOT ?>index.ci.php/person/gradelist/index/'+student_uid,'Notenspiegel');
+	window.open('<?php echo APP_ROOT ?>index.ci.php/person/gradelist/index/'+student_uid,'Studienverlauf');
 }
 
 // ****

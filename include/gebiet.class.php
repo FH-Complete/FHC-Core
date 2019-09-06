@@ -372,7 +372,7 @@ class gebiet extends basis_db
 					{
 						if($row->anzahl>$this->maxfragen)
 						{
-							$this->errormsg .= "Wenn Levelgleichverteilung gesetzt ist, muss maxfragen groesser als die Anzahl der verwendeten Levels sein\n";
+							//$this->errormsg .= "Wenn Levelgleichverteilung gesetzt ist, muss maxfragen groesser als die Anzahl der verwendeten Levels sein\n";
 						}
 					}
 				}

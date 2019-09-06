@@ -20,14 +20,6 @@
  *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
  *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
-
-// ------------------------------------------------------------------------------------------
-// Session Starten - Merk Anwenderdaten
-// ------------------------------------------------------------------------------------------
-  	$SESSIONID=trim((isset($_REQUEST['SESSIONID']) ? $_REQUEST['SESSIONID']:''));
- 	if (session_start($SESSIONID))
-		$SESSIONID=@session_id();
-
 	require_once('../../config/cis.config.inc.php');
 	require_once('../../include/wochenplan.class.php');
 	require_once('../../include/benutzerberechtigung.class.php');

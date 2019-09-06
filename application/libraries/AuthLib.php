@@ -30,7 +30,6 @@ class AuthLib
 	/**
 	 * Construct
 	 *
-	 *
 	 * @param bool $authenticate If the authentication must be performed.
 	 */
 	public function __construct($authenticate = true)
@@ -483,6 +482,8 @@ class AuthLib
 
 	/**
 	 * Stores the authentication object into the authentication session
+	 * Everything was fine, the user at this point is authenticated, it is possible to store the authentication object
+	 * in the user session
 	 */
 	private function _storeSessionAuthObj($authObj)
 	{
@@ -552,7 +553,12 @@ class AuthLib
 				$this->_showError(getData($auth)); // display a generic error message and logs the occurred error
 			}
 		}
-		// else the user is already logged, then continue with the execution
+		// else the user is already logged, then loads authentication helper and continue with the execution
+		// NOTE: it is needed only here because:
+		//		- it is called when a user is already logged in
+		//		- it is called after login the user
+		//		- it is NOT called in case of fatal error or wrong authentication
+		$this->_ci->load->helper('hlp_authentication');
 	}
 
 	/**

@@ -97,15 +97,13 @@ foreach ($uid_arr as $uid)
 		{
 			if($row = $db->db_fetch_object())
 			{
-				$vorname = convertProblemChars($row->vorname);
-				$vorname1 = $row->vorname;
-				$nachname = convertProblemChars($row->nachname);
-				$nachname1 = $row->nachname;
+				$vorname = $row->vorname;
+				$nachname = $row->nachname;
 				$matrikelnr = $row->matrikelnr;
-				$studiengang = convertProblemChars($row->bezeichnung);
-				$studiengang_eng = convertProblemChars($row->english);
-				$studiengangbezeichnung = convertProblemChars($row->studiengangbezeichnung);
-				$studiengangbezeichnung_englisch = convertProblemChars($row->studiengangbezeichnung_englisch);
+				$studiengang = $row->bezeichnung;
+				$studiengang_eng = $row->english;
+				$studiengangbezeichnung = $row->studiengangbezeichnung;
+				$studiengangbezeichnung_englisch = $row->studiengangbezeichnung_englisch;
 				$studiengang_bezeichnung = empty($studiengangbezeichnung) ? $studiengang : $studiengangbezeichnung;
 				$studiengang_bezeichnung_englisch = empty($studiengangbezeichnung_englisch) ? $studiengang_eng : $studiengangbezeichnung_englisch;
 				$uid = $row->uid;
@@ -120,7 +118,7 @@ foreach ($uid_arr as $uid)
 	}
 
 	echo "\n		<infoblatt>";
-	echo "\n			<name><![CDATA[".$vorname1.' '.$nachname1."]]></name>";
+	echo "\n			<name><![CDATA[".$vorname.' '.$nachname."]]></name>";
 	echo "\n			<account><![CDATA[".$uid."]]></account>";
 	echo "\n			<aktivierungscode><![CDATA[".$row->aktivierungscode."]]></aktivierungscode>";
 	if($row->alias!='')

@@ -86,8 +86,8 @@ if($student_help->load($uid))
 	$studiengang_bezeichnung_englisch = empty($studiengangbezeichnung_englisch) ? $studiengang->english : $studiengangbezeichnung_englisch;
 
 	echo "\t<studiengang_typ>".$studTyp."</studiengang_typ>\n";
-	echo "\t<studiengang>".$studiengang_bezeichnung."</studiengang>\n";
-	echo "\t<studiengang_englisch>".$studiengang_bezeichnung_englisch."</studiengang_englisch>\n";
+	echo "\t<studiengang>".$db->convert_html_chars($studiengang_bezeichnung)."</studiengang>\n";
+	echo "\t<studiengang_englisch>".$db->convert_html_chars($studiengang_bezeichnung_englisch)."</studiengang_englisch>\n";
 }
 
 foreach($uid_arr as $uid)
@@ -148,8 +148,8 @@ foreach($uid_arr as $uid)
 		echo "\t\t<staatsbuergerschaft>".$staatsbuergerschaft->langtext."</staatsbuergerschaft>\n";
 		echo "\t\t<svnr>".$svnr."</svnr>\n";
 		echo "\t\t<matrikelnr>".trim($student->matrikelnr)."</matrikelnr>\n";
-		echo "\t\t<studiengang>".$studiengang_bezeichnung."</studiengang>\n";
-		echo "\t\t<studiengang_englisch>".$studiengang_bezeichnung_englisch."</studiengang_englisch>\n";
+		echo "\t\t<studiengang>".$db->convert_html_chars($studiengang_bezeichnung)."</studiengang>\n";
+		echo "\t\t<studiengang_englisch>".$db->convert_html_chars($studiengang_bezeichnung_englisch)."</studiengang_englisch>\n";
 		echo "\t\t<studiengang_kurzbz>".$studiengang->kurzbzlang."</studiengang_kurzbz>\n";
 		echo "\t\t<studiengang_kz>".$studiengang_kz."</studiengang_kz>\n";
 		echo "\t\t<studiengangSprache>".$studiengang->sprache."</studiengangSprache>";
@@ -301,8 +301,8 @@ if($prestudent_help->load($prest_id))
 	$studiengang_bezeichnung_englisch = empty($studiengangbezeichnung_englisch) ? $studiengang->english : $studiengangbezeichnung_englisch;
 
 	echo "\t<studiengang_typ>".$studTyp."</studiengang_typ>\n";
-	echo "\t<studiengang>".$studiengang_bezeichnung."</studiengang>\n";
-	echo "\t<studiengang_englisch>".$studiengang_bezeichnung_englisch."</studiengang_englisch>\n";
+	echo "\t<studiengang>".$db->convert_html_chars($studiengang_bezeichnung)."</studiengang>\n";
+	echo "\t<studiengang_englisch>".$db->convert_html_chars($studiengang_bezeichnung_englisch)."</studiengang_englisch>\n";
 }
 
 foreach($prestudent_arr as $prest_id)
@@ -364,8 +364,8 @@ foreach($prestudent_arr as $prest_id)
 					echo "\t\t<gebort>".$person->gebort."</gebort>\n";
 					echo "\t\t<staatsbuergerschaft>".$staatsbuergerschaft->langtext."</staatsbuergerschaft>\n";
 					echo "\t\t<svnr>".$svnr."</svnr>\n";
-					echo "\t\t<studiengang>".$studiengang_bezeichnung."</studiengang>\n";
-					echo "\t\t<studiengang_englisch>".$studiengang_bezeichnung_englisch."</studiengang_englisch>\n";
+					echo "\t\t<studiengang>".$db->convert_html_chars($studiengang_bezeichnung)."</studiengang>\n";
+					echo "\t\t<studiengang_englisch>".$db->convert_html_chars($studiengang_bezeichnung_englisch)."</studiengang_englisch>\n";
 					echo "\t\t<studiengang_kurzbz>".$studiengang->kurzbzlang."</studiengang_kurzbz>\n";
 					echo "\t\t<studiengang_kz>".$studiengang_kz."</studiengang_kz>\n";
 					echo "\t\t<studiengangSprache>".$studiengang->sprache."</studiengangSprache>";

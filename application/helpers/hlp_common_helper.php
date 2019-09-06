@@ -224,3 +224,19 @@ function isDateWorkingDay($date, $days = null)
 			return true;
 	}
 }
+
+/**
+ * Checks if the current user is logged by checking that the AuthLib is loaded and
+ * it is present the authentication object in session
+ * NOTE: it is placed here instead of being placed in the helper hlp_authentication_helper
+ *		because hlp_authentication_helper is loaded after the authentication.
+ *		It is very useful to use this function even in those parts of the code that are accessible
+ *		even when a user is NOT authenticated!!!
+ *		If and only if this function returns true, then all the functions present in hlp_authentication_helper can be used!
+ */
+function isLogged()
+{
+	$ci =& get_instance(); // get CI instance
+
+	return isset($ci->authlib) && $ci->authlib->getAuthObj() != null;
+}

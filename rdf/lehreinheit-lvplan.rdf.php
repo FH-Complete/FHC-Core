@@ -36,6 +36,8 @@ require_once('../config/vilesci.config.inc.php');
 require_once('../include/functions.inc.php');
 require_once('../include/lehreinheit.class.php');
 require_once('../include/notiz.class.php');
+require_once('../include/mitarbeiter.class.php');
+require_once('../include/zeitaufzeichnung_gd.class.php');
 
 $uid=get_uid();
 $error_msg='';
@@ -162,6 +164,33 @@ if ($anz>0)
 		// Lektoren
 		$lektor='';
 		$l->lektor=array_unique($l->lektor);
+
+		$fixangestellt = false;
+		foreach ($l->lektor_uid as $lktuid)
+		{
+			$ma = new mitarbeiter();
+			$ma->load($lktuid);
+			if ($ma->fixangestellt)
+			{
+				$fixangestellt = true;
+				break;
+			}
+		}
+
+		$selbstverwaltete_pause = false;
+		foreach ($l->lektor_uid as $lktuid)
+		{
+			$gd = new zeitaufzeichnung_gd();
+			if($gd->load($lktuid, $studiensemester))
+			{
+				if ($gd->selbstverwaltete_pause)
+				{
+					$selbstverwaltete_pause = true;
+					break;
+				}
+			}
+		}
+
 		sort($l->lektor);
 		foreach($l->lektor as $lv)
 			$lektor.=$lv.' ';
@@ -261,11 +290,26 @@ if ($anz>0)
 				continue;
 			}
 		}
+
+		$fixangestellt_info = '';
+		if($fixangestellt)
+		{
+			if($selbstverwaltete_pause)
+			{
+				$fixangestellt_info = 'SVP';
+			}
+			else
+				$fixangestellt_info = 'FIX';
+		}
+		else
+			$fixangestellt_info = 'EXT';
+
 		echo'<RDF:li>
-	      		<RDF:Description  id="lva'.($anz--).'" about="'.$rdf_url.$l->unr.'">
-			   		<LVA:lvnr>'.$lvnr.'</LVA:lvnr>
+			<RDF:Description  id="lva'.($anz--).'" about="'.$rdf_url.$l->unr.'">
+					<LVA:lvnr>'.$lvnr.'</LVA:lvnr>
 					<LVA:unr>'.$l->unr.'</LVA:unr>
 					<LVA:lektor>'.$lektor.'</LVA:lektor>
+					<LVA:fixangestellt_info>'.$fixangestellt_info.'</LVA:fixangestellt_info>
 					<LVA:lehrfach_id>'.$l->lehrfach_id.'</LVA:lehrfach_id>
 					<LVA:studiengang_kz>'.$l->stg_kz[0].'</LVA:studiengang_kz>
 					<LVA:fachbereich_kurzbz>'.$l->fachbereich.'</LVA:fachbereich_kurzbz>
@@ -291,7 +335,7 @@ if ($anz>0)
 					<LVA:lehrverband>'.$lehrverband.'</LVA:lehrverband>
 					<LVA:anzahl_notizen>'.$anzahl_notizen.'</LVA:anzahl_notizen>
 					<LVA:lehreinheit_id>'.$l->lehreinheit_id[0].'</LVA:lehreinheit_id>
-	      		</RDF:Description>
+				</RDF:Description>
 			</RDF:li>';
 	}
 }

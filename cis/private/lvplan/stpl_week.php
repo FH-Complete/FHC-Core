@@ -121,7 +121,7 @@ if (isset($_POST['titel']))
 	<META charset="UTF-8">
 	<TITLE><?php echo $p->t('lvplan/lehrveranstaltungsplan').' '.CAMPUS_NAME;?></TITLE>
 	<?php include('../../../include/meta/jquery.php');?>
-
+	<script type="text/javascript" src="../../../vendor/components/jqueryui/jquery-ui.min.js"></script>
 	<script type="text/javascript">
 		<!--
 		function MM_jumpMenu(targ,selObj,restore)
@@ -144,6 +144,45 @@ if (isset($_POST['titel']))
 		}
 
 		$(document).ready(function() {
+			$("#user_uid").autocomplete({
+				source: "lvplan_autocomplete.php?autocomplete=mitarbeiter",
+				minLength:2,
+				response: function(event, ui)
+				{
+					//Value und Label fuer die Anzeige setzen
+					for(var i in ui.content)
+					{
+						ui.content[i].value=ui.content[i].vorname+" "+ui.content[i].nachname+" ("+ui.content[i].uid+")";
+						ui.content[i].label=ui.content[i].vorname+" "+ui.content[i].nachname+" ("+ui.content[i].uid+")";
+					}
+				},
+				select: function(event, ui)
+				{
+					var uid = ui.item.uid;
+
+					if ($("#lecturer_"+uid).length <= 0)
+					{
+						$("#user_uid").after("<input type='hidden' name='lecturer_uids[]' value='" + uid + "' id='lecturer_" + uid + "'>");
+						$("#firstinputrow").after("<tr id='lecturerrow_"+uid+"'>" +
+							"<td colspan='9'></td>" +
+							"<td class='lecturercell'>" +
+							"<div class='lecturercellname'>"+ui.item.value+"</div>" +
+							"<div class='lecturercelldelete'>" +
+							"<img src='../../../skin/images/delete_x.png' id='deleteLecturer_"+uid+"' width='11px' height='11px' title='<?php echo $p->t('global/löschen');?>'>" +
+							"</div>" +
+							"</td></tr>");
+						$("#deleteLecturer_"+uid).click(
+							function() {
+								$("#lecturer_"+uid).remove();
+								$("#lecturerrow_"+uid).remove();
+							}
+						);
+					}
+					$("#user_uid").val("");
+
+					return false;
+				}
+			});
 			$("select[name='studiengang_kz']").change(function() {
 				var studiengang_kz = $("select[name='studiengang_kz']").val();
 				$.ajax({
@@ -251,6 +290,7 @@ if (isset($_POST['titel']))
 	';
 	?>
 	<link rel="stylesheet" href="../../../skin/style.css.php" type="text/css">
+	<link href="../../../skin/jquery-ui-1.9.2.custom.min.css" rel="stylesheet" type="text/css">
 </HEAD>
 <BODY id="inhalt">
 <h1><?php echo $p->t('lvplan/wochenplan');?></h1>
@@ -305,8 +345,51 @@ if (isset($_POST['reserve']))
 	$reserve=$_POST['reserve'];
 else if (isset($_GET['reserve']))
 	$reserve=$_GET['reserve'];
+
+if (isset($_GET['reservtodelete']))
+	$reservtodelete=$_GET['reservtodelete'];
+
+// Loeschen von Reservierungen
+if (isset($reservtodelete))
+{
+	if (is_array($reservtodelete))
+	{
+		foreach ($reservtodelete as $delete_id)
+		{
+			if (!is_numeric($delete_id))
+				die('ungueltige ID');
+		}
+
+		$reservierung = new reservierung();
+		$reservdelcount = 0;
+		$reservberechtigt = $rechte->isBerechtigt('lehre/reservierung', null, 'suid');
+
+		foreach ($reservtodelete as $delete_id)
+		{
+			if ($reservierung->load($delete_id))
+			{
+				if ($reservberechtigt && ($reservierung->insertvon==$uid || $reservierung->uid==$uid))
+				{
+					if($reservierung->delete($delete_id))
+						$reservdelcount++;
+					else
+						echo $reservierung->errormsg;
+				}
+				else
+				{
+					echo '<b>'.$p->t('global/keineBerechtigung').'</b><br>';
+				}
+			}
+			else
+				echo '<b>'.$p->t('global/fehleraufgetreten').'!</b><br>';
+		}
+	}
+	else
+		die('<b>ungueltige IDs</b><br>');
+}
+
 // Reservieren
-if (isset($reserve) && $raumres)
+elseif (isset($reserve) && $raumres)
 {
 	$ort_obj = new ort();
 	if(!$ort_obj->load($ort_kurzbz))
@@ -358,25 +441,33 @@ if (isset($reserve) && $raumres)
 							$reservierung->insertamum=date('Y-m-d H:i:s');
 							$reservierung->insertvon=$uid;
 
-							if(isset($_REQUEST['studiengang_kz']))
+							if(isset($_REQUEST['lecturer_uids']) && !empty($_REQUEST['lecturer_uids'] && isset($_REQUEST['studiengang_kz'])))
 							{
-								$reservierung->studiengang_kz = $_REQUEST['studiengang_kz'];
-								$reservierung->semester = $_REQUEST['semester'];
-								$reservierung->verband = $_REQUEST['verband'];
-								$reservierung->gruppe = $_REQUEST['gruppe'];
-								$reservierung->gruppe_kurzbz = $_REQUEST['gruppe_kurzbz'];
-								$reservierung->uid = $_REQUEST['user_uid'];
+								$lecturer_uids = $_REQUEST['lecturer_uids'];
+								foreach ($lecturer_uids as $lecturer_uid)
+								{
+									$reservierung->studiengang_kz = $_REQUEST['studiengang_kz'];
+									$reservierung->semester = $_REQUEST['semester'];
+									$reservierung->verband = $_REQUEST['verband'];
+									$reservierung->gruppe = $_REQUEST['gruppe'];
+									$reservierung->gruppe_kurzbz = $_REQUEST['gruppe_kurzbz'];
+									$reservierung->uid = $lecturer_uid;
+
+									if(!$reservierung->save(true))
+										echo $reservierung->errormsg;
+									else
+										$count++;
+								}
 							}
 							else
 							{
 								$reservierung->studiengang_kz='0';
 								$reservierung->uid = $uid;
+								if(!$reservierung->save(true))
+									echo $reservierung->errormsg;
+								else
+									$count++;
 							}
-
-							if(!$reservierung->save(true))
-								echo $reservierung->errormsg;
-							else
-								$count++;
 						}
 					}
 					else
@@ -429,6 +520,8 @@ else
 
 if (isset($count))
 	echo "Es wurde".($count!=1?'n':'')." $count Stunde".($count!=1?'n':'')." reserviert!<BR>";
+if (isset($reservdelcount))
+	echo "Es wurde".($reservdelcount!=1?'n':'')." $reservdelcount Stunde".($reservdelcount!=1?'n':'')." gel&ouml;scht!<BR>";
 ?>
 
 <P><br><?php echo $p->t('lvplan/fehlerUndFeedback');?> <A class="Item" href="mailto:<?php echo MAIL_LVPLAN?>"><?php echo $p->t('lvplan/lvKoordinationsstelle');?></A>.</P>

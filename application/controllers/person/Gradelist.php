@@ -28,6 +28,7 @@ class Gradelist extends Auth_Controller
 		$this->load->model('education/zeugnisnote_model', 'ZeugnisnoteModel');
 		$this->load->model('education/lehrveranstaltung_model', 'LehrveranstaltungModel');
 		$this->load->model('codex/note_model', 'NoteModel');
+		$this->load->model('education/lehrveranstaltung_model', 'LehrveranstaltungModel');
 
 		$this->loadPhrases(
 			array(
@@ -45,6 +46,9 @@ class Gradelist extends Auth_Controller
 			$this->_grades[$row->note]['anmerkung'] = $row->anmerkung;
 			$this->_grades[$row->note]['notenwert'] = $row->notenwert;
 		}
+		$this->_grades['']['positiv'] = false;
+		$this->_grades['']['anmerkung'] = '';
+		$this->_grades['']['notenwert'] = 0;
 	}
 
 	/**
@@ -163,6 +167,14 @@ class Gradelist extends Auth_Controller
 					'studienplan_bezeichnung' => $stpl_bezeichnung,
 				);
 			}
+			$result_zuordnung = $this->LehrveranstaltungModel->getLvsByStudent($uid, $row_status->studiensemester_kurzbz);
+			if(isSuccess($result_zuordnung) && hasData($result_zuordnung))
+			{
+				$this->setZuordnung(
+					$result_zuordnung,
+					$courses['semester'][$row_status->studiensemester_kurzbz]['lvs']
+				);
+			}
 		}
 
 		// Load Grades and add to studyplan
@@ -186,6 +198,7 @@ class Gradelist extends Auth_Controller
 			if (!isset($row_noten->found))
 			{
 				$result_lv = $this->LehrveranstaltungModel->load($row_noten->lehrveranstaltung_id);
+				$result_stg = $this->StudiengangModel->load($result_lv->retval[0]->studiengang_kz);
 				$courses['semester'][$row_noten->studiensemester_kurzbz]['lvs_nonstpl'][] = array(
 					'lehrveranstaltung_id' => $row_noten->lehrveranstaltung_id,
 					'lehrtyp_kurzbz' => $result_lv->retval[0]->lehrtyp_kurzbz,
@@ -194,13 +207,20 @@ class Gradelist extends Auth_Controller
 					'sws' => $result_lv->retval[0]->sws,
 					'zeugnis' => $result_lv->retval[0]->zeugnis,
 					'bezeichnung' => $result_lv->retval[0]->bezeichnung,
+					'kurzbz' => $result_lv->retval[0]->kurzbz,
 					'ects' => $result_lv->retval[0]->ects,
+					'semester' => $result_lv->retval[0]->semester,
 					'note' => $row_noten->note,
-					'datum' => $row_noten->benotungsdatum
+					'datum' => $row_noten->benotungsdatum,
+					'zugeordnet' => true,
+					'studiengang_kurzbz' => $result_stg->retval[0]->kurzbzlang
 				);
 				if(!isset($courses['semester'][$row_noten->studiensemester_kurzbz]['data']['ectssumme_nonstpl']))
 					$courses['semester'][$row_noten->studiensemester_kurzbz]['data']['ectssumme_nonstpl'] = 0;
+				if(!isset($courses['semester'][$row_noten->studiensemester_kurzbz]['data']['swssumme_nonstpl']))
+					$courses['semester'][$row_noten->studiensemester_kurzbz]['data']['swssumme_nonstpl'] = 0;
 				$courses['semester'][$row_noten->studiensemester_kurzbz]['data']['ectssumme_nonstpl'] += $result_lv->retval[0]->ects;
+				$courses['semester'][$row_noten->studiensemester_kurzbz]['data']['swssumme_nonstpl'] += $result_lv->retval[0]->sws;
 			}
 		}
 
@@ -210,6 +230,8 @@ class Gradelist extends Auth_Controller
 		$num_grades_overall = 0;
 		$sum_ects_overall = 0;
 		$sum_ects_positiv_overall = 0;
+		$sum_sws_overall = 0;
+		$sum_sws_positiv_overall = 0;
 
 		// Calculate Sum and Average
 		foreach ($courses['semester'] as $stsem => $row_lvs)
@@ -219,6 +241,8 @@ class Gradelist extends Auth_Controller
 			$num_grades = 0;
 			$sum_ects = 0;
 			$sum_ects_positiv = 0;
+			$sum_sws = 0;
+			$sum_sws_positiv = 0;
 			$sum_grades = 0;
 			$notendurchschnitt = 0;
 			$sum_gradeweighted = 0;
@@ -235,8 +259,12 @@ class Gradelist extends Auth_Controller
 					$sum_gradeweighted += $row['ects'] * $this->_grades[$row['note']]['notenwert'];
 				}
 				$sum_ects += $row['ects'];
+				$sum_sws += $row['sws'];
 				if ($this->_grades[$row['note']]['positiv'])
+				{
 					$sum_ects_positiv += $row['ects'];
+					$sum_sws_positiv += $row['sws'];
+				}
 			}
 			if ($num_grades > 0)
 				$notendurchschnitt = $sum_grades / $num_grades;
@@ -254,11 +282,15 @@ class Gradelist extends Auth_Controller
 			$sum_ectsweighted_overall += $sum_ectsweighted;
 			$sum_ects_overall += $sum_ects;
 			$sum_ects_positiv_overall += $sum_ects_positiv;
+			$sum_sws_overall += $sum_sws;
+			$sum_sws_positiv_overall += $sum_sws_positiv;
 
 			$courses['semester'][$stsem]['data']['notendurchschnitt'] = number_format($notendurchschnitt, 2);
 			$courses['semester'][$stsem]['data']['notendurchschnittgewichtet'] = number_format($notendurchschnittgewichtet, 2);
 			$courses['semester'][$stsem]['data']['ectssumme'] = number_format($sum_ects,2);
-			$courses['semester'][$stsem]['data']['ectssumme_positiv'] = number_formaT($sum_ects_positiv,2);
+			$courses['semester'][$stsem]['data']['ectssumme_positiv'] = number_format($sum_ects_positiv,2);
+			$courses['semester'][$stsem]['data']['swssumme'] = number_format($sum_sws,2);
+			$courses['semester'][$stsem]['data']['swssumme_positiv'] = number_format($sum_sws_positiv,2);
 		}
 
 		if ($num_grades_overall > 0)
@@ -275,7 +307,9 @@ class Gradelist extends Auth_Controller
 			'notendurchschnitt' => number_format($notendurchschnitt, 2),
 			'notendurchschnittgewichtet' => number_format($notendurchschnittgewichtet, 2),
 			'ectssumme' => $sum_ects_overall,
-			'ectssumme_positiv' => $sum_ects_positiv_overall
+			'ectssumme_positiv' => $sum_ects_positiv_overall,
+			'swssumme' => $sum_sws_overall,
+			'swssumme_positiv' => $sum_sws_positiv_overall
 		);
 		return $courses;
 	}
@@ -307,6 +341,37 @@ class Gradelist extends Auth_Controller
 	}
 
 	/**
+	 * Checks if the Student is Assigned to this course and marks the course
+	 * @param $zuordnung reference to array of all assigned courses.
+	 * @param $courses reference to array of all courses.
+	 * @param $studiensemester_kurzbz Studiensemester of the Course and Grades
+	 */
+	private function setZuordnung(&$zuordnung, &$courses)
+	{
+		$subtree_zugeordnet = false;
+		foreach ($courses as $key => $value)
+		{
+			foreach ($zuordnung->retval as $zuordnungkey => $row_zuordnung)
+			{
+				if ($row_zuordnung->lehrveranstaltung_id == $value['lehrveranstaltung_id'])
+				{
+					$courses[$key]['zugeordnet'] = true;
+					$subtree_zugeordnet = true;
+				}
+				if (isset($value['childs']))
+				{
+					if ($this->setZuordnung($zuordnung, $courses[$key]['childs']) === true)
+					{
+						$courses[$key]['zugeordnet'] = true;
+						$subtree_zugeordnet = true;
+					}
+				}
+			}
+		}
+		return $subtree_zugeordnet;
+	}
+
+	/**
 	 * Reads all the Courses recursivly and Returns an Array with the Grades and ECTS
 	 * @param $courses array of courses
 	 * @return array with grades and ects
@@ -320,7 +385,17 @@ class Gradelist extends Auth_Controller
 			{
 				$grades[] = array(
 					'note' => $row['note'],
-					'ects' => $row['ects']
+					'ects' => $row['ects'],
+					'sws' => $row['sws']
+				);
+			}
+			elseif (isset($row['zugeordnet']) && $row['zugeordnet'] == true && $row['lehrtyp_kurzbz']=='lv')
+			{
+				// ECTS und SWS mitzaehlen wenn die Person zugeordnet ist auch wenn noch keine Noten vorhanden ist.
+				$grades[] = array(
+					'note' => '',
+					'ects' => $row['ects'],
+					'sws' => $row['sws']
 				);
 			}
 

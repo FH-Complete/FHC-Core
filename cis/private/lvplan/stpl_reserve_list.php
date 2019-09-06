@@ -67,7 +67,7 @@ if(!$rechte->isBerechtigt('lehre/reservierung:begrenzt', null, 'suid'))
 		$reservierung = new reservierung();
 		if($reservierung->load($id))
 		{
-			if($reservierung->uid==$uid || $reservierung->insertvon==$uid || $rechte->isBerechtigt('lehre/reservierung', null, 'suid'))
+			if(($reservierung->uid==$uid || $reservierung->insertvon==$uid) && $rechte->isBerechtigt('lehre/reservierung', null, 'suid'))
 			{
 				if($reservierung->delete($id))
 					echo '<b>'.$p->t('lvplan/reservierungWurdeGeloescht').'</b><br>';
@@ -135,8 +135,8 @@ if(!$rechte->isBerechtigt('lehre/reservierung:begrenzt', null, 'suid'))
 			echo '<td>'.$db->convert_html_chars($pers_uid).'</td>';
 			echo '<td>'.$db->convert_html_chars($beschreibung).'<a  name="liste'.$i.'">&nbsp;</a></td>';
 			$z=$i-1;
-			if (($pers_uid==$uid)|| ($insertvon==$uid) || $rechte->isBerechtigt('lehre/reservierung', null, 'suid'))
-				echo '<td><A class="Item" href="stpl_reserve_list.php?id='.$id.(isset($_GET['alle'])?'&alle=true':'').'#liste'.$z.'">Delete</A></td>';
+			if (($pers_uid==$uid || $insertvon==$uid) && $rechte->isBerechtigt('lehre/reservierung', null, 'suid'))
+				echo '<td><A class="Item" href="stpl_reserve_list.php?id='.$id.'#liste'.$z.'">Delete</A></td>';
 			echo '</tr>';
 		}
 		echo '</table>';
@@ -145,67 +145,6 @@ if(!$rechte->isBerechtigt('lehre/reservierung:begrenzt', null, 'suid'))
 
 	echo '<br><br>';
 	flush();
-	
-	if(isset($_GET['alle']))
-	{
-
-		//ALLE
-		$sql_query="SELECT * FROM campus.vw_reservierung 
-					WHERE datum>=".$db->db_add_param($datum)."
-					ORDER BY  datum, titel, ort_kurzbz, stunde";
-		if (!$erg_res=$db->db_query($sql_query))
-			die($db->db_last_error());
-		
-		$num_rows_res=$db->db_num_rows($erg_res);
-		if ($num_rows_res>0)
-		{
-			echo $p->t('lvplan/alleReservierungen').':<br>';
-			echo '<table border="0">';
-			echo '
-				<tr class="liste">
-					<th>'.$p->t('global/datum').'</th>
-					<th>'.$p->t('global/titel').'</th>
-					<th>'.$p->t('global/stunde').'</th>
-					<th>'.$p->t('lvplan/raum').'</th>
-					<th>'.$p->t('global/person').'</th>
-					<th>'.$p->t('global/beschreibung').'</th>
-					<th>'.$p->t('global/aktion').'</th>
-				</tr>';
-	
-			for ($i=0; $i<$num_rows_res; $i++)
-			{
-				$zeile=$i % 2;
-				$id=$db->db_result($erg_res,$i,"reservierung_id");
-				$datum=$db->db_result($erg_res,$i,"datum");
-				$titel=$db->db_result($erg_res,$i,"titel");
-				$stunde=$db->db_result($erg_res,$i,"stunde");
-				$ort_kurzbz=$db->db_result($erg_res,$i,"ort_kurzbz");
-				$pers_uid=$db->db_result($erg_res,$i,"uid");
-				$beschreibung=$db->db_result($erg_res,$i,"beschreibung");
-				$insertamum=$db->db_result($erg_res,$i,"insertamum");
-				$insertvon=$db->db_result($erg_res,$i,"insertvon");
-				
-				$datum = $datum_obj->formatDatum($datum, 'd.m.Y');
-				if($insertamum!='')
-					$insertamum = $datum_obj->formatDatum($insertamum, 'd.m.Y H:i:s');
-				echo '<tr class="liste'.$zeile.'" title="'.$p->t('global/angelegtAm').' '.$insertamum.' '.$p->t('global/von').' '.$insertvon.'">';
-				echo '<td>'.$db->convert_html_chars($datum).'</td>';
-				echo '<td>'.$db->convert_html_chars($titel).'</td>';
-				echo '<td>'.$db->convert_html_chars($stunde).'</td>';
-				echo '<td>'.$db->convert_html_chars($ort_kurzbz).'</td>';
-				echo '<td>'.$db->convert_html_chars($pers_uid).'</td>';
-				echo '<td>'.$db->convert_html_chars($beschreibung).'<a  name="liste'.$i.'">&nbsp;</a></td>';
-				$z=$i-1;
-				if (($pers_uid==$uid) || ($insertvon==$uid) || $rechte->isBerechtigt('lehre/reservierung', null, 'suid'))
-					echo '<td><A class="Item" href="stpl_reserve_list.php?id='.$id.(isset($_GET['alle'])?'&alle=true':'').'#liste'.$z.'">Delete</A></td>';
-				echo '</tr>';
-			}
-			echo '</table>';
-			flush();
-		}
-	}
-	else 
-		echo '<a href="stpl_reserve_list.php?alle=true">'.$p->t('lvplan/alleReservierungenAnzeigen').'</a>';
 	
 ?>
 </body>

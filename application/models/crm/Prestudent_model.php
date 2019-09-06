@@ -218,7 +218,7 @@ class Prestudent_model extends DB_Model
 
 		if (count($lastStatus->retval) > 0)
 		{
-			// get Studiengangname from Studienlan and -ordnung
+			//get Studiengangname from Studienplan and -ordnung
 			$studienordnung = $this->PrestudentstatusModel->getStudienordnungFromPrestudent($prestudent_id);
 			if ($studienordnung->error)
 				return error($studienordnung->retval);

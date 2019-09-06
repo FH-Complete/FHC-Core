@@ -314,8 +314,14 @@ function LoadGruppe(type)
   	</td></tr>
 
 		<tr>
-			<td width="30%">
-				<h2>'.$p->t("lvplan/saalplan").'</h2>
+			<td width="30%">';
+
+		if(!defined('CIS_LVPLAN_SAALPLAN_ANZEIGEN') || CIS_LVPLAN_SAALPLAN_ANZEIGEN)
+		{
+			echo '<h2>'.$p->t("lvplan/saalplan").'</h2>';
+		}
+
+		echo '
 			</td>
 			<td>';
 
@@ -328,25 +334,28 @@ function LoadGruppe(type)
 			</td>
 		</tr>
 		<tr>
-			<td valign="top">
+			<td valign="top">';
+
+		if(!defined('CIS_LVPLAN_SAALPLAN_ANZEIGEN') || CIS_LVPLAN_SAALPLAN_ANZEIGEN)
+		{	echo '
 			<select name="select" style="width:200px;" onChange="MM_jumpMenu(\'self\',this,0)">
         		<option value="stpl_week.php" selected>'.$p->t('lvplan/raumAuswaehlen').'</option>';
-		if(defined('CIS_SAALPLAN_ALLERAEUME_OPTION') && CIS_SAALPLAN_ALLERAEUME_OPTION)
-		    echo '<option value="stpl_week.php?type=ort&amp;ort_kurzbz=all" value="all">'.$p->t('lvplan/alleRaeume').'</option>';
 
+			if(defined('CIS_SAALPLAN_ALLERAEUME_OPTION') && CIS_SAALPLAN_ALLERAEUME_OPTION)
+				echo '<option value="stpl_week.php?type=ort&amp;ort_kurzbz=all" value="all">'.$p->t('lvplan/alleRaeume').'</option>';
 
-
-        for ($i=0;$i<$num_rows_ort;$i++)
-		{
-			$row=$db->db_fetch_object ($result_ort, $i);
-			echo "<option value=\"stpl_week.php?type=ort&amp;ort_kurzbz=$row->ort_kurzbz\">$row->ort_kurzbz ($row->bezeichnung)</option>";
-		}
+			for ($i=0;$i<$num_rows_ort;$i++)
+			{
+				$row=$db->db_fetch_object ($result_ort, $i);
+				echo "<option value=\"stpl_week.php?type=ort&amp;ort_kurzbz=$row->ort_kurzbz\">$row->ort_kurzbz ($row->bezeichnung)</option>";
+			}
 
 		echo '</select>';
+		}
 
 		if ($raumres)
 		{
-			echo '<BR><BR><A class="Item" href="stpl_reserve_list.php">'.$p->t("lvplan/reservierungenLoeschen").'</A><BR>';
+			echo '<BR><BR><A class="Item" href="stpl_reserve_list.php">'.$p->t("lvplan/meineReservierungenAnzeigen").'</A><BR>';
 		}
 
 		echo'</td>

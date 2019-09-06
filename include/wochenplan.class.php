@@ -702,6 +702,7 @@ class wochenplan extends basis_db
 		$datum=$datum_mon=$this->datum;
 		$rechte = new benutzerberechtigung();
 		$rechte->getBerechtigungen($user_uid);
+		$reservberechtigt = $rechte->isBerechtigt('lehre/reservierung', null, 'suid');
 
 		for ($i=1; $i<=TAGE_PRO_WOCHE; $i++)
 		{
@@ -764,6 +765,12 @@ class wochenplan extends basis_db
 						if (!$reservierung)
 							$reservierung=$lehrstunde->reservierung;
 					}
+
+					$datum_res_lektor_start_m = date('Y-m-d', $datum_res_lektor_start);
+					$datum_res_lektor_ende_m = date('Y-m-d', $datum_res_lektor_ende);
+					$datum_m = date('Y-m-d',$datum);
+
+					$showdelete = $raumres && $this->type=='ort' && (/*$datum>=$datum_now && */$datum_m>=$datum_res_lektor_start_m && $datum_m<=$datum_res_lektor_ende_m);
 
 					if ($gruppieren)
 					{
@@ -836,6 +843,14 @@ class wochenplan extends basis_db
 						if (isset($this->std_plan[$i][$j][0]->farbe))
 							echo 'style="background-color: #'.$this->std_plan[$i][$j][0]->farbe.';"';
 						echo '>'.$blink_ein.'<DIV align="center">';
+
+						$ort = $this->std_plan[$i][$j][0]->ort;
+
+						if ($showdelete)
+						{
+							$this->stpltable_deletelink($ort, $datum, $j, $user_uid, $reservberechtigt);
+						}
+
 						// Link zu Details setzten
 						echo '<A class="stpl_detail" onClick="window.open(';
 						echo "'stpl_detail.php";
@@ -845,7 +860,7 @@ class wochenplan extends basis_db
 						echo '&sem='.$this->sem;
 						echo '&ver='.$this->ver;
 						echo '&grp='.$this->grp;
-						echo '&ort_kurzbz='.$this->std_plan[$i][$j][0]->ort;
+						echo '&ort_kurzbz='.$ort;
 						echo "','Details', 'height=320,width=550,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=no,toolbar=no,location=no,menubar=no,dependent=yes');return false;";
 						echo '" title="'.$this->convert_html_chars($titel).'" ';
 						echo ' href="#">';
@@ -901,6 +916,12 @@ class wochenplan extends basis_db
 							if (isset($uEinheit['farbe']))
 								echo 'style="background-color: #'.$uEinheit['farbe'].'; margin-bottom: 3px;"';
 							echo '>';
+
+							// Löschlink anzeigen
+							if ($showdelete)
+							{
+								$this->stpltable_deletelink($uEinheit['ort'][0], $datum, $j, $user_uid, $reservberechtigt);
+							}
 
 							// Link zu Details setzten
 							echo '<A class="stpl_detail" onClick="window.open(';
@@ -982,37 +1003,22 @@ class wochenplan extends basis_db
 		{
 			$check_all_checkbox='';
 
-			echo '<br><table><tr>';
+			echo '<br><table><tr id="firstinputrow">';
 			echo '	<td>'.$p->t('global/titel').':</td><td><input onchange="if (this.value.length>0 && document.getElementById(\'beschreibung\').value.length<1) {document.getElementById(\'beschreibung\').value=document.getElementById(\'titel\').value;document.getElementById(\'beschreibung\').focus();};" type="text" id="titel"  name="titel" size="10" maxlength="10" value="" /></td> '.$this->crlf;
-			echo '	<td>'.$p->t('global/beschreibung').':</td><td colspan="6"> <input onchange="if (this.value.length<1 && document.getElementById(\'titel\').value.length>0) {alert(\'Achtung! Speichern nur mit Beschreibung moeglich!\');this.focus();};" type="text" id="beschreibung" name="beschreibung" size="20" maxlength="32" value=""  /> </td>'.$this->crlf;
+			echo '	<td>'.$p->t('global/beschreibung').':</td><td colspan="5"> <input onchange="if (this.value.length<1 && document.getElementById(\'titel\').value.length>0) {alert(\'Achtung! Speichern nur mit Beschreibung moeglich!\');this.focus();};" type="text" id="beschreibung" name="beschreibung" size="20" maxlength="32" value=""  /> </td>'.$this->crlf;
 
 			//Pruefen ob die erweiterte Reservierungsrechte vorhanden sind
 			if ($rechte->isBerechtigt('lehre/reservierung', null, 'sui'))
 			{
 				$check_all_checkbox='';
 				//Lektor
-				echo '<td>'.$p->t('lvplan/lektor').':</td>
-					  <td><SELECT name="user_uid">'.$this->crlf;
 
-				$qry = "SELECT uid, kurzbz, vorname, nachname FROM campus.vw_mitarbeiter
-						WHERE aktiv=true
-						ORDER BY nachname, uid";
-
-				if ($result = $this->db_query($qry))
-				{
-					while ($row = $this->db_fetch_object($result))
-					{
-						if ($row->uid==$user_uid)
-							$selected='selected="selected"';
-						else
-							$selected='';
-
-						echo '<OPTION value="'.$row->uid.'" '.$selected.'>'.$row->nachname.' '.$row->vorname.' - '.$row->uid.'</OPTION>'.$this->crlf;
-					}
-				}
-
-				echo '</SELECT></td>'.$this->crlf;
-				echo '</tr><tr>'.$this->crlf;
+				echo "<td>".$p->t('lvplan/lektor').":</td>
+					  <td><input class='search' placeholder='".$p->t('lvplan/nameEingeben')."' type='text' id='user_uid' size='32' value=''>".$this->crlf;
+				echo '</td>'.$this->crlf;
+				echo '<td>&nbsp;</td>';
+				echo '</tr>';
+				echo '<tr>'.$this->crlf;
 
 				//Studiengaenge Laden fuer die eine erweiterte Reservierungsberechtigung vorhanden ist
 				$stg = new studiengang();
@@ -1112,7 +1118,7 @@ class wochenplan extends basis_db
 			echo '</td>';
 
 			echo '</tr></table></form>';
-			echo ' <a href="stpl_reserve_list.php">'.$p->t('lvplan/reservierungenLoeschen').' </a>';
+			echo ' <a href="stpl_reserve_list.php">'.$p->t('lvplan/meineReservierungenAnzeigen').' </a>';
 		}
 		elseif ($this->type=='ort' && $raumReservierbar == false)
 		{
@@ -2723,6 +2729,49 @@ class wochenplan extends basis_db
 			$wochenmontag+=60*60*24*7;
 		}
 		echo '			</tr></table></div></div></div></td></tr></table>'.$crlf;
+	}
+
+	/**
+	 * Gibt Link zum Löschen der Reservierungen für einen Ort zu einer Zeit zuürck.
+	 * @param $ort
+	 * @param $datum
+	 * @param $stunde
+	 * @param $user_uid eingeloggter User
+	 * @param $reservberechtigt erweiterte Reservierungsberechtigung
+	 */
+	private function stpltable_deletelink($ort, $datum, $stunde, $user_uid, $reservberechtigt)
+	{
+		global $p;
+		$deleteberechtigt = false;
+		$reservtodelete = array();
+
+		$qry = "SELECT reservierung_id, insertvon, uid FROM campus.tbl_reservierung
+									WHERE ort_kurzbz=" . $this->db_add_param($ort) . "
+									AND datum = " . $this->db_add_param(date('Y-m-d', $datum)) . "
+									AND stunde = " . $this->db_add_param($stunde);
+
+		if ($result = $this->db_query($qry))
+		{
+			while ($row = $this->db_fetch_object($result))
+			{
+				if ($reservberechtigt && ($row->uid == $user_uid || $row->insertvon == $user_uid))
+				{
+					$deleteberechtigt = true;
+					$reservtodelete[] = $row->reservierung_id;
+				}
+			}
+		}
+
+		if ($deleteberechtigt)
+		{
+			$reservetodeleteurl = 'stpl_week.php?type=ort&ort_kurzbz='.$ort.'&datum='.$datum;
+			$reservetodeleteurl .= '&reservtodelete[]='.implode("&reservtodelete[]=", $reservtodelete);
+			echo '<div class="reservdelete">
+											<a href="'.$reservetodeleteurl.'"  title="' . $p->t('lvplan/reservierungenLoeschen') . '">
+												<img src="../../../skin/images/cross.png" width="12px" height="12px"/>
+											</a>
+										</div>';
+		}
 	}
 }
 ?>
