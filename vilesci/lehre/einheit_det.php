@@ -42,6 +42,7 @@ if(!$rechte->isBerechtigt('lehre/gruppe:begrenzt',null,'s'))
 	die($rechte->errormsg);
 
 $kurzbz=(isset($_GET['kurzbz'])?$_GET['kurzbz']:(isset($_POST['kurzbz'])?$_POST['kurzbz']:''));
+$searchItems=(isset($_GET['searchItems'])?$_GET['searchItems']:(isset($_POST['searchItems'])?$_POST['searchItems']:''));
 if(empty($kurzbz))
 	die('Gruppe wurde nicht &uuml;bergeben <a href="javascript:history.back()">Zur&uuml;ck</a>');
 
@@ -108,7 +109,7 @@ if(!$gruppe->load($kurzbz))
 <H2>Gruppe <?php echo $kurzbz ?></H2>
 
 <?php
-echo "<a href='einheit_menu.php?studiengang_kz=$gruppe->studiengang_kz'>Zurück zur &Uuml;bersicht</a><br><br>";
+echo "<a href='einheit_menu.php?studiengang_kz=$gruppe->studiengang_kz&searchItems=$searchItems'>Zurück zur &Uuml;bersicht</a><br><br>";
 echo $errormsg;
 $generiertegruppe = $gruppe->generiert;
 if(!$gruppe->generiert)
@@ -141,6 +142,7 @@ if(!$gruppe->generiert)
 		$("#uid").focus();
 		</script>
 		 <INPUT type="hidden" name="kurzbz" value="'.$kurzbz.'">
+		 <INPUT type="hidden" name="searchItems" value="'.$searchItems.'">
 	  <INPUT type="submit" name="new" value="Hinzuf&uuml;gen">
 	</FORM>
 	<HR>
