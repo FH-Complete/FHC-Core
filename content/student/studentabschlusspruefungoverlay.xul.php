@@ -73,15 +73,15 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 					class="sortDirectionIndicator"
 					sort="rdf:http://www.technikum-wien.at/abschlusspruefung/rdf#vorsitz_nachname" onclick="StudentAbschlusspruefungTreeSort()"/>
 				<splitter class="tree-splitter"/>
-				<treecol id="student-abschlusspruefung-treecol-pruefer1" label="Pruefer1" flex="1" persist="hidden, width" hidden="true"
+				<treecol id="student-abschlusspruefung-treecol-pruefer1" label="PrueferIn1" flex="1" persist="hidden, width" hidden="true"
 					class="sortDirectionIndicator"
 					sort="rdf:http://www.technikum-wien.at/abschlusspruefung/rdf#pruefer1_nachname" onclick="StudentAbschlusspruefungTreeSort()"/>
 				<splitter class="tree-splitter"/>
-				<treecol id="student-abschlusspruefung-treecol-pruefer2" label="Pruefer2" flex="1" persist="hidden, width" hidden="true"
+				<treecol id="student-abschlusspruefung-treecol-pruefer2" label="PrueferIn2" flex="1" persist="hidden, width" hidden="true"
 					class="sortDirectionIndicator"
 					sort="rdf:http://www.technikum-wien.at/abschlusspruefung/rdf#pruefer2_nachname" onclick="StudentAbschlusspruefungTreeSort()"/>
 				<splitter class="tree-splitter"/>
-				<treecol id="student-abschlusspruefung-treecol-pruefer3" label="Pruefer3" flex="1" persist="hidden, width" hidden="true"
+				<treecol id="student-abschlusspruefung-treecol-pruefer3" label="PrueferIn3" flex="1" persist="hidden, width" hidden="true"
 					class="sortDirectionIndicator"
 					sort="rdf:http://www.technikum-wien.at/abschlusspruefung/rdf#pruefer3_nachname" onclick="StudentAbschlusspruefungTreeSort()"/>
 				<splitter class="tree-splitter"/>
@@ -210,7 +210,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 						</menupopup>
 					</template>
 				</menulist>
-				<label value="Pruefer 1" id="student-abschlusspruefung-label-pruefer1" control="student-abschlusspruefung-menulist-pruefer1" />
+				<label value="PrueferIn 1" id="student-abschlusspruefung-label-pruefer1" control="student-abschlusspruefung-menulist-pruefer1" />
 					<menulist id="student-abschlusspruefung-menulist-pruefer1"
 						editable="true" disabled="true"
 						datasources="rdf:null" flex="1"
@@ -240,7 +240,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 							</menupopup>
 						</template>
 					</menulist>
-				<label value="Pruefer 2" id="student-abschlusspruefung-label-pruefer2" control="student-abschlusspruefung-menulist-pruefer2" />
+				<label value="PrueferIn 2" id="student-abschlusspruefung-label-pruefer2" control="student-abschlusspruefung-menulist-pruefer2" />
 					<menulist id="student-abschlusspruefung-menulist-pruefer2"
 						editable="true" disabled="true"
 						datasources="rdf:null" flex="1"
@@ -270,7 +270,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 							</menupopup>
 					</template>
 				</menulist>
-				<label value="Pruefer 3" id="student-abschlusspruefung-label-pruefer3" control="student-abschlusspruefung-menulist-pruefer3" />
+				<label value="PrueferIn 3" id="student-abschlusspruefung-label-pruefer3" control="student-abschlusspruefung-menulist-pruefer3" />
 				<menulist id="student-abschlusspruefung-menulist-pruefer3"
 					editable="true" disabled="true"
 					datasources="rdf:null" flex="1"

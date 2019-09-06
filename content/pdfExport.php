@@ -502,7 +502,7 @@ else
 				}
 				else
 				{
-					die('Student hat keinen Status in diesem Semester');
+					die('StudentIn hat keinen Status in diesem Semester');
 				}
 			}
 		}

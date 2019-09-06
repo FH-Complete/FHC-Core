@@ -178,7 +178,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/lvplanung/stpl-semester-overlay.xu
 		<tabs orient="horizontal">
 			<tab id="tab-week" label="Wochenplan" />
 			<tab id="tab-semester" label="Semesterplan" />
-			<tab id="tab-studenten" label="Studenten" />
+			<tab id="tab-studenten" label="StudentInnen" />
 			<tab id="tab-lfvt" label="Lehrveranstaltung" />
 		</tabs>
 		<tabpanels id="tabpanels-main" flex="1">

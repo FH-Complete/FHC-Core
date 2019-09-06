@@ -376,7 +376,6 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
 				<text:p text:style-name="P32"><xsl:value-of select="mitarbeiter/zuhanden" /></text:p>
 			</xsl:if>
 			<text:p text:style-name="P33"/>
-			<text:p text:style-name="P34">Abs.: <text:s/>Fachhochschule Technikum Wien, Höchstädtplatz 6, 1200 Wien </text:p>
 			<text:p text:style-name="P33"/>
 			<text:p text:style-name="P17"/>
 			<text:p text:style-name="P17"/>
@@ -391,7 +390,6 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
 			<text:p text:style-name="P19">Personalnummer: <xsl:value-of select="mitarbeiter/personalnummer" /></text:p>
 			<text:p text:style-name="P19"/>
 			<text:p text:style-name="P19"/>
-			<text:p text:style-name="P19">Wir beauftragen Sie, im <xsl:value-of select="studiensemester" /> folgende Lehrveranstaltungen abzuhalten:</text:p>
 			<text:p text:style-name="P19"/>
 			<table:table table:name="Tabelle1" table:style-name="Tabelle1">
 				<table:table-column table:style-name="Tabelle1.A"/>
@@ -500,9 +498,6 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
 				</table:table-row>
 			</table:table>
 			<text:p text:style-name="P19"/>
-			<text:p text:style-name="P19">Die angeführten Stundensätze sind Bruttobeträge, von denen gegebenenfalls die DienstnehmerInnenanteile für Steuern und Sozialversicherung abgezogen werden.
-											Die angeführte Stundenzahl ist die maximal vorgesehene; abgerechnet werden jedoch nur die tatsächlich gehaltenen Stunden laut Anwesenheitslisten.
-											Außerdem besteht die Verpflichtung zur Teilnahme an LektorInnenkonferenzen.</text:p>
 			<table:table table:name="Tabelle2" table:style-name="Tabelle2">
 				<table:table-column table:style-name="Tabelle2.A"/>
 				<table:table-column table:style-name="Tabelle2.B"/>

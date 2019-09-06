@@ -116,7 +116,7 @@ var studentDDObserver=
 				uid = tree.view.getCellText(v,col);
 				if(uid=='')
 				{
-					alert('Es koennen nur Personen mit UID (Studenten/Mitarbeiter) verschoben werden');
+					alert('Es koennen nur Personen mit UID (Studierende/Mitarbeitende) verschoben werden');
 					return false;
 				}
 				paramList += ';'+uid;
@@ -295,7 +295,7 @@ var LektorFunktionDDObserver=
 
 		if(stg=='')
 		{
-			alert('Mitarbeiter kann nur auf einen Studiengang gezogen werden');
+			alert('MitarbeiterIn kann nur auf einen Studiengang gezogen werden');
 			return false;
 		}
 

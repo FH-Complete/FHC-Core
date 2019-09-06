@@ -187,7 +187,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 					class="sortDirectionIndicator"
 					sort="rdf:http://www.technikum-wien.at/dokumentprestudent/rdf#dokument_kurzbz" onclick="InteressentDokumenteAbgegebenTreeSort()"/>
 				<splitter class="tree-splitter"/>
-				<treecol id="interessent-dokumente-tree-abgegeben-prestudent_id" label="PrestudentID" flex="1" hidden="true"
+				<treecol id="interessent-dokumente-tree-abgegeben-prestudent_id" label="PrestudentInID" flex="1" hidden="true"
 					class="sortDirectionIndicator"
 					sort="rdf:http://www.technikum-wien.at/dokumentprestudent/rdf#prestudent_id" onclick="InteressentDokumenteAbgegebenTreeSort()"/>
 				<splitter class="tree-splitter"/>

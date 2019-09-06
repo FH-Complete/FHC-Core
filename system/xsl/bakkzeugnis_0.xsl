@@ -362,8 +362,6 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
 			<text:p text:style-name="P9"/>
 			<text:p text:style-name="P9"/>
 			<text:p text:style-name="P10"/>
-			<text:p text:style-name="P10">Gesamtnote: mit ausgezeichnetem Erfolg bestanden, mit gutem Erfolg bestanden, bestanden</text:p>
-			<text:p text:style-name="P10">Gesetzliche Grundlage: gem. § 6 Abs. 1 des Bundesgesetzes über Fachhochschul-Studiengänge (FHStG), BGBI. Nr. <xsl:value-of select="bescheidbgbl1" /> idgF</text:p>
 			<text:p text:style-name="P18"/>
 			<text:p text:style-name="P18"/>
 			<text:p text:style-name="P18"/>
