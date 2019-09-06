@@ -10,6 +10,9 @@ class Person_model extends DB_Model
 		parent::__construct();
 		$this->dbTable = 'public.tbl_person';
 		$this->pk = 'person_id';
+
+		$this->load->model('person/kontakt_model', 'KontaktModel');
+		$this->load->model('person/adresse_model', 'AdresseModel');
 	}
 
 	/**
@@ -161,9 +164,6 @@ class Person_model extends DB_Model
 		//return null if not found
 		if(count($person->retval) < 1)
 			return success(null);
-
-		$this->load->model('person/kontakt_model', 'KontaktModel');
-		$this->load->model('person/adresse_model', 'AdresseModel');
 
 		$this->KontaktModel->addDistinct();
 		$this->KontaktModel->addSelect('kontakttyp, anmerkung, kontakt, zustellung');
