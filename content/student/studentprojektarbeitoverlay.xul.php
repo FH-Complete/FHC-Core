@@ -104,7 +104,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 					class="sortDirectionIndicator"
 					sort="rdf:http://www.technikum-wien.at/projektarbeit/rdf#lehreinheit_id" />
 				<splitter class="tree-splitter"/>
-				<treecol id="student-projektarbeit-tree-student_uid" label="StudentUID" flex="2" hidden="true"
+				<treecol id="student-projektarbeit-tree-student_uid" label="StudentInUID" flex="2" hidden="true"
 					class="sortDirectionIndicator"
 					sort="rdf:http://www.technikum-wien.at/projektarbeit/rdf#student_uid" />
 				<splitter class="tree-splitter"/>
@@ -328,7 +328,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 				</vbox>
 			</groupbox>
 			<groupbox flex="1">
-				<caption label="Betreuer"/>
+				<caption label="BetreuerIn"/>
 				<hbox>
 					<tree id="student-projektbetreuer-tree" seltype="single" hidecolumnpicker="false" flex="1"
 						  datasources="rdf:null" ref="http://www.technikum-wien.at/projektbetreuer/liste"
@@ -424,7 +424,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 						</columns>
 						<rows>
 							<row>
-								<label value="Betreuer" control="student-projektbetreuer-menulist-person" />
+								<label value="BetreuerIn" control="student-projektbetreuer-menulist-person" />
 				    			<menulist id="student-projektbetreuer-menulist-person"
 										  editable="true" disabled="true"
 								          datasources="rdf:null" flex="1"

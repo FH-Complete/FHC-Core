@@ -2050,7 +2050,6 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 			<style:footer>
 				<text:p text:style-name="MP4"/>
 				<text:p text:style-name="MP5">
-					<text:span text:style-name="MT1">University of Applied Sciences Technikum Wien, Hoechstaedtplatz 6, 1200 Wien<text:tab/><text:tab/></text:span>
 					<text:page-number text:select-page="current">6</text:page-number>
 				</text:p>
 			</style:footer>

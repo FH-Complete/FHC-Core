@@ -147,7 +147,7 @@ function LektorFunktionDel()
 		idx = tree.currentIndex;
 	else
 	{
-		alert('Bitte zuerst einen Mitarbeiter markieren');
+		alert('Bitte zuerst eine/n MitarbeiterIn markieren');
 		return false;
 	}
 
@@ -223,7 +223,7 @@ function LektorFunktionMail()
   		}
 	}
 	if(anzfault!=0)
-		alert(anzfault+' Mitarbeiter konnten nicht hinzugefuegt werden weil keine UID eingetragen ist!');
+		alert(anzfault+' MitarbeiterInnen konnten nicht hinzugefuegt werden weil keine UID eingetragen ist!');
 	if(mailempfaenger!='')
 		window.location.href=mailempfaenger;
 }
@@ -891,7 +891,7 @@ function StatistikPrintLVPlanung()
 
 		if(tree.currentIndex==-1)
 		{
-			alert('Bitte zuerst einen Mitarbeiter auswaehlen');
+			alert('Bitte zuerst eine/n MitarbeiterIn auswaehlen');
 			return;
 		}
 
@@ -905,7 +905,7 @@ function StatistikPrintLVPlanung()
 	if(typeof(url)!='undefined')
 		window.open(url,'LV-Planung');
 	else
-		alert('Bitte waehlen sie ein(en) Verband, Institut oder Lektor aus');
+		alert('Bitte waehlen sie ein(e/en) Verband, Institut oder LektorIn aus');
 }
 
 // ****
@@ -956,7 +956,7 @@ function StatistikPrintLVPlanungExcel()
 
 		if(tree.currentIndex==-1)
 		{
-			alert('Bitte zuerst einen Mitarbeiter auswaehlen');
+			alert('Bitte zuerst eine/n MitarbeiterIn auswaehlen');
 			return;
 		}
 
@@ -970,7 +970,7 @@ function StatistikPrintLVPlanungExcel()
 	if(typeof(url)!='undefined')
 		window.open(url,'LV-Planung');
 	else
-		alert('Bitte waehlen sie ein(en) Verband, Institut oder Lektor aus');
+		alert('Bitte waehlen sie einen Verband, Institut oder LektorIn aus');
 }
 
 // ****
@@ -1134,14 +1134,14 @@ function StatistikPrintStudienverlaufStudent()
 	//Wenn nichts markiert wurde -> alle exportieren
 	if(tree.currentIndex==-1)
 	{
-		alert("Bitte zuerst einen Studenten markieren");
+		alert("Bitte zuerst eine/n Studierende/n markieren");
 		return;
 	}
 
 	var student_uid = getTreeCellText(tree, 'student-treecol-uid', tree.currentIndex);
 	if (student_uid == '')
 	{
-		alert('Markierte Person ist kein Student');
+		alert('Markierte Person ist kein/e StudentIn');
 		return;
 	}
 	window.open('<?php echo APP_ROOT ?>index.ci.php/person/gradelist/index/'+student_uid,'Studienverlauf');
@@ -1893,7 +1893,7 @@ function PrintStudienblatt(event)
 	}
 	catch(e)
 	{
-		check = confirm('Achtung: Beim letzten (aktuellen) PreStudent-Status ist KEIN STUDIENPLAN eingetragen.\nDas Studienblatt ist moeglicherweise unvollstaendig.\nMoechten Sie es dennoch erstellen?');
+		check = confirm('Achtung: Beim letzten (aktuellen) PreStudentInnen-Status ist KEIN STUDIENPLAN eingetragen.\nDas Studienblatt ist moeglicherweise unvollstaendig.\nMoechten Sie es dennoch erstellen?');
 		if (check == false)
 			return false;
 	}
@@ -1906,7 +1906,7 @@ function PrintStudienblatt(event)
 
 	if(studienplan_id=='')
 	{
-		check = confirm('Achtung: Beim letzten (aktuellen) PreStudent-Status ist KEIN STUDIENPLAN eingetragen.\nDas Studienblatt ist moeglicherweise unvollstaendig.\nMoechten Sie es dennoch erstellen?');
+		check = confirm('Achtung: Beim letzten (aktuellen) PreStudentInnen-Status ist KEIN STUDIENPLAN eingetragen.\nDas Studienblatt ist moeglicherweise unvollstaendig.\nMoechten Sie es dennoch erstellen?');
 		if (check == false)
 			return false;
 	}
@@ -1969,7 +1969,7 @@ function PrintStudienblatt(event)
 	}
 	else
 	{
-		alert('Bitte zuerst einen Studenten auswaehlen');
+		alert('Bitte zuerst eine/n Studierende/n auswaehlen');
 	}
 }
 
@@ -2001,7 +2001,7 @@ function PrintStudienblattEnglisch(event)
 	}
 	catch(e)
 	{
-		check = confirm('Achtung: Beim letzten (aktuellen) PreStudent-Status ist KEIN STUDIENPLAN eingetragen.\nDas Studienblatt ist moeglicherweise unvollstaendig.\nMoechten Sie es dennoch erstellen?');
+		check = confirm('Achtung: Beim letzten (aktuellen) PreStudentInnen-Status ist KEIN STUDIENPLAN eingetragen.\nDas Studienblatt ist moeglicherweise unvollstaendig.\nMoechten Sie es dennoch erstellen?');
 		if (check == false)
 			return false;
 	}
@@ -2015,7 +2015,7 @@ function PrintStudienblattEnglisch(event)
 
 	if(studienplan_id=='')
 	{
-		check = confirm('Achtung: Beim letzten (aktuellen) PreStudent-Status ist KEIN STUDIENPLAN eingetragen.\nDas Studienblatt ist moeglicherweise unvollstaendig.\nMoechten Sie es dennoch erstellen?');
+		check = confirm('Achtung: Beim letzten (aktuellen) PreStudentInnen-Status ist KEIN STUDIENPLAN eingetragen.\nDas Studienblatt ist moeglicherweise unvollstaendig.\nMoechten Sie es dennoch erstellen?');
 		if (check == false)
 			return false;
 	}
@@ -2078,7 +2078,7 @@ function PrintStudienblattEnglisch(event)
 	}
 	else
 	{
-		alert('Bitte zuerst einen Studenten auswaehlen');
+		alert('Bitte zuerst eine/n Studierende/n auswaehlen');
 	}
 }
 
