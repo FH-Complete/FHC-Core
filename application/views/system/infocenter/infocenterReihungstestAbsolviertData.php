@@ -6,6 +6,7 @@
 	$TAETIGKEIT_KURZBZ = '\'bewerbung\', \'kommunikation\'';
 	$LOGDATA_NAME = '\'Login with code\', \'Login with user\', \'New application\'';
 	$ADDITIONAL_STG = '10021,10027';
+	$STUDIENSEMESTER = '\''.$this->variablelib->getVar('infocenter_studiensemester').'\'';
 
 	$query = '
 		SELECT
@@ -191,7 +192,7 @@
 							AND pss.status_kurzbz = '.$INTERESSENT_STATUS.'
 							AND pss.bestaetigtam IS NOT NULL
 							AND pss.bewerbung_abgeschicktamum IS NOT NULL
-							AND pss.studiensemester_kurzbz IN (SELECT ss.studiensemester_kurzbz FROM public.tbl_studiensemester ss WHERE ss.ende >= NOW())
+							AND pss.studiensemester_kurzbz = '.$STUDIENSEMESTER.'
 				)
 			)
 	ORDER BY "LastAction" DESC';

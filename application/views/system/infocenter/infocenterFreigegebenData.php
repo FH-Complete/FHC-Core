@@ -8,6 +8,7 @@
 	$REJECTED_STATUS = '\'Abgewiesener\'';
 	$ADDITIONAL_STG = '10021,10027,10002';
 	$STATUS_KURZBZ = '\'Wartender\', \'Bewerber\', \'Aufgenommener\', \'Student\'';
+	$STUDIENSEMESTER = '\''.$this->variablelib->getVar('infocenter_studiensemester').'\'';
 
 	$query = '
 		SELECT
@@ -179,7 +180,7 @@
 				) rtp ON(rtp.person_id = ps.person_id AND rtp.studiensemester_kurzbz = pss.studiensemester_kurzbz)
 				 WHERE pss.status_kurzbz = '.$INTERESSENT_STATUS.'
 				   AND ps.person_id = p.person_id
-				   AND pss.studiensemester_kurzbz IN (SELECT ss.studiensemester_kurzbz FROM public.tbl_studiensemester ss WHERE ss.studiensemester_kurzbz = \'WS2019\')
+				   AND pss.studiensemester_kurzbz IN (SELECT ss.studiensemester_kurzbz FROM public.tbl_studiensemester ss WHERE ss.studiensemester_kurzbz = '.$STUDIENSEMESTER.')
 			  ORDER BY pss.datum DESC, pss.insertamum DESC, pss.ext_id DESC
 				 LIMIT 1
 			) AS "ReihungstestApplied",
@@ -215,7 +216,7 @@
 							AND pss.status_kurzbz = '.$INTERESSENT_STATUS.'
 							AND pss.bestaetigtam IS NOT NULL
 							AND pss.bewerbung_abgeschicktamum IS NOT NULL
-							AND pss.studiensemester_kurzbz IN (SELECT ss.studiensemester_kurzbz FROM public.tbl_studiensemester ss WHERE ss.ende >= NOW())
+							AND pss.studiensemester_kurzbz = '.$STUDIENSEMESTER.'
 				AND NOT EXISTS (
 					   SELECT 1
 						 FROM tbl_prestudentstatus spss

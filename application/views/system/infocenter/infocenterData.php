@@ -11,16 +11,9 @@
 	$STATUS_KURZBZ = '\'Wartender\', \'Bewerber\', \'Aufgenommener\', \'Student\'';
 	$ADDITIONAL_STG = '10021,10027';
 	$AKTE_TYP = '\'identity\', \'zgv_bakk\'';
+	$STUDIENSEMESTER = '\''.$this->variablelib->getVar('infocenter_studiensemester').'\'';
 
 	$query = '
-		WITH currentOrNextStudiensemester AS (
-			SELECT ss.studiensemester_kurzbz
-			  FROM public.tbl_studiensemester ss
-			 WHERE ss.ende > NOW()
-		  ORDER BY ss.ende
-			 LIMIT 3
-		)
-
 		SELECT
 			p.person_id AS "PersonId",
 			p.vorname AS "Vorname",
@@ -100,7 +93,7 @@
 					   OR
 					   sg.studiengang_kz in('.$ADDITIONAL_STG.')
 					   )
-				   AND pss.studiensemester_kurzbz IN (SELECT cnss.studiensemester_kurzbz FROM currentOrNextStudiensemester cnss)
+				   AND pss.studiensemester_kurzbz = '.$STUDIENSEMESTER.'
 				   AND NOT EXISTS (
 					   SELECT 1
 						 FROM tbl_prestudentstatus spss
@@ -125,7 +118,7 @@
 					   OR
 					   sg.studiengang_kz in('.$ADDITIONAL_STG.')
 					   )
-				   AND pss.studiensemester_kurzbz IN (SELECT cnss.studiensemester_kurzbz FROM currentOrNextStudiensemester cnss)
+				   AND pss.studiensemester_kurzbz = '.$STUDIENSEMESTER.'
 				   AND NOT EXISTS (
 						SELECT 1
 						  FROM tbl_prestudentstatus spss
@@ -149,7 +142,7 @@
 					   OR
 					   sg.studiengang_kz in('.$ADDITIONAL_STG.')
 					   )
-				   AND pss.studiensemester_kurzbz IN (SELECT cnss.studiensemester_kurzbz FROM currentOrNextStudiensemester cnss)
+				   AND pss.studiensemester_kurzbz = '.$STUDIENSEMESTER.'
 				   AND NOT EXISTS (
 					   SELECT 1
 						 FROM tbl_prestudentstatus spss
@@ -173,7 +166,8 @@
 					   OR
 					   sg.studiengang_kz in('.$ADDITIONAL_STG.')
 					   )
-				   AND pss.studiensemester_kurzbz IN (SELECT cnss.studiensemester_kurzbz FROM currentOrNextStudiensemester cnss)
+				   AND pss.studiensemester_kurzbz = '.$STUDIENSEMESTER.'
+
 				   AND NOT EXISTS (
 					  SELECT 1
 						FROM tbl_prestudentstatus spss
@@ -252,7 +246,7 @@
 						 WHERE spss.prestudent_id = sps.prestudent_id
 						   AND spss.status_kurzbz = '.$INTERESSENT_STATUS.'
 						   AND spss.bestaetigtam IS NULL
-						   AND spss.studiensemester_kurzbz IN (SELECT ss.studiensemester_kurzbz FROM public.tbl_studiensemester ss WHERE ss.ende > NOW())
+						   AND spss.studiensemester_kurzbz = '.$STUDIENSEMESTER.'
 					)
 			)
 	ORDER BY "LastAction" ASC';
