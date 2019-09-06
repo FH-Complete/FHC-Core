@@ -131,9 +131,19 @@ class reservierung extends basis_db
 			$this->errormsg = 'Stunde ist ungueltig';
 			return false;
 		}
+		if($this->titel=='')
+		{
+			$this->errormsg = 'Es muss ein Titel angegeben werden';
+			return false;
+		}
 		if(mb_strlen($this->titel)>10)
 		{
 			$this->errormsg = 'Titel darf nicht laenger als 10 Zeichen sein';
+			return false;
+		}
+		if($this->beschreibung=='')
+		{
+			$this->errormsg = 'Es muss eine Beschreibung angegeben werden';
 			return false;
 		}
 		if(mb_strlen($this->beschreibung)>32)
