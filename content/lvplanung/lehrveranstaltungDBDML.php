@@ -143,7 +143,7 @@ function getStundenproInstitut($mitarbeiter_uid, $studiensemester_kurzbz, $oe_ar
 {
 	global $db;
 
-	$ret="Der Lektor ist in folgenden Organisationseinheiten zugeteilt:\n";
+	$ret="Der/Die LektorIn ist in folgenden Organisationseinheiten zugeteilt:\n";
 
 	//Liste mit den Stunden in den jeweiligen Instituten anzeigen
 	$qry = "SELECT sum(tbl_lehreinheitmitarbeiter.semesterstunden) as summe, tbl_studiengang.bezeichnung
@@ -700,7 +700,7 @@ if(!$error)
 					if($db->db_num_rows()>0)
 					{
 						$return = false;
-						$errormsg = 'Dieser Lektor kann nicht gelöscht werden da er schon verplant ist';
+						$errormsg = 'Diese/r LektorIn kann nicht gelöscht werden da er schon verplant ist';
 					}
 					else
 					{
@@ -913,7 +913,7 @@ if(!$error)
 			{
 				$error = true;
 				$return = false;
-				$errormsg='Dieser Lektor kann nicht aus dem LVPlan entfernt werden da dies der letzte verplante Lektor ist';
+				$errormsg='Diese/r LektorIn kann nicht aus dem LVPlan entfernt werden da dies der/die letzte verplante LektorIn ist';
 			}
 		}
 
@@ -1379,13 +1379,13 @@ if(!$error)
 			}
 			else
 			{
-				$errormsg = 'Fehler beim Laden des Mitarbeiters';
+				$errormsg = 'Fehler beim Laden des Mitarbeitenden';
 				$return = false;
 			}
 		}
 		else
 		{
-			$errormsg = 'MitarbeiterUID muss uebergeben werden';
+			$errormsg = 'MitarbeitendeUID muss uebergeben werden';
 			$return = false;
 		}
 	}

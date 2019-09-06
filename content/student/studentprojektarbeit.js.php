@@ -957,7 +957,7 @@ function StudentProjektbetreuerSpeichern()
 
 	if(person_id=='')
 	{
-		alert('Bitte zuerst einen Betreuer auswaehlen');
+		alert('Bitte zuerst eine/n BetreuerIn auswaehlen');
 		return false;
 	}
 

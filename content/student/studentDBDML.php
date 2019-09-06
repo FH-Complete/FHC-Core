@@ -3676,7 +3676,7 @@ if(!$error)
 					{
 						if($row->anzahl>0)
 						{
-							$errormsg = 'Bitte zuerst alle Betreuer loeschen';
+							$errormsg = 'Bitte zuerst alle BetreuerInnen loeschen';
 							$return = false;
 						}
 						else
@@ -3758,7 +3758,7 @@ if(!$error)
 				if($projektbetreuer->load($_POST['person_id'], $_POST['projektarbeit_id'], $_POST['betreuerart_kurzbz']))
 				{
 					$error = true;
-					$errormsg = 'Dieser Betreuer ist bereits zugeteilt';
+					$errormsg = 'Diese/r BetreuerIn ist bereits zugeteilt';
 				}
 				$projektbetreuer->new = true;
 				$projektbetreuer->insertamum = date('Y-m-d H:i:s');

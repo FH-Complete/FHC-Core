@@ -4546,7 +4546,7 @@ function StudentAnrechnungNeu()
 	var tree = document.getElementById('student-tree');
 	if (tree.currentIndex==-1)
 	{
-		alert('Student muss ausgewaehlt sein');
+		alert('StudentIn muss ausgewaehlt sein');
 		return false;
 	}
 
@@ -4680,7 +4680,7 @@ function StudentAnrechnungDetailSpeichern()
 
 	if (document.getElementById("student-anrechnungen-prestudent_id").value == '')
 	{
-		alert('Student muss ausgewaehlt sein');
+		alert('StudentIn muss ausgewaehlt sein');
 		return;
 	}
 
@@ -5035,7 +5035,7 @@ function StudentSendMail(event)
 		}
 	}
 	if(anzfault!=0)
-		alert(anzfault+' Student(en) konnten nicht hinzugefuegt werden weil keine UID eingetragen ist!');
+		alert(anzfault+' StudentIn konnte nicht hinzugefuegt werden weil keine UID eingetragen ist!');
 	if(mailempfaenger!='')
 	{
 		if (event.ctrlKey)
@@ -5107,7 +5107,7 @@ function splitmailto(mails, art)
 	var mailto='';
 	var loop=true;
 	if(mails.length>2048)
-		alert('Aufgrund der großen Anzahl an Empfängern, muss die Nachricht auf mehrere E-Mails aufgeteilt werden!');
+		alert('Aufgrund der großen Anzahl an EmpfängerInnen, muss die Nachricht auf mehrere E-Mails aufgeteilt werden!');
 
 	while(loop)
 	{
@@ -5170,7 +5170,7 @@ function StudentCreateDiplSupplement(event)
 
 	if(paramList.replace(";",'')=='')
 	{
-		alert('Bitte einen Studenten auswaehlen');
+		alert('Bitte eine/n Studierende/n auswaehlen');
 		return false;
 	}
 	if (event.shiftKey)
@@ -5315,7 +5315,7 @@ function StudentCreateStudienerfolg(event, xsl, finanzamt, studiensemester, all)
 
 	if(paramList.replace(";",'')=='')
 	{
-		alert('Bitte einen Studenten auswaehlen');
+		alert('Bitte eine/n Studierende/n auswaehlen');
 		return false;
 	}
 	if(!studiensemester)
@@ -5563,7 +5563,7 @@ function StudentCisStudienplan(event)
 	var tree = document.getElementById('student-tree');
 	if (tree.currentIndex == -1)
 	{
-		alert("Bitte wählen Sie einen Studenten aus.");
+		alert("Bitte wählen Sie einen Studierenden aus.");
 		return false;
 	}
 
@@ -5581,7 +5581,7 @@ function StudentCisNotenliste(event)
 	var tree = document.getElementById('student-tree');
 	if (tree.currentIndex == -1)
 	{
-		alert("Bitte wählen Sie einen Studenten aus.");
+		alert("Bitte wählen Sie eine/n Studierende/n aus.");
 		return false;
 	}
 
@@ -5644,14 +5644,14 @@ function StudentExportBescheid()
 
 	if(paramList.replace(";",'') == '')
 	{
-		alert('Bitte einen Studenten auswaehlen');
+		alert('Bitte eine/n Studierende/n auswaehlen');
 		return false;
 	}
 
 	if(anzahl>0)
 		window.open('<?php echo APP_ROOT; ?>content/pdfExport.php?archivdokument=Bescheid&uid='+paramList,'Bescheide', 'height=200,width=350,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
 	else
-		alert('Bitte einen Studenten auswaehlen');
+		alert('Bitte eine/n Studierende/n auswaehlen');
 }
 
 //****
