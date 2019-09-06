@@ -92,7 +92,7 @@ var FHC_FilterWidget = {
 	},
 
 	/**
-	 * Alias call to method display only to inprove the readability of the code
+	 * Alias call to method display only to improve the readability of the code
 	 */
 	refresh: function() {
 
@@ -100,11 +100,28 @@ var FHC_FilterWidget = {
 	},
 
 	/**
-	 * To retrive the page where the FilterWidget is used, using the FHC_JS_DATA_STORAGE_OBJECT
+	 * To retrieve the page where the FilterWidget is used, using the FHC_JS_DATA_STORAGE_OBJECT
 	 */
 	getFilterPage: function() {
 
 		return FHC_JS_DATA_STORAGE_OBJECT.called_path + "/" + FHC_JS_DATA_STORAGE_OBJECT.called_method;
+	},
+
+	/**
+	 * Reload of dataset, also reloads page to show changes
+	 */
+	reloadDataset: function() {
+		FHC_AjaxClient.ajaxCallPost(
+			"system/Filters/reloadDataset",
+			{
+				filter_page: FHC_FilterWidget.getFilterPage()
+			},
+			{
+				successCallback: function(data, textStatus, jqXHR) {
+					FHC_FilterWidget._failOrReload(data);
+				}
+			}
+		);
 	},
 
 	//------------------------------------------------------------------------------------------------------------------
@@ -197,7 +214,7 @@ var FHC_FilterWidget = {
 	},
 
 	/**
-	 * This method calls all the other methods needed to rendere the GUI for a FilterWidget
+	 * This method calls all the other methods needed to render the GUI for a FilterWidget
 	 * The parameter data contains all the data about the FilterWidget and it is given as parameter
 	 * to all the methods that here are called
 	 * NOTE: think very carefully before changing the order of the calls
