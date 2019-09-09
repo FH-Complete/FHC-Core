@@ -229,13 +229,13 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/mitarbeiter/mitarbeiteroverlay.xul
 				<treeitem>
 					<treerow>
 					   	<treecell label="StudiengangsleiterIn"/>
-					   	<treecell label="StudiengangsleiterIn"/>
+					   	<treecell label="Studiengangsleiter"/>
 					</treerow>
 				</treeitem>
 				<treeitem>
 					<treerow>
 					   	<treecell label="InstitutsleiterIn"/>
-					   	<treecell label="FachbereichsleiterIn"/>
+					   	<treecell label="Fachbereichsleiter"/>
 					</treerow>
 				</treeitem>
 				<treeitem>
