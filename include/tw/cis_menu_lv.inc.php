@@ -411,12 +411,17 @@ function checkZeilenUmbruch()
 			{
 				if($row->gruppe_kurzbz!='')
 				{
-					if(!$db->db_parse_bool($row->mailgrp))
+					$bngrp = new benutzergruppe();
+					$bngrp->load_uids($row->gruppe_kurzbz, $angezeigtes_stsem);
+					if(isset($bngrp->uids) && count($bngrp->uids) > 0)
 					{
-						$nomail=$row->gruppe_kurzbz.' ';
+						if(!$db->db_parse_bool($row->mailgrp))
+						{
+							$nomail=$row->gruppe_kurzbz.' ';
+						}
+						else
+							$mailto.=mb_strtolower($row->gruppe_kurzbz.'@'.DOMAIN.$variable->variable->emailadressentrennzeichen);
 					}
-					else
-						$mailto.=mb_strtolower($row->gruppe_kurzbz.'@'.DOMAIN.$variable->variable->emailadressentrennzeichen);
 				}
 				else
 					$mailto.=mb_strtolower($row->stg_typ.$row->stg_kurzbz.$row->semester.trim($row->verband).trim($row->gruppe).'@'.DOMAIN.$variable->variable->emailadressentrennzeichen);
