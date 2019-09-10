@@ -128,7 +128,7 @@ function ip_increment($ip = "")
 					{
 						$VLAN = $mfiles->match[1];
 						$fuser = $mfiles->match[2];
-						$fuser = split(" ", $fuser);
+						$fuser = explode(" ", $fuser);
 						$fuser = $fuser[0];
 						//hier könnte man noch eine email oder dgl. schicken
 						if ($fuser != $txtUID)
