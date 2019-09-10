@@ -38,7 +38,7 @@ else
 
 function ip_increment($ip = "")
 {
-	$ip = split("\.", $ip);
+	$ip = explode(".", $ip);
 
 	if($ip[3] > 0 && $ip[3] < 254)
 	{
