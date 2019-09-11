@@ -38,68 +38,36 @@ require_once '../../include/datum.class.php';
 if (!$db = new basis_db())
 	die('Fehler beim Oeffnen der Datenbankverbindung');
 
-//if(isset($_GET['lang']))
-//	setSprache($_GET['lang']);
+// Start session
+session_start();
 
-$date = new datum();
-
-function getSpracheUser()
+// Logout (triggered by logout button in menu.php)
+if (isset($_GET['logout']) && $_GET['logout'] == true)
 {
-	if(isset($_SESSION['sprache_user']))
-	{
-		$sprache_user=$_SESSION['sprache_user'];
-	}
-	else
-	{
-		if(isset($_COOKIE['sprache_user']))
-		{
-			$sprache_user=$_COOKIE['sprache_user'];
-		}
-		else
-		{
-			$sprache_user=DEFAULT_LANGUAGE;
-		}
-		setSpracheUser($sprache_user);
-	}
-	return $sprache_user;
-}
+    // Unset global vars
+    unset($_GET['logout']);
+    unset($_GET['sprache_user']);
+    $_POST = [];
+    $_SESSION = [];
 
-function setSpracheUser($sprache)
-{
-	$_SESSION['sprache_user']=$sprache;
-	setcookie('sprache_user',$sprache,time()+60*60*24*30,'/');
-}
+    // Destroy session
+    session_destroy();
 
-if(isset($_GET['sprache_user']))
-{
-	$sprache_user = new sprache();
-	if($sprache_user->load($_GET['sprache_user']))
-	{
-		setSpracheUser($_GET['sprache_user']);
-	}
-	else
-		setSpracheUser(DEFAULT_LANGUAGE);
+    echo '
+        <script language="Javascript">
+            location = location.pathname;       // clean the login.php-url from querystring
+            parent.menu.location = parent.menu.location.pathname;   // clean the menu.php-url from querystring     
+            parent.topbar.location = parent.topbar.location.pathname;   // clean the topbar.php-url from querystring
+        </script>
+    ';
 }
-
-$sprache_user = getSpracheUser();
-$p = new phrasen($sprache_user);
 
 $gebdatum='';
+$date = new datum();
 
-session_start();
-$reload=false;
-$reload_parent=false;
+$reload_menu=false;
 
 $sg_var = new studiengang();
-
-if (isset($_GET['logout']))
-{
-	if(isset($_SESSION['prestudent_id']))
-	{
-		$reload = true;
-		session_destroy();
-	}
-}
 
 if(isset($_POST['gebdatum']) && $_POST['gebdatum']!='')
 {
@@ -178,7 +146,6 @@ if (isset($_POST['prestudent']) && isset($gebdatum))
 				$_SESSION['vorname']=$ps->vorname;
 				$_SESSION['gebdatum']=$ps->gebdatum;
 				$stg_obj = new studiengang($studiengang);
-				$_SESSION['sprache']=$stg_obj->sprache;
 
 				$_SESSION['semester']=$semester;
                 $stg_obj->getStudiengangTyp($stg_obj->typ);
@@ -215,7 +182,6 @@ if (isset($_POST['prestudent']) && isset($gebdatum))
 						break;
 					}
 				}
-
 				// Sprachvorgaben zu STG mit höchster Prio ermitteln
 
                 // * 1. Sprache über Ablauf Vorgaben ermitteln
@@ -246,11 +212,11 @@ if (isset($_POST['prestudent']) && isset($gebdatum))
 				// * 4. Sprache setzen. Falls keine Sprache vorhanden -> DEFAULT language verwenden
 				if (empty($rt_sprache))
 				{
-					$_SESSION['sprache'] = DEFAULT_LANGUAGE;
+					$_SESSION['sprache_user'] = DEFAULT_LANGUAGE;
 				}
 				else
                 {
-					$_SESSION['sprache'] = $rt_sprache;
+					$_SESSION['sprache_user'] = $rt_sprache;
                 }
 			}
 			else
@@ -269,8 +235,38 @@ if (isset($_POST['prestudent']) && isset($gebdatum))
 	}
 }
 
+// Set language of user.
+// NOTE: don't move the code in order to check first the right studies' reihungstest language
+// (in case it was overruled by other STG with higher priority)
+
+// Start with default language on first login (before any prestudent has been selected)
+$sprache_user = DEFAULT_LANGUAGE;
+if (isset($_SESSION['sprache_user']) && !empty($_SESSION['sprache_user']))
+{
+    // If session var already exists, overwrite language var
+    // (session var changes e.g. when user selects other language with language-select-menu)
+    $sprache_user = $_SESSION['sprache_user'];
+}
+elseif (isset($_SESSION['prestudent_id']))
+{
+    // If session var does not exist but prestudent is known, set the session var
+    $_SESSION['sprache_user'] = DEFAULT_LANGUAGE;
+}
+
+// If language is changed by language select menu, reset language variables
+if(isset($_GET['sprache_user']) && !empty($_GET['sprache_user']))
+{
+    $sprache_user = $_GET['sprache_user'];
+    $_SESSION['sprache_user'] = $_GET['sprache_user'];
+}
+
+// NOTE: leave phrasen here, as the final users language is not defined until here
+$p = new phrasen($sprache_user);
+
 if (isset($_SESSION['prestudent_id']))
-	$prestudent_id=$_SESSION['prestudent_id'];
+{
+    $prestudent_id=$_SESSION['prestudent_id'];
+}
 else
 {
 	//$prestudent_id=null;
@@ -279,10 +275,6 @@ else
 	$ps->getPrestudentRT($datum);
 }
 
-if(isset($_GET['type']) && $_GET['type']=='sprachechange' && isset($_GET['sprache']))
-{
-	setSprache($_GET['sprache']);
-}
 
 if(isset($_SESSION['prestudent_id']) && !isset($_SESSION['pruefling_id']))
 {
@@ -303,7 +295,7 @@ if(isset($_SESSION['prestudent_id']) && !isset($_SESSION['pruefling_id']))
 		if($pruefling->save())
 		{
 			$_SESSION['pruefling_id']=$pruefling->pruefling_id;
-			$reload_parent=true;
+			$reload_menu=true;
 		}
 }
 
@@ -327,7 +319,7 @@ if(isset($_POST['save']) && isset($_SESSION['prestudent_id']))
 	{
 		$_SESSION['pruefling_id']=$pruefling->pruefling_id;
 		$_SESSION['semester']=$pruefling->semester;
-		$reload_parent=true;
+		$reload_menu=true;
 	}
 }
 ?><!DOCTYPE HTML>
@@ -371,24 +363,19 @@ if(isset($_POST['save']) && isset($_SESSION['prestudent_id']))
 	});
 	</script>
 <?php
-	if($reload_parent)
+	if($reload_menu)
 		echo '<script language="Javascript">parent.menu.location.reload();</script>';
-
-	if($reload)
-		echo "<script language=\"Javascript\">parent.location.reload();</script>";
 ?>
 </head>
 
 <body scroll="no">
     <div class="row">
-        <div class="col-xs-10 col-sm-9 col-lg-6">
 
 <?php
 
 //REIHUNGSTEST STARTSEITE (nach Login)
 if (isset($prestudent_id))
 {
-
     $prestudent = new prestudent($prestudent_id);
     $stg_obj = new studiengang($prestudent->studiengang_kz);
     $pruefling = new pruefling();
@@ -399,7 +386,7 @@ if (isset($prestudent_id))
     $ps = new Prestudent();
 
     //  * prinzipiell STG der session übernehmem
-    $firstPrio_studiengang_kz = $prestudent->studiengang_kz;;
+    $firstPrio_studiengang_kz = $prestudent->studiengang_kz;
 
     //  * wenn STG des eingeloggten Prestudenten vom Typ Bachelor ist, dann höchste Prio aller
     //  Bachelor-STG ermitteln, an denen die Person noch interessiert ist
@@ -424,7 +411,18 @@ if (isset($prestudent_id))
        $sprachwahl = $ablauf->result[0]->sprachwahl;
     }
 
+    // If language can be switched, display language select menu on the top
+    if ($sprachwahl)
+    {
+        $_SESSION['sprache_auswahl'] = true;
+    ?>
+        <script type="text/javascript">
+            parent.topbar.location.reload();
+        </script>
+    <?php
+    }
     //Prestudent Informationen
+    echo '<div class="col-xs-10 col-sm-9 col-lg-6">';
     echo '
         <h1 style="margin-top: -20px;">'. $p->t('testtool/begruessungstext'). '</h1><br/>
         <p>'. $p->t('testtool/anmeldedaten'). '</p><br/>   
@@ -538,53 +536,6 @@ if (isset($prestudent_id))
         //echo '<tr><td></td><td><input type="submit" name="save" value="Semester ändern"></td>';
         echo '</table>';
         echo '</FORM>';
-
-        //Wenn die Sprachwahl fuer den priorisierten Studiengang aktiviert ist, dann die Sprachen anzeigen
-        if($sprachwahl==true)
-        {
-            //Liste der Sprachen, die in den Gebieten vorkommen koennen
-            $qry = "SELECT distinct sprache
-                    FROM
-                        testtool.tbl_pruefling
-                        JOIN testtool.tbl_ablauf USING(studiengang_kz)
-                        JOIN testtool.tbl_frage USING(gebiet_id)
-                        JOIN testtool.tbl_frage_sprache USING(frage_id)
-                    WHERE
-                        tbl_pruefling.pruefling_id=".$db->db_add_param($pruefling->pruefling_id)."
-                    ORDER BY sprache DESC";
-
-            if($result = $db->db_query($qry))
-            {
-				echo '
-                    <p>'. $p->t('testtool/spracheDerTestfragen').':</p><br>
-                    <div class="btn-group btn-group-justified" role="group">          
-                ';
-
-				while($row = $db->db_fetch_object($result))
-				{
-					$selected = ($_SESSION['sprache'] == $row->sprache) ? 'active' : '';
-					$row_sprache = $row->sprache;
-					if ($sprache_user == 'German')
-                    {
-                        if($row->sprache == 'English')
-                        {
-							$row_sprache = 'Englisch';
-                        }
-                        elseif ($row->sprache == 'German')
-                        {
-							$row_sprache = 'Deutsch';
-                        }
-                    }
-					echo "
-                          <div class='btn-group' role='group'> 
-                            <a role='button' class='btn btn-default $selected' href='". $_SERVER['PHP_SELF']. "?type=sprachechange&sprache=". $row->sprache. "'>$row_sprache</a>
-                          </div>                     
-                    ";
-				}
-				echo '</div>';
-            }
-        }
-
         echo '<br><br>';
         echo '
             <div class="well well-lg text-center">
@@ -594,22 +545,45 @@ if (isset($prestudent_id))
         if($pruefling->pruefling_id!='')
         {
             $_SESSION['pruefling_id']=$pruefling->pruefling_id;
-            //echo '<script language="Javascript">parent.menu.location.reload()</script>';
         }
     }
     else
     {
         echo '<span class="error">'.$p->t('testtool/keinPrueflingseintragVorhanden').'</span>';
     }
+    echo '    </div><!--/.col-->';
 }
-else
+else // LOGIN Site (vor Login)
 {
-        //LOGIN FORM (Startseite vor Login)
     $prestudent_id_dummy_student = (defined('PRESTUDENT_ID_DUMMY_STUDENT')?PRESTUDENT_ID_DUMMY_STUDENT:'');
+    echo '<div class="col-xs-11">';
 
-    echo '<form method="post">
-            <SELECT name="prestudent">';
-    echo '<OPTION value="'.$prestudent_id_dummy_student.'">'.$p->t('testtool/nameAuswaehlen').'</OPTION>\n';
+//    Welcome text
+    echo '
+        <div class="row" style="margin-bottom: 10%; margin-top: 3%;">
+            <div class="col-xs-6 text-center" style="border-right: 1px solid lightgrey;">
+                <h1 style="white-space: normal">Herzlich Willkommen zum Reihungstest</h1><br><br>
+                Bitte warten Sie mit dem Login auf die Anweisung der Aufsichtsperson.<br><br>
+                Wir wünschen Ihnen einen erfolgreichen Start ins Studium.
+            </div>
+            <div class="col-xs-6 text-center">
+                <h1 style="white-space: normal">Welcome to the placement test</h1> <br><br>
+                Please wait for the tutor\'s instructions before you log in.<br><br>
+                We wish you a good start to your studies.
+            </div>
+        </div>
+    ';
+
+    // Begin form
+    echo '<div class="row text-center">';
+    echo '<form method="post" class="form-inline">';
+
+    // Name select menu
+    echo '<div class="form-group">';
+    echo '<label for="select-prestudent" class="col-sm-2 control-label">Name</label>';
+    echo '<div class="col-sm-10">';
+    echo '<SELECT name="prestudent" id="select-prestudent" class="form-control">';
+    echo '<OPTION value="'.$prestudent_id_dummy_student.'">Bitte wählen / Please select...</OPTION>\n';
     foreach($ps->result as $prestd)
     {
         $stg = new studiengang();
@@ -618,7 +592,8 @@ else
             $selected = 'selected';
         else
             $selected='';
-        echo '<OPTION value="'.$prestd->prestudent_id.'" '.$selected.'>'.$prestd->nachname.' '.$prestd->vorname.' ('.(strtoupper($stg->typ.$stg->kurzbz)).')</OPTION>\n';
+        echo '
+                <OPTION value="'.$prestd->prestudent_id.'" '.$selected.'>'.$prestd->nachname.' '.$prestd->vorname.' ('.(strtoupper($stg->typ.$stg->kurzbz)).')</OPTION>\n';
     }
     // An der FHTW gibt es 3 Testuser für den Camus International
     if (CAMPUS_NAME == 'FH Technikum Wien')
@@ -628,19 +603,26 @@ else
 	    echo '<OPTION value="30889">Testuser Campus International 03</OPTION>\n';
     }
     echo '</SELECT>';
-    echo '&nbsp; '.$p->t('global/geburtsdatum').': ';
-    echo '<input type="text" id="datepicker" size="12" name="gebdatum" value="'.$date->formatDatum($gebdatum,'d.m.Y').'">';
-    echo '<INPUT type="submit" value="'.$p->t('testtool/login').'" />';
-    echo '</form>';
+    echo '</div>'; // end col-xs
+    echo '</div>'; // end form-group
 
-    echo '<br /><br /><br />
-    <center>
-    <span style="font-size: 1.2em; font-style: italic;">'.$p->t('testtool/willkommenstextTitel').'</span><br><br>
-    <span style="font-size: 1.2em; font-style: italic;">'.$p->t('testtool/willkommenstext').'</span>
-    </center>';
+    // Datepicker input
+    echo '<div class="form-group"> ';
+    echo '<label for="datepicker" class="col-sm-offset-1 col-sm-4 control-label">Geburtsdatum | Date of Birth</label>';
+    echo '<div class="col-sm-3">';
+    echo '<input type="text" id="datepicker" class="form-control" name="gebdatum" value="'.$date->formatDatum($gebdatum,'d.m.Y').'">';
+    echo '</div>'; // end col-xs
+    echo '</div>'; // end form-group
+
+    // Login button
+    echo '<button type="submit" class="btn btn-default" value="'.$p->t('testtool/login').'" />'.$p->t('testtool/login').'</button>';
+
+    echo '</form>'; // end form
+
+    echo '</div>';  // end row
+    echo '</div>';  // end col-xs-11
 }
 ?>
-    </div><!--/.col-->
 </div><!--/.row-->
 </body>
 </html>

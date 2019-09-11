@@ -42,50 +42,19 @@ if (!$db = new basis_db())
 
 $PHP_SELF=$_SERVER["PHP_SELF"];
 
-function getSpracheUser()
-{
-	if(isset($_SESSION['sprache_user']))
-	{
-		$sprache_user=$_SESSION['sprache_user'];
-	}
-	else
-	{
-		if(isset($_COOKIE['sprache_user']))
-		{
-			$sprache_user=$_COOKIE['sprache_user'];
-		}
-		else
-		{
-			$sprache_user=DEFAULT_LANGUAGE;
-		}
-		setSpracheUser($sprache_user);
-	}
-	return $sprache_user;
-}
-
-function setSpracheUser($sprache)
-{
-	$_SESSION['sprache_user']=$sprache;
-	setcookie('sprache_user',$sprache,time()+60*60*24*30,'/');
-}
-
-if(isset($_GET['sprache_user']))
-{
-	$sprache_user = new sprache();
-	if($sprache_user->load($_GET['sprache_user']))
-	{
-		setSpracheUser($_GET['sprache_user']);
-	}
-	else
-		setSpracheUser(DEFAULT_LANGUAGE);
-}
-
-$sprache_user = getSpracheUser(); 
-$p = new phrasen($sprache_user);
-
-$sprache = getSprache(); 
-
+// Start session
 session_start();
+
+// If language is changed by language select menu, reset language variables
+if (isset($_GET['sprache_user']) && !empty($_GET['sprache_user']))
+{
+    $_SESSION['sprache_user'] = $_GET['sprache_user'];
+    $sprache_user = $_GET['sprache_user'];
+}
+
+// Set language variable, which impacts the question language
+$sprache_user = (isset($_SESSION['sprache_user']) && !empty($_SESSION['sprache_user'])) ? $_SESSION['sprache_user'] : DEFAULT_LANGUAGE;
+$p = new phrasen($sprache_user);
 
 if(isset($_GET['gebiet_id']))
 	$gebiet_id = $_GET['gebiet_id'];
@@ -489,7 +458,7 @@ else
 if($frage->frage_id!='')
 {
 	$frage_id = $frage->frage_id;
-	$frage->getFrageSprache($frage_id, $_SESSION['sprache']);
+	$frage->getFrageSprache($frage_id, $_SESSION['sprache_user']);
 
 	if(!$demo)
 	{
@@ -574,7 +543,7 @@ if($frage->frage_id!='')
     {
        echo '
             <div class="row text-center">
-                <img class="testtoolfrage" src="bild.php?src=frage&amp;frage_id='. $frage->frage_id.'&amp;sprache='. $_SESSION["sprache"].'"></img><br/><br/><br/> 
+                <img class="testtoolfrage" src="bild.php?src=frage&amp;frage_id='. $frage->frage_id.'&amp;sprache='. $_SESSION["sprache_user"].'"></img><br/><br/><br/> 
             </div>      
         ';
     }
@@ -585,7 +554,7 @@ if($frage->frage_id!='')
 	{
 		echo '	
             <div class="row text-center">
-                <audio src="sound.php?src=frage&amp;frage_id='.$frage->frage_id.'&amp;sprache='.$_SESSION['sprache'].'&amp;'.$timestamp.'" controls="controls" type="audio/ogg">
+                <audio src="sound.php?src=frage&amp;frage_id='.$frage->frage_id.'&amp;sprache='.$_SESSION['sprache_user'].'&amp;'.$timestamp.'" controls="controls" type="audio/ogg">
                      <div>
                            <p>Ihr Browser unterstützt dieses Audioelement leider nicht.</p>
                      </div>
@@ -605,7 +574,7 @@ if($frage->frage_id!='')
 
     //Vorschlaege laden
 	$vs = new vorschlag();
-	$vs->getVorschlag($frage->frage_id, $_SESSION['sprache'], $gebiet->zufallvorschlag);
+	$vs->getVorschlag($frage->frage_id, $_SESSION['sprache_user'], $gebiet->zufallvorschlag);
 	$letzte = $frage->getNextFrage($gebiet_id, $_SESSION['pruefling_id'], $frage_id, $demo);
 	echo "<form action=\"$PHP_SELF?gebiet_id=$gebiet_id&amp;frage_id=$frage->frage_id\" method=\"POST\" ".(!$letzte && !$levelgebiet?"onsubmit=\"letzteFrage()\"":"").">";
 	echo '
@@ -649,10 +618,10 @@ if($frage->frage_id!='')
 		
 		echo '<br/>';
 		if($vorschlag->bild!='')
-			echo "<img class='testtoolvorschlag' src='bild.php?src=vorschlag&amp;vorschlag_id=$vorschlag->vorschlag_id&amp;sprache=".$_SESSION['sprache']."' /><br/>";
+			echo "<img class='testtoolvorschlag' src='bild.php?src=vorschlag&amp;vorschlag_id=$vorschlag->vorschlag_id&amp;sprache=".$_SESSION['sprache_user']."' /><br/>";
 		if($vorschlag->audio!='')
 		{
-			echo '	<audio src="sound.php?src=vorschlag&amp;vorschlag_id='.$vorschlag->vorschlag_id.'&amp;sprache='.$_SESSION['sprache'].'" controls="controls">
+			echo '	<audio src="sound.php?src=vorschlag&amp;vorschlag_id='.$vorschlag->vorschlag_id.'&amp;sprache='.$_SESSION['sprache_user'].'" controls="controls">
 						<div>
 							<p>Ihr Browser unterstützt dieses Audioelement leider nicht.</p>
 						</div>

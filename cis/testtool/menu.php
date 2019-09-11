@@ -19,6 +19,7 @@
  *			Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>,
  *			Rudolf Hangl <rudolf.hangl@technikum-wien.at>,
  *			Manfred Kindl <manfred.kindl@technikum-wien.at>
+ *          Cristina Hainberger <hainberg@technikum-wien.at>
  */
 
 require_once('../../config/cis.config.inc.php');
@@ -27,55 +28,24 @@ require_once('../../include/basis_db.class.php');
 require_once('../../include/sprache.class.php');
 require_once '../../include/phrasen.class.php';
 require_once '../../include/studiengang.class.php';
+require_once('../../include/gebiet.class.php');
 
 if (!$db = new basis_db())
 	die('Fehler beim Oeffnen der Datenbankverbindung');
 
-require_once('../../include/gebiet.class.php');
-
-function getSpracheUser()
-{
-	if(isset($_SESSION['sprache_user']))
-	{
-		$sprache_user=$_SESSION['sprache_user'];
-	}
-	else
-	{
-		if(isset($_COOKIE['sprache_user']))
-		{
-			$sprache_user=$_COOKIE['sprache_user'];
-		}
-		else
-		{
-			$sprache_user=DEFAULT_LANGUAGE;
-		}
-		setSpracheUser($sprache_user);
-	}
-	return $sprache_user;
-}
-
-function setSpracheUser($sprache)
-{
-	$_SESSION['sprache_user']=$sprache;
-	setcookie('sprache_user',$sprache,time()+60*60*24*30,'/');
-}
-
-if(isset($_GET['sprache_user']))
-{
-	$sprache_user = new sprache();
-	if($sprache_user->load($_GET['sprache_user']))
-	{
-		setSpracheUser($_GET['sprache_user']);
-	}
-	else
-		setSpracheUser(DEFAULT_LANGUAGE);
-}
-
-$sprache_user = getSpracheUser();
-$p = new phrasen($sprache_user);
-$sprache = getSprache();
-
+// Start session
 session_start();
+
+// If language is changed by language select menu, reset language and session variables
+if(isset($_GET['sprache_user']) && !empty($_GET['sprache_user']))
+{
+    $sprache_user = $_GET['sprache_user'];
+    $_SESSION['sprache_user'] = $_GET['sprache_user'];
+}
+
+// Set language variable, which impacts the navigation menu
+$sprache_user = (isset($_SESSION['sprache_user']) && !empty($_SESSION['sprache_user'])) ? $_SESSION['sprache_user'] : DEFAULT_LANGUAGE;
+$p = new phrasen($sprache_user);
 
 ?><!DOCTYPE HTML>
 <html>
@@ -89,6 +59,9 @@ session_start();
 
 <body scroll="no">
 <?php
+$gebiet_hasMathML = false; // true, wenn irgendein Gebiet eine/n Frage/Vorschlag im MathML-Format enthält
+$invalid_gebiete = false;
+
 if (isset($_SESSION['pruefling_id']))
 {
 	//content_id fuer Einfuehrung auslesen
@@ -110,7 +83,7 @@ if (isset($_SESSION['pruefling_id']))
         {
 			echo '
                 <tr id="tr-einleitung"><td class="ItemTesttool" style="margin-left: 20px;" nowrap>
-                    <a class="ItemTesttool navButton" href="../../cms/content.php?content_id='.$content_id->content_id.'&sprache='.$sprache.'" target="content">'.$p->t('testtool/einleitung').'</a>
+                    <a class="ItemTesttool navButton" href="../../cms/content.php?content_id='.$content_id->content_id.'&sprache='.$sprache_user.'" target="content">'.$p->t('testtool/einleitung').'</a>
                 </td></tr>
             ';
         }
@@ -296,8 +269,6 @@ if (isset($_SESSION['pruefling_id']))
 	$result = $db->db_query($qry);
 	$lastsemester = '';
 	$quereinsteiger_stg = '';
-    $gebiet_hasMathML = false; // true, wenn irgendein Gebiet eine/n Frage/Vorschlag im MathML-Format enthält
-    $invalid_gebiete = false;
 	while($row = $db->db_fetch_object($result))
 	{
 		//Jedes Semester in einer eigenen Tabelle anzeigen
@@ -404,7 +375,7 @@ if (isset($_SESSION['pruefling_id']))
 
 	// Link zum Logout
 	echo '<tr><td class="ItemTesttool" style="margin-left: 20px;" nowrap>
-			<a class="ItemTesttool navButton" href="login.php?logout" target="content">Logout</a>
+			<a class="ItemTesttool navButton" href="login.php?logout=true" target="content">Logout</a>
 		</td></tr>';
 
 	echo '</td></tr></table>';
