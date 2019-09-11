@@ -400,8 +400,10 @@ class pruefling extends basis_db
 						tbl_rt_person.rt_id = ".$this->db_add_param($reihungstest_id, FHC_INTEGER)."
 					AND 
 						tbl_prestudentstatus.status_kurzbz='Interessent'
+					AND 
+						tbl_prestudentstatus.studiensemester_kurzbz = tbl_reihungstest.studiensemester_kurzbz
 					ORDER BY
-						tbl_reihungstest.datum desc LIMIT 1
+						tbl_reihungstest.datum DESC, tbl_prestudent.priorisierung ASC LIMIT 1
 				)
 			";
 			if($result = $this->db_query($qry))
