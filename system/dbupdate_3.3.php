@@ -3107,6 +3107,20 @@ if($result = @$db->db_query("SELECT 1 FROM lehre.tbl_vertragsstatus WHERE vertra
 	}
 }
 
+// Insert 'Betreuung' to tbl_vertragstyp
+if($result = @$db->db_query("SELECT 1 FROM lehre.tbl_vertragstyp WHERE vertragstyp_kurzbz = 'Betreuung';"))
+{
+	if($db->db_num_rows($result) == 0)
+	{
+		$qry = "INSERT INTO lehre.tbl_vertragstyp(vertragstyp_kurzbz, bezeichnung) VALUES('Betreuung', 'Betreuung');";
+
+		if(!$db->db_query($qry))
+			echo '<strong>lehre.tbl_vertragstyp '.$db->db_last_error().'</strong><br>';
+		else
+			echo 'lehre.tbl_vertragstyp: Added value \'Betreuung\'<br>';
+	}
+}
+
 // Add permission to order lehrauftrag (lehrauftrag_bestellen)
 if($result = @$db->db_query("SELECT 1 FROM system.tbl_berechtigung WHERE berechtigung_kurzbz = 'lehre/lehrauftrag_bestellen';"))
 {

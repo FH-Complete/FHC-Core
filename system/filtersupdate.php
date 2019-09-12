@@ -410,10 +410,17 @@ $filters = array(
 			{
 			    "name": "",
 				"columns": [
+				    {"name": "id"},
 				    {"name": "LE_ID"},
+				    {"name": "LV_ID"},
+				    {"name": "PA_ID"},
+				    {"name": "Studiensemester"},
+				    {"name": "studiengang_kz"},
+				    {"name": "Person_ID"},
 				    {"name": "Typ"},
 					{"name": "Auftrag"},
 					{"name": "Organisationseinheit"},
+					{"name": "lv_oe_kurzbz"},
 					{"name": "Gruppe"},
 					{"name": "Lektor"},
 					{"name": "Stunden"},
