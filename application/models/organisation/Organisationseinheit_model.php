@@ -165,4 +165,27 @@ class Organisationseinheit_model extends DB_Model
 		return $this->execQuery(sprintf($query, $aktivstring, $aktivstring), array($oe_kurzbz));
 	}
 
+    /**
+     * Get one parent only.
+     * Easily retrieve department of a studiengang or fakultät of department etc.
+     * @param $oe_kurzbz
+     * @return array|null
+     */
+	public function getParent($oe_kurzbz)
+    {
+        if (is_string($oe_kurzbz))
+        {
+            $condition = '
+                oe_kurzbz = (
+                    SELECT 
+                        oe_parent_kurzbz
+                    FROM
+                        public.tbl_organisationseinheit
+                    WHERE
+                        oe_kurzbz = \''. $oe_kurzbz. '\'
+                )
+            ';
+        }
+        return $this->loadWhere($condition);
+    }
 }
