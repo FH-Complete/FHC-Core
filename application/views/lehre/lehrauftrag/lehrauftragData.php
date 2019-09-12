@@ -145,14 +145,22 @@ $filterWidgetArray = array(
     'filterKurzbz' => 'LehrauftragOrder',
     'requiredPermissions' => 'lehre', // TODO: change permission
     'datasetRepresentation' => 'tabulator',
+    'reloadDataset' => true,    // reload query on page refresh
     'customMenu' => false,
     'hideOptions' => true,
     'hideMenu' => true,
     'columnsAliases' => array(  // TODO: use phrasen
+        'id',
         'LE-ID',
+        'LV-ID',
+        'PA-ID',
+        'Studiensemester',
+        'Studiengang',
+        'Person-ID',
         ucfirst($this->p->t('global', 'typ')),
         'Auftrag',
         'Organisationseinheit',
+        'lv_oe_kurzbz',
         'Gruppe',
         'Lektor',
         'Stunden',
@@ -175,21 +183,32 @@ $filterWidgetArray = array(
         selectable: true,               // allows row selection
         selectableRangeMode: "click",   // allows range selection using shift end click on end of range
         selectablePersistence:false,    // deselect previously selected rows when table is filtered, sorted or paginated
+        selectableCheck: function(row){ // only allow selection if is not bestellt (as order already exists)
+            return row.getData().Bestellt == null;
+        },
         movableColumns: true,           // allows changing column    
 	    headerFilterPlaceholder: " "
     }', // tabulator properties
     'datasetRepFieldsDefs' => '{
+        id: {visible:false}, // necessary for row indexing
         LE_ID: {headerFilter:"input", bottomCalc:"count"},
+        LV_ID: {visible: false},
+        PA_ID: {visible: false},
+        Studiensemester: {visible: false},
+        studiengang_kz: {visible: false},  
+        Person_ID: {visible: false},
         Typ: {headerFilter:"input"},
         Auftrag: {headerFilter:"input"},
         Organisationseinheit: {headerFilter:"input"},
+        lv_oe_kurzbz: {visible: false},
         Gruppe: {headerFilter:"input"},
         Lektor: {headerFilter:"input"},
         Stunden: {align:"right", headerFilter:"input", bottomCalc:"sum", bottomCalcParams:{precision:1}}, 
-        Betrag: {align:"right", headerFilter:"input", headerFilterPlaceholder:">=", headerFilterFunc:">=", bottomCalc:"sum", bottomCalcParams:{precision:2}},
-        Bestellt: {align:"center", headerFilter:"input"}, 
-        Erteilt: {align:"center", headerFilter:"input"},
-        Akzeptiert: {align:"center", headerFilter:"input"}
+        Betrag: {align:"right",  headerFilter:"input", headerFilterPlaceholder:">=", headerFilterFunc: hf_compareWithFloat,
+            bottomCalc:"sum", bottomCalcParams:{precision:2}, bottomCalcFormatter:"money", bottomCalcFormatterParams:{decimal: ",", thousand: ".", symbol:"€"}},
+        Bestellt: {align:"center", headerFilter:"input", mutator: mut_formatStringDate}, 
+        Erteilt: {align:"center", headerFilter:"input", mutator: mut_formatStringDate},
+        Akzeptiert: {align:"center", headerFilter:"input", mutator: mut_formatStringDate}
     }', // col properties
 );
 
