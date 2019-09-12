@@ -155,4 +155,83 @@ class Lehrauftrag extends Auth_Controller
         if (!$this->_uid) show_error('User authentification failed');
     }
 
+    private function _sendMail($lehrvertrag_data_arr)
+    {
+        // Cluster data of new lehrvertraege as needed to send mail
+        $lehrvertrag_data_arr = $this->_cluster_newVertragData($lehrvertrag_data_arr);
+
+        foreach ($lehrvertrag_data_arr as $lehrvertrag_data)
+        {
+            // Get mail recipients
+            $result = $this->BenutzerrolleModel->getBenutzerByBerechtigung('lehre/lehrauftrag_erteilen', $lehrvertrag_data['lv_oe_kurzbz']);
+
+            // If given lv organisational unit has no authorized user, check if is a Kompetenzfeld.
+            // If so, look up for authorized user on Department level.
+            if (!hasData($result)) {
+                $result = $this->OrganisationseinheitModel->getParent($lehrvertrag_data['lv_oe_kurzbz']);
+
+                if (hasData($result)) {
+                    if ($result->retval[0]->organisationseinheittyp_kurzbz === 'Department') {
+                        $result = $this->BenutzerrolleModel->getBenutzerByBerechtigung('lehre/lehrauftrag_erteilen', $result->retval[0]->oe_kurzbz);
+                    }
+                }
+            }
+
+            // Set mail recipients (department assistance/leader)
+            $to = '';
+            $to_arr = array();
+            foreach ($result->retval as $berechtigung) {
+                $to_arr []= $berechtigung->uid . '@' . DOMAIN; // TODO: als array, dann splitten mit ;? oder als array lassen?
+            }
+            $to = implode(', ', $to_arr);
+
+            // Set link to lehrauftrag-site with preselected studiengang and studiensemester of new lehrauftraege
+            $url = site_url(self::LEHRAUFTRAG_URI).'?studiensemester='. $lehrvertrag_data['studiensemester_kurzbz']. '&studiengang='. $lehrvertrag_data['studiengang_kz'];
+
+            // Prepare mail content
+            $content_data_arr = array(
+                'anzahl' => $lehrvertrag_data['amount_new_lehrvertraege'],
+                'studiengang' => $lehrvertrag_data['studiengang_kz'],
+                'studiensemester' => $lehrvertrag_data['studiensemester_kurzbz'],
+                'link' => anchor($url, 'Lehrverträge Übersicht')
+            );
+
+            // Send mail
+            sendSanchoMail(
+                'LehrauftragBestellMail',
+                $content_data_arr,
+                $to,
+                'Bestellung neuer Lehraufträge',
+                'sancho_header_min_bw.jpg',
+                'sancho_footer_min_bw.jpg'
+            );
+        }
+    }
+
+    /**
+     * Clusters data as needed for _sendMail.
+     * Makes array of new lehrvertraege unique (by studiensemester, studiengang and lv_oe_kurzbz)
+     * Adds the amount of lehrvertraege of each unique array element.
+     * @param $new_lehrvertrag_data_arr
+     * @return array
+     */
+    private function _cluster_newVertragData($new_lehrvertrag_data_arr)
+    {
+        $unique_new_lehrvertrag_data_arr = array_unique($new_lehrvertrag_data_arr, SORT_REGULAR);
+        foreach ($unique_new_lehrvertrag_data_arr as &$new_lehrvertrag)
+        {
+            $cnt = 1;
+            foreach ($new_lehrvertrag_data_arr as $item)
+            {
+                if ($new_lehrvertrag['studiensemester_kurzbz'] === $item['studiensemester_kurzbz'] &&
+                    $new_lehrvertrag['studiengang_kz'] === $item['studiengang_kz'] &&
+                    $new_lehrvertrag['lv_oe_kurzbz'] === $item['lv_oe_kurzbz'])
+                {
+                    $new_lehrvertrag['amount_new_lehrvertraege'] = $cnt++;
+                }
+            }
+        }
+
+        return $unique_new_lehrvertrag_data_arr;
+    }
 }
