@@ -52,20 +52,29 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
 <script type="text/javascript" src="../../vendor/jquery/sizzle/sizzle.js"></script>
 	<title>Kartentausch</title>
 	<script type="text/javascript">
-	$(document).ready(function() 
-	{ 
+	$(document).ready(function()
+	{
 		$("#myTable").tablesorter(
 		{
 			sortList: [[2,0]],
 			widgets: ["zebra"]
-		}); 
-	}); 
-</script> 
-	
+		});
+	});
+</script>
+
 </head>
 <body>
 <h2>Zutrittskarte - Zuweisen der Karte</h2>';
 
+function printWarning()
+{
+	echo '<div style="color:red; font-style:bold">
+		ACHTUNG - Es wurde eine große Datenmenge geschickt.<br>
+		Daten wurden eventuell nicht vollständig gespeichert.<br>
+		Bitte wähle einzelne Studiengänge aus um die Daten einzutragen.<br>
+		</div>';
+
+}
 if(!$rechte->isBerechtigt('basis/fhausweis', 'suid'))
 	die('Sie haben keine Berechtigung für diese Seite');
 
@@ -76,8 +85,13 @@ if(isset($_GET['data']))
 {
 	$users = explode(';',$_GET['data']);
 }
+if(count($_POST)>700)
+{
+	printWarning();
+}
 if(isset($_POST['save']) && $users!='')
 {
+	var_dump($users);
 	foreach($users as $user)
 	{
 		$benutzer = new benutzer();
@@ -85,7 +99,7 @@ if(isset($_POST['save']) && $users!='')
 		{
 			$nummer1 = $_POST['nummer1_'.$user];
 			$nummer2 = $_POST['nummer2_'.$user];
-			
+
 			if($nummer1=='' || $nummer2=='')
 			{
 				echo '<span class="error">Ueberspringe '.$db->convert_html_chars($user).' - keine Nummer eingetragen</span>';
@@ -101,10 +115,10 @@ if(isset($_POST['save']) && $users!='')
 			$bm->updateamum = date('Y-m-d H:i:s');
 			$bm->updatevon = $uid;
 			$bm->reservieren=false;
-			
+
 			if($bm->save(true))
 			{
-			
+
 				//Zuordnung zu Benutzer anlegen
 				$bmp = new betriebsmittelperson();
 				$bmp->betriebsmittel_id = $bm->betriebsmittel_id;
@@ -134,10 +148,12 @@ if(isset($_POST['save']) && $users!='')
 		}
 	}
 }
-
 if($users!='')
 {
-	
+	if(count($users)>500)
+	{
+		printWarning();
+	}
 	echo '<form action="'.$_SERVER['PHP_SELF'].'" method="POST">
 	Karte gleich als Ausgegeben eintragen: <input type="checkbox" name="ausgegeben"/>
 	<table id="myTable" class="tablesorter">
