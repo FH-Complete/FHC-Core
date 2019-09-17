@@ -132,7 +132,7 @@ $(function() {
         //$('#filterTabulator').tabulator('selectRow', true);
 
         $('#filterTabulator').tabulator('getRows')
-            .filter(row => row.getData().Bestellt == null)
+            .filter(row => row.getData().bestellt == null)
             .forEach((row => row.select()));
     });
 
@@ -143,12 +143,12 @@ $(function() {
 
     // Show all rows
     $("#show-all").click(function(){
-        $('#filterTabulator').tabulator('removeFilter', 'Bestellt', '=', null);
+        $('#filterTabulator').tabulator('removeFilter', 'bestellt', '=', null);
     });
 
     // Show only rows with new lehrauftraege
     $("#show-new").click(function(){
-        $('#filterTabulator').tabulator('setFilter', 'Bestellt', '=', null);
+        $('#filterTabulator').tabulator('setFilter', 'bestellt', '=', null);
     });
 
     // Order Lehrauftraege
@@ -172,7 +172,7 @@ $(function() {
                 },
                 errorCallback: function (jqXHR, textStatus, errorThrown)
                 {
-                    FHC_DialogLib.alertError("Sytemfehler<br>Bestellung wurde nicht durchgeführt.");
+                    FHC_DialogLib.alertError("Sytemfehler<br>Bitte kontaktieren Sie Ihren Administrator.");
                 }
             }
         );

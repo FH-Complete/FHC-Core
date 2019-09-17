@@ -25,7 +25,7 @@ class Lehrauftrag extends Auth_Controller
         parent::__construct(
             array(
                 'index' => 'lehre/lehrauftrag_bestellen:r',
-                'orderLehrauftrag' => 'lehre/lehrauftrag_bestellen:rw'
+                'orderLehrauftrag' => 'lehre/lehrauftrag_bestellen:rw',
             )
         );
 
@@ -107,22 +107,23 @@ class Lehrauftrag extends Auth_Controller
         {
             if (!isEmptyArray($lehrauftrag)) {
                 if ($this->VertragModel->save(
-                    element('Person_ID', $lehrauftrag),
-                    element('LV_ID', $lehrauftrag),
-                    element('LE_ID', $lehrauftrag),
-                    element('PA_ID', $lehrauftrag),
-                    element('Stunden', $lehrauftrag),
-                    element('Betrag', $lehrauftrag),
-                    element('Studiensemester', $lehrauftrag)
+                    element('person_id', $lehrauftrag),
+                    element('mitarbeiter_uid', $lehrauftrag),
+                    element('lehrveranstaltung_id', $lehrauftrag),
+                    element('lehreinheit_id', $lehrauftrag),
+                    element('projektarbeit_id', $lehrauftrag),
+                    element('stunden', $lehrauftrag),
+                    element('betrag', $lehrauftrag),
+                    element('studiensemester_kurzbz', $lehrauftrag)
                 )->retval)
                 {
                     $result []= array(
-                        'id' => $lehrauftrag['id'],
-                        'Bestellt' => date('Y-m-d')
+                        'row_index' => $lehrauftrag['row_index'],
+                        'bestellt' => date('Y-m-d')
                     );
 
                     $new_lehrvertrag_data_arr[] = array(
-                        'studiensemester_kurzbz' => $lehrauftrag['Studiensemester'],
+                        'studiensemester_kurzbz' => $lehrauftrag['studiensemester_kurzbz'],
                         'studiengang_kz' => $lehrauftrag['studiengang_kz'],
                         'lv_oe_kurzbz' => $lehrauftrag['lv_oe_kurzbz']
                     );
