@@ -4,6 +4,7 @@ $this->phrasen['zeitaufzeichnung/benutzerWurdeNichtGefunden']='Benutzer %s wurde
 $this->phrasen['zeitaufzeichnung/zeitaufzeichnungVon']='Zeitaufzeichnung von';
 $this->phrasen['zeitaufzeichnung/neu']='NEU';
 $this->phrasen['zeitaufzeichnung/projekt']='Projekt';
+$this->phrasen['zeitaufzeichnung/projektphase']='Projektphase';
 $this->phrasen['zeitaufzeichnung/keineAuswahl']='keine Auswahl';
 $this->phrasen['zeitaufzeichnung/aktivitaet']='Aktivität';
 $this->phrasen['zeitaufzeichnung/id']='ID';

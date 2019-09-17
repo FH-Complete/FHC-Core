@@ -33,6 +33,7 @@ require_once('../../../include/zeitaufzeichnung.class.php');
 require_once('../../../include/zeitsperre.class.php');
 require_once('../../../include/datum.class.php');
 require_once('../../../include/projekt.class.php');
+require_once('../../../include/projektphase.class.php');
 require_once('../../../include/phrasen.class.php');
 require_once('../../../include/organisationseinheit.class.php');
 require_once('../../../include/service.class.php');
@@ -117,6 +118,7 @@ $sperrdatum = date('c', strtotime($gesperrt_bis));
 // Uses urlencode to avoid XSS issues
 $zeitaufzeichnung_id = urlencode(isset($_GET['zeitaufzeichnung_id'])?$_GET['zeitaufzeichnung_id']:'');
 $projekt_kurzbz = (isset($_POST['projekt'])?$_POST['projekt']:'');
+$projektphase_id = (isset($_POST['projektphase'])?$_POST['projektphase']:'');
 $oe_kurzbz_1 = (isset($_POST['oe_kurzbz_1'])?$_POST['oe_kurzbz_1']:'');
 $oe_kurzbz_2 = (isset($_POST['oe_kurzbz_2'])?$_POST['oe_kurzbz_2']:'');
 $aktivitaet_kurzbz = (isset($_POST['aktivitaet'])?$_POST['aktivitaet']:'');
@@ -251,6 +253,13 @@ echo '
 				$("#kunde_uid").val(ui.item.uid);
 			}
 			});
+			
+			$("#projekt").change(
+				function()
+				{
+					getProjektphasen($(this).val());
+				}
+			)
 
 		});
 
@@ -489,6 +498,40 @@ echo '
 			}
 			return true;
 		}
+		
+		function getProjektphasen(projekt_kurzbz)
+		{
+			$.ajax
+			(
+				{
+					type: "GET",
+					url: "zeitaufzeichnung_projektphasen.php",
+					dataType: "json",
+					data: 
+					{
+						"projekt_kurzbz":projekt_kurzbz
+					},
+					success: function(json)
+					{
+						$("#projektphase").children("option").each(
+							function()
+							{
+								if ($(this).prop("id") !== "projektphasekeineausw")
+									$(this).remove();
+							}	
+						);
+						
+						var projphasenhtml = "";
+						for (var i = 0; i < json.length; i++)
+						{
+							projphasenhtml += "<option value = \'" + json[i].projektphase_id + "\'>" + json[i].bezeichnung + "<\/option>";
+						}
+						
+						$("#projektphase").append(projphasenhtml);
+					}
+				}
+			);
+		}
 		</script>
 	</head>
 <body>
@@ -645,6 +688,7 @@ if(isset($_POST['save']) || isset($_POST['edit']) || isset($_POST['import']))
 		$zeit->updateamum = date('Y-m-d H:i:s');
 		$zeit->updatevon = $user;
 		$zeit->projekt_kurzbz = $projekt_kurzbz;
+		$zeit->projektphase_id = $projektphase_id;
 		$zeit->service_id = $service_id;
 		$zeit->kunde_uid = $kunde_uid;
 
@@ -667,6 +711,7 @@ if(isset($_POST['save']) || isset($_POST['edit']) || isset($_POST['import']))
 			$oe_kurzbz_1 = '';
 			$oe_kurzbz_2 = '';
 			$projekt_kurzbz = '';
+			$projektphase_id = '';
 			$service_id = '';
 			$kunde_uid = '';
 		}
@@ -719,8 +764,20 @@ if(isset($_GET['type']) && $_GET['type']=='edit')
 			$oe_kurzbz_1 = $zeit->oe_kurzbz_1;
 			$oe_kurzbz_2 = $zeit->oe_kurzbz_2;
 			$projekt_kurzbz = $zeit->projekt_kurzbz;
+			$projektphase_id = $zeit->projektphase_id;
 			$service_id = $zeit->service_id;
 			$kunde_uid = $zeit->kunde_uid;
+
+			$projektphase = new projektphase();
+
+			$projektphasen = array();
+			if($projektphase->getProjektphasen($projekt_kurzbz))
+			{
+				foreach ($projektphase->result as $row)
+				{
+					$projektphasen[] = $row;
+				}
+			}
 		}
 		else
 		{
@@ -942,6 +999,27 @@ if($projekt->getProjekteMitarbeiter($user, true))
 				echo '<option value="'.$db->convert_html_chars($row_projekt->projekt_kurzbz).'" '.$selected.'>'.$db->convert_html_chars($row_projekt->titel).'</option>';
 			}
 			echo '</SELECT><!--<input type="button" value="'.$p->t("zeitaufzeichnung/uebersicht").'" onclick="loaduebersicht();">--></td>';
+			echo '</tr>';
+
+			//Projektphase
+			echo '<tr>
+					<td>'.$p->t("zeitaufzeichnung/projektphase").'</td>
+					<td colspan="4"><SELECT name="projektphase" id="projektphase">
+						<OPTION value="" id="projektphasekeineausw">-- '.$p->t('zeitaufzeichnung/keineAuswahl').' --</OPTION>';
+
+			if (isset($projektphasen) && is_array($projektphasen))
+			{
+				foreach ($projektphasen as $projektphase)
+				{
+					if ($projektphase_id == $projektphase->projektphase_id/* || $filter == $row_projekt->projekt_kurzbz*/)
+						$selected = 'selected';
+					else
+						$selected = '';
+
+					echo '<option value="'.$db->convert_html_chars($projektphase->projektphase_id).'" '.$selected.'>'.$db->convert_html_chars($projektphase->bezeichnung).'</option>';
+				}
+			}
+			echo '</SELECT></td>';
 			echo '</tr>';
 		}
 
