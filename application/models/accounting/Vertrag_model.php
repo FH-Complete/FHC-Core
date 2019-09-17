@@ -25,7 +25,7 @@ class Vertrag_model extends DB_Model
      * @param $vertragstyp_kurzbz
      * @return array|null               On success object. On failure null.
      */
-	public function save($person_id, $lehrveranstaltung_id, $lehreinheit_id, $projektarbeit_id = null, $vertragsstunden, $betrag, $studiensemester_kurzbz){
+	public function save($person_id, $mitarbeiter_uid, $lehrveranstaltung_id, $lehreinheit_id, $projektarbeit_id = null, $vertragsstunden, $betrag, $studiensemester_kurzbz){
 
         // Cast input params
         $person_id = (!isset($person_id) || empty($person_id)) ? null : intval($person_id);
@@ -34,16 +34,12 @@ class Vertrag_model extends DB_Model
         $projektarbeit_id = (!isset($projektarbeit_id) || empty($projektarbeit_id)) ? null : intval($projektarbeit_id);
         $vertragsstunden = (!isset($vertragsstunden) || empty($vertragsstunden)) ? null : floatval($vertragsstunden);
         $betrag = (!isset($betrag) || empty($betrag)) ? null : floatval($betrag);
+        $mitarbeiter_uid = (!isset($mitarbeiter_uid) || empty($mitarbeiter_uid)) ? null : $mitarbeiter_uid;
 
         $vertragstyp_kurzbz = (is_null($projektarbeit_id)) ? 'Lehrauftrag' : 'Betreuung';
 
 	    $result = array();
 	    $user = getAuthUID();
-
-        // Retrieve mitarbeiter uid from person_id
-        $this->load->model('person/Benutzer_model', 'BenutzerModel');
-        $benutzer = $this->BenutzerModel->getFromPersonId($person_id)->retval;
-        $mitarbeiter_uid = $benutzer[0]->uid; // lectors uid
 
         // First check if Vertrag already exists for that Lehrauftrag or for that Projektbetreuerauftrag
         if ($vertragstyp_kurzbz == 'Lehrauftrag')
