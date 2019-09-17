@@ -3030,6 +3030,18 @@ if(!$result = @$db->db_query("SELECT stufe FROM public.tbl_dokumentstudiengang L
 		echo '<br>public.tbl_dokumentstudiengang: Spalte stufe hinzugefuegt';
 }
 
+// Add column projektphase_id to tbl_zeitaufzeichnung
+if(!$result = @$db->db_query("SELECT projektphase_id FROM campus.tbl_zeitaufzeichnung LIMIT 1"))
+{
+	$qry = "ALTER TABLE campus.tbl_zeitaufzeichnung ADD COLUMN projektphase_id bigint;
+			ALTER TABLE campus.tbl_zeitaufzeichnung ADD CONSTRAINT fk_zeitaufzeichnung_projektphase FOREIGN KEY (projektphase_id) REFERENCES fue.tbl_projektphase (projektphase_id) ON DELETE RESTRICT ON UPDATE CASCADE;";
+
+	if(!$db->db_query($qry))
+		echo '<strong>campus.tbl_zeitaufzeichnung: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>campus.tbl_zeitaufzeichnung: Spalte projektphase_id hinzugefuegt';
+}
+
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
 
