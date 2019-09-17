@@ -2,20 +2,19 @@
 
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
-class MessageClient extends Auth_Controller
+/**
+ * NOTE: MessageClient extends FHC_Controller and NOT Auth_Controller to be able to use
+ * 		the authentication system without the need to load the permissions system
+ */
+class MessageClient extends FHC_Controller
 {
 	public function __construct()
 	{
-		parent::__construct(
-			array(
-				'read' => array('basis/person:r'),
-				'write' => array('basis/person:r'),
-				'listReceivedMessages' => array('basis/person:r'),
-				'listSentMessages' => array('basis/person:r'),
-				'sendMessageToOU' => array('basis/person:r'),
-				'setMessageRead' => array('basis/person:r')
-			)
-		);
+		parent::__construct();
+
+		// Loads authentication library and starts authentication
+		// NOTE: it is loaded here because the controller extends FHC_Controller and NOT Auth_Controller
+		$this->load->library('AuthLib');
 
 		// Loads model CLMessagesModel which contains the GUI logic
 		$this->load->model('CL/Messages_model', 'CLMessagesModel');
