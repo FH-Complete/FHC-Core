@@ -86,6 +86,7 @@ $this->load->view(
                 <button id="deselect-all" class="btn btn-default">Alle abwählen</button>
                 <button id="show-all" class="btn btn-default">Alle anzeigen</button>
                 <button id="show-new" class="btn btn-default">Nur neue anzeigen</button>
+                <button id="show-ordered" class="btn btn-default">Nur bestellte anzeigen</button>
             </div>
         </div>
     </div>
@@ -149,6 +150,11 @@ $(function() {
     // Show only rows with new lehrauftraege
     $("#show-new").click(function(){
         $('#filterTabulator').tabulator('setFilter', 'bestellt', '=', null);
+    });
+
+    // Show only rows with ordered lehrauftraege
+    $("#show-ordered").click(function(){
+        $('#filterTabulator').tabulator('setFilter', 'bestellt', '!=', null);
     });
 
     // Order Lehrauftraege
