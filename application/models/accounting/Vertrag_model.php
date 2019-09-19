@@ -115,7 +115,7 @@ class Vertrag_model extends DB_Model
         // If updating vertrag_id was successfully, set Status to 'bestellt'
         if (isSuccess($result))
         {
-            $result = $this->setStatus($vertrag_id, 'bestellt', $mitarbeiter_uid);
+            $result = $this->setStatus($vertrag_id, $mitarbeiter_uid,'bestellt');
         }
 
         // Transaction complete!
@@ -142,10 +142,25 @@ class Vertrag_model extends DB_Model
      * @param $vertrag_id
      * @param $vertragsstatus_kurzbz
      * @param $mitarbeiter_uid
-     * @return array|null               On success object. On failure null.
+     * @return array|null           On success object, retval is true. Null if status already exist for this vertrag.
      */
-    public function setStatus($vertrag_id, $vertragsstatus_kurzbz, $mitarbeiter_uid){
+    public function setStatus($vertrag_id, $mitarbeiter_uid, $vertragsstatus_kurzbz){
 
+        // First check if vertrag has already this status
+        $this->addJoin('lehre.tbl_vertrag_vertragsstatus', 'vertrag_id');
+
+        $result = $this->loadWhere(array(
+            'vertrag_id' => $vertrag_id,
+            'uid' => $mitarbeiter_uid,
+            'vertragsstatus_kurzbz' => $vertragsstatus_kurzbz
+        ));
+
+        if (!isEmptyArray($result->retval))
+        {
+            return success(null); // return null if status already set
+        }
+
+        // Set new status
         $query = '
             INSERT INTO lehre.tbl_vertrag_vertragsstatus(
                 vertragsstatus_kurzbz,
