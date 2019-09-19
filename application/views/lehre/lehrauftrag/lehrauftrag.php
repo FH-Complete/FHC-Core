@@ -130,8 +130,6 @@ $(function() {
 
     // Select all (filtered) rows and ignore rows which have status bestellt
     $("#select-all").click(function(){
-        //$('#filterTabulator').tabulator('selectRow', true);
-
         $('#filterTabulator').tabulator('getRows')
             .filter(row => row.getData().bestellt == null)
             .forEach((row => row.select()));
@@ -144,7 +142,7 @@ $(function() {
 
     // Show all rows
     $("#show-all").click(function(){
-        $('#filterTabulator').tabulator('removeFilter', 'bestellt', '=', null);
+        $('#filterTabulator').tabulator('clearFilter');
     });
 
     // Show only rows with new lehrauftraege
