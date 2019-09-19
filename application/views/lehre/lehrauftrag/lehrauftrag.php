@@ -162,6 +162,13 @@ $(function() {
 
         var selected_data = $('#filterTabulator').tabulator('getSelectedData');
 
+        // Alert and exit if no lehraufgang is selected
+        if (selected_data.length == 0)
+        {
+            FHC_DialogLib.alertInfo('Bitte wählen Sie erst zumindest einen Lehrauftrag');
+            return;
+        }
+
         FHC_AjaxClient.ajaxCallPost(
             FHC_JS_DATA_STORAGE_OBJECT.called_path + "/orderLehrauftrag",
             selected_data,
