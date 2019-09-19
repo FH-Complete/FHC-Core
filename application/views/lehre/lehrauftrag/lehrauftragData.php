@@ -178,7 +178,7 @@ FROM
                   AND oe.aktiv = TRUE
             ) tmp_projektbetreuung
     ) auftraege
-ORDER BY "typ" DESC, "auftrag", "lektor"
+ORDER BY "typ" DESC, "auftrag", "lektor", "bestellt"
 ';
 
 $filterWidgetArray = array(
@@ -200,7 +200,7 @@ $filterWidgetArray = array(
         'Studiensemester',
         'Studiengang',
         'Person-ID',
-        ucfirst($this->p->t('global', 'typ')),
+        'Typ',
         'Auftrag',
         'Organisationseinheit',
         'Gruppe',
@@ -216,20 +216,49 @@ $filterWidgetArray = array(
     'datasetRepOptions' => '{
         height: 700,   
         layout:"fitColumns",            // fit columns to width of table
-	    responsiveLayout:"hide",        // hide columns that dont fit on the table       
+	    responsiveLayout:"hide",        // hide columns that dont fit on the table     
+	    movableColumns: true,           // allows changing column    
+	    groupBy: "lektor",              // collapsable groups   
+	    headerFilterPlaceholder: " ",
+	    index: "row_index",             // assign specific column as unique id (important for row indexing)
         selectable: true,               // allows row selection
         selectableRangeMode: "click",   // allows range selection using shift end click on end of range
         selectablePersistence:false,    // deselect previously selected rows when table is filtered, sorted or paginated
-        selectableCheck: function(row){ // only allow selection if is not bestellt (as order already exists)
+        selectableCheck: function(row)
+        { 
+            // only allow to select new Lehraufträge 
             return row.getData().bestellt == null;
         },
-        movableColumns: true,           // allows changing column    
-	    headerFilterPlaceholder: " ",
-	    index: "row_index"              // assign specific column as unique id (important for row indexing)
+         rowUpdated:function(row)
+        {
+                // deselect and disable new selection of updated rows (ordering done)
+                row.deselect();
+                row.getElement().off("click");         
+        },
+        rowFormatter:function(row)
+        {
+            var data = row.getData();
+            
+            // default (white): rows to be ordered
+            // green: rows ordered 
+            // grey: all other
+            if(row.getData().bestellt == null)
+            {
+                return;
+            }
+            else if(row.getData().bestellt != null)
+            {
+                row.getElement().style["background-color"] = "#d1f1d196";   // green
+            }
+            else
+            {
+                row.getElement().style["background-color"] = "#f5f5f5";     // grey
+            }
+        } 
     }', // tabulator properties
     'datasetRepFieldsDefs' => '{
         row_index: {visible:false}, // necessary for row indexing
-        lehreinheit_id: {headerFilter:"input", bottomCalc:"count"},
+        lehreinheit_id: {headerFilter:"input", bottomCalc:"count", bottomCalcFormatter:function(cell){return "Anzahl: " + cell.getValue();}},
         lehrveranstaltung_id: {headerFilter:"input"},
         projektarbeit_id: {visible: false},
         studiensemester_kurzbz: {headerFilter:"input"},
