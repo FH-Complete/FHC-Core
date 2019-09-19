@@ -60,6 +60,10 @@ class Vertrag_model extends DB_Model
         }
 
         // If Vertrag does not exist, create now
+
+        // Vertragsbezeichnung
+        $bezeichnung = $this->_writeVertragsbezeichung($lehrveranstaltung_id, $studiensemester_kurzbz);
+
         // Start DB transaction
         $this->db->trans_start(false);
 
@@ -68,6 +72,7 @@ class Vertrag_model extends DB_Model
             'person_id' => $person_id,
             'lehrveranstaltung_id' => $lehrveranstaltung_id,
             'vertragstyp_kurzbz' => $vertragstyp_kurzbz,
+            'bezeichnung' => $bezeichnung,
             'betrag' => $betrag,
             'insertamum' => 'NOW()',
             'insertvon' => $user,
@@ -173,5 +178,34 @@ class Vertrag_model extends DB_Model
             ) VALUES (?, ?, ?, ?, ?, ?, ?);';
 
         return $this->execQuery($query, array($vertragsstatus_kurzbz, $vertrag_id, $mitarbeiter_uid, 'NOW()', getAuthUID(), null, null));
+    }
+
+    /**
+     * Generate contract description.
+     * Example: WS2017-BEE3-LIA-LAB
+     * @param $lehrveranstaltung_id
+     * @param $studiensemester_kurzbz   Studiensemester of Lehrauftrag (= when the lector will teach the lehrveranstaltung)
+     * @return string
+     */
+    private function _writeVertragsbezeichung($lehrveranstaltung_id, $studiensemester_kurzbz)
+    {
+        $bezeichnung = '';
+        $this->load->model('education/Lehrveranstaltung_model', 'LehrveranstaltungModel');
+        $this->LehrveranstaltungModel->addSelect('tbl_lehrveranstaltung.semester, tbl_lehrveranstaltung.kurzbz, lehrform_kurzbz, public.tbl_studiengang.kurzbzlang');
+        $this->LehrveranstaltungModel->addJoin('lehre.tbl_studienplan_lehrveranstaltung', 'lehrveranstaltung_id');
+        $this->LehrveranstaltungModel->addJoin('lehre.tbl_studienplan', 'studienplan_id');
+        $this->LehrveranstaltungModel->addJoin('lehre.tbl_studienordnung', 'studienordnung_id');
+        $this->LehrveranstaltungModel->addJoin('public.tbl_studiengang', 'public.tbl_studiengang.studiengang_kz = lehre.tbl_studienordnung.studiengang_kz');
+        $result = $this->LehrveranstaltungModel->load($lehrveranstaltung_id);
+
+        if (hasData($result))
+        {
+            $bezeichnung = $studiensemester_kurzbz. '-';
+            $bezeichnung.= $result->retval[0]->kurzbzlang. $result->retval[0]->semester. '-';
+            $bezeichnung.= $result->retval[0]->kurzbz. '-';
+            $bezeichnung.= $result->retval[0]->lehrform_kurzbz;
+        }
+
+        return $bezeichnung;
     }
 }
