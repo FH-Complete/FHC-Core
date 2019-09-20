@@ -49,10 +49,7 @@ var InfocenterPersonDataset = {
 		FHC_AjaxClient.ajaxCallGet(
 			'widgets/Filters/rowNumber',
 			{
-				filterUniqueId: FHC_FilterWidget.getFilterUniqueIdPrefix() + "/" +
-					$("#divFilterWidgetDataset").attr("app") + ":" +
-					$("#divFilterWidgetDataset").attr("dataset") + ":" +
-					$("#divFilterWidgetDataset").attr("filterid")
+				filterUniqueId: FHC_FilterWidget.getFilterUniqueIdPrefix()
 			},
 			{
 				successCallback: function(data, textStatus, jqXHR) {
