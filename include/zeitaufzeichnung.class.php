@@ -418,6 +418,7 @@ class zeitaufzeichnung extends basis_db
 				$obj->updateamum = $row->updateamum;
 				$obj->updatevon = $row->updatevon;
 				$obj->projekt_kurzbz = $row->projekt_kurzbz;
+				$obj->projektphase_id = $row->projektphase_id;
 				$obj->ext_id = $row->ext_id;
 				$obj->service_id = $row->service_id;
 				$obj->kunde_uid = $row->kunde_uid;
@@ -474,6 +475,7 @@ class zeitaufzeichnung extends basis_db
 				$obj->updateamum = $row->updateamum;
 				$obj->updatevon = $row->updatevon;
 				$obj->projekt_kurzbz = $row->projekt_kurzbz;
+				$obj->projektphase_id = $row->projektphase_id;
 				$obj->ext_id = $row->ext_id;
 				$obj->service_id = $row->service_id;
 				$obj->kunde_uid = $row->kunde_uid;
@@ -538,6 +540,7 @@ class zeitaufzeichnung extends basis_db
 				$obj->updateamum = $row->updateamum;
 				$obj->updatevon = $row->updatevon;
 				$obj->projekt_kurzbz = $row->projekt_kurzbz;
+				$obj->projektphase_id = $row->projektphase_id;
 				$obj->ext_id = $row->ext_id;
 				$obj->service_id = $row->service_id;
 				$obj->kunde_uid = $row->kunde_uid;
