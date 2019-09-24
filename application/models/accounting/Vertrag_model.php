@@ -163,7 +163,7 @@ class Vertrag_model extends DB_Model
     }
 
     /**
-     * Sets Vertragsstatus for the given Vertrag and Mitarbeiter.
+     * Set Vertragsstatus for the given Vertrag and Mitarbeiter.
      * @param $vertrag_id
      * @param $vertragsstatus_kurzbz
      * @param $mitarbeiter_uid
@@ -171,21 +171,26 @@ class Vertrag_model extends DB_Model
      */
     public function setStatus($vertrag_id, $mitarbeiter_uid, $vertragsstatus_kurzbz){
 
-        // First check if vertrag has already this status
-        $this->addJoin('lehre.tbl_vertrag_vertragsstatus', 'vertrag_id');
-
-        $result = $this->loadWhere(array(
-            'vertrag_id' => $vertrag_id,
-            'uid' => $mitarbeiter_uid,
-            'vertragsstatus_kurzbz' => $vertragsstatus_kurzbz
-        ));
-
-        if (!isEmptyArray($result->retval))
+        // Check if vertrag has already this status
+        $result = $this->hasStatus($vertrag_id, $mitarbeiter_uid, $vertragsstatus_kurzbz);
+        if (hasData($result))
         {
-            return success(null); // return null if status already set
+            return success(null); // return null if status is already set
         }
 
-        // Set new status
+        // If new status should be 'akzeptiert', the latest status has to be 'erteilt'
+        if ($vertragsstatus_kurzbz == 'akzeptiert')
+        {
+            $result = $this->getLastStatus($vertrag_id, $mitarbeiter_uid);
+            $last_status = getData($result)[0]->vertragsstatus_kurzbz;
+
+            if ($last_status != 'erteilt')
+            {
+                return success(null); // return null if latest status is not 'erteilt'
+            }
+        }
+
+        // Set new status if passed all checks
         $query = '
             INSERT INTO lehre.tbl_vertrag_vertragsstatus(
                 vertragsstatus_kurzbz,
@@ -197,7 +202,17 @@ class Vertrag_model extends DB_Model
                 updateamum
             ) VALUES (?, ?, ?, ?, ?, ?, ?);';
 
-        return $this->execQuery($query, array($vertragsstatus_kurzbz, $vertrag_id, $mitarbeiter_uid, 'NOW()', getAuthUID(), null, null));
+        return $this->execQuery($query,
+            array(
+                $vertragsstatus_kurzbz,
+                $vertrag_id,
+                $mitarbeiter_uid,
+                'NOW()',
+                getAuthUID(),
+                null,
+                null
+            )
+        );
     }
 
     /**
