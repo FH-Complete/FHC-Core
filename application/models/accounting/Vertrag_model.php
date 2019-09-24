@@ -143,6 +143,26 @@ class Vertrag_model extends DB_Model
     }
 
     /**
+     * Check if Vertrag has the given Vertragsstatus.
+     * @param integer $vertrag_id
+     * @param string $mitarbeiter_uid
+     * @param string $vertragsstatus_kurzbz
+     * @return array
+     */
+    public function hasStatus($vertrag_id, $mitarbeiter_uid, $vertragsstatus_kurzbz)
+    {
+        $this->addSelect('1');
+        $this->addJoin('lehre.tbl_vertrag_vertragsstatus', 'vertrag_id');
+        $this->addLimit(1);
+
+        return $this->loadWhere(array(
+            'vertrag_id' => $vertrag_id,
+            'uid' => $mitarbeiter_uid,
+            'vertragsstatus_kurzbz' => $vertragsstatus_kurzbz
+        ));
+    }
+
+    /**
      * Sets Vertragsstatus for the given Vertrag and Mitarbeiter.
      * @param $vertrag_id
      * @param $vertragsstatus_kurzbz
