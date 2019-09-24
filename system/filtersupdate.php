@@ -471,6 +471,42 @@ $filters = array(
 		',
         'oe_kurzbz' => null,
     ),
+    array(
+        'app' => 'lehrauftrag',
+        'dataset_name' => 'lehrauftragAccept',
+        'filter_kurzbz' => 'LehrauftragAccept',
+        'description' => '{Alle}',
+        'sort' => 1,
+        'default_filter' => true,
+        'filter' => '
+			{
+			    "name": "",
+				"columns": [
+				    {"name": "row_index"},
+				    {"name": "lehreinheit_id"},
+				    {"name": "lehrveranstaltung_id"},
+				    {"name": "projektarbeit_id"},
+				    {"name": "studiensemester_kurzbz"},
+				    {"name": "studiengang_kz"},
+				    {"name": "stg_oe_kurzbz"},
+				    {"name": "person_id"},
+				    {"name": "typ"},
+					{"name": "auftrag"},
+					{"name": "lv_oe_kurzbz"},
+					{"name": "gruppe"},
+					{"name": "stunden"},
+					{"name": "betrag"},
+                    {"name": "vertrag_id"},
+					{"name": "mitarbeiter_uid"},
+					{"name": "bestellt"},
+					{"name": "erteilt"},
+					{"name": "akzeptiert"}
+				],
+				"filters": []
+			}
+		',
+        'oe_kurzbz' => null,
+    ),
 	array(
 		'app' => 'budget',
 		'dataset_name' => 'budgetoverview',
