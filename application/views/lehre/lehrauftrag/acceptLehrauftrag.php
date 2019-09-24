@@ -81,6 +81,14 @@ $this->load->view(
 
 
 <script type="text/javascript">
+
+    // -----------------------------------------------------------------------------------------------------------------
+    // Global vars
+    // -----------------------------------------------------------------------------------------------------------------
+
+    // Store boolean has_inkludierteLehre. If true, used to hide column Betrag.
+    var has_inkludierteLehre = new Boolean(<?php echo $has_inkludierteLehre ?>).valueOf();
+
     // -----------------------------------------------------------------------------------------------------------------
     // Mutators - setter methods to manipulate table data when entering the tabulator
     // -----------------------------------------------------------------------------------------------------------------

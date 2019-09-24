@@ -31,6 +31,7 @@ class LehrauftragAkzeptieren extends Auth_Controller
         $this->load->model('organisation/Studiensemester_model', 'StudiensemesterModel');
         $this->load->model('accounting/Vertrag_model', 'VertragModel');
         $this->load->model('ressource/Mitarbeiter_model', 'MitarbeiterModel');
+        $this->load->model('codex/Bisverwendung_model', 'BisverwendungModel');
 
         // Load libraries
         $this->load->library('WidgetLib');
@@ -67,6 +68,14 @@ class LehrauftragAkzeptieren extends Auth_Controller
             show_error('Fehler bei Berechtigungsprüfung');
         }
 
+        // Check if lectors latest active Verwendung has inkludierte Lehre
+        $has_inkludierteLehre = false;
+        $result = $this->BisverwendungModel->getLast($this->_uid);
+        if (hasData($result))
+        {
+            $has_inkludierteLehre = ($result->retval[0]->inkludierte_lehre >= 0) ? true : false;
+        }
+
         // Set studiensemester selected for studiengang dropdown
         $studiensemester_kurzbz = $this->input->get('studiensemester'); // if provided by selected studiensemester
         if (is_null($studiensemester_kurzbz)) // else set next studiensemester as default value
@@ -83,7 +92,8 @@ class LehrauftragAkzeptieren extends Auth_Controller
         }
 
         $view_data = array(
-            'studiensemester_selected' => $studiensemester_kurzbz
+            'studiensemester_selected' => $studiensemester_kurzbz,
+            'has_inkludierteLehre' => $has_inkludierteLehre
         );
 
         $this->load->view('lehre/lehrauftrag/acceptLehrauftrag.php', $view_data);

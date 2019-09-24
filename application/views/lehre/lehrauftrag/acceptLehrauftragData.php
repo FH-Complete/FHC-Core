@@ -259,7 +259,15 @@ $filterWidgetArray = array(
             {
                 row.getElement().style["background-color"] = "#f5f5f5";     // grey
             }
-          }
+        },
+        renderComplete:function()
+        {
+            // If the lectors actual Verwendung has inkludierte Lehre, hide the column betrag
+            if (has_inkludierteLehre)
+            {
+                this.hideColumn("betrag");
+            }  
+        }     
     }', // tabulator properties
     'datasetRepFieldsDefs' => '{
         row_index: {visible:false},     // necessary for row indexing
