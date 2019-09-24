@@ -201,6 +201,29 @@ class Vertrag_model extends DB_Model
     }
 
     /**
+     * Get the latest Vertragsstatus for the given Vertrag and Mitarbeiter
+     * @param integer $vertrag_id
+     * @param string $mitarbeiter_uid
+     * @return array
+     */
+    public function getLastStatus($vertrag_id, $mitarbeiter_uid)
+    {
+        $this->addSelect('vertragsstatus_kurzbz');
+        $this->addJoin('lehre.tbl_vertrag_vertragsstatus', 'vertrag_id');
+        $this->addOrder('datum', 'DESC');
+        $this->addLimit(1);
+        return $this->loadWhere(
+            array(
+                'vertrag_id' => $vertrag_id,
+                'uid' => $mitarbeiter_uid
+            )
+        );
+    }
+
+    // -----------------------------------------------------------------------------------------------------------------
+    // Private methods
+
+    /**
      * Generate contract description.
      * Example: WS2017-BEE3-LIA-LAB
      * @param $lehrveranstaltung_id
