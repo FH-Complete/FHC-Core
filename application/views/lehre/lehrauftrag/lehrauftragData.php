@@ -240,13 +240,13 @@ $filterWidgetArray = array(
             var data = row.getData();
             
             // default (white): rows to be ordered
-            // green: rows ordered 
+            // green: rows accepted
             // grey: all other
             if(row.getData().bestellt == null)
             {
                 return;
             }
-            else if(row.getData().bestellt != null)
+            else if(row.getData().bestellt != null && row.getData().erteilt != null && row.getData().akzeptiert != null)
             {
                 row.getElement().style["background-color"] = "#d1f1d196";   // green
             }
