@@ -231,8 +231,8 @@ $filterWidgetArray = array(
         selectablePersistence:false,    // deselect previously selected rows when table is filtered, sorted or paginated
         selectableCheck: function(row)
         { 
-            // only allow to select bestellte Lehraufträge         
-            return row.getData().bestellt != null && row.getData().erteilt != null;
+            // only allow to select bestellte && erteilte Lehraufträge         
+            return (row.getData().bestellt != null && row.getData().erteilt != null && row.getData().akzeptiert == null);
         },      
         rowUpdated:function(row)
         {
