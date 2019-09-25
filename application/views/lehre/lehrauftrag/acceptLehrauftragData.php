@@ -8,7 +8,25 @@ $PERSON_ID = getAuthPersonId();
 $query = '
 SELECT
     /* provide extra row index for tabulator, because no other column has unique ids */
-    ROW_NUMBER() OVER () AS "row_index", *
+    ROW_NUMBER() OVER () AS "row_index",
+    lehreinheit_id,
+    lehrveranstaltung_id,
+    projektarbeit_id,
+    studiensemester_kurzbz,
+    studiengang_kz,
+    stg_oe_kurzbz,
+    person_id,
+    typ,
+    auftrag,
+    lv_oe_kurzbz,
+    gruppe,
+    stunden,
+    betrag,
+    vertrag_id,
+    mitarbeiter_uid,
+    bestellt,
+    erteilt,
+    akzeptiert
 FROM
     (
 	/* Lehraufträge and -vertragsstati */
