@@ -13,31 +13,31 @@ class Mitarbeiter_model extends DB_Model
 	}
 
     /**
-     * Checks if the user is a lector.
+     * Checks if the user is a Mitarbeiter.
      * @param string $uid
      * @param boolean null $fixangestellt
-     * @return bool
+     * @return array
      */
-    public function isLektor($uid, $fixangestellt = null)
+    public function isMitarbeiter($uid, $fixangestellt = null)
     {
         $this->addSelect('1');
 
         if (is_bool($fixangestellt))
         {
-            $result = $this->loadWhere(array('mitarbeiter_uid' => $uid, 'lektor' => true, 'fixangestellt' => $fixangestellt));
+            $result = $this->loadWhere(array('mitarbeiter_uid' => $uid, 'fixangestellt' => $fixangestellt));
         }
-        else    // Default: if lektor is true
+        else    // default
         {
-            $result = $this->loadWhere(array('mitarbeiter_uid' => $uid, 'lektor' => true));
+            $result = $this->loadWhere(array('mitarbeiter_uid' => $uid));
         }
 
         if(hasData($result))
         {
-            return true;
+            return success(true);
         }
         else
         {
-            return false;
+            return success(false);
         }
     }
 }
