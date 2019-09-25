@@ -68,12 +68,17 @@ class LehrauftragAkzeptieren extends Auth_Controller
             show_error('Fehler bei Berechtigungsprüfung');
         }
 
-        // Check if lectors latest active Verwendung has inkludierte Lehre
+        /**
+         * Check if lectors latest active Verwendung has inkludierte Lehre
+         * - inkludierte_lehre is null: freelancer lector -> has NO inkludierte Lehre
+         * - inkludierte_lehre -1: fix employed lector -> all inclusive Lehre
+         * - inkludierte_lehre > 0: fix employed lector -> given value is inclusive Lehre
+         */
         $has_inkludierteLehre = false;
         $result = $this->BisverwendungModel->getLast($this->_uid);
         if (hasData($result))
         {
-            $has_inkludierteLehre = ($result->retval[0]->inkludierte_lehre >= 0) ? true : false;
+            $has_inkludierteLehre = (is_null($result->retval[0]->inkludierte_lehre)) ? false : true;
         }
 
         // Set studiensemester selected for studiengang dropdown
