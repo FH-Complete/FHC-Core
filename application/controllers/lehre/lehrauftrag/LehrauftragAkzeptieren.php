@@ -63,8 +63,9 @@ class LehrauftragAkzeptieren extends Auth_Controller
      */
     public function index()
     {
-        // Check if user is lector
-        if (!$this->MitarbeiterModel->isLektor($this->_uid))
+        // Check if user is Mitarbeiter
+        $result = $this->MitarbeiterModel->isMitarbeiter($this->_uid);
+        if (!getData($result))
         {
             show_error('Fehler bei Berechtigungsprüfung');
         }
