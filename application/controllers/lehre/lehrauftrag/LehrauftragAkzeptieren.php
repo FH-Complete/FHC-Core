@@ -36,6 +36,7 @@ class LehrauftragAkzeptieren extends Auth_Controller
         // Load libraries
         $this->load->library('WidgetLib');
         $this->load->library('PermissionLib');
+        $this->load->library('AuthLib');
 
         // Load helpers
         $this->load->helper('array');
@@ -110,17 +111,33 @@ class LehrauftragAkzeptieren extends Auth_Controller
      */
     public function acceptLehrauftrag()
     {
-        $lehrauftrag_arr = $this->input->post();
-        
-        foreach($lehrauftrag_arr as $lehrauftrag)
+        // Verify password
+        $password = $this->input->post('password');
+        if (!isEmptyString($password))
         {
-            if (!isEmptyArray($lehrauftrag))
+            $result = $this->authlib->checkUserAuthByUsernamePassword($this->_uid, $password);
+            if (isError($result))
+            {
+                return $this->outputJsonError('Passwort ist inkorrekt');    // exit if password is incorrect
+            }
+        }
+        else
+        {
+            show_error('Password is missing');
+        }
+
+        // Loop through lehraufträge
+        $lehrauftrag_arr = $this->input->post('selected_data');
+        if(is_array($lehrauftrag_arr))
+        {
+            foreach($lehrauftrag_arr as $lehrauftrag)
             {
                 $mitarbeiter_uid = (!is_null($lehrauftrag['mitarbeiter_uid'])) ? $lehrauftrag['mitarbeiter_uid'] : null;
                 $vertrag_id = (!is_null($lehrauftrag['vertrag_id'])) ? intval($lehrauftrag['vertrag_id']) : null;
 
+                // Set status to accepted
                 $result = $this->VertragModel->setStatus($vertrag_id, $mitarbeiter_uid, 'akzeptiert');
-
+    
                 if ($result->retval)
                 {
                     $json []= array(
@@ -129,11 +146,12 @@ class LehrauftragAkzeptieren extends Auth_Controller
                     );
                 }
             }
-        }
-        // output json to ajax
-        if (isset($json) && !isEmptyArray($json))
-        {
-            $this->outputJsonSuccess($json);
+
+            // Output json to ajax
+            if (isset($json) && !isEmptyArray($json))
+            {
+                $this->outputJsonSuccess($json);
+            }
         }
     }
 

@@ -65,14 +65,22 @@ $this->load->view(
         </div>
 
         <div class="row">
-            <div class="col-lg-12">
-                <button id="accept-lehrauftraege" class="btn btn-primary pull-right">Lehrauftrag akzeptieren</button>
+            <div class="col-xs-6">
                 <button id="select-all" class="btn btn-default">Alle auswählen</button>
                 <button id="deselect-all" class="btn btn-default">Alle abwählen</button>
                 <button id="show-all" class="btn btn-default">Alle anzeigen</button>
                 <button id="show-accepted" class="btn btn-default">Nur akzeptierte anzeigen</button>
-            </div>
+            </div><!-- end col -->
+            <div class="col-md-offset-2 col-xs-offset-1 col-md-4 col-xs-5">
+                <div class="input-group">
+                    <input id="password" type="password" class="form-control" placeholder="Login-Passwort">
+                    <span class="input-group-btn">
+                        <button id="accept-lehrauftraege" class="btn btn-primary pull-right">Lehrauftrag akzeptieren</button>
+                    </span>
+                </div>
+            </div><!-- end col -->
         </div>
+
     </div>
 </div>
 </body>
@@ -152,27 +160,46 @@ $(function() {
     // Approve Lehrauftraege
     $("#accept-lehrauftraege").click(function(){
 
-        selected_data = $('#filterTabulator').tabulator('getSelectedData');
-
+        // Get selected rows data
+        var selected_data = $('#filterTabulator').tabulator('getSelectedData');
         if (selected_data.length == 0)
         {
             FHC_DialogLib.alertInfo('Bitte wählen Sie erst zumindest einen Lehrauftrag');
             return;
         }
 
+        // Get password for verification
+        var password = $("#password").val();
+        if (password == '')
+        {
+            FHC_DialogLib.alertInfo('Bitte verifizieren Sie sich mit Ihrem Login Passwort.');
+            $("#password").focus();
+            return;
+        }
+
+        // Prepare data object for ajax call
+        var data = {
+            'password': password,
+            'selected_data': selected_data
+        };
+
         FHC_AjaxClient.ajaxCallPost(
             FHC_JS_DATA_STORAGE_OBJECT.called_path + "/acceptLehrauftrag",
-            selected_data,
+            data,
             {
                 successCallback: function (data, textStatus, jqXHR)
                 {
-                    if (data.retval != null)
+                    if (data.error)
+                    {
+                        // Password not verified
+                        FHC_DialogLib.alertWarning(data.retval);
+                    }
+                    if (!data.error && data.retval != null)
                     {
                         // Update status 'Erteilt'
                         $('#filterTabulator').tabulator('updateData', data.retval);
+                        FHC_DialogLib.alertSuccess(data.retval.length + " Lehraufträge wurden akzeptiert.");
                     }
-
-                    FHC_DialogLib.alertSuccess(data.retval.length + " Lehraufträge wurden akzeptiert.");
                 },
                 errorCallback: function (jqXHR, textStatus, errorThrown)
                 {
@@ -180,7 +207,6 @@ $(function() {
                 }
             }
         );
-
      });
 });
 </script>
