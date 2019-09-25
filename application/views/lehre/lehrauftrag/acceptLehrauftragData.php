@@ -97,15 +97,8 @@ FROM
 
 	    /* Projektbetreuungsaufträge and -vertragsstati */
         SELECT *,
-            /* concatinated and aggregated gruppen */
-            (SELECT
-                 string_agg(concat(stg_oe_kurzbz, \'-\', semester, verband, gruppe,
-                                   \'\n\' || gruppe_kurzbz), \', \')
-             FROM
-                 lehre.tbl_lehreinheitgruppe
-             WHERE
-                 lehreinheit_id = tmp_projektbetreuung.lehreinheit_id
-            )                                                    AS "gruppe",
+            /* mitarbeiter uid retrieved by person_id */
+            /* NOTE: mitarbeiter MUST come after Select * to ensure correct order with select for tmp_lehrauftraege*/
             (SELECT
                  uid
              FROM
@@ -113,6 +106,15 @@ FROM
              WHERE
                  person_id = tmp_projektbetreuung.person_id
                AND aktiv = TRUE)                                 AS "mitarbeiter_uid",
+            /* concatinated and aggregated gruppen */
+            (SELECT
+                 string_agg(concat(stg_oe_kurzbz, \'-\', semester, verband, gruppe,
+                                   \'\n\' || gruppe_kurzbz), \', \')
+             FROM
+                 lehre.tbl_lehreinheitgruppe
+             WHERE
+                     lehreinheit_id = tmp_projektbetreuung.lehreinheit_id
+            )                                                    AS "gruppe",
             /* existing contracts with status bestellt */
             (SELECT
                  datum
