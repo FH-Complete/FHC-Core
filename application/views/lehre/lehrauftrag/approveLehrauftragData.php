@@ -11,6 +11,15 @@ FROM
     (
 	/* Lehraufträge and -vertragsstati */
     SELECT *,
+        /* concatinated and aggregated gruppen */
+        (SELECT
+             string_agg(concat(stg_oe_kurzbz, \'-\', semester, verband, gruppe,
+                               \'\n\' || gruppe_kurzbz), \', \')
+         FROM
+             lehre.tbl_lehreinheitgruppe
+         WHERE
+             lehreinheit_id = tmp_lehrauftraege.lehreinheit_id
+        )                                                 AS "gruppe",
         /* existing contracts with status bestellt */
         (SELECT
              datum
@@ -43,6 +52,7 @@ FROM
                 NULL                                                AS "projektarbeit_id",
                 le.studiensemester_kurzbz,
                 stg.studiengang_kz,
+                upper(stg.oe_kurzbz)                                AS "stg_oe_kurzbz",
                 person.person_id,
                 upper(lv.lehrtyp_kurzbz)                            AS "typ",
                 (lv.bezeichnung || \' [\' || le.lehrform_kurzbz || \' \' || lv.semester || \'.Semester\' ||
@@ -52,8 +62,6 @@ FROM
                     WHEN oe.organisationseinheittyp_kurzbz = \'Department\' THEN (\'DEP \' || oe.bezeichnung)
                     ELSE (oe.organisationseinheittyp_kurzbz || \' \' || oe.bezeichnung)
                     END                                             AS "lv_oe_kurzbz",
-                CONCAT(stg.kurzbzlang, \'-\', legr.semester, legr.verband, legr.gruppe,
-                       \'\n\' || legr.gruppe_kurzbz)                AS "gruppe",
                 (person.vorname || \' \' || person.nachname)        AS "lektor",
                 TRUNC(lema.semesterstunden, 1)                      AS "stunden",
                 TRUNC((lema.semesterstunden * lema.stundensatz), 2) AS "betrag",
@@ -64,7 +72,6 @@ FROM
                     JOIN lehre.tbl_lehreinheit           le USING (lehreinheit_id)
                     JOIN lehre.tbl_lehrveranstaltung     lv USING (lehrveranstaltung_id)
                     JOIN PUBLIC.tbl_organisationseinheit oe USING (oe_kurzbz)
-                    JOIN lehre.tbl_lehreinheitgruppe     legr USING (lehreinheit_id)
                     JOIN PUBLIC.tbl_mitarbeiter          ma USING (mitarbeiter_uid)
                     JOIN PUBLIC.tbl_benutzer             benutzer
                          ON ma.mitarbeiter_uid = benutzer.uid
@@ -88,6 +95,15 @@ FROM
 
 	    /* Projektbetreuungsaufträge and -vertragsstati */
         SELECT *,
+            /* concatinated and aggregated gruppen */
+            (SELECT
+                 string_agg(concat(stg_oe_kurzbz, \'-\', semester, verband, gruppe,
+                                   \'\n\' || gruppe_kurzbz), \', \')
+             FROM
+                 lehre.tbl_lehreinheitgruppe
+             WHERE
+                 lehreinheit_id = tmp_projektbetreuung.lehreinheit_id
+            )                                                    AS "gruppe",
             (SELECT
                  uid
              FROM
@@ -127,8 +143,9 @@ FROM
                     pa.projektarbeit_id                                                                 AS "projektarbeit_id",
                     le.studiensemester_kurzbz,
                     stg.studiengang_kz,
+                    upper(stg.oe_kurzbz)                                                                AS "stg_oe_kurzbz",
                     person.person_id,
-                    \'Betreuung\'                                                                         AS "typ",
+                    \'Betreuung\'                                                                       AS "typ",
                     (betreuerart_kurzbz || \' \' ||
                      (SELECT
                           vorname || \' \' || nachname
@@ -149,9 +166,6 @@ FROM
                         ELSE (oe.organisationseinheittyp_kurzbz ||
                               \' \' || oe.bezeichnung)
                         END                                                                             AS "lv_oe_kurzbz",
-                    CONCAT(stg.kurzbzlang,
-                           \'-\', legr.semester, legr.verband, legr.gruppe,
-                           \'\n\' || legr.gruppe_kurzbz)                                                  AS "gruppe",
                     (vorname || \' \' || nachname)                                                        AS "lektor",
                     TRUNC(pb.stunden, 1)                                                                AS "stunden",
                     TRUNC((pb.stunden * pb.stundensatz), 2)                                             AS "betrag",
@@ -162,7 +176,6 @@ FROM
                         JOIN lehre.tbl_lehreinheit           le USING (lehreinheit_id)
                         JOIN lehre.tbl_lehrveranstaltung     lv USING (lehrveranstaltung_id)
                         JOIN PUBLIC.tbl_organisationseinheit oe USING (oe_kurzbz)
-                        JOIN lehre.tbl_lehreinheitgruppe     legr USING (lehreinheit_id)
                         JOIN PUBLIC.tbl_person               person USING (person_id)
                         LEFT JOIN lehre.tbl_vertrag          vertrag USING (vertrag_id)
                         JOIN PUBLIC.tbl_studiengang          stg
