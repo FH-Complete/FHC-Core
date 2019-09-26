@@ -3069,7 +3069,7 @@ if(!@$db->db_query("SELECT 0 FROM public.tbl_variablenname WHERE 0 = 1")) {
 		echo '<br>Created public.tbl_variablenname';
 
 	// GRANT SELECT, UPDATE, INSERT, DELETE ON TABLE public.tbl_variablenname TO web;
-	$qry = 'GRANT SELECT, UPDATE, INSERT, DELETE ON TABLE public.tbl_variablenname TO web;';
+	$qry = 'GRANT SELECT ON TABLE public.tbl_variablenname TO web;';
 	if (!$db->db_query($qry))
 		echo '<strong>public.tbl_variablenname ' . $db->db_last_error() . '</strong><br>';
 	else
