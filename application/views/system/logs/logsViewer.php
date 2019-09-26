@@ -2,7 +2,7 @@
 	$this->load->view(
 		'templates/FHC-Header',
 		array(
-			'title' => 'JobsViewer',
+			'title' => 'Logs viewer',
 			'jquery' => true,
 			'jqueryui' => true,
 			'bootstrap' => true,
@@ -37,7 +37,7 @@
 					</div>
 				</div>
 				<div>
-					<?php $this->load->view('system/jobs/jobsViewerData.php'); ?>
+					<?php $this->load->view('system/logs/logsViewerData.php'); ?>
 				</div>
 			</div>
 		</div>

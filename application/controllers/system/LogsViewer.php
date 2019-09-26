@@ -5,7 +5,7 @@ if (! defined('BASEPATH')) exit('No direct script access allowed');
 /**
  * Overview on cronjob logs
  */
-class JobsViewer extends Auth_Controller
+class LogsViewer extends Auth_Controller
 {
 	/**
 	 * Constructor
@@ -39,6 +39,6 @@ class JobsViewer extends Auth_Controller
 	 */
 	public function index()
 	{
-		$this->load->view('system/jobs/jobsViewer.php');
+		$this->load->view('system/logs/logsViewer.php');
 	}
 }

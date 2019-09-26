@@ -7,9 +7,9 @@
 					wsl.execute_time AS "ExecutionTime",
 					wsl.execute_user AS "ExecutedBy",
 					wsl.beschreibung AS "Description",
-					wsl.request_data AS "Data"
+					wsl.request_data AS "Data",
+					wsl.webservicetyp_kurzbz AS "WebserviceType"
 			 FROM system.tbl_webservicelog wsl
-			WHERE wsl.webservicetyp_kurzbz = \'job\'
 		 ORDER BY wsl.execute_time DESC
 		',
 		'requiredPermissions' => 'admin',
@@ -21,7 +21,8 @@
 			'Execution time',
 			'Executed by',
 			'Producer',
-			'Data'
+			'Data',
+			'Webservice type'
 		),
 		'formatRow' => function($datasetRaw) {
 
@@ -58,8 +59,7 @@
 	);
 
 	$filterWidgetArray['app'] = 'core';
-	$filterWidgetArray['datasetName'] = 'jobslogs';
-	$filterWidgetArray['filterKurzbz'] = 'all';
+	$filterWidgetArray['datasetName'] = 'logs';
 	$filterWidgetArray['filter_id'] = $this->input->get('filter_id');
 
 	echo $this->widgetlib->widget('FilterWidget', $filterWidgetArray);

@@ -463,14 +463,14 @@ $filters = array(
 	),
 	array(
 		'app' => 'core',
-		'dataset_name' => 'jobslogs',
-		'filter_kurzbz' => 'all',
-		'description' => '{All logs produced by jobs}',
+		'dataset_name' => 'logs',
+		'filter_kurzbz' => 'last7days',
+		'description' => '{Last 7 days logs}',
 		'sort' => 1,
 		'default_filter' => true,
 		'filter' => '
 			{
-				"name": "All jobs viewer",
+				"name": "All logs from the last 7 days",
 				"columns": [
 					{"name": "RequestId"},
 					{"name": "ExecutionTime"},
@@ -478,7 +478,150 @@ $filters = array(
 					{"name": "Description"},
 					{"name": "Data"}
 				],
-				"filters": []
+				"filters": [
+					{
+						"name": "ExecutionTime",
+						"operation": "lt",
+						"condition": "7",
+						"option": "days"
+					}
+				]
+			}
+		',
+		'oe_kurzbz' => null,
+	),
+	array(
+		'app' => 'core',
+		'dataset_name' => 'logs',
+		'filter_kurzbz' => 'jobs14days',
+		'description' => '{Last 14 days jobs logs}',
+		'sort' => 2,
+		'default_filter' => false,
+		'filter' => '
+			{
+				"name": "All jobs logs from the last 14 days",
+				"columns": [
+					{"name": "RequestId"},
+					{"name": "ExecutionTime"},
+					{"name": "ExecutedBy"},
+					{"name": "Description"},
+					{"name": "Data"}
+				],
+				"filters": [
+					{
+						"name": "WebserviceType",
+						"operation": "contains",
+						"condition": "job"
+					},
+					{
+						"name": "ExecutionTime",
+						"operation": "lt",
+						"condition": "14",
+						"option": "days"
+					}
+				]
+			}
+		',
+		'oe_kurzbz' => null,
+	),
+	array(
+		'app' => 'core',
+		'dataset_name' => 'logs',
+		'filter_kurzbz' => 'repots14days',
+		'description' => '{Last 14 days reports logs}',
+		'sort' => 3,
+		'default_filter' => false,
+		'filter' => '
+			{
+				"name": "All reports logs from the last 14 days",
+				"columns": [
+					{"name": "RequestId"},
+					{"name": "ExecutionTime"},
+					{"name": "ExecutedBy"},
+					{"name": "Description"},
+					{"name": "Data"}
+				],
+				"filters": [
+					{
+						"name": "WebserviceType",
+						"operation": "contains",
+						"condition": "reports"
+					},
+					{
+						"name": "ExecutionTime",
+						"operation": "lt",
+						"condition": "14",
+						"option": "days"
+					}
+				]
+			}
+		',
+		'oe_kurzbz' => null,
+	),
+	array(
+		'app' => 'core',
+		'dataset_name' => 'logs',
+		'filter_kurzbz' => 'content3days',
+		'description' => '{Last 3 days content logs}',
+		'sort' => 4,
+		'default_filter' => false,
+		'filter' => '
+			{
+				"name": "All content logs from the last 3 days",
+				"columns": [
+					{"name": "RequestId"},
+					{"name": "ExecutionTime"},
+					{"name": "ExecutedBy"},
+					{"name": "Description"},
+					{"name": "Data"}
+				],
+				"filters": [
+					{
+						"name": "WebserviceType",
+						"operation": "contains",
+						"condition": "content"
+					},
+					{
+						"name": "ExecutionTime",
+						"operation": "lt",
+						"condition": "3",
+						"option": "days"
+					}
+				]
+			}
+		',
+		'oe_kurzbz' => null,
+	),
+	array(
+		'app' => 'core',
+		'dataset_name' => 'logs',
+		'filter_kurzbz' => 'wienerlinien7days',
+		'description' => '{Last 7 days wiener linien logs}',
+		'sort' => 5,
+		'default_filter' => false,
+		'filter' => '
+			{
+				"name": "All wiener linien logs from the last 7 days",
+				"columns": [
+					{"name": "RequestId"},
+					{"name": "ExecutionTime"},
+					{"name": "ExecutedBy"},
+					{"name": "Description"},
+					{"name": "Data"}
+				],
+				"filters": [
+					{
+						"name": "WebserviceType",
+						"operation": "contains",
+						"condition": "wienerlinien"
+					},
+					{
+						"name": "ExecutionTime",
+						"operation": "lt",
+						"condition": "7",
+						"option": "days"
+					}
+				]
 			}
 		',
 		'oe_kurzbz' => null,
