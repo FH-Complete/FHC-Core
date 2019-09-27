@@ -111,8 +111,6 @@ else if (defined('CIS_ZEITAUFZEICHNUNG_GESPERRT_BIS') && CIS_ZEITAUFZEICHNUNG_GE
 else
 	$gesperrt_bis = '2015-08-31';
 
-//var_dump($gesperrt_bis);
-
 $sperrdatum = date('c', strtotime($gesperrt_bis));
 
 // Uses urlencode to avoid XSS issues
@@ -513,6 +511,7 @@ echo '
 					},
 					success: function(json)
 					{
+						//remove Projektphasen from html if any
 						$("#projektphase").children("option").each(
 							function()
 							{
@@ -520,14 +519,22 @@ echo '
 									$(this).remove();
 							}	
 						);
-						
-						var projphasenhtml = "";
-						for (var i = 0; i < json.length; i++)
+						//append Projektphasen if any
+						if (json.length > 0)
 						{
-							projphasenhtml += "<option value = \'" + json[i].projektphase_id + "\'>" + json[i].bezeichnung + "<\/option>";
+							var projphasenhtml = "";
+							for (var i = 0; i < json.length; i++)
+							{
+								projphasenhtml += "<option value = \'" + json[i].projektphase_id + "\'>" + json[i].bezeichnung + "<\/option>";
+							}
+							
+							$("#projektphase").append(projphasenhtml);
+							$("#projektphaseformgroup").show();
 						}
-						
-						$("#projektphase").append(projphasenhtml);
+						else 
+						{
+							$("#projektphaseformgroup").hide();		
+						}
 					}
 				}
 			);
@@ -989,25 +996,32 @@ if($projekt->getProjekteMitarbeiter($user, true))
 					<OPTION value="">-- '.$p->t('zeitaufzeichnung/keineAuswahl').' --</OPTION>';
 
 			sort($projekt->result);
+			$projektfound = false;
 			foreach ($projekt->result as $row_projekt)
 			{
 				if ($projekt_kurzbz == $row_projekt->projekt_kurzbz || $filter == $row_projekt->projekt_kurzbz)
+				{
+					$projektfound = true;
 					$selected = 'selected';
+				}
 				else
 					$selected = '';
 
 				echo '<option value="'.$db->convert_html_chars($row_projekt->projekt_kurzbz).'" '.$selected.'>'.$db->convert_html_chars($row_projekt->titel).'</option>';
 			}
-			echo '</SELECT><!--<input type="button" value="'.$p->t("zeitaufzeichnung/uebersicht").'" onclick="loaduebersicht();">--></td>';
-			echo '</tr>';
+			echo '</SELECT><!--<input type="button" value="'.$p->t("zeitaufzeichnung/uebersicht").'" onclick="loaduebersicht();">-->';
 
 			//Projektphase
-			echo '<tr>
-					<td>'.$p->t("zeitaufzeichnung/projektphase").'</td>
-					<td colspan="4"><SELECT name="projektphase" id="projektphase">
+			$showprojphases = isset($projektphasen) && is_array($projektphasen) && count($projektphasen) > 0 && $projektfound;
+			$hiddentext = $showprojphases ? "" : " style='display:none'";
+
+			echo
+				'<span id="projektphaseformgroup"'.$hiddentext.'>&nbsp;&nbsp;&nbsp;&nbsp;'.
+				$p->t("zeitaufzeichnung/projektphase").'
+					<SELECT name="projektphase" id="projektphase">
 						<OPTION value="" id="projektphasekeineausw">-- '.$p->t('zeitaufzeichnung/keineAuswahl').' --</OPTION>';
 
-			if (isset($projektphasen) && is_array($projektphasen))
+			if ($showprojphases)
 			{
 				foreach ($projektphasen as $projektphase)
 				{
@@ -1018,9 +1032,9 @@ if($projekt->getProjekteMitarbeiter($user, true))
 
 					echo '<option value="'.$db->convert_html_chars($projektphase->projektphase_id).'" '.$selected.'>'.$db->convert_html_chars($projektphase->bezeichnung).'</option>';
 				}
+				echo '</SELECT></span>';
 			}
-			echo '</SELECT></td>';
-			echo '</tr>';
+			echo '</td></tr>';
 		}
 
 		if ($za_simple == 0)
