@@ -217,12 +217,12 @@ function checkZeilenUmbruch()
 			$link= "anwesenheitsliste.php?stg_kz=$studiengang_kz&sem=$semester&lvid=$lvid&stsem=$angezeigtes_stsem";
 		}
 
-		ensureDirectoryExists($DOC_ROOT, $kurzbz, $semester, $short_short_name, 'leistung','teacher');
-		$dir_empty = isDirectoryEmpty($DOC_ROOT, $kurzbz, $semester, $short_short_name, 'leistung');
-
 		$text='';
 	  	if(CIS_LEHRVERANSTALTUNG_LEISTUNGSUEBERSICHT_ANZEIGEN && ($angemeldet || $is_lector))
 		{
+			ensureDirectoryExists($DOC_ROOT, $kurzbz, $semester, $short_short_name, 'leistung','teacher');
+			$dir_empty = isDirectoryEmpty($DOC_ROOT, $kurzbz, $semester, $short_short_name, 'leistung');
+
 			if($dir_empty == false)
 			{
 				$dir_name=$DOC_ROOT.'/documents/'.mb_strtolower($kurzbz).'/'.$semester.'/'.mb_strtolower($short_short_name).'/leistung';
