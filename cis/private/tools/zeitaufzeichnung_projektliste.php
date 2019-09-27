@@ -528,7 +528,7 @@ $nrProjects = count($projektnames);
 $totalwidth = 150;
 $daywidth = 4;
 $totalworktimewidth = 13;
-$worktimewidth = 8;
+$worktimewidth = 14;
 $timecolumnswidth = 2 * $daywidth + $totalworktimewidth + $worktimewidth;
 
 if ($nrProjects < 1)//no projekts - merge all cells and write notice
@@ -660,14 +660,18 @@ foreach ($projektnames as $projektname)
 		$phasenames = array();
 		$phasenameslength = 0;
 	}
-	$worksheet->write($zeile, $spalte, $projektname, $format_bold_centered_toprightline);
 	$worksheet->write($zeile, $spalte + $phasenameslength + 1, '', $format_bold_centered_toprightline);
-	$worksheet->write($zeile + 1, $spalte, $p->t('zeitaufzeichnung/stunden'), $format_bold_centered_bottomline);
+	$worksheet->write($zeile + 1, $spalte, $p->t('zeitaufzeichnung/projektstunden'), $format_bold_centered_bottomline);
+
+	for($i = 0; $i < $phasenameslength; $i++)
+		$worksheet->write($zeile, $spalte + 1 + $i, '', $format_bold_centered_toprightline);
+
 	$worksheet->setMerge($zeile, $spalte, $zeile, $spalte + 1 + $phasenameslength);
+	$worksheet->write($zeile, $spalte, $projektname, $format_bold_centered_toprightline);
+
 	for ($i = 0; $i < $phasenameslength; $i++)
-	{
 		$worksheet->write($zeile + 1, $spalte + 1 + $i, $phasenames[$i], $format_bold_centered_bottomline);
-	}
+
 	$worksheet->setColumn($spalte + $phasenameslength + 1, $spalte + $phasenameslength + 1, $taetigkeitenwidth);
 	$worksheet->write($zeile + 1, $spalte + $phasenameslength + 1, $p->t('zeitaufzeichnung/taetigkeit'), $format_bold_centered_bottomrightline);
 	$spalte = $spalte + 2 + $phasenameslength;
