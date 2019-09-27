@@ -59,7 +59,7 @@
 					    sg.studiengang_kz in('.$ADDITIONAL_STG.')
 					    )
 				   AND pss.bestaetigtam is not null
-				   AND pss.studiensemester_kurzbz IN (SELECT ss.studiensemester_kurzbz FROM public.tbl_studiensemester ss WHERE ss.ende >= NOW())
+				   AND pss.studiensemester_kurzbz = '.$STUDIENSEMESTER.'
 			  ORDER BY pss.datum DESC, pss.insertamum DESC, pss.ext_id DESC
 				 LIMIT 1
 			) AS "Studiensemester",
@@ -75,7 +75,7 @@
 					    OR
 					    sg.studiengang_kz in('.$ADDITIONAL_STG.')
 					   )
-				   AND pss.studiensemester_kurzbz IN (SELECT ss.studiensemester_kurzbz FROM public.tbl_studiensemester ss WHERE ss.ende >= NOW())
+				   AND pss.studiensemester_kurzbz = '.$STUDIENSEMESTER.'
 			  ORDER BY pss.datum DESC, pss.insertamum DESC, pss.ext_id DESC
 				 LIMIT 1
 			) AS "SendDate",
@@ -91,7 +91,7 @@
 					    OR
 					    sg.studiengang_kz in('.$ADDITIONAL_STG.')
 					   )
-				   AND pss.studiensemester_kurzbz IN (SELECT ss.studiensemester_kurzbz FROM public.tbl_studiensemester ss WHERE ss.ende >= NOW())
+				   AND pss.studiensemester_kurzbz = '.$STUDIENSEMESTER.'
 				   AND NOT EXISTS (
    					   SELECT 1
    						 FROM tbl_prestudentstatus spss
@@ -113,7 +113,7 @@
 					    OR
 					    sg.studiengang_kz in('.$ADDITIONAL_STG.')
 					   )
-				   AND pss.studiensemester_kurzbz IN (SELECT ss.studiensemester_kurzbz FROM public.tbl_studiensemester ss WHERE ss.ende >= NOW())
+				   AND pss.studiensemester_kurzbz = '.$STUDIENSEMESTER.'
 				 LIMIT 1
 			) AS "StgAbgeschickt",
 			(
@@ -129,13 +129,14 @@
 					OR
 					sg.studiengang_kz in('.$ADDITIONAL_STG.')
 					)
-				   AND pss.studiensemester_kurzbz IN (SELECT ss.studiensemester_kurzbz FROM public.tbl_studiensemester ss WHERE ss.ende >= NOW())
+				   AND pss.studiensemester_kurzbz = '.$STUDIENSEMESTER.'
 				   AND NOT EXISTS (
 					   SELECT 1
 						 FROM tbl_prestudentstatus spss
 						WHERE spss.prestudent_id = pss.prestudent_id
 						  AND spss.status_kurzbz = '.$REJECTED_STATUS.'
-						  AND spss.studiensemester_kurzbz IN (SELECT ss.studiensemester_kurzbz FROM public.tbl_studiensemester ss WHERE ss.ende > NOW())
+						  AND spss.studiensemester_kurzbz IN (SELECT ss.studiensemester_kurzbz FROM public.tbl_studiensemester ss WHERE ss.ende > 
+						  (SELECT start FROM public.tbl_studiensemester sss WHERE studiensemester_kurzbz = '.$STUDIENSEMESTER.'))
 					)
 				 LIMIT 1
 			) AS "StgAktiv",
@@ -146,7 +147,7 @@
 			 LEFT JOIN public.tbl_status_grund sg USING(statusgrund_id)
 				 WHERE pss.status_kurzbz = '.$INTERESSENT_STATUS.'
 				   AND ps.person_id = p.person_id
-				   AND pss.studiensemester_kurzbz IN (SELECT ss.studiensemester_kurzbz FROM public.tbl_studiensemester ss WHERE ss.ende >= NOW())
+				   AND pss.studiensemester_kurzbz = '.$STUDIENSEMESTER.'
 				 LIMIT 1
 			) AS "Statusgrund",
 			(
@@ -163,7 +164,7 @@
 				) rtp ON(rtp.person_id = ps.person_id AND rtp.studiensemester_kurzbz = pss.studiensemester_kurzbz)
 				 WHERE pss.status_kurzbz = '.$INTERESSENT_STATUS.'
 				   AND ps.person_id = p.person_id
-				   AND pss.studiensemester_kurzbz IN (SELECT ss.studiensemester_kurzbz FROM public.tbl_studiensemester ss WHERE ss.ende >= NOW())
+				   AND pss.studiensemester_kurzbz = '.$STUDIENSEMESTER.'
 			  ORDER BY pss.datum DESC, pss.insertamum DESC, pss.ext_id DESC
 				 LIMIT 1
 			) AS "ReihungstestAngetreten",
@@ -180,7 +181,7 @@
 				) rtp ON(rtp.person_id = ps.person_id AND rtp.studiensemester_kurzbz = pss.studiensemester_kurzbz)
 				 WHERE pss.status_kurzbz = '.$INTERESSENT_STATUS.'
 				   AND ps.person_id = p.person_id
-				   AND pss.studiensemester_kurzbz IN (SELECT ss.studiensemester_kurzbz FROM public.tbl_studiensemester ss WHERE ss.studiensemester_kurzbz = '.$STUDIENSEMESTER.')
+				   AND pss.studiensemester_kurzbz = '.$STUDIENSEMESTER.'
 			  ORDER BY pss.datum DESC, pss.insertamum DESC, pss.ext_id DESC
 				 LIMIT 1
 			) AS "ReihungstestApplied",
