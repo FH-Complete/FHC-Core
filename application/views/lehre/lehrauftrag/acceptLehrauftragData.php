@@ -123,7 +123,8 @@ FROM
                  public.tbl_benutzer
              WHERE
                  person_id = tmp_projektbetreuung.person_id
-               AND aktiv = TRUE)                                 AS "mitarbeiter_uid",
+               ORDER BY aktiv DESC, updateaktivam DESC      -- accept inactive as some person_ids have no active, but order them last
+               LIMIT 1)                                 AS "mitarbeiter_uid",
             /* concatinated and aggregated gruppen */
             (SELECT
                  string_agg(concat(stg_oe_kurzbz, \'-\', semester, verband, gruppe,
