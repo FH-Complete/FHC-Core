@@ -164,6 +164,8 @@ $(function() {
         var selected_data = $('#filterTabulator').tabulator('getSelectedData');
         if (selected_data.length == 0)
         {
+            // Emtpy password field
+            $("#password").val('');
             FHC_DialogLib.alertInfo('Bitte wählen Sie erst zumindest einen Lehrauftrag');
             return;
         }
@@ -207,6 +209,10 @@ $(function() {
                 }
             }
         );
+
+        // Empty password field
+        $("#password").val('');
+
      });
 });
 </script>
