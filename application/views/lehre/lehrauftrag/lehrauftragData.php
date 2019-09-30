@@ -253,8 +253,7 @@ $filterWidgetArray = array(
         height: 700,   
         layout:"fitColumns",            // fit columns to width of table
 	    responsiveLayout:"hide",        // hide columns that dont fit on the table     
-	    movableColumns: true,           // allows changing column    
-	    groupBy: "lektor",              // collapsable groups   
+	    movableColumns: true,           // allows changing column     
 	    headerFilterPlaceholder: " ",
 	    index: "row_index",             // assign specific column as unique id (important for row indexing)
         selectable: true,               // allows row selection
