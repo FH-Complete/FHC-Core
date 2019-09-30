@@ -267,9 +267,9 @@ $filterWidgetArray = array(
         },
          rowUpdated:function(row)
         {
-                // deselect and disable new selection of updated rows (ordering done)
-                row.deselect();
-                row.getElement().off("click");         
+            // deselect and disable new selection of updated rows (ordering done)
+            row.deselect();
+            row.getElement().style["pointerEvents"] = "none";   
         },
         rowFormatter:function(row)
         {

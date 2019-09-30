@@ -270,7 +270,7 @@ $filterWidgetArray = array(
         {
                 // deselect and disable new selection of updated rows (approvement done)
                 row.deselect();
-                row.getElement().off("click");         
+                row.getElement().style["pointerEvents"] = "none";         
         },
         rowFormatter:function(row)
         {
