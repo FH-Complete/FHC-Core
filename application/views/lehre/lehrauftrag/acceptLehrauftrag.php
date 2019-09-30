@@ -68,8 +68,8 @@ $this->load->view(
             <div class="col-xs-6">
                 <button id="select-all" class="btn btn-default">Alle auswählen</button>
                 <button id="deselect-all" class="btn btn-default">Alle abwählen</button>
+                <button id="show-approved" class="btn btn-default">Nur erteilte anzeigen</button>
                 <button id="show-all" class="btn btn-default">Alle anzeigen</button>
-                <button id="show-accepted" class="btn btn-default">Nur akzeptierte anzeigen</button>
             </div><!-- end col -->
             <div class="col-md-offset-2 col-xs-offset-1 col-md-4 col-xs-5">
                 <div class="input-group">
@@ -148,11 +148,11 @@ $(function() {
     });
 
     // Show only rows with akzeptierte lehrauftraege
-    $("#show-accepted").click(function(){
+    $("#show-approved").click(function(){
         $('#filterTabulator').tabulator('setFilter', [
-                {field: 'bestellt', type: '!=', value: null},   // filter by bestellt must be set
-                {field: 'erteilt', type: '!=', value: null},    // and erteilt must be set
-                {field: 'akzeptiert', type: '!=', value: null}  // and akzeptiert must be set
+                {field: 'bestellt', type: '!=', value: null},   // filter when is bestellt
+                {field: 'erteilt', type: '!=', value: null},    // and is erteilt
+                {field: 'akzeptiert', type: '=', value: null}  // and is not akzeptiert
             ]
         );
     });
