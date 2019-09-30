@@ -10,7 +10,7 @@ class LehrauftragAkzeptieren extends Auth_Controller
 {
     const APP = 'lehrauftrag';
     const LEHRAUFTRAG_URI = 'lehre/lehrauftrag/LehrauftragAkzeptieren';    // URL prefix for this controller
-    const BERECHTIGUNG_LEHRAUFTRAG_ERTEILEN = 'lehre/lehrauftrag_erteilen';
+    const BERECHTIGUNG_LEHRAUFTRAG_AKZEPTIEREN = 'lehre/lehrauftrag_akzeptieren';
 
     private $_uid;  // uid of the logged user
 
@@ -22,8 +22,8 @@ class LehrauftragAkzeptieren extends Auth_Controller
         // Set required permissions
         parent::__construct(
             array(
-                'index' => 'lehre:r',
-                'acceptLehrauftrag' => 'lehre:rw'  // TODO: check ob eigene permission?
+                'index' => 'lehre/lehrauftrag_akzeptieren:r',
+                'acceptLehrauftrag' => 'lehre/lehrauftrag_akzeptieren:rw'
             )
         );
 
@@ -63,13 +63,6 @@ class LehrauftragAkzeptieren extends Auth_Controller
      */
     public function index()
     {
-        // Check if user is Mitarbeiter
-        $result = $this->MitarbeiterModel->isMitarbeiter($this->_uid);
-        if (!getData($result))
-        {
-            show_error('Fehler bei Berechtigungsprüfung');
-        }
-
         /**
          * Check if lectors latest active Verwendung has inkludierte Lehre
          * - inkludierte_lehre is null: freelancer lector -> has NO inkludierte Lehre
