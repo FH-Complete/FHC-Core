@@ -243,13 +243,13 @@ class Vertrag_model extends DB_Model
      * Example: WS2017-BEE3-LIA-LAB
      * @param $lehrveranstaltung_id
      * @param $studiensemester_kurzbz   Studiensemester of Lehrauftrag (= when the lector will teach the lehrveranstaltung)
-     * @return string
+     * @return string   Returns e.g. WS2017-BBE5-GAP-LAB
      */
     private function _writeVertragsbezeichung($lehrveranstaltung_id, $studiensemester_kurzbz)
     {
         $bezeichnung = '';
         $this->load->model('education/Lehrveranstaltung_model', 'LehrveranstaltungModel');
-        $this->LehrveranstaltungModel->addSelect('tbl_lehrveranstaltung.semester, tbl_lehrveranstaltung.kurzbz, lehrform_kurzbz, public.tbl_studiengang.kurzbzlang');
+        $this->LehrveranstaltungModel->addSelect('tbl_lehrveranstaltung.semester, tbl_lehrveranstaltung.kurzbz AS "lv_kurzbz", lehrform_kurzbz, public.tbl_studiengang.typ, public.tbl_studiengang.kurzbz');
         $this->LehrveranstaltungModel->addJoin('lehre.tbl_studienplan_lehrveranstaltung', 'lehrveranstaltung_id');
         $this->LehrveranstaltungModel->addJoin('lehre.tbl_studienplan', 'studienplan_id');
         $this->LehrveranstaltungModel->addJoin('lehre.tbl_studienordnung', 'studienordnung_id');
@@ -259,8 +259,8 @@ class Vertrag_model extends DB_Model
         if (hasData($result))
         {
             $bezeichnung = $studiensemester_kurzbz. '-';
-            $bezeichnung.= $result->retval[0]->kurzbzlang. $result->retval[0]->semester. '-';
-            $bezeichnung.= $result->retval[0]->kurzbz. '-';
+            $bezeichnung.= strtoupper($result->retval[0]->typ. $result->retval[0]->kurzbz). $result->retval[0]->semester. '-';
+            $bezeichnung.= $result->retval[0]->lv_kurzbz. '-';
             $bezeichnung.= $result->retval[0]->lehrform_kurzbz;
         }
 

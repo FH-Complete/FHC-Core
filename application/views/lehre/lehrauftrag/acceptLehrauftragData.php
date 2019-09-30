@@ -14,7 +14,7 @@ SELECT
     projektarbeit_id,
     studiensemester_kurzbz,
     studiengang_kz,
-    stg_oe_kurzbz,
+    stg_typ_kurzbz,
     person_id,
     typ,
     auftrag,
@@ -33,7 +33,7 @@ FROM
     SELECT *,
         /* concatinated and aggregated gruppen */
         (SELECT
-             string_agg(concat(stg_oe_kurzbz, \'-\', semester, verband, gruppe,
+             string_agg(concat(stg_typ_kurzbz, \'-\', semester, verband, gruppe,
                                \'\n\' || gruppe_kurzbz), \', \')
          FROM
              lehre.tbl_lehreinheitgruppe
@@ -72,7 +72,7 @@ FROM
                     NULL                                                AS "projektarbeit_id",
                     le.studiensemester_kurzbz,
                     stg.studiengang_kz,
-                    upper(stg.oe_kurzbz)                                AS "stg_oe_kurzbz",
+                    upper(stg.typ || stg.kurzbz)                                AS "stg_typ_kurzbz",
                     person.person_id,
                     upper(lv.lehrtyp_kurzbz)                            AS "typ",
                     (lv.bezeichnung || \' [\' || le.lehrform_kurzbz || \' \' || lv.semester || \'.Semester\' ||
@@ -127,7 +127,7 @@ FROM
                LIMIT 1)                                 AS "mitarbeiter_uid",
             /* concatinated and aggregated gruppen */
             (SELECT
-                 string_agg(concat(stg_oe_kurzbz, \'-\', semester, verband, gruppe,
+                 string_agg(concat(stg_typ_kurzbz, \'-\', semester, verband, gruppe,
                                    \'\n\' || gruppe_kurzbz), \', \')
              FROM
                  lehre.tbl_lehreinheitgruppe
@@ -166,7 +166,7 @@ FROM
                     pa.projektarbeit_id                                                                 AS "projektarbeit_id",
                     le.studiensemester_kurzbz,
                     stg.studiengang_kz,
-                    upper(stg.oe_kurzbz)                                                                AS "stg_oe_kurzbz",
+                    upper(stg.typ || stg.kurzbz)                                                        AS "stg_typ_kurzbz",
                     person.person_id,
                     \'Betreuung\'                                                                       AS "typ",
                     (betreuerart_kurzbz || \' \' ||
@@ -308,7 +308,7 @@ $filterWidgetArray = array(
         projektarbeit_id: {visible: false},
         studiensemester_kurzbz: {visible: false},
         studiengang_kz: {visible: false},  
-        stg_oe_kurzbz: {headerFilter:"input", width: "5%"},
+        stg_typ_kurzbz: {headerFilter:"input", width: "5%"},
         person_id: {visible: false},
         typ: {headerFilter:"input", width: "7%"},
         auftrag: {headerFilter:"input", width: "23%"},
