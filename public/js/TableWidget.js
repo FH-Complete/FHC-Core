@@ -43,6 +43,14 @@ var FHC_TableWidget = {
 	// Private methods
 
 	/**
+	 * To retrive the page where the TableWidget is used, using the FHC_JS_DATA_STORAGE_OBJECT
+	 */
+	_getTableUniqueIdPrefix: function() {
+
+		return FHC_JS_DATA_STORAGE_OBJECT.called_path + "/" + FHC_JS_DATA_STORAGE_OBJECT.called_method;
+	},
+
+	/**
 	 * Utility method that checks if data contains an error and print that to the console
 	 * otherwise the TableWidget GUI is refreshed
 	 */
@@ -109,11 +117,10 @@ var FHC_TableWidget = {
 
 		for (var tableWidgetsCounter = 0; tableWidgetsCounter < tableWidgetUniqueIdArray.length; tableWidgetsCounter++)
 		{
-
 			FHC_AjaxClient.ajaxCallGet(
 				"widgets/Tables/getTable",
 				{
-					tableUniqueId: tableWidgetUniqueIdArray[tableWidgetsCounter]
+					tableUniqueId: FHC_TableWidget._getTableUniqueIdPrefix() + "/" + tableWidgetUniqueIdArray[tableWidgetsCounter]
 				},
 				{
 					successCallback: function(data, textStatus, jqXHR) {

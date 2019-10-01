@@ -59,7 +59,7 @@ class TableWidget extends Widget
 		// NOTE: If it is NOT allowed then no data are loaded
 		if ($this->tablewidgetlib->isAllowed($this->_requiredPermissions))
 		{
-			$this->_startTableWidget();
+			$this->_startTableWidget($args[TableWidgetLib::TABLE_UNIQUE_ID]);
 		}
 	}
 
@@ -244,7 +244,7 @@ class TableWidget extends Widget
 	/**
 	 * Contains all the logic used to load all the data needed to the TableWidget
 	 */
-	private function _startTableWidget()
+	private function _startTableWidget($tableUniqueId)
 	{
 		// Read the all session for this table widget
 		$session = $this->tablewidgetlib->getSession();
@@ -297,6 +297,7 @@ class TableWidget extends Widget
 				// Stores an array that contains all the data useful for
 				$this->tablewidgetlib->setSession(
 					array(
+						TableWidgetLib::TABLE_UNIQUE_ID => $tableUniqueId, // table unique id
 						TableWidgetLib::SESSION_FIELDS => $this->tablewidgetlib->getExecutedQueryListFields(), // all the fields of the dataset
 						TableWidgetLib::SESSION_COLUMNS_ALIASES => $this->_columnsAliases, // all the fields aliases
 						TableWidgetLib::SESSION_ADDITIONAL_COLUMNS => $this->_additionalColumns, // additional columns

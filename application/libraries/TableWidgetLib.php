@@ -119,8 +119,6 @@ class TableWidgetLib
 	 */
 	public function setSession($data)
 	{
-		$data[TableWidgetLib::TABLE_UNIQUE_ID] = $this->_tableUniqueId; // the unique id of this table widget
-
 		setSessionElement(self::SESSION_NAME, $this->_tableUniqueId, $data);
 	}
 
@@ -190,15 +188,19 @@ class TableWidgetLib
 			&& isset($params[self::TABLE_UNIQUE_ID])
 			&& !isEmptyString($params[self::TABLE_UNIQUE_ID]))
 		{
-			$this->setTableUniqueId($params[self::TABLE_UNIQUE_ID]);
+			$tableUniqueId = $this->_ci->router->directory.$this->_ci->router->class.'/'.
+				$this->_ci->router->method.'/'.
+				$params[self::TABLE_UNIQUE_ID];
+
+			$this->setTableUniqueId($tableUniqueId);
 		}
 	}
 
 	/**
 	 * Set the _tableUniqueId property
 	 */
-	public function setTableUniqueId($filterUniqueId)
+	public function setTableUniqueId($tableUniqueId)
 	{
-		$this->_tableUniqueId = $filterUniqueId;
+		$this->_tableUniqueId = $tableUniqueId;
 	}
 }
