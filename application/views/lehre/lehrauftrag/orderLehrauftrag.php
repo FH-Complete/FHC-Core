@@ -19,15 +19,16 @@ $this->load->view(
         'phrases' => array(
             'global' => array('lehrauftraege'),
         ),
-        'customCSSs' => 'public/css/sbadmin2/tablesort_bootstrap.css',
         'customJSs' => array('public/js/bootstrapper.js')
     )
 );
 ?>
 
 <body>
-<div id="page-wrapper">
-    <div class="container-fluid">
+    <?php echo $this->widgetlib->widget('NavigationWidget'); ?>
+    <div id="page-wrapper">
+        <div class="container-fluid">
+
         <div class="row">
             <div class="col-lg-12">
                 <h3 class="page-header">
