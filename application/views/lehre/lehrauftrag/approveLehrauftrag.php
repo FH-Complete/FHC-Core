@@ -84,9 +84,8 @@ $this->load->view(
                 <button id="approve-lehrauftraege" class="btn btn-primary pull-right">Lehrauftrag erteilen</button>
                 <button id="select-all" class="btn btn-default">Alle auswählen</button>
                 <button id="deselect-all" class="btn btn-default">Alle abwählen</button>
-                <button id="show-all" class="btn btn-default">Alle anzeigen</button>
                 <button id="show-ordered" class="btn btn-default">Nur bestellte anzeigen</button>
-                <button id="show-approved" class="btn btn-default">Nur erteilte anzeigen</button>
+                <button id="show-all" class="btn btn-default">Alle anzeigen</button>
             </div>
         </div>
     </div>
@@ -164,6 +163,10 @@ $(function() {
             ]
         );
     });
+
+    $("#download-cvs").click(function(){
+         $('#filterTabulator').tabulator("download", "csv", "data.csv");
+     });
 
     // Approve Lehrauftraege
     $("#approve-lehrauftraege").click(function(){

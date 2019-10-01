@@ -75,7 +75,7 @@ $this->load->view(
 
         <div class="row">
             <div class="col-lg-12">
-                <?php $this->load->view('lehre/lehrauftrag/lehrauftragData.php'); ?>
+                <?php $this->load->view('lehre/lehrauftrag/orderLehrauftragData.php'); ?>
             </div>
         </div>
 
@@ -84,9 +84,8 @@ $this->load->view(
                 <button id="order-lehrauftraege" class="btn btn-primary pull-right">Lehrauftrag bestellen</button>
                 <button id="select-all" class="btn btn-default">Alle auswählen</button>
                 <button id="deselect-all" class="btn btn-default">Alle abwählen</button>
-                <button id="show-all" class="btn btn-default">Alle anzeigen</button>
                 <button id="show-new" class="btn btn-default">Nur neue anzeigen</button>
-                <button id="show-ordered" class="btn btn-default">Nur bestellte anzeigen</button>
+                <button id="show-all" class="btn btn-default">Alle anzeigen</button>
             </div>
         </div>
     </div>

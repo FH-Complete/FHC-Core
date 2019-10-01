@@ -95,7 +95,7 @@ class Lehrauftrag extends Auth_Controller
             'studiensemester_selected' => $studiensemester_kurzbz
         );
 
-        $this->load->view('lehre/lehrauftrag/lehrauftrag.php', $view_data);
+        $this->load->view('lehre/lehrauftrag/orderLehrauftrag.php', $view_data);
     }
 
     public function orderLehrauftrag()
