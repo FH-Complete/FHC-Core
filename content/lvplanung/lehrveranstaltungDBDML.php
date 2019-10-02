@@ -1715,6 +1715,34 @@ if(!$error)
 			}
 		}
 	}
+	elseif(isset($_POST['type']) && $_POST['type']=='getLastVertragsstatus')
+	{
+		if(isset($_POST['vertrag_id']))
+		{
+			$vertrag = new vertrag();
+			if($vertrag->getAllStatus($_POST['vertrag_id']))
+			{
+				$vertraege = $vertrag->result;
+				foreach($vertraege as $vertrag)
+				{
+					$data = $vertrag->vertragsstatus_kurzbz;
+					$return = true;
+					break; // exit loop because only last (most actual) vertrag item is needed
+				}
+
+			}
+			else
+			{
+				$errormsg = 'Fehler beim Laden des Vertragsstatus';
+				$return = false;
+			}
+		}
+		else
+		{
+			$errormsg = 'VertragsID muss uebergeben werden';
+			$return = false;
+		}
+	}
 	else
 	{
 		$return = false;
