@@ -101,9 +101,11 @@ class InfoCenter extends Auth_Controller
 				'reloadNotizen' => 'infocenter:r',
 				'reloadLogs' => 'infocenter:r',
 				'outputAkteContent' => 'infocenter:r',
-				'getParkedDate' => 'infocenter:r',
+				'getPostponeDate' => 'infocenter:r',
 				'park' => 'infocenter:rw',
 				'unpark' => 'infocenter:rw',
+				'setOnHold' => 'infocenter:rw',
+				'removeOnHold' => 'infocenter:rw',
 				'getStudienjahrEnd' => 'infocenter:r',
 				'setNavigationMenuArrayJson' => 'infocenter:r'
 			)
@@ -712,11 +714,32 @@ class InfoCenter extends Auth_Controller
 	 * Gets the date until which a person is parked
 	 * @param $person_id
 	 */
-	public function getParkedDate($person_id)
+	public function getPostponeDate($person_id)
 	{
+		$result = array(
+			'type' => null,
+			'date' => null
+		);
+
 		$parkedDate = $this->personloglib->getParkedDate($person_id);
 
-		$this->outputJsonSuccess(array($parkedDate));
+		if (isset($parkedDate))
+		{
+			$result['type'] = 'parked';
+			$result['date'] = $parkedDate;
+		}
+		else
+		{
+			$onholdDate = $this->personloglib->getOnHoldDate($person_id);
+
+			if (isset($onholdDate))
+			{
+				$result['type'] = 'onhold';
+				$result['date'] = $onholdDate;
+			}
+		}
+
+		$this->outputJsonSuccess($result);
 	}
 
 	/**
@@ -740,6 +763,31 @@ class InfoCenter extends Auth_Controller
 		$person_id = $this->input->post('person_id');
 
 		$result = $this->personloglib->unPark($person_id);
+
+		$this->outputJson($result);
+	}
+
+	/**
+	 * Sets a person on hold ("zurückstellen")
+	 */
+	public function setOnHold()
+	{
+		$person_id = $this->input->post('person_id');
+		$date = $this->input->post('onholddate');
+
+		$result = $this->personloglib->setOnHold($person_id, date_format(date_create($date), 'Y-m-d'), self::TAETIGKEIT, self::APP, null, $this->_uid);
+
+		$this->outputJson($result);
+	}
+
+	/**
+	 * Removed on hold status of a person
+	 */
+	public function removeOnHold()
+	{
+		$person_id = $this->input->post('person_id');
+
+		$result = $this->personloglib->removeOnHold($person_id);
 
 		$this->outputJson($result);
 	}

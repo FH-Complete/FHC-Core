@@ -34,7 +34,12 @@
 					'nichtsZumAusparken',
 					'fehlerBeimAusparken',
 					'fehlerBeimParken',
-					'bewerberGeparktBis'
+					'bewerberGeparktBis',
+					'bewerberOnHold',
+					'bewerberOnHoldEntfernen',
+					'bewerberOnHoldBis',
+					'nichtsZumEntfernen',
+					'fehlerBeimEntfernen',
 				),
 				'ui' => array(
 					'gespeichert',
@@ -176,7 +181,7 @@
 										</div>
 									</div>
 									<div class="col-lg-6">
-										<div id="parking"></div>
+										<div id="postponing"></div>
 										<div id="logs">
 										<?php $this->load->view('system/infocenter/logs.php'); ?>
 										</div>
