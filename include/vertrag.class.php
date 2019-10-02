@@ -65,6 +65,8 @@ class vertrag extends basis_db
 				$this->anmerkung = $row->anmerkung;
 				$this->vertragsdatum = $row->vertragsdatum;
 				$this->lehrveranstaltung_id = $row->lehrveranstaltung_id;
+				$this->vertragsstunden = $row->vertragsstunden;
+				$this->vertragsstunden_studiensemester_kurzbz = $row->vertragsstunden_studiensemester_kurzbz;
 
 				$this->new=false;
 
@@ -377,7 +379,7 @@ class vertrag extends basis_db
 			JOIN lehre.tbl_projektarbeit USING(projektarbeit_id)
 			JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
 		WHERE
-			person_id=".$this->db_add_param($person_id, FHC_INTEGER)."
+			tbl_projektbetreuer.person_id=".$this->db_add_param($person_id, FHC_INTEGER)."
 			AND vertrag_id IS NULL";
 			/*
 		UNION
@@ -520,10 +522,13 @@ class vertrag extends basis_db
 					JOIN public.tbl_studiengang USING(studiengang_kz)
 				WHERE
 					lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id)
-			as bezeichnung
+			as bezeichnung,
+			vertragsstunden,
+    		vertragsstunden_studiensemester_kurzbz
 		FROM
 			lehre.tbl_lehreinheitmitarbeiter
 			JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
+			JOIN lehre.tbl_vertrag USING (vertrag_id)		
 		WHERE
 			vertrag_id=".$this->db_add_param($vertrag_id, FHC_INTEGER)."
 		UNION
@@ -537,11 +542,14 @@ class vertrag extends basis_db
 			tbl_lehreinheit.studiensemester_kurzbz,
 			tbl_projektbetreuer.betreuerart_kurzbz,
 			(SELECT nachname || ' ' || vorname FROM public.tbl_person JOIN public.tbl_benutzer USING(person_id) WHERE uid=tbl_projektarbeit.student_uid)
-			as bezeichnung
+			as bezeichnung,
+			vertragsstunden,
+    		vertragsstunden_studiensemester_kurzbz
 		FROM
 			lehre.tbl_projektbetreuer
 			JOIN lehre.tbl_projektarbeit USING(projektarbeit_id)
 			JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
+			JOIN lehre.tbl_vertrag USING (vertrag_id)
 		WHERE
 			vertrag_id=".$this->db_add_param($vertrag_id, FHC_INTEGER).";";
 /*		UNION
@@ -582,6 +590,8 @@ class vertrag extends basis_db
 				$obj->studiensemester_kurzbz = $row->studiensemester_kurzbz;
 				$obj->betreuerart_kurzbz = $row->betreuerart_kurzbz;
 				$obj->bezeichnung = $row->bezeichnung;
+				$obj->vertragsstunden = $row->vertragsstunden;
+				$obj->vertragsstunden_studiensemester_kurzbz = $row->vertragsstunden_studiensemester_kurzbz;
 				$this->result[] = $obj;
 			}
 			return true;
