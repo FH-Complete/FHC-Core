@@ -1340,7 +1340,8 @@ function LeMitarbeiterAuswahl()
         // Reset attributes
         document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-label-vertragsstatus').setAttribute("style", "font-weight: normal");
         document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-button-vertrag-stornieren').setAttribute("tooltiptext",
-            "Stornieren erst ab Status 'Angenommen' möglich.")
+            "Stornieren erst ab Status 'Angenommen' möglich.");
+        document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-button-vertrag-stornieren').disabled = true;
 
         // Wenn es einen Vertrag zum Lehrauftrag gibt
         if (vertrag_id != null && vertrag_id != '')
@@ -1410,12 +1411,18 @@ function LeMitarbeiterAuswahl()
             // Uppercase status
             vertragsstatus = vertragsstatus.charAt(0).toUpperCase() + vertragsstatus.slice(1)
 
-            // Stornierung
-            // * nur wenn Vertragsstatus 'akzeptiert' ist zulassen und tooltip ausblenden
+            /**
+             * Stornierung
+             * Nur wenn Vertragsstatus 'akzeptiert' ist:
+             * - button Stornierung aktivieren
+             * - tooltip ausblenden
+             * - Felder zur Bearbeitung von LektorInnendaten deaktivieren
+             */
             if(letzterStatus == 'akzeptiert')
             {
                 document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-button-vertrag-stornieren').disabled = false;
                 document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-button-vertrag-stornieren').setAttribute("tooltiptext", "");
+                LeMitarbeiterDisableFields(true);
             }
         }
         // Wenn kein Vertrag vorhanden
