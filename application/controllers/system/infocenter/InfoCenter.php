@@ -24,6 +24,7 @@ class InfoCenter extends Auth_Controller
 
 	const FILTER_ID = 'filter_id';
 	const PREV_FILTER_ID = 'prev_filter_id';
+	const RELOAD_DATASET = 'reloadDataset';
 
 	private $_uid; // contains the UID of the logged user
 
@@ -234,7 +235,7 @@ class InfoCenter extends Auth_Controller
 		$redirectLink = '/'.self::INFOCENTER_URI.'?'.self::FHC_CONTROLLER_ID.'='.$this->getControllerId();
 
 		// Force reload of Dataset after Unlock
-		$redirectLink .= '&reloadDataset=true';
+		$redirectLink .= '&'.self::RELOAD_DATASET.'=true';
 
 		$currentFilterId = $this->input->get(self::FILTER_ID);
 		if (isset($currentFilterId))
@@ -894,10 +895,16 @@ class InfoCenter extends Auth_Controller
 		$freigegebenLink = site_url(self::INFOCENTER_URI.'/'.self::FREIGEGEBEN_PAGE);
 		$reihungstestAbsolviertLink = site_url(self::INFOCENTER_URI.'/'.self::REIHUNGSTESTABSOLVIERT_PAGE);
 		$currentFilterId = $this->input->get(self::FILTER_ID);
+		$reloadDatasetParam = self::RELOAD_DATASET.'=true';
 		if (isset($currentFilterId))
 		{
-			$freigegebenLink .= '?'.self::PREV_FILTER_ID.'='.$currentFilterId;
-			$reihungstestAbsolviertLink .= '?'.self::PREV_FILTER_ID.'='.$currentFilterId;
+			$freigegebenLink .= '?'.self::PREV_FILTER_ID.'='.$currentFilterId.'&'.$reloadDatasetParam;
+			$reihungstestAbsolviertLink .= '?'.self::PREV_FILTER_ID.'='.$currentFilterId.'&'.$reloadDatasetParam;
+		}
+		else
+		{
+			$freigegebenLink .= '?'.$reloadDatasetParam;
+			$reihungstestAbsolviertLink .= '?'.$reloadDatasetParam;
 		}
 
 		$this->navigationlib->setSessionMenu(
@@ -993,9 +1000,10 @@ class InfoCenter extends Auth_Controller
 		$this->load->library('NavigationLib', array(self::NAVIGATION_PAGE => self::INFOCENTER_URI.'/'.$page));
 
 		// Generate the home link with the eventually loaded filter
-		$homeLink = site_url(self::INFOCENTER_URI.'/'.self::INDEX_PAGE);
-		$freigegebenLink = site_url(self::INFOCENTER_URI.'/'.self::FREIGEGEBEN_PAGE);
-		$absolviertLink = site_url(self::INFOCENTER_URI.'/'.self::REIHUNGSTESTABSOLVIERT_PAGE);
+		$reloadDatasetParam = '?'.self::RELOAD_DATASET.'=true';
+		$homeLink = site_url(self::INFOCENTER_URI.'/'.self::INDEX_PAGE.$reloadDatasetParam);
+		$freigegebenLink = site_url(self::INFOCENTER_URI.'/'.self::FREIGEGEBEN_PAGE.$reloadDatasetParam);
+		$absolviertLink = site_url(self::INFOCENTER_URI.'/'.self::REIHUNGSTESTABSOLVIERT_PAGE.$reloadDatasetParam);
 		$prevFilterId = $this->input->get(self::PREV_FILTER_ID);
 		if (isset($prevFilterId))
 		{
