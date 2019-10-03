@@ -101,7 +101,7 @@ class PersonLogLib
 			'name' => self::PARKED_LOGNAME
 		);
 
-		return $this->_saveLog($person_id, $date, $taetigkeit_kurzbz, $logjson, $app, $oe_kurzbz, $user);
+		return $this->_savePsLog($person_id, $date, $taetigkeit_kurzbz, $logjson, $app, $oe_kurzbz, $user);
 	}
 
 	/**
@@ -182,7 +182,7 @@ class PersonLogLib
 			'name' => self::ONHOLD_LOGNAME
 		);
 
-		return $this->_saveLog($person_id, $date, $taetigkeit_kurzbz, $logjson, $app, $oe_kurzbz, $user);
+		return $this->_savePsLog($person_id, $date, $taetigkeit_kurzbz, $logjson, $app, $oe_kurzbz, $user);
 	}
 
 	/**
@@ -241,7 +241,7 @@ class PersonLogLib
 	}
 
 	/**
-	 * Saves a log with specified parameters, including a specified log date.
+	 * Saves a processstate log with specified parameters, including a specified log date.
 	 * @param $person_id
 	 * @param $date
 	 * @param $taetigkeit_kurzbz
@@ -251,7 +251,7 @@ class PersonLogLib
 	 * @param null $user
 	 * @return mixed
 	 */
-	private function _saveLog($person_id, $date, $taetigkeit_kurzbz, $logjson, $app = 'core', $oe_kurzbz = null, $user = null)
+	private function _savePsLog($person_id, $date, $taetigkeit_kurzbz, $logjson, $app = 'core', $oe_kurzbz = null, $user = null)
 	{
 		$data = array(
 			'person_id' => $person_id,
