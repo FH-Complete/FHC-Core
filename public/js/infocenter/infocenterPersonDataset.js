@@ -50,7 +50,8 @@ var InfocenterPersonDataset = {
 			'<i class="fa fa-envelope"></i>&nbsp;Nachricht senden</a>';
 
 		var legendHtml = '<i class="fa fa-circle text-danger"></i> Gesperrt&nbsp;&nbsp;&nbsp;&nbsp;' +
-			'<i class="fa fa-circle text-info"></i> Geparkt';
+			'<i class="fa fa-circle text-info"></i> Geparkt&nbsp;&nbsp;&nbsp;&nbsp;' +
+			'<i class="fa fa-circle text-success"></i> Zurückgestellt';
 
 		// userdefined Semestervariable shown independently of personcount,
 		// it is possible to change the semester

@@ -3292,6 +3292,26 @@ $phrases = array(
 		)
 	),
 	array(
+		'app' => 'core',
+		'category' => 'global',
+		'phrase' => 'rueckstelldatum',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'rückstelldatum',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'on hold date',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
 		'app' => 'infocenter',
 		'category' => 'infocenter',
 		'phrase' => 'bewerberParken',
