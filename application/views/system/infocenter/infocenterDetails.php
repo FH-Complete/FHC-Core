@@ -40,6 +40,8 @@
 					'bewerberOnHoldBis',
 					'nichtsZumEntfernen',
 					'fehlerBeimEntfernen',
+					'rueckstelldatumUeberschritten',
+					'parkenZurueckstellenInfo'
 				),
 				'ui' => array(
 					'gespeichert',

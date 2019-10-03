@@ -927,9 +927,7 @@ var InfocenterDetails = {
 					'<button class="btn btn-default" id="onholdlink" type="button""><i class="fa fa-anchor"></i>&nbsp;' + FHC_PhrasesLib.t('infocenter', 'bewerberOnHold') + '</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'+
 					FHC_PhrasesLib.t('global', 'bis') + '&nbsp;&nbsp;'+
 					'<input id="postponedate" type="text" class="form-control" placeholder="Parkdatum">&nbsp;'+
-					'<i class="fa fa-info-circle"  data-toggle="tooltip" title="Geparkte und zurückgestellte BewerberInnen werden aus dem Workflow temporär rausgenommen.\n' +
-					'Geparkte BewerberInnen werden zum angegebenen Datum automatisch entparkt, während zurückgestellte BewerberInnen nur manuell durch Drücken des Buttons den Zurückgestellt-Status verlieren.\n' +
-					'Im Falle einer Zurückstellung dient das Datum nur der Erinnerung."></i>&nbsp;'+
+					'<i class="fa fa-info-circle"  data-toggle="tooltip" title="'+FHC_PhrasesLib.t('infocenter', 'parkenZurueckstellenInfo')+'"></i>&nbsp;'+
 					'<span class="text-danger" id="postponemsg"></span>'+
 				'</div>');
 
@@ -943,7 +941,6 @@ var InfocenterDetails = {
 
 				function ()
 				{
-					//console.log(date);
 					var date = $("#postponedate").val();
 					InfocenterDetails.parkPerson(personid, date);
 				}
@@ -988,7 +985,7 @@ var InfocenterDetails = {
 				var currdate = new Date();
 
 				if (currdate > postponedate)
-					postponedtext = "<span class='alert-danger' data-toggle='tooltip' title='Zurückstelldatum überschritten!'>"+postponedtext+"</span>";
+					postponedtext = "<span class='alert-danger' data-toggle='tooltip' title='"+FHC_PhrasesLib.t('infocenter', 'rueckstelldatumUeberschritten')+"'>"+postponedtext+"</span>";
 
 				callbackforundo = function ()
 				{
