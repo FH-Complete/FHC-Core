@@ -970,7 +970,7 @@ class InfoCenter extends Auth_Controller
 		$prevFilterId = $this->input->get(self::PREV_FILTER_ID);
 		if (isset($prevFilterId))
 		{
-			$link .= '?'.self::FILTER_ID.'='.$prevFilterId;
+			$link .= '?'.self::FILTER_ID.'='.$prevFilterId.'&'.self::RELOAD_DATASET.'=true';
 		}
 
 		$this->navigationlib->setSessionMenu(
