@@ -213,7 +213,7 @@ class dvb extends basis_db
 				return ErrorHandler::error($errormsg);
 			}
 
-			$studienjahr = substr($studiensemester_kurzbz, 4);
+			$studienjahr = substr($studiensemester_kurzbz, 2);
 			$art = substr($studiensemester_kurzbz, 0, 2);
 			if ($art == 'SS')
 				$studienjahr = $studienjahr - 1;

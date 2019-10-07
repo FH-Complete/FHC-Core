@@ -3030,6 +3030,86 @@ if(!$result = @$db->db_query("SELECT stufe FROM public.tbl_dokumentstudiengang L
 		echo '<br>public.tbl_dokumentstudiengang: Spalte stufe hinzugefuegt';
 }
 
+// Create TABLE public.tbl_variablenname
+if(!@$db->db_query("SELECT 0 FROM public.tbl_variablenname WHERE 0 = 1"))
+{
+	$qry = '
+		CREATE TABLE public.tbl_variablenname
+		(
+			name varchar(64)     NOT NULL constraint pk_tbl_variablenname primary key,
+			defaultwert                    varchar(64)
+		);
+		COMMENT ON TABLE public.tbl_variablenname IS \'Namen aller benutzerdefinierten Variablen\';
+
+		INSERT INTO public.tbl_variablenname (name, defaultwert) VALUES (\'termin_export_db_stpl_table\', null);
+		INSERT INTO public.tbl_variablenname (name, defaultwert) VALUES (\'sleep_time\', null);
+		INSERT INTO public.tbl_variablenname (name, defaultwert) VALUES (\'semester_aktuell\', null);
+		INSERT INTO public.tbl_variablenname (name, defaultwert) VALUES (\'reihungstestverwaltung_punkteberechnung\', null);
+		INSERT INTO public.tbl_variablenname (name, defaultwert) VALUES (\'number_displayed_past_studiensemester\', null);
+		INSERT INTO public.tbl_variablenname (name, defaultwert) VALUES (\'max_kollision\', \'0\');
+		INSERT INTO public.tbl_variablenname (name, defaultwert) VALUES (\'locale\', \'de-AT\');
+		INSERT INTO public.tbl_variablenname (name, defaultwert) VALUES (\'kontofilterstg\', \'false\');
+		INSERT INTO public.tbl_variablenname (name, defaultwert) VALUES (\'kollision_student\', \'false\');
+		INSERT INTO public.tbl_variablenname (name, defaultwert) VALUES (\'infocenter_studiensemester\', null);
+		INSERT INTO public.tbl_variablenname (name, defaultwert) VALUES (\'ignore_zeitsperre\', \'false\');
+		INSERT INTO public.tbl_variablenname (name, defaultwert) VALUES (\'ignore_reservierung\', \'false\');
+		INSERT INTO public.tbl_variablenname (name, defaultwert) VALUES (\'ignore_kollision\', \'false\');
+		INSERT INTO public.tbl_variablenname (name, defaultwert) VALUES (\'fas_id\', null);
+		INSERT INTO public.tbl_variablenname (name, defaultwert) VALUES (\'fasfunktionfilter\', \'alle\');
+		INSERT INTO public.tbl_variablenname (name, defaultwert) VALUES (\'emailadressentrennzeichen\', null);
+		INSERT INTO public.tbl_variablenname (name, defaultwert) VALUES (\'db_stpl_table\', \'stundenplan\');
+		INSERT INTO public.tbl_variablenname (name, defaultwert) VALUES (\'allow_lehrstunde_drop\', \'false\');
+		INSERT INTO public.tbl_variablenname (name, defaultwert) VALUES (\'alle_unr_mitladen\', \'false\');
+
+		ALTER TABLE public.tbl_variable ADD CONSTRAINT variablenname_variable FOREIGN KEY (name) REFERENCES public.tbl_variablenname(name) ON UPDATE CASCADE ON DELETE RESTRICT;
+		';
+
+	if (!$db->db_query($qry))
+		echo '<strong>public.tbl_variablenname ' . $db->db_last_error() . '</strong><br>';
+	else
+		echo '<br>Created public.tbl_variablenname';
+
+	// GRANT SELECT, UPDATE, INSERT, DELETE ON TABLE public.tbl_variablenname TO web;
+	$qry = 'GRANT SELECT ON TABLE public.tbl_variablenname TO web;';
+	if (!$db->db_query($qry))
+		echo '<strong>public.tbl_variablenname ' . $db->db_last_error() . '</strong><br>';
+	else
+		echo '<br>Granted privileges to <strong>web</strong> on public.tbl_variablenname';
+
+	// GRANT SELECT, UPDATE, INSERT, DELETE ON TABLE public.tbl_variablenname TO vilesci;
+	$qry = 'GRANT SELECT, UPDATE, INSERT, DELETE ON TABLE public.tbl_variablenname TO vilesci;';
+	if (!$db->db_query($qry))
+		echo '<strong>public.tbl_variablenname ' . $db->db_last_error() . '</strong><br>';
+	else
+		echo '<br>Granted privileges to <strong>vilesci</strong> on public.tbl_variablenname';
+}
+
+// Add column projektphase_id to tbl_zeitaufzeichnung
+if(!$result = @$db->db_query("SELECT projektphase_id FROM campus.tbl_zeitaufzeichnung LIMIT 1"))
+{
+	$qry = "ALTER TABLE campus.tbl_zeitaufzeichnung ADD COLUMN projektphase_id bigint;
+			ALTER TABLE campus.tbl_zeitaufzeichnung ADD CONSTRAINT fk_zeitaufzeichnung_projektphase FOREIGN KEY (projektphase_id) REFERENCES fue.tbl_projektphase (projektphase_id) ON DELETE RESTRICT ON UPDATE CASCADE;";
+
+	if(!$db->db_query($qry))
+		echo '<strong>campus.tbl_zeitaufzeichnung: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>campus.tbl_zeitaufzeichnung: Spalte projektphase_id hinzugefuegt';
+}
+
+// Add new webservice type in system.tbl_webservicetyp
+if ($result = @$db->db_query("SELECT 1 FROM system.tbl_webservicetyp WHERE webservicetyp_kurzbz = 'job';"))
+{
+	if ($db->db_num_rows($result) == 0)
+	{
+		$qry = "INSERT INTO system.tbl_webservicetyp(webservicetyp_kurzbz, beschreibung) VALUES('job', 'Cronjob');";
+
+		if (!$db->db_query($qry))
+			echo '<strong>system.tbl_webservicetyp '.$db->db_last_error().'</strong><br>';
+		else
+			echo ' system.tbl_webservicetyp: Added webservice type "job"<br>';
+	}
+}
+
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
 
@@ -3258,6 +3338,7 @@ $tabellen=array(
 	"public.tbl_studiensemester"  => array("studiensemester_kurzbz","bezeichnung","start","ende","studienjahr_kurzbz","ext_id","beschreibung","onlinebewerbung"),
 	"public.tbl_tag"  => array("tag"),
 	"public.tbl_variable"  => array("name","uid","wert"),
+	"public.tbl_variablenname"  => array("name","defaultwert"),
 	"public.tbl_vorlage"  => array("vorlage_kurzbz","bezeichnung","anmerkung","mimetype","attribute","archivierbar","signierbar","stud_selfservice","dokument_kurzbz"),
 	"public.tbl_vorlagedokument"  => array("vorlagedokument_id","sort","vorlagestudiengang_id","dokument_kurzbz"),
 	"public.tbl_vorlagestudiengang"  => array("vorlagestudiengang_id","vorlage_kurzbz","studiengang_kz","version","text","oe_kurzbz","style","berechtigung","anmerkung_vorlagestudiengang","aktiv","sprache","subject","orgform_kurzbz"),

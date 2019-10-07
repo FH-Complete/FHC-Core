@@ -136,6 +136,8 @@ class InfoCenter extends Auth_Controller
 
 		$this->_setAuthUID(); // sets property uid
 
+		$this->load->library('VariableLib', array('uid' => $this->_uid));
+
 		$this->setControllerId(); // sets the controller id
     }
 

@@ -29,6 +29,7 @@ $this->phrasen['zeitaufzeichnung/organisationseinheit2']='';
 $this->phrasen['zeitaufzeichnung/organisationseinheiten']='';
 $this->phrasen['zeitaufzeichnung/pause']='';
 $this->phrasen['zeitaufzeichnung/projekt']='';
+$this->phrasen['zeitaufzeichnung/projektphase']='';
 $this->phrasen['zeitaufzeichnung/service']='';
 $this->phrasen['zeitaufzeichnung/sieSindDerzeitKeinenProjektenZugeordnet']='';
 $this->phrasen['zeitaufzeichnung/start']='';

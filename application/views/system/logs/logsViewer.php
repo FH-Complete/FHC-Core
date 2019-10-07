@@ -2,10 +2,9 @@
 	$this->load->view(
 		'templates/FHC-Header',
 		array(
-			'title' => 'Info Center',
+			'title' => 'Logs viewer',
 			'jquery' => true,
 			'jqueryui' => true,
-			'jquerycheckboxes' => true,
 			'bootstrap' => true,
 			'fontawesome' => true,
 			'sbadmintemplate' => true,
@@ -14,12 +13,11 @@
 			'filterwidget' => true,
 			'navigationwidget' => true,
 			'phrases' => array(
-				'person' => array('vorname', 'nachname'),
 				'global' => array('mailAnXversandt'),
 				'ui' => array('bitteEintragWaehlen')
 			),
-			'customCSSs' => array('public/css/sbadmin2/tablesort_bootstrap.css', 'public/css/infocenter/infocenterPersonDataset.css'),
-			'customJSs' => array('public/js/bootstrapper.js', 'public/js/infocenter/infocenterPersonDataset.js')
+			'customCSSs' => 'public/css/sbadmin2/tablesort_bootstrap.css',
+			'customJSs' => array('public/js/bootstrapper.js')
 		)
 	);
 ?>
@@ -34,12 +32,12 @@
 				<div class="row">
 					<div class="col-lg-12">
 						<h3 class="page-header">
-							zum Reihungstest freigegeben
+							JobsViewer
 						</h3>
 					</div>
 				</div>
 				<div>
-					<?php $this->load->view('system/infocenter/infocenterFreigegebenData.php'); ?>
+					<?php $this->load->view('system/logs/logsViewerData.php'); ?>
 				</div>
 			</div>
 		</div>

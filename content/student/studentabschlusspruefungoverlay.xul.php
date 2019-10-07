@@ -292,6 +292,8 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 					<vbox>
 						<box class="Datum" id="student-abschlusspruefung-datum-datum" disabled="true"/>
 					</vbox>
+					<label value="Anmerkung" control="student-abschlusspruefung-textbox-anmerkung" />
+					<textbox id="student-abschlusspruefung-textbox-anmerkung" multiline="true" maxlength="256" disabled="true"/>
 				</row>
 				<row id="student-abschlusspruefung-datum-uhrzeit-row">
 					<vbox>
@@ -300,8 +302,6 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 					<vbox>
 						<timepicker id="student-abschlusspruefung-datum-uhrzeit" hideseconds="true" disabled="true"/>
 					</vbox>
-					<label value="Anmerkung" control="student-abschlusspruefung-textbox-anmerkung" />
-					<textbox id="student-abschlusspruefung-textbox-anmerkung" multiline="true" maxlength="256" disabled="true"/>
 				</row>
 				<row>
 					<vbox>
