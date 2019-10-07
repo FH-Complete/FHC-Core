@@ -413,6 +413,7 @@ var FHC_FilterWidget = {
  			},
  			{
  				successCallback: function(data, textStatus, jqXHR) {
+ 					FHC_FilterWidget._cleanTablesorterLocalStorage();
  					FHC_FilterWidget._failOrRefresh(data, textStatus, jqXHR);
  				}
  			}
@@ -488,6 +489,7 @@ var FHC_FilterWidget = {
 			},
 			{
 				successCallback: function(data, textStatus, jqXHR) {
+					FHC_FilterWidget._cleanTablesorterLocalStorage();
 					FHC_FilterWidget._failOrReload(data, textStatus, jqXHR);
 				}
 			}
@@ -507,6 +509,7 @@ var FHC_FilterWidget = {
 			},
 			{
 				successCallback: function(data, textStatus, jqXHR) {
+					FHC_FilterWidget._cleanTablesorterLocalStorage();
 					FHC_FilterWidget._failOrReload(data, textStatus, jqXHR);
 				}
 			}
@@ -935,9 +938,13 @@ var FHC_FilterWidget = {
 				}
 			});
 
-			// Reset filter storage if there is a filter id in url TODO: find better solution
-			var filter_id = FHC_AjaxClient.getUrlParameter("filter_id");
-			if (typeof filter_id !== "undefined") FHC_FilterWidget._cleanTablesorterLocalStorage();
+			// Reset filter storage if not specified by get parameter
+			var keepTsFilter = FHC_AjaxClient.getUrlParameter("keepTsFilter");
+
+			if (typeof keepTsFilter === "undefined" || keepTsFilter !== "true")
+			{
+				FHC_FilterWidget._cleanTablesorterLocalStorage();
+			}
 
 			$.tablesorter.updateAll($("#filterTableDataset")[0].config, true, null);
 		}
