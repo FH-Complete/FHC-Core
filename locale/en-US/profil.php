@@ -78,4 +78,5 @@ $this->phrasen['profil/fotoAuswählen']='Click on the image below to upload a ph
 $this->phrasen['profil/bildSpeichern']='Save image';
 $this->phrasen['profil/gueltigvon']='Valid from';
 $this->phrasen['profil/gueltigbis']='Valid to';
+$this->phrasen['profil/wochenstunden']='week hours';
 ?>

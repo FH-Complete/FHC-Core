@@ -80,4 +80,5 @@ $this->phrasen['profil/fotoAuswählen']='Klicken Sie auf das Bild um ein Foto ho
 $this->phrasen['profil/bildSpeichern']='Bild speichern';
 $this->phrasen['profil/gueltigvon']='Gültig von';
 $this->phrasen['profil/gueltigbis']='Gültig bis';
+$this->phrasen['profil/wochenstunden']='Wochenstunden';
 ?>

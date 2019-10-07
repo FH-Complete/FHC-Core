@@ -507,7 +507,7 @@ if (!defined('CIS_PROFIL_FUNKTIONEN_ANZEIGEN') || CIS_PROFIL_FUNKTIONEN_ANZEIGEN
 	$qry = "SELECT
 				*, tbl_benutzerfunktion.oe_kurzbz as oe_kurzbz, tbl_organisationseinheit.bezeichnung as oe_bezeichnung,
 				 tbl_benutzerfunktion.semester, tbl_benutzerfunktion.bezeichnung as bf_bezeichnung,
-				 tbl_benutzerfunktion.datum_von, tbl_benutzerfunktion.datum_bis
+       			 tbl_benutzerfunktion.wochenstunden, tbl_benutzerfunktion.datum_von, tbl_benutzerfunktion.datum_bis
 			FROM
 				public.tbl_benutzerfunktion
 				JOIN public.tbl_funktion USING(funktion_kurzbz)
@@ -526,13 +526,14 @@ if (!defined('CIS_PROFIL_FUNKTIONEN_ANZEIGEN') || CIS_PROFIL_FUNKTIONEN_ANZEIGEN
 					<tr>
 						<th>'.$p->t('global/bezeichnung').'</th>
 						<th>'.$p->t('global/organisationseinheit').'</th>
-						<th>'.$p->t('global/semester').'</th>
-						<th>'.$p->t('global/institut').'</th>
 						<th>'.$p->t('profil/gueltigvon').'</th>
 						<th>'.$p->t('profil/gueltigbis').'</th>
+						<th>'.$p->t('profil/wochenstunden').'</th>
 					</tr>
 				</thead>
 			<tbody>';
+
+			$wochenstunden_sum = 0.00;
 
 			while($row_funktion = $db->db_fetch_object($result_funktion))
 			{
@@ -544,13 +545,45 @@ if (!defined('CIS_PROFIL_FUNKTIONEN_ANZEIGEN') || CIS_PROFIL_FUNKTIONEN_ANZEIGEN
 					echo ' - '.$row_funktion->bf_bezeichnung;
 				echo "</td>
 					<td nowrap>".$row_funktion->organisationseinheittyp_kurzbz.' '.$row_funktion->oe_bezeichnung."</td>
-					<td>$row_funktion->semester</td>
-					<td>$row_funktion->fachbereich_kurzbz</td>
 					<td>".$datum_obj->formatDatum($row_funktion->datum_von,'d.m.Y')."</td>
 					<td>".$datum_obj->formatDatum($row_funktion->datum_bis,'d.m.Y')."</td>
+					<td>".$row_funktion->wochenstunden."</td>
 				</tr>";
+
+				if(isset($row_funktion->wochenstunden))
+					$wochenstunden_sum += (double)$row_funktion->wochenstunden;
 			}
-			echo '</tbody></table><br>';
+			echo '</tbody><br>';
+
+			//vertragsstunden
+			$vertragsstunden = 0.00;
+			$qry = "SELECT sum(vertragsstunden) AS vertragsstdsumme from bis.tbl_bisverwendung
+					WHERE mitarbeiter_uid = ".$db->db_add_param($uid)."
+					AND (ende > now() OR ende IS NULL)";
+
+			if ($result_vertragsstd = $db->db_query($qry))
+			{
+				if ($db->db_num_rows($result_vertragsstd) > 0)
+				{
+					while($row_vertragsstd = $db->db_fetch_object($result_vertragsstd))
+					{
+						$vertragsstunden = $row_vertragsstd->vertragsstdsumme;
+					}
+				}
+			}
+
+			echo "
+			<tfoot>
+			<tr>
+				<td></td>
+				<td></td>
+				<th colspan ='2'>Summe Wochenstunden (Vertragsstunden)</th>
+				<th style='padding: 4pt 0'>&nbsp;".number_format($wochenstunden_sum,2).
+				"&nbsp;(".number_format($vertragsstunden,2).")</th>
+			</tr>
+			</tfoot>";
+			echo "</table>";
+
 		}
 	}
 }

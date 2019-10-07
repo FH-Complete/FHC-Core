@@ -58,5 +58,6 @@ $this->phrasen['profil/wendenSieSichAn']='';
 $this->phrasen['profil/zeitsperrenVon']='';
 $this->phrasen['profil/zeitwuensche']='';
 $this->phrasen['profil/zustaendigeAssistenz']='';
+$this->phrasen['profil/wochenstunden']='';
 
 ?>
