@@ -113,3 +113,8 @@
 #applyFilter, #saveCustomFilterButton {
 	width: 100px;
 }
+
+#dragAndDropFieldsArea
+{
+	display: inline-table !important;
+}
