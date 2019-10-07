@@ -65,7 +65,7 @@ $is_hidden = (!defined('FAS_LV_LEKTORINNENZUTEILUNG_VERTRAGSDETAILS_ANZEIGEN') |
 	</popupset>
 	<popupset>
 		<menupopup id="lehrveranstaltung-lektor-tree-popup">
-			<menuitem label="Entfernen" oncommand="LeMitarbeiterDel();" />
+			<menuitem id="lehrveranstaltung-lektor-tree-popup-label" label="Entfernen" oncommand="LeMitarbeiterDel();" />
 			<?php
 			if($rechte->isBerechtigt('lv-plan/lektorentfernen'))
 			{
@@ -516,6 +516,7 @@ $is_hidden = (!defined('FAS_LV_LEKTORINNENZUTEILUNG_VERTRAGSDETAILS_ANZEIGEN') |
                     <column flex="1"/>
                 </columns>
                 <rows>
+                    <label id="lehrveranstaltung-lehreinheitmitarbeiter-label-vertrag_id" hidden="true" value=""/>
                     <row>
                         <label value="Vertragsstatus:"/>
                         <label id="lehrveranstaltung-lehreinheitmitarbeiter-label-vertragsstatus" value="" readonly="true" maxlength="8" size="6"/>
@@ -526,7 +527,7 @@ $is_hidden = (!defined('FAS_LV_LEKTORINNENZUTEILUNG_VERTRAGSDETAILS_ANZEIGEN') |
                         <label value="Vertragsdetails lt. Urfassung" style="margin-bottom: 10px;"/>
                     </row>
                     <row>
-                        <label value="Stunden:" class="indent"/>
+                        <label value="Semesterstunden:" class="indent"/>
                         <label id="lehrveranstaltung-lehreinheitmitarbeiter-label-vertragsstunden" value="" readonly="true"/>
                     </row>
                     <row>
