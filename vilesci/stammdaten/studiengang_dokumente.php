@@ -134,11 +134,18 @@ if($action === 'togglepflicht')
 $changeStufe = filter_input(INPUT_POST, 'changeStufe', FILTER_VALIDATE_BOOLEAN);
 if ($changeStufe && isset($_POST['stufe']) && isset($_POST['studiengang_kz']))
 {
-	if (!$stufe = filter_input(INPUT_POST, 'stufe', FILTER_VALIDATE_INT))
+	// Check if stufe = 0
+	if (filter_input(INPUT_POST, 'stufe', FILTER_VALIDATE_INT) === 0
+		|| filter_input(INPUT_POST, 'stufe', FILTER_VALIDATE_INT)
+		|| filter_input(INPUT_POST, 'stufe') == '')
+	{
+		$stufe = filter_input(INPUT_POST, 'stufe');
+	}
+	else
 	{
 		echo json_encode(array(
 			'status' => 'fehler',
-			'msg' => '"'.$_POST['stufe'].'" ist kein gültiger Wert für die Stufe'
+			'msg' => '"'.$_POST['stufe'].'" ist kein gueltiger Wert fuer die Stufe'
 		));
 		exit();
 	}
@@ -229,7 +236,7 @@ echo '<!DOCTYPE HTML>
 		$(document).ready(function()
 		{
 			$.tablesorter.addParser({
-	        // set a unique id
+			// set a unique id
 			id: "stufe",
 			is: function(s) {
 				// return false so this parser is not auto detected
@@ -241,12 +248,29 @@ echo '<!DOCTYPE HTML>
 			},
 			// set type, either numeric or text
 			type: "numeric"
-		});
+			});
+			
 			$("#t1").tablesorter(
 			{
 				sortList: [[0,0]],
-				widgets: ["zebra"],
-				headers: {7:{sorter: "stufe"}}
+				widgets: ["zebra","filter"],
+				headers: {7:{sorter: "stufe"}},
+				widgetOptions : {	filter_useParsedData : true,
+									filter_functions : {
+									// Add select menu to this column
+									4 : {
+									"Ja" : function(e, n, f, i, $r, c, data) { return /t/.test(e); },
+									"Nein" : function(e, n, f, i, $r, c, data) { return /f/.test(e); }
+									},
+									5 : {
+									"Ja" : function(e, n, f, i, $r, c, data) { return /t/.test(e); },
+									"Nein" : function(e, n, f, i, $r, c, data) { return /f/.test(e); }
+									},
+									6 : {
+									"Ja" : function(e, n, f, i, $r, c, data) { return /t/.test(e); },
+									"Nein" : function(e, n, f, i, $r, c, data) { return /f/.test(e); }
+									}
+				}}
 			});
 			$("#t2").tablesorter(
 			{
@@ -547,7 +571,7 @@ else
 			echo'	<th style="text-align: center">Online-Bewerbung</th>
 					<th style="text-align: center">Pflicht</th>
 					<th style="text-align: center">Nachreichbar</th>
-					<th style="text-align: center">Stufe</th>
+					<th style="text-align: center">Stufe*</th>
 					<th class="sorter-false"></th>';
 		}
 		echo'</tr>
@@ -574,11 +598,14 @@ else
 			{
 				$beschreibung = '';
 				echo '<td>'.$dok->bezeichnung_mehrsprachig[$sprache_row->sprache].'</td>';
-				if ($dok->dokumentbeschreibung_mehrsprachig[$sprache_row->sprache] != '')
+				/*if ($dok->dokumentbeschreibung_mehrsprachig[$sprache_row->sprache] != '')
 					$beschreibung = '<b>Allgemein</b>: '.cutString($dok->dokumentbeschreibung_mehrsprachig[$sprache_row->sprache], 50, ' [...]').'<br/>';
 				if ($dok_stg->beschreibung_mehrsprachig[$sprache_row->sprache] != '')
-					$beschreibung .= '<span style="color: green"><b>'.$kuerzel.'</b></span>: '.cutString($dok_stg->beschreibung_mehrsprachig[$sprache_row->sprache], 50, ' [...]');	
-					
+					$beschreibung .= '<span style="color: green"><b>'.$kuerzel.'</b></span>: '.cutString($dok_stg->beschreibung_mehrsprachig[$sprache_row->sprache], 50, ' [...]');*/
+
+				if ($dok->dokumentbeschreibung_mehrsprachig[$sprache_row->sprache] != '' || $dok_stg->beschreibung_mehrsprachig[$sprache_row->sprache] != '')
+					$beschreibung = 'Vorhanden';
+
 				echo '<td>'.$beschreibung.'</td>';
 			}
 			if($rechte->isBerechtigt('assistenz', $stg_kz, 'su'))
@@ -673,6 +700,16 @@ else
 	else
 		echo '</form>';
 }
+echo '<div style="font-size: small">*) Statusstufen:<br>
+<ul>
+<li>0 oder leer -> immer sichtbar</li>
+<li>10 -> Interessent</li>
+<li>15 -> Interessent Status bestätigt</li>
+<li>20 -> Bewerber</li>
+<li>30 -> Wartender</li>
+<li>40 -> Aufgenommener</li>
+<li>50 -> Student</li>
+</ul></div>';
 echo '
 </body>
 </html>';
