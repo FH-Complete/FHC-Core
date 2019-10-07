@@ -1341,11 +1341,29 @@ function LeMitarbeiterAuswahl()
         document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-label-vertragsstatus').setAttribute("style", "font-weight: normal");
         document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-button-vertrag-stornieren').setAttribute("tooltiptext",
             "Stornieren erst ab Status 'Angenommen' möglich.");
-        document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-button-vertrag-stornieren').disabled = true;
+        document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-button-vertrag-stornieren').disabled = true
+        document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-menulist-lektor').disabled = false;
+        document.getElementById('lehrveranstaltung-lektor-tree-popup-label').disabled = false;
+        document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-textbox-semesterstunden').disabled= false;
+        document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-textbox-stundensatz').disabled= false;
+        document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-textbox-semesterstunden').setAttribute("tooltiptext", "");
+        document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-textbox-stundensatz').setAttribute("tooltiptext", "");
+        document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-menulist-lektor').setAttribute("tooltiptext", "");
+        document.getElementById('lehrveranstaltung-lektor-tree-popup-label').setAttribute("tooltiptext", "");
 
         // Wenn es einen Vertrag zum Lehrauftrag gibt
         if (vertrag_id != null && vertrag_id != '')
         {
+            // Änderung und Entfernen des Lektors disablen
+            document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-menulist-lektor').disabled = true;
+            document.getElementById('lehrveranstaltung-lektor-tree-popup-label').disabled = true;
+
+            // Tooltip für Blockierung von Aenderung und Entfernen des Lektors
+            document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-menulist-lektor').setAttribute("tooltiptext",
+                "Änderung nur nach Stornierung des Vertrags möglich.");
+            document.getElementById('lehrveranstaltung-lektor-tree-popup-label').setAttribute("tooltiptext",
+                "Änderung nur nach Stornierung des Vertrags möglich.");
+
             // Url zum RDF
             var url = "<?php echo APP_ROOT; ?>rdf/vertrag.rdf.php?"+gettimestamp();
             //
@@ -1409,7 +1427,7 @@ function LeMitarbeiterAuswahl()
             }
 
             // Uppercase status
-            vertragsstatus = vertragsstatus.charAt(0).toUpperCase() + vertragsstatus.slice(1)
+            vertragsstatus = vertragsstatus.charAt(0).toUpperCase() + vertragsstatus.slice(1);
 
             /**
              * Stornierung
@@ -1422,7 +1440,16 @@ function LeMitarbeiterAuswahl()
             {
                 document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-button-vertrag-stornieren').disabled = false;
                 document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-button-vertrag-stornieren').setAttribute("tooltiptext", "");
-                LeMitarbeiterDisableFields(true);
+
+                // Semesterstunden und Stundensatz disablen
+                document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-textbox-semesterstunden').disabled= true;
+                document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-textbox-stundensatz').disabled= true;
+
+                // Tooltip für Semesterstunden und Stundensatz
+                document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-textbox-semesterstunden').setAttribute("tooltiptext",
+                    "Änderung nur nach Stornierung des Vertrags möglich.");
+                document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-textbox-stundensatz').setAttribute("tooltiptext",
+                    "Änderung nur nach Stornierung des Vertrags möglich.");
             }
         }
         // Wenn kein Vertrag vorhanden
@@ -1436,7 +1463,49 @@ function LeMitarbeiterAuswahl()
         document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-label-vertragsstatus').value = vertragsstatus;
         document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-label-vertragsstunden').value = vertragsstunden;
         document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-label-vertragsstunden_studiensemester_kurzbz').value = vertragsstunden_studiensemester_kurzbz;
+        document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-label-vertrag_id').value = vertrag_id;
     }
+}
+
+// ****
+// * Storniert einen Vertrag
+// ****
+function VertragStornieren(){
+
+    var result = confirm("Möchten Sie den Vertrag wirklich stornieren?");
+
+    if (result == true) {
+
+        var vertrag_id = document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-label-vertrag_id').value;
+        var mitarbeiter_uid = document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-menulist-lektor').value;
+
+        // Vertrag stornieren
+        var url_storniert = '<?php echo APP_ROOT ?>content/lvplanung/lehrveranstaltungDBDML.php';
+        var req_storniert = new phpRequest(url_storniert,'','');
+
+        req_storniert.add('type', 'cancelVertrag');
+        req_storniert.add('vertrag_id', vertrag_id);
+        req_storniert.add('mitarbeiter_uid', mitarbeiter_uid);
+
+        var response_storniert = req_storniert.executePOST();
+
+        var val_storniert =  new ParseReturnValue(response_storniert);
+
+        if (!val_storniert.dbdml_return)
+        {
+            if(val_storniert.dbdml_errormsg=='')
+                alert(response_storniert);
+            else
+                alert(val_storniert.dbdml_errormsg);
+        }
+        else
+        {
+            // Reiter wieder aufbauen
+            LeMitarbeiterAuswahl();
+        }
+    }
+
+
 }
 
 // ****
