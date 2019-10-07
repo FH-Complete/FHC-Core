@@ -19,6 +19,7 @@
  *          Andreas Österreicher <andreas.oesterreicher@technikum-wien.at>
  */
 require_once(dirname(__FILE__).'/basis_db.class.php');
+require_once(dirname(__FILE__).'/functions.inc.php');
 
 class vertrag extends basis_db
 {
@@ -1024,6 +1025,38 @@ class vertrag extends basis_db
 		else
 		{
 			$this->errormsg = 'Fehler beim Löschen der Daten';
+			return false;
+		}
+	}
+
+	/**
+	 * Storniert einen Vertrag und seine Verbindungen
+	 * @param $vertrag_id ID des Vertrags
+	 * @param $mitarbeiter_uid
+	 */
+	public function cancel($vertrag_id, $mitarbeiter_uid)
+	{
+		$insertvon = get_uid();
+
+		$qry = "
+			UPDATE lehre.tbl_lehreinheitmitarbeiter SET vertrag_id=null WHERE vertrag_id=".$this->db_add_param($vertrag_id, FHC_INTEGER).";
+			UPDATE lehre.tbl_projektbetreuer SET vertrag_id=null WHERE vertrag_id=".$this->db_add_param($vertrag_id, FHC_INTEGER).";
+			INSERT INTO lehre.tbl_vertrag_vertragsstatus(vertragsstatus_kurzbz, vertrag_id, uid, datum, insertamum, insertvon) 
+				VALUES(".
+					$this->db_qoute('storno'). ", ".
+					$this->db_add_param($vertrag_id, FHC_INTEGER). ", ".
+					$this->db_add_param($mitarbeiter_uid). ", ".
+					$this->db_qoute('NOW()'). ", ".
+					$this->db_qoute('NOW()'). ", ".
+					$this->db_qoute($insertvon). "
+				);
+			";
+
+		if($this->db_query($qry))
+			return true;
+		else
+		{
+			$this->errormsg = 'Fehler beim Stornieren des Vertrags';
 			return false;
 		}
 	}
