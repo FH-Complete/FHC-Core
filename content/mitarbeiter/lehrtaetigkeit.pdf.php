@@ -58,6 +58,7 @@ $person = new Person();
 $person->getPersonFromBenutzer($uid);
 $person_id = $person->person_id;
 $anrede = $person->anrede;
+$gender = $person->geschlecht;
 $fullname = $person->getFullName();
 $birthday_date = new DateTime($person->gebdatum);
 
@@ -237,7 +238,8 @@ $data = array (
 	'begin_date' => !is_null($begin_date) ? $begin_date->format('d.m.Y') : '',
 	'end_date' =>  !is_null($end_date) ? $end_date->format('d.m.Y') : '',	// empty, if lector is still employed
 	'total_ss_actual_semester' => current($semesterstunden_of_actual_semester),	// empty, if lector has no lehreinheit- or projektarbeitsstunden at the actual studiensemester
-	'actual_date' => $actual_date->format('d.m.Y')
+	'actual_date' => $actual_date->format('d.m.Y'),
+	'gender' => $gender
 );
 
 // Put semesterstunden per semester array in correct format for xsl template
