@@ -17,7 +17,8 @@
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
  *		  Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *		  Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ *		  Rudolf Hangl <rudolf.hangl@technikum-wien.at>
+ * 		  Cristina Hainberger <hainberg@technikum-wien.at>.
  */
 
 // ****************************************
@@ -1740,6 +1741,27 @@ if(!$error)
 		else
 		{
 			$errormsg = 'VertragsID muss uebergeben werden';
+			$return = false;
+		}
+	}
+	elseif(isset($_POST['type']) && $_POST['type']=='cancelVertrag')
+	{
+		if(isset($_POST['vertrag_id']) && isset($_POST['mitarbeiter_uid']))
+		{
+			$vertrag = new vertrag();
+			if($vertrag->cancel($_POST['vertrag_id'], $_POST['mitarbeiter_uid']))
+			{
+				$return = true;
+			}
+			else
+			{
+				$errormsg = 'Fehler beim Ausführen des Vertragsstornos';
+				$return = false;
+			}
+		}
+		else
+		{
+			$errormsg = 'VertragsID und MitarbeiterUID müssen uebergeben werden';
 			$return = false;
 		}
 	}
