@@ -81,4 +81,6 @@ $this->phrasen['profil/bildSpeichern']='Bild speichern';
 $this->phrasen['profil/gueltigvon']='Gültig von';
 $this->phrasen['profil/gueltigbis']='Gültig bis';
 $this->phrasen['profil/wochenstunden']='Wochenstunden';
+$this->phrasen['profil/vertragsstunden']='Vertragsstunden';
+$this->phrasen['profil/zukuenftigeFunktionen']='Zukünftige Funktionen';
 ?>

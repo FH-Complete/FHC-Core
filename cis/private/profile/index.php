@@ -156,12 +156,7 @@ echo '<!DOCTYPE HTML>
 
 		$(document).ready(function()
 		{
-			$("#t1").tablesorter(
-			{
-				sortList: [[0,0]],
-				widgets: ["zebra"]
-			});
-			$("#t2").tablesorter(
+			$("#t1, #t2, #tfuture").tablesorter(
 			{
 				sortList: [[0,0]],
 				widgets: ["zebra"]
@@ -504,7 +499,7 @@ echo '<tr>
 if (!defined('CIS_PROFIL_FUNKTIONEN_ANZEIGEN') || CIS_PROFIL_FUNKTIONEN_ANZEIGEN)
 {
 	//Funktionen
-	$qry = "SELECT
+	$baseqry = "SELECT
 				*, tbl_benutzerfunktion.oe_kurzbz as oe_kurzbz, tbl_organisationseinheit.bezeichnung as oe_bezeichnung,
 				 tbl_benutzerfunktion.semester, tbl_benutzerfunktion.bezeichnung as bf_bezeichnung,
        			 tbl_benutzerfunktion.wochenstunden, tbl_benutzerfunktion.datum_von, tbl_benutzerfunktion.datum_bis
@@ -513,15 +508,33 @@ if (!defined('CIS_PROFIL_FUNKTIONEN_ANZEIGEN') || CIS_PROFIL_FUNKTIONEN_ANZEIGEN
 				JOIN public.tbl_funktion USING(funktion_kurzbz)
 				JOIN public.tbl_organisationseinheit USING(oe_kurzbz)
 			WHERE
-				uid=".$db->db_add_param($uid)." AND
-				(tbl_benutzerfunktion.datum_bis is null OR tbl_benutzerfunktion.datum_bis>=now())";
+				uid=".$db->db_add_param($uid);
 
-	if ($result_funktion = $db->db_query($qry))
+	$currfunkqry = $baseqry . " AND ((tbl_benutzerfunktion.datum_bis is null OR tbl_benutzerfunktion.datum_bis>=now())
+	AND (tbl_benutzerfunktion.datum_von is null OR tbl_benutzerfunktion.datum_von<=now()))";
+	$futurefunkqry = $baseqry . " AND (tbl_benutzerfunktion.datum_von>now())";
+
+	printFunctionsTable($currfunkqry, 'profil/funktionen', 't1', true);
+	printFunctionsTable($futurefunkqry, 'profil/zukuenftigeFunktionen', 'tfuture');
+}
+
+/**
+ * Print html table containing user functions.
+ * @param $query string execute for getting data
+ * @param $tableid string html table id
+ * @param $showVertragsstunden bool show Vertragsstunden sum near Wochenstunden sum
+ */
+function printFunctionsTable($query, $headingphrase, $tableid, $showVertragsstunden = false)
+{
+	global $db, $p, $datum_obj, $uid;
+
+	if ($result_funktion = $db->db_query($query))
 	{
 		if ($db->db_num_rows($result_funktion) > 0)
 		{
-			echo '<b>'.$p->t('profil/funktionen').'</b>
-			<table class="tablesorter" id="t1">
+			echo '<b>'.$p->t($headingphrase).'</b>';
+			echo '
+			<table class="tablesorter" id="'.$tableid.'">
 				<thead>
 					<tr>
 						<th>'.$p->t('global/bezeichnung').'</th>
@@ -547,7 +560,7 @@ if (!defined('CIS_PROFIL_FUNKTIONEN_ANZEIGEN') || CIS_PROFIL_FUNKTIONEN_ANZEIGEN
 					<td nowrap>".$row_funktion->organisationseinheittyp_kurzbz.' '.$row_funktion->oe_bezeichnung."</td>
 					<td>".$datum_obj->formatDatum($row_funktion->datum_von,'d.m.Y')."</td>
 					<td>".$datum_obj->formatDatum($row_funktion->datum_bis,'d.m.Y')."</td>
-					<td>".$row_funktion->wochenstunden."</td>
+					<td>".number_format($row_funktion->wochenstunden, 2)."</td>
 				</tr>";
 
 				if(isset($row_funktion->wochenstunden))
@@ -556,18 +569,21 @@ if (!defined('CIS_PROFIL_FUNKTIONEN_ANZEIGEN') || CIS_PROFIL_FUNKTIONEN_ANZEIGEN
 			echo '</tbody><br>';
 
 			//vertragsstunden
-			$vertragsstunden = 0.00;
-			$qry = "SELECT sum(vertragsstunden) AS vertragsstdsumme from bis.tbl_bisverwendung
-					WHERE mitarbeiter_uid = ".$db->db_add_param($uid)."
-					AND (ende > now() OR ende IS NULL)";
-
-			if ($result_vertragsstd = $db->db_query($qry))
+			if ($showVertragsstunden === true)
 			{
-				if ($db->db_num_rows($result_vertragsstd) > 0)
+				$vertragsstunden = 0.00;
+				$qry = "SELECT sum(vertragsstunden) AS vertragsstdsumme from bis.tbl_bisverwendung
+						WHERE mitarbeiter_uid = ".$db->db_add_param($uid)."
+						AND (ende > now() OR ende IS NULL)";
+
+				if ($result_vertragsstd = $db->db_query($qry))
 				{
-					while($row_vertragsstd = $db->db_fetch_object($result_vertragsstd))
+					if ($db->db_num_rows($result_vertragsstd) > 0)
 					{
-						$vertragsstunden = $row_vertragsstd->vertragsstdsumme;
+						while($row_vertragsstd = $db->db_fetch_object($result_vertragsstd))
+						{
+							$vertragsstunden = $row_vertragsstd->vertragsstdsumme;
+						}
 					}
 				}
 			}
@@ -577,13 +593,12 @@ if (!defined('CIS_PROFIL_FUNKTIONEN_ANZEIGEN') || CIS_PROFIL_FUNKTIONEN_ANZEIGEN
 			<tr>
 				<td></td>
 				<td></td>
-				<th colspan ='2'>Summe Wochenstunden (Vertragsstunden)</th>
-				<th style='padding: 4pt 0'>&nbsp;".number_format($wochenstunden_sum,2).
-				"&nbsp;(".number_format($vertragsstunden,2).")</th>
+				<th colspan ='2'>Summe Wochenstunden".($showVertragsstunden === true ? " (".$p->t('profil/vertragsstunden').")" : "")."</th>
+				<th style='padding: 4pt 0'>&nbsp;".number_format($wochenstunden_sum,2).($showVertragsstunden === true ?
+				"&nbsp;(".number_format($vertragsstunden,2).")" : "")."</th>
 			</tr>
 			</tfoot>";
 			echo "</table>";
-
 		}
 	}
 }
