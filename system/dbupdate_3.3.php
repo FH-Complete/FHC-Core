@@ -3110,6 +3110,34 @@ if ($result = @$db->db_query("SELECT 1 FROM system.tbl_webservicetyp WHERE webse
 	}
 }
 
+// insert und update fuer public.tbl_vorlage
+if(!@$db->db_query("SELECT insertamum FROM public.tbl_vorlage LIMIT 1"))
+{
+	$qry = "ALTER TABLE public.tbl_vorlage ADD COLUMN insertamum timestamp;
+			ALTER TABLE public.tbl_vorlage ADD COLUMN insertvon varchar(32);
+			ALTER TABLE public.tbl_vorlage ADD COLUMN updateamum timestamp;
+			ALTER TABLE public.tbl_vorlage ADD COLUMN updatevon varchar(32);";
+
+	if(!$db->db_query($qry))
+		echo '<strong>public.tbl_vorlage: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Neue Spalten insertamum,insertvon,updateamum und updatevon in public.tbl_vorlage hinzugefügt';
+}
+
+// insert und update fuer public.tbl_vorlagestudiengang
+if(!@$db->db_query("SELECT insertamum FROM public.tbl_vorlagestudiengang LIMIT 1"))
+{
+	$qry = "ALTER TABLE public.tbl_vorlagestudiengang ADD COLUMN insertamum timestamp;
+			ALTER TABLE public.tbl_vorlagestudiengang ADD COLUMN insertvon varchar(32);
+			ALTER TABLE public.tbl_vorlagestudiengang ADD COLUMN updateamum timestamp;
+			ALTER TABLE public.tbl_vorlagestudiengang ADD COLUMN updatevon varchar(32);";
+
+	if(!$db->db_query($qry))
+		echo '<strong>public.tbl_vorlagestudiengang: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Neue Spalten insertamum,insertvon,updateamum und updatevon in public.tbl_vorlagestudiengang hinzugefügt';
+}
+
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
 
@@ -3338,10 +3366,9 @@ $tabellen=array(
 	"public.tbl_studiensemester"  => array("studiensemester_kurzbz","bezeichnung","start","ende","studienjahr_kurzbz","ext_id","beschreibung","onlinebewerbung"),
 	"public.tbl_tag"  => array("tag"),
 	"public.tbl_variable"  => array("name","uid","wert"),
-	"public.tbl_variablenname"  => array("name","defaultwert"),
 	"public.tbl_vorlage"  => array("vorlage_kurzbz","bezeichnung","anmerkung","mimetype","attribute","archivierbar","signierbar","stud_selfservice","dokument_kurzbz"),
 	"public.tbl_vorlagedokument"  => array("vorlagedokument_id","sort","vorlagestudiengang_id","dokument_kurzbz"),
-	"public.tbl_vorlagestudiengang"  => array("vorlagestudiengang_id","vorlage_kurzbz","studiengang_kz","version","text","oe_kurzbz","style","berechtigung","anmerkung_vorlagestudiengang","aktiv","sprache","subject","orgform_kurzbz"),
+	"public.tbl_vorlagestudiengang"  => array("vorlagestudiengang_id","vorlage_kurzbz","studiengang_kz","version","text","oe_kurzbz","style","berechtigung","anmerkung_vorlagestudiengang","aktiv","sprache","subject","orgform_kurzbz","insertamum","insertvon","updateamum","updatevon"),
 	"testtool.tbl_ablauf"  => array("ablauf_id","gebiet_id","studiengang_kz","reihung","gewicht","semester", "insertamum","insertvon","updateamum", "updatevon","ablauf_vorgaben_id","studienplan_id"),
 	"testtool.tbl_ablauf_vorgaben"  => array("ablauf_vorgaben_id","studiengang_kz","sprache","sprachwahl","content_id","insertamum","insertvon","updateamum", "updatevon"),
 	"testtool.tbl_antwort"  => array("antwort_id","pruefling_id","vorschlag_id"),
