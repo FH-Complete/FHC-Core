@@ -21,6 +21,7 @@
  */
 
 require_once('../../config/vilesci.config.inc.php');
+require_once('../../config/global.config.inc.php');
 
 ?>
 // *********** Globale Variablen *****************//
@@ -30,6 +31,8 @@ var StudentProjektbetreuerTreeDatasource=null; //Datasource des Projektbetreuer 
 var StudentProjektbetreuerSelectPersonID=null;
 var StudentProjektbetreuerSelectProjektarbeitID=null;
 var StudentProjektbetreuerSelectBetreuerartKurzbz=null;
+vertragsdetails_anzeigen = <?php echo (defined('FAS_STUDIERENDE_PROJEKTARBEIT_VERTRAGSDETAILS_ANZEIGEN') && FAS_STUDIERENDE_PROJEKTARBEIT_VERTRAGSDETAILS_ANZEIGEN) ? true : false ?>;
+
 // ********** Observer und Listener ************* //
 
 // ****
@@ -113,6 +116,32 @@ var StudentProjektbetreuerTreeListener =
 		//noch keine values haben. Ab Seamonkey funktionierts auch
 		//ohne dem setTimeout
 		window.setTimeout(StudentProjektbetreuerTreeSelectID,10);
+
+		if(vertragsdetails_anzeigen)
+        {
+            var mindEinVertragExistiert = StudentProjektbetreuer_VertragExistiert();
+
+            // Wenn für diese Projektarbeit zumindest ein Projektbetreuer einen Vertrag besitzt
+            if (mindEinVertragExistiert === true)
+            {
+                // Entfernen der Bachelorarbeit disablen
+                document.getElementById('student-projektarbeit-button-loeschen').disabled = true;
+
+                // Tooltip setzen
+                document.getElementById('student-projektarbeit-button-loeschen').setAttribute("tooltiptext",
+                    "Projektarbeit kann nurmehr nach Vertragsstorno gelöscht werden.");
+            }
+            else {
+                // Entfernen der Bachelorarbeit enablen
+                document.getElementById('student-projektarbeit-button-loeschen').disabled = false;
+
+                // Tooltip setzen
+                document.getElementById('student-projektarbeit-button-loeschen').setAttribute("tooltiptext",
+                    "");
+
+            }
+        }
+
 	}
 };
 // ****************** FUNKTIONEN ************************** //
@@ -152,6 +181,16 @@ function StudentProjektarbeitTreeLoad(uid)
 	tree.builder.addListener(StudentProjektarbeitTreeListener);
 
 	StudentProjektarbeitDisableFields(false);
+    var vertragsdetails_anzeigen = <?php echo (defined('FAS_STUDIERENDE_PROJEKTARBEIT_VERTRAGSDETAILS_ANZEIGEN') && FAS_STUDIERENDE_PROJEKTARBEIT_VERTRAGSDETAILS_ANZEIGEN) ? true : false ?>;
+
+    // Wenn Vertragsdetails angezeigt werden
+    if (vertragsdetails_anzeigen) {
+        //Reset attributes
+        document.getElementById('student-projektbetreuer-label-vertragsstatus').value = '';
+        document.getElementById('student-projektbetreuer-label-vertragsstunden').value = '';
+        document.getElementById('student-projektbetreuer-label-vertragsstunden_studiensemester_kurzbz').value = '';
+        document.getElementById('student-projektbetreuer-label-vertrag_id').value = '';
+    }
 }
 
 // ****
@@ -181,6 +220,9 @@ function StudentProjektarbeitDisableFields(val)
 {
 	document.getElementById('student-projektarbeit-button-neu').disabled=val;
 	document.getElementById('student-projektarbeit-button-loeschen').disabled=val;
+    // Tooltip setzen
+    document.getElementById('student-projektarbeit-button-loeschen').setAttribute("tooltiptext",
+        "");
 
 	if(val)
 	{
@@ -427,6 +469,8 @@ function StudentProjektarbeitAuswahl()
 	var tree = document.getElementById('student-projektbetreuer-tree');
 	var url='<?php echo APP_ROOT;?>rdf/projektbetreuer.rdf.php?projektarbeit_id='+projektarbeit_id+"&"+gettimestamp();
 
+    StudentProjektbetreuerDisableFields(false);
+
 	try
 	{
 		StudentProjektbetreuerTreeDatasource.removeXMLSinkObserver(StudentProjektbetreuerTreeSinkObserver);
@@ -451,8 +495,12 @@ function StudentProjektarbeitAuswahl()
 	tree.database.AddDataSource(StudentProjektbetreuerTreeDatasource);
 	StudentProjektbetreuerTreeDatasource.addXMLSinkObserver(StudentProjektbetreuerTreeSinkObserver);
 	tree.builder.addListener(StudentProjektbetreuerTreeListener);
-	StudentProjektbetreuerDisableFields(false);
 
+    //Reset attributes
+    document.getElementById('student-projektbetreuer-label-vertragsstatus').value = '';
+    document.getElementById('student-projektbetreuer-label-vertragsstunden').value = '';
+    document.getElementById('student-projektbetreuer-label-vertragsstunden_studiensemester_kurzbz').value = '';
+    document.getElementById('student-projektbetreuer-label-vertrag_id').value = '';
 }
 
 // ****
@@ -752,6 +800,32 @@ function StudentProjektbetreuerTreeSelectID()
 }
 
 // *****
+// * Prüft, ob zu einer Projektarbeit zumindest ein Lektor einen Vertrag besitzt
+// *****
+function StudentProjektbetreuer_VertragExistiert(){
+
+    var tree = document.getElementById('student-projektbetreuer-tree');
+
+    if(tree.view)
+        var items = tree.view.rowCount; //Anzahl der Zeilen ermitteln
+    else
+        return false;
+
+    for(var i = 0;i < items; i++)
+    {
+        //ID der row holen
+        col = tree.columns ? tree.columns["student-projektbetreuer-tree-vertrag_id"] : "student-projektbetreuer-tree-vertrag_id";
+        var vertrag_id = tree.view.getCellText(i,col);
+
+        if(vertrag_id != '')
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+// *****
 // * Bei Auswahl eines Betreuers, wird dieser zum Bearbeiten geladen
 // *****
 function StudentProjektbetreuerAuswahl()
@@ -799,6 +873,7 @@ function StudentProjektbetreuerAuswahl()
 	stundensatz = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#stundensatz" ));
 	betreuerart_kurzbz = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#betreuerart_kurzbz" ));
 	person_nachname = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#person_nachname" ));
+    vertrag_id = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#vertrag_id" ));
 
 	StudentProjektbetreuerMenulistPersonLoad(document.getElementById('student-projektbetreuer-menulist-person'), person_nachname);
 
@@ -814,6 +889,198 @@ function StudentProjektbetreuerAuswahl()
 	document.getElementById('student-projektbetreuer-textbox-betreuerart_kurzbz_old').value=betreuerart_kurzbz;
 	document.getElementById('student-projektbetreuer-textbox-person_id').value=person_id;
 	document.getElementById('student-projektbetreuer-checkbox-neu').checked=false;
+
+    var gesamtkosten = StudentProjektbetreuerGesamtkosten();
+
+    // Prüfe ob Vertragsdetails angezeigt werden
+    var vertragsdetails_anzeigen = <?php echo (defined('FAS_STUDIERENDE_PROJEKTARBEIT_VERTRAGSDETAILS_ANZEIGEN') && FAS_STUDIERENDE_PROJEKTARBEIT_VERTRAGSDETAILS_ANZEIGEN) ? true : false ?>;
+
+    // Wenn Vertragsdetails angezeigt werden
+    if (vertragsdetails_anzeigen) {
+         //Reset attributes
+        document.getElementById('student-projektbetreuer-label-vertragsstatus').setAttribute("style", "font-weight: normal");
+        document.getElementById('student-projektbetreuer-button-vertrag-stornieren').setAttribute("tooltiptext",
+            "Stornieren erst ab Status 'Angenommen' möglich.");
+        document.getElementById('student-projektbetreuer-button-vertrag-stornieren').disabled = true;
+        document.getElementById('student-projektbetreuer-button-loeschen').disabled = false;
+        document.getElementById('student-projektbetreuer-menulist-person').disabled = false;
+        document.getElementById('student-projektbetreuer-textbox-stunden').disabled= false;
+        document.getElementById('student-projektbetreuer-textbox-stundensatz').disabled= false;
+        document.getElementById('student-projektbetreuer-textbox-stunden').setAttribute("tooltiptext", "");
+        document.getElementById('student-projektbetreuer-textbox-stundensatz').setAttribute("tooltiptext", "");
+        document.getElementById('student-projektbetreuer-button-loeschen').setAttribute("tooltiptext", "");
+        document.getElementById('student-projektbetreuer-menulist-person').setAttribute("tooltiptext", "");
+
+        // Wenn es einen Vertrag zum Lehrauftrag gibt
+        if (vertrag_id != null && vertrag_id != '')
+        {
+            // Änderung und Entfernen des Lektors disablen
+            document.getElementById('student-projektbetreuer-button-loeschen').disabled = true;
+            document.getElementById('student-projektbetreuer-menulist-person').disabled = true;
+
+            // Tooltip für Blockierung von Aenderung und Entfernen des Lektors
+            document.getElementById('student-projektbetreuer-button-loeschen').setAttribute("tooltiptext",
+                "Änderung nur nach Stornierung des Vertrags möglich.");
+            document.getElementById('student-projektbetreuer-menulist-person').setAttribute("tooltiptext",
+                "Änderung nur nach Stornierung des Vertrags möglich.");
+
+            // Url zum RDF
+            var url = "<?php echo APP_ROOT; ?>rdf/vertrag.rdf.php?"+gettimestamp();
+
+            ////RDF laden
+            var req = new phpRequest(url, '', '');
+            req.add('vertrag_id', vertrag_id);
+            var response = req.execute();
+
+            // Trick 17	(sonst gibt's ein Permission denied)
+            netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+
+            // XML in Datasource parsen
+            var dsource = parseRDFString(response, 'http://www.technikum-wien.at/vertrag/liste');
+            var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].
+            getService(Components.interfaces.nsIRDFService);
+            var subject = rdfService.GetResource("http://www.technikum-wien.at/vertrag/" + vertrag_id);
+            var predicateNS = "http://www.technikum-wien.at/vertrag/rdf";
+
+            //Daten holen
+            betrag = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#betrag" ));
+            vertragsdatum = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#vertragsdatum" ));
+            vertragsstunden = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#vertragsstunden" ));
+            vertragsstunden_studiensemester_kurzbz = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#vertragsstunden_studiensemester_kurzbz" ));
+
+            // Letzten (aktuellsten) Vertragsstatus laden
+            var url_letzterStatus = '<?php echo APP_ROOT ?>content/lvplanung/lehrveranstaltungDBDML.php';
+            var req_letzterStatus = new phpRequest(url_letzterStatus,'','');
+
+            req_letzterStatus.add('type', 'getLastVertragsstatus');
+            req_letzterStatus.add('vertrag_id', vertrag_id);
+
+
+            var response_letzterStatus = req_letzterStatus.executePOST();
+
+            var val_letzterStatus =  new ParseReturnValue(response_letzterStatus);
+
+            if (!val_letzterStatus.dbdml_return)
+            {
+                if(val_letzterStatus.dbdml_errormsg=='')
+                    alert(response_letzterStatus);
+                else
+                    alert(val_letzterStatus.dbdml_errormsg);
+            }
+            else
+            {
+                var letzterStatus = val_letzterStatus.dbdml_data;
+            }
+
+            // Vertragsstatus setzen
+            // * wenn Gesamtkosten im Lehrauftrag nicht gleich Betrag im Vertrag ist: Status 'geändert' hardcoden
+            if(gesamtkosten != parseFloat(betrag))
+            {
+                vertragsstatus = 'Geändert';
+                document.getElementById('student-projektbetreuer-label-vertragsstatus').setAttribute("style", "font-weight: bold")
+            }
+            // * ansonsten Vertragsstatus zeigen
+            else
+            {
+                vertragsstatus = letzterStatus;
+            }
+
+            // Uppercase status
+            vertragsstatus = vertragsstatus.charAt(0).toUpperCase() + vertragsstatus.slice(1);
+
+            /**
+             * Stornierung
+             * Nur wenn Vertragsstatus 'akzeptiert' ist:
+             * - button Stornierung aktivieren
+             * - tooltip ausblenden
+             * - Felder zur Bearbeitung von LektorInnendaten deaktivieren
+             */
+            if(letzterStatus == 'akzeptiert')
+            {
+                document.getElementById('student-projektbetreuer-button-vertrag-stornieren').disabled = false;
+                document.getElementById('student-projektbetreuer-button-vertrag-stornieren').setAttribute("tooltiptext", "");
+
+                // Semesterstunden und Stundensatz disablen
+                document.getElementById('student-projektbetreuer-textbox-stunden').disabled= true;
+                document.getElementById('student-projektbetreuer-textbox-stundensatz').disabled= true;
+
+                // Tooltip für Semesterstunden und Stundensatz
+                document.getElementById('student-projektbetreuer-textbox-stunden').setAttribute("tooltiptext",
+                    "Änderung nur nach Stornierung des Vertrags möglich.");
+                document.getElementById('student-projektbetreuer-textbox-stundensatz').setAttribute("tooltiptext",
+                    "Änderung nur nach Stornierung des Vertrags möglich.");
+            }
+        }
+        // Wenn kein Vertrag vorhanden
+        else {
+            vertragsstatus = 'Noch kein Vertrag';
+            vertragsstunden = '-';
+            vertragsstunden_studiensemester_kurzbz = '-';
+        }
+
+        // Felder befüllen
+        document.getElementById('student-projektbetreuer-label-vertragsstatus').value = vertragsstatus;
+        document.getElementById('student-projektbetreuer-label-vertragsstunden').value = vertragsstunden;
+        document.getElementById('student-projektbetreuer-label-vertragsstunden_studiensemester_kurzbz').value = vertragsstunden_studiensemester_kurzbz;
+        document.getElementById('student-projektbetreuer-label-vertrag_id').value = vertrag_id;
+    }
+}
+
+// *****
+// * Berechnet die Projektbetreuungskosten
+// *****
+function StudentProjektbetreuerGesamtkosten(){
+    var semesterstunden = document.getElementById('student-projektbetreuer-textbox-stunden').value
+    var stundensatz = document.getElementById('student-projektbetreuer-textbox-stundensatz').value
+
+    if(!isNaN(semesterstunden) && !isNaN(stundensatz))
+        gesamtkosten = semesterstunden*stundensatz;
+    else
+        gesamtkosten = 0;
+
+    return gesamtkosten;
+}
+
+// ****
+// * Storniert einen Vertrag
+// ****
+function StudentProjektbetreuerVertragStornieren(){
+
+    var result = confirm("Möchten Sie den Vertrag wirklich stornieren?");
+
+    if (result == true) {
+
+        var vertrag_id = document.getElementById('student-projektbetreuer-label-vertrag_id').value;
+        var person_id = document.getElementById('student-projektbetreuer-textbox-person_id').value;
+
+        // Vertrag stornieren
+        var url_storniert = '<?php echo APP_ROOT ?>content/lvplanung/lehrveranstaltungDBDML.php';
+        var req_storniert = new phpRequest(url_storniert,'','');
+
+        req_storniert.add('type', 'cancelVertrag');
+        req_storniert.add('vertrag_id', vertrag_id);
+        req_storniert.add('person_id', person_id);
+
+        var response_storniert = req_storniert.executePOST();
+
+        var val_storniert =  new ParseReturnValue(response_storniert);
+
+        if (!val_storniert.dbdml_return)
+        {
+            if(val_storniert.dbdml_errormsg=='')
+                alert(response_storniert);
+            else
+                alert(val_storniert.dbdml_errormsg);
+        }
+        else
+        {
+            // Reiter wieder aufbauen
+            // Kompletten Aufbau, um wieder alle Projektbetreuer zu ermitteln und prüfen zu können,
+            // ob zumindesteiner einen Vertrag besitzt.
+            StudentProjektarbeitAuswahl();
+        }
+    }
+
 }
 
 // *****
