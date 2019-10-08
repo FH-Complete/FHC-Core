@@ -27,6 +27,7 @@ $this->phrasen['profil/alleStudentenVon']='All students from';
 $this->phrasen['profil/kurzbeschreibungFuerOeh']='Brief description for the Austian Student Union candidacy';
 $this->phrasen['profil/solltenDatenNichtStimmen']='If your data is incorrect, please contact the responsible assistant';
 $this->phrasen['profil/esWurdenKeineProfileGefunden']='No profile ore multiple profiles were found for your user account';
+$this->phrasen['profil/keinGueltigesProfil']='Not a valid profile';
 $this->phrasen['profil/adminstration']='Administration';
 $this->phrasen['profil/zustaendigeAssistenz']='Administrative Assistant';
 $this->phrasen['profil/wendenSieSichAn']='Please contact the';

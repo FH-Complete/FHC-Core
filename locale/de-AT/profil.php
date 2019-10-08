@@ -29,6 +29,7 @@ $this->phrasen['profil/alleStudentenVon']='Alle StudentInnen von';
 $this->phrasen['profil/kurzbeschreibungFuerOeh']='Kurzbeschreibung für die ÖH-Kandidatur';
 $this->phrasen['profil/solltenDatenNichtStimmen']='Sollten Ihre Daten nicht stimmen, wenden Sie sich bitte an die zuständige Assistenz';
 $this->phrasen['profil/esWurdenKeineProfileGefunden']='Es wurden keine oder mehrere Profile f&uuml;r Ihren Useraccount gefunden';
+$this->phrasen['profil/keinGueltigesProfil']='Kein gültiges Profil';
 $this->phrasen['profil/adminstration']='Administration';
 $this->phrasen['profil/zustaendigeAssistenz']='zuständige Assistenz';
 $this->phrasen['profil/wendenSieSichAn']='Bitte wenden Sie sich an die';
