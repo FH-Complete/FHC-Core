@@ -69,8 +69,8 @@ function ip_increment($ip = "")
 		    <?php
 			if($is_lector || check_lektor($txtUID))
 			{
-				echo 'Die Notebook registrierung steht nur für Studierende zur Verfügung.<br>
-				Wollen Sie als Mitarbeiter ein Notebook registrieren wenden Sie sich bitte an den <a href="mailto:support@technikum-wien.at">Support</a> ';
+				echo 'Die Notebook Registrierung steht nur für Studierende zur Verfügung.<br>
+				Wollen Sie als Mitarbeiter ein Notebook registrieren, wenden Sie sich bitte an den <a href="mailto:support@technikum-wien.at">Support</a>.';
 				echo '</td></tr></table></div></body></html>';
 				exit;
 			}
