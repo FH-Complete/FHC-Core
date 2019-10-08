@@ -1759,6 +1759,30 @@ if(!$error)
 				$return = false;
 			}
 		}
+		elseif(isset($_POST['vertrag_id']) && isset($_POST['person_id']))
+        {
+            $benutzer = new Benutzer();
+            if($benutzer->getBenutzerFromPerson($_POST['person_id']))
+            {
+                $mitarbeiter_uid = $benutzer->result[0]->uid;
+
+                $vertrag = new vertrag();
+                if($vertrag->cancel($_POST['vertrag_id'], $mitarbeiter_uid))
+                {
+                    $return = true;
+                }
+                else
+                {
+                    $errormsg = 'Fehler beim Ausführen des Vertragsstornos';
+                    $return = false;
+                }
+            }
+            else
+            {
+                $errormsg = 'Benutzer konnte nicht von PersonID geladen werden';
+                $return = false;
+            }
+        }
 		else
 		{
 			$errormsg = 'VertragsID und MitarbeiterUID müssen uebergeben werden';
