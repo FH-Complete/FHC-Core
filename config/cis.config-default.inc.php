@@ -216,6 +216,8 @@ define('CIS_DOKUMENTE_SELFSERVICE', true);
 //**** INFOSCREEN ****
 //Gibt an, ob der Lageplan im Infoterminal angezeigt werden soll.
 define('CIS_INFOSCREEN_LAGEPLAN_ANZEIGEN',true);
+//Gibt an, ob News im Infoterminal angezeigt werden soll.
+define('CIS_INFOSCREEN_NEWS_ANZEIGEN',false);
 
 //User, welcher für das Anlegen von Anrechnungen bei der Prüfungsanmeldung verwendet wird
 define('CIS_PRUEFUNGSANMELDUNG_USER','p.pruefungsanmeldung');
