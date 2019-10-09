@@ -178,7 +178,10 @@ function getPruefungByLv($aktStudiensemester = null, $uid = null)
 			$lveranstaltung = new lehrveranstaltung($lehreinheiten[0]->lehrfach_id);
 			$oe = new organisationseinheit($lveranstaltung->oe_kurzbz);
 			$prf->organisationseinheit = $oe->bezeichnung;
-			array_push($pruefungen, $prf);
+
+			// nur hinzufügen wenn zumindest 1 Termin vorhanden ist
+			if (!empty($prf->pruefung->termine))
+				array_push($pruefungen, $prf);
 			}
 		}
 		$anmeldung = new pruefungsanmeldung();
@@ -265,7 +268,10 @@ function getPruefungByLvFromStudiengang($aktStudiensemester = null, $uid = null)
 		$lveranstaltung = new lehrveranstaltung($lehreinheiten[0]->lehrfach_id);
 		$oe = new organisationseinheit($lveranstaltung->oe_kurzbz);
 		$prf->organisationseinheit = $oe->bezeichnung;
-		array_push($pruefungen, $prf);
+
+		// nur hinzufügen wenn zumindest 1 Termin vorhanden ist
+		if (!empty($prf->pruefung->termine))
+			array_push($pruefungen, $prf);
 		}
 	}
 
@@ -805,7 +811,10 @@ function getAllPruefungen($aktStudiensemester = null, $uid = null)
 		$lveranstaltung = new lehrveranstaltung($lehreinheiten[0]->lehrfach_id);
 		$oe = new organisationseinheit($lveranstaltung->oe_kurzbz);
 		$prf->organisationseinheit = $oe->bezeichnung;
-		array_push($pruefungen, $prf);
+
+		// nur hinzufügen wenn zumindest 1 Termin vorhanden ist
+		if (!empty($prf->pruefung->termine))
+			array_push($pruefungen, $prf);
 		}
 	}
 
