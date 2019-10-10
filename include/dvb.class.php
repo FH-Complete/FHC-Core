@@ -979,7 +979,8 @@ class dvb extends basis_db
 							$bpk = $domnodes_feldinhalt->item(0)->textContent;
 							$retval = new stdClass();
 							$retval->matrikelnummer = $person->matrikelnummer;
-							$retval->bpk = $bpk;
+							if ($bpk != 'keine bPK gefunden')
+								$retval->bpk = $bpk;
 
 							$this->errormsg .= 'ED10065 Response';
 							$this->errormsg .= 'Eine Personendatenprüfung ist erforderlich';
