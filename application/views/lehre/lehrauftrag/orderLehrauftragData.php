@@ -9,6 +9,7 @@ SELECT
     ROW_NUMBER() OVER () AS "row_index",
     lehreinheit_id,
     lehrveranstaltung_id,
+    lv_bezeichnung,
     projektarbeit_id,
     studiensemester_kurzbz,
     semester,
@@ -21,8 +22,15 @@ SELECT
     gruppe,
     lektor,
     stunden,
+    stundensatz,
     betrag,
     vertrag_id,
+    vertrag_stunden,
+    vertrag_betrag,
+    vertrag_insertvon,
+    vertrag_insertamum,
+    vertrag_updatevon,
+    vertrag_updateamum,
     mitarbeiter_uid,
     bestellt,
     erteilt,
@@ -69,6 +77,7 @@ FROM
             SELECT
                 lema.lehreinheit_id,
                 lv.lehrveranstaltung_id,
+                lv.bezeichnung                                      AS "lv_bezeichnung",
                 NULL                                                AS "projektarbeit_id",
                 le.studiensemester_kurzbz,
                 lv.semester,
@@ -85,8 +94,15 @@ FROM
                     END                                             AS "lv_oe_kurzbz",
                 (person.vorname || \' \' || person.nachname)        AS "lektor",
                 TRUNC(lema.semesterstunden, 1)                      AS "stunden",
+                lema.stundensatz,
                 TRUNC((lema.semesterstunden * lema.stundensatz), 2) AS "betrag",
                 vertrag_id,
+                vertragsstunden                                                                     AS "vertrag_stunden",
+                vertrag.betrag                                                                      AS "vertrag_betrag",
+                vertrag.insertvon                                                                   AS "vertrag_insertvon",
+                vertrag.insertamum                                                                  AS "vertrag_insertamum",
+                vertrag.updatevon                                                                   AS "vertrag_updatevon",
+                vertrag.updateamum                                                                  AS "vertrag_updateamum",
                 mitarbeiter_uid
             FROM
                 lehre.tbl_lehreinheitmitarbeiter         lema
@@ -164,6 +180,7 @@ FROM
                 SELECT
                     pa.lehreinheit_id,
                     lv.lehrveranstaltung_id,
+                    lv.bezeichnung                                                                      AS "lv_bezeichnung",
                     pa.projektarbeit_id                                                                 AS "projektarbeit_id",
                     le.studiensemester_kurzbz,
                     lv.semester,
@@ -193,8 +210,15 @@ FROM
                         END                                                                             AS "lv_oe_kurzbz",
                     (vorname || \' \' || nachname)                                                        AS "lektor",
                     TRUNC(pb.stunden, 1)                                                                AS "stunden",
+                    pb.stundensatz,
                     TRUNC((pb.stunden * pb.stundensatz), 2)                                             AS "betrag",
-                    vertrag_id
+                    vertrag_id,
+                    vertragsstunden                                                                     AS "vertrag_stunden",
+                    vertrag.betrag                                                                      AS "vertrag_betrag",
+                    vertrag.insertvon                                                                   AS "vertrag_insertvon",
+                    vertrag.insertamum                                                                  AS "vertrag_insertamum",
+                    vertrag.updatevon                                                                   AS "vertrag_updatevon",
+                    vertrag.updateamum                                                                  AS "vertrag_updateamum"
                 FROM
                     lehre.tbl_projektbetreuer                pb
                         JOIN lehre.tbl_projektarbeit         pa USING (projektarbeit_id)
@@ -218,7 +242,6 @@ FROM
     ) auftraege
 ORDER BY "typ" DESC, "auftrag", "lektor", "bestellt"
 ';
-echo '<pre>', print_r($query, 1), '</pre>';
 $filterWidgetArray = array(
     'query' => $query,
     'app' => Lehrauftrag::APP,
@@ -234,6 +257,7 @@ $filterWidgetArray = array(
         'row_index',
         'LE-ID',
         'LV-ID',
+        'LV',
         'PA-ID',
         'Studiensemester',
         'Semester',
@@ -246,8 +270,15 @@ $filterWidgetArray = array(
         'Gruppe',
         'Lektor',
         'Stunden',
+        'Stundensatz',
         'Betrag',
         'Vertrag-ID',
+        'Vertrag-Stunden',
+        'Vertrag-Betrag',
+        'Vertrag-ErstelltVon',
+        'Vertrag-ErstelltDatum',
+        'Vertrag-UpdateVon',
+        'Vertrag-UpdateDatum',
         'UID',
         'Bestellt',
         'Erteilt',
@@ -299,6 +330,7 @@ $filterWidgetArray = array(
         row_index: {visible:false}, // necessary for row indexing
         lehreinheit_id: {headerFilter:"input", bottomCalc:"count", bottomCalcFormatter:function(cell){return "Anzahl: " + cell.getValue();}},
         lehrveranstaltung_id: {headerFilter:"input"},
+        lv_bezeichnung: {visible: false},
         projektarbeit_id: {visible: false},
         studiensemester_kurzbz: {headerFilter:"input"},
         semester: {visible: false}, 
@@ -310,10 +342,21 @@ $filterWidgetArray = array(
         lv_oe_kurzbz: {headerFilter:"input"},
         gruppe: {headerFilter:"input"},
         lektor: {headerFilter:"input"},
-        stunden: {align:"right", headerFilter:"input", bottomCalc:"sum", bottomCalcParams:{precision:1}}, 
-        betrag: {align:"right",  headerFilter:"input", headerFilterPlaceholder:">=", headerFilterFunc: hf_compareWithFloat,
-            bottomCalc:"sum", bottomCalcParams:{precision:2}, bottomCalcFormatter:"money", bottomCalcFormatterParams:{decimal: ",", thousand: ".", symbol:"€"}},
+        stunden: {align:"right", 
+            headerFilter:"input", headerFilterPlaceholder:">=", headerFilterFunc: hf_compareWithFloat,
+            bottomCalc:"sum", bottomCalcParams:{precision:1}}, 
+        stundensatz: {visible: false},
+        betrag: {align:"right",  
+            headerFilter:"input", headerFilterPlaceholder:">=", headerFilterFunc: hf_compareWithFloat,
+            bottomCalc:"sum", bottomCalcParams:{precision:2}, bottomCalcFormatter:"money", 
+            bottomCalcFormatterParams:{decimal: ",", thousand: ".", symbol:"€"}},
         vertrag_id: {visible: false},
+        vertrag_stunden: {visible: false},
+        vertrag_betrag: {visible: false},
+        vertrag_insertvon: {visible: false},
+        vertrag_insertamaum: {visible: false},
+        vertrag_updatevon: {visible: false},
+        vertrag_updateamum: {visible: false},
         mitarbeiter_uid: {visible: false},
         bestellt: {align:"center", headerFilter:"input", mutator: mut_formatStringDate}, 
         erteilt: {align:"center", headerFilter:"input", mutator: mut_formatStringDate},
