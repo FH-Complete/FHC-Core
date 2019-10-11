@@ -10,6 +10,8 @@ class Vertrag_model extends DB_Model
 		parent::__construct();
 		$this->dbTable = 'lehre.tbl_vertrag';
 		$this->pk = 'vertrag_id';
+
+        $this->load->model('accounting/Vertragvertragsstatus_model', 'VertragvertragsstatusModel');
 	}
 
     /**
@@ -140,6 +142,65 @@ class Vertrag_model extends DB_Model
 
         return $result;
 
+    }
+
+    /**
+     * Updates Vertrag and, if resets vertragsstatus as follows:
+     * - if vertragsstatus 'erteilt': delete status 'erteilt' and update date of status 'bestellt'
+     * - if vertragsstatus 'bestellt': update date of status 'bestellt'
+     * @param $vertrag_obj  Object with vertrag properties vertrag_id, vertragsstunden, betrag.
+     * @param $mitarbeiter_uid
+     */
+    public function updateVertrag($vertrag_obj, $mitarbeiter_uid)
+    {
+        $user = getAuthUID();
+
+        // Start DB transaction
+        $this->db->trans_start(false);
+
+        // Update contract
+        $result = $this->update(
+            $vertrag_obj->vertrag_id,
+            array(
+                'vertragsstunden' => $vertrag_obj->vertragsstunden,
+                'betrag' => $vertrag_obj->betrag,
+                'updateamum' => $this->escape('NOW()'),
+                'updatevon' => $user,
+            )
+        );
+
+        // If last vertragsstatus is 'erteilt', delete the status
+        if (isSuccess($result))
+        {
+            $result = $this->getLastStatus($vertrag_obj->vertrag_id, $mitarbeiter_uid);
+            $lastStatus = getData($result)[0]->vertragsstatus_kurzbz;
+
+            if ($lastStatus == 'erteilt')
+            {
+                $result = $this->VertragvertragsstatusModel->deleteStatus($vertrag_obj->vertrag_id, 'erteilt');
+            }
+        }
+
+        // Update date of status 'bestellt'
+        if (isSuccess($result))
+        {
+            $result =  $this->VertragvertragsstatusModel->updateStatus($vertrag_obj->vertrag_id, 'bestellt');
+        }
+
+        // Transaction complete!
+        $this->db->trans_complete();
+
+        // Check if everything went ok during the transaction
+        if ($this->db->trans_status() === false || isError($result))
+        {
+            $this->db->trans_rollback();
+            return error($result->msg, EXIT_ERROR);
+        }
+        else
+        {
+            $this->db->trans_commit();
+            return success('Contract successfully updated.');
+        }
     }
 
     /**
