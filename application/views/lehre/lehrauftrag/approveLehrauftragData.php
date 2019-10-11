@@ -9,6 +9,7 @@ SELECT
     ROW_NUMBER() OVER () AS "row_index",
     lehreinheit_id,
     lehrveranstaltung_id,
+    lv_bezeichnung,
     projektarbeit_id,
     studiensemester_kurzbz,
     semester,
@@ -69,6 +70,7 @@ FROM
             SELECT
                 lema.lehreinheit_id,
                 lv.lehrveranstaltung_id,
+                lv.bezeichnung                                      AS "lv_bezeichnung",
                 NULL                                                AS "projektarbeit_id",
                 le.studiensemester_kurzbz,
                 lv.semester,
@@ -164,6 +166,7 @@ FROM
                 SELECT
                     pa.lehreinheit_id,
                     lv.lehrveranstaltung_id,
+                    lv.bezeichnung                                                                      AS "lv_bezeichnung",
                     pa.projektarbeit_id                                                                 AS "projektarbeit_id",
                     le.studiensemester_kurzbz,
                     lv.semester,
@@ -231,9 +234,10 @@ $filterWidgetArray = array(
     'hideOptions' => true,
     'hideMenu' => true,
     'columnsAliases' => array(  // TODO: use phrasen
-        'row_index',
+        'Status', // alias for row_index, because row_index is formatted to display the status icons
         'LE-ID',
         'LV-ID',
+        'LV',
         'PA-ID',
         'Studiensemester',
         'Semester',
@@ -259,46 +263,39 @@ $filterWidgetArray = array(
 	    responsiveLayout: "hide",       // hide columns that dont fit on the table    
 	    movableColumns: true,           // allows changing column 
 	    headerFilterPlaceholder: " ",
+	    groupBy:"lehrveranstaltung_id",
+	    groupToggleElement:"header",    //toggle group on click anywhere in the group header
+	    groupHeader: function(value, count, data, group){
+	       return func_groupHeader(data);
+	    },
+        columnCalcs:"both",             // show column calculations at top and bottom of table and in groups
         index: "row_index",             // assign specific column as unique id (important for row indexing)
         selectable: true,               // allow row selection
         selectableRangeMode: "click",   // allow range selection using shift end click on end of range
         selectablePersistence:false,    // deselect previously selected rows when table is filtered, sorted or paginated
-        selectableCheck: function(row)
-        { 
-            // only allow to select bestellte Lehraufträge         
-            return row.getData().bestellt != null && row.getData().erteilt == null;
+        selectableCheck: function(row){ 
+            return func_selectableCheck(row);       
         },      
-        rowUpdated:function(row)
-        {
-                // deselect and disable new selection of updated rows (approvement done)
-                row.deselect();
-                row.getElement().style["pointerEvents"] = "none";      
+        rowUpdated:function(row){
+             func_rowUpdated(row);    
         },
         rowFormatter:function(row)
         {
-            var data = row.getData();
-            
-            // default (white): rows to be approved
-            // green: rows accepted 
-            // grey: all other
-            if(row.getData().bestellt != null && row.getData().erteilt == null)
-            {
-                return;
-            }
-            else if(row.getData().bestellt != null && row.getData().erteilt != null && row.getData().akzeptiert != null)
-            {
-                row.getElement().style["background-color"] = "#d1f1d196";   // green
-            }
-            else
-            {
-                row.getElement().style["background-color"] = "#f5f5f5";     // grey
-            }
-          }
+            func_rowFormatter(row);
+        },
+        renderStarted:function(){
+            func_renderStarted(this);
+        },
+        tableBuilt: function(){
+            func_tableBuilt(this);
+        }
     }', // tabulator properties
     'datasetRepFieldsDefs' => '{
+        // column status is built dynamically in funcTableBuilt(),
         row_index: {visible:false},     // necessary for row indexing
         lehreinheit_id: {headerFilter:"input", bottomCalc:"count", bottomCalcFormatter:function(cell){return "Anzahl: " + cell.getValue();},},
         lehrveranstaltung_id: {headerFilter:"input"},
+        lv_bezeichnung: {visible: false},
         projektarbeit_id: {visible: false},
         studiensemester_kurzbz: {headerFilter:"input"},
         semester: {visible: false}, 

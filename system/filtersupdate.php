@@ -459,6 +459,7 @@ $filters = array(
 				    {"name": "row_index"},
 				    {"name": "lehreinheit_id"},
 				    {"name": "lehrveranstaltung_id"},
+				    {"name": "lv_bezeichnung"},
 				    {"name": "projektarbeit_id"},
 				    {"name": "studiensemester_kurzbz"},
 				    {"name": "semester"},
