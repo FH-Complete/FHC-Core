@@ -375,7 +375,11 @@ class projekt extends basis_db
 					JOIN fue.tbl_projekt USING(projekt_kurzbz)
 				WHERE (beginn<=now() or beginn is null)
 				AND (ende + interval '1 month 1 day' >=now() OR ende is null)
-				AND mitarbeiter_uid=".$this->db_add_param($mitarbeiter_uid);
+				AND
+				(
+					mitarbeiter_uid=".$this->db_add_param($mitarbeiter_uid)." OR
+					student_uid=".$this->db_add_param($mitarbeiter_uid)."
+				)";
 
                 if ($projektphasen == true)
                     $qry .=  "UNION
@@ -387,7 +391,7 @@ class projekt extends basis_db
                                         JOIN fue.tbl_projekt USING (projekt_kurzbz)
                                         JOIN fue.tbl_projekt_ressource USING (projektphase_id)
                                         JOIN fue.tbl_ressource ON (tbl_ressource.ressource_id=tbl_projekt_ressource.ressource_id)
-                                WHERE 
+                                WHERE
                                 (
 									(
 										(tbl_projekt.beginn<=now() or tbl_projekt.beginn is null)
