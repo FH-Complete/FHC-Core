@@ -254,7 +254,7 @@ $filterWidgetArray = array(
     'hideOptions' => true,
     'hideMenu' => true,
     'columnsAliases' => array(  // TODO: use phrasen
-        'row_index',
+        'Status', // alias for row_index, because row_index is formatted to display the status icons
         'LE-ID',
         'LV-ID',
         'LV',
@@ -290,45 +290,40 @@ $filterWidgetArray = array(
 	    responsiveLayout:"hide",        // hide columns that dont fit on the table     
 	    movableColumns: true,           // allows changing column     
 	    headerFilterPlaceholder: " ",
+	    groupBy:"lehrveranstaltung_id",
+	    groupToggleElement:"header",    //toggle group on click anywhere in the group header
+	    groupHeader: function(value, count, data, group){
+	       return func_groupHeader(data);
+	    },
+        columnCalcs:"both",             // show column calculations at top and bottom of table and in groups
 	    index: "row_index",             // assign specific column as unique id (important for row indexing)
         selectable: true,               // allows row selection
         selectableRangeMode: "click",   // allows range selection using shift end click on end of range
         selectablePersistence:false,    // deselect previously selected rows when table is filtered, sorted or paginated
-        selectableCheck: function(row)
-        { 
-            // only allow to select new Lehraufträge 
-            return row.getData().bestellt == null;
+        selectableCheck: function(row){ 
+            return func_selectableCheck(row);
         },
-         rowUpdated:function(row)
-        {
-            // deselect and disable new selection of updated rows (ordering done)
-            row.deselect();
-            row.getElement().style["pointerEvents"] = "none";   
+        rowUpdated:function(row){
+            func_rowUpdated(row); 
         },
-        rowFormatter:function(row)
-        {
-            var data = row.getData();
-            
-            // default (white): rows to be ordered
-            // green: rows accepted
-            // grey: all other
-            if(row.getData().bestellt == null)
-            {
-                return;
-            }
-            else if(row.getData().bestellt != null && row.getData().erteilt != null && row.getData().akzeptiert != null)
-            {
-                row.getElement().style["background-color"] = "#d1f1d196";   // green
-            }
-            else
-            {
-                row.getElement().style["background-color"] = "#f5f5f5";     // grey
-            }
-        } 
+        rowFormatter:function(row){
+            func_rowFormatter(row);
+        },
+        renderStarted:function(){
+            func_renderStarted(this);
+        },
+        renderComplete:function(){
+            func_renderComplete(this);
+        },
+        tableBuilt: function(){
+            func_tableBuilt(this);
+        }
     }', // tabulator properties
     'datasetRepFieldsDefs' => '{
-        row_index: {visible:false}, // necessary for row indexing
-        lehreinheit_id: {headerFilter:"input", bottomCalc:"count", bottomCalcFormatter:function(cell){return "Anzahl: " + cell.getValue();}},
+        // column status is built dynamically in funcTableBuilt()
+        row_index: {visible: false},  
+        lehreinheit_id: {headerFilter:"input", bottomCalc:"count", 
+            bottomCalcFormatter:function(cell){return "Anzahl: " + cell.getValue();}},
         lehrveranstaltung_id: {headerFilter:"input"},
         lv_bezeichnung: {visible: false},
         projektarbeit_id: {visible: false},
