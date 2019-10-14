@@ -25,6 +25,7 @@ SELECT
     stunden,
     betrag,
     vertrag_id,
+    vertrag_betrag,
     mitarbeiter_uid,
     bestellt,
     erteilt,
@@ -89,6 +90,7 @@ FROM
                     TRUNC(lema.semesterstunden, 1)                      AS "stunden",
                     TRUNC((lema.semesterstunden * lema.stundensatz), 2) AS "betrag",
                     vertrag_id,
+                    vertrag.betrag                                      AS "vertrag_betrag",
                     mitarbeiter_uid
                 FROM
                     lehre.tbl_lehreinheitmitarbeiter               lema
@@ -197,7 +199,8 @@ FROM
                         END                                                                             AS "lv_oe_kurzbz",
                     TRUNC(pb.stunden, 1)                                                                AS "stunden",
                     TRUNC((pb.stunden * pb.stundensatz), 2)                                             AS "betrag",
-                    vertrag_id
+                    vertrag_id,
+                    vertrag.betrag                                                                      AS "vertrag_betrag"
                 FROM
                     lehre.tbl_projektbetreuer                      pb
                         JOIN lehre.tbl_projektarbeit               pa USING (projektarbeit_id)
@@ -254,6 +257,7 @@ $filterWidgetArray = array(
         'Stunden',
         'Betrag',
         'Vertrag-ID',
+        'Vertrag-Betrag',
         'UID',
         'Bestellt',
         'Erteilt',
@@ -329,6 +333,7 @@ $filterWidgetArray = array(
             bottomCalc:"sum", bottomCalcParams:{precision:2}, bottomCalcFormatter:"money", bottomCalcFormatterParams:{decimal: ",", thousand: ".", symbol:"€"},
             width: "8%"},
         vertrag_id: {visible: false},
+        vertrag_betrag: {visible: false},
         mitarbeiter_uid: {visible: false},
         bestellt: {align:"center", headerFilter:"input", mutator: mut_formatStringDate}, width: "auto", 
         erteilt: {align:"center", headerFilter:"input", mutator: mut_formatStringDate}, width: "auto",
