@@ -13,12 +13,13 @@ SELECT
     lehrveranstaltung_id,
     projektarbeit_id,
     studiensemester_kurzbz,
-    semester,
     studiengang_kz,
     stg_typ_kurzbz,
+    orgform_kurzbz,
     person_id,
     typ,
     auftrag,
+    semester,
     lv_oe_kurzbz,
     gruppe,
     stunden,
@@ -72,13 +73,14 @@ FROM
                     lv.lehrveranstaltung_id,
                     NULL                                                AS "projektarbeit_id",
                     le.studiensemester_kurzbz,
-                    lv.semester,
                     stg.studiengang_kz,
                     upper(stg.typ || stg.kurzbz)                                AS "stg_typ_kurzbz",
+                    lv.orgform_kurzbz,
                     person.person_id,
                     upper(lv.lehrtyp_kurzbz)                            AS "typ",
-                    (lv.bezeichnung || \' [\' || le.lehrform_kurzbz || \' \' || lv.semester || \'.Semester\' ||
+                    (lv.bezeichnung || \' [\' || le.lehrform_kurzbz ||
                      \']\')                                               AS "auftrag",
+                     lv.semester,
                     CASE
                         WHEN oe.organisationseinheittyp_kurzbz = \'Kompetenzfeld\' THEN (\'KF \' || oe.bezeichnung)
                         WHEN oe.organisationseinheittyp_kurzbz = \'Department\' THEN (\'DEP \' || oe.bezeichnung)
@@ -167,9 +169,9 @@ FROM
                     lv.lehrveranstaltung_id,
                     pa.projektarbeit_id                                                                 AS "projektarbeit_id",
                     le.studiensemester_kurzbz,
-                    lv.semester,
                     stg.studiengang_kz,
                     upper(stg.typ || stg.kurzbz)                                                        AS "stg_typ_kurzbz",
+                    lv.orgform_kurzbz,
                     person.person_id,
                     \'Betreuung\'                                                                       AS "typ",
                     (betreuerart_kurzbz || \' \' ||
@@ -181,7 +183,8 @@ FROM
                       WHERE
                           uid = pa.student_uid
                      )
-                        || \' [\' || projekttyp_kurzbz || \'arbeit\' || \' \' || lv.semester || \'.Semester]\') AS "auftrag",
+                        || \' [\' || projekttyp_kurzbz || \'arbeit]\') AS "auftrag",
+                    lv.semester,
                     CASE
                         WHEN oe.organisationseinheittyp_kurzbz =
                              \'Kompetenzfeld\' THEN (
@@ -239,12 +242,13 @@ $filterWidgetArray = array(
         'LV-ID',
         'PA-ID',
         'Studiensemester',
-        'Semester',
         'Studiengang-KZ',
         'Studiengang',
+        'OrgForm',
         'Person-ID',
         'Typ',
         'Auftrag',
+        'Semester',
         'Organisationseinheit',
         'Gruppe',
         'Stunden',
@@ -311,12 +315,13 @@ $filterWidgetArray = array(
         lehrveranstaltung_id: {headerFilter:"input", width: "5%"},
         projektarbeit_id: {visible: false},
         studiensemester_kurzbz: {visible: false},
-        semester: {visible: false}, 
         studiengang_kz: {visible: false},  
         stg_typ_kurzbz: {headerFilter:"input", width: "5%"},
+        orgform_kurzbz: {headerFilter:"input"},
         person_id: {visible: false},
         typ: {headerFilter:"input", width: "7%"},
         auftrag: {headerFilter:"input", width: "23%"},
+        semester: {headerFilter:"input"}, 
         lv_oe_kurzbz: {headerFilter:"input", width: "12%"},
         gruppe: {headerFilter:"input", width: "5%"},
         stunden: {align:"right", headerFilter:"input", bottomCalc:"sum", bottomCalcParams:{precision:1}, width: "5%"}, 

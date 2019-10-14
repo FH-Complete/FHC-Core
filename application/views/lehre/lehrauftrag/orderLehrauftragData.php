@@ -12,12 +12,13 @@ SELECT
     lv_bezeichnung,
     projektarbeit_id,
     studiensemester_kurzbz,
-    semester,
     studiengang_kz,
     stg_typ_kurzbz,
+    orgform_kurzbz,
     person_id,
     typ,
     auftrag,
+    semester,
     lv_oe_kurzbz,
     gruppe,
     lektor,
@@ -80,13 +81,14 @@ FROM
                 lv.bezeichnung                                      AS "lv_bezeichnung",
                 NULL                                                AS "projektarbeit_id",
                 le.studiensemester_kurzbz,
-                lv.semester,
                 stg.studiengang_kz,
                 upper(stg.typ || stg.kurzbz)                        AS "stg_typ_kurzbz",
+                lv.orgform_kurzbz,
                 person.person_id,
                 upper(lv.lehrtyp_kurzbz)                            AS "typ",
-                (lv.bezeichnung || \' [\' || le.lehrform_kurzbz || \' \' || lv.semester || \'.Semester\' ||
+                (lv.bezeichnung || \' [\' || le.lehrform_kurzbz ||
                  \']\')                                             AS "auftrag",
+                lv.semester,
                 CASE
                     WHEN oe.organisationseinheittyp_kurzbz = \'Kompetenzfeld\' THEN (\'KF \' || oe.bezeichnung)
                     WHEN oe.organisationseinheittyp_kurzbz = \'Department\' THEN (\'DEP \' || oe.bezeichnung)
@@ -183,9 +185,9 @@ FROM
                     lv.bezeichnung                                                                      AS "lv_bezeichnung",
                     pa.projektarbeit_id                                                                 AS "projektarbeit_id",
                     le.studiensemester_kurzbz,
-                    lv.semester,
                     stg.studiengang_kz,
                     upper(stg.typ || stg.kurzbz)                                                        AS "stg_typ_kurzbz",
+                    lv.orgform_kurzbz,
                     person.person_id,
                     \'Betreuung\'                                                                         AS "typ",
                     (betreuerart_kurzbz || \' \' ||
@@ -197,7 +199,8 @@ FROM
                       WHERE
                           uid = pa.student_uid
                      )
-                        || \' [\' || projekttyp_kurzbz || \'arbeit\' || \' \' || lv.semester || \'.Semester]\') AS "auftrag",
+                        || \' [\' || projekttyp_kurzbz || \'arbeit]\') AS "auftrag",
+                    lv.semester,
                     CASE
                         WHEN oe.organisationseinheittyp_kurzbz =
                              \'Kompetenzfeld\' THEN (
@@ -208,7 +211,7 @@ FROM
                         ELSE (oe.organisationseinheittyp_kurzbz ||
                               \' \' || oe.bezeichnung)
                         END                                                                             AS "lv_oe_kurzbz",
-                    (vorname || \' \' || nachname)                                                        AS "lektor",
+                    (vorname || \' \' || nachname)                                                      AS "lektor",
                     TRUNC(pb.stunden, 1)                                                                AS "stunden",
                     pb.stundensatz,
                     TRUNC((pb.stunden * pb.stundensatz), 2)                                             AS "betrag",
@@ -260,12 +263,13 @@ $filterWidgetArray = array(
         'LV',
         'PA-ID',
         'Studiensemester',
-        'Semester',
         'Studiengang-KZ',
         'Studiengang',
+        'OrgForm',
         'Person-ID',
         'Typ',
         'Auftrag',
+        'Semester',
         'Organisationseinheit',
         'Gruppe',
         'Lektor',
@@ -328,12 +332,13 @@ $filterWidgetArray = array(
         lv_bezeichnung: {visible: false},
         projektarbeit_id: {visible: false},
         studiensemester_kurzbz: {headerFilter:"input"},
-        semester: {visible: false}, 
         studiengang_kz: {visible: false},  
         stg_typ_kurzbz: {visible: false}, 
+        orgform_kurzbz: {headerFilter:"input"},
         person_id: {visible: false},
         typ: {headerFilter:"input"},
         auftrag: {headerFilter:"input", width:"20%"},
+        semester: {headerFilter:"input"}, 
         lv_oe_kurzbz: {headerFilter:"input"},
         gruppe: {headerFilter:"input"},
         lektor: {headerFilter:"input"},
