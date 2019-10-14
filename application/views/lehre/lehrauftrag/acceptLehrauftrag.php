@@ -16,7 +16,7 @@ $this->load->view(
         'filterwidget' => true,
         'navigationwidget' => true,
         'phrases' => array(
-            'global' => array('lehrauftraege'),
+            'global' => array('lehrauftraegeAnnehmen'),
         ),
        // 'customCSSs' => 'public/css/sbadmin2/tablesort_bootstrap.css',
         'customJSs' => array('public/js/bootstrapper.js')
@@ -31,7 +31,7 @@ $this->load->view(
         <div class="row">
             <div class="col-lg-12">
                 <h3 class="page-header">
-                    <?php echo ucfirst($this->p->t('global', 'lehrauftraege')); ?>
+                    <?php echo ucfirst($this->p->t('global', 'lehrauftraegeAnnehmen')); ?>
                 </h3>
             </div>
         </div>

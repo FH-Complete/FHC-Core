@@ -3454,18 +3454,58 @@ $phrases = array(
     array(
         'app' => 'core',
         'category' => 'global',
-        'phrase' => 'lehrauftraege',
+        'phrase' => 'lehrauftraegeBestellen',
         'insertvon' => 'system',
         'phrases' => array(
             array(
                 'sprache' => 'German',
-                'text' => 'Lehraufträge',
+                'text' => 'Lehraufträge bestellen',
                 'description' => '',
                 'insertvon' => 'system'
             ),
             array(
                 'sprache' => 'English',
-                'text' => 'Lectureships',
+                'text' => 'Order lectureships',
+                'description' => '',
+                'insertvon' => 'system'
+            )
+        )
+    ),
+    array(
+        'app' => 'core',
+        'category' => 'global',
+        'phrase' => 'lehrauftraegeErteilen',
+        'insertvon' => 'system',
+        'phrases' => array(
+            array(
+                'sprache' => 'German',
+                'text' => 'Lehraufträge erteilen',
+                'description' => '',
+                'insertvon' => 'system'
+            ),
+            array(
+                'sprache' => 'English',
+                'text' => 'Approve lectureships',
+                'description' => '',
+                'insertvon' => 'system'
+            )
+        )
+    ),
+    array(
+        'app' => 'core',
+        'category' => 'global',
+        'phrase' => 'lehrauftraegeAnnehmen',
+        'insertvon' => 'system',
+        'phrases' => array(
+            array(
+                'sprache' => 'German',
+                'text' => 'Lehraufträge annehmen',
+                'description' => '',
+                'insertvon' => 'system'
+            ),
+            array(
+                'sprache' => 'English',
+                'text' => 'Accept lectureships',
                 'description' => '',
                 'insertvon' => 'system'
             )
