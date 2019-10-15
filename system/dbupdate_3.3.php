@@ -3080,6 +3080,12 @@ if(!$result = @$db->db_query("SELECT 1 FROM bis.tbl_aufenthaltfoerderung LIMIT 1
 
 		ALTER TABLE bis.tbl_bisio_aufenthaltfoerderung ADD CONSTRAINT fk_tbl_bisio_aufenthaltfoerderung_bisio FOREIGN KEY (bisio_id) REFERENCES bis.tbl_bisio (bisio_id) ON DELETE CASCADE ON UPDATE CASCADE;
 		ALTER TABLE bis.tbl_bisio_aufenthaltfoerderung ADD CONSTRAINT fk_tbl_bisio_aufenthaltfoerderung_aufenthaltfoerderung FOREIGN KEY (aufenthaltfoerderung_code) REFERENCES bis.tbl_aufenthaltfoerderung (aufenthaltfoerderung_code) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+		GRANT SELECT, UPDATE, INSERT, DELETE ON TABLE bis.tbl_aufenthaltfoerderung TO web;
+		GRANT SELECT, UPDATE, INSERT, DELETE ON TABLE bis.tbl_aufenthaltfoerderung TO vilesci;
+
+		GRANT SELECT, UPDATE, INSERT, DELETE ON TABLE bis.tbl_bisio_aufenthaltfoerderung TO web;
+		GRANT SELECT, UPDATE, INSERT, DELETE ON TABLE bis.tbl_bisio_aufenthaltfoerderung TO vilesci;
 	";
 
 	if(!$db->db_query($qry))
@@ -3087,20 +3093,6 @@ if(!$result = @$db->db_query("SELECT 1 FROM bis.tbl_aufenthaltfoerderung LIMIT 1
 	else
 		echo '<br>bis.tbl_aufenthaltfoerderung hinzugefügt, Tabelle bis.tbl_bisio_aufenthaltfoerderung hinzugefuegt';
 }
-
-// GRANT SELECT, UPDATE, INSERT, DELETE ON TABLE bis.tbl_aufenthaltfoerderung TO web;
-$qry = 'GRANT SELECT, UPDATE, INSERT, DELETE ON TABLE bis.tbl_aufenthaltfoerderung TO web;';
-if (!$db->db_query($qry))
-	echo '<strong>bis.tbl_aufenthaltfoerderung ' . $db->db_last_error() . '</strong><br>';
-else
-	echo '<br>Granted privileges to <strong>web</strong> on bis.tbl_aufenthaltfoerderung';
-
-// GRANT SELECT, UPDATE, INSERT, DELETE ON TABLE bis.tbl_aufenthaltfoerderung TO vilesci;
-$qry = 'GRANT SELECT, UPDATE, INSERT, DELETE ON TABLE bis.tbl_aufenthaltfoerderung TO vilesci;';
-if (!$db->db_query($qry))
-	echo '<strong>bis.tbl_aufenthaltfoerderung ' . $db->db_last_error() . '</strong><br>';
-else
-	echo '<br>Granted privileges to <strong>vilesci</strong> on bis.tbl_aufenthaltfoerderung';
 
 // Add table bis.tbl_bisio_zweck
 if(!$result = @$db->db_query("SELECT 1 FROM bis.tbl_bisio_zweck LIMIT 1"))
@@ -3119,6 +3111,9 @@ if(!$result = @$db->db_query("SELECT 1 FROM bis.tbl_bisio_zweck LIMIT 1"))
 
 		INSERT INTO bis.tbl_bisio_zweck(bisio_id, zweck_code) SELECT bisio_id, zweck_code FROM bis.tbl_bisio WHERE zweck_code is not null;
 		COMMENT ON COLUMN bis.tbl_bisio.zweck_code IS 'DEPRECATED';
+
+		GRANT SELECT, UPDATE, INSERT, DELETE ON TABLE bis.tbl_bisio_zweck TO web;
+		GRANT SELECT, UPDATE, INSERT, DELETE ON TABLE bis.tbl_bisio_zweck TO vilesci;
 	";
 
 	if(!$db->db_query($qry))
@@ -3126,20 +3121,6 @@ if(!$result = @$db->db_query("SELECT 1 FROM bis.tbl_bisio_zweck LIMIT 1"))
 	else
 		echo '<br>bis.tbl_bisio_zweck hinzugefuegt, Spalte bis.tbl_bisio.zweck_code als DEPRECATED markiert.';
 }
-
-// GRANT SELECT, UPDATE, INSERT, DELETE ON TABLE bis.tbl_bisio_zweck TO web;
-$qry = 'GRANT SELECT, UPDATE, INSERT, DELETE ON TABLE bis.tbl_bisio_zweck TO web;';
-if (!$db->db_query($qry))
-	echo '<strong>bis.tbl_bisio_zweck ' . $db->db_last_error() . '</strong><br>';
-else
-	echo '<br>Granted privileges to <strong>web</strong> on bis.tbl_bisio_zweck';
-
-// GRANT SELECT, UPDATE, INSERT, DELETE ON TABLE bis.tbl_bisio_zweck TO vilesci;
-$qry = 'GRANT SELECT, UPDATE, INSERT, DELETE ON TABLE bis.tbl_bisio_zweck TO vilesci;';
-if (!$db->db_query($qry))
-	echo '<strong>bis.tbl_bisio_zweck ' . $db->db_last_error() . '</strong><br>';
-else
-	echo '<br>Granted privileges to <strong>vilesci</strong> on bis.tbl_bisio_zweck';
 
 // Add Column incoming and outgoing to bis.tbl_zweck
 // change Datatype of bis.tbl_zweck.bezeichnung from varchar(32) to varchar(64)
