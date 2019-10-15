@@ -2,6 +2,7 @@
 
 $STUDIENSEMESTER = $studiensemester_selected;
 $STUDIENGANG = (isset($studiengang_selected) && !is_null($studiengang_selected)) ? array($studiengang_selected) : $studiengang;
+$AUSBILDUNGSSEMESTER = (isset($ausbildungssemester_selected) && !is_null($ausbildungssemester_selected)) ? $ausbildungssemester_selected : '1,2,3,4,5,6,7,8';
 
 $query = '
 SELECT
@@ -126,6 +127,8 @@ FROM
               AND lv.aktiv = TRUE
                 /* filter active organisationseinheiten */
               AND oe.aktiv = TRUE
+                /* filter ausbildungssemester */
+              AND lv.semester IN  ('. $AUSBILDUNGSSEMESTER . ')
                 /* filter dummies and invalid mitarbeiter */
               AND ma.personalnummer >= 0
         ) tmp_lehrauftraege
@@ -239,6 +242,8 @@ FROM
                   AND le.studiensemester_kurzbz =  \''. $STUDIENSEMESTER. '\'
                     /* filter active lehrveranstaltungen */
                   AND lv.aktiv = TRUE
+                    /* filter ausbildungssemester */
+                  AND lv.semester IN  ('. $AUSBILDUNGSSEMESTER . ')
                     /* filter active organisationseinheiten */
                   AND oe.aktiv = TRUE
             ) tmp_projektbetreuung

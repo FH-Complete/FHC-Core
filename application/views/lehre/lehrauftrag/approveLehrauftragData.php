@@ -2,6 +2,7 @@
 
 $STUDIENSEMESTER = $studiensemester_selected;
 $ORGANISATIONSEINHEIT = (isset($organisationseinheit_selected) && !is_null($organisationseinheit_selected)) ? array($organisationseinheit_selected) : $organisationseinheit;
+$AUSBILDUNGSSEMESTER = (isset($ausbildungssemester_selected) && !is_null($ausbildungssemester_selected)) ? $ausbildungssemester_selected : '1,2,3,4,5,6,7,8';
 
 $query = '
 SELECT
@@ -134,6 +135,8 @@ FROM
               AND lv.aktiv = TRUE
                 /* filter active organisationseinheiten */
               AND oe.aktiv = TRUE
+                /* filter ausbildungssemester */
+              AND lv.semester IN  ('. $AUSBILDUNGSSEMESTER . ')
                 /* filter dummies and invalid mitarbeiter */
               AND ma.personalnummer >= 0
         ) tmp_lehrauftraege
@@ -247,6 +250,8 @@ FROM
                   AND lv.aktiv = TRUE
                     /* filter active organisationseinheiten */
                   AND oe.aktiv = TRUE
+                    /* filter ausbildungssemester */
+                  AND lv.semester IN  ('. $AUSBILDUNGSSEMESTER . ')
             ) tmp_projektbetreuung
     ) auftraege
 ORDER BY "typ" DESC, "auftrag", "lektor", "bestellt", "erteilt"
