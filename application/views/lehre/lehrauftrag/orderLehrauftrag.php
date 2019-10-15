@@ -69,6 +69,21 @@ $this->load->view(
                         );
                         ?>
                     </div>
+                    <div class="form-group">
+                        <?php
+                        echo $this->widgetlib->widget(
+                            'Ausbildungssemester_widget',
+                            array(
+                                DropdownWidget::SELECTED_ELEMENT => $ausbildungssemester_selected,
+                                'number_semester' => 6
+                            ),
+                            array(
+                                'name' => 'ausbildungssemester',
+                                'id' => 'ausbildungssemester'
+                            )
+                        );
+                        ?>
+                    </div>
                     <button type="submit" name="submit" value="anzeigen" class="btn btn-default form-group">Anzeigen</button>
                 </form>
             </div>
