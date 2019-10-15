@@ -29,6 +29,7 @@ header("Pragma: no-cache");
 header("Content-type: application/xhtml+xml");
 require_once('../config/vilesci.config.inc.php');
 require_once('../include/basis_db.class.php');
+require_once('../include/bisio.class.php');
 
 echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 
@@ -41,13 +42,25 @@ echo '
 >
    <RDF:Seq about="'.$rdf_url.'/liste">';
 
-$qry = 'SELECT * FROM bis.tbl_zweck ORDER BY kurzbz';
 $db = new basis_db();
-
-if($db->db_query($qry))
+$bisio = new bisio();
+if(isset($_GET['bisio_id']))
 {
-	while($row = $db->db_fetch_object())
-	{
+	$bisio->getZweck($_GET['bisio_id']);
+}
+else
+{
+	$incoming = null;
+	$outgoing = null;
+	if (isset($_GET['type']) && $_GET['type'] == 'incoming')
+		$incoming = true;
+	if (isset($_GET['type']) && $_GET['type'] == 'outgoing')
+		$outgoing = true;
+	$bisio->getZweck(null, $outgoing, $incoming);
+}
+
+foreach($bisio->result as $row)
+{
 		echo '
 		      <RDF:li>
 		         <RDF:Description  id="'.$row->zweck_code.'"  about="'.$rdf_url.'/'.$row->zweck_code.'" >
@@ -56,7 +69,6 @@ if($db->db_query($qry))
 		            <ZWECK:bezeichnung><![CDATA['.$row->bezeichnung.']]></ZWECK:bezeichnung>
 		         </RDF:Description>
 		      </RDF:li>';
-	}
 }
 ?>
    </RDF:Seq>
