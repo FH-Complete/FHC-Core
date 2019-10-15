@@ -90,10 +90,15 @@ class LehrauftragErteilen extends Auth_Controller
             }
         }
 
+        // Set ausbildungssemester selected for ausbildungssemester dropdown
+        $ausbildungssemester = $this->input->get('ausbildungssemester'); // if provided by selected ausbildungssemester
+        $ausbildungssemester = ($ausbildungssemester == 'null' ? null : $ausbildungssemester);
+
         $view_data = array(
             'organisationseinheit_selected' => $oe_kurzbz,
             'organisationseinheit' => $oe_kurzbz_arr,
-            'studiensemester_selected' => $studiensemester_kurzbz
+            'studiensemester_selected' => $studiensemester_kurzbz,
+            'ausbildungssemester_selected' => $ausbildungssemester,
         );
 
         $this->load->view('lehre/lehrauftrag/approveLehrauftrag.php', $view_data);

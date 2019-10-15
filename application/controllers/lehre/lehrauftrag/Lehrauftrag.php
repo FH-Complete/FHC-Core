@@ -89,10 +89,15 @@ class Lehrauftrag extends Auth_Controller
             }
         }
 
+        // Set ausbildungssemester selected for ausbildungssemester dropdown
+        $ausbildungssemester = $this->input->get('ausbildungssemester'); // if provided by selected ausbildungssemester
+        $ausbildungssemester = ($ausbildungssemester == 'null' ? null : $ausbildungssemester);
+
         $view_data = array(
             'studiengang_selected' => $studiengang_kz,
             'studiengang' => $studiengang_kz_arr,
-            'studiensemester_selected' => $studiensemester_kurzbz
+            'studiensemester_selected' => $studiensemester_kurzbz,
+            'ausbildungssemester_selected' => $ausbildungssemester,
         );
 
         $this->load->view('lehre/lehrauftrag/orderLehrauftrag.php', $view_data);
