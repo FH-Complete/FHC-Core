@@ -119,13 +119,18 @@ function _getMessages(getMessagesURL)
 
 				if (FHC_AjaxClient.hasData(data))
 				{
-					try
+					var messages = FHC_AjaxClient.getData(data);
+
+					if ($.isArray(messages))
 					{
-						tableMessageLst.replaceData(JSON.parse(FHC_AjaxClient.getData(data)));
-					}
-					catch (syntaxError)
-					{
-						readMessagesGenericError();
+						try
+						{
+							tableMessageLst.replaceData(JSON.parse());
+						}
+						catch (syntaxError)
+						{
+							readMessagesGenericError();
+						}
 					}
 				}
 			},
@@ -155,7 +160,6 @@ $(document).ready(function () {
 	// Tabulator initialization
 	tableMessageLst = new Tabulator("#lstMessagesPanel", {
 		height: "400px",
-		pagination: "local",
 		layout: "fitColumns",
 		layoutColumnsOnNewData: true,
 		columns: [
