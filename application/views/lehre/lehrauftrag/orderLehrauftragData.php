@@ -8,6 +8,7 @@ $query = '
 SELECT
     /* provide extra row index for tabulator, because no other column has unique ids */
     ROW_NUMBER() OVER () AS "row_index",
+    personalnummer,
     lehreinheit_id,
     lehrveranstaltung_id,
     lv_bezeichnung,
@@ -77,6 +78,8 @@ FROM
     FROM
         (
             SELECT
+                /* lehrauftraege also planned with dummies, therefore personalnummer is needed */
+                ma.personalnummer,
                 lema.lehreinheit_id,
                 lv.lehrveranstaltung_id,
                 lv.bezeichnung                                      AS "lv_bezeichnung",
@@ -129,8 +132,6 @@ FROM
               AND oe.aktiv = TRUE
                 /* filter ausbildungssemester */
               AND lv.semester IN  ('. $AUSBILDUNGSSEMESTER . ')
-                /* filter dummies and invalid mitarbeiter */
-              AND ma.personalnummer >= 0
         ) tmp_lehrauftraege
 
         UNION
@@ -183,6 +184,8 @@ FROM
         FROM
             (
                 SELECT
+                    /* projektbetreuung does not plan with dummies, therefore no need to retrieve personalnummer */
+                    NULL                                                                                AS personalnummer,
                     pa.lehreinheit_id,
                     lv.lehrveranstaltung_id,
                     lv.bezeichnung                                                                      AS "lv_bezeichnung",
@@ -192,7 +195,7 @@ FROM
                     upper(stg.typ || stg.kurzbz)                                                        AS "stg_typ_kurzbz",
                     lv.orgform_kurzbz,
                     person.person_id,
-                    \'Betreuung\'                                                                         AS "typ",
+                    \'Betreuung\'                                                                       AS "typ",
                     (betreuerart_kurzbz || \' \' ||
                      (SELECT
                           vorname || \' \' || nachname
@@ -248,7 +251,7 @@ FROM
                   AND oe.aktiv = TRUE
             ) tmp_projektbetreuung
     ) auftraege
-ORDER BY "typ" DESC, "auftrag", "lektor", "bestellt"
+ORDER BY "typ" DESC, "auftrag", "personalnummer" DESC, "lektor", "bestellt"
 ';
 $filterWidgetArray = array(
     'query' => $query,
@@ -263,6 +266,7 @@ $filterWidgetArray = array(
     'hideMenu' => true,
     'columnsAliases' => array(  // TODO: use phrasen
         'Status', // alias for row_index, because row_index is formatted to display the status icons
+        'Personalnummer',
         'LE-ID',
         'LV-ID',
         'LV',
@@ -330,7 +334,8 @@ $filterWidgetArray = array(
     }', // tabulator properties
     'datasetRepFieldsDefs' => '{
         // column status is built dynamically in funcTableBuilt()
-        row_index: {visible: false},  
+        row_index: {visible: false},
+        personalnummer: {visible: false},   
         lehreinheit_id: {headerFilter:"input", bottomCalc:"count", 
             bottomCalcFormatter:function(cell){return "Anzahl: " + cell.getValue();}},
         lehrveranstaltung_id: {headerFilter:"input"},
