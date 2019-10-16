@@ -105,6 +105,7 @@ $this->load->view(
                 <button id="show-ordered" class="btn btn-default" data-toggle="tooltip" data-placement="left" title="Nur bestellte anzeigen"><i class='fa fa-check-square-o'></i></button>
                 <button id="show-approved" class="btn btn-default" data-toggle="tooltip" data-placement="left" title="Nur erteilte anzeigen"><i class='fa fa-check-square'></i></button>
                 <button id="show-accepted" class="btn btn-default" data-toggle="tooltip" data-placement="left" title="Nur akzeptierte anzeigen"><i class='fa fa-handshake-o'></i></button>
+                <button id="show-changed" class="btn btn-default" data-toggle="tooltip" data-placement="left" title="Nur geänderte anzeigen"><i class='fa fa-pencil'></i></button>
                 <button id="show-dummies" class="btn btn-default" data-toggle="tooltip" data-placement="left" title="Nur verplante ohne Lektor anzeigen (Dummies)"><i class='fa fa-user-secret'></i></button>
             </div>
         </div>
@@ -146,6 +147,19 @@ $this->load->view(
         //filterParams - params object passed to the headerFilterFuncParams property
 
         return parseFloat(headerValue) <= parseFloat(rowValue); //must return a boolean, true if it passes the filter.
+    }
+
+    // -----------------------------------------------------------------------------------------------------------------
+    // Custom filters
+    // -----------------------------------------------------------------------------------------------------------------
+
+    // Filters geaenderte
+    function filter_showChanged(data){
+
+        // Filters geaenderte from status bestellt on
+        return  data.personalnummer > 0 &&          // NOT dummy lector AND
+                data.bestellt != null &&            // bestellt AND
+                data.betrag != data.vertrag_betrag; // geaendert
     }
 
     // -----------------------------------------------------------------------------------------------------------------
@@ -429,6 +443,12 @@ $(function() {
                 {field: 'akzeptiert', type: '!=', value: null}
             ]
         );
+    });
+
+    // Show only rows with dummy lectors
+    $("#show-changed").click(function(){
+        // needs custom filter to compare fields betrag and vertrag_betrag
+        $('#filterTabulator').tabulator('setFilter', filter_showChanged);
     });
 
     // Show only rows with dummy lectors
