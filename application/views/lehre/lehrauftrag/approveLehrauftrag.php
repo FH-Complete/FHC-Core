@@ -157,6 +157,9 @@ $this->load->view(
 
     // Formats the rows
     function func_rowFormatter(row){
+        var bestellt = row.getData().bestellt;
+        var betrag = parseFloat(row.getData().betrag);
+        var vertrag_betrag = parseFloat(row.getData().vertrag_betrag);
         /*
         Formats the color of the rows depending on their status
         - default (white): bestellte
@@ -164,8 +167,11 @@ $this->load->view(
         - grey: all other (marks unselectable)
          */
         row.getCells().forEach(function(cell){
-
-            if(row.getData().bestellt != null && row.getData().erteilt == null)
+            if (bestellt != null && (betrag != vertrag_betrag)  && !row._row.element.classList.contains('tabulator-calcs')) // exclude calculation rows
+            {
+                row._row.getElement().style['font-weight'] = 'bold';
+            }
+            else if(row.getData().bestellt != null && row.getData().erteilt == null)
             {
                 return;                                                         // bestellt
             }
@@ -182,9 +188,13 @@ $this->load->view(
 
     // Formats row selectable/unselectable
     function func_selectableCheck(row){
+        var betrag = parseFloat(row.getData().betrag);
+        var vertrag_betrag = parseFloat(row.getData().vertrag_betrag);
+
         // only allow to select bestellte Lehraufträge
-        return  row.getData().bestellt != null &&  // nicht neue
-                row.getData().erteilt == null; // bestellt
+        return  row.getData().bestellt != null &&   // nicht neue
+                row.getData().erteilt == null &&    // AND bestellt
+                betrag == vertrag_betrag;           // AND nicht geändert
     }
 
     // Adds column status
@@ -259,8 +269,16 @@ $this->load->view(
         var erteilt = cell.getRow().getData().erteilt;
         var akzeptiert = cell.getRow().getData().akzeptiert;
 
+        var betrag = parseFloat(cell.getRow().getData().betrag);
+        var vertrag_betrag = parseFloat(cell.getRow().getData().vertrag_betrag);
+
         // commented icons would be so nice to have with fontawsome 5.11...
-        if (bestellt == null && erteilt == null && akzeptiert == null)
+        if (bestellt != null && (betrag != vertrag_betrag))
+        {
+            return "<i class='fa fa-pencil'></i>";     // geaendert
+            // return "<i class='fas fa-user-edit'></i>";     // geaendert
+        }
+        else if (bestellt == null && erteilt == null && akzeptiert == null)
         {
             return "<i class='fa fa-user-plus'></i>";      // neu
         }
@@ -287,7 +305,28 @@ $this->load->view(
 
     // Generates status tooltip
     status_tooltip = function(cell){
+        var bestellt = cell.getRow().getData().bestellt;
+        var erteilt = cell.getRow().getData().erteilt;
+        var akzeptiert = cell.getRow().getData().akzeptiert;
 
+        var betrag = parseFloat(cell.getRow().getData().betrag);
+        var vertrag_betrag = parseFloat(cell.getRow().getData().vertrag_betrag);
+
+        var text = 'Lehrauftragsstunden und/oder -betrag wurde/n geändert.';
+            text += "\n";
+
+        if (bestellt != null && erteilt == null && betrag != vertrag_betrag)
+        {
+            return text += 'Erteilen möglich, wenn die Änderungen erneut bestellt worden sind.';
+        }
+        else if (bestellt != null && erteilt != null && betrag != vertrag_betrag)
+        {
+            return text += 'Neuerliches Erteilen möglich, wenn die Änderungen erneut bestellt worden sind.';
+        }
+        else if (bestellt != null)
+        {
+            return text = 'Lehrauftrag wurde bestellt von: ' + cell.getRow().getData().vertrag_insertvon;
+        }
     }
 $(function() {
 
