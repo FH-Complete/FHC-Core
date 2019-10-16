@@ -136,6 +136,9 @@ $this->load->view(
     // Formats the rows
     function func_rowFormatter(row){
         var bestellt = row.getData().bestellt;
+        var erteilt = row.getData().bestellt;
+        var akzeptiert = row.getData().akzeptiert;
+
         var betrag = parseFloat(row.getData().betrag);
         var vertrag_betrag = parseFloat(row.getData().vertrag_betrag);
 
@@ -149,13 +152,13 @@ $this->load->view(
         row.getCells().forEach(function(cell){
             if (bestellt != null && (betrag != vertrag_betrag))
             {
-                row._row.getElement().style['font-weight'] = 'bold';            // geaendert
+                cell.getElement().classList.add('bg-warning');                  // geaenderte
             }
-            else if(row.getData().bestellt != null && row.getData().erteilt != null && row.getData().akzeptiert == null)
+            else if(bestellt != null && erteilt != null && akzeptiert == null)
             {
                 return;                                                         // bestellte + erteilte
             }
-            else if(row.getData().bestellt != null && row.getData().erteilt != null && row.getData().akzeptiert != null)
+            else if(bestellt != null && erteilt != null && akzeptiert != null)
             {
                 cell.getElement().classList.add('bg-success')                   // akzeptierte
             }
@@ -168,8 +171,8 @@ $this->load->view(
 
     // Formats row selectable/unselectable
     function func_selectableCheck(row){
-        var betrag = parseFloat(row.getData().betrag);
-        var vertrag_betrag = parseFloat(row.getData().vertrag_betrag);
+        var betrag = row.getData().betrag;
+        var vertrag_betrag = row.getData().vertrag_betrag;
 
         // only allow to select bestellte && erteilte && nicht geaenderte Lehraufträge
         return  row.getData().bestellt != null &&       // bestellt
@@ -241,6 +244,7 @@ $this->load->view(
 
     // Hide betrag, if lector has inkludierte Lehre
     function func_renderComplete(table){
+
         // If the lectors actual Verwendung has inkludierte Lehre, hide the column betrag
        if (has_inkludierteLehre)
        {
@@ -258,8 +262,8 @@ $this->load->view(
         var erteilt = cell.getRow().getData().erteilt;
         var akzeptiert = cell.getRow().getData().akzeptiert;
 
-        var betrag = parseFloat(cell.getRow().getData().betrag);
-        var vertrag_betrag = parseFloat(cell.getRow().getData().vertrag_betrag);
+        var betrag = cell.getRow().getData().betrag;
+        var vertrag_betrag = cell.getRow().getData().vertrag_betrag;
 
         // commented icons would be so nice to have with fontawsome 5.11...
         if (bestellt != null && isNaN(vertrag_betrag))
@@ -299,14 +303,22 @@ $this->load->view(
     // Generates status tooltip
     status_tooltip = function(cell){
         var bestellt = cell.getRow().getData().bestellt;
+        var erteilt = cell.getRow().getData().erteilt;
+        var akzeptiert = cell.getRow().getData().akzeptiert;
+
         var betrag = parseFloat(cell.getRow().getData().betrag);
         var vertrag_betrag = parseFloat(cell.getRow().getData().vertrag_betrag);
 
-        if (bestellt != null && betrag != vertrag_betrag) {
-            var text = 'Lehrauftrag wird bearbeitet.';
-                text += "\n";
-                text += 'Sobald dieser (erneut) erteilt wurde, kann der Lehrauftrag angenommen werden.';
+        var text = 'Lehrauftrag in Bearbeitung.';
+            text += "\n";
 
+        if (bestellt != null && erteilt == null && akzeptiert == null && betrag != vertrag_betrag) {
+            text += 'Wartet auf Erteilung, danach können können Sie den Lehrauftrag annehmen.';
+            return text;
+        }
+        else if (bestellt != null && erteilt != null && akzeptiert == null && betrag != vertrag_betrag)
+        {
+            text += 'Wartet auf erneute Erteilung, danach können können Sie den Lehrauftrag annehmen.';
             return text;
         }
     }

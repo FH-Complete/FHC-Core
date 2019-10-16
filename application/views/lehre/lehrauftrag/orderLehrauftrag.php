@@ -175,8 +175,11 @@ $this->load->view(
         var is_dummy = (row.getData().personalnummer <= 0 && row.getData().personalnummer != null);
 
         var bestellt = row.getData().bestellt;
-        var betrag = parseFloat(row.getData().betrag);
-        var vertrag_betrag = parseFloat(row.getData().vertrag_betrag);
+        var erteilt = row.getData().erteilt;
+        var akzeptiert = row.getData().akzeptiert;
+
+        var betrag = row.getData().betrag;
+        var vertrag_betrag = row.getData().vertrag_betrag;
 
         /*
         Formats the color of the rows depending on their status
@@ -193,19 +196,19 @@ $this->load->view(
             }
             else if (bestellt != null && (betrag != vertrag_betrag)  && !row._row.element.classList.contains('tabulator-calcs')) // exclude calculation rows
             {
-                // cell.getElement().classList.add('bg-warning')                   // geaendert
+                 row.getElement().style['font-weight'] = 'bold';                    // geaendert
             }
-            else if(row.getData().bestellt == null)
+            else if(bestellt == null)
             {
-                return;                                                         // neu und erteilt
+                return;                                                             // neu und erteilt
             }
-            else if(row.getData().bestellt != null && row.getData().erteilt != null && row.getData().akzeptiert != null)
+            else if(bestellt != null && erteilt != null && akzeptiert != null)
             {
-                cell.getElement().classList.add('bg-success')                   // akzeptiert
+                cell.getElement().classList.add('bg-success')                       // akzeptiert
             }
             else
             {
-                row.getElement().style["background-color"] = COLOR_LIGHTGREY;   // default
+                row.getElement().style["background-color"] = COLOR_LIGHTGREY;       // default
             }
         });
     }
@@ -246,8 +249,8 @@ $this->load->view(
             var erteilt = row.getData().erteilt;
             var akzeptiert = row.getData().akzeptiert;
 
-            var betrag = parseFloat(row.getData().betrag);
-            var vertrag_betrag = parseFloat(row.getData().vertrag_betrag);
+            var betrag = row.getData().betrag;
+            var vertrag_betrag = row.getData().vertrag_betrag;
 
             if (bestellt != null && (betrag != vertrag_betrag))
             {
@@ -307,13 +310,17 @@ $this->load->view(
          var erteilt = cell.getRow().getData().erteilt;
          var akzeptiert = cell.getRow().getData().akzeptiert;
 
-         var betrag = parseFloat(cell.getRow().getData().betrag);
-         var vertrag_betrag = parseFloat(cell.getRow().getData().vertrag_betrag);
+         var betrag = cell.getRow().getData().betrag;
+         var vertrag_betrag = cell.getRow().getData().vertrag_betrag;
 
          // commented icons would be so nice to have with fontawsome 5.11...
          if (is_dummy)
          {
-             return "<i class='fas fa-user-minus'></i>";    // kein Vertrag
+             return "<i class='fa fa-user-secret'></i>";    // dummy lector
+         }
+         else if (bestellt != null && isNaN(vertrag_betrag))
+         {
+             return "<i class='fa fa-user-minus'></i>";    //  kein Vertrag
          }
          else if (bestellt != null && (betrag != vertrag_betrag))
          {
@@ -370,7 +377,7 @@ $this->load->view(
         }
         else if (isNaN(vertrag_betrag))
         {
-            return 'Neuer Lehrauftrag. Noch kein Vertrag vorhanden.'
+            return 'Neuer Lehrauftrag. Wartet auf Bestellung.'
         }
         else if (betrag != vertrag_betrag) {
             var text = 'NACH Änderung: Stundensatz: ' + stundensatz + '  Stunden: ' + stunden;
