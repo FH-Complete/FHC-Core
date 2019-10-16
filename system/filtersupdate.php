@@ -411,6 +411,7 @@ $filters = array(
 			    "name": "",
 				"columns": [
 				    {"name": "row_index"},
+				    {"name": "personalnummer"},
 				    {"name": "lehreinheit_id"},
 				    {"name": "lehrveranstaltung_id"},
 				    {"name": "lv_bezeichnung"},
@@ -458,6 +459,7 @@ $filters = array(
 			    "name": "",
 				"columns": [
 				    {"name": "row_index"},
+				    {"name": "personalnummer"},
 				    {"name": "lehreinheit_id"},
 				    {"name": "lehrveranstaltung_id"},
 				    {"name": "lv_bezeichnung"},
