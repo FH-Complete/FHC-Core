@@ -385,7 +385,9 @@ $(function() {
     // Select all (filtered) rows and ignore rows which have status bestellt
     $("#select-all").click(function(){
         $('#filterTabulator').tabulator('getRows', true)
-            .filter(row => row.getData().bestellt == null)
+            .filter(row =>  row.getData().bestellt == null ||                       // neu
+                            row.getData().bestellt != null &&                       // OR bestellt
+                            row.getData().betrag != row.getData().vertrag_betrag)   // AND geaendert
             .forEach((row => row.select()));
     });
 
