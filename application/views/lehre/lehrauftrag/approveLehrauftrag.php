@@ -100,13 +100,13 @@ $this->load->view(
                 <button id="approve-lehrauftraege" class="btn btn-primary pull-right">Lehrauftrag erteilen</button>
                 <button id="select-all" class="btn btn-default">Alle auswählen</button>
                 <button id="deselect-all" class="btn btn-default">Alle abwählen</button>
-                <button id="show-all" class="btn btn-default" data-toggle="tooltip" data-placement="left" title="Alle anzeigen"><i class='fa fa-users'></i></button>
-                <button id="show-new" class="btn btn-default" data-toggle="tooltip" data-placement="left" title="Nur neue anzeigen"><i class='fa fa-user-plus'></i></button>
-                <button id="show-ordered" class="btn btn-default" data-toggle="tooltip" data-placement="left" title="Nur bestellte anzeigen"><i class='fa fa-check-square-o'></i></button>
-                <button id="show-approved" class="btn btn-default" data-toggle="tooltip" data-placement="left" title="Nur erteilte anzeigen"><i class='fa fa-check-square'></i></button>
-                <button id="show-accepted" class="btn btn-default" data-toggle="tooltip" data-placement="left" title="Nur akzeptierte anzeigen"><i class='fa fa-handshake-o'></i></button>
-                <button id="show-changed" class="btn btn-default" data-toggle="tooltip" data-placement="left" title="Nur geänderte anzeigen"><i class='fa fa-pencil'></i></button>
-                <button id="show-dummies" class="btn btn-default" data-toggle="tooltip" data-placement="left" title="Nur verplante ohne Lektor anzeigen (Dummies)"><i class='fa fa-user-secret'></i></button>
+                <button id="show-all" class="btn btn-default btn-lehrauftrag focus" data-toggle="tooltip" data-placement="left" title="Alle anzeigen"><i class='fa fa-users'></i></button>
+                <button id="show-new" class="btn btn-default btn-lehrauftrag" data-toggle="tooltip" data-placement="left" title="Nur neue anzeigen"><i class='fa fa-user-plus'></i></button>
+                <button id="show-ordered" class="btn btn-default btn-lehrauftrag" data-toggle="tooltip" data-placement="left" title="Nur bestellte anzeigen"><i class='fa fa-check-square-o'></i></button>
+                <button id="show-approved" class="btn btn-default btn-lehrauftrag" data-toggle="tooltip" data-placement="left" title="Nur erteilte anzeigen"><i class='fa fa-check-square'></i></button>
+                <button id="show-accepted" class="btn btn-default btn-lehrauftrag" data-toggle="tooltip" data-placement="left" title="Nur akzeptierte anzeigen"><i class='fa fa-handshake-o'></i></button>
+                <button id="show-changed" class="btn btn-default btn-lehrauftrag" data-toggle="tooltip" data-placement="left" title="Nur geänderte anzeigen"><i class='fa fa-pencil'></i></button>
+                <button id="show-dummies" class="btn btn-default btn-lehrauftrag" data-toggle="tooltip" data-placement="left" title="Nur verplante ohne Lektor anzeigen (Dummies)"><i class='fa fa-user-secret'></i></button>
             </div>
         </div>
     </div>
@@ -455,6 +455,11 @@ $(function() {
         $('#filterTabulator').tabulator('setFilter', filter_showChanged);
     });
 
+    // Focus on clicked button
+    $(".btn-lehrauftrag").click(function() {
+        $(".btn-lehrauftrag").removeClass('focus');
+        $(this).addClass('focus');
+    });
 
     $("#download-cvs").click(function(){
          $('#filterTabulator').tabulator("download", "csv", "data.csv");

@@ -68,10 +68,10 @@ $this->load->view(
             <div class="col-xs-6">
                 <button id="select-all" class="btn btn-default">Alle auswählen</button>
                 <button id="deselect-all" class="btn btn-default">Alle abwählen</button>
-                <button id="show-all" class="btn btn-default" data-toggle="tooltip" data-placement="left" title="Alle anzeigen"><i class='fa fa-users'></i></button>
-                <button id="show-ordered" class="btn btn-default" data-toggle="tooltip" data-placement="left" title="Nur bestellte anzeigen"><i class='fa fa-check-square-o'></i></button>
-                <button id="show-approved" class="btn btn-default" data-toggle="tooltip" data-placement="left" title="Nur erteilte anzeigen"><i class='fa fa-check-square'></i></button>
-                <button id="show-accepted" class="btn btn-default" data-toggle="tooltip" data-placement="left" title="Nur akzeptierte anzeigen"><i class='fa fa-handshake-o'></i></button>
+                <button id="show-all" class="btn btn-default btn-lehrauftrag focus" data-toggle="tooltip" data-placement="left" title="Alle anzeigen"><i class='fa fa-users'></i></button>
+                <button id="show-ordered" class="btn btn-default btn-lehrauftrag" data-toggle="tooltip" data-placement="left" title="Nur bestellte anzeigen"><i class='fa fa-check-square-o'></i></button>
+                <button id="show-approved" class="btn btn-default btn-lehrauftrag" data-toggle="tooltip" data-placement="left" title="Nur erteilte anzeigen"><i class='fa fa-check-square'></i></button>
+                <button id="show-accepted" class="btn btn-default btn-lehrauftrag" data-toggle="tooltip" data-placement="left" title="Nur akzeptierte anzeigen"><i class='fa fa-handshake-o'></i></button>
             </div><!-- end col -->
             <div class="col-md-offset-2 col-xs-offset-1 col-md-4 col-xs-5">
                 <div class="input-group">
@@ -433,5 +433,11 @@ $this->load->view(
         $("#password").val('');
 
      });
+
+    // Focus on clicked button
+    $(".btn-lehrauftrag").click(function() {
+        $(".btn-lehrauftrag").removeClass('focus');
+        $(this).addClass('focus');
+    });
 });
 </script>
