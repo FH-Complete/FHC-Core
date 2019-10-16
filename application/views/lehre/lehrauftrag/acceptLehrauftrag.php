@@ -114,17 +114,6 @@ $this->load->view(
         }
     }
 
-
-    Major addition of tabulator functionality methods III / Enhanced code
-
-    III: Same as for orderLehrauftrag is here adapted to acceptLehrauftrag:
-
-        . MOVED out function from datasetRepFieldDefs to javascript for better
-        maintainance
-            . Added status column and status icons with tooltips
-        . Added status buttons to filter status rapidly
-        . Rows formatting enhanced and bootstrapped
-        . day of date now with 2 digits
     // -----------------------------------------------------------------------------------------------------------------
     // Header filter
     // -----------------------------------------------------------------------------------------------------------------
