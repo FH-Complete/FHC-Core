@@ -105,6 +105,7 @@ $this->load->view(
                 <button id="show-ordered" class="btn btn-default" data-toggle="tooltip" data-placement="left" title="Nur bestellte anzeigen"><i class='fa fa-check-square-o'></i></button>
                 <button id="show-approved" class="btn btn-default" data-toggle="tooltip" data-placement="left" title="Nur erteilte anzeigen"><i class='fa fa-check-square'></i></button>
                 <button id="show-accepted" class="btn btn-default" data-toggle="tooltip" data-placement="left" title="Nur akzeptierte anzeigen"><i class='fa fa-handshake-o'></i></button>
+                <button id="show-dummies" class="btn btn-default" data-toggle="tooltip" data-placement="left" title="Nur verplante ohne Lektor anzeigen (Dummies)"><i class='fa fa-user-secret'></i></button>
             </div>
         </div>
     </div>
@@ -157,19 +158,26 @@ $this->load->view(
 
     // Formats the rows
     function func_rowFormatter(row){
+        var is_dummy = (row.getData().personalnummer <= 0 && row.getData().personalnummer != null);
+
         var bestellt = row.getData().bestellt;
         var betrag = parseFloat(row.getData().betrag);
         var vertrag_betrag = parseFloat(row.getData().vertrag_betrag);
 
         /*
         Formats the color of the rows depending on their status
-        - orange: geaendert
-        - default: neu und erteilt
+        - blue: dummy lectors
+        - bold: geaendert
+        - default (white): neu und erteilt
         - green: akzeptiert
         - grey: all other (marks unselectable)
          */
         row.getCells().forEach(function(cell){
-            if (bestellt != null && (betrag != vertrag_betrag)  && !row._row.element.classList.contains('tabulator-calcs')) // exclude calculation rows
+            if(is_dummy)
+            {
+                cell.getElement().classList.add('bg-info');                          // dummy lectors
+            }
+            else if (bestellt != null && (betrag != vertrag_betrag)  && !row._row.element.classList.contains('tabulator-calcs')) // exclude calculation rows
             {
                 // cell.getElement().classList.add('bg-warning')                   // geaendert
             }
@@ -190,12 +198,15 @@ $this->load->view(
 
     // Formats row selectable/unselectable
     function func_selectableCheck(row){
-        var betrag = parseFloat(row.getData().betrag);
-        var vertrag_betrag = parseFloat(row.getData().vertrag_betrag);
+        var is_dummy = (row.getData().personalnummer <= 0 && row.getData().personalnummer != null);
+
+        var betrag = row.getData().betrag;
+        var vertrag_betrag = row.getData().vertrag_betrag;
 
         // Only allow to select neue and geaenderte
-        return  row.getData().bestellt == null ||  // neue
-                row.getData().bestellt != null && betrag != vertrag_betrag; // geaenderte
+        return  !is_dummy &&                                                // NOT dummy lector
+                row.getData().bestellt == null ||                           // AND neue
+                row.getData().bestellt != null && betrag != vertrag_betrag; // OR geaenderte
     }
 
     // Adds column status
@@ -276,6 +287,7 @@ $this->load->view(
     // -----------------------------------------------------------------------------------------------------------------
     // Generates status icons
     status_formatter = function(cell, formatterParams, onRendered){
+         var is_dummy = (cell.getRow().getData().personalnummer <= 0 && cell.getRow().getData().personalnummer != null);
 
          var bestellt = cell.getRow().getData().bestellt;
          var erteilt = cell.getRow().getData().erteilt;
@@ -285,7 +297,7 @@ $this->load->view(
          var vertrag_betrag = parseFloat(cell.getRow().getData().vertrag_betrag);
 
          // commented icons would be so nice to have with fontawsome 5.11...
-         if (bestellt != null && isNaN(vertrag_betrag))
+         if (is_dummy)
          {
              return "<i class='fas fa-user-minus'></i>";    // kein Vertrag
          }
@@ -321,6 +333,8 @@ $this->load->view(
 
     // Generates status tooltip
     status_tooltip = function(cell){
+        var is_dummy = (cell.getRow().getData().personalnummer <= 0 && cell.getRow().getData().personalnummer != null);
+
         var betrag = parseFloat(cell.getRow().getData().betrag);
         var stunden = parseFloat(cell.getRow().getData().stunden);
         var stundensatz = parseFloat(cell.getRow().getData().stundensatz);
@@ -336,7 +350,11 @@ $this->load->view(
         }
 
         // Return tooltip message
-        if (isNaN(vertrag_betrag))
+        if (is_dummy)
+        {
+            return 'Neuer Lehrauftrag. Ohne Lektor verplant.'
+        }
+        else if (isNaN(vertrag_betrag))
         {
             return 'Neuer Lehrauftrag. Noch kein Vertrag vorhanden.'
         }
@@ -367,10 +385,12 @@ $(function() {
         $('#filterTabulator').tabulator('clearFilter');
     });
 
-    // Show only rows with new lehrauftraege
+    // Show only rows with new lehrauftraege (not dummy lectors)
     $("#show-new").click(function(){
         $('#filterTabulator').tabulator('setFilter',
             [
+                {field: 'personalnummer', type: '!=', value: null},
+                {field: 'personalnummer', type: '>=', value: 0},
                 {field: 'bestellt', type: '=', value: null},
                 {field: 'erteilt', type: '=', value: null},
                 {field: 'akzeptiert', type: '=', value: null}
@@ -407,6 +427,16 @@ $(function() {
                 {field: 'bestellt', type: '!=', value: null},
                 {field: 'erteilt', type: '!=', value: null},
                 {field: 'akzeptiert', type: '!=', value: null}
+            ]
+        );
+    });
+
+    // Show only rows with dummy lectors
+    $("#show-dummies").click(function(){
+        $('#filterTabulator').tabulator('setFilter',
+            [
+                {field: 'personalnummer', type: '!=', value: null},
+                {field: 'personalnummer', type: '<=', value: 0},
             ]
         );
     });
