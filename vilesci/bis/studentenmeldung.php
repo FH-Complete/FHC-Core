@@ -257,7 +257,29 @@ if($result_in = $db->db_query($qry_in))
 }
 
 //Hauptselect
-$qry="
+// An der FHTW können nur die Incomings ausgelesen werden, wenn die stg_kz 10006 übergeben wird
+if (CAMPUS_NAME == 'FH Technikum Wien' && $stg_kz==10006)
+{
+	$qry="
+	SELECT
+		DISTINCT ON(student_uid, nachname, vorname) *, public.tbl_person.person_id AS pers_id, to_char(gebdatum, 'ddmmyy') AS vdat
+	FROM
+		public.tbl_student
+		JOIN public.tbl_benutzer ON(student_uid=uid)
+		JOIN public.tbl_person USING (person_id)
+		JOIN public.tbl_prestudent USING (prestudent_id)
+		JOIN public.tbl_prestudentstatus ON(tbl_prestudent.prestudent_id=tbl_prestudentstatus.prestudent_id)
+	WHERE
+		bismelden=TRUE
+		AND (status_kurzbz='Incoming' AND student_uid IN (SELECT student_uid FROM bis.tbl_bisio WHERE (tbl_bisio.bis>=".$db->db_add_param($bisprevious).")
+				OR (tbl_bisio.von<=".$db->db_add_param($bisdatum)." AND (tbl_bisio.bis>=".$db->db_add_param($bisdatum)."  OR tbl_bisio.bis IS NULL))
+		))
+	ORDER BY student_uid, nachname, vorname
+	";
+}
+else
+{
+	$qry="
 	SELECT
 		DISTINCT ON(student_uid, nachname, vorname) *, public.tbl_person.person_id AS pers_id, to_char(gebdatum, 'ddmmyy') AS vdat
 	FROM
@@ -280,6 +302,7 @@ $qry="
 		)))
 	ORDER BY student_uid, nachname, vorname
 	";
+}
 
 if($result = $db->db_query($qry))
 {
@@ -534,6 +557,7 @@ function GenerateXMLStudentBlock($row)
 	global $iosem, $stsem, $usem, $asem, $absem, $stlist, $gssem;
 	global $verwendete_orgformen, $datum_obj,$orgform_code_array,$standortcode;
 	global $kodex_studientyp_array, $kodex_studstatuscode_array;
+	global $stg_kz;
 	$error_log='';
 	$error_log1='';
 	$datei = '';
@@ -814,8 +838,20 @@ function GenerateXMLStudentBlock($row)
 		}
 	}
 	//Wenn im Status keine Organisationsform eingetragen ist, wird die des Studienganges uebernommen
+	//echo '<pre>', var_dump($storgform), '</pre>';
 	if($storgform=='')
-		$storgform=$orgform_kurzbz;
+	{
+		// Wenn FHTW und studiengang_kz 10006 (Campus International) wird die OrgForm des Studiengangs vom Incoming ermittelt
+		if (CAMPUS_NAME == 'FH Technikum Wien' && $stg_kz == 10006)
+		{
+			$studiengang = new studiengang($row->studiengang_kz);
+			$storgform = $studiengang->orgform_kurzbz;
+		}
+		else
+		{
+			$storgform=$orgform_kurzbz;
+		}
+	}
 
 	// **** GS Container ****/
 	$gsstatus='';
