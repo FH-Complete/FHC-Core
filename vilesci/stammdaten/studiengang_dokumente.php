@@ -253,7 +253,7 @@ echo '<!DOCTYPE HTML>
 			$("#t1").tablesorter(
 			{
 				sortList: [[0,0]],
-				widgets: ["zebra","filter"],
+				widgets: ["saveSort","zebra","filter"],
 				headers: {7:{sorter: "stufe"}},
 				widgetOptions : {	filter_useParsedData : true,
 									filter_functions : {
