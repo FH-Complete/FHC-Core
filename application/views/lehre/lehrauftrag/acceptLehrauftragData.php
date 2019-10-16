@@ -240,7 +240,7 @@ $filterWidgetArray = array(
     'hideOptions' => true,
     'hideMenu' => true,
     'columnsAliases' => array(  // TODO: use phrasen
-        'row_index',
+        'Status',   // alias for row_index, because row_index is formatted to display the status icons
         'LE-ID',
         'LV-ID',
         'PA-ID',
@@ -273,45 +273,24 @@ $filterWidgetArray = array(
         selectable: true,               // allow row selection
         selectableRangeMode: "click",   // allow range selection using shift end click on end of range
         selectablePersistence:false,    // deselect previously selected rows when table is filtered, sorted or paginated
-        selectableCheck: function(row)
-        { 
-            // only allow to select bestellte && erteilte Lehraufträge         
-            return (row.getData().bestellt != null && row.getData().erteilt != null && row.getData().akzeptiert == null);
+        selectableCheck: function(row){ 
+            return func_selectableCheck(row);
         },      
-        rowUpdated:function(row)
-        {
-                // deselect and disable new selection of updated rows (approvement done)
-                row.deselect();
-                row.getElement().style["pointerEvents"] = "none";         
+        rowUpdated:function(row){
+            func_rowUpdated(row);    
         },
-        rowFormatter:function(row)
-        {
-            var data = row.getData();
-            
-            // default (white): rows to be accepted
-            // green: rows accepted 
-            // grey: all other
-            if(row.getData().bestellt != null && row.getData().erteilt != null && row.getData().akzeptiert == null)
-            {
-                return;
-            }
-            else if(row.getData().bestellt != null && row.getData().erteilt != null && row.getData().akzeptiert != null)
-            {
-                row.getElement().style["background-color"] = "#d1f1d196";   // green
-            }
-            else
-            {
-                row.getElement().style["background-color"] = "#f5f5f5";     // grey
-            }
+        rowFormatter:function(row){
+            func_rowFormatter(row);
         },
-        renderComplete:function()
-        {
-            // If the lectors actual Verwendung has inkludierte Lehre, hide the column betrag
-            if (has_inkludierteLehre)
-            {
-                this.hideColumn("betrag");
-            }  
-        }     
+        tableBuilt: function(){
+            func_tableBuilt(this);
+        },  
+        renderComplete:function(){
+            func_renderComplete(this);
+        },
+         renderStarted:function(){
+            func_renderStarted(this);
+        }         
     }', // tabulator properties
     'datasetRepFieldsDefs' => '{
         row_index: {visible:false},     // necessary for row indexing

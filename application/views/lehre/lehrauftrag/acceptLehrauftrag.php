@@ -68,8 +68,10 @@ $this->load->view(
             <div class="col-xs-6">
                 <button id="select-all" class="btn btn-default">Alle auswählen</button>
                 <button id="deselect-all" class="btn btn-default">Alle abwählen</button>
-                <button id="show-approved" class="btn btn-default">Nur erteilte anzeigen</button>
-                <button id="show-all" class="btn btn-default">Alle anzeigen</button>
+                <button id="show-all" class="btn btn-default" data-toggle="tooltip" data-placement="left" title="Alle anzeigen"><i class='fa fa-users'></i></button>
+                <button id="show-ordered" class="btn btn-default" data-toggle="tooltip" data-placement="left" title="Nur bestellte anzeigen"><i class='fa fa-check-square-o'></i></button>
+                <button id="show-approved" class="btn btn-default" data-toggle="tooltip" data-placement="left" title="Nur erteilte anzeigen"><i class='fa fa-check-square'></i></button>
+                <button id="show-accepted" class="btn btn-default" data-toggle="tooltip" data-placement="left" title="Nur akzeptierte anzeigen"><i class='fa fa-handshake-o'></i></button>
             </div><!-- end col -->
             <div class="col-md-offset-2 col-xs-offset-1 col-md-4 col-xs-5">
                 <div class="input-group">
@@ -94,6 +96,7 @@ $this->load->view(
     // Global vars
     // -----------------------------------------------------------------------------------------------------------------
 
+    const COLOR_LIGHTGREY = "#f5f5f5";
     // Store boolean has_inkludierteLehre. If true, used to hide column Betrag.
     var has_inkludierteLehre = new Boolean(<?php echo $has_inkludierteLehre ?>).valueOf();
 
@@ -107,10 +110,21 @@ $this->load->view(
         if (value != null)
         {
             var d = new Date(value);
-            return d.getDate()  + "." + ("0"+(d.getMonth()+1)).slice(-2) + "." + d.getFullYear();
+            return ("0" + (d.getDate())).slice(-2)  + "." + ("0"+(d.getMonth()+1)).slice(-2) + "." + d.getFullYear();
         }
     }
 
+
+    Major addition of tabulator functionality methods III / Enhanced code
+
+    III: Same as for orderLehrauftrag is here adapted to acceptLehrauftrag:
+
+        . MOVED out function from datasetRepFieldDefs to javascript for better
+        maintainance
+            . Added status column and status icons with tooltips
+        . Added status buttons to filter status rapidly
+        . Rows formatting enhanced and bootstrapped
+        . day of date now with 2 digits
     // -----------------------------------------------------------------------------------------------------------------
     // Header filter
     // -----------------------------------------------------------------------------------------------------------------
@@ -126,11 +140,193 @@ $this->load->view(
         return parseFloat(headerValue) <= parseFloat(rowValue); //must return a boolean, true if it passes the filter.
     }
 
-$(function() {
+    // -----------------------------------------------------------------------------------------------------------------
+    // Tabulator table format functions
+    // -----------------------------------------------------------------------------------------------------------------
+
+    // Formats the rows
+    function func_rowFormatter(row){
+        var bestellt = row.getData().bestellt;
+        var betrag = parseFloat(row.getData().betrag);
+        var vertrag_betrag = parseFloat(row.getData().vertrag_betrag);
+
+        /*
+        Formats the color of the rows depending on their status
+        - orange: geaendert
+        - default: bestellte und erteilte (= zu akzeptierende)
+        - green: akzeptierte
+        - grey: all other (marks unselectable)
+         */
+        row.getCells().forEach(function(cell){
+            if (bestellt != null && (betrag != vertrag_betrag))
+            {
+                row._row.getElement().style['font-weight'] = 'bold';            // geaendert
+            }
+            else if(row.getData().bestellt != null && row.getData().erteilt != null && row.getData().akzeptiert == null)
+            {
+                return;                                                         // bestellte + erteilte
+            }
+            else if(row.getData().bestellt != null && row.getData().erteilt != null && row.getData().akzeptiert != null)
+            {
+                cell.getElement().classList.add('bg-success')                   // akzeptierte
+            }
+            else
+            {
+                row.getElement().style["background-color"] = COLOR_LIGHTGREY;   // default
+            }
+        });
+    }
+
+    // Formats row selectable/unselectable
+    function func_selectableCheck(row){
+        var betrag = parseFloat(row.getData().betrag);
+        var vertrag_betrag = parseFloat(row.getData().vertrag_betrag);
+
+        // only allow to select bestellte && erteilte && nicht geaenderte Lehraufträge
+        return  row.getData().bestellt != null &&       // bestellt
+                row.getData().erteilt != null &&        // AND erteilt
+                row.getData().akzeptiert == null &&     // AND nicht akzeptiert
+                betrag == vertrag_betrag;               // OR nicht geaenderte
+    }
+
+    // Adds column status
+    function func_tableBuilt(table) {
+        // Add status column to table
+        table.addColumn(
+            {
+                title: "Status",
+                field: "status",
+                width:40,
+                align:"center",
+                formatter: status_formatter,
+                tooltip: status_tooltip
+            }, true
+        );
+    }
+
+    // Sets status values into column status
+    function func_renderStarted(table){
+        // Set literally status to each row - this enables sorting by status despite using icons
+        table.getRows().forEach(function(row){
+            var bestellt = row.getData().bestellt;
+            var erteilt = row.getData().erteilt;
+            var akzeptiert = row.getData().akzeptiert;
+
+            var betrag = parseFloat(row.getData().betrag);
+            var vertrag_betrag = parseFloat(row.getData().vertrag_betrag);
+
+            if (bestellt != null && (betrag != vertrag_betrag))
+            {
+                row.getData().status = 'Geändert';      // geaendert
+            }
+            else if (bestellt == null && erteilt == null && akzeptiert == null)
+            {
+                row.getData().status = 'Neu';           // neu
+            }
+            else if (bestellt != null && erteilt == null && akzeptiert == null)
+            {
+                row.getData().status = 'Bestellt';      // bestellt
+            }
+            else if (bestellt != null && erteilt != null && akzeptiert == null)
+            {
+                row.getData().status = 'Erteilt';       // erteilt
+            }
+            else if (bestellt != null && erteilt != null && akzeptiert != null)
+            {
+                row.getData().status = 'Akzeptiert';    // akzeptiert
+            }
+            else
+            {
+                row.getData().status = null;            // default
+            }
+        });
+    }
+
+    // Performes after row was updated
+    function func_rowUpdated(row){
+        // Deselect and disable new selection of updated rows (ordering done)
+        row.deselect();
+        row.getElement().style["background-color"] = COLOR_LIGHTGREY;
+        row.getElement().style["pointerEvents"] = "none";
+    }
+
+    // Hide betrag, if lector has inkludierte Lehre
+    function func_renderComplete(table){
+        // If the lectors actual Verwendung has inkludierte Lehre, hide the column betrag
+       if (has_inkludierteLehre)
+       {
+           table.hideColumn("betrag");
+       }
+    }
+
+    // -----------------------------------------------------------------------------------------------------------------
+    // Tabulator columns format functions
+    // -----------------------------------------------------------------------------------------------------------------
+    // Generates status icons
+    status_formatter = function(cell, formatterParams, onRendered){
+
+        var bestellt = cell.getRow().getData().bestellt;
+        var erteilt = cell.getRow().getData().erteilt;
+        var akzeptiert = cell.getRow().getData().akzeptiert;
+
+        var betrag = parseFloat(cell.getRow().getData().betrag);
+        var vertrag_betrag = parseFloat(cell.getRow().getData().vertrag_betrag);
+
+        // commented icons would be so nice to have with fontawsome 5.11...
+        if (bestellt != null && isNaN(vertrag_betrag))
+        {
+            return "<i class='fas fa-user-minus'></i>";    // kein Vertrag
+        }
+        else if (bestellt != null && (betrag != vertrag_betrag))
+        {
+            return "<i class='fa fa-pencil'></i>";     // geaendert
+            // return "<i class='fas fa-user-edit'></i>";     // geaendert
+        }
+        else if (bestellt == null && erteilt == null && akzeptiert == null)
+        {
+            return "<i class='fa fa-user-plus'></i>";      // neu
+        }
+        else if (bestellt != null && erteilt == null && akzeptiert == null)
+        {
+            return "<i class='fa fa-check-square-o'></i>";     // bestellt
+            // return "<i class='fa fa-user-tag'></i>";     // bestellt
+        }
+        else if (bestellt != null && erteilt != null && akzeptiert == null)
+        {
+            return "<i class='fa fa-check-square'></i>";  // erteilt
+            // return "<i class='fas fa-user-check'></i>";  // erteilt
+        }
+        else if (bestellt != null && erteilt != null && akzeptiert != null)
+        {
+            return "<i class='fa fa-handshake-o'></i>";  // akzeptiert
+            // return "<i class='fas fa-user-graduate'></i>";  // akzeptiert
+        }
+        else
+        {
+            return "<i class='fa fa-user'></i>";            // default
+        }
+    };
+
+    // Generates status tooltip
+    status_tooltip = function(cell){
+        var bestellt = cell.getRow().getData().bestellt;
+        var betrag = parseFloat(cell.getRow().getData().betrag);
+        var vertrag_betrag = parseFloat(cell.getRow().getData().vertrag_betrag);
+
+        if (bestellt != null && betrag != vertrag_betrag) {
+            var text = 'Lehrauftrag wird bearbeitet.';
+                text += "\n";
+                text += 'Sobald dieser (erneut) erteilt wurde, kann der Lehrauftrag angenommen werden.';
+
+            return text;
+        }
+    }
+
+    $(function() {
 
     // Select all (filtered) rows, where status bestellt AND erteilt has a value and status akzeptiert has no value.
     $("#select-all").click(function(){
-        $('#filterTabulator').tabulator('getRows')
+        $('#filterTabulator').tabulator('getRows', true)
             .filter(function(row){
                 return row.getData().bestellt != null && row.getData().erteilt != null && row.getData().akzeptiert == null;
             })
@@ -147,7 +343,18 @@ $(function() {
         $('#filterTabulator').tabulator('clearFilter');
     });
 
-    // Show only rows with akzeptierte lehrauftraege
+    // Show only rows with ordered lehrauftraege
+    $("#show-ordered").click(function(){
+            $('#filterTabulator').tabulator('setFilter',
+                [
+                    {field: 'bestellt', type: '!=', value: null},
+                    {field: 'erteilt', type: '=', value: null},
+                    {field: 'akzeptiert', type: '=', value: null}
+                ]
+            );
+        });
+
+    // Show only rows with erteilte lehrauftraege
     $("#show-approved").click(function(){
         $('#filterTabulator').tabulator('setFilter', [
                 {field: 'bestellt', type: '!=', value: null},   // filter when is bestellt
@@ -156,6 +363,17 @@ $(function() {
             ]
         );
     });
+
+    // Show only rows with akzeptierte lehrauftraege
+    $("#show-accepted").click(function(){
+            $('#filterTabulator').tabulator('setFilter',
+                [
+                    {field: 'bestellt', type: '!=', value: null},
+                    {field: 'erteilt', type: '!=', value: null},
+                    {field: 'akzeptiert', type: '!=', value: null}
+                ]
+            );
+        });
 
     // Approve Lehrauftraege
     $("#accept-lehrauftraege").click(function(){
