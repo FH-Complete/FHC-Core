@@ -381,7 +381,7 @@ function writePruefungsTable(e, data, anmeldung)
 				button = "<p><a href='#' title='<?php echo $p->t('pruefung/anmeldenMoeglichBis'); ?> "+frist+"'><input style='width: 140px; background-color: green;' type='button' value='"+termin+" "+time+"' onclick='openDialog(\""+e.lehrveranstaltung[0].lehrveranstaltung_id+"\", \""+d.pruefungstermin_id+"\", \""+e.lehrveranstaltung[0].bezeichnung.replace("'", "&apos;")+"\", \""+d.von+"\", \""+d.bis+"\");'></a></p>";
 			}
 		}
-		else if(new Date > minimumFrist)
+		else
         {
 			button = "<p><input style='width: 180px;' type='button' value='<?php echo $p->t('pruefung/zurLvAnmeldung'); ?>' onclick='openAnmeldung(\""+e.lehrveranstaltung[0].lehrveranstaltung_id+"\", \""+e.pruefung.studiensemester_kurzbz+"\");'></p>";
 		}
