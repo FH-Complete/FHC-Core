@@ -143,6 +143,7 @@ class Lehrauftrag extends Auth_Controller
                         $json []= array(
                             'row_index' => $lehrauftrag['row_index'],
                             'bestellt' => date('Y-m-d'),
+                            'vertrag_betrag' => $betrag,
                             'erteilt' => null
                         );
                     }
@@ -165,7 +166,8 @@ class Lehrauftrag extends Auth_Controller
                     {
                         $json []= array(
                             'row_index' => $lehrauftrag['row_index'],
-                            'bestellt' => date('Y-m-d')
+                            'bestellt' => date('Y-m-d'),
+                            'vertrag_betrag' => $betrag
                         );
                     }
 

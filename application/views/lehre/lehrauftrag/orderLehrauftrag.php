@@ -293,9 +293,15 @@ $this->load->view(
 
     // Performes after row was updated
     function func_rowUpdated(row){
+
+        // Refresh status icon and row color
+        row.reformat(); // retriggers cell formatters and rowFormatter callback
+
+        // Format font-weight normal (needed after geaenderte were bestellt)
+        row.getElement().style['font-weight'] = 'normal';
+
         // Deselect and disable new selection of updated rows (ordering done)
         row.deselect();
-        row.getElement().style["background-color"] = COLOR_LIGHTGREY;
         row.getElement().style["pointerEvents"] = "none";
     }
 

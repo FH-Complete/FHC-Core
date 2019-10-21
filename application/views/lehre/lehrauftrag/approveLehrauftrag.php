@@ -282,9 +282,12 @@ $this->load->view(
 
     // Performes after row was updated
     function func_rowUpdated(row){
-        // Deselect and disable new selection of updated rows (ordering done)
+
+        // Refresh status icon and row color
+        row.reformat(); // retriggers cell formatters and rowFormatter callback
+
+        // Deselect and disable new selection of updated rows
         row.deselect();
-        row.getElement().style["background-color"] = COLOR_LIGHTGREY;
         row.getElement().style["pointerEvents"] = "none";
     }
 
