@@ -136,7 +136,7 @@ $this->load->view(
     // Formats the rows
     function func_rowFormatter(row){
         var bestellt = row.getData().bestellt;
-        var erteilt = row.getData().bestellt;
+        var erteilt = row.getData().erteilt;
         var akzeptiert = row.getData().akzeptiert;
 
         var betrag = parseFloat(row.getData().betrag);
