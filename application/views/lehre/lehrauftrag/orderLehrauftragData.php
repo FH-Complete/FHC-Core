@@ -30,10 +30,6 @@ SELECT
     vertrag_id,
     vertrag_stunden,
     vertrag_betrag,
-    vertrag_insertvon,
-    vertrag_insertamum,
-    vertrag_updatevon,
-    vertrag_updateamum,
     mitarbeiter_uid,
     bestellt,
     erteilt,
@@ -153,10 +149,6 @@ FROM
                 vertrag_id,
                 vertragsstunden                                                                     AS "vertrag_stunden",
                 vertrag.betrag                                                                      AS "vertrag_betrag",
-                vertrag.insertvon                                                                   AS "vertrag_insertvon",
-                vertrag.insertamum                                                                  AS "vertrag_insertamum",
-                vertrag.updatevon                                                                   AS "vertrag_updatevon",
-                vertrag.updateamum                                                                  AS "vertrag_updateamum",
                 mitarbeiter_uid
             FROM
                 lehre.tbl_lehreinheitmitarbeiter         lema
@@ -271,11 +263,7 @@ FROM
                     TRUNC((pb.stunden * pb.stundensatz), 2)                                             AS "betrag",
                     vertrag_id,
                     vertragsstunden                                                                     AS "vertrag_stunden",
-                    vertrag.betrag                                                                      AS "vertrag_betrag",
-                    vertrag.insertvon                                                                   AS "vertrag_insertvon",
-                    vertrag.insertamum                                                                  AS "vertrag_insertamum",
-                    vertrag.updatevon                                                                   AS "vertrag_updatevon",
-                    vertrag.updateamum                                                                  AS "vertrag_updateamum"
+                    vertrag.betrag                                                                      AS "vertrag_betrag"
                 FROM
                     lehre.tbl_projektbetreuer                pb
                         JOIN lehre.tbl_projektarbeit         pa USING (projektarbeit_id)
@@ -336,10 +324,6 @@ $filterWidgetArray = array(
         'Vertrag-ID',
         'Vertrag-Stunden',
         'Vertrag-Betrag',
-        'Vertrag-ErstelltVon',
-        'Vertrag-ErstelltDatum',
-        'Vertrag-UpdateVon',
-        'Vertrag-UpdateDatum',
         'UID',
         'Bestellt',
         'Erteilt',
@@ -414,10 +398,6 @@ $filterWidgetArray = array(
         vertrag_id: {visible: false},
         vertrag_stunden: {visible: false},
         vertrag_betrag: {visible: false},
-        vertrag_insertvon: {visible: false},
-        vertrag_insertamaum: {visible: false},
-        vertrag_updatevon: {visible: false},
-        vertrag_updateamum: {visible: false},
         mitarbeiter_uid: {visible: false},
         bestellt: {align:"center", headerFilter:"input", mutator: mut_formatStringDate, tooltip: bestellt_tooltip}, 
         erteilt: {align:"center", headerFilter:"input", mutator: mut_formatStringDate, tooltip: erteilt_tooltip},
