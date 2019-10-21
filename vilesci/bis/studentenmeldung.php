@@ -36,6 +36,7 @@ require_once('../../include/datum.class.php');
 require_once('../../include/studiengang.class.php');
 require_once('../../include/functions.inc.php');
 require_once('../../include/benutzerberechtigung.class.php');
+require_once('../../include/bisio.class.php');
 
 if (!$db = new basis_db())
 	die('Es konnte keine Verbindung zum Server aufgebaut werden.');
@@ -243,7 +244,7 @@ $qry_in="
 	WHERE
 		bismelden=TRUE
 		AND tbl_student.studiengang_kz=".$db->db_add_param($stg_kz)."
-		AND (status_kurzbz='Incoming' AND student_uid NOT IN (SELECT student_uid FROM bis.tbl_bisio))
+		AND (status_kurzbz='Incoming' AND NOT EXISTS (SELECT 1 FROM bis.tbl_bisio WHERE student_uid=tbl_student.student_uid))
 	ORDER BY student_uid, nachname, vorname
 	";
 if($result_in = $db->db_query($qry_in))
@@ -1152,7 +1153,6 @@ function GenerateXMLStudentBlock($row)
 				$gast=$rowio->nation_code;
 				$avon=date("dmY", $datumobj->mktime_fromdate($rowio->von));
 				$abis=date("dmY", $datumobj->mktime_fromdate($rowio->bis));
-				$zweck=$rowio->zweck_code;
 
 				$datei.="
 			<IO>
@@ -1164,8 +1164,36 @@ function GenerateXMLStudentBlock($row)
 					$datei.="
 				<AufenthaltBis>".$abis."</AufenthaltBis>";
 				}
-				$datei.="
-				<AufenthaltZweckCode>".$zweck."</AufenthaltZweckCode>
+
+				$bisio_zweck = new bisio();
+				$bisio_zweck->getZweck($rowio->bisio_id);
+				foreach ($bisio_zweck->result as $row_zweck)
+				{
+					$datei.="
+					<AufenthaltZweckCode>".$row_zweck->zweck_code."</AufenthaltZweckCode>";
+				}
+				if ($aktstatus != 'Incoming' && $rowio->ects_erworben != '')
+				{
+					$datei.="
+					<ECTSerworben>".$rowio->ects_erworben."</ECTSerworben>";
+				}
+				if ($aktstatus != 'Incoming' && $rowio->ects_angerechnet != '')
+				{
+					$datei.="
+					<ECTSangerechnet>".$rowio->ects_angerechnet."</ECTSangerechnet>";
+				}
+				if ($aktstatus != 'Incoming')
+				{
+					$bisio_foerderung = new bisio();
+					$bisio_foerderung->getFoerderungen($rowio->bisio_id);
+					foreach ($bisio_foerderung->result as $row_foerderung)
+					{
+						$datei.="
+						<AufenthaltFoerderungCode>".$row_foerderung->aufenthaltfoerderung_code."</AufenthaltFoerderungCode>";
+					}
+				}
+
+			$datei.="
 			</IO>";
 				if($aktstatus!='Incoming')
 				{
