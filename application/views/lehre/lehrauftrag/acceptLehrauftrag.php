@@ -312,17 +312,53 @@ $this->load->view(
         var betrag = parseFloat(cell.getRow().getData().betrag);
         var vertrag_betrag = parseFloat(cell.getRow().getData().vertrag_betrag);
 
-        var text = 'Lehrauftrag in Bearbeitung.';
-            text += "\n";
+        var text = 'Lehrauftrag in Bearbeitung. ';
 
-        if (bestellt != null && erteilt == null && akzeptiert == null && betrag != vertrag_betrag) {
-            text += 'Wartet auf Erteilung, danach können können Sie den Lehrauftrag annehmen.';
+        if (bestellt != null && erteilt == null && akzeptiert == null
+            && betrag != vertrag_betrag)                                        // geaendert (when never erteilt before)
+        {
+            text += 'Wartet auf Erteilung.';
             return text;
         }
-        else if (bestellt != null && erteilt != null && akzeptiert == null && betrag != vertrag_betrag)
+        else if (bestellt != null && erteilt != null && akzeptiert == null
+            && betrag != vertrag_betrag)                                        // geaendert (when has been erteilt once)
         {
-            text += 'Wartet auf erneute Erteilung, danach können können Sie den Lehrauftrag annehmen.';
+            text += 'Wartet auf erneute Erteilung.';
             return text;
+        }
+        else if (bestellt != null && erteilt == null && akzeptiert == null)     // bestellt
+        {
+            return 'Letzter Status: Bestellt. Wartet auf Erteilung.';
+        }
+        else if (bestellt != null && erteilt != null && akzeptiert == null)     // erteilt
+        {
+            return 'Letzter Status: Erteilt. Wartet auf Annahme durch Lektor.';
+        }
+        else if (bestellt != null && erteilt != null && akzeptiert != null)     // akzeptiert
+        {
+            return 'Letzter Status: Angenommen. Vertrag wurde beidseitig abgeschlossen.';
+        }
+    }
+
+    // Generates bestellt tooltip
+    bestellt_tooltip = function(cell){
+        if (cell.getRow().getData().bestellt_von != null)
+        {
+            return 'Bestellt von: ' + cell.getRow().getData().bestellt_von;
+        }
+    }
+
+    // Generates erteilt tooltip
+    erteilt_tooltip = function(cell){
+        if (cell.getRow().getData().erteilt_von != null) {
+            return 'Erteilt von: ' + cell.getRow().getData().erteilt_von;
+        }
+    }
+
+    // Generates akzeptiert tooltip
+    akzeptiert_tooltip = function(cell){
+        if (cell.getRow().getData().akzeptiert_von != null) {
+            return 'Angenommen von: ' + cell.getRow().getData().akzeptiert_von;
         }
     }
 

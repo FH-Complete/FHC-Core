@@ -347,6 +347,7 @@ $this->load->view(
 
         var bestellt = cell.getRow().getData().bestellt;
         var erteilt = cell.getRow().getData().erteilt;
+        var akzeptiert = cell.getRow().getData().akzeptiert;
 
         var betrag = cell.getRow().getData().betrag;
         var vertrag_betrag = cell.getRow().getData().vertrag_betrag;
@@ -354,25 +355,55 @@ $this->load->view(
         var text = 'Lehrauftragstunden/-stundensatz geändert.';
             text += "\n";
 
-        if (is_dummy)
+        if (is_dummy)                                                               // dummy (no lector)
         {
             return 'Neuer Lehrauftrag. Ohne Lektor verplant.'
         }
-        else if (bestellt != null && erteilt == null && betrag != vertrag_betrag)
+        else if (bestellt != null && erteilt == null && betrag != vertrag_betrag)   // geaendert (when never erteilt before)
         {
             return text += 'Wartet auf Bestellung, danach Erteilen möglich.';
         }
-        else if (bestellt != null && erteilt != null && betrag != vertrag_betrag)
+        else if (bestellt != null && erteilt != null && betrag != vertrag_betrag)   // geaendert (when has been erteilt once)
         {
             return text += 'Wartet auf neuerliche Bestellung, danach erneut Erteilen möglich.';
         }
-        else if (bestellt == null)
+        else if (bestellt == null)                                                  // neu
         {
             return 'Neuer Lehrauftrag. Wartet auf Bestellung.';
         }
-        else if (bestellt != null)
+        else if (bestellt != null && erteilt == null && akzeptiert == null)         // bestellt
         {
-            return 'Lehrauftrag bestellt von: ' + cell.getRow().getData().vertrag_insertvon;
+            return 'Letzter Status: Bestellt. Wartet auf Erteilung.';
+        }
+        else if (bestellt != null && erteilt != null && akzeptiert == null)         // erteilt
+        {
+            return 'Letzter Status: Erteilt. Wartet auf Annahme durch Lektor.';
+        }
+        else if (bestellt != null && erteilt != null && akzeptiert != null)         // akzeptiert
+        {
+            return 'Letzter Status: Angenommen. Vertrag wurde beidseitig abgeschlossen.';
+        }
+    }
+
+    // Generates bestellt tooltip
+    bestellt_tooltip = function(cell){
+        if (cell.getRow().getData().bestellt_von != null)
+        {
+            return 'Bestellt von: ' + cell.getRow().getData().bestellt_von;
+        }
+    }
+
+    // Generates erteilt tooltip
+    erteilt_tooltip = function(cell){
+        if (cell.getRow().getData().erteilt_von != null) {
+            return 'Erteilt von: ' + cell.getRow().getData().erteilt_von;
+        }
+    }
+
+    // Generates akzeptiert tooltip
+    akzeptiert_tooltip = function(cell){
+        if (cell.getRow().getData().akzeptiert_von != null) {
+            return 'Angenommen von: ' + cell.getRow().getData().akzeptiert_von;
         }
     }
 $(function() {

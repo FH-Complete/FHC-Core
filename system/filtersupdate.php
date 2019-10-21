@@ -440,7 +440,10 @@ $filters = array(
 					{"name": "mitarbeiter_uid"},
 					{"name": "bestellt"},
 					{"name": "erteilt"},
-					{"name": "akzeptiert"}
+					{"name": "akzeptiert"},
+                    {"name": "bestellt_von"},
+					{"name": "erteilt_von"},
+					{"name": "akzeptiert_von"}
 				],
 				"filters": []
 			}
@@ -486,7 +489,10 @@ $filters = array(
 					{"name": "mitarbeiter_uid"},
 					{"name": "bestellt"},
 					{"name": "erteilt"},
-					{"name": "akzeptiert"}
+					{"name": "akzeptiert"},
+                    {"name": "bestellt_von"},
+					{"name": "erteilt_von"},
+					{"name": "akzeptiert_von"}
 				],
 				"filters": []
 			}
@@ -525,7 +531,10 @@ $filters = array(
 					{"name": "mitarbeiter_uid"},
 					{"name": "bestellt"},
 					{"name": "erteilt"},
-					{"name": "akzeptiert"}
+					{"name": "akzeptiert"},
+                    {"name": "bestellt_von"},
+					{"name": "erteilt_von"},
+					{"name": "akzeptiert_von"}
 				],
 				"filters": []
 			}

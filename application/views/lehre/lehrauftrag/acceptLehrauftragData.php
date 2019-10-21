@@ -29,7 +29,55 @@ SELECT
     mitarbeiter_uid,
     bestellt,
     erteilt,
-    akzeptiert
+    akzeptiert,
+      (SELECT
+         vorname || \' \' || nachname
+     FROM
+         public.tbl_person
+             JOIN public.tbl_benutzer benutzer USING (person_id)
+     WHERE
+             benutzer.uid = (
+             SELECT
+                 insertvon
+             FROM
+                 lehre.tbl_vertrag_vertragsstatus vvs
+             WHERE
+                 vvs.vertragsstatus_kurzbz = \'bestellt\'
+               AND vvs.vertrag_id = auftraege.vertrag_id
+         )
+    )                    AS "bestellt_von",
+    (SELECT
+         vorname || \' \' || nachname
+     FROM
+         public.tbl_person
+             JOIN public.tbl_benutzer benutzer USING (person_id)
+     WHERE
+             benutzer.uid = (
+             SELECT
+                 insertvon
+             FROM
+                 lehre.tbl_vertrag_vertragsstatus vvs
+             WHERE
+                 vvs.vertragsstatus_kurzbz = \'erteilt\'
+               AND vvs.vertrag_id = auftraege.vertrag_id
+         )
+    )                    AS "erteilt_von",
+    (SELECT
+         vorname || \' \' || nachname
+     FROM
+         public.tbl_person
+             JOIN public.tbl_benutzer benutzer USING (person_id)
+     WHERE
+             benutzer.uid = (
+             SELECT
+                 insertvon
+             FROM
+                 lehre.tbl_vertrag_vertragsstatus vvs
+             WHERE
+                 vvs.vertragsstatus_kurzbz = \'akzeptiert\'
+               AND vvs.vertrag_id = auftraege.vertrag_id
+         )
+    )                    AS "akzeptiert_von"
 FROM
     (
 	/* Lehraufträge and -vertragsstati */
@@ -261,7 +309,10 @@ $filterWidgetArray = array(
         'UID',
         'Bestellt',
         'Erteilt',
-        'Akzeptiert'
+        'Akzeptiert',
+        'Bestellt von',
+        'Erteilt von',
+        'Angenommen von'
     ),
     'datasetRepOptions' => '{
         height: 550,   
@@ -314,9 +365,12 @@ $filterWidgetArray = array(
         vertrag_id: {visible: false},
         vertrag_betrag: {visible: false},
         mitarbeiter_uid: {visible: false},
-        bestellt: {align:"center", headerFilter:"input", mutator: mut_formatStringDate}, width: "auto", 
-        erteilt: {align:"center", headerFilter:"input", mutator: mut_formatStringDate}, width: "auto",
-        akzeptiert: {align:"center", headerFilter:"input", mutator: mut_formatStringDate}, width: "auto"
+        bestellt: {align:"center", headerFilter:"input", mutator: mut_formatStringDate, tooltip: bestellt_tooltip}, 
+        erteilt: {align:"center", headerFilter:"input", mutator: mut_formatStringDate, tooltip: erteilt_tooltip},
+        akzeptiert: {align:"center", headerFilter:"input", mutator: mut_formatStringDate, tooltip: akzeptiert_tooltip},
+        bestellt_von: {visible: false},
+        erteilt_von: {visible: false},
+        akzeptiert_von: {visible: false}
     }', // col properties
 );
 
