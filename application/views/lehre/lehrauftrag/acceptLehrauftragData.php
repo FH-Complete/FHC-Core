@@ -273,7 +273,7 @@ FROM
                   AND vvs.vertragsstatus_kurzbz IN (\'bestellt\', \'erteilt\', \'akzeptiert\')
             ) tmp_projektbetreuung
     ) auftraege
-ORDER BY "typ" DESC, "auftrag", "bestellt", "erteilt"
+ORDER BY "akzeptiert" NULLS FIRST, "erteilt" NULLS LAST, "bestellt"
 ';
 
 $filterWidgetArray = array(
