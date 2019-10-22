@@ -127,15 +127,26 @@ $this->load->view(
     // Header filter
     // -----------------------------------------------------------------------------------------------------------------
 
-    // Casts string formatted float values to float when using the filter.
-    // This will allow correct filtering.
-    function hf_compareWithFloat(headerValue, rowValue, rowData, filterParams){
-        //headerValue - the value of the header filter element
-        //rowValue - the value of the column in this row
-        //rowData - the data for the row being filtered
-        //filterParams - params object passed to the headerFilterFuncParams property
+    // Filters values using comparison operator or just by string comparison
+    function hf_filterStringnumberWithOperator(headerValue, rowValue, rowData){
 
-        return parseFloat(headerValue) <= parseFloat(rowValue); //must return a boolean, true if it passes the filter.
+        // If string starts with <, <=, >, >=, !=, ==, compare values with that operator
+        var operator = '';
+        if (headerValue.match(/([<=>!]{1,2})/g)) {
+            var operator_arr = headerValue.match(/([<=>!]{1,2})/g);
+            operator = operator_arr[0];
+
+            headerValue = headerValue
+                .replace(operator, '')
+                .trim()
+            ;
+
+            // return if value comparison is true
+            return eval(rowValue + operator + headerValue);
+        }
+
+        // If just a stringnumber, return if exact match found
+        return parseFloat(rowValue) == headerValue;
     }
 
     // -----------------------------------------------------------------------------------------------------------------
