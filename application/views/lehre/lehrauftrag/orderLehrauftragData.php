@@ -327,7 +327,7 @@ $filterWidgetArray = array(
         'UID',
         'Bestellt',
         'Erteilt',
-        'Akzeptiert',
+        'Angenommen',
         'Bestellt von',
         'Erteilt von',
         'Angenommen von'

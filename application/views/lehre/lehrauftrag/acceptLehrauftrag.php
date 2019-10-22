@@ -71,13 +71,13 @@ $this->load->view(
                 <button id="show-all" class="btn btn-default btn-lehrauftrag focus" data-toggle="tooltip" data-placement="left" title="Alle anzeigen"><i class='fa fa-users'></i></button>
                 <button id="show-ordered" class="btn btn-default btn-lehrauftrag" data-toggle="tooltip" data-placement="left" title="Nur bestellte anzeigen"></button>
                 <button id="show-approved" class="btn btn-default btn-lehrauftrag" data-toggle="tooltip" data-placement="left" title="Nur erteilte anzeigen"></button>
-                <button id="show-accepted" class="btn btn-default btn-lehrauftrag" data-toggle="tooltip" data-placement="left" title="Nur akzeptierte anzeigen"><i class='fa fa-handshake-o'></i></button>
+                <button id="show-accepted" class="btn btn-default btn-lehrauftrag" data-toggle="tooltip" data-placement="left" title="Nur angenommene anzeigen"><i class='fa fa-handshake-o'></i></button>
             </div><!-- end col -->
             <div class="col-md-offset-2 col-xs-offset-1 col-md-4 col-xs-5">
                 <div class="input-group">
                     <input id="password" type="password" class="form-control" placeholder="Login-Passwort">
                     <span class="input-group-btn">
-                        <button id="accept-lehrauftraege" class="btn btn-primary pull-right">Lehrauftrag akzeptieren</button>
+                        <button id="accept-lehrauftraege" class="btn btn-primary pull-right">Lehrauftrag annehmen</button>
                     </span>
                 </div>
             </div><!-- end col -->
@@ -448,7 +448,7 @@ $this->load->view(
     });
 
 
-    // Approve Lehrauftraege
+        // Approve Lehrauftraege
     $("#accept-lehrauftraege").click(function(){
 
         // Get selected rows data
