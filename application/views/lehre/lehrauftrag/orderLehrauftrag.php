@@ -95,19 +95,17 @@ $this->load->view(
             </div>
         </div>
 
-        <div class="row">
-            <div class="col-lg-12">
-                <button id="order-lehrauftraege" class="btn btn-primary pull-right">Lehrauftrag bestellen</button>
-                <button id="select-all" class="btn btn-default">Alle auswählen</button>
-                <button id="deselect-all" class="btn btn-default">Alle abwählen</button>
-                <button id="show-all" class="btn btn-default btn-lehrauftrag focus" data-toggle="tooltip" data-placement="left" title="Alle anzeigen"><i class='fa fa-users'></i></button>
-                <button id="show-new" class="btn btn-default btn-lehrauftrag" data-toggle="tooltip" data-placement="left" title="Nur neue anzeigen"><i class='fa fa-user-plus'></i></button>
-                <button id="show-ordered" class="btn btn-default btn-lehrauftrag" data-toggle="tooltip" data-placement="left" title="Nur bestellte anzeigen"><i class='fa fa-check-square-o'></i></button>
-                <button id="show-approved" class="btn btn-default btn-lehrauftrag" data-toggle="tooltip" data-placement="left" title="Nur erteilte anzeigen"><i class='fa fa-check-square'></i></button>
-                <button id="show-accepted" class="btn btn-default btn-lehrauftrag" data-toggle="tooltip" data-placement="left" title="Nur akzeptierte anzeigen"><i class='fa fa-handshake-o'></i></button>
-                <button id="show-changed" class="btn btn-default btn-lehrauftrag" data-toggle="tooltip" data-placement="left" title="Nur geänderte anzeigen"><i class='fa fa-pencil'></i></button>
-                <button id="show-dummies" class="btn btn-default btn-lehrauftrag" data-toggle="tooltip" data-placement="left" title="Nur verplante ohne Lektor anzeigen (Dummies)"><i class='fa fa-user-secret'></i></button>
-            </div>
+        <div class="col-lg-12">
+            <button id="order-lehrauftraege" class="btn btn-primary pull-right">Lehrauftrag bestellen</button>
+            <button id="select-all" class="btn btn-default">Alle auswählen</button>
+            <button id="deselect-all" class="btn btn-default">Alle abwählen</button>
+            <button id="show-all" class="btn btn-default btn-lehrauftrag focus" data-toggle="tooltip" data-placement="left" title="Alle anzeigen"><i class='fa fa-users'></i></button>
+            <button id="show-new" class="btn btn-default btn-lehrauftrag" data-toggle="tooltip" data-placement="left" title="Nur neue anzeigen"><i class='fa fa-user-plus'></i></button>
+            <button id="show-ordered" class="btn btn-default btn-lehrauftrag" data-toggle="tooltip" data-placement="left" title="Nur bestellte anzeigen"></button><!-- png img set in javascript -->
+            <button id="show-approved" class="btn btn-default btn-lehrauftrag" data-toggle="tooltip" data-placement="left" title="Nur erteilte anzeigen"></button><!-- png img set in javascript -->
+            <button id="show-accepted" class="btn btn-default btn-lehrauftrag" data-toggle="tooltip" data-placement="left" title="Nur akzeptierte anzeigen"><i class='fa fa-handshake-o'></i></button>
+            <button id="show-changed" class="btn btn-default btn-lehrauftrag" data-toggle="tooltip" data-placement="left" title="Nur geänderte anzeigen"></button><!-- png img set in javascript -->
+            <button id="show-dummies" class="btn btn-default btn-lehrauftrag" data-toggle="tooltip" data-placement="left" title="Nur verplante ohne Lektor anzeigen (Dummies)"><i class='fa fa-user-secret'></i></button>
         </div>
     </div>
 </div>
@@ -119,6 +117,14 @@ $this->load->view(
 <script type="text/javascript">
 
     const COLOR_LIGHTGREY = "#f5f5f5";
+
+    /**
+     * PNG icons used in status- and filter buttons
+     * Setting png icons is a workaround to use font-awsome 5.9.0 icons until system can be updated to newer font awsome version.
+     * */
+    const ICON_LEHRAUFTRAG_ORDERED = '<img src="../../../public/images/icons/fa-user-tag.png" style="height: 30px; width: 30px; margin: -5px;">';
+    const ICON_LEHRAUFTRAG_APPROVED = '<img src="../../../public/images/icons/fa-user-check.png" style="height: 30px; width: 30px; margin: -5px;">';
+    const ICON_LEHRAUFTRAG_CHANGED = '<img src="../../../public/images/icons/fa-user-edit.png" style="height: 30px; width: 30px; margin: -5px;">';
 
     // -----------------------------------------------------------------------------------------------------------------
     // Mutators - setter methods to manipulate table data when entering the tabulator
@@ -326,12 +332,12 @@ $this->load->view(
          }
          else if (bestellt != null && isNaN(vertrag_betrag))
          {
-             return "<i class='fa fa-user-minus'></i>";    //  kein Vertrag
+             return "<i class='fa fa-user-minus'></i>";     // kein Vertrag
          }
          else if (bestellt != null && (betrag != vertrag_betrag))
          {
-             return "<i class='fa fa-pencil'></i>";     // geaendert
-             // return "<i class='fas fa-user-edit'></i>";     // geaendert
+             return ICON_LEHRAUFTRAG_CHANGED;               // geaendert
+             // return "<i class='fas fa-user-edit'></i>";
          }
          else if (bestellt == null && erteilt == null && akzeptiert == null)
          {
@@ -339,18 +345,17 @@ $this->load->view(
          }
          else if (bestellt != null && erteilt == null && akzeptiert == null)
          {
-             return "<i class='fa fa-check-square-o'></i>";     // bestellt
-             // return "<i class='fa fa-user-tag'></i>";     // bestellt
+             return ICON_LEHRAUFTRAG_ORDERED;               // bestellt
+             // return "<i class='fa fa-user-tag'></i>";
          }
          else if (bestellt != null && erteilt != null && akzeptiert == null)
          {
-             return "<i class='fa fa-check-square'></i>";  // erteilt
-             // return "<i class='fas fa-user-check'></i>";  // erteilt
+             return ICON_LEHRAUFTRAG_APPROVED;              // erteilt
+             // return "<i class='fas fa-user-check'></i>";
          }
          else if (bestellt != null && erteilt != null && akzeptiert != null)
          {
-             return "<i class='fa fa-handshake-o'></i>";  // akzeptiert
-             // return "<i class='fas fa-user-graduate'></i>";  // akzeptiert
+             return "<i class='fa fa-handshake-o'></i>";    // akzeptiert
          }
          else
          {
@@ -513,6 +518,21 @@ $(function() {
                 {field: 'personalnummer', type: '<=', value: 0},
             ]
         );
+    });
+
+     // Set png-icons into filter-buttons
+    $(".btn-lehrauftrag").each(function(){
+        switch(this.id) {
+            case 'show-ordered':
+                this.innerHTML = ICON_LEHRAUFTRAG_ORDERED;
+                break;
+            case 'show-approved':
+                this.innerHTML = ICON_LEHRAUFTRAG_APPROVED;
+                break;
+            case 'show-changed':
+                this.innerHTML = ICON_LEHRAUFTRAG_CHANGED;
+                break;
+        }
     });
 
     // Focus on clicked button
