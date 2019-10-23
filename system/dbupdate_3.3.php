@@ -3250,6 +3250,32 @@ if(!$result = @$db->db_query("SELECT incoming FROM bis.tbl_zweck LIMIT 1"))
 		echo '<br>bis.tbl_zweck Spalte incoming und outgoing hinzugefügt, neue Codexeinträge ergänzt.';
 }
 
+// Add column statistik_kurzbz to system.tbl_filters
+if(!$result = @$db->db_query("SELECT statistik_kurzbz FROM system.tbl_filters LIMIT 1"))
+{
+	$qry = "ALTER TABLE system.tbl_filters ADD COLUMN statistik_kurzbz varchar(64);
+			ALTER TABLE system.tbl_filters ADD CONSTRAINT fk_filters_statistik FOREIGN KEY (statistik_kurzbz) REFERENCES public.tbl_statistik (statistik_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;";
+
+	if(!$db->db_query($qry))
+		echo '<strong>system.tbl_filters: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>system.tbl_filters: Spalte statistik_kurzbz hinzugefuegt';
+}
+
+// app reporting hinzufügen
+if($result = @$db->db_query("SELECT 1 FROM system.tbl_app WHERE app= 'reporting';"))
+{
+	if($db->db_num_rows($result) == 0)
+	{
+		$qry = "INSERT INTO system.tbl_app(app) VALUES ('reporting');";
+
+		if(!$db->db_query($qry))
+			echo '<strong>system.tbl_app: '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>system.tbl_app: Zeile reporting hinzugefuegt!<br>';
+	}
+}
+
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
 
