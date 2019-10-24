@@ -95,20 +95,28 @@ $this->load->view(
             </div>
         </div>
 
-        <div class="col-lg-12">
-            <button id="order-lehrauftraege" class="btn btn-primary pull-right">Lehrauftrag bestellen</button>
-            <button id="select-all" class="btn btn-default">Alle auswählen</button>
-            <button id="deselect-all" class="btn btn-default">Alle abwählen</button>
-            <button id="show-all" class="btn btn-default btn-lehrauftrag focus" data-toggle="tooltip" data-placement="left" title="Alle anzeigen"><i class='fa fa-users'></i></button>
-            <button id="show-new" class="btn btn-default btn-lehrauftrag" data-toggle="tooltip" data-placement="left" title="Nur neue anzeigen"><i class='fa fa-user-plus'></i></button>
-            <button id="show-ordered" class="btn btn-default btn-lehrauftrag" data-toggle="tooltip" data-placement="left" title="Nur bestellte anzeigen"></button><!-- png img set in javascript -->
-            <button id="show-approved" class="btn btn-default btn-lehrauftrag" data-toggle="tooltip" data-placement="left" title="Nur erteilte anzeigen"></button><!-- png img set in javascript -->
-            <button id="show-accepted" class="btn btn-default btn-lehrauftrag" data-toggle="tooltip" data-placement="left" title="Nur angenommene anzeigen"><i class='fa fa-handshake-o'></i></button>
-            <button id="show-changed" class="btn btn-default btn-lehrauftrag" data-toggle="tooltip" data-placement="left" title="Nur geänderte anzeigen"></button><!-- png img set in javascript -->
-            <button id="show-dummies" class="btn btn-default btn-lehrauftrag" data-toggle="tooltip" data-placement="left" title="Nur verplante ohne Lektor anzeigen (Dummies)"><i class='fa fa-user-secret'></i></button>
+        <br>
+        <div class="row">
+            <div class="col-xs-12">
+                <button id="order-lehrauftraege" class="btn btn-primary pull-right" data-toggle="tooltip" data-placement="left" title="">Lehrauftrag bestellen</button>
+                <div class="btn-toolbar" role="toolbar">
+                    <div class="btn-group" role="group">
+                        <button id="show-all" class="btn btn-default btn-lehrauftrag" type="button" data-toggle="tooltip" data-placement="left" title="Alle anzeigen"><i class='fa fa-users'></i></button>
+                        <button id="show-new" class="btn btn-default btn-lehrauftrag active focus" type="button" data-toggle="tooltip" data-placement="left" title="Nur neue anzeigen"><i class='fa fa-user-plus'></i></button>
+                        <button id="show-changed" class="btn btn-default btn-lehrauftrag active focus" type="button" data-toggle="tooltip" data-placement="left" title="Nur geänderte anzeigen"></button><!-- png img set in javascript -->
+                        <button id="show-ordered" class="btn btn-default btn-lehrauftrag" type="button" data-toggle="tooltip" data-placement="left" title="Nur bestellte anzeigen"></button><!-- png img set in javascript -->
+                        <button id="show-approved" class="btn btn-default btn-lehrauftrag" type="button" data-toggle="tooltip" data-placement="left" title="Nur erteilte anzeigen"></button><!-- png img set in javascript -->
+                        <button id="show-accepted" class="btn btn-default btn-lehrauftrag" type="button" data-toggle="tooltip" data-placement="left" title="Nur angenommene anzeigen"><i class='fa fa-handshake-o'></i></button>
+                    </div>
+                    <div class="btn-group" role="group" style="margin-left: 15px;">
+                        <button id="show-dummies" class="btn btn-default btn-lehrauftrag" type="button" data-toggle="tooltip" data-placement="left" title="Nur verplante ohne Lektor anzeigen (Dummies)"><i class='fa fa-user-secret'></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         </div>
     </div>
-</div>
 </body>
 
 <?php $this->load->view('templates/FHC-Footer'); ?>
@@ -122,9 +130,9 @@ $this->load->view(
      * PNG icons used in status- and filter buttons
      * Setting png icons is a workaround to use font-awsome 5.9.0 icons until system can be updated to newer font awsome version.
      * */
-    const ICON_LEHRAUFTRAG_ORDERED = '<img src="../../../public/images/icons/fa-user-tag.png" style="height: 30px; width: 30px; margin: -5px;">';
-    const ICON_LEHRAUFTRAG_APPROVED = '<img src="../../../public/images/icons/fa-user-check.png" style="height: 30px; width: 30px; margin: -5px;">';
-    const ICON_LEHRAUFTRAG_CHANGED = '<img src="../../../public/images/icons/fa-user-edit.png" style="height: 30px; width: 30px; margin: -5px;">';
+    const ICON_LEHRAUFTRAG_ORDERED = '<img src="../../../public/images/icons/fa-user-tag.png" style="height: 30px; width: 30px; margin: -6px;">';
+    const ICON_LEHRAUFTRAG_APPROVED = '<img src="../../../public/images/icons/fa-user-check.png" style="height: 30px; width: 30px; margin: -6px;">';
+    const ICON_LEHRAUFTRAG_CHANGED = '<img src="../../../public/images/icons/fa-user-edit.png" style="height: 30px; width: 30px; margin: -6px;">';
 
     // -----------------------------------------------------------------------------------------------------------------
     // Mutators - setter methods to manipulate table data when entering the tabulator
@@ -322,6 +330,66 @@ $this->load->view(
         row.getElement().style["pointerEvents"] = "none";
     }
 
+    // Tabulator footer element
+    // -----------------------------------------------------------------------------------------------------------------
+
+    // Adds a footer with buttons select all / deselect all / download
+    function func_footerElement(){
+
+        var footer_html = '<div class="row">';
+            footer_html += '<div class="col-lg-12" style="padding: 5px;">';
+
+            footer_html += '<div class="btn-toolbar pull-right" role="toolbar">';
+            footer_html += '<div class="btn-group" role="group">';
+            footer_html += '<button id="download-csv" class="btn btn-default" type="button" data-toggle="tooltip" data-placement="left" title="Download CSV" onclick="footer_downloadCSV()"><small>CSV&nbsp;&nbsp;</small><i class="fa fa-arrow-down"></i></button>';
+            footer_html += '</div>';
+            footer_html += '</div>';
+
+            footer_html += '<div class="btn-toolbar" role="toolbar">';
+            footer_html += '<div class="btn-group" role="group">';
+            footer_html += '<button id="select-all" class="btn btn-default pull-left" type="button" onclick="footer_selectAll()">Alle auswählen</button>';
+            footer_html += '<button id="deselect-all" class="btn btn-default pull-left" type="button" onclick="footer_deselectAll()">Alle abwählen</button>';
+            footer_html += '<span id="number-selected" style="margin-left: 20px; line-height: 2; font-weight: normal"></span>';
+            footer_html += '</div>';
+            footer_html += '</div>';
+
+            footer_html += '</div>';
+            footer_html += '</div>';
+
+        return footer_html;
+    }
+
+    // Performs download CSV
+    function footer_downloadCSV(){
+         $('#filterTabulator').tabulator("download", "csv", "data.csv", {bom:true}); // BOM for correct UTF-8 char output
+    }
+
+    /*
+     * Performs select all
+     * Select all (filtered) rows and ignore rows which have status bestellt
+     */
+    function footer_selectAll(){
+        $('#filterTabulator').tabulator('getRows', true)
+            .filter(row => row.getData().personalnummer >= 0 &&             // NOT dummies
+                    row.getData().bestellt == null ||                       // AND neu
+                    row.getData().bestellt != null &&                       // OR (bestellt
+                    row.getData().betrag != row.getData().vertrag_betrag)   // AND geaendert)
+            .forEach((row => row.select()));
+    }
+
+    /*
+     * Performs deselect all
+     * Deselect all (filtered) rows
+     */
+    function footer_deselectAll(){
+        $('#filterTabulator').tabulator('deselectRow');
+    }
+
+    // Displays number of selected rows on row selection change
+    function func_rowSelectionChanged(data, rows){
+         $('#number-selected').html("Für Bestellung ausgewählt: <strong>" + rows.length + "</strong>");
+    }
+
     // -----------------------------------------------------------------------------------------------------------------
     // Tabulator columns format functions
     // -----------------------------------------------------------------------------------------------------------------
@@ -450,20 +518,6 @@ $this->load->view(
 
 $(function() {
 
-    // Select all (filtered) rows and ignore rows which have status bestellt
-    $("#select-all").click(function(){
-        $('#filterTabulator').tabulator('getRows', true)
-            .filter(row =>  row.getData().bestellt == null ||                       // neu
-                            row.getData().bestellt != null &&                       // OR bestellt
-                            row.getData().betrag != row.getData().vertrag_betrag)   // AND geaendert
-            .forEach((row => row.select()));
-    });
-
-    // Deselect all (filtered) rows
-    $("#deselect-all").click(function(){
-        $('#filterTabulator').tabulator('deselectRow');
-    });
-
     // Show all rows
     $("#show-all").click(function(){
         $('#filterTabulator').tabulator('clearFilter');
@@ -546,10 +600,21 @@ $(function() {
         }
     });
 
-    // Focus on clicked button
+    // De/activate and un/focus on clicked button, En-/Disable 'Lehrauftrag bestellen'
     $(".btn-lehrauftrag").click(function() {
-        $(".btn-lehrauftrag").removeClass('focus');
-        $(this).addClass('focus');
+
+        // De/activate and un/focus on clicked button
+        $(".btn-lehrauftrag").removeClass('focus').removeClass('active');
+        $(this).addClass('focus').addClass('active');
+
+        //Enable button 'Lehrauftrag bestellen' by default
+        $('#order-lehrauftraege').attr('disabled', false).attr('title', '');
+
+        // Disable button Lehrauftrag bestellen for dummies
+        if (this.id == 'show-dummies')
+        {
+            $('#order-lehrauftraege').attr('disabled', true).attr('title', 'Lehraufträge ohne Lektorzuteilung können nicht bestellt werden.');
+        }
     });
 
     // Order Lehrauftraege

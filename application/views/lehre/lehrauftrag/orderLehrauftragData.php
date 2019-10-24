@@ -343,6 +343,7 @@ $filterWidgetArray = array(
 	    groupHeader: function(value, count, data, group){
 	       return func_groupHeader(data);
 	    },
+	    footerElement: func_footerElement(),
         columnCalcs:"both",             // show column calculations at top and bottom of table and in groups
 	    index: "row_index",             // assign specific column as unique id (important for row indexing)
         selectable: true,               // allows row selection
@@ -353,6 +354,9 @@ $filterWidgetArray = array(
         },
         rowUpdated:function(row){
             func_rowUpdated(row); 
+        },
+        rowSelectionChanged:function(data, rows){
+            func_rowSelectionChanged(data, rows);
         },
         rowFormatter:function(row){
             func_rowFormatter(row);
@@ -371,7 +375,7 @@ $filterWidgetArray = array(
         // column status is built dynamically in funcTableBuilt()
         row_index: {visible: false},
         personalnummer: {visible: false},   
-        lehreinheit_id: {headerFilter:"input", bottomCalc:"count", 
+        lehreinheit_id: {headerFilter:"input", bottomCalc:"count", width: "7%",
             bottomCalcFormatter:function(cell){return "Anzahl: " + cell.getValue();}},
         lehrveranstaltung_id: {headerFilter:"input"},
         lv_bezeichnung: {visible: false},
