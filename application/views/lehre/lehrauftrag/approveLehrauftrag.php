@@ -179,6 +179,16 @@ $this->load->view(
     // Custom filters
     // -----------------------------------------------------------------------------------------------------------------
 
+    // Filters bestellte initially
+    function func_initialFilter(){
+        return [
+            {field: 'personalnummer', type: '>=', value: 0},    // NOT dummy lector
+            {field: 'bestellt', type: '!=', value: null},       // AND bestellt
+            {field: 'erteilt', type: '=', value: null},         // AND NOT erteilt
+            {field: 'akzeptiert', type: '=', value: null}       // AND NOT akzeptiert
+        ]
+    }
+
     // Filters geaenderte
     function filter_showChanged(data){
 
