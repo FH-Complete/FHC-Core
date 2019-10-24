@@ -193,7 +193,7 @@ $this->load->view(
     function filter_showChanged(data){
 
         // Filters geaenderte from status bestellt on
-        return  data.personalnummer > 0 &&          // NOT dummy lector AND
+        return  data.personalnummer >= 0 &&          // NOT dummy lector AND
                 data.bestellt != null &&            // bestellt AND
                 data.betrag != data.vertrag_betrag; // geaendert
     }
@@ -512,7 +512,6 @@ $(function() {
     $("#show-new").click(function(){
         $('#filterTabulator').tabulator('setFilter',
             [
-                {field: 'personalnummer', type: '!=', value: null},
                 {field: 'personalnummer', type: '>=', value: 0},
                 {field: 'bestellt', type: '=', value: null},
                 {field: 'erteilt', type: '=', value: null},
@@ -525,6 +524,7 @@ $(function() {
     $("#show-ordered").click(function(){
         $('#filterTabulator').tabulator('setFilter',
             [
+                {field: 'personalnummer', type: '>=', value: 0},
                 {field: 'bestellt', type: '!=', value: null},
                 {field: 'erteilt', type: '=', value: null},
                 {field: 'akzeptiert', type: '=', value: null}
