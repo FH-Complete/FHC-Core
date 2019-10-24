@@ -76,7 +76,7 @@ $this->load->view(
                     </div>
                 </div>
             </div>
-            <div class="col-md-offset-3 col-xs-offset-2 col-md-3 col-xs-4">
+            <div class="col-md-offset-2 col-md-4 col-xs-6">
                 <div class="input-group">
                     <input id="password" type="password" class="form-control" placeholder="Login-Passwort">
                     <span class="input-group-btn">
