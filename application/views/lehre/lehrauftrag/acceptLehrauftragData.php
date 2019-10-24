@@ -326,9 +326,13 @@ $filterWidgetArray = array(
         selectablePersistence:false,    // deselect previously selected rows when table is filtered, sorted or paginated
         selectableCheck: function(row){ 
             return func_selectableCheck(row);
-        },      
+        },
+        footerElement: func_footerElement(),         
         rowUpdated:function(row){
             func_rowUpdated(row);    
+        },
+        rowSelectionChanged:function(data, rows){
+            func_rowSelectionChanged(data, rows);
         },
         rowFormatter:function(row){
             func_rowFormatter(row);

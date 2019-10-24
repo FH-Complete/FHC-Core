@@ -64,16 +64,19 @@ $this->load->view(
             </div>
         </div>
 
+        <br>
         <div class="row">
             <div class="col-xs-6">
-                <button id="select-all" class="btn btn-default">Alle auswählen</button>
-                <button id="deselect-all" class="btn btn-default">Alle abwählen</button>
-                <button id="show-all" class="btn btn-default btn-lehrauftrag focus" data-toggle="tooltip" data-placement="left" title="Alle anzeigen"><i class='fa fa-users'></i></button>
-                <button id="show-ordered" class="btn btn-default btn-lehrauftrag" data-toggle="tooltip" data-placement="left" title="Nur bestellte anzeigen"></button>
-                <button id="show-approved" class="btn btn-default btn-lehrauftrag" data-toggle="tooltip" data-placement="left" title="Nur erteilte anzeigen"></button>
-                <button id="show-accepted" class="btn btn-default btn-lehrauftrag" data-toggle="tooltip" data-placement="left" title="Nur angenommene anzeigen"><i class='fa fa-handshake-o'></i></button>
-            </div><!-- end col -->
-            <div class="col-md-offset-2 col-xs-offset-1 col-md-4 col-xs-5">
+                <div class="btn-toolbar" role="toolbar">
+                    <div class="btn-group" role="group">
+                        <button id="show-all" class="btn btn-default btn-lehrauftrag" type="button" data-toggle="tooltip" data-placement="left" title="Alle anzeigen"><i class='fa fa-users'></i></button>
+                        <button id="show-ordered" class="btn btn-default btn-lehrauftrag" type="button" data-toggle="tooltip" data-placement="left" title="Nur bestellte anzeigen"></button><!-- png img set in javascript -->
+                        <button id="show-approved" class="btn btn-default btn-lehrauftrag active focus" type="button" data-toggle="tooltip" data-placement="left" title="Nur erteilte anzeigen"></button><!-- png img set in javascript -->
+                        <button id="show-accepted" class="btn btn-default btn-lehrauftrag" type="button" data-toggle="tooltip" data-placement="left" title="Nur angenommene anzeigen"><i class='fa fa-handshake-o'></i></button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-offset-3 col-xs-offset-2 col-md-3 col-xs-4">
                 <div class="input-group">
                     <input id="password" type="password" class="form-control" placeholder="Login-Passwort">
                     <span class="input-group-btn">
@@ -104,9 +107,9 @@ $this->load->view(
      * PNG icons used in status- and filter buttons
      * Setting png icons is a workaround to use font-awsome 5.9.0 icons until system can be updated to newer font awsome version.
      * */
-    const ICON_LEHRAUFTRAG_ORDERED = '<img src="../../../public/images/icons/fa-user-tag.png" style="height: 30px; width: 30px; margin: -5px;">';
-    const ICON_LEHRAUFTRAG_APPROVED = '<img src="../../../public/images/icons/fa-user-check.png" style="height: 30px; width: 30px; margin: -5px;">';
-    const ICON_LEHRAUFTRAG_CHANGED = '<img src="../../../public/images/icons/fa-user-edit.png" style="height: 30px; width: 30px; margin: -5px;">';
+    const ICON_LEHRAUFTRAG_ORDERED = '<img src="../../../public/images/icons/fa-user-tag.png" style="height: 30px; width: 30px; margin: -6px;">';
+    const ICON_LEHRAUFTRAG_APPROVED = '<img src="../../../public/images/icons/fa-user-check.png" style="height: 30px; width: 30px; margin: -6px;">';
+    const ICON_LEHRAUFTRAG_CHANGED = '<img src="../../../public/images/icons/fa-user-edit.png" style="height: 30px; width: 30px; margin: -6px;">';
 
 
     // -----------------------------------------------------------------------------------------------------------------
@@ -275,6 +278,66 @@ $this->load->view(
        }
     }
 
+    // Tabulator footer element
+    // -----------------------------------------------------------------------------------------------------------------
+
+    // Adds a footer with buttons select all / deselect all / download
+    function func_footerElement(){
+
+        var footer_html = '<div class="row">';
+        footer_html += '<div class="col-lg-12" style="padding: 5px;">';
+
+        footer_html += '<div class="btn-toolbar pull-right" role="toolbar">';
+        footer_html += '<div class="btn-group" role="group">';
+        footer_html += '<button id="download-csv" class="btn btn-default" type="button" data-toggle="tooltip" data-placement="left" title="Download CSV" onclick="footer_downloadCSV()"><small>CSV&nbsp;&nbsp;</small><i class="fa fa-arrow-down"></i></button>';
+        footer_html += '</div>';
+        footer_html += '</div>';
+
+        footer_html += '<div class="btn-toolbar" role="toolbar">';
+        footer_html += '<div class="btn-group" role="group">';
+        footer_html += '<button id="select-all" class="btn btn-default pull-left" type="button" onclick="footer_selectAll()">Alle auswählen</button>';
+        footer_html += '<button id="deselect-all" class="btn btn-default pull-left" type="button" onclick="footer_deselectAll()">Alle abwählen</button>';
+        footer_html += '<span id="number-selected" style="margin-left: 20px; line-height: 2; font-weight: normal"></span>';
+        footer_html += '</div>';
+        footer_html += '</div>';
+
+        footer_html += '</div>';
+        footer_html += '</div>';
+
+        return footer_html;
+    }
+
+    // Performs download CSV
+    function footer_downloadCSV(){
+        $('#filterTabulator').tabulator("download", "csv", "data.csv", {bom:true}); // BOM for correct UTF-8 char output
+    }
+
+    /*
+     * Performs select all
+     * Select all (filtered) rows and ignore rows that are bestellt and erteilt
+     */
+    function footer_selectAll(){
+        $('#filterTabulator').tabulator('getRows', true)
+            .filter(row =>  row.getData().bestellt != null &&   // bestellt
+                    row.getData().erteilt != null &&            // AND erteilt
+                    row.getData().akzeptiert == null &&         // AND NOT akzeptiert
+                    row.getData().status != 'Geändert')         // AND NOT geändert
+            .forEach((row => row.select()));
+    }
+
+    /*
+     * Performs deselect all
+     * Deselect all (filtered) rows
+     */
+    function footer_deselectAll(){
+        $('#filterTabulator').tabulator('deselectRow');
+    }
+
+    // Displays number of selected rows on row selection change
+    function func_rowSelectionChanged(data, rows){
+        $('#number-selected').html("Für Annehmen ausgewählt: <strong>" + rows.length + "</strong>");
+    }
+
     // -----------------------------------------------------------------------------------------------------------------
     // Tabulator columns format functions
     // -----------------------------------------------------------------------------------------------------------------
@@ -384,20 +447,6 @@ $this->load->view(
 
     $(function() {
 
-    // Select all (filtered) rows, where status bestellt AND erteilt has a value and status akzeptiert has no value.
-    $("#select-all").click(function(){
-        $('#filterTabulator').tabulator('getRows', true)
-            .filter(function(row){
-                return row.getData().bestellt != null && row.getData().erteilt != null && row.getData().akzeptiert == null;
-            })
-            .forEach((row => row.select()));
-    });
-
-    // Deselect all (filtered) rows
-    $("#deselect-all").click(function(){
-        $('#filterTabulator').tabulator('deselectRow');
-    });
-
     // Show all rows
     $("#show-all").click(function(){
         $('#filterTabulator').tabulator('clearFilter');
@@ -447,6 +496,13 @@ $this->load->view(
         }
     });
 
+        // De/activate and un/focus on clicked button
+    $(".btn-lehrauftrag").click(function() {
+
+        // De/activate and un/focus on clicked button
+            $(".btn-lehrauftrag").removeClass('focus').removeClass('active');
+            $(this).addClass('focus').addClass('active');
+    });
 
         // Approve Lehrauftraege
     $("#accept-lehrauftraege").click(function(){
