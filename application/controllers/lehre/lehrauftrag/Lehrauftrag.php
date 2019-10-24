@@ -106,23 +106,23 @@ class Lehrauftrag extends Auth_Controller
     public function orderLehrauftrag()
     {
         $new_lehrvertrag_data_arr = array();    // information of new lehrvertraege to be used in mail
-        $lehrauftrag_arr = $this->input->post('selected_data');
+        $lehrauftrag_arr = json_decode($this->input->post('selected_data'));
 
         // Loop through lehraufträge
         if(is_array($lehrauftrag_arr))
         {
             foreach($lehrauftrag_arr as $lehrauftrag)
             {
-                $lehreinheit_id = (isset($lehrauftrag['lehreinheit_id']) && is_numeric($lehrauftrag['lehreinheit_id'])) ? $lehrauftrag['lehreinheit_id'] : null;
-                $lehrveranstaltung_id = (isset($lehrauftrag['lehrveranstaltung_id']) && is_numeric($lehrauftrag['lehrveranstaltung_id'])) ? $lehrauftrag['lehrveranstaltung_id'] : null;
-                $person_id = (isset($lehrauftrag['person_id']) && is_numeric($lehrauftrag['person_id'])) ? $lehrauftrag['person_id'] : null;
-                $mitarbeiter_uid = (isset($lehrauftrag['mitarbeiter_uid']) && is_string($lehrauftrag['mitarbeiter_uid'])) ? $lehrauftrag['mitarbeiter_uid'] : null;
-                $vertrag_id = (isset($lehrauftrag['vertrag_id']) && is_numeric($lehrauftrag['vertrag_id'])) ? $lehrauftrag['vertrag_id'] : null;
-                $projektarbeit_id = (isset($lehrauftrag['projektarbeit_id']) && is_numeric($lehrauftrag['projektarbeit_id'])) ? $lehrauftrag['projektarbeit_id'] : null;
-                $stunden = (isset($lehrauftrag['stunden']) && is_numeric($lehrauftrag['stunden'])) ? $lehrauftrag['stunden'] : null;
-                $betrag = (isset($lehrauftrag['betrag']) && is_numeric($lehrauftrag['betrag'])) ? $lehrauftrag['betrag'] : null;
-                $vertrag_betrag = (isset($lehrauftrag['vertrag_betrag']) && is_numeric($lehrauftrag['vertrag_betrag'])) ? $lehrauftrag['vertrag_betrag'] : null;
-                $studiensemester_kurzbz = (isset($lehrauftrag['studiensemester_kurzbz']) && is_string($lehrauftrag['studiensemester_kurzbz'])) ? $lehrauftrag['betrag'] : null;
+                $lehreinheit_id = (isset($lehrauftrag->lehreinheit_id)) ? $lehrauftrag->lehreinheit_id : null;
+                $lehrveranstaltung_id = (isset($lehrauftrag->lehrveranstaltung_id)) ? $lehrauftrag->lehrveranstaltung_id : null;
+                $person_id = (isset($lehrauftrag->person_id)) ? $lehrauftrag->person_id : null;
+                $mitarbeiter_uid = (isset($lehrauftrag->mitarbeiter_uid)) ? $lehrauftrag->mitarbeiter_uid : null;
+                $vertrag_id = (isset($lehrauftrag->vertrag_id)) ? $lehrauftrag->vertrag_id : null;
+                $projektarbeit_id = (isset($lehrauftrag->projektarbeit_id)) ? $lehrauftrag->projektarbeit_id : null;
+                $stunden = (isset($lehrauftrag->stunden)) ? $lehrauftrag->stunden : null;
+                $betrag = (isset($lehrauftrag->betrag)) ? $lehrauftrag->betrag : null;
+                $vertrag_betrag = (isset($lehrauftrag->vertrag_betrag)) ? $lehrauftrag->vertrag_betrag : null;
+                $studiensemester_kurzbz = (isset($lehrauftrag->studiensemester_kurzbz)) ? $lehrauftrag->studiensemester_kurzbz : null;
 
                 // update contract if contract exists and the betrag was changed
                 $hasChanged = (floatval($betrag) != floatval($vertrag_betrag)) ? true : false;
@@ -141,7 +141,7 @@ class Lehrauftrag extends Auth_Controller
                     if (isSuccess($result))
                     {
                         $json []= array(
-                            'row_index' => $lehrauftrag['row_index'],
+                            'row_index' => $lehrauftrag->row_index,
                             'bestellt' => date('Y-m-d'),
                             'vertrag_betrag' => $betrag,
                             'erteilt' => null
@@ -152,29 +152,29 @@ class Lehrauftrag extends Auth_Controller
                 else
                 {
                     $result = $this->VertragModel->save(
-                        element('person_id', $lehrauftrag),
-                        element('mitarbeiter_uid', $lehrauftrag),
-                        element('lehrveranstaltung_id', $lehrauftrag),
-                        element('lehreinheit_id', $lehrauftrag),
-                        element('projektarbeit_id', $lehrauftrag),
-                        element('stunden', $lehrauftrag),
-                        element('betrag', $lehrauftrag),
-                        element('studiensemester_kurzbz', $lehrauftrag)
+                        $person_id,
+                        $mitarbeiter_uid,
+                        $lehrveranstaltung_id,
+                        $lehreinheit_id,
+                        $projektarbeit_id,
+                        $stunden,
+                        $betrag,
+                        $studiensemester_kurzbz
                     );
 
                     if (isSuccess($result))
                     {
                         $json []= array(
-                            'row_index' => $lehrauftrag['row_index'],
+                            'row_index' => $lehrauftrag->row_index,
                             'bestellt' => date('Y-m-d'),
                             'vertrag_betrag' => $betrag
                         );
                     }
 
                     $new_lehrvertrag_data_arr[] = array(
-                        'studiensemester_kurzbz' => $lehrauftrag['studiensemester_kurzbz'],
-                        'studiengang_kz' => $lehrauftrag['studiengang_kz'],
-                        'lv_oe_kurzbz' => $lehrauftrag['lv_oe_kurzbz']
+                        'studiensemester_kurzbz' => $lehrauftrag->studiensemester_kurzbz,
+                        'studiengang_kz' => $lehrauftrag->studiengang_kz,
+                        'lv_oe_kurzbz' => $lehrauftrag->lv_oe_kurzbz
                     );
                 }
             }

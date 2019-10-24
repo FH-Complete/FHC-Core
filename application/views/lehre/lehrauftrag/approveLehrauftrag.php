@@ -627,13 +627,22 @@ $(function() {
             return;
         }
 
+        /*
+         * Prepare data object for ajax call
+         * NOTE: Stringify to send only ONE post param (json string) instead of many single post params.
+         * This avoids issues with POST param limitation.
+         */
+        var data = {
+            'selected_data': JSON.stringify(selected_data)
+        };
+
         FHC_AjaxClient.ajaxCallPost(
             FHC_JS_DATA_STORAGE_OBJECT.called_path + "/approveLehrauftrag",
-            selected_data,
+            data,
             {
                 successCallback: function (data, textStatus, jqXHR)
                 {
-                    if (data.retval != null)
+                    if (!data.error && data.retval != null)
                     {
                         // Update status 'Erteilt'
                         $('#filterTabulator').tabulator('updateData', data.retval);

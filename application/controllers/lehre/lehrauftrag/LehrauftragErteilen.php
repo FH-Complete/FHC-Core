@@ -110,29 +110,27 @@ class LehrauftragErteilen extends Auth_Controller
      */
     public function approveLehrauftrag()
     {
-        $lehrauftrag_arr = $this->input->post();
-
-        foreach($lehrauftrag_arr as $lehrauftrag)
+        $lehrauftrag_arr = json_decode($this->input->post('selected_data'));
+        
+        if (is_array($lehrauftrag_arr)) 
         {
-            if (!isEmptyArray($lehrauftrag))
+            foreach ($lehrauftrag_arr as $lehrauftrag) 
             {
-                $mitarbeiter_uid = (!is_null($lehrauftrag['mitarbeiter_uid'])) ? $lehrauftrag['mitarbeiter_uid'] : null;
-                $vertrag_id = (!is_null($lehrauftrag['vertrag_id'])) ? intval($lehrauftrag['vertrag_id']) : null;
+                $mitarbeiter_uid = (isset($lehrauftrag->mitarbeiter_uid)) ? $lehrauftrag->mitarbeiter_uid : null;
+                $vertrag_id = (isset($lehrauftrag->vertrag_id)) ? $lehrauftrag->vertrag_id : null;
 
                 $result = $this->VertragModel->setStatus($vertrag_id, $mitarbeiter_uid, 'erteilt');
 
-                if ($result->retval)
-                {
-                    $json []= array(
-                        'row_index' => $lehrauftrag['row_index'],
+                if ($result->retval) {
+                    $json [] = array(
+                        'row_index' => $lehrauftrag->row_index,
                         'erteilt' => date('Y-m-d')
                     );
                 }
             }
         }
-
         // output json to ajax
-        if (!isEmptyArray($json))
+        if (isset($json) && !isEmptyArray($json))
         {
             $this->outputJsonSuccess($json);
         }

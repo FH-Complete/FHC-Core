@@ -127,7 +127,7 @@ class LehrauftragAkzeptieren extends Auth_Controller
             foreach($lehrauftrag_arr as $lehrauftrag)
             {
                 $mitarbeiter_uid = (!is_null($lehrauftrag['mitarbeiter_uid'])) ? $lehrauftrag['mitarbeiter_uid'] : null;
-                $vertrag_id = (!is_null($lehrauftrag['vertrag_id'])) ? intval($lehrauftrag['vertrag_id']) : null;
+                $vertrag_id = (!is_null($lehrauftrag['vertrag_id'])) ? $lehrauftrag['vertrag_id'] : null;
 
                 // Set status to accepted
                 $result = $this->VertragModel->setStatus($vertrag_id, $mitarbeiter_uid, 'akzeptiert');

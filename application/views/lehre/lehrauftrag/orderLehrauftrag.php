@@ -656,9 +656,13 @@ $(function() {
             return;
         }
 
-        // Prepare data object for ajax call
+        /*
+         * Prepare data object for ajax call
+         * NOTE: Stringify to send only ONE post param (json string) instead of many single post params.
+         * This avoids issues with POST param limitation.
+         */
         var data = {
-            'selected_data': selected_data
+            'selected_data': JSON.stringify(selected_data)
         };
 
         FHC_AjaxClient.ajaxCallPost(
