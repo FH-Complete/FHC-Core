@@ -88,8 +88,8 @@ FROM
     SELECT *,
         /* concatinated and aggregated gruppen */
         (SELECT
-             string_agg(concat(stg_typ_kurzbz, \'-\', semester, verband, gruppe,
-                               \'\n\' || gruppe_kurzbz), \', \')
+             string_agg(concat(stg_typ_kurzbz, \'-\', semester, verband, gruppe
+                                || gruppe_kurzbz), \', \')
          FROM
              lehre.tbl_lehreinheitgruppe
          WHERE
@@ -190,8 +190,8 @@ FROM
                LIMIT 1)                                 AS "mitarbeiter_uid",
             /* concatinated and aggregated gruppen */
             (SELECT
-                 string_agg(concat(stg_typ_kurzbz, \'-\', semester, verband, gruppe,
-                                   \'\n\' || gruppe_kurzbz), \', \')
+                 string_agg(concat(stg_typ_kurzbz, \'-\', semester, verband, gruppe
+                                   || gruppe_kurzbz), \', \')
              FROM
                  lehre.tbl_lehreinheitgruppe
              WHERE
@@ -363,9 +363,6 @@ $filterWidgetArray = array(
         },
         renderStarted:function(){
             func_renderStarted(this);
-        },
-        renderComplete:function(){
-            func_renderComplete(this);
         },
         tableBuilt: function(){
             func_tableBuilt(this);

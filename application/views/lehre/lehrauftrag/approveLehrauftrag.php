@@ -272,6 +272,7 @@ $this->load->view(
                 field: "status",
                 width:40,
                 align:"center",
+                downloadTitle: 'Status',
                 formatter: status_formatter,
                 tooltip: status_tooltip
             }, true

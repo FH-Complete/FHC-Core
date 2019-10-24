@@ -276,6 +276,7 @@ $this->load->view(
                 field: "status",
                 width:40,
                 align:"center",
+                downloadTitle: 'Status',
                 formatter: status_formatter,
                 tooltip: status_tooltip
             }, true
@@ -318,18 +319,6 @@ $this->load->view(
                 row.getData().status = null;            // default
             }
         });
-    }
-
-    function func_renderComplete(table){
-        // console.log(table.getDataCount());
-        // Display message if table is empty
-        // TODO: msg funktioniert, aber wenn beim filtern kein Ergebnis (0 rows), und man den filter nachher wegmacht,
-        // TODO: bleibt die msg. Ev gleich am anfang check: nur wenn nicht gefiltert. ODER ev besser: nicht in renderStarted, sondern tabelBuilt
-        // if (table.getRows( == 0)
-        // {
-        //     table.element.childNodes.item(1).innerHTML =
-        //         '<div class="tabulator-row panel text-center" role="row" style="padding: 50px;">Es sind keine Lehraufträge vorhanden.</div>';
-        // }
     }
 
     // Performes after row was updated
