@@ -437,7 +437,7 @@ var InfocenterDetails = {
 	parkPerson: function(personid, date)
 	{
 		var parkError = function(){
-			$("#postponemsg").text("  Fehler beim Parken!");
+			$("#postponemsg").text("   Fehler beim Parken!");
 		};
 
 		FHC_AjaxClient.ajaxCallPost(
@@ -486,7 +486,7 @@ var InfocenterDetails = {
 	setPersonOnHold: function(personid, date)
 	{
 		var onHoldError = function(){
-			$("#postponemsg").text("  Fehler beim Setzen auf On Hold!");
+			$("#postponemsg").text("   Fehler beim Setzen auf On Hold!");
 		};
 
 		FHC_AjaxClient.ajaxCallPost(
@@ -925,9 +925,9 @@ var InfocenterDetails = {
 				'<div class="form-group form-inline">'+
 					'<button class="btn btn-default" id="parklink" type="button""><i class="fa fa-clock-o"></i>&nbsp;' + FHC_PhrasesLib.t('infocenter', 'bewerberParken') + '</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'+
 					'<button class="btn btn-default" id="onholdlink" type="button""><i class="fa fa-anchor"></i>&nbsp;' + FHC_PhrasesLib.t('infocenter', 'bewerberOnHold') + '</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'+
-					FHC_PhrasesLib.t('global', 'bis') + '&nbsp;&nbsp;'+
+					'<label id="postponedatelabel">'+FHC_PhrasesLib.t('global', 'bis') + '&nbsp;&nbsp;'+
 					'<input id="postponedate" type="text" class="form-control" placeholder="Parkdatum">&nbsp;'+
-					'<i class="fa fa-info-circle"  data-toggle="tooltip" title="'+FHC_PhrasesLib.t('infocenter', 'parkenZurueckstellenInfo')+'"></i>&nbsp;'+
+					'<i class="fa fa-info-circle"  data-toggle="tooltip" title="'+FHC_PhrasesLib.t('infocenter', 'parkenZurueckstellenInfo')+'"></i></label>'+
 					'<span class="text-danger" id="postponemsg"></span>'+
 				'</div>');
 
@@ -935,7 +935,6 @@ var InfocenterDetails = {
 				"dateFormat": "dd.mm.yy",
 				"minDate": 0
 			});
-
 
 			$("#parklink").click(
 
