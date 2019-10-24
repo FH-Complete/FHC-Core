@@ -536,9 +536,11 @@ $this->load->view(
         // Alert and exit if no lehraufgang is selected
         if (selected_data.length == 0)
         {
+            FHC_DialogLib.alertInfo('Bitte wählen Sie erst zumindest einen Lehrauftrag');
+
             // Emtpy password field
             $("#password").val('');
-            FHC_DialogLib.alertInfo('Bitte wählen Sie erst zumindest einen Lehrauftrag');
+
             return;
         }
 
@@ -547,7 +549,10 @@ $this->load->view(
         if (password == '')
         {
             FHC_DialogLib.alertInfo('Bitte verifizieren Sie sich mit Ihrem Login Passwort.');
+
+            // Focus on password field
             $("#password").focus();
+
             return;
         }
 
@@ -587,10 +592,5 @@ $this->load->view(
 
      });
 
-    // Focus on clicked button
-    $(".btn-lehrauftrag").click(function() {
-        $(".btn-lehrauftrag").removeClass('focus');
-        $(this).addClass('focus');
-    });
 });
 </script>
