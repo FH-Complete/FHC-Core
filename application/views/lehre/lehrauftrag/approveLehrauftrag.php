@@ -268,7 +268,7 @@ $this->load->view(
         // Add status column to table
         table.addColumn(
             {
-                title: "Status",
+                title: "<i class='fa fa-user-o'></i>",
                 field: "status",
                 width:40,
                 align:"center",
@@ -601,10 +601,6 @@ $(function() {
             $('#approve-lehrauftraege').attr('disabled', true).attr('title', 'Lehraufträge ohne Lektorzuteilung können nicht bestellt werden.');
         }
     });
-
-    $("#download-cvs").click(function(){
-         $('#filterTabulator').tabulator("download", "csv", "data.csv");
-     });
 
     // Approve Lehrauftraege
     $("#approve-lehrauftraege").click(function(){

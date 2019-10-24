@@ -272,7 +272,7 @@ $this->load->view(
         // Add status column to table
         table.addColumn(
             {
-                title: "Status",
+                title: "<i class='fa fa-user-o'></i>",
                 field: "status",
                 width:40,
                 align:"center",
@@ -574,7 +574,7 @@ $(function() {
         );
     });
 
-    // Show only rows with ordered lehrauftraege
+    // Show only rows with akzeptierte lehrauftraege
     $("#show-accepted").click(function(){
         $('#filterTabulator').tabulator('setFilter',
             [
@@ -585,7 +585,7 @@ $(function() {
         );
     });
 
-    // Show only rows with dummy lectors
+    // Show only rows with geaenderte lectors
     $("#show-changed").click(function(){
         // needs custom filter to compare fields betrag and vertrag_betrag
         $('#filterTabulator').tabulator('setFilter', filter_showChanged);

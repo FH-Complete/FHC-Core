@@ -189,6 +189,7 @@ $this->load->view(
             if (bestellt != null && (betrag != vertrag_betrag))
             {
                 cell.getElement().classList.add('bg-warning');                  // geaenderte
+                row.getElement().style["pointerEvents"] = "none";
             }
             else if(bestellt != null && erteilt != null && akzeptiert == null)
             {
@@ -222,7 +223,7 @@ $this->load->view(
         // Add status column to table
         table.addColumn(
             {
-                title: "Status",
+                title: "<i class='fa fa-user-o'></i>",
                 field: "status",
                 width:40,
                 align:"center",
