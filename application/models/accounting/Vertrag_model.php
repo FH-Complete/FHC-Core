@@ -35,7 +35,7 @@ class Vertrag_model extends DB_Model
         $lehrveranstaltung_id = (!isset($lehrveranstaltung_id) || empty($lehrveranstaltung_id)) ? null : intval($lehrveranstaltung_id);
         $projektarbeit_id = (!isset($projektarbeit_id) || empty($projektarbeit_id)) ? null : intval($projektarbeit_id);
         $vertragsstunden = (!isset($vertragsstunden) || empty($vertragsstunden)) ? null : floatval($vertragsstunden);
-        $betrag = (!isset($betrag) || empty($betrag)) ? null : floatval($betrag);
+        $betrag = (!isset($betrag) || empty($betrag)) ? 0 : floatval($betrag);
         $mitarbeiter_uid = (!isset($mitarbeiter_uid) || empty($mitarbeiter_uid)) ? null : $mitarbeiter_uid;
 
         $vertragstyp_kurzbz = (is_null($projektarbeit_id)) ? 'Lehrauftrag' : 'Betreuung';
