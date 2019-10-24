@@ -933,7 +933,7 @@ var InfocenterDetails = {
 
 			$("#postponedate").datepicker({
 				"dateFormat": "dd.mm.yy",
-				"minDate": 0
+				"minDate": 1
 			});
 
 			$("#parklink").click(
