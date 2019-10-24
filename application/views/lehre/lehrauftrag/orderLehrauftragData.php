@@ -369,7 +369,10 @@ $filterWidgetArray = array(
         },
         tableBuilt: function(){
             func_tableBuilt(this);
-        }
+        },
+        dataLoaded: function(data){
+            func_dataLoaded(data, this);
+        },
     }', // tabulator properties
     'datasetRepFieldsDefs' => '{
         // column status is built dynamically in funcTableBuilt()

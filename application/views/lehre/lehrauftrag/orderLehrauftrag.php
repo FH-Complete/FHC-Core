@@ -178,6 +178,22 @@ $this->load->view(
     // Custom filters
     // -----------------------------------------------------------------------------------------------------------------
 
+    /*
+     * Filters neue AND geaenderte initially
+     * NOTE: This is a workaround. The tabulators callback initialFilter is not used here because
+     * it is processed before the callback tableBuilt, where the status is going to be built.
+     * The callback dataLoaded is processed after tableBuild and provides the status.
+     */
+    function func_dataLoaded(data, table){
+        table.setFilter([
+            {field: 'personalnummer', type: '>=', value: 0},        // not dummy lector AND
+            [
+                {field: 'status', type: '=', value: 'Neu'},         // neu OR
+                {field: 'status', type: '=', value: 'Geändert'}     // geaendert
+            ]
+        ]);
+    }
+
     // Filters geaenderte
     function filter_showChanged(data){
 
