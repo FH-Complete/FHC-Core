@@ -343,9 +343,13 @@ $filterWidgetArray = array(
         selectablePersistence:false,    // deselect previously selected rows when table is filtered, sorted or paginated
         selectableCheck: function(row){ 
             return func_selectableCheck(row);       
-        },      
+        },
+        footerElement: func_footerElement(),      
         rowUpdated:function(row){
              func_rowUpdated(row);    
+        },
+        rowSelectionChanged:function(data, rows){
+             func_rowSelectionChanged(data, rows);
         },
         rowFormatter:function(row)
         {
@@ -362,7 +366,8 @@ $filterWidgetArray = array(
         // column status is built dynamically in funcTableBuilt(),
         row_index: {visible:false},     // necessary for row indexing
         personalnummer: {visible: false},
-        lehreinheit_id: {headerFilter:"input", bottomCalc:"count", bottomCalcFormatter:function(cell){return "Anzahl: " + cell.getValue();},},
+        lehreinheit_id: {headerFilter:"input", bottomCalc:"count", width: "7%",
+            bottomCalcFormatter:function(cell){return "Anzahl: " + cell.getValue();},},
         lehrveranstaltung_id: {headerFilter:"input"},
         lv_bezeichnung: {visible: false},
         projektarbeit_id: {visible: false},
