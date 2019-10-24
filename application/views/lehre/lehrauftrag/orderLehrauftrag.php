@@ -629,6 +629,24 @@ $(function() {
             .filter(function(val){
                 // filter pseudo lines of groupBy (e.g. the bottom calculations lines)
                 return val.row_index != null || typeof(val.row_index) !== 'undefined';
+            })
+            .map(function(data){
+                // reduce to necessary fields
+                return {
+                    'row_index' : data.row_index,
+                    'lehreinheit_id' : data.lehreinheit_id,
+                    'lehrveranstaltung_id' : data.lehrveranstaltung_id,
+                    'person_id' : data.person_id,
+                    'mitarbeiter_uid' : data.mitarbeiter_uid,
+                    'vertrag_id' : data.vertrag_id,
+                    'projektarbeit_id' : data.projektarbeit_id,
+                    'stunden' : data.stunden,
+                    'betrag' : data.betrag,
+                    'vertrag_betrag' : data.vertrag_betrag,
+                    'studiensemester_kurzbz' : data.studiensemester_kurzbz,
+                    'studiengang_kz' : data.studiengang_kz,
+                    'lv_oe_kurzbz' : data.lv_oe_kurzbz
+                }
             });
 
         // Alert and exit if no lehraufgang is selected

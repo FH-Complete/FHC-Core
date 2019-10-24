@@ -610,8 +610,17 @@ $(function() {
             .filter(function(val){
                 // filter pseudo lines of groupBy (e.g. the bottom calculations lines)
                 return val.row_index != null || typeof(val.row_index) !== 'undefined';
+            })
+            .map(function(data){
+                // reduce to necessary fields
+                return {
+                    'row_index': data.row_index,
+                    'mitarbeiter_uid' : data.mitarbeiter_uid,
+                    'vertrag_id' : data.vertrag_id,
+                }
             });
 
+        // Alert and exit if no lehraufgang is selected
         if (selected_data.length == 0)
         {
             FHC_DialogLib.alertInfo('Bitte wählen Sie erst zumindest einen Lehrauftrag');

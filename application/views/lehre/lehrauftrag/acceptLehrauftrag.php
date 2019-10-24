@@ -523,7 +523,17 @@ $this->load->view(
     $("#accept-lehrauftraege").click(function(){
 
         // Get selected rows data
-        var selected_data = $('#filterTabulator').tabulator('getSelectedData');
+        var selected_data = $('#filterTabulator').tabulator('getSelectedData')
+            .map(function(data){
+                // reduce to necessary fields
+                return {
+                    'row_index' : data.row_index,
+                    'mitarbeiter_uid' : data.mitarbeiter_uid,
+                    'vertrag_id' : data.vertrag_id
+                }
+            });
+
+        // Alert and exit if no lehraufgang is selected
         if (selected_data.length == 0)
         {
             // Emtpy password field
