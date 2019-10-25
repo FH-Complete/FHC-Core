@@ -83,6 +83,7 @@ if($doc->isLocked($id))
 		if (CAMPUS_NAME == 'FH Technikum Wien')
 		{
 			$dokumente_arr[] .= 'ZgvBaPre';
+			$dokumente_arr[] .= 'ZgvMaPre';
 			$dokumente_arr[] .= 'InvitLet';
 		}
 		if ($person_id!=$akte_person || !in_array($akte_dokument_kurzbz, $dokumente_arr))
