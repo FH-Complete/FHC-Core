@@ -1340,8 +1340,8 @@ function LeMitarbeiterAuswahl()
         // Reset attributes
         document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-label-vertragsstatus').setAttribute("style", "font-weight: normal");
         document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-button-vertrag-stornieren').setAttribute("tooltiptext",
-            "Stornieren erst ab Status 'Angenommen' möglich.");
-        document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-button-vertrag-stornieren').disabled = true
+            "Stornieren erst nötig, sobald Lektor einen Vertrag hat. (Ab Status 'Bestellt')");
+        document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-button-vertrag-stornieren').disabled = true;
         document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-menulist-lektor').disabled = false;
         document.getElementById('lehrveranstaltung-lektor-tree-popup-label').disabled = false;
         document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-textbox-semesterstunden').disabled= false;
@@ -1363,6 +1363,10 @@ function LeMitarbeiterAuswahl()
                 "Änderung nur nach Stornierung des Vertrags möglich.");
             document.getElementById('lehrveranstaltung-lektor-tree-popup-label').setAttribute("tooltiptext",
                 "Änderung nur nach Stornierung des Vertrags möglich.");
+
+            // Stornieren ermoeglichen und tooltip entfernen
+            document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-button-vertrag-stornieren').disabled = false;
+            document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-button-vertrag-stornieren').setAttribute("tooltiptext", "");
 
             // Url zum RDF
             var url = "<?php echo APP_ROOT; ?>rdf/vertrag.rdf.php?"+gettimestamp();
@@ -1438,9 +1442,6 @@ function LeMitarbeiterAuswahl()
              */
             if(letzterStatus == 'akzeptiert')
             {
-                document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-button-vertrag-stornieren').disabled = false;
-                document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-button-vertrag-stornieren').setAttribute("tooltiptext", "");
-
                 // Semesterstunden und Stundensatz disablen
                 document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-textbox-semesterstunden').disabled= true;
                 document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-textbox-stundensatz').disabled= true;

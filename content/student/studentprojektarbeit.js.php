@@ -900,7 +900,7 @@ function StudentProjektbetreuerAuswahl()
          //Reset attributes
         document.getElementById('student-projektbetreuer-label-vertragsstatus').setAttribute("style", "font-weight: normal");
         document.getElementById('student-projektbetreuer-button-vertrag-stornieren').setAttribute("tooltiptext",
-            "Stornieren erst ab Status 'Angenommen' möglich.");
+            "Stornieren erst nötig, sobald Lektor einen Vertrag hat. (Ab Status 'Bestellt')");
         document.getElementById('student-projektbetreuer-button-vertrag-stornieren').disabled = true;
         document.getElementById('student-projektbetreuer-button-loeschen').disabled = false;
         document.getElementById('student-projektbetreuer-menulist-person').disabled = false;
@@ -923,6 +923,10 @@ function StudentProjektbetreuerAuswahl()
                 "Änderung nur nach Stornierung des Vertrags möglich.");
             document.getElementById('student-projektbetreuer-menulist-person').setAttribute("tooltiptext",
                 "Änderung nur nach Stornierung des Vertrags möglich.");
+
+            // Stornieren ermoeglichen und tooltip entfernen
+            document.getElementById('student-projektbetreuer-button-vertrag-stornieren').disabled = false;
+            document.getElementById('student-projektbetreuer-button-vertrag-stornieren').setAttribute("tooltiptext", "");
 
             // Url zum RDF
             var url = "<?php echo APP_ROOT; ?>rdf/vertrag.rdf.php?"+gettimestamp();
@@ -997,9 +1001,6 @@ function StudentProjektbetreuerAuswahl()
              */
             if(letzterStatus == 'akzeptiert')
             {
-                document.getElementById('student-projektbetreuer-button-vertrag-stornieren').disabled = false;
-                document.getElementById('student-projektbetreuer-button-vertrag-stornieren').setAttribute("tooltiptext", "");
-
                 // Semesterstunden und Stundensatz disablen
                 document.getElementById('student-projektbetreuer-textbox-stunden').disabled= true;
                 document.getElementById('student-projektbetreuer-textbox-stundensatz').disabled= true;
