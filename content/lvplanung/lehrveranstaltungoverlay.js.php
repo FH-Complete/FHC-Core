@@ -1333,7 +1333,7 @@ function LeMitarbeiterAuswahl()
 	var gesamtkosten = LeMitarbeiterGesamtkosten();
 
     // Prüfe ob Vertragsdetails angezeigt werden
-    var vertragsdetails_anzeigen = <?php echo (defined('FAS_LV_LEKTORINNENZUTEILUNG_VERTRAGSDETAILS_ANZEIGEN') && FAS_LV_LEKTORINNENZUTEILUNG_VERTRAGSDETAILS_ANZEIGEN) ? true : false ?>;
+    var vertragsdetails_anzeigen = new Boolean(<?php echo (defined('FAS_LV_LEKTORINNENZUTEILUNG_VERTRAGSDETAILS_ANZEIGEN') && FAS_LV_LEKTORINNENZUTEILUNG_VERTRAGSDETAILS_ANZEIGEN) ? 'true' : 'false' ?>);
 
     // Wenn Vertragsdetails angezeigt werden
     if (vertragsdetails_anzeigen) {
