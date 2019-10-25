@@ -178,7 +178,10 @@ function getPruefungByLv($aktStudiensemester = null, $uid = null)
 			$lveranstaltung = new lehrveranstaltung($lehreinheiten[0]->lehrfach_id);
 			$oe = new organisationseinheit($lveranstaltung->oe_kurzbz);
 			$prf->organisationseinheit = $oe->bezeichnung;
-			array_push($pruefungen, $prf);
+
+			// nur hinzufügen wenn zumindest 1 Termin vorhanden ist
+			if (!empty($prf->pruefung->termine))
+				array_push($pruefungen, $prf);
 			}
 		}
 		$anmeldung = new pruefungsanmeldung();
@@ -265,7 +268,10 @@ function getPruefungByLvFromStudiengang($aktStudiensemester = null, $uid = null)
 		$lveranstaltung = new lehrveranstaltung($lehreinheiten[0]->lehrfach_id);
 		$oe = new organisationseinheit($lveranstaltung->oe_kurzbz);
 		$prf->organisationseinheit = $oe->bezeichnung;
-		array_push($pruefungen, $prf);
+
+		// nur hinzufügen wenn zumindest 1 Termin vorhanden ist
+		if (!empty($prf->pruefung->termine))
+			array_push($pruefungen, $prf);
 		}
 	}
 
@@ -805,7 +811,10 @@ function getAllPruefungen($aktStudiensemester = null, $uid = null)
 		$lveranstaltung = new lehrveranstaltung($lehreinheiten[0]->lehrfach_id);
 		$oe = new organisationseinheit($lveranstaltung->oe_kurzbz);
 		$prf->organisationseinheit = $oe->bezeichnung;
-		array_push($pruefungen, $prf);
+
+		// nur hinzufügen wenn zumindest 1 Termin vorhanden ist
+		if (!empty($prf->pruefung->termine))
+			array_push($pruefungen, $prf);
 		}
 	}
 
@@ -1206,6 +1215,7 @@ function compareRaeume($a, $b)
 
 function saveRaum($terminId, $ort_kurzbz, $uid)
 {
+	$terminkollision = defined('CIS_PRUEFUNGSANMELDUNG_ERLAUBE_TERMINKOLLISION') ? CIS_PRUEFUNGSANMELDUNG_ERLAUBE_TERMINKOLLISION : false;
 	$pruefungstermin = new pruefungstermin($terminId);
 	$stunde = new stunde();
 	$datum_von = explode(" ", $pruefungstermin->von);
@@ -1218,7 +1228,7 @@ function saveRaum($terminId, $ort_kurzbz, $uid)
 	if($reservierung->isReserviert($ort_kurzbz, $datum_von[0], $h))
 		$reserviert = true;
 	}
-	if(!$reserviert || $pruefungstermin->sammelklausur == TRUE)
+	if($terminkollision || !$reserviert || $pruefungstermin->sammelklausur == TRUE)
 	{
 	$pruefung = new pruefungCis($pruefungstermin->pruefung_id);
 	$mitarbeiter = new mitarbeiter($pruefung->mitarbeiter_uid);

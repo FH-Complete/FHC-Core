@@ -56,7 +56,7 @@ if (isset($_GET['logout']) && $_GET['logout'] == true)
     echo '
         <script language="Javascript">
             location = location.pathname;       // clean the login.php-url from querystring
-            parent.menu.location = parent.menu.location.pathname;   // clean the menu.php-url from querystring     
+            parent.menu.location = parent.menu.location.pathname;   // clean the menu.php-url from querystring
             parent.topbar.location = parent.topbar.location.pathname;   // clean the topbar.php-url from querystring
         </script>
     ';
@@ -326,12 +326,12 @@ if(isset($_POST['save']) && isset($_SESSION['prestudent_id']))
 <html>
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <link rel="stylesheet" href="../../vendor/twbs/bootstrap/dist/css/bootstrap.min.css" type="text/css"/>
+	<link rel="stylesheet" href="../../vendor/twbs/bootstrap/dist/css/bootstrap.min.css" type="text/css"/>
 	<link href="../../skin/style.css.php" rel="stylesheet" type="text/css">
-	<link rel="stylesheet" href="../../skin/jquery.css" type="text/css"/>
-    <script type="text/javascript" src="../../include/js/jquery1.9.min.js"></script>
-	<link rel="stylesheet" type="text/css" href="../../skin/jquery-ui-1.9.2.custom.min.css"/>
-    <script type="text/javascript" src="../../vendor/components/jquery/jquery.min.js"></script>
+	<link rel="stylesheet" href="../../vendor/components/jqueryui/themes/base/jquery-ui.min.css" type="text/css"/>
+	<script type="text/javascript" src="../../vendor/components/jquery/jquery.min.js"></script>
+	<script type="text/javascript" src="../../vendor/components/jqueryui/jquery-ui.min.js"></script>
+	<script type="text/javascript" src="../../vendor/components/jqueryui/ui/i18n/datepicker-de.js"></script>
     <script type="text/javascript" src="../../vendor/twbs/bootstrap/dist/js/bootstrap.min.js"></script>
 	<script type="text/javascript">
 	$(document).ready(function()
@@ -406,7 +406,9 @@ if (isset($prestudent_id))
     // Sprachwahl zu STG mit höchster Prio ermitteln
     $ablauf = new Ablauf();
     $sprachwahl = false;
-    if ($ablauf->getAblaufVorgabeStudiengang($firstPrio_studiengang_kz) && is_bool($ablauf->result[0]->sprachwahl))
+    if (isset($ablauf->result[0])
+	 && $ablauf->getAblaufVorgabeStudiengang($firstPrio_studiengang_kz)
+	 && is_bool($ablauf->result[0]->sprachwahl))
     {
        $sprachwahl = $ablauf->result[0]->sprachwahl;
     }
@@ -425,7 +427,7 @@ if (isset($prestudent_id))
     echo '<div class="col-xs-10 col-sm-9 col-lg-6">';
     echo '
         <h1 style="margin-top: -20px;">'. $p->t('testtool/begruessungstext'). '</h1><br/>
-        <p>'. $p->t('testtool/anmeldedaten'). '</p><br/>   
+        <p>'. $p->t('testtool/anmeldedaten'). '</p><br/>
     ';
 
     echo '
@@ -447,15 +449,15 @@ if (isset($prestudent_id))
 	echo '<br>';
     echo '
          <p>'. $p->t('testtool/fuerFolgendeStgAngemeldet'). '</p><br>
-         
-         <table class="table table-bordered">        
+
+         <table class="table table-bordered">
             <thead>
                 <tr>
                     <th style="width: 50%;">'. $p->t('global/studiengang'). '</th>
                     <th>Status</th>
                  </tr>
-            </thead>    
-            <tbody>  
+            </thead>
+            <tbody>
          ';
 
     //  * wenn Prestudent an 1 - n Bachelor-Studiengängen interessiert ist, dann STG anführen
@@ -519,8 +521,8 @@ if (isset($prestudent_id))
 		echo '<td>'. $ps_master->status_mehrsprachig[$sprache_user]. '</td>';
     }
 
-    echo ' 
-        </tbody>				 
+    echo '
+        </tbody>
      </table>
     ';
 

@@ -150,8 +150,8 @@ $studiensemester->getAll();
 		{
 			$("#accordion").accordion({
 				header: "h2",
-				autoHeight: false
-			});
+                heightStyle: "content"
+            });
 			$("#accordion").attr("style", "visibility: visible;");
 		}
 	});

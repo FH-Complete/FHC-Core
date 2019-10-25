@@ -308,8 +308,12 @@ else
 				// Nur Noten, die aufs Zeugnis gedruckt werden für Durchschnittsberechnung addieren
 				if ($row->zeugnis == true)
 				{
-					$notenSummenArray[$row->lehrveranstaltung_id]['notenwert'] = (isset($notenarr[$row->note]['notenwert']) ? $notenarr[$row->note]['notenwert'] : '');
-					$notenSummenArray[$row->lehrveranstaltung_id]['ects'] = $row->ects;
+					// Noten ohne Wert werden entfernen
+					if(isset($notenarr[$row->note]['notenwert']))
+					{
+						$notenSummenArray[$row->lehrveranstaltung_id]['notenwert'] = $notenarr[$row->note]['notenwert'];					
+						$notenSummenArray[$row->lehrveranstaltung_id]['ects'] = $row->ects;
+					}
 				}
 			}
 			$tblBody .= "</td>";
@@ -379,13 +383,10 @@ else
 		$anzahlLv = 0;
 		foreach ($notenSummenArray AS $key => $value)
 		{
-			if ($value['notenwert'] != '')
-			{
-				$anzahlLv++;
-				$notenSumme += $value['notenwert'];
-				$ectsSumme += $value['ects'];
-				$notenSummeGewichtet += $value['notenwert'] * $value['ects'];
-			}
+			$anzahlLv++;
+			$notenSumme += $value['notenwert'];
+			$ectsSumme += $value['ects'];
+			$notenSummeGewichtet += $value['notenwert'] * $value['ects'];
 		}
 
 		$tblBody .= "</tbody>";

@@ -256,10 +256,7 @@ if (isset($_SESSION['pruefling_id']))
             semester,
              gebiet_id,
              bezeichnung,
-             bezeichnung_mehrsprachig_1,
-             bezeichnung_mehrsprachig_2,
-             bezeichnung_mehrsprachig_3,
-             bezeichnung_mehrsprachig_4
+			". $bezeichnung_mehrsprachig_sel ." 
 
         ORDER BY
 	        semester,

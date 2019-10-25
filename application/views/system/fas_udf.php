@@ -47,7 +47,7 @@
 		}
 	}
 ?>
-		<form action="<?php echo site_url('system/UDF/saveUDF'); ?>" method="POST">
+		<form action="<?php echo site_url('system/FAS_UDF/saveUDF'); ?>" method="POST">
 
 			<div class="div-table">
 				<div class="div-row">
