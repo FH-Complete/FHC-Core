@@ -29,6 +29,7 @@ require_once('../../../include/phrasen.class.php');
 require_once('../../../include/datum.class.php');
 require_once('../../../include/Excel/excel.php');
 require_once('../../../include/benutzer.class.php');
+require_once('../../../include/benutzerberechtigung.class.php');
 require_once('../../../include/mitarbeiter.class.php');
 require_once('../../../include/zeitaufzeichnung.class.php');
 require_once('../../../include/projekt.class.php');
@@ -46,6 +47,24 @@ $sprache_obj->load($sprache);
 $sprache_index = $sprache_obj->index;
 
 $uid = get_uid();
+
+//Wenn User Administrator ist und UID uebergeben wurde, dann die Zeitaufzeichnung
+//des uebergebenen Users anzeigen
+if (isset($_GET['uid']))
+{
+	$rechte = new benutzerberechtigung();
+	$rechte->getBerechtigungen($uid);
+
+	if ($rechte->isBerechtigt('admin'))
+	{
+		$uid = $_GET['uid'];
+	}
+	else
+	{
+		die($p->t('global/FuerDieseAktionBenoetigenSieAdministrationsrechte'));
+	}
+}
+
 $benutzer = new benutzer();
 if (!$benutzer->load($uid))
 	die($p->t("zeitaufzeichnung/benutzerWurdeNichtGefunden", array($uid)));
