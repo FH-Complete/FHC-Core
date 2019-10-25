@@ -371,7 +371,8 @@ $this->load->view(
         $('#filterTabulator').tabulator('getRows', true)
             .filter(row => row.getData().personalnummer >= 0 && // NOT dummies
                     row.getData().bestellt != null &&           // AND bestellt
-                    row.getData().erteilt == null)              // AND NOT erteilt
+                    row.getData().erteilt == null &&           // AND NOT erteilt
+                    row.getData().betrag == row.getData().vertrag_betrag)   // AND NOT geaendert
             .forEach((row => row.select()));
     }
 
