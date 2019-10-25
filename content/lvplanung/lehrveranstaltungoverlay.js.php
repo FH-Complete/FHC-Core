@@ -1131,6 +1131,7 @@ function LeMitarbeiterDel()
 	req.add('type', 'lehreinheit_mitarbeiter_del');
 	req.add('lehreinheit_id', lehreinheit_id);
 	req.add('mitarbeiter_uid', uid);
+	req.add('vertrag_id', vertrag_id);
 
 	var response = req.executePOST();
 	var val =  new ParseReturnValue(response)

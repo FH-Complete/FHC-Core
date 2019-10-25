@@ -1321,6 +1321,7 @@ function StudentProjektbetreuerLoeschen()
 	req.add('projektarbeit_id', projektarbeit_id);
 	req.add('betreuerart_kurzbz', betreuerart_kurzbz);
 	req.add('studiengang_kz', studiengang_kz);
+	req.add('vertrag_id', vertrag_id);
 
 	var response = req.executePOST();
 

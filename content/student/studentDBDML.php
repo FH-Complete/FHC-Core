@@ -3803,25 +3803,27 @@ if(!$error)
 		}
 		else
 		{
-			//Loescht einen Projektbetreuer Eintrag
-			if(isset($_POST['person_id']) && is_numeric($_POST['person_id']))
+			// Wenn der Projektbetreuer schon einen Vertrag hat, wird das Loeschen verhindert
+			if (isset($_POST['vertrag_id']) && is_numeric($_POST['vertrag_id']))
 			{
-				$projektbetreuer = new projektbetreuer();
-
-				if($projektbetreuer->delete($_POST['person_id'], $_POST['projektarbeit_id'], $_POST['betreuerart_kurzbz']))
-				{
-					$return = true;
-				}
-				else
-				{
-					$errormsg = $projektbetreuer->errormsg;
-					$return = false;
-				}
+				$return = false;
+				$errormsg = 'Löschen nur nach Stornierung des Vertrags möglich.';
 			}
 			else
 			{
-				$return = false;
-				$errormsg  = 'Fehlerhafte Parameteruebergabe';
+				//Loescht einen Projektbetreuer Eintrag
+				if (isset($_POST['person_id']) && is_numeric($_POST['person_id'])) {
+					$projektbetreuer = new projektbetreuer();
+					if ($projektbetreuer->delete($_POST['person_id'], $_POST['projektarbeit_id'], $_POST['betreuerart_kurzbz'])) {
+						$return = true;
+					} else {
+						$errormsg = $projektbetreuer->errormsg;
+						$return = false;
+					}
+				} else {
+					$return = false;
+					$errormsg = 'Fehlerhafte Parameteruebergabe';
+				}
 			}
 		}
 	}

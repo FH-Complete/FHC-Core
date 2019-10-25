@@ -692,50 +692,58 @@ if(!$error)
 			//Lehreinheitmitarbeiterzuteilung loeschen
 			if(isset($_POST['lehreinheit_id']) && is_numeric($_POST['lehreinheit_id']) && isset($_POST['mitarbeiter_uid']))
 			{
-				//Wenn der Mitarbeiter im Stundenplan verplant ist, dann wird das Loeschen verhindert
-				$qry = "SELECT stundenplandev_id as id FROM lehre.tbl_stundenplandev WHERE lehreinheit_id=".$db->db_add_param($_POST['lehreinheit_id'], FHC_INTEGER)." AND mitarbeiter_uid=".$db->db_add_param($_POST['mitarbeiter_uid'])."
-						UNION
-						SELECT stundenplan_id as id FROM lehre.tbl_stundenplan WHERE lehreinheit_id=".$db->db_add_param($_POST['lehreinheit_id'], FHC_INTEGER)." AND mitarbeiter_uid=".$db->db_add_param($_POST['mitarbeiter_uid']);
-				if($db->db_query($qry))
+				// Wenn der Mitarbeiter schon einen Vertrag hat, wird das Loeschen verhindert
+				if (isset($_POST['vertrag_id']) && is_numeric($_POST['vertrag_id']))
 				{
-					if($db->db_num_rows()>0)
+					$return = false;
+					$errormsg = 'Löschen nur nach Stornierung des Vertrags möglich.';
+				}
+				else
+				{
+					//Wenn der Mitarbeiter im Stundenplan verplant ist, dann wird das Loeschen verhindert
+					$qry = "SELECT stundenplandev_id as id FROM lehre.tbl_stundenplandev WHERE lehreinheit_id=".$db->db_add_param($_POST['lehreinheit_id'], FHC_INTEGER)." AND mitarbeiter_uid=".$db->db_add_param($_POST['mitarbeiter_uid'])."
+							UNION
+							SELECT stundenplan_id as id FROM lehre.tbl_stundenplan WHERE lehreinheit_id=".$db->db_add_param($_POST['lehreinheit_id'], FHC_INTEGER)." AND mitarbeiter_uid=".$db->db_add_param($_POST['mitarbeiter_uid']);
+					if($db->db_query($qry))
 					{
-						$return = false;
-						$errormsg = 'Dieser Lektor kann nicht gelöscht werden da er schon verplant ist';
-					}
-					else
-					{
-						$leg = new lehreinheitmitarbeiter();
-						if($leg->load($_POST['lehreinheit_id'], $_POST['mitarbeiter_uid']))
+						if($db->db_num_rows()>0)
 						{
-							// Wenn ein Vertrag dazu angelegt ist, dann diesen mitloeschen
-							if($leg->vertrag_id!='')
+							$return = false;
+							$errormsg = 'Dieser Lektor kann nicht gelöscht werden da er schon verplant ist';
+						}
+						else
+						{
+							$leg = new lehreinheitmitarbeiter();
+							if($leg->load($_POST['lehreinheit_id'], $_POST['mitarbeiter_uid']))
 							{
-								$vertrag = new vertrag();
-								$vertrag->delete($leg->vertrag_id);
-							}
-
-							if($leg->delete($_POST['lehreinheit_id'], $_POST['mitarbeiter_uid']))
-							{
-								$return = true;
+								// Wenn ein Vertrag dazu angelegt ist, dann diesen mitloeschen
+								if($leg->vertrag_id!='')
+								{
+									$vertrag = new vertrag();
+									$vertrag->delete($leg->vertrag_id);
+								}
+								if($leg->delete($_POST['lehreinheit_id'], $_POST['mitarbeiter_uid']))
+								{
+									$return = true;
+								}
+								else
+								{
+									$return = false;
+									$errormsg = $leg->errormsg;
+								}
 							}
 							else
 							{
 								$return = false;
-								$errormsg = $leg->errormsg;
+								$errormsg='Fehlgeschlagen:'.$leg->errormsg;
 							}
 						}
-						else
-						{
-							$return = false;
-							$errormsg='Fehlgeschlagen:'.$leg->errormsg;
-						}
 					}
-				}
-				else
-				{
-					$return = false;
-					$errormsg = 'Fehler:'.$qry;
+					else
+					{
+						$return = false;
+						$errormsg = 'Fehler:'.$qry;
+					}
 				}
 			}
 			else
