@@ -148,6 +148,28 @@ var InfocenterPersonDataset = {
 				trs.find("input[name=PersonId\\[\\]]").prop("checked", false);
 			}
 		);
+
+		//make sure tablesorter local storage for homepage url with and without "/index" shares same values
+		$("#filterTableDataset").bind('filterEnd', function()
+		{
+			if (FHC_JS_DATA_STORAGE_OBJECT.called_method === 'index')
+			{
+				var pathname = window.location.pathname;
+				var storageobj = localStorage.getItem("tablesorter-filters");
+				var parsed = JSON.parse(storageobj);
+				var regex = new RegExp(/\/index(?!\.ci\.php)/);
+				if (regex.test(pathname))
+				{
+					parsed[pathname.replace(regex, "")] = parsed[pathname];
+				}
+				else
+				{
+					parsed[pathname + "/index"] = parsed[pathname];
+				}
+				storageobj = JSON.stringify(parsed);
+				localStorage.setItem("tablesorter-filters", storageobj);
+			}
+		});
 	},
 
 	/**

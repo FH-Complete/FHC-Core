@@ -84,7 +84,7 @@ var FHC_FilterWidget = {
 	// Public methods
 
 	/**
-	 * To display the FilterWidget using the loaded data prenset in the session
+	 * To display the FilterWidget using the loaded data present in the session
 	 */
 	display: function() {
 
@@ -392,7 +392,6 @@ var FHC_FilterWidget = {
 				},
 				{
 					successCallback: function(data, textStatus, jqXHR) {
-						FHC_FilterWidget._cleanTablesorterLocalStorage();
 						FHC_FilterWidget._failOrRefresh(data, textStatus, jqXHR);
 					}
 				}
@@ -413,7 +412,6 @@ var FHC_FilterWidget = {
  			},
  			{
  				successCallback: function(data, textStatus, jqXHR) {
- 					FHC_FilterWidget._cleanTablesorterLocalStorage();
  					FHC_FilterWidget._failOrRefresh(data, textStatus, jqXHR);
  				}
  			}
@@ -454,7 +452,6 @@ var FHC_FilterWidget = {
 			},
 			{
 				successCallback: function(data, textStatus, jqXHR) {
-					FHC_FilterWidget._cleanTablesorterLocalStorage();
 					FHC_FilterWidget._failOrRefresh(data, textStatus, jqXHR);
 				}
 			}
@@ -489,7 +486,6 @@ var FHC_FilterWidget = {
 			},
 			{
 				successCallback: function(data, textStatus, jqXHR) {
-					FHC_FilterWidget._cleanTablesorterLocalStorage();
 					FHC_FilterWidget._failOrReload(data, textStatus, jqXHR);
 				}
 			}
@@ -509,7 +505,6 @@ var FHC_FilterWidget = {
 			},
 			{
 				successCallback: function(data, textStatus, jqXHR) {
-					FHC_FilterWidget._cleanTablesorterLocalStorage();
 					FHC_FilterWidget._failOrReload(data, textStatus, jqXHR);
 				}
 			}
@@ -840,6 +835,14 @@ var FHC_FilterWidget = {
 	 */
 	_renderDatasetTablesorter: function(data) {
 
+		//clear tablesorter filter storage
+		var keepTsFilter = FHC_AjaxClient.getUrlParameter("keepTsFilter");
+
+		if (typeof keepTsFilter === "undefined" || keepTsFilter !== "true")
+		{
+			FHC_FilterWidget._clearTablesorterLocalStorage();
+		}
+
 		if (data.hasOwnProperty("checkboxes") && data.checkboxes!=null && data.checkboxes.trim() != "")
 		{
 			$("#filterTableDataset > thead > tr").append("<th data-filter='false' title='Select'>Select</th>");
@@ -937,14 +940,6 @@ var FHC_FilterWidget = {
 					filter_saveFilters : true
 				}
 			});
-
-			// Reset filter storage if not specified by get parameter
-			var keepTsFilter = FHC_AjaxClient.getUrlParameter("keepTsFilter");
-
-			if (typeof keepTsFilter === "undefined" || keepTsFilter !== "true")
-			{
-				FHC_FilterWidget._cleanTablesorterLocalStorage();
-			}
 
 			$.tablesorter.updateAll($("#filterTableDataset")[0].config, true, null);
 		}
@@ -1064,9 +1059,8 @@ var FHC_FilterWidget = {
 	/**
 	 * Tablesorter filter local storage clean
 	 */
-	_cleanTablesorterLocalStorage: function() {
-
-		$("#filterTableDataset").trigger("filterResetSaved");
+	_clearTablesorterLocalStorage: function() {
+		localStorage.removeItem("tablesorter-filters");
 	},
 
 	/**
