@@ -119,52 +119,69 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/lvplanung/stpl-semester-overlay.xu
 	    </rule>
   </template>
 </tree>
-<tree id="tree-lektor" onmouseup="onLektorSelect(event);"
-	seltype="multi" hidecolumnpicker="false" flex="1"
-	enableColumnDrag="true"
-	ondraggesture="nsDragAndDrop.startDrag(event,mitarbeiterDDObserver);"
-	ondrop="nsDragAndDrop.drop(event,LektorFunktionDDObserver)"
-	ondragdrop="nsDragAndDrop.drop(event,LektorFunktionDDObserver)"
-	ondragover="nsDragAndDrop.dragOver(event,LektorFunktionDDObserver)"
-	ondragenter="nsDragAndDrop.dragEnter(event,LektorFunktionDDObserver)"
-	ondragexit="nsDragAndDrop.dragExit(event,LektorFunktionDDObserver)"
-	datasources="rdf:null" ref="http://www.technikum-wien.at/mitarbeiter/liste"
-	context="fasoverlay-lektor-tree-popup"
-	>
-	<treecols>
-		<treecol id="kurzbz" label="Kuerzel" flex="2" primary="true" />
-		<splitter class="tree-splitter"/>
-		<treecol id="nachname" label="Nachname" flex="2" hidden="true"/>
-		<splitter class="tree-splitter"/>
-		<treecol id="vorname" label="Vorname" flex="2" hidden="true"/>
-		<splitter class="tree-splitter"/>
-		<treecol id="titel" label="Titel" flex="1" hidden="true"/>
-		<splitter class="tree-splitter"/>
-		<treecol id="uid" label="UID" flex="1" hidden="true"/>
-		<splitter class="tree-splitter"/>
-		<treecol id="studiengang_kz" label="Studiengangkz" flex="1" hidden="true"/>
-		<splitter class="tree-splitter"/>
-		<treecol id="tree-lektor-fixangestellt" label="Fixangestellt" flex="1" hidden="true"/>
-	</treecols>
 
-	<template>
-		<rule>
-		<treechildren>
-			<treeitem uri="rdf:*">
-				<treerow>
-					<treecell properties="Lektor_rdf:http://www.technikum-wien.at/mitarbeiter/rdf#aktiv" label="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#kurzbz"/>
-					<treecell properties="Lektor_rdf:http://www.technikum-wien.at/mitarbeiter/rdf#aktiv" label="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#nachname"/>
-					<treecell properties="Lektor_rdf:http://www.technikum-wien.at/mitarbeiter/rdf#aktiv" label="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#vorname"/>
-					<treecell properties="Lektor_rdf:http://www.technikum-wien.at/mitarbeiter/rdf#aktiv" label="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#titelpre"/>
-					<treecell properties="Lektor_rdf:http://www.technikum-wien.at/mitarbeiter/rdf#aktiv" label="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#uid"/>
-					<treecell properties="Lektor_rdf:http://www.technikum-wien.at/mitarbeiter/rdf#aktiv" label="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#studiengang_kz"/>
-					<treecell properties="Lektor_rdf:http://www.technikum-wien.at/mitarbeiter/rdf#aktiv" label="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#fixangestellt"/>
-				</treerow>
-			</treeitem>
-		</treechildren>
-		</rule>
-	</template>
-</tree>
+<vbox id="vbox-lektor">
+	<hbox>
+<!--		<spacer flex="1" />-->
+		<toolbox>
+			<toolbar id="toolbarLektorTreeFilter" tbautostretch="always" persist="collapsed">
+				<toolbarbutton id="toolbarbuttonLektorTreeRefresh"
+							   image="../skin/images/refresh.png"
+							   oncommand="onLektorRefresh();"
+							   tooltiptext="Neu laden"
+				/>
+				<textbox id="tempus-lektor-filter" size="30" oninput="onLektorFilter()" flex="1"/>
+			</toolbar>
+		</toolbox>
+<!--		<spacer flex="1" />-->
+	</hbox>
+	<tree id="tree-lektor" onmouseup="onLektorSelect(event);"
+		  seltype="multi" hidecolumnpicker="false" flex="1"
+		  enableColumnDrag="true"
+		  ondraggesture="nsDragAndDrop.startDrag(event,mitarbeiterDDObserver);"
+		  ondrop="nsDragAndDrop.drop(event,LektorFunktionDDObserver)"
+		  ondragdrop="nsDragAndDrop.drop(event,LektorFunktionDDObserver)"
+		  ondragover="nsDragAndDrop.dragOver(event,LektorFunktionDDObserver)"
+		  ondragenter="nsDragAndDrop.dragEnter(event,LektorFunktionDDObserver)"
+		  ondragexit="nsDragAndDrop.dragExit(event,LektorFunktionDDObserver)"
+		  datasources="rdf:null" ref="http://www.technikum-wien.at/mitarbeiter/liste"
+		  context="fasoverlay-lektor-tree-popup"
+	>
+		<treecols>
+			<treecol id="kurzbz" label="Kuerzel" flex="2" primary="true" />
+			<splitter class="tree-splitter"/>
+			<treecol id="nachname" label="Nachname" flex="2" hidden="true"/>
+			<splitter class="tree-splitter"/>
+			<treecol id="vorname" label="Vorname" flex="2" hidden="true"/>
+			<splitter class="tree-splitter"/>
+			<treecol id="titel" label="Titel" flex="1" hidden="true"/>
+			<splitter class="tree-splitter"/>
+			<treecol id="uid" label="UID" flex="1" hidden="true"/>
+			<splitter class="tree-splitter"/>
+			<treecol id="studiengang_kz" label="Studiengangkz" flex="1" hidden="true"/>
+			<splitter class="tree-splitter"/>
+			<treecol id="tree-lektor-fixangestellt" label="Fixangestellt" flex="1" hidden="true"/>
+		</treecols>
+
+		<template>
+			<rule>
+				<treechildren>
+					<treeitem uri="rdf:*">
+						<treerow>
+							<treecell properties="Lektor_rdf:http://www.technikum-wien.at/mitarbeiter/rdf#aktiv" label="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#kurzbz"/>
+							<treecell properties="Lektor_rdf:http://www.technikum-wien.at/mitarbeiter/rdf#aktiv" label="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#nachname"/>
+							<treecell properties="Lektor_rdf:http://www.technikum-wien.at/mitarbeiter/rdf#aktiv" label="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#vorname"/>
+							<treecell properties="Lektor_rdf:http://www.technikum-wien.at/mitarbeiter/rdf#aktiv" label="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#titelpre"/>
+							<treecell properties="Lektor_rdf:http://www.technikum-wien.at/mitarbeiter/rdf#aktiv" label="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#uid"/>
+							<treecell properties="Lektor_rdf:http://www.technikum-wien.at/mitarbeiter/rdf#aktiv" label="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#studiengang_kz"/>
+							<treecell properties="Lektor_rdf:http://www.technikum-wien.at/mitarbeiter/rdf#aktiv" label="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#fixangestellt"/>
+						</treerow>
+					</treeitem>
+				</treechildren>
+			</rule>
+		</template>
+	</tree>
+</vbox>
 
 <vbox id="vbox-main">
 <popupset>

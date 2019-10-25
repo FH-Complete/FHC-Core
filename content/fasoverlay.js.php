@@ -103,24 +103,24 @@ var LektorTreeListener =
 function LektorTreeSelectMitarbeiter()
 {
 	var tree=document.getElementById('tree-lektor');
-	var items = tree.view.rowCount; //Anzahl der Zeilen ermitteln
-	if(LektorTreeOpenStudiengang!=null)
+	if (tree.view != null)
 	{
-	   	for(var i=0;i<items;i++)
-	   	{
-	   		//Lehreinheit_id der row holen
-			col = tree.columns ? tree.columns["studiengang_kz"] : "studiengang_kz";
-			var studiengang_kz=tree.view.getCellText(i,col);
-			if(studiengang_kz == LektorTreeOpenStudiengang)
-			{
-				tree.view.toggleOpenState(i);
-				break;
+		var items = tree.view.rowCount; //Anzahl der Zeilen ermitteln
+		if (LektorTreeOpenStudiengang != null) {
+			for (var i = 0; i < items; i++) {
+				//Lehreinheit_id der row holen
+				col = tree.columns ? tree.columns["studiengang_kz"] : "studiengang_kz";
+				var studiengang_kz = tree.view.getCellText(i, col);
+				if (studiengang_kz == LektorTreeOpenStudiengang) {
+					tree.view.toggleOpenState(i);
+					break;
+				}
 			}
-	   	}
-	   	//nach dem laden der daten wieder ganz oben im tree positionieren da es sonst vorkommt, dass
-	   	//der scrollbalken unterhalb aller eintraege rutscht und dann nichts mehr im tree sichtbar ist.
-	   	//(funktioniert anscheinend auch nur mit setTimeout)
-	   	window.setTimeout("document.getElementById('tree-lektor').treeBoxObject.scrollToRow(0)",10);
+			//nach dem laden der daten wieder ganz oben im tree positionieren da es sonst vorkommt, dass
+			//der scrollbalken unterhalb aller eintraege rutscht und dann nichts mehr im tree sichtbar ist.
+			//(funktioniert anscheinend auch nur mit setTimeout)
+			window.setTimeout("document.getElementById('tree-lektor').treeBoxObject.scrollToRow(0)", 10);
+		}
 	}
 }
 

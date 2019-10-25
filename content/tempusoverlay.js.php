@@ -282,7 +282,10 @@ function onLektorSelect(event)
 
 	var stg_idx = tree.view.getParentIndex(tree.currentIndex);
 	var col = tree.columns ? tree.columns["studiengang_kz"] : "studiengang_kz";
-	var stg_kz=tree.view.getCellText(stg_idx,col);
+	if (stg_idx != -1)
+		var stg_kz=tree.view.getCellText(stg_idx,col);
+	else
+		var stg_kz = 0;
 
 	document.getElementById('LehrveranstaltungEditor').setAttribute('stg_kz',stg_kz);
 	document.getElementById('LehrveranstaltungEditor').setAttribute('uid',uid);
