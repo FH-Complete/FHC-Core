@@ -2299,6 +2299,29 @@ if(!$error)
 								$errormsg='Fehler beim Laden des Dokuments';
 							}
 						}
+						// Wenn kein Dokument im DMS vorhanden ist, aber die akte auf "wird nachgereicht" gesetzt ist
+						// darf das Dokument auch gelöscht werden
+						elseif($akte->nachgereicht === true && $akte->inhalt == '')
+						{
+							if($akte->delete($akte_id))
+							{
+								// Log schreiben
+								$logdata_akte = (array)$akte;
+								$logdata = var_export($logdata_akte, true);
+								$log = new log();
+								$log->executetime = date('Y-m-d H:i:s');
+								$log->mitarbeiter_uid = $user;
+								$log->beschreibung = "Löschen der Nachreichung der Akte '".$akte->dokument_kurzbz."' ID '".$akte_id."'";
+								$log->sql = 'DELETE FROM public.tbl_akte WHERE akte_id='.$db->db_add_param($akte_id, FHC_INTEGER).'; LogData:'.$logdata;
+								$log->sqlundo = '';
+								$log->save(true);
+							}
+							else
+							{
+								$error=true;
+								$errormsg='Fehler beim Loeschen der Akte';
+							}
+						}
 						else
 						{
 							$error=true;
