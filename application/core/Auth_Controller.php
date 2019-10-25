@@ -1,8 +1,11 @@
 <?php
 
-if (! defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Auth_Controller extends FHC_Controller
+/**
+ *
+ */
+abstract class Auth_Controller extends FHC_Controller
 {
 	/**
 	 * Extends this controller if authentication is required

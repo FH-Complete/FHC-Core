@@ -171,7 +171,7 @@ office:version="1.2">
 			<text:p text:style-name="Seitenumbruch">
 				<draw:frame xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0" xmlns:xlink="http://www.w3.org/1999/xlink" draw:style-name="fr2" draw:name="Bild2" text:anchor-type="paragraph" svg:y="8.819cm" svg:width="11.449cm" svg:height="12.61cm" draw:z-index="1">
 					<draw:image xlink:href="Pictures/100000000000087900000955F5761520DAB70522.jpg" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/>
-				</draw:frame>Bescheid</text:p>
+				</draw:frame>Bescheid
 			
 				<!-- Ueberprueft ob benoetigte Datenfelder leer sind -->
 				<xsl:if test="gebdatum = ''"><text:p text:style-name="Warning">Geburtsdatum fehlt</text:p></xsl:if>
@@ -180,9 +180,10 @@ office:version="1.2">
 				<xsl:if test="geburtsnation = ''"><text:p text:style-name="Warning">Geburtsnation fehlt</text:p></xsl:if>
 				<xsl:if test="rektor = ''"><text:p text:style-name="Warning">Name des Rektors fehlt</text:p></xsl:if>
 				<xsl:if test="geburtsnation_engl = ''"><text:p text:style-name="Warning">Englische Geburtsnation fehlt</text:p></xsl:if>
+			</text:p>
 				
 			<text:p text:style-name="P3"/>
-			<text:p text:style-name="P3">Das Kollegium der Fachhochschule Technikum Wien verleiht</text:p>
+			<text:p text:style-name="P3">Lorem ipsum dolor sit amet, consetetur sadipscing</text:p>
 			<text:p text:style-name="P3"/>
 			<text:p text:style-name="P5"><xsl:value-of select="anrede" /><xsl:text> </xsl:text><xsl:value-of select="name" /></text:p>
 			<text:p text:style-name="P3"/>
@@ -198,32 +199,8 @@ office:version="1.2">
 							<xsl:text>, </xsl:text>
 						</xsl:if>
 							<xsl:value-of select="geburtsnation" />
-						<xsl:choose>
-							<xsl:when test="contains(anrede, 'err')">
-								<xsl:text> der</xsl:text>
-							</xsl:when>
-							<xsl:when test="contains(anrede, 'rau')">
-								<xsl:text> die</xsl:text>
-							</xsl:when>
-							<xsl:otherwise>
-								<xsl:text> die/der</xsl:text>
-							</xsl:otherwise>
-						</xsl:choose>
-			 			durch Ablegung der 
-			 			<xsl:choose>
-							<xsl:when test="stg_art='b'">Bachelor</xsl:when>					
-							<xsl:when test="stg_art='m'">Master</xsl:when>					
-							<xsl:when test="stg_art='d'">Diplom</xsl:when>					
-							<xsl:when test="stg_art='l'">Lehrgang</xsl:when>				
-							<xsl:when test="stg_art='k'">Kurzstudium</xsl:when>								
-						</xsl:choose>prüfung am <xsl:value-of select="datum" /> den 
-						<xsl:choose>
-							<xsl:when test="stg_art='b'">Bachelor</xsl:when>					
-							<xsl:when test="stg_art='m'">Master</xsl:when>					
-							<xsl:when test="stg_art='d'">Diplom</xsl:when>					
-							<xsl:when test="stg_art='l'">Lehrgang</xsl:when>				
-							<xsl:when test="stg_art='k'">Kurzstudium</xsl:when>								
-						</xsl:choose>studiengang</text:p>
+						</text:p>
+							<text:p text:style-name="P3">Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod</text:p>
 						<text:p text:style-name="P4"/>
 					</table:table-cell>
 					<table:table-cell table:style-name="Tabelle1.B1" office:value-type="string">
@@ -233,21 +210,7 @@ office:version="1.2">
 								<xsl:text>, </xsl:text>
 							</xsl:if>
 								<xsl:value-of select="geburtsnation_engl" />
-							who, by taking the 
-							<xsl:choose>
-							<xsl:when test="stg_art='b'">Bachelor</xsl:when>					
-							<xsl:when test="stg_art='m'">Master</xsl:when>					
-							<xsl:when test="stg_art='d'">Diploma</xsl:when>					
-							<xsl:when test="stg_art='l'">Course</xsl:when>				
-							<xsl:when test="stg_art='k'">Short study</xsl:when>											
-						</xsl:choose> examination on <xsl:value-of select="datum" />, has duly completed the 
-						<xsl:choose>
-							<xsl:when test="stg_art='b'">Bachelor</xsl:when>					
-							<xsl:when test="stg_art='m'">Master</xsl:when>					
-							<xsl:when test="stg_art='d'">Diploma</xsl:when>					
-							<xsl:when test="stg_art='l'">Course</xsl:when>				
-							<xsl:when test="stg_art='k'">Short study</xsl:when>											
-						</xsl:choose><xsl:if test="stg_art != 'l' or 'k'" >'s</xsl:if> degree program</text:p>
+						<text:p text:style-name="P3">Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod</text:p></text:p>
 						<text:p text:style-name="P4"/>
 					</table:table-cell>
 				</table:table-row>
@@ -264,12 +227,12 @@ office:version="1.2">
 				<table:table-row>
 					<table:table-cell table:style-name="Tabelle1.A1" office:value-type="string">
 						<text:p text:style-name="P3"/>
-						<text:p text:style-name="P3">ordnungsgemäß abgeschlossen hat,</text:p>
-						<text:p text:style-name="P3">gemäß § 6 Abs 1 FHStG, BGBl. Nr. 340/1993, idgF, den akademischen Grad</text:p>
+						<text:p text:style-name="P3">Lorem ipsum dolor sit</text:p>
+						<text:p text:style-name="P3">Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam</text:p>
 					</table:table-cell>
 					<table:table-cell table:style-name="Tabelle1.B1" office:value-type="string">
 						<text:p text:style-name="P3"/>
-						<text:p text:style-name="P3">according to § 6 Abs 1 FHStG, BGBl. No. 340/1993, as amended, the academic degree of</text:p>
+						<text:p text:style-name="P3">Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut</text:p>
 					</table:table-cell>
 				</table:table-row>
 			</table:table>
@@ -279,8 +242,8 @@ office:version="1.2">
 			<text:p text:style-name="P3"/>
 			<text:p text:style-name="P3"/>
 			<text:section text:style-name="Sect1" text:name="Bereich2">
-				<text:p text:style-name="P4">Rechtsmittelbelehrung: Gegen diesen Bescheid ist gemäß § 10 Abs 6 FHStG, BGBl. Nr. 340/1993, idgF, eine Beschwerde beim Bundesverwaltungsgericht zulässig. Sie ist innerhalb von vier Wochen ab Zustellung bei der belangten Behörde (Kollegium der Fachhochschule Technikum Wien) einzubringen.</text:p>
-				<text:p text:style-name="P6">Appeal notice: An appeal against this decision may be lodged with the Federal Administrative Court (Bundesverwaltungsgericht) in accordance with Section 10 (6) of the FHStG, Federal Law Gazette no. 340/1993, as amended. It must be submitted to the relevant authority (Council of the University of Applied Sciences Technikum Wien) within four weeks of notification.</text:p>
+				<text:p text:style-name="P4">Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et</text:p>
+				<text:p text:style-name="P6">Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren</text:p>
 			</text:section>
 			<text:p text:style-name="P3"/>
 			<xsl:choose>
@@ -296,8 +259,8 @@ office:version="1.2">
 					<text:p text:style-name="P3"/>
 					<text:p text:style-name="P3">Wien, <xsl:value-of select="ort_datum" /></text:p>
 					<text:p text:style-name="P3"/>
-					<text:p text:style-name="P3">Für das Fachhochschulkollegium</text:p>
-					<text:p text:style-name="P3">Der Rektor</text:p>
+					<text:p text:style-name="P3">Lorem ipsum dolor sit</text:p>
+					<text:p text:style-name="P3">Lorem ipsum</text:p>
 					<text:p text:style-name="P3"/>
 					<text:p text:style-name="P3"/>
 					<text:p text:style-name="P3"/>

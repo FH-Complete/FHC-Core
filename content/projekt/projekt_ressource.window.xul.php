@@ -98,7 +98,7 @@ echo '<?xml-stylesheet href="'.APP_ROOT.'skin/tempus.css" type="text/css"?>';
 					<label value="Funktion" control="textbox-ressource-funktionradio"/>
 						<radiogroup>
 							<radio id="leitung" label="Leitung" <?php echo $leitung_sel; ?>/>
-	  						<radio id="mitarbeiter" label="Mitarbeiter" <?php echo $mitarbeiter_sel; ?>/>
+	  						<radio id="mitarbeiter" label="MitarbeiterIn" <?php echo $mitarbeiter_sel; ?>/>
 						</radiogroup>
 				</row>
 				<row>

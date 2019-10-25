@@ -213,7 +213,7 @@ $studiengang->load($stundenplan->studiengang_kz);
 					</menulist>
       			</row>
       			<row>
-      				<label value="Lektor" control="stpl-details-dialog-menulist-lektor"/>
+      				<label value="LektorIn" control="stpl-details-dialog-menulist-lektor"/>
 					<menulist id="stpl-details-dialog-menulist-lektor"
 							datasources="<?php echo APP_ROOT.'rdf/mitarbeiter.rdf.php?stg_kz='.$stundenplan->studiengang_kz.'&amp;lektor=true'.
 							                    ' '.APP_ROOT.'rdf/mitarbeiter.rdf.php?mitarbeiter_uid='.$stundenplan->mitarbeiter_uid;?>"

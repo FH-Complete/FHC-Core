@@ -267,11 +267,11 @@ function doSave()
 
 function doEdit($kurzbz,$new=false)
 {
-	global $db, $rechte, $studiengang;
+	global $db, $rechte, $studiengang, $searchItems;
 	if (!$new)
 	{
 		$e = new gruppe($kurzbz);
-		echo '<a href="einheit_menu.php?studiengang_kz='.$e->studiengang_kz.'">Zurück zur &Uuml;bersicht</a><br>';
+		echo '<a href="einheit_menu.php?studiengang_kz='.$e->studiengang_kz.'&searchItems='.implode(' ',$searchItems).'">Zurück zur &Uuml;bersicht</a><br>';
 	}
 	else
 	{
@@ -486,10 +486,10 @@ function getUebersicht()
 		echo "<td><img title='Aufnahmegruppe' height='16px' src='../../skin/images/".($e->aufnahmegruppe?"true.png":"false.png")."' alt='".($e->aufnahmegruppe?"true.png":"false.png")."'></td>";
 		// src="../../skin/images/'.($row->projektarbeit=='t'?'true.png':'false.png').'"
 		//echo "<td>".$gruppe->countStudenten($e->gruppe_kurzbz)."</td>"; Auskommentiert, da sonst die Ladezeit der Seite zu lange ist
-		echo "<td style='padding-right: 5px'><a href='einheit_det.php?kurzbz=$e->gruppe_kurzbz'>Personen</a></td>";
+		echo "<td style='padding-right: 5px'><a href='einheit_det.php?kurzbz=$e->gruppe_kurzbz&searchItems=".implode(' ',$searchItems)."'>Personen</a></td>";
 
 		if($rechte->isBerechtigt('lehre/gruppe', $oe_studiengang, 'su'))
-			echo "<td style='padding-right: 5px'><a href=\"einheit_menu.php?edit=1&kurzbz=$e->gruppe_kurzbz\">Edit</a></td>";
+			echo "<td style='padding-right: 5px'><a href=\"einheit_menu.php?edit=1&kurzbz=$e->gruppe_kurzbz&searchItems=".implode(' ',$searchItems)."\">Edit</a></td>";
 
 		if($rechte->isBerechtigt('lehre/gruppe', $oe_studiengang, 'suid'))
 			echo "<td><a href=\"einheit_menu.php?einheit_id=$e->gruppe_kurzbz&studiengang_kz=$e->studiengang_kz&type=delete\" onclick='return conf_del()'>Delete</a></td>";

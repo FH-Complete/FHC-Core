@@ -39,6 +39,8 @@ var StudentKontoTreeDatasource; //Datasource des KontoTrees
 var StudentTreeLoadDataOnSelect=true; //Gib an ob beim Selectieren im Tree die Daten geladen werden sollen
 var StudentTreeLoadDataOnSelect2=true; //Gib an ob beim Selectieren im Tree die Daten geladen werden sollen
 var StudentIOTreeDatasource; //Datasource des Incomming/Outgoing Trees
+var StudentIOAufenthaltFoerderungTreeDatasource; //Datasource des Outgoing Foerderung Trees
+var StudentIOZweckTreeDatasource; //Datasource des Outgoing Zweck Trees
 var StudentIOSelectID=null; //BISIO Eintrag der nach dem Refresh markiert werden soll
 var StudentNotenTreeDatasource; //Datasource des Noten Trees
 var StudentNotenSelectLehrveranstaltungID=null; //LehreinheitID des Noten Eintrages der nach dem Refresh markiert werden soll
@@ -195,6 +197,71 @@ var StudentIOTreeListener =
 	}
 };
 
+// ****
+// * Observer fuer BISIO Aufenthaltfoerderung Tree
+// * startet Rebuild nachdem das Refresh
+// * der datasource fertig ist
+// ****
+var StudentIOAufenthaltFoerderungTreeSinkObserver =
+{
+	onBeginLoad : function(pSink)
+	{
+	},
+	onInterrupt : function(pSink) {},
+	onResume : function(pSink) {},
+	onError : function(pSink, pStatus, pError) {},
+	onEndLoad : function(pSink)
+	{
+		netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+		document.getElementById('student-io-tree-aufenthaltfoerderung').builder.rebuild();
+	}
+};
+
+// ****
+// * Nach dem Rebuild wird der Eintrag wieder
+// * markiert
+// ****
+var StudentIOAufenthaltFoerderungTreeListener =
+{
+	willRebuild : function(builder) {  },
+	didRebuild : function(builder)
+	{
+
+	}
+};
+
+// ****
+// * Observer fuer BISIO Zweck Tree
+// * startet Rebuild nachdem das Refresh
+// * der datasource fertig ist
+// ****
+var StudentIOZweckTreeSinkObserver =
+{
+	onBeginLoad : function(pSink)
+	{
+	},
+	onInterrupt : function(pSink) {},
+	onResume : function(pSink) {},
+	onError : function(pSink, pStatus, pError) {},
+	onEndLoad : function(pSink)
+	{
+		netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+		document.getElementById('student-io-tree-aufenthaltfoerderung').builder.rebuild();
+	}
+};
+
+// ****
+// * Nach dem Rebuild wird der Eintrag wieder
+// * markiert
+// ****
+var StudentIOZweckTreeListener =
+{
+	willRebuild : function(builder) {  },
+	didRebuild : function(builder)
+	{
+
+	}
+};
 
 // ****
 // * Observer fuer Noten Tree
@@ -454,7 +521,7 @@ function StudentLVZeugnisPrint(event, sprache)
 	var xsl = 'LVZeugnis';
 	if (sprache == 'English')
 		xsl = 'LVZeugnisEng';
-	
+
 	url =  '<?php echo APP_ROOT; ?>content/pdfExport.php?xml=lehrveranstaltungszeugnis.rdf.php&xsl='+xsl+'&stg_kz='+stg_kz+'&uid=;'+uid+'&output='+output+'&ss='+stsem+'&lvid='+lvid+'&'+gettimestamp();
 
 	window.location.href = url;
@@ -3107,7 +3174,8 @@ function StudentIOAuswahl()
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 	var tree = document.getElementById('student-io-tree');
 
-	if (tree.currentIndex==-1) return;
+	if (tree.currentIndex == -1)
+		return;
 
 	StudentIODetailDisableFields(false);
 
@@ -3139,6 +3207,8 @@ function StudentIOAuswahl()
 	studiensemester_kurzbz = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#studiensemester_kurzbz" ));
 	ort = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#ort" ));
 	universitaet = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#universitaet" ));
+	ects_angerechnet = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#ects_angerechnet" ));
+	ects_erworben = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#ects_erworben" ));
 
 	try
 	{
@@ -3204,7 +3274,6 @@ function StudentIOAuswahl()
 	document.getElementById('student-io-menulist-nation').value=nation_code;
 	document.getElementById('student-io-textbox-von').value=von;
 	document.getElementById('student-io-textbox-bis').value=bis;
-	document.getElementById('student-io-menulist-zweck').value=zweck_code;
 	document.getElementById('student-io-detail-textbox-uid').value=student_uid;
 	document.getElementById('student-io-detail-checkbox-neu').checked=false;
 	document.getElementById('student-io-detail-textbox-bisio_id').value=bisio_id;
@@ -3212,6 +3281,210 @@ function StudentIOAuswahl()
 	document.getElementById('student-io-textbox-universitaet').value=universitaet;
 	document.getElementById('student-io-menulist-lehreinheit').value=lehreinheit_id;
 	document.getElementById('student-io-menulist-lehrveranstaltung').value=lehrveranstaltung_id;
+	document.getElementById('student-io-textbox-ects_erworben').value=ects_erworben;
+	document.getElementById('student-io-textbox-ects_angerechnet').value=ects_angerechnet;
+
+	StudentIOAufenthaltFoerderungTreeLoad(bisio_id);
+	StudentIOZweckTreeLoad(bisio_id);
+	StudentIOZweckMenulistLoad();
+}
+
+/**
+ * Laedt das Dropdown fuer den Zweck
+ * Abhaengig vom Status werden unterschiedliche Eintraege geladen
+ */
+function StudentIOZweckMenulistLoad()
+{
+	var student_tree = document.getElementById('student-tree');
+	var status = getTreeCellText(student_tree, 'student-treecol-status', student_tree.currentIndex);
+
+	var type = 'outgoing';
+	if (status == 'Incoming')
+		type = 'incoming';
+
+	//Lehreinheiten Drop Down laden
+	var zweckDropDown = document.getElementById('student-io-menulist-zweck');
+	url = '<?php echo APP_ROOT;?>rdf/zweck.rdf.php?type=' + type + '&'+gettimestamp();
+
+	//Alte DS entfernen
+	var oldDatasources = zweckDropDown.database.GetDataSources();
+	while (oldDatasources.hasMoreElements())
+	{
+		zweckDropDown.database.RemoveDataSource(oldDatasources.getNext());
+	}
+	//Refresh damit die entfernten DS auch wirklich entfernt werden
+	zweckDropDown.builder.rebuild();
+
+	zweckDropDown.selectedItem = '';
+	zweckDropDown.value = '';
+	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
+	var datasource = rdfService.GetDataSourceBlocking(url);
+	zweckDropDown.database.AddDataSource(datasource);
+	zweckDropDown.builder.rebuild();
+}
+
+/**
+ * Fuegt einen Zweck zu einem Auslandssemester hinzu
+ * Bei Incoming darf nur ein Eintrag gesetzt werden
+ */
+function StudentIOZweckAdd()
+{
+	var student_tree = document.getElementById('student-tree');
+	var status = getTreeCellText(student_tree, 'student-treecol-status', student_tree.currentIndex);
+
+	if (status == 'Incoming')
+	{
+		// Incoming duerfen nur einen Zweck eingetragen haben.
+		tree = document.getElementById('student-io-tree-zweck');
+		if (tree.view && tree.view.rowCount > 0)
+		{
+			alert("Bei Incoming darf nur ein Zweck angegeben werden");
+			return false;
+		}
+	}
+
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+	var bisio_id = document.getElementById('student-io-detail-textbox-bisio_id').value;
+	var zweck_code = document.getElementById('student-io-menulist-zweck').value;
+
+	var url = '<?php echo APP_ROOT ?>content/student/studentDBDML.php';
+	var req = new phpRequest(url,'','');
+
+	req.add('type', 'savebisiozweck');
+
+	req.add('bisio_id', bisio_id);
+	req.add('zweck_code', zweck_code);
+
+	var response = req.executePOST();
+
+	var val =  new ParseReturnValue(response)
+
+	if (!val.dbdml_return)
+	{
+		if (val.dbdml_errormsg == '')
+			alert(response)
+		else
+			alert(val.dbdml_errormsg)
+	}
+	else
+	{
+		StudentIOZweckTreeLoad(bisio_id);
+		SetStatusBarText('Daten wurden gespeichert');
+	}
+}
+
+/**
+ * Loescht die Zuordnung eines Zwecks zu einem Auslandssemester
+ */
+function StudentIOZweckDelete()
+{
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+	var tree = document.getElementById('student-io-tree-zweck');
+
+	if (tree.currentIndex == -1)
+		return;
+
+	//Ausgewaehlte Nr holen
+	var zweck_code = getTreeCellText(tree, 'student-io-tree-zweck-code', tree.currentIndex);
+	var bisio_id = document.getElementById('student-io-detail-textbox-bisio_id').value
+
+	var url = '<?php echo APP_ROOT ?>content/student/studentDBDML.php';
+	var req = new phpRequest(url,'','');
+
+	req.add('type', 'deletebisiozweck');
+	req.add('bisio_id', bisio_id);
+	req.add('zweck_code', zweck_code);
+
+	var response = req.executePOST();
+
+	var val =  new ParseReturnValue(response)
+
+	if (!val.dbdml_return)
+	{
+		if (val.dbdml_errormsg == '')
+			alert(response)
+		else
+			alert(val.dbdml_errormsg)
+	}
+	else
+	{
+		StudentIOZweckTreeLoad(bisio_id);
+		SetStatusBarText('Eintrag wurde gelöscht');
+	}
+}
+
+/**
+ * Fuegt eine Foerderung zu einem Auslandssemester hinzu
+ */
+function StudentIOAufenthaltfoerderungAdd()
+{
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+	var bisio_id = document.getElementById('student-io-detail-textbox-bisio_id').value;
+	var aufenthaltfoerderung_code = document.getElementById('student-io-menulist-aufenthaltfoerderung').value;
+	var url = '<?php echo APP_ROOT ?>content/student/studentDBDML.php';
+	var req = new phpRequest(url,'','');
+
+	req.add('type', 'savebisioaufenthaltfoerderung');
+
+	req.add('bisio_id', bisio_id);
+	req.add('aufenthaltfoerderung_code', aufenthaltfoerderung_code);
+
+	var response = req.executePOST();
+
+	var val =  new ParseReturnValue(response)
+
+	if (!val.dbdml_return)
+	{
+		if (val.dbdml_errormsg == '')
+			alert(response)
+		else
+			alert(val.dbdml_errormsg)
+	}
+	else
+	{
+		StudentIOAufenthaltFoerderungTreeLoad(bisio_id);
+		SetStatusBarText('Daten wurden gespeichert');
+	}
+}
+
+/**
+ * Entfernt eine Foerderung von einem Auslandssemester
+ */
+function StudentIOAufenthaltfoerderungDelete()
+{
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+	var tree = document.getElementById('student-io-tree-aufenthaltfoerderung');
+
+	if (tree.currentIndex == -1)
+		return;
+
+	//Ausgewaehlte Nr holen
+	var aufenthaltfoerderung_code = getTreeCellText(tree, 'student-io-tree-aufenthaltfoerderung-code', tree.currentIndex);
+	var bisio_id = document.getElementById('student-io-detail-textbox-bisio_id').value
+
+	var url = '<?php echo APP_ROOT ?>content/student/studentDBDML.php';
+	var req = new phpRequest(url,'','');
+
+	req.add('type', 'deletebisioaufenthaltfoerderung');
+	req.add('bisio_id', bisio_id);
+	req.add('aufenthaltfoerderung_code', aufenthaltfoerderung_code);
+
+	var response = req.executePOST();
+
+	var val =  new ParseReturnValue(response)
+
+	if (!val.dbdml_return)
+	{
+		if (val.dbdml_errormsg == '')
+			alert(response)
+		else
+			alert(val.dbdml_errormsg)
+	}
+	else
+	{
+		StudentIOAufenthaltFoerderungTreeLoad(bisio_id);
+		SetStatusBarText('Eintrag wurde gelöscht');
+	}
 }
 
 // ****
@@ -3239,6 +3512,13 @@ function StudentIODetailDisableFields(val)
 	document.getElementById('student-io-menulist-lehreinheit').disabled=val;
 	document.getElementById('student-io-textbox-ort').disabled=val;
 	document.getElementById('student-io-textbox-universitaet').disabled=val;
+	document.getElementById('student-io-textbox-ects_angerechnet').disabled=val;
+	document.getElementById('student-io-textbox-ects_erworben').disabled=val;
+	document.getElementById('student-io-menulist-aufenthaltfoerderung').disabled=val;
+	document.getElementById('student-io-button-aufenthaltfoerderung-hinzufuegen').disabled=val;
+	document.getElementById('student-io-button-zweck-hinzufuegen').disabled=val;
+	document.getElementById('student-io-tree-aufenthaltfoerderung').disabled=val;
+	document.getElementById('student-io-tree-zweck').disabled=val;
 }
 
 // *****
@@ -3248,11 +3528,13 @@ function StudentIOResetFileds()
 {
 	document.getElementById('student-io-textbox-von').value='';
 	document.getElementById('student-io-textbox-bis').value='';
-	document.getElementById('student-io-menulist-mobilitaetsprogramm').value='6';
+	document.getElementById('student-io-menulist-mobilitaetsprogramm').value='7';
 	document.getElementById('student-io-menulist-zweck').value='2';
 	document.getElementById('student-io-menulist-nation').value='A';
 	document.getElementById('student-io-textbox-ort').value='';
 	document.getElementById('student-io-textbox-universitaet').value='';
+	document.getElementById('student-io-textbox-ects_angerechnet').value='';
+	document.getElementById('student-io-textbox-ects_erworben').value='';
 }
 
 // ****
@@ -3273,6 +3555,8 @@ function StudentIODetailSpeichern()
 	lehreinheit_id = document.getElementById('student-io-menulist-lehreinheit').value;
 	ort = document.getElementById('student-io-textbox-ort').value;
 	universitaet = document.getElementById('student-io-textbox-universitaet').value;
+	ects_erworben = document.getElementById('student-io-textbox-ects_erworben').value;
+	ects_angerechnet = document.getElementById('student-io-textbox-ects_angerechnet').value;
 
 	studiengang_kz = document.getElementById('student-prestudent-menulist-studiengang_kz').value;
 
@@ -3307,6 +3591,8 @@ function StudentIODetailSpeichern()
 	req.add('lehreinheit_id', lehreinheit_id);
 	req.add('ort', ort);
 	req.add('universitaet', universitaet);
+	req.add('ects_angerechnet', ects_angerechnet);
+	req.add('ects_erworben', ects_erworben);
 
 	var response = req.executePOST();
 
@@ -3379,7 +3665,7 @@ function StudentIODelete()
 }
 
 // ****
-// * Aktiviert die Felder zum Anlegen eines neuen Eintrages
+// * Erstellt einen neuen IO Eintrag mit Defaultwerten und wechselt in den Editiermodus
 // ****
 function StudentIONeu()
 {
@@ -3400,17 +3686,21 @@ function StudentIONeu()
 	if(tag<10)
 		tag='0'+tag;
 
-	//UID ins Textfeld schreiben
-	document.getElementById('student-io-detail-textbox-uid').value=document.getElementById('student-detail-textbox-uid').value;
-	document.getElementById('student-io-detail-checkbox-neu').checked=true;
-	document.getElementById('student-io-textbox-von').value=tag+'.'+monat+'.'+jahr;
-	document.getElementById('student-io-textbox-bis').value=tag+'.'+monat+'.'+jahr;
+	var uid = document.getElementById('student-detail-textbox-uid').value;
+	var defaultdatum = tag+'.'+monat+'.'+jahr;
+	var mobilitaetsprogramm = 7; // ERASMUS
 
+	//UID ins Textfeld schreiben
+	document.getElementById('student-io-detail-textbox-uid').value = uid;
+	document.getElementById('student-io-detail-checkbox-neu').checked = true;
+	document.getElementById('student-io-textbox-von').value = defaultdatum;
+	document.getElementById('student-io-textbox-bis').value = defaultdatum;
+	document.getElementById('student-io-menulist-mobilitaetsprogramm').value = mobilitaetsprogramm;
 	try
 	{
 		//Wenn nach dem Personen gesucht wurde, ist es moeglich, dass kein Studiengang gewaehlt ist.
 		//Dann wird der Studiengang/Semester des Studenten genommen
-		var verband_tree=document.getElementById('tree-verband');
+		var verband_tree = document.getElementById('tree-verband');
 
 		var stg_kz = getTreeCellText(verband_tree, 'stg_kz', verband_tree.currentIndex);
 		var sem = getTreeCellText(verband_tree, 'sem', verband_tree.currentIndex);
@@ -3421,13 +3711,51 @@ function StudentIONeu()
 		var sem = document.getElementById('student-detail-textbox-semester').value;
 	}
 
+	// Neuen IO Datensatz erstellen und in Editiermodus wechseln.
+	var url = '<?php echo APP_ROOT ?>content/student/studentDBDML.php';
+	var req = new phpRequest(url,'','');
+
+	req.add('type', 'savebisio');
+
+	req.add('neu', true);
+	req.add('von', ConvertDateToISO(defaultdatum));
+	req.add('bis', ConvertDateToISO(defaultdatum));
+	req.add('mobilitaetsprogramm_code', mobilitaetsprogramm);
+	req.add('nation_code', 'A');
+	req.add('student_uid', uid);
+	req.add('studiengang_kz', stg_kz);
+	req.add('lehreinheit_id', '');
+	req.add('ort', '');
+	req.add('universitaet', '');
+	req.add('ects_angerechnet', '');
+	req.add('ects_erworben', '');
+
+	var response = req.executePOST();
+
+	var val =  new ParseReturnValue(response)
+
+	if (!val.dbdml_return)
+	{
+		if(val.dbdml_errormsg == '')
+			alert(response)
+		else
+			alert(val.dbdml_errormsg)
+	}
+	else
+	{
+		StudentIOSelectID = val.dbdml_data;
+		StudentIOTreeDatasource.Refresh(false); //non blocking
+		document.getElementById('student-io-detail-checkbox-neu').checked = false;
+		document.getElementById('student-io-detail-textbox-bisio_id').value = StudentIOSelectID;
+	}
+
 	//Lehrveranstaltung Drop Down laden
 	var LVDropDown = document.getElementById('student-io-menulist-lehrveranstaltung');
-	url='<?php echo APP_ROOT;?>rdf/lehrveranstaltung.rdf.php?stg_kz='+stg_kz+"&sem="+sem+"&optional=true&"+gettimestamp();
+	url = '<?php echo APP_ROOT;?>rdf/lehrveranstaltung.rdf.php?stg_kz='+stg_kz+"&sem="+sem+"&optional=true&"+gettimestamp();
 
 	//Alte DS entfernen
 	var oldDatasources = LVDropDown.database.GetDataSources();
-	while(oldDatasources.hasMoreElements())
+	while (oldDatasources.hasMoreElements())
 	{
 		LVDropDown.database.RemoveDataSource(oldDatasources.getNext());
 	}
@@ -3437,22 +3765,21 @@ function StudentIONeu()
 	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
 	var datasource = rdfService.GetDataSource(url);
 	LVDropDown.database.AddDataSource(datasource);
-	LVDropDown.value='';
-	//LVDropDown.selectedItem='';
+	LVDropDown.value = '';
 
 	var LEDropDown = document.getElementById('student-io-menulist-lehreinheit');
 
 	//Alte DS entfernen
 	var oldDatasources = LEDropDown.database.GetDataSources();
-	while(oldDatasources.hasMoreElements())
+	while (oldDatasources.hasMoreElements())
 	{
 		LEDropDown.database.RemoveDataSource(oldDatasources.getNext());
 	}
 	//Refresh damit die entfernten DS auch wirklich entfernt werden
 	LEDropDown.builder.rebuild();
 
-	LEDropDown.value='';
-	LEDropDown.selectedItem='';
+	LEDropDown.value = '';
+	LEDropDown.selectedItem = '';
 }
 
 // ****
@@ -3524,6 +3851,76 @@ function StudentIOLVAChange()
 	//Lehreinheiten DropDown Auswahl leeren
 	LEDropDown.selectedIndex=-1;
 
+}
+
+/**
+ * Laedt den Aufenthalt Foerderung Tree im In/Out Karteireiter
+ */
+function StudentIOAufenthaltFoerderungTreeLoad(bisio_id)
+{
+	tree = document.getElementById('student-io-tree-aufenthaltfoerderung');
+	url='<?php echo APP_ROOT;?>rdf/aufenthaltfoerderung.rdf.php?bisio_id='+bisio_id+"&"+gettimestamp();
+
+	//Alte Observer entfernen
+	try
+	{
+		StudentIOAufenthaltFoerderungTreeDatasource.removeXMLSinkObserver(StudentIOAufenthaltFoerderungTreeSinkObserver);
+		tree.builder.removeListener(StudentIOAufenthaltFoerderungTreeListener);
+	}
+	catch(e)
+	{}
+
+	//Alte DS entfernen
+	var oldDatasources = tree.database.GetDataSources();
+	while(oldDatasources.hasMoreElements())
+	{
+		tree.database.RemoveDataSource(oldDatasources.getNext());
+	}
+	//Refresh damit die entfernten DS auch wirklich entfernt werden
+	tree.builder.rebuild();
+
+	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
+	StudentIOAufenthaltFoerderungTreeDatasource = rdfService.GetDataSource(url);
+	StudentIOAufenthaltFoerderungTreeDatasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
+	StudentIOAufenthaltFoerderungTreeDatasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
+	tree.database.AddDataSource(StudentIOAufenthaltFoerderungTreeDatasource);
+	StudentIOAufenthaltFoerderungTreeDatasource.addXMLSinkObserver(StudentIOAufenthaltFoerderungTreeSinkObserver);
+	tree.builder.addListener(StudentIOAufenthaltFoerderungTreeListener);
+}
+
+/**
+ * Laedt den Zweck Tree im In/Out Karteireiter
+ */
+function StudentIOZweckTreeLoad(bisio_id)
+{
+	tree = document.getElementById('student-io-tree-zweck');
+	url='<?php echo APP_ROOT;?>rdf/zweck.rdf.php?bisio_id='+bisio_id+"&"+gettimestamp();
+
+	//Alte Observer entfernen
+	try
+	{
+		StudentIOZweckTreeDatasource.removeXMLSinkObserver(StudentIOZweckTreeSinkObserver);
+		tree.builder.removeListener(StudentIOZweckTreeListener);
+	}
+	catch(e)
+	{}
+
+	//Alte DS entfernen
+	var oldDatasources = tree.database.GetDataSources();
+	while(oldDatasources.hasMoreElements())
+	{
+		tree.database.RemoveDataSource(oldDatasources.getNext());
+	}
+	//Refresh damit die entfernten DS auch wirklich entfernt werden
+	tree.builder.rebuild();
+
+	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
+	StudentIOZweckTreeDatasource = rdfService.GetDataSource(url);
+	StudentIOZweckTreeDatasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
+	StudentIOZweckTreeDatasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
+	tree.database.AddDataSource(StudentIOZweckTreeDatasource);
+	StudentIOZweckTreeDatasource.addXMLSinkObserver(StudentIOZweckTreeSinkObserver);
+	tree.builder.addListener(StudentIOZweckTreeListener);
 }
 
 // **************** NOTEN ************** //
@@ -4553,7 +4950,7 @@ function StudentAnrechnungNeu()
 	var tree = document.getElementById('student-tree');
 	if (tree.currentIndex==-1)
 	{
-		alert('Student muss ausgewaehlt sein');
+		alert('StudentIn muss ausgewaehlt sein');
 		return false;
 	}
 
@@ -4687,7 +5084,7 @@ function StudentAnrechnungDetailSpeichern()
 
 	if (document.getElementById("student-anrechnungen-prestudent_id").value == '')
 	{
-		alert('Student muss ausgewaehlt sein');
+		alert('StudentIn muss ausgewaehlt sein');
 		return;
 	}
 
@@ -5042,7 +5439,7 @@ function StudentSendMail(event)
 		}
 	}
 	if(anzfault!=0)
-		alert(anzfault+' Student(en) konnten nicht hinzugefuegt werden weil keine UID eingetragen ist!');
+		alert(anzfault+' StudentIn konnte nicht hinzugefuegt werden weil keine UID eingetragen ist!');
 	if(mailempfaenger!='')
 	{
 		if (event.ctrlKey)
@@ -5114,7 +5511,7 @@ function splitmailto(mails, art)
 	var mailto='';
 	var loop=true;
 	if(mails.length>2048)
-		alert('Aufgrund der großen Anzahl an Empfängern, muss die Nachricht auf mehrere E-Mails aufgeteilt werden!');
+		alert('Aufgrund der großen Anzahl an EmpfängerInnen, muss die Nachricht auf mehrere E-Mails aufgeteilt werden!');
 
 	while(loop)
 	{
@@ -5177,7 +5574,7 @@ function StudentCreateDiplSupplement(event)
 
 	if(paramList.replace(";",'')=='')
 	{
-		alert('Bitte einen Studenten auswaehlen');
+		alert('Bitte eine/n Studierende/n auswaehlen');
 		return false;
 	}
 	if (event.shiftKey)
@@ -5322,7 +5719,7 @@ function StudentCreateStudienerfolg(event, xsl, finanzamt, studiensemester, all)
 
 	if(paramList.replace(";",'')=='')
 	{
-		alert('Bitte einen Studenten auswaehlen');
+		alert('Bitte eine/n Studierende/n auswaehlen');
 		return false;
 	}
 	if(!studiensemester)
@@ -5570,7 +5967,7 @@ function StudentCisStudienplan(event)
 	var tree = document.getElementById('student-tree');
 	if (tree.currentIndex == -1)
 	{
-		alert("Bitte wählen Sie einen Studenten aus.");
+		alert("Bitte wählen Sie einen Studierenden aus.");
 		return false;
 	}
 
@@ -5588,7 +5985,7 @@ function StudentCisNotenliste(event)
 	var tree = document.getElementById('student-tree');
 	if (tree.currentIndex == -1)
 	{
-		alert("Bitte wählen Sie einen Studenten aus.");
+		alert("Bitte wählen Sie eine/n Studierende/n aus.");
 		return false;
 	}
 
@@ -5651,14 +6048,14 @@ function StudentExportBescheid()
 
 	if(paramList.replace(";",'') == '')
 	{
-		alert('Bitte einen Studenten auswaehlen');
+		alert('Bitte eine/n Studierende/n auswaehlen');
 		return false;
 	}
 
 	if(anzahl>0)
 		window.open('<?php echo APP_ROOT; ?>content/pdfExport.php?archivdokument=Bescheid&uid='+paramList,'Bescheide', 'height=200,width=350,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
 	else
-		alert('Bitte einen Studenten auswaehlen');
+		alert('Bitte eine/n Studierende/n auswaehlen');
 }
 
 //****

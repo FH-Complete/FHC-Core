@@ -151,7 +151,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/mitarbeiter/mitarbeitervertragover
 				class="sortDirectionIndicator"
 				sort="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#kurzbz"  onclick="MitarbeiterTreeSort()"/>
 			<splitter class="tree-splitter"/>
-			<treecol id="mitarbeiter-treecol-lektor" label="Lektor" flex="1" persist="hidden, width, ordinal" hidden="true"
+			<treecol id="mitarbeiter-treecol-lektor" label="LektorIn" flex="1" persist="hidden, width, ordinal" hidden="true"
 				class="sortDirectionIndicator"
 				sort="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#lektor"  onclick="MitarbeiterTreeSort()"/>
 			<splitter class="tree-splitter"/>

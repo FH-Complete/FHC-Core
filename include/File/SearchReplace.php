@@ -32,7 +32,7 @@
  */
 class File_SearchReplace
 {
-    
+
     // {{{ Properties (All private)
 
     var $find;
@@ -63,7 +63,7 @@ class File_SearchReplace
      *
      * @author Richard Heyes <richard.heyes@heyes-computing.net>
      */
-    function File_SearchReplace($find, $replace, $files, $directories = '', $include_subdir = 1, $ignore_lines = array())
+    function __construct($find, $replace, $files, $directories = '', $include_subdir = 1, $ignore_lines = array())
     {
 
         $this->find            = $find;
@@ -367,7 +367,7 @@ class File_SearchReplace
 
     // }}}
     // {{{ writeout()
-    
+
     /**
      * Function to writeout the file contents.
      *
@@ -455,7 +455,7 @@ class File_SearchReplace
 
     // }}}
     // {{{ doSearch()
-    
+
     /**
      * This starts the search/replace off. Call this to do the search.
      * First do whatever files are specified, and/or if directories are specified,
@@ -472,7 +472,7 @@ class File_SearchReplace
             if ($this->directories != '')                                                   $this->doDirectories($this->search_function);
         }
     }
-    
+
     // }}}
 
 }

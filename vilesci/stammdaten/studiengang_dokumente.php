@@ -34,6 +34,7 @@ $dokument_kurzbz = isset($_REQUEST['dokument_kurzbz']) ? $_REQUEST['dokument_kur
 $onlinebewerbung = isset($_REQUEST['onlinebewerbung']);
 $pflicht = isset($_POST['pflicht']);
 $nachreichbar = isset($_POST['nachreichbar']);
+$stufe = isset($_REQUEST['stufe']) ? $_REQUEST['stufe'] : '';
 
 $sprache = new sprache();
 $sprache->getAll(true, 'index');
@@ -64,6 +65,7 @@ if($action == 'add')
 		$dokument->onlinebewerbung = $onlinebewerbung;
         $dokument->pflicht = $pflicht;
         $dokument->nachreichbar = $nachreichbar;
+		$dokument->stufe = $stufe;
 
 		$beschreibung_mehrsprachig = array();
 		foreach($sprache->result as $row_sprache)
@@ -128,6 +130,51 @@ if($action === 'togglepflicht')
 	}
 }
 
+// Ändern der Stufe per Ajax
+$changeStufe = filter_input(INPUT_POST, 'changeStufe', FILTER_VALIDATE_BOOLEAN);
+if ($changeStufe && isset($_POST['stufe']) && isset($_POST['studiengang_kz']))
+{
+	// Check if stufe = 0
+	if (filter_input(INPUT_POST, 'stufe', FILTER_VALIDATE_INT) === 0
+		|| filter_input(INPUT_POST, 'stufe', FILTER_VALIDATE_INT)
+		|| filter_input(INPUT_POST, 'stufe') == '')
+	{
+		$stufe = filter_input(INPUT_POST, 'stufe');
+	}
+	else
+	{
+		echo json_encode(array(
+			'status' => 'fehler',
+			'msg' => '"'.$_POST['stufe'].'" ist kein gueltiger Wert fuer die Stufe'
+		));
+		exit();
+	}
+
+	$studiengang_kz = filter_input(INPUT_POST, 'studiengang_kz', FILTER_VALIDATE_INT);
+	$dokument_kurzbz = filter_input(INPUT_POST, 'dokument_kurzbz');
+
+	$dokument = new dokument();
+	$dokument->loadDokumentStudiengang($dokument_kurzbz, $studiengang_kz);
+	$dokument->stufe = $stufe;
+
+	if (!$dokument->saveDokumentStudiengang())
+	{
+		echo json_encode(array(
+			'status' => 'fehler',
+			'msg' => $p->t('global/fehlerBeiDerParameteruebergabe')
+		));
+		exit();
+	}
+	else
+	{
+		echo json_encode(array(
+			'status' => 'ok',
+			'msg' => 'Status erfolgreich aktualisiert'
+		));
+		exit();
+	}
+}
+
 if($action === 'togglenachreichbar') 
 {
 	if(!$rechte->isBerechtigt('assistenz', $stg_kz, 'su'))
@@ -188,10 +235,42 @@ echo '<!DOCTYPE HTML>
 	<script type="text/javascript">
 		$(document).ready(function()
 		{
+			$.tablesorter.addParser({
+			// set a unique id
+			id: "stufe",
+			is: function(s) {
+				// return false so this parser is not auto detected
+				return false;
+			},
+			format: function(s, table, cell) 
+			{
+				return $("input", cell).val();
+			},
+			// set type, either numeric or text
+			type: "numeric"
+			});
+			
 			$("#t1").tablesorter(
 			{
 				sortList: [[0,0]],
-				widgets: ["zebra"]
+				widgets: ["saveSort","zebra","filter"],
+				headers: {7:{sorter: "stufe"}},
+				widgetOptions : {	filter_useParsedData : true,
+									filter_functions : {
+									// Add select menu to this column
+									4 : {
+									"Ja" : function(e, n, f, i, $r, c, data) { return /t/.test(e); },
+									"Nein" : function(e, n, f, i, $r, c, data) { return /f/.test(e); }
+									},
+									5 : {
+									"Ja" : function(e, n, f, i, $r, c, data) { return /t/.test(e); },
+									"Nein" : function(e, n, f, i, $r, c, data) { return /f/.test(e); }
+									},
+									6 : {
+									"Ja" : function(e, n, f, i, $r, c, data) { return /t/.test(e); },
+									"Nein" : function(e, n, f, i, $r, c, data) { return /f/.test(e); }
+									}
+				}}
 			});
 			$("#t2").tablesorter(
 			{
@@ -237,6 +316,45 @@ echo '<!DOCTYPE HTML>
 			forced_root_block: "",
 			editor_deselector: "mceNoEditor"
 		});
+		
+		function changeStufe(dokument_kurzbz)
+		{
+			var stufe = $("#stufe_"+dokument_kurzbz).val();
+			var studiengang_kz = $("#studiengangSelect").val();
+			
+			data = {
+				stufe: stufe,
+				studiengang_kz: studiengang_kz,
+				dokument_kurzbz: dokument_kurzbz,
+				changeStufe: true
+			};
+		
+			$.ajax({
+				url: "studiengang_dokumente.php",
+				data: data,
+				type: "POST",
+				dataType: "json",
+				success: function(data)
+				{
+					if(data.status!="ok")
+					{
+						$("#feedbackSpanFalse_"+dokument_kurzbz).toggle();
+						$("#feedbackSpanFalse_"+dokument_kurzbz).attr("title", data["msg"]);
+						
+					}
+					else
+					{
+						$("#feedbackSpanFalse_"+dokument_kurzbz).hide();
+						$("#feedbackSpanTrue_"+dokument_kurzbz).toggle();
+						$("#feedbackSpanTrue_"+dokument_kurzbz).delay(1000).fadeOut();
+					}
+				},
+				error: function(data)
+				{
+					alert(data["msg"]);
+				}
+			});
+		}
 	</script>
 	<title>Zuordnung Studiengang - Dokumente</title>
 </head>
@@ -399,7 +517,7 @@ else
 	<tr>
 	<td>
 	<form action='.$_SERVER['PHP_SELF'].' method="post" name="dokumente_zuteilung">
-		<select name="stg_kz" onchange="document.dokumente_zuteilung.submit()">';
+		<select id="studiengangSelect" name="stg_kz" onchange="document.dokumente_zuteilung.submit()">';
 	echo '<option value="">-- Studiengang auswählen --</option>';
 	foreach ($studiengang->result as $stg)
 	{
@@ -450,9 +568,10 @@ else
 		}
 		if($rechte->isBerechtigt('assistenz', $stg_kz, 'su'))
 		{
-			echo'	<th class="sorter-false" style="text-align: center">Online-Bewerbung</th>
-					<th class="sorter-false" style="text-align: center">Pflicht</th>
-					<th class="sorter-false" style="text-align: center">Nachreichbar</th>
+			echo'	<th style="text-align: center">Online-Bewerbung</th>
+					<th style="text-align: center">Pflicht</th>
+					<th style="text-align: center">Nachreichbar</th>
+					<th style="text-align: center">Stufe*</th>
 					<th class="sorter-false"></th>';
 		}
 		echo'</tr>
@@ -479,18 +598,41 @@ else
 			{
 				$beschreibung = '';
 				echo '<td>'.$dok->bezeichnung_mehrsprachig[$sprache_row->sprache].'</td>';
-				if ($dok->dokumentbeschreibung_mehrsprachig[$sprache_row->sprache] != '')
+				/*if ($dok->dokumentbeschreibung_mehrsprachig[$sprache_row->sprache] != '')
 					$beschreibung = '<b>Allgemein</b>: '.cutString($dok->dokumentbeschreibung_mehrsprachig[$sprache_row->sprache], 50, ' [...]').'<br/>';
 				if ($dok_stg->beschreibung_mehrsprachig[$sprache_row->sprache] != '')
-					$beschreibung .= '<span style="color: green"><b>'.$kuerzel.'</b></span>: '.cutString($dok_stg->beschreibung_mehrsprachig[$sprache_row->sprache], 50, ' [...]');	
-					
+					$beschreibung .= '<span style="color: green"><b>'.$kuerzel.'</b></span>: '.cutString($dok_stg->beschreibung_mehrsprachig[$sprache_row->sprache], 50, ' [...]');*/
+
+				if ($dok->dokumentbeschreibung_mehrsprachig[$sprache_row->sprache] != '' || $dok_stg->beschreibung_mehrsprachig[$sprache_row->sprache] != '')
+					$beschreibung = 'Vorhanden';
+
 				echo '<td>'.$beschreibung.'</td>';
 			}
 			if($rechte->isBerechtigt('assistenz', $stg_kz, 'su'))
 			{
-				echo'	<td style="text-align: center"><a href="'.$_SERVER['PHP_SELF'].'?action=toggleonline&dokument_kurzbz='.$dok->dokument_kurzbz.'&stg_kz='.$stg_kz.'"><img src="../../skin/images/'.$checked_onlinebewerbung.'.png" /></a></td>
-						<td style="text-align: center"><a href="'.$_SERVER['PHP_SELF'].'?action=togglepflicht&dokument_kurzbz='.$dok->dokument_kurzbz.'&stg_kz='.$stg_kz.'"><img src="../../skin/images/'.$checked_pflicht.'.png" /></a></td>
-						<td style="text-align: center"><a href="'.$_SERVER['PHP_SELF'].'?action=togglenachreichbar&dokument_kurzbz='.$dok->dokument_kurzbz.'&stg_kz='.$stg_kz.'"><img src="../../skin/images/'.$checked_nachreichbar.'.png" /></a></td>
+				echo'	<td style="text-align: center">
+							<div style="display: none">'.$checked_onlinebewerbung.'</div>
+							<a href="'.$_SERVER['PHP_SELF'].'?action=toggleonline&dokument_kurzbz='.$dok->dokument_kurzbz.'&stg_kz='.$stg_kz.'">
+								<img src="../../skin/images/'.$checked_onlinebewerbung.'.png" />
+							</a>
+						</td>
+						<td style="text-align: center">
+							<div style="display: none">'.$checked_pflicht.'</div>
+							<a href="'.$_SERVER['PHP_SELF'].'?action=togglepflicht&dokument_kurzbz='.$dok->dokument_kurzbz.'&stg_kz='.$stg_kz.'">
+								<img src="../../skin/images/'.$checked_pflicht.'.png" />
+							</a>
+						</td>
+						<td style="text-align: center">
+							<div style="display: none">'.$checked_nachreichbar.'</div>
+							<a href="'.$_SERVER['PHP_SELF'].'?action=togglenachreichbar&dokument_kurzbz='.$dok->dokument_kurzbz.'&stg_kz='.$stg_kz.'">
+								<img src="../../skin/images/'.$checked_nachreichbar.'.png" />
+							</a>
+						</td>
+						<td style="text-align: left; width: 60px">
+							<input style="width: 30px" type="text" id="stufe_'.$dok->dokument_kurzbz.'" value="'.$dok->stufe.'" tabindex="1" onchange="changeStufe(\''.$dok->dokument_kurzbz.'\')">
+							<span id="feedbackSpanTrue_'.$dok->dokument_kurzbz.'" style="display: none"><img style="width: 16px" src="../../skin/images/true.png" /></span>
+							<span id="feedbackSpanFalse_'.$dok->dokument_kurzbz.'" style="display: none" title=""><img style="width: 16px" src="../../skin/images/false.png" /></span>
+						</td>
 						<td style="text-align: center">';
 						if($rechte->isBerechtigt('assistenz', $stg_kz, 'su'))
 							echo '<a href="'.$_SERVER['PHP_SELF'].'?action=edit&dokument_kurzbz='.$dok->dokument_kurzbz.'&stg_kz='.$stg_kz.'"><img src="../../skin/images/edit.png" title="Zuordnung bearbeiten" size="17px" /></a>';
@@ -546,6 +688,9 @@ else
 					<td  class="normal" style="text-align: center" valign="top">
 						<input type="checkbox" name="nachreichbar" '.($dok_stg->nachreichbar?'checked="checked"':'').'>
 					</td>
+					<td class="normal" style="text-align: center" valign="top">
+						<input type="text" style="width: 30px" name="stufe" value="'.$dok_stg->stufe.'">
+					</td>
 					<td  class="normal" valign="top"><input type="submit" name="add" value="Speichern"></td>
 				</tr>
 			</tfoot>';
@@ -555,6 +700,16 @@ else
 	else
 		echo '</form>';
 }
+echo '<div style="font-size: small">*) Statusstufen:<br>
+<ul>
+<li>0 oder leer -> immer sichtbar</li>
+<li>10 -> Interessent</li>
+<li>15 -> Interessent Status bestätigt</li>
+<li>20 -> Bewerber</li>
+<li>30 -> Wartender</li>
+<li>40 -> Aufgenommener</li>
+<li>50 -> Student</li>
+</ul></div>';
 echo '
 </body>
 </html>';

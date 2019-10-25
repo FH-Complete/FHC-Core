@@ -1974,6 +1974,9 @@ function personen_id_read_mitarbeiter_oder_student($db,$person_id)
 */
 function read_create_html_news($db,$fachbereich_kurzbz,$studiengang_kz,$semester)
 {
+	if(defined('CIS_INFOSCREEN_NEWS_ANZEIGEN') && CIS_INFOSCREEN_NEWS_ANZEIGEN==false)
+		return '';
+	
 	// ------------------------------------------------------------------------------------------
 	//	Lesen Newstickerzeilen
 	// ------------------------------------------------------------------------------------------

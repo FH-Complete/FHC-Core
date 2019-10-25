@@ -2,8 +2,10 @@
 
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
-class UDF extends Auth_Controller
+class FAS_UDF extends Auth_Controller
 {
+	const FAS_UDF_SESSION_NAME = 'fasUdfSessionName';
+
 	public function __construct()
     {
         parent::__construct(
@@ -22,31 +24,33 @@ class UDF extends Auth_Controller
 	 */
 	public function index()
 	{
+		$fasUdfSession = getSession(self::FAS_UDF_SESSION_NAME);
+
 		$person_id = $this->input->get('person_id');
-		if (isset($this->session->person_id))
+		if (isset($fasUdfSession['person_id']))
 		{
 			if (!isset($person_id))
 			{
-				$person_id = $this->session->person_id;
+				$person_id = $fasUdfSession['person_id'];
 			}
-			unset($this->session->person_id);
+			unset($fasUdfSession['person_id']);
 		}
 
 		$prestudent_id = $this->input->get('prestudent_id');
-		if (isset($this->session->prestudent_id))
+		if (isset($fasUdfSession['prestudent_id']))
 		{
 			if (!isset($prestudent_id))
 			{
-				$prestudent_id = $this->session->prestudent_id;
+				$prestudent_id = $fasUdfSession['prestudent_id'];
 			}
-			unset($this->session->prestudent_id);
+			unset($fasUdfSession['prestudent_id']);
 		}
 
 		$result = null;
-		if (isset($this->session->result))
+		if (isset($fasUdfSession['result']))
 		{
-			$result = clone $this->session->result;
-			$this->session->set_userdata('result', null);
+			$result = clone $fasUdfSession['result'];
+			setSessionElement(self::FAS_UDF_SESSION_NAME, 'result', null);
 		}
 
 		$data = array('result' => $result);
@@ -71,7 +75,7 @@ class UDF extends Auth_Controller
 			}
 		}
 
-		$this->load->view('system/udf', $data);
+		$this->load->view('system/fas_udf', $data);
 	}
 
 	/**
@@ -90,9 +94,9 @@ class UDF extends Auth_Controller
 		if (isSuccess($validation))
 		{
 			// Load model UDF_model
-			$this->load->model('system/UDF_model', 'UDFModel');
+			$this->load->model('system/FAS_UDF_model', 'FASUDFModel');
 
-			$result = $this->UDFModel->saveUDFs($udfs);
+			$result = $this->FASUDFModel->saveUDFs($udfs);
 
 			$userdata['result'] = $result;
 		}
@@ -101,8 +105,11 @@ class UDF extends Auth_Controller
 			$userdata['result'] = $validation;
 		}
 
-		$this->session->set_userdata($userdata);
-		redirect('system/UDF');
+		setSessionElement(self::FAS_UDF_SESSION_NAME, 'person_id', $userdata['person_id']);
+		setSessionElement(self::FAS_UDF_SESSION_NAME, 'prestudent_id', $userdata['prestudent_id']);
+		setSessionElement(self::FAS_UDF_SESSION_NAME, 'result', $userdata['result']);
+
+		redirect('system/FAS_UDF');
 	}
 
 	/**

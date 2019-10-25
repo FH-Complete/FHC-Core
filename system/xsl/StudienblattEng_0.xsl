@@ -356,7 +356,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
                 <table:table-row table:style-name="Tabelle2.1">
                     <table:table-cell table:style-name="Tabelle2.A1" table:number-columns-spanned="3" office:value-type="string">
                         <text:p text:style-name="P10">Institution</text:p>
-                        <text:p text:style-name="P8">University of Applied Sciences Technikum Wien</text:p>
+                        <text:p text:style-name="P8"></text:p>
                     </table:table-cell>
                     <table:covered-table-cell/>
                     <table:covered-table-cell/>
@@ -571,7 +571,6 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
                 </table:table-row>
             </table:table>
             <text:p text:style-name="P19"/>
-            <text:p text:style-name="P19">Also valid without signature and official stamp</text:p>
         </office:text>
 </xsl:template>
 </xsl:stylesheet>

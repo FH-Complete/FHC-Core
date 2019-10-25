@@ -168,7 +168,7 @@
 				"name": "nicolaskruchten/pivottable",
 				"version": "2.15.0",
 				"dist": {
-					"url": "https://github.com/nicolaskruchten/pivottable/archive/v2.15.0.zip",
+					"url": "https://github.com/nicolaskruchten/pivottable/archive/v2.21.0.zip",
 					"type": "zip"
 				}
 			}
@@ -258,7 +258,7 @@
 
 		"nategood/httpful": "^0.2.20",
 		"netcarver/textile": "^3.5",
-		"nicolaskruchten/pivottable": "^2.15.0",
+		"nicolaskruchten/pivottable": "^2.21.0",
 
 		"phpseclib/phpseclib": "^2.0",
 
