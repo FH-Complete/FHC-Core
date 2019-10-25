@@ -224,7 +224,8 @@ if (empty($lehrveranstaltung->lehrveranstaltungen) && !$rechte->isBerechtigt('le
 		<td><?php echo $p->t('pruefung/pruefungIntervall'); ?>:</td>
 			<td>
 				<select id="pruefungsintervall">
-				<option value="15">15</option>
+                <option value="10">10</option>
+                <option value="15">15</option>
 				<option value="20">20</option>
 				<option value="30">30</option>
 				</select>

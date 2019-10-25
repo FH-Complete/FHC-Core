@@ -37,7 +37,8 @@ class Prestudentstatus extends CLI_Controller
 			tbl_prestudent.studiengang_kz,
 			tbl_prestudentstatus.studienplan_id,
 			tbl_studienplan.orgform_kurzbz,
-			tbl_prestudent.person_id');
+			tbl_prestudent.person_id,
+			tbl_studienplan.sprache');
 		$this->PrestudentstatusModel->addJoin('public.tbl_prestudent', 'prestudent_id');
 		$this->PrestudentstatusModel->addJoin('lehre.tbl_studienplan', 'studienplan_id','LEFT');
 		$this->PrestudentstatusModel->addJoin('lehre.tbl_studienordnung', 'studienordnung_id','LEFT');
@@ -64,7 +65,8 @@ class Prestudentstatus extends CLI_Controller
 							$row_status->studiengang_kz,
 							$row_status->studiensemester_kurzbz,
 							$row_status->ausbildungssemester,
-							$row_status->orgform_kurzbz);
+							$row_status->orgform_kurzbz,
+							$row_status->sprache);
 
 					if(isSuccess($studienplan) && count($studienplan->retval) == 1)
 					{

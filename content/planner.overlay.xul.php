@@ -164,7 +164,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/projekt/ressource.overlay.xul.php"
 	    <splitter class="tree-splitter"/>
 	    <treecol id="treecol-ressourcemenue-mitarbeiter_uid" label="MitarbeiterUID" flex="1" hidden="true"/>
 	    <splitter class="tree-splitter"/>
-	    <treecol id="treecol-ressourcemenue-student_uid" label="StudentUID" flex="1" hidden="true"/>
+	    <treecol id="treecol-ressourcemenue-student_uid" label="StudentInUID" flex="1" hidden="true"/>
 	    <splitter class="tree-splitter"/>
 	    <treecol id="treecol-ressourcemenue-betriebsmittel_id" label="BetriebsmittelID" flex="2" hidden="true"/>
 	    <splitter class="tree-splitter"/>

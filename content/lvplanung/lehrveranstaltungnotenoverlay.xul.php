@@ -159,7 +159,7 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/bindings.css\" type=\"text/css
 	</vbox>
 
 	<vbox flex="1">
-	<label value="Lektor" />
+	<label value="LektorIn" />
 	<tree id="lehrveranstaltung-lvgesamtnoten-tree" seltype="multi" hidecolumnpicker="false" flex="1"
 		datasources="rdf:null" ref="http://www.technikum-wien.at/lvgesamtnote/liste"
 		style="margin-bottom:5px;" height="100%" enableColumnDrag="true"
@@ -183,7 +183,7 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/bindings.css\" type=\"text/css
 			   class="sortDirectionIndicator"
 				sort="rdf:http://www.technikum-wien.at/lvgesamtnote/rdf#note_bezeichnung" onclick="LehrveranstaltungLVGesamtNotenTreeSort()"/>
 			<splitter class="tree-splitter"/>
-			<treecol id="lehrveranstaltung-lvgesamtnoten-tree-mitarbeiter_uid" label="MitarbeiterUID" flex="2" hidden="true"
+			<treecol id="lehrveranstaltung-lvgesamtnoten-tree-mitarbeiter_uid" label="MitarbeitendeUID" flex="2" hidden="true"
 				class="sortDirectionIndicator"
 				sort="rdf:http://www.technikum-wien.at/lvgesamtnote/rdf#mitarbeiter_uid"  onclick="LehrveranstaltungLVGesamtNotenTreeSort()"/>
 			<splitter class="tree-splitter"/>
@@ -207,7 +207,7 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/bindings.css\" type=\"text/css
 				class="sortDirectionIndicator"
 				sort="rdf:http://www.technikum-wien.at/lvgesamtnote/rdf#note"  onclick="LehrveranstaltungLVGesamtNotenTreeSort()"/>
 			<splitter class="tree-splitter"/>
-			<treecol id="lehrveranstaltung-lvgesamtnoten-tree-student_uid" label="StudentUID" flex="2" hidden="true"
+			<treecol id="lehrveranstaltung-lvgesamtnoten-tree-student_uid" label="StudierendeUID" flex="2" hidden="true"
 				class="sortDirectionIndicator"
 				sort="rdf:http://www.technikum-wien.at/lvgesamtnote/rdf#student_uid"  onclick="LehrveranstaltungLVGesamtNotenTreeSort()"/>
 			<splitter class="tree-splitter"/>
@@ -274,7 +274,7 @@ if(defined('FAS_GESAMTNOTE_PRUEFUNGSHONORAR') && FAS_GESAMTNOTE_PRUEFUNGSHONORAR
 	<caption label="Prüfungshonorar" />
 	<vbox>
 		<hbox>
-			<label value="Mitarbeiter" control="lehrveranstaltung-noten-pruefung-menulist-mitarbeiter"/>
+			<label value="MitarbeiterIn" control="lehrveranstaltung-noten-pruefung-menulist-mitarbeiter"/>
 			<menulist id="lehrveranstaltung-noten-pruefung-menulist-mitarbeiter"
 				      datasources="'.APP_ROOT.'rdf/mitarbeiter.rdf.php" flex="1"
 				      ref="http://www.technikum-wien.at/mitarbeiter/_alle"

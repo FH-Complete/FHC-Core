@@ -271,7 +271,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 		 </office:text>
 </xsl:template>
 <xsl:template name="abschnitt">
-	<text:p text:style-name="P9">Studienbestätigung Fachhochschule Technikum Wien</text:p>
+	<text:p text:style-name="P9">Studienbestätigung</text:p>
 		<table:table table:name="Tabelle1" table:style-name="Tabelle1">
 			<table:table-column table:style-name="Tabelle1.A"/>
 			<table:table-column table:style-name="Tabelle1.B"/>
@@ -313,7 +313,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 				</xsl:otherwise>
 			</xsl:choose>
 			(Studienbeginn<xsl:text> </xsl:text><xsl:value-of select="studiensemester_beginn" />, Beginn<xsl:text> </xsl:text><xsl:value-of select="studienbeginn_beginn" />)
-			<text:line-break />der Studienrichtung <xsl:text> </xsl:text><xsl:value-of select="studiengang_kz" /><xsl:text> </xsl:text><xsl:value-of select="studiengang_art" /><xsl:text> </xsl:text>
+			<text:line-break />der Studienrichtung <xsl:text> </xsl:text><xsl:value-of select="studiengang_kz" /><xsl:text> </xsl:text><xsl:text> </xsl:text>
 			<xsl:choose>
 				<xsl:when test="studiengang_bezeichnung_sto=''">
 					<xsl:value-of select="studiengang_bezeichnung" />

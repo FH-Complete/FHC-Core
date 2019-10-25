@@ -187,7 +187,7 @@ else
 									<menuitem id="student-toolbar-suchkriterien-email" label="E-Mail #email" oncommand="StudentSuchkriterien('#email')" disabled="false" tooltiptext="Suche nach E-Mail Adresse"/>
 									<menuitem id="student-toolbar-suchkriterien-genau" label="Name #name" oncommand="StudentSuchkriterien('#name')" disabled="false" tooltiptext="Suche nach einer exakten Namensübereinstimmung (Geeignet für kurze Namen wie 'Wu')"/>
 									<menuitem id="student-toolbar-suchkriterien-person_id" label="Person ID #pid" oncommand="StudentSuchkriterien('#pid')" disabled="false" tooltiptext="Suche nach Person ID" />
-									<menuitem id="student-toolbar-suchkriterien-prestudent_id" label="Prestudent ID #preid" oncommand="StudentSuchkriterien('#preid')" disabled="false" tooltiptext="Suche nach Prestudent ID" />
+									<menuitem id="student-toolbar-suchkriterien-prestudent_id" label="PrestudentIn ID #preid" oncommand="StudentSuchkriterien('#preid')" disabled="false" tooltiptext="Suche nach PrestudentIn ID" />
 									<menuitem id="student-toolbar-suchkriterien-telefon" label="Telefonnummer #tel" oncommand="StudentSuchkriterien('#tel')" disabled="false" tooltiptext="Suche nach Telefonnummer"/>
 									<menuitem id="student-toolbar-suchkriterien-ref" label="Zahlungsreferenz #ref" oncommand="StudentSuchkriterien('#ref')" disabled="false" tooltiptext="Suche nach Zahlungsreferenz (Kontobuchung)"/>
 								</menupopup>
@@ -385,7 +385,7 @@ else
 						class="sortDirectionIndicator"
 	    					sort="rdf:http://www.technikum-wien.at/student/rdf#studienplan_bezeichnung" onclick="StudentTreeSort()"/>
 						<splitter class="tree-splitter"/>
-						<treecol id="student-treecol-prestudent_id" label="PreStudentID" flex="1" hidden="false" persist="hidden, width, ordinal"
+						<treecol id="student-treecol-prestudent_id" label="PreStudentInnenID" flex="1" hidden="false" persist="hidden, width, ordinal"
 	    					class="sortDirectionIndicator"
 	    					sort="rdf:http://www.technikum-wien.at/student/rdf#prestudent_id" onclick="StudentTreeSort()"/>
 	    				<splitter class="tree-splitter"/>
@@ -480,7 +480,7 @@ else
 							<tab id="student-tab-detail" label="Details" />
 							<tab id="student-tab-notizen" label="Notizen"/>
 							<tab id="student-tab-kontakt" label="Kontakt" />
-							<tab id="student-tab-prestudent" label="PreStudent" />
+							<tab id="student-tab-prestudent" label="PreStudentIn" />
 							<tab id="student-tab-dokumente" label="Dokumente" />
 							<tab id="student-tab-konto" label="Konto" />
 							<tab id="student-tab-betriebsmittel" label="Betriebsmittel" />

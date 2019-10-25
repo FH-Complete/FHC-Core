@@ -9,6 +9,9 @@ define('DEFAULT_LEHREINHEIT_LEHRFORM','UE');
 // Defaul Trennzeichen fuer E-Mail Empfaenger wenn nicht ueber Variablen ueberschrieben
 define('DEFAULT_EMAILADRESSENTRENNZEICHEN',',');
 
+// Gibt an ob neue Mitarbeiter per default fixangestellt sind oder nicht
+define('DEFAULT_MITARBEITER_FIXANGESTELLT', true);
+
 //Anzeigeoptionen für Lehrveranstaltungen im CIS
 define('CIS_LEHRVERANSTALTUNG_NEWSGROUPS_ANZEIGEN',true);
 define('CIS_LEHRVERANSTALTUNG_FEEDBACK_ANZEIGEN',true);
@@ -195,6 +198,9 @@ define('SET_UID_AS_PERSONENKENNZEICHEN',false);
 
 // Legt fest ob fuer Studierende eine Alias EMail Adresse generiert wird (true|false)
 define('GENERATE_ALIAS_STUDENT',true);
+
+// gibt an ob beim Anlegen von Mitarbeitern ein Alias generiert wird.
+define('GENERATE_ALIAS_MITARBEITERIN',true);
 
 // Wie viele Tage nach Semesterstart soll bei der Neuanlage von Studierenden noch das aktuelle Semester vorgeschlagen werden.
 define('VILESCI_PERSON_NEU_STUDIENSEMESTER_UEBERGANGSFRIST',30);

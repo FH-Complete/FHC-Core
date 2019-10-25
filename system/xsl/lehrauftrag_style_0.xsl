@@ -547,13 +547,13 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
 	<office:master-styles>
 		<style:master-page style:name="Standard" style:page-layout-name="Mpm1">
 			<style:header>
-				<text:p text:style-name="MP1">Fachhochschule Technikum Wien <draw:frame draw:style-name="Mfr1" draw:name="Bild 1" text:anchor-type="char" svg:x="13.259cm" svg:y="-0.24cm" svg:width="4.193cm" svg:height="2.17cm" draw:z-index="0">
+				<text:p text:style-name="MP1"><draw:frame draw:style-name="Mfr1" draw:name="Bild 1" text:anchor-type="char" svg:x="13.259cm" svg:y="-0.24cm" svg:width="4.193cm" svg:height="2.17cm" draw:z-index="0">
 						<draw:image xlink:href="Pictures/10000201000000FD0000008209020D9B.png" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/>
 					</draw:frame>
 				</text:p>
-				<text:p text:style-name="MP1">Höchstädtplatz 6</text:p>
-				<text:p text:style-name="MP1">1200 Wien</text:p>
-				<text:p text:style-name="MP2">ZVR-Nr.:074476426, DVR-Nr.: 0928381</text:p>
+				<text:p text:style-name="MP1"></text:p>
+				<text:p text:style-name="MP1"></text:p>
+				<text:p text:style-name="MP2"></text:p>
 			</style:header>
 		</style:master-page>
 	</office:master-styles>

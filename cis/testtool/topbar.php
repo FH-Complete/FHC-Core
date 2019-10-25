@@ -16,57 +16,33 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
  * Authors: Manfred Kindl <manfred.kindl@technikum-wien.at>.
+ *          Cristina Hainberger <hainberg@technikum-wien.at>
  */
 
 require_once('../../config/cis.config.inc.php');
 require_once('../../include/basis_db.class.php');
 require_once('../../include/sprache.class.php');
 require_once '../../include/phrasen.class.php';
+require_once('../../include/gebiet.class.php');
 
   if (!$db = new basis_db())
       die('Fehler beim Oeffnen der Datenbankverbindung');
-  
-require_once('../../include/gebiet.class.php');
-	
-function getSpracheUser()
+
+// Start session
+session_start();
+
+// If language is changed by language select menu, reset session- and language variable
+if (isset($_GET['sprache_user']) && !empty($_GET['sprache_user']))
 {
-	if(isset($_SESSION['sprache_user']))
-	{
-		$sprache_user=$_SESSION['sprache_user'];
-	}
-	else
-	{
-		if(isset($_COOKIE['sprache_user']))
-		{
-			$sprache_user=$_COOKIE['sprache_user'];
-		}
-		else
-		{
-			$sprache_user=DEFAULT_LANGUAGE;
-		}
-		setSpracheUser($sprache_user);
-	}
-	return $sprache_user;
+    $_SESSION['sprache_user'] = $_GET['sprache_user'];
+    $sprache_user = $_GET['sprache_user'];
 }
 
-function setSpracheUser($sprache)
-{
-	$_SESSION['sprache_user']=$sprache;
-	setcookie('sprache_user',$sprache,time()+60*60*24*30,'/');
-}
+// Set language variable, which impacts the language displayed in the language select menu
+$sprache_user = (isset($_SESSION['sprache_user']) && !empty($_SESSION['sprache_user'])) ? $_SESSION['sprache_user'] : DEFAULT_LANGUAGE;
 
-if(isset($_GET['sprache_user']))
-{
-	$sprache_user = new sprache();
-	if($sprache_user->load($_GET['sprache_user']))
-	{
-		setSpracheUser($_GET['sprache_user']);
-	}
-	else
-		setSpracheUser(DEFAULT_LANGUAGE);
-}
-
-$sprache_user = getSpracheUser(); 
+// The language select menu is only displayed if RT-Ablauf of STG allows to switch language
+$display = (isset($_SESSION['sprache_auswahl']) && $_SESSION['sprache_auswahl'] == true) ? '' : 'hidden';
 
 $p = new phrasen($sprache_user);
 ?>
@@ -85,16 +61,15 @@ $p = new phrasen($sprache_user);
 <script type="text/javascript">
 function changeSprache(sprache)
 {
-	var content = '';
-	content = parent.content.location.pathname+parent.content.location.search;
-	
-	window.location.href="topbar.php?sprache_user="+sprache;
-	parent.menu.location.href="menu.php?sprache_user="+sprache;
+    // Add or replace param 'sprache_user' to the contents URL
+    var content_url = new URL(parent.content.location); // url of contents' frame page (login.php or frage.php)
+    var content_params = new URLSearchParams(content_url.search.slice(1));  // retrieve the querystring params
+    content_params.set('sprache_user', sprache); // add or replace sprache_user
 
-	if (parent.content.location.search=='')
-		parent.content.location.href=content+"?sprache_user="+sprache;
-	else
-		parent.content.location.href=content+"&sprache_user="+sprache;
+    // Pass GET-param sprache_user to topbar.php, menu.php and content (login.php or frage.php) and refresh the frames.
+    location.href = location.pathname + '?sprache_user=' + sprache; // refreshes topbar.php
+    parent.menu.location.href = parent.menu.location.pathname + '?sprache_user=' + sprache; // refreshes menu.php
+    parent.content.location.href = parent.content.location.pathname + '?' + content_params; // refreshes login.php or frage.php
 }
 </script>
 <body>
@@ -104,15 +79,17 @@ echo '	<table style="background-image: url(../../skin/images/header_testtool.png
     		<td valign="top" align="left">
     			<a href="index.html" target="_top"><img class="header_logo" style="min-height:65%; left: 16px; top: 10%;" src="../../skin/styles/'.DEFAULT_STYLE.'/logo_250x130.png" alt="logo"></a>
     		</td>
-    		<td valign="middle">
+
+        <!--The language select menu is hidden by default. 
+            Only displayed if RT-Ablauf of STG allows to switch language.-->
+    		<td id="select_sprache" '. $display. '>
     		<div class="form-group form-inline pull-right">
-               <!-- <label for="select-sprache">Sprache Menü:&nbsp;&nbsp;</label>-->
                 <select id="select-sprache" class="form-control" style="width: 170px; margin-right: 50px;" onchange="if (typeof(this.value) != \'undefined\') changeSprache(this.value)">';
                 $sprache = new sprache();
                 $sprache->getAll(true);
                 foreach($sprache->result as $row)
                 {
-                    echo ' <option value="'. $row->sprache. '" '.($row->sprache==$sprache_user?'selected':'').'>'.($row->bezeichnung_arr[getSprache()]).'&nbsp;&nbsp;</option>';
+                    echo ' <option value="'. $row->sprache. '" '.($row->sprache == $sprache_user ? 'selected' : '').'>'.($row->bezeichnung_arr[$sprache_user]).'&nbsp;&nbsp;</option>';
                 }
                 echo '
                 </select>
@@ -123,7 +100,6 @@ echo '	<table style="background-image: url(../../skin/images/header_testtool.png
 ?>
 </body>
 </html>
-
 
 
 

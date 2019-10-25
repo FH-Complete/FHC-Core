@@ -216,6 +216,16 @@ class Filters extends FHC_Controller
 		$this->outputJsonSuccess('Success');
 	}
 
+	/**
+	 * Reloads the dataset
+	 */
+	public function reloadDataset()
+	{
+		$this->filterslib->reloadDataset();
+
+		$this->outputJsonSuccess('Success');
+	}
+
 	//------------------------------------------------------------------------------------------------------------------
 	// Private methods
 

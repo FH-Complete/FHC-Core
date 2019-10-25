@@ -55,6 +55,10 @@ class vorlage extends basis_db
 	public $signierbar = false;
 	public $stud_selfservice = false;
 	public $dokument_kurzbz;
+	public $insertamum;
+	public $insertvon;
+	public $updateamum;
+	public $updatevon;
 
 	/**
 	 * Konstruktor
@@ -84,6 +88,10 @@ class vorlage extends basis_db
 				$this->archivierbar = $this->db_parse_bool($row->archivierbar);
 				$this->stud_selfservice = $this->db_parse_bool($row->stud_selfservice);
 				$this->dokument_kurzbz = $row->dokument_kurzbz;
+				$this->insertamum = $row->insertamum;
+				$this->insertvon = $row->insertvon;
+				$this->updateamum = $row->updateamum;
+				$this->updatevon = $row->updatevon;
 				return true;
 			}
 			else
@@ -113,7 +121,7 @@ class vorlage extends basis_db
 		if($new)
 		{
 			$qry = "INSERT INTO public.tbl_vorlage(vorlage_kurzbz, bezeichnung, anmerkung, mimetype,
-					archivierbar, signierbar, stud_selfservice, dokument_kurzbz) VALUES(".
+					archivierbar, signierbar, stud_selfservice, dokument_kurzbz, insertamum, insertvon, updateamum, updatevon) VALUES(".
 					$this->db_add_param($this->vorlage_kurzbz).','.
 					$this->db_add_param($this->bezeichnung).','.
 					$this->db_add_param($this->anmerkung).','.
@@ -121,7 +129,11 @@ class vorlage extends basis_db
 					$this->db_add_param($this->archivierbar, FHC_BOOLEAN).','.
 					$this->db_add_param($this->signierbar, FHC_BOOLEAN).','.
 					$this->db_add_param($this->stud_selfservice, FHC_BOOLEAN).','.
-					$this->db_add_param($this->dokument_kurzbz).');';
+					$this->db_add_param($this->dokument_kurzbz).','.
+					$this->db_add_param($this->insertamum).','.
+					$this->db_add_param($this->insertvon).','.
+					$this->db_add_param($this->updateamum).','.
+					$this->db_add_param($this->updatevon).');';
 		}
 		else
 		{
@@ -132,7 +144,9 @@ class vorlage extends basis_db
 							archivierbar='.$this->db_add_param($this->archivierbar, FHC_BOOLEAN).',
 							signierbar='.$this->db_add_param($this->signierbar, FHC_BOOLEAN).',
 							stud_selfservice='.$this->db_add_param($this->stud_selfservice, FHC_BOOLEAN).',
-							dokument_kurzbz='.$this->db_add_param($this->dokument_kurzbz).'
+							dokument_kurzbz='.$this->db_add_param($this->dokument_kurzbz).',
+							updateamum='.$this->db_add_param($this->updateamum).',
+							updatevon='.$this->db_add_param($this->updatevon).'
 					WHERE vorlage_kurzbz='.$this->db_add_param($this->vorlage_kurzbz).';';
 		}
 
@@ -168,6 +182,10 @@ class vorlage extends basis_db
 				$obj->archivierbar = $this->db_parse_bool($row->archivierbar);
 				$obj->stud_selfservice = $this->db_parse_bool($row->stud_selfservice);
 				$obj->dokument_kurzbz = $row->dokument_kurzbz;
+				$obj->insertamum = $row->insertamum;
+				$obj->insertvon = $row->insertvon;
+				$obj->updateamum = $row->updateamum;
+				$obj->updatevon = $row->updatevon;
 
 				$this->result[]= $obj;
 			}
@@ -196,6 +214,10 @@ class vorlage extends basis_db
 				$obj->signierbar = $this->db_parse_bool($row->signierbar);
 				$obj->stud_selfservice = $this->db_parse_bool($row->stud_selfservice);
 				$obj->dokument_kurzbz = $row->dokument_kurzbz;
+				$obj->insertamum = $row->insertamum;
+				$obj->insertvon = $row->insertvon;
+				$obj->updateamum = $row->updateamum;
+				$obj->updatevon = $row->updatevon;
 
 				$this->result[]= $obj;
 			}
@@ -229,6 +251,10 @@ class vorlage extends basis_db
 				$this->sprache = $row->sprache;
 				$this->subject = $row->subject;
 				$this->orgform_kurzbz = $row->orgform_kurzbz;
+				$this->insertamum = $row->insertamum;
+				$this->insertvon = $row->insertvon;
+				$this->updateamum = $row->updateamum;
+				$this->updatevon = $row->updatevon;
 				return true;
 			}
 			else
@@ -285,6 +311,10 @@ class vorlage extends basis_db
 				$obj->sprache = $row->sprache;
 				$obj->subject = $row->subject;
 				$obj->orgform_kurzbz = $row->orgform_kurzbz;
+				$obj->insertamum = $row->insertamum;
+				$obj->insertvon = $row->insertvon;
+				$obj->updateamum = $row->updateamum;
+				$obj->updatevon = $row->updatevon;
 
 				$this->result[]= $obj;
 			}
@@ -345,7 +375,7 @@ class vorlage extends basis_db
 
 		if($new)
 		{
-			$qry = "INSERT INTO public.tbl_vorlagestudiengang(vorlage_kurzbz,studiengang_kz,version,text,oe_kurzbz,style,berechtigung,anmerkung_vorlagestudiengang,aktiv,sprache,subject,orgform_kurzbz) VALUES(".
+			$qry = "INSERT INTO public.tbl_vorlagestudiengang(vorlage_kurzbz,studiengang_kz,version,text,oe_kurzbz,style,berechtigung,anmerkung_vorlagestudiengang,aktiv,sprache,subject,orgform_kurzbz,insertamum,insertvon,updateamum,updatevon) VALUES(".
 					$this->db_add_param($this->vorlage_kurzbz).','.
 					$this->db_add_param($this->studiengang_kz).','.
 					$this->db_add_param($this->version).','.
@@ -357,7 +387,11 @@ class vorlage extends basis_db
 					$this->db_add_param($this->aktiv, FHC_BOOLEAN).','.
 					$this->db_add_param($this->sprache).','.
 					$this->db_add_param($this->subject).','.
-					$this->db_add_param($this->orgform_kurzbz).');';
+					$this->db_add_param($this->orgform_kurzbz).','.
+					$this->db_add_param($this->insertamum).','.
+					$this->db_add_param($this->insertvon).','.
+					$this->db_add_param($this->updateamum).','.
+					$this->db_add_param($this->updatevon).');';
 		}
 		else
 		{
@@ -373,7 +407,9 @@ class vorlage extends basis_db
 							anmerkung_vorlagestudiengang='.$this->db_add_param($this->anmerkung_vorlagestudiengang).',
 							sprache='.$this->db_add_param($this->sprache).',
 							subject='.$this->db_add_param($this->subject).',
-							orgform_kurzbz='.$this->db_add_param($this->orgform_kurzbz).'
+							orgform_kurzbz='.$this->db_add_param($this->orgform_kurzbz).',
+							updateamum='.$this->db_add_param($this->updateamum).',
+							updatevon='.$this->db_add_param($this->updatevon).'
 					WHERE vorlagestudiengang_id='.$this->db_add_param($this->vorlagestudiengang_id).';';
 		}
 
@@ -526,6 +562,10 @@ class vorlage extends basis_db
 				$this->sprache = $row->sprache;
 				$this->subject = $row->subject;
 				$this->orgform_kurzbz = $row->orgform_kurzbz;
+				$this->insertamum = $row->insertamum;
+				$this->insertvon = $row->insertvon;
+				$this->updateamum = $row->updateamum;
+				$this->updatevon = $row->updatevon;
 
 				return true;
 			}

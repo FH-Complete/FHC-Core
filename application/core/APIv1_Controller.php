@@ -1,9 +1,11 @@
 <?php
 
+if (!defined('BASEPATH')) exit('No direct script access allowed');
+
 /**
  * REST_Controller takes care about authentication and it loads the AuthLib
  */
-class APIv1_Controller extends REST_Controller
+abstract class APIv1_Controller extends REST_Controller
 {
 	private $_requiredPermissions;
 

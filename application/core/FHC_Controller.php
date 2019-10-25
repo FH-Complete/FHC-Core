@@ -1,8 +1,11 @@
 <?php
 
-if (! defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class FHC_Controller extends CI_Controller
+/**
+ *
+ */
+abstract class FHC_Controller extends CI_Controller
 {
 	const FHC_CONTROLLER_ID = 'fhc_controller_id'; // name of the parameter used to identify uniquely a call to a controller
 

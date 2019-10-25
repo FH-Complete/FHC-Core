@@ -80,9 +80,9 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
 			<text:p text:style-name="P1"/>
 			<text:p text:style-name="P1"/>
 			<text:p text:style-name="P1"/>
-			<text:p text:style-name="P1">Pursuant to section 6 subsection 1 of the Universities of Applied Sciences Studies Act</text:p>
-			<text:p text:style-name="P1">(Austrian legal reference: Fachhochschul-Studiengesetz - FHStG, BGBl. Nr. <xsl:value-of select="bescheidbgbl1" /> idgF),</text:p>
-			<text:p text:style-name="P1">the University of Applied Sciences Council (Fachhochschulkollegium) awards</text:p>
+			<text:p text:style-name="P1">Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut</text:p>
+			<text:p text:style-name="P1">Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna</text:p>
+			<text:p text:style-name="P1">Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam</text:p>
 			<text:p text:style-name="P1"/>
 			<text:p text:style-name="P3"><xsl:value-of select="anrede_engl" /><xsl:text> </xsl:text><xsl:value-of select="name" /></text:p>
 			<text:p text:style-name="P1"/>
@@ -106,9 +106,9 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
 			<text:p text:style-name="P1">(program classification number <xsl:value-of select="studiengang_kz" />)</text:p>
 			<text:p text:style-name="P1"/>
 			<text:p text:style-name="P1">after successfully passing the diploma examination on <xsl:value-of select="datum" /></text:p>
-			<text:p text:style-name="P1">at the University of Applied Sciences Technikum Wien (Fachhochschule Technikum Wien)</text:p>
-			<text:p text:style-name="P1">in accordance with the directive of the Agency for Quality Assurance and Accreditation Austria</text:p>
-			<text:p text:style-name="P1">dated 09.05.2012 the academic degree</text:p>
+			<text:p text:style-name="P1">Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut</text:p>
+			<text:p text:style-name="P1">Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et</text:p>
+			<text:p text:style-name="P1">Lorem ipsum dolor sit amet, consetetur</text:p>
 			<text:p text:style-name="P1"/>
 			<text:p text:style-name="P3"><xsl:value-of select="titel" /></text:p>
 			<text:p text:style-name="P1">abbreviated</text:p>
@@ -116,8 +116,8 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
 			<text:p text:style-name="P1"/>
 			<text:p text:style-name="P1">Vienna, <xsl:value-of select="sponsion" /></text:p>
 			<text:p text:style-name="P1"/>
-			<text:p text:style-name="P1">On behalf of the University of Applied Sciences Council</text:p>
-			<text:p text:style-name="P1">The Rector</text:p>
+			<text:p text:style-name="P1">Lorem ipsum dolor sit amet, consetetur sadipscing elitr</text:p>
+			<text:p text:style-name="P1">Lorem ipsum</text:p>
 			<text:p text:style-name="P1"/>
 			<text:p text:style-name="P1"/>
 			<text:p text:style-name="P1"/>

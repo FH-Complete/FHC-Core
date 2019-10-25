@@ -36,6 +36,7 @@ require_once('../../include/datum.class.php');
 require_once('../../include/studiengang.class.php');
 require_once('../../include/functions.inc.php');
 require_once('../../include/benutzerberechtigung.class.php');
+require_once('../../include/bisio.class.php');
 
 if (!$db = new basis_db())
 	die('Es konnte keine Verbindung zum Server aufgebaut werden.');
@@ -243,7 +244,7 @@ $qry_in="
 	WHERE
 		bismelden=TRUE
 		AND tbl_student.studiengang_kz=".$db->db_add_param($stg_kz)."
-		AND (status_kurzbz='Incoming' AND student_uid NOT IN (SELECT student_uid FROM bis.tbl_bisio))
+		AND (status_kurzbz='Incoming' AND NOT EXISTS (SELECT 1 FROM bis.tbl_bisio WHERE student_uid=tbl_student.student_uid))
 	ORDER BY student_uid, nachname, vorname
 	";
 if($result_in = $db->db_query($qry_in))
@@ -257,7 +258,29 @@ if($result_in = $db->db_query($qry_in))
 }
 
 //Hauptselect
-$qry="
+// An der FHTW können nur die Incomings ausgelesen werden, wenn die stg_kz 10006 übergeben wird
+if (CAMPUS_NAME == 'FH Technikum Wien' && $stg_kz==10006)
+{
+	$qry="
+	SELECT
+		DISTINCT ON(student_uid, nachname, vorname) *, public.tbl_person.person_id AS pers_id, to_char(gebdatum, 'ddmmyy') AS vdat
+	FROM
+		public.tbl_student
+		JOIN public.tbl_benutzer ON(student_uid=uid)
+		JOIN public.tbl_person USING (person_id)
+		JOIN public.tbl_prestudent USING (prestudent_id)
+		JOIN public.tbl_prestudentstatus ON(tbl_prestudent.prestudent_id=tbl_prestudentstatus.prestudent_id)
+	WHERE
+		bismelden=TRUE
+		AND (status_kurzbz='Incoming' AND student_uid IN (SELECT student_uid FROM bis.tbl_bisio WHERE (tbl_bisio.bis>=".$db->db_add_param($bisprevious).")
+				OR (tbl_bisio.von<=".$db->db_add_param($bisdatum)." AND (tbl_bisio.bis>=".$db->db_add_param($bisdatum)."  OR tbl_bisio.bis IS NULL))
+		))
+	ORDER BY student_uid, nachname, vorname
+	";
+}
+else
+{
+	$qry="
 	SELECT
 		DISTINCT ON(student_uid, nachname, vorname) *, public.tbl_person.person_id AS pers_id, to_char(gebdatum, 'ddmmyy') AS vdat
 	FROM
@@ -280,6 +303,7 @@ $qry="
 		)))
 	ORDER BY student_uid, nachname, vorname
 	";
+}
 
 if($result = $db->db_query($qry))
 {
@@ -534,6 +558,7 @@ function GenerateXMLStudentBlock($row)
 	global $iosem, $stsem, $usem, $asem, $absem, $stlist, $gssem;
 	global $verwendete_orgformen, $datum_obj,$orgform_code_array,$standortcode;
 	global $kodex_studientyp_array, $kodex_studstatuscode_array;
+	global $stg_kz;
 	$error_log='';
 	$error_log1='';
 	$datei = '';
@@ -814,8 +839,20 @@ function GenerateXMLStudentBlock($row)
 		}
 	}
 	//Wenn im Status keine Organisationsform eingetragen ist, wird die des Studienganges uebernommen
+	//echo '<pre>', var_dump($storgform), '</pre>';
 	if($storgform=='')
-		$storgform=$orgform_kurzbz;
+	{
+		// Wenn FHTW und studiengang_kz 10006 (Campus International) wird die OrgForm des Studiengangs vom Incoming ermittelt
+		if (CAMPUS_NAME == 'FH Technikum Wien' && $stg_kz == 10006)
+		{
+			$studiengang = new studiengang($row->studiengang_kz);
+			$storgform = $studiengang->orgform_kurzbz;
+		}
+		else
+		{
+			$storgform=$orgform_kurzbz;
+		}
+	}
 
 	// **** GS Container ****/
 	$gsstatus='';
@@ -1116,7 +1153,6 @@ function GenerateXMLStudentBlock($row)
 				$gast=$rowio->nation_code;
 				$avon=date("dmY", $datumobj->mktime_fromdate($rowio->von));
 				$abis=date("dmY", $datumobj->mktime_fromdate($rowio->bis));
-				$zweck=$rowio->zweck_code;
 
 				$datei.="
 			<IO>
@@ -1128,8 +1164,36 @@ function GenerateXMLStudentBlock($row)
 					$datei.="
 				<AufenthaltBis>".$abis."</AufenthaltBis>";
 				}
-				$datei.="
-				<AufenthaltZweckCode>".$zweck."</AufenthaltZweckCode>
+
+				$bisio_zweck = new bisio();
+				$bisio_zweck->getZweck($rowio->bisio_id);
+				foreach ($bisio_zweck->result as $row_zweck)
+				{
+					$datei.="
+					<AufenthaltZweckCode>".$row_zweck->zweck_code."</AufenthaltZweckCode>";
+				}
+				if ($aktstatus != 'Incoming' && $rowio->ects_erworben != '')
+				{
+					$datei.="
+					<ECTSerworben>".$rowio->ects_erworben."</ECTSerworben>";
+				}
+				if ($aktstatus != 'Incoming' && $rowio->ects_angerechnet != '')
+				{
+					$datei.="
+					<ECTSangerechnet>".$rowio->ects_angerechnet."</ECTSangerechnet>";
+				}
+				if ($aktstatus != 'Incoming')
+				{
+					$bisio_foerderung = new bisio();
+					$bisio_foerderung->getFoerderungen($rowio->bisio_id);
+					foreach ($bisio_foerderung->result as $row_foerderung)
+					{
+						$datei.="
+						<AufenthaltFoerderungCode>".$row_foerderung->aufenthaltfoerderung_code."</AufenthaltFoerderungCode>";
+					}
+				}
+
+			$datei.="
 			</IO>";
 				if($aktstatus!='Incoming')
 				{

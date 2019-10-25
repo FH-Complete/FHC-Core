@@ -10,6 +10,9 @@ class Lehrveranstaltung_model extends DB_Model
 		parent::__construct();
 		$this->dbTable = 'lehre.tbl_lehrveranstaltung';
 		$this->pk = 'lehrveranstaltung_id';
+
+		$this->load->model('organisation/studiengang_model', 'StudiengangModel');
+		$this->load->model('organisation/studiensemester_model', 'StudiensemesterModel');
 	}
 
 	/**
@@ -22,8 +25,6 @@ class Lehrveranstaltung_model extends DB_Model
 	 */
 	public function getLehrveranstaltungGroupNames($studiensemester_kurzbz, $ausbildungssemester = null, $studiengang_kz = null, $lehrveranstaltung_ids = null)
 	{
-		$this->load->model('organisation/studiengang_model', 'StudiengangModel');
-
 		$studiengang_kz_arr = array();
 		$ausbildungssemester_arr = array();
 		$lehrveranstaltung_id_arr = array();
@@ -59,7 +60,6 @@ class Lehrveranstaltung_model extends DB_Model
 		}
 		else
 		{
-			$this->load->model('organisation/studiensemester_model', 'StudiensemesterModel');
 			foreach ($studiengang_kz_arr as $studiengang_kz_item)
 			{
 				$result = $this->StudiensemesterModel->getAusbildungssemesterByStudiensemesterAndStudiengang($studiensemester_kurzbz, $studiengang_kz_item);
@@ -214,8 +214,6 @@ class Lehrveranstaltung_model extends DB_Model
 	 */
 	public function getLvsWithIncomingPlaces($studiensemester_kurzbz)
 	{
-		$this->load->model('organisation/Studiensemester_model', 'StudiensemesterModel');
-
 		$studsemres = $this->StudiensemesterModel->load($studiensemester_kurzbz);
 
 		if (!hasData($studsemres))

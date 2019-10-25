@@ -459,12 +459,6 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 			<xsl:apply-templates select="fussnote"/>
 		</table:table>
 		<text:p text:style-name="P26"/>
-		<text:p text:style-name="P22">Notenstufen:<text:tab/>Sehr gut (1), Gut (2), Befriedigend (3), Genügend (4), mit Erfolg teilgenommen (met), teilgenommen (tg),
-			angerechnet (ar), bestanden (b),
-		</text:p>
-		<text:p text:style-name="P22">
-			<text:tab/>erfolgreich absolviert (ea)
-		</text:p>
 		<text:p text:style-name="P7"/>
 		<xsl:if test="abschlusspruefung_typ">
 			<table:table table:name="Tabelle2" table:style-name="Tabelle2">

@@ -19,7 +19,7 @@ class Studienplan_model extends DB_Model
 		return $this->loadWhere(array("studiengang_kz" => $studiengang_kz));
 	}
 
-	public function getStudienplaeneBySemester($studiengang_kz, $studiensemester_kurzbz, $ausbildungssemester = null, $orgform_kurzbz = null)
+	public function getStudienplaeneBySemester($studiengang_kz, $studiensemester_kurzbz, $ausbildungssemester = null, $orgform_kurzbz = null, $sprache = null)
 	{
 		$this->addJoin("lehre.tbl_studienordnung", "studienordnung_id");
 		$this->addJoin("lehre.tbl_studienplan_semester", "studienplan_id");
@@ -38,6 +38,11 @@ class Studienplan_model extends DB_Model
 		if(!is_null($orgform_kurzbz))
 		{
 			$whereArray["orgform_kurzbz"] = $orgform_kurzbz;
+		}
+
+		if(!is_null($sprache))
+		{
+			$whereArray["tbl_studienplan.sprache"] = $sprache;
 		}
 
 		return $this->StudienplanModel->loadWhere($whereArray);

@@ -11,16 +11,9 @@
 	$STATUS_KURZBZ = '\'Wartender\', \'Bewerber\', \'Aufgenommener\', \'Student\'';
 	$ADDITIONAL_STG = '10021,10027';
 	$AKTE_TYP = '\'identity\', \'zgv_bakk\'';
+	$STUDIENSEMESTER = '\''.$this->variablelib->getVar('infocenter_studiensemester').'\'';
 
 	$query = '
-		WITH currentOrNextStudiensemester AS (
-			SELECT ss.studiensemester_kurzbz
-			  FROM public.tbl_studiensemester ss
-			 WHERE ss.ende > NOW()
-		  ORDER BY ss.ende
-			 LIMIT 3
-		)
-
 		SELECT
 			p.person_id AS "PersonId",
 			p.vorname AS "Vorname",
@@ -100,13 +93,14 @@
 					   OR
 					   sg.studiengang_kz in('.$ADDITIONAL_STG.')
 					   )
-				   AND pss.studiensemester_kurzbz IN (SELECT cnss.studiensemester_kurzbz FROM currentOrNextStudiensemester cnss)
+				   AND pss.studiensemester_kurzbz = '.$STUDIENSEMESTER.'
 				   AND NOT EXISTS (
 					   SELECT 1
 						 FROM tbl_prestudentstatus spss
 						WHERE spss.prestudent_id = pss.prestudent_id
 						  AND spss.status_kurzbz = '.$REJECTED_STATUS.'
-						  AND spss.studiensemester_kurzbz IN (SELECT ss.studiensemester_kurzbz FROM public.tbl_studiensemester ss WHERE ss.ende > NOW())
+						  AND spss.studiensemester_kurzbz IN (SELECT ss.studiensemester_kurzbz FROM public.tbl_studiensemester ss WHERE ss.ende > 
+						  (SELECT start FROM public.tbl_studiensemester sss WHERE studiensemester_kurzbz = '.$STUDIENSEMESTER.'))
 					)
 			  ORDER BY pss.datum DESC, pss.insertamum DESC, pss.ext_id DESC
 				 LIMIT 1
@@ -125,13 +119,14 @@
 					   OR
 					   sg.studiengang_kz in('.$ADDITIONAL_STG.')
 					   )
-				   AND pss.studiensemester_kurzbz IN (SELECT cnss.studiensemester_kurzbz FROM currentOrNextStudiensemester cnss)
+				   AND pss.studiensemester_kurzbz = '.$STUDIENSEMESTER.'
 				   AND NOT EXISTS (
 						SELECT 1
 						  FROM tbl_prestudentstatus spss
 						 WHERE spss.prestudent_id = pss.prestudent_id
 						   AND spss.status_kurzbz = '.$REJECTED_STATUS.'
-						   AND spss.studiensemester_kurzbz IN (SELECT ss.studiensemester_kurzbz FROM public.tbl_studiensemester ss WHERE ss.ende > NOW())
+						    AND spss.studiensemester_kurzbz IN (SELECT ss.studiensemester_kurzbz FROM public.tbl_studiensemester ss WHERE ss.ende > 
+						  (SELECT start FROM public.tbl_studiensemester sss WHERE studiensemester_kurzbz = '.$STUDIENSEMESTER.'))
 					)
 				 LIMIT 1
 			) AS "AnzahlAbgeschickt",
@@ -149,13 +144,14 @@
 					   OR
 					   sg.studiengang_kz in('.$ADDITIONAL_STG.')
 					   )
-				   AND pss.studiensemester_kurzbz IN (SELECT cnss.studiensemester_kurzbz FROM currentOrNextStudiensemester cnss)
+				   AND pss.studiensemester_kurzbz = '.$STUDIENSEMESTER.'
 				   AND NOT EXISTS (
 					   SELECT 1
 						 FROM tbl_prestudentstatus spss
 						WHERE spss.prestudent_id = pss.prestudent_id
 						  AND spss.status_kurzbz = '.$REJECTED_STATUS.'
-						  AND spss.studiensemester_kurzbz IN (SELECT ss.studiensemester_kurzbz FROM public.tbl_studiensemester ss WHERE ss.ende > NOW())
+						  AND spss.studiensemester_kurzbz IN (SELECT ss.studiensemester_kurzbz FROM public.tbl_studiensemester ss WHERE ss.ende > 
+						  (SELECT start FROM public.tbl_studiensemester sss WHERE studiensemester_kurzbz = '.$STUDIENSEMESTER.'))
 					)
 				 LIMIT 1
 			) AS "StgAbgeschickt",
@@ -173,13 +169,15 @@
 					   OR
 					   sg.studiengang_kz in('.$ADDITIONAL_STG.')
 					   )
-				   AND pss.studiensemester_kurzbz IN (SELECT cnss.studiensemester_kurzbz FROM currentOrNextStudiensemester cnss)
+				   AND pss.studiensemester_kurzbz = '.$STUDIENSEMESTER.'
+
 				   AND NOT EXISTS (
 					  SELECT 1
 						FROM tbl_prestudentstatus spss
 					   WHERE spss.prestudent_id = pss.prestudent_id
 						 AND spss.status_kurzbz = '.$REJECTED_STATUS.'
-						 AND spss.studiensemester_kurzbz IN (SELECT ss.studiensemester_kurzbz FROM public.tbl_studiensemester ss WHERE ss.ende > NOW())
+						 AND spss.studiensemester_kurzbz IN (SELECT ss.studiensemester_kurzbz FROM public.tbl_studiensemester ss WHERE ss.ende > 
+						 (SELECT start FROM public.tbl_studiensemester sss WHERE studiensemester_kurzbz = '.$STUDIENSEMESTER.'))
 					)
 				 LIMIT 1
 			) AS "StgNichtAbgeschickt",
@@ -196,13 +194,14 @@
 					   OR
 					   sg.studiengang_kz in('.$ADDITIONAL_STG.')
 					   )
-				   AND pss.studiensemester_kurzbz IN (SELECT ss.studiensemester_kurzbz FROM public.tbl_studiensemester ss WHERE ss.start >= NOW())
+				   AND pss.studiensemester_kurzbz  = '.$STUDIENSEMESTER.'
 				   AND NOT EXISTS (
 					   SELECT 1
 						 FROM tbl_prestudentstatus spss
 						WHERE spss.prestudent_id = pss.prestudent_id
 						  AND spss.status_kurzbz = '.$REJECTED_STATUS.'
-						  AND spss.studiensemester_kurzbz IN (SELECT ss.studiensemester_kurzbz FROM public.tbl_studiensemester ss WHERE ss.ende > NOW())
+						  AND spss.studiensemester_kurzbz IN (SELECT ss.studiensemester_kurzbz FROM public.tbl_studiensemester ss WHERE ss.ende > 
+						  (SELECT start FROM public.tbl_studiensemester sss WHERE studiensemester_kurzbz = '.$STUDIENSEMESTER.'))
 					)
 				 LIMIT 1
 			) AS "StgAktiv",
@@ -252,7 +251,7 @@
 						 WHERE spss.prestudent_id = sps.prestudent_id
 						   AND spss.status_kurzbz = '.$INTERESSENT_STATUS.'
 						   AND spss.bestaetigtam IS NULL
-						   AND spss.studiensemester_kurzbz IN (SELECT ss.studiensemester_kurzbz FROM public.tbl_studiensemester ss WHERE ss.ende > NOW())
+						   AND spss.studiensemester_kurzbz = '.$STUDIENSEMESTER.'
 					)
 			)
 	ORDER BY "LastAction" ASC';

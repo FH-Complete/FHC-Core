@@ -529,6 +529,14 @@ class FiltersLib
 	}
 
 	/**
+	 * Reloads dataset by setting session variable to true
+	 */
+	public function reloadDataset()
+	{
+		$this->setSessionElement(self::SESSION_RELOAD_DATASET, true);
+	}
+
+	/**
 	 * Add a filter (SQL where clause) to be applied to the current filter
 	 */
 	public function addFilter($filter)

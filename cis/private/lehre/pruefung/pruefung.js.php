@@ -352,7 +352,9 @@ function writePruefungsTable(e, data, anmeldung)
 		var termin = d.von.split(" ");
 		var time = termin[1].substring(0,5);
 		termin = termin[0].split("-");
-		termin = new Date(termin[0], termin[1]-1,termin[2]);
+        var minimumFrist = new Date(termin[0], termin[1]-1,termin[2]);
+        minimumFrist.setMonth(minimumFrist.getMonth() - 2);
+        termin = new Date(termin[0], termin[1]-1,termin[2]);
 		var frist = termin;
 		termin = termin.getDate()+"."+(termin.getMonth()+1)+"."+termin.getFullYear();
 		frist = frist.getTime();
@@ -374,26 +376,29 @@ function writePruefungsTable(e, data, anmeldung)
 				button = "<p><a href='#' title='<?php echo $p->t('pruefung/stornierenMoeglichBis'); ?> "+frist+"'><input style='width: 140px;' type='button' value='"+termin+" "+time+"' onclick='stornoAnmeldung(\""+anmeldung_id+"\");'></a></p>";
 
 			}
-			else
+			else if(new Date() > minimumFrist)
 			{
 				button = "<p><a href='#' title='<?php echo $p->t('pruefung/anmeldenMoeglichBis'); ?> "+frist+"'><input style='width: 140px; background-color: green;' type='button' value='"+termin+" "+time+"' onclick='openDialog(\""+e.lehrveranstaltung[0].lehrveranstaltung_id+"\", \""+d.pruefungstermin_id+"\", \""+e.lehrveranstaltung[0].bezeichnung.replace("'", "&apos;")+"\", \""+d.von+"\", \""+d.bis+"\");'></a></p>";
 			}
 		}
 		else
-		{
+        {
 			button = "<p><input style='width: 180px;' type='button' value='<?php echo $p->t('pruefung/zurLvAnmeldung'); ?>' onclick='openAnmeldung(\""+e.lehrveranstaltung[0].lehrveranstaltung_id+"\", \""+e.pruefung.studiensemester_kurzbz+"\");'></p>";
 		}
 
 		row += button;
 
-		if(d.max === null)
-		{
-			teilnehmer += "<?php echo $p->t('pruefung/unbegrenzt'); ?><br />";
-		}
-		else
-		{
-			teilnehmer += "<p><span style='line-height: 24px'>"+(d.max - d.teilnehmer)+"/"+d.max+"</span></p>";
-		}
+		if(new Date() > minimumFrist)
+        {
+            if(d.max === null)
+            {
+                teilnehmer += "<?php echo $p->t('pruefung/unbegrenzt'); ?><br />";
+            }
+            else
+            {
+                teilnehmer += "<p><span style='line-height: 24px'>"+(d.max - d.teilnehmer)+"/"+d.max+"</span></p>";
+            }
+        }
 	});
 	row += "<td>"+teilnehmer+"</td>";
 	return row;
