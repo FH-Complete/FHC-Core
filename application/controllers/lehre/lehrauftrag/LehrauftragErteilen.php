@@ -75,6 +75,15 @@ class LehrauftragErteilen extends Auth_Controller
             show_error('Fehler bei Berechtigungsprüfung');
         }
 
+        // If oe_kurzbz get param was set, check against entitled stg
+        if (!is_null($oe_kurzbz))
+        {
+            if (!in_array($oe_kurzbz, $oe_kurzbz_arr))
+            {
+                show_error('Keine Berechtigung für diese Organisationseinheit');
+            }
+        }
+
         // Set studiensemester selected for studiengang dropdown
         $studiensemester_kurzbz = $this->input->get('studiensemester'); // if provided by selected studiensemester
         if (is_null($studiensemester_kurzbz)) // else set next studiensemester as default value
@@ -118,6 +127,12 @@ class LehrauftragErteilen extends Auth_Controller
             {
                 $mitarbeiter_uid = (isset($lehrauftrag->mitarbeiter_uid)) ? $lehrauftrag->mitarbeiter_uid : null;
                 $vertrag_id = (isset($lehrauftrag->vertrag_id)) ? $lehrauftrag->vertrag_id : null;
+                $lv_oe_kurzbz = (isset($lehrauftrag->lv_oe_kurzbz)) ? $lehrauftrag->lv_oe_kurzbz : null;
+
+                // Check if user is entitled to approve this Lehrauftrag
+                if (!$this->permissionlib->isBerechtigt(self::BERECHTIGUNG_LEHRAUFTRAG_ERTEILEN, 'suid', $lv_oe_kurzbz)){
+                    show_error('Keine Erteilberechtigung für diese Organisationseinheit: '. $lv_oe_kurzbz);
+                }
 
                 $result = $this->VertragModel->setStatus($vertrag_id, $mitarbeiter_uid, 'erteilt');
 

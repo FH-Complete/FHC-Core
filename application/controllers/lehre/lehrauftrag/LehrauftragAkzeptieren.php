@@ -32,6 +32,7 @@ class LehrauftragAkzeptieren extends Auth_Controller
         $this->load->model('accounting/Vertrag_model', 'VertragModel');
         $this->load->model('ressource/Mitarbeiter_model', 'MitarbeiterModel');
         $this->load->model('codex/Bisverwendung_model', 'BisverwendungModel');
+        $this->load->model('person/Benutzer_model', 'BenutzerModel');
 
         // Load libraries
         $this->load->library('WidgetLib');
@@ -122,15 +123,42 @@ class LehrauftragAkzeptieren extends Auth_Controller
 
         // Loop through lehraufträge
         $lehrauftrag_arr = $this->input->post('selected_data');
+
         if(is_array($lehrauftrag_arr))
         {
             foreach($lehrauftrag_arr as $lehrauftrag)
             {
-                $mitarbeiter_uid = (!is_null($lehrauftrag['mitarbeiter_uid'])) ? $lehrauftrag['mitarbeiter_uid'] : null;
                 $vertrag_id = (!is_null($lehrauftrag['vertrag_id'])) ? $lehrauftrag['vertrag_id'] : null;
 
+                // Check if user is entitled to accept this Lehrauftrag
+                // * first retrieve person_id of the contract
+                $this->VertragModel->addSelect('person_id');
+
+                if ($result = getData($this->VertragModel->load($vertrag_id)))
+                {
+                    // * then find the uid of that contracts person_id
+                    $this->BenutzerModel->addSelect('uid');
+
+                    if ($result = getData($this->BenutzerModel->getFromPersonId($result[0]->person_id)))
+                    {
+                        // * finally check uid of contract against the logged in user
+                        if ($result[0]->uid != $this->_uid)
+                        {
+                            show_error('Keine Berechtigung für diesen Vertrag');
+                        }
+                    }
+                    else
+                    {
+                        show_error($result->retval);
+                    }
+                }
+                else
+                {
+                    show_error($result->retval);
+                }
+
                 // Set status to accepted
-                $result = $this->VertragModel->setStatus($vertrag_id, $mitarbeiter_uid, 'akzeptiert');
+                $result = $this->VertragModel->setStatus($vertrag_id, $this->_uid, 'akzeptiert');
     
                 if ($result->retval)
                 {

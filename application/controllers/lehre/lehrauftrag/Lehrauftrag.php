@@ -74,6 +74,15 @@ class Lehrauftrag extends Auth_Controller
             show_error('Fehler bei Berechtigungsprüfung');
         }
 
+        // If studiengang_kz get param was set, check against entitled stg
+        if (!is_null($studiengang_kz))
+        {
+            if (!in_array($studiengang_kz, $studiengang_kz_arr))
+            {
+                show_error('Keine Berechtigung für diesen Studiengang');
+            }
+        }
+
         // Set studiensemester selected for studiengang dropdown
         $studiensemester_kurzbz = $this->input->get('studiensemester'); // if provided by selected studiensemester
         if (is_null($studiensemester_kurzbz)) // else set next studiensemester as default value
@@ -123,6 +132,12 @@ class Lehrauftrag extends Auth_Controller
                 $betrag = (isset($lehrauftrag->betrag)) ? $lehrauftrag->betrag : null;
                 $vertrag_betrag = (isset($lehrauftrag->vertrag_betrag)) ? $lehrauftrag->vertrag_betrag : null;
                 $studiensemester_kurzbz = (isset($lehrauftrag->studiensemester_kurzbz)) ? $lehrauftrag->studiensemester_kurzbz : null;
+                $studiengang_kz = (isset($lehrauftrag->studiengang_kz)) ? $lehrauftrag->studiengang_kz : null;
+
+                // Check if user is entitled to order this Lehrauftrag
+                if (!$this->permissionlib->isBerechtigt(self::BERECHTIGUNG_LEHRAUFTRAG_BESTELLEN, 'suid', $studiengang_kz)){
+                    show_error('Keine Bestellberechtigung für diesen Studiengang: '. $studiengang_kz);
+                }
 
                 // update contract if contract exists and the betrag was changed
                 $hasChanged = (floatval($betrag) != floatval($vertrag_betrag)) ? true : false;

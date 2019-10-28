@@ -32,6 +32,7 @@
 // * - Lehreinheitmitarbeiter Zuteilung hinzufuegen/bearbeiten/loeschen
 // * - Lehreinheitgruppe Zutelung hinzufuegen/loeschen
 // * - Lehreinheit anlegen/bearbeiten/loeschen
+// * - Lehrauftrag (Vertrag) loeschen (stornieren)
 // ****************************************
 
 require_once('../../config/vilesci.config.inc.php');
@@ -1754,43 +1755,66 @@ if(!$error)
 	}
 	elseif(isset($_POST['type']) && $_POST['type']=='cancelVertrag')
 	{
-		if(isset($_POST['vertrag_id']) && isset($_POST['mitarbeiter_uid']))
+		$error = false;
+
+		// Check if user is entitled to cancel this contract
+		if (isset($_POST['vertrag_id']) && is_numeric($_POST['vertrag_id']))
 		{
+			// * first find lehrveranstaltung_id of the contracts lehrveranstaltung
 			$vertrag = new vertrag();
-			if($vertrag->cancel($_POST['vertrag_id'], $_POST['mitarbeiter_uid']))
+			$vertrag->load($_POST['vertrag_id']);
+			$lva = new lehrveranstaltung($vertrag->lehrveranstaltung_id);
+
+			// * then check if the user has permissions to cancel the corresponding lv-organisational units
+			if (!$rechte->isBerechtigtMultipleOe('admin', $lva->getAllOe(), 'suid') &&
+				!$rechte->isBerechtigtMultipleOe('lehre/lehrauftrag_bestellen', $lva->getAllOe(), 'suid'))
 			{
-				$return = true;
-			}
-			else
-			{
-				$errormsg = 'Fehler beim Ausführen des Vertragsstornos';
+				$error = true;
 				$return = false;
+				$errormsg = 'Keine Berechtigung';
 			}
 		}
-		elseif(isset($_POST['vertrag_id']) && isset($_POST['person_id']))
-        {
-            $benutzer = new Benutzer();
-            if($benutzer->getBenutzerFromPerson($_POST['person_id']))
-            {
-                $mitarbeiter_uid = $benutzer->result[0]->uid;
 
-                $vertrag = new vertrag();
-                if($vertrag->cancel($_POST['vertrag_id'], $mitarbeiter_uid))
-                {
-                    $return = true;
-                }
-                else
-                {
-                    $errormsg = 'Fehler beim Ausführen des Vertragsstornos';
-                    $return = false;
-                }
-            }
-            else
-            {
-                $errormsg = 'Benutzer konnte nicht von PersonID geladen werden';
-                $return = false;
-            }
-        }
+		if (!$error)
+		{
+			if(isset($_POST['mitarbeiter_uid']))
+			{
+				$vertrag = new vertrag();
+				if($vertrag->cancel($_POST['vertrag_id'], $_POST['mitarbeiter_uid']))
+				{
+					$return = true;
+				}
+				else
+				{
+					$errormsg = 'Fehler beim Ausführen des Vertragsstornos';
+					$return = false;
+				}
+			}
+			elseif(isset($_POST['person_id']))
+			{
+				$benutzer = new Benutzer();
+				if($benutzer->getBenutzerFromPerson($_POST['person_id']))
+				{
+					$mitarbeiter_uid = $benutzer->result[0]->uid;
+
+					$vertrag = new vertrag();
+					if($vertrag->cancel($_POST['vertrag_id'], $mitarbeiter_uid))
+					{
+						$return = true;
+					}
+					else
+					{
+						$errormsg = 'Fehler beim Ausführen des Vertragsstornos';
+						$return = false;
+					}
+				}
+				else
+				{
+					$errormsg = 'Benutzer konnte nicht von PersonID geladen werden';
+					$return = false;
+				}
+			}
+		}
 		else
 		{
 			$errormsg = 'VertragsID und MitarbeiterUID müssen uebergeben werden';

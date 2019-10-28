@@ -56,7 +56,10 @@ $config['navigation_header'] = array(
                     'description' => 'Lehrauftrag',
                     'expand' => true,
                     'sort' => 40,
-                    'requiredPermissions' => 'lehre:r'
+                    'requiredPermissions' => array(
+                        'lehre/lehrauftrag_bestellen:r',
+                        'lehre/lehrauftrag_erteilen:r'
+                    )
                 )
 			)
 		),
@@ -132,6 +135,7 @@ $config['navigation_menu']['lehre/lehrauftrag/Lehrauftrag/index'] = array(
         'description' => 'Lehrauftrag bestellen',
         'icon' => '',
         'sort' => 1,
+        'requiredPermissions' => 'lehre/lehrauftrag_bestellen:r',
         'target' => '_blank'
     ),
     'lehrauftragErteilen' => array(
@@ -139,6 +143,7 @@ $config['navigation_menu']['lehre/lehrauftrag/Lehrauftrag/index'] = array(
         'description' => 'Lehrauftrag erteilen',
         'icon' => '',
         'sort' => 1,
+        'requiredPermissions' => 'lehre/lehrauftrag_erteilen:r',
         'target' => '_blank'
     )
 );
