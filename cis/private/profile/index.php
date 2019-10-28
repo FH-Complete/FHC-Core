@@ -127,6 +127,9 @@ if (!$user->load($uid))
 
 if ($type == 'mitarbeiter')
 {
+	if (isset($user->personalnummer) && is_numeric($user->personalnummer) && (int)$user->personalnummer < 0)
+		die($p->t('profil/keinGueltigesProfil'));
+
 	$vorwahl = '';
 	$kontakt = new kontakt();
 	$kontakt->loadFirmaKontakttyp($user->standort_id,'telefon');
