@@ -66,6 +66,9 @@ if (isset($_GET['uid']) && $_GET['uid'] != $uid)
 	$uid = stripslashes($_GET['uid']);
 	$ansicht = true;
 }
+
+$adminOrOwnUser = $rechte->isBerechtigt('admin') || !$ansicht;
+
 if ($rechte->isBerechtigt('basis/kontakt'))
 	$ansicht = false;
 
@@ -526,7 +529,7 @@ if (!defined('CIS_PROFIL_FUNKTIONEN_ANZEIGEN') || CIS_PROFIL_FUNKTIONEN_ANZEIGEN
  */
 function printFunctionsTable($query, $headingphrase, $tableid, $showVertragsstunden = false)
 {
-	global $db, $p, $datum_obj, $uid;
+	global $db, $p, $datum_obj, $uid, $adminOrOwnUser;
 
 	if ($result_funktion = $db->db_query($query))
 	{
@@ -540,9 +543,9 @@ function printFunctionsTable($query, $headingphrase, $tableid, $showVertragsstun
 						<th>'.$p->t('global/bezeichnung').'</th>
 						<th>'.$p->t('global/organisationseinheit').'</th>
 						<th>'.$p->t('profil/gueltigvon').'</th>
-						<th>'.$p->t('profil/gueltigbis').'</th>
-						<th>'.$p->t('profil/wochenstunden').'</th>
-					</tr>
+						<th>'.$p->t('profil/gueltigbis').'</th>'.
+						($adminOrOwnUser ? '<th>'.$p->t('profil/wochenstunden').'</th>' : '').
+					'</tr>
 				</thead>
 			<tbody>';
 
@@ -559,17 +562,17 @@ function printFunctionsTable($query, $headingphrase, $tableid, $showVertragsstun
 				echo "</td>
 					<td nowrap>".$row_funktion->organisationseinheittyp_kurzbz.' '.$row_funktion->oe_bezeichnung."</td>
 					<td>".$datum_obj->formatDatum($row_funktion->datum_von,'d.m.Y')."</td>
-					<td>".$datum_obj->formatDatum($row_funktion->datum_bis,'d.m.Y')."</td>
-					<td>".number_format($row_funktion->wochenstunden, 2)."</td>
-				</tr>";
+					<td>".$datum_obj->formatDatum($row_funktion->datum_bis,'d.m.Y')."</td>".
+					($adminOrOwnUser ? "<td>".number_format($row_funktion->wochenstunden, 2)."</td>" : "").
+				"</tr>";
 
-				if(isset($row_funktion->wochenstunden))
+				if(isset($row_funktion->wochenstunden) && $adminOrOwnUser)
 					$wochenstunden_sum += (double)$row_funktion->wochenstunden;
 			}
 			echo '</tbody><br>';
 
 			//vertragsstunden
-			if ($showVertragsstunden === true)
+			if ($showVertragsstunden === true && $adminOrOwnUser)
 			{
 				$vertragsstunden = 0.00;
 				$qry = "SELECT sum(vertragsstunden) AS vertragsstdsumme from bis.tbl_bisverwendung
@@ -588,16 +591,19 @@ function printFunctionsTable($query, $headingphrase, $tableid, $showVertragsstun
 				}
 			}
 
-			echo "
-			<tfoot>
-			<tr>
-				<td></td>
-				<td></td>
-				<th colspan ='2'>Summe Wochenstunden".($showVertragsstunden === true ? " (".$p->t('profil/vertragsstunden').")" : "")."</th>
-				<th style='padding: 4pt 0'>&nbsp;".number_format($wochenstunden_sum,2).($showVertragsstunden === true ?
-				"&nbsp;(".number_format($vertragsstunden,2).")" : "")."</th>
-			</tr>
-			</tfoot>";
+			if ($adminOrOwnUser)
+			{
+				echo "
+				<tfoot>
+				<tr>
+					<td></td>
+					<td></td>
+					<th colspan ='2'>Summe Wochenstunden".($showVertragsstunden === true ? " (".$p->t('profil/vertragsstunden').")" : "")."</th>
+					<th style='padding: 4pt 0'>&nbsp;".number_format($wochenstunden_sum, 2).($showVertragsstunden === true ?
+							"&nbsp;(".number_format($vertragsstunden, 2).")" : "")."</th>
+				</tr>
+				</tfoot>";
+			}
 			echo "</table>";
 		}
 	}
