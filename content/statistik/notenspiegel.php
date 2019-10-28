@@ -107,6 +107,7 @@ $qry = "SELECT
 	        		vw_student_lehrveranstaltung.studiensemester_kurzbz=tbl_studentlehrverband.studiensemester_kurzbz
 	        ) 
 	        AND studiengang_kz<>0
+	        AND zeugnis
 	    UNION
 	    SELECT
 	    	lehrveranstaltung_id, bezeichnung, studiengang_kz, semester, ects
@@ -114,6 +115,7 @@ $qry = "SELECT
 	    	lehre.tbl_lehrveranstaltung JOIN lehre.tbl_zeugnisnote USING(lehrveranstaltung_id)
 	    WHERE
 	    	tbl_lehrveranstaltung.studiengang_kz=".$db->db_add_param($studiengang_kz, FHC_INTEGER)." AND
+	    	zeugnis AND
 	    	tbl_zeugnisnote.student_uid in($uids) AND
 	    	tbl_zeugnisnote.studiensemester_kurzbz=".$db->db_add_param($semester_aktuell)."
 		ORDER BY bezeichnung";
