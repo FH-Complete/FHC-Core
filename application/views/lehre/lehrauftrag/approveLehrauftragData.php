@@ -390,7 +390,7 @@ $filterWidgetArray = array(
         stunden: {align:"right", 
             headerFilter:"input", headerFilterFunc: hf_filterStringnumberWithOperator,
             bottomCalc:"sum", bottomCalcParams:{precision:1}}, 
-        betrag: {align:"right",  
+        betrag: {align:"right", formatter: form_formatNulltoStringNumber,  
             headerFilter:"input", headerFilterFunc: hf_filterStringnumberWithOperator,
             bottomCalc:"sum", bottomCalcParams:{precision:2}, bottomCalcFormatter:"money", bottomCalcFormatterParams:{decimal: ",", thousand: ".", symbol:"€"}},
         vertrag_id: {visible: false},
