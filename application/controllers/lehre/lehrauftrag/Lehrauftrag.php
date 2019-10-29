@@ -128,8 +128,8 @@ class Lehrauftrag extends Auth_Controller
                 $mitarbeiter_uid = (isset($lehrauftrag->mitarbeiter_uid)) ? $lehrauftrag->mitarbeiter_uid : null;
                 $vertrag_id = (isset($lehrauftrag->vertrag_id)) ? $lehrauftrag->vertrag_id : null;
                 $projektarbeit_id = (isset($lehrauftrag->projektarbeit_id)) ? $lehrauftrag->projektarbeit_id : null;
-                $stunden = (isset($lehrauftrag->stunden)) ? $lehrauftrag->stunden : null;
-                $betrag = (isset($lehrauftrag->betrag)) ? $lehrauftrag->betrag : null;
+                $stunden = (isset($lehrauftrag->stunden)) ? $lehrauftrag->stunden : 0;
+                $betrag = (isset($lehrauftrag->betrag)) ? $lehrauftrag->betrag : 0;
                 $vertrag_betrag = (isset($lehrauftrag->vertrag_betrag)) ? $lehrauftrag->vertrag_betrag : null;
                 $studiensemester_kurzbz = (isset($lehrauftrag->studiensemester_kurzbz)) ? $lehrauftrag->studiensemester_kurzbz : null;
                 $studiengang_kz = (isset($lehrauftrag->studiengang_kz)) ? $lehrauftrag->studiengang_kz : null;
@@ -140,24 +140,36 @@ class Lehrauftrag extends Auth_Controller
                 }
 
                 // update contract if contract exists and the betrag was changed
-                $hasChanged = (floatval($betrag) != floatval($vertrag_betrag)) ? true : false;
-                if (!is_null($vertrag_id) && $hasChanged)
+                if (!is_null($vertrag_id))
                 {
-                    $result = $this->VertragModel->updateVertrag(
-                        $vertrag_id,
-                        $stunden,
-                        $betrag,
-                        $mitarbeiter_uid
-                    );
+                    $this->VertragModel->addSelect('vertragsstunden, betrag');
 
-                    if (isSuccess($result))
+                    if($result = getData($this->VertragModel->load($vertrag_id)))
                     {
-                        $json []= array(
-                            'row_index' => $lehrauftrag->row_index,
-                            'bestellt' => date('Y-m-d'),
-                            'vertrag_betrag' => $betrag,
-                            'erteilt' => null
+                        $vertrag_betrag = $result[0]->betrag;
+                        $vertrag_stunden = $result[0]->vertragsstunden;
+                    }
+
+                    $hasChanged = ($betrag != floatval($vertrag_betrag) || $stunden != $vertrag_stunden) ? true : false;
+
+                    if ($hasChanged)
+                    {
+                        $result = $this->VertragModel->updateVertrag(
+                            $vertrag_id,
+                            $stunden,
+                            $betrag,
+                            $mitarbeiter_uid
                         );
+
+                        if (isSuccess($result))
+                        {
+                            $json []= array(
+                                'row_index' => $lehrauftrag->row_index,
+                                'bestellt' => date('Y-m-d'),
+                                'vertrag_betrag' => $betrag,
+                                'erteilt' => null
+                            );
+                        }
                     }
                 }
                 // else save new contract
