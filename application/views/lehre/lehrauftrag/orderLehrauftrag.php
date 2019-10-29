@@ -151,6 +151,20 @@ $this->load->view(
     }
 
     // -----------------------------------------------------------------------------------------------------------------
+    // Formatters - changes display information, not the data itself
+    // -----------------------------------------------------------------------------------------------------------------
+
+    // Formats null values to a string number '0.00'
+    var form_formatNulltoStringNumber = function(cell){
+        if (cell.getValue() == null){
+            return '0.00';
+        }
+        else {
+            return cell.getValue();
+        }
+    }
+
+    // -----------------------------------------------------------------------------------------------------------------
     // Header filter
     // -----------------------------------------------------------------------------------------------------------------
 
@@ -217,6 +231,9 @@ $this->load->view(
 
         var betrag = parseFloat(row.getData().betrag);
         var vertrag_betrag = parseFloat(row.getData().vertrag_betrag);
+
+        // console.log(betrag);
+        // console.log(vertrag_betrag);
 
         if (isNaN(betrag))
         {
