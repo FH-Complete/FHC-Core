@@ -2,7 +2,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class CheckUserAuth extends REST_Controller
+class CheckUserAuth extends RESTFul_Controller
 {
 	/**
 	 * Course API constructor.
