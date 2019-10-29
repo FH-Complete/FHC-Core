@@ -7,6 +7,7 @@
 	$TAETIGKEIT_KURZBZ = '\'bewerbung\', \'kommunikation\'';
 	$LOGDATA_NAME = '\'Login with code\', \'Login with user\', \'New application\', \'Interessent rejected\'';
 	$LOGDATA_NAME_PARKED = '\'Parked\'';
+	$LOGDATA_NAME_ONHOLD = '\'Onhold\'';
 	$LOGTYPE_KURZBZ = '\'Processstate\'';
 	$STATUS_KURZBZ = '\'Wartender\', \'Bewerber\', \'Aufgenommener\', \'Student\'';
 	$ADDITIONAL_STG = '10021,10027';
@@ -24,6 +25,7 @@
 			pl.zeitpunkt AS "LockDate",
 			pl.lockuser AS "LockUser",
 			pd.parkdate AS "ParkDate",
+		    ohd.onholddate AS "OnholdDate",
 			(
 				SELECT l.zeitpunkt
 				  FROM system.tbl_log l
@@ -228,6 +230,14 @@
 				   AND l.logdata->>\'name\' = '.$LOGDATA_NAME_PARKED.'
 				   AND l.zeitpunkt >= NOW()
 			) pd USING(person_id)
+	LEFT JOIN (
+				SELECT l.person_id,
+					   l.zeitpunkt AS onholddate
+				  FROM system.tbl_log l
+				 WHERE l.logtype_kurzbz = '.$LOGTYPE_KURZBZ.'
+				   AND l.logdata->>\'name\' = '.$LOGDATA_NAME_ONHOLD.'
+				   AND l.zeitpunkt >= NOW()
+			) ohd USING(person_id)
 		 WHERE
 			EXISTS (
 				SELECT 1
@@ -278,6 +288,7 @@
 			ucfirst($this->p->t('global', 'sperrdatum')),
 			ucfirst($this->p->t('global', 'gesperrtVon')),
 			ucfirst($this->p->t('global', 'parkdatum')),
+			ucfirst($this->p->t('global', 'rueckstelldatum')),
 			ucfirst($this->p->t('global', 'letzteAktion')),
 			'Aktionstyp',
 			'AnzahlAktePflicht',
@@ -340,6 +351,11 @@
 				$datasetRaw->{'ParkDate'} = '-';
 			}
 
+			if ($datasetRaw->{'OnholdDate'} == null)
+			{
+				$datasetRaw->{'OnholdDate'} = '-';
+			}
+
 			if ($datasetRaw->{'StgAbgeschickt'} == null)
 			{
 				$datasetRaw->{'StgAbgeschickt'} = '-';
@@ -374,6 +390,11 @@
 			if ($datasetRaw->LockDate != null)
 			{
 				$mark = FilterWidget::DEFAULT_MARK_ROW_CLASS;
+			}
+
+			if ($datasetRaw->OnholdDate != null)
+			{
+				$mark = "text-success";
 			}
 
 			// Parking has priority over locking
