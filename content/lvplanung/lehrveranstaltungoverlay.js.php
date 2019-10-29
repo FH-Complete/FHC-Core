@@ -1419,8 +1419,10 @@ function LeMitarbeiterAuswahl()
             }
 
             // Vertragsstatus setzen
-            // * wenn Gesamtkosten im Lehrauftrag nicht gleich Betrag im Vertrag ist: Status 'geändert' hardcoden
-            if(gesamtkosten != parseFloat(betrag))
+            // * wenn Gesamtkosten im Lehrauftrag nicht gleich Betrag im Vertrag ist ODER
+            //   wenn Semesterstunden im Lehrauftrag nicht gleich Stunden im Vertrag:
+            //   dann: Status 'geändert' hardcoden
+            if(gesamtkosten != parseFloat(betrag) || semesterstunden != vertragsstunden)
             {
                 vertragsstatus = 'Geändert';
                 document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-label-vertragsstatus').setAttribute("style", "font-weight: bold")

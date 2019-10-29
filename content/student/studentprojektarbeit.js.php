@@ -977,8 +977,10 @@ function StudentProjektbetreuerAuswahl()
             }
 
             // Vertragsstatus setzen
-            // * wenn Gesamtkosten im Lehrauftrag nicht gleich Betrag im Vertrag ist: Status 'geändert' hardcoden
-            if(gesamtkosten != parseFloat(betrag))
+            // * wenn Gesamtkosten des Projektbetreuers nicht gleich Betrag im Vertrag ist ODER
+            //   wenn Semesterstunden des Projektbetreuers nicht gleich Stunden im Vertrag:
+            //   dann: Status 'geändert' hardcoden
+            if(gesamtkosten != parseFloat(betrag) || stunden != vertragsstunden)
             {
                 vertragsstatus = 'Geändert';
                 document.getElementById('student-projektbetreuer-label-vertragsstatus').setAttribute("style", "font-weight: bold")
