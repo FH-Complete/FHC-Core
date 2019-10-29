@@ -524,7 +524,16 @@ if(!$error)
 				$prestudent->studiengang_kz = $_POST['studiengang_kz'];
 				$prestudent->berufstaetigkeit_code = $_POST['berufstaetigkeit_code'];
 				$prestudent->ausbildungcode = $_POST['ausbildungcode'];
-				$prestudent->zgv_code = $_POST['zgv_code'];
+				// Die Bachelor-ZGV darf nur mit einem eigenen Recht geändert werden
+				if($rechte->isBerechtigt('student/editBakkZgv',$_POST['studiengang_kz'],'suid'))
+				{
+					$prestudent->zgv_code = $_POST['zgv_code'];
+				}
+				elseif ($prestudent->zgv_code != $_POST['zgv_code'])
+				{
+					$errormsg = 'Keine Berechtigung zum Ändern der ZGV';
+					$error = true;
+				}
 				$prestudent->zgvort = $_POST['zgvort'];
 				$prestudent->zgvdatum = $_POST['zgvdatum'];
 				$prestudent->zgvnation = $_POST['zgvnation'];

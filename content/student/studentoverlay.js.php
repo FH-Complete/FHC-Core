@@ -23,6 +23,7 @@
 require_once('../../config/vilesci.config.inc.php');
 require_once('../../include/functions.inc.php');
 require_once('../../include/variable.class.php');
+require_once('../../include/benutzerberechtigung.class.php');
 
 $user = get_uid();
 
@@ -1647,7 +1648,6 @@ function StudentPrestudentDisableFields(val)
 	document.getElementById('student-prestudent-menulist-aufmerksamdurch').disabled=val;
 	document.getElementById('student-prestudent-menulist-berufstaetigkeit').disabled=val;
 	document.getElementById('student-prestudent-menulist-ausbildung').disabled=val;
-	document.getElementById('student-prestudent-menulist-zgvcode').disabled=val;
 	document.getElementById('student-prestudent-textbox-zgvort').disabled=val;
 	document.getElementById('student-prestudent-menulist-zgvnation').disabled=val;
 	document.getElementById('student-prestudent-textbox-zgvdatum').disabled=val;
@@ -1664,6 +1664,29 @@ function StudentPrestudentDisableFields(val)
 	document.getElementById('student-prestudent-textbox-priorisierung').disabled=val;
 	document.getElementById('student-prestudent-textbox-mentor').disabled=val;
 	document.getElementById('student-detail-menulist-gsstudientyp').disabled=val;
+
+	// Studiengang des angeklickten Prestudenten ermitteln
+	var tree = document.getElementById('student-tree');
+	var col = tree.columns ? tree.columns["student-treecol-studiengang_kz"] : "student-treecol-studiengang_kz";
+	var studiengang_kz = parseInt(tree.view.getCellText(tree.currentIndex,col));
+
+	<?php
+	// Die Bachelor-ZGV darf nur mit einem eigenen Recht geändert werden
+	$rechte = new benutzerberechtigung();
+	$rechte->getBerechtigungen($user);
+	$studiengaenge = $rechte->getStgKz('student/editBakkZgv');
+	// Anlegen eines Arrays mit allen berechtigten Stg-Kz
+	echo ' var berechtigte_studiengaenge = ['.implode(',',$studiengaenge).'];';
+	?>
+
+	if (berechtigte_studiengaenge.indexOf(studiengang_kz) >= 0)
+	{
+		document.getElementById('student-prestudent-menulist-zgvcode').disabled=val;
+	}
+	else
+	{
+		document.getElementById('student-prestudent-menulist-zgvcode').disabled=true;
+	}
 
 	//Status Tree leeren
 	rollentree = document.getElementById('student-prestudent-tree-rolle');
