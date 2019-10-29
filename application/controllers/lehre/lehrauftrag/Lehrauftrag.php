@@ -143,13 +143,10 @@ class Lehrauftrag extends Auth_Controller
                 $hasChanged = (floatval($betrag) != floatval($vertrag_betrag)) ? true : false;
                 if (!is_null($vertrag_id) && $hasChanged)
                 {
-                    $vertrag_obj = new StdClass();
-                    $vertrag_obj->vertrag_id = $vertrag_id;
-                    $vertrag_obj->vertragsstunden = $stunden;
-                    $vertrag_obj->betrag = $betrag;
-
                     $result = $this->VertragModel->updateVertrag(
-                        $vertrag_obj,
+                        $vertrag_id,
+                        $stunden,
+                        $betrag,
                         $mitarbeiter_uid
                     );
 

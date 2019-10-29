@@ -27,21 +27,31 @@ class Vertrag_model extends DB_Model
      * @param $vertragstyp_kurzbz
      * @return array|null               On success object. On failure null.
      */
-	public function save($person_id, $mitarbeiter_uid, $lehrveranstaltung_id, $lehreinheit_id, $projektarbeit_id = null, $vertragsstunden, $betrag, $studiensemester_kurzbz){
-
-        // Cast input params
-        $person_id = (!isset($person_id) || empty($person_id)) ? null : intval($person_id);
-        $lehreinheit_id = (!isset($lehreinheit_id) || empty($lehreinheit_id)) ? null : intval($lehreinheit_id);
-        $lehrveranstaltung_id = (!isset($lehrveranstaltung_id) || empty($lehrveranstaltung_id)) ? null : intval($lehrveranstaltung_id);
-        $projektarbeit_id = (!isset($projektarbeit_id) || empty($projektarbeit_id)) ? null : intval($projektarbeit_id);
-        $vertragsstunden = (!isset($vertragsstunden) || empty($vertragsstunden)) ? null : floatval($vertragsstunden);
-        $betrag = (!isset($betrag) || empty($betrag)) ? 0 : floatval($betrag);
-        $mitarbeiter_uid = (!isset($mitarbeiter_uid) || empty($mitarbeiter_uid)) ? null : $mitarbeiter_uid;
+	public function save($person_id, $mitarbeiter_uid, $lehrveranstaltung_id, $lehreinheit_id, $projektarbeit_id = null, $vertragsstunden, $betrag, $studiensemester_kurzbz)
+    {
+        $person_id = (isset($person_id) && is_numeric($person_id))
+            ? $person_id
+            : show_error('peron_id must be set and numeric.');
+        $lehreinheit_id = (isset($lehreinheit_id) && is_numeric($lehreinheit_id))
+            ? $lehreinheit_id
+            : show_error('lehreinheit_id must be set and numeric.');
+        $lehrveranstaltung_id = (isset($lehrveranstaltung_id) && is_numeric($lehrveranstaltung_id))
+            ? $lehrveranstaltung_id
+            : show_error('lehrveranstaltung_id must be set and numeric.');
+        $projektarbeit_id = (isset($projektarbeit_id) && is_numeric($projektarbeit_id))
+            ? $projektarbeit_id
+            : null;
+        $vertragsstunden = (isset($vertragsstunden) && is_numeric($vertragsstunden))
+            ? $vertragsstunden
+            : 0;
+        $betrag = (isset($betrag) && is_numeric($betrag))
+            ? $betrag
+            : 0;
+        $mitarbeiter_uid = (isset($mitarbeiter_uid) && is_string($mitarbeiter_uid))
+            ? $mitarbeiter_uid
+            : show_error('mitarbeiter_uid must be set and a string value.');;
 
         $vertragstyp_kurzbz = (is_null($projektarbeit_id)) ? 'Lehrauftrag' : 'Betreuung';
-
-	    $result = array();
-	    $user = getAuthUID();
 
         // First check if Vertrag already exists for that Lehrauftrag or for that Projektbetreuerauftrag
         if ($vertragstyp_kurzbz == 'Lehrauftrag')
@@ -49,7 +59,7 @@ class Vertrag_model extends DB_Model
             $this->load->model('education/Lehreinheitmitarbeiter_model', 'LehreinheitmitarbeiterModel'); //
             if ($this->LehreinheitmitarbeiterModel->hasVertrag($mitarbeiter_uid, $lehreinheit_id))
             {
-                return $result = success(null);   // Exit if Lehrauftrag already has Vertrag
+                return success(null);   // Exit if Lehrauftrag already has Vertrag
             }
         }
         elseif ($vertragstyp_kurzbz == 'Betreuung')
@@ -57,12 +67,11 @@ class Vertrag_model extends DB_Model
             $this->load->model('education/Projektbetreuer_model', 'ProjektbetreuerModel');
             if ($this->ProjektbetreuerModel->hasVertrag($person_id, $projektarbeit_id))
             {
-                return $result = success(null);   // Exit if Projektbetreuung already has Vertrag
+                return success(null);   // Exit if Projektbetreuung already has Vertrag
             }
         }
 
         // If Vertrag does not exist, create now
-
         // Vertragsbezeichnung
         $bezeichnung = $this->_writeVertragsbezeichung($lehrveranstaltung_id, $studiensemester_kurzbz);
 
@@ -70,18 +79,20 @@ class Vertrag_model extends DB_Model
         $this->db->trans_start(false);
 
         // Insert Vertragsdata
-        $result = $this->insert(array(
-            'person_id' => $person_id,
-            'lehrveranstaltung_id' => $lehrveranstaltung_id,
-            'vertragstyp_kurzbz' => $vertragstyp_kurzbz,
-            'bezeichnung' => $bezeichnung,
-            'betrag' => $betrag,
-            'insertamum' => 'NOW()',
-            'insertvon' => $user,
-            'vertragsdatum' => 'NOW()',
-            'vertragsstunden' => $vertragsstunden,
-            'vertragsstunden_studiensemester_kurzbz' => $studiensemester_kurzbz
-        ));
+        $result = $this->insert(
+            array(
+                'person_id' => $person_id,
+                'lehrveranstaltung_id' => $lehrveranstaltung_id,
+                'vertragstyp_kurzbz' => $vertragstyp_kurzbz,
+                'bezeichnung' => $bezeichnung,
+                'betrag' => $betrag,
+                'insertamum' => 'NOW()',
+                'insertvon' => getAuthUID(),
+                'vertragsdatum' => 'NOW()',
+                'vertragsstunden' => $vertragsstunden,
+                'vertragsstunden_studiensemester_kurzbz' => $studiensemester_kurzbz
+            )
+        );
 
         // Retrieve primary key
         $vertrag_id = $result->retval;
@@ -132,16 +143,13 @@ class Vertrag_model extends DB_Model
         if ($this->db->trans_status() === false || isError($result))
         {
             $this->db->trans_rollback();
-            $result = error($result->msg, EXIT_ERROR);
+            return error($result->msg, EXIT_ERROR);
         }
         else
         {
             $this->db->trans_commit();
-            $result = success($vertrag_id);
+            return success($vertrag_id);
         }
-
-        return $result;
-
     }
 
     /**
@@ -151,21 +159,32 @@ class Vertrag_model extends DB_Model
      * @param $vertrag_obj  Object with vertrag properties vertrag_id, vertragsstunden, betrag.
      * @param $mitarbeiter_uid
      */
-    public function updateVertrag($vertrag_obj, $mitarbeiter_uid)
+    public function updateVertrag($vertrag_id, $vertragsstunden, $betrag, $mitarbeiter_uid)
     {
-        $user = getAuthUID();
+        $vertrag_id = (isset($vertrag_id) && is_numeric($vertrag_id))
+            ? $vertrag_id
+            : show_error('vertrag_id must be set and numeric.');
+        $vertragsstunden = (isset($vertragsstunden) && is_numeric($vertragsstunden))
+            ? $vertragsstunden
+            : 0;
+        $betrag = (isset($betrag) && is_numeric($betrag))
+            ? $betrag
+            : 0;
+        $mitarbeiter_uid = (isset($mitarbeiter_uid) && is_string($mitarbeiter_uid))
+            ? $mitarbeiter_uid
+            : show_error('mitarbeiter_uid must be set and a string value.');
 
         // Start DB transaction
         $this->db->trans_start(false);
 
         // Update contract
         $result = $this->update(
-            $vertrag_obj->vertrag_id,
+            $vertrag_id,
             array(
-                'vertragsstunden' => $vertrag_obj->vertragsstunden,
-                'betrag' => $vertrag_obj->betrag,
+                'vertragsstunden' => $vertragsstunden,
+                'betrag' => $betrag,
                 'updateamum' => $this->escape('NOW()'),
-                'updatevon' => $user,
+                'updatevon' => getAuthUID()
             )
         );
 
@@ -202,99 +221,6 @@ class Vertrag_model extends DB_Model
             $this->db->trans_commit();
             return success('Contract successfully updated.');
         }
-    }
-
-    /**
-     * Check if Vertrag has the given Vertragsstatus.
-     * @param integer $vertrag_id
-     * @param string $mitarbeiter_uid
-     * @param string $vertragsstatus_kurzbz
-     * @return array
-     */
-    public function hasStatus($vertrag_id, $mitarbeiter_uid, $vertragsstatus_kurzbz)
-    {
-        $this->addSelect('1');
-        $this->addJoin('lehre.tbl_vertrag_vertragsstatus', 'vertrag_id');
-        $this->addLimit(1);
-
-        return $this->loadWhere(array(
-            'vertrag_id' => $vertrag_id,
-            'uid' => $mitarbeiter_uid,
-            'vertragsstatus_kurzbz' => $vertragsstatus_kurzbz
-        ));
-    }
-
-    /**
-     * Set Vertragsstatus for the given Vertrag and Mitarbeiter.
-     * @param $vertrag_id
-     * @param $vertragsstatus_kurzbz
-     * @param $mitarbeiter_uid
-     * @return array|null           On success object, retval is true. Null if status already exist for this vertrag.
-     */
-    public function setStatus($vertrag_id, $mitarbeiter_uid, $vertragsstatus_kurzbz){
-
-        // Check if vertrag has already this status
-        $result = $this->hasStatus($vertrag_id, $mitarbeiter_uid, $vertragsstatus_kurzbz);
-        if (hasData($result))
-        {
-            return success(null); // return null if status is already set
-        }
-
-        // If new status should be 'akzeptiert', the latest status has to be 'erteilt'
-        if ($vertragsstatus_kurzbz == 'akzeptiert')
-        {
-            $result = $this->getLastStatus($vertrag_id, $mitarbeiter_uid);
-            $last_status = getData($result)[0]->vertragsstatus_kurzbz;
-
-            if ($last_status != 'erteilt')
-            {
-                return success(null); // return null if latest status is not 'erteilt'
-            }
-        }
-
-        // Set new status if passed all checks
-        $query = '
-            INSERT INTO lehre.tbl_vertrag_vertragsstatus(
-                vertragsstatus_kurzbz,
-                vertrag_id,
-                uid,
-                datum,
-                insertvon,
-                updatevon,
-                updateamum
-            ) VALUES (?, ?, ?, ?, ?, ?, ?);';
-
-        return $this->execQuery($query,
-            array(
-                $vertragsstatus_kurzbz,
-                $vertrag_id,
-                $mitarbeiter_uid,
-                'NOW()',
-                getAuthUID(),
-                null,
-                null
-            )
-        );
-    }
-
-    /**
-     * Get the latest Vertragsstatus for the given Vertrag and Mitarbeiter
-     * @param integer $vertrag_id
-     * @param string $mitarbeiter_uid
-     * @return array
-     */
-    public function getLastStatus($vertrag_id, $mitarbeiter_uid)
-    {
-        $this->addSelect('vertragsstatus_kurzbz');
-        $this->addJoin('lehre.tbl_vertrag_vertragsstatus', 'vertrag_id');
-        $this->addOrder('datum', 'DESC');
-        $this->addLimit(1);
-        return $this->loadWhere(
-            array(
-                'vertrag_id' => $vertrag_id,
-                'uid' => $mitarbeiter_uid
-            )
-        );
     }
 
     // -----------------------------------------------------------------------------------------------------------------
