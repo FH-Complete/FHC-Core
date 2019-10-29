@@ -122,7 +122,7 @@ class Vertrag_model extends DB_Model
         // If updating vertrag_id was successfully, set Status to 'bestellt'
         if (isSuccess($result))
         {
-            $result = $this->setStatus($vertrag_id, $mitarbeiter_uid,'bestellt');
+            $result = $this->VertragvertragsstatusModel->setStatus($vertrag_id, $mitarbeiter_uid, 'bestellt');
         }
 
         // Transaction complete!
@@ -172,19 +172,20 @@ class Vertrag_model extends DB_Model
         // If last vertragsstatus is 'erteilt', delete the status
         if (isSuccess($result))
         {
-            $result = $this->getLastStatus($vertrag_obj->vertrag_id, $mitarbeiter_uid);
+            $result = $this->VertragvertragsstatusModel->getLastStatus($vertrag_id, $mitarbeiter_uid);
+
             $lastStatus = getData($result)[0]->vertragsstatus_kurzbz;
 
             if ($lastStatus == 'erteilt')
             {
-                $result = $this->VertragvertragsstatusModel->deleteStatus($vertrag_obj->vertrag_id, 'erteilt');
+                $result = $this->VertragvertragsstatusModel->deleteStatus($vertrag_id, 'erteilt');
             }
         }
 
         // Update date of status 'bestellt'
         if (isSuccess($result))
         {
-            $result =  $this->VertragvertragsstatusModel->updateStatus($vertrag_obj->vertrag_id, 'bestellt');
+            $result = $this->VertragvertragsstatusModel->updateStatus($vertrag_id, 'bestellt');
         }
 
         // Transaction complete!

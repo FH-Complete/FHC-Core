@@ -35,6 +35,7 @@ class LehrauftragErteilen extends Auth_Controller
         $this->load->model('organisation/Studiensemester_model', 'StudiensemesterModel');
         $this->load->model('organisation/Studiengang_model', 'StudiengangModel');
         $this->load->model('accounting/Vertrag_model', 'VertragModel');
+        $this->load->model('accounting/Vertragvertragsstatus_model', 'VertragvertragsstatusModel');
 
         // Load libraries
         $this->load->library('WidgetLib');
@@ -134,7 +135,7 @@ class LehrauftragErteilen extends Auth_Controller
                     show_error('Keine Erteilberechtigung für diese Organisationseinheit: '. $lv_oe_kurzbz);
                 }
 
-                $result = $this->VertragModel->setStatus($vertrag_id, $mitarbeiter_uid, 'erteilt');
+                $result = $this->VertragvertragsstatusModel->setStatus($vertrag_id, $mitarbeiter_uid, 'erteilt');
 
                 if ($result->retval) {
                     $json [] = array(

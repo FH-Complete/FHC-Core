@@ -30,6 +30,7 @@ class LehrauftragAkzeptieren extends Auth_Controller
         // Load models
         $this->load->model('organisation/Studiensemester_model', 'StudiensemesterModel');
         $this->load->model('accounting/Vertrag_model', 'VertragModel');
+        $this->load->model('accounting/Vertragvertragsstatus_model', 'VertragvertragsstatusModel');
         $this->load->model('ressource/Mitarbeiter_model', 'MitarbeiterModel');
         $this->load->model('codex/Bisverwendung_model', 'BisverwendungModel');
         $this->load->model('person/Benutzer_model', 'BenutzerModel');
@@ -158,7 +159,7 @@ class LehrauftragAkzeptieren extends Auth_Controller
                 }
 
                 // Set status to accepted
-                $result = $this->VertragModel->setStatus($vertrag_id, $this->_uid, 'akzeptiert');
+                $result = $this->VertragvertragsstatusModel->setStatus($vertrag_id, $this->_uid, 'akzeptiert');
     
                 if ($result->retval)
                 {
