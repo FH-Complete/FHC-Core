@@ -175,8 +175,16 @@ $this->load->view(
         var erteilt = row.getData().erteilt;
         var akzeptiert = row.getData().akzeptiert;
 
+        var stunden = parseFloat(row.getData().stunden);
+        var vertrag_stunden = parseFloat(row.getData().vertrag_stunden);
+
         var betrag = parseFloat(row.getData().betrag);
         var vertrag_betrag = parseFloat(row.getData().vertrag_betrag);
+
+        if (isNaN(betrag))
+        {
+            betrag = 0;
+        }
 
         /*
         Formats the color of the rows depending on their status
@@ -186,7 +194,8 @@ $this->load->view(
         - grey: all other (marks unselectable)
          */
         row.getCells().forEach(function(cell){
-            if (bestellt != null && (betrag != vertrag_betrag))
+            if (bestellt != null && (betrag != vertrag_betrag) ||
+                bestellt != null && stunden != vertrag_stunden)
             {
                 cell.getElement().classList.add('bg-warning');                  // geaenderte
             }
@@ -207,14 +216,23 @@ $this->load->view(
 
     // Formats row selectable/unselectable
     function func_selectableCheck(row){
-        var betrag = row.getData().betrag;
-        var vertrag_betrag = row.getData().vertrag_betrag;
+        var stunden = parseFloat(row.getData().stunden);
+        var vertrag_stunden = parseFloat(row.getData().vertrag_stunden);
+
+        var betrag = parseFloat(row.getData().betrag);
+        var vertrag_betrag = parseFloat(row.getData().vertrag_betrag);
+
+        if (isNaN(betrag))
+        {
+            betrag = 0;
+        }
 
         // only allow to select bestellte && erteilte && nicht geaenderte Lehraufträge
         return  row.getData().bestellt != null &&       // bestellt
                 row.getData().erteilt != null &&        // AND erteilt
                 row.getData().akzeptiert == null &&     // AND nicht akzeptiert
-                betrag == vertrag_betrag;               // OR nicht geaenderte
+                betrag == vertrag_betrag &&
+                stunden == vertrag_stunden;               // OR nicht geaenderte
     }
 
     // Adds column status
@@ -241,10 +259,19 @@ $this->load->view(
             var erteilt = row.getData().erteilt;
             var akzeptiert = row.getData().akzeptiert;
 
+            var stunden = parseFloat(row.getData().stunden);
+            var vertrag_stunden = parseFloat(row.getData().vertrag_stunden);
+
             var betrag = parseFloat(row.getData().betrag);
             var vertrag_betrag = parseFloat(row.getData().vertrag_betrag);
 
-            if (bestellt != null && (betrag != vertrag_betrag))
+            if (isNaN(betrag))
+            {
+                betrag = 0;
+            }
+
+            if ((bestellt != null && betrag != vertrag_betrag) ||
+                (bestellt != null && stunden != vertrag_stunden))
             {
                 row.getData().status = 'Geändert';      // geaendert
             }
@@ -362,15 +389,24 @@ $this->load->view(
         var erteilt = cell.getRow().getData().erteilt;
         var akzeptiert = cell.getRow().getData().akzeptiert;
 
-        var betrag = cell.getRow().getData().betrag;
-        var vertrag_betrag = cell.getRow().getData().vertrag_betrag;
+        var stunden = parseFloat(cell.getRow().getData().stunden);
+        var vertrag_stunden = parseFloat(cell.getRow().getData().vertrag_stunden);
+
+        var betrag = parseFloat(cell.getRow().getData().betrag);
+        var vertrag_betrag = parseFloat(cell.getRow().getData().vertrag_betrag);
+
+        if (isNaN(betrag))
+        {
+            betrag = 0;
+        }
 
         // commented icons would be so nice to have with fontawsome 5.11...
         if (bestellt != null && isNaN(vertrag_betrag))
         {
             return "<i class='fas fa-user-minus'></i>";     // kein Vertrag
         }
-        else if (bestellt != null && (betrag != vertrag_betrag))
+        else if (bestellt != null && (betrag != vertrag_betrag) ||
+                bestellt != null && stunden != vertrag_stunden)
         {
             return ICON_LEHRAUFTRAG_CHANGED;               // geaendert
             // return "<i class='fas fa-user-edit'></i>";
@@ -406,19 +442,27 @@ $this->load->view(
         var erteilt = cell.getRow().getData().erteilt;
         var akzeptiert = cell.getRow().getData().akzeptiert;
 
+        var stunden = parseFloat(cell.getRow().getData().stunden);
+        var vertrag_stunden = parseFloat(cell.getRow().getData().vertrag_stunden);
+
         var betrag = parseFloat(cell.getRow().getData().betrag);
         var vertrag_betrag = parseFloat(cell.getRow().getData().vertrag_betrag);
+
+        if (isNaN(betrag))
+        {
+            betrag = 0;
+        }
 
         var text = 'Lehrauftrag in Bearbeitung. ';
 
         if (bestellt != null && erteilt == null && akzeptiert == null
-            && betrag != vertrag_betrag)                                        // geaendert (when never erteilt before)
+            && (betrag != vertrag_betrag || stunden != vertrag_stunden))        // geaendert (when never erteilt before)
         {
             text += 'Wartet auf Erteilung.';
             return text;
         }
         else if (bestellt != null && erteilt != null && akzeptiert == null
-            && betrag != vertrag_betrag)                                        // geaendert (when has been erteilt once)
+            && (betrag != vertrag_betrag || stunden != vertrag_stunden))        // geaendert (when has been erteilt once)
         {
             text += 'Wartet auf erneute Erteilung.';
             return text;

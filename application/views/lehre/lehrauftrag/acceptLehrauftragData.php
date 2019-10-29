@@ -25,6 +25,7 @@ SELECT
     stunden,
     betrag,
     vertrag_id,
+    vertrag_stunden,
     vertrag_betrag,
     mitarbeiter_uid,
     bestellt,
@@ -138,6 +139,7 @@ FROM
                     TRUNC(lema.semesterstunden, 1)                      AS "stunden",
                     TRUNC((lema.semesterstunden * lema.stundensatz), 2) AS "betrag",
                     vertrag_id,
+                    vertragsstunden                                     AS "vertrag_stunden",
                     vertrag.betrag                                      AS "vertrag_betrag",
                     mitarbeiter_uid
                 FROM
@@ -248,6 +250,7 @@ FROM
                     TRUNC(pb.stunden, 1)                                                                AS "stunden",
                     TRUNC((pb.stunden * pb.stundensatz), 2)                                             AS "betrag",
                     vertrag_id,
+                    vertragsstunden                                                                     AS "vertrag_stunden",
                     vertrag.betrag                                                                      AS "vertrag_betrag"
                 FROM
                     lehre.tbl_projektbetreuer                      pb
@@ -305,6 +308,7 @@ $filterWidgetArray = array(
         'Stunden',
         'Betrag',
         'Vertrag-ID',
+        'Vertrag-Stunden',
         'Vertrag-Betrag',
         'UID',
         'Bestellt',
@@ -371,6 +375,7 @@ $filterWidgetArray = array(
             bottomCalc:"sum", bottomCalcParams:{precision:2}, bottomCalcFormatter:"money", bottomCalcFormatterParams:{decimal: ",", thousand: ".", symbol:"€"},
             width: "8%"},
         vertrag_id: {visible: false},
+        vertrag_stunden: {visible: false},
         vertrag_betrag: {visible: false},
         mitarbeiter_uid: {visible: false},
         bestellt: {align:"center", headerFilter:"input", mutator: mut_formatStringDate, tooltip: bestellt_tooltip}, 

@@ -196,15 +196,6 @@ $this->load->view(
         ]);
     }
 
-    // Filters geaenderte
-    function filter_showChanged(data){
-
-        // Filters geaenderte from status bestellt on
-        return  data.personalnummer >= 0 &&         // NOT dummy lector AND
-                data.bestellt != null &&            // bestellt AND
-                data.betrag != data.vertrag_betrag; // geaendert
-    }
-
     // -----------------------------------------------------------------------------------------------------------------
     // Tabulator table format functions
     // -----------------------------------------------------------------------------------------------------------------
@@ -221,8 +212,16 @@ $this->load->view(
         var erteilt = row.getData().erteilt;
         var akzeptiert = row.getData().akzeptiert;
 
-        var betrag = row.getData().betrag;
-        var vertrag_betrag = row.getData().vertrag_betrag;
+        var stunden = parseFloat(row.getData().stunden);
+        var vertrag_stunden = parseFloat(row.getData().vertrag_stunden);
+
+        var betrag = parseFloat(row.getData().betrag);
+        var vertrag_betrag = parseFloat(row.getData().vertrag_betrag);
+
+        if (isNaN(betrag))
+        {
+            betrag = 0;
+        }
 
         /*
         Formats the color of the rows depending on their status
@@ -237,7 +236,9 @@ $this->load->view(
             {
                 cell.getElement().classList.add('bg-info');                          // dummy lectors
             }
-            else if (bestellt != null && (betrag != vertrag_betrag)  && !row._row.element.classList.contains('tabulator-calcs')) // exclude calculation rows
+            else if (bestellt != null && (betrag != vertrag_betrag) ||
+                    bestellt != null && stunden != vertrag_stunden &&
+                    !row._row.element.classList.contains('tabulator-calcs'))        // exclude calculation rows
             {
                  row.getElement().style['font-weight'] = 'bold';                    // geaendert
             }
@@ -260,13 +261,22 @@ $this->load->view(
     function func_selectableCheck(row){
         var is_dummy = (row.getData().personalnummer <= 0 && row.getData().personalnummer != null);
 
-        var betrag = row.getData().betrag;
-        var vertrag_betrag = row.getData().vertrag_betrag;
+        var stunden = parseFloat(row.getData().stunden);
+        var vertrag_stunden = parseFloat(row.getData().vertrag_stunden);
+
+        var betrag = parseFloat(row.getData().betrag);
+        var vertrag_betrag = parseFloat(row.getData().vertrag_betrag);
+
+        if (isNaN(betrag))
+        {
+            betrag = 0;
+        }
 
         // Only allow to select neue and geaenderte
-        return  !is_dummy &&                                                // NOT dummy lector
-                row.getData().bestellt == null ||                           // AND neue
-                row.getData().bestellt != null && betrag != vertrag_betrag; // OR geaenderte
+        return  !is_dummy &&                                                    // NOT dummy lector
+                row.getData().bestellt == null ||                               // AND neue
+                row.getData().bestellt != null && betrag != vertrag_betrag ||   // OR geaenderte
+                row.getData().bestellt != null && stunden != vertrag_stunden    // OR geanderte (if betrag is 0 or null)
     }
 
     // Adds column status
@@ -293,10 +303,19 @@ $this->load->view(
             var erteilt = row.getData().erteilt;
             var akzeptiert = row.getData().akzeptiert;
 
-            var betrag = row.getData().betrag;
-            var vertrag_betrag = row.getData().vertrag_betrag;
+            var stunden = parseFloat(row.getData().stunden);
+            var vertrag_stunden = parseFloat(row.getData().vertrag_stunden);
 
-            if (bestellt != null && (betrag != vertrag_betrag))
+            var betrag = parseFloat(row.getData().betrag);
+            var vertrag_betrag = parseFloat(row.getData().vertrag_betrag);
+
+            if (isNaN(betrag))
+            {
+                betrag = 0;
+            }
+
+            if ((bestellt != null && betrag != vertrag_betrag) ||
+                (bestellt != null && stunden != vertrag_stunden))
             {
                 row.getData().status = 'Geändert';      // geaendert
             }
@@ -380,7 +399,7 @@ $this->load->view(
             .filter(row => row.getData().personalnummer >= 0 &&             // NOT dummies
                     row.getData().bestellt == null ||                       // AND neu
                     row.getData().bestellt != null &&                       // OR (bestellt
-                    row.getData().betrag != row.getData().vertrag_betrag)   // AND geaendert)
+                    row.getData().status == 'Geändert')                     // AND geaendert)
             .forEach((row => row.select()));
     }
 
@@ -408,8 +427,16 @@ $this->load->view(
          var erteilt = cell.getRow().getData().erteilt;
          var akzeptiert = cell.getRow().getData().akzeptiert;
 
-         var betrag = cell.getRow().getData().betrag;
-         var vertrag_betrag = cell.getRow().getData().vertrag_betrag;
+         var stunden = parseFloat(cell.getRow().getData().stunden);
+         var vertrag_stunden = parseFloat(cell.getRow().getData().vertrag_stunden);
+
+         var betrag = parseFloat(cell.getRow().getData().betrag);
+         var vertrag_betrag = parseFloat(cell.getRow().getData().vertrag_betrag);
+
+        if (isNaN(betrag))
+        {
+            betrag = 0;
+        }
 
          // commented icons would be so nice to have with fontawsome 5.11...
          if (is_dummy)
@@ -420,7 +447,8 @@ $this->load->view(
          {
              return "<i class='fa fa-user-minus'></i>";     // kein Vertrag
          }
-         else if (bestellt != null && (betrag != vertrag_betrag))
+         else if (bestellt != null && (betrag != vertrag_betrag) ||     // geaendert
+                bestellt != null && stunden != vertrag_stunden)         // geaendert ((if betrag is 0 or null)
          {
              return ICON_LEHRAUFTRAG_CHANGED;               // geaendert
              // return "<i class='fas fa-user-edit'></i>";
@@ -459,11 +487,16 @@ $this->load->view(
 
         var betrag = parseFloat(cell.getRow().getData().betrag);
         var stunden = parseFloat(cell.getRow().getData().stunden);
-        var stundensatz = parseFloat(cell.getRow().getData().stundensatz);
+        var stundensatz = cell.getRow().getData().stundensatz;
 
         var vertrag_betrag = parseFloat(cell.getRow().getData().vertrag_betrag);
         var vertrag_stunden = parseFloat(cell.getRow().getData().vertrag_stunden);
         var vertrag_stundensatz = 0;
+
+        if (isNaN(betrag))
+        {
+            betrag = 0;
+        }
 
         // Calculate vertrag stundensatz
         if (vertrag_stunden != 0)
@@ -480,7 +513,8 @@ $this->load->view(
         {
             return 'Neuer Lehrauftrag. Wartet auf Bestellung.'
         }
-        else if (betrag != vertrag_betrag)                      // geaendert
+        else if (betrag != vertrag_betrag ||                                        // geaendert
+                 bestellt != null && stunden != vertrag_stunden)                    // geaendert (if betrag is 0 or null)
         {
             var text = 'NACH Änderung: Stundensatz: ' + stundensatz + '  Stunden: ' + stunden;
                 text += "\n";
@@ -579,7 +613,13 @@ $(function() {
     // Show only rows with geaenderte lectors
     $("#show-changed").click(function(){
         // needs custom filter to compare fields betrag and vertrag_betrag
-        $('#filterTabulator').tabulator('setFilter', filter_showChanged);
+        $('#filterTabulator').tabulator('setFilter',
+            [
+                {field: 'personalnummer', type: '>=', value: 0},    // NOT dummy lector AND
+                {field: 'bestellt', type: '!=', value: null},       // bestellt AND
+                {field: 'status', type: '=', value: 'Geändert'}     // geaendert
+            ]
+        );
     });
 
     // Show only rows with dummy lectors
