@@ -113,7 +113,8 @@ function searchPerson($searchItems)
 {
 	global $db, $p, $noalias, $uid;
 	$bn = new benutzer();
-	$bn->search($searchItems, 21);
+	//search only active and Mitarbeiter with positive Personalnr
+	$bn->search($searchItems, 21, true, true);
 
 	if(count($bn->result)>0)
 	{

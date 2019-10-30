@@ -46,13 +46,16 @@ function generateCSSsInclude($CSSs)
 {
 	$cssLink = '<link rel="stylesheet" type="text/css" href="%s" />';
 
+	$ci =& get_instance();
+	$cachetoken = '?'.$ci->config->item('fhcomplete_build_version');
+
 	if (isset($CSSs))
 	{
 		$tmpCSSs = is_array($CSSs) ? $CSSs : array($CSSs);
 
 		for ($tmpCSSsCounter = 0; $tmpCSSsCounter < count($tmpCSSs); $tmpCSSsCounter++)
 		{
-			$toPrint = sprintf($cssLink, base_url($tmpCSSs[$tmpCSSsCounter])).PHP_EOL;
+			$toPrint = sprintf($cssLink, base_url($tmpCSSs[$tmpCSSsCounter]).$cachetoken).PHP_EOL;
 
 			if ($tmpCSSsCounter > 0) $toPrint = "\t\t".$toPrint;
 
@@ -108,13 +111,16 @@ function generateJSsInclude($JSs)
 {
 	$jsInclude = '<script type="text/javascript" src="%s"></script>';
 
+	$ci =& get_instance();
+	$cachetoken = '?'.$ci->config->item('fhcomplete_build_version');
+
 	if (isset($JSs))
 	{
 		$tmpJSs = is_array($JSs) ? $JSs : array($JSs);
 
 		for ($tmpJSsCounter = 0; $tmpJSsCounter < count($tmpJSs); $tmpJSsCounter++)
 		{
-			$toPrint = sprintf($jsInclude, base_url($tmpJSs[$tmpJSsCounter])).PHP_EOL;
+			$toPrint = sprintf($jsInclude, base_url($tmpJSs[$tmpJSsCounter].$cachetoken)).PHP_EOL;
 
 			if ($tmpJSsCounter > 0) $toPrint = "\t\t".$toPrint;
 

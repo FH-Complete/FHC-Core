@@ -50,7 +50,8 @@ var InfocenterPersonDataset = {
 			'<i class="fa fa-envelope"></i>&nbsp;Nachricht senden</a>';
 
 		var legendHtml = '<i class="fa fa-circle text-danger"></i> Gesperrt&nbsp;&nbsp;&nbsp;&nbsp;' +
-			'<i class="fa fa-circle text-info"></i> Geparkt';
+			'<i class="fa fa-circle text-info"></i> Geparkt&nbsp;&nbsp;&nbsp;&nbsp;' +
+			'<i class="fa fa-circle text-success"></i> Zurückgestellt';
 
 		// userdefined Semestervariable shown independently of personcount,
 		// it is possible to change the semester
@@ -148,6 +149,28 @@ var InfocenterPersonDataset = {
 				trs.find("input[name=PersonId\\[\\]]").prop("checked", false);
 			}
 		);
+
+		//make sure tablesorter local storage for homepage url with and without "/index" shares same values
+		$("#filterTableDataset").bind('filterEnd', function()
+		{
+			if (FHC_JS_DATA_STORAGE_OBJECT.called_method === 'index')
+			{
+				var pathname = window.location.pathname;
+				var storageobj = localStorage.getItem("tablesorter-filters");
+				var parsed = JSON.parse(storageobj);
+				var regex = new RegExp(/\/index(?!\.ci\.php)/);
+				if (regex.test(pathname))
+				{
+					parsed[pathname.replace(regex, "")] = parsed[pathname];
+				}
+				else
+				{
+					parsed[pathname + "/index"] = parsed[pathname];
+				}
+				storageobj = JSON.stringify(parsed);
+				localStorage.setItem("tablesorter-filters", storageobj);
+			}
+		});
 	},
 
 	/**

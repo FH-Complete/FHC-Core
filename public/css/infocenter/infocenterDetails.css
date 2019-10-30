@@ -66,3 +66,30 @@
 #scrollToTop:hover{
     background-color: lightgrey;
 }
+
+#postponedate{
+    height: 25px;
+    width: 99px
+}
+
+#postponedatelabel{
+    font-weight: normal;
+}
+
+@media screen and (max-width: 1510px)
+{
+    #postponing{
+        text-align: center;
+    }
+    #postponedatelabel{
+        display: block;
+        margin-top: 20px;
+    }
+}
+
+@media screen and (max-width: 768px)
+{
+    #postponedate {
+        display: inline-block
+    }
+}

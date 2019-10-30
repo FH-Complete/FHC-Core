@@ -503,3 +503,15 @@ $config['rewrite_short_tags'] = FALSE;
 | Array:		array('10.0.1.200', '192.168.5.0/24')
 */
 $config['proxy_ips'] = '';
+
+/*
+|--------------------------------------------------------------------------
+| FHComplete Build Version
+|--------------------------------------------------------------------------
+|
+| Version Number of the Current Build
+| This is used to invalidate Cache for JS and CSS Files
+| 
+| Example: 2019102901
+*/
+$config['fhcomplete_build_version'] = '2019102903';

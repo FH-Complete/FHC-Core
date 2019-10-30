@@ -204,6 +204,7 @@
 		'filter_id' => $this->input->get('filter_id'),
 		'requiredPermissions' => 'infocenter',
 		'datasetRepresentation' => 'tablesorter',
+		'reloadDataset' => ($this->input->get('reloadDataset')=='true'?true:false),
 		'checkboxes' => 'PersonId',
 		'additionalColumns' => array('Details'),
 		'columnsAliases' => array(

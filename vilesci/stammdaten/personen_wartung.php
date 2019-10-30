@@ -41,6 +41,7 @@ require_once ('../../include/fotostatus.class.php');
 require_once ('../../include/kontakt.class.php');
 require_once ('../../include/dokument.class.php');
 require_once ('../../include/reihungstest.class.php');
+require_once ('../../include/pruefling.class.php');
 
 
 if (! $db = new basis_db())
@@ -560,7 +561,7 @@ if (isset($personToDelete) && isset($personToKeep) && $personToDelete >= 0 && $p
 					 */
 					$prestudenten = new prestudent();
 					$prestudenten->getPrestudenten($personToKeep);
-					$statusArrayWichtigeWichtige = array(); // Array mit allen PreStudentStatus die NICHT Interessent oder Abgewiesener sind
+					$statusArrayWichtige = array(); // Array mit allen PreStudentStatus die NICHT Interessent oder Abgewiesener sind
 
 					foreach ($prestudenten->result AS $key => $value)
 					{
@@ -673,6 +674,7 @@ if (isset($personToDelete) && isset($personToKeep) && $personToDelete >= 0 && $p
 					$studiengang_kz = '';
 					$anmerkung = '';
 					$prestudentLoeschArray = array();
+					$prueflingTransferArray = array();
 					$warningList = array();
 					$i = 0;
 					foreach ($prestudentenArray AS $key => $value)
@@ -715,6 +717,7 @@ if (isset($personToDelete) && isset($personToKeep) && $personToDelete >= 0 && $p
 														// Wenn kein Status außer Interessent und Abgewiesener mehr vorhanden ist, löschen
 														if (!isset($statusArrayWichtige[$value['prestudent_id']]))
 														{
+															setPrueflingTransfer($value['prestudent_id'], $prestudentId, $prueflingTransferArray);
 															unset($prestudentenArray[$key]);
 															$prestudentLoeschArray[] = $value['prestudent_id'];
 														}
@@ -732,6 +735,7 @@ if (isset($personToDelete) && isset($personToKeep) && $personToDelete >= 0 && $p
 														// Wenn kein Status außer Interessent und Abgewiesener mehr vorhanden ist, löschen
 														if (!isset($statusArrayWichtige[$value['prestudent_id']]))
 														{
+															setPrueflingTransfer($value['prestudent_id'], $prestudentId, $prueflingTransferArray);
 															unset($prestudentenArray[$key]);
 															$prestudentLoeschArray[] = $value['prestudent_id'];
 														}
@@ -748,6 +752,7 @@ if (isset($personToDelete) && isset($personToKeep) && $personToDelete >= 0 && $p
 														$prestudentenArray[$previousKey]['zgvort'] = $zgvort = $value['zgvort'];
 														$prestudentenArray[$previousKey]['zgvdatum'] = $zgvdatum = $value['zgvdatum'];
 														$prestudentenArray[$previousKey]['zgvnation'] = $zgvnation = $value['zgvnation'];
+														setPrueflingTransfer($value['prestudent_id'], $prestudentId, $prueflingTransferArray);
 														unset($prestudentenArray[$key]);
 														$prestudentLoeschArray[] = $value['prestudent_id'];
 														continue;
@@ -761,6 +766,7 @@ if (isset($personToDelete) && isset($personToKeep) && $personToDelete >= 0 && $p
 														$warningList['zgvUnklar'][$prestudentId][$i]['zgvort'] = $value['zgvort'];
 														$warningList['zgvUnklar'][$prestudentId][$i]['zgvdatum'] = $value['zgvdatum'];
 														$warningList['zgvUnklar'][$prestudentId][$i]['zgvnation'] = $value['zgvnation'];
+														setPrueflingTransfer($value['prestudent_id'], $prestudentId, $prueflingTransferArray);
 														unset($prestudentenArray[$key]);
 														$prestudentLoeschArray[] = $value['prestudent_id'];
 														$i++;
@@ -769,6 +775,7 @@ if (isset($personToDelete) && isset($personToKeep) && $personToDelete >= 0 && $p
 												}
 											}
 										}
+										setPrueflingTransfer($value['prestudent_id'], $prestudentId, $prueflingTransferArray);
 										unset($prestudentenArray[$key]);
 										$prestudentLoeschArray[] = $value['prestudent_id'];
 										continue;
@@ -834,6 +841,19 @@ if (isset($personToDelete) && isset($personToKeep) && $personToDelete >= 0 && $p
 
 					$msg_warning[] = $messageOutput;
 
+					//Wenn Prüfling auf zu löschenden Prestudenten zeigt und ggf auf bleibenden umhängen.
+					foreach ($prueflingTransferArray as $pruefling_id => $prestudent_id)
+					{
+						$transferqry = "UPDATE testtool.tbl_pruefling SET prestudent_id=" . $db->db_add_param($prestudent_id, FHC_INTEGER) . " WHERE pruefling_id=" . $db->db_add_param($pruefling_id, FHC_INTEGER) . ";";
+
+						if (!$db->db_query($transferqry))
+						{
+							$msg_error[] = 'Fehler beim Aktualisieren des Prüflings '.$pruefling_id;
+						}
+						else
+							$msg_warning[] = 'Prüfling '.$pruefling_id.' auf prestudent '.$prestudent_id.' aktualisiert';
+					}
+
 					// Prestudenten in $prestudentLoeschArray löschen
 					foreach ($prestudentLoeschArray AS $key => $value)
 					{
@@ -884,6 +904,28 @@ if ((isset($personToDelete) && ! isset($personToKeep)) || (! isset($personToDele
 {
 	$msg_info[] = "Es muß je ein Radio-Button pro Tabelle angeklickt werden";
 }
+
+/**
+ * Holt sich Prüflinge zu einem zu löschenden Prestudenten,
+ * speichert auf welchen Prestudenten die Prüflinge "umgehängt" werden sollen.
+ * @param $prestudentIdToDelete prestudent_id des zu löschenden Prestudenten
+ * @param $prestudentIdToKeep prestudent_id des behaltenen Prestundenten
+ * @param $prueflingTransferArray zum Speichern, form [pruefling_id] => neue_prestudent_id
+ */
+function setPrueflingTransfer($prestudentIdToDelete, $prestudentIdToKeep, &$prueflingTransferArray)
+{
+	$pruefling = new pruefling();
+
+	if (is_numeric($prestudentIdToDelete) && is_numeric($prestudentIdToKeep) &&
+		$pruefling->getPrueflinge($prestudentIdToDelete))
+	{
+		foreach ($pruefling->result as $pr)
+		{
+			$prueflingTransferArray[$pr->pruefling_id] = (int)$prestudentIdToKeep;
+		}
+	}
+}
+
 function resize($base64, $width, $height) // 828 x 1104 -> 240 x 320
 {
 	ob_start();

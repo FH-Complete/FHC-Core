@@ -14,7 +14,7 @@ class LogsViewer extends Auth_Controller
 	{
 		parent::__construct(
 			array(
-				'index' => 'admin:r'
+				'index' => 'system/developer:r'
 			)
 		);
 
