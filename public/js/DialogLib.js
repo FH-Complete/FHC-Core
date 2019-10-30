@@ -74,7 +74,7 @@ var FHC_DialogLib = {
 			buttons: [{
 				text: "Ok",
 				click: function() {
-					$(this).dialog("close");
+					$("#fhc-dialoglib-dialog").remove();
 				}
 			}]
 		});
