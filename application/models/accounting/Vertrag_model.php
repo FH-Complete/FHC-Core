@@ -223,6 +223,82 @@ class Vertrag_model extends DB_Model
         }
     }
 
+    /**
+     * Gets Lehreinheit ID corresponding to the contract.
+     * @param $vertrag_id
+     * @return array
+     */
+    public function getLehreinheitID($vertrag_id)
+    {
+        $vertragstyp_kurzbz = null;
+
+        $this->addSelect('vertragstyp_kurzbz');
+        if ($result = getData($this->load($vertrag_id)))
+        {
+            $vertragstyp_kurzbz = $result[0]->vertragstyp_kurzbz;
+        }
+        else
+        {
+            return error('Fehler beim Laden des Vertrags.');
+        }
+
+        if ($vertragstyp_kurzbz == 'Lehrauftrag')
+        {
+            $this->LehreinheitmitarbeiterModel->addSelect('lehreinheit_id');
+            if ($result = $this->LehreinheitmitarbeiterModel->loadWhere(array('vertrag_id' => $vertrag_id)))
+            {
+                return success($result->retval);
+            }
+            else
+            {
+                return error('Fehler beim Ermitteln der Lehreinheit ID');
+            }
+
+        }
+        elseif ($vertragstyp_kurzbz == 'Betreuung')
+        {
+            $this->addSelect('lehreinheit_id');
+            $this->addJoin('lehre.tbl_projektbetreuer', 'vertrag_id');
+            $this->addJoin('lehre.tbl_projektarbeit', 'projektarbeit_id');
+            if ($result = $this->loadWhere(array('vertrag_id' => $vertrag_id)))
+            {
+                return success($result->retval);
+            }
+            else
+            {
+                return error('Fehler beim Ermitteln der Lehreinheit ID');
+            }
+        }
+    }
+
+    /**
+     * Gets (table) data of lehreinheit_id corresponding to the contract.
+     * @param integer $vertrag_id
+     * @param string $select To restrict fields, pass select string. e.g. 'lehrveranstaltung_id'.
+     * @return array
+     */
+    public function getLehreinheitData($vertrag_id, $select = '*')
+    {
+        if ($result = getData($this->getLehreinheitID($vertrag_id)))
+        {
+            $this->load->model('education/Lehreinheit_model', 'LehreinheitModel');
+            $this->LehreinheitModel->addSelect($select);
+
+            if($result = $this->LehreinheitModel->load($result[0]->lehreinheit_id))
+            {
+                return success($result->retval);
+            }
+            else
+            {
+                return error('Fehler beim Laden der Lehreinheit');
+            }
+        }
+        else
+        {
+            return error('Fehler beim Ermitteln der Lehreinheit ID');
+        }
+    }
+
     // -----------------------------------------------------------------------------------------------------------------
     // Private methods
 
