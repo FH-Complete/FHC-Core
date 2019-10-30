@@ -88,9 +88,15 @@ if(!$rechte->isBerechtigt('lehre/reservierung:begrenzt', null, 'suid'))
 	$datum = date("Y-m-d",$datum);
 
 	//EIGENE
-	$sql_query="SELECT * FROM campus.vw_reservierung
+	$sql_query="SELECT vw_reservierung.*, vw_mitarbeiter.titelpre, vw_mitarbeiter.titelpost, 
+				vw_mitarbeiter.vorname, vw_mitarbeiter.nachname, reserviert_von.titelpre AS titelpre_reserviertvon,
+       			reserviert_von.titelpost AS titelpost_reserviertvon, reserviert_von.vorname AS vorname_reserviertvon,
+       			reserviert_von.nachname AS nachname_reserviertvon
+				FROM campus.vw_reservierung
+				JOIN campus.vw_mitarbeiter ON vw_reservierung.uid=vw_mitarbeiter.uid
+				LEFT JOIN campus.vw_mitarbeiter reserviert_von ON vw_reservierung.insertvon=reserviert_von.uid
 				WHERE datum>=".$db->db_add_param($datum)."
- 				AND (uid=".$db->db_add_param($uid)." OR insertvon=".$db->db_add_param($uid).")
+ 				AND (vw_reservierung.uid=".$db->db_add_param($uid)." OR vw_reservierung.insertvon=".$db->db_add_param($uid).")
 				ORDER BY  datum, titel, ort_kurzbz, stunde";
 
 	if (!$erg_res=$db->db_query($sql_query))
@@ -108,8 +114,9 @@ if(!$rechte->isBerechtigt('lehre/reservierung:begrenzt', null, 'suid'))
 				<th>'.$p->t('global/titel').'</th>
 				<th>'.$p->t('global/stunde').'</th>
 				<th>'.$p->t('lvplan/raum').'</th>
-				<th>'.$p->t('global/uid').'</th>
+				<th>'.$p->t('global/person').'</th>
 				<th>'.$p->t('global/beschreibung').'</th>
+				<th>'.$p->t('lvplan/reserviertVon').'</th>
 				<th>'.$p->t('global/aktion').'</th>
 			</tr>';
 		for ($i=0; $i<$num_rows_res; $i++)
@@ -124,6 +131,14 @@ if(!$rechte->isBerechtigt('lehre/reservierung:begrenzt', null, 'suid'))
 			$beschreibung=$db->db_result($erg_res,$i,"beschreibung");
 			$insertamum=$db->db_result($erg_res,$i,"insertamum");
 			$insertvon=$db->db_result($erg_res,$i,"insertvon");
+			$titelpre=$db->db_result($erg_res,$i,"titelpre");
+			$titelpost=$db->db_result($erg_res,$i,"titelpost");
+			$pers_vorname=$db->db_result($erg_res,$i,"vorname");
+			$pers_nachname=$db->db_result($erg_res,$i,"nachname");
+			$titelpre_reserviertvon=$db->db_result($erg_res,$i,"titelpre_reserviertvon");
+			$titelpost_reserviertvon=$db->db_result($erg_res,$i,"titelpost_reserviertvon");
+			$pers_vorname_reserviertvon=$db->db_result($erg_res,$i,"vorname_reserviertvon");
+			$pers_nachname_reserviertvon=$db->db_result($erg_res,$i,"nachname_reserviertvon");
 			$datum1 = $datum_obj->formatDatum($datum1, 'd.m.Y');
 			if($insertamum!='')
 				$insertamum = $datum_obj->formatDatum($insertamum, 'd.m.Y H:i:s');
@@ -132,8 +147,9 @@ if(!$rechte->isBerechtigt('lehre/reservierung:begrenzt', null, 'suid'))
 			echo '<td>'.$db->convert_html_chars($titel).'</td>';
 			echo '<td>'.$db->convert_html_chars($stunde).'</td>';
 			echo '<td>'.$db->convert_html_chars($ort_kurzbz).'</td>';
-			echo '<td>'.$db->convert_html_chars($pers_uid).'</td>';
+			echo '<td>'.$db->convert_html_chars($titelpre.' '.$pers_vorname.' '.$pers_nachname.' '.$titelpost).'</td>';
 			echo '<td>'.$db->convert_html_chars($beschreibung).'<a  name="liste'.$i.'">&nbsp;</a></td>';
+			echo '<td>'.$db->convert_html_chars($titelpre_reserviertvon.' '.$pers_vorname_reserviertvon.' '.$pers_nachname_reserviertvon.' '.$titelpost_reserviertvon).'</td>';
 			$z=$i-1;
 			if (($pers_uid==$uid || $insertvon==$uid) && $rechte->isBerechtigt('lehre/reservierung:begrenzt', null, 'suid'))
 				echo '<td><A class="Item" href="stpl_reserve_list.php?id='.$id.'#liste'.$z.'">Delete</A></td>';
