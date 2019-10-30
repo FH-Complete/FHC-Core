@@ -154,6 +154,7 @@ $config['navigation_menu']['lehre/lehrauftrag/LehrauftragErteilen/index'] = arra
         'description' => 'Lehrauftrag bestellen',
         'icon' => '',
         'sort' => 1,
+        'requiredPermissions' => 'lehre/lehrauftrag_bestellen:r',
         'target' => '_blank'
     ),
     'lehrauftragErteilen' => array(
@@ -161,6 +162,7 @@ $config['navigation_menu']['lehre/lehrauftrag/LehrauftragErteilen/index'] = arra
         'description' => 'Lehrauftrag erteilen',
         'icon' => '',
         'sort' => 1,
+        'requiredPermissions' => 'lehre/lehrauftrag_erteilen:r',
         'target' => '_blank'
     )
 );
