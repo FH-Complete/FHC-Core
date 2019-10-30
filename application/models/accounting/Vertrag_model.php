@@ -12,6 +12,8 @@ class Vertrag_model extends DB_Model
 		$this->pk = 'vertrag_id';
 
         $this->load->model('accounting/Vertragvertragsstatus_model', 'VertragvertragsstatusModel');
+        $this->load->model('education/Lehreinheitmitarbeiter_model', 'LehreinheitmitarbeiterModel');
+        $this->load->model('education/Projektbetreuer_model', 'ProjektbetreuerModel');
 	}
 
     /**
@@ -56,7 +58,6 @@ class Vertrag_model extends DB_Model
         // First check if Vertrag already exists for that Lehrauftrag or for that Projektbetreuerauftrag
         if ($vertragstyp_kurzbz == 'Lehrauftrag')
         {
-            $this->load->model('education/Lehreinheitmitarbeiter_model', 'LehreinheitmitarbeiterModel'); //
             if ($this->LehreinheitmitarbeiterModel->hasVertrag($mitarbeiter_uid, $lehreinheit_id))
             {
                 return success(null);   // Exit if Lehrauftrag already has Vertrag
@@ -64,7 +65,6 @@ class Vertrag_model extends DB_Model
         }
         elseif ($vertragstyp_kurzbz == 'Betreuung')
         {
-            $this->load->model('education/Projektbetreuer_model', 'ProjektbetreuerModel');
             if ($this->ProjektbetreuerModel->hasVertrag($person_id, $projektarbeit_id))
             {
                 return success(null);   // Exit if Projektbetreuung already has Vertrag
