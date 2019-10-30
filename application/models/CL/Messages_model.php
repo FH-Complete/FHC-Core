@@ -62,7 +62,8 @@ class Messages_model extends CI_Model
 		$statusData = array(
 			'message_id' => $message_id,
 			'person_id' => $person_id,
-			'status' => MSG_STATUS_READ
+			'status' => MSG_STATUS_READ,
+			'insertvon' => getAuthUID()
 		);
 
 		return $this->MsgStatusModel->insert($statusData); // insert and return result
@@ -83,11 +84,53 @@ class Messages_model extends CI_Model
 		{
 			foreach (getData($ouResult) as $ou)
 			{
-				$ouOptions .= sprintf("\n".'<option value="%s">%s</option>', $ou->oe_kurzbz, $ou->bezeichnung);
+				$ouOptions .= sprintf(
+					"\n".'<option value="%s">%s</option>',
+					is_numeric($ou->prestudent_id) ? $ou->oe_kurzbz : 'infocenter',
+					$ou->bezeichnung
+				);
 			}
 		}
 
 		return array('organisationUnitOptions' => $ouOptions);
+	}
+
+	/**
+	 * Prepares data for the view system/messages/ajaxWriteReply
+	 */
+	public function prepareAjaxWriteReply($token)
+	{
+		if (isEmptyString($token)) show_error('The given token is not valid');
+
+		// Retrieves message using the given token
+		$messageResult = $this->MessageTokenModel->getMessageByToken($token);
+		if (isError($messageResult)) show_error('An error occurred while loading this page, please contact the site administrator');
+
+		if (hasData($messageResult))
+		{
+			$message = getData($messageResult)[0]; // Found message data
+
+			// Retrieves message sender information
+			$senderResult = $this->MessageTokenModel->getSenderData($message->sender_id);
+			if (isError($senderResult)) show_error('An error occurred while loading this page, please contact the site administrator');
+
+			if (hasData($senderResult))
+			{
+				$sender = getData($senderResult)[0]; // Found sender data
+
+				$replySubject = self::REPLY_SUBJECT_PREFIX.$message->subject;
+				$replyBody = $this->_getReplyBody($message->body, $sender->vorname, $sender->nachname, $message->sent);
+
+				return array (
+					'receiver' => $sender->vorname.' '.$sender->nachname, // yep! the sender of the sent message is the receiver of the reply message
+					'subject' => $replySubject,
+					'body' => $replyBody,
+					'receiver_id' => $message->sender_id,
+					'relationmessage_id' => $message->message_id,
+					'token' => $token
+				);
+			}
+		}
 	}
 
 	/**
@@ -96,12 +139,6 @@ class Messages_model extends CI_Model
 	 */
 	public function prepareAjaxReadReceived()
 	{
-		// Name and surname of the logged user
-		$loggedUserName = getAuthFirstname().' '.getAuthSurname();
-
-		// If empty then use a hard coded one
-		if (isEmptyString($loggedUserName)) $loggedUserName = 'Me';
-
 		// Retrieves received messages for the logged user and its organisation units
 		$receivedMessagesResult = $this->RecipientModel->getReceivedMessages(
 			getAuthPersonId(),
@@ -127,6 +164,7 @@ class Messages_model extends CI_Model
 				$jsonRecord->sent = $sentDate->format('d/m/Y H:i:s');
 				$jsonRecord->status = $receivedMessage->status;
 				$jsonRecord->statusPersonId = $receivedMessage->statuspersonid;
+				$jsonRecord->token = $receivedMessage->token;
 
 				$jsonArray[] = $jsonRecord;
 			}
@@ -143,12 +181,6 @@ class Messages_model extends CI_Model
 	 */
 	public function prepareAjaxReadSent()
 	{
-		// Name and surname of the logged user
-		$loggedUserName = getAuthFirstname().' '.getAuthSurname();
-
-		// If empty then use a hard coded one
-		if (isEmptyString($loggedUserName)) $loggedUserName = 'Me';
-
 		// Retrieves sent messages from the logged user
 		$sentMessagesResult = $this->RecipientModel->getSentMessages(getAuthPersonId());
 		if (isError($sentMessagesResult)) return $sentMessagesResult; // If an error occurred return it
@@ -164,11 +196,20 @@ class Messages_model extends CI_Model
 				$jsonRecord->message_id = $sentMessage->message_id;
 				$jsonRecord->subject = $sentMessage->subject;
 				$jsonRecord->body = $sentMessage->body;
-				$jsonRecord->to = $sentMessage->vorname.' '.$sentMessage->nachname;
 				$sentDate = new DateTime($sentMessage->sent);
 				$jsonRecord->sent = $sentDate->format('d/m/Y H:i:s');
 				$jsonRecord->status = $sentMessage->status;
 				$jsonRecord->statusPersonId = $sentMessage->statuspersonid;
+				$jsonRecord->token = $sentMessage->token;
+
+				if ($sentMessage->person_id == $this->config->item(MessageLib::CFG_SYSTEM_PERSON_ID))
+				{
+					$jsonRecord->to = $sentMessage->sg;
+				}
+				else
+				{
+					$jsonRecord->to = $sentMessage->vorname.' '.$sentMessage->nachname;
+				}
 
 				$jsonArray[] = $jsonRecord;
 			}

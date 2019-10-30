@@ -57,11 +57,13 @@ class Recipient_model extends DB_Model
 						m.oe_kurzbz,
 						s.status,
 						s.statusinfo,
-						s.insertamum as statusamum
+						s.insertamum as statusamum,
+						b.uid
 				  FROM public.tbl_msg_recipient r JOIN public.tbl_msg_message m USING (message_id)
 						JOIN (
 							SELECT * FROM public.tbl_msg_status WHERE status < ? ORDER BY insertamum DESC, status DESC
-						) s ON (r.message_id = s.message_id AND r.person_id = s.person_id)
+						) s ON (r.message_id = s.message_id AND r.person_id = s.person_id),
+						LEFT JOIN public.tbl_benutzer b USING(person_id)
 				 WHERE r.token = ?
 				 LIMIT 1';
 
@@ -217,7 +219,8 @@ class Recipient_model extends DB_Model
 						 mr.token,
 						 mm.subject,
 						 mm.body,
-						 mr.sentinfo
+						 mr.sentinfo,
+						 mr.oe_kurzbz
 					FROM public.tbl_msg_recipient mr INNER JOIN public.tbl_msg_message mm USING (message_id)
 						LEFT JOIN (
 							SELECT person_id, kontakt FROM public.tbl_kontakt WHERE zustellung = true AND kontakttyp = ?
@@ -315,11 +318,12 @@ class Recipient_model extends DB_Model
 						p.vorname,
 						p.nachname,
 						MAX(ms.status) AS status,
-						ms.person_id AS statusPersonId
+						ms.person_id AS statusPersonId,
+						mr.token
 				  FROM public.tbl_msg_recipient mr
 				  JOIN public.tbl_msg_message mm ON (mm.message_id = mr.message_id)
 				  JOIN public.tbl_msg_status ms ON (ms.message_id = mr.message_id AND ms.person_id = mr.person_id)
-				  JOIN public.tbl_person p ON (p.person_id = mr.person_id)
+				  JOIN public.tbl_person p ON (p.person_id = mm.person_id)
 				 WHERE mr.person_id = ?
 				   AND mr.sent IS NOT NULL
 				   AND mr.sentinfo IS NULL
@@ -330,7 +334,8 @@ class Recipient_model extends DB_Model
 						mr.sent,
 						p.vorname,
 						p.nachname,
-						ms.person_id
+						ms.person_id,
+						mr.token
 				 UNION
 				-- Messages sent to a person that belongs to the recipient organisation unit
 				SELECT mrou.message_id,
@@ -341,14 +346,21 @@ class Recipient_model extends DB_Model
 						pr.vorname,
 						pr.nachname,
 						MAX(ms.status) AS status,
-						ms.person_id AS statusPersonId
+						ms.person_id AS statusPersonId,
+						mrou.token
 				  FROM public.tbl_person p
 				  JOIN public.tbl_benutzer b ON (b.person_id = p.person_id)
-				  JOIN (SELECT uid, oe_kurzbz FROM public.tbl_benutzerfunktion WHERE funktion_kurzbz IN ?) bf ON (bf.uid = b.uid)
+				  JOIN (
+					  	SELECT uid, oe_kurzbz
+						  FROM public.tbl_benutzerfunktion
+						 WHERE (datum_von IS NULL OR datum_von <= NOW())
+					  	   AND (datum_bis IS NULL OR datum_bis >= NOW())
+						   AND funktion_kurzbz IN ?
+						) bf ON (bf.uid = b.uid)
 				  JOIN public.tbl_msg_recipient mrou ON (mrou.oe_kurzbz = bf.oe_kurzbz)
 				  JOIN public.tbl_msg_message mm ON (mm.message_id = mrou.message_id)
 				  JOIN public.tbl_msg_status ms ON (ms.message_id = mrou.message_id AND ms.person_id = mrou.person_id)
-				  JOIN public.tbl_person pr ON (pr.person_id = mrou.person_id)
+				  JOIN public.tbl_person pr ON (pr.person_id = mm.person_id)
 				 WHERE p.person_id = ?
 				   AND mrou.sent IS NOT NULL
 				   AND mrou.sentinfo IS NULL
@@ -359,10 +371,76 @@ class Recipient_model extends DB_Model
 						mrou.sent,
 						pr.vorname,
 						pr.nachname,
-						ms.person_id
+						ms.person_id,
+						mrou.token
 			  ORDER BY sent DESC';
 
 		return $this->execQuery($sql, array($person_id, $functions, $person_id));
+	}
+
+	/**
+	 * Gets only the recieved messages from an organisation unit where this person plays a role given by the parameter functions
+	 */
+	public function getReceivedMessagesByOE($oe_kurzbz, $functions, $kontaktType)
+	{
+		// Messages sent to a person that belongs to the recipient organisation unit
+		$sql = 'SELECT mm.message_id,
+						mm.subject,
+						mm.body,
+						mrou.person_id as receiver_id,
+						mrou.sentinfo,
+						mrou.token,
+						mrou.oe_kurzbz,
+						ks.kontakt as sender,
+						kr.kontakt as receiver,
+						mu.mitarbeiter_uid as employeeContact,
+						mb.mitarbeiter_uid as senderemployeeContact
+				  FROM public.tbl_benutzer b
+				  JOIN (
+					  	SELECT uid, oe_kurzbz
+						  FROM public.tbl_benutzerfunktion
+						 WHERE (datum_von IS NULL OR datum_von <= NOW())
+					  	   AND (datum_bis IS NULL OR datum_bis >= NOW())
+						   AND funktion_kurzbz IN ?
+						) bf ON (bf.uid = b.uid)
+				  JOIN public.tbl_msg_recipient mrou ON (mrou.oe_kurzbz = bf.oe_kurzbz)
+				  JOIN public.tbl_msg_message mm ON (mm.message_id = mrou.message_id)
+				  JOIN public.tbl_msg_status ms ON (ms.message_id = mrou.message_id AND ms.person_id = mrou.person_id)
+				  JOIN public.tbl_person pr ON (pr.person_id = mm.person_id)
+				  LEFT JOIN (
+					  SELECT person_id, kontakt FROM public.tbl_kontakt WHERE zustellung = true AND kontakttyp = ?
+				  ) ks ON (ks.person_id = mm.person_id)
+				  LEFT JOIN (
+					  SELECT person_id, kontakt FROM public.tbl_kontakt WHERE zustellung = true AND kontakttyp = ?
+				  ) kr ON (kr.person_id = mrou.person_id)
+				  LEFT JOIN (
+					  SELECT b.person_id,
+							 m.mitarbeiter_uid
+						FROM public.tbl_benutzer b INNER JOIN public.tbl_mitarbeiter m ON(b.uid = m.mitarbeiter_uid)
+					   WHERE b.aktiv = TRUE
+				  ) mu ON (mu.person_id = mrou.person_id)
+				  LEFT JOIN (
+					  SELECT b.person_id,
+							 m.mitarbeiter_uid
+						FROM public.tbl_benutzer b INNER JOIN public.tbl_mitarbeiter m ON(b.uid = m.mitarbeiter_uid)
+					   WHERE b.aktiv = TRUE
+				  ) mb ON (mb.person_id = mm.person_id)
+				 WHERE bf.oe_kurzbz = ?
+				   AND mrou.sent IS NULL
+				   AND mrou.sentinfo IS NOT NULL
+			  GROUP BY mm.message_id,
+	  						mm.subject,
+	  						mm.body,
+	  						mrou.person_id,
+	  						mrou.sentinfo,
+	  						mrou.token,
+	  						mrou.oe_kurzbz,
+	  						ks.kontakt,
+	  						kr.kontakt,
+	  						mu.mitarbeiter_uid,
+	  						mb.mitarbeiter_uid';
+
+		return $this->execQuery($sql, array($functions, $kontaktType, $kontaktType, $oe_kurzbz));
 	}
 
 	/**
@@ -375,14 +453,18 @@ class Recipient_model extends DB_Model
 						mm.subject,
 						mm.body,
 						mr.sent,
+						p.person_id,
 						p.vorname,
 						p.nachname,
 						MAX(ms.status) AS status,
-						ms.person_id AS statusPersonId
+						ms.person_id AS statusPersonId,
+						sg.bezeichnung AS sg,
+						mr.token
 				  FROM public.tbl_msg_message mm
 				  JOIN public.tbl_msg_recipient mr ON (mr.message_id = mm.message_id)
 				  JOIN public.tbl_msg_status ms ON (ms.message_id = mm.message_id AND mr.person_id = mr.person_id)
 				  JOIN public.tbl_person p ON (p.person_id = mr.person_id)
+			 LEFT JOIN public.tbl_studiengang sg ON (sg.oe_kurzbz = mr.oe_kurzbz)
 				 WHERE mm.person_id = ?
 				   AND mr.sent IS NOT NULL
 				   AND mr.sentinfo IS NULL
@@ -391,9 +473,12 @@ class Recipient_model extends DB_Model
 						mm.subject,
 						mm.body,
 						mr.sent,
+						p.person_id,
 						p.vorname,
 						p.nachname,
-						ms.person_id
+						ms.person_id,
+						sg.bezeichnung,
+						mr.token
 			  ORDER BY mr.sent DESC';
 
 		return $this->execQuery($sql, array($person_id));

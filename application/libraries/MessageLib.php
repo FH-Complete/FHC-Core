@@ -272,10 +272,17 @@ class MessageLib
 			// If NOT found then insert the read status
 			if (!$found)
 			{
+				$uid = null;
+				if (!isEmptyString($messageTokenResult[0]->uid))
+				{
+					$uid = $messageTokenResult[0]->uid;
+				}
+
 				$statusData = array(
 					'message_id' => getData($messageTokenResult)[0]->message_id,
 					'person_id' => getData($messageTokenResult)[0]->receiver_id,
-					'status' => MSG_STATUS_READ
+					'status' => MSG_STATUS_READ,
+					'insertvon' => $uid
 				);
 
 				$messageTokenResultIns = $this->_ci->MsgStatusModel->insert($statusData);
@@ -383,6 +390,15 @@ class MessageLib
 		// Starts database transaction
 		$this->_ci->db->trans_start(false);
 
+		$this->_ci->load->model('person/Benutzer_model', 'BenutzerModel');
+
+		$uid = null;
+		$benutzerDB = $this->_ci->BenutzerModel->loadWhere(array('person_id' => $sender_id));
+		if (hasData($benutzerDB))
+		{
+			$uid = getData($benutzerDB)[0]->uid;
+		}
+
 		// Store message information in tbl_msg_message
 		$messageData = array(
 			'person_id' => $sender_id,
@@ -413,7 +429,8 @@ class MessageLib
 				$statusData = array(
 					'message_id' => $messageId,
 					'person_id' => $receiver_id,
-					'status' => MSG_STATUS_UNREAD
+					'status' => MSG_STATUS_UNREAD,
+					'insertvon' => $uid
 				);
 				$saveMessageResult = $this->_ci->MsgStatusModel->insert($statusData);
 			}
@@ -511,7 +528,17 @@ class MessageLib
 		if (isError($messageResult)) return $messageResult; // if an error occured then return it
 		if (!hasData($messageResult)) return error('No data found with the given message id'); // if no data found then return an error
 
-		return $this->_sendNotice(getData($messageResult));
+		$messages = getData($messageResult);
+		if (count($messages) == 1 && $messages[0]->receiver_id == $this->_ci->config->item(self::CFG_SYSTEM_PERSON_ID))
+		{
+			$messages = $this->_ci->RecipientModel->getReceivedMessagesByOE(
+				$messages[0]->oe_kurzbz,
+				$this->_ci->config->item(MessageLib::CFG_OU_RECEIVERS),
+				self::EMAIL_KONTAKT_TYPE
+			);
+		}
+
+		return $this->_sendNotice($messages);
 	}
 
 	/**
@@ -614,11 +641,13 @@ class MessageLib
 		// Checks if sender is fine
 		$sender = $this->_getSender($sender_id);
 		if (!hasData($sender)) return $sender;
+
 		// Checks if the sender and receiver organisation unit are valid
 		if (($receiversOU != null && !$this->_ouExists($receiversOU)) || ($senderOU != null && !$this->_ouExists($senderOU)))
 		{
 			return error('The given organisation unit is not valid', MSG_ERR_INVALID_OU);
 		}
+
 		// Checks subjects
 		if (isEmptyString($subject)) return error('The given subject is an empty string', MSG_ERR_INVALID_SUBJECT);
 		// Checks body

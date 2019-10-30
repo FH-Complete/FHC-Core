@@ -529,13 +529,23 @@ class Prestudent_model extends DB_Model
 	 */
 	public function getOrganisationunitsByPersonId($person_id)
 	{
-		$query = 'SELECT o.oe_kurzbz, o.bezeichnung
+		$query = 'SELECT o.oe_kurzbz,
+						sg.bezeichnung,
+						ps.prestudent_id
 					FROM public.tbl_prestudent p
-			  		JOIN public.tbl_studiengang s USING(studiengang_kz)
+			  		JOIN public.tbl_studiengang sg USING(studiengang_kz)
 					JOIN public.tbl_organisationseinheit o USING(oe_kurzbz)
+			   LEFT JOIN (
+				   			SELECT prestudent_id
+							  FROM public.tbl_prestudentstatus
+							 WHERE bestaetigtam IS NOT NULL
+							   AND status_kurzbz = \'Interessent\'
+						) ps USING(prestudent_id)
 				   WHERE p.person_id = ?
-				GROUP BY o.oe_kurzbz, o.bezeichnung
-				ORDER BY o.bezeichnung';
+				GROUP BY o.oe_kurzbz,
+						sg.bezeichnung,
+						ps.prestudent_id
+				ORDER BY sg.bezeichnung';
 
 		return $this->execQuery($query, array($person_id));
 	}

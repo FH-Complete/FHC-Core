@@ -18,6 +18,14 @@ class MessageClient extends FHC_Controller
 
 		// Loads model CLMessagesModel which contains the GUI logic
 		$this->load->model('CL/Messages_model', 'CLMessagesModel');
+
+		// Phrases used in loaded views
+		$this->loadPhrases(
+			array(
+				'global',
+				'ui'
+			)
+		);
 	}
 
 	/**
@@ -36,6 +44,17 @@ class MessageClient extends FHC_Controller
 	{
 		// Loads the view to write a message
 		$this->load->view('system/messages/ajaxWrite', $this->CLMessagesModel->prepareAjaxWrite());
+	}
+
+	/**
+	 * Starts the GUI used to reply to a received personal message
+	 */
+	public function writeReply()
+	{
+		$token = $this->input->get('token');
+
+		// Loads the view to reply to a message
+		$this->load->view('system/messages/ajaxWriteReply', $this->CLMessagesModel->prepareAjaxWriteReply($token));
 	}
 
 	/**
@@ -64,6 +83,20 @@ class MessageClient extends FHC_Controller
 		$body = $this->input->post('body');
 
 		$this->outputJson($this->CLMessagesModel->sendToOrganisationUnit($receiverOU, $subject, $body));
+	}
+
+	/**
+	 * Sends a message to an organisation unit
+	 */
+	public function sendMessageReply()
+	{
+		$receiver_id = $this->input->post('receiver_id');
+		$relationmessage_id = $this->input->post('relationmessage_id');
+		$token = $this->input->post('token');
+		$subject = $this->input->post('subject');
+		$body = $this->input->post('body');
+
+		$this->outputJson($this->CLMessagesModel->sendReply($receiver_id, $subject, $body, $relationmessage_id, $token));
 	}
 
 	/**

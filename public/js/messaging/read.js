@@ -4,6 +4,7 @@
 
 // Global variable that contains tha tabulator instance
 var tableMessageLst;
+var selectedToggleMessage = "received";
 
 /**
  * Use DialogLib to display a Generic error
@@ -40,7 +41,14 @@ function getSentMessages()
  */
 function changeTinyMCE(row)
 {
-	tinyMCE.get("readMessagePanel").setContent(row.getData().body);
+	if (row == null)
+	{
+		tinyMCE.get("readMessagePanel").setContent('');
+	}
+	else
+	{
+		tinyMCE.get("readMessagePanel").setContent(row.getData().body);
+	}
 }
 
 /**
@@ -50,8 +58,8 @@ function changeTinyMCE(row)
  */
 function rowClick(e, row)
 {
-	// If the message is unread
-	if (row.getData().status == "0")
+	// If in received mode and the message is not unread
+	if (selectedToggleMessage == "received" && row.getData().status == "0")
 	{
 		FHC_AjaxClient.ajaxCallPost(
 			FHC_JS_DATA_STORAGE_OBJECT.called_path + "/setMessageRead",
@@ -64,7 +72,8 @@ function rowClick(e, row)
 
 					if (FHC_AjaxClient.isSuccess(data))
 					{
-						rowFormatter(row, "normal");
+						rowFormatter(row, "normal"); // format row
+						row.getData().status = "1"; // update status to read
 					}
 					else
 					{
@@ -77,6 +86,12 @@ function rowClick(e, row)
 		);
 	}
 
+	// If NOT in send mode
+	if (selectedToggleMessage == "received")
+	{
+		$("#replyMessage").show();
+	}
+
 	changeTinyMCE(row); // Change TinyMCE content
 }
 
@@ -85,8 +100,19 @@ function rowClick(e, row)
  */
 function toggleMessages()
 {
-	$(this)[0].id == "received" ? getReceivedMessages() : getSentMessages();
+	if ($(this)[0].id == "received")
+	{
+		selectedToggleMessage = "received";
+		getReceivedMessages();
+	}
+	else
+	{
+		selectedToggleMessage = "send";
+		$("#replyMessage").hide();
+		getSentMessages();
+	}
 
+	changeTinyMCE(null); // clean tinymce
 	tableMessageLst.redraw(); // redraw table after its content is changed
 }
 
@@ -119,13 +145,19 @@ function _getMessages(getMessagesURL)
 
 				if (FHC_AjaxClient.hasData(data))
 				{
-					var messages = FHC_AjaxClient.getData(data);
+					var messages = null;
+
+					try
+					{
+						messages = JSON.parse(FHC_AjaxClient.getData(data));
+					}
+					catch (syntaxError) {}
 
 					if ($.isArray(messages))
 					{
 						try
 						{
-							tableMessageLst.replaceData(JSON.parse());
+							tableMessageLst.replaceData(messages);
 						}
 						catch (syntaxError)
 						{
@@ -141,9 +173,38 @@ function _getMessages(getMessagesURL)
 }
 
 /**
- * Start!
+ * Open new tab/window to write a new message
+ */
+function writeNewMessage()
+{
+	window.open("write", "_blank");
+}
+
+/**
+ * Open new tab/window to reply to a received message
+ */
+function replyMessage()
+{
+	var selectedMessages = tableMessageLst.getSelectedData();
+
+	if ($.isArray(selectedMessages))
+	{
+		var selectedMessage = selectedMessages[0];
+
+		window.open("writeReply?token=" + selectedMessage.token, "_blank");
+	}
+	else //
+	{
+		FHC_DialogLib.alertInfo("Please select a message");
+	}
+}
+
+/**
+ * Start me up!
  */
 $(document).ready(function () {
+
+	$("#replyMessage").hide();
 
 	// TinyMCE initialization
 	tinymce.init({
@@ -153,14 +214,15 @@ $(document).ready(function () {
 		toolbar: false,
 		statusbar: false,
 		readonly: 1,
-		autoresize_min_height: 200,
+		autoresize_min_height: 300,
 		autoresize_bottom_margin: 0
 	});
 
 	// Tabulator initialization
 	tableMessageLst = new Tabulator("#lstMessagesPanel", {
-		height: "400px",
+		height: "270px",
 		layout: "fitColumns",
+		selectable: 1,
 		layoutColumnsOnNewData: true,
 		columns: [
 			{title: "Subject", field: "subject", responsive: 0},
@@ -174,6 +236,12 @@ $(document).ready(function () {
 
 	// Bind radio buttons click event with toggleMessages function
 	$("#toggleMessages input").click(toggleMessages);
+
+	// Bind write a new message button
+	$("#writeMessage").click(writeNewMessage);
+
+	// Bind reply to a message button
+	$("#replyMessage").click(replyMessage);
 
 	// First retrieve the received message and populate the tabulator
 	getReceivedMessages();
