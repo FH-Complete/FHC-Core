@@ -244,8 +244,15 @@ function checkWunschUid()
 	uid = $("#wunschUid").val().toLowerCase();
 	uid = uid.replace(/\s+/g, '');
 	uid = uid.replace('-', '');
-
 	$("#wunschUid").val(uid);
+
+	// Check ob uid Sonderzeichen (alles außer a-z und 0-9) enthält
+	if (/^[a-z0-9]+$/i.test(uid) === false)
+	{
+		$("#checkUID").css( "color", "red" );
+		$("#checkUID").html('Die UID darf keine Sonderzeichen enthalten');
+		return false;
+	}
 
 	if (uid != '')
 	{
@@ -265,11 +272,13 @@ function checkWunschUid()
 				{
 					$("#checkUID").css( "color", "red" );
 					$("#checkUID").html('UID bereits vorhanden');
+					return false;
 				}
 				else
 				{
 					$("#checkUID").css( "color", "green" );
 					$("#checkUID").html('UID verfügbar');
+					return true;
 				}
 			},
 			error: function(data)
@@ -930,7 +939,7 @@ if(($geburtsdatum=='' && $vorname=='' && $nachname=='') || $geburtsdatum_error)
 else
 {
 	echo '<input type="submit" name="showagain" value="Vorschlag laden">';
-	echo '<input type="submit" name="save" value="Speichern"></td></tr>';
+	echo '<input type="submit" name="save" value="Speichern" onclick="return checkWunschUid()"></td></tr>';
 }
 
 echo '
