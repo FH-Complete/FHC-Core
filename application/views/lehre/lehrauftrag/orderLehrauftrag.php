@@ -232,6 +232,9 @@ $this->load->view(
         var betrag = parseFloat(row.getData().betrag);
         var vertrag_betrag = parseFloat(row.getData().vertrag_betrag);
 
+        // console.log(betrag);
+        // console.log(vertrag_betrag);
+
         if (isNaN(betrag))
         {
             betrag = 0;
