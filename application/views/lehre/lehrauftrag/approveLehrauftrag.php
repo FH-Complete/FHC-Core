@@ -681,8 +681,7 @@ $(function() {
                 return {
                     'row_index': data.row_index,
                     'mitarbeiter_uid' : data.mitarbeiter_uid,
-                    'vertrag_id' : data.vertrag_id,
-                    'lv_oe_kurzbz' : data.lv_oe_kurzbz
+                    'vertrag_id' : data.vertrag_id
                 }
             });
 

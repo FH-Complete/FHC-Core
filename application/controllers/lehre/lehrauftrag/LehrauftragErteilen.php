@@ -128,13 +128,37 @@ class LehrauftragErteilen extends Auth_Controller
             {
                 $mitarbeiter_uid = (isset($lehrauftrag->mitarbeiter_uid)) ? $lehrauftrag->mitarbeiter_uid : null;
                 $vertrag_id = (isset($lehrauftrag->vertrag_id)) ? $lehrauftrag->vertrag_id : null;
-                $lv_oe_kurzbz = (isset($lehrauftrag->lv_oe_kurzbz)) ? $lehrauftrag->lv_oe_kurzbz : null;
 
-                // Check if user is entitled to approve this Lehrauftrag
+                $lv_oe_kurzbz = null;
+
+                // Retrieve organisational unit to which the lehrveranstaltung of the contract belongs to
+                // * first get lehrveranstaltung
+                $result = $this->VertragModel->getLehreinheitData($vertrag_id, 'lehrveranstaltung_id');
+                if (hasData($result))
+                {
+                    // * then get corresponding organisational unit
+                    $this->load->model('education/Lehrveranstaltung_model', 'Lehrveranstaltung_model');
+                    $result = $this->LehrveranstaltungModel->load($result->retval[0]->lehrveranstaltung_id);
+                    if (hasData($result))
+                    {
+                        $lv_oe_kurzbz = $result->retval[0]->oe_kurzbz;
+                    }
+                    elseif (isError(($result)))
+                    {
+                        show_error($result->retval);
+                    }
+                }
+                elseif (isError($result))
+                {
+                    show_error($result->retval);
+                }
+
+                // Check if user is entitled to approve this lehrauftrag (by permission and organisational unit)
                 if (!$this->permissionlib->isBerechtigt(self::BERECHTIGUNG_LEHRAUFTRAG_ERTEILEN, 'suid', $lv_oe_kurzbz)){
                     show_error('Keine Erteilberechtigung für diese Organisationseinheit: '. $lv_oe_kurzbz);
                 }
 
+                // Approve lehrauftrag by setting vertragsstatus to 'erteilt'
                 $result = $this->VertragvertragsstatusModel->setStatus($vertrag_id, $mitarbeiter_uid, 'erteilt');
 
                 if ($result->retval) {
