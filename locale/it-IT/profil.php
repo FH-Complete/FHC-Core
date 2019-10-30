@@ -15,6 +15,7 @@ $this->phrasen['profil/derUserIstInFolgendenVerteilern ']='';
 $this->phrasen['profil/email']='Email';
 $this->phrasen['profil/entlehnteBetriebsmittel']='';
 $this->phrasen['profil/esWurdenKeineProfileGefunden']='Nessun profilo o più profili per l\'utente richiesto';
+$this->phrasen['profil/keinGueltigesProfil']='';
 $this->phrasen['profil/faxTw']='fax';
 $this->phrasen['profil/fhausweisAbholbereitAmEmpfangAb']='';
 $this->phrasen['profil/fhausweisGedrucktAm']='';
@@ -58,5 +59,7 @@ $this->phrasen['profil/wendenSieSichAn']='';
 $this->phrasen['profil/zeitsperrenVon']='';
 $this->phrasen['profil/zeitwuensche']='';
 $this->phrasen['profil/zustaendigeAssistenz']='';
-
+$this->phrasen['profil/wochenstunden']='';
+$this->phrasen['profil/vertragsstunden']='';
+$this->phrasen['profil/zukuenftigeFunktionen']='';
 ?>

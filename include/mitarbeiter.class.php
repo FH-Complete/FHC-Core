@@ -867,7 +867,7 @@ class mitarbeiter extends benutzer
 	 * Nachname, Vorname, UID $filter enthaelt
 	 * @param $filter
 	 */
-	public function search($filter, $limit=null, $aktiv=true)
+	public function search($filter, $limit=null, $aktiv=true, $positivePersonalnr=false)
 	{
 		$qry = "SELECT vorname, nachname, titelpre, titelpost, kurzbz, vornamen, uid
 			FROM campus.vw_mitarbeiter
@@ -882,7 +882,6 @@ class mitarbeiter extends benutzer
 		if(!is_null($limit) && is_numeric($limit))
 			$qry.=" LIMIT ".$limit;
 
-		//echo $qry;
 		if($this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object())

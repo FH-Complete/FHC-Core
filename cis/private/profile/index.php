@@ -66,6 +66,9 @@ if (isset($_GET['uid']) && $_GET['uid'] != $uid)
 	$uid = stripslashes($_GET['uid']);
 	$ansicht = true;
 }
+
+$adminOrOwnUser = $rechte->isBerechtigt('admin') || !$ansicht;
+
 if ($rechte->isBerechtigt('basis/kontakt'))
 	$ansicht = false;
 
@@ -127,6 +130,9 @@ if (!$user->load($uid))
 
 if ($type == 'mitarbeiter')
 {
+	if (isset($user->personalnummer) && is_numeric($user->personalnummer) && (int)$user->personalnummer < 0)
+		die($p->t('profil/keinGueltigesProfil'));
+
 	$vorwahl = '';
 	$kontakt = new kontakt();
 	$kontakt->loadFirmaKontakttyp($user->standort_id,'telefon');
@@ -156,12 +162,7 @@ echo '<!DOCTYPE HTML>
 
 		$(document).ready(function()
 		{
-			$("#t1").tablesorter(
-			{
-				sortList: [[0,0]],
-				widgets: ["zebra"]
-			});
-			$("#t2").tablesorter(
+			$("#t1, #t2, #tfuture").tablesorter(
 			{
 				sortList: [[0,0]],
 				widgets: ["zebra"]
@@ -504,35 +505,54 @@ echo '<tr>
 if (!defined('CIS_PROFIL_FUNKTIONEN_ANZEIGEN') || CIS_PROFIL_FUNKTIONEN_ANZEIGEN)
 {
 	//Funktionen
-	$qry = "SELECT
+	$baseqry = "SELECT
 				*, tbl_benutzerfunktion.oe_kurzbz as oe_kurzbz, tbl_organisationseinheit.bezeichnung as oe_bezeichnung,
 				 tbl_benutzerfunktion.semester, tbl_benutzerfunktion.bezeichnung as bf_bezeichnung,
-				 tbl_benutzerfunktion.datum_von, tbl_benutzerfunktion.datum_bis
+       			 tbl_benutzerfunktion.wochenstunden, tbl_benutzerfunktion.datum_von, tbl_benutzerfunktion.datum_bis
 			FROM
 				public.tbl_benutzerfunktion
 				JOIN public.tbl_funktion USING(funktion_kurzbz)
 				JOIN public.tbl_organisationseinheit USING(oe_kurzbz)
 			WHERE
-				uid=".$db->db_add_param($uid)." AND
-				(tbl_benutzerfunktion.datum_bis is null OR tbl_benutzerfunktion.datum_bis>=now())";
+				uid=".$db->db_add_param($uid);
 
-	if ($result_funktion = $db->db_query($qry))
+	$currfunkqry = $baseqry . " AND ((tbl_benutzerfunktion.datum_bis is null OR tbl_benutzerfunktion.datum_bis>=now())
+	AND (tbl_benutzerfunktion.datum_von is null OR tbl_benutzerfunktion.datum_von<=now()))";
+	$futurefunkqry = $baseqry . " AND (tbl_benutzerfunktion.datum_von>now())";
+
+	printFunctionsTable($currfunkqry, 'profil/funktionen', 't1', true);
+	printFunctionsTable($futurefunkqry, 'profil/zukuenftigeFunktionen', 'tfuture');
+}
+
+/**
+ * Print html table containing user functions.
+ * @param $query string execute for getting data
+ * @param $tableid string html table id
+ * @param $showVertragsstunden bool show Vertragsstunden sum near Wochenstunden sum
+ */
+function printFunctionsTable($query, $headingphrase, $tableid, $showVertragsstunden = false)
+{
+	global $db, $p, $datum_obj, $uid, $adminOrOwnUser;
+
+	if ($result_funktion = $db->db_query($query))
 	{
 		if ($db->db_num_rows($result_funktion) > 0)
 		{
-			echo '<b>'.$p->t('profil/funktionen').'</b>
-			<table class="tablesorter" id="t1">
+			echo '<b>'.$p->t($headingphrase).'</b>';
+			echo '
+			<table class="tablesorter" id="'.$tableid.'">
 				<thead>
 					<tr>
 						<th>'.$p->t('global/bezeichnung').'</th>
 						<th>'.$p->t('global/organisationseinheit').'</th>
-						<th>'.$p->t('global/semester').'</th>
-						<th>'.$p->t('global/institut').'</th>
 						<th>'.$p->t('profil/gueltigvon').'</th>
-						<th>'.$p->t('profil/gueltigbis').'</th>
-					</tr>
+						<th>'.$p->t('profil/gueltigbis').'</th>'.
+						($adminOrOwnUser ? '<th>'.$p->t('profil/wochenstunden').'</th>' : '').
+					'</tr>
 				</thead>
 			<tbody>';
+
+			$wochenstunden_sum = 0.00;
 
 			while($row_funktion = $db->db_fetch_object($result_funktion))
 			{
@@ -544,13 +564,50 @@ if (!defined('CIS_PROFIL_FUNKTIONEN_ANZEIGEN') || CIS_PROFIL_FUNKTIONEN_ANZEIGEN
 					echo ' - '.$row_funktion->bf_bezeichnung;
 				echo "</td>
 					<td nowrap>".$row_funktion->organisationseinheittyp_kurzbz.' '.$row_funktion->oe_bezeichnung."</td>
-					<td>$row_funktion->semester</td>
-					<td>$row_funktion->fachbereich_kurzbz</td>
 					<td>".$datum_obj->formatDatum($row_funktion->datum_von,'d.m.Y')."</td>
-					<td>".$datum_obj->formatDatum($row_funktion->datum_bis,'d.m.Y')."</td>
-				</tr>";
+					<td>".$datum_obj->formatDatum($row_funktion->datum_bis,'d.m.Y')."</td>".
+					($adminOrOwnUser ? "<td>".number_format($row_funktion->wochenstunden, 2)."</td>" : "").
+				"</tr>";
+
+				if(isset($row_funktion->wochenstunden) && $adminOrOwnUser)
+					$wochenstunden_sum += (double)$row_funktion->wochenstunden;
 			}
-			echo '</tbody></table><br>';
+			echo '</tbody><br>';
+
+			//vertragsstunden
+			if ($showVertragsstunden === true && $adminOrOwnUser)
+			{
+				$vertragsstunden = 0.00;
+				$qry = "SELECT sum(vertragsstunden) AS vertragsstdsumme from bis.tbl_bisverwendung
+						WHERE mitarbeiter_uid = ".$db->db_add_param($uid)."
+						AND (ende > now() OR ende IS NULL)";
+
+				if ($result_vertragsstd = $db->db_query($qry))
+				{
+					if ($db->db_num_rows($result_vertragsstd) > 0)
+					{
+						while($row_vertragsstd = $db->db_fetch_object($result_vertragsstd))
+						{
+							$vertragsstunden = $row_vertragsstd->vertragsstdsumme;
+						}
+					}
+				}
+			}
+
+			if ($adminOrOwnUser)
+			{
+				echo "
+				<tfoot>
+				<tr>
+					<td></td>
+					<td></td>
+					<th colspan ='2'>Summe Wochenstunden".($showVertragsstunden === true ? " (".$p->t('profil/vertragsstunden').")" : "")."</th>
+					<th style='padding: 4pt 0'>&nbsp;".number_format($wochenstunden_sum, 2).($showVertragsstunden === true ?
+							"&nbsp;(".number_format($vertragsstunden, 2).")" : "")."</th>
+				</tr>
+				</tfoot>";
+			}
+			echo "</table>";
 		}
 	}
 }
