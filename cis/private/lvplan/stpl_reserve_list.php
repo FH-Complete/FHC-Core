@@ -23,15 +23,15 @@ require_once('../../../config/cis.config.inc.php');
 require_once('../../../include/functions.inc.php');
 require_once('../../../include/datum.class.php');
 require_once('../../../include/benutzerberechtigung.class.php');
-require_once('../../../include/phrasen.class.php'); 
-require_once('../../../include/reservierung.class.php'); 
+require_once('../../../include/phrasen.class.php');
+require_once('../../../include/reservierung.class.php');
 
 if (!$db = new basis_db())
 	die($p->t('global/fehlerBeimOeffnenDerDatenbankverbindung'));
-	
-$sprache = getSprache(); 
-$p=new phrasen($sprache); 
-	
+
+$sprache = getSprache();
+$p=new phrasen($sprache);
+
 $uid = get_uid();
 
 if (isset($_GET['id']))
@@ -67,7 +67,7 @@ if(!$rechte->isBerechtigt('lehre/reservierung:begrenzt', null, 'suid'))
 		$reservierung = new reservierung();
 		if($reservierung->load($id))
 		{
-			if(($reservierung->uid==$uid || $reservierung->insertvon==$uid) && $rechte->isBerechtigt('lehre/reservierung', null, 'suid'))
+			if(($reservierung->uid==$uid || $reservierung->insertvon==$uid) && $rechte->isBerechtigt('lehre/reservierung:begrenzt', null, 'suid'))
 			{
 				if($reservierung->delete($id))
 					echo '<b>'.$p->t('lvplan/reservierungWurdeGeloescht').'</b><br>';
@@ -79,17 +79,17 @@ if(!$rechte->isBerechtigt('lehre/reservierung:begrenzt', null, 'suid'))
 				echo '<b>'.$p->t('global/keineBerechtigung').'</b><br>';
 			}
 		}
-		else 
+		else
 			echo '<b>'.$p->t('global/fehleraufgetreten').'!</b><br>';
 	}
 
 	//Aktuelle Reservierungen abfragen.
 	$datum = time();
 	$datum = date("Y-m-d",$datum);
-	
+
 	//EIGENE
-	$sql_query="SELECT * FROM campus.vw_reservierung 
-				WHERE datum>=".$db->db_add_param($datum)." 
+	$sql_query="SELECT * FROM campus.vw_reservierung
+				WHERE datum>=".$db->db_add_param($datum)."
  				AND (uid=".$db->db_add_param($uid)." OR insertvon=".$db->db_add_param($uid).")
 				ORDER BY  datum, titel, ort_kurzbz, stunde";
 
@@ -97,7 +97,7 @@ if(!$rechte->isBerechtigt('lehre/reservierung:begrenzt', null, 'suid'))
 		die($db->db_last_error());
 
 	$num_rows_res=$db->db_num_rows($erg_res);
-	
+
 	if ($num_rows_res>0)
 	{
 		echo $p->t('lvplan/eigeneReservierungen').':<br>';
@@ -135,7 +135,7 @@ if(!$rechte->isBerechtigt('lehre/reservierung:begrenzt', null, 'suid'))
 			echo '<td>'.$db->convert_html_chars($pers_uid).'</td>';
 			echo '<td>'.$db->convert_html_chars($beschreibung).'<a  name="liste'.$i.'">&nbsp;</a></td>';
 			$z=$i-1;
-			if (($pers_uid==$uid || $insertvon==$uid) && $rechte->isBerechtigt('lehre/reservierung', null, 'suid'))
+			if (($pers_uid==$uid || $insertvon==$uid) && $rechte->isBerechtigt('lehre/reservierung:begrenzt', null, 'suid'))
 				echo '<td><A class="Item" href="stpl_reserve_list.php?id='.$id.'#liste'.$z.'">Delete</A></td>';
 			echo '</tr>';
 		}
@@ -145,7 +145,7 @@ if(!$rechte->isBerechtigt('lehre/reservierung:begrenzt', null, 'suid'))
 
 	echo '<br><br>';
 	flush();
-	
+
 ?>
 </body>
 </html>

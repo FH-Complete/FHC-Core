@@ -38,7 +38,7 @@ else
 
 function ip_increment($ip = "")
 {
-	$ip = split("\.", $ip);
+	$ip = explode(".", $ip);
 
 	if($ip[3] > 0 && $ip[3] < 254)
 	{
@@ -67,7 +67,13 @@ function ip_increment($ip = "")
   <tr>
     <td class="cmscontent" rowspan="3" valign="top">
 		    <?php
-
+			if($is_lector || check_lektor($txtUID))
+			{
+				echo 'Die Notebook Registrierung steht nur für Studierende zur Verfügung.<br>
+				Wollen Sie als Mitarbeiter ein Notebook registrieren, wenden Sie sich bitte an den <a href="mailto:support@technikum-wien.at">Support</a>.';
+				echo '</td></tr></table></div></body></html>';
+				exit;
+			}
 			if (!$txtUID)
 				$txtUID = $user;
 			// wenn die übergebene UID nicht gleich dem
@@ -128,7 +134,7 @@ function ip_increment($ip = "")
 					{
 						$VLAN = $mfiles->match[1];
 						$fuser = $mfiles->match[2];
-						$fuser = split(" ", $fuser);
+						$fuser = explode(" ", $fuser);
 						$fuser = $fuser[0];
 						//hier könnte man noch eine email oder dgl. schicken
 						if ($fuser != $txtUID)
@@ -240,21 +246,21 @@ function ip_increment($ip = "")
 			else if ($error == 3)
 				echo '<h3>'.$p->t("notebookregister/MACadresseBereitsVerwendet").'.</h3>';
 
-		  	if(isset($mac_result) && $mac_result!='')
+		  	if(isset($mac_result) && $mac_result!=='')
 			{
-				if($mac_result == 0)
+				if($mac_result === 0)
 				{
 					echo '<h3>'.$p->t("notebookregister/MACadresseErfolgreichEingetragen").'.</h3>';
 				}
-				else if($mac_result == 1)
+				else if($mac_result === 1)
 				{
 					echo '<h3>'.$p->t("notebookregister/MACadresseErfolgreichGeaendert").'.</h3>';
 				}
-				else if($mac_result == 2)
+				else if($mac_result === 2)
 				{
 					echo '<h3>'.$p->t("notebookregister/MACadresseFehlerhaft").'.</h3>';
 				}
-				else if($mac_result == 3)
+				else if($mac_result === 3)
 				{
 					echo '<h3>'.$p->t("notebookregister/MACadresseNichtFreigeschalten").'.</h3>';
 				}

@@ -60,7 +60,7 @@ foreach ($mitarbeiterDAO->result as $key => $foo)
 
 array_multisort($nachname, SORT_ASC, $vorname, SORT_ASC, $mitarbeiterDAO->result);
 
-$spalte = array('titelpre', 'vorname', 'vornamen', 'nachname', 'titelpost','gebdatum','svnr','ersatzkennzeichen',
+$spalte = array('anrede','titelpre', 'vorname', 'vornamen', 'nachname', 'titelpost','gebdatum','svnr','ersatzkennzeichen',
 	'aktiv','personalnummer', 'kurzbz','fixangestellt','lektor');
 $anzSpalten = count($spalte);
 

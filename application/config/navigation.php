@@ -82,6 +82,13 @@ $config['navigation_header'] = array(
 					'expand' => true,
 					'sort' => 10,
 					'requiredPermissions' => 'admin:r'
+				),
+				'logsviewer' => array(
+					'link' => site_url('system/LogsViewer'),
+					'description' => 'Logs',
+					'expand' => true,
+					'sort' => 20,
+					'requiredPermissions' => 'system/developer:r'
 				)
 			)
 		)

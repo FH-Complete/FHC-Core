@@ -702,7 +702,7 @@ class wochenplan extends basis_db
 		$datum=$datum_mon=$this->datum;
 		$rechte = new benutzerberechtigung();
 		$rechte->getBerechtigungen($user_uid);
-		$reservberechtigt = $rechte->isBerechtigt('lehre/reservierung', null, 'suid');
+		$reservberechtigt = $rechte->isBerechtigt('lehre/reservierung:begrenzt', null, 'suid');
 
 		for ($i=1; $i<=TAGE_PRO_WOCHE; $i++)
 		{

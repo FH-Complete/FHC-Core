@@ -19,17 +19,25 @@ if (FHC_JS_DATA_STORAGE_OBJECT.called_method == 'index')
  *
  */
 var InfocenterPersonDataset = {
+	infocenter_studiensemester_variablename: 'infocenter_studiensemester',
 
 	/**
 	 * adds person table additional actions html (above and beneath it)
 	 */
-	appendTableActionsHtml: function()
+	appendTableActionsHtml: function(infocenter_studiensemester)
 	{
-		var currurl = window.location.href;
 		var url = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router + "/system/Messages/write";
 
 		var formHtml = '<form id="sendMsgsForm" method="post" action="'+ url +'" target="_blank"></form>';
 		$("#datasetActionsTop").before(formHtml);
+
+		var studienSemesterHtml = '<button class="btn btn-default btn-xs decStudiensemester">' +
+			'<i class="fa fa-chevron-left"></i>' +
+			'</button>&nbsp;' +
+			infocenter_studiensemester +
+			'&nbsp;<button class="btn btn-default btn-xs incStudiensemester">' +
+			'<i class="fa fa-chevron-right"></i>' +
+			'</button>';
 
 		var selectAllHtml =
 			'<a href="javascript:void(0)" class="selectAll">' +
@@ -42,7 +50,23 @@ var InfocenterPersonDataset = {
 			'<i class="fa fa-envelope"></i>&nbsp;Nachricht senden</a>';
 
 		var legendHtml = '<i class="fa fa-circle text-danger"></i> Gesperrt&nbsp;&nbsp;&nbsp;&nbsp;' +
-			'<i class="fa fa-circle text-info"></i> Geparkt';
+			'<i class="fa fa-circle text-info"></i> Geparkt&nbsp;&nbsp;&nbsp;&nbsp;' +
+			'<i class="fa fa-circle text-success"></i> Zurückgestellt';
+
+		// userdefined Semestervariable shown independently of personcount,
+		// it is possible to change the semester
+		$("#datasetActionsTop, #datasetActionsBottom").append(
+			"<div class='row'>"+
+			"<div class='col-xs-12 text-center'>"+studienSemesterHtml+"</div>"+
+			"</div><div class='h-divider'></div><hr class='studiensemesterline'>");
+
+		$("button.incStudiensemester").click(function() {
+			InfocenterPersonDataset.changeStudiensemesterUservar(1);
+		});
+
+		$("button.decStudiensemester").click(function() {
+			InfocenterPersonDataset.changeStudiensemesterUservar(-1);
+		});
 
 		var personcount = 0;
 
@@ -70,9 +94,9 @@ var InfocenterPersonDataset = {
 
 							$("#datasetActionsTop, #datasetActionsBottom").append(
 								"<div class='row'>"+
-								"<div class='col-xs-6'>" + selectAllHtml + "&nbsp;&nbsp;" + actionHtml + "</div>"+
-								"<div class='col-xs-4'>" + legendHtml + "</div>"+
-								"<div class='col-xs-2 text-right'>" +
+								"<div class='col-xs-4'>" + selectAllHtml + "&nbsp;&nbsp;" + actionHtml + "</div>"+
+								"<div class='col-xs-4 text-center'>" + legendHtml + "</div>"+
+								"<div class='col-xs-4 text-right'>" +
 								"<span class='filterTableDatasetCntFiltered'></span>" +
 								countHtml +	"</div>"+
 								"<div class='clearfix'></div>"+
@@ -125,8 +149,87 @@ var InfocenterPersonDataset = {
 				trs.find("input[name=PersonId\\[\\]]").prop("checked", false);
 			}
 		);
-	}
 
+		//make sure tablesorter local storage for homepage url with and without "/index" shares same values
+		$("#filterTableDataset").bind('filterEnd', function()
+		{
+			if (FHC_JS_DATA_STORAGE_OBJECT.called_method === 'index')
+			{
+				var pathname = window.location.pathname;
+				var storageobj = localStorage.getItem("tablesorter-filters");
+				var parsed = JSON.parse(storageobj);
+				var regex = new RegExp(/\/index(?!\.ci\.php)/);
+				if (regex.test(pathname))
+				{
+					parsed[pathname.replace(regex, "")] = parsed[pathname];
+				}
+				else
+				{
+					parsed[pathname + "/index"] = parsed[pathname];
+				}
+				storageobj = JSON.stringify(parsed);
+				localStorage.setItem("tablesorter-filters", storageobj);
+			}
+		});
+	},
+
+	/**
+	 * initializes change of the uservariable infocenter_studiensemesster, either
+	 * to next semester (change > 0) or previous semester (change < 0)
+	 */
+	changeStudiensemesterUservar: function(change)
+	{
+		FHC_AjaxClient.showVeil();
+
+		FHC_AjaxClient.ajaxCallPost(
+			'system/Variables/changeStudiensemesterVar',
+			{
+				'name': InfocenterPersonDataset.infocenter_studiensemester_variablename,
+				'change': change
+			},
+			{
+				successCallback: function(data, textStatus, jqXHR) {
+					if (FHC_AjaxClient.hasData(data))
+					{
+						// refresh filterwidget with page reload
+						FHC_FilterWidget.reloadDataset();
+					}
+				},
+				errorCallback: function(jqXHR, textStatus, errorThrown) {
+					FHC_AjaxClient.hideVeil();
+					alert(textStatus);//TODO dialoglib
+				}
+			}
+		);
+	},
+
+	/**
+	 * initializes call to get the Studiensemester user variable
+	 */
+	getStudiensemesterUservar: function(callback)
+	{
+		FHC_AjaxClient.ajaxCallGet(
+			'system/Variables/getVar',
+			{
+				'name': InfocenterPersonDataset.infocenter_studiensemester_variablename
+			},
+			{
+				successCallback: function(data, textStatus, jqXHR) {
+					if (FHC_AjaxClient.hasData(data))
+					{
+						if (typeof callback === "function")
+						{
+							var infocenter_studiensemester = FHC_AjaxClient.getData(data);
+							callback(infocenter_studiensemester[InfocenterPersonDataset.infocenter_studiensemester_variablename]);
+						}
+					}
+				},
+				errorCallback: function(jqXHR, textStatus, errorThrown) {
+					alert(textStatus);
+				}
+			}
+		);
+	}
 };
 
 /**
@@ -134,6 +237,6 @@ var InfocenterPersonDataset = {
  */
 $(document).ready(function() {
 
-	InfocenterPersonDataset.appendTableActionsHtml();
+	InfocenterPersonDataset.getStudiensemesterUservar(InfocenterPersonDataset.appendTableActionsHtml);
 
 });

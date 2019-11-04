@@ -339,7 +339,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 					<xsl:text>ordentliche/r Student/in </xsl:text>
 				</xsl:otherwise>
 			</xsl:choose>
-			folgende Lehrveranstaltung an der FH Technikum Wien absolviert:</text:p>
+			folgende Lehrveranstaltung absolviert:</text:p>
 			<text:p text:style-name="P19"/>
 			<table:table table:name="Tabelle1" table:style-name="Tabelle1">
 				<table:table-column table:style-name="Tabelle1.A"/>
@@ -404,8 +404,6 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 			</table:table>
 			<text:p text:style-name="P6"/>
 			<text:p text:style-name="P6"/>
-			<text:p text:style-name="P25">Notenstufen:<text:tab/>Sehr gut (1), Gut (2), Befriedigend (3), Genügend (4), Nicht genügend (5), mit Erfolg teilgenommen (met), nicht teilgenommen (nt), teilgenommen(tg),</text:p>
-			<text:p text:style-name="P25"><text:tab/>angerechnet (ar), nicht beurteilt (nb), bestanden (b), erfolgreich absolviert (ea), nicht erfolgreich absolviert (nea)</text:p>
 			<text:p text:style-name="P20"/>
 			<text:p text:style-name="P21"/>
 			<text:p text:style-name="P22">Nach erfolgreichem Abschluss sind die Studierenden in der Lage, ...</text:p>
@@ -437,7 +435,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 								<table:table-cell table:style-name="Tabelle3.A1" office:value-type="string">
 									<text:p text:style-name="P17">
 										<draw:frame xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0" xmlns:xlink="http://www.w3.org/1999/xlink" draw:style-name="fr3" draw:name="Bild1" text:anchor-type="char" svg:x="5.2cm" svg:width="3.51cm" svg:height="3.51cm" draw:z-index="1">
-											<draw:image xlink:href="Pictures/10000201000002290000022939997AEC.png" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/>
+											<draw:image xlink:href="Picture/fhcomplete-stempel.png" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/>
 										</draw:frame>
 										<xsl:value-of select="ort_datum" /></text:p>
 								</table:table-cell>

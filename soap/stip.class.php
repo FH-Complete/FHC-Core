@@ -399,7 +399,7 @@ class stip extends basis_db
 						public.tbl_prestudentstatus
 					WHERE
 						prestudent_id=".$this->db_add_param($prestudent_id, FHC_INTEGER)."
-						AND studiensemester_kurzbz=".$this->db_add_param($psem)."'";
+						AND studiensemester_kurzbz=".$this->db_add_param($psem);
 				if(!is_null($bisdatum))
 					$qrystatus.=" AND (tbl_prestudentstatus.datum<".$this->db_add_param($bisdatum).") ";
 				$qrystatus.=" ORDER BY datum desc, insertamum desc, ext_id desc;";
@@ -445,6 +445,8 @@ class stip extends basis_db
 	 */
 	public function getSemester($prestudent_id, $studiensemester_kurzbz, $bisdatum=null)
 	{
+		$sem = '';
+		
 		$qrystatus="
 			SELECT
 				*

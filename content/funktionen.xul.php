@@ -101,7 +101,7 @@ else
 				class="sortDirectionIndicator"
 				sort="rdf:http://www.technikum-wien.at/bnfunktion/rdf#uid"/>
 			<splitter class="tree-splitter"/>
-			<treecol id="funktion-treecol-benutzerfunktion_id" label="BenutzerfunktionID" flex="1" hidden="true"
+			<treecol id="funktion-treecol-benutzerfunktion_id" label="BenutzerInfunktionID" flex="1" hidden="true"
 				class="sortDirectionIndicator"
 				sort="rdf:http://www.technikum-wien.at/bnfunktion/rdf#benutzerfunktion_id"/>
 			<splitter class="tree-splitter"/>

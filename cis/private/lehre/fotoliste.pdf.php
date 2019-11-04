@@ -31,6 +31,7 @@ require_once('../../../include/lehrveranstaltung.class.php');
 require_once('../../../include/lehreinheit.class.php');
 require_once('../../../include/benutzerberechtigung.class.php');
 require_once('../../../include/studiensemester.class.php');
+require_once('../../../include/studiengang.class.php');
 require_once('../../../include/functions.inc.php');
 require_once('../../../include/erhalter.class.php');
 require_once('../../../include/datum.class.php');
@@ -57,6 +58,9 @@ isset($_GET['stsem']) ? $studiensemester = $_GET['stsem'] : die('Ein Studienseme
 
 $lv = new lehrveranstaltung();
 $lv->load($lvid);
+
+$stg = new studiengang();
+$stg->load($lv->studiengang_kz);
 
 $berechtigung = new benutzerberechtigung();
 $berechtigung->getBerechtigungen($user);
@@ -96,17 +100,15 @@ if ($lehreinheit != '')
 
 $gruppen_string = '';
 $gruppen_string_arr = array();
-$stg_typ = '';
+$stg_typ = $stg->typ;
+$stg_bezeichnung = $stg->bezeichnung;
 
 //structure overall lehrveranstaltungs data
 if ($result = $db->db_query($qry)) {
     while ($row = $db->db_fetch_object($result)) {
         //lehrveranstaltung
         $lv_bezeichnung = $row->lv_bezeichnung;
-        //studiengang
-        $stg_bezeichnung = $row->stg_bez;
-        //studiengangstyp
-        $stg_typ = $row->stg_typ;
+
         //collect all gruppenkürzel
         if ($row->gruppe_kurzbz == '')
             $gruppen_string = trim($row->kuerzel . '-' . $row->semester . $row->verband . $row->gruppe);
@@ -237,8 +239,8 @@ if ($result = $db->db_query($qry)) {
                 $row->foto_sperre = 'f';
 
             //create foto (if not locked by student OR if fotolist is created by admin or assistenz)
-            $foto_url = '';  
-			
+            $foto_url = '';
+
 			if ($row->foto_sperre == 'f' && $row->foto != '') {
                 $foto_src = $row->foto;
                 $foto_url = sys_get_temp_dir() . '/foto' . trim($row->matrikelnr) . '.jpg';

@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "e3de1eee238160400fb63f68735b4144",
-    "content-hash": "5b71e8a3c356d52e43d788eb6f018151",
+    "hash": "44a02c1e72626f05e682de2030c8adad",
+    "content-hash": "e0898c2ba3d18593851989029e54bedb",
     "packages": [
         {
             "name": "BlackrockDigital/startbootstrap-sb-admin-2",
@@ -47,7 +47,7 @@
             ],
             "description": "Defacto way to enable use of HTML5 sectioning elements in legacy Internet Explorer.",
             "homepage": "http://paulirish.com/2011/the-history-of-the-html5-shiv/",
-            "time": "2015-07-20 20:04:00"
+            "time": "2015-07-20T20:04:00+00:00"
         },
         {
             "name": "alvaro-prieto/colResizable",
@@ -72,6 +72,45 @@
             "type": "library"
         },
         {
+            "name": "chriskacerguis/codeigniter-restserver",
+            "version": "3.0.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/chriskacerguis/codeigniter-restserver.git",
+                "reference": "3a5ba0dffdebd24cc215ef714b72208c88304203"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/chriskacerguis/codeigniter-restserver/zipball/3a5ba0dffdebd24cc215ef714b72208c88304203",
+                "reference": "3a5ba0dffdebd24cc215ef714b72208c88304203",
+                "shasum": ""
+            },
+            "require": {
+                "codeigniter/framework": "^3.0.4",
+                "php": ">=5.4.0"
+            },
+            "type": "library",
+            "autoload": {
+                "classmap": [
+                    "application/libraries/Format.php",
+                    "application/libraries/REST_Controller.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Chris Kacerguis",
+                    "role": "Developer"
+                }
+            ],
+            "description": "REST Server for the CodeIgniter framework",
+            "homepage": "https://github.com/chriskacerguis/codeigniter-restserver",
+            "time": "2017-09-23 16:44:55"
+        },
+        {
             "name": "christianbach/tablesorter",
             "version": "1.0.1",
             "source": {
@@ -87,7 +126,7 @@
             },
             "type": "library",
             "notification-url": "https://packagist.org/downloads/",
-            "time": "2016-09-02 11:31:54"
+            "time": "2016-09-02T11:31:54+00:00"
         },
         {
             "name": "codeigniter/framework",
@@ -120,7 +159,7 @@
             ],
             "description": "The CodeIgniter framework",
             "homepage": "https://codeigniter.com",
-            "time": "2019-01-16 15:49:35"
+            "time": "2019-01-16T15:49:35+00:00"
         },
         {
             "name": "components/angular.js",
@@ -424,7 +463,7 @@
             ],
             "description": "Shim repository for Angular.js",
             "homepage": "http://angularjs.org",
-            "time": "2015-06-07 20:10:38"
+            "time": "2015-06-07T20:10:38+00:00"
         },
         {
             "name": "components/font-awesome",
@@ -459,7 +498,7 @@
                 "OFL-1.1"
             ],
             "description": "The iconic font designed for use with Twitter Bootstrap.",
-            "time": "2016-10-25 10:56:23"
+            "time": "2016-10-25T10:56:23+00:00"
         },
         {
             "name": "components/jquery",
@@ -501,7 +540,7 @@
             ],
             "description": "jQuery JavaScript Library",
             "homepage": "http://jquery.com",
-            "time": "2018-03-04 13:23:48"
+            "time": "2018-03-04T13:23:48+00:00"
         },
         {
             "name": "components/jqueryui",
@@ -586,7 +625,7 @@
                 }
             ],
             "description": "jQuery UI is a curated set of user interface interactions, effects, widgets, and themes built on top of the jQuery JavaScript Library. Whether you're building highly interactive web applications or you just need to add a date picker to a form control, jQuery UI is the perfect choice.",
-            "time": "2016-09-16 05:47:55"
+            "time": "2016-09-16T05:47:55+00:00"
         },
         {
             "name": "easyrdf/easyrdf",
@@ -648,7 +687,7 @@
                 "rdfa",
                 "sparql"
             ],
-            "time": "2015-02-27 09:45:49"
+            "time": "2015-02-27T09:45:49+00:00"
         },
         {
             "name": "fgelinas/timepicker",
@@ -657,6 +696,12 @@
                 "type": "git",
                 "url": "https://github.com/fgelinas/timepicker",
                 "reference": "9aebe413b784696639220bc36b7c1e8a30fda129"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://fgelinas.com/code/timepicker/releases/jquery-ui-timepicker-0.3.3.zip",
+                "reference": null,
+                "shasum": null
             },
             "type": "library"
         },
@@ -708,7 +753,7 @@
                 "faker",
                 "fixtures"
             ],
-            "time": "2018-07-12 10:23:15"
+            "time": "2018-07-12T10:23:15+00:00"
         },
         {
             "name": "joeldbirch/superfish",
@@ -850,7 +895,7 @@
                 "json",
                 "schema"
             ],
-            "time": "2014-08-25 02:48:14"
+            "time": "2014-08-25T02:48:14+00:00"
         },
         {
             "name": "kevinlebrun/colors.php",
@@ -901,7 +946,7 @@
                 "console",
                 "shell"
             ],
-            "time": "2018-05-30 08:34:23"
+            "time": "2018-05-30T08:34:23+00:00"
         },
         {
             "name": "kingsquare/json-schema-form",
@@ -935,17 +980,11 @@
                 }
             ],
             "description": "A framework-agnostic PHP Implementation for generating simple forms based on json-schema",
-            "time": "2014-07-10 12:27:19"
+            "time": "2014-07-10T12:27:19+00:00"
         },
         {
             "name": "ludo/jquery-treetable",
             "version": "3.2.0",
-            "dist": {
-                "type": "zip",
-                "url": "https://github.com/ludo/jquery-treetable/archive/3.2.0.zip",
-                "reference": null,
-                "shasum": null
-            },
             "type": "library"
         },
         {
@@ -997,7 +1036,7 @@
             "keywords": [
                 "markdown"
             ],
-            "time": "2015-03-01 12:03:08"
+            "time": "2015-03-01T12:03:08+00:00"
         },
         {
             "name": "ml/iri",
@@ -1044,7 +1083,7 @@
                 "uri",
                 "url"
             ],
-            "time": "2014-01-21 13:43:39"
+            "time": "2014-01-21T13:43:39+00:00"
         },
         {
             "name": "ml/json-ld",
@@ -1093,7 +1132,7 @@
                 "JSON-LD",
                 "jsonld"
             ],
-            "time": "2018-11-18 20:26:18"
+            "time": "2018-11-18T20:26:18+00:00"
         },
         {
             "name": "moment/momentjs",
@@ -1155,7 +1194,7 @@
                 "sorting",
                 "table"
             ],
-            "time": "2018-11-20 21:54:28"
+            "time": "2018-11-20T21:54:28+00:00"
         },
         {
             "name": "nategood/httpful",
@@ -1205,7 +1244,7 @@
                 "rest",
                 "restful"
             ],
-            "time": "2015-10-26 16:11:30"
+            "time": "2015-10-26T16:11:30+00:00"
         },
         {
             "name": "netcarver/textile",
@@ -1258,18 +1297,54 @@
                 "plaintext",
                 "textile"
             ],
+<<<<<<< HEAD
             "time": "2019-06-08 17:57:17"
+=======
+            "time": "2019-01-26T17:03:58+00:00"
+>>>>>>> master
         },
         {
             "name": "nicolaskruchten/pivottable",
-            "version": "2.15.0",
+            "version": "v2.23.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/nicolaskruchten/pivottable.git",
+                "reference": "a9cabee5382be0aaf0984ac906d9fa2e0376d2c1"
+            },
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/nicolaskruchten/pivottable/archive/v2.15.0.zip",
-                "reference": null,
-                "shasum": null
+                "url": "https://api.github.com/repos/nicolaskruchten/pivottable/zipball/a9cabee5382be0aaf0984ac906d9fa2e0376d2c1",
+                "reference": "a9cabee5382be0aaf0984ac906d9fa2e0376d2c1",
+                "shasum": ""
             },
-            "type": "library"
+            "require": {
+                "components/jquery": ">=1.9"
+            },
+            "type": "library",
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Nicolas Kruchten",
+                    "email": "nicolas@kruchten.com"
+                }
+            ],
+            "description": "Javascript Pivot Table (aka Pivot Grid, Pivot Chart, Cross-Tab) implementation with drag'n'drop.",
+            "homepage": "https://pivottable.js.org/",
+            "keywords": [
+                "crosstab",
+                "grid",
+                "jquery",
+                "jquery-plugin",
+                "pivot",
+                "pivotchart",
+                "pivotgrid",
+                "pivottable",
+                "table"
+            ],
+            "time": "2018-11-04T18:21:09+00:00"
         },
         {
             "name": "olifolkerd/tabulator",
@@ -1327,28 +1402,28 @@
             "authors": [
                 {
                     "name": "Jim Wigginton",
-                    "email": "terrafrost@php.net",
-                    "role": "Lead Developer"
+                    "role": "Lead Developer",
+                    "email": "terrafrost@php.net"
                 },
                 {
                     "name": "Patrick Monnerat",
-                    "email": "pm@datasphere.ch",
-                    "role": "Developer"
+                    "role": "Developer",
+                    "email": "pm@datasphere.ch"
                 },
                 {
                     "name": "Andreas Fischer",
-                    "email": "bantu@phpbb.com",
-                    "role": "Developer"
+                    "role": "Developer",
+                    "email": "bantu@phpbb.com"
                 },
                 {
                     "name": "Hans-Jürgen Petrich",
-                    "email": "petrich@tronic-media.com",
-                    "role": "Developer"
+                    "role": "Developer",
+                    "email": "petrich@tronic-media.com"
                 },
                 {
                     "name": "Graham Campbell",
-                    "email": "graham@alt-three.com",
-                    "role": "Developer"
+                    "role": "Developer",
+                    "email": "graham@alt-three.com"
                 }
             ],
             "description": "PHP Secure Communications Library - Pure-PHP implementations of RSA, AES, SSH2, SFTP, X.509 etc.",
@@ -1372,7 +1447,11 @@
                 "x.509",
                 "x509"
             ],
+<<<<<<< HEAD
             "time": "2019-06-23 16:33:11"
+=======
+            "time": "2019-03-10T16:53:45+00:00"
+>>>>>>> master
         },
         {
             "name": "psr/log",
@@ -1419,7 +1498,7 @@
                 "psr",
                 "psr-3"
             ],
-            "time": "2018-11-20 15:27:04"
+            "time": "2018-11-20T15:27:04+00:00"
         },
         {
             "name": "rdlowrey/auryn",
@@ -1480,17 +1559,11 @@
                 "dic",
                 "ioc"
             ],
-            "time": "2017-05-15 06:26:46"
+            "time": "2017-05-15T06:26:46+00:00"
         },
         {
             "name": "rmariuzzo/jquery-checkboxes",
             "version": "1.0.7",
-            "dist": {
-                "type": "zip",
-                "url": "https://github.com/rmariuzzo/checkboxes.js/archive/v1.0.7.zip",
-                "reference": null,
-                "shasum": null
-            },
             "type": "library"
         },
         {
@@ -1542,7 +1615,7 @@
                 "php",
                 "template"
             ],
-            "time": "2016-02-01 16:31:13"
+            "time": "2016-02-01T16:31:13+00:00"
         },
         {
             "name": "rougin/combustor",
@@ -1607,7 +1680,7 @@
                 "generator",
                 "php"
             ],
-            "time": "2016-02-14 10:36:58"
+            "time": "2016-02-14T10:36:58+00:00"
         },
         {
             "name": "rougin/describe",
@@ -1660,7 +1733,7 @@
                 "describe",
                 "php"
             ],
-            "time": "2016-03-24 18:17:47"
+            "time": "2016-03-24T18:17:47+00:00"
         },
         {
             "name": "rougin/refinery",
@@ -1725,7 +1798,7 @@
                 "php",
                 "refinery"
             ],
-            "time": "2016-03-04 16:55:32"
+            "time": "2016-03-04T16:55:32+00:00"
         },
         {
             "name": "rougin/spark-plug",
@@ -1784,7 +1857,7 @@
                 "php",
                 "spark-plug"
             ],
-            "time": "2015-10-23 08:27:10"
+            "time": "2015-10-23T08:27:10+00:00"
         },
         {
             "name": "scottjehl/Respond",
@@ -1856,7 +1929,7 @@
             ],
             "description": "Symfony Console Component",
             "homepage": "https://symfony.com",
-            "time": "2018-11-20 15:55:20"
+            "time": "2018-11-20T15:55:20+00:00"
         },
         {
             "name": "symfony/debug",
@@ -1913,7 +1986,7 @@
             ],
             "description": "Symfony Debug Component",
             "homepage": "https://symfony.com",
-            "time": "2016-07-30 07:22:48"
+            "time": "2016-07-30T07:22:48+00:00"
         },
         {
             "name": "symfony/polyfill-ctype",
@@ -1971,7 +2044,7 @@
                 "polyfill",
                 "portable"
             ],
-            "time": "2019-02-06 07:57:58"
+            "time": "2019-02-06T07:57:58+00:00"
         },
         {
             "name": "symfony/polyfill-mbstring",
@@ -2030,7 +2103,7 @@
                 "portable",
                 "shim"
             ],
-            "time": "2019-02-06 07:57:58"
+            "time": "2019-02-06T07:57:58+00:00"
         },
         {
             "name": "symfony/yaml",
@@ -2080,7 +2153,7 @@
             ],
             "description": "Symfony Yaml Component",
             "homepage": "https://symfony.com",
-            "time": "2018-11-11 11:18:13"
+            "time": "2018-11-11T11:18:13+00:00"
         },
         {
             "name": "tapmodo/Jcrop",
@@ -2137,7 +2210,11 @@
                 "tinymce",
                 "wysiwyg"
             ],
+<<<<<<< HEAD
             "time": "2019-07-03 01:28:44"
+=======
+            "time": "2019-03-20T13:56:58+00:00"
+>>>>>>> master
         },
         {
             "name": "tomazdragar/SimpleCropper",
@@ -2198,7 +2275,7 @@
                 "responsive",
                 "web"
             ],
-            "time": "2019-02-13 15:55:38"
+            "time": "2019-02-13T15:55:38+00:00"
         },
         {
             "name": "twig/twig",
@@ -2244,19 +2321,19 @@
             "authors": [
                 {
                     "name": "Fabien Potencier",
+                    "role": "Lead Developer",
                     "email": "fabien@symfony.com",
-                    "homepage": "http://fabien.potencier.org",
-                    "role": "Lead Developer"
+                    "homepage": "http://fabien.potencier.org"
                 },
                 {
                     "name": "Armin Ronacher",
-                    "email": "armin.ronacher@active-4.com",
-                    "role": "Project Founder"
+                    "role": "Project Founder",
+                    "email": "armin.ronacher@active-4.com"
                 },
                 {
                     "name": "Twig Team",
-                    "homepage": "https://twig.symfony.com/contributors",
-                    "role": "Contributors"
+                    "role": "Contributors",
+                    "homepage": "https://twig.symfony.com/contributors"
                 }
             ],
             "description": "Twig, the flexible, fast, and secure template language for PHP",
@@ -2264,7 +2341,11 @@
             "keywords": [
                 "templating"
             ],
+<<<<<<< HEAD
             "time": "2019-06-18 15:35:16"
+=======
+            "time": "2019-05-14T11:59:08+00:00"
+>>>>>>> master
         },
         {
             "name": "zetacomponents/base",
@@ -2328,7 +2409,7 @@
             ],
             "description": "The Base package provides the basic infrastructure that all packages rely on. Therefore every component relies on this package.",
             "homepage": "https://github.com/zetacomponents",
-            "time": "2017-11-28 11:30:00"
+            "time": "2017-11-28T11:30:00+00:00"
         },
         {
             "name": "zetacomponents/database",
@@ -2405,7 +2486,7 @@
             ],
             "description": "A lightweight database layer on top of PHP's PDO that allows you to utilize a database without having to take care of differences in SQL dialects.",
             "homepage": "https://github.com/zetacomponents",
-            "time": "2017-11-28 10:55:26"
+            "time": "2017-11-28T10:55:26+00:00"
         },
         {
             "name": "zetacomponents/document",
@@ -2456,7 +2537,7 @@
             ],
             "description": "The Document components provides a general conversion framework for different semantic document markup languages like XHTML, Docbook, RST and similar.",
             "homepage": "https://github.com/zetacomponents",
-            "time": "2013-12-19 11:40:00"
+            "time": "2013-12-19T11:40:00+00:00"
         },
         {
             "name": "zetacomponents/workflow",
@@ -2522,7 +2603,7 @@
             ],
             "description": "The purpose of the Workflow component is to provide the core functionality of an activity-based workflow system including the definition and execution of workflow specifications.",
             "homepage": "https://github.com/zetacomponents",
-            "time": "2014-09-27 19:26:10"
+            "time": "2014-09-27T19:26:10+00:00"
         },
         {
             "name": "zetacomponents/workflow-database-tiein",
@@ -2589,7 +2670,7 @@
             ],
             "description": "Contains the database backend for the Workflow component.",
             "homepage": "https://github.com/zetacomponents",
-            "time": "2014-09-27 19:26:10"
+            "time": "2014-09-27T19:26:10+00:00"
         },
         {
             "name": "zetacomponents/workflow-event-log-tiein",
@@ -2649,7 +2730,7 @@
             ],
             "description": "Contains the EventLog listener for the Workflow component.",
             "homepage": "https://github.com/zetacomponents",
-            "time": "2007-12-17 09:04:44"
+            "time": "2007-12-17T09:04:44+00:00"
         }
     ],
     "packages-dev": [],

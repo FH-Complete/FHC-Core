@@ -37,7 +37,7 @@ class Benutzer extends APIv1_Controller
 
 		if (isset($uid))
 		{
-			$result = $this->BenutzerModel->load($uid);
+			$result = $this->BenutzerModel->load(array('uid' => $uid));
 
 			$this->response($result, REST_Controller::HTTP_OK);
 		}

@@ -90,7 +90,7 @@ var FHC_FilterWidget = {
 	// Public methods
 
 	/**
-	 * To display the FilterWidget using the loaded data prenset in the session
+	 * To display the FilterWidget using the loaded data present in the session
 	 */
 	display: function() {
 
@@ -98,7 +98,7 @@ var FHC_FilterWidget = {
 	},
 
 	/**
-	 * Alias call to method display only to inprove the readability of the code
+	 * Alias call to method display only to improve the readability of the code
 	 */
 	refresh: function() {
 
@@ -106,11 +106,28 @@ var FHC_FilterWidget = {
 	},
 
 	/**
-	 * To retrive the page where the FilterWidget is used, using the FHC_JS_DATA_STORAGE_OBJECT
+	 * To retrieve the page where the FilterWidget is used, using the FHC_JS_DATA_STORAGE_OBJECT
 	 */
 	getFilterUniqueIdPrefix: function() {
 
 		return FHC_JS_DATA_STORAGE_OBJECT.called_path + "/" + FHC_JS_DATA_STORAGE_OBJECT.called_method;
+	},
+
+	/**
+	 * Reload of dataset, also reloads page to show changes
+	 */
+	reloadDataset: function() {
+		FHC_AjaxClient.ajaxCallPost(
+			"system/Filters/reloadDataset",
+			{
+				filter_page: FHC_FilterWidget.getFilterPage()
+			},
+			{
+				successCallback: function(data, textStatus, jqXHR) {
+					FHC_FilterWidget._failOrReload(data);
+				}
+			}
+		);
 	},
 
 	//------------------------------------------------------------------------------------------------------------------
@@ -209,7 +226,7 @@ var FHC_FilterWidget = {
 	},
 
 	/**
-	 * This method calls all the other methods needed to rendere the GUI for a FilterWidget
+	 * This method calls all the other methods needed to render the GUI for a FilterWidget
 	 * The parameter data contains all the data about the FilterWidget and it is given as parameter
 	 * to all the methods that here are called
 	 * NOTE: think very carefully before changing the order of the calls
@@ -394,7 +411,6 @@ var FHC_FilterWidget = {
 				},
 				{
 					successCallback: function(data, textStatus, jqXHR) {
-						FHC_FilterWidget._cleanTablesorterLocalStorage();
 						FHC_FilterWidget._failOrRefresh(data, textStatus, jqXHR);
 					}
 				}
@@ -455,7 +471,6 @@ var FHC_FilterWidget = {
 			},
 			{
 				successCallback: function(data, textStatus, jqXHR) {
-					FHC_FilterWidget._cleanTablesorterLocalStorage();
 					FHC_FilterWidget._failOrRefresh(data, textStatus, jqXHR);
 				}
 			}
@@ -850,6 +865,14 @@ var FHC_FilterWidget = {
 	 */
 	_renderDatasetTablesorter: function(data) {
 
+		//clear tablesorter filter storage
+		var keepTsFilter = FHC_AjaxClient.getUrlParameter("keepTsFilter");
+
+		if (typeof keepTsFilter === "undefined" || keepTsFilter !== "true")
+		{
+			FHC_FilterWidget._clearTablesorterLocalStorage();
+		}
+
 		if (data.hasOwnProperty("checkboxes") && data.checkboxes != null && data.checkboxes.trim() != "")
 		{
 			$("#filterTableDataset > thead > tr").append("<th data-filter='false' title='Select'>Select</th>");
@@ -949,10 +972,6 @@ var FHC_FilterWidget = {
 					filter_saveFilters : true
 				}
 			});
-
-			// Reset filter storage if there is a filter id in url
-			var filter_id = FHC_AjaxClient.getUrlParameter("filter_id");
-			if (typeof filter_id !== "undefined") FHC_FilterWidget._cleanTablesorterLocalStorage();
 
 			$.tablesorter.updateAll(filterWidgetTablesorter[0].config, true, null);
 		}
@@ -1204,6 +1223,10 @@ var FHC_FilterWidget = {
 		}
 
 		return fieldsDefinitions;
+	},
+
+	_clearTablesorterLocalStorage: function() {
+		localStorage.removeItem("tablesorter-filters");
 	},
 
 	/**

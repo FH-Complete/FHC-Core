@@ -144,9 +144,7 @@
 					<text:sequence-decl text:display-outline-level="0" text:name="Text"/>
 					<text:sequence-decl text:display-outline-level="0" text:name="Drawing"/>
 				</text:sequence-decls>
-				<draw:frame draw:style-name="fr1" draw:name="logo" text:anchor-type="page" text:anchor-page-number="1" svg:x="23.49cm" svg:y="1cm" svg:width="4.2cm" svg:height="2.24cm" draw:z-index="0">
-					<draw:image xlink:href="Pictures/logo_fhtw.png" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad" loext:mime-type="image/png"/>
-				</draw:frame>
+
 				<text:p text:style-name="P6">Fotoliste <xsl:value-of select="lehrveranstaltung" /></text:p>
 				<text:p text:style-name="P1"/>
 				<text:p text:style-name="P1">Studiengang: <xsl:value-of select="studiengang" /> - <xsl:value-of select="studiengangs_typ" /></text:p>

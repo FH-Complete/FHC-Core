@@ -3,6 +3,7 @@ $this->load->view('templates/FHC-Header',
 	array(
 		'title' => 'FH-Complete',
 		'jquery' => true,
+		'jqueryui' => true,
 		'bootstrap' => true,
 		'fontawesome' => true,
 		'sbadmintemplate' => true,

@@ -33,6 +33,7 @@ require_once('../../../include/zeitaufzeichnung.class.php');
 require_once('../../../include/zeitsperre.class.php');
 require_once('../../../include/datum.class.php');
 require_once('../../../include/projekt.class.php');
+require_once('../../../include/projektphase.class.php');
 require_once('../../../include/phrasen.class.php');
 require_once('../../../include/organisationseinheit.class.php');
 require_once('../../../include/service.class.php');
@@ -81,8 +82,8 @@ else {
 $datum = new datum();
 
 $fieldheadings = array(
-	'id' => $p->t("zeitaufzeichnung/id"), 'user' => $p->t("zeitaufzeichnung/user"), 'projekt' => $p->t("zeitaufzeichnung/projekt"),
-	'oe1' => $p->t("zeitaufzeichnung/oe").'1', 'oe2' => $p->t("zeitaufzeichnung/oe").'2', 'aktivitaet' => $p->t("zeitaufzeichnung/aktivitaet"),
+	'id' => $p->t("zeitaufzeichnung/id"), 'user' => $p->t("zeitaufzeichnung/user"), 'projekt' => $p->t("zeitaufzeichnung/projekt"), 'ap' => $p->t("zeitaufzeichnung/projektphase"),
+	'oe1' => $p->t("zeitaufzeichnung/oe"), 'oe2' => $p->t("zeitaufzeichnung/oe").'2', 'aktivitaet' => $p->t("zeitaufzeichnung/aktivitaet"),
 	'service' => $p->t("zeitaufzeichnung/service"), 'start' => $p->t("zeitaufzeichnung/start"), 'ende' => $p->t("zeitaufzeichnung/ende"),
 	'dauer' => $p->t("zeitaufzeichnung/dauer"), 'kunde' => $p->t("zeitaufzeichnung/kunde"), 'beschreibung' => $p->t("global/beschreibung"), 'aktion' => $p->t("global/aktion"),
 	'datum' => $p->t("global/datum")
@@ -91,12 +92,12 @@ $fieldheadings = array(
 if ($rechte->isBerechtigt('basis/servicezeitaufzeichnung'))
 {
 	$za_simple = 0;
-	$activities = 	array('Design', 'Operativ', 'Betrieb',  'Pause', 'Lehre', 'Arztbesuch', 'DienstreiseMT', 'Behoerde', 'Ersatzruhe');
+	$activities = 	array('Design', 'Operativ', 'Betrieb',  'Pause', 'FuE', 'Lehre', 'Arztbesuch', 'DienstreiseMT', 'Behoerde', 'Ersatzruhe');
 }
 else
 {
 	$za_simple = 1;
-	$activities = array('Arbeit', 'Pause', 'Lehre', 'Arztbesuch', 'DienstreiseMT', 'Behoerde', 'Ersatzruhe');
+	$activities = array('Admin', 'FuE','Lehre', 'Pause', 'Arztbesuch', 'DienstreiseMT', 'Behoerde', 'Ersatzruhe');
 }
 
 $activities_str = "'".implode("','", $activities)."'";
@@ -110,13 +111,12 @@ else if (defined('CIS_ZEITAUFZEICHNUNG_GESPERRT_BIS') && CIS_ZEITAUFZEICHNUNG_GE
 else
 	$gesperrt_bis = '2015-08-31';
 
-//var_dump($gesperrt_bis);
-
 $sperrdatum = date('c', strtotime($gesperrt_bis));
 
 // Uses urlencode to avoid XSS issues
 $zeitaufzeichnung_id = urlencode(isset($_GET['zeitaufzeichnung_id'])?$_GET['zeitaufzeichnung_id']:'');
 $projekt_kurzbz = (isset($_POST['projekt'])?$_POST['projekt']:'');
+$projektphase_id = (isset($_POST['projektphase'])?$_POST['projektphase']:'');
 $oe_kurzbz_1 = (isset($_POST['oe_kurzbz_1'])?$_POST['oe_kurzbz_1']:'');
 $oe_kurzbz_2 = (isset($_POST['oe_kurzbz_2'])?$_POST['oe_kurzbz_2']:'');
 $aktivitaet_kurzbz = (isset($_POST['aktivitaet'])?$_POST['aktivitaet']:'');
@@ -251,6 +251,13 @@ echo '
 				$("#kunde_uid").val(ui.item.uid);
 			}
 			});
+
+			$("#projekt").change(
+				function()
+				{
+					getProjektphasen($(this).val());
+				}
+			)
 
 		});
 
@@ -489,6 +496,49 @@ echo '
 			}
 			return true;
 		}
+
+		function getProjektphasen(projekt_kurzbz)
+		{
+			$.ajax
+			(
+				{
+					type: "GET",
+					url: "zeitaufzeichnung_projektphasen.php",
+					dataType: "json",
+					data:
+					{
+						"projekt_kurzbz":projekt_kurzbz
+					},
+					success: function(json)
+					{
+						//remove Projektphasen from html if any
+						$("#projektphase").children("option").each(
+							function()
+							{
+								if ($(this).prop("id") !== "projektphasekeineausw")
+									$(this).remove();
+							}
+						);
+						//append Projektphasen if any
+						if (json.length > 0)
+						{
+							var projphasenhtml = "";
+							for (var i = 0; i < json.length; i++)
+							{
+								projphasenhtml += "<option value = \'" + json[i].projektphase_id + "\'>" + json[i].bezeichnung + "<\/option>";
+							}
+
+							$("#projektphase").append(projphasenhtml);
+							$("#projektphaseformgroup").show();
+						}
+						else
+						{
+							$("#projektphaseformgroup").hide();
+						}
+					}
+				}
+			);
+		}
 		</script>
 	</head>
 <body>
@@ -506,6 +556,29 @@ if($kartennummer != '')
     $kunde_uid = $betriebsmittel->uid;
 }
 //Speichern der Daten
+
+function checkVals ($oe_val, $project_val, $phase_val, $service_val)
+{
+	$error = 0;
+	if ($service_val && ( filter_var($service_val, FILTER_VALIDATE_INT) === false ))
+		$error = 1;
+	if ($phase_val && ( filter_var($phase_val, FILTER_VALIDATE_INT) === false ))
+		$error = 1;
+	if ($oe_val)
+	{
+		$oecheck = new organisationseinheit($oe_val);
+		if ($oecheck->errormsg)
+			$error = 1;
+	}
+	if ($project_val)
+	{
+		$procheck = new projekt($project_val);
+		if ($procheck->errormsg)
+			$error = 1;
+	}
+	return $error;
+}
+
 if(isset($_POST['save']) || isset($_POST['edit']) || isset($_POST['import']))
 {
 	$zeit = new zeitaufzeichnung();
@@ -530,13 +603,35 @@ if(isset($_POST['save']) || isset($_POST['edit']) || isset($_POST['import']))
 					{
 						if($data[0] == $user)
 						{
+							if (!isset($data[5]))
+								$data[5] = NULL;
+							if (!isset($data[6]))
+								$data[6] = NULL;
+							if (!isset($data[7]))
+								$data[7] = NULL;
+							if (!isset($data[8]))
+								$data[8] = NULL;
 							if ($datum->formatDatum($data[2], $format='Y-m-d H:i:s') < $sperrdatum)
 								echo '<span style="color:red"><b>'.$p->t("global/fehlerBeimSpeichernDerDaten").': Eingabe nicht möglich da vor dem Sperrdatum ('.$data[2].')</b></span><br>';
+							//elseif (isset($data[8]) && ( filter_var($data[8], FILTER_VALIDATE_INT) === false ))
+							//{
+							//	echo '<span style="color:red"><b>'.$p->t("global/fehlerBeimSpeichernDerDaten").': Service ID ist keine Zahl ('.$data[8].')</b></span><br>';
+							//}
+							elseif (checkVals($data[5],$data[6],$data[7],$data[8]))
+							{
+								echo '<span style="color:red"><b>'.$p->t("global/fehlerBeimSpeichernDerDaten").': Fehlerhafte Werte  ('.$data[2].')</b></span><br>';
+							}
 							else
 							{
 								if ($data[1] == 'LehreIntern')
 									$data[1] = 'Lehre';
 								$zeit->new = true;
+								$zeit->beschreibung = NULL;
+								$zeit->oe_kurzbz_1 = NULL;
+								$zeit->projekt_kurzbz = NULL;
+								$zeit->projektphase_id = NULL;
+								$zeit->service_id = NULL;
+
 								$zeit->insertamum = date('Y-m-d H:i:s');
 								$zeit->updateamum = date('Y-m-d H:i:s');
 								$zeit->updatevon = $user;
@@ -548,7 +643,13 @@ if(isset($_POST['save']) || isset($_POST['edit']) || isset($_POST['import']))
 								if (isset($data[4]))
 									$zeit->beschreibung = $data[4];
 								if (isset($data[5]))
-									$zeit->service_id = $data[5];
+									$zeit->oe_kurzbz_1 = $data[5];
+								if (isset($data[6]))
+									$zeit->projekt_kurzbz = $data[6];
+								if (isset($data[7]))
+									$zeit->projektphase_id = $data[7];
+								if (isset($data[8]))
+									$zeit->service_id = $data[8];
 								$tag = $datum->formatDatum($data[2], $format='Y-m-d');
 
 								if(!in_array($tag, $importtage_array))
@@ -571,10 +672,10 @@ if(isset($_POST['save']) || isset($_POST['edit']) || isset($_POST['import']))
 										$pause->aktivitaet_kurzbz = 'Pause';
 										$pause->start = $ende_vorher;
 										$pause->ende = $zeit->start;
-										$zeit->beschreibung = '';
+										$pause->beschreibung = '';
 										if(!$pause->save())
 										{
-											echo '<span style="color:red"><b>'.$p->t("global/fehlerBeimSpeichernDerDaten").': '.$pause->errormsg.'</b></span>';
+											echo '<span style="color:red"><b>'.$p->t("global/fehlerBeimSpeichernDerDaten").': '.$pause->errormsg.'</b></span><br>';
 										}
 									}
 								}
@@ -591,7 +692,7 @@ if(isset($_POST['save']) || isset($_POST['edit']) || isset($_POST['import']))
 									*/
 									if(!$zeit->save())
 									{
-										echo '<span style="color:red"><b>'.$p->t("global/fehlerBeimSpeichernDerDaten").': '.$zeit->errormsg.'</b>('.$zeit->start.')</span>';
+										echo '<span style="color:red"><b>'.$p->t("global/fehlerBeimSpeichernDerDaten").': '.$zeit->errormsg.'</b>('.$zeit->start.')</span><br>';
 									}
 									else
 										$anzahl++;
@@ -600,6 +701,10 @@ if(isset($_POST['save']) || isset($_POST['edit']) || isset($_POST['import']))
 									$anzahl++;
 
 							}
+						}
+						else if (strpos($data[0],'#') === false)
+						{
+							echo '<span style="color:red"><b>'.$p->t("global/fehlerBeimSpeichernDerDaten").': Falsche UID nicht importiert </b>('.$data[0].')</span><br>';
 						}
 					}
 					if($anzahl>0)
@@ -645,6 +750,7 @@ if(isset($_POST['save']) || isset($_POST['edit']) || isset($_POST['import']))
 		$zeit->updateamum = date('Y-m-d H:i:s');
 		$zeit->updatevon = $user;
 		$zeit->projekt_kurzbz = $projekt_kurzbz;
+		$zeit->projektphase_id = $projektphase_id;
 		$zeit->service_id = $service_id;
 		$zeit->kunde_uid = $kunde_uid;
 
@@ -667,6 +773,7 @@ if(isset($_POST['save']) || isset($_POST['edit']) || isset($_POST['import']))
 			$oe_kurzbz_1 = '';
 			$oe_kurzbz_2 = '';
 			$projekt_kurzbz = '';
+			$projektphase_id = '';
 			$service_id = '';
 			$kunde_uid = '';
 		}
@@ -719,8 +826,20 @@ if(isset($_GET['type']) && $_GET['type']=='edit')
 			$oe_kurzbz_1 = $zeit->oe_kurzbz_1;
 			$oe_kurzbz_2 = $zeit->oe_kurzbz_2;
 			$projekt_kurzbz = $zeit->projekt_kurzbz;
+			$projektphase_id = $zeit->projektphase_id;
 			$service_id = $zeit->service_id;
 			$kunde_uid = $zeit->kunde_uid;
+
+			$projektphase = new projektphase();
+
+			$projektphasen = array();
+			if($projektphase->getProjektphasen($projekt_kurzbz))
+			{
+				foreach ($projektphase->result as $row)
+				{
+					$projektphasen[] = $row;
+				}
+			}
 		}
 		else
 		{
@@ -828,87 +947,6 @@ if($projekt->getProjekteMitarbeiter($user, true))
 			echo '</form>';
 		}
 
-		//Projekte werden nicht angezeigt wenn es keine gibt
-		if($anzprojekte > 0)
-		{
-			//Projekt
-			echo '<tr>
-				<td>'.$p->t("zeitaufzeichnung/projekt").'</td>
-				<td colspan="4"><SELECT name="projekt" id="projekt">
-					<OPTION value="">-- '.$p->t('zeitaufzeichnung/keineAuswahl').' --</OPTION>';
-
-			sort($projekt->result);
-			foreach ($projekt->result as $row_projekt)
-			{
-				if ($projekt_kurzbz == $row_projekt->projekt_kurzbz || $filter == $row_projekt->projekt_kurzbz)
-					$selected = 'selected';
-				else
-					$selected = '';
-
-				echo '<option value="'.$db->convert_html_chars($row_projekt->projekt_kurzbz).'" '.$selected.'>'.$db->convert_html_chars($row_projekt->titel).'</option>';
-			}
-			echo '</SELECT><!--<input type="button" value="'.$p->t("zeitaufzeichnung/uebersicht").'" onclick="loaduebersicht();">--></td>';
-			echo '</tr>';
-		}
-		if($za_simple == 0)
-		{
-		//OE_KURZBZ_1
-		echo '<tr><td nowrap>'.$p->t("zeitaufzeichnung/organisationseinheiten").'</td>
-			<td colspan="3"><SELECT style="width:200px;" name="oe_kurzbz_1">';
-		$oe = new organisationseinheit();
-		$oe->getFrequent($user,'180','3',true);
-		$trennlinie = true;
-
-		echo '<option value="">-- '.$p->t("zeitaufzeichnung/keineAuswahl").' --</option>';
-
-		foreach ($oe->result as $row)
-		{
-			if($row->oe_kurzbz == $oe_kurzbz_1)
-				$selected = 'selected';
-			else
-				$selected = '';
-			if($row->aktiv)
-				$class='';
-			else
-				$class='class="inaktiv"';
-
-			if ($row->anzahl =='0' && $trennlinie==true)
-			{
-				echo '<OPTION value="" disabled="disabled">------------------------</OPTION>';
-				$trennlinie = false;
-			}
-			echo '<option value="'.$db->convert_html_chars($row->oe_kurzbz).'" '.$selected.' '.$class.'>'.$db->convert_html_chars($row->bezeichnung.' ('.$row->organisationseinheittyp_kurzbz).')</option>';
-		}
-		echo '</SELECT>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
-
-		//OE_KURZBZ_2
-		echo '<SELECT style="width:200px;" name="oe_kurzbz_2">';
-		echo '<option value="">-- '.$p->t("zeitaufzeichnung/keineAuswahl").' --</option>';
-
-		$trennlinie = true;
-
-		foreach ($oe->result as $row)
-		{
-			if($oe_kurzbz_2 == $row->oe_kurzbz)
-				$selected = 'selected';
-			else
-				$selected = '';
-
-			if($row->aktiv)
-				$class='';
-			else
-				$class='class="inaktiv"';
-
-			if ($row->anzahl =='0' && $trennlinie==true)
-			{
-				echo '<OPTION value="" disabled="disabled">------------------------</OPTION>';
-				$trennlinie = false;
-			}
-			echo '<option value="'.$db->convert_html_chars($row->oe_kurzbz).'" '.$selected.' '.$class.'>'.$db->convert_html_chars($row->bezeichnung.' ('.$row->organisationseinheittyp_kurzbz).')</option>';
-		}
-		echo '</SELECT></td></tr>';
-		}
-
 		//Aktivitaet
 		echo '<tr>';
 		echo '<td>'.$p->t("zeitaufzeichnung/aktivitaet").'</td><td colspan="4">';
@@ -936,49 +974,167 @@ if($projekt->getProjekteMitarbeiter($user, true))
 		}
 		echo '</td></tr>';
 
+
+		if($za_simple >= 0)
+		{
+			$oestyle = '';
+			if($za_simple == 0)
+				$oestyle = 'style="width:200px;"';
+
+			//OE_KURZBZ_1
+			echo '<tr><td nowrap>'.$p->t("zeitaufzeichnung/organisationseinheiten").'</td>
+				<td colspan="3"><SELECT '.$oestyle.' name="oe_kurzbz_1">';
+			$oe = new organisationseinheit();
+			$oe->getFrequent($user,'180','3',true);
+			$trennlinie = true;
+
+			echo '<option value="">-- '.$p->t("zeitaufzeichnung/keineAuswahl").' --</option>';
+
+			foreach ($oe->result as $row)
+			{
+				if($row->oe_kurzbz == $oe_kurzbz_1)
+					$selected = 'selected';
+				else
+					$selected = '';
+				if($row->aktiv)
+					$class='';
+				else
+					$class='class="inaktiv"';
+
+				if ($row->anzahl =='0' && $trennlinie==true)
+				{
+					echo '<OPTION value="" disabled="disabled">------------------------</OPTION>';
+					$trennlinie = false;
+				}
+				echo '<option value="'.$db->convert_html_chars($row->oe_kurzbz).'" '.$selected.' '.$class.'>'.$db->convert_html_chars($row->bezeichnung.' ('.$row->organisationseinheittyp_kurzbz).') ['.$row->oe_kurzbz.']</option>';
+			}
+			echo '</SELECT>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
+			if($za_simple == 0)
+			{
+				//OE_KURZBZ_2
+				echo '<SELECT style="width:200px;" name="oe_kurzbz_2">';
+				echo '<option value="">-- '.$p->t("zeitaufzeichnung/keineAuswahl").' --</option>';
+
+				$trennlinie = true;
+
+				foreach ($oe->result as $row)
+				{
+					if($oe_kurzbz_2 == $row->oe_kurzbz)
+						$selected = 'selected';
+					else
+						$selected = '';
+
+					if($row->aktiv)
+						$class='';
+					else
+						$class='class="inaktiv"';
+
+					if ($row->anzahl =='0' && $trennlinie==true)
+					{
+						echo '<OPTION value="" disabled="disabled">------------------------</OPTION>';
+						$trennlinie = false;
+					}
+					echo '<option value="'.$db->convert_html_chars($row->oe_kurzbz).'" '.$selected.' '.$class.'>'.$db->convert_html_chars($row->bezeichnung.' ('.$row->organisationseinheittyp_kurzbz).')</option>';
+				}
+				echo '</SELECT>';
+			}
+			echo '</td></tr>';
+		}
+
+		//Projekte werden nicht angezeigt wenn es keine gibt
+		if($anzprojekte > 0)
+		{
+			//Projekt
+			echo '<tr>
+				<td>'.$p->t("zeitaufzeichnung/projekt").'</td>
+				<td colspan="4"><SELECT name="projekt" id="projekt">
+					<OPTION value="">-- '.$p->t('zeitaufzeichnung/keineAuswahl').' --</OPTION>';
+
+			sort($projekt->result);
+			$projektfound = false;
+			foreach ($projekt->result as $row_projekt)
+			{
+				if ($projekt_kurzbz == $row_projekt->projekt_kurzbz || $filter == $row_projekt->projekt_kurzbz)
+				{
+					$projektfound = true;
+					$selected = 'selected';
+				}
+				else
+					$selected = '';
+
+				echo '<option value="'.$db->convert_html_chars($row_projekt->projekt_kurzbz).'" '.$selected.'>'.$db->convert_html_chars($row_projekt->titel).'</option>';
+			}
+			echo '</SELECT><!--<input type="button" value="'.$p->t("zeitaufzeichnung/uebersicht").'" onclick="loaduebersicht();">-->';
+
+			//Projektphase
+			$showprojphases = isset($projektphasen) && is_array($projektphasen) && count($projektphasen) > 0 && $projektfound;
+			$hiddentext = $showprojphases ? "" : " style='display:none'";
+
+			echo
+				'<span id="projektphaseformgroup"'.$hiddentext.'>&nbsp;&nbsp;&nbsp;&nbsp;'.
+				$p->t("zeitaufzeichnung/projektphase").'
+					<SELECT name="projektphase" id="projektphase">
+						<OPTION value="" id="projektphasekeineausw">-- '.$p->t('zeitaufzeichnung/keineAuswahl').' --</OPTION>';
+
+			if ($showprojphases)
+			{
+				foreach ($projektphasen as $projektphase)
+				{
+					if ($projektphase_id == $projektphase->projektphase_id/* || $filter == $row_projekt->projekt_kurzbz*/)
+						$selected = 'selected';
+					else
+						$selected = '';
+
+					echo '<option value="'.$db->convert_html_chars($projektphase->projektphase_id).'" '.$selected.'>'.$db->convert_html_chars($projektphase->bezeichnung).'</option>';
+				}
+				echo '</SELECT></span>';
+			}
+			echo '</td></tr>';
+		}
+
 		if ($za_simple == 0)
 		{
-		// Service
-		echo '<tr>
-			<td>'.$p->t('zeitaufzeichnung/service').'</td>
-			<td colspan="4"><SELECT name="service_id">
-			<OPTION value="">-- '.$p->t('zeitaufzeichnung/keineAuswahl').' --</OPTION>';
-		$trennlinie = true;
-		$service = new service();
-		$service->getFrequentServices($user, '180','3');
-		foreach($service->result as $row)
-		{
-			if($row->service_id==$service_id)
-				$selected='selected';
-			else
-				$selected='';
-
-			if ($row->anzahl =='0' && $trennlinie==true)
+			// Service
+			echo '<tr>
+				<td>'.$p->t('zeitaufzeichnung/service').'</td>
+				<td colspan="4"><SELECT name="service_id">
+				<OPTION value="">-- '.$p->t('zeitaufzeichnung/keineAuswahl').' --</OPTION>';
+			$trennlinie = true;
+			$service = new service();
+			$service->getFrequentServices($user, '180','3');
+			foreach($service->result as $row)
 			{
-				echo '<OPTION value="" disabled="disabled">------------------------</OPTION>';
-				$trennlinie = false;
+				if($row->service_id==$service_id)
+					$selected='selected';
+				else
+					$selected='';
+
+				if ($row->anzahl =='0' && $trennlinie==true)
+				{
+					echo '<OPTION value="" disabled="disabled">------------------------</OPTION>';
+					$trennlinie = false;
+				}
+				echo '<OPTION title="'.$db->convert_html_chars($row->beschreibung).'" value="'.$db->convert_html_chars($row->service_id).'" '.$selected.'>'.$db->convert_html_chars($row->bezeichnung.' ('.$row->oe_kurzbz.')').'</OPTION>';
 			}
-			echo '<OPTION title="'.$db->convert_html_chars($row->beschreibung).'" value="'.$db->convert_html_chars($row->service_id).'" '.$selected.'>'.$db->convert_html_chars($row->bezeichnung.' ('.$row->oe_kurzbz.')').'</OPTION>';
-		}
-		echo '</SELECT></td>
+			echo '</SELECT></td>
+				</tr>';
+
+			// person für Kundenvoransicht laden
+			$kunde_name = '';
+			if($kunde_uid != '')
+			{
+				$user_kunde = new benutzer();
+
+				if($user_kunde->load($kunde_uid))
+					$kunde_name=$user_kunde->vorname.' '.$user_kunde->nachname;
+			}
+			echo '
+			<tr>
+				<td>'.$p->t("zeitaufzeichnung/kunde").'</td>
+				<td colspan="3"><input type="text" id="kunde_name" value="'.$kunde_name.'" placeholder="'.$p->t("zeitaufzeichnung/nameEingeben").'"><input type ="hidden" id="kunde_uid" name="kunde_uid" value="'.$kunde_uid.'"> '.$p->t("zeitaufzeichnung/oderKartennummerOptional").'
+				<input type="text" id="kartennummer" name="kartennummer" placeholder="'.$p->t("zeitaufzeichnung/kartennummer").'"></td>
 			</tr>';
-
-        // person für Kundenvoransicht laden
-        $kunde_name = '';
-        if($kunde_uid != '')
-        {
-            $user_kunde = new benutzer();
-
-            if($user_kunde->load($kunde_uid))
-                $kunde_name=$user_kunde->vorname.' '.$user_kunde->nachname;
-        }
-        echo '
-        <tr>
-            <td>'.$p->t("zeitaufzeichnung/kunde").'</td>
-            <td colspan="3"><input type="text" id="kunde_name" value="'.$kunde_name.'" placeholder="'.$p->t("zeitaufzeichnung/nameEingeben").'"><input type ="hidden" id="kunde_uid" name="kunde_uid" value="'.$kunde_uid.'"> '.$p->t("zeitaufzeichnung/oderKartennummerOptional").'
-            <input type="text" id="kartennummer" name="kartennummer" placeholder="'.$p->t("zeitaufzeichnung/kartennummer").'"></td>
-        </tr>';
-		echo '<tr><td colspan="4">&nbsp;</td></tr>';
+			echo '<tr><td colspan="4">&nbsp;</td></tr>';
 		}
 
 		//Start/Ende
@@ -1101,7 +1257,7 @@ if($projekt->getProjekteMitarbeiter($user, true))
 		{
 			//Uebersichtstabelle
 			$woche=date('W');
-			$colspan=($za_simple)?10:13;
+			$colspan=($za_simple)?12:14;
 			echo '
 			<table id="t1" class="" style="width:100%">
 
@@ -1184,7 +1340,7 @@ if($projekt->getProjekteMitarbeiter($user, true))
 
 						$tagessaldo = $tagessaldo-$pausesumme;
 						$tagessaldo = date('H:i', ($tagessaldo));
-						$colspan = ($za_simple)?4:7;
+						$colspan = ($za_simple)?6:8;
 						echo '<tr id="tag_row_'.$datum->formatDatum($tag,'d_m_Y').'"><td '.$style.' colspan="'.$colspan.'")>';
 
 						// Zusaetzlicher span fuer Addon Informationen
@@ -1259,7 +1415,7 @@ if($projekt->getProjekteMitarbeiter($user, true))
 
 					<!--</table>-->';
 
-					$colspan=($za_simple)?10:13;
+					$colspan=($za_simple)?12:14;
 					echo '
 					<!--<table id="t'.$datumwoche.'" class="tablesorter">-->
 					<tr><th colspan="'.$colspan.'">&nbsp;</th></tr>
@@ -1281,7 +1437,7 @@ if($projekt->getProjekteMitarbeiter($user, true))
 				// Diestreisen NEU
 				if (array_key_exists($datumtag, $dr_arr))
 				{
-					$colspan=($za_simple)?4:7;
+					$colspan=($za_simple)?6:8;
 					echo '<tr style="background-color: #aabb99"><td colspan="'.$colspan.'">'.$p->t('zeitaufzeichnung/dienstreise');
 					if (array_key_exists('start', $dr_arr[$datumtag]) && !array_key_exists('ende', $dr_arr[$datumtag]))
 						echo ' '.$p->t('global/beginn');
@@ -1335,14 +1491,17 @@ if($projekt->getProjekteMitarbeiter($user, true))
 				$summe = $row->summe;
 				$service = new service();
 				$service->load($row->service_id);
+				$projektphase = new projektphase($row->projektphase_id);
+				$ap = $projektphase->bezeichnung;
 				echo '<tr>
 					<td '.$style.'>'.$db->convert_html_chars($row->zeitaufzeichnung_id).'</td>
 					<td '.$style.'>'.$db->convert_html_chars($row->uid).'</td>
 					<td '.$style.'>'.$db->convert_html_chars($row->projekt_kurzbz).'</td>';
+				echo '<td '.$style.' > '.$db->convert_html_chars($ap).'</td>';
+				echo '<td '.$style.' > '.$db->convert_html_chars($row->oe_kurzbz_1).'</td>';
 				if(!$za_simple)
 				{
-					echo '<td '.$style.' > '.$db->convert_html_chars($row->oe_kurzbz_1).'</td>
-			        <td '.$style.' > '.$db->convert_html_chars($row->oe_kurzbz_2).'</td>';
+					echo '<td '.$style.' > '.$db->convert_html_chars($row->oe_kurzbz_2).'</td>';
 				}
 			    echo '<td '.$style.'>'.$db->convert_html_chars($row->aktivitaet_kurzbz).'</td>';
 				if(!$za_simple)
@@ -1417,11 +1576,12 @@ function printTableHeadings($fieldheadings, $za_simple = false){
 	echo '<tr>
 						<th style="background-color:#DCE4EF" align="center">'.$fieldheadings['id'].'</th>
 						<th style="background-color:#DCE4EF" align="center">'.$fieldheadings['user'].'</th>
-						<th style="background-color:#DCE4EF" align="center">'.$fieldheadings['projekt'].'</th>';
+						<th style="background-color:#DCE4EF" align="center">'.$fieldheadings['projekt'].'</th>
+						<th style="background-color:#DCE4EF" align="center">'.$fieldheadings['ap'].'</th>
+						<th style="background-color:#DCE4EF" align="center">'.$fieldheadings['oe1'].'</th>';
 			if (!$za_simple)
 			{
-				echo '<th style="background-color:#DCE4EF" align="center">'.$fieldheadings['oe1'].'</th>
-						<th style="background-color:#DCE4EF" align="center">'.$fieldheadings['oe2'].'</th>';
+				echo '<th style="background-color:#DCE4EF" align="center">'.$fieldheadings['oe2'].'</th>';
 			}
 			echo '<th style="background-color:#DCE4EF" align="center">'.$fieldheadings['aktivitaet'].'</th>';
 			if (!$za_simple)
@@ -1477,8 +1637,8 @@ function getDataForCSV($rawdata, $fieldheadings, $za_simple = false)
 	$datum = new datum();
 	$csvData = array();
 	//headers schreiben
-	$csvData[] = ($za_simple) ? array($fieldheadings['user'], $fieldheadings['datum'], $fieldheadings['start'], $fieldheadings['ende'], $fieldheadings['projekt'], $fieldheadings['aktivitaet'], $fieldheadings['beschreibung'])
-		: array($fieldheadings['user'], $fieldheadings['datum'], $fieldheadings['start'], $fieldheadings['ende'], $fieldheadings['projekt'], $fieldheadings['oe1'], $fieldheadings['oe2'], $fieldheadings['aktivitaet'], $fieldheadings['service'], $fieldheadings['kunde'], $fieldheadings['beschreibung']);
+	$csvData[] = ($za_simple) ? array($fieldheadings['user'], $fieldheadings['datum'], $fieldheadings['start'], $fieldheadings['ende'], $fieldheadings['projekt'], $fieldheadings['ap'], $fieldheadings['oe1'], $fieldheadings['aktivitaet'], $fieldheadings['beschreibung'])
+		: array($fieldheadings['user'], $fieldheadings['datum'], $fieldheadings['start'], $fieldheadings['ende'], $fieldheadings['projekt'], $fieldheadings['ap'], $fieldheadings['oe1'], $fieldheadings['oe2'], $fieldheadings['aktivitaet'], $fieldheadings['service'], $fieldheadings['kunde'], $fieldheadings['beschreibung']);
 	foreach ($rawdata as $zeitauf)
 	{
 		//Newline characters bei Beschreibung ersetzen
@@ -1491,13 +1651,13 @@ function getDataForCSV($rawdata, $fieldheadings, $za_simple = false)
 		if($za_simple)
 		{
 			$csvData[] = array($zeitauf->uid, $hauptdatum, $datum->formatDatum($zeitauf->start, 'H:i'),
-				$bisdatum, $zeitauf->projekt_kurzbz, $zeitauf->aktivitaet_kurzbz, $beschreibung);
+				$bisdatum, $zeitauf->projekt_kurzbz, $zeitauf->projektphase_id, $zeitauf->oe_kurzbz_1, $zeitauf->aktivitaet_kurzbz, $beschreibung);
 		}
 		else
 		{
 			$servicebez = ($service->load($zeitauf->service_id))?$service->bezeichnung:"";
 			$csvData[] = array($zeitauf->uid, $hauptdatum, $datum->formatDatum($zeitauf->start, 'H:i'), $bisdatum,
-				$zeitauf->projekt_kurzbz, $zeitauf->oe_kurzbz_1, $zeitauf->oe_kurzbz_2, $zeitauf->aktivitaet_kurzbz, $servicebez, $zeitauf->kunde_uid, $beschreibung);
+				$zeitauf->projekt_kurzbz, $zeitauf->projektphase_id, $zeitauf->oe_kurzbz_1, $zeitauf->oe_kurzbz_2, $zeitauf->aktivitaet_kurzbz, $servicebez, $zeitauf->kunde_uid, $beschreibung);
 		}
 	}
 	return $csvData;

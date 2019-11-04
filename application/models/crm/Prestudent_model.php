@@ -10,6 +10,8 @@ class Prestudent_model extends DB_Model
 		parent::__construct();
 		$this->dbTable = 'public.tbl_prestudent';
 		$this->pk = 'prestudent_id';
+
+		$this->load->model('crm/prestudentstatus_model', 'PrestudentstatusModel');
 	}
 
 	/**
@@ -208,7 +210,6 @@ class Prestudent_model extends DB_Model
 			return error('prestudent could not be loaded');
 
 		//Prestudentstatus
-		$this->load->model('crm/prestudentstatus_model', 'PrestudentstatusModel');
 		$lastStatus = $this->PrestudentstatusModel->getLastStatus($prestudent_id);
 
 		if ($lastStatus->error)
@@ -309,8 +310,6 @@ class Prestudent_model extends DB_Model
 
 		if (!hasData($prestudents))
 			return $bewerbungen;
-
-		$this->load->model('crm/prestudentstatus_model', 'PrestudentstatusModel');
 
 		foreach ($prestudents->retval as $prestudent)
 		{
@@ -424,7 +423,6 @@ class Prestudent_model extends DB_Model
 		if (!hasData($prestudent))
 			return false;
 
-		$this->load->model('prestudentstatus_model', 'PrestudentstatusModel');
 		$lastStatus = $this->PrestudentstatusModel->getLastStatus($prestudent_id, null, 'Interessent');
 
 		if (!hasData($lastStatus))

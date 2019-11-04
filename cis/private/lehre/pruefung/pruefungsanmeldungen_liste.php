@@ -35,6 +35,7 @@ require_once('../../../../include/datum.class.php');
 require_once('../../../../include/phrasen.class.php');
 require_once('../../../../include/globals.inc.php');
 require_once('../../../../include/sprache.class.php');
+require_once('../../../../include/studiengang.class.php');
 
 $sprache = getSprache();
 $lang = new sprache();
@@ -230,6 +231,7 @@ $rechte->getBerechtigungen($uid);
 			<th><?php echo $p->t('global/vorname'); ?></th>
 			<th><?php echo $p->t('global/nachname'); ?></th>
 			<th><?php echo $p->t('pruefung/matrikelnummer'); ?></th>
+            <th><?php echo $p->t('pruefung/studiengangAbkuerzung'); ?></th>
 			<th><?php echo $p->t('global/datum'); ?></th>
 			<th><?php echo $p->t('benotungstool/note'); ?></th>
 			<th><?php echo $p->t('global/anmerkung'); ?></th>
@@ -242,6 +244,7 @@ $rechte->getBerechtigungen($uid);
 			foreach($anmeldungen as $anmeldung)
 			{
 				$student = new student($anmeldung->uid);
+				$studiengang = new studiengang($student->studiengang_kz);
 				$prfTermin = new pruefungstermin($anmeldung->pruefungstermin_id);
 
 				if($einzeln)
@@ -262,6 +265,7 @@ $rechte->getBerechtigungen($uid);
 				echo '<td>'.$student->vorname.'</td>';
 				echo '<td>'.$student->nachname.'</td>';
 				echo '<td>'.$student->matr_nr.'</td>';
+                echo '<td>'.$studiengang->kurzbzlang.'</td>';
 				echo '<td>'.$date.'</td>';
 				echo '<td></td>';
 				echo '<td></td>';

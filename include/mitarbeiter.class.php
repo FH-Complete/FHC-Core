@@ -404,7 +404,7 @@ class mitarbeiter extends benutzer
 	 */
 	public function getMitarbeiterStg($lektor=true,$fixangestellt, $stge, $fkt_kurzbz, $order='studiengang_kz, nachname, vorname, kurzbz', $datum_von='', $datum_bis='')
 	{
-		$sql_query='SELECT DISTINCT campus.vw_mitarbeiter.*, studiengang_kz FROM campus.vw_mitarbeiter
+		$sql_query='SELECT DISTINCT campus.vw_mitarbeiter.*, studiengang_kz, tbl_studiengang.typ, tbl_studiengang.kurzbz AS stg_kurzbz FROM campus.vw_mitarbeiter
 					JOIN public.tbl_benutzerfunktion USING (uid) JOIN public.tbl_studiengang USING(oe_kurzbz)
 					WHERE true';
 		if(!is_null($lektor))
@@ -833,7 +833,9 @@ class mitarbeiter extends benutzer
 	 */
 	public function getMitarbeiterFilter($filter)
 	{
-		$qry = "SELECT * FROM campus.vw_mitarbeiter WHERE lower(nachname) ~* lower(".$this->db_add_param($filter).") OR uid ~* ".$this->db_add_param($filter).';';
+		$qry = "SELECT * FROM campus.vw_mitarbeiter WHERE lower(nachname) ~* lower(".$this->db_add_param($filter).") OR uid ~* ".$this->db_add_param($filter);
+		$qry .= " ORDER BY nachname, vorname, kurzbz;";
+
 		if($this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object())
@@ -865,7 +867,7 @@ class mitarbeiter extends benutzer
 	 * Nachname, Vorname, UID $filter enthaelt
 	 * @param $filter
 	 */
-	public function search($filter, $limit=null, $aktiv=true)
+	public function search($filter, $limit=null, $aktiv=true, $positivePersonalnr=false)
 	{
 		$qry = "SELECT vorname, nachname, titelpre, titelpost, kurzbz, vornamen, uid
 			FROM campus.vw_mitarbeiter
@@ -880,7 +882,6 @@ class mitarbeiter extends benutzer
 		if(!is_null($limit) && is_numeric($limit))
 			$qry.=" LIMIT ".$limit;
 
-		//echo $qry;
 		if($this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object())

@@ -98,12 +98,12 @@ $user=get_uid();
 					<label value="Rolle"/>
 					<menulist id="student-rolle-menulist-status_kurzbz" disabled="false" oncommand="StudentRolleChangeStatus()">
 						<menupopup>
-							<menuitem value="Interessent" label="Interessent"/>
-							<menuitem value="Bewerber" label="Bewerber"/>
-							<menuitem value="Aufgenommener" label="Aufgenommener"/>
-							<menuitem value="Student" label="Student"/>
-							<menuitem value="Unterbrecher" label="Unterbrecher"/>
-							<menuitem value="Diplomand" label="Diplomand"/>
+							<menuitem value="Interessent" label="InteressentIn"/>
+							<menuitem value="Bewerber" label="BewerberIn"/>
+							<menuitem value="Aufgenommener" label="Aufgenommene/r"/>
+							<menuitem value="Student" label="StudentIn"/>
+							<menuitem value="Unterbrecher" label="UnterbrecherIn"/>
+							<menuitem value="Diplomand" label="DiplomandIn"/>
 							<menuitem value="Incoming" label="Incoming"/>
 						</menupopup>
 					</menulist>

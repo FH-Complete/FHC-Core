@@ -1012,7 +1012,7 @@ function MitarbeiterSendMail()
   		}
 	}
 	if(anzfault!=0)
-		alert(anzfault+' Mitarbeiter konnten nicht hinzugefuegt werden weil keine UID eingetragen ist!');
+		alert(anzfault+' MitarbeiterIn konnten nicht hinzugefuegt werden weil keine UID eingetragen ist!');
 	window.location.href=mailempfaenger;
 }
 
@@ -1693,7 +1693,7 @@ function MitarbeiterEntwicklungsteamSpeichern()
 
 	if (tree.currentIndex==-1)
 	{
-		alert('Es ist kein Mitarbeiter ausgewaehlt');
+		alert('Es ist kein/e MitarbeiterIn ausgewaehlt');
 		return;
 	}
 

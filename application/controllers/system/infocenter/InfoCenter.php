@@ -24,6 +24,8 @@ class InfoCenter extends Auth_Controller
 
 	const FILTER_ID = 'filter_id';
 	const PREV_FILTER_ID = 'prev_filter_id';
+	const RELOAD_DATASET = 'reloadDataset';
+	const KEEP_TABLESORTER_FILTER = 'keepTsFilter';
 
 	private $_uid; // contains the UID of the logged user
 
@@ -100,9 +102,11 @@ class InfoCenter extends Auth_Controller
 				'reloadNotizen' => 'infocenter:r',
 				'reloadLogs' => 'infocenter:r',
 				'outputAkteContent' => 'infocenter:r',
-				'getParkedDate' => 'infocenter:r',
+				'getPostponeDate' => 'infocenter:r',
 				'park' => 'infocenter:rw',
 				'unpark' => 'infocenter:rw',
+				'setOnHold' => 'infocenter:rw',
+				'removeOnHold' => 'infocenter:rw',
 				'getStudienjahrEnd' => 'infocenter:r',
 				'setNavigationMenuArrayJson' => 'infocenter:r'
 			)
@@ -135,6 +139,8 @@ class InfoCenter extends Auth_Controller
 		);
 
 		$this->_setAuthUID(); // sets property uid
+
+		$this->load->library('VariableLib', array('uid' => $this->_uid));
 
 		$this->setControllerId(); // sets the controller id
     }
@@ -232,7 +238,7 @@ class InfoCenter extends Auth_Controller
 		$redirectLink = '/'.self::INFOCENTER_URI.'?'.self::FHC_CONTROLLER_ID.'='.$this->getControllerId();
 
 		// Force reload of Dataset after Unlock
-		$redirectLink .= '&reloadDataset=true';
+		$redirectLink .= '&'.self::RELOAD_DATASET.'=true&'.self::KEEP_TABLESORTER_FILTER.'=true';
 
 		$currentFilterId = $this->input->get(self::FILTER_ID);
 		if (isset($currentFilterId))
@@ -709,11 +715,32 @@ class InfoCenter extends Auth_Controller
 	 * Gets the date until which a person is parked
 	 * @param $person_id
 	 */
-	public function getParkedDate($person_id)
+	public function getPostponeDate($person_id)
 	{
+		$result = array(
+			'type' => null,
+			'date' => null
+		);
+
 		$parkedDate = $this->personloglib->getParkedDate($person_id);
 
-		$this->outputJsonSuccess(array($parkedDate));
+		if (isset($parkedDate))
+		{
+			$result['type'] = 'parked';
+			$result['date'] = $parkedDate;
+		}
+		else
+		{
+			$onholdDate = $this->personloglib->getOnHoldDate($person_id);
+
+			if (isset($onholdDate))
+			{
+				$result['type'] = 'onhold';
+				$result['date'] = $onholdDate;
+			}
+		}
+
+		$this->outputJsonSuccess($result);
 	}
 
 	/**
@@ -737,6 +764,31 @@ class InfoCenter extends Auth_Controller
 		$person_id = $this->input->post('person_id');
 
 		$result = $this->personloglib->unPark($person_id);
+
+		$this->outputJson($result);
+	}
+
+	/**
+	 * Sets a person on hold ("zurückstellen")
+	 */
+	public function setOnHold()
+	{
+		$person_id = $this->input->post('person_id');
+		$date = $this->input->post('onholddate');
+
+		$result = $this->personloglib->setOnHold($person_id, date_format(date_create($date), 'Y-m-d'), self::TAETIGKEIT, self::APP, null, $this->_uid);
+
+		$this->outputJson($result);
+	}
+
+	/**
+	 * Removed on hold status of a person
+	 */
+	public function removeOnHold()
+	{
+		$person_id = $this->input->post('person_id');
+
+		$result = $this->personloglib->removeOnHold($person_id);
 
 		$this->outputJson($result);
 	}
@@ -892,10 +944,16 @@ class InfoCenter extends Auth_Controller
 		$freigegebenLink = site_url(self::INFOCENTER_URI.'/'.self::FREIGEGEBEN_PAGE);
 		$reihungstestAbsolviertLink = site_url(self::INFOCENTER_URI.'/'.self::REIHUNGSTESTABSOLVIERT_PAGE);
 		$currentFilterId = $this->input->get(self::FILTER_ID);
+		$reloadDatasetParam = self::RELOAD_DATASET.'=true';
 		if (isset($currentFilterId))
 		{
-			$freigegebenLink .= '?'.self::PREV_FILTER_ID.'='.$currentFilterId;
-			$reihungstestAbsolviertLink .= '?'.self::PREV_FILTER_ID.'='.$currentFilterId;
+			$freigegebenLink .= '?'.self::PREV_FILTER_ID.'='.$currentFilterId.'&'.$reloadDatasetParam;
+			$reihungstestAbsolviertLink .= '?'.self::PREV_FILTER_ID.'='.$currentFilterId.'&'.$reloadDatasetParam;
+		}
+		else
+		{
+			$freigegebenLink .= '?'.$reloadDatasetParam;
+			$reihungstestAbsolviertLink .= '?'.$reloadDatasetParam;
 		}
 
 		$this->navigationlib->setSessionMenu(
@@ -948,7 +1006,7 @@ class InfoCenter extends Auth_Controller
 
 		$origin_page = $this->input->get(self::ORIGIN_PAGE);
 
-		$link = site_url(self::INFOCENTER_URI.'/'.self::INDEX_PAGE);
+		$link = site_url(self::INFOCENTER_URI);
 		if ($origin_page == self::FREIGEGEBEN_PAGE)
 		{
 			$link = site_url(self::INFOCENTER_URI.'/'.self::FREIGEGEBEN_PAGE);
@@ -961,7 +1019,7 @@ class InfoCenter extends Auth_Controller
 		$prevFilterId = $this->input->get(self::PREV_FILTER_ID);
 		if (isset($prevFilterId))
 		{
-			$link .= '?'.self::FILTER_ID.'='.$prevFilterId;
+			$link .= '?'.self::FILTER_ID.'='.$prevFilterId.'&'.self::RELOAD_DATASET.'=true&'.self::KEEP_TABLESORTER_FILTER.'=true';
 		}
 
 		$this->navigationlib->setSessionMenu(
@@ -991,13 +1049,14 @@ class InfoCenter extends Auth_Controller
 		$this->load->library('NavigationLib', array(self::NAVIGATION_PAGE => self::INFOCENTER_URI.'/'.$page));
 
 		// Generate the home link with the eventually loaded filter
-		$homeLink = site_url(self::INFOCENTER_URI.'/'.self::INDEX_PAGE);
-		$freigegebenLink = site_url(self::INFOCENTER_URI.'/'.self::FREIGEGEBEN_PAGE);
-		$absolviertLink = site_url(self::INFOCENTER_URI.'/'.self::REIHUNGSTESTABSOLVIERT_PAGE);
+		$reloadDatasetParam = '?'.self::RELOAD_DATASET.'=true';
+		$homeLink = site_url(self::INFOCENTER_URI.'/'.self::INDEX_PAGE.$reloadDatasetParam);
+		$freigegebenLink = site_url(self::INFOCENTER_URI.'/'.self::FREIGEGEBEN_PAGE.$reloadDatasetParam);
+		$absolviertLink = site_url(self::INFOCENTER_URI.'/'.self::REIHUNGSTESTABSOLVIERT_PAGE.$reloadDatasetParam);
 		$prevFilterId = $this->input->get(self::PREV_FILTER_ID);
 		if (isset($prevFilterId))
 		{
-			$homeLink .= '?'.self::FILTER_ID.'='.$prevFilterId;
+			$homeLink .= '&'.self::FILTER_ID.'='.$prevFilterId;
 		}
 
 		$this->navigationlib->setSessionElementMenu(

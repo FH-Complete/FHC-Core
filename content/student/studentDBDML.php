@@ -2299,6 +2299,29 @@ if(!$error)
 								$errormsg='Fehler beim Laden des Dokuments';
 							}
 						}
+						// Wenn kein Dokument im DMS vorhanden ist, aber die akte auf "wird nachgereicht" gesetzt ist
+						// darf das Dokument auch gelöscht werden
+						elseif($akte->nachgereicht === true && $akte->inhalt == '')
+						{
+							if($akte->delete($akte_id))
+							{
+								// Log schreiben
+								$logdata_akte = (array)$akte;
+								$logdata = var_export($logdata_akte, true);
+								$log = new log();
+								$log->executetime = date('Y-m-d H:i:s');
+								$log->mitarbeiter_uid = $user;
+								$log->beschreibung = "Löschen der Nachreichung der Akte '".$akte->dokument_kurzbz."' ID '".$akte_id."'";
+								$log->sql = 'DELETE FROM public.tbl_akte WHERE akte_id='.$db->db_add_param($akte_id, FHC_INTEGER).'; LogData:'.$logdata;
+								$log->sqlundo = '';
+								$log->save(true);
+							}
+							else
+							{
+								$error=true;
+								$errormsg='Fehler beim Loeschen der Akte';
+							}
+						}
 						else
 						{
 							$error=true;
@@ -2669,11 +2692,12 @@ if(!$error)
 			$bisio->nation_code = $_POST['nation_code'];
 			$bisio->von = $_POST['von'];
 			$bisio->bis = $_POST['bis'];
-			$bisio->zweck_code = $_POST['zweck_code'];
 			$bisio->student_uid = $_POST['student_uid'];
 			$bisio->lehreinheit_id = $_POST['lehreinheit_id'];
 			$bisio->ort = $_POST['ort'];
 			$bisio->universitaet = $_POST['universitaet'];
+			$bisio->ects_erworben = $_POST['ects_erworben'];
+			$bisio->ects_angerechnet = $_POST['ects_angerechnet'];
 			$bisio->updateamum = date('Y-m-d H:i:s');
 			$bisio->updatevon = $user;
 
@@ -2690,6 +2714,210 @@ if(!$error)
 					$return = false;
 				}
 			}
+		}
+	}
+	elseif(isset($_POST['type']) && $_POST['type']=='savebisiozweck')
+	{
+		$bisio = new bisio();
+		if($bisio->load($_POST['bisio_id']))
+		{
+			$student = new student();
+			if($student->load($bisio->student_uid))
+			{
+
+				//Speichert einen BisIO Eintrag
+				if(!$rechte->isBerechtigt('assistenz',$student->studiengang_kz,'suid') &&
+				   !$rechte->isBerechtigt('admin',$student->studiengang_kz, 'suid'))
+				{
+					$error = true;
+					$return = false;
+					$errormsg = 'Sie haben keine Berechtigung';
+				}
+				else
+				{
+
+					$bisio = new bisio();
+
+					$bisio->bisio_id = (isset($_POST['bisio_id'])?$_POST['bisio_id']:'');
+					$bisio->zweck_code = $_POST['zweck_code'];
+
+					if(!$error)
+					{
+						if($bisio->saveZweck())
+						{
+							$return = true;
+							$data = $bisio->bisio_id;
+						}
+						else
+						{
+							$errormsg = $bisio->errormsg;
+							$return = false;
+						}
+					}
+				}
+			}
+			else
+			{
+				$errormsg = $student->errormsg;
+				$return = false;
+			}
+		}
+		else
+		{
+			$errormsg = $bisio->errormsg;
+			$return = false;
+		}
+	}
+	elseif(isset($_POST['type']) && $_POST['type']=='deletebisiozweck')
+	{
+		$bisio = new bisio();
+		if($bisio->load($_POST['bisio_id']))
+		{
+			$student = new student();
+			if($student->load($bisio->student_uid))
+			{
+				//Speichert einen BisIO Eintrag
+				if(!$rechte->isBerechtigt('assistenz',$student->studiengang_kz,'suid') &&
+				   !$rechte->isBerechtigt('admin',$student->studiengang_kz, 'suid'))
+				{
+					$error = true;
+					$return = false;
+					$errormsg = 'Sie haben keine Berechtigung';
+				}
+				else
+				{
+
+					$bisio = new bisio();
+
+					$bisio->bisio_id = (isset($_POST['bisio_id'])?$_POST['bisio_id']:'');
+					$bisio->zweck_code = $_POST['zweck_code'];
+
+					if(!$error)
+					{
+						if($bisio->deleteZweck())
+						{
+							$return = true;
+						}
+						else
+						{
+							$errormsg = $bisio->errormsg;
+							$return = false;
+						}
+					}
+				}
+			}
+			else
+			{
+				$errormsg = $student->errormsg;
+				$return = false;
+			}
+		}
+		else
+		{
+			$errormsg = $bisio->errormsg;
+			$return = false;
+		}
+	}
+	elseif(isset($_POST['type']) && $_POST['type']=='savebisioaufenthaltfoerderung')
+	{
+		$bisio = new bisio();
+		if($bisio->load($_POST['bisio_id']))
+		{
+			$student = new student();
+			if($student->load($bisio->student_uid))
+			{
+
+				//Speichert einen BisIO Eintrag
+				if(!$rechte->isBerechtigt('assistenz',$student->studiengang_kz,'suid') &&
+				   !$rechte->isBerechtigt('admin',$student->studiengang_kz, 'suid'))
+				{
+					$error = true;
+					$return = false;
+					$errormsg = 'Sie haben keine Berechtigung';
+				}
+				else
+				{
+
+					$bisio = new bisio();
+
+					$bisio->bisio_id = (isset($_POST['bisio_id'])?$_POST['bisio_id']:'');
+					$bisio->aufenthaltfoerderung_code = $_POST['aufenthaltfoerderung_code'];
+
+					if(!$error)
+					{
+						if($bisio->saveAufenthaltFoerderung())
+						{
+							$return = true;
+							$data = $bisio->bisio_id;
+						}
+						else
+						{
+							$errormsg = $bisio->errormsg;
+							$return = false;
+						}
+					}
+				}
+			}
+			else
+			{
+				$errormsg = $student->errormsg;
+				$return = false;
+			}
+		}
+		else
+		{
+			$errormsg = $bisio->errormsg;
+			$return = false;
+		}
+	}
+	elseif(isset($_POST['type']) && $_POST['type']=='deletebisioaufenthaltfoerderung')
+	{
+		$bisio = new bisio();
+		if($bisio->load($_POST['bisio_id']))
+		{
+			$student = new student();
+			if($student->load($bisio->student_uid))
+			{
+				//Speichert einen BisIO Eintrag
+				if(!$rechte->isBerechtigt('assistenz',$student->studiengang_kz,'suid') &&
+				   !$rechte->isBerechtigt('admin',$student->studiengang_kz, 'suid'))
+				{
+					$error = true;
+					$return = false;
+					$errormsg = 'Sie haben keine Berechtigung';
+				}
+				else
+				{
+
+					$bisio = new bisio();
+
+					$bisio->bisio_id = (isset($_POST['bisio_id'])?$_POST['bisio_id']:'');
+					$bisio->aufenthaltfoerderung_code = $_POST['aufenthaltfoerderung_code'];
+
+					if(!$error)
+					{
+						if($bisio->deleteAufenthaltFoerderung())
+						{
+							$return = true;
+						}
+						else
+						{
+							$errormsg = $bisio->errormsg;
+							$return = false;
+						}
+					}
+				}
+			}
+			else
+			{
+				$errormsg = $student->errormsg;
+				$return = false;
+			}
+		}
+		else
+		{
+			$errormsg = $bisio->errormsg;
+			$return = false;
 		}
 	}
 	elseif(isset($_POST['type']) && $_POST['type']=='getnotenotenschluessel')
@@ -3676,7 +3904,7 @@ if(!$error)
 					{
 						if($row->anzahl>0)
 						{
-							$errormsg = 'Bitte zuerst alle Betreuer loeschen';
+							$errormsg = 'Bitte zuerst alle BetreuerInnen loeschen';
 							$return = false;
 						}
 						else
@@ -3758,7 +3986,7 @@ if(!$error)
 				if($projektbetreuer->load($_POST['person_id'], $_POST['projektarbeit_id'], $_POST['betreuerart_kurzbz']))
 				{
 					$error = true;
-					$errormsg = 'Dieser Betreuer ist bereits zugeteilt';
+					$errormsg = 'Diese/r BetreuerIn ist bereits zugeteilt';
 				}
 				$projektbetreuer->new = true;
 				$projektbetreuer->insertamum = date('Y-m-d H:i:s');
