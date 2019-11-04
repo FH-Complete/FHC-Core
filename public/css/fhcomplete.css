@@ -2,22 +2,36 @@
 	margin: 10px 0 5px;
 }
 h1 {
+	margin-top: 0px;
 	font-size: 2rem;
 }
 h2 {
+	margin-top: 0px;
 	font-size: 1.8rem;
 }
 h3 {
+	margin-top: 0px;
 	font-size: 1.6rem;
 }
 
 h4 {
+	margin-top: 0px;
 	font-size: 1.4rem;
 }
 h5 {
+	margin-top: 0px;
 	font-size: 1.2rem;
 }
 h6 {
+	margin-top: 0px;
 	font-size: 1rem;
 
+}
+body
+{
+	background-color: white;
+	color: black;
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 13px;
+	line-height: 1;
 }

@@ -202,7 +202,7 @@ if(!$cj->getAll(null, 'titel'))
 echo '<br><a href="'.$_SERVER['PHP_SELF'].'?type=new">Neuen Cronjob anlegen</a>';
 
 echo '<br><br>
-<table id="table1" style="table-layout: fixed; white-space: nowrap">
+<table id="table1" style="table-layout: fixed">
 	<thead>
 	<tr>
 		<th style="width: 30px">ID</th>

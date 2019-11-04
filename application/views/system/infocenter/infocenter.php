@@ -18,7 +18,7 @@
 				'global' => array('mailAnXversandt'),
 				'ui' => array('bitteEintragWaehlen')
 			),
-			'customCSSs' => 'public/css/sbadmin2/tablesort_bootstrap.css',
+			'customCSSs' => array('public/css/sbadmin2/tablesort_bootstrap.css', 'public/css/infocenter/infocenterPersonDataset.css'),
 			'customJSs' => array('public/js/bootstrapper.js', 'public/js/infocenter/infocenterPersonDataset.js')
 		)
 	);

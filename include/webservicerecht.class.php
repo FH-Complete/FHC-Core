@@ -17,7 +17,7 @@
  *
  * Authors:	Karl Burkhart <burkhart@technikum-wien.at>.
  */
- 
+
 require_once(dirname(__FILE__).'/basis_db.class.php');
 require_once(dirname(__FILE__).'/benutzerberechtigung.class.php');
 
@@ -35,7 +35,7 @@ class webservicerecht extends basis_db
 
 	public $new;					// boolean
 	public $result = array(); 		// webservicerecht object array
-	
+
 	/**
 	 * Konstruktor - Laedt optional einen DS
 	 * @param $webservicerecht_id
@@ -47,85 +47,85 @@ class webservicerecht extends basis_db
 		if(!is_null($webservicerecht_id))
 			$this->load($webservicerecht_id);
 	}
-	
+
     /**
      * Überprüft ob ein User die Berechtigung für eine Methode zum lesen besitzt
      * true wenn user lesen darf, false wenn nicht
-     * 
+     *
      * @param $user
-     * @param $methode 
+     * @param $methode
 	 * @param $klasse
      */
     public function isUserAuthorized($user, $methode, $klasse=null)
     {
-        $berechtigung = new benutzerberechtigung(); 
+        $berechtigung = new benutzerberechtigung();
         $berechtigung->getBerechtigungen($user);
-        $berechtigungArray = array(); 
-        
+        $berechtigungArray = array();
+
         foreach ($berechtigung->berechtigungen as $recht)
-        {   
+        {
             // ist berechtigung noch gültig
             if(($recht->start < date('Y-m-d') || $recht->start=='') && ($recht->ende > date('Y-m-d') || $recht->ende==''))
-                $berechtigungArray[] = $recht->berechtigung_kurzbz; 
+                $berechtigungArray[] = $recht->berechtigung_kurzbz;
         }
-        
-        $qry = "SELECT 1 from system.tbl_webservicerecht where methode = ".$this->db_add_param($methode)." 
+
+        $qry = "SELECT 1 from system.tbl_webservicerecht where methode = ".$this->db_add_param($methode)."
             AND berechtigung_kurzbz IN (".$this->implode4SQL($berechtigungArray).')';
 
 		if(!is_null($klasse))
 			$qry.=" AND klasse=".$this->db_add_param($klasse);
-        
+
         if($result = $this->db_query($qry))
 		{
             if($this->db_num_rows($result) == 0 )
             {
-                return false; 
+                return false;
             }
         }
         else
-            return false; 
-        
-        return true; 
+            return false;
+
+        return true;
 
     }
-    
+
     /**
      * Löscht alle Attribute für die ein User keine Berechtiung hat
-     * 
+     *
      * @param $user
      * @param $methode
      * @param $objec
-     * 
+     *
      */
     public function clearResponse($user, $methode, $object)
     {
-        $berechtigung = new benutzerberechtigung(); 
+        $berechtigung = new benutzerberechtigung();
         $berechtigung->getBerechtigungen($user);
-        $berechtigungArray = array(); 
-        $attributArray = array(); 
-        
+        $berechtigungArray = array();
+        $attributArray = array();
+
         foreach ($berechtigung->berechtigungen as $recht)
-            $berechtigungArray[] = $recht->berechtigung_kurzbz; 
-        
-        $qry = "SELECT attribut from system.tbl_webservicerecht where methode = ".$this->db_add_param($methode)." 
+            $berechtigungArray[] = $recht->berechtigung_kurzbz;
+
+        $qry = "SELECT attribut from system.tbl_webservicerecht where methode = ".$this->db_add_param($methode)."
             AND berechtigung_kurzbz IN (".$this->implode4SQL($berechtigungArray).');';
-        
+
         if($result = $this->db_query($qry))
 		{
             while($row = $this->db_fetch_object($result))
             {
-                $attributArray[] = $row->attribut; 
+                $attributArray[] = $row->attribut;
             }
         }
-       
-        $helpObject = new stdClass(); 
-        
+
+        $helpObject = new stdClass();
+
         for($i = 0; $i<sizeof($attributArray); $i++)
         {
-        	if(isset($object->$attributArray[$i]))
-            	$helpObject->$attributArray[$i] = $object->$attributArray[$i];
+			if(isset($object->{$attributArray[$i]}))
+				$helpObject->{$attributArray[$i]} = $object->{$attributArray[$i]};
         }
 
-        return $helpObject; 
+        return $helpObject;
     }
 }

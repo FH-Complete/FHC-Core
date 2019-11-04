@@ -115,14 +115,14 @@ function draw_content($row)
 	            <IO:von><![CDATA['.$datum->convertISODate($row->von).']]></IO:von>
 	            <IO:bis_iso><![CDATA['.$row->bis.']]></IO:bis_iso>
 	            <IO:bis><![CDATA['.$datum->convertISODate($row->bis).']]></IO:bis>
-	            <IO:zweck_code><![CDATA['.$row->zweck_code.']]></IO:zweck_code>
-	            <IO:zweck_bezeichnung><![CDATA['.$row->zweck_bezeichnung.']]></IO:zweck_bezeichnung>
 	            <IO:student_uid><![CDATA['.$row->student_uid.']]></IO:student_uid>
 	            <IO:lehreinheit_id><![CDATA['.$row->lehreinheit_id.']]></IO:lehreinheit_id>
 	            <IO:ort><![CDATA['.$row->ort.']]></IO:ort>
 	            <IO:universitaet><![CDATA['.$row->universitaet.']]></IO:universitaet>
 	            <IO:lehrveranstaltung_id><![CDATA['.$lehrveranstaltung_id.']]></IO:lehrveranstaltung_id>
 	            <IO:studiensemester_kurzbz><![CDATA['.$studiensemester_kurzbz.']]></IO:studiensemester_kurzbz>
+				<IO:ects_angerechnet><![CDATA['.$row->ects_angerechnet.']]></IO:ects_angerechnet>
+				<IO:ects_erworben><![CDATA['.$row->ects_erworben.']]></IO:ects_erworben>
 	         </RDF:Description>
 	      </RDF:li>';
 }

@@ -277,7 +277,7 @@ function func_footerElement(){
 
 // Performs download CSV
 function footer_downloadCSV(){
-    $('#filterTabulator').tabulator("download", "csv", "data.csv", {bom:true}); // BOM for correct UTF-8 char output
+    $('#tableWidgetTabulator').tabulator("download", "csv", "data.csv", {bom:true}); // BOM for correct UTF-8 char output
 }
 
 /*
@@ -285,7 +285,7 @@ function footer_downloadCSV(){
  * Select all (filtered) rows that are bestellt
  */
 function footer_selectAll(){
-    $('#filterTabulator').tabulator('getRows', true)
+    $('#tableWidgetTabulator').tabulator('getRows', true)
         .filter(row => row.getData().personalnummer >= 0 && // NOT dummies
             row.getData().bestellt != null &&           // AND bestellt
             row.getData().erteilt == null &&            // AND NOT erteilt
@@ -298,7 +298,7 @@ function footer_selectAll(){
  * Deselect all (filtered) rows
  */
 function footer_deselectAll(){
-    $('#filterTabulator').tabulator('deselectRow');
+    $('#tableWidgetTabulator').tabulator('deselectRow');
 }
 
 // Displays number of selected rows on row selection change
@@ -447,12 +447,12 @@ $(function() {
 
     // Show all rows
     $("#show-all").click(function(){
-        $('#filterTabulator').tabulator('clearFilter');
+        $('#tableWidgetTabulator').tabulator('clearFilter');
     });
 
     // Show only rows with new lehrauftraege (not dummy lectors)
     $("#show-new").click(function(){
-        $('#filterTabulator').tabulator('setFilter',
+        $('#tableWidgetTabulator').tabulator('setFilter',
             [
                 {field: 'personalnummer', type: '>=', value: 0},
                 {field: 'bestellt', type: '=', value: null},
@@ -464,7 +464,7 @@ $(function() {
 
     // Show only rows with ordered lehrauftraege
     $("#show-ordered").click(function(){
-        $('#filterTabulator').tabulator('setFilter',
+        $('#tableWidgetTabulator').tabulator('setFilter',
             [
                 {field: 'personalnummer', type: '>=', value: 0},
                 {field: 'bestellt', type: '!=', value: null},
@@ -476,7 +476,7 @@ $(function() {
 
     // Show only rows with erteilte lehrauftraege
     $("#show-approved").click(function(){
-        $('#filterTabulator').tabulator('setFilter',
+        $('#tableWidgetTabulator').tabulator('setFilter',
             [
                 {field: 'bestellt', type: '!=', value: null},
                 {field: 'erteilt', type: '!=', value: null},
@@ -487,7 +487,7 @@ $(function() {
 
     // Show only rows with accepted lehrauftraege
     $("#show-accepted").click(function(){
-        $('#filterTabulator').tabulator('setFilter',
+        $('#tableWidgetTabulator').tabulator('setFilter',
             [
                 {field: 'bestellt', type: '!=', value: null},
                 {field: 'erteilt', type: '!=', value: null},
@@ -498,7 +498,7 @@ $(function() {
 
     // Show only rows with dummy lectors
     $("#show-dummies").click(function(){
-        $('#filterTabulator').tabulator('setFilter',
+        $('#tableWidgetTabulator').tabulator('setFilter',
             [
                 {field: 'personalnummer', type: '!=', value: null},
                 {field: 'personalnummer', type: '<=', value: 0},
@@ -509,7 +509,7 @@ $(function() {
     // Show only rows with dummy lectors
     $("#show-changed").click(function(){
         // needs custom filter to compare fields betrag and vertrag_betrag
-        $('#filterTabulator').tabulator('setFilter',
+        $('#tableWidgetTabulator').tabulator('setFilter',
             [
                 {field: 'personalnummer', type: '>=', value: 0},    // NOT dummy lector AND
                 {field: 'bestellt', type: '!=', value: null},       // bestellt AND
@@ -553,7 +553,7 @@ $(function() {
     // Approve Lehrauftraege
     $("#approve-lehrauftraege").click(function(){
 
-        var selected_data = $('#filterTabulator').tabulator('getSelectedData')
+        var selected_data = $('#tableWidgetTabulator').tabulator('getSelectedData')
             .filter(function(val){
                 // filter pseudo lines of groupBy (e.g. the bottom calculations lines)
                 return val.row_index != null || typeof(val.row_index) !== 'undefined';
@@ -592,7 +592,7 @@ $(function() {
                     if (!data.error && data.retval != null)
                     {
                         // Update status 'Erteilt'
-                        $('#filterTabulator').tabulator('updateData', data.retval);
+                        $('#tableWidgetTabulator').tabulator('updateData', data.retval);
                     }
 
                     FHC_DialogLib.alertSuccess(data.retval.length + " Lehraufträge wurden erteilt.");

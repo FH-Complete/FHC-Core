@@ -182,7 +182,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 					class="sortDirectionIndicator"
 					sort="rdf:http://www.technikum-wien.at/ressource/rdf#mitarbeiter_uid" />
 			    <xul:splitter class="tree-splitter"/>
-			    <xul:treecol anonid="treecol-ressource-student_uid" label="StudentUID" flex="2" hidden="true" persist="hidden width ordinal"
+			    <xul:treecol anonid="treecol-ressource-student_uid" label="StudentInUID" flex="2" hidden="true" persist="hidden width ordinal"
 					class="sortDirectionIndicator"
 					sort="rdf:http://www.technikum-wien.at/ressource/rdf#student_uid" />
 			    <xul:splitter class="tree-splitter"/>

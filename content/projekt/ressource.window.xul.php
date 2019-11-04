@@ -53,7 +53,7 @@ echo '<?xml-stylesheet href="'.APP_ROOT.'skin/tempus.css" type="text/css"?>';
 			</columns>
 			<rows>
 				<row>
-					<label value="Mitarbeiter" control="ressource-menulist-mitarbeiter" />
+					<label value="MitarbeiterIn" control="ressource-menulist-mitarbeiter" />
 				    <menulist id="ressource-menulist-mitarbeiter"
 										  editable="true"
 								          datasources="rdf:null" flex="1"
@@ -71,7 +71,7 @@ echo '<?xml-stylesheet href="'.APP_ROOT.'skin/tempus.css" type="text/css"?>';
 					</menulist>
 				</row>
 				<row>
-					<label value="Student" control="ressource-menulist-student" />
+					<label value="StudentIn" control="ressource-menulist-student" />
 				    <menulist id="ressource-menulist-student"
 										  editable="true"
 								          datasources="rdf:null" flex="1"

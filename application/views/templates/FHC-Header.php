@@ -30,6 +30,7 @@
 	$pivotui = isset($pivotui) ? $pivotui : false;
 	$sbadmintemplate = isset($sbadmintemplate) ? $sbadmintemplate : false;
 	$tablesorter = isset($tablesorter) ? $tablesorter : false;
+	$tablewidget = isset($tablewidget) ? $tablewidget : false;
 	$tabulator = isset($tabulator) ? $tabulator : false;
 	$tinymce = isset($tinymce) ? $tinymce : false;
 ?>
@@ -102,6 +103,9 @@
 
 			// NavigationWidget CSS
 			if ($navigationwidget === true) generateCSSsInclude('public/css/NavigationWidget.css');
+
+			// TableWidget CSS
+			if ($tablewidget === true) generateCSSsInclude('public/css/TableWidget.css');
 
 			// Eventually required CSS
 			generateCSSsInclude($customCSSs); // Eventually required CSS
@@ -202,6 +206,9 @@
 
 			// PhrasesLib JS
 			if ($phrases != null) generateJSsInclude('public/js/PhrasesLib.js');
+
+			// TableWidget JS
+			if ($tablewidget === true) generateJSsInclude('public/js/TableWidget.js');
 
 			// Load addon hooks JS
 			// NOTE: keep it as the latest but one

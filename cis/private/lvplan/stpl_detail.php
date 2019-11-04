@@ -35,6 +35,7 @@ require_once('../../../include/ort.class.php');
 require_once('../../../include/functions.inc.php');
 require_once('../../../include/datum.class.php');
 require_once('../../../include/phrasen.class.php');
+require_once('../../../include/mitarbeiter.class.php');
 
 $sprache = getSprache(); 
 $p = new phrasen($sprache); 
@@ -231,11 +232,21 @@ if ($num_rows_stpl>0)
 		$titel = trim($row->titel);
 	    $gesamtanzahl = ($anzahl_grp!=0?$anzahl_grp:$anzahl_lvb);
 	    $ort->load($ortkurzbz);
-	    
+
+	    // no profile link for fake Mitarbeiter like Dummylektor, Personalnr must be > 0
+	    $profileLink = true;
+	    $mitarbeiter = new mitarbeiter();
+
+	    if ($mitarbeiter->load($row->uid))
+		{
+			if (isset($mitarbeiter->personalnummer) && is_numeric($mitarbeiter->personalnummer) && (int)$mitarbeiter->personalnummer < 0)
+				$profileLink = false;
+		}
+
 	    echo '
 	    <tr class="liste'.($i%2).'">
 	        <td>'.$db->convert_html_chars($unr).'</td>
-	        <td><A class="Item" href="../profile/index.php?uid='.$row->uid.'" target="_self" onClick="window.resizeTo(1200,880)">'.$db->convert_html_chars($titelpre.' '.$pers_vorname.' '.$pers_nachname.' '.$titelpost).'</A></td>
+	        <td>'.($profileLink ? '<A class="Item" href="../profile/index.php?uid='.$row->uid.'" target="_self" onClick="window.resizeTo(1200,880)">' : '').$db->convert_html_chars($titelpre.' '.$pers_vorname.' '.$pers_nachname.' '.$titelpost).($profileLink ? '</A>' : '').'</td>
 	        <td  title="'.$db->convert_html_chars($ort->bezeichnung).'">'.(!empty($ortkurzbz)?($ort->content_id!=''?'<a href="../../../cms/content.php?content_id='.$ort->content_id.'" target="_self" onClick="window.resizeTo(1200,880)">'.$db->convert_html_chars($ortkurzbz).'</a>':$db->convert_html_chars($ortkurzbz)):$db->convert_html_chars($ortkurzbz)).'</td>
 	        <td>'.$db->convert_html_chars($lehrfachkurzbz).'</td>
 	        <td>'.$db->convert_html_chars($bezeichnung).'</td>

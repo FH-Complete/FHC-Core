@@ -140,7 +140,7 @@ if(isset($_POST['kopieren']))
 	}
 }
 
-if(isset($_POST['schick']))
+if(isset($_POST['schick']) || isset($_POST['copy']))
 {
 	if($rechte->isBerechtigt('basis/berechtigung', null, 'suid'))
 	{
@@ -158,7 +158,7 @@ if(isset($_POST['schick']))
 		$anmerkung = (isset($_POST['anmerkung'])?$_POST['anmerkung']:'');
 
 		$ber = new benutzerberechtigung();
-		if (isset($_POST['neu']))
+		if (isset($_POST['neu']) || isset($_POST['copy']))
 		{
 			$ber->insertamum=date('Y-m-d H:i:s');
 			$ber->insertvon = $user;
@@ -337,6 +337,84 @@ if (isset($_REQUEST['uid']) || isset($_REQUEST['funktion_kurzbz']))
 					<th></th>
 					<!--<th></th>-->
 				</tr></thead><tbody>\n";
+
+	$htmlstr .= "<tr id='neu'>\n";
+	$htmlstr .= "<form action='benutzerberechtigung_details.php' method='POST' name='berechtigung_neu'>\n";
+	$htmlstr .= "<input type='hidden' name='neu' value='1'>\n";
+	$htmlstr .= "<input type='hidden' name='benutzerberechtigung_id' value=''>\n";
+	$htmlstr .= "<input type='hidden' name='uid' value='".$uid."'>\n";
+	$htmlstr .= "<input type='hidden' name='funktion_kurzbz' value='".$funktion_kurzbz."'>\n";
+
+	//Status
+	$htmlstr .= "		<td>&nbsp;</td>\n";
+	//Rolle
+	$htmlstr .= "		<td style='padding-top: 15px;'><select name='rolle_kurzbz' id='rolle_kurzbz_neu' onchange='markier(\"neu\"); setnull(\"berechtigung_kurzbz_neu\"); setnull(\"art_neu\");'>\n";
+	$htmlstr .= "			<option value='' onclick='enable(\"berechtigung_kurzbz_neu\");'>&nbsp;</option>\n";
+	for ($i = 0; $i < sizeof($rolle_arr); $i++)
+	{
+		$sel = "";
+		$htmlstr .= "				<option value='".$rolle_arr[$i]."' ".$sel." onclick='disable(\"berechtigung_kurzbz_neu\");'>".$rolle_arr[$i]."</option>";
+	}
+	$htmlstr .= "		</select></td>\n";
+
+	//Berechtigung_kurzbz
+	$htmlstr .= "		<td style='padding-top: 15px;'><select name='berechtigung_kurzbz' id='berechtigung_kurzbz_neu' onchange='markier(\"neu\"); setnull(\"rolle_kurzbz_neu\");'>\n";
+	$htmlstr .= "			<option value='' onclick='enable(\"rolle_kurzbz_neu\");'>&nbsp;</option>\n";
+	for ($i = 0; $i < sizeof($berechtigung_arr); $i++)
+	{
+		$sel = "";
+		$htmlstr .= "				<option title='".$berechtigung_beschreibung_arr[$i]."' ".(array_search($berechtigung_arr[$i],$berechtigung_user_arr)!==false?"style='color: #666'":"")." value='".$berechtigung_arr[$i]."' ".$sel." onclick='disable(\"rolle_kurzbz_neu\");'>".$berechtigung_arr[$i]."</option>";
+	}
+	$htmlstr .= "		</select></td>\n";
+
+	//Art
+	$htmlstr .= "		<td style='padding-top: 15px;'><input id='art_neu' type='text' name='art' value='' size='5' maxlength='5' onBlur='checkrequired(\"art_neu\")' onChange='validateArt(\"art_neu\")' placeholder='suid'></td>\n";
+
+	//Organisationseinheit
+	if($funktion_kurzbz!='')
+		$htmlstr .= "		<td class='oe_column' style='padding-top: 15px;'>OE aus MA-Funktion</td>\n";
+	else
+	{
+		$htmlstr .= "		<td class='oe_column' style='padding-top: 15px;'><select id='oe_kurzbz_neu' name='oe_kurzbz' onchange='markier(\"neu\")' style='width: 200px;'>\n";
+		$htmlstr .= "			<option value='' onclick='enable(\"kostenstelle_neu\");'>-- Alle --</option>\n";
+
+		foreach ($oe->result as $oekey)
+		{
+			if(!$oekey->aktiv)
+				$class='class="inactive"';
+			else
+				$class='';
+			$htmlstr .= "				<option value='".$oekey->oe_kurzbz."' ".$class." onclick='disable(\"kostenstelle_neu\");'>".$oekey->organisationseinheittyp_kurzbz.' '.$oekey->bezeichnung.'</option>';
+		}
+		$htmlstr .= "		</select></td>\n";
+	}
+
+	//Kostenstelle
+	$htmlstr .= "		<td class='ks_column' style='padding-top: 15px;'><select id='kostenstelle_neu' name='kostenstelle_id' onchange='markier(\"".(isset($b->benutzerberechtigung_id)?$b->benutzerberechtigung_id:'')."\")' style='width: 200px;'>\n";
+	$htmlstr .= "			<option value='' onclick='enable(\"oe_kurzbz_neu\");'>&nbsp;</option>\n";
+
+	foreach ($kostenstelle->result as $kst)
+	{
+		if(!$kst->aktiv)
+			$class='class="inactive"';
+		else
+			$class='';
+
+		$htmlstr .= "		<option value='".$kst->kostenstelle_id."' ".$class." onclick='disable(\"oe_kurzbz_neu\");'>".$kst->bezeichnung.'</option>';
+	}
+	$htmlstr .= "		</select></td>\n";
+
+	$htmlstr .= "		<td align='center' style='padding-top: 15px;'><input type='checkbox' name='negativ' onchange='markier(\"neu\")'></td>\n";
+	$htmlstr .= "		<td nowrap style='padding-top: 15px;'><input class='datepicker_datum' type='text' name='start' value='' size='10' maxlength='10' onchange='markier(\"neu\")'></td>\n";
+	$htmlstr .= "		<td nowrap style='padding-top: 15px;'><input class='datepicker_datum' type='text' name='ende' value='' size='10' maxlength='10' onchange='markier(\"neu\")'></td>\n";
+
+	//Anmerkung
+	$htmlstr .= "		<td style='padding-top: 15px;'><input id='anmerkung_neu' type='text' name='anmerkung' value='' size='30' maxlength='256' onchange='markier(\"neu\")'></td>\n";
+
+	$htmlstr .= "		<td style='padding-top: 15px;'><input type='submit' name='schick' value='neu'></td>";
+	$htmlstr .= "</form>\n";
+	$htmlstr .= "	</tr>\n";
+
 	foreach($rights->berechtigungen as $b)
 	{
 		switch($filter)
@@ -399,9 +477,9 @@ if (isset($_REQUEST['uid']) || isset($_REQUEST['funktion_kurzbz']))
 			<script language='javascript'>
 			$(document).ready(function()
 			{
-				var url = location.href;
-				location.href = '#editrow'
-				history.replaceState(null,null,url);
+				//var url = location.href;
+				//location.href = '#editrow'
+				//history.replaceState(null,null,url);
 			});
 			</script>";
 			$htmlstr.="</td>\n";
@@ -470,7 +548,7 @@ if (isset($_REQUEST['uid']) || isset($_REQUEST['funktion_kurzbz']))
 			$htmlstr .= "		<td name='td_$b->benutzerberechtigung_id'><input id='anmerkung_$b->benutzerberechtigung_id' type='text' name='anmerkung' value='".$b->anmerkung."' title='".$db->convert_html_chars(mb_eregi_replace('\r\n'," ",$b->anmerkung))."' size='30' maxlength='256' markier(\"td_".$b->benutzerberechtigung_id."\")'></td>\n";
 			$htmlstr .= "		<td align='center' name='td_$b->benutzerberechtigung_id'><img src='../../skin/images/information.png' alt='information' title='Angelegt von ".$b->insertvon." am ".$b->insertamum." \nZuletzt geaendert von ".$b->updatevon." am ".$b->updateamum."'></td>\n";
 
-			$htmlstr .= "		<td name='td_$b->benutzerberechtigung_id'><input type='submit' name='schick' value='speichern'></td>";
+			$htmlstr .= "		<td name='td_$b->benutzerberechtigung_id' style='white-space: nowrap'><input type='submit' name='schick' value='speichern'> &nbsp; <input type='submit' name='copy' value='kopieren'></td>";
 			$htmlstr .= "		<td name='td_$b->benutzerberechtigung_id'><input type='submit' name='del' value='l&ouml;schen'></td>";
 			$htmlstr .= "</form>\n";
 			$htmlstr .= "	</tr>\n";
@@ -541,85 +619,7 @@ if (isset($_REQUEST['uid']) || isset($_REQUEST['funktion_kurzbz']))
 
 	}
 
-	$htmlstr .= "	</tbody><tfoot><tr id='neu'>\n";
-	$htmlstr .= "<form action='benutzerberechtigung_details.php' method='POST' name='berechtigung_neu'>\n";
-	$htmlstr .= "<input type='hidden' name='neu' value='1'>\n";
-	$htmlstr .= "<input type='hidden' name='benutzerberechtigung_id' value=''>\n";
-	$htmlstr .= "<input type='hidden' name='uid' value='".$uid."'>\n";
-	$htmlstr .= "<input type='hidden' name='funktion_kurzbz' value='".$funktion_kurzbz."'>\n";
-
-	//Status
-	$htmlstr .= "		<td>&nbsp;</td>\n";
-	//Rolle
-	$htmlstr .= "		<td style='padding-top: 15px;'><select name='rolle_kurzbz' id='rolle_kurzbz_neu' onchange='markier(\"neu\"); setnull(\"berechtigung_kurzbz_neu\"); setnull(\"art_neu\");'>\n";
-	$htmlstr .= "			<option value='' onclick='enable(\"berechtigung_kurzbz_neu\");'>&nbsp;</option>\n";
-	for ($i = 0; $i < sizeof($rolle_arr); $i++)
-	{
-		$sel = "";
-		$htmlstr .= "				<option value='".$rolle_arr[$i]."' ".$sel." onclick='disable(\"berechtigung_kurzbz_neu\");'>".$rolle_arr[$i]."</option>";
-	}
-	$htmlstr .= "		</select></td>\n";
-
-	//Berechtigung_kurzbz
-	$htmlstr .= "		<td style='padding-top: 15px;'><select name='berechtigung_kurzbz' id='berechtigung_kurzbz_neu' onchange='markier(\"neu\"); setnull(\"rolle_kurzbz_neu\");'>\n";
-	$htmlstr .= "			<option value='' onclick='enable(\"rolle_kurzbz_neu\");'>&nbsp;</option>\n";
-	for ($i = 0; $i < sizeof($berechtigung_arr); $i++)
-	{
-		$sel = "";
-		$htmlstr .= "				<option title='".$berechtigung_beschreibung_arr[$i]."' ".(array_search($berechtigung_arr[$i],$berechtigung_user_arr)!==false?"style='color: #666'":"")." value='".$berechtigung_arr[$i]."' ".$sel." onclick='disable(\"rolle_kurzbz_neu\");'>".$berechtigung_arr[$i]."</option>";
-	}
-	$htmlstr .= "		</select></td>\n";
-
-	//Art
-	$htmlstr .= "		<td style='padding-top: 15px;'><input id='art_neu' type='text' name='art' value='' size='5' maxlength='5' onBlur='checkrequired(\"art_neu\")' onChange='validateArt(\"art_neu\")' placeholder='suid'></td>\n";
-
-	//Organisationseinheit
-	if($funktion_kurzbz!='')
-		$htmlstr .= "		<td class='oe_column' style='padding-top: 15px;'>OE aus MA-Funktion</td>\n";
-	else
-	{
-		$htmlstr .= "		<td class='oe_column' style='padding-top: 15px;'><select id='oe_kurzbz_neu' name='oe_kurzbz' onchange='markier(\"neu\")' style='width: 200px;'>\n";
-		$htmlstr .= "			<option value='' onclick='enable(\"kostenstelle_neu\");'>-- Alle --</option>\n";
-
-		foreach ($oe->result as $oekey)
-		{
-			if(!$oekey->aktiv)
-					$class='class="inactive"';
-				else
-					$class='';
-			$htmlstr .= "				<option value='".$oekey->oe_kurzbz."' ".$class." onclick='disable(\"kostenstelle_neu\");'>".$oekey->organisationseinheittyp_kurzbz.' '.$oekey->bezeichnung.'</option>';
-		}
-		$htmlstr .= "		</select></td>\n";
-	}
-
-	//Kostenstelle
-	$htmlstr .= "		<td class='ks_column' style='padding-top: 15px;'><select id='kostenstelle_neu' name='kostenstelle_id' onchange='markier(\"".(isset($b->benutzerberechtigung_id)?$b->benutzerberechtigung_id:'')."\")' style='width: 200px;'>\n";
-	$htmlstr .= "			<option value='' onclick='enable(\"oe_kurzbz_neu\");'>&nbsp;</option>\n";
-
-	foreach ($kostenstelle->result as $kst)
-	{
-		if(!$kst->aktiv)
-			$class='class="inactive"';
-		else
-			$class='';
-
-		$htmlstr .= "		<option value='".$kst->kostenstelle_id."' ".$class." onclick='disable(\"oe_kurzbz_neu\");'>".$kst->bezeichnung.'</option>';
-	}
-	$htmlstr .= "		</select></td>\n";
-
-	$htmlstr .= "		<td align='center' style='padding-top: 15px;'><input type='checkbox' name='negativ' onchange='markier(\"neu\")'></td>\n";
-	$htmlstr .= "		<td nowrap style='padding-top: 15px;'><input class='datepicker_datum' type='text' name='start' value='' size='10' maxlength='10' onchange='markier(\"neu\")'></td>\n";
-	$htmlstr .= "		<td nowrap style='padding-top: 15px;'><input class='datepicker_datum' type='text' name='ende' value='' size='10' maxlength='10' onchange='markier(\"neu\")'></td>\n";
-
-	//Anmerkung
-	$htmlstr .= "		<td style='padding-top: 15px;'><input id='anmerkung_neu' type='text' name='anmerkung' value='' size='30' maxlength='256' onchange='markier(\"neu\")'></td>\n";
-
-	$htmlstr .= "		<td style='padding-top: 15px;'><input type='submit' name='schick' value='neu'></td>";
-	$htmlstr .= "</form>\n";
-	$htmlstr .= "	</tr>\n";
-
-
-	$htmlstr .= "</tfoot></table>\n";
+	$htmlstr .= "</tbody></table>\n";
 
 }
 $htmlstr .= "<div class='inserterror'>".$errorstr."</div>\n";

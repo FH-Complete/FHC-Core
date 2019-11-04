@@ -70,11 +70,11 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 					class="sortDirectionIndicator"
 					sort="rdf:http://www.technikum-wien.at/notiz/rdf#text" />
 			    <xul:splitter class="tree-splitter"/>
-			    <xul:treecol anonid="treecol-notiz-verfasser" label="Verfasser" flex="2" hidden="false" persist="hidden width ordinal"
+			    <xul:treecol anonid="treecol-notiz-verfasser" label="VerfasserIn" flex="2" hidden="false" persist="hidden width ordinal"
 					class="sortDirectionIndicator"
 					sort="rdf:http://www.technikum-wien.at/notiz/rdf#verfasser_uid" />
 			    <xul:splitter class="tree-splitter"/>
-			    <xul:treecol anonid="treecol-notiz-bearbeiter" label="Bearbeiter" flex="2" hidden="true" persist="hidden width ordinal"
+			    <xul:treecol anonid="treecol-notiz-bearbeiter" label="BearbeiterIn" flex="2" hidden="true" persist="hidden width ordinal"
 					class="sortDirectionIndicator"
 					sort="rdf:http://www.technikum-wien.at/notiz/rdf#bearbeiter_uid" />
 			    <xul:splitter class="tree-splitter"/>
@@ -177,12 +177,12 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 										<xul:label value="Gültig bis"/>
 										<xul:hbox>
 							      			<xul:box class="Datum" anonid="box-notiz-ende"/>
-											<xul:label value="Verfasser"/>
+											<xul:label value="VerfasserIn"/>
 											<xul:label anonid="textbox-notiz-verfasser" disabled="true"/>
 										</xul:hbox>
 								</xul:row>
 								<xul:row>
-				      				<xul:label value="Bearbeiter"/>
+				      				<xul:label value="BearbeiterIn"/>
 				      				<xul:hbox>
 				      					<xul:hbox flex="1">
 								      		<xul:menulist anonid="menulist-notiz-bearbeiter"

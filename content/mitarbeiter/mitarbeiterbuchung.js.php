@@ -379,7 +379,7 @@ function MitarbeiterBuchungKontoAnlegen()
 	var tree = document.getElementById('mitarbeiter-tree');
 	if (tree.currentIndex == -1)
 	{
-		alert('Bitte waehlen Sie einen Mitarbeiter aus');
+		alert('Bitte waehlen Sie eine/n MitarbeiterIn aus');
 		return false;
 	}
 
