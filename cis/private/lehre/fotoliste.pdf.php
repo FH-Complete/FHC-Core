@@ -210,6 +210,7 @@ $a_o_kz = '9' . sprintf("%03s", $erhalter->result[0]->erhalter_kz); //Stg_Kz AO-
 $anzahl_studierende = 0;
 $datum = new datum();
 $zusatz = '';
+$foto_url_arr = array();
 
 //structure students data
 if ($result = $db->db_query($qry)) {
