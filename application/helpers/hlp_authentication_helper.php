@@ -34,3 +34,31 @@ function getAuthUID()
 
 	return isLogged() ? ($ci->authlib->getAuthObj())->{AuthLib::AO_USERNAME} : null;
 }
+
+/**
+ * If the user is NOT logged then a null value is returned.
+ * If the user is alredy logged, then it is possible to access to the authentication object
+ * that contains the firstname of the logged user
+ * NOTE: if the user is logged with a "foreign" method (ex. Bewerbungstool),
+ *		then it is possible that the firstname is null!
+ */
+function getAuthFirstname()
+{
+	$ci =& get_instance(); // get CI instance
+
+	return isLogged() ? ($ci->authlib->getAuthObj())->{AuthLib::AO_NAME} : null;
+}
+
+/**
+ * If the user is NOT logged then a null value is returned.
+ * If the user is alredy logged, then it is possible to access to the authentication object
+ * that contains the surname of the logged user
+ * NOTE: if the user is logged with a "foreign" method (ex. Bewerbungstool),
+ *		then it is possible that the surname is null!
+ */
+function getAuthSurname()
+{
+	$ci =& get_instance(); // get CI instance
+
+	return isLogged() ? ($ci->authlib->getAuthObj())->{AuthLib::AO_SURNAME} : null;
+}

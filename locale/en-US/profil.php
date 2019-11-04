@@ -27,6 +27,7 @@ $this->phrasen['profil/alleStudentenVon']='All students from';
 $this->phrasen['profil/kurzbeschreibungFuerOeh']='Brief description for the Austian Student Union candidacy';
 $this->phrasen['profil/solltenDatenNichtStimmen']='If your data is incorrect, please contact the responsible assistant';
 $this->phrasen['profil/esWurdenKeineProfileGefunden']='No profile ore multiple profiles were found for your user account';
+$this->phrasen['profil/keinGueltigesProfil']='Not a valid profile';
 $this->phrasen['profil/adminstration']='Administration';
 $this->phrasen['profil/zustaendigeAssistenz']='Administrative Assistant';
 $this->phrasen['profil/wendenSieSichAn']='Please contact the';
@@ -78,4 +79,7 @@ $this->phrasen['profil/fotoAuswählen']='Click on the image below to upload a ph
 $this->phrasen['profil/bildSpeichern']='Save image';
 $this->phrasen['profil/gueltigvon']='Valid from';
 $this->phrasen['profil/gueltigbis']='Valid to';
+$this->phrasen['profil/wochenstunden']='week hours';
+$this->phrasen['profil/vertragsstunden']='contract hours';
+$this->phrasen['profil/zukuenftigeFunktionen']='Future functions';
 ?>

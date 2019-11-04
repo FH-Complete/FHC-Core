@@ -649,6 +649,11 @@ class gruppe extends basis_db
 	 */
 	public function searchGruppen($searchItems, $aktiv = true, $limit = null)
 	{
+		if (!is_array($searchItems))
+		{
+			$this->errormsg = '$searchItems muss ein Array sein';
+			return false;
+		}
 		$qry = "SELECT
 				*
 				FROM

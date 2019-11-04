@@ -2,7 +2,10 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class CLI_Controller extends FHC_Controller
+/**
+ *
+ */
+abstract class CLI_Controller extends FHC_Controller
 {
 	const INFO_FORMAT = '%s %s %s %s'; // Info message format
 	const REQUIRED_PARAM_FORMAT = ' %s'; // Info message required method parameter format

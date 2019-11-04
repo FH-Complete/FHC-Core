@@ -1149,11 +1149,11 @@ function StudentProjektbetreuerDetailReset()
 	}
 	else if(document.getElementById('student-projektarbeit-menulist-projekttyp').value=='Praktikum')
 	{
-		document.getElementById('student-projektbetreuer-menulist-betreuerart').value='BetreuerPraktik';
+		document.getElementById('student-projektbetreuer-menulist-betreuerart').value='Betreuer';
 	}
 	else if(document.getElementById('student-projektarbeit-menulist-projekttyp').value=='Projekt')
 	{
-		document.getElementById('student-projektbetreuer-menulist-betreuerart').value='BetreuerProjekt';
+		document.getElementById('student-projektbetreuer-menulist-betreuerart').value='Betreuer';
 	}
 	else
 	{
@@ -1227,7 +1227,7 @@ function StudentProjektbetreuerSpeichern()
 
 	if(person_id=='')
 	{
-		alert('Bitte zuerst einen Betreuer auswaehlen');
+		alert('Bitte zuerst eine/n BetreuerIn auswaehlen');
 		return false;
 	}
 

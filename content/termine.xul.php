@@ -94,7 +94,7 @@ $student_uid = filter_input(INPUT_GET,'student_uid');
 						class="sortDirectionIndicator"
 						sort="rdf:http://www.technikum-wien.at/termine/rdf#ort" onclick="termineTreeSort()"/>
 					<splitter class="tree-splitter"/>
-					<treecol id="termine-treecol-lektor" label="Lektor" flex="2" hidden="false"
+					<treecol id="termine-treecol-lektor" label="LektorIn" flex="2" hidden="false"
 						class="sortDirectionIndicator"
 						sort="rdf:http://www.technikum-wien.at/termine/rdf#lektor" onclick="termineTreeSort()"/>
 					<splitter class="tree-splitter"/>

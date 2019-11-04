@@ -353,7 +353,7 @@ $filters = array(
 					{"name": "fakultaet"},
 					{"name": "datum"},
 					{"name": "uhrzeit"},
-					{"name": "anmeldefrist"},					
+					{"name": "anmeldefrist"},
 					{"name": "oeffentlich"},
 					{"name": "studiengaenge"},
 					{"name": "freie_plaetze"},
@@ -400,142 +400,6 @@ $filters = array(
 		'oe_kurzbz' => null,
 	),
 	array(
-		'app' => 'lehrauftrag',
-		'dataset_name' => 'lehrauftragOrder',
-		'filter_kurzbz' => 'LehrauftragOrder',
-		'description' => '{Alle}',
-		'sort' => 1,
-		'default_filter' => true,
-		'filter' => '
-			{
-			    "name": "",
-				"columns": [
-				    {"name": "row_index"},
-				    {"name": "personalnummer"},
-				    {"name": "lehreinheit_id"},
-				    {"name": "lehrveranstaltung_id"},
-				    {"name": "lv_bezeichnung"},
-				    {"name": "projektarbeit_id"},
-				    {"name": "studiensemester_kurzbz"},
-				    {"name": "studiengang_kz"},
-				    {"name": "stg_typ_kurzbz"},
-				    {"name": "orgform_kurzbz"},
-				    {"name": "person_id"},
-				    {"name": "typ"},
-					{"name": "auftrag"},
-                    {"name": "semester"},
-					{"name": "lv_oe_kurzbz"},
-                    {"name": "gruppe"},
-					{"name": "lektor"},
-					{"name": "stunden"},
-					{"name": "stundensatz"},
-					{"name": "betrag"},
-                    {"name": "vertrag_id"},
-                    {"name": "vertrag_stunden"},
-                    {"name": "vertrag_betrag"},
-					{"name": "mitarbeiter_uid"},
-					{"name": "bestellt"},
-					{"name": "erteilt"},
-					{"name": "akzeptiert"},
-                    {"name": "bestellt_von"},
-					{"name": "erteilt_von"},
-					{"name": "akzeptiert_von"}
-				],
-				"filters": []
-			}
-		',
-		'oe_kurzbz' => null,
-	),
-    array(
-        'app' => 'lehrauftrag',
-        'dataset_name' => 'lehrauftragApprove',
-        'filter_kurzbz' => 'LehrauftragApprove',
-        'description' => '{Alle}',
-        'sort' => 1,
-        'default_filter' => true,
-        'filter' => '
-			{
-			    "name": "",
-				"columns": [
-				    {"name": "row_index"},
-				    {"name": "personalnummer"},
-				    {"name": "lehreinheit_id"},
-				    {"name": "lehrveranstaltung_id"},
-				    {"name": "lv_bezeichnung"},
-				    {"name": "projektarbeit_id"},
-				    {"name": "studiensemester_kurzbz"},
-				    {"name": "studiengang_kz"},
-				    {"name": "stg_typ_kurzbz"},
-                    {"name": "orgform_kurzbz"},
-				    {"name": "person_id"},
-				    {"name": "typ"},
-					{"name": "auftrag"},
-                    {"name": "semester"},
-					{"name": "lv_oe_kurzbz"},
-					{"name": "gruppe"},
-					{"name": "lektor"},
-					{"name": "stunden"},
-					{"name": "betrag"},
-                    {"name": "vertrag_id"},
-                    {"name": "vertrag_stunden"},
-                    {"name": "vertrag_betrag"},
-					{"name": "mitarbeiter_uid"},
-					{"name": "bestellt"},
-					{"name": "erteilt"},
-					{"name": "akzeptiert"},
-                    {"name": "bestellt_von"},
-					{"name": "erteilt_von"},
-					{"name": "akzeptiert_von"}
-				],
-				"filters": []
-			}
-		',
-        'oe_kurzbz' => null,
-    ),
-    array(
-        'app' => 'lehrauftrag',
-        'dataset_name' => 'lehrauftragAccept',
-        'filter_kurzbz' => 'LehrauftragAccept',
-        'description' => '{Alle}',
-        'sort' => 1,
-        'default_filter' => true,
-        'filter' => '
-			{
-			    "name": "",
-				"columns": [
-				    {"name": "row_index"},
-				    {"name": "lehreinheit_id"},
-				    {"name": "lehrveranstaltung_id"},
-				    {"name": "projektarbeit_id"},
-				    {"name": "studiensemester_kurzbz"},
-				    {"name": "studiengang_kz"},
-				    {"name": "stg_typ_kurzbz"},
-                    {"name": "orgform_kurzbz"},
-				    {"name": "person_id"},
-				    {"name": "typ"},
-					{"name": "auftrag"},
-                    {"name": "semester"},
-					{"name": "lv_oe_kurzbz"},
-					{"name": "gruppe"},
-					{"name": "stunden"},
-					{"name": "betrag"},
-                    {"name": "vertrag_id"},
-                    {"name": "vertrag_stunden"},
-                    {"name": "vertrag_betrag"},
-					{"name": "mitarbeiter_uid"},
-					{"name": "bestellt"},
-					{"name": "erteilt"},
-					{"name": "akzeptiert"},
-                    {"name": "bestellt_von"},
-					{"name": "erteilt_von"},
-					{"name": "akzeptiert_von"}
-				],
-				"filters": []
-			}
-		',
-        'oe_kurzbz' => null,
-    ),
-	array(
 		'app' => 'budget',
 		'dataset_name' => 'budgetoverview',
 		'filter_kurzbz' => 'BudgetUebersicht',
@@ -569,7 +433,172 @@ $filters = array(
 		',
 		'oe_kurzbz' => null,
 	),
-    array(
+	array(
+		'app' => 'core',
+		'dataset_name' => 'logs',
+		'filter_kurzbz' => 'last7days',
+		'description' => '{Last 7 days logs}',
+		'sort' => 1,
+		'default_filter' => true,
+		'filter' => '
+			{
+				"name": "All logs from the last 7 days",
+				"columns": [
+					{"name": "RequestId"},
+					{"name": "ExecutionTime"},
+					{"name": "ExecutedBy"},
+					{"name": "Description"},
+					{"name": "Data"}
+				],
+				"filters": [
+					{
+						"name": "ExecutionTime",
+						"operation": "lt",
+						"condition": "7",
+						"option": "days"
+					}
+				]
+			}
+		',
+		'oe_kurzbz' => null,
+	),
+	array(
+		'app' => 'core',
+		'dataset_name' => 'logs',
+		'filter_kurzbz' => 'jobs14days',
+		'description' => '{Last 14 days jobs logs}',
+		'sort' => 2,
+		'default_filter' => false,
+		'filter' => '
+			{
+				"name": "All jobs logs from the last 14 days",
+				"columns": [
+					{"name": "RequestId"},
+					{"name": "ExecutionTime"},
+					{"name": "ExecutedBy"},
+					{"name": "Description"},
+					{"name": "Data"}
+				],
+				"filters": [
+					{
+						"name": "WebserviceType",
+						"operation": "contains",
+						"condition": "job"
+					},
+					{
+						"name": "ExecutionTime",
+						"operation": "lt",
+						"condition": "14",
+						"option": "days"
+					}
+				]
+			}
+		',
+		'oe_kurzbz' => null,
+	),
+	array(
+		'app' => 'core',
+		'dataset_name' => 'logs',
+		'filter_kurzbz' => 'repots14days',
+		'description' => '{Last 14 days reports logs}',
+		'sort' => 3,
+		'default_filter' => false,
+		'filter' => '
+			{
+				"name": "All reports logs from the last 14 days",
+				"columns": [
+					{"name": "RequestId"},
+					{"name": "ExecutionTime"},
+					{"name": "ExecutedBy"},
+					{"name": "Description"},
+					{"name": "Data"}
+				],
+				"filters": [
+					{
+						"name": "WebserviceType",
+						"operation": "contains",
+						"condition": "reports"
+					},
+					{
+						"name": "ExecutionTime",
+						"operation": "lt",
+						"condition": "14",
+						"option": "days"
+					}
+				]
+			}
+		',
+		'oe_kurzbz' => null,
+	),
+	array(
+		'app' => 'core',
+		'dataset_name' => 'logs',
+		'filter_kurzbz' => 'content3days',
+		'description' => '{Last 3 days content logs}',
+		'sort' => 4,
+		'default_filter' => false,
+		'filter' => '
+			{
+				"name": "All content logs from the last 3 days",
+				"columns": [
+					{"name": "RequestId"},
+					{"name": "ExecutionTime"},
+					{"name": "ExecutedBy"},
+					{"name": "Description"},
+					{"name": "Data"}
+				],
+				"filters": [
+					{
+						"name": "WebserviceType",
+						"operation": "contains",
+						"condition": "content"
+					},
+					{
+						"name": "ExecutionTime",
+						"operation": "lt",
+						"condition": "3",
+						"option": "days"
+					}
+				]
+			}
+		',
+		'oe_kurzbz' => null,
+	),
+	array(
+		'app' => 'core',
+		'dataset_name' => 'logs',
+		'filter_kurzbz' => 'wienerlinien7days',
+		'description' => '{Last 7 days wiener linien logs}',
+		'sort' => 5,
+		'default_filter' => false,
+		'filter' => '
+			{
+				"name": "All wiener linien logs from the last 7 days",
+				"columns": [
+					{"name": "RequestId"},
+					{"name": "ExecutionTime"},
+					{"name": "ExecutedBy"},
+					{"name": "Description"},
+					{"name": "Data"}
+				],
+				"filters": [
+					{
+						"name": "WebserviceType",
+						"operation": "contains",
+						"condition": "wienerlinien"
+					},
+					{
+						"name": "ExecutionTime",
+						"operation": "lt",
+						"condition": "7",
+						"option": "days"
+					}
+				]
+			}
+		',
+		'oe_kurzbz' => null,
+	),
+	array(
         'app' => 'budget',
         'dataset_name' => 'budgetoverview',
         'filter_kurzbz' => 'BudgetUebersicht',
@@ -601,8 +630,8 @@ $filters = array(
 				]
 			}
 		',
-        'oe_kurzbz' => null,
-    )
+		'oe_kurzbz' => null,
+	)
 );
 
 // Loop through the filters array

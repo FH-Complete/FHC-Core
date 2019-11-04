@@ -42,7 +42,7 @@ table.tablesort-hover tr:hover, .tablesort-active {
 }
 
 /* Remove background color from filter row */
-.tablesorter-default .tablesorter-filter-row td {
+.tablesorter-default .tablesorter-filter-row td, .tablesorter-default .tablesorter-filter-row:hover td {
     background-color: white !important;
 }
 

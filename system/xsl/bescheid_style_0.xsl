@@ -158,11 +158,9 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
 		<style:master-page style:name="Standard" style:page-layout-name="Mpm1">
 			<style:header>
 				<text:p text:style-name="MP1">
-					<draw:frame draw:style-name="Mfr1" draw:name="Bild4" text:anchor-type="char" svg:x="13.259cm" svg:y="0cm" svg:width="4.193cm" svg:height="2.17cm" draw:z-index="0">
-						<draw:image xlink:href="Pictures/1000020100000185000000C8D52FE05B715D2B9D.png" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/>
-					</draw:frame>Kollegium der FH Technikum Wien</text:p>
-				<text:p text:style-name="MP2">Höchstädtplatz 6</text:p>
-				<text:p text:style-name="MP2">A-1200 Wien</text:p>
+				</text:p>
+				<text:p text:style-name="MP2">www.fhcomplete.org</text:p>
+
 			</style:header>
 		</style:master-page>
 	</office:master-styles>

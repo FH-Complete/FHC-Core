@@ -281,9 +281,9 @@ ORDER BY "akzeptiert" NULLS FIRST, "erteilt" NULLS LAST, "bestellt"
 
 $filterWidgetArray = array(
     'query' => $query,
-    'app' => LehrauftragAkzeptieren::APP,
-    'datasetName' => 'lehrauftragAccept',
-    'filterKurzbz' => 'LehrauftragAccept',
+
+    'tableUniqueId' => 'acceptLehrauftrag',
+
     'requiredPermissions' => 'lehre/lehrauftrag_akzeptieren',
     'datasetRepresentation' => 'tabulator',
     'reloadDataset' => true,    // reload query on page refresh
@@ -319,22 +319,22 @@ $filterWidgetArray = array(
         'Angenommen von'
     ),
     'datasetRepOptions' => '{
-        height: 550,   
+        height: 550,
         layout: "fitColumns",           // fit columns to width of table
-	    responsiveLayout: "hide",       // hide columns that dont fit on the table    
-	    movableColumns: true,           // allows changing column 
+	    responsiveLayout: "hide",       // hide columns that dont fit on the table
+	    movableColumns: true,           // allows changing column
 	    headerFilterPlaceholder: " ",
         index: "row_index",             // assign specific column as unique id (important for row indexing)
         selectable: true,               // allow row selection
         selectableRangeMode: "click",   // allow range selection using shift end click on end of range
         selectablePersistence:false,    // deselect previously selected rows when table is filtered, sorted or paginated
-        selectableCheck: function(row){ 
+        selectableCheck: function(row){
             return func_selectableCheck(row);
         },
         initialFilter: func_initialFilter(),
-        footerElement: func_footerElement(),         
+        footerElement: func_footerElement(),
         rowUpdated:function(row){
-            func_rowUpdated(row);    
+            func_rowUpdated(row);
         },
         rowSelectionChanged:function(data, rows){
             func_rowSelectionChanged(data, rows);
@@ -344,13 +344,13 @@ $filterWidgetArray = array(
         },
         tableBuilt: function(){
             func_tableBuilt(this);
-        },  
+        },
         renderComplete:function(){
             func_renderComplete(this);
         },
          renderStarted:function(){
             func_renderStarted(this);
-        }         
+        }
     }', // tabulator properties
     'datasetRepFieldsDefs' => '{
         row_index: {visible:false},     // necessary for row indexing
@@ -358,19 +358,19 @@ $filterWidgetArray = array(
         lehrveranstaltung_id: {headerFilter:"input", width: "5%"},
         projektarbeit_id: {visible: false},
         studiensemester_kurzbz: {visible: false},
-        studiengang_kz: {visible: false},  
+        studiengang_kz: {visible: false},
         stg_typ_kurzbz: {headerFilter:"input", width: "5%"},
         orgform_kurzbz: {headerFilter:"input"},
         person_id: {visible: false},
         typ: {headerFilter:"input", width: "7%"},
         auftrag: {headerFilter:"input", width: "23%"},
-        semester: {headerFilter:"input"}, 
+        semester: {headerFilter:"input"},
         lv_oe_kurzbz: {headerFilter:"input", width: "12%"},
         gruppe: {headerFilter:"input", width: "5%"},
-        stunden: {align:"right", 
-            headerFilter:"input", headerFilterFunc: hf_filterStringnumberWithOperator, 
-            bottomCalc:"sum", bottomCalcParams:{precision:1}, width: "5%"}, 
-        betrag: {align:"right", formatter: form_formatNulltoStringNumber, 
+        stunden: {align:"right",
+            headerFilter:"input", headerFilterFunc: hf_filterStringnumberWithOperator,
+            bottomCalc:"sum", bottomCalcParams:{precision:1}, width: "5%"},
+        betrag: {align:"right", formatter: form_formatNulltoStringNumber,
             headerFilter:"input", headerFilterFunc: hf_filterStringnumberWithOperator,
             bottomCalc:"sum", bottomCalcParams:{precision:2}, bottomCalcFormatter:"money", bottomCalcFormatterParams:{decimal: ",", thousand: ".", symbol:"€"},
             width: "8%"},
@@ -378,7 +378,7 @@ $filterWidgetArray = array(
         vertrag_stunden: {visible: false},
         vertrag_betrag: {visible: false},
         mitarbeiter_uid: {visible: false},
-        bestellt: {align:"center", headerFilter:"input", mutator: mut_formatStringDate, tooltip: bestellt_tooltip}, 
+        bestellt: {align:"center", headerFilter:"input", mutator: mut_formatStringDate, tooltip: bestellt_tooltip},
         erteilt: {align:"center", headerFilter:"input", mutator: mut_formatStringDate, tooltip: erteilt_tooltip},
         akzeptiert: {align:"center", headerFilter:"input", mutator: mut_formatStringDate, tooltip: akzeptiert_tooltip},
         bestellt_von: {visible: false},
@@ -387,7 +387,6 @@ $filterWidgetArray = array(
     }', // col properties
 );
 
-echo $this->widgetlib->widget('FilterWidget', $filterWidgetArray);
+echo $this->widgetlib->widget('TableWidget', $filterWidgetArray);
 
 ?>
-

@@ -509,6 +509,11 @@ class frage extends basis_db
 						$level[$row->level]=round(($row->anzahl/$fragengesamt)*$maxfragen);
 					}
 				}
+				// Wenn ein Level besonders viele Fragen und eines nur eine Frage (nach dem Runden) hat,
+				// kann es durch Rundungsfehler vorkommen, dass bei der Ausgabe ein Level ausgelassen wird.
+				// Deshalb wird das array hier aufsteigend sortiert. So wird ggf. vom Level mit den meisten Fragen
+				// die letzte ausgelassen. Hier wäre eine sauberere Lösung besser.
+				asort($level);
 
 				// Von jedem Gebiet muss mindestens eine Frage kommen
 				foreach ($level as $key=>$row)

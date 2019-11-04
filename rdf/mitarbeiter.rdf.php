@@ -166,7 +166,7 @@ if($lehrveranstaltung_id==null && $filter==null && $mitarbeiter_uid==null)
 		{
 			$stge=$bb->getStgKz('admin');
 			$stge=array_merge($stge, $bb->getStgKz('assistenz'));
-			$ma=$mitarbeiter->getMitarbeiterStg($lektor,$fixangestellt,$stge, 'lkt');
+			$ma=$mitarbeiter->getMitarbeiterStg($lektor,$fixangestellt,$stge, 'lkt', 'typ, stg_kurzbz, nachname, vorname, vw_mitarbeiter.kurzbz');
 			$laststg=-1;
 			if(count($ma)>0)
 			{

@@ -19,6 +19,7 @@
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> ,
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>,
  *          Manfred Kindl <manfred.kindl@technikum-wien.at>
+ *          Cristina Hainberger <hainberg@technikum-wien.at>
  */
 
 require_once('../../config/cis.config.inc.php');
@@ -29,45 +30,18 @@ require_once '../../include/phrasen.class.php';
   if (!$db = new basis_db())
       die('Fehler beim Oeffnen der Datenbankverbindung');
 
-function getSpracheUser()
+// Start session
+session_start();
+
+// If language is changed by language select menu, reset language variables
+if (isset($_GET['sprache_user']) && !empty($_GET['sprache_user']))
 {
-	if(isset($_SESSION['sprache_user']))
-	{
-		$sprache_user=$_SESSION['sprache_user'];
-	}
-	else
-	{
-		if(isset($_COOKIE['sprache_user']))
-		{
-			$sprache_user=$_COOKIE['sprache_user'];
-		}
-		else
-		{
-			$sprache_user=DEFAULT_LANGUAGE;
-		}
-		setSpracheUser($sprache_user);
-	}
-	return $sprache_user;
+    $_SESSION['sprache_user'] = $_GET['sprache_user'];
+    $sprache_user = $_GET['sprache_user'];
 }
 
-function setSpracheUser($sprache)
-{
-	$_SESSION['sprache_user']=$sprache;
-	setcookie('sprache_user',$sprache,time()+60*60*24*30,'/');
-}
-
-if(isset($_GET['sprache_user']))
-{
-	$sprache_user = new sprache();
-	if($sprache_user->load($_GET['sprache_user']))
-	{
-		setSpracheUser($_GET['sprache_user']);
-	}
-	else
-		setSpracheUser(DEFAULT_LANGUAGE);
-}
-
-$sprache_user = getSpracheUser(); 
+// Set language variable
+$sprache_user = (isset($_SESSION['sprache_user']) && !empty($_SESSION['sprache_user'])) ? $_SESSION['sprache_user'] : DEFAULT_LANGUAGE;
 $p = new phrasen($sprache_user);
 
 ?>

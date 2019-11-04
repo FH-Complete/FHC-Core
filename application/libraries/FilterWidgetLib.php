@@ -533,6 +533,14 @@ class FilterWidgetLib
 	}
 
 	/**
+	 * Reloads dataset by setting session variable to true
+	 */
+	public function reloadDataset()
+	{
+		$this->setSessionElement(self::SESSION_RELOAD_DATASET, true);
+	}
+
+	/**
 	 * Add a filter (SQL where clause) to be applied to the current filter
 	 */
 	public function addFilter($filter)
@@ -795,32 +803,7 @@ class FilterWidgetLib
 			$filterUniqueId = $this->_ci->router->directory.$this->_ci->router->class.'/'.$this->_ci->router->method;
 		}
 
-		if ($params != null
-			&& is_array($params)
-			&& (isset($params[self::APP_PARAMETER]) || isset($params[self::DATASET_NAME_PARAMETER]) || isset($params[self::FILTER_ID])))
-		{
-			$app = '';
-			$dataset = '';
-			$filterid = '';
-
-			if (isset($params[self::APP_PARAMETER])) $app = $params[self::APP_PARAMETER];
-			if (isset($params[self::DATASET_NAME_PARAMETER])) $dataset = $params[self::DATASET_NAME_PARAMETER];
-			if (isset($params[self::FILTER_ID])) $filterid = $params[self::FILTER_ID];
-
-			$filterUniqueId .= '/'.$app.':'.$dataset.':'.$filterid;
-		}
-
-		// If the FHC_CONTROLLER_ID parameter is present in the HTTP GET
-		if (isset($_GET[self::FHC_CONTROLLER_ID]))
-		{
-			$filterUniqueId .= '/'.$this->_ci->input->get(self::FHC_CONTROLLER_ID); // then use it
-		}
-		elseif (isset($_POST[self::FHC_CONTROLLER_ID])) // else if the FHC_CONTROLLER_ID parameter is present in the HTTP POST
-		{
-			$filterUniqueId .= '/'.$this->_ci->input->post(self::FHC_CONTROLLER_ID); // then use it
-		}
-
-		$this->_filterUniqueId = $filterUniqueId;
+		$this->setFilterUniqueId($filterUniqueId);
 	}
 
 	/**

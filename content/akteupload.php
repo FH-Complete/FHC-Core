@@ -168,7 +168,7 @@ if(isset($_POST['submitbild']))
 if(isset($_GET['person_id']))
 {
 	$dokument = new dokument();
-	$dokument->getAllDokumente('Zeugnis');
+	$dokument->getAllDokumente('Zeugnis,DiplSupp,Bescheid');
 
 	echo "	<!DOCTYPE HTML PUBLIC '-//W3C//DTD HTML 4.01 Transitional//EN' 'http://www.w3.org/TR/html4/loose.dtd'>
 			<html>

@@ -13,7 +13,7 @@ $this->load->view(
         'momentjs' => true,
         'ajaxlib' => true,
         'dialoglib' => true,
-        'filterwidget' => true,
+        'tablewidget' => true,
         'navigationwidget' => true,
         'phrases' => array(
             'global' => array('lehrauftraegeErteilen'),

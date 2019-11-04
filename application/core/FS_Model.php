@@ -1,6 +1,11 @@
 <?php
 
-class FS_Model extends CI_Model
+if (!defined('BASEPATH')) exit('No direct script access allowed');
+
+/**
+ *
+ */
+abstract class FS_Model extends CI_Model
 {
 	protected $filepath;  // Path of the file
 

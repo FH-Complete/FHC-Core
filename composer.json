@@ -179,7 +179,7 @@
 				"name": "nicolaskruchten/pivottable",
 				"version": "2.15.0",
 				"dist": {
-					"url": "https://github.com/nicolaskruchten/pivottable/archive/v2.15.0.zip",
+					"url": "https://github.com/nicolaskruchten/pivottable/archive/v2.21.0.zip",
 					"type": "zip"
 				}
 			}
@@ -250,6 +250,7 @@
 		"borgar/textile-js": "2.0.4",
 		"BlackrockDigital/startbootstrap-sb-admin-2": "^3.3",
 
+		"chriskacerguis/codeigniter-restserver": "^3.0",
 		"christianbach/tablesorter": "^1.0",
 		"codeigniter/framework": "3.*",
 		"components/jquery": "^3.2",
@@ -281,7 +282,7 @@
 
 		"nategood/httpful": "^0.2.20",
 		"netcarver/textile": "^3.5",
-		"nicolaskruchten/pivottable": "^2.15.0",
+		"nicolaskruchten/pivottable": "^2.21.0",
 
 		"olifolkerd/tabulator": "4.2.7",
 

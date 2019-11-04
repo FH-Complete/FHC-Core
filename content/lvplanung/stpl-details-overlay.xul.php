@@ -64,7 +64,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 				persist="hidden, width, ordinal"
 				sort="rdf:http://www.technikum-wien.at/lehrstunde/rdf#lehreinheit_id"  />
 			<splitter class="tree-splitter"/>
-			<treecol id="stplLektor" label="Lektor" flex="2" hidden="false"
+			<treecol id="stplLektor" label="LektorIn" flex="2" hidden="false"
 				class="sortDirectionIndicator" persist="hidden, width, ordinal"
 				sort="rdf:http://www.technikum-wien.at/lehrstunde/rdf#lektor" />
 			<splitter class="tree-splitter"/>

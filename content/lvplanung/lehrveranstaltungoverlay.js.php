@@ -1107,7 +1107,7 @@ function LeMitarbeiterDel()
 		idx = tree.currentIndex;
 	else
 	{
-		alert('Bitte zuerst einen Mitarbeiter markieren');
+		alert('Bitte zuerst eine/n MitarbeiterIn markieren');
 		return false;
 	}
 
@@ -1799,7 +1799,7 @@ function LeLektorDelLVPlan()
 		idx = tree.currentIndex;
 	else
 	{
-		alert('Bitte zuerst einen Lektor markieren');
+		alert('Bitte zuerst eine/n LektorIn markieren');
 		return false;
 	}
 
@@ -1817,7 +1817,7 @@ function LeLektorDelLVPlan()
 		return false;
 	}
 
-	if(!confirm("Sind Sie sicher dass Sie diesen Mitarbeiter aus dem LVPlan entfernen wollen?"))
+	if(!confirm("Sind Sie sicher dass Sie diese/n MitarbeiterIn aus dem LVPlan entfernen wollen?"))
 		return false;
 
 	var req = new phpRequest('lvplanung/lehrveranstaltungDBDML.php','','');
@@ -2975,7 +2975,7 @@ function LehrveranstaltungNotenPruefungSave()
 
     if(mitarbeiter_uid == '' || satz == '' || anzahl == '' || vertragstyp_kurzbz=='')
     {
-        alert('Bitte wählen Sie einen Mitarbeiter aus und geben Sie den Satz pro Prüfung sowie die Anzahl der Prüfungen an!');
+        alert('Bitte wählen Sie eine/n MitarbeiterIn aus und geben Sie den Satz pro Prüfung sowie die Anzahl der Prüfungen an!');
         return false;
     }
 
