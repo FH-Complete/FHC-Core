@@ -23,7 +23,8 @@ class LehrauftragAkzeptieren extends Auth_Controller
         parent::__construct(
             array(
                 'index' => 'lehre/lehrauftrag_akzeptieren:r',
-                'acceptLehrauftrag' => 'lehre/lehrauftrag_akzeptieren:rw'
+                'acceptLehrauftrag' => 'lehre/lehrauftrag_akzeptieren:rw',
+				'checkInkludierteLehre' => 'lehre/lehrauftrag_akzeptieren:rw'
             )
         );
 
@@ -65,19 +66,6 @@ class LehrauftragAkzeptieren extends Auth_Controller
      */
     public function index()
     {
-        /**
-         * Check if lectors latest active Verwendung has inkludierte Lehre
-         * - inkludierte_lehre is null: freelancer lector -> has NO inkludierte Lehre
-         * - inkludierte_lehre -1: fix employed lector -> all inclusive Lehre
-         * - inkludierte_lehre > 0: fix employed lector -> given value is inclusive Lehre
-         */
-        $has_inkludierteLehre = false;
-        $result = $this->BisverwendungModel->getLast($this->_uid);
-        if (hasData($result))
-        {
-            $has_inkludierteLehre = (is_null($result->retval[0]->inkludierte_lehre)) ? false : true;
-        }
-
         // Set studiensemester selected for studiengang dropdown
         $studiensemester_kurzbz = $this->input->get('studiensemester'); // if provided by selected studiensemester
         if (is_null($studiensemester_kurzbz)) // else set next studiensemester as default value
@@ -94,8 +82,7 @@ class LehrauftragAkzeptieren extends Auth_Controller
         }
 
         $view_data = array(
-            'studiensemester_selected' => $studiensemester_kurzbz,
-            'has_inkludierteLehre' => $has_inkludierteLehre
+            'studiensemester_selected' => $studiensemester_kurzbz
         );
 
         $this->load->view('lehre/lehrauftrag/acceptLehrauftrag.php', $view_data);
@@ -177,6 +164,26 @@ class LehrauftragAkzeptieren extends Auth_Controller
             }
         }
     }
+	
+	/**
+	 * Check if lectors latest active Verwendung has inkludierte Lehre
+	 * - inkludierte_lehre is null: freelancer lector -> has NO inkludierte Lehre
+	 * - inkludierte_lehre -1: fix employed lector -> all inclusive Lehre
+	 * - inkludierte_lehre > 0: fix employed lector -> given value is inclusive Lehre
+	 */
+    public function checkInkludierteLehre()
+	{
+		$result = $this->BisverwendungModel->getLast($this->_uid);
+		
+		if (hasData($result))
+		{
+			$this->outputJsonSuccess(!is_null($result->retval[0]->inkludierte_lehre));
+		}
+		else
+		{
+			$this->outputJsonError($result->retval);
+		}
+	}
 
     // -----------------------------------------------------------------------------------------------------------------
     // Private methods

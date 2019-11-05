@@ -4,15 +4,11 @@
  * Lehrauftraege annehmen - Tabulator: acceptLehrauftragData.php
  */
 
-
 // -----------------------------------------------------------------------------------------------------------------
 // Global vars
 // -----------------------------------------------------------------------------------------------------------------
 
 const COLOR_LIGHTGREY = "#f5f5f5";
-
-// Store boolean has_inkludierteLehre. If true, used to hide column Betrag.
-// has_inkludierteLehre is defined in acceptLehrauftrag.php BEFORE loading this js-script (to pass php variable)
 
 /**
  * PNG icons used in status- and filter buttons
@@ -237,11 +233,25 @@ function func_rowUpdated(row){
 // Hide betrag, if lector has inkludierte Lehre
 function func_renderComplete(table){
 
-    // If the lectors actual Verwendung has inkludierte Lehre, hide the column betrag
-    if (has_inkludierteLehre)
-    {
-        table.hideColumn("betrag");
-    }
+    // Check if the lectors actual Verwendung has inkludierte Lehre
+    FHC_AjaxClient.ajaxCallGet(
+        FHC_JS_DATA_STORAGE_OBJECT.called_path + "/checkInkludierteLehre",
+        null,
+        {
+            successCallback: function (data, textStatus, jqXHR)
+            {
+                // If lector has inkludierte Lehre, hide the column betrag
+                if (data.retval)
+                {
+                    table.hideColumn("betrag");
+                }
+            },
+            errorCallback: function (jqXHR, textStatus, errorThrown)
+            {
+                FHC_DialogLib.alertError("Systemfehler<br>Bitte kontaktieren Sie Ihren Administrator.");
+            }
+        }
+    );
 }
 
 // Tabulator footer element

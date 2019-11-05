@@ -1,11 +1,3 @@
-<script>
-    // -----------------------------------------------------------------------------------------------------------------
-    // Global vars to be known in public/js/lehre/lehrauftrag/acceptLehrauftrag.js
-    // -----------------------------------------------------------------------------------------------------------------
-    // Store boolean has_inkludierteLehre. If true, used to hide column Betrag.
-    var has_inkludierteLehre = new Boolean(<?php echo $has_inkludierteLehre ?>).valueOf();
-</script>
-
 <?php
 $this->load->view(
     'templates/FHC-Header',
