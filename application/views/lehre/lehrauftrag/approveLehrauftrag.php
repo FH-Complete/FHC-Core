@@ -2,7 +2,7 @@
 $this->load->view(
     'templates/FHC-Header',
     array(
-        'title' => 'Lehrauftrag',
+        'title' => 'Lehrauftrag erteilen',
         'jquery' => true,
         'jqueryui' => true,
         'jquerycheckboxes' => true,

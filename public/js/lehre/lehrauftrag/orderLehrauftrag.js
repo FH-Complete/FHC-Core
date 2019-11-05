@@ -386,7 +386,7 @@ status_tooltip = function(cell){
 
     var betrag = parseFloat(cell.getRow().getData().betrag);
     var stunden = parseFloat(cell.getRow().getData().stunden);
-    var stundensatz = cell.getRow().getData().stundensatz;
+    var stundensatz = parseFloat(cell.getRow().getData().stundensatz);
 
     var vertrag_betrag = parseFloat(cell.getRow().getData().vertrag_betrag);
     var vertrag_stunden = parseFloat(cell.getRow().getData().vertrag_stunden);
