@@ -528,17 +528,23 @@ class MessageLib
 		if (isError($messageResult)) return $messageResult; // if an error occured then return it
 		if (!hasData($messageResult)) return error('No data found with the given message id'); // if no data found then return an error
 
+		// If the message was sent to an organisation unit, then retrives the allowed people to receive the notice email for that organisation unit
 		$messages = getData($messageResult);
-		if (count($messages) == 1 && $messages[0]->receiver_id == $this->_ci->config->item(self::CFG_SYSTEM_PERSON_ID))
+		if (count($messages) == 1
+			&& $messages[0]->receiver_id == $this->_ci->config->item(self::CFG_SYSTEM_PERSON_ID)
+			&& !isEmptyString($messages[0]->oe_kurzbz))
 		{
-			$messages = $this->_ci->RecipientModel->getReceivedMessagesByOE(
+			$messageResult = $this->_ci->RecipientModel->getMessagesToSentToOE(
 				$messages[0]->oe_kurzbz,
 				$this->_ci->config->item(MessageLib::CFG_OU_RECEIVERS),
 				self::EMAIL_KONTAKT_TYPE
 			);
 		}
 
-		return $this->_sendNotice($messages);
+		if (isError($messageResult)) return $messageResult;
+		if (!hasData($messageResult)) return error('It is not possible to retrieve the recipient for this message: '.$message_id);
+
+		return $this->_sendNotice(getData($messageResult));
 	}
 
 	/**

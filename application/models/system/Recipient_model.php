@@ -379,9 +379,9 @@ class Recipient_model extends DB_Model
 	}
 
 	/**
-	 * Gets only the recieved messages from an organisation unit where this person plays a role given by the parameter functions
+	 * Get all the messages to sent to an organisation unit
 	 */
-	public function getReceivedMessagesByOE($oe_kurzbz, $functions, $kontaktType)
+	public function getMessagesToSentToOE($oe_kurzbz, $functions, $kontaktType)
 	{
 		// Messages sent to a person that belongs to the recipient organisation unit
 		$sql = 'SELECT mm.message_id,
@@ -427,7 +427,7 @@ class Recipient_model extends DB_Model
 				  ) mb ON (mb.person_id = mm.person_id)
 				 WHERE bf.oe_kurzbz = ?
 				   AND mrou.sent IS NULL
-				   AND mrou.sentinfo IS NOT NULL
+				   AND mrou.sentinfo IS NULL
 			  GROUP BY mm.message_id,
 	  						mm.subject,
 	  						mm.body,

@@ -22,7 +22,15 @@ function sendMessageToOU()
 			},
 			{
 				successCallback: function(data, textStatus, jqXHR) {
-					FHC_DialogLib.alertSuccess("Message sent succesfully");
+
+					if (FHC_AjaxClient.isSuccess(data))
+					{
+						FHC_DialogLib.alertSuccess("Message sent succesfully");
+					}
+					else
+					{
+						FHC_DialogLib.alertError("Error");
+					}
 				},
 				errorCallback: function() {
 					FHC_DialogLib.alertError("Error");
