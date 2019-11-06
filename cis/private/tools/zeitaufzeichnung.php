@@ -1490,16 +1490,19 @@ if($projekt->getProjekteMitarbeiter($user, true))
 						}
 						list($h2, $m2) = explode(':', $elsumme);
 						$elsumme = $h2*3600+$m2*60;
-						if ($tagessaldo > 18000 && $tagessaldo < 19800 && $pflichtpause==false && $elsumme == 0)
+						if ($datum->formatDatum($tag, 'Y-m-d') >= '2019-11-06')
 						{
-							//$pausesumme = $tagessaldo-18000;
 							$pausesumme = $pausesumme;
+						}
+						else if ($tagessaldo > 18000 && $tagessaldo < 19800 && $pflichtpause==false && $elsumme == 0)
+						{
+							$pausesumme = $tagessaldo-18000;
 						}
 						else if ($tagessaldo>18000 && $pflichtpause==false && $elsumme == 0)
 						{
-							//$pausesumme = $pausesumme+1800;
-							$pausesumme = $pausesumme;
+							$pausesumme = $pausesumme+1800;
 						}
+
 						if ($elsumme > 0){
 							$pausesumme = $pausesumme + $elsumme;
 							$pflichtpause = true;
