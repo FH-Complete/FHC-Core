@@ -621,12 +621,12 @@ foreach ($projektnames as $projektname)
 	$lastspalte = 4 + $nrPhases;
 
 	//calculating spaces for centering global header texts
-	$usernamelength = strlen($username) * 1.77;
+/*	$usernamelength = strlen($username) * 1.77;
 	$numberspacesfirstrow = $totalwidth - $daywidth * 2 - $worktimewidth - $usernamelength;
 	$numberspacessecondrow = $numberspacesfirstrow + $usernamelength - strlen($p->t('zeitaufzeichnung/personalnr').$persnr) - 4;
 
 	$spacesstringfirstrow = str_repeat(' ', $numberspacesfirstrow);
-	$spacesstringsecondrow = str_repeat(' ', $numberspacessecondrow);
+	$spacesstringsecondrow = str_repeat(' ', $numberspacessecondrow);*/
 
 	$spalte = $zeile = 0;
 
@@ -645,14 +645,14 @@ foreach ($projektnames as $projektname)
 	}
 	$worksheet->setMerge($zeile, $spalte + 3, $zeile, $lastspalte);
 	$worksheet->setMerge($zeile + 1, $spalte + 3, $zeile + 1, $lastspalte);
-	$worksheet->write($zeile, $spalte + 3, $p->t('zeitaufzeichnung/projektlistegedruckt').$spacesstringfirstrow.$username, $format_heading_right);
+	$worksheet->write($zeile, $spalte + 3, /*$p->t('zeitaufzeichnung/projektlistegedruckt').$spacesstringfirstrow.*/$username, $format_heading_right);
 	for ($i = 4; $i < $lastspalte; $i++)
 	{
 		$worksheet->write($zeile, $i, '', $format_heading_topline);
 		$worksheet->write($zeile + 1, $i, '', $format_heading_bottomline);
 	}
 	$worksheet->write($zeile, $lastspalte, '', $format_heading_right);
-	$worksheet->write($zeile + 1, $spalte + 3, date('d.m.Y H:i').$spacesstringsecondrow.$p->t('zeitaufzeichnung/personalnr').$persnr, $format_heading_right_bottomline);
+	$worksheet->write($zeile + 1, $spalte + 3, /*date('d.m.Y H:i').$spacesstringsecondrow.*/$p->t('zeitaufzeichnung/personalnr').$persnr, $format_heading_right_bottomline);
 	$worksheet->write($zeile + 1, $lastspalte, '', $format_heading_right_bottomline);
 	$zeile += 3;
 
