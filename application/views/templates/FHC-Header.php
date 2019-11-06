@@ -104,9 +104,6 @@
 			// NavigationWidget CSS
 			if ($navigationwidget === true) generateCSSsInclude('public/css/NavigationWidget.css');
 
-			// TableWidget CSS
-			if ($tablewidget === true) generateCSSsInclude('public/css/TableWidget.css');
-
 			// Eventually required CSS
 			generateCSSsInclude($customCSSs); // Eventually required CSS
 
