@@ -20,7 +20,7 @@ class Studiensemester extends Auth_Controller
 				'editStudiensemester' => 'basis/studiensemester:rw',
 				'newStudiensemester' => 'basis/studiensemester:rw',
 				'insStudiensemester' => 'basis/studiensemester:rw',
-				'saveStudiensemester' => 'basis/studiensemester:rw',
+				'updateStudiensemester' => 'basis/studiensemester:rw',
 				'deleteStudiensemester' => 'basis/studiensemester:rw'
 			)
 		);
@@ -108,6 +108,11 @@ class Studiensemester extends Auth_Controller
 	public function insStudiensemester()
 	{
 		$data = $this->__retrieveStudiensemesterData();
+
+		$studiensemester_exists = $this->StudiensemesterModel->load($data['studiensemester_kurzbz']);
+		if (hasData($studiensemester_exists))
+			show_error("Studiensemester existiert bereits");
+
 		$semester = $this->StudiensemesterModel->insert($data);
 
 		if ($semester->error)
@@ -185,7 +190,7 @@ class Studiensemester extends Auth_Controller
 	 * redirects to edit page after inserting
 	 * saved=true is a GET parameter passed for showing save message
 	 */
-	public function saveStudiensemester()
+	public function updateStudiensemester()
 	{
 		$data = $this->__retrieveStudiensemesterData();
 		$semester = $this->StudiensemesterModel->update($data['studiensemester_kurzbz'], $data);
@@ -214,5 +219,4 @@ class Studiensemester extends Auth_Controller
 
 		redirect("/organisation/studiensemester/listStudiensemester");
 	}
-
 }
