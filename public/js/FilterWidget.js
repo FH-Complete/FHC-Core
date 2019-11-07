@@ -460,8 +460,9 @@ var FHC_FilterWidget = {
 
 	/**
 	 * Event function used by the apply filter button
+	 * The given parameter is used to decide if the page is going to be reloaded
 	 */
-	_applyFilterEvent: function() {
+	_applyFilterEvent: function(reload = true) {
 
 		var appliedFilters = [];
 		var appliedFiltersOperations = [];
@@ -486,7 +487,15 @@ var FHC_FilterWidget = {
 			},
 			{
 				successCallback: function(data, textStatus, jqXHR) {
-					FHC_FilterWidget._failOrReload(data, textStatus, jqXHR);
+
+					if (reload === true)
+					{
+						FHC_FilterWidget._failOrReload(data, textStatus, jqXHR);
+					}
+					else
+					{
+						console.log(FHC_AjaxClient.getError(data));
+					}
 				}
 			}
 		);
@@ -558,6 +567,9 @@ var FHC_FilterWidget = {
 
  		if ($("#customFilterDescription").val() != "")
  		{
+			// Apply the filter before saving it, without reloading the page
+			FHC_FilterWidget._applyFilterEvent(false);
+
  			FHC_AjaxClient.ajaxCallPost(
  				"system/Filters/saveCustomFilter",
  				{
@@ -566,11 +578,8 @@ var FHC_FilterWidget = {
  				},
  				{
  					successCallback: function(data, textStatus, jqXHR) {
-						// If a success and refreshSideMenuHook is a valid function then call it to refresh the side menu
-						if (typeof refreshSideMenuHook == "function")
-						{
-							refreshSideMenuHook();
-						}
+
+						FHC_FilterWidget._failOrReload(data);
 					}
  				}
  			);
