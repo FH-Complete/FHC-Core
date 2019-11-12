@@ -31,15 +31,114 @@ $this->load->view(
     <?php echo $this->widgetlib->widget('NavigationWidget'); ?>
     <div id="page-wrapper">
         <div class="container-fluid">
-
+			
+		<!-- title & helper link -->
         <div class="row">
-            <div class="col-lg-12">
-                <h3 class="page-header">
+            <div class="col-lg-12 page-header">
+				<a class="pull-right" data-toggle="collapse" href="#collapseHelp" aria-expanded="false" aria-controls="collapseExample">
+					Hilfe zu dieser Seite
+				</a>
+                <h3>
                     <?php echo ucfirst($this->p->t('global', 'lehrauftraegeBestellen')); ?>
                 </h3>
             </div>
         </div>
 
+		<!-- helper collapse module -->
+		<div class="row">
+			<div class="col-lg-12 collapse" id="collapseHelp">
+				<div class="well">
+					
+					<h4>Lehrauftrag Standard-Bestellprozess</h4>
+					<div class="panel panel-body">
+						<table>
+							<tr class="text-center">
+								<td><img src="../../../public/images/icons/fa-user-tag.png" style="height: 60px; width: 60px;"></td>
+								<td><i class='fa fa-2x fa-long-arrow-right'></i></td>
+								<td><img src="../../../public/images/icons/fa-user-check.png" style="height: 60px; width: 60px;"></td>
+								<td><i class='fa fa-2x fa-long-arrow-right'></i></td>
+								<td><i class='fa fa-2x fa-handshake-o'></i></td>
+							</tr>
+							<tr class="text-center">
+								<td><b>BESTELLEN<br>(Studiengangsleitung)</b></td>
+								<td></td>
+								<td class="text-muted">ERTEILEN<br>(Department-/Kompetenzfeldleitung)</td>
+								<td></td>
+								<td class="text-muted">ANNEHMEN<br>(LektorIn)</td>
+							</tr>
+						</table>
+					</div>
+					<br>
+					
+					<h4>Lehraufträge bestellen</h4>
+					<div class="panel panel-body">
+						Sobald im FAS ein Lehrauftrag/eine Projektbetreuung angelegt wurde, können Sie diese hier bestellen.<br>
+						Bestellte Lehraufträge sind zur Erteilung freigegeben.<br>
+					<ol>
+						<li>Klicken Sie unten auf das Status-Icon 'Nur neue anzeigen', 'Nur geänderte anzeigen' oder 'Alle anzeigen'</li>
+						<li>Wählen Sie die zu bestellenden Lehraufträge selbst oder über den Button 'Alle auswählen'.</li>
+						<li>Klicken Sie auf Lehrauftrag bestellen.</li>
+					</ol>
+						Für jeden bestellten Lehrauftrag legt das System einen Vertrag an.
+					</div>
+					<br>
+					
+					<h4>Geänderte Lehraufträge</h4>
+					<div class="panel panel-body">
+						Im FAS können Änderungen an Stunden/Stundensatz eines Lehrauftrags durchgeführt werden, solange dieser nicht vom Lehrenden angenommen wurde.<br>
+						Wenn Änderungen an bereits bestellten oder erteilten Lehraufträgen vorgenommen wurden, werden diese in einem tooltip angezeigt.<br>
+						Fahren Sie dazu mit der Maus über dem Status-Icon am Beginn der Zeile.<br>
+					</div>
+					<br>
+					
+					<h4>Warum kann ich manche Lehraufträge nicht auswählen?</h4>
+					<div class="panel panel-body">
+						Nur Lehraufträge mit dem Status 'neu' und 'geändert' können bestellt werden.<br>
+						Erteilte oder akzeptierte Lehraufträge werden nur zu Ihrer Information angezeigt und sind daher NICHT wählbar.
+					</div>
+					<br>
+
+					<h4>Filter</h4>
+					<div class="panel panel-body">
+						<table class="table table-bordered">
+							<tr class="text-center">
+								<td class="col-xs-1"><i class='fa fa-users'></i></td>
+								<td class="col-xs-1"><i class='fa fa-user-plus'></i></td>
+								<td class="col-xs-1"><img src="../../../public/images/icons/fa-user-tag.png" style="height: 30px; width: 30px;"></td>
+								<td class="col-xs-1"><img src="../../../public/images/icons/fa-user-check.png" style="height: 30px; width: 30px;"></td>
+								<td class="col-xs-1"><i class='fa fa-handshake-o'></i></td>
+								<td class="col-xs-1"><img src="../../../public/images/icons/fa-user-edit.png" style="height: 30px; width: 30px;"></td>
+								<td class="col-xs-1"><i class='fa fa-user-secret'></i></td>
+
+							</tr>
+							<tr class="text-center">
+								<td><b>Alle</b><br>Alle Lehraufträge mit jedem Status, auch geänderte und Dummy-Aufträge</td>
+								<td><b>Neu</b><br>Nur Lehraufträge, die im FAS über die Zuteilung eines Lehrenden zu einer Lehreinheit/einem Projekt angelegt und noch nicht bestellt worden sind</td>
+								<td><b>Bestellt</b><br>Nur bestellte UND geänderte bestellte Lehraufträge</td>
+								<td><b>Erteilt</b><br>Nur erteilte UND geänderte erteilte Lehraufträge</td>
+								<td><b>Angenommen</b><br>Nur vom Lehrenden angenommene Lehraufträge</td>
+								<td><b>Geändert</b><br>Nur geänderte Lehraufträge, die den Status 'bestellt' oder 'erteilt' haben</td>
+								<td><b>Dummies</b><br>Nur Lehraufträge, die mit einem Dummylektor angelegt sind</td>
+							</tr>
+						</table>
+					</div>
+					<br>
+
+					<h4>Auswahl</h4>
+					<div class="panel panel-body">
+						<ul>
+							<li>Einzeln auswählen: <kbd>Strg</kbd> + Klick auf einzelne Zeile(n)</li>
+							<li>Bereich auswählen: <kbd>Shift</kbd> + Klick auf Anfangs- und Endzeile</li>
+							<li>Alle auswählen: Button 'Alle auswählen'</li>
+						</ul>
+					</div>
+					<br>
+
+				</div>
+			</div>
+		</div>
+
+		<!-- dropdown widgets -->
         <div class="row">
             <div class="col-lg-12">
                 <form id="formLehrauftrag" class="form-inline" action="" method="get">
@@ -92,13 +191,15 @@ $this->load->view(
             </div>
         </div>
 
+		<!-- tabulator data table -->
         <div class="row">
             <div class="col-lg-12">
                 <?php $this->load->view('lehre/lehrauftrag/orderLehrauftragData.php'); ?>
             </div>
         </div>
-
         <br>
+
+		<!-- filter buttons & bestell-button -->
         <div class="row">
             <div class="col-xs-12">
                 <button id="order-lehrauftraege" class="btn btn-primary pull-right" data-toggle="tooltip" data-placement="left" title="">Lehrauftrag bestellen</button>
@@ -120,8 +221,9 @@ $this->load->view(
             </div>
         </div>
 
-        </div>
-    </div>
+        </div><!-- end container -->
+    </div><!-- end page-wrapper -->
+	<br>
 </body>
 
 <?php $this->load->view('templates/FHC-Footer'); ?>
