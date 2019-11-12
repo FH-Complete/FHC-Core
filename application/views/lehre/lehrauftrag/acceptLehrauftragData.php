@@ -287,7 +287,7 @@ $filterWidgetArray = array(
     'reloadDataset' => true,    // reload query on page refresh
     'columnsAliases' => array(  // TODO: use phrasen
         'Status',   // alias for row_index, because row_index is formatted to display the status icons
-        'LE-ID',
+        'LV-Teil',
         'LV-ID',
         'PA-ID',
         'Studiensemester',

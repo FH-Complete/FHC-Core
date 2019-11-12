@@ -298,7 +298,7 @@ $filterWidgetArray = array(
     'columnsAliases' => array(  // TODO: use phrasen
         'Status', // alias for row_index, because row_index is formatted to display the status icons
         'Personalnummer',
-        'LE-ID',
+        'LV-Teil',
         'LV-ID',
         'LV',
         'PA-ID',
