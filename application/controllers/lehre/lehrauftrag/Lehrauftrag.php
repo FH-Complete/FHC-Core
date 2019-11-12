@@ -131,7 +131,6 @@ class Lehrauftrag extends Auth_Controller
                 $projektarbeit_id = (isset($lehrauftrag->projektarbeit_id)) ? $lehrauftrag->projektarbeit_id : null;
                 $stunden = (isset($lehrauftrag->stunden)) ? $lehrauftrag->stunden : 0;
                 $betrag = (isset($lehrauftrag->betrag)) ? $lehrauftrag->betrag : 0;
-                $vertrag_betrag = (isset($lehrauftrag->vertrag_betrag)) ? $lehrauftrag->vertrag_betrag : null;
                 $studiensemester_kurzbz = (isset($lehrauftrag->studiensemester_kurzbz)) ? $lehrauftrag->studiensemester_kurzbz : null;
                 $studiengang_kz = (isset($lehrauftrag->studiengang_kz)) ? $lehrauftrag->studiengang_kz : null;
 

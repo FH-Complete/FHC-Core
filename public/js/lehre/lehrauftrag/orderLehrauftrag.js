@@ -583,7 +583,6 @@ $(function() {
                     'projektarbeit_id' : data.projektarbeit_id,
                     'stunden' : data.stunden,
                     'betrag' : data.betrag,
-                    'vertrag_betrag' : data.vertrag_betrag,
                     'studiensemester_kurzbz' : data.studiensemester_kurzbz,
                     'studiengang_kz' : data.studiengang_kz,
                     'lv_oe_kurzbz' : data.lv_oe_kurzbz
