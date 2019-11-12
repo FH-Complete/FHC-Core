@@ -13,7 +13,7 @@ class Studiensemester_widget extends DropdownWidget
 		$this->setElementsArray(
 			$this->StudiensemesterModel->load(),
 			true,
-			'Select a studiensemester...',
+			$this->p->t('lehre', 'studiensemester'),
 			'No studiensemester found'
 		);
 		

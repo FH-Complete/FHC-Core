@@ -34,7 +34,7 @@ class Ausbildungssemester_widget extends DropdownWidget
 		$this->setElementsArray(
             success($ausbildungssemester_arr),
 			true,
-			'Ausbildungssemester',
+			$this->p->t('lehre', 'ausbildungssemester'),
 			'No Ausbildungssemester found'
 		);
 

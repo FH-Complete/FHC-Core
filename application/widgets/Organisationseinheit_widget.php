@@ -22,7 +22,7 @@ class Organisationseinheit_widget extends DropdownWidget
             $this->setElementsArray(
                 $this->OrganisationseinheitModel->loadWhere($condition),
                 true,
-                $this->p->t('ui', 'bitteEintragWaehlen'),
+                $this->p->t('lehre', 'organisationseinheit'),
                 'No organisational units found'
             );
         }

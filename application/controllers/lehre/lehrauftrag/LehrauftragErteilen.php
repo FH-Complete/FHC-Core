@@ -49,7 +49,8 @@ class LehrauftragErteilen extends Auth_Controller
         $this->loadPhrases(
             array(
                 'global',
-                'ui'
+                'ui',
+				'lehre'
             )
         );
 

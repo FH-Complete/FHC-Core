@@ -27,7 +27,7 @@ class Studiengang_widget extends DropdownWidget
         $this->setElementsArray(
             $this->StudiengangModel->loadWhere($condition),
             true,
-            $this->p->t('ui', 'bitteEintragWaehlen'),
+            $this->p->t('lehre', 'studiengang'),
             'No studiengaenge found'
         );
 
