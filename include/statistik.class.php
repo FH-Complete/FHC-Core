@@ -514,6 +514,13 @@ class statistik extends basis_db
 		if($this->sql!='')
 		{
 			$sql = $this->sql;
+
+			// Wenn im SQL ein $user vorkommt wird das durch den eingeloggten User ersetzt
+			if(strpos($sql, '$user')!==false)
+			{
+				$uid = get_uid();
+				$sql = str_replace('$user',$this->db_add_param($uid),$sql);
+			}
 			foreach($_REQUEST as $name=>$value)
 			{
 				if (is_array($value))
@@ -615,11 +622,15 @@ class statistik extends basis_db
 		$check = '/\$[0-9A-z]+/';
 		preg_match_all($check, $value, $result);
 		$result = $result[0];
-
+		$vars = array();
 		for($i=0;$i<count($result);$i++)
 		{
-			$result[$i] = mb_str_replace('$','',$result[$i]);
+			// $user wird automatisch ersetzt und daher auch nicht geliefert
+			if($result[$i]!='$user')
+			{
+				$vars[$i] = mb_str_replace('$','',$result[$i]);
+			}
 		}
-		return array_unique($result);
+		return array_unique($vars);
 	}
 }
