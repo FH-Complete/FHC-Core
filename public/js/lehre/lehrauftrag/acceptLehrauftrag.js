@@ -74,19 +74,6 @@ function hf_filterStringnumberWithOperator(headerValue, rowValue, rowData){
 }
 
 // -----------------------------------------------------------------------------------------------------------------
-// Custom filters
-// -----------------------------------------------------------------------------------------------------------------
-
-// Filters erteilte initially
-function func_initialFilter(){
-    return [
-        {field: 'bestellt', type: '!=', value: null},   // bestellt
-        {field: 'erteilt', type: '!=', value: null},    // AND erteilt
-        {field: 'akzeptiert', type: '=', value: null}   // AND NOT akzeptiert
-    ]
-}
-
-// -----------------------------------------------------------------------------------------------------------------
 // Tabulator table format functions
 // -----------------------------------------------------------------------------------------------------------------
 

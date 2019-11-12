@@ -326,7 +326,6 @@ $filterWidgetArray = array(
         selectableCheck: function(row){
             return func_selectableCheck(row);
         },
-        initialFilter: func_initialFilter(),
         footerElement: func_footerElement(),
         rowUpdated:function(row){
             func_rowUpdated(row);
