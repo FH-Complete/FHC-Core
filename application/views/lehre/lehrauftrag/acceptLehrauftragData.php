@@ -361,7 +361,7 @@ $filterWidgetArray = array(
         semester: {headerFilter:"input"},
         lv_oe_kurzbz: {headerFilter:"input", width: "12%"},
         gruppe: {headerFilter:"input", width: "5%"},
-        stunden: {align:"right",
+        stunden: {align:"right", formatter: form_formatNulltoStringNumber, formatterParams:{precision:1},
             headerFilter:"input", headerFilterFunc: hf_filterStringnumberWithOperator,
             bottomCalc:"sum", bottomCalcParams:{precision:1}, width: "5%"},
         betrag: {align:"right", formatter: form_formatNulltoStringNumber,

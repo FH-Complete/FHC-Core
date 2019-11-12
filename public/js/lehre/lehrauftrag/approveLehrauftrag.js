@@ -38,8 +38,12 @@ var mut_formatStringDate = function(value, data, type, params, component) {
 // -----------------------------------------------------------------------------------------------------------------
 
 // Formats null values to a string number '0.00'
-var form_formatNulltoStringNumber = function(cell){
+var form_formatNulltoStringNumber = function(cell, formatterParams){
     if (cell.getValue() == null){
+        if (formatterParams.precision == 1)
+        {
+            return '0.0';
+        }
         return '0.00';
     }
     else {

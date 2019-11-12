@@ -382,7 +382,7 @@ $filterWidgetArray = array(
         lv_oe_kurzbz: {headerFilter:"input"},
         gruppe: {headerFilter:"input"},
         lektor: {headerFilter:"input"},
-        stunden: {align:"right",
+        stunden: {align:"right",  formatter: form_formatNulltoStringNumber, formatterParams:{precision:1},
             headerFilter:"input", headerFilterFunc: hf_filterStringnumberWithOperator,
             bottomCalc:"sum", bottomCalcParams:{precision:1}},
         betrag: {align:"right", formatter: form_formatNulltoStringNumber,
