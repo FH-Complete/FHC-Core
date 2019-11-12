@@ -143,7 +143,7 @@ $config['navigation_menu']['lehre/lehrauftrag/Lehrauftrag/index'] = array(
         'icon' => '',
         'sort' => 1,
         'requiredPermissions' => 'lehre/lehrauftrag_bestellen:r',
-        'target' => '_blank'
+        'target' => '_self'
     ),
     'lehrauftragErteilen' => array(
         'link' => site_url('lehre/lehrauftrag/LehrauftragErteilen'),
@@ -151,7 +151,7 @@ $config['navigation_menu']['lehre/lehrauftrag/Lehrauftrag/index'] = array(
         'icon' => '',
         'sort' => 1,
         'requiredPermissions' => 'lehre/lehrauftrag_erteilen:r',
-        'target' => '_blank'
+        'target' => '_self'
     )
 );
 
@@ -162,7 +162,7 @@ $config['navigation_menu']['lehre/lehrauftrag/LehrauftragErteilen/index'] = arra
         'icon' => '',
         'sort' => 1,
         'requiredPermissions' => 'lehre/lehrauftrag_bestellen:r',
-        'target' => '_blank'
+        'target' => '_self'
     ),
     'lehrauftragErteilen' => array(
         'link' => site_url('lehre/lehrauftrag/LehrauftragErteilen'),
@@ -170,6 +170,6 @@ $config['navigation_menu']['lehre/lehrauftrag/LehrauftragErteilen/index'] = arra
         'icon' => '',
         'sort' => 1,
         'requiredPermissions' => 'lehre/lehrauftrag_erteilen:r',
-        'target' => '_blank'
+        'target' => '_self'
     )
 );
