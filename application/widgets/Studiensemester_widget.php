@@ -6,7 +6,7 @@ class Studiensemester_widget extends DropdownWidget
 	{
 		// Studiensemester
 		$this->load->model('organisation/Studiensemester_model', 'StudiensemesterModel');
-		$this->StudiensemesterModel->addOrder('studiensemester_kurzbz', 'DESC');
+		$this->StudiensemesterModel->addOrder('start', 'DESC');
 		
 		$this->addSelectToModel($this->StudiensemesterModel, 'studiensemester_kurzbz', 'studiensemester_kurzbz');
 		
