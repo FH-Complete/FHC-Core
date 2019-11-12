@@ -118,6 +118,21 @@ function func_rowFormatter(row){
         betrag = 0;
     }
 
+    if (isNaN(stunden))
+    {
+        stunden = 0;
+    }
+
+    if (isNaN(vertrag_stunden))
+    {
+        vertrag_stunden = 0;
+    }
+
+    if (isNaN(vertrag_betrag))
+    {
+        vertrag_betrag = 0;
+    }
+
     /*
     Formats the color of the rows depending on their status
     - blue: dummy lectors
@@ -167,6 +182,21 @@ function func_selectableCheck(row){
         betrag = 0;
     }
 
+    if (isNaN(stunden))
+    {
+        stunden = 0;
+    }
+
+    if (isNaN(vertrag_stunden))
+    {
+        vertrag_stunden = 0;
+    }
+
+    if (isNaN(vertrag_betrag))
+    {
+        vertrag_betrag = 0;
+    }
+
     // only allow to select bestellte Lehraufträge
     return  !is_dummy &&                        // NOT dummy lector
         row.getData().bestellt != null &&   // AND NOT neue
@@ -208,6 +238,21 @@ function func_renderStarted(table){
         if (isNaN(betrag))
         {
             betrag = 0;
+        }
+
+        if (isNaN(stunden))
+        {
+            stunden = 0;
+        }
+
+        if (isNaN(vertrag_stunden))
+        {
+            vertrag_stunden = 0;
+        }
+
+        if (isNaN(vertrag_betrag))
+        {
+            vertrag_betrag = 0;
         }
 
         if ((bestellt != null && betrag != vertrag_betrag) ||
@@ -332,6 +377,21 @@ status_formatter = function(cell, formatterParams, onRendered){
         betrag = 0;
     }
 
+    if (isNaN(stunden))
+    {
+        stunden = 0;
+    }
+
+    if (isNaN(vertrag_stunden))
+    {
+        vertrag_stunden = 0;
+    }
+
+    if (isNaN(vertrag_betrag))
+    {
+        vertrag_betrag = 0;
+    }
+
     // commented icons would be so nice to have with fontawsome 5.11...
     if (is_dummy)
     {
@@ -385,6 +445,16 @@ status_tooltip = function(cell){
     if (isNaN(betrag))
     {
         betrag = 0;
+    }
+
+    if (isNaN(stunden))
+    {
+        stunden = 0;
+    }
+
+    if (isNaN(vertrag_betrag))
+    {
+        vertrag_betrag = 0;
     }
 
     if (isNaN(vertrag_stunden)){

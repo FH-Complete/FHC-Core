@@ -118,12 +118,24 @@ function func_rowFormatter(row){
     var betrag = parseFloat(row.getData().betrag);
     var vertrag_betrag = parseFloat(row.getData().vertrag_betrag);
 
-    // console.log(betrag);
-    // console.log(vertrag_betrag);
-
     if (isNaN(betrag))
     {
         betrag = 0;
+    }
+
+    if (isNaN(stunden))
+    {
+        stunden = 0;
+    }
+
+    if (isNaN(vertrag_stunden))
+    {
+        vertrag_stunden = 0;
+    }
+
+    if (isNaN(vertrag_betrag))
+    {
+        vertrag_betrag = 0;
     }
 
     /*
@@ -175,6 +187,22 @@ function func_selectableCheck(row){
         betrag = 0;
     }
 
+    if (isNaN(stunden))
+    {
+        stunden = 0;
+    }
+
+    if (isNaN(vertrag_stunden))
+    {
+        vertrag_stunden = 0;
+    }
+
+    if (isNaN(vertrag_betrag))
+    {
+        vertrag_betrag = 0;
+    }
+
+
     // Only allow to select neue and geaenderte
     return  !is_dummy &&                                                    // NOT dummy lector
         row.getData().bestellt == null ||                               // AND neue
@@ -215,6 +243,21 @@ function func_renderStarted(table){
         if (isNaN(betrag))
         {
             betrag = 0;
+        }
+
+        if (isNaN(stunden))
+        {
+            stunden = 0;
+        }
+
+        if (isNaN(vertrag_stunden))
+        {
+            vertrag_stunden = 0;
+        }
+
+        if (isNaN(vertrag_betrag))
+        {
+            vertrag_betrag = 0;
         }
 
         if ((bestellt != null && betrag != vertrag_betrag) ||
@@ -341,6 +384,21 @@ status_formatter = function(cell, formatterParams, onRendered){
         betrag = 0;
     }
 
+    if (isNaN(stunden))
+    {
+        stunden = 0;
+    }
+
+    if (isNaN(vertrag_stunden))
+    {
+        vertrag_stunden = 0;
+    }
+
+    if (isNaN(vertrag_betrag))
+    {
+        vertrag_betrag = 0;
+    }
+
     // commented icons would be so nice to have with fontawsome 5.11...
     if (is_dummy)
     {
@@ -399,6 +457,21 @@ status_tooltip = function(cell){
     if (isNaN(betrag))
     {
         betrag = 0;
+    }
+
+    if (isNaN(stunden))
+    {
+        stunden = 0;
+    }
+
+    if (isNaN(vertrag_stunden))
+    {
+        vertrag_stunden = 0;
+    }
+
+    if (isNaN(vertrag_betrag))
+    {
+        vertrag_betrag = 0;
     }
 
     // Calculate vertrag stundensatz
