@@ -48,23 +48,52 @@ $this->load->view(
 				<div class="well">
 					<h4>Wie nehme ich Lehraufträge an?</h4>
 					<div class="panel panel-body">
-					<p>
 						Sobald Ihnen ein oder mehrere Lehraufträge erteilt wurden, können Sie diese annehmen.
 						<ol>
 							<li>Klicken Sie unten auf das Status-Icon 'Nur erteilte anzeigen' oder 'Alle anzeigen'</li>
-							<li>Wählen Sie einzelne Lehraufträge mit Klick auf die Zeilen oder alle über den Button 'Alle auswählen'.</li>
+							<li>Wählen Sie die Lehraufträge, die Sie annehmen möchten, selbst oder alle über den Button 'Alle auswählen'.</li>
 							<li>Geben Sie Ihr CIS-Passwort ein und klicken auf Lehrauftrag annehmen.</li>
 						</ol>
-					</p>
 					</div>
 					<br>
+					
 					<h4>Warum kann ich manche Lehraufträge nicht auswählen?</h4>
 					<div class="panel panel-body">
-					<p>
 						Nur Lehraufträge mit dem Status 'erteilt' können gewählt werden.<br>
 						Angenommene Lehraufträge oder Lehraufträge in Bearbeitung werden nur zu Ihrer Information angezeigt.
-					</p>
 					</div>
+					<br>
+					
+					<h4>Filter</h4>
+					<div class="panel panel-body">
+						<div class="col-xs-12 col-md-8 col-lg-6">
+						<table class="table table-bordered">
+							<tr class="text-center">
+								<td class="col-xs-1"><i class='fa fa-users'></i></td>
+								<td class="col-xs-1"><img src="../../../public/images/icons/fa-user-tag.png" style="height: 30px; width: 30px;"></td>
+								<td class="col-xs-1"><img src="../../../public/images/icons/fa-user-check.png" style="height: 30px; width: 30px;"></td>
+								<td class="col-xs-1"><i class='fa fa-handshake-o'></i></td>
+							</tr>
+							<tr class="text-center">
+								<td><b>Alle</b><br>Alle Lehraufträge mit jedem Status</td>
+								<td><b>Bestellt</b><br>Nur bestellte UND bestellte Lehraufträge, die in Bearbeitung sind</td>
+								<td><b>Erteilt</b><br>Nur erteilte UND geänderte Lehraufträge, die in Bearbeitung sind</td>
+								<td><b>Angenommen</b><br>Nur von Ihnen angenommene Lehraufträge</td>
+							</tr>
+						</table>
+						</div>
+					</div>
+					<br>
+
+					<h4>Auswahl</h4>
+					<div class="panel panel-body">
+						<ul>
+							<li>Einzeln auswählen: <kbd>Strg</kbd> + Klick auf einzelne Zeile(n)</li>
+							<li>Bereich auswählen: <kbd>Shift</kbd> + Klick auf Anfangs- und Endzeile</li>
+							<li>Alle auswählen: Button 'Alle auswählen'</li>
+						</ul>
+					</div>
+					<br>
 				</div>
 			</div>
 		</div>
