@@ -980,7 +980,7 @@ function StudentProjektbetreuerAuswahl()
             // * wenn Gesamtkosten des Projektbetreuers nicht gleich Betrag im Vertrag ist ODER
             //   wenn Semesterstunden des Projektbetreuers nicht gleich Stunden im Vertrag:
             //   dann: Status 'geändert' hardcoden
-            if(gesamtkosten != parseFloat(betrag) || stunden != vertragsstunden)
+            if(parseFloat(gesamtkosten) != parseFloat(betrag) || parseFloat(stunden) != vertragsstunden)
             {
                 vertragsstatus = 'Geändert';
                 document.getElementById('student-projektbetreuer-label-vertragsstatus').setAttribute("style", "font-weight: bold")
