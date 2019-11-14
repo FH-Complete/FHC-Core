@@ -118,9 +118,9 @@ var FHC_FilterWidget = {
 	 */
 	reloadDataset: function() {
 		FHC_AjaxClient.ajaxCallPost(
-			"system/Filters/reloadDataset",
+			"widgets/Filters/reloadDataset",
 			{
-				filter_page: FHC_FilterWidget.getFilterPage()
+				filterUniqueId: FHC_FilterWidget.getFilterUniqueIdPrefix()
 			},
 			{
 				successCallback: function(data, textStatus, jqXHR) {
