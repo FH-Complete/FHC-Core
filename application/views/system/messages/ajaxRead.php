@@ -13,6 +13,7 @@
 			'ajaxlib' => true,
 			'dialoglib' => true,
 			'tinymce' => true,
+			'phrases' => array('global', 'ui'),
 			'customCSSs' => array('public/css/sbadmin2/admintemplate_contentonly.css', 'public/css/messaging/message.css'),
 			'customJSs' => array('public/js/bootstrapper.js', 'public/js/messaging/read.js')
 		)

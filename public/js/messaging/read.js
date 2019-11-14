@@ -11,7 +11,7 @@ var selectedToggleMessage = "received";
  */
 function readMessagesGenericError()
 {
-	FHC_DialogLib.alertError("An error occurred while retrieving message, contact the website administrator");
+	FHC_DialogLib.alertError(FHC_PhrasesLib.t("global", "genericError"));
 }
 
 /**
@@ -137,6 +137,8 @@ function rowFormatter(row, fontWeight = 700)
  */
 function _getMessages(getMessagesURL)
 {
+	tableMessageLst.replaceData(Array());
+
 	FHC_AjaxClient.ajaxCallGet(
 		getMessagesURL,
 		null,
@@ -195,7 +197,7 @@ function replyMessage()
 	}
 	else //
 	{
-		FHC_DialogLib.alertInfo("Please select a message");
+		FHC_DialogLib.alertInfo(FHC_PhrasesLib.t("ui", "pleaseSelectMessage"));
 	}
 }
 

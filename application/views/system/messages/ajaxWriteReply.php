@@ -11,6 +11,7 @@
 			'ajaxlib' => true,
 			'dialoglib' => true,
 			'tinymce' => true,
+			'phrases' => array('global', 'ui'),
 			'customCSSs' => array('public/css/sbadmin2/admintemplate_contentonly.css', 'public/css/messaging/message.css'),
 			'customJSs' => array('public/js/bootstrapper.js', 'public/js/messaging/writeReply.js')
 		)
@@ -22,13 +23,13 @@
 				<div class="container-fluid">
 					<div class="row">
 						<div class="col-lg-12">
-							<h3 class="page-header">Reply to a message</h3>
+							<h3 class="page-header"><?php echo $this->p->t('ui', 'sendMessage'); ?></h3>
 						</div>
 					</div>
 					<div class="row">
 						<div class="form-group">
 							<div class="col-lg-1 msgfieldcol-left">
-								<label>Receiver:</label>
+								<label><?php echo $this->p->t('ui', 'receiver'); ?>:</label>
 							</div>
 							<div class="col-lg-11 msgfieldcol-right">
 
@@ -40,7 +41,7 @@
 					<div class="row">
 						<div class="form-group">
 							<div class="col-lg-1 msgfield msgfieldcol-left">
-								<label>Subject:</label>
+								<label><?php echo $this->p->t('ui', 'subject'); ?>:</label>
 							</div>
 							&nbsp;
 							<div id="subject" class="col-lg-7">
@@ -53,7 +54,7 @@
 					<br>
 					<div class="row">
 						<div class="col-lg-12">
-							<label>Message:</label>
+							<label><?php echo $this->p->t('ui', 'message'); ?>:</label>
 							<textarea id="body">
 
 								<?php echo $body; ?>
@@ -69,7 +70,7 @@
 							<input id="relationmessage_id" type="hidden" value="<?php echo $relationmessage_id; ?>">
 							<input id="token" type="hidden" value="<?php echo $token; ?>">
 
-							<button id="sendButton" class="btn btn-default" type="button">Send</button>
+							<button id="sendButton" class="btn btn-default" type="button"><?php echo $this->p->t('ui', 'send'); ?></button>
 						</div>
 					</div>
 				</div>

@@ -9,7 +9,7 @@ function sendMessageToOU()
 {
 	if ($('#organisationUnit').val() == 0)
 	{
-		FHC_DialogLib.alertWarning("Not valid organisation unit");
+		FHC_DialogLib.alertWarning(FHC_PhrasesLib.t("global", "notValidOE"));
 	}
 	else
 	{
@@ -25,15 +25,15 @@ function sendMessageToOU()
 
 					if (FHC_AjaxClient.isSuccess(data))
 					{
-						FHC_DialogLib.alertSuccess("Message sent succesfully");
+						FHC_DialogLib.alertSuccess(FHC_PhrasesLib.t("global", "messageSent"));
 					}
 					else
 					{
-						FHC_DialogLib.alertError("Error");
+						FHC_DialogLib.alertError(FHC_PhrasesLib.t("global", "genericError"));
 					}
 				},
 				errorCallback: function() {
-					FHC_DialogLib.alertError("Error");
+					FHC_DialogLib.alertError(FHC_PhrasesLib.t("global", "genericError"));
 				},
 				veilTimeout: 300
 			}

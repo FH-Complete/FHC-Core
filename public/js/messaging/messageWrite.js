@@ -34,7 +34,7 @@ function parseMessageText(receiver_id, text)
 				}
 				else if (FHC_AjaxClient.isError(data))
 				{
-					alert(data.retval);
+					FHC_DialogLib.alertError(data.retval);
 				}
 			}
 		}
@@ -97,7 +97,7 @@ $(document).ready(function ()
 			}
 			else
 			{
-				alert("Subject and text are required fields!");
+				FHC_DialogLib.alertInfo("Subject and text are required fields!");
 			}
 		});
 	}
