@@ -25,7 +25,10 @@ function sendMessageToOU()
 
 					if (FHC_AjaxClient.isSuccess(data))
 					{
-						FHC_DialogLib.alertSuccess(FHC_PhrasesLib.t("global", "messageSent"));
+						window.location = FHC_JS_DATA_STORAGE_OBJECT.app_root +
+							FHC_JS_DATA_STORAGE_OBJECT.ci_router + "/" +
+							FHC_JS_DATA_STORAGE_OBJECT.called_path +
+							"/read";
 					}
 					else
 					{

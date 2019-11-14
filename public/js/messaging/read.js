@@ -179,7 +179,10 @@ function _getMessages(getMessagesURL)
  */
 function writeNewMessage()
 {
-	window.open("write", "_blank");
+	window.location = FHC_JS_DATA_STORAGE_OBJECT.app_root +
+		FHC_JS_DATA_STORAGE_OBJECT.ci_router + "/" +
+		FHC_JS_DATA_STORAGE_OBJECT.called_path +
+		"/write";
 }
 
 /**
