@@ -5,7 +5,7 @@ if (! defined('BASEPATH')) exit('No direct script access allowed');
 /**
  * FilterWidget logic
  */
-class FiltersLib
+class FilterWidgetLib
 {
 	// Session parameters names
 	const SESSION_NAME = 'FHC_FILTER_WIDGET'; // Filter session name
@@ -22,6 +22,7 @@ class FiltersLib
 	const SESSION_RELOAD_DATASET = 'reloadDataset';
 	const SESSION_DATASET_REPRESENTATION = 'datasetRepresentation';
 	const SESSION_DATASET_REP_OPTIONS = 'datasetRepresentationOptions';
+	const SESSION_DATASET_REP_FIELDS_DEFS = 'datasetRepresentationFieldsDefinitions';
 
 	// Alias for the dynamic table used to retrieve the dataset
 	const DATASET_TABLE_ALIAS = 'datasetFilterTable';
@@ -53,18 +54,23 @@ class FiltersLib
 	const MARK_ROW = 'markRow';
 
 	// ...to hide the options for a filter
-	const HIDE_HEADER = 'hideHeader';
+	const HIDE_OPTIONS = 'hideOptions';
+	const HIDE_SELECT_FIELDS = 'hideSelectFields';
+	const HIDE_SELECT_FILTERS = 'hideSelectFilters';
 	const HIDE_SAVE = 'hideSave';
 
 	const CUSTOM_MENU = 'customMenu'; // ...to specify if the menu for this filter is custom (true) or not (false)
+	const HIDE_MENU = 'hideMenu'; // ...to specify if the menu should be shown or not
 
 	// ...to specify how to represent the dataset (ex: tablesorter, pivotUI, ...)
 	const DATASET_REPRESENTATION = 'datasetRepresentation';
 	const DATASET_REP_OPTIONS = 'datasetRepOptions';
+	const DATASET_REP_FIELDS_DEFS = 'datasetRepFieldsDefs';
 
 	// Different dataset representations
 	const DATASET_REP_TABLESORTER = 'tablesorter';
 	const DATASET_REP_PIVOTUI = 'pivotUI';
+	const DATASET_REP_TABULATOR = 'tabulator';
 
 	// Filter operations values
 	const OP_EQUAL = 'equal';
@@ -84,7 +90,7 @@ class FiltersLib
 
 	const FILTER_PHRASES_CATEGORY = 'FilterWidget'; // The category used to store phrases for the FilterWidget
 
-	const FILTER_PAGE_PARAM = 'filter_page'; // Filter page parameter name
+	const FILTER_UNIQUE_ID = 'filterUniqueId'; // Filter page parameter name
 
 	const PERMISSION_FILTER_METHOD = 'FilterWidget'; // Name for fake method to be checked by the PermissionLib
 	const PERMISSION_TYPE = 'rw';
@@ -107,8 +113,6 @@ class FiltersLib
 	public function __construct($params = null)
 	{
 		$this->_ci =& get_instance(); // get code igniter instance
-
-		$this->_filterUniqueId = $this->_getFilterUniqueId($params); // sets the id for the related filter widget
 	}
 
 	//------------------------------------------------------------------------------------------------------------------
@@ -689,7 +693,7 @@ class FiltersLib
 	public function generateFilterMenu($navigationPage)
 	{
 		// Loads the NavigationLib for the current page (given as parameter)
-		$this->_ci->load->library('NavigationLib', array(FiltersLib::NAVIGATION_PAGE => $navigationPage));
+		$this->_ci->load->library('NavigationLib', array(FilterWidgetLib::NAVIGATION_PAGE => $navigationPage));
 
 		$filterMenu = null;
 		$currentMenu = $this->_ci->navigationlib->getSessionMenu(); // The navigation menu currently stored in session
@@ -771,7 +775,7 @@ class FiltersLib
 				);
 
 				// Sets in the session only the element related to the filters menu
-				$this->_ci->navigationlib->setSessionElementMenu(FiltersLib::NAV_MENU_FILTER_KEY, $filterMenu);
+				$this->_ci->navigationlib->setSessionElementMenu(FilterWidgetLib::NAV_MENU_FILTER_KEY, $filterMenu);
 			}
 		}
 	}
@@ -784,14 +788,14 @@ class FiltersLib
 	 * NOTE: The default value is the URI where the FilterWidget is called
 	 * If the fhc_controller_id is present then is also used
 	 */
-	private function _getFilterUniqueId($params)
+	public function setFilterUniqueIdByParams($params)
 	{
 		if ($params != null
 			&& is_array($params)
-			&& isset($params[self::FILTER_PAGE_PARAM])
-			&& !isEmptyString($params[self::FILTER_PAGE_PARAM]))
+			&& isset($params[self::FILTER_UNIQUE_ID])
+			&& !isEmptyString($params[self::FILTER_UNIQUE_ID]))
 		{
-			$filterUniqueId = $params[self::FILTER_PAGE_PARAM];
+			$filterUniqueId = $params[self::FILTER_UNIQUE_ID];
 		}
 		else
 		{
@@ -799,6 +803,14 @@ class FiltersLib
 			$filterUniqueId = $this->_ci->router->directory.$this->_ci->router->class.'/'.$this->_ci->router->method;
 		}
 
+		$this->setFilterUniqueId($filterUniqueId);
+	}
+
+	/**
+	 *
+	 */
+	public function setFilterUniqueId($filterUniqueId)
+	{
 		// If the FHC_CONTROLLER_ID parameter is present in the HTTP GET
 		if (isset($_GET[self::FHC_CONTROLLER_ID]))
 		{
@@ -809,7 +821,7 @@ class FiltersLib
 			$filterUniqueId .= '/'.$this->_ci->input->post(self::FHC_CONTROLLER_ID); // then use it
 		}
 
-		return $filterUniqueId;
+		$this->_filterUniqueId = $filterUniqueId;
 	}
 
 	/**

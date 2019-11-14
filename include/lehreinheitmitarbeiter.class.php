@@ -146,6 +146,7 @@ class lehreinheitmitarbeiter extends basis_db
 				$obj->insertamum = $row->insertamum;
 				$obj->insertvon = $row->insertvon;
 				$obj->ext_id = $row->ext_id;
+                $obj->vertrag_id = $row->vertrag_id;
 
 				$this->lehreinheitmitarbeiter[] = $obj;
 			}

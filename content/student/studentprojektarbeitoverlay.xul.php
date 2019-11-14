@@ -26,7 +26,11 @@ header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
 header("Pragma: no-cache");
 header("Content-type: application/vnd.mozilla.xul+xml");
 require_once('../../config/vilesci.config.inc.php');
+require_once('../../config/global.config.inc.php');
 echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
+
+// Vertragsdetails: Anzeige wird über config Eintrag bestimmt
+$is_hidden = (!defined('FAS_STUDIERENDE_PROJEKTARBEIT_VERTRAGSDETAILS_ANZEIGEN') || FAS_STUDIERENDE_PROJEKTARBEIT_VERTRAGSDETAILS_ANZEIGEN == true) ? 'false' : 'true';
 
 ?>
 
@@ -383,6 +387,10 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 									class="sortDirectionIndicator"
 									sort="rdf:http://www.technikum-wien.at/projektbetreuer/rdf#projektarbeit_id" />
 								<splitter class="tree-splitter"/>
+                                <treecol id="student-projektbetreuer-tree-vertrag_id" label="VertragID" flex="2" hidden="true"
+                                         class="sortDirectionIndicator"
+                                         sort="rdf:http://www.technikum-wien.at/projektbetreuer/rdf#vertrag_id" />
+                                <splitter class="tree-splitter"/>
 							</treecols>
 
 							<template>
@@ -400,6 +408,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 											<treecell label="rdf:http://www.technikum-wien.at/projektbetreuer/rdf#betreuerart_kurzbz"/>
 											<treecell label="rdf:http://www.technikum-wien.at/projektbetreuer/rdf#person_id"/>
 											<treecell label="rdf:http://www.technikum-wien.at/projektbetreuer/rdf#projektarbeit_id"/>
+                                            <treecell label="rdf:http://www.technikum-wien.at/projektbetreuer/rdf#vertrag_id"/>
 										</treerow>
 									</treeitem>
 								</treechildren>
@@ -433,7 +442,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 								          oncommand="StudentProjektbetreuerLoadMitarbeiterDaten()">
 									<template>
 										<menupopup>
-											<menuitem value="rdf:http://www.technikum-wien.at/person/rdf#person_id"
+											<menuitem id="student-projektbetreuer-test" value="rdf:http://www.technikum-wien.at/person/rdf#person_id"
 								        		      label="rdf:http://www.technikum-wien.at/person/rdf#anzeigename ( rdf:http://www.technikum-wien.at/person/rdf#status )"
 											  		  uri="rdf:*"/>
 										</menupopup>
@@ -508,6 +517,40 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 						</rows>
 					</grid>
 			</groupbox>
+
+        <!-- Vertragsdetails: Anzeige wird ueber config Eintrag bestimmt -->
+        <vbox>
+            <groupbox id="student-projektbetreuer-groupbox-vertragsdetails" hidden="<?php echo $is_hidden ?>">
+                <caption label="Vertragsdetails" />
+                <grid style="overflow:auto; padding:10px;" flex="1">
+                    <columns>
+                        <column flex="1"/>
+                        <column flex="1"/>
+                        <column flex="1"/>
+                    </columns>
+                    <rows>
+                        <label id="student-projektbetreuer-label-vertrag_id" hidden="true" value=""/>
+                        <row>
+                            <label value="Vertragsstatus:"/>
+                            <label id="student-projektbetreuer-label-vertragsstatus" value="" readonly="true" maxlength="8" size="6"/>
+                            <button label="Stornieren" disabled="true" id="student-projektbetreuer-button-vertrag-stornieren"
+                                    oncommand="StudentProjektbetreuerVertragStornieren();" flex="1"/>
+                        </row>
+                        <row>
+                            <label value="Vertragsdetails lt. Urfassung" style="margin-bottom: 10px;"/>
+                        </row>
+                        <row>
+                            <label value="Semesterstunden:" class="indent"/>
+                            <label id="student-projektbetreuer-label-vertragsstunden" value="" readonly="true"/>
+                        </row>
+                        <row>
+                            <label value="Studiensemester:" class="indent"/>
+                            <label id="student-projektbetreuer-label-vertragsstunden_studiensemester_kurzbz" value="" readonly="true"/>
+                        </row>
+                    </rows>
+                </grid>
+            </groupbox>
+        </vbox>
 	</hbox>
 
 <spacer flex="1" />

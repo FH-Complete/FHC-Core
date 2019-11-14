@@ -15,8 +15,7 @@ class Benutzer_model extends DB_Model
 
 	public function getFromPersonId($person_id)
 	{
-		/*$this->addSelect('uid, aktiv, alias');*/
-		$this->loadWhere(array('person_id' => $person_id));
+		return $this->loadWhere(array('person_id' => $person_id, 'aktiv' => true));
 	}
 
 }

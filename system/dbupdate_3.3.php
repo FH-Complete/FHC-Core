@@ -1366,6 +1366,21 @@ if($result = $db->db_query("SELECT 1 FROM system.tbl_app WHERE app='bewerbung'")
 	}
 }
 
+// App 'lehrauftrag' hinzufügen
+if($result = $db->db_query("SELECT 1 FROM system.tbl_app WHERE app='lehrauftrag'"))
+{
+	if($db->db_num_rows($result)==0)
+	{
+
+		$qry = "INSERT INTO system.tbl_app(app) VALUES('lehrauftrag');";
+
+		if(!$db->db_query($qry))
+			echo '<strong>App: '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>Neue App lehrauftrag in system.tbl_app hinzugefügt';
+	}
+}
+
 // Archiv boolean fuer public.tbl_akte
 if(!@$db->db_query("SELECT archiv FROM public.tbl_akte LIMIT 1"))
 {
@@ -2938,6 +2953,37 @@ if(!$result = @$db->db_query("SELECT bezeichnung_mehrsprachig FROM bis.tbl_orgfo
 	}
 }
 
+// Spalte vertragsstunden für tbl_vertrag
+if(!$result = @$db->db_query("SELECT vertragsstunden FROM lehre.tbl_vertrag LIMIT 1"))
+{
+	$qry = "ALTER TABLE lehre.tbl_vertrag ADD COLUMN vertragsstunden NUMERIC(5,2);";
+
+	if(!$db->db_query($qry))
+		echo '<strong>lehre.tbl_vertrag: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>lehre.tbl_vertrag: Spalte vertragsstunden hinzugefuegt';
+}
+
+// Spalte vertragsstunden_studiensemester_kurzbz für tbl_vertrag
+if(!$result = @$db->db_query("SELECT vertragsstunden_studiensemester_kurzbz FROM lehre.tbl_vertrag LIMIT 1"))
+{
+    $qry = "
+		ALTER TABLE lehre.tbl_vertrag 
+			ADD COLUMN vertragsstunden_studiensemester_kurzbz VARCHAR(16);
+			
+		ALTER TABLE lehre.tbl_vertrag
+			ADD CONSTRAINT fk_vertrag_vertragsstunden_studiensemester_kurzbz 
+				FOREIGN KEY (vertragsstunden_studiensemester_kurzbz) 
+					REFERENCES public.tbl_studiensemester (studiensemester_kurzbz) 
+					ON UPDATE CASCADE ON DELETE RESTRICT;
+	";
+
+    if (!$db->db_query($qry))
+        echo '<strong>lehre.tbl_vertrag: ' . $db->db_last_error() . '</strong><br>';
+    else
+        echo '<br>lehre.tbl_vertrag: Spalte vertragsstunden_studiensemester_kurzbz hinzugefuegt';
+}
+
 // Create SEQUENCE tbl_zeitaufzeichnung_gd_id
 if ($result = $db->db_query("SELECT 0 FROM pg_class WHERE relname = 'tbl_zeitaufzeichnung_gd_id_seq'"))
 {
@@ -3016,7 +3062,105 @@ if(!@$db->db_query("SELECT 0 FROM campus.tbl_zeitaufzeichnung_gd WHERE 0 = 1")) 
 		echo '<strong>campus.tbl_zeitaufzeichnung_gd ' . $db->db_last_error() . '</strong><br>';
 	else
 		echo '<br>Granted privileges to <strong>vilesci</strong> on campus.tbl_zeitaufzeichnung_gd';
+}
 
+
+// Insert 'bestellt' to tbl_vertragsstatus
+if($result = @$db->db_query("SELECT 1 FROM lehre.tbl_vertragsstatus WHERE vertragsstatus_kurzbz = 'bestellt';"))
+{
+	if($db->db_num_rows($result) == 0)
+	{
+		$qry = "INSERT INTO lehre.tbl_vertragsstatus(vertragsstatus_kurzbz, bezeichnung) VALUES('bestellt', 'Bestellt');";
+
+		if(!$db->db_query($qry))
+			echo '<strong>lehre.tbl_vertragsstatus '.$db->db_last_error().'</strong><br>';
+		else
+			echo 'lehre.tbl_vertragsstatus: Added value \'bestellt\'<br>';
+	}
+}
+
+// Insert 'erteilt' to tbl_vertragsstatus
+if($result = @$db->db_query("SELECT 1 FROM lehre.tbl_vertragsstatus WHERE vertragsstatus_kurzbz = 'erteilt';"))
+{
+	if($db->db_num_rows($result) == 0)
+	{
+		$qry = "INSERT INTO lehre.tbl_vertragsstatus(vertragsstatus_kurzbz, bezeichnung) VALUES('erteilt', 'Erteilt');";
+
+		if(!$db->db_query($qry))
+			echo '<strong>lehre.tbl_vertragsstatus '.$db->db_last_error().'</strong><br>';
+		else
+			echo 'lehre.tbl_vertragsstatus: Added value \'erteilt\'<br>';
+	}
+}
+
+// Insert 'akzeptiert' to tbl_vertragsstatus
+if($result = @$db->db_query("SELECT 1 FROM lehre.tbl_vertragsstatus WHERE vertragsstatus_kurzbz = 'akzeptiert';"))
+{
+	if($db->db_num_rows($result) == 0)
+	{
+		$qry = "INSERT INTO lehre.tbl_vertragsstatus(vertragsstatus_kurzbz, bezeichnung) VALUES('akzeptiert', 'Akzeptiert');";
+
+		if(!$db->db_query($qry))
+			echo '<strong>lehre.tbl_vertragsstatus '.$db->db_last_error().'</strong><br>';
+		else
+			echo 'lehre.tbl_vertragsstatus: Added value \'akzeptiert\'<br>';
+	}
+}
+
+// Insert 'Betreuung' to tbl_vertragstyp
+if($result = @$db->db_query("SELECT 1 FROM lehre.tbl_vertragstyp WHERE vertragstyp_kurzbz = 'Betreuung';"))
+{
+	if($db->db_num_rows($result) == 0)
+	{
+		$qry = "INSERT INTO lehre.tbl_vertragstyp(vertragstyp_kurzbz, bezeichnung) VALUES('Betreuung', 'Betreuung');";
+
+		if(!$db->db_query($qry))
+			echo '<strong>lehre.tbl_vertragstyp '.$db->db_last_error().'</strong><br>';
+		else
+			echo 'lehre.tbl_vertragstyp: Added value \'Betreuung\'<br>';
+	}
+}
+
+// Add permission to order lehrauftrag (lehrauftrag_bestellen)
+if($result = @$db->db_query("SELECT 1 FROM system.tbl_berechtigung WHERE berechtigung_kurzbz = 'lehre/lehrauftrag_bestellen';"))
+{
+	if($db->db_num_rows($result) == 0)
+	{
+		$qry = "INSERT INTO system.tbl_berechtigung(berechtigung_kurzbz, beschreibung) VALUES('lehre/lehrauftrag_bestellen', 'Lehrauftrag bestellen');";
+
+		if(!$db->db_query($qry))
+			echo '<strong>system.tbl_berechtigung '.$db->db_last_error().'</strong><br>';
+		else
+			echo ' system.tbl_berechtigung: Added permission for lehre/lehrauftrag_bestellen<br>';
+	}
+}
+
+// Add permission to approve lehrauftrag (lehrauftrag_erteilen)
+if($result = @$db->db_query("SELECT 1 FROM system.tbl_berechtigung WHERE berechtigung_kurzbz = 'lehre/lehrauftrag_erteilen';"))
+{
+	if($db->db_num_rows($result) == 0)
+	{
+		$qry = "INSERT INTO system.tbl_berechtigung(berechtigung_kurzbz, beschreibung) VALUES('lehre/lehrauftrag_erteilen', 'Lehrauftrag erteilen');";
+
+		if(!$db->db_query($qry))
+			echo '<strong>system.tbl_berechtigung '.$db->db_last_error().'</strong><br>';
+		else
+			echo ' system.tbl_berechtigung: Added permission for lehre/lehrauftrag_erteilen<br>';
+	}
+}
+
+// Add permission to accept lehrauftrag (lehrauftrag_akzeptieren)
+if($result = @$db->db_query("SELECT 1 FROM system.tbl_berechtigung WHERE berechtigung_kurzbz = 'lehre/lehrauftrag_akzeptieren';"))
+{
+	if($db->db_num_rows($result) == 0)
+	{
+		$qry = "INSERT INTO system.tbl_berechtigung(berechtigung_kurzbz, beschreibung) VALUES('lehre/lehrauftrag_akzeptieren', 'Lehrauftrag akzeptieren');";
+
+		if(!$db->db_query($qry))
+			echo '<strong>system.tbl_berechtigung '.$db->db_last_error().'</strong><br>';
+		else
+			echo ' system.tbl_berechtigung: Added permission for lehre/lehrauftrag_akzeptieren<br>';
+	}
 }
 
 // Add column Stufe to tbl_dokumentstudiengang
@@ -3391,7 +3535,7 @@ $tabellen=array(
 	"lehre.tbl_stundenplan"  => array("stundenplan_id","unr","mitarbeiter_uid","datum","stunde","ort_kurzbz","gruppe_kurzbz","titel","anmerkung","lehreinheit_id","studiengang_kz","semester","verband","gruppe","fix","updateamum","updatevon","insertamum","insertvon"),
 	"lehre.tbl_stundenplandev"  => array("stundenplandev_id","lehreinheit_id","unr","studiengang_kz","semester","verband","gruppe","gruppe_kurzbz","mitarbeiter_uid","ort_kurzbz","datum","stunde","titel","anmerkung","fix","updateamum","updatevon","insertamum","insertvon","ext_id"),
 	"lehre.tbl_stundenplan_betriebsmittel" => array("stundenplan_betriebsmittel_id","betriebsmittel_id","stundenplandev_id","anmerkung","insertamum","insertvon"),
-	"lehre.tbl_vertrag"  => array("vertrag_id","person_id","vertragstyp_kurzbz","bezeichnung","betrag","insertamum","insertvon","updateamum","updatevon","ext_id","anmerkung","vertragsdatum","lehrveranstaltung_id"),
+	"lehre.tbl_vertrag"  => array("vertrag_id","person_id","vertragstyp_kurzbz","bezeichnung","betrag","insertamum","insertvon","updateamum","updatevon","ext_id","anmerkung","vertragsdatum","lehrveranstaltung_id", "vertragsstunden", "vertragsstunden_studiensemester_kurzbz"),
 	"lehre.tbl_vertrag_vertragsstatus"  => array("vertragsstatus_kurzbz","vertrag_id","uid","datum","ext_id","insertamum","insertvon","updateamum","updatevon"),
 	"lehre.tbl_vertragstyp"  => array("vertragstyp_kurzbz","bezeichnung"),
 	"lehre.tbl_vertragsstatus"  => array("vertragsstatus_kurzbz","bezeichnung"),
@@ -3547,7 +3691,7 @@ $i=0;
 $errors = 0;
 foreach ($tabellen AS $attribute)
 {
-	$sql_attr='';
+	$sql_attr = '';
 	foreach($attribute AS $attr)
 		$sql_attr.='"'.$attr.'",';
 	$sql_attr=substr($sql_attr, 0, -1);
