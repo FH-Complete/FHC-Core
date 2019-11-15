@@ -109,6 +109,7 @@ $qry = "SELECT
 	        		vw_student_lehrveranstaltung.studiensemester_kurzbz=tbl_studentlehrverband.studiensemester_kurzbz
 	        ) 
 	        AND studiengang_kz<>0
+	        AND zeugnis
 	    UNION
 	    SELECT
 	    	lehrveranstaltung_id, bezeichnung, studiengang_kz, semester, ects
@@ -117,7 +118,8 @@ $qry = "SELECT
 	    WHERE
 	    	tbl_lehrveranstaltung.studiengang_kz=".$db->db_add_param($studiengang_kz, FHC_INTEGER)." AND
 	    	tbl_zeugnisnote.student_uid in($uids) AND
-	    	tbl_zeugnisnote.studiensemester_kurzbz=".$db->db_add_param($semester_aktuell)."
+	    	tbl_zeugnisnote.studiensemester_kurzbz=".$db->db_add_param($semester_aktuell)." AND
+	    	zeugnis
 		ORDER BY bezeichnung";
 
 if (!$result_lva = $db->db_query($qry))
@@ -152,7 +154,7 @@ $nulltermine = array_filter($termine, function ($termin)
 });
 
 //keine Werte in sort Spalte - es wird versucht, Reihenfolge aufgrund Strings zu bestimmen
-//zuerst Termine 1 - n, dann kommissionelle und zusätzliche kommissionelle
+//zuerst Termine 1 bis n, dann kommissionelle und zusätzliche kommissionelle
 $max = 0;
 foreach ($nulltermine as $termin)
 {
