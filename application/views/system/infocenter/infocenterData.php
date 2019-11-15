@@ -394,7 +394,7 @@
 
 			if ($datasetRaw->OnholdDate != null)
 			{
-				$mark = "text-success";
+				$mark = "onhold";
 			}
 
 			// Parking has priority over locking
