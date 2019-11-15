@@ -55,6 +55,7 @@ if (!$db = new basis_db())
 
 $user = get_uid();
 
+$passuid = false;
 $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($user);
 
@@ -67,6 +68,7 @@ if(isset($_GET['uid']))
 		$user = $_GET['uid'];
 		$rechte = new benutzerberechtigung();
 		$rechte->getBerechtigungen($user);
+		$passuid = true;
 	}
 	else
 	{
@@ -1021,7 +1023,7 @@ if($projekt->getProjekteMitarbeiter($user, true))
 
 		      			<a href='".$_SERVER['PHP_SELF']."?csvexport=1' style='font-size: larger;'>CSV Export</a>";
 		      			if($anzprojekte > 0)
-		      				echo "<a style='font-size: larger; text-decoration: none; cursor: default'> | </a><a href='".$_SERVER['PHP_SELF']."?projektexport=1' style='font-size: larger;'>".$p->t("zeitaufzeichnung/projektexport")."</a>";
+		      				echo "<a style='font-size: larger; text-decoration: none; cursor: default'> | </a><a href='".$_SERVER['PHP_SELF']."?projektexport=1".($passuid ? '&uid='.$user : '')."' style='font-size: larger;'>".$p->t("zeitaufzeichnung/projektexport")."</a>";
 				echo "</td>
 		      		<td class='menubox' height='10px'>";
 		if ($p->t("dms_link/handbuchZeitaufzeichnung")!='')
@@ -1054,19 +1056,21 @@ if($projekt->getProjekteMitarbeiter($user, true))
 			echo '<tr><td colspan="4"><hr></td></tr>';
 			echo '<tr><td>'.$p->t('zeitaufzeichnung/projektexport').'</td>';
 			echo '<td align="center">'.$p->t('zeitaufzeichnung/monat').' <select id="projexpmonat" name="projexpmonat">';
-			for($i=1;$i<13;$i++)
+			for ($i=1;$i<13;$i++)
 			{
 				$selected = ($i == $aktmonat)?'selected = "selected"':'';
 				echo '<option value="'.$i.'" '.$selected.'>'.$monatsname[$sprache_index][$i - 1].'</option>';
 			}
 			echo '</select></td>';
 			echo '<td align="center">'.$p->t('zeitaufzeichnung/jahr').' <select id="projexpjahr" name="projexpjahr">';
-			for(;$jahreanz>0;$jahreanz--)
+			for (;$jahreanz>0;$jahreanz--)
 			{
 				echo '<option value="'.$aktjahr.'">'.$aktjahr.'</option>';
 				$aktjahr--;
 			}
 			echo '</select></td>';
+			if ($passuid)
+				echo '<input type="hidden" value="'.$user.'" name="uid">';
 			echo '<td align="right"><input type="submit" value="Export" name="projexport"></td></tr>';
 			echo '<tr><td colspan="4"><hr></td></tr>';
 			echo '</form>';

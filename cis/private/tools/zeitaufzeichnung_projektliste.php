@@ -29,6 +29,7 @@ require_once('../../../include/phrasen.class.php');
 require_once('../../../include/datum.class.php');
 require_once('../../../include/Excel/excel.php');
 require_once('../../../include/benutzer.class.php');
+require_once('../../../include/benutzerberechtigung.class.php');
 require_once('../../../include/mitarbeiter.class.php');
 require_once('../../../include/zeitaufzeichnung.class.php');
 require_once('../../../include/projekt.class.php');
@@ -46,6 +47,24 @@ $sprache_obj->load($sprache);
 $sprache_index = $sprache_obj->index;
 
 $uid = get_uid();
+
+//Wenn User Administrator ist und UID uebergeben wurde, dann die Zeitaufzeichnung
+//des uebergebenen Users anzeigen
+if (isset($_GET['uid']))
+{
+	$rechte = new benutzerberechtigung();
+	$rechte->getBerechtigungen($uid);
+
+	if ($rechte->isBerechtigt('admin'))
+	{
+		$uid = $_GET['uid'];
+	}
+	else
+	{
+		die($p->t('global/FuerDieseAktionBenoetigenSieAdministrationsrechte'));
+	}
+}
+
 $benutzer = new benutzer();
 if (!$benutzer->load($uid))
 	die($p->t("zeitaufzeichnung/benutzerWurdeNichtGefunden", array($uid)));
@@ -602,12 +621,12 @@ foreach ($projektnames as $projektname)
 	$lastspalte = 4 + $nrPhases;
 
 	//calculating spaces for centering global header texts
-	$usernamelength = strlen($username) * 1.77;
+/*	$usernamelength = strlen($username) * 1.77;
 	$numberspacesfirstrow = $totalwidth - $daywidth * 2 - $worktimewidth - $usernamelength;
 	$numberspacessecondrow = $numberspacesfirstrow + $usernamelength - strlen($p->t('zeitaufzeichnung/personalnr').$persnr) - 4;
 
 	$spacesstringfirstrow = str_repeat(' ', $numberspacesfirstrow);
-	$spacesstringsecondrow = str_repeat(' ', $numberspacessecondrow);
+	$spacesstringsecondrow = str_repeat(' ', $numberspacessecondrow);*/
 
 	$spalte = $zeile = 0;
 
@@ -626,14 +645,14 @@ foreach ($projektnames as $projektname)
 	}
 	$worksheet->setMerge($zeile, $spalte + 3, $zeile, $lastspalte);
 	$worksheet->setMerge($zeile + 1, $spalte + 3, $zeile + 1, $lastspalte);
-	$worksheet->write($zeile, $spalte + 3, $p->t('zeitaufzeichnung/projektlistegedruckt').$spacesstringfirstrow.$username, $format_heading_right);
+	$worksheet->write($zeile, $spalte + 3, /*$p->t('zeitaufzeichnung/projektlistegedruckt').$spacesstringfirstrow.*/$username, $format_heading_right);
 	for ($i = 4; $i < $lastspalte; $i++)
 	{
 		$worksheet->write($zeile, $i, '', $format_heading_topline);
 		$worksheet->write($zeile + 1, $i, '', $format_heading_bottomline);
 	}
 	$worksheet->write($zeile, $lastspalte, '', $format_heading_right);
-	$worksheet->write($zeile + 1, $spalte + 3, date('d.m.Y H:i').$spacesstringsecondrow.$p->t('zeitaufzeichnung/personalnr').$persnr, $format_heading_right_bottomline);
+	$worksheet->write($zeile + 1, $spalte + 3, /*date('d.m.Y H:i').$spacesstringsecondrow.*/$p->t('zeitaufzeichnung/personalnr').$persnr, $format_heading_right_bottomline);
 	$worksheet->write($zeile + 1, $lastspalte, '', $format_heading_right_bottomline);
 	$zeile += 3;
 
