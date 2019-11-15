@@ -1118,17 +1118,17 @@ class mitarbeiter extends benutzer
 				$oe.=$this->db_add_param($row->oe_kurzbz);
 			}
 		}
-	
+
 		// Kinder-Organisationseinheiten holen
 		if ($include_OE_childs == true)
 		{
 			if (!empty($oe))
 			{
 				$child_oe_arr = array();	// array of string child oes
-				
+
 				$qry = '
-					WITH RECURSIVE 
-						oes (oe_kurzbz, oe_parent_kurzbz) AS 
+					WITH RECURSIVE
+						oes (oe_kurzbz, oe_parent_kurzbz) AS
 						(
 							SELECT
 								oe_kurzbz,
@@ -1140,11 +1140,11 @@ class mitarbeiter extends benutzer
 
 							UNION ALL
 
-							SELECT 
+							SELECT
 								o.oe_kurzbz,
 								o.oe_parent_kurzbz
 							FROM
-								public.tbl_organisationseinheit o, oes 
+								public.tbl_organisationseinheit o, oes
 							WHERE
 								o.oe_parent_kurzbz = oes.oe_kurzbz
 						)
@@ -1156,39 +1156,39 @@ class mitarbeiter extends benutzer
 						oe_kurzbz';
 
 				if($this->db_query($qry))
-				{			
+				{
 					while($row = $this->db_fetch_object())
 					{
 						$child_oe_arr []= $this->db_add_param($row->oe_kurzbz);
 					}
 				}
-			
+
 				// eliminate duplicates
 				$child_oe_arr = array_unique($child_oe_arr);
-				
+
 				// check if leader has child oes by comparing the original
 				// string of oes with string of child oes.
 				if ($oe == implode(',', $child_oe_arr))
 				{
 					$this->result ['isIndirectSupervisor']= false;
-				}	
+				}
 				else
 				{
 					$this->result ['isIndirectSupervisor']= true;
 				}
-					
+
 				// overwrite $oe with child oes for further query
 				$oe = implode(',', $child_oe_arr);
-			}	
+			}
 		}
-		
+
 
 		//Alle Personen holen die dieser Organisationseinheit untergeordnet sind
 		$qry = "
-			SELECT distinct 
-				uid 
-			FROM 
-				public.tbl_benutzerfunktion 
+			SELECT distinct
+				uid
+			FROM
+				public.tbl_benutzerfunktion
 			JOIN
 				public.tbl_benutzer
 			USING (uid)
@@ -1199,12 +1199,9 @@ class mitarbeiter extends benutzer
 
 		$qry.=")) ";
 
-		if($oe!='')
-			$qry.=" OR (funktion_kurzbz='ass' AND oe_kurzbz in($oe))";
-
-		$qry.= ") 
-			AND 
-				(tbl_benutzerfunktion.datum_von is null OR tbl_benutzerfunktion.datum_von<=now()) 
+		$qry.= ")
+			AND
+				(tbl_benutzerfunktion.datum_von is null OR tbl_benutzerfunktion.datum_von<=now())
 			AND
 				(tbl_benutzerfunktion.datum_bis is null OR tbl_benutzerfunktion.datum_bis>=now())
 			AND
@@ -1491,15 +1488,15 @@ class mitarbeiter extends benutzer
 			return false;
 		}
 	}
-	
+
 	/** Check if uid is a supervisor
- * 
+ *
  * @param string $uid
  * @param string $employee_uid
  * @return boolean True if $uid is direct leader of $employee_uid.
  */
 	function check_isVorgesetzter($uid, $employee_uid)
-	{	
+	{
 		$this->getUntergebene($uid);
 		$untergebenen_arr = $this->untergebene;
 
@@ -1515,14 +1512,14 @@ class mitarbeiter extends benutzer
 		}
 	}
 	/** Check if uid is a supervisor on higher oe level
-	 * 
+	 *
 	 * @param string $uid
 	 * @param string $employee_uid
 	 * @return boolean True if $uid is indirect supervisor (leader on higher oe-level)
-	 *	of $employee_uid. 
-	 *	:NOTE: as all children oes also include the direct oe, the return value is also true when 
+	 *	of $employee_uid.
+	 *	:NOTE: as all children oes also include the direct oe, the return value is also true when
 	 *	uid is ONLY direct leader. To distinguish you might check in the calling script:
-	 *	isVorgesetzter_indirekt && isVorgesetzter --> direct leader 
+	 *	isVorgesetzter_indirekt && isVorgesetzter --> direct leader
 	 *	isVorgesetzter_indirekt && !isVorgesetzter --> only super leader on higher level
 	 */
 	function check_isVorgesetzter_indirekt($uid, $employee_uid)
