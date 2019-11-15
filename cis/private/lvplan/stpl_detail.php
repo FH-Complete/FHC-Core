@@ -156,9 +156,12 @@ $num_rows_stpl = $db->db_num_rows($erg_stpl);
 $sql_query="
 SELECT 
 	vw_reservierung.*, vw_mitarbeiter.titelpre, vw_mitarbeiter.titelpost, 
-	vw_mitarbeiter.vorname,vw_mitarbeiter.nachname 
+	vw_mitarbeiter.vorname, vw_mitarbeiter.nachname, reserviert_von.titelpre AS titelpre_reserviertvon, reserviert_von.titelpost AS titelpost_reserviertvon, 
+	reserviert_von.vorname AS vorname_reserviertvon, reserviert_von.nachname AS nachname_reserviertvon 
 FROM 
-	campus.vw_reservierung, campus.vw_mitarbeiter 
+	campus.vw_reservierung
+	JOIN campus.vw_mitarbeiter ON vw_reservierung.uid=vw_mitarbeiter.uid
+	LEFT JOIN campus.vw_mitarbeiter reserviert_von ON vw_reservierung.insertvon=reserviert_von.uid
 WHERE 
 	datum=".$db->db_add_param($datum)." 
 	AND stunde=".$db->db_add_param($stunde);
@@ -167,7 +170,6 @@ if (isset($ort_kurzbz) && $type=='ort')
     $sql_query.=" AND vw_reservierung.ort_kurzbz=".$db->db_add_param($ort_kurzbz);
 if ($type=='lektor')
     $sql_query.=" AND vw_reservierung.uid=".$db->db_add_param($pers_uid);
-$sql_query.=" AND vw_reservierung.uid=vw_mitarbeiter.uid";
 if ($type=='verband' || $type=='student')
 {
     $sql_query.=" AND studiengang_kz=".$db->db_add_param($stg_kz)." 
@@ -271,7 +273,7 @@ if ($num_rows_repl>0)
 {
     echo '<h2>'.$p->t('lvplan/reservierungen').'</h2>';
     echo '<table class="stdplan">';
-    echo '<tr><th>'.$p->t('global/titel').'</th><th>'.$p->t('lvplan/ort').'</th><th>'.$p->t('global/person').'</th><th>'.$p->t('global/beschreibung').'</th></tr>';
+    echo '<tr><th>'.$p->t('global/titel').'</th><th>'.$p->t('lvplan/ort').'</th><th>'.$p->t('global/person').'</th><th>'.$p->t('global/beschreibung').'</th><th>'.$p->t('lvplan/reserviertVon').'</th></tr>';
     $i=0;
     $ort = new ort();
     while($row = $db->db_fetch_object($erg_repl))
@@ -285,13 +287,20 @@ if ($num_rows_repl>0)
    		$pers_nachname=$row->nachname;
     	$pers_email=$row->uid.'@'.DOMAIN;
     	$beschreibung=$row->beschreibung;
+    	$reserviertvon=$row->insertvon;
+		$titelpre_reserviertvon=$row->titelpre_reserviertvon;
+		$titelpost_reserviertvon=$row->titelpost_reserviertvon;
+		$pers_vorname_reserviertvon=$row->vorname_reserviertvon;
+		$pers_nachname_reserviertvon=$row->nachname_reserviertvon;
+
     	$ort->load($ortkurzbz);
     	
         echo '<tr class="liste'.($i%2).'">';
-        echo '<td >'.$db->convert_html_chars($titel).'</td>';
+        echo '<td>'.$db->convert_html_chars($titel).'</td>';
         echo '<td>'.(!empty($ortkurzbz)?($ort->content_id!=''?'<a href="../../../cms/content.php?content_id='.$ort->content_id.'" target="_self" onClick="window.resizeTo(1200,880)">'.$db->convert_html_chars($ortkurzbz).'</a>':$db->convert_html_chars($ortkurzbz)):$db->convert_html_chars($ortkurzbz)).'</td>';
-        echo '<td  ><A href="mailto:'.$pers_email.'">'.$db->convert_html_chars($titelpre.' '.$pers_vorname.' '.$pers_nachname.' '.$titelpost).'</A></td>';
-        echo '<td >'.$db->convert_html_chars($beschreibung).'</td></tr>';
+        echo '<td><A href="mailto:'.$pers_email.'">'.$db->convert_html_chars($titelpre.' '.$pers_vorname.' '.$pers_nachname.' '.$titelpost).'</A></td>';
+        echo '<td>'.$db->convert_html_chars($beschreibung).'</td>';
+		echo '<td>'.$db->convert_html_chars($titelpre_reserviertvon.' '.$pers_vorname_reserviertvon.' '.$pers_nachname_reserviertvon.' '.$titelpost_reserviertvon).'</td>';
     }
     echo '</table><br>';
 }
