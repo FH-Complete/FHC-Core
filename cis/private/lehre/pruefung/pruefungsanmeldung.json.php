@@ -1177,7 +1177,12 @@ function getAllFreieRaeume($terminId)
 	$teilnehmer = $teilnehmer !== false ? $teilnehmer : 0;
 	$pruefungstermin->getAll($pruefungstermin->von, $pruefungstermin->bis, TRUE);
 
-	if($ort->search($datum_von[0], $datum_von[1], $datum_bis[1], null, $teilnehmer, true))
+	if(defined('CIS_PRUEFUNGSANMELDUNG_ERLAUBE_TERMINKOLLISION') && CIS_PRUEFUNGSANMELDUNG_ERLAUBE_TERMINKOLLISION)
+		$ortSuccess = $ort->getOrte(true, null, true);
+	else
+		$ortSuccess = $ort->search($datum_von[0], $datum_von[1], $datum_bis[1], null, $teilnehmer, true);
+
+	if($ortSuccess)
 	{
 	foreach($pruefungstermin->result as $termin)
 	{
