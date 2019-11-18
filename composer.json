@@ -258,6 +258,8 @@
 		"components/font-awesome": "^4.7",
 		"components/angular.js": "1.3.16",
 
+		"dapphp/securimage": "3.6.7",
+
 		"easyrdf/easyrdf": "0.9.*",
 
 		"fgelinas/timepicker": "^0.3.3",
