@@ -38,6 +38,8 @@ require_once('../include/lehreinheit.class.php');
 require_once('../include/notiz.class.php');
 require_once('../include/mitarbeiter.class.php');
 require_once('../include/zeitaufzeichnung_gd.class.php');
+require_once('../include/lehreinheitmitarbeiter.class.php');
+require_once('../include/vertrag.class.php');
 
 $uid=get_uid();
 $error_msg='';
@@ -304,6 +306,23 @@ if ($anz>0)
 		else
 			$fixangestellt_info = 'EXT';
 
+		$vertragsstatus = 'Neu';
+		// Lehrauftragsstatus ermitteln
+		foreach ($l->lem as $row_lem)
+		{
+			$lem_obj = new lehreinheitmitarbeiter();
+			if ($lem_obj->load($row_lem['lehreinheit_id'], $row_lem['mitarbeiter_uid']))
+			{
+				if ($lem_obj->vertrag_id != '')
+				{
+					$vertrag = new vertrag();
+					if($vertrag->getStatus($lem_obj->vertrag_id))
+					{
+						$vertragsstatus = $vertrag->vertragsstatus_bezeichnung;
+					}
+				}
+			}
+		}
 		echo'<RDF:li>
 			<RDF:Description  id="lva'.($anz--).'" about="'.$rdf_url.$l->unr.'">
 					<LVA:lvnr>'.$lvnr.'</LVA:lvnr>
@@ -335,6 +354,7 @@ if ($anz>0)
 					<LVA:lehrverband>'.$lehrverband.'</LVA:lehrverband>
 					<LVA:anzahl_notizen>'.$anzahl_notizen.'</LVA:anzahl_notizen>
 					<LVA:lehreinheit_id>'.$l->lehreinheit_id[0].'</LVA:lehreinheit_id>
+					<LVA:vertragsstatus>'.$vertragsstatus.'</LVA:vertragsstatus>
 				</RDF:Description>
 			</RDF:li>';
 	}

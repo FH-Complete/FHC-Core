@@ -163,8 +163,12 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/lvplanung/stpl-details-overlay.xul
 	        			</hbox>
 	        		</row>
 	    			<row>
-	    				<label value="rdf:http://www.technikum-wien.at/lehreinheit-lvplan/rdf#lehrfach rdf:http://www.technikum-wien.at/lehreinheit-lvplan/rdf#lehrform"
-	    					tooltiptext="rdf:http://www.technikum-wien.at/lehreinheit-lvplan/rdf#lehrfach_bez" />
+						<hbox>
+	    					<label value="rdf:http://www.technikum-wien.at/lehreinheit-lvplan/rdf#lehrfach rdf:http://www.technikum-wien.at/lehreinheit-lvplan/rdf#lehrform"
+	    						tooltiptext="rdf:http://www.technikum-wien.at/lehreinheit-lvplan/rdf#lehrfach_bez" />
+							<spacer flex="1" />
+							<label value="rdf:http://www.technikum-wien.at/lehreinheit-lvplan/rdf#vertragsstatus" class="tempus_vertrag_info"/>
+						</hbox>
 	       				<label align="right" value="rdf:http://www.technikum-wien.at/lehreinheit-lvplan/rdf#raumtyp"
 	       					tooltiptext="rdf:http://www.technikum-wien.at/lehreinheit-lvplan/rdf#raumtypalternativ" />
 	    			</row>
@@ -184,6 +188,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/lvplanung/stpl-details-overlay.xul
 	    			<row>
 	    				<hbox>
 							<label value="rdf:http://www.technikum-wien.at/lehreinheit-lvplan/rdf#lektor" />
+							<spacer flex="1"/>
 							<label value="rdf:http://www.technikum-wien.at/lehreinheit-lvplan/rdf#fixangestellt_info" class="tempus_lektor_fix_info"/>
 						</hbox>
 	    				<label value="WR: rdf:http://www.technikum-wien.at/lehreinheit-lvplan/rdf#wochenrythmus Bl: rdf:http://www.technikum-wien.at/lehreinheit-lvplan/rdf#stundenblockung"

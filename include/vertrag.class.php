@@ -529,7 +529,7 @@ class vertrag extends basis_db
 		FROM
 			lehre.tbl_lehreinheitmitarbeiter
 			JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
-			JOIN lehre.tbl_vertrag USING (vertrag_id)		
+			JOIN lehre.tbl_vertrag USING (vertrag_id)
 		WHERE
 			vertrag_id=".$this->db_add_param($vertrag_id, FHC_INTEGER)."
 		UNION
@@ -728,9 +728,10 @@ class vertrag extends basis_db
 	}
 
 	/**
-	 * Laedt alle Stati eines Vertrags
+	 * Laedt den letzten Status eines Vertrags
 	 *
 	 * @param $vertrag_id
+	 * @param $status optional
 	 * @return boolean
 	 */
 	public function getStatus($vertrag_id, $status=NULL)
@@ -745,32 +746,32 @@ class vertrag extends basis_db
 
 		if(!is_null($status))
 		{
-		    $qry .= " AND tbl_vertrag_vertragsstatus.vertragsstatus_kurzbz=".$this->db_add_param($status);
+			$qry .= " AND tbl_vertrag_vertragsstatus.vertragsstatus_kurzbz=".$this->db_add_param($status);
 		}
 
 		$qry .= " ORDER BY datum DESC;";
 
 		if($result = $this->db_query($qry))
 		{
-		    if($row = $this->db_fetch_object($result))
-		    {
-			$this->vertrag_id = $row->vertrag_id;
-			$this->vertragsstatus_kurzbz = $row->vertragsstatus_kurzbz;
-			$this->vertragsstatus_bezeichnung = $row->bezeichnung;
-			$this->datum = $row->datum;
-			$this->uid = $row->uid;
-			$this->insertvon = $row->insertvon;
-			$this->insertamum = $row->insertamum;
-			$this->updatevon = $row->updatevon;
-			$this->updateamum = $row->updateamum;
-			$this->new=false;
-			return true;
-		    }
-		    else
-		    {
-			    $this->errormsg = 'Eintrag wurde nicht gefunden';
-			    return false;
-		    }
+			if($row = $this->db_fetch_object($result))
+			{
+				$this->vertrag_id = $row->vertrag_id;
+				$this->vertragsstatus_kurzbz = $row->vertragsstatus_kurzbz;
+				$this->vertragsstatus_bezeichnung = $row->bezeichnung;
+				$this->datum = $row->datum;
+				$this->uid = $row->uid;
+				$this->insertvon = $row->insertvon;
+				$this->insertamum = $row->insertamum;
+				$this->updatevon = $row->updatevon;
+				$this->updateamum = $row->updateamum;
+				$this->new=false;
+				return true;
+			}
+			else
+			{
+				$this->errormsg = 'Eintrag wurde nicht gefunden';
+				return false;
+			}
 		}
 		else
 		{
@@ -1041,7 +1042,7 @@ class vertrag extends basis_db
 		$qry = "
 			UPDATE lehre.tbl_lehreinheitmitarbeiter SET vertrag_id=null WHERE vertrag_id=".$this->db_add_param($vertrag_id, FHC_INTEGER).";
 			UPDATE lehre.tbl_projektbetreuer SET vertrag_id=null WHERE vertrag_id=".$this->db_add_param($vertrag_id, FHC_INTEGER).";
-			INSERT INTO lehre.tbl_vertrag_vertragsstatus(vertragsstatus_kurzbz, vertrag_id, uid, datum, insertamum, insertvon) 
+			INSERT INTO lehre.tbl_vertrag_vertragsstatus(vertragsstatus_kurzbz, vertrag_id, uid, datum, insertamum, insertvon)
 				VALUES(".
 					$this->db_qoute('storno'). ", ".
 					$this->db_add_param($vertrag_id, FHC_INTEGER). ", ".
@@ -1123,7 +1124,7 @@ class vertrag extends basis_db
 	 */
 	public function getFalscheBetraege($studiensemester_kurzbz)
 	{
-		$qry = "SELECT * FROM 
+		$qry = "SELECT * FROM
 				(
 					SELECT
 						tbl_vertrag.*, tbl_lehreinheitmitarbeiter.mitarbeiter_uid, tbl_lehreinheitmitarbeiter.lehreinheit_id,
@@ -1136,7 +1137,7 @@ class vertrag extends basis_db
 					WHERE
 						studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz)."
 				)x
-				WHERE 
+				WHERE
 					x.semesterstunden * x.stundensatz != x.betrag";
 
 		if($result = $this->db_query($qry))
