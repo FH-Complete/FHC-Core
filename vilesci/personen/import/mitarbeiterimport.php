@@ -163,6 +163,28 @@ $(document).ready(function()
 		widgets: ['zebra'],
 		headers: {0: {sorter: false},8: {sorter: false},9: {sorter: false}}
 	});
+
+	$("#vorschlladen").click(
+		function(evt)
+		{
+			var input = $("<input>")
+				.attr("type", "hidden")
+				.attr("name", "showagain").val("showagain");
+			$('#mitarbeiterimportform').append(input);
+			checkInput1(evt);
+		}
+	);
+
+	$("#savemitarbeiter").click(
+		function(evt)
+		{
+			var input = $("<input>")
+				.attr("type", "hidden")
+				.attr("name", "save").val("save");
+			$('#mitarbeiterimportform').append(input);
+			checkInput1(evt);
+		}
+	);
 });
 
 function disablefields(obj)
@@ -223,38 +245,47 @@ function GeburtsdatumEintragen()
 	}
 }
 
-function checkInput1()
+function checkInput1(evt)
 {
+	evt.preventDefault();
 	if(document.getElementById('nachname').value=='')
 	{
 		alert('Nachname muss eingetragen werden');
-		return false;
 	}
-	if(document.getElementById('geburtsdatum').value=='')
+	else if(document.getElementById('geburtsdatum').value=='')
 	{
 		alert('Geburtsdatum muss eingetragen werden');
-		return false;
 	}
-	return true;
+	else
+		checkWunschUid(true);
 }
 
-function checkWunschUid()
+function checkWunschUid(submit)
 {
 	// Set UID lower case and remove whitespaces and -
 	uid = $("#wunschUid").val().toLowerCase();
 	uid = uid.replace(/\s+/g, '');
-	uid = uid.replace('-', '');
+	uid = uid.replace(/-/g, '');
+	$("#checkUID").html('');
 	$("#wunschUid").val(uid);
 
+	if (uid === '')
+	{
+		if (submit === true)
+			$("#mitarbeiterimportform").submit();
+	}
+	else if(uid.length < 4 || uid.length > 32)
+	{
+		$("#checkUID").css( "color", "red" );
+		$("#checkUID").html('UID Länge muss mind. 4, max. 32 Zeichen sein');
+	}
 	// Check ob uid Sonderzeichen (alles außer a-z und 0-9) enthält
-	if (/^[a-z0-9]+$/i.test(uid) === false)
+	else if (/^[a-z0-9]*$/i.test(uid) === false)
 	{
 		$("#checkUID").css( "color", "red" );
 		$("#checkUID").html('Die UID darf keine Sonderzeichen enthalten');
-		return false;
 	}
-
-	if (uid != '')
+	else
 	{
 		data = {
 			uid: uid,
@@ -266,23 +297,25 @@ function checkWunschUid()
 			data: data,
 			type: 'POST',
 			dataType: "json",
-			success: function(data)
-			{
-				if(data.status != 'ok')
+			success: function (data) {
+				if (data.status != 'ok')
 				{
-					$("#checkUID").css( "color", "red" );
+					$("#checkUID").css("color", "red");
 					$("#checkUID").html('UID bereits vorhanden');
-					return false;
-				}
-				else
+				} else
 				{
-					$("#checkUID").css( "color", "green" );
-					$("#checkUID").html('UID verfügbar');
-					return true;
+					if (submit)
+					{
+						$("#mitarbeiterimportform").submit();
+					}
+					else
+					{
+						$("#checkUID").css("color", "green");
+						$("#checkUID").html('UID verfügbar');
+					}
 				}
 			},
-			error: function(data)
-			{
+			error: function (data) {
 				alert(data.msg)
 			}
 		});
@@ -833,10 +866,10 @@ if($geburtsdatum!='')
 	if($geburtsdatum_error)
 		echo "Format des Geburtsdatums ist ungueltig!";
 }
-if(($vorname=='' && $nachname=='') || $geburtsdatum_error || $geburtsdatum=='')
-	echo "<form method='POST' onsubmit='return checkInput1();'>";
-else
-	echo "<form method='POST'>";
+/*if(($vorname=='' && $nachname=='') || $geburtsdatum_error || $geburtsdatum=='')
+	echo "<form method='POST' action='' id='mitarbeiterimportform'>";// onsubmit='return checkInput1();'
+else*/
+	echo "<form method='POST' action='' id='mitarbeiterimportform'>";
 ?>
 <!-- <form method='POST'>-->
 <table width="100%">
@@ -846,14 +879,25 @@ else
 <!--Formularfelder-->
 <table>
 <?php
-echo '<tr><td>Wunsch-UID</td><td><input type="text" name="wunschUid" id="wunschUid" maxlength="32" size="30" value="'.$wunschUid.'" />
-		<span style="padding: 0 3px" id="checkUID"></span>
-		<button type="button" title="Prüft, ob die UID schon vorhanden ist. Keine Sonderzeichen, Umlaute oder Leerzeichen in der UID" href="#" onclick="checkWunschUid()"> Check UID </button> (optional, max. 32)
-		</td></tr>';
+echo '<tr><td>Wunsch-UID</td><td><input type="text" name="wunschUid" id="wunschUid" maxlength="32" size="30" value="'.$wunschUid.'" />';
+echo '<span style="padding: 0 3px" id="checkUID"></span>';
+if (isset($_POST['showagain']))
+	echo '<br>';
+echo '<button type="button" title="Prüft, ob die UID schon vorhanden ist. Keine Sonderzeichen, Umlaute oder Leerzeichen in der UID" href="#" onclick="checkWunschUid()"> Check UID </button> (optional, max. 32)
+</td></tr>';
 echo '<tr><td>Anrede</td><td><input type="text" id="anrede" name="anrede" maxlength="16" size="30" value="'.$anrede.'" onblur="AnredeChange()"/></td></tr>';
 echo '<tr><td>Titel(Pre)</td><td><input type="text" id="titel" name="titel" maxlength="64" size="30" value="'.$titel.'" /></td></tr>';
-echo '<tr><td>Vorname</td><td><input type="text" id="vorname" maxlength="32" name="vorname" size="30" value="'.$vorname.'" />
-		&nbsp;&nbsp;Weitere Vornamen&nbsp;<input type="text" id="vornamen" maxlength="32" size="30" name="vornamen" value="'.$vornamen.'" /></td></tr>';
+echo '<tr><td>Vorname</td><td><input type="text" id="vorname" maxlength="32" name="vorname" size="30" value="'.$vorname.'" />';
+if (isset($_POST['showagain']))
+	echo '</td></tr><tr><td>';
+else
+	echo '&nbsp;&nbsp';
+echo 'Weitere Vornamen';
+if (isset($_POST['showagain']))
+	echo '</td><td>';
+else
+	echo '&nbsp;';
+echo '<input type="text" id="vornamen" maxlength="32" size="30" name="vornamen" value="'.$vornamen.'" /></td></tr>';
 //echo '<tr></tr>';
 echo '<tr><td>Nachname *</td><td><input type="text" maxlength="64" size="30" id="nachname" name="nachname" value="'.$nachname.'" /></td></tr>';
 echo '<tr><td>Titel(Post)</td><td><input type="text" id="titelpost" name="titelpost" maxlength="64" size="30" value="'.$titelpost.'" /></td></tr>';
@@ -865,7 +909,12 @@ echo '</SELECT>';
 echo '</td></tr>';
 echo '<tr><td>SVNR</td><td><input type="text" id="svnr" size="30" maxlength="16" name="svnr" value="'.$svnr.'" onblur="GeburtsdatumEintragen()" /></td></tr>';
 echo '<tr><td>Ersatzkennzeichen</td><td><input type="text" id="ersatzkennzeichen" size="30" maxlength="10" name="ersatzkennzeichen" value="'.$ersatzkennzeichen.'" /></td></tr>';
-echo '<tr><td>Geburtsdatum *</td><td><input type="text" id="geburtsdatum" size="30" maxlength="10" name="geburtsdatum" value="'.$geburtsdatum.'" /> (Format: TT.MM.JJJJ)</td></tr>';
+echo '<tr><td>Geburtsdatum *</td><td><input type="text" id="geburtsdatum" size="30" maxlength="10" name="geburtsdatum" value="'.$geburtsdatum.'" />';
+if (isset($_POST['showagain']))
+	echo '<br>';
+else
+	echo '&nbsp;';
+echo '(Format: TT.MM.JJJJ)</td></tr>';
 echo '<tr><td>&nbsp;</td></tr>';
 echo '<tr><td>Nation</td><td><SELECT name="adresse_nation" id="adresse_nation" onchange="loadGemeindeData()">';
 $nation =  new nation();
@@ -935,11 +984,11 @@ echo '<tr><td>Anmerkungen</td><td><textarea id="anmerkung" name="anmerkungen" co
 echo '<tr><td></td><td>';
 
 if(($geburtsdatum=='' && $vorname=='' && $nachname=='') || $geburtsdatum_error)
-	echo '<input type="submit" name="showagain" value="Vorschlag laden"></td></tr>';
+	echo '<input type="submit" id="vorschlladen" name="showagain" value="Vorschlag laden"></td></tr>';
 else
 {
-	echo '<input type="submit" name="showagain" value="Vorschlag laden">';
-	echo '<input type="submit" name="save" value="Speichern" onclick="return checkWunschUid()"></td></tr>';
+	echo '<input type="submit" id="vorschlladen" name="showagain" value="Vorschlag laden">';
+	echo '<input type="submit" id="savemitarbeiter" name="save" value="Speichern"></td></tr>';
 }
 
 echo '
