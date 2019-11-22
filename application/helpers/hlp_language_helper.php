@@ -18,28 +18,48 @@ if (! defined('BASEPATH')) exit('No direct script access allowed');
 
 /**
  * Function to retrieve the language of the logged user
- * If is not possible to retrieve it, then the default system language is returnd
- * If as parameter is given a valid language the it's returned useful to avoid
- * to write the same control structures for the language
+ * If is not possible to retrieve it, then the default system language is returned
+ * NOTE: If the given parameter is a valid language then it is returned
+ *			It is useful to avoid to write a lot of "if else" structures
  */
 function getUserLanguage($language = null)
 {
+	// If the given parameter is a valid language then return it
 	if (!isEmptyString($language)) return $language;
 
-	$ci =& get_instance(); // get CI instance
-
-	// Use the default system language, if it's possible retrieves the language for the logged user
+	// Use the default system language as fallback
 	$language = DEFAULT_LANGUAGE;
-	// Checks if the user is authenticated to retrieve the users's language
-	// NOTE: this helper could be called when the user is not logged in the system
-	// 		so this is why is checked if the function getAuthUID exists
-	if (function_exists('getAuthUID'))
+
+	// If the language is present in the session and it is valid
+	if (isset($_SESSION['sprache']) && !isEmptyString($_SESSION['sprache']))
 	{
+		$language = $_SESSION['sprache']; // then use it
+	}
+	// Otherwise checks if the user is authenticated to retrieve the users's language
+	// NOTE: this helper could be called when the user is NOT logged in the system
+	// 		therefore is checked if the user is logged
+	elseif (isLogged())
+	{
+		$ci =& get_instance(); // get CI instance
+
 		// NOTE: Stores the loaded model with the alias PersonModelLanguage to avoid to overwrite
 		// 		an already loaded PersonModel used somewhere else
 		$ci->load->model('person/Person_model', 'PersonModelLanguage');
 
-		$language = $ci->PersonModelLanguage->getLanguage(getAuthUID());
+		// Retrieves language/s for the logged user
+		$languagesDB = $ci->PersonModelLanguage->getLanguage(getAuthUID());
+		if (hasData($languagesDB))
+		{
+			// Looks for the first valid language
+			foreach (getData($languagesDB) as $languageDB)
+			{
+				if (!isEmptyString($languageDB->sprache))
+				{
+					$language = $languageDB->sprache;
+					break;
+				}
+			}
+		}
 	}
 
 	return $language;
