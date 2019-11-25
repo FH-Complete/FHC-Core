@@ -157,12 +157,15 @@ if(isset($_POST['checkUID']))
 
 $(document).ready(function()
 {
-	$('#t1').tablesorter(
+	if ($('#t1 tbody td').length > 0)
 	{
-		sortList: [[1,0],[2,0],[4,0]],
-		widgets: ['zebra'],
-		headers: {0: {sorter: false},8: {sorter: false},9: {sorter: false}}
-	});
+		$('#t1').tablesorter(
+		{
+			sortList: [[1,0],[2,0],[4,0]],
+			widgets: ['zebra'],
+			headers: {0: {sorter: false},8: {sorter: false},9: {sorter: false}}
+		});
+	}
 
 	$("#vorschlladen").click(
 		function(evt)
@@ -221,6 +224,26 @@ function disablefields(obj)
 		document.getElementById('ueb3').style.display = 'none';
 		document.getElementById('ueberschreiben1').checked = true;
 	}
+	disablefields2(val);
+}
+
+function disablefields2(val)
+{
+	document.getElementById('adresse_nation').disabled=val;
+	document.getElementById('adresse').disabled=val;
+	document.getElementById('plz').disabled=val;
+	var ortel = document.getElementById('ort');
+	if (typeof(ortel) != 'undefined' && ortel != null)
+		ortel.disabled=val;
+	var gemeindeel = document.getElementById('gemeinde');
+	if (typeof(gemeindeel) != 'undefined' && gemeindeel != null)
+		gemeindeel.disabled=val;
+	var orttextel = document.getElementById('adresse-ort-textfeld');
+	if (typeof(orttextel) != 'undefined' && orttextel != null)
+		orttextel.disabled=val;
+	var gemeindetextel = document.getElementById('adresse-gemeinde-textfeld');
+	if (typeof(gemeindetextel) != 'undefined' && gemeindetextel != null)
+		gemeindetextel.disabled=val;
 }
 
 function GeburtsdatumEintragen()
@@ -601,7 +624,13 @@ if(isset($_POST['save']))
 
 		if ($wunschUid != '')
 		{
-			$uid = $wunschUid;
+			if (preg_match('/^[a-z0-9]{4,32}$/i', $wunschUid))
+				$uid = $wunschUid;
+			else
+			{
+				$error = true;
+				$errormsg = 'Die Wunsch-UID '.$wunschUid.' ist ungültig!';
+			}
 		}
 
 		$bn = new benutzer();
@@ -875,25 +904,26 @@ else*/
 <table width="100%">
 
 <tr>
-<td>
+<td valign="top">
 <!--Formularfelder-->
 <table>
 <?php
+$showagain = isset($_POST['showagain']);
 echo '<tr><td>Wunsch-UID</td><td><input type="text" name="wunschUid" id="wunschUid" maxlength="32" size="30" value="'.$wunschUid.'" />';
 echo '<span style="padding: 0 3px" id="checkUID"></span>';
-if (isset($_POST['showagain']))
+if ($showagain)
 	echo '<br>';
 echo '<button type="button" title="Prüft, ob die UID schon vorhanden ist. Keine Sonderzeichen, Umlaute oder Leerzeichen in der UID" href="#" onclick="checkWunschUid()"> Check UID </button> (optional, max. 32)
 </td></tr>';
 echo '<tr><td>Anrede</td><td><input type="text" id="anrede" name="anrede" maxlength="16" size="30" value="'.$anrede.'" onblur="AnredeChange()"/></td></tr>';
 echo '<tr><td>Titel(Pre)</td><td><input type="text" id="titel" name="titel" maxlength="64" size="30" value="'.$titel.'" /></td></tr>';
 echo '<tr><td>Vorname</td><td><input type="text" id="vorname" maxlength="32" name="vorname" size="30" value="'.$vorname.'" />';
-if (isset($_POST['showagain']))
+if ($showagain)
 	echo '</td></tr><tr><td>';
 else
 	echo '&nbsp;&nbsp';
 echo 'Weitere Vornamen';
-if (isset($_POST['showagain']))
+if ($showagain)
 	echo '</td><td>';
 else
 	echo '&nbsp;';
@@ -910,7 +940,7 @@ echo '</td></tr>';
 echo '<tr><td>SVNR</td><td><input type="text" id="svnr" size="30" maxlength="16" name="svnr" value="'.$svnr.'" onblur="GeburtsdatumEintragen()" /></td></tr>';
 echo '<tr><td>Ersatzkennzeichen</td><td><input type="text" id="ersatzkennzeichen" size="30" maxlength="10" name="ersatzkennzeichen" value="'.$ersatzkennzeichen.'" /></td></tr>';
 echo '<tr><td>Geburtsdatum *</td><td><input type="text" id="geburtsdatum" size="30" maxlength="10" name="geburtsdatum" value="'.$geburtsdatum.'" />';
-if (isset($_POST['showagain']))
+if ($showagain)
 	echo '<br>';
 else
 	echo '&nbsp;';
@@ -995,10 +1025,9 @@ echo '
 </table>
 <br><br>
 Felder die mit einem * gekennzeichnet sind müssen ausgefüllt werden!
-</td>
+</td>';
 
-<td valign="top">
-';
+echo '<td valign="top"'.($showagain ? ' width="75%"' : '').'>';
 
 //Vorschlaege laden
 if($geburtsdatum!='')
@@ -1023,7 +1052,7 @@ if($where!='')
 	if($result = $db->db_query($qry))
 	{
 		echo '<table style="margin-top: 0px" class="tablesorter" id="t1"><thead><tr><th></th><th>Nachname</th><th>Vorname</th><th>Weitere<br/>Vornamen</th><th>GebDatum</th><th>SVNR</th><th>Geschlecht</th><th>Adresse</th><th>Status</th><th>Details</th></tr></thead>';
-		echo '<tfoot><tr><td style="padding: 4px"><input type="radio" name="person_id" value="0" checked onclick="disablefields(this)"></td><td style="padding: 4px" colspan="3">Neue Person anlegen</td></tr></tfoot><tbody>';
+		echo '<tfoot><tr><td style="padding: 4px"><input type="radio" name="person_id" value="0" checked onclick="disablefields(this)"></td><td style="padding: 4px" colspan="9">Neue Person anlegen</td></tr></tfoot><tbody>';
 		while($row = $db->db_fetch_object($result))
 		{
 			$status = '';
