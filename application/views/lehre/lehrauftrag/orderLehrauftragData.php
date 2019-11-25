@@ -377,7 +377,7 @@ $filterWidgetArray = array(
         projektarbeit_id: {visible: false},
         studiensemester_kurzbz: {headerFilter:"input"},
         studiengang_kz: {visible: false},
-        stg_typ_kurzbz: {visible: false},
+        stg_typ_kurzbz: {headerFilter:"input", width: "5%"},
         orgform_kurzbz: {headerFilter:"input"},
         person_id: {visible: false},
         typ: {headerFilter:"input"},
