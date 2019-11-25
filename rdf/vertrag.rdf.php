@@ -31,7 +31,7 @@ $uid = get_uid();
 $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($uid);
 
-if(!$rechte->isBerechtigt('vertrag/mitarbeiter'))
+if(!$rechte->isBerechtigt('vertrag/mitarbeiter') && !$rechte->isBerechtigt('lehre/lehrauftrag_bestellen'))
 	die('Sie haben keine Berechtigung für diese Seite');
 
 $datum_obj = new datum();
