@@ -1323,6 +1323,7 @@ class mitarbeiter extends benutzer
 		$l->gebort=$row->gebort;
 		$l->gebzeit=$row->gebzeit;
 		$l->geschlecht=$row->geschlecht;
+		$l->staatsbuergerschaft=$row->staatsbuergerschaft;
 		//$l->foto=$row->foto;
 		$l->anmerkung=$row->anmerkung;
 		$l->aktiv= $this->db_parse_bool($row->aktiv);

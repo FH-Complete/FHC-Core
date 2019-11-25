@@ -350,6 +350,64 @@ class bisio extends basis_db
 	}
 
 	/**
+	 * Liefert alle Incoming/Outgoing
+	 * Eintraege eines Studenten, die
+	 * innerhalb des gewuenschten
+	 * Zeitraums beginnen
+	 * @param $uid
+	 * @param $von
+	 * @param $bis
+	 * @return true wenn ok, false wenn fehler
+	 */
+	public function getIOForPeriod($uid, $von, $bis)
+	{
+		$qry = "SELECT	tbl_bisio.*,
+						tbl_mobilitaetsprogramm.kurzbz as mobilitaetsprogramm_kurzbz
+				FROM
+					bis.tbl_bisio,
+					bis.tbl_mobilitaetsprogramm
+				WHERE
+					student_uid=".$this->db_add_param($uid)." AND
+					tbl_mobilitaetsprogramm.mobilitaetsprogramm_code=tbl_bisio.mobilitaetsprogramm_code AND
+					tbl_bisio.von BETWEEN ".$this->db_add_param($von)." AND ".$this->db_add_param($bis)."
+				ORDER BY bis;";
+
+		if ($this->db_query($qry))
+		{
+			while ($row = $this->db_fetch_object())
+			{
+				$io = new bisio();
+
+				$io->bisio_id = $row->bisio_id;
+				$io->mobilitaetsprogramm_code = $row->mobilitaetsprogramm_code;
+				$io->mobilitaetsprogramm_kurzbz = $row->mobilitaetsprogramm_kurzbz;
+				$io->nation_code = $row->nation_code;
+				$io->von = $row->von;
+				$io->bis = $row->bis;
+				$io->student_uid = $row->student_uid;
+				$io->updateamum = $row->updateamum;
+				$io->updatevon = $row->updatevon;
+				$io->insertamum = $row->insertamum;
+				$io->insertvon = $row->insertvon;
+				$io->ext_id = $row->ext_id;
+				$io->ort = $row->ort;
+				$io->universitaet = $row->universitaet;
+				$io->lehreinheit_id = $row->lehreinheit_id;
+				$io->ects_angerechnet = $row->ects_angerechnet;
+				$io->ects_erworben = $row->ects_erworben;
+
+				$this->result[] = $io;
+			}
+			return true;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+	}
+
+	/**
 	 * Laedt alle Foerderungen
 	 */
 	public function getFoerderungen($bisio_id = null)
