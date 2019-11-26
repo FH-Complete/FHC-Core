@@ -200,7 +200,67 @@ class LehrauftragJob extends JOB_Controller
 	 **/
 	public function mailLehrauftraegeToAccept()
 	{
-	
+		// Get vertrag_id and uid of lehrauftraege that had been approved and had NOT been accepted or cancelled YESTERDAY
+		$this->VertragvertragsstatusModel->addSelect('vertrag_id, uid');
+		$this->VertragvertragsstatusModel->addOrder('uid');
+		$result = $this->VertragvertragsstatusModel->getApproved_fromDate('YESTERDAY');
+		
+		/**
+		 * Build the data array to be used in the email. Data array is clustered as follows:
+		 * Array
+		 * 	[uid]				// lectors uid (mail receiver)
+		 * 	[studiensemester]	// studiensemester of the lehrauftraege (can be more, e.g. 'WS2019 and SS2020')
+		 * 	[amount]			// amount of new approved lehrauftraege
+		 **/
+		if ($vertrag_arr = getData($result))
+		{
+			$data_arr = array();
+			foreach ($vertrag_arr as $vertrag)
+			{
+				// Get studiensemester of the lehrauftrag
+				$this->VertragModel->addSelect('vertragsstunden_studiensemester_kurzbz');
+				$result = $this->VertragModel->load($vertrag->vertrag_id);
+				if ($studiensemester = getData($result))
+				{
+					$studiensemester = $studiensemester[0]->vertragsstunden_studiensemester_kurzbz;
+				}
+				
+				// Search if uid exists in data_arr
+				$uid_index = array_search($vertrag->uid, array_column($data_arr, 'uid'));
+		
+				// If uid is new, add uid, studiensemester and start amount with 1
+				if ($uid_index === false)
+				{
+					$data = array();
+					$data['uid'] = $vertrag->uid;
+					$data['studiensemester'] = $studiensemester;
+					$data['amount']= 1;
+					$data_arr []= $data;
+				}
+				// Else if uid exists
+				else
+				{
+					// If studiensemester is new, add to studiensemester-string
+					if (strpos($data_arr[$uid_index]['studiensemester'], $studiensemester) === false)
+					{
+						$data_arr[$uid_index]['studiensemester'] .= ' und '. $studiensemester;
+					}
+					
+					// Increase amount +1
+					$data_arr[$uid_index]['amount']++;
+				}
+			}
+		}
+
+		// Send email
+		if ($this->_sendMail_toAccept($data_arr))
+		{
+			$this->logInfo('SUCCEDED: Sending emails about yesterdays approved lehrauftraege succeded.');
+		}
+		else
+		{
+			$this->logError('Error when sending emails in job MailLehrauftragToAccept');
+		}
 	}
 	
 	//******************************************************************************************************************
@@ -422,5 +482,49 @@ class LehrauftragJob extends JOB_Controller
 		}
 		
 		return $html;
+	}
+	
+	/**
+	 * Send Sancho eMail about ordered Lehrauftraege.
+	 * @param $data_arr
+	 */
+	private function _sendMail_toAccept($data_arr)
+	{
+		// Loop through 'container' of mail recipients
+		foreach($data_arr as $data)
+		{
+			// Set mail recipient (lector)
+			$to = $data['uid']. '@'. DOMAIN;
+			
+			// Link to LehrauftragAkzeptieren
+			$url =  site_url(self::LEHRAUFTRAG_AKZEPTIEREN_URI);
+			
+			// Get first name
+			$first_name = '';
+			$this->load->model('person/Benutzer_model', 'BenutzerModel');
+			$this->BenutzerModel->addSelect('vorname');
+			$this->BenutzerModel->addJoin('public.tbl_person', 'person_id');
+			$result = $this->BenutzerModel->loadWhere(array('uid' => $data['uid']));
+			
+			if (hasData($result))
+			{
+				$first_name = $result->retval[0]->vorname;
+			}
+			
+			// Prepare mail content
+			$content_data_arr = array(
+				'vorname' => $first_name,
+				'studiensemester' => $data['studiensemester'],
+				'anzahl' 	=> $data['amount'],
+				'link'		=> anchor($url, 'Lehraufträge Übersicht')
+			);
+			
+			sendSanchoMail(
+				'LehrauftragNeueErteilte',
+				$content_data_arr,
+				$to,
+				'Neu erteilte Lehraufträge zum Annehmen bereit'
+			);
+		}
 	}
 }
