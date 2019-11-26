@@ -162,7 +162,7 @@ class LehrauftragJob extends JOB_Controller
 						else
 						{
 							// Increase amount +1
-							$data_arr[$ss_index][$oe_index][$stg_index]['amount'] = $data_arr[$ss_index][$oe_index][$stg_index]['amount'] + 1;
+							$data_arr[$ss_index][$oe_index][$stg_index]['amount']++;
 						}
 					}
 				}
@@ -188,9 +188,13 @@ class LehrauftragJob extends JOB_Controller
 		$data_arr = $this->_clusterData_byReceiver($data_arr);
 		
 		// Send email
-		if(!$this->_sendMail($data_arr))
+		if(!$this->_sendMail_toApprove($data_arr))
 		{
-			$this->logError('Fehler beim Mailversand in Job MailLehrauftragToApprove');
+			$this->logInfo('SUCCEDED: Sending emails about yesterdays ordered lehrauftraege succeded.');
+		}
+		else
+		{
+			$this->logError('Error when sending emails in job MailLehrauftragToApprove');
 		}
 	}
 	
@@ -298,7 +302,7 @@ class LehrauftragJob extends JOB_Controller
 	 * Send Sancho eMail about ordered Lehrauftraege.
 	 * @param $data_arr
 	 */
-	private function _sendMail($data_arr)
+	private function _sendMail_toApprove($data_arr)
 	{
 		// Loop through 'container' of mail recipients
 		foreach($data_arr as $data)
