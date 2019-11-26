@@ -158,4 +158,33 @@ class Vertragvertragsstatus_model extends DB_Model
   
 		return $this->loadWhere($condition);
 	}
+	
+	/**
+	 * Get all contracts, where the status had been set to 'erteilt' on given date
+	 * @param string $string_date e.g. '01.11.2019' or special Date/Time inputs like 'YESTERDAY', 'TODAY', 'NOW'
+	 * @param bool $further_processed If true, ALL contracts approved on that day are retrieved, even if they were
+	 * 								  were ALSO accepted/cancelled (further processed) on that same day.
+	 * @return array
+	 */
+	public function getApproved_fromDate($string_date = 'TODAY', $further_processed = false)
+	{
+		$condition = '
+				vertragsstatus_kurzbz = \'erteilt\' AND
+				(insertamum)::date = date \''. $string_date .'\'
+			';
+		
+		if (!$further_processed)
+		{
+			$condition .= '
+				 AND
+				vertrag_id NOT IN (
+					SELECT vertrag_id
+					FROM lehre.tbl_vertrag_vertragsstatus
+					WHERE vertragsstatus_kurzbz IN (\'akzeptiert\', \'storno\')
+					)
+				';
+		}
+		
+		return $this->loadWhere($condition);
+	}
 }
