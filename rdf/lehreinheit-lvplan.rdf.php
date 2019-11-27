@@ -92,6 +92,10 @@ if (isset($_GET['orgform']))
 	$orgform=$_GET['orgform'];
 else
 	$orgform=null;
+if (isset($_GET['vertrag']))
+	$vertrag=$_GET['vertrag'];
+else
+	$vertrag=null;
 
 //Sortierreihenfolge
 if(isset($_GET['order']))
@@ -306,7 +310,8 @@ if ($anz>0)
 		else
 			$fixangestellt_info = 'EXT';
 
-		$vertragsstatus = 'Neu';
+		$vertragsstatus_arr = array();
+		$vertragsstatus_kurzbz_arr = array();
 		// Lehrauftragsstatus ermitteln
 		foreach ($l->lem as $row_lem)
 		{
@@ -315,12 +320,47 @@ if ($anz>0)
 			{
 				if ($lem_obj->vertrag_id != '')
 				{
-					$vertrag = new vertrag();
-					if($vertrag->getStatus($lem_obj->vertrag_id))
+					$vertrag_obj = new vertrag();
+					if($vertrag_obj->getStatus($lem_obj->vertrag_id))
 					{
-						$vertragsstatus = $vertrag->vertragsstatus_bezeichnung;
+						$vertragsstatus_arr[] = $vertrag_obj->vertragsstatus_bezeichnung;
+						$vertragsstatus_kurzbz_arr[] = $vertrag_obj->vertragsstatus_kurzbz;
 					}
 				}
+				else
+				{
+					$vertragsstatus_arr[] = 'Neu';
+				}
+			}
+		}
+		$vertragsstatus = implode(',', array_unique($vertragsstatus_arr));
+
+		if (!is_null($vertrag) && $vertrag != '')
+		{
+			switch($vertrag)
+			{
+				// Alle ab Status erteilt herausfiltern
+				// der rest wird verworfen
+				case 'erteilt':
+					if (!in_array('erteilt', $vertragsstatus_kurzbz_arr)
+					 && !in_array('akzeptiert', $vertragsstatus_kurzbz_arr))
+					{
+						continue 2;
+					}
+					break;
+
+				// Alle ab Status bestellt herausfiltern
+				// der rest wird verworfen
+				case 'bestellt':
+					if (!in_array('bestellt', $vertragsstatus_kurzbz_arr)
+					 && !in_array('erteilt', $vertragsstatus_kurzbz_arr)
+					 && !in_array('akzeptiert', $vertragsstatus_kurzbz_arr))
+					{
+						continue 2;
+					}
+					break;
+				default:
+					break;
 			}
 		}
 		echo'<RDF:li>

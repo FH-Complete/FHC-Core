@@ -219,3 +219,8 @@ treechildren::-moz-tree-row(makeItMarked)
 {
 	background-color: #ceffb0;
 }
+
+.timetablefilter-vertrag .toolbarbutton-icon {
+   width: 25px;
+   height:25px;
+}

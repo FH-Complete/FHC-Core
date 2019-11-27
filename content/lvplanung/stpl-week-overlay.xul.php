@@ -110,7 +110,35 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/lvplanung/stpl-details-overlay.xul
 			/>
 			<textbox id="tempus-lva-filter" size="10" oninput="onLVAFilter()" flex="1"/>
 		</toolbar>
-
+		<toolbar id="toolbarTimeTableFilterVertrag" tbautostretch="always" persist="collapsed">
+		<toolbarbutton
+			image="../public/images/icons/fa-user-clock.png"
+			label="Alle"
+			class="timetablefilter-vertrag"
+			oncommand="onLVAFilterVertrag(this);"
+			value=""
+			id="toolbarTimeTableFilter-alle"
+			tooltiptext="Filter Status Alle"
+		/>
+		<toolbarbutton
+			image="../public/images/icons/fa-user-tag.png"
+			label="Bestellt"
+			class="timetablefilter-vertrag"
+			oncommand="onLVAFilterVertrag(this);"
+			value="bestellt"
+			id="toolbarTimeTableFilter-bestellt"
+			tooltiptext="Filter Status Bestellt"
+		/>
+		<toolbarbutton
+			image="../public/images/icons/fa-user-check.png"
+			label="Erteilt"
+			class="timetablefilter-vertrag"
+			oncommand="onLVAFilterVertrag(this);"
+			value="erteilt"
+			id="toolbarTimeTableFilter-erteilt"
+			tooltiptext="Filter Status Erteilt"
+		/>
+		</toolbar>
 </toolbox>
 
 <vbox id="vboxLehrveranstalungPlanung" style="overflow:auto;margin:0px;" flex="1"
@@ -257,7 +285,6 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/lvplanung/stpl-details-overlay.xul
 				id="toolbarTimeTableSort-stundenASC"
 				tooltiptext="Offenen Stunden aufsteigend"
 			/>
-
 		</toolbar>
 </toolbox>
 </vbox>
