@@ -3406,13 +3406,14 @@ if(!$result = @$db->db_query("SELECT 1 FROM fue.tbl_projekttyp LIMIT 1"))
 		COMMENT ON TABLE fue.tbl_projekttyp IS 'Project Type';
 		ALTER TABLE fue.tbl_projekttyp ADD CONSTRAINT pk_tbl_projekttyp PRIMARY KEY (projekttyp_kurzbz);
 		ALTER TABLE fue.tbl_projekt ADD COLUMN projekttyp_kurzbz varchar(32);
-		ALTER TABLE fue.tbl_projekt ADD CONSTRAINT fk_tbl_projekt_projekttyp FOREIGN KEY (projekttyp_kurzbz) REFERENCES fue.tbl_projekttyp (projekttyp_kurzbz) ON DELETE CASCADE ON UPDATE CASCADE;
+		ALTER TABLE fue.tbl_projekt ADD CONSTRAINT fk_tbl_projekt_projekttyp FOREIGN KEY (projekttyp_kurzbz) REFERENCES fue.tbl_projekttyp (projekttyp_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 		INSERT INTO fue.tbl_projekttyp(projekttyp_kurzbz, bezeichnung) VALUES ('fue', 'Forschung und Entwicklung');
 		INSERT INTO fue.tbl_projekttyp(projekttyp_kurzbz, bezeichnung) VALUES ('intern', 'Intern');
 		INSERT INTO fue.tbl_projekttyp(projekttyp_kurzbz, bezeichnung) VALUES ('internoe', 'Intern Organisationseinheit');
 
-		GRANT SELECT, UPDATE, INSERT, DELETE ON TABLE fue.tbl_projekttyp TO web;
+		GRANT SELECT ON TABLE fue.tbl_projekttyp TO web;
+		GRANT SELECT ON TABLE fue.tbl_projekttyp TO wawi;
 		GRANT SELECT, UPDATE, INSERT, DELETE ON TABLE fue.tbl_projekttyp TO vilesci;
 	";
 
