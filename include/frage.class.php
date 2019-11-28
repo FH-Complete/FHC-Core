@@ -400,7 +400,7 @@ class frage extends basis_db
 				$this->text = $row->text;
 				$this->bild = $row->bild;
 				$this->audio = $row->audio;
-				$this->insertaum = $row->insertamum;
+				$this->insertamum = $row->insertamum;
 				$this->insertvon = $row->insertvon;
 				$this->updateamum = $row->updateamum;
 				$this->updatevon = $row->updatevon;
