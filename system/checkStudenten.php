@@ -244,8 +244,9 @@ FROM
 WHERE
 	status.studiensemester_kurzbz = ".$db->db_add_param($aktSem)."
 	AND lv.studiensemester_kurzbz = ".$db->db_add_param($aktSem)."
-	AND status.status_kurzbz NOT IN ('Interessent','Bewerber','Aufgenommener','Wartender','Abgewiesener')
-	AND get_rolle_prestudent (prestudent_id, ".$db->db_add_param($aktSem).")='Student'";
+	AND status.status_kurzbz NOT IN ('Interessent','Bewerber','Aufgenommener','Wartender','Abgewiesener','Unterbrecher')
+	AND get_rolle_prestudent (prestudent_id, ".$db->db_add_param($aktSem).")='Student'
+	AND status.ausbildungssemester != lv.semester";
 
 if ($studiengang_kz != '')
 	$qry .= " AND prestudent.studiengang_kz=".$db->db_add_param($studiengang_kz, FHC_INTEGER);
@@ -256,11 +257,8 @@ if ($db->db_query($qry))
 	{
 		$student_uid = $row->student_uid;
 
-		if ($row->ausbildungssemester != $row->semester)
-		{
-			$ausgabe[$row->studiengang][5][] = $student_uid;
-			$text .= "Studenten-uid: ".$student_uid."<br>";
-		}
+		$ausgabe[$row->studiengang][5][] = $student_uid;
+		$text .= "Studenten-uid: ".$student_uid."<br>";
 	}
 }
 
@@ -623,7 +621,7 @@ WHERE
 	status_kurzbz in('Student', 'Diplomand', 'Absolvent', 'Abbrecher')
 	AND tbl_prestudent.bismelden
 	AND tbl_benutzer.aktiv
-	AND tbl_person.matr_nr is null OR tbl_person.matr_nr = ''
+	AND (tbl_person.matr_nr is null OR tbl_person.matr_nr = '')
 	AND tbl_prestudentstatus.studiensemester_kurzbz=".$db->db_add_param($aktSem);
 
 if ($studiengang_kz != '')
@@ -655,7 +653,7 @@ if ($result = $db->db_query($qry))
 	while ($row = $db->db_fetch_object($result))
 	{
 		$ausgabe[$row->studiengang_kz][15][] = $row->vorname.' '.$row->nachname.
-			' ('.$row->prestudent_id.')';
+			' (Prestudent ID: '.$row->prestudent_id.')';
 		$text .= $row->vorname.' '.$row->nachname.
 			' ('.$row->prestudent_id.')';
 	}
