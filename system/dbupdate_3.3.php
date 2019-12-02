@@ -3394,6 +3394,61 @@ if(!$result = @$db->db_query("SELECT incoming FROM bis.tbl_zweck LIMIT 1"))
 		echo '<br>bis.tbl_zweck Spalte incoming und outgoing hinzugefügt, neue Codexeinträge ergänzt.';
 }
 
+// Add column statistik_kurzbz to system.tbl_filters
+if(!$result = @$db->db_query("SELECT statistik_kurzbz FROM system.tbl_filters LIMIT 1"))
+{
+	$qry = "ALTER TABLE system.tbl_filters ADD COLUMN statistik_kurzbz varchar(64);
+			ALTER TABLE system.tbl_filters ADD CONSTRAINT fk_filters_statistik FOREIGN KEY (statistik_kurzbz) REFERENCES public.tbl_statistik (statistik_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;";
+
+	if(!$db->db_query($qry))
+		echo '<strong>system.tbl_filters: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>system.tbl_filters: Spalte statistik_kurzbz hinzugefuegt';
+}
+
+// app reporting hinzufügen
+if($result = @$db->db_query("SELECT 1 FROM system.tbl_app WHERE app= 'reporting';"))
+{
+	if($db->db_num_rows($result) == 0)
+	{
+		$qry = "INSERT INTO system.tbl_app(app) VALUES ('reporting');";
+
+		if(!$db->db_query($qry))
+			echo '<strong>system.tbl_app: '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>system.tbl_app: Zeile reporting hinzugefuegt!<br>';
+	}
+}
+
+// Add table fue.tbl_projekttyp
+if(!$result = @$db->db_query("SELECT 1 FROM fue.tbl_projekttyp LIMIT 1"))
+{
+	$qry = "
+		CREATE TABLE fue.tbl_projekttyp
+		(
+			projekttyp_kurzbz varchar(32) NOT NULL,
+			bezeichnung varchar(255)
+		);
+		COMMENT ON TABLE fue.tbl_projekttyp IS 'Project Type';
+		ALTER TABLE fue.tbl_projekttyp ADD CONSTRAINT pk_tbl_projekttyp PRIMARY KEY (projekttyp_kurzbz);
+		ALTER TABLE fue.tbl_projekt ADD COLUMN projekttyp_kurzbz varchar(32);
+		ALTER TABLE fue.tbl_projekt ADD CONSTRAINT fk_tbl_projekt_projekttyp FOREIGN KEY (projekttyp_kurzbz) REFERENCES fue.tbl_projekttyp (projekttyp_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+		INSERT INTO fue.tbl_projekttyp(projekttyp_kurzbz, bezeichnung) VALUES ('fue', 'Forschung und Entwicklung');
+		INSERT INTO fue.tbl_projekttyp(projekttyp_kurzbz, bezeichnung) VALUES ('intern', 'Intern');
+		INSERT INTO fue.tbl_projekttyp(projekttyp_kurzbz, bezeichnung) VALUES ('internoe', 'Intern Organisationseinheit');
+
+		GRANT SELECT ON TABLE fue.tbl_projekttyp TO web;
+		GRANT SELECT ON TABLE fue.tbl_projekttyp TO wawi;
+		GRANT SELECT, UPDATE, INSERT, DELETE ON TABLE fue.tbl_projekttyp TO vilesci;
+	";
+
+	if(!$db->db_query($qry))
+		echo '<strong>fue.tbl_projekttyp: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>fue.tbl_projekttyp hinzugefuegt.';
+}
+
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
 
@@ -3487,9 +3542,10 @@ $tabellen=array(
 	"campus.tbl_zeitwunsch"  => array("stunde","mitarbeiter_uid","tag","gewicht","updateamum","updatevon","insertamum","insertvon"),
 	"fue.tbl_aktivitaet"  => array("aktivitaet_kurzbz","beschreibung","sort"),
 	"fue.tbl_aufwandstyp" => array("aufwandstyp_kurzbz","bezeichnung"),
-	"fue.tbl_projekt"  => array("projekt_kurzbz","nummer","titel","beschreibung","beginn","ende","oe_kurzbz","budget","farbe","aufwandstyp_kurzbz","ressource_id","anzahl_ma","aufwand_pt","projekt_id"),
+	"fue.tbl_projekt"  => array("projekt_kurzbz","nummer","titel","beschreibung","beginn","ende","oe_kurzbz","budget","farbe","aufwandstyp_kurzbz","ressource_id","anzahl_ma","aufwand_pt","projekt_id","projekttyp_kurzbz"),
 	"fue.tbl_projektphase"  => array("projektphase_id","projekt_kurzbz","projektphase_fk","bezeichnung","typ","beschreibung","start","ende","budget","insertamum","insertvon","updateamum","updatevon","personentage","farbe","ressource_id"),
 	"fue.tbl_projekttask"  => array("projekttask_id","projektphase_id","bezeichnung","beschreibung","aufwand","mantis_id","insertamum","insertvon","updateamum","updatevon","projekttask_fk","erledigt","ende","ressource_id","scrumsprint_id"),
+	"fue.tbl_projekttyp"  => array("projekttyp_kurzbz","bezeichnung"),
 	"fue.tbl_projekt_dokument"  => array("projekt_dokument_id","projektphase_id","projekt_kurzbz","dms_id"),
 	"fue.tbl_projekt_ressource"  => array("projekt_ressource_id","projekt_kurzbz","projektphase_id","ressource_id","funktion_kurzbz","beschreibung","aufwand"),
 	"fue.tbl_ressource"  => array("ressource_id","student_uid","mitarbeiter_uid","betriebsmittel_id","firma_id","bezeichnung","beschreibung","insertamum","insertvon","updateamum","updatevon"),
@@ -3649,7 +3705,7 @@ $tabellen=array(
 	"system.tbl_extensions" => array("extension_id","name","version","description","license","url","core_version","dependencies","enabled"),
 	"system.tbl_log" => array("log_id","person_id","zeitpunkt","app","oe_kurzbz","logtype_kurzbz","logdata","insertvon","taetigkeit_kurzbz"),
 	"system.tbl_logtype" => array("logtype_kurzbz", "data_schema"),
-	"system.tbl_filters" => array("filter_id","app","dataset_name","filter_kurzbz","person_id","description","sort","default_filter","filter","oe_kurzbz"),
+	"system.tbl_filters" => array("filter_id","app","dataset_name","filter_kurzbz","person_id","description","sort","default_filter","filter","oe_kurzbz","statistik_kurzbz"),
 	"system.tbl_phrase" => array("phrase_id","app","phrase","insertamum","insertvon","category"),
 	"system.tbl_phrasentext" => array("phrasentext_id","phrase_id","sprache","orgeinheit_kurzbz","orgform_kurzbz","text","description","insertamum","insertvon"),
 	"system.tbl_rolle"  => array("rolle_kurzbz","beschreibung"),
