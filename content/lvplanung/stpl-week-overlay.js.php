@@ -133,14 +133,10 @@ function LehrstundeGetSortOrder()
 	return 'stundenDESC';
 }
 
-// LVA-Panel auf Vertragsstatus filtern
-function onLVAFilterVertrag(item)
+// Setzt den Vertragsfilter zurueck
+function LVAFilterReset()
 {
-	var vorher='';
-	var nachher='';
-	var vertragsstatus=item.getAttribute('value');
-
-	//Sortiermarkierung von allen entfernen
+	//Filtermarkierung von allen entfernen
 	var toolbar = document.getElementById('toolbarTimeTableFilterVertrag');
 	var tbbuttons = toolbar.getElementsByTagName('toolbarbutton');
 
@@ -149,6 +145,16 @@ function onLVAFilterVertrag(item)
 		if(button.id)
 			button.setAttribute('checked','false');
 	}
+}
+
+// LVA-Panel auf Vertragsstatus filtern
+function onLVAFilterVertrag(item)
+{
+	var vorher='';
+	var nachher='';
+	var vertragsstatus=item.getAttribute('value');
+
+	LVAFilterReset();
 	//Element als gedrueckt markieren
 	item.setAttribute('checked','true');
 

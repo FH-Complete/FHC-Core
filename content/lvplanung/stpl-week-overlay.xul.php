@@ -22,7 +22,16 @@
  */
 header("Content-type: application/vnd.mozilla.xul+xml");
 include('../../config/vilesci.config.inc.php');
+include('../../config/global.config.inc.php');
 
+if(defined('FAS_LV_LEKTORINNENZUTEILUNG_VERTRAGSDETAILS_ANZEIGEN') && FAS_LV_LEKTORINNENZUTEILUNG_VERTRAGSDETAILS_ANZEIGEN)
+{
+	$showvertragsfilter = true;
+}
+else
+{
+	$showvertragsfilter = false;
+}
 echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 echo '<?xul-overlay href="'.APP_ROOT.'content/lvplanung/stpl-details-overlay.xul.php"?>';
 ?>
@@ -100,7 +109,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/lvplanung/stpl-details-overlay.xul
 	<grippy />
 </splitter>
 
-<vbox style="margin:0px;" flex="1">
+<vbox style="margin:0px; width:250px" flex="1">
 <toolbox>
 		<toolbar id="toolbarTimeTableLeftWeek" tbautostretch="always" persist="collapsed">
 			<toolbarbutton id="toolbarbuttonStplWeekRefresh"
@@ -110,7 +119,12 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/lvplanung/stpl-details-overlay.xul
 			/>
 			<textbox id="tempus-lva-filter" size="10" oninput="onLVAFilter()" flex="1"/>
 		</toolbar>
-		<toolbar id="toolbarTimeTableFilterVertrag" tbautostretch="always" persist="collapsed">
+		<toolbar
+			id="toolbarTimeTableFilterVertrag"
+			tbautostretch="always"
+			persist="collapsed"
+			hidden="<?php echo ($showvertragsfilter?'false':'true');?>"
+		>
 		<toolbarbutton
 			image="../public/images/icons/fa-user-clock.png"
 			label="Alle"
