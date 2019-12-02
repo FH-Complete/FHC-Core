@@ -3394,6 +3394,32 @@ if(!$result = @$db->db_query("SELECT incoming FROM bis.tbl_zweck LIMIT 1"))
 		echo '<br>bis.tbl_zweck Spalte incoming und outgoing hinzugefügt, neue Codexeinträge ergänzt.';
 }
 
+// Add column statistik_kurzbz to system.tbl_filters
+if(!$result = @$db->db_query("SELECT statistik_kurzbz FROM system.tbl_filters LIMIT 1"))
+{
+	$qry = "ALTER TABLE system.tbl_filters ADD COLUMN statistik_kurzbz varchar(64);
+			ALTER TABLE system.tbl_filters ADD CONSTRAINT fk_filters_statistik FOREIGN KEY (statistik_kurzbz) REFERENCES public.tbl_statistik (statistik_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;";
+
+	if(!$db->db_query($qry))
+		echo '<strong>system.tbl_filters: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>system.tbl_filters: Spalte statistik_kurzbz hinzugefuegt';
+}
+
+// app reporting hinzufügen
+if($result = @$db->db_query("SELECT 1 FROM system.tbl_app WHERE app= 'reporting';"))
+{
+	if($db->db_num_rows($result) == 0)
+	{
+		$qry = "INSERT INTO system.tbl_app(app) VALUES ('reporting');";
+
+		if(!$db->db_query($qry))
+			echo '<strong>system.tbl_app: '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>system.tbl_app: Zeile reporting hinzugefuegt!<br>';
+	}
+}
+
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
 
@@ -3649,7 +3675,7 @@ $tabellen=array(
 	"system.tbl_extensions" => array("extension_id","name","version","description","license","url","core_version","dependencies","enabled"),
 	"system.tbl_log" => array("log_id","person_id","zeitpunkt","app","oe_kurzbz","logtype_kurzbz","logdata","insertvon","taetigkeit_kurzbz"),
 	"system.tbl_logtype" => array("logtype_kurzbz", "data_schema"),
-	"system.tbl_filters" => array("filter_id","app","dataset_name","filter_kurzbz","person_id","description","sort","default_filter","filter","oe_kurzbz"),
+	"system.tbl_filters" => array("filter_id","app","dataset_name","filter_kurzbz","person_id","description","sort","default_filter","filter","oe_kurzbz","statistik_kurzbz"),
 	"system.tbl_phrase" => array("phrase_id","app","phrase","insertamum","insertvon","category"),
 	"system.tbl_phrasentext" => array("phrasentext_id","phrase_id","sprache","orgeinheit_kurzbz","orgform_kurzbz","text","description","insertamum","insertvon"),
 	"system.tbl_rolle"  => array("rolle_kurzbz","beschreibung"),
