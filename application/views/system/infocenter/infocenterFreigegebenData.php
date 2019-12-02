@@ -206,6 +206,7 @@
 				  FROM public.tbl_prestudent ps
 				  JOIN public.tbl_studiengang sg USING(studiengang_kz)
 				WHERE ps.person_id = p.person_id
+				  AND ps.reihungstestangetreten = FALSE
 				  AND (sg.typ IN ('.$STUDIENGANG_TYP.')
 					   OR
 					   sg.studiengang_kz in('.$ADDITIONAL_STG.')
