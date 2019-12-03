@@ -3769,7 +3769,7 @@ When on hold, the date is only a reminder.',
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Please enter the old an new password',
+				'text' => 'Please enter the old and the new password',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -4210,6 +4210,26 @@ When on hold, the date is only a reminder.',
             array(
                 'sprache' => 'English',
                 'text' => 'Activate',
+                'description' => '',
+                'insertvon' => 'system'
+            )
+        )
+    ),
+    array(
+        'app' => 'core',
+        'category' => 'password',
+        'phrase' => 'wrongCaptcha',
+        'insertvon' => 'system',
+        'phrases' => array(
+            array(
+                'sprache' => 'German',
+                'text' => 'Captcha code falsch ',
+                'description' => '',
+                'insertvon' => 'system'
+            ),
+            array(
+                'sprache' => 'English',
+                'text' => 'Captcha code is wrong',
                 'description' => '',
                 'insertvon' => 'system'
             )
