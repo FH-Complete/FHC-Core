@@ -208,6 +208,8 @@ function MitarbeiterVertragGenerateVertrag(windowdocument)
 			mitarbeiter_uid = getTreeCellText(tree, "mitarbeiter-vertrag-tree-nichtzugeordnet-mitarbeiter_uid",v);
 			lehreinheit_id = getTreeCellText(tree, "mitarbeiter-vertrag-tree-nichtzugeordnet-lehreinheit_id",v);
 			betreuerart_kurzbz = getTreeCellText(tree, "mitarbeiter-vertrag-tree-nichtzugeordnet-betreuerart_kurzbz",v);
+            vertragsstunden = getTreeCellText(tree, "mitarbeiter-vertrag-tree-nichtzugeordnet-vertragsstunden",v);
+            vertragsstunden_studiensemester_kurzbz = getTreeCellText(tree, "mitarbeiter-vertrag-tree-nichtzugeordnet-vertragsstunden_studiensemester_kurzbz",v);
 
 			req.add('type_'+anzahl, type);
 			req.add('stsem_'+anzahl, stsem);
@@ -216,6 +218,8 @@ function MitarbeiterVertragGenerateVertrag(windowdocument)
 			req.add('mitarbeiter_uid_'+anzahl, mitarbeiter_uid);
 			req.add('lehreinheit_id_'+anzahl, lehreinheit_id);
 			req.add('betreuerart_kurzbz_'+anzahl, betreuerart_kurzbz);
+            req.add('vertragsstunden'+anzahl, vertragsstunden);
+            req.add('vertragsstunden_studiensemester_kurzbz'+anzahl, vertragsstunden_studiensemester_kurzbz);
 
 			anzahl++;
 		}

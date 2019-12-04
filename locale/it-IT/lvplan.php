@@ -87,5 +87,5 @@ $this->phrasen['lvplan/vonZeitEingeben']='';
 $this->phrasen['lvplan/vonZeitFormat']='';
 $this->phrasen['lvplan/wochenplan']='';
 $this->phrasen['lvplan/zurReservierung']='';
-
+$this->phrasen['lvplan/reserviertVon']='';
 ?>

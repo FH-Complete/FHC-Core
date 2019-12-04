@@ -14,7 +14,7 @@
 		',
 		'requiredPermissions' => 'admin',
 		'datasetRepresentation' => 'tablesorter',
-		'reloadDataset' => ($this->input->get('reloadDataset') == 'true' ? true : false),
+		'reloadDataset' => true,
 		'columnsAliases' => array(
 			'Log id',
 			'Request id',

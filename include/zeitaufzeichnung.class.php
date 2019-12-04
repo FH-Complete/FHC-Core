@@ -172,17 +172,28 @@ class zeitaufzeichnung extends basis_db
 				}
 			}
 		}
-		if ($this->aktivitaet_kurzbz != 'Ersatzruhe')
+		if ($this->aktivitaet_kurzbz != 'Ersatzruhe' && $this->aktivitaet_kurzbz != 'DienstreiseMT')
 		{
-			$check_qry = "SELECT count(*) from campus.tbl_zeitaufzeichnung where uid=".$this->db_add_param($this->uid)." and aktivitaet_kurzbz = 'Ersatzruhe' and (start < ".$this->db_add_param($this->ende)." and ende > ".$this->db_add_param($this->start).")";
+			$check_qry = "SELECT count(*) from campus.tbl_zeitaufzeichnung where uid=".$this->db_add_param($this->uid)." and aktivitaet_kurzbz != 'DienstreiseMT' and (start < ".$this->db_add_param($this->ende)." and ende > ".$this->db_add_param($this->start).")";
 			if($this->db_query($check_qry))
 			{
 				if($row = $this->db_fetch_object())
 				{
-					if ($row->count)
+					if ($this->new)
 					{
-						$this->errormsg = 'Eintrag darf nicht mit Ersatzruhe Überlappen!';
-						return false;
+						if ($row->count)
+						{
+							$this->errormsg = 'Einträge dürfen nicht Überlappen!';
+							return false;
+						}
+					}
+					else
+					{
+						if ($row->count > 1)
+						{
+							$this->errormsg = 'Einträge dürfen nicht Überlappen!';
+							return false;
+						}
 					}
 				}
 			}

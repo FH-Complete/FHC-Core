@@ -36,4 +36,22 @@ class Benutzerrolle_model extends DB_Model
 		
 		return $result;
 	}
+
+    /**
+     * Get user who are authorized with berechtigung and, if given, authorized for the specific organisational unit.
+     * @param $berechtigung_kurzbz
+     * @param null $oe_kurzbz
+     * @return array
+     */
+	public function getBenutzerByBerechtigung($berechtigung_kurzbz, $oe_kurzbz = null){
+
+	    $condition = array('berechtigung_kurzbz' => $berechtigung_kurzbz);
+
+	    if (is_string($oe_kurzbz))
+        {
+            $condition['oe_kurzbz'] = $oe_kurzbz;
+        }
+
+	    return  $this->loadWhere($condition);
+    }
 }

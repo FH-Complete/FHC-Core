@@ -173,6 +173,7 @@ $qry = 'SELECT DISTINCT ON
             tbl_student.studiengang_kz AS stg_kz_student,
             tbl_zeugnisnote.note,
             tbl_mitarbeiter.mitarbeiter_uid,
+            tbl_person.person_id,
             tbl_person.matr_nr,
             tbl_person.geschlecht,
             tbl_person.foto,
@@ -210,6 +211,7 @@ $a_o_kz = '9' . sprintf("%03s", $erhalter->result[0]->erhalter_kz); //Stg_Kz AO-
 $anzahl_studierende = 0;
 $datum = new datum();
 $zusatz = '';
+$foto_url_arr = array();
 
 //structure students data
 if ($result = $db->db_query($qry)) {
@@ -243,7 +245,7 @@ if ($result = $db->db_query($qry)) {
 
 			if ($row->foto_sperre == 'f' && $row->foto != '') {
                 $foto_src = $row->foto;
-                $foto_url = sys_get_temp_dir() . '/foto' . trim($row->matrikelnr) . '.jpg';
+                $foto_url = sys_get_temp_dir() . '/foto' . trim($row->person_id) . '.jpg';
                 $foto_url_arr[] = $foto_url;
 
                 //create writeable file
@@ -256,7 +258,7 @@ if ($result = $db->db_query($qry)) {
                 }
 
                 //add foto to document
-                $doc->addImage($foto_url, trim($row->matrikelnr) . '.jpg', 'image/jpg');
+                $doc->addImage($foto_url, trim($row->person_id) . '.jpg', 'image/jpg');
             }
             elseif ($row->foto_sperre == 't')
             {

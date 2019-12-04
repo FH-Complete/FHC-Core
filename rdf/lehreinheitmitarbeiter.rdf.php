@@ -100,6 +100,7 @@ foreach ($DAO_obj->lehreinheitmitarbeiter as $row)
             <LEHREINHEITMITARBEITER:bismelden><![CDATA[<?php echo ($row->bismelden?'Ja':'Nein') ?>]]></LEHREINHEITMITARBEITER:bismelden>
 			<LEHREINHEITMITARBEITER:verplant><![CDATA[<?php echo ($verplant?'true':'false'); ?>]]></LEHREINHEITMITARBEITER:verplant>
 			<LEHREINHEITMITARBEITER:aktiv><![CDATA[<?php echo ($aktiv?'aktiv':'inaktiv'); ?>]]></LEHREINHEITMITARBEITER:aktiv>
+             <LEHREINHEITMITARBEITER:vertrag_id><![CDATA[<?php echo $row->vertrag_id; ?>]]></LEHREINHEITMITARBEITER:vertrag_id>
          </RDF:Description>
       </RDF:li>
 <?php

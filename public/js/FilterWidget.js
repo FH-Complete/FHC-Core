@@ -13,14 +13,14 @@
  * Global function used by FilterWidget JS to refresh the side menu
  * NOTE: it is called from the FilterWidget JS therefore must be a global function
  *		It may be overwritten by a custom refreshSideMenuHook included in a javascript which will be loaded after this one
- *		The given parameters, filter_page and navigation_page, are required
+ *		The given parameters, filterUniqueId and navigation_page, are required
  */
 function refreshSideMenuHook()
 {
 	FHC_NavigationWidget.refreshSideMenuHook(
-		'system/Filters/setNavigationMenu',
+		'widgets/Filters/setNavigationMenu',
 		{
-			filter_page: FHC_FilterWidget.getFilterPage(),
+			filterUniqueId: FHC_FilterWidget.getFilterUniqueIdPrefix(),
 			navigation_page: FHC_NavigationWidget.getNavigationPage()
 		}
 	);
@@ -33,34 +33,37 @@ function refreshSideMenuHook()
  */
 function sideMenuHook()
 {
-	$(".remove-custom-filter").click(function() {
+	// If menu is present
+	if (FHC_FilterWidget._hideMenu != true)
+	{
+		$(".remove-custom-filter").click(function() {
 
-		// Ajax call to remove a custom filter
-		FHC_AjaxClient.ajaxCallPost(
-			"system/Filters/removeCustomFilter",
-			{
-				filter_id: $(this).attr("value"), // filter_id of the filter to be removed
-				filter_page: FHC_FilterWidget.getFilterPage()
-			},
-			{
-				successCallback: function(data, textStatus, jqXHR) {
+			// Ajax call to remove a custom filter
+			FHC_AjaxClient.ajaxCallPost(
+				"widgets/Filters/removeCustomFilter",
+				{
+					filter_id: $(this).attr("value"), // filter_id of the filter to be removed
+					filterUniqueId: FHC_FilterWidget.getFilterUniqueIdPrefix()
+				},
+				{
+					successCallback: function(data, textStatus, jqXHR) {
 
-					if (FHC_AjaxClient.isError(data))
-					{
-						console.log(FHC_AjaxClient.getError(data));
-					}
-					else
-					{
-						// If a success and refreshSideMenuHook is a valid function then call it to refresh the side menu
-						if (typeof refreshSideMenuHook == "function")
+						if (FHC_AjaxClient.isError(data))
 						{
-							refreshSideMenuHook();
+							console.log(FHC_AjaxClient.getError(data));
+						}
+						else
+						{
+							if (typeof refreshSideMenuHook == "function")
+							{
+								refreshSideMenuHook();
+							}
 						}
 					}
 				}
-			}
-		);
-	});
+			);
+		});
+	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------
@@ -69,6 +72,7 @@ function sideMenuHook()
 // Success
 const DATASET_REP_TABLESORTER = "tablesorter";
 const DATASET_REP_PIVOTUI = "pivotUI";
+const DATASET_REP_TABULATOR = "tabulator";
 
 /**
  * FHC_FilterWidget this object is used to render the GUI of a filter widget and to operate with it
@@ -78,7 +82,9 @@ var FHC_FilterWidget = {
 	//------------------------------------------------------------------------------------------------------------------
 	// Properties
 
-	_datasetRepresentation: null, //
+	_datasetRepresentation: null, // contains the current data representation
+	_hideMenu: false, //
+	_hideOptions: false, //
 
 	//------------------------------------------------------------------------------------------------------------------
 	// Public methods
@@ -102,7 +108,7 @@ var FHC_FilterWidget = {
 	/**
 	 * To retrieve the page where the FilterWidget is used, using the FHC_JS_DATA_STORAGE_OBJECT
 	 */
-	getFilterPage: function() {
+	getFilterUniqueIdPrefix: function() {
 
 		return FHC_JS_DATA_STORAGE_OBJECT.called_path + "/" + FHC_JS_DATA_STORAGE_OBJECT.called_method;
 	},
@@ -112,9 +118,9 @@ var FHC_FilterWidget = {
 	 */
 	reloadDataset: function() {
 		FHC_AjaxClient.ajaxCallPost(
-			"system/Filters/reloadDataset",
+			"widgets/Filters/reloadDataset",
 			{
-				filter_page: FHC_FilterWidget.getFilterPage()
+				filterUniqueId: FHC_FilterWidget.getFilterUniqueIdPrefix()
 			},
 			{
 				successCallback: function(data, textStatus, jqXHR) {
@@ -181,6 +187,12 @@ var FHC_FilterWidget = {
 		{
 			$("#filterPivotUI").html("");
 		}
+
+		// If the choosen dataset representation is tabulator
+		if (FHC_FilterWidget._datasetRepresentation == DATASET_REP_TABULATOR)
+		{
+			$("#filterTabulator").html("");
+		}
 	},
 
 	/**
@@ -190,9 +202,9 @@ var FHC_FilterWidget = {
 	_getFilter: function(renderFunction) {
 
 		FHC_AjaxClient.ajaxCallGet(
-			"system/Filters/getFilter",
+			"widgets/Filters/getFilter",
 			{
-				filter_page: FHC_FilterWidget.getFilterPage()
+				filterUniqueId: FHC_FilterWidget.getFilterUniqueIdPrefix()
 			},
 			{
 				successCallback: function(data, textStatus, jqXHR) {
@@ -224,16 +236,23 @@ var FHC_FilterWidget = {
 		FHC_FilterWidget._initSessionStorage(); // initialize the session storage
 
 		FHC_FilterWidget._setDatasetRepresentation(data); // set what type of dataset representation was choosen
+		FHC_FilterWidget._setHideMenu(data); // sets the _hideMenu property
+		FHC_FilterWidget._setHideOptions(data);
 
 		FHC_FilterWidget._turnOffEvents(); // turns all the events off
 		FHC_FilterWidget._resetGUI(); // Reset the entire GUI
 
 		// Render the GUI for this FilterWidget
 		FHC_FilterWidget._setFilterName(data); // set the name in the GUI
-		FHC_FilterWidget._renderDragAndDropFields(data); // render the fields drag and drop GUI
-		FHC_FilterWidget._renderDropDownFields(data); // render the fields drop-down
-		FHC_FilterWidget._renderAppliedFilters(data); // render the GUI for the applied filters
-		FHC_FilterWidget._renderDropDownFilters(data); // render the filters drop-down
+
+		if (FHC_FilterWidget._hideOptions != true)
+		{
+			FHC_FilterWidget._renderDragAndDropFields(data); // render the fields drag and drop GUI
+			FHC_FilterWidget._renderDropDownFields(data); // render the fields drop-down
+			FHC_FilterWidget._renderAppliedFilters(data); // render the GUI for the applied filters
+			FHC_FilterWidget._renderDropDownFilters(data); // render the filters drop-down
+		}
+
 		FHC_FilterWidget._renderDataset(data);
 
 		FHC_FilterWidget._turnOnEvents(); // turns all the events off
@@ -265,7 +284,7 @@ var FHC_FilterWidget = {
 	 */
 	_turnOffEvents: function() {
 
-		$("[data-toggle='collapse']").off("click");
+		$('[data-toggle="collapse"]').off("click");
 		$(".drag-and-drop-fields-span").off("draggable");
 		$(".drag-and-drop-fields-span").off("droppable");
 		$(".remove-selected-field").off("click");
@@ -279,7 +298,7 @@ var FHC_FilterWidget = {
 		// If the choosen dataset representation is tablesorter
 		if (FHC_FilterWidget._datasetRepresentation == DATASET_REP_TABLESORTER)
 		{
-			FHC_FilterWidget._disableTableSorter(); // disable the tablesorter
+			FHC_FilterWidget._disableTablesorter(); // disable the tablesorter
 		}
 	},
 
@@ -289,7 +308,7 @@ var FHC_FilterWidget = {
 	 */
 	_turnOnEvents: function() {
 
-		$("[data-toggle='collapse']").click(FHC_FilterWidget._dataToggleCollapseEvent); // Click event to collapse or to open the filter options panel
+		$('[data-toggle="collapse"]').click(FHC_FilterWidget._dataToggleCollapseEvent); // Click event to collapse or to open the filter options panel
 		$(".drag-and-drop-fields-span").draggable(FHC_FilterWidget._draggableConf); // draggable event on selected fields
 		$(".drag-and-drop-fields-span").droppable(FHC_FilterWidget._droppableConf); // droppable event on selected fields
 		$(".remove-selected-field").click(FHC_FilterWidget._revomeSelectedFieldsEvent); // Click event on the "X" link
@@ -385,10 +404,10 @@ var FHC_FilterWidget = {
 			});
 
 			FHC_AjaxClient.ajaxCallPost(
-				"system/Filters/sortSelectedFields",
+				"widgets/Filters/sortSelectedFields",
 				{
 					selectedFields: arrayDndId,
-					filter_page: FHC_FilterWidget.getFilterPage()
+					filterUniqueId: FHC_FilterWidget.getFilterUniqueIdPrefix()
 				},
 				{
 					successCallback: function(data, textStatus, jqXHR) {
@@ -405,10 +424,10 @@ var FHC_FilterWidget = {
 	_revomeSelectedFieldsEvent: function(event) {
 
  		FHC_AjaxClient.ajaxCallPost(
- 			"system/Filters/removeSelectedField",
+ 			"widgets/Filters/removeSelectedField",
  			{
  				selectedField: $(this).attr("fieldToRemove"),
- 				filter_page: FHC_FilterWidget.getFilterPage()
+				filterUniqueId: FHC_FilterWidget.getFilterUniqueIdPrefix()
  			},
  			{
  				successCallback: function(data, textStatus, jqXHR) {
@@ -445,10 +464,10 @@ var FHC_FilterWidget = {
 	_addFieldEvent: function(event) {
 
 		FHC_AjaxClient.ajaxCallPost(
-			"system/Filters/addSelectedField",
+			"widgets/Filters/addSelectedField",
 			{
 				selectedField: $(this).val(),
-				filter_page: FHC_FilterWidget.getFilterPage()
+				filterUniqueId: FHC_FilterWidget.getFilterUniqueIdPrefix()
 			},
 			{
 				successCallback: function(data, textStatus, jqXHR) {
@@ -460,8 +479,9 @@ var FHC_FilterWidget = {
 
 	/**
 	 * Event function used by the apply filter button
+	 * The given parameter is used to decide if the page is going to be reloaded
 	 */
-	_applyFilterEvent: function() {
+	_applyFilterEvent: function(reload = true) {
 
 		var appliedFilters = [];
 		var appliedFiltersOperations = [];
@@ -476,17 +496,25 @@ var FHC_FilterWidget = {
 		});
 
 		FHC_AjaxClient.ajaxCallPost(
-			"system/Filters/applyFilters",
+			"widgets/Filters/applyFilters",
 			{
 				appliedFilters: appliedFilters,
 				appliedFiltersOperations: appliedFiltersOperations,
 				appliedFiltersConditions: appliedFiltersConditions,
 				appliedFiltersOptions: appliedFiltersOptions,
-				filter_page: FHC_FilterWidget.getFilterPage()
+				filterUniqueId: FHC_FilterWidget.getFilterUniqueIdPrefix()
 			},
 			{
 				successCallback: function(data, textStatus, jqXHR) {
-					FHC_FilterWidget._failOrReload(data, textStatus, jqXHR);
+
+					if (reload === true)
+					{
+						FHC_FilterWidget._failOrReload(data, textStatus, jqXHR);
+					}
+					else
+					{
+						console.log(FHC_AjaxClient.getError(data));
+					}
 				}
 			}
 		);
@@ -498,10 +526,10 @@ var FHC_FilterWidget = {
 	_removeAppliedFiltersEvent: function(event) {
 
 		FHC_AjaxClient.ajaxCallPost(
-			"system/Filters/removeAppliedFilter",
+			"widgets/Filters/removeAppliedFilter",
 			{
 				appliedFilter: $(this).attr("filterToRemove"),
-				filter_page: FHC_FilterWidget.getFilterPage()
+				filterUniqueId: FHC_FilterWidget.getFilterUniqueIdPrefix()
 			},
 			{
 				successCallback: function(data, textStatus, jqXHR) {
@@ -517,10 +545,10 @@ var FHC_FilterWidget = {
 	_addFilterEvent: function(event) {
 
  		FHC_AjaxClient.ajaxCallPost(
- 			"system/Filters/addFilter",
+ 			"widgets/Filters/addFilter",
  			{
  				filter: $(this).val(),
- 				filter_page: FHC_FilterWidget.getFilterPage()
+				filterUniqueId: FHC_FilterWidget.getFilterUniqueIdPrefix()
  			},
  			{
  				successCallback: function(data, textStatus, jqXHR) {
@@ -558,19 +586,18 @@ var FHC_FilterWidget = {
 
  		if ($("#customFilterDescription").val() != "")
  		{
+			// Apply the filter before saving it, without reloading the page
+			FHC_FilterWidget._applyFilterEvent(false);
+
  			FHC_AjaxClient.ajaxCallPost(
- 				"system/Filters/saveCustomFilter",
+ 				"widgets/Filters/saveCustomFilter",
  				{
  					customFilterDescription: $("#customFilterDescription").val(),
- 					filter_page: FHC_FilterWidget.getFilterPage()
+					filterUniqueId: FHC_FilterWidget.getFilterUniqueIdPrefix()
  				},
  				{
  					successCallback: function(data, textStatus, jqXHR) {
-						// If a success and refreshSideMenuHook is a valid function then call it to refresh the side menu
-						if (typeof refreshSideMenuHook == "function")
-						{
-							refreshSideMenuHook();
-						}
+						FHC_FilterWidget._failOrReload(data);
 					}
  				}
  			);
@@ -827,6 +854,12 @@ var FHC_FilterWidget = {
 		{
 			FHC_FilterWidget._renderDatasetPivotUI(data); // ...render the pivotUI GUI
 		}
+
+		// If the choosen dataset representation is tabulator then...
+		if (FHC_FilterWidget._datasetRepresentation == DATASET_REP_TABULATOR)
+		{
+			FHC_FilterWidget._renderDatasetTabulator(data); // ...render the tabulator GUI
+		}
 	},
 
 	/**
@@ -843,7 +876,7 @@ var FHC_FilterWidget = {
 			FHC_FilterWidget._clearTablesorterLocalStorage();
 		}
 
-		if (data.hasOwnProperty("checkboxes") && data.checkboxes!=null && data.checkboxes.trim() != "")
+		if (data.hasOwnProperty("checkboxes") && data.checkboxes != null && data.checkboxes.trim() != "")
 		{
 			$("#filterTableDataset > thead > tr").append("<th data-filter='false' title='Select'>Select</th>");
 		}
@@ -928,12 +961,14 @@ var FHC_FilterWidget = {
 	 */
 	_enableTableSorter: function() {
 
+		var filterWidgetTablesorter = $("#filterTableDataset");
+
 		// Checks if the table contains data (rows)
-		if ($("#filterTableDataset").find("tbody:empty").length == 0
-			&& $("#filterTableDataset").find("tr:empty").length == 0
-			&& $("#filterTableDataset").hasClass("table-condensed"))
+		if (filterWidgetTablesorter.find("tbody:empty").length == 0
+			&& filterWidgetTablesorter.find("tr:empty").length == 0
+			&& filterWidgetTablesorter.hasClass("table-condensed"))
 		{
-			$("#filterTableDataset").tablesorter({
+			filterWidgetTablesorter.tablesorter({
 				dateFormat: "ddmmyyyy",
 				widgets: ["zebra", "filter"],
 				widgetOptions: {
@@ -941,16 +976,24 @@ var FHC_FilterWidget = {
 				}
 			});
 
-			$.tablesorter.updateAll($("#filterTableDataset")[0].config, true, null);
+			$.tablesorter.updateAll(filterWidgetTablesorter[0].config, true, null);
 		}
 	},
 
 	/**
 	 * Disable the tablesorter
 	 */
-	_disableTableSorter: function() {
+	_disableTablesorter: function() {
 
 		$("#filterTableDataset").trigger("disable");
+	},
+
+	/**
+	 * Tablesorter filter local storage clean
+	 */
+	_cleanTablesorterLocalStorage: function() {
+
+		$("#filterTableDataset").trigger("filterResetSaved");
 	},
 
 	/**
@@ -959,19 +1002,8 @@ var FHC_FilterWidget = {
 	 */
 	_renderDatasetPivotUI: function(data) {
 
-		var options = {}; // eventually contains options fot the pivotUI
-
-		// Checks if options were given
-		if (data.hasOwnProperty("datasetRepresentationOptions") && data.datasetRepresentationOptions != "")
-		{
-			var tmpOptions = eval("(" + data.datasetRepresentationOptions + ")"); // and converts them from string to javascript code
-
-			// If it is an object then can be used
-			if (typeof tmpOptions == "object")
-			{
-				options = tmpOptions;
-			}
-		}
+		// Checks if options were given and returns them
+		var options = FHC_FilterWidget._getRepresentationOptions(data);
 
 		// Manipulation for the representation!
 		var arrayFieldsToDisplay = FHC_FilterWidget._getFieldsToDisplay(data);
@@ -1057,8 +1089,145 @@ var FHC_FilterWidget = {
 	},
 
 	/**
-	 * Tablesorter filter local storage clean
+	 * Renders the tabulator for the FilterWidget
+	 * The data to be displayed are retrived from the parameter data
 	 */
+	_renderDatasetTabulator: function(data) {
+
+		// Checks if options were given and returns them
+		var options = FHC_FilterWidget._getRepresentationOptions(data);
+		// Checks if record fields definitions were given and returns them
+		var recordFieldsDefinitions = FHC_FilterWidget._getRepresentationFieldsDefinitions(data);
+
+		// Manipulation for the representation!
+		var arrayTabulatorColumns = FHC_FilterWidget._getTabulatorColumns(data, recordFieldsDefinitions);
+
+		if (arrayTabulatorColumns.length > 0)
+		{
+			// ...if there are data to be displayed...
+			if (data.hasOwnProperty("dataset") && $.isArray(data.dataset))
+			{
+				if (options == null) options = {};
+
+				options.columns = arrayTabulatorColumns;
+				options.data = data.dataset;
+
+				// Renders the tabulator
+				$("#filterTabulator").tabulator(options);
+			}
+		}
+	},
+
+	/**
+	 * Retrives the fields to be displayed from the data parameter, if aliases are present then they are used
+	 */
+	_getTabulatorColumns: function(data, recordFieldsDefinitions) {
+
+		var fieldsToDisplayTabulator = [];
+
+		if (data.hasOwnProperty("selectedFields") && $.isArray(data.selectedFields))
+		{
+			for (var sfc = 0; sfc < data.selectedFields.length; sfc++)
+			{
+				for (var fc = 0; fc < data.fields.length; fc++)
+				{
+					if (data.selectedFields[sfc] == data.fields[fc])
+					{
+						// Build the array of objects (columns) used by tabulator and store it in tabulatorColumns
+						var tmpColumnObj = {}; // New object that represents a column
+
+						// If was given a definition for this field then use it!
+						if (recordFieldsDefinitions != null && recordFieldsDefinitions.hasOwnProperty(data.selectedFields[sfc]))
+						{
+							tmpColumnObj = recordFieldsDefinitions[data.selectedFields[sfc]];
+						}
+
+						tmpColumnObj.field = data.selectedFields[sfc]; // Field name to be linked with dataset field name
+
+						// If there is an alias for this field use it to give a title to this field (header)
+						if (data.hasOwnProperty("columnsAliases") && $.isArray(data.columnsAliases))
+						{
+							tmpColumnObj.title = data.columnsAliases[fc];
+						}
+						else // otherwise use the field name itself
+						{
+							tmpColumnObj.title = data.selectedFields[sfc];
+						}
+
+						fieldsToDisplayTabulator.push(tmpColumnObj); // Add tmpColumnObj to tabulatorColumns
+					}
+				}
+			}
+		}
+
+		// If additional columns are present...
+		if (data.hasOwnProperty("additionalColumns") && data.additionalColumns != null && $.isArray(data.additionalColumns))
+		{
+			// ...loops through them
+			$.each(data.additionalColumns, function(i, additionalColumn) {
+
+				var tmpColumnObj = {}; // New object that represents a column
+
+				// If was given a definition for this field then use it!
+				if (recordFieldsDefinitions != null && recordFieldsDefinitions.hasOwnProperty(additionalColumn))
+				{
+					tmpColumnObj = recordFieldsDefinitions[additionalColumn];
+				}
+
+				tmpColumnObj.title = additionalColumn; // Give a title to this field (header)
+				tmpColumnObj.field = additionalColumn; // Field name to be linked with dataset field name
+
+				fieldsToDisplayTabulator.push(tmpColumnObj); // Add tmpColumnObj to tabulatorColumns
+			});
+		}
+
+		return fieldsToDisplayTabulator;
+	},
+
+	/**
+	 * Gets options for the representation
+	 */
+	_getRepresentationOptions: function(data) {
+
+		var options = {}; // eventually contains options fot the representation
+
+		// Checks if options were given
+		if (data.hasOwnProperty("datasetRepresentationOptions") && data.datasetRepresentationOptions != "")
+		{
+			var tmpOptions = eval("(" + data.datasetRepresentationOptions + ")"); // and converts them from string to javascript code
+
+			// If it is an object then can be used
+			if (typeof tmpOptions == "object")
+			{
+				options = tmpOptions;
+			}
+		}
+
+		return options;
+	},
+
+	/**
+	 * Gets record fields definitions to represent the dataset
+	 */
+	_getRepresentationFieldsDefinitions: function(data) {
+
+		var fieldsDefinitions = {}; // eventually contains record fields definitions
+
+		// Checks if record fields definitions was given as parameter
+		if (data.hasOwnProperty("datasetRepresentationFieldsDefinitions") && data.datasetRepresentationFieldsDefinitions != "")
+		{
+			var tmpFDefs = eval("(" + data.datasetRepresentationFieldsDefinitions + ")"); // and converts them from string to javascript code
+
+			// If it is an object then can be used
+			if (typeof tmpFDefs == "object")
+			{
+				fieldsDefinitions = tmpFDefs;
+			}
+		}
+
+		return fieldsDefinitions;
+	},
+
 	_clearTablesorterLocalStorage: function() {
 		localStorage.removeItem("tablesorter-filters");
 	},
@@ -1072,8 +1241,29 @@ var FHC_FilterWidget = {
 		{
 			FHC_FilterWidget._datasetRepresentation = data.datasetRepresentation;
 		}
-	}
+	},
 
+	/**
+	 * Set what type of dataset representation was choosen
+	 */
+	_setHideMenu: function(data) {
+
+		if (data.hasOwnProperty("hideMenu"))
+		{
+			FHC_FilterWidget._hideMenu = data.hideMenu;
+		}
+	},
+
+	/**
+	 * Set what type of dataset representation was choosen
+	 */
+	_setHideOptions: function(data) {
+
+		if (data.hasOwnProperty("hideOptions"))
+		{
+			FHC_FilterWidget._hideOptions = data.hideOptions;
+		}
+	}
 };
 
 /**

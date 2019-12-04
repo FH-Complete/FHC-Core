@@ -60,3 +60,5 @@ $this->phrasen['zeitaufzeichnung/keineprojekte']='keine Projekte vorhanden';
 $this->phrasen['zeitaufzeichnung/summe']='Summe:';
 $this->phrasen['zeitaufzeichnung/dienstreise']='Dienstreise';
 $this->phrasen['zeitaufzeichnung/projektphase']='AP';
+$this->phrasen['zeitaufzeichnung/pauseEinfuegen']='Pause automatisch einfügen';
+$this->phrasen['zeitaufzeichnung/zeitraumZuKurz']='Zeitraum zu kurz für automatische Pause';

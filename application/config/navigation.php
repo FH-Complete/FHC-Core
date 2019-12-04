@@ -51,6 +51,16 @@ $config['navigation_header'] = array(
 					'sort' => 30,
 					'requiredPermissions' => 'infocenter:r'
 				),
+				'lehrauftrag' => array(
+					'link' => site_url('lehre/lehrauftrag/Lehrauftrag/Dashboard'),
+					'description' => 'Lehrauftrag',
+					'expand' => true,
+					'sort' => 40,
+					'requiredPermissions' => array(
+						'lehre/lehrauftrag_bestellen:r',
+						'lehre/lehrauftrag_erteilen:r'
+					)
+				)
 			)
 		),
 		'Personen' => array(
@@ -123,5 +133,50 @@ $config['navigation_menu']['organisation/Reihungstest/index'] = array(
 		'icon' => 'list-alt',
 		'sort' => 1,
 		'target' => '_blank'
+	)
+);
+
+$config['navigation_menu']['lehre/lehrauftrag/Lehrauftrag/*'] = array(
+	'lehrauftragDashboard' => array(
+		'link' => site_url('lehre/lehrauftrag/Lehrauftrag/Dashboard'),
+		'description' => 'Dashboard',
+		'icon' => 'dashboard',
+		'sort' => 1,
+		'requiredPermissions' => array('lehre/lehrauftrag_bestellen:r','lehre/lehrauftrag_erteilen:r')
+	),'lehrauftragBestellen' => array(
+		'link' => site_url('lehre/lehrauftrag/Lehrauftrag'),
+		'description' => 'Lehrauftrag bestellen',
+		'icon' => '',
+		'sort' => 1,
+		'requiredPermissions' => 'lehre/lehrauftrag_bestellen:r'
+	),
+	'lehrauftragErteilen' => array(
+		'link' => site_url('lehre/lehrauftrag/LehrauftragErteilen'),
+		'description' => 'Lehrauftrag erteilen',
+		'icon' => '',
+		'sort' => 1,
+		'requiredPermissions' => 'lehre/lehrauftrag_erteilen:r'
+	)
+);
+$config['navigation_menu']['lehre/lehrauftrag/LehrauftragErteilen/*'] = array(
+	'lehrauftragDashboard' => array(
+		'link' => site_url('lehre/lehrauftrag/Lehrauftrag/Dashboard'),
+		'description' => 'Dashboard',
+		'icon' => 'dashboard',
+		'sort' => 1,
+		'requiredPermissions' => array('lehre/lehrauftrag_bestellen:r','lehre/lehrauftrag_erteilen:r')
+	),'lehrauftragBestellen' => array(
+		'link' => site_url('lehre/lehrauftrag/Lehrauftrag'),
+		'description' => 'Lehrauftrag bestellen',
+		'icon' => '',
+		'sort' => 1,
+		'requiredPermissions' => 'lehre/lehrauftrag_bestellen:r'
+	),
+	'lehrauftragErteilen' => array(
+		'link' => site_url('lehre/lehrauftrag/LehrauftragErteilen'),
+		'description' => 'Lehrauftrag erteilen',
+		'icon' => '',
+		'sort' => 1,
+		'requiredPermissions' => 'lehre/lehrauftrag_erteilen:r'
 	)
 );

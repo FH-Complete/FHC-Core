@@ -524,7 +524,16 @@ if(!$error)
 				$prestudent->studiengang_kz = $_POST['studiengang_kz'];
 				$prestudent->berufstaetigkeit_code = $_POST['berufstaetigkeit_code'];
 				$prestudent->ausbildungcode = $_POST['ausbildungcode'];
-				$prestudent->zgv_code = $_POST['zgv_code'];
+				// Die Bachelor-ZGV darf nur mit einem eigenen Recht geändert werden
+				if($rechte->isBerechtigt('student/editBakkZgv',$_POST['studiengang_kz'],'suid'))
+				{
+					$prestudent->zgv_code = $_POST['zgv_code'];
+				}
+				elseif ($prestudent->zgv_code != $_POST['zgv_code'])
+				{
+					$errormsg = 'Keine Berechtigung zum Ändern der ZGV';
+					$error = true;
+				}
 				$prestudent->zgvort = $_POST['zgvort'];
 				$prestudent->zgvdatum = $_POST['zgvdatum'];
 				$prestudent->zgvnation = $_POST['zgvnation'];
@@ -4031,25 +4040,27 @@ if(!$error)
 		}
 		else
 		{
-			//Loescht einen Projektbetreuer Eintrag
-			if(isset($_POST['person_id']) && is_numeric($_POST['person_id']))
+			// Wenn der Projektbetreuer schon einen Vertrag hat, wird das Loeschen verhindert
+			if (isset($_POST['vertrag_id']) && is_numeric($_POST['vertrag_id']))
 			{
-				$projektbetreuer = new projektbetreuer();
-
-				if($projektbetreuer->delete($_POST['person_id'], $_POST['projektarbeit_id'], $_POST['betreuerart_kurzbz']))
-				{
-					$return = true;
-				}
-				else
-				{
-					$errormsg = $projektbetreuer->errormsg;
-					$return = false;
-				}
+				$return = false;
+				$errormsg = 'Löschen nur nach Stornierung des Vertrags möglich.';
 			}
 			else
 			{
-				$return = false;
-				$errormsg  = 'Fehlerhafte Parameteruebergabe';
+				//Loescht einen Projektbetreuer Eintrag
+				if (isset($_POST['person_id']) && is_numeric($_POST['person_id'])) {
+					$projektbetreuer = new projektbetreuer();
+					if ($projektbetreuer->delete($_POST['person_id'], $_POST['projektarbeit_id'], $_POST['betreuerart_kurzbz'])) {
+						$return = true;
+					} else {
+						$errormsg = $projektbetreuer->errormsg;
+						$return = false;
+					}
+				} else {
+					$return = false;
+					$errormsg = 'Fehlerhafte Parameteruebergabe';
+				}
 			}
 		}
 	}

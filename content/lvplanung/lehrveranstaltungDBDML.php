@@ -17,7 +17,8 @@
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
  *		  Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *		  Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ *		  Rudolf Hangl <rudolf.hangl@technikum-wien.at>
+ * 		  Cristina Hainberger <hainberg@technikum-wien.at>.
  */
 
 // ****************************************
@@ -31,6 +32,7 @@
 // * - Lehreinheitmitarbeiter Zuteilung hinzufuegen/bearbeiten/loeschen
 // * - Lehreinheitgruppe Zutelung hinzufuegen/loeschen
 // * - Lehreinheit anlegen/bearbeiten/loeschen
+// * - Lehrauftrag (Vertrag) loeschen (stornieren)
 // ****************************************
 
 require_once('../../config/vilesci.config.inc.php');
@@ -691,50 +693,58 @@ if(!$error)
 			//Lehreinheitmitarbeiterzuteilung loeschen
 			if(isset($_POST['lehreinheit_id']) && is_numeric($_POST['lehreinheit_id']) && isset($_POST['mitarbeiter_uid']))
 			{
-				//Wenn der Mitarbeiter im Stundenplan verplant ist, dann wird das Loeschen verhindert
-				$qry = "SELECT stundenplandev_id as id FROM lehre.tbl_stundenplandev WHERE lehreinheit_id=".$db->db_add_param($_POST['lehreinheit_id'], FHC_INTEGER)." AND mitarbeiter_uid=".$db->db_add_param($_POST['mitarbeiter_uid'])."
-						UNION
-						SELECT stundenplan_id as id FROM lehre.tbl_stundenplan WHERE lehreinheit_id=".$db->db_add_param($_POST['lehreinheit_id'], FHC_INTEGER)." AND mitarbeiter_uid=".$db->db_add_param($_POST['mitarbeiter_uid']);
-				if($db->db_query($qry))
+				// Wenn der Mitarbeiter schon einen Vertrag hat, wird das Loeschen verhindert
+				if (isset($_POST['vertrag_id']) && is_numeric($_POST['vertrag_id']))
 				{
-					if($db->db_num_rows()>0)
+					$return = false;
+					$errormsg = 'Löschen nur nach Stornierung des Vertrags möglich.';
+				}
+				else
+				{
+					//Wenn der Mitarbeiter im Stundenplan verplant ist, dann wird das Loeschen verhindert
+					$qry = "SELECT stundenplandev_id as id FROM lehre.tbl_stundenplandev WHERE lehreinheit_id=".$db->db_add_param($_POST['lehreinheit_id'], FHC_INTEGER)." AND mitarbeiter_uid=".$db->db_add_param($_POST['mitarbeiter_uid'])."
+							UNION
+							SELECT stundenplan_id as id FROM lehre.tbl_stundenplan WHERE lehreinheit_id=".$db->db_add_param($_POST['lehreinheit_id'], FHC_INTEGER)." AND mitarbeiter_uid=".$db->db_add_param($_POST['mitarbeiter_uid']);
+					if($db->db_query($qry))
 					{
-						$return = false;
-						$errormsg = 'Diese/r LektorIn kann nicht gelöscht werden da er schon verplant ist';
-					}
-					else
-					{
-						$leg = new lehreinheitmitarbeiter();
-						if($leg->load($_POST['lehreinheit_id'], $_POST['mitarbeiter_uid']))
+						if($db->db_num_rows()>0)
 						{
-							// Wenn ein Vertrag dazu angelegt ist, dann diesen mitloeschen
-							if($leg->vertrag_id!='')
+							$return = false;
+							$errormsg = 'Diese/r LektorIn kann nicht gelöscht werden da er schon verplant ist';
+						}
+						else
+						{
+							$leg = new lehreinheitmitarbeiter();
+							if($leg->load($_POST['lehreinheit_id'], $_POST['mitarbeiter_uid']))
 							{
-								$vertrag = new vertrag();
-								$vertrag->delete($leg->vertrag_id);
-							}
-
-							if($leg->delete($_POST['lehreinheit_id'], $_POST['mitarbeiter_uid']))
-							{
-								$return = true;
+								// Wenn ein Vertrag dazu angelegt ist, dann diesen mitloeschen
+								if($leg->vertrag_id!='')
+								{
+									$vertrag = new vertrag();
+									$vertrag->delete($leg->vertrag_id);
+								}
+								if($leg->delete($_POST['lehreinheit_id'], $_POST['mitarbeiter_uid']))
+								{
+									$return = true;
+								}
+								else
+								{
+									$return = false;
+									$errormsg = $leg->errormsg;
+								}
 							}
 							else
 							{
 								$return = false;
-								$errormsg = $leg->errormsg;
+								$errormsg='Fehlgeschlagen:'.$leg->errormsg;
 							}
 						}
-						else
-						{
-							$return = false;
-							$errormsg='Fehlgeschlagen:'.$leg->errormsg;
-						}
 					}
-				}
-				else
-				{
-					$return = false;
-					$errormsg = 'Fehler:'.$qry;
+					else
+					{
+						$return = false;
+						$errormsg = 'Fehler:'.$qry;
+					}
 				}
 			}
 			else
@@ -1713,6 +1723,102 @@ if(!$error)
 				$errormsg = 'Gruppe passt nicht zur Lehreinheit';
 				$return = false;
 			}
+		}
+	}
+	elseif(isset($_POST['type']) && $_POST['type']=='getLastVertragsstatus')
+	{
+		if(isset($_POST['vertrag_id']))
+		{
+			$vertrag = new vertrag();
+			if($vertrag->getAllStatus($_POST['vertrag_id']))
+			{
+				$vertraege = $vertrag->result;
+				foreach($vertraege as $vertrag)
+				{
+					$data = $vertrag->vertragsstatus_kurzbz;
+					$return = true;
+					break; // exit loop because only last (most actual) vertrag item is needed
+				}
+
+			}
+			else
+			{
+				$errormsg = 'Fehler beim Laden des Vertragsstatus';
+				$return = false;
+			}
+		}
+		else
+		{
+			$errormsg = 'VertragsID muss uebergeben werden';
+			$return = false;
+		}
+	}
+	elseif(isset($_POST['type']) && $_POST['type']=='cancelVertrag')
+	{
+		$error = false;
+
+		// Check if user is entitled to cancel this contract
+		if (isset($_POST['vertrag_id']) && is_numeric($_POST['vertrag_id']))
+		{
+			// * first find lehrveranstaltung_id of the contracts lehrveranstaltung
+			$vertrag = new vertrag();
+			$vertrag->load($_POST['vertrag_id']);
+			$lva = new lehrveranstaltung($vertrag->lehrveranstaltung_id);
+
+			// * then check if the user has permissions to cancel the corresponding lv-organisational units
+			if (!$rechte->isBerechtigtMultipleOe('admin', $lva->getAllOe(), 'suid') &&
+				!$rechte->isBerechtigtMultipleOe('lehre/lehrauftrag_bestellen', $lva->getAllOe(), 'suid'))
+			{
+				$error = true;
+				$return = false;
+				$errormsg = 'Keine Berechtigung';
+			}
+		}
+
+		if (!$error)
+		{
+			if(isset($_POST['mitarbeiter_uid']))
+			{
+				$vertrag = new vertrag();
+				if($vertrag->cancel($_POST['vertrag_id'], $_POST['mitarbeiter_uid']))
+				{
+					$return = true;
+				}
+				else
+				{
+					$errormsg = 'Fehler beim Ausführen des Vertragsstornos';
+					$return = false;
+				}
+			}
+			elseif(isset($_POST['person_id']))
+			{
+				$benutzer = new Benutzer();
+				if($benutzer->getBenutzerFromPerson($_POST['person_id']))
+				{
+					$mitarbeiter_uid = $benutzer->result[0]->uid;
+
+					$vertrag = new vertrag();
+					if($vertrag->cancel($_POST['vertrag_id'], $mitarbeiter_uid))
+					{
+						$return = true;
+					}
+					else
+					{
+						$errormsg = 'Fehler beim Ausführen des Vertragsstornos';
+						$return = false;
+					}
+				}
+				else
+				{
+					$errormsg = 'Benutzer konnte nicht von PersonID geladen werden';
+					$return = false;
+				}
+			}
+		}
+		else
+		{
+			$errormsg = 'VertragsID und MitarbeiterUID müssen uebergeben werden';
+			$return = false;
 		}
 	}
 	else

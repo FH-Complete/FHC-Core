@@ -1131,6 +1131,7 @@ function LeMitarbeiterDel()
 	req.add('type', 'lehreinheit_mitarbeiter_del');
 	req.add('lehreinheit_id', lehreinheit_id);
 	req.add('mitarbeiter_uid', uid);
+	req.add('vertrag_id', vertrag_id);
 
 	var response = req.executePOST();
 	var val =  new ParseReturnValue(response)
@@ -1222,7 +1223,7 @@ function LeMitarbeiterDisableFields(val)
 
 // ****
 // * Bei Auswaehlen eines Mitarbeiters werden zu zugehoerigen
-// * Details geladen und angezeigt
+// * Details sowie ggf. die Vertragsdetails geladen und angezeigt
 // ****
 function LeMitarbeiterAuswahl()
 {
@@ -1308,6 +1309,7 @@ function LeMitarbeiterAuswahl()
 	faktor = getTargetHelper(dsource, subject, rdfService.GetResource( predicateNS + "#faktor" ));
 	anmerkung = getTargetHelper(dsource, subject, rdfService.GetResource( predicateNS + "#anmerkung" ));
 	bismelden = getTargetHelper(dsource, subject, rdfService.GetResource( predicateNS + "#bismelden" ));
+    vertrag_id = getTargetHelper(dsource, subject, rdfService.GetResource( predicateNS + "#vertrag_id" ));
 
 	//Felder aktivieren
 	LeMitarbeiterDisableFields(false);
@@ -1328,7 +1330,186 @@ function LeMitarbeiterAuswahl()
 	else
 		document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-checkbox-bismelden').checked=false;
 
-	LeMitarbeiterGesamtkosten();
+	var gesamtkosten = LeMitarbeiterGesamtkosten();
+
+    // Prüfe ob Vertragsdetails angezeigt werden
+    var vertragsdetails_anzeigen = new Boolean(<?php echo (defined('FAS_LV_LEKTORINNENZUTEILUNG_VERTRAGSDETAILS_ANZEIGEN') && FAS_LV_LEKTORINNENZUTEILUNG_VERTRAGSDETAILS_ANZEIGEN) ? 'true' : 'false' ?>);
+
+    // Wenn Vertragsdetails angezeigt werden
+    if (vertragsdetails_anzeigen) {
+
+        // Reset attributes
+        document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-label-vertragsstatus').setAttribute("style", "font-weight: normal");
+        document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-button-vertrag-stornieren').setAttribute("tooltiptext",
+            "Stornieren erst nötig, sobald Lektor einen Vertrag hat. (Ab Status 'Bestellt')");
+        document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-button-vertrag-stornieren').disabled = true;
+        document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-menulist-lektor').disabled = false;
+        document.getElementById('lehrveranstaltung-lektor-tree-popup-label').disabled = false;
+        document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-textbox-semesterstunden').disabled= false;
+        document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-textbox-stundensatz').disabled= false;
+        document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-textbox-semesterstunden').setAttribute("tooltiptext", "");
+        document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-textbox-stundensatz').setAttribute("tooltiptext", "");
+        document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-menulist-lektor').setAttribute("tooltiptext", "");
+        document.getElementById('lehrveranstaltung-lektor-tree-popup-label').setAttribute("tooltiptext", "");
+
+        // Wenn es einen Vertrag zum Lehrauftrag gibt
+        if (vertrag_id != null && vertrag_id != '')
+        {
+            // Änderung und Entfernen des Lektors disablen
+            document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-menulist-lektor').disabled = true;
+            document.getElementById('lehrveranstaltung-lektor-tree-popup-label').disabled = true;
+
+            // Tooltip für Blockierung von Aenderung und Entfernen des Lektors
+            document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-menulist-lektor').setAttribute("tooltiptext",
+                "Änderung nur nach Stornierung des Vertrags möglich.");
+            document.getElementById('lehrveranstaltung-lektor-tree-popup-label').setAttribute("tooltiptext",
+                "Änderung nur nach Stornierung des Vertrags möglich.");
+
+            // Stornieren ermoeglichen und tooltip entfernen
+            document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-button-vertrag-stornieren').disabled = false;
+            document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-button-vertrag-stornieren').setAttribute("tooltiptext", "");
+
+            // Url zum RDF
+            var url = "<?php echo APP_ROOT; ?>rdf/vertrag.rdf.php?"+gettimestamp();
+            //
+            ////RDF laden
+            var req = new phpRequest(url, '', '');
+            req.add('vertrag_id', vertrag_id);
+            var response = req.execute();
+
+            // Trick 17	(sonst gibt's ein Permission denied)
+            netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+
+            // XML in Datasource parsen
+            var dsource = parseRDFString(response, 'http://www.technikum-wien.at/vertrag/liste');
+            var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].
+            getService(Components.interfaces.nsIRDFService);
+            var subject = rdfService.GetResource("http://www.technikum-wien.at/vertrag/" + vertrag_id);
+            var predicateNS = "http://www.technikum-wien.at/vertrag/rdf";
+
+            //Daten holen
+            betrag = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#betrag" ));
+            vertragsdatum = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#vertragsdatum" ));
+            vertragsstunden = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#vertragsstunden" ));
+            vertragsstunden_studiensemester_kurzbz = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#vertragsstunden_studiensemester_kurzbz" ));
+
+
+            // Letzten (aktuellsten) Vertragsstatus laden
+            var url_letzterStatus = '<?php echo APP_ROOT ?>content/lvplanung/lehrveranstaltungDBDML.php';
+            var req_letzterStatus = new phpRequest(url_letzterStatus,'','');
+
+            req_letzterStatus.add('type', 'getLastVertragsstatus');
+            req_letzterStatus.add('vertrag_id', vertrag_id);
+
+
+            var response_letzterStatus = req_letzterStatus.executePOST();
+
+            var val_letzterStatus =  new ParseReturnValue(response_letzterStatus);
+
+            if (!val_letzterStatus.dbdml_return)
+            {
+                if(val_letzterStatus.dbdml_errormsg=='')
+                    alert(response_letzterStatus);
+                else
+                    alert(val_letzterStatus.dbdml_errormsg);
+            }
+            else
+            {
+                var letzterStatus = val_letzterStatus.dbdml_data;
+            }
+
+            // Vertragsstatus setzen
+            // * wenn Gesamtkosten im Lehrauftrag nicht gleich Betrag im Vertrag ist ODER
+            //   wenn Semesterstunden im Lehrauftrag nicht gleich Stunden im Vertrag:
+            //   dann: Status 'geändert' hardcoden
+            if(gesamtkosten != parseFloat(betrag) || semesterstunden != vertragsstunden)
+            {
+                vertragsstatus = 'Geändert';
+                document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-label-vertragsstatus').setAttribute("style", "font-weight: bold")
+            }
+            // * ansonsten Vertragsstatus zeigen
+            else
+            {
+                vertragsstatus = letzterStatus;
+            }
+
+            // Uppercase status
+            vertragsstatus = vertragsstatus.charAt(0).toUpperCase() + vertragsstatus.slice(1);
+
+            /**
+             * Stornierung
+             * Nur wenn Vertragsstatus 'akzeptiert' ist:
+             * - button Stornierung aktivieren
+             * - tooltip ausblenden
+             * - Felder zur Bearbeitung von LektorInnendaten deaktivieren
+             */
+            if(letzterStatus == 'akzeptiert')
+            {
+                // Semesterstunden und Stundensatz disablen
+                document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-textbox-semesterstunden').disabled= true;
+                document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-textbox-stundensatz').disabled= true;
+
+                // Tooltip für Semesterstunden und Stundensatz
+                document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-textbox-semesterstunden').setAttribute("tooltiptext",
+                    "Änderung nur nach Stornierung des Vertrags möglich.");
+                document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-textbox-stundensatz').setAttribute("tooltiptext",
+                    "Änderung nur nach Stornierung des Vertrags möglich.");
+            }
+        }
+        // Wenn kein Vertrag vorhanden
+        else {
+            vertragsstatus = 'Noch kein Vertrag';
+            vertragsstunden = '-';
+            vertragsstunden_studiensemester_kurzbz = '-';
+        }
+
+        // Felder befüllen
+        document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-label-vertragsstatus').value = vertragsstatus;
+        document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-label-vertragsstunden').value = vertragsstunden;
+        document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-label-vertragsstunden_studiensemester_kurzbz').value = vertragsstunden_studiensemester_kurzbz;
+        document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-label-vertrag_id').value = vertrag_id;
+    }
+}
+
+// ****
+// * Storniert einen Vertrag
+// ****
+function VertragStornieren(){
+
+    var result = confirm("Möchten Sie den Vertrag wirklich stornieren?");
+
+    if (result == true) {
+
+        var vertrag_id = document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-label-vertrag_id').value;
+        var mitarbeiter_uid = document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-menulist-lektor').value;
+
+        // Vertrag stornieren
+        var url_storniert = '<?php echo APP_ROOT ?>content/lvplanung/lehrveranstaltungDBDML.php';
+        var req_storniert = new phpRequest(url_storniert,'','');
+
+        req_storniert.add('type', 'cancelVertrag');
+        req_storniert.add('vertrag_id', vertrag_id);
+        req_storniert.add('mitarbeiter_uid', mitarbeiter_uid);
+
+        var response_storniert = req_storniert.executePOST();
+
+        var val_storniert =  new ParseReturnValue(response_storniert);
+
+        if (!val_storniert.dbdml_return)
+        {
+            if(val_storniert.dbdml_errormsg=='')
+                alert(response_storniert);
+            else
+                alert(val_storniert.dbdml_errormsg);
+        }
+        else
+        {
+            // Reiter wieder aufbauen
+            LeMitarbeiterAuswahl();
+        }
+    }
+
+
 }
 
 // ****
@@ -2076,22 +2257,22 @@ function LehrveranstaltungNotenAuswahl()
 	var col = tree.columns ? tree.columns["lehrveranstaltung-noten-tree-studiensemester_kurzbz"] : "lehrveranstaltung-noten-tree-studiensemester_kurzbz";
 	var studiensemester_kurzbz=tree.view.getCellText(tree.currentIndex,col);
 
-	//Daten holen
-	var url = '<?php echo APP_ROOT ?>rdf/zeugnisnote.rdf.php?lehrveranstaltung_id='+lehrveranstaltung_id+'&uid='+student_uid+'&studiensemester_kurzbz='+studiensemester_kurzbz+'&'+gettimestamp();
-
-	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].
-                   getService(Components.interfaces.nsIRDFService);
+    var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].
+    getService(Components.interfaces.nsIRDFService);
 
     var dsource = rdfService.GetDataSourceBlocking(url);
 
-	var subject = rdfService.GetResource("http://www.technikum-wien.at/zeugnisnote/" + lehrveranstaltung_id+'/'+student_uid+'/'+studiensemester_kurzbz);
+    var subject = rdfService.GetResource("http://www.technikum-wien.at/zeugnisnote/" + lehrveranstaltung_id+'/'+student_uid+'/'+studiensemester_kurzbz);
 
-	var predicateNS = "http://www.technikum-wien.at/zeugnisnote/rdf";
+    var predicateNS = "http://www.technikum-wien.at/zeugnisnote/rdf";
+
+    //Daten holen
+
+    note = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#note" ));
+    punkte = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#punkte" ));
 
 	//Daten holen
-
-	note = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#note" ));
-	punkte = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#punkte" ));
+	var url = '<?php echo APP_ROOT ?>rdf/zeugnisnote.rdf.php?lehrveranstaltung_id='+lehrveranstaltung_id+'&uid='+student_uid+'&studiensemester_kurzbz='+studiensemester_kurzbz+'&'+gettimestamp();
 
 	if(note=='')
 		note='9';
@@ -2375,6 +2556,8 @@ function LeMitarbeiterGesamtkosten()
 		document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-label-gesamtkosten').setAttribute("style",'color: red');
 	else
 		document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-label-gesamtkosten').setAttribute("style",'color: black');
+
+	return gesamtkosten;
 }
 
 /*
