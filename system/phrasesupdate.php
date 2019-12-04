@@ -4234,7 +4234,47 @@ When on hold, the date is only a reminder.',
                 'insertvon' => 'system'
             )
         )
-    )
+    ),
+	array(
+		'app' => 'core',
+		'category' => 'account',
+		'phrase' => 'missingParameters',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Bitte geben Sie Benutzername, Code und Passwort ein',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Please enter username, code and password',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'account',
+		'phrase' => 'wrongActivationCode',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Der angegebene Aktivierungscode ist falsch',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'The provided activation code is wrong',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	)
 );
 
 
