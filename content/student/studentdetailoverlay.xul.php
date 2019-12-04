@@ -559,14 +559,6 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 								class="sortDirectionIndicator"
 								sort="rdf:http://www.technikum-wien.at/prestudentrolle/rdf#statusgrund" />
 							<splitter class="tree-splitter"/>
-							<!--<treecol id="student-prestudent-tree-rolle-slv_verband" label="Verband" flex="1" hidden="false" persist="hidden, width, ordinal"
-									 class="sortDirectionIndicator"
-									 sort="rdf:http://www.technikum-wien.at/prestudentrolle/rdf#slv_verband" />
-							<splitter class="tree-splitter"/>
-							<treecol id="student-prestudent-tree-rolle-slv_gruppe" label="Gruppe" flex="1" hidden="false" persist="hidden, width, ordinal"
-									 class="sortDirectionIndicator"
-									 sort="rdf:http://www.technikum-wien.at/prestudentrolle/rdf#slv_gruppe" />
-							<splitter class="tree-splitter"/>-->
 						</treecols>
 
 						<template>
