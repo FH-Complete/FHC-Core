@@ -3449,6 +3449,20 @@ if(!$result = @$db->db_query("SELECT 1 FROM fue.tbl_projekttyp LIMIT 1"))
 		echo '<br>fue.tbl_projekttyp hinzugefuegt.';
 }
 
+// Add new webservice type in system.tbl_webservicetyp
+if ($result = @$db->db_query("SELECT 1 FROM system.tbl_webservicetyp WHERE webservicetyp_kurzbz = 'API';"))
+{
+	if ($db->db_num_rows($result) == 0)
+	{
+		$qry = "INSERT INTO system.tbl_webservicetyp(webservicetyp_kurzbz, beschreibung) VALUES('API', 'Cronjob');";
+
+		if (!$db->db_query($qry))
+			echo '<strong>system.tbl_webservicetyp '.$db->db_last_error().'</strong><br>';
+		else
+			echo ' system.tbl_webservicetyp: Added webservice type "API"<br>';
+	}
+}
+
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
 
