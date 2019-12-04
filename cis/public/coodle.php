@@ -158,7 +158,9 @@ if (isset($_POST['auswahl_termin']))
 								</div>';
 			}
 			else
+			{
 				$saveOk = true;
+			}
 
 			$coodle_status = new coodle();
 			$coodle_status->load($coodle_id);
@@ -283,6 +285,7 @@ if (isset($_GET['resend']))
 				$(this).remove();
 			});
 		}, 1500);
+
 	</script>
 	<style type="text/css">
 
@@ -465,342 +468,417 @@ if (isset($_GET['resend']))
 
 		if (!isset($_GET['zugangscode']))
 		{
-			echo "<a href='".APP_ROOT."cis/private/coodle/uebersicht.php'><< ".$p->t('coodle/zurueckZurUebersicht')."</a>";
+			echo '<a href="'.APP_ROOT.'cis/private/coodle/uebersicht.php" class="btn btn-default" role="button">'.$p->t('coodle/zurueckZurUebersicht').'</a>';
 			echo '<br><br>';
 		}
-		echo '<div id="wrapper">';
 
-		$coodle_help = new coodle();
-		$coodle_help->load($coodle_id);
-
-		$alt = strtotime($coodle_help->insertamum);
-
-		$differenz = time() - $alt;
-		$differenz = $differenz / 86400;
-		$benutzer = new benutzer();
-		$benutzer->load($coodle->ersteller_uid);
-		// $ersteller_name = trim($benutzer->titelpre.' '.$benutzer->vorname.' '.$benutzer->nachname.' '.$benutzer->titelpost);
-		$ersteller_name = trim($benutzer->vorname.' '.$benutzer->nachname);
-		echo '<h4>'.$coodle->titel.'</h4>';
-		$erstellt = array(
-			$ersteller_name,
-			round($differenz)
-		);
-		echo '<span style="color: #555555">'.$p->t('coodle/erstelltVon', $erstellt).'</span><br>';
-		echo '<span style="color: #555555">'.$p->t('coodle/dauer').': '.$coodle->dauer.' min.</span><br><br>';
-
-		echo $coodle->beschreibung;
-
-		echo '</div>';
-
-		if ($abgeschlossen)
+		if ($saveOk === true)
 		{
-			$datum = new datum();
-			$coodle_abgeschlossen = new coodle();
-			$termin_id = $coodle_abgeschlossen->getTerminAuswahl($coodle_id);
-			$coodle_abgeschlossen->loadTermin($termin_id);
-			echo '<br><div class="abgeschlossen">'.$p->t('coodle/umfrageAbgeschlossen', array(
-					substr($tagbez[$sprache_index][$datum->formatDatum($coodle_abgeschlossen->datum, 'N')], 0, 2).', '.
-					$datum->formatDatum($coodle_abgeschlossen->datum, 'd.m.Y').' '.
-					$datum->formatDatum($coodle_abgeschlossen->uhrzeit, 'H:i')
-				)).'</div>';
+			echo '
+				<div class="alert alert-success" id="success-alert2" style="width: 800px">
+					<strong>'.$p->t('global/erfolgreichgespeichert').'</strong>
+				</div>
+				<div>
+					<a href="'.$_SERVER['PHP_SELF'].'?coodle_id='.$coodle_id.'" class="btn btn-info" role="button">'.$p->t('coodle/zurueckZurUmfrage').'</a>
+				</div>';
 		}
-
-		echo '<br>
-<div>';
-
-		$coodle_ressourcen = new coodle();
-		$coodle_ressourcen->getRessourcen($coodle_id);
-		$mailadressen = '?subject=Coodle%20Umfrage%20'.htmlspecialchars($coodle->titel).'&amp;bcc=';
-
-		foreach ($coodle_ressourcen->result as $ressource)
+		else
 		{
-			$name = '';
+			echo '<div id="wrapper">';
+
+			$coodle_help = new coodle();
+			$coodle_help->load($coodle_id);
+
+			$alt = strtotime($coodle_help->insertamum);
+
+			$differenz = time() - $alt;
+			$differenz = $differenz / 86400;
 			$benutzer = new benutzer();
+			$benutzer->load($coodle->ersteller_uid);
+			// $ersteller_name = trim($benutzer->titelpre.' '.$benutzer->vorname.' '.$benutzer->nachname.' '.$benutzer->titelpost);
+			$ersteller_name = trim($benutzer->vorname.' '.$benutzer->nachname);
+			echo '<h4>'.$coodle->titel.'</h4>';
+			$erstellt = array(
+				$ersteller_name,
+				round($differenz)
+			);
+			echo '<span style="color: #555555">'.$p->t('coodle/erstelltVon', $erstellt).'</span><br>';
+			echo '<span style="color: #555555">'.$p->t('coodle/dauer').': '.$coodle->dauer.' min.</span><br><br>';
 
-			// wenn uid gesetzt ist nimm uid
-			if ($ressource->uid != '')
+			echo $coodle->beschreibung;
+
+			echo '</div>';
+
+			if ($abgeschlossen)
 			{
-				$benutzer->load($ressource->uid);
-				// $name .= ($benutzer->titelpre!='')?$benutzer->titelpre.' ':'';
-				$name .= $benutzer->vorname.' ';
-				$name .= $benutzer->nachname.' ';
-				// $name .= $benutzer->titelpost;
-
-				$mailadressen .= $ressource->uid.'@'.DOMAIN.';';
-
-				$ressource->anzeigename = $name;
-				$ressource->vorname = $benutzer->vorname;
-				$ressource->nachname = $benutzer->nachname;
+				$datum = new datum();
+				$coodle_abgeschlossen = new coodle();
+				$termin_id = $coodle_abgeschlossen->getTerminAuswahl($coodle_id);
+				$coodle_abgeschlossen->loadTermin($termin_id);
+				echo '<br><div class="abgeschlossen">'.$p->t('coodle/umfrageAbgeschlossen', array(
+						substr($tagbez[$sprache_index][$datum->formatDatum($coodle_abgeschlossen->datum, 'N')], 0, 2).', '.
+						$datum->formatDatum($coodle_abgeschlossen->datum, 'd.m.Y').' '.
+						$datum->formatDatum($coodle_abgeschlossen->uhrzeit, 'H:i')
+					)).'</div>';
 			}
 
-			// wenn uid nicht gesetzt ist nimm zugangscode
-			if ($ressource->zugangscode != '' && $ressource->uid == '')
+			echo '<br>
+			<div>';
+
+			$coodle_ressourcen = new coodle();
+			$coodle_ressourcen->getRessourcen($coodle_id);
+			$mailadressen = '?subject=Coodle%20Umfrage%20'.htmlspecialchars($coodle->titel).'&amp;bcc=';
+
+			foreach ($coodle_ressourcen->result as $ressource)
 			{
-				$name = $ressource->name;
-				$ressource->anzeigename = $name;
-				$ressource->vorname = $name;
-				$ressource->nachname = $name;
+				$name = '';
+				$benutzer = new benutzer();
 
-				$mailadressen .= ';'.$ressource->email;
-			}
-		}
-
-		// alle termine der coodle umfrage holen
-		$coodle_termine = new coodle();
-		$coodle_termine->getTermine($coodle_id);
-
-		$datum = new datum();
-		$datum_colspan = '';
-
-		echo "<div id='coodle_content' >
-					<form action='' method='POST'>
-
-				<table class='table-bordered'>
-				<tr><td></td>";
-		// Für Colspan bei Datum
-		$max_colspan = array();
-		foreach ($coodle_termine->result as $termin)
-		{
-			$max_colspan[] .= $termin->datum;
-		}
-
-		foreach ($coodle_termine->result as $termin)
-		{
-			$class_auswahl = 'normal';
-			$time = strtotime($termin->uhrzeit);
-			$coodle_auswahl = new coodle();
-
-			// Falls es schon eine Auswahl gibt - hervorheben
-			if ($coodle_auswahl->checkTerminAuswahl($coodle_id, $termin->coodle_termin_id))
-				$class_auswahl = 'auswahl';
-
-			// Colspan für Datum berechnen
-			$count = array_count_values($max_colspan);
-			$colspan = $count[$termin->datum];
-
-			if ($datum_colspan != $termin->datum && $termin->datum != '1900-01-01')
-				echo "<th colspan='$colspan' class='".$class_auswahl."' style='text-align: center'>
-				<span style='color: #71787D'>".substr($monatsname[$sprache_index][$datum->formatDatum($termin->datum, 'n') - 1], 0, 3)."</span><br>
-				<span style='font-size: x-large'>".$datum->formatDatum($termin->datum, 'd')."</span><br>
-				<span style='color: #71787D'>".substr($tagbez[$sprache_index][$datum->formatDatum($termin->datum, 'N')], 0, 2)."</span>
-				</th>";
-
-			$datum_colspan = $termin->datum;
-		}
-		if ($ersteller)
-			echo '<th></th>';
-		echo "</tr><tr>";
-		echo '<td class="normal">';
-		if ($ersteller && $abgeschlossen)
-		{
-			echo '<a href="mailto:'.$mailadressen.'" title="Mail an alle schicken"><span class="glyphicon glyphicon-envelope"></span></a>';
-		}
-		echo '</td>';
-
-		foreach ($coodle_termine->result as $termin)
-		{
-			$class_auswahl = 'normal_uhrzeit';
-			$time = strtotime($termin->uhrzeit);
-			// Endzeit berechnen
-			$ende = $time + ($coodle->dauer * 60);
-
-			$coodle_auswahl = new coodle();
-
-			// Falls es schon eine Auswahl gibt - hervorheben
-			if ($coodle_auswahl->checkTerminAuswahl($coodle_id, $termin->coodle_termin_id))
-				$class_auswahl = 'auswahl_uhrzeit';
-
-			if ($termin->datum != '1900-01-01')
-				echo "<th class='".$class_auswahl."'>".date('H:i', $time)." -<br>".date('H:i', $ende)."&nbsp;&nbsp;</th>";
-			else
-				echo '<th class="'.$class_auswahl.'">'.$p->t('coodle/keinTerminMoeglich').'</th>';
-		}
-		echo "</tr>";
-
-		// Sortiert die Ressourcen alphabetisch nach anzeigename
-		function sortRessourcen($a, $b)
-		{
-			return strcmp($a->nachname.''.$a->vorname, $b->nachname.''.$b->vorname);
-		}
-
-		usort($coodle_ressourcen->result, "sortRessourcen");
-
-		$owner = false;
-		// ressourcen durchlaufen
-		foreach ($coodle_ressourcen->result as $ressource)
-		{
-			$owner = false;
-			// Ist der User ident mit einer Ressource
-			if (isset($_GET['zugangscode']) && $_GET['zugangscode'] == $ressource->zugangscode)
-				$owner = true;
-			if (!isset($_GET['zugangscode']) && $ressource->uid == $uid)
-				$owner = true;
-
-			if ($coodle_help->teilnehmer_anonym && !$owner)
-				continue;
-			else
-			{
-
-				// Ort-Ressourcen ueberspringen
-				if ($ressource->ort_kurzbz != '')
-					continue;
-
-				$class = 'normal';
-				// eigene Reihe farbig hervorheben
-				if ($owner)
-					$class = 'owner';
-				// Bei anonymen TeilnehmerInnen entfaellt das Hervorheben
-				if ($coodle_help->teilnehmer_anonym)
-					$class = 'normal';
-
-				echo "<tr class='".$class."'><td class='".$class."'>".$ressource->anzeigename."</td>";
-
-				$termin_datum = '';
-				$disabled = false;
-				$checked = false;
-
-				$coodle_ressource = new coodle();
-				if (isset($_GET['zugangscode']))
+				// wenn uid gesetzt ist nimm uid
+				if ($ressource->uid != '')
 				{
-					$coodle_ressource->getRessourceFromUser($coodle_id, '', $_GET['zugangscode']);
-					if ($ressource->coodle_ressource_id != $coodle_ressource->coodle_ressource_id)
-						$disabled = true;
+					$benutzer->load($ressource->uid);
+					// $name .= ($benutzer->titelpre!='')?$benutzer->titelpre.' ':'';
+					$name .= $benutzer->vorname.' ';
+					$name .= $benutzer->nachname.' ';
+					// $name .= $benutzer->titelpost;
+
+					$mailadressen .= $ressource->uid.'@'.DOMAIN.';';
+
+					$ressource->anzeigename = $name;
+					$ressource->vorname = $benutzer->vorname;
+					$ressource->nachname = $benutzer->nachname;
+				}
+
+				// wenn uid nicht gesetzt ist nimm zugangscode
+				if ($ressource->zugangscode != '' && $ressource->uid == '')
+				{
+					$name = $ressource->name;
+					$ressource->anzeigename = $name;
+					$ressource->vorname = $name;
+					$ressource->nachname = $name;
+
+					$mailadressen .= ';'.$ressource->email;
+				}
+			}
+
+			// alle termine der coodle umfrage holen
+			$coodle_termine = new coodle();
+			$coodle_termine->getTermine($coodle_id);
+
+			$datum = new datum();
+			$datum_colspan = '';
+
+			echo "<div id='coodle_content' >
+						<form action='' method='POST'>
+	
+					<table class='table-bordered'>
+					<tr><td></td>";
+			// Für Colspan bei Datum
+			$max_colspan = array();
+			foreach ($coodle_termine->result as $termin)
+			{
+				$max_colspan[] .= $termin->datum;
+			}
+
+			foreach ($coodle_termine->result as $termin)
+			{
+				$class_auswahl = 'normal';
+				$time = strtotime($termin->uhrzeit);
+				$coodle_auswahl = new coodle();
+
+				// Falls es schon eine Auswahl gibt - hervorheben
+				if ($coodle_auswahl->checkTerminAuswahl($coodle_id, $termin->coodle_termin_id))
+				{
+					$class_auswahl = 'auswahl';
+				}
+
+				// Colspan für Datum berechnen
+				$count = array_count_values($max_colspan);
+				$colspan = $count[$termin->datum];
+
+				if ($datum_colspan != $termin->datum && $termin->datum != '1900-01-01')
+				{
+					echo "<th colspan='$colspan' class='".$class_auswahl."' style='text-align: center'>
+					<span style='color: #71787D'>".substr($monatsname[$sprache_index][$datum->formatDatum($termin->datum, 'n') - 1], 0, 3)."</span><br>
+					<span style='font-size: x-large'>".$datum->formatDatum($termin->datum, 'd')."</span><br>
+					<span style='color: #71787D'>".substr($tagbez[$sprache_index][$datum->formatDatum($termin->datum, 'N')], 0, 2)."</span>
+					</th>";
+				}
+
+				$datum_colspan = $termin->datum;
+			}
+			if ($ersteller)
+			{
+				echo '<th></th>';
+			}
+			echo "</tr><tr>";
+			echo '<td class="normal">';
+			if ($ersteller && $abgeschlossen)
+			{
+				echo '<a href="mailto:'.$mailadressen.'" title="Mail an alle schicken"><span class="glyphicon glyphicon-envelope"></span></a>';
+			}
+			echo '</td>';
+
+			foreach ($coodle_termine->result as $termin)
+			{
+				$class_auswahl = 'normal_uhrzeit';
+				$time = strtotime($termin->uhrzeit);
+				// Endzeit berechnen
+				$ende = $time + ($coodle->dauer * 60);
+
+				$coodle_auswahl = new coodle();
+
+				// Falls es schon eine Auswahl gibt - hervorheben
+				if ($coodle_auswahl->checkTerminAuswahl($coodle_id, $termin->coodle_termin_id))
+				{
+					$class_auswahl = 'auswahl_uhrzeit';
+				}
+
+				if ($termin->datum != '1900-01-01')
+				{
+					echo "<th class='".$class_auswahl."'>".date('H:i', $time)." -<br>".date('H:i', $ende)."&nbsp;&nbsp;</th>";
 				}
 				else
 				{
-					$coodle_ressource->getRessourceFromUser($coodle_id, $uid);
-					if ($ressource->coodle_ressource_id != $coodle_ressource->coodle_ressource_id)
-						$disabled = true;
+					echo '<th class="'.$class_auswahl.'">'.$p->t('coodle/keinTerminMoeglich').'</th>';
+				}
+			}
+			echo "</tr>";
+
+			// Sortiert die Ressourcen alphabetisch nach anzeigename
+			function sortRessourcen($a, $b)
+			{
+				return strcmp($a->nachname.''.$a->vorname, $b->nachname.''.$b->vorname);
+			}
+
+			usort($coodle_ressourcen->result, "sortRessourcen");
+
+			$owner = false;
+			// ressourcen durchlaufen
+			foreach ($coodle_ressourcen->result as $ressource)
+			{
+				$owner = false;
+				// Ist der User ident mit einer Ressource
+				if (isset($_GET['zugangscode']) && $_GET['zugangscode'] == $ressource->zugangscode)
+				{
+					$owner = true;
+				}
+				if (!isset($_GET['zugangscode']) && $ressource->uid == $uid)
+				{
+					$owner = true;
 				}
 
-				if ($abgeschlossen)
-					$disabled = true;
-
-				// termine zu ressourcen anzeigen
-				foreach ($coodle_termine->result as $termin)
+				if ($coodle_help->teilnehmer_anonym && !$owner)
 				{
+					continue;
+				}
+				else
+				{
+
+					// Ort-Ressourcen ueberspringen
+					if ($ressource->ort_kurzbz != '')
+					{
+						continue;
+					}
+
+					$class = 'normal';
+					// eigene Reihe farbig hervorheben
+					if ($owner)
+					{
+						$class = 'owner';
+					}
+					// Bei anonymen TeilnehmerInnen entfaellt das Hervorheben
+					if ($coodle_help->teilnehmer_anonym)
+					{
+						$class = 'normal';
+					}
+
+					echo "<tr class='".$class."'><td class='".$class."'>".$ressource->anzeigename."</td>";
+
+					$termin_datum = '';
+					$disabled = false;
 					$checked = false;
-					$style = '';
-					if ($coodle_termine->checkTermin($termin->coodle_termin_id, $ressource->coodle_ressource_id))
-						$checked = true;
 
-					if ($termin_datum != '' && $termin_datum != $termin->datum)
-						$style = 'style="border-left: 1px solid #DCDDDF;"';
-
-					if ($coodle_help->termine_anonym && !$owner && !$ersteller)
-						echo "<td class='normal' align='center'></td>";
+					$coodle_ressource = new coodle();
+					if (isset($_GET['zugangscode']))
+					{
+						$coodle_ressource->getRessourceFromUser($coodle_id, '', $_GET['zugangscode']);
+						if ($ressource->coodle_ressource_id != $coodle_ressource->coodle_ressource_id)
+						{
+							$disabled = true;
+						}
+					}
 					else
 					{
-						if ($disabled)
+						$coodle_ressource->getRessourceFromUser($coodle_id, $uid);
+						if ($ressource->coodle_ressource_id != $coodle_ressource->coodle_ressource_id)
 						{
-							if ($checked)
-								echo '<td class="'.$class.'" align="center" '.$style.'><span class="glyphicon glyphicon-ok"></span></td>';
-							else
-								echo '<td class="'.$class.'" align="center" '.$style.'></td>';
-						}
-						else
-						{
-							// Der 01.01.1900 wird fuer "Keine Auswahl" verwendet. Beim anklicken der Checkbox werden alle anderen Checkboxen deaktiviert
-							echo '	<td class="'.$class.'" align="center" '.$style.'>
-								<div class="checkbox">
-									<label style="font-size: 1.5em; padding-left: 10px">
-										<input  type="checkbox" 
-												value="" 
-												'.($checked ? 'checked="checked"' : '').'
-												'.($termin->datum == '1900-01-01' ? 'id="disableCheckboxes"' : '').'
-												name="check_'.$ressource->coodle_ressource_id.'_'.$termin->coodle_termin_id.'"
-										>
-										<span class="cr" '.($termin->datum == '1900-01-01' ? 'style="background-color: #F2DEDE; border-color: #ebccd1;"' : '').'>
-											<span class="cr-icon glyphicon glyphicon-ok"></span>
-										</span>
-									</label>
-								</div>
-							</td>';
+							$disabled = true;
 						}
 					}
 
-					$termin_datum = $termin->datum;
+					if ($abgeschlossen)
+					{
+						$disabled = true;
+					}
+
+					// termine zu ressourcen anzeigen
+					foreach ($coodle_termine->result as $termin)
+					{
+						$checked = false;
+						$style = '';
+						if ($coodle_termine->checkTermin($termin->coodle_termin_id, $ressource->coodle_ressource_id))
+						{
+							$checked = true;
+						}
+
+						if ($termin_datum != '' && $termin_datum != $termin->datum)
+						{
+							$style = 'style="border-left: 1px solid #DCDDDF;"';
+						}
+
+						if ($coodle_help->termine_anonym && !$owner && !$ersteller)
+						{
+							echo "<td class='normal' align='center'></td>";
+						}
+						else
+						{
+							if ($disabled)
+							{
+								if ($checked)
+								{
+									echo '<td class="'.$class.'" align="center" '.$style.'><span class="glyphicon glyphicon-ok"></span></td>';
+								}
+								else
+								{
+									echo '<td class="'.$class.'" align="center" '.$style.'></td>';
+								}
+							}
+							else
+							{
+								// Der 01.01.1900 wird fuer "Keine Auswahl" verwendet. Beim anklicken der Checkbox werden alle anderen Checkboxen deaktiviert
+								echo '	<td class="'.$class.'" align="center" '.$style.'>
+									<div class="checkbox">
+										<label style="font-size: 1.5em; padding-left: 10px">
+											<input  type="checkbox" 
+													value="" 
+													'.($checked ? 'checked="checked"' : '').'
+													'.($termin->datum == '1900-01-01' ? 'id="disableCheckboxes"' : '').'
+													name="check_'.$ressource->coodle_ressource_id.'_'.$termin->coodle_termin_id.'"
+											>
+											<span class="cr" '.($termin->datum == '1900-01-01' ? 'style="background-color: #F2DEDE; border-color: #ebccd1;"' : '').'>
+												<span class="cr-icon glyphicon glyphicon-ok"></span>
+											</span>
+										</label>
+									</div>
+								</td>';
+							}
+						}
+
+						$termin_datum = $termin->datum;
+					}
+					if ($ersteller)
+					{
+						echo "<td></td>";
+					}
+					echo '</tr>';
 				}
-				if ($ersteller)
-					echo "<td></td>";
-				echo '</tr>';
 			}
-		}
 
-		$disabled = $abgeschlossen ? 'disabled' : '';
+			$disabled = $abgeschlossen ? 'disabled' : '';
 
-		// Counter fuer Anzahl der Auswahlen pro Termin
-		$counter_arr = array();
-		foreach ($coodle_termine->result as $termin)
-		{
-			$countTermine = new coodle();
-			$countTermine->countTermin($termin->coodle_termin_id);
-
-			$counter_arr[] = $countTermine->anzahl;
-		}
-		if ($coodle_help->teilnehmer_anonym)
-			echo '<tr><td></td><td class="infotext" colspan="200">Die TeilnehmerInnen dieser Umfrage sind anonym</td></tr>';
-		elseif ($coodle_help->termine_anonym)
-			echo '<tr><td></td><td class="infotext" colspan="200">Die Terminwahl dieser Umfrage erfolgt anonym</td></tr>';
-
-		echo '<tr><td class="normal" style="color: #71787D">Summe der Einträge</td>';
-		foreach ($coodle_termine->result as $termin)
-		{
-			$countTermine = new coodle();
-			$countTermine->countTermin($termin->coodle_termin_id);
-
-			if ($countTermine->anzahl == max($counter_arr))
-				echo '<td class="footer"><b>'.$countTermine->anzahl.'</b></td>';
-			else
-				echo '<td class="footer" style="color: #71787D">'.$countTermine->anzahl.'</td>';
-		}
-		if ($ersteller)
-			echo '<td align="center" class="normal">'.$p->t('coodle/keineAuswahl').'</td>';
-		echo "</tr>";
-
-		if ($ersteller)
-		{
-			// buttons für auswahl des endgültigen termins
-			echo '<tr><td class="normal" style="background-color: #d9edf7">'.$p->t('coodle/auswahlEndtermin').'</td>';
+			// Counter fuer Anzahl der Auswahlen pro Termin
+			$counter_arr = array();
 			foreach ($coodle_termine->result as $termin)
 			{
-				$checked = ($termin->auswahl) ? 'checked' : '';
-				if ($termin->datum != '1900-01-01')
-					echo '<td align="center" style="background-color: #d9edf7"><input type="radio" onclick="showInfotext();" name="auswahl_termin" '.$checked.' '.$disabled.' value='.$termin->coodle_termin_id.'></td>';
-				else
-					echo '<td align="center" style="background-color: #d9edf7"></td>';
-			}
-			echo '<td align="center" style="background-color: #d9edf7"><input type="radio" onclick="hideInfotext();" name="auswahl_termin" '.$disabled.' value=""></td>';
-			echo "</tr>";
-		}
+				$countTermine = new coodle();
+				$countTermine->countTermin($termin->coodle_termin_id);
 
-		echo '	<tr><td id="infotext" class="infotext" style="display: none" colspan="20">'.$p->t('coodle/auswahlHinweis').'</td></tr>';
-		echo '</td></tr>
-			</table>';
-		echo '<br><input type="submit" class="btn btn-success '.$disabled.'" value="'.$p->t('global/speichern').'" name="save" '.$disabled.'>';
+				$counter_arr[] = $countTermine->anzahl;
+			}
+			if ($coodle_help->teilnehmer_anonym)
+			{
+				echo '<tr><td></td><td class="infotext" colspan="200">Die TeilnehmerInnen dieser Umfrage sind anonym</td></tr>';
+			}
+			elseif ($coodle_help->termine_anonym)
+			{
+				echo '<tr><td></td><td class="infotext" colspan="200">Die Terminwahl dieser Umfrage erfolgt anonym</td></tr>';
+			}
+
+			echo '<tr><td class="normal" style="color: #71787D">Summe der Einträge</td>';
+			foreach ($coodle_termine->result as $termin)
+			{
+				$countTermine = new coodle();
+				$countTermine->countTermin($termin->coodle_termin_id);
+
+				if ($countTermine->anzahl == max($counter_arr))
+				{
+					echo '<td class="footer"><b>'.$countTermine->anzahl.'</b></td>';
+				}
+				else
+				{
+					echo '<td class="footer" style="color: #71787D">'.$countTermine->anzahl.'</td>';
+				}
+			}
+			if ($ersteller)
+			{
+				echo '<td align="center" class="normal">'.$p->t('coodle/keineAuswahl').'</td>';
+			}
+			echo "</tr>";
+
+			if ($ersteller)
+			{
+				// buttons für auswahl des endgültigen termins
+				echo '<tr><td class="normal" style="background-color: #d9edf7">'.$p->t('coodle/auswahlEndtermin').'</td>';
+				foreach ($coodle_termine->result as $termin)
+				{
+					$checked = ($termin->auswahl) ? 'checked' : '';
+					if ($termin->datum != '1900-01-01')
+					{
+						echo '<td align="center" style="background-color: #d9edf7"><input type="radio" onclick="showInfotext();" name="auswahl_termin" '.$checked.' '.$disabled.' value='.$termin->coodle_termin_id.'></td>';
+					}
+					else
+					{
+						echo '<td align="center" style="background-color: #d9edf7"></td>';
+					}
+				}
+				echo '<td align="center" style="background-color: #d9edf7"><input type="radio" onclick="hideInfotext();" name="auswahl_termin" '.$disabled.' value=""></td>';
+				echo "</tr>";
+			}
+
+			echo '	<tr><td id="infotext" class="infotext" style="display: none" colspan="20">'.$p->t('coodle/auswahlHinweis').'</td></tr>';
+			echo '</td></tr>
+				</table>';
+			if ($saveOk === true)
+			{
+				echo '
+					<div class="success" id="success-alert">
+						<strong>'.$p->t('global/erfolgreichgespeichert').'</strong>
+					</div>';
+			}
+			echo '<br><input type="submit" class="btn btn-success '.$disabled.'" value="'.$p->t('global/speichern').'" name="save" '.$disabled.'>';
+		}
 
 		// Benutzer mit CIS-Account können die Terminzusagen als iCal importieren
 		if (isset($uid) && $uid != '')
 		{
 			echo '<br><br><div class="alert alert-info" style="width: 800px">
-		<span class="glyphicon glyphicon-info-sign"></span>
-		Sie können ihre vorläufigen Terminzusagen in ihr Kalendersystem einbinden.<br>
-		Importieren Sie dazu die .ics-Datei aus folgendem Link in ihren Kalender:<br>
-		<a href="'.APP_ROOT.'cis/public/ical_coodle.php/'.$uid.'" target="_blank">
-		'.APP_ROOT.'cis/public/ical_coodle.php/'.$uid.'
-		</a>
-		<br><br>
-		Die Datei enthält ihre Terminzusagen aus <u>allen laufenden Umfragen</u> in anonymisierter Form.
-		</div>';
+			<span class="glyphicon glyphicon-info-sign"></span>
+			Sie können ihre vorläufigen Terminzusagen in ihr Kalendersystem einbinden.<br>
+			Importieren Sie dazu die .ics-Datei aus folgendem Link in ihren Kalender:<br>
+			<a href="'.APP_ROOT.'cis/public/ical_coodle.php/'.$uid.'" target="_blank">
+			'.APP_ROOT.'cis/public/ical_coodle.php/'.$uid.'
+			</a>
+			<br><br>
+			Die Datei enthält ihre Terminzusagen aus <u>allen laufenden Umfragen</u> in anonymisierter Form.
+			</div>';
 		}
 
 		if ($ersteller && $abgeschlossen)
+		{
 			echo '&nbsp;&nbsp;<input type="button" class="btn btn-success" onclick="window.location.href=\''.$_SERVER['PHP_SELF'].'?coodle_id='.$coodle_id.'&resend\'" value="'.$p->t('coodle/einladungNeuVerschicken').'">';
-		if ($saveOk === true)
-			echo '	<div class="success" id="success-alert">
-				<strong>'.$p->t('global/erfolgreichgespeichert').'</strong>
-			</div>';
+		}
 		echo '</form></div>';
 
 		echo '<br>'.$message;

@@ -64,4 +64,5 @@ $this->phrasen['coodle/dauerInfotext']='Wählen Sie hier die vermutliche Dauer d
 $this->phrasen['coodle/endeInfotext']='?';
 $this->phrasen['coodle/TerminInDerVergangenheit']='Dieser Termin liegt in der Vergangenheit und kann nicht gewählt werden';
 $this->phrasen['coodle/keinTerminMoeglich']='Kein Termin möglich';
+$this->phrasen['coodle/zurueckZurUmfrage']='Back to poll';
 ?>
