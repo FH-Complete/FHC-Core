@@ -107,12 +107,16 @@ elseif($oe_kurzbz!='')
 if($studiengang_kz!='') //Liste nach Studiengang
 {
 	$qry = "SELECT
-				tbl_lehrveranstaltung.kurzbz as kurzbz, tbl_lehrveranstaltung.bezeichnung as bezeichnung, tbl_lehrveranstaltung.lehrveranstaltung_id,
+				tbl_lehrveranstaltung.kurzbz as kurzbz, tbl_lehrveranstaltung.bezeichnung as bezeichnung,
+				tbl_lehrveranstaltung.lehrveranstaltung_id,
 				tbl_lehrveranstaltung.ects as ects, tbl_lehrveranstaltung.semesterstunden as semesterstunden,
-				lehrfach.kurzbz as lf_kurzbz, lehrfach.bezeichnung as lf_bezeichnung, tbl_lehreinheit.lehreinheit_id as lehreinheit_id,
-				tbl_lehreinheit.lehrform_kurzbz as lehrform_kurzbz, tbl_lehreinheitmitarbeiter.semesterstunden as lektor_semesterstunden,
-				tbl_lehreinheitmitarbeiter.stundensatz as lektor_stundensatz, tbl_lehreinheitmitarbeiter.faktor as lektor_faktor,
-				tbl_person.vorname, tbl_person.nachname, tbl_lehrveranstaltung.studiengang_kz, tbl_lehrveranstaltung.semester
+				lehrfach.kurzbz as lf_kurzbz, lehrfach.bezeichnung as lf_bezeichnung,
+				tbl_lehreinheit.lehreinheit_id as lehreinheit_id,
+				tbl_lehreinheit.lehrform_kurzbz as lehrform_kurzbz,
+				tbl_lehreinheitmitarbeiter.semesterstunden as lektor_semesterstunden,
+				tbl_lehreinheitmitarbeiter.stundensatz as lektor_stundensatz,
+				tbl_person.vorname, tbl_person.nachname, tbl_lehrveranstaltung.studiengang_kz,
+				tbl_lehrveranstaltung.semester
 			FROM
 				lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit, lehre.tbl_lehreinheitmitarbeiter,
 				lehre.tbl_lehrveranstaltung as lehrfach, public.tbl_benutzer, public.tbl_person
@@ -126,17 +130,25 @@ if($studiengang_kz!='') //Liste nach Studiengang
 				tbl_lehreinheit.studiensemester_kurzbz=".$db->db_add_param($semester_aktuell);
 	if($semester!='')
 		$qry.=" AND tbl_lehrveranstaltung.semester=".$db->db_add_param($semester, FHC_INTEGER);
-	$qry.=" ORDER BY tbl_lehrveranstaltung.semester, tbl_lehrveranstaltung.bezeichnung, tbl_lehrveranstaltung.lehrveranstaltung_id, tbl_lehreinheit.lehreinheit_id";
+	$qry.=" ORDER BY
+		tbl_lehrveranstaltung.semester,
+		tbl_lehrveranstaltung.bezeichnung,
+		tbl_lehrveranstaltung.lehrveranstaltung_id,
+		tbl_lehreinheit.lehreinheit_id";
 }
 elseif($mitarbeiter_uid!='') // Liste nach Mitarbeiter
 {
-$qry = "SELECT
-				tbl_lehrveranstaltung.kurzbz as kurzbz, tbl_lehrveranstaltung.bezeichnung as bezeichnung, tbl_lehrveranstaltung.lehrveranstaltung_id,
+	$qry = "SELECT
+				tbl_lehrveranstaltung.kurzbz as kurzbz,
+				tbl_lehrveranstaltung.bezeichnung as bezeichnung, tbl_lehrveranstaltung.lehrveranstaltung_id,
 				tbl_lehrveranstaltung.ects as ects, tbl_lehrveranstaltung.semesterstunden as semesterstunden,
-				lehrfach.kurzbz as lf_kurzbz, lehrfach.bezeichnung as lf_bezeichnung, tbl_lehreinheit.lehreinheit_id as lehreinheit_id,
-				tbl_lehreinheit.lehrform_kurzbz as lehrform_kurzbz, tbl_lehreinheitmitarbeiter.semesterstunden as lektor_semesterstunden,
-				tbl_lehreinheitmitarbeiter.stundensatz as lektor_stundensatz, tbl_lehreinheitmitarbeiter.faktor as lektor_faktor,
-				tbl_person.vorname, tbl_person.nachname, tbl_lehrveranstaltung.studiengang_kz, tbl_lehrveranstaltung.semester
+				lehrfach.kurzbz as lf_kurzbz, lehrfach.bezeichnung as lf_bezeichnung,
+				tbl_lehreinheit.lehreinheit_id as lehreinheit_id,
+				tbl_lehreinheit.lehrform_kurzbz as lehrform_kurzbz,
+				tbl_lehreinheitmitarbeiter.semesterstunden as lektor_semesterstunden,
+				tbl_lehreinheitmitarbeiter.stundensatz as lektor_stundensatz,
+				tbl_person.vorname, tbl_person.nachname, tbl_lehrveranstaltung.studiengang_kz,
+				tbl_lehrveranstaltung.semester
 			FROM
 				lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit, lehre.tbl_lehreinheitmitarbeiter,
 				lehre.tbl_lehrveranstaltung as lehrfach, public.tbl_benutzer, public.tbl_person
@@ -148,17 +160,25 @@ $qry = "SELECT
 				tbl_person.person_id=tbl_benutzer.person_id AND
 				tbl_lehreinheitmitarbeiter.mitarbeiter_uid=".$db->db_add_param($mitarbeiter_uid)." AND
 				tbl_lehreinheit.studiensemester_kurzbz=".$db->db_add_param($semester_aktuell);
-	$qry.=" ORDER BY tbl_lehrveranstaltung.semester, tbl_lehrveranstaltung.bezeichnung, tbl_lehrveranstaltung.lehrveranstaltung_id, tbl_lehreinheit.lehreinheit_id";
+	$qry.=" ORDER BY
+		tbl_lehrveranstaltung.semester,
+		tbl_lehrveranstaltung.bezeichnung,
+		tbl_lehrveranstaltung.lehrveranstaltung_id,
+		tbl_lehreinheit.lehreinheit_id";
 }
 elseif($oe_kurzbz!='') // Liste nach Organisationseinheit
 {
-$qry = "SELECT
-				tbl_lehrveranstaltung.kurzbz as kurzbz, tbl_lehrveranstaltung.bezeichnung as bezeichnung, tbl_lehrveranstaltung.lehrveranstaltung_id,
+	$qry = "SELECT
+				tbl_lehrveranstaltung.kurzbz as kurzbz,
+				tbl_lehrveranstaltung.bezeichnung as bezeichnung, tbl_lehrveranstaltung.lehrveranstaltung_id,
 				tbl_lehrveranstaltung.ects as ects, tbl_lehrveranstaltung.semesterstunden as semesterstunden,
-				lehrfach.kurzbz as lf_kurzbz, lehrfach.bezeichnung as lf_bezeichnung, tbl_lehreinheit.lehreinheit_id as lehreinheit_id,
-				tbl_lehreinheit.lehrform_kurzbz as lehrform_kurzbz, tbl_lehreinheitmitarbeiter.semesterstunden as lektor_semesterstunden,
-				tbl_lehreinheitmitarbeiter.stundensatz as lektor_stundensatz, tbl_lehreinheitmitarbeiter.faktor as lektor_faktor,
-				tbl_person.vorname, tbl_person.nachname, tbl_lehrveranstaltung.studiengang_kz, tbl_lehrveranstaltung.semester
+				lehrfach.kurzbz as lf_kurzbz, lehrfach.bezeichnung as lf_bezeichnung,
+				tbl_lehreinheit.lehreinheit_id as lehreinheit_id,
+				tbl_lehreinheit.lehrform_kurzbz as lehrform_kurzbz,
+				tbl_lehreinheitmitarbeiter.semesterstunden as lektor_semesterstunden,
+				tbl_lehreinheitmitarbeiter.stundensatz as lektor_stundensatz,
+				tbl_person.vorname, tbl_person.nachname, tbl_lehrveranstaltung.studiengang_kz,
+				tbl_lehrveranstaltung.semester
 			FROM
 				lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit, lehre.tbl_lehreinheitmitarbeiter,
 				lehre.tbl_lehrveranstaltung as lehrfach, public.tbl_benutzer, public.tbl_person
@@ -170,7 +190,12 @@ $qry = "SELECT
 				tbl_person.person_id=tbl_benutzer.person_id AND
 				lehrfach.oe_kurzbz=".$db->db_add_param($oe_kurzbz)." AND
 				tbl_lehreinheit.studiensemester_kurzbz=".$db->db_add_param($semester_aktuell);
-	$qry.=" ORDER BY tbl_lehrveranstaltung.studiengang_kz, tbl_lehrveranstaltung.semester, tbl_lehrveranstaltung.bezeichnung, tbl_lehrveranstaltung.lehrveranstaltung_id, tbl_lehreinheit.lehreinheit_id";
+	$qry.=" ORDER BY
+			tbl_lehrveranstaltung.studiengang_kz,
+			tbl_lehrveranstaltung.semester,
+			tbl_lehrveranstaltung.bezeichnung,
+			tbl_lehrveranstaltung.lehrveranstaltung_id,
+			tbl_lehreinheit.lehreinheit_id";
 }
 else
 	die('Fehlerhafte Parameteruebergabe');
@@ -248,10 +273,10 @@ if($result = $db->db_query($qry))
 		echo "<td align='right'>$row->lektor_semesterstunden</td>";
 		echo "<td>$gruppen</td>";
 		echo "<td>$row->nachname $row->vorname</td>";
-		echo "<td align='right'>".number_format(($row->lektor_stundensatz*$row->lektor_faktor*$row->lektor_semesterstunden),2,',','.')." €</td>";
+		echo "<td align='right'>".number_format(($row->lektor_stundensatz*$row->lektor_semesterstunden),2,',','.')." €</td>";
 		echo '<td>&nbsp;</td>';
 		echo '</tr>';
-		$kosten_lv +=($row->lektor_stundensatz*$row->lektor_faktor*$row->lektor_semesterstunden);
+		$kosten_lv +=($row->lektor_stundensatz*$row->lektor_semesterstunden);
 		$stunden_lv +=$row->lektor_semesterstunden;
 	}
 	$gesamtkosten_lva +=$kosten_lv;
@@ -273,15 +298,15 @@ if($studiengang_kz!='')
 	$qry = "SELECT
 				*
 			FROM
-				lehre.tbl_projektarbeit, lehre.tbl_lehreinheit, lehre.tbl_lehrveranstaltung, lehre.tbl_projektbetreuer, public.tbl_person
+				lehre.tbl_projektarbeit, lehre.tbl_lehreinheit, lehre.tbl_lehrveranstaltung,
+				lehre.tbl_projektbetreuer, public.tbl_person
 			WHERE
 				tbl_projektarbeit.lehreinheit_id=tbl_lehreinheit.lehreinheit_id AND
 				tbl_lehreinheit.lehrveranstaltung_id=tbl_lehrveranstaltung.lehrveranstaltung_id AND
 				tbl_projektarbeit.projektarbeit_id=tbl_projektbetreuer.projektarbeit_id AND
 				tbl_person.person_id=tbl_projektbetreuer.person_id AND
 				tbl_lehrveranstaltung.studiengang_kz=".$db->db_add_param($studiengang_kz, FHC_INTEGER)." AND
-				tbl_lehreinheit.studiensemester_kurzbz=".$db->db_add_param($semester_aktuell)." AND
-				(tbl_projektbetreuer.faktor*tbl_projektbetreuer.stundensatz*tbl_projektbetreuer.stunden)>0
+				tbl_lehreinheit.studiensemester_kurzbz=".$db->db_add_param($semester_aktuell)."
 				";
 
 	if($semester!='')
@@ -299,8 +324,7 @@ elseif($mitarbeiter_uid!='')
 				tbl_projektarbeit.projektarbeit_id=tbl_projektbetreuer.projektarbeit_id AND
 				tbl_person.person_id=tbl_projektbetreuer.person_id AND
 				tbl_projektbetreuer.person_id=".$db->db_add_param($mitarbeiter->person_id, FHC_INTEGER)." AND
-				tbl_lehreinheit.studiensemester_kurzbz=".$db->db_add_param($semester_aktuell)." AND
-				(tbl_projektbetreuer.faktor*tbl_projektbetreuer.stundensatz*tbl_projektbetreuer.stunden)>0
+				tbl_lehreinheit.studiensemester_kurzbz=".$db->db_add_param($semester_aktuell)."
 				";
 }
 elseif($oe_kurzbz!='')
@@ -308,7 +332,8 @@ elseif($oe_kurzbz!='')
 	$qry = "SELECT
 				*
 			FROM
-				lehre.tbl_projektarbeit, lehre.tbl_lehreinheit, lehre.tbl_lehrveranstaltung, lehre.tbl_projektbetreuer, public.tbl_person, lehre.tbl_lehrveranstaltung as lehrfach
+				lehre.tbl_projektarbeit, lehre.tbl_lehreinheit, lehre.tbl_lehrveranstaltung, lehre.tbl_projektbetreuer,
+				public.tbl_person, lehre.tbl_lehrveranstaltung as lehrfach
 			WHERE
 				tbl_projektarbeit.lehreinheit_id=tbl_lehreinheit.lehreinheit_id AND
 				tbl_lehreinheit.lehrveranstaltung_id=tbl_lehrveranstaltung.lehrveranstaltung_id AND
@@ -316,8 +341,7 @@ elseif($oe_kurzbz!='')
 				tbl_lehreinheit.lehrfach_id=lehrfach.lehrveranstaltung_id AND
 				tbl_person.person_id=tbl_projektbetreuer.person_id AND
 				tbl_lehreinheit.studiensemester_kurzbz=".$db->db_add_param($semester_aktuell)." AND
-				lehrfach.oe_kurzbz=".$db->db_add_param($oe_kurzbz)." AND
-				(tbl_projektbetreuer.faktor*tbl_projektbetreuer.stundensatz*tbl_projektbetreuer.stunden)>0
+				lehrfach.oe_kurzbz=".$db->db_add_param($oe_kurzbz)."
 				";
 }
 else
@@ -332,8 +356,6 @@ if($result = $db->db_query($qry))
 		echo '<tr>';
 		echo '<th>&nbsp;</th>';
 		echo "<th colspan='3'>Titel</th>";
-		//echo "<th>&nbsp;</th>";
-		//echo '<th>&nbsp;</th>';
 		echo "<th align='right'>Stunden</th>";
 		echo "<th>Student</th>";
 		echo "<th>Lektor</th>";
@@ -348,17 +370,15 @@ if($result = $db->db_query($qry))
 			echo '<tr class="liste1">';
 			echo '<td>&nbsp;</td>';
 			echo "<td colspan='3'>$row->titel</td>";
-			//echo "<td>&nbsp;</td>";
-			//echo '<td>&nbsp;</td>';
 			echo "<td align='right'>".number_format($row->stunden,2)."</td>";
 			$benutzer = new benutzer();
 			$benutzer->load($row->student_uid);
 			echo "<td>$benutzer->nachname $benutzer->vorname</td>";
 			echo "<td>$row->nachname $row->vorname</td>";
-			echo "<td align='right'>".number_format(($row->stundensatz*$row->faktor*$row->stunden),2,',','.')." €</td>";
+			echo "<td align='right'>".number_format(($row->stundensatz*$row->stunden),2,',','.')." €</td>";
 			echo '<td>&nbsp;</td>';
 			echo '</tr>';
-			$gesamtkosten_betreuung +=($row->stundensatz*$row->faktor*$row->stunden);
+			$gesamtkosten_betreuung +=($row->stundensatz*$row->stunden);
 			$stunden_betreuung+=$row->stunden;
 		}
 

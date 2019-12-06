@@ -96,7 +96,6 @@ foreach($addon_obj->result as $addon)
   <command id="menu-prefs-stpltable-stundenplandev:command" oncommand="stpltableChange('stundenplandev');"/>
   <command id="menu-prefs-kontofilterstg:command" oncommand="EinstellungenKontoFilterStgChange();"/>
   <command id="menu-prefs-number_displayed_past_studiensemester:command" oncommand="variableChangeValue('number_displayed_past_studiensemester');"/>
-  <command id="menu-statistic-koordinatorstunden:command" oncommand="StatistikPrintKoordinatorstunden();"/>
   <command id="menu-statistic-lehrauftraege:command" oncommand="StatistikPrintLehrauftraege();"/>
   <command id="menu-statistic-lvplanung:command" oncommand="StatistikPrintLVPlanung();"/>
   <command id="menu-statistic-lvplanungexcel:command" oncommand="StatistikPrintLVPlanungExcel();"/>
@@ -115,14 +114,12 @@ foreach($addon_obj->result as $addon)
   <command id="menu-statistic-substatistik-studentenprosemester-html:command" oncommand="StatistikPrintStudentenProSemester('');"/>
   <command id="menu-statistic-substatistik-alvsstatistik-excel:command" oncommand="StatistikPrintALVSStatistik('xls');"/>
   <command id="menu-statistic-substatistik-alvsstatistik-html:command" oncommand="StatistikPrintALVSStatistik('');"/>
-  <command id="menu-statistic-substatistik-lvplanunggesamtsj-excel:command" oncommand="StatistikPrintLvPlanungGesamtSJ();"/>
   <command id="menu-statistic-absolventenstatistik:command" oncommand="StatistikPrintAbsolventenstatistik();"/>
   <command id="menu-statistic-absolventenzahlen:command" oncommand="StatistikPrintAbsolventenZahlen();"/>
   <command id="menu-statistic-studentenstatistik:command" oncommand="StatistikPrintStudentenstatistik();"/>
   <command id="menu-statistic-oehbeitraege:command" oncommand="StatistikPrintOehBeitrag();"/>
   <command id="menu-statistic-mitarbeiterstatistik:command" oncommand="StatistikPrintMitarbeiterstatistik();"/>
   <command id="menu-statistic-studentendetails:command" oncommand="StatistikPrintStudentExportExtended();"/>
-  <command id="menu-statistic-lektorenstatistik:command" oncommand="StatistikPrintLektorenstatistik();"/>
   <command id="menu-statistic-stromanalyse:command" oncommand="StatistikPrintStromanalyse();"/>
   <command id="menu-dokumente-bewerberakt:command" oncommand="StudentPrintBewerberakt(event);"/>
   <command id="menu-dokumente-inskriptionsbestaetigung:command" oncommand="StudentPrintInskriptionsbestaetigung(event);"/>
@@ -317,12 +314,6 @@ foreach($addon_obj->result as $addon)
 			<menu id="menu-statistic-mitarbeiter" label="&menu-statistic-mitarbeiter.label;" accesskey="&menu-statistic-mitarbeiter.accesskey;">
 				<menupopup id="menu-statistic-mitarbeiter-popup">
 					<menuitem
-		               id        =  "menu-statistic-koordinatorstunden"
-		               key       =  "menu-statistic-koordinatorstunden:key"
-		               label     = "&menu-statistic-koordinatorstunden.label;"
-		               command   =  "menu-statistic-koordinatorstunden:command"
-		               accesskey = "&menu-statistic-koordinatorstunden.accesskey;"/>
-		            <menuitem
 		               id        =  "menu-statistic-lehrauftragsliste"
 		               key       =  "menu-statistic-lehrauftragsliste:key"
 		               label     = "&menu-statistic-lehrauftragsliste.label;"
@@ -422,23 +413,6 @@ foreach($addon_obj->result as $addon)
 				               accesskey = "&menu-statistic-substatistik-alvsstatistik-html.accesskey;"/>
 						</menupopup>
 					</menu>
-					<?php
-					if($rechte->isBerechtigt('admin'))
-					{
-						echo '
-						<menu id="menu-statistic-substatistik-lvplanunggesamtsj" label="&menu-statistic-substatistik-lvplanunggesamtsj.label;" accesskey="&menu-statistic-substatistik-lvplanunggesamtsj.accesskey;">
-							<menupopup id="menu-statistic-substatistik-lvplanunggesamtsj-popup">
-					             <menuitem
-					               id        =  "menu-statistic-substatistik-lvplanunggesamtsj-excel"
-					               key       =  "menu-statistic-substatistik-lvplanunggesamtsj-excel:key"
-					               label     = "&menu-statistic-substatistik-lvplanunggesamtsj-excel.label;"
-					               command   =  "menu-statistic-substatistik-lvplanunggesamtsj-excel:command"
-					               accesskey = "&menu-statistic-substatistik-lvplanunggesamtsj-excel.accesskey;"/>
-							</menupopup>
-						</menu>
-						';
-					}
-					?>
 					<menu id="menu-statistic-substatistik-bewerberstatistik" label="&menu-statistic-substatistik-bewerberstatistik.label;" accesskey="&menu-statistic-substatistik-bewerberstatistik.accesskey;">
 						<menupopup id="menu-statistic-substatistik-bewerberstatistik-popup">
 				             <menuitem
@@ -479,12 +453,6 @@ foreach($addon_obj->result as $addon)
 		               label     = "&menu-statistic-studentenstatistik.label;"
 		               command   =  "menu-statistic-studentenstatistik:command"
 		               accesskey = "&menu-statistic-studentenstatistik.accesskey;"/>
-					<menuitem
-		               id        =  "menu-statistic-lektorenstatistik"
-		               key       =  "menu-statistic-lektorenstatistik:key"
-		               label     = "&menu-statistic-lektorenstatistik.label;"
-		               command   =  "menu-statistic-lektorenstatistik:command"
-		               accesskey = "&menu-statistic-lektorenstatistik.accesskey;"/>
 					<menuitem
 		               id        =  "menu-statistic-mitarbeiterstatistik"
 		               key       =  "menu-statistic-mitarbeiterstatistik:key"
