@@ -33,24 +33,24 @@ require_once('../../include/mail.class.php');
 
 $stsem = new studiensemester();
 
-if(isset($_GET['stsem']))
+if (isset($_GET['stsem']))
 {
-	if(check_stsem($_GET['stsem']))
+	if (check_stsem($_GET['stsem']))
 		$semester_aktuell = $_GET['stsem'];
 	else
 		die('Studiensemester ist ungueltig');
 }
 else
-	$semester_aktuell  = $stsem->getaktorNext();
+	$semester_aktuell = $stsem->getaktorNext();
 
 //UID als Kommandozeilenparameter
-if(isset($_SERVER['argv']) && isset($_SERVER['argv'][1]) && !strstr($_SERVER['argv'][1],'='))
+if (isset($_SERVER['argv']) && isset($_SERVER['argv'][1]) && !strstr($_SERVER['argv'][1], '='))
 {
 	$oe_kurzbz = $_SERVER['argv'][1];
 }
 else
 {
-	if(isset($_GET['oe_kurzbz']))
+	if (isset($_GET['oe_kurzbz']))
 		$oe_kurzbz = $_GET['oe_kurzbz'];
 	else
 	{
@@ -61,7 +61,7 @@ else
 }
 
 $file = 'lehrauftragsliste.xls';
-$file = tempnam('/tmp','lehrauftragsliste_').'.xls';
+$file = tempnam('/tmp', 'lehrauftragsliste_').'.xls';
 
 // Creating a workbook
 echo 'Lehrauftragslisten werden erstellt. Bitte warten!<BR>';
@@ -72,10 +72,10 @@ $db = new basis_db();
 
 $stg = new studiengang();
 $stg->getStudiengaengeFromOe($oe_kurzbz);
-$stg_arr=array();
-if(count($stg->result)>0)
+$stg_arr = array();
+if (count($stg->result) > 0)
 {
-	foreach($stg->result as $row)
+	foreach ($stg->result as $row)
 	{
 		$stg_arr[] = $row->studiengang_kz;
 	}
@@ -105,16 +105,16 @@ $qry_stg = "SELECT distinct studiengang_kz, typ, kurzbz
 				) as foo
 				JOIN public.tbl_studiengang USING (studiengang_kz)
 				";
-if(count($stg_arr)>0)
-	$qry_stg.=" WHERE studiengang_kz in (".$db->db_implode4SQL($stg_arr).")";
+if (count($stg_arr) > 0)
+	$qry_stg .= " WHERE studiengang_kz in (".$db->db_implode4SQL($stg_arr).")";
 
-	$qry_stg.=" ORDER BY typ, kurzbz";
+	$qry_stg .= " ORDER BY typ, kurzbz";
 
 $liste_gesamt = array();
 
 $gesamt =& $workbook->addWorksheet('Gesamt');
 $gesamt->setInputEncoding('utf-8');
-$gesamtsheet_row=1;
+$gesamtsheet_row = 1;
 
 //Formate Definieren
 $format_bold =& $workbook->addFormat();
@@ -125,68 +125,70 @@ $format_colored =& $workbook->addFormat();
 $format_colored->setFgColor(10);
 
 $format_number_colored =& $workbook->addFormat();
-$format_number_colored->setNumFormat('0,0.00');
+$format_number_colored->setNumFormat('0, 0.00');
 //$format_number_colored->setNumFormat('0.00');
 $format_number_colored->setFgColor(10);
 
 $format_number =& $workbook->addFormat();
-$format_number->setNumFormat('0,0.00');
+$format_number->setNumFormat('0, 0.00');
 
 $format_number_bold =& $workbook->addFormat();
-$format_number_bold->setNumFormat('0,0.00');
+$format_number_bold->setNumFormat('0, 0.00');
 //$format_number_bold->setNumFormat('0.00');
 $format_number_bold->setBold();
 
 $format_normal = & $workbook->addFormat();
-if($result_stg = $db->db_query($qry_stg))
+if ($result_stg = $db->db_query($qry_stg))
 {
-	while($row_stg = $db->db_fetch_object($result_stg))
+	while ($row_stg = $db->db_fetch_object($result_stg))
 	{
 		//Studiengang laden
 		$studiengang = new studiengang($row_stg->studiengang_kz);
-		$studiengang_kz=$row_stg->studiengang_kz;
+		$studiengang_kz = $row_stg->studiengang_kz;
 
 		// Creating a worksheet
 		$worksheet =& $workbook->addWorksheet($studiengang->kuerzel);
 		$worksheet->setInputEncoding('utf-8');
 		//echo "Writing $studiengang->kuerzel ...".microtime()."<br>";
 
-		$i=0;
+		$i = 0;
 		$gesamtsheet_row++;
-		//$gesamt->write(0,0,"", $format_colored); Mag er nicht. Wirft Fehler in MS Excel
-		//$gesamt->write(0,1,"Kennzeichnet Änderungen am Lehrauftrag innerhalb der letzten 31 Tage", $format_normal); Mag er nicht. Wirft Fehler in MS Excel
-		$worksheet->write(0,0,'Erstellt am '.date('d.m.Y').' '.$semester_aktuell.' '.$studiengang->kuerzel, $format_bold);
-		$gesamt->write($gesamtsheet_row,0,'Erstellt am '.date('d.m.Y').' '.$semester_aktuell.' '.$studiengang->kuerzel, $format_bold);
-		$gesamtsheet_row+=2;
+		$worksheet->write(0, 0, 'Erstellt am '.date('d.m.Y').' '.$semester_aktuell.' '.$studiengang->kuerzel, $format_bold);
+		$gesamt->write($gesamtsheet_row, 0, 'Erstellt am '.date('d.m.Y').' '.$semester_aktuell.' '.$studiengang->kuerzel, $format_bold);
+		$gesamtsheet_row += 2;
 		//Ueberschriften
-		$worksheet->write(2,$i,"Studiengang", $format_bold);
-		$gesamt->write($gesamtsheet_row,$i,"Studiengang", $format_bold);
-		$worksheet->write(2,++$i,"Personalnr", $format_bold);
-		$gesamt->write($gesamtsheet_row,$i,"Personalnr", $format_bold);
-		$worksheet->write(2,++$i,"Titel", $format_bold);
-		$gesamt->write($gesamtsheet_row,$i,"Titel", $format_bold);
-		$worksheet->write(2,++$i,"Vorname", $format_bold);
-		$gesamt->write($gesamtsheet_row,$i,"Vorname", $format_bold);
-		$worksheet->write(2,++$i,"Familienname", $format_bold);
-		$gesamt->write($gesamtsheet_row,$i,"Familienname", $format_bold);
-		$worksheet->write(2,++$i,"Fixangestellt", $format_bold);
-		$gesamt->write($gesamtsheet_row,$i,"Fixangestellt", $format_bold);
-		$worksheet->write(2,++$i,"Disz. Zuordnung", $format_bold);
-		$gesamt->write($gesamtsheet_row,$i,"Disz. Zuordnung", $format_bold);
-		$worksheet->write(2,++$i,"Department", $format_bold);
-		$gesamt->write($gesamtsheet_row,$i,"Department", $format_bold);
-		$worksheet->write(2,++$i,"LV-Stunden", $format_bold);
-		$gesamt->write($gesamtsheet_row,$i,"LV-Stunden", $format_bold);
-		$worksheet->write(2,++$i,"LV-Kosten", $format_bold);
-		$gesamt->write($gesamtsheet_row,$i,"LV-Kosten", $format_bold);
-		$worksheet->write(2,++$i,"Betreuerstunden", $format_bold);
-		$gesamt->write($gesamtsheet_row,$i,"Betreuerstunden", $format_bold);
-		$worksheet->write(2,++$i,"Betreuerkosten", $format_bold);
-		$gesamt->write($gesamtsheet_row,$i,"Betreuer-Kosten", $format_bold);
-		$worksheet->write(2,++$i,"Gesamtstunden", $format_bold);
-		$gesamt->write($gesamtsheet_row,$i,"Gesamtstunden", $format_bold);
-		$worksheet->write(2,++$i,"Gesamtkosten", $format_bold);
-		$gesamt->write($gesamtsheet_row,$i,"Gesamtkosten", $format_bold);
+		$worksheet->write(2, $i, "Studiengang", $format_bold);
+		$gesamt->write($gesamtsheet_row, $i, "Studiengang", $format_bold);
+		$worksheet->write(2, ++$i, "Personalnr", $format_bold);
+		$gesamt->write($gesamtsheet_row, $i, "Personalnr", $format_bold);
+		$worksheet->write(2, ++$i, "Titel", $format_bold);
+		$gesamt->write($gesamtsheet_row, $i, "Titel", $format_bold);
+		$worksheet->write(2, ++$i, "Vorname", $format_bold);
+		$gesamt->write($gesamtsheet_row, $i, "Vorname", $format_bold);
+		$worksheet->write(2, ++$i, "Familienname", $format_bold);
+		$gesamt->write($gesamtsheet_row, $i, "Familienname", $format_bold);
+		$worksheet->write(2, ++$i, "Fixangestellt", $format_bold);
+		$gesamt->write($gesamtsheet_row, $i, "Fixangestellt", $format_bold);
+		$worksheet->write(2, ++$i, "Disz. Zuordnung", $format_bold);
+		$gesamt->write($gesamtsheet_row, $i, "Disz. Zuordnung", $format_bold);
+		$worksheet->write(2, ++$i, "Department", $format_bold);
+		$gesamt->write($gesamtsheet_row, $i, "Department", $format_bold);
+		$worksheet->write(2, ++$i, "LV-Stunden", $format_bold);
+		$gesamt->write($gesamtsheet_row, $i, "LV-Stunden", $format_bold);
+		$worksheet->write(2, ++$i, "LV-Kosten", $format_bold);
+		$gesamt->write($gesamtsheet_row, $i, "LV-Kosten", $format_bold);
+		$worksheet->write(2, ++$i, "Betreuerstunden", $format_bold);
+		$gesamt->write($gesamtsheet_row, $i, "Betreuerstunden", $format_bold);
+		$worksheet->write(2, ++$i, "Betreuerkosten", $format_bold);
+		$gesamt->write($gesamtsheet_row, $i, "Betreuer-Kosten", $format_bold);
+		$worksheet->write(2, ++$i, "Gesamtstunden", $format_bold);
+		$gesamt->write($gesamtsheet_row, $i, "Gesamtstunden", $format_bold);
+		$worksheet->write(2, ++$i, "Gesamtkosten", $format_bold);
+		$gesamt->write($gesamtsheet_row, $i, "Gesamtkosten", $format_bold);
+		$worksheet->write(2, ++$i, "Gesamtstunden angenommen", $format_bold);
+		$gesamt->write($gesamtsheet_row, $i, "Gesamtstunden angenommen", $format_bold);
+		$worksheet->write(2, ++$i, "Gesamtkosten angenommen", $format_bold);
+		$gesamt->write($gesamtsheet_row, $i, "Gesamtkosten angenommen", $format_bold);
 
 		//Daten holen
 		$qry = "SELECT tbl_lehreinheit.*,
@@ -259,7 +261,15 @@ if($result_stg = $db->db_query($qry_stg))
 						WHEN COALESCE(tbl_lehreinheitmitarbeiter.updateamum, tbl_lehreinheitmitarbeiter.insertamum) > now() - interval '31 days'
 							THEN 't'
 						ELSE 'f'
-						END AS geaendert
+						END AS geaendert,
+					(SELECT
+						vertragsstatus_kurzbz
+					FROM
+						lehre.tbl_vertrag_vertragsstatus
+					WHERE
+						vertrag_id = tbl_lehreinheitmitarbeiter.vertrag_id
+					ORDER BY datum DESC
+					LIMIT 1) as vertragsstatus
 				FROM lehre.tbl_lehreinheit,
 					lehre.tbl_lehreinheitmitarbeiter,
 					PUBLIC.tbl_mitarbeiter,
@@ -284,28 +294,62 @@ if($result_stg = $db->db_query($qry_stg))
 					vorname,
 					tbl_mitarbeiter.mitarbeiter_uid";
 
-		if($result = $db->db_query($qry))
+		if ($result = $db->db_query($qry))
 		{
-			$zeile=3;
+			$zeile = 3;
 			$gesamtkosten = 0;
-			$liste=array();
+			$liste = array();
 			$gesamtsheet_row++;
-			while($row = $db->db_fetch_object($result))
+			while ($row = $db->db_fetch_object($result))
 			{
 				//Gesamtstunden und Kosten ermitteln
-				if(array_key_exists($row->mitarbeiter_uid, $liste))
+				if (array_key_exists($row->mitarbeiter_uid, $liste))
 				{
-					$liste[$row->mitarbeiter_uid]['lvstunden'] = $liste[$row->mitarbeiter_uid]['lvstunden'] + $row->semesterstunden;
-					$liste[$row->mitarbeiter_uid]['lvkosten'] = $liste[$row->mitarbeiter_uid]['lvkosten'] + ($row->semesterstunden*$row->stundensatz);
-					$liste[$row->mitarbeiter_uid]['gesamtstunden'] = $liste[$row->mitarbeiter_uid]['gesamtstunden'] + $row->semesterstunden;
-					$liste[$row->mitarbeiter_uid]['gesamtkosten'] = $liste[$row->mitarbeiter_uid]['gesamtkosten'] + ($row->semesterstunden*$row->stundensatz);
+					$liste[$row->mitarbeiter_uid]['lvstunden'] =
+						$liste[$row->mitarbeiter_uid]['lvstunden'] + $row->semesterstunden;
+					$liste[$row->mitarbeiter_uid]['lvkosten'] =
+						$liste[$row->mitarbeiter_uid]['lvkosten'] + ($row->semesterstunden * $row->stundensatz);
+					$liste[$row->mitarbeiter_uid]['gesamtstunden'] =
+						$liste[$row->mitarbeiter_uid]['gesamtstunden'] + $row->semesterstunden;
+					$liste[$row->mitarbeiter_uid]['gesamtkosten'] =
+						$liste[$row->mitarbeiter_uid]['gesamtkosten'] + ($row->semesterstunden * $row->stundensatz);
+
+					if (!isset($liste[$row->mitarbeiter_uid]['gesamtstunden_akzeptiert']))
+					{
+						$liste[$row->mitarbeiter_uid]['gesamtstunden_akzeptiert'] = 0;
+						$liste[$row->mitarbeiter_uid]['gesamtkosten_akzeptiert'] = 0;
+					}
+
+					if ($row->vertragsstatus == 'akzeptiert')
+					{
+						$liste[$row->mitarbeiter_uid]['gesamtstunden_akzeptiert'] =
+							$liste[$row->mitarbeiter_uid]['gesamtstunden_akzeptiert'] + $row->semesterstunden;
+						$liste[$row->mitarbeiter_uid]['gesamtkosten_akzeptiert'] =
+							$liste[$row->mitarbeiter_uid]['gesamtkosten_akzeptiert']
+							+ ($row->semesterstunden * $row->stundensatz);
+					}
 				}
 				else
 				{
 					$liste[$row->mitarbeiter_uid]['lvstunden'] = $row->semesterstunden;
-					$liste[$row->mitarbeiter_uid]['lvkosten'] = $row->semesterstunden*$row->stundensatz;
+					$liste[$row->mitarbeiter_uid]['lvkosten'] = $row->semesterstunden * $row->stundensatz;
 					$liste[$row->mitarbeiter_uid]['gesamtstunden'] = $row->semesterstunden;
-					$liste[$row->mitarbeiter_uid]['gesamtkosten'] = $row->semesterstunden*$row->stundensatz;
+					$liste[$row->mitarbeiter_uid]['gesamtkosten'] = $row->semesterstunden * $row->stundensatz;
+
+					if (!isset($liste[$row->mitarbeiter_uid]['gesamtstunden_akzeptiert']))
+					{
+						$liste[$row->mitarbeiter_uid]['gesamtstunden_akzeptiert'] = 0;
+						$liste[$row->mitarbeiter_uid]['gesamtkosten_akzeptiert'] = 0;
+					}
+
+					if ($row->vertragsstatus == 'akzeptiert')
+					{
+						$liste[$row->mitarbeiter_uid]['gesamtstunden_akzeptiert'] =
+							$liste[$row->mitarbeiter_uid]['gesamtstunden_akzeptiert'] + $row->semesterstunden;
+						$liste[$row->mitarbeiter_uid]['gesamtkosten_akzeptiert'] =
+							$liste[$row->mitarbeiter_uid]['gesamtkosten_akzeptiert']
+							+ ($row->semesterstunden * $row->stundensatz);
+					}
 				}
 				$liste[$row->mitarbeiter_uid]['personalnummer'] = $row->personalnummer;
 				$liste[$row->mitarbeiter_uid]['titelpre'] = $row->titelpre;
@@ -316,21 +360,27 @@ if($result_stg = $db->db_query($qry_stg))
 				$liste[$row->mitarbeiter_uid]['department'] = $row->department;
 				$liste[$row->mitarbeiter_uid]['betreuergesamtstunden'] = 0;
 				$liste[$row->mitarbeiter_uid]['betreuergesamtkosten'] = 0;
-				if($row->geaendert=='t')
-					$liste[$row->mitarbeiter_uid]['geaendert']=true;
+				if ($row->geaendert == 't')
+					$liste[$row->mitarbeiter_uid]['geaendert'] = true;
 			}
 
 			//Alle holen die eine Betreuung aber keinen Lehrauftrag haben
 			$qry = "SELECT
-						distinct personalnummer, titelpre, vorname, nachname, uid, CASE WHEN fixangestellt = true THEN 'Ja' ELSE 'Nein' END as fixangestellt,
-						(SELECT tbl_organisationseinheit.organisationseinheittyp_kurzbz||' '||tbl_organisationseinheit.bezeichnung
-						FROM public.tbl_benutzerfunktion
-						JOIN public.tbl_organisationseinheit USING (oe_kurzbz)
-						WHERE funktion_kurzbz='oezuordnung'
-						AND (datum_von IS NULL OR datum_von <= now())
-						AND (datum_bis IS NULL OR datum_bis >= now())
-						AND tbl_benutzerfunktion.uid = tbl_benutzer.uid
-						LIMIT 1) AS oezuordnung,
+						distinct personalnummer, titelpre, vorname, nachname, uid,
+						CASE WHEN fixangestellt = true THEN 'Ja' ELSE 'Nein' END as fixangestellt,
+						(SELECT
+							tbl_organisationseinheit.organisationseinheittyp_kurzbz
+							|| ' ' || tbl_organisationseinheit.bezeichnung
+						FROM
+							public.tbl_benutzerfunktion
+							JOIN public.tbl_organisationseinheit USING (oe_kurzbz)
+						WHERE
+							funktion_kurzbz='oezuordnung'
+							AND (datum_von IS NULL OR datum_von <= now())
+							AND (datum_bis IS NULL OR datum_bis >= now())
+							AND tbl_benutzerfunktion.uid = tbl_benutzer.uid
+						LIMIT 1
+						) AS oezuordnung,
 						(
 						WITH RECURSIVE meine_oes(oe_kurzbz, oe_parent_kurzbz, organisationseinheittyp_kurzbz) AS (
 								SELECT oe_kurzbz,
@@ -392,14 +442,19 @@ if($result_stg = $db->db_query($qry_stg))
 										tbl_lehreinheitmitarbeiter.lehreinheit_id=tbl_lehreinheit.lehreinheit_id AND
 										tbl_lehreinheitmitarbeiter.semesterstunden<>0 AND
 										tbl_lehreinheitmitarbeiter.semesterstunden is not null AND
-										EXISTS (SELECT lehreinheit_id FROM lehre.tbl_lehreinheitgruppe WHERE lehreinheit_id=tbl_lehreinheit.lehreinheit_id) AND
-										tbl_lehreinheit.studiensemester_kurzbz=".$db->db_add_param($semester_aktuell).");";
+										EXISTS (
+											SELECT lehreinheit_id
+											FROM
+												lehre.tbl_lehreinheitgruppe
+											WHERE
+												lehreinheit_id=tbl_lehreinheit.lehreinheit_id) AND
+												tbl_lehreinheit.studiensemester_kurzbz=".$db->db_add_param($semester_aktuell).");";
 
-			if($result = $db->db_query($qry))
+			if ($result = $db->db_query($qry))
 			{
-				while($row = $db->db_fetch_object($result))
+				while ($row = $db->db_fetch_object($result))
 				{
-					if(!isset($liste[$row->uid]))
+					if (!isset($liste[$row->uid]))
 					{
 						$liste[$row->uid]['personalnummer'] = $row->personalnummer;
 						$liste[$row->uid]['titelpre'] = $row->titelpre;
@@ -408,7 +463,7 @@ if($result_stg = $db->db_query($qry_stg))
 						$liste[$row->uid]['fixangestellt'] = $row->fixangestellt;
 						$liste[$row->uid]['oezuordnung'] = $row->oezuordnung;
 						$liste[$row->uid]['department'] = $row->department;
-						$liste[$row->uid]['geaendert']=false;
+						$liste[$row->uid]['geaendert'] = false;
 						$liste[$row->uid]['gesamtstunden'] = 0;
 						$liste[$row->uid]['gesamtkosten'] = 0;
 						$liste[$row->uid]['lvstunden'] = 0;
@@ -420,10 +475,10 @@ if($result_stg = $db->db_query($qry_stg))
 			}
 
 			//Betreuungen fuer Projektarbeiten
-			foreach ($liste as $uid=>$arr)
+			foreach ($liste as $uid => $arr)
 			{
 				$qry = "
-					SELECT 
+					SELECT
 						tbl_projektbetreuer.stunden,
 						tbl_projektbetreuer.stundensatz,
 						CASE WHEN
@@ -432,7 +487,17 @@ if($result_stg = $db->db_query($qry_stg))
 								't'
 							ELSE
 								'f'
-							END as geaendert
+						END as geaendert,
+						(
+							SELECT
+							vertragsstatus_kurzbz
+							FROM
+								lehre.tbl_vertrag_vertragsstatus
+							WHERE
+								vertrag_id = tbl_projektbetreuer.vertrag_id
+							ORDER BY datum DESC
+							LIMIT 1
+						) as vertragsstatus
 					FROM lehre.tbl_projektbetreuer, lehre.tbl_lehreinheit, lehre.tbl_lehrveranstaltung,
 						public.tbl_benutzer, lehre.tbl_projektarbeit, campus.vw_student
 					WHERE
@@ -445,17 +510,32 @@ if($result_stg = $db->db_query($qry_stg))
 						AND tbl_lehreinheit.lehrveranstaltung_id = tbl_lehrveranstaltung.lehrveranstaltung_id
 						AND tbl_lehrveranstaltung.studiengang_kz=".$db->db_add_param($studiengang_kz, FHC_INTEGER);
 
-				if($result = $db->db_query($qry))
+				if ($result = $db->db_query($qry))
 				{
-					while($row = $db->db_fetch_object($result))
+					while ($row = $db->db_fetch_object($result))
 					{
 						$liste[$uid]['gesamtstunden'] = $liste[$uid]['gesamtstunden'] + $row->stunden;
-						$liste[$uid]['gesamtkosten'] = $liste[$uid]['gesamtkosten'] + ($row->stunden*$row->stundensatz);
+						$liste[$uid]['gesamtkosten'] =
+							$liste[$uid]['gesamtkosten'] + ($row->stunden * $row->stundensatz);
 						$liste[$uid]['betreuergesamtstunden'] = $liste[$uid]['betreuergesamtstunden'] + $row->stunden;
-						$liste[$uid]['betreuergesamtkosten'] = $liste[$uid]['betreuergesamtkosten'] + ($row->stunden*$row->stundensatz);
-						if($row->geaendert=='t')
+						$liste[$uid]['betreuergesamtkosten'] =
+							$liste[$uid]['betreuergesamtkosten'] + ($row->stunden * $row->stundensatz);
+						if ($row->geaendert == 't')
 						{
-							$liste[$uid]['geaendert']=true;
+							$liste[$uid]['geaendert'] = true;
+						}
+						if (!isset($liste[$uid]['gesamtstunden_akzeptiert']))
+						{
+							$liste[$uid]['gesamtstunden_akzeptiert'] = 0;
+							$liste[$uid]['gesamtkosten_akzeptiert'] = 0;
+						}
+
+						if ($row->vertragsstatus == 'akzeptiert')
+						{
+							$liste[$uid]['gesamtstunden_akzeptiert'] =
+								$liste[$uid]['gesamtstunden_akzeptiert'] + $row->stunden;
+							$liste[$uid]['gesamtkosten_akzeptiert'] =
+								$liste[$uid]['gesamtkosten_akzeptiert'] + ($row->stunden * $row->stundensatz);
 						}
 					}
 				}
@@ -465,17 +545,17 @@ if($result_stg = $db->db_query($qry_stg))
 			$nn = array();
 			foreach ($liste as $key => $row)
 			{
-		    	$vn[$key]  = $row['vorname'];
-		    	$nn[$key] = $row['nachname'];
+				$vn[$key] = $row['vorname'];
+				$nn[$key] = $row['nachname'];
 			}
 
 			array_multisort($nn, SORT_ASC, $vn, SORT_ASC, $liste);
 
 			//Daten ausgeben
-			foreach ($liste as $uid=>$row)
+			foreach ($liste as $uid => $row)
 			{
-				$i=0;
-				if(isset($row['geaendert']) && $row['geaendert']==true)
+				$i = 0;
+				if (isset($row['geaendert']) && $row['geaendert'] == true)
 				{
 					$format = $format_colored;
 					$formatnb = $format_number_colored;
@@ -486,78 +566,95 @@ if($result_stg = $db->db_query($qry_stg))
 					$formatnb = $format_number;
 				}
 				//Studiengang
-				$worksheet->write($zeile,$i,$studiengang->kuerzel, $format);
-				$gesamt->write($gesamtsheet_row,$i,$studiengang->kuerzel, $format);
+				$worksheet->write($zeile, $i, $studiengang->kuerzel, $format);
+				$gesamt->write($gesamtsheet_row, $i, $studiengang->kuerzel, $format);
 				//Personalnummer
-				$worksheet->write($zeile,++$i,$row['personalnummer'], $format);
-				$gesamt->write($gesamtsheet_row,$i,$row['personalnummer'], $format);
+				$worksheet->write($zeile, ++$i, $row['personalnummer'], $format);
+				$gesamt->write($gesamtsheet_row, $i, $row['personalnummer'], $format);
 				//Titel
-				$worksheet->write($zeile,++$i,$row['titelpre'], $format);
-				$gesamt->write($gesamtsheet_row,$i,$row['titelpre'], $format);
+				$worksheet->write($zeile, ++$i, $row['titelpre'], $format);
+				$gesamt->write($gesamtsheet_row, $i, $row['titelpre'], $format);
 				//Vorname
-				$worksheet->write($zeile,++$i,$row['vorname'], $format);
-				$gesamt->write($gesamtsheet_row,$i,$row['vorname'], $format);
+				$worksheet->write($zeile, ++$i, $row['vorname'], $format);
+				$gesamt->write($gesamtsheet_row, $i, $row['vorname'], $format);
 				//Nachname
-				$worksheet->write($zeile,++$i,$row['nachname'], $format);
-				$gesamt->write($gesamtsheet_row,$i,$row['nachname'], $format);
+				$worksheet->write($zeile, ++$i, $row['nachname'], $format);
+				$gesamt->write($gesamtsheet_row, $i, $row['nachname'], $format);
 				//Fixangestellt
-				$worksheet->write($zeile,++$i,$row['fixangestellt'], $format);
-				$gesamt->write($gesamtsheet_row,$i,$row['fixangestellt'], $format);
+				$worksheet->write($zeile, ++$i, $row['fixangestellt'], $format);
+				$gesamt->write($gesamtsheet_row, $i, $row['fixangestellt'], $format);
 				//OE-Zuordnung
-				$worksheet->write($zeile,++$i,$row['oezuordnung'], $format);
-				$gesamt->write($gesamtsheet_row,$i,$row['oezuordnung'], $format);
+				$worksheet->write($zeile, ++$i, $row['oezuordnung'], $format);
+				$gesamt->write($gesamtsheet_row, $i, $row['oezuordnung'], $format);
 				//Department der OE-Zuordnung
-				$worksheet->write($zeile,++$i,$row['department'], $format);
-				$gesamt->write($gesamtsheet_row,$i,$row['department'], $format);
+				$worksheet->write($zeile, ++$i, $row['department'], $format);
+				$gesamt->write($gesamtsheet_row, $i, $row['department'], $format);
 				//LVStunden
-				$lvstunden = str_replace(',', '.', $row['lvstunden']);
-				$worksheet->write($zeile,++$i,$lvstunden, $format);
-				$gesamt->write($gesamtsheet_row,$i,$lvstunden, $format);
+				$lvstunden = str_replace(', ', '.', $row['lvstunden']);
+				$worksheet->write($zeile, ++$i, $lvstunden, $format);
+				$gesamt->write($gesamtsheet_row, $i, $lvstunden, $format);
 				//LVKosten
-				$lvkosten = str_replace(',', '.', $row['lvkosten']);
-				$worksheet->writeNumber($zeile,++$i,$lvkosten, $formatnb);
-				$gesamt->writeNumber($gesamtsheet_row,$i,$lvkosten, $formatnb);
+				$lvkosten = str_replace(', ', '.', $row['lvkosten']);
+				$worksheet->writeNumber($zeile, ++$i, $lvkosten, $formatnb);
+				$gesamt->writeNumber($gesamtsheet_row, $i, $lvkosten, $formatnb);
 				//Betreuerstunden
-				$betreuergesamtstunden = str_replace(',', '.', $row['betreuergesamtstunden']);
-				$worksheet->write($zeile,++$i,$betreuergesamtstunden, $formatnb);
-				$gesamt->write($gesamtsheet_row,$i,$betreuergesamtstunden, $formatnb);
+				$betreuergesamtstunden = str_replace(', ', '.', $row['betreuergesamtstunden']);
+				$worksheet->write($zeile, ++$i, $betreuergesamtstunden, $formatnb);
+				$gesamt->write($gesamtsheet_row, $i, $betreuergesamtstunden, $formatnb);
 				//Betreuerkosten
-				$betreuergesamtkosten = str_replace(',', '.', $row['betreuergesamtkosten']);
-				$worksheet->write($zeile,++$i,$betreuergesamtkosten, $formatnb);
-				$gesamt->write($gesamtsheet_row,$i,$betreuergesamtkosten, $formatnb);
+				$betreuergesamtkosten = str_replace(', ', '.', $row['betreuergesamtkosten']);
+				$worksheet->write($zeile, ++$i, $betreuergesamtkosten, $formatnb);
+				$gesamt->write($gesamtsheet_row, $i, $betreuergesamtkosten, $formatnb);
 				//Gesamtstunden
-				$gesamtstunden = str_replace(',', '.', $row['gesamtstunden']);
-				$worksheet->write($zeile,++$i,$gesamtstunden, $formatnb);
-				$gesamt->write($gesamtsheet_row,$i,$gesamtstunden, $formatnb);
+				$gesamtstunden = str_replace(', ', '.', $row['gesamtstunden']);
+				$worksheet->write($zeile, ++$i, $gesamtstunden, $formatnb);
+				$gesamt->write($gesamtsheet_row, $i, $gesamtstunden, $formatnb);
 				//Gesamtkosten
-				$gesamtkosten_row = str_replace(',', '.', $row['gesamtkosten']);
-				$worksheet->writeNumber($zeile,++$i,$gesamtkosten_row, $formatnb);
-				$gesamt->writeNumber($gesamtsheet_row,$i,$gesamtkosten_row, $formatnb);
-
+				$gesamtkosten_row = str_replace(', ', '.', $row['gesamtkosten']);
+				$worksheet->writeNumber($zeile, ++$i, $gesamtkosten_row, $formatnb);
+				$gesamt->writeNumber($gesamtsheet_row, $i, $gesamtkosten_row, $formatnb);
+				//Gesamtstunden akzeptiert
+				$gesamtstunden_akzeptiert = str_replace(', ', '.', $row['gesamtstunden_akzeptiert']);
+				$worksheet->write($zeile, ++$i, $gesamtstunden_akzeptiert, $formatnb);
+				$gesamt->write($gesamtsheet_row, $i, $gesamtstunden_akzeptiert, $formatnb);
+				//Gesamtkosten akzeptiert
+				$gesamtkosten_akzeptiert_row = str_replace(', ', '.', $row['gesamtkosten_akzeptiert']);
+				$worksheet->writeNumber($zeile, ++$i, $gesamtkosten_akzeptiert_row, $formatnb);
+				$gesamt->writeNumber($gesamtsheet_row, $i, $gesamtkosten_akzeptiert_row, $formatnb);
 
 				//Kosten zu den Gesamtkosten hinzurechnen
 				$gesamtkosten = $gesamtkosten + $row['gesamtkosten'];
 				$zeile++;
 				$gesamtsheet_row++;
 
-				$liste_gesamt[$uid]['personalnummer']=$row['personalnummer'];
-				$liste_gesamt[$uid]['titelpre']=$row['titelpre'];
-				$liste_gesamt[$uid]['vorname']=$row['vorname'];
-				$liste_gesamt[$uid]['nachname']=$row['nachname'];
-				if(isset($liste_gesamt[$uid]['gesamtstunden']))
-					$liste_gesamt[$uid]['gesamtstunden']+=$row['gesamtstunden'];
+				$liste_gesamt[$uid]['personalnummer'] = $row['personalnummer'];
+				$liste_gesamt[$uid]['titelpre'] = $row['titelpre'];
+				$liste_gesamt[$uid]['vorname'] = $row['vorname'];
+				$liste_gesamt[$uid]['nachname'] = $row['nachname'];
+				if (isset($liste_gesamt[$uid]['gesamtstunden']))
+					$liste_gesamt[$uid]['gesamtstunden'] += $row['gesamtstunden'];
 				else
-					$liste_gesamt[$uid]['gesamtstunden']=$row['gesamtstunden'];
+					$liste_gesamt[$uid]['gesamtstunden'] = $row['gesamtstunden'];
 
-				if(isset($liste_gesamt[$uid]['gesamtkosten']))
-					$liste_gesamt[$uid]['gesamtkosten']+=$row['gesamtkosten'];
+				if (isset($liste_gesamt[$uid]['gesamtkosten']))
+					$liste_gesamt[$uid]['gesamtkosten'] += $row['gesamtkosten'];
 				else
-					$liste_gesamt[$uid]['gesamtkosten']=$row['gesamtkosten'];
+					$liste_gesamt[$uid]['gesamtkosten'] = $row['gesamtkosten'];
+
+				if (isset($liste_gesamt[$uid]['gesamtstunden_akzeptiert']))
+					$liste_gesamt[$uid]['gesamtstunden_akzeptiert'] += $row['gesamtstunden_akzeptiert'];
+				else
+					$liste_gesamt[$uid]['gesamtstunden_akzeptiert'] = $row['gesamtstunden_akzeptiert'];
+
+				if (isset($liste_gesamt[$uid]['gesamtkosten_akzeptiert']))
+					$liste_gesamt[$uid]['gesamtkosten_akzeptiert'] += $row['gesamtkosten_akzeptiert'];
+				else
+					$liste_gesamt[$uid]['gesamtkosten_akzeptiert'] = $row['gesamtkosten_akzeptiert'];
 			}
 
 			//Gesamtkosten anzeigen
-			$worksheet->writeNumber($zeile,13,$gesamtkosten, $format_number_bold);
-			$gesamt->writeNumber($gesamtsheet_row,13,$gesamtkosten, $format_number_bold);
+			$worksheet->writeNumber($zeile, 13, $gesamtkosten, $format_number_bold);
+			$gesamt->writeNumber($gesamtsheet_row, 13, $gesamtkosten, $format_number_bold);
 		}
 	}
 
@@ -566,62 +663,62 @@ if($result_stg = $db->db_query($qry_stg))
 	$worksheet->setInputEncoding('utf-8');
 	$qry = "SELECT
 				studiensemester_kurzbz, nachname, vorname, sum(stunden) AS stunden, titelpre,
-				sum(tbl_projektbetreuer.stundensatz*tbl_projektbetreuer.stunden)::numeric(8,2) AS euro, person_id
+				sum(tbl_projektbetreuer.stundensatz*tbl_projektbetreuer.stunden)::numeric(8, 2) AS euro, person_id
 			FROM
 				public.tbl_person JOIN lehre.tbl_projektbetreuer USING (person_id)
 				JOIN lehre.tbl_projektarbeit USING (projektarbeit_id)
 				JOIN lehre.tbl_lehreinheit USING (lehreinheit_id)
 				JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id)
 			WHERE
-				studiensemester_kurzbz=".$db->db_add_param($semester_aktuell)." AND
-				stunden>0";
+				studiensemester_kurzbz = ".$db->db_add_param($semester_aktuell)." AND
+				stunden > 0";
 
-	if(count($stg_arr)>0)
-		$qry.=" AND tbl_lehrveranstaltung.studiengang_kz IN(".$db->db_implode4SQL($stg_arr).")";
+	if (count($stg_arr) > 0)
+		$qry .= " AND tbl_lehrveranstaltung.studiengang_kz IN(".$db->db_implode4SQL($stg_arr).")";
 
-	$qry.="
+	$qry .= "
 			GROUP BY
-				studiensemester_kurzbz,person_id,nachname,vorname, titelpre
+				studiensemester_kurzbz, person_id, nachname, vorname, titelpre
 			ORDER BY
-				nachname,vorname
+				nachname, vorname
 			";
-	$i=0;
-	$gesamtkosten=0;
+	$i = 0;
+	$gesamtkosten = 0;
 
-	$worksheet->write(0,0,'Erstellt am '.date('d.m.Y').' '.$semester_aktuell.' Betreuerstunden', $format_bold);
+	$worksheet->write(0, 0, 'Erstellt am '.date('d.m.Y').' '.$semester_aktuell.' Betreuerstunden', $format_bold);
 	//Ueberschriften
-	//$worksheet->write(2,$i,"Studiengang", $format_bold);
-	$worksheet->write(2,++$i,"Titel", $format_bold);
-	$worksheet->write(2,++$i,"Familienname", $format_bold);
-	$worksheet->write(2,++$i,"Vorname", $format_bold);
-	$worksheet->write(2,++$i,"Stunden", $format_bold);
-	$worksheet->write(2,++$i,"Kosten", $format_bold);
+	//$worksheet->write(2, $i, "Studiengang", $format_bold);
+	$worksheet->write(2, ++$i, "Titel", $format_bold);
+	$worksheet->write(2, ++$i, "Familienname", $format_bold);
+	$worksheet->write(2, ++$i, "Vorname", $format_bold);
+	$worksheet->write(2, ++$i, "Stunden", $format_bold);
+	$worksheet->write(2, ++$i, "Kosten", $format_bold);
 
 	$format = $format_normal;
 	$formatnb = $format_number;
-	if($result = $db->db_query($qry))
+	if ($result = $db->db_query($qry))
 	{
-		$zeile=3;
-		while($row = $db->db_fetch_object($result))
+		$zeile = 3;
+		while ($row = $db->db_fetch_object($result))
 		{
-			$i=0;
+			$i = 0;
 			//Studiensemester
-			$worksheet->write($zeile,++$i,$row->titelpre, $format);
+			$worksheet->write($zeile, ++$i, $row->titelpre, $format);
 			//Vorname
-			$worksheet->write($zeile,++$i,$row->nachname, $format);
+			$worksheet->write($zeile, ++$i, $row->nachname, $format);
 			//Nachname
-			$worksheet->write($zeile,++$i,$row->vorname, $format);
+			$worksheet->write($zeile, ++$i, $row->vorname, $format);
 			//Stunden
-			$worksheet->writeNumber($zeile,++$i,$row->stunden, $formatnb);
+			$worksheet->writeNumber($zeile, ++$i, $row->stunden, $formatnb);
 			//Kosten
-			$worksheet->writeNumber($zeile,++$i,$row->euro, $formatnb);
+			$worksheet->writeNumber($zeile, ++$i, $row->euro, $formatnb);
 			$zeile++;
 
 			$gesamtkosten = $gesamtkosten + $row->euro;
 		}
 
 		//Gesamtkosten anzeigen
-		$worksheet->writeNumber($zeile,5,$gesamtkosten, $format_number_bold);
+		$worksheet->writeNumber($zeile, 5, $gesamtkosten, $format_number_bold);
 	}
 
 	$workbook->close();
@@ -629,24 +726,22 @@ if($result_stg = $db->db_query($qry_stg))
 	//Mail versenden mit Excel File im Anhang
     $subject = "Lehrauftragsliste ".date('d.m.Y');
     $message = "Dies ist eine automatische eMail!\n\nAnbei die Lehrauftragslisten vom ".date('d.m.Y');
-    $message.= "\n\nJederzeit abrufbar unter ".APP_ROOT.'content/statistik/lehrauftragsliste_mail.xls.php';
-	if($oe_kurzbz!='')
-		$message.="?oe_kurzbz=".$oe_kurzbz;
+    $message .= "\n\nJederzeit abrufbar unter ".APP_ROOT.'content/statistik/lehrauftragsliste_mail.xls.php';
+	if ($oe_kurzbz != '')
+		$message .= "?oe_kurzbz=".$oe_kurzbz;
 
     $fileatttype = "application/xls";
     $fileattname = "lehrauftragsliste_".date('Y_m_d').".xls";
 
 	$empfaenger = MAIL_GST;
-	if($oe_kurzbz=='lehrgang')
+	if ($oe_kurzbz == 'lehrgang')
 		$empfaenger = MAIL_LG;
 
-    $mail = new mail($empfaenger, 'noreply@'.DOMAIN, $subject, $message);
-    $mail->addAttachmentBinary($file, $fileatttype, $fileattname);
+	$mail = new mail($empfaenger, 'noreply@'.DOMAIN, $subject, $message);
+	$mail->addAttachmentBinary($file, $fileatttype, $fileattname);
 
-    if($mail->send())
+	if ($mail->send())
 		echo 'Email mit Lehrauftragslisten wurde an '.$empfaenger.' versandt!';
-     else
-        echo "Fehler beim Versenden der Lehrauftragsliste";
+	else
+		echo "Fehler beim Versenden der Lehrauftragsliste";
 }
-
-?>
