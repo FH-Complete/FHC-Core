@@ -85,10 +85,16 @@ FROM
     SELECT *,
         /* concatinated and aggregated gruppen */
         (SELECT
-             string_agg(concat(stg_typ_kurzbz, \'-\', semester, verband, gruppe
-                                || gruppe_kurzbz), \', \')
+			string_agg(
+				CASE WHEN gruppe_kurzbz is null THEN
+				   concat(upper(grpstg.typ || grpstg.kurzbz), \'-\', semester, verband, gruppe)
+			   ELSE
+				   gruppe_kurzbz
+			   END
+			   , \', \')
          FROM
              lehre.tbl_lehreinheitgruppe
+			 JOIN public.tbl_studiengang grpstg USING(studiengang_kz)
          WHERE
              lehreinheit_id = tmp_lehrauftraege.lehreinheit_id
         )                                                 AS "gruppe",
@@ -183,10 +189,16 @@ FROM
                LIMIT 1)                                 AS "mitarbeiter_uid",
             /* concatinated and aggregated gruppen */
             (SELECT
-                 string_agg(concat(stg_typ_kurzbz, \'-\', semester, verband, gruppe
-                                    || gruppe_kurzbz), \', \')
+				string_agg(
+				   CASE WHEN gruppe_kurzbz is null THEN
+					  concat(upper(grpstg.typ || grpstg.kurzbz), \'-\', semester, verband, gruppe)
+				  ELSE
+					  gruppe_kurzbz
+				  END
+				  , \', \')
              FROM
                  lehre.tbl_lehreinheitgruppe
+				 JOIN public.tbl_studiengang grpstg USING(studiengang_kz)
              WHERE
                      lehreinheit_id = tmp_projektbetreuung.lehreinheit_id
             )                                                    AS "gruppe",
