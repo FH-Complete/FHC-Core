@@ -22,7 +22,16 @@
  */
 header("Content-type: application/vnd.mozilla.xul+xml");
 include('../../config/vilesci.config.inc.php');
+include('../../config/global.config.inc.php');
 
+if(defined('FAS_LV_LEKTORINNENZUTEILUNG_VERTRAGSDETAILS_ANZEIGEN') && FAS_LV_LEKTORINNENZUTEILUNG_VERTRAGSDETAILS_ANZEIGEN)
+{
+	$showvertragsfilter = true;
+}
+else
+{
+	$showvertragsfilter = false;
+}
 echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 echo '<?xul-overlay href="'.APP_ROOT.'content/lvplanung/stpl-details-overlay.xul.php"?>';
 ?>
@@ -100,7 +109,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/lvplanung/stpl-details-overlay.xul
 	<grippy />
 </splitter>
 
-<vbox style="margin:0px;" flex="1">
+<vbox style="margin:0px; width:250px" flex="1">
 <toolbox>
 		<toolbar id="toolbarTimeTableLeftWeek" tbautostretch="always" persist="collapsed">
 			<toolbarbutton id="toolbarbuttonStplWeekRefresh"
@@ -110,7 +119,40 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/lvplanung/stpl-details-overlay.xul
 			/>
 			<textbox id="tempus-lva-filter" size="10" oninput="onLVAFilter()" flex="1"/>
 		</toolbar>
-
+		<toolbar
+			id="toolbarTimeTableFilterVertrag"
+			tbautostretch="always"
+			persist="collapsed"
+			hidden="<?php echo ($showvertragsfilter?'false':'true');?>"
+		>
+		<toolbarbutton
+			image="../public/images/icons/fa-user-clock.png"
+			label="Alle"
+			class="timetablefilter-vertrag"
+			oncommand="onLVAFilterVertrag(this);"
+			value=""
+			id="toolbarTimeTableFilter-alle"
+			tooltiptext="Filter Status Alle"
+		/>
+		<toolbarbutton
+			image="../public/images/icons/fa-user-tag.png"
+			label="Bestellt"
+			class="timetablefilter-vertrag"
+			oncommand="onLVAFilterVertrag(this);"
+			value="bestellt"
+			id="toolbarTimeTableFilter-bestellt"
+			tooltiptext="Filter Status Bestellt"
+		/>
+		<toolbarbutton
+			image="../public/images/icons/fa-user-check.png"
+			label="Erteilt"
+			class="timetablefilter-vertrag"
+			oncommand="onLVAFilterVertrag(this);"
+			value="erteilt"
+			id="toolbarTimeTableFilter-erteilt"
+			tooltiptext="Filter Status Erteilt"
+		/>
+		</toolbar>
 </toolbox>
 
 <vbox id="vboxLehrveranstalungPlanung" style="overflow:auto;margin:0px;" flex="1"
@@ -163,8 +205,12 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/lvplanung/stpl-details-overlay.xul
 	        			</hbox>
 	        		</row>
 	    			<row>
-	    				<label value="rdf:http://www.technikum-wien.at/lehreinheit-lvplan/rdf#lehrfach rdf:http://www.technikum-wien.at/lehreinheit-lvplan/rdf#lehrform"
-	    					tooltiptext="rdf:http://www.technikum-wien.at/lehreinheit-lvplan/rdf#lehrfach_bez" />
+						<hbox>
+	    					<label value="rdf:http://www.technikum-wien.at/lehreinheit-lvplan/rdf#lehrfach rdf:http://www.technikum-wien.at/lehreinheit-lvplan/rdf#lehrform"
+	    						tooltiptext="rdf:http://www.technikum-wien.at/lehreinheit-lvplan/rdf#lehrfach_bez" />
+							<spacer flex="1" />
+							<label value="rdf:http://www.technikum-wien.at/lehreinheit-lvplan/rdf#vertragsstatus" class="tempus_vertrag_info"/>
+						</hbox>
 	       				<label align="right" value="rdf:http://www.technikum-wien.at/lehreinheit-lvplan/rdf#raumtyp"
 	       					tooltiptext="rdf:http://www.technikum-wien.at/lehreinheit-lvplan/rdf#raumtypalternativ" />
 	    			</row>
@@ -184,6 +230,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/lvplanung/stpl-details-overlay.xul
 	    			<row>
 	    				<hbox>
 							<label value="rdf:http://www.technikum-wien.at/lehreinheit-lvplan/rdf#lektor" />
+							<spacer flex="1"/>
 							<label value="rdf:http://www.technikum-wien.at/lehreinheit-lvplan/rdf#fixangestellt_info" class="tempus_lektor_fix_info"/>
 						</hbox>
 	    				<label value="WR: rdf:http://www.technikum-wien.at/lehreinheit-lvplan/rdf#wochenrythmus Bl: rdf:http://www.technikum-wien.at/lehreinheit-lvplan/rdf#stundenblockung"
@@ -252,7 +299,6 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/lvplanung/stpl-details-overlay.xul
 				id="toolbarTimeTableSort-stundenASC"
 				tooltiptext="Offenen Stunden aufsteigend"
 			/>
-
 		</toolbar>
 </toolbox>
 </vbox>
