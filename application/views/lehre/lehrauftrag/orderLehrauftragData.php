@@ -16,6 +16,36 @@ SELECT
     studiensemester_kurzbz,
     studiengang_kz,
     stg_typ_kurzbz,
+    /* get valid STPL(s), to which the lehrveranstaltung is assigned to (can be more) */
+    /* therefore join over lv, studiensemester and semester */
+    (
+           SELECT
+               string_agg(bezeichnung, \', \')
+           FROM (
+                    SELECT stpl.bezeichnung
+                    FROM lehre.tbl_studienplan stpl
+                             JOIN lehre.tbl_studienplan_semester stplsem USING (studienplan_id)
+                             JOIN lehre.tbl_studienplan_lehrveranstaltung stpllv USING (studienplan_id)
+                             JOIN lehre.tbl_lehrveranstaltung lv USING (lehrveranstaltung_id)
+                             JOIN lehre.tbl_lehreinheit le USING (lehrveranstaltung_id)
+                    WHERE
+                    	/* join over lv of the le */
+                    	le.lehreinheit_id = auftraege.lehreinheit_id
+					  AND stpl.aktiv
+					   /* then restrict on stpl of les studiensemester */
+					  AND stplsem.studiensemester_kurzbz = le.studiensemester_kurzbz
+					   /* then restrict on stpl of lvs semester*/
+					  AND stplsem.semester = stpllv.semester
+					  /* then restrict on most recent inserted studienplan of the lv */
+					  AND studienplan_id = (
+						SELECT stpllv.studienplan_id
+						FROM lehre.tbl_studienplan_lehrveranstaltung
+						WHERE lehrveranstaltung_id = lv.lehrveranstaltung_id
+						ORDER BY insertamum DESC
+						LIMIT 1
+						)
+					) AS tmp_stpl
+       )                                                    AS "studienplan_bezeichnung",
     orgform_kurzbz,
     person_id,
     typ,
@@ -305,6 +335,7 @@ $filterWidgetArray = array(
         'Studiensemester',
         'Studiengang-KZ',
         'Studiengang',
+		'Studienplan',
         'OrgForm',
         'Person-ID',
         'Typ',
@@ -378,10 +409,11 @@ $filterWidgetArray = array(
         studiensemester_kurzbz: {headerFilter:"input"},
         studiengang_kz: {visible: false},
         stg_typ_kurzbz: {headerFilter:"input", width: "5%"},
+		studienplan_bezeichnung: {headerFilter:"input", width: "7%"},
         orgform_kurzbz: {headerFilter:"input"},
         person_id: {visible: false},
         typ: {headerFilter:"input"},
-        auftrag: {headerFilter:"input", width:"20%"},
+        auftrag: {headerFilter:"input", width:"15%"},
         semester: {headerFilter:"input"},
         lv_oe_kurzbz: {headerFilter:"input"},
         gruppe: {headerFilter:"input"},
@@ -403,7 +435,7 @@ $filterWidgetArray = array(
         akzeptiert: {align:"center", headerFilter:"input", mutator: mut_formatStringDate, tooltip: akzeptiert_tooltip, width: "8%"},
         bestellt_von: {visible: false},
         erteilt_von: {visible: false},
-        akzeptiert_von: {visible: false},
+        akzeptiert_von: {visible: false}
     }', // col properties
 );
 
