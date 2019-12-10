@@ -97,6 +97,9 @@ switch($method)
 	case 'anmeldungBestaetigen':
 		$data = anmeldungBestaetigen($uid);
 		break;
+	case 'anmeldungLoeschen':
+		$data = anmeldungLoeschen();
+		break;
 	case 'alleBestaetigen':
 		$data = alleBestaetigen($uid);
 		break;
@@ -1063,6 +1066,30 @@ function anmeldungBestaetigen($uid)
 	$data['error']='true';
 	$data['errormsg']=$anmeldung->errormsg;
 	}
+	return $data;
+}
+
+/**
+ * Löscht eine Prüfungsanmeldung
+ * @return Array
+ */
+function anmeldungLoeschen()
+{
+	$pruefungsanmeldung_id = $_REQUEST["pruefungsanmeldung_id"];
+	$anmeldung = new pruefungsanmeldung();
+
+	if($anmeldung->delete($pruefungsanmeldung_id))
+	{
+		$data['result']=true;
+		$data['error']='false';
+		$data['errormsg']='';
+	}
+	else
+	{
+		$data['error']='true';
+		$data['errormsg']=$anmeldung->errormsg;
+	}
+
 	return $data;
 }
 
