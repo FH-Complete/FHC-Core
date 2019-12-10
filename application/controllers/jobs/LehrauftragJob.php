@@ -22,7 +22,7 @@ class LehrauftragJob extends JOB_Controller
 	const BERECHTIGUNG_LEHRAUFTRAG_AKZEPTIEREN = 'lehre/lehrauftrag_akzeptieren';
 	
 	const LEHRAUFTRAG_ERTEILEN_URI = 'lehre/lehrauftrag/LehrauftragErteilen';
-	const LEHRAUFTRAG_AKZEPTIEREN_URI = 'lehre/lehrauftrag/LehrauftragAkzeptieren';
+	const LEHRAUFTRAG_AKZEPTIEREN_URI = '/lehre/lehrauftrag/LehrauftragAkzeptieren';
 	
 	/**
 	 * Constructor
@@ -216,9 +216,9 @@ class LehrauftragJob extends JOB_Controller
 		 * 	[studiensemester]	// studiensemester of the lehrauftraege (can be more, e.g. 'WS2019 and SS2020')
 		 * 	[amount]			// amount of new approved lehrauftraege
 		 **/
+		$data_arr = array();
 		if ($vertrag_arr = getData($result))
 		{
-			$data_arr = array();
 			foreach ($vertrag_arr as $vertrag)
 			{
 				// Get studiensemester of the lehrauftrag
@@ -501,7 +501,9 @@ class LehrauftragJob extends JOB_Controller
 			$to = $data['uid']. '@'. DOMAIN;
 			
 			// Link to LehrauftragAkzeptieren
-			$url =  site_url(self::LEHRAUFTRAG_AKZEPTIEREN_URI);
+			$url =  CIS_ROOT. 'cis/index.php?menu='.
+				CIS_ROOT. 'cis/menu.php?content_id=&content='.
+				CIS_ROOT. index_page(). self::LEHRAUFTRAG_AKZEPTIEREN_URI;
 			
 			// Get first name
 			$first_name = '';
