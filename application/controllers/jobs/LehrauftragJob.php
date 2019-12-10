@@ -216,9 +216,9 @@ class LehrauftragJob extends JOB_Controller
 		 * 	[studiensemester]	// studiensemester of the lehrauftraege (can be more, e.g. 'WS2019 and SS2020')
 		 * 	[amount]			// amount of new approved lehrauftraege
 		 **/
+		$data_arr = array();
 		if ($vertrag_arr = getData($result))
 		{
-			$data_arr = array();
 			foreach ($vertrag_arr as $vertrag)
 			{
 				// Get studiensemester of the lehrauftrag
