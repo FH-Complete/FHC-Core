@@ -141,7 +141,7 @@ class Vertragvertragsstatus_model extends DB_Model
 	{
     	$condition = '
     		vertragsstatus_kurzbz = \'bestellt\' AND
-    		(insertamum)::date = date \''. $string_date .'\'
+    		(datum)::date = date \''. $string_date .'\'
 		';
     	
     	if (!$further_processed)
@@ -170,7 +170,7 @@ class Vertragvertragsstatus_model extends DB_Model
 	{
 		$condition = '
 				vertragsstatus_kurzbz = \'erteilt\' AND
-				(insertamum)::date = date \''. $string_date .'\'
+				(datum)::date = date \''. $string_date .'\'
 			';
 		
 		if (!$further_processed)
