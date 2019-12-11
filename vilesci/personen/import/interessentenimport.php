@@ -37,6 +37,7 @@ require_once('../../../include/student.class.php');
 require_once('../../../include/lehrverband.class.php');
 require_once('../../../include/nation.class.php');
 require_once('../../../include/studienplan.class.php');
+require_once('../../../include/geschlecht.class.php');
 
 $db = new basis_db();
 $user = get_uid();
@@ -940,9 +941,17 @@ echo '<tr><td>Weitere Vornamen </td><td><input type="text" id="vornamen" maxleng
 echo '<tr><td>Nachname *</td><td><input type="text" maxlength="64" id="nachname" name="nachname" value="'.$nachname.'" required="required" autofocus/></td></tr>';
 echo '<tr><td>Titel(Post)</td><td><input type="text" id="titelpost" name="titelpost" maxlength="64" value="'.$titelpost.'" /></td></tr>';
 echo '<tr><td>Geschlecht *</td><td><SELECT id="geschlecht" name="geschlecht">';
-echo '<OPTION value="m" '.($geschlecht=='m'?'selected':'').'>m&auml;nnlich</OPTION>';
-echo '<OPTION value="w" '.($geschlecht=='w'?'selected':'').'>weiblich</OPTION>';
-echo '<OPTION value="u" '.($geschlecht=='u'?'selected':'').'>unbekannt</OPTION>';
+$geschlecht_obj = new geschlecht();
+$geschlecht_obj->getAll();
+foreach ($geschlecht_obj->result as $row_geschlecht)
+{
+	if ($row_geschlecht->geschlecht == $geschlecht)
+		$selected = 'selected';
+	else
+		$selected = '';
+
+	echo '<OPTION value="'.$row_geschlecht->geschlecht.'" '.$selected.'>'.$row_geschlecht->bezeichnung_mehrsprachig_arr[DEFAULT_LANGUAGE].'</OPTION>';
+}
 echo '</SELECT>';
 echo '</td></tr>';
 echo '<tr><td>Geburtsdatum </td><td><input type="text" id="geburtsdatum" size="10" maxlength="10" name="geburtsdatum" value="'.$geburtsdatum_orig.'" /> (Format: dd.mm.JJJJ)</td></tr>';

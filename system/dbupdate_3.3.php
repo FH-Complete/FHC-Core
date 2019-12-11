@@ -3449,6 +3449,40 @@ if(!$result = @$db->db_query("SELECT 1 FROM fue.tbl_projekttyp LIMIT 1"))
 		echo '<br>fue.tbl_projekttyp hinzugefuegt.';
 }
 
+// Add new Table for gender
+// Add FK to public.tbl_person and Drop old Check Constraint
+if(!$result = @$db->db_query("SELECT 1 FROM public.tbl_geschlecht LIMIT 1"))
+{
+	$qry = "
+		CREATE TABLE public.tbl_geschlecht
+		(
+			geschlecht character(1) NOT NULL,
+			bezeichnung_mehrsprachig varchar(255)[],
+			sort smallint
+		);
+		COMMENT ON TABLE public.tbl_geschlecht IS 'Key-Table of Gender';
+		ALTER TABLE public.tbl_geschlecht ADD CONSTRAINT pk_tbl_geschlecht PRIMARY KEY (geschlecht);
+
+		INSERT INTO public.tbl_geschlecht(geschlecht, bezeichnung_mehrsprachig, sort) VALUES ('m', '{\"männlich\",\"male\"}', 1);
+		INSERT INTO public.tbl_geschlecht(geschlecht, bezeichnung_mehrsprachig, sort) VALUES ('w', '{\"weiblich\",\"female\"}', 2);
+		INSERT INTO public.tbl_geschlecht(geschlecht, bezeichnung_mehrsprachig, sort) VALUES ('x', '{\"divers\",\"divers\"}', 3);
+		INSERT INTO public.tbl_geschlecht(geschlecht, bezeichnung_mehrsprachig, sort) VALUES ('u', '{\"unbekannt\",\"unknown\"}', 4);
+
+		ALTER TABLE public.tbl_person ADD CONSTRAINT fk_tbl_person_geschlecht FOREIGN KEY (geschlecht) REFERENCES public.tbl_geschlecht (geschlecht) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+		ALTER TABLE public.tbl_person DROP CONSTRAINT tbl_person_geschlecht;
+
+		GRANT SELECT ON TABLE public.tbl_geschlecht TO web;
+		GRANT SELECT ON TABLE public.tbl_geschlecht TO wawi;
+		GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE public.tbl_geschlecht TO vilesci;
+	";
+
+	if(!$db->db_query($qry))
+		echo '<strong>public.tbl_geschlecht: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>public.tbl_geschlecht hinzugefügt. Check Constraint für Geschlecht entfernt.';
+}
+
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
 
@@ -3626,6 +3660,7 @@ $tabellen=array(
 	"public.tbl_firmatag"  => array("firma_id","tag","insertamum","insertvon"),
 	"public.tbl_fotostatus"  => array("fotostatus_kurzbz","beschreibung"),
 	"public.tbl_funktion"  => array("funktion_kurzbz","beschreibung","aktiv","fachbereich","semester"),
+	"public.tbl_geschlecht"  => array("geschlecht","bezeichnung_mehrsprachig"),
 	"public.tbl_geschaeftsjahr"  => array("geschaeftsjahr_kurzbz","start","ende","bezeichnung"),
 	"public.tbl_gruppe"  => array("gruppe_kurzbz","studiengang_kz","semester","bezeichnung","beschreibung","sichtbar","lehre","aktiv","sort","mailgrp","generiert","updateamum","updatevon","insertamum","insertvon","ext_id","orgform_kurzbz","gid","content_visible","gesperrt","zutrittssystem","aufnahmegruppe","direktinskription"),
 	"public.tbl_kontakt"  => array("kontakt_id","person_id","kontakttyp","anmerkung","kontakt","zustellung","updateamum","updatevon","insertamum","insertvon","ext_id","standort_id"),

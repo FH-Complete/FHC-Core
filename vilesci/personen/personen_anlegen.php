@@ -27,6 +27,7 @@ require_once('../../include/person.class.php');
 require_once('../../include/datum.class.php');
 require_once('../../include/kontakt.class.php');
 require_once('../../include/adresse.class.php');
+require_once('../../include/geschlecht.class.php');
 
 if (!$db = new basis_db())
 	die('Es konnte keine Verbindung zum Server aufgebaut werden.');
@@ -39,7 +40,7 @@ loadVariables($user);
 <html>
 <head>
 	<meta charset="UTF-8">
-	<link href="../../skin/cis.css" rel="stylesheet" type="text/css">
+	<link href="../../skin/style.css.php" rel="stylesheet" type="text/css">
 	<script language="Javascript">
 	function disablefields(obj)
 	{
@@ -347,9 +348,17 @@ echo '<tr><td>Vorname</td><td><input type="text" id="vorname" maxlength="32" nam
 echo '<tr><td>Nachname *</td><td><input type="text" maxlength="64" id="nachname" name="nachname" value="'.$nachname.'" /></td></tr>';
 echo '<tr><td>Titel(Post)</td><td><input type="text" id="titelpost" name="titelpost" maxlength="64" value="'.$titelpost.'" /></td></tr>';
 echo '<tr><td>Geschlecht *</td><td><SELECT id="geschlecht" name="geschlecht">';
-echo '<OPTION value="m" '.($geschlecht=='m'?'selected':'').'>m&auml;nnlich</OPTION>';
-echo '<OPTION value="w" '.($geschlecht=='w'?'selected':'').'>weiblich</OPTION>';
-echo '<OPTION value="u" '.($geschlecht=='u'?'selected':'').'>unbekannt</OPTION>';
+$geschlecht_obj = new geschlecht();
+$geschlecht_obj->getAll();
+foreach ($geschlecht_obj->result as $row_geschlecht)
+{
+	if ($geschlecht == $row_geschlecht->geschlecht)
+		$selected = 'selected';
+	else
+		$selected = '';
+
+	echo '<OPTION value="'.$row_geschlecht->geschlecht.'" '.$selected.'>'.$row_geschlecht->bezeichnung_mehrsprachig_arr[DEFAULT_LANGUAGE].'</OPTION>';
+}
 echo '</SELECT>';
 echo '</td></tr>';
 echo '<tr><td>SVNR</td><td><input type="text" id="svnr" size="10" maxlength="10" name="svnr" value="'.$svnr.'" onblur="GeburtsdatumEintragen()" /></td></tr>';
