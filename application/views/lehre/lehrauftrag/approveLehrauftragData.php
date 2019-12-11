@@ -306,7 +306,7 @@ $filterWidgetArray = array(
         'OrgForm',
         'Person-ID',
         'Typ',
-        'Auftrag',
+        'LV- / Projektbezeichnung',
         'Semester',
         'Organisationseinheit',
         'Gruppe',
