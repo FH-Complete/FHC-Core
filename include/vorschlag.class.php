@@ -299,6 +299,7 @@ class vorschlag extends basis_db
 				$vs->frage_id = $row->frage_id;
 				$vs->nummer = $row->nummer;
 				$vs->punkte = $row->punkte;
+				$vs->aktiv = $this->db_parse_bool($row->aktiv);
 				$qry = "SELECT * FROM testtool.tbl_vorschlag_sprache 
 						WHERE vorschlag_id=".$this->db_add_param($row->vorschlag_id, FHC_INTEGER)." AND sprache=".$this->db_add_param($sprache).";";
 				if($this->db_query($qry))

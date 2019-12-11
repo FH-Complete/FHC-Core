@@ -20,7 +20,7 @@ class Studienjahr extends Auth_Controller
 				'editStudienjahr' => 'basis/studiensemester:rw',
 				'newStudienjahr' => 'basis/studiensemester:rw',
 				'insStudienjahr' => 'basis/studiensemester:rw',
-				'saveStudienjahr' => 'basis/studiensemester:rw',
+				'updateStudienjahr' => 'basis/studiensemester:rw',
 				'deleteStudienjahr' => 'basis/studiensemester:rw'
 			)
 		);
@@ -117,6 +117,10 @@ class Studienjahr extends Auth_Controller
 	public function insStudienjahr()
 	{
 		$data = $this->__retrieveStudienjahrData();
+		$studienjahr_exists = $this->StudienjahrModel->load($data['studienjahr_kurzbz']);
+		if (hasData($studienjahr_exists))
+			show_error("Studienjahr existiert bereits");
+
 		$studienjahr = $this->StudienjahrModel->insert($data);
 
 		if ($studienjahr->error)
@@ -177,7 +181,7 @@ class Studienjahr extends Auth_Controller
 	 * replaces slash in Kurzbezeichnung with underscore
 	 * saved=true is a GET parameter passed for showing save message
 	 */
-	public function saveStudienjahr()
+	public function updateStudienjahr()
 	{
 		$data = $this->__retrieveStudienjahrData();
 		$studienjahr = $this->StudienjahrModel->update($data['studienjahr_kurzbz'], $data);

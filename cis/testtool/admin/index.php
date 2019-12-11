@@ -690,6 +690,7 @@ if (($anzahl !== 0) || ($stg_kz == '-1') && ($stg_kz !== ''))
 	echo " <a href='$PHP_SELF?gebiet_id=$gebiet_id&amp;stg_kz=$stg_kz&amp;nummer=$nummer&amp;type=gebietpruefen' class='Item'>Prüfen</a> | ";
 	echo " <a href='edit_gebiet.php?gebiet_id=$gebiet_id&amp;stg_kz=$stg_kz' class='Item'>Bearbeiten</a> |";
 	echo " <a href='add_gebiet.php?stg_kz=".$stg_kz."'>Neues Gebiet</a> | ";
+	echo " <a href='copy_gebiet.php?stg_kz=".$stg_kz."&amp;gebietToCopy=".$gebiet_id."'>Gebiet kopieren</a>";
 	//echo " <a href='export.php?gebiet_id=$gebiet_id&amp;stg_kz=$stg_kz' target='_blank'>PDF exportieren</a>";
 	//echo " <br/>Gebiet_id=".$gebiet_id."";
 	echo '</td><td align="right">';
