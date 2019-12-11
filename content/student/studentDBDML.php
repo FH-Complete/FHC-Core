@@ -4032,7 +4032,8 @@ if(!$error)
 		else
 		{
 			// Wenn der Projektbetreuer schon einen Vertrag hat, wird das Loeschen verhindert
-			if (isset($_POST['vertrag_id']) && is_numeric($_POST['vertrag_id']))
+			if (isset($_POST['vertrag_id']) && is_numeric($_POST['vertrag_id']) &&
+				(defined('FAS_STUDIERENDE_PROJEKTARBEIT_VERTRAGSDETAILS_ANZEIGEN') && FAS_STUDIERENDE_PROJEKTARBEIT_VERTRAGSDETAILS_ANZEIGEN))
 			{
 				$return = false;
 				$errormsg = 'Löschen nur nach Stornierung des Vertrags möglich.';
