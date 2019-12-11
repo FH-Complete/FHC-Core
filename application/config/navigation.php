@@ -156,6 +156,13 @@ $config['navigation_menu']['lehre/lehrauftrag/Lehrauftrag/*'] = array(
 		'icon' => '',
 		'sort' => 1,
 		'requiredPermissions' => 'lehre/lehrauftrag_erteilen:r'
+	),
+	'lehrauftragLehrendeÜbersicht' => array(
+		'link' => site_url('lehre/lehrauftrag/Lehrauftrag/LehrendeUebersicht'),
+		'description' => 'Lehrendenübersicht',
+		'icon' => '',
+		'sort' => 1,
+		'requiredPermissions' => array('lehre/lehrauftrag_bestellen:r')
 	)
 );
 $config['navigation_menu']['lehre/lehrauftrag/LehrauftragErteilen/*'] = array(
