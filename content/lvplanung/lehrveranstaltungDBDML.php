@@ -157,8 +157,6 @@ function getStundenproInstitut($mitarbeiter_uid, $studiensemester_kurzbz, $oe_ar
 			WHERE
 				mitarbeiter_uid=".$db->db_add_param($mitarbeiter_uid)." AND
 				studiensemester_kurzbz=".$db->db_add_param($studiensemester_kurzbz)." AND
-				faktor>0 AND
-				stundensatz>0 AND
 				bismelden AND
 				tbl_studiengang.oe_kurzbz in(".$db->db_implode4SQL($oe_arr).")
 			GROUP BY tbl_studiengang.bezeichnung";
@@ -305,12 +303,12 @@ if(!$error)
 					$le = new lehreinheit();
 					$le->load($lem->lehreinheit_id);
 
-					if($lem->stundensatz<=0 || $lem->faktor<=0 || $lem->bismelden==false)
+					if($lem->bismelden==false)
 						$neue_stunden_eingerechnet=false;
 					else
 						$neue_stunden_eingerechnet=true;
 
-					if(($stundensatz_alt<=0 || $faktor_alt<=0 || $bismelden_alt==false))
+					if($bismelden_alt==false)
 						$alte_stunden_eingerechnet=false;
 					else
 						$alte_stunden_eingerechnet=true;
@@ -337,8 +335,6 @@ if(!$error)
 								WHERE
 									mitarbeiter_uid=".$db->db_add_param($lem->mitarbeiter_uid)." AND
 									studiensemester_kurzbz=".$db->db_add_param($le->studiensemester_kurzbz)." AND
-									faktor>0 AND
-									stundensatz>0 AND
 									bismelden";
 
 						if(count($oe_arr)>0)
@@ -559,8 +555,6 @@ if(!$error)
 							WHERE
 								mitarbeiter_uid=".$db->db_add_param($lem->mitarbeiter_uid)." AND
 								studiensemester_kurzbz=".$db->db_add_param($le->studiensemester_kurzbz)." AND
-								faktor>0 AND
-								stundensatz>0 AND
 								bismelden";
 
 					if(count($oe_arr)>0)

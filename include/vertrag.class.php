@@ -346,7 +346,7 @@ class vertrag extends basis_db
 			mitarbeiter_uid,
 			null as pruefung_id,
 			null as projektarbeit_id,
-			(tbl_lehreinheitmitarbeiter.faktor*tbl_lehreinheitmitarbeiter.semesterstunden*tbl_lehreinheitmitarbeiter.stundensatz) as betrag,
+			(tbl_lehreinheitmitarbeiter.semesterstunden*tbl_lehreinheitmitarbeiter.stundensatz) as betrag,
 			tbl_lehreinheit.studiensemester_kurzbz,
 			null as betreuerart_kurzbz,
 			(	SELECT
@@ -370,7 +370,7 @@ class vertrag extends basis_db
 			null as mitarbeiter_uid,
 			null::integer as pruefung_id,
 			projektarbeit_id,
-			(tbl_projektbetreuer.faktor*tbl_projektbetreuer.stunden*tbl_projektbetreuer.stundensatz) as betrag,
+			(tbl_projektbetreuer.stunden*tbl_projektbetreuer.stundensatz) as betrag,
 			tbl_lehreinheit.studiensemester_kurzbz,
 			tbl_projektbetreuer.betreuerart_kurzbz,
 			(SELECT nachname || ' ' || vorname FROM public.tbl_person JOIN public.tbl_benutzer USING(person_id) WHERE uid=tbl_projektarbeit.student_uid)
@@ -513,7 +513,7 @@ class vertrag extends basis_db
 			mitarbeiter_uid,
 			null as pruefung_id,
 			null as projektarbeit_id,
-			(tbl_lehreinheitmitarbeiter.faktor*tbl_lehreinheitmitarbeiter.semesterstunden*tbl_lehreinheitmitarbeiter.stundensatz) as betrag,
+			(tbl_lehreinheitmitarbeiter.semesterstunden*tbl_lehreinheitmitarbeiter.stundensatz) as betrag,
 			tbl_lehreinheit.studiensemester_kurzbz,
 			null as betreuerart_kurzbz,
 			(	SELECT
@@ -529,7 +529,7 @@ class vertrag extends basis_db
 		FROM
 			lehre.tbl_lehreinheitmitarbeiter
 			JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
-			JOIN lehre.tbl_vertrag USING (vertrag_id)		
+			JOIN lehre.tbl_vertrag USING (vertrag_id)
 		WHERE
 			vertrag_id=".$this->db_add_param($vertrag_id, FHC_INTEGER)."
 		UNION
@@ -539,7 +539,7 @@ class vertrag extends basis_db
 			null as mitarbeiter_uid,
 			null::integer as pruefung_id,
 			projektarbeit_id,
-			(tbl_projektbetreuer.faktor*tbl_projektbetreuer.stunden*tbl_projektbetreuer.stundensatz) as betrag,
+			(tbl_projektbetreuer.stunden*tbl_projektbetreuer.stundensatz) as betrag,
 			tbl_lehreinheit.studiensemester_kurzbz,
 			tbl_projektbetreuer.betreuerart_kurzbz,
 			(SELECT nachname || ' ' || vorname FROM public.tbl_person JOIN public.tbl_benutzer USING(person_id) WHERE uid=tbl_projektarbeit.student_uid)
@@ -1041,7 +1041,7 @@ class vertrag extends basis_db
 		$qry = "
 			UPDATE lehre.tbl_lehreinheitmitarbeiter SET vertrag_id=null WHERE vertrag_id=".$this->db_add_param($vertrag_id, FHC_INTEGER).";
 			UPDATE lehre.tbl_projektbetreuer SET vertrag_id=null WHERE vertrag_id=".$this->db_add_param($vertrag_id, FHC_INTEGER).";
-			INSERT INTO lehre.tbl_vertrag_vertragsstatus(vertragsstatus_kurzbz, vertrag_id, uid, datum, insertamum, insertvon) 
+			INSERT INTO lehre.tbl_vertrag_vertragsstatus(vertragsstatus_kurzbz, vertrag_id, uid, datum, insertamum, insertvon)
 				VALUES(".
 					$this->db_qoute('storno'). ", ".
 					$this->db_add_param($vertrag_id, FHC_INTEGER). ", ".
@@ -1123,7 +1123,7 @@ class vertrag extends basis_db
 	 */
 	public function getFalscheBetraege($studiensemester_kurzbz)
 	{
-		$qry = "SELECT * FROM 
+		$qry = "SELECT * FROM
 				(
 					SELECT
 						tbl_vertrag.*, tbl_lehreinheitmitarbeiter.mitarbeiter_uid, tbl_lehreinheitmitarbeiter.lehreinheit_id,
@@ -1136,7 +1136,7 @@ class vertrag extends basis_db
 					WHERE
 						studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz)."
 				)x
-				WHERE 
+				WHERE
 					x.semesterstunden * x.stundensatz != x.betrag";
 
 		if($result = $this->db_query($qry))

@@ -2545,8 +2545,8 @@ function LeMitarbeiterGesamtkosten()
 	faktor = document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-textbox-faktor').value
 	stundensatz = document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-textbox-stundensatz').value
 
-	if(!isNaN(semesterstunden) && !isNaN(faktor) && !isNaN(stundensatz))
-		gesamtkosten = semesterstunden*faktor*stundensatz;
+	if(!isNaN(semesterstunden) && !isNaN(stundensatz))
+		gesamtkosten = semesterstunden*stundensatz;
 	else
 		gesamtkosten = 0;
 
