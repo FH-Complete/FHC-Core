@@ -3483,6 +3483,34 @@ if(!$result = @$db->db_query("SELECT 1 FROM public.tbl_geschlecht LIMIT 1"))
 		echo '<br>public.tbl_geschlecht hinzugefügt. Check Constraint für Geschlecht entfernt.';
 }
 
+if($result = $db->db_query("SELECT * FROM pg_proc WHERE proname = 'transform_geschlecht'"))
+{
+	if ($db->db_num_rows($result) == 0)
+	{
+		$qry = '
+		CREATE OR REPLACE FUNCTION transform_geschlecht(character, date) RETURNS character
+		LANGUAGE plpgsql
+		AS $_$
+			DECLARE geschlecht ALIAS FOR $1;
+			DECLARE gebdatum ALIAS FOR $2;
+
+			BEGIN
+				IF geschlecht=\'x\' THEN
+					IF date_part(\'day\', gebdatum)::int%2=0 THEN
+						geschlecht:=\'m\';
+					ELSE
+						geschlecht:=\'w\';
+					END IF;
+				END IF;
+			RETURN geschlecht;
+			END;
+		$_$;';
+		if(!$db->db_query($qry))
+			echo '<strong>transform_geschlecht: '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>Function transform_geschlecht hinzugefügt.';
+	}
+}
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
 
