@@ -26,7 +26,8 @@ class Lehrauftrag extends Auth_Controller
             array(
                 'index' => 'lehre/lehrauftrag_bestellen:r',
                 'orderLehrauftrag' => 'lehre/lehrauftrag_bestellen:rw',
-				'Dashboard' => array('lehre/lehrauftrag_bestellen:r', 'lehre/lehrauftrag_erteilen:rw')
+				'Dashboard' => array('lehre/lehrauftrag_bestellen:r', 'lehre/lehrauftrag_erteilen:rw'),
+				'LehrendeUebersicht' => array('lehre/lehrauftrag_bestellen:r')
             )
         );
 
@@ -67,6 +68,14 @@ class Lehrauftrag extends Auth_Controller
 	public function Dashboard()
 	{
 		$this->load->view('lehre/lehrauftrag/Dashboard.php');
+	}
+
+	/**
+	 * Display of Lehrauftragsübersicht report
+	 */
+	public function LehrendeUebersicht()
+	{
+		$this->load->view('lehre/lehrauftrag/LehrendeUebersicht.php');
 	}
 
     // -----------------------------------------------------------------------------------------------------------------

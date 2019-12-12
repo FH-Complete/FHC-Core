@@ -96,7 +96,7 @@ function func_initialFilter(){
 // -----------------------------------------------------------------------------------------------------------------
 // Formats the group header
 function func_groupHeader(data){
-    return data[0].lv_bezeichnung;  // change name to lehrveranstaltung
+    return data[0].lv_bezeichnung + "&nbsp;&nbsp;" + ' ( LV-ID: ' + data[0].lehrveranstaltung_id + ' )';  // change name to lehrveranstaltung;
 };
 
 // Formats the rows

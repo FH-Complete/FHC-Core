@@ -130,5 +130,61 @@ class Vertragvertragsstatus_model extends DB_Model
         );
     }
 
-
+	/**
+	 * Get all contracts, where the status had been set to 'bestellt' on given date
+	 * @param string $string_date e.g. '01.11.2019' or special Date/Time inputs like 'YESTERDAY', 'TODAY', 'NOW'
+	 * @param bool $further_processed If true, ALL ordered contracts of that day are retrieved, even if they were
+	 * 								  were ALSO approved/accepted/cancelled (further processed) on that same day.
+	 * @return array
+	 */
+    public function getOrdered_fromDate($string_date = 'TODAY', $further_processed = false)
+	{
+    	$condition = '
+    		vertragsstatus_kurzbz = \'bestellt\' AND
+    		(datum)::date = date \''. $string_date .'\'
+		';
+    	
+    	if (!$further_processed)
+		{
+			$condition .= '
+			 AND
+    		vertrag_id NOT IN (
+    			SELECT vertrag_id
+    			FROM lehre.tbl_vertrag_vertragsstatus
+    			WHERE vertragsstatus_kurzbz IN (\'erteilt\', \'akzeptiert\', \'storno\')
+    			)
+			';
+		}
+  
+		return $this->loadWhere($condition);
+	}
+	
+	/**
+	 * Get all contracts, where the status had been set to 'erteilt' on given date
+	 * @param string $string_date e.g. '01.11.2019' or special Date/Time inputs like 'YESTERDAY', 'TODAY', 'NOW'
+	 * @param bool $further_processed If true, ALL contracts approved on that day are retrieved, even if they were
+	 * 								  were ALSO accepted/cancelled (further processed) on that same day.
+	 * @return array
+	 */
+	public function getApproved_fromDate($string_date = 'TODAY', $further_processed = false)
+	{
+		$condition = '
+				vertragsstatus_kurzbz = \'erteilt\' AND
+				(datum)::date = date \''. $string_date .'\'
+			';
+		
+		if (!$further_processed)
+		{
+			$condition .= '
+				 AND
+				vertrag_id NOT IN (
+					SELECT vertrag_id
+					FROM lehre.tbl_vertrag_vertragsstatus
+					WHERE vertragsstatus_kurzbz IN (\'akzeptiert\', \'storno\')
+					)
+				';
+		}
+		
+		return $this->loadWhere($condition);
+	}
 }

@@ -16,6 +16,36 @@ SELECT
     studiensemester_kurzbz,
     studiengang_kz,
     stg_typ_kurzbz,
+    /* get valid STPL(s), to which the lehrveranstaltung is assigned to (can be more) */
+    /* therefore join over lv, studiensemester and semester */
+    (
+           SELECT
+               string_agg(bezeichnung, \', \')
+           FROM (
+                    SELECT stpl.bezeichnung
+                    FROM lehre.tbl_studienplan stpl
+                             JOIN lehre.tbl_studienplan_semester stplsem USING (studienplan_id)
+                             JOIN lehre.tbl_studienplan_lehrveranstaltung stpllv USING (studienplan_id)
+                             JOIN lehre.tbl_lehrveranstaltung lv USING (lehrveranstaltung_id)
+                             JOIN lehre.tbl_lehreinheit le USING (lehrveranstaltung_id)
+                    WHERE
+                    	/* join over lv of the le */
+                    	le.lehreinheit_id = auftraege.lehreinheit_id
+					  AND stpl.aktiv
+					   /* then restrict on stpl of les studiensemester */
+					  AND stplsem.studiensemester_kurzbz = le.studiensemester_kurzbz
+					   /* then restrict on stpl of lvs semester*/
+					  AND stplsem.semester = stpllv.semester
+					  /* then restrict on most recent inserted studienplan of the lv */
+					  AND studienplan_id = (
+						SELECT stpllv.studienplan_id
+						FROM lehre.tbl_studienplan_lehrveranstaltung
+						WHERE lehrveranstaltung_id = lv.lehrveranstaltung_id
+						ORDER BY insertamum DESC
+						LIMIT 1
+						)
+					) AS tmp_stpl
+       )                                                    AS "studienplan_bezeichnung",
     orgform_kurzbz,
     person_id,
     typ,
@@ -317,10 +347,11 @@ $filterWidgetArray = array(
         'Studiensemester',
         'Studiengang-KZ',
         'Studiengang',
+		'Studienplan',
         'OrgForm',
         'Person-ID',
         'Typ',
-        'Auftrag',
+        'LV- / Projektbezeichnung',
         'Semester',
         'Organisationseinheit',
         'Gruppe',
@@ -389,11 +420,12 @@ $filterWidgetArray = array(
         projektarbeit_id: {visible: false},
         studiensemester_kurzbz: {headerFilter:"input"},
         studiengang_kz: {visible: false},
-        stg_typ_kurzbz: {visible: false},
+        stg_typ_kurzbz: {headerFilter:"input", width: "5%"},
+		studienplan_bezeichnung: {headerFilter:"input", width: "7%"},
         orgform_kurzbz: {headerFilter:"input"},
         person_id: {visible: false},
         typ: {headerFilter:"input"},
-        auftrag: {headerFilter:"input", width:"20%"},
+        auftrag: {headerFilter:"input", width:"15%"},
         semester: {headerFilter:"input"},
         lv_oe_kurzbz: {headerFilter:"input"},
         gruppe: {headerFilter:"input"},
@@ -402,7 +434,7 @@ $filterWidgetArray = array(
             headerFilter:"input", headerFilterFunc: hf_filterStringnumberWithOperator,
             bottomCalc:"sum", bottomCalcParams:{precision:1}},
         stundensatz: {visible: false},
-        betrag: {align:"right", formatter: form_formatNulltoStringNumber,
+        betrag: {align:"right", width: "8%", formatter: form_formatNulltoStringNumber,
             headerFilter:"input", headerFilterFunc: hf_filterStringnumberWithOperator,
             bottomCalc:"sum", bottomCalcParams:{precision:2}, bottomCalcFormatter:"money",
             bottomCalcFormatterParams:{decimal: ",", thousand: ".", symbol:"€"}},
@@ -410,12 +442,12 @@ $filterWidgetArray = array(
         vertrag_stunden: {visible: false},
         vertrag_betrag: {visible: false},
         mitarbeiter_uid: {visible: false},
-        bestellt: {align:"center", headerFilter:"input", mutator: mut_formatStringDate, tooltip: bestellt_tooltip},
-        erteilt: {align:"center", headerFilter:"input", mutator: mut_formatStringDate, tooltip: erteilt_tooltip},
-        akzeptiert: {align:"center", headerFilter:"input", mutator: mut_formatStringDate, tooltip: akzeptiert_tooltip},
+        bestellt: {align:"center", headerFilter:"input", mutator: mut_formatStringDate, tooltip: bestellt_tooltip, width: "8%"},
+        erteilt: {align:"center", headerFilter:"input", mutator: mut_formatStringDate, tooltip: erteilt_tooltip, width: "8%"},
+        akzeptiert: {align:"center", headerFilter:"input", mutator: mut_formatStringDate, tooltip: akzeptiert_tooltip, width: "8%"},
         bestellt_von: {visible: false},
         erteilt_von: {visible: false},
-        akzeptiert_von: {visible: false},
+        akzeptiert_von: {visible: false}
     }', // col properties
 );
 

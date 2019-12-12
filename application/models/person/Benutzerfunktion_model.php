@@ -48,7 +48,7 @@ class Benutzerfunktion_model extends DB_Model
 
 		if (is_string($funktion_kurzbz))
 		{
-			$query .= " AND funktion_kurzbz = ".$funktion_kurzbz.")";
+			$query .= " AND funktion_kurzbz = '".$funktion_kurzbz."'";
 		}
 		elseif (is_array($funktion_kurzbz) && count($funktion_kurzbz) > 0)
 		{

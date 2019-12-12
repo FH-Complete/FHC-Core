@@ -31,7 +31,9 @@ var StudentProjektbetreuerTreeDatasource=null; //Datasource des Projektbetreuer 
 var StudentProjektbetreuerSelectPersonID=null;
 var StudentProjektbetreuerSelectProjektarbeitID=null;
 var StudentProjektbetreuerSelectBetreuerartKurzbz=null;
-vertragsdetails_anzeigen = new Boolean(<?php echo (defined('FAS_STUDIERENDE_PROJEKTARBEIT_VERTRAGSDETAILS_ANZEIGEN') && FAS_STUDIERENDE_PROJEKTARBEIT_VERTRAGSDETAILS_ANZEIGEN) ? 'true' : 'false' ?>);
+
+// Config-Eintrag, ob Vertragsdetails angezeigt werden sollen
+var projektarbeit_vertragsdetails_anzeigen = Boolean(<?php echo (defined('FAS_STUDIERENDE_PROJEKTARBEIT_VERTRAGSDETAILS_ANZEIGEN') && FAS_STUDIERENDE_PROJEKTARBEIT_VERTRAGSDETAILS_ANZEIGEN) ? true : false ?>);
 
 // ********** Observer und Listener ************* //
 
@@ -117,7 +119,7 @@ var StudentProjektbetreuerTreeListener =
 		//ohne dem setTimeout
 		window.setTimeout(StudentProjektbetreuerTreeSelectID,10);
 
-		if(vertragsdetails_anzeigen)
+		if(projektarbeit_vertragsdetails_anzeigen)
         {
             var mindEinVertragExistiert = StudentProjektbetreuer_VertragExistiert();
 
@@ -181,10 +183,9 @@ function StudentProjektarbeitTreeLoad(uid)
 	tree.builder.addListener(StudentProjektarbeitTreeListener);
 
 	StudentProjektarbeitDisableFields(false);
-    var vertragsdetails_anzeigen = new Boolean(<?php echo (defined('FAS_STUDIERENDE_PROJEKTARBEIT_VERTRAGSDETAILS_ANZEIGEN') && FAS_STUDIERENDE_PROJEKTARBEIT_VERTRAGSDETAILS_ANZEIGEN) ? 'true' : 'false' ?>);
-
+	
     // Wenn Vertragsdetails angezeigt werden
-    if (vertragsdetails_anzeigen) {
+    if (projektarbeit_vertragsdetails_anzeigen) {
         //Reset attributes
         document.getElementById('student-projektbetreuer-label-vertragsstatus').value = '';
         document.getElementById('student-projektbetreuer-label-vertragsstunden').value = '';
@@ -891,12 +892,9 @@ function StudentProjektbetreuerAuswahl()
 	document.getElementById('student-projektbetreuer-checkbox-neu').checked=false;
 
     var gesamtkosten = StudentProjektbetreuerGesamtkosten();
-
-    // Prüfe ob Vertragsdetails angezeigt werden
-    var vertragsdetails_anzeigen = new Boolean(<?php echo (defined('FAS_STUDIERENDE_PROJEKTARBEIT_VERTRAGSDETAILS_ANZEIGEN') && FAS_STUDIERENDE_PROJEKTARBEIT_VERTRAGSDETAILS_ANZEIGEN) ? 'true' : 'false' ?>);
-
+    
     // Wenn Vertragsdetails angezeigt werden
-    if (vertragsdetails_anzeigen) {
+    if (projektarbeit_vertragsdetails_anzeigen) {
          //Reset attributes
         document.getElementById('student-projektbetreuer-label-vertragsstatus').setAttribute("style", "font-weight: normal");
         document.getElementById('student-projektbetreuer-button-vertrag-stornieren').setAttribute("tooltiptext",

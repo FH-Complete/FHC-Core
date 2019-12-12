@@ -86,6 +86,7 @@ $this->load->view(
 					<h4>Geänderte Lehraufträge</h4>
 					<div class="panel panel-body">
 						Im FAS können Änderungen an Stunden/Stundensatz eines Lehrauftrags durchgeführt werden, solange dieser nicht vom Lehrenden angenommen wurde.<br>
+						Diese müssen dann erneut bestellt werden.<br><br>
 						Wenn Änderungen an bereits bestellten oder erteilten Lehraufträgen vorgenommen wurden, werden diese in einem tooltip angezeigt.<br>
 						Fahren Sie dazu mit der Maus über dem Status-Icon am Beginn der Zeile.<br>
 					</div>
@@ -117,7 +118,7 @@ $this->load->view(
 								<td><b>Bestellt</b><br>Nur bestellte UND geänderte bestellte Lehraufträge</td>
 								<td><b>Erteilt</b><br>Nur erteilte UND geänderte erteilte Lehraufträge</td>
 								<td><b>Angenommen</b><br>Nur vom Lehrenden angenommene Lehraufträge</td>
-								<td><b>Geändert</b><br>Nur geänderte Lehraufträge, die den Status 'bestellt' oder 'erteilt' haben</td>
+								<td><b>Geändert</b><br>Nur Lehraufträge, die geändert wurden, nachdem sie bereits bestellt oder erteilt worden sind</td>
 								<td><b>Dummies</b><br>Nur Lehraufträge, die mit einem Dummylektor angelegt sind</td>
 							</tr>
 						</table>

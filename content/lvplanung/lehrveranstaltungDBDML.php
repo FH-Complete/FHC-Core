@@ -693,8 +693,11 @@ if(!$error)
 			//Lehreinheitmitarbeiterzuteilung loeschen
 			if(isset($_POST['lehreinheit_id']) && is_numeric($_POST['lehreinheit_id']) && isset($_POST['mitarbeiter_uid']))
 			{
-				// Wenn der Mitarbeiter schon einen Vertrag hat, wird das Loeschen verhindert
-				if (isset($_POST['vertrag_id']) && is_numeric($_POST['vertrag_id']))
+				// Wenn der Mitarbeiter schon einen Vertrag hat UND
+				// der config Eintrag zum Anzeigen der Vertragsdetails true ist,
+				// wird das Loeschen verhindert
+				if (isset($_POST['vertrag_id']) && is_numeric($_POST['vertrag_id']) &&
+					(defined('FAS_LV_LEKTORINNENZUTEILUNG_VERTRAGSDETAILS_ANZEIGEN') && FAS_LV_LEKTORINNENZUTEILUNG_VERTRAGSDETAILS_ANZEIGEN))
 				{
 					$return = false;
 					$errormsg = 'Löschen nur nach Stornierung des Vertrags möglich.';
