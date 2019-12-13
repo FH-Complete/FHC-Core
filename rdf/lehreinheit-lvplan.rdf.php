@@ -38,6 +38,8 @@ require_once('../include/lehreinheit.class.php');
 require_once('../include/notiz.class.php');
 require_once('../include/mitarbeiter.class.php');
 require_once('../include/zeitaufzeichnung_gd.class.php');
+require_once('../include/lehreinheitmitarbeiter.class.php');
+require_once('../include/vertrag.class.php');
 
 $uid=get_uid();
 $error_msg='';
@@ -90,6 +92,10 @@ if (isset($_GET['orgform']))
 	$orgform=$_GET['orgform'];
 else
 	$orgform=null;
+if (isset($_GET['vertrag']))
+	$vertrag=$_GET['vertrag'];
+else
+	$vertrag=null;
 
 //Sortierreihenfolge
 if(isset($_GET['order']))
@@ -304,6 +310,59 @@ if ($anz>0)
 		else
 			$fixangestellt_info = 'EXT';
 
+		$vertragsstatus_arr = array();
+		$vertragsstatus_kurzbz_arr = array();
+		// Lehrauftragsstatus ermitteln
+		foreach ($l->lem as $row_lem)
+		{
+			$lem_obj = new lehreinheitmitarbeiter();
+			if ($lem_obj->load($row_lem['lehreinheit_id'], $row_lem['mitarbeiter_uid']))
+			{
+				if ($lem_obj->vertrag_id != '')
+				{
+					$vertrag_obj = new vertrag();
+					if($vertrag_obj->getStatus($lem_obj->vertrag_id))
+					{
+						$vertragsstatus_arr[] = $vertrag_obj->vertragsstatus_bezeichnung;
+						$vertragsstatus_kurzbz_arr[] = $vertrag_obj->vertragsstatus_kurzbz;
+					}
+				}
+				else
+				{
+					$vertragsstatus_arr[] = 'Neu';
+				}
+			}
+		}
+		$vertragsstatus = implode(',', array_unique($vertragsstatus_arr));
+
+		if (!is_null($vertrag) && $vertrag != '')
+		{
+			switch($vertrag)
+			{
+				// Alle ab Status erteilt herausfiltern
+				// der rest wird verworfen
+				case 'erteilt':
+					if (!in_array('erteilt', $vertragsstatus_kurzbz_arr)
+					 && !in_array('akzeptiert', $vertragsstatus_kurzbz_arr))
+					{
+						continue 2;
+					}
+					break;
+
+				// Alle ab Status bestellt herausfiltern
+				// der rest wird verworfen
+				case 'bestellt':
+					if (!in_array('bestellt', $vertragsstatus_kurzbz_arr)
+					 && !in_array('erteilt', $vertragsstatus_kurzbz_arr)
+					 && !in_array('akzeptiert', $vertragsstatus_kurzbz_arr))
+					{
+						continue 2;
+					}
+					break;
+				default:
+					break;
+			}
+		}
 		echo'<RDF:li>
 			<RDF:Description  id="lva'.($anz--).'" about="'.$rdf_url.$l->unr.'">
 					<LVA:lvnr>'.$lvnr.'</LVA:lvnr>
@@ -335,6 +394,7 @@ if ($anz>0)
 					<LVA:lehrverband>'.$lehrverband.'</LVA:lehrverband>
 					<LVA:anzahl_notizen>'.$anzahl_notizen.'</LVA:anzahl_notizen>
 					<LVA:lehreinheit_id>'.$l->lehreinheit_id[0].'</LVA:lehreinheit_id>
+					<LVA:vertragsstatus>'.$vertragsstatus.'</LVA:vertragsstatus>
 				</RDF:Description>
 			</RDF:li>';
 	}

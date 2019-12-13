@@ -87,10 +87,16 @@ FROM
     SELECT *,
         /* concatinated and aggregated gruppen */
         (SELECT
-             string_agg(concat(stg_typ_kurzbz, \'-\', semester, verband, gruppe
-                             || gruppe_kurzbz), \', \')
+			string_agg(
+			   CASE WHEN gruppe_kurzbz is null THEN
+				  concat(upper(grpstg.typ || grpstg.kurzbz), \'-\', semester, verband, gruppe)
+			  ELSE
+				  gruppe_kurzbz
+			  END
+			  , \', \')
          FROM
              lehre.tbl_lehreinheitgruppe
+			 JOIN public.tbl_studiengang grpstg USING(studiengang_kz)
          WHERE
              lehreinheit_id = tmp_lehrauftraege.lehreinheit_id
         )                                                 AS "gruppe",
@@ -188,10 +194,16 @@ FROM
                LIMIT 1)                                 AS "mitarbeiter_uid",
             /* concatinated and aggregated gruppen */
             (SELECT
-                 string_agg(concat(stg_typ_kurzbz, \'-\', semester, verband, gruppe
-                                    || gruppe_kurzbz), \', \')
+				string_agg(
+				  CASE WHEN gruppe_kurzbz is null THEN
+					 concat(upper(grpstg.typ || grpstg.kurzbz), \'-\', semester, verband, gruppe)
+				 ELSE
+					 gruppe_kurzbz
+				 END
+				 , \', \')
              FROM
                  lehre.tbl_lehreinheitgruppe
+				 JOIN public.tbl_studiengang grpstg USING(studiengang_kz)
              WHERE
                      lehreinheit_id = tmp_projektbetreuung.lehreinheit_id
             )                                                    AS "gruppe",
@@ -306,7 +318,7 @@ $filterWidgetArray = array(
         'OrgForm',
         'Person-ID',
         'Typ',
-        'Auftrag',
+        'LV- / Projektbezeichnung',
         'Semester',
         'Organisationseinheit',
         'Gruppe',
@@ -373,7 +385,7 @@ $filterWidgetArray = array(
         projektarbeit_id: {visible: false},
         studiensemester_kurzbz: {headerFilter:"input"},
         studiengang_kz: {visible: false},
-        stg_typ_kurzbz: {visible: false},
+        stg_typ_kurzbz: {headerFilter:"input", width: "5%"},
         orgform_kurzbz: {headerFilter:"input"},
         person_id: {visible: false},
         typ: {headerFilter:"input"},
@@ -385,16 +397,16 @@ $filterWidgetArray = array(
         stunden: {align:"right",  formatter: form_formatNulltoStringNumber, formatterParams:{precision:1},
             headerFilter:"input", headerFilterFunc: hf_filterStringnumberWithOperator,
             bottomCalc:"sum", bottomCalcParams:{precision:1}},
-        betrag: {align:"right", formatter: form_formatNulltoStringNumber,
+        betrag: {align:"right", width: "8%", formatter: form_formatNulltoStringNumber,
             headerFilter:"input", headerFilterFunc: hf_filterStringnumberWithOperator,
             bottomCalc:"sum", bottomCalcParams:{precision:2}, bottomCalcFormatter:"money", bottomCalcFormatterParams:{decimal: ",", thousand: ".", symbol:"€"}},
         vertrag_id: {visible: false},
         vertrag_stunden: {visible: false},
         vertrag_betrag: {visible: false},
         mitarbeiter_uid: {visible: false},
-        bestellt: {align:"center", headerFilter:"input", mutator: mut_formatStringDate, tooltip: bestellt_tooltip},
-        erteilt: {align:"center", headerFilter:"input", mutator: mut_formatStringDate, tooltip: erteilt_tooltip},
-        akzeptiert: {align:"center", headerFilter:"input", mutator: mut_formatStringDate, tooltip: akzeptiert_tooltip},
+        bestellt: {align:"center", headerFilter:"input", mutator: mut_formatStringDate, tooltip: bestellt_tooltip, width: "8%"},
+        erteilt: {align:"center", headerFilter:"input", mutator: mut_formatStringDate, tooltip: erteilt_tooltip, width: "8%"},
+        akzeptiert: {align:"center", headerFilter:"input", mutator: mut_formatStringDate, tooltip: akzeptiert_tooltip, width: "8%"},
         bestellt_von: {visible: false},
         erteilt_von: {visible: false},
         akzeptiert_von: {visible: false},

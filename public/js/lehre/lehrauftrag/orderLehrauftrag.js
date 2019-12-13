@@ -100,9 +100,9 @@ function func_dataLoaded(data, table){
 // Tabulator table format functions
 // -----------------------------------------------------------------------------------------------------------------
 // Formats the group header
-function func_groupHeader(data){
-    return data[0].lv_bezeichnung;  // change name to lehrveranstaltung
-};
+function func_groupHeader(data) {
+    return data[0].lv_bezeichnung + "&nbsp;&nbsp;" + ' ( LV-ID: ' + data[0].lehrveranstaltung_id + ' )';  // change name to lehrveranstaltung;
+}
 
 // Formats the rows
 function func_rowFormatter(row){

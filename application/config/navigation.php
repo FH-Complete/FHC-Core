@@ -14,6 +14,7 @@ $config['navigation_header'] = array(
 			'icon' => 'sitemap',
 			'description' => 'Organisation',
 			'sort' => 20,
+			'requiredPermissions' => 'basis/vilesci:r',
 			'children'=> array(
 				'vilesci' => array(
 					'link' => base_url('vilesci'),
@@ -30,6 +31,7 @@ $config['navigation_header'] = array(
 			'icon' => 'graduation-cap',
 			'description' => 'Lehre',
 			'sort' => 30,
+			'requiredPermissions' => 'basis/vilesci:r',
 			'children'=> array(
 				'cis' => array(
 					'link' => CIS_ROOT,
@@ -68,6 +70,7 @@ $config['navigation_header'] = array(
 			'icon' => 'user',
 			'description' => 'Personen',
 			'sort' => 40,
+			'requiredPermissions' => 'basis/vilesci:r',
 			'children'=> array(
 				'bpk' => array(
 					'link' => site_url('person/BPKWartung'),
@@ -156,6 +159,13 @@ $config['navigation_menu']['lehre/lehrauftrag/Lehrauftrag/*'] = array(
 		'icon' => '',
 		'sort' => 1,
 		'requiredPermissions' => 'lehre/lehrauftrag_erteilen:r'
+	),
+	'lehrauftragLehrendeÜbersicht' => array(
+		'link' => site_url('lehre/lehrauftrag/Lehrauftrag/LehrendeUebersicht'),
+		'description' => 'Lehrendenübersicht',
+		'icon' => '',
+		'sort' => 1,
+		'requiredPermissions' => array('lehre/lehrauftrag_bestellen:r')
 	)
 );
 $config['navigation_menu']['lehre/lehrauftrag/LehrauftragErteilen/*'] = array(

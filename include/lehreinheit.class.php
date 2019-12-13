@@ -802,6 +802,9 @@ class lehreinheit extends basis_db
 				$this->lehreinheiten[$row->unr]->lehrverband[]=$row->gruppe_kurzbz;
 			else
 				$this->lehreinheiten[$row->unr]->lehrverband[]=$lvb;
+			$this->lehreinheiten[$row->unr]->lem[]=array(
+				'lehreinheit_id' => $row->lehreinheit_id,
+				'mitarbeiter_uid' => $row->lektor_uid);
 		}
 		return true;
 	}

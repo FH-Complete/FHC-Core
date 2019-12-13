@@ -116,7 +116,7 @@ $this->load->view(
 								<td><b>Bestellt</b><br>Nur bestellte UND geänderte bestellte Lehraufträge</td>
 								<td><b>Erteilt</b><br>Nur erteilte UND geänderte erteilte Lehraufträge</td>
 								<td><b>Angenommen</b><br>Nur vom Lehrenden angenommene Lehraufträge</td>
-								<td><b>Geändert</b><br>Nur geänderte Lehraufträge, die den Status 'bestellt' oder 'erteilt' haben</td>
+								<td><b>Geändert</b><br>Nur Lehraufträge, die geändert wurden, nachdem sie bereits bestellt oder erteilt worden sind</td>
 								<td><b>Dummies</b><br>Nur Lehraufträge, die mit einem Dummylektor angelegt sind</td>
 							</tr>
 						</table>
