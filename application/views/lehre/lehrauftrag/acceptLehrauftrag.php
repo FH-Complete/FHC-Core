@@ -14,7 +14,6 @@ $this->load->view(
         'ajaxlib' => true,
         'dialoglib' => true,
         'tablewidget' => true,
-        'navigationwidget' => true,
         'phrases' => array(
             'global' => array('lehrauftraegeAnnehmen'),
         ),
@@ -56,14 +55,14 @@ $this->load->view(
 						</ol>
 					</div>
 					<br>
-					
+
 					<h4>Warum kann ich manche Lehraufträge nicht auswählen?</h4>
 					<div class="panel panel-body">
 						Nur Lehraufträge mit dem Status 'erteilt' können gewählt werden.<br>
 						Angenommene Lehraufträge oder Lehraufträge in Bearbeitung werden nur zu Ihrer Information angezeigt.
 					</div>
 					<br>
-					
+
 					<h4>Filter</h4>
 					<div class="panel panel-body">
 						<div class="col-xs-12 col-md-8 col-lg-6">
@@ -150,7 +149,7 @@ $this->load->view(
                 </div>
             </div>
         </div>
-		
+
     </div><!-- end container -->
 </div><!-- end page-wrapper -->
 <br>
