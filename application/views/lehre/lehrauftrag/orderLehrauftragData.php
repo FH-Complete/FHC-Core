@@ -172,7 +172,7 @@ FROM
                     WHEN oe.organisationseinheittyp_kurzbz = \'Department\' THEN (\'DEP \' || oe.bezeichnung)
                     ELSE (oe.organisationseinheittyp_kurzbz || \' \' || oe.bezeichnung)
                     END                                             AS "lv_oe_kurzbz",
-                (person.vorname || \' \' || person.nachname)        AS "lektor",
+                (person.nachname || \' \' || person.vorname)        AS "lektor",
                 TRUNC(lema.semesterstunden, 1)                      AS "stunden",
                 lema.stundensatz,
                 TRUNC((lema.semesterstunden * lema.stundensatz), 2) AS "betrag",
@@ -287,7 +287,7 @@ FROM
                         ELSE (oe.organisationseinheittyp_kurzbz ||
                               \' \' || oe.bezeichnung)
                         END                                                                             AS "lv_oe_kurzbz",
-                    (vorname || \' \' || nachname)                                                      AS "lektor",
+                    (nachname || \' \' || vorname)                                                      AS "lektor",
                     TRUNC(pb.stunden, 1)                                                                AS "stunden",
                     pb.stundensatz,
                     TRUNC((pb.stunden * pb.stundensatz), 2)                                             AS "betrag",
