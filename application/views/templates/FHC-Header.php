@@ -33,6 +33,7 @@
 	$tablewidget = isset($tablewidget) ? $tablewidget : false;
 	$tabulator = isset($tabulator) ? $tabulator : false;
 	$tinymce = isset($tinymce) ? $tinymce : false;
+	$udfs = isset($udfs) ? $udfs : false;
 ?>
 
 <!-- Header start -->
@@ -175,6 +176,9 @@
 
 			// Tinymce JS
 			if ($tinymce === true) generateJSsInclude('vendor/tinymce/tinymce/tinymce.min.js');
+
+			// Tinymce JS
+			if ($udfs === true) generateJSsInclude('public/js/UDFWidget.js');
 
 			// SB Admin 2 template JS
 			if ($sbadmintemplate === true)

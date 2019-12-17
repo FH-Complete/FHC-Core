@@ -7,6 +7,10 @@ if (! defined('BASEPATH')) exit('No direct script access allowed');
  */
 class UDFLib
 {
+	const UDF_UNIQUE_ID = 'udfUniqueId';
+
+	const SESSION_NAME = 'FHC_UDF_WIDGET';
+
 	const WIDGET_NAME = 'UDFWidget';
 	const SCHEMA_ARG_NAME = 'schema';
 	const TABLE_ARG_NAME = 'table';
@@ -21,6 +25,16 @@ class UDFLib
 	const LIST_VALUES = 'listValues'; // UDF listValues attribute
 	const FE_REGEX_LANGUAGE = 'js'; // UDF javascript regex language attribute (front end)
 	const BE_REGEX_LANGUAGE = 'php'; // UDF php regex language attribute (back end)
+
+	// ...to specify permissions that are needed to use this TableWidget
+	const REQUIRED_PERMISSIONS_PARAMETER = 'requiredPermissions';
+
+	// ...
+	const PRIMARY_KEY_NAME = 'primaryKeyName';
+	const PRIMARY_KEY_VALUE = 'primaryKeyValue';
+
+	const PERMISSION_TABLE_METHOD = 'UDFWidget'; // Name for fake method to be checked by the PermissionLib
+	const PERMISSION_TYPE = 'rw';
 
 	// HTML components
 	const LABEL = 'title';
@@ -47,6 +61,8 @@ class UDFLib
 
 	private $_ci; // Code igniter instance
 
+	private $_udfUniqueId; //
+
 	/**
 	 * Loads fhc helper
 	 */
@@ -63,8 +79,8 @@ class UDFLib
      */
     public function UDFWidget($args, $htmlArgs = array())
     {
-		if ((isset($args[UDFLib::SCHEMA_ARG_NAME]) && !isEmptyString($args[UDFLib::SCHEMA_ARG_NAME]))
-			&& (isset($args[UDFLib::TABLE_ARG_NAME]) && !isEmptyString($args[UDFLib::TABLE_ARG_NAME])))
+		if ((isset($args[self::SCHEMA_ARG_NAME]) && !isEmptyString($args[self::SCHEMA_ARG_NAME]))
+			&& (isset($args[self::TABLE_ARG_NAME]) && !isEmptyString($args[self::TABLE_ARG_NAME])))
 		{
 			// Loads the widget library
 			$this->_ci->load->library('WidgetLib');
@@ -73,26 +89,26 @@ class UDFLib
 			loadResource(APPPATH.'widgets/udf');
 
 			// Default external block is true
-			if (!isset($args[UDFLib::FIELD_ARG_NAME]) && !isset($htmlArgs[HTMLWidget::EXTERNAL_BLOCK]))
+			if (!isset($args[self::FIELD_ARG_NAME]) && !isset($htmlArgs[HTMLWidget::EXTERNAL_BLOCK]))
 			{
 				$htmlArgs[HTMLWidget::EXTERNAL_BLOCK] = true;
 			}
 
 			return $this->_ci->widgetlib->widget(
-				UDFLib::WIDGET_NAME,
+				self::WIDGET_NAME,
 				$args,
 				$htmlArgs
 			);
 		}
 		else
 		{
-			if (!isset($args[UDFLib::SCHEMA_ARG_NAME]) || isEmptyString($args[UDFLib::SCHEMA_ARG_NAME]))
+			if (!isset($args[self::SCHEMA_ARG_NAME]) || isEmptyString($args[self::SCHEMA_ARG_NAME]))
 			{
-				show_error(UDFLib::SCHEMA_ARG_NAME.' parameter is missing!');
+				show_error(self::SCHEMA_ARG_NAME.' parameter is missing!');
 			}
-			if (!isset($args[UDFLib::TABLE_ARG_NAME]) || isEmptyString($args[UDFLib::TABLE_ARG_NAME]))
+			if (!isset($args[self::TABLE_ARG_NAME]) || isEmptyString($args[self::TABLE_ARG_NAME]))
 			{
-				show_error(UDFLib::TABLE_ARG_NAME.' parameter is missing!');
+				show_error(self::TABLE_ARG_NAME.' parameter is missing!');
 			}
 		}
     }
@@ -105,12 +121,12 @@ class UDFLib
 	 */
     public function displayUDFWidget(&$widgetData)
 	{
-		$schema = $widgetData[UDFLib::SCHEMA_ARG_NAME]; // schema attribute
-		$table = $widgetData[UDFLib::TABLE_ARG_NAME]; // table attribute
+		$schema = $widgetData[self::SCHEMA_ARG_NAME]; // schema attribute
+		$table = $widgetData[self::TABLE_ARG_NAME]; // table attribute
 
-		if (isset($widgetData[UDFLib::FIELD_ARG_NAME]))
+		if (isset($widgetData[self::FIELD_ARG_NAME]))
 		{
-			$field = $widgetData[UDFLib::FIELD_ARG_NAME]; // UDF name
+			$field = $widgetData[self::FIELD_ARG_NAME]; // UDF name
 		}
 
 		$udfResults = $this->_loadUDF($schema, $table); // loads UDF definition
@@ -122,6 +138,9 @@ class UDFLib
 				$jsonSchemas = json_decode($udf->jsons); // decode the json schema
 				if (is_object($jsonSchemas) || is_array($jsonSchemas))
 				{
+					//
+					$this->_printStartUDFBlock($widgetData);
+
 					// If the schema is an object then convert it into an array
 					if (is_object($jsonSchemas))
 					{
@@ -140,18 +159,18 @@ class UDFLib
 					foreach ($jsonSchemasArray as $jsonSchema)
 					{
 						// If the type property is not present then show an error
-						if (!isset($jsonSchema->{UDFLib::TYPE}))
+						if (!isset($jsonSchema->{self::TYPE}))
 						{
 							show_error(sprintf('%s.%s: Attribute "type" not present in the json schema', $schema, $table));
 						}
 						// If the name property is not present then show an error
-						if (!isset($jsonSchema->{UDFLib::NAME}))
+						if (!isset($jsonSchema->{self::NAME}))
 						{
 							show_error(sprintf('%s.%s: Attribute "name" not present in the json schema', $schema, $table));
 						}
 
 						// If a UDF is specified and is present in the json schemas list or no UDF is specified
-						if ((isset($field) && $field == $jsonSchema->{UDFLib::NAME}) || !isset($field))
+						if ((isset($field) && $field == $jsonSchema->{self::NAME}) || !isset($field))
 						{
 							// Set attributes using phrases
 							$this->_setAttributesWithPhrases($jsonSchema, $widgetData[HTMLWidget::HTML_ARG_NAME]);
@@ -166,7 +185,7 @@ class UDFLib
 							$this->_render($jsonSchema, $widgetData);
 
 							// If a UDf is specified and it was found then stop looking through this list
-							if (isset($field) && $field == $jsonSchema->{UDFLib::NAME})
+							if (isset($field) && $field == $jsonSchema->{self::NAME})
 							{
 								$found = true;
 								break;
@@ -179,6 +198,9 @@ class UDFLib
 					{
 						show_error(sprintf('%s.%s: No schema present for field: %s', $schema, $table, $field));
 					}
+
+					//
+					$this->_printEndUDFBlock();
 				}
 				else // not a valid schema
 				{
@@ -218,7 +240,7 @@ class UDFLib
 
 			// Decodes json that define the UDFs for this table
 			$decodedUDFDefinitions = json_decode(
-				$resultUDFsDefinitions->retval[0]->{UDFLib::COLUMN_JSON_DESCRIPTION}
+				$resultUDFsDefinitions->retval[0]->{self::COLUMN_JSON_DESCRIPTION}
 			);
 
 			// Loops through the UDFs definitions
@@ -232,28 +254,28 @@ class UDFLib
 					$tmpValidate = success(true); // temporary variable used to store the returned value from _validateUDFs
 
 					// If this is the definition of this UDF
-					if ($decodedUDFDefinition->{UDFLib::NAME} == $key)
+					if ($decodedUDFDefinition->{self::NAME} == $key)
 					{
-						if (isset($decodedUDFDefinition->{UDFLib::VALIDATION})) // If validation rules are present for this UDF
+						if (isset($decodedUDFDefinition->{self::VALIDATION})) // If validation rules are present for this UDF
 						{
 							// Checks if the given UDF is required and the result will be stored in $chkRequiredPassed
 							// If $chkRequiredPassed == true => required check passed
 							// If $chkRequiredPassed == false => required check NOT passed
 							$chkRequiredPassed = true;
 							// If required property is present in the UDF description and it is true
-							if (isset($decodedUDFDefinition->{UDFLib::VALIDATION}->{UDFLib::REQUIRED})
-								&& $decodedUDFDefinition->{UDFLib::VALIDATION}->{UDFLib::REQUIRED} === true)
+							if (isset($decodedUDFDefinition->{self::VALIDATION}->{self::REQUIRED})
+								&& $decodedUDFDefinition->{self::VALIDATION}->{self::REQUIRED} === true)
 							{
 								// If this UDF is a checkbox and the given value is false
 								// OR
-								// if this UDF is NOT a checkbox and the given value is null
-								if (($decodedUDFDefinition->{UDFLib::TYPE} == UDFLib::CHKBOX_TYPE && $val === false)
-									|| ($decodedUDFDefinition->{UDFLib::TYPE} != UDFLib::CHKBOX_TYPE && $val == null))
+								// if this UD7F is NOT a checkbox and the given value is null
+								if (($decodedUDFDefinition->{self::TYPE} == self::CHKBOX_TYPE && $val === false)
+									|| ($decodedUDFDefinition->{self::TYPE} != self::CHKBOX_TYPE && $val == null))
 								{
 									$chkRequiredPassed = false; // not passed
 									// A new error is generated and added to array $requiredUDFsArray
-									$requiredUDFsArray[$decodedUDFDefinition->{UDFLib::NAME}] = error(
-										$decodedUDFDefinition->{UDFLib::NAME},
+									$requiredUDFsArray[$decodedUDFDefinition->{self::NAME}] = error(
+										$decodedUDFDefinition->{self::NAME},
 										EXIT_VALIDATION_UDF_REQUIRED
 									);
 								}
@@ -267,22 +289,22 @@ class UDFLib
 								// If $toBeValidated == false => validation is NOT performed
 								$toBeValidated = false;
 								// If this UDF is NOT a checkbox
-								if ($decodedUDFDefinition->{UDFLib::TYPE} != UDFLib::CHKBOX_TYPE)
+								if ($decodedUDFDefinition->{self::TYPE} != self::CHKBOX_TYPE)
 								{
 									// If required property is NOT present in the UDF description
-									if (!isset($decodedUDFDefinition->{UDFLib::VALIDATION}->{UDFLib::REQUIRED}))
+									if (!isset($decodedUDFDefinition->{self::VALIDATION}->{self::REQUIRED}))
 									{
 										$toBeValidated = true;
 									}
 									// If required property is present in the UDF description and it is true
-									if (isset($decodedUDFDefinition->{UDFLib::VALIDATION}->{UDFLib::REQUIRED})
-										&& $decodedUDFDefinition->{UDFLib::VALIDATION}->{UDFLib::REQUIRED} === true)
+									if (isset($decodedUDFDefinition->{self::VALIDATION}->{self::REQUIRED})
+										&& $decodedUDFDefinition->{self::VALIDATION}->{self::REQUIRED} === true)
 									{
 										$toBeValidated = true;
 									}
 									// If required property is present in the UDF description and it is true and the given value is null
-									if (isset($decodedUDFDefinition->{UDFLib::VALIDATION}->{UDFLib::REQUIRED})
-										&& $decodedUDFDefinition->{UDFLib::VALIDATION}->{UDFLib::REQUIRED} === false
+									if (isset($decodedUDFDefinition->{self::VALIDATION}->{self::REQUIRED})
+										&& $decodedUDFDefinition->{self::VALIDATION}->{self::REQUIRED} === false
 										&& $val != null)
 									{
 										$toBeValidated = true;
@@ -292,8 +314,8 @@ class UDFLib
 								if ($toBeValidated === true) // Checks if validation should be performed
 								{
 									$tmpValidate = $this->_validateUDFs(
-										$decodedUDFDefinition->{UDFLib::VALIDATION},
-										$decodedUDFDefinition->{UDFLib::NAME},
+										$decodedUDFDefinition->{self::VALIDATION},
+										$decodedUDFDefinition->{self::NAME},
 										$val
 									);
 								}
@@ -341,7 +363,7 @@ class UDFLib
 				if ($encodedToBeStoredUDFs !== false) // if encode was ok
 				{
 					// Save the supplied UDFs values
-					$data[UDFLib::COLUMN_NAME] = $encodedToBeStoredUDFs;
+					$data[self::COLUMN_NAME] = $encodedToBeStoredUDFs;
 				}
 			}
 			else // otherwise the returning value will be the list of UDFs validation errors
@@ -360,8 +382,8 @@ class UDFLib
 	{
 		$isUDFColumn = false;
 
-		if (substr($columnName, 0, strlen(UDFLib::COLUMN_PREFIX)) == UDFLib::COLUMN_PREFIX
-			&& $columnType == UDFLib::COLUMN_TYPE)
+		if (substr($columnName, 0, strlen(self::COLUMN_PREFIX)) == self::COLUMN_PREFIX
+			&& $columnType == self::COLUMN_TYPE)
 		{
 			$isUDFColumn = true;
 		}
@@ -369,8 +391,147 @@ class UDFLib
 		return $isUDFColumn;
 	}
 
+	/**
+	 * Set the _udfUniqueId property
+	 */
+	public function setUDFUniqueId($udfUniqueId)
+	{
+		$this->_udfUniqueId = $udfUniqueId;
+	}
+
+	/**
+	 * Return an unique string that identify this filter widget
+	 * NOTE: The default value is the URI where the FilterWidget is called
+	 * If the fhc_controller_id is present then is also used
+	 */
+	public function setUDFUniqueIdByParams($params)
+	{
+		if ($params != null
+			&& is_array($params)
+			&& isset($params[self::UDF_UNIQUE_ID])
+			&& !isEmptyString($params[self::UDF_UNIQUE_ID]))
+		{
+			$udfUniqueId = $this->_ci->router->directory.$this->_ci->router->class.'/'.
+				$this->_ci->router->method.'/'.
+				$params[self::UDF_UNIQUE_ID];
+
+			$this->setUDFUniqueId($udfUniqueId);
+		}
+	}
+
+	/**
+	 * Wrapper method to the session helper funtions to retrieve the whole session for this filter
+	 */
+	public function getSession()
+	{
+		return getSessionElement(self::SESSION_NAME, $this->_udfUniqueId);
+	}
+
+	/**
+	 * Wrapper method to the session helper funtions to retrieve one element from the session of this filter
+	 */
+	public function getSessionElement($name)
+	{
+		$session = getSessionElement(self::SESSION_NAME, $this->_udfUniqueId);
+
+		if (isset($session[$name]))
+		{
+			return $session[$name];
+		}
+
+		return null;
+	}
+
+	/**
+	 * Wrapper method to the session helper funtions to set the whole session for this filter
+	 */
+	public function setSession($data)
+	{
+		setSessionElement(self::SESSION_NAME, $this->_udfUniqueId, $data);
+	}
+
+	/**
+	 * Wrapper method to the session helper funtions to set one element in the session for this filter
+	 */
+	public function setSessionElement($name, $value)
+	{
+		$session = getSessionElement(self::SESSION_NAME, $this->_udfUniqueId);
+
+		$session[$name] = $value;
+
+		setSessionElement(self::SESSION_NAME, $this->_udfUniqueId, $session); // stores the single value
+	}
+
+	/**
+	 * Save UDFs
+	 */
+	public function saveUDFs($udfUniqueId, $udfs)
+	{
+		// Read the all session for this udf widget
+		$session = $this->getSession();
+
+		if ($session == null) return error('No UDFWidget loaded');
+
+		// Workaround
+		$this->_ci->load->model('system/UDF_model', 'UDFModel');
+
+		//
+		$dbModel = new DB_Model();
+
+		$dbModel->setup(
+			$session[self::SCHEMA_ARG_NAME], //
+			$session[self::TABLE_ARG_NAME], //
+			$session[self::PRIMARY_KEY_NAME] //
+		);
+
+		return $dbModel->update(
+			array($session[self::PRIMARY_KEY_NAME] => $session[self::PRIMARY_KEY_VALUE]),
+			(array)$udfs
+		);
+	}
+
 	// -------------------------------------------------------------------------------------------------
 	// Private methods
+
+	/**
+	 *
+	 */
+	private function _printStartUDFBlock($widgetData)
+	{
+		$startBlock = '<div type="%s" udfUniqueId="%s">'."\n";
+
+		echo sprintf(
+			$startBlock,
+			self::WIDGET_NAME,
+			$widgetData[self::UDF_UNIQUE_ID]
+		);
+	}
+
+	/**
+	 *
+	 */
+	private function _printEndUDFBlock()
+	{
+		echo '</div>'."\n";
+	}
+
+	/**
+	 * Checks if at least one of the permissions given as parameter (requiredPermissions) belongs
+	 * to the authenticated user, if confirmed then is allowed to use this FilterWidget.
+	 * If the parameter requiredPermissions is NOT given or is not present in the session,
+	 * then NO one is allow to use this FilterWidget
+	 * Wrapper method to permissionlib->hasAtLeastOne
+	 */
+	public function isAllowed($requiredPermissions = null)
+	{
+		$this->_ci->load->library('PermissionLib'); // Load permission library
+
+		// Gets the required permissions from the session if they are not provided as parameter
+		$rq = $requiredPermissions;
+		if ($rq == null) $rq = $this->getSessionElement(self::REQUIRED_PERMISSIONS_PARAMETER);
+
+		return $this->_ci->permissionlib->hasAtLeastOne($rq, self::PERMISSION_TABLE_METHOD, self::PERMISSION_TYPE);
+	}
 
 	/**
 	 * Move UDFs from $data to $UDFs
@@ -381,7 +542,7 @@ class UDFLib
 
 		foreach ($data as $key => $val)
 		{
-			if (substr($key, 0, 4) == UDFLib::COLUMN_PREFIX)
+			if (substr($key, 0, 4) == self::COLUMN_PREFIX)
 			{
 				$udfsParameters[$key] = $val; // stores UDF value into property UDFs
 				unset($data[$key]); // remove from data
@@ -416,8 +577,8 @@ class UDFLib
 				{
 					// If min value attribute is present in the validation for this UDF,
 					// then checks if the value of this UDF is compliant to this attribute
-					if (isset($decodedUDFValidation->{UDFLib::MIN_VALUE})
-						&& $udfVal < $decodedUDFValidation->{UDFLib::MIN_VALUE})
+					if (isset($decodedUDFValidation->{self::MIN_VALUE})
+						&& $udfVal < $decodedUDFValidation->{self::MIN_VALUE})
 					{
 						// validation is failed and the error is stored in $returnArrayValidation
 						$returnArrayValidation[] = error($udfName, EXIT_VALIDATION_UDF_MIN_VALUE);
@@ -425,8 +586,8 @@ class UDFLib
 
 					// If max value attribute is present in the validation for this UDF,
 					// then checks if the value of this UDF is compliant to this attribute
-					if (isset($decodedUDFValidation->{UDFLib::MAX_VALUE})
-						&& $udfVal > $decodedUDFValidation->{UDFLib::MAX_VALUE})
+					if (isset($decodedUDFValidation->{self::MAX_VALUE})
+						&& $udfVal > $decodedUDFValidation->{self::MAX_VALUE})
 					{
 						// validation is failed and the error is stored in $returnArrayValidation
 						$returnArrayValidation[] = error($udfName, EXIT_VALIDATION_UDF_MAX_VALUE);
@@ -436,8 +597,8 @@ class UDFLib
 				$strUdfVal = strval($udfVal); // store in $strUdfVal the string conversion of $udfVal
 				// If min length attribute is present in the validation for this UDF,
 				// then checks if the value of this UDF is compliant to this attribute
-				if (isset($decodedUDFValidation->{UDFLib::MIN_LENGTH}) && isset($strUdfVal)
-					&& strlen($strUdfVal) < $decodedUDFValidation->{UDFLib::MIN_LENGTH})
+				if (isset($decodedUDFValidation->{self::MIN_LENGTH}) && isset($strUdfVal)
+					&& strlen($strUdfVal) < $decodedUDFValidation->{self::MIN_LENGTH})
 				{
 					// validation is failed and the error is stored in $returnArrayValidation
 					$returnArrayValidation[] = error($udfName, EXIT_VALIDATION_UDF_MIN_LENGTH);
@@ -445,8 +606,8 @@ class UDFLib
 
 				// If max length attribute is present in the validation for this UDF,
 				// then checks if the value of this UDF is compliant to this attribute
-				if (isset($decodedUDFValidation->{UDFLib::MAX_LENGTH}) && isset($strUdfVal)
-					&& strlen($strUdfVal) > $decodedUDFValidation->{UDFLib::MAX_LENGTH})
+				if (isset($decodedUDFValidation->{self::MAX_LENGTH}) && isset($strUdfVal)
+					&& strlen($strUdfVal) > $decodedUDFValidation->{self::MAX_LENGTH})
 				{
 					// validation is failed and the error is stored in $returnArrayValidation
 					$returnArrayValidation[] = error($udfName, EXIT_VALIDATION_UDF_MAX_LENGTH);
@@ -457,12 +618,12 @@ class UDFLib
 				{
 					// Search for a php regular expression in the validation of this UDF, if one is found
 					// then checks if the value of this UDF is compliant to this attribute
-					if (isset($decodedUDFValidation->{UDFLib::REGEX})
-						&& is_array($decodedUDFValidation->{UDFLib::REGEX}))
+					if (isset($decodedUDFValidation->{self::REGEX})
+						&& is_array($decodedUDFValidation->{self::REGEX}))
 					{
-						foreach ($decodedUDFValidation->{UDFLib::REGEX} as $regexIndx => $regex)
+						foreach ($decodedUDFValidation->{self::REGEX} as $regexIndx => $regex)
 						{
-							if ($regex->language == UDFLib::BE_REGEX_LANGUAGE)
+							if ($regex->language == self::BE_REGEX_LANGUAGE)
 							{
 								if (preg_match($regex->expression, $udfVal) != 1)
 								{
@@ -494,8 +655,8 @@ class UDFLib
      */
     private function _setNameAndId($jsonSchema, &$htmlParameters)
     {
-		$htmlParameters[HTMLWidget::HTML_ID] = $jsonSchema->{UDFLib::NAME};
-		$htmlParameters[HTMLWidget::HTML_NAME] = $jsonSchema->{UDFLib::NAME};
+		$htmlParameters[HTMLWidget::HTML_ID] = $jsonSchema->{self::NAME};
+		$htmlParameters[HTMLWidget::HTML_NAME] = $jsonSchema->{self::NAME};
     }
 
     /**
@@ -504,20 +665,20 @@ class UDFLib
     private function _sortJsonSchemas(&$jsonSchemasArray)
     {
 		usort($jsonSchemasArray, function ($a, $b) {
-			if (!isset($a->{UDFLib::SORT}))
+			if (!isset($a->{self::SORT}))
 			{
-				$a->{UDFLib::SORT} = 9999;
+				$a->{self::SORT} = 9999;
 			}
-			if (!isset($b->{UDFLib::SORT}))
+			if (!isset($b->{self::SORT}))
 			{
-				$b->{UDFLib::SORT} = 9999;
+				$b->{self::SORT} = 9999;
 			}
-			if ($a->{UDFLib::SORT} == $b->{UDFLib::SORT})
+			if ($a->{self::SORT} == $b->{self::SORT})
 			{
 				return 0;
 			}
 
-			return ($a->{UDFLib::SORT} < $b->{UDFLib::SORT}) ? -1 : 1;
+			return ($a->{self::SORT} < $b->{self::SORT}) ? -1 : 1;
 		});
     }
 
@@ -565,32 +726,32 @@ class UDFLib
     private function _render($jsonSchema, &$widgetData)
     {
 		// Checkbox
-		if ($jsonSchema->{UDFLib::TYPE} == 'checkbox')
+		if ($jsonSchema->{self::TYPE} == 'checkbox')
 		{
 			$this->_renderCheckbox($jsonSchema, $widgetData);
 		}
 		// Textfield
-		elseif ($jsonSchema->{UDFLib::TYPE} == 'textfield')
+		elseif ($jsonSchema->{self::TYPE} == 'textfield')
 		{
 			$this->_renderTextfield($jsonSchema, $widgetData);
 		}
 		// Textarea
-		elseif ($jsonSchema->{UDFLib::TYPE} == 'textarea')
+		elseif ($jsonSchema->{self::TYPE} == 'textarea')
 		{
 			$this->_renderTextarea($jsonSchema, $widgetData);
 		}
 		// Date
-		elseif ($jsonSchema->{UDFLib::TYPE} == 'date')
+		elseif ($jsonSchema->{self::TYPE} == 'date')
 		{
 			// To be done
 		}
 		// Dropdown
-		elseif ($jsonSchema->{UDFLib::TYPE} == 'dropdown')
+		elseif ($jsonSchema->{self::TYPE} == 'dropdown')
 		{
 			$this->_renderDropdown($jsonSchema, $widgetData);
 		}
 		// Multiple dropdown
-		elseif ($jsonSchema->{UDFLib::TYPE} == 'multipledropdown')
+		elseif ($jsonSchema->{self::TYPE} == 'multipledropdown')
 		{
 			$this->_renderDropdown($jsonSchema, $widgetData, true);
 		}
@@ -602,29 +763,29 @@ class UDFLib
 	private function _renderDropdown($jsonSchema, &$widgetData, $multiple = false)
 	{
 		// Selected element/s
-		if (isset($widgetData[UDFLib::UDFS_ARG_NAME])
-			&& isset($widgetData[UDFLib::UDFS_ARG_NAME][$jsonSchema->{UDFLib::NAME}]))
+		if (isset($widgetData[self::UDFS_ARG_NAME])
+			&& isset($widgetData[self::UDFS_ARG_NAME][$jsonSchema->{self::NAME}]))
 		{
-			$widgetData[DropdownWidget::SELECTED_ELEMENT] = $widgetData[UDFLib::UDFS_ARG_NAME][$jsonSchema->{UDFLib::NAME}];
+			$widgetData[DropdownWidget::SELECTED_ELEMENT] = $widgetData[self::UDFS_ARG_NAME][$jsonSchema->{self::NAME}];
 		}
 		else
 		{
 			$widgetData[DropdownWidget::SELECTED_ELEMENT] = null;
 		}
 
-		$dropdownWidgetUDF = new DropdownWidgetUDF(UDFLib::WIDGET_NAME, $widgetData);
+		$dropdownWidgetUDF = new DropdownWidgetUDF(self::WIDGET_NAME, $widgetData);
 		$parameters = array();
 
 		// If the list of values to show is an array
-		if (isset($jsonSchema->{UDFLib::LIST_VALUES}->enum))
+		if (isset($jsonSchema->{self::LIST_VALUES}->enum))
 		{
-			$parameters = $jsonSchema->{UDFLib::LIST_VALUES}->enum;
+			$parameters = $jsonSchema->{self::LIST_VALUES}->enum;
 		}
 		// If the list of values to show should be retrieved with a SQL statement
-		elseif (isset($jsonSchema->{UDFLib::LIST_VALUES}->sql))
+		elseif (isset($jsonSchema->{self::LIST_VALUES}->sql))
 		{
 			// UDFModel is loaded in method _loadUDF that is called before the current method
-			$queryResult = $this->_ci->UDFModel->execReadOnlyQuery($jsonSchema->{UDFLib::LIST_VALUES}->sql);
+			$queryResult = $this->_ci->UDFModel->execReadOnlyQuery($jsonSchema->{self::LIST_VALUES}->sql);
 			if (hasData($queryResult))
 			{
 				$parameters = $queryResult->retval;
@@ -645,13 +806,13 @@ class UDFLib
 	private function _renderTextarea($jsonSchema, &$widgetData)
 	{
 		$text = null; // text value
-		$textareaUDF = new TextareaWidgetUDF(UDFLib::WIDGET_NAME, $widgetData);
+		$textareaUDF = new TextareaWidgetUDF(self::WIDGET_NAME, $widgetData);
 
 		// Set text value if present in the DB
-		if (isset($widgetData[UDFLib::UDFS_ARG_NAME])
-			&& isset($widgetData[UDFLib::UDFS_ARG_NAME][$jsonSchema->{UDFLib::NAME}]))
+		if (isset($widgetData[self::UDFS_ARG_NAME])
+			&& isset($widgetData[self::UDFS_ARG_NAME][$jsonSchema->{self::NAME}]))
 		{
-			$text = $widgetData[UDFLib::UDFS_ARG_NAME][$jsonSchema->{UDFLib::NAME}];
+			$text = $widgetData[self::UDFS_ARG_NAME][$jsonSchema->{self::NAME}];
 		}
 
 		$textareaUDF->render($text);
@@ -663,13 +824,13 @@ class UDFLib
 	private function _renderTextfield($jsonSchema, &$widgetData)
 	{
 		$text = null; // text value
-		$textareaUDF = new TextfieldWidgetUDF(UDFLib::WIDGET_NAME, $widgetData);
+		$textareaUDF = new TextfieldWidgetUDF(self::WIDGET_NAME, $widgetData);
 
 		// Set text value if present in the DB
-		if (isset($widgetData[UDFLib::UDFS_ARG_NAME])
-			&& isset($widgetData[UDFLib::UDFS_ARG_NAME][$jsonSchema->{UDFLib::NAME}]))
+		if (isset($widgetData[self::UDFS_ARG_NAME])
+			&& isset($widgetData[self::UDFS_ARG_NAME][$jsonSchema->{self::NAME}]))
 		{
-			$text = $widgetData[UDFLib::UDFS_ARG_NAME][$jsonSchema->{UDFLib::NAME}];
+			$text = $widgetData[self::UDFS_ARG_NAME][$jsonSchema->{self::NAME}];
 		}
 
 		$textareaUDF->render($text);
@@ -681,17 +842,17 @@ class UDFLib
 	private function _renderCheckbox($jsonSchema, &$widgetData)
 	{
 		// Set checkbox value if present in the DB
-		if (isset($widgetData[UDFLib::UDFS_ARG_NAME])
-			&& isset($widgetData[UDFLib::UDFS_ARG_NAME][$jsonSchema->{UDFLib::NAME}]))
+		if (isset($widgetData[self::UDFS_ARG_NAME])
+			&& isset($widgetData[self::UDFS_ARG_NAME][$jsonSchema->{self::NAME}]))
 		{
-			$widgetData[CheckboxWidget::VALUE_FIELD] = $widgetData[UDFLib::UDFS_ARG_NAME][$jsonSchema->{UDFLib::NAME}];
+			$widgetData[CheckboxWidget::VALUE_FIELD] = $widgetData[self::UDFS_ARG_NAME][$jsonSchema->{self::NAME}];
 		}
 		else
 		{
 			$widgetData[CheckboxWidget::VALUE_FIELD] = CheckboxWidget::HTML_DEFAULT_VALUE;
 		}
 
-		$checkboxWidgetUDF = new CheckboxWidgetUDF(UDFLib::WIDGET_NAME, $widgetData);
+		$checkboxWidgetUDF = new CheckboxWidgetUDF(self::WIDGET_NAME, $widgetData);
 
 		$checkboxWidgetUDF->render();
 	}
@@ -707,21 +868,21 @@ class UDFLib
 		$htmlParameters[HTMLWidget::PLACEHOLDER] = null;
 
 		// Description, title and placeholder
-		if (isset($jsonSchema->{UDFLib::LABEL})
-			|| isset($jsonSchema->{UDFLib::TITLE})
-			|| isset($jsonSchema->{UDFLib::PLACEHOLDER}))
+		if (isset($jsonSchema->{self::LABEL})
+			|| isset($jsonSchema->{self::TITLE})
+			|| isset($jsonSchema->{self::PLACEHOLDER}))
 		{
 			// Loads phrases library
 			$this->_ci->load->library('PhrasesLib');
 
 			// If is set the label property in the json schema
-			if (isset($jsonSchema->{UDFLib::LABEL}))
+			if (isset($jsonSchema->{self::LABEL}))
 			{
 				// Load the related phrase
 				$tmpResult = $this->_ci->phraseslib->getPhrases(
-					UDFLib::PHRASES_APP_NAME,
+					self::PHRASES_APP_NAME,
 					getUserLanguage(),
-					$jsonSchema->{UDFLib::LABEL},
+					$jsonSchema->{self::LABEL},
 					null,
 					null,
 					'no'
@@ -733,13 +894,13 @@ class UDFLib
 			}
 
 			// If is set the title property in the json schema
-			if (isset($jsonSchema->{UDFLib::TITLE}))
+			if (isset($jsonSchema->{self::TITLE}))
 			{
 				// Load the related phrase
 				$tmpResult = $this->_ci->phraseslib->getPhrases(
-					UDFLib::PHRASES_APP_NAME,
+					self::PHRASES_APP_NAME,
 					getUserLanguage(),
-					$jsonSchema->{UDFLib::TITLE},
+					$jsonSchema->{self::TITLE},
 					null,
 					null,
 					'no'
@@ -751,13 +912,13 @@ class UDFLib
 			}
 
 			// If is set the placeholder property in the json schema
-			if (isset($jsonSchema->{UDFLib::PLACEHOLDER}))
+			if (isset($jsonSchema->{self::PLACEHOLDER}))
 			{
 				// Load the related phrase
 				$tmpResult = $this->_ci->phraseslib->getPhrases(
-					UDFLib::PHRASES_APP_NAME,
+					self::PHRASES_APP_NAME,
 					getUserLanguage(),
-					$jsonSchema->{UDFLib::PLACEHOLDER},
+					$jsonSchema->{self::PLACEHOLDER},
 					null,
 					null,
 					'no'
@@ -784,17 +945,17 @@ class UDFLib
 		$htmlParameters[HTMLWidget::MAX_LENGTH] = null;
 
 		// If validation property is present in the json schema
-		if (isset($jsonSchema->{UDFLib::VALIDATION}))
+		if (isset($jsonSchema->{self::VALIDATION}))
 		{
-			$jsonSchemaValidation =& $jsonSchema->{UDFLib::VALIDATION}; // Reference for a better code readability
+			$jsonSchemaValidation =& $jsonSchema->{self::VALIDATION}; // Reference for a better code readability
 
 			// Front-end regex
-			if (isset($jsonSchemaValidation->{UDFLib::REGEX})
-				&& is_array($jsonSchemaValidation->{UDFLib::REGEX}))
+			if (isset($jsonSchemaValidation->{self::REGEX})
+				&& is_array($jsonSchemaValidation->{self::REGEX}))
 			{
-				foreach ($jsonSchemaValidation->{UDFLib::REGEX} as $regex)
+				foreach ($jsonSchemaValidation->{self::REGEX} as $regex)
 				{
-					if ($regex->language === UDFLib::FE_REGEX_LANGUAGE)
+					if ($regex->language === self::FE_REGEX_LANGUAGE)
 					{
 						$htmlParameters[HTMLWidget::REGEX] = $regex->expression;
 					}
@@ -802,33 +963,33 @@ class UDFLib
 			}
 
 			// Required
-			if (isset($jsonSchemaValidation->{UDFLib::REQUIRED}))
+			if (isset($jsonSchemaValidation->{self::REQUIRED}))
 			{
-				$htmlParameters[HTMLWidget::REQUIRED] = $jsonSchemaValidation->{UDFLib::REQUIRED};
+				$htmlParameters[HTMLWidget::REQUIRED] = $jsonSchemaValidation->{self::REQUIRED};
 			}
 
 			// Min value
-			if (isset($jsonSchemaValidation->{UDFLib::MIN_VALUE}))
+			if (isset($jsonSchemaValidation->{self::MIN_VALUE}))
 			{
-				$htmlParameters[HTMLWidget::MIN_VALUE] = $jsonSchemaValidation->{UDFLib::MIN_VALUE};
+				$htmlParameters[HTMLWidget::MIN_VALUE] = $jsonSchemaValidation->{self::MIN_VALUE};
 			}
 
 			// Max value
-			if (isset($jsonSchemaValidation->{UDFLib::MAX_VALUE}))
+			if (isset($jsonSchemaValidation->{self::MAX_VALUE}))
 			{
-				$htmlParameters[HTMLWidget::MAX_VALUE] = $jsonSchemaValidation->{UDFLib::MAX_VALUE};
+				$htmlParameters[HTMLWidget::MAX_VALUE] = $jsonSchemaValidation->{self::MAX_VALUE};
 			}
 
 			// Min length
-			if (isset($jsonSchemaValidation->{UDFLib::MIN_LENGTH}))
+			if (isset($jsonSchemaValidation->{self::MIN_LENGTH}))
 			{
-				$htmlParameters[HTMLWidget::MIN_LENGTH] = $jsonSchemaValidation->{UDFLib::MIN_LENGTH};
+				$htmlParameters[HTMLWidget::MIN_LENGTH] = $jsonSchemaValidation->{self::MIN_LENGTH};
 			}
 
 			// Max length
-			if (isset($jsonSchemaValidation->{UDFLib::MAX_LENGTH}))
+			if (isset($jsonSchemaValidation->{self::MAX_LENGTH}))
 			{
-				$htmlParameters[HTMLWidget::MAX_LENGTH] = $jsonSchemaValidation->{UDFLib::MAX_LENGTH};
+				$htmlParameters[HTMLWidget::MAX_LENGTH] = $jsonSchemaValidation->{self::MAX_LENGTH};
 			}
 		}
 	}

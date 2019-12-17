@@ -1,53 +1,27 @@
-<?php $this->load->view("templates/header", array("title" => "UDF", "widgetsCSS" => true)); ?>
+<?php
+	$this->load->view(
+		'templates/FHC-Header',
+		array(
+			'title' => 'InfocenterDetails',
+			'jquery' => true,
+			'bootstrap' => true,
+			'fontawesome' => true,
+			'jqueryui' => true,
+			'dialoglib' => true,
+			'ajaxlib' => true,
+			'udfs' => true,
+			'sbadmintemplate' => true,
+			'customCSSs' => array(
+				'public/css/sbadmin2/admintemplate.css'
+			),
+			'customJSs' => array(
+				'public/js/bootstrapper.js'
+			)
+		)
+	);
+?>
 
 	<body style="background-color: #eff0f1;">
-
-<?php
-	if ($result != null)
-	{
-		if (isSuccess($result))
-		{
-?>
-		<div style="color: black;">
-			Saved!
-		</div>
-
-		<br>
-<?php
-		}
-		else
-		{
-?>
-		<div style="color: red;">
-			Error while saving!
-		</div>
-		<br>
-		<div style="color: red;">
-<?php
-		$errors = $result->retval;
-		if(is_array($errors))
-		{
-			foreach ($errors as $error)
-			{
-				foreach ($error as $fieldError)
-				{
-					echo $fieldError->code . ': ' . $fieldError->retval . '<br>';
-				}
-			}
-		}
-		else
-			echo $result->retval;
-?>
-		</div>
-
-		<br>
-		<br>
-		<br>
-<?php
-		}
-	}
-?>
-		<form action="<?php echo site_url('system/FAS_UDF/saveUDF'); ?>" method="POST">
 
 			<div class="div-table">
 				<div class="div-row">
@@ -69,8 +43,12 @@
 						<?php
 							echo $this->udflib->UDFWidget(
 								array(
+									UDFLib::UDF_UNIQUE_ID => 'fasPersonUDFs',
+									UDFLib::REQUIRED_PERMISSIONS_PARAMETER => 'basis/person',
 									UDFLib::SCHEMA_ARG_NAME => 'public',
 									UDFLib::TABLE_ARG_NAME => 'tbl_person',
+									UDFLib::PRIMARY_KEY_NAME => 'person_id',
+									UDFLib::PRIMARY_KEY_VALUE => $person_id,
 									UDFLib::UDFS_ARG_NAME => $personUdfs
 								)
 							);
@@ -90,8 +68,12 @@
 						<?php
 							echo $this->udflib->UDFWidget(
 								array(
+									UDFLib::UDF_UNIQUE_ID => 'fasPrestudentUDFs',
+									UDFLib::REQUIRED_PERMISSIONS_PARAMETER => 'basis/person',
 									UDFLib::SCHEMA_ARG_NAME => 'public',
 									UDFLib::TABLE_ARG_NAME => 'tbl_prestudent',
+									UDFLib::PRIMARY_KEY_NAME => 'prestudent_id',
+									UDFLib::PRIMARY_KEY_VALUE => $prestudent_id,
 									UDFLib::UDFS_ARG_NAME => $prestudentUdfs
 								)
 							);
@@ -120,30 +102,8 @@
 				<?php
 					}
 				?>
-					<div class="div-cell halign-right">
-						<input type="submit" value="&nbsp;Speichern&nbsp;">
-					</div>
 				</div>
 			</div>
-
-		<?php
-			if (isset($personUdfs))
-			{
-		?>
-			<input type="hidden" name="person_id" value="<?php echo $personUdfs['person_id']; ?>">
-		<?php
-			}
-		?>
-		<?php
-			if (isset($prestudentUdfs))
-			{
-		?>
-			<input type="hidden" name="prestudent_id" value="<?php echo $prestudentUdfs['prestudent_id']; ?>">
-		<?php
-			}
-		?>
-
-		</form>
 
 	</body>
 
