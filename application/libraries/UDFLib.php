@@ -3,19 +3,20 @@
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
 /**
- * Library to manage UDF
+ * Library to manage UDFs
  */
 class UDFLib
 {
-	const UDF_UNIQUE_ID = 'udfUniqueId';
+	const UDF_UNIQUE_ID = 'udfUniqueId'; // Name of the UDF widget unique id
 
-	const SESSION_NAME = 'FHC_UDF_WIDGET';
+	const SESSION_NAME = 'FHC_UDF_WIDGET'; // Name of the session area used for UDFs
 
-	const WIDGET_NAME = 'UDFWidget';
-	const SCHEMA_ARG_NAME = 'schema';
-	const TABLE_ARG_NAME = 'table';
-	const FIELD_ARG_NAME = 'field';
-	const UDFS_ARG_NAME = 'udfs';
+	// Parameters names
+	const WIDGET_NAME = 'UDFWidget'; // UDFWidget name
+	const SCHEMA_ARG_NAME = 'schema'; // Schema parameter name
+	const TABLE_ARG_NAME = 'table'; // Table parameter name
+	const FIELD_ARG_NAME = 'field'; // Field parameter name
+	const UDFS_ARG_NAME = 'udfs';  // UDFs parameter name
 
 	// UDF json schema attributes
 	const NAME = 'name'; // UDF name attribute
@@ -29,7 +30,7 @@ class UDFLib
 	// ...to specify permissions that are needed to use this TableWidget
 	const REQUIRED_PERMISSIONS_PARAMETER = 'requiredPermissions';
 
-	// ...
+	// ...to specify the primary key name and value
 	const PRIMARY_KEY_NAME = 'primaryKeyName';
 	const PRIMARY_KEY_VALUE = 'primaryKeyValue';
 
@@ -61,10 +62,10 @@ class UDFLib
 
 	private $_ci; // Code igniter instance
 
-	private $_udfUniqueId; //
+	private $_udfUniqueId; // Property that contains the UDF widget unique id
 
 	/**
-	 * Loads fhc helper
+	 * Gets CI instance
 	 */
 	public function __construct()
 	{
@@ -400,7 +401,7 @@ class UDFLib
 	}
 
 	/**
-	 * Return an unique string that identify this filter widget
+	 * Return an unique string that identify this UDF widget
 	 * NOTE: The default value is the URI where the FilterWidget is called
 	 * If the fhc_controller_id is present then is also used
 	 */
@@ -420,7 +421,7 @@ class UDFLib
 	}
 
 	/**
-	 * Wrapper method to the session helper funtions to retrieve the whole session for this filter
+	 * Wrapper method to the session helper funtions to retrieve the whole session for this UDF widget
 	 */
 	public function getSession()
 	{
@@ -428,7 +429,7 @@ class UDFLib
 	}
 
 	/**
-	 * Wrapper method to the session helper funtions to retrieve one element from the session of this filter
+	 * Wrapper method to the session helper funtions to retrieve one element from the session of this UDF widget
 	 */
 	public function getSessionElement($name)
 	{
@@ -443,7 +444,7 @@ class UDFLib
 	}
 
 	/**
-	 * Wrapper method to the session helper funtions to set the whole session for this filter
+	 * Wrapper method to the session helper funtions to set the whole session for this UDF widget
 	 */
 	public function setSession($data)
 	{
@@ -451,7 +452,7 @@ class UDFLib
 	}
 
 	/**
-	 * Wrapper method to the session helper funtions to set one element in the session for this filter
+	 * Wrapper method to the session helper funtions to set one element in the session for this UDF widget
 	 */
 	public function setSessionElement($name, $value)
 	{
@@ -470,31 +471,52 @@ class UDFLib
 		// Read the all session for this udf widget
 		$session = $this->getSession();
 
+		// If session is empty then return an error
 		if ($session == null) return error('No UDFWidget loaded');
 
-		// Workaround
+		// Workaround to load CI
 		$this->_ci->load->model('system/UDF_model', 'UDFModel');
 
-		//
+		// Initialize a new DB_Model
 		$dbModel = new DB_Model();
 
+		// Setup the new dbModel object with...
 		$dbModel->setup(
-			$session[self::SCHEMA_ARG_NAME], //
-			$session[self::TABLE_ARG_NAME], //
-			$session[self::PRIMARY_KEY_NAME] //
+			$session[self::SCHEMA_ARG_NAME], // ... schema...
+			$session[self::TABLE_ARG_NAME], // ...table...
+			$session[self::PRIMARY_KEY_NAME] // ...and primary key name
 		);
 
+		// Returns the result of the database update operation to save UDFs
 		return $dbModel->update(
 			array($session[self::PRIMARY_KEY_NAME] => $session[self::PRIMARY_KEY_VALUE]),
 			(array)$udfs
 		);
 	}
 
+	/**
+	 * Checks if at least one of the permissions given as parameter (requiredPermissions) belongs
+	 * to the authenticated user, if confirmed then is allowed to use this UDFWidget.
+	 * If the parameter requiredPermissions is NOT given or is not present in the session,
+	 * then NO one is allow to use this UDFWidget
+	 * Wrapper method to permissionlib->hasAtLeastOne
+	 */
+	public function isAllowed($requiredPermissions = null)
+	{
+		$this->_ci->load->library('PermissionLib'); // Load permission library
+
+		// Gets the required permissions from the session if they are not provided as parameter
+		$rq = $requiredPermissions;
+		if ($rq == null) $rq = $this->getSessionElement(self::REQUIRED_PERMISSIONS_PARAMETER);
+
+		return $this->_ci->permissionlib->hasAtLeastOne($rq, self::PERMISSION_TABLE_METHOD, self::PERMISSION_TYPE);
+	}
+
 	// -------------------------------------------------------------------------------------------------
 	// Private methods
 
 	/**
-	 *
+	 * Print the block for UDFs
 	 */
 	private function _printStartUDFBlock($widgetData)
 	{
@@ -508,29 +530,11 @@ class UDFLib
 	}
 
 	/**
-	 *
+	 * Print the end of the UDFs block
 	 */
 	private function _printEndUDFBlock()
 	{
 		echo '</div>'."\n";
-	}
-
-	/**
-	 * Checks if at least one of the permissions given as parameter (requiredPermissions) belongs
-	 * to the authenticated user, if confirmed then is allowed to use this FilterWidget.
-	 * If the parameter requiredPermissions is NOT given or is not present in the session,
-	 * then NO one is allow to use this FilterWidget
-	 * Wrapper method to permissionlib->hasAtLeastOne
-	 */
-	public function isAllowed($requiredPermissions = null)
-	{
-		$this->_ci->load->library('PermissionLib'); // Load permission library
-
-		// Gets the required permissions from the session if they are not provided as parameter
-		$rq = $requiredPermissions;
-		if ($rq == null) $rq = $this->getSessionElement(self::REQUIRED_PERMISSIONS_PARAMETER);
-
-		return $this->_ci->permissionlib->hasAtLeastOne($rq, self::PERMISSION_TABLE_METHOD, self::PERMISSION_TYPE);
 	}
 
 	/**

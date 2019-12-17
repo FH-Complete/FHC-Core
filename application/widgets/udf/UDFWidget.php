@@ -6,12 +6,12 @@
  */
 class UDFWidget extends HTMLWidget
 {
-	private $_requiredPermissions; //
+	private $_requiredPermissions; // The required permissions to use this UDF widget
 
-	private $_schema;
-	private $_table;
-	private $_primaryKeyName;
-	private $_primaryKeyValue;
+	private $_schema; // Schema name
+	private $_table; // Table name
+	private $_primaryKeyName; // Primary key name
+	private $_primaryKeyValue; // Primary key value
 
 	/**
 	 * Initialize the UDFWidget and starts the execution of the logic
@@ -22,7 +22,7 @@ class UDFWidget extends HTMLWidget
 
 		$this->load->library('UDFLib'); // Loads the UDFLib that contains all the used logic
 
-		$this->udflib->setUDFUniqueIdByParams($args);
+		$this->udflib->setUDFUniqueIdByParams($args); // sets the unique id for this UDF
 
 		$this->_initUDFWidget($args); // checks parameters and initialize properties
 

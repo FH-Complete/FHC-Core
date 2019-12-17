@@ -3,14 +3,19 @@
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
 /**
- * This controller...
+ * This controller operates between (interface) the JS (GUI) and the UDFLib (back-end)
+ * Provides data to the ajax get calls about the UDF widget
+ * Accepts ajax post calls to save UDFs
+ * This controller works with JSON calls on the HTTP GET or POST and the output is always JSON
+ * NOTE: extends the FHC_Controller instead of the Auth_Controller because the UDFWidget has its
+ * 		own permissions check
  */
 class UDF extends FHC_Controller
 {
-	const UDF_UNIQUE_ID = 'udfUniqueId';
+	const UDF_UNIQUE_ID = 'udfUniqueId'; // Name of the udf widget unique id
 
 	/**
-	 * Calls the parent's constructor and loads the
+	 * Calls the parent's constructor and loads the UDFLib
 	 */
 	public function __construct()
     {
@@ -22,7 +27,7 @@ class UDF extends FHC_Controller
 		// Loads the UDFLib with HTTP GET/POST parameters
 		$this->_loadUDFLib();
 
-		// Checks if the caller is allow to read this data
+		// Checks if the caller is allow to use this UDF widget
 		$this->_isAllowed();
     }
 
@@ -30,7 +35,7 @@ class UDF extends FHC_Controller
 	// Public methods
 
 	/**
-	 * Retrieves data about the current filter from the session and will be written on the output in JSON format
+	 * Save data about the current UDFs and the result will be written on the output in JSON format
 	 */
 	public function saveUDFs()
 	{
@@ -59,7 +64,7 @@ class UDF extends FHC_Controller
 	// Private methods
 
 	/**
-	 * Checks if the user is allowed to use this filter
+	 * Checks if the user is allowed to use this UDFWidget
 	 */
 	private function _isAllowed()
 	{
@@ -70,7 +75,7 @@ class UDF extends FHC_Controller
 	}
 
 	/**
-	 * Loads the tablewidgetlib with the UDF_UNIQUE_ID parameter
+	 * Loads the UDFLib with the UDF_UNIQUE_ID parameter
 	 * If the parameter UDF_UNIQUE_ID is not given then the execution of the controller is terminated and
 	 * an error message is printed
 	 */
@@ -89,7 +94,7 @@ class UDF extends FHC_Controller
 				$udfUniqueId = $this->input->post(self::UDF_UNIQUE_ID); // is retrieved from the HTTP POST
 			}
 
-			// Loads the tablewidgetlib that contains all the used logic
+			// Loads the UDFLib that contains all the used logic
 			$this->load->library('UDFLib');
 
 			$this->udflib->setUDFUniqueId($udfUniqueId);

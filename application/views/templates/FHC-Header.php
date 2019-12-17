@@ -177,7 +177,7 @@
 			// Tinymce JS
 			if ($tinymce === true) generateJSsInclude('vendor/tinymce/tinymce/tinymce.min.js');
 
-			// Tinymce JS
+			// User Defined Fields
 			if ($udfs === true) generateJSsInclude('public/js/UDFWidget.js');
 
 			// SB Admin 2 template JS

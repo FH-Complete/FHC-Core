@@ -61,7 +61,7 @@ class DB_Model extends CI_Model
 	// Public methods
 
 	/**
-	 * This method provides a way to setup a database model without declaring one
+	 * This method provides a way to setup a database model without declaring one that extends this class
 	 */
 	public function setup($schema, $table, $primaryKey, $hasSequence = true)
 	{
