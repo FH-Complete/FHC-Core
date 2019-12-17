@@ -44,6 +44,7 @@ class gebiet extends basis_db
 	public $level_sprung_ab;
 	public $levelgleichverteilung;
 	public $maxpunkte;
+	public $offsetpunkte;
 	public $insertamum;
 	public $insertvon;
 	public $updateamum;
@@ -96,6 +97,7 @@ class gebiet extends basis_db
 				$this->level_sprung_ab = $row->level_sprung_ab;
 				$this->levelgleichverteilung = $this->db_parse_bool($row->levelgleichverteilung);
 				$this->maxpunkte = $row->maxpunkte;
+				$this->offsetpunkte = $row->offsetpunkte;
 				$this->insertamum = $row->insertamum;
 				$this->insertvon = $row->insertvon;
 				$this->updateamum = $row->updateamum;
@@ -196,7 +198,7 @@ class gebiet extends basis_db
 		{
 			$qry = 'BEGIN;INSERT INTO testtool.tbl_gebiet (kurzbz, bezeichnung, beschreibung, zeit, multipleresponse,
 					kategorien, maxfragen, zufallfrage, zufallvorschlag, level_start, level_sprung_auf, level_sprung_ab,
-					levelgleichverteilung, maxpunkte, antwortenprozeile, ';
+					levelgleichverteilung, maxpunkte, offsetpunkte, antwortenprozeile, ';
 					
 					foreach($this->bezeichnung_mehrsprachig as $key=>$value)
 					{
@@ -220,6 +222,7 @@ class gebiet extends basis_db
 					$this->db_add_param($this->level_sprung_ab).','.
 					$this->db_add_param($this->levelgleichverteilung, FHC_BOOLEAN).','.
 					$this->db_add_param($this->maxpunkte).','.
+					$this->db_add_param($this->offsetpunkte).','.
 					$this->db_add_param($this->antwortenprozeile).',';
 					foreach($this->bezeichnung_mehrsprachig as $key=>$value)
 						$qry.=$this->db_add_param($value).',';
@@ -245,6 +248,7 @@ class gebiet extends basis_db
 					' level_sprung_ab='.$this->db_add_param($this->level_sprung_ab).','.
 					' levelgleichverteilung='.$this->db_add_param($this->levelgleichverteilung, FHC_BOOLEAN).','.
 					' maxpunkte='.$this->db_add_param($this->maxpunkte).','.
+					' offsetpunkte='.$this->db_add_param($this->offsetpunkte).','.
 					' antwortenprozeile='.$this->db_add_param($this->antwortenprozeile).','.
 					' updateamum='.$this->db_add_param($this->updateamum).','.
 					' updatevon='.$this->db_add_param($this->updatevon).',';
@@ -472,6 +476,7 @@ class gebiet extends basis_db
 				$obj->zufallvorschlag = $this->db_parse_bool($row->zufallvorschlag);
 				$obj->levelgleichverteilung = $this->db_parse_bool($row->levelgleichverteilung);
 				$obj->maxpunkte = $row->maxpunkte;
+				$obj->offsetpunkte = $row->offsetpunkte;
 				$obj->level_start = $row->level_start;
 				$obj->level_sprung_ab = $row->level_sprung_ab;
 				$obj->level_sprung_auf = $row->level_sprung_auf;
