@@ -378,7 +378,7 @@ class AuthLib
 		}
 		else // otherwise
 		{
-			$hta = $this->_createAuthObjByPerson(array('uid' => $_SERVER['PHP_AUTH_USER']));
+			$hta = $this->_createAuthObjByPerson(array('uid' => trim($_SERVER['PHP_AUTH_USER'])));
 		}
 
 		// Invalid credentials
