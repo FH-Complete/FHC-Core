@@ -133,7 +133,7 @@ $this->load->view(
             </div>
         </div>
 
-		<!-- tabulator data table -->
+		<!-- tabulator data table 'Lehrauftraege annehmen'-->
         <div class="row">
             <div class="col-lg-12">
                 <?php $this->load->view('lehre/lehrauftrag/acceptLehrauftragData.php'); ?>
@@ -146,10 +146,18 @@ $this->load->view(
             <div class="col-xs-6">
                 <div class="btn-toolbar" role="toolbar">
                     <div class="btn-group" role="group">
-                        <button id="show-all" class="btn btn-default btn-lehrauftrag active focus" type="button" data-toggle="tooltip" data-placement="left" title="Alle anzeigen"><i class='fa fa-users'></i></button>
-                        <button id="show-ordered" class="btn btn-default btn-lehrauftrag" type="button" data-toggle="tooltip" data-placement="left" title="Nur bestellte anzeigen"></button><!-- png img set in javascript -->
-                        <button id="show-approved" class="btn btn-default btn-lehrauftrag" type="button" data-toggle="tooltip" data-placement="left" title="Nur erteilte anzeigen"></button><!-- png img set in javascript -->
-                        <button id="show-accepted" class="btn btn-default btn-lehrauftrag" type="button" data-toggle="tooltip" data-placement="left" title="Nur angenommene anzeigen"><i class='fa fa-handshake-o'></i></button>
+                        <button id="show-all" class="btn btn-default btn-lehrauftrag active focus" type="button"
+								data-toggle="tooltip" data-placement="left" title="Alle anzeigen"><i class='fa fa-users'></i>
+						</button>
+                        <button id="show-ordered" class="btn btn-default btn-lehrauftrag" type="button"
+								data-toggle="tooltip" data-placement="left" title="Nur bestellte anzeigen">
+						</button><!-- png img set in javascript -->
+                        <button id="show-approved" class="btn btn-default btn-lehrauftrag" type="button"
+								data-toggle="tooltip" data-placement="left" title="Nur erteilte anzeigen">
+						</button><!-- png img set in javascript -->
+                        <button id="show-accepted" class="btn btn-default btn-lehrauftrag" type="button"
+								data-toggle="tooltip" data-placement="left" title="Nur angenommene anzeigen"><i class='fa fa-handshake-o'></i>
+						</button>
                     </div>
 					
 					<button id="show-cancelled" class="btn btn-default btn-lehrauftrag" type="button" style="margin-left: 20px;"

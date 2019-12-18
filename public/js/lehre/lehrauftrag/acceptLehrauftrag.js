@@ -26,11 +26,11 @@ const ICON_LEHRAUFTRAG_CANCELLED = '<img src="../../../public/images/icons/fa-us
 // Converts string date postgre style to string DD.MM.YYYY.
 // This will allow correct filtering.
 var mut_formatStringDate = function(value, data, type, params, component) {
-    if (value != null)
-    {
-        var d = new Date(value);
-        return ("0" + (d.getDate())).slice(-2)  + "." + ("0"+(d.getMonth()+1)).slice(-2) + "." + d.getFullYear();
-    }
+	if (value != null)
+	{
+		var d = new Date(value);
+		return ("0" + (d.getDate())).slice(-2)  + "." + ("0"+(d.getMonth()+1)).slice(-2) + "." + d.getFullYear();
+	}
 }
 
 // -----------------------------------------------------------------------------------------------------------------
@@ -39,16 +39,16 @@ var mut_formatStringDate = function(value, data, type, params, component) {
 
 // Formats null values to a string number '0.00'
 var form_formatNulltoStringNumber = function(cell, formatterParams){
-    if (cell.getValue() == null){
-        if (formatterParams.precision == 1)
-        {
-            return '0.0';
-        }
-        return '0.00';
-    }
-    else {
-        return cell.getValue();
-    }
+	if (cell.getValue() == null){
+		if (formatterParams.precision == 1)
+		{
+			return '0.0';
+		}
+		return '0.00';
+	}
+	else {
+		return cell.getValue();
+	}
 }
 
 // -----------------------------------------------------------------------------------------------------------------
@@ -58,23 +58,23 @@ var form_formatNulltoStringNumber = function(cell, formatterParams){
 // Filters values using comparison operator or just by string comparison
 function hf_filterStringnumberWithOperator(headerValue, rowValue, rowData){
 
-    // If string starts with <, <=, >, >=, !=, ==, compare values with that operator
-    var operator = '';
-    if (headerValue.match(/([<=>!]{1,2})/g)) {
-        var operator_arr = headerValue.match(/([<=>!]{1,2})/g);
-        operator = operator_arr[0];
+	// If string starts with <, <=, >, >=, !=, ==, compare values with that operator
+	var operator = '';
+	if (headerValue.match(/([<=>!]{1,2})/g)) {
+		var operator_arr = headerValue.match(/([<=>!]{1,2})/g);
+		operator = operator_arr[0];
 
-        headerValue = headerValue
-            .replace(operator, '')
-            .trim()
-        ;
+		headerValue = headerValue
+			.replace(operator, '')
+			.trim()
+		;
 
-        // return if value comparison is true
-        return eval(rowValue + operator + headerValue);
-    }
+		// return if value comparison is true
+		return eval(rowValue + operator + headerValue);
+	}
 
-    // If just a stringnumber, return if exact match found
-    return parseFloat(rowValue) == headerValue;
+	// If just a stringnumber, return if exact match found
+	return parseFloat(rowValue) == headerValue;
 }
 
 // -----------------------------------------------------------------------------------------------------------------
@@ -83,56 +83,56 @@ function hf_filterStringnumberWithOperator(headerValue, rowValue, rowData){
 
 // Formats the rows
 function func_rowFormatter(row){
-    var bestellt = row.getData().bestellt;
-    var erteilt = row.getData().erteilt;
-    var akzeptiert = row.getData().akzeptiert;
+	var bestellt = row.getData().bestellt;
+	var erteilt = row.getData().erteilt;
+	var akzeptiert = row.getData().akzeptiert;
 
-    var stunden = parseFloat(row.getData().stunden);
-    var vertrag_stunden = parseFloat(row.getData().vertrag_stunden);
+	var stunden = parseFloat(row.getData().stunden);
+	var vertrag_stunden = parseFloat(row.getData().vertrag_stunden);
 
-    var betrag = parseFloat(row.getData().betrag);
-    var vertrag_betrag = parseFloat(row.getData().vertrag_betrag);
+	var betrag = parseFloat(row.getData().betrag);
+	var vertrag_betrag = parseFloat(row.getData().vertrag_betrag);
 
-    if (isNaN(betrag))
-    {
-        betrag = 0;
-    }
+	if (isNaN(betrag))
+	{
+		betrag = 0;
+	}
 
-    /*
-    Formats the color of the rows depending on their status
-    - orange: geaendert
-    - default: bestellte und erteilte (= zu akzeptierende)
-    - green: akzeptierte
-    - grey: all other (marks unselectable)
-     */
-    row.getCells().forEach(function(cell){
-        if (bestellt != null && (betrag != vertrag_betrag) ||
-            bestellt != null && stunden != vertrag_stunden)
-        {
-            cell.getElement().classList.add('bg-warning');                  // geaenderte
-        }
-        else if(bestellt != null && erteilt != null && akzeptiert == null)
-        {
-            return;                                                         // bestellte + erteilte
-        }
-        else if(bestellt != null && erteilt != null && akzeptiert != null)
-        {
-            cell.getElement().classList.add('bg-success')                   // akzeptierte
-        }
-        else
-        {
-            row.getElement().style["background-color"] = COLOR_LIGHTGREY;   // default
-        }
-    });
+	/*
+	 Formats the color of the rows depending on their status
+	 - orange: geaendert
+	 - default: bestellte und erteilte (= zu akzeptierende)
+	 - green: akzeptierte
+	 - grey: all other (marks unselectable)
+	 */
+	row.getCells().forEach(function(cell){
+		if (bestellt != null && (betrag != vertrag_betrag) ||
+			bestellt != null && stunden != vertrag_stunden)
+		{
+			cell.getElement().classList.add('bg-warning');                  // geaenderte
+		}
+		else if(bestellt != null && erteilt != null && akzeptiert == null)
+		{
+			return;                                                         // bestellte + erteilte
+		}
+		else if(bestellt != null && erteilt != null && akzeptiert != null)
+		{
+			cell.getElement().classList.add('bg-success')                   // akzeptierte
+		}
+		else
+		{
+			row.getElement().style["background-color"] = COLOR_LIGHTGREY;   // default
+		}
+	});
 }
 
 // Formats row selectable/unselectable
 function func_selectableCheck(row){
-    var stunden = parseFloat(row.getData().stunden);
-    var vertrag_stunden = parseFloat(row.getData().vertrag_stunden);
+	var stunden = parseFloat(row.getData().stunden);
+	var vertrag_stunden = parseFloat(row.getData().vertrag_stunden);
 
-    var betrag = parseFloat(row.getData().betrag);
-    var vertrag_betrag = parseFloat(row.getData().vertrag_betrag);
+	var betrag = parseFloat(row.getData().betrag);
+	var vertrag_betrag = parseFloat(row.getData().vertrag_betrag);
 
 	var is_storniert = row.getData().storniert != undefined;
 
@@ -141,12 +141,13 @@ function func_selectableCheck(row){
 		betrag = 0;
 	}
 
-    // only allow to select bestellte && erteilte && nicht geaenderte Lehraufträge
-    return  row.getData().bestellt != null &&       // bestellt
-        row.getData().erteilt != null &&        // AND erteilt
-        row.getData().akzeptiert == null &&     // AND nicht akzeptiert
-        betrag == vertrag_betrag &&
-        stunden == vertrag_stunden;               // OR nicht geaenderte
+	// only allow to select bestellte && erteilte && nicht geaenderte Lehraufträge
+	return  row.getData().bestellt != null &&   // bestellt
+		row.getData().erteilt != null &&        // AND erteilt
+		row.getData().akzeptiert == null &&     // AND nicht akzeptiert
+		betrag == vertrag_betrag &&
+		stunden == vertrag_stunden &&           // AND nicht geaendert
+		!is_storniert;                          // AND nicht storniert
 }
 
 // Adds column status
@@ -167,84 +168,84 @@ function func_tableBuilt(table) {
 
 // Sets status values into column status
 function func_renderStarted(table){
-    // Set literally status to each row - this enables sorting by status despite using icons
-    table.getRows().forEach(function(row){
-        var bestellt = row.getData().bestellt;
-        var erteilt = row.getData().erteilt;
-        var akzeptiert = row.getData().akzeptiert;
+	// Set literally status to each row - this enables sorting by status despite using icons
+	table.getRows().forEach(function(row){
+		var bestellt = row.getData().bestellt;
+		var erteilt = row.getData().erteilt;
+		var akzeptiert = row.getData().akzeptiert;
 
-        var stunden = parseFloat(row.getData().stunden);
-        var vertrag_stunden = parseFloat(row.getData().vertrag_stunden);
+		var stunden = parseFloat(row.getData().stunden);
+		var vertrag_stunden = parseFloat(row.getData().vertrag_stunden);
 
-        var betrag = parseFloat(row.getData().betrag);
-        var vertrag_betrag = parseFloat(row.getData().vertrag_betrag);
+		var betrag = parseFloat(row.getData().betrag);
+		var vertrag_betrag = parseFloat(row.getData().vertrag_betrag);
 
-        if (isNaN(betrag))
-        {
-            betrag = 0;
-        }
+		if (isNaN(betrag))
+		{
+			betrag = 0;
+		}
 
-        if ((bestellt != null && betrag != vertrag_betrag) ||
-            (bestellt != null && stunden != vertrag_stunden))
-        {
-            row.getData().status = 'Geändert';      // geaendert
-        }
-        else if (bestellt == null && erteilt == null && akzeptiert == null)
-        {
-            row.getData().status = 'Neu';           // neu
-        }
-        else if (bestellt != null && erteilt == null && akzeptiert == null)
-        {
-            row.getData().status = 'Bestellt';      // bestellt
-        }
-        else if (bestellt != null && erteilt != null && akzeptiert == null)
-        {
-            row.getData().status = 'Erteilt';       // erteilt
-        }
-        else if (bestellt != null && erteilt != null && akzeptiert != null)
-        {
-            row.getData().status = 'Akzeptiert';    // akzeptiert
-        }
-        else
-        {
-            row.getData().status = null;            // default
-        }
-    });
+		if ((bestellt != null && betrag != vertrag_betrag) ||
+			(bestellt != null && stunden != vertrag_stunden))
+		{
+			row.getData().status = 'Geändert';      // geaendert
+		}
+		else if (bestellt == null && erteilt == null && akzeptiert == null)
+		{
+			row.getData().status = 'Neu';           // neu
+		}
+		else if (bestellt != null && erteilt == null && akzeptiert == null)
+		{
+			row.getData().status = 'Bestellt';      // bestellt
+		}
+		else if (bestellt != null && erteilt != null && akzeptiert == null)
+		{
+			row.getData().status = 'Erteilt';       // erteilt
+		}
+		else if (bestellt != null && erteilt != null && akzeptiert != null)
+		{
+			row.getData().status = 'Akzeptiert';    // akzeptiert
+		}
+		else
+		{
+			row.getData().status = null;            // default
+		}
+	});
 }
 
 // Performes after row was updated
 function func_rowUpdated(row){
 
-    // Refresh status icon and row color
-    row.reformat(); // retriggers cell formatters and rowFormatter callback
+	// Refresh status icon and row color
+	row.reformat(); // retriggers cell formatters and rowFormatter callback
 
-    // Deselect and disable new selection of updated rows
-    row.deselect();
-    row.getElement().style["pointerEvents"] = "none";
+	// Deselect and disable new selection of updated rows
+	row.deselect();
+	row.getElement().style["pointerEvents"] = "none";
 }
 
 // Hide betrag, if lector has inkludierte Lehre
 function func_renderComplete(table){
 
-    // Check if the lectors actual Verwendung has inkludierte Lehre
-    FHC_AjaxClient.ajaxCallGet(
-        FHC_JS_DATA_STORAGE_OBJECT.called_path + "/checkInkludierteLehre",
-        null,
-        {
-            successCallback: function (data, textStatus, jqXHR)
-            {
-                // If lector has inkludierte Lehre, hide the column betrag
-                if (data.retval)
-                {
-                    table.hideColumn("betrag");
-                }
-            },
-            errorCallback: function (jqXHR, textStatus, errorThrown)
-            {
-                FHC_DialogLib.alertError("Systemfehler<br>Bitte kontaktieren Sie Ihren Administrator.");
-            }
-        }
-    );
+	// Check if the lectors actual Verwendung has inkludierte Lehre
+	FHC_AjaxClient.ajaxCallGet(
+		FHC_JS_DATA_STORAGE_OBJECT.called_path + "/checkInkludierteLehre",
+		null,
+		{
+			successCallback: function (data, textStatus, jqXHR)
+			{
+				// If lector has inkludierte Lehre, hide the column betrag
+				if (data.retval)
+				{
+					table.hideColumn("betrag");
+				}
+			},
+			errorCallback: function (jqXHR, textStatus, errorThrown)
+			{
+				FHC_DialogLib.alertError("Systemfehler<br>Bitte kontaktieren Sie Ihren Administrator.");
+			}
+		}
+	);
 }
 
 // Tabulator footer element
@@ -253,32 +254,32 @@ function func_renderComplete(table){
 // Adds a footer with buttons select all / deselect all / download
 function func_footerElement(){
 
-    var footer_html = '<div class="row">';
-    footer_html += '<div class="col-lg-12" style="padding: 5px;">';
+	var footer_html = '<div class="row">';
+	footer_html += '<div class="col-lg-12" style="padding: 5px;">';
 
-    footer_html += '<div class="btn-toolbar pull-right" role="toolbar">';
-    footer_html += '<div class="btn-group" role="group">';
-    footer_html += '<button id="download-csv" class="btn btn-default" type="button" data-toggle="tooltip" data-placement="left" title="Download CSV" onclick="footer_downloadCSV()"><small>CSV&nbsp;&nbsp;</small><i class="fa fa-arrow-down"></i></button>';
-    footer_html += '</div>';
-    footer_html += '</div>';
+	footer_html += '<div class="btn-toolbar pull-right" role="toolbar">';
+	footer_html += '<div class="btn-group" role="group">';
+	footer_html += '<button id="download-csv" class="btn btn-default" type="button" data-toggle="tooltip" data-placement="left" title="Download CSV" onclick="footer_downloadCSV()"><small>CSV&nbsp;&nbsp;</small><i class="fa fa-arrow-down"></i></button>';
+	footer_html += '</div>';
+	footer_html += '</div>';
 
-    footer_html += '<div class="btn-toolbar" role="toolbar">';
-    footer_html += '<div class="btn-group" role="group">';
-    footer_html += '<button id="select-all" class="btn btn-default pull-left" type="button" onclick="footer_selectAll()">Alle auswählen</button>';
-    footer_html += '<button id="deselect-all" class="btn btn-default pull-left" type="button" onclick="footer_deselectAll()">Alle abwählen</button>';
-    footer_html += '<span id="number-selected" style="margin-left: 20px; line-height: 2; font-weight: normal"></span>';
-    footer_html += '</div>';
-    footer_html += '</div>';
+	footer_html += '<div class="btn-toolbar" role="toolbar">';
+	footer_html += '<div class="btn-group" role="group">';
+	footer_html += '<button id="select-all" class="btn btn-default pull-left" type="button" onclick="footer_selectAll()">Alle auswählen</button>';
+	footer_html += '<button id="deselect-all" class="btn btn-default pull-left" type="button" onclick="footer_deselectAll()">Alle abwählen</button>';
+	footer_html += '<span id="number-selected" style="margin-left: 20px; line-height: 2; font-weight: normal"></span>';
+	footer_html += '</div>';
+	footer_html += '</div>';
 
-    footer_html += '</div>';
-    footer_html += '</div>';
+	footer_html += '</div>';
+	footer_html += '</div>';
 
-    return footer_html;
+	return footer_html;
 }
 
 // Performs download CSV
 function footer_downloadCSV(){
-    $('#tableWidgetTabulator').tabulator("download", "csv", "data.csv", {bom:true}); // BOM for correct UTF-8 char output
+	$('#tableWidgetTabulator').tabulator("download", "csv", "data.csv", {bom:true}); // BOM for correct UTF-8 char output
 }
 
 /*
@@ -286,12 +287,12 @@ function footer_downloadCSV(){
  * Select all (filtered) rows and ignore rows that are bestellt and erteilt
  */
 function footer_selectAll(){
-    $('#tableWidgetTabulator').tabulator('getRows', true)
-        .filter(row =>  row.getData().bestellt != null &&   // bestellt
-            row.getData().erteilt != null &&            // AND erteilt
-            row.getData().akzeptiert == null &&         // AND NOT akzeptiert
-            row.getData().status != 'Geändert')         // AND NOT geändert
-        .forEach((row => row.select()));
+	$('#tableWidgetTabulator').tabulator('getRows', true)
+		.filter(row =>  row.getData().bestellt != null &&   // bestellt
+			row.getData().erteilt != null &&            // AND erteilt
+			row.getData().akzeptiert == null &&         // AND NOT akzeptiert
+			row.getData().status != 'Geändert')         // AND NOT geändert
+		.forEach((row => row.select()));
 }
 
 /*
@@ -299,12 +300,12 @@ function footer_selectAll(){
  * Deselect all (filtered) rows
  */
 function footer_deselectAll(){
-    $('#tableWidgetTabulator').tabulator('deselectRow');
+	$('#tableWidgetTabulator').tabulator('deselectRow');
 }
 
 // Displays number of selected rows on row selection change
 function func_rowSelectionChanged(data, rows){
-    $('#number-selected').html("Für Annehmen ausgewählt: <strong>" + rows.length + "</strong>");
+	$('#number-selected').html("Für Annehmen ausgewählt: <strong>" + rows.length + "</strong>");
 }
 
 // -----------------------------------------------------------------------------------------------------------------
@@ -318,16 +319,16 @@ status_formatter = function(cell, formatterParams, onRendered){
 	var akzeptiert = cell.getRow().getData().akzeptiert;
 	var is_storniert = cell.getRow().getData().storniert != undefined;
 
-    var stunden = parseFloat(cell.getRow().getData().stunden);
-    var vertrag_stunden = parseFloat(cell.getRow().getData().vertrag_stunden);
+	var stunden = parseFloat(cell.getRow().getData().stunden);
+	var vertrag_stunden = parseFloat(cell.getRow().getData().vertrag_stunden);
 
-    var betrag = parseFloat(cell.getRow().getData().betrag);
-    var vertrag_betrag = parseFloat(cell.getRow().getData().vertrag_betrag);
+	var betrag = parseFloat(cell.getRow().getData().betrag);
+	var vertrag_betrag = parseFloat(cell.getRow().getData().vertrag_betrag);
 
-    if (isNaN(betrag))
-    {
-        betrag = 0;
-    }
+	if (isNaN(betrag))
+	{
+		betrag = 0;
+	}
 
 	// commented icons would be so nice to have with fontawsome 5.11...
 	if (bestellt != null && isNaN(vertrag_betrag))
@@ -378,16 +379,16 @@ status_tooltip = function(cell){
 	var letzterStatus_vorStorniert = cell.getRow().getData().letzterStatus_vorStorniert;
 
 
-    var stunden = parseFloat(cell.getRow().getData().stunden);
-    var vertrag_stunden = parseFloat(cell.getRow().getData().vertrag_stunden);
+	var stunden = parseFloat(cell.getRow().getData().stunden);
+	var vertrag_stunden = parseFloat(cell.getRow().getData().vertrag_stunden);
 
-    var betrag = parseFloat(cell.getRow().getData().betrag);
-    var vertrag_betrag = parseFloat(cell.getRow().getData().vertrag_betrag);
+	var betrag = parseFloat(cell.getRow().getData().betrag);
+	var vertrag_betrag = parseFloat(cell.getRow().getData().vertrag_betrag);
 
-    if (isNaN(betrag))
-    {
-        betrag = 0;
-    }
+	if (isNaN(betrag))
+	{
+		betrag = 0;
+	}
 
 	if (letzterStatus_vorStorniert != undefined && letzterStatus_vorStorniert == 'akzeptiert')
 	{
@@ -429,24 +430,24 @@ status_tooltip = function(cell){
 
 // Generates bestellt tooltip
 bestellt_tooltip = function(cell){
-    if (cell.getRow().getData().bestellt_von != null)
-    {
-        return 'Bestellt von: ' + cell.getRow().getData().bestellt_von;
-    }
+	if (cell.getRow().getData().bestellt_von != null)
+	{
+		return 'Bestellt von: ' + cell.getRow().getData().bestellt_von;
+	}
 }
 
 // Generates erteilt tooltip
 erteilt_tooltip = function(cell){
-    if (cell.getRow().getData().erteilt_von != null) {
-        return 'Erteilt von: ' + cell.getRow().getData().erteilt_von;
-    }
+	if (cell.getRow().getData().erteilt_von != null) {
+		return 'Erteilt von: ' + cell.getRow().getData().erteilt_von;
+	}
 }
 
 // Generates akzeptiert tooltip
 akzeptiert_tooltip = function(cell){
-    if (cell.getRow().getData().akzeptiert_von != null) {
-        return 'Angenommen von: ' + cell.getRow().getData().akzeptiert_von;
-    }
+	if (cell.getRow().getData().akzeptiert_von != null) {
+		return 'Angenommen von: ' + cell.getRow().getData().akzeptiert_von;
+	}
 }
 
 // Generates storniert tooltip
@@ -457,43 +458,42 @@ storniert_tooltip = function(cell){
 }
 
 $(function() {
+	// Show all rows
+	$("#show-all").click(function(){
+		$('#tableWidgetTabulator').tabulator('clearFilter');
+	});
 
-    // Show all rows
-    $("#show-all").click(function(){
-        $('#tableWidgetTabulator').tabulator('clearFilter');
-    });
+	// Show only rows with ordered lehrauftraege
+	$("#show-ordered").click(function(){
+		$('#tableWidgetTabulator').tabulator('setFilter',
+			[
+				{field: 'bestellt', type: '!=', value: null},
+				{field: 'erteilt', type: '=', value: null},
+				{field: 'akzeptiert', type: '=', value: null}
+			]
+		);
+	});
 
-    // Show only rows with ordered lehrauftraege
-    $("#show-ordered").click(function(){
-        $('#tableWidgetTabulator').tabulator('setFilter',
-            [
-                {field: 'bestellt', type: '!=', value: null},
-                {field: 'erteilt', type: '=', value: null},
-                {field: 'akzeptiert', type: '=', value: null}
-            ]
-        );
-    });
+	// Show only rows with erteilte lehrauftraege
+	$("#show-approved").click(function(){
+		$('#tableWidgetTabulator').tabulator('setFilter', [
+				{field: 'bestellt', type: '!=', value: null},   // filter when is bestellt
+				{field: 'erteilt', type: '!=', value: null},    // and is erteilt
+				{field: 'akzeptiert', type: '=', value: null}  // and is not akzeptiert
+			]
+		);
+	});
 
-    // Show only rows with erteilte lehrauftraege
-    $("#show-approved").click(function(){
-        $('#tableWidgetTabulator').tabulator('setFilter', [
-                {field: 'bestellt', type: '!=', value: null},   // filter when is bestellt
-                {field: 'erteilt', type: '!=', value: null},    // and is erteilt
-                {field: 'akzeptiert', type: '=', value: null}  // and is not akzeptiert
-            ]
-        );
-    });
-
-    // Show only rows with akzeptierte lehrauftraege
-    $("#show-accepted").click(function(){
-        $('#tableWidgetTabulator').tabulator('setFilter',
-            [
-                {field: 'bestellt', type: '!=', value: null},
-                {field: 'erteilt', type: '!=', value: null},
-                {field: 'akzeptiert', type: '!=', value: null}
-            ]
-        );
-    });
+	// Show only rows with akzeptierte lehrauftraege
+	$("#show-accepted").click(function(){
+		$('#tableWidgetTabulator').tabulator('setFilter',
+			[
+				{field: 'bestellt', type: '!=', value: null},
+				{field: 'erteilt', type: '!=', value: null},
+				{field: 'akzeptiert', type: '!=', value: null}
+			]
+		);
+	});
 
 	// Set png-icons into filter-buttons
 	$(".btn-lehrauftrag").each(function(){
@@ -510,13 +510,13 @@ $(function() {
 		}
 	});
 
-    // De/activate and un/focus on clicked button
-    $(".btn-lehrauftrag").click(function() {
+	// De/activate and un/focus on clicked button
+	$(".btn-lehrauftrag").click(function() {
 
-        // De/activate and un/focus on clicked button
-        $(".btn-lehrauftrag").removeClass('focus').removeClass('active');
-        $(this).addClass('focus').addClass('active');
-    });
+		// De/activate and un/focus on clicked button
+		$(".btn-lehrauftrag").removeClass('focus').removeClass('active');
+		$(this).addClass('focus').addClass('active');
+	});
 
 	// Redraw table stornierte lehrauftraege on button click
 	$('#collapseCancelledLehrauftraege').on('shown.bs.collapse', function () {
@@ -526,73 +526,73 @@ $(function() {
 	// Approve Lehrauftraege
 	$("#accept-lehrauftraege").click(function(){
 
-        // Get selected rows data
-        var selected_data = $('#tableWidgetTabulator').tabulator('getSelectedData')
-            .map(function(data){
-                // reduce to necessary fields
-                return {
-                    'row_index' : data.row_index,
-                    'vertrag_id' : data.vertrag_id
-                }
-            });
+		// Get selected rows data
+		var selected_data = $('#tableWidgetTabulator').tabulator('getSelectedData')
+			.map(function(data){
+				// reduce to necessary fields
+				return {
+					'row_index' : data.row_index,
+					'vertrag_id' : data.vertrag_id
+				}
+			});
 
-        // Alert and exit if no lehraufgang is selected
-        if (selected_data.length == 0)
-        {
-            FHC_DialogLib.alertInfo('Bitte wählen Sie erst zumindest einen Lehrauftrag');
+		// Alert and exit if no lehraufgang is selected
+		if (selected_data.length == 0)
+		{
+			FHC_DialogLib.alertInfo('Bitte wählen Sie erst zumindest einen Lehrauftrag');
 
-            // Emtpy password field
-            $("#password").val('');
+			// Emtpy password field
+			$("#password").val('');
 
-            return;
-        }
+			return;
+		}
 
-        // Get password for verification
-        var password = $("#password").val();
-        if (password == '')
-        {
-            FHC_DialogLib.alertInfo('Bitte verifizieren Sie sich mit Ihrem Login Passwort.');
+		// Get password for verification
+		var password = $("#password").val();
+		if (password == '')
+		{
+			FHC_DialogLib.alertInfo('Bitte verifizieren Sie sich mit Ihrem Login Passwort.');
 
-            // Focus on password field
-            $("#password").focus();
+			// Focus on password field
+			$("#password").focus();
 
-            return;
-        }
+			return;
+		}
 
-        // Prepare data object for ajax call
-        var data = {
-            'password': password,
-            'selected_data': selected_data
-        };
+		// Prepare data object for ajax call
+		var data = {
+			'password': password,
+			'selected_data': selected_data
+		};
 
-        FHC_AjaxClient.ajaxCallPost(
-            FHC_JS_DATA_STORAGE_OBJECT.called_path + "/acceptLehrauftrag",
-            data,
-            {
-                successCallback: function (data, textStatus, jqXHR)
-                {
-                    if (data.error)
-                    {
-                        // Password not verified
-                        FHC_DialogLib.alertWarning(data.retval);
-                    }
-                    if (!data.error && data.retval != null)
-                    {
-                        // Update status 'Erteilt'
-                        $('#tableWidgetTabulator').tabulator('updateData', data.retval);
-                        FHC_DialogLib.alertSuccess(data.retval.length + " Lehraufträge wurden akzeptiert.");
-                    }
-                },
-                errorCallback: function (jqXHR, textStatus, errorThrown)
-                {
-                    FHC_DialogLib.alertError("Systemfehler<br>Bitte kontaktieren Sie Ihren Administrator.");
-                }
-            }
-        );
+		FHC_AjaxClient.ajaxCallPost(
+			FHC_JS_DATA_STORAGE_OBJECT.called_path + "/acceptLehrauftrag",
+			data,
+			{
+				successCallback: function (data, textStatus, jqXHR)
+				{
+					if (data.error)
+					{
+						// Password not verified
+						FHC_DialogLib.alertWarning(data.retval);
+					}
+					if (!data.error && data.retval != null)
+					{
+						// Update status 'Erteilt'
+						$('#tableWidgetTabulator').tabulator('updateData', data.retval);
+						FHC_DialogLib.alertSuccess(data.retval.length + " Lehraufträge wurden akzeptiert.");
+					}
+				},
+				errorCallback: function (jqXHR, textStatus, errorThrown)
+				{
+					FHC_DialogLib.alertError("Systemfehler<br>Bitte kontaktieren Sie Ihren Administrator.");
+				}
+			}
+		);
 
-        // Empty password field
-        $("#password").val('');
+		// Empty password field
+		$("#password").val('');
 
-    });
+	});
 
 });
