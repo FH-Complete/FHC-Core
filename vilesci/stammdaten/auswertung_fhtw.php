@@ -731,6 +731,7 @@ if ($punkteUebertragen)
 		{
 			foreach ($_POST['prestudentPunkteArr'] AS $key => $array)
 			{
+				$rtpunkte = number_format(floatval(str_replace(',', '.', $array['ergebnis'])), 4);
 				$prestudentrolle = new prestudent($array['prestudent_id']);
 				$prestudentrolle->getLastStatus($array['prestudent_id'], null, 'Interessent');
 
@@ -750,7 +751,7 @@ if ($punkteUebertragen)
 					if ($setRTPunkte->punkte == '')
 					{
 						$setRTPunkte->new = false;
-						$setRTPunkte->punkte = number_format(floatval($array['ergebnis']), 4);
+						$setRTPunkte->punkte = $rtpunkte;
 						$setRTPunkte->updateamum = date('Y-m-d H:i:s');
 						$setRTPunkte->updatevon = $user;
 
@@ -789,7 +790,7 @@ if ($punkteUebertragen)
 						$setRTPunkte->anmeldedatum = '';
 						$setRTPunkte->ort_kurzbz = $ort_kurzbz;
 						$setRTPunkte->studienplan_id = $prestudentrolle->studienplan_id;
-						$setRTPunkte->punkte = number_format(floatval($array['ergebnis']), 4);
+						$setRTPunkte->punkte = $rtpunkte;
 						$setRTPunkte->insertamum = date('Y-m-d H:i:s');
 						$setRTPunkte->insertvon = $user;
 
