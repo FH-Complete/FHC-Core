@@ -2140,7 +2140,7 @@ else
 		$("#auswertung_table").tablesorter(
 		{			
 			widgets: ["zebra", "filter", "columnSelector"],
-			sortList: [[16,1],[3,0],[4,0]],
+			sortList: [[15,1],[17,1],[3,0],[4,0]],//16th fake hidden column for correct sort with colspan
 			headers: {0: { sorter: false, filter: false}, 2: { sorter: false, filter: false}, 4: { dateFormat: "ddmmyyyy" }}
 			/*widgetOptions : {
 				columnSelector_container : $("#columnSelector"),
@@ -2926,6 +2926,7 @@ else
 				<th title="Priorität" rowspan="2" style="width: 20px">Prio</th>
 				<th rowspan="2">Raum</th>
 				<th title="Teilgenommen" rowspan="2">TG</th>
+				<th style="display: none"></th>
 				<th colspan="2">Gesamt</th>';
 
 		foreach ($gebiet AS $gbt)
@@ -2935,6 +2936,7 @@ else
 
 		echo '</tr>
 			<tr>
+				<th style="display: none"></th>
 				<th><small>Punkte</small></th>
 				<th><small>Prozent</small></th>';
 
@@ -2977,6 +2979,8 @@ else
 						<td class='".$inaktiv."'>$erg->raum</td>
 						<td class='".$inaktiv."'>".($erg->teilgenommen == true ? "<span class='glyphicon glyphicon-ok'></span>" : "")."</td>";
 				//<td>$erg->idnachweis</td>
+				$gesamtprozent = ($erg->gesamt != '' ? number_format($erg->gesamt, 2, ',', ' ') : '');
+				echo '<td style="display: none">'. $gesamtprozent .'</td>';
 				echo '	<td style="text-align: right; padding-right: 3px" class="punkte '.$inaktiv.'" nowrap>';
 				// Punkte können nur gelöscht werden, solange "Zum Reihungstest angetreten" nicht gesetzt ist
 				if ($erg->teilgenommen == false || $rechte->isBerechtigt('admin'))
@@ -3002,7 +3006,7 @@ else
 					$erg->gesamt_ohne_physik = '';
 				}*/
 				echo '	<td style="text-align: right; padding-right: 3px" class="col_gesamtpunkte punkte '.$inaktiv.'" nowrap>
-							<b>' . ($erg->gesamt != '' ? number_format($erg->gesamt, 2, ',', ' ') : '') . '</b>
+							<b>' . $gesamtprozent . '</b>
 							<span class="erg_gesamt" style="display: none">'.$erg->gesamt.'</span>
 						</td>';
 /*				echo '	<td style="text-align: right; padding-right: 3px" class="col_gesamtpunkte_ohne_physik '.$inaktiv.'" nowrap>
