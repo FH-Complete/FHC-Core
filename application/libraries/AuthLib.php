@@ -390,7 +390,7 @@ class AuthLib
 		}
 		elseif (isError($hta)) // display error and stop execution
 		{
-			$this->_showError(getData($hta));
+			$this->_showError($hta->retval);
 		}
 
 		return $hta; // if success then is returned!
