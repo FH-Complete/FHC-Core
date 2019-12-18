@@ -168,9 +168,9 @@ class LehrauftragAkzeptieren extends Auth_Controller
 	
 	/**
 	 * Check if lectors latest active Verwendung has inkludierte Lehre
-	 * - inkludierte_lehre is null: freelancer lector -> has NO inkludierte Lehre
-	 * - inkludierte_lehre -1: fix employed lector -> all inclusive Lehre
-	 * - inkludierte_lehre > 0: fix employed lector -> given value is inclusive Lehre
+	 * - inkludierte_lehre is null OR 0: freelancer lector -> has NO inkludierte Lehre
+	 * - inkludierte_lehre -1: fix employed lector -> has inkludierte Lehre (all inclusive)
+	 * - inkludierte_lehre > 0: fix employed lector -> has inkludierte Lehre (value is amount of hours included)
 	 */
     public function checkInkludierteLehre()
 	{
@@ -178,7 +178,7 @@ class LehrauftragAkzeptieren extends Auth_Controller
 		
 		if (hasData($result))
 		{
-			$this->outputJsonSuccess(!is_null($result->retval[0]->inkludierte_lehre));
+			$this->outputJsonSuccess(!is_null($result->retval[0]->inkludierte_lehre) && $result->retval[0]->inkludierte_lehre != 0);
 		}
 		else
 		{

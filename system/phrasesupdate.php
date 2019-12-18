@@ -4094,7 +4094,27 @@ When on hold, the date is only a reminder.',
                 'insertvon' => 'system'
             )
         )
-    )
+    ),
+	array(
+		'app' => 'core',
+		'category' => 'global',
+		'phrase' => 'stornierteLehrauftraege',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Stornierte Lehraufträge',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Cancelled lectureships',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	)
 );
 
 
