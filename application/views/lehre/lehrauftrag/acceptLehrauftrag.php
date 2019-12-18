@@ -151,6 +151,11 @@ $this->load->view(
                         <button id="show-approved" class="btn btn-default btn-lehrauftrag" type="button" data-toggle="tooltip" data-placement="left" title="Nur erteilte anzeigen"></button><!-- png img set in javascript -->
                         <button id="show-accepted" class="btn btn-default btn-lehrauftrag" type="button" data-toggle="tooltip" data-placement="left" title="Nur angenommene anzeigen"><i class='fa fa-handshake-o'></i></button>
                     </div>
+					
+					<button id="show-cancelled" class="btn btn-default btn-lehrauftrag" type="button" style="margin-left: 20px;"
+							data-toggle="collapse" data-placement="left" title="Stornierte anzeigen"
+							data-target ="#collapseCancelledLehrauftraege" aria-expanded="false" aria-controls="collapseExample">
+					</button><!-- png img set in javascript -->
                 </div>
             </div>
             <div class="col-md-offset-2 col-md-4 col-xs-6">
@@ -162,6 +167,28 @@ $this->load->view(
                 </div>
             </div>
         </div>
+		<br>
+		<br>
+		
+		<!-- collapse module with data table 'Stornierte Lehrauftraege' (collapsed by default until opened on buttonclick)-->
+		<div class="row">
+			<div class="col-lg-12 collapse" id="collapseCancelledLehrauftraege">
+				<h4>
+					<?php echo ucfirst($this->p->t('global', 'stornierteLehrauftraege')); ?>:
+					<small>
+						<abbr title="Anderes Studiensemester? Bitte oben im Dropdown wählen." >
+							<?php echo $studiensemester_selected ?>
+						</abbr>
+					</small>
+				</h4>
+				<div class="row">
+					<div class="col-lg-12">
+						<?php $this->load->view('lehre/lehrauftrag/cancelledLehrauftragData.php'); ?>
+					</div>
+				</div>
+				<br>
+			</div>
+		</div>
 		
     </div><!-- end container -->
 </div><!-- end page-wrapper -->
