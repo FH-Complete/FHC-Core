@@ -76,7 +76,7 @@ class PersonLogLib
 			return $decoded_logs;
 		}
 		else
-			show_error($result->retval);
+			show_error(getError($result));
 	}
 
 	/**

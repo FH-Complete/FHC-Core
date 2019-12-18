@@ -78,7 +78,7 @@ class LehrauftragAkzeptieren extends Auth_Controller
             }
             elseif (isError($studiensemester))
             {
-                show_error($studiensemester->error);
+                show_error(getError($studiensemester));
             }
         }
 
@@ -138,17 +138,17 @@ class LehrauftragAkzeptieren extends Auth_Controller
                     }
                     else
                     {
-                        show_error($result->retval);
+                        show_error(getError($result));
                     }
                 }
                 else
                 {
-                    show_error($result->retval);
+                    show_error(getError($result));
                 }
 
                 // Set status to accepted
                 $result = $this->VertragvertragsstatusModel->setStatus($vertrag_id, $this->_uid, 'akzeptiert');
-    
+
                 if ($result->retval)
                 {
                     $json []= array(
@@ -165,7 +165,7 @@ class LehrauftragAkzeptieren extends Auth_Controller
             }
         }
     }
-	
+
 	/**
 	 * Check if lectors latest active Verwendung has inkludierte Lehre
 	 * - inkludierte_lehre is null OR 0: freelancer lector -> has NO inkludierte Lehre
@@ -175,14 +175,14 @@ class LehrauftragAkzeptieren extends Auth_Controller
     public function checkInkludierteLehre()
 	{
 		$result = $this->BisverwendungModel->getLast($this->_uid);
-		
+
 		if (hasData($result))
 		{
 			$this->outputJsonSuccess(!is_null($result->retval[0]->inkludierte_lehre) && $result->retval[0]->inkludierte_lehre != 0);
 		}
 		else
 		{
-			$this->outputJsonError($result->retval);
+			$this->outputJsonError(getError($result));
 		}
 	}
 

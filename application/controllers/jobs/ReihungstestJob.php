@@ -35,7 +35,7 @@ class ReihungstestJob extends CLI_Controller
 		}
 		elseif (isError($result))
 		{
-			show_error($result->error);
+			show_error(getError($result));
 		}
 
         // Get free places
@@ -48,7 +48,7 @@ class ReihungstestJob extends CLI_Controller
 		}
 		elseif (isError($result))
 		{
-			show_error($result->error);
+			show_error(getError($result));
 		}
 
         // Prepare data for mail template 'ReihungstestJob'
@@ -103,7 +103,7 @@ class ReihungstestJob extends CLI_Controller
 		}
 		elseif (isError($result))
 		{
-			show_error($result->error);
+			show_error(getError($result));
 		}
 
         $applicants_arr = array();
@@ -118,7 +118,7 @@ class ReihungstestJob extends CLI_Controller
 			}
 			elseif (isError($applicants))
 			{
-				show_error($applicants->error);
+				show_error(getError($applicants));
 			}
 
 			// Get all Bachelor-Degree-Programs with Mailadress
@@ -131,7 +131,7 @@ class ReihungstestJob extends CLI_Controller
 			}
 			elseif (isError($bachelorStudiengeange))
 			{
-				show_error($bachelorStudiengeange->error);
+				show_error(getError($bachelorStudiengeange));
 			}
 
 			// If a person ist an applicant of this degree-program send mail with application data
@@ -222,7 +222,7 @@ class ReihungstestJob extends CLI_Controller
         }
         elseif (isError($result))
         {
-            show_error($result->error);
+            show_error(getError($result));
         }
 
         $studiengang = '';
@@ -382,7 +382,7 @@ class ReihungstestJob extends CLI_Controller
                     }
                     elseif (isError($resultTestsOnDate))
                     {
-                        show_error($resultTestsOnDate->error);
+                        show_error(getError($resultTestsOnDate));
                     }
                 }
 
@@ -399,7 +399,7 @@ class ReihungstestJob extends CLI_Controller
                         }
                         elseif (isError($applicants))
                         {
-                            show_error($applicants->error);
+                            show_error(getError($applicants));
                         }
 
 						foreach ($applicants_arr as $applicant)
@@ -479,7 +479,7 @@ class ReihungstestJob extends CLI_Controller
         }
         elseif (isError($yesterdays_applicants_arr))
         {
-            show_error($yesterdays_applicants_arr->error);
+            show_error(getError($yesterdays_applicants_arr));
         }
 
         // Get all other prestudenten of the given persons.
@@ -503,7 +503,7 @@ class ReihungstestJob extends CLI_Controller
             // Store them, if they have already absolved a placement test in the same study term they have applied for.
             $placement_absolvents_arr = $this->PrestudentModel->loadWhere('
                 person_id IN (' . implode(', ', $person_id_arr) . ') AND
-                typ = \'b\' AND 
+                typ = \'b\' AND
                 teilgenommen = \'t\' AND
                 tbl_reihungstest.studiensemester_kurzbz IN (
                     SELECT
@@ -548,7 +548,7 @@ class ReihungstestJob extends CLI_Controller
         $to = ''; // mail recipient (stg assistance)
         $content_arr = array(); // url paths to the new applicants
         $base_link = base_url('vilesci/stammdaten/auswertung_fhtw.php');
-       
+
         $i = 0; // loop counter
         $len = count($result_arr);
 
@@ -569,7 +569,7 @@ class ReihungstestJob extends CLI_Controller
             {
                 // Prepare content for mail template
                 $content_data_arr = $this->_getContentDataNewApplicant($content_arr);
-                
+
                 // Send mail
                  sendSanchoMail(
                      'BewerberNachReihungstest',
@@ -786,4 +786,3 @@ class ReihungstestJob extends CLI_Controller
         }
     }
 }
-

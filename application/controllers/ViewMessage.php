@@ -46,7 +46,7 @@ class ViewMessage extends FHC_Controller
 
 		if ($msg->error)
 		{
-			show_error(getData($msg));
+			show_error(getError($msg));
 		}
 
 		if (is_array(getData($msg)) && count(getData($msg)) > 0)
@@ -55,7 +55,7 @@ class ViewMessage extends FHC_Controller
 
 			if (isError($setReadMessageStatusByToken))
 			{
-				show_error($msg->$setReadMessageStatusByToken);
+				show_error($msg);
 			}
 
 			$sender_id = getData($msg)[0]->sender_id;
@@ -144,7 +144,7 @@ class ViewMessage extends FHC_Controller
 		$sendReply = $this->CLMessagesModel->sendReply($subject, $body, $persons, $relationmessage_id, $token);
 		if (isError($sendReply))
 		{
-			show_error(getData($sendReply));
+			show_error(getError($sendReply));
 		}
 
 		$this->load->view('system/messages/messageReplySent');

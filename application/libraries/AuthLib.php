@@ -390,7 +390,7 @@ class AuthLib
 		}
 		elseif (isError($hta)) // display error and stop execution
 		{
-			$this->_showError($hta->retval);
+			$this->_showError(getError($hta));
 		}
 
 		return $hta; // if success then is returned!
@@ -550,7 +550,7 @@ class AuthLib
 			}
 			elseif (isError($auth)) // blocking error
 			{
-				$this->_showError(getData($auth)); // display a generic error message and logs the occurred error
+				$this->_showError(getError($auth)); // display a generic error message and logs the occurred error
 			}
 		}
 		// else the user is already logged, then loads authentication helper and continue with the execution

@@ -22,8 +22,7 @@ class Konto_model extends DB_Model
 		$this->addJoin('wawi.tbl_konto_kostenstelle', 'konto_id');
 		$konten = $this->loadWhere(array('kostenstelle_id' => $kostenstelle_id));
 
-		if ($konten->error)
-			return error($konten->retval);
+		if ($konten->error) return $konten;
 
 		return $konten;
 	}
