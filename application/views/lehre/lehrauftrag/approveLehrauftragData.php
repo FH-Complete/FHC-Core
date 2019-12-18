@@ -16,11 +16,11 @@ SELECT
     studiensemester_kurzbz,
     studiengang_kz,
     stg_typ_kurzbz,
+    semester,
     orgform_kurzbz,
     person_id,
     typ,
     auftrag,
-    semester,
     lv_oe_kurzbz,
     gruppe,
     lektor,
@@ -147,7 +147,7 @@ FROM
                     WHEN oe.organisationseinheittyp_kurzbz = \'Department\' THEN (\'DEP \' || oe.bezeichnung)
                     ELSE (oe.organisationseinheittyp_kurzbz || \' \' || oe.bezeichnung)
                     END                                             AS "lv_oe_kurzbz",
-                (person.vorname || \' \' || person.nachname)        AS "lektor",
+                (person.nachname || \' \' || person.vorname)        AS "lektor",
                 TRUNC(lema.semesterstunden, 1)                      AS "stunden",
                 TRUNC((lema.semesterstunden * lema.stundensatz), 2) AS "betrag",
                 vertrag_id,
@@ -267,7 +267,7 @@ FROM
                         ELSE (oe.organisationseinheittyp_kurzbz ||
                               \' \' || oe.bezeichnung)
                         END                                                                             AS "lv_oe_kurzbz",
-                    (vorname || \' \' || nachname)                                                        AS "lektor",
+                    (nachname || \' \' || vorname)                                                        AS "lektor",
                     TRUNC(pb.stunden, 1)                                                                AS "stunden",
                     TRUNC((pb.stunden * pb.stundensatz), 2)                                             AS "betrag",
                     vertrag_id,
@@ -315,11 +315,11 @@ $filterWidgetArray = array(
         'Studiensemester',
         'Studiengang-KZ',
         'Studiengang',
+        'Semester',
         'OrgForm',
         'Person-ID',
         'Typ',
         'LV- / Projektbezeichnung',
-        'Semester',
         'Organisationseinheit',
         'Gruppe',
         'Lektor',
@@ -341,6 +341,7 @@ $filterWidgetArray = array(
         layout: "fitColumns",           // fit columns to width of table
 	    responsiveLayout: "hide",       // hide columns that dont fit on the table
 	    movableColumns: true,           // allows changing column
+        placeholder: func_placeholder(),
 	    headerFilterPlaceholder: " ",
 	    groupBy:"lehrveranstaltung_id",
 	    groupToggleElement:"header",    //toggle group on click anywhere in the group header
@@ -386,14 +387,14 @@ $filterWidgetArray = array(
         studiensemester_kurzbz: {headerFilter:"input"},
         studiengang_kz: {visible: false},
         stg_typ_kurzbz: {headerFilter:"input", width: "5%"},
+        semester: {headerFilter:"input"},
         orgform_kurzbz: {headerFilter:"input"},
         person_id: {visible: false},
         typ: {headerFilter:"input"},
         auftrag: {headerFilter:"input", width:"20%"},
-        semester: {headerFilter:"input"},
         lv_oe_kurzbz: {headerFilter:"input"},
         gruppe: {headerFilter:"input"},
-        lektor: {headerFilter:"input"},
+        lektor: {headerFilter:"input", widthGrow: 3},
         stunden: {align:"right",  formatter: form_formatNulltoStringNumber, formatterParams:{precision:1},
             headerFilter:"input", headerFilterFunc: hf_filterStringnumberWithOperator,
             bottomCalc:"sum", bottomCalcParams:{precision:1}},
