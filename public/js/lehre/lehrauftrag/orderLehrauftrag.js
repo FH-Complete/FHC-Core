@@ -99,6 +99,13 @@ function func_dataLoaded(data, table){
 // -----------------------------------------------------------------------------------------------------------------
 // Tabulator table format functions
 // -----------------------------------------------------------------------------------------------------------------
+
+// Displays text when table is empty
+function func_placeholder()
+{
+    return "<h4>Keine Daten vorhanden.</h4>";
+}
+
 // Formats the group header
 function func_groupHeader(data) {
     return data[0].lv_bezeichnung + "&nbsp;&nbsp;" + ' ( LV-ID: ' + data[0].lehrveranstaltung_id + ' )';  // change name to lehrveranstaltung;

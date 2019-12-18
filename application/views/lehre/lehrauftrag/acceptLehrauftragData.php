@@ -318,6 +318,7 @@ $filterWidgetArray = array(
         layout: "fitColumns",           // fit columns to width of table
 	    responsiveLayout: "hide",       // hide columns that dont fit on the table
 	    movableColumns: true,           // allows changing column
+		placeholder: func_placeholder(),
 	    headerFilterPlaceholder: " ",
         index: "row_index",             // assign specific column as unique id (important for row indexing)
         selectable: true,               // allow row selection

@@ -67,6 +67,7 @@ $tableWidgetArray = array(
         layout: "fitColumns",           // fit columns to width of table
 	    responsiveLayout: "hide",       // hide columns that dont fit on the table
 	    movableColumns: true,           // allows changing column
+	    placeholder: func_placeholder(),
         rowFormatter:function(row){
             func_rowFormatter(row);
         },

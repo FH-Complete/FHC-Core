@@ -329,6 +329,7 @@ $filterWidgetArray = array(
         layout: "fitColumns",           // fit columns to width of table
 	    responsiveLayout: "hide",       // hide columns that dont fit on the table
 	    movableColumns: true,           // allows changing column
+        placeholder: func_placeholder(),
 	    headerFilterPlaceholder: " ",
 	    groupBy:"lehrveranstaltung_id",
 	    groupToggleElement:"header",    //toggle group on click anywhere in the group header
