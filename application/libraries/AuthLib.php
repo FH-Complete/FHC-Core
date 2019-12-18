@@ -574,10 +574,11 @@ class AuthLib
 
 		// Needed information
 		$this->_ci->PersonModel->addSelect('person_id, vorname, nachname, uid');
-		// Retrieves the uid if it is possible
-		$this->_ci->PersonModel->addJoin('public.tbl_benutzer', 'person_id', 'LEFT');
-
-		$queryParamsArray['tbl_person.aktiv'] = true; // only active users!
+		// Retrieves the uid if it is possible for active users
+		$this->_ci->PersonModel->addJoin(
+			'(SELECT uid, person_id FROM public.tbl_benutzer WHERE aktiv = TRUE) tb', 'person_id',
+			'LEFT'
+		);
 
 		// Execute query with where clause
 		$personResult = $this->_ci->PersonModel->loadWhere($queryParamsArray);
