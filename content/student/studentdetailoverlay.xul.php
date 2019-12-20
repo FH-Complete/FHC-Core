@@ -69,6 +69,10 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 						<row>
 							<label value="Person ID" control="student-detail-textbox-person_id"/>
 							<hbox><textbox id="student-detail-textbox-person_id" readonly="true" maxlength="16" size="16"/></hbox>
+							<label value="Zugangscode" control="student-detail-zugangscode"/>
+							<label id="label-student-detail-link_bewerbungstool" hidden="true" value=""></label>
+							<label class="text-link" href="#" id="label-student-detail-zugangscode" value="" onclick="window.open(document.getElementById('label-student-detail-link_bewerbungstool').value)"/>
+
 						</row>
 						<row>
 							<label value="Anrede" control="student-detail-textbox-anrede"/>
@@ -492,6 +496,10 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 					</rows>
 				</grid>
 			</groupbox>
+			<hbox>
+				<spacer flex="1" />
+				<button id="student-prestudent-button-save" label="Speichern" oncommand="StudentPrestudentSave();" disabled="true"/>
+			</hbox>
 			<groupbox id="student-detail-groupbox-rollen">
 			<caption label="Status" />
 					<tree id="student-prestudent-tree-rolle" seltype="single" hidecolumnpicker="false" flex="1"
@@ -587,10 +595,75 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 						</template>
 					</tree>
 			</groupbox>
-			<hbox>
-				<spacer flex="1" />
-				<button id="student-prestudent-button-save" label="Speichern" oncommand="StudentPrestudentSave();" disabled="true"/>
-			</hbox>
+			<groupbox id="student-detail-groupbox-historie">
+				<caption label="Gesamthistorie" />
+				<vbox flex="1">
+					<tree id="historie-tree" seltype="single" hidecolumnpicker="true" flex="1"
+						  datasources="rdf:null" ref="http://www.technikum-wien.at/prestudenthistorie/liste"
+						  style="margin-left:10px;margin-right:10px;margin-bottom:5px;" height="100px"
+						  persist="hidden, height"
+						  context="historie-tree-popup"
+					>
+						<treecols>
+							<treecol id="historie-treecol-studiensemester_kurzbz" label="Studiensemester" flex="1" hidden="false"
+									 class="sortDirectionIndicator"
+									 sort="rdf:http://www.technikum-wien.at/prestudenthistorie/rdf#studiensemester_kurzbz" onclick="historieTreeSort()"/>
+							<splitter class="tree-splitter"/>
+							<treecol id="historie-treecol-prioritaet" label="Priorität" flex="1" hidden="false"
+									 class="sortDirectionIndicator"
+									 sort="rdf:http://www.technikum-wien.at/prestudenthistorie/rdf#prioritaet" onclick="historieTreeSort()"/>
+							<splitter class="tree-splitter"/>
+							<treecol id="historie-treecol-studiengang" label="Studiengang" flex="1" hidden="false"
+									 class="sortDirectionIndicator"
+									 sort="rdf:http://www.technikum-wien.at/prestudenthistorie/rdf#studiengang" onclick="historieTreeSort()"/>
+							<splitter class="tree-splitter"/>
+							<treecol id="historie-treecol-orgform_kurzbz" label="Organisationsform" flex="1" hidden="false"
+									 class="sortDirectionIndicator"
+									 sort="rdf:http://www.technikum-wien.at/prestudenthistorie/rdf#orgform_kurzbz" onclick="historieTreeSort()"/>
+							<splitter class="tree-splitter"/>
+							<treecol id="historie-treecol-studienplan_bezeichnung" label="Studienplan" flex="3" hidden="false"
+									 class="sortDirectionIndicator"
+									 sort="rdf:http://www.technikum-wien.at/prestudenthistorie/rdf#studienplan_bezeichnung" onclick="historieTreeSort()"/>
+							<splitter class="tree-splitter"/>
+							<!--<treecol id="historie-treecol-reihung_absolviert" label="Reihung absolviert" flex="2" hidden="false"
+									 class="sortDirectionIndicator"
+									 sort="rdf:http://www.technikum-wien.at/prestudenthistorie/rdf#reihung_absolviert" onclick="historieTreeSort()"/>
+							<splitter class="tree-splitter"/>-->
+							<treecol id="historie-treecol-uid" label="UID" flex="2" hidden="false"
+									 class="sortDirectionIndicator"
+									 sort="rdf:http://www.technikum-wien.at/prestudenthistorie/rdf#uid" onclick="historieTreeSort()"/>
+							<splitter class="tree-splitter"/>
+							<treecol id="historie-treecol-status" label="Status" flex="4" hidden="false"
+									 class="sortDirectionIndicator"
+									 sort="rdf:http://www.technikum-wien.at/prestudenthistorie/rdf#status" onclick="historieTreeSort()"/>
+							<splitter class="tree-splitter"/>
+							<treecol id="historie-treecol-prestudent_id" label="PrestudentID" flex="1" hidden="false"
+									 class="sortDirectionIndicator"
+									 sort="rdf:http://www.technikum-wien.at/prestudenthistorie/rdf#prestudent_id" onclick="historieTreeSort()"/>
+							<splitter class="tree-splitter"/>
+						</treecols>
+
+						<template>
+							<rule>
+								<treechildren>
+									<treeitem uri="rdf:*">
+										<treerow>
+											<treecell properties="Aktiv_rdf:http://www.technikum-wien.at/prestudenthistorie/rdf#aktiv rdf:http://www.technikum-wien.at/prestudenthistorie/rdf#bold" label="rdf:http://www.technikum-wien.at/prestudenthistorie/rdf#studiensemester_kurzbz" />
+											<treecell properties="Aktiv_rdf:http://www.technikum-wien.at/prestudenthistorie/rdf#aktiv rdf:http://www.technikum-wien.at/prestudenthistorie/rdf#bold" label="rdf:http://www.technikum-wien.at/prestudenthistorie/rdf#prioritaet" />
+											<treecell properties="Aktiv_rdf:http://www.technikum-wien.at/prestudenthistorie/rdf#aktiv rdf:http://www.technikum-wien.at/prestudenthistorie/rdf#bold" label="rdf:http://www.technikum-wien.at/prestudenthistorie/rdf#studiengang" />
+											<treecell properties="Aktiv_rdf:http://www.technikum-wien.at/prestudenthistorie/rdf#aktiv rdf:http://www.technikum-wien.at/prestudenthistorie/rdf#bold" label="rdf:http://www.technikum-wien.at/prestudenthistorie/rdf#orgform_kurzbz" />
+											<treecell properties="Aktiv_rdf:http://www.technikum-wien.at/prestudenthistorie/rdf#aktiv rdf:http://www.technikum-wien.at/prestudenthistorie/rdf#bold" label="rdf:http://www.technikum-wien.at/prestudenthistorie/rdf#studienplan_bezeichnung" />
+											<treecell properties="Aktiv_rdf:http://www.technikum-wien.at/prestudenthistorie/rdf#aktiv rdf:http://www.technikum-wien.at/prestudenthistorie/rdf#bold" label="rdf:http://www.technikum-wien.at/prestudenthistorie/rdf#uid" />
+											<treecell properties="Aktiv_rdf:http://www.technikum-wien.at/prestudenthistorie/rdf#aktiv rdf:http://www.technikum-wien.at/prestudenthistorie/rdf#bold" label="rdf:http://www.technikum-wien.at/prestudenthistorie/rdf#status" />
+											<treecell properties="Aktiv_rdf:http://www.technikum-wien.at/prestudenthistorie/rdf#aktiv rdf:http://www.technikum-wien.at/prestudenthistorie/rdf#bold" label="rdf:http://www.technikum-wien.at/prestudenthistorie/rdf#prestudent_id" />
+										</treerow>
+									</treeitem>
+								</treechildren>
+							</rule>
+						</template>
+					</tree>
+				</vbox>
+			</groupbox>
 </vbox>
 
 </overlay>
