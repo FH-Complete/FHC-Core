@@ -2142,11 +2142,22 @@ else
 		{			
 			widgets: ["zebra", "filter", "columnSelector"],
 			sortList: [[15,1],[17,1],[3,0],[4,0]],//16th fake hidden column for correct sort with colspan
-			headers: {0: { sorter: false, filter: false}, 2: { sorter: false, filter: false}, 4: { dateFormat: "ddmmyyyy" }}
+			headers: {0: { sorter: false, filter: false}, 2: { sorter: false, filter: false}, 4: { dateFormat: "ddmmyyyy" }, 15: { sorter: false, filter: false}}
 			/*widgetOptions : {
 				columnSelector_container : $("#columnSelector"),
 				columnSelector_saveColumns: true}			*/
 		});
+		
+		//hide tablesorter filter field if column is hidden
+		for (var i = 0; i < $("#auswertung_table tbody tr:nth-child(1) td").length; i++)
+		{
+			var colnr = i + 1;
+			var cell = $("#auswertung_table tbody tr:nth-child(1) td:nth-child(" + colnr + ")");
+			if (cell.css("display") === "none")
+			{
+				$("#auswertung_table tr.tablesorter-filter-row td:nth-child(" + colnr + ")").css("display", "none");
+			}
+		}
 		/*$.tablesorter.columnSelector.attachTo( $("#auswertung_table"), "#popover-target");*/
 		
 		/*$("#columnSelector").popover(
