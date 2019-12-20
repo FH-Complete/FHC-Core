@@ -97,7 +97,7 @@ class LehrauftragErteilen extends Auth_Controller
             }
             elseif (isError($studiensemester))
             {
-                show_error($studiensemester->error);
+                show_error(getError($studiensemester));
             }
         }
 
@@ -122,10 +122,10 @@ class LehrauftragErteilen extends Auth_Controller
     public function approveLehrauftrag()
     {
         $lehrauftrag_arr = json_decode($this->input->post('selected_data'));
-        
-        if (is_array($lehrauftrag_arr)) 
+
+        if (is_array($lehrauftrag_arr))
         {
-            foreach ($lehrauftrag_arr as $lehrauftrag) 
+            foreach ($lehrauftrag_arr as $lehrauftrag)
             {
                 $mitarbeiter_uid = (isset($lehrauftrag->mitarbeiter_uid)) ? $lehrauftrag->mitarbeiter_uid : null;
                 $vertrag_id = (isset($lehrauftrag->vertrag_id)) ? $lehrauftrag->vertrag_id : null;
@@ -146,12 +146,12 @@ class LehrauftragErteilen extends Auth_Controller
                     }
                     elseif (isError(($result)))
                     {
-                        show_error($result->retval);
+                        show_error(getError($result));
                     }
                 }
                 elseif (isError($result))
                 {
-                    show_error($result->retval);
+                    show_error(getError($result));
                 }
 
                 // Check if user is entitled to approve this lehrauftrag (by permission and organisational unit)
