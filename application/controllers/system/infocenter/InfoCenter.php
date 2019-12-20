@@ -24,7 +24,6 @@ class InfoCenter extends Auth_Controller
 
 	const FILTER_ID = 'filter_id';
 	const PREV_FILTER_ID = 'prev_filter_id';
-	const RELOAD_DATASET = 'reloadDataset';
 	const KEEP_TABLESORTER_FILTER = 'keepTsFilter';
 
 	private $_uid; // contains the UID of the logged user
@@ -238,7 +237,7 @@ class InfoCenter extends Auth_Controller
 		$redirectLink = '/'.self::INFOCENTER_URI.'?'.self::FHC_CONTROLLER_ID.'='.$this->getControllerId();
 
 		// Force reload of Dataset after Unlock
-		$redirectLink .= '&'.self::RELOAD_DATASET.'=true&'.self::KEEP_TABLESORTER_FILTER.'=true';
+		$redirectLink .= '&'.self::KEEP_TABLESORTER_FILTER.'=true';
 
 		$currentFilterId = $this->input->get(self::FILTER_ID);
 		if (isset($currentFilterId))
@@ -943,17 +942,12 @@ class InfoCenter extends Auth_Controller
 
 		$freigegebenLink = site_url(self::INFOCENTER_URI.'/'.self::FREIGEGEBEN_PAGE);
 		$reihungstestAbsolviertLink = site_url(self::INFOCENTER_URI.'/'.self::REIHUNGSTESTABSOLVIERT_PAGE);
+
 		$currentFilterId = $this->input->get(self::FILTER_ID);
-		$reloadDatasetParam = self::RELOAD_DATASET.'=true';
 		if (isset($currentFilterId))
 		{
-			$freigegebenLink .= '?'.self::PREV_FILTER_ID.'='.$currentFilterId.'&'.$reloadDatasetParam;
-			$reihungstestAbsolviertLink .= '?'.self::PREV_FILTER_ID.'='.$currentFilterId.'&'.$reloadDatasetParam;
-		}
-		else
-		{
-			$freigegebenLink .= '?'.$reloadDatasetParam;
-			$reihungstestAbsolviertLink .= '?'.$reloadDatasetParam;
+			$freigegebenLink .= '?'.self::PREV_FILTER_ID.'='.$currentFilterId;
+			$reihungstestAbsolviertLink .= '?'.self::PREV_FILTER_ID.'='.$currentFilterId;
 		}
 
 		$this->navigationlib->setSessionMenu(
@@ -1019,7 +1013,7 @@ class InfoCenter extends Auth_Controller
 		$prevFilterId = $this->input->get(self::PREV_FILTER_ID);
 		if (isset($prevFilterId))
 		{
-			$link .= '?'.self::FILTER_ID.'='.$prevFilterId.'&'.self::RELOAD_DATASET.'=true&'.self::KEEP_TABLESORTER_FILTER.'=true';
+			$link .= '?'.self::FILTER_ID.'='.$prevFilterId.'&'.self::KEEP_TABLESORTER_FILTER.'=true';
 		}
 
 		$this->navigationlib->setSessionMenu(
@@ -1049,10 +1043,9 @@ class InfoCenter extends Auth_Controller
 		$this->load->library('NavigationLib', array(self::NAVIGATION_PAGE => self::INFOCENTER_URI.'/'.$page));
 
 		// Generate the home link with the eventually loaded filter
-		$reloadDatasetParam = '?'.self::RELOAD_DATASET.'=true';
-		$homeLink = site_url(self::INFOCENTER_URI.'/'.self::INDEX_PAGE.$reloadDatasetParam);
-		$freigegebenLink = site_url(self::INFOCENTER_URI.'/'.self::FREIGEGEBEN_PAGE.$reloadDatasetParam);
-		$absolviertLink = site_url(self::INFOCENTER_URI.'/'.self::REIHUNGSTESTABSOLVIERT_PAGE.$reloadDatasetParam);
+		$homeLink = site_url(self::INFOCENTER_URI.'/'.self::INDEX_PAGE);
+		$freigegebenLink = site_url(self::INFOCENTER_URI.'/'.self::FREIGEGEBEN_PAGE);
+		$absolviertLink = site_url(self::INFOCENTER_URI.'/'.self::REIHUNGSTESTABSOLVIERT_PAGE);
 		$prevFilterId = $this->input->get(self::PREV_FILTER_ID);
 		if (isset($prevFilterId))
 		{

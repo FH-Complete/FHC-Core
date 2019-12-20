@@ -304,7 +304,6 @@ $filterWidgetArray = array(
     'tableUniqueId' => 'approveLehrauftrag',
     'requiredPermissions' => 'lehre/lehrauftrag_erteilen',
     'datasetRepresentation' => 'tabulator',
-    'reloadDataset' => true,    // reload query on page refresh
     'columnsAliases' => array(  // TODO: use phrasen
         'Status', // alias for row_index, because row_index is formatted to display the status icons
         'Personalnummer',
