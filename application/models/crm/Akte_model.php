@@ -186,8 +186,7 @@ class Akte_model extends DB_Model
 
 		$dokumente = $this->loadWhere($where);
 
-		if($dokumente->error)
-			return error($dokumente->retval);
+		if($dokumente->error) return $dokumente;
 
 		return success($dokumente->retval);
 	}

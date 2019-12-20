@@ -123,7 +123,7 @@ class FASMessages extends Auth_Controller
 		$msg = $this->messagelib->getMessage($msg_id, $receiver_id);
 		if (isError($msg))
 		{
-			show_error(getData($msg));
+			show_error(getError($msg));
 		}
 		elseif (!hasData($msg))
 		{
@@ -147,7 +147,7 @@ class FASMessages extends Auth_Controller
 
 		if (isError($msgVarsData))
 		{
-			show_error(getData($msgVarsData));
+			show_error(getError($msgVarsData));
 		}
 
 		return $msgVarsData;
@@ -160,7 +160,7 @@ class FASMessages extends Auth_Controller
 	{
 		$variables = $this->messagelib->getMessageVarsPerson();
 
-		if (isError($variables)) show_error(getData($variables));
+		if (isError($variables)) show_error(getError($variables));
 
 		return getData($variables);
 	}
@@ -172,7 +172,7 @@ class FASMessages extends Auth_Controller
 	{
 		$oe_kurzbz = $this->messagelib->getOeKurzbz($sender_id);
 
-		if (isError($oe_kurzbz)) show_error(getData($oe_kurzbz));
+		if (isError($oe_kurzbz)) show_error(getError($oe_kurzbz));
 
 		return getData($oe_kurzbz);
 	}
@@ -184,7 +184,7 @@ class FASMessages extends Auth_Controller
 	{
 		$isAdmin = $this->messagelib->getIsAdmin($sender_id);
 
-		if (isError($isAdmin)) show_error(getData($isAdmin));
+		if (isError($isAdmin)) show_error(getError($isAdmin));
 
 		return getData($isAdmin);
 	}

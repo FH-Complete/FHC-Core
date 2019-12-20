@@ -71,7 +71,7 @@ class BPKWartung extends Auth_Controller
 		$personexists = $this->PersonModel->load($person_id);
 
 		if (isError($personexists))
-			show_error($personexists->retval);
+			show_error(getError($personexists));
 
 		if (!hasData($personexists))
 			show_error('Person does not exist!');
@@ -122,7 +122,7 @@ class BPKWartung extends Auth_Controller
 
 		if (isError($stammdaten))
 		{
-			show_error($stammdaten->retval);
+			show_error(getError($stammdaten));
 		}
 
 		if (!isset($stammdaten->retval))
@@ -132,7 +132,7 @@ class BPKWartung extends Auth_Controller
 
 		if (isError($adresse))
 		{
-			show_error($adresse->retval);
+			show_error(getError($adresse));
 		}
 
 		$data = array(

@@ -29,8 +29,7 @@ class PersonLock_model extends DB_Model
 
 		$result = $this->loadWhere($lockdata);
 
-		if ($result->error)
-			return error($result->retval);
+		if ($result->error) return $result;
 
 		if (count($result->retval) > 0)
 			return success($result->retval);
@@ -49,8 +48,7 @@ class PersonLock_model extends DB_Model
 	{
 		$locked = $this->checkIfLocked($person_id, $app);
 
-		if ($locked->error)
-			return error($locked->retval);
+		if ($locked->error) return $locked;
 
 		//insert only if not already locked
 		if ($locked->retval === null)
@@ -77,8 +75,7 @@ class PersonLock_model extends DB_Model
 		foreach ($locks->retval as $lock)
 		{
 			$result = $this->delete($lock->lock_id);
-			if ($result->error)
-				return error($result->retval);
+			if ($result->error) return $result;
 
 			$deleted[] = $lock;
 		}
