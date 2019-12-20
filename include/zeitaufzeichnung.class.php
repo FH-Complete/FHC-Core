@@ -457,10 +457,14 @@ class zeitaufzeichnung extends basis_db
 	{
 		$where = "uid=".$this->db_add_param($user);
 		if ($days!='')
-			$where.= " AND ende>(now() - INTERVAL '".$days." days')";
+			$where.= " AND start>(now() - INTERVAL '".$days." days')";
 
 	   $qry = "SELECT
-	    			*, to_char ((ende-start),'HH24:MI') as diff,
+	    			*, 
+	    			CASE WHEN (ende IS NOT NULL AND ende > start)
+	    			THEN to_char ((ende-start),'HH24:MI')
+	    			ELSE '0'
+	    			END as diff,
 	    			(SELECT (to_char(sum(ende-start),'DD')::integer)*24+to_char(sum(ende-start),'HH24')::integer || ':' || to_char(sum(ende-start),'MI')
 	    			 FROM campus.tbl_zeitaufzeichnung
 	    			 WHERE $where ) as summe
