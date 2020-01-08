@@ -107,7 +107,7 @@ class LehrauftragAkzeptieren extends Auth_Controller
         }
         else
         {
-            show_error('Password is missing');
+			return $this->outputJsonError('Passwort fehlt');
         }
 
         // Loop through lehraufträge
@@ -133,17 +133,17 @@ class LehrauftragAkzeptieren extends Auth_Controller
                         // * finally check uid of contract against the logged in user
                         if ($result[0]->uid != $this->_uid)
                         {
-                            show_error('Keine Berechtigung für diesen Vertrag');
+							return $this->outputJsonError('Sie haben keine Berechtigung für einen Vertrag');
                         }
                     }
                     else
                     {
-                        show_error($result->retval);
+						return $this->outputJsonError('Fehler beim Laden der Benutzerdaten');
                     }
                 }
                 else
                 {
-                    show_error($result->retval);
+					return $this->outputJsonError('Fehler beim Laden des Vertrags');
                 }
 
                 // Set status to accepted
@@ -156,6 +156,10 @@ class LehrauftragAkzeptieren extends Auth_Controller
                         'akzeptiert' => date('Y-m-d')
                     );
                 }
+				else
+				{
+					return $this->outputJsonError($result->retval);
+				}
             }
 
             // Output json to ajax
@@ -164,6 +168,10 @@ class LehrauftragAkzeptieren extends Auth_Controller
                 $this->outputJsonSuccess($json);
             }
         }
+		else
+		{
+			return $this->outputJsonError('Fehler beim Übertragen der Daten.');
+		}
     }
 	
 	/**
