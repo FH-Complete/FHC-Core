@@ -131,7 +131,16 @@ class LehrauftragAkzeptieren extends Auth_Controller
                     if ($result = getData($this->BenutzerModel->getFromPersonId($result[0]->person_id)))
                     {
                         // * finally check uid of contract against the logged in user
-                        if ($result[0]->uid != $this->_uid)
+						$account_found = false;
+						foreach($result as $row_accounts)
+						{
+							if($row_accounts->uid == $this->_uid)
+							{
+								$account_found = true;
+							}
+						}
+						
+                        if (!$account_found)
                         {
                             show_error('Keine Berechtigung für diesen Vertrag');
                         }
@@ -148,7 +157,7 @@ class LehrauftragAkzeptieren extends Auth_Controller
 
                 // Set status to accepted
                 $result = $this->VertragvertragsstatusModel->setStatus($vertrag_id, $this->_uid, 'akzeptiert');
-    
+
                 if ($result->retval)
                 {
                     $json []= array(
@@ -165,7 +174,7 @@ class LehrauftragAkzeptieren extends Auth_Controller
             }
         }
     }
-	
+
 	/**
 	 * Check if lectors latest active Verwendung has inkludierte Lehre
 	 * - inkludierte_lehre is null OR 0: freelancer lector -> has NO inkludierte Lehre
@@ -175,7 +184,7 @@ class LehrauftragAkzeptieren extends Auth_Controller
     public function checkInkludierteLehre()
 	{
 		$result = $this->BisverwendungModel->getLast($this->_uid);
-		
+
 		if (hasData($result))
 		{
 			$this->outputJsonSuccess(!is_null($result->retval[0]->inkludierte_lehre) && $result->retval[0]->inkludierte_lehre != 0);
