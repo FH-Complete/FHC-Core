@@ -575,8 +575,8 @@ function saveAnmeldung(lehrveranstaltung_id, termin_id)
 		studienverpflichtung_id = $("#studienverpflichtung option:selected").val();
 
 	var studiengang_kz = null;
-	if($('#select_studiengang').length)
-		studiengang_kz =   $('#select_studiengang option:selected').val();
+	if($('#prestudent_studiengang').length)
+		studiengang_kz =   $('#prestudent_studiengang option:selected').val();
 
 	$.ajax({
 		dataType: 'json',
