@@ -341,7 +341,7 @@ class TableWidget extends Widget
 		// To be always stored in the session, otherwise is not possible to load data from Filters controller
 		$this->tablewidgetlib->setSessionElement(TableWidgetLib::REQUIRED_PERMISSIONS, $this->_requiredPermissions);
 		// Renew or set the session expiring time
-		$this->filterwidgetlib->setSessionElement(TableWidgetLib::SESSION_TIMEOUT, strtotime('+'.$this->_sessionTimeout.' minutes', time()));
+		$this->tablewidgetlib->setSessionElement(TableWidgetLib::SESSION_TIMEOUT, strtotime('+'.$this->_sessionTimeout.' minutes', time()));
 	}
 
 	/**
