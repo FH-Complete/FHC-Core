@@ -632,24 +632,11 @@ function saveAnmeldung($aktStudiensemester = null, $uid = null)
 		{
 			foreach ($prestudenten as $ps)
 			{
-				if($ps->studiengang_kz === $studiengang_kz)
+				if ($ps->getLaststatus($ps->prestudent_id, $stdsem))
 				{
-					if ($ps->getLaststatus($ps->prestudent_id, $stdsem))
+					if (($ps->status_kurzbz == "Student") || ($ps->status_kurzbz == "Unterbrecher"))
 					{
-						if (($ps->status_kurzbz == "Student") || ($ps->status_kurzbz == "Unterbrecher"))
-						{
-							$prestudent_id = $ps->prestudent_id;
-						}
-						else
-						{
-							if ($ps->getLaststatus($ps->prestudent_id, $stdsem_lv_besuch))
-							{
-								if (($ps->status_kurzbz == "Student") || ($ps->status_kurzbz == "Unterbrecher"))
-								{
-									$prestudent_id = $ps->prestudent_id;
-								}
-							}
-						}
+						$prestudent_id = $ps->prestudent_id;
 					}
 					else
 					{
@@ -659,6 +646,16 @@ function saveAnmeldung($aktStudiensemester = null, $uid = null)
 							{
 								$prestudent_id = $ps->prestudent_id;
 							}
+						}
+					}
+				}
+				else
+				{
+					if ($ps->getLaststatus($ps->prestudent_id, $stdsem_lv_besuch))
+					{
+						if (($ps->status_kurzbz == "Student") || ($ps->status_kurzbz == "Unterbrecher"))
+						{
+							$prestudent_id = $ps->prestudent_id;
 						}
 					}
 				}
