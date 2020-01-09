@@ -476,7 +476,7 @@ function StudentFFZertifikatPrint(event)
 	col = tree.columns ? tree.columns["student-noten-tree-studiensemester_kurzbz"] : "student-noten-tree-studiensemester_kurzbz";
 	stsem = tree.view.getCellText(tree.currentIndex,col);
 
-	col = tree.columns ? tree.columns["student-noten-tree-studiengang_kz"] : "student-noten-tree-studiengang_kz";
+	col = tree.columns ? tree.columns["student-noten-tree-studiengang_kz_lv"] : "student-noten-tree-studiengang_kz_lv";
 	stg_kz = tree.view.getCellText(tree.currentIndex,col);
 
 	if (event.shiftKey)
