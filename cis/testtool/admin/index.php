@@ -966,7 +966,7 @@ if ($frage_id != '')
 	echo "<input type='button' value='3' onclick='document.getElementById(\"nummer\").value=\"3\";' />";
 	echo "<input type='button' value='4' onclick='document.getElementById(\"nummer\").value=\"4\";' /></td></tr>";
 	echo '<tr>';
-	echo "<td>Punkte:</td><td><input type='text' size='8' id='punkte' name='punkte' value='$vorschlag->punkte' />";
+	echo "<td>Punkte:</td><td><input type='text' size='8' id='punkte' name='punkte' value='$vorschlag->punkte' onchange='this.value = this.value.replace(/,/g, \".\")'/>";
 	echo "<input type='button' style='background-color:#FFBFBF' value='-1/2' onclick='document.getElementById(\"punkte\").value=\"-0.5\";' />";
 	echo "<input type='button' style='background-color:#FFBFBF' value='-1/3' onclick='document.getElementById(\"punkte\").value=\"-0.3333\";' />";
 	echo "<input type='button' value='-1' style='background-color:#FFBFBF' onclick='document.getElementById(\"punkte\").value=\"-1\";' />";
