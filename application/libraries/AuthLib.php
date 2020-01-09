@@ -378,7 +378,8 @@ class AuthLib
 		}
 		else // otherwise
 		{
-			$hta = $this->_createAuthObjByPerson(array('uid' => trim($_SERVER['PHP_AUTH_USER'])));
+			// NOTE: Username needs to be trimmed and lowered because htaccess is allowing login
+			$hta = $this->_createAuthObjByPerson(array('uid' => mb_strtolower(trim($_SERVER['PHP_AUTH_USER']))));
 		}
 
 		// Invalid credentials

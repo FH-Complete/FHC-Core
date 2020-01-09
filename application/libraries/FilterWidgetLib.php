@@ -7,8 +7,10 @@ if (! defined('BASEPATH')) exit('No direct script access allowed');
  */
 class FilterWidgetLib
 {
-	// Session parameters names
-	const SESSION_NAME = 'FHC_FILTER_WIDGET'; // Filter session name
+	// FilterWidget session name
+	const SESSION_NAME = 'FHC_FILTER_WIDGET';
+
+	// Session elements
 	const SESSION_FILTER_NAME = 'filterName';
 	const SESSION_FIELDS = 'fields';
 	const SESSION_SELECTED_FIELDS = 'selectedFields';
@@ -17,12 +19,18 @@ class FilterWidgetLib
 	const SESSION_CHECKBOXES = 'checkboxes';
 	const SESSION_FILTERS = 'filters';
 	const SESSION_METADATA = 'datasetMetadata';
-	const SESSION_DATASET = 'dataset';
 	const SESSION_ROW_NUMBER = 'rowNumber';
-	const SESSION_RELOAD_DATASET = 'reloadDataset';
+	const SESSION_TIMEOUT = 'sessionTimeout';
+
+	// Session dataset elements
+	const SESSION_DATASET = 'dataset';
+	const SESSION_DATASET_RELOAD = 'reloadDataset';
 	const SESSION_DATASET_REPRESENTATION = 'datasetRepresentation';
 	const SESSION_DATASET_REP_OPTIONS = 'datasetRepresentationOptions';
 	const SESSION_DATASET_REP_FIELDS_DEFS = 'datasetRepresentationFieldsDefinitions';
+
+	// Default session timeout
+	const SESSION_DEFAULT_TIMEOUT = 30;
 
 	// Alias for the dynamic table used to retrieve the dataset
 	const DATASET_TABLE_ALIAS = 'datasetFilterTable';
@@ -33,16 +41,16 @@ class FilterWidgetLib
 
 	 // ...to identify a single filter widget in the DB
 	const FILTER_ID = 'filter_id';
-	const APP_PARAMETER = 'app';
-	const DATASET_NAME_PARAMETER = 'datasetName';
-	const FILTER_KURZBZ_PARAMETER = 'filterKurzbz';
-	const DATASET_RELOAD_PARAMETER = 'reloadDataset';
+	const APP = 'app';
+	const DATASET_NAME = 'datasetName';
+	const FILTER_KURZBZ = 'filterKurzbz';
+	const DATASET_RELOAD = 'reloadDataset';
 
 	// ...to specify permissions that are needed to use this FilterWidget
-	const REQUIRED_PERMISSIONS_PARAMETER = 'requiredPermissions';
+	const REQUIRED_PERMISSIONS = 'requiredPermissions';
 
 	// ...stament to retrieve the dataset
-	const QUERY_PARAMETER = 'query';
+	const QUERY = 'query';
 
 	// ...to specify more columns or aliases for them
 	const ADDITIONAL_COLUMNS = 'additionalColumns';
@@ -131,7 +139,7 @@ class FilterWidgetLib
 
 		// Gets the required permissions from the session if they are not provided as parameter
 		$rq = $requiredPermissions;
-		if ($rq == null) $rq = $this->getSessionElement(self::REQUIRED_PERMISSIONS_PARAMETER);
+		if ($rq == null) $rq = $this->getSessionElement(self::REQUIRED_PERMISSIONS);
 
 		return $this->_ci->permissionlib->hasAtLeastOne($rq, self::PERMISSION_FILTER_METHOD, self::PERMISSION_TYPE);
 	}
@@ -177,6 +185,29 @@ class FilterWidgetLib
 		$session[$name] = $value;
 
 		setSessionElement(self::SESSION_NAME, $this->_filterUniqueId, $session); // stores the single value
+	}
+
+	/**
+	 *
+	 */
+	public function dropExpiredFilterWidgets()
+	{
+		// Loads the session for all the filter widgets
+		$filterWidgetsSession = getSession(self::SESSION_NAME);
+
+		// If something is present in session
+		if ($filterWidgetsSession != null)
+		{
+			// Loops in the session for all the filter widgets
+			foreach ($filterWidgetsSession as $filterWidget => $filterWidgetData)
+			{
+				// If this filter widget is not the currrent used filter widget and the it is expired...
+				if ($this->_filterUniqueId != $filterWidget && $filterWidgetData[self::SESSION_TIMEOUT] <= time())
+				{
+					cleanSessionElement(self::SESSION_NAME, $filterWidget); // ...remove it
+				}
+			}
+		}
 	}
 
 	/**
@@ -471,7 +502,7 @@ class FilterWidgetLib
 
 				 // Write changes into the session
 				$this->setSessionElement(self::SESSION_FILTERS, $filters);
-				$this->setSessionElement(self::SESSION_RELOAD_DATASET, true); // the dataset must be reloaded
+				$this->setSessionElement(self::SESSION_DATASET_RELOAD, true); // the dataset must be reloaded
 
 				$removeAppliedFilter = true;
 			}
@@ -523,7 +554,7 @@ class FilterWidgetLib
 
 				// Write changes into the session
 				$this->setSessionElement(self::SESSION_FILTERS, $filters);
-				$this->setSessionElement(self::SESSION_RELOAD_DATASET, true); // the dataset must be reloaded
+				$this->setSessionElement(self::SESSION_DATASET_RELOAD, true); // the dataset must be reloaded
 
 				$applyFilters = true;
 			}
@@ -537,7 +568,7 @@ class FilterWidgetLib
 	 */
 	public function reloadDataset()
 	{
-		$this->setSessionElement(self::SESSION_RELOAD_DATASET, true);
+		$this->setSessionElement(self::SESSION_DATASET_RELOAD, true);
 	}
 
 	/**
@@ -603,8 +634,8 @@ class FilterWidgetLib
 
 		// Loads the definition to check if is already present in the DB
 		$definition = $this->_ci->FiltersModel->loadWhere(array(
-			'app' => $this->getSessionElement(self::APP_PARAMETER),
-			'dataset_name' => $this->getSessionElement(self::DATASET_NAME_PARAMETER),
+			'app' => $this->getSessionElement(self::APP),
+			'dataset_name' => $this->getSessionElement(self::DATASET_NAME),
 			'description' => $descPGArray,
 			'person_id' => $authPersonId
 		));
@@ -632,8 +663,8 @@ class FilterWidgetLib
 			// update it
 			$this->_ci->FiltersModel->update(
 				array(
-					'app' => $this->getSessionElement(self::APP_PARAMETER),
-					'dataset_name' => $this->getSessionElement(self::DATASET_NAME_PARAMETER),
+					'app' => $this->getSessionElement(self::APP),
+					'dataset_name' => $this->getSessionElement(self::DATASET_NAME),
 					'description' => $descPGArray,
 					'person_id' => $authPersonId
 				),
@@ -648,8 +679,8 @@ class FilterWidgetLib
 		{
 			$this->_ci->FiltersModel->insert(
 				array(
-					'app' => $this->getSessionElement(self::APP_PARAMETER),
-					'dataset_name' => $this->getSessionElement(self::DATASET_NAME_PARAMETER),
+					'app' => $this->getSessionElement(self::APP),
+					'dataset_name' => $this->getSessionElement(self::DATASET_NAME),
 					'filter_kurzbz' => uniqid($authPersonId, true),
 					'description' => $descPGArray,
 					'person_id' => $authPersonId,
@@ -693,7 +724,7 @@ class FilterWidgetLib
 	public function generateFilterMenu($navigationPage)
 	{
 		// Loads the NavigationLib for the current page (given as parameter)
-		$this->_ci->load->library('NavigationLib', array(FilterWidgetLib::NAVIGATION_PAGE => $navigationPage));
+		$this->_ci->load->library('NavigationLib', array(self::NAVIGATION_PAGE => $navigationPage));
 
 		$filterMenu = null;
 		$currentMenu = $this->_ci->navigationlib->getSessionMenu(); // The navigation menu currently stored in session
@@ -706,7 +737,7 @@ class FilterWidgetLib
 
 			// Loads all the filters related to this page (same dataset_name and same app name)
 			$filters = $this->_ci->FiltersModel->getFiltersByAppDatasetName(
-				$session[self::APP_PARAMETER], $session[self::DATASET_NAME_PARAMETER]
+				$session[self::APP], $session[self::DATASET_NAME]
 			);
 
 			// If filters were loaded
@@ -775,7 +806,7 @@ class FilterWidgetLib
 				);
 
 				// Sets in the session only the element related to the filters menu
-				$this->_ci->navigationlib->setSessionElementMenu(FilterWidgetLib::NAV_MENU_FILTER_KEY, $filterMenu);
+				$this->_ci->navigationlib->setSessionElementMenu(self::NAV_MENU_FILTER_KEY, $filterMenu);
 			}
 		}
 	}

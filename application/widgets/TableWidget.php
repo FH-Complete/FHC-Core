@@ -38,6 +38,8 @@ class TableWidget extends Widget
 
 	private $_reloadDataset; // Force Reload of Dataset
 
+	private $_sessionTimeout; // session expiring time
+
 	private static $_TableWidgetInstance; // static property that contains the instance of itself
 
 	/**
@@ -124,22 +126,23 @@ class TableWidget extends Widget
 		$this->_datasetRepresentation = null;
 		$this->_datasetRepresentationOptions = null;
 		$this->_datasetRepFieldsDefs = null;
+		$this->_sessionTimeout = TableWidgetLib::SESSION_DEFAULT_TIMEOUT;
 
 		// Retrieved the required permissions parameter if present
-		if (isset($args[TableWidgetLib::REQUIRED_PERMISSIONS_PARAMETER]))
+		if (isset($args[TableWidgetLib::REQUIRED_PERMISSIONS]))
 		{
-			$this->_requiredPermissions = $args[TableWidgetLib::REQUIRED_PERMISSIONS_PARAMETER];
+			$this->_requiredPermissions = $args[TableWidgetLib::REQUIRED_PERMISSIONS];
 		}
 
 		// How to retrieve data for the table: SQL statement or a result from DB
-		if (isset($args[TableWidgetLib::QUERY_PARAMETER]))
+		if (isset($args[TableWidgetLib::QUERY]))
 		{
-			$this->_query = $args[TableWidgetLib::QUERY_PARAMETER];
+			$this->_query = $args[TableWidgetLib::QUERY];
 		}
 
-		if (isset($args[TableWidgetLib::DATASET_RELOAD_PARAMETER]))
+		if (isset($args[TableWidgetLib::DATASET_RELOAD]))
 		{
-			$this->_reloadDataset = $args[TableWidgetLib::DATASET_RELOAD_PARAMETER];
+			$this->_reloadDataset = $args[TableWidgetLib::DATASET_RELOAD];
 		}
 
 		// Parameter is used to add extra columns to the dataset
@@ -197,6 +200,12 @@ class TableWidget extends Widget
 		{
 			$this->_datasetRepFieldsDefs = $args[TableWidgetLib::DATASET_REP_FIELDS_DEFS];
 		}
+
+		// To specify the expiring session time
+		if (isset($args[TableWidgetLib::SESSION_TIMEOUT]) && is_numeric($args[TableWidgetLib::SESSION_TIMEOUT]))
+		{
+			$this->_sessionTimeout = $args[TableWidgetLib::SESSION_TIMEOUT];
+		}
 	}
 
 	/**
@@ -204,27 +213,32 @@ class TableWidget extends Widget
 	 */
 	private function _checkParameters($args)
 	{
+		// If no options are given to this widget...
 		if (!is_array($args) || (is_array($args) && count($args) == 0))
 		{
 			show_error('Second parameter of the widget call must be a NOT empty associative array');
 		}
-		else
+		else // ...otherwise
 		{
+			// The unique id parameter is mandatory
 			if (!isset($args[TableWidgetLib::TABLE_UNIQUE_ID]))
 			{
 				show_error('The parameter "'.TableWidgetLib::TABLE_UNIQUE_ID.'" must be specified');
 			}
 
-			if (!isset($args[TableWidgetLib::QUERY_PARAMETER]))
+			// The query parameter is mandatory
+			if (!isset($args[TableWidgetLib::QUERY]))
 			{
-				show_error('The parameters "'.TableWidgetLib::QUERY_PARAMETER.'" must be specified');
+				show_error('The parameter "'.TableWidgetLib::QUERY.'" must be specified');
 			}
 
+			// The dataset representation parameter is mandatory
 			if (!isset($args[TableWidgetLib::DATASET_REPRESENTATION]))
 			{
 				show_error('The parameter "'.TableWidgetLib::DATASET_REPRESENTATION.'" must be specified');
 			}
 
+			// Checks if the dataset representation parameter is valid
 			if (isset($args[TableWidgetLib::DATASET_REPRESENTATION])
 				&& $args[TableWidgetLib::DATASET_REPRESENTATION] != TableWidgetLib::DATASET_REP_TABLESORTER
 				&& $args[TableWidgetLib::DATASET_REPRESENTATION] != TableWidgetLib::DATASET_REP_PIVOTUI
@@ -238,6 +252,12 @@ class TableWidget extends Widget
 						.TableWidgetLib::DATASET_REP_TABULATOR.'")'
 				);
 			}
+
+			// If given the session timeout parameter must be a number
+			if (isset($args[TableWidgetLib::SESSION_TIMEOUT]) && !is_numeric($args[TableWidgetLib::SESSION_TIMEOUT]))
+			{
+				show_error('The parameter "'.TableWidgetLib::SESSION_TIMEOUT.'" must be a number');
+			}
 		}
 	}
 
@@ -246,20 +266,23 @@ class TableWidget extends Widget
 	 */
 	private function _startTableWidget($tableUniqueId)
 	{
+		// Looks for expired table widgets in session and drops them
+		$this->tablewidgetlib->dropExpiredTableWidgets();
+
 		// Read the all session for this table widget
 		$session = $this->tablewidgetlib->getSession();
 
 		// If session is NOT empty -> a table was already loaded
 		if ($session != null)
 		{
-			// Get SESSION_RELOAD_DATASET from the session
-			$sessionReloadDataset = $this->tablewidgetlib->getSessionElement(TableWidgetLib::SESSION_RELOAD_DATASET);
+			// Get SESSION_DATASET_RELOAD from the session
+			$sessionReloadDataset = $this->tablewidgetlib->getSessionElement(TableWidgetLib::SESSION_DATASET_RELOAD);
 
 			// if Filter changed or reload is forced by parameter then reload the Dataset
 			if ($this->_reloadDataset === true || $sessionReloadDataset === true)
 			{
 				// Set as false to stop changing the dataset
-				$this->tablewidgetlib->setSessionElement(TableWidgetLib::SESSION_RELOAD_DATASET, false);
+				$this->tablewidgetlib->setSessionElement(TableWidgetLib::SESSION_DATASET_RELOAD, false);
 
 				// Generate dataset query using tables from the session
 				$datasetQuery = $this->tablewidgetlib->generateDatasetQuery($this->_query);
@@ -305,7 +328,7 @@ class TableWidget extends Widget
 						TableWidgetLib::SESSION_METADATA => $this->tablewidgetlib->getExecutedQueryMetaData(), // the metadata of the dataset
 						TableWidgetLib::SESSION_ROW_NUMBER => count($dataset->retval), // the number of loaded rows by this table
 						TableWidgetLib::SESSION_DATASET => $dataset->retval, // the entire dataset
-						TableWidgetLib::SESSION_RELOAD_DATASET => false, // if the dataset must be reloaded, not needed the first time
+						TableWidgetLib::SESSION_DATASET_RELOAD => false, // if the dataset must be reloaded, not needed the first time
 						TableWidgetLib::SESSION_DATASET_REPRESENTATION => $this->_datasetRepresentation, // the choosen dataset representation
 						TableWidgetLib::SESSION_DATASET_REP_OPTIONS => $this->_datasetRepresentationOptions, // the choosen dataset representation options
 						TableWidgetLib::SESSION_DATASET_REP_FIELDS_DEFS => $this->_datasetRepFieldsDefs // the choosen dataset representation record fields definition
@@ -314,9 +337,11 @@ class TableWidget extends Widget
 			}
 		}
 
-		// To be always stored in the session, otherwise is not possible to load data from Filters controller
 		// NOTE: must the latest operation to be performed in the session to be shure that is always present
-		$this->tablewidgetlib->setSessionElement(TableWidgetLib::REQUIRED_PERMISSIONS_PARAMETER, $this->_requiredPermissions);
+		// To be always stored in the session, otherwise is not possible to load data from Filters controller
+		$this->tablewidgetlib->setSessionElement(TableWidgetLib::REQUIRED_PERMISSIONS, $this->_requiredPermissions);
+		// Renew or set the session expiring time
+		$this->tablewidgetlib->setSessionElement(TableWidgetLib::SESSION_TIMEOUT, strtotime('+'.$this->_sessionTimeout.' minutes', time()));
 	}
 
 	/**
