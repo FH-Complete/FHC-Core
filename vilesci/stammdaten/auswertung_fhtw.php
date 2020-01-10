@@ -1148,7 +1148,8 @@ if (isset($_REQUEST['reihungstest']))
 			tbl_gebiet.bezeichnung AS gebiet,
 			tbl_ablauf.reihung,
 			tbl_ablauf.studiengang_kz,
-			tbl_ablauf.semester
+			tbl_ablauf.semester,
+		    tbl_ablauf.gewicht
 		FROM PUBLIC.tbl_rt_person
 		JOIN PUBLIC.tbl_person ON (tbl_rt_person.person_id = tbl_person.person_id)
 		JOIN PUBLIC.tbl_prestudent ps ON (ps.person_id = tbl_rt_person.person_id)
@@ -1210,6 +1211,7 @@ if (isset($_REQUEST['reihungstest']))
 		}
 		$gebiet[$row->gebiet_id]->name = $row->gebiet;
 		$gebiet[$row->gebiet_id]->gebiet_id = $row->gebiet_id;
+		$gebiet[$row->gebiet_id]->gewicht = $row->gewicht;
 	}
 
 	// Alle Ergebnisse laden
@@ -1450,7 +1452,6 @@ if (isset($_REQUEST['reihungstest']))
 		}
 
 		$ergebnis[$row->prestudent_id]->gebiet[$row->gebiet_id]->name = $row->gebiet;
-		$ergebnis[$row->prestudent_id]->gebiet[$row->gebiet_id]->punkte = (($row->punkte >= $row->maxpunkte) ? $row->maxpunkte : $row->punkte);
 		/*if ($row->punkte == 0 && $row->punkte != '')
 		{
 			$prozent = '0';
@@ -1486,8 +1487,8 @@ if (isset($_REQUEST['reihungstest']))
 				//offset zur Vermeidung negativer Prozentzahlen
 				$punkte_positiv = $punkte + $row->offsetpunkte;
 				$maxpunkte_positiv = $row->maxpunkte + $row->offsetpunkte;
-				//Formel: Summe(Punkte/Max Punkte * Gewicht)
-				$ergebnis[$row->prestudent_id]->gebiet[$row->gebiet_id]->prozent = $maxpunkte_positiv > 0 ? $punkte_positiv / $maxpunkte_positiv * $row->gewicht * 100 : null;
+				//Formel: Summe(Punkte/Maxpunkte * Gewicht)
+				$ergebnis[$row->prestudent_id]->gebiet[$row->gebiet_id]->prozent = $maxpunkte_positiv > 0 ? $punkte_positiv / $maxpunkte_positiv * /*$row->gewicht **/ 100 : null;
 			}
 		}
 
@@ -1501,11 +1502,11 @@ if (isset($_REQUEST['reihungstest']))
 			// Gesamtpunkte
 			if (isset($ergebnis[$row->prestudent_id]->gesamt))
 			{
-				$ergebnis[$row->prestudent_id]->gesamt += $ergebnis[$row->prestudent_id]->gebiet[$row->gebiet_id]->prozent;
+				$ergebnis[$row->prestudent_id]->gesamt += $ergebnis[$row->prestudent_id]->gebiet[$row->gebiet_id]->prozent * $row->gewicht;
 			}
 			else
 			{
-				$ergebnis[$row->prestudent_id]->gesamt = $ergebnis[$row->prestudent_id]->gebiet[$row->gebiet_id]->prozent;
+				$ergebnis[$row->prestudent_id]->gesamt = $ergebnis[$row->prestudent_id]->gebiet[$row->gebiet_id]->prozent * $row->gewicht;
 			}
 
 			if (isset($ergebnis[$row->prestudent_id]->gesamtpunkte))
@@ -1555,7 +1556,7 @@ if (isset($_REQUEST['reihungstest']))
 
 	foreach ($ergebnis as $prestudentid => $erg)
 	{
-		//Berechnen Gesamtpunkte nach Formel: Summe(Punkte/Max Punkte * Gewicht)/Summe(Gewichte) * 100
+		//Berechnen Gesamtpunkte nach Formel: Summe(Punkte/Maxpunkte * Gewicht)/Summe(Gewichte) * 100
 		if (isset($erg->gesamtgewicht) && $erg->gesamtgewicht > 0)
 			$erg->gesamt /= $erg->gesamtgewicht;
 	}
@@ -1702,7 +1703,7 @@ if (isset($_REQUEST['format']) && $_REQUEST['format'] == 'xls')
 	foreach ($gebiet AS $gbt)
 	{
 		++$spalte;
-		$worksheet->write($zeile, ++$spalte, strip_tags($gbt->name), $format_bold_border);
+		$worksheet->write($zeile, ++$spalte, strip_tags($gbt->name) . (isset($gbt->gewicht) ? " (Gew: $gbt->gewicht)" : ""), $format_bold_border);
 		$worksheet->mergeCells($zeile, $spalte, 0, $spalte + 1);
 		$maxlength[$spalte] = 10;
 	}
