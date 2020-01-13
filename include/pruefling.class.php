@@ -446,6 +446,8 @@ class pruefling extends basis_db
 				if($this->db_num_rows($result)==0)
 					return false;
 
+				$summeGewicht = 0;
+
 				while($row = $this->db_fetch_object($result))
 				{
 					//wenn maxpunkte ueberschritten wurde -> 100%
@@ -455,17 +457,19 @@ class pruefling extends basis_db
 						$row->punkte = $row->maxpunkte;
 					}
 					else
-						$prozent = ($row->punkte/$row->maxpunkte)*100;
+						$prozent = (($row->punkte + $row->offsetpunkte)/($row->maxpunkte + $row->offsetpunkte))*100;
 
 					if($punkte)
 					{
-						$ergebnis +=$row->punkte;
+						$ergebnis += $row->punkte;
 					}
-
 					else
-						$ergebnis+=$prozent*$row->gewicht;
+					{
+						$ergebnis += $prozent * $row->gewicht;
+						$summeGewicht += $row->gewicht;
+					}
 				}
-				return $ergebnis;
+				return $summeGewicht > 0 ? $ergebnis/$summeGewicht : $ergebnis;
 			}
 			else
 			{
