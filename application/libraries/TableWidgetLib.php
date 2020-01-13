@@ -19,6 +19,7 @@ class TableWidgetLib
 	const SESSION_CHECKBOXES = 'checkboxes';
 	const SESSION_METADATA = 'datasetMetadata';
 	const SESSION_ROW_NUMBER = 'rowNumber';
+	const SESSION_TIMEOUT = 'sessionTimeout';
 
 	// Session dataset elements
 	const SESSION_DATASET = 'dataset';
