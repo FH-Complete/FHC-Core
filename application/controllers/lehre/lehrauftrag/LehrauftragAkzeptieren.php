@@ -78,7 +78,7 @@ class LehrauftragAkzeptieren extends Auth_Controller
             }
             elseif (isError($studiensemester))
             {
-                show_error($studiensemester->error);
+                show_error(getError($studiensemester));
             }
         }
 
@@ -147,12 +147,12 @@ class LehrauftragAkzeptieren extends Auth_Controller
                     }
                     else
                     {
-                        show_error($result->retval);
+                        show_error(getError($result));
                     }
                 }
                 else
                 {
-                    show_error($result->retval);
+                    show_error(getError($result));
                 }
 
                 // Set status to accepted
@@ -191,7 +191,7 @@ class LehrauftragAkzeptieren extends Auth_Controller
 		}
 		else
 		{
-			$this->outputJsonError($result->retval);
+			$this->outputJsonError(getError($result));
 		}
 	}
 

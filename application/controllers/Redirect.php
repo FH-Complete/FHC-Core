@@ -39,7 +39,7 @@ class Redirect extends FHC_Controller
 		$msg = $this->MessageTokenModel->getMessageByToken($token);
 		if ($msg->error)
 		{
-			show_error($msg->retval);
+			show_error(getError($msg));
 		}
 
 		$oe_kurzbz = $msg->retval[0]->oe_kurzbz;
