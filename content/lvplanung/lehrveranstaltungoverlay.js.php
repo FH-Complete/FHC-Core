@@ -2428,7 +2428,7 @@ function LehrveranstaltungFFZertifikatPrint(event)
 		}
 	}
 	var ss = getStudiensemester();
-	col = tree.columns ? tree.columns["lehrveranstaltung-noten-tree-lv_studiengang_kz"] : "lehrveranstaltung-noten-tree-lv_studiengang_kz";
+	col = tree.columns ? tree.columns["lehrveranstaltung-noten-tree-studiengang_kz_lv"] : "lehrveranstaltung-noten-tree-studiengang_kz_lv";
 	stg_kz = tree.view.getCellText(tree.currentIndex,col);
 
 	if (event.shiftKey)
