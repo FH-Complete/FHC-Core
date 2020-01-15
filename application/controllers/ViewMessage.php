@@ -43,8 +43,7 @@ class ViewMessage extends FHC_Controller
 	public function toHTML($token)
 	{
 		$msg = $this->MessageTokenModel->getMessageByToken($token);
-
-		if ($msg->error)
+		if (isError($msg))
 		{
 			show_error(getError($msg));
 		}
@@ -52,10 +51,9 @@ class ViewMessage extends FHC_Controller
 		if (is_array(getData($msg)) && count(getData($msg)) > 0)
 		{
 			$setReadMessageStatusByToken = $this->MessageTokenModel->setReadMessageStatusByToken($token);
-
 			if (isError($setReadMessageStatusByToken))
 			{
-				show_error($msg);
+				show_error(getError($setReadMessageStatusByToken));
 			}
 
 			$sender_id = getData($msg)[0]->sender_id;
@@ -64,9 +62,9 @@ class ViewMessage extends FHC_Controller
 
 			// To decide how to change the redirection
 			$isEmployee = $this->MessageTokenModel->isEmployee($receiver_id);
-			if (!is_bool($isEmployee) && isError($isEmployee))
+			if (isError($isEmployee))
 			{
-				show_error($isEmployee);
+				show_error(getError($isEmployee));
 			}
 
 			if($this->config->item('redirect_view_message_url') != '')
@@ -78,7 +76,7 @@ class ViewMessage extends FHC_Controller
 				'sender_id' => $sender_id,
 				'sender' => getData($sender)[0],
 				'message' => getData($msg)[0],
-				'isEmployee' => $isEmployee,
+				'isEmployee' => hasData($isEmployee),
 				'href' => $href
 			);
 
