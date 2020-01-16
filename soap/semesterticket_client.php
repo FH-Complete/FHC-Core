@@ -70,13 +70,13 @@ $db = new basis_db();
 
 if(isset($_REQUEST['submit']))
 {
-	$client = new SoapClient(APP_ROOT."/soap/semesterticket.wsdl.php?".microtime(true)); 
+	$client = new SoapClient(APP_ROOT."/soap/semesterticket.wsdl.php?".microtime(true));
 
 	try
 	{
 		class foo {};
 		$obj = new foo();
-		$obj->Token = $_REQUEST['token'];
+		$obj->token = $_REQUEST['token'];
 		$obj->Matrikelnummer = $_REQUEST['matrikelnummer'];
 		$obj->Name = $_REQUEST['name'];
 		$obj->Vorname = $_REQUEST['vorname'];

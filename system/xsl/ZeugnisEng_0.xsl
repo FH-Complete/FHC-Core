@@ -487,10 +487,6 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 			<xsl:apply-templates select="fussnote"/>
 		</table:table>
 		<text:p text:style-name="P26"/>
-		<text:p text:style-name="P22">¹ 1 Semester period per week = 45 minutes</text:p>
-		<text:p text:style-name="P22">² Grades:<text:tab/>excellent (1), good (2), satisfactory (3), sufficient (4), Credit based on previous experience/work (ar), Participated with success (met), passed (b),</text:p>
-		<text:p text:style-name="P22">
-			<text:tab/>successfully completed (ea), participated (tg)</text:p>
 		<text:p text:style-name="P7"/>
 		<xsl:if test="abschlusspruefung_typ">
 			<table:table table:name="Tabelle2" table:style-name="Tabelle2">
@@ -530,7 +526,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 	</office:text>
 </xsl:template>
 <xsl:template match="unterrichtsfach">
-<xsl:if test="note_positiv='1' or note=''">
+<xsl:if test="note_positiv='1'">
     <table:table-row>
         <table:table-cell table:style-name="Tabelle1.A7" office:value-type="string">
             <xsl:choose>

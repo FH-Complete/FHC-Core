@@ -136,7 +136,7 @@ if($rechte->isBerechtigt('admin', null, 'suid'))
 		$stgs[] = $row->studiengang_kz;
 }
 else
-	$stgs = $rechte->getStgKz();
+	$stgs = $rechte->getStgKz('assistenz');
 
 foreach ($stgs as $kz)
 {

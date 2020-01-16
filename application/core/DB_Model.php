@@ -1,5 +1,10 @@
 <?php
 
+if (!defined('BASEPATH')) exit('No direct script access allowed');
+
+/**
+ *
+ */
 class DB_Model extends CI_Model
 {
 	// Default schema used by the models

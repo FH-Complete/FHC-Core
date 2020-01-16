@@ -301,7 +301,7 @@ echo '<?xml-stylesheet href="datepicker/datepicker.css" type="text/css"?>';
 			<tree id="tree-verband" />
 			<tree id="tree-ort" />
 			<vbox id="vbox-fachbereich" />
-			<tree id="tree-lektor" />
+			<vbox id="vbox-lektor" />
 		</tabpanels>
 	</tabbox>
 	<splitter collapse="before" persist="state">

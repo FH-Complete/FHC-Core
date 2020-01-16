@@ -21,6 +21,8 @@
  */
 require_once(dirname(__FILE__).'/basis_db.class.php');
 require_once(dirname(__FILE__).'/datum.class.php');
+require_once(dirname(__FILE__).'/log.class.php');
+require_once(dirname(__FILE__).'/authentication.class.php');
 
 class reservierung extends basis_db 
 {
@@ -129,9 +131,19 @@ class reservierung extends basis_db
 			$this->errormsg = 'Stunde ist ungueltig';
 			return false;
 		}
+		if($this->titel=='')
+		{
+			$this->errormsg = 'Es muss ein Titel angegeben werden';
+			return false;
+		}
 		if(mb_strlen($this->titel)>10)
 		{
 			$this->errormsg = 'Titel darf nicht laenger als 10 Zeichen sein';
+			return false;
+		}
+		if($this->beschreibung=='')
+		{
+			$this->errormsg = 'Es muss eine Beschreibung angegeben werden';
 			return false;
 		}
 		if(mb_strlen($this->beschreibung)>32)
@@ -238,11 +250,29 @@ class reservierung extends basis_db
 			$this->errormsg = 'Reservierung_id muss eine gueltige Zahl sein';
 			return false;
 		}
-		
+
+		$reservierung = new reservierung($reservierung_id);
 		$qry = "DELETE FROM campus.tbl_reservierung WHERE reservierung_id=".$this->db_add_param($reservierung_id, FHC_INTEGER);
-		
+
 		if($this->db_query($qry))
+		{
+			$logdata_reservierung = (array)$reservierung;
+			$logdata = var_export($logdata_reservierung, true);
+			$log = new log();
+			$log->executetime = date('Y-m-d H:i:s');
+			$log->sqlundo = '';
+			$log->sql = 'DELETE FROM campus.tbl_reservierung WHERE reservierung_id='.$reservierung_id.'; LogData:'.$logdata;
+			$log->beschreibung = 'Löschen der Reservierung '.$reservierung_id;
+			$auth = new authentication();
+			$uid = $auth->getUser();
+			$log->mitarbeiter_uid = $uid;
+			if(!$log->save(true))
+			{
+				$this->errormsg = 'Fehler: '.$log->errormsg;
+				return false;
+			}
 			return true;
+		}
 		else
 		{
 			$this->errormsg = 'Fehler beim Loeschen der Reservierung';

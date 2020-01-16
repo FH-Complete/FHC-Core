@@ -102,11 +102,11 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 								class="sortDirectionIndicator"
 								sort="rdf:http://www.technikum-wien.at/pruefung/rdf#lehreinheit_id" />
 							<splitter class="tree-splitter"/>
-							<treecol id="student-pruefung-tree-student_uid" label="StudentUID" flex="2" hidden="true"
+							<treecol id="student-pruefung-tree-student_uid" label="StudentInUID" flex="2" hidden="true"
 								class="sortDirectionIndicator"
 								sort="rdf:http://www.technikum-wien.at/pruefung/rdf#student_uid" />
 							<splitter class="tree-splitter"/>
-							<treecol id="student-pruefung-tree-mitarbeiter_uid" label="mitarbeiter_uid" flex="2" hidden="true"
+							<treecol id="student-pruefung-tree-mitarbeiter_uid" label="MitarbeiterInUID" flex="2" hidden="true"
 								class="sortDirectionIndicator"
 								sort="rdf:http://www.technikum-wien.at/pruefung/rdf#mitarbeiter_uid" />
 							<splitter class="tree-splitter"/>
@@ -186,7 +186,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 										</menulist>
 									</row>
 									<row>
-										<label value="Mitarbeiter" control="student-pruefung-menulist-mitarbeiter"/>
+										<label value="MitarbeiterIn" control="student-pruefung-menulist-mitarbeiter"/>
 										<menulist id="student-pruefung-menulist-mitarbeiter" disabled="true"
 										          datasources="rdf:null" flex="1"
 										          ref="http://www.technikum-wien.at/mitarbeiter/liste" >

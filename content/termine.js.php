@@ -182,7 +182,7 @@ function TermineToggleAnwesenheitMitarbeiter()
 {
 	if(TermineMitarbeiterUID=='')
 	{
-		alert('Anwesenheit kann nur bei Mitarbeiter gelöscht werden');
+		alert('Anwesenheit kann nur bei MitarbeiterInnen gelöscht werden');
 		return;
 	}
 

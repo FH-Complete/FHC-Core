@@ -235,7 +235,7 @@ $studiensemester_start = $prestudent->studiensemester_kurzbz;
 $ausbildungssemester_start = $prestudent->ausbildungssemester;
 $orgform_kurzbz = $prestudent->orgform_kurzbz;
 
-$prestudent->getLastStatus($student->prestudent_id, 'Student');
+$prestudent->getLastStatus($student->prestudent_id, '', 'Student');
 $studienplan_id = $prestudent->studienplan_id;
 
 $studienplan = new studienplan();

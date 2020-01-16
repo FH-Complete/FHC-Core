@@ -191,7 +191,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 
 	<hbox>
 		<groupbox flex="8">
-			<caption label="Mitarbeiterdaten" />
+			<caption label="MitarbeiterInnendaten" />
 			<grid align="end" flex="1"
 				 flags="dont-build-content"
 				enableColumnDrag="true"
@@ -214,7 +214,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 						<textbox id="mitarbeiter-detail-textbox-kurzbezeichnung"  class="pflichtfeld" size="10" maxlength="10" disabled="true" oninput="MitarbeiterDetailValueChange()"/>
 						<spacer />
 					</hbox>
-					<checkbox label="Lektor" id="mitarbeiter-detail-checkbox-lektor" checked="false" disabled="true" onchange="MitarbeiterDetailValueChange()"/>
+					<checkbox label="LektorIn" id="mitarbeiter-detail-checkbox-lektor" checked="false" disabled="true" onchange="MitarbeiterDetailValueChange()"/>
 		    		<checkbox label="Kleriker" id="mitarbeiter-detail-checkbox-kleriker" checked="false" disabled="true" hidden="true" onchange="MitarbeiterDetailValueChange()"/>
 		    	</row>
 		    	<row>

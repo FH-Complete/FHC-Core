@@ -45,6 +45,7 @@ class zeitaufzeichnung extends basis_db
 	public $updateamum;				// timestamp
 	public $updatevon;				// varchar(16)
 	public $projekt_kurzbz;			// varchar(16)
+	public $projektphase_id;		// bigint
 	public $ext_id;					// bigint
 	public $service_id;				// integer
 	public $kunde_uid;				// varchar(32)
@@ -99,6 +100,7 @@ class zeitaufzeichnung extends basis_db
 			$this->updateamum = $row->updateamum;
 			$this->updatevon = $row->updatevon;
 			$this->projekt_kurzbz = $row->projekt_kurzbz;
+			$this->projektphase_id = $row->projektphase_id;
 			$this->ext_id = $row->ext_id;
 			$this->service_id = $row->service_id;
 			$this->kunde_uid = $row->kunde_uid;
@@ -170,17 +172,28 @@ class zeitaufzeichnung extends basis_db
 				}
 			}
 		}
-		if ($this->aktivitaet_kurzbz != 'Ersatzruhe')
+		if ($this->aktivitaet_kurzbz != 'Ersatzruhe' && $this->aktivitaet_kurzbz != 'DienstreiseMT')
 		{
-			$check_qry = "SELECT count(*) from campus.tbl_zeitaufzeichnung where uid=".$this->db_add_param($this->uid)." and aktivitaet_kurzbz = 'Ersatzruhe' and (start < ".$this->db_add_param($this->ende)." and ende > ".$this->db_add_param($this->start).")";
+			$check_qry = "SELECT count(*) from campus.tbl_zeitaufzeichnung where uid=".$this->db_add_param($this->uid)." and aktivitaet_kurzbz != 'DienstreiseMT' and (start < ".$this->db_add_param($this->ende)." and ende > ".$this->db_add_param($this->start).")";
 			if($this->db_query($check_qry))
 			{
 				if($row = $this->db_fetch_object())
 				{
-					if ($row->count)
+					if ($this->new)
 					{
-						$this->errormsg = 'Eintrag darf nicht mit Ersatzruhe Überlappen!';
-						return false;
+						if ($row->count)
+						{
+							$this->errormsg = 'Einträge dürfen nicht Überlappen!';
+							return false;
+						}
+					}
+					else
+					{
+						if ($row->count > 1)
+						{
+							$this->errormsg = 'Einträge dürfen nicht Überlappen!';
+							return false;
+						}
 					}
 				}
 			}
@@ -190,7 +203,7 @@ class zeitaufzeichnung extends basis_db
 		{
 			//Neuen Datensatz einfuegen
 			$qry='BEGIN;INSERT INTO campus.tbl_zeitaufzeichnung (uid, aktivitaet_kurzbz, start, ende, beschreibung,
-			      oe_kurzbz_1, oe_kurzbz_2, insertamum, insertvon, updateamum, updatevon, projekt_kurzbz, service_id, kunde_uid) VALUES('.
+			      oe_kurzbz_1, oe_kurzbz_2, insertamum, insertvon, updateamum, updatevon, projekt_kurzbz, projektphase_id, service_id, kunde_uid) VALUES('.
 			      $this->db_add_param($this->uid).', '.
 			      $this->db_add_param($this->aktivitaet_kurzbz).', '.
 			      $this->db_add_param($this->start).', '.
@@ -203,6 +216,7 @@ class zeitaufzeichnung extends basis_db
 			      $this->db_add_param($this->updateamum).', '.
 			      $this->db_add_param($this->updatevon).', '.
 			      $this->db_add_param($this->projekt_kurzbz).', '.
+			      $this->db_add_param($this->projektphase_id, FHC_INTEGER).', '.
 			      $this->db_add_param($this->service_id).', '.
 			      $this->db_add_param($this->kunde_uid).');';
 		}
@@ -228,6 +242,7 @@ class zeitaufzeichnung extends basis_db
 		      	' updateamum='.$this->db_add_param($this->updateamum).', '.
 		      	' updatevon='.$this->db_add_param($this->updatevon).', '.
 		      	' projekt_kurzbz='.$this->db_add_param($this->projekt_kurzbz).', '.
+		      	' projektphase_id='.$this->db_add_param($this->projektphase_id, FHC_INTEGER).', '.
 				' service_id='.$this->db_add_param($this->service_id).', '.
 				' kunde_uid='.$this->db_add_param($this->kunde_uid).' '.
 		      	'WHERE zeitaufzeichnung_id='.$this->db_add_param($this->zeitaufzeichnung_id, FHC_INTEGER, false);
@@ -333,6 +348,7 @@ class zeitaufzeichnung extends basis_db
 				$obj->updateamum = $row->updateamum;
 				$obj->updatevon = $row->updatevon;
 				$obj->projekt_kurzbz = $row->projekt_kurzbz;
+				$obj->projektphase_id = $row->projektphase_id;
 				$obj->ext_id = $row->ext_id;
 				$obj->service_id = $row->service_id;
 				$obj->kunde_uid = $row->kunde_uid;
@@ -413,6 +429,7 @@ class zeitaufzeichnung extends basis_db
 				$obj->updateamum = $row->updateamum;
 				$obj->updatevon = $row->updatevon;
 				$obj->projekt_kurzbz = $row->projekt_kurzbz;
+				$obj->projektphase_id = $row->projektphase_id;
 				$obj->ext_id = $row->ext_id;
 				$obj->service_id = $row->service_id;
 				$obj->kunde_uid = $row->kunde_uid;
@@ -440,10 +457,14 @@ class zeitaufzeichnung extends basis_db
 	{
 		$where = "uid=".$this->db_add_param($user);
 		if ($days!='')
-			$where.= " AND ende>(now() - INTERVAL '".$days." days')";
+			$where.= " AND start>(now() - INTERVAL '".$days." days')";
 
 	   $qry = "SELECT
-	    			*, to_char ((ende-start),'HH24:MI') as diff,
+	    			*, 
+	    			CASE WHEN (ende IS NOT NULL AND ende > start)
+	    			THEN to_char ((ende-start),'HH24:MI')
+	    			ELSE '0'
+	    			END as diff,
 	    			(SELECT (to_char(sum(ende-start),'DD')::integer)*24+to_char(sum(ende-start),'HH24')::integer || ':' || to_char(sum(ende-start),'MI')
 	    			 FROM campus.tbl_zeitaufzeichnung
 	    			 WHERE $where ) as summe
@@ -469,6 +490,7 @@ class zeitaufzeichnung extends basis_db
 				$obj->updateamum = $row->updateamum;
 				$obj->updatevon = $row->updatevon;
 				$obj->projekt_kurzbz = $row->projekt_kurzbz;
+				$obj->projektphase_id = $row->projektphase_id;
 				$obj->ext_id = $row->ext_id;
 				$obj->service_id = $row->service_id;
 				$obj->kunde_uid = $row->kunde_uid;
@@ -533,6 +555,7 @@ class zeitaufzeichnung extends basis_db
 				$obj->updateamum = $row->updateamum;
 				$obj->updatevon = $row->updatevon;
 				$obj->projekt_kurzbz = $row->projekt_kurzbz;
+				$obj->projektphase_id = $row->projektphase_id;
 				$obj->ext_id = $row->ext_id;
 				$obj->service_id = $row->service_id;
 				$obj->kunde_uid = $row->kunde_uid;

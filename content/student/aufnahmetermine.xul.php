@@ -303,12 +303,14 @@ echo ']>
                                                 <label value="Reihungstestpunkte (inkl. Physik)" control="aufnahmetermine-textbox-endpunkte-inkl-gebiete" style="margin-right: 7px;"/>
                                                 <hbox>
                                                     <textbox id="aufnahmetermine-textbox-endpunkte-inkl-gebiete" readonly="true" maxlength="8" size="6" flex="1"/>
+													<toolbarbutton image="../../skin/images/up.png" tooltiptext="Als Punkte setzen" onclick="setEndpunkteAsPunkte('aufnahmetermine-textbox-endpunkte-inkl-gebiete')"/>
                                                 </hbox>
                                             </row>
                                             <row>
                                                 <label value="Reihungstestpunkte (exkl. Physik)" control="aufnahmetermine-textbox-endpunkte-exkl-gebiete" />
                                                 <hbox>
                                                    <textbox id="aufnahmetermine-textbox-endpunkte-exkl-gebiete" readonly="true" maxlength="8" size="6" flex="1"/>
+													<toolbarbutton image="../../skin/images/up.png" tooltiptext="Als Punkte setzen" onclick="setEndpunkteAsPunkte('aufnahmetermine-textbox-endpunkte-exkl-gebiete')"/>
                                                 </hbox>
                                             </row>
                                         </vbox>

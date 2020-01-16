@@ -8,6 +8,7 @@ if (! defined('BASEPATH')) exit('No direct script access allowed');
 class PersonLogLib
 {
 	const PARKED_LOGNAME = 'Parked';
+	const ONHOLD_LOGNAME = 'Onhold';
 
 	/**
 	 * Constructor
@@ -75,7 +76,7 @@ class PersonLogLib
 			return $decoded_logs;
 		}
 		else
-			show_error($result->retval);
+			show_error(getError($result));
 	}
 
 	/**
@@ -91,26 +92,20 @@ class PersonLogLib
 	 */
 	public function park($person_id, $date, $taetigkeit_kurzbz, $app = 'core', $oe_kurzbz = null, $user = null)
 	{
-		$logdata = array(
+		$onhold = $this->getOnHoldDate($person_id);
+
+		if (hasData($onhold))
+			return error("Person already on hold");
+
+		$logjson = array(
 			'name' => self::PARKED_LOGNAME
 		);
 
-		$data = array(
-			'person_id' => $person_id,
-			'zeitpunkt' => $date,
-			'taetigkeit_kurzbz' => $taetigkeit_kurzbz,
-			'app' => $app,
-			'oe_kurzbz' => $oe_kurzbz,
-			'logtype_kurzbz' => 'Processstate',
-			'logdata' => json_encode($logdata),
-			'insertvon' => $user
-		);
-
-		return $this->ci->PersonLogModel->insert($data);
+		return $this->_savePsLog($person_id, $date, $taetigkeit_kurzbz, $logjson, $app, $oe_kurzbz, $user);
 	}
 
 	/**
-	 * Unparks a person, i.e. removes all log entries in the future
+	 * Unparks a person, i.e. removes all log entries in the future with logname for parking
 	 * @param $person_id
 	 * @return array with deleted logids
 	 */
@@ -131,16 +126,8 @@ class PersonLogLib
 					{
 						$deleted[] = $log->log_id;
 					}
-					else
-					{
-						return $delresult;
-					}
 				}
 			}
-		}
-		else
-		{
-			return $result;
 		}
 
 		return success($deleted);
@@ -171,5 +158,112 @@ class PersonLogLib
 		}
 
 		return $parkeddate;
+	}
+
+	/**
+	 * Sets person on hold, i.e. marks a person so no actions are expected for the person (e.g. as a prestudent).
+	 * Done by adding a logentry with a special name. can be undone only manually by clicking button.
+	 * @param $person_id
+	 * @param $date
+	 * @param $taetigkeit_kurzbz
+	 * @param string $app
+	 * @param null $oe_kurzbz
+	 * @param null $user
+	 * @return array
+	 */
+	public function setOnHold($person_id, $date, $taetigkeit_kurzbz, $app = 'core', $oe_kurzbz = null, $user = null)
+	{
+		$parked = $this->getParkedDate($person_id);
+
+		if (hasData($parked))
+			return error("Person already parked");
+
+		$logjson = array(
+			'name' => self::ONHOLD_LOGNAME
+		);
+
+		return $this->_savePsLog($person_id, $date, $taetigkeit_kurzbz, $logjson, $app, $oe_kurzbz, $user);
+	}
+
+	/**
+	 * Removes on hold status, i.e. removes all log entries with logname for on hold
+	 * @param $person_id
+	 * @return array
+	 */
+	public function removeOnHold($person_id)
+	{
+		$deleted = array();
+
+		$result = $this->ci->PersonLogModel->filterLog($person_id);
+		if (hasData($result))
+		{
+			foreach ($result->retval as $log)
+			{
+				$logdata = json_decode($log->logdata);
+				if (isset($logdata->name) && $logdata->name === self::ONHOLD_LOGNAME)
+				{
+					$delresult = $this->ci->PersonLogModel->deleteLog($log->log_id);
+					if (isSuccess($delresult))
+					{
+						$deleted[] = $log->log_id;
+					}
+				}
+			}
+		}
+		return success($deleted);
+	}
+
+	/**
+	 * Gets date until which a person is on hold
+	 * @param $person_id
+	 * @return the date if person is on hold, null otherwise
+	 */
+	public function getOnHoldDate($person_id)
+	{
+		$result = $this->ci->PersonLogModel->filterLog($person_id);
+
+		$onholddate = null;
+
+		if (hasData($result))
+		{
+			foreach ($result->retval as $log)
+			{
+				$logdata = json_decode($log->logdata);
+				if (isset($logdata->name) && $logdata->name === self::ONHOLD_LOGNAME)
+				{
+					$onholddate = $log->zeitpunkt;
+					break;
+				}
+			}
+		}
+
+		return $onholddate;
+	}
+
+	/**
+	 * Saves a processstate log with specified parameters, including a specified log date.
+	 * @param $person_id
+	 * @param $date
+	 * @param $taetigkeit_kurzbz
+	 * @param $logjson
+	 * @param string $app
+	 * @param null $oe_kurzbz
+	 * @param null $user
+	 * @return mixed
+	 */
+	private function _savePsLog($person_id, $date, $taetigkeit_kurzbz, $logjson, $app = 'core', $oe_kurzbz = null, $user = null)
+	{
+		$data = array(
+			'person_id' => $person_id,
+			'zeitpunkt' => $date,
+			'taetigkeit_kurzbz' => $taetigkeit_kurzbz,
+			'app' => $app,
+			'oe_kurzbz' => $oe_kurzbz,
+			'logtype_kurzbz' => 'Processstate',
+			'logdata' => json_encode($logjson),
+			'insertvon' => $user
+		);
+
+		return $this->ci->PersonLogModel->insert($data);
 	}
 }

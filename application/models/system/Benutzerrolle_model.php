@@ -11,7 +11,7 @@ class Benutzerrolle_model extends DB_Model
 		$this->dbTable = 'system.tbl_benutzerrolle';
 		$this->pk = 'benutzerberechtigung_id';
 	}
-	
+
 	/**
 	 * Checks if the given user is an admin
 	 */
@@ -19,9 +19,9 @@ class Benutzerrolle_model extends DB_Model
 	{
 		// Join with the table tbl_benutzer
 		$this->addJoin('public.tbl_benutzer', 'uid');
-		
+
 		$result = $this->loadWhere(array('person_id' => $person_id, 'rolle_kurzbz' => 'admin'));
-		
+
 		if (!isError($result))
 		{
 			if (hasData($result))
@@ -33,7 +33,35 @@ class Benutzerrolle_model extends DB_Model
 				$result = success(false);
 			}
 		}
-		
+
 		return $result;
+	}
+
+	/**
+	 * Get user who are authorized with berechtigung and, if given, authorized for the specific organisational unit.
+	 * @param $berechtigung_kurzbz
+	 * @param null $oe_kurzbz
+	 * @return array
+	 */
+	public function getBenutzerByBerechtigung($berechtigung_kurzbz, $oe_kurzbz = null)
+	{
+		$params = array();
+		$query = '
+			SELECT
+				*
+			FROM
+				system.vw_berechtigung_nichtrekursiv
+			WHERE
+				berechtigung_kurzbz = ?';
+
+		$params[] = $berechtigung_kurzbz;
+
+		if (!is_null($oe_kurzbz))
+		{
+			$query .= ' AND oe_kurzbz = ?';
+			$params[] = $oe_kurzbz;
+		}
+
+		return $this->execQuery($query, $params);
 	}
 }

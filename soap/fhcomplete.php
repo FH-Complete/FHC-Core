@@ -1,22 +1,22 @@
 <?php
-/* 
+/*
  * Copyright 2013 fhcomplete.org
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301, USA.
- * 
+ *
  *
  * Authors: Andreas Österreicher <andreas.oesterreicher@technikum-wien.at>
  */
@@ -48,7 +48,7 @@ for($i=0;$i<100;$i++)
 				$parameter[]=null;
 		else
 			$parameter[]=$_REQUEST['parameter_'.$i];
-	}		
+	}
 	else
 		break;
 }
@@ -69,12 +69,13 @@ if(!$wsrecht->isUserAuthorized($uid, $method, $class))
 $obj = new $class();
 $error=false;
 
-
 // Bei Save Funktionen werden alle Parameter zugewiesen
 if(mb_stristr($method,'save'))
 {
-
-	$loaddata=json_decode($_REQUEST['loaddata'], true);
+	if(isset($_REQUEST['loaddata']))
+		$loaddata=json_decode($_REQUEST['loaddata'], true);
+	else
+		$loaddata=null;
 	$savedata=json_decode($_REQUEST['savedata'], true);
 
 	if(isset($loaddata['method']))
@@ -114,6 +115,7 @@ if(mb_stristr($method,'save'))
 		}
 	}
 }
+
 $return = '';
 if(!$error && ($return = call_user_func_array(array($obj, $method), $parameter)))
 {

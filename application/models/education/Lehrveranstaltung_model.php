@@ -10,6 +10,9 @@ class Lehrveranstaltung_model extends DB_Model
 		parent::__construct();
 		$this->dbTable = 'lehre.tbl_lehrveranstaltung';
 		$this->pk = 'lehrveranstaltung_id';
+
+		$this->load->model('organisation/studiengang_model', 'StudiengangModel');
+		$this->load->model('organisation/studiensemester_model', 'StudiensemesterModel');
 	}
 
 	/**
@@ -22,8 +25,6 @@ class Lehrveranstaltung_model extends DB_Model
 	 */
 	public function getLehrveranstaltungGroupNames($studiensemester_kurzbz, $ausbildungssemester = null, $studiengang_kz = null, $lehrveranstaltung_ids = null)
 	{
-		$this->load->model('organisation/studiengang_model', 'StudiengangModel');
-
 		$studiengang_kz_arr = array();
 		$ausbildungssemester_arr = array();
 		$lehrveranstaltung_id_arr = array();
@@ -59,13 +60,12 @@ class Lehrveranstaltung_model extends DB_Model
 		}
 		else
 		{
-			$this->load->model('organisation/studiensemester_model', 'StudiensemesterModel');
 			foreach ($studiengang_kz_arr as $studiengang_kz_item)
 			{
 				$result = $this->StudiensemesterModel->getAusbildungssemesterByStudiensemesterAndStudiengang($studiensemester_kurzbz, $studiengang_kz_item);
 
 				if (isError($result))
-					return error($result->retval);
+					return error(getError($result));
 
 				foreach ($result->retval as $semester)
 				{
@@ -104,7 +104,7 @@ class Lehrveranstaltung_model extends DB_Model
 
 		if (count($studiengang_kz_arr) > 0)
 			$query .= " AND tbl_lehrveranstaltung.studiengang_kz IN (". implode(", ", $studiengang_kz_arr).")";
-		
+
 		if (count($lehrveranstaltung_id_arr) > 0)
 		{
 			$query .= " AND tbl_lehrveranstaltung.lehrveranstaltung_id IN (". implode(', ', $lehrveranstaltung_id_arr).")";
@@ -144,7 +144,7 @@ class Lehrveranstaltung_model extends DB_Model
 		WHERE
 			vw_student_lehrveranstaltung.studiensemester_kurzbz=?
 		AND
-			vw_student_lehrveranstaltung.lehrveranstaltung_id=? 
+			vw_student_lehrveranstaltung.lehrveranstaltung_id=?
 		ORDER BY nachname, vorname, person_id, tbl_bisio.bis DESC";
 
 		return $this->execQuery($query, array($studiensemester_kurzbz, $lehrveranstaltung_id));
@@ -214,8 +214,6 @@ class Lehrveranstaltung_model extends DB_Model
 	 */
 	public function getLvsWithIncomingPlaces($studiensemester_kurzbz)
 	{
-		$this->load->model('organisation/Studiensemester_model', 'StudiensemesterModel');
-
 		$studsemres = $this->StudiensemesterModel->load($studiensemester_kurzbz);
 
 		if (!hasData($studsemres))

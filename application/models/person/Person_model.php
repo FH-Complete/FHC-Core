@@ -10,6 +10,9 @@ class Person_model extends DB_Model
 		parent::__construct();
 		$this->dbTable = 'public.tbl_person';
 		$this->pk = 'person_id';
+
+		$this->load->model('person/kontakt_model', 'KontaktModel');
+		$this->load->model('person/adresse_model', 'AdresseModel');
 	}
 
 	/**
@@ -155,29 +158,24 @@ class Person_model extends DB_Model
 
 		$person = $this->load($person_id);
 
-		if($person->error)
-			return error($person->retval);
+		if($person->error) return $person;
 
 		//return null if not found
 		if(count($person->retval) < 1)
 			return success(null);
-
-		$this->load->model('person/kontakt_model', 'KontaktModel');
-		$this->load->model('person/adresse_model', 'AdresseModel');
 
 		$this->KontaktModel->addDistinct();
 		$this->KontaktModel->addSelect('kontakttyp, anmerkung, kontakt, zustellung');
 		$this->KontaktModel->addOrder('kontakttyp');
 		$where = $zustellung_only === true ? array('person_id' => $person_id, 'zustellung' => true) : array('person_id' => $person_id);
 		$kontakte = $this->KontaktModel->loadWhere($where);
-		if($kontakte->error)
-			return error($kontakte->retval);
+		if($kontakte->error) return $kontakte;
+
 		$where = $zustellung_only === true ? array('person_id' => $person_id, 'zustelladresse' => true) : array('person_id' => $person_id);
 		$this->AdresseModel->addSelect('public.tbl_adresse.*, bis.tbl_nation.kurztext AS nationkurztext');
 		$this->AdresseModel->addJoin('bis.tbl_nation', 'tbl_adresse.nation = tbl_nation.nation_code', 'LEFT');
 		$adressen = $this->AdresseModel->loadWhere($where);
-		if($adressen->error)
-			return error($adressen->retval);
+		if($adressen->error) return $adressen;
 
 		$stammdaten = $person->retval[0];
 		$stammdaten->kontakte = $kontakte->retval;

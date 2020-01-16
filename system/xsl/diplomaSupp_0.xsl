@@ -1282,15 +1282,9 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 		<text:sequence-decls xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0" xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0" xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0" xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0" xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0">
 		<text:sequence-decl text:display-outline-level="0" text:name="Illustration"/>
 		<text:sequence-decl text:display-outline-level="0" text:name="Table"/>
-		<text:sequence-decl text:display-outline-level="0" text:name="Text"/>
+		<text:sequence-decl text:display-outline-level="0" text:name="Table"/>
 		<text:sequence-decl text:display-outline-level="0" text:name="Drawing"/>
 		</text:sequence-decls>
-		<text:p text:style-name="P60">
-			<draw:frame xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0" xmlns:xlink="http://www.w3.org/1999/xlink" draw:style-name="fr5" draw:name="Bild2" text:anchor-type="paragraph" svg:y="8.82cm" svg:width="11.45cm" svg:height="12.61cm" draw:z-index="20">
-				<draw:image xlink:href="Pictures/bundesadler.jpg" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/>
-			</draw:frame>
-		</text:p>
-		<text:p text:style-name="P2"/>
 		<text:p text:style-name="P2"/>
 		<text:p text:style-name="P2"/>
 		<text:p text:style-name="P2"/>
@@ -1335,10 +1329,10 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 		<text:soft-page-break/>
 		<table:table-row table:style-name="Table1.1">
 			<table:table-cell table:style-name="Table1.A1" office:value-type="string">
-			<text:p text:style-name="Standard">Dieser Anhang zum Diplom wurde nach dem von der Europäischen Kommission, dem Europarat und UNESCO/CEPES entwickelten Modell erstellt. Mit dem Anhang wird das Ziel verfolgt, ausreichend unabhängige Daten zu erfassen, um die internationale "Transparenz" und die angemessene akademische und berufliche Anerkennung von Qualifikationen (Diplomen, Abschlüssen, Zeugnissen usw.) zu verbessern. Der Anhang soll eine Beschreibung über Art, Niveau, Kontext, Inhalt und Status eines Studiums bieten, den die im Original-Befähigungsnachweis, dem der Anhang beigefügt ist, genannte Person absolviert und erfolgreich abgeschlossen hat. Der Anhang sollte keinerlei Werturteile, Aussagen über Gleichwertigkeit mit anderen Qualifikationen oder Vorschläge bezüglich der Anerkennung enthalten. Zu allen acht Punkten sollten Angaben gemacht werden. Werden zu einem Punkt keine Angaben gemacht, sollte der Grund dafür angegeben werden.</text:p>
+			<text:p text:style-name="Standard">Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. </text:p>
 			</table:table-cell>
 			<table:table-cell table:style-name="Table1.B1" office:value-type="string">
-			<text:p text:style-name="P12">This diploma supplement follows the model developed by the European Commission, Council of Europe and UNESCO/CEPES. The purpose of the supplement is to provide sufficient independent data to improve the international transparency and fair academic and professional recognition of qualifications (diplomas, degrees, certificates, etc.). It is designed to provide a description of the nature, level, context, content and status of the studies that were pursued and successfully completed by the individual named on the original qualification to which this supplement is appended. It should be free from any value judgments, equivalence statements or suggestions about recognition. Information in all eight sections should be provided. Where information is not provided, an explanation should give the reason why.</text:p>
+			<text:p text:style-name="P12">Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. </text:p>
 			</table:table-cell>
 		</table:table-row>
 		</table:table>
@@ -1517,24 +1511,24 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 			</table:table-cell>
 			<table:table-cell table:style-name="Table3.B4" office:value-type="string">
 			<text:p text:style-name="P44">
-				<text:span text:style-name="Tabelleninhalt">Name und Status der Organisation, die die Qualifikation verliehen hat</text:span>
+				<text:span text:style-name="Tabelleninhalt">Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam</text:span>
 			</text:p>
 			<text:p text:style-name="P44">
-				<text:span text:style-name="Tabelleninhalt">Name and status of awarding institution</text:span>
+				<text:span text:style-name="Tabelleninhalt">Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam</text:span>
 			</text:p>
 			</table:table-cell>
 			<table:table-cell table:style-name="Table3.C4" office:value-type="string">
 			<text:p text:style-name="P44">
 				<text:span text:style-name="Tabelleninhalt">
-				<text:span text:style-name="T2">Fachhochschule Technikum Wien, Verleihung des Status "Fachhochschule" im November 2000</text:span>
+				<text:span text:style-name="T2">Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam</text:span>
 				</text:span>
 				<text:span text:style-name="Tabelleninhalt"> </text:span>
 			</text:p>
 			<text:p text:style-name="P44">
 				<text:span text:style-name="Tabelleninhalt">
-				<text:span text:style-name="T3">University of Applied Sciences Technikum Wien, status University of Applied Science </text:span>
+				<text:span text:style-name="T3">Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam</text:span>
 				</text:span>
-				<text:span text:style-name="Tabelleninhalt">conferred November 2000</text:span>
+				<text:span text:style-name="Tabelleninhalt">Lorem ipsum dolor</text:span>
 			</text:p>
 			</table:table-cell>
 		</table:table-row>
@@ -1547,23 +1541,23 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 			<table:table-cell table:style-name="Table3.B5" office:value-type="string">
 			<text:p text:style-name="P44">
 				<text:span text:style-name="Tabelleninhalt">
-				<text:span text:style-name="T1">Name und Status der Einrichtung, die das Studium durchführte</text:span>
+				<text:span text:style-name="T1">Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam</text:span>
 				</text:span>
 				<text:span text:style-name="Tabelleninhalt"> </text:span>
 			</text:p>
 			<text:p text:style-name="P44">
 				<text:span text:style-name="Tabelleninhalt">
-				<text:span text:style-name="T1">Name and status of institution administering studies</text:span>
+				<text:span text:style-name="T1">Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam</text:span>
 				</text:span>
 			</text:p>
 			</table:table-cell>
 			<table:table-cell table:style-name="Table3.C5" office:value-type="string">
 			<text:p text:style-name="P44">
-				<text:span text:style-name="Tabelleninhalt">Fachhochschule Technikum Wien, Verleihung des Status "Fachhochschule" im November 2000 </text:span>
+				<text:span text:style-name="Tabelleninhalt">Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam</text:span>
 			</text:p>
 			<text:p text:style-name="P44">
 				<text:span text:style-name="Tabelleninhalt">
-				<text:span text:style-name="T3">University of Applied Sciences Technikum Wien, status University of Applied Science conferred November 2000</text:span>
+				<text:span text:style-name="T3">Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam</text:span>
 				</text:span>
 				<text:span text:style-name="Tabelleninhalt"> </text:span>
 			</text:p>
@@ -1577,19 +1571,14 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 			</table:table-cell>
 			<table:table-cell table:style-name="Table3.B6" office:value-type="string">
 			<text:p text:style-name="P44">
-				<text:span text:style-name="Tabelleninhalt">Im Unterricht / in den Prüfungen verwendete Sprachen</text:span>
+				<text:span text:style-name="Tabelleninhalt">Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam</text:span>
 			</text:p>
 			<text:p text:style-name="P44">
-				<text:span text:style-name="Tabelleninhalt">Language(s) of instruction / examination</text:span>
+				<text:span text:style-name="Tabelleninhalt">Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam</text:span>
 			</text:p>
 			</table:table-cell>
 			<table:table-cell table:style-name="Table3.C6" office:value-type="string">
-			<text:p text:style-name="P44">
-				<text:span text:style-name="Tabelleninhalt"><xsl:value-of select="sprache_deutsch"/><text:line-break/></text:span>
-			</text:p>
-			<text:p text:style-name="P44">
-				<text:span text:style-name="Tabelleninhalt"><xsl:value-of select="sprache_englisch"/></text:span>
-			</text:p>
+				<text:span text:style-name="Tabelleninhalt">Lorem ipsum dolor sit amet</text:span>
 			</table:table-cell>
 		</table:table-row>
 		</table:table>
@@ -1661,18 +1650,18 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 			</table:table-cell>
 			<table:table-cell table:style-name="Table4.B4" office:value-type="string">
 			<text:p text:style-name="P44">
-				<text:span text:style-name="Tabelleninhalt">Zulassungsvoraussetzungen</text:span>
+				<text:span text:style-name="Tabelleninhalt">Lorem ipsum</text:span>
 			</text:p>
 			<text:p text:style-name="P44">
-				<text:span text:style-name="Tabelleninhalt">Access requirement(s)</text:span>
+				<text:span text:style-name="Tabelleninhalt">Lorem ipsum</text:span>
 			</text:p>
 			</table:table-cell>
 			<table:table-cell table:style-name="Table4.C4" office:value-type="string">
 			<text:p text:style-name="P44">
-				<text:span text:style-name="Tabelleninhalt"><xsl:value-of select="zulassungsvoraussetzungen_deutsch"/></text:span>
+				<text:span text:style-name="Tabelleninhalt">Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. </text:span>
 			</text:p>
 			<text:p text:style-name="P44">
-				<text:span text:style-name="Tabelleninhalt"><xsl:value-of select="zulassungsvoraussetzungen_englisch"/></text:span>
+				<text:span text:style-name="Tabelleninhalt">Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. </text:span>
 			</text:p>
 			</table:table-cell>
 		</table:table-row>
@@ -1737,10 +1726,10 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 			</table:table-cell>
 			<table:table-cell table:style-name="Table5.C3" table:number-columns-spanned="4" office:value-type="string">
 			<text:p text:style-name="P44">
-				<text:span text:style-name="Tabelleninhalt"><xsl:value-of select="anforderungen_deutsch"/></text:span>
+				<text:span text:style-name="Tabelleninhalt">Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. </text:span>
 			</text:p>
 			<text:p text:style-name="P44">
-				<text:span text:style-name="Tabelleninhalt"><xsl:value-of select="anforderungen_englisch"/></text:span>
+				<text:span text:style-name="Tabelleninhalt">Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. </text:span>
 			</text:p>
 			</table:table-cell>
 			<table:covered-table-cell/>
@@ -2058,18 +2047,18 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 			</table:table-cell>
 			<table:table-cell table:style-name="Table5.B14" office:value-type="string">
 			<text:p text:style-name="P44">
-				<text:span text:style-name="Tabelleninhalt">Gesamtbeurteilung der Qualifikation</text:span>
+				<text:span text:style-name="Tabelleninhalt">Lorem ipsum dolor sit amet, consete</text:span>
 			</text:p>
 			<text:p text:style-name="P44">
-				<text:span text:style-name="Tabelleninhalt">Overall classification of the qualification</text:span>
+				<text:span text:style-name="Tabelleninhalt">Lorem ipsum dolor sit amet, consetetur sadi</text:span>
 			</text:p>
 			</table:table-cell>
 			<table:table-cell table:style-name="Table5.C14" table:number-columns-spanned="4" office:value-type="string">
 			<text:p text:style-name="P44">
-				<text:span text:style-name="Tabelleninhalt"><xsl:value-of select="beurteilung"/></text:span>
+				<text:span text:style-name="Tabelleninhalt">Lorem ipsum dolor sit amet</text:span>
 			</text:p>
 			<text:p text:style-name="P44">
-				<text:span text:style-name="Tabelleninhalt"><xsl:value-of select="beurteilung_english"/></text:span>
+				<text:span text:style-name="Tabelleninhalt">Lorem ipsum dolor sit amet</text:span>
 			</text:p>
 			</table:table-cell>
 			<table:covered-table-cell/>
@@ -2077,628 +2066,14 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 			<table:covered-table-cell/>
 		</table:table-row>
 		</table:table>
+
 		<text:p text:style-name="P12"/>
-		<table:table table:name="Table6" table:style-name="Table6">
-		<table:table-column table:style-name="Table6.A"/>
-		<table:table-column table:style-name="Table6.B"/>
-		<table:table-column table:style-name="Table6.C"/>
-		<table:table-row table:style-name="Table6.1">
-			<table:table-cell table:style-name="Table6.A1" office:value-type="string">
-			<text:p text:style-name="Tabellenkopf">5.</text:p>
-			</table:table-cell>
-			<table:table-cell table:style-name="Table6.B1" table:number-columns-spanned="2" office:value-type="string">
-			<text:p text:style-name="Tabellenkopf">Angaben zur Funktion der Qualifikation</text:p>
-			<text:p text:style-name="Tabellenkopf">Information on the function of the qualification</text:p>
-			</table:table-cell>
-			<table:covered-table-cell/>
-		</table:table-row>
-		<table:table-row table:style-name="Table6.2">
-			<table:table-cell table:style-name="Table6.A2" office:value-type="string">
-			<text:p text:style-name="P42">
-				<text:span text:style-name="Tabelleninhalt">5.1</text:span>
-			</text:p>
-			</table:table-cell>
-			<table:table-cell table:style-name="Table6.B2" office:value-type="string">
-			<text:p text:style-name="P44">
-				<text:span text:style-name="Tabelleninhalt">Zugangsberechtigung zu weiterführenden Studien</text:span>
-			</text:p>
-			<text:p text:style-name="P44">
-				<text:span text:style-name="Tabelleninhalt">Access to further study</text:span>
-			</text:p>
-			</table:table-cell>
-			<table:table-cell table:style-name="Table6.C2" office:value-type="string">
-			<text:p text:style-name="P44">
-				<text:span text:style-name="Tabelleninhalt"><xsl:value-of select="zugangsberechtigung_deutsch"/></text:span>
-			</text:p>
-			<text:p text:style-name="P44">
-				<text:span text:style-name="Tabelleninhalt"><xsl:value-of select="zugangsberechtigung_englisch"/> </text:span>
-			</text:p>
-			</table:table-cell>
-		</table:table-row>
-		<table:table-row table:style-name="Table6.3">
-			<table:table-cell table:style-name="Table6.A3" office:value-type="string">
-			<text:p text:style-name="P42">
-				<text:span text:style-name="Tabelleninhalt">5.2</text:span>
-			</text:p>
-			</table:table-cell>
-			<table:table-cell table:style-name="Table6.B3" office:value-type="string">
-			<text:p text:style-name="P44">
-				<text:span text:style-name="Tabelleninhalt">Beruflicher Status</text:span>
-			</text:p>
-			<text:p text:style-name="P44">
-				<text:span text:style-name="Tabelleninhalt">Professional status conferred</text:span>
-			</text:p>
-			</table:table-cell>
-			<table:table-cell table:style-name="Table6.C3" office:value-type="string">
-			<text:p text:style-name="P44">
-				<text:span text:style-name="Tabelleninhalt">Zugang zu akademischen Berufen nach Maßgabe der berufsrechtlichen Vorschriften; Diplom im Sinne der Richtlinie 89/48/EWG.</text:span>
-			</text:p>
-			<text:p text:style-name="P44">
-				<text:span text:style-name="Tabelleninhalt">Access to academic professions according to the professional regulation; Diploma in the sense of directive RL 89/48/EEC.</text:span>
-			</text:p>
-			</table:table-cell>
-		</table:table-row>
-		</table:table>
+
 		<text:p text:style-name="P12"/>
-		<table:table table:name="Table7" table:style-name="Table7">
-		<table:table-column table:style-name="Table7.A"/>
-		<table:table-column table:style-name="Table7.B"/>
-		<table:table-column table:style-name="Table7.C"/>
-		<table:table-row table:style-name="Table7.1">
-			<table:table-cell table:style-name="Table7.A1" office:value-type="string">
-			<text:p text:style-name="Tabellenkopf">6.</text:p>
-			</table:table-cell>
-			<table:table-cell table:style-name="Table7.B1" table:number-columns-spanned="2" office:value-type="string">
-			<text:p text:style-name="Tabellenkopf">Sonstige Angaben</text:p>
-			<text:p text:style-name="Tabellenkopf">Additional information</text:p>
-			</table:table-cell>
-			<table:covered-table-cell/>
-		</table:table-row>
-		<table:table-row table:style-name="Table7.2">
-			<table:table-cell table:style-name="Table7.A2" office:value-type="string">
-			<text:p text:style-name="P42">
-				<text:span text:style-name="Tabelleninhalt">6.1</text:span>
-			</text:p>
-			</table:table-cell>
-			<table:table-cell table:style-name="Table7.B2" office:value-type="string">
-			<text:p text:style-name="P44">
-				<text:span text:style-name="Tabelleninhalt">Weitere Angaben</text:span>
-			</text:p>
-			<text:p text:style-name="P44">
-				<text:span text:style-name="Tabelleninhalt">Additional information</text:span>
-			</text:p>
-			</table:table-cell>
-			<table:table-cell table:style-name="Table7.C2" office:value-type="string">
-			<xsl:if test="praktikum != ''">
-				 <text:p text:style-name="P44">
-					<text:span text:style-name="T2"><xsl:value-of select="praktikum"/> </text:span>
-				 </text:p>
-			</xsl:if>
-			<xsl:if test="auslandssemester != ''">
-				 <text:p text:style-name="P44">
-					<text:span text:style-name="T2"><xsl:value-of select="auslandssemester"/></text:span>
-				 </text:p>
-			</xsl:if>
-			<xsl:if test="angerechnete_ects_quereinstieg != ''">
-				<text:p text:style-name="P44">
-				<text:span text:style-name="T2">Durch Berücksichtigung fremder, gleichwertiger Studienteile (vgl. Fachhochschul-Studiengesetz, § 12) kommt es bei oben genannter Person zu einer Reduzierung der vorgeschriebenen Studiendauer. In diesem Fall wurden Lehrveranstaltungen im Ausmaß von <xsl:value-of select="angerechnete_ects_quereinstieg"/> ECTS auf das Studium angerechnet und damit ein Einstieg in das <xsl:value-of select="start_semester_number"/>. Semester gestattet.</text:span>
-				</text:p>
-				<text:p text:style-name="P44">
-				<text:span text:style-name="T2">The above named person was granted a reduction of the prescribed duration of studies by taking into account outside equivalent academic achievements (cf. University of Applied Sciences Act, § 12), in this case <xsl:value-of select="angerechnete_ects_quereinstieg"/> credit points. Therefore, the person was admitted to enter the <xsl:value-of select="start_semester_number"/>. study semester.</text:span>
-				</text:p>
-			</xsl:if>
-			<xsl:if test="(not(praktikum) or praktikum='') and (not(auslandssemester) or auslandssemester = '') and (not(angerechnete_ects_quereinstieg) or angerechnete_ects_quereinstieg = '')">
-				<text:p text:style-name="P44">
-				 <text:span text:style-name="T2">Nicht zutreffend</text:span>
-				</text:p>
-				<text:p text:style-name="P44">
-				 <text:span text:style-name="T2">Not applicable</text:span>
-				</text:p>
-			</xsl:if>
-			</table:table-cell>
-		</table:table-row>
-		<table:table-row table:style-name="Table7.3">
-			<table:table-cell table:style-name="Table7.A3" office:value-type="string">
-			<text:p text:style-name="Tabelleninhalt_20_neu">
-				<text:span text:style-name="Tabelleninhalt">6.2</text:span>
-			</text:p>
-			</table:table-cell>
-			<table:table-cell table:style-name="Table7.B3" office:value-type="string">
-			<text:p text:style-name="P44">
-				<text:span text:style-name="Tabelleninhalt">Informationsquellen für ergänzende Angaben</text:span>
-			</text:p>
-			<text:p text:style-name="P44">
-				<text:span text:style-name="Tabelleninhalt">Further information sources</text:span>
-			</text:p>
-			</table:table-cell>
-			<table:table-cell table:style-name="Table7.C3" office:value-type="string">
-			<text:p text:style-name="P44">
-				<text:span text:style-name="Tabelleninhalt">www.technikum-wien.at</text:span>
-			</text:p>
-			<text:p text:style-name="P44">
-				<text:span text:style-name="Tabelleninhalt">www.aq.ac.at</text:span>
-			</text:p>
-			<text:p text:style-name="P44">
-				<text:span text:style-name="Tabelleninhalt">www.bmwf.gv.at/home/academic_mobility/enic_naric_austria/</text:span>
-			</text:p>
-			</table:table-cell>
-		</table:table-row>
-		</table:table>
-		<text:p text:style-name="P12"/>
-		<table:table table:name="Table8" table:style-name="Table8">
-		<table:table-column table:style-name="Table8.A"/>
-		<table:table-column table:style-name="Table8.B"/>
-		<table:table-column table:style-name="Table8.C"/>
-		<table:table-column table:style-name="Table8.D"/>
-		<table:table-row table:style-name="Table8.1">
-			<table:table-cell table:style-name="Table8.A1" office:value-type="string">
-			<text:p text:style-name="Tabellenkopf">7.</text:p>
-			</table:table-cell>
-			<table:table-cell table:style-name="Table8.B1" table:number-columns-spanned="3" office:value-type="string">
-			<text:p text:style-name="Tabellenkopf">Beurkundung des Anhangs</text:p>
-			<text:p text:style-name="Tabellenkopf">Certification of the supplement</text:p>
-			</table:table-cell>
-			<table:covered-table-cell/>
-			<table:covered-table-cell/>
-		</table:table-row>
-		<table:table-row table:style-name="Table8.2">
-			<table:table-cell table:style-name="Table8.A2" office:value-type="string">
-			<text:p text:style-name="P43">
-				<text:span text:style-name="Tabelleninhalt"/>
-			</text:p>
-			</table:table-cell>
-			<table:table-cell table:style-name="Table8.B2" office:value-type="string">
-			<text:p text:style-name="P44">
-				<text:span text:style-name="Tabelleninhalt">Datum</text:span>
-			</text:p>
-			<text:p text:style-name="P44">
-				<text:span text:style-name="Tabelleninhalt">Date</text:span>
-			</text:p>
-			<text:p text:style-name="P44">
-				<text:span text:style-name="Tabelleninhalt"><text:s/><xsl:value-of select="sponsion_datum"/></text:span>
-			</text:p>
-			</table:table-cell>
-			<table:table-cell table:style-name="Table8.C2" office:value-type="string">
-			<text:p text:style-name="P44">
-				<text:span text:style-name="Tabelleninhalt">Studiengangsleitung</text:span>
-			</text:p>
-			<text:p text:style-name="P44">
-				<text:span text:style-name="Tabelleninhalt">Program Director</text:span>
-			</text:p>
-			<text:p text:style-name="P44">
-				<text:span text:style-name="Tabelleninhalt"><xsl:value-of select="stgl"/></text:span>
-			</text:p>
-			</table:table-cell>
-			<table:table-cell table:style-name="Table8.D2" office:value-type="string">
-			<text:p text:style-name="P44">
-				<text:span text:style-name="Tabelleninhalt">Rundsiegel</text:span>
-				<draw:frame xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0" xmlns:xlink="http://www.w3.org/1999/xlink" draw:style-name="fr3" draw:name="graphics4" text:anchor-type="char" svg:x="0.9cm" svg:y="0.15cm" svg:width="2.2cm" svg:height="2.2cm" draw:z-index="15" >
-				<draw:image xlink:href="Pictures/rundstempel_fhtw_22mm.png" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/>
-				</draw:frame>
-			</text:p>
-			<text:p text:style-name="P44">
-				<text:span text:style-name="Tabelleninhalt">Official stamp</text:span>
-			</text:p>
-			</table:table-cell>
-		</table:table-row>
-		</table:table>
-		<text:p text:style-name="P12"/>
-		<table:table table:name="Table9" table:style-name="Table9">
-		<table:table-column table:style-name="Table9.A"/>
-		<table:table-column table:style-name="Table9.B"/>
-		<table:table-row table:style-name="Table9.1">
-			<table:table-cell table:style-name="Table9.A1" office:value-type="string">
-			<text:p text:style-name="Tabellenkopf">8.</text:p>
-			</table:table-cell>
-			<table:table-cell table:style-name="Table9.B1" office:value-type="string">
-			<text:p text:style-name="Tabellenkopf">Angaben zum nationalen Hochschulsystem (siehe Anhang)</text:p>
-			<text:p text:style-name="Tabellenkopf">Information on the Austrian higher education system (see appendix)</text:p>
-			</table:table-cell>
-		</table:table-row>
-		</table:table>
+
 	<text:p text:style-name="Standard"></text:p>
-	<text:p text:style-name="Standard">Siehe folgende Seiten</text:p>
-			<text:p text:style-name="Standard">See following pages</text:p>
 		<text:p text:style-name="P8"/>
 		<text:p text:style-name="P8"/>
-		<text:p text:style-name="P56">ANHANG: Angaben zum nationalen Hochschulsystem</text:p>
-		<text:p text:style-name="P74">Stand: 1. März 2017</text:p>
-		<text:p text:style-name="P41">Der postsekundäre Sektor in Österreich</text:p>
-		<text:list xml:id="list2030519318" text:style-name="WW8Num16">
-		<text:list-item>
-			<text:p text:style-name="P52">In Österreich umfasst der postsekundäre Sektor auf <text:span text:style-name="T14">Universitätsniveau</text:span> ("Hochschulsektor")</text:p>
-		</text:list-item>
-		</text:list>
-		<text:list xml:id="list2065892677" text:style-name="WW8Num13">
-		<text:list-item>
-			<text:list>
-			<text:list-item>
-				<text:p text:style-name="P49">die öffentlichen Universitäten, erhalten vom Staat;</text:p>
-			</text:list-item>
-			<text:list-item>
-				<text:p text:style-name="P49">die Privatuniversitäten, erhalten von privaten Trägern mit staatlicher Akkreditierung;</text:p>
-			</text:list-item>
-			<text:list-item>
-				<text:p text:style-name="P49">die Erhalter von Fachhochschul-Studiengängen, erhalten von privatrechtlich organisierten und staatlich subventionierten oder von öffentlichen Trägern, mit staatlicher Akkreditierung (manche Trägern wurde die Berechtigung zur Führung der Bezeichnung "Fachhochschule" verliehen);</text:p>
-			</text:list-item>
-			<text:list-item>
-				<text:p text:style-name="P49">die Pädagogischen Hochschulen, erhalten vom Staat oder von privaten Trägern mit staatlicher Akkreditierung;</text:p>
-			</text:list-item>
-			<text:list-item>
-				<text:p text:style-name="P49">das Institute of Science and Technology Austria;</text:p>
-			</text:list-item>
-			<text:list-item>
-				<text:p text:style-name="P49">die Philosophisch-Theologischen Hochschulen, erhalten von der Katholischen Kirche.</text:p>
-			</text:list-item>
-			</text:list>
-		</text:list-item>
-		</text:list>
-		<text:p text:style-name="P14"/>
-		<text:list xml:id="list1154796277" text:continue-list="list2030519318" text:style-name="WW8Num16">
-		<text:list-item>
-			<text:p text:style-name="P52">Der <text:span text:style-name="T14">außeruniversitäre</text:span> postsekundäre Sektor umfasst</text:p>
-		</text:list-item>
-		</text:list>
-		<text:list xml:id="list282475735" text:continue-list="list2065892677" text:style-name="WW8Num13">
-		<text:list-item>
-			<text:list>
-			<text:list-item>
-				<text:p text:style-name="P49">die Militärischen Akademien;</text:p>
-			</text:list-item>
-			<text:list-item>
-				<text:p text:style-name="P49">die Diplomatische Akademie;</text:p>
-			</text:list-item>
-			<text:list-item>
-				<text:p text:style-name="P49">bestimmte Psychotherapeutischen Ausbildungseinrichtungen;</text:p>
-			</text:list-item>
-			<text:list-item>
-				<text:p text:style-name="P49">die Konservatorien.</text:p>
-			</text:list-item>
-			</text:list>
-		</text:list-item>
-		</text:list>
-		<text:p text:style-name="P14"/>
-		<text:p text:style-name="P24">Im Folgenden wird ausschließlich auf den "Hochschulsektor" eingegangen.</text:p>
-		<text:p text:style-name="P24"/>
-		<text:p text:style-name="P41">Allgemeine Struktur des Hochschulwesens</text:p>
-		<text:p text:style-name="P24">Es gibt ein neues und ein altes System der österreichischen ordentlichen Studien: das neue im Sinne des Europäischen Hochschulraums (Bologna-Prozess) und das alte aus der Zeit vor dem Europäischen Hochschulraum.</text:p>
-		<text:p text:style-name="P14"/>
-		<text:list xml:id="list1370974139" text:continue-list="list1154796277" text:style-name="WW8Num16">
-		<text:list-item>
-			<text:p text:style-name="P52">Das <text:span text:style-name="T14">neue System</text:span> folgt der Trennung zwischen einem Undergraduate-Studium und einem Graduate-Studium. Nach Beendigung des Undergraduate-Studiums (<text:span text:style-name="T15">Bachelorstudium</text:span> an Universitäten und Pädagogischen Hochschulen bzw. <text:span text:style-name="T15">Fachhochschul-Bachelorstudiengang</text:span>
-											mit 180 bis 240 ECTS credits) wird ein <text:span text:style-name="T15">Bachelorgrad</text:span> (mit dem Wortlaut "Bachelor of/in ...") verliehen. Nach Beendigung des Graduate-Studiums (<text:span text:style-name="T15">Masterstudium</text:span> an Universitäten und Pädagogischen Hochschulen bzw. <text:span text:style-name="T15">Fachhochschul-Masterstudiengang</text:span>
-											mit 60 bis 120 ECTS credits) wird ein <text:span text:style-name="T15">Mastergrad</text:span> (mit dem Wortlaut "Master of/in ...") verliehen. In ingenieurwissenschaftlichen Graduate-Studien kann der Mastergrad auch "Diplom-Ingenieur/in" lauten.</text:p>
-		</text:list-item>
-		<text:list-item>
-			<text:p text:style-name="P52">Das <text:span text:style-name="T14">alte System</text:span> ist das der Diplomstudien, die grundsätzlich auf der Basis einer Reifeprüfung begonnen werden und deren Abschluss zur Aufnahme eines Doktoratsstudiums berechtigt. Ein <text:span text:style-name="T15">Diplomgrad</text:span> wird von den Universitäten nach einem Diplomstudium mit 240 bis 360 ECTS-Credits verliehen. Der volle Wortlaut ist "Magister/Magistra ..." samt einer fachspezifischen Beifügung, z.B. "Magister philosophiae". In den ingenieurwissenschaftlichen Studien ist der Wortlaut "Diplom-Ingenieur/in". Das Studium der Humanmedizin und der Zahnmedizin sind Ausnahmen: Hier wird als erster akademischer Grad "Doctor medicinae universae" bzw. "Doctor medicinae dentalis" nach einem Diplomstudium mit 360 ECTS-Credits verliehen.</text:p>
-			<text:p text:style-name="P54">In Fachhochschul-Studiengängen wird, analog zu den Universitätsstudien, ein <text:span text:style-name="T15">Fachhochschul-Diplomgrad</text:span> ("Diplom-Ingenieur/in (FH)" im ingenieurwissenschaftlichen Bereich bzw. "Magister/Magistra (FH)" in den anderen Bereichen; 240 bis 300 ECTS-Credits) verliehen.</text:p>
-		</text:list-item>
-		</text:list>
-		<text:p text:style-name="P24">Die Studien für das Lehramt werden gemeinsam zwischen Universitäten und Pädagogischen Hochschulen eingerichtet.</text:p>
-		<text:p text:style-name="P16"/>
-		<text:p text:style-name="P24">Die Inhaber/innen dieser Diplomgrade oder Mastergrade (einschließlich Fachhochschul-Diplomgraden oder Fachhochschul-Mastergraden) sind zur Zulassung zum Doktoratsstudium an einer Universität berechtigt. Der <text:span text:style-name="T15">Doktorgrad</text:span> mit dem Wortlaut "Doktor/in ..." oder "Doctor of Philosophy" ("PhD") wird nach einem mindestens dreijährigen Studium verliehen.</text:p>
-		<text:p text:style-name="P24"/>
-		<text:p text:style-name="P25">Neben den ordentlichen Studien, die oben beschrieben wurden, gibt es auch außerordentliche Studien, die an Universitäten entweder ein Universitätslehrgang oder der Besuch einzelner Lehrveranstaltungen, im Fachhochschulbereich ein Lehrgang zur Weiterbildung oder der Besuch einzelner Lehrveranstaltungen und an Pädagogischen Hochschulen ein Hochschullehrgang sein können.</text:p>
-		<text:p text:style-name="P24"/>
-		<text:p text:style-name="P41">Bachelorstudium</text:p>
-		<text:p text:style-name="P24">Die Zulassung zu einem Bachelorstudium erfolgt auf der Grundlage eines österreichischen oder gleichwertigen ausländischen Reifezeugnisses, eines Zeugnisses über die Studienberechtigungsprüfung oder eines Zeugnisses über die Berufsreifeprüfung, in künstlerischen Studien auf der Grundlage einer Zulassungsprüfung. Die Zulassung zu einem Fachhochschul-Bachelorstudiengang kann auch auf der Grundlage einer einschlägigen beruflichen Qualifikation erfolgen. In einigen Bachelorstudien an Universitäten, in den meisten Fachhochschul-Bachelorstudiengängen und in Bachelorstudien an Pädagogischen Hochschulen findet ein Auswahlverfahren statt.</text:p>
-		<text:p text:style-name="P24">Die Fächer/Module und ihre Inhalte sind im Curriculum festgelegt. In der Regel sind zwei Bachelorarbeiten im Rahmen von Lehrveranstaltungen abzufassen. Fachhochschul-Bachelorstudiengänge, Bachelorstudien an Pädagogischen Hochschulen und einige Bachelorstudien an Universitäten umfassen ein angeleitetes Praktikum. Das Studium kann mit einer Bachelorprüfung abgeschlossen werden.</text:p>
-		<text:p text:style-name="P24"/>
-		<text:p text:style-name="P41"><text:soft-page-break/>Masterstudium</text:p>
-		<text:p text:style-name="P24">Die Zulassung zu einem Masterstudium erfolgt auf der Grundlage eines abgeschlossenen facheinschlägigen Bachelorstudiums oder gleichwertigen postsekundären Abschlusses. In einigen Studien findet ein Auswahlverfahren statt</text:p>
-		<text:p text:style-name="P24">Die Fächer/Module und ihre Inhalte sind im Curriculum festgelegt. Ein Schwerpunkt des Studiums liegt auf der Erstellung der Masterarbeit. Das Studium wird mit einer Masterprüfung abgeschlossen. Die Zulassung zur Masterprüfung setzt die Approbation der Masterarbeit voraus.</text:p>
-		<text:p text:style-name="P24"/>
-		<text:p text:style-name="P41">Diplomstudium</text:p>
-		<text:p text:style-name="P24">Die Zulassung zu einem Diplomstudium erfolgt auf der Grundlage eines österreichischen oder gleichwertigen ausländischen Reifezeugnisses, eines Zeugnisses über die Studienberechtigungsprüfung oder eines Zeugnisses über die Berufsreifeprüfung, in künstlerischen Studien auf der Grundlage einer Zulassungsprüfung. Die Zulassung zu einem Fachhochschul-Diplomstudiengang kann auch auf der Grundlage einer einschlägigen beruflichen Qualifikation erfolgen. In einigen Studien (z.B. Humanmedizin und Zahnmedizin sowie in Fachhochschul-Diplomstudiengängen) findet ein Auswahlverfahren statt.</text:p>
-		<text:p text:style-name="P24">Das Studium kann in Studienabschnitte unterteilt sein. Die Dauer jedes Studienabschnitts, die Fächer und ihre Inhalte sind im Curriculum festgelegt. Sie gliedern sich in Pflichtfächer und Wahlfächer. Jeder Studienabschnitt wird mit einer Diplomprüfung abgeschlossen. Fachhochschul-Diplomstudiengänge und einige Diplomstudien an Universitäten umfassen ein angeleitetes Praktikum. Die Zulassung zur letzten Diplomprüfung setzt die Approbation der Diplomarbeit voraus.</text:p>
-		<text:p text:style-name="P24"/>
-		<text:p text:style-name="P24"/>
-		<text:p text:style-name="P24"/>
-		<text:p text:style-name="P24"/>
-		<text:p text:style-name="P41">Doktoratsstudium</text:p>
-		<text:p text:style-name="P24">Die Zulassung zu einem Doktoratsstudium an einer Universität erfolgt auf der Grundlage eines abgeschlossenen facheinschlägigen Diplom- oder Masterstudiums.</text:p>
-		<text:p text:style-name="P24">Die Inhalte und Anforderungen sind im Curriculum festgelegt. Das Hauptgewicht liegt auf der Anfertigung einer Dissertation als Ergebnis einer selbstständigen wissenschaftlichen Forschungsleistung. Das Studium wird mit der Approbation der Dissertation und einem Rigorosum/einer Defensio abgeschlossen.</text:p>
-		<text:p text:style-name="P24">Im Fachhochschulbereich und an Pädagogischen Hochschulen gibt es kein Doktoratsstudium.</text:p>
-		<text:p text:style-name="P24"/>
-		<text:p text:style-name="P41">Leistungsbewertung und Notensystem (Österreichische Notenskala)</text:p>
-		<text:p text:style-name="P24">Entsprechend den in den Curricula geregelten Prüfungsmodalitäten kann die Bewertung der Leistungen in der Form mündlicher oder schriftlicher Prüfungen oder von Projektarbeiten erfolgen. Mündliche Prüfungen sind grundsätzlich öffentlich.</text:p>
-		<text:p text:style-name="P24"/>
-		<table:table table:name="Table10" table:style-name="Table10">
-		<table:table-column table:style-name="Table10.A"/>
-		<table:table-column table:style-name="Table10.B"/>
-		<table:table-row table:style-name="Table10.1">
-			<table:table-cell table:style-name="Table10.A1" office:value-type="string">
-			<text:p text:style-name="P33">Österreichische Notenskala</text:p>
-			</table:table-cell>
-			<table:table-cell table:style-name="Table10.B1" office:value-type="string">
-			<text:p text:style-name="P33">Definition</text:p>
-			</table:table-cell>
-		</table:table-row>
-		<table:table-row table:style-name="Table10.1">
-			<table:table-cell table:style-name="Table10.A2" office:value-type="string">
-			<text:p text:style-name="P33">1</text:p>
-			</table:table-cell>
-			<table:table-cell table:style-name="Table10.B2" office:value-type="string">
-			<text:p text:style-name="P33">SEHR GUT</text:p>
-			</table:table-cell>
-		</table:table-row>
-		<table:table-row table:style-name="Table10.1">
-			<table:table-cell table:style-name="Table10.A2" office:value-type="string">
-			<text:p text:style-name="P33">2</text:p>
-			</table:table-cell>
-			<table:table-cell table:style-name="Table10.B2" office:value-type="string">
-			<text:p text:style-name="P33">GUT</text:p>
-			</table:table-cell>
-		</table:table-row>
-		<table:table-row table:style-name="Table10.1">
-			<table:table-cell table:style-name="Table10.A2" office:value-type="string">
-			<text:p text:style-name="P33">3</text:p>
-			</table:table-cell>
-			<table:table-cell table:style-name="Table10.B2" office:value-type="string">
-			<text:p text:style-name="P33">BEFRIEDIGEND</text:p>
-			</table:table-cell>
-		</table:table-row>
-		<table:table-row table:style-name="Table10.1">
-			<table:table-cell table:style-name="Table10.A2" office:value-type="string">
-			<text:p text:style-name="P33">4</text:p>
-			</table:table-cell>
-			<table:table-cell table:style-name="Table10.B2" office:value-type="string">
-			<text:p text:style-name="P33">GENÜGEND</text:p><text:p text:style-name="P33">(unterste Bestehensnote)</text:p>
-			</table:table-cell>
-		</table:table-row>
-		<table:table-row table:style-name="Table10.1">
-			<table:table-cell table:style-name="Table10.A2" office:value-type="string">
-			<text:p text:style-name="P33">Mit Erfolg teilgenommen</text:p>
-			</table:table-cell>
-			<table:table-cell table:style-name="Table10.B2" office:value-type="string">
-			<text:p text:style-name="P33">Positive Leistung, wo eine genaue Differenzierung nicht tunlich ist</text:p>
-			</table:table-cell>
-		</table:table-row>
-		<table:table-row table:style-name="Table10.1">
-			<table:table-cell table:style-name="Table10.A2" office:value-type="string">
-			<text:p text:style-name="P33">5</text:p>
-			</table:table-cell>
-			<table:table-cell table:style-name="Table10.B2" office:value-type="string">
-			<text:p text:style-name="P33">NICHT GENÜGEND</text:p>
-			</table:table-cell>
-		</table:table-row>
-		<table:table-row table:style-name="Table10.1">
-			<table:table-cell table:style-name="Table10.A2" office:value-type="string">
-			<text:p text:style-name="P33">Ohne Erfolg teilgenommen</text:p>
-			</table:table-cell>
-			<table:table-cell table:style-name="Table10.B2" office:value-type="string">
-			<text:p text:style-name="P33">Negative Leistung, wo eine genaue Differenzierung nicht tunlich ist</text:p>
-			</table:table-cell>
-		</table:table-row>
-		</table:table>
-		<text:p text:style-name="P24"/>
-		<text:p text:style-name="P33">Noten für Gesamtprüfungen, d.h. Prüfungen, die aus mehreren Fächern bestehen:</text:p>
-		<table:table table:name="Table14" table:style-name="Table14">
-		 <table:table-column table:style-name="Table14.B" />
-		 <table:table-column table:style-name="Table14.C" />
-		 <table:table-row>
-			<table:table-cell table:style-name="Table14.A1" office:value-type="string">
-				 <text:p text:style-name="P33">positiv:</text:p>
-			</table:table-cell>
-			<table:table-cell table:style-name="Table14.A1" office:value-type="string">
-				 <text:p text:style-name="P33">mit Auszeichnung bestanden</text:p>
-				 <text:p text:style-name="P33">mit gutem Erfolg bestanden</text:p>
-				 <text:p text:style-name="P33">bestanden</text:p>
-			</table:table-cell>
-		 </table:table-row>
-		 <table:table-row>
-			<table:table-cell table:style-name="Table14.A1" office:value-type="string">
-				 <text:p text:style-name="P33">negativ:</text:p>
-			</table:table-cell>
-			<table:table-cell table:style-name="Table14.A1" office:value-type="string">
-				 <text:p text:style-name="P33">nicht bestanden</text:p>
-			</table:table-cell>
-		 </table:table-row>
-		</table:table>
-		<text:p text:style-name="P24"/>
-		<text:p text:style-name="P73">Quelle:</text:p>
-		<text:p text:style-name="P73">Bundesministerium für Wissenschaft, Forschung und Wirtschaft</text:p>
-		<text:p text:style-name="P73">Abteilung VI/7</text:p>
-		<text:p text:style-name="P8"/>
-		<text:p text:style-name="P56">APPENDIX: Information on the Austrian higher education system</text:p>
-		<text:p text:style-name="P76">As of 1<text:span text:style-name="T5">st</text:span> March 2017</text:p>
-		<text:p text:style-name="P39">Post-secondary Education in Austria</text:p>
-		<text:list xml:id="list1050643529" text:continue-numbering="true" text:style-name="WW8Num16">
-		<text:list-item>
-			<text:p text:style-name="P53">The Austrian post-secondary <text:span text:style-name="T14">university sector</text:span> (<text:span text:style-name="T15">Hochschulsektor</text:span>) consists of</text:p>
-		</text:list-item>
-		</text:list>
-		<text:list xml:id="list695069009" text:continue-list="list282475735" text:style-name="WW8Num13">
-		<text:list-item>
-			<text:list>
-			<text:list-item>
-				<text:p text:style-name="P50">Public universities (<text:span text:style-name="T15">Universitäten</text:span>), maintained by the state;</text:p>
-			</text:list-item>
-			<text:list-item>
-				<text:p text:style-name="P50">Private universities (<text:span text:style-name="T15">Privatuniversitäten</text:span>), operated by private organisations with state accreditation;</text:p>
-			</text:list-item>
-			<text:list-item>
-				<text:p text:style-name="P50">Maintainers of university of applied sciences degree programmes (<text:span text:style-name="T15">Fachhochschul-Studiengänge</text:span>) incorporated upon the basis of private or public law and subsidised by the state, with state accreditation (some of which are entitled to use the designation <text:span text:style-name="T15">Fachhochschule</text:span>);</text:p>
-			</text:list-item>
-			<text:list-item>
-				<text:p text:style-name="P50">University colleges of education (<text:span text:style-name="T15">Pädagogische Hochschulen</text:span>) maintained by the state or operated by private organisations with state accreditation;</text:p>
-			</text:list-item>
-			<text:list-item>
-				<text:p text:style-name="P50">The Institute of Science and Technology Austria;</text:p>
-			</text:list-item>
-			<text:list-item>
-				<text:p text:style-name="P50">Universities of philosophy and theology (<text:span text:style-name="T15">Philosophisch-Theologische Hochschulen</text:span>), operated by the Roman Catholic Church.</text:p>
-			</text:list-item>
-			</text:list>
-		</text:list-item>
-		</text:list>
-		<text:p text:style-name="P15"/>
-		<text:list xml:id="list471845522" text:continue-list="list1050643529" text:style-name="WW8Num16">
-		<text:list-item>
-			<text:p text:style-name="P53">The <text:span text:style-name="T14">non-university post-secondary sector</text:span> (<text:span text:style-name="T15">außeruniversitärer postsekundärer Sektor</text:span>) consists of</text:p>
-		</text:list-item>
-		</text:list>
-		<text:list xml:id="list119325670" text:continue-list="list695069009" text:style-name="WW8Num13">
-		<text:list-item>
-			<text:list>
-			<text:list-item>
-				<text:p text:style-name="P50">Military academies (<text:span text:style-name="T15">Militärische Akademien</text:span>);</text:p>
-			</text:list-item>
-			<text:list-item>
-				<text:p text:style-name="P50">Vienna School of International Studies (<text:span text:style-name="T15">Diplomatische Akademie</text:span>);</text:p>
-			</text:list-item>
-			<text:list-item>
-				<text:p text:style-name="P50">Certain training institutions for psychotherapists (<text:span text:style-name="T15">Psychotherapeutische Ausbildungseinrichtungen</text:span>);</text:p>
-			</text:list-item>
-			<text:list-item>
-				<text:p text:style-name="P50">Conservatories (<text:span text:style-name="T15">Konservatorien</text:span>).</text:p>
-			</text:list-item>
-			</text:list>
-		</text:list-item>
-		</text:list>
-		<text:p text:style-name="P15"/>
-		<text:p text:style-name="P17">The following text addresses exclusively the university sector.</text:p>
-		<text:p text:style-name="P17"/>
-		<text:p text:style-name="P39">Overall Structure of University Level Higher Education</text:p>
-		<text:p text:style-name="P17">There are currently two different systems of degree programmes in Austria: a newer system, based on the European Higher Education Area (Bologna process), and a former one, dating from before the European Higher Education Area.</text:p>
-		<text:p text:style-name="P15"/>
-		<text:list xml:id="list1119633922" text:continue-list="list471845522" text:style-name="WW8Num16">
-		<text:list-item>
-			<text:p text:style-name="P53">The <text:span text:style-name="T14">new system</text:span> is based on the distinction between undergraduate and graduate studies. Upon completion of an undergraduate programme (<text:span text:style-name="T15">Bachelorstudium</text:span> at universities and university colleges of education or, respectively, <text:span text:style-name="T15">Fachhochschul-Bachelorstudiengang</text:span> at universities of applied sciences, comprising 180 to 240 ECTS credits), a bachelor’s degree (designation: "Bachelor of/in ..." ) is awarded. Upon completion of a graduate program (<text:span text:style-name="T15">Masterstudium</text:span> at universities and university colleges of education or, respectively, <text:span text:style-name="T15">Fachhochschul-Masterstudiengang</text:span> at universities of applied sciences, comprising 60 to 120 ECTS credits), a master’s degree (designation: "Master of/in ..." ) is awarded. In the fields of engineering, the designation of the master’s degree can also be "Diplom-Ingenieur/in".</text:p>
-		</text:list-item>
-		<text:list-item>
-			<text:p text:style-name="P53">Under the auspices of the <text:span text:style-name="T14">older system</text:span> of diploma degree programmes (<text:span text:style-name="T15">Diplomstudien</text:span>), the first degree awarded is the diploma degree (<text:span text:style-name="T15">Diplomgrad</text:span>). An Austrian higher secondary school leaving certificate or its equivalent is the general qualification necessary for enrolling in a diploma degree programme; conclusion of a diploma degree programme entitles degree holders to enrol in doctoral programmes. A diploma degree (<text:span text:style-name="T15">Diplomgrad</text:span>) is awarded by Austrian universities after a course of study consisting of 240 to 360 ECTS credits. Full degree titles are gender specific designations: <text:span text:style-name="T15">Magister</text:span> for men; <text:span text:style-name="T15">Magistra</text:span> for women. Degree titles also include a general description of the field of study in which they were obtained, e.g. <text:span text:style-name="T15">Magister philosophiae</text:span>. In the fields of engineering, the degree titles are <text:span text:style-name="T15">Diplom-Ingenieur/in</text:span>.
-											Degrees awarded in medicine and dentistry are exceptions to the above. The first degrees awarded after the completion of these degree programmes consisting of 360 ECTS credits are <text:span text:style-name="T15">Doctor medicinae universae</text:span> and <text:span text:style-name="T15">Doctor medicinae dentalis</text:span>, respectively.</text:p>
-			<text:p text:style-name="P53">Graduates of university of applied sciences programmes that consist of 240 to 300 ECTS credits are awarded, analogous to university studies, a university of applied science diploma degree (<text:span text:style-name="T15">Fachhochschul-Diplomgrad</text:span>) contingent upon <text:soft-page-break/>discipline: either a <text:span text:style-name="T15">Diplom-Ingenieur/in (FH)</text:span> for fields of engineering or <text:span text:style-name="T15">Magister/Magistra (FH)</text:span> in other fields of study.</text:p>
-		</text:list-item>
-		</text:list>
-		<text:p text:style-name="P17"/>
-		<text:p text:style-name="P17">The study programmes for teachers’ qualifications are offered jointly between universities and university colleges of education.</text:p>
-		<text:p text:style-name="P17"/>
-		<text:p text:style-name="P17">Recipients of the diploma degrees from the old system or master’s degrees from the new system (including the ones awarded in both cases by the universities of applied sciences) are entitled to enrol in doctoral programmes (<text:span text:style-name="T15">Doktoratsstudium</text:span>) at universities. A doctoral degree with the designation either <text:span text:style-name="T15">"Doktor/in"</text:span> or "Doctor of Philosophy" (PhD) is awarded upon completion of a doctoral programme with a minimum duration of three years.</text:p>
-		<text:p text:style-name="P17"/>
-		<text:p text:style-name="P17">In addition to the degree programmes (<text:span text:style-name="T15">ordentliche Studien</text:span>) described above, non-consecutive certificate programmes (<text:span text:style-name="T15">außerordentliche Studien</text:span>) are offered, for example in the form of university programmes for further education (<text:span text:style-name="T15">Universitätslehrgänge</text:span>) or individual units / modules in scientific subjects, both at universities; certificate university of applied sciences programmes for further education (<text:span text:style-name="T15">Lehrgänge zur Weiterbildung</text:span>) or individual units / modules in scientific subjects at universities of applied sciences; and certificate university college programmes for further education (<text:span text:style-name="T15">Hochschullehrgänge</text:span>) at university colleges of education.</text:p>
-		<text:p text:style-name="P17"/>
-		<text:p text:style-name="P39">Bachelor Programme (<text:span text:style-name="T15">Bachelorstudium</text:span>)</text:p>
-		<text:p text:style-name="P17">Admission to a bachelor programme is granted upon the basis on the Austrian higher secondary school leaving certificate (<text:span text:style-name="T15">Reifezeugnis</text:span>), its foreign equivalent, or the successful completion of a special university entrance qualification examination (<text:span text:style-name="T15">Studienberechtigungsprüfung</text:span>). Students of compulsory lower schools who have completed additional schooling in the form of apprenticeships as skilled workers may take a vocationally <text:soft-page-break/>based examination acknowledged as equivalent to the higher secondary school leaving certificate (<text:span text:style-name="T15">Berufsreifeprüfung</text:span>). Admission to bachelor programmes in the arts is based on aptitude ascertained by admission examinations. Admission to university of applied sciences bachelor programmes is also possible on the basis of previous vocational or technical experience and qualifications of applicants. In some university bachelor programmes, in most university of applied sciences bachelor programmes and in bachelor programmes at university colleges of education, admission is based on a selective admission process.</text:p>
-		<text:p text:style-name="P17">Areas/Modules of study (<text:span text:style-name="T15">Fächer/Module</text:span>) are specified in curricula. As a rule, the completion of two substantial bachelor papers or projects (<text:span text:style-name="T15">Bachelorarbeiten</text:span>) are required for awarding the degree. University of applied sciences bachelor programmes, bachelor programmes at university college and some bachelor programmes at universities include an internship or practical training. The program can conclude with a bachelor examination (<text:span text:style-name="T15">Bachelorprüfung</text:span>). </text:p>
-		<text:p text:style-name="P17"/>
-		<text:p text:style-name="P40">Master Programme (<text:span text:style-name="T15">Masterstudium</text:span>)</text:p>
-		<text:p text:style-name="P17">Admission to a master programme is granted on the basis of the successful completion of a subject-relevant bachelor programme or an equivalent post-secondary qualification. In some master programmes admission is based on a selective admission process.</text:p>
-		<text:p text:style-name="P17">Areas/modules of study (<text:span text:style-name="T15">Fächer/Module</text:span>) are specified in curricula. A core requirement is the completion of a master thesis (<text:span text:style-name="T15">Masterarbeit</text:span>). This degree programme concludes with a master examination (<text:span text:style-name="T15">Masterprüfung</text:span>). The approval of the master thesis (<text:span text:style-name="T15">Masterarbeit</text:span>) is a prerequisite for admission to this examination.</text:p>
-		<text:p text:style-name="P17"/>
-		<text:p text:style-name="P40">Diploma Programme (<text:span text:style-name="T15">Diplomstudium = old system</text:span>)</text:p>
-		<text:p text:style-name="P17">Admission to a diploma programme is granted upon the basis of the Austrian higher secondary school leaving certificate (<text:span text:style-name="T15">Reifezeugnis</text:span>), its foreign equivalent, or the successful completion of a special university entrance qualification examination (<text:span text:style-name="T15">Studienberechtigungsprüfung</text:span>). Students of compulsory lower schools who have completed additional schooling in the form of apprenticeships as skilled workers also may take a vocationally based examination acknowledged as equivalent to the higher secondary school leaving certificate (<text:span text:style-name="T15">Berufsreifeprüfung</text:span>). Admission to diploma programmes in the arts is based on aptitude ascertained by admission examinations. Admission to university of applied sciences diploma programmes may also take place upon the basis of previous vocational or technical experience and qualifications of applicants. In some fields of study (e.g. Human Medicine and Dentistry, and university of applied sciences diploma programmes) admission is based on a selective admission process.</text:p>
-		<text:p text:style-name="P17">A degree programme may be divided into stages (<text:span text:style-name="T15">Studienabschnitte</text:span>). The length of each stage of the degree programme as well as the areas of study (<text:span text:style-name="T15">Fächer</text:span>) and content required are articulated in curricula that distinguish between required subjects (<text:span text:style-name="T15">Pflichtfächer</text:span>) and electives (<text:span text:style-name="T15">Wahlfächer</text:span>). Each stage concludes with a diploma examination (<text:span text:style-name="T15">Diplomprüfung</text:span>). University of applied sciences diploma programmes and some diploma programmes at universities include an internship or practical training. The approval of a diploma thesis (<text:span text:style-name="T15">Diplomarbeit</text:span>) is a prerequisite for admission to the concluding diploma examination.</text:p>
-		<text:p text:style-name="P17"/>
-		<text:p text:style-name="P40">Doctoral Programme (<text:span text:style-name="T15">Doktoratsstudium</text:span>)</text:p>
-		<text:p text:style-name="P17">Admission to a doctoral programme at a university is granted on the basis of the successful completion of a subject-relevant diploma or master programme.</text:p>
-		<text:p text:style-name="P17">Contents and requirements of study are specified in curricula with the focus on the doctoral thesis (<text:span text:style-name="T15">Dissertation</text:span>) as the result of independent research. This degree programme concludes with the approval of the dissertation and with a comprehensive doctoral examination (<text:span text:style-name="T15">Rigorosum</text:span>) or a <text:span text:style-name="T15">defensio</text:span>.</text:p>
-		<text:p text:style-name="P17">At universities of applied sciences and at university colleges of education no doctoral degree programmes are offered.</text:p>
-		<text:p text:style-name="P17"/>
-		<text:p text:style-name="P39">Evaluation of performance and grading system (Austrian grading scale) </text:p>
-		<text:p text:style-name="P17">According to the modalities for examinations outlined in the curricula, achievement may be assessed by oral and written exams or project related work. In principle oral examinations are open to the public.</text:p>
-		<text:p text:style-name="P15"/>
-		<table:table table:name="Table11" table:style-name="Table11">
-		<table:table-column table:style-name="Table11.A"/>
-		<table:table-column table:style-name="Table11.B"/>
-		<table:table-row table:style-name="Table11.1">
-			<table:table-cell table:style-name="Table11.A1" office:value-type="string">
-			<text:p text:style-name="P32">Austrian Grading scheme</text:p>
-			</table:table-cell>
-			<table:table-cell table:style-name="Table11.B1" office:value-type="string">
-			<text:p text:style-name="P32">Definition</text:p>
-			</table:table-cell>
-		</table:table-row>
-		<table:table-row table:style-name="Table11.1">
-			<table:table-cell table:style-name="Table11.A2" office:value-type="string">
-			<text:p text:style-name="P32">1</text:p>
-			</table:table-cell>
-			<table:table-cell table:style-name="Table11.B2" office:value-type="string">
-			<text:p text:style-name="P32">EXCELLENT (<text:span text:style-name="T15">SEHR GUT</text:span>)</text:p>
-			</table:table-cell>
-		</table:table-row>
-		<table:table-row table:style-name="Table11.1">
-			<table:table-cell table:style-name="Table11.A2" office:value-type="string">
-			<text:p text:style-name="P32">2</text:p>
-			</table:table-cell>
-			<table:table-cell table:style-name="Table11.B2" office:value-type="string">
-			<text:p text:style-name="P32">GOOD (<text:span text:style-name="T15">GUT</text:span>)</text:p>
-			</table:table-cell>
-		</table:table-row>
-		<table:table-row table:style-name="Table11.1">
-			<table:table-cell table:style-name="Table11.A2" office:value-type="string">
-			<text:p text:style-name="P32">3</text:p>
-			</table:table-cell>
-			<table:table-cell table:style-name="Table11.B2" office:value-type="string">
-			<text:p text:style-name="P32">SATISFACTORY (<text:span text:style-name="T15">BEFRIEDIGEND</text:span>)</text:p>
-			</table:table-cell>
-		</table:table-row>
-		<table:table-row table:style-name="Table11.1">
-			<table:table-cell table:style-name="Table11.A2" office:value-type="string">
-			<text:p text:style-name="P32">4</text:p>
-			</table:table-cell>
-			<table:table-cell table:style-name="Table11.B2" office:value-type="string">
-			<text:p text:style-name="P32">SUFFICIENT (<text:span text:style-name="T15">GENÜGEND</text:span>)</text:p>
-			<text:p text:style-name="P32">(minimum positive grade)</text:p>
-			</table:table-cell>
-		</table:table-row>
-		<table:table-row table:style-name="Table11.1">
-			<table:table-cell table:style-name="Table11.A2" office:value-type="string">
-			<text:p text:style-name="P32">successfully completed</text:p>
-			</table:table-cell>
-			<table:table-cell table:style-name="Table11.B2" office:value-type="string">
-			<text:p text:style-name="P32">Positive performance, where a strict differentiation is not adequate</text:p>
-			</table:table-cell>
-		</table:table-row>
-		<table:table-row table:style-name="Table11.1">
-			<table:table-cell table:style-name="Table11.A2" office:value-type="string">
-			<text:p text:style-name="P32">5</text:p>
-			</table:table-cell>
-			<table:table-cell table:style-name="Table11.B2" office:value-type="string">
-			<text:p text:style-name="P32">INSUFFICIENT (<text:span text:style-name="T15">NICHT GENÜGEND</text:span>)</text:p>
-			</table:table-cell>
-		</table:table-row>
-		<table:table-row table:style-name="Table11.1">
-			<table:table-cell table:style-name="Table11.A2" office:value-type="string">
-			<text:p text:style-name="P32">not completed</text:p>
-			</table:table-cell>
-			<table:table-cell table:style-name="Table11.B2" office:value-type="string">
-			<text:p text:style-name="P32">Negative performance, where a strict differentiation is not adequate</text:p>
-			</table:table-cell>
-		</table:table-row>
-		</table:table>
-		<text:p text:style-name="P17"/>
-
-
-		<text:p text:style-name="P75">Grades for comprehensive examinations, i.e. examinations covering materials from various subjects:</text:p>
-		<table:table table:name="Table15" table:style-name="Table15">
-		 <table:table-column table:style-name="Table15.B" />
-		 <table:table-column table:style-name="Table15.C" />
-		 <table:table-row>
-			<table:table-cell table:style-name="Table15.A1" office:value-type="string">
-				 <text:p text:style-name="P32">positive:</text:p>
-			</table:table-cell>
-			<table:table-cell table:style-name="Table15.A1" office:value-type="string">
-				 <text:p text:style-name="P32"><text:span text:style-name="T15">mit Auszeichnung bestanden</text:span> (pass with distinction)</text:p>
-				 <text:p text:style-name="P32"><text:span text:style-name="T15">mit gutem Erfolg bestanden</text:span> (pass with merit)</text:p>
-				 <text:p text:style-name="P32"><text:span text:style-name="T15">bestanden</text:span> (pass)</text:p>
-			</table:table-cell>
-		 </table:table-row>
-		 <table:table-row>
-			<table:table-cell table:style-name="Table15.A1" office:value-type="string">
-				 <text:p text:style-name="P32">negative:</text:p>
-			</table:table-cell>
-			<table:table-cell table:style-name="Table15.A1" office:value-type="string">
-				 <text:p text:style-name="P32"><text:span text:style-name="T15">nicht bestanden</text:span> (insufficient)</text:p>
-			</table:table-cell>
-		 </table:table-row>
-		</table:table>
-		<text:p text:style-name="P17"/>
-		<text:p text:style-name="P75">Source:</text:p>
-		<text:p text:style-name="P75">Federal Ministry of Science, Research and Economy</text:p>
-		<text:p text:style-name="P75">Unit VI/7</text:p>
-		<text:p text:style-name="P13"/>
 
 		<text:p text:style-name="P48">
 		<draw:frame xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0" xmlns:xlink="http://www.w3.org/1999/xlink" draw:style-name="fr2" draw:name="graphics3" text:anchor-type="paragraph" svg:width="17cm" svg:height="24.042cm" draw:z-index="14" >
@@ -2722,7 +2097,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 		<text:p text:style-name="P15"/>
 		<text:p text:style-name="P20">Date of Birth: <xsl:value-of select="geburtsdatum"/></text:p>
 		<text:p text:style-name="P20"/>
-		<text:p text:style-name="P21">Within the period of studies at the University of Applied Sciences Technikum Wien from <xsl:value-of select="start_semester"/> to <xsl:value-of select="end_semester"/> in the <xsl:value-of select="studiengang_typ"/>’s degree program <xsl:value-of select="studiengang_bezeichnung_englisch"/> examinations in the following subjects were passed:</text:p>
+
 		<text:p text:style-name="P20"/>
 		<table:table table:name="Table12" table:style-name="Table12">
 		<table:table-column table:style-name="Table12.A"/>
@@ -2810,12 +2185,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 		<text:p text:style-name="P23">Grading Scheme: Passed with distinction, Passed with merit, Passed</text:p>
 		<text:p text:style-name="P22"/>
 		<text:p text:style-name="P22">
-		<draw:frame xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0" xmlns:xlink="http://www.w3.org/1999/xlink" draw:style-name="fr4" draw:name="graphics5" text:anchor-type="char" svg:x="4.50cm" svg:y="0.1cm" svg:width="3.5cm" svg:height="3.5cm" draw:z-index="16" >
-			<draw:image xlink:href="Pictures/rundstempel_fhtw_35mm.png" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/>
-		</draw:frame>
 		</text:p>
-		<text:p text:style-name="P22"/>
-		<text:p text:style-name="P22"/>
 		<text:p text:style-name="P22"/>
 		<text:p text:style-name="P22"/>
 		<table:table table:name="Table13" table:style-name="Table13">
@@ -2837,14 +2207,6 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 		<text:p text:style-name="P22"/>
 		<text:p text:style-name="P22"/>
 		<text:p text:style-name="P78">
-			<draw:frame xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0" xmlns:xlink="http://www.w3.org/1999/xlink" draw:style-name="fr6" draw:name="Bild1" text:anchor-type="paragraph" svg:y="8.82cm" svg:width="11.45cm" svg:height="12.61cm" draw:z-index="20">
-				<draw:image xlink:href="Pictures/bundesadler.jpg" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/>
-			</draw:frame>
-		</text:p>
-		<text:p text:style-name="P78">
-			<draw:frame xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0" xmlns:xlink="http://www.w3.org/1999/xlink" draw:style-name="fr7" draw:name="Bild5" text:anchor-type="paragraph" svg:y="8.82cm" svg:width="11.45cm" svg:height="12.61cm" draw:z-index="21">
-				<draw:image xlink:href="Pictures/bundesadler.jpg" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/>
-			</draw:frame>
 		</text:p>
 
 	</xsl:template>

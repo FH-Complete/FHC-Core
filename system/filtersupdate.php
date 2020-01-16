@@ -353,7 +353,7 @@ $filters = array(
 					{"name": "fakultaet"},
 					{"name": "datum"},
 					{"name": "uhrzeit"},
-					{"name": "anmeldefrist"},					
+					{"name": "anmeldefrist"},
 					{"name": "oeffentlich"},
 					{"name": "studiengaenge"},
 					{"name": "freie_plaetze"},
@@ -400,34 +400,6 @@ $filters = array(
 		'oe_kurzbz' => null,
 	),
 	array(
-		'app' => 'infocenter',
-		'dataset_name' => 'reihungstestAbsolviert',
-		'filter_kurzbz' => 'InfoCenterReihungstestAbsolviertAlle',
-		'description' => '{Alle}',
-		'sort' => 1,
-		'default_filter' => true,
-		'filter' => '
-			{
-				"name": "Reihungstest absolviert - Alle",
-				"columns": [
-					{"name": "Vorname"},
-					{"name": "Nachname"},
-					{"name": "StgAbgeschickt"},
-					{"name": "LastAction"},
-					{"name": "User/Operator"},
-					{"name": "LockUser"}
-				],
-				"filters": [
-					{
-						"name": "ReihungstestAngetreten",
-						"operation": "true"
-					}
-				]
-			}
-		',
-		'oe_kurzbz' => null,
-	),
-	array(
 		'app' => 'budget',
 		'dataset_name' => 'budgetoverview',
 		'filter_kurzbz' => 'BudgetUebersicht',
@@ -435,6 +407,205 @@ $filters = array(
 		'sort' => 1,
 		'default_filter' => true,
 		'filter' => '
+			{
+				"name": "Budgetanträge",
+				"columns": [
+					{"name": "Budgetantrag"},
+					{"name": "Kostenstelle"},
+					{"name": "Organisationseinheit"},
+					{"name": "Geschäftsjahr"},
+					{"name": "Budgetstatus"},
+					{"name": "Betrag"}
+				],
+				"filters": [
+					{
+						"name": "Budgetstatus",
+						"condition": "Freigegeben",
+						"operation": "ncontains"
+					},
+					{
+						"name": "Geschäftsjahr",
+						"condition": "GJ2019-2020",
+						"operation": "contains"
+					}
+				]
+			}
+		',
+		'oe_kurzbz' => null,
+	),
+	array(
+		'app' => 'core',
+		'dataset_name' => 'logs',
+		'filter_kurzbz' => 'last7days',
+		'description' => '{Last 7 days logs}',
+		'sort' => 1,
+		'default_filter' => true,
+		'filter' => '
+			{
+				"name": "All logs from the last 7 days",
+				"columns": [
+					{"name": "RequestId"},
+					{"name": "ExecutionTime"},
+					{"name": "ExecutedBy"},
+					{"name": "Description"},
+					{"name": "Data"}
+				],
+				"filters": [
+					{
+						"name": "ExecutionTime",
+						"operation": "lt",
+						"condition": "7",
+						"option": "days"
+					}
+				]
+			}
+		',
+		'oe_kurzbz' => null,
+	),
+	array(
+		'app' => 'core',
+		'dataset_name' => 'logs',
+		'filter_kurzbz' => 'jobs14days',
+		'description' => '{Last 14 days jobs logs}',
+		'sort' => 2,
+		'default_filter' => false,
+		'filter' => '
+			{
+				"name": "All jobs logs from the last 14 days",
+				"columns": [
+					{"name": "RequestId"},
+					{"name": "ExecutionTime"},
+					{"name": "ExecutedBy"},
+					{"name": "Description"},
+					{"name": "Data"}
+				],
+				"filters": [
+					{
+						"name": "WebserviceType",
+						"operation": "contains",
+						"condition": "job"
+					},
+					{
+						"name": "ExecutionTime",
+						"operation": "lt",
+						"condition": "14",
+						"option": "days"
+					}
+				]
+			}
+		',
+		'oe_kurzbz' => null,
+	),
+	array(
+		'app' => 'core',
+		'dataset_name' => 'logs',
+		'filter_kurzbz' => 'repots14days',
+		'description' => '{Last 14 days reports logs}',
+		'sort' => 3,
+		'default_filter' => false,
+		'filter' => '
+			{
+				"name": "All reports logs from the last 14 days",
+				"columns": [
+					{"name": "RequestId"},
+					{"name": "ExecutionTime"},
+					{"name": "ExecutedBy"},
+					{"name": "Description"},
+					{"name": "Data"}
+				],
+				"filters": [
+					{
+						"name": "WebserviceType",
+						"operation": "contains",
+						"condition": "reports"
+					},
+					{
+						"name": "ExecutionTime",
+						"operation": "lt",
+						"condition": "14",
+						"option": "days"
+					}
+				]
+			}
+		',
+		'oe_kurzbz' => null,
+	),
+	array(
+		'app' => 'core',
+		'dataset_name' => 'logs',
+		'filter_kurzbz' => 'content3days',
+		'description' => '{Last 3 days content logs}',
+		'sort' => 4,
+		'default_filter' => false,
+		'filter' => '
+			{
+				"name": "All content logs from the last 3 days",
+				"columns": [
+					{"name": "RequestId"},
+					{"name": "ExecutionTime"},
+					{"name": "ExecutedBy"},
+					{"name": "Description"},
+					{"name": "Data"}
+				],
+				"filters": [
+					{
+						"name": "WebserviceType",
+						"operation": "contains",
+						"condition": "content"
+					},
+					{
+						"name": "ExecutionTime",
+						"operation": "lt",
+						"condition": "3",
+						"option": "days"
+					}
+				]
+			}
+		',
+		'oe_kurzbz' => null,
+	),
+	array(
+		'app' => 'core',
+		'dataset_name' => 'logs',
+		'filter_kurzbz' => 'wienerlinien7days',
+		'description' => '{Last 7 days wiener linien logs}',
+		'sort' => 5,
+		'default_filter' => false,
+		'filter' => '
+			{
+				"name": "All wiener linien logs from the last 7 days",
+				"columns": [
+					{"name": "RequestId"},
+					{"name": "ExecutionTime"},
+					{"name": "ExecutedBy"},
+					{"name": "Description"},
+					{"name": "Data"}
+				],
+				"filters": [
+					{
+						"name": "WebserviceType",
+						"operation": "contains",
+						"condition": "wienerlinien"
+					},
+					{
+						"name": "ExecutionTime",
+						"operation": "lt",
+						"condition": "7",
+						"option": "days"
+					}
+				]
+			}
+		',
+		'oe_kurzbz' => null,
+	),
+	array(
+        'app' => 'budget',
+        'dataset_name' => 'budgetoverview',
+        'filter_kurzbz' => 'BudgetUebersicht',
+        'description' => '{Budgetanträge Übersicht}',
+        'sort' => 1,
+        'default_filter' => true,
+        'filter' => '
 			{
 				"name": "Budgetanträge",
 				"columns": [

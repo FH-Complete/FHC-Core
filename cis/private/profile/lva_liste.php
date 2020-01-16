@@ -247,7 +247,14 @@ require_once('../../../include/benutzerberechtigung.class.php');
 			echo '<td>'.$row->raumtypalternativ.'</td>';
 			echo '<td>'.$row->stundenblockung.'</td>';
 			echo '<td>'.$row->wochenrythmus.'</td>';
-			echo '<td>'.$row->semesterstunden.'</td>';
+			if(getSprache()=='German')
+			{
+				echo '<td>'.number_format($row->semesterstunden,2,$dec_point=",",$thousands_sep=".").'</td>';
+			}
+			else
+			{
+				echo '<td>'.number_format($row->semesterstunden,2,$dec_point=".",$thousands_sep=",").'</td>';
+			}
 			echo '<td>'.$row->start_kw.'</td>';
 
 			$lvangebot->getAllFromLvId($row->lehrveranstaltung_id, $row->studiensemester_kurzbz);
@@ -276,7 +283,7 @@ require_once('../../../include/benutzerberechtigung.class.php');
 
 		echo '<td>&nbsp;</td>';
 		echo '<td>&nbsp;</td>';
-
+		echo '<td>&nbsp;</td>';
 		echo '<td>&nbsp;</td>';
 		echo '<td>&nbsp;</td>';
 		echo '<td>&nbsp;</td>';
@@ -286,7 +293,14 @@ require_once('../../../include/benutzerberechtigung.class.php');
 		echo '<td>&nbsp;</td>';
 		echo '<td>&nbsp;</td>';
 		echo '<td align="right"><b>'.$p->t('lvaliste/summe').'</b></td>';
-		echo '<th class="header">'.number_format($summe_std,2).'</th>';
+		if(getSprache()=='German')
+		{
+			echo '<th>'.number_format($summe_std,2,$dec_point=",",$thousands_sep=".").'</th>';
+		}
+		else
+		{
+			echo '<th>'.number_format($summe_std,2,$dec_point=".",$thousands_sep=",").'</th>';
+		}
 		echo '<td>&nbsp;</td>';
 		echo '</tr>';
 		echo '</tfoot>';
@@ -304,19 +318,21 @@ require_once('../../../include/benutzerberechtigung.class.php');
 				tbl_lehrveranstaltung.bezeichnung, tbl_projektarbeit.titel,
 				(SELECT nachname || ' ' || vorname FROM public.tbl_benutzer JOIN public.tbl_person USING(person_id)
 				 WHERE uid=student_uid) as student, tbl_lehrveranstaltung.studiengang_kz, tbl_lehrveranstaltung.semester,
-				 tbl_studiengang.email
+				 tbl_studiengang.email, tbl_betreuerart.beschreibung AS beutreuerart_beschreibung, tbl_projektbetreuer.stunden
 			FROM
-				lehre.tbl_lehreinheit, lehre.tbl_lehrveranstaltung, lehre.tbl_projektarbeit, lehre.tbl_projektbetreuer, public.tbl_studiengang
+				lehre.tbl_lehreinheit, lehre.tbl_lehrveranstaltung, lehre.tbl_projektarbeit, lehre.tbl_projektbetreuer, public.tbl_studiengang, lehre.tbl_betreuerart
 			WHERE
 				tbl_lehreinheit.lehreinheit_id=tbl_projektarbeit.lehreinheit_id AND
 				tbl_lehreinheit.lehrveranstaltung_id=tbl_lehrveranstaltung.lehrveranstaltung_id AND
 				tbl_lehreinheit.studiensemester_kurzbz=".$db->db_add_param($stdsem)." AND
 				tbl_projektarbeit.projektarbeit_id=tbl_projektbetreuer.projektarbeit_id AND
 				tbl_lehrveranstaltung.studiengang_kz=tbl_studiengang.studiengang_kz AND
+				tbl_projektbetreuer.betreuerart_kurzbz=tbl_betreuerart.betreuerart_kurzbz AND
 				tbl_projektbetreuer.person_id=".$db->db_add_param($mitarbeiter->person_id, FHC_INTEGER);
 
 	$stg_obj = new studiengang();
 	$stg_obj->getAll(null,null);
+	$summe_std = 0;
 
 	if($result = $db->db_query($qry))
 	{
@@ -328,8 +344,10 @@ require_once('../../../include/benutzerberechtigung.class.php');
 			echo '<thead><tr>';
 			echo '<th>'.$p->t('lvaliste/studiengang').'</th>';
 			echo '<th>'.$p->t('lvaliste/semester').'</th>';
+			echo '<th>'.$p->t('lvaliste/stunden').'</th>';
 			echo '<th>'.$p->t('lvaliste/lvBezeichnung').'</th>';
 			echo '<th>'.$p->t('lvaliste/student').'</th>';
+			echo '<th>'.$p->t('lvaliste/betreuungsart').'</th>';
 			echo '<th>'.$p->t('lvaliste/titelProjektarbeit').'</th>';
 			echo '</tr></thead><tbody>';
 			while($row = $db->db_fetch_object($result))
@@ -337,12 +355,46 @@ require_once('../../../include/benutzerberechtigung.class.php');
 				echo '<tr>';
 				echo '<td><a href="mailto:'.$row->email.'">'.$stg_obj->kuerzel_arr[$row->studiengang_kz].'</a></td>';
 				echo '<td>'.$row->semester.'</td>';
+				if(getSprache()=='German')
+				{
+					echo '<td>'.number_format($row->stunden,2,$dec_point =",", $thousands_sep ="."). '</td>';
+				}
+				else
+				{
+					echo '<td>'.number_format($row->stunden,2,$dec_point =".", $thousands_sep =","). '</td>';
+				}
 				echo '<td>'.$row->bezeichnung.'</td>';
 				echo '<td>'.$row->student.'</td>';
+				echo '<td>'.$row->beutreuerart_beschreibung.'</td>';
 				echo '<td>'.$row->titel.'</td>';
 
-				echo '</tr>';
+				$summe_std+=$row->stunden;
 			}
+			echo '</tbody>';
+			echo '<tfoot>';
+			echo '<tr>';
+			if(!defined('CIS_LVALISTE_NOTENEINGABE_ANZEIGEN') || CIS_LVALISTE_NOTENEINGABE_ANZEIGEN)
+			{
+				echo '<td>&nbsp;</td>';
+			}
+			if($lvinfo)
+
+				echo '<td align="right"><b>'.$p->t('lvaliste/summe').'</b></td>';
+
+			if(getSprache()=='German')
+			{
+				echo '<th>'.number_format($summe_std,2,$dec_point=",",$thousands_sep=".").'</th>';
+			}
+			else
+			{
+				echo '<th>'.number_format($summe_std,2,$dec_point=".",$thousands_sep=",").'</th>';
+			}
+
+
+			echo '<td>&nbsp;</td>';
+
+			echo '</tr>';
+
 			echo '</tbody></table>';
 		}
 	}
@@ -423,6 +475,7 @@ require_once('../../../include/benutzerberechtigung.class.php');
 				echo '<tr>';
 					echo '<td><a href="mailto:'.$row->email.'">'.$stg_obj->kuerzel_arr[$row->studiengang_kz].'</a></td>';
 					echo '<td>'.$row->semester.'</td>';
+					echo '<td>'.$row->stunden.'</td>';
 					echo '<td>'.$row->fachbereich_kurzbz.'</td>';
 					echo '<td>'.$row->bezeichnung.'</td>';
 					echo '<td>'.$lektoren.'</td>';

@@ -20,6 +20,7 @@ $this->phrasen['testtool/reihungstestNichtFreigeschalten']='The entrance examina
 $this->phrasen['testtool/reihungstestKannNichtGeladenWerden']='The entrance examination assigned to you can not be loaded.';
 $this->phrasen['testtool/geburtsdatumStimmtNichtUeberein']='Your date of birth does not correspond to the data we have. Please speak to the supervisor. ';
 $this->phrasen['testtool/home']='Home';
+$this->phrasen['testtool/teilnehmerIn']='Participant';
 $this->phrasen['testtool/klickenSieAufEinTeilgebiet']='Select a topic on the left side.<br>';
 $this->phrasen['testtool/gebietStarten']='Start section';
 $this->phrasen['testtool/startseite']='Startpage';

@@ -123,7 +123,7 @@ class Prestudentstatus_model extends DB_Model
 
 		if ($lastStatus->error)
 		{
-			return error($lastStatus->retval);
+			return $lastStatus;
 		}
 
 		if (count($lastStatus->retval) > 0)
@@ -158,7 +158,7 @@ class Prestudentstatus_model extends DB_Model
 
 		if ($lastStatus->error)
 		{
-			return error($lastStatus->retval);
+			return $lastStatus;
 		}
 
 		if (count($lastStatus->retval) > 0)

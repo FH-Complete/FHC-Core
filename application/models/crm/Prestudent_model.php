@@ -10,6 +10,8 @@ class Prestudent_model extends DB_Model
 		parent::__construct();
 		$this->dbTable = 'public.tbl_prestudent';
 		$this->pk = 'prestudent_id';
+
+		$this->load->model('crm/prestudentstatus_model', 'PrestudentstatusModel');
 	}
 
 	/**
@@ -208,12 +210,11 @@ class Prestudent_model extends DB_Model
 			return error('prestudent could not be loaded');
 
 		//Prestudentstatus
-		$this->load->model('crm/prestudentstatus_model', 'PrestudentstatusModel');
 		$lastStatus = $this->PrestudentstatusModel->getLastStatus($prestudent_id);
 
 		if ($lastStatus->error)
 		{
-			return error($lastStatus->retval);
+			return $lastStatus;
 		}
 
 		if (count($lastStatus->retval) > 0)
@@ -221,7 +222,7 @@ class Prestudent_model extends DB_Model
 			//get Studiengangname from Studienplan and -ordnung
 			$studienordnung = $this->PrestudentstatusModel->getStudienordnungFromPrestudent($prestudent_id);
 			if ($studienordnung->error)
-				return error($studienordnung->retval);
+				return $studienordnung;
 
 			if (count($studienordnung->retval) > 0)
 			{
@@ -238,7 +239,7 @@ class Prestudent_model extends DB_Model
 			$language = $this->SpracheModel->load($lastStatus->retval[0]->sprache);
 
 			if ($language->error)
-				return error($language->retval);
+				return $language;
 
 			if (count($language->retval) > 0)
 				$lastStatus->retval[0]->sprachedetails = $language->retval[0];
@@ -256,7 +257,7 @@ class Prestudent_model extends DB_Model
 				)
 			);
 			if ($bewerbungstermin->error)
-				return error($bewerbungstermin->retval);
+				return $bewerbungstermin;
 
 			if (count($bewerbungstermin->retval) > 0)
 			{
@@ -309,8 +310,6 @@ class Prestudent_model extends DB_Model
 
 		if (!hasData($prestudents))
 			return $bewerbungen;
-
-		$this->load->model('crm/prestudentstatus_model', 'PrestudentstatusModel');
 
 		foreach ($prestudents->retval as $prestudent)
 		{
@@ -424,7 +423,6 @@ class Prestudent_model extends DB_Model
 		if (!hasData($prestudent))
 			return false;
 
-		$this->load->model('prestudentstatus_model', 'PrestudentstatusModel');
 		$lastStatus = $this->PrestudentstatusModel->getLastStatus($prestudent_id, null, 'Interessent');
 
 		if (!hasData($lastStatus))

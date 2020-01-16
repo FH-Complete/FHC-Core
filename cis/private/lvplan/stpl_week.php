@@ -362,13 +362,13 @@ if (isset($reservtodelete))
 
 		$reservierung = new reservierung();
 		$reservdelcount = 0;
-		$reservberechtigt = $rechte->isBerechtigt('lehre/reservierung', null, 'suid');
+		$reservberechtigt = $rechte->isBerechtigt('lehre/reservierung:begrenzt', null, 'suid');
 
 		foreach ($reservtodelete as $delete_id)
 		{
 			if ($reservierung->load($delete_id))
 			{
-				if ($reservberechtigt || $reservierung->uid==$uid || $reservierung->insertvon==$uid)
+				if ($reservberechtigt && ($reservierung->insertvon==$uid || $reservierung->uid==$uid))
 				{
 					if($reservierung->delete($delete_id))
 						$reservdelcount++;

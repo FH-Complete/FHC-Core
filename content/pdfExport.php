@@ -305,6 +305,12 @@ else
 	else
 		$output = 'pdf';
 
+	// An der FHTW darf fas Studienblatt auch iin anderen Formaten exportiert werden
+	if (CAMPUS_NAME == 'FH Technikum Wien' && ($xsl == 'Studienblatt' || $xsl == 'StudienblattEng'))
+	{
+		$output = $_GET['output'];
+	}
+
 	$vorlage = new vorlage();
 	if(!$vorlage->loadVorlage($xsl))
 		die('Vorlage wurde nicht gefunden');
@@ -502,7 +508,7 @@ else
 				}
 				else
 				{
-					die('Student hat keinen Status in diesem Semester');
+					die('StudentIn hat keinen Status in diesem Semester');
 				}
 			}
 		}

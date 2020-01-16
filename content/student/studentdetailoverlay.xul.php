@@ -190,7 +190,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 
 			<vbox flex="1" >
 				<groupbox id="student-detail-groupbox-student">
-				<caption label="Student" />
+				<caption label="StudentIn" />
 				<grid id="student-detail-grid-student" style="margin:4px;">
 						<columns >
 							<column flex="1"/>
@@ -362,7 +362,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 
 			</groupbox>
 			<groupbox id="student-detail-groupbox-prestudent">
-		<caption label="Prestudent" />
+		<caption label="PrestudentIn" />
 		<grid id="student-prestudent-grid-prestudent" style="margin:4px;" flex="1">
 					<columns>
 						<column flex="1"/>
@@ -486,7 +486,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 							</hbox>
 						</row>
 						<row id="student-prestudent-row-mentor">
-						<label value="Mentor" control="student-prestudent-textbox-mentor"/>
+						<label value="MentorIn" control="student-prestudent-textbox-mentor"/>
 						<hbox><textbox id="student-prestudent-textbox-mentor" disabled="true" size="40" maxlength="256"/></hbox>
 						</row>
 					</rows>
@@ -515,6 +515,10 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 								sort="rdf:http://www.technikum-wien.at/prestudentrolle/rdf#ausbildungssemester"
 								sorthints="integer"/>
 							<splitter class="tree-splitter"/>
+							<treecol id="student-prestudent-tree-rolle-lehrverband" label="Lehrverband" flex="1" hidden="false" persist="hidden, width, ordinal"
+									 class="sortDirectionIndicator"
+									 sort="rdf:http://www.technikum-wien.at/prestudentrolle/rdf#lehrverband" />
+							<splitter class="tree-splitter"/>
 							<treecol id="student-prestudent-tree-rolle-datum" label="Datum" flex="2" hidden="false" persist="hidden, width, ordinal"
 								class="sortDirectionIndicator"
 								sort="rdf:http://www.technikum-wien.at/prestudentrolle/rdf#datum" />
@@ -523,7 +527,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 								class="sortDirectionIndicator"
 								sort="rdf:http://www.technikum-wien.at/prestudentrolle/rdf#orgform_kurzbz" />
 							<splitter class="tree-splitter"/>
-							<treecol id="student-prestudent-tree-rolle-prestudent_id" label="PrestudentID" flex="2" hidden="true" persist="hidden, width, ordinal"
+							<treecol id="student-prestudent-tree-rolle-prestudent_id" label="PrestudentInID" flex="2" hidden="true" persist="hidden, width, ordinal"
 								class="sortDirectionIndicator"
 								sort="rdf:http://www.technikum-wien.at/prestudentrolle/rdf#prestudent_id" />
 							<splitter class="tree-splitter"/>
@@ -565,6 +569,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 											<treecell label="rdf:http://www.technikum-wien.at/prestudentrolle/rdf#status_kurzbz"/>
 											<treecell label="rdf:http://www.technikum-wien.at/prestudentrolle/rdf#studiensemester_kurzbz"/>
 											<treecell label="rdf:http://www.technikum-wien.at/prestudentrolle/rdf#ausbildungssemester"/>
+											<treecell label="rdf:http://www.technikum-wien.at/prestudentrolle/rdf#lehrverband"/>
 											<treecell label="rdf:http://www.technikum-wien.at/prestudentrolle/rdf#datum"/>
 											<treecell label="rdf:http://www.technikum-wien.at/prestudentrolle/rdf#orgform_kurzbz"/>
 											<treecell label="rdf:http://www.technikum-wien.at/prestudentrolle/rdf#prestudent_id"/>

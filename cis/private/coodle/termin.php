@@ -76,11 +76,12 @@ if(isset($_POST['action']) && $_POST['action']=='start')
 	// Start der Umfrage
 	$coodle_termine = new coodle();
 	$coodle_termine->getTermine($coodle_id);
-	if(count($coodle_termine->result)>0)
+	// Die Terminoption "keine Auswahl wird immer benötigt. Deshalb > 1
+	if(count($coodle_termine->result) > 1)
 	{
 		$coodle_ressource = new coodle();
 		$coodle_ressource->getRessourcen($coodle_id);
-		if(count($coodle_ressource->result)>0)
+		if(count($coodle_ressource->result) > 0)
 		{
 			// Status aendern
 			$coodle->coodle_status_kurzbz='laufend';
@@ -135,16 +136,18 @@ if(isset($_POST['action']) && $_POST['action']=='start')
 					Bitte folgen Sie dem Link, um Ihre Terminwünsche bekannt zu geben:
 					<a href="'.$link.'">Link zur Terminumfrage</a>
 					<br><br>
+					'.($coodle->beschreibung != '' ? '
 					Beschreibung:<br><br>
-					'.$coodle->beschreibung.'<br><br>
+					'.$coodle->beschreibung.'<br><br>' : '').'
 					'.nl2br($sign);
 
 				$text=$anrede."!\n\nSie wurden zu einer Terminumfrage zum Thema \"".$db->convert_html_chars($coodle->titel)."\" eingeladen.\n
 					Bitte folgen Sie dem Link, um Ihre Terminwünsche bekannt zu geben:\n
 					$link\n\n
+					".($coodle->beschreibung != "" ? "
 					Beschreibung:\n\n
 					".strip_tags($coodle->beschreibung)."
-					\n\n
+					\n\n" : "")."
 					$sign";
 
 				$mail = new mail($email, $von,'Terminumfrage - '.$coodle->titel, $text);
@@ -317,7 +320,6 @@ echo '<html>
 
 </style>
 <script type="text/javascript">
-
 	$(document).ready(function()
 	{
 		// Coodle Termin initialisieren
@@ -341,7 +343,6 @@ echo '<html>
 				scroll: false		// behebt ruckeln im IE7
 			});
 		});
-
 
 		// Kalender Initialisieren
 		$("#calendar").fullCalendar(
@@ -567,6 +568,35 @@ echo '<html>
 					$("#calendar").fullCalendar("gotoDate", date);
 				}
 			}
+		});
+				
+		$("#umfrageStartenSubmitButton").click(function(e) 
+		{
+			e.preventDefault(); // avoid to execute the actual submit of the form.
+		
+			var form = $(this).parents("form:first");
+			formdata = form.serialize();
+			formdata += (formdata!=="")? "&work=countTermine&coodle_id='.$coodle_id.'":"";
+			$.ajax({
+				type: "POST",
+				url:"coodle_worker.php",
+				data: formdata,
+				success: function(data)
+				{
+					if (parseInt(data) > 1)
+					{
+						form.submit();
+					}
+					else
+					{
+						alert("Bitte ziehen Sie mindestens einen Termin in den Kalender");
+					}
+				},
+				error: function(data) 
+				{
+					alert("Error: "+data);
+				}
+			 });
 		});
 	});
 
@@ -847,7 +877,8 @@ echo '
 	}
 	</script>
 	<p>
-	'.$p->t('coodle/ressourcenBeschreibung').'
+	'.$p->t('coodle/ressourcenBeschreibung');
+	echo '
 	<br><br><a href="#" onclick="showExterne(); return false;">'.$p->t('coodle/externePersonhinzu').'</a>
 	</div> <!-- RessourcenInput -->
 	<div id="externePersonen" style="display: none">
@@ -864,10 +895,10 @@ echo '
 	</div>
 	<div id="fertig">
 		<h4>'.$p->t('coodle/umfrageStarten').'</h4>
-		<form action="'.$_SERVER['PHP_SELF'].'" method="POST">
+		<form id="umfrageStartenForm" action="'.$_SERVER['PHP_SELF'].'" method="POST">
 		<input type="hidden" name="action" value="start" />
 		<input type="hidden" name="coodle_id" value="'.$db->convert_html_chars($coodle_id).'" />
-		<input type="submit" value="'.$p->t('coodle/umfrageStarten').'" />
+		<input id="umfrageStartenSubmitButton" type="submit" value="'.$p->t('coodle/umfrageStarten').'"/>
 		</form>
 		<p>
 			'.$p->t('coodle/startBeschreibung').'

@@ -43,7 +43,7 @@ $this->phrasen['coodle/keineOderMehrereRäume']='No room or multiple rooms have 
 $this->phrasen['coodle/terminauswahl']='Coodle appointment selection'; 
 $this->phrasen['coodle/erstelltVon']='Created from %s (%s days ago)'; 
 $this->phrasen['coodle/einladungNeuVerschicken']='Send invitations again'; 
-$this->phrasen['coodle/umfrageAbgeschlossen']='The poll is closed. The date has been scheduled on %s'; 
+$this->phrasen['coodle/umfrageAbgeschlossen']='The poll is closed. The date has been scheduled on <b>%s</b>';
 $this->phrasen['coodle/loeschen']='Cancel poll'; 
 $this->phrasen['coodle/zurUmfrage']='To the poll'; 
 $this->phrasen['coodle/ressource']='Ressource';
@@ -64,4 +64,5 @@ $this->phrasen['coodle/dauerInfotext']='Wählen Sie hier die vermutliche Dauer d
 $this->phrasen['coodle/endeInfotext']='?';
 $this->phrasen['coodle/TerminInDerVergangenheit']='Dieser Termin liegt in der Vergangenheit und kann nicht gewählt werden';
 $this->phrasen['coodle/keinTerminMoeglich']='Kein Termin möglich';
+$this->phrasen['coodle/zurueckZurUmfrage']='Back to poll';
 ?>

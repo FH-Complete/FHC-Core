@@ -56,7 +56,7 @@ $oRdf = new rdf('VER','http://www.technikum-wien.at/vertragdetails');
 $oRdf->sendHeader();
 
 foreach($vertrag->result as $row)
-{	
+{
 	switch($row->type)
 	{
 		case 'Lehrauftrag':
@@ -81,7 +81,11 @@ foreach($vertrag->result as $row)
 	$oRdf->obj[$i]->setAttribut('projektarbeit_id',$row->projektarbeit_id,true);
 	$oRdf->obj[$i]->setAttribut('betreuerart_kurzbz',$row->betreuerart_kurzbz,true);
 	$oRdf->obj[$i]->setAttribut('bezeichnung',$row->bezeichnung,true);
-	
+	if(isset($row->vertragsstunden) && !empty($row->vertragsstunden))
+		$oRdf->obj[$i]->setAttribut('vertragsstunden', $row->vertragsstunden, true);
+	if(isset($row->vertragsstunden_studiensemester_kurzbz) && !empty($row->vertragsstunden_studiensemester_kurzbz))
+		$oRdf->obj[$i]->setAttribut('vertragsstunden_studiensemester_kurzbz', $row->vertragsstunden_studiensemester_kurzbz, true);
+
 	$oRdf->addSequence($key);
 }
 

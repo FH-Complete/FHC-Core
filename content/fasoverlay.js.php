@@ -103,24 +103,24 @@ var LektorTreeListener =
 function LektorTreeSelectMitarbeiter()
 {
 	var tree=document.getElementById('tree-lektor');
-	var items = tree.view.rowCount; //Anzahl der Zeilen ermitteln
-	if(LektorTreeOpenStudiengang!=null)
+	if (tree.view != null)
 	{
-	   	for(var i=0;i<items;i++)
-	   	{
-	   		//Lehreinheit_id der row holen
-			col = tree.columns ? tree.columns["studiengang_kz"] : "studiengang_kz";
-			var studiengang_kz=tree.view.getCellText(i,col);
-			if(studiengang_kz == LektorTreeOpenStudiengang)
-			{
-				tree.view.toggleOpenState(i);
-				break;
+		var items = tree.view.rowCount; //Anzahl der Zeilen ermitteln
+		if (LektorTreeOpenStudiengang != null) {
+			for (var i = 0; i < items; i++) {
+				//Lehreinheit_id der row holen
+				col = tree.columns ? tree.columns["studiengang_kz"] : "studiengang_kz";
+				var studiengang_kz = tree.view.getCellText(i, col);
+				if (studiengang_kz == LektorTreeOpenStudiengang) {
+					tree.view.toggleOpenState(i);
+					break;
+				}
 			}
-	   	}
-	   	//nach dem laden der daten wieder ganz oben im tree positionieren da es sonst vorkommt, dass
-	   	//der scrollbalken unterhalb aller eintraege rutscht und dann nichts mehr im tree sichtbar ist.
-	   	//(funktioniert anscheinend auch nur mit setTimeout)
-	   	window.setTimeout("document.getElementById('tree-lektor').treeBoxObject.scrollToRow(0)",10);
+			//nach dem laden der daten wieder ganz oben im tree positionieren da es sonst vorkommt, dass
+			//der scrollbalken unterhalb aller eintraege rutscht und dann nichts mehr im tree sichtbar ist.
+			//(funktioniert anscheinend auch nur mit setTimeout)
+			window.setTimeout("document.getElementById('tree-lektor').treeBoxObject.scrollToRow(0)", 10);
+		}
 	}
 }
 
@@ -147,7 +147,7 @@ function LektorFunktionDel()
 		idx = tree.currentIndex;
 	else
 	{
-		alert('Bitte zuerst einen Mitarbeiter markieren');
+		alert('Bitte zuerst eine/n MitarbeiterIn markieren');
 		return false;
 	}
 
@@ -223,7 +223,7 @@ function LektorFunktionMail()
   		}
 	}
 	if(anzfault!=0)
-		alert(anzfault+' Mitarbeiter konnten nicht hinzugefuegt werden weil keine UID eingetragen ist!');
+		alert(anzfault+' MitarbeiterInnen konnten nicht hinzugefuegt werden weil keine UID eingetragen ist!');
 	if(mailempfaenger!='')
 		window.location.href=mailempfaenger;
 }
@@ -500,6 +500,56 @@ function onVerbandSelect(event)
 		{
 			debug(e);
 		}
+	}
+}
+
+// ****
+// * Wenn im Suchfeld Enter gedrueckt wird, dann die Suchfunktion starten
+// ****
+function LehrveranstaltungSearchFieldKeyPress(event)
+{
+	if(event.keyCode==13) //Enter
+		LehrveranstaltungSuche();
+}
+
+function LehrveranstaltungSuche()
+{
+	var filter = document.getElementById("lehrveranstaltung-toolbar-textbox-suche").value;
+	// Lehrveranstaltung
+	document.getElementById('statusbar-progressmeter').setAttribute('mode','undetermined');
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+	try
+	{
+		url = '<?php echo APP_ROOT; ?>rdf/lehrveranstaltung_einheiten.rdf.php?filter='+encodeURIComponent(filter)+'&'+gettimestamp();
+		var treeLV=document.getElementById('lehrveranstaltung-tree');
+
+		try
+		{
+			LvTreeDatasource.removeXMLSinkObserver(LvTreeSinkObserver);
+			treeLV.builder.removeListener(LvTreeListener);
+		}
+		catch(e)
+		{}
+
+		//Alte DS entfernen
+		var oldDatasources = treeLV.database.GetDataSources();
+		while(oldDatasources.hasMoreElements())
+		{
+			treeLV.database.RemoveDataSource(oldDatasources.getNext());
+		}
+
+		var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
+		LvTreeDatasource = rdfService.GetDataSource(url);
+		LvTreeDatasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
+		LvTreeDatasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
+		treeLV.database.AddDataSource(LvTreeDatasource);
+		LvTreeDatasource.addXMLSinkObserver(LvTreeSinkObserver);
+		treeLV.builder.addListener(LvTreeListener);
+		document.getElementById('lehrveranstaltung-toolbar-lehrauftrag').hidden=true;
+	}
+	catch(e)
+	{
+		debug(e);
 	}
 }
 
@@ -841,7 +891,7 @@ function StatistikPrintLVPlanung()
 
 		if(tree.currentIndex==-1)
 		{
-			alert('Bitte zuerst einen Mitarbeiter auswaehlen');
+			alert('Bitte zuerst eine/n MitarbeiterIn auswaehlen');
 			return;
 		}
 
@@ -855,7 +905,7 @@ function StatistikPrintLVPlanung()
 	if(typeof(url)!='undefined')
 		window.open(url,'LV-Planung');
 	else
-		alert('Bitte waehlen sie ein(en) Verband, Institut oder Lektor aus');
+		alert('Bitte waehlen sie ein(e/en) Verband, Institut oder LektorIn aus');
 }
 
 // ****
@@ -906,7 +956,7 @@ function StatistikPrintLVPlanungExcel()
 
 		if(tree.currentIndex==-1)
 		{
-			alert('Bitte zuerst einen Mitarbeiter auswaehlen');
+			alert('Bitte zuerst eine/n MitarbeiterIn auswaehlen');
 			return;
 		}
 
@@ -920,7 +970,7 @@ function StatistikPrintLVPlanungExcel()
 	if(typeof(url)!='undefined')
 		window.open(url,'LV-Planung');
 	else
-		alert('Bitte waehlen sie ein(en) Verband, Institut oder Lektor aus');
+		alert('Bitte waehlen sie einen Verband, Institut oder LektorIn aus');
 }
 
 // ****
@@ -1077,24 +1127,24 @@ function StatistikPrintNotenspiegelErweitert(typ)
 	window.open('<?php echo APP_ROOT ?>content/statistik/notenspiegel_erweitert.php?studiengang_kz='+studiengang_kz+'&semester='+semester+'&typ='+typ+'&orgform='+orgform,'Notenspiegel');
 }
 
-function StatistikPrintNotenspiegelStudent()
+function StatistikPrintStudienverlaufStudent()
 {
 	var tree = document.getElementById('student-tree');
 	var data='';
 	//Wenn nichts markiert wurde -> alle exportieren
 	if(tree.currentIndex==-1)
 	{
-		alert("Bitte zuerst einen Studenten markieren");
+		alert("Bitte zuerst eine/n Studierende/n markieren");
 		return;
 	}
 
 	var student_uid = getTreeCellText(tree, 'student-treecol-uid', tree.currentIndex);
 	if (student_uid == '')
 	{
-		alert('Markierte Person ist kein Student');
+		alert('Markierte Person ist kein/e StudentIn');
 		return;
 	}
-	window.open('<?php echo APP_ROOT ?>index.ci.php/person/gradelist/index/'+student_uid,'Notenspiegel');
+	window.open('<?php echo APP_ROOT ?>index.ci.php/person/gradelist/index/'+student_uid,'Studienverlauf');
 }
 
 // ****
@@ -1523,7 +1573,7 @@ function OpenAboutDialog()
 // ****
 function OpenManual()
 {
-	window.open('http://fhcomplete.technikum-wien.at/dokuwiki/doku.php?','_blank');
+	window.open('https://wiki.fhcomplete.org/doku.php?','_blank');
 }
 
 // ****
@@ -1843,7 +1893,7 @@ function PrintStudienblatt(event)
 	}
 	catch(e)
 	{
-		check = confirm('Achtung: Beim letzten (aktuellen) PreStudent-Status ist KEIN STUDIENPLAN eingetragen.\nDas Studienblatt ist moeglicherweise unvollstaendig.\nMoechten Sie es dennoch erstellen?');
+		check = confirm('Achtung: Beim letzten (aktuellen) PreStudentInnen-Status ist KEIN STUDIENPLAN eingetragen.\nDas Studienblatt ist moeglicherweise unvollstaendig.\nMoechten Sie es dennoch erstellen?');
 		if (check == false)
 			return false;
 	}
@@ -1856,7 +1906,7 @@ function PrintStudienblatt(event)
 
 	if(studienplan_id=='')
 	{
-		check = confirm('Achtung: Beim letzten (aktuellen) PreStudent-Status ist KEIN STUDIENPLAN eingetragen.\nDas Studienblatt ist moeglicherweise unvollstaendig.\nMoechten Sie es dennoch erstellen?');
+		check = confirm('Achtung: Beim letzten (aktuellen) PreStudentInnen-Status ist KEIN STUDIENPLAN eingetragen.\nDas Studienblatt ist moeglicherweise unvollstaendig.\nMoechten Sie es dennoch erstellen?');
 		if (check == false)
 			return false;
 	}
@@ -1919,7 +1969,7 @@ function PrintStudienblatt(event)
 	}
 	else
 	{
-		alert('Bitte zuerst einen Studenten auswaehlen');
+		alert('Bitte zuerst eine/n Studierende/n auswaehlen');
 	}
 }
 
@@ -1951,7 +2001,7 @@ function PrintStudienblattEnglisch(event)
 	}
 	catch(e)
 	{
-		check = confirm('Achtung: Beim letzten (aktuellen) PreStudent-Status ist KEIN STUDIENPLAN eingetragen.\nDas Studienblatt ist moeglicherweise unvollstaendig.\nMoechten Sie es dennoch erstellen?');
+		check = confirm('Achtung: Beim letzten (aktuellen) PreStudentInnen-Status ist KEIN STUDIENPLAN eingetragen.\nDas Studienblatt ist moeglicherweise unvollstaendig.\nMoechten Sie es dennoch erstellen?');
 		if (check == false)
 			return false;
 	}
@@ -1965,7 +2015,7 @@ function PrintStudienblattEnglisch(event)
 
 	if(studienplan_id=='')
 	{
-		check = confirm('Achtung: Beim letzten (aktuellen) PreStudent-Status ist KEIN STUDIENPLAN eingetragen.\nDas Studienblatt ist moeglicherweise unvollstaendig.\nMoechten Sie es dennoch erstellen?');
+		check = confirm('Achtung: Beim letzten (aktuellen) PreStudentInnen-Status ist KEIN STUDIENPLAN eingetragen.\nDas Studienblatt ist moeglicherweise unvollstaendig.\nMoechten Sie es dennoch erstellen?');
 		if (check == false)
 			return false;
 	}
@@ -2028,7 +2078,7 @@ function PrintStudienblattEnglisch(event)
 	}
 	else
 	{
-		alert('Bitte zuerst einen Studenten auswaehlen');
+		alert('Bitte zuerst eine/n Studierende/n auswaehlen');
 	}
 }
 

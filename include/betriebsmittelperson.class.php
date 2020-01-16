@@ -535,6 +535,7 @@ class betriebsmittelperson extends basis_db
 			OR tbl_betriebsmittel.nummer2='.$this->db_add_param('0000'.$nummer).'
 			OR tbl_betriebsmittel.nummer2='.$this->db_add_param('00000'.$nummer).'
 			)
+			AND tbl_betriebsmittel.betriebsmitteltyp=\'Zutrittskarte\'
 			AND (ausgegebenam<=now() OR ausgegebenam is NULL)
 			AND (retouram>=now() OR retouram is NULL)';
 
@@ -595,6 +596,7 @@ class betriebsmittelperson extends basis_db
 				wawi.tbl_betriebsmittel
 				JOIN wawi.tbl_betriebsmittelperson USING(betriebsmittel_id)
 			WHERE tbl_betriebsmittel.nummer='.$this->db_add_param($nummer).'
+			AND tbl_betriebsmittel.betriebsmitteltyp=\'Zutrittskarte\'
 			AND tbl_betriebsmittelperson.person_id='.$this->db_add_param($person_id);
 
 		if($this->db_query($qry))

@@ -690,6 +690,7 @@ if (($anzahl !== 0) || ($stg_kz == '-1') && ($stg_kz !== ''))
 	echo " <a href='$PHP_SELF?gebiet_id=$gebiet_id&amp;stg_kz=$stg_kz&amp;nummer=$nummer&amp;type=gebietpruefen' class='Item'>Prüfen</a> | ";
 	echo " <a href='edit_gebiet.php?gebiet_id=$gebiet_id&amp;stg_kz=$stg_kz' class='Item'>Bearbeiten</a> |";
 	echo " <a href='add_gebiet.php?stg_kz=".$stg_kz."'>Neues Gebiet</a> | ";
+	echo " <a href='copy_gebiet.php?stg_kz=".$stg_kz."&amp;gebietToCopy=".$gebiet_id."'>Gebiet kopieren</a>";
 	//echo " <a href='export.php?gebiet_id=$gebiet_id&amp;stg_kz=$stg_kz' target='_blank'>PDF exportieren</a>";
 	//echo " <br/>Gebiet_id=".$gebiet_id."";
 	echo '</td><td align="right">';
@@ -965,7 +966,7 @@ if ($frage_id != '')
 	echo "<input type='button' value='3' onclick='document.getElementById(\"nummer\").value=\"3\";' />";
 	echo "<input type='button' value='4' onclick='document.getElementById(\"nummer\").value=\"4\";' /></td></tr>";
 	echo '<tr>';
-	echo "<td>Punkte:</td><td><input type='text' size='8' id='punkte' name='punkte' value='$vorschlag->punkte' />";
+	echo "<td>Punkte:</td><td><input type='text' size='8' id='punkte' name='punkte' value='$vorschlag->punkte' onchange='this.value = this.value.replace(/,/g, \".\")'/>";
 	echo "<input type='button' style='background-color:#FFBFBF' value='-1/2' onclick='document.getElementById(\"punkte\").value=\"-0.5\";' />";
 	echo "<input type='button' style='background-color:#FFBFBF' value='-1/3' onclick='document.getElementById(\"punkte\").value=\"-0.3333\";' />";
 	echo "<input type='button' value='-1' style='background-color:#FFBFBF' onclick='document.getElementById(\"punkte\").value=\"-1\";' />";

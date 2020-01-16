@@ -10,110 +10,112 @@ const STGFREIGABE_MESSAGE_VORLAGE = "InfocenterSTGfreigegeben";
 //Statusgründe for which no Studiengang Freigabe Message should be sent
 const FIT_PROGRAMM_STUDIENGAENGE = [10021, 10027];
 
+const PARKEDNAME = 'parked';
+const ONHOLDNAME = 'onhold';
+
 /**
  * javascript file for infocenterDetails page
  */
 $(document).ready(function ()
 {
-		//initialise table sorter
-		Tablesort.addTablesorter("doctable", [[2, 1], [1, 0]], ["zebra"]);
-		Tablesort.addTablesorter("nachgdoctable", [[2, 0], [1, 1]], ["zebra"]);
+	//initialise table sorter
+	Tablesort.addTablesorter("doctable", [[2, 1], [1, 0]], ["zebra"]);
+	Tablesort.addTablesorter("nachgdoctable", [[2, 0], [1, 1]], ["zebra"]);
 
-		InfocenterDetails._formatMessageTable();
-		InfocenterDetails._formatNotizTable();
-		InfocenterDetails._formatLogTable();
+	InfocenterDetails._formatMessageTable();
+	InfocenterDetails._formatNotizTable();
+	InfocenterDetails._formatLogTable();
 
-		var personid = $("#hiddenpersonid").val();
+	var personid = $("#hiddenpersonid").val();
 
-		//add submit event to message send link
-		$("#sendmsglink").click(function ()
-		{
-			$("#sendmsgform").submit();
-		});
-
-		//add click events to "formal geprüft" checkboxes
-		$(".prchbox").click(function ()
-		{
-			var boxid = this.id;
-			var akteid = boxid.substr(boxid.indexOf("_") + 1);
-			var checked = this.checked;
-			InfocenterDetails.saveFormalGeprueft(personid, akteid, checked)
-		});
-
-		//add click events to zgv Prüfung section
-		InfocenterDetails._addZgvPruefungEvents(personid);
-
-		MessageList.initMessageList();
-
-		//save notiz
-		$("#notizform").on("submit", function (e)
-			{
-				e.preventDefault();
-				var notizid = $("#notizform :input[name='hiddenNotizId']").val();
-				var formdata = $(this).serializeArray();
-				var data = {};
-
-				data.person_id = personid;
-
-				for (var i = 0; i < formdata.length; i++)
-				{
-					data[formdata[i].name] = formdata[i].value;
-				}
-
-				$("#notizmsg").empty();
-
-				if (notizid !== '')
-				{
-					InfocenterDetails.updateNotiz(notizid, data);
-				}
-				else
-				{
-					InfocenterDetails.saveNotiz(personid, data);
-				}
-			}
-		);
-
-		//update notiz - autofill notizform
-		$(document).on("click", "#notiztable tbody tr", function ()
-			{
-				$("#notizmsg").empty();
-
-				var notizid = $(this).find("td.hiddennotizid").html();
-
-				InfocenterDetails.getNotiz(notizid);
-			}
-		);
-
-		//update notiz - abbrechen-button: reset styles
-		$("#notizform :input[type='reset']").click(function ()
-			{
-				InfocenterDetails._resetNotizFields();
-			}
-		);
-
-		//check if person is parked and display it
-		InfocenterDetails.getParkedDate(personid);
-
-		if ($(document).scrollTop() > 20)
-			$("#scrollToTop").show();
-
-		//scroll to top button
-		$(window).scroll(function()
-			{
-				if ($(document).scrollTop() > 20)
-					$("#scrollToTop").show();
-				else
-					$("#scrollToTop").hide();
-			}
-		);
-
-		$("#scrollToTop").click(function()
-			{
-				$('html,body').animate({scrollTop:0},250,'linear');
-			}
-		)
-
+	//add submit event to message send link
+	$("#sendmsglink").click(function ()
+	{
+		$("#sendmsgform").submit();
 	});
+
+	//add click events to "formal geprüft" checkboxes
+	$(".prchbox").click(function ()
+	{
+		var boxid = this.id;
+		var akteid = boxid.substr(boxid.indexOf("_") + 1);
+		var checked = this.checked;
+		InfocenterDetails.saveFormalGeprueft(personid, akteid, checked)
+	});
+
+	//add click events to zgv Prüfung section
+	InfocenterDetails._addZgvPruefungEvents(personid);
+
+	MessageList.initMessageList();
+
+	//save notiz
+	$("#notizform").on("submit", function (e)
+		{
+			e.preventDefault();
+			var notizid = $("#notizform :input[name='hiddenNotizId']").val();
+			var formdata = $(this).serializeArray();
+			var data = {};
+
+			data.person_id = personid;
+
+			for (var i = 0; i < formdata.length; i++)
+			{
+				data[formdata[i].name] = formdata[i].value;
+			}
+
+			$("#notizmsg").empty();
+
+			if (notizid !== '')
+			{
+				InfocenterDetails.updateNotiz(notizid, data);
+			}
+			else
+			{
+				InfocenterDetails.saveNotiz(personid, data);
+			}
+		}
+	);
+
+	//update notiz - autofill notizform
+	$(document).on("click", "#notiztable tbody tr", function ()
+		{
+			$("#notizmsg").empty();
+
+			var notizid = $(this).find("td.hiddennotizid").html();
+
+			InfocenterDetails.getNotiz(notizid);
+		}
+	);
+
+	//update notiz - abbrechen-button: reset styles
+	$("#notizform :input[type='reset']").click(function ()
+		{
+			InfocenterDetails._resetNotizFields();
+		}
+	);
+
+	//check if person is postponed (parked, on hold...) and display it
+	InfocenterDetails.getPostponeDate(personid);
+
+	if ($(document).scrollTop() > 20)
+		$("#scrollToTop").show();
+
+	//scroll to top button
+	$(window).scroll(function()
+		{
+			if ($(document).scrollTop() > 20)
+				$("#scrollToTop").show();
+			else
+				$("#scrollToTop").hide();
+		}
+	);
+
+	$("#scrollToTop").click(function()
+		{
+			$('html,body').animate({scrollTop:0},250,'linear');
+		}
+	)
+});
 
 var InfocenterDetails = {
 
@@ -397,7 +399,7 @@ var InfocenterDetails = {
 					{
 						var engdate = $.datepicker.parseDate("yy-mm-dd", FHC_AjaxClient.getData(data)[0]);
 						var gerdate = $.datepicker.formatDate("dd.mm.yy", engdate);
-						$("#parkdate").val(gerdate);
+						$("#postponedate").val(gerdate);
 					}
 				},
 				errorCallback: function()
@@ -408,19 +410,19 @@ var InfocenterDetails = {
 			}
 		);
 	},
-	getParkedDate: function(personid)
+	getPostponeDate: function(personid)
 	{
 		FHC_AjaxClient.ajaxCallGet(
-			CALLED_PATH + "/getParkedDate/"+encodeURIComponent(personid),
+			CALLED_PATH + "/getPostponeDate/"+encodeURIComponent(personid),
 			null,
 			{
 				successCallback: function(data, textStatus, jqXHR) {
 					if (FHC_AjaxClient.hasData(data))
 					{
-						var parkedDate = FHC_AjaxClient.getData(data)[0];
-						InfocenterDetails._refreshParking(parkedDate);
+						var postponeobj = FHC_AjaxClient.getData(data);
+						InfocenterDetails._refreshPostpone(postponeobj);
 						InfocenterDetails._refreshLog();
-						if (parkedDate === null)
+						if (postponeobj === null || postponeobj.type === null)
 							InfocenterDetails.getStudienjahrEnd();
 					}
 				},
@@ -435,7 +437,7 @@ var InfocenterDetails = {
 	parkPerson: function(personid, date)
 	{
 		var parkError = function(){
-			$("#parkmsg").text("  Fehler beim Parken!");
+			$("#postponemsg").text("   Fehler beim Parken!");
 		};
 
 		FHC_AjaxClient.ajaxCallPost(
@@ -447,7 +449,7 @@ var InfocenterDetails = {
 			{
 				successCallback: function(data, textStatus, jqXHR) {
 					if (FHC_AjaxClient.hasData(data))
-						InfocenterDetails.getParkedDate(personid);
+						InfocenterDetails.getPostponeDate(personid);
 					else
 					{
 						parkError();
@@ -469,13 +471,62 @@ var InfocenterDetails = {
 				successCallback: function(data, textStatus, jqXHR) {
 					if (FHC_AjaxClient.hasData(data))
 					{
-						InfocenterDetails.getParkedDate(personid);
+						InfocenterDetails.getPostponeDate(personid);
 					}
 					else
-						$("#unparkmsg").removeClass().addClass("text-warning").text(FHC_PhrasesLib.t('infocenter', 'nichtsZumAusparken'));
+						$("#unpostponemsg").removeClass().addClass("text-warning").text(FHC_PhrasesLib.t('infocenter', 'nichtsZumAusparken'));
 				},
 				errorCallback: function(){
-					$("#unparkmsg").removeClass().addClass("text-danger").text(FHC_PhrasesLib.t('infocenter', 'fehlerBeimAusparken'));
+					$("#unpostponemsg").removeClass().addClass("text-danger").text(FHC_PhrasesLib.t('infocenter', 'fehlerBeimAusparken'));
+				},
+				veilTimeout: 0
+			}
+		);
+	},
+	setPersonOnHold: function(personid, date)
+	{
+		var onHoldError = function(){
+			$("#postponemsg").text("   Fehler beim Setzen auf On Hold!");
+		};
+
+		FHC_AjaxClient.ajaxCallPost(
+			CALLED_PATH + '/setOnHold',
+			{
+				"person_id": personid,
+				"onholddate": date
+			},
+			{
+				successCallback: function(data, textStatus, jqXHR) {
+					if (FHC_AjaxClient.hasData(data))
+						InfocenterDetails.getPostponeDate(personid);
+					else
+					{
+						onHoldError();
+					}
+				},
+				errorCallback: onHoldError,
+				veilTimeout: 0
+			}
+		);
+	},
+	removePersonOnHold: function(personid)
+	{
+		FHC_AjaxClient.ajaxCallPost(
+			CALLED_PATH + '/removeOnHold',
+			{
+				"person_id": personid
+			},
+			{
+				successCallback: function(data, textStatus, jqXHR) {
+					if (FHC_AjaxClient.hasData(data))
+					{
+						InfocenterDetails.getPostponeDate(personid);
+					}
+					else
+						$("#unpostponemsg").removeClass().addClass("text-warning").text(FHC_PhrasesLib.t('infocenter', 'nichtsZumEntfernen'));
+				},
+				errorCallback: function(){
+					$("#unpostponemsg").removeClass().addClass("text-danger").text(FHC_PhrasesLib.t('infocenter', 'fehlerBeimEntfernen'));
 				},
 				veilTimeout: 0
 			}
@@ -864,50 +915,94 @@ var InfocenterDetails = {
 			}
 		);
 	},
-	_refreshParking: function(date)
+	_refreshPostpone: function(postponeobj)
 	{
-		if (date === null)
+		var personid = $("#hiddenpersonid").val();
+		if (postponeobj === null || postponeobj.date === null || postponeobj.type === null)
 		{
-			$("#parking").html(
+			//show both park and on hold buttons if not parked and not on hold
+			$("#postponing").html(
 				'<div class="form-group form-inline">'+
 					'<button class="btn btn-default" id="parklink" type="button""><i class="fa fa-clock-o"></i>&nbsp;' + FHC_PhrasesLib.t('infocenter', 'bewerberParken') + '</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'+
-					FHC_PhrasesLib.t('global', 'bis') + '&nbsp;&nbsp;'+
-					'<input id="parkdate" type="text" class="form-control" placeholder="Parkdatum" style="height: 25px; width: 99px">&nbsp;'+
-					'<span class="text-danger" id="parkmsg"></span>'+
+					'<button class="btn btn-default" id="onholdlink" type="button""><i class="fa fa-anchor"></i>&nbsp;' + FHC_PhrasesLib.t('infocenter', 'bewerberOnHold') + '</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'+
+					'<label id="postponedatelabel">'+FHC_PhrasesLib.t('global', 'bis') + '&nbsp;&nbsp;'+
+					'<input id="postponedate" type="text" class="form-control" placeholder="Parkdatum">&nbsp;'+
+					'<i class="fa fa-info-circle"  data-toggle="tooltip" title="'+FHC_PhrasesLib.t('infocenter', 'parkenZurueckstellenInfo')+'"></i></label>'+
+					'<span class="text-danger" id="postponemsg"></span>'+
 				'</div>');
 
-			$("#parkdate").datepicker({
+			$("#postponedate").datepicker({
 				"dateFormat": "dd.mm.yy",
-				"minDate": 0
+				"minDate": 1
 			});
 
 			$("#parklink").click(
 
 				function ()
 				{
-					var personid = $("#hiddenpersonid").val();
-					var date = $("#parkdate").val();
-
+					var date = $("#postponedate").val();
 					InfocenterDetails.parkPerson(personid, date);
+				}
+			);
+
+			$("#onholdlink").click(
+
+				function ()
+				{
+					var date = $("#postponedate").val();
+					InfocenterDetails.setPersonOnHold(personid, date);
 				}
 			);
 		}
 		else
 		{
-			var parkdate = $.datepicker.parseDate("yy-mm-dd", date);
-			var gerparkdate = $.datepicker.formatDate("dd.mm.yy", parkdate);
-			$("#parking").html(
-				FHC_PhrasesLib.t('infocenter', 'bewerberGeparktBis')+'&nbsp;&nbsp;'+gerparkdate+'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'+
-				'<button class="btn btn-default" id="unparklink"><i class="fa fa-sign-out"></i>&nbsp;'+FHC_PhrasesLib.t('infocenter', 'bewerberAusparken')+'</button>&nbsp;'+
-				'<span id="unparkmsg"></span>'
+			//info if parked/on hold and possibility to undo parking/on hold
+			var postponedate = $.datepicker.parseDate("yy-mm-dd", postponeobj.date);
+			var gerpostponedate = $.datepicker.formatDate("dd.mm.yy", postponedate);
+
+			//var postponehtml = "";
+			var callbackforundo = null;
+			var removePhrase = "";
+			var postponedPhrase = "";
+			var postponedtext = "";
+
+			if (postponeobj.type === PARKEDNAME)
+			{
+				removePhrase = 'bewerberAusparken';
+				postponedtext = FHC_PhrasesLib.t('infocenter', 'bewerberGeparktBis')+'&nbsp;&nbsp;'+gerpostponedate;
+
+				callbackforundo = function ()
+				{
+					InfocenterDetails.unparkPerson(personid);
+				}
+			}
+			else if (postponeobj.type === ONHOLDNAME)
+			{
+				removePhrase = 'bewerberOnHoldEntfernen';
+				postponedtext = FHC_PhrasesLib.t('infocenter', 'bewerberOnHoldBis')+'&nbsp;&nbsp;'+gerpostponedate;
+
+				var currdate = new Date();
+
+				if (currdate > postponedate)
+					postponedtext = "<span class='alert-danger' data-toggle='tooltip' title='"+FHC_PhrasesLib.t('infocenter', 'rueckstelldatumUeberschritten')+"'>"+postponedtext+"</span>";
+
+				callbackforundo = function ()
+				{
+					InfocenterDetails.removePersonOnHold(personid);
+				}
+			}
+
+			var postponehtml = postponedtext+'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'+
+				'<button class="btn btn-default" id="unpostponelink"><i class="fa fa-sign-out"></i>&nbsp;'+FHC_PhrasesLib.t('infocenter', removePhrase)+'</button>&nbsp;'+
+				'<span id="unpostponemsg"></span>';
+
+
+			$("#postponing").html(
+				postponehtml
 			);
 
-			$("#unparklink").click(
-				function ()
-				{
-					var personid = $("#hiddenpersonid").val();
-					InfocenterDetails.unparkPerson(personid, date);
-				}
+			$("#unpostponelink").click(
+				callbackforundo
 			);
 		}
 	},

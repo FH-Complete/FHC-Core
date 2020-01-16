@@ -19,6 +19,7 @@
  *          Andreas Österreicher <andreas.oesterreicher@technikum-wien.at>
  */
 require_once(dirname(__FILE__).'/basis_db.class.php');
+require_once(dirname(__FILE__).'/functions.inc.php');
 
 class vertrag extends basis_db
 {
@@ -65,6 +66,8 @@ class vertrag extends basis_db
 				$this->anmerkung = $row->anmerkung;
 				$this->vertragsdatum = $row->vertragsdatum;
 				$this->lehrveranstaltung_id = $row->lehrveranstaltung_id;
+				$this->vertragsstunden = $row->vertragsstunden;
+				$this->vertragsstunden_studiensemester_kurzbz = $row->vertragsstunden_studiensemester_kurzbz;
 
 				$this->new=false;
 
@@ -142,6 +145,8 @@ class vertrag extends basis_db
 				$obj->anmerkung = $row->anmerkung;
 				$obj->vertragsdatum = $row->vertragsdatum;
 				$obj->lehrveranstaltung_id = $row->lehrveranstaltung_id;
+				$obj->vertragsstunden = $row->vertragsstunden;
+				$obj->vertragsstunden_studiensemester_kurzbz = $row->vertragsstunden_studiensemester_kurzbz;
 
 				$obj->vertragstyp_bezeichnung = $row->vertragstyp_bezeichnung;
 
@@ -375,7 +380,7 @@ class vertrag extends basis_db
 			JOIN lehre.tbl_projektarbeit USING(projektarbeit_id)
 			JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
 		WHERE
-			person_id=".$this->db_add_param($person_id, FHC_INTEGER)."
+			tbl_projektbetreuer.person_id=".$this->db_add_param($person_id, FHC_INTEGER)."
 			AND vertrag_id IS NULL";
 			/*
 		UNION
@@ -518,10 +523,13 @@ class vertrag extends basis_db
 					JOIN public.tbl_studiengang USING(studiengang_kz)
 				WHERE
 					lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id)
-			as bezeichnung
+			as bezeichnung,
+			vertragsstunden,
+    		vertragsstunden_studiensemester_kurzbz
 		FROM
 			lehre.tbl_lehreinheitmitarbeiter
 			JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
+			JOIN lehre.tbl_vertrag USING (vertrag_id)
 		WHERE
 			vertrag_id=".$this->db_add_param($vertrag_id, FHC_INTEGER)."
 		UNION
@@ -535,11 +543,14 @@ class vertrag extends basis_db
 			tbl_lehreinheit.studiensemester_kurzbz,
 			tbl_projektbetreuer.betreuerart_kurzbz,
 			(SELECT nachname || ' ' || vorname FROM public.tbl_person JOIN public.tbl_benutzer USING(person_id) WHERE uid=tbl_projektarbeit.student_uid)
-			as bezeichnung
+			as bezeichnung,
+			vertragsstunden,
+    		vertragsstunden_studiensemester_kurzbz
 		FROM
 			lehre.tbl_projektbetreuer
 			JOIN lehre.tbl_projektarbeit USING(projektarbeit_id)
 			JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
+			JOIN lehre.tbl_vertrag USING (vertrag_id)
 		WHERE
 			vertrag_id=".$this->db_add_param($vertrag_id, FHC_INTEGER).";";
 /*		UNION
@@ -580,6 +591,8 @@ class vertrag extends basis_db
 				$obj->studiensemester_kurzbz = $row->studiensemester_kurzbz;
 				$obj->betreuerart_kurzbz = $row->betreuerart_kurzbz;
 				$obj->bezeichnung = $row->bezeichnung;
+				$obj->vertragsstunden = $row->vertragsstunden;
+				$obj->vertragsstunden_studiensemester_kurzbz = $row->vertragsstunden_studiensemester_kurzbz;
 				$this->result[] = $obj;
 			}
 			return true;
@@ -715,9 +728,10 @@ class vertrag extends basis_db
 	}
 
 	/**
-	 * Laedt alle Stati eines Vertrags
+	 * Laedt den letzten Status eines Vertrags
 	 *
 	 * @param $vertrag_id
+	 * @param $status optional
 	 * @return boolean
 	 */
 	public function getStatus($vertrag_id, $status=NULL)
@@ -732,32 +746,32 @@ class vertrag extends basis_db
 
 		if(!is_null($status))
 		{
-		    $qry .= " AND tbl_vertrag_vertragsstatus.vertragsstatus_kurzbz=".$this->db_add_param($status);
+			$qry .= " AND tbl_vertrag_vertragsstatus.vertragsstatus_kurzbz=".$this->db_add_param($status);
 		}
 
 		$qry .= " ORDER BY datum DESC;";
 
 		if($result = $this->db_query($qry))
 		{
-		    if($row = $this->db_fetch_object($result))
-		    {
-			$this->vertrag_id = $row->vertrag_id;
-			$this->vertragsstatus_kurzbz = $row->vertragsstatus_kurzbz;
-			$this->vertragsstatus_bezeichnung = $row->bezeichnung;
-			$this->datum = $row->datum;
-			$this->uid = $row->uid;
-			$this->insertvon = $row->insertvon;
-			$this->insertamum = $row->insertamum;
-			$this->updatevon = $row->updatevon;
-			$this->updateamum = $row->updateamum;
-			$this->new=false;
-			return true;
-		    }
-		    else
-		    {
-			    $this->errormsg = 'Eintrag wurde nicht gefunden';
-			    return false;
-		    }
+			if($row = $this->db_fetch_object($result))
+			{
+				$this->vertrag_id = $row->vertrag_id;
+				$this->vertragsstatus_kurzbz = $row->vertragsstatus_kurzbz;
+				$this->vertragsstatus_bezeichnung = $row->bezeichnung;
+				$this->datum = $row->datum;
+				$this->uid = $row->uid;
+				$this->insertvon = $row->insertvon;
+				$this->insertamum = $row->insertamum;
+				$this->updatevon = $row->updatevon;
+				$this->updateamum = $row->updateamum;
+				$this->new=false;
+				return true;
+			}
+			else
+			{
+				$this->errormsg = 'Eintrag wurde nicht gefunden';
+				return false;
+			}
 		}
 		else
 		{
@@ -1017,6 +1031,38 @@ class vertrag extends basis_db
 	}
 
 	/**
+	 * Storniert einen Vertrag und seine Verbindungen
+	 * @param $vertrag_id ID des Vertrags
+	 * @param $mitarbeiter_uid
+	 */
+	public function cancel($vertrag_id, $mitarbeiter_uid)
+	{
+		$insertvon = get_uid();
+
+		$qry = "
+			UPDATE lehre.tbl_lehreinheitmitarbeiter SET vertrag_id=null WHERE vertrag_id=".$this->db_add_param($vertrag_id, FHC_INTEGER).";
+			UPDATE lehre.tbl_projektbetreuer SET vertrag_id=null WHERE vertrag_id=".$this->db_add_param($vertrag_id, FHC_INTEGER).";
+			INSERT INTO lehre.tbl_vertrag_vertragsstatus(vertragsstatus_kurzbz, vertrag_id, uid, datum, insertamum, insertvon)
+				VALUES(".
+					$this->db_qoute('storno'). ", ".
+					$this->db_add_param($vertrag_id, FHC_INTEGER). ", ".
+					$this->db_add_param($mitarbeiter_uid). ", ".
+					$this->db_qoute('NOW()'). ", ".
+					$this->db_qoute('NOW()'). ", ".
+					$this->db_qoute($insertvon). "
+				);
+			";
+
+		if($this->db_query($qry))
+			return true;
+		else
+		{
+			$this->errormsg = 'Fehler beim Stornieren des Vertrags';
+			return false;
+		}
+	}
+
+	/**
 	 * Liefert alle Vertraege bei denen die Lehraufträge nicht zur Person passen.
 	 * (zB Aufgrund Lektorenaenderung)
 	 * @param $studiensemester_kurzbz
@@ -1078,7 +1124,7 @@ class vertrag extends basis_db
 	 */
 	public function getFalscheBetraege($studiensemester_kurzbz)
 	{
-		$qry = "SELECT * FROM 
+		$qry = "SELECT * FROM
 				(
 					SELECT
 						tbl_vertrag.*, tbl_lehreinheitmitarbeiter.mitarbeiter_uid, tbl_lehreinheitmitarbeiter.lehreinheit_id,
@@ -1091,7 +1137,7 @@ class vertrag extends basis_db
 					WHERE
 						studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz)."
 				)x
-				WHERE 
+				WHERE
 					x.semesterstunden * x.stundensatz != x.betrag";
 
 		if($result = $this->db_query($qry))

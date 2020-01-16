@@ -702,7 +702,7 @@ class wochenplan extends basis_db
 		$datum=$datum_mon=$this->datum;
 		$rechte = new benutzerberechtigung();
 		$rechte->getBerechtigungen($user_uid);
-		$reservberechtigt = $rechte->isBerechtigt('lehre/reservierung', null, 'suid');
+		$reservberechtigt = $rechte->isBerechtigt('lehre/reservierung:begrenzt', null, 'suid');
 
 		for ($i=1; $i<=TAGE_PRO_WOCHE; $i++)
 		{
@@ -2754,7 +2754,7 @@ class wochenplan extends basis_db
 		{
 			while ($row = $this->db_fetch_object($result))
 			{
-				if ($reservberechtigt || $row->uid == $user_uid || $row->insertvon == $user_uid)
+				if ($reservberechtigt && ($row->uid == $user_uid || $row->insertvon == $user_uid))
 				{
 					$deleteberechtigt = true;
 					$reservtodelete[] = $row->reservierung_id;

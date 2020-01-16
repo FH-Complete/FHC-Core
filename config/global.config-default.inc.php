@@ -9,6 +9,9 @@ define('DEFAULT_LEHREINHEIT_LEHRFORM','UE');
 // Defaul Trennzeichen fuer E-Mail Empfaenger wenn nicht ueber Variablen ueberschrieben
 define('DEFAULT_EMAILADRESSENTRENNZEICHEN',',');
 
+// Gibt an ob neue Mitarbeiter per default fixangestellt sind oder nicht
+define('DEFAULT_MITARBEITER_FIXANGESTELLT', true);
+
 //Anzeigeoptionen für Lehrveranstaltungen im CIS
 define('CIS_LEHRVERANSTALTUNG_NEWSGROUPS_ANZEIGEN',true);
 define('CIS_LEHRVERANSTALTUNG_FEEDBACK_ANZEIGEN',true);
@@ -96,6 +99,9 @@ define('FAS_GESAMTNOTE_PRUEFUNGSHONORAR',false);
 // Aus Datenschutzgründen ist dies per default deaktiviert
 define('CIS_GESAMTNOTE_FREIGABEMAIL_NOTE', false);
 
+// Gibt an ob in der Notenliste der Studierenden nur offizielle Noten oder alle angezeigt werden
+define('CIS_NOTENLISTE_OFFIZIELL_ANZEIGEN', false);
+
 // Grenzwerte für Anwesenheit
 define('FAS_ANWESENHEIT_ROT', 70);
 define('FAS_ANWESENHEIT_GELB', 90);
@@ -120,12 +126,19 @@ define('FAS_UDF', true);
 // Legt fest ob Aufnahmegruppen bei Reihungstests verwaltet werden true|false
 define('FAS_REIHUNGSTEST_AUFNAHMEGRUPPEN',false);
 
+// Legt fest, ob Vertragsdetails zum Lehrauftrag im Reiter LektorInnenzuteilung angezeigt werden
+define('FAS_LV_LEKTORINNENZUTEILUNG_VERTRAGSDETAILS_ANZEIGEN', false);
+
+// Legt fest, ob Vertragsdetails zum Projektauftrag im Reiter Projektarbeit angezeigt werden
+define('FAS_STUDIERENDE_PROJEKTARBEIT_VERTRAGSDETAILS_ANZEIGEN', false);
+
 // Anzeigeoptionen für LV-Plan Menü
 define('CIS_LVPLAN_EXPORT_ANZEIGEN',true);
 define('CIS_LVPLAN_PERSONENAUSWAHL_ANZEIGEN',true);
 define('CIS_LVPLAN_LEHRVERBANDAUSWAHL_ANZEIGEN',true);
 define('CIS_LVPLAN_ARCHIVAUSWAHL_ANZEIGEN',true);
 define('CIS_LVPLAN_ZUSATZMENUE_ANZEIGEN',true);
+define('CIS_LVPLAN_SAALPLAN_ANZEIGEN',true);
 
 //Anmerkung bei Unterrichtseinheiten im LV-Plan anzeigen. Anmerkungen bei LV-Plan Sync mitkopieren.
 define('LVPLAN_ANMERKUNG_ANZEIGEN',true);
@@ -192,6 +205,9 @@ define('SET_UID_AS_PERSONENKENNZEICHEN',false);
 // Legt fest ob fuer Studierende eine Alias EMail Adresse generiert wird (true|false)
 define('GENERATE_ALIAS_STUDENT',true);
 
+// gibt an ob beim Anlegen von Mitarbeitern ein Alias generiert wird.
+define('GENERATE_ALIAS_MITARBEITERIN',true);
+
 // Wie viele Tage nach Semesterstart soll bei der Neuanlage von Studierenden noch das aktuelle Semester vorgeschlagen werden.
 define('VILESCI_PERSON_NEU_STUDIENSEMESTER_UEBERGANGSFRIST',30);
 
@@ -241,7 +257,7 @@ define('LOG_CONTENT', false);
 // ContentID of default content-template for reports. New contents will be childs of this.
 define('REPORT_CONTENT_TEMPLATE', '');
 
-// Schwund in %, der bei Arbeitsplätzen herausgerechnet werden soll. 
+// Schwund in %, der bei Arbeitsplätzen herausgerechnet werden soll.
 // zB 5. Dann werden bei 20 Plätzen 5% Schwund herausgerechnet und nur 19 Plätze zurückgegeben
 define('REIHUNGSTEST_ARBEITSPLAETZE_SCHWUND', 0);
 
@@ -255,8 +271,4 @@ define('STATUSGRUND_ID_EINSTIEG_SOMMERSEMESTER', null);
 
 // Studiengangs_kz des Studiengangs "Qualifikationskurse". Der Studiengang hat eine Sonderstellung zB für das Bewerbungstool.
 define('STUDIENGANG_KZ_QUALIFIKATIONKURSE', null);
-
-// EinsteigerInnen ins Sommersemester werden mit einem Statusgrund versehen.
-// Die ID dieses Statusgrundes kann hier eingegeben werden. Es wird zB vom Infocenter-Tool gesetzt und im Bewerbungstool abgefragt
-define('STATUSGRUND_ID_EINSTIEG_SOMMERSEMESTER', null);
 ?>

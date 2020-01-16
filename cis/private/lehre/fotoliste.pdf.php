@@ -31,6 +31,7 @@ require_once('../../../include/lehrveranstaltung.class.php');
 require_once('../../../include/lehreinheit.class.php');
 require_once('../../../include/benutzerberechtigung.class.php');
 require_once('../../../include/studiensemester.class.php');
+require_once('../../../include/studiengang.class.php');
 require_once('../../../include/functions.inc.php');
 require_once('../../../include/erhalter.class.php');
 require_once('../../../include/datum.class.php');
@@ -57,6 +58,9 @@ isset($_GET['stsem']) ? $studiensemester = $_GET['stsem'] : die('Ein Studienseme
 
 $lv = new lehrveranstaltung();
 $lv->load($lvid);
+
+$stg = new studiengang();
+$stg->load($lv->studiengang_kz);
 
 $berechtigung = new benutzerberechtigung();
 $berechtigung->getBerechtigungen($user);
@@ -96,17 +100,15 @@ if ($lehreinheit != '')
 
 $gruppen_string = '';
 $gruppen_string_arr = array();
-$stg_typ = '';
+$stg_typ = $stg->typ;
+$stg_bezeichnung = $stg->bezeichnung;
 
 //structure overall lehrveranstaltungs data
 if ($result = $db->db_query($qry)) {
     while ($row = $db->db_fetch_object($result)) {
         //lehrveranstaltung
         $lv_bezeichnung = $row->lv_bezeichnung;
-        //studiengang
-        $stg_bezeichnung = $row->stg_bez;
-        //studiengangstyp
-        $stg_typ = $row->stg_typ;
+
         //collect all gruppenkürzel
         if ($row->gruppe_kurzbz == '')
             $gruppen_string = trim($row->kuerzel . '-' . $row->semester . $row->verband . $row->gruppe);
@@ -171,6 +173,7 @@ $qry = 'SELECT DISTINCT ON
             tbl_student.studiengang_kz AS stg_kz_student,
             tbl_zeugnisnote.note,
             tbl_mitarbeiter.mitarbeiter_uid,
+            tbl_person.person_id,
             tbl_person.matr_nr,
             tbl_person.geschlecht,
             tbl_person.foto,
@@ -208,6 +211,7 @@ $a_o_kz = '9' . sprintf("%03s", $erhalter->result[0]->erhalter_kz); //Stg_Kz AO-
 $anzahl_studierende = 0;
 $datum = new datum();
 $zusatz = '';
+$foto_url_arr = array();
 
 //structure students data
 if ($result = $db->db_query($qry)) {
@@ -237,11 +241,11 @@ if ($result = $db->db_query($qry)) {
                 $row->foto_sperre = 'f';
 
             //create foto (if not locked by student OR if fotolist is created by admin or assistenz)
-            $foto_url = '';  
-			
+            $foto_url = '';
+
 			if ($row->foto_sperre == 'f' && $row->foto != '') {
                 $foto_src = $row->foto;
-                $foto_url = sys_get_temp_dir() . '/foto' . trim($row->matrikelnr) . '.jpg';
+                $foto_url = sys_get_temp_dir() . '/foto' . trim($row->person_id) . '.jpg';
                 $foto_url_arr[] = $foto_url;
 
                 //create writeable file
@@ -254,7 +258,7 @@ if ($result = $db->db_query($qry)) {
                 }
 
                 //add foto to document
-                $doc->addImage($foto_url, trim($row->matrikelnr) . '.jpg', 'image/jpg');
+                $doc->addImage($foto_url, trim($row->person_id) . '.jpg', 'image/jpg');
             }
             elseif ($row->foto_sperre == 't')
             {

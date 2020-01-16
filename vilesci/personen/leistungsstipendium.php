@@ -441,7 +441,7 @@ Dylan;Bob;1234567;MEE;750;03.10.2016</pre>
 							// Fills the select element with all the loaded studiengang
 							foreach($studiengang->result as $val)
 							{
-								echo sprintf("<option value=\"%s\">%s - %s</option>", $val->studiengang_kz, $val->kurzbzlang, $val->bezeichnung);
+								echo sprintf("<option value=\"%s\">%s [%s%s] - %s</option>", $val->studiengang_kz, $val->kurzbzlang,$val->typ, $val->kurzbz, $val->bezeichnung);
 							}
 						?>
 						</select>

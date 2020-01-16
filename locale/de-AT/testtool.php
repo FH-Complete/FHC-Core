@@ -20,6 +20,7 @@ $this->phrasen['testtool/reihungstestNichtFreigeschalten']='Der zuteilte Reihung
 $this->phrasen['testtool/reihungstestKannNichtGeladenWerden']='Der Reihungstest dem Sie zugeteilt sind, kann nicht geladen werden';
 $this->phrasen['testtool/geburtsdatumStimmtNichtUeberein']='Ihr Geburtsdatum stimmt nicht mit unseren Daten überein. Bitte wenden Sie sich an die Aufsichtsperson';
 $this->phrasen['testtool/home']='Home';
+$this->phrasen['testtool/teilnehmerIn']='TeilnehmerIn';
 $this->phrasen['testtool/klickenSieAufEinTeilgebiet']='Zum Starten klicken Sie bitte links auf ein Teilgebiet.<br>Wir wünschen Ihnen viel Erfolg!';
 $this->phrasen['testtool/gebietStarten']='Gebiet starten';
 $this->phrasen['testtool/startseite']='Startseite';

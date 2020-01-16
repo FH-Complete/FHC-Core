@@ -170,7 +170,9 @@ if (isset($_REQUEST["submit"]) && ($_REQUEST["student_uid"] != '')  )
 	if($pr->getPruefungen($student_uid, "Termin1", $lvid, $stsem))
 	{
 		if ($pr->result)
+		{
 			$termin1 = 1;
+		}
 		else
 		{
 			$lvnote = new lvgesamtnote();
@@ -183,6 +185,7 @@ if (isset($_REQUEST["submit"]) && ($_REQUEST["student_uid"] != '')  )
 			else
 			{
 				$pr_note = 9;
+				$pr_punkte = '';
 				$benotungsdatum = $jetzt;
 			}
 

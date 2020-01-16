@@ -143,8 +143,10 @@
 				<div class="panel-footer">
 					<b><?php echo $this->p->t('lehre','notendurchschnitt');?>:</b>
 					<?php echo (isset($semesterdata['notendurchschnitt'])?$semesterdata['notendurchschnitt']:'');?>
+					<img src="../../../../skin/images/information.png" title="<?php echo htmlentities($this->p->t('lehre', 'info_notendurchschnitt')); ?>" />
 					<b><?php echo $this->p->t('lehre','gewichteternotendurchschnitt');?>:</b>
 					<?php echo (isset($semesterdata['notendurchschnittgewichtet'])?$semesterdata['notendurchschnittgewichtet']:'');?>
+					<img src="../../../../skin/images/information.png" title="<?php echo htmlentities($this->p->t('lehre', 'info_notendurchschnitt_gewichtet')); ?>" />
 				</div>
 		</div>
 		</div>

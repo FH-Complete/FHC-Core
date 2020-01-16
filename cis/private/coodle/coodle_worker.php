@@ -314,6 +314,24 @@ switch($work)
 			echo $coodletermin->errormsg;
 
 		break;
+
+	case 'countTermine':
+		if(isset($_POST['coodle_id']))
+			$coodle_id = $_POST['coodle_id'];
+		else
+			die('CoodleID fehlt');
+
+		$coodle = new coodle();
+		if ($coodle->getTermine($coodle_id))
+		{
+			echo count($coodle->result);
+		}
+		else
+		{
+			echo $coodle->errormsg;
+		}
+
+		break;
 	default:
 			die('Invalid Work Parameter');
 }

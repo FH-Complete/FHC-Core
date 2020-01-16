@@ -107,7 +107,7 @@ class DropdownWidget extends HTMLWidget
 		{
 			if (is_object($elements) && isset($elements->retval))
 			{
-				show_error($elements->retval);
+				show_error(getError($elements));
 			}
 			else if (is_string($elements))
 			{

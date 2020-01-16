@@ -1,0 +1,12 @@
+/* styles for infocenter overview page */
+
+/* horizontal line after Studiensemester in dataset table header */
+hr.studiensemesterline
+{
+   margin: 6px 6px;
+}
+
+.onhold
+{
+   color: #CDAD00
+}

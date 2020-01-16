@@ -48,7 +48,7 @@ class Benutzerfunktion_model extends DB_Model
 
 		if (is_string($funktion_kurzbz))
 		{
-			$query .= " AND funktion_kurzbz = ".$funktion_kurzbz.")";
+			$query .= " AND funktion_kurzbz = '".$funktion_kurzbz."'";
 		}
 		elseif (is_array($funktion_kurzbz) && count($funktion_kurzbz) > 0)
 		{
@@ -104,4 +104,38 @@ class Benutzerfunktion_model extends DB_Model
 
 		return $this->execQuery($query, $parametersArray);
 	}
+
+    /**
+     * Get active Studiengangsleitung(en) of the user by UID.
+     * @param $uid
+     */
+	public function getSTGLByUID($uid)
+    {
+        $query = '
+            SELECT
+                uid,
+                oe_kurzbz,
+                studiengang_kz,
+                typ,
+                tbl_studiengang.bezeichnung
+            FROM
+                public.tbl_benutzerfunktion
+                    JOIN public.tbl_studiengang USING (oe_kurzbz)
+            WHERE
+                funktion_kurzbz = \'Leitung\'
+              AND (datum_von IS NULL OR datum_von <= now())
+              AND (datum_bis IS NULL OR datum_bis >= now())
+              AND uid = ?
+            ORDER BY
+                oe_kurzbz
+        ';
+
+        $parameters_array = array();
+        if (is_string($uid))
+        {
+            $parameters_array[] = $uid;
+        }
+
+        return $this->execQuery($query, $parameters_array);
+    }
 }

@@ -301,14 +301,17 @@ class benutzer extends person
 	/**
 	 * Sucht nach Benutzern. Limit optional. Aktiv optional.
 	 *
+	 * @param $searchItems
 	 * @param $limit (optional)
-	 * @param $aktiv (optional). Default true. Wenn false werden nur inaktive benutzer geladen, wenn null dann alle
+	 * @param bool $aktiv (optional). Default true. Wenn false werden nur inaktive benutzer geladen, wenn null dann alle
+	 * @param bool $positivePersonalnr (optional). Default false. Wenn true, nur Mitarbeiter mit positiver Personalnr laden.
+	 * @return bool
 	 */
-	public function search($searchItems, $limit=null, $aktiv=true)
+	public function search($searchItems, $limit=null, $aktiv=true, $positivePersonalnr=false)
 	{
 		$qry = "SELECT * FROM (
 					SELECT
-						distinct on (uid) vorname, nachname, uid, mitarbeiter_uid, titelpre, titelpost, lektor, fixangestellt, alias, tbl_benutzer.aktiv, anrede,
+						distinct on (uid) vorname, nachname, uid, mitarbeiter_uid, personalnummer, titelpre, titelpost, lektor, fixangestellt, alias, tbl_benutzer.aktiv, anrede,
 							(SELECT UPPER
 								(tbl_studiengang.typ || tbl_studiengang.kurzbz)
 					 		FROM public.tbl_student
@@ -339,14 +342,15 @@ class benutzer extends person
 					JOIN public.tbl_benutzer USING(person_id)
 					LEFT JOIN public.tbl_mitarbeiter ON(uid=mitarbeiter_uid)
 				WHERE";
-				if(is_null($aktiv))
-					$qry.=" (";
-				elseif($aktiv==true)
-					$qry.=" tbl_benutzer.aktiv=true AND (";
-				elseif($aktiv==false)
-					$qry.=" tbl_benutzer.aktiv=false AND (";
+				if($aktiv===true)
+					$qry.=" tbl_benutzer.aktiv=true AND";
+				elseif($aktiv===false)
+					$qry.=" tbl_benutzer.aktiv=false AND";
 
-		$qry.=" lower(vorname || ' ' || nachname) like lower('%".$this->db_escape(implode(' ',$searchItems))."%')";
+				if($positivePersonalnr === true)
+					$qry.=" (personalnummer >= 0 OR personalnummer IS NULL) AND";
+
+		$qry.=" (lower(vorname || ' ' || nachname) like lower('%".$this->db_escape(implode(' ',$searchItems))."%')";
 		$qry.=" OR lower(nachname || ' ' || vorname) like lower('%".$this->db_escape(implode(' ',$searchItems))."%')";
 		$qry.=" OR lower(uid) like lower('%".$this->db_escape(implode(' ',$searchItems))."%')";
 		$qry.=" OR lower(telefonklappe) like lower('%".$this->db_escape(implode(' ',$searchItems))."%')";
