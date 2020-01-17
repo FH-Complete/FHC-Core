@@ -252,7 +252,7 @@ if (empty($pruefung->result) && !$rechte->isBerechtigt('lehre/pruefungsanmeldung
 			<?php
 			echo '<select id="filter_studiensemester" onchange="loadPruefungStudiengang();" style="visibility: hidden;">';
 			$aktuellesSemester = $studiensemester->getaktorNext();
-			$studiensemester->getAll();
+			$studiensemester->getPlusMinus(null, 5);
 			foreach($studiensemester->studiensemester as $sem)
 			{
 				/*@var $sem studiensemester */

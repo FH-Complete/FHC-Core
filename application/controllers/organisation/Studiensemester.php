@@ -45,7 +45,7 @@ class Studiensemester extends Auth_Controller
 		$semester = $this->StudiensemesterModel->load();
 		if ($semester->error)
 		{
-			show_error($semester->retval);
+			show_error(getError($semester));
 		}
 
 		$data = array(
@@ -64,13 +64,13 @@ class Studiensemester extends Auth_Controller
 		$semester = $this->StudiensemesterModel->load($semester_kurzbez);
 		if ($semester->error)
 		{
-			show_error($semester->retval);
+			show_error(getError($semester));
 		}
 		$this->StudienjahrModel->addOrder('studienjahr_kurzbz', "DESC");
 		$allstudienjahre = $this->StudienjahrModel->load();
 		if ($allstudienjahre->error)
 		{
-			show_error($allstudienjahre->retval);
+			show_error(getError($allstudienjahre));
 		}
 		$data = array(
 			"semester" => $semester->retval,
@@ -90,7 +90,7 @@ class Studiensemester extends Auth_Controller
 		$allstudienjahre = $this->StudienjahrModel->load();
 		if ($allstudienjahre->error)
 		{
-			show_error($allstudienjahre->retval);
+			show_error(getError($allstudienjahre));
 		}
 
 		$data = array(
@@ -117,7 +117,7 @@ class Studiensemester extends Auth_Controller
 
 		if ($semester->error)
 		{
-			show_error($semester->retval);
+			show_error(getError($semester));
 		}
 
 		redirect("/organisation/studiensemester/editStudiensemester/".$data['studiensemester_kurzbz']."?saved=true");
@@ -161,7 +161,7 @@ class Studiensemester extends Auth_Controller
 			return $data;
 		} else
 		{
-			show_error($validation->retval);
+			show_error(getError($validation));
 		}
 	}
 
@@ -197,7 +197,7 @@ class Studiensemester extends Auth_Controller
 
 		if ($semester->error)
 		{
-			show_error($semester->retval);
+			show_error(getError($semester));
 		}
 
 		redirect("/organisation/studiensemester/editStudiensemester/".$data['studiensemester_kurzbz']."?saved=true");
@@ -214,7 +214,7 @@ class Studiensemester extends Auth_Controller
 
 		if ($semester->error)
 		{
-			show_error($semester->retval);
+			show_error(getError($semester));
 		}
 
 		redirect("/organisation/studiensemester/listStudiensemester");

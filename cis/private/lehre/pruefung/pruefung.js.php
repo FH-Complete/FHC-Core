@@ -1219,7 +1219,8 @@ function loadStudiensemester()
 		url: "./pruefungstermin.json.php",
 		type: "POST",
 		data: {
-			method: "loadStudiensemester"
+			method: "loadStudiensemester",
+            prevSemester: 5
 		},
 		error: loadError,
 		success: function(data){

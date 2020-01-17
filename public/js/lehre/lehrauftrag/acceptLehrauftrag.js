@@ -577,15 +577,18 @@ $(function() {
 			{
 				successCallback: function (data, textStatus, jqXHR)
 				{
-					if (data.error)
+					if (data.error && data.retval != null)
 					{
-						// Password not verified
+						// Print error message
 						FHC_DialogLib.alertWarning(data.retval);
 					}
+					
 					if (!data.error && data.retval != null)
 					{
 						// Update status 'Erteilt'
 						$('#tableWidgetTabulator').tabulator('updateData', data.retval);
+
+						// Print success message
 						FHC_DialogLib.alertSuccess(data.retval.length + " Lehraufträge wurden akzeptiert.");
 					}
 				},

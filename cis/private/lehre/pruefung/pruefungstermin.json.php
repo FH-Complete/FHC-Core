@@ -61,7 +61,8 @@ switch($method)
 	case 'loadStudiensemester':
 		$studiensemester = new studiensemester();
 		$aktStudiensemester = $studiensemester->getaktorNext();
-		$data = loadStudiensemester($aktStudiensemester);
+		$prevSemester = empty($_POST["prevSemester"]) ? 0 : $_POST["prevSemester"];
+		$data = loadStudiensemester($aktStudiensemester, $prevSemester);
 		break;
 	case 'getPruefungsfensterByStudiensemester':
 		$studiensemester = new studiensemester();
@@ -223,12 +224,15 @@ function loadPruefungstypen($abschluss)
 /**
  * Lädt alle Studiensemester aus der Datenbank
  * @param String $aktStudiensemester das Aktuelle Studiensemester
+ * @param int $prevSemester wie viele vergangene Semester sollen geladen werden
  * @return Array
  */
-function loadStudiensemester($aktStudiensemester = null)
+function loadStudiensemester($aktStudiensemester = null, $prevSemester = 0)
 {
 	$studiensemester = new studiensemester();
-	if($studiensemester->getAll())
+	$prevSemester == 0 ? $studiensemester->getAll() : $studiensemester->getPlusMinus(null, $prevSemester);
+
+	if(!empty($studiensemester->studiensemester))
 	{
 		$data['result']=$studiensemester->studiensemester;
 		if(!is_null($aktStudiensemester))
