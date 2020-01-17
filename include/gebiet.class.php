@@ -383,7 +383,7 @@ class gebiet extends basis_db
 			$qry = "SELECT * FROM (
 						SELECT level, count(*) as anzahl FROM (
 							SELECT level, punkte, count(*) as anzahl FROM (
-								SELECT level, sum(punkte) as punkte
+								SELECT level, round(sum(punkte)) as punkte
 								FROM testtool.tbl_frage JOIN testtool.tbl_vorschlag USING(frage_id)
 								WHERE punkte>0 AND not demo AND gebiet_id=".$this->db_add_param($gebiet_id, FHC_INTEGER)."
 								GROUP BY frage_id, level) as a
