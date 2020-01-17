@@ -244,6 +244,7 @@ function drawrow($row)
 	$oRdf->obj[$i]->setAttribut('stufe',$reihungstest_obj->stufe,true);
 	$oRdf->obj[$i]->setAttribut('studienplan_id',$row->studienplan_id,true);
 	$oRdf->obj[$i]->setAttribut('studienplan_bezeichnung',$studienplan->bezeichnung,true);
+	$oRdf->obj[$i]->setAttribut('studienplan_studiengang_kz',$stpl_stg->studiengang_kz,true);
 	$oRdf->obj[$i]->setAttribut('studienplan_studiengang',$stpl_stg->kuerzel,true);
 	$oRdf->obj[$i]->setAttribut('studiensemester',$reihungstest_obj->studiensemester_kurzbz,true);
 	$oRdf->obj[$i]->setAttribut('datum',$datum_obj->formatDatum($reihungstest_obj->datum,'d.m.Y'),true);

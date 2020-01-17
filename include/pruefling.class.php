@@ -350,9 +350,10 @@ class pruefling extends basis_db
 	 * definiert sind, bei der Berechnung der Endpunkte nicht berücksichtigt.
 	 * @param $studiengang_kz Wenn eine Studiengangskennzahl übergeben wird, dann werden nur die Punkte der
 	 * Basis-Fragengebiete (ohne Quereinsteiger) bei der Berechnung der Endpunkte berücksichtigt.
+	 * @param $gewichtung_studiengang_kz Wenn diese studiengang_kz übergeben wird, wird das Ergebnis entsprechend des Gewichtungsschemas des Studienganges gewichtet
 	 * @return Endpunkte des Reihungstests oder False wenn keine Punkte vorhanden
 	 */
-	public function getReihungstestErgebnisPerson($person_id, $punkte=false, $reihungstest_id, $has_excluded_gebiete = false, $studiengang_kz = null)
+	public function getReihungstestErgebnisPerson($person_id, $punkte=false, $reihungstest_id, $has_excluded_gebiete = false, $studiengang_kz = null, $gewichtung_studiengang_kz = null)
 	{
 		if(is_numeric($reihungstest_id))
 		{
@@ -415,31 +416,44 @@ class pruefling extends basis_db
 			 * Ergebniss der beiden Tests summiert bekommen
 			 * Im Zweifelsfall wird der neuere Reihungstest genommen */
 			$qry .= "
-				AND prestudent_id = (
-					SELECT
-						prestudent_id
-					FROM
-						public.tbl_rt_person
-					JOIN 
-						public.tbl_prestudent USING(person_id)
-					JOIN
-						public.tbl_prestudentstatus USING (prestudent_id, studienplan_id)
-					JOIN 
-						tbl_reihungstest ON (
-							tbl_rt_person.rt_id = tbl_reihungstest.reihungstest_id			
-						)
-					WHERE
-						tbl_rt_person.person_id = ".$this->db_add_param($person_id, FHC_INTEGER)."
-					AND 
-						tbl_rt_person.rt_id = ".$this->db_add_param($reihungstest_id, FHC_INTEGER)."
-					AND 
-						tbl_prestudentstatus.status_kurzbz='Interessent'
-					AND 
-						tbl_prestudentstatus.studiensemester_kurzbz = tbl_reihungstest.studiensemester_kurzbz
-					ORDER BY
-						tbl_reihungstest.datum DESC, tbl_prestudent.priorisierung ASC LIMIT 1
-				)
-			";
+					AND prestudent_id = (
+						SELECT
+							prestudent_id
+						FROM
+							public.tbl_rt_person
+						JOIN 
+							public.tbl_prestudent USING(person_id)
+						JOIN
+							public.tbl_prestudentstatus USING (prestudent_id, studienplan_id)
+						JOIN 
+							tbl_reihungstest ON (
+								tbl_rt_person.rt_id = tbl_reihungstest.reihungstest_id			
+							)
+						WHERE
+							tbl_rt_person.person_id = ".$this->db_add_param($person_id, FHC_INTEGER)."
+						AND 
+							tbl_rt_person.rt_id = ".$this->db_add_param($reihungstest_id, FHC_INTEGER)."
+						AND 
+							tbl_prestudentstatus.status_kurzbz='Interessent'
+						AND 
+							tbl_prestudentstatus.studiensemester_kurzbz = tbl_reihungstest.studiensemester_kurzbz
+						ORDER BY tbl_reihungstest.datum DESC, tbl_prestudent.priorisierung ASC LIMIT 1
+					)
+				";
+
+			//calculate Gewicht for Studiengang if set
+			$gewichte = array();
+			if (isset($gewichtung_studiengang_kz))
+			{
+				$ablauf = new ablauf();
+				$ablauf->getAblaufGebiete($gewichtung_studiengang_kz);
+
+				foreach ($ablauf->result as $abl)
+				{
+					$gewichte[$abl->gebiet_id] = $abl->gewicht;
+				}
+			}
+
 			if($result = $this->db_query($qry))
 			{
 				// Wenn keine Eintraege vorhanden dann false
@@ -450,6 +464,9 @@ class pruefling extends basis_db
 
 				while($row = $this->db_fetch_object($result))
 				{
+					if (!isset($row->punkte))
+						continue;
+
 					//wenn maxpunkte ueberschritten wurde -> 100%
 					if($row->punkte>=$row->maxpunkte)
 					{
@@ -465,8 +482,9 @@ class pruefling extends basis_db
 					}
 					else
 					{
-						$ergebnis += $prozent * $row->gewicht;
-						$summeGewicht += $row->gewicht;
+						$gew = isset($gewichte[$row->gebiet_id]) ? $gewichte[$row->gebiet_id] : 1;
+						$ergebnis += $prozent * $gew;
+						$summeGewicht += $gew;
 					}
 				}
 				return $summeGewicht > 0 ? $ergebnis/$summeGewicht : $ergebnis;
@@ -532,5 +550,62 @@ class pruefling extends basis_db
 			return false;
 		}
 	}
+
+	/**
+	 * Berechnet das Reihungstestergebnis fuer einen Prestudenten und ggf Reihungstest
+	 *
+	 * @param $prestudent_id ID des Prestudenten
+	 * @param $punkte Wenn true werden Punkte geliefert, sonst Prozentsumme.
+	 * @param $reihungstest_id ID des Reihungstests.
+	 * @return Endpunkte des Reihungstests oder false wenn keine Punkte vorhanden
+	 */
+	public function getReihungstestErgebnisPrestudentNeu($prestudent_id, $punkte=false, $reihungstest_id=null)
+	{
+		$qry = "SELECT * FROM testtool.vw_auswertung
+				WHERE prestudent_id=".$this->db_add_param($prestudent_id, FHC_INTEGER);
+
+		if(!is_null($reihungstest_id))
+			$qry.=" AND reihungstest_id=".$this->db_add_param($reihungstest_id, FHC_INTEGER);
+
+		$ergebnis=0;
+
+		if($result = $this->db_query($qry))
+		{
+			if($this->db_num_rows($result)==0)
+				return false;
+
+			while($row = $this->db_fetch_object())
+			{
+				if (!isset($row->punkte))
+					continue;
+
+				$summeGewicht = 0;
+
+				//wenn maxpunkte ueberschritten wurde -> 100%
+				if($row->punkte>=$row->maxpunkte)
+				{
+					$prozent=100;
+					$row->punkte = $row->maxpunkte;
+				}
+				else
+					$prozent = (($row->punkte + $row->offsetpunkte)/($row->maxpunkte + $row->offsetpunkte))*100;
+
+				if($punkte)
+					$ergebnis +=$row->punkte;
+				else
+				{
+					$ergebnis+=$prozent*$row->gewicht;
+					$summeGewicht += $row->gewicht;
+				}
+			}
+			return $summeGewicht > 0 ? $ergebnis/$summeGewicht : $ergebnis;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler bei einer Abfrage';
+			return false;
+		}
+	}
+
 }
 ?>
