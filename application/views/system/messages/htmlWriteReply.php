@@ -22,7 +22,7 @@
 							<h3 class="page-header">Send message</h3>
 						</div>
 					</div>
-					<form id="sendForm" method="post" action="<?php echo site_url('/ViewMessage/sendReply'); ?>">
+					<form id="sendForm" method="post" action="<?php echo site_url('system/messages/ViewMessage/sendReply'); ?>">
 						<div class="row">
 							<div class="form-group">
 								<div class="col-lg-1 msgfieldcol-left">
