@@ -441,7 +441,7 @@ class pruefling extends basis_db
 					)
 				";
 
-			//calculate Gewicht for Studiengang if set
+			//calculate Gewichte for Studiengang if set
 			$gewichte = array();
 			if (isset($gewichtung_studiengang_kz))
 			{
@@ -550,62 +550,5 @@ class pruefling extends basis_db
 			return false;
 		}
 	}
-
-	/**
-	 * Berechnet das Reihungstestergebnis fuer einen Prestudenten und ggf Reihungstest
-	 *
-	 * @param $prestudent_id ID des Prestudenten
-	 * @param $punkte Wenn true werden Punkte geliefert, sonst Prozentsumme.
-	 * @param $reihungstest_id ID des Reihungstests.
-	 * @return Endpunkte des Reihungstests oder false wenn keine Punkte vorhanden
-	 */
-	public function getReihungstestErgebnisPrestudentNeu($prestudent_id, $punkte=false, $reihungstest_id=null)
-	{
-		$qry = "SELECT * FROM testtool.vw_auswertung
-				WHERE prestudent_id=".$this->db_add_param($prestudent_id, FHC_INTEGER);
-
-		if(!is_null($reihungstest_id))
-			$qry.=" AND reihungstest_id=".$this->db_add_param($reihungstest_id, FHC_INTEGER);
-
-		$ergebnis=0;
-
-		if($result = $this->db_query($qry))
-		{
-			if($this->db_num_rows($result)==0)
-				return false;
-
-			while($row = $this->db_fetch_object())
-			{
-				if (!isset($row->punkte))
-					continue;
-
-				$summeGewicht = 0;
-
-				//wenn maxpunkte ueberschritten wurde -> 100%
-				if($row->punkte>=$row->maxpunkte)
-				{
-					$prozent=100;
-					$row->punkte = $row->maxpunkte;
-				}
-				else
-					$prozent = (($row->punkte + $row->offsetpunkte)/($row->maxpunkte + $row->offsetpunkte))*100;
-
-				if($punkte)
-					$ergebnis +=$row->punkte;
-				else
-				{
-					$ergebnis+=$prozent*$row->gewicht;
-					$summeGewicht += $row->gewicht;
-				}
-			}
-			return $summeGewicht > 0 ? $ergebnis/$summeGewicht : $ergebnis;
-		}
-		else
-		{
-			$this->errormsg = 'Fehler bei einer Abfrage';
-			return false;
-		}
-	}
-
 }
 ?>

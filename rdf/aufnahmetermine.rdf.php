@@ -113,11 +113,11 @@ if($prestudent_id!='')
 		// * Endpunkte über alle Basisgebiete
 		if(defined('FAS_REIHUNGSTEST_PUNKTE') && FAS_REIHUNGSTEST_PUNKTE)
 		{
-			$endpunkte_inkl_gebiete = $pruefling->getReihungstestErgebnisPerson($row->person_id, true, $row->reihungstest_id, false, $row->studiengang_kz);
+			$endpunkte_inkl_gebiete = $pruefling->getReihungstestErgebnisPerson($row->person_id, true, $row->reihungstest_id, false, $row->studiengang_kz, $studiengang_kz);
 		}
 		else
 		{
-			$endpunkte_inkl_gebiete = $pruefling->getReihungstestErgebnisPerson($row->person_id, false, $row->reihungstest_id, false, $row->studiengang_kz);
+			$endpunkte_inkl_gebiete = $pruefling->getReihungstestErgebnisPerson($row->person_id, false, $row->reihungstest_id, false, $row->studiengang_kz, $studiengang_kz);
 		}
 
 		// * ggf. Endpunkte exklusive bestimmter Gebiete, die in der config-Datei gesetzt sind
@@ -125,11 +125,11 @@ if($prestudent_id!='')
 		{
 			if(defined('FAS_REIHUNGSTEST_PUNKTE') && FAS_REIHUNGSTEST_PUNKTE)
 			{
-				$endpunkte_exkl_gebiete = $pruefling->getReihungstestErgebnisPerson($row->person_id, true, $row->reihungstest_id, true, $row->studiengang_kz);
+				$endpunkte_exkl_gebiete = $pruefling->getReihungstestErgebnisPerson($row->person_id, true, $row->reihungstest_id, true, $row->studiengang_kz, $studiengang_kz);
 			}
 			else
 			{
-				$endpunkte_exkl_gebiete = $pruefling->getReihungstestErgebnisPerson($row->person_id, false, $row->reihungstest_id, true, $row->studiengang_kz);
+				$endpunkte_exkl_gebiete = $pruefling->getReihungstestErgebnisPerson($row->person_id, false, $row->reihungstest_id, true, $row->studiengang_kz, $studiengang_kz);
 			}
 		}
 
@@ -174,22 +174,22 @@ elseif($rt_person_id!='')
 		// * Endpunkte über alle Basisgebiete
 		if(defined('FAS_REIHUNGSTEST_PUNKTE') && FAS_REIHUNGSTEST_PUNKTE)
 		{
-			$endpunkte_inkl_gebiete = $pruefling->getReihungstestErgebnisPerson($reihungstest->person_id, true, $reihungstest->reihungstest_id, false, $studiengang_kz);
+			$endpunkte_inkl_gebiete = $pruefling->getReihungstestErgebnisPerson($reihungstest->person_id, true, $reihungstest->reihungstest_id, false, $studiengang_kz, $studiengang_kz);
 		}
 		else
 		{
-			$endpunkte_inkl_gebiete = $pruefling->getReihungstestErgebnisPerson($reihungstest->person_id, false, $reihungstest->reihungstest_id, false, $studiengang_kz);
+			$endpunkte_inkl_gebiete = $pruefling->getReihungstestErgebnisPerson($reihungstest->person_id, false, $reihungstest->reihungstest_id, false, $studiengang_kz, $studiengang_kz);
 		}
 		// * ggf. Endpunkte exklusive bestimmter Gebiete, die in der config-Datei gesetzt sind
 		if (defined('FAS_REIHUNGSTEST_EXCLUDE_GEBIETE') && !empty(FAS_REIHUNGSTEST_EXCLUDE_GEBIETE))
 		{
 			if(defined('FAS_REIHUNGSTEST_PUNKTE') && FAS_REIHUNGSTEST_PUNKTE)
 			{
-				$endpunkte_exkl_gebiete = $pruefling->getReihungstestErgebnisPerson($reihungstest->person_id, true, $reihungstest->reihungstest_id, true, $studiengang_kz);
+				$endpunkte_exkl_gebiete = $pruefling->getReihungstestErgebnisPerson($reihungstest->person_id, true, $reihungstest->reihungstest_id, true, $studiengang_kz, $studiengang_kz);
 			}
 			else
 			{
-				$endpunkte_exkl_gebiete = $pruefling->getReihungstestErgebnisPerson($reihungstest->person_id, false, $reihungstest->reihungstest_id, true, $studiengang_kz);
+				$endpunkte_exkl_gebiete = $pruefling->getReihungstestErgebnisPerson($reihungstest->person_id, false, $reihungstest->reihungstest_id, true, $studiengang_kz, $studiengang_kz);
 			}
 		}
 
