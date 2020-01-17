@@ -45,7 +45,7 @@ class Phrases extends Auth_Controller
 	{
 		$phrases = $this->phraseslib->getPhraseByApp('aufnahme');
 		if ($phrases->error)
-			show_error($phrases->retval);
+			show_error(getError($phrases));
 
 		$data = array(
 			'app' => 'aufnahme',
@@ -67,7 +67,7 @@ class Phrases extends Auth_Controller
 
 		$phrase_inhalt = $this->phraseslib->getPhraseInhalt($phrase_id);
 		if ($phrase_inhalt->error)
-			show_error($phrase_inhalt->retval);
+			show_error(getError($phrase_inhalt));
 
 		$data = array(
 			'phrase_id' => $phrase_id,
@@ -88,7 +88,7 @@ class Phrases extends Auth_Controller
 
 		$phrase_inhalt = $this->phraseslib->delPhrasentext($phrasentext_id);
 		if ($phrase_inhalt->error)
-			show_error($phrase_inhalt->retval);
+			show_error(getError($phrase_inhalt));
 
 		redirect('/system/Phrases/view/'.$phrase_id);
 	}
@@ -102,7 +102,7 @@ class Phrases extends Auth_Controller
 
 		$phrase = $this->phraseslib->getPhrase($phrase_id);
 		if ($phrase->error)
-			show_error($phrase->retval);
+			show_error(getError($phrase));
 
 		if (count($phrase->retval) != 1)
 			show_error('Phrase nicht vorhanden! ID: '.$phrase_id);
@@ -124,7 +124,7 @@ class Phrases extends Auth_Controller
 
 		$phrase = $this->phraseslib->savePhrase($phrase_id, $data);
 		if ($phrase->error)
-			show_error($phrase->retval);
+			show_error(getError($phrase));
 
 		$phrase_id = $phrase->retval;
 
@@ -145,7 +145,7 @@ class Phrases extends Auth_Controller
 
 		$resultOE = $this->OrganisationseinheitModel->loadWhere(array('aktiv' => true, 'oe_parent_kurzbz' => null));
 		if ($resultOE->error)
-			show_error($resultOE->retval);
+			show_error(getError($resultOE));
 
 		if (hasData($resultOE))
 		{
@@ -161,7 +161,7 @@ class Phrases extends Auth_Controller
 
 			$phrase_inhalt = $this->phraseslib->insertPhraseinhalt($data);
 			if ($phrase_inhalt->error)
-				show_error($phrase_inhalt->retval);
+				show_error(getError($phrase_inhalt);
 
 			$phrase_inhalt_id = $phrase_inhalt->retval;
 
@@ -180,7 +180,7 @@ class Phrases extends Auth_Controller
 	{
 		$phrase_inhalt = $this->phraseslib->getPhrasentextById($phrasentext_id);
 		if ($phrase_inhalt->error)
-			show_error($phrase_inhalt->retval);
+			show_error(getError($phrase_inhalt));
 
 		$data = $phrase_inhalt->retval[0];
 
@@ -204,7 +204,7 @@ class Phrases extends Auth_Controller
 
 		$phrase_inhalt = $this->phraseslib->updatePhraseInhalt($phrase_inhalt_id, $data);
 		if ($phrase_inhalt->error)
-			show_error($phrase_inhalt->retval);
+			show_error(getError($phrase_inhalt));
 
 
 		redirect('/system/Phrases/editText/'.$phrase_inhalt_id);

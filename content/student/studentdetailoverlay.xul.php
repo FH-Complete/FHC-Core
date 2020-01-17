@@ -515,6 +515,10 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 								sort="rdf:http://www.technikum-wien.at/prestudentrolle/rdf#ausbildungssemester"
 								sorthints="integer"/>
 							<splitter class="tree-splitter"/>
+							<treecol id="student-prestudent-tree-rolle-lehrverband" label="Lehrverband" flex="1" hidden="false" persist="hidden, width, ordinal"
+									 class="sortDirectionIndicator"
+									 sort="rdf:http://www.technikum-wien.at/prestudentrolle/rdf#lehrverband" />
+							<splitter class="tree-splitter"/>
 							<treecol id="student-prestudent-tree-rolle-datum" label="Datum" flex="2" hidden="false" persist="hidden, width, ordinal"
 								class="sortDirectionIndicator"
 								sort="rdf:http://www.technikum-wien.at/prestudentrolle/rdf#datum" />
@@ -565,6 +569,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 											<treecell label="rdf:http://www.technikum-wien.at/prestudentrolle/rdf#status_kurzbz"/>
 											<treecell label="rdf:http://www.technikum-wien.at/prestudentrolle/rdf#studiensemester_kurzbz"/>
 											<treecell label="rdf:http://www.technikum-wien.at/prestudentrolle/rdf#ausbildungssemester"/>
+											<treecell label="rdf:http://www.technikum-wien.at/prestudentrolle/rdf#lehrverband"/>
 											<treecell label="rdf:http://www.technikum-wien.at/prestudentrolle/rdf#datum"/>
 											<treecell label="rdf:http://www.technikum-wien.at/prestudentrolle/rdf#orgform_kurzbz"/>
 											<treecell label="rdf:http://www.technikum-wien.at/prestudentrolle/rdf#prestudent_id"/>

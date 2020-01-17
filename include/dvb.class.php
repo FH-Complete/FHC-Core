@@ -39,8 +39,8 @@ class dvb extends basis_db
 	const DVB_URL_WEBSERVICE_NACHNAME = DVB_PORTAL.'/rws/0.2/simpleStudentByNachname.xml';
 	const DVB_URL_WEBSERVICE_NAME = DVB_PORTAL.'/rws/0.2/simpleStudentByName.xml';
 	const DVB_URL_WEBSERVICE_MATRIKELNUMMER = DVB_PORTAL.'/rws/0.2/simpleStudentByMatrikelnummer.xml';
-	const DVB_URL_WEBSERVICE_RESERVIERUNG = DVB_PORTAL.'/dvb/matrikelnummern/1.0/reservierung.xml';
-	const DVB_URL_WEBSERVICE_MELDUNG = DVB_PORTAL.'/dvb/matrikelnummern/1.0/meldung.xml';
+	const DVB_URL_WEBSERVICE_RESERVIERUNG = DVB_PORTAL.'/rws/0.5/matrikelreservierung.xml';
+	const DVB_URL_WEBSERVICE_MELDUNG = DVB_PORTAL.'/rws/0.5/matrikelmeldung.xml';
 	const DVB_URL_WEBSERVICE_BPK = DVB_PORTAL.'/rws/0.2/pruefeBpk.xml';
 
 	public $authentication;
@@ -747,7 +747,7 @@ class dvb extends basis_db
 		}
 
 		$data = '<?xml version="1.0" encoding="UTF-8"?>
-		<matrikelnummernanfrage>
+		<matrikelnummernanfrage xmlns="http://www.brz.gv.at/datenverbund-unis">
 			<uuid>'.$uuid.'</uuid>
 			<kontingentblock>
 				<anzahl>'.$anzahl.'</anzahl>
@@ -828,13 +828,13 @@ class dvb extends basis_db
 		$gebdat = str_replace("-", "", $person->geburtsdatum);
 
 		$data = '<?xml version="1.0" encoding="UTF-8"?>
-		<matrikelnummernmeldung>
+		<matrikelnummernmeldung xmlns="http://www.brz.gv.at/datenverbund-unis">
 			<uuid>'.$uuid.'</uuid>
-			<personmeldung>
+			<personmeldung xmlns="http://www.brz.gv.at/datenverbund-unis">
 				<be>'.$bildungseinrichtung.'</be>
 				<gebdat>'.$gebdat.'</gebdat>
 				<geschlecht>'.$person->geschlecht.'</geschlecht>
-				<matrikel>'.$person->matrikelnummer.'</matrikel>';
+				<matrikelnummer>'.$person->matrikelnummer.'</matrikelnummer>';
 		if (isset($person->matura) && $person->matura != '')
 			$data .= '<matura>'.$person->matura.'</matura>';
 		else

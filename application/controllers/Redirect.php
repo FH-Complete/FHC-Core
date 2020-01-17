@@ -37,12 +37,13 @@ class Redirect extends FHC_Controller
 	public function redirectByToken($token)
 	{
 		$msg = $this->MessageTokenModel->getMessageByToken($token);
-		if ($msg->error)
+		if (isError($msg))
 		{
-			show_error($msg->retval);
+			show_error(getError($msg));
 		}
 
-		$oe_kurzbz = $msg->retval[0]->oe_kurzbz;
+		$oe_kurzbz = null;
+		if (hasData($msg)) $oe_kurzbz = getData($msg)[0]->oe_kurzbz;
 
 		if ($oe_kurzbz != null && $oe_kurzbz != '')
 		{
@@ -51,7 +52,7 @@ class Redirect extends FHC_Controller
 			$getOERoot = $this->MessageTokenModel->getOERoot($oe_kurzbz);
 			if (isSuccess($getOERoot)) // If no errors occurred
 			{
-				$organisationRoot = $getOERoot->retval;
+				$organisationRoot = getData($getOERoot);
 			}
 			else
 			{

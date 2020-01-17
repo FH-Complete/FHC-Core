@@ -165,10 +165,32 @@
 		{
 			"type": "package",
 			"package": {
+				"name": "moment/momentjs",
+				"version": "2.24.0",
+				"dist": {
+					"url": "https://github.com/moment/moment/archive/2.24.0.zip",
+					"type": "zip"
+				}
+			}
+		},
+		{
+			"type": "package",
+			"package": {
 				"name": "nicolaskruchten/pivottable",
 				"version": "2.15.0",
 				"dist": {
 					"url": "https://github.com/nicolaskruchten/pivottable/archive/v2.21.0.zip",
+					"type": "zip"
+				}
+			}
+		},
+		{
+			"type": "package",
+			"package": {
+				"name": "olifolkerd/tabulator",
+				"version": "4.2.7",
+				"dist": {
+					"url": "https://github.com/olifolkerd/tabulator/archive/4.2.7.zip",
 					"type": "zip"
 				}
 			}
@@ -253,6 +275,7 @@
 
 		"ludo/jquery-treetable": "^3.2",
 
+		"moment/momentjs": "2.24.0",
 		"michelf/php-markdown": "1.5.0",
 		"ml/json-ld": "1.*",
 		"mottie/tablesorter": "^2.29",
@@ -260,6 +283,8 @@
 		"nategood/httpful": "^0.2.20",
 		"netcarver/textile": "^3.5",
 		"nicolaskruchten/pivottable": "^2.21.0",
+
+		"olifolkerd/tabulator": "4.2.7",
 
 		"phpseclib/phpseclib": "^2.0",
 

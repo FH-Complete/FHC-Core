@@ -135,7 +135,7 @@
 						 FROM tbl_prestudentstatus spss
 						WHERE spss.prestudent_id = pss.prestudent_id
 						  AND spss.status_kurzbz = '.$REJECTED_STATUS.'
-						  AND spss.studiensemester_kurzbz IN (SELECT ss.studiensemester_kurzbz FROM public.tbl_studiensemester ss WHERE ss.ende > 
+						  AND spss.studiensemester_kurzbz IN (SELECT ss.studiensemester_kurzbz FROM public.tbl_studiensemester ss WHERE ss.ende >
 						  (SELECT start FROM public.tbl_studiensemester sss WHERE studiensemester_kurzbz = '.$STUDIENSEMESTER.'))
 					)
 				 LIMIT 1
@@ -206,6 +206,7 @@
 				  FROM public.tbl_prestudent ps
 				  JOIN public.tbl_studiengang sg USING(studiengang_kz)
 				WHERE ps.person_id = p.person_id
+				  AND ps.reihungstestangetreten = FALSE
 				  AND (sg.typ IN ('.$STUDIENGANG_TYP.')
 					   OR
 					   sg.studiengang_kz in('.$ADDITIONAL_STG.')
@@ -235,7 +236,6 @@
 		'filter_id' => $this->input->get('filter_id'),
 		'requiredPermissions' => 'infocenter',
 		'datasetRepresentation' => 'tablesorter',
-		'reloadDataset' => ($this->input->get('reloadDataset')=='true'?true:false),
 		'checkboxes' => 'PersonId',
 		'additionalColumns' => array('Details'),
 		'columnsAliases' => array(

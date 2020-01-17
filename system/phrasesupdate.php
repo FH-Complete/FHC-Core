@@ -3292,6 +3292,26 @@ $phrases = array(
 		)
 	),
 	array(
+		'app' => 'core',
+		'category' => 'global',
+		'phrase' => 'rueckstelldatum',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'rückstelldatum',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'onHold date',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
 		'app' => 'infocenter',
 		'category' => 'infocenter',
 		'phrase' => 'bewerberParken',
@@ -4014,8 +4034,87 @@ When on hold, the date is only a reminder.',
 				'insertvon' => 'system'
 			)
 		)
+	),
+	array(
+        'app' => 'core',
+        'category' => 'global',
+        'phrase' => 'lehrauftraegeBestellen',
+        'insertvon' => 'system',
+        'phrases' => array(
+            array(
+                'sprache' => 'German',
+                'text' => 'Lehraufträge bestellen',
+                'description' => '',
+                'insertvon' => 'system'
+            ),
+            array(
+                'sprache' => 'English',
+                'text' => 'Order lectureships',
+                'description' => '',
+                'insertvon' => 'system'
+            )
+        )
+    ),
+    array(
+        'app' => 'core',
+        'category' => 'global',
+        'phrase' => 'lehrauftraegeErteilen',
+        'insertvon' => 'system',
+        'phrases' => array(
+            array(
+                'sprache' => 'German',
+                'text' => 'Lehraufträge erteilen',
+                'description' => '',
+                'insertvon' => 'system'
+            ),
+            array(
+                'sprache' => 'English',
+                'text' => 'Approve lectureships',
+                'description' => '',
+                'insertvon' => 'system'
+            )
+        )
+    ),
+    array(
+        'app' => 'core',
+        'category' => 'global',
+        'phrase' => 'lehrauftraegeAnnehmen',
+        'insertvon' => 'system',
+        'phrases' => array(
+            array(
+                'sprache' => 'German',
+                'text' => 'Lehraufträge annehmen',
+                'description' => '',
+                'insertvon' => 'system'
+            ),
+            array(
+                'sprache' => 'English',
+                'text' => 'Accept lectureships',
+                'description' => '',
+                'insertvon' => 'system'
+            )
+        )
+    ),
+	array(
+		'app' => 'core',
+		'category' => 'global',
+		'phrase' => 'stornierteLehrauftraege',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Stornierte Lehraufträge',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Cancelled lectureships',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
 	)
-
 );
 
 

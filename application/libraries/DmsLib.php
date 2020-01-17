@@ -249,7 +249,7 @@ class DmsLib
 				}
 				else
 				{
-					return error($dmscontent->retval);
+					return error(getError($dmscontent));
 				}
 			}
 			else
@@ -259,7 +259,7 @@ class DmsLib
 		}
 		else
 		{
-			return error($akte->retval);
+			return error(getError($akte));
 		}
 	}
 

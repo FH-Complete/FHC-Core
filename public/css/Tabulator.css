@@ -1,0 +1,14 @@
+.tabulator-col {
+	font-size: 14px;
+}
+
+.tabulator-page {
+	color: black;
+	opacity: 1 !important;
+	padding: 2px 7px !important;
+	border: 0px !important;
+}
+
+.tabulator-page.active {
+	color: #337ab7 !important;
+}

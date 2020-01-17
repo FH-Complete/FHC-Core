@@ -35,6 +35,9 @@ $rechte->getBerechtigungen($user);
 
 echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 
+// Vertragsdetails: Anzeige wird über config Eintrag bestimmt
+$is_hidden = (!defined('FAS_LV_LEKTORINNENZUTEILUNG_VERTRAGSDETAILS_ANZEIGEN') || FAS_LV_LEKTORINNENZUTEILUNG_VERTRAGSDETAILS_ANZEIGEN == true) ? 'false' : 'true';
+
 ?>
 
 <overlay id="LehrveranstaltungDetailOverlay"
@@ -62,7 +65,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 	</popupset>
 	<popupset>
 		<menupopup id="lehrveranstaltung-lektor-tree-popup">
-			<menuitem label="Entfernen" oncommand="LeMitarbeiterDel();" />
+			<menuitem id="lehrveranstaltung-lektor-tree-popup-label" label="Entfernen" oncommand="LeMitarbeiterDel();" />
 			<?php
 			if($rechte->isBerechtigt('lv-plan/lektorentfernen'))
 			{
@@ -429,10 +432,10 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 		</vbox>
 
 		<vbox>
-		<hbox>
+		<vbox>
 		<groupbox>
 			<caption label="LektorInnendaten" />
-			<vbox flex="1">
+			<vbox flex="1" style="padding: 10px;">
 			<textbox id="lehrveranstaltung-lehreinheitmitarbeiter-textbox-lehreinheit_id" hidden="true"/>
 			<textbox id="lehrveranstaltung-lehreinheitmitarbeiter-textbox-mitarbeiter_uid" hidden="true"/>
 			<grid align="end" flex="1"
@@ -500,9 +503,43 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 				</hbox>
 			</vbox>
 		</groupbox>
-		</hbox>
 		</vbox>
-		<spacer flex="1" />
+
+        <!-- Vertragsdetails: Anzeige wird ueber config Eintrag bestimmt -->
+        <vbox>
+            <groupbox id="lehrveranstaltung-lehreinheitmitarbeiter-groupbox-vertragsdetails" hidden="<?php echo $is_hidden ?>">
+                <caption label="Vertragsdetails" />
+                <grid style="overflow:auto; padding:10px;" flex="1">
+                <columns>
+                    <column flex="1"/>
+                    <column flex="1"/>
+                    <column flex="1"/>
+                </columns>
+                <rows>
+                    <label id="lehrveranstaltung-lehreinheitmitarbeiter-label-vertrag_id" hidden="true" value=""/>
+                    <row>
+                        <label value="Vertragsstatus:"/>
+                        <label id="lehrveranstaltung-lehreinheitmitarbeiter-label-vertragsstatus" value="" readonly="true" maxlength="8" size="6"/>
+                        <button label="Stornieren" disabled="true" id="lehrveranstaltung-lehreinheitmitarbeiter-button-vertrag-stornieren"
+                                oncommand="VertragStornieren();" flex="1"/>
+                    </row>
+                    <row>
+                        <label value="Vertragsdetails lt. Urfassung" style="margin-bottom: 10px;"/>
+                    </row>
+                    <row>
+                        <label value="Semesterstunden:" class="indent"/>
+                        <label id="lehrveranstaltung-lehreinheitmitarbeiter-label-vertragsstunden" value="" readonly="true"/>
+                    </row>
+                    <row>
+                        <label value="Studiensemester:" class="indent"/>
+                        <label id="lehrveranstaltung-lehreinheitmitarbeiter-label-vertragsstunden_studiensemester_kurzbz" value="" readonly="true"/>
+                    </row>
+                </rows>
+                </grid>
+            </groupbox>
+        </vbox>
+
+		</vbox>
 	</hbox>
 </vbox>
 

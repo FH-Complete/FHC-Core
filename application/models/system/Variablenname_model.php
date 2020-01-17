@@ -27,7 +27,7 @@ class Variablenname_model extends DB_Model
 	/**
 	 * Gets defaults for user variables.
 	 * If no default value present in table, SQL can be executed for retrieving the value.
-	 * @param null $names optionally get only defaults for certain variables
+	 * @param $names optionally get only defaults for certain variables
 	 * @return array
 	 */
 	public function getDefaults($names = null)
@@ -36,13 +36,13 @@ class Variablenname_model extends DB_Model
 
 		$qry = "SELECT name, defaultwert FROM public.tbl_variablenname";
 
-		if (isset($names) && is_array($names))
+		if (!isEmptyArray($names))
 		{
-			$qry .= " WHERE name IN ('".implode(',', $names)."')";
+			$qry .= " WHERE name IN ?";
 		}
 		$qry .= ";";
 
-		$defaultsres = $this->execQuery($qry);
+		$defaultsres = $this->execQuery($qry, array('name' => $names));
 
 		if (hasData($defaultsres))
 		{

@@ -20,7 +20,7 @@ class Studiensemester extends Auth_Controller
 				'editStudiensemester' => 'basis/studiensemester:rw',
 				'newStudiensemester' => 'basis/studiensemester:rw',
 				'insStudiensemester' => 'basis/studiensemester:rw',
-				'saveStudiensemester' => 'basis/studiensemester:rw',
+				'updateStudiensemester' => 'basis/studiensemester:rw',
 				'deleteStudiensemester' => 'basis/studiensemester:rw'
 			)
 		);
@@ -45,7 +45,7 @@ class Studiensemester extends Auth_Controller
 		$semester = $this->StudiensemesterModel->load();
 		if ($semester->error)
 		{
-			show_error($semester->retval);
+			show_error(getError($semester));
 		}
 
 		$data = array(
@@ -64,13 +64,13 @@ class Studiensemester extends Auth_Controller
 		$semester = $this->StudiensemesterModel->load($semester_kurzbez);
 		if ($semester->error)
 		{
-			show_error($semester->retval);
+			show_error(getError($semester));
 		}
 		$this->StudienjahrModel->addOrder('studienjahr_kurzbz', "DESC");
 		$allstudienjahre = $this->StudienjahrModel->load();
 		if ($allstudienjahre->error)
 		{
-			show_error($allstudienjahre->retval);
+			show_error(getError($allstudienjahre));
 		}
 		$data = array(
 			"semester" => $semester->retval,
@@ -90,7 +90,7 @@ class Studiensemester extends Auth_Controller
 		$allstudienjahre = $this->StudienjahrModel->load();
 		if ($allstudienjahre->error)
 		{
-			show_error($allstudienjahre->retval);
+			show_error(getError($allstudienjahre));
 		}
 
 		$data = array(
@@ -108,11 +108,16 @@ class Studiensemester extends Auth_Controller
 	public function insStudiensemester()
 	{
 		$data = $this->__retrieveStudiensemesterData();
+
+		$studiensemester_exists = $this->StudiensemesterModel->load($data['studiensemester_kurzbz']);
+		if (hasData($studiensemester_exists))
+			show_error("Studiensemester existiert bereits");
+
 		$semester = $this->StudiensemesterModel->insert($data);
 
 		if ($semester->error)
 		{
-			show_error($semester->retval);
+			show_error(getError($semester));
 		}
 
 		redirect("/organisation/studiensemester/editStudiensemester/".$data['studiensemester_kurzbz']."?saved=true");
@@ -156,7 +161,7 @@ class Studiensemester extends Auth_Controller
 			return $data;
 		} else
 		{
-			show_error($validation->retval);
+			show_error(getError($validation));
 		}
 	}
 
@@ -185,14 +190,14 @@ class Studiensemester extends Auth_Controller
 	 * redirects to edit page after inserting
 	 * saved=true is a GET parameter passed for showing save message
 	 */
-	public function saveStudiensemester()
+	public function updateStudiensemester()
 	{
 		$data = $this->__retrieveStudiensemesterData();
 		$semester = $this->StudiensemesterModel->update($data['studiensemester_kurzbz'], $data);
 
 		if ($semester->error)
 		{
-			show_error($semester->retval);
+			show_error(getError($semester));
 		}
 
 		redirect("/organisation/studiensemester/editStudiensemester/".$data['studiensemester_kurzbz']."?saved=true");
@@ -209,10 +214,9 @@ class Studiensemester extends Auth_Controller
 
 		if ($semester->error)
 		{
-			show_error($semester->retval);
+			show_error(getError($semester));
 		}
 
 		redirect("/organisation/studiensemester/listStudiensemester");
 	}
-
 }
