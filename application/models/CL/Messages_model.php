@@ -21,6 +21,7 @@ class Messages_model extends CI_Model
 		</blockquote>';
 
 	const NO_AUTH_UID = 'online'; // hard coded uid if no authentication is performed
+	const ALT_OE = 'infocenter'; // alternative organisation unit when no one is found for a presetudent
 
 	/**
 	 * Constructor
@@ -86,7 +87,7 @@ class Messages_model extends CI_Model
 			{
 				$ouOptions .= sprintf(
 					"\n".'<option value="%s">%s</option>',
-					is_numeric($ou->prestudent_id) ? $ou->oe_kurzbz : 'infocenter',
+					is_numeric($ou->prestudent_id) ? $ou->oe_kurzbz : self::ALT_OE,
 					$ou->bezeichnung
 				);
 			}
@@ -182,7 +183,7 @@ class Messages_model extends CI_Model
 	public function prepareAjaxReadSent()
 	{
 		// Retrieves sent messages from the logged user
-		$sentMessagesResult = $this->RecipientModel->getSentMessages(getAuthPersonId());
+		$sentMessagesResult = $this->RecipientModel->getSentMessages(getAuthPersonId(), self::ALT_OE);
 		if (isError($sentMessagesResult)) return $sentMessagesResult; // If an error occurred return it
 
 		if (hasData($sentMessagesResult))
