@@ -1047,7 +1047,7 @@ class InfoCenter extends Auth_Controller
 		$prevFilterId = $this->input->get(self::PREV_FILTER_ID);
 		if (isset($prevFilterId))
 		{
-			$homeLink .= '&'.self::FILTER_ID.'='.$prevFilterId;
+			$homeLink .= '?'.self::FILTER_ID.'='.$prevFilterId;
 		}
 
 		$this->navigationlib->setSessionElementMenu(
