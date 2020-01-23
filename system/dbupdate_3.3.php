@@ -3449,6 +3449,81 @@ if(!$result = @$db->db_query("SELECT 1 FROM fue.tbl_projekttyp LIMIT 1"))
 		echo '<br>fue.tbl_projekttyp hinzugefuegt.';
 }
 
+// iban und bic zu vw_msg_vars hinzufügen
+if(!$result = @$db->db_query('SELECT "IBAN Studiengang", "BIC Studiengang" FROM public.vw_msg_vars LIMIT 1'))
+{
+	$qry = '
+	CREATE OR REPLACE VIEW public.vw_msg_vars AS (
+		SELECT DISTINCT ON(p.person_id, pr.prestudent_id) p.person_id,
+			   pr.prestudent_id AS prestudent_id,
+			   p.nachname AS "Nachname",
+			   p.vorname AS "Vorname",
+			   p.anrede AS "Anrede",
+			   a.strasse AS "Strasse",
+			   a.ort AS "Ort",
+			   a.plz AS "PLZ",
+			   a.gemeinde AS "Gemeinde",
+			   a.langtext AS "Nation",
+			   ke.kontakt AS "Email",
+			   kt.kontakt AS "Telefon",
+			   s.bezeichnung AS "Studiengang DE",
+			   s.english AS "Studiengang EN",
+			   st.bezeichnung AS "Typ",
+			   orgform_kurzbz AS "Orgform",
+			   p.zugangscode AS "Zugangscode",
+			   bk.iban AS "IBAN Studiengang",
+               bk.bic AS "BIC Studiengang"
+		  FROM public.tbl_person p
+	 LEFT JOIN (
+					SELECT person_id,
+						   kontakt
+					  FROM public.tbl_kontakt
+					 WHERE zustellung = TRUE
+					   AND kontakttyp = \'email\'
+				  ORDER BY kontakt_id DESC
+			) ke USING(person_id)
+	 LEFT JOIN (
+					SELECT person_id,
+						   kontakt
+					  FROM public.tbl_kontakt
+					 WHERE zustellung = TRUE
+					   AND kontakttyp IN (\'telefon\', \'mobil\')
+				  ORDER BY kontakt_id DESC
+			) kt USING(person_id)
+	 LEFT JOIN (
+					SELECT person_id,
+						   strasse,
+						   ort,
+						   plz,
+						   gemeinde,
+						   langtext
+					  FROM public.tbl_adresse
+				 LEFT JOIN bis.tbl_nation ON(bis.tbl_nation.nation_code = public.tbl_adresse.nation)
+					 WHERE public.tbl_adresse.heimatadresse = TRUE
+				  ORDER BY adresse_id DESC
+			) a USING(person_id)
+			LEFT JOIN public.tbl_prestudent pr USING(person_id)
+			INNER JOIN public.tbl_studiengang s USING(studiengang_kz)
+			INNER JOIN public.tbl_studiengangstyp st USING(typ)
+			         LEFT JOIN ( SELECT DISTINCT ON (prestudent_id)
+                         tbl_prestudent.prestudent_id,
+                         tbl_bankverbindung.iban,
+                         tbl_bankverbindung.bic,
+                         tbl_studiengang.oe_kurzbz
+                     FROM public.tbl_bankverbindung
+                              JOIN public.tbl_studiengang USING(oe_kurzbz)
+                              JOIN public.tbl_prestudent USING (studiengang_kz)
+                     ORDER BY prestudent_id, tbl_bankverbindung.insertamum DESC, iban) bk USING (prestudent_id)
+		 WHERE p.aktiv = TRUE
+	  ORDER BY p.person_id ASC, pr.prestudent_id ASC
+	);';
+
+	if(!$db->db_query($qry))
+		echo '<strong>public.vw_msg_vars: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>public.vw_msg_vars iban und bic added';
+}
+
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
 
@@ -3637,7 +3712,7 @@ $tabellen=array(
 	"public.tbl_mitarbeiter"  => array("mitarbeiter_uid","personalnummer","telefonklappe","kurzbz","lektor","fixangestellt","bismelden","stundensatz","ausbildungcode","ort_kurzbz","standort_id","anmerkung","insertamum","insertvon","updateamum","updatevon","ext_id","kleriker"),
 	"public.tbl_msg_attachment" => array("attachment_id","message_id","name","filename"),
 	"public.tbl_msg_message" => array("message_id","person_id","subject","body","priority","relationmessage_id","oe_kurzbz","insertamum","insertvon"),
-	"public.tbl_msg_recipient" => array("message_id","person_id","token","sent","sentinfo","insertamum","insertvon"),
+	"public.tbl_msg_recipient" => array("message_id","person_id","token","sent","sentinfo","insertamum","insertvon","oe_kurzbz"),
 	"public.tbl_msg_status" => array("message_id","person_id","status","statusinfo","insertamum","insertvon","updateamum","updatevon"),
 	"public.tbl_notiz"  => array("notiz_id","titel","text","verfasser_uid","bearbeiter_uid","start","ende","erledigt","insertamum","insertvon","updateamum","updatevon","ext_id"),
 	"public.tbl_notizzuordnung"  => array("notizzuordnung_id","notiz_id","projekt_kurzbz","projektphase_id","projekttask_id","uid","person_id","prestudent_id","bestellung_id","lehreinheit_id","ext_id","anrechnung_id"),
