@@ -107,7 +107,7 @@ class PhrasesLib
 					// If no <p> tags required
 					if ($blockTags == 'no')
 					{
-						$tmpText = $textileParser->textileThis($result->retval[$i]->text); // Parse
+						$tmpText = $textileParser->parse($result->retval[$i]->text); // Parse
 
 						// Removes tags <p> and </p> from the beginning and from the end of the string if they are present
 						// NOTE: Those tags are usually, but not always, added by the textile parser
@@ -127,7 +127,7 @@ class PhrasesLib
 					}
 					else
 					{
-						$result->retval[$i]->text = $textileParser->textileThis($result->retval[$i]->text);
+						$result->retval[$i]->text = $textileParser->parse($result->retval[$i]->text);
 					}
 				}
 			}

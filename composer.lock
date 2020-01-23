@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "5fa45f7d529152ca14fc108e2454033f",
-    "content-hash": "c95c49b4e8106a5aa05a11720c0f6f72",
+    "hash": "59fc693321fbae0364ec7174a0d0dcb1",
+    "content-hash": "b377fd50d87a28fdedf6214e4ffb6a6d",
     "packages": [
         {
             "name": "BlackrockDigital/startbootstrap-sb-admin-2",
@@ -467,38 +467,38 @@
         },
         {
             "name": "components/font-awesome",
-            "version": "5.12.0",
+            "version": "4.7.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/components/font-awesome.git",
-                "reference": "d8646ec635a00b06cc219b7dffed3418444975cc"
+                "reference": "885308b939369d147bec93174722786bc2c4eedd"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/components/font-awesome/zipball/d8646ec635a00b06cc219b7dffed3418444975cc",
-                "reference": "d8646ec635a00b06cc219b7dffed3418444975cc",
+                "url": "https://api.github.com/repos/components/font-awesome/zipball/885308b939369d147bec93174722786bc2c4eedd",
+                "reference": "885308b939369d147bec93174722786bc2c4eedd",
                 "shasum": ""
             },
             "type": "component",
             "extra": {
                 "component": {
                     "styles": [
-                        "css/all.css"
+                        "css/font-awesome.css"
                     ],
                     "files": [
-                        "css/all.min.css",
-                        "webfonts/*"
+                        "css/font-awesome.min.css",
+                        "css/font-awesome.css.map",
+                        "fonts/*"
                     ]
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
-                "CC-BY-4.0",
                 "MIT",
                 "OFL-1.1"
             ],
-            "description": "Font Awesome, the iconic SVG, font, and CSS framework.",
-            "time": "2020-01-08 10:17:47"
+            "description": "The iconic font designed for use with Twitter Bootstrap.",
+            "time": "2016-10-25 10:56:23"
         },
         {
             "name": "components/jquery",
