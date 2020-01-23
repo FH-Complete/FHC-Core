@@ -34,6 +34,7 @@ require_once('../include/note.class.php');
 require_once('../include/studiengang.class.php');
 require_once('../include/mitarbeiter.class.php');
 require_once('../include/anrechnung.class.php');
+require_once('../include/prestudent.class.php');
 
 $datum = new datum();
 $db = new basis_db();
@@ -260,9 +261,17 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 
 				$ects_gesamt = $ects_gesamt_positiv = 0;
 				$prestudent_id = $row->prestudent_id;
+
+				$prestudent = new prestudent();
+				$showAllNoten = false;
+				$lastPrestudentStatus = $prestudent->getLastStatus($prestudent_id, $studiensemester_kurzbz);
+				//wenn Incoming, sollen am Zeugnis alle Noten gedruckt werden
+				if ($lastPrestudentStatus)
+					$showAllNoten = $prestudent->status_kurzbz === 'Incoming';
+
 				foreach ($obj->result as $row)
 				{
-					if($row->zeugnis)
+					if($showAllNoten || $row->zeugnis)
 					{
 						if (trim($row->note)!=='' && isset($note_arr[$row->note]))
 							$note = $note_arr[$row->note];
