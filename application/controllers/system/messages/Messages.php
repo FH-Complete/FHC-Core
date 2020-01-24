@@ -92,9 +92,17 @@ class Messages extends Auth_Controller
 	public function parseMessageText()
 	{
 		$person_id = $this->input->get('person_id');
+		$prestudent_id = $this->input->get('prestudent_id');
 		$text = $this->input->get('text');
 
-		$this->outputJson($this->CLMessagesModel->parseMessageText($person_id, $text));
+		if (!isEmptyString($person_id))
+		{
+			$this->outputJson($this->CLMessagesModel->parseMessageText($person_id, $text));
+		}
+		else
+		{
+			$this->outputJson($this->CLMessagesModel->parseMessageTextPrestudent($prestudent_id, $text));
+		}
 	}
 
 	// -----------------------------------------------------------------------------------------------------------------

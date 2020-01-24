@@ -230,18 +230,18 @@ class Messages_model extends CI_Model
 
 		// Retrieves message using the given token
 		$messageResult = $this->MessageTokenModel->getMessageByToken($token);
-		if (isError($messageResult)) show_error(getData($messageResult));
+		if (isError($messageResult)) show_error(getError($messageResult));
 		if (!hasData($messageResult)) show_error('No message found with the given token');
 
 		$message = getData($messageResult)[0]; // Found message data
 
 		// Set message as read
 		$srmsbtResult = $this->MessageTokenModel->setReadMessageStatusByToken($token);
-		if (isError($srmsbtResult)) show_error(getData($srmsbtResult));
+		if (isError($srmsbtResult)) show_error(getError($srmsbtResult));
 
 		// Retrieves message sender information
 		$senderResult = $this->MessageTokenModel->getSenderData($message->sender_id);
-		if (isError($senderResult)) show_error(getData($senderResult));
+		if (isError($senderResult)) show_error(getError($senderResult));
 		if (!hasData($senderResult)) show_error('No sender information found');
 
 		$sender = getData($senderResult)[0]; // Found sender data
@@ -249,7 +249,7 @@ class Messages_model extends CI_Model
 		// Check if the receiver is an employee
 		$isEmployee = false; // not by default
 		$isEmployeeResult = $this->MessageTokenModel->isEmployee($message->receiver_id);
-		if (isError($isEmployeeResult)) show_error(getData($isEmployeeResult));
+		if (isError($isEmployeeResult)) show_error(getError($isEmployeeResult));
 		if (hasData($isEmployeeResult)) $isEmployee = true;
 
 		// If the sender is an employee and are present configurations to reply
@@ -277,14 +277,14 @@ class Messages_model extends CI_Model
 
 		// Retrieves message using the given token
 		$messageResult = $this->MessageTokenModel->getMessageByToken($token);
-		if (isError($messageResult)) show_error(getData($messageResult));
+		if (isError($messageResult)) show_error(getError($messageResult));
 		if (!hasData($messageResult)) show_error('No message found with the given token');
 
 		$message = getData($messageResult)[0]; // Found message data
 
 		// Retrieves message sender information
 		$senderResult = $this->MessageTokenModel->getSenderData($message->sender_id);
-		if (isError($senderResult)) show_error(getData($senderResult));
+		if (isError($senderResult)) show_error(getError($senderResult));
 		if (!hasData($senderResult)) show_error('No sender information found');
 
 		$sender = getData($senderResult)[0]; // Found sender data
@@ -338,7 +338,7 @@ class Messages_model extends CI_Model
 
 		// Retrieves message vars data for the given user/s
 		$msgVarsData = $this->MessageModel->getMsgVarsDataByPersonId($persons);
-		if (isError($msgVarsData)) show_error(getData($msgVarsData));
+		if (isError($msgVarsData)) show_error(getError($msgVarsData));
 		if (!hasData($msgVarsData)) show_error('No recipients were given');
 
 		foreach (getData($msgVarsData) as $receiver)
@@ -381,7 +381,7 @@ class Messages_model extends CI_Model
 
 		// Retrieves message vars data for the given user/s
 		$msgVarsData = $this->MessageModel->getMsgVarsDataByPrestudentId($prestudents);
-		if (isError($msgVarsData)) show_error(getData($msgVarsData));
+		if (isError($msgVarsData)) show_error(getError($msgVarsData));
 		if (!hasData($msgVarsData)) show_error('No recipients were given');
 
 		$prestudentsData = $this->PrestudentModel->getOrganisationunits($prestudents);
@@ -425,13 +425,13 @@ class Messages_model extends CI_Model
 	{
 		// Retrieves message sender information
 		$senderResult = $this->MessageTokenModel->getSenderData($receiver_id);
-		if (isError($senderResult)) show_error(getData($senderResult));
+		if (isError($senderResult)) show_error(getError($senderResult));
 		if (!hasData($senderResult)) show_error('No sender information found');
 
 		$sender = getData($senderResult)[0]; // Found sender data
 
 		$messageResult = $this->MessageTokenModel->getMessageByToken($token);
-		if (isError($messageResult)) show_error(getData($messageResult));
+		if (isError($messageResult)) show_error(getError($messageResult));
 		// Security check! It is possible to reply only to a received message!!
 		if (!hasData($messageResult) || $relationmessage_id != getData($messageResult)[0]->message_id)
 		{
@@ -522,6 +522,32 @@ class Messages_model extends CI_Model
 		if (is_numeric($person_id))
 		{
 			$parseMessageText = $this->MessageModel->getMsgVarsDataByPersonId($person_id);
+		}
+
+		if (hasData($parseMessageText))
+		{
+			$parseMessageText = success(
+				parseText(
+					$text,
+					$this->_lowerReplaceSpaceArrayKeys((array)getData($parseMessageText)[0])
+				)
+			);
+		}
+
+		return $parseMessageText;
+	}
+
+	/**
+	 * Parse the given given text using data from the given user
+	 * Use the CI parser which performs simple text substitution for pseudo-variable
+	 */
+	public function parseMessageTextPrestudent($prestudent_id, $text)
+	{
+		$parseMessageText = error('The given prestudent_id is not a valid number');
+
+		if (is_numeric($prestudent_id))
+		{
+			$parseMessageText = $this->MessageModel->getMsgVarsDataByPrestudentId($prestudent_id);
 		}
 
 		if (hasData($parseMessageText))
@@ -638,8 +664,9 @@ class Messages_model extends CI_Model
 	 */
 	private function _prepareHtmlWriteTemplate($info, $message_id, $recipient_id)
 	{
+
 		// Checks that info parameter is valid
-		if (isError($info)) show_error(getData($info));
+		if (isError($info)) show_error(getError($info));
 		if (!hasData($info)) show_error('No recipients were given');
 
 		// If the message id and recipient id are given, then both they must be valid numbers
@@ -678,7 +705,7 @@ class Messages_model extends CI_Model
 		{
 			// Retrieves a received message from tbl_msg_recipient
 			$messageResult = $this->messagelib->getMessage($message_id, $recipient_id);
-			if (isError($messageResult)) show_error(getData($messageResult));
+			if (isError($messageResult)) show_error(getError($messageResult));
 			if (!hasData($messageResult)) show_error('The selected message does not exist');
 
 			$message = getData($messageResult)[0];
@@ -689,9 +716,25 @@ class Messages_model extends CI_Model
 		}
 
 		// ---------------------------------------------------------------------------------------
-		// Retrieves message vars from database view vw_msg_vars_person
-		$variablesResult = $this->messagelib->getMessageVarsPerson();
-		if (isError($variablesResult)) show_error(getData($variablesResult));
+		// Retrieves message vars from database view vw_msg_vars/vw_msg_vars_person
+		$variablesResult = null;
+		$type = '';
+
+		// If data contains a prestudent id
+		// NOTE:
+		// - info is checked at the beginning of this method so it is safe to use getData($info)[0]
+		// - the provided data inside info are all persons or prestudents, so it is safe to check only the first one
+		if (isset(getData($info)[0]->prestudent_id) && is_numeric(getData($info)[0]->prestudent_id))
+		{
+			$variablesResult = $this->messagelib->getMessageVarsPrestudent();
+			$type = '<input type="hidden" id="type" value="prestudents">';
+		}
+		else
+		{
+			$variablesResult = $this->messagelib->getMessageVarsPerson();
+			$type = '<input type="hidden" id="type" value="persons">';
+		}
+		if (isError($variablesResult)) show_error(getError($variablesResult));
 
 		// Then builds an array that contains objects with id (person_id) and description (Vorname + Nachname) of recipient
 		$variables = array();
@@ -712,9 +755,9 @@ class Messages_model extends CI_Model
 		// ---------------------------------------------------------------------------------------
  		// Organisation units and a boolean (true if the sender is administrator) are used to get the templates
 		$organisationUnits = $this->messagelib->getOeKurzbz($sender_id);
-		if (isError($organisationUnits)) show_error(getData($organisationUnits));
+		if (isError($organisationUnits)) show_error(getError($organisationUnits));
 		$senderIsAdmin = $this->BenutzerrolleModel->isAdminByPersonId($sender_id);
-		if (isError($senderIsAdmin)) show_error(getData($senderIsAdmin));
+		if (isError($senderIsAdmin)) show_error(getError($senderIsAdmin));
 
 		// ---------------------------------------------------------------------------------------
 		// Returns data as an array
@@ -727,7 +770,8 @@ class Messages_model extends CI_Model
 			'senderIsAdmin' => getData($senderIsAdmin),
 			'recipientsArray' => $recipientsArray,
 			'persons' => $persons,
-			'relationmessage_id' => $relationmessage
+			'relationmessage_id' => $relationmessage,
+			'type' => $type
 		);
 	}
 }

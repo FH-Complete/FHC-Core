@@ -158,6 +158,7 @@
 
 					<?php echo $persons; ?>
 					<?php echo $relationmessage_id; ?>
+					<?php echo $type; ?>
 
 				</form>
 			</div>

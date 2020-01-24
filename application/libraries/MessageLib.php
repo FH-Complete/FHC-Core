@@ -191,6 +191,30 @@ class MessageLib
 	}
 
 	/**
+	 * Retrieves message vars from view vw_msg_vars
+	 */
+	public function getMessageVarsPrestudent()
+	{
+		// Retrieves message vars from view vw_msg_vars
+		$messageVars = $this->_ci->MessageModel->getMessageVars();
+		if (isSuccess($messageVars)) // if everything is ok
+		{
+			$variablesArray = array();
+			$tmpVariablesArray = getData($messageVars);
+
+			// Starts from 1 to skip the first element which is person_id
+			for ($i = 1; $i < count($tmpVariablesArray); $i++)
+			{
+				$variablesArray['{'.str_replace(' ', '_', strtolower($tmpVariablesArray[$i])).'}'] = $tmpVariablesArray[$i];
+			}
+
+			return success($variablesArray);
+		}
+
+		return $messageVars; // otherwise returns the error
+	}
+
+	/**
 	 * Retrieves organisation units for each role that a user plays inside that organisation unit
 	 */
 	public function getOeKurzbz($sender_id)
