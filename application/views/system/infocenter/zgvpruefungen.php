@@ -118,8 +118,7 @@
 			<div id="collapse<?php echo $zgvpruefung->prestudent_id ?>"
 				 class="panel-collapse collapse<?php echo $infoonly ? '' : ' in' ?>">
 				<div class="panel-body">
-					<form method="post"
-						  action="#" class="zgvform">
+					<form action="javascript:void(0);" class="zgvform" id="zgvform_<?php echo $zgvpruefung->prestudent_id ?>">
 						<input type="hidden" name="prestudentid" value="<?php echo $zgvpruefung->prestudent_id ?>" class="prestudentidinput">
 						<div class="row">
 							<div class="col-lg-<?php echo $columns[0] ?>">
@@ -302,21 +301,38 @@
 							</div>
 							<!-- show only master zgv if master studiengang - end -->
 						<?php endif; ?>
-						<?php if (!$infoonly): ?>
-							<div class="row">
-								<div class="col-xs-6 text-left">
-									<button type="button" class="btn btn-default zgvUebernehmen" id="zgvUebernehmen_<?php echo $zgvpruefung->prestudent_id ?>">
-										<?php echo $this->p->t('infocenter', 'letzteZgvUebernehmen') ?>
-									</button>
-								</div>
-								<div class="col-xs-6 text-right">
-									<button type="submit" class="btn btn-default saveZgv" id="zgvSpeichern_<?php echo $zgvpruefung->prestudent_id ?>">
-										<?php echo  $this->p->t('ui', 'speichern') ?>
-									</button>
-								</div>
-							</div>
-						<?php endif; ?>
 					</form>
+					<?php if (!$infoonly): ?>
+						<div class="row">
+							<div class="col-xs-6 text-left">
+								<button type="button" class="btn btn-default zgvUebernehmen" id="zgvUebernehmen_<?php echo $zgvpruefung->prestudent_id ?>">
+									<?php echo $this->p->t('infocenter', 'letzteZgvUebernehmen') ?>
+								</button>
+							</div>
+							<div class="col-xs-6 text-right">
+								<button type="submit" class="btn btn-default saveZgv" id="zgvSpeichern_<?php echo $zgvpruefung->prestudent_id ?>">
+									<?php echo  $this->p->t('ui', 'speichern') ?>
+								</button>
+							</div>
+						</div>
+					<?php endif; ?>
+					<br />
+					<?php
+					if (isset($zgvpruefung->prestudentUdfs))
+					{
+						echo $this->udflib->UDFWidget(
+							array(
+								UDFLib::UDF_UNIQUE_ID => 'infocenterPrestudentUDFs_'.$zgvpruefung->prestudent_id,
+								UDFLib::REQUIRED_PERMISSIONS_PARAMETER => 'infocenter',
+								UDFLib::SCHEMA_ARG_NAME => 'public',
+								UDFLib::TABLE_ARG_NAME => 'tbl_prestudent',
+								UDFLib::PRIMARY_KEY_NAME => 'prestudent_id',
+								UDFLib::PRIMARY_KEY_VALUE => $zgvpruefung->prestudent_id,
+								UDFLib::UDFS_ARG_NAME => $zgvpruefung->prestudentUdfs
+							)
+						);
+					}
+					?>
 				</div>
 
 				<?php

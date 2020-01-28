@@ -14,6 +14,7 @@
 			'sbadmintemplate' => true,
 			'addons' => true,
 			'navigationwidget' => true,
+			'udfs' => true,
 			'customCSSs' => array(
 				'public/css/sbadmin2/admintemplate.css',
 				'public/css/sbadmin2/tablesort_bootstrap.css',
