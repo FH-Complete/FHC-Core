@@ -12,3 +12,8 @@
 .tabulator-page.active {
 	color: #337ab7 !important;
 }
+
+/* Avoid confusing color change when hovering over selected rows */
+.tabulator-row.tabulator-selected:hover {
+	background-color: #769bcc !important;
+}
