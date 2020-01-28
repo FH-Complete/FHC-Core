@@ -160,6 +160,18 @@ textarea {
 font-size: 10pt;
 }
 
+.nummern
+{
+	border: 1px solid lightgrey;
+	border-collapse: collapse;
+	border-spacing: 0;
+	padding: 2px;
+}
+td.nummern
+{
+	width: 15px;
+	text-align: center;
+}
 </style>
 </head>
 
@@ -718,19 +730,29 @@ if (($anzahl !== 0) || ($stg_kz == '-1') && ($stg_kz !== ''))
 	// Liste der Fragen
 	if ($filter == 'aktiv')
 	{
-		$qry = "SELECT distinct nummer, aktiv FROM testtool.tbl_frage WHERE gebiet_id=".$db->db_add_param($gebiet_id)." AND aktiv ORDER BY nummer";
+		$qry = "SELECT distinct nummer, aktiv, level, demo FROM testtool.tbl_frage WHERE gebiet_id=".$db->db_add_param($gebiet_id)." AND aktiv ORDER BY nummer";
 	}
 	elseif ($filter == 'inaktiv')
 	{
-		$qry = "SELECT distinct nummer, aktiv FROM testtool.tbl_frage WHERE gebiet_id=".$db->db_add_param($gebiet_id)." AND NOT aktiv ORDER BY nummer";
+		$qry = "SELECT distinct nummer, aktiv, level, demo FROM testtool.tbl_frage WHERE gebiet_id=".$db->db_add_param($gebiet_id)." AND NOT aktiv ORDER BY nummer";
 	}
 	else
 	{
-		$qry = "SELECT distinct nummer, aktiv FROM testtool.tbl_frage WHERE gebiet_id=".$db->db_add_param($gebiet_id)." ORDER BY nummer";
+		$qry = "SELECT distinct nummer, aktiv, level, demo FROM testtool.tbl_frage WHERE gebiet_id=".$db->db_add_param($gebiet_id)." ORDER BY nummer";
 	}
 
 	if ($result = $db->db_query($qry))
 	{
+		$resultArray = array();
+		$i = 0;
+		while ($row = $db->db_fetch_object($result))
+		{
+			$resultArray[$i]['nummer'] = $row->nummer;
+			$resultArray[$i]['aktiv'] = $row->aktiv;
+			$resultArray[$i]['level'] = $row->level;
+			$resultArray[$i]['demo'] = $row->demo;
+			$i++;
+		}
 		// Aktiv / Inaktiv Checkboxes
 		$aktivchecked = ($filter == 'aktiv' || $filter == '')?'checked="checked"':'';
 		$inaktivchecked = ($filter == 'inaktiv' || $filter == '')?'checked="checked"':'';
@@ -756,21 +778,45 @@ if (($anzahl !== 0) || ($stg_kz == '-1') && ($stg_kz !== ''))
 					<a href="'.$PHP_SELF.'?gebiet_id='.$gebiet_id.'&amp;stg_kz='.$stg_kz.'&amp;nummer='.$nummer.'&amp;filter=aktiv">
 					<input type="checkbox" name="inaktiv" '.$inaktivchecked.' onclick="window.location.assign(\''.$PHP_SELF.'?gebiet_id='.$gebiet_id.'&amp;stg_kz='.$stg_kz.'&amp;nummer='.$nummer.'&amp;filter=aktiv\');"/>inaktiv</a>';
 		}
-		echo '<br/>Nummer: ';
-		while ($row = $db->db_fetch_object($result))
+		echo '<br/><table class="nummern" style="display: inline-table;"><tbody><tr>
+				<td>Nummer:</td>';
+		foreach ($resultArray AS $key=>$value)
 		{
 			if ($nummer == '')
-				$nummer = $row->nummer;
+				$nummer = $value['nummer'];
 
 			$style = '';
-			if ($db->db_parse_bool($row->aktiv) == false)
+			if ($db->db_parse_bool($value['aktiv']) == false)
 				$style = 'style="color: lightgrey"';
 
-			if ($nummer == $row->nummer)
-				echo " <a href='$PHP_SELF?gebiet_id=$gebiet_id&amp;stg_kz=$stg_kz&amp;nummer=$row->nummer&amp;filter=$filter' class='Item' $style><u>$row->nummer</u></a> -";
-			else
-				echo " <a href='$PHP_SELF?gebiet_id=$gebiet_id&amp;stg_kz=$stg_kz&amp;nummer=$row->nummer&amp;filter=$filter' class='Item' $style>$row->nummer</a> -";
+			$styleSelected = '';
+			if ($nummer == $value['nummer'])
+			{
+				$styleSelected = 'style="background-color: lightblue"';
+			}
+
+			echo '<td class="nummern" '.$styleSelected.'><a href="'.$PHP_SELF.'?gebiet_id='.$gebiet_id.'&amp;stg_kz='.$stg_kz.'&amp;nummer='.$value['nummer'].'&amp;filter='.$filter.'" '.$style.'>'.$value['nummer'].'</a></td>';
 		}
+		echo '</tr><tr>
+				<td>Level:</td>';
+		$leveltext = '';
+		foreach ($resultArray AS $key=>$value)
+		{
+			if ($value['level'] == '')
+			{
+				$leveltext = '-';
+			}
+			else
+			{
+				$leveltext = $value['level'];
+				if ($value['demo'] == 't')
+				{
+					$leveltext .= '*';
+				}
+			}
+			echo '<td class="nummern" style="color: grey">'.$leveltext.'</td>';
+		}
+		echo '</tr></tbody></table>';
 		echo " <a href='$PHP_SELF?gebiet_id=$gebiet_id&amp;stg_kz=$stg_kz&amp;type=neuefrage&amp;filter=$filter' class='Item'>neue Frage hinzufuegen</a>";
 		$frage_obj = new frage();
 		if ($filter == 'aktiv')

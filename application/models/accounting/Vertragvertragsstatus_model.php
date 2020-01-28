@@ -52,19 +52,21 @@ class Vertragvertragsstatus_model extends DB_Model
 
     /**
      * Set Vertragsstatus for the given Vertrag and Mitarbeiter.
-     * @param $vertrag_id
-     * @param $vertragsstatus_kurzbz
-     * @param $mitarbeiter_uid
-     * @return array|null           On success object, retval is true. Null if status already exist for this vertrag.
+     * @param integer $vertrag_id
+	 * @param string $mitarbeiter_uid
+     * @param string $vertragsstatus_kurzbz
+     * @return object	On success, return success object.
+	 * 					If status already exists or earlier status is missing, return error object.
      */
     public function setStatus($vertrag_id, $mitarbeiter_uid, $vertragsstatus_kurzbz){
 
         // Check if vertrag has already this status
         $result = $this->hasStatus($vertrag_id, $mitarbeiter_uid, $vertragsstatus_kurzbz);
-
+        
+		// If status is already set, return error message
         if (hasData($result))
         {
-            return success(null); // return null if status is already set
+            return error('Fehler: Status bereits vorhanden.');
         }
 
         // If new status should be 'akzeptiert', the latest status has to be 'erteilt'
@@ -72,10 +74,11 @@ class Vertragvertragsstatus_model extends DB_Model
         {
             $result = $this->getLastStatus($vertrag_id, $mitarbeiter_uid);
             $last_status = getData($result)[0]->vertragsstatus_kurzbz;
-
+	
+			// If latest status is not 'erteilt', return error message
             if ($last_status != 'erteilt')
             {
-                return success(null); // return null if latest status is not 'erteilt'
+                return error('Fehler: Vor Status \'angenommen\' muss erst Status \'erteilt\' gesetzt sein.');
             }
         }
 

@@ -114,7 +114,7 @@ class Lehrauftrag extends Auth_Controller
             }
             elseif (isError($studiensemester))
             {
-                show_error($studiensemester->error);
+                show_error(getError($studiensemester));
             }
         }
 
@@ -154,8 +154,9 @@ class Lehrauftrag extends Auth_Controller
                 $studiengang_kz = (isset($lehrauftrag->studiengang_kz)) ? $lehrauftrag->studiengang_kz : null;
 
                 // Check if user is entitled to order this Lehrauftrag
-                if (!$this->permissionlib->isBerechtigt(self::BERECHTIGUNG_LEHRAUFTRAG_BESTELLEN, 'suid', $studiengang_kz)){
-                    show_error('Keine Bestellberechtigung für diesen Studiengang: '. $studiengang_kz);
+                if (!$this->permissionlib->isBerechtigt(self::BERECHTIGUNG_LEHRAUFTRAG_BESTELLEN, 'suid', $studiengang_kz))
+                {
+					return $this->outputJsonError('Sie haben keine Bestellberechtigung für diesen Studiengang: '. $studiengang_kz);
                 }
 
                 // update contract if contract exists and the betrag was changed
@@ -168,6 +169,10 @@ class Lehrauftrag extends Auth_Controller
                         $vertrag_betrag = $result[0]->betrag;
                         $vertrag_stunden = $result[0]->vertragsstunden;
                     }
+                    elseif (isError($result))
+					{
+						return $this->outputJsonError('Fehler beim Laden des Vertrags');
+					}
 
                     $hasChanged = ($betrag != floatval($vertrag_betrag) || $stunden != $vertrag_stunden) ? true : false;
 
@@ -190,6 +195,10 @@ class Lehrauftrag extends Auth_Controller
                                 'erteilt' => null
                             );
                         }
+                        else
+						{
+							return $this->outputJsonError('Fehler beim Vertragsupdate');
+						}
                     }
                 }
                 // else save new contract
@@ -215,6 +224,14 @@ class Lehrauftrag extends Auth_Controller
 							'vertrag_stunden' => $stunden
                         );
                     }
+                    elseif (isError($result) && $result->retval)
+					{
+						return $this->outputJsonError($result->retval);
+					}
+                    else
+					{
+						return $this->outputJsonError('Fehler beim Speichern des Vertrags');
+					}
 
                     $new_lehrvertrag_data_arr[] = array(
                         'studiensemester_kurzbz' => $lehrauftrag->studiensemester_kurzbz,
@@ -224,6 +241,10 @@ class Lehrauftrag extends Auth_Controller
                 }
             }
         }
+		else
+		{
+			return $this->outputJsonError('Fehler beim Übertragen der Daten.');
+		}
 
         if (isset($json) && !isEmptyArray($json))
         {

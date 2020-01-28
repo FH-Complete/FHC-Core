@@ -37,17 +37,7 @@ class MessageToken_model extends DB_Model
 				 WHERE r.token = ?
 				 LIMIT 1';
 
-		$result = $this->db->query($sql, array(MSG_STATUS_DELETED, $token));
-
-		// If no errors occurred
-		if ($result)
-		{
-			return success($result->result());
-		}
-		else
-		{
-			return error($this->db->error());
-		}
+		return $this->execQuery($sql, array(MSG_STATUS_DELETED, $token));
 	}
 
 	/**
@@ -74,25 +64,24 @@ class MessageToken_model extends DB_Model
 				 WHERE r.token = ?
 				 LIMIT 1';
 
-		$msgs = $this->db->query($sql, array(MSG_STATUS_ARCHIVED, $token));
+		$msgsResult = $this->execQuery($sql, array(MSG_STATUS_ARCHIVED, $token));
 
 		// If no errors occurred
-		if ($msgs)
+		if (isSuccess($msgsResult))
 		{
-			$msgs_result = $msgs->result();
 			// If at least a record is present
-			if (count($msgs_result) > 0)
+			if (hasData($msgsResult))
 			{
-				$msg = $msgs_result[0];
+				$msg = getData($msgsResult)[0];
+				$msgStatusResult = error();
 
-				$msgStatusResult = false; // pessimistic expectation
+				$this->load->model('system/MsgStatus_model', 'MsgStatusModel');
 
 				// If the status of the message is unread
 				if ($msg->status == MSG_STATUS_UNREAD)
 				{
 					// Insert the read status
-					$msgStatusResult = $this->db->insert(
-						'public.tbl_msg_status',
+					$msgStatusResult = $this->MsgStatusModel->insert(
 						array(
 							'message_id' => $msg->message_id,
 							'person_id' => $msg->receiver_id,
@@ -108,31 +97,23 @@ class MessageToken_model extends DB_Model
 				// If the status of the message is read
 				else if ($msg->status == MSG_STATUS_READ)
 				{
-					// Update updateamum to current date
-					$this->db->set('updateamum', 'NOW()');
-
-					$this->db->where('message_id', $msg->message_id);
-					$this->db->where('person_id', $msg->receiver_id);
-					$this->db->where('status', MSG_STATUS_READ);
-
-					$msgStatusResult = $this->db->update('public.tbl_msg_status');
+					$msgStatusResult = $this->MsgStatusModel->update(
+						array(
+							'message_id' => $msg->message_id,
+							'person_id' => $msg->receiver_id,
+							'status' => MSG_STATUS_READ
+						),
+						array('updateamum' => 'NOW()')
+					);
 				}
 
-				// If some of the previous DB manipulation (update or insert) has failed
-				if (!$msgStatusResult)
-				{
-					return error($this->db->error());
-				}
+				return $msgStatusResult;
 			}
-
-			return success($msgs_result);
 		}
 		else
 		{
-			return error($this->db->error());
+			return $msgsResult;
 		}
-
-		return success($result->result());
 	}
 
 	/**
@@ -152,17 +133,7 @@ class MessageToken_model extends DB_Model
 			 LEFT JOIN public.tbl_mitarbeiter m ON(b.uid = m.mitarbeiter_uid)
 				 WHERE p.person_id = ?';
 
-		$result = $this->db->query($sql, array($person_id));
-
-		// If no errors occurred
-		if ($result)
-		{
-			return success($result->result());
-		}
-		else
-		{
-			return error($this->db->error());
-		}
+		return $this->execQuery($sql, array($person_id));
 	}
 
 	/**
@@ -180,17 +151,7 @@ class MessageToken_model extends DB_Model
 				  FROM public.tbl_person
 				 WHERE person_id %s ?';
 
-		$result = $this->db->query(sprintf($sql, is_array($person_id) ? 'IN' : '='), array($person_id));
-
-		// If no errors occurred
-		if ($result)
-		{
-			return success($result->result());
-		}
-		else
-		{
-			return error($this->db->error());
-		}
+		return $this->execQuery(sprintf($sql, is_array($person_id) ? 'IN' : '='), array($person_id));
 	}
 
 	/**
@@ -200,35 +161,12 @@ class MessageToken_model extends DB_Model
 	{
 		$sql = 'SELECT m.mitarbeiter_uid
 				  FROM public.tbl_person p
-			 LEFT JOIN public.tbl_benutzer b USING(person_id)
-			 LEFT JOIN public.tbl_mitarbeiter m ON(b.uid = m.mitarbeiter_uid)
+			 	  JOIN public.tbl_benutzer b USING(person_id)
+			 	  JOIN public.tbl_mitarbeiter m ON(b.uid = m.mitarbeiter_uid)
 				 WHERE p.person_id = ?
 				   AND b.aktiv = TRUE';
 
-		$result = $this->db->query($sql, array($person_id));
-
-		// If no errors occurred
-		if ($result)
-		{
-			// If data are present
-			if (is_array($result->result()) && count($result->result()) > 0)
-			{
-				$personresults = $result->result();
-				$person = $personresults[0];
-
-				// If it is an employee
-				if ($person->mitarbeiter_uid != null)
-				{
-					return true;
-				}
-			}
-
-			return false;
-		}
-		else
-		{
-			return error($this->db->error());
-		}
+		return $this->execQuery($sql, array($person_id));
 	}
 
 	/**
@@ -254,28 +192,6 @@ class MessageToken_model extends DB_Model
 		     LIMIT 1
 		';
 
-		$result = $this->db->query($sql, array($oe_kurzbz));
-		if ($result) // If no errors occurred
-		{
-			$result_arr = $result->result();
-			// If data are present
-			if (is_array($result_arr)
-				&& count($result_arr) > 0
-				&& is_object($result_arr[0])
-				&& isset($result_arr[0]->oe_kurzbz))
-			{
-				return success($result_arr[0]->oe_kurzbz);
-			}
-			else
-			{
-				return error();
-			}
-		}
-		else
-		{
-			return error($this->db->error());
-		}
-
-		return $result;
+		return $this->execQuery($sql, array($oe_kurzbz));
 	}
 }

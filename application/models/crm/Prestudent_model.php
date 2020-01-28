@@ -214,7 +214,7 @@ class Prestudent_model extends DB_Model
 
 		if ($lastStatus->error)
 		{
-			return error($lastStatus->retval);
+			return $lastStatus;
 		}
 
 		if (count($lastStatus->retval) > 0)
@@ -222,7 +222,7 @@ class Prestudent_model extends DB_Model
 			//get Studiengangname from Studienplan and -ordnung
 			$studienordnung = $this->PrestudentstatusModel->getStudienordnungFromPrestudent($prestudent_id);
 			if ($studienordnung->error)
-				return error($studienordnung->retval);
+				return $studienordnung;
 
 			if (count($studienordnung->retval) > 0)
 			{
@@ -239,7 +239,7 @@ class Prestudent_model extends DB_Model
 			$language = $this->SpracheModel->load($lastStatus->retval[0]->sprache);
 
 			if ($language->error)
-				return error($language->retval);
+				return $language;
 
 			if (count($language->retval) > 0)
 				$lastStatus->retval[0]->sprachedetails = $language->retval[0];
@@ -257,7 +257,7 @@ class Prestudent_model extends DB_Model
 				)
 			);
 			if ($bewerbungstermin->error)
-				return error($bewerbungstermin->retval);
+				return $bewerbungstermin;
 
 			if (count($bewerbungstermin->retval) > 0)
 			{
