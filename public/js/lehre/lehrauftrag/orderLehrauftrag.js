@@ -111,6 +111,11 @@ function func_dataLoaded(data, table){
 // Tabulator table format functions
 // -----------------------------------------------------------------------------------------------------------------
 
+// Returns relative height (depending on screen size)
+function func_height(table){
+    return $(window).height() * 0.50;
+}
+
 // Displays text when table is empty
 function func_placeholder()
 {
@@ -508,6 +513,12 @@ akzeptiert_tooltip = function(cell){
 }
 
 $(function() {
+
+    // Redraw table on resize to fit tabulators height to windows height
+    window.addEventListener('resize', function(){
+        $('#tableWidgetTabulator').tabulator('setHeight', $(window).height() * 0.50);
+        $('#tableWidgetTabulator').tabulator('redraw', true);
+    });
 
     // Show all rows
     $("#show-all").click(function(){
