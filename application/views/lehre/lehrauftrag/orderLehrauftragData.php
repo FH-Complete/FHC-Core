@@ -371,20 +371,22 @@ $filterWidgetArray = array(
         'Angenommen von'
     ),
     'datasetRepOptions' => '{
-        height: 700,
-        layout:"fitColumns",            // fit columns to width of table
-	    responsiveLayout:"hide",        // hide columns that dont fit on the table
-	    movableColumns: true,           // allows changing column
-		placeholder: func_placeholder(),
-	    headerFilterPlaceholder: " ",
-	    groupBy:"lehrveranstaltung_id",
-	    groupToggleElement:"header",    //toggle group on click anywhere in the group header
-	    groupHeader: function(value, count, data, group){
-	       return func_groupHeader(data);
-	    },
-	    footerElement: func_footerElement(),
-        columnCalcs:"both",             // show column calculations at top and bottom of table and in groups
-	    index: "row_index",             // assign specific column as unique id (important for row indexing)
+		height: func_height(this),
+		layout:"fitColumns",            // fit columns to width of table
+		layoutColumnsOnNewData: true,	// ajust column widths to the data each time TableWidget is loaded
+		persistentLayout:true,			// enables persistence (default store in localStorage if available, else in cookie)
+		persistenceID: "orderLehrauftrag",	// TableWidget unique id to store persistence data seperately for multiple tables
+		autoResize: false, 				// prevent auto resizing of table (false to allow adapting table size when cols are (de-)activated
+		movableColumns: true,			// allows changing column order
+		placeholder: func_placeholder(),	// shown on empty table (no data)
+		headerFilterPlaceholder: " ",
+		groupBy:"lehrveranstaltung_id",
+		groupToggleElement:"header",    //toggle group on click anywhere in the group header
+		groupHeader: function(value, count, data, group){
+			return func_groupHeader(data);
+		},
+		columnCalcs:"both",             // show column calculations at top and bottom of table and in groups
+		index: "row_index",             // assign specific column as unique id (important for row indexing)
         selectable: true,               // allows row selection
         selectableRangeMode: "click",   // allows range selection using shift end click on end of range
         selectablePersistence:false,    // deselect previously selected rows when table is filtered, sorted or paginated
@@ -409,46 +411,50 @@ $filterWidgetArray = array(
         dataLoaded: function(data){
             func_dataLoaded(data, this);
         },
+		tableWidgetFooter: {
+			selectButtons: true
+		}
     }', // tabulator properties
     'datasetRepFieldsDefs' => '{
         // column status is built dynamically in funcTableBuilt()
         row_index: {visible: false},
-        personalnummer: {visible: false},
-        lehreinheit_id: {headerFilter:"input", bottomCalc:"count", width: "7%",
+        personalnummer: {visible: false, headerFilter:"input"},
+        lehreinheit_id: {headerFilter:"input", bottomCalc:"count", minWidth: 115,
             bottomCalcFormatter:function(cell){return "Anzahl: " + cell.getValue();}},
         lehrveranstaltung_id: {headerFilter:"input"},
-        lv_bezeichnung: {visible: false},
-        projektarbeit_id: {visible: false},
+        lv_bezeichnung: {visible: false, headerFilter:"input"},
+        projektarbeit_id: {visible: false, headerFilter:"input"},
         studiensemester_kurzbz: {headerFilter:"input"},
-        studiengang_kz: {visible: false},
-        stg_typ_kurzbz: {headerFilter:"input", width: "5%"},
+        studiengang_kz: {visible: false, headerFilter:"input"},
+        stg_typ_kurzbz: {headerFilter:"input", minWidth: 70},
 		semester: {headerFilter:"input"},
-		studienplan_bezeichnung: {headerFilter:"input", width: "7%"},
+		studienplan_bezeichnung: {headerFilter:"input"},
         orgform_kurzbz: {headerFilter:"input"},
-        person_id: {visible: false},
-        typ: {headerFilter:"input"},
-        auftrag: {headerFilter:"input", width:"15%"},
-        lv_oe_kurzbz: {headerFilter:"input"},
-        gruppe: {headerFilter:"input"},
+        person_id: {visible: false, headerFilter:"input"},
+        typ: {headerFilter:"input", minWidth:100},
+        auftrag: {headerFilter:"input", minWidth:280},
+        lv_oe_kurzbz: {headerFilter:"input", minWidth:80},
+        gruppe: {headerFilter:"input", minWidth:120},
         lektor: {headerFilter:"input", widthGrow: 3},
-        stunden: {align:"right", formatter: form_formatNulltoStringNumber, formatterParams:{precision:1},
+        stunden: {align:"right", minWidth: 80, formatter: form_formatNulltoStringNumber, formatterParams:{precision:1},
             headerFilter:"input", headerFilterFunc: hf_filterStringnumberWithOperator,
             bottomCalc:"sum", bottomCalcParams:{precision:1}},
-        stundensatz: {visible: false},
-        betrag: {align:"right", width: "8%", formatter: form_formatNulltoStringNumber,
+        stundensatz: {visible: false, align:"right", minWidth: 100, formatter: form_formatNulltoStringNumber,
+            headerFilter:"input", headerFilterFunc: hf_filterStringnumberWithOperator},
+        betrag: {align:"right", minWidth: 120, formatter: form_formatNulltoStringNumber,
             headerFilter:"input", headerFilterFunc: hf_filterStringnumberWithOperator,
             bottomCalc:"sum", bottomCalcParams:{precision:2}, bottomCalcFormatter:"money",
             bottomCalcFormatterParams:{decimal: ",", thousand: ".", symbol:"€"}},
-        vertrag_id: {visible: false},
+        vertrag_id: {visible: false, headerFilter:"input"},
         vertrag_stunden: {visible: false},
         vertrag_betrag: {visible: false},
-        mitarbeiter_uid: {visible: false},
-        bestellt: {align:"center", headerFilter:"input", mutator: mut_formatStringDate, tooltip: bestellt_tooltip, width: "8%"},
-        erteilt: {align:"center", headerFilter:"input", mutator: mut_formatStringDate, tooltip: erteilt_tooltip, width: "8%"},
-        akzeptiert: {align:"center", headerFilter:"input", mutator: mut_formatStringDate, tooltip: akzeptiert_tooltip, width: "8%"},
-        bestellt_von: {visible: false},
-        erteilt_von: {visible: false},
-        akzeptiert_von: {visible: false}
+        mitarbeiter_uid: {visible: false, headerFilter:"input"},
+        bestellt: {align:"center", headerFilter:"input", mutator: mut_formatStringDate, tooltip: bestellt_tooltip, minWidth: 100},
+        erteilt: {align:"center", headerFilter:"input", mutator: mut_formatStringDate, tooltip: erteilt_tooltip, minWidth: 100},
+        akzeptiert: {align:"center", headerFilter:"input", mutator: mut_formatStringDate, tooltip: akzeptiert_tooltip, minWidth: 100},
+        bestellt_von: {visible: false, headerFilter:"input"},
+        erteilt_von: {visible: false, headerFilter:"input"},
+        akzeptiert_von: {visible: false, headerFilter:"input"}
     }', // col properties
 );
 

@@ -35,7 +35,7 @@ $this->load->view(
 		<!-- title & helper link -->
         <div class="row">
             <div class="col-lg-12 page-header">
-				<a class="pull-right" data-toggle="collapse" href="#collapseHelp" aria-expanded="false" aria-controls="collapseExample">
+				<a class="pull-right" data-toggle="collapse" href="#collapseHelp" aria-expanded="false" aria-controls="collapseHelp">
 					Hilfe zu dieser Seite
 				</a>
                 <h3>
@@ -205,12 +205,7 @@ $this->load->view(
         </div>
 
 		<!-- tabulator data table -->
-        <div class="row">
-            <div class="col-lg-12">
-                <?php $this->load->view('lehre/lehrauftrag/orderLehrauftragData.php'); ?>
-            </div>
-        </div>
-        <br>
+		<?php $this->load->view('lehre/lehrauftrag/orderLehrauftragData.php'); ?>
 
 		<!-- filter buttons & bestell-button -->
         <div class="row">

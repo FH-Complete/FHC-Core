@@ -64,8 +64,11 @@ $tableWidgetArray = array(
 		'Storniert am'
 	),
 	'datasetRepOptions' => '{
-        layout: "fitColumns",           // fit columns to width of table
-	    responsiveLayout: "hide",       // hide columns that dont fit on the table
+		layout: "fitColumns",           // fit columns to width of table
+		layoutColumnsOnNewData: true,	// ajust column widths to the data each time TableWidget is loaded
+		persistentLayout: true,			// enables persistence (default store in localStorage if available, else in cookie)
+	    persistenceID: "cancelledLehrauftrag",	// TableWidget unique id to store persistence data seperately for multiple tables
+		autoResize: false, 				// prevent auto resizing of table (false to allow adapting table size when cols are (de-)activated
 	    movableColumns: true,           // allows changing column
 	    placeholder: func_placeholder(),
         rowFormatter:function(row){
@@ -79,22 +82,24 @@ $tableWidgetArray = array(
         },
         tableBuilt: function(){
             func_tableBuilt(this);
-        }
+        },
     }', // tabulator properties
 	'datasetRepFieldsDefs' => '{
         vertrag_id: {visible: false},
-        vertragsstunden_studiensemester_kurzbz: {visible: false},
-        vertragstyp_kurzbz: {widthGrow: 2},
-        bezeichnung: {widthGrow: 2},
+        vertragsstunden_studiensemester_kurzbz: {visible: false, widthShrink:1},
+        vertragstyp_kurzbz: {minWidth: 300},
+        bezeichnung: {minWidth: 400},
         vertragsstunden: {
             align:"right", formatter: form_formatNulltoStringNumber, formatterParams:{precision:1},
-            bottomCalc:"sum", bottomCalcParams:{precision:1}
+            bottomCalc:"sum", bottomCalcParams:{precision:1},
+            minWidth: 300
         },
         betrag: {
             align:"right", formatter: form_formatNulltoStringNumber,
-            bottomCalc:"sum", bottomCalcParams:{precision:2}, bottomCalcFormatter:"money", bottomCalcFormatterParams:{decimal: ",", thousand: ".", symbol:"€"}
+            bottomCalc:"sum", bottomCalcParams:{precision:2}, bottomCalcFormatter:"money", bottomCalcFormatterParams:{decimal: ",", thousand: ".", symbol:"€"},
+            minWidth: 200
         },
-        storniert: {align:"center", mutator: mut_formatStringDate, tooltip: storniert_tooltip},
+        storniert: {align:"center", mutator: mut_formatStringDate, tooltip: storniert_tooltip, minWidth: 200},
         storniert_von: {visible: false},
         letzterStatus_vorStorniert: {visible: false}
     }', // col properties

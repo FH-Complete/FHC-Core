@@ -182,10 +182,89 @@ var FHC_TableWidget = {
 	 */
 	_turnOnEvents: function(tableWidgetDiv) {
 
+		var tableUniqueId = tableWidgetDiv.attr('tableUniqueId');
+
 		// If the choosen dataset representation is tablesorter
 		if (FHC_TableWidget._datasetRepresentation == DATASET_REP_TABLESORTER)
 		{
 			FHC_TableWidget._enableTableSorter(tableWidgetDiv); // enable the tablesorter
+		}
+
+		// If the choosen dataset representation is tabulator
+		if (FHC_TableWidget._datasetRepresentation == DATASET_REP_TABULATOR)
+		{
+			// ---------------------------------------------------------------------------------------------------------
+			// Add events to the elements
+			// ---------------------------------------------------------------------------------------------------------
+
+			// Click-Event to download csv
+			tableWidgetDiv.find('#download-csv').on('click', function()
+			{
+				// BOM for correct UTF-8 char output
+				tableWidgetDiv.find("#tableWidgetTabulator").tabulator("download", "csv", "data.csv", {bom:true});
+			})
+
+			// Click-Event to collapse settings div
+			tableWidgetDiv.find('#settings').on('click', function()
+			{
+
+				//... auch unteren event für settings hier hinein
+				$('#tabulatorSettings-' + tableUniqueId).collapse('toggle');
+
+				$(this).toggleClass('active focus');
+
+				// De/activate and un/focus on clicked settings button
+				if(!$(this).hasClass('active focus'))
+				{
+					$(this).css({'background-color': 'white', 'border-color' : '#ccc', 'outline': 'none'});
+				}
+				else
+				{
+					$(this).css({'background-color': '#e6e6e6'});
+				}
+			})
+
+			/**
+			 * Click-Event to select all rows
+			 * Default is ALL rows. This can be modified via hook tableWidgetHook_selectAllButton.
+ 			 */
+			if (typeof tableWidgetHook_selectAllButton == 'function')
+			{
+				tableWidgetDiv.find('#select-all').on('click', function() {
+					tableWidgetHook_selectAllButton(tableWidgetDiv);
+				});
+			}
+			else
+			{
+				tableWidgetDiv.find('#select-all').on('click', function() {
+					tableWidgetDiv.find("#tableWidgetTabulator").tabulator('selectRow', true);
+				});
+			}
+
+			// Click-Event to deselect all rows
+			tableWidgetDiv.find('#deselect-all').on('click', function()
+			{
+				tableWidgetDiv.find("#tableWidgetTabulator").tabulator('deselectRow');
+			})
+
+			// Click-Event to toggle column-picker columns
+			tableWidgetDiv.find('.btn-select-col').on('click', function()
+			{
+				var selected = this.value;
+
+				tableWidgetDiv.find("#tableWidgetTabulator").tabulator('toggleColumn', selected);
+
+				$(this).toggleClass('active');
+
+				if(!$(this).hasClass('active'))
+				{
+					$(this).css('background-color', 'white');
+				}
+				else
+				{
+					$(this).css('background-color', '#e6e6e6');
+				}
+			})
 		}
 	},
 
@@ -443,10 +522,42 @@ var FHC_TableWidget = {
 
 				options.columns = arrayTabulatorColumns;
 				options.data = data.dataset;
-
+				options.rowSelectionChanged = function(data, rows){
+					_func_rowSelectionChanged(data, rows);
+				};
+				options.columnVisibilityChanged = function(column, visible) {
+					_func_columnVisibilityChanged(column, visible);
+				};
+				
 				// Renders the tabulator
 				tableWidgetDiv.find("#tableWidgetTabulator").tabulator(options);
 			}
+		}
+
+		// -------------------------------------------------------------------------------------------------------------
+		// Render TableWidget Header and -Footer
+		// -------------------------------------------------------------------------------------------------------------
+
+		// Render tableWidgetHeader
+		var tabulatorHeaderHTML = _renderTabulatorHeaderHTML(tableWidgetDiv);
+		tableWidgetDiv.find('#tableWidgetHeader').append(tabulatorHeaderHTML);
+
+		// Render the collapsable div triggered by button in tableWidgetHeader
+		var tabulatorHeaderCollapseHTML = _renderTabulatorHeaderCollapseHTML(tableWidgetDiv);
+		tableWidgetDiv.find('#tableWidgetHeader').after(tabulatorHeaderCollapseHTML);
+
+		/**
+		 * 	tableWidgetFooter is NOT rendered by default.
+		 * 	tableWidgetFooter is rendered, if tableWidgetFooter is set in tabulators datasetRepOptions.
+		 *	Setup options like this:
+		 *  tableWidgetFooter: {
+		 *  	selectButtons: true  // tableWidgetFooter properties are checked in _renderTabulatorFooterHTML function
+		 *  }
+ 		 */
+		if (options.tableWidgetFooter != 'undefined' && options.tableWidgetFooter != null)
+		{
+			var tabulatorFooterHTML = _renderTabulatorFooterHTML(options.tableWidgetFooter);
+			tableWidgetDiv.find('#tableWidgetFooter').append(tabulatorFooterHTML);
 		}
 	},
 
@@ -583,6 +694,122 @@ var FHC_TableWidget = {
 		return tableWidgetUniqueIdArray;
 	}
 };
+
+//**********************************************************************************************************************
+// Render functions
+//**********************************************************************************************************************
+/*
+ * Processed when row selection changed.
+ * Displays number of selected rows on row selection change.
+ */
+function _func_rowSelectionChanged (data, rows){
+
+	$('#number-selected').html("Ausgewählte Zeilen: <strong>" + rows.length + "</strong>");
+}
+
+/* Processed when columns visibility changed (e.g. using the column picker).
+ * Redraws the table to expand columns to table width.
+ */
+function _func_columnVisibilityChanged(column, visible){
+
+	var table = column.getTable();
+
+	table.redraw();
+}
+
+// Returns TableWidget Header HTML (download-, setting button...)
+function _renderTabulatorHeaderHTML(tableWidgetDiv){
+
+	var tableUniqueId = tableWidgetDiv.attr('tableUniqueId');
+
+	var tabulatorHeaderHTML = '';
+	tabulatorHeaderHTML += '<div class="btn-toolbar pull-right" role="toolbar">';
+	tabulatorHeaderHTML += '<div class="btn-group" role="group">';
+	tabulatorHeaderHTML += '<button id="download-csv" class="btn btn-default" type="button" data-toggle="tooltip" data-placement="left" title="Download CSV"><small>CSV&nbsp;&nbsp;</small><i class="fa fa-arrow-down"></i></button>';
+	tabulatorHeaderHTML += '<button id="settings" class="btn btn-default" type="button" data-toggle="collapse" data-target="tabulatorSettings-'+ tableUniqueId + '" aria-expanded="false" aria-controls="tabulatorSettings-'+ tableUniqueId + '"><i class="fa fa-cog"></i></button>';
+	tabulatorHeaderHTML += '</div>';
+	tabulatorHeaderHTML += '</div>';
+
+	return tabulatorHeaderHTML;
+}
+
+// Returns collapsable HTML element for TableWidget header buttons
+function _renderTabulatorHeaderCollapseHTML(tableWidgetDiv){
+
+	var tableUniqueId = tableWidgetDiv.attr('tableUniqueId');
+
+	var tabulatorHeaderCollapseHTML = '';
+	tabulatorHeaderCollapseHTML += '<br>';
+	tabulatorHeaderCollapseHTML += '<div class="row">';
+	tabulatorHeaderCollapseHTML += '<div class="col-lg-12 collapse" id="tabulatorSettings-'+ tableUniqueId + '">';
+	tabulatorHeaderCollapseHTML += '<div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">';
+
+	tabulatorHeaderCollapseHTML += '<div class="panel panel-default">';
+	tabulatorHeaderCollapseHTML += '<div class="panel-heading" role="tab" id="headingOne">';
+	tabulatorHeaderCollapseHTML += '<h5 class="panel-title">';
+	tabulatorHeaderCollapseHTML += '<a role="button" data-toggle="collapse" data-parent="#accordion" href="#selectColumns-' + tableUniqueId + '" aria-expanded="false" aria-controls="selectColumns">Spalten einstellen</a>';
+	tabulatorHeaderCollapseHTML += '</h5>';
+	tabulatorHeaderCollapseHTML += '</div>'; // end panel-heading
+	tabulatorHeaderCollapseHTML += '<div id="selectColumns-' + tableUniqueId + '" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">';
+	tabulatorHeaderCollapseHTML += '<div class="panel-body">';
+	tabulatorHeaderCollapseHTML += '<div class="btn-group" role="group">';
+
+	// Create column picker (Spalten einstellen)
+	tableWidgetDiv.find('#tableWidgetTabulator').tabulator('getColumns').forEach(function(column)
+	{
+		var field = column.getField();
+		var title = column.getDefinition().title;
+		var active_status = column.getVisibility() ? 'active' : '';
+
+		// If certain columns should be excluded from the column picker (define them in a blacklist array)
+		if (typeof tableWidgetBlacklistArray_columnUnselectable != 'undefined' &&
+			Array.isArray(tableWidgetBlacklistArray_columnUnselectable) &&
+			tableWidgetBlacklistArray_columnUnselectable.length)
+		{
+			if ($.inArray(field, tableWidgetBlacklistArray_columnUnselectable) < 0)
+			{
+				tabulatorHeaderCollapseHTML += '<button type="button" class="btn btn-default btn-sm btn-select-col ' + active_status +'" aria-pressed="true" id="btn-' + field + '" value="' + field + '">' + title + '</button>';
+			}
+		}
+		// Else provide all tabulator fields as pickable columns
+		else
+		{
+			tabulatorHeaderCollapseHTML += '<button type="button" class="btn btn-default btn-sm btn-select-col ' + active_status +'" aria-pressed="true" id="btn-' + field + '" value="' + field + '">' + title + '</button>';
+		}
+	});
+
+	tabulatorHeaderCollapseHTML += '</div>'; // end btn-group
+	tabulatorHeaderCollapseHTML += '</div>'; // end panel-body
+	tabulatorHeaderCollapseHTML += '</div>'; // end panel-collapse
+	tabulatorHeaderCollapseHTML += '</div>'; // end panel
+
+	tabulatorHeaderCollapseHTML += '</div>'; // end panel-group
+	tabulatorHeaderCollapseHTML += ' </div>'; // end col
+	tabulatorHeaderCollapseHTML += ' </div>'; // end row
+
+	return tabulatorHeaderCollapseHTML;
+}
+
+// Returns TableWidget Footer HTML (de-/select buttons,...)
+function _renderTabulatorFooterHTML(tableWidgetFooterOptions){
+
+	var tabulatorFooterHTML = '';
+
+	// If property selectButtons is true, render 'Alle auswaehlen / Alle abwaehlen' buttons
+	if (tableWidgetFooterOptions.selectButtons != 'undefined' && tableWidgetFooterOptions.selectButtons == true)
+	{
+		tabulatorFooterHTML += '<div class="btn-toolbar" role="toolbar">';
+		tabulatorFooterHTML += '<div class="btn-group" role="group">';
+		tabulatorFooterHTML += '<button id="select-all" class="btn btn-default pull-left" type="button">Alle auswählen</button>';
+		tabulatorFooterHTML += '<button id="deselect-all" class="btn btn-default pull-left" type="button">Alle abwählen</button>';
+		tabulatorFooterHTML += '<span id="number-selected" style="margin-left: 20px; line-height: 2; font-weight: normal">Ausgewählte Zeilen: <strong>0</strong></span>';
+		tabulatorFooterHTML += '</div>';
+		tabulatorFooterHTML += '</div>';
+		tabulatorFooterHTML += '</br></br>';
+	}
+
+	return tabulatorFooterHTML;
+}
 
 /**
  * When JQuery is up
