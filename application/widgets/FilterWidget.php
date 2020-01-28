@@ -57,6 +57,8 @@ class FilterWidget extends Widget
 
 	private $_reloadDataset; // Force Reload of Dataset
 
+	private $_sessionTimeout; // session expiring time
+
 	private static $_FilterWidgetInstance; // static property that contains the instance of itself
 
 	/**
@@ -186,7 +188,7 @@ class FilterWidget extends Widget
 		$this->_datasetName = null;
 		$this->_filterKurzbz = null;
 		$this->_filterId = null;
-		$this->_reloadDataset = null;
+		$this->_reloadDataset = true; // by default the dataset is NOT cached in session
 		$this->_query = null;
 		$this->_additionalColumns = null;
 		$this->_columnsAliases = null;
@@ -202,27 +204,28 @@ class FilterWidget extends Widget
 		$this->_datasetRepresentation = null;
 		$this->_datasetRepresentationOptions = null;
 		$this->_datasetRepFieldsDefs = null;
+		$this->_sessionTimeout = FilterWidgetLib::SESSION_DEFAULT_TIMEOUT;
 
 		// Retrieved the required permissions parameter if present
-		if (isset($args[FilterWidgetLib::REQUIRED_PERMISSIONS_PARAMETER]))
+		if (isset($args[FilterWidgetLib::REQUIRED_PERMISSIONS]))
 		{
-			$this->_requiredPermissions = $args[FilterWidgetLib::REQUIRED_PERMISSIONS_PARAMETER];
+			$this->_requiredPermissions = $args[FilterWidgetLib::REQUIRED_PERMISSIONS];
 		}
 
 		// Parameters needed to retrieve univocally a filter from DB
-		if (isset($args[FilterWidgetLib::APP_PARAMETER]))
+		if (isset($args[FilterWidgetLib::APP]))
 		{
-			$this->_app = $args[FilterWidgetLib::APP_PARAMETER];
+			$this->_app = $args[FilterWidgetLib::APP];
 		}
 
-		if (isset($args[FilterWidgetLib::DATASET_NAME_PARAMETER]))
+		if (isset($args[FilterWidgetLib::DATASET_NAME]))
 		{
-			$this->_datasetName = $args[FilterWidgetLib::DATASET_NAME_PARAMETER];
+			$this->_datasetName = $args[FilterWidgetLib::DATASET_NAME];
 		}
 
-		if (isset($args[FilterWidgetLib::FILTER_KURZBZ_PARAMETER]))
+		if (isset($args[FilterWidgetLib::FILTER_KURZBZ]))
 		{
-			$this->_filterKurzbz = $args[FilterWidgetLib::FILTER_KURZBZ_PARAMETER];
+			$this->_filterKurzbz = $args[FilterWidgetLib::FILTER_KURZBZ];
 		}
 
 		if (isset($args[FilterWidgetLib::FILTER_ID]))
@@ -231,14 +234,14 @@ class FilterWidget extends Widget
 		}
 
 		// How to retrieve data for the filter: SQL statement or a result from DB
-		if (isset($args[FilterWidgetLib::QUERY_PARAMETER]))
+		if (isset($args[FilterWidgetLib::QUERY]))
 		{
-			$this->_query = $args[FilterWidgetLib::QUERY_PARAMETER];
+			$this->_query = $args[FilterWidgetLib::QUERY];
 		}
 
-		if (isset($args[FilterWidgetLib::DATASET_RELOAD_PARAMETER]))
+		if (isset($args[FilterWidgetLib::DATASET_RELOAD]))
 		{
-			$this->_reloadDataset = $args[FilterWidgetLib::DATASET_RELOAD_PARAMETER];
+			$this->_reloadDataset = $args[FilterWidgetLib::DATASET_RELOAD];
 		}
 
 		// Parameter is used to add extra columns to the dataset
@@ -332,6 +335,12 @@ class FilterWidget extends Widget
 		{
 			$this->_datasetRepFieldsDefs = $args[FilterWidgetLib::DATASET_REP_FIELDS_DEFS];
 		}
+
+		// To specify the expiring session time
+		if (isset($args[FilterWidgetLib::SESSION_TIMEOUT]) && is_numeric($args[FilterWidgetLib::SESSION_TIMEOUT]))
+		{
+			$this->_sessionTimeout = $args[FilterWidgetLib::SESSION_TIMEOUT];
+		}
 	}
 
 	/**
@@ -339,31 +348,36 @@ class FilterWidget extends Widget
 	 */
 	private function _checkParameters($args)
 	{
+		// If no options are given to this widget...
 		if (!is_array($args) || (is_array($args) && count($args) == 0))
 		{
 			show_error('Second parameter of the widget call must be a NOT empty associative array');
 		}
-		else
+		else // ...otherwise
 		{
-			if ((!isset($args[FilterWidgetLib::APP_PARAMETER]) && !isset($args[FilterWidgetLib::DATASET_NAME_PARAMETER]))
+			// Parameters (app AND dataset name) OR filter id are mandatory
+			if ((!isset($args[FilterWidgetLib::APP]) && !isset($args[FilterWidgetLib::DATASET_NAME]))
 				&& !isset($args[FilterWidgetLib::FILTER_ID]))
 			{
 				show_error(
-					'The parameters ("'.FilterWidgetLib::APP_PARAMETER.'" AND "'.FilterWidgetLib::DATASET_NAME_PARAMETER.') OR "'.
+					'The parameters ("'.FilterWidgetLib::APP.'" AND "'.FilterWidgetLib::DATASET_NAME.') OR "'.
 					FilterWidgetLib::FILTER_ID.'" must be specified'
 				);
 			}
 
-			if (!isset($args[FilterWidgetLib::QUERY_PARAMETER]))
+			// The query parameter is mandatory
+			if (!isset($args[FilterWidgetLib::QUERY]))
 			{
-				show_error('The parameters "'.FilterWidgetLib::QUERY_PARAMETER.'" must be specified');
+				show_error('The parameter "'.FilterWidgetLib::QUERY.'" must be specified');
 			}
 
+			// The dataset representation parameter is mandatory
 			if (!isset($args[FilterWidgetLib::DATASET_REPRESENTATION]))
 			{
 				show_error('The parameter "'.FilterWidgetLib::DATASET_REPRESENTATION.'" must be specified');
 			}
 
+			// Checks if the dataset representation parameter is valid
 			if (isset($args[FilterWidgetLib::DATASET_REPRESENTATION])
 				&& $args[FilterWidgetLib::DATASET_REPRESENTATION] != FilterWidgetLib::DATASET_REP_TABLESORTER
 				&& $args[FilterWidgetLib::DATASET_REPRESENTATION] != FilterWidgetLib::DATASET_REP_PIVOTUI
@@ -377,6 +391,12 @@ class FilterWidget extends Widget
 						.FilterWidgetLib::DATASET_REP_TABULATOR.'")'
 				);
 			}
+
+			// If given the session timeout parameter must be a number
+			if (isset($args[FilterWidgetLib::SESSION_TIMEOUT]) && !is_numeric($args[FilterWidgetLib::SESSION_TIMEOUT]))
+			{
+				show_error('The parameter "'.FilterWidgetLib::SESSION_TIMEOUT.'" must be a number');
+			}
 		}
 	}
 
@@ -385,6 +405,9 @@ class FilterWidget extends Widget
 	 */
 	private function _startFilterWidget()
 	{
+		// Looks for expired filter widgets in session and drops them
+		$this->filterwidgetlib->dropExpiredFilterWidgets();
+
 		// Read the all session for this filter widget
 		$session = $this->filterwidgetlib->getSession();
 
@@ -402,14 +425,14 @@ class FilterWidget extends Widget
 			}
 			else // else if the filter loaded in session is the same that is being requested
 			{
-				// Get SESSION_RELOAD_DATASET from the session
-				$sessionReloadDataset = $this->filterwidgetlib->getSessionElement(FilterWidgetLib::SESSION_RELOAD_DATASET);
+				// Get SESSION_DATASET_RELOAD from the session
+				$sessionReloadDataset = $this->filterwidgetlib->getSessionElement(FilterWidgetLib::SESSION_DATASET_RELOAD);
 
 				// if Filter changed or reload is forced by parameter then reload the Dataset
 				if ($this->_reloadDataset === true || $sessionReloadDataset === true)
 				{
 					// Set as false to stop changing the dataset
-					$this->filterwidgetlib->setSessionElement(FilterWidgetLib::SESSION_RELOAD_DATASET, false);
+					$this->filterwidgetlib->setSessionElement(FilterWidgetLib::SESSION_DATASET_RELOAD, false);
 
 					// Generate dataset query using filters from the session
 					$datasetQuery = $this->filterwidgetlib->generateDatasetQuery(
@@ -467,8 +490,8 @@ class FilterWidget extends Widget
 					$this->filterwidgetlib->setSession(
 						array(
 							FilterWidgetLib::FILTER_ID => $this->_filterId, // the current filter id
-							FilterWidgetLib::APP_PARAMETER => $this->_app, // the current app parameter
-							FilterWidgetLib::DATASET_NAME_PARAMETER => $this->_datasetName, // the carrent dataset name
+							FilterWidgetLib::APP => $this->_app, // the current app parameter
+							FilterWidgetLib::DATASET_NAME => $this->_datasetName, // the carrent dataset name
 							FilterWidgetLib::SESSION_FILTER_NAME => $filterName, // the current filter name
 							FilterWidgetLib::SESSION_FIELDS => $this->FiltersModel->getExecutedQueryListFields(), // all the fields of the dataset
 							FilterWidgetLib::SESSION_SELECTED_FIELDS => $this->_getColumnsNames($parsedFilterJson->columns), // all the selected fields
@@ -479,7 +502,7 @@ class FilterWidget extends Widget
 							FilterWidgetLib::SESSION_METADATA => $this->FiltersModel->getExecutedQueryMetaData(), // the metadata of the dataset
 							FilterWidgetLib::SESSION_ROW_NUMBER => count($dataset->retval), // the number of loaded rows by this filter
 							FilterWidgetLib::SESSION_DATASET => $dataset->retval, // the entire dataset
-							FilterWidgetLib::SESSION_RELOAD_DATASET => false, // if the dataset must be reloaded, not needed the first time
+							FilterWidgetLib::SESSION_DATASET_RELOAD => false, // if the dataset must be reloaded, not needed the first time
 							FilterWidgetLib::SESSION_DATASET_REPRESENTATION => $this->_datasetRepresentation, // the choosen dataset representation
 							FilterWidgetLib::SESSION_DATASET_REP_OPTIONS => $this->_datasetRepresentationOptions, // the choosen dataset representation options
 							FilterWidgetLib::SESSION_DATASET_REP_FIELDS_DEFS => $this->_datasetRepFieldsDefs // the choosen dataset representation record fields definition
@@ -489,9 +512,11 @@ class FilterWidget extends Widget
 			}
 		}
 
+		// NOTE: latest operations to be performed in the session to be shure that they are always present
 		// To be always stored in the session, otherwise is not possible to load data from Filters controller
-		// NOTE: must the latest operation to be performed in the session to be shure that is always present
-		$this->filterwidgetlib->setSessionElement(FilterWidgetLib::REQUIRED_PERMISSIONS_PARAMETER, $this->_requiredPermissions);
+		$this->filterwidgetlib->setSessionElement(FilterWidgetLib::REQUIRED_PERMISSIONS, $this->_requiredPermissions);
+		// Renew or set the session expiring time
+		$this->filterwidgetlib->setSessionElement(FilterWidgetLib::SESSION_TIMEOUT, strtotime('+'.$this->_sessionTimeout.' minutes', time()));
 	}
 
 	/**

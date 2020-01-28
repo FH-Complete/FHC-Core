@@ -61,7 +61,7 @@ class PrestudentMultiAssign extends Auth_Controller
 		}
 		else if (isError($returnUsers))
 		{
-			show_error($returnUsers->retval);
+			show_error(getError($returnUsers));
 		}
 	}
 

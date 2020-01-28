@@ -532,20 +532,34 @@ class lehreinheit extends basis_db
 
 			for($anz=0;$anz<count($this->studiengang_kz);$anz++)
 			{
-				$sql_query.=" OR ((studiengang_kz=".$this->db_add_param($this->studiengang_kz[$anz])." AND semester=".$this->db_add_param($this->semester[$anz]).")";
+				// Direkte Gruppen kollidieren nicht
+				$direktgruppe = false;
+				if($this->gruppe_kurzbz[$anz]!=null && $this->gruppe_kurzbz[$anz]!='' && $this->gruppe_kurzbz[$anz]!=' ')
+				{
+					$grp_obj = new gruppe();
+					$grp_obj->load($this->gruppe_kurzbz[$anz]);
+					if($grp_obj->direktinskription)
+					{
+						$direktgruppe = true;
+					}
+				}
+				if(!$direktgruppe)
+				{
+					$sql_query.=" OR ((studiengang_kz=".$this->db_add_param($this->studiengang_kz[$anz])." AND semester=".$this->db_add_param($this->semester[$anz]).")";
 
-				if ($this->gruppe_kurzbz[$anz]!=null && $this->gruppe_kurzbz[$anz]!='' && $this->gruppe_kurzbz[$anz]!=' ')
-				{
-					$sql_query.=" OR (gruppe_kurzbz=".$this->db_add_param($this->gruppe_kurzbz[$anz]).")";
+					if ($this->gruppe_kurzbz[$anz]!=null && $this->gruppe_kurzbz[$anz]!='' && $this->gruppe_kurzbz[$anz]!=' ')
+					{
+						$sql_query.=" OR (gruppe_kurzbz=".$this->db_add_param($this->gruppe_kurzbz[$anz]).")";
+					}
+					else
+					{
+						if ($this->verband[$anz]!=null && $this->verband[$anz]!='' && $this->verband[$anz]!=' ')
+							$sql_query.=" AND (verband=".$this->db_add_param($this->verband[$anz])." OR verband IS NULL OR verband='' OR verband=' ')";
+						if ($this->gruppe[$anz]!=null && $this->gruppe[$anz]!='' && $this->gruppe[$anz]!=' ')
+							$sql_query.=" AND (gruppe=".$this->db_add_param($this->gruppe[$anz])." OR gruppe IS NULL OR gruppe='' OR gruppe=' ')";
+					}
+					$sql_query.=')';
 				}
-				else
-				{
-					if ($this->verband[$anz]!=null && $this->verband[$anz]!='' && $this->verband[$anz]!=' ')
-						$sql_query.=" AND (verband=".$this->db_add_param($this->verband[$anz])." OR verband IS NULL OR verband='' OR verband=' ')";
-					if ($this->gruppe[$anz]!=null && $this->gruppe[$anz]!='' && $this->gruppe[$anz]!=' ')
-						$sql_query.=" AND (gruppe=".$this->db_add_param($this->gruppe[$anz])." OR gruppe IS NULL OR gruppe='' OR gruppe=' ')";
-				}
-				$sql_query.=')';
 			}
 			$sql_query.=")";
 
@@ -802,6 +816,9 @@ class lehreinheit extends basis_db
 				$this->lehreinheiten[$row->unr]->lehrverband[]=$row->gruppe_kurzbz;
 			else
 				$this->lehreinheiten[$row->unr]->lehrverband[]=$lvb;
+			$this->lehreinheiten[$row->unr]->lem[]=array(
+				'lehreinheit_id' => $row->lehreinheit_id,
+				'mitarbeiter_uid' => $row->lektor_uid);
 		}
 		return true;
 	}

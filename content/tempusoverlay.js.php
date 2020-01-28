@@ -101,6 +101,7 @@ function onVerbandSelect()
 	}
 
 	var order = LehrstundeGetSortOrder();
+	LVAFilterReset();
 	// LVAs
 	var vboxLehrveranstalungPlanung=document.getElementById('vboxLehrveranstalungPlanung');
 	var attribute='../rdf/lehreinheit-lvplan.rdf.php'+type+"&stg_kz="+stg_kz+"&sem="+sem+"&ver="+ver+"&grp="+grp+"&gruppe="+gruppe+"&order="+order+"&orgform="+orgform;
@@ -196,7 +197,7 @@ function onOrtSelect()
 	url+=attributes+'&'+gettimestamp();
 	if (url)
 		contentFrame.setAttribute('src', url);
-		
+
 	// Semesterplan
 	var semesterplan=document.getElementById('tabpanels-main');
 	var panelIndex=semesterplan.getAttribute("selectedIndex");
@@ -238,7 +239,7 @@ function onLektorSelect(event)
 	url+=attributes+'&'+gettimestamp();
 	if (url)
 		contentFrame.setAttribute('src', url);
-		
+
 	// Semesterplan
 	var semesterplan=document.getElementById('tabpanels-main');
 	var panelIndex=semesterplan.getAttribute("selectedIndex");
@@ -251,8 +252,9 @@ function onLektorSelect(event)
 		if (url)
 			contentFrame.setAttribute('src', url);
 	}
-	
+
 	var order = LehrstundeGetSortOrder();
+	LVAFilterReset();
 	// LVAs
 	var vboxLehrveranstalungPlanung=document.getElementById('vboxLehrveranstalungPlanung');
 	vboxLehrveranstalungPlanung.setAttribute('datasources','../rdf/lehreinheit-lvplan.rdf.php?'+"type=lektor&lektor="+uid+"&order="+order+"&"+gettimestamp());
@@ -307,7 +309,7 @@ function onLektorSelect(event)
 		}
 		catch(e)
 		{}
-		
+
 		while(oldDatasources.hasMoreElements())
 		{
 			treeLV.database.RemoveDataSource(oldDatasources.getNext());
@@ -363,7 +365,7 @@ function onFachbereichSelect(event)
 
 	col = tree.columns ? tree.columns["fachbereich-treecol-uid"] : "fachbereich-treecol-uid";
 	var uid=tree.view.getCellText(tree.currentIndex,col);
-	
+
 	//Wenn auf einen Mitarbeiter geklickt wird, dann die kurzbz vom uebergeordneten
 	//Fachbereich holen
 	if(uid!='')
@@ -387,7 +389,7 @@ function onFachbereichSelect(event)
 	url+=attributes+'&'+gettimestamp();
 	if (url)
 		contentFrame.setAttribute('src', url);
-		
+
 	// Semesterplan
 	var semesterplan=document.getElementById('tabpanels-main');
 	var panelIndex=semesterplan.getAttribute("selectedIndex");
@@ -400,8 +402,9 @@ function onFachbereichSelect(event)
 		if (url)
 			contentFrame.setAttribute('src', url);
 	}
-	
+
 	var order = LehrstundeGetSortOrder();
+	LVAFilterReset();
 	// LVAs
 	var vboxLehrveranstalungPlanung=document.getElementById('vboxLehrveranstalungPlanung');
 	vboxLehrveranstalungPlanung.setAttribute('datasources','../rdf/lehreinheit-lvplan.rdf.php?'+"type=fachbereich&fachbereich_kurzbz="+kurzbz+"&order="+order+"&"+gettimestamp());
@@ -424,7 +427,7 @@ function onFachbereichSelect(event)
 		}
 		catch(e)
 		{}
-		
+
 		while(oldDatasources.hasMoreElements())
 		{
 			treeLV.database.RemoveDataSource(oldDatasources.getNext());
@@ -444,4 +447,3 @@ function onFachbereichSelect(event)
 		debug(e);
 	}
 }
-

@@ -68,7 +68,7 @@ class DocumentLib
 				}
 				else
 				{
-					return error($ret->retval);
+					return error(getError($ret));
 				}
 			case 'application/pdf':
 				return success($filename);

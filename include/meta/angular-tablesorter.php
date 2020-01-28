@@ -25,9 +25,9 @@ if($dr=='')
 	$dr='/';
 
 //Originaldateien des Herstellers
-echo '<link rel="stylesheet" type="text/css" href="'.$dr.'vendor/FHC-vendor/angular-tablesort/tablesort.css">';
+echo '<link rel="stylesheet" type="text/css" href="'.$dr.'FHC-vendor/angular-tablesort/tablesort.css">';
 
-echo '<script src="'.$dr.'vendor/FHC-vendor/angular-tablesort/js/angular-tablesort.js"></script>';
+echo '<script src="'.$dr.'FHC-vendor/angular-tablesort/js/angular-tablesort.js"></script>';
 
 //Anpassungen
 echo '<link rel="stylesheet" type="text/css" href="'.$dr.'include/vendor_custom/angular-tablesorter/tablesort.css">';

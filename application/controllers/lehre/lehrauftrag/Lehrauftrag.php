@@ -26,7 +26,8 @@ class Lehrauftrag extends Auth_Controller
             array(
                 'index' => 'lehre/lehrauftrag_bestellen:r',
                 'orderLehrauftrag' => 'lehre/lehrauftrag_bestellen:rw',
-				'Dashboard' => array('lehre/lehrauftrag_bestellen:r', 'lehre/lehrauftrag_erteilen:rw')
+				'Dashboard' => array('lehre/lehrauftrag_bestellen:r', 'lehre/lehrauftrag_erteilen:rw'),
+				'LehrendeUebersicht' => array('lehre/lehrauftrag_erteilen:r')
             )
         );
 
@@ -69,6 +70,14 @@ class Lehrauftrag extends Auth_Controller
 		$this->load->view('lehre/lehrauftrag/Dashboard.php');
 	}
 
+	/**
+	 * Display of Lehrauftragsübersicht report
+	 */
+	public function LehrendeUebersicht()
+	{
+		$this->load->view('lehre/lehrauftrag/LehrendeUebersicht.php');
+	}
+
     // -----------------------------------------------------------------------------------------------------------------
     // Public methods
     /**
@@ -105,7 +114,7 @@ class Lehrauftrag extends Auth_Controller
             }
             elseif (isError($studiensemester))
             {
-                show_error($studiensemester->error);
+                show_error(getError($studiensemester));
             }
         }
 
@@ -145,8 +154,9 @@ class Lehrauftrag extends Auth_Controller
                 $studiengang_kz = (isset($lehrauftrag->studiengang_kz)) ? $lehrauftrag->studiengang_kz : null;
 
                 // Check if user is entitled to order this Lehrauftrag
-                if (!$this->permissionlib->isBerechtigt(self::BERECHTIGUNG_LEHRAUFTRAG_BESTELLEN, 'suid', $studiengang_kz)){
-                    show_error('Keine Bestellberechtigung für diesen Studiengang: '. $studiengang_kz);
+                if (!$this->permissionlib->isBerechtigt(self::BERECHTIGUNG_LEHRAUFTRAG_BESTELLEN, 'suid', $studiengang_kz))
+                {
+					return $this->outputJsonError('Sie haben keine Bestellberechtigung für diesen Studiengang: '. $studiengang_kz);
                 }
 
                 // update contract if contract exists and the betrag was changed
@@ -159,6 +169,10 @@ class Lehrauftrag extends Auth_Controller
                         $vertrag_betrag = $result[0]->betrag;
                         $vertrag_stunden = $result[0]->vertragsstunden;
                     }
+                    elseif (isError($result))
+					{
+						return $this->outputJsonError('Fehler beim Laden des Vertrags');
+					}
 
                     $hasChanged = ($betrag != floatval($vertrag_betrag) || $stunden != $vertrag_stunden) ? true : false;
 
@@ -181,6 +195,10 @@ class Lehrauftrag extends Auth_Controller
                                 'erteilt' => null
                             );
                         }
+                        else
+						{
+							return $this->outputJsonError('Fehler beim Vertragsupdate');
+						}
                     }
                 }
                 // else save new contract
@@ -206,6 +224,14 @@ class Lehrauftrag extends Auth_Controller
 							'vertrag_stunden' => $stunden
                         );
                     }
+                    elseif (isError($result) && $result->retval)
+					{
+						return $this->outputJsonError($result->retval);
+					}
+                    else
+					{
+						return $this->outputJsonError('Fehler beim Speichern des Vertrags');
+					}
 
                     $new_lehrvertrag_data_arr[] = array(
                         'studiensemester_kurzbz' => $lehrauftrag->studiensemester_kurzbz,
@@ -215,16 +241,14 @@ class Lehrauftrag extends Auth_Controller
                 }
             }
         }
+		else
+		{
+			return $this->outputJsonError('Fehler beim Übertragen der Daten.');
+		}
 
         if (isset($json) && !isEmptyArray($json))
         {
             $this->outputJsonSuccess($json);
-        }
-
-        // Send email to Mitarbeiter
-        // if(!$this->_sendMail($new_lehrvertrag_data_arr)) // TODO: slows down Bestell-process -> better chronjob?
-        {
-           // return error information // TODO: implement after decision regarding communication process
         }
     }
 
@@ -319,42 +343,5 @@ class Lehrauftrag extends Auth_Controller
         }
 
         return $unique_new_lehrvertrag_data_arr;
-    }
-
-    private function validateGetPost($lehrauftrag){
-        $lehreinheit_id = (isset($lehrauftrag['lehreinheit_id']) && is_numeric($lehrauftrag['lehreinheit_id'])) ? $lehrauftrag['lehreinheit_id'] : null;
-        $lehrveranstaltung_id = (isset($lehrauftrag['lehrveranstaltung_id']) && is_numeric($lehrauftrag['lehrveranstaltung_id'])) ? $lehrauftrag['lehrveranstaltung_id'] : null;
-        $person_id = (isset($lehrauftrag['person_id']) && is_numeric($lehrauftrag['person_id'])) ? $lehrauftrag['person_id'] : null;
-        $mitarbeiter_uid = (isset($lehrauftrag['mitarbeiter_uid']) && is_string($lehrauftrag['mitarbeiter_uid'])) ? $lehrauftrag['mitarbeiter_uid'] : null;
-        $vertrag_id = (isset($lehrauftrag['vertrag_id']) && is_numeric($lehrauftrag['vertrag_id'])) ? $lehrauftrag['vertrag_id'] : null;
-        $projektarbeit_id = (isset($lehrauftrag['projektarbeit_id']) && is_numeric($lehrauftrag['projektarbeit_id'])) ? $lehrauftrag['projektarbeit_id'] : null;
-        $stunden = (isset($lehrauftrag['stunden']) && is_numeric($lehrauftrag['stunden'])) ? $lehrauftrag['stunden'] : null;
-        $betrag = (isset($lehrauftrag['betrag']) && is_numeric($lehrauftrag['betrag'])) ? $lehrauftrag['betrag'] : null;
-        $studiensemester_kurzbz = (isset($lehrauftrag['studiensemester_kurzbz']) && is_string($lehrauftrag['studiensemester_kurzbz'])) ? $lehrauftrag['betrag'] : null;
-
-        return array(
-            $lehreinheit_id,
-            $lehrveranstaltung_id,
-            $person_id,
-            $mitarbeiter_uid,
-            $vertrag_id,
-            $projektarbeit_id,
-            $stunden,
-            $betrag,
-            $studiensemester_kurzbz
-        );
-
-// LIST IS TO BE SET ABOVE!!!:
-//        list(
-//            $lehreinheit_id,
-//            $lehrveranstaltung_id,
-//            $person_id,
-//            $mitarbeiter_uid,
-//            $vertrag_id,
-//            $projektarbeit_id,
-//            $stunden,
-//            $betrag,
-//            $studiensemester_kurzbz
-//            ) = $this->_validateGetPost($lehrauftrag);
     }
 }

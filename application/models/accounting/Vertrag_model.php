@@ -60,14 +60,14 @@ class Vertrag_model extends DB_Model
         {
             if ($this->LehreinheitmitarbeiterModel->hasVertrag($mitarbeiter_uid, $lehreinheit_id))
             {
-                return success(null);   // Exit if Lehrauftrag already has Vertrag
+            	return error('Lehrauftrag existiert bereits');	// Exit if Lehrauftrag already has Vertrag
             }
         }
         elseif ($vertragstyp_kurzbz == 'Betreuung')
         {
             if ($this->ProjektbetreuerModel->hasVertrag($person_id, $projektarbeit_id))
             {
-                return success(null);   // Exit if Projektbetreuung already has Vertrag
+                return error('Lehrauftrag existiert bereits');   // Exit if Projektbetreuung already has Vertrag
             }
         }
 

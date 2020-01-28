@@ -44,7 +44,7 @@ class Studienjahr extends Auth_Controller
 		$studienjahr = $this->StudienjahrModel->load();
 		if ($studienjahr->error)
 		{
-			show_error($studienjahr->retval);
+			show_error(getError($studienjahr));
 		}
 
 		$data = array(
@@ -66,7 +66,7 @@ class Studienjahr extends Auth_Controller
 		$studienjahr = $this->StudienjahrModel->load($studienjahr_kurzbez);
 		if ($studienjahr->error)
 		{
-			show_error($studienjahr->retval);
+			show_error(getError($studienjahr));
 		}
 		$data = array(
 			"studienjahr" => $studienjahr->retval
@@ -86,7 +86,7 @@ class Studienjahr extends Auth_Controller
 		$allstudienjahrkurzbz = $this->StudienjahrModel->load();
 		if ($allstudienjahrkurzbz->error)
 		{
-			show_error($allstudienjahrkurzbz->retval);
+			show_error(getError($allstudienjahrkurzbz));
 		}
 		$studienjahrkurzbz = $allstudienjahrkurzbz->retval[0]->studienjahr_kurzbz;
 		$years = $this->__getYearsFromStudienjahr($studienjahrkurzbz);
@@ -125,7 +125,7 @@ class Studienjahr extends Auth_Controller
 
 		if ($studienjahr->error)
 		{
-			show_error($studienjahr->retval);
+			show_error(getError($studienjahr));
 		}
 
 		redirect("/organisation/studienjahr/editStudienjahr/".str_replace("/", "_", $data['studienjahr_kurzbz']."?saved=true"));
@@ -153,7 +153,7 @@ class Studienjahr extends Auth_Controller
 			return $data;
 		} else
 		{
-			show_error($validation->retval);
+			show_error(getError($validation));
 		}
 	}
 
@@ -188,7 +188,7 @@ class Studienjahr extends Auth_Controller
 
 		if ($studienjahr->error)
 		{
-			show_error($studienjahr->retval);
+			show_error(getError($studienjahr));
 		}
 
 		redirect("/organisation/studienjahr/editStudienjahr/".str_replace("/", "_", $data['studienjahr_kurzbz']."?saved=true"));
@@ -207,7 +207,7 @@ class Studienjahr extends Auth_Controller
 
 		if ($studienjahr->error)
 		{
-			show_error($studienjahr->retval);
+			show_error(getError($studienjahr));
 		}
 
 		redirect("/organisation/studienjahr/listStudienjahr");

@@ -94,9 +94,16 @@ function func_initialFilter(){
 // -----------------------------------------------------------------------------------------------------------------
 // Tabulator table format functions
 // -----------------------------------------------------------------------------------------------------------------
+
+// Displays text when table is empty
+function func_placeholder()
+{
+    return "<h4>Keine Daten vorhanden.</h4>";
+}
+
 // Formats the group header
 function func_groupHeader(data){
-    return data[0].lv_bezeichnung;  // change name to lehrveranstaltung
+    return data[0].lv_bezeichnung + "&nbsp;&nbsp;" + ' ( LV-ID: ' + data[0].lehrveranstaltung_id + ' )';  // change name to lehrveranstaltung;
 };
 
 // Formats the rows
@@ -667,9 +674,16 @@ $(function() {
                     {
                         // Update status 'Erteilt'
                         $('#tableWidgetTabulator').tabulator('updateData', data.retval);
+
+                        // Print success message
+                        FHC_DialogLib.alertSuccess(data.retval.length + " Lehraufträge wurden erteilt.");
                     }
 
-                    FHC_DialogLib.alertSuccess(data.retval.length + " Lehraufträge wurden erteilt.");
+                    if (data.error && data.retval != null)
+                    {
+                        // Print error message
+                        FHC_DialogLib.alertError(data.retval);
+                    }
                 },
                 errorCallback: function (jqXHR, textStatus, errorThrown)
                 {

@@ -151,8 +151,8 @@ class stip extends basis_db
 				$this->Familienname_Antwort = $row->nachname;
 				$this->SVNR_Antwort = $row->svnr;
 				$this->PersKz_Antwort = trim($row->matrikelnr);
-				$this->StgKz = str_pad($row->studiengang_kz, 4,'0', STR_PAD_LEFT);
-				$this->Matrikelnummer = $row->matr_nr;
+				$this->StgKz_Antwort = str_pad($row->studiengang_kz, 4,'0', STR_PAD_LEFT);
+				$this->Matrikelnummer_Antwort = $row->matr_nr;
 				$this->AntwortStatusCode = 1;
 				return $row->prestudent_id;
 			}
@@ -193,8 +193,8 @@ class stip extends basis_db
 				$this->Familienname_Antwort = $row->nachname;
 				$this->SVNR_Antwort = $row->svnr;
 				$this->PersKz_Antwort = trim($row->matrikelnr);
-				$this->StgKz = str_pad($row->studiengang_kz, 4,'0', STR_PAD_LEFT);
-				$this->Matrikelnummer = $row->matr_nr;
+				$this->StgKz_Antwort = str_pad($row->studiengang_kz, 4,'0', STR_PAD_LEFT);
+				$this->Matrikelnummer_Antwort = $row->matr_nr;
 				$this->AntwortStatusCode = 1;
 				return $row->prestudent_id;
 			}
@@ -236,8 +236,8 @@ class stip extends basis_db
 					$this->Familienname_Antwort = $row->nachname;
 					$this->SVNR_Antwort = $row->svnr;
 					$this->PersKz_Antwort = trim($row->matrikelnr);
-					$this->StgKz = str_pad($row->studiengang_kz, 4,'0', STR_PAD_LEFT);
-					$this->Matrikelnummer = $row->matr_nr;
+					$this->StgKz_Antwort = str_pad($row->studiengang_kz, 4,'0', STR_PAD_LEFT);
+					$this->Matrikelnummer_Antwort = $row->matr_nr;
 					$this->AntwortStatusCode = 1;
 					return $row->prestudent_id;
 				}
@@ -289,8 +289,8 @@ class stip extends basis_db
 					$this->Familienname_Antwort = $row->nachname;
 					$this->SVNR_Antwort = $row->svnr;
 					$this->PersKz_Antwort = trim($row->matrikelnr);
-					$this->StgKz = str_pad($row->studiengang_kz, 4,'0', STR_PAD_LEFT);
-					$this->Matrikelnummer = $row->matr_nr;
+					$this->StgKz_Antwort = str_pad($row->studiengang_kz, 4,'0', STR_PAD_LEFT);
+					$this->Matrikelnummer_Antwort = $row->matr_nr;
 					$this->AntwortStatusCode = 1;
 					return $row->prestudent_id;
 				}

@@ -116,7 +116,7 @@ $this->load->view(
 								<td><b>Bestellt</b><br>Nur bestellte UND geänderte bestellte Lehraufträge</td>
 								<td><b>Erteilt</b><br>Nur erteilte UND geänderte erteilte Lehraufträge</td>
 								<td><b>Angenommen</b><br>Nur vom Lehrenden angenommene Lehraufträge</td>
-								<td><b>Geändert</b><br>Nur geänderte Lehraufträge, die den Status 'bestellt' oder 'erteilt' haben</td>
+								<td><b>Geändert</b><br>Nur Lehraufträge, die geändert wurden, nachdem sie bereits bestellt oder erteilt worden sind</td>
 								<td><b>Dummies</b><br>Nur Lehraufträge, die mit einem Dummylektor angelegt sind</td>
 							</tr>
 						</table>
@@ -130,6 +130,18 @@ $this->load->view(
 							<li>Bereich auswählen: <kbd>Shift</kbd> + Klick auf Anfangs- und Endzeile</li>
 							<li>Alle auswählen: Button 'Alle auswählen'</li>
 						</ul>
+					</div>
+					<br>
+
+					<h4>Ansicht</h4>
+					<div class="panel panel-body">
+						<b>Spaltenbreite verändern</b>
+						<p>
+							Um die Spaltenbreite zu verändern, fährt man im Spaltenkopf langsam mit dem Mauszeiger auf
+							den rechten Rand der entprechenden Spalte. <br>
+							Sobald sich der Mauszeiger in einen Doppelpfeil verwandelt, wird die Maustaste geklickt und
+							mit gedrückter Maustaste die Spalte nach rechts erweitert oder nach links verkleinert.
+						</p>
 					</div>
 					<br>
 

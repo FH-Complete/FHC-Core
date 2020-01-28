@@ -43,6 +43,10 @@ var lehrveranstaltungLvGesamtNotenSelectUID=null; //LehreinheitID des Noten Eint
 var lehrveranstaltungNotenTreeloaded=false;
 var lehrveranstaltungGesamtNotenTreeloaded=false;
 var LehrveranstaltungAusbildungssemesterFilter='';
+
+// Config-Eintrag, ob Vertragsdetails angezeigt werden sollen
+var lehrveranstaltung_vertragsdetails_anzeigen = Boolean(<?php echo (defined('FAS_LV_LEKTORINNENZUTEILUNG_VERTRAGSDETAILS_ANZEIGEN') && FAS_LV_LEKTORINNENZUTEILUNG_VERTRAGSDETAILS_ANZEIGEN) ? true : false ?>);
+
 // ********** Observer und Listener ************* //
 
 // ****
@@ -1331,12 +1335,9 @@ function LeMitarbeiterAuswahl()
 		document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-checkbox-bismelden').checked=false;
 
 	var gesamtkosten = LeMitarbeiterGesamtkosten();
-
-    // Prüfe ob Vertragsdetails angezeigt werden
-    var vertragsdetails_anzeigen = new Boolean(<?php echo (defined('FAS_LV_LEKTORINNENZUTEILUNG_VERTRAGSDETAILS_ANZEIGEN') && FAS_LV_LEKTORINNENZUTEILUNG_VERTRAGSDETAILS_ANZEIGEN) ? 'true' : 'false' ?>);
-
+	
     // Wenn Vertragsdetails angezeigt werden
-    if (vertragsdetails_anzeigen) {
+    if (lehrveranstaltung_vertragsdetails_anzeigen) {
 
         // Reset attributes
         document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-label-vertragsstatus').setAttribute("style", "font-weight: normal");
@@ -2427,7 +2428,7 @@ function LehrveranstaltungFFZertifikatPrint(event)
 		}
 	}
 	var ss = getStudiensemester();
-	col = tree.columns ? tree.columns["lehrveranstaltung-noten-tree-studiengang_kz"] : "lehrveranstaltung-noten-tree-studiengang_kz";
+	col = tree.columns ? tree.columns["lehrveranstaltung-noten-tree-studiengang_kz_lv"] : "lehrveranstaltung-noten-tree-studiengang_kz_lv";
 	stg_kz = tree.view.getCellText(tree.currentIndex,col);
 
 	if (event.shiftKey)

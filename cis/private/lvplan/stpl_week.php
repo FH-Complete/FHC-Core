@@ -497,19 +497,19 @@ $stdplan->user_uid=$uid;
 // Zusaetzliche Daten laden
 if (! $stdplan->load_data($type,$pers_uid,$ort_kurzbz,$stg_kz,$sem,$ver,$grp,$gruppe_kurzbz,null,$lva) )
 {
-	die($stdplan->errormsg);
+	die(htmlentities($stdplan->errormsg));
 }
 
 // Stundenplan einer Woche laden
 if (! $stdplan->load_week($datum))
 {
-	die($stdplan->errormsg);
+	die(htmlentities($stdplan->errormsg));
 }
 
 // Kopfbereich drucken
 if (! $stdplan->draw_header())
 {
-	die($stdplan->errormsg);
+	die(htmlentities($stdplan->errormsg));
 }
 
 // Stundenplan der Woche drucken
