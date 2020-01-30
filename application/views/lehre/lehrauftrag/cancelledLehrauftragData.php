@@ -64,12 +64,6 @@ $tableWidgetArray = array(
 		'Storniert am'
 	),
 	'datasetRepOptions' => '{
-		layout: "fitColumns",           // fit columns to width of table
-		layoutColumnsOnNewData: true,	// ajust column widths to the data each time TableWidget is loaded
-		persistentLayout: true,			// enables persistence (default store in localStorage if available, else in cookie)
-	    persistenceID: "cancelledLehrauftrag",	// TableWidget unique id to store persistence data seperately for multiple tables
-		autoResize: false, 				// prevent auto resizing of table (false to allow adapting table size when cols are (de-)activated
-	    movableColumns: true,           // allows changing column
         rowFormatter:function(row){
             func_rowFormatter(row);
         },

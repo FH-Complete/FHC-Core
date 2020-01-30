@@ -522,8 +522,11 @@ var FHC_TableWidget = {
 
 				options.columns = arrayTabulatorColumns;
 				options.data = data.dataset;
-				options.tooltipsHeader = true;									// set header tooltip with column title
-				options.placeholder = _func_placeholder();						// display text when table is empty
+				options.persistentLayout = true;			// enables persistence (default store in localStorage if available, else in cookie)
+				options.persistenceID = data.tableUniqueId;	// TableWidget unique id to store persistence data seperately for multiple tables
+				options.movableColumns = true;				// allows changing column order
+				options.tooltipsHeader = true;				// set header tooltip with column title
+				options.placeholder = _func_placeholder();	// display text when table is empty
 				options.rowSelectionChanged = function(data, rows){
 					_func_rowSelectionChanged(data, rows);
 				};

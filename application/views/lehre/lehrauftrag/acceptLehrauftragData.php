@@ -328,10 +328,7 @@ $filterWidgetArray = array(
     'datasetRepOptions' => '{
 		height: func_height(this),
 		layout: "fitColumns",           // fit columns to width of table
-		persistentLayout:true,			// enables persistence (default store in localStorage if available, else in cookie)
-		persistenceID: "acceptLehrauftrag",	// TableWidget unique id to store persistence data seperately for multiple tables
 		autoResize: false, 				// prevent auto resizing of table (false to allow adapting table size when cols are (de-)activated
-		movableColumns: true,           // allows changing column
 	    headerFilterPlaceholder: " ",
         index: "row_index",             // assign specific column as unique id (important for row indexing)
         selectable: true,               // allow row selection
