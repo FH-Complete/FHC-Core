@@ -204,6 +204,32 @@ var FHC_TableWidget = {
 				tableWidgetDiv.find("#tableWidgetTabulator").tabulator("download", "csv", "data.csv", {bom:true});
 			})
 
+			// Click-Event to collapse help div
+			tableWidgetDiv.find('#help').on('click', function()
+			{
+
+				//... auch unteren event für settings hier hinein
+				$('#tabulatorHelp-' + tableUniqueId).collapse('toggle');
+
+				$(this).toggleClass('active focus');
+
+				// De/activate and un/focus on clicked settings button
+				if(!$(this).hasClass('active focus'))
+				{
+					$(this).css({'background-color': 'white', 'border-color' : '#ccc', 'outline': 'none'});
+				}
+				else
+				{
+					$(this).css({'background-color': '#e6e6e6'});
+				}
+
+				if($('#tabulatorSettings-' + tableUniqueId).hasClass('collapse in'))
+				{
+					$('#tabulatorSettings-' + tableUniqueId).removeClass('in');
+					// $('#settings').toggleClass('active focus');
+				}
+			})
+
 			// Click-Event to collapse settings div
 			tableWidgetDiv.find('#settings').on('click', function()
 			{
@@ -221,6 +247,12 @@ var FHC_TableWidget = {
 				else
 				{
 					$(this).css({'background-color': '#e6e6e6'});
+				}
+
+				if($('#tabulatorHelp-' + tableUniqueId).hasClass('collapse in'))
+				{
+					$('#tabulatorHelp-' + tableUniqueId).removeClass('in');
+					// $('#help').toggleClass('active focus');
 				}
 			})
 
@@ -738,7 +770,8 @@ function _renderTabulatorHeaderHTML(tableWidgetDiv){
 	tabulatorHeaderHTML += '<div class="btn-toolbar pull-right" role="toolbar">';
 	tabulatorHeaderHTML += '<div class="btn-group" role="group">';
 	tabulatorHeaderHTML += '<button id="download-csv" class="btn btn-default" type="button" data-toggle="tooltip" data-placement="left" title="Download CSV"><small>CSV&nbsp;&nbsp;</small><i class="fa fa-arrow-down"></i></button>';
-	tabulatorHeaderHTML += '<button id="settings" class="btn btn-default" type="button" data-toggle="collapse" data-target="tabulatorSettings-'+ tableUniqueId + '" aria-expanded="false" aria-controls="tabulatorSettings-'+ tableUniqueId + '"><i class="fa fa-cog"></i></button>';
+	tabulatorHeaderHTML += '<button id="help" class="btn btn-default" type="button" data-toggle="collapse tooltip" data-target="tabulatorHelp-'+ tableUniqueId + '" data-placement="left" title="Hilfe zu Tabelleneinstellungen"><i class="fa fa-question"></i></button>';
+	tabulatorHeaderHTML += '<button id="settings" class="btn btn-default" type="button" data-toggle="collapse tooltip" data-target="tabulatorSettings-'+ tableUniqueId + '" data-placement="left" title="Tabelleneinstellungen" aria-expanded="false" aria-controls="tabulatorSettings-'+ tableUniqueId + '"><i class="fa fa-cog"></i></button>';
 	tabulatorHeaderHTML += '</div>';
 	tabulatorHeaderHTML += '</div>';
 
@@ -751,6 +784,8 @@ function _renderTabulatorHeaderCollapseHTML(tableWidgetDiv){
 	var tableUniqueId = tableWidgetDiv.attr('tableUniqueId');
 
 	var tabulatorHeaderCollapseHTML = '';
+
+	// CollapseHTML 'Settings'
 	tabulatorHeaderCollapseHTML += '<br>';
 	tabulatorHeaderCollapseHTML += '<div class="row">';
 	tabulatorHeaderCollapseHTML += '<div class="col-lg-12 collapse" id="tabulatorSettings-'+ tableUniqueId + '">';
@@ -797,6 +832,51 @@ function _renderTabulatorHeaderCollapseHTML(tableWidgetDiv){
 
 	tabulatorHeaderCollapseHTML += '</div>'; // end panel-group
 	tabulatorHeaderCollapseHTML += ' </div>'; // end col
+	tabulatorHeaderCollapseHTML += ' </div>'; // end row
+
+	// CollapseHTML 'Help'
+	tabulatorHeaderCollapseHTML += '<br>';
+	tabulatorHeaderCollapseHTML += '<div class="row">';
+	tabulatorHeaderCollapseHTML += '<div class="col-lg-12 collapse" id="tabulatorHelp-'+ tableUniqueId + '">';
+	tabulatorHeaderCollapseHTML += '<div class="well">';
+
+	tabulatorHeaderCollapseHTML += '<h4>Tabelleneinstellungen</h4>';
+	tabulatorHeaderCollapseHTML += '<div class="panel panel-body">';
+	tabulatorHeaderCollapseHTML += '<b>Spalten ein- und ausblenden</b>';
+	tabulatorHeaderCollapseHTML += '<p>';
+	tabulatorHeaderCollapseHTML += '<ul>';
+	tabulatorHeaderCollapseHTML += '<li>Mit einem Klick auf <button><i class="fa fa-cog"></i></button> ' +
+		'werden die Einstellungen geöffnet.</li>';
+	tabulatorHeaderCollapseHTML += '<li>Auf Spalteneinstellungen klicken</li>';
+	tabulatorHeaderCollapseHTML += '<li>Durch (wiederholtes) Klicken auf die einzelnen Spaltennamen können ' +
+		'diese in der Tabelle beliebig oft aktiviert / deaktiviert werden.</li>';
+	tabulatorHeaderCollapseHTML += '<li>Mit einem Klick auf <button><i class="fa fa-cog"></i></button> ' +
+		'werden die Einstellungen wieder geschlossen.</li>';
+	tabulatorHeaderCollapseHTML += '</ul>';
+	tabulatorHeaderCollapseHTML += '</p>';
+	tabulatorHeaderCollapseHTML += '<b>Spaltenbreite verändern</b>';
+	tabulatorHeaderCollapseHTML += '<p>Um die Spaltenbreite zu verändern, fährt man im Spaltenkopf langsam ' +
+		'mit dem Mauszeiger auf den rechten Rand der entprechenden Spalte. <br>' +
+		'Sobald sich der Mauszeiger in einen Doppelpfeil verwandelt, wird die Maustaste geklickt und ' +
+		'mit gedrückter Maustaste die Spalte nach rechts erweitert oder nach links verkleinert.';
+	tabulatorHeaderCollapseHTML += '</p>';
+	tabulatorHeaderCollapseHTML += '<div class="alert alert-info"><strong>INFO: </strong>Alle individuellen Tabelleneinstellungen werden in ' +
+		'Ihrem Browser Cache gespeichert. Wenn Sie Ihren Browser Cache löschen, werden Ihre Einstellungen zurückgesetzt und ' +
+		'müssen gegebenenfalls neu eingestellt werden.';
+	tabulatorHeaderCollapseHTML += '</div>';
+	tabulatorHeaderCollapseHTML += '</div><br>';	// end panel-body
+
+	tabulatorHeaderCollapseHTML += '<h4>Zeilen auswählen</h4>';
+	tabulatorHeaderCollapseHTML += '<div class="panel panel-body">';
+	tabulatorHeaderCollapseHTML += '<ul>';
+	tabulatorHeaderCollapseHTML += '<li>Einzeln auswählen: <kbd>Strg</kbd> + Klick auf einzelne Zeile(n)</li>';
+	tabulatorHeaderCollapseHTML += '<li>Bereich auswählen: <kbd>Shift</kbd> + Klick auf Anfangs- und Endzeile</li>';
+	tabulatorHeaderCollapseHTML += '<li>Alle auswählen: Button \'Alle auswählen\'</li>';
+	tabulatorHeaderCollapseHTML += '</ul>';
+	tabulatorHeaderCollapseHTML += '</div><br>'; // end panel-body
+
+	tabulatorHeaderCollapseHTML += '</div>';  // end well
+	tabulatorHeaderCollapseHTML += ' </div>'; // end col collapse
 	tabulatorHeaderCollapseHTML += ' </div>'; // end row
 
 	return tabulatorHeaderCollapseHTML;
