@@ -522,6 +522,7 @@ var FHC_TableWidget = {
 
 				options.columns = arrayTabulatorColumns;
 				options.data = data.dataset;
+				options.tooltipsHeader = true;									// set header tooltip with column title
 				options.rowSelectionChanged = function(data, rows){
 					_func_rowSelectionChanged(data, rows);
 				};
