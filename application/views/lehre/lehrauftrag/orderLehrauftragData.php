@@ -379,7 +379,6 @@ $filterWidgetArray = array(
 		persistenceID: "orderLehrauftrag",	// TableWidget unique id to store persistence data seperately for multiple tables
 		autoResize: false, 				// prevent auto resizing of table (false to allow adapting table size when cols are (de-)activated
 		movableColumns: true,			// allows changing column order
-		placeholder: func_placeholder(),	// shown on empty table (no data)
 		headerFilterPlaceholder: " ",
 		groupBy:"lehrveranstaltung_id",
 		groupToggleElement:"header",    //toggle group on click anywhere in the group header

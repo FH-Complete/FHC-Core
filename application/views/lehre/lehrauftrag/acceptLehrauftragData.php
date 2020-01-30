@@ -332,7 +332,6 @@ $filterWidgetArray = array(
 		persistenceID: "acceptLehrauftrag",	// TableWidget unique id to store persistence data seperately for multiple tables
 		autoResize: false, 				// prevent auto resizing of table (false to allow adapting table size when cols are (de-)activated
 		movableColumns: true,           // allows changing column
-		placeholder: func_placeholder(),
 	    headerFilterPlaceholder: " ",
         index: "row_index",             // assign specific column as unique id (important for row indexing)
         selectable: true,               // allow row selection

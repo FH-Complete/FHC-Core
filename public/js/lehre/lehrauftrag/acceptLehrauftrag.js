@@ -98,12 +98,6 @@ function func_height(table){
 	return $(window).height() * 0.50;
 }
 
-// Displays text when table is empty
-function func_placeholder()
-{
-	return "<h4>Keine Daten vorhanden.</h4>";
-}
-
 // Formats the rows
 function func_rowFormatter(row){
 	var bestellt = row.getData().bestellt;

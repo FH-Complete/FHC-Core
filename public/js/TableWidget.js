@@ -523,6 +523,7 @@ var FHC_TableWidget = {
 				options.columns = arrayTabulatorColumns;
 				options.data = data.dataset;
 				options.tooltipsHeader = true;									// set header tooltip with column title
+				options.placeholder = _func_placeholder();						// display text when table is empty
 				options.rowSelectionChanged = function(data, rows){
 					_func_rowSelectionChanged(data, rows);
 				};
@@ -716,6 +717,13 @@ function _func_columnVisibilityChanged(column, visible){
 	var table = column.getTable();
 
 	table.redraw();
+}
+
+/*
+ * Displays text when table is empty
+ */
+function _func_placeholder(){
+	return "<h4>Keine Daten vorhanden.</h4>";
 }
 
 // Returns TableWidget Header HTML (download-, setting button...)
