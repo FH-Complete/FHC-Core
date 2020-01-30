@@ -70,7 +70,7 @@ if(defined('CIS_CHECK_PASSWORD_CHANGE') && CIS_CHECK_PASSWORD_CHANGE==true)
  */
 function validURLCheck($param)
 {
-	if(strstr($param,'://'))
+	if(strstr($param,':'))
 	{
 		// Der APP_ROOT muss in der URL vorkommen, sonfern es kein relativer Pfad ist
 		// HTTPS und HTTP
@@ -170,7 +170,7 @@ $db = new basis_db();
 	<script type="text/javascript" src="../vendor/components/jqueryui/jquery-ui.min.js"></script>
 	<script type="text/javascript" src="../include/js/jquery.ui.datepicker.translation.js"></script>
 	<script type="text/javascript" src="../vendor/jquery/sizzle/sizzle.js"></script>
-	<link rel="stylesheet" type="text/css" href="../vendor/twbs/bootstrap/dist/css/bootstrap.min.css">	
+	<link rel="stylesheet" type="text/css" href="../vendor/twbs/bootstrap/dist/css/bootstrap.min.css">
 </head>
 <script type="text/javascript">
 function changeSprache(sprache)
