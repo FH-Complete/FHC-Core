@@ -189,10 +189,6 @@ function checkZeilenUmbruch()
 			$text.=  '<br>';
 			$text.=  "<a class='Item' target='_blank' href='upload.php?course_id=$studiengang_kz&term_id=$semester&short=$short'>".$p->t('lehre/upload')."</a>";
 			$text.=  '&nbsp;&nbsp;&nbsp;';
-			if(isset($dir_empty) && $dir_empty == false)
-				$text.=  "<a class='Item' title='".$p->t('lehre/ziparchivTitle')."' href='zipdownload.php?stg=$studiengang_kz&sem=$semester&short=$short' target='_blank'>".$p->t('lehre/ziparchiv')."</a>";
-			else
-				$text.=  $p->t('lehre/ziparchiv');
 		}
 
 		$menu[]=array
