@@ -184,14 +184,14 @@ class LehrauftragAkzeptieren extends Auth_Controller
     }
 
 	/**
-	 * Check if lectors latest active Verwendung has inkludierte Lehre
+	 * Check if lectors latest Verwendung has inkludierte Lehre
 	 * - inkludierte_lehre is null OR 0: freelancer lector -> has NO inkludierte Lehre
 	 * - inkludierte_lehre -1: fix employed lector -> has inkludierte Lehre (all inclusive)
 	 * - inkludierte_lehre > 0: fix employed lector -> has inkludierte Lehre (value is amount of hours included)
 	 */
     public function checkInkludierteLehre()
 	{
-		$result = $this->BisverwendungModel->getLast($this->_uid);
+		$result = $this->BisverwendungModel->getLast($this->_uid, false);
 
 		if (hasData($result))
 		{
