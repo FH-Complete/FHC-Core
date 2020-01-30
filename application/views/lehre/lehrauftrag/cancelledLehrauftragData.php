@@ -87,12 +87,12 @@ $tableWidgetArray = array(
 	'datasetRepFieldsDefs' => '{
         vertrag_id: {visible: false},
         vertragsstunden_studiensemester_kurzbz: {visible: false, widthShrink:1},
-        vertragstyp_kurzbz: {minWidth: 300},
-        bezeichnung: {minWidth: 400},
+        vertragstyp_kurzbz: {minWidth: 200},
+        bezeichnung: {minWidth: 200},
         vertragsstunden: {
             align:"right", formatter: form_formatNulltoStringNumber, formatterParams:{precision:1},
             bottomCalc:"sum", bottomCalcParams:{precision:1},
-            minWidth: 300
+            minWidth: 200
         },
         betrag: {
             align:"right", formatter: form_formatNulltoStringNumber,
