@@ -64,7 +64,9 @@ define('LDAP_TOO_MANY_USER_DN',		11);
 |--------------------------------------------------------------------------
 */
 define('LANG_SESSION_NAME', 'LANGUAGE');
-define('LANG_SESSION_INDEXES', 'LANGUAGE_INDEXES');
+define('LANG_SESSION_INDEXES', 'INDEXES');
+define('LANG_SESSION_ACTIVE_LANGUAGES', 'ACTIVE_LANGUAGES');
+define('LANG_SESSION_CURRENT_LANGUAGE', 'sprache'); // NOTE: it is not under LANG_SESSION_NAME
 
 /*
 |--------------------------------------------------------------------------
