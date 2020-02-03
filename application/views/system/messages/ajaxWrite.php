@@ -56,6 +56,12 @@
 						<div class="col-lg-12">
 							<label><?php echo $this->p->t('ui', 'message'); ?>:</label>
 							<textarea id="body"></textarea>
+
+							<br>
+
+							<div>
+								<?php echo $this->p->t('ui', 'altRecipientNote'); ?>
+							</div>
 						</div>
 					</div>
 					<br>

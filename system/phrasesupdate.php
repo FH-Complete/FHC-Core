@@ -4174,6 +4174,26 @@ When on hold, the date is only a reminder.',
 				'insertvon' => 'system'
 			)
 		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'altRecipientNote',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => '* This is a notice to notice you that you have been noticed DE',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => '* This is a notice to notice you that you have been noticed',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
 	)
 );
 
