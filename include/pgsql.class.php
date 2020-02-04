@@ -289,7 +289,7 @@ class basis_db extends db
 			case FHC_INTEGER:
 				$var = $this->db_escape($var);
 				if(!is_numeric($var) && $var!=='')
-					die('Invalid Integer Parameter detected:'.$var);
+					die('Invalid Integer Parameter detected');
 				$var = $this->db_null_value($var, false);
 				break;
 

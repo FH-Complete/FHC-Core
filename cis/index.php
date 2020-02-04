@@ -70,13 +70,14 @@ if(defined('CIS_CHECK_PASSWORD_CHANGE') && CIS_CHECK_PASSWORD_CHANGE==true)
  */
 function validURLCheck($param)
 {
-	if(strstr($param,':'))
+	if (strstr($param,':') || strstr($param,'//'))
 	{
 		// Der APP_ROOT muss in der URL vorkommen, sonfern es kein relativer Pfad ist
 		// HTTPS und HTTP
 		if(mb_strpos($param, APP_ROOT)!==0
 			&& mb_strpos(mb_str_replace("http://","https://", $param), APP_ROOT)!==0
-			&& mb_strpos(mb_str_replace("https://","http://", $param), APP_ROOT)!==0)
+			&& mb_strpos(mb_str_replace("https://","http://", $param), APP_ROOT)!==0
+			&& $param != 'about:blank')
 		{
 			$text="Dies ist eine automatische Mail.\nEs wurde eine mögliche XSS Attacke durchgefuehrt:\n";
 			$text.="\nFolgende URL wurde versucht aufzurufen: \n".$_SERVER['SERVER_NAME'].$_SERVER['REQUEST_URI'];
