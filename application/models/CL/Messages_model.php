@@ -183,7 +183,7 @@ class Messages_model extends CI_Model
 	public function prepareAjaxReadSent()
 	{
 		// Retrieves sent messages from the logged user
-		$sentMessagesResult = $this->RecipientModel->getSentMessages(getAuthPersonId(), self::ALT_OE);
+		$sentMessagesResult = $this->RecipientModel->getSentMessages(getAuthPersonId());
 		if (isError($sentMessagesResult)) return $sentMessagesResult; // If an error occurred return it
 
 		if (hasData($sentMessagesResult))
@@ -205,7 +205,7 @@ class Messages_model extends CI_Model
 
 				if ($sentMessage->person_id == $this->config->item(MessageLib::CFG_SYSTEM_PERSON_ID))
 				{
-					$jsonRecord->to = $sentMessage->sg;
+					$jsonRecord->to = $sentMessage->oe;
 				}
 				else
 				{

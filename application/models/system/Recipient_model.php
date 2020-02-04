@@ -446,7 +446,7 @@ class Recipient_model extends DB_Model
 	/**
 	 * Gets all the sent message by the given person
 	 */
-	public function getSentMessages($person_id, $altOe = '')
+	public function getSentMessages($person_id)
 	{
 		$sql = 'SELECT mm.message_id,
 						mm.relationmessage_id,
@@ -458,18 +458,13 @@ class Recipient_model extends DB_Model
 						p.nachname,
 						MAX(ms.status) AS status,
 						ms.person_id AS statusPersonId,
-						sg.bezeichnung AS sg,
+						oe.bezeichnung AS oe,
 						mr.token
 				  FROM public.tbl_msg_message mm
 				  JOIN public.tbl_msg_recipient mr ON (mr.message_id = mm.message_id)
 				  JOIN public.tbl_msg_status ms ON (ms.message_id = mm.message_id AND mr.person_id = mr.person_id)
 				  JOIN public.tbl_person p ON (p.person_id = mr.person_id)
-			 LEFT JOIN (
-				 			SELECT oe_kurzbz, bezeichnung
-							  FROM public.tbl_studiengang
-							UNION
-								SELECT ?, ?
-					) sg ON (sg.oe_kurzbz = mr.oe_kurzbz)
+			 	  JOIN public.tbl_organisationseinheit oe ON (oe.oe_kurzbz = mr.oe_kurzbz)
 				 WHERE mm.person_id = ?
 				   AND mr.sent IS NOT NULL
 				   AND mr.sentinfo IS NULL
@@ -482,10 +477,10 @@ class Recipient_model extends DB_Model
 						p.vorname,
 						p.nachname,
 						ms.person_id,
-						sg.bezeichnung,
+						oe.bezeichnung,
 						mr.token
 			  ORDER BY mr.sent DESC';
 
-		return $this->execQuery($sql, array($altOe, ucfirst($altOe), $person_id));
+		return $this->execQuery($sql, array($person_id));
 	}
 }
