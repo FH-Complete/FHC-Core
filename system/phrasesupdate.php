@@ -3789,7 +3789,7 @@ When on hold, the date is only a reminder.',
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Please enter the old an new password',
+				'text' => 'Please enter the old and the new password',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -4036,65 +4036,65 @@ When on hold, the date is only a reminder.',
 		)
 	),
 	array(
-        'app' => 'core',
-        'category' => 'global',
-        'phrase' => 'lehrauftraegeBestellen',
-        'insertvon' => 'system',
-        'phrases' => array(
-            array(
-                'sprache' => 'German',
-                'text' => 'Lehraufträge bestellen',
-                'description' => '',
-                'insertvon' => 'system'
-            ),
-            array(
-                'sprache' => 'English',
-                'text' => 'Order lectureships',
-                'description' => '',
-                'insertvon' => 'system'
-            )
-        )
-    ),
-    array(
-        'app' => 'core',
-        'category' => 'global',
-        'phrase' => 'lehrauftraegeErteilen',
-        'insertvon' => 'system',
-        'phrases' => array(
-            array(
-                'sprache' => 'German',
-                'text' => 'Lehraufträge erteilen',
-                'description' => '',
-                'insertvon' => 'system'
-            ),
-            array(
-                'sprache' => 'English',
-                'text' => 'Approve lectureships',
-                'description' => '',
-                'insertvon' => 'system'
-            )
-        )
-    ),
-    array(
-        'app' => 'core',
-        'category' => 'global',
-        'phrase' => 'lehrauftraegeAnnehmen',
-        'insertvon' => 'system',
-        'phrases' => array(
-            array(
-                'sprache' => 'German',
-                'text' => 'Lehraufträge annehmen',
-                'description' => '',
-                'insertvon' => 'system'
-            ),
-            array(
-                'sprache' => 'English',
-                'text' => 'Accept lectureships',
-                'description' => '',
-                'insertvon' => 'system'
-            )
-        )
-    ),
+		'app' => 'core',
+		'category' => 'global',
+		'phrase' => 'lehrauftraegeBestellen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Lehraufträge bestellen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Order lectureships',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'global',
+		'phrase' => 'lehrauftraegeErteilen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Lehraufträge erteilen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Approve lectureships',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'global',
+		'phrase' => 'lehrauftraegeAnnehmen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Lehraufträge annehmen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Accept lectureships',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
 	array(
 		'app' => 'core',
 		'category' => 'global',
@@ -4110,6 +4110,206 @@ When on hold, the date is only a reminder.',
 			array(
 				'sprache' => 'English',
 				'text' => 'Cancelled lectureships',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'account',
+		'phrase' => 'title',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Account Aktivierung',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Account Activation',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'account',
+		'phrase' => 'usage',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Bitte wählen Sie ein Passwort für Ihren Account.<br>Das Passwort muss zumindest 8 Zeichen enthalten, davon mindestens 1 Großbuchstabe, 1 Kleinbuchstabe und eine Ziffer.<br>Das Passwort darf keine Leerzeichen und Umlaute enthalten.<br>Erlaubte Sonderzeichen sind: -$#[]{}!().,*:;_',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Please choose a password for your account<br>The password must contain at least 8 characters, of which 1 must be upper case, 1 lower case and 1 a numeral.<br>The password may not include spaces or umlauts.<br>The following special characters are allowed: -$#[]{}!().,*:;_',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'account',
+		'phrase' => 'username',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Username',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Username',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'account',
+		'phrase' => 'code',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Code',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Code',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'captcha',
+		'phrase' => 'label',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Tippen Sie die angezeigten<br>Zeichen in das untere Feld.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Enter the characters in<br>the field below.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'captcha',
+		'phrase' => 'reload',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Ich kann das Bild nicht lesen - neu laden',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Reload picture',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'account',
+		'phrase' => 'activate',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Abschicken',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Activate',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'password',
+		'phrase' => 'wrongCaptcha',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Captcha code falsch ',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Captcha code is wrong',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'account',
+		'phrase' => 'missingParameters',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Bitte geben Sie Benutzername, Code und Passwort ein',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Please enter username, code and password',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'account',
+		'phrase' => 'wrongActivationCode',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Der angegebene Aktivierungscode ist falsch',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'The provided activation code is wrong',
 				'description' => '',
 				'insertvon' => 'system'
 			)

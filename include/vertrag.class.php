@@ -346,7 +346,7 @@ class vertrag extends basis_db
 			mitarbeiter_uid,
 			null as pruefung_id,
 			null as projektarbeit_id,
-			(tbl_lehreinheitmitarbeiter.faktor*tbl_lehreinheitmitarbeiter.semesterstunden*tbl_lehreinheitmitarbeiter.stundensatz) as betrag,
+			(tbl_lehreinheitmitarbeiter.semesterstunden*tbl_lehreinheitmitarbeiter.stundensatz) as betrag,
 			tbl_lehreinheit.studiensemester_kurzbz,
 			null as betreuerart_kurzbz,
 			(	SELECT
@@ -370,7 +370,7 @@ class vertrag extends basis_db
 			null as mitarbeiter_uid,
 			null::integer as pruefung_id,
 			projektarbeit_id,
-			(tbl_projektbetreuer.faktor*tbl_projektbetreuer.stunden*tbl_projektbetreuer.stundensatz) as betrag,
+			(tbl_projektbetreuer.stunden*tbl_projektbetreuer.stundensatz) as betrag,
 			tbl_lehreinheit.studiensemester_kurzbz,
 			tbl_projektbetreuer.betreuerart_kurzbz,
 			(SELECT nachname || ' ' || vorname FROM public.tbl_person JOIN public.tbl_benutzer USING(person_id) WHERE uid=tbl_projektarbeit.student_uid)
@@ -513,7 +513,7 @@ class vertrag extends basis_db
 			mitarbeiter_uid,
 			null as pruefung_id,
 			null as projektarbeit_id,
-			(tbl_lehreinheitmitarbeiter.faktor*tbl_lehreinheitmitarbeiter.semesterstunden*tbl_lehreinheitmitarbeiter.stundensatz) as betrag,
+			(tbl_lehreinheitmitarbeiter.semesterstunden*tbl_lehreinheitmitarbeiter.stundensatz) as betrag,
 			tbl_lehreinheit.studiensemester_kurzbz,
 			null as betreuerart_kurzbz,
 			(	SELECT
@@ -539,7 +539,7 @@ class vertrag extends basis_db
 			null as mitarbeiter_uid,
 			null::integer as pruefung_id,
 			projektarbeit_id,
-			(tbl_projektbetreuer.faktor*tbl_projektbetreuer.stunden*tbl_projektbetreuer.stundensatz) as betrag,
+			(tbl_projektbetreuer.stunden*tbl_projektbetreuer.stundensatz) as betrag,
 			tbl_lehreinheit.studiensemester_kurzbz,
 			tbl_projektbetreuer.betreuerart_kurzbz,
 			(SELECT nachname || ' ' || vorname FROM public.tbl_person JOIN public.tbl_benutzer USING(person_id) WHERE uid=tbl_projektarbeit.student_uid)

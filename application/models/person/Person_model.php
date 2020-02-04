@@ -205,28 +205,12 @@ class Person_model extends DB_Model
 	 */
 	public function getLanguage($uid)
 	{
-		$language = DEFAULT_LANGUAGE;
-
+		$this->addSelect('public.tbl_person.sprache');
 		$this->addJoin('public.tbl_benutzer', 'person_id');
+		$this->addJoin('public.tbl_sprache', 'sprache');
 		$this->addOrder('public.tbl_person.updateamum', 'DESC');
 		$this->addOrder('public.tbl_person.insertvon', 'DESC');
 
-		$persons = $this->loadWhere(array('uid' => $uid));
-
-		if (hasData($persons))
-		{
-			for ($i = 0; $i < count($persons->retval); $i++)
-			{
-				$person = $persons->retval[$i];
-
-				if (!isEmptyString($person->sprache))
-				{
-					$language = $person->sprache;
-					break;
-				}
-			}
-		}
-
-		return $language;
+		return $this->loadWhere(array('uid' => $uid, 'content' => true));
 	}
 }

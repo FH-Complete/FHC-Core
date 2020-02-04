@@ -338,7 +338,7 @@ function drawLehrauftrag($uid)
 			$stunden = $row->semesterstunden;
 			$satz = $row->stundensatz;
 			$faktor = $row->faktor;
-			$brutto = $row->semesterstunden * $row->stundensatz * $row->faktor;
+			$brutto = $row->semesterstunden * $row->stundensatz;
 			$last_le = $row->lehreinheit_id;
 		}
 		array_unique($gruppen);
@@ -404,7 +404,7 @@ function drawLehrauftrag($uid)
 			$stg->load($row->studiengang_kz);
 			$stg_kuerzel = $stg->kuerzel;
 
-			$brutto = $row->stunden * $row->stundensatz * $row->faktor;
+			$brutto = $row->stunden * $row->stundensatz;
 			if ($row->stunden != 0)
 			{
 				switch ($row->projekttyp_kurzbz)
@@ -444,7 +444,7 @@ function drawLehrauftrag($uid)
 				<lehrveranstaltung><![CDATA['.$lv_row['lehrveranstaltung'].']]></lehrveranstaltung>
 				<fachbereich><![CDATA['.$lv_row['fachbereich'].']]></fachbereich>
 				<gruppe><![CDATA['.$lv_row['gruppe'].']]></gruppe>
-                <gruppen_getrennt>'. $lv_row['einzelgruppe']. '</gruppen_getrennt> <!-- Variable enthält CDATA tags-->
+				<gruppen_getrennt>'. $lv_row['einzelgruppe']. '</gruppen_getrennt> <!-- Variable enthält CDATA tags-->
 				<stunden><![CDATA['.$lv_row['stunden'].']]></stunden>
 				<satz><![CDATA['.$lv_row['satz'].']]></satz>
 				<faktor><![CDATA['.$lv_row['faktor'].']]></faktor>

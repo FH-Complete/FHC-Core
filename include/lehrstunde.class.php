@@ -291,6 +291,11 @@ class lehrstunde extends basis_db
 			$this->errormsg='Fehler: LVA-ID ist nicht gesetzt';
 			return -1;
 		}
+		if ($type=='lva' && !is_numeric($lva))
+		{
+			$this->errormsg='Fehler: LVA-ID ist ungueltig';
+			return -1;
+		}
 		// Type
 		if ($type==null)
 		{
@@ -362,7 +367,7 @@ class lehrstunde extends basis_db
 			}
 			else
 			{
-				$this->errormsg=$this->db_last_error();
+				$this->errormsg = 'Fehler beim Laden der Verbaende';
 				return -2;
 			}
 			// Spezialgruppen ermitteln zu denen die Person zugeteilt ist
@@ -394,7 +399,7 @@ class lehrstunde extends basis_db
 
 			if (!$result_einheit=$this->db_query($sql_query))
 			{
-				$this->errormsg=$this->db_last_error($this->conn);
+				$this->errormsg= 'Fehler beim Laden der Gruppen';
 				return false;
 			}
 			else
@@ -424,7 +429,7 @@ class lehrstunde extends basis_db
 
 			if (!$result_einheit=$this->db_query($sql_query))
 			{
-				$this->errormsg=$this->db_last_error($this->conn);
+				$this->errormsg='Fehler beim Laden der Gruppen';
 				return false;
 			}
 			else
@@ -565,7 +570,7 @@ class lehrstunde extends basis_db
 		//Datenbankabfrage
 		if (!$this->db_query($sql_query_stdplan))
 		{
-			$this->errormsg = $this->db_last_error();
+			$this->errormsg = 'Fehler beim Laden der Stundenplandaten';
 			return -2;
 		}
 		$stpl_tbl = $this->db_result;
@@ -619,7 +624,7 @@ class lehrstunde extends basis_db
 			//Datenbankabfrage
 			if (!$this->db_query($sql_query_reservierung))
 			{
-				$this->errormsg = $this->db_last_error();
+				$this->errormsg = 'Fehler beim Laden der Reservierungen';
 				return -2;
 			}
 			$stpl_tbl = $this->db_result;
