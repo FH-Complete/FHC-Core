@@ -154,7 +154,7 @@ class studienordnung extends basis_db
 					FROM lehre.tbl_studienordnung sto
 					LEFT JOIN lehre.tbl_studienordnungstatus s USING(status_kurzbz)
 					LEFT JOIN public.tbl_studiensemester ON(sto.gueltigvon=tbl_studiensemester.studiensemester_kurzbz)
-					LEFT JOIN public.tbl_studiensemester stoende ON(sto.gueltigvon=stoende.studiensemester_kurzbz)
+					LEFT JOIN public.tbl_studiensemester stoende ON(sto.gueltigbis=stoende.studiensemester_kurzbz)
 					WHERE studiengang_kz='.$this->db_add_param($studiengang_kz, FHC_INTEGER, false);
 		}
 		else
@@ -165,7 +165,7 @@ class studienordnung extends basis_db
 					LEFT JOIN lehre.tbl_studienplan USING(studienordnung_id)
 					LEFT JOIN lehre.tbl_studienplan_semester sem USING (studienplan_id)
 					LEFT JOIN public.tbl_studiensemester ON(sto.gueltigvon=tbl_studiensemester.studiensemester_kurzbz)
-					LEFT JOIN public.tbl_studiensemester stoende ON(sto.gueltigvon=stoende.studiensemester_kurzbz)
+					LEFT JOIN public.tbl_studiensemester stoende ON(sto.gueltigbis=stoende.studiensemester_kurzbz)
 					WHERE studiengang_kz='.$this->db_add_param($studiengang_kz, FHC_INTEGER, false);
 
 			if (!is_null($studiensemester_kurzbz))
