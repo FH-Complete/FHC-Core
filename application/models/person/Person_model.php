@@ -213,4 +213,23 @@ class Person_model extends DB_Model
 
 		return $this->loadWhere(array('uid' => $uid, 'content' => true));
 	}
+
+	/**
+	 * Checks if a person has a Bewerberstatus and reihungstestangetreten = true
+	 * @param $person_id
+	 * @param $studiensemester_kurzbz
+	 * @return array
+	 */
+	public function hasBewerber($person_id, $studiensemester_kurzbz)
+	{
+		$qry = "SELECT count(*) AS anzahl_bewerber FROM public.tbl_person
+				JOIN public.tbl_prestudent USING (person_id)
+				JOIN public.tbl_prestudentstatus ON tbl_prestudentstatus.prestudent_id = tbl_prestudent.prestudent_id
+				WHERE person_id = ?
+				AND studiensemester_kurzbz = ?
+				AND status_kurzbz = 'Bewerber'
+				AND reihungstestangetreten";
+
+		return $this->execQuery($qry, array($person_id, $studiensemester_kurzbz));
+	}
 }
