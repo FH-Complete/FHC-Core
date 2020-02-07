@@ -648,7 +648,7 @@ function GenerateXMLStudentBlock($row)
 	{
 		$error_log.=(!empty($error_log)?', ':'')."Geburtsdatum ('".$row->gebdatum."')";
 	}
-	if($row->geschlecht!='m' && $row->geschlecht!='w')
+	if($row->geschlecht!='m' && $row->geschlecht!='w' && $row->geschlecht!='x')
 	{
 		$error_log.=(!empty($error_log)?', ':'')."Geschlecht ('".$row->geschlecht."')";
 	}
@@ -1355,13 +1355,19 @@ function GenerateXMLBewerberBlock($orgformcode=null)
 	if(mb_strstr($ssem,"WS"))
 	{
 		//Bewerber
-		$qrybw="SELECT * FROM public.tbl_prestudent
+		$qrybw="
+		SELECT
+			*, transform_geschlecht(tbl_person.geschlecht, tbl_person.gebdatum) as geschlecht_imputiert
+		FROM
+			public.tbl_prestudent
 			JOIN public.tbl_prestudentstatus ON(tbl_prestudent.prestudent_id=tbl_prestudentstatus.prestudent_id)
 			JOIN public.tbl_person USING(person_id)
 			LEFT JOIN bis.tbl_orgform USING(orgform_kurzbz)
-			WHERE (studiensemester_kurzbz=".$db->db_add_param($ssem)." OR studiensemester_kurzbz=".$db->db_add_param($psem).") AND tbl_prestudent.studiengang_kz=".$db->db_add_param($stg_kz)."
+		WHERE (studiensemester_kurzbz=".$db->db_add_param($ssem)." OR studiensemester_kurzbz=".$db->db_add_param($psem).")
+			AND tbl_prestudent.studiengang_kz=".$db->db_add_param($stg_kz)."
 			AND (tbl_prestudentstatus.datum<=".$db->db_add_param($bisdatum).")
-			AND status_kurzbz='Bewerber' AND reihungstestangetreten
+			AND status_kurzbz='Bewerber'
+			AND reihungstestangetreten
 			";
 		if(!is_null($orgformcode))
 			$qrybw.=" AND tbl_orgform.code=".$db->db_add_param($orgformcode);
@@ -1373,7 +1379,7 @@ function GenerateXMLBewerberBlock($orgformcode=null)
 				// Bachelor / Diplom
 				if(($stgart==1 || $stgart==3) && $rowbw->zgv_code!=NULL)
 				{
-					if(strtoupper($rowbw->geschlecht)=='M')
+					if(strtoupper($rowbw->geschlecht_imputiert)=='M')
 					{
 						if(!isset($bewerberM[$rowbw->zgv_code]))
 						{
@@ -1393,7 +1399,7 @@ function GenerateXMLBewerberBlock($orgformcode=null)
 				// Master
 				if($stgart==2 && $rowbw->zgvmas_code!=NULL)
 				{
-					if(strtoupper($rowbw->geschlecht)=='M')
+					if(strtoupper($rowbw->geschlecht_imputiert)=='M')
 					{
 						if(!isset($bewerberM[$rowbw->zgvmas_code]))
 						{
@@ -1421,7 +1427,18 @@ function GenerateXMLBewerberBlock($orgformcode=null)
 				else
 					$bewerbercount[$bworgform]=1;
 
-				$bwlist.='<tr><td>'.trim($rowbw->nachname).'</td><td>'.trim($rowbw->vorname).'</td><td>'.$bworgform.'</td></tr>';
+				if($rowbw->geschlecht_imputiert!=$rowbw->geschlecht)
+					$geschlecht_imputiert = ' -> '.$rowbw->geschlecht_imputiert;
+				else
+					$geschlecht_imputiert = '';
+
+				$bwlist.='
+				<tr>
+					<td>'.trim($rowbw->nachname).'</td>
+					<td>'.trim($rowbw->vorname).'</td>
+					<td>'.$bworgform.'</td>
+					<td>'.$rowbw->geschlecht.$geschlecht_imputiert.'</td>
+				</tr>';
 			}
 		}
 
