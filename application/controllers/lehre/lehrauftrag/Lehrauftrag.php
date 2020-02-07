@@ -26,7 +26,7 @@ class Lehrauftrag extends Auth_Controller
             array(
                 'index' => 'lehre/lehrauftrag_bestellen:r',
                 'orderLehrauftrag' => 'lehre/lehrauftrag_bestellen:rw',
-				'Dashboard' => array('lehre/lehrauftrag_bestellen:r', 'lehre/lehrauftrag_erteilen:rw'),
+				'Dashboard' => array('lehre/lehrauftrag_bestellen:r', 'lehre/lehrauftrag_erteilen:r'),
 				'LehrendeUebersicht' => array('lehre/lehrauftrag_erteilen:r')
             )
         );
