@@ -3452,7 +3452,7 @@ if(!$result = @$db->db_query("SELECT 1 FROM fue.tbl_projekttyp LIMIT 1"))
 // Add column offset to testtool.tbl_gebiet
 if(!$result = @$db->db_query("SELECT offsetpunkte FROM testtool.tbl_gebiet LIMIT 1"))
 {
-	$qry = "ALTER TABLE testtool.tbl_gebiet ADD COLUMN offsetpunkte smallint";
+	$qry = "ALTER TABLE testtool.tbl_gebiet ADD COLUMN offsetpunkte numeric(8,4)";
 
 	if(!$db->db_query($qry))
 		echo '<strong>testtool.tbl_gebiet: '.$db->db_last_error().'</strong><br>';
