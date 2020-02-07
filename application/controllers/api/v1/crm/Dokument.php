@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Dokument extends APIv1_Controller
+class Dokument extends API_Controller
 {
 	/**
 	 * Dokument API constructor.

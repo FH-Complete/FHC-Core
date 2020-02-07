@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Ampel extends APIv1_Controller
+class Ampel extends API_Controller
 {
 	/**
 	 * Ampel API constructor.

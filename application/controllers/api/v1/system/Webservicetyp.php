@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Webservicetyp extends APIv1_Controller
+class Webservicetyp extends API_Controller
 {
 	/**
 	 * Webservicetyp API constructor.

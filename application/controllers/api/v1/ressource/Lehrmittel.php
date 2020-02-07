@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Lehrmittel extends APIv1_Controller
+class Lehrmittel extends API_Controller
 {
 	/**
 	 * Lehrmittel API constructor.

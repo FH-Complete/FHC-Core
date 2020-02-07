@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Server extends APIv1_Controller
+class Server extends API_Controller
 {
 	/**
 	 * Server API constructor.

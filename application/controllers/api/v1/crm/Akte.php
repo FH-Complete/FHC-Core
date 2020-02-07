@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Akte extends APIv1_Controller
+class Akte extends API_Controller
 {
 	/**
 	 * Akte API constructor.

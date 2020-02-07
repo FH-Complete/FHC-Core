@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Raumtyp extends APIv1_Controller
+class Raumtyp extends API_Controller
 {
 	/**
 	 * Raumtyp API constructor.

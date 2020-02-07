@@ -14,7 +14,7 @@
 
 if (!defined("BASEPATH")) exit("No direct script access allowed");
 
-class Studienplan extends APIv1_Controller
+class Studienplan extends API_Controller
 {
 	/**
 	 * Course API constructor.

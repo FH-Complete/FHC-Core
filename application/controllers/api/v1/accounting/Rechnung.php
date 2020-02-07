@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Rechnung extends APIv1_Controller
+class Rechnung extends API_Controller
 {
 	/**
 	 * Rechnung API constructor.

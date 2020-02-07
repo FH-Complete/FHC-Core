@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Uebung extends APIv1_Controller
+class Uebung extends API_Controller
 {
 	/**
 	 * Uebung API constructor.

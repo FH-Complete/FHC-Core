@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Kontakttyp extends APIv1_Controller
+class Kontakttyp extends API_Controller
 {
 	/**
 	 * Kontakttyp API constructor.

@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Betriebsmittel extends APIv1_Controller
+class Betriebsmittel extends API_Controller
 {
 	/**
 	 * Betriebsmittel API constructor.

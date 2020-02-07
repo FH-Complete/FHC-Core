@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Zeitaufzeichnung extends APIv1_Controller
+class Zeitaufzeichnung extends API_Controller
 {
 	/**
 	 * Zeitaufzeichnung API constructor.

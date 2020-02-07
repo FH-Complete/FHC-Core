@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Notenschluesselaufteilung extends APIv1_Controller
+class Notenschluesselaufteilung extends API_Controller
 {
 	/**
 	 * Notenschluesselaufteilung API constructor.

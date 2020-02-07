@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Organisationseinheit2 extends APIv1_Controller
+class Organisationseinheit2 extends API_Controller
 {
 	/**
 	 * Organisationseinheit API constructor.

@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Message extends APIv1_Controller
+class Message extends API_Controller
 {
 	/**
 	 * Message API constructor.

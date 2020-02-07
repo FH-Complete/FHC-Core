@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Funktion extends APIv1_Controller
+class Funktion extends API_Controller
 {
 	/**
 	 * Funktion API constructor.

@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Lehrverband extends APIv1_Controller
+class Lehrverband extends API_Controller
 {
 	/**
 	 * Lehrverband API constructor.

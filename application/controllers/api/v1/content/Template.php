@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Template extends APIv1_Controller
+class Template extends API_Controller
 {
 	/**
 	 * Template API constructor.
