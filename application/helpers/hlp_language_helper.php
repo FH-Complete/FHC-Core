@@ -18,28 +18,48 @@ if (! defined('BASEPATH')) exit('No direct script access allowed');
 
 /**
  * Function to retrieve the language of the logged user
- * If is not possible to retrieve it, then the default system language is returnd
- * If as parameter is given a valid language the it's returned useful to avoid
- * to write the same control structures for the language
+ * If is not possible to retrieve it, then the default system language is returned
+ * NOTE: If the given parameter is a valid language then it is returned
+ *			It is useful to avoid to write a lot of "if else" structures
  */
 function getUserLanguage($language = null)
 {
+	// If the given parameter is a valid language then return it
 	if (!isEmptyString($language)) return $language;
 
-	$ci =& get_instance(); // get CI instance
-
-	// Use the default system language, if it's possible retrieves the language for the logged user
+	// Use the default system language as fallback
 	$language = DEFAULT_LANGUAGE;
-	// Checks if the user is authenticated to retrieve the users's language
-	// NOTE: this helper could be called when the user is not logged in the system
-	// 		so this is why is checked if the function getAuthUID exists
-	if (function_exists('getAuthUID'))
+
+	// If the language is present in the session and it is valid
+	if (isset($_SESSION[LANG_SESSION_CURRENT_LANGUAGE]) && !isEmptyString($_SESSION[LANG_SESSION_CURRENT_LANGUAGE]))
 	{
+		$language = $_SESSION[LANG_SESSION_CURRENT_LANGUAGE]; // then use it
+	}
+	// Otherwise checks if the user is authenticated to retrieve the users's language
+	// NOTE: this helper could be called when the user is NOT logged in the system
+	// 		therefore is checked if the user is logged
+	elseif (isLogged())
+	{
+		$ci =& get_instance(); // get CI instance
+
 		// NOTE: Stores the loaded model with the alias PersonModelLanguage to avoid to overwrite
 		// 		an already loaded PersonModel used somewhere else
 		$ci->load->model('person/Person_model', 'PersonModelLanguage');
 
-		$language = $ci->PersonModelLanguage->getLanguage(getAuthUID());
+		// Retrieves language/s for the logged user
+		$languagesDB = $ci->PersonModelLanguage->getLanguage(getAuthUID());
+		if (hasData($languagesDB))
+		{
+			// Looks for the first valid language
+			foreach (getData($languagesDB) as $languageDB)
+			{
+				if (!isEmptyString($languageDB->sprache))
+				{
+					$language = $languageDB->sprache;
+					break;
+				}
+			}
+		}
 	}
 
 	return $language;
@@ -62,31 +82,21 @@ function getPhraseByLanguage($phraseLanguagesArray, $language)
 	$langArray = getSessionElement(LANG_SESSION_NAME, LANG_SESSION_INDEXES);
 	if ($langArray == null) // If not already loaded in session
 	{
-		// Loads the Sprache_model to retrieve the language settings from the DB
-		// NOTE: Stores the loaded model with the alias SpracheModelLanguage to avoid to overwrite
-		// 		an already loaded SpracheModel used somewhere else
-		$ci->load->model('system/Sprache_model', 'SpracheModelLanguage');
-
-		// Add order clause by index and select only the sprache column
-		$ci->SpracheModelLanguage->addOrder('index');
-		$ci->SpracheModelLanguage->addSelect('sprache');
-
-		// Retrieves from public.tbl_sprache
-		$dbLanguages = $ci->SpracheModelLanguage->load();
+		// Retrieves active languages
+		$dbLanguages = getDBActiveLanguages();
 		if (hasData($dbLanguages)) // If everything is ok and contains data
 		{
 			$index = 0; // Incremental integer
-			$languageIndexes = array(); // Array that will contains languages and their indexes
+			$langArray = array(); // Array that will contains languages and their indexes
 
 			// Loops through database results
 			foreach (getData($dbLanguages) as $dbLanguage)
 			{
-				$languageIndexes[$dbLanguage->sprache] = $index++; // set $languageIndexes array elements
+				$langArray[$dbLanguage->sprache] = $index++; // set $languageIndexes array elements
 			}
 		}
 
-		$langArray = $languageIndexes; // copy $languageIndexes to $langArray
-		// Set session element $_SESSION['LANG']['LANG_INDEXES'] with $languageIndexes
+		// Set session element $_SESSION['LANG']['LANG_INDEXES'] with $langArray
 		setSessionElement(LANG_SESSION_NAME, LANG_SESSION_INDEXES, $langArray);
 	}
 
@@ -99,4 +109,79 @@ function getPhraseByLanguage($phraseLanguagesArray, $language)
 	}
 
 	return $phrase;
+}
+
+/**
+ * Tries to load active languages from session, if not present then loads them from database and stores them in session
+ */
+function getActiveLanguages()
+{
+	$languagesArray = getSessionElement(LANG_SESSION_NAME, LANG_SESSION_ACTIVE_LANGUAGES);
+	if ($languagesArray == null)
+	{
+		$languagesArray = array();
+
+		// Retrieves from public.tbl_sprache
+		$dbLanguages = getDBActiveLanguages();
+		if (hasData($dbLanguages))
+		{
+			// Loops through database results
+			foreach (getData($dbLanguages) as $dbLanguage)
+			{
+				$languagesArray[$dbLanguage->sprache] = $dbLanguage->bezeichnung; // set $languageIndexes array elements
+			}
+		}
+
+		// Set session element $_SESSION['LANG']['LANG_SESSION_ACTIVE_LANGUAGES'] with $languagesArray
+		setSessionElement(LANG_SESSION_NAME, LANG_SESSION_ACTIVE_LANGUAGES, $languagesArray);
+	}
+
+	return $languagesArray;
+}
+
+/**
+ * Loads active languages from database
+ */
+function getDBActiveLanguages()
+{
+	$ci =& get_instance(); // get CI instance
+
+	// Loads the Sprache_model to retrieve the language settings from the DB
+	// NOTE: Stores the loaded model with the alias SpracheModelLanguage to avoid to overwrite
+	// 		an already loaded SpracheModel used somewhere else
+	$ci->load->model('system/Sprache_model', 'SpracheModelLanguage');
+
+	// Add order clause by index and select only the sprache column
+	$ci->SpracheModelLanguage->addOrder('index');
+	$ci->SpracheModelLanguage->addSelect('sprache, bezeichnung');
+
+	// Retrieves from public.tbl_sprache
+	return $ci->SpracheModelLanguage->loadWhere(array('content' => true));
+}
+
+/**
+ * Sets the current language to render the GUI in session
+ */
+function setUserLanguage($language)
+{
+	$languageValid = false;
+
+	// Checks if the given language is valid (present between active languages)
+	foreach (getActiveLanguages() as $languageName => $languageTranslation)
+	{
+		if ($language == $languageName)
+		{
+			$languageValid = true;
+			break;
+		}
+	}
+
+	if ($languageValid) // if the provided language is valid
+	{
+		$_SESSION[LANG_SESSION_CURRENT_LANGUAGE] = $language; // stores it in session
+
+		return success('Language successfully changed'); // return success!!
+	}
+
+	return error('The given language is not valid'); // return an error
 }

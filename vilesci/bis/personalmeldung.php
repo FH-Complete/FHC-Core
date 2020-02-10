@@ -115,7 +115,7 @@ $stg_obj = new studiengang();
 $stg_obj->getAll(null,false);
 
 $qry="
-	SELECT DISTINCT ON (UID) *
+	SELECT DISTINCT ON (UID) *, transform_geschlecht(tbl_person.geschlecht, tbl_person.gebdatum) as geschlecht_imputiert
 	FROM
 		public.tbl_mitarbeiter
 		JOIN public.tbl_benutzer ON(mitarbeiter_uid=uid)
@@ -175,7 +175,12 @@ if($result = $db->db_query($qry))
      <Person>
       <PersonalNummer>".sprintf("%015s",$row->personalnummer)."</PersonalNummer>
       <GeburtsDatum>".date("dmY", $datumobj->mktime_fromdate($row->gebdatum))."</GeburtsDatum>
-      <Geschlecht>".strtoupper($row->geschlecht)."</Geschlecht>
+      <Geschlecht>".strtoupper($row->geschlecht)."</Geschlecht>";
+	  if ($row->geschlecht == 'x')
+	  	$person_content.="
+	  <GeschlechtX>".strtoupper($row->geschlecht_imputiert)."</GeschlechtX>";
+
+	  $person_content.="
       <HoechsteAbgeschlosseneAusbildung>".$row->ausbildungcode."</HoechsteAbgeschlosseneAusbildung>";
 		$qryvw="SELECT * FROM bis.tbl_bisverwendung WHERE mitarbeiter_uid=".$db->db_add_param($row->mitarbeiter_uid)." AND habilitation=true;";
 		if($resultvw=$db->db_query($qryvw))

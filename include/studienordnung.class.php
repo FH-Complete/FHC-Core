@@ -154,6 +154,7 @@ class studienordnung extends basis_db
 					FROM lehre.tbl_studienordnung sto
 					LEFT JOIN lehre.tbl_studienordnungstatus s USING(status_kurzbz)
 					LEFT JOIN public.tbl_studiensemester ON(sto.gueltigvon=tbl_studiensemester.studiensemester_kurzbz)
+					LEFT JOIN public.tbl_studiensemester stoende ON(sto.gueltigbis=stoende.studiensemester_kurzbz)
 					WHERE studiengang_kz='.$this->db_add_param($studiengang_kz, FHC_INTEGER, false);
 		}
 		else
@@ -164,6 +165,7 @@ class studienordnung extends basis_db
 					LEFT JOIN lehre.tbl_studienplan USING(studienordnung_id)
 					LEFT JOIN lehre.tbl_studienplan_semester sem USING (studienplan_id)
 					LEFT JOIN public.tbl_studiensemester ON(sto.gueltigvon=tbl_studiensemester.studiensemester_kurzbz)
+					LEFT JOIN public.tbl_studiensemester stoende ON(sto.gueltigbis=stoende.studiensemester_kurzbz)
 					WHERE studiengang_kz='.$this->db_add_param($studiengang_kz, FHC_INTEGER, false);
 
 			if (!is_null($studiensemester_kurzbz))
@@ -172,7 +174,7 @@ class studienordnung extends basis_db
 				$qry.=" AND semester=".$this->db_add_param($semester, FHC_INTEGER,false);
 		}
 
-		$qry.=" ORDER BY gueltig_startdatum desc";
+		$qry.=" ORDER BY gueltig_startdatum desc, stoende.start nulls first";
 
 		if(!$this->db_query($qry))
 		{
@@ -475,10 +477,10 @@ class studienordnung extends basis_db
 			return false;
 		}
 
-        $qry = 'SELECT 1 FROM lehre.tbl_studienplan_semester 
-            WHERE studienplan_id 
+        $qry = 'SELECT 1 FROM lehre.tbl_studienplan_semester
+            WHERE studienplan_id
             IN (SELECT studienplan_id FROM lehre.tbl_studienplan
-                WHERE studienordnung_id ='.$this->db_add_param($studienordnung_id).';'; 
+                WHERE studienordnung_id ='.$this->db_add_param($studienordnung_id).';';
 
 		if($this->db_query($qry))
 		{

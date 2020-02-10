@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "59fc693321fbae0364ec7174a0d0dcb1",
-    "content-hash": "b377fd50d87a28fdedf6214e4ffb6a6d",
+    "hash": "d9941245360c86434d18413999bdc812",
+    "content-hash": "fbeb5d4ef943f6d1d55220cb844d11f1",
     "packages": [
         {
             "name": "BlackrockDigital/startbootstrap-sb-admin-2",
@@ -626,6 +626,55 @@
             ],
             "description": "jQuery UI is a curated set of user interface interactions, effects, widgets, and themes built on top of the jQuery JavaScript Library. Whether you're building highly interactive web applications or you just need to add a date picker to a form control, jQuery UI is the perfect choice.",
             "time": "2016-09-16 05:47:55"
+        },
+        {
+            "name": "dapphp/securimage",
+            "version": "3.6.7",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/dapphp/securimage.git",
+                "reference": "1ecb884797c66e01a875c058def46c85aecea45b"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/dapphp/securimage/zipball/1ecb884797c66e01a875c058def46c85aecea45b",
+                "reference": "1ecb884797c66e01a875c058def46c85aecea45b",
+                "shasum": ""
+            },
+            "require": {
+                "ext-gd": "*",
+                "php": ">=5.4"
+            },
+            "suggest": {
+                "ext-pdo": "For database storage support",
+                "ext-pdo_mysql": "For MySQL database support",
+                "ext-pdo_sqlite": "For SQLite3 database support"
+            },
+            "type": "library",
+            "autoload": {
+                "classmap": [
+                    "securimage.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-3-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "Drew Phillips",
+                    "email": "drew@drew-phillips.com"
+                }
+            ],
+            "description": "PHP CAPTCHA Library",
+            "homepage": "https://www.phpcaptcha.org",
+            "keywords": [
+                "Forms",
+                "anti-spam",
+                "captcha",
+                "security"
+            ],
+            "time": "2018-03-09 06:07:41"
         },
         {
             "name": "easyrdf/easyrdf",
@@ -1455,16 +1504,16 @@
         },
         {
             "name": "tinymce/tinymce",
-            "version": "4.9.7",
+            "version": "4.9.8",
             "source": {
                 "type": "git",
                 "url": "https://github.com/tinymce/tinymce-dist.git",
-                "reference": "e14935a4ba07beb716ccdb192ee9823dbb4a73d5"
+                "reference": "912df2bc85015c758e32d1262219f1653bbf9783"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/tinymce/tinymce-dist/zipball/e14935a4ba07beb716ccdb192ee9823dbb4a73d5",
-                "reference": "e14935a4ba07beb716ccdb192ee9823dbb4a73d5",
+                "url": "https://api.github.com/repos/tinymce/tinymce-dist/zipball/912df2bc85015c758e32d1262219f1653bbf9783",
+                "reference": "912df2bc85015c758e32d1262219f1653bbf9783",
                 "shasum": ""
             },
             "type": "component",
@@ -1497,7 +1546,7 @@
                 "tinymce",
                 "wysiwyg"
             ],
-            "time": "2019-12-19 06:05:16"
+            "time": "2020-01-28 05:03:01"
         },
         {
             "name": "tomazdragar/SimpleCropper",

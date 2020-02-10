@@ -31,13 +31,11 @@ require_once('../../include/studiensemester.class.php');
 require_once('../../include/phrasen.class.php');
 require_once('../../include/benutzerberechtigung.class.php');
 
-
 $user = get_uid();
 $sprache = getSprache();
 $p = new phrasen($sprache);
 
 $doc = new dokument_export('Lehrtaetigkeit');
-
 
 if (!$db = new basis_db())
 	die('Es konnte keine Verbindung zum Server aufgebaut werden.');
@@ -86,12 +84,12 @@ foreach($active_semester_arr as $active_semester)
 	$studiensemester_start_date = $ss->start;
 	$studiensemester_end_date = $ss->ende;
 
-	// * get total amount of semesterstunden of the lehreinheiten, where stundensatz > 0
+	// * get total amount of semesterstunden of the lehreinheiten
 	$total_semesterstunden = 0;
 	foreach ($le_id_arr as $le_id)
 	{
 		$le_ma = new Lehreinheitmitarbeiter($le_id, $uid);
-		if ($le_ma && (!is_null ($le_ma->stundensatz) && $le_ma->stundensatz > 0))
+		if ($le_ma)
 		{
 			$total_semesterstunden = $total_semesterstunden + $le_ma->semesterstunden;
 		}
@@ -140,15 +138,16 @@ foreach ($project_arr as $project)
 	}, $projektstunden_per_semester
 	));
 
-	// * if studiensemester exists, sum up hours of projektarbeit, where stundensatz > 0
+	// * if studiensemester exists, sum up hours of projektarbeit
 	if ($studiensemester_index !== false)
 	{
-		$projektstunden_per_semester [$studiensemester_index]['total_semesterstunden'] = $projektstunden_per_semester [$studiensemester_index]['total_semesterstunden'] + $projektstunden;
+		$projektstunden_per_semester[$studiensemester_index]['total_semesterstunden'] =
+			$projektstunden_per_semester[$studiensemester_index]['total_semesterstunden'] + $projektstunden;
 	}
 	// * if not, create new index
 	else
 	{
-		$projektstunden_per_semester []= (
+		$projektstunden_per_semester[] = (
 			array(
 				'studiensemester_kurzbz'=> $studiensemester_kurzbz,
 				'total_semesterstunden' => $projektstunden,
@@ -171,7 +170,9 @@ foreach ($projektstunden_per_semester as $item)
 	// * if studiensemester exists, merge lehreinheit- and projektarbeit hours
 	if ($studiensemester_index !== false)
 	{
-		$semesterstunden_per_semester [$studiensemester_index]['total_semesterstunden'] = $semesterstunden_per_semester [$studiensemester_index]['total_semesterstunden'] + $item['total_semesterstunden'];
+		$semesterstunden_per_semester[$studiensemester_index]['total_semesterstunden'] =
+			$semesterstunden_per_semester [$studiensemester_index]['total_semesterstunden']
+			+ $item['total_semesterstunden'];
 	}
 	// * if not, create new index
 	else
@@ -202,12 +203,15 @@ $actual_studiensemester_index = array_search($actual_studiensemester, array_map(
 }, $semesterstunden_per_semester
 ));
 
-// * if lector is teaching actually, split former teaching activities from actual teaching activities of actual studiensemester
+// if lector is teaching actually, split former teaching activities
+// from actual teaching activities of actual studiensemester
 $semesterstunden_of_actual_semester = array();
 if ($actual_studiensemester_index !== false)
 {
-	$semesterstunden_of_actual_semester = array_slice($semesterstunden_per_semester, $actual_studiensemester_index);	// array with actual + future semester
-	$semesterstunden_per_semester = array_slice($semesterstunden_per_semester, 0, $actual_studiensemester_index);	// array with all former semester
+	// array with actual + future semester
+	$semesterstunden_of_actual_semester = array_slice($semesterstunden_per_semester, $actual_studiensemester_index);
+	// array with all former semester
+	$semesterstunden_per_semester = array_slice($semesterstunden_per_semester, 0, $actual_studiensemester_index);
 }
 
 // Semester begin and ending date of lehreinheit- and projektarbeit studiensemester
@@ -257,7 +261,8 @@ if (!empty($semesterstunden_per_semester))
 }
 else
 {
-	$data[]= array('total_ss_per_semester'=> '');	// empty if lector has no lehreinheit- or projektarbeitsstunden in the past (before the actual studiensemester)
+	// empty if lector has no lehreinheit- or projektarbeitsstunden in the past (before the actual studiensemester)
+	$data[]= array('total_ss_per_semester'=> '');
 }
 
 // Add data to lehrtaetigkeit.xsl
@@ -275,5 +280,3 @@ $doc->output();
 
 // unlink doc from tmp-folder
 $doc->close();
-
-

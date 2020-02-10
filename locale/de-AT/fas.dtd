@@ -46,10 +46,6 @@
 		<!ENTITY menu-statistic.label		"Berichte">
 		<!ENTITY menu-statistic.accesskey	"R">
 
-		<!ENTITY menu-statistic-koordinatorstunden.key			"K">
-		<!ENTITY menu-statistic-koordinatorstunden.label		"Koordinatorstunden">
-		<!ENTITY menu-statistic-koordinatorstunden.accesskey	"K">
-
 		<!ENTITY menu-statistic-lehre.key		"L">
 		<!ENTITY menu-statistic-lehre.label		"Lehre">
 		<!ENTITY menu-statistic-lehre.accesskey	"L">
@@ -155,14 +151,6 @@
 		<!ENTITY menu-statistic-substatistik-alvsstatistik-html.label		"HTML">
 		<!ENTITY menu-statistic-substatistik-alvsstatistik-html.accesskey	"H">
 
-		<!ENTITY menu-statistic-substatistik-lvplanunggesamtsj.key			"L">
-		<!ENTITY menu-statistic-substatistik-lvplanunggesamtsj.label		"LV-Planung Gesamt SJ">
-		<!ENTITY menu-statistic-substatistik-lvplanunggesamtsj.accesskey	"L">
-
-		<!ENTITY menu-statistic-substatistik-lvplanunggesamtsj-excel.key		"E">
-		<!ENTITY menu-statistic-substatistik-lvplanunggesamtsj-excel.label		"EXCEL">
-		<!ENTITY menu-statistic-substatistik-lvplanunggesamtsj-excel.accesskey	"E">
-
 		<!ENTITY menu-statistic-abgaengerstatistik.key			"A">
 		<!ENTITY menu-statistic-abgaengerstatistik.label		"AbgängerInnenstatistik">
 		<!ENTITY menu-statistic-abgaengerstatistik.accesskey	"A">
@@ -174,10 +162,6 @@
 		<!ENTITY menu-statistic-absolventenzahlen.key		"Z">
 		<!ENTITY menu-statistic-absolventenzahlen.label		"AbsolventInnenzahlen">
 		<!ENTITY menu-statistic-absolventenzahlen.accesskey	"Z">
-
-		<!ENTITY menu-statistic-lektorenstatistik.key		"L">
-		<!ENTITY menu-statistic-lektorenstatistik.label		"LektorInnenstatistik">
-		<!ENTITY menu-statistic-lektorenstatistik.accesskey	"L">
 
 		<!ENTITY menu-statistic-studentenstatistik.key			"S">
 		<!ENTITY menu-statistic-studentenstatistik.label		"Studierendenstatistik">
