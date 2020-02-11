@@ -3525,6 +3525,20 @@ if($result = $db->db_query("SELECT * FROM pg_proc WHERE proname = 'transform_ges
 			echo '<br>Function transform_geschlecht hinzugefügt.';
 	}
 }
+// UNIQUE INDEX unq_idx_ablauf_gebiet_studiengang_semester in testtool.tbl_ablauf löschen und durch neuen INDEX ersetzen, der auch den Studienplan einschließt
+if ($result = $db->db_query("SELECT 1 FROM pg_class WHERE relname = 'unq_idx_ablauf_gebiet_studiengang_semester'"))
+{
+	if ($db->db_num_rows($result) == 1)
+	{
+		$qry = 'DROP INDEX testtool.unq_idx_ablauf_gebiet_studiengang_semester;';
+		$qry .= 'CREATE UNIQUE INDEX unq_idx_ablauf_gebiet_studiengang_semester_studienplan ON testtool.tbl_ablauf USING btree (gebiet_id, studiengang_kz, semester, studienplan_id);';
+		if (!$db->db_query($qry))
+			echo '<strong>unq_idx_ablauf_gebiet_studiengang_semester_studienplan '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>Dropped index "unq_idx_ablauf_gebiet_studiengang_semester" and created unique index "unq_idx_ablauf_gebiet_studiengang_semester_studienplan"';
+	}
+}
+
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
 
