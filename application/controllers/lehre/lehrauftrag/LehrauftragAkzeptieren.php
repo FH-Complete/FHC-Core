@@ -71,14 +71,14 @@ class LehrauftragAkzeptieren extends Auth_Controller
         $studiensemester_kurzbz = $this->input->get('studiensemester'); // if provided by selected studiensemester
         if (is_null($studiensemester_kurzbz)) // else set next studiensemester as default value
         {
-            $studiensemester = $this->StudiensemesterModel->getNext();
+            $studiensemester = $this->StudiensemesterModel->getAktOrNextSemester();
             if (hasData($studiensemester))
             {
                 $studiensemester_kurzbz = $studiensemester->retval[0]->studiensemester_kurzbz;
             }
             elseif (isError($studiensemester))
             {
-                show_error($studiensemester->error);
+                show_error(getError($studiensemester));
             }
         }
 
@@ -107,7 +107,7 @@ class LehrauftragAkzeptieren extends Auth_Controller
         }
         else
         {
-            show_error('Password is missing');
+			return $this->outputJsonError('Passwort fehlt');
         }
 
         // Loop through lehraufträge
@@ -131,24 +131,33 @@ class LehrauftragAkzeptieren extends Auth_Controller
                     if ($result = getData($this->BenutzerModel->getFromPersonId($result[0]->person_id)))
                     {
                         // * finally check uid of contract against the logged in user
-                        if ($result[0]->uid != $this->_uid)
+						$account_found = false;
+						foreach($result as $row_accounts)
+						{
+							if($row_accounts->uid == $this->_uid)
+							{
+								$account_found = true;
+							}
+						}
+
+                        if (!$account_found)
                         {
-                            show_error('Keine Berechtigung für diesen Vertrag');
+							return $this->outputJsonError('Sie haben keine Berechtigung für einen Vertrag');
                         }
                     }
                     else
                     {
-                        show_error($result->retval);
+						return $this->outputJsonError('Fehler beim Laden der Benutzerdaten');
                     }
                 }
                 else
                 {
-                    show_error($result->retval);
+					return $this->outputJsonError('Fehler beim Laden des Vertrags');
                 }
 
                 // Set status to accepted
                 $result = $this->VertragvertragsstatusModel->setStatus($vertrag_id, $this->_uid, 'akzeptiert');
-    
+
                 if ($result->retval)
                 {
                     $json []= array(
@@ -156,6 +165,10 @@ class LehrauftragAkzeptieren extends Auth_Controller
                         'akzeptiert' => date('Y-m-d')
                     );
                 }
+				else
+				{
+					return $this->outputJsonError($result->retval);
+				}
             }
 
             // Output json to ajax
@@ -164,25 +177,29 @@ class LehrauftragAkzeptieren extends Auth_Controller
                 $this->outputJsonSuccess($json);
             }
         }
+		else
+		{
+			return $this->outputJsonError('Fehler beim Übertragen der Daten.');
+		}
     }
-	
+
 	/**
-	 * Check if lectors latest active Verwendung has inkludierte Lehre
+	 * Check if lectors latest Verwendung has inkludierte Lehre
 	 * - inkludierte_lehre is null OR 0: freelancer lector -> has NO inkludierte Lehre
 	 * - inkludierte_lehre -1: fix employed lector -> has inkludierte Lehre (all inclusive)
 	 * - inkludierte_lehre > 0: fix employed lector -> has inkludierte Lehre (value is amount of hours included)
 	 */
     public function checkInkludierteLehre()
 	{
-		$result = $this->BisverwendungModel->getLast($this->_uid);
-		
+		$result = $this->BisverwendungModel->getLast($this->_uid, false);
+
 		if (hasData($result))
 		{
 			$this->outputJsonSuccess(!is_null($result->retval[0]->inkludierte_lehre) && $result->retval[0]->inkludierte_lehre != 0);
 		}
 		else
 		{
-			$this->outputJsonError($result->retval);
+			$this->outputJsonError(getError($result));
 		}
 	}
 

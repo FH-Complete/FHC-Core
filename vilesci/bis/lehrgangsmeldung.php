@@ -197,7 +197,7 @@ if($result = $db->db_query($qry))
 		{
 			$error_log.=(!empty($error_log)?', ':'')."Geburtsdatum ('".$row->gebdatum."')";
 		}
-		if($row->geschlecht!='m' && $row->geschlecht!='w')
+		if($row->geschlecht!='m' && $row->geschlecht!='w' && $row->geschlecht!='x')
 		{
 			$error_log.=(!empty($error_log)?', ':'')."Geschlecht ('".$row->geschlecht."')";
 		}

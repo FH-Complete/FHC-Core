@@ -108,7 +108,6 @@ SELECT tbl_lehrveranstaltung.bezeichnung AS lf_bezeichnung,
 	tbl_lehreinheitmitarbeiter.mitarbeiter_uid,
 	tbl_lehrveranstaltung.semester AS lv_semester,
 	tbl_lehreinheit.lehreinheit_id,
-	tbl_lehreinheitmitarbeiter.faktor,
 	tbl_lehreinheitmitarbeiter.stundensatz,
 	tbl_lehreinheitmitarbeiter.semesterstunden lemss,
 	tbl_lehreinheitmitarbeiter.planstunden,
@@ -154,7 +153,6 @@ SELECT tbl_lehrveranstaltung.bezeichnung AS lf_bezeichnung,
 FROM lehre.tbl_lehrveranstaltung
 JOIN lehre.tbl_lehreinheit USING (lehrveranstaltung_id)
 JOIN lehre.tbl_lehreinheitmitarbeiter USING (lehreinheit_id)
---JOIN lehre.tbl_lehrveranstaltung as lehrfach ON(tbl_lehreinheit.lehrfach_id=lehrfach.lehrveranstaltung_id)
 WHERE tbl_lehreinheit.studiensemester_kurzbz = ".$db->db_add_param($studiensemester_kurzbz);
 
 if($studiengang_kz!='')
@@ -227,8 +225,6 @@ $maxlength[$spalte]=15;
 $worksheet->write($zeile,++$spalte,"Anmerkung", $format_bold);
 $maxlength[$spalte]=9;
 
-// Neu 13.11.2009 sequens
-
 $worksheet->write($zeile,++$spalte,"LV-Leitung", $format_bold);
 $maxlength[$spalte]=9;
 
@@ -248,7 +244,6 @@ if($result = $db->db_query($qry))
 {
 	while($row = $db->db_fetch_object($result))
 	{
-
 		$spalte=0;
 		$zeile++;
 
@@ -387,7 +382,6 @@ if($result = $db->db_query($qry))
 				student_uid,
 				stunden,
 				tbl_projektbetreuer.stundensatz,
-				tbl_projektbetreuer.faktor,
 				tbl_projektbetreuer.person_id
 			FROM lehre.tbl_projektarbeit,
 				lehre.tbl_lehreinheit,
@@ -397,11 +391,8 @@ if($result = $db->db_query($qry))
 			WHERE tbl_projektarbeit.lehreinheit_id = tbl_lehreinheit.lehreinheit_id
 				AND tbl_lehreinheit.lehrveranstaltung_id = tbl_lehrveranstaltung.lehrveranstaltung_id
 				AND tbl_projektarbeit.projektarbeit_id = tbl_projektbetreuer.projektarbeit_id
-				--AND tbl_lehreinheit.lehrfach_id = tbl_lehrveranstaltung.lehrveranstaltung_id
 				AND tbl_person.person_id = tbl_projektbetreuer.person_id
-				AND tbl_lehreinheit.studiensemester_kurzbz = ".$db->db_add_param($studiensemester_kurzbz)."
-				AND (tbl_projektbetreuer.stundensatz * tbl_projektbetreuer.stunden) > 0
-				";
+				AND tbl_lehreinheit.studiensemester_kurzbz = ".$db->db_add_param($studiensemester_kurzbz);
 
 	if($uid!=='')
 	{
@@ -414,6 +405,9 @@ if($result = $db->db_query($qry))
 
 	if($studiengang_kz!='')
 		$qry.=" AND tbl_lehrveranstaltung.studiengang_kz=".$db->db_add_param($studiengang_kz, FHC_INTEGER);
+
+	if($semester!='')
+		$qry.=" AND tbl_lehrveranstaltung.semester=".$db->db_add_param($semester, FHC_INTEGER);
 
 	if($result = $db->db_query($qry))
 	{
@@ -458,7 +452,6 @@ if($result = $db->db_query($qry))
 			{
 				$fixangestellt = 'Extern';
 			}
-
 
 			//Studiengang
 			$worksheet->write($zeile,$spalte,$stg_obj->kuerzel_arr[$row->studiengang_kz]);

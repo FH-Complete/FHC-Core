@@ -57,7 +57,7 @@ class VariableLib
 
 		if (!isEmptyString($uid) && !isEmptyString($name) && is_numeric($change))
 		{
-			$change = (int) $change;
+			$change = (int)$change;
 			$varres = $this->_ci->VariableModel->getVariables($uid, array($name));
 
 			if (isSuccess($varres))

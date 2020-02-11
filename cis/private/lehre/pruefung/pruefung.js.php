@@ -575,8 +575,8 @@ function saveAnmeldung(lehrveranstaltung_id, termin_id)
 		studienverpflichtung_id = $("#studienverpflichtung option:selected").val();
 
 	var studiengang_kz = null;
-	if($('#select_studiengang').length)
-		studiengang_kz =   $('#select_studiengang option:selected').val();
+	if($('#prestudent_studiengang').length)
+		studiengang_kz =   $('#prestudent_studiengang option:selected').val();
 
 	$.ajax({
 		dataType: 'json',
@@ -892,28 +892,31 @@ function saveReihung(terminId, lehrveranstaltung_id)
 		anmeldung.uid = v.id;
 		reihung.push(anmeldung);
 	});
-	$.ajax({
-		dataType: 'json',
-		url: "./pruefungsanmeldung.json.php",
-		type: "POST",
-		data: {
-			method: "saveReihung",
-			reihung: reihung
-		},
-		error: loadError,
-		success: function(data){
-			if(data.error === 'false' && data.result === true)
-			{
-				messageBox("message", "<?php echo $p->t('pruefung/reihunghErfolgreichGeaendert'); ?>", "green", "highlight", 1000);
-			}
-			else
-			{
-				messageBox("message", data.errormsg, "red", "highlight", 1000);
-			}
 
-			showAnmeldungen(terminId, lehrveranstaltung_id);
-		}
-	});
+	if (reihung.length > 0) {
+        $.ajax({
+            dataType: 'json',
+            url: "./pruefungsanmeldung.json.php",
+            type: "POST",
+            data: {
+                method: "saveReihung",
+                reihung: reihung
+            },
+            error: loadError,
+            success: function(data){
+                if(data.error === 'false' && data.result === true)
+                {
+                    messageBox("message", "<?php echo $p->t('pruefung/reihunghErfolgreichGeaendert'); ?>", "green", "highlight", 1000);
+                }
+                else
+                {
+                    messageBox("message", data.errormsg, "red", "highlight", 1000);
+                }
+
+                showAnmeldungen(terminId, lehrveranstaltung_id);
+            }
+        });
+    }
 }
 
 /**
@@ -1216,7 +1219,8 @@ function loadStudiensemester()
 		url: "./pruefungstermin.json.php",
 		type: "POST",
 		data: {
-			method: "loadStudiensemester"
+			method: "loadStudiensemester",
+            prevSemester: 5
 		},
 		error: loadError,
 		success: function(data){

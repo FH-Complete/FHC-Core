@@ -2428,7 +2428,7 @@ function LehrveranstaltungFFZertifikatPrint(event)
 		}
 	}
 	var ss = getStudiensemester();
-	col = tree.columns ? tree.columns["lehrveranstaltung-noten-tree-lv_studiengang_kz"] : "lehrveranstaltung-noten-tree-lv_studiengang_kz";
+	col = tree.columns ? tree.columns["lehrveranstaltung-noten-tree-studiengang_kz_lv"] : "lehrveranstaltung-noten-tree-studiengang_kz_lv";
 	stg_kz = tree.view.getCellText(tree.currentIndex,col);
 
 	if (event.shiftKey)
@@ -2546,8 +2546,8 @@ function LeMitarbeiterGesamtkosten()
 	faktor = document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-textbox-faktor').value
 	stundensatz = document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-textbox-stundensatz').value
 
-	if(!isNaN(semesterstunden) && !isNaN(faktor) && !isNaN(stundensatz))
-		gesamtkosten = semesterstunden*faktor*stundensatz;
+	if(!isNaN(semesterstunden) && !isNaN(stundensatz))
+		gesamtkosten = semesterstunden*stundensatz;
 	else
 		gesamtkosten = 0;
 

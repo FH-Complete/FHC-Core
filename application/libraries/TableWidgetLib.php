@@ -9,19 +9,27 @@ class TableWidgetLib
 {
 	const TABLE_UNIQUE_ID = 'tableUniqueId'; // TableWidget unique id
 
-	// Session parameters names
-	const SESSION_NAME = 'FHC_TABLE_WIDGET'; // Table session name
+	// TableWidget session name
+	const SESSION_NAME = 'FHC_TABLE_WIDGET';
+
+	// Session elements
 	const SESSION_FIELDS = 'fields';
 	const SESSION_COLUMNS_ALIASES = 'columnsAliases';
 	const SESSION_ADDITIONAL_COLUMNS = 'additionalColumns';
 	const SESSION_CHECKBOXES = 'checkboxes';
 	const SESSION_METADATA = 'datasetMetadata';
-	const SESSION_DATASET = 'dataset';
 	const SESSION_ROW_NUMBER = 'rowNumber';
-	const SESSION_RELOAD_DATASET = 'reloadDataset';
+	const SESSION_TIMEOUT = 'sessionTimeout';
+
+	// Session dataset elements
+	const SESSION_DATASET = 'dataset';
+	const SESSION_DATASET_RELOAD = 'reloadDataset';
 	const SESSION_DATASET_REPRESENTATION = 'datasetRepresentation';
 	const SESSION_DATASET_REP_OPTIONS = 'datasetRepresentationOptions';
 	const SESSION_DATASET_REP_FIELDS_DEFS = 'datasetRepresentationFieldsDefinitions';
+
+	// Default session timeout
+	const SESSION_DEFAULT_TIMEOUT = 30;
 
 	// Alias for the dynamic table used to retrieve the dataset
 	const DATASET_TABLE_ALIAS = 'datasetTableWidget';
@@ -29,13 +37,13 @@ class TableWidgetLib
 	// Parameters names...
 
 	// ...to reload the dataset
-	const DATASET_RELOAD_PARAMETER = 'reloadDataset';
+	const DATASET_RELOAD = 'reloadDataset';
 
 	// ...to specify permissions that are needed to use this TableWidget
-	const REQUIRED_PERMISSIONS_PARAMETER = 'requiredPermissions';
+	const REQUIRED_PERMISSIONS = 'requiredPermissions';
 
 	// ...stament to retrieve the dataset
-	const QUERY_PARAMETER = 'query';
+	const QUERY = 'query';
 
 	// ...to specify more columns or aliases for them
 	const ADDITIONAL_COLUMNS = 'additionalColumns';
@@ -50,6 +58,7 @@ class TableWidgetLib
 	const DATASET_REPRESENTATION = 'datasetRepresentation';
 	const DATASET_REP_OPTIONS = 'datasetRepOptions';
 	const DATASET_REP_FIELDS_DEFS = 'datasetRepFieldsDefs';
+	const DATASET_TIMEOUT = 'datasetTimeout'; // ...and its expiring time
 
 	// Different dataset representations
 	const DATASET_REP_TABLESORTER = 'tablesorter';
@@ -57,7 +66,7 @@ class TableWidgetLib
 	const DATASET_REP_TABULATOR = 'tabulator';
 
 	const PERMISSION_TABLE_METHOD = 'TableWidget'; // Name for fake method to be checked by the PermissionLib
-	const PERMISSION_TYPE = 'rw';
+	const PERMISSION_TYPE = 'r';
 
 	private $_ci; // Code igniter instance
 	private $_tableUniqueId; // unique id for this table widget
@@ -86,13 +95,13 @@ class TableWidgetLib
 
 		// Gets the required permissions from the session if they are not provided as parameter
 		$rq = $requiredPermissions;
-		if ($rq == null) $rq = $this->getSessionElement(self::REQUIRED_PERMISSIONS_PARAMETER);
+		if ($rq == null) $rq = $this->getSessionElement(self::REQUIRED_PERMISSIONS);
 
 		return $this->_ci->permissionlib->hasAtLeastOne($rq, self::PERMISSION_TABLE_METHOD, self::PERMISSION_TYPE);
 	}
 
 	/**
-	 * Wrapper method to the session helper funtions to retrieve the whole session for this filter
+	 * Wrapper method to the session helper funtions to retrieve the whole session for this table widget
 	 */
 	public function getSession()
 	{
@@ -100,7 +109,7 @@ class TableWidgetLib
 	}
 
 	/**
-	 * Wrapper method to the session helper funtions to retrieve one element from the session of this filter
+	 * Wrapper method to the session helper funtions to retrieve one element from the session of this table widget
 	 */
 	public function getSessionElement($name)
 	{
@@ -115,7 +124,7 @@ class TableWidgetLib
 	}
 
 	/**
-	 * Wrapper method to the session helper funtions to set the whole session for this filter
+	 * Wrapper method to the session helper funtions to set the whole session for this table widget
 	 */
 	public function setSession($data)
 	{
@@ -123,7 +132,7 @@ class TableWidgetLib
 	}
 
 	/**
-	 * Wrapper method to the session helper funtions to set one element in the session for this filter
+	 * Wrapper method to the session helper funtions to set one element in the session for this table widget
 	 */
 	public function setSessionElement($name, $value)
 	{
@@ -135,7 +144,30 @@ class TableWidgetLib
 	}
 
 	/**
-	 * Generate the query to retrieve the dataset for a filter
+	 *
+	 */
+	public function dropExpiredTableWidgets()
+	{
+		// Loads the session for all the table widgets
+		$tableWidgetsSession = getSession(self::SESSION_NAME);
+
+		// If something is present in session
+		if ($tableWidgetsSession != null)
+		{
+			// Loops in the session for all the table widgets
+			foreach ($tableWidgetsSession as $tableWidget => $tableWidgetData)
+			{
+				// If this table widget is not the currrent used table widget and the it is expired...
+				if ($this->_tableUniqueId != $tableWidget && $tableWidgetData[self::SESSION_TIMEOUT] <= time())
+				{
+					cleanSessionElement(self::SESSION_NAME, $tableWidget); // ...remove it
+				}
+			}
+		}
+	}
+
+	/**
+	 * Generate the query to retrieve the dataset for a table widget
 	 */
 	public function generateDatasetQuery($query)
 	{
@@ -177,7 +209,7 @@ class TableWidgetLib
 	}
 
 	/**
-	 * Return an unique string that identify this filter widget
+	 * Return an unique string that identify this table widget
 	 * NOTE: The default value is the URI where the FilterWidget is called
 	 * If the fhc_controller_id is present then is also used
 	 */

@@ -125,6 +125,9 @@ if (isset($_POST['prestudent']) && isset($gebdatum))
 		{
 			if($rt->freigeschaltet)
 			{
+				// regenerate Session ID after Login
+				session_regenerate_id();
+
 				$pruefling = new pruefling();
 				if($pruefling->getPruefling($ps->prestudent_id))
 				{

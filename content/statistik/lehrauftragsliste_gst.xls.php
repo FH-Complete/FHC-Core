@@ -30,12 +30,12 @@ require_once('../../include/studiengang.class.php');
 
 if(isset($_GET['studiengang_kz']) && is_numeric($_GET['studiengang_kz']))
 	$studiengang_kz=$_GET['studiengang_kz'];
-else 
+else
 	die('studiengangs_kz muss uebergeben werden');
-	
+
 if(isset($_GET['semester']) && is_numeric($_GET['semester']))
 	$semester=$_GET['semester'];
-else 
+else
 	$semester='';
 
 $user = get_uid();
@@ -78,46 +78,48 @@ $worksheet->write(2,++$i,"Kosten", $format_bold);
 $db = new basis_db();
 //Daten holen
 $qry = "SELECT * FROM (
-		SELECT 
-			tbl_lehreinheit.*, tbl_person.vorname, tbl_person.nachname, tbl_person.titelpre, 
-			tbl_mitarbeiter.personalnummer, tbl_person.person_id, tbl_mitarbeiter.mitarbeiter_uid, tbl_mitarbeiter.fixangestellt,
-			tbl_lehreinheitmitarbeiter.faktor as faktor, tbl_lehreinheitmitarbeiter.stundensatz as stundensatz,
+		SELECT
+			tbl_lehreinheit.*, tbl_person.vorname, tbl_person.nachname, tbl_person.titelpre,
+			tbl_mitarbeiter.personalnummer, tbl_person.person_id, tbl_mitarbeiter.mitarbeiter_uid,
+			tbl_mitarbeiter.fixangestellt,
+			tbl_lehreinheitmitarbeiter.stundensatz as stundensatz,
 			tbl_lehreinheitmitarbeiter.semesterstunden as semesterstunden
-		FROM 
-			lehre.tbl_lehreinheit, lehre.tbl_lehreinheitmitarbeiter, public.tbl_mitarbeiter, 
+		FROM
+			lehre.tbl_lehreinheit, lehre.tbl_lehreinheitmitarbeiter, public.tbl_mitarbeiter,
 			public.tbl_benutzer, public.tbl_person, lehre.tbl_lehrveranstaltung
-		WHERE 
-			tbl_person.person_id = tbl_benutzer.person_id AND 
-			tbl_benutzer.uid=tbl_mitarbeiter.mitarbeiter_uid AND
-			tbl_lehreinheitmitarbeiter.mitarbeiter_uid=tbl_mitarbeiter.mitarbeiter_uid AND
-			tbl_lehreinheit.lehreinheit_id=tbl_lehreinheitmitarbeiter.lehreinheit_id AND
-			tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id AND
-			studiengang_kz=".$db->db_add_param($studiengang_kz)." AND studiensemester_kurzbz=".$db->db_add_param($semester_aktuell)." AND 
-			tbl_lehreinheitmitarbeiter.semesterstunden<>0 AND tbl_lehreinheitmitarbeiter.semesterstunden is not null 
-			AND tbl_lehreinheitmitarbeiter.stundensatz<>0 AND tbl_lehreinheitmitarbeiter.faktor<>0 AND
-			EXISTS (SELECT * FROM lehre.tbl_lehreinheitgruppe WHERE lehreinheit_id=tbl_lehreinheit.lehreinheit_id)";
+		WHERE
+			tbl_person.person_id = tbl_benutzer.person_id AND
+			tbl_benutzer.uid = tbl_mitarbeiter.mitarbeiter_uid AND
+			tbl_lehreinheitmitarbeiter.mitarbeiter_uid = tbl_mitarbeiter.mitarbeiter_uid AND
+			tbl_lehreinheit.lehreinheit_id = tbl_lehreinheitmitarbeiter.lehreinheit_id AND
+			tbl_lehrveranstaltung.lehrveranstaltung_id = tbl_lehreinheit.lehrveranstaltung_id AND
+			studiengang_kz = ".$db->db_add_param($studiengang_kz)."
+			AND studiensemester_kurzbz = ".$db->db_add_param($semester_aktuell)." AND
+			tbl_lehreinheitmitarbeiter.semesterstunden<>0 AND tbl_lehreinheitmitarbeiter.semesterstunden is not null
+			AND	EXISTS (SELECT * FROM lehre.tbl_lehreinheitgruppe WHERE lehreinheit_id=tbl_lehreinheit.lehreinheit_id)";
 if($semester!='')
 	$qry.=" AND semester=".$db->db_add_param($semester);
 
 //Projektsbetreuungen
-$qry.= " UNION 
-		 SELECT 
+$qry.= " UNION
+		 SELECT
 		 	tbl_lehreinheit.*, tbl_person.vorname, tbl_person.nachname, tbl_person.titelpre,
-		 	tbl_mitarbeiter.personalnummer, tbl_person.person_id, tbl_mitarbeiter.mitarbeiter_uid, tbl_mitarbeiter.fixangestellt,
-			0 as faktor, 0 as stundensatz,
+		 	tbl_mitarbeiter.personalnummer, tbl_person.person_id, tbl_mitarbeiter.mitarbeiter_uid,
+			tbl_mitarbeiter.fixangestellt,
+			0 as stundensatz,
 			0 as semesterstunden
-		 FROM 
-		 	lehre.tbl_lehreinheit, lehre.tbl_projektarbeit, lehre.tbl_projektbetreuer, 
+		 FROM
+		 	lehre.tbl_lehreinheit, lehre.tbl_projektarbeit, lehre.tbl_projektbetreuer,
 		 	public.tbl_mitarbeiter, public.tbl_benutzer, lehre.tbl_lehrveranstaltung, public.tbl_person
 		 WHERE
-		 	tbl_mitarbeiter.mitarbeiter_uid=tbl_benutzer.uid AND
-		 	tbl_benutzer.person_id=tbl_projektbetreuer.person_id AND
+		 	tbl_mitarbeiter.mitarbeiter_uid = tbl_benutzer.uid AND
+		 	tbl_benutzer.person_id = tbl_projektbetreuer.person_id AND
 		 	tbl_projektarbeit.projektarbeit_id = tbl_projektbetreuer.projektarbeit_id AND
 		 	tbl_projektarbeit.lehreinheit_id = tbl_lehreinheit.lehreinheit_id AND
-		 	tbl_lehreinheit.studiensemester_kurzbz = ".$db->db_add_param($semester_aktuell)." AND 
+		 	tbl_lehreinheit.studiensemester_kurzbz = ".$db->db_add_param($semester_aktuell)." AND
 		 	tbl_lehreinheit.lehrveranstaltung_id = tbl_lehrveranstaltung.lehrveranstaltung_id AND
-		 	tbl_lehrveranstaltung.studiengang_kz=".$db->db_add_param($studiengang_kz, FHC_INTEGER)." AND
-		 	tbl_person.person_id=tbl_projektbetreuer.person_id";
+		 	tbl_lehrveranstaltung.studiengang_kz = ".$db->db_add_param($studiengang_kz, FHC_INTEGER)." AND
+		 	tbl_person.person_id = tbl_projektbetreuer.person_id";
 if($semester!='')
 	$qry.=" AND tbl_lehrveranstaltung.semester=".$db->db_add_param($semester, FHC_INTEGER);
 $qry.=") as foo";
@@ -129,19 +131,19 @@ if($result = $db->db_query($qry))
 	$gesamtkosten = 0;
 	$gesamtstunden = 0;
 	$liste=array();
-	
+
 	while($row = $db->db_fetch_object($result))
 	{
 		//Gesamtstunden und Kosten ermitteln
 		if(array_key_exists($row->mitarbeiter_uid, $liste))
 		{
 			$liste[$row->mitarbeiter_uid]['gesamtstunden'] = $liste[$row->mitarbeiter_uid]['gesamtstunden'] + $row->semesterstunden;
-			$liste[$row->mitarbeiter_uid]['gesamtkosten'] = $liste[$row->mitarbeiter_uid]['gesamtkosten'] + ($row->semesterstunden*$row->stundensatz*$row->faktor);
+			$liste[$row->mitarbeiter_uid]['gesamtkosten'] = $liste[$row->mitarbeiter_uid]['gesamtkosten'] + ($row->semesterstunden*$row->stundensatz);
 		}
-		else 
+		else
 		{
 			$liste[$row->mitarbeiter_uid]['gesamtstunden'] = $row->semesterstunden;
-			$liste[$row->mitarbeiter_uid]['gesamtkosten'] = $row->semesterstunden*$row->stundensatz*$row->faktor;
+			$liste[$row->mitarbeiter_uid]['gesamtkosten'] = $row->semesterstunden*$row->stundensatz;
 		}
 		$liste[$row->mitarbeiter_uid]['personalnummer'] = $row->personalnummer;
 		$liste[$row->mitarbeiter_uid]['titelpre'] = $row->titelpre;
@@ -149,18 +151,24 @@ if($result = $db->db_query($qry))
 		$liste[$row->mitarbeiter_uid]['vorname'] = $row->vorname;
 		$liste[$row->mitarbeiter_uid]['nachname'] = $row->nachname;
 	}
-	
+
 	//Betreuungen fuer Projektarbeiten
 	foreach ($liste as $uid=>$arr)
 	{
-		$qry = "SELECT tbl_projektbetreuer.faktor, tbl_projektbetreuer.stunden, tbl_projektbetreuer.stundensatz
-	        FROM lehre.tbl_projektbetreuer, lehre.tbl_lehreinheit, lehre.tbl_lehrveranstaltung, 
-	               public.tbl_benutzer, lehre.tbl_projektarbeit, campus.vw_student 
-	        WHERE tbl_projektbetreuer.person_id=tbl_benutzer.person_id AND tbl_benutzer.uid=".$db->db_add_param($uid)." AND 
-	              tbl_projektarbeit.projektarbeit_id=tbl_projektbetreuer.projektarbeit_id AND student_uid=vw_student.uid
-	              AND tbl_lehreinheit.lehreinheit_id=tbl_projektarbeit.lehreinheit_id AND
-	              tbl_lehreinheit.studiensemester_kurzbz=".$db->db_add_param($semester_aktuell)." AND tbl_lehreinheit.lehrveranstaltung_id = tbl_lehrveranstaltung.lehrveranstaltung_id AND
-	              tbl_lehrveranstaltung.studiengang_kz=".$db->db_add_param($studiengang_kz, FHC_INTEGER);
+		$qry = "
+			SELECT
+				tbl_projektbetreuer.stunden, tbl_projektbetreuer.stundensatz
+			FROM lehre.tbl_projektbetreuer, lehre.tbl_lehreinheit, lehre.tbl_lehrveranstaltung,
+				public.tbl_benutzer, lehre.tbl_projektarbeit, campus.vw_student
+			WHERE
+				tbl_projektbetreuer.person_id=tbl_benutzer.person_id
+				AND tbl_benutzer.uid=".$db->db_add_param($uid)."
+				AND tbl_projektarbeit.projektarbeit_id=tbl_projektbetreuer.projektarbeit_id
+				AND student_uid=vw_student.uid
+				AND tbl_lehreinheit.lehreinheit_id=tbl_projektarbeit.lehreinheit_id
+				AND tbl_lehreinheit.studiensemester_kurzbz=".$db->db_add_param($semester_aktuell)."
+				AND tbl_lehreinheit.lehrveranstaltung_id = tbl_lehrveranstaltung.lehrveranstaltung_id
+				AND tbl_lehrveranstaltung.studiengang_kz=".$db->db_add_param($studiengang_kz, FHC_INTEGER);
 		if($semester!='')
 			$qry.=" AND tbl_lehrveranstaltung.semester=".$db->db_add_param($semester, FHC_INTEGER);
 		if($result = $db->db_query($qry))
@@ -168,14 +176,14 @@ if($result = $db->db_query($qry))
 			while($row = $db->db_fetch_object($result))
 			{
 				$liste[$uid]['gesamtstunden'] = $liste[$uid]['gesamtstunden'] + $row->stunden;
-				$liste[$uid]['gesamtkosten'] = $liste[$uid]['gesamtkosten'] + ($row->stunden*$row->stundensatz*$row->faktor);
+				$liste[$uid]['gesamtkosten'] = $liste[$uid]['gesamtkosten'] + ($row->stunden*$row->stundensatz);
 			}
 		}
 	}
-	
+
 	//Daten ausgeben
 	foreach ($liste as $row)
-	{			
+	{
 		$i=0;
 		//Studiengang
 		$worksheet->write($zeile,$i,$studiengang->kuerzel);
@@ -186,24 +194,24 @@ if($result = $db->db_query($qry))
 		//Vorname
 		$worksheet->write($zeile,++$i,$row['vorname']);
 		//Nachname
-		$worksheet->write($zeile,++$i,$row['nachname']);		
+		$worksheet->write($zeile,++$i,$row['nachname']);
 		//Fixangestellt
-		$worksheet->write($zeile,++$i,($row['fixangestellt']=='t'?'Ja':'Nein'));		
+		$worksheet->write($zeile,++$i,($row['fixangestellt']=='t'?'Ja':'Nein'));
 		//Stunden
 		$worksheet->write($zeile,++$i,$row['gesamtstunden']);
 		//Kosten
 		$worksheet->writeNumber($zeile,++$i,$row['gesamtkosten'], $format_number);
-		
+
 		//Kosten zu den Gesamtkosten hinzurechnen
 		$gesamtkosten = $gesamtkosten + $row['gesamtkosten'];
 		$gesamtstunden = $gesamtstunden + $row['gesamtstunden'];
 		$zeile++;
 	}
-	
+
 	//Gesamtkosten und Gesamtstunden anzeigen
 	$worksheet->writeNumber($zeile,6,$gesamtstunden, $format_bold);
 	$worksheet->writeNumber($zeile,7,$gesamtkosten, $format_number_bold);
 }
-	
+
 	$workbook->close();
 ?>

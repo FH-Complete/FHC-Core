@@ -51,7 +51,7 @@ class Messages extends Auth_Controller
 		$authUser = $this->CLMessagesModel->getAuthUser();
 		if (isError($authUser))
 		{
-			show_error(getData($authUser));
+			show_error(getError($authUser));
 		}
 		else
 		{
@@ -59,19 +59,19 @@ class Messages extends Auth_Controller
 		}
 
 		$msgVarsData = $this->MessageModel->getMsgVarsDataByPersonId($person_id);
-		if (isError($msgVarsData)) show_error(getData($msgVarsData));
+		if (isError($msgVarsData)) show_error(getError($msgVarsData));
 
 		// Retrieves message vars for a person from view view vw_msg_vars_person
 		$variables = $this->messagelib->getMessageVarsPerson();
-		if (isError($variables)) show_error(getData($variables));
+		if (isError($variables)) show_error(getError($variables));
 
  		// Organisation units used to get the templates
 		$oe_kurzbz = $this->messagelib->getOeKurzbz($sender_id);
-		if (isError($oe_kurzbz)) show_error(getData($oe_kurzbz));
+		if (isError($oe_kurzbz)) show_error(getError($oe_kurzbz));
 
  		// Admin or commoner?
 		$isAdmin = $this->messagelib->getIsAdmin($sender_id);
-		if (isError($isAdmin)) show_error(getData($isAdmin));
+		if (isError($isAdmin)) show_error(getError($isAdmin));
 
 		$data = array (
 			'recipients' => getData($msgVarsData),
@@ -122,7 +122,7 @@ class Messages extends Auth_Controller
 		$send = $this->CLMessagesModel->send($msgVarsData, null, $oe_kurzbz, $vorlage_kurzbz, $msgVars);
 		if (isError($send))
 		{
-			$this->outputJsonError(getData($send));
+			$this->outputJsonError(getError($send));
 		}
 		else
 		{
@@ -152,7 +152,7 @@ class Messages extends Auth_Controller
 
 		if (isError($result) || !hasData($result))
 		{
-			$this->outputJsonError(getData($result));
+			$this->outputJsonError(getError($result));
 		}
 		else
 		{
@@ -181,7 +181,7 @@ class Messages extends Auth_Controller
 
 		if (isError($data) || !hasData($data))
 		{
-			$this->outputJsonError(getData($data));
+			$this->outputJsonError(getError($data));
 		}
 		else
 		{

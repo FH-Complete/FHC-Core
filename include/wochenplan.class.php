@@ -240,7 +240,7 @@ class wochenplan extends basis_db
 
 			if (!$this->db_query($sql_query))
 			{
-				$this->errormsg=$this->db_last_error();
+				$this->errormsg = 'Failed to load Personal Information';
 				return false;
 			}
 			if ($row = $this->db_fetch_object())
@@ -262,7 +262,7 @@ class wochenplan extends basis_db
 			}
 			else
 			{
-				$this->errormsg='User nicht gefunden';
+				$this->errormsg = 'User nicht gefunden';
 				return false;
 			}
 		}
@@ -275,7 +275,7 @@ class wochenplan extends basis_db
 
 			if (!$this->db_query($sql_query))
 			{
-				$this->errormsg=$this->db_last_error();
+				$this->errormsg = 'Failed to load Location Information';
 				return false;
 			}
 
@@ -303,7 +303,7 @@ class wochenplan extends basis_db
 
 			if (!$this->db_query($sql_query))
 			{
-				$this->errormsg=$this->db_last_error();
+				$this->errormsg = 'Failed to load Location Information';
 				return false;
 			}
 
@@ -328,7 +328,10 @@ class wochenplan extends basis_db
 						FROM public.tbl_studiengang WHERE studiengang_kz=".$this->db_add_param($this->stg_kz);
 
 			if (!($this->db_query($sql_query)))
-				die($this->db_last_error());
+			{
+				$this->errormsg = 'Failed to load Degree Program';
+				return false;
+			}
 			if ($row = $this->db_fetch_object())
 			{
 				$this->stg_bez = $row->bezeichnung;
@@ -342,13 +345,13 @@ class wochenplan extends basis_db
 		// Stundentafel abfragen
 		$sql_query="SELECT stunde, beginn, ende FROM lehre.tbl_stunde ORDER BY stunde";
 		if (!$this->db_query($sql_query))
-			die($this->db_last_error());
+			die('Failed to load Timetable');
 		$this->stunde = $this->db_result;
 
 		// Studiensemesterdaten ermitteln
 		$sql_query="SELECT * FROM public.tbl_studiensemester WHERE now()<ende ORDER BY start LIMIT 2";
 		if (!$this->db_query($sql_query))
-			die($this->db_last_error());
+			die('Failed to load Studiensemester');
 		else
 		{
 			if ($row = $this->db_fetch_object())

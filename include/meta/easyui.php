@@ -25,11 +25,11 @@ if($dr=='')
 	$dr='/';
 
 //Originaldateien des Herstellers
-echo '<link rel="stylesheet" type="text/css" href="'.$dr.'vendor/FHC-vendor/easyui/themes/icon.css">';
-echo '<link rel="stylesheet" type="text/css" href="'.$dr.'vendor/FHC-vendor/easyui/themes/gray/easyui.css">';
+echo '<link rel="stylesheet" type="text/css" href="'.$dr.'FHC-vendor/easyui/themes/icon.css">';
+echo '<link rel="stylesheet" type="text/css" href="'.$dr.'FHC-vendor/easyui/themes/gray/easyui.css">';
 
-echo '<script src="'.$dr.'vendor/FHC-vendor/easyui/jquery.min.js"></script>';
-echo '<script src="'.$dr.'vendor/FHC-vendor/easyui/jquery.easyui.min.js"></script>';
+echo '<script src="'.$dr.'FHC-vendor/easyui/jquery.min.js"></script>';
+echo '<script src="'.$dr.'FHC-vendor/easyui/jquery.easyui.min.js"></script>';
 
 
 //Anpassungen

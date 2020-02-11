@@ -109,7 +109,7 @@ class Prestudentstatus extends CLI_Controller
 		}
 		else
 		{
-			show_error($status->retval);
+			show_error(getError($status));
 		}
 		echo "Corrected:".$sum_corrected."\n";
 		echo "Not Corrected:".$sum_notcorrected."\n";

@@ -37,6 +37,7 @@ require_once('../../include/studiengang.class.php');
 require_once('../../include/functions.inc.php');
 require_once('../../include/benutzerberechtigung.class.php');
 require_once('../../include/bisio.class.php');
+require_once('../../include/prestudent.class.php');
 
 if (!$db = new basis_db())
 	die('Es konnte keine Verbindung zum Server aufgebaut werden.');
@@ -56,8 +57,18 @@ $fehler='';
 $maxsemester=0;
 $v='';
 $studiensemester=new studiensemester();
-$ssem=$studiensemester->getaktorNext();
-$psem=$studiensemester->getPrevious();
+// Wenn Studiensemester als GET übergeben wird, dieses laden, sonst getaktorNext()
+if (isset($_GET['studiensemester']))
+{
+	$ssem = $_GET['studiensemester'];
+	$psem = $studiensemester->getPreviousFrom($ssem);
+}
+else
+{
+	$ssem = $studiensemester->getaktorNext();
+	$psem = $studiensemester->getPrevious();
+}
+
 $anzahl_fehler=0;
 $erhalter='';
 $stgart='';
@@ -350,7 +361,46 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 		<link href="../../skin/vilesci.css" rel="stylesheet" type="text/css">
 	</head>
 	<body>';
-echo "<H1>BIS - Studentendaten werden &uuml;berpr&uuml;ft! Studiengang: ".$db->convert_html_chars($stg_kz)."</H1>\n";
+if ($rechte->isBerechtigt('admin'))
+{
+	echo '<form name="frm_studiengang" action='.$_SERVER['PHP_SELF'].' method="GET">';
+	echo 'Studiengang: <SELECT name="stg_kz"  onchange="document.frm_studiengang.submit()">';
+	$studiengang = new studiengang();
+	$studiengang->getAll('typ, kurzbz', true);
+	$types = new studiengang();
+	$types->getAllTypes();
+	$typ = '';
+	foreach ($studiengang->result AS $row)
+	{
+		if ($row->studiengang_kz == $stg_kz)
+		{
+			$selected = 'selected';
+		}
+		else
+		{
+			$selected = '';
+		}
+
+		if ($typ != $row->typ || $typ == '')
+		{
+			if ($typ != '')
+			{
+				echo '</optgroup>';
+			}
+			echo '<optgroup label="'.($types->studiengang_typ_arr[$row->typ] != ''?$types->studiengang_typ_arr[$row->typ]:$row->typ).'">';
+		}
+
+		echo '<OPTION value="'.$row->studiengang_kz.'"'.$selected.'>'.$row->kuerzel.' - '.$row->bezeichnung.'</OPTION>';
+
+		$typ = $row->typ;
+	}
+	echo '</select>';
+	echo '</form>';
+}
+$studiengang = new studiengang($stg_kz);
+$typ = new studiengang($stg_kz);
+$typ->getStudiengangTyp($studiengang->typ);
+echo "<H1>BIS - Studentendaten werden &uuml;berpr&uuml;ft! Studiengang: ".$db->convert_html_chars($stg_kz)." - ".$typ->bezeichnung." ".$studiengang->bezeichnung."</H1>\n";
 echo "<H2>Nicht plausible BIS-Daten (f&uuml;r Meldung ".$db->convert_html_chars($ssem)."): </H2><br>";
 echo nl2br($v."\n\n");
 
@@ -564,6 +614,9 @@ function GenerateXMLStudentBlock($row)
 	$datei = '';
 	$datumobj = new datum();
 
+	$laststatus = new prestudent();
+	$laststatus->getLastStatus($row->prestudent_id);
+
 	//Pruefen ob Ausserordnetlicher Studierender (4.Stelle in Personenkennzeichen = 9)
 	if(mb_substr($row->matrikelnr,3,1)=='9')
 		$ausserordentlich=true;
@@ -595,7 +648,7 @@ function GenerateXMLStudentBlock($row)
 	{
 		$error_log.=(!empty($error_log)?', ':'')."Geburtsdatum ('".$row->gebdatum."')";
 	}
-	if($row->geschlecht!='m' && $row->geschlecht!='w')
+	if($row->geschlecht!='m' && $row->geschlecht!='w' && $row->geschlecht!='x')
 	{
 		$error_log.=(!empty($error_log)?', ':'')."Geschlecht ('".$row->geschlecht."')";
 	}
@@ -839,7 +892,6 @@ function GenerateXMLStudentBlock($row)
 		}
 	}
 	//Wenn im Status keine Organisationsform eingetragen ist, wird die des Studienganges uebernommen
-	//echo '<pre>', var_dump($storgform), '</pre>';
 	if($storgform=='')
 	{
 		// Wenn FHTW und studiengang_kz 10006 (Campus International) wird die OrgForm des Studiengangs vom Incoming ermittelt
@@ -893,7 +945,7 @@ function GenerateXMLStudentBlock($row)
 
 			if($gserror!='')
 			{
-				$v.="<u>Bei Student (UID, Vorname, Nachname) '".$row->student_uid."', '".$row->nachname."', '".$row->vorname."' ($row->status_kurzbz): </u>\n";
+				$v.="<u>Bei Student (UID, Vorname, Nachname) '".$row->student_uid."', '".$row->nachname."', '".$row->vorname."' ($laststatus->status_kurzbz): </u>\n";
 				$v.=$gserror."\n";
 				return '';
 			}
@@ -997,7 +1049,7 @@ function GenerateXMLStudentBlock($row)
 
 	if($error_log!='' OR $error_log1!='')
 	{
-		$v.="<u>Bei Student (UID, Vorname, Nachname) '".$row->student_uid."', '".$row->nachname."', '".$row->vorname."' ($row->status_kurzbz): </u>\n";
+		$v.="<u>Bei Student (UID, Vorname, Nachname) '".$row->student_uid."', '".$row->nachname."', '".$row->vorname."' ($laststatus->status_kurzbz): </u>\n";
 		if($error_log!='')
 		{
 			$v.="&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Fehler: ".$error_log."\n";
@@ -1303,13 +1355,19 @@ function GenerateXMLBewerberBlock($orgformcode=null)
 	if(mb_strstr($ssem,"WS"))
 	{
 		//Bewerber
-		$qrybw="SELECT * FROM public.tbl_prestudent
+		$qrybw="
+		SELECT
+			*, transform_geschlecht(tbl_person.geschlecht, tbl_person.gebdatum) as geschlecht_imputiert
+		FROM
+			public.tbl_prestudent
 			JOIN public.tbl_prestudentstatus ON(tbl_prestudent.prestudent_id=tbl_prestudentstatus.prestudent_id)
 			JOIN public.tbl_person USING(person_id)
 			LEFT JOIN bis.tbl_orgform USING(orgform_kurzbz)
-			WHERE (studiensemester_kurzbz=".$db->db_add_param($ssem)." OR studiensemester_kurzbz=".$db->db_add_param($psem).") AND tbl_prestudent.studiengang_kz=".$db->db_add_param($stg_kz)."
+		WHERE (studiensemester_kurzbz=".$db->db_add_param($ssem)." OR studiensemester_kurzbz=".$db->db_add_param($psem).")
+			AND tbl_prestudent.studiengang_kz=".$db->db_add_param($stg_kz)."
 			AND (tbl_prestudentstatus.datum<=".$db->db_add_param($bisdatum).")
-			AND status_kurzbz='Bewerber' AND reihungstestangetreten
+			AND status_kurzbz='Bewerber'
+			AND reihungstestangetreten
 			";
 		if(!is_null($orgformcode))
 			$qrybw.=" AND tbl_orgform.code=".$db->db_add_param($orgformcode);
@@ -1321,7 +1379,7 @@ function GenerateXMLBewerberBlock($orgformcode=null)
 				// Bachelor / Diplom
 				if(($stgart==1 || $stgart==3) && $rowbw->zgv_code!=NULL)
 				{
-					if(strtoupper($rowbw->geschlecht)=='M')
+					if(strtoupper($rowbw->geschlecht_imputiert)=='M')
 					{
 						if(!isset($bewerberM[$rowbw->zgv_code]))
 						{
@@ -1341,7 +1399,7 @@ function GenerateXMLBewerberBlock($orgformcode=null)
 				// Master
 				if($stgart==2 && $rowbw->zgvmas_code!=NULL)
 				{
-					if(strtoupper($rowbw->geschlecht)=='M')
+					if(strtoupper($rowbw->geschlecht_imputiert)=='M')
 					{
 						if(!isset($bewerberM[$rowbw->zgvmas_code]))
 						{
@@ -1369,7 +1427,18 @@ function GenerateXMLBewerberBlock($orgformcode=null)
 				else
 					$bewerbercount[$bworgform]=1;
 
-				$bwlist.='<tr><td>'.trim($rowbw->nachname).'</td><td>'.trim($rowbw->vorname).'</td><td>'.$bworgform.'</td></tr>';
+				if($rowbw->geschlecht_imputiert!=$rowbw->geschlecht)
+					$geschlecht_imputiert = ' -> '.$rowbw->geschlecht_imputiert;
+				else
+					$geschlecht_imputiert = '';
+
+				$bwlist.='
+				<tr>
+					<td>'.trim($rowbw->nachname).'</td>
+					<td>'.trim($rowbw->vorname).'</td>
+					<td>'.$bworgform.'</td>
+					<td>'.$rowbw->geschlecht.$geschlecht_imputiert.'</td>
+				</tr>';
 			}
 		}
 

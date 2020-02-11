@@ -158,8 +158,7 @@ class Person_model extends DB_Model
 
 		$person = $this->load($person_id);
 
-		if($person->error)
-			return error($person->retval);
+		if($person->error) return $person;
 
 		//return null if not found
 		if(count($person->retval) < 1)
@@ -170,14 +169,13 @@ class Person_model extends DB_Model
 		$this->KontaktModel->addOrder('kontakttyp');
 		$where = $zustellung_only === true ? array('person_id' => $person_id, 'zustellung' => true) : array('person_id' => $person_id);
 		$kontakte = $this->KontaktModel->loadWhere($where);
-		if($kontakte->error)
-			return error($kontakte->retval);
+		if($kontakte->error) return $kontakte;
+
 		$where = $zustellung_only === true ? array('person_id' => $person_id, 'zustelladresse' => true) : array('person_id' => $person_id);
 		$this->AdresseModel->addSelect('public.tbl_adresse.*, bis.tbl_nation.kurztext AS nationkurztext');
 		$this->AdresseModel->addJoin('bis.tbl_nation', 'tbl_adresse.nation = tbl_nation.nation_code', 'LEFT');
 		$adressen = $this->AdresseModel->loadWhere($where);
-		if($adressen->error)
-			return error($adressen->retval);
+		if($adressen->error) return $adressen;
 
 		$stammdaten = $person->retval[0];
 		$stammdaten->kontakte = $kontakte->retval;
@@ -207,28 +205,12 @@ class Person_model extends DB_Model
 	 */
 	public function getLanguage($uid)
 	{
-		$language = DEFAULT_LANGUAGE;
-
+		$this->addSelect('public.tbl_person.sprache');
 		$this->addJoin('public.tbl_benutzer', 'person_id');
+		$this->addJoin('public.tbl_sprache', 'sprache');
 		$this->addOrder('public.tbl_person.updateamum', 'DESC');
 		$this->addOrder('public.tbl_person.insertvon', 'DESC');
 
-		$persons = $this->loadWhere(array('uid' => $uid));
-
-		if (hasData($persons))
-		{
-			for ($i = 0; $i < count($persons->retval); $i++)
-			{
-				$person = $persons->retval[$i];
-
-				if (!isEmptyString($person->sprache))
-				{
-					$language = $person->sprache;
-					break;
-				}
-			}
-		}
-
-		return $language;
+		return $this->loadWhere(array('uid' => $uid, 'content' => true));
 	}
 }

@@ -31,7 +31,7 @@ require_once('../../include/nation.class.php');
 require_once('../../include/ort.class.php');
 require_once('../../include/akte.class.php');
 require_once('../../include/benutzerberechtigung.class.php');
-require_once('../../include/fckeditor/fckeditor.php');
+require_once('../../include/geschlecht.class.php');
 
 if (!$db = new basis_db())
 	die('Es konnte keine Verbindung zum Server aufgebaut werden.');
@@ -119,7 +119,6 @@ $ort_kurzbz = (isset($_POST['ort_kurzbz'])?$_POST['ort_kurzbz']:'');
 $standort_id = (isset($_POST['standort_id'])?$_POST['standort_id']:'');
 $anmerkung = (isset($_POST['anmerkung'])?$_POST['anmerkung']:'');
 $bismelden = (isset($_POST['bismelden'])?$_POST['bismelden']:'');
-$kurzbeschreibung = (isset($_POST['kurzbeschreibung'])?$_POST['kurzbeschreibung']:'');
 $matrikelnummer = (isset($_POST['matrikelnummer'])?$_POST['matrikelnummer']:'');
 $semester = (isset($_POST['semester'])?$_POST['semester']:'');
 $verband = (isset($_POST['verband'])?$_POST['verband']:'');
@@ -128,9 +127,9 @@ $dms_id_lichtbild = '';
 
 if($uid!='')
 {
-	$qry = "SELECT person_id, true as mitarbeiter FROM campus.vw_mitarbeiter WHERE uid='".addslashes($uid)."'
+	$qry = "SELECT person_id, true as mitarbeiter FROM campus.vw_mitarbeiter WHERE uid=".$db->db_add_param($uid)."
 			UNION
-			SELECT person_id, false as mitarbeiter FROM campus.vw_student WHERE uid='".addslashes($uid)."'";
+			SELECT person_id, false as mitarbeiter FROM campus.vw_student WHERE uid=".$db->db_add_param($uid);
 
 	if($result = $db->db_query($qry))
 	{
@@ -176,7 +175,6 @@ if(isset($_POST['saveperson']))
 	$person->homepage = $homepage;
 	$person->updateamum = date('Y-m-d H:i:s');
 	$person->updatevon = $user;
-	$person->kurzbeschreibung = $kurzbeschreibung;
 	$person->new = false;
 
 	if($person->save())
@@ -344,7 +342,6 @@ if(!$error_person_save)
 	$anzahlderkinder = $person->anzahlkinder;
 	$anmerkungen = $person->anmerkungen;
 	$homepage = $person->homepage;
-	$kurzbeschreibung = $person->kurzbeschreibung;
 }
 
 $akte = new akte();
@@ -452,11 +449,19 @@ echo "
 </tr>
 <tr>
 	<td>Geschlecht</td>
-	<td><SELECT name='geschlecht'>
-			<option value='m' ".($geschlecht=='m'?'selected':'').">maennlich</option>
-			<option value='w' ".($geschlecht=='w'?'selected':'').">weiblich</option>
-			<option value='u' ".($geschlecht=='u'?'selected':'').">unbekannt</option>
-		</SELECT>
+	<td><SELECT name='geschlecht'>";
+$geschlecht_obj = new geschlecht();
+$geschlecht_obj->getAll();
+foreach ($geschlecht_obj->result as $row_geschlecht)
+{
+	if($geschlecht == $row_geschlecht->geschlecht)
+		$selected = 'selected';
+	else
+		$selected = '';
+
+	echo "<option value='".$row_geschlecht->geschlecht."' ".$selected.">".$row_geschlecht->bezeichnung_mehrsprachig_arr[DEFAULT_LANGUAGE]."</option>";
+}
+echo "		</SELECT>
 	</td>
 	<td>Familienstand</td>
 	<td><SELECT name='familienstand'>
@@ -486,19 +491,6 @@ echo "
 	</td>
 </tr>
 <tr>
-	<td colspan=6>
-	";
-$oFCKeditor = new FCKeditor('kurzbeschreibung') ;
-$sBasePath = '../../include/fckeditor/';
-
-$oFCKeditor->BasePath	= $sBasePath ;
-$oFCKeditor->Value		= $kurzbeschreibung;
-$oFCKeditor->Create() ;
-
-echo "
-	</td>
-</tr>
-<tr>
 	<td></td>
 	<td></td>
 	<td></td>
@@ -521,7 +513,7 @@ if(isset($uid) && $uid!='')
 	<legend>Benutzerdaten</legend>
 	";
 
-	$qry = "SELECT * FROM public.tbl_benutzer WHERE uid='".addslashes($uid)."'";
+	$qry = "SELECT * FROM public.tbl_benutzer WHERE uid=".$db->db_add_param($uid);
 	if(!$result_benutzer = $db->db_query($qry))
 		die('Fehler beim Auslesen der Benutzerdaten');
 
@@ -544,7 +536,6 @@ if(isset($uid) && $uid!='')
 
 	echo '<br><a href="../../content/pdfExport.php?xsl=AccountInfo&xml=accountinfoblatt.xml.php&uid='.$uid.'" >AccountInfoBlatt erstellen</a>';
 	echo '<br><a href="../stammdaten/betriebsmittel_frameset.php?searchstr='.$uid.'" >Betriebsmittel verwalten</a>';
-
 
 	echo "</fieldset></td></tr>";
 

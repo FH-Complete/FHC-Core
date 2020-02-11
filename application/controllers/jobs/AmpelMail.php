@@ -121,13 +121,13 @@ class AmpelMail extends CLI_Controller
 				}
 				elseif (isError($result_ampel_user))
 				{
-					show_error($result_ampel_user->error);
+					show_error(getError($result_ampel_user));
 				}
 			}
 		}
 		elseif (isError($result_active_ampeln))
 		{
-			show_error($result_active_ampeln->error);
+			show_error(getError($result_active_ampeln));
 		}
 
 		// Send mails for new ampeln merged by user
