@@ -23,13 +23,13 @@
 				<div class="container-fluid">
 					<div class="row">
 						<div class="col-lg-12">
-							<h3 class="page-header"><?php echo $this->p->t('ui', 'sendMessage'); ?></h3>
+							<h3 class="page-header"><?php echo $this->p->t('ui', 'nachrichtSenden'); ?></h3>
 						</div>
 					</div>
 					<div class="row">
 						<div class="form-group">
 							<div class="col-lg-1 msgfieldcol-left">
-								<label><?php echo $this->p->t('ui', 'receiver'); ?>:</label>
+								<label><?php echo $this->p->t('global', 'empfaenger'); ?>:</label>
 							</div>
 							<div class="col-lg-11 msgfieldcol-right">
 								<select id="organisationUnit">
@@ -43,7 +43,7 @@
 					<div class="row">
 						<div class="form-group">
 							<div class="col-lg-1 msgfield msgfieldcol-left">
-								<label><?php echo $this->p->t('ui', 'subject'); ?>:</label>
+								<label><?php echo $this->p->t('global', 'betreff'); ?>:</label>
 							</div>
 							&nbsp;
 							<div class="col-lg-7">
@@ -54,7 +54,7 @@
 					<br>
 					<div class="row">
 						<div class="col-lg-12">
-							<label><?php echo $this->p->t('ui', 'message'); ?>:</label>
+							<label><?php echo $this->p->t('global', 'nachricht'); ?>:</label>
 							<textarea id="body"></textarea>
 
 							<br>
@@ -68,7 +68,7 @@
 					<div class="row">
 						<div class="col-lg-12 text-right">
 							<button id="sendButton" class="btn btn-default" type="button">
-								<?php echo $this->p->t('ui', 'send'); ?>
+								<?php echo $this->p->t('ui', 'senden'); ?>
 							</button>
 						</div>
 					</div>

@@ -4383,13 +4383,13 @@ When on hold, the date is only a reminder.',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => '* This is a notice to notice you that you have been noticed DE',
+				'text' => '* Diese Nachricht wird an das Infocenter der FHTW zugestellt',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => '* This is a notice to notice you that you have been noticed',
+				'text' => '* This message will be delivered to the Infocenter of UAS Technikum Wien',
 				'description' => '',
 				'insertvon' => 'system'
 			)
