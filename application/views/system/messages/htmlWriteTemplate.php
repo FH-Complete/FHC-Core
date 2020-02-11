@@ -36,7 +36,7 @@
 							<div class="col-lg-1 msgfieldcol-left">
 								<label>
 
-									<?php echo ucfirst($this->p->t('global', 'empfaenger')).':'; ?>
+									<?php echo ucfirst($this->p->t('global', 'empfaenger')); ?>:
 
 								</label>
 							</div>
@@ -50,7 +50,7 @@
 							<div class="col-lg-1 msgfield msgfieldcol-left">
 								<label>
 
-									<?php echo ucfirst($this->p->t('global', 'betreff')).':'; ?>
+									<?php echo ucfirst($this->p->t('global', 'betreff')); ?>:
 
 								</label>
 							</div>
@@ -65,7 +65,7 @@
 						<div class="col-lg-10">
 							<label>
 
-								<?php echo ucfirst($this->p->t('global', 'nachricht')).':'; ?>
+								<?php echo ucfirst($this->p->t('global', 'nachricht')); ?>:
 
 							</label>
 							<textarea id="bodyTextArea" name="body">
@@ -78,7 +78,7 @@
 							<div class="form-group">
 								<label>
 
-									<?php echo ucfirst($this->p->t('ui', 'felder')).':'; ?>
+									<?php echo ucfirst($this->p->t('ui', 'felder')); ?>:
 
 								</label>
 
@@ -114,7 +114,7 @@
 						<div class="col-lg-7 col-xs-9 text-right">
 							<button id="sendButton" class="btn btn-default" type="button">
 
-								<?php echo  $this->p->t('ui', 'senden'); ?>
+								<?php echo $this->p->t('ui', 'senden'); ?>
 
 							</button>
 						</div>
@@ -124,7 +124,7 @@
 							<div class="col-lg-12">
 								<label>
 
-									<?php echo ucfirst($this->p->t('global', 'vorschau')).':'; ?>
+									<?php echo ucfirst($this->p->t('global', 'vorschau')); ?>:
 
 								</label>
 							</div>
@@ -149,7 +149,13 @@
 									</div>
 								</div>
 								<div class="col-lg-1 valign-middle">
-									<strong><a href="#" id="refresh">Refresh</a></strong>
+									<strong>
+										<a href="#" id="refresh">
+
+											<?php echo ucfirst($this->p->t('ui', 'refresh')); ?>
+
+										</a>
+									</strong>
 								</div>
 							</div>
 							<br>

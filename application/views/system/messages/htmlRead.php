@@ -17,7 +17,11 @@
 				<div class="container-fluid">
 					<div class="row">
 						<div class="col-xs-12">
-							<h3 class="page-header text-center">You have a new message</h3>
+							<h3 class="page-header text-center">
+
+								<?php echo ucfirst($this->p->t('ui', 'newMessage')); ?>:
+
+							</h3>
 						</div>
 					</div>
 					<div class="row">
@@ -32,7 +36,11 @@
 									<table class="table table-condensed table-bordered" id="msgtable" align="center">
 										<tr>
 											<td width="80px">
-												<b>From:</b>
+												<b>
+
+													<?php echo ucfirst($this->p->t('ui', 'from')); ?>:
+
+												</b>
 											</td>
 											<td>
 
@@ -42,7 +50,11 @@
 										</tr>
 										<tr>
 											<td width="80px">
-												<b>Subject:</b>
+												<b>
+
+													<?php echo ucfirst($this->p->t('global', 'betreff')); ?>:
+
+												</b>
 											</td>
 											<td>
 
@@ -52,7 +64,11 @@
 										</tr>
 										<tr>
 											<td width="80px">
-												<b>Message:</b>
+												<b>
+
+													<?php echo ucfirst($this->p->t('global', 'nachricht')); ?>:
+
+												</b>
 											</td>
 											<td>
 
@@ -69,7 +85,7 @@
 											<?php if (!isEmptyString($hrefReply)): ?>
 
 												<button class="btn btn-default" id="replybutton" onclick="location.href='<?php echo $hrefReply; ?>';">
-													<i class="fa fa-reply"></i>&nbsp;Reply
+													<i class="fa fa-reply"></i>&nbsp;<?php echo ucfirst($this->p->t('global', 'reply')); ?>:
 												</button>
 
 											<?php endif; ?>

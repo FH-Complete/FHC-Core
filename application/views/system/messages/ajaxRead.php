@@ -27,12 +27,16 @@
 
 				<input type="radio" name="toggleMessages" id="received" checked>
 				<label for="received">
+
 					<?php echo $this->p->t('global', 'received'); ?>
+
 				</label>
 
 				<input type="radio" name="toggleMessages" id="sent">
 				<label for="sent">
+
 					<?php echo ucfirst($this->p->t('global', 'gesendet')); ?>
+
 				</label>
 
 			</span>
@@ -40,7 +44,7 @@
 			<span class="buttonsSpacer"></span>
 
 			<span>
-				<input id="writeMessage" type="button" value="<?php echo $this->p->t('global', 'write'); ?>">
+				<input id="writeMessage" type="button" value="<?php echo $this->p->t('ui', 'nachrichtSenden'); ?>">
 
 				<input id="replyMessage" type="button" value="<?php echo $this->p->t('global', 'reply'); ?>">
 			</span>

@@ -23,13 +23,21 @@
 				<div class="container-fluid">
 					<div class="row">
 						<div class="col-lg-12">
-							<h3 class="page-header"><?php echo $this->p->t('ui', 'sendMessage'); ?></h3>
+							<h3 class="page-header">
+
+								<?php echo $this->p->t('ui', 'nachrichtSenden'); ?>
+
+							</h3>
 						</div>
 					</div>
 					<div class="row">
 						<div class="form-group">
 							<div class="col-lg-1 msgfieldcol-left">
-								<label><?php echo $this->p->t('ui', 'receiver'); ?>:</label>
+								<label>
+
+									<?php echo ucfirst($this->p->t('global', 'empfaenger')); ?>:
+
+								</label>
 							</div>
 							<div class="col-lg-11 msgfieldcol-right">
 
@@ -41,7 +49,11 @@
 					<div class="row">
 						<div class="form-group">
 							<div class="col-lg-1 msgfield msgfieldcol-left">
-								<label><?php echo $this->p->t('ui', 'subject'); ?>:</label>
+								<label>
+
+									<?php echo ucfirst($this->p->t('global', 'betreff')); ?>:
+
+								</label>
 							</div>
 							&nbsp;
 							<div id="subject" class="col-lg-7">
@@ -54,7 +66,11 @@
 					<br>
 					<div class="row">
 						<div class="col-lg-12">
-							<label><?php echo $this->p->t('ui', 'message'); ?>:</label>
+							<label>
+
+								<?php echo ucfirst($this->p->t('global', 'nachricht')); ?>:
+
+							</label>
 							<textarea id="body">
 
 								<?php echo $body; ?>
@@ -70,7 +86,11 @@
 							<input id="relationmessage_id" type="hidden" value="<?php echo $relationmessage_id; ?>">
 							<input id="token" type="hidden" value="<?php echo $token; ?>">
 
-							<button id="sendButton" class="btn btn-default" type="button"><?php echo $this->p->t('ui', 'send'); ?></button>
+							<button id="sendButton" class="btn btn-default" type="button">
+
+								<?php echo  $this->p->t('ui', 'senden'); ?>
+
+							</button>
 						</div>
 					</div>
 				</div>
