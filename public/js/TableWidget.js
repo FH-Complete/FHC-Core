@@ -204,57 +204,40 @@ var FHC_TableWidget = {
 				tableWidgetDiv.find("#tableWidgetTabulator").tabulator("download", "csv", "data.csv", {bom:true});
 			})
 
-			// Click-Event to collapse help div
+			// Click-Event to toggle the collapsable help panel
 			tableWidgetDiv.find('#help').on('click', function()
 			{
+				// Hide the collapsable settings panel, if it actually shown
+				$('#tabulatorSettings-' + tableUniqueId).collapse('hide');
 
-				//... auch unteren event für settings hier hinein
+				// Toggle the collapsable help panel
 				$('#tabulatorHelp-' + tableUniqueId).collapse('toggle');
-
-				$(this).toggleClass('active focus');
-
-				// De/activate and un/focus on clicked settings button
-				if(!$(this).hasClass('active focus'))
-				{
-					$(this).css({'background-color': 'white', 'border-color' : '#ccc', 'outline': 'none'});
-				}
-				else
-				{
-					$(this).css({'background-color': '#e6e6e6'});
-				}
-
-				if($('#tabulatorSettings-' + tableUniqueId).hasClass('collapse in'))
-				{
-					$('#tabulatorSettings-' + tableUniqueId).removeClass('in');
-					// $('#settings').toggleClass('active focus');
-				}
 			})
 
-			// Click-Event to collapse settings div
+			// Click-Event to toggle the collapsable settings panel
 			tableWidgetDiv.find('#settings').on('click', function()
 			{
+				// Hide the collapsable help panel, if it actually shown
+				$('#tabulatorHelp-' + tableUniqueId).collapse('hide');
 
-				//... auch unteren event für settings hier hinein
+				// Toggle the collapsable settings panel
 				$('#tabulatorSettings-' + tableUniqueId).collapse('toggle');
+			})
 
-				$(this).toggleClass('active focus');
-
-				// De/activate and un/focus on clicked settings button
-				if(!$(this).hasClass('active focus'))
+			/* Beautify button group behaviour
+			 * Let buttons stay active even until they are clicked again to close the collapsable help- oder setting panels
+			 * Also remove the disturbing button focus behaviour
+			 */
+			$(".btn-group > .btn").click(function(){
+				if ($(this).hasClass("active"))
 				{
-					$(this).css({'background-color': 'white', 'border-color' : '#ccc', 'outline': 'none'});
+					$(this).removeClass('active').css('outline', 'none');
 				}
 				else
 				{
-					$(this).css({'background-color': '#e6e6e6'});
+					$(this).addClass("active").css('outline', 'none').siblings().removeClass("active");
 				}
-
-				if($('#tabulatorHelp-' + tableUniqueId).hasClass('collapse in'))
-				{
-					$('#tabulatorHelp-' + tableUniqueId).removeClass('in');
-					// $('#help').toggleClass('active focus');
-				}
-			})
+			});
 
 			/**
 			 * Click-Event to select all rows
@@ -774,6 +757,7 @@ function _renderTabulatorHeaderHTML(tableWidgetDiv){
 	tabulatorHeaderHTML += '<button id="settings" class="btn btn-default" type="button" data-toggle="collapse tooltip" data-target="tabulatorSettings-'+ tableUniqueId + '" data-placement="left" title="Tabelleneinstellungen" aria-expanded="false" aria-controls="tabulatorSettings-'+ tableUniqueId + '"><i class="fa fa-cog"></i></button>';
 	tabulatorHeaderHTML += '</div>';
 	tabulatorHeaderHTML += '</div>';
+	tabulatorHeaderHTML += '<br><br><br>';
 
 	return tabulatorHeaderHTML;
 }
@@ -786,7 +770,6 @@ function _renderTabulatorHeaderCollapseHTML(tableWidgetDiv){
 	var tabulatorHeaderCollapseHTML = '';
 
 	// CollapseHTML 'Settings'
-	tabulatorHeaderCollapseHTML += '<br>';
 	tabulatorHeaderCollapseHTML += '<div class="row">';
 	tabulatorHeaderCollapseHTML += '<div class="col-lg-12 collapse" id="tabulatorSettings-'+ tableUniqueId + '">';
 	tabulatorHeaderCollapseHTML += '<div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">';
@@ -794,10 +777,13 @@ function _renderTabulatorHeaderCollapseHTML(tableWidgetDiv){
 	tabulatorHeaderCollapseHTML += '<div class="panel panel-default">';
 	tabulatorHeaderCollapseHTML += '<div class="panel-heading" role="tab" id="headingOne">';
 	tabulatorHeaderCollapseHTML += '<h5 class="panel-title">';
-	tabulatorHeaderCollapseHTML += '<a role="button" data-toggle="collapse" data-parent="#accordion" href="#selectColumns-' + tableUniqueId + '" aria-expanded="false" aria-controls="selectColumns">Spalten einstellen</a>';
+	tabulatorHeaderCollapseHTML += '<a role="button" data-toggle="collapse" data-parent="#accordion" ' +
+		'href="#selectColumns-' + tableUniqueId + '" ' +
+		'aria-expanded="false" aria-controls="selectColumns">Spalten einstellen</a>';
 	tabulatorHeaderCollapseHTML += '</h5>';
 	tabulatorHeaderCollapseHTML += '</div>'; // end panel-heading
-	tabulatorHeaderCollapseHTML += '<div id="selectColumns-' + tableUniqueId + '" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">';
+	tabulatorHeaderCollapseHTML += '<div id="selectColumns-' + tableUniqueId + '" class="panel-collapse collapse" ' +
+		'role="tabpanel" aria-labelledby="headingOne">';
 	tabulatorHeaderCollapseHTML += '<div class="panel-body">';
 	tabulatorHeaderCollapseHTML += '<div class="btn-group" role="group">';
 
@@ -835,7 +821,6 @@ function _renderTabulatorHeaderCollapseHTML(tableWidgetDiv){
 	tabulatorHeaderCollapseHTML += ' </div>'; // end row
 
 	// CollapseHTML 'Help'
-	tabulatorHeaderCollapseHTML += '<br>';
 	tabulatorHeaderCollapseHTML += '<div class="row">';
 	tabulatorHeaderCollapseHTML += '<div class="col-lg-12 collapse" id="tabulatorHelp-'+ tableUniqueId + '">';
 	tabulatorHeaderCollapseHTML += '<div class="well">';
