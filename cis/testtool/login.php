@@ -66,6 +66,7 @@ $gebdatum='';
 $date = new datum();
 
 $reload_menu=false;
+$alertmsg = '';
 
 $sg_var = new studiengang();
 
@@ -189,7 +190,7 @@ if (isset($_POST['prestudent']) && isset($gebdatum))
 
                 // * 1. Sprache über Ablauf Vorgaben ermitteln
 				$ablauf = new Ablauf();
-				$ablauf->getAblaufVorgabeStudiengang($firstPrio_studiengang_kz);
+				$ablauf->getAblaufGebiete($firstPrio_studiengang_kz, $firstPrio_studienplan_id);
 				$rt_sprache = '';
 
 				if(!empty($ablauf->result[0]))
@@ -224,17 +225,17 @@ if (isset($_POST['prestudent']) && isset($gebdatum))
 			}
 			else
             {
-                echo '<span class="error">'.$p->t('testtool/reihungstestNichtFreigeschalten').'</span>';
+	            $alertmsg .= '<div class="alert alert-danger">'.$p->t('testtool/reihungstestNichtFreigeschalten').'</div>';
 			}
 		}
 		else
 		{
-			echo '<span class="error">'.$p->t('testtool/reihungstestKannNichtGeladenWerden').'</span>';
+			$alertmsg .= '<div class="alert alert-danger">'.$p->t('testtool/reihungstestKannNichtGeladenWerden').'</div>';
 		}
 	}
 	else
 	{
-		echo '<span class="error">'.$p->t('testtool/geburtsdatumStimmtNichtUeberein').'</span>';
+		$alertmsg .= '<div class="alert alert-danger">'.$p->t('testtool/geburtsdatumStimmtNichtUeberein').'</div>';
 	}
 }
 
@@ -499,7 +500,7 @@ if (isset($prestudent_id))
                     }
                     elseif($ps_obj->ausbildungssemester == '3')
                     {
-                        echo '<td>'. $p->t('testtool/quereinstieg'). ' (3.Semester)</td>';
+                        echo '<td>'. $p->t('testtool/quereinstieg'). ' (3. Semester)</td>';
                     }
                 }
                 // wenn letzter Status \'Abgewiesener\' ist, dann als solchen kennzeichnen
@@ -564,7 +565,8 @@ else // LOGIN Site (vor Login)
     echo '<div class="col-xs-11">';
 
 //    Welcome text
-    echo '
+	echo $alertmsg;
+	echo '
         <div class="row" style="margin-bottom: 10%; margin-top: 3%;">
             <div class="col-xs-6 text-center" style="border-right: 1px solid lightgrey;">
                 <h1 style="white-space: normal">Herzlich Willkommen zum Reihungstest</h1><br><br>
