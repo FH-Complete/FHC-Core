@@ -3449,6 +3449,18 @@ if(!$result = @$db->db_query("SELECT 1 FROM fue.tbl_projekttyp LIMIT 1"))
 		echo '<br>fue.tbl_projekttyp hinzugefuegt.';
 }
 
+// Add column orgform_kurzbz to tbl_bankverbindung
+if(!$result = @$db->db_query("SELECT orgform_kurzbz FROM public.tbl_bankverbindung LIMIT 1"))
+{
+	$qry = "ALTER TABLE public.tbl_bankverbindung ADD COLUMN orgform_kurzbz varchar(3);
+			ALTER TABLE public.tbl_bankverbindung ADD CONSTRAINT fk_bankverbindung_orgform FOREIGN KEY (orgform_kurzbz) REFERENCES bis.tbl_orgform (orgform_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;";
+
+	if(!$db->db_query($qry))
+		echo '<strong>public.tbl_bankverbindung: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>public.tbl_bankverbindung: Spalte orgform_kurzbz hinzugefuegt';
+}
+
 // iban und bic zu vw_msg_vars hinzufügen
 if(!$result = @$db->db_query('SELECT "IBAN Studiengang", "BIC Studiengang" FROM public.vw_msg_vars LIMIT 1'))
 {
@@ -3469,53 +3481,60 @@ if(!$result = @$db->db_query('SELECT "IBAN Studiengang", "BIC Studiengang" FROM 
 			   s.bezeichnung AS "Studiengang DE",
 			   s.english AS "Studiengang EN",
 			   st.bezeichnung AS "Typ",
-			   orgform_kurzbz AS "Orgform",
+			   last_prestudent_status.orgform_kurzbz AS "Orgform",
 			   p.zugangscode AS "Zugangscode",
 			   bk.iban AS "IBAN Studiengang",
                bk.bic AS "BIC Studiengang"
 		  FROM public.tbl_person p
-	 LEFT JOIN (
-					SELECT person_id,
-						   kontakt
-					  FROM public.tbl_kontakt
-					 WHERE zustellung = TRUE
-					   AND kontakttyp = \'email\'
-				  ORDER BY kontakt_id DESC
-			) ke USING(person_id)
-	 LEFT JOIN (
-					SELECT person_id,
-						   kontakt
-					  FROM public.tbl_kontakt
-					 WHERE zustellung = TRUE
-					   AND kontakttyp IN (\'telefon\', \'mobil\')
-				  ORDER BY kontakt_id DESC
-			) kt USING(person_id)
-	 LEFT JOIN (
-					SELECT person_id,
-						   strasse,
-						   ort,
-						   plz,
-						   gemeinde,
-						   langtext
-					  FROM public.tbl_adresse
-				 LEFT JOIN bis.tbl_nation ON(bis.tbl_nation.nation_code = public.tbl_adresse.nation)
-					 WHERE public.tbl_adresse.heimatadresse = TRUE
-				  ORDER BY adresse_id DESC
-			) a USING(person_id)
-			LEFT JOIN public.tbl_prestudent pr USING(person_id)
-			INNER JOIN public.tbl_studiengang s USING(studiengang_kz)
-			INNER JOIN public.tbl_studiengangstyp st USING(typ)
-			         LEFT JOIN ( SELECT DISTINCT ON (prestudent_id)
-                         tbl_prestudent.prestudent_id,
-                         tbl_bankverbindung.iban,
-                         tbl_bankverbindung.bic,
-                         tbl_studiengang.oe_kurzbz
-                     FROM public.tbl_bankverbindung
-                              JOIN public.tbl_studiengang USING(oe_kurzbz)
-                              JOIN public.tbl_prestudent USING (studiengang_kz)
-                     ORDER BY prestudent_id, tbl_bankverbindung.insertamum DESC, iban) bk USING (prestudent_id)
-		 WHERE p.aktiv = TRUE
-	  ORDER BY p.person_id ASC, pr.prestudent_id ASC
+		 LEFT JOIN (
+						SELECT person_id,
+							   kontakt
+						  FROM public.tbl_kontakt
+						 WHERE zustellung = TRUE
+						   AND kontakttyp = \'email\'
+					  ORDER BY kontakt_id DESC
+				) ke USING(person_id)
+		 LEFT JOIN (
+						SELECT person_id,
+							   kontakt
+						  FROM public.tbl_kontakt
+						 WHERE zustellung = TRUE
+						   AND kontakttyp IN (\'telefon\', \'mobil\')
+					  ORDER BY kontakt_id DESC
+				) kt USING(person_id)
+		 LEFT JOIN (
+						SELECT person_id,
+							   strasse,
+							   ort,
+							   plz,
+							   gemeinde,
+							   langtext
+						  FROM public.tbl_adresse
+					 LEFT JOIN bis.tbl_nation ON(bis.tbl_nation.nation_code = public.tbl_adresse.nation)
+						 WHERE public.tbl_adresse.heimatadresse = TRUE
+					  ORDER BY adresse_id DESC
+				) a USING(person_id)
+		LEFT JOIN public.tbl_prestudent pr USING(person_id)
+		INNER JOIN public.tbl_studiengang s USING(studiengang_kz)
+		INNER JOIN public.tbl_studiengangstyp st USING(typ)
+		LEFT JOIN (
+						SELECT DISTINCT ON (ps.prestudent_id) tbl_studienplan.orgform_kurzbz, ps.prestudent_id
+						FROM public.tbl_prestudent ps
+								 JOIN public.tbl_prestudentstatus ON ps.prestudent_id = tbl_prestudentstatus.prestudent_id
+								 JOIN lehre.tbl_studienplan USING(studienplan_id)
+						ORDER BY ps.prestudent_id DESC,
+								 tbl_prestudentstatus.datum DESC,
+								 tbl_prestudentstatus.insertamum DESC,
+								 tbl_prestudentstatus.ext_id DESC
+				) last_prestudent_status ON pr.prestudent_id = last_prestudent_status.prestudent_id
+		LEFT JOIN (
+			SELECT DISTINCT ON (oe_kurzbz, orgform_kurzbz) oe_kurzbz, orgform_kurzbz, iban, bic
+			FROM tbl_bankverbindung
+			WHERE oe_kurzbz IS NOT NULL
+			ORDER BY oe_kurzbz, orgform_kurzbz, tbl_bankverbindung.insertamum DESC,tbl_bankverbindung.iban
+			)bk ON s.oe_kurzbz = bk.oe_kurzbz AND (last_prestudent_status.orgform_kurzbz = bk.orgform_kurzbz OR bk.orgform_kurzbz IS NULL)
+		WHERE p.aktiv = TRUE
+		ORDER BY p.person_id ASC, pr.prestudent_id ASC
 	);';
 
 	if(!$db->db_query($qry))
@@ -3682,7 +3701,7 @@ $tabellen=array(
 	"public.tbl_aufnahmeschluessel"  => array("aufnahmeschluessel"),
 	"public.tbl_aufnahmetermin" => array("aufnahmetermin_id","aufnahmetermintyp_kurzbz","prestudent_id","termin","teilgenommen","bewertung","protokoll","insertamum","insertvon","updateamum","updatevon","ext_id"),
 	"public.tbl_aufnahmetermintyp" => array("aufnahmetermintyp_kurzbz","bezeichnung"),
-	"public.tbl_bankverbindung"  => array("bankverbindung_id","person_id","name","anschrift","bic","blz","iban","kontonr","typ","verrechnung","updateamum","updatevon","insertamum","insertvon","ext_id","oe_kurzbz"),
+	"public.tbl_bankverbindung"  => array("bankverbindung_id","person_id","name","anschrift","bic","blz","iban","kontonr","typ","verrechnung","updateamum","updatevon","insertamum","insertvon","ext_id","oe_kurzbz", "orgform_kurzbz"),
 	"public.tbl_benutzer"  => array("uid","person_id","aktiv","alias","insertamum","insertvon","updateamum","updatevon","ext_id","updateaktivvon","updateaktivam","aktivierungscode"),
 	"public.tbl_benutzerfunktion"  => array("benutzerfunktion_id","fachbereich_kurzbz","uid","oe_kurzbz","funktion_kurzbz","semester", "datum_von","datum_bis", "updateamum","updatevon","insertamum","insertvon","ext_id","bezeichnung","wochenstunden"),
 	"public.tbl_benutzergruppe"  => array("uid","gruppe_kurzbz","studiensemester_kurzbz","updateamum","updatevon","insertamum","insertvon","ext_id"),
