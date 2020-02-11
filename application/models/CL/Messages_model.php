@@ -687,8 +687,17 @@ class Messages_model extends CI_Model
 		foreach (getData($info) as $receiver)
 		{
 			$recipient = new stdClass();
-			$recipient->id = $receiver->person_id;
 			$recipient->description = $receiver->Vorname.' '.$receiver->Nachname;
+
+			// If it is a prestudent then
+			if (isset($receiver->prestudent_id) && is_numeric($receiver->prestudent_id))
+			{
+				$recipient->id = $receiver->prestudent_id;
+			}
+			else // otherwise it is a person
+			{
+				$recipient->id = $receiver->person_id;
+			}
 
 			$recipientsArray[] = $recipient;
 			$recipientsList .= $receiver->Vorname.' '.$receiver->Nachname.'; ';
@@ -723,7 +732,7 @@ class Messages_model extends CI_Model
 		// If data contains a prestudent id
 		// NOTE:
 		// - info is checked at the beginning of this method so it is safe to use getData($info)[0]
-		// - the provided data inside info are all persons or prestudents, so it is safe to check only the first one
+		// - the provided data inside info are all persons or all prestudents, so it is safe to check only the first one
 		if (isset(getData($info)[0]->prestudent_id) && is_numeric(getData($info)[0]->prestudent_id))
 		{
 			$variablesResult = $this->messagelib->getMessageVarsPrestudent();
