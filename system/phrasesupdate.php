@@ -342,8 +342,8 @@ $phrases = array(
 			),
 			array(
 				'sprache' => 'English',
-				'text' => '',
-				'description' => 'last editor',
+				'text' => 'last change',
+				'description' => '',
 				'insertvon' => 'system'
 			)
 		)
@@ -682,7 +682,7 @@ $phrases = array(
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'messages',
+				'text' => 'Messages',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -802,7 +802,7 @@ $phrases = array(
 			),
 			array(
 				'sprache' => 'English',
-				'text' => '',
+				'text' => 'edited by',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -842,7 +842,7 @@ $phrases = array(
 			),
 			array(
 				'sprache' => 'English',
-				'text' => '',
+				'text' => 'approved for the course',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -882,7 +882,7 @@ $phrases = array(
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'message',
+				'text' => 'Message',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -1128,7 +1128,7 @@ $phrases = array(
 			),
 			array(
 				'sprache' => 'English',
-				'text' => '',
+				'text' => 'Release',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -1288,7 +1288,7 @@ $phrases = array(
 			),
 			array(
 				'sprache' => 'English',
-				'text' => '',
+				'text' => 'Cancel',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -1635,7 +1635,7 @@ $phrases = array(
 			),
 			array(
 				'sprache' => 'English',
-				'text' => '',
+				'text' => 'Address',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -1675,7 +1675,7 @@ $phrases = array(
 			),
 			array(
 				'sprache' => 'English',
-				'text' => '',
+				'text' => 'Man',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -1695,7 +1695,7 @@ $phrases = array(
 			),
 			array(
 				'sprache' => 'English',
-				'text' => '',
+				'text' => 'Woman',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -1755,7 +1755,7 @@ $phrases = array(
 			),
 			array(
 				'sprache' => 'English',
-				'text' => '',
+				'text' => 'Social insurance number',
 				'description' => 'social security number',
 				'insertvon' => 'system'
 			)
@@ -1775,7 +1775,7 @@ $phrases = array(
 			),
 			array(
 				'sprache' => 'English',
-				'text' => '',
+				'text' => 'Replacement bearing',
 				'description' => 'Replacement Label',
 				'insertvon' => 'system'
 			)
@@ -1795,8 +1795,8 @@ $phrases = array(
 			),
 			array(
 				'sprache' => 'English',
-				'text' => '',
-				'description' => 'bPK',
+				'text' => 'bPK',
+				'description' => '',
 				'insertvon' => 'system'
 			)
 		)
@@ -1975,8 +1975,8 @@ $phrases = array(
 			),
 			array(
 				'sprache' => 'English',
-				'text' => '',
-				'description' => 'ZIP-Code',
+				'text' => 'Post code',
+				'description' => '',
 				'insertvon' => 'system'
 			)
 		)
@@ -1995,8 +1995,8 @@ $phrases = array(
 			),
 			array(
 				'sprache' => 'English',
-				'text' => '',
-				'description' => 'Street',
+				'text' => 'Street',
+				'description' => '',
 				'insertvon' => 'system'
 			)
 		)
@@ -2077,7 +2077,7 @@ $phrases = array(
 			),
 			array(
 				'sprache' => 'English',
-				'text' => '',
+				'text' => 'Education semester',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -2520,7 +2520,7 @@ $phrases = array(
 			),
 			array(
 				'sprache' => 'English',
-				'text' => '',
+				'text' => 'ZGV exam',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -2540,7 +2540,7 @@ $phrases = array(
 			),
 			array(
 				'sprache' => 'English',
-				'text' => '',
+				'text' => 'ZGV place',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -2560,7 +2560,7 @@ $phrases = array(
 			),
 			array(
 				'sprache' => 'English',
-				'text' => '',
+				'text' => 'ZGV date',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -2580,7 +2580,7 @@ $phrases = array(
 			),
 			array(
 				'sprache' => 'English',
-				'text' => '',
+				'text' => 'ZGV nation',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -2640,7 +2640,7 @@ $phrases = array(
 			),
 			array(
 				'sprache' => 'English',
-				'text' => '',
+				'text' => 'Graduate',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -2660,7 +2660,7 @@ $phrases = array(
 			),
 			array(
 				'sprache' => 'English',
-				'text' => '',
+				'text' => 'Leaving certificate',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -2780,8 +2780,8 @@ $phrases = array(
 			),
 			array(
 				'sprache' => 'English',
-				'text' => '',
-				'description' => 'notes on the application',
+				'text' => 'Application Notes',
+				'description' => '',
 				'insertvon' => 'system'
 			)
 		)
@@ -2820,7 +2820,7 @@ $phrases = array(
 			),
 			array(
 				'sprache' => 'English',
-				'text' => '',
+				'text' => 'ZGV',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -2840,7 +2840,7 @@ $phrases = array(
 			),
 			array(
 				'sprache' => 'English',
-				'text' => '',
+				'text' => 'Access requirements',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -2860,7 +2860,7 @@ $phrases = array(
 			),
 			array(
 				'sprache' => 'English',
-				'text' => '',
+				'text' => 'Entry requirements',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -2880,7 +2880,7 @@ $phrases = array(
 			),
 			array(
 				'sprache' => 'English',
-				'text' => '',
+				'text' => 'No admission requirements defined for the course',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -2900,7 +2900,7 @@ $phrases = array(
 			),
 			array(
 				'sprache' => 'English',
-				'text' => '',
+				'text' => 'last ZGV attended',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -2920,7 +2920,7 @@ $phrases = array(
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'reason for cancellation',
+				'text' => 'Reason for cancellation',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -2974,15 +2974,13 @@ $phrases = array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Bei Absage von InteressentInnen	erhalten diese den Status "Abgewiesener" und deren '
-				.'ZGV-Daten können im Infocenter nicht mehr bearbeitet oder freigegeben werden. '
-				.'Alle nicht gespeicherten ZGV-Daten gehen verloren. Fortfahren?',
+				'text' => 'Bei Absage von InteressentInnen erhalten diese den Status "Abgewiesener" und deren ZGV-Daten können im Infocenter nicht mehr bearbeitet oder freigegeben werden. Alle nicht gespeicherten ZGV-Daten gehen verloren. Fortfahren?',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => '',
+				'text' => 'If interested parties are rejected, they receive the status "rejected" and their ZGV data can no longer be edited or released in the Info Center. All ZGV data that has not been saved will be lost. Continue?',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -3096,16 +3094,13 @@ $phrases = array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Bei Freigabe von InteressentInnen wird deren Interessentenstatus bestätigt
-					und deren Zgvdaten können im Infocenter nicht mehr bearbeitet oder freigegeben werden.<br/>
-					Alle nicht gespeicherten Zgvdaten gehen verloren.<br/>
-					Fortfahren?',
+				'text' => 'Bei Freigabe von InteressentInnen wird deren Interessentenstatus bestätigt und deren Zgvdaten können im Infocenter nicht mehr bearbeitet oder freigegeben werden.<br/> Alle nicht gespeicherten Zgvdaten gehen verloren.<br/> Fortfahren?',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => '',
+				'text' => 'If interested parties are released, their interested party status is confirmed and their Zgv data can no longer be edited or released in the Infocenter. <br/> All Zgv data not saved will be lost. <br/> Continue?',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -3365,7 +3360,7 @@ $phrases = array(
 			),
 			array(
 				'sprache' => 'English',
-				'text' => '',
+				'text' => 'Nothing to park out',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -3385,7 +3380,7 @@ $phrases = array(
 			),
 			array(
 				'sprache' => 'English',
-				'text' => '',
+				'text' => 'Parking error',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -3405,7 +3400,7 @@ $phrases = array(
 			),
 			array(
 				'sprache' => 'English',
-				'text' => '',
+				'text' => 'Parking error',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -4318,32 +4313,12 @@ When on hold, the date is only a reminder.',
 	array(
 		'app' => 'core',
 		'category' => 'global',
-		'phrase' => 'write',
-		'insertvon' => 'system',
-		'phrases' => array(
-			array(
-				'sprache' => 'German',
-				'text' => '',
-				'description' => '',
-				'insertvon' => 'system'
-			),
-			array(
-				'sprache' => 'English',
-				'text' => 'Write',
-				'description' => '',
-				'insertvon' => 'system'
-			)
-		)
-	),
-	array(
-		'app' => 'core',
-		'category' => 'global',
 		'phrase' => 'received',
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => '',
+				'text' => 'Empfangen',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -4363,7 +4338,7 @@ When on hold, the date is only a reminder.',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => '',
+				'text' => 'Antworten',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -4390,6 +4365,66 @@ When on hold, the date is only a reminder.',
 			array(
 				'sprache' => 'English',
 				'text' => '* This message will be delivered to the Infocenter of UAS Technikum Wien',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'refresh',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Aktualisierung',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Refresh',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'from',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Von',
+				'description' => 'Aktualisierung',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'From',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'newMessage',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Sie haben eine neue Nachricht erhalten',
+				'description' => 'Aktualisierung',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'You received a new message',
 				'description' => '',
 				'insertvon' => 'system'
 			)
