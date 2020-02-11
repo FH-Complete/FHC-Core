@@ -460,6 +460,12 @@ if($frage->frage_id!='')
 	$frage_id = $frage->frage_id;
 	$frage->getFrageSprache($frage_id, $_SESSION['sprache_user']);
 
+	// Fallback auf DEFAULT_LANGUAGE wenn keine Frage in der $_SESSION['sprache_user'] vorhanden ist
+	if ($frage->text == '' && $frage->bild == '' && $frage->audio == '')
+	{
+		$frage->getFrageSprache($frage_id, DEFAULT_LANGUAGE);
+	}
+
 	if(!$demo)
 	{
 		//Nachschauen ob diese Frage bereits angesehen wurde
