@@ -21,13 +21,17 @@ function parseMessageText(receiver_id, text)
 {
 	var data = {text: text};
 
-	if ($("#type").val() == 'person_id')
+	if ($("#type").val() == 'persons')
 	{
 		data.person_id = receiver_id;
 	}
-	else
+	else if ($("#type").val() == 'prestudents')
 	{
 		data.prestudent_id = receiver_id;
+	}
+	else
+	{
+		return;
 	}
 
 	FHC_AjaxClient.ajaxCallGet(
