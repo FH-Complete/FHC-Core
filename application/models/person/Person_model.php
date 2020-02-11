@@ -220,16 +220,32 @@ class Person_model extends DB_Model
 	 * @param $studiensemester_kurzbz
 	 * @return array
 	 */
-	public function hasBewerber($person_id, $studiensemester_kurzbz)
+	public function hasBewerber($person_id, $studiensemester_kurzbz, $studiengangtyp = null)
 	{
+		$parametersArray = array($person_id, $studiensemester_kurzbz);
+
 		$qry = "SELECT count(*) AS anzahl_bewerber FROM public.tbl_person
 				JOIN public.tbl_prestudent USING (person_id)
-				JOIN public.tbl_prestudentstatus ON tbl_prestudentstatus.prestudent_id = tbl_prestudent.prestudent_id
-				WHERE person_id = ?
+				JOIN public.tbl_prestudentstatus ON tbl_prestudentstatus.prestudent_id = tbl_prestudent.prestudent_id";
+
+		if (isset($studiengangtyp))
+		{
+			$qry .= " JOIN lehre.tbl_studienplan USING(studienplan_id)
+					 JOIN lehre.tbl_studienordnung USING(studienordnung_id)
+					 JOIN public.tbl_studiengang ON tbl_studienordnung.studiengang_kz = tbl_studiengang.studiengang_kz";
+		}
+
+		$qry .=	" WHERE person_id = ?
 				AND studiensemester_kurzbz = ?
-				AND status_kurzbz = 'Bewerber'
+				AND tbl_prestudentstatus.status_kurzbz = 'Bewerber'
 				AND reihungstestangetreten";
 
-		return $this->execQuery($qry, array($person_id, $studiensemester_kurzbz));
+		if (isset($studiengangtyp))
+		{
+			$parametersArray[] = $studiengangtyp;
+			$qry .= " AND tbl_studiengang.typ = ?";
+		}
+
+		return $this->execQuery($qry, $parametersArray);
 	}
 }

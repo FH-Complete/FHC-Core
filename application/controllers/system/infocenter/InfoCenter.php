@@ -560,7 +560,7 @@ class InfoCenter extends Auth_Controller
 					else
 					{
 						// check if there is already a Bewerberstatus and Reihungsverfahren already absolviert
-						$bewerber = $this->PersonModel->hasBewerber($person_id, $lastStatus->studiensemester_kurzbz);
+						$bewerber = $this->PersonModel->hasBewerber($person_id, $lastStatus->studiensemester_kurzbz, 'b');
 
 						if (hasData($bewerber))
 						{
@@ -1559,7 +1559,7 @@ class InfoCenter extends Auth_Controller
 	}
 
 	/**
-	 * Sends infomail with prestudent and person data when Prestudent is freigegeben
+	 * Sends infomail to Studiengang with prestudent and person data when Prestudent is freigegeben
 	 * @param $prestudent_id
 	 */
 	private function _sendFreigabeMail($prestudent_id)
