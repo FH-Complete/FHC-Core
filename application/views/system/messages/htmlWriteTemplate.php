@@ -163,6 +163,7 @@
 						</div>
 
 					<?php echo $persons; ?>
+					<?php echo $prestudenten; ?>
 					<?php echo $relationmessage_id; ?>
 					<?php echo $type; ?>
 

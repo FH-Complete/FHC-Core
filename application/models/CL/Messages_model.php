@@ -337,7 +337,7 @@ class Messages_model extends CI_Model
 		if (!is_numeric($sender_id)) show_error('The current logged user person_id is not defined');
 
 		// Retrieves message vars data for the given user/s
-		$msgVarsData = $this->MessageModel->getMsgVarsDataByPersonId($persons);
+		$msgVarsData = $this->MessageModel->getMsgVarsDataByPrestudentId($persons);
 		if (isError($msgVarsData)) show_error(getError($msgVarsData));
 		if (!hasData($msgVarsData)) show_error('No recipients were given');
 
@@ -684,6 +684,7 @@ class Messages_model extends CI_Model
 		$recipientsArray = array();
 		$recipientsList = '';
 		$persons = '';
+		$prestudenten = '';
 		foreach (getData($info) as $receiver)
 		{
 			$recipient = new stdClass();
@@ -702,6 +703,7 @@ class Messages_model extends CI_Model
 			$recipientsArray[] = $recipient;
 			$recipientsList .= $receiver->Vorname.' '.$receiver->Nachname.'; ';
 			$persons .= '<input type="hidden" name="persons[]" value="'.$receiver->person_id.'">'."\n";
+			$prestudenten .= '<input type="hidden" name="prestudenten[]" value="'.$receiver->prestudent_id.'">'."\n";
 		}
 
 		// ---------------------------------------------------------------------------------------
@@ -779,6 +781,7 @@ class Messages_model extends CI_Model
 			'senderIsAdmin' => getData($senderIsAdmin),
 			'recipientsArray' => $recipientsArray,
 			'persons' => $persons,
+			'prestudenten' => $prestudenten,
 			'relationmessage_id' => $relationmessage,
 			'type' => $type
 		);

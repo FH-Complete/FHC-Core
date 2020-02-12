@@ -57,9 +57,10 @@ class Messages extends Auth_Controller
 		$subject = $this->input->post('subject');
 		$body = $this->input->post('body');
 		$persons = $this->input->post('persons');
+		$prestudenten = $this->input->post('prestudenten');
 		$relationmessage_id = $this->input->post('relationmessage_id');
 
-		$sendImplicitTemplate = $this->CLMessagesModel->sendImplicitTemplate($persons, $subject, $body, $relationmessage_id);
+		$sendImplicitTemplate = $this->CLMessagesModel->sendImplicitTemplate($prestudenten, $subject, $body, $relationmessage_id);
 		if (isSuccess($sendImplicitTemplate))
 		{
 			$this->load->view('system/messages/htmlSuccess');
