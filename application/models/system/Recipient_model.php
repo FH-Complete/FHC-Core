@@ -464,7 +464,7 @@ class Recipient_model extends DB_Model
 				  JOIN public.tbl_msg_recipient mr ON (mr.message_id = mm.message_id)
 				  JOIN public.tbl_msg_status ms ON (ms.message_id = mm.message_id AND mr.person_id = mr.person_id)
 				  JOIN public.tbl_person p ON (p.person_id = mr.person_id)
-			 	  JOIN public.tbl_organisationseinheit oe ON (oe.oe_kurzbz = mr.oe_kurzbz)
+			 LEFT JOIN public.tbl_organisationseinheit oe ON (oe.oe_kurzbz = mr.oe_kurzbz)
 				 WHERE mm.person_id = ?
 				   AND mr.sent IS NOT NULL
 				   AND mr.sentinfo IS NULL
