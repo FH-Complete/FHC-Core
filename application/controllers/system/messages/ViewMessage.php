@@ -29,6 +29,14 @@ class ViewMessage extends FHC_Controller
 
 		// Load model MessageToken_model, not calling the authentication system
 		$this->load->model('CL/Messages_model', 'CLMessagesModel');
+
+		// Phrases used in loaded views
+		$this->loadPhrases(
+			array(
+				'global',
+				'ui'
+			)
+		);
 	}
 
 	/**
