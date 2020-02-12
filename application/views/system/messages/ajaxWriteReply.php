@@ -56,9 +56,9 @@
 								</label>
 							</div>
 							&nbsp;
-							<div id="subject" class="col-lg-7">
+							<div class="col-lg-7">
 
-								<?php echo $subject; ?>
+								<input id="subject" type="text" value="<?php echo $subject; ?>">
 
 							</div>
 						</div>

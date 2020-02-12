@@ -85,7 +85,7 @@
 											<?php if (!isEmptyString($hrefReply)): ?>
 
 												<button class="btn btn-default" id="replybutton" onclick="location.href='<?php echo $hrefReply; ?>';">
-													<i class="fa fa-reply"></i>&nbsp;<?php echo ucfirst($this->p->t('global', 'reply')); ?>:
+													<i class="fa fa-reply"></i>&nbsp;<?php echo ucfirst($this->p->t('global', 'reply')); ?>
 												</button>
 
 											<?php endif; ?>
