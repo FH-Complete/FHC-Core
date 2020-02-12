@@ -56,18 +56,18 @@ class Messages extends Auth_Controller
 	{
 		$subject = $this->input->post('subject');
 		$body = $this->input->post('body');
-		$persons = $this->input->post('persons');
-		$prestudenten = $this->input->post('prestudenten');
+		$recipients_ids = $this->input->post('recipients_ids');
 		$relationmessage_id = $this->input->post('relationmessage_id');
+		$type = $this->input->post('type');
 
-		$sendImplicitTemplate = $this->CLMessagesModel->sendImplicitTemplate($prestudenten, $subject, $body, $relationmessage_id);
+		$sendImplicitTemplate = $this->CLMessagesModel->sendImplicitTemplate($type, $recipients_ids, $subject, $body, $relationmessage_id);
 		if (isSuccess($sendImplicitTemplate))
 		{
-			$this->load->view('system/messages/htmlSuccess');
+			$this->load->view('system/messages/htmlMessageSentSuccess');
 		}
 		else
 		{
-			$this->load->view('system/messages/htmlError');
+			$this->load->view('system/messages/htmlMessageSentError');
 		}
 	}
 
@@ -92,17 +92,21 @@ class Messages extends Auth_Controller
 	 */
 	public function parseMessageText()
 	{
-		$person_id = $this->input->get('person_id');
-		$prestudent_id = $this->input->get('prestudent_id');
+		$receiver_id = $this->input->get('receiver_id');
 		$text = $this->input->get('text');
+		$type = $this->input->get('type');
 
-		if (!isEmptyString($person_id))
+		if ($type == Messages_model::TYPE_PERSONS)
 		{
-			$this->outputJson($this->CLMessagesModel->parseMessageText($person_id, $text));
+			$this->outputJson($this->CLMessagesModel->parseMessageTextPerson($receiver_id, $text));
+		}
+		elseif ($type == Messages_model::TYPE_PRESTUDENTS)
+		{
+			$this->outputJson($this->CLMessagesModel->parseMessageTextPrestudent($receiver_id, $text));
 		}
 		else
 		{
-			$this->outputJson($this->CLMessagesModel->parseMessageTextPrestudent($prestudent_id, $text));
+			$this->outputJsonError('Not a person nor a prestudent was provided');
 		}
 	}
 

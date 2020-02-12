@@ -19,24 +19,13 @@ function tinymcePreviewSetContent()
 
 function parseMessageText(receiver_id, text)
 {
-	var data = {text: text};
-
-	if ($("#type").val() == 'persons')
-	{
-		data.person_id = receiver_id;
-	}
-	else if ($("#type").val() == 'prestudents')
-	{
-		data.prestudent_id = receiver_id;
-	}
-	else
-	{
-		return;
-	}
-
 	FHC_AjaxClient.ajaxCallGet(
 		"system/messages/Messages/parseMessageText",
-		data,
+		{
+			receiver_id: receiver_id,
+			text: text,
+			type: $("#type").val()
+		},
 		{
 			successCallback: function(data, textStatus, jqXHR) {
 

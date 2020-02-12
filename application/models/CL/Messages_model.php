@@ -23,6 +23,10 @@ class Messages_model extends CI_Model
 	const NO_AUTH_UID = 'online'; // hard coded uid if no authentication is performed
 	const ALT_OE = 'infocenter'; // alternative organisation unit when no one is found for a presetudent
 
+	// Recipients types
+	const TYPE_PERSONS = 'persons';
+	const TYPE_PRESTUDENTS = 'prestudents';
+
 	/**
 	 * Constructor
 	 */
@@ -330,14 +334,22 @@ class Messages_model extends CI_Model
 	 * Sends a new message or a reply to a message (if $relationmessage_id is given)
 	 * using the template stored in the subject and body
 	 */
-	public function sendImplicitTemplate($persons, $subject, $body, $relationmessage_id = null)
+	public function sendImplicitTemplate($type, $recipients_ids, $subject, $body, $relationmessage_id = null)
 	{
 		// Retrieves the sender id
 		$sender_id = getAuthPersonId();
 		if (!is_numeric($sender_id)) show_error('The current logged user person_id is not defined');
 
+		$msgVarsData = error('No persons nor prestudents were provided');
 		// Retrieves message vars data for the given user/s
-		$msgVarsData = $this->MessageModel->getMsgVarsDataByPrestudentId($persons);
+		if ($type == self::TYPE_PERSONS) // if persons were given
+		{
+			$msgVarsData = $this->MessageModel->getMsgVarsDataByPersonId($recipients_ids);
+		}
+		elseif ($type == self::TYPE_PRESTUDENTS) // otherwise prestudents were given
+		{
+			$msgVarsData = $this->MessageModel->getMsgVarsDataByPrestudentId($recipients_ids);
+		}
 		if (isError($msgVarsData)) show_error(getError($msgVarsData));
 		if (!hasData($msgVarsData)) show_error('No recipients were given');
 
@@ -361,9 +373,12 @@ class Messages_model extends CI_Model
 			if (isError($message)) return $message;
 			if (!hasData($message)) return error('No messages were saved in database');
 
-			// Write log entry
-			$personLog = $this->_personLog($sender_id, $msgVarsDataArray['person_id'], getData($message)[0]);
-			if (isError($personLog)) return $personLog;
+			// Write log entry only if persons were given
+			if ($type == self::TYPE_PERSONS)
+			{
+				$personLog = $this->_personLog($sender_id, $msgVarsDataArray['person_id'], getData($message)[0]);
+				if (isError($personLog)) return $personLog;
+			}
 		}
 
 		return success('Messages sent successfully');
@@ -515,14 +530,11 @@ class Messages_model extends CI_Model
 	 * Parse the given given text using data from the given user
 	 * Use the CI parser which performs simple text substitution for pseudo-variable
 	 */
-	public function parseMessageText($person_id, $text)
+	public function parseMessageTextPerson($person_id, $text)
 	{
 		$parseMessageText = error('The given person_id is not a valid number');
 
-		if (is_numeric($person_id))
-		{
-			$parseMessageText = $this->MessageModel->getMsgVarsDataByPersonId($person_id);
-		}
+		if (is_numeric($person_id)) $parseMessageText = $this->MessageModel->getMsgVarsDataByPersonId($person_id);
 
 		if (hasData($parseMessageText))
 		{
@@ -545,10 +557,7 @@ class Messages_model extends CI_Model
 	{
 		$parseMessageText = error('The given prestudent_id is not a valid number');
 
-		if (is_numeric($prestudent_id))
-		{
-			$parseMessageText = $this->MessageModel->getMsgVarsDataByPrestudentId($prestudent_id);
-		}
+		if (is_numeric($prestudent_id)) $parseMessageText = $this->MessageModel->getMsgVarsDataByPrestudentId($prestudent_id);
 
 		if (hasData($parseMessageText))
 		{
@@ -683,27 +692,30 @@ class Messages_model extends CI_Model
 		// - persons: a string that contains HTML input hidden with alla the receivers id (person_id)
 		$recipientsArray = array();
 		$recipientsList = '';
-		$persons = '';
-		$prestudenten = '';
+		$recipients_ids = '';
+
 		foreach (getData($info) as $receiver)
 		{
+			$id = 0;
 			$recipient = new stdClass();
 			$recipient->description = $receiver->Vorname.' '.$receiver->Nachname;
+			$recipientsList .= $receiver->Vorname.' '.$receiver->Nachname.'; ';
 
 			// If it is a prestudent then
 			if (isset($receiver->prestudent_id) && is_numeric($receiver->prestudent_id))
 			{
 				$recipient->id = $receiver->prestudent_id;
+				$id = $receiver->prestudent_id;
 			}
 			else // otherwise it is a person
 			{
 				$recipient->id = $receiver->person_id;
+				$id = $receiver->person_id;
 			}
 
+			$recipients_ids .= '<input type="hidden" name="recipients_ids[]" value="'.$id.'">'."\n";
+
 			$recipientsArray[] = $recipient;
-			$recipientsList .= $receiver->Vorname.' '.$receiver->Nachname.'; ';
-			$persons .= '<input type="hidden" name="persons[]" value="'.$receiver->person_id.'">'."\n";
-			$prestudenten .= '<input type="hidden" name="prestudenten[]" value="'.$receiver->prestudent_id.'">'."\n";
 		}
 
 		// ---------------------------------------------------------------------------------------
@@ -738,12 +750,12 @@ class Messages_model extends CI_Model
 		if (isset(getData($info)[0]->prestudent_id) && is_numeric(getData($info)[0]->prestudent_id))
 		{
 			$variablesResult = $this->messagelib->getMessageVarsPrestudent();
-			$type = '<input type="hidden" id="type" value="prestudents">';
+			$type = '<input type="hidden" id="type" name="type" value="'.self::TYPE_PRESTUDENTS.'">';
 		}
 		else
 		{
 			$variablesResult = $this->messagelib->getMessageVarsPerson();
-			$type = '<input type="hidden" id="type" value="persons">';
+			$type = '<input type="hidden" id="type" name="type" value="'.self::TYPE_PERSONS.'">';
 		}
 		if (isError($variablesResult)) show_error(getError($variablesResult));
 
@@ -780,8 +792,7 @@ class Messages_model extends CI_Model
 			'organisationUnits' => getData($organisationUnits),
 			'senderIsAdmin' => getData($senderIsAdmin),
 			'recipientsArray' => $recipientsArray,
-			'persons' => $persons,
-			'prestudenten' => $prestudenten,
+			'recipients_ids' => $recipients_ids,
 			'relationmessage_id' => $relationmessage,
 			'type' => $type
 		);

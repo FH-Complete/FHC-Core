@@ -73,11 +73,11 @@ class ViewMessage extends FHC_Controller
 		$sendReply = $this->CLMessagesModel->sendReply($receiver_id, $subject, $body, $relationmessage_id, $token);
 		if (isSuccess($sendReply))
 		{
-			$this->load->view('system/messages/htmlSuccess');
+			$this->load->view('system/messages/htmlMessageSentSuccess');
 		}
 		else
 		{
-			$this->load->view('system/messages/htmlError');
+			$this->load->view('system/messages/htmlMessageSentError');
 		}
 	}
 

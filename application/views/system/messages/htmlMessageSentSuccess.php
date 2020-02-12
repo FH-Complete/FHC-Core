@@ -2,7 +2,7 @@
 	$this->load->view(
 		'templates/FHC-Header',
 		array(
-			'title' => 'Message sent failure',
+			'title' => 'Message sent successfully - Nachricht erfolgreich versandt!',
 			'jquery' => true,
 			'bootstrap' => true,
 			'fontawesome' => true,
@@ -36,10 +36,10 @@
 							<div class="panel-heading">
 								<div class="row">
 									<div class="col-xs-6 text-right">
-										An error occurred while sending your message, please try later.
+										Message sent successfully!
 									</div>
 									<div class="col-xs-6">
-										Beim Senden Ihrer Nachricht ist ein Fehler aufgetreten. Bitte versuchen Sie es später erneut.
+										Nachricht erfolgreich versandt!
 									</div>
 								</div>
 							</div>

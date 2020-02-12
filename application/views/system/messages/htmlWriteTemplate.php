@@ -162,8 +162,12 @@
 							<textarea id="tinymcePreview"></textarea>
 						</div>
 
+<<<<<<< Updated upstream
 					<?php echo $persons; ?>
 					<?php echo $prestudenten; ?>
+=======
+					<?php echo $recipients_ids; ?>
+>>>>>>> Stashed changes
 					<?php echo $relationmessage_id; ?>
 					<?php echo $type; ?>
 
