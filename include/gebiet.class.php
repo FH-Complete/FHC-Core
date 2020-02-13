@@ -171,6 +171,11 @@ class gebiet extends basis_db
 			$this->errormsg = 'Maxpunkte muss eine gueltige Zahl sein';
 			return false;
 		}
+		if(!is_numeric($this->offsetpunkte) && $this->offsetpunkte!='')
+		{
+			$this->errormsg = 'Offsetpunkte muss eine gueltige Zahl sein';
+			return false;
+		}
 		if(!is_numeric($this->antwortenprozeile) || $this->antwortenprozeile<=0)
 		{
 			$this->errormsg = 'AntortenProZeile muss eine gueltige Zahl und groesser als 0 sein';
@@ -571,7 +576,8 @@ class gebiet extends basis_db
 				(
 				SELECT level, frage_id, sum(punkte) as punkte
 				FROM testtool.tbl_frage JOIN testtool.tbl_vorschlag USING(frage_id)
-				WHERE gebiet_id=".$this->db_add_param($gebiet_id, FHC_INTEGER)." AND punkte>0 AND level>=".$this->db_add_param($this->level_start)." AND NOT demo
+				WHERE gebiet_id=".$this->db_add_param($gebiet_id, FHC_INTEGER)." AND punkte>0
+				AND level>=".$this->db_add_param($this->level_start)." AND NOT demo
 				GROUP BY level, frage_id
 				) as a
 			GROUP by level, punkte ORDER BY level";
@@ -612,6 +618,133 @@ class gebiet extends basis_db
 		else
 		{
 			$this->errormsg = 'Fehler beim Ermitteln der Maximalpunkte';
+			return false;
+		}
+	}
+
+	/**
+	 * Berechnet die offsetpunkte fuer das Gebiet
+	 *
+	 * @param $gebiet_id
+	 */
+	public function berechneOffsetpunkte($gebiet_id)
+	{
+		if(!$this->load($gebiet_id))
+			return false;
+
+		$qry = "
+			WITH fragen AS (
+				 SELECT tbl_frage.frage_id, tbl_frage.gebiet_id, tbl_frage.level, punkte
+				 FROM testtool.tbl_frage
+						  JOIN testtool.tbl_vorschlag USING (frage_id)
+				 WHERE tbl_vorschlag.aktiv
+				   AND tbl_vorschlag.punkte < 0
+				   AND tbl_frage.demo = false
+				   AND tbl_frage.aktiv
+			),
+			fragenanzahl AS (
+				SELECT gebiet_id, level, levelgleichverteilung,
+					   CASE WHEN levelgleichverteilung
+								THEN
+								ROUND(COALESCE(maxfragen
+											 * ((SELECT count(*) FROM testtool.tbl_frage f WHERE f.level = tbl_frage.level AND f.gebiet_id = tbl_frage.gebiet_id)::decimal)
+											 / (SELECT count(*) FROM testtool.tbl_frage f WHERE f.gebiet_id = tbl_frage.gebiet_id)::decimal
+									, (SELECT count(*) FROM testtool.tbl_frage f WHERE f.level = tbl_frage.level AND f.gebiet_id = tbl_frage.gebiet_id)
+									))
+							ELSE
+								COALESCE(maxfragen, count(*))
+						   END
+						   AS anzahl
+				FROM testtool.tbl_frage
+						 JOIN testtool.tbl_gebiet USING (gebiet_id)
+				WHERE tbl_frage.aktiv
+				  AND tbl_frage.demo = false
+				GROUP BY gebiet_id, level, levelgleichverteilung, maxfragen
+			)
+			SELECT
+				tbl_gebiet.gebiet_id, tbl_gebiet.bezeichnung,
+				tbl_gebiet.multipleresponse,
+				tbl_gebiet.maxpunkte, tbl_gebiet.maxfragen,
+				tbl_gebiet.levelgleichverteilung,
+				tbl_gebiet.level_start,
+				(
+					CASE WHEN tbl_gebiet.levelgleichverteilung  THEN
+								 (CASE WHEN tbl_gebiet.multipleresponse=false THEN
+										   (SELECT sum(frprolevel) FROM
+											   (
+												   SELECT fragen.level, (min(punkte)
+															  * (SELECT anzahl FROM fragenanzahl WHERE fragenanzahl.gebiet_id = fragen.gebiet_id and fragenanzahl.level = fragen.level LIMIT 1)) AS frprolevel
+												   FROM fragen
+												   WHERE fragen.gebiet_id = tbl_gebiet.gebiet_id
+												   GROUP BY fragen.gebiet_id, level
+											   ) pkteprolevel)
+									   ELSE
+										   (SELECT sum(frprolevel) FROM
+											   (
+												   SELECT fragen.level, (sum(punkte)
+													   * (SELECT anzahl FROM fragenanzahl WHERE fragenanzahl.gebiet_id = fragen.gebiet_id and fragenanzahl.level = fragen.level LIMIT 1)) AS frprolevel
+												   FROM fragen
+												   WHERE fragen.gebiet_id = tbl_gebiet.gebiet_id
+													 AND frage_id = (SELECT min(frage_id) FROM fragen fr WHERE fr.gebiet_id = fragen.gebiet_id AND fr.level = fragen.level)
+												   GROUP BY fragen.gebiet_id, level
+											   ) pkteprolevel)
+									 END) *(-1)
+					WHEN tbl_gebiet.level_start IS NOT NULL THEN
+								 (CASE WHEN tbl_gebiet.multipleresponse=false THEN
+											   (
+												   SELECT min(punkte)
+												   FROM fragen
+												   WHERE fragen.gebiet_id = tbl_gebiet.gebiet_id
+												   AND fragen.level = tbl_gebiet.level_start
+											   ) * (SELECT fragenanzahl.anzahl FROM fragenanzahl WHERE fragenanzahl.gebiet_id = tbl_gebiet.gebiet_id AND fragenanzahl.level = tbl_gebiet.level_start LIMIT 1)
+									   ELSE
+											   (SELECT sum(punkte)
+												FROM fragen
+												WHERE fragen.gebiet_id = tbl_gebiet.gebiet_id
+												  AND frage_id = (SELECT min(frage_id) FROM fragen WHERE fragen.gebiet_id = tbl_gebiet.gebiet_id)
+												  AND fragen.level = tbl_gebiet.level_start
+											   )* (SELECT fragenanzahl.anzahl FROM fragenanzahl WHERE fragenanzahl.gebiet_id = tbl_gebiet.gebiet_id AND fragenanzahl.level = tbl_gebiet.level_start LIMIT 1)
+									 END) *(-1)
+					ELSE
+						(CASE WHEN tbl_gebiet.multipleresponse=false THEN
+								 (
+									SELECT min(punkte)
+									 FROM fragen
+									 WHERE fragen.gebiet_id = tbl_gebiet.gebiet_id
+								 ) * (SELECT fragenanzahl.anzahl FROM fragenanzahl WHERE fragenanzahl.gebiet_id = tbl_gebiet.gebiet_id LIMIT 1)
+							 ELSE
+								 (SELECT sum(punkte)
+								  FROM fragen
+								  WHERE fragen.gebiet_id = tbl_gebiet.gebiet_id
+								  AND frage_id = (SELECT min(frage_id) FROM fragen WHERE fragen.gebiet_id = tbl_gebiet.gebiet_id)
+								 )* (SELECT fragenanzahl.anzahl FROM fragenanzahl WHERE fragenanzahl.gebiet_id = tbl_gebiet.gebiet_id LIMIT 1)
+							END) *(-1)
+			
+					END) AS offsetpunkte
+			FROM
+				testtool.tbl_gebiet
+			WHERE
+				EXISTS(
+						SELECT 1 FROM fragen WHERE fragen.gebiet_id=tbl_gebiet.gebiet_id
+					)
+				AND gebiet_id = ".$this->db_add_param($gebiet_id, FHC_INTEGER)."	
+		";
+
+		if($this->db_query($qry))
+		{
+			if($row = $this->db_fetch_object())
+			{
+				return $row->offsetpunkte;
+			}
+			else
+			{
+				$this->errormsg = 'Fehler beim Ermitteln der Offsetpunkte';
+				return false;
+			}
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Ermitteln der Offsetpunkte';
 			return false;
 		}
 	}
