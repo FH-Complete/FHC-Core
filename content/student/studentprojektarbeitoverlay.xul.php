@@ -247,6 +247,7 @@ $is_hidden = (!defined('FAS_STUDIERENDE_PROJEKTARBEIT_VERTRAGSDETAILS_ANZEIGEN')
 							<label value="Lehreinheit" control="student-projektarbeit-menulist-lehreinheit"/>
 							<menulist id="student-projektarbeit-menulist-lehreinheit" disabled="true"
 							          datasources="rdf:null" flex="1"
+									  style="max-width: 600px"
 							          ref="http://www.technikum-wien.at/lehreinheit/liste" >
 								<template>
 									<menupopup>
