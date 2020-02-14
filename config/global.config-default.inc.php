@@ -128,6 +128,9 @@ define('FAS_REIHUNGSTEST_AUFNAHMEGRUPPEN',false);
 // Legt fest, ob Vertragsdetails zum Lehrauftrag im Reiter LektorInnenzuteilung angezeigt werden
 define('FAS_LV_LEKTORINNENZUTEILUNG_VERTRAGSDETAILS_ANZEIGEN', false);
 
+// Legt fest ob bei Fixangestellten Lektoren der Stundensatz vorgeschlagen wird
+define('FAS_LV_LEKTORINNENZUTEILUNG_FIXANGESTELLT_STUNDENSATZ', true);
+
 // Legt fest, ob Vertragsdetails zum Projektauftrag im Reiter Projektarbeit angezeigt werden
 define('FAS_STUDIERENDE_PROJEKTARBEIT_VERTRAGSDETAILS_ANZEIGEN', false);
 

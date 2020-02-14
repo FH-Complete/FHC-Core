@@ -404,8 +404,8 @@ class bisverwendung extends basis_db
 				$obj->verwendung_code = $row->verwendung_code;
 				$obj->mitarbeiter_uid = $row->mitarbeiter_uid;
 				$obj->hauptberufcode = $row->hauptberufcode;
-                $obj->hauptberuflich = $this->db_parse_bool($row->hauptberuflich);
-                $obj->habilitation = $this->db_parse_bool($row->habilitation);
+				$obj->hauptberuflich = $this->db_parse_bool($row->hauptberuflich);
+				$obj->habilitation = $this->db_parse_bool($row->habilitation);
 				$obj->beginn = $row->beginn;
 				$obj->ende = $row->ende;
 				$obj->updatevon = $row->updatevon;
@@ -513,8 +513,8 @@ class bisverwendung extends basis_db
 				$this->verwendung_code = $row->verwendung_code;
 				$this->mitarbeiter_uid = $row->mitarbeiter_uid;
 				$this->hauptberufcode = $row->hauptberufcode;
-                $this->hauptberuflich = $this->db_parse_bool($row->hauptberuflich);
-                $this->habilitation = $this->db_parse_bool($row->habilitation);
+				$this->hauptberuflich = $this->db_parse_bool($row->hauptberuflich);
+				$this->habilitation = $this->db_parse_bool($row->habilitation);
 				$this->beginn = $row->beginn;
 				$this->ende = $row->ende;
 				$this->updatevon = $row->updatevon;
@@ -566,8 +566,8 @@ class bisverwendung extends basis_db
 				$this->verwendung_code = $row->verwendung_code;
 				$this->mitarbeiter_uid = $row->mitarbeiter_uid;
 				$this->hauptberufcode = $row->hauptberufcode;
-                $this->hauptberuflich = $this->db_parse_bool($row->hauptberuflich);
-                $this->habilitation = $this->db_parse_bool($row->habilitation);
+				$this->hauptberuflich = $this->db_parse_bool($row->hauptberuflich);
+				$this->habilitation = $this->db_parse_bool($row->habilitation);
 				$this->beginn = $row->beginn;
 				$this->ende = $row->ende;
 				$this->updatevon = $row->updatevon;
@@ -578,6 +578,69 @@ class bisverwendung extends basis_db
 				$this->dv_art = $row->dv_art;
 				$this->inkludierte_lehre = $row->inkludierte_lehre;
 				$this->zeitaufzeichnungspflichtig = $this->db_parse_bool($row->zeitaufzeichnungspflichtig);
+			}
+			return true;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler bei der Datenbankabfrage';
+			return false;
+		}
+	}
+
+	/**
+	 * Laedt alle Verwendungen eines Mitarbeiters die in einen Datumsbereich fallen
+	 * @param $uid UID des Mitarbeiters
+	 * @param $von
+	 * @param $bis
+	 * @return true wenn ok, false wenn Fehler
+	 */
+	public function getVerwendungRange($uid, $von, $bis)
+	{
+		$datum_obj = new datum();
+		//laden des Datensatzes
+		$qry = "
+		SELECT
+			*
+		FROM
+			bis.tbl_bisverwendung
+		WHERE
+			mitarbeiter_uid=".$this->db_add_param($uid)."
+			AND
+			(
+				".$this->db_add_param($datum_obj->formatDatum($von,'Y-m-d'))." BETWEEN COALESCE(beginn,'1970-01-01') AND COALESCE(ende,'2999-12-31')
+				OR
+				".$this->db_add_param($datum_obj->formatDatum($bis,'Y-m-d'))." BETWEEN COALESCE(beginn,'1970-01-01') AND COALESCE(ende,'2999-12-31')
+			)
+		ORDER BY ende desc;";
+
+		if($this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object())
+			{
+				$obj = new bisverwendung();
+
+				$obj->bisverwendung_id = $row->bisverwendung_id;
+				$obj->ba1code = $row->ba1code;
+				$obj->ba2code = $row->ba2code;
+				$obj->beschausmasscode = $row->beschausmasscode;
+				$obj->verwendung_code = $row->verwendung_code;
+				$obj->mitarbeiter_uid = $row->mitarbeiter_uid;
+				$obj->hauptberufcode = $row->hauptberufcode;
+				$obj->hauptberuflich = $this->db_parse_bool($row->hauptberuflich);
+				$obj->habilitation = $this->db_parse_bool($row->habilitation);
+				$obj->beginn = $row->beginn;
+				$obj->ende = $row->ende;
+				$obj->updatevon = $row->updatevon;
+				$obj->updateamum = $row->updateamum;
+				$obj->insertamum = $row->insertamum;
+				$obj->insertvon = $row->insertvon;
+				$obj->vertragsstunden = $row->vertragsstunden;
+				$obj->dv_art = $row->dv_art;
+				$obj->inkludierte_lehre = $row->inkludierte_lehre;
+				$obj->zeitaufzeichnungspflichtig = $this->db_parse_bool($row->zeitaufzeichnungspflichtig);
+
+				$this->result[] = $obj;
 			}
 			return true;
 		}
