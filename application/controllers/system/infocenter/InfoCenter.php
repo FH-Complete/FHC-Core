@@ -532,6 +532,8 @@ class InfoCenter extends Auth_Controller
 				if (isSuccess($result))
 				{
 					$this->load->model('crm/Dokumentprestudent_model', 'DokumentprestudentModel');
+					$json->retval['nonCriticalErrors'] = array();
+					$json->retval['infoMessages'] = array();
 
 					//set documents which have been formal geprüft to accepted
 					$dokument_kurzbzs = array();
@@ -545,7 +547,7 @@ class InfoCenter extends Auth_Controller
 
 					// acceptresult returns null if no documents to accept
 					if ($acceptresult !== null && isError($acceptresult))
-						$json->retval['nonCriticalErrors'] = 'error when accepting documents in FAS';
+						$json->retval['nonCriticalErrors'][] = 'error when accepting documents in FAS';
 
 					$logparams = array($prestudent_id, $logdata['studiengang_kurzbz'], '');
 
@@ -584,7 +586,7 @@ class InfoCenter extends Auth_Controller
 								);
 
 								if (isError($bewerberresult))
-									$json->retval['nonCriticalErrors'] = 'error when inserting Bewerberstatus';
+									$json->retval['nonCriticalErrors'][] = 'error when inserting Bewerberstatus';
 
 								$rtangetretenres = $this->PrestudentModel->update(
 									$prestudent_id,
@@ -595,10 +597,11 @@ class InfoCenter extends Auth_Controller
 
 								if (isError($rtangetretenres))
 								{
-									$json->retval['nonCriticalErrors'] = 'error when setting reihungstestangetreten';
+									$json->retval['nonCriticalErrors'][] = 'error when setting reihungstestangetreten';
 								}
 								else
 								{
+									$json->retval['infoMessages'][] = $this->p->t('infocenter', 'rtPunkteEintragenInfo');
 									$this->load->model('crm/RtPerson_model', 'RtPersonModel');
 
 									$rtteilgenommenres = $this->RtPersonModel->update(
@@ -612,7 +615,7 @@ class InfoCenter extends Auth_Controller
 									);
 
 									if (isError($rtteilgenommenres))
-										$json->retval['nonCriticalErrors'] = 'error when setting reihungstest teilgenommen';
+										$json->retval['nonCriticalErrors'][] = 'error when setting reihungstest teilgenommen';
 								}
 							}
 						}
