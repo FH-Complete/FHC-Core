@@ -379,71 +379,6 @@ class Recipient_model extends DB_Model
 	}
 
 	/**
-	 * Get all the messages to sent to an organisation unit
-	 */
-	public function getMessagesToSentToOE($oe_kurzbz, $functions, $kontaktType)
-	{
-		// Messages sent to a person that belongs to the recipient organisation unit
-		$sql = 'SELECT mm.message_id,
-						mm.subject,
-						mm.body,
-						mrou.person_id as receiver_id,
-						mrou.sentinfo,
-						mrou.token,
-						mrou.oe_kurzbz,
-						ks.kontakt as sender,
-						kr.kontakt as receiver,
-						mu.mitarbeiter_uid as employeeContact,
-						mb.mitarbeiter_uid as senderemployeeContact
-				  FROM public.tbl_benutzer b
-				  JOIN (
-					  	SELECT uid, oe_kurzbz
-						  FROM public.tbl_benutzerfunktion
-						 WHERE (datum_von IS NULL OR datum_von <= NOW())
-					  	   AND (datum_bis IS NULL OR datum_bis >= NOW())
-						   AND funktion_kurzbz IN ?
-						) bf ON (bf.uid = b.uid)
-				  JOIN public.tbl_msg_recipient mrou ON (mrou.oe_kurzbz = bf.oe_kurzbz)
-				  JOIN public.tbl_msg_message mm ON (mm.message_id = mrou.message_id)
-				  JOIN public.tbl_msg_status ms ON (ms.message_id = mrou.message_id AND ms.person_id = mrou.person_id)
-				  JOIN public.tbl_person pr ON (pr.person_id = mm.person_id)
-				  LEFT JOIN (
-					  SELECT person_id, kontakt FROM public.tbl_kontakt WHERE zustellung = true AND kontakttyp = ?
-				  ) ks ON (ks.person_id = mm.person_id)
-				  LEFT JOIN (
-					  SELECT person_id, kontakt FROM public.tbl_kontakt WHERE zustellung = true AND kontakttyp = ?
-				  ) kr ON (kr.person_id = mrou.person_id)
-				  LEFT JOIN (
-					  SELECT b.person_id,
-							 m.mitarbeiter_uid
-						FROM public.tbl_benutzer b INNER JOIN public.tbl_mitarbeiter m ON(b.uid = m.mitarbeiter_uid)
-					   WHERE b.aktiv = TRUE
-				  ) mu ON (mu.person_id = mrou.person_id)
-				  LEFT JOIN (
-					  SELECT b.person_id,
-							 m.mitarbeiter_uid
-						FROM public.tbl_benutzer b INNER JOIN public.tbl_mitarbeiter m ON(b.uid = m.mitarbeiter_uid)
-					   WHERE b.aktiv = TRUE
-				  ) mb ON (mb.person_id = mm.person_id)
-				 WHERE bf.oe_kurzbz = ?
-				   AND mrou.sent IS NULL
-				   AND mrou.sentinfo IS NULL
-			  GROUP BY mm.message_id,
-	  						mm.subject,
-	  						mm.body,
-	  						mrou.person_id,
-	  						mrou.sentinfo,
-	  						mrou.token,
-	  						mrou.oe_kurzbz,
-	  						ks.kontakt,
-	  						kr.kontakt,
-	  						mu.mitarbeiter_uid,
-	  						mb.mitarbeiter_uid';
-
-		return $this->execQuery($sql, array($functions, $kontaktType, $kontaktType, $oe_kurzbz));
-	}
-
-	/**
 	 * Gets all the sent message by the given person
 	 */
 	public function getSentMessages($person_id)
@@ -482,5 +417,28 @@ class Recipient_model extends DB_Model
 			  ORDER BY mr.sent DESC';
 
 		return $this->execQuery($sql, array($person_id));
+	}
+
+	/**
+	 *
+	 */
+	public function getMessageById($message_id)
+	{
+		$sql = 'SELECT mm.message_id,
+						mm.person_id AS sender_id,
+						mm.subject,
+						mm.body,
+						mm.relationmessage_id,
+						mm.oe_kurzbz AS sender_ou,
+						mr.person_id AS receiver_id,
+						mr.token,
+						mr.sent,
+						mr.sentinfo,
+						mr.oe_kurzbz AS receiver_ou
+				  FROM public.tbl_msg_message mm
+				  JOIN public.tbl_msg_recipient mr ON (mr.message_id = mm.message_id)
+				 WHERE mm.message_id = ?';
+
+		return $this->execQuery($sql, array($message_id));
 	}
 }

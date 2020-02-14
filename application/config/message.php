@@ -12,7 +12,12 @@ $config['message_html_view_url'] = '/system/messages/ViewMessage/toHTML/';
 
 // Change this to CIS Server (https://cis.example.com/index.ci.php) if you are sending Messages from Vilesci
 $config['message_server'] = site_url();
+// Organisation unit function that are allowed to read messages for the organisation unit
 $config['ou_receivers'] = array('ass');
+// Organisation units that will never receive notice emails
+$config['ou_receivers_no_notice'] = array('infocenter');
+// Organisation units that will not send the notice email to the internal account, but to the private one
+$config['ou_receivers_private'] = array('eac', 'ewu', 'scs');
 
 $config['message_redirect_url'] = array();
 $config['message_redirect_url']['fallback'] = site_url('system/messages/ViewMessage/writeReply');

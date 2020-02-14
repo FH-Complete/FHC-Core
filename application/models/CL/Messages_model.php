@@ -21,7 +21,6 @@ class Messages_model extends CI_Model
 		</blockquote>';
 
 	const NO_AUTH_UID = 'online'; // hard coded uid if no authentication is performed
-	const ALT_OE = 'infocenter'; // alternative organisation unit when no one is found for a presetudent
 
 	// Recipients types
 	const TYPE_PERSONS = 'persons';
@@ -91,7 +90,7 @@ class Messages_model extends CI_Model
 			{
 				$ouOptions .= sprintf(
 					"\n".'<option value="%s">%s</option>',
-					is_numeric($ou->prestudent_id) ? $ou->oe_kurzbz : self::ALT_OE,
+					is_numeric($ou->prestudent_id) ? $ou->oe_kurzbz : MessageLib::ALT_OE,
 					$ou->bezeichnung . (is_numeric($ou->prestudent_id) ? '' : ' *')
 				);
 			}
