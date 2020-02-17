@@ -141,9 +141,9 @@ class MessageLib
 	/**
 	 * Gets all NOT sent messages from DB and sends for each of them the notice email
 	 * Does not return anything, it logs info and errors on CI logs and in tbl_msg_recipient table
-	 * Wrapper for _sendNotice.
+	 * Wrapper for _sendNoticeEmail.
 	 */
-	public function sendAllNotices($numberToSent, $numberPerTimeRange, $emailTimeRange, $emailFromSystem)
+	public function sendAllEmailNotices($numberToSent, $numberPerTimeRange, $emailTimeRange, $emailFromSystem)
 	{
 		// Overrides MailLib configs with the given parameters
 		$this->_ci->maillib->overrideConfigs($numberToSent, $numberPerTimeRange, $emailTimeRange, $emailFromSystem);
@@ -157,7 +157,7 @@ class MessageLib
 
 		if (isError($messagesResult)) terminateWithError(getData($messagesResult)); // If an error occurred then log it and terminate
 
-		$sendNotice = $this->_sendNotice(getData($messagesResult));
+		$sendNotice = $this->_sendNoticeEmails(getData($messagesResult));
 
 		if (isError($sendNotice)) terminateWithError(getData($sendNotice)); // If an error occurred then log it and terminate
 	}
@@ -541,148 +541,174 @@ class MessageLib
 	}
 
 	/**
-	 * Sends a notice email that notices to a user about a new received message
-	 * It gets just one message. Wrapper for _sendNotice.
+	 * Sends notice emails to the recipient of a message
 	 */
-	private function _sendOneNotice($message_id)
+	private function _sendNoticeEmails($messageIds)
 	{
-		// Retrieves the message information by message_id
-		$messageResult = $this->_ci->RecipientModel->getMessageById($message_id);
-		if (isError($messageResult)) return $messageRecipientResult; // if an error occured then return it
-		if (!hasData($messageResult)) return error('No data found with the given message id'); // if no data found then return an error
+		// Retrieves the messages information using the given message ids array
+		$messagesResult = $this->_ci->RecipientModel->getMessagesById($messageIds);
+		if (isError($messagesResult)) return $messageRecipientResult; // if an error occured then return it
+		if (!hasData($messagesResult)) return error('No data found with the given message ids'); // if no data found then return an error
 
-		// Contains the message info
-		$message = getData($messageResult)[0];
+		$messages = array(); // all the worked messages will be added here
 
-		// If the recipient organisation unit is in the list of organisation units that do not receive notice emails
-		if (array_search($message->receiver_ou, $this->_ci->config->item(self::CFG_OU_RECEIVERS_NO_NOTICE)))
+		// Loops through $messagesResult and stores data about a message in $message
+		foreach (getData($messagesResult) as $message)
 		{
-			return success('There is no need to send a notice email to this organisation unit');
-		}
-
-		$message->receiverContact = null; // by default set the recipient contact as null
-
-		// If the message was sent to an organisation unit then retrives degree program email
-		if ($message->receiver_id == $this->_ci->config->item(self::CFG_SYSTEM_PERSON_ID) && !isEmptyString($message->receiver_ou))
-		{
-			$this->_ci->load->model('organisation/Studiengang_model', 'StudiengangModel');
-
-			$studiengangResult = $this->_ci->StudiengangModel->loadWhere(array('oe_kurzbz' => $message->receiver_ou));
-			if (isError($studiengangResult)) return $studiengangResult; // if an error occured then return it
-
-			// Use the degree program email
-			if (hasData($studiengangResult)) $message->receiverContact = getData($studiengangResult)[0]->email;
-		}
-		// If message was sent from FAS
-		elseif (!isEmptyString($message->sender_ou))
-		{
-			// If the recipient organisation unit is NOT in the list of organisation units that sent only to private emails
-			if (array_search($message->receiver_ou, $this->_ci->config->item(self::CFG_OU_RECEIVERS_PRIVATE)) === false)
+			// If the recipient organisation unit is in the list of organisation units that do not receive notice emails
+			if (array_search($message->receiver_ou, $this->_ci->config->item(self::CFG_OU_RECEIVERS_NO_NOTICE)))
 			{
-				$this->_ci->load->model('person/Benutzer_model', 'BenutzerModel');
-
-				// And the receiver has an active account for the given organisation unit
-				$benutzerResult = $this->_ci->BenutzerModel->getActiveUserByPersonIdAndOrganisationUnit($message->receiver_id, $message->sender_ou);
-				if (isError($benutzerResult)) return $benutzerResult; // if an error occured then return it
-
-				// Use the uid + domain email
-				if (hasData($benutzerResult)) $message->receiverContact = getData($benutzerResult)[0]->uid .'@'.DOMAIN;
+				// Then there is no need to send a notice email to this organisation unit
 			}
-
-			// Otherwise try with the private email
-			if ($message->receiverContact == null)
+			else // otherwise tries to retrieve the right email contact for the message recipient
 			{
-				$this->_ci->load->model('person/Kontakt_model', 'KontaktModel');
+				$message->receiverContact = null; // by default set the recipient contact as null
 
-				$kontaktResult = $this->_ci->KontaktModel->getContactByPersonId($person_id, self::EMAIL_KONTAKT_TYPE);
-				if (isError($kontaktResult)) return $kontaktResult; // if an error occured then return it
-
-				// Use the private email
-				if (hasData($kontaktResult)) $message->receiverContact = getData($kontaktResult)[0]->kontakt;
-			}
-		}
-		else
-		{
-			$this->_ci->load->model('person/Benutzer_model', 'BenutzerModel');
-
-			// The receiver has an active account for the given organisation unit
-			$benutzerResult = $this->_ci->BenutzerModel->getActiveUserByPersonIdAndOrganisationUnit($message->receiver_id, $message->sender_ou);
-			if (isError($benutzerResult)) return $benutzerResult; // if an error occured then return it
-
-			// Use the uid + domain email
-			if (hasData($benutzerResult))
-			{
-				$this->_ci->load->model('ressource/Mitarbeiter_model', 'MitarbeiterModel');
-
-				$mitarbeiterResult = $this->_ci->MitarbeiterModel->loadWhere(array('mitarbeiter_uid' => getData($benutzerResult)[0]->uid));
-				if (isError($mitarbeiterResult)) return $mitarbeiterResult; // if an error occured then return it
-
-				// If employee
-				if (hasData($mitarbeiterResult))
+				// If the message was sent to an organisation unit then retrives degree program email
+				if ($message->receiver_id == $this->_ci->config->item(self::CFG_SYSTEM_PERSON_ID) && !isEmptyString($message->receiver_ou))
 				{
-					$message->receiverContact = getData($benutzerResult)[0]->uid .'@'.DOMAIN;
+					$this->_ci->load->model('organisation/Studiengang_model', 'StudiengangModel');
+
+					$studiengangResult = $this->_ci->StudiengangModel->loadWhere(array('oe_kurzbz' => $message->receiver_ou));
+					if (isError($studiengangResult)) return $studiengangResult; // if an error occured then return it
+
+					// Use the degree program email
+					if (hasData($studiengangResult)) $message->receiverContact = getData($studiengangResult)[0]->email;
 				}
-				else
+				// If message was sent from FAS
+				elseif (!isEmptyString($message->sender_ou))
 				{
-					$this->_ci->load->model('crm/Prestudent_model', 'PrestudentModel');
-
-					$prestudentResults = $this->_ci->PrestudentModel->getOrganisationunitsByPersonId($message->receiver_id);
-					if (isError($prestudentResults)) return $prestudentResults; // if an error occured then return it
-
-					$inArray = true;
-
-					if (hasData($prestudentResults))
+					// If the recipient organisation unit is NOT in the list of organisation units that sent only to private emails
+					if (array_search($message->receiver_ou, $this->_ci->config->item(self::CFG_OU_RECEIVERS_PRIVATE)) === false)
 					{
-						$organisationUnits = getData($prestudentResults);
+						$this->_ci->load->model('person/Benutzer_model', 'BenutzerModel');
 
-						foreach ($organisationUnits as $organisationUnit)
+						// And the receiver has an active account for the given organisation unit
+						$benutzerResult = $this->_ci->BenutzerModel->getActiveUserByPersonIdAndOrganisationUnit($message->receiver_id, $message->sender_ou);
+						if (isError($benutzerResult)) return $benutzerResult; // if an error occured then return it
+
+						// Use the uid + domain email
+						if (hasData($benutzerResult)) $message->receiverContact = getData($benutzerResult)[0]->uid .'@'.DOMAIN;
+					}
+
+					// Otherwise try with the private email
+					if ($message->receiverContact == null)
+					{
+						$privateEmailResult = $this->_getPrivateEmail($message->receiver_id);
+						if (isError($privateEmailResult)) return $privateEmailResult; // if an error occured then return it
+
+						// Use the private email
+						if (hasData($privateEmailResult)) $message->receiverContact = getData($privateEmailResult);
+					}
+				}
+				else // the recipient is a person
+				{
+					$this->_ci->load->model('person/Benutzer_model', 'BenutzerModel');
+
+					// The recipient has an active account
+					$benutzerResult = $this->_ci->BenutzerModel->loadWhere(array('person_id' => $message->receiver_id, 'aktiv' => true));
+					if (isError($benutzerResult)) return $benutzerResult; // if an error occured then return it
+
+					// If the user is present and active
+					if (hasData($benutzerResult))
+					{
+						$this->_ci->load->model('ressource/Mitarbeiter_model', 'MitarbeiterModel');
+
+						$mitarbeiterResult = $this->_ci->MitarbeiterModel->loadWhere(array('mitarbeiter_uid' => getData($benutzerResult)[0]->uid));
+						if (isError($mitarbeiterResult)) return $mitarbeiterResult; // if an error occured then return it
+
+						// If employee
+						if (hasData($mitarbeiterResult))
 						{
-							// If the recipient organisation unit is NOT in the list of organisation units that sent only to private emails
-							if (array_search($message->receiver_ou, $this->_ci->config->item(self::CFG_OU_RECEIVERS_PRIVATE)) === false)
+							$message->receiverContact = getData($benutzerResult)[0]->uid .'@'.DOMAIN; // Use the uid + domain email
+						}
+						else // ...otherwise...
+						{
+							$this->_ci->load->model('crm/Prestudent_model', 'PrestudentModel');
+
+							// ...try to get all the prestudent for this receiver
+							$prestudentResults = $this->_ci->PrestudentModel->getOrganisationunitsByPersonId($message->receiver_id);
+							if (isError($prestudentResults)) return $prestudentResults; // if an error occured then return it
+
+							// If there are presetudent
+							if (hasData($prestudentResults))
 							{
-								$inArray = false;
-								break;
+								$inArray = true;
+								$organisationUnits = getData($prestudentResults);
+
+								// Look if any of the organization units of this prestudent are in the list of the
+								// organization units that will not send the notice email to the internal account
+								foreach ($organisationUnits as $organisationUnit)
+								{
+									// If the recipient organisation unit is NOT in the list of organisation units that sent only to private emails
+									if (array_search($organisationUnit, $this->_ci->config->item(self::CFG_OU_RECEIVERS_PRIVATE)) === false)
+									{
+										$inArray = false;
+										break;
+									}
+								}
+
+								// If the recipient prestudent organization unit is not in in the list of the
+								// organization units that will not send the notice email to the internal account
+								if (!$inArray)
+								{
+									// Then use the private email
+									$privateEmailResult = $this->_getPrivateEmail($message->receiver_id);
+									if (isError($privateEmailResult)) return $privateEmailResult; // if an error occured then return it
+
+									if (hasData($privateEmailResult)) $message->receiverContact = getData($privateEmailResult);
+								}
+								else // Use the most recent UID + domain
+								{
+									$this->_ci->BenutzerModel->resetQuery();
+
+									$this->_ci->BenutzerModel->addOrder('updateamum', 'DESC');
+									$this->_ci->BenutzerModel->addOrder('insertamum', 'DESC');
+
+									$benutzerResult = $this->_ci->BenutzerModel->loadWhere(array('person_id' => $message->receiver_id));
+									if (isError($benutzerResult)) return $benutzerResult; // if an error occured then return it
+
+									$message->receiverContact = getData($benutzerResult)[0]->uid .'@'.DOMAIN; // Use the uid + domain email
+								}
 							}
 						}
+					}
+					else // otherwise use the private email
+					{
+						$privateEmailResult = $this->_getPrivateEmail($message->receiver_id);
+						if (isError($privateEmailResult)) return $privateEmailResult; // if an error occured then return it
 
-						if (!$inArray)
-						{
-							$this->_ci->load->model('person/Kontakt_model', 'KontaktModel');
-
-							$kontaktResult = $this->_ci->KontaktModel->getContactByPersonId($message->receiver_id, self::EMAIL_KONTAKT_TYPE);
-							if (isError($kontaktResult)) return $kontaktResult; // if an error occured then return it
-
-							// Use the private email
-							if (hasData($kontaktResult)) $message->receiverContact = getData($kontaktResult)[0]->kontakt;
-						}
-						else
-						{
-
-						}
+						// Use the private email
+						if (hasData($privateEmailResult)) $message->receiverContact = getData($privateEmailResult);
 					}
 				}
 			}
-			else // use the private email
-			{
-				$this->_ci->load->model('person/Kontakt_model', 'KontaktModel');
 
-				$kontaktResult = $this->_ci->KontaktModel->getContactByPersonId($message->receiver_id, self::EMAIL_KONTAKT_TYPE);
-				if (isError($kontaktResult)) return $kontaktResult; // if an error occured then return it
-
-				// Use the private email
-				if (hasData($kontaktResult)) $message->receiverContact = getData($kontaktResult)[0]->kontakt;
-			}
+			$messages[] = $message; // add new message to be noticed into the messages array
 		}
 
-		var_dump_to_error_log($message);
+		return $this->_sendNoticeEmail($messages);
+	}
 
-		return $this->_sendNotice(array($message));
+	/**
+	 *
+	 */
+	private function _getPrivateEmail($person_id)
+	{
+		$this->_ci->load->model('person/Kontakt_model', 'KontaktModel');
+
+		$getPrivateEmail = $this->_ci->KontaktModel->getContactByPersonId($person_id, self::EMAIL_KONTAKT_TYPE);
+
+		if (hasData($getPrivateEmail)) return success(getData($getPrivateEmail)[0]->kontakt);
+		else return success();
+
+		return $getPrivateEmail;
 	}
 
 	/**
 	 * Core method to send one or more email notices for one or more messages
 	 */
-	private function _sendNotice($messagesResult)
+	private function _sendNoticeEmail($messages)
 	{
 		// Prefix for all links that will be subsequently generated
 		$prefixLink = $this->_ci->config->item(self::CFG_MESSAGE_SERVER).$this->_ci->config->item(self::CFG_MESSAGE_HTML_VIEW_URL);
@@ -694,24 +720,10 @@ class MessageLib
 		$fsEmailNoticeTemplateTXT = $this->_loadFsNoticeEmailTemplate(self::NOTICE_TEMPLATE_FALLBACK_TXT);
 
 		// Loops through all the messages to be sent
-		foreach ($messagesResult as $messageData)
+		foreach ($messages as $messageData)
 		{
 			// Checks if this person has a valid email address where to send the notice email
-			// NOTE: this is a NON blocking error!
-			if (isEmptyString($messageData->receiverContact))
-			{
-				// Set in database why this email is NOT going to be send
-				$sse = $this->_setSentError(
-					$messageData->message_id,
-					$messageData->receiver_id,
-					'This person or organization unit does not have an email account',
-					$messageData->sentinfo
-				);
-
-				// If database error occurred then return it
-				if (isError($sse)) return $sse;
-			}
-			else
+			if (!isEmptyString($messageData->receiverContact))
 			{
 				// Create a link to the controller to view the message using a token
 				$viewMessageLink = $prefixLink.$messageData->token;
@@ -817,9 +829,7 @@ class MessageLib
 			foreach ($savedMessages as $message_id)
 			{
 				// Send message notice via email!
-				$sendNotice = $this->_sendOneNotice($message_id);
-
-				var_dump_to_error_log($sendNotice);
+				$sendNotice = $this->_sendNoticeEmails(array($message_id));
 
 				// If an error occurred then return it
 				if (isError($sendNotice)) return $sendNotice;

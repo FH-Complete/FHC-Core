@@ -58,7 +58,7 @@
 							&nbsp;
 							<div class="col-lg-7">
 
-								<input id="subject" type="text" value="<?php echo $subject; ?>">
+								<input id="subject" name="subject" type="text" value="<?php echo $subject; ?>">
 
 							</div>
 						</div>

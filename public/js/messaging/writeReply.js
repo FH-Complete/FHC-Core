@@ -13,7 +13,7 @@ function sendReply()
 			receiver_id: $('#receiver_id').val(),
 			relationmessage_id: $('#relationmessage_id').val(),
 			token: $('#token').val(),
-			subject: $('#subject').html(),
+			subject: $('#subject').val(),
 			body: tinyMCE.get("body").getContent()
 		},
 		{

@@ -422,7 +422,7 @@ class Recipient_model extends DB_Model
 	/**
 	 *
 	 */
-	public function getMessageById($message_id)
+	public function getMessagesById($messageIds)
 	{
 		$sql = 'SELECT mm.message_id,
 						mm.person_id AS sender_id,
@@ -437,8 +437,8 @@ class Recipient_model extends DB_Model
 						mr.oe_kurzbz AS receiver_ou
 				  FROM public.tbl_msg_message mm
 				  JOIN public.tbl_msg_recipient mr ON (mr.message_id = mm.message_id)
-				 WHERE mm.message_id = ?';
+				 WHERE mm.message_id IN ?';
 
-		return $this->execQuery($sql, array($message_id));
+		return $this->execQuery($sql, array($messageIds));
 	}
 }
