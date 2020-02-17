@@ -632,6 +632,49 @@ class gebiet extends basis_db
 		if(!$this->load($gebiet_id))
 			return false;
 
+		$checkqry = "SELECT COUNT (uniquepoints) AS count_uniquepoints
+					FROM (
+							 SELECT gebiet_id,
+									level,
+									count(DISTINCT punkte),
+									CASE WHEN count(DISTINCT punkte) > 1 THEN FALSE ELSE TRUE END AS uniquepoints
+							 FROM (
+									  SELECT tbl_frage.gebiet_id,
+											 tbl_frage.level,
+											 CASE WHEN multipleresponse THEN sum(punkte) ELSE min(punkte) END AS punkte
+									  FROM testtool.tbl_frage
+											   JOIN testtool.tbl_vorschlag USING (frage_id)
+											   JOIN testtool.tbl_gebiet USING (gebiet_id)
+									  WHERE tbl_vorschlag.aktiv
+										AND tbl_vorschlag.punkte < 0
+										AND tbl_frage.demo = false
+										AND tbl_frage.aktiv
+										AND gebiet_id = ".$this->db_add_param($gebiet_id, FHC_INTEGER)."
+									  GROUP BY tbl_frage.gebiet_id, multipleresponse, tbl_frage.level, tbl_frage.frage_id
+								  ) p
+							 GROUP BY gebiet_id, level
+						 ) pu
+					WHERE uniquepoints = FALSE";
+
+		if($this->db_query($checkqry))
+		{
+			if($row = $this->db_fetch_object())
+			{
+				if (!is_numeric($row->count_uniquepoints) || $row->count_uniquepoints > 0)
+					$this->errormsg = 'Negativpunkte sind nicht für alle Fragen gleich hoch!';
+			}
+			else
+			{
+				$this->errormsg = 'Fehler beim Prüfen der Offsetpunkte';
+				return false;
+			}
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Prüfen der Offsetpunkte';
+			return false;
+		}
+
 		$qry = "
 			WITH fragen AS (
 				 SELECT tbl_frage.frage_id, tbl_frage.gebiet_id, tbl_frage.level, punkte
@@ -688,7 +731,7 @@ class gebiet extends basis_db
 													 AND frage_id = (SELECT min(frage_id) FROM fragen fr WHERE fr.gebiet_id = fragen.gebiet_id AND fr.level = fragen.level)
 												   GROUP BY fragen.gebiet_id, level
 											   ) pkteprolevel)
-									 END) *(-1)
+									 END)
 					WHEN tbl_gebiet.level_start IS NOT NULL THEN
 								 (CASE WHEN tbl_gebiet.multipleresponse=false THEN
 											   (
@@ -696,31 +739,31 @@ class gebiet extends basis_db
 												   FROM fragen
 												   WHERE fragen.gebiet_id = tbl_gebiet.gebiet_id
 												   AND fragen.level = tbl_gebiet.level_start
-											   ) * (SELECT fragenanzahl.anzahl FROM fragenanzahl WHERE fragenanzahl.gebiet_id = tbl_gebiet.gebiet_id AND fragenanzahl.level = tbl_gebiet.level_start LIMIT 1)
+											   ) * (SELECT anzahl FROM fragenanzahl WHERE fragenanzahl.gebiet_id = tbl_gebiet.gebiet_id AND fragenanzahl.level = tbl_gebiet.level_start LIMIT 1)
 									   ELSE
 											   (SELECT sum(punkte)
 												FROM fragen
 												WHERE fragen.gebiet_id = tbl_gebiet.gebiet_id
 												  AND frage_id = (SELECT min(frage_id) FROM fragen WHERE fragen.gebiet_id = tbl_gebiet.gebiet_id)
 												  AND fragen.level = tbl_gebiet.level_start
-											   )* (SELECT fragenanzahl.anzahl FROM fragenanzahl WHERE fragenanzahl.gebiet_id = tbl_gebiet.gebiet_id AND fragenanzahl.level = tbl_gebiet.level_start LIMIT 1)
-									 END) *(-1)
+											   )* (SELECT anzahl FROM fragenanzahl WHERE fragenanzahl.gebiet_id = tbl_gebiet.gebiet_id AND fragenanzahl.level = tbl_gebiet.level_start LIMIT 1)
+									 END)
 					ELSE
 						(CASE WHEN tbl_gebiet.multipleresponse=false THEN
 								 (
 									SELECT min(punkte)
 									 FROM fragen
 									 WHERE fragen.gebiet_id = tbl_gebiet.gebiet_id
-								 ) * (SELECT fragenanzahl.anzahl FROM fragenanzahl WHERE fragenanzahl.gebiet_id = tbl_gebiet.gebiet_id LIMIT 1)
+								 ) * (SELECT anzahl FROM fragenanzahl WHERE fragenanzahl.gebiet_id = tbl_gebiet.gebiet_id LIMIT 1)
 							 ELSE
 								 (SELECT sum(punkte)
 								  FROM fragen
 								  WHERE fragen.gebiet_id = tbl_gebiet.gebiet_id
 								  AND frage_id = (SELECT min(frage_id) FROM fragen WHERE fragen.gebiet_id = tbl_gebiet.gebiet_id)
-								 )* (SELECT fragenanzahl.anzahl FROM fragenanzahl WHERE fragenanzahl.gebiet_id = tbl_gebiet.gebiet_id LIMIT 1)
-							END) *(-1)
+								 )* (SELECT anzahl FROM fragenanzahl WHERE fragenanzahl.gebiet_id = tbl_gebiet.gebiet_id LIMIT 1)
+							END)
 			
-					END) AS offsetpunkte
+					END) * (-1) AS offsetpunkte
 			FROM
 				testtool.tbl_gebiet
 			WHERE
