@@ -617,7 +617,7 @@ else // LOGIN Site (vor Login)
     echo '<div class="form-group"> ';
     echo '<label for="datepicker" class="col-sm-offset-1 col-sm-4 control-label">Geburtsdatum | Date of Birth</label>';
     echo '<div class="col-sm-3">';
-    echo '<input type="text" id="datepicker" class="form-control" name="gebdatum" value="'.$date->formatDatum($gebdatum,'d.m.Y').'">';
+    echo '<input type="text" id="datepicker" class="form-control" name="gebdatum" value="'.$date->formatDatum($gebdatum,'d.m.Y').'" placeholder="DD.MM.YYYY">';
     echo '</div>'; // end col-xs
     echo '</div>'; // end form-group
 
