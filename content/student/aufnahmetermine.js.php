@@ -242,12 +242,14 @@ function AufnahmeTermineAuswahl()
 	var teilgenommen = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#teilgenommen" ));
 	var punkte = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#punkte" ));
 	var studienplan_id = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#studienplan_id" ));
+	var studienplan_studiengang_kz = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#studienplan_studiengang_kz" ));
     var endpunkte_inkl_gebiete = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#endpunkte_inkl_gebiete" ));
     var endpunkte_exkl_gebiete = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#endpunkte_exkl_gebiete" ));
     var typ = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#typ" ));
 
 	document.getElementById('aufnahmetermine-textbox-rt_person_id').value=rt_person_id;
 	document.getElementById('aufnahmetermine-textbox-person_id').value=person_id;
+	document.getElementById('aufnahmetermine-textbox-studienplan_studiengang_kz').value=studienplan_studiengang_kz;
 	document.getElementById('aufnahmetermine-checkbox-neu').checked=false;
 	document.getElementById('aufnahmetermine-textbox-anmeldungreihungstest').value=anmeldedatum;
 	MenulistSelectItemOnValue('aufnahmetermine-menulist-reihungstest', rt_id);
@@ -325,6 +327,7 @@ function AufnahemTermineReihungstestPunkteTransmit()
 {
 	var reihungstest_id = document.getElementById('aufnahmetermine-menulist-reihungstest').value;
 	var person_id = document.getElementById('aufnahmetermine-textbox-person_id').value;
+	var studienplan_studiengang_kz = document.getElementById('aufnahmetermine-textbox-studienplan_studiengang_kz').value;
 
 	var url = '<?php echo APP_ROOT ?>content/student/studentDBDML.php';
 	var req = new phpRequest(url,'','');
@@ -332,6 +335,7 @@ function AufnahemTermineReihungstestPunkteTransmit()
 	req.add('type', 'getReihungstestPunkte');
 
 	req.add('person_id', person_id);
+	req.add('studienplan_studiengang_kz', studienplan_studiengang_kz);
 	req.add('reihungstest_id', reihungstest_id);
 	var response = req.executePOST();
 
@@ -436,6 +440,7 @@ function AufnahmeTermineResetFields()
 	document.getElementById('aufnahmetermine-textbox-anmeldungreihungstest').value='';
 	document.getElementById('aufnahmetermine-menulist-reihungstest').value='';
 	document.getElementById('aufnahmetermine-textbox-person_id').value='';
+	document.getElementById('aufnahmetermine-textbox-studienplan_studiengang_kz').value='';
 	document.getElementById('aufnahmetermine-checkbox-neu').checked=true;
 	document.getElementById('aufnahmetermine-textbox-rt_person_id').value='';
 	document.getElementById('aufnahmetermine-menulist-studienplan').value=AufnahmeTermineStudienplanID;
