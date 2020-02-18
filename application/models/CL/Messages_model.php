@@ -62,15 +62,31 @@ class Messages_model extends CI_Model
 		// Loads needed models
 		$this->load->model('system/MsgStatus_model', 'MsgStatusModel');
 
-		// Set date used to insert
-		$statusData = array(
-			'message_id' => $message_id,
-			'person_id' => $person_id,
-			'status' => MSG_STATUS_READ,
-			'insertvon' => getAuthUID()
+		$statuResult = $this->MsgStatusModel->loadWhere(
+			array(
+				'message_id' => $message_id,
+				'person_id' => $person_id,
+				'status' => MSG_STATUS_READ
+			)
 		);
 
-		return $this->MsgStatusModel->insert($statusData); // insert and return result
+		if (isError($statuResult)) return $statuResult;
+		if (!hasData($statuResult))
+		{
+			// Set date used to insert
+			return $this->MsgStatusModel->insert(
+				array(
+					'message_id' => $message_id,
+					'person_id' => $person_id,
+					'status' => MSG_STATUS_READ,
+					'insertvon' => getAuthUID()
+				)
+			); // insert and return result
+		}
+		else
+		{
+			return success('Already set as read');
+		}
 	}
 
 	/**
@@ -348,23 +364,43 @@ class Messages_model extends CI_Model
 		elseif ($type == self::TYPE_PRESTUDENTS) // otherwise prestudents were given
 		{
 			$msgVarsData = $this->MessageModel->getMsgVarsDataByPrestudentId($recipients_ids);
+
+			// Retrieve organisation unit for the recipients
+			$organisationUnitsResult = $this->PrestudentModel->getOrganisationunits($recipients_ids);
+			if (isError($organisationUnitsResult)) return $organisationUnitsResult;
+			if (hasData($organisationUnitsResult)) $senderOUArray = getData($organisationUnitsResult);
 		}
 		if (isError($msgVarsData)) show_error(getError($msgVarsData));
 		if (!hasData($msgVarsData)) show_error('No recipients were given');
 
+		$senderOU = null; // sender organisation unit only for presetudents
+		$receiversCounter = 0; // a counter
+
+		// Looping on receivers data
 		foreach (getData($msgVarsData) as $receiver)
 		{
 			$msgVarsDataArray = $this->_lowerReplaceSpaceArrayKeys((array)$receiver); // replaces array keys
-
 			$parsedSubject = parseText($subject, $msgVarsDataArray);
 			$parsedBody = parseText($body, $msgVarsDataArray);
+
+			// If exist an organisation unit for this prestudent and it is valid
+			if (isset($senderOUArray[$receiversCounter])
+				&& isset($senderOUArray[$receiversCounter]->oe_kurzbz)
+				&& !isEmptyString($senderOUArray[$receiversCounter]->oe_kurzbz))
+			{
+				$senderOU = $senderOUArray[$receiversCounter]->oe_kurzbz;
+			}
+			else
+			{
+				$senderOU = null;
+			}
 
 			$message = $this->messagelib->sendMessageUser(
 				$msgVarsDataArray['person_id'],	// receiverPersonId
 				$parsedSubject,					// subject
 				$parsedBody,					// body
 				$sender_id,						// sender_id
-				null,							// senderOU
+				$senderOU,						// senderOU
 				$relationmessage_id,			// relationmessage_id
 				MSG_PRIORITY_NORMAL				// priority
 			);
@@ -378,6 +414,8 @@ class Messages_model extends CI_Model
 				$personLog = $this->_personLog($sender_id, $msgVarsDataArray['person_id'], getData($message)[0]);
 				if (isError($personLog)) return $personLog;
 			}
+
+			$receiversCounter++; // increment the counter
 		}
 
 		return success('Messages sent successfully');
@@ -452,7 +490,8 @@ class Messages_model extends CI_Model
 			show_error('An error occurred while sending your message, please contact the site administrator');
 		}
 
-		$sender_id = getData($messageResult)[0]->receiver_id;
+		$sender_id = getAuthPersonId();
+		if (!is_numeric($sender_id)) return error('The current logged user person_id is not defined');
 
 		$message = $this->messagelib->sendMessageUser(
 			$receiver_id,			// receiverPersonId
@@ -484,6 +523,7 @@ class Messages_model extends CI_Model
 		if (isEmptyString($body)) return error('Body is an empty string');
 
 		$sender_id = getAuthPersonId();
+		if (!is_numeric($sender_id)) return error('The current logged user person_id is not defined');
 
 		$message = $this->messagelib->sendMessageOU(
 			$receiverOU,			// receiverPersonId
@@ -672,7 +712,6 @@ class Messages_model extends CI_Model
 	 */
 	private function _prepareHtmlWriteTemplate($info, $message_id, $recipient_id)
 	{
-
 		// Checks that info parameter is valid
 		if (isError($info)) show_error(getError($info));
 		if (!hasData($info)) show_error('No recipients were given');

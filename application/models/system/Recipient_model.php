@@ -314,7 +314,7 @@ class Recipient_model extends DB_Model
 						mm.relationmessage_id,
 						mm.subject,
 						mm.body,
-						mr.sent AS sent,
+						mm.insertamum AS sent,
 						p.vorname,
 						p.nachname,
 						MAX(ms.status) AS status,
@@ -325,13 +325,11 @@ class Recipient_model extends DB_Model
 				  JOIN public.tbl_msg_status ms ON (ms.message_id = mr.message_id AND ms.person_id = mr.person_id)
 				  JOIN public.tbl_person p ON (p.person_id = mm.person_id)
 				 WHERE mr.person_id = ?
-				   AND mr.sent IS NOT NULL
-				   AND mr.sentinfo IS NULL
 			  GROUP BY mr.message_id,
 			  			mm.relationmessage_id,
 						mm.subject,
 						mm.body,
-						mr.sent,
+						mm.insertamum,
 						p.vorname,
 						p.nachname,
 						ms.person_id,
@@ -342,7 +340,7 @@ class Recipient_model extends DB_Model
 						mm.relationmessage_id,
 						mm.subject,
 						mm.body,
-						mrou.sent AS sent,
+						mm.insertamum AS sent,
 						pr.vorname,
 						pr.nachname,
 						MAX(ms.status) AS status,
@@ -362,13 +360,11 @@ class Recipient_model extends DB_Model
 				  JOIN public.tbl_msg_status ms ON (ms.message_id = mrou.message_id AND ms.person_id = mrou.person_id)
 				  JOIN public.tbl_person pr ON (pr.person_id = mm.person_id)
 				 WHERE p.person_id = ?
-				   AND mrou.sent IS NOT NULL
-				   AND mrou.sentinfo IS NULL
 			  GROUP BY mrou.message_id,
 			  			mm.relationmessage_id,
 						mm.subject,
 						mm.body,
-						mrou.sent,
+						mm.insertamum,
 						pr.vorname,
 						pr.nachname,
 						ms.person_id,
@@ -387,7 +383,7 @@ class Recipient_model extends DB_Model
 						mm.relationmessage_id,
 						mm.subject,
 						mm.body,
-						mr.sent,
+						mm.insertamum AS sent,
 						p.person_id,
 						p.vorname,
 						p.nachname,
@@ -397,24 +393,22 @@ class Recipient_model extends DB_Model
 						mr.token
 				  FROM public.tbl_msg_message mm
 				  JOIN public.tbl_msg_recipient mr ON (mr.message_id = mm.message_id)
-				  JOIN public.tbl_msg_status ms ON (ms.message_id = mm.message_id AND mr.person_id = mr.person_id)
+				  JOIN public.tbl_msg_status ms ON (ms.message_id = mm.message_id AND ms.person_id = mr.person_id)
 				  JOIN public.tbl_person p ON (p.person_id = mr.person_id)
 			 LEFT JOIN public.tbl_organisationseinheit oe ON (oe.oe_kurzbz = mr.oe_kurzbz)
 				 WHERE mm.person_id = ?
-				   AND mr.sent IS NOT NULL
-				   AND mr.sentinfo IS NULL
 			  GROUP BY mm.message_id,
 			  			mm.relationmessage_id,
 						mm.subject,
 						mm.body,
-						mr.sent,
+						mm.insertamum,
 						p.person_id,
 						p.vorname,
 						p.nachname,
 						ms.person_id,
 						oe.bezeichnung,
 						mr.token
-			  ORDER BY mr.sent DESC';
+			  ORDER BY sent DESC';
 
 		return $this->execQuery($sql, array($person_id));
 	}

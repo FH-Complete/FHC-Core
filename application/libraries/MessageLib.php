@@ -575,8 +575,9 @@ class MessageLib
 					// Use the degree program email
 					if (hasData($studiengangResult)) $message->receiverContact = getData($studiengangResult)[0]->email;
 				}
-				// If message was sent from FAS
-				elseif (!isEmptyString($message->sender_ou))
+				// If message was sent from FAS and NOT from infocenter
+				elseif (!isEmptyString($message->sender_ou)
+					&& !array_search($message->sender_ou, $this->_ci->config->item(self::CFG_OU_RECEIVERS_NO_NOTICE)))
 				{
 					// If the recipient organisation unit is NOT in the list of organisation units that sent only to private emails
 					if (array_search($message->receiver_ou, $this->_ci->config->item(self::CFG_OU_RECEIVERS_PRIVATE)) === false)
@@ -592,7 +593,7 @@ class MessageLib
 					}
 
 					// Otherwise try with the private email
-					if ($message->receiverContact == null)
+					if (isEmptyString($message->receiverContact))
 					{
 						$privateEmailResult = $this->_getPrivateEmail($message->receiver_id);
 						if (isError($privateEmailResult)) return $privateEmailResult; // if an error occured then return it
