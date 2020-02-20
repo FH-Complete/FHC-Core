@@ -34,6 +34,7 @@
 	$tablewidget = isset($tablewidget) ? $tablewidget : false;
 	$tabulator = isset($tabulator) ? $tabulator : false;
 	$tinymce = isset($tinymce) ? $tinymce : false;
+	$widgets = isset($widgets) ? $widgets : false;
 ?>
 
 <!-- Header start -->
@@ -63,6 +64,9 @@
 			// Font Awesome CSS
 			if ($fontawesome === true) generateCSSsInclude('vendor/components/font-awesome/css/font-awesome.min.css');
 
+			// PivotUI CSS
+			if ($pivotui === true) generateCSSsInclude('vendor/nicolaskruchten/pivottable/dist/pivot.min.css');
+
 			// SB Admin 2 template CSS
 			if ($sbadmintemplate === true)
 			{
@@ -72,12 +76,6 @@
 
 			// Securimage CSS
 			if ($captcha === true) generateCSSsInclude('vendor/dapphp/securimage/securimage.css');
-
-			// PivotUI CSS
-			if ($pivotui === true)
-			{
-				generateCSSsInclude('vendor/nicolaskruchten/pivottable/dist/pivot.min.css');
-			}
 
 			// Table sorter CSS
 			if ($tablesorter === true)
@@ -92,6 +90,9 @@
 				generateCSSsInclude('vendor/olifolkerd/tabulator/dist/css/bootstrap/tabulator_bootstrap.min.css');
 				generateCSSsInclude('public/css/Tabulator.css');
 			}
+
+			// Tinymce CSS
+			if ($tinymce === true) generateCSSsInclude('public/css/TinyMCE.css');
 
 			// --------------------------------------------------------------------------------------------------------
 			// From public folder
@@ -108,11 +109,12 @@
 			// NavigationWidget CSS
 			if ($navigationwidget === true) generateCSSsInclude('public/css/NavigationWidget.css');
 
+			// HTML Widget CSS
+			if ($widgets === true) generateCSSsInclude('public/css/Widgets.css');
+
 			// Eventually required CSS
 			generateCSSsInclude($customCSSs); // Eventually required CSS
 
-			// CSS End
-			// --------------------------------------------------------------------------------------------------------
 
 			// --------------------------------------------------------------------------------------------------------
 			// Javascripts
@@ -140,11 +142,7 @@
 
 			// jQuery checkboxes
 			// NOTE: keep it after jQuery includes
-			if ($jquerycheckboxes === true)
-			{
-				generateJSsInclude('vendor/rmariuzzo/jquery-checkboxes/dist/jquery.checkboxes-1.0.7.min.js');
-			}
-
+			if ($jquerycheckboxes === true) generateJSsInclude('vendor/rmariuzzo/jquery-checkboxes/dist/jquery.checkboxes-1.0.7.min.js');
 			// jQuery treetable
 			// NOTE: keep it after jQuery includes
 			if ($jquerytreetable === true) generateJSsInclude('vendor/ludo/jquery-treetable/jquery.treetable.js');
@@ -173,10 +171,7 @@
 			}
 
 			// PivotUI JS
-			if ($pivotui === true)
-			{
-				generateJSsInclude('vendor/nicolaskruchten/pivottable/dist/pivot.min.js');
-			}
+			if ($pivotui === true) generateJSsInclude('vendor/nicolaskruchten/pivottable/dist/pivot.min.js');
 
 			// Table sorter JS
 			if ($tablesorter === true)
@@ -187,11 +182,7 @@
 			}
 
 			// Tabulator JS
-			if ($tabulator === true)
-			{
-				generateJSsInclude('vendor/olifolkerd/tabulator/dist/js/tabulator.min.js');
-				generateJSsInclude('vendor/olifolkerd/tabulator/dist/js/jquery_wrapper.min.js');
-			}
+			if ($tabulator === true) generateJSsInclude('vendor/olifolkerd/tabulator/dist/js/tabulator.min.js');
 
 			// Tinymce JS
 			if ($tinymce === true) generateJSsInclude('vendor/tinymce/tinymce/tinymce.min.js');

@@ -37,11 +37,11 @@
 					<?php
 						$elements = ${DropdownWidget::WIDGET_DATA_ELEMENTS_ARRAY_NAME};
 						$selectedElements = ${DropdownWidget::SELECTED_ELEMENT};
-						
+
 						foreach($elements as $element)
 						{
 							$selected = '';
-							
+
 							if (is_array($selectedElements))
 							{
 								foreach($selectedElements as $selectedElement)

@@ -2,12 +2,12 @@
 	$this->load->view(
 		'templates/FHC-Header',
 		array(
-			'title' => 'MessageSent',
+			'title' => 'Message sent successfully - Nachricht erfolgreich versandt!',
 			'jquery' => true,
 			'bootstrap' => true,
 			'fontawesome' => true,
 			'sbadmintemplate' => true,
-			'customCSSs' => array('public/css/sbadmin2/admintemplate_contentonly.css', 'public/css/messaging/messageSent.css')
+			'customCSSs' => array('public/css/sbadmin2/admintemplate_contentonly.css', 'public/css/messaging/message.css')
 		)
 	);
 ?>
@@ -16,11 +16,6 @@
 	<div id="wrapper">
 		<div id="page-wrapper">
 			<div class="container-fluid">
-
-			<?php
-				if ($success)
-				{
-			?>
 
 				<div class="row">
 
@@ -79,11 +74,6 @@
 
 					</div>
 				</div>
-
-			<?php
-				}
-			?>
-
 			</div>
 		</div>
 	</div>

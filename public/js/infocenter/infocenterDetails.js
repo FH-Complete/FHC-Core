@@ -680,7 +680,7 @@ var InfocenterDetails = {
 	sendFreigabeMessage: function(prestudentid, vorlage_kurzbz, msgvars)
 	{
 		FHC_AjaxClient.ajaxCallPost(
-			'system/Messages/sendJson',
+			'system/messages/Messages/sendExplicitTemplateJson',
 			{
 				"prestudents": prestudentid,
 				"vorlage_kurzbz": vorlage_kurzbz,

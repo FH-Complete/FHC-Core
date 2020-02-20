@@ -98,9 +98,7 @@ function _parseMailContent($vorlage_kurzbz, $vorlage_data)
 			!isEmptyString($result->retval[0]->text))
 		{
 			// Parses template text
-			$parsedText = $ci->vorlagelib->parseVorlagetext($result->retval[0]->text, $vorlage_data);
-
-			return $parsedText;
+			return parseText($result->retval[0]->text, $vorlage_data);
 		}
 	}
 }

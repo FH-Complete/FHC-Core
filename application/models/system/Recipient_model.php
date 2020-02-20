@@ -25,7 +25,8 @@ class Recipient_model extends DB_Model
 						 ks.kontakt,
 						 p.nachname,
 						 p.vorname,
-						 b.uid
+						 b.uid,
+						 mr.sent
 					FROM public.tbl_msg_recipient mr INNER JOIN public.tbl_msg_message mm USING (message_id)
 						INNER JOIN public.tbl_person p ON (mm.person_id = p.person_id)
 						LEFT JOIN public.tbl_benutzer b ON (mr.person_id = b.person_id)
@@ -56,11 +57,13 @@ class Recipient_model extends DB_Model
 						m.oe_kurzbz,
 						s.status,
 						s.statusinfo,
-						s.insertamum as statusamum
+						s.insertamum as statusamum,
+						b.uid
 				  FROM public.tbl_msg_recipient r JOIN public.tbl_msg_message m USING (message_id)
 						JOIN (
 							SELECT * FROM public.tbl_msg_status WHERE status < ? ORDER BY insertamum DESC, status DESC
-						) s ON (r.message_id = s.message_id AND r.person_id = s.person_id)
+						) s ON (r.message_id = s.message_id AND r.person_id = s.person_id),
+						LEFT JOIN public.tbl_benutzer b USING(person_id)
 				 WHERE r.token = ?
 				 LIMIT 1';
 
@@ -205,7 +208,7 @@ class Recipient_model extends DB_Model
 	 * @param limit specifies the number of messages to get
 	 * @param message_id specifies a single message
 	 */
-	public function getMessages($kontaktType, $sent, $limit = null, $message_id = null)
+	public function getMessages($kontaktType, $message_id = null, $limit = 1)
 	{
 		$query = 'SELECT mm.message_id,
 						 ks.kontakt as sender,
@@ -216,13 +219,14 @@ class Recipient_model extends DB_Model
 						 mr.token,
 						 mm.subject,
 						 mm.body,
-						 mr.sentinfo
+						 mr.sentinfo,
+						 mr.oe_kurzbz
 					FROM public.tbl_msg_recipient mr INNER JOIN public.tbl_msg_message mm USING (message_id)
 						LEFT JOIN (
-							SELECT person_id, kontakt FROM public.tbl_kontakt WHERE kontakttyp = ?
+							SELECT person_id, kontakt FROM public.tbl_kontakt WHERE zustellung = true AND kontakttyp = ?
 						) ks ON (ks.person_id = mm.person_id)
 						LEFT JOIN (
-							SELECT person_id, kontakt FROM public.tbl_kontakt WHERE kontakttyp = ?
+							SELECT person_id, kontakt FROM public.tbl_kontakt WHERE zustellung = true AND kontakttyp = ?
 						) kr ON (kr.person_id = mr.person_id)
 						LEFT JOIN (
 							SELECT b.person_id,
@@ -235,21 +239,12 @@ class Recipient_model extends DB_Model
 								   m.mitarbeiter_uid
 							  FROM public.tbl_benutzer b INNER JOIN public.tbl_mitarbeiter m ON(b.uid = m.mitarbeiter_uid)
 							 WHERE b.aktiv = TRUE
-						) ms ON (ms.person_id = mm.person_id)';
+						) ms ON (ms.person_id = mm.person_id)
+					WHERE mr.sent IS NULL';
 
 		$parametersArray = array($kontaktType, $kontaktType);
 
-		if (is_null($sent) || $sent == '')
-		{
-			$query .= ' WHERE mr.sent IS NULL';
-		}
-		else
-		{
-			array_push($parametersArray, $sent);
-			$query .= ' WHERE mr.sent = ?';
-		}
-
-		if (!is_null($message_id))
+		if (is_numeric($message_id))
 		{
 			array_push($parametersArray, $message_id);
 			$query .= ' AND mm.message_id = ?';
@@ -257,7 +252,7 @@ class Recipient_model extends DB_Model
 
 		$query .= ' ORDER BY mr.insertamum ASC';
 
-		if (!is_null($limit))
+		if (is_numeric($limit))
 		{
 			$query .= ' LIMIT ?';
 			array_push($parametersArray, $limit);
@@ -306,5 +301,138 @@ class Recipient_model extends DB_Model
 		}
 
 		return $this->execQuery($sql, $parametersArray);
+	}
+
+	/**
+	 * - Gets the directly recieved messages using the given person id
+	 * - Gets the recieved messages from an organisation unit where this person plays a role given by the parameter functions
+	 */
+	public function getReceivedMessages($person_id, $functions)
+	{
+		$sql = '-- Messages sent directly to the person
+				SELECT mr.message_id,
+						mm.relationmessage_id,
+						mm.subject,
+						mm.body,
+						mm.insertamum AS sent,
+						p.vorname,
+						p.nachname,
+						MAX(ms.status) AS status,
+						ms.person_id AS statusPersonId,
+						mr.token
+				  FROM public.tbl_msg_recipient mr
+				  JOIN public.tbl_msg_message mm ON (mm.message_id = mr.message_id)
+				  JOIN public.tbl_msg_status ms ON (ms.message_id = mr.message_id AND ms.person_id = mr.person_id)
+				  JOIN public.tbl_person p ON (p.person_id = mm.person_id)
+				 WHERE mr.person_id = ?
+			  GROUP BY mr.message_id,
+			  			mm.relationmessage_id,
+						mm.subject,
+						mm.body,
+						mm.insertamum,
+						p.vorname,
+						p.nachname,
+						ms.person_id,
+						mr.token
+				 UNION
+				-- Messages sent to a person that belongs to the recipient organisation unit
+				SELECT mrou.message_id,
+						mm.relationmessage_id,
+						mm.subject,
+						mm.body,
+						mm.insertamum AS sent,
+						pr.vorname,
+						pr.nachname,
+						MAX(ms.status) AS status,
+						ms.person_id AS statusPersonId,
+						mrou.token
+				  FROM public.tbl_person p
+				  JOIN public.tbl_benutzer b ON (b.person_id = p.person_id)
+				  JOIN (
+					  	SELECT uid, oe_kurzbz
+						  FROM public.tbl_benutzerfunktion
+						 WHERE (datum_von IS NULL OR datum_von <= NOW())
+					  	   AND (datum_bis IS NULL OR datum_bis >= NOW())
+						   AND funktion_kurzbz IN ?
+						) bf ON (bf.uid = b.uid)
+				  JOIN public.tbl_msg_recipient mrou ON (mrou.oe_kurzbz = bf.oe_kurzbz)
+				  JOIN public.tbl_msg_message mm ON (mm.message_id = mrou.message_id)
+				  JOIN public.tbl_msg_status ms ON (ms.message_id = mrou.message_id AND ms.person_id = mrou.person_id)
+				  JOIN public.tbl_person pr ON (pr.person_id = mm.person_id)
+				 WHERE p.person_id = ?
+			  GROUP BY mrou.message_id,
+			  			mm.relationmessage_id,
+						mm.subject,
+						mm.body,
+						mm.insertamum,
+						pr.vorname,
+						pr.nachname,
+						ms.person_id,
+						mrou.token
+			  ORDER BY sent DESC';
+
+		return $this->execQuery($sql, array($person_id, $functions, $person_id));
+	}
+
+	/**
+	 * Gets all the sent message by the given person
+	 */
+	public function getSentMessages($person_id)
+	{
+		$sql = 'SELECT mm.message_id,
+						mm.relationmessage_id,
+						mm.subject,
+						mm.body,
+						mm.insertamum AS sent,
+						p.person_id,
+						p.vorname,
+						p.nachname,
+						MAX(ms.status) AS status,
+						ms.person_id AS statusPersonId,
+						oe.bezeichnung AS oe,
+						mr.token
+				  FROM public.tbl_msg_message mm
+				  JOIN public.tbl_msg_recipient mr ON (mr.message_id = mm.message_id)
+				  JOIN public.tbl_msg_status ms ON (ms.message_id = mm.message_id AND ms.person_id = mr.person_id)
+				  JOIN public.tbl_person p ON (p.person_id = mr.person_id)
+			 LEFT JOIN public.tbl_organisationseinheit oe ON (oe.oe_kurzbz = mr.oe_kurzbz)
+				 WHERE mm.person_id = ?
+			  GROUP BY mm.message_id,
+			  			mm.relationmessage_id,
+						mm.subject,
+						mm.body,
+						mm.insertamum,
+						p.person_id,
+						p.vorname,
+						p.nachname,
+						ms.person_id,
+						oe.bezeichnung,
+						mr.token
+			  ORDER BY sent DESC';
+
+		return $this->execQuery($sql, array($person_id));
+	}
+
+	/**
+	 *
+	 */
+	public function getMessagesById($messageIds)
+	{
+		$sql = 'SELECT mm.message_id,
+						mm.person_id AS sender_id,
+						mm.subject,
+						mm.body,
+						mm.relationmessage_id,
+						mm.oe_kurzbz AS sender_ou,
+						mr.person_id AS receiver_id,
+						mr.token,
+						mr.sent,
+						mr.sentinfo,
+						mr.oe_kurzbz AS receiver_ou
+				  FROM public.tbl_msg_message mm
+				  JOIN public.tbl_msg_recipient mr ON (mr.message_id = mm.message_id)
+				 WHERE mm.message_id IN ?';
+
+		return $this->execQuery($sql, array($messageIds));
 	}
 }
