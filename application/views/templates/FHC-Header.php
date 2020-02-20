@@ -182,7 +182,11 @@
 			}
 
 			// Tabulator JS
-			if ($tabulator === true) generateJSsInclude('vendor/olifolkerd/tabulator/dist/js/tabulator.min.js');
+			if ($tabulator === true)
+			{
+				generateJSsInclude('vendor/olifolkerd/tabulator/dist/js/tabulator.min.js');
+				generateJSsInclude('vendor/olifolkerd/tabulator/dist/js/jquery_wrapper.min.js');
+			}
 
 			// Tinymce JS
 			if ($tinymce === true) generateJSsInclude('vendor/tinymce/tinymce/tinymce.min.js');

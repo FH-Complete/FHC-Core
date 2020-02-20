@@ -30,6 +30,7 @@ require_once('../../../include/kontakt.class.php');
 require_once('../../../include/adresse.class.php');
 require_once('../../../include/datum.class.php');
 require_once('../../../include/nation.class.php');
+require_once('../../../include/geschlecht.class.php');
 require_once('../../../include/'.EXT_FKT_PATH.'/generateuid.inc.php');
 
 $db = new basis_db();
@@ -932,9 +933,18 @@ echo '<input type="text" id="vornamen" maxlength="32" size="30" name="vornamen" 
 echo '<tr><td>Nachname *</td><td><input type="text" maxlength="64" size="30" id="nachname" name="nachname" value="'.$nachname.'" /></td></tr>';
 echo '<tr><td>Titel(Post)</td><td><input type="text" id="titelpost" name="titelpost" maxlength="64" size="30" value="'.$titelpost.'" /></td></tr>';
 echo '<tr><td>Geschlecht *</td><td><SELECT id="geschlecht" name="geschlecht" onchange="GeschlechtChange()">';
-echo '<OPTION value="m" '.($geschlecht=='m'?'selected':'').'>m&auml;nnlich</OPTION>';
-echo '<OPTION value="w" '.($geschlecht=='w'?'selected':'').'>weiblich</OPTION>';
-echo '<OPTION value="u" '.($geschlecht=='u'?'selected':'').'>unbekannt</OPTION>';
+$geschlecht_obj = new geschlecht();
+$geschlecht_obj->getAll();
+
+foreach($geschlecht_obj->result as $row_geschlecht)
+{
+	if($geschlecht == $row_geschlecht->geschlecht)
+		$selected = 'selected';
+	else
+		$selected = '';
+
+	echo '<OPTION value="'.$row_geschlecht->geschlecht.'" '.$selected.'>'.$row_geschlecht->bezeichnung_mehrsprachig_arr[DEFAULT_LANGUAGE].'</OPTION>';
+}
 echo '</SELECT>';
 echo '</td></tr>';
 echo '<tr><td>SVNR</td><td><input type="text" id="svnr" size="30" maxlength="16" name="svnr" value="'.$svnr.'" onblur="GeburtsdatumEintragen()" /></td></tr>';

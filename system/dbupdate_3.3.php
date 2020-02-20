@@ -3488,6 +3488,193 @@ if ($result = @$db->db_query("SELECT 1 FROM system.tbl_webservicetyp WHERE webse
 	}
 }
 
+// Add new Table for gender
+// Add FK to public.tbl_person and Drop old Check Constraint
+if(!$result = @$db->db_query("SELECT 1 FROM public.tbl_geschlecht LIMIT 1"))
+{
+	$qry = "
+		CREATE TABLE public.tbl_geschlecht
+		(
+			geschlecht character(1) NOT NULL,
+			bezeichnung_mehrsprachig varchar(255)[],
+			sort smallint
+		);
+		COMMENT ON TABLE public.tbl_geschlecht IS 'Key-Table of Gender';
+		ALTER TABLE public.tbl_geschlecht ADD CONSTRAINT pk_tbl_geschlecht PRIMARY KEY (geschlecht);
+
+		INSERT INTO public.tbl_geschlecht(geschlecht, bezeichnung_mehrsprachig, sort) VALUES ('m', '{\"männlich\",\"male\"}', 1);
+		INSERT INTO public.tbl_geschlecht(geschlecht, bezeichnung_mehrsprachig, sort) VALUES ('w', '{\"weiblich\",\"female\"}', 2);
+		INSERT INTO public.tbl_geschlecht(geschlecht, bezeichnung_mehrsprachig, sort) VALUES ('x', '{\"divers\",\"divers\"}', 3);
+		INSERT INTO public.tbl_geschlecht(geschlecht, bezeichnung_mehrsprachig, sort) VALUES ('u', '{\"unbekannt\",\"unknown\"}', 4);
+
+		ALTER TABLE public.tbl_person ADD CONSTRAINT fk_tbl_person_geschlecht FOREIGN KEY (geschlecht) REFERENCES public.tbl_geschlecht (geschlecht) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+		ALTER TABLE public.tbl_person DROP CONSTRAINT tbl_person_geschlecht;
+
+		GRANT SELECT ON TABLE public.tbl_geschlecht TO web;
+		GRANT SELECT ON TABLE public.tbl_geschlecht TO wawi;
+		GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE public.tbl_geschlecht TO vilesci;
+	";
+
+	if(!$db->db_query($qry))
+		echo '<strong>public.tbl_geschlecht: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>public.tbl_geschlecht hinzugefügt. Check Constraint für Geschlecht entfernt.';
+}
+
+if($result = $db->db_query("SELECT * FROM pg_proc WHERE proname = 'transform_geschlecht'"))
+{
+	if ($db->db_num_rows($result) == 0)
+	{
+		$qry = '
+		CREATE OR REPLACE FUNCTION transform_geschlecht(character, date) RETURNS character
+		LANGUAGE plpgsql
+		AS $_$
+			DECLARE geschlecht ALIAS FOR $1;
+			DECLARE gebdatum ALIAS FOR $2;
+
+			BEGIN
+				IF geschlecht=\'x\' THEN
+					IF date_part(\'day\', gebdatum)::int%2=0 THEN
+						geschlecht:=\'m\';
+					ELSE
+						geschlecht:=\'w\';
+					END IF;
+				END IF;
+			RETURN geschlecht;
+			END;
+		$_$;';
+		if(!$db->db_query($qry))
+			echo '<strong>transform_geschlecht: '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>Function transform_geschlecht hinzugefügt.';
+	}
+}
+
+// Add column offset to testtool.tbl_gebiet
+if(!$result = @$db->db_query("SELECT offsetpunkte FROM testtool.tbl_gebiet LIMIT 1"))
+{
+	$qry = "ALTER TABLE testtool.tbl_gebiet ADD COLUMN offsetpunkte numeric(8,4)";
+
+	if(!$db->db_query($qry))
+		echo '<strong>testtool.tbl_gebiet: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>testtool.tbl_gebiet: Spalte offsetpunkte hinzugefuegt';
+}
+
+// ADD COLUMN offset to testtool.vw_auswertung_ablauf
+if(!$result = @$db->db_query("SELECT offsetpunkte FROM testtool.vw_auswertung_ablauf LIMIT 1"))
+{
+	// CREATE OR REPLACE VIEW testtool.vw_auswertung_ablauf
+	$qry = '
+		CREATE OR REPLACE VIEW testtool.vw_auswertung_ablauf AS (
+			SELECT
+				tbl_gebiet.gebiet_id,
+				tbl_gebiet.bezeichnung AS gebiet,
+				tbl_ablauf.reihung,
+				tbl_gebiet.maxpunkte,
+				tbl_pruefling.pruefling_id,
+				tbl_pruefling.prestudent_id,
+				tbl_person.vorname,
+				tbl_person.nachname,
+				tbl_person.gebdatum,
+				tbl_person.geschlecht,
+				tbl_pruefling.semester,
+				upper(tbl_studiengang.typ::character varying(1)::text || tbl_studiengang.kurzbz::text) AS stg_kurzbz,
+				tbl_studiengang.bezeichnung AS stg_bez,
+				tbl_pruefling.registriert,
+				tbl_pruefling.idnachweis,
+				( SELECT sum(tbl_vorschlag.punkte) AS sum
+					   FROM testtool.tbl_vorschlag
+						 JOIN testtool.tbl_antwort USING (vorschlag_id)
+						 JOIN testtool.tbl_frage USING (frage_id)
+					  WHERE tbl_antwort.pruefling_id = tbl_pruefling.pruefling_id AND tbl_frage.gebiet_id = tbl_gebiet.gebiet_id
+				) AS punkte,
+				tbl_rt_person.rt_id AS reihungstest_id,
+				tbl_ablauf.gewicht,
+				tbl_studiengang.studiengang_kz,
+				tbl_gebiet.offsetpunkte
+			FROM
+				testtool.tbl_pruefling
+			 JOIN testtool.tbl_ablauf ON tbl_ablauf.studiengang_kz = tbl_pruefling.studiengang_kz
+			 JOIN testtool.tbl_gebiet USING (gebiet_id)
+			 JOIN public.tbl_prestudent USING (prestudent_id)
+			 JOIN public.tbl_person USING (person_id)
+			 JOIN public.tbl_rt_person USING (person_id)
+			 JOIN lehre.tbl_studienplan ON tbl_studienplan.studienplan_id = tbl_rt_person.studienplan_id
+			 JOIN lehre.tbl_studienordnung ON tbl_studienordnung.studienordnung_id = tbl_studienplan.studienordnung_id
+			 JOIN public.tbl_studiengang ON tbl_prestudent.studiengang_kz = tbl_studiengang.studiengang_kz
+			WHERE NOT (tbl_ablauf.gebiet_id IN
+				(
+				SELECT tbl_kategorie.gebiet_id
+				FROM testtool.tbl_kategorie
+				)
+			) AND tbl_studienordnung.studiengang_kz = tbl_pruefling.studiengang_kz
+           )';
+
+	if(!$db->db_query($qry))
+		echo '<strong>testtool.vw_auswertung_ablauf: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>testtool.vw_auswertung_ablauf view created';
+}
+
+// ADD COLUMN offset to testtool.vw_auswertung_ablauf
+if(!$result = @$db->db_query("SELECT offsetpunkte FROM testtool.vw_auswertung LIMIT 1"))
+{
+	// CREATE OR REPLACE VIEW testtool.vw_auswertung_ablauf
+	$qry = '
+					CREATE OR REPLACE VIEW testtool.vw_auswertung AS
+			SELECT
+				tbl_gebiet.gebiet_id,
+				tbl_gebiet.bezeichnung AS gebiet,
+				tbl_gebiet.maxpunkte,
+				tbl_pruefling.pruefling_id,
+				tbl_pruefling.prestudent_id,
+				tbl_person.vorname,
+				tbl_person.nachname,
+				tbl_person.gebdatum,
+				tbl_person.geschlecht,
+				tbl_pruefling.semester,
+				upper(tbl_studiengang.typ::character varying(1)::text || tbl_studiengang.kurzbz::text) AS stg_kurzbz,
+				tbl_studiengang.bezeichnung AS stg_bez,
+				tbl_pruefling.registriert,
+				tbl_pruefling.idnachweis,
+				(
+					SELECT
+						sum(tbl_vorschlag.punkte) AS sum
+					FROM
+						testtool.tbl_vorschlag
+						JOIN testtool.tbl_antwort USING (vorschlag_id)
+						JOIN testtool.tbl_frage USING (frage_id)
+					WHERE
+						tbl_antwort.pruefling_id = tbl_pruefling.pruefling_id
+						AND tbl_frage.gebiet_id = tbl_gebiet.gebiet_id
+				) AS punkte,
+				tbl_rt_person.rt_id as reihungstest_id,
+				tbl_ablauf.gewicht,
+				tbl_person.person_id,
+				tbl_gebiet.offsetpunkte
+			FROM
+				testtool.tbl_pruefling
+				JOIN testtool.tbl_ablauf ON (tbl_ablauf.studiengang_kz = tbl_pruefling.studiengang_kz AND tbl_ablauf.semester = tbl_pruefling.semester)
+				JOIN testtool.tbl_gebiet USING (gebiet_id)
+				JOIN public.tbl_prestudent USING (prestudent_id)
+				JOIN public.tbl_person USING (person_id)
+				JOIN public.tbl_studiengang ON tbl_prestudent.studiengang_kz = tbl_studiengang.studiengang_kz
+				JOIN public.tbl_rt_person USING (person_id)
+				JOIN lehre.tbl_studienplan ON (tbl_studienplan.studienplan_id = tbl_rt_person.studienplan_id)
+				JOIN lehre.tbl_studienordnung ON (tbl_studienordnung.studienordnung_id = tbl_studienplan.studienordnung_id)
+			WHERE
+				tbl_studienordnung.studiengang_kz = tbl_prestudent.studiengang_kz
+				AND NOT (tbl_ablauf.gebiet_id IN ( SELECT tbl_kategorie.gebiet_id
+					FROM testtool.tbl_kategorie));';
+
+	if(!$db->db_query($qry))
+		echo '<strong>testtool.vw_auswertung: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>testtool.vw_auswertung view created';
+}
+
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
 
@@ -3665,6 +3852,7 @@ $tabellen=array(
 	"public.tbl_firmatag"  => array("firma_id","tag","insertamum","insertvon"),
 	"public.tbl_fotostatus"  => array("fotostatus_kurzbz","beschreibung"),
 	"public.tbl_funktion"  => array("funktion_kurzbz","beschreibung","aktiv","fachbereich","semester"),
+	"public.tbl_geschlecht"  => array("geschlecht","bezeichnung_mehrsprachig","sort"),
 	"public.tbl_geschaeftsjahr"  => array("geschaeftsjahr_kurzbz","start","ende","bezeichnung"),
 	"public.tbl_gruppe"  => array("gruppe_kurzbz","studiengang_kz","semester","bezeichnung","beschreibung","sichtbar","lehre","aktiv","sort","mailgrp","generiert","updateamum","updatevon","insertamum","insertvon","ext_id","orgform_kurzbz","gid","content_visible","gesperrt","zutrittssystem","aufnahmegruppe","direktinskription"),
 	"public.tbl_kontakt"  => array("kontakt_id","person_id","kontakttyp","anmerkung","kontakt","zustellung","updateamum","updatevon","insertamum","insertvon","ext_id","standort_id"),
@@ -3728,7 +3916,7 @@ $tabellen=array(
 	"testtool.tbl_ablauf_vorgaben"  => array("ablauf_vorgaben_id","studiengang_kz","sprache","sprachwahl","content_id","insertamum","insertvon","updateamum", "updatevon"),
 	"testtool.tbl_antwort"  => array("antwort_id","pruefling_id","vorschlag_id"),
 	"testtool.tbl_frage"  => array("frage_id","kategorie_kurzbz","gebiet_id","level","nummer","demo","insertamum","insertvon","updateamum","updatevon","aktiv"),
-	"testtool.tbl_gebiet"  => array("gebiet_id","kurzbz","bezeichnung","beschreibung","zeit","multipleresponse","kategorien","maxfragen","zufallfrage","zufallvorschlag","levelgleichverteilung","maxpunkte","insertamum", "insertvon", "updateamum", "updatevon", "level_start","level_sprung_auf","level_sprung_ab","antwortenprozeile","bezeichnung_mehrsprachig"),
+	"testtool.tbl_gebiet"  => array("gebiet_id","kurzbz","bezeichnung","beschreibung","zeit","multipleresponse","kategorien","maxfragen","zufallfrage","zufallvorschlag","levelgleichverteilung","maxpunkte","insertamum", "insertvon", "updateamum", "updatevon", "level_start","level_sprung_auf","level_sprung_ab","antwortenprozeile","bezeichnung_mehrsprachig", "offsetpunkte"),
 	"testtool.tbl_kategorie"  => array("kategorie_kurzbz","gebiet_id"),
 	"testtool.tbl_kriterien"  => array("gebiet_id","kategorie_kurzbz","punkte","typ"),
 	"testtool.tbl_pruefling"  => array("pruefling_id","prestudent_id","studiengang_kz","idnachweis","registriert","semester"),

@@ -145,12 +145,16 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 						</row>
 						<row>
 							<label value="Geschlecht" control="student-detail-menulist-geschlecht"/>
-							<menulist id="student-detail-menulist-geschlecht" disabled="true">
-								<menupopup>
-										<menuitem value="m" label="maennlich"/>
-										<menuitem value="w" label="weiblich"/>
-										<menuitem value="u" label="unbekannt"/>
-								</menupopup>
+							<menulist id="student-detail-menulist-geschlecht" disabled="true"
+								datasources="<?php echo APP_ROOT ?>rdf/geschlecht.rdf.php"
+								ref="http://www.technikum-wien.at/geschlecht">
+								<template>
+									<menupopup>
+										<menuitem value="rdf:http://www.technikum-wien.at/geschlecht/rdf#geschlecht"
+											label="rdf:http://www.technikum-wien.at/geschlecht/rdf#bezeichnung"
+											uri="rdf:*"/>
+										</menupopup>
+								</template>
 							</menulist>
 							<label value="Familienstand" control="student-detail-menulist-familienstand"/>
 							<menulist id="student-detail-menulist-familienstand" disabled="true">
@@ -475,7 +479,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 							</hbox>
 							<hbox>
 								<label value="Priorität" control="student-prestudent-textbox-priorisierung"/>
-								<?php 
+								<?php
 									$readonly = 'readonly="true"';
 									$rechte = new benutzerberechtigung();
 									$rechte->getBerechtigungen($user);

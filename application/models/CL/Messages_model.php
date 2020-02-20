@@ -271,9 +271,9 @@ class Messages_model extends CI_Model
 		if (isError($isEmployeeResult)) show_error(getError($isEmployeeResult));
 		if (hasData($isEmployeeResult)) $isEmployee = true;
 
-		// If the sender is an employee and are present configurations to reply
+		// If the sender is not an employee and are present configurations to reply
 		$hrefReply = '';
-		if ($isEmployee && !isEmptyString($this->config->item(MessageLib::CFG_REDIRECT_VIEW_MESSAGE_URL)))
+		if (!$isEmployee && !isEmptyString($this->config->item(MessageLib::CFG_REDIRECT_VIEW_MESSAGE_URL)))
 		{
 			$hrefReply = $this->config->item(MessageLib::CFG_MESSAGE_SERVER).
 				$this->config->item(MessageLib::CFG_REDIRECT_VIEW_MESSAGE_URL).
