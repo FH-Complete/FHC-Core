@@ -472,6 +472,7 @@ class Messages_model extends CI_Model
 
 	/**
 	 * Send a reply to a single recipient for a message identified by a token (no templates are used)
+	 * NOTE: this method could be also called from not authenticated controllers
 	 */
 	public function sendReply($receiver_id, $subject, $body, $relationmessage_id, $token)
 	{
@@ -490,8 +491,9 @@ class Messages_model extends CI_Model
 			show_error('An error occurred while sending your message, please contact the site administrator');
 		}
 
-		$sender_id = getAuthPersonId();
-		if (!is_numeric($sender_id)) return error('The current logged user person_id is not defined');
+		// If the user is logged then use its person id as sender id, otherwise get the receiver id of the previous message
+		$sender_id = isLogged() ? getAuthPersonId() : getData($messageResult)[0]->receiver_id;
+		if (!is_numeric($sender_id)) return error('The sender id is not valid');
 
 		$message = $this->messagelib->sendMessageUser(
 			$receiver_id,			// receiverPersonId
