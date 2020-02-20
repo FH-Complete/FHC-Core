@@ -3462,62 +3462,63 @@ if(!$result = @$db->db_query("SELECT orgform_kurzbz FROM public.tbl_bankverbindu
 }
 
 // iban und bic zu vw_msg_vars hinzufügen
-if(!$result = @$db->db_query('SELECT "IBAN Studiengang", "BIC Studiengang", "Studiengangskennzahl", "Einstiegssemester", "Einstiegsstudiensemester", "Vorname Studiengangsassistenz", "Nachname Studiengangsassistenz", "Durchwahl Studiengangsassistenz", "Relative Priorität" FROM public.vw_msg_vars LIMIT 1'))
+if(!$result = @$db->db_query('SELECT "IBAN Studiengang", "BIC Studiengang", "Studiengangskennzahl", "Einstiegssemester", "Einstiegsstudiensemester", "Vorname Studiengangsassistenz", "Nachname Studiengangsassistenz", "Durchwahl Studiengangsassistenz", "Relative Prio" FROM public.vw_msg_vars LIMIT 1'))
 {
 	$qry = '
 	CREATE OR REPLACE VIEW public.vw_msg_vars AS (
 		SELECT DISTINCT ON(p.person_id, pr.prestudent_id) p.person_id,
-														  pr.prestudent_id AS prestudent_id,
-														  p.nachname AS "Nachname",
-														  p.vorname AS "Vorname",
-														  p.anrede AS "Anrede",
-														  a.strasse AS "Strasse",
-														  a.ort AS "Ort",
-														  a.plz AS "PLZ",
-														  a.gemeinde AS "Gemeinde",
-														  a.langtext AS "Nation",
-														  ke.kontakt AS "Email",
-														  kt.kontakt AS "Telefon",
-														  s.bezeichnung AS "Studiengang DE",
-														  s.english AS "Studiengang EN",
-														  st.bezeichnung AS "Typ",
-														  last_prestudent_status.orgform_kurzbz AS "Orgform",
-														  p.zugangscode AS "Zugangscode",
-														  bk.iban AS "IBAN Studiengang",
-														  bk.bic AS "BIC Studiengang",
-														  s.studiengang_kz AS "Studiengangskennzahl",
-														  first_prestudent_status.ausbildungssemester AS "Einstiegssemester",
-														  first_prestudent_status.studiensemester AS "Einstiegsstudiensemester",
-														  ass.vorname AS "Vorname Studiengangsassistenz",
-														  ass.nachname AS "Nachname Studiengangsassistenz",
-														  ass.telefonklappe AS "Durchwahl Studiengangsassistenz",
-														  (SELECT count(*)
-														   FROM (
-																	SELECT pss.prestudent_id, pss.person_id, priorisierung,
-																		   (
-																			   SELECT status_kurzbz
-																			   FROM public.tbl_prestudentstatus
-																			   WHERE prestudent_id = pss.prestudent_id
-																			   ORDER BY datum DESC,
-																						tbl_prestudentstatus.insertamum DESC LIMIT 1
-																		   ) AS laststatus
-																	FROM public.tbl_prestudent pss
-																	JOIN public.tbl_prestudentstatus USING (prestudent_id)
-																	WHERE person_id = (
-																		SELECT person_id
-																		FROM public.tbl_prestudent
-																		WHERE prestudent_id = pr.prestudent_id
-																	)
-																	  AND studiensemester_kurzbz = (
-																		SELECT studiensemester_kurzbz
-																		FROM public.tbl_prestudentstatus
-																		WHERE prestudent_id = pr.prestudent_id
-																		  AND status_kurzbz = \'Interessent\' LIMIT 1
-																	)
-																	  AND status_kurzbz = \'Interessent\'
-																) prest
-														   WHERE laststatus NOT IN (\'Abbrecher\', \'Abgewiesener\', \'Absolvent\')
-														   AND priorisierung <= pr.priorisierung) AS "Relative Priorität"
+		  pr.prestudent_id AS prestudent_id,
+		  p.nachname AS "Nachname",
+		  p.vorname AS "Vorname",
+		  p.anrede AS "Anrede",
+		  a.strasse AS "Strasse",
+		  a.ort AS "Ort",
+		  a.plz AS "PLZ",
+		  a.gemeinde AS "Gemeinde",
+		  a.langtext AS "Nation",
+		  ke.kontakt AS "Email",
+		  kt.kontakt AS "Telefon",
+		  s.bezeichnung AS "Studiengang DE",
+		  s.english AS "Studiengang EN",
+		  st.bezeichnung AS "Typ",
+		  last_prestudent_status.orgform_kurzbz AS "Orgform",
+		  p.zugangscode AS "Zugangscode",
+		  bk.iban AS "IBAN Studiengang",
+		  bk.bic AS "BIC Studiengang",
+		  s.studiengang_kz AS "Studiengangskennzahl",
+		  first_prestudent_status.ausbildungssemester AS "Einstiegssemester",
+		  first_prestudent_status.studiensemester AS "Einstiegsstudiensemester",
+		  ass.vorname AS "Vorname Studiengangsassistenz",
+		  ass.nachname AS "Nachname Studiengangsassistenz",
+		  ass.telefonklappe AS "Durchwahl Studiengangsassistenz",
+		  ass.alias AS "Alias Studiengangsassistenz",
+		  (SELECT count(*)
+		   FROM (
+					SELECT pss.prestudent_id, pss.person_id, priorisierung,
+						   (
+							   SELECT status_kurzbz
+							   FROM public.tbl_prestudentstatus
+							   WHERE prestudent_id = pss.prestudent_id
+							   ORDER BY datum DESC,
+										tbl_prestudentstatus.insertamum DESC LIMIT 1
+						   ) AS laststatus
+					FROM public.tbl_prestudent pss
+					JOIN public.tbl_prestudentstatus USING (prestudent_id)
+					WHERE person_id = (
+						SELECT person_id
+						FROM public.tbl_prestudent
+						WHERE prestudent_id = pr.prestudent_id
+					)
+					  AND studiensemester_kurzbz = (
+						SELECT studiensemester_kurzbz
+						FROM public.tbl_prestudentstatus
+						WHERE prestudent_id = pr.prestudent_id
+						  AND status_kurzbz = \'Interessent\' LIMIT 1
+					)
+					  AND status_kurzbz = \'Interessent\'
+				) prest
+		   WHERE laststatus NOT IN (\'Abbrecher\', \'Abgewiesener\', \'Absolvent\')
+		   AND priorisierung <= pr.priorisierung) AS "Relative Prio"
 		FROM public.tbl_person p
 		LEFT JOIN (
 			SELECT person_id,
@@ -3576,7 +3577,7 @@ if(!$result = @$db->db_query('SELECT "IBAN Studiengang", "BIC Studiengang", "Stu
 					 tbl_prestudentstatus.ext_id ASC
 		) first_prestudent_status ON pr.prestudent_id = first_prestudent_status.prestudent_id
 				 LEFT JOIN (
-			SELECT DISTINCT ON (tbl_benutzerfunktion.oe_kurzbz) vorname, nachname, oe_kurzbz, telefonklappe
+			SELECT DISTINCT ON (tbl_benutzerfunktion.oe_kurzbz) vorname, nachname, oe_kurzbz, telefonklappe, alias
 			FROM public.tbl_benutzerfunktion
 					 JOIN public.tbl_benutzer USING (uid)
 					 JOIN public.tbl_person USING (person_id)
