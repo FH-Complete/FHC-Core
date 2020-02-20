@@ -3462,77 +3462,135 @@ if(!$result = @$db->db_query("SELECT orgform_kurzbz FROM public.tbl_bankverbindu
 }
 
 // iban und bic zu vw_msg_vars hinzufügen
-if(!$result = @$db->db_query('SELECT "IBAN Studiengang", "BIC Studiengang" FROM public.vw_msg_vars LIMIT 1'))
+if(!$result = @$db->db_query('SELECT "IBAN Studiengang", "BIC Studiengang", "Studiengangskennzahl", "Einstiegssemester", "Einstiegsstudiensemester", "Vorname Studiengangsassistenz", "Nachname Studiengangsassistenz", "Durchwahl Studiengangsassistenz", "Relative Priorität" FROM public.vw_msg_vars LIMIT 1'))
 {
 	$qry = '
 	CREATE OR REPLACE VIEW public.vw_msg_vars AS (
 		SELECT DISTINCT ON(p.person_id, pr.prestudent_id) p.person_id,
-			   pr.prestudent_id AS prestudent_id,
-			   p.nachname AS "Nachname",
-			   p.vorname AS "Vorname",
-			   p.anrede AS "Anrede",
-			   a.strasse AS "Strasse",
-			   a.ort AS "Ort",
-			   a.plz AS "PLZ",
-			   a.gemeinde AS "Gemeinde",
-			   a.langtext AS "Nation",
-			   ke.kontakt AS "Email",
-			   kt.kontakt AS "Telefon",
-			   s.bezeichnung AS "Studiengang DE",
-			   s.english AS "Studiengang EN",
-			   st.bezeichnung AS "Typ",
-			   last_prestudent_status.orgform_kurzbz AS "Orgform",
-			   p.zugangscode AS "Zugangscode",
-			   bk.iban AS "IBAN Studiengang",
-               bk.bic AS "BIC Studiengang"
-		  FROM public.tbl_person p
-		 LEFT JOIN (
-						SELECT person_id,
-							   kontakt
-						  FROM public.tbl_kontakt
-						 WHERE zustellung = TRUE
-						   AND kontakttyp = \'email\'
-					  ORDER BY kontakt_id DESC
-				) ke USING(person_id)
-		 LEFT JOIN (
-						SELECT person_id,
-							   kontakt
-						  FROM public.tbl_kontakt
-						 WHERE zustellung = TRUE
-						   AND kontakttyp IN (\'telefon\', \'mobil\')
-					  ORDER BY kontakt_id DESC
-				) kt USING(person_id)
-		 LEFT JOIN (
-						SELECT person_id,
-							   strasse,
-							   ort,
-							   plz,
-							   gemeinde,
-							   langtext
-						  FROM public.tbl_adresse
+														  pr.prestudent_id AS prestudent_id,
+														  p.nachname AS "Nachname",
+														  p.vorname AS "Vorname",
+														  p.anrede AS "Anrede",
+														  a.strasse AS "Strasse",
+														  a.ort AS "Ort",
+														  a.plz AS "PLZ",
+														  a.gemeinde AS "Gemeinde",
+														  a.langtext AS "Nation",
+														  ke.kontakt AS "Email",
+														  kt.kontakt AS "Telefon",
+														  s.bezeichnung AS "Studiengang DE",
+														  s.english AS "Studiengang EN",
+														  st.bezeichnung AS "Typ",
+														  last_prestudent_status.orgform_kurzbz AS "Orgform",
+														  p.zugangscode AS "Zugangscode",
+														  bk.iban AS "IBAN Studiengang",
+														  bk.bic AS "BIC Studiengang",
+														  s.studiengang_kz AS "Studiengangskennzahl",
+														  first_prestudent_status.ausbildungssemester AS "Einstiegssemester",
+														  first_prestudent_status.studiensemester AS "Einstiegsstudiensemester",
+														  ass.vorname AS "Vorname Studiengangsassistenz",
+														  ass.nachname AS "Nachname Studiengangsassistenz",
+														  ass.telefonklappe AS "Durchwahl Studiengangsassistenz",
+														  (SELECT count(*)
+														   FROM (
+																	SELECT pss.prestudent_id, pss.person_id, priorisierung,
+																		   (
+																			   SELECT status_kurzbz
+																			   FROM public.tbl_prestudentstatus
+																			   WHERE prestudent_id = pss.prestudent_id
+																			   ORDER BY datum DESC,
+																						tbl_prestudentstatus.insertamum DESC LIMIT 1
+																		   ) AS laststatus
+																	FROM public.tbl_prestudent pss
+																	JOIN public.tbl_prestudentstatus USING (prestudent_id)
+																	WHERE person_id = (
+																		SELECT person_id
+																		FROM public.tbl_prestudent
+																		WHERE prestudent_id = pr.prestudent_id
+																	)
+																	  AND studiensemester_kurzbz = (
+																		SELECT studiensemester_kurzbz
+																		FROM public.tbl_prestudentstatus
+																		WHERE prestudent_id = pr.prestudent_id
+																		  AND status_kurzbz = \'Interessent\' LIMIT 1
+																	)
+																	  AND status_kurzbz = \'Interessent\'
+																) prest
+														   WHERE laststatus NOT IN (\'Abbrecher\', \'Abgewiesener\', \'Absolvent\')
+														   AND priorisierung <= pr.priorisierung) AS "Relative Priorität"
+		FROM public.tbl_person p
+		LEFT JOIN (
+			SELECT person_id,
+				   kontakt
+			FROM public.tbl_kontakt
+			WHERE zustellung = TRUE
+			  AND kontakttyp = \'email\'
+			ORDER BY kontakt_id DESC
+		) ke USING(person_id)
+		LEFT JOIN (
+			SELECT person_id,
+				   kontakt
+			FROM public.tbl_kontakt
+			WHERE zustellung = TRUE
+			  AND kontakttyp IN (\'telefon\', \'mobil\')
+			ORDER BY kontakt_id DESC
+		) kt USING(person_id)
+		LEFT JOIN (
+			SELECT person_id,
+				   strasse,
+				   ort,
+				   plz,
+				   gemeinde,
+				   langtext
+			FROM public.tbl_adresse
 					 LEFT JOIN bis.tbl_nation ON(bis.tbl_nation.nation_code = public.tbl_adresse.nation)
-						 WHERE public.tbl_adresse.heimatadresse = TRUE
-					  ORDER BY adresse_id DESC
-				) a USING(person_id)
+			WHERE public.tbl_adresse.heimatadresse = TRUE
+			ORDER BY adresse_id DESC
+		) a USING(person_id)
 		LEFT JOIN public.tbl_prestudent pr USING(person_id)
 		INNER JOIN public.tbl_studiengang s USING(studiengang_kz)
 		INNER JOIN public.tbl_studiengangstyp st USING(typ)
 		LEFT JOIN (
-						SELECT DISTINCT ON (ps.prestudent_id) tbl_studienplan.orgform_kurzbz, ps.prestudent_id
-						FROM public.tbl_prestudent ps
-								 JOIN public.tbl_prestudentstatus ON ps.prestudent_id = tbl_prestudentstatus.prestudent_id
-								 JOIN lehre.tbl_studienplan USING(studienplan_id)
-						ORDER BY ps.prestudent_id DESC,
-								 tbl_prestudentstatus.datum DESC,
-								 tbl_prestudentstatus.insertamum DESC,
-								 tbl_prestudentstatus.ext_id DESC
-				) last_prestudent_status ON pr.prestudent_id = last_prestudent_status.prestudent_id
+			SELECT DISTINCT ON (ps.prestudent_id) ps.prestudent_id, tbl_studienplan.orgform_kurzbz
+			FROM public.tbl_prestudent ps
+					 JOIN public.tbl_prestudentstatus ON ps.prestudent_id = tbl_prestudentstatus.prestudent_id
+					 JOIN lehre.tbl_studienplan USING(studienplan_id)
+			ORDER BY ps.prestudent_id DESC,
+					 tbl_prestudentstatus.datum DESC,
+					 tbl_prestudentstatus.insertamum DESC,
+					 tbl_prestudentstatus.ext_id DESC
+		) last_prestudent_status ON pr.prestudent_id = last_prestudent_status.prestudent_id
 		LEFT JOIN (
+			SELECT DISTINCT ON (ps.prestudent_id) ps.prestudent_id, tbl_prestudentstatus.ausbildungssemester,
+												  studiensemester_kurzbz, tbl_studiensemester.bezeichnung AS studiensemester,
+												  tbl_studienordnung.studiengang_kz
+			FROM public.tbl_prestudent ps
+					 JOIN public.tbl_prestudentstatus ON ps.prestudent_id = tbl_prestudentstatus.prestudent_id
+					 JOIN public.tbl_studiensemester USING (studiensemester_kurzbz)
+					 JOIN lehre.tbl_studienplan USING(studienplan_id)
+					 JOIN lehre.tbl_studienordnung USING (studienordnung_id)
+			WHERE tbl_prestudentstatus.status_kurzbz = \'Interessent\'
+			ORDER BY ps.prestudent_id ASC,
+					 tbl_prestudentstatus.datum ASC,
+					 tbl_prestudentstatus.insertamum ASC,
+					 tbl_prestudentstatus.ext_id ASC
+		) first_prestudent_status ON pr.prestudent_id = first_prestudent_status.prestudent_id
+				 LEFT JOIN (
+			SELECT DISTINCT ON (tbl_benutzerfunktion.oe_kurzbz) vorname, nachname, oe_kurzbz, telefonklappe
+			FROM public.tbl_benutzerfunktion
+					 JOIN public.tbl_benutzer USING (uid)
+					 JOIN public.tbl_person USING (person_id)
+					 JOIN public.tbl_mitarbeiter on tbl_benutzer.uid = tbl_mitarbeiter.mitarbeiter_uid
+			WHERE tbl_benutzerfunktion.funktion_kurzbz = \'ass\'
+			  AND NOW() BETWEEN COALESCE(datum_von, NOW()) AND COALESCE(datum_bis, NOW())
+			ORDER BY tbl_benutzerfunktion.oe_kurzbz, tbl_benutzerfunktion.insertamum DESC NULLS LAST, datum_von DESC NULLS LAST
+		) ass ON s.oe_kurzbz = ass.oe_kurzbz
+				 LEFT JOIN (
 			SELECT DISTINCT ON (oe_kurzbz, orgform_kurzbz) oe_kurzbz, orgform_kurzbz, iban, bic
 			FROM tbl_bankverbindung
 			WHERE oe_kurzbz IS NOT NULL
 			ORDER BY oe_kurzbz, orgform_kurzbz, tbl_bankverbindung.insertamum DESC,tbl_bankverbindung.iban
-			)bk ON s.oe_kurzbz = bk.oe_kurzbz AND (last_prestudent_status.orgform_kurzbz = bk.orgform_kurzbz OR bk.orgform_kurzbz IS NULL)
+		)bk ON s.oe_kurzbz = bk.oe_kurzbz AND (last_prestudent_status.orgform_kurzbz = bk.orgform_kurzbz OR bk.orgform_kurzbz IS NULL)
 		WHERE p.aktiv = TRUE
 		ORDER BY p.person_id ASC, pr.prestudent_id ASC
 	);';
@@ -3540,7 +3598,7 @@ if(!$result = @$db->db_query('SELECT "IBAN Studiengang", "BIC Studiengang" FROM 
 	if(!$db->db_query($qry))
 		echo '<strong>public.vw_msg_vars: '.$db->db_last_error().'</strong><br>';
 	else
-		echo '<br>public.vw_msg_vars iban und bic added';
+		echo '<br>public.vw_msg_vars IBAN Studiengang, BIC Studiengang, Studiengangskennzahl, Einstiegssemester, Einstiegsstudiensemester, Vorname Studiengangsassistenz, Nachname Studiengangsassistenz, Durchwahl Studiengangsassistenz, Relative Priorität added';
 }
 
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
