@@ -137,24 +137,6 @@ class MessageToken_model extends DB_Model
 	}
 
 	/**
-	 * Get data of a person
-	 */
-	public function getPersonData($person_id)
-	{
-		$sql = 'SELECT person_id,
-					   vorname as "Vorname",
-					   nachname as "Nachname",
-					   anrede as "Anrede",
-					   titelpost as "TitelPost",
-					   titelpre as "TitelPre",
-					   vornamen as "Vornamen"
-				  FROM public.tbl_person
-				 WHERE person_id %s ?';
-
-		return $this->execQuery(sprintf($sql, is_array($person_id) ? 'IN' : '='), array($person_id));
-	}
-
-	/**
 	 * Searchs for a person by its person_id and checks if it is an employee
 	 */
 	public function isEmployee($person_id)
