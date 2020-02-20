@@ -165,16 +165,6 @@ class PhrasesLib
     }
 
 	/**
-     * parseVorlagetext() - will parse a Vorlagetext.
-     */
-    public function parseVorlagetext($text, $data = array())
-	{
-        if (isEmptyString($text)) return error('Not a valid text');
-
-		return $this->_ci->parser->parse_string($text, $data, true);
-    }
-
-	/**
 	 * Retrieves a phrases from the the property _phrases with the given parameters
 	 * It also replace parameters inside the phrase if they are provided
 	 * @param string $category Category name which is used to categorize the phrase.
@@ -201,7 +191,7 @@ class PhrasesLib
 				{
 					if (!is_array($parameters)) $parameters = array(); // if params is not an array
 
-					return $this->_ci->parser->parse_string($_phrase->text, $parameters, true); // parsing
+					return parseText($_phrase->text, $parameters); // parsing
 				}
 			}
 		}

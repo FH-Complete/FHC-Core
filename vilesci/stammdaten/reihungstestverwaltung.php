@@ -2553,7 +2553,7 @@ echo '<table width="100%"><tr><td>';
 if($reihungstest_id!='')
 {
 	echo '<a class="buttongreen" href="'.$_SERVER['PHP_SELF'].'?reihungstest_id='.$reihungstest_id.'&excel=true">Excel Export</a>';
-	echo '<a class="buttongreen" href="'.$_SERVER['PHP_SELF'].'?reihungstest_id='.$reihungstest_id.'&type=saveallrtpunkte">Punkte ins FAS &uuml;bertragen</a>';
+	//echo '<a class="buttongreen" href="'.$_SERVER['PHP_SELF'].'?reihungstest_id='.$reihungstest_id.'&type=saveallrtpunkte">Punkte ins FAS &uuml;bertragen</a>';
 	echo '<a class="buttongreen" href="#" onclick="SendMail()" id="mailSendButton">Mail an alle BewerberInnen senden</a>';
 }
 if (defined('CAMPUS_NAME') && CAMPUS_NAME == 'FH Technikum Wien')
