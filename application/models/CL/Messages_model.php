@@ -509,7 +509,8 @@ class Messages_model extends CI_Model
 		if (!hasData($message)) return error('No messages were saved in database');
 
 		// Write log entry
-		$personLog = $this->_personLog($sender_id, $receiver_id, getData($message)[0]);
+		// NOTE: $receiver_id and $sender_id are switched!!! Currently this is a workaround
+		$personLog = $this->_personLog($receiver_id, $sender_id, getData($message)[0]);
 		if (isError($personLog)) return $personLog;
 
 		return success('Messages sent successfully');

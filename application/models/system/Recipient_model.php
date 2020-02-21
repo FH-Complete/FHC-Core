@@ -199,66 +199,23 @@ class Recipient_model extends DB_Model
 	}
 
 	/**
-	 * getMessages
+	 * Gets all messages for which notice emails are still not sent
 	 *
-	 * Gets all the messages to be sent
-	 *
-	 * @param kontaktType specifies the type of the kontakt to get
-	 * @param sent specifies the status of the messages to get (NULL never sent, otherwise the shipping date)
-	 * @param limit specifies the number of messages to get
-	 * @param message_id specifies a single message
+	 * @param kontaktType specifies the type of the kontakt to get (email,...)
+	 * @param limit specifies the max number of messages to get
+	 * @param since specifies from which date messages have to be retrieved
 	 */
-	public function getMessages($kontaktType, $message_id = null, $limit = 1)
+	public function getNotSentMessages($limit, $since = '1970-01-01')
 	{
-		$query = 'SELECT mm.message_id,
-						 ks.kontakt as sender,
-						 kr.kontakt as receiver,
-						 mu.mitarbeiter_uid as employeeContact,
-						 ms.mitarbeiter_uid as senderemployeeContact,
-						 mr.person_id as receiver_id,
-						 mr.token,
-						 mm.subject,
-						 mm.body,
-						 mr.sentinfo,
-						 mr.oe_kurzbz
-					FROM public.tbl_msg_recipient mr INNER JOIN public.tbl_msg_message mm USING (message_id)
-						LEFT JOIN (
-							SELECT person_id, kontakt FROM public.tbl_kontakt WHERE zustellung = true AND kontakttyp = ?
-						) ks ON (ks.person_id = mm.person_id)
-						LEFT JOIN (
-							SELECT person_id, kontakt FROM public.tbl_kontakt WHERE zustellung = true AND kontakttyp = ?
-						) kr ON (kr.person_id = mr.person_id)
-						LEFT JOIN (
-							SELECT b.person_id,
-								   m.mitarbeiter_uid
-							  FROM public.tbl_benutzer b INNER JOIN public.tbl_mitarbeiter m ON(b.uid = m.mitarbeiter_uid)
-							 WHERE b.aktiv = TRUE
-						) mu ON (mu.person_id = mr.person_id)
-						LEFT JOIN (
-							SELECT b.person_id,
-								   m.mitarbeiter_uid
-							  FROM public.tbl_benutzer b INNER JOIN public.tbl_mitarbeiter m ON(b.uid = m.mitarbeiter_uid)
-							 WHERE b.aktiv = TRUE
-						) ms ON (ms.person_id = mm.person_id)
-					WHERE mr.sent IS NULL';
+		$query = 'SELECT mm.message_id
+					FROM public.tbl_msg_recipient mr
+					JOIN public.tbl_msg_message mm USING (message_id)
+				   WHERE mr.sent IS NULL
+				     AND mm.insertamum > ?
+				ORDER BY mr.insertamum ASC
+				   LIMIT ?';
 
-		$parametersArray = array($kontaktType, $kontaktType);
-
-		if (is_numeric($message_id))
-		{
-			array_push($parametersArray, $message_id);
-			$query .= ' AND mm.message_id = ?';
-		}
-
-		$query .= ' ORDER BY mr.insertamum ASC';
-
-		if (is_numeric($limit))
-		{
-			$query .= ' LIMIT ?';
-			array_push($parametersArray, $limit);
-		}
-
-		return $this->execQuery($query, $parametersArray);
+		return $this->execQuery($query, array($since, $limit));
 	}
 
 	/**

@@ -139,27 +139,31 @@ class MessageLib
 	// Public methods called by a job
 
 	/**
-	 * Gets all NOT sent messages from DB and sends for each of them the notice email
-	 * Does not return anything, it logs info and errors on CI logs and in tbl_msg_recipient table
+	 * Gets all messages for which notice emails are still not sent from DB and sends for each of them the notice email
 	 * Wrapper for _sendNoticeEmail.
 	 */
-	public function sendAllEmailNotices($numberToSent, $numberPerTimeRange, $emailTimeRange, $emailFromSystem)
+	public function sendAllEmailNotices($since, $numberToSent, $numberPerTimeRange, $emailTimeRange, $emailFromSystem)
 	{
 		// Overrides MailLib configs with the given parameters
 		$this->_ci->maillib->overrideConfigs($numberToSent, $numberPerTimeRange, $emailTimeRange, $emailFromSystem);
 
-		// Retrieves a certain amount of NOT sent messages, the amount is given by maillib->email_number_to_sent
-		$messagesResult = $this->_ci->RecipientModel->getMessages(
-			self::EMAIL_KONTAKT_TYPE,
-			null,
-			$this->_ci->maillib->getEmailNumberToSent()
+		// Retrieves a certain amount of NOT sent messages
+		$messagesResult = $this->_ci->RecipientModel->getNotSentMessages(
+			$this->_ci->maillib->getEmailNumberToSent(),
+			$since
 		);
 
-		if (isError($messagesResult)) terminateWithError(getData($messagesResult)); // If an error occurred then log it and terminate
+		if (isError($messagesResult) || !hasData($messagesResult)) return $messagesResult;
 
-		$sendNotice = $this->_sendNoticeEmails(getData($messagesResult));
+		// Collects all the message ids in an array
+		$messageIds = array();
+		foreach (getData($messagesResult) as $message)
+		{
+			$messageIds[] = $message->message_id;
+		}
 
-		if (isError($sendNotice)) terminateWithError(getData($sendNotice)); // If an error occurred then log it and terminate
+		// Send'em all
+		return $this->_sendNoticeEmails($messageIds);
 	}
 
 	//------------------------------------------------------------------------------------------------------------------
