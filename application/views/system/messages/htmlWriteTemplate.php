@@ -129,33 +129,29 @@
 								</label>
 							</div>
 						</div>
-						<div class="well">
+						<div class="well" id="templatePreviewDiv">
 							<div class="row">
-								<div class="col-lg-3">
-									<div class="form-grop form-inline">
-
+								<div class="col-sm-12" style="display: inline">
+									<div class="form-group form-inline">
+										<div class="input-group">
 										<?php
 											echo $this->widgetlib->widget(
 												'Dropdown_widget',
-												array('elements' => success($recipientsArray), 'emptyElement' => 'Select...'),
+												array('elements' => success($recipientsArray), 'emptyElement' => ucfirst($this->p->t('global', 'empfaenger')).'...'),
 												array(
-													'title' => ucfirst($this->p->t('global', 'empfaenger')).': ',
+													/*'title' => ucfirst($this->p->t('global', 'empfaenger')).':&nbsp;',*/
 													'name' => 'recipients[]',
 													'id' => 'recipients'
 												)
 											);
 										?>
-
+											<span class="input-group-btn">
+												<a class="btn btn-default" href="#templatePreviewDiv" id="refresh">
+													<?php echo ucfirst($this->p->t('ui', 'refresh')); ?>
+												</a>
+											</span>
+										</div>
 									</div>
-								</div>
-								<div class="col-lg-1 valign-middle">
-									<strong>
-										<a href="#" id="refresh">
-
-											<?php echo ucfirst($this->p->t('ui', 'refresh')); ?>
-
-										</a>
-									</strong>
 								</div>
 							</div>
 							<br>
