@@ -24,39 +24,54 @@ if (! defined('BASEPATH')) exit('No direct script access allowed');
 // ------------------------------------------------------------------------
 
 /**
- * generateToken() - generates a new token for diffent use
- * - reading Messages from external
- * - forgotten Password
- *
- * @return  string
+ * Generates a new token for diffent use cases. Default token length is 64
+ * - Reading messages
+ * - Forgotten password
+ * - etc
+ * Returns null on failure
  */
 function generateToken($length = 64)
 {
+	$token = null;
+	$firstGeneratedToken = null;
+
 	// For PHP 7 you can use random_bytes()
 	if (function_exists('random_bytes'))
 	{
-		$token = base64_encode(random_bytes($length));
-		//base64 is about 33% longer, so we need to truncate the result
-		return strtr(substr($token, 0, $length), '+/=', '-_,');
+		try
+		{
+			$firstGeneratedToken = random_bytes($length); // try to generates cryptographically secure pseudo-random bytes...
+		}
+		catch (Exception $e) { $firstGeneratedToken = null; } // if fails $firstGeneratedToken is set to null
 	}
-
-	// for PHP >=5.3 and <7
-	if (function_exists('openssl_random_pseudo_bytes'))
+	// For PHP >= 5.3 and < 7 and openssl is available
+	elseif (function_exists('openssl_random_pseudo_bytes'))
 	{
-        $token = base64_encode(openssl_random_pseudo_bytes($length, $strong));
-		// is the token strong enough?
-        if($strong == true)
-			return strtr(substr($token, 0, $length), '+/=', '-_,');
+		$firstGeneratedToken = openssl_random_pseudo_bytes($length, $strong);
+		// If the token generation ended with errors OR the generated token is NOT strong enough
+        if ($firstGeneratedToken == false || $strong == false) $firstGeneratedToken = null; // $firstGeneratedToken is set to null
     }
 
-    //fallback to mt_rand if php < 5.3 or no openssl available
-    $characters = '0123456789';
-    $characters .= 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz/+';
-    $charactersLength = strlen($characters)-1;
-    $token = '';
-    //select some random characters
-    for ($i = 0; $i < $length; $i++)
-        $token .= $characters[mt_rand(0, $charactersLength)];
+	if ($firstGeneratedToken != null) // If everything was fine
+	{
+		// base64 is about 33% longer, so we need to truncate the result
+		$token = strtr(substr(base64_encode($firstGeneratedToken), 0, $length), '+/=', '-_,');
+	}
+
+	// Fallback to mt_rand if:
+	// php < 5.3
+	// OR no openssl is available
+	// OR openssl_random_pseudo_bytes used an algorithm that is cryptographically NOT strong
+	// OR one of the previous methods failed
+	if ($token == null)
+	{
+		$token = ''; // set $token as an empty string
+	    $characters = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz/+';
+	    $charactersLength = strlen($characters) - 1;
+
+	    // Select some random characters
+	    for ($i = 0; $i < $length; $i++) $token .= $characters[mt_rand(0, $charactersLength)];
+	}
 
     return $token;
 }
@@ -223,6 +238,52 @@ function isDateWorkingDay($date, $days = null)
 		else
 			return true;
 	}
+}
+
+/**
+ * Parse the given text using the given data parameter
+ * Use the CI parser which performs simple text substitution for pseudo-variable
+ */
+function parseText($text, $data)
+{
+	$ci =& get_instance(); // get CI instance
+	$ci->load->library('parser'); // Loads CI parser library
+
+	return $ci->parser->parse_string($text, $data, true);
+}
+
+/**
+ * Parse the given template using the given data parameter
+ * Use the CI parser which performs simple text substitution for pseudo-variable
+ */
+function parseTemplate($template, $data)
+{
+	$ci =& get_instance(); // get CI instance
+	$ci->load->library('parser'); // Loads CI parser library
+
+	return $ci->parser->parse($template, $data, true);
+}
+
+/**
+ * Terminate immediately the execution of the current script.
+ * If message parameter is given then:
+ * - logs the given message in CI logs
+ * - prints the given message to standard output
+ * Otherwise terminate with the generic error
+ */
+function terminateWithError($message = null)
+{
+	if (!isEmptyString($message))
+	{
+		$ci =& get_instance(); // get CI instance
+		$ci->load->library('LogLib'); // Loads LogLib
+
+		$ci->loglib->logError($message);
+
+		exit($message);
+	}
+
+	exit(EXIT_ERROR);
 }
 
 /**

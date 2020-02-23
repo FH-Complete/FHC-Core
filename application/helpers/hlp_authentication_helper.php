@@ -20,7 +20,6 @@ function getAuthPersonId()
 	return isLogged() ? ($ci->authlib->getAuthObj())->{AuthLib::AO_PERSON_ID} : null;
 }
 
-
 /**
  * If the user is NOT logged then a null value is returned.
  * If the user is alredy logged, then it is possible to access to the authentication object

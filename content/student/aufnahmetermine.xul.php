@@ -226,6 +226,8 @@ echo ']>
 						<vbox hidden="true">
 							<label value="person_id" control="aufnahmetermine-textbox-person_id"/>
 							<textbox id="aufnahmetermine-textbox-person_id" disabled="true"/>
+                            <label value="studienplan_studiengang_kz" control="aufnahmetermine-textbox-studienplan_studiengang_kz"/>
+                            <textbox id="aufnahmetermine-textbox-studienplan_studiengang_kz" disabled="true"/>
 							<label value="Neu" control="aufnahmetermine-checkbox-neu"/>
 							<checkbox id="aufnahmetermine-checkbox-neu" disabled="true" checked="false"/>
 							<label value="rt_person_id" control="aufnahmetermine-textbox-rt_person_id"/>
