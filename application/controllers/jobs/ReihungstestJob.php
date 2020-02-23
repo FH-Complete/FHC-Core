@@ -899,8 +899,8 @@ class ReihungstestJob extends CLI_Controller
 								);
 								if (isSuccess($result))
 								{
-									$mailArray[$rowNiedrPrios->studiengang_kz][$rowNiedrPrios->orgform_kurzbz]['AbgewiesenGesetzt'][]
-										= $rowNiedrPrios->nachname.' '.$rowNiedrPrios->vorname.' ('.$rowNiedrPrios->prestudent_id.')';
+									/*$mailArray[$rowNiedrPrios->studiengang_kz][$rowNiedrPrios->orgform_kurzbz]['AbgewiesenGesetzt'][]
+										= $rowNiedrPrios->nachname.' '.$rowNiedrPrios->vorname.' ('.$rowNiedrPrios->prestudent_id.')';*/
 								}
 							}
 							elseif ($rowNiedrPrios->laststatus == 'Wartender')
@@ -937,7 +937,8 @@ class ReihungstestJob extends CLI_Controller
 							}
 						}
 					}
-					echo '<pre>', var_dump($mailArray), '</pre>';
+
+
 					// Kaution einbuchen für $row_ps->prestudent_id
 					// Vorher prüfen, ob schon eine Kaution gebucht ist
 					// Todo: Betrag automatisch aus tbl_buchungstyp laden
@@ -971,6 +972,7 @@ class ReihungstestJob extends CLI_Controller
 				}
 			}
 		}
+		echo '<pre>', var_dump($mailArray), '</pre>';
 		// Mails senden
 		if (!isEmptyArray($mailArray))
 		{
@@ -983,7 +985,11 @@ class ReihungstestJob extends CLI_Controller
 
 				foreach ($orgform AS $art=>$value)
 				{
-					$mailcontent .= '<p style="font-family: verdana, sans-serif;"><b>Orgform '.$art.'</b></p>';
+					// Orgform nur dazu schreiben, wenn es mehr als Eine gibt
+					if (count($orgform) > 1)
+					{
+						$mailcontent .= '<p style="font-family: verdana, sans-serif;"><b>Orgform '.$art.'</b></p>';
+					}
 					if (isset($value['AbgewiesenGesetzt']) && !isEmptyArray($value['AbgewiesenGesetzt']))
 					{
 						$mailcontent .= '<table style="border-collapse: collapse; border: 1px solid grey;">
