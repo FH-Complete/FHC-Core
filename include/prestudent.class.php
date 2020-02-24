@@ -421,6 +421,62 @@ class prestudent extends person
 	}
 
 	/**
+	 * Laden aller Prestudenten, die an $datum zum Reihungstest geladen sind.
+	 * Wenn es mehrere Bewerbungen für ein Person gibt, wird nur die höchste Prestudent_id zurückgeliefert
+	 * @param string $datum Datum in der Form YYYY-MM-DD an dem der Reihungstest stattfindet
+	 * @return true wenn erfolgreich, false im Fehlerfall
+	 */
+	public function getFirstPrioPrestudentRT($datum)
+	{
+		$sql_query='SELECT DISTINCT
+						ps.prestudent_id,
+						pers.vorname, pers.nachname, pers.person_id, pers.titelpre,
+						pers.titelpost, pers.gebdatum,
+						tbl_reihungstest.*,
+						ps.studiengang_kz as studiengang_kz
+					FROM 
+						public.tbl_prestudent ps
+						JOIN public.tbl_person pers USING(person_id)
+						JOIN public.tbl_rt_person USING(person_id)
+						JOIN public.tbl_reihungstest ON(tbl_reihungstest.reihungstest_id=tbl_rt_person.rt_id)
+					WHERE
+						tbl_reihungstest.datum='.$this->db_add_param($datum).'
+						AND tbl_rt_person.studienplan_id IN (SELECT studienplan_id FROM public.tbl_prestudentstatus WHERE prestudent_id=ps.prestudent_id)
+						AND EXISTS(SELECT * FROM public.tbl_prestudentstatus JOIN public.tbl_studiensemester USING(studiensemester_kurzbz)
+							WHERE prestudent_id=ps.prestudent_id AND tbl_studiensemester.ende>'.$this->db_add_param($datum).')
+						AND priorisierung = (SELECT priorisierung FROM public.tbl_prestudent 
+									WHERE person_id = pers.person_id 
+									AND get_rolle_prestudent (ps.prestudent_id,NULL) IN (\'Interessent\',\'Bewerber\',\'Wartender\',\'Aufgenommener\')
+									ORDER BY priorisierung ASC LIMIT 1)
+					ORDER BY nachname,vorname';
+
+		if(!$this->db_query($sql_query))
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+
+		$this->num_rows=0;
+
+		while($row = $this->db_fetch_object())
+		{
+			$ps=new prestudent();
+			$ps->prestudent_id = $row->prestudent_id;
+			$ps->person_id = $row->person_id;
+			$ps->reihungstest_id = $row->reihungstest_id;
+			$ps->titelpost = $row->titelpost;
+			$ps->titelpre = $row->titelpre;
+			$ps->nachname = $row->nachname;
+			$ps->vorname = $row->vorname;
+			$ps->gebdatum = $row->gebdatum;
+			$ps->studiengang_kz = $row->studiengang_kz;
+			$this->result[]=$ps;
+			$this->num_rows++;
+		}
+		return true;
+	}
+
+	/**
 	 * Laedt über einen Prestudenten alle anderen Prestudenten einer Person, die aktuell an STG interessiert sind.
 	 * @integer $prestudent_id Prestudent ID, über die alle weiteren Prestudenten ermittelt werden sollen.
 	 * @boolean $prio Wenn true, dann wird nur der Prestudent mit dem am höchsten priorisierten Studiengang zurückgegeben.

@@ -562,10 +562,9 @@ if ($testende)
 											<tr>
 												<td style="padding-left: 8%; padding-right: 8%; padding-top: 5%; padding-bottom: 5%; font-family: verdana, sans-serif; font-size: 1em; border-bottom: 2px solid #000000;">';
 									$mailtext .= 'Der Reihungstest vom ' . $datum_obj->convertISODate($reihungstest->datum) . ' um ' . $datum_obj->formatDatum($reihungstest->uhrzeit, 'H:i') . ' Uhr ist beendet.';
-									$mailtext .= '<br> Es haben <b>'.$anzahl.'</b> Person(en) aus dem Studiengang '.$stg->kuerzel.'-'.$orgForm.' teilgenommen';
-									$mailtext .= '<br> Sie finden die Auswertung unter dem folgendem Link:';
+									$mailtext .= '<br> Es haben <b>'.$anzahl.'</b> Person(en) aus dem Studiengang '.$stg->kuerzel.'-'.$orgForm.' teilgenommen.';
 									$mailtext .= '<br><br><a href="' . APP_ROOT . 'vilesci/stammdaten/auswertung_fhtw.php?reihungstest=' . $reihungstest->reihungstest_id . '&studiengang=' . $studiengang_kz . '&orgform_kurzbz=' . $orgForm . '">Link zur Auswertung</a>';
-
+									$mailtext .= '<br><br><a href="' . APP_ROOT . 'addons/reports/cis/vorschau.php?statistik_kurzbz=BewerberReihungstestPriorisierung&debug=true">Link zur Pivot-Tabelle für die Priorisierung</a>';
 									$mailtext .= '</td>
 											</tr>
 											<tr>
@@ -643,7 +642,7 @@ if (isset($_POST['method']) && $_POST['method'] == 'addPerson')
 			if ($row->bewerbung_abgeschicktamum != '' && $row->bestaetigtam != '' && $row->studienplan_id != '')
 			{
 				$studienplan = $row->studienplan_id;
-				$break;
+				break;
 			}
 		}
 
@@ -1154,7 +1153,7 @@ if (isset($_REQUEST['reihungstest']))
 		JOIN PUBLIC.tbl_person ON (tbl_rt_person.person_id = tbl_person.person_id)
 		JOIN PUBLIC.tbl_prestudent ps ON (ps.person_id = tbl_rt_person.person_id)
 		JOIN PUBLIC.tbl_reihungstest rt ON (tbl_rt_person.rt_id = rt.reihungstest_id)
-		JOIN PUBLIC.tbl_prestudentstatus USING (prestudent_id)
+		JOIN PUBLIC.tbl_prestudentstatus pss USING (prestudent_id)
 		JOIN public.tbl_studiengang ON (ps.studiengang_kz = tbl_studiengang.studiengang_kz)
 		LEFT JOIN bis.tbl_zgv ON (ps.zgv_code = tbl_zgv.zgv_code)
 		LEFT JOIN PUBLIC.tbl_ort ON (tbl_rt_person.ort_kurzbz = tbl_ort.ort_kurzbz)
@@ -1195,6 +1194,20 @@ if (isset($_REQUEST['reihungstest']))
 	if ($prestudent_id != '')
 	{
 		$query .= " AND ps.prestudent_id=" . $db->db_add_param($prestudent_id, FHC_INTEGER);
+	}
+	if ($orgform_kurzbz != '' && $studiengang != '')
+	{
+		$query .= " AND tbl_ablauf.studienplan_id=(
+							SELECT studienplan_id FROM lehre.tbl_studienplan 
+							JOIN lehre.tbl_studienordnung USING (studienordnung_id) 
+							WHERE studiengang_kz=".$db->db_add_param($studiengang, FHC_INTEGER)."
+							AND tbl_studienplan.orgform_kurzbz = ".$db->db_add_param($orgform_kurzbz)."
+							AND tbl_studienplan.aktiv
+							AND tbl_studienordnung.status_kurzbz='approved'
+							AND ((SELECT start FROM public.tbl_studiensemester WHERE studiensemester_kurzbz=tbl_studienordnung.gueltigvon) <= now() 
+									OR tbl_studienordnung.gueltigvon IS NULL)
+							AND ((SELECT ende FROM public.tbl_studiensemester WHERE studiensemester_kurzbz=tbl_studienordnung.gueltigbis) >= now() OR tbl_studienordnung.gueltigbis IS NULL)
+							ORDER BY studienplan_id DESC LIMIT 1)";
 	}
 	//$query .= " AND nachname='Al-Mafrachi'";
 	$query .= " ORDER BY tbl_ablauf.studiengang_kz, tbl_ablauf.semester, reihung";
@@ -1403,6 +1416,9 @@ if (isset($_REQUEST['reihungstest']))
 	}
 	if ($orgform_kurzbz != '')
 	{
+		//$query .= " AND tbl_prestudentstatus.orgform_kurzbz=" . $db->db_add_param($orgform_kurzbz);
+		//$query .= " AND tbl_ablauf.studienplan_id = tbl_prestudentstatus.studienplan_id";
+		//$query .= " AND tbl_ablauf.studienplan_id = 5";
 		$query .= " AND tbl_studienplan.orgform_kurzbz=" . $db->db_add_param($orgform_kurzbz);
 	}
 	//$query .= " AND nachname='Al-Mafrachi'";
@@ -1410,6 +1426,7 @@ if (isset($_REQUEST['reihungstest']))
 				vorname,
 				person_id	
 	";/*print_r($query);*/
+	//echo '<pre>', var_dump($query), '</pre>';
 	if (!($result = $db->db_query($query)))
 	{
 		die($db->db_last_error());
