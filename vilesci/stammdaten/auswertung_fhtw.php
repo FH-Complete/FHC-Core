@@ -1211,7 +1211,11 @@ if (isset($_REQUEST['reihungstest']))
 		}
 		$gebiet[$row->gebiet_id]->name = $row->gebiet;
 		$gebiet[$row->gebiet_id]->gebiet_id = $row->gebiet_id;
-		$gebiet[$row->gebiet_id]->gewicht = $row->gewicht;
+		//gewicht ist meist für alle Studiengänge gleich (Bachelor, Master und Distance haben jeweilsandere Gebiete)
+		if (!isset($gebiet[$row->gebiet_id]->gewicht))
+		{
+			$gebiet[$row->gebiet_id]->gewicht = $row->gewicht;
+		}
 	}
 
 	// Alle Ergebnisse laden
@@ -1476,18 +1480,22 @@ if (isset($_REQUEST['reihungstest']))
 
 		$ergebnis[$row->prestudent_id]->gebiet[$row->gebiet_id]->prozent = null;
 		$ergebnis[$row->prestudent_id]->gebiet[$row->gebiet_id]->punkte = $punkte;
+		$ergebnis[$row->prestudent_id]->gebiet[$row->gebiet_id]->punktemitoffset = null;
 
 		// Punkte berechnen
 		if (isset($punkte))
 		{
+			//offset zur Vermeidung negativer Prozentzahlen
+			$punkte_positiv = $punkte + $row->offsetpunkte;
+			$maxpunkte_positiv = $row->maxpunkte + $row->offsetpunkte;
+			$ergebnis[$row->prestudent_id]->gebiet[$row->gebiet_id]->punktemitoffset = $punkte_positiv;
+
 			if ($row->punkte >= $row->maxpunkte)
+			{
 				$ergebnis[$row->prestudent_id]->gebiet[$row->gebiet_id]->prozent = 100;
+			}
 			else
 			{
-				//offset zur Vermeidung negativer Prozentzahlen
-				$punkte_positiv = $punkte + $row->offsetpunkte;
-				$maxpunkte_positiv = $row->maxpunkte + $row->offsetpunkte;
-				//Formel: Summe(Punkte/Maxpunkte * Gewicht)
 				$ergebnis[$row->prestudent_id]->gebiet[$row->gebiet_id]->prozent = $maxpunkte_positiv > 0 ? $punkte_positiv / $maxpunkte_positiv * /*$row->gewicht **/ 100 : null;
 			}
 		}
@@ -1518,6 +1526,15 @@ if (isset($_REQUEST['reihungstest']))
 				$ergebnis[$row->prestudent_id]->gesamtpunkte = $punkte;
 			}
 
+			if (isset($ergebnis[$row->prestudent_id]->gesamtoffsetpunkte))
+			{
+				$ergebnis[$row->prestudent_id]->gesamtoffsetpunkte += $ergebnis[$row->prestudent_id]->gebiet[$row->gebiet_id]->punktemitoffset;
+			}
+			else
+			{
+				$ergebnis[$row->prestudent_id]->gesamtoffsetpunkte = $ergebnis[$row->prestudent_id]->gebiet[$row->gebiet_id]->punktemitoffset;
+			}
+
 			if (isset($row->punkte))
 			{
 				if (isset($ergebnis[$row->prestudent_id]->gesamtgewicht))
@@ -1529,28 +1546,6 @@ if (isset($_REQUEST['reihungstest']))
 					$ergebnis[$row->prestudent_id]->gesamtgewicht = $row->gewicht;
 				}
 			}
-
-			// Gesamtpunkte ohne Physik
-/*			if ($row->gebiet_id != 10)
-			{
-				if (isset($ergebnis[$row->prestudent_id]->gesamt_ohne_physik))
-				{
-					$ergebnis[$row->prestudent_id]->gesamt_ohne_physik += $prozent * $row->gewicht;
-				}
-				else
-				{
-					$ergebnis[$row->prestudent_id]->gesamt_ohne_physik = $prozent * $row->gewicht;
-				}
-
-				if (isset($ergebnis[$row->prestudent_id]->gesamtpunkte_ohne_physik))
-				{
-					$ergebnis[$row->prestudent_id]->gesamtpunkte_ohne_physik += $punkte;
-				}
-				else
-				{
-					$ergebnis[$row->prestudent_id]->gesamtpunkte_ohne_physik = $punkte;
-				}
-			}*/
 		}
 	}
 
@@ -1703,7 +1698,7 @@ if (isset($_REQUEST['format']) && $_REQUEST['format'] == 'xls')
 	foreach ($gebiet AS $gbt)
 	{
 		++$spalte;
-		$worksheet->write($zeile, ++$spalte, strip_tags($gbt->name) . (isset($gbt->gewicht) ? " (Gew: $gbt->gewicht)" : ""), $format_bold_border);
+		$worksheet->write($zeile, ++$spalte, strip_tags($gbt->name) . (	isset($gbt->gewicht) ? " (Gew: $gbt->gewicht)" : ""), $format_bold_border);
 		$worksheet->mergeCells($zeile, $spalte, 0, $spalte + 1);
 		$maxlength[$spalte] = 10;
 	}
@@ -2142,7 +2137,7 @@ else
 		$("#auswertung_table").tablesorter(
 		{			
 			widgets: ["zebra", "filter", "columnSelector"],
-			sortList: [[15,1],[17,1],[3,0],[4,0]],//16th fake hidden column for correct sort with colspan
+			sortList: [[15,1],[18,1],[3,0],[4,0]],//16th (index 15) fake hidden column for correct sort with colspan
 			headers: {0: { sorter: false, filter: false}, 2: { sorter: false, filter: false}, 4: { dateFormat: "ddmmyyyy" }, 15: { sorter: false, filter: false}}
 			/*widgetOptions : {
 				columnSelector_container : $("#columnSelector"),
@@ -2940,22 +2935,24 @@ else
 				<th rowspan="2">Raum</th>
 				<th title="Teilgenommen" rowspan="2">TG</th>
 				<th style="display: none"></th>
-				<th colspan="2">Gesamt</th>';
+				<th colspan="3">Gesamt</th>';
 
 		foreach ($gebiet AS $gbt)
 		{
-			echo '<th colspan="2">' . $gbt->name . '</th>';
+			echo '<th colspan="3">' . $gbt->name . '</th>';
 		}
 
 		echo '</tr>
 			<tr>
 				<th style="display: none"></th>
 				<th><small>Punkte</small></th>
+				<th><small>Punkte mit Offset</small></th>
 				<th><small>Prozent</small></th>';
 
 		foreach ($gebiet AS $gbt)
 		{
 			echo "<th><small>Punkte</small></th>";
+			echo "<th><small>Punkte mit Offset</small></th>";
 			echo "<th><small>Prozent</small></th>";
 		}
 
@@ -3010,25 +3007,16 @@ else
 					echo '  <span class=""><b>' . ($erg->gesamtpunkte != '' ? number_format($erg->gesamtpunkte, 2, ',', ' ') : '') . '</b></span>';
 				}
 				echo '	</td>';
-/*				if (!isset($erg->gesamtpunkte_ohne_physik))
-				{
-					$erg->gesamtpunkte_ohne_physik = '';
-				}*/
-/*				if (!isset($erg->gesamt_ohne_physik))
-				{
-					$erg->gesamt_ohne_physik = '';
-				}*/
+
+				echo '	<td style="text-align: right; padding-right: 3px" class="col_gesamtpunkte_mit_offset '.$inaktiv.'" nowrap>
+							<b>' . ($erg->gesamtoffsetpunkte != '' ? number_format($erg->gesamtoffsetpunkte, 2, ',', ' ') : '') . '</b>
+						</td>';
+
 				echo '	<td style="text-align: right; padding-right: 3px" class="col_gesamtpunkte punkte '.$inaktiv.'" nowrap>
 							<b>' . $gesamtprozent . '</b>
 							<span class="erg_gesamt" style="display: none">'.$erg->gesamt.'</span>
 						</td>';
-/*				echo '	<td style="text-align: right; padding-right: 3px" class="col_gesamtpunkte_ohne_physik '.$inaktiv.'" nowrap>
-							<b>' . ($erg->gesamtpunkte_ohne_physik != '' ? number_format($erg->gesamtpunkte_ohne_physik, 2, ',', ' ') : '') . '</b>
-						</td>';*/
-/*				echo '	<td style="text-align: right; padding-right: 3px" class="punkte '.$inaktiv.'" nowrap>
-							<b>' . ($erg->gesamt_ohne_physik != '' ? number_format($erg->gesamt_ohne_physik, 2, ',', ' ') : '') . '</b>
-							<span class="erg_gesamt_ohne_physik" style="display: none">'.$erg->gesamt_ohne_physik.'</span>
-						</td>';*/
+
 				foreach ($gebiet AS $gbt)
 				{
 					if (isset($erg->gebiet[$gbt->gebiet_id]))
@@ -3060,11 +3048,12 @@ else
 							echo '  <span class="">' . ($erg->gebiet[$gbt->gebiet_id]->punkte != '' ? number_format($erg->gebiet[$gbt->gebiet_id]->punkte, 2, ',', ' ') : '') . '</span>';
 						}
 						echo '</td>';
+						echo '<td ' . $style . ' class="pst_' . $erg->prestudent_id . '_gbt_' . $gbt->gebiet_id . ' punkte '.$inaktiv.'" nowrap>' . ($erg->gebiet[$gbt->gebiet_id]->punktemitoffset != '' ? number_format($erg->gebiet[$gbt->gebiet_id]->punktemitoffset, 2, ',', ' ') : '') . '</td>';
 						echo '<td ' . $style . ' class="pst_' . $erg->prestudent_id . '_gbt_' . $gbt->gebiet_id . ' punkte '.$inaktiv.'" nowrap>' . ($erg->gebiet[$gbt->gebiet_id]->prozent != '' ? number_format($erg->gebiet[$gbt->gebiet_id]->prozent, 2, ',', ' ') . ' %' : '') . '</td>';
 					}
 					else
 					{
-						echo '<td></td><td></td>';
+						echo '<td></td><td></td><td></td>';
 					}
 				}
 
