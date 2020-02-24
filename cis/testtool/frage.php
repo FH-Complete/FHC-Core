@@ -581,6 +581,14 @@ if($frage->frage_id!='')
     //Vorschlaege laden
 	$vs = new vorschlag();
 	$vs->getVorschlag($frage->frage_id, $_SESSION['sprache_user'], $gebiet->zufallvorschlag);
+
+	// Fallback auf DEFAULT_LANGUAGE wenn kein Vorschlag in der $_SESSION['sprache_user'] vorhanden ist
+	if (isset($vs->result[0]) && $vs->result[0]->text == '' && $vs->result[0]->bild == '' && $vs->result[0]->audio == '')
+	{
+		$vs = new vorschlag();
+		$vs->getVorschlag($frage->frage_id, DEFAULT_LANGUAGE, $gebiet->zufallvorschlag);
+	}
+
 	$letzte = $frage->getNextFrage($gebiet_id, $_SESSION['pruefling_id'], $frage_id, $demo);
 	echo "<form action=\"$PHP_SELF?gebiet_id=$gebiet_id&amp;frage_id=$frage->frage_id\" method=\"POST\" ".(!$letzte && !$levelgebiet?"onsubmit=\"letzteFrage()\"":"").">";
 	echo '
