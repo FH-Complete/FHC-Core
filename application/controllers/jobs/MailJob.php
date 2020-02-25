@@ -19,12 +19,13 @@ class MailJob extends JOB_Controller
 	 * Send all the NOT sent notice emails for messaging system
 	 * The parameters are all not mandatory, they could be used to overrides the configs for testing, debug or one shot purposes
 	 */
-	public function sendAllMessageEmailNotices($since = null, $numberToSent = null, $numberPerTimeRange = null, $emailTimeRange = null, $emailFromSystem = null)
+	public function sendAllMessageEmailNotices($since = '1970-01-01', $numberToSent = null, $numberPerTimeRange = null, $emailTimeRange = null, $emailFromSystem = null)
 	{
 		$this->logInfo('Send all message email notices started');
 
 		// Send them all!
 		$sendAllEmailNotices = $this->messagelib->sendAllEmailNotices($since, $numberToSent, $numberPerTimeRange, $emailTimeRange, $emailFromSystem);
+
 		if (isError($sendAllEmailNotices))
 		{
 			$optionalParameters = new stdClass();

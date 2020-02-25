@@ -26,6 +26,8 @@ class Messages_model extends CI_Model
 	const TYPE_PERSONS = 'persons';
 	const TYPE_PRESTUDENTS = 'prestudents';
 
+	const ALT_OE = 'infocenter'; // alternative organisation unit when no one is found for a presetudent
+
 	/**
 	 * Constructor
 	 */
@@ -106,7 +108,7 @@ class Messages_model extends CI_Model
 			{
 				$ouOptions .= sprintf(
 					"\n".'<option value="%s">%s</option>',
-					is_numeric($ou->prestudent_id) ? $ou->oe_kurzbz : MessageLib::ALT_OE,
+					is_numeric($ou->prestudent_id) ? $ou->oe_kurzbz : self::ALT_OE,
 					$ou->bezeichnung . (is_numeric($ou->prestudent_id) ? '' : ' *')
 				);
 			}

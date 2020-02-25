@@ -205,12 +205,13 @@ class Recipient_model extends DB_Model
 	 * @param limit specifies the max number of messages to get
 	 * @param since specifies from which date messages have to be retrieved
 	 */
-	public function getNotSentMessages($limit, $since = '1970-01-01')
+	public function getNotSentMessages($limit, $since)
 	{
 		$query = 'SELECT mm.message_id
 					FROM public.tbl_msg_recipient mr
 					JOIN public.tbl_msg_message mm USING (message_id)
 				   WHERE mr.sent IS NULL
+				   	 AND mr.sentinfo IS NULL
 				     AND mm.insertamum > ?
 				ORDER BY mr.insertamum ASC
 				   LIMIT ?';
