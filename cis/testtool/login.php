@@ -277,11 +277,11 @@ else
 	$ps=new prestudent();
 	$datum=date('Y-m-d');
 	// An der FHTW wird ein Bewerber nur einmal ausgegeben (1. Prio) falls es mehrere Bewerbungen gibt
-	if (CAMPUS_NAME == 'FH Technikum Wien')
+	/*if (CAMPUS_NAME == 'FH Technikum Wien')
 	{
 		$ps->getFirstPrioPrestudentRT($datum);
 	}
-	else
+	else*/
 	{
 		$ps->getPrestudentRT($datum);
 	}
@@ -504,7 +504,7 @@ if (isset($prestudent_id))
 	                || $ps_obj->lastStatus == "Wartender"
 	                || $ps_obj->lastStatus == "Aufgenommener")
                 {
-                    echo '<td style="width: 50%;">'. $ps_obj->typ_bz .' '. ($sprache_user == 'English' ? $stg->english : $stg->bezeichnung). '</td>';
+                    echo '<td style="width: 50%;">'. $ps_obj->typ_bz .' '. ($sprache_user == 'English' ? $stg->english : $stg->bezeichnung). ' ('.$ps_obj->orgform_bezeichnung[$sprache_user].')</td>';
                     if($ps_obj->ausbildungssemester == '1')
                     {
                         echo '<td>'. $p->t('testtool/regulaererEinstieg'). ' (1. Semester)</td>';

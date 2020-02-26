@@ -433,20 +433,27 @@ class prestudent extends person
 						pers.vorname, pers.nachname, pers.person_id, pers.titelpre,
 						pers.titelpost, pers.gebdatum,
 						tbl_reihungstest.*,
-						ps.studiengang_kz as studiengang_kz
+						ps.studiengang_kz as studiengang_kz,
+						tbl_studiengang.typ
 					FROM 
 						public.tbl_prestudent ps
-						JOIN public.tbl_person pers USING(person_id)
-						JOIN public.tbl_rt_person USING(person_id)
-						JOIN public.tbl_reihungstest ON(tbl_reihungstest.reihungstest_id=tbl_rt_person.rt_id)
+						JOIN public.tbl_person pers USING (person_id)
+						JOIN public.tbl_rt_person USING (person_id)
+						JOIN public.tbl_reihungstest ON (tbl_reihungstest.reihungstest_id=tbl_rt_person.rt_id)
+						JOIN public.tbl_studiengang ON (ps.studiengang_kz=tbl_studiengang.studiengang_kz)
+						JOIN public.tbl_prestudentstatus ON (tbl_prestudentstatus.prestudent_id=ps.prestudent_id 
+																AND status_kurzbz=\'Interessent\' 
+																AND tbl_prestudentstatus.studiensemester_kurzbz=tbl_reihungstest.studiensemester_kurzbz)
 					WHERE
 						tbl_reihungstest.datum='.$this->db_add_param($datum).'
 						/*AND tbl_rt_person.studienplan_id IN (SELECT studienplan_id FROM public.tbl_prestudentstatus WHERE prestudent_id=ps.prestudent_id)*/
+						AND tbl_prestudentstatus.studienplan_id IN (SELECT studienplan_id FROM public.tbl_rt_studienplan WHERE reihungstest_id=tbl_rt_person.rt_id)
 						AND EXISTS(SELECT * FROM public.tbl_prestudentstatus JOIN public.tbl_studiensemester USING(studiensemester_kurzbz)
-							WHERE prestudent_id=ps.prestudent_id AND tbl_studiensemester.ende>'.$this->db_add_param($datum).')
+							WHERE prestudent_id=ps.prestudent_id AND tbl_studiensemester.ende > '.$this->db_add_param($datum).')
 						AND priorisierung = (SELECT priorisierung FROM public.tbl_prestudent 
 									WHERE person_id = pers.person_id 
 									AND get_rolle_prestudent (ps.prestudent_id,NULL) IN (\'Interessent\',\'Bewerber\',\'Wartender\',\'Aufgenommener\')
+									--AND tbl_prestudent.studiengang_kz=ps.studiengang_kz
 									ORDER BY priorisierung ASC LIMIT 1)
 					ORDER BY nachname,vorname';
 
@@ -492,11 +499,12 @@ class prestudent extends person
 			SELECT DISTINCT ON (priorisierung, prestudent_id) 
 				priorisierung,
 				prestudent_id, 
-				studienplan_id,
+				tbl_prestudentstatus.studienplan_id,
 				studiengang_kz,
 				typ,
 				tbl_studiengangstyp.bezeichnung AS typ_bz,
-				ausbildungssemester
+				ausbildungssemester,
+				tbl_orgform.bezeichnung_mehrsprachig
 			FROM
 				public.tbl_prestudentstatus
 			JOIN
@@ -505,6 +513,10 @@ class prestudent extends person
 				public.tbl_studiengang USING (studiengang_kz)
 			JOIN
 				public.tbl_studiengangstyp USING (typ)
+			JOIN
+				lehre.tbl_studienplan ON (tbl_prestudentstatus.studienplan_id = tbl_studienplan.studienplan_id)
+			JOIN
+				bis.tbl_orgform ON (tbl_studienplan.orgform_kurzbz = tbl_orgform.orgform_kurzbz)
 			WHERE 
 				tbl_prestudent.person_id = (
 				SELECT
@@ -572,6 +584,7 @@ class prestudent extends person
 					$obj->typ = $row->typ;
 					$obj->typ_bz = $row->typ_bz;
 					$obj->ausbildungssemester = $row->ausbildungssemester;
+					$obj->orgform_bezeichnung = $this->db_parse_lang_array($row->bezeichnung_mehrsprachig);
 
 					$this->result[] = $obj;
 				}
