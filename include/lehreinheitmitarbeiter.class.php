@@ -495,6 +495,41 @@ class lehreinheitmitarbeiter extends basis_db
 		return $ret;
 	}
 
+	public function getLehreinheiten_SWS_BISMeldung($uid, $studiensemester)
+	{
+		$qry = '
+			SELECT 
+				round(sum(semesterstunden) / 15) AS sws
+			FROM (
+					 SELECT DISTINCT lehreinheit_id, studiensemester_kurzbz, mitarbeiter_uid, semesterstunden
+					 FROM lehre.tbl_lehreinheitmitarbeiter
+						  JOIN public.tbl_mitarbeiter ma USING (mitarbeiter_uid)
+						  JOIN public.tbl_benutzer ON (mitarbeiter_uid = uid)
+						  JOIN public.tbl_person USING (person_id)
+						  JOIN bis.tbl_bisverwendung USING (mitarbeiter_uid)
+						  JOIN lehre.tbl_lehreinheit USING (lehreinheit_id)
+						  JOIN public.tbl_studiensemester ss USING (studiensemester_kurzbz)
+					 WHERE mitarbeiter_uid = '. $this->db_add_param($uid).'
+					   AND ma.bismelden
+					   AND studiensemester_kurzbz = '. $this->db_add_param($studiensemester).'
+				 ) tbl_semesterstunden
+		';
+
+		if($this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object())
+			{
+				$this->result[] = $row->sws;
+			}
+			return true;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler bei der Datenbankabfrage';
+			return false;
+		}
+	}
+
 	/**
 	 * Laedt die Lektoren einer Lehrveranstaltung in einem Studiensemester
 	 * @param lehrveranstaltung_id
