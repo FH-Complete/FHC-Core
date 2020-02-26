@@ -3842,6 +3842,33 @@ if ($result = $db->db_query("SELECT 1 FROM pg_class WHERE relname = 'unq_idx_abl
 	}
 }
 
+// Spalte bezeichnung_mehrsprachig in public.tbl_studiengangstyp
+if(!$result = @$db->db_query("SELECT bzeichnung_mehrsprachig FROM public.tbl_studiengangstyp LIMIT 1"))
+{
+	$qry = "ALTER TABLE public.tbl_studiengangstyp ADD COLUMN bezeichnung_mehrsprachig varchar(255)[];";
+
+	if(!$db->db_query($qry))
+		echo '<strong>public.tbl_studiengangstyp '.$db->db_last_error().'</strong><br>';
+	else
+		echo 'public.tbl_studiengangstyp: Spalte bezeichnung_mehrsprachig hinzugefuegt!<br>';
+
+	// Bezeichnung_mehrsprachig aus existierender Bezeichnung vorausfuellen. Ein Eintrag fuer jede Sprache mit Content aktiv.
+	$qry_help = "SELECT index FROM public.tbl_sprache WHERE content=TRUE;";
+	if(!$result = $db->db_query($qry_help))
+		echo '<strong>tbl_studiengangstyp bezeichnung_mehrsprachig: Fehler beim ermitteln der Sprachen: '.$db->db_last_error().'</strong>';
+	else
+	{
+		$qry='';
+		while($row = $db->db_fetch_object($result))
+			$qry.= "UPDATE public.tbl_studiengangstyp set bezeichnung_mehrsprachig[".$row->index."] = bezeichnung;";
+
+		if(!$db->db_query($qry))
+			echo '<strong>Setzen der bezeichnung_mehrsprachig fehlgeschlagen: '.$db->db_last_error().'</strong><br>';
+		else
+			echo 'bis.tbl_studiengangstyp: bezeichnung_mehrprachig automatisch aus existierender Bezeichnung uebernommen<br>';
+	}
+}
+
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
 
