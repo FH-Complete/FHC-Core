@@ -3687,8 +3687,8 @@ if(!$result = @$db->db_query("SELECT orgform_kurzbz FROM public.tbl_bankverbindu
 		echo '<br>public.tbl_bankverbindung: Spalte orgform_kurzbz hinzugefuegt';
 }
 
-// iban und bic zu vw_msg_vars hinzufügen
-if(!$result = @$db->db_query('SELECT "IBAN Studiengang", "BIC Studiengang", "Studiengangskennzahl", "Einstiegssemester", "Einstiegsstudiensemester", "Vorname Studiengangsassistenz", "Nachname Studiengangsassistenz", "Durchwahl Studiengangsassistenz", "Relative Prio" FROM public.vw_msg_vars LIMIT 1'))
+// iban, bic und weitere Variablen zu vw_msg_vars hinzufügen
+if(!$result = @$db->db_query('SELECT "IBAN Studiengang", "BIC Studiengang", "Studiengangskennzahl", "Einstiegssemester", "Einstiegsstudiensemester", "Vorname Studiengangsassistenz", "Nachname Studiengangsassistenz", "Durchwahl Studiengangsassistenz", "Alias Studiengangsassistenz", "Relative Prio" FROM public.vw_msg_vars LIMIT 1'))
 {
 	$qry = '
 	CREATE OR REPLACE VIEW public.vw_msg_vars AS (
