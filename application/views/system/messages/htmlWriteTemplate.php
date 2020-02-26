@@ -139,7 +139,6 @@
 												'Dropdown_widget',
 												array('elements' => success($recipientsArray), 'emptyElement' => ucfirst($this->p->t('global', 'empfaenger')).'...'),
 												array(
-													/*'title' => ucfirst($this->p->t('global', 'empfaenger')).':&nbsp;',*/
 													'name' => 'recipients[]',
 													'id' => 'recipients'
 												)

@@ -63,7 +63,6 @@ class Vorlage_widget extends DropdownWidget
 					FROM tbl_vorlagestudiengang vs INNER JOIN tbl_vorlage v USING(vorlage_kurzbz)
 				) templates';
 		$alias = 'templates';
-		//$fields = array("templates.vorlage_kurzbz AS id", "UPPER(templates.oe_kurzbz) || ' - ' || templates.bezeichnung || ' - V' || templates.version AS description");
 	    $fields = array("templates.vorlage_kurzbz AS id", "templates.bezeichnung AS description");
 		$where = 'templates.aktiv = TRUE
 				AND templates.subject IS NOT NULL

@@ -223,7 +223,7 @@ class MessageLib
 		$this->_ci->load->model('person/Benutzerfunktion_model', 'BenutzerfunktionModel');
 
 		// Retrieves organisation units for a user from database
- 		$benutzer = $this->_ci->BenutzerfunktionModel->getByPersonId($sender_id);
+ 		$benutzer = $this->_ci->BenutzerfunktionModel->getActiveFunctionsByPersonId($sender_id);
  		if (isSuccess($benutzer)) // if everything is ok
  		{
 			$ouArray = array();
