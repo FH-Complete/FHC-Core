@@ -1,7 +1,7 @@
 <?php
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class ReihungstestJob extends CLI_Controller
+class Priorisation extends CLI_Controller
 {
 	/**
 	 * Constructor
@@ -11,15 +11,12 @@ class ReihungstestJob extends CLI_Controller
 		parent::__construct();
 
 		// Load models
-		$this->load->model('crm/Reihungstest_model', 'ReihungstestModel');
-		$this->load->model('crm/RtStudienplan_model', 'RtStudienplanModel');
-		$this->load->model('crm/Konto_model', 'KontoModel');
-		$this->load->model('crm/Prestudentstatus_model', 'PrestudentstatusModel');
-		$this->load->model('organisation/Studiengang_model', 'StudiengangModel');
-		$this->load->model('organisation/Studienplan_model', 'StudienplanModel');
+		$this->load->model('crm/Prestudent_model', 'PrestudentModel');
+		//$this->load->model('organisation/Studiengang_model', 'StudiengangModel');
+		//$this->load->model('organisation/Studienplan_model', 'StudienplanModel');
 
 		// Load helpers
-		$this->load->helper('hlp_sancho_helper');
+		//$this->load->helper('hlp_sancho_helper');
 	}
 
 	/**
@@ -317,7 +314,7 @@ class ReihungstestJob extends CLI_Controller
 	}
 
 	/*
-	 * Sends an email to all applicants of a placement test to remind them 2 working days before
+	 * Sends an email to all applicants of a placement test to remind them 3 working days before
 	 *
 	 * @param integer $degreeProgram. Kennzahl of Degree Program to check
 	 * @param string $bcc. Optional. BCC-Mailadress to send the Mails to
@@ -355,14 +352,14 @@ class ReihungstestJob extends CLI_Controller
 				$workingdays = 0;
 				$testsOndate = array();
 
-				// Deduct days till 2 working days are reached
+				// Deduct days till 3 working days are reached
 				for ($i = 1; ; $i++)
 				{
 					if (isDateWorkingDay($testDates->datum, $i) === true)
 					{
 						$workingdays++;
 					}
-					if ($workingdays == 2)
+					if ($workingdays == 3)
 					{
 						$enddate = date("Y-m-d", strtotime("$testDates->datum -" . $i . " days"));
 						break;
@@ -783,254 +780,6 @@ class ReihungstestJob extends CLI_Controller
 							));
 						}
 					}
-				}
-			}
-		}
-	}
-
-	/*
-	 * Cronjob for priorisation process of FHTW
-	 *
-	 * Wenn ein Student in einer höheren Prio aufgenommen wird, werden die anderen Bewerbungen auf "Abgewiesen" gesetzt,
-	 * solang diese noch im Status "Bewerber" sind.
-	 * Andernfalls wird eine Mail an die niedrigeren Prios verschickt, dass eine höhere Prio aufgenommen hat
-	 * Die Kaution wird automatisch gebucht
-	 *
-	 * @param string $bcc. Optional. BCC-Mailadress to send the Mails to
-	 * @param string $from. Optional. Sender-Mailadress shown to recipient
-	 */
-	public function prioritizationJob($bcc = null, $from = null)
-	{
-		$qry = "
-					SELECT DISTINCT
-					get_rolle_prestudent (tbl_prestudent.prestudent_id, 'WS2020') AS laststatus, /* Studiensemester dynamisch ermitteln oder als Parameter */
-					tbl_prestudentstatus.studiensemester_kurzbz,
-					tbl_prestudent.*
-					FROM PUBLIC.tbl_person
-					JOIN PUBLIC.tbl_prestudent USING (person_id)
-					JOIN PUBLIC.tbl_prestudentstatus USING (prestudent_id)
-					JOIN lehre.tbl_studienplan USING (studienplan_id)
-					JOIN lehre.tbl_studienordnung USING (studienordnung_id)
-					JOIN PUBLIC.tbl_studiengang ON (tbl_studienordnung.studiengang_kz = tbl_studiengang.studiengang_kz)
-					WHERE tbl_prestudentstatus.datum >= (SELECT CURRENT_DATE -1)
-						AND get_rolle_prestudent (tbl_prestudent.prestudent_id, 'WS2020') IN ('Aufgenommener','Bewerber','Wartender')
-						AND studiensemester_kurzbz = 'WS2020' /* Studiensemester dynamisch ermitteln oder als Parameter */
-						AND tbl_studiengang.typ = 'b'
-						ORDER BY studiengang_kz, laststatus
-					";
-
-		// Encode Params
-		if ($bcc != '')
-		{
-			// $bcc can be given as null-string, so check that too
-			if ($bcc == 'null')
-			{
-				$bcc = '';
-			}
-			else
-			{
-				$bcc = urldecode($bcc);
-			}
-		}
-		if ($from != '')
-		{
-			$from = urldecode($from);
-		}
-
-		$db = new DB_Model();
-		$result_prestudents = $db->execReadOnlyQuery($qry);
-		$mailArray = array();
-
-		if (hasdata($result_prestudents))
-		{
-			foreach ($result_prestudents->retval as $row_ps)
-			{
-				// Wenn der letzte Status "Aufgenommener" ist, alle niedrigeren Prios auf "Abgewiesen" setzen
-				// falls diese Bewerber oder Warteliste sind
-				// Danach Kaution einbuchen
-				if ($row_ps->laststatus == 'Aufgenommener')
-				{
-					// Alle niedrigeren Prios laden
-					$qryNiedrPrios = "
-						SELECT DISTINCT
-							get_rolle_prestudent (tbl_prestudent.prestudent_id, '".$row_ps->studiensemester_kurzbz."') AS laststatus,
-							tbl_studienplan.orgform_kurzbz,
-							tbl_person.nachname,
-							tbl_person.vorname,
-							tbl_prestudent.*
-						FROM PUBLIC.tbl_person
-							JOIN PUBLIC.tbl_prestudent USING (person_id)
-							JOIN PUBLIC.tbl_prestudentstatus USING (prestudent_id)
-							JOIN lehre.tbl_studienplan USING (studienplan_id)
-							JOIN PUBLIC.tbl_studiengang ON (tbl_prestudent.studiengang_kz = tbl_studiengang.studiengang_kz)
-						WHERE tbl_prestudent.person_id = ".$row_ps->person_id."
-							AND tbl_prestudent.prestudent_id != ".$row_ps->prestudent_id."
-							AND get_rolle_prestudent (tbl_prestudent.prestudent_id, '".$row_ps->studiensemester_kurzbz."') IN ('Aufgenommener','Bewerber','Wartender')
-							AND studiensemester_kurzbz = '".$row_ps->studiensemester_kurzbz."'
-							AND tbl_studiengang.typ = 'b'
-							AND priorisierung > ".$row_ps->priorisierung."
-						ORDER BY studiengang_kz, laststatus
-					";
-
-					$resultNiedrPrios = $db->execReadOnlyQuery($qryNiedrPrios);
-
-					if (hasdata($resultNiedrPrios))
-					{
-						foreach ($resultNiedrPrios->retval as $rowNiedrPrios)
-						{
-							if ($rowNiedrPrios->laststatus == 'Bewerber')
-							{
-								// Abgewiesenen-Status mit Statusgrund "Aufnahme anderer Studiengang" (ID 5) setzen
-								$lastStatus = $this->PrestudentstatusModel->getLastStatus($rowNiedrPrios->prestudent_id);
-
-								$result = $this->PrestudentstatusModel->insert(
-									array(
-										'prestudent_id' => $rowNiedrPrios->prestudent_id,
-										'studiensemester_kurzbz' => $lastStatus->retval[0]->studiensemester_kurzbz,
-										'ausbildungssemester' => $lastStatus->retval[0]->ausbildungssemester,
-										'datum' => date('Y-m-d'),
-										'orgform_kurzbz' => $lastStatus->retval[0]->orgform_kurzbz,
-										'studienplan_id' => $lastStatus->retval[0]->studienplan_id,
-										'status_kurzbz' => 'Abgewiesener',
-										'statusgrund_id' => 5,
-										'insertvon' => 'prioritizationJob',
-										'insertamum' => date('Y-m-d H:i:s')
-									)
-								);
-								if (isSuccess($result))
-								{
-									/*$mailArray[$rowNiedrPrios->studiengang_kz][$rowNiedrPrios->orgform_kurzbz]['AbgewiesenGesetzt'][]
-										= $rowNiedrPrios->nachname.' '.$rowNiedrPrios->vorname.' ('.$rowNiedrPrios->prestudent_id.')';*/
-								}
-							}
-							elseif ($rowNiedrPrios->laststatus == 'Wartender')
-							{
-								// Abgewiesenen-Status mit Statusgrund "Aufnahme anderer Studiengang" (ID 5) setzen
-								// Mail zur Info an Assistenz schicken
-								$lastStatus = $this->PrestudentstatusModel->getLastStatus($rowNiedrPrios->prestudent_id);
-
-								$result = $this->PrestudentstatusModel->insert(
-									array(
-										'prestudent_id' => $rowNiedrPrios->prestudent_id,
-										'studiensemester_kurzbz' => $lastStatus->retval[0]->studiensemester_kurzbz,
-										'ausbildungssemester' => $lastStatus->retval[0]->ausbildungssemester,
-										'datum' => date('Y-m-d'),
-										'orgform_kurzbz' => $lastStatus->retval[0]->orgform_kurzbz,
-										'studienplan_id' => $lastStatus->retval[0]->studienplan_id,
-										'status_kurzbz' => 'Abgewiesener',
-										'statusgrund_id' => 5,
-										'insertvon' => 'prioritizationJob',
-										'insertamum' => date('Y-m-d H:i:s')
-									)
-								);
-								if (isSuccess($result))
-								{
-									$mailArray[$rowNiedrPrios->studiengang_kz][$rowNiedrPrios->orgform_kurzbz]['AbgewiesenGesetzt'][]
-										= $rowNiedrPrios->nachname.' '.$rowNiedrPrios->vorname.' ('.$rowNiedrPrios->prestudent_id.')';
-								}
-							}
-							elseif ($rowNiedrPrios->laststatus == 'Aufgenommener')
-							{
-								// Mail zur Info an Assistenz schicken, dass in höherer Prio aufgenommen wurde
-								$mailArray[$rowNiedrPrios->studiengang_kz][$rowNiedrPrios->orgform_kurzbz]['AufnahmeHoeherePrio'][]
-									= $rowNiedrPrios->nachname.' '.$rowNiedrPrios->vorname.' ('.$rowNiedrPrios->prestudent_id.')';
-							}
-						}
-					}
-
-
-					// Kaution einbuchen für $row_ps->prestudent_id
-					// Vorher prüfen, ob schon eine Kaution gebucht ist
-					// Todo: Betrag automatisch aus tbl_buchungstyp laden
-
-					$qryKautionExists = "
-						SELECT count(*) as anzahl
-						FROM public.tbl_konto
-						WHERE person_id = ".$row_ps->person_id."
-							AND studiensemester_kurzbz = '".$row_ps->studiensemester_kurzbz."'
-							AND buchungstyp_kurzbz = 'Kaution'";
-
-					$resultKautionExists = $db->execReadOnlyQuery($qryKautionExists);
-					if (hasdata($resultKautionExists))
-					{
-						if ($resultKautionExists->retval[0]->anzahl == '0')
-						{
-							// Todo: Zahlungsreferenz generieren (StudiengangsOE+Buchungsnummer)
-							$this->KontoModel->insert(array(
-								"person_id" => $row_ps->person_id,
-								"studiengang_kz" => $row_ps->studiengang_kz,
-								"studiensemester_kurzbz" => $row_ps->studiensemester_kurzbz,
-								"betrag" => -150,
-								"buchungsdatum" => date('Y-m-d'),
-								"buchungstext" => 'Kaution',
-								"buchungstyp_kurzbz" => 'Kaution',
-								"insertvon" => 'prioritizationJob',
-								"insertamum" => date('Y-m-d H:i:s')
-							));
-						}
-					}
-				}
-			}
-		}
-		echo '<pre>', var_dump($mailArray), '</pre>';
-		// Mails senden
-		if (!isEmptyArray($mailArray))
-		{
-			foreach ($mailArray AS $stg=>$orgform)
-			{
-				$studiengang = $this->StudiengangModel->load($stg);
-
-				$mailcontent = '<p style="font-family: verdana, sans-serif;">
-									Folgende BewerberInnen wurden in einem höher priorisierten Studiengang aufgenommen und haben deshalb einen Status "Abgewiesen" erhalten:</p>';
-
-				foreach ($orgform AS $art=>$value)
-				{
-					// Orgform nur dazu schreiben, wenn es mehr als Eine gibt
-					if (count($orgform) > 1)
-					{
-						$mailcontent .= '<p style="font-family: verdana, sans-serif;"><b>Orgform '.$art.'</b></p>';
-					}
-					if (isset($value['AbgewiesenGesetzt']) && !isEmptyArray($value['AbgewiesenGesetzt']))
-					{
-						$mailcontent .= '<table style="border-collapse: collapse; border: 1px solid grey;">
-											<thead><th style="font-family: verdana, sans-serif; border: 1px solid grey; padding: 3px; text-align: left">Zuvor Warteliste</th></thead>
-											<tbody>';
-						sort($value['AbgewiesenGesetzt']);
-						foreach ($value['AbgewiesenGesetzt'] AS $key=>$bewerber)
-						{
-							$mailcontent .= '<tr><td style="font-family: verdana, sans-serif; border: 1px solid grey; padding: 3px">'.$bewerber.'</td></tr>';
-						}
-						$mailcontent .= '</tbody></table><br><br>';
-					}
-					if (isset($value['AufnahmeHoeherePrio']) && !isEmptyArray($value['AufnahmeHoeherePrio']))
-					{
-						$mailcontent .= '<table style="border-collapse: collapse; border: 1px solid grey;">
-											<thead><th style="font-family: verdana, sans-serif; border: 1px solid grey; padding: 3px; text-align: left">Zuvor BewerberIn</th></thead>
-											<tbody>';
-						sort($value['AufnahmeHoeherePrio']);
-						foreach ($value['AufnahmeHoeherePrio'] AS $key=>$bewerber)
-						{
-							$mailcontent .= '<tr><td style="font-family: verdana, sans-serif; border: 1px solid grey; padding: 3px">'.$bewerber.'</td></tr>';
-						}
-						$mailcontent .= '</tbody></table>';
-					}
-				}
-
-				$mailcontent_data_arr['table'] = $mailcontent;
-
-				// Send email in Sancho design
-				if (!isEmptyString($mailcontent))
-				{
-					sendSanchoMail(
-						'Sancho_ReihungstestteilnehmerJob',
-						$mailcontent_data_arr,
-						$studiengang->retval[0]->email,
-						'Status Abgewiesen gesetzt',
-						'sancho_header_min_bw.jpg',
-						'sancho_footer_min_bw.jpg',
-						$from,
-						'',
-						$bcc);
 				}
 			}
 		}
