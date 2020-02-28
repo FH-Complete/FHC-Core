@@ -1689,7 +1689,7 @@ if (isset($_REQUEST['format']) && $_REQUEST['format'] == 'xls')
 		$worksheet->mergeCells($zeile, $spalte, 0, $spalte + 2);
 		$spalte += 2;
 	}
-	$worksheet->write($zeile, ++$spalte, 'Gesamt (gewichtet)', $format_bold_border);
+	$worksheet->write($zeile, ++$spalte, 'Gesamt', $format_bold_border);
 	$worksheet->mergeCells($zeile, $spalte, 0, $spalte + 2);
 
 	$spalte = 12;
@@ -1702,10 +1702,11 @@ if (isset($_REQUEST['format']) && $_REQUEST['format'] == 'xls')
 		$worksheet->write($zeile + 1, ++$spalte, 'Punkte + Offset', $format_bold_border);
 		$worksheet->write($zeile + 1, ++$spalte, 'Prozent', $format_bold_border);
 	}
-	$maxlength[$spalte +1] = $maxlength[$spalte + 2] = $maxlength[$spalte + 3] = 14;
+	$maxlength[$spalte +1] = $maxlength[$spalte + 2] = 14;
+	$maxlength[$spalte + 3] = 17;
 	$worksheet->write($zeile + 1, ++$spalte, 'Punkte', $format_bold_border);
 	$worksheet->write($zeile + 1, ++$spalte, 'Punkte + Offset', $format_bold_border);
-	$worksheet->write($zeile + 1, ++$spalte, 'Prozent', $format_bold_border);
+	$worksheet->write($zeile + 1, ++$spalte, 'Prozent (gewichtet)', $format_bold_border);
 
 	$maxspalten = $spalte;
 
@@ -2774,7 +2775,7 @@ else
 				<th rowspan="2">Raum</th>
 				<th title="Teilgenommen" rowspan="2">TG</th>
 				<th style="display: none"></th>
-				<th colspan="3">Gesamt (gewichtet)</th>';
+				<th colspan="3">Gesamt</th>';
 
 		foreach ($gebiet AS $gbt)
 		{
@@ -2786,7 +2787,7 @@ else
 				<th style="display: none"></th>
 				<th><small>Punkte</small></th>
 				<th><small>Punkte mit Offset</small></th>
-				<th><small>Prozent</small></th>';
+				<th><small>Prozent (gewichtet)</small></th>';
 
 		foreach ($gebiet AS $gbt)
 		{
