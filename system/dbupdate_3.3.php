@@ -3687,8 +3687,8 @@ if(!$result = @$db->db_query("SELECT orgform_kurzbz FROM public.tbl_bankverbindu
 		echo '<br>public.tbl_bankverbindung: Spalte orgform_kurzbz hinzugefuegt';
 }
 
-// iban und bic zu vw_msg_vars hinzufügen
-if(!$result = @$db->db_query('SELECT "IBAN Studiengang", "BIC Studiengang", "Studiengangskennzahl", "Einstiegssemester", "Einstiegsstudiensemester", "Vorname Studiengangsassistenz", "Nachname Studiengangsassistenz", "Durchwahl Studiengangsassistenz", "Relative Prio" FROM public.vw_msg_vars LIMIT 1'))
+// iban, bic und weitere Variablen zu vw_msg_vars hinzufügen
+if(!$result = @$db->db_query('SELECT "IBAN Studiengang", "BIC Studiengang", "Studiengangskennzahl", "Einstiegssemester", "Einstiegsstudiensemester", "Vorname Studiengangsassistenz", "Nachname Studiengangsassistenz", "Durchwahl Studiengangsassistenz", "Alias Studiengangsassistenz", "Relative Prio" FROM public.vw_msg_vars LIMIT 1'))
 {
 	$qry = '
 	CREATE OR REPLACE VIEW public.vw_msg_vars AS (
@@ -3826,6 +3826,20 @@ if(!$result = @$db->db_query('SELECT "IBAN Studiengang", "BIC Studiengang", "Stu
 		echo '<strong>public.vw_msg_vars: '.$db->db_last_error().'</strong><br>';
 	else
 		echo '<br>public.vw_msg_vars IBAN Studiengang, BIC Studiengang, Studiengangskennzahl, Einstiegssemester, Einstiegsstudiensemester, Vorname Studiengangsassistenz, Nachname Studiengangsassistenz, Durchwahl Studiengangsassistenz, Relative Priorität added';
+}
+
+// UNIQUE INDEX unq_idx_ablauf_gebiet_studiengang_semester in testtool.tbl_ablauf löschen und durch neuen INDEX ersetzen, der auch den Studienplan einschließt
+if ($result = $db->db_query("SELECT 1 FROM pg_class WHERE relname = 'unq_idx_ablauf_gebiet_studiengang_semester'"))
+{
+	if ($db->db_num_rows($result) == 1)
+	{
+		$qry = 'DROP INDEX testtool.unq_idx_ablauf_gebiet_studiengang_semester;';
+		$qry .= 'CREATE UNIQUE INDEX unq_idx_ablauf_gebiet_studiengang_semester_studienplan ON testtool.tbl_ablauf USING btree (gebiet_id, studiengang_kz, semester, studienplan_id);';
+		if (!$db->db_query($qry))
+			echo '<strong>unq_idx_ablauf_gebiet_studiengang_semester_studienplan '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>Dropped index "unq_idx_ablauf_gebiet_studiengang_semester" and created unique index "unq_idx_ablauf_gebiet_studiengang_semester_studienplan"';
+	}
 }
 
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen

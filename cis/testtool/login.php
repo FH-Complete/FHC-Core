@@ -66,6 +66,7 @@ $gebdatum='';
 $date = new datum();
 
 $reload_menu=false;
+$alertmsg = '';
 
 $sg_var = new studiengang();
 
@@ -189,7 +190,7 @@ if (isset($_POST['prestudent']) && isset($gebdatum))
 
                 // * 1. Sprache über Ablauf Vorgaben ermitteln
 				$ablauf = new Ablauf();
-				$ablauf->getAblaufVorgabeStudiengang($firstPrio_studiengang_kz);
+				$ablauf->getAblaufGebiete($firstPrio_studiengang_kz, $firstPrio_studienplan_id);
 				$rt_sprache = '';
 
 				if(!empty($ablauf->result[0]))
@@ -224,17 +225,17 @@ if (isset($_POST['prestudent']) && isset($gebdatum))
 			}
 			else
             {
-                echo '<span class="error">'.$p->t('testtool/reihungstestNichtFreigeschalten').'</span>';
+	            $alertmsg .= '<div class="alert alert-danger">'.$p->t('testtool/reihungstestNichtFreigeschalten').'</div>';
 			}
 		}
 		else
 		{
-			echo '<span class="error">'.$p->t('testtool/reihungstestKannNichtGeladenWerden').'</span>';
+			$alertmsg .= '<div class="alert alert-danger">'.$p->t('testtool/reihungstestKannNichtGeladenWerden').'</div>';
 		}
 	}
 	else
 	{
-		echo '<span class="error">'.$p->t('testtool/geburtsdatumStimmtNichtUeberein').'</span>';
+		$alertmsg .= '<div class="alert alert-danger">'.$p->t('testtool/geburtsdatumStimmtNichtUeberein').'</div>';
 	}
 }
 
@@ -275,7 +276,15 @@ else
 	//$prestudent_id=null;
 	$ps=new prestudent();
 	$datum=date('Y-m-d');
-	$ps->getPrestudentRT($datum);
+	// An der FHTW wird ein Bewerber nur einmal ausgegeben (1. Prio) falls es mehrere Bewerbungen gibt
+	/*if (CAMPUS_NAME == 'FH Technikum Wien')
+	{
+		$ps->getFirstPrioPrestudentRT($datum);
+	}
+	else*/
+	{
+		$ps->getPrestudentRT($datum);
+	}
 }
 
 
@@ -490,16 +499,19 @@ if (isset($prestudent_id))
                 echo '<tr>';
                 $stg = new Studiengang($ps_obj->studiengang_kz);
 
-                if($ps_obj->lastStatus == "Interessent")
+                if($ps_obj->lastStatus == "Interessent"
+	                || $ps_obj->lastStatus == "Bewerber"
+	                || $ps_obj->lastStatus == "Wartender"
+	                || $ps_obj->lastStatus == "Aufgenommener")
                 {
-                    echo '<td style="width: 50%;">'. $ps_obj->typ_bz .' '. ($sprache_user == 'English' ? $stg->english : $stg->bezeichnung). '</td>';
+                    echo '<td style="width: 50%;">'. $ps_obj->typ_bz .' '. ($sprache_user == 'English' ? $stg->english : $stg->bezeichnung). ' ('.$ps_obj->orgform_bezeichnung[$sprache_user].')</td>';
                     if($ps_obj->ausbildungssemester == '1')
                     {
                         echo '<td>'. $p->t('testtool/regulaererEinstieg'). ' (1. Semester)</td>';
                     }
                     elseif($ps_obj->ausbildungssemester == '3')
                     {
-                        echo '<td>'. $p->t('testtool/quereinstieg'). ' (3.Semester)</td>';
+                        echo '<td>'. $p->t('testtool/quereinstieg'). ' (3. Semester)</td>';
                     }
                 }
                 // wenn letzter Status \'Abgewiesener\' ist, dann als solchen kennzeichnen
@@ -564,7 +576,8 @@ else // LOGIN Site (vor Login)
     echo '<div class="col-xs-11">';
 
 //    Welcome text
-    echo '
+	echo $alertmsg;
+	echo '
         <div class="row" style="margin-bottom: 10%; margin-top: 3%;">
             <div class="col-xs-6 text-center" style="border-right: 1px solid lightgrey;">
                 <h1 style="white-space: normal">Herzlich Willkommen zum Reihungstest</h1><br><br>
@@ -615,7 +628,7 @@ else // LOGIN Site (vor Login)
     echo '<div class="form-group"> ';
     echo '<label for="datepicker" class="col-sm-offset-1 col-sm-4 control-label">Geburtsdatum | Date of Birth</label>';
     echo '<div class="col-sm-3">';
-    echo '<input type="text" id="datepicker" class="form-control" name="gebdatum" value="'.$date->formatDatum($gebdatum,'d.m.Y').'">';
+    echo '<input type="text" id="datepicker" class="form-control" name="gebdatum" value="'.$date->formatDatum($gebdatum,'d.m.Y').'" placeholder="DD.MM.YYYY">';
     echo '</div>'; // end col-xs
     echo '</div>'; // end form-group
 
