@@ -801,9 +801,8 @@ class ReihungstestJob extends CLI_Controller
 	 */
 	public function prioritizationJob($bcc = null, $from = null)
 	{
-		$qry = "
-					SELECT DISTINCT
-					get_rolle_prestudent (tbl_prestudent.prestudent_id, 'WS2020') AS laststatus, /* Studiensemester dynamisch ermitteln oder als Parameter */
+		$qry = "    SELECT DISTINCT
+					get_rolle_prestudent (tbl_prestudent.prestudent_id, 'WS2020') AS laststatus, /* Todo: Studiensemester dynamisch ermitteln oder als Parameter */
 					tbl_prestudentstatus.studiensemester_kurzbz,
 					tbl_prestudent.*
 					FROM PUBLIC.tbl_person
@@ -814,7 +813,7 @@ class ReihungstestJob extends CLI_Controller
 					JOIN PUBLIC.tbl_studiengang ON (tbl_studienordnung.studiengang_kz = tbl_studiengang.studiengang_kz)
 					WHERE tbl_prestudentstatus.datum >= (SELECT CURRENT_DATE -1)
 						AND get_rolle_prestudent (tbl_prestudent.prestudent_id, 'WS2020') IN ('Aufgenommener','Bewerber','Wartender')
-						AND studiensemester_kurzbz = 'WS2020' /* Studiensemester dynamisch ermitteln oder als Parameter */
+						AND studiensemester_kurzbz = 'WS2020' /* Todo: Studiensemester dynamisch ermitteln oder als Parameter */
 						AND tbl_studiengang.typ = 'b'
 						ORDER BY studiengang_kz, laststatus
 					";
@@ -899,8 +898,9 @@ class ReihungstestJob extends CLI_Controller
 								);
 								if (isSuccess($result))
 								{
-									/*$mailArray[$rowNiedrPrios->studiengang_kz][$rowNiedrPrios->orgform_kurzbz]['AbgewiesenGesetzt'][]
-										= $rowNiedrPrios->nachname.' '.$rowNiedrPrios->vorname.' ('.$rowNiedrPrios->prestudent_id.')';*/
+									// Derzeit nur Info an Admins schicken, wenn er Bewerber war
+									$mailArray[$rowNiedrPrios->studiengang_kz][$rowNiedrPrios->orgform_kurzbz]['AbgewiesenWeilBewerber'][]
+										= $rowNiedrPrios->nachname.' '.$rowNiedrPrios->vorname.' ('.$rowNiedrPrios->prestudent_id.')';
 								}
 							}
 							elseif ($rowNiedrPrios->laststatus == 'Wartender')
@@ -925,7 +925,7 @@ class ReihungstestJob extends CLI_Controller
 								);
 								if (isSuccess($result))
 								{
-									$mailArray[$rowNiedrPrios->studiengang_kz][$rowNiedrPrios->orgform_kurzbz]['AbgewiesenGesetzt'][]
+									$mailArray[$rowNiedrPrios->studiengang_kz][$rowNiedrPrios->orgform_kurzbz]['AbgewiesenGesetztWartender'][]
 										= $rowNiedrPrios->nachname.' '.$rowNiedrPrios->vorname.' ('.$rowNiedrPrios->prestudent_id.')';
 								}
 							}
@@ -937,7 +937,6 @@ class ReihungstestJob extends CLI_Controller
 							}
 						}
 					}
-
 
 					// Kaution einbuchen für $row_ps->prestudent_id
 					// Vorher prüfen, ob schon eine Kaution gebucht ist
@@ -972,16 +971,14 @@ class ReihungstestJob extends CLI_Controller
 				}
 			}
 		}
-		echo '<pre>', var_dump($mailArray), '</pre>';
+
 		// Mails senden
 		if (!isEmptyArray($mailArray))
 		{
 			foreach ($mailArray AS $stg=>$orgform)
 			{
 				$studiengang = $this->StudiengangModel->load($stg);
-
-				$mailcontent = '<p style="font-family: verdana, sans-serif;">
-									Folgende BewerberInnen wurden in einem höher priorisierten Studiengang aufgenommen und haben deshalb einen Status "Abgewiesen" erhalten:</p>';
+				$mailcontent = '';
 
 				foreach ($orgform AS $art=>$value)
 				{
@@ -990,13 +987,15 @@ class ReihungstestJob extends CLI_Controller
 					{
 						$mailcontent .= '<p style="font-family: verdana, sans-serif;"><b>Orgform '.$art.'</b></p>';
 					}
-					if (isset($value['AbgewiesenGesetzt']) && !isEmptyArray($value['AbgewiesenGesetzt']))
+					if (isset($value['AbgewiesenGesetztWartender']) && !isEmptyArray($value['AbgewiesenGesetztWartender']))
 					{
-						$mailcontent .= '<table style="border-collapse: collapse; border: 1px solid grey;">
-											<thead><th style="font-family: verdana, sans-serif; border: 1px solid grey; padding: 3px; text-align: left">Zuvor Warteliste</th></thead>
-											<tbody>';
-						sort($value['AbgewiesenGesetzt']);
-						foreach ($value['AbgewiesenGesetzt'] AS $key=>$bewerber)
+						$mailcontent .= '<p style="font-family: verdana, sans-serif;">
+									Folgende Personen auf der Warteliste wurden in einem höher priorisierten Studiengang aufgenommen und haben deshalb einen Status "Abgewiesen" erhalten:</p>';
+						$mailcontent .= '<table style="border-collapse: collapse; border: 1px solid grey;">';
+						//$mailcontent .= '<thead><th style="font-family: verdana, sans-serif; border: 1px solid grey; padding: 3px; text-align: left">Zuvor Warteliste</th></thead>';
+						$mailcontent .= '					<tbody>';
+						sort($value['AbgewiesenGesetztWartender']);
+						foreach ($value['AbgewiesenGesetztWartender'] AS $key=>$bewerber)
 						{
 							$mailcontent .= '<tr><td style="font-family: verdana, sans-serif; border: 1px solid grey; padding: 3px">'.$bewerber.'</td></tr>';
 						}
@@ -1004,11 +1003,27 @@ class ReihungstestJob extends CLI_Controller
 					}
 					if (isset($value['AufnahmeHoeherePrio']) && !isEmptyArray($value['AufnahmeHoeherePrio']))
 					{
-						$mailcontent .= '<table style="border-collapse: collapse; border: 1px solid grey;">
-											<thead><th style="font-family: verdana, sans-serif; border: 1px solid grey; padding: 3px; text-align: left">Zuvor BewerberIn</th></thead>
-											<tbody>';
+						$mailcontent .= '<p style="font-family: verdana, sans-serif;">
+									Folgende Aufgenommene wurden in einem höher priorisierten Studiengang aufgenommen:</p>';
+						$mailcontent .= '<table style="border-collapse: collapse; border: 1px solid grey;">';
+						//$mailcontent .= '<thead><th style="font-family: verdana, sans-serif; border: 1px solid grey; padding: 3px; text-align: left">Aufgenommene</th></thead>';
+						$mailcontent .= '					<tbody>';
 						sort($value['AufnahmeHoeherePrio']);
 						foreach ($value['AufnahmeHoeherePrio'] AS $key=>$bewerber)
+						{
+							$mailcontent .= '<tr><td style="font-family: verdana, sans-serif; border: 1px solid grey; padding: 3px">'.$bewerber.'</td></tr>';
+						}
+						$mailcontent .= '</tbody></table>';
+					}
+					if ($bcc != '' && isset($value['AbgewiesenWeilBewerber']) && !isEmptyArray($value['AbgewiesenWeilBewerber']))
+					{
+						$mailcontent .= '<p style="font-family: verdana, sans-serif;">
+										Folgende BewerberInnen wurden zu Abgewiesenen gemacht:</p>';
+						$mailcontent .= '<table style="border-collapse: collapse; border: 1px solid grey;">';
+						//$mailcontent .= '<thead><th style="font-family: verdana, sans-serif; border: 1px solid grey; padding: 3px; text-align: left">Aufgenommene</th></thead>';
+						$mailcontent .= '					<tbody>';
+						sort($value['AbgewiesenWeilBewerber']);
+						foreach ($value['AbgewiesenWeilBewerber'] AS $key => $bewerber)
 						{
 							$mailcontent .= '<tr><td style="font-family: verdana, sans-serif; border: 1px solid grey; padding: 3px">'.$bewerber.'</td></tr>';
 						}
