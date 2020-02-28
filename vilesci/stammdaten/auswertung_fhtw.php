@@ -504,7 +504,7 @@ if ($testende)
 
 				// Setzt "teilgenommen" (Zum Reihungstest angetreten) auf TRUE
 				$teilgenommen = new reihungstest();
-				$teilgenommen->getPersonReihungstest($prestudentrolle->person_id, $_POST['reihungstest_id']);
+				$teilgenommen->getPersonReihungstest($prestudentrolle->person_id, $_POST['reihungstest_id'], $prestudentrolle->studienplan_id);
 
 				$teilgenommen->new = false;
 				$teilgenommen->teilgenommen = true;
@@ -766,7 +766,7 @@ if ($punkteUebertragen)
 					}
 					else
 					{
-						$msg_warning .= '<br>Der Prestudent '.$array['prestudent_id'].' hat bereits Punkte eingetragen.';
+						$msg_warning .= '<br>Der Prestudent '.$array['prestudent_id'].' hat bereits Punkte für den Studienplan '.$prestudentrolle->studienplan_id.' eingetragen.';
 					}
 				}
 				else
@@ -779,6 +779,7 @@ if ($punkteUebertragen)
 					{
 						$ort_kurzbz = $setRTPunkte->ort_kurzbz;
 					}
+					$setRTPunkte = new reihungstest();
 					$setRTPunkte->getPersonReihungstest($prestudentrolle->person_id, $_POST['reihungstest_id'], $prestudentrolle->studienplan_id);
 
 					// Check, ob Punkte schon befüllt sind
@@ -788,6 +789,7 @@ if ($punkteUebertragen)
 						$setRTPunkte->person_id = $prestudentrolle->person_id;
 						$setRTPunkte->reihungstest_id = $_POST['reihungstest_id'];
 						$setRTPunkte->anmeldedatum = '';
+						$setRTPunkte->teilgenommen = true;
 						$setRTPunkte->ort_kurzbz = $ort_kurzbz;
 						$setRTPunkte->studienplan_id = $prestudentrolle->studienplan_id;
 						$setRTPunkte->punkte = $rtpunkte;
@@ -805,7 +807,7 @@ if ($punkteUebertragen)
 					}
 					else
 					{
-						$msg_warning .= '<br>Der Prestudent '.$array['prestudent_id'].' hat bereits Punkte eingetragen.';
+						$msg_warning .= '<br>Der Prestudent '.$array['prestudent_id'].' hat bereits Punkte für den Studienplan '.$prestudentrolle->studienplan_id.' eingetragen.';
 					}
 				}
 
@@ -819,7 +821,7 @@ if ($punkteUebertragen)
 					if ($prestudent->punkte == '')
 					{
 						$prestudent->new = false;
-						$prestudent->punkte = number_format($array['ergebnis'], 4);
+						$prestudent->punkte = $rtpunkte;
 						$prestudent->reihungstestangetreten = true;
 						$setRTPunkte->updateamum = date('Y-m-d H:i:s');
 						$setRTPunkte->updatevon = $user;
@@ -1198,7 +1200,7 @@ if (isset($_REQUEST['reihungstest']))
 	}
 	if ($orgform_kurzbz != '' && $studiengang != '')
 	{
-		$query .= " AND tbl_ablauf.studienplan_id=(
+		$query .= " AND (tbl_ablauf.studienplan_id=(
 							SELECT studienplan_id FROM lehre.tbl_studienplan 
 							JOIN lehre.tbl_studienordnung USING (studienordnung_id) 
 							WHERE studiengang_kz=".$db->db_add_param($studiengang, FHC_INTEGER)."
@@ -1208,7 +1210,8 @@ if (isset($_REQUEST['reihungstest']))
 							AND ((SELECT start FROM public.tbl_studiensemester WHERE studiensemester_kurzbz=tbl_studienordnung.gueltigvon) <= now() 
 									OR tbl_studienordnung.gueltigvon IS NULL)
 							AND ((SELECT ende FROM public.tbl_studiensemester WHERE studiensemester_kurzbz=tbl_studienordnung.gueltigbis) >= now() OR tbl_studienordnung.gueltigbis IS NULL)
-							ORDER BY studienplan_id DESC LIMIT 1)";
+							ORDER BY studienplan_id DESC LIMIT 1)
+							OR tbl_ablauf.studienplan_id IS NULL)";
 	}
 	//$query .= " AND nachname='Al-Mafrachi'";
 	$query .= " ORDER BY tbl_ablauf.studiengang_kz, tbl_ablauf.semester, reihung";
@@ -2575,6 +2578,10 @@ else
 						$("#msgbox").show();
 						$("#msgbox").append(data["msg_success"]);
 					}
+					else
+					{
+						$(".loaderIcon").hide();
+					}
 					if(data["msg_warning"] !== "")
 					{
 						$("#msgbox").attr("class","alert alert-warning");
@@ -2583,12 +2590,20 @@ else
 						$("#msgbox").append(data["msg_warning"]);
 						//$("#msgbox").html(data["msg"]).delay(2000).fadeOut();
 					}
+					else
+					{
+						$(".loaderIcon").hide();
+					}
 					if(data["msg_error"] !== "")
 					{
 						$("#msgbox").attr("class","alert alert-danger");
 						$(".loaderIcon").hide();
 						$("#msgbox").show();
 						$("#msgbox").append(data["msg_error"]);
+					}
+					else
+					{
+						$(".loaderIcon").hide();
 					}
 				},
 				error: function(data)
