@@ -45,6 +45,10 @@ echo '<?xml-stylesheet href="'.APP_ROOT.'content/datepicker/datepicker.css" type
 
 $prestudent_id = filter_input(INPUT_GET,'prestudent_id');
 
+if(!defined('FAS_REIHUNGSTEST_PUNKTEUEBERNAHME') || FAS_REIHUNGSTEST_PUNKTEUEBERNAHME == true)
+	$rt_uebernahme = true;
+else
+	$rt_uebernahme = false;
 echo '
 <!DOCTYPE overlay [';
 require('../../locale/'.$variable->variable->locale.'/fas.dtd');
@@ -293,7 +297,15 @@ echo ']>
 										<label value="Punkte" control="aufnahmetermine-textbox-punkte" />
 										<hbox>
 											<textbox id="aufnahmetermine-textbox-punkte" disabled="true" maxlength="8" size="6"/>
-											<toolbarbutton id="aufnahmetermine-button-reihungstest-punktesync" image="../../skin/images/transmit.png" tooltiptext="Reihungstest Ergebnis holen" onclick="AufnahemTermineReihungstestPunkteTransmit()"/>
+											<toolbarbutton
+												id="aufnahmetermine-button-reihungstest-punktesync"
+												<?php
+												if(!$rt_uebernahme)
+													echo 'hidden="true"';
+												?>
+												image="../../skin/images/transmit.png"
+												tooltiptext="Reihungstest Ergebnis holen"
+												onclick="AufnahemTermineReihungstestPunkteTransmit()"/>
 											<spacer flex="1" />
 										</hbox>
                                     </row>

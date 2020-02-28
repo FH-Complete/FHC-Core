@@ -565,6 +565,7 @@ if ($testende)
 									$mailtext .= '<br> Es haben <b>'.$anzahl.'</b> Person(en) aus dem Studiengang '.$stg->kuerzel.'-'.$orgForm.' teilgenommen.';
 									$mailtext .= '<br><br><a href="' . APP_ROOT . 'vilesci/stammdaten/auswertung_fhtw.php?reihungstest=' . $reihungstest->reihungstest_id . '&studiengang=' . $studiengang_kz . '&orgform_kurzbz=' . $orgForm . '">Link zur Auswertung</a>';
 									$mailtext .= '<br><br><a href="' . APP_ROOT . 'addons/reports/cis/vorschau.php?statistik_kurzbz=BewerberReihungstestPriorisierung&debug=true">Link zur Pivot-Tabelle für die Priorisierung</a>';
+									$mailtext .= '<br><br>Reihung der BewerberInnen: Prio 1 innerhalb von 2 Werktagen, Prio 2 am 3. Werktag und Prio 3 am 4. Werktag';
 									$mailtext .= '</td>
 											</tr>
 											<tr>
