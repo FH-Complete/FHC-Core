@@ -62,7 +62,7 @@
 					</div>
 					<br>
 					<div class="row">
-						<div class="col-lg-10">
+						<div class="col-lg-9">
 							<label>
 
 								<?php echo ucfirst($this->p->t('global', 'nachricht')); ?>:
@@ -74,7 +74,7 @@
 
 							</textarea>
 						</div>
-						<div class="col-lg-2">
+						<div class="col-lg-3">
 							<div class="form-group">
 								<label>
 
@@ -89,7 +89,7 @@
 										array(
 											'name' => 'variables[]',
 											'id' => 'variables',
-											'size' => 14,
+											'size' => 27,
 											'multiple' => true
 										)
 									);

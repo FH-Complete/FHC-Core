@@ -46,10 +46,7 @@ $(document).ready(function ()
 {
 	tinymce.init({
 		selector: "#bodyTextArea",
-		plugins: "autoresize",
-		autoresize_min_height: 150,
-		autoresize_max_height: 600,
-		autoresize_bottom_margin: 10
+		plugins: "autoresize"
 	});
 
 	tinymce.init({
@@ -58,9 +55,7 @@ $(document).ready(function ()
 		menubar: false,
 		toolbar: false,
 		statusbar: false,
-		readonly: 1,
-		autoresize_min_height: 150,
-		autoresize_bottom_margin: 10
+		readonly: 1
 	});
 
 	if ($("#variables"))
