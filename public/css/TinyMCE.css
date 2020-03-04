@@ -1,0 +1,7 @@
+.mce-tinymce .mce-container .mce-panel {
+	border-width: 0px;
+}
+
+.mce-panel {
+	border-width: 0px !important;
+}

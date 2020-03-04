@@ -504,7 +504,7 @@ if ($testende)
 
 				// Setzt "teilgenommen" (Zum Reihungstest angetreten) auf TRUE
 				$teilgenommen = new reihungstest();
-				$teilgenommen->getPersonReihungstest($prestudentrolle->person_id, $_POST['reihungstest_id']);
+				$teilgenommen->getPersonReihungstest($prestudentrolle->person_id, $_POST['reihungstest_id'], $prestudentrolle->studienplan_id);
 
 				$teilgenommen->new = false;
 				$teilgenommen->teilgenommen = true;
@@ -562,10 +562,10 @@ if ($testende)
 											<tr>
 												<td style="padding-left: 8%; padding-right: 8%; padding-top: 5%; padding-bottom: 5%; font-family: verdana, sans-serif; font-size: 1em; border-bottom: 2px solid #000000;">';
 									$mailtext .= 'Der Reihungstest vom ' . $datum_obj->convertISODate($reihungstest->datum) . ' um ' . $datum_obj->formatDatum($reihungstest->uhrzeit, 'H:i') . ' Uhr ist beendet.';
-									$mailtext .= '<br> Es haben <b>'.$anzahl.'</b> Person(en) aus dem Studiengang '.$stg->kuerzel.'-'.$orgForm.' teilgenommen';
-									$mailtext .= '<br> Sie finden die Auswertung unter dem folgendem Link:';
+									$mailtext .= '<br> Es haben <b>'.$anzahl.'</b> Person(en) aus dem Studiengang '.$stg->kuerzel.'-'.$orgForm.' teilgenommen.';
 									$mailtext .= '<br><br><a href="' . APP_ROOT . 'vilesci/stammdaten/auswertung_fhtw.php?reihungstest=' . $reihungstest->reihungstest_id . '&studiengang=' . $studiengang_kz . '&orgform_kurzbz=' . $orgForm . '">Link zur Auswertung</a>';
-
+									$mailtext .= '<br><br><a href="' . APP_ROOT . 'addons/reports/cis/vorschau.php?statistik_kurzbz=BewerberReihungstestPriorisierung&debug=true">Link zur Pivot-Tabelle für die Priorisierung</a>';
+									$mailtext .= '<br><br>Reihung der BewerberInnen: Prio 1 innerhalb von 2 Werktagen, Prio 2 am 3. Werktag und Prio 3 am 4. Werktag';
 									$mailtext .= '</td>
 											</tr>
 											<tr>
@@ -643,7 +643,7 @@ if (isset($_POST['method']) && $_POST['method'] == 'addPerson')
 			if ($row->bewerbung_abgeschicktamum != '' && $row->bestaetigtam != '' && $row->studienplan_id != '')
 			{
 				$studienplan = $row->studienplan_id;
-				$break;
+				break;
 			}
 		}
 
@@ -731,6 +731,7 @@ if ($punkteUebertragen)
 		{
 			foreach ($_POST['prestudentPunkteArr'] AS $key => $array)
 			{
+				$rtpunkte = number_format(floatval(str_replace(',', '.', $array['ergebnis'])), 4);
 				$prestudentrolle = new prestudent($array['prestudent_id']);
 				$prestudentrolle->getLastStatus($array['prestudent_id'], null, 'Interessent');
 
@@ -750,7 +751,7 @@ if ($punkteUebertragen)
 					if ($setRTPunkte->punkte == '')
 					{
 						$setRTPunkte->new = false;
-						$setRTPunkte->punkte = number_format(floatval($array['ergebnis']), 4);
+						$setRTPunkte->punkte = $rtpunkte;
 						$setRTPunkte->updateamum = date('Y-m-d H:i:s');
 						$setRTPunkte->updatevon = $user;
 
@@ -765,7 +766,7 @@ if ($punkteUebertragen)
 					}
 					else
 					{
-						$msg_warning .= '<br>Der Prestudent '.$array['prestudent_id'].' hat bereits Punkte eingetragen.';
+						$msg_warning .= '<br>Der Prestudent '.$array['prestudent_id'].' hat bereits Punkte für den Studienplan '.$prestudentrolle->studienplan_id.' eingetragen.';
 					}
 				}
 				else
@@ -778,6 +779,7 @@ if ($punkteUebertragen)
 					{
 						$ort_kurzbz = $setRTPunkte->ort_kurzbz;
 					}
+					$setRTPunkte = new reihungstest();
 					$setRTPunkte->getPersonReihungstest($prestudentrolle->person_id, $_POST['reihungstest_id'], $prestudentrolle->studienplan_id);
 
 					// Check, ob Punkte schon befüllt sind
@@ -787,9 +789,10 @@ if ($punkteUebertragen)
 						$setRTPunkte->person_id = $prestudentrolle->person_id;
 						$setRTPunkte->reihungstest_id = $_POST['reihungstest_id'];
 						$setRTPunkte->anmeldedatum = '';
+						$setRTPunkte->teilgenommen = true;
 						$setRTPunkte->ort_kurzbz = $ort_kurzbz;
 						$setRTPunkte->studienplan_id = $prestudentrolle->studienplan_id;
-						$setRTPunkte->punkte = number_format(floatval($array['ergebnis']), 4);
+						$setRTPunkte->punkte = $rtpunkte;
 						$setRTPunkte->insertamum = date('Y-m-d H:i:s');
 						$setRTPunkte->insertvon = $user;
 
@@ -804,7 +807,7 @@ if ($punkteUebertragen)
 					}
 					else
 					{
-						$msg_warning .= '<br>Der Prestudent '.$array['prestudent_id'].' hat bereits Punkte eingetragen.';
+						$msg_warning .= '<br>Der Prestudent '.$array['prestudent_id'].' hat bereits Punkte für den Studienplan '.$prestudentrolle->studienplan_id.' eingetragen.';
 					}
 				}
 
@@ -818,7 +821,7 @@ if ($punkteUebertragen)
 					if ($prestudent->punkte == '')
 					{
 						$prestudent->new = false;
-						$prestudent->punkte = number_format($array['ergebnis'], 4);
+						$prestudent->punkte = $rtpunkte;
 						$prestudent->reihungstestangetreten = true;
 						$setRTPunkte->updateamum = date('Y-m-d H:i:s');
 						$setRTPunkte->updatevon = $user;
@@ -1035,7 +1038,7 @@ function getMailEmpfaenger($studiengang_kz, $studienplan_id = null, $orgform_kur
 		return false;
 }
 
-$ergebnis = '';
+$ergebnis = array();
 $gebiet = array();
 $kategorie = array();
 $erg_kat = array();
@@ -1147,12 +1150,13 @@ if (isset($_REQUEST['reihungstest']))
 			tbl_gebiet.bezeichnung AS gebiet,
 			tbl_ablauf.reihung,
 			tbl_ablauf.studiengang_kz,
-			tbl_ablauf.semester
+			tbl_ablauf.semester,
+		    tbl_ablauf.gewicht
 		FROM PUBLIC.tbl_rt_person
 		JOIN PUBLIC.tbl_person ON (tbl_rt_person.person_id = tbl_person.person_id)
 		JOIN PUBLIC.tbl_prestudent ps ON (ps.person_id = tbl_rt_person.person_id)
 		JOIN PUBLIC.tbl_reihungstest rt ON (tbl_rt_person.rt_id = rt.reihungstest_id)
-		JOIN PUBLIC.tbl_prestudentstatus USING (prestudent_id)
+		JOIN PUBLIC.tbl_prestudentstatus pss USING (prestudent_id)
 		JOIN public.tbl_studiengang ON (ps.studiengang_kz = tbl_studiengang.studiengang_kz)
 		LEFT JOIN bis.tbl_zgv ON (ps.zgv_code = tbl_zgv.zgv_code)
 		LEFT JOIN PUBLIC.tbl_ort ON (tbl_rt_person.ort_kurzbz = tbl_ort.ort_kurzbz)
@@ -1194,6 +1198,21 @@ if (isset($_REQUEST['reihungstest']))
 	{
 		$query .= " AND ps.prestudent_id=" . $db->db_add_param($prestudent_id, FHC_INTEGER);
 	}
+	if ($orgform_kurzbz != '' && $studiengang != '')
+	{
+		$query .= " AND (tbl_ablauf.studienplan_id=(
+							SELECT studienplan_id FROM lehre.tbl_studienplan 
+							JOIN lehre.tbl_studienordnung USING (studienordnung_id) 
+							WHERE studiengang_kz=".$db->db_add_param($studiengang, FHC_INTEGER)."
+							AND tbl_studienplan.orgform_kurzbz = ".$db->db_add_param($orgform_kurzbz)."
+							AND tbl_studienplan.aktiv
+							AND tbl_studienordnung.status_kurzbz='approved'
+							AND ((SELECT start FROM public.tbl_studiensemester WHERE studiensemester_kurzbz=tbl_studienordnung.gueltigvon) <= now() 
+									OR tbl_studienordnung.gueltigvon IS NULL)
+							AND ((SELECT ende FROM public.tbl_studiensemester WHERE studiensemester_kurzbz=tbl_studienordnung.gueltigbis) >= now() OR tbl_studienordnung.gueltigbis IS NULL)
+							ORDER BY studienplan_id DESC LIMIT 1)
+							OR tbl_ablauf.studienplan_id IS NULL)";
+	}
 	//$query .= " AND nachname='Al-Mafrachi'";
 	$query .= " ORDER BY tbl_ablauf.studiengang_kz, tbl_ablauf.semester, reihung";
 
@@ -1209,6 +1228,7 @@ if (isset($_REQUEST['reihungstest']))
 		}
 		$gebiet[$row->gebiet_id]->name = $row->gebiet;
 		$gebiet[$row->gebiet_id]->gebiet_id = $row->gebiet_id;
+		$gebiet[$row->gebiet_id]->gewicht = $row->gewicht;
 	}
 
 	// Alle Ergebnisse laden
@@ -1222,6 +1242,7 @@ if (isset($_REQUEST['reihungstest']))
 			tbl_studiengang.bezeichnung AS stg_bez,
 			tbl_studienplan.orgform_kurzbz,
 			tbl_gebiet.maxpunkte,
+		    tbl_gebiet.offsetpunkte,            
 			tbl_prestudentstatus.ausbildungssemester,
 			tbl_ablauf.gewicht,
 			tbl_ort.planbezeichnung AS raum,
@@ -1313,6 +1334,7 @@ if (isset($_REQUEST['reihungstest']))
 											AND studiensemester_kurzbz = rt.studiensemester_kurzbz
 										ORDER BY registriert DESC LIMIT 1
 										)
+						    	ORDER BY registriert DESC LIMIT 1
 								)
 							AND testtool.tbl_frage.gebiet_id = tbl_gebiet.gebiet_id
 						)
@@ -1398,13 +1420,17 @@ if (isset($_REQUEST['reihungstest']))
 	}
 	if ($orgform_kurzbz != '')
 	{
+		//$query .= " AND tbl_prestudentstatus.orgform_kurzbz=" . $db->db_add_param($orgform_kurzbz);
+		//$query .= " AND tbl_ablauf.studienplan_id = tbl_prestudentstatus.studienplan_id";
+		//$query .= " AND tbl_ablauf.studienplan_id = 5";
 		$query .= " AND tbl_studienplan.orgform_kurzbz=" . $db->db_add_param($orgform_kurzbz);
 	}
 	//$query .= " AND nachname='Al-Mafrachi'";
 	$query .= " ORDER BY nachname,
 				vorname,
 				person_id	
-	";//var_dump($query);
+	";/*print_r($query);*/
+	//echo '<pre>', var_dump($query), '</pre>';
 	if (!($result = $db->db_query($query)))
 	{
 		die($db->db_last_error());
@@ -1447,8 +1473,7 @@ if (isset($_REQUEST['reihungstest']))
 		}
 
 		$ergebnis[$row->prestudent_id]->gebiet[$row->gebiet_id]->name = $row->gebiet;
-		$ergebnis[$row->prestudent_id]->gebiet[$row->gebiet_id]->punkte = (($row->punkte >= $row->maxpunkte) ? $row->maxpunkte : $row->punkte);
-		if ($row->punkte == 0 && $row->punkte != '')
+		/*if ($row->punkte == 0 && $row->punkte != '')
 		{
 			$prozent = '0';
 		}
@@ -1459,7 +1484,7 @@ if (isset($_REQUEST['reihungstest']))
 		else
 		{
 			$prozent = ($row->punkte / $row->maxpunkte) * 100;
-		}
+		}*/
 
 		if ($row->punkte >= $row->maxpunkte)
 		{
@@ -1470,8 +1495,23 @@ if (isset($_REQUEST['reihungstest']))
 			$punkte = $row->punkte;
 		}
 
-		$ergebnis[$row->prestudent_id]->gebiet[$row->gebiet_id]->prozent = $prozent;
+		$ergebnis[$row->prestudent_id]->gebiet[$row->gebiet_id]->prozent = null;
 		$ergebnis[$row->prestudent_id]->gebiet[$row->gebiet_id]->punkte = $punkte;
+
+		// Punkte berechnen
+		if (isset($punkte))
+		{
+			if ($row->punkte >= $row->maxpunkte)
+				$ergebnis[$row->prestudent_id]->gebiet[$row->gebiet_id]->prozent = 100;
+			else
+			{
+				//offset zur Vermeidung negativer Prozentzahlen
+				$punkte_positiv = $punkte + $row->offsetpunkte;
+				$maxpunkte_positiv = $row->maxpunkte + $row->offsetpunkte;
+				//Formel: Summe(Punkte/Maxpunkte * Gewicht)
+				$ergebnis[$row->prestudent_id]->gebiet[$row->gebiet_id]->prozent = $maxpunkte_positiv > 0 ? $punkte_positiv / $maxpunkte_positiv * /*$row->gewicht **/ 100 : null;
+			}
+		}
 
 		// Bei Auswertungen ohne rt_id kann es vorkommen, dass Datensätze Doppelt sind
 		// Bei der Summe darf ein Gebiet jedenfalls nur einmal summiert werden
@@ -1480,14 +1520,14 @@ if (isset($_REQUEST['reihungstest']))
 		{
 			$gebiete_arr[$row->prestudent_id][] = $row->gebiet_id;
 
-			// Gesamtpunkte mit Physik
+			// Gesamtpunkte
 			if (isset($ergebnis[$row->prestudent_id]->gesamt))
 			{
-				$ergebnis[$row->prestudent_id]->gesamt += $prozent * $row->gewicht;
+				$ergebnis[$row->prestudent_id]->gesamt += $ergebnis[$row->prestudent_id]->gebiet[$row->gebiet_id]->prozent * $row->gewicht;
 			}
 			else
 			{
-				$ergebnis[$row->prestudent_id]->gesamt = $prozent * $row->gewicht;
+				$ergebnis[$row->prestudent_id]->gesamt = $ergebnis[$row->prestudent_id]->gebiet[$row->gebiet_id]->prozent * $row->gewicht;
 			}
 
 			if (isset($ergebnis[$row->prestudent_id]->gesamtpunkte))
@@ -1499,8 +1539,20 @@ if (isset($_REQUEST['reihungstest']))
 				$ergebnis[$row->prestudent_id]->gesamtpunkte = $punkte;
 			}
 
+			if (isset($row->punkte))
+			{
+				if (isset($ergebnis[$row->prestudent_id]->gesamtgewicht))
+				{
+					$ergebnis[$row->prestudent_id]->gesamtgewicht += $row->gewicht;
+				}
+				else
+				{
+					$ergebnis[$row->prestudent_id]->gesamtgewicht = $row->gewicht;
+				}
+			}
+
 			// Gesamtpunkte ohne Physik
-			if ($row->gebiet_id != 10)
+/*			if ($row->gebiet_id != 10)
 			{
 				if (isset($ergebnis[$row->prestudent_id]->gesamt_ohne_physik))
 				{
@@ -1519,8 +1571,15 @@ if (isset($_REQUEST['reihungstest']))
 				{
 					$ergebnis[$row->prestudent_id]->gesamtpunkte_ohne_physik = $punkte;
 				}
-			}
+			}*/
 		}
+	}
+
+	foreach ($ergebnis as $prestudentid => $erg)
+	{
+		//Berechnen Gesamtpunkte nach Formel: Summe(Punkte/Maxpunkte * Gewicht)/Summe(Gewichte) * 100
+		if (isset($erg->gesamtgewicht) && $erg->gesamtgewicht > 0)
+			$erg->gesamt /= $erg->gesamtgewicht;
 	}
 
 	$ergb = $ergebnis;
@@ -1567,7 +1626,7 @@ if (isset($_REQUEST['format']) && $_REQUEST['format'] == 'xls')
 	// Eigener TItel bei Bachelor-Studiengängen
 	if (isset($studiengangObj) && $studiengangObj->typ == 'b')
 	{
-		$worksheet =& $workbook->addWorksheet("Auswertung MIT Physik " . ($titel_studiengang ? $stg_arr[$_REQUEST['studiengang']] : '') . ($titel_semester ? ' ' . $semester . '.Semester' : ''));
+		$worksheet =& $workbook->addWorksheet("Auswertung " . ($titel_studiengang ? $stg_arr[$_REQUEST['studiengang']] : '') . ($titel_semester ? ' ' . $semester . '.Semester' : ''));
 	}
 	else
 	{
@@ -1665,7 +1724,7 @@ if (isset($_REQUEST['format']) && $_REQUEST['format'] == 'xls')
 	foreach ($gebiet AS $gbt)
 	{
 		++$spalte;
-		$worksheet->write($zeile, ++$spalte, strip_tags($gbt->name), $format_bold_border);
+		$worksheet->write($zeile, ++$spalte, strip_tags($gbt->name) . (isset($gbt->gewicht) ? " (Gew: $gbt->gewicht)" : ""), $format_bold_border);
 		$worksheet->mergeCells($zeile, $spalte, 0, $spalte + 1);
 		$maxlength[$spalte] = 10;
 	}
@@ -1756,7 +1815,7 @@ if (isset($_REQUEST['format']) && $_REQUEST['format'] == 'xls')
 	}
 
 	// Worksheet ohne Physik nur für Bachelor-Studiengänge
-	if (isset($studiengangObj) && $studiengangObj->typ == 'b')
+	/*if (isset($studiengangObj) && $studiengangObj->typ == 'b')
 	{
 		$worksheetOhnePhsyik =& $workbook->addWorksheet("Auswertung OHNE Physik " . ($titel_studiengang ? $stg_arr[$_REQUEST['studiengang']] : '') . ($titel_semester ? ' ' . $semester . '.Semester' : ''));
 		$worksheetOhnePhsyik->setInputEncoding('utf-8');
@@ -1912,7 +1971,7 @@ if (isset($_REQUEST['format']) && $_REQUEST['format'] == 'xls')
 		{
 			$worksheetOhnePhsyik->setColumn($i, $i, $breite);
 		}
-	}
+	}*/
 
 	if (isset($erg_kat) && count($erg_kat) > 0)
 	{
@@ -2104,12 +2163,23 @@ else
 		$("#auswertung_table").tablesorter(
 		{			
 			widgets: ["zebra", "filter", "columnSelector"],
-			sortList: [[16,1],[3,0],[4,0]],
-			headers: {0: { sorter: false, filter: false}, 2: { sorter: false, filter: false}, 4: { dateFormat: "ddmmyyyy" }}
+			sortList: [[15,1],[17,1],[3,0],[4,0]],//16th fake hidden column for correct sort with colspan
+			headers: {0: { sorter: false, filter: false}, 2: { sorter: false, filter: false}, 4: { dateFormat: "ddmmyyyy" }, 15: { sorter: false, filter: false}}
 			/*widgetOptions : {
 				columnSelector_container : $("#columnSelector"),
 				columnSelector_saveColumns: true}			*/
 		});
+		
+		//hide tablesorter filter field if column is hidden
+		for (var i = 0; i < $("#auswertung_table tbody tr:nth-child(1) td").length; i++)
+		{
+			var colnr = i + 1;
+			var cell = $("#auswertung_table tbody tr:nth-child(1) td:nth-child(" + colnr + ")");
+			if (cell.css("display") === "none")
+			{
+				$("#auswertung_table tr.tablesorter-filter-row td:nth-child(" + colnr + ")").css("display", "none");
+			}
+		}
 		/*$.tablesorter.columnSelector.attachTo( $("#auswertung_table"), "#popover-target");*/
 		
 		/*$("#columnSelector").popover(
@@ -2263,7 +2333,7 @@ else
 					}
 					else
 					{
-						$("#row_"+prestudent_id).find("td.punkte, td.col_gesamtpunkte_ohne_physik").each (function() 
+						$("#row_"+prestudent_id).find("td.punkte, td.col_gesamtpunkte").each (function() 
 						{
 						  $(this).html("");
 						});
@@ -2434,7 +2504,7 @@ else
 	function checkAllWithResult()
 	{
 		// Schleife ueber die einzelnen Elemente
-		$(".col_gesamtpunkte_ohne_physik").each(function()
+		$(".col_gesamtpunkte").each(function()
 		{
 			if ($(this).text().trim() !== "")
 			{
@@ -2469,20 +2539,10 @@ else
 		{
 			$("input.prestudentCheckbox:checked").each(function() 
 			{
-				if ($("#uebertragenOptionPhysik:checked").length === 1)
-				{
-					prestudentPunkteArr.push({
-			            prestudent_id: $(this).attr("name"), 
-						ergebnis:  $(this).parents("tr").find(".erg_gesamt_mit_physik").text()
-			        });
-				}
-				else
-				{
-					prestudentPunkteArr.push({
-			            prestudent_id: $(this).attr("name"), 
-						ergebnis:  $(this).parents("tr").find(".erg_gesamt_ohne_physik").text()
-			        });
-				}
+				prestudentPunkteArr.push({
+					prestudent_id: $(this).attr("name"), 
+					ergebnis:  $(this).parents("tr").find(".erg_gesamt").text()
+				});
 		    });
 		    
 			$(".loaderIcon").show();
@@ -2518,6 +2578,10 @@ else
 						$("#msgbox").show();
 						$("#msgbox").append(data["msg_success"]);
 					}
+					else
+					{
+						$(".loaderIcon").hide();
+					}
 					if(data["msg_warning"] !== "")
 					{
 						$("#msgbox").attr("class","alert alert-warning");
@@ -2526,12 +2590,20 @@ else
 						$("#msgbox").append(data["msg_warning"]);
 						//$("#msgbox").html(data["msg"]).delay(2000).fadeOut();
 					}
+					else
+					{
+						$(".loaderIcon").hide();
+					}
 					if(data["msg_error"] !== "")
 					{
 						$("#msgbox").attr("class","alert alert-danger");
 						$(".loaderIcon").hide();
 						$("#msgbox").show();
 						$("#msgbox").append(data["msg_error"]);
+					}
+					else
+					{
+						$(".loaderIcon").hide();
 					}
 				},
 				error: function(data)
@@ -2814,9 +2886,6 @@ else
 	echo '	<form class="form" role="form">
 			<div class="panel panel-default" id="uebertragenOptions" style="display: none">
 			 <div class="panel-body">
-				 <div class="checkbox">
-				  <label><input type="checkbox" id="uebertragenOptionPhysik" value="">Mit Physik</label>
-				</div>
 				<div class="checkbox">
 				  <label><input type="checkbox" id="uebertragenOptionGesamtpunkte" value="">"Gesamtpunkte" und "Reihungsverfahren absolviert" setzen</label>
 				</div>
@@ -2903,8 +2972,8 @@ else
 				<th title="Priorität" rowspan="2" style="width: 20px">Prio</th>
 				<th rowspan="2">Raum</th>
 				<th title="Teilgenommen" rowspan="2">TG</th>
-				<th colspan="2">Gesamt mit Physik</th>
-				<th colspan="2">Gesamt ohne Physik</th>';
+				<th style="display: none"></th>
+				<th colspan="2">Gesamt</th>';
 
 		foreach ($gebiet AS $gbt)
 		{
@@ -2913,8 +2982,7 @@ else
 
 		echo '</tr>
 			<tr>
-				<th><small>Punkte</small></th>
-				<th><small>Prozent</small></th>
+				<th style="display: none"></th>
 				<th><small>Punkte</small></th>
 				<th><small>Prozent</small></th>';
 
@@ -2957,6 +3025,8 @@ else
 						<td class='".$inaktiv."'>$erg->raum</td>
 						<td class='".$inaktiv."'>".($erg->teilgenommen == true ? "<span class='glyphicon glyphicon-ok'></span>" : "")."</td>";
 				//<td>$erg->idnachweis</td>
+				$gesamtprozent = ($erg->gesamt != '' ? number_format($erg->gesamt, 2, ',', ' ') : '');
+				echo '<td style="display: none">'. $gesamtprozent .'</td>';
 				echo '	<td style="text-align: right; padding-right: 3px" class="punkte '.$inaktiv.'" nowrap>';
 				// Punkte können nur gelöscht werden, solange "Zum Reihungstest angetreten" nicht gesetzt ist
 				if ($erg->teilgenommen == false || $rechte->isBerechtigt('admin'))
@@ -2973,25 +3043,25 @@ else
 					echo '  <span class=""><b>' . ($erg->gesamtpunkte != '' ? number_format($erg->gesamtpunkte, 2, ',', ' ') : '') . '</b></span>';
 				}
 				echo '	</td>';
-				if (!isset($erg->gesamtpunkte_ohne_physik))
+/*				if (!isset($erg->gesamtpunkte_ohne_physik))
 				{
 					$erg->gesamtpunkte_ohne_physik = '';
-				}
-				if (!isset($erg->gesamt_ohne_physik))
+				}*/
+/*				if (!isset($erg->gesamt_ohne_physik))
 				{
 					$erg->gesamt_ohne_physik = '';
-				}
-				echo '	<td style="text-align: right; padding-right: 3px" class="punkte '.$inaktiv.'" nowrap>
-							<b>' . ($erg->gesamt != '' ? number_format($erg->gesamt, 2, ',', ' ') : '') . '</b>
-							<span class="erg_gesamt_mit_physik" style="display: none">'.$erg->gesamt.'</span>
+				}*/
+				echo '	<td style="text-align: right; padding-right: 3px" class="col_gesamtpunkte punkte '.$inaktiv.'" nowrap>
+							<b>' . $gesamtprozent . '</b>
+							<span class="erg_gesamt" style="display: none">'.$erg->gesamt.'</span>
 						</td>';
-				echo '	<td style="text-align: right; padding-right: 3px" class="col_gesamtpunkte_ohne_physik '.$inaktiv.'" nowrap>
+/*				echo '	<td style="text-align: right; padding-right: 3px" class="col_gesamtpunkte_ohne_physik '.$inaktiv.'" nowrap>
 							<b>' . ($erg->gesamtpunkte_ohne_physik != '' ? number_format($erg->gesamtpunkte_ohne_physik, 2, ',', ' ') : '') . '</b>
-						</td>';
-				echo '	<td style="text-align: right; padding-right: 3px" class="punkte '.$inaktiv.'" nowrap>
+						</td>';*/
+/*				echo '	<td style="text-align: right; padding-right: 3px" class="punkte '.$inaktiv.'" nowrap>
 							<b>' . ($erg->gesamt_ohne_physik != '' ? number_format($erg->gesamt_ohne_physik, 2, ',', ' ') : '') . '</b>
 							<span class="erg_gesamt_ohne_physik" style="display: none">'.$erg->gesamt_ohne_physik.'</span>
-						</td>';
+						</td>';*/
 				foreach ($gebiet AS $gbt)
 				{
 					if (isset($erg->gebiet[$gbt->gebiet_id]))

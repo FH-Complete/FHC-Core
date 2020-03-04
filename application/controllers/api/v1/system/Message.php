@@ -144,26 +144,26 @@ class Message extends API_Controller
 	 */
 	public function postMessage()
 	{
-		$validation = $this->_validatePostMessage($this->post());
+		$postMessage = $this->_validatePostMessage($this->post());
 
-		if (isSuccess($validation))
+		if (isSuccess($postMessage))
 		{
-			$result = $this->messagelib->sendMessage(
-				isset($this->post()['person_id']) ? $this->post()['person_id'] : null,
-				isset($this->post()['receiver_id']) ? $this->post()['receiver_id'] : null,
-				$this->post()['subject'],
-				$this->post()['body'],
-				PRIORITY_NORMAL,
-				isset($this->post()['relationmessage_id']) ? $this->post()['relationmessage_id'] : null,
-				isset($this->post()['oe_kurzbz']) ? $this->post()['oe_kurzbz'] : null, // Sender organisation unit
-				isset($this->post()['multiPartMime']) ? $this->post()['multiPartMime'] : true
+			$result = $this->messagelib->sendMessageUser(
+				$this->post()['receiver_id']),																// receiverPersonId
+				$this->post()['subject'],																	// subject
+				$this->post()['body'],																		// body
+				$this->post()['person_id']) ? $this->post()['person_id'] : null,							// sender_id
+				isset($this->post()['oe_kurzbz']) ? $this->post()['oe_kurzbz'] : null, 						// senderOU
+				isset($this->post()['relationmessage_id']) ? $this->post()['relationmessage_id'] : null,	// relationmessage_id
+				MSG_PRIORITY_NORMAL,																		// priority
+				isset($this->post()['multiPartMime']) ? $this->post()['multiPartMime'] : true				// multiPartMime
 			);
 
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
 		{
-			$this->response($validation, REST_Controller::HTTP_OK);
+			$this->response($postMessage, REST_Controller::HTTP_OK);
 		}
 	}
 
@@ -172,26 +172,27 @@ class Message extends API_Controller
 	 */
 	public function postMessageVorlage()
 	{
-		$validation = $this->_validatePostMessageVorlage($this->post());
+		$postMessage = $this->_validatePostMessageVorlage($this->post());
 
-		if (isSuccess($validation))
+		if (isSuccess($postMessage))
 		{
-			$result = $this->messagelib->sendMessageVorlage(
-				isset($this->post()['sender_id']) ? $this->post()['sender_id'] : null,
-				isset($this->post()['receiver_id']) ? $this->post()['receiver_id'] : null,
-				$this->post()['vorlage_kurzbz'],
-				isset($this->post()['oe_kurzbz']) ? $this->post()['oe_kurzbz'] : null, // Sender organisation unit
-				$this->post()['data'],
-				isset($this->post()['relationmessage_id']) ? $this->post()['relationmessage_id'] : null,
-				isset($this->post()['orgform_kurzbz']) ? $this->post()['orgform_kurzbz'] : null,
-				isset($this->post()['multiPartMime']) ? $this->post()['multiPartMime'] : true
+			$result = $this->messagelib->sendMessageUserTemplate(
+				isset($this->post()['receiver_id']) ? $this->post()['receiver_id'] : null,					// receiversPersonId
+				$this->post()['vorlage_kurzbz'],															// vorlage
+				$this->post()['data'],																		// parseData
+				isset($this->post()['orgform_kurzbz']) ? $this->post()['orgform_kurzbz'] : null,			// orgform
+				isset($this->post()['sender_id']) ? $this->post()['sender_id'] : null,						// sender_id
+				isset($this->post()['oe_kurzbz']) ? $this->post()['oe_kurzbz'] : null,						// senderOU
+				isset($this->post()['relationmessage_id']) ? $this->post()['relationmessage_id'] : null,	// relationmessage_id
+				MSG_PRIORITY_NORMAL,																		// priority
+				isset($this->post()['multiPartMime']) ? $this->post()['multiPartMime'] : true				// multiPartMime
 			);
 
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
 		{
-			$this->response($validation, REST_Controller::HTTP_OK);
+			$this->response($postMessage, REST_Controller::HTTP_OK);
 		}
 	}
 
@@ -220,26 +221,26 @@ class Message extends API_Controller
 	/**
 	 * _validatePostMessage
 	 */
-	private function _validatePostMessage($message = null)
+	private function _validatePostMessage($post = null)
 	{
-		if (!isset($message))
+		if (!isset($post))
 		{
 			return error('Parameter is null');
 		}
-		if (!isset($message['subject']))
+		if (!isset($post['subject']))
 		{
 			return error('subject is not set');
 		}
-		if( !isset($message['body']))
+		if (!isset($post['body']))
 		{
 			return error('body is not set');
 		}
-		if (!isset($message['receiver_id']) && !isset($message['oe_kurzbz']))
+		if (!isset($post['receiver_id']))
 		{
-			return error('If a receiver_id is not given a oe_kurzbz must be specified');
+			return error('receiver_id is not set');
 		}
 
-		return success('Input data are valid');
+		return success();
 	}
 
 	/**
