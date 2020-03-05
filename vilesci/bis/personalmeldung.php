@@ -1,32 +1,14 @@
 <?php
-/* Copyright (C) 2006 Technikum-Wien
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as
- * published by the Free Software Foundation; either version 2 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
- *
- * Authors: Christian Paminger 	< christian.paminger@technikum-wien.at >
- *          Andreas Oesterreicher 	< andreas.oesterreicher@technikum-wien.at >
- *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
- *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
- */
 
 require_once('../../config/vilesci.config.inc.php');
 require_once('../../include/studiensemester.class.php');
 require_once('../../include/datum.class.php');
 require_once('../../include/benutzerberechtigung.class.php');
 require_once('../../include/functions.inc.php');
+require_once('../../include/bisverwendung.class.php');
+require_once('../../include/mitarbeiter.class.php');
 require_once('../../include/studiengang.class.php');
+require_once('../../include/lehreinheitmitarbeiter.class.php');
 
 $uid = get_uid();
 
@@ -39,510 +21,423 @@ if(!$rechte->isBerechtigt('mitarbeiter/stammdaten',null,'suid'))
 if (!$db = new basis_db())
 	die('Es konnte keine Verbindung zum Server aufgebaut werden.');
 
-$error_log='';
-$error_log1='';
-$error_log_all="";
-$mitarbeiter_data=array();
-$mitarbeiter_gesamt=array();
-$stgart='';
-$fehler='';
-$v='';
-$erhalter='';
-$zaehl=0;
-$eteam=array();
-$studiensemester=new studiensemester();
-if(isset($_GET['stsem']))
-	$stsem = $_GET['stsem'];
-else
-	$stsem=$studiensemester->getaktorNext(1);		//aktuelles Semester
+if (!defined('BIS_VOLLZEIT_ARBEITSSTUNDEN') || empty('BIS_VOLLZEIT_ARBEITSSTUNDEN'))
+{
+	die('config var BIS_VOLLZEIT_ARBEITSSTUNDEN fehlt');
+}
 
-$datei='';
-$mitarbeiterzahl=0;
-$echt=0;
-$frei=0;
+if (!defined('BIS_VOLLZEIT_SWS_EINZELSTUNDENBASIS') || empty('BIS_VOLLZEIT_SWS_EINZELSTUNDENBASIS'))
+{
+	die('config var BIS_VOLLZEIT_SWS_EINZELSTUNDENBASIS fehlt');
+}
 
-$nichtmelden = array(11,91,92,94,999,203,145,204,308,182,222);
+if (!defined('BIS_VOLLZEIT_SWS_INKLUDIERTE_LEHRE') || empty('BIS_VOLLZEIT_SWS_INKLUDIERTE_LEHRE'))
+{
+	die('config var BIS_VOLLZEIT_SWS_INKLUDIERTE_LEHRE fehlt');
+}
 
-$datumobj=new datum();
+if (!defined('BIS_EXCLUDE_STG') || empty('BIS_EXCLUDE_STG'))
+{
+	die('config var BIS_EXCLUDE_STG fehlt');
+}
 
-if(mb_strstr($stsem,"WS"))
+if (!defined('BIS_HALBJAHRES_GEWICHTUNG_SWS') || empty('BIS_HALBJAHRES_GEWICHTUNG_SWS'))
+{
+	die('config var BIS_HALBJAHRES_GEWICHTUNG_SWS fehlt');
+}
+
+
+// Prüfe Zeitraum zur Erstellung einer BIS-Meldung
+$studiensemester = new studiensemester();
+$stsem = (isset($_GET['stsem'])) ? $_GET['stsem'] : $studiensemester->getaktorNext(1);	// aktuelles Studiensemester
+
+$datum_obj = new datum();
+if(mb_strstr($stsem,'SS'))
 {
 	$studiensemester->load($stsem);
-	$jahr = $datumobj->formatDatum($studiensemester->start, 'Y');
-	$bisdatum=date("Y-m-d",  mktime(0, 0, 0, 9, 1, $jahr));
-	$bisprevious=date("Y-m-d",  mktime(0, 0, 0, 9, 1, $jahr-1));
+	$jahr = $datum_obj->formatDatum($studiensemester->start, 'Y');
+	$stichtag = date("Y-m-d",  mktime(0, 0, 0, 12, 31, $jahr - 1)); // 31.12. des vorangehenden Kalenderjahres zur BIS Meldung TODO: oder Abfragetag mitgeben?
 }
 else
 {
-	echo "Fehler: Studiensemester muss ein Wintersemester sein";
+	echo "Fehler: Studiensemester muss ein Sommersemester sein";
 	exit;
 }
 
-$qry="SELECT * FROM public.tbl_erhalter";
-if($result = $db->db_query($qry))
+$beginn_imJahr = new DateTime(($jahr - 1). '-01-01');
+$ende_imJahr = new DateTime(($jahr - 1). '-12-31');
+
+$tage_imJahr = $ende_imJahr->diff($beginn_imJahr)->days + 1;
+
+// Sommer- und Wintersemester im BIS Meldungsjahr
+$ss_kurzbz = $studiensemester->getBeforePrevious();
+$ws_kurzbz = $studiensemester->getStudienjahrStudiensemester($stsem);
+$ss = new studiensemester($ss_kurzbz);
+$ws = new studiensemester($ws_kurzbz);
+
+// Alle gemeldeten Mitarbeiter holen
+$mitarbeiter = new mitarbeiter();
+$mitarbeiter->getMitarbeiterBISMeldung($beginn_imJahr->format('Y-m-d'));
+$mitarbeiter_arr = $mitarbeiter->result;
+
+// *********************************************************************************************************************
+// Container Person generieren
+// *********************************************************************************************************************
+$person_arr = array();
+
+foreach ($mitarbeiter_arr as $mitarbeiter)
 {
-	if($row = $db->db_fetch_object($result))
+	$person_obj = new StdClass();
+
+	$person_obj->personalnummer = $mitarbeiter->personalnummer;
+	$person_obj->uid = $mitarbeiter->uid;
+	$person_obj->geschlecht = $mitarbeiter->geschlecht;
+	$person_obj->geschlechtX = $mitarbeiter->geschlechtX;
+	$person_obj->geburtsjahr = $datum_obj->formatDatum($mitarbeiter->gebdatum, 'Y');
+	$person_obj->staatsangehoerigkeit = $mitarbeiter->staatsbuergerschaft;
+	$person_obj->hoechste_abgeschlossene_ausbildung = $mitarbeiter->ausbildungcode;
+
+	// Habilitation
+	$bisverwendung = new bisverwendung();
+	$person_obj->habilitation = $bisverwendung->isHabilitiert($mitarbeiter->uid) ? 'j' : 'n';
+
+	// Alle im FAS gemeldeten BIS-Verwendungen holen
+	$bisverwendung = new bisverwendung();
+	$bisverwendung->getVerwendungenBISMeldung($mitarbeiter->uid, $stichtag);
+	$bisverwendung_arr = $bisverwendung->result;	// alle im FAS gemeldeten BIS Verwendungen
+
+	// BIS Verwendungsdauer und -gewichtung ergaenzen
+	$bisverwendung_arr = _addDauerGewichtung_imBISMeldungsjahr($bisverwendung_arr);
+
+	// Hauptberufcode: wenn Hauptberuf / Nebenberuf im gleichen Jahr - laengere Dauer entscheidet
+	// -----------------------------------------------------------------------------------------------------------------
+	$is_hauptberuflich = $bisverwendung_arr[count($bisverwendung_arr) - 1]->hauptberuflich;  // default: hauptberuflich der letzten BIS-Verwendung
+
+	// Wenn im selben Jahr hauptberuflich UND nebenberuflich -> laengere Dauer wird gemeldet (Ueberwiegenheitprinzip)
+	if (in_array(true, array_column($bisverwendung_arr, 'hauptberuflich')) &&	// hauptberuflich UND
+		in_array(false, array_column($bisverwendung_arr, 'hauptberuflich')))		// nebenberuflich
 	{
-		$erhalter = sprintf("%03s",trim($row->erhalter_kz));
+		$is_hauptberuflich = _getUeberwiegendeTaetigkeit_HauptNebenberuf($bisverwendung_arr);
 	}
-}
 
-$ba1_arr = array();
-$qry = "SELECT * FROM bis.tbl_beschaeftigungsart1";
-if($result = $db->db_query($qry))
-	while($row = $db->db_fetch_object($result))
-		$ba1_arr[$row->ba1code]=$row->ba1kurzbz;
+	/**
+	 * Hauptberufcode
+	 * - hauptberuflich Lehrender: NULL,
+	 * - nebenberuflich Lehrender: Hauptberufscode der letzten BIS-Verwendung
+	 */
+	$person_obj->hauptberufcode = ($is_hauptberuflich == true) ? NULL : $bisverwendung_arr[count($bisverwendung_arr) - 1]->hauptberufcode;
 
-$ba2_arr = array();
-$qry = "SELECT * FROM bis.tbl_beschaeftigungsart2";
-if($result = $db->db_query($qry))
-	while($row = $db->db_fetch_object($result))
-		$ba2_arr[$row->ba2code]=$row->ba2bez;
+	// -----------------------------------------------------------------------------------------------------------------
+	// Relatives Beschaeftigungsausmass / Anteilige JVZAE ermitteln
+	// -----------------------------------------------------------------------------------------------------------------
 
-$verwendung_arr = array();
-$qry = "SELECT * FROM bis.tbl_verwendung";
-if($result = $db->db_query($qry))
-	while($row = $db->db_fetch_object($result))
-		$verwendung_arr[$row->verwendung_code]=$row->verwendungbez;
+	// Lehrtaetigkeit ermitteln
+	$lema = new lehreinheitmitarbeiter();
+	$lema->getLehreinheiten_SWS_BISMeldung($person_obj->uid, $ss_kurzbz);
+	$lehre_ss_sws = $lema->result[0];	// Anzahl SS - Semesterwochenstunden
 
-$ausmass_arr = array();
-$qry = "SELECT * FROM bis.tbl_beschaeftigungsausmass";
-if($result = $db->db_query($qry))
-	while($row = $db->db_fetch_object($result))
-		$ausmass_arr[$row->beschausmasscode]=$row->beschausmassbez;
+	$lema = new lehreinheitmitarbeiter();
+	$lema->getLehreinheiten_SWS_BISMeldung($person_obj->uid, $ws_kurzbz);
+	$lehre_ws_sws = $lema->result[0];	// Anzahl WS - Semesterwochenstunden
 
-$stg_obj = new studiengang();
-$stg_obj->getAll(null,false);
+	$has_lehrtaetigkeit = !is_null($lehre_ss_sws) || !is_null($lehre_ws_sws);
 
-$qry="
-	SELECT DISTINCT ON (UID) *, transform_geschlecht(tbl_person.geschlecht, tbl_person.gebdatum) as geschlecht_imputiert
-	FROM
-		public.tbl_mitarbeiter
-		JOIN public.tbl_benutzer ON(mitarbeiter_uid=uid)
-		JOIN public.tbl_person USING(person_id)
-		JOIN bis.tbl_bisverwendung USING(mitarbeiter_uid)
-	WHERE
-		bismelden
-		AND personalnummer>0
-		AND (tbl_bisverwendung.ende is NULL OR tbl_bisverwendung.ende>".$db->db_add_param($bisprevious).")
-	ORDER BY uid, nachname,vorname
-	";
-
-if($result = $db->db_query($qry))
-{
-
-	$datei.="<?xml version=\"1.0\" encoding=\"UTF-8\"?>
-<Erhalter>
-   <ErhKz>".$erhalter."</ErhKz>
-   <MeldeDatum>".date("dmY", mktime(0, 0, 0, 11, 15, $jahr))."</MeldeDatum>
-   <PersonalMeldung>";
-	while($row = $db->db_fetch_object($result))
+	foreach ($bisverwendung_arr as $index => $bisverwendung)
 	{
-		$mitarbeiter_data=array();
+		$has_vertragsstunden = !is_null($bisverwendung->vertragsstunden) && !empty($bisverwendung->vertragsstunden);
+		$is_lektor = $bisverwendung->verwendung_code == 1 || $bisverwendung->verwendung_code == 2;
 
-		$error_person = false;
-		$person_content='';
-		$qryet="SELECT * FROM bis.tbl_entwicklungsteam WHERE mitarbeiter_uid=".$db->db_add_param($row->mitarbeiter_uid).";";
-		if($resultet=$db->db_query($qryet))
+		/**
+		 * NOTE: is_karenziert ist ein boolean fuer Vollzeit-Karenz, nicht fuer Teilzeit-(Bildungs-)Karenz!
+		 * Die Unterscheidung ist wichtig fuer die weitere Ermittlung der JVZAE.
+		 * Vollzeitkarenz: Anteiliger Beschaeftigungsausmass und JVZAE wird auf 0 gesetzt.
+		 * Bildungs-Teilzeitkarenz:  entspricht im System
+		 */
+		$is_karenziert_VZ = $bisverwendung->beschausmasscode == 5 && !$has_vertragsstunden;	// VZ-Kinder- und Bildungskarenz
+		$is_karenziert_TZ = $bisverwendung->beschausmasscode == 5 && $has_vertragsstunden;	// TZ-Bildungskarenz
+
+		// Karenzzeit
+		// -------------------------------------------------------------------------------------------------------------
+		if ($is_karenziert_VZ)
 		{
-			while($rowet=$db->db_fetch_object($resultet))
+			// Relatives Beschaeftigungsausmass / Anteilige JVZAE ermitteln
+			$bisverwendung->beschaeftigungsausmass_relativ = number_format(0.00, 2);
+			$bisverwendung->jvzae_anteilig = 0;
+			continue;
+		}
+
+		// Echter Dienstvertrag - d.h. Vertragsstunden sind vorhanden
+		// Bsp. angestellte Lektoren, angestellte MA in Verwaltung/Management/Wartung
+		// -------------------------------------------------------------------------------------------------------------
+		else if ($has_vertragsstunden)
+		{
+			// Vertragsstunden koennen max. VZ Aequivalenz-Basiswert haben
+			if ($bisverwendung->vertragsstunden > BIS_VOLLZEIT_ARBEITSSTUNDEN)
 			{
-				$eteam[$rowet->studiengang_kz]=$rowet->besqualcode;
+				$bisverwendung->vertragsstunden = BIS_VOLLZEIT_ARBEITSSTUNDEN;
 			}
-		}
-		$error_log='';
 
-		if($row->gebdatum=='' || $row->gebdatum==NULL)
-		{
-				$error_log.=($error_log!=''?', ':'')."Geburtsdatum ('".$row->gebdatum."')";
-		}
-		if($row->geschlecht=='' || $row->geschlecht==NULL)
-		{
-				$error_log.=($error_log!=''?', ':'')."Geschlecht ('".$row->geschlecht."')";
-		}
-		if($row->ausbildungcode=='' || $row->ausbildungcode==NULL)
-		{
-				$error_log.=($error_log!=''?', ':'')."HoechsteAbgeschlosseneAusbildung ('".$row->ausbildungcode."')";
-		}
-		$mitarbeiter_data['uid']=$row->uid;
-		$mitarbeiter_data['personalnummer']=sprintf("%015s",$row->personalnummer);
-		$mitarbeiter_data['vorname']=$row->vorname;
-		$mitarbeiter_data['nachname']=$row->nachname;
-		$mitarbeiter_data['fixangestellt']=($row->fixangestellt=='t'?true:false);
-		$mitarbeiter_data['lektor']=($row->lektor=='t'?true:false);
+			// Relatives Beschaeftigungsausmass / Anteilige JVZAE ermitteln
+			$bisverwendung->beschaeftigungsausmass_relativ = round($bisverwendung->vertragsstunden / BIS_VOLLZEIT_ARBEITSSTUNDEN, 2);
+			$bisverwendung->jvzae_anteilig = round($bisverwendung->beschaeftigungsausmass_relativ * $bisverwendung->gewichtung, 2);
+			
+			// Echter Dienstvertrag - mit Lehrtaetigkeit, jedoch kein Lektor.
+			// Bsp. STG-Leiter mit Lehrtaetigkeit
+			// ---------------------------------------------------------------------------------------------------------
+			if (!$is_lektor && $has_lehrtaetigkeit)
+			{
+				/**
+				 * Verwendungen ergänzen, wenn Mitarbeiter in Verwaltung/Managment/Wartung (jedenfalls nicht in Lehre)
+				 * zugeteilt ist und dennoch lehrt.
+				 * Die SWS werden sowohl fuer Sommer- als auch Wintersemster ermittelt und jeweils in einer eigenen
+				 * Verwendung mit dem Verwendungscode 1 ergaenzt.
+				 */
+				$bisverwendung_beginn_BIS = new DateTime($bisverwendung->beginn_imBISMeldungsJahr);
+				$bisverwendung_ende_BIS = new DateTime($bisverwendung->ende_imBISMeldungsJahr);
 
-		$person_content.="
-     <Person>
-      <PersonalNummer>".sprintf("%015s",$row->personalnummer)."</PersonalNummer>
-      <GeburtsDatum>".date("dmY", $datumobj->mktime_fromdate($row->gebdatum))."</GeburtsDatum>
-      <Geschlecht>".strtoupper($row->geschlecht)."</Geschlecht>";
-	  if ($row->geschlecht == 'x')
-	  	$person_content.="
-	  <GeschlechtX>".strtoupper($row->geschlecht_imputiert)."</GeschlechtX>";
-
-	  $person_content.="
-      <HoechsteAbgeschlosseneAusbildung>".$row->ausbildungcode."</HoechsteAbgeschlosseneAusbildung>";
-		$qryvw="SELECT * FROM bis.tbl_bisverwendung WHERE mitarbeiter_uid=".$db->db_add_param($row->mitarbeiter_uid)." AND habilitation=true;";
-		if($resultvw=$db->db_query($qryvw))
-		{
-			if($db->db_num_rows($resultvw)>0)
-			{
-				$person_content.="
-       <Habilitation>J</Habilitation>";
-			}
-			else
-			{
-				$person_content.="
-       <Habilitation>N</Habilitation>";
-			}
-		}
-		$qryvw="SELECT * FROM bis.tbl_bisverwendung WHERE mitarbeiter_uid=".$db->db_add_param($row->mitarbeiter_uid)." AND (ende is null OR ende>".$db->db_add_param($bisprevious).") AND (beginn<".$db->db_add_param($bisdatum)." OR beginn is null);";
-		if($resultvw=$db->db_query($qryvw))
-		{
-			if($db->db_num_rows($resultvw)>0)
-			{
-				$verwendung_data=array();
-				while($rowvw=$db->db_fetch_object($resultvw))
+				foreach (array($ss_kurzbz => $lehre_ss_sws, $ws_kurzbz => $lehre_ws_sws) as $studsem_kurzbz => $lehre_sws)
 				{
-					if($rowvw->ba1code=='' || $rowvw->ba1code==NULL)
-					{
-							$error_log.=($error_log!=''?', ':'')."Beschaeftigungsart1 ('".$rowvw->ba1code."')";
-					}
-					if($rowvw->ba2code=='' || $rowvw->ba2code==NULL)
-					{
-							$error_log.=($error_log!=''?', ':'')."Beschaeftigungsart2 ('".$rowvw->ba2code."')";
-					}
-					if($rowvw->beschausmasscode=='' || $rowvw->beschausmasscode==NULL)
-					{
-							$error_log.=($error_log!=''?', ':'')."BeschaeftigungsAusmass ('".$rowvw->beschausmasscode."')";
-					}
-					if($rowvw->verwendung_code=='' || $rowvw->verwendung_code==NULL)
-					{
-							$error_log.=($error_log!=''?', ':'')."VerwendungsCode ('".$rowvw->verwendung_code."')";
-					}
-					if(!$rowvw->hauptberuflich && ($rowvw->hauptberufcode=='' || $rowvw->hauptberufcode==NULL))
-					{
-							$error_log.=($error_log!=''?', ':'')."Hauptberuf ('".$rowvw->hauptberufcode."')";
-					}
-					if($rowvw->ba1code==3)
-					{
-						$echt++;
-					}
-					if($rowvw->ba1code==4)
-					{
-						$frei++;
-					}
-					$key = $rowvw->ba1code.'/'.$rowvw->ba2code.'/'.$rowvw->beschausmasscode.'/'.$rowvw->verwendung_code;
-					$verwendung_data[$key]['ba1code']=$rowvw->ba1code;
-					$verwendung_data[$key]['ba2code']=$rowvw->ba2code;
-					$verwendung_data[$key]['beschausmasscode']=$rowvw->beschausmasscode;
-					$verwendung_data[$key]['verwendung_code']=$rowvw->verwendung_code;
+					$studsem = new studiensemester($studsem_kurzbz);
+					$studsem_start = new DateTime($studsem->start);
+					$studsem_ende = new DateTime($studsem->ende);
 
-
-
-					//Studiengangsleiter
-					$qryslt="SELECT
-								tbl_benutzerfunktion.*, tbl_studiengang.studiengang_kz
-							FROM public.tbl_benutzerfunktion JOIN public.tbl_studiengang USING(oe_kurzbz)
-							WHERE
-								uid=".$db->db_add_param($row->mitarbeiter_uid)."
-								AND funktion_kurzbz='Leitung'
-								AND (datum_von<".$db->db_add_param($bisdatum)." OR datum_von is null)
-								AND (datum_bis>".$db->db_add_param($bisprevious)." OR datum_bis is NULL)
-								AND studiengang_kz>0
-								AND studiengang_kz<10000;";
-					if($resultslt=$db->db_query($qryslt))
+					// Wenn Lehrzeit in die BIS Verwendungszeit hineinfaellt, Verwendung erstellen
+					if (!is_null($lehre_sws) &&
+						(!($studsem_start > $bisverwendung_ende_BIS) &&
+						 !($studsem_ende < $bisverwendung_beginn_BIS)))
 					{
-						while($rowslt=$db->db_fetch_object($resultslt))
-						{
-							if($rowslt->studiengang_kz=='' || $rowslt->studiengang_kz==NULL)
-							{
-									$error_log=($error_log!=''?', ':'')."StgKz(Leitung) ('".$rowslt->studiengang_kz."')";
-							}
-							if(!in_array($rowslt->studiengang_kz, $nichtmelden))
-							{
-								$verwendung_data[$key]['stgltg'][]=$rowslt->studiengang_kz;
-							}
-						}
-					}
-					//Funktionen
-					$qryfkt="SELECT * FROM bis.tbl_bisfunktion WHERE bisverwendung_id=".$db->db_add_param($rowvw->bisverwendung_id)." AND studiengang_kz>0 AND studiengang_kz<10000;";
-					if($resultfkt=$db->db_query($qryfkt))
-					{
-						while($rowfkt=$db->db_fetch_object($resultfkt))
-						{
-							if($rowfkt->studiengang_kz=='' || $rowfkt->studiengang_kz==NULL)
-							{
-									$error_log.=($error_log!=''?', ':'')."StgKz(Funktion) ('".$rowfkt->studiengang_kz."')";
-							}
-							if($rowfkt->sws=='' || $rowfkt->sws==NULL)
-							{
-									$error_log.=($error_log!=''?', ':'')."SWS ('".$rowfkt->sws."')";
-							}
-							if($rowvw->hauptberuflich=='' || $rowvw->hauptberuflich==NULL)
-							{
-									$error_log.=($error_log!=''?', ':'')."Hauptberuflich ('".$rowvw->hauptberuflich."')";
-							}
-							if(($rowvw->hauptberufcode=='' || $rowvw->hauptberufcode==NULL) && $rowvw->hauptberuflich=='f')
-							{
-									$error_log.=($error_log!=''?', ':'')."HauptberufCode ('".$rowvw->hauptberufcode."')";
-							}
-							if (isset($eteam[$rowfkt->studiengang_kz]))
-							{
-								if(($eteam[$rowfkt->studiengang_kz]=='' || $eteam[$rowfkt->studiengang_kz]==NULL))
-								{
-										$error_log.=($error_log!=''?', ':'')."BesondereQualifikationCode ('".$eteam[$rowfkt->studiengang_kz]."')";
-								}
-							}
+						// Verwendung erstellen
+						list($tage_lehre_imSemester, $verwendung_lehre_obj) = _addVerwendung_fuerLehre_inkludiert($studsem, $bisverwendung);
 
-							$verwfkt_found=false;
+						// Relatives Beschaeftigungsausmass / Anteilige JVZAE ermitteln
+						$verwendung_lehre_obj->beschaeftigungsausmass_relativ = round($lehre_sws / BIS_VOLLZEIT_SWS_INKLUDIERTE_LEHRE, 2);	// VZ-Basis fuer inkludierte Lehre
+						$verwendung_lehre_obj->gewichtung = ($tage_lehre_imSemester == 182) ? BIS_HALBJAHRES_GEWICHTUNG_SWS : round(BIS_HALBJAHRES_GEWICHTUNG_SWS / ($tage_imJahr / 2) * $tage_lehre_imSemester, 2);
+						$verwendung_lehre_obj->jvzae_anteilig = round($verwendung_lehre_obj->beschaeftigungsausmass_relativ * $verwendung_lehre_obj->gewichtung, 3);
 
-							// Wenn mehrere Verwendungen vorhanden sind fuer und funktionen fuer die gleichen Studiengaenge
-							// dann muessen diese zusammengezaehlt werden
-							if(isset($verwendung_data[$key]['fkt']) && is_array($verwendung_data[$key]['fkt']))
-							{
-								foreach($verwendung_data[$key]['fkt'] as $key_verwfkt=>$row_verwfkt)
-								{
-									if($row_verwfkt['stgkz']==$rowfkt->studiengang_kz)
-									{
-										$verwendung_data[$key]['fkt'][$key_verwfkt]['sws']+=$rowfkt->sws;
-										$verwfkt_found=true;
-										break;
-									}
-								}
-							}
-							if(!$verwfkt_found)
-							{
-							$verwendung_data[$key]['fkt'][] = array(
-								'stgkz'=>$rowfkt->studiengang_kz,
-								'sws'=>$rowfkt->sws,
-								'hauptberuflich'=>$rowvw->hauptberuflich,
-								'hauptberufcode'=>$rowvw->hauptberufcode);
-							}
-						}
+						/**
+						 * Relativen Beschaeftigungsausmass der BIS-Verwendung berichtigen
+						 * (durch Abzug des eben erstellten relativen Beschaeftigungsausmass fuer Lehrtaetigkeiten)
+						 * */
+						$bisverwendung->beschaeftigungsausmass_relativ -= $verwendung_lehre_obj->beschaeftigungsausmass_relativ;
+
+						/**
+						 * Anteilige JVZAE der BIS-Verwendung berichtigen
+						 * (durch Abzug der eben erstellten anteiligen JVZAE fuer Lehrtaetigkeiten)
+						 */
+						$bisverwendung->jvzae_anteilig -= $verwendung_lehre_obj->jvzae_anteilig;
+						$bisverwendung_arr [] = $verwendung_lehre_obj;
 					}
 				}
-				$mitarbeiter_data['verwendung']=$verwendung_data;
-				//Verwendungen ausgeben
-				foreach($verwendung_data as $row_verwendung)
-				{
-					$person_content.="
-       <Verwendung>
-              <BeschaeftigungsArt1>".$row_verwendung['ba1code']."</BeschaeftigungsArt1>
-              <BeschaeftigungsArt2>".$row_verwendung['ba2code']."</BeschaeftigungsArt2>
-              <BeschaeftigungsAusmass>".$row_verwendung['beschausmasscode']."</BeschaeftigungsAusmass>
-              <VerwendungsCode>".$row_verwendung['verwendung_code']."</VerwendungsCode>";
-
-					if(isset($row_verwendung['stgltg']) && isset($row_verwendung['verwendung_code']) && $row_verwendung['verwendung_code']==5)
-					{
-						foreach($row_verwendung['stgltg'] as $row_stgl)
-						{
-							$person_content.="
-		                     <StgLeitung>
-		                          <StgKz>".sprintf("%04s",$row_stgl)."</StgKz>
-		                     </StgLeitung>";
-						}
-					}
-					if(isset($row_verwendung['fkt']))
-					{
-						foreach($row_verwendung['fkt'] as $row_fkt)
-						{
-							$person_content.="
-		                    <Funktion>
-		                       <StgKz>".sprintf("%04s",$row_fkt['stgkz'])."</StgKz>
-		                       <SWS>".number_format($row_fkt['sws'],2)."</SWS>";
-								if($row_fkt['hauptberuflich']=='t')
-								{
-									$person_content.="
-		                       <Hauptberuflich>J</Hauptberuflich>";
-								}
-								else
-								{
-									$person_content.="
-		                       <Hauptberuflich>N</Hauptberuflich>
-		                       <HauptberufCode>".$row_fkt['hauptberufcode']."</HauptberufCode>";
-								}
-								if(isset($eteam[$row_fkt['stgkz']]))
-								{
-									$person_content.="
-		                       <Entwicklungsteam>J</Entwicklungsteam>
-		                       <BesondereQualifikationCode>".$eteam[$row_fkt['stgkz']]."</BesondereQualifikationCode>";
-								}
-								else
-								{
-									$person_content.="
-		                       <Entwicklungsteam>N</Entwicklungsteam>";
-								}
-							$person_content.="
-		                    </Funktion>";
-						}
-					}
-						$person_content.="
-       </Verwendung>";
-				}
-
 			}
-			else
+			// TODO: Interner Check: if ($bisverwendung->jvzae_anteilig < 0) -> Anteil für 'Nicht-Lehre'-Teil muss gegeben sein.
+		}
+
+		// Sonstige Beschaeftigungsverhaeltnisse ohne Vertragsstunden
+		// Freie Dienstvertraege auf Stundenbasis
+		// -------------------------------------------------------------------------------------------------------------
+		else if (!$has_vertragsstunden &&  $has_lehrtaetigkeit)
+		{
+			foreach (array($ss_kurzbz => $lehre_ss_sws, $ws_kurzbz => $lehre_ws_sws) as $studsem => $lehre_sws)
 			{
-				$qry_count="SELECT 1 FROM bis.tbl_bisverwendung WHERE mitarbeiter_uid=".$db->db_add_param($row->mitarbeiter_uid);
-				if($result_count=$db->db_query($qry_count))
+				if (!is_null($lehre_sws))
 				{
-					if($db->db_num_rows($result_count)==0)
+					// Verwendungen erstellen
+					$verwendung_lehre_obj = _addVerwendung_fuerLehre_Stundenbasis($bisverwendung);
+
+					// Relatives Beschaeftigungsausmass / Anteilige JVZAE ermitteln
+					$verwendung_lehre_obj->beschaeftigungsausmass_relativ = round($lehre_sws / BIS_VOLLZEIT_SWS_EINZELSTUNDENBASIS, 2);	// VZ-Basis nach BIS-Vorgabe fuer Stundenbasis
+					$verwendung_lehre_obj->gewichtung = BIS_HALBJAHRES_GEWICHTUNG_SWS;
+					$verwendung_lehre_obj->jvzae_anteilig = round($verwendung_lehre_obj->beschaeftigungsausmass_relativ * $verwendung_lehre_obj->gewichtung, 2);
+					$bisverwendung_arr []= $verwendung_lehre_obj;
+				}
+			}
+		}
+	}
+
+	// *****************************************************************************************************************
+	// JVZAE und VZAE ermitteln  (Jahresvollzeitaequivalenz, Vollzeitaequivalenz)
+	// *****************************************************************************************************************
+
+	// Container Verwendung aus dem bisverwendung_arr generieren, formatieren und dem Container Person anhängen
+	$verwendung_arr = array();
+	foreach ($bisverwendung_arr as $bisverwendung)
+	{
+		if (empty($verwendung_arr) || 																					// wenn erster Durchlauf ODER
+			(!(in_array($bisverwendung->ba1code, array_column($verwendung_arr, 'ba1code')) &&               	// im verwendung_arr Beschaeftigungsart1 UND
+				in_array($bisverwendung->ba2code, array_column($verwendung_arr, 'ba2code')) &&					// Beschaeftigungsart2 UND
+				in_array($bisverwendung->verwendung_code, array_column($verwendung_arr, 'verwendung_code')))))  // Verwendung_code noch NICHT vorhanden
+		{
+
+			// Temporaeren array mit Verwendungen mit gleichem Beschaeftigungsverhaeltnis und gleichem Verwendungscode erstellen
+			$verwendung_tmp_arr = array_filter($bisverwendung_arr, function ($obj) use ($bisverwendung) {
+				return
+					$obj->ba1code == $bisverwendung->ba1code &&
+					$obj->ba2code == $bisverwendung->ba2code &&
+					$obj->verwendung_code == $bisverwendung->verwendung_code;
+			});
+
+			// Neue Verwendung fuer Container Verwendung erstellen
+			$verwendung_obj = new StdClass();
+			$verwendung_obj->ba1code = $bisverwendung->ba1code;
+			$verwendung_obj->ba2code = $bisverwendung->ba2code;
+			$verwendung_obj->verwendung_code = $bisverwendung->verwendung_code;
+			$verwendung_obj->jvzae = 0;
+			$verwendung_obj->vzae = -1;	// default
+
+			// Loop innerhalb Verwendungen mit selben Beschaeftigungsverhaeltnissen und Verwendung_codes
+			foreach ($verwendung_tmp_arr as $verwendung_tmp)
+			{
+
+			//	Jahresvollzeitaequivalenz JVZAE ermitteln
+			// ---------------------------------------------------------------------------------------------------------
+				/**
+				 * Berechnung:
+				 * JVZAE wird aus der Summe aller anteiligen JVZE gebildet.
+				 */
+				$verwendung_obj->jvzae += (isset($verwendung_tmp->jvzae_anteilig)) ? $verwendung_tmp->jvzae_anteilig * 100 : NULL; // TODO: not null...
+
+
+			//	Vollzeitaequivalenz VZAE ermitteln (Beschaeftigungsausmass zum Stichtag 31.12)
+			// ---------------------------------------------------------------------------------------------------------
+				/**
+				 * Berechnung:
+				 * - Wenn Karenz zum Stichtag 31.12. vorhanden: VZAE = 0.00
+				 * - Wenn Beschaeftigung zum Stichtag 31.12. vorhanden: VZAE = Beschaeftigungsausmass relativ zu VZ
+				 * - Wenn keine Beschaeftigung zum Stichtag 31.12 vorhanden: VZAE = -1;
+				 */
+				$ende_imBISMeldungsJahr = new DateTime($verwendung_tmp->ende_imBISMeldungsJahr);
+				$is_karenziert_VZ = $verwendung_tmp->beschausmasscode == 5 && $verwendung_tmp->jvzae_anteilig == 0;
+				if ($ende_imBISMeldungsJahr == $ende_imJahr)
+				{
+					if ($is_karenziert_VZ)
 					{
-						//Keine Verwendung
-						$v.="<u>$row->mitarbeiter_uid</u> hat keine Verwendung und wird ausgelassen<br>";
-						$error_person = true;
+						$verwendung_obj->vzae = number_format(0.00, 2);
+						break;
 					}
 					else
 					{
-						//Keine Verwendung im Meldezeitraum
-						//$v.="<u>$row->mitarbeiter_uid</u> hat keine Verwendung und wird ausgelassen<br>";
-						$error_person = true;
+						$verwendung_obj->vzae = (isset($verwendung_tmp->beschaeftigungsausmass_relativ)) ? $verwendung_tmp->beschaeftigungsausmass_relativ * 100 : NULL;	// TODO: not null...
 					}
 				}
-			}		}
-		$mitarbeiterzahl++;
-			$person_content.="
-     </Person>";
-		if($error_log!='' || $error_log1!='')
-		{
-			if($error_person)
-				$v.='<span style="color:gray;" >';
-			$v.="<u>Bei Mitarbeiter (PersNr, UID, Vorname, Nachname) '".$row->personalnummer."','".$row->mitarbeiter_uid."', '".$row->nachname."', '".$row->vorname."': </u>\n";
-			if($error_log!='')
-			{
-				$v.="&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Es fehlt: ".$error_log."\n";
 			}
-			$zaehl++;
-			$v.="\n";
-			$error_log='';
-			if($error_person)
-				$v.='</span>';
-		}
-		else
-		{
-			if(!$error_person)
-			{
-				$datei.=$person_content;
-				$mitarbeiter_gesamt[]=$mitarbeiter_data;
-			}
+
+			// Neue Verwendung im finalen Verwendungcontainer speichern
+			$verwendung_arr [] = $verwendung_obj;
 		}
 	}
-	$datei.="
-      </PersonalMeldung>
-</Erhalter>";
+
+	// Container Verwendung dem Container Person anhaengen
+	// -----------------------------------------------------------------------------------------------------------------
+	$person_obj->verwendung_arr = $verwendung_arr;
+	$person_arr []= $person_obj;
 }
 
-echo '	<html><head><title>BIS - Meldung Mitarbeiter</title>
-	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-	<link href="../../skin/vilesci.css" rel="stylesheet" type="text/css">';
-	include('../../include/meta/jquery.php');
-	include('../../include/meta/jquery-tablesorter.php');
-echo '
-	</head><body>';
-echo "<H1>BIS - Mitarbeiterdaten werden &uuml;berpr&uuml;ft (f&uuml;r Meldung ".$stsem." / $bisprevious - $bisdatum)</H1><br>";
-echo "Anzahl Mitarbeiter: Gesamt: ".$mitarbeiterzahl." / echter Dienstvertrag: ".$echt." / freier Dienstvertrag: ".$frei."<br><br>";
-echo "<H2>Nicht plausible BIS-Daten</H2><br>";
-echo nl2br($v."<br><br>");
-
-//Tabelle mit Ergebnissen ausgeben
-
-$ddd='bisdaten/bismeldung_mitarbeiter.xml';
-$dateiausgabe=fopen($ddd,'w');
-fwrite($dateiausgabe,$datei);
-fclose($dateiausgabe);
-
-echo '<h2>Folgende Personen werden gemeldet</h2>
-Anzahl:'.count($mitarbeiter_gesamt).'
-<script type="text/javascript">
-	$(document).ready(function()
-		{
-			$("#t1").tablesorter(
-			{
-				sortList: [[2,0]],
-				widgets: ["zebra"]
-			});
-		});
-</script>
-<table class="tablesorter" id="t1">
-<thead>
-	<tr>
-		<th>UID</th>
-		<th>Vorname</th>
-		<th>Nachname</th>
-		<th>Personalnummer</th>
-		<th>Fixangestellt</th>
-		<th>Lektor</th>
-		<th>BeschaeftigungsArt1</th>
-		<th>BeschaeftigungsArt2</th>
-		<th>Ausmass</th>
-		<th>Verwendung</th>
-		<th>Details (Funktion/Lehre)</th>
-	</tr>
-</thead>
-<tbody>';
-
-foreach($mitarbeiter_gesamt as $row)
+// ---------------------------------------------------------------------------------------------------------------------
+// Private Functions
+// ---------------------------------------------------------------------------------------------------------------------
+/**
+ * Funktion ermittelt fuer jede BIS-Verwendung die Dauer (in Tagen) und Gewichtung (Dauer / Tage im Jahr)
+ * @param array $bisverwendung_arr Array mit BIS-Verwendungsobjekten
+ * @return array
+ */
+function _addDauerGewichtung_imBISMeldungsjahr($bisverwendung_arr)
 {
-	echo '<tr>';
-	echo '<td>'.$row['uid'].'</td>';
-	echo '<td>'.$row['vorname'].'</td>';
-	echo '<td>'.$row['nachname'].'</td>';
-	echo '<td>'.$row['personalnummer'].'</td>';
-	echo '<td>'.($row['fixangestellt']?'Ja':'Nein').'</td>';
-	echo '<td>'.($row['lektor']?'Ja':'Nein').'</td>';
-	foreach($row['verwendung'] as $row_verwendung)
+	global $tage_imJahr;
+
+	foreach ($bisverwendung_arr as &$bisverwendung)
 	{
-		// Ba1Code
-		if(isset($ba1_arr[$row_verwendung['ba1code']]))
-			echo '<td>'.$ba1_arr[$row_verwendung['ba1code']].'</td>';
-		else
-			echo '<td>'.$row_verwendung['ba1code'].'</td>';
+		$bisverwendung_beginn_imBISMeldungsJahr = new DateTime($bisverwendung->beginn_imBISMeldungsJahr);
+		$bisverwendung_ende_imBISMeldungsJahr = new DateTime($bisverwendung->ende_imBISMeldungsJahr);
 
-		// Ba2Code
-		if(isset($ba2_arr[$row_verwendung['ba2code']]))
-			echo '<td>'.$ba2_arr[$row_verwendung['ba2code']].'</td>';
-		else
-			echo '<td>'.$row_verwendung['ba2code'].'</td>';
-
-		// Ausmass
-		if(isset($ausmass_arr[$row_verwendung['beschausmasscode']]))
-			echo '<td>'.$ausmass_arr[$row_verwendung['beschausmasscode']].'</td>';
-		else
-			echo '<td>'.$row_verwendung['beschausmasscode'].'</td>';
-
-		// Verwendung
-		if(isset($verwendung_arr[$row_verwendung['verwendung_code']]))
-			echo '<td nowrap>'.$verwendung_arr[$row_verwendung['verwendung_code']].'</td>';
-		else
-			echo '<td nowrap>'.$row_verwendung['verwendung_code'].'</td>';
-
-		echo '<td nowrap>';
-		// Details
-		if(isset($row_verwendung['stgltg']))
-		{
-
-			foreach($row_verwendung['stgltg'] as $row_stgl)
-			{
-				echo 'Leitung:'.$stg_obj->kuerzel_arr[$row_stgl];
-				echo '<br>';
-			}
-		}
-
-		if(isset($row_verwendung['fkt']))
-		{
-			foreach($row_verwendung['fkt'] as $row_fkt)
-			{
-				echo $stg_obj->kuerzel_arr[$row_fkt['stgkz']].': '.$row_fkt['sws'].' SWS';
-				echo '<br>';
-			}
-		}
-
-		echo '</td>';
+		$bisverwendung->dauer_imBISMeldungsJahr = $bisverwendung_ende_imBISMeldungsJahr->diff($bisverwendung_beginn_imBISMeldungsJahr)->days + 1;
+		$bisverwendung->gewichtung = round($bisverwendung->dauer_imBISMeldungsJahr / $tage_imJahr, 2);
 	}
-	echo '</tr>';
+
+	return $bisverwendung_arr;
 }
-echo '</tbody></table><br>';
-echo '<a href="archiv.php?meldung='.$ddd.'&sem='.$stsem.'&typ=mitarbeiter&action=archivieren">Mitarbeiter-BIS-Meldung archivieren</a><br>';
-echo "<a href=$ddd>XML-Datei f&uuml;r Mitarbeiter-BIS-Meldung</a><br><br>";
-?>
+
+/**
+ * Funktion ermittelt, ob Person im BIS Meldungsjahr vorwiegend haupt- oder nebenberuflich taetig war.
+ * @param $bisverwendung_arr Array mit BIS-Verwendungsobjekten
+ * @return boolean	True wenn vorwiegend hauptberuflich
+ */
+function _getUeberwiegendeTaetigkeit_HauptNebenberuf($bisverwendung_arr)
+{
+	// Zeiten vergleichen
+	$sum_dauer_hauptberuflich = 0;
+	$sum_dauer_nebenberuflich = 0;
+
+	foreach ($bisverwendung_arr as $bisverwendung)
+	{
+		if ($bisverwendung->hauptberuflich == true)
+		{
+			$sum_dauer_hauptberuflich += $bisverwendung->dauer_imBISMeldungsJahr;
+		}
+		else
+		{
+			$sum_dauer_nebenberuflich += $bisverwendung->dauer_imBISMeldungsJahr;
+		}
+	}
+
+	// Laengere Dauer bestimmt Haupt- oder Nebenberuf
+	$is_hauptberuflich = $sum_dauer_hauptberuflich > $sum_dauer_nebenberuflich;
+
+	return array($is_hauptberuflich);
+}
+
+/**
+ * Funktion erstellt Verwendung fuer Lehrtaetigkeiten fuer Personen mit echtem Dienstvertrag.
+ * (zB STG Leiter mit Lehrtaetigkeit)
+ * @param object $studiensemester	Sommer- / Winterstudiensemester
+ * @param object $bisverwendung
+ * @return array
+ */
+function _addVerwendung_fuerLehre_inkludiert($studiensemester, $bisverwendung)
+{
+	$verwendung_lehre_obj = new StdClass();
+
+	$verwendung_lehre_obj->ba1code = $bisverwendung->ba1code;
+	$verwendung_lehre_obj->ba2code = $bisverwendung->ba2code;
+	$verwendung_lehre_obj->beschausmasscode = $bisverwendung->beschausmasscode;
+	$verwendung_lehre_obj->verwendung_code = 1;
+	$verwendung_lehre_obj->beginn_imBISMeldungsJahr = $bisverwendung->beginn_imBISMeldungsJahr;
+	$verwendung_lehre_obj->ende_imBISMeldungsJahr = $bisverwendung->ende_imBISMeldungsJahr;
+
+	/**
+	 * Anteilige Lehrtage im Studiensemester ermitteln
+	 * NOTE: Da die gesamte Lehrtaetigkeit fuer SS und WS im BIS Meldungsjahr gemeldet wird, muss die WS Lehrtaetigkeit
+	 * jahresuebergreifend erfasst werden. Daher Datumsvergleiche mit dem tatsaechlichen BIS-Verwendungsende.
+	 * */
+	$tage_lehre_imSemester = 182;	// default Tage im Halbjahr entsprechend der default Gewichtung von 0.5
+	$studsem_start = new DateTime($studiensemester->start);
+	$studsem_ende = new DateTime($studiensemester->ende);
+	$bisverwendung_beginn_BIS = new DateTime($bisverwendung->beginn_imBISMeldungsJahr);
+	$bisverwendung_ende = new DateTime($bisverwendung->ende);
+
+	$beginn_im_semester = ($bisverwendung_beginn_BIS < $studsem_start) ? $studsem_start : $bisverwendung_beginn_BIS;
+	$ende_im_semester = (!is_null($bisverwendung_ende) && $bisverwendung_ende > $studsem_ende) ? $studsem_ende : $bisverwendung_ende;
+	$tage_lehre_imSemester = $beginn_im_semester->diff($ende_im_semester)->days + 1;
+
+	return array($tage_lehre_imSemester, $verwendung_lehre_obj);
+}
+
+/**
+ * Funktion erstellt Verwendung fuer Lehrtaetigkeiten fuer freie Lektoren.
+ * @param object $bisverwendung
+ * @return object Verwendung fuer Lehrtaetigkeit
+ */
+function _addVerwendung_fuerLehre_Stundenbasis($bisverwendung)
+{
+	$verwendung_lehre_obj = new StdClass();
+
+	$verwendung_lehre_obj->ba1code = $bisverwendung->ba1code;
+	$verwendung_lehre_obj->ba2code = $bisverwendung->ba2code;
+	$verwendung_lehre_obj->beschausmasscode = $bisverwendung->beschausmasscode;
+	$verwendung_lehre_obj->verwendung_code = 1;
+	$verwendung_lehre_obj->beginn_imBISMeldungsJahr =$bisverwendung->beginn_imBISMeldungsJahr;
+	$verwendung_lehre_obj->ende_imBISMeldungsJahr = $bisverwendung->ende_imBISMeldungsJahr;
+
+	return $verwendung_lehre_obj;
+}
+
+
