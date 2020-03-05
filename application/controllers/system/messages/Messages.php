@@ -92,9 +92,9 @@ class Messages extends Auth_Controller
 	 */
 	public function parseMessageText()
 	{
-		$receiver_id = $this->input->get('receiver_id');
-		$text = $this->input->get('text');
-		$type = $this->input->get('type');
+		$receiver_id = $this->input->post('receiver_id');
+		$text = $this->input->post('text');
+		$type = $this->input->post('type');
 
 		if ($type == Messages_model::TYPE_PERSONS)
 		{
