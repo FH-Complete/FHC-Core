@@ -3842,6 +3842,134 @@ if ($result = $db->db_query("SELECT 1 FROM pg_class WHERE relname = 'unq_idx_abl
 	}
 }
 
+// Creates table system.tbl_jobstatuses if it doesn't exist and grants privileges
+if (!$result = @$db->db_query('SELECT 1 FROM system.tbl_jobstatuses LIMIT 1'))
+{
+	$qry = 'CREATE TABLE system.tbl_jobstatuses (
+    			status character varying NOT NULL
+			);
+
+			COMMENT ON TABLE system.tbl_jobstatuses IS \'All possible job statuses\';
+			COMMENT ON COLUMN system.tbl_jobstatuses.status IS \'Job status value and primary key\';
+
+			ALTER TABLE ONLY system.tbl_jobstatuses ADD CONSTRAINT pk_jobstatuses PRIMARY KEY (status);
+		';
+
+	if (!$db->db_query($qry))
+		echo '<strong>system.tbl_jobstatuses: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>system.tbl_jobstatuses table created';
+
+	$qry = 'GRANT SELECT ON TABLE system.tbl_jobstatuses TO web;';
+	if (!$db->db_query($qry))
+		echo '<strong>system.tbl_jobstatuses: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Granted privileges to <strong>web</strong> on system.tbl_jobstatuses';
+
+	$qry = 'GRANT SELECT, UPDATE, INSERT, DELETE ON TABLE system.tbl_jobstatuses TO vilesci;';
+	if (!$db->db_query($qry))
+		echo '<strong>system.tbl_jobstatuses: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Granted privileges to <strong>vilesci</strong> on system.tbl_jobstatuses';
+}
+
+// Creates table system.tbl_jobtypes if it doesn't exist and grants privileges
+if (!$result = @$db->db_query('SELECT 1 FROM system.tbl_jobtypes LIMIT 1'))
+{
+	$qry = 'CREATE TABLE system.tbl_jobtypes (
+			    type character varying(256) NOT NULL,
+			    description text NOT NULL
+			);
+
+			COMMENT ON TABLE system.tbl_jobtypes IS \'All possible job types\';
+			COMMENT ON COLUMN system.tbl_jobtypes.type IS \'Job type value and primary key\';
+			COMMENT ON COLUMN system.tbl_jobtypes.description IS \'Job type description\';
+
+			ALTER TABLE ONLY system.tbl_jobtypes ADD CONSTRAINT pk_jobtypes PRIMARY KEY (type);
+		';
+
+	if (!$db->db_query($qry))
+		echo '<strong>system.tbl_jobtypes: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>system.tbl_jobtypes table created';
+
+	$qry = 'GRANT SELECT ON TABLE system.tbl_jobtypes TO web;';
+	if (!$db->db_query($qry))
+		echo '<strong>system.tbl_jobtypes: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Granted privileges to <strong>web</strong> on system.tbl_jobtypes';
+
+	$qry = 'GRANT SELECT, UPDATE, INSERT, DELETE ON TABLE system.tbl_jobtypes TO vilesci;';
+	if (!$db->db_query($qry))
+		echo '<strong>system.tbl_jobtypes: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Granted privileges to <strong>vilesci</strong> on system.tbl_jobtypes';
+}
+
+// Creates table system.tbl_jobsqueue if it doesn't exist and grants privileges
+if (!$result = @$db->db_query('SELECT 1 FROM system.tbl_jobsqueue LIMIT 1'))
+{
+	$qry = 'CREATE TABLE system.tbl_jobsqueue (
+			    jobid integer NOT NULL,
+			    type character varying(256) NOT NULL,
+			    creationtime timestamp without time zone DEFAULT now(),
+			    status character varying(64) NOT NULL,
+			    input jsonb,
+			    output jsonb,
+			    starttime timestamp without time zone,
+			    endtime timestamp without time zone,
+			    insertvon character varying(32),
+			    insertamum timestamp without time zone DEFAULT now()
+			);
+
+			COMMENT ON TABLE system.tbl_jobsqueue IS \'Table to schedule/manage the jobs queue\';
+			COMMENT ON COLUMN system.tbl_jobsqueue.jobid IS \'Primary key\';
+			COMMENT ON COLUMN system.tbl_jobsqueue.type IS \'Job type\';
+			COMMENT ON COLUMN system.tbl_jobsqueue.creationtime IS \'Job creation timestamp\';
+			COMMENT ON COLUMN system.tbl_jobsqueue.status IS \'Job current status\';
+			COMMENT ON COLUMN system.tbl_jobsqueue.input IS \'Job input in JSON format\';
+			COMMENT ON COLUMN system.tbl_jobsqueue.output IS \'Job output in JSON format\';
+			COMMENT ON COLUMN system.tbl_jobsqueue.starttime IS \'Job start timestamp\';
+			COMMENT ON COLUMN system.tbl_jobsqueue.endtime IS \'Job end timestamp\';
+			COMMENT ON COLUMN system.tbl_jobsqueue.insertvon IS \'User/Service who/that inserted this record\';
+			COMMENT ON COLUMN system.tbl_jobsqueue.insertamum IS \'Record insert time stamp\';
+
+			CREATE SEQUENCE system.seq_jobsqueue_jobid
+			    START WITH 1
+			    INCREMENT BY 1
+			    NO MINVALUE
+			    NO MAXVALUE
+			    CACHE 1;
+
+			ALTER SEQUENCE system.seq_jobsqueue_jobid OWNED BY system.tbl_jobsqueue.jobid;
+
+			ALTER TABLE ONLY system.tbl_jobsqueue ALTER COLUMN jobid SET DEFAULT nextval(\'system.seq_jobsqueue_jobid\'::regclass);
+
+			ALTER TABLE ONLY system.tbl_jobsqueue ADD CONSTRAINT pk_jobsqueue PRIMARY KEY (jobid);
+
+			ALTER TABLE ONLY system.tbl_jobsqueue ADD CONSTRAINT fk_jobsqueue_status FOREIGN KEY (status) REFERENCES system.tbl_jobstatuses(status) ON UPDATE CASCADE ON DELETE RESTRICT;
+
+			ALTER TABLE ONLY system.tbl_jobsqueue ADD CONSTRAINT fk_jobsqueue_type FOREIGN KEY (type) REFERENCES system.tbl_jobtypes(type) ON UPDATE CASCADE ON DELETE RESTRICT;
+		';
+
+	if (!$db->db_query($qry))
+		echo '<strong>system.tbl_jobsqueue: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>system.tbl_jobsqueue table created';
+
+	$qry = 'GRANT SELECT ON TABLE system.tbl_jobsqueue TO web;';
+	if (!$db->db_query($qry))
+		echo '<strong>system.tbl_jobsqueue: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Granted privileges to <strong>web</strong> on system.tbl_jobsqueue';
+
+	$qry = 'GRANT SELECT, UPDATE, INSERT, DELETE ON TABLE system.tbl_jobsqueue TO vilesci;';
+	if (!$db->db_query($qry))
+		echo '<strong>system.tbl_jobsqueue: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Granted privileges to <strong>vilesci</strong> on system.tbl_jobsqueue';
+}
+
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
 
@@ -4100,6 +4228,9 @@ $tabellen=array(
 	"system.tbl_log" => array("log_id","person_id","zeitpunkt","app","oe_kurzbz","logtype_kurzbz","logdata","insertvon","taetigkeit_kurzbz"),
 	"system.tbl_logtype" => array("logtype_kurzbz", "data_schema"),
 	"system.tbl_filters" => array("filter_id","app","dataset_name","filter_kurzbz","person_id","description","sort","default_filter","filter","oe_kurzbz","statistik_kurzbz"),
+	"system.tbl_jobsqueue" => array("jobid", "type", "creationtime", "status", "input", "output", "starttime", "endtime", "insertvon", "insertamum"),
+	"system.tbl_jobstatuses" => array("status"),
+	"system.tbl_jobtypes" => array("type", "description"),
 	"system.tbl_phrase" => array("phrase_id","app","phrase","insertamum","insertvon","category"),
 	"system.tbl_phrasentext" => array("phrasentext_id","phrase_id","sprache","orgeinheit_kurzbz","orgform_kurzbz","text","description","insertamum","insertvon"),
 	"system.tbl_rolle"  => array("rolle_kurzbz","beschreibung"),

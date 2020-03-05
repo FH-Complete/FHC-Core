@@ -631,6 +631,37 @@ $filters = array(
 			}
 		',
 		'oe_kurzbz' => null,
+	),
+	array(
+		'app' => 'core',
+		'dataset_name' => 'jq',
+		'filter_kurzbz' => 'lastHour',
+		'description' => '{Last hour queued jobs}',
+		'sort' => 1,
+		'default_filter' => true,
+		'filter' => '
+			{
+				"name": "All jobs queued in the last hour",
+				"columns": [
+					{"name": "JobId"},
+					{"name": "CreationTime"},
+					{"name": "Type"},
+					{"name": "Status"},
+					{"name": "StartTime"},
+					{"name": "EndTime"},
+					{"name": "UserService"}
+				],
+				"filters": [
+					{
+						"name": "CreationTime",
+						"operation": "lt",
+						"condition": "1",
+						"option": "hours"
+					}
+				]
+			}
+		',
+		'oe_kurzbz' => null,
 	)
 );
 

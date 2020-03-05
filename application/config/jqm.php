@@ -2,5 +2,15 @@
 
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
-//
-$config['addable_jobs_black_list'] = array('doomsday', 'sudo rm -fR /', 'sudo mv / /dev/null');
+// White list of permissions that are able to store a spcific job type in database
+$config['job_type_permissions_white_list'] = array(
+	'SAPStammdatenUpdate' => array(
+		'admin'
+	),
+	'OEHPayment' => array(
+		'admin'
+	),
+	'SAPPayment' => array(
+		'admin'
+	)
+);

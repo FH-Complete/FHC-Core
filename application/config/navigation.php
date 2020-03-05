@@ -102,6 +102,13 @@ $config['navigation_header'] = array(
 					'expand' => true,
 					'sort' => 20,
 					'requiredPermissions' => 'system/developer:r'
+				),
+				'jobsqueueviewer' => array(
+					'link' => site_url('system/jq/JobsQueueViewer'),
+					'description' => 'Jobs Queue Viewer',
+					'expand' => true,
+					'sort' => 20,
+					'requiredPermissions' => 'system/developer:r'
 				)
 			)
 		)

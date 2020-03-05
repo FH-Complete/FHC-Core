@@ -3,18 +3,22 @@
 if (!defined("BASEPATH")) exit("No direct script access allowed");
 
 /**
+ * Job Queue Worker
  *
+ * This controller acts as interface of the JobsQueueLib that contains all the needed functionalities to operate with
+ * the Jobs Queue System
+ * This is an abstract class that provide basic functionalities, it has to be extended to broaden its logic
  */
 abstract class JQW_Controller extends JOB_Controller
 {
 	/**
-	 *
+	 * Constructor
 	 */
 	public function __construct()
 	{
 		parent::__construct();
 
-		// Loads LogLib with different ...
+		// Loads LogLib with different parameters
 		$this->load->library('LogLib', array(
 			'classIndex' => 5,
 			'functionIndex' => 5,
@@ -23,33 +27,36 @@ abstract class JQW_Controller extends JOB_Controller
 			'dbExecuteUser' => 'Jobs queue system'
 		));
 
-		// Loads JobsQueueLib
+		// Loads JobsQueueLib library
 		$this->load->library('JobsQueueLib');
 	}
 
-	// ------------------------------------------------------------------------------------------------------------
-	// Protected methods to read/write the jobs queue
+	//------------------------------------------------------------------------------------------------------------------
+	// Protected methods
 
 	/**
-	 *
+	 * To get all the most recently added jobs using the given job type
 	 */
-	protected function getJobsByType($jobType)
+	protected function getLastJobs($type)
 	{
-		$jobs = $this->jobsqueuelib->getJobsByType($jobType);
+		$jobs = $this->jobsqueuelib->getLastJobs($type);
 
-		if (isError($jobs)) $this->logError(getError($jobs), $jobType);
+		// If an error occurred then log it in database
+		if (isError($jobs)) $this->logError(getError($jobs), $type);
 
 		return $jobs;
 	}
 
 	/**
-	 *
+	 * Add new jobs in the jobs queue with the given type
+	 * jobs is an array of job objects
 	 */
-	protected function addNewJobsToQueue($jobType, $jobs)
+	protected function addNewJobsToQueue($type, $jobs)
 	{
-		$result = $this->jobsqueuelib->addNewJobsToQueue($jobType, $jobs);
+		$result = $this->jobsqueuelib->addNewJobsToQueue($type, $jobs);
 
-		if (isError($result)) $this->logError(getError($result), $jobType);
+		// If an error occurred then log it in database
+		if (isError($result)) $this->logError(getError($result), $type);
 
 		return $result;
 	}
