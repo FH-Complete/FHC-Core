@@ -3529,7 +3529,7 @@ if($result = $db->db_query("SELECT * FROM pg_proc WHERE proname = 'transform_ges
 /**
  * Anpassungen fuer BIS Personalmeldung 6.8
  */
-if (!$result = @$db->db_query("SELECT ba1bis_code FROM bis.tbl_beschaeftigungsart1 LIMIT 1"))
+if (!$result = @$db->db_query("SELECT ba1code_bis FROM bis.tbl_beschaeftigungsart1 LIMIT 1"))
 {
 	/*
 	Beschaeftigungsausmass Kodextabelle aktualisieren
@@ -3545,13 +3545,13 @@ if (!$result = @$db->db_query("SELECT ba1bis_code FROM bis.tbl_beschaeftigungsar
 	BA1code wird um 100 erhöht damit klar ist, dass es sich um einen anderen Code handelt.
 	*/
 	$qry = "
-		ALTER TABLE bis.tbl_beschaeftigungsart1 ADD COLUMN ba1bis_code smallint;
-		UPDATE bis.tbl_beschaeftigungsart1 SET ba1bis_code=1, ba1code=101 WHERE ba1code=1;
-		UPDATE bis.tbl_beschaeftigungsart1 SET ba1bis_code=2, ba1code=102 WHERE ba1code=2;
-		UPDATE bis.tbl_beschaeftigungsart1 SET ba1bis_code=3, ba1code=103 WHERE ba1code=3;
-		UPDATE bis.tbl_beschaeftigungsart1 SET ba1bis_code=5, ba1code=105 WHERE ba1code=4;
-		UPDATE bis.tbl_beschaeftigungsart1 SET ba1bis_code=4, ba1code=104 WHERE ba1code=5;
-		UPDATE bis.tbl_beschaeftigungsart1 SET ba1bis_code=6, ba1code=106 WHERE ba1code=6;
+		ALTER TABLE bis.tbl_beschaeftigungsart1 ADD COLUMN ba1code_bis smallint;
+		UPDATE bis.tbl_beschaeftigungsart1 SET ba1code_bis=1, ba1code=101 WHERE ba1code=1;
+		UPDATE bis.tbl_beschaeftigungsart1 SET ba1code_bis=2, ba1code=102 WHERE ba1code=2;
+		UPDATE bis.tbl_beschaeftigungsart1 SET ba1code_bis=3, ba1code=103 WHERE ba1code=3;
+		UPDATE bis.tbl_beschaeftigungsart1 SET ba1code_bis=5, ba1code=105 WHERE ba1code=4;
+		UPDATE bis.tbl_beschaeftigungsart1 SET ba1code_bis=4, ba1code=104 WHERE ba1code=5;
+		UPDATE bis.tbl_beschaeftigungsart1 SET ba1code_bis=6, ba1code=106 WHERE ba1code=6;
 		";
 
 	/*
@@ -3563,8 +3563,8 @@ if (!$result = @$db->db_query("SELECT ba1bis_code FROM bis.tbl_beschaeftigungsar
 	Alle Personen mit einer Funktion als Hilfskraft werden auf diese Beschaeftigungsart geaendert.
 	*/
 	$qry .= "
-		INSERT INTO bis.tbl_beschaeftigungsart1(ba1code, ba1bez, ba1kurzbz, ba1bis_code) VALUES(107,'Werkvertrag (Sonstiges)','Werkvertrag (Sonstiges)', 5);
-		INSERT INTO bis.tbl_beschaeftigungsart1(ba1code, ba1bez, ba1kurzbz, ba1bis_code) VALUES(108,'Studentische Hilfskraft (Echter DV)','Stud. Hilfskraft (Echter DV)', 3);
+		INSERT INTO bis.tbl_beschaeftigungsart1(ba1code, ba1bez, ba1kurzbz, ba1code_bis) VALUES(107,'Werkvertrag (Sonstiges)','Werkvertrag (Sonstiges)', 5);
+		INSERT INTO bis.tbl_beschaeftigungsart1(ba1code, ba1bez, ba1kurzbz, ba1code_bis) VALUES(108,'Studentische Hilfskraft (Echter DV)','Stud. Hilfskraft (Echter DV)', 3);
 		UPDATE bis.tbl_bisverwendung SET ba1code=107 WHERE ba1code=106;
 		UPDATE bis.tbl_bisverwendung SET ba1code=108 WHERE ba1code=103 AND EXISTS(
 			SELECT 1 FROM public.tbl_benutzerfunktion
@@ -3631,7 +3631,7 @@ $tabellen=array(
 	"bis.tbl_bisio_aufenthaltfoerderung" => array("bisio_id","aufenthaltfoerderung_code"),
 	"bis.tbl_ausbildung"  => array("ausbildungcode","ausbildungbez","ausbildungbeschreibung"),
 	"bis.tbl_berufstaetigkeit"  => array("berufstaetigkeit_code","berufstaetigkeit_bez","berufstaetigkeit_kurzbz"),
-	"bis.tbl_beschaeftigungsart1"  => array("ba1code","ba1bez","ba1kurzbz","ba1bis_code"),
+	"bis.tbl_beschaeftigungsart1"  => array("ba1code","ba1bez","ba1kurzbz","ba1code_bis"),
 	"bis.tbl_beschaeftigungsart2"  => array("ba2code","ba2bez"),
 	"bis.tbl_beschaeftigungsausmass"  => array("beschausmasscode","beschausmassbez","min","max"),
 	"bis.tbl_besqual"  => array("besqualcode","besqualbez"),
