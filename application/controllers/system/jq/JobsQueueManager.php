@@ -8,6 +8,9 @@ if (!defined('BASEPATH')) exit('No direct script access allowed');
  */
 class JobsQueueManager extends Auth_Controller
 {
+	// Config entry name for White list of permissions...
+	const JOB_TYPE_PERMISSIONS_WHITE_LIST = 'job_type_permissions_white_list';
+
 	/**
 	 * Constructor
 	 */
@@ -15,7 +18,7 @@ class JobsQueueManager extends Auth_Controller
 	{
 		parent::__construct(
 			array(
-				'getJobsByType' => 'admin:r',
+				'getLastJobs' => 'admin:r',
 				'addNewJobsToQueue' => 'admin:rw'
 			)
 		);
@@ -46,6 +49,18 @@ class JobsQueueManager extends Auth_Controller
 		$type = $this->input->post(JobsQueueLib::PARAM_JOB_TYPE);
 		$jobs = $this->input->post(JobsQueueLib::PARAM_JOBS);
 
-		$this->outputJson($this->jobsqueuelib->addNewJobsToQueue($type, $jobs));
+		// Loads permission lib
+		$this->load->library('PermissionLib');
+
+		// Checks if the caller has the permissions to add new jobs with the given type in the queue
+		if (!$this->permissionlib->isEntitled($this->config->item(self::JOB_TYPE_PERMISSIONS_WHITE_LIST), $type))
+		{
+			// Permissions NOT valid
+			$this->outputJsonError('You are not allowed to access to this content');
+		}
+		else // Otherwise call JobsQueueLib library
+		{
+			$this->outputJson($this->jobsqueuelib->addNewJobsToQueue($type, $jobs));
+		}
 	}
 }

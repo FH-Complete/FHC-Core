@@ -3853,6 +3853,11 @@ if (!$result = @$db->db_query('SELECT 1 FROM system.tbl_jobstatuses LIMIT 1'))
 			COMMENT ON COLUMN system.tbl_jobstatuses.status IS \'Job status value and primary key\';
 
 			ALTER TABLE ONLY system.tbl_jobstatuses ADD CONSTRAINT pk_jobstatuses PRIMARY KEY (status);
+
+			INSERT INTO system.tbl_jobstatuses(status) VALUES('new');
+			INSERT INTO system.tbl_jobstatuses(status) VALUES('running');
+			INSERT INTO system.tbl_jobstatuses(status) VALUES('done');
+			INSERT INTO system.tbl_jobstatuses(status) VALUES('failed');
 		';
 
 	if (!$db->db_query($qry))
