@@ -35,22 +35,22 @@
 
 			$mark = '';
 
-			if ($datasetRaw->Status == 'Failed')
+			if ($datasetRaw->Status == JobsQueueLib::STATUS_FAILED)
 			{
 				$mark = 'text-red';
 			}
 
-			if ($datasetRaw->Status == 'Done')
+			if ($datasetRaw->Status == JobsQueueLib::STATUS_DONE)
 			{
 				$mark = 'text-green';
 			}
 
-			if ($datasetRaw->Status == 'Running')
+			if ($datasetRaw->Status == JobsQueueLib::STATUS_RUNNING)
 			{
 				$mark = 'text-orange';
 			}
 
-			if ($datasetRaw->Status == 'New')
+			if ($datasetRaw->Status == JobsQueueLib::STATUS_NEW)
 			{
 				$mark = 'text-info';
 			}

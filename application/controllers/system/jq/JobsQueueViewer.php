@@ -25,6 +25,9 @@ class JobsQueueViewer extends Auth_Controller
 		// Loads WidgetLib
 		$this->load->library('WidgetLib');
 
+		// Loads JobsQueueLib
+		$this->load->library('JobsQueueLib');
+
 		// Loads phrases system
 		$this->loadPhrases(
 			array(
