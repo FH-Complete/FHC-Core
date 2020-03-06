@@ -11,9 +11,9 @@ class Vorlage_widget extends DropdownWidget
 		$vorlage = null;
 
 		// If the user is an admin
-		if ($idAdmin === true)
+		if ($idAdmin)
 		{
-			 // Get all the vorlage with mimetype = text/html
+			// Get all the vorlage with mimetype = text/html
 			$vorlage = $this->_getAllHTMLVorlage();
 		}
 		else
@@ -39,7 +39,7 @@ class Vorlage_widget extends DropdownWidget
     private function _getAllHTMLVorlage()
     {
 		$this->load->model('system/Vorlage_model', 'VorlageModel');
-		$this->VorlageModel->addOrder('vorlage_kurzbz');
+		$this->VorlageModel->addOrder('bezeichnung');
 
 		$this->addSelectToModel($this->VorlageModel, 'vorlage_kurzbz', 'bezeichnung');
 
@@ -59,15 +59,31 @@ class Vorlage_widget extends DropdownWidget
 		$vorlage = success(array()); // Default value
 
 		$table = '(
-					SELECT v.vorlage_kurzbz, v.bezeichnung, vs.version, vs.oe_kurzbz, vs.aktiv, vs.subject, vs.text, v.mimetype
-					FROM tbl_vorlagestudiengang vs INNER JOIN tbl_vorlage v USING(vorlage_kurzbz)
+					SELECT v.vorlage_kurzbz,
+							v.bezeichnung,
+							vs.version,
+							vs.oe_kurzbz,
+							vs.aktiv,
+							vs.subject,
+							vs.text,
+							v.mimetype
+					FROM tbl_vorlagestudiengang vs
+					JOIN tbl_vorlage v USING(vorlage_kurzbz)
 				) templates';
+
 		$alias = 'templates';
-	    $fields = array("templates.vorlage_kurzbz AS id", "templates.bezeichnung AS description");
+
+	    $fields = array(
+			'templates.vorlage_kurzbz AS id',
+			'templates.bezeichnung || \' (\' || UPPER(templates.oe_kurzbz) || \')\' AS description'
+		);
+
 		$where = 'templates.aktiv = TRUE
-				AND templates.subject IS NOT NULL
-				AND templates.text IS NOT NULL
-				AND templates.mimetype = \'text/html\'';
+					AND templates.subject IS NOT NULL
+					AND templates.text IS NOT NULL
+					AND templates.mimetype = \'text/html\'
+			   GROUP BY 1, 2, 3';
+
 		$order_by = 'description ASC';
 
 		if (!is_array($oe_kurzbz))
@@ -99,30 +115,37 @@ class Vorlage_widget extends DropdownWidget
 				if (hasData($tmpVorlage))
 				{
 					// If it's the first vorlage copy it
-					if (count($vorlage->retval) == 0)
+					if (!hasData($vorlage))
 					{
-						for ($j = 0; $j < count($tmpVorlage->retval); $j++)
+						for ($j = 0; $j < count(getData($tmpVorlage)); $j++)
 						{
-							if ($tmpVorlage->retval[$j]->id != '')
+							if (getData($tmpVorlage)[$j]->id != '')
 							{
-								array_push($vorlage->retval, $tmpVorlage->retval[$j]);
+								array_push($vorlage->retval, getData($tmpVorlage)[$j]);
 							}
 						}
 					}
-					else // checks for duplicates, if it's not already present push it into the array $vorlage->retval
+					else // checks for duplicates, if it's not already present push it into the array getData($vorlage)
 					{
-						for ($i = 0; $i < count($vorlage->retval); $i++)
+						for ($j = 0; $j < count(getData($tmpVorlage)); $j++)
 						{
-							for ($j = 0; $j < count($tmpVorlage->retval); $j++)
+							$found = false;
+							$currentTmpVorlageData = null;
+
+							for ($i = 0; $i < count(getData($vorlage)); $i++)
 							{
-								if ($tmpVorlage->retval[$j]->id != ''
-									&& $vorlage->retval[$i]->_pk != $tmpVorlage->retval[$j]->_pk
-									&& $vorlage->retval[$i]->_ppk != $tmpVorlage->retval[$j]->_ppk
-									&& $vorlage->retval[$i]->_jtpk != $tmpVorlage->retval[$j]->_jtpk)
+								$currentTmpVorlageData = getData($tmpVorlage)[$j];
+
+								if (getData($vorlage)[$i]->_pk == getData($tmpVorlage)[$j]->_pk
+									&& getData($vorlage)[$i]->_ppk == getData($tmpVorlage)[$j]->_ppk
+									&& getData($vorlage)[$i]->_jtpk == getData($tmpVorlage)[$j]->_jtpk)
 								{
-									array_push($vorlage->retval, $tmpVorlage->retval[$j]);
+									$found = true;
+									break;
 								}
 							}
+
+							if (!$found && $currentTmpVorlageData->id != '') array_push($vorlage->retval, $currentTmpVorlageData);
 						}
 					}
 				}
