@@ -3950,6 +3950,9 @@ if (!$result = @$db->db_query('SELECT 1 FROM system.tbl_jobsqueue LIMIT 1'))
 
 			ALTER TABLE ONLY system.tbl_jobsqueue ALTER COLUMN jobid SET DEFAULT nextval(\'system.seq_jobsqueue_jobid\'::regclass);
 
+			GRANT SELECT, UPDATE ON SEQUENCE system.seq_jobsqueue_jobid TO vilesci;
+			GRANT SELECT, UPDATE ON SEQUENCE system.seq_jobsqueue_jobid TO fhcomplete;
+
 			ALTER TABLE ONLY system.tbl_jobsqueue ADD CONSTRAINT pk_jobsqueue PRIMARY KEY (jobid);
 
 			ALTER TABLE ONLY system.tbl_jobsqueue ADD CONSTRAINT fk_jobsqueue_status FOREIGN KEY (status) REFERENCES system.tbl_jobstatuses(status) ON UPDATE CASCADE ON DELETE RESTRICT;
