@@ -34,9 +34,6 @@ class JobsQueueLib
 		// Gets CI instance
 		$this->_ci =& get_instance();
 
-		// Loads JQM configuration
-		$this->_ci->config->load('jqm');
-
 		// Loads all needed models
 		$this->_ci->load->model('system/JobsQueue_model', 'JobsQueueModel');
 		$this->_ci->load->model('system/JobTypes_model', 'JobTypesModel');
