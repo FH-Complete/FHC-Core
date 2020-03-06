@@ -60,4 +60,18 @@ abstract class JQW_Controller extends JOB_Controller
 
 		return $result;
 	}
+
+	/**
+	 * Updates jobs already present in the jobs queue
+	 * jobs is an array of job objects
+	 */
+	protected function updateJobsQueue($type, $jobs)
+	{
+		$result = $this->jobsqueuelib->updateJobsQueue($type, $jobs);
+
+		// If an error occurred then log it in database
+		if (isError($result)) $this->logError(getError($result), $type);
+
+		return $result;
+	}
 }

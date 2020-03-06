@@ -10,6 +10,8 @@ class JobsQueueManager extends Auth_Controller
 {
 	// Config entry name for White list of permissions...
 	const JOB_TYPE_PERMISSIONS_WHITE_LIST = 'job_type_permissions_white_list';
+	// Parameter names
+	const PARAM_JOBS = 'jobs';
 
 	/**
 	 * Constructor
@@ -19,12 +21,15 @@ class JobsQueueManager extends Auth_Controller
 		parent::__construct(
 			array(
 				'getLastJobs' => 'admin:r',
-				'addNewJobsToQueue' => 'admin:rw'
+				'addNewJobsToQueue' => 'admin:rw',
+				'updateJobsQueue' => 'admin:rw'
 			)
 		);
 
 		// Loads JobsQueueLib
 		$this->load->library('JobsQueueLib');
+		// Loads permission lib
+		$this->load->library('PermissionLib');
 	}
 
 	//------------------------------------------------------------------------------------------------------------------
@@ -35,7 +40,9 @@ class JobsQueueManager extends Auth_Controller
 	 */
 	public function getLastJobs()
 	{
-		$type = $this->input->get(JobsQueueLib::PARAM_JOB_TYPE);
+		$type = $this->input->get(JobsQueueLib::PROPERTY_TYPE);
+
+		$this->_checkPermissions($type);
 
 		$this->outputJson($this->jobsqueuelib->getLastJobs($type));
 	}
@@ -46,21 +53,75 @@ class JobsQueueManager extends Auth_Controller
 	 */
 	public function addNewJobsToQueue()
 	{
-		$type = $this->input->post(JobsQueueLib::PARAM_JOB_TYPE);
-		$jobs = $this->input->post(JobsQueueLib::PARAM_JOBS);
+		$type = $this->input->post(JobsQueueLib::PROPERTY_TYPE);
+		$jobs = $this->input->post(self::PARAM_JOBS);
 
-		// Loads permission lib
-		$this->load->library('PermissionLib');
+		$this->_checkPermissions($type);
 
+		// Otherwise convert jobs from json to php and call JobsQueueLib library
+		$this->outputJson($this->jobsqueuelib->addNewJobsToQueue($type, $this->_convertJobs($jobs)));
+	}
+
+	/**
+	 * Add new jobs in the jobs queue with the given type
+	 * jobs is an array of job objects
+	 */
+	public function updateJobsQueue()
+	{
+		$type = $this->input->post(JobsQueueLib::PROPERTY_TYPE);
+		$jobs = $this->input->post(self::PARAM_JOBS);
+
+		$this->_checkPermissions($type);
+
+		// Otherwise convert jobs from json to php and call JobsQueueLib library
+		$this->outputJson($this->jobsqueuelib->updateJobsQueue($type, $this->_convertJobs($jobs)));
+	}
+
+	//------------------------------------------------------------------------------------------------------------------
+	// Private methods
+
+	/**
+	 *
+	 */
+	private function _checkPermissions($type)
+	{
 		// Checks if the caller has the permissions to add new jobs with the given type in the queue
 		if (!$this->permissionlib->isEntitled($this->config->item(self::JOB_TYPE_PERMISSIONS_WHITE_LIST), $type))
 		{
 			// Permissions NOT valid
-			$this->outputJsonError('You are not allowed to access to this content');
+			$this->terminateWithJsonError('You are not allowed to access to this content');
 		}
-		else // Otherwise call JobsQueueLib library
+	}
+
+	/**
+	 *
+	 */
+	private function _convertJobs($jobs)
+	{
+		if (isEmptyArray($jobs)) return null; // if not a valid array then return null
+
+		$convertedJobsArray = array(); // returned values
+
+		// Loops through all the provided jobs
+		foreach ($jobs as $job)
 		{
-			$this->outputJson($this->jobsqueuelib->addNewJobsToQueue($type, $jobs));
+			$tmpObj = json_decode($job); // Try to decode json to php
+
+			// If decode was a success
+			if ($tmpObj != null)
+			{
+				$convertedJobsArray[] = $tmpObj; // then store the decoded object in the result array
+			}
+			else // otherwise
+			{
+				// Create a new object and store the error message in it
+				$tmpObj = new stdClass();
+				$tmpObj->{JobsQueueLib::PROPERTY_ERROR} = 'A not valid json was provided';
+
+				$convertedJobsArray[] = $tmpObj; // store this object into the result array
+			}
 		}
+
+		return $convertedJobsArray;
 	}
 }
