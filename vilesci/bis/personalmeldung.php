@@ -9,6 +9,7 @@ require_once('../../include/bisverwendung.class.php');
 require_once('../../include/mitarbeiter.class.php');
 require_once('../../include/studiengang.class.php');
 require_once('../../include/lehreinheitmitarbeiter.class.php');
+require_once('../../include/benutzerfunktion.class.php');
 
 $uid = get_uid();
 
@@ -46,6 +47,11 @@ if (!defined('BIS_HALBJAHRES_GEWICHTUNG_SWS') || empty('BIS_HALBJAHRES_GEWICHTUN
 	die('config var BIS_HALBJAHRES_GEWICHTUNG_SWS fehlt');
 }
 
+if (!defined('BIS_PAUSCHALE_STUDENTISCHE_HILFSKRAFT') || empty('BIS_PAUSCHALE_STUDENTISCHE_HILFSKRAFT'))
+{
+	die('config var BIS_PAUSCHALE_STUDENTISCHE_HILFSKRAFT fehlt');
+}
+
 
 // Prüfe Zeitraum zur Erstellung einer BIS-Meldung
 $studiensemester = new studiensemester();
@@ -68,6 +74,7 @@ $beginn_imJahr = new DateTime(($jahr - 1). '-01-01');
 $ende_imJahr = new DateTime(($jahr - 1). '-12-31');
 
 $tage_imJahr = $ende_imJahr->diff($beginn_imJahr)->days + 1;
+$wochen_imJahr = $tage_imJahr / 7;
 
 // Sommer- und Wintersemester im BIS Meldungsjahr
 $ss_kurzbz = $studiensemester->getBeforePrevious();
@@ -250,6 +257,36 @@ foreach ($mitarbeiter_arr as $mitarbeiter)
 					$verwendung_lehre_obj->jvzae_anteilig = round($verwendung_lehre_obj->beschaeftigungsausmass_relativ * $verwendung_lehre_obj->gewichtung, 2);
 					$bisverwendung_arr []= $verwendung_lehre_obj;
 				}
+			}
+		}
+		else
+		{
+			// Studentische Hilfskraft
+			// ---------------------------------------------------------------------------------------------------------
+			$benutzerfunktion = new Benutzerfunktion();
+			$is_studentische_hilfskraft = $benutzerfunktion->getBenutzerFunktionByUid(
+				$person_obj->uid,
+				'hilfskraft',
+				$beginn_imJahr->format('Y-m-d'),
+				$ende_imJahr->format('Y-m-d')
+			);
+
+			if ($is_studentische_hilfskraft)
+			{
+				// Kalkulatorische Umrechnung der Jahrespauschale
+				$pauschale_hilfskraft_inStunden = BIS_PAUSCHALE_STUDENTISCHE_HILFSKRAFT; // Pauschale pro Jahr und Person (in Stunden)
+				$pauschale_hilfskraft_relativImJahr = $pauschale_hilfskraft_inStunden / 1; // Stundenpauschale in Verhaeltnis zu 1 Jahr
+				$vollzeit_arbeitsstunden_imJahr = BIS_VOLLZEIT_ARBEITSSTUNDEN * $wochen_imJahr;
+
+				// Relatives Beschaeftigungsausmass / Anteilige JVZAE ermitteln
+				$bisverwendung->beschaeftigungsausmass_relativ = round($pauschale_hilfskraft_relativImJahr / $vollzeit_arbeitsstunden_imJahr, 4);
+				$bisverwendung->jvzae_anteilig =round($pauschale_hilfskraft_relativImJahr / $vollzeit_arbeitsstunden_imJahr, 4);
+			}
+			// Mitarbeiter ohne Vertragsstunden und keine SWS
+			// ---------------------------------------------------------------------------------------------------------
+			else
+			{
+				// TODO: Plausicheck
 			}
 		}
 	}
