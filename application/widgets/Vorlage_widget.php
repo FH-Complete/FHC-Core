@@ -136,7 +136,8 @@ class Vorlage_widget extends DropdownWidget
 							{
 								$currentTmpVorlageData = getData($tmpVorlage)[$j];
 
-								if (getData($vorlage)[$i]->_pk == getData($tmpVorlage)[$j]->_pk
+								if (getData($vorlage)[$i]->id == getData($tmpVorlage)[$j]->id
+									&& getData($vorlage)[$i]->_pk == getData($tmpVorlage)[$j]->_pk
 									&& getData($vorlage)[$i]->_ppk == getData($tmpVorlage)[$j]->_ppk
 									&& getData($vorlage)[$i]->_jtpk == getData($tmpVorlage)[$j]->_jtpk)
 								{
@@ -145,7 +146,10 @@ class Vorlage_widget extends DropdownWidget
 								}
 							}
 
-							if (!$found && $currentTmpVorlageData->id != '') array_push($vorlage->retval, $currentTmpVorlageData);
+							if (!$found && $currentTmpVorlageData->id != '')
+							{
+								array_push($vorlage->retval, $currentTmpVorlageData);
+							}
 						}
 					}
 				}

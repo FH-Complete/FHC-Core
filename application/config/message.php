@@ -19,7 +19,7 @@ $config['ou_receivers_no_notice'] = array('infocenter');
 // Organization units that will not send the notice email to the internal account, but to the private one
 $config['ou_receivers_private'] = array('eac', 'ewu', 'scs');
 //
-$config['ou_function_whitelist'] = array('ass', 'Leitung');
+$config['ou_function_whitelist'] = array('ass', 'Leitung', 'fachzuordnung', 'oezuordnung');
 
 $config['message_redirect_url'] = array();
 $config['message_redirect_url']['fallback'] = site_url('system/messages/ViewMessage/writeReply');
