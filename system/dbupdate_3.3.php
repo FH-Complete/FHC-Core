@@ -3616,6 +3616,12 @@ if (!$result = @$db->db_query("SELECT ba1code_bis FROM bis.tbl_beschaeftigungsar
 		DELETE FROM bis.tbl_verwendung WHERE verwendung_code=9;
 	";
 
+	$qry.="
+		INSERT INTO public.tbl_funktion(funktion_kurzbz, beschreibung, aktiv, fachbereich, semester) VALUES('vertrBefugter','Vertretungsbefugte/r des Erhalters',true,false,false);
+		INSERT INTO public.tbl_funktion(funktion_kurzbz, beschreibung, aktiv, fachbereich, semester) VALUES('kollegium_Ltg','Leiter/in des Kollegiums',true,false,false);
+		INSERT INTO public.tbl_funktion(funktion_kurzbz, beschreibung, aktiv, fachbereich, semester) VALUES('kollegium_stvLtg','Stellv. Leiter/in des Kollegiums',true,false,false);
+	";
+
 	if(!$db->db_query($qry))
 		echo '<strong>bis.tbl_verwendung und bis.tbl_beschaeftigungsart: '.$db->db_last_error().'</strong><br>';
 	else
