@@ -35,7 +35,7 @@ class Statusgrund extends Auth_Controller
 		$status = $this->StatusModel->load();
 		if ($status->error)
 		{
-			show_error($status->retval);
+			show_error(getError($status));
 		}
 
 		$data = array (
@@ -50,7 +50,7 @@ class Statusgrund extends Auth_Controller
 		$statusGrund = $this->StatusgrundModel->loadWhere(array("status_kurzbz" => $status_kurzbz));
 		if ($statusGrund->error)
 		{
-			show_error($statusGrund->retval);
+			show_error(getError($statusGrund));
 		}
 
 		$data = array (
@@ -66,13 +66,13 @@ class Statusgrund extends Auth_Controller
 		$statusGrund = $this->StatusgrundModel->load($statusgrund_id);
 		if ($statusGrund->error)
 		{
-			show_error($statusGrund->retval);
+			show_error(getError($statusGrund));
 		}
 
 		$sprache = $this->SpracheModel->loadWhere(array('content' => true));
 		if ($sprache->error)
 		{
-			show_error($sprache->retval);
+			show_error(getError($sprache));
 		}
 
 		$data = array (
@@ -89,13 +89,13 @@ class Statusgrund extends Auth_Controller
 		$status = $this->StatusModel->load($status_id);
 		if ($status->error)
 		{
-			show_error($status->retval);
+			show_error(getError($status));
 		}
 
 		$sprache = $this->SpracheModel->loadWhere(array('content' => true));
 		if ($sprache->error)
 		{
-			show_error($sprache->retval);
+			show_error(getError($sprache));
 		}
 
 		$data = array (
@@ -112,7 +112,7 @@ class Statusgrund extends Auth_Controller
 		$sprache = $this->SpracheModel->loadWhere(array('content' => true));
 		if ($sprache->error)
 		{
-			show_error($sprache->retval);
+			show_error(getError($sprache));
 		}
 
 		$data = array (
@@ -184,7 +184,7 @@ class Statusgrund extends Auth_Controller
 
 		if ($statusgrund->error)
 		{
-			show_error($statusgrund->retval);
+			show_error(getError($statusgrund));
 		}
 
 		redirect("/crm/Statusgrund/editGrund/" . $statusgrund_id . "/" . true);
@@ -252,7 +252,7 @@ class Statusgrund extends Auth_Controller
 
 		if ($statusgrund->error)
 		{
-			show_error($statusgrund->retval);
+			show_error(getError($statusgrund));
 		}
 
 		redirect("/crm/Statusgrund/editGrund/" . $statusgrund->retval . "/" . true);
@@ -297,7 +297,7 @@ class Statusgrund extends Auth_Controller
 
 		if ($status->error)
 		{
-			show_error($status->retval);
+			show_error(getError($status));
 		}
 
 		redirect("/crm/Statusgrund/editStatus/" . $status_kurzbz . "/" . true);

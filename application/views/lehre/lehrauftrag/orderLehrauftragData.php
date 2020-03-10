@@ -219,7 +219,8 @@ FROM
             (SELECT
                  uid
              FROM
-                 public.tbl_benutzer
+                 public.tbl_benutzer JOIN public.tbl_mitarbeiter ma 
+                    ON tbl_benutzer.uid = ma.mitarbeiter_uid
              WHERE
                  person_id = tmp_projektbetreuung.person_id
                ORDER BY aktiv DESC, updateaktivam DESC      -- accept inactive as some person_ids have no active, but order them last
@@ -336,7 +337,6 @@ $filterWidgetArray = array(
 	'tableUniqueId' => 'orderLehrauftrag',
     'requiredPermissions' => 'lehre/lehrauftrag_bestellen',
     'datasetRepresentation' => 'tabulator',
-    'reloadDataset' => true,    // reload query on page refresh
     'columnsAliases' => array(  // TODO: use phrasen
         'Status', // alias for row_index, because row_index is formatted to display the status icons
         'Personalnummer',

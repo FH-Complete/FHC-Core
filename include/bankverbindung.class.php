@@ -16,8 +16,8 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ *		  Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
+ *		  Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
 /**
  * Klasse bankverbindung
@@ -47,6 +47,7 @@ class bankverbindung extends basis_db
 	public $updateamum;			// timestamp
 	public $updatevon;			// bigint
 	public $oe_kurzbz;			// string
+	public $orgform_kurzbz;		// string
 
 	/**
 	 * Konstruktor
@@ -95,6 +96,7 @@ class bankverbindung extends basis_db
 				$this->insertvon = $row->insertvon;
 				$this->ext_id = $row->ext_id;
 				$this->oe_kurzbz = $row->oe_kurzbz;
+				$this->orgform_kurzbz = $row->orgform_kurzbz;
 				return true;
 			}
 			else
@@ -176,19 +178,20 @@ class bankverbindung extends basis_db
 			//Neuen Datensatz einfuegen
 
 			$qry = 'BEGIN;INSERT INTO public.tbl_bankverbindung  (person_id, name, anschrift, blz, bic,
-			       kontonr, iban, typ, oe_kurzbz, verrechnung, insertamum, insertvon, updateamum, updatevon) VALUES('.
-			       $this->db_add_param($this->person_id, FHC_INTEGER).', '.
-			       $this->db_add_param($this->name).', '.
-			       $this->db_add_param($this->anschrift).', '.
-			       $this->db_add_param($this->blz).', '.
-			       $this->db_add_param($this->bic).', '.
-			       $this->db_add_param($this->kontonr).', '.
-			       $this->db_add_param($this->iban).', '.
-			       $this->db_add_param($this->typ).', '.
-			       $this->db_add_param($this->oe_kurzbz).', '.
-                   $this->db_add_param($this->verrechnung, FHC_BOOLEAN).',  now(), '.
-			       $this->db_add_param($this->insertvon).', now(), '.
-			       $this->db_add_param($this->updatevon).');';
+					kontonr, iban, typ, oe_kurzbz, orgform_kurzbz, verrechnung, insertamum, insertvon, updateamum, updatevon) VALUES('.
+					$this->db_add_param($this->person_id, FHC_INTEGER).', '.
+					$this->db_add_param($this->name).', '.
+					$this->db_add_param($this->anschrift).', '.
+					$this->db_add_param($this->blz).', '.
+					$this->db_add_param($this->bic).', '.
+					$this->db_add_param($this->kontonr).', '.
+					$this->db_add_param($this->iban).', '.
+					$this->db_add_param($this->typ).', '.
+					$this->db_add_param($this->oe_kurzbz).', '.
+					$this->db_add_param($this->orgform_kurzbz).', '.
+					$this->db_add_param($this->verrechnung, FHC_BOOLEAN).',  now(), '.
+					$this->db_add_param($this->insertvon).', now(), '.
+					$this->db_add_param($this->updatevon).');';
 		}
 		else
 		{
@@ -212,6 +215,7 @@ class bankverbindung extends basis_db
  			'typ='.$this->db_add_param($this->typ).', '.
  			'verrechnung='.$this->db_add_param($this->verrechnung,FHC_BOOLEAN).', '.
  			'oe_kurzbz='.$this->db_add_param($this->oe_kurzbz).', '.
+			'orgform_kurzbz='.$this->db_add_param($this->orgform_kurzbz).', '.
  			'updateamum='.$this->db_add_param($this->updateamum).','.
  			'updatevon='.$this->db_add_param($this->updatevon).' '.
  			'WHERE bankverbindung_id='.$this->db_add_param($this->bankverbindung_id).';';
@@ -315,6 +319,7 @@ class bankverbindung extends basis_db
 				$obj->insertvon = $row->insertvon;
 				$obj->ext_id = $row->ext_id;
 				$obj->oe_kurzbz = $row->oe_kurzbz;
+				$obj->orgform_kurzbz = $row->orgform_kurzbz;
 
 				$this->result[] = $obj;
 			}
@@ -328,11 +333,12 @@ class bankverbindung extends basis_db
 	}
 
 	/**
-	 * Laedt die Bankverbindung einer Organisationseinheit
-	 * @param  $person_id
+	 * Laedt die Bankverbindung einer Organisationseinheit und optional einer OrgForm
+	 * @param string $oe_kurzbz
+	 * @param string $orgform_kurzbz
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	public function load_oe($oe_kurzbz)
+	public function load_oe($oe_kurzbz, $orgform_kurzbz = null)
 	{
 		if($oe_kurzbz==null || $oe_kurzbz=='')
 		{
@@ -341,6 +347,11 @@ class bankverbindung extends basis_db
 		}
 
 		$qry = "SELECT * FROM public.tbl_bankverbindung WHERE oe_kurzbz=".$this->db_add_param($oe_kurzbz);
+
+		if($orgform_kurzbz != '')
+		{
+			$qry .= " AND orgform_kurzbz=".$this->db_add_param($orgform_kurzbz);
+		}
 
 		if($this->db_query($qry))
 		{
@@ -364,6 +375,7 @@ class bankverbindung extends basis_db
 				$obj->insertvon = $row->insertvon;
 				$obj->ext_id = $row->ext_id;
 				$obj->oe_kurzbz = $row->oe_kurzbz;
+				$obj->orgform_kurzbz = $row->orgform_kurzbz;
 
 				$this->result[] = $obj;
 			}
@@ -412,6 +424,7 @@ class bankverbindung extends basis_db
 				$this->insertvon = $row->insertvon;
 				$this->ext_id = $row->ext_id;
 				$this->oe_kurzbz = $row->oe_kurzbz;
+				$this->orgform_kurzbz = $row->orgform_kurzbz;
 	
 				return true;
 			}

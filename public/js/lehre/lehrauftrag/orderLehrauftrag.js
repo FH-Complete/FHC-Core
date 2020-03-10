@@ -671,9 +671,16 @@ $(function() {
                     {
                         // Update status 'Bestellt'
                         $('#tableWidgetTabulator').tabulator('updateData', data.retval);
+
+                        // Print success message
+                        FHC_DialogLib.alertSuccess("Alle " + data.retval.length + " Lehraufträge wurden bestellt.")
                     }
 
-                    FHC_DialogLib.alertSuccess("Alle " + data.retval.length + " Lehraufträge wurden bestellt.")
+                   if (data.error && data.retval != null)
+                   {
+                       // Print error message
+                       FHC_DialogLib.alertError(data.retval);
+                   }
                 },
                 errorCallback: function (jqXHR, textStatus, errorThrown)
                 {

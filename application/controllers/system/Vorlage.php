@@ -49,7 +49,7 @@ class Vorlage extends Auth_Controller
 		$vorlage = $this->vorlagelib->getVorlageByMimetype($mimetype);
 
 		if ($vorlage->error)
-			show_error($vorlage->retval);
+			show_error(getError($vorlage));
 
 		$data = array (
 			'mimetype' => $mimetype,
@@ -66,7 +66,7 @@ class Vorlage extends Auth_Controller
 		$vorlagentext = $this->vorlagelib->getVorlagetextByVorlage($vorlage_kurzbz);
 
 		if ($vorlagentext->error)
-			show_error($vorlagentext->retval);
+			show_error(getError($vorlagentext));
 
 		$data = array (
 			'vorlage_kurzbz' => $vorlage_kurzbz,
@@ -83,7 +83,7 @@ class Vorlage extends Auth_Controller
 		$vorlage = $this->vorlagelib->getVorlage($vorlage_kurzbz);
 
 		if ($vorlage->error)
-			show_error($vorlage->retval);
+			show_error(getError($vorlage));
 
 		if (count($vorlage->retval) != 1)
 			show_error('Nachricht nicht vorhanden! ID: '.$vorlage_kurzbz);
@@ -119,7 +119,7 @@ class Vorlage extends Auth_Controller
 		$vorlage = $this->vorlagelib->saveVorlage($vorlage_kurzbz, $data);
 
 		if ($vorlage->error)
-			show_error($vorlage->retval);
+			show_error(getError($vorlage));
 
 		$vorlage_kurzbz = $vorlage->retval;
 
@@ -137,7 +137,7 @@ class Vorlage extends Auth_Controller
 		$resultOE = $this->OrganisationseinheitModel->loadWhere(array('aktiv' => true, 'oe_parent_kurzbz' => null));
 
 		if ($resultOE->error)
-			show_error($resultOE->retval);
+			show_error(getError($resultOE));
 
 		if (hasData($resultOE))
 		{
@@ -153,7 +153,7 @@ class Vorlage extends Auth_Controller
 			$vorlagetext = $this->vorlagelib->insertVorlagetext($data);
 
 			if ($vorlagetext->error)
-				show_error($vorlagetext->retval);
+				show_error(getError($vorlagetext));
 
 			$vorlagestudiengang_id = $vorlagetext->retval;
 
@@ -170,7 +170,7 @@ class Vorlage extends Auth_Controller
 		$vorlagetext = $this->vorlagelib->getVorlagetextById($vorlagestudiengang_id);
 
 		if ($vorlagetext->error)
-			show_error($vorlagetext->retval);
+			show_error(getError($vorlagetext));
 
 		$data = $vorlagetext->retval[0];
 
@@ -254,7 +254,7 @@ class Vorlage extends Auth_Controller
 		$vorlagetext = $this->vorlagelib->updateVorlagetext($data['vorlagestudiengang_id'], $data);
 
 		if ($vorlagetext->error)
-			show_error($vorlagetext->retval);
+			show_error(getError($vorlagetext));
 
 		redirect('/system/vorlage/editText/'.$data['vorlagestudiengang_id']);
 	}
@@ -266,10 +266,10 @@ class Vorlage extends Auth_Controller
 		$vorlagetext = $this->vorlagelib->getVorlagetextById($vorlagestudiengang_id);
 
 		if ($vorlagetext->error)
-			show_error($vorlagetext->retval);
+			show_error(getError($vorlagetext));
 
 		$data = array(
-			'text' => $this->vorlagelib->parseVorlagetext($vorlagetext->retval[0]->text, $jsonDecodedForm)
+			'text' => parseText($vorlagetext->retval[0]->text, $jsonDecodedForm)
 		);
 
 		$this->load->view('system/vorlage/templatetextPreview', $data);

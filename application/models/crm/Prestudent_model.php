@@ -214,7 +214,7 @@ class Prestudent_model extends DB_Model
 
 		if ($lastStatus->error)
 		{
-			return error($lastStatus->retval);
+			return $lastStatus;
 		}
 
 		if (count($lastStatus->retval) > 0)
@@ -222,7 +222,7 @@ class Prestudent_model extends DB_Model
 			//get Studiengangname from Studienplan and -ordnung
 			$studienordnung = $this->PrestudentstatusModel->getStudienordnungFromPrestudent($prestudent_id);
 			if ($studienordnung->error)
-				return error($studienordnung->retval);
+				return $studienordnung;
 
 			if (count($studienordnung->retval) > 0)
 			{
@@ -239,7 +239,7 @@ class Prestudent_model extends DB_Model
 			$language = $this->SpracheModel->load($lastStatus->retval[0]->sprache);
 
 			if ($language->error)
-				return error($language->retval);
+				return $language;
 
 			if (count($language->retval) > 0)
 				$lastStatus->retval[0]->sprachedetails = $language->retval[0];
@@ -257,7 +257,7 @@ class Prestudent_model extends DB_Model
 				)
 			);
 			if ($bewerbungstermin->error)
-				return error($bewerbungstermin->retval);
+				return $bewerbungstermin;
 
 			if (count($bewerbungstermin->retval) > 0)
 			{
@@ -520,5 +520,36 @@ class Prestudent_model extends DB_Model
 				return true;
 			}
 		}
+	}
+
+	/**
+	 * Get organisation units for all the prestudents of a person
+	 */
+	public function getOrganisationunitsByPersonId($person_id)
+	{
+		$query = 'SELECT o.oe_kurzbz,
+						o.bezeichnung,
+						(CASE
+							WHEN sg.typ = \'b\' THEN ps.prestudent_id
+							WHEN sg.typ = \'m\' THEN p.prestudent_id
+            				ELSE NULL
+       					END) AS prestudent_id
+					FROM public.tbl_prestudent p
+			  		JOIN public.tbl_studiengang sg USING(studiengang_kz)
+					JOIN public.tbl_organisationseinheit o USING(oe_kurzbz)
+			   LEFT JOIN (
+				   			SELECT prestudent_id
+							  FROM public.tbl_prestudentstatus
+							 WHERE status_kurzbz = \'Bewerber\'
+						) ps USING(prestudent_id)
+				   WHERE p.person_id = ?
+				GROUP BY o.oe_kurzbz,
+						o.bezeichnung,
+						sg.typ,
+						ps.prestudent_id,
+						p.prestudent_id
+				ORDER BY o.bezeichnung';
+
+		return $this->execQuery($query, array($person_id));
 	}
 }

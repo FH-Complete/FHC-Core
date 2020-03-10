@@ -66,7 +66,7 @@ class TableWidgetLib
 	const DATASET_REP_TABULATOR = 'tabulator';
 
 	const PERMISSION_TABLE_METHOD = 'TableWidget'; // Name for fake method to be checked by the PermissionLib
-	const PERMISSION_TYPE = 'rw';
+	const PERMISSION_TYPE = 'r';
 
 	private $_ci; // Code igniter instance
 	private $_tableUniqueId; // unique id for this table widget

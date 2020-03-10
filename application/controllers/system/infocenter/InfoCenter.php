@@ -24,7 +24,6 @@ class InfoCenter extends Auth_Controller
 
 	const FILTER_ID = 'filter_id';
 	const PREV_FILTER_ID = 'prev_filter_id';
-	const RELOAD_DATASET = 'reloadDataset';
 	const KEEP_TABLESORTER_FILTER = 'keepTsFilter';
 
 	private $_uid; // contains the UID of the logged user
@@ -70,6 +69,7 @@ class InfoCenter extends Auth_Controller
 	// Name of Interessentenstatus
 	const INTERESSENTSTATUS = 'Interessent';
 	const ABGEWIESENERSTATUS = 'Abgewiesener';
+	const BEWERBERSTATUS = 'Bewerber';
 
 	// Statusgruende for which no Studiengangsfreigabemessage should be sent
 	private $_statusgruendeNoStgFreigabeMessage = array('FIT Programm', 'FIT program', 'FIT programme');
@@ -194,7 +194,7 @@ class InfoCenter extends Auth_Controller
 		$personexists = $this->PersonModel->load($person_id);
 
 		if (isError($personexists))
-			show_error($personexists->retval);
+			show_error(getError($personexists));
 
 		if (!hasData($personexists))
 			show_error('Person does not exist!');
@@ -205,8 +205,7 @@ class InfoCenter extends Auth_Controller
 			// mark person as locked for editing
 			$result = $this->PersonLockModel->lockPerson($person_id, $this->_uid, self::APP);
 
-			if (isError($result))
-				show_error($result->retval);
+			if (isError($result)) show_error(getError($result));
 		}
 
 		$persondata = $this->_loadPersonData($person_id);
@@ -232,13 +231,12 @@ class InfoCenter extends Auth_Controller
 	{
 		$result = $this->PersonLockModel->unlockPerson($person_id, self::APP);
 
-		if (isError($result))
-			show_error($result->retval);
+		if (isError($result)) show_error(getError($result));
 
 		$redirectLink = '/'.self::INFOCENTER_URI.'?'.self::FHC_CONTROLLER_ID.'='.$this->getControllerId();
 
 		// Force reload of Dataset after Unlock
-		$redirectLink .= '&'.self::RELOAD_DATASET.'=true&'.self::KEEP_TABLESORTER_FILTER.'=true';
+		$redirectLink .= '&'.self::KEEP_TABLESORTER_FILTER.'=true';
 
 		$currentFilterId = $this->input->get(self::FILTER_ID);
 		if (isset($currentFilterId))
@@ -496,7 +494,9 @@ class InfoCenter extends Auth_Controller
 
 		$logdata = $this->_getPersonAndStudiengangFromPrestudent($prestudent_id);
 
-		$akteresult = $this->AkteModel->loadWhere(array('person_id' => $logdata['person_id'], 'formal_geprueft_amum !=' => NULL));
+		$person_id = $logdata['person_id'];
+
+		$akteresult = $this->AkteModel->loadWhere(array('person_id' => $person_id, 'formal_geprueft_amum !=' => NULL));
 
 		if (hasData($lastStatus) && isSuccess($akteresult))
 		{
@@ -532,6 +532,8 @@ class InfoCenter extends Auth_Controller
 				if (isSuccess($result))
 				{
 					$this->load->model('crm/Dokumentprestudent_model', 'DokumentprestudentModel');
+					$json->retval['nonCriticalErrors'] = array();
+					$json->retval['infoMessages'] = array();
 
 					//set documents which have been formal geprüft to accepted
 					$dokument_kurzbzs = array();
@@ -545,7 +547,7 @@ class InfoCenter extends Auth_Controller
 
 					// acceptresult returns null if no documents to accept
 					if ($acceptresult !== null && isError($acceptresult))
-						$json->retval['nonCriticalErrors'] = 'error when accepting documents in FAS';
+						$json->retval['nonCriticalErrors'][] = 'error when accepting documents in FAS';
 
 					$logparams = array($prestudent_id, $logdata['studiengang_kurzbz'], '');
 
@@ -557,8 +559,69 @@ class InfoCenter extends Auth_Controller
 						if (hasData($statusgrund_kurzbz))
 							$logparams[2] = ', confirmation type '.$statusgrund_kurzbz->retval[0]->bezeichnung_mehrsprachig[0];
 					}
+					else
+					{
+						// check if there is already a Bewerberstatus and Reihungsverfahren already absolviert
+						$bewerber = $this->PersonModel->hasBewerber($person_id, $lastStatus->studiensemester_kurzbz, 'b');
 
-					$this->_log($logdata['person_id'], 'freigegeben', $logparams);
+						if (hasData($bewerber))
+						{
+							$bewerbercnt = getData($bewerber);
+
+							if (is_numeric($bewerbercnt[0]->anzahl_bewerber) && $bewerbercnt[0]->anzahl_bewerber > 0)
+							{
+								// then insert Bewerberstatus and rt absolviert, teilgenommen for prestudent
+								$bewerberresult = $this->PrestudentstatusModel->insert(
+									array(
+										'prestudent_id' => $prestudent_id,
+										'status_kurzbz' => self::BEWERBERSTATUS,
+										'studiensemester_kurzbz' => $lastStatus->studiensemester_kurzbz,
+										'ausbildungssemester' => $lastStatus->ausbildungssemester,
+										'datum' => date('Y-m-d'),
+										'orgform_kurzbz' => $lastStatus->orgform_kurzbz,
+										'studienplan_id' => $lastStatus->studienplan_id,
+										'insertvon' => $this->_uid,
+										'insertamum' => date('Y-m-d H:i:s')
+									)
+								);
+
+								if (isError($bewerberresult))
+									$json->retval['nonCriticalErrors'][] = 'error when inserting Bewerberstatus';
+
+								$rtangetretenres = $this->PrestudentModel->update(
+									$prestudent_id,
+									array(
+										'reihungstestangetreten' => true
+									)
+								);
+
+								if (isError($rtangetretenres))
+								{
+									$json->retval['nonCriticalErrors'][] = 'error when setting reihungstestangetreten';
+								}
+								else
+								{
+									$json->retval['infoMessages'][] = $this->p->t('infocenter', 'rtPunkteEintragenInfo');
+									$this->load->model('crm/RtPerson_model', 'RtPersonModel');
+
+									$rtteilgenommenres = $this->RtPersonModel->update(
+										array(
+											'person_id' => $person_id,
+											'studienplan_id' => $lastStatus->studienplan_id
+										),
+										array(
+											'teilgenommen' => true
+										)
+									);
+
+									if (isError($rtteilgenommenres))
+										$json->retval['nonCriticalErrors'][] = 'error when setting reihungstest teilgenommen';
+								}
+							}
+						}
+					}
+
+					$this->_log($person_id, 'freigegeben', $logparams);
 
 					$this->_sendFreigabeMail($prestudent_id);
 				}
@@ -652,7 +715,7 @@ class InfoCenter extends Auth_Controller
 	public function reloadMessages($person_id)
 	{
 		$messages = $this->MessageModel->getMessagesOfPerson($person_id, 1);
-		$this->load->view('system/messages/messageList.php', array('messages' => $messages->retval));
+		$this->load->view('system/infocenter/messageList.php', array('messages' => $messages->retval));
 	}
 
 	/**
@@ -665,7 +728,7 @@ class InfoCenter extends Auth_Controller
 
 		if (isError($notizen))
 		{
-			show_error($notizen->retval);
+			show_error(getError($notizen));
 		}
 
 		$this->load->view('system/infocenter/notizen.php', array('notizen' => $notizen->retval));
@@ -693,14 +756,14 @@ class InfoCenter extends Auth_Controller
 
 		if (isError($akte))
 		{
-			show_error($akte->retval);
+			show_error(getError($akte));
 		}
 
 		$aktecontent = $this->dmslib->getAkteContent($akte_id);
 
 		if (isError($aktecontent))
 		{
-			show_error($aktecontent->retval);
+			show_error(getError($aktecontent));
 		}
 
 		$this->output
@@ -943,17 +1006,12 @@ class InfoCenter extends Auth_Controller
 
 		$freigegebenLink = site_url(self::INFOCENTER_URI.'/'.self::FREIGEGEBEN_PAGE);
 		$reihungstestAbsolviertLink = site_url(self::INFOCENTER_URI.'/'.self::REIHUNGSTESTABSOLVIERT_PAGE);
+
 		$currentFilterId = $this->input->get(self::FILTER_ID);
-		$reloadDatasetParam = self::RELOAD_DATASET.'=true';
 		if (isset($currentFilterId))
 		{
-			$freigegebenLink .= '?'.self::PREV_FILTER_ID.'='.$currentFilterId.'&'.$reloadDatasetParam;
-			$reihungstestAbsolviertLink .= '?'.self::PREV_FILTER_ID.'='.$currentFilterId.'&'.$reloadDatasetParam;
-		}
-		else
-		{
-			$freigegebenLink .= '?'.$reloadDatasetParam;
-			$reihungstestAbsolviertLink .= '?'.$reloadDatasetParam;
+			$freigegebenLink .= '?'.self::PREV_FILTER_ID.'='.$currentFilterId;
+			$reihungstestAbsolviertLink .= '?'.self::PREV_FILTER_ID.'='.$currentFilterId;
 		}
 
 		$this->navigationlib->setSessionMenu(
@@ -1019,7 +1077,7 @@ class InfoCenter extends Auth_Controller
 		$prevFilterId = $this->input->get(self::PREV_FILTER_ID);
 		if (isset($prevFilterId))
 		{
-			$link .= '?'.self::FILTER_ID.'='.$prevFilterId.'&'.self::RELOAD_DATASET.'=true&'.self::KEEP_TABLESORTER_FILTER.'=true';
+			$link .= '?'.self::FILTER_ID.'='.$prevFilterId.'&'.self::KEEP_TABLESORTER_FILTER.'=true';
 		}
 
 		$this->navigationlib->setSessionMenu(
@@ -1049,14 +1107,13 @@ class InfoCenter extends Auth_Controller
 		$this->load->library('NavigationLib', array(self::NAVIGATION_PAGE => self::INFOCENTER_URI.'/'.$page));
 
 		// Generate the home link with the eventually loaded filter
-		$reloadDatasetParam = '?'.self::RELOAD_DATASET.'=true';
-		$homeLink = site_url(self::INFOCENTER_URI.'/'.self::INDEX_PAGE.$reloadDatasetParam);
-		$freigegebenLink = site_url(self::INFOCENTER_URI.'/'.self::FREIGEGEBEN_PAGE.$reloadDatasetParam);
-		$absolviertLink = site_url(self::INFOCENTER_URI.'/'.self::REIHUNGSTESTABSOLVIERT_PAGE.$reloadDatasetParam);
+		$homeLink = site_url(self::INFOCENTER_URI.'/'.self::INDEX_PAGE);
+		$freigegebenLink = site_url(self::INFOCENTER_URI.'/'.self::FREIGEGEBEN_PAGE);
+		$absolviertLink = site_url(self::INFOCENTER_URI.'/'.self::REIHUNGSTESTABSOLVIERT_PAGE);
 		$prevFilterId = $this->input->get(self::PREV_FILTER_ID);
 		if (isset($prevFilterId))
 		{
-			$homeLink .= '&'.self::FILTER_ID.'='.$prevFilterId;
+			$homeLink .= '?'.self::FILTER_ID.'='.$prevFilterId;
 		}
 
 		$this->navigationlib->setSessionElementMenu(
@@ -1171,7 +1228,7 @@ class InfoCenter extends Auth_Controller
 
 		if (isError($locked))
 		{
-			show_error($locked->retval);
+			show_error(getError($locked));
 		}
 
 		$lockedby = null;
@@ -1190,7 +1247,7 @@ class InfoCenter extends Auth_Controller
 
 		if (isError($stammdaten))
 		{
-			show_error($stammdaten->retval);
+			show_error(getError($stammdaten));
 		}
 
 		if (!isset($stammdaten->retval))
@@ -1200,21 +1257,21 @@ class InfoCenter extends Auth_Controller
 
 		if (isError($dokumente))
 		{
-			show_error($dokumente->retval);
+			show_error(getError($dokumente));
 		}
 
 		$dokumente_nachgereicht = $this->AkteModel->getAktenWithDokInfo($person_id, null, true);
 
 		if (isError($dokumente_nachgereicht))
 		{
-			show_error($dokumente_nachgereicht->retval);
+			show_error(getError($dokumente_nachgereicht));
 		}
 
 		$messages = $this->MessageModel->getMessagesOfPerson($person_id, 1);
 
 		if (isError($messages))
 		{
-			show_error($messages->retval);
+			show_error(getError($messages));
 		}
 
 		$logs = $this->personloglib->getLogs($person_id);
@@ -1223,21 +1280,21 @@ class InfoCenter extends Auth_Controller
 
 		if (isError($notizen))
 		{
-			show_error($notizen->retval);
+			show_error(getError($notizen));
 		}
 
 		$notizen_bewerbung = $this->NotizModel->getNotizByTitel($person_id, 'Anmerkung zur Bewerbung%');
 
 		if (isError($notizen_bewerbung))
 		{
-			show_error($notizen_bewerbung->retval);
+			show_error(getError($notizen_bewerbung));
 		}
 
 		$user_person = $this->PersonModel->getByUid($this->_uid);
 
 		if (isError($user_person))
 		{
-			show_error($user_person->retval);
+			show_error(getError($user_person));
 		}
 
 		$data = array (
@@ -1268,7 +1325,7 @@ class InfoCenter extends Auth_Controller
 
 		if (isError($prestudenten))
 		{
-			show_error($prestudenten->retval);
+			show_error(getError($prestudenten));
 		}
 
 		foreach ($prestudenten->retval as $prestudent)
@@ -1277,7 +1334,7 @@ class InfoCenter extends Auth_Controller
 
 			if (isError($prestudentWithZgv))
 			{
-				show_error($prestudentWithZgv->retval);
+				show_error(getError($prestudentWithZgv));
 			}
 
 			$zgvpruefung = $prestudentWithZgv->retval[0];
@@ -1385,13 +1442,13 @@ class InfoCenter extends Auth_Controller
 				$starta = $this->StudiensemesterModel->load($a->prestudentstatus->studiensemester_kurzbz);
 				if (!hasData($starta))
 				{
-					show_error($starta->retval);
+					show_error(getError($starta));
 				}
 
 				$startb = $this->StudiensemesterModel->load($b->prestudentstatus->studiensemester_kurzbz);
 				if (!hasData($startb))
 				{
-					show_error($startb->retval);
+					show_error(getError($startb));
 				}
 
 				$starta = date_format(date_create($starta->retval[0]->start), 'Y-m-d');
@@ -1463,7 +1520,7 @@ class InfoCenter extends Auth_Controller
 
 		if (isError($prestudent))
 		{
-			show_error($prestudent->retval);
+			show_error(getError($prestudent));
 		}
 
 		$person_id = $prestudent->retval[0]->person_id;
@@ -1505,7 +1562,7 @@ class InfoCenter extends Auth_Controller
 	}
 
 	/**
-	 * Sends infomail with prestudent and person data when Prestudent is freigegeben
+	 * Sends infomail to Studiengang with prestudent and person data when Prestudent is freigegeben
 	 * @param $prestudent_id
 	 */
 	private function _sendFreigabeMail($prestudent_id)

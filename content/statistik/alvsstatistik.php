@@ -64,7 +64,8 @@ $db = new basis_db();
 $qry = "
 SELECT * FROM (
 	SELECT
-		lehrfach.oe_kurzbz as lehrfach_oe_kurzbz, tbl_lehrveranstaltung.studiengang_kz, geschlecht,sum(tbl_lehreinheitmitarbeiter.semesterstunden) as semesterstunden
+		lehrfach.oe_kurzbz as lehrfach_oe_kurzbz, tbl_lehrveranstaltung.studiengang_kz, geschlecht,
+		sum(tbl_lehreinheitmitarbeiter.semesterstunden) as semesterstunden
 	FROM
 		lehre.tbl_lehreinheit,
 		lehre.tbl_lehrveranstaltung,
@@ -79,8 +80,6 @@ SELECT * FROM (
 		tbl_lehreinheitmitarbeiter.mitarbeiter_uid = tbl_benutzer.uid AND
 		tbl_benutzer.person_id = tbl_person.person_id AND
 		tbl_lehreinheitmitarbeiter.semesterstunden<>0 AND
-		faktor<>0 AND
-		stundensatz<>0 AND
 		tbl_lehreinheitmitarbeiter.lehreinheit_id=tbl_lehreinheit.lehreinheit_id
 	GROUP BY lehrfach.oe_kurzbz, geschlecht, tbl_lehrveranstaltung.studiengang_kz
 	) as a JOIN public.tbl_studiengang USING(studiengang_kz)
@@ -116,9 +115,7 @@ WHERE
 	tbl_lehreinheit.lehreinheit_id=tbl_projektarbeit.lehreinheit_id AND
 	tbl_lehreinheit.lehrveranstaltung_id=tbl_lehrveranstaltung.lehrveranstaltung_id AND
 	tbl_projektbetreuer.person_id=tbl_person.person_id AND
-	tbl_projektbetreuer.faktor<>0 AND
 	tbl_projektbetreuer.stunden<>0 AND
-	tbl_projektbetreuer.stundensatz<>0 AND
 	tbl_lehreinheit.studiensemester_kurzbz=".$db->db_add_param($stsem)."
 GROUP BY studiengang_kz,geschlecht";
 

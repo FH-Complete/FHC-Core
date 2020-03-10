@@ -65,7 +65,7 @@ class Lehrveranstaltung_model extends DB_Model
 				$result = $this->StudiensemesterModel->getAusbildungssemesterByStudiensemesterAndStudiengang($studiensemester_kurzbz, $studiengang_kz_item);
 
 				if (isError($result))
-					return error($result->retval);
+					return error(getError($result));
 
 				foreach ($result->retval as $semester)
 				{
@@ -104,7 +104,7 @@ class Lehrveranstaltung_model extends DB_Model
 
 		if (count($studiengang_kz_arr) > 0)
 			$query .= " AND tbl_lehrveranstaltung.studiengang_kz IN (". implode(", ", $studiengang_kz_arr).")";
-		
+
 		if (count($lehrveranstaltung_id_arr) > 0)
 		{
 			$query .= " AND tbl_lehrveranstaltung.lehrveranstaltung_id IN (". implode(', ', $lehrveranstaltung_id_arr).")";
@@ -144,7 +144,7 @@ class Lehrveranstaltung_model extends DB_Model
 		WHERE
 			vw_student_lehrveranstaltung.studiensemester_kurzbz=?
 		AND
-			vw_student_lehrveranstaltung.lehrveranstaltung_id=? 
+			vw_student_lehrveranstaltung.lehrveranstaltung_id=?
 		ORDER BY nachname, vorname, person_id, tbl_bisio.bis DESC";
 
 		return $this->execQuery($query, array($studiensemester_kurzbz, $lehrveranstaltung_id));

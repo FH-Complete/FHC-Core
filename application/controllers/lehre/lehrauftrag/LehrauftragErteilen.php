@@ -90,14 +90,14 @@ class LehrauftragErteilen extends Auth_Controller
         $studiensemester_kurzbz = $this->input->get('studiensemester'); // if provided by selected studiensemester
         if (is_null($studiensemester_kurzbz)) // else set next studiensemester as default value
         {
-            $studiensemester = $this->StudiensemesterModel->getNext();
+            $studiensemester = $this->StudiensemesterModel->getAktOrNextSemester();
             if (hasData($studiensemester))
             {
                 $studiensemester_kurzbz = $studiensemester->retval[0]->studiensemester_kurzbz;
             }
             elseif (isError($studiensemester))
             {
-                show_error($studiensemester->error);
+                show_error(getError($studiensemester));
             }
         }
 
@@ -122,10 +122,10 @@ class LehrauftragErteilen extends Auth_Controller
     public function approveLehrauftrag()
     {
         $lehrauftrag_arr = json_decode($this->input->post('selected_data'));
-        
-        if (is_array($lehrauftrag_arr)) 
+
+        if (is_array($lehrauftrag_arr))
         {
-            foreach ($lehrauftrag_arr as $lehrauftrag) 
+            foreach ($lehrauftrag_arr as $lehrauftrag)
             {
                 $mitarbeiter_uid = (isset($lehrauftrag->mitarbeiter_uid)) ? $lehrauftrag->mitarbeiter_uid : null;
                 $vertrag_id = (isset($lehrauftrag->vertrag_id)) ? $lehrauftrag->vertrag_id : null;
@@ -146,31 +146,42 @@ class LehrauftragErteilen extends Auth_Controller
                     }
                     elseif (isError(($result)))
                     {
-                        show_error($result->retval);
+						return $this->outputJsonError('Fehler beim Laden einer Lehrveranstaltung.');
                     }
                 }
                 elseif (isError($result))
                 {
-                    show_error($result->retval);
+					return $this->outputJsonError('Fehler beim Laden von Lehreinheitdaten.');
                 }
 
                 // Check if user is entitled to approve this lehrauftrag (by permission and organisational unit)
-                if (!$this->permissionlib->isBerechtigt(self::BERECHTIGUNG_LEHRAUFTRAG_ERTEILEN, 'suid', $lv_oe_kurzbz)){
-                    show_error('Keine Erteilberechtigung für diese Organisationseinheit: '. $lv_oe_kurzbz);
+                if (!$this->permissionlib->isBerechtigt(self::BERECHTIGUNG_LEHRAUFTRAG_ERTEILEN, 'suid', $lv_oe_kurzbz))
+                {
+					return $this->outputJsonError('Sie haben keine Erteilberechtigung für diese Organisationseinheit: '. $lv_oe_kurzbz);
                 }
 
                 // Approve lehrauftrag by setting vertragsstatus to 'erteilt'
                 $result = $this->VertragvertragsstatusModel->setStatus($vertrag_id, $mitarbeiter_uid, 'erteilt');
 
-                if ($result->retval) {
+                if (!isError($result))
+                {
                     $json [] = array(
                         'row_index' => $lehrauftrag->row_index,
                         'erteilt' => date('Y-m-d')
                     );
                 }
+                else
+				{
+					return $this->outputJsonError($result->retval);
+				}
             }
         }
-        // output json to ajax
+        else
+		{
+			return $this->outputJsonError('Fehler beim Übertragen der Daten.');
+		}
+
+        // output success json to ajax
         if (isset($json) && !isEmptyArray($json))
         {
             $this->outputJsonSuccess($json);

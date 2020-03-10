@@ -14,7 +14,6 @@
 		',
 		'requiredPermissions' => 'admin',
 		'datasetRepresentation' => 'tablesorter',
-		'reloadDataset' => true,
 		'columnsAliases' => array(
 			'Log id',
 			'Request id',

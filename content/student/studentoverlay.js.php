@@ -476,7 +476,7 @@ function StudentFFZertifikatPrint(event)
 	col = tree.columns ? tree.columns["student-noten-tree-studiensemester_kurzbz"] : "student-noten-tree-studiensemester_kurzbz";
 	stsem = tree.view.getCellText(tree.currentIndex,col);
 
-	col = tree.columns ? tree.columns["student-noten-tree-studiengang_kz"] : "student-noten-tree-studiengang_kz";
+	col = tree.columns ? tree.columns["student-noten-tree-studiengang_kz_lv"] : "student-noten-tree-studiengang_kz_lv";
 	stg_kz = tree.view.getCellText(tree.currentIndex,col);
 
 	if (event.shiftKey)
@@ -1055,6 +1055,8 @@ function StudentAuswahl()
 	status=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#status" ));
 	alias=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#alias" ));
 	matr_nr=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#matr_nr" ));
+	zugangscode=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#zugangscode" ));
+	link_bewerbungstool=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#link_bewerbungstool" ));
 
 	//Bei Incoming wird das Menue zur Statusaenderung deaktiviert
 	if(status=='Incoming')
@@ -1099,6 +1101,8 @@ function StudentAuswahl()
 	document.getElementById('student-detail-textbox-person_id').value = person_id;
 	document.getElementById('student-detail-textbox-alias').value=alias;
 	document.getElementById('student-detail-textbox-matr_nr').value=matr_nr;
+	document.getElementById('label-student-detail-zugangscode').value=zugangscode;
+	document.getElementById('label-student-detail-link_bewerbungstool').value=link_bewerbungstool;
 
 	//PreStudent Daten holen
 
@@ -1186,6 +1190,22 @@ function StudentAuswahl()
 	StudentDetailRolleTreeDatasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
 	rollentree.database.AddDataSource(StudentDetailRolleTreeDatasource);
 	StudentDetailRolleTreeDatasource.addXMLSinkObserver(StudentDetailRolleTreeSinkObserver);
+
+	var historietree = document.getElementById('historie-tree');
+	url_historie='<?php echo APP_ROOT;?>rdf/prestudenthistorie.rdf.php?prestudent_id='+prestudent_id+"&"+gettimestamp();
+
+	//Alte DS entfernen
+	var oldDatasourcesHistorie = historietree.database.GetDataSources();
+	while(oldDatasourcesHistorie.hasMoreElements())
+	{
+		historietree.database.RemoveDataSource(oldDatasourcesHistorie.getNext());
+	}
+	//Refresh damit die entfernten DS auch wirklich entfernt werden
+	historietree.builder.rebuild();
+
+	var HistorieTreeDatasource = rdfService.GetDataSource(url_historie);
+	HistorieTreeDatasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
+	historietree.database.AddDataSource(HistorieTreeDatasource);
 
 	if(uid=='')
 	{

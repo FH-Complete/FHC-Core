@@ -53,7 +53,6 @@ $tableWidgetArray = array(
 	'tableUniqueId' => 'cancelledLehrauftrag',
 	'requiredPermissions' => 'lehre/lehrauftrag_akzeptieren',
 	'datasetRepresentation' => 'tabulator',
-	'reloadDataset' => true,    // reload query on page refresh
 	'columnsAliases' => array(  // TODO: use phrasen
 		'Status',
 		'Studiensemester',

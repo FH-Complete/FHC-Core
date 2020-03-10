@@ -616,18 +616,18 @@
 			}
 
 			$("#farbe").ColorPicker(
+			{
+				onSubmit: function(hsb, hex, rgb, el)
 				{
-					onSubmit: function(hsb, hex, rgb, el)
-					{
-						$(el).val(hex);
-						$(el).ColorPickerHide();
-						document.getElementById("farbevorschau").style.backgroundColor=hex;
-					},
-					onBeforeShow: function ()
-					{
-						$(this).ColorPickerSetColor(this.value);
-					}
-				})
+					$(el).val(hex);
+					$(el).ColorPickerHide();
+					document.getElementById("farbevorschau").style.backgroundColor=hex;
+				},
+				onBeforeShow: function ()
+				{
+					$(this).ColorPickerSetColor(this.value);
+				}
+			})
 			.bind("keyup", function()
 			{
 				$(this).ColorPickerSetColor(this.value);

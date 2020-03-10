@@ -107,7 +107,7 @@ class PhrasesLib
 					// If no <p> tags required
 					if ($blockTags == 'no')
 					{
-						$tmpText = $textileParser->textileThis($result->retval[$i]->text); // Parse
+						$tmpText = $textileParser->parse($result->retval[$i]->text); // Parse
 
 						// Removes tags <p> and </p> from the beginning and from the end of the string if they are present
 						// NOTE: Those tags are usually, but not always, added by the textile parser
@@ -127,7 +127,7 @@ class PhrasesLib
 					}
 					else
 					{
-						$result->retval[$i]->text = $textileParser->textileThis($result->retval[$i]->text);
+						$result->retval[$i]->text = $textileParser->parse($result->retval[$i]->text);
 					}
 				}
 			}
@@ -165,16 +165,6 @@ class PhrasesLib
     }
 
 	/**
-     * parseVorlagetext() - will parse a Vorlagetext.
-     */
-    public function parseVorlagetext($text, $data = array())
-	{
-        if (isEmptyString($text)) return error('Not a valid text');
-
-		return $this->_ci->parser->parse_string($text, $data, true);
-    }
-
-	/**
 	 * Retrieves a phrases from the the property _phrases with the given parameters
 	 * It also replace parameters inside the phrase if they are provided
 	 * @param string $category Category name which is used to categorize the phrase.
@@ -201,7 +191,7 @@ class PhrasesLib
 				{
 					if (!is_array($parameters)) $parameters = array(); // if params is not an array
 
-					return $this->_ci->parser->parse_string($_phrase->text, $parameters, true); // parsing
+					return parseText($_phrase->text, $parameters); // parsing
 				}
 			}
 		}

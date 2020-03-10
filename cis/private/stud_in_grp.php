@@ -183,7 +183,7 @@ else
 				AND studiengang_kz=".$db->db_add_param($_GET['kz']);
 
 	if (isset($_GET['sem']))
-		$qry.=" AND semester=".$db->db_add_param($_GET['sem']);
+		$qry.=" AND semester=".$db->db_add_param($_GET['sem'], FHC_INTEGER);
 
 	if (isset($_GET['verband']))
 		$qry.=" AND verband=".$db->db_add_param($_GET['verband']);

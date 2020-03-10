@@ -24,30 +24,32 @@ class Variable_model extends DB_Model
 	 */
 	public function getVariables($uid, $names = null)
 	{
-		if (isEmptyString($uid) || (isset($names) && !is_array($names)))
+		if (isEmptyString($uid))
 			$result = error('wrong parameters passed');
 		else
 		{
 			$vardata = array();
+			$parametersArray = array($uid);
 
 			$qry = "SELECT name, wert FROM public.tbl_variable WHERE uid = ?";
 
-			if (isset($names))
+			if (!isEmptyArray($names))
 			{
-				$qry .= " AND name IN ('".implode(',', $names)."')";
+				$qry .= " AND name IN ?";
+				$parametersArray[] = $names;
 			}
 			$qry .= ";";
 
-			$varresults = $this->execQuery($qry, array($uid));
+			$varresults = $this->execQuery($qry, $parametersArray);
 
 			if (hasData($varresults))
 			{
 				$varresults = getData($varresults);
-					foreach ($varresults as $varresult)
-					{
-						if (isset($varresult->wert))
-							$vardata[$varresult->name] = $varresult->wert;
-					}
+				foreach ($varresults as $varresult)
+				{
+					if (isset($varresult->wert))
+						$vardata[$varresult->name] = $varresult->wert;
+				}
 			}
 
 			$vardefaults = $this->VariablennameModel->getDefaults($names);
@@ -55,7 +57,6 @@ class Variable_model extends DB_Model
 			if (hasData($vardefaults))
 			{
 				$vardefaults = getData($vardefaults);
-
 
 				foreach ($vardefaults as $vardefault)
 				{

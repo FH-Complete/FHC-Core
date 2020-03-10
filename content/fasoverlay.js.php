@@ -798,30 +798,6 @@ function loadURL(event)
 };
 
 // ****
-// * Liefert eine HTML Liste mit den Koordinatorstunden
-// * fuer einen Fachbereich
-// ****
-function StatistikPrintKoordinatorstunden()
-{
-	tree = document.getElementById('tree-organisationseinheit');
-
-	try
-	{
-		//Organisationseinheit holen
-		var col;
-		col = tree.columns ? tree.columns["organisationseinheit-treecol-oe_kurzbz"] : "organisationseinheit-treecol-oe_kurzbz";
-		var oe_kurzbz=tree.view.getCellText(tree.currentIndex,col);
-
-		window.open('<?php echo APP_ROOT ?>content/statistik/koordinatorstunden.php?oe_kurzbz='+oe_kurzbz,'Koordinatorstunden');
-	}
-	catch(e)
-	{
-		alert('Bitte einen Fachbereich auswaehlen');
-		return false;
-	}
-}
-
-// ****
 // * Erstellt das PDF File fuer die Lehrauftraege
 // * Studiengang muss ausgewaehlt sein
 // ****
@@ -1210,16 +1186,6 @@ function StatistikPrintStudentenstatistik()
 }
 
 // ****
-// * Liefert eine statistik ueber die Lektorenverteilung auf die Institute
-// ****
-function StatistikPrintLektorenstatistik()
-{
-	var stsem = getStudiensemester();
-
-	window.open('<?php echo APP_ROOT ?>content/statistik/lektorenstatistik.php?stsem='+stsem,'Lektorenstatistik');
-}
-
-// ****
 // * Liefert eine statistik ueber die Institutszuordnungen und Aufteilung auf intern/extern
 // ****
 function StatistikPrintMitarbeiterstatistik()
@@ -1300,7 +1266,7 @@ function MessageNew()
 	{
 		var prestudentIdArray = getMultipleTreeCellText(tree, 'student-treecol-prestudent_id');
 
-		var action = '<?php echo APP_ROOT ?>index.ci.php/system/FASMessages/write/' + <?php echo $benutzer->person_id; ?>;
+		var action = '<?php echo APP_ROOT ?>index.ci.php/system/messages/FASMessages/writeTemplate/' + <?php echo $benutzer->person_id; ?>;
 
 		openWindowPostArray(action, 'prestudent_id', prestudentIdArray);
 	}
@@ -1582,14 +1548,6 @@ function OpenManual()
 function StatistikPrintALVSStatistik(format)
 {
 	window.open('<?php echo APP_ROOT ?>content/statistik/alvsstatistik.php?format='+format,'ALVS-Statistik','');
-}
-
-// ****
-// * Oeffnet die LVPlanunggesamtSJ Statistik
-// ****
-function StatistikPrintLvPlanungGesamtSJ()
-{
-	window.open('<?php echo APP_ROOT ?>content/statistik/lvplanunggesamtsj.php','LVPlanungGesamtSJ','');
 }
 
 // ****

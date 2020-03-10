@@ -125,3 +125,18 @@ function getCode($result)
 
 	return $code;
 }
+
+/**
+ * Returns the property retval if present, otherwise null
+ */
+function getError($result)
+{
+	$error = null;
+
+	if (isset($result->retval))
+	{
+		$error = $result->retval;
+	}
+
+	return $error;
+}

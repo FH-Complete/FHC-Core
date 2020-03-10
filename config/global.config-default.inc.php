@@ -16,7 +16,6 @@ define('DEFAULT_MITARBEITER_FIXANGESTELLT', true);
 define('CIS_LEHRVERANSTALTUNG_NEWSGROUPS_ANZEIGEN',true);
 define('CIS_LEHRVERANSTALTUNG_FEEDBACK_ANZEIGEN',true);
 define('CIS_LEHRVERANSTALTUNG_DOWNLOAD_ANZEIGEN',true);
-define('CIS_LEHRVERANSTALTUNG_UEBUNGSTOOL_ANZEIGEN',true);
 define('CIS_LEHRVERANSTALTUNG_PINBOARD_ANZEIGEN',true);
 define('CIS_LEHRVERANSTALTUNG_MAILSTUDIERENDE_ANZEIGEN',true);
 define('CIS_LEHRVERANSTALTUNG_STUDENTENUPLOAD_ANZEIGEN',true);
@@ -108,6 +107,10 @@ define('FAS_ANWESENHEIT_GELB', 90);
 
 // Legt einen Prüfungstermin an wenn eine neue Note erfasst wird
 define('FAS_PRUEFUNG_BEI_NOTENEINGABE_ANLEGEN',false);
+
+// Legt fest ob die Uebernahme der Reihungstestpunkte im FAS moeglich ist
+// true | false
+define('FAS_REIHUNGSTEST_PUNKTEUEBERNAHME', true);
 
 // Legt fest ob bei der Uebernahme der Reihungstestpunkte die Punkte
 //oder Prozentpunkte uebernommen werden true=Punkte, false=Prozentpunkte

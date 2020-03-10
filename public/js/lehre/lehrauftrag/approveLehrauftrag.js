@@ -645,9 +645,16 @@ $(function() {
                     {
                         // Update status 'Erteilt'
                         $('#tableWidgetTabulator').tabulator('updateData', data.retval);
+
+                        // Print success message
+                        FHC_DialogLib.alertSuccess(data.retval.length + " Lehraufträge wurden erteilt.");
                     }
 
-                    FHC_DialogLib.alertSuccess(data.retval.length + " Lehraufträge wurden erteilt.");
+                    if (data.error && data.retval != null)
+                    {
+                        // Print error message
+                        FHC_DialogLib.alertError(data.retval);
+                    }
                 },
                 errorCallback: function (jqXHR, textStatus, errorThrown)
                 {
