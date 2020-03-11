@@ -10,6 +10,8 @@ require_once('../../include/mitarbeiter.class.php');
 require_once('../../include/studiengang.class.php');
 require_once('../../include/lehreinheitmitarbeiter.class.php');
 require_once('../../include/benutzerfunktion.class.php');
+require_once('../../include/organisationseinheit.class.php');
+require_once('../../include/entwicklungsteam.class.php');
 
 $uid = get_uid();
 
@@ -50,6 +52,21 @@ if (!defined('BIS_HALBJAHRES_GEWICHTUNG_SWS') || empty('BIS_HALBJAHRES_GEWICHTUN
 if (!defined('BIS_PAUSCHALE_STUDENTISCHE_HILFSKRAFT') || empty('BIS_PAUSCHALE_STUDENTISCHE_HILFSKRAFT'))
 {
 	die('config var BIS_PAUSCHALE_STUDENTISCHE_HILFSKRAFT fehlt');
+}
+
+if (!defined('BIS_FUNKTIONSCODE_1234_ARR') || empty('BIS_FUNKTIONSCODE_1234_ARR'))
+{
+	die('config var BIS_FUNKTIONSCODE_1234_ARR fehlt');
+}
+
+if (!defined('BIS_FUNKTIONSCODE_5_ARR') || empty('BIS_FUNKTIONSCODE_5_ARR'))
+{
+	die('config var BIS_FUNKTIONSCODE_5_ARR fehlt');
+}
+
+if (!defined('BIS_FUNKTIONSCODE_6_ARR') || empty('BIS_FUNKTIONSCODE_6_ARR'))
+{
+	die('config var BIS_FUNKTIONSCODE_6_ARR fehlt');
 }
 
 
@@ -366,6 +383,43 @@ foreach ($mitarbeiter_arr as $mitarbeiter)
 	// Container Verwendung dem Container Person anhaengen
 	// -----------------------------------------------------------------------------------------------------------------
 	$person_obj->verwendung_arr = $verwendung_arr;
+
+
+	// *********************************************************************************************************************
+	// Container Funktion und Lehre werden nur für STG generiert (nicht für Lehrgaenge)
+	// *********************************************************************************************************************
+	// -----------------------------------------------------------------------------------------------------------------
+	// Container Funktion generieren
+	// -----------------------------------------------------------------------------------------------------------------
+	$funktion_arr = array();
+
+	// Alle Benutzerfunktionen im BIS Meldungsjahr holen
+	$benutzerfunktion = new Benutzerfunktion();
+	$benutzerfunktion->getBenutzerFunktionByUid(
+		$person_obj->uid, null,
+		$beginn_imJahr->format('Y-m-d'),
+		$ende_imJahr->format('Y-m-d')
+	);
+	$bisfunktion_arr = $benutzerfunktion->result;
+
+	/**
+	 * Funktionscode 1 - 6 anhand Benutzerfunktionen ermitteln
+	 * Exkludiert Funktionen, die einem Lehrgang bzw. STG, die nicht BIS-gemeldet werden, zugeordnet sind.
+	 */
+	// -------------------------------------------------------------------------------------------------------------
+	$funktion_arr = _getFunktionscontainer_Funktionscode123456($bisfunktion_arr);
+
+	/**
+	 * Funktionscode 7 aus Entwicklungsteam-Tabelle ermitteln
+	 * Exkludiert Funktionen, die einem Lehrgang bzw. STG, die nicht BIS-gemeldet werden, zugeordnet sind.
+	 */
+	// -------------------------------------------------------------------------------------------------------------
+	$funktion_arr = _addFunktionscontainer_Funktionscode7($person_obj->uid, $funktion_arr);
+
+	// Container Funktion dem Container Person anhaengen
+	// -----------------------------------------------------------------------------------------------------------------
+	$person_obj->funktion_arr = $funktion_arr;
+
 	$person_arr []= $person_obj;
 }
 
@@ -475,6 +529,143 @@ function _addVerwendung_fuerLehre_Stundenbasis($bisverwendung)
 	$verwendung_lehre_obj->ende_imBISMeldungsJahr = $bisverwendung->ende_imBISMeldungsJahr;
 
 	return $verwendung_lehre_obj;
+}
+
+/**
+ * Funktionscode 1 - 6 anhand Benutzerfunktionen ermitteln
+ * @param array $bisfunktion_arr
+ * @return array
+ */
+function  _getFunktionscontainer_Funktionscode123456($bisfunktion_arr)
+{
+	$funktion_arr = array();
+
+	foreach ($bisfunktion_arr as $bisfunktion)
+	{
+		$funktion_code = NULL;
+		$has_oe_lehrgang = false;	// default
+
+		$studiengang = new Studiengang();
+		$studiengang->getStudiengangFromOe($bisfunktion->oe_kurzbz);
+
+		// Wenn OE der Funktion eine STG-Kennzahl ist
+		if (!is_null($studiengang->studiengang_kz))
+		{
+			// Pruefen ob STG-Kennzahl STG oder Lehrgang
+			$has_oe_lehrgang = !($studiengang->studiengang_kz > 0 && $studiengang->studiengang_kz < 10000);
+
+			// STG, die nicht BIS-bemeldet werden, ueberspringen
+			if (in_array($studiengang->studiengang_kz, BIS_EXCLUDE_STG))
+			{
+				continue;
+			}
+		}
+
+		// Funktionscode 1 - 6 anhand Benutzerfunktionen ermitteln
+		// -------------------------------------------------------------------------------------------------------------
+		// Wenn OE der Funktion nicht einem Lehrgang zugeordnet ist
+		if (!$has_oe_lehrgang)
+		{
+			// FunktionsCode 1-4
+			if (array_key_exists($bisfunktion->funktion_kurzbz, BIS_FUNKTIONSCODE_1234_ARR))
+			{
+				$funktion_code = BIS_FUNKTIONSCODE_1234_ARR[$bisfunktion->funktion_kurzbz];
+			}
+
+			if (in_array($bisfunktion->funktion_kurzbz, BIS_FUNKTIONSCODE_5_ARR))	// Leitung
+			{
+				// FunktionsCode 5 : STG-Leitung
+				if (!is_null($studiengang->studiengang_kz))
+				{
+					$funktion_code = 5;
+				}
+
+				// FunktionsCode 6 : Leitung Organisationseinheit der postsekundaeren Bildungseinrichtung
+				$organisationseinheit = new Organisationseinheit($bisfunktion->oe_kurzbz);
+				if (is_null($studiengang->studiengang_kz) &&
+					!in_array($organisationseinheit->oetyp_bezeichnung, BIS_FUNKTIONSCODE_6_ARR)) // nicht Teamleitung
+				{
+					$funktion_code = 6;
+				}
+			}
+		}
+
+		// Funktionsobjekt generieren
+		if (!is_null($funktion_code) &&		// Funktionscode vorhanden UND
+			(empty($funktion_arr) ||		// (Erster Durchlauf ODER
+				!in_array($funktion_code, array_column($funktion_arr, 'funktionscode'))))	// Funktionsobjekt mit diesem Funktionscode nicht vorhanden)
+		{
+			$funktion_obj = new StdClass();
+			$funktion_obj->funktionscode = $funktion_code;
+			$funktion_obj->besondereQualifikationCode = NULL;
+			$funktion_obj->studiengang = ($funktion_code == 5)
+				? array(setLeadingZero(intval($studiengang->studiengang_kz), 4))		// STG bei Funktionscode 5 melden
+				: NULL;
+
+			// Funktionsobjekt dem Funktionscontainer anhaengen
+			$funktion_arr []= $funktion_obj;
+		}
+		else if ($funktion_code == 5)		// Funktionscontainer vorhanden und Funktionscode 5
+		{
+			$funktion_obj_arr = array_filter($funktion_arr, function (&$obj) {
+				return $obj->funktionscode == 5;
+			});
+
+			$funktion_obj_arr[0]->studiengang[]= setLeadingZero(intval($studiengang->studiengang_kz), 4);	// STG ergaenzen
+		}
+	}
+
+	return $funktion_arr;
+}
+
+/**
+ * 	Funktionscode 7 aus Entwicklungsteam-Tabelle ermitteln
+ * @param String $uid
+ * @param array $funktion_arr 	Object-Array
+ * @return array
+ *
+ */
+function _addFunktionscontainer_Funktionscode7($uid, $funktion_arr)
+{
+	$entwicklungsteam = new Entwicklungsteam();
+	$entwicklungsteam->getEntwicklungsteam($uid);
+	$entwicklungsteam_arr = $entwicklungsteam->result;
+
+	if (!empty($entwicklungsteam_arr))
+	{
+		// Lehrgaenge und STG, die nicht BIS gemeldet werden, extrahieren
+		$entwicklungsteam_arr = array_filter($entwicklungsteam_arr, function ($obj)
+		{
+			return
+				!in_array($obj->studiengang_kz, BIS_EXCLUDE_STG) &&
+				$obj->studiengang_kz > 0 &&
+				$obj->studiengang_kz < 10000;
+		});
+	}
+
+	if (!empty($entwicklungsteam_arr))
+	{
+		// Hoechste besondere Qualifikation
+		$besondere_qualifikation_code_arr = array_values(array_column($entwicklungsteam_arr, 'besqualcode'));
+		$besondere_qualifikation_code = max($besondere_qualifikation_code_arr);
+
+		// Studiengaenge, wo Person Teil des Entwicklungsteams gewesen ist
+		$studiengang_kz_arr = array_values(array_column($entwicklungsteam_arr, 'studiengang_kz'));
+		sort($studiengang_kz_arr);							// sortieren
+		foreach($studiengang_kz_arr as &$studiengang_kz)	// fuehrende Nullen fuer STG
+		{
+			$studiengang_kz = setLeadingZero(intval($studiengang_kz), 4);
+		}
+
+		// Funktionsobjekt generieren und dem Funktionscontainer anhaengen
+		$funktion_obj = new StdClass();
+		$funktion_obj->funktionscode = 7;
+		$funktion_obj->besondereQualifikationCode = $besondere_qualifikation_code;
+		$funktion_obj->studiengang = $studiengang_kz_arr;
+		$funktion_arr []= $funktion_obj;
+	}
+
+	return $funktion_arr;
 }
 
 
