@@ -241,8 +241,13 @@ foreach ($mitarbeiter_arr as $mitarbeiter)
 						/**
 						 * Relativen Beschaeftigungsausmass der BIS-Verwendung berichtigen
 						 * (durch Abzug des eben erstellten relativen Beschaeftigungsausmass fuer Lehrtaetigkeiten)
+						 * NOTE: Abzug nur fuer Lehrtaetigkeiten im WS, da nur diese das Beschaeftigungsausmass der
+						 * BIS-Verwendung (und in Folge die VZAE ) zum Stichtag 31.12. bestimmen.
 						 * */
-						$bisverwendung->beschaeftigungsausmass_relativ -= $verwendung_lehre_obj->beschaeftigungsausmass_relativ;
+						if(substr($studsem_kurzbz, 0, 2) == 'WS')
+						{
+							$bisverwendung->beschaeftigungsausmass_relativ -= $verwendung_lehre_obj->beschaeftigungsausmass_relativ;
+						}
 
 						/**
 						 * Anteilige JVZAE der BIS-Verwendung berichtigen
