@@ -64,7 +64,9 @@ define('LDAP_TOO_MANY_USER_DN',		11);
 |--------------------------------------------------------------------------
 */
 define('LANG_SESSION_NAME', 'LANGUAGE');
-define('LANG_SESSION_INDEXES', 'LANGUAGE_INDEXES');
+define('LANG_SESSION_INDEXES', 'INDEXES');
+define('LANG_SESSION_ACTIVE_LANGUAGES', 'ACTIVE_LANGUAGES');
+define('LANG_SESSION_CURRENT_LANGUAGE', 'sprache'); // NOTE: it is not under LANG_SESSION_NAME
 
 /*
 |--------------------------------------------------------------------------
@@ -125,37 +127,25 @@ define('EMAIL_CONFIG_INDEX', 'mail');
 | Messaging system constants
 |--------------------------------------------------------------------------
 */
-// Email kontakt type
-define('EMAIL_KONTAKT_TYPE', 'email');
-// tbl_msg_recipient->sentInfo separator
-define('SENT_INFO_NEWLINE', '\n');
-
 // Message statuses
 define('MSG_STATUS_UNREAD',		0);
 define('MSG_STATUS_READ',		1);
 define('MSG_STATUS_ARCHIVED',	2);
 define('MSG_STATUS_DELETED',	3);
 
-// Priority
-define('PRIORITY_LOW',		1);
-define('PRIORITY_NORMAL',	2);
-define('PRIORITY_HIGH',		3);
-define('PRIORITY_URGENT',	4);
+// Message priorities
+define('MSG_PRIORITY_LOW',		1);
+define('MSG_PRIORITY_NORMAL',	2);
+define('MSG_PRIORITY_HIGH',		3);
+define('MSG_PRIORITY_URGENT',	4);
 
-define('MSG_ERR_SUBJECT_EMPTY',			40);
-define('MSG_ERR_BODY_EMPTY',			41);
-define('MSG_ERR_TEMPLATE_NOT_FOUND',	42);
-define('MSG_ERR_DELIVERY_MESSAGE',		43);
-define('MSG_ERR_CONTACT_NOT_FOUND',		44);
-define('MSG_ERR_OU_CONTACTS_NOT_FOUND',	45);
-
-define('MSG_ERR_INVALID_USER_ID',		100);
-define('MSG_ERR_INVALID_MSG_ID',		101);
-define('MSG_ERR_INVALID_THREAD_ID',		102);
-define('MSG_ERR_INVALID_STATUS_ID',		103);
-define('MSG_ERR_INVALID_SENDER_ID',		104);
-define('MSG_ERR_INVALID_RECIPIENTS',	105);
-define('MSG_ERR_INVALID_RECEIVER_ID',	106);
-define('MSG_ERR_INVALID_OU',			107);
-define('MSG_ERR_INVALID_TEMPLATE',		108);
-define('MSG_ERR_INVALID_TOKEN',			109);
+// Message error status
+define('MSG_ERR_INVALID_SUBJECT',		40);
+define('MSG_ERR_INVALID_BODY',			41);
+define('MSG_ERR_INVALID_TEMPLATE',		42);
+define('MSG_ERR_INVALID_MSG_ID',		43);
+define('MSG_ERR_INVALID_STATUS_ID',		44);
+define('MSG_ERR_INVALID_SENDER',		45);
+define('MSG_ERR_INVALID_RECIPIENTS',	46);
+define('MSG_ERR_INVALID_OU',			47);
+define('MSG_ERR_INVALID_TOKEN',			48);

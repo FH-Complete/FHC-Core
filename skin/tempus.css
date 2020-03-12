@@ -205,6 +205,10 @@ treechildren::-moz-tree-cell-text(Aktiv_false)
 {
   color: grey;
 }
+treechildren::-moz-tree-cell-text(bold)
+{
+	font-weight: bold;
+}
 treechildren::-moz-tree-cell(Lektor_inaktiv)
 {
   color: grey;

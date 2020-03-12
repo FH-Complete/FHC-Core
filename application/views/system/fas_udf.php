@@ -10,6 +10,7 @@
 			'dialoglib' => true,
 			'ajaxlib' => true,
 			'udfs' => true,
+			'widgets' => true,
 			'sbadmintemplate' => true,
 			'customCSSs' => array(
 				'public/css/sbadmin2/admintemplate.css'

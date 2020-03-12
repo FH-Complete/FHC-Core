@@ -15,7 +15,7 @@ class Bisverwendung_model extends DB_Model
     /**
      * Get latest (active) Verwendung of the user.
      * @param string $uid
-     * @param bool $active If false, returns latest Verwendung no matter if actual or not (ignores ending/beginning date).
+     * @param bool $active If false, returns latest Verwendung no matter if it is still actual.
      * @return array
      */
 	public function getLast($uid, $active = true)
@@ -28,14 +28,14 @@ class Bisverwendung_model extends DB_Model
                 mitarbeiter_uid = '. $this->escape($uid). '
                 AND ( beginn <= NOW() OR beginn IS NULL )
                 AND ( ende >= NOW() OR ende IS NULL )
-                ORDER BY ende DESC NULLS LAST, beginn DESC NULLS LAST
+                ORDER BY ende DESC NULLS FIRST, beginn DESC NULLS LAST
             ';
         }
         else
         {
             $condition =  '
                 mitarbeiter_uid = '. $this->escape($uid). '
-                ORDER BY ende DESC NULLS LAST, beginn DESC NULLS LAST
+                ORDER BY ende DESC NULLS FIRST, beginn DESC NULLS LAST
             ';
         }
 

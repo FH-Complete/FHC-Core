@@ -44,6 +44,7 @@ class gebiet extends basis_db
 	public $level_sprung_ab;
 	public $levelgleichverteilung;
 	public $maxpunkte;
+	public $offsetpunkte;
 	public $insertamum;
 	public $insertvon;
 	public $updateamum;
@@ -96,6 +97,7 @@ class gebiet extends basis_db
 				$this->level_sprung_ab = $row->level_sprung_ab;
 				$this->levelgleichverteilung = $this->db_parse_bool($row->levelgleichverteilung);
 				$this->maxpunkte = $row->maxpunkte;
+				$this->offsetpunkte = $row->offsetpunkte;
 				$this->insertamum = $row->insertamum;
 				$this->insertvon = $row->insertvon;
 				$this->updateamum = $row->updateamum;
@@ -169,6 +171,11 @@ class gebiet extends basis_db
 			$this->errormsg = 'Maxpunkte muss eine gueltige Zahl sein';
 			return false;
 		}
+		if(!is_numeric($this->offsetpunkte) && $this->offsetpunkte!='')
+		{
+			$this->errormsg = 'Offsetpunkte muss eine gueltige Zahl sein';
+			return false;
+		}
 		if(!is_numeric($this->antwortenprozeile) || $this->antwortenprozeile<=0)
 		{
 			$this->errormsg = 'AntortenProZeile muss eine gueltige Zahl und groesser als 0 sein';
@@ -196,14 +203,14 @@ class gebiet extends basis_db
 		{
 			$qry = 'BEGIN;INSERT INTO testtool.tbl_gebiet (kurzbz, bezeichnung, beschreibung, zeit, multipleresponse,
 					kategorien, maxfragen, zufallfrage, zufallvorschlag, level_start, level_sprung_auf, level_sprung_ab,
-					levelgleichverteilung, maxpunkte, antwortenprozeile, ';
-					
+					levelgleichverteilung, maxpunkte, offsetpunkte, antwortenprozeile, ';
+
 					foreach($this->bezeichnung_mehrsprachig as $key=>$value)
 					{
 						$idx = sprache::$index_arr[$key];
 						$qry.=" bezeichnung_mehrsprachig[$idx],";
 					}
-					
+
 					$qry.='insertamum, insertvon , updateamum, updatevon) VALUES('.
 
 					$this->db_add_param($this->kurzbz).','.
@@ -220,10 +227,11 @@ class gebiet extends basis_db
 					$this->db_add_param($this->level_sprung_ab).','.
 					$this->db_add_param($this->levelgleichverteilung, FHC_BOOLEAN).','.
 					$this->db_add_param($this->maxpunkte).','.
+					$this->db_add_param($this->offsetpunkte).','.
 					$this->db_add_param($this->antwortenprozeile).',';
 					foreach($this->bezeichnung_mehrsprachig as $key=>$value)
 						$qry.=$this->db_add_param($value).',';
-					
+
 					$qry .= $this->db_add_param($this->insertamum).','.
 					$this->db_add_param($this->insertvon).
 					',null, null);';
@@ -245,6 +253,7 @@ class gebiet extends basis_db
 					' level_sprung_ab='.$this->db_add_param($this->level_sprung_ab).','.
 					' levelgleichverteilung='.$this->db_add_param($this->levelgleichverteilung, FHC_BOOLEAN).','.
 					' maxpunkte='.$this->db_add_param($this->maxpunkte).','.
+					' offsetpunkte='.$this->db_add_param($this->offsetpunkte).','.
 					' antwortenprozeile='.$this->db_add_param($this->antwortenprozeile).','.
 					' updateamum='.$this->db_add_param($this->updateamum).','.
 					' updatevon='.$this->db_add_param($this->updatevon).',';
@@ -472,6 +481,7 @@ class gebiet extends basis_db
 				$obj->zufallvorschlag = $this->db_parse_bool($row->zufallvorschlag);
 				$obj->levelgleichverteilung = $this->db_parse_bool($row->levelgleichverteilung);
 				$obj->maxpunkte = $row->maxpunkte;
+				$obj->offsetpunkte = $row->offsetpunkte;
 				$obj->level_start = $row->level_start;
 				$obj->level_sprung_ab = $row->level_sprung_ab;
 				$obj->level_sprung_auf = $row->level_sprung_auf;
@@ -566,7 +576,8 @@ class gebiet extends basis_db
 				(
 				SELECT level, frage_id, sum(punkte) as punkte
 				FROM testtool.tbl_frage JOIN testtool.tbl_vorschlag USING(frage_id)
-				WHERE gebiet_id=".$this->db_add_param($gebiet_id, FHC_INTEGER)." AND punkte>0 AND level>=".$this->db_add_param($this->level_start)." AND NOT demo
+				WHERE gebiet_id=".$this->db_add_param($gebiet_id, FHC_INTEGER)." AND punkte>0
+				AND level>=".$this->db_add_param($this->level_start)." AND NOT demo
 				GROUP BY level, frage_id
 				) as a
 			GROUP by level, punkte ORDER BY level";
@@ -607,6 +618,202 @@ class gebiet extends basis_db
 		else
 		{
 			$this->errormsg = 'Fehler beim Ermitteln der Maximalpunkte';
+			return false;
+		}
+	}
+
+	/**
+	 * Berechnet die offsetpunkte fuer das Gebiet
+	 *
+	 * @param $gebiet_id
+	 */
+	public function berechneOffsetpunkte($gebiet_id)
+	{
+		if(!$this->load($gebiet_id))
+			return false;
+
+		$checkqry = "SELECT COUNT (uniquepoints) AS count_uniquepoints
+					FROM (
+							 SELECT gebiet_id,
+									level,
+									count(DISTINCT punkte),
+									CASE WHEN count(DISTINCT punkte) > 1 THEN FALSE ELSE TRUE END AS uniquepoints
+							 FROM (
+									  SELECT tbl_frage.gebiet_id,
+											 tbl_frage.level,
+											 CASE WHEN multipleresponse THEN sum(punkte) ELSE min(punkte) END AS punkte
+									  FROM testtool.tbl_frage
+											   JOIN testtool.tbl_vorschlag USING (frage_id)
+											   JOIN testtool.tbl_gebiet USING (gebiet_id)
+									  WHERE tbl_vorschlag.aktiv
+										AND tbl_vorschlag.punkte < 0
+										AND tbl_frage.demo = false
+										AND tbl_frage.aktiv
+										AND gebiet_id = ".$this->db_add_param($gebiet_id, FHC_INTEGER)."
+									  GROUP BY tbl_frage.gebiet_id, multipleresponse, tbl_frage.level, tbl_frage.frage_id
+								  ) p
+							 GROUP BY gebiet_id, level
+						 ) pu
+					WHERE uniquepoints = FALSE";
+
+		if($this->db_query($checkqry))
+		{
+			if($row = $this->db_fetch_object())
+			{
+				if (!is_numeric($row->count_uniquepoints) || $row->count_uniquepoints > 0)
+					$this->errormsg = 'Negativpunkte sind nicht für alle Fragen gleich hoch!';
+			}
+			else
+			{
+				$this->errormsg = 'Fehler beim Prüfen der Offsetpunkte';
+				return false;
+			}
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Prüfen der Offsetpunkte';
+			return false;
+		}
+
+		$qry = "
+			WITH fragen AS (
+				SELECT tbl_frage.frage_id, tbl_frage.gebiet_id, tbl_frage.level, tbl_frage.nummer, punkte
+				FROM testtool.tbl_frage
+						 JOIN testtool.tbl_vorschlag USING (frage_id)
+				WHERE tbl_vorschlag.aktiv
+				  AND tbl_vorschlag.punkte < 0
+				  AND tbl_frage.demo = false
+				  AND tbl_frage.aktiv
+			),
+			fragenanzahl AS (
+				SELECT gebiet_id, level, levelgleichverteilung,
+					   CASE WHEN levelgleichverteilung
+								THEN
+								ROUND(COALESCE(maxfragen
+											 * ((SELECT count(*) FROM testtool.tbl_frage f WHERE f.level = tbl_frage.level AND f.gebiet_id = tbl_frage.gebiet_id)::decimal)
+											 / (SELECT count(*) FROM testtool.tbl_frage f WHERE f.gebiet_id = tbl_frage.gebiet_id)::decimal
+									, (SELECT count(*) FROM testtool.tbl_frage f WHERE f.level = tbl_frage.level AND f.gebiet_id = tbl_frage.gebiet_id)
+									))
+							ELSE
+								COALESCE(maxfragen, count(*))
+						   END
+						   AS anzahl
+				FROM testtool.tbl_frage
+						 JOIN testtool.tbl_gebiet USING (gebiet_id)
+				WHERE tbl_frage.aktiv
+				  AND tbl_frage.demo = false
+				GROUP BY gebiet_id, level, levelgleichverteilung, maxfragen
+			)
+			SELECT
+				tbl_gebiet.gebiet_id, tbl_gebiet.bezeichnung,
+				tbl_gebiet.multipleresponse,
+				tbl_gebiet.maxpunkte, tbl_gebiet.maxfragen,
+				tbl_gebiet.levelgleichverteilung,
+				tbl_gebiet.level_start,
+				(
+					CASE WHEN tbl_gebiet.levelgleichverteilung  THEN
+							 (CASE WHEN tbl_gebiet.multipleresponse=false THEN
+									   (SELECT sum(frprolevel) FROM
+										   (
+											   SELECT fragen.level, (SELECT sum(punkte) FROM (SELECT min(punkte) AS punkte FROM fragen lvlfr WHERE lvlfr.gebiet_id = fragen.gebiet_id and lvlfr.level = fragen.level
+																							  GROUP BY lvlfr.frage_id, lvlfr.nummer
+																							  ORDER BY lvlfr.nummer
+																							  LIMIT (SELECT anzahl FROM fragenanzahl WHERE fragenanzahl.gebiet_id = fragen.gebiet_id and fragenanzahl.level = fragen.level LIMIT 1)) fr)
+												   AS frprolevel
+											   FROM fragen
+											   WHERE fragen.gebiet_id = tbl_gebiet.gebiet_id
+											   GROUP BY fragen.gebiet_id, level
+										   ) pkteprolevel)
+								   ELSE
+									   (SELECT sum(frprolevel) FROM
+										   (
+											   SELECT fragen.level,
+													  (SELECT sum(punkte) FROM (SELECT sum(punkte) AS punkte FROM fragen lvlfr WHERE lvlfr.gebiet_id = fragen.gebiet_id and lvlfr.level = fragen.level
+																				GROUP by lvlfr.frage_id, lvlfr.nummer
+																				ORDER BY lvlfr.nummer
+																				LIMIT (SELECT anzahl FROM fragenanzahl WHERE fragenanzahl.gebiet_id = fragen.gebiet_id and fragenanzahl.level = fragen.level LIMIT 1)) fr)
+														  AS frprolevel
+											   FROM fragen
+											   WHERE fragen.gebiet_id = tbl_gebiet.gebiet_id
+											   GROUP BY fragen.gebiet_id, level
+										   ) pkteprolevel)
+								 END)
+					WHEN tbl_gebiet.level_start IS NOT NULL THEN
+							 (CASE WHEN tbl_gebiet.multipleresponse=false THEN
+									   (SELECT sum(pkte)
+										FROM (
+												 SELECT min(punkte) AS pkte
+												 FROM fragen
+												 WHERE fragen.gebiet_id = tbl_gebiet.gebiet_id
+												   AND fragen.level = tbl_gebiet.level_start
+												 GROUP BY frage_id, nummer
+												 ORDER BY nummer
+												 LIMIT (SELECT anzahl FROM fragenanzahl WHERE fragenanzahl.gebiet_id = tbl_gebiet.gebiet_id AND fragenanzahl.level = tbl_gebiet.level_start LIMIT 1)
+											 ) minpkte
+									   )
+								   ELSE
+									   (
+										   SELECT sum(pkte)
+										   FROM (SELECT sum(punkte) AS pkte
+												 FROM fragen
+												 WHERE fragen.gebiet_id = tbl_gebiet.gebiet_id
+												   AND fragen.level = tbl_gebiet.level_start
+												 GROUP BY frage_id, nummer
+												 ORDER BY nummer
+												 LIMIT (SELECT anzahl FROM fragenanzahl WHERE fragenanzahl.gebiet_id = tbl_gebiet.gebiet_id AND fragenanzahl.level = tbl_gebiet.level_start LIMIT 1)
+												) sumpkte
+									   )
+								 END)
+					ELSE
+							 (CASE WHEN tbl_gebiet.multipleresponse=false THEN
+									   (
+										   SELECT sum(pkte)
+										   FROM (SELECT min(punkte) AS pkte
+												 FROM fragen
+												 WHERE fragen.gebiet_id = tbl_gebiet.gebiet_id
+												 GROUP BY frage_id, nummer
+												 ORDER BY nummer
+												 LIMIT (SELECT anzahl FROM fragenanzahl WHERE fragenanzahl.gebiet_id = tbl_gebiet.gebiet_id LIMIT 1)
+												) minpkte
+									   )
+								   ELSE
+									   (
+										   SELECT sum(pkte)
+										   FROM (SELECT sum(punkte) AS pkte
+												 FROM fragen
+												 WHERE fragen.gebiet_id = tbl_gebiet.gebiet_id
+												 GROUP BY frage_id, nummer
+												 ORDER BY nummer
+												 LIMIT (SELECT anzahl FROM fragenanzahl WHERE fragenanzahl.gebiet_id = tbl_gebiet.gebiet_id LIMIT 1)
+												) sumpkte
+									   )
+								 END)
+			
+					END) * (-1) AS offsetpunkte
+			FROM
+				testtool.tbl_gebiet
+			WHERE
+				EXISTS(
+						SELECT 1 FROM fragen WHERE fragen.gebiet_id=tbl_gebiet.gebiet_id
+					)
+			AND gebiet_id = ".$this->db_add_param($gebiet_id, FHC_INTEGER)."
+		";
+
+		if($this->db_query($qry))
+		{
+			if($row = $this->db_fetch_object())
+			{
+				return $row->offsetpunkte;
+			}
+			else
+			{
+				$this->errormsg = 'Fehler beim Ermitteln der Offsetpunkte';
+				return false;
+			}
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Ermitteln der Offsetpunkte';
 			return false;
 		}
 	}
@@ -833,7 +1040,7 @@ class gebiet extends basis_db
 		if (is_numeric($gebiet_id))
 		{
 			$qry = '
-            WITH 
+            WITH
                fragen AS (
                   SELECT DISTINCT
                      frage_id
@@ -843,7 +1050,7 @@ class gebiet extends basis_db
                      testtool.tbl_gebiet USING (gebiet_id)
                   WHERE
                      tbl_gebiet.gebiet_id = '. $this->db_add_param($gebiet_id, FHC_INTEGER). '
-               ),          
+               ),
                vorschlaege AS (
                   SELECT DISTINCT
                      vorschlag_id
@@ -852,7 +1059,7 @@ class gebiet extends basis_db
                   JOIN
                      fragen USING (frage_id)
                )
-               
+
             SELECT
                1
             FROM
@@ -861,9 +1068,9 @@ class gebiet extends basis_db
                fragen USING (frage_id)
             WHERE
                SUBSTRING(text, \'MathML\') IS NOT NULL
-               
+
             UNION
-            
+
             SELECT
                1
             FROM

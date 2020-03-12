@@ -161,7 +161,7 @@ class Phrases extends Auth_Controller
 
 			$phrase_inhalt = $this->phraseslib->insertPhraseinhalt($data);
 			if ($phrase_inhalt->error)
-				show_error(getError($phrase_inhalt);
+				show_error(getError($phrase_inhalt));
 
 			$phrase_inhalt_id = $phrase_inhalt->retval;
 

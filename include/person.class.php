@@ -374,12 +374,7 @@ class person extends basis_db
 			$this->errormsg = 'Staatsbuergerschaft darf nicht laenger als 3 Zeichen sein';
 			return false;
 		}
-		if ($this->geschlecht != 'm' && $this->geschlecht != 'w' && $this->geschlecht != 'u')
-		{
-			$this->errormsg = 'Geschlecht muss w, m oder u sein!';
-			return false;
-		}
-
+		
 		//Pruefen ob das Geburtsdatum mit der SVNR uebereinstimmt.
 		if ($this->svnr != '' && $this->gebdatum != '')
 		{

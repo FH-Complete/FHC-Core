@@ -69,6 +69,7 @@ class InfoCenter extends Auth_Controller
 	// Name of Interessentenstatus
 	const INTERESSENTSTATUS = 'Interessent';
 	const ABGEWIESENERSTATUS = 'Abgewiesener';
+	const BEWERBERSTATUS = 'Bewerber';
 
 	// Statusgruende for which no Studiengangsfreigabemessage should be sent
 	private $_statusgruendeNoStgFreigabeMessage = array('FIT Programm', 'FIT program', 'FIT programme');
@@ -493,7 +494,9 @@ class InfoCenter extends Auth_Controller
 
 		$logdata = $this->_getPersonAndStudiengangFromPrestudent($prestudent_id);
 
-		$akteresult = $this->AkteModel->loadWhere(array('person_id' => $logdata['person_id'], 'formal_geprueft_amum !=' => NULL));
+		$person_id = $logdata['person_id'];
+
+		$akteresult = $this->AkteModel->loadWhere(array('person_id' => $person_id, 'formal_geprueft_amum !=' => NULL));
 
 		if (hasData($lastStatus) && isSuccess($akteresult))
 		{
@@ -529,6 +532,8 @@ class InfoCenter extends Auth_Controller
 				if (isSuccess($result))
 				{
 					$this->load->model('crm/Dokumentprestudent_model', 'DokumentprestudentModel');
+					$json->retval['nonCriticalErrors'] = array();
+					$json->retval['infoMessages'] = array();
 
 					//set documents which have been formal geprüft to accepted
 					$dokument_kurzbzs = array();
@@ -542,7 +547,7 @@ class InfoCenter extends Auth_Controller
 
 					// acceptresult returns null if no documents to accept
 					if ($acceptresult !== null && isError($acceptresult))
-						$json->retval['nonCriticalErrors'] = 'error when accepting documents in FAS';
+						$json->retval['nonCriticalErrors'][] = 'error when accepting documents in FAS';
 
 					$logparams = array($prestudent_id, $logdata['studiengang_kurzbz'], '');
 
@@ -554,8 +559,69 @@ class InfoCenter extends Auth_Controller
 						if (hasData($statusgrund_kurzbz))
 							$logparams[2] = ', confirmation type '.$statusgrund_kurzbz->retval[0]->bezeichnung_mehrsprachig[0];
 					}
+					else
+					{
+						// check if there is already a Bewerberstatus and Reihungsverfahren already absolviert
+						$bewerber = $this->PersonModel->hasBewerber($person_id, $lastStatus->studiensemester_kurzbz, 'b');
 
-					$this->_log($logdata['person_id'], 'freigegeben', $logparams);
+						if (hasData($bewerber))
+						{
+							$bewerbercnt = getData($bewerber);
+
+							if (is_numeric($bewerbercnt[0]->anzahl_bewerber) && $bewerbercnt[0]->anzahl_bewerber > 0)
+							{
+								// then insert Bewerberstatus and rt absolviert, teilgenommen for prestudent
+								$bewerberresult = $this->PrestudentstatusModel->insert(
+									array(
+										'prestudent_id' => $prestudent_id,
+										'status_kurzbz' => self::BEWERBERSTATUS,
+										'studiensemester_kurzbz' => $lastStatus->studiensemester_kurzbz,
+										'ausbildungssemester' => $lastStatus->ausbildungssemester,
+										'datum' => date('Y-m-d'),
+										'orgform_kurzbz' => $lastStatus->orgform_kurzbz,
+										'studienplan_id' => $lastStatus->studienplan_id,
+										'insertvon' => $this->_uid,
+										'insertamum' => date('Y-m-d H:i:s')
+									)
+								);
+
+								if (isError($bewerberresult))
+									$json->retval['nonCriticalErrors'][] = 'error when inserting Bewerberstatus';
+
+								$rtangetretenres = $this->PrestudentModel->update(
+									$prestudent_id,
+									array(
+										'reihungstestangetreten' => true
+									)
+								);
+
+								if (isError($rtangetretenres))
+								{
+									$json->retval['nonCriticalErrors'][] = 'error when setting reihungstestangetreten';
+								}
+								else
+								{
+									$json->retval['infoMessages'][] = $this->p->t('infocenter', 'rtPunkteEintragenInfo');
+									$this->load->model('crm/RtPerson_model', 'RtPersonModel');
+
+									$rtteilgenommenres = $this->RtPersonModel->update(
+										array(
+											'person_id' => $person_id,
+											'studienplan_id' => $lastStatus->studienplan_id
+										),
+										array(
+											'teilgenommen' => true
+										)
+									);
+
+									if (isError($rtteilgenommenres))
+										$json->retval['nonCriticalErrors'][] = 'error when setting reihungstest teilgenommen';
+								}
+							}
+						}
+					}
+
+					$this->_log($person_id, 'freigegeben', $logparams);
 
 					$this->_sendFreigabeMail($prestudent_id);
 				}
@@ -649,7 +715,7 @@ class InfoCenter extends Auth_Controller
 	public function reloadMessages($person_id)
 	{
 		$messages = $this->MessageModel->getMessagesOfPerson($person_id, 1);
-		$this->load->view('system/messages/messageList.php', array('messages' => $messages->retval));
+		$this->load->view('system/infocenter/messageList.php', array('messages' => $messages->retval));
 	}
 
 	/**
@@ -1501,7 +1567,7 @@ class InfoCenter extends Auth_Controller
 	}
 
 	/**
-	 * Sends infomail with prestudent and person data when Prestudent is freigegeben
+	 * Sends infomail to Studiengang with prestudent and person data when Prestudent is freigegeben
 	 * @param $prestudent_id
 	 */
 	private function _sendFreigabeMail($prestudent_id)

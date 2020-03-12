@@ -101,7 +101,7 @@ class FilterWidgetLib
 	const FILTER_UNIQUE_ID = 'filterUniqueId'; // Filter page parameter name
 
 	const PERMISSION_FILTER_METHOD = 'FilterWidget'; // Name for fake method to be checked by the PermissionLib
-	const PERMISSION_TYPE = 'rw';
+	const PERMISSION_TYPE = 'r';
 
 	// Name and array keys of the filters menu array
 	const NAV_MENU_FILTER_KEY = 'filters';

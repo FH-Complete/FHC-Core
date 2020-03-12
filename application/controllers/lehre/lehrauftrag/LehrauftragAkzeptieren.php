@@ -71,7 +71,7 @@ class LehrauftragAkzeptieren extends Auth_Controller
         $studiensemester_kurzbz = $this->input->get('studiensemester'); // if provided by selected studiensemester
         if (is_null($studiensemester_kurzbz)) // else set next studiensemester as default value
         {
-            $studiensemester = $this->StudiensemesterModel->getNext();
+            $studiensemester = $this->StudiensemesterModel->getAktOrNextSemester();
             if (hasData($studiensemester))
             {
                 $studiensemester_kurzbz = $studiensemester->retval[0]->studiensemester_kurzbz;
@@ -184,14 +184,14 @@ class LehrauftragAkzeptieren extends Auth_Controller
     }
 
 	/**
-	 * Check if lectors latest active Verwendung has inkludierte Lehre
+	 * Check if lectors latest Verwendung has inkludierte Lehre
 	 * - inkludierte_lehre is null OR 0: freelancer lector -> has NO inkludierte Lehre
 	 * - inkludierte_lehre -1: fix employed lector -> has inkludierte Lehre (all inclusive)
 	 * - inkludierte_lehre > 0: fix employed lector -> has inkludierte Lehre (value is amount of hours included)
 	 */
     public function checkInkludierteLehre()
 	{
-		$result = $this->BisverwendungModel->getLast($this->_uid);
+		$result = $this->BisverwendungModel->getLast($this->_uid, false);
 
 		if (hasData($result))
 		{

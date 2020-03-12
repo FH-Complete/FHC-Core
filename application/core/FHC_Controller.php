@@ -21,6 +21,9 @@ abstract class FHC_Controller extends CI_Controller
 	{
 		parent::__construct();
 
+		// NOTE: placed here before performing anything else!!!
+		$this->_checkHTTPS();
+
 		$this->_controllerId = null; // set _controllerId as null by default
 
 		// Loads helper message to manage returning messages
@@ -128,5 +131,21 @@ abstract class FHC_Controller extends CI_Controller
 	protected function outputJson($mixed)
 	{
 		$this->output->set_content_type('application/json')->set_output(json_encode($mixed));
+	}
+
+	//------------------------------------------------------------------------------------------------------------------
+	// Private methods
+
+	/**
+	 * Checks if the call is performed via web and if HTTPS is enabled and used
+	 * If NOT then an error is raised and the execution is terminated
+	 */
+	private function _checkHTTPS()
+	{
+		// If NOT called from command line and if the HTTPS protocol is NOT enabled
+		if (!$this->input->is_cli_request() && !isset($_SERVER['HTTPS']))
+		{
+			show_error('This web site cannot work correctly without the HTTPS protocol enabled');
+		}
 	}
 }

@@ -15,6 +15,7 @@
 			'addons' => true,
 			'navigationwidget' => true,
 			'udfs' => true,
+			'widgets' => true,
 			'customCSSs' => array(
 				'public/css/sbadmin2/admintemplate.css',
 				'public/css/sbadmin2/tablesort_bootstrap.css',
@@ -23,7 +24,7 @@
 			'customJSs' => array(
 				'public/js/bootstrapper.js',
 				'public/js/tablesort/tablesort.js',
-				'public/js/messaging/messageList.js',
+				'public/js/infocenter/messageList.js',
 				'public/js/infocenter/infocenterDetails.js'
 			),
 			'phrases' => array(
@@ -155,7 +156,7 @@
 							<div class="panel-body">
 								<div class="row" id="messagelist">
 									<?php
-									$this->load->view('system/messages/messageList.php', $messages);
+									$this->load->view('system/infocenter/messageList.php', $messages);
 									?>
 								</div>
 							</div>
