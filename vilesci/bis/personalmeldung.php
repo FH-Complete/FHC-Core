@@ -425,6 +425,34 @@ foreach ($mitarbeiter_arr as $mitarbeiter)
 	// -----------------------------------------------------------------------------------------------------------------
 	$person_obj->funktion_arr = $funktion_arr;
 
+
+	// -----------------------------------------------------------------------------------------------------------------
+	// Container Lehre generieren
+	// -----------------------------------------------------------------------------------------------------------------
+	$lehre_arr = array();
+
+	// Alle Semesterwochenstunden, summiert nach STG und Studiensemester
+	$lehreinheitmitarbeiter = new Lehreinheitmitarbeiter();
+	$lehreinheitmitarbeiter->get_SWS_groupByStg(
+		$person_obj->uid,
+		$beginn_imJahr->format('Y-m-d'),
+		$ende_imJahr->format('Y-m-d')
+	);
+	$sws_proStg_arr = $lehreinheitmitarbeiter->result;
+
+	/**
+	 * Lehrtaetigkeit (Semesterwochenstunden) pro STG ermitteln.
+	 * Exkludiert Lehrtaetigkeit an Lehrgaengen bzw. Lehrtaetigkeit an STG, die nicht BIS-gemeldet werden.
+	 */
+	$lehre_arr = _getLehrecontainer($sws_proStg_arr);
+
+	// Container Lehre dem Container Person anhaengen
+	// -----------------------------------------------------------------------------------------------------------------
+	$person_obj->lehre_arr = $lehre_arr;
+
+
+	// Container Person dem Gesamt-Container anhaengen
+	// -----------------------------------------------------------------------------------------------------------------
 	$person_arr []= $person_obj;
 }
 
@@ -671,6 +699,70 @@ function _addFunktionscontainer_Funktionscode7($uid, $funktion_arr)
 	}
 
 	return $funktion_arr;
+}
+
+/**
+ * Lehrecontainer fuer Lehrtaetigkeit (Semesterwochenstunden) pro STG erstellen.
+ * @param array $sws_proStg_arr Object-Array
+ * @return array
+ */
+function _getLehrecontainer($sws_proStg_arr)
+{
+	$lehre_arr = array();
+
+	if (!empty($sws_proStg_arr))
+	{
+		// Lehrgaenge und STG, die nicht BIS gemeldet werden, extrahieren
+		$sws_proStg_arr = array_filter($sws_proStg_arr, function ($obj)
+	{
+		return
+			!in_array($obj->studiengang_kz, BIS_EXCLUDE_STG) &&
+			$obj->studiengang_kz > 0 &&
+			$obj->studiengang_kz < 10000;
+	});
+	}
+
+	if (!empty($sws_proStg_arr))
+	{
+		foreach ($sws_proStg_arr as $sws_proStg)
+		{
+			$is_sommersemester = substr($sws_proStg->studiensemester_kurzbz, 0, 2) == 'SS';
+			$is_wintersemester = substr($sws_proStg->studiensemester_kurzbz, 0, 2) == 'WS';
+
+			// Lehreobjekt generieren
+			if (empty($lehre_arr) ||																// Erster Durchlauf ODER
+				!in_array($sws_proStg->studiengang_kz, array_column($lehre_arr, 'StgKz')))	// Neu
+			{
+				$lehre_obj = new StdClass();
+
+				$lehre_obj->StgKz = $sws_proStg->studiengang_kz;
+				$lehre_obj->SommersemesterSWS = $is_sommersemester ? $sws_proStg->sws : NULL;
+				$lehre_obj->WintersemesterSWS = $is_wintersemester ? $sws_proStg->sws : NULL;
+
+				// Lehreobjekt dem Lehrecontainer anhaengen
+				$lehre_arr []= $lehre_obj;
+			}
+			else	// Lehrecontainer mit STG schon vorhanden
+			{
+				$lehre_obj_arr = array_filter($lehre_arr, function (&$obj) use ($sws_proStg) {
+					return $obj->StgKz == $sws_proStg->studiengang_kz;
+				});
+
+				// SWS ergaenzen
+				if ($is_sommersemester)
+				{
+					current($lehre_obj_arr)->SommersemesterSWS = $sws_proStg->sws;
+				}
+				else if ($is_wintersemester)
+				{
+					current($lehre_obj_arr)->WintersemesterSWS = $sws_proStg->sws;
+				}
+			}
+		}
+	}
+
+
+	return $lehre_arr;
 }
 
 
