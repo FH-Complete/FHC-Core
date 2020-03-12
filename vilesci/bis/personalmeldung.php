@@ -138,11 +138,11 @@ foreach ($mitarbeiter_arr as $mitarbeiter)
 	// BIS Verwendungsdauer und -gewichtung ergaenzen
 	$bisverwendung_arr = _addDauerGewichtung_imBISMeldungsjahr($bisverwendung_arr);
 
-	// Hauptberufcode: wenn Hauptberuf / Nebenberuf im gleichen Jahr - laengere Dauer entscheidet
+	// Hauptberufcode
 	// -----------------------------------------------------------------------------------------------------------------
-	$is_hauptberuflich = $bisverwendung_arr[count($bisverwendung_arr) - 1]->hauptberuflich;  // default: hauptberuflich der letzten BIS-Verwendung
+	$is_hauptberuflich = $bisverwendung_arr[count($bisverwendung_arr) - 1]->hauptberuflich;
 
-	// Wenn im selben Jahr hauptberuflich UND nebenberuflich -> laengere Dauer wird gemeldet (Ueberwiegenheitprinzip)
+	// wenn Hauptberuf / Nebenberuf im gleichen Jahr - laengere Dauer melden (Ueberwiegenheitprinzip)
 	if (in_array(true, array_column($bisverwendung_arr, 'hauptberuflich')) &&	// hauptberuflich UND
 		in_array(false, array_column($bisverwendung_arr, 'hauptberuflich')))		// nebenberuflich
 	{
@@ -154,181 +154,22 @@ foreach ($mitarbeiter_arr as $mitarbeiter)
 	 * - hauptberuflich Lehrender: NULL,
 	 * - nebenberuflich Lehrender: Hauptberufscode der letzten BIS-Verwendung
 	 */
-	$person_obj->hauptberufcode = ($is_hauptberuflich == true) ? NULL : $bisverwendung_arr[count($bisverwendung_arr) - 1]->hauptberufcode;
+	$person_obj->hauptberufcode = ($is_hauptberuflich == true)
+		? NULL
+		: $bisverwendung_arr[count($bisverwendung_arr) - 1]->hauptberufcode;
 
-	// -----------------------------------------------------------------------------------------------------------------
+
+	// *****************************************************************************************************************
+	// Container Verwendung generieren (mit JVZAE und VZAE)
+	// *****************************************************************************************************************
+	$verwendung_arr = array();
+
 	// Relatives Beschaeftigungsausmass / Anteilige JVZAE ermitteln
 	// -----------------------------------------------------------------------------------------------------------------
+	$bisverwendung_arr = _add_relativesBA_und_anteiligeJVZAE($person_obj->uid, $bisverwendung_arr);
 
-	// Lehrtaetigkeit ermitteln
-	$lema = new lehreinheitmitarbeiter();
-	$lema->getLehreinheiten_SWS_BISMeldung($person_obj->uid, $ss_kurzbz);
-	$lehre_ss_sws = $lema->result[0];	// Anzahl SS - Semesterwochenstunden
-
-	$lema = new lehreinheitmitarbeiter();
-	$lema->getLehreinheiten_SWS_BISMeldung($person_obj->uid, $ws_kurzbz);
-	$lehre_ws_sws = $lema->result[0];	// Anzahl WS - Semesterwochenstunden
-
-	$has_lehrtaetigkeit = !is_null($lehre_ss_sws) || !is_null($lehre_ws_sws);
-
-	foreach ($bisverwendung_arr as $index => $bisverwendung)
-	{
-		$has_vertragsstunden = !is_null($bisverwendung->vertragsstunden) && !empty($bisverwendung->vertragsstunden);
-		$is_lektor = $bisverwendung->verwendung_code == 1 || $bisverwendung->verwendung_code == 2;
-
-		/**
-		 * NOTE: is_karenziert ist ein boolean fuer Vollzeit-Karenz, nicht fuer Teilzeit-(Bildungs-)Karenz!
-		 * Die Unterscheidung ist wichtig fuer die weitere Ermittlung der JVZAE.
-		 * Vollzeitkarenz: Anteiliger Beschaeftigungsausmass und JVZAE wird auf 0 gesetzt.
-		 * Bildungs-Teilzeitkarenz:  entspricht im System
-		 */
-		$is_karenziert_VZ = $bisverwendung->beschausmasscode == 5 && !$has_vertragsstunden;	// VZ-Kinder- und Bildungskarenz
-		$is_karenziert_TZ = $bisverwendung->beschausmasscode == 5 && $has_vertragsstunden;	// TZ-Bildungskarenz
-
-		// Karenzzeit
-		// -------------------------------------------------------------------------------------------------------------
-		if ($is_karenziert_VZ)
-		{
-			// Relatives Beschaeftigungsausmass / Anteilige JVZAE ermitteln
-			$bisverwendung->beschaeftigungsausmass_relativ = number_format(0.00, 2);
-			$bisverwendung->jvzae_anteilig = 0;
-			continue;
-		}
-
-		// Echter Dienstvertrag - d.h. Vertragsstunden sind vorhanden
-		// Bsp. angestellte Lektoren, angestellte MA in Verwaltung/Management/Wartung
-		// -------------------------------------------------------------------------------------------------------------
-		else if ($has_vertragsstunden)
-		{
-			// Vertragsstunden koennen max. VZ Aequivalenz-Basiswert haben
-			if ($bisverwendung->vertragsstunden > BIS_VOLLZEIT_ARBEITSSTUNDEN)
-			{
-				$bisverwendung->vertragsstunden = BIS_VOLLZEIT_ARBEITSSTUNDEN;
-			}
-
-			// Relatives Beschaeftigungsausmass / Anteilige JVZAE ermitteln
-			$bisverwendung->beschaeftigungsausmass_relativ = round($bisverwendung->vertragsstunden / BIS_VOLLZEIT_ARBEITSSTUNDEN, 2);
-			$bisverwendung->jvzae_anteilig = round($bisverwendung->beschaeftigungsausmass_relativ * $bisverwendung->gewichtung, 2);
-			
-			// Echter Dienstvertrag - mit Lehrtaetigkeit, jedoch kein Lektor.
-			// Bsp. STG-Leiter mit Lehrtaetigkeit
-			// ---------------------------------------------------------------------------------------------------------
-			if (!$is_lektor && $has_lehrtaetigkeit)
-			{
-				/**
-				 * Verwendungen ergänzen, wenn Mitarbeiter in Verwaltung/Managment/Wartung (jedenfalls nicht in Lehre)
-				 * zugeteilt ist und dennoch lehrt.
-				 * Die SWS werden sowohl fuer Sommer- als auch Wintersemster ermittelt und jeweils in einer eigenen
-				 * Verwendung mit dem Verwendungscode 1 ergaenzt.
-				 */
-				$bisverwendung_beginn_BIS = new DateTime($bisverwendung->beginn_imBISMeldungsJahr);
-				$bisverwendung_ende_BIS = new DateTime($bisverwendung->ende_imBISMeldungsJahr);
-
-				foreach (array($ss_kurzbz => $lehre_ss_sws, $ws_kurzbz => $lehre_ws_sws) as $studsem_kurzbz => $lehre_sws)
-				{
-					$studsem = new studiensemester($studsem_kurzbz);
-					$studsem_start = new DateTime($studsem->start);
-					$studsem_ende = new DateTime($studsem->ende);
-
-					// Wenn Lehrzeit in die BIS Verwendungszeit hineinfaellt, Verwendung erstellen
-					if (!is_null($lehre_sws) &&
-						(!($studsem_start > $bisverwendung_ende_BIS) &&
-						 !($studsem_ende < $bisverwendung_beginn_BIS)))
-					{
-						// Verwendung erstellen
-						list($tage_lehre_imSemester, $verwendung_lehre_obj) = _addVerwendung_fuerLehre_inkludiert($studsem, $bisverwendung);
-
-						// Relatives Beschaeftigungsausmass / Anteilige JVZAE ermitteln
-						$verwendung_lehre_obj->beschaeftigungsausmass_relativ = round($lehre_sws / BIS_VOLLZEIT_SWS_INKLUDIERTE_LEHRE, 2);	// VZ-Basis fuer inkludierte Lehre
-						$verwendung_lehre_obj->gewichtung = ($tage_lehre_imSemester == 182) ? BIS_HALBJAHRES_GEWICHTUNG_SWS : round(BIS_HALBJAHRES_GEWICHTUNG_SWS / ($tage_imJahr / 2) * $tage_lehre_imSemester, 2);
-						$verwendung_lehre_obj->jvzae_anteilig = round($verwendung_lehre_obj->beschaeftigungsausmass_relativ * $verwendung_lehre_obj->gewichtung, 3);
-
-						/**
-						 * Relativen Beschaeftigungsausmass der BIS-Verwendung berichtigen
-						 * (durch Abzug des eben erstellten relativen Beschaeftigungsausmass fuer Lehrtaetigkeiten)
-						 * NOTE: Abzug nur fuer Lehrtaetigkeiten im WS, da nur diese das Beschaeftigungsausmass der
-						 * BIS-Verwendung (und in Folge die VZAE ) zum Stichtag 31.12. bestimmen.
-						 * */
-						if(substr($studsem_kurzbz, 0, 2) == 'WS')
-						{
-							$bisverwendung->beschaeftigungsausmass_relativ -= $verwendung_lehre_obj->beschaeftigungsausmass_relativ;
-						}
-
-						/**
-						 * Anteilige JVZAE der BIS-Verwendung berichtigen
-						 * (durch Abzug der eben erstellten anteiligen JVZAE fuer Lehrtaetigkeiten)
-						 */
-						$bisverwendung->jvzae_anteilig -= $verwendung_lehre_obj->jvzae_anteilig;
-						$bisverwendung_arr [] = $verwendung_lehre_obj;
-					}
-				}
-			}
-		}
-
-		// Sonstige Beschaeftigungsverhaeltnisse ohne Vertragsstunden
-		// Freie Dienstvertraege auf Stundenbasis
-		// -------------------------------------------------------------------------------------------------------------
-		else if (!$has_vertragsstunden &&  $has_lehrtaetigkeit)
-		{
-			foreach (array($ss_kurzbz => $lehre_ss_sws, $ws_kurzbz => $lehre_ws_sws) as $studsem => $lehre_sws)
-			{
-				if (!is_null($lehre_sws))
-				{
-					// Verwendungen erstellen
-					$verwendung_lehre_obj = _addVerwendung_fuerLehre_Stundenbasis($bisverwendung);
-
-					// Relatives Beschaeftigungsausmass / Anteilige JVZAE ermitteln
-					$verwendung_lehre_obj->beschaeftigungsausmass_relativ = round($lehre_sws / BIS_VOLLZEIT_SWS_EINZELSTUNDENBASIS, 2);	// VZ-Basis nach BIS-Vorgabe fuer Stundenbasis
-					$verwendung_lehre_obj->gewichtung = BIS_HALBJAHRES_GEWICHTUNG_SWS;
-					$verwendung_lehre_obj->jvzae_anteilig = round($verwendung_lehre_obj->beschaeftigungsausmass_relativ * $verwendung_lehre_obj->gewichtung, 2);
-					$bisverwendung_arr []= $verwendung_lehre_obj;
-				}
-			}
-		}
-		else
-		{
-			// Studentische Hilfskraft
-			// ---------------------------------------------------------------------------------------------------------
-			$benutzerfunktion = new Benutzerfunktion();
-			$is_studentische_hilfskraft = $benutzerfunktion->getBenutzerFunktionByUid(
-				$person_obj->uid,
-				'hilfskraft',
-				$beginn_imJahr->format('Y-m-d'),
-				$ende_imJahr->format('Y-m-d')
-			);
-
-			if ($is_studentische_hilfskraft)
-			{
-				// Kalkulatorische Umrechnung der Jahrespauschale
-				$pauschale_hilfskraft_inStunden = BIS_PAUSCHALE_STUDENTISCHE_HILFSKRAFT; // Pauschale pro Jahr und Person (in Stunden)
-				$pauschale_hilfskraft_relativImJahr = $pauschale_hilfskraft_inStunden / 1; // Stundenpauschale in Verhaeltnis zu 1 Jahr
-				$vollzeit_arbeitsstunden_imJahr = BIS_VOLLZEIT_ARBEITSSTUNDEN * $wochen_imJahr;
-
-				// Relatives Beschaeftigungsausmass / Anteilige JVZAE ermitteln
-				$bisverwendung->beschaeftigungsausmass_relativ = round($pauschale_hilfskraft_relativImJahr / $vollzeit_arbeitsstunden_imJahr, 4);
-				$bisverwendung->jvzae_anteilig =round($pauschale_hilfskraft_relativImJahr / $vollzeit_arbeitsstunden_imJahr, 4);
-			}
-			// Mitarbeiter mit sonstigem Dienstverhaeltnis (zB. Werkvertrag)
-			// ---------------------------------------------------------------------------------------------------------
-			else
-			{
-				$pauschale_sonstigeDV_inStunden = BIS_PAUSCHALE_SONSTIGES_DIENSTVERHAELTNIS; // Pauschale pro Jahr und Person (in Stunden)
-				$pauschale_sonstigeDV_relativImJahr = $pauschale_sonstigeDV_inStunden / 1; // Stundenpauschale in Verhaeltnis zu 1 Jahr
-				$vollzeit_arbeitsstunden_imJahr = BIS_VOLLZEIT_ARBEITSSTUNDEN * $wochen_imJahr;
-
-				// Relatives Beschaeftigungsausmass / Anteilige JVZAE ermitteln
-				$bisverwendung->beschaeftigungsausmass_relativ = round($pauschale_sonstigeDV_relativImJahr / $vollzeit_arbeitsstunden_imJahr, 4);
-				$bisverwendung->jvzae_anteilig =round($pauschale_sonstigeDV_relativImJahr / $vollzeit_arbeitsstunden_imJahr, 4);
-			}
-		}
-	}
-
-	// *****************************************************************************************************************
-	// JVZAE und VZAE ermitteln  (Jahresvollzeitaequivalenz, Vollzeitaequivalenz)
-	// *****************************************************************************************************************
-
-	// Container Verwendung aus dem bisverwendung_arr generieren, formatieren und dem Container Person anhängen
-	$verwendung_arr = array();
+	// JVZAE und VZAE ermitteln und Container Verwendung generieren
+	// -----------------------------------------------------------------------------------------------------------------
 	foreach ($bisverwendung_arr as $bisverwendung)
 	{
 		if (empty($verwendung_arr) || 																					// wenn erster Durchlauf ODER
@@ -400,12 +241,9 @@ foreach ($mitarbeiter_arr as $mitarbeiter)
 	$person_obj->verwendung_arr = $verwendung_arr;
 
 
-	// *********************************************************************************************************************
-	// Container Funktion und Lehre werden nur für STG generiert (nicht für Lehrgaenge)
-	// *********************************************************************************************************************
-	// -----------------------------------------------------------------------------------------------------------------
-	// Container Funktion generieren
-	// -----------------------------------------------------------------------------------------------------------------
+	// *****************************************************************************************************************
+	// Container Funktion generieren (nicht für Lehrgaenge)
+	// *****************************************************************************************************************
 	$funktion_arr = array();
 
 	// Alle Benutzerfunktionen im BIS Meldungsjahr holen
@@ -436,9 +274,9 @@ foreach ($mitarbeiter_arr as $mitarbeiter)
 	$person_obj->funktion_arr = $funktion_arr;
 
 
-	// -----------------------------------------------------------------------------------------------------------------
-	// Container Lehre generieren
-	// -----------------------------------------------------------------------------------------------------------------
+	// *****************************************************************************************************************
+	// Container Lehre generieren (nicht für Lehrgaenge)
+	// *****************************************************************************************************************
 	$lehre_arr = array();
 
 	// Alle Semesterwochenstunden, summiert nach STG und Studiensemester
@@ -479,6 +317,190 @@ echo '<pre>', print_r($xml, 1), '</pre>';
 // ---------------------------------------------------------------------------------------------------------------------
 // Private Functions
 // ---------------------------------------------------------------------------------------------------------------------
+
+/**
+ * Funktion ermittelt relatives Beschaeftigungsausmass und anteilige Jahresvollzeitaequivalenz
+ * @param String $uid
+ * @param array $bisverwendung_arr Object-Array
+ * @return array
+ */
+function _add_relativesBA_und_anteiligeJVZAE($uid, $bisverwendung_arr)
+{
+	global $beginn_imJahr;
+	global $ende_imJahr;
+	global $wochen_imJahr;
+	global $tage_imJahr;
+	global $ss_kurzbz;
+	global $ws_kurzbz;
+
+	// Lehrtaetigkeit ermitteln
+	$lema = new lehreinheitmitarbeiter();
+	$lema->getLehreinheiten_SWS_BISMeldung($uid, $ss_kurzbz);
+	$lehre_ss_sws = $lema->result[0];	// Anzahl SS - Semesterwochenstunden
+
+	$lema = new lehreinheitmitarbeiter();
+	$lema->getLehreinheiten_SWS_BISMeldung($uid, $ws_kurzbz);
+	$lehre_ws_sws = $lema->result[0];	// Anzahl WS - Semesterwochenstunden
+
+	$has_lehrtaetigkeit = !is_null($lehre_ss_sws) || !is_null($lehre_ws_sws);
+
+	foreach ($bisverwendung_arr as $index => $bisverwendung)
+	{
+		$has_vertragsstunden = !is_null($bisverwendung->vertragsstunden) && !empty($bisverwendung->vertragsstunden);
+		$is_lektor = $bisverwendung->verwendung_code == 1 || $bisverwendung->verwendung_code == 2;
+
+		/**
+		 * NOTE: is_karenziert ist ein boolean fuer Vollzeit-Karenz, nicht fuer Teilzeit-(Bildungs-)Karenz!
+		 * Die Unterscheidung ist wichtig fuer die weitere Ermittlung der JVZAE.
+		 * Vollzeitkarenz: Anteiliger Beschaeftigungsausmass und JVZAE wird auf 0 gesetzt.
+		 * Bildungs-Teilzeitkarenz:  entspricht im System
+		 */
+		$is_karenziert_VZ = $bisverwendung->beschausmasscode == 5 && !$has_vertragsstunden;	// VZ-Kinder- und Bildungskarenz
+		$is_karenziert_TZ = $bisverwendung->beschausmasscode == 5 && $has_vertragsstunden;	// TZ-Bildungskarenz
+
+		// Karenzzeit
+		// -------------------------------------------------------------------------------------------------------------
+		if ($is_karenziert_VZ)
+		{
+			// Relatives Beschaeftigungsausmass / Anteilige JVZAE ermitteln
+			$bisverwendung->beschaeftigungsausmass_relativ = number_format(0.00, 2);
+			$bisverwendung->jvzae_anteilig = 0;
+			continue;
+		}
+
+		// Echter Dienstvertrag - d.h. Vertragsstunden sind vorhanden
+		// Bsp. angestellte Lektoren, angestellte MA in Verwaltung/Management/Wartung
+		// -------------------------------------------------------------------------------------------------------------
+		else if ($has_vertragsstunden)
+		{
+			// Vertragsstunden koennen max. VZ Aequivalenz-Basiswert haben
+			if ($bisverwendung->vertragsstunden > BIS_VOLLZEIT_ARBEITSSTUNDEN)
+			{
+				$bisverwendung->vertragsstunden = BIS_VOLLZEIT_ARBEITSSTUNDEN;
+			}
+
+			// Relatives Beschaeftigungsausmass / Anteilige JVZAE ermitteln
+			$bisverwendung->beschaeftigungsausmass_relativ = round($bisverwendung->vertragsstunden / BIS_VOLLZEIT_ARBEITSSTUNDEN, 2);
+			$bisverwendung->jvzae_anteilig = round($bisverwendung->beschaeftigungsausmass_relativ * $bisverwendung->gewichtung, 2);
+
+			// Echter Dienstvertrag - mit Lehrtaetigkeit, jedoch kein Lektor.
+			// Bsp. STG-Leiter mit Lehrtaetigkeit
+			// ---------------------------------------------------------------------------------------------------------
+			if (!$is_lektor && $has_lehrtaetigkeit)
+			{
+				/**
+				 * Verwendungen ergänzen, wenn Mitarbeiter in Verwaltung/Managment/Wartung (jedenfalls nicht in Lehre)
+				 * zugeteilt ist und dennoch lehrt.
+				 * Die SWS werden sowohl fuer Sommer- als auch Wintersemster ermittelt und jeweils in einer eigenen
+				 * Verwendung mit dem Verwendungscode 1 ergaenzt.
+				 */
+				$bisverwendung_beginn_BIS = new DateTime($bisverwendung->beginn_imBISMeldungsJahr);
+				$bisverwendung_ende_BIS = new DateTime($bisverwendung->ende_imBISMeldungsJahr);
+
+				foreach (array($ss_kurzbz => $lehre_ss_sws, $ws_kurzbz => $lehre_ws_sws) as $studsem_kurzbz => $lehre_sws)
+				{
+					$studsem = new studiensemester($studsem_kurzbz);
+					$studsem_start = new DateTime($studsem->start);
+					$studsem_ende = new DateTime($studsem->ende);
+
+					// Wenn Lehrzeit in die BIS Verwendungszeit hineinfaellt, Verwendung erstellen
+					if (!is_null($lehre_sws) &&
+						(!($studsem_start > $bisverwendung_ende_BIS) &&
+							!($studsem_ende < $bisverwendung_beginn_BIS)))
+					{
+						// Verwendung erstellen
+						list($tage_lehre_imSemester, $verwendung_lehre_obj) = _addVerwendung_fuerLehre_inkludiert($studsem, $bisverwendung);
+
+						// Relatives Beschaeftigungsausmass / Anteilige JVZAE ermitteln
+						$verwendung_lehre_obj->beschaeftigungsausmass_relativ = round($lehre_sws / BIS_VOLLZEIT_SWS_INKLUDIERTE_LEHRE, 2);	// VZ-Basis fuer inkludierte Lehre
+						$verwendung_lehre_obj->gewichtung = ($tage_lehre_imSemester == 182)
+							? BIS_HALBJAHRES_GEWICHTUNG_SWS
+							: round(BIS_HALBJAHRES_GEWICHTUNG_SWS / ($tage_imJahr / 2) * $tage_lehre_imSemester, 2);
+						$verwendung_lehre_obj->jvzae_anteilig = round($verwendung_lehre_obj->beschaeftigungsausmass_relativ * $verwendung_lehre_obj->gewichtung, 3);
+
+						/**
+						 * Relativen Beschaeftigungsausmass der BIS-Verwendung berichtigen
+						 * (durch Abzug des eben erstellten relativen Beschaeftigungsausmass fuer Lehrtaetigkeiten)
+						 * NOTE: Abzug nur fuer Lehrtaetigkeiten im WS, da nur diese das Beschaeftigungsausmass der
+						 * BIS-Verwendung (und in Folge die VZAE ) zum Stichtag 31.12. bestimmen.
+						 * */
+						if(substr($studsem_kurzbz, 0, 2) == 'WS')
+						{
+							$bisverwendung->beschaeftigungsausmass_relativ -= $verwendung_lehre_obj->beschaeftigungsausmass_relativ;
+						}
+
+						/**
+						 * Anteilige JVZAE der BIS-Verwendung berichtigen
+						 * (durch Abzug der eben erstellten anteiligen JVZAE fuer Lehrtaetigkeiten)
+						 */
+						$bisverwendung->jvzae_anteilig -= $verwendung_lehre_obj->jvzae_anteilig;
+						$bisverwendung_arr [] = $verwendung_lehre_obj;
+					}
+				}
+			}
+		}
+
+		// Sonstige Beschaeftigungsverhaeltnisse ohne Vertragsstunden
+		// Freie Dienstvertraege auf Stundenbasis
+		// -------------------------------------------------------------------------------------------------------------
+		else if (!$has_vertragsstunden &&  $has_lehrtaetigkeit)
+		{
+			foreach (array($ss_kurzbz => $lehre_ss_sws, $ws_kurzbz => $lehre_ws_sws) as $studsem => $lehre_sws)
+			{
+				if (!is_null($lehre_sws))
+				{
+					// Verwendungen erstellen
+					$verwendung_lehre_obj = _addVerwendung_fuerLehre_Stundenbasis($bisverwendung);
+
+					// Relatives Beschaeftigungsausmass / Anteilige JVZAE ermitteln
+					$verwendung_lehre_obj->beschaeftigungsausmass_relativ = round($lehre_sws / BIS_VOLLZEIT_SWS_EINZELSTUNDENBASIS, 2);	// VZ-Basis nach BIS-Vorgabe fuer Stundenbasis
+					$verwendung_lehre_obj->gewichtung = BIS_HALBJAHRES_GEWICHTUNG_SWS;
+					$verwendung_lehre_obj->jvzae_anteilig = round($verwendung_lehre_obj->beschaeftigungsausmass_relativ * $verwendung_lehre_obj->gewichtung, 2);
+					$bisverwendung_arr []= $verwendung_lehre_obj;
+				}
+			}
+		}
+		else
+		{
+			// Studentische Hilfskraft
+			// ---------------------------------------------------------------------------------------------------------
+			$benutzerfunktion = new Benutzerfunktion();
+			$is_studentische_hilfskraft = $benutzerfunktion->getBenutzerFunktionByUid(
+				$uid,
+				'hilfskraft',
+				$beginn_imJahr->format('Y-m-d'),
+				$ende_imJahr->format('Y-m-d')
+			);
+
+			if ($is_studentische_hilfskraft)
+			{
+				// Kalkulatorische Umrechnung der Jahrespauschale
+				$pauschale_hilfskraft_inStunden = BIS_PAUSCHALE_STUDENTISCHE_HILFSKRAFT; // Pauschale pro Jahr und Person (in Stunden)
+				$pauschale_hilfskraft_relativImJahr = $pauschale_hilfskraft_inStunden / 1; // Stundenpauschale in Verhaeltnis zu 1 Jahr
+				$vollzeit_arbeitsstunden_imJahr = BIS_VOLLZEIT_ARBEITSSTUNDEN * $wochen_imJahr;
+
+				// Relatives Beschaeftigungsausmass / Anteilige JVZAE ermitteln
+				$bisverwendung->beschaeftigungsausmass_relativ = round($pauschale_hilfskraft_relativImJahr / $vollzeit_arbeitsstunden_imJahr, 4);
+				$bisverwendung->jvzae_anteilig =round($pauschale_hilfskraft_relativImJahr / $vollzeit_arbeitsstunden_imJahr, 4);
+			}
+			// Mitarbeiter mit sonstigem Dienstverhaeltnis (zB. Werkvertrag)
+			// ---------------------------------------------------------------------------------------------------------
+			else
+			{
+				$pauschale_sonstigeDV_inStunden = BIS_PAUSCHALE_SONSTIGES_DIENSTVERHAELTNIS; // Pauschale pro Jahr und Person (in Stunden)
+				$pauschale_sonstigeDV_relativImJahr = $pauschale_sonstigeDV_inStunden / 1; // Stundenpauschale in Verhaeltnis zu 1 Jahr
+				$vollzeit_arbeitsstunden_imJahr = BIS_VOLLZEIT_ARBEITSSTUNDEN * $wochen_imJahr;
+
+				// Relatives Beschaeftigungsausmass / Anteilige JVZAE ermitteln
+				$bisverwendung->beschaeftigungsausmass_relativ = round($pauschale_sonstigeDV_relativImJahr / $vollzeit_arbeitsstunden_imJahr, 4);
+				$bisverwendung->jvzae_anteilig =round($pauschale_sonstigeDV_relativImJahr / $vollzeit_arbeitsstunden_imJahr, 4);
+			}
+		}
+	}
+
+	return $bisverwendung_arr;
+}
+
 /**
  * Funktion ermittelt fuer jede BIS-Verwendung die Dauer (in Tagen) und Gewichtung (Dauer / Tage im Jahr)
  * @param array $bisverwendung_arr Array mit BIS-Verwendungsobjekten
