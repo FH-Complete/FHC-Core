@@ -12,6 +12,7 @@ require_once('../../include/lehreinheitmitarbeiter.class.php');
 require_once('../../include/benutzerfunktion.class.php');
 require_once('../../include/organisationseinheit.class.php');
 require_once('../../include/entwicklungsteam.class.php');
+require_once('../../include/erhalter.class.php');
 
 $uid = get_uid();
 
@@ -118,7 +119,7 @@ foreach ($mitarbeiter_arr as $mitarbeiter)
 {
 	$person_obj = new StdClass();
 
-	$person_obj->personalnummer = $mitarbeiter->personalnummer;
+	$person_obj->personalnummer = setLeadingZero(intval($mitarbeiter->personalnummer), 15);
 	$person_obj->uid = $mitarbeiter->uid;
 	$person_obj->geschlecht = $mitarbeiter->geschlecht;
 	$person_obj->geschlechtX = $mitarbeiter->geschlechtX;
@@ -191,7 +192,7 @@ foreach ($mitarbeiter_arr as $mitarbeiter)
 			$verwendung_obj->ba1code = $bisverwendung->ba1code;
 			$verwendung_obj->ba2code = $bisverwendung->ba2code;
 			$verwendung_obj->verwendung_code = $bisverwendung->verwendung_code;
-			$verwendung_obj->jvzae = 0;
+			$verwendung_obj->jvzae = 0.00;
 			$verwendung_obj->vzae = -1;	// default
 
 			// Loop innerhalb Verwendungen mit selben Beschaeftigungsverhaeltnissen und Verwendung_codes
@@ -204,7 +205,9 @@ foreach ($mitarbeiter_arr as $mitarbeiter)
 				 * Berechnung:
 				 * JVZAE wird aus der Summe aller anteiligen JVZE gebildet.
 				 */
-				$verwendung_obj->jvzae += (isset($verwendung_tmp->jvzae_anteilig)) ? $verwendung_tmp->jvzae_anteilig * 100 : NULL; // TODO: not null...
+				$verwendung_obj->jvzae += (isset($verwendung_tmp->jvzae_anteilig))
+					? number_format($verwendung_tmp->jvzae_anteilig * 100, 2)
+					: NULL; // TODO: not null...
 
 
 			//	Vollzeitaequivalenz VZAE ermitteln (Beschaeftigungsausmass zum Stichtag 31.12)
@@ -785,9 +788,9 @@ function _getLehrecontainer($sws_proStg_arr)
 			{
 				$lehre_obj = new StdClass();
 
-				$lehre_obj->StgKz = $sws_proStg->studiengang_kz;
-				$lehre_obj->SommersemesterSWS = $is_sommersemester ? $sws_proStg->sws : NULL;
-				$lehre_obj->WintersemesterSWS = $is_wintersemester ? $sws_proStg->sws : NULL;
+				$lehre_obj->StgKz = setLeadingZero(intval($sws_proStg->studiengang_kz), 4);
+				$lehre_obj->SommersemesterSWS = $is_sommersemester ? $sws_proStg->sws : 0.00;
+				$lehre_obj->WintersemesterSWS = $is_wintersemester ? $sws_proStg->sws : 0.00;
 
 				// Lehreobjekt dem Lehrecontainer anhaengen
 				$lehre_arr []= $lehre_obj;
@@ -820,6 +823,10 @@ function _generateXML($person_arr)
 	$xml = '';
 	$xml .= '<?xml version="1.0" encoding="UTF-8"?>';
 
+// TODO: ErhKz und Meldedatum aendern
+	$xml .= '<Erhalter>';
+	$xml .= '<ErhKz>005</ErhKz>';
+	$xml .= '<MeldeDatum>15042020</MeldeDatum>';
 	$xml .= '<PersonalMeldung>';
 
 	foreach ($person_arr as $person)
@@ -830,15 +837,17 @@ function _generateXML($person_arr)
 		$xml .= '<Geschlecht><![CDATA['. $person->geschlecht. ']]></Geschlecht>';
 		$xml .= '<GeschlechtX><![CDATA['. $person->geschlechtX. ']]></GeschlechtX>';
 		$xml .= '<Geburtsjahr><![CDATA['. $person->geburtsjahr. ']]></Geburtsjahr>';
-		$xml .= '<Staatsangehoerigkeit><![CDATA['. $person->staatsangehoerigkeit. ']]></Staatsangehoerigkeit>';
+		$xml .= '<StaatsangehoerigkeitCode><![CDATA['. $person->staatsangehoerigkeit. ']]></StaatsangehoerigkeitCode>';
 		$xml .= '<HoechsteAbgeschlosseneAusbildung><![CDATA['. $person->hoechste_abgeschlossene_ausbildung. ']]></HoechsteAbgeschlosseneAusbildung>';
 		$xml .= '<Habilitation><![CDATA['. $person->habilitation. ']]></Habilitation>';
-		$xml .= '<HauptberufCode><![CDATA['. $person->hauptberufcode. ']]></HauptberufCode>';
+		$xml .= (!is_null($person->hauptberufcode))
+			? '<HauptberufCode><![CDATA['. $person->hauptberufcode. ']]></HauptberufCode>'
+			: '';
 
 		foreach ($person->verwendung_arr as $verwendung)
 		{
 			$xml .= '<Verwendung>';
-			$xml .= '<Verwendungscode><![CDATA['. $verwendung->verwendung_code. ']]></Verwendungscode>';
+			$xml .= '<VerwendungsCode><![CDATA['. $verwendung->verwendung_code. ']]></VerwendungsCode>';
 			$xml .= '<BeschaeftigungsArt1><![CDATA['. $verwendung->ba1code. ']]></BeschaeftigungsArt1>';
 			$xml .= '<BeschaeftigungsArt2><![CDATA['. $verwendung->ba2code. ']]></BeschaeftigungsArt2>';
 			$xml .= '<BeschaeftigungsAusmassVZAE><![CDATA['. $verwendung->vzae. ']]></BeschaeftigungsAusmassVZAE>';
@@ -850,21 +859,29 @@ function _generateXML($person_arr)
 		{
 			$xml .= '<Funktion>';
 			$xml .= '<FunktionsCode><![CDATA['. $funktion->funktionscode. ']]></FunktionsCode>';
-			$xml .= '<BesondereQualifikationsCode><![CDATA['. $funktion->besondereQualifikationCode. ']]></BesondereQualifikationsCode>';
-			$xml .= '<Studiengang>';
-			if (is_array($funktion->studiengang))
-			{
-				foreach ($funktion->studiengang as $studiengang)
-				{
-					$xml .= '<StgKz><![CDATA['. $studiengang. ']]></StgKz>';
-				}
-			}
-			else if (!is_null($funktion->studiengang))
-			{
-				$xml .= '<StgKz><![CDATA['. $funktion->studiengang. ']]></StgKz>';
+			$xml .= (!is_null($funktion->besondereQualifikationCode))
+				? '<BesondereQualifikationCode><![CDATA['. $funktion->besondereQualifikationCode. ']]></BesondereQualifikationCode>'
+				: '';
 
+			if ($funktion->funktionscode == 5 || $funktion->funktionscode == 7)
+			{
+				$xml .= '<Studiengang>';
+
+				if (is_array($funktion->studiengang))
+				{
+					foreach ($funktion->studiengang as $studiengang)
+					{
+						$xml .= '<StgKz><![CDATA['. $studiengang. ']]></StgKz>';
+					}
+				}
+				else if (!is_null($funktion->studiengang))
+				{
+					$xml .= '<StgKz><![CDATA['. $funktion->studiengang. ']]></StgKz>';
+
+				}
+				$xml .= '</Studiengang>';
 			}
-			$xml .= '</Studiengang>';
+
 			$xml .= '</Funktion>';
 		}
 
@@ -881,6 +898,7 @@ function _generateXML($person_arr)
 	}
 
 	$xml .= '</PersonalMeldung>';
+	$xml .= '</Erhalter>';
 
 	return $xml;
 }
