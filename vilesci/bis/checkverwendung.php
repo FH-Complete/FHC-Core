@@ -40,19 +40,19 @@ $rechte->getBerechtigungen($uid);
 if(!$rechte->isBerechtigt('mitarbeiter/stammdaten', null,'suid'))
 	die('Sie haben keine Berechtigung für diese Seite');
 
-$error_log='';
-$fehler=0;
+$error_log = '';
+$fehler = 0;
 
 $text = '';
-$anzahl_quelle=0;
-$anzahl_eingefuegt=0;
-$anzahl_update=0;
-$anzahl_fehler=0;
-$ausgabe='';
-$error_log_fas='';
-$update=false;
-$bismeldedatum=date("Y-m-d",  mktime(0, 0, 0, 9, 1, date("Y")));
-$bismeldedatumvorjahr=date("Y-m-d",  mktime(0, 0, 0, 9, 1, date("Y")-1));
+$anzahl_quelle = 0;
+$anzahl_eingefuegt = 0;
+$anzahl_update = 0;
+$anzahl_fehler = 0;
+$ausgabe = '';
+$error_log_fas = '';
+$update = false;
+$bismeldedatum_start = date("Y-m-d",  mktime(0, 0, 0, 1, 1, date("Y")-1));
+$bismeldedatum_ende = date("Y-m-d",  mktime(0, 0, 0, 12, 31, date("Y")-1));
 
 $ba1_arr = array();
 $qry = "SELECT * FROM bis.tbl_beschaeftigungsart1";
@@ -141,14 +141,14 @@ if($resultall = $db->db_query($qryall))
 				AND mitarbeiter_uid=".$db->db_add_param($rowall->uid)."
 			ORDER BY beginn";
 
-		if($result = $db->db_query($qry))
+		if ($result = $db->db_query($qry))
 		{
-			$num_rows=$db->db_num_rows($result);
-			if($num_rows>1)
+			$num_rows = $db->db_num_rows($result);
+			if ($num_rows > 1)
 			{
-				while($row=$db->db_fetch_object($result))
+				while ($row = $db->db_fetch_object($result))
 				{
-					if($i==0)
+					if ($i == 0)
 					{
 						echo "
 							<br>
@@ -165,7 +165,7 @@ if($resultall = $db->db_query($qryall))
 						$row->beginn." - ".$row->ende."<br>";
 				}
 			}
-			elseif($num_rows==0)
+			elseif ($num_rows == 0)
 				echo "<br><u>Aktive(r) Mitarbeiter(in): <b>".$rowall->nachname." ".$rowall->vorname."</b>
 				 hat ".$num_rows." aktuelle Verwendungen:</u><br>";
 		}
@@ -188,14 +188,14 @@ $qryall = '
 			)
 		GROUP BY uid, nachname, vorname
 		ORDER by nachname, vorname;';
-if($resultall = $db->db_query($qryall))
+if ($resultall = $db->db_query($qryall))
 {
-	$num_rows_all=$db->db_num_rows($resultall);
+	$num_rows_all = $db->db_num_rows($resultall);
 	echo "<br><br><H2>Bei $num_rows_all aktiven Fixangestellten Mitarbeitern sind keine aktuellen Verwendungen eingetragen</H2>";
-	while($rowall=$db->db_fetch_object($resultall))
+	while ($rowall = $db->db_fetch_object($resultall))
 	{
-		$i=0;
-		$qry="
+		$i = 0;
+		$qry = "
 			SELECT
 				*
 			FROM
@@ -207,12 +207,12 @@ if($resultall = $db->db_query($qryall))
 				AND mitarbeiter_uid=".$db->db_add_param($rowall->uid)."
 			ORDER by beginn";
 
-		if($result = $db->db_query($qry))
+		if ($result = $db->db_query($qry))
 		{
 			$num_rows=$db->db_num_rows($result);
-			while($row=$db->db_fetch_object($result))
+			while ($row=$db->db_fetch_object($result))
 			{
-				if($i==0)
+				if ($i == 0)
 				{
 					echo "<br>
 							<u>
@@ -233,7 +233,7 @@ if($resultall = $db->db_query($qryall))
 }
 
 //3 - nicht aktive mitarbeiter mitarbeiter mit aktueller verwendung
-$qryall='
+$qryall = '
 	SELECT
 		uid, nachname, vorname
 	FROM
@@ -246,14 +246,14 @@ $qryall='
 	GROUP BY uid, nachname, vorname
 	ORDER by nachname, vorname;';
 
-if($resultall = $db->db_query($qryall))
+if ($resultall = $db->db_query($qryall))
 {
 	$num_rows_all=$db->db_num_rows($resultall);
 	echo "<br><br><H2>Bei $num_rows_all nicht aktiven Mitarbeitern sind die aktuellen Verwendungen nicht plausibel (inaktiv aber aktuelle Verwendung)</H2>";
-	while($rowall=$db->db_fetch_object($resultall))
+	while ($rowall = $db->db_fetch_object($resultall))
 	{
-		$i=0;
-		$qry="
+		$i = 0;
+		$qry = "
 			SELECT
 				*
 			FROM
@@ -263,12 +263,12 @@ if($resultall = $db->db_query($qryall))
 				AND mitarbeiter_uid=".$db->db_add_param($rowall->uid)."
 			ORDER BY beginn";
 
-		if($result = $db->db_query($qry))
+		if ($result = $db->db_query($qry))
 		{
-			$num_rows=$db->db_num_rows($result);
-			while($row=$db->db_fetch_object($result))
+			$num_rows = $db->db_num_rows($result);
+			while ($row = $db->db_fetch_object($result))
 			{
-				if($i==0)
+				if ($i == 0)
 				{
 					echo "<br>
 						<u>
@@ -287,16 +287,17 @@ if($resultall = $db->db_query($qryall))
 		}
 	}
 }
-//4 - wenn hauptberuf=j dann sollte verwendung=1,5,6 sein - check
-$qryall="
+//4 - wenn hauptberufcode gesetzt ist, muss die Verwendung 1 sein
+$qryall = "
 	SELECT
 		uid, nachname, vorname
 	FROM
 		campus.vw_mitarbeiter
 		JOIN bis.tbl_bisverwendung ON (uid=mitarbeiter_uid)
 	WHERE
-		verwendung_code NOT IN ('1','5','6')
+		verwendung_code NOT IN ('1')
 		AND hauptberuflich=true
+		AND (tbl_bisverwendung.ende>".$db->db_add_param($bismeldedatum_start)." or tbl_bisverwendung.ende is null)
 	GROUP BY uid, nachname, vorname
 	ORDER by nachname, vorname, uid;";
 
@@ -304,8 +305,7 @@ if($resultall = $db->db_query($qryall))
 {
 	$num_rows_all=$db->db_num_rows($resultall);
 	echo "<br><br><H2>Bei $num_rows_all Mitarbeitern sind die Eintragungen 'hauptberuflich' nicht plausibel</H2>";
- 	echo "hauptberuflich=ja, aber Verwendung nicht ".
-	$verwendung_arr[1].", ".$verwendung_arr[5]." oder ".$verwendung_arr[6];
+ 	echo "hauptberuflich=ja, aber Verwendung nicht ".$verwendung_arr[1];
 
 	while($rowall=$db->db_fetch_object($resultall))
 	{
@@ -316,9 +316,10 @@ if($resultall = $db->db_query($qryall))
 			FROM
 				bis.tbl_bisverwendung
 			WHERE
-				verwendung_code NOT IN ('1','5','6')
+				verwendung_code NOT IN ('1')
 				AND hauptberuflich=true
 				AND mitarbeiter_uid=".$db->db_add_param($rowall->uid)."
+				AND (tbl_bisverwendung.ende>".$db->db_add_param($bismeldedatum_start)." or tbl_bisverwendung.ende is null)
 			ORDER BY beginn";
 
 		if($result = $db->db_query($qry))
@@ -342,6 +343,7 @@ if($resultall = $db->db_query($qryall))
 	}
 }
 //5 - stimmt beschausmasscode mit vertragsstunden überein?
+/* Beschaeftigungsausmass nicht mehr relevant
 $qryall="
 	SELECT
 		uid, nachname, vorname
@@ -403,6 +405,7 @@ if($resultall = $db->db_query($qryall))
 		}
 	}
 }
+*/
 //6 - aktive, freie lektoren auf verwendung 1 oder 2 prüfen
 $qryall="
 	SELECT

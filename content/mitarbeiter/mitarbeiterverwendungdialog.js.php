@@ -87,12 +87,12 @@ function MitarbeiterVerwendungInit(mitarbeiter_uid, bisverwendung_id)
 		var predicateNS = "http://www.technikum-wien.at/mitarbeiter/rdf";
 
 		fixangestellt = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#fixangestellt" ));
-	
+
 		//neuer Datensatz wird angelegt
 		MitarbeiterVerwendungDetailNeu='true';
 
 		//Defaultwerte
-		ba1code=3; //fixer Dienstvertrag
+		ba1code=103; //fixer Dienstvertrag
 		ba2code=1; //unbefristet
 		beschausmasscode=1; //Vollzeit
 		verwendung_code=1; //Lehr- und Forschungspersonal
