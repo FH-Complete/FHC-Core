@@ -37,6 +37,7 @@ require_once('../../../include/datum.class.php');
 require_once('../../../include/lvangebot.class.php');
 require_once('../../../include/addon.class.php');
 require_once('../../../include/benutzerberechtigung.class.php');
+require_once('../../../include/vertrag.class.php');
 
 	if (!$db = new basis_db())
       die('Fehler beim Oeffnen der Datenbankverbindung');
@@ -211,6 +212,18 @@ require_once('../../../include/benutzerberechtigung.class.php');
 		for ($i=0; $i<$num_rows; $i++)
 		{
 			$row=$db->db_fetch_object($result);
+
+			// Nur erteilte Vertraege anzeigen wenn dies im Config hinterlegt ist.
+			if (defined('CIS_LV_LEKTORINNENZUTEILUNG_VERTRAGSPRUEFUNG_VON')
+			 && CIS_LV_LEKTORINNENZUTEILUNG_VERTRAGSPRUEFUNG_VON != '')
+			{
+				$vertrag = new vertrag();
+				if (!$vertrag->isVertragErteiltLV($row->lehrveranstaltung_id, $stdsem, $user))
+				{
+					continue;
+				}
+			}
+
 			$lvangebot = new lvangebot();
 			echo '<tr>';
 			if(!defined('CIS_LVALISTE_NOTENEINGABE_ANZEIGEN') || CIS_LVALISTE_NOTENEINGABE_ANZEIGEN)

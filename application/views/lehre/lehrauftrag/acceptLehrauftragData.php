@@ -170,7 +170,7 @@ FROM
                     /* filter active organisationseinheiten */
                   AND oe.aktiv = TRUE
                     /* filter vertragsstatus to avoid showing before status is bestellt */
-                  AND vvs.vertragsstatus_kurzbz IN (\'bestellt\', \'erteilt\', \'akzeptiert\')
+                  AND vvs.vertragsstatus_kurzbz IN (\'erteilt\', \'akzeptiert\')
         ) tmp_lehrauftraege
 
         UNION
@@ -182,8 +182,8 @@ FROM
             (SELECT
                  uid
              FROM
-			 public.tbl_benutzer JOIN public.tbl_mitarbeiter ma 
-                    ON tbl_benutzer.uid = ma.mitarbeiter_uid 
+			 public.tbl_benutzer JOIN public.tbl_mitarbeiter ma
+                    ON tbl_benutzer.uid = ma.mitarbeiter_uid
              WHERE
                  person_id = tmp_projektbetreuung.person_id
                ORDER BY aktiv DESC, updateaktivam DESC      -- accept inactive as some person_ids have no active, but order them last
@@ -285,8 +285,8 @@ FROM
                   AND lv.aktiv = TRUE
                     /* filter active organisationseinheiten */
                   AND oe.aktiv = TRUE
-                    /* filter vertragsstatus to avoid showing before status is bestellt */
-                  AND vvs.vertragsstatus_kurzbz IN (\'bestellt\', \'erteilt\', \'akzeptiert\')
+                    /* filter vertragsstatus to avoid showing before status is erteilt */
+                  AND vvs.vertragsstatus_kurzbz IN (\'erteilt\', \'akzeptiert\')
             ) tmp_projektbetreuung
     ) auftraege
 ORDER BY "akzeptiert" NULLS FIRST, "erteilt" NULLS LAST, "bestellt"

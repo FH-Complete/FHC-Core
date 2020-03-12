@@ -69,13 +69,11 @@ $this->load->view(
 						<table class="table table-bordered">
 							<tr class="text-center">
 								<td class="col-xs-1"><i class='fa fa-users'></i></td>
-								<td class="col-xs-1"><img src="../../../public/images/icons/fa-user-tag.png" style="height: 30px; width: 30px;"></td>
 								<td class="col-xs-1"><img src="../../../public/images/icons/fa-user-check.png" style="height: 30px; width: 30px;"></td>
 								<td class="col-xs-1"><i class='fa fa-handshake-o'></i></td>
 							</tr>
 							<tr class="text-center">
 								<td><b>Alle</b><br>Alle Lehraufträge mit jedem Status</td>
-								<td><b>Bestellt</b><br>Nur bestellte UND bestellte Lehraufträge, die in Bearbeitung sind</td>
 								<td><b>Erteilt</b><br>Nur erteilte UND geänderte Lehraufträge, die in Bearbeitung sind</td>
 								<td><b>Angenommen</b><br>Nur von Ihnen angenommene Lehraufträge</td>
 							</tr>
@@ -148,9 +146,6 @@ $this->load->view(
                         <button id="show-all" class="btn btn-default btn-lehrauftrag active focus" type="button"
 								data-toggle="tooltip" data-placement="left" title="Alle anzeigen"><i class='fa fa-users'></i>
 						</button>
-                        <button id="show-ordered" class="btn btn-default btn-lehrauftrag" type="button"
-								data-toggle="tooltip" data-placement="left" title="Nur bestellte anzeigen">
-						</button><!-- png img set in javascript -->
                         <button id="show-approved" class="btn btn-default btn-lehrauftrag" type="button"
 								data-toggle="tooltip" data-placement="left" title="Nur erteilte anzeigen">
 						</button><!-- png img set in javascript -->
@@ -196,7 +191,7 @@ $this->load->view(
 				</div>
 				<br>
 			</div>
-		</div>		
+		</div>
     </div><!-- end container -->
 </div><!-- end page-wrapper -->
 <br>

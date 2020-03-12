@@ -294,11 +294,12 @@ function footer_downloadCSV(){
  */
 function footer_selectAll(){
 	$('#tableWidgetTabulator').tabulator('getRows', true)
-		.filter(row =>  row.getData().bestellt != null &&   // bestellt
+		.filter(function(row){ return row.getData().bestellt != null &&   // bestellt
 			row.getData().erteilt != null &&            // AND erteilt
 			row.getData().akzeptiert == null &&         // AND NOT akzeptiert
-			row.getData().status != 'Geändert')         // AND NOT geändert
-		.forEach((row => row.select()));
+			row.getData().status != 'Geändert'
+		;})         // AND NOT geändert
+		.forEach((function(row){ return row.select();}));
 }
 
 /*
@@ -464,6 +465,17 @@ storniert_tooltip = function(cell){
 }
 
 $(function() {
+
+	// Pruefen ob Promise unterstuetzt wird
+	// Tabulator funktioniert nicht mit IE
+	var canPromise = !! window.Promise;
+	if(!canPromise)
+	{
+		alert("Diese Seite kann mit ihrem Browser nicht angezeigt werden. Bitte verwenden Sie Firefox, Chrome oder Edge um die Seite anzuzeigen");
+		window.location.href='about:blank';
+		return;
+	}
+
 	// Show all rows
 	$("#show-all").click(function(){
 		$('#tableWidgetTabulator').tabulator('clearFilter');
@@ -582,7 +594,7 @@ $(function() {
 						// Print error message
 						FHC_DialogLib.alertWarning(data.retval);
 					}
-					
+
 					if (!data.error && data.retval != null)
 					{
 						// Update status 'Erteilt'

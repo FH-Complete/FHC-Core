@@ -24,11 +24,13 @@
  */
 require_once(dirname(__FILE__).'/menu_addon.class.php');
 require_once(dirname(__FILE__).'/../../config/cis.config.inc.php');
+require_once(dirname(__FILE__).'/../../config/global.config.inc.php');
 require_once(dirname(__FILE__).'/../../include/functions.inc.php');
 require_once(dirname(__FILE__).'/../../include/phrasen.class.php');
 require_once(dirname(__FILE__).'/../../include/studiensemester.class.php');
 require_once(dirname(__FILE__).'/../../include/studiengang.class.php');
 require_once(dirname(__FILE__).'/../../include/lehrveranstaltung.class.php');
+require_once(dirname(__FILE__).'/../../include/vertrag.class.php');
 
 class menu_addon_meinelv extends menu_addon
 {
@@ -186,6 +188,17 @@ class menu_addon_meinelv extends menu_addon
 							{
 								$lv_obj = new lehrveranstaltung();
 								$lv_obj->load($row->lehrveranstaltung_id);
+
+								// Nur erteilte Vertraege anzeigen wenn dies im Config hinterlegt ist.
+								if (defined('CIS_LV_LEKTORINNENZUTEILUNG_VERTRAGSPRUEFUNG_VON')
+								 && CIS_LV_LEKTORINNENZUTEILUNG_VERTRAGSPRUEFUNG_VON != '')
+								{
+									$vertrag = new vertrag();
+									if (!$vertrag->isVertragErteiltLV($lv_obj->lehrveranstaltung_id, $stsem, $user))
+									{
+										continue;
+									}
+								}
 
 								if($row->studiengang_kz==0 AND $row->semester==0)
 								{
