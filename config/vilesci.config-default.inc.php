@@ -208,4 +208,43 @@ define('DVB_PASSWORD','passwort');
 
 define('CI_ENVIRONMENT', 'development'); // Code igniter environment variable
 
+// BIS Personalmeldung
+
+// Studiengaenge, die nicht gemeldet werden
+define('BIS_EXCLUDE_STG', array());
+
+// Basis Vollzeit Arbeitsstunden für Berechnung von Jahresvollzeitaequivalenz JVZAE (echte Dienstverträge)
+define('BIS_VOLLZEIT_ARBEITSSTUNDEN', '0');
+
+// Basis Vollzeit Semesterwochenstunden für Berechnung von Jahresvollzeitaequivalenz JVZAE auf Stundenbasis (freie Dienstverträge)
+define('BIS_VOLLZEIT_SWS_EINZELSTUNDENBASIS', '0');
+
+// Basis Vollzeit Semesterwochenstunden für Berechnung von Jahresvollzeitaequivalenz JVZAE für inkludierte Lehre bei echten Dienstverträgen
+define('BIS_VOLLZEIT_SWS_INKLUDIERTE_LEHRE', '0');
+
+// Semester Gewichtung für Berechnung von Jahresvollzeitaequivalenz JVZAE
+define('BIS_HALBJAHRES_GEWICHTUNG_SWS', 0.5);
+
+// Jahrespauschale fuer studentische Hilfskraefte (in Stunden)
+define('BIS_PAUSCHALE_STUDENTISCHE_HILFSKRAFT', 0);
+
+// Jahrespauschale fuer sonstige Dienstverhaeltnisse, zb Werkvertrag (in Stunden)
+define('BIS_PAUSCHALE_SONSTIGES_DIENSTVERHAELTNIS', 0);
+
+define('BIS_FUNKTIONSCODE_1234_ARR', array(
+	'vertrBefugter' => 1,		// Vertretungsbefugte/r des Erhalters (GF, Prokura)
+	'kollegium_Ltg' => 2,		// Leiter/in des Kollegiums
+	'kollegium_Ltg' => 2,		// Leiter/in des Kollegiums
+	'kollegium_stvLtg' => 3,	// stellv. Leiter/In des Kollegiums
+	'kollegium' => 4			// Mitglied des Kollegiums
+));
+
+define('BIS_FUNKTIONSCODE_5_ARR', array(
+	'Leitung'
+));
+
+define('BIS_FUNKTIONSCODE_6_ARR', array(
+	'Team'
+));
+
 ?>
