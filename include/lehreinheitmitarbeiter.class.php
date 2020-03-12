@@ -531,6 +531,74 @@ class lehreinheitmitarbeiter extends basis_db
 	}
 
 	/**
+	 * Ladet Semesterwochenstunden-Summe gruppiert nach Studiengang und Studiensemester.
+	 * Es werden die Studiensemester herangezogen, die im Zeitraum zwischen beginn und ende beginnen.
+	 * @param String $uid
+	 * @param String $beginn
+	 * @param String $ende
+	 * @return bool
+	 */
+	public function get_SWS_groupByStg($uid, $beginn, $ende)
+	{
+		$beginn = new DateTime($beginn);
+		$ende = new DateTime($ende);
+
+		$qry = '
+			WITH semester_sws_tbl AS (
+				SELECT DISTINCT lehreinheit_id, studiensemester_kurzbz, lema.semesterstunden, stg.studiengang_kz
+				FROM lehre.tbl_lehreinheitmitarbeiter lema
+					JOIN lehre.tbl_lehreinheit USING (lehreinheit_id)
+					JOIN lehre.tbl_lehrveranstaltung lv USING (lehrveranstaltung_id)
+					JOIN lehre.tbl_studienplan_lehrveranstaltung USING (lehrveranstaltung_id)
+					JOIN lehre.tbl_studienplan USING (studienplan_id)
+					JOIN lehre.tbl_studienordnung sto USING (studienordnung_id)
+					JOIN public.tbl_studiengang stg ON stg.studiengang_kz = sto.studiengang_kz
+					JOIN public.tbl_studiensemester ss USING (studiensemester_kurzbz)
+				WHERE mitarbeiter_uid =  '. $this->db_add_param($uid). '
+					 AND (
+					 	ss.start BETWEEN 
+					 	'. $this->db_add_param($beginn->format('Y-m-d')). ' AND 
+					 	'. $this->db_add_param($ende->format('Y-m-d')). ')
+				-- nur lehre, die bisgemeldet wird
+					AND lema.bismelden
+				-- keine lehreinheiten ohne semesterstunden
+				AND lema.semesterstunden != 0
+			)
+
+			SELECT
+				studiengang_kz,
+				studiensemester_kurzbz,
+				sum(semesterstunden)				AS summe,
+				round(sum(semesterstunden) / 15, 2)	AS sws
+			FROM
+				semester_sws_tbl
+			GROUP BY
+				studiengang_kz,
+				studiensemester_kurzbz
+			ORDER BY
+				studiengang_kz;
+		';
+
+		if ($this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object())
+			{
+				$obj = new StdClass();
+				$obj->studiengang_kz = $row->studiengang_kz;
+				$obj->studiensemester_kurzbz = $row->studiensemester_kurzbz;
+				$obj->sws = $row->sws;
+				$this->result []= $obj;
+			}
+			return true;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler bei der Datenbankabfrage';
+			return false;
+		}
+	}
+
+	/**
 	 * Laedt die Lektoren einer Lehrveranstaltung in einem Studiensemester
 	 * @param lehrveranstaltung_id
 	 * @param studiensemester_kurzbz
