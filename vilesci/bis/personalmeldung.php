@@ -54,6 +54,11 @@ if (!defined('BIS_PAUSCHALE_STUDENTISCHE_HILFSKRAFT') || empty('BIS_PAUSCHALE_ST
 	die('config var BIS_PAUSCHALE_STUDENTISCHE_HILFSKRAFT fehlt');
 }
 
+if (!defined('BIS_PAUSCHALE_SONSTIGES_DIENSTVERHAELTNIS') || empty('BIS_PAUSCHALE_SONSTIGES_DIENSTVERHAELTNIS'))
+{
+	die('config var BIS_PAUSCHALE_SONSTIGES_DIENSTVERHAELTNIS fehlt');
+}
+
 if (!defined('BIS_FUNKTIONSCODE_1234_ARR') || empty('BIS_FUNKTIONSCODE_1234_ARR'))
 {
 	die('config var BIS_FUNKTIONSCODE_1234_ARR fehlt');
@@ -258,7 +263,6 @@ foreach ($mitarbeiter_arr as $mitarbeiter)
 					}
 				}
 			}
-			// TODO: Interner Check: if ($bisverwendung->jvzae_anteilig < 0) -> Anteil für 'Nicht-Lehre'-Teil muss gegeben sein.
 		}
 
 		// Sonstige Beschaeftigungsverhaeltnisse ohne Vertragsstunden
@@ -304,11 +308,17 @@ foreach ($mitarbeiter_arr as $mitarbeiter)
 				$bisverwendung->beschaeftigungsausmass_relativ = round($pauschale_hilfskraft_relativImJahr / $vollzeit_arbeitsstunden_imJahr, 4);
 				$bisverwendung->jvzae_anteilig =round($pauschale_hilfskraft_relativImJahr / $vollzeit_arbeitsstunden_imJahr, 4);
 			}
-			// Mitarbeiter ohne Vertragsstunden und keine SWS
+			// Mitarbeiter mit sonstigem Dienstverhaeltnis (zB. Werkvertrag)
 			// ---------------------------------------------------------------------------------------------------------
 			else
 			{
-				// TODO: Plausicheck
+				$pauschale_sonstigeDV_inStunden = BIS_PAUSCHALE_SONSTIGES_DIENSTVERHAELTNIS; // Pauschale pro Jahr und Person (in Stunden)
+				$pauschale_sonstigeDV_relativImJahr = $pauschale_sonstigeDV_inStunden / 1; // Stundenpauschale in Verhaeltnis zu 1 Jahr
+				$vollzeit_arbeitsstunden_imJahr = BIS_VOLLZEIT_ARBEITSSTUNDEN * $wochen_imJahr;
+
+				// Relatives Beschaeftigungsausmass / Anteilige JVZAE ermitteln
+				$bisverwendung->beschaeftigungsausmass_relativ = round($pauschale_sonstigeDV_relativImJahr / $vollzeit_arbeitsstunden_imJahr, 4);
+				$bisverwendung->jvzae_anteilig =round($pauschale_sonstigeDV_relativImJahr / $vollzeit_arbeitsstunden_imJahr, 4);
 			}
 		}
 	}
