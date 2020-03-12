@@ -310,7 +310,15 @@ foreach ($mitarbeiter_arr as $mitarbeiter)
 $xml = '';
 $xml = _generateXML($person_arr);
 
-echo '<pre>', print_r($xml, 1), '</pre>';
+$xml_datei = 'bisdaten/bismeldung_mitarbeiter.xml';
+$dateiausgabe = fopen($xml_datei,'w');
+fwrite($dateiausgabe, $xml);
+fclose($dateiausgabe);
+
+echo '<a href="bisdaten/bismeldung_mitarbeiter.xml">Herunterladen</a>';
+
+//header("Content-Type: text/xml");
+//echo $xml;
 
 
 
