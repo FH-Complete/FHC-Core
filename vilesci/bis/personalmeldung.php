@@ -456,6 +456,16 @@ foreach ($mitarbeiter_arr as $mitarbeiter)
 	$person_arr []= $person_obj;
 }
 
+// *********************************************************************************************************************
+// XML generieren
+// *********************************************************************************************************************
+$xml = '';
+$xml = _generateXML($person_arr);
+
+echo '<pre>', print_r($xml, 1), '</pre>';
+
+
+
 // ---------------------------------------------------------------------------------------------------------------------
 // Private Functions
 // ---------------------------------------------------------------------------------------------------------------------
@@ -763,6 +773,76 @@ function _getLehrecontainer($sws_proStg_arr)
 
 
 	return $lehre_arr;
+}
+
+function _generateXML($person_arr)
+{
+	$xml = '';
+	$xml .= '<?xml version="1.0" encoding="UTF-8"?>';
+
+	$xml .= '<PersonalMeldung>';
+
+	foreach ($person_arr as $person)
+	{
+		$xml .= '<Person>';
+
+		$xml .= '<PersonalNummer><![CDATA['. $person->personalnummer. ']]></PersonalNummer>';
+		$xml .= '<Geschlecht><![CDATA['. $person->geschlecht. ']]></Geschlecht>';
+		$xml .= '<GeschlechtX><![CDATA['. $person->geschlechtX. ']]></GeschlechtX>';
+		$xml .= '<Geburtsjahr><![CDATA['. $person->geburtsjahr. ']]></Geburtsjahr>';
+		$xml .= '<Staatsangehoerigkeit><![CDATA['. $person->staatsangehoerigkeit. ']]></Staatsangehoerigkeit>';
+		$xml .= '<HoechsteAbgeschlosseneAusbildung><![CDATA['. $person->hoechste_abgeschlossene_ausbildung. ']]></HoechsteAbgeschlosseneAusbildung>';
+		$xml .= '<Habilitation><![CDATA['. $person->habilitation. ']]></Habilitation>';
+		$xml .= '<HauptberufCode><![CDATA['. $person->hauptberufcode. ']]></HauptberufCode>';
+
+		foreach ($person->verwendung_arr as $verwendung)
+		{
+			$xml .= '<Verwendung>';
+			$xml .= '<Verwendungscode><![CDATA['. $verwendung->verwendung_code. ']]></Verwendungscode>';
+			$xml .= '<BeschaeftigungsArt1><![CDATA['. $verwendung->ba1code. ']]></BeschaeftigungsArt1>';
+			$xml .= '<BeschaeftigungsArt2><![CDATA['. $verwendung->ba2code. ']]></BeschaeftigungsArt2>';
+			$xml .= '<BeschaeftigungsAusmassVZAE><![CDATA['. $verwendung->vzae. ']]></BeschaeftigungsAusmassVZAE>';
+			$xml .= '<BeschaeftigungsAusmassJVZAE><![CDATA['. $verwendung->jvzae. ']]></BeschaeftigungsAusmassJVZAE>';
+			$xml .= '</Verwendung>';
+		}
+
+		foreach ($person->funktion_arr as $funktion)
+		{
+			$xml .= '<Funktion>';
+			$xml .= '<FunktionsCode><![CDATA['. $funktion->funktionscode. ']]></FunktionsCode>';
+			$xml .= '<BesondereQualifikationsCode><![CDATA['. $funktion->besondereQualifikationCode. ']]></BesondereQualifikationsCode>';
+			$xml .= '<Studiengang>';
+			if (is_array($funktion->studiengang))
+			{
+				foreach ($funktion->studiengang as $studiengang)
+				{
+					$xml .= '<StgKz><![CDATA['. $studiengang. ']]></StgKz>';
+				}
+			}
+			else if (!is_null($funktion->studiengang))
+			{
+				$xml .= '<StgKz><![CDATA['. $funktion->studiengang. ']]></StgKz>';
+
+			}
+			$xml .= '</Studiengang>';
+			$xml .= '</Funktion>';
+		}
+
+		foreach ($person->lehre_arr as $lehre)
+		{
+			$xml .= '<Lehre>';
+			$xml .= '<StgKz><![CDATA['. $lehre->StgKz. ']]></StgKz>';
+			$xml .= '<SommersemesterSWS><![CDATA['. $lehre->SommersemesterSWS. ']]></SommersemesterSWS>';
+			$xml .= '<WintersemesterSWS><![CDATA['. $lehre->WintersemesterSWS. ']]></WintersemesterSWS>';
+			$xml .= '</Lehre>';
+		}
+
+		$xml .= '</Person>';
+	}
+
+	$xml .= '</PersonalMeldung>';
+
+	return $xml;
 }
 
 
