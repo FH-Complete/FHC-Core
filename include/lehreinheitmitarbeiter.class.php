@@ -497,6 +497,13 @@ class lehreinheitmitarbeiter extends basis_db
 		return $ret;
 	}
 
+	/**
+	 * Ladet Semesterwochenstunden-Summe eines Mitarbeiters eines Semesters.
+	 * Nur bisrelevante SWS.
+	 * @param String $uid
+	 * @param String $studiensemester
+	 * @return bool
+	 */
 	public function getLehreinheiten_SWS_BISMeldung($uid, $studiensemester)
 	{
 		$qry = '
@@ -504,7 +511,7 @@ class lehreinheitmitarbeiter extends basis_db
 				round(sum(semesterstunden) / 15) AS sws
 			FROM (
 					 SELECT DISTINCT lehreinheit_id, studiensemester_kurzbz, mitarbeiter_uid, semesterstunden
-					 FROM lehre.tbl_lehreinheitmitarbeiter
+					 FROM lehre.tbl_lehreinheitmitarbeiter lema
 						  JOIN public.tbl_mitarbeiter ma USING (mitarbeiter_uid)
 						  JOIN public.tbl_benutzer ON (mitarbeiter_uid = uid)
 						  JOIN public.tbl_person USING (person_id)
@@ -512,7 +519,7 @@ class lehreinheitmitarbeiter extends basis_db
 						  JOIN lehre.tbl_lehreinheit USING (lehreinheit_id)
 						  JOIN public.tbl_studiensemester ss USING (studiensemester_kurzbz)
 					 WHERE mitarbeiter_uid = '. $this->db_add_param($uid).'
-					   AND ma.bismelden
+					   AND lema.bismelden
 					   AND studiensemester_kurzbz = '. $this->db_add_param($studiensemester).'
 				 ) tbl_semesterstunden
 		';
