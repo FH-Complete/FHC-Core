@@ -26,6 +26,9 @@ class JobsQueueManager extends Auth_Controller
 			)
 		);
 
+		// Loading config file jqm
+		$this->config->load('jqm');
+
 		// Loads JobsQueueLib
 		$this->load->library('JobsQueueLib');
 		// Loads permission lib

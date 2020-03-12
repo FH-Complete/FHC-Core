@@ -38,6 +38,7 @@ class JobsQueueLib
 		$this->_ci->load->model('system/JobsQueue_model', 'JobsQueueModel');
 		$this->_ci->load->model('system/JobTypes_model', 'JobTypesModel');
 		$this->_ci->load->model('system/JobStatuses_model', 'JobStatusesModel');
+		$this->_ci->load->model('system/JobTriggers_model', 'JobTriggersModel');
 	}
 
 	//------------------------------------------------------------------------------------------------------------------
@@ -92,17 +93,21 @@ class JobsQueueLib
 				$job->{self::PROPERTY_TYPE} = $type; // What you asked is what you get!
 
 				// Try to insert the single job into database
-				$dbResult = $this->_ci->JobsQueueModel->insert($job);
+				$dbNewJobResult = $this->_ci->JobsQueueModel->insert($job);
 
 				// If an error occurred during while inserting in database
-				if (isError($dbResult))
+				if (isError($dbNewJobResult))
 				{
-					$job->{self::PROPERTY_ERROR} = getError($dbResult); // retrieve the cause and store it in job object
+					$job->{self::PROPERTY_ERROR} = getError($dbNewJobResult); // retrieve the cause and store it in job object
 					$errorOccurred = true; // set error occurred flag
 				}
 				else // otherwise
 				{
-					$job->{self::PROPERTY_JOBID} = getData($dbResult); // get the jobid and store it in job object
+					$job->{self::PROPERTY_JOBID} = getData($dbNewJobResult); // get the jobid and store it in job object
+
+					$dbNewTriggeredJobResult = $this->_addNewTriggeredJobToQueue($type, $job, array(self::STATUS_NEW));
+					// If an error occurred during while inserting in database
+					if (isError($dbNewTriggeredJobResult)) return $dbNewTriggeredJobResult;
 				}
 			}
 			else // otherwise
@@ -137,6 +142,8 @@ class JobsQueueLib
 		// Loops through all the provided jobs
 		foreach ($results as $job)
 		{
+			// TODO: find if present in database or not!!!
+
 			// If the structure of the job object is valid
 			if ($this->_checkUpdateJobStructure($job) && $this->_checkJobStatus($job, $statuses))
 			{
@@ -152,6 +159,16 @@ class JobsQueueLib
 				{
 					$job->{self::PROPERTY_ERROR} = getError($dbResult); // retrieve the cause and store it in job object
 					$errorOccurred = true; // set error occurred flag
+				}
+				else // otherwise
+				{
+					$dbNewTriggeredJobResult = $this->_addNewTriggeredJobToQueue(
+						$type,
+						$job,
+						array($job->status)
+					);
+					// If an error occurred during while inserting in database
+					if (isError($dbNewTriggeredJobResult)) return $dbNewTriggeredJobResult;
 				}
 			}
 			else // otherwise
@@ -276,5 +293,44 @@ class JobsQueueLib
 	{
 		unset($job->{self::PROPERTY_CREATIONTIME});
 		unset($job->{self::PROPERTY_TYPE});
+	}
+
+	/**
+	 * Add e new triggered job to the jobs queue
+	 * NOTE:
+	 * - In this method there are less checks compared to addNewJobsToQueue method because
+	 * the new jobs that will be added are generate in this method
+	 * - Job ids in this case are not returned, therefore the caller is not going to be informed about these new jobs
+	 */
+	private function _addNewTriggeredJobToQueue($type, $job, $triggeredStatuses)
+	{
+		// Get all the job trigggers for the given type and for the given statuses
+		$dbTriggersResult = $this->_ci->JobTriggersModel->getJobtriggersByTypeStatuses($type, $triggeredStatuses);
+
+		// If an error occurred while getting job triggers from database then return it
+		if (isError($dbTriggersResult)) return $dbTriggersResult;
+		if (hasData($dbTriggersResult)) // If triggers were retrieved
+		{
+			// The output of the trigging job is the input of the trigged job
+			$triggeredJobInput = null;
+			if (isset($job->{self::PROPERTY_OUTPUT})) $triggeredJobInput = $job->{self::PROPERTY_OUTPUT};
+
+			// For each trigger
+			foreach (getData($dbTriggersResult) as $trigger)
+			{
+				$triggeredJob = array(
+					self::PROPERTY_TYPE => $trigger->following_type, // the new type is the one defined in tbl_jobtriggers
+					self::PROPERTY_STATUS => self::STATUS_NEW, // new job status is new
+					self::PROPERTY_INPUT => $triggeredJobInput // new job input
+				);
+
+				// Try to insert the single job into database
+				$dbNewJob = $this->_ci->JobsQueueModel->insert($triggeredJob);
+				// If an error occurred during while inserting in database
+				if (isError($dbNewJob)) return $dbNewJob;
+			}
+		}
+
+		return success(); // if here then it was a success!
 	}
 }

@@ -3846,7 +3846,7 @@ if ($result = $db->db_query("SELECT 1 FROM pg_class WHERE relname = 'unq_idx_abl
 if (!$result = @$db->db_query('SELECT 1 FROM system.tbl_jobstatuses LIMIT 1'))
 {
 	$qry = 'CREATE TABLE system.tbl_jobstatuses (
-    			status character varying NOT NULL
+    			status character varying(64) NOT NULL
 			);
 
 			COMMENT ON TABLE system.tbl_jobstatuses IS \'All possible job statuses\';
@@ -3854,10 +3854,10 @@ if (!$result = @$db->db_query('SELECT 1 FROM system.tbl_jobstatuses LIMIT 1'))
 
 			ALTER TABLE ONLY system.tbl_jobstatuses ADD CONSTRAINT pk_jobstatuses PRIMARY KEY (status);
 
-			INSERT INTO system.tbl_jobstatuses(status) VALUES('new');
-			INSERT INTO system.tbl_jobstatuses(status) VALUES('running');
-			INSERT INTO system.tbl_jobstatuses(status) VALUES('done');
-			INSERT INTO system.tbl_jobstatuses(status) VALUES('failed');
+			INSERT INTO system.tbl_jobstatuses(status) VALUES(\'new\');
+			INSERT INTO system.tbl_jobstatuses(status) VALUES(\'running\');
+			INSERT INTO system.tbl_jobstatuses(status) VALUES(\'done\');
+			INSERT INTO system.tbl_jobstatuses(status) VALUES(\'failed\');
 		';
 
 	if (!$db->db_query($qry))
@@ -3882,7 +3882,7 @@ if (!$result = @$db->db_query('SELECT 1 FROM system.tbl_jobstatuses LIMIT 1'))
 if (!$result = @$db->db_query('SELECT 1 FROM system.tbl_jobtypes LIMIT 1'))
 {
 	$qry = 'CREATE TABLE system.tbl_jobtypes (
-			    type character varying(256) NOT NULL,
+			    type character varying(128) NOT NULL,
 			    description text NOT NULL
 			);
 
@@ -3916,7 +3916,7 @@ if (!$result = @$db->db_query('SELECT 1 FROM system.tbl_jobsqueue LIMIT 1'))
 {
 	$qry = 'CREATE TABLE system.tbl_jobsqueue (
 			    jobid integer NOT NULL,
-			    type character varying(256) NOT NULL,
+			    type character varying(128) NOT NULL,
 			    creationtime timestamp without time zone DEFAULT now(),
 			    status character varying(64) NOT NULL,
 			    input jsonb,
@@ -3976,6 +3976,47 @@ if (!$result = @$db->db_query('SELECT 1 FROM system.tbl_jobsqueue LIMIT 1'))
 		echo '<strong>system.tbl_jobsqueue: '.$db->db_last_error().'</strong><br>';
 	else
 		echo '<br>Granted privileges to <strong>vilesci</strong> on system.tbl_jobsqueue';
+}
+
+// Creates table system.tbl_jobtriggers if it doesn't exist and grants privileges
+if (!$result = @$db->db_query('SELECT 1 FROM system.tbl_jobtriggers LIMIT 1'))
+{
+	$qry = 'CREATE TABLE system.tbl_jobtriggers (
+			    type character varying(128) NOT NULL,
+			    status character varying(64) NOT NULL,
+			    following_type character varying(128) NOT NULL
+			);
+
+			COMMENT ON TABLE system.tbl_jobtriggers IS \'Table to manage the job triggers\';
+			COMMENT ON COLUMN system.tbl_jobtriggers.type IS \'Job type\';
+			COMMENT ON COLUMN system.tbl_jobtriggers.status IS \'Job status\';
+			COMMENT ON COLUMN system.tbl_jobtriggers.following_type IS \'New job type\';
+
+			ALTER TABLE ONLY system.tbl_jobtriggers ADD CONSTRAINT pk_jobtriggers PRIMARY KEY (type, status, following_type);
+
+			ALTER TABLE ONLY system.tbl_jobtriggers ADD CONSTRAINT fk_jobtriggers_status FOREIGN KEY (status) REFERENCES system.tbl_jobstatuses(status) ON UPDATE CASCADE ON DELETE RESTRICT;
+
+			ALTER TABLE ONLY system.tbl_jobtriggers ADD CONSTRAINT fk_jobtriggers_type FOREIGN KEY (type) REFERENCES system.tbl_jobtypes(type) ON UPDATE CASCADE ON DELETE RESTRICT;
+
+			ALTER TABLE ONLY system.tbl_jobtriggers ADD CONSTRAINT fk_jobtriggers_following_type FOREIGN KEY (following_type) REFERENCES system.tbl_jobtypes(type) ON UPDATE CASCADE ON DELETE RESTRICT;
+		';
+
+	if (!$db->db_query($qry))
+		echo '<strong>system.tbl_jobtriggers: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>system.tbl_jobtriggers table created';
+
+	$qry = 'GRANT SELECT ON TABLE system.tbl_jobtriggers TO web;';
+	if (!$db->db_query($qry))
+		echo '<strong>system.tbl_jobtriggers: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Granted privileges to <strong>web</strong> on system.tbl_jobtriggers';
+
+	$qry = 'GRANT SELECT, UPDATE, INSERT, DELETE ON TABLE system.tbl_jobtriggers TO vilesci;';
+	if (!$db->db_query($qry))
+		echo '<strong>system.tbl_jobtriggers: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Granted privileges to <strong>vilesci</strong> on system.tbl_jobtriggers';
 }
 
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
@@ -4238,6 +4279,7 @@ $tabellen=array(
 	"system.tbl_filters" => array("filter_id","app","dataset_name","filter_kurzbz","person_id","description","sort","default_filter","filter","oe_kurzbz","statistik_kurzbz"),
 	"system.tbl_jobsqueue" => array("jobid", "type", "creationtime", "status", "input", "output", "starttime", "endtime", "insertvon", "insertamum"),
 	"system.tbl_jobstatuses" => array("status"),
+	"system.tbl_jobtriggers" => array("type", "status", "following_type"),
 	"system.tbl_jobtypes" => array("type", "description"),
 	"system.tbl_phrase" => array("phrase_id","app","phrase","insertamum","insertvon","category"),
 	"system.tbl_phrasentext" => array("phrasentext_id","phrase_id","sprache","orgeinheit_kurzbz","orgform_kurzbz","text","description","insertamum","insertvon"),
