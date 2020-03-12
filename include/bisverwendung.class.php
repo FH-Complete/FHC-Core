@@ -639,6 +639,7 @@ class bisverwendung extends basis_db
 					END as ende_imBISMeldungsJahr
 				FROM
 					bis.tbl_bisverwendung
+					JOIN bis.tbl_beschaeftigungsart1 USING (ba1code)
 				WHERE
 					mitarbeiter_uid = '. $this->db_add_param($uid).'
 					AND (beginn <= '. $this->db_add_param($stichtag).' OR beginn is null)
@@ -655,7 +656,7 @@ class bisverwendung extends basis_db
 				$obj->bisverwendung_id = $row->bisverwendung_id;
 				$obj->mitarbeiter_uid = $row->mitarbeiter_uid;
 				$obj->vertragsstunden = $row->vertragsstunden;
-				$obj->ba1code = $row->ba1code;
+				$obj->ba1code = $row->ba1code_bis;
 				$obj->ba2code = $row->ba2code;
 				$obj->verwendung_code = $row->verwendung_code;
 				$obj->beschausmasscode = $row->beschausmasscode;
