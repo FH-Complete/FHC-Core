@@ -44,6 +44,8 @@ class lehreinheitmitarbeiter extends basis_db
 	public $ext_id; 				// bigint
 	public $vertrag_id;
 
+	public $result = array();
+
 	/**
 	 * Konstruktor - Laedt optional einee LEMitarbeiterzuordnung
 	 * @param $lehreinheit_id
