@@ -89,7 +89,7 @@
 										array(
 											'name' => 'variables[]',
 											'id' => 'variables',
-											'size' => 27,
+											'size' => count($variables),
 											'multiple' => true
 										)
 									);
