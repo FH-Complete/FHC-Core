@@ -2017,17 +2017,19 @@ else
 	$(document).ready(function()
 	{
 		$("#rtcheckboxesbtn").click(toggleRtDropdown);
-		$("#rtcheckboxes .rtchkboxlabel").click(
+		$("#rtcheckboxes .rtlabel").click(
 			function(e)
 			{
-				var rt_id = this.id.substr(this.id.indexOf("_") + 1);
-				var rtel = $("#rt_" + rt_id);
-				rtel.prop("checked",!rtel.prop("checked"));					
-				
+				//only toggle if div itself and not child label or input
+				if (e.target.type !== \'checkbox\' && e.target === this)
+				{
+					var rtel = $(this).find("input[type=\'checkbox\']");
+					rtel.prop("checked",!rtel.prop("checked"));
+				}
 				showSelectedRts();				
 			}
 		);
-		$(".rtchkbox input[type=\'checkbox\']").click(
+		$(".rtlabel input[type=\'checkbox\']").change(
 			showSelectedRts	
 		);
 		showSelectedRts();
@@ -2348,7 +2350,6 @@ else
 				
 					if (prestudent_id)
 					{
-					console.log(prestudent_id);
 						var rt_id = $(this).find("td.rt_id").text();
 						selected.push({prestudent_id: prestudent_id, reihungstest_id: rt_id});
 					}
@@ -2565,15 +2566,13 @@ else
 	{
 		var rtsstr = "";
 		var first = true;
-		//var maxeachline = 1;
-		//console.log($("#rtcheckboxes"));
 		$("#rtcheckboxes input:checked").each(
 			function() {
-				var rt_id = $(this).val();
+				var rt_id = this.id;
 				if (!first)
 					rtsstr += "<br />";
 						
-				rtsstr += $("#rtlabel_" + rt_id).text();
+				rtsstr += $("label[for=" + rt_id + "]").text();
 				first = false;
 			}
 		);
@@ -2589,7 +2588,7 @@ else
 	<div class="container-fluid">
 	<h3>Auswertung Reihungstest</h3>
 	<div class="row">
-	<div class="col-md-6">
+	<div class="col-lg-6 col-md-12">
 			<form method="POST">
 			<table><tr><td>
 			<table class="table table-bordered" id="paramstbl">
@@ -2622,62 +2621,19 @@ else
 				}
 			}
 		}
-/*		if ($rt->reihungstest_id == $reihungstest && !$select)
-		{
-			//$selected = 'selected';
-			$select = true;
-		}
-		elseif ($prestudent_id == '' && $reihungstest == '' && $rt->datum == date('Y-m-d') && $datum_von == '' && $datum_bis == '' && $studiengang == '' && $semester == '' && !$select)
-		{
-			//$selected = 'selected';
-			$select = true;
-		}
-		else
-		{
-			$selected = '';
-		}*/
 
-/*		$checkbxstr .=  '<input type="checkbox" name="reihungstest[]" id="rt_' . $rt->reihungstest_id . '" value="' . $rt->reihungstest_id . '"' . $checked . ' />';
-		$checkbxstr .= '<div class="rtchkbox" style="display: inline"> <label for="rt_' . $rt->reihungstest_id . '">' . $rtstr . '</label></div><br />';*/
-		$checkbxstr .=  '<div class="rtchkbox"><input type="checkbox" name="reihungstest[]" id="rt_' . $rt->reihungstest_id . '" value="' . $rt->reihungstest_id . '"' . $checked . ' /></div>';
-		$checkbxstr .= '<div class="rtchkboxlabel" id="rtlabel_' . $rt->reihungstest_id . '">' . '&nbsp;' . $rtstr . '</div>';
-		//echo '<OPTION value="' . $rt->reihungstest_id . '" ' . $selected . '>' . $rt->datum . ' ' . $datum_obj->formatDatum($rt->uhrzeit,'H:i') . ' ' . (isset($stg_arr[$rt->studiengang_kz]) ? $stg_arr[$rt->studiengang_kz] : '') . ' ' . $rt->ort_kurzbz . ' ' . $rt->anmerkung . "</OPTION>\n";
+		$checkbxstr .=  '<div class="input-group rtlabel"><input type="checkbox" name="reihungstest[]" id="rt_' . $rt->reihungstest_id . '" value="' . $rt->reihungstest_id . '"' . $checked . ' />';
+		$checkbxstr .= '<label for="rt_' . $rt->reihungstest_id . '">&nbsp;' . $rtstr . '</label></div>';
 	}
 
-	//var_dump($selectedrtstr);
 	$btntxt = $selectedrtstr === '' ? '-- keine Auswahl --' : $selectedrtstr;
 	echo '<button type="button" id="rtcheckboxesbtn">' . $btntxt . '</button>
 			<div id="rtcheckboxes">';
 	echo $checkbxstr;
 
-					/*echo '<SELECT id="reihungstest" name="reihungstest" style="width: 60%">
-					<OPTION value="" style="display:none">-- keine Auswahl --</OPTION>';
-	$selected = '';
-	$select = false;
-	foreach ($rtest as $rt)
-	{
-		if ($rt->reihungstest_id == $reihungstest && !$select)
-		{
-			$selected = 'selected';
-			$select = true;
-		}
-		elseif ($prestudent_id == '' && $reihungstest == '' && $rt->datum == date('Y-m-d') && $datum_von == '' && $datum_bis == '' && $studiengang == '' && $semester == '' && !$select)
-		{
-			$selected = 'selected';
-			$select = true;
-		}
-		else
-		{
-			$selected = '';
-		}
-
-		echo '<OPTION value="' . $rt->reihungstest_id . '" ' . $selected . '>' . $rt->datum . ' ' . $datum_obj->formatDatum($rt->uhrzeit,'H:i') . ' ' . (isset($stg_arr[$rt->studiengang_kz]) ? $stg_arr[$rt->studiengang_kz] : '') . ' ' . $rt->ort_kurzbz . ' ' . $rt->anmerkung . "</OPTION>\n";
-	}
-
-	echo '</SELECT>';*/
 	echo '</div></td></tr>
 			<tr><td>
-				Studiengang:
+				<label>Studiengang:
 					<SELECT name="studiengang">
 						<OPTION value="">Alle</OPTION>';
 	foreach ($stg_arr as $kz => $kurzbz)
@@ -2693,8 +2649,8 @@ else
 
 		echo '<OPTION value="' . $kz . '" ' . $selected . '>' . $kurzbz . '</OPTION>';
 	}
-	echo '</SELECT>
-				Semester:
+	echo '</SELECT></label>
+				<label>Semester:
 					<SELECT name="semester">
 						<OPTION value="">Alle</OPTION>';
 	for ($i = 1; $i < 9; $i++)
@@ -2708,8 +2664,8 @@ else
 			echo "<option value=\"$i\">$i</option>";
 		}
 	}
-	echo '</SELECT>
-				OrgForm:
+	echo '</SELECT></label>
+				<label>OrgForm:
 					<SELECT name="orgform_kurzbz">
 						<OPTION value="">Alle</OPTION>';
 	foreach ($orgformen_arr as $kurzbz => $bezeichnung)
@@ -2725,10 +2681,10 @@ else
 
 		echo '<OPTION value="' . $kurzbz . '" ' . $selected . '>' . $kurzbz . '</OPTION>';
 	}
-	echo '</SELECT>';
+	echo '</SELECT></label>';
 
-	echo '&nbsp;von Datum: <INPUT class="datepicker_datum" type="text" name="datum_von" maxlength="10" size="10" value="' . $datum_obj->formatDatum($datum_von, 'd.m.Y') . '" />&nbsp;';
-	echo 'bis Datum: <INPUT class="datepicker_datum" type="text" name="datum_bis" maxlength="10" size="10" value="' . $datum_obj->formatDatum($datum_bis, 'd.m.Y') . '" />';
+	echo '&nbsp;<label>von Datum: <INPUT class="datepicker_datum" type="text" name="datum_von" maxlength="10" size="10" value="' . $datum_obj->formatDatum($datum_von, 'd.m.Y') . '" /></label>&nbsp;';
+	echo '<label>bis Datum: <INPUT class="datepicker_datum" type="text" name="datum_bis" maxlength="10" size="10" value="' . $datum_obj->formatDatum($datum_bis, 'd.m.Y') . '" /></label>';
 	echo '</td></tr>';
 	echo '<tr><td>';
 	echo 'PrestudentIn: <INPUT id="prestudent" type="text" name="prestudent_id" size="50" value="' . $prestudent_id . '" placeholder="Name, UID oder Prestudent_id eingeben" onInput="document.getElementById(\'reihungstest\').value=\'\'" onkeyup="document.getElementById(\'prestudent_id\').value=this.value"/><input type="hidden" id="prestudent_id" name="prestudent_id" value="' . $prestudent_id . '" />';
@@ -2856,7 +2812,7 @@ else
 			</form>';
 
 	echo '</div>
-			<div class="col-md-6">';
+			<div class="col-lg-6 col-md-12">';
 	echo '	';
 	$displayWarning = false;
 	$displayInfo = false;

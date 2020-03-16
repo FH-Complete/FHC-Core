@@ -69,6 +69,16 @@
     margin-bottom: 0;
 }
 
+#paramstbl label
+{
+    font-weight: normal;
+}
+
+#rtcheckboxesbtn
+{
+    max-width: 390px;
+}
+
 #rtwaehlen
 {
     white-space: nowrap;
@@ -80,21 +90,16 @@
     float: left;
 }
 
-.rtchkboxlabel:hover
+.rtlabel
+{
+    width: 100%;
+}
+
+.rtlabel:hover, .rtlabel label:hover
 {
     color: white;
     background-color: #337ab7;
     cursor: pointer;
-}
-
-/*.rtchkbox:hover,.rtchkbox input:hover,.rtchkbox label:hover
-{
-    cursor: pointer;
-}*/
-
-.rtchkbox label
-{
-    font-weight: normal;
 }
 
 #rtcheckboxes
