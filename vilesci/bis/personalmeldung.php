@@ -1,5 +1,22 @@
 <?php
-
+/* Copyright (C) 2020 fhcomplete.org
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+ *
+ * Authors: Cristina Hainberger < cristina.hainberger@technikum-wien.at >
+ */
 require_once('../../config/vilesci.config.inc.php');
 require_once('../../include/studiensemester.class.php');
 require_once('../../include/datum.class.php');
@@ -78,7 +95,7 @@ if (!defined('BIS_FUNKTIONSCODE_6_ARR') || empty('BIS_FUNKTIONSCODE_6_ARR'))
 
 // Prüfe Zeitraum zur Erstellung einer BIS-Meldung
 $studiensemester = new studiensemester();
-$stsem = (isset($_GET['stsem'])) ? $_GET['stsem'] : $studiensemester->getaktorNext(1);	// aktuelles Studiensemester
+$stsem = (isset($_GET['stsem'])) ? $_GET['stsem'] : $studiensemester->getaktorNext();	// aktuelles Studiensemester
 
 $datum_obj = new datum();
 if(mb_strstr($stsem,'SS'))
@@ -121,6 +138,8 @@ foreach ($mitarbeiter_arr as $mitarbeiter)
 
 	$person_obj->personalnummer = setLeadingZero(intval($mitarbeiter->personalnummer), 15);
 	$person_obj->uid = $mitarbeiter->uid;
+	$person_obj->vorname = $mitarbeiter->vorname;
+	$person_obj->nachname = $mitarbeiter->nachname;
 	$person_obj->geschlecht = $mitarbeiter->geschlecht;
 	$person_obj->geschlechtX = $mitarbeiter->geschlechtX;
 	$person_obj->geburtsjahr = $datum_obj->formatDatum($mitarbeiter->gebdatum, 'Y');
@@ -311,6 +330,8 @@ foreach ($mitarbeiter_arr as $mitarbeiter)
 // XML generieren
 // *********************************************************************************************************************
 $xml = '';
+
+_outputHTML($person_arr);
 $xml = _generateXML($person_arr);
 
 $xml_datei = 'bisdaten/bismeldung_mitarbeiter.xml';
@@ -318,12 +339,7 @@ $dateiausgabe = fopen($xml_datei,'w');
 fwrite($dateiausgabe, $xml);
 fclose($dateiausgabe);
 
-echo '<a href="bisdaten/bismeldung_mitarbeiter.xml">Herunterladen</a>';
-
-//header("Content-Type: text/xml");
-//echo $xml;
-
-
+echo '<a href="bisdaten/bismeldung_mitarbeiter.xml" download="Personalmeldung">XML Herunterladen</a>';
 
 // ---------------------------------------------------------------------------------------------------------------------
 // Private Functions
@@ -823,10 +839,19 @@ function _generateXML($person_arr)
 	$xml = '';
 	$xml .= '<?xml version="1.0" encoding="UTF-8"?>';
 
-// TODO: ErhKz und Meldedatum aendern
+	$erhalter = new erhalter();
+	$erhalter->getAll();
+
+	if(isset($erhalter->result[0]))
+	{
+		$erhalter = sprintf("%03s",trim($erhalter->result[0]->erhalter_kz));
+	}
+	else
+		$erhalter = '';
+
 	$xml .= '<Erhalter>';
-	$xml .= '<ErhKz>005</ErhKz>';
-	$xml .= '<MeldeDatum>15042020</MeldeDatum>';
+	$xml .= '<ErhKz>'.$erhalter.'</ErhKz>';
+	$xml .= '<MeldeDatum>1504'.date('Y').'</MeldeDatum>';
 	$xml .= '<PersonalMeldung>';
 
 	foreach ($person_arr as $person)
@@ -835,7 +860,8 @@ function _generateXML($person_arr)
 
 		$xml .= '<PersonalNummer><![CDATA['. $person->personalnummer. ']]></PersonalNummer>';
 		$xml .= '<Geschlecht><![CDATA['. $person->geschlecht. ']]></Geschlecht>';
-		$xml .= '<GeschlechtX><![CDATA['. $person->geschlechtX. ']]></GeschlechtX>';
+		if ($person->geschlecht == 'x')
+			$xml .= '<GeschlechtX><![CDATA['. $person->geschlechtX. ']]></GeschlechtX>';
 		$xml .= '<Geburtsjahr><![CDATA['. $person->geburtsjahr. ']]></Geburtsjahr>';
 		$xml .= '<StaatsangehoerigkeitCode><![CDATA['. $person->staatsangehoerigkeit. ']]></StaatsangehoerigkeitCode>';
 		$xml .= '<HoechsteAbgeschlosseneAusbildung><![CDATA['. $person->hoechste_abgeschlossene_ausbildung. ']]></HoechsteAbgeschlosseneAusbildung>';
@@ -903,4 +929,187 @@ function _generateXML($person_arr)
 	return $xml;
 }
 
+/**
+ * Prints the HTML Table with all Persons
+ * @param $person_arr Array of PersonData
+ */
+function _outputHTML($person_arr)
+{
+	echo '<html>
+	<head>
+		<title>BIS - Meldung Personal</title>
+		<meta charset="utf-8">
+		<link href="../../skin/vilesci.css" rel="stylesheet" type="text/css">';
+		include('../../include/meta/jquery.php');
+		include('../../include/meta/jquery-tablesorter.php');
+	echo '
+	</head>
+	<body>
+	<h1>Personalmeldung</h1>';
 
+	echo '
+	<script type="text/javascript">
+		$(document).ready(function()
+			{
+				$("#t1").tablesorter(
+				{
+					sortList: [[2,0]],
+					widgets: ["zebra"]
+				});
+			});
+	</script>
+	';
+
+	echo "Anzahl der gemeldeten Personen: ".count($person_arr);
+
+	echo '
+	<table id="t1">
+	<thead>
+		<tr>
+			<th>PersNr</th>
+			<th>Vorname</th>
+			<th>Nachname</th>
+			<th>UID</th>
+			<th>Geschlecht (X)</th>
+			<th>Geb.Jahr</th>
+			<th>Staat</th>
+			<th>Höchste Ausb.</th>
+			<th>Habil.</th>
+			<th>Hautpberufcode</th>
+			<th>Verwendung</th>
+			<th>Funktion</th>
+			<th>Lehre</th>
+		</tr>
+	</thead>
+	<tbody>';
+
+
+	foreach ($person_arr as $person)
+	{
+		echo '
+		<tr>
+			<td>'.$person->personalnummer.'</td>
+			<td>'.$person->vorname.'</td>
+			<td>'.$person->nachname.'</td>
+			<td>'.$person->uid.'</td>
+			<td>'.$person->geschlecht.($person->geschlecht=='x'?'('.$person->geschlechtX.')':'').'</td>
+			<td>'.$person->geburtsjahr.'</td>
+			<td>'.$person->staatsangehoerigkeit.'</td>
+			<td>'.$person->hoechste_abgeschlossene_ausbildung.'</td>
+			<td>'.$person->habilitation.'</td>
+			<td>'.$person->hauptberufcode.'</td>';
+
+		echo '<td style="vertical-align: top">';
+
+		if (count($person->verwendung_arr) > 0)
+		{
+			echo '
+				<table>
+				<thead>
+					<tr>
+						<td>Verwendung</td>
+						<td>Ba1Code</td>
+						<td>Ba2Code</td>
+						<td>VZÄ</td>
+						<td>JVZÄ</td>
+					</tr>
+				</thead>
+				<tbody>
+				';
+
+			foreach ($person->verwendung_arr as $verwendung)
+			{
+				echo '
+				<tr>
+					<td>'.$verwendung->verwendung_code.'</td>
+					<td>'.$verwendung->ba1code.'</td>
+					<td>'.$verwendung->ba2code.'</td>
+					<td>'.$verwendung->vzae.'</td>
+					<td>'.$verwendung->jvzae.'</td>
+				</tr>';
+			}
+			echo '</tbody>
+				</table>';
+		}
+		echo '</td>';
+
+		echo '<td style="vertical-align: top">';
+
+		if (count($person->funktion_arr) > 0)
+		{
+			echo '
+				<table>
+				<thead>
+					<tr>
+						<td>Funktion</td>
+						<td>Bes.Qual</td>
+						<td>StgKZ</td>
+					</tr>
+				</thead>
+				<tbody>
+			';
+
+			foreach ($person->funktion_arr as $funktion)
+			{
+				echo '
+				<tr>
+					<td>'. $funktion->funktionscode. '</td>
+					<td>'. $funktion->besondereQualifikationCode. '</td>
+					<td>';
+
+				if ($funktion->funktionscode == 5 || $funktion->funktionscode == 7)
+				{
+					if (is_array($funktion->studiengang))
+					{
+						foreach ($funktion->studiengang as $studiengang)
+						{
+							echo $studiengang.' ';
+						}
+					}
+					else if (!is_null($funktion->studiengang))
+					{
+						echo $funktion->studiengang.' ';
+					}
+				}
+				echo '</td>
+				</tr>';
+			}
+			echo '</tbody>
+				</table>';
+		}
+		echo '</td>';
+
+		echo '<td style="vertical-align: top">';
+		if ($person->lehre_arr > 0)
+		{
+			echo '
+				<table>
+				<thead>
+				<tr>
+					<td>StgKZ</td>
+					<td>SommerSWS</td>
+					<td>WinterSWS</td>
+				</tr>
+				</thead>
+				<tbody>';
+
+			foreach ($person->lehre_arr as $lehre)
+			{
+				echo '
+				<tr>
+					<td>'. $lehre->StgKz. '</td>
+					<td>'. $lehre->SommersemesterSWS. '</td>
+					<td>'. $lehre->WintersemesterSWS. '</td>
+				</tr>';
+			}
+
+			echo '</tbody>
+				</table>';
+		}
+		echo '</td>
+		</tr>';
+	}
+
+	echo '</tbody>
+	</table>';
+}
