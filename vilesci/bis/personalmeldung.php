@@ -891,21 +891,21 @@ function _generateXML($person_arr)
 
 			if ($funktion->funktionscode == 5 || $funktion->funktionscode == 7)
 			{
-				$xml .= '<Studiengang>';
-
 				if (is_array($funktion->studiengang))
 				{
 					foreach ($funktion->studiengang as $studiengang)
 					{
+						$xml .= '<Studiengang>';
 						$xml .= '<StgKz><![CDATA['. $studiengang. ']]></StgKz>';
+						$xml .= '</Studiengang>';
 					}
 				}
 				else if (!is_null($funktion->studiengang))
 				{
+					$xml .= '<Studiengang>';
 					$xml .= '<StgKz><![CDATA['. $funktion->studiengang. ']]></StgKz>';
-
+					$xml .= '</Studiengang>';
 				}
-				$xml .= '</Studiengang>';
 			}
 
 			$xml .= '</Funktion>';
@@ -947,6 +947,7 @@ function _outputHTML($person_arr)
 	<body>
 	<h1>Personalmeldung</h1>';
 
+	outputPlausibilitaetschecks($person_arr);
 	echo '
 	<script type="text/javascript">
 		$(document).ready(function()
@@ -960,6 +961,7 @@ function _outputHTML($person_arr)
 	</script>
 	';
 
+	echo "<h2>Meldedaten</h2>";
 	echo "Anzahl der gemeldeten Personen: ".count($person_arr);
 
 	echo '
@@ -1112,4 +1114,99 @@ function _outputHTML($person_arr)
 
 	echo '</tbody>
 	</table>';
+}
+
+function outputPlausibilitaetschecks($person_arr)
+{
+	echo "<h2>Plausibilitätsprüfung</h2>";
+
+	foreach ($person_arr as $row)
+	{
+		$msg = array();
+		if ($row->personalnummer == '')
+		{
+			$msg[] = 'Personalnummer fehlt ';
+		}
+		if ($row->geschlecht == '')
+		{
+			$msg[] = 'Geschlecht fehlt ';
+		}
+		if ($row->geburtsjahr == '')
+		{
+			$msg[] = 'Geburtsjahr fehlt ';
+		}
+		if (date('Y') - $row->geburtsjahr >= 100)
+		{
+			$msg[] = 'Person darf nicht älter als 100 sein ';
+		}
+		if (date('Y') - $row->geburtsjahr <= 10)
+		{
+			$msg[] = 'Person darf nicht jünger als 10 sein ';
+		}
+		if ($row->staatsangehoerigkeit == '')
+		{
+			$msg[] = 'Staatsangehoerigkeit fehlt ';
+		}
+		if ($row->hoechste_abgeschlossene_ausbildung == '')
+		{
+			$msg[] = 'Höchste Abgeschlossene Ausbildung fehlt ';
+		}
+		if ($row->habilitation == '')
+		{
+			$msg[] = 'Habilitation fehlt ';
+		}
+
+		if (isset($row->verwendung_arr) && is_array($row->verwendung_arr) && count($row->verwendung_arr) > 0)
+		{
+			foreach ($row->verwendung_arr as $verwendung)
+			{
+				if($verwendung->vzae < -1)
+				{
+					$msg[] = 'VZAE ist zu klein -> Vertragsstunden prüfen';
+				}
+				if($verwendung->vzae > 100)
+				{
+					$msg[] = 'VZAE ist zu gross -> Vertragsstunden prüfen';
+				}
+
+				if($verwendung->jvzae < -1)
+				{
+					$msg[] = 'JVZAE ist zu klein -> Vertragsstunden prüfen';
+				}
+				if($verwendung->jvzae > 100)
+				{
+					$msg[] = 'JVZAE ist zu gross -> Vertragsstunden prüfen';
+				}
+			}
+		}
+
+		if (isset($row->lehre_arr) && is_array($row->lehre_arr) && count($row->lehre_arr) > 0)
+		{
+			foreach ($row->lehre_arr as $lehre)
+			{
+				if ($lehre->SommersemesterSWS > 40)
+				{
+					$msg[] = 'Sommersemester SWS zu groß '.$lehre->SommersemesterSWS;
+				}
+				if ($lehre->WintersemesterSWS < 0)
+				{
+					$msg[] = 'Wintersemester SWS zu groß '.$lehre->WintersemesterSWS;
+				}
+				if ($lehre->SommersemesterSWS < 0)
+				{
+					$msg[] = 'Sommersemester SWS zu klein '.$lehre->SommersemesterSWS;
+				}
+				if ($lehre->WintersemesterSWS < 0)
+				{
+					$msg[] = 'Wintersemester SWS zu klein '.$lehre->WintersemesterSWS;
+				}
+			}
+		}
+
+		if (count($msg) > 0)
+		{
+			echo "Fehler bei ".$row->vorname.' '.$row->nachname.' : '.implode($msg,', ');
+			echo "\n<br/>";
+		}
+	}
 }
