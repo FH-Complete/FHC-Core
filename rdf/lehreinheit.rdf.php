@@ -86,7 +86,11 @@ else
 {
 	if($lehrveranstaltung_id!='')
 	{
-		$lehreinheit->load_lehreinheiten($lehrveranstaltung_id, $studiensemester_kurzbz);
+	    if($studiensemester_kurzbz=!'')
+		    $lehreinheit->load_lehreinheiten($lehrveranstaltung_id, $studiensemester_kurzbz);
+	    else
+	        $lehreinheit->load_all_lehreinheiten($lehrveranstaltung_id);
+
 		foreach ($lehreinheit->lehreinheiten as $row)
 			draw_row($row);
 	}
