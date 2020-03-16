@@ -26,7 +26,7 @@ var InfocenterPersonDataset = {
 	 */
 	appendTableActionsHtml: function(infocenter_studiensemester)
 	{
-		var url = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router + "/system/Messages/write";
+		var url = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router + "/system/messages/Messages/writeTemplate";
 
 		var formHtml = '<form id="sendMsgsForm" method="post" action="'+ url +'" target="_blank"></form>';
 		$("#datasetActionsTop").before(formHtml);

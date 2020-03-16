@@ -180,6 +180,7 @@ function draw_content_liste($row)
 			<STUDENT:status_bestaetigung><![CDATA['.($prestudent->bestaetigtam!=''?$datum_obj->formatDatum($prestudent->bestaetigtam,'d.m.Y'):'-').']]></STUDENT:status_bestaetigung>
 			<STUDENT:status_datum_iso><![CDATA['.$datum_obj->formatDatum($prestudent->datum,'Y-m-d').']]></STUDENT:status_datum_iso>
 			<STUDENT:status_bestaetigung_iso><![CDATA['.($prestudent->bestaetigtam!=''?$datum_obj->formatDatum($prestudent->bestaetigtam,'Y-m-d'):'-').']]></STUDENT:status_bestaetigung_iso>
+			<STUDENT:zugangscode><![CDATA['.$row->zugangscode.']]></STUDENT:zugangscode>
 
 			<STUDENT:anmerkungen>'.($row->anmerkungen==''?'&#xA0;':'<![CDATA['.$row->anmerkungen.']]>').'</STUDENT:anmerkungen>
 			<STUDENT:anmerkungpre>'.($row->anmerkung==''?'&#xA0;':'<![CDATA['.$row->anmerkung.']]>').'</STUDENT:anmerkungpre>
@@ -222,10 +223,10 @@ function draw_content($row)
 	{
 		switch($row->bnaktiv)
 		{
-			case "t":
+			case true:
 				$aktiv = "true";
 				break;
-			case "f":
+			case false:
 				$aktiv = "false";
 				break;
 			default:
@@ -294,6 +295,8 @@ function draw_content($row)
 			<STUDENT:studienplan_id><![CDATA['.$prestudent->studienplan_id.']]></STUDENT:studienplan_id>
 			<STUDENT:mail_privat><![CDATA['.$mail_privat.']]></STUDENT:mail_privat>
 			<STUDENT:mail_intern><![CDATA['.(isset($row->uid)?$row->uid.'@'.DOMAIN:'').']]></STUDENT:mail_intern>
+			<STUDENT:zugangscode><![CDATA['.$row->zugangscode.']]></STUDENT:zugangscode>
+			<STUDENT:link_bewerbungstool><![CDATA['.CIS_ROOT.'addons/bewerbung/cis/registration.php?code='.$row->zugangscode.'&emailAdresse='.$mail_privat.']]></STUDENT:link_bewerbungstool>
 
 			<STUDENT:aktiv><![CDATA['.$aktiv.']]></STUDENT:aktiv>
 			<STUDENT:uid><![CDATA['.(isset($row->uid)?$row->uid:'').']]></STUDENT:uid>
@@ -475,7 +478,7 @@ if($xmlformat=='rdf')
 			AS email_privat,
 			(SELECT rt_gesamtpunkte as punkte FROM public.tbl_prestudent WHERE prestudent_id=tbl_student.prestudent_id) as punkte,
 			 tbl_prestudent.dual as dual, tbl_prestudent.reihungstest_id, tbl_prestudent.anmeldungreihungstest, p.matr_nr,
-			 tbl_prestudent.gsstudientyp_kurzbz, tbl_prestudent.aufnahmegruppe_kurzbz, tbl_prestudent.priorisierung
+			 tbl_prestudent.gsstudientyp_kurzbz, tbl_prestudent.aufnahmegruppe_kurzbz, tbl_prestudent.priorisierung, p.zugangscode
 		FROM
 			public.tbl_student
 			JOIN public.tbl_benutzer ON (student_uid=uid)

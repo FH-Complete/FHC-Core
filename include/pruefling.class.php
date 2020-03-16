@@ -350,9 +350,10 @@ class pruefling extends basis_db
 	 * definiert sind, bei der Berechnung der Endpunkte nicht berücksichtigt.
 	 * @param $studiengang_kz Wenn eine Studiengangskennzahl übergeben wird, dann werden nur die Punkte der
 	 * Basis-Fragengebiete (ohne Quereinsteiger) bei der Berechnung der Endpunkte berücksichtigt.
+	 * @param $gewichtung_studiengang_kz Wenn diese studiengang_kz übergeben wird, wird das Ergebnis entsprechend des Gewichtungsschemas des Studienganges gewichtet
 	 * @return Endpunkte des Reihungstests oder False wenn keine Punkte vorhanden
 	 */
-	public function getReihungstestErgebnisPerson($person_id, $punkte=false, $reihungstest_id, $has_excluded_gebiete = false, $studiengang_kz = null)
+	public function getReihungstestErgebnisPerson($person_id, $punkte=false, $reihungstest_id, $has_excluded_gebiete = false, $studiengang_kz = null, $gewichtung_studiengang_kz = null)
 	{
 		if(is_numeric($reihungstest_id))
 		{
@@ -415,39 +416,57 @@ class pruefling extends basis_db
 			 * Ergebniss der beiden Tests summiert bekommen
 			 * Im Zweifelsfall wird der neuere Reihungstest genommen */
 			$qry .= "
-				AND prestudent_id = (
-					SELECT
-						prestudent_id
-					FROM
-						public.tbl_rt_person
-					JOIN 
-						public.tbl_prestudent USING(person_id)
-					JOIN
-						public.tbl_prestudentstatus USING (prestudent_id, studienplan_id)
-					JOIN 
-						tbl_reihungstest ON (
-							tbl_rt_person.rt_id = tbl_reihungstest.reihungstest_id			
-						)
-					WHERE
-						tbl_rt_person.person_id = ".$this->db_add_param($person_id, FHC_INTEGER)."
-					AND 
-						tbl_rt_person.rt_id = ".$this->db_add_param($reihungstest_id, FHC_INTEGER)."
-					AND 
-						tbl_prestudentstatus.status_kurzbz='Interessent'
-					AND 
-						tbl_prestudentstatus.studiensemester_kurzbz = tbl_reihungstest.studiensemester_kurzbz
-					ORDER BY
-						tbl_reihungstest.datum DESC, tbl_prestudent.priorisierung ASC LIMIT 1
-				)
-			";
+					AND prestudent_id = (
+						SELECT
+							prestudent_id
+						FROM
+							public.tbl_rt_person
+						JOIN 
+							public.tbl_prestudent USING(person_id)
+						JOIN
+							public.tbl_prestudentstatus USING (prestudent_id, studienplan_id)
+						JOIN 
+							tbl_reihungstest ON (
+								tbl_rt_person.rt_id = tbl_reihungstest.reihungstest_id			
+							)
+						WHERE
+							tbl_rt_person.person_id = ".$this->db_add_param($person_id, FHC_INTEGER)."
+						AND 
+							tbl_rt_person.rt_id = ".$this->db_add_param($reihungstest_id, FHC_INTEGER)."
+						AND 
+							tbl_prestudentstatus.status_kurzbz='Interessent'
+						AND 
+							tbl_prestudentstatus.studiensemester_kurzbz = tbl_reihungstest.studiensemester_kurzbz
+						ORDER BY tbl_reihungstest.datum DESC, tbl_prestudent.priorisierung ASC LIMIT 1
+					)
+				";
+
+			//calculate Gewichte for Studiengang if set
+			$gewichte = array();
+			if (isset($gewichtung_studiengang_kz))
+			{
+				$ablauf = new ablauf();
+				$ablauf->getAblaufGebiete($gewichtung_studiengang_kz);
+
+				foreach ($ablauf->result as $abl)
+				{
+					$gewichte[$abl->gebiet_id] = $abl->gewicht;
+				}
+			}
+
 			if($result = $this->db_query($qry))
 			{
 				// Wenn keine Eintraege vorhanden dann false
 				if($this->db_num_rows($result)==0)
 					return false;
 
+				$summeGewicht = 0;
+
 				while($row = $this->db_fetch_object($result))
 				{
+					if (!isset($row->punkte))
+						continue;
+
 					//wenn maxpunkte ueberschritten wurde -> 100%
 					if($row->punkte>=$row->maxpunkte)
 					{
@@ -455,17 +474,20 @@ class pruefling extends basis_db
 						$row->punkte = $row->maxpunkte;
 					}
 					else
-						$prozent = ($row->punkte/$row->maxpunkte)*100;
+						$prozent = (($row->punkte + $row->offsetpunkte)/($row->maxpunkte + $row->offsetpunkte))*100;
 
 					if($punkte)
 					{
-						$ergebnis +=$row->punkte;
+						$ergebnis += $row->punkte;
 					}
-
 					else
-						$ergebnis+=$prozent*$row->gewicht;
+					{
+						$gew = isset($gewichte[$row->gebiet_id]) ? $gewichte[$row->gebiet_id] : 1;
+						$ergebnis += $prozent * $gew;
+						$summeGewicht += $gew;
+					}
 				}
-				return $ergebnis;
+				return $summeGewicht > 0 ? $ergebnis/$summeGewicht : $ergebnis;
 			}
 			else
 			{

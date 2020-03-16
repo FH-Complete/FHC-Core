@@ -166,12 +166,13 @@ $this->load->view(
                 </div>
             </div>
             <div class="col-md-offset-2 col-md-4 col-xs-6">
-                <div class="input-group">
-                    <input id="password" type="password" class="form-control" placeholder="CIS-Passwort">
-                    <span class="input-group-btn">
-                        <button id="accept-lehrauftraege" class="btn btn-primary pull-right">Lehrauftrag annehmen</button>
-                    </span>
-                </div>
+				<div class="input-group">
+					<input id="username" type="hidden" value=""><!-- this is to prevent Chrome autofilling a random input field with the username-->
+					<input id="password" type="password" autocomplete="new-password" class="form-control" placeholder="CIS-Passwort">
+						<span class="input-group-btn">
+							<button id="accept-lehrauftraege" class="btn btn-primary pull-right">Lehrauftrag annehmen</button>
+						</span>
+				</div>
             </div>
         </div>
 		<br>
