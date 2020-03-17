@@ -101,6 +101,9 @@ define('CIS_GESAMTNOTE_FREIGABEMAIL_NOTE', false);
 // Gibt an ob in der Notenliste der Studierenden nur offizielle Noten oder alle angezeigt werden
 define('CIS_NOTENLISTE_OFFIZIELL_ANZEIGEN', false);
 
+// Gibt an ob in der Notenliste der Durchschnitt und der gewichtete Durchschnitt angezeigt werden
+define('CIS_NOTENLISTE_DURCHSCHNITT_ANZEIGEN', true);
+
 // Grenzwerte für Anwesenheit
 define('FAS_ANWESENHEIT_ROT', 70);
 define('FAS_ANWESENHEIT_GELB', 90);
