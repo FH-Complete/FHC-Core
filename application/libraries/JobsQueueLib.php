@@ -135,45 +135,58 @@ class JobsQueueLib
 		$errorOccurred = false; // very optimistic
 
 		// Get all the job statuses
-		$dbResult = $this->_ci->JobStatusesModel->load();
-		if (isError($dbResult)) return $dbResult;
-		$statuses = getData($dbResult);
+		$dbResultStatuses = $this->_ci->JobStatusesModel->load();
+		if (isError($dbResultStatuses)) return $dbResultStatuses;
+		$statuses = getData($dbResultStatuses);
 
 		// Loops through all the provided jobs
 		foreach ($results as $job)
 		{
-			// TODO: find if present in database or not!!!
-
-			// If the structure of the job object is valid
-			if ($this->_checkUpdateJobStructure($job) && $this->_checkJobStatus($job, $statuses))
+			// Check if the required job is present in the database
+			$dbResultJobs = $this->_ci->JobsQueueModel->load($job->{self::PROPERTY_JOBID});
+			if (isError($dbResultJobs))
 			{
-				$this->_dropNotAllowedPropertiesUpdateJob($job); // remove the black listed properties from this object
-
-				$job->{self::PROPERTY_TYPE} = $type; // What you asked is what you get!
-
-				// Try to update the single job into database
-				$dbResult = $this->_ci->JobsQueueModel->update($job->{self::PROPERTY_JOBID}, (array)$job);
-
-				// If an error occurred during while updating in database
-				if (isError($dbResult))
+				$job->{self::PROPERTY_ERROR} = getError($dbResultJobs); // retrieve the cause and store it in job object
+				$errorOccurred = true; // set error occurred flag
+			}
+			elseif (!hasData($dbResultJobs)) // if no jobs were found
+			{
+				$job->{self::PROPERTY_ERROR} = 'The required job is not present';
+				$errorOccurred = true; // set error occurred flag
+			}
+			else // if a job was found then it could be updated
+			{
+				// If the structure of the job object is valid
+				if ($this->_checkUpdateJobStructure($job) && $this->_checkJobStatus($job, $statuses))
 				{
-					$job->{self::PROPERTY_ERROR} = getError($dbResult); // retrieve the cause and store it in job object
-					$errorOccurred = true; // set error occurred flag
+					$this->_dropNotAllowedPropertiesUpdateJob($job); // remove the black listed properties from this object
+
+					$job->{self::PROPERTY_TYPE} = $type; // What you asked is what you get!
+
+					// Try to update the single job into database
+					$dbResult = $this->_ci->JobsQueueModel->update($job->{self::PROPERTY_JOBID}, (array)$job);
+
+					// If an error occurred during while updating in database
+					if (isError($dbResult))
+					{
+						$job->{self::PROPERTY_ERROR} = getError($dbResult); // retrieve the cause and store it in job object
+						$errorOccurred = true; // set error occurred flag
+					}
+					else // otherwise
+					{
+						$dbNewTriggeredJobResult = $this->_addNewTriggeredJobToQueue(
+							$type,
+							$job,
+							array($job->status)
+						);
+						// If an error occurred during while inserting in database
+						if (isError($dbNewTriggeredJobResult)) return $dbNewTriggeredJobResult;
+					}
 				}
 				else // otherwise
 				{
-					$dbNewTriggeredJobResult = $this->_addNewTriggeredJobToQueue(
-						$type,
-						$job,
-						array($job->status)
-					);
-					// If an error occurred during while inserting in database
-					if (isError($dbNewTriggeredJobResult)) return $dbNewTriggeredJobResult;
+					$errorOccurred = true; // set error occurred flag
 				}
-			}
-			else // otherwise
-			{
-				$errorOccurred = true; // set error occurred flag
 			}
 		}
 
@@ -244,7 +257,15 @@ class JobsQueueLib
 	 */
 	private function _checkJobStatus(&$job, $statuses)
 	{
-		$found = $this->_inArray($job->{self::PROPERTY_STATUS}, $statuses, self::PROPERTY_STATUS);
+		// If the given job doesn't have the property status then it is not valid
+		if (!isset($job->{self::PROPERTY_STATUS}))
+		{
+			$found = false;
+		}
+		else // otherwise test if it valid
+		{
+			$found = $this->_inArray($job->{self::PROPERTY_STATUS}, $statuses, self::PROPERTY_STATUS);
+		}
 
 		// No status was not found and does NOT already contain the property error
 		if (!$found && !property_exists($job, self::PROPERTY_ERROR))
