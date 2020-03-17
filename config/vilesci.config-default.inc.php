@@ -214,13 +214,13 @@ define('CI_ENVIRONMENT', 'development'); // Code igniter environment variable
 define('BIS_EXCLUDE_STG', array());
 
 // Basis Vollzeit Arbeitsstunden für Berechnung von Jahresvollzeitaequivalenz JVZAE (echte Dienstverträge)
-define('BIS_VOLLZEIT_ARBEITSSTUNDEN', '0');
+define('BIS_VOLLZEIT_ARBEITSSTUNDEN', '40');
 
 // Basis Vollzeit Semesterwochenstunden für Berechnung von Jahresvollzeitaequivalenz JVZAE auf Stundenbasis (freie Dienstverträge)
-define('BIS_VOLLZEIT_SWS_EINZELSTUNDENBASIS', '0');
+define('BIS_VOLLZEIT_SWS_EINZELSTUNDENBASIS', '15');
 
 // Basis Vollzeit Semesterwochenstunden für Berechnung von Jahresvollzeitaequivalenz JVZAE für inkludierte Lehre bei echten Dienstverträgen
-define('BIS_VOLLZEIT_SWS_INKLUDIERTE_LEHRE', '0');
+define('BIS_VOLLZEIT_SWS_INKLUDIERTE_LEHRE', '25');
 
 // Semester Gewichtung für Berechnung von Jahresvollzeitaequivalenz JVZAE
 define('BIS_HALBJAHRES_GEWICHTUNG_SWS', 0.5);
@@ -239,10 +239,12 @@ define('BIS_FUNKTIONSCODE_1234_ARR', array(
 	'kollegium' => 4			// Mitglied des Kollegiums
 ));
 
+// Liste der Leitungsfunktionen
 define('BIS_FUNKTIONSCODE_5_ARR', array(
 	'Leitung'
 ));
 
+// Organisationseinheitstypen bei denen KEINE Leiter gemeldet werden
 define('BIS_FUNKTIONSCODE_6_ARR', array(
 	'Team'
 ));
