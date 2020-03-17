@@ -219,7 +219,7 @@ if ($result = $db->db_query($qry))
 	echo '<br><br>Anzahl:'.$db->db_num_rows($result);
 	echo '
 	<div style="float:right" >Beendingungsdatum der Verwendung:
-	<input class="datepicker_datum" type="text" size="10" value="'.date('Y').'-08-31" id="deaktivierungsdatum"/>
+	<input class="datepicker_datum" type="text" size="10" value="'.(date('Y')-2).'-12-31" id="deaktivierungsdatum"/>
 	</div>
 	<br><br>
 	<table class="tablesorter" id="t1">
