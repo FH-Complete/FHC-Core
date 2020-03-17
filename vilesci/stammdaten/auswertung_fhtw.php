@@ -461,9 +461,10 @@ if ($rtFreischalten)
 
 		if ($result = $db->db_query($qry))
 		{
+			$msg = $_POST['art'] === 'false' ? 'Reihungstest wurde gesperrt' : 'Reihungstest wurde freigeschaltet';
 			echo json_encode(array(
 				'status' => 'ok',
-				'msg' => 'Reihungstest wurde freigeschaltet'));
+				'msg' => $msg));
 			exit();
 		}
 		else
@@ -513,7 +514,7 @@ if ($testende)
 				&& $prestudentrolle->bestaetigtvon != ''
 				&& $stg->typ == 'b')
 			{
-				$prestudentArray[$reihungstest_id][$prestudentrolle->studiengang_kz][$prestudentrolle->orgform_kurzbz][] = $prestudent_id;
+				$prestudentArray[$prestudentrolle->studiengang_kz][$prestudentrolle->orgform_kurzbz][] = $prestrt;
 			}
 
 			// Setzt "teilgenommen" (Zum Reihungstest angetreten) auf TRUE
@@ -539,109 +540,111 @@ if ($testende)
 	$sendError = false;
 	$empfaengerArray = array();
 	$rtidArray = array();
+	$rtdatumstr = '';
 
 	foreach ($prestudentsrt as $psrt)
 	{
 		if (!in_array($psrt['reihungstest_id'], $rtidArray))
+		{
 			$rtidArray[] = $psrt['reihungstest_id'];
+			$rt = new reihungstest($psrt['reihungstest_id']);
+
+			$rtdatumstr .= 'Der Reihungstest vom '.$datum_obj->convertISODate($rt->datum).' um '.$datum_obj->formatDatum($rt->uhrzeit, 'H:i').' Uhr ist beendet.<br>';
+		}
 	}
 
 	$rtidparams = http_build_query(array('reihungstest' => $rtidArray));
 
-	foreach ($prestudentArray AS $reihungstest_id => $studiengang)
+	foreach ($prestudentArray AS $studiengang_kz => $OrgFormPrestudent)
 	{
-		foreach ($studiengang AS $studiengang_kz => $OrgFormPrestudent)
+		foreach ($OrgFormPrestudent AS $orgForm => $prestudentrt)
 		{
-			foreach ($OrgFormPrestudent AS $orgForm => $prestudent_id)
+			$empfaenger = getMailEmpfaenger($studiengang_kz, null, $orgForm);
+			//Pfuschloesung fur BIF Dual
+			if (CAMPUS_NAME == 'FH Technikum Wien' && $studiengang_kz == 257 && $orgForm == 'DUA')
 			{
-				$rtest = new reihungstest($reihungstest_id);
-				$empfaenger = getMailEmpfaenger($studiengang_kz, null, $orgForm);
-				//Pfuschloesung fur BIF Dual
-				if (CAMPUS_NAME == 'FH Technikum Wien' && $studiengang_kz == 257 && $orgForm == 'DUA')
-				{
-					$empfaenger = 'info.bid@technikum-wien.at';
-				}
-				elseif (CAMPUS_NAME == 'FH Technikum Wien' && $studiengang_kz == 257 && $orgForm != 'DUA')
-				{
-					$empfaenger = 'info.bif@technikum-wien.at';
-				}
-				$empfaengerArray[] = $empfaenger;
-				$anzahl = count($OrgFormPrestudent[$orgForm]);
-				$stg = new studiengang($studiengang_kz);
-				$mailtext = '<html>
-								<head>	
-									<title>Sancho Mail</title>
-								</head>
-								<body>
-										<table cellpadding="0" cellspacing="0" style="border: 2px solid #000000; padding: 0px; max-width: 850px; 
-											border-collapse:collapse; mso-table-lspace:0pt; mso-table-rspace:0pt;">  
-											<tr>
-												<td align="center">
-													<table cellpadding="0" cellspacing="0" width="100%%" border="0">
-														<tr>
-															<td>
-																<img src="cid:sancho_header" alt="sancho_header" style="width: 100%; display: block"/>
-															</td>
-														</tr>
-													</table>
-												</td>
-											</tr>
-											<tr>
-												<td style="padding-left: 8%; padding-right: 8%; padding-top: 5%; padding-bottom: 5%; font-family: verdana, sans-serif; font-size: 1em; border-bottom: 2px solid #000000;">';
-				$mailtext .= 'Der Reihungstest vom '.$datum_obj->convertISODate($rtest->datum).' um '.$datum_obj->formatDatum($rtest->uhrzeit, 'H:i').' Uhr ist beendet.';
-				$mailtext .= '<br> Es haben <b>'.$anzahl.'</b> Person(en) aus dem Studiengang '.$stg->kuerzel.'-'.$orgForm.' teilgenommen.';
-				$mailtext .= '<br><br><a href="'.APP_ROOT.'vilesci/stammdaten/auswertung_fhtw.php?'.$rtidparams.'&studiengang='.$studiengang_kz.'&orgform_kurzbz='.$orgForm.'">Link zur Auswertung</a>';
-				$mailtext .= '<br><br><a href="'.APP_ROOT.'addons/reports/cis/vorschau.php?statistik_kurzbz=BewerberReihungstestPriorisierung&debug=true">Link zur Pivot-Tabelle für die Priorisierung</a>';
-				$mailtext .= '<br><br>Reihung der BewerberInnen: Prio 1 innerhalb von 2 Werktagen, Prio 2 am 3. Werktag und Prio 3 am 4. Werktag';
-				$mailtext .= '</td>
-											</tr>
-											<tr>
-												<td align="center">
-													<table cellpadding="0" cellspacing="0" width="100%">
-														<tr>
-															<td>
-																<img src="cid:sancho_footer" alt="sancho_footer" style="width: 100%; display: block"/>
-															</td>
-														</tr>
-													</table>
-												</td>
-											</tr>
-										</table>
-									</body>
-								</html>';
+				$empfaenger = 'info.bid@technikum-wien.at';
+			}
+			elseif (CAMPUS_NAME == 'FH Technikum Wien' && $studiengang_kz == 257 && $orgForm != 'DUA')
+			{
+				$empfaenger = 'info.bif@technikum-wien.at';
+			}
+			$empfaengerArray[] = $empfaenger;
+			$anzahl = count($OrgFormPrestudent[$orgForm]);
+			$stg = new studiengang($studiengang_kz);
+			$mailtext = '<html>
+							<head>	
+								<title>Sancho Mail</title>
+							</head>
+							<body>
+									<table cellpadding="0" cellspacing="0" style="border: 2px solid #000000; padding: 0px; max-width: 850px; 
+										border-collapse:collapse; mso-table-lspace:0pt; mso-table-rspace:0pt;">  
+										<tr>
+											<td align="center">
+												<table cellpadding="0" cellspacing="0" width="100%%" border="0">
+													<tr>
+														<td>
+															<img src="cid:sancho_header" alt="sancho_header" style="width: 100%; display: block"/>
+														</td>
+													</tr>
+												</table>
+											</td>
+										</tr>
+										<tr>
+											<td style="padding-left: 8%; padding-right: 8%; padding-top: 5%; padding-bottom: 5%; font-family: verdana, sans-serif; font-size: 1em; border-bottom: 2px solid #000000;">';
+			$mailtext .= $rtdatumstr;
+			$mailtext .= 'Es haben <b>'.$anzahl.'</b> Person(en) aus dem Studiengang '.$stg->kuerzel.'-'.$orgForm.' teilgenommen.';
+			$mailtext .= '<br><br><a href="'.APP_ROOT.'vilesci/stammdaten/auswertung_fhtw.php?'.$rtidparams.'&studiengang='.$studiengang_kz.'&orgform_kurzbz='.$orgForm.'">Link zur Auswertung</a>';
+			$mailtext .= '<br><br><a href="'.APP_ROOT.'addons/reports/cis/vorschau.php?statistik_kurzbz=BewerberReihungstestPriorisierung&debug=true">Link zur Pivot-Tabelle für die Priorisierung</a>';
+			$mailtext .= '<br><br>Reihung der BewerberInnen: Prio 1 innerhalb von 2 Werktagen, Prio 2 am 3. Werktag und Prio 3 am 4. Werktag';
+			$mailtext .= '</td>
+										</tr>
+										<tr>
+											<td align="center">
+												<table cellpadding="0" cellspacing="0" width="100%">
+													<tr>
+														<td>
+															<img src="cid:sancho_footer" alt="sancho_footer" style="width: 100%; display: block"/>
+														</td>
+													</tr>
+												</table>
+											</td>
+										</tr>
+									</table>
+								</body>
+							</html>';
 
-				$mailtext = wordwrap($mailtext, 70); // Bricht den Code um, da es sonst zu Anzeigefehlern im Mail kommen kann
+			$mailtext = wordwrap($mailtext, 70); // Bricht den Code um, da es sonst zu Anzeigefehlern im Mail kommen kann
 
-				$mail = new mail($empfaenger, 'no-reply', 'Reihungstest vom '.$datum_obj->convertISODate($reihungstest->datum).' um '.$datum_obj->formatDatum($reihungstest->uhrzeit, 'H:i').' beendet', 'Bitte sehen Sie sich die Nachricht in HTML Sicht an, um den Link vollständig darzustellen.');
-				$mail->setHTMLContent($mailtext);
-				$mail->addEmbeddedImage(APP_ROOT.'skin/images/sancho/sancho_header_min_bw.jpg', 'image/jpg', 'header_image', 'sancho_header');
-				$mail->addEmbeddedImage(APP_ROOT.'skin/images/sancho/sancho_footer_min_bw.jpg', 'image/jpg', 'footer_image', 'sancho_footer');
-				$mail->setBCCRecievers('kindlm@technikum-wien.at');
+			$mail = new mail($empfaenger, 'no-reply', 'Reihungstest beendet', 'Bitte sehen Sie sich die Nachricht in HTML Sicht an, um den Link vollständig darzustellen.');
+			$mail->setHTMLContent($mailtext);
+			$mail->addEmbeddedImage(APP_ROOT.'skin/images/sancho/sancho_header_min_bw.jpg', 'image/jpg', 'header_image', 'sancho_header');
+			$mail->addEmbeddedImage(APP_ROOT.'skin/images/sancho/sancho_footer_min_bw.jpg', 'image/jpg', 'footer_image', 'sancho_footer');
+			$mail->setBCCRecievers('kindlm@technikum-wien.at');
 
-				if (!$mail->send())
-				{
-					$sendError = true;
-				}
+			if (!$mail->send())
+			{
+				$sendError = true;
 			}
 		}
-		if ($sendError)
-		{
-			echo json_encode(array(
-				'status' => 'fehler',
-				'msg' => '<p>Fehler beim Senden einer Nachricht</p>'
-			));
-			exit();
-		}
-		else
-		{
-			$empfaengerArray = array_unique($empfaengerArray);
-			echo json_encode(array(
-				'status' => 'ok',
-				'msg' => 'Nachricht erfolgreich verschickt an: '.implode(',', $empfaengerArray)
-			));
-			exit();
-		}
 	}
+    if ($sendError)
+    {
+        echo json_encode(array(
+            'status' => 'fehler',
+            'msg' => '<p>Fehler beim Senden einer Nachricht</p>'
+        ));
+        exit();
+    }
+    else
+    {
+        $empfaengerArray = array_unique($empfaengerArray);
+        echo json_encode(array(
+            'status' => 'ok',
+            'msg' => 'Nachricht erfolgreich verschickt an: '.implode(',', $empfaengerArray)
+        ));
+        exit();
+    }
 }
 
 // Fügt einen Teilnehmer zum Reihungstest hinzu
