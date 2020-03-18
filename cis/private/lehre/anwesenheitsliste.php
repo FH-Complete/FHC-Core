@@ -33,7 +33,7 @@
 	require_once('../../../include/studiengang.class.php');
 	require_once('../../../include/lehrveranstaltung.class.php');
 	require_once('../../../include/phrasen.class.php');
-
+	require_once('../../../include/vertrag.class.php');
 
 	$sprache = getSprache();
 	$p=new phrasen($sprache);
@@ -134,6 +134,17 @@
 			  				{
 			  					while($row_lkt = $db->db_fetch_object($result_lkt))
 			  					{
+									// Lektor wird erst angezeigt wenn der Auftrag erteilt wurde
+									if (defined('CIS_LV_LEKTORINNENZUTEILUNG_VERTRAGSPRUEFUNG_VON')
+									 && CIS_LV_LEKTORINNENZUTEILUNG_VERTRAGSPRUEFUNG_VON != '')
+									{
+										$vertrag = new vertrag();
+										if (!$vertrag->isVertragErteiltLV($lvid, $stsem, $row_lkt->mitarbeiter_uid))
+										{
+											continue;
+										}
+									}
+
 			  						if($lektoren!='')
 			  							$lektoren.=', ';
 			  						$lektoren .= $row_lkt->kurzbz;
