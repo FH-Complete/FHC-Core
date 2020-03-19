@@ -2753,7 +2753,7 @@ else
 				prestudent_id=' . $prestudent_id . '&
 				&' . http_build_query(array('reihungstest' => $reihungstest)) . '">
 		<div class="row">';
-	echo '<div class="col-xs-12">';
+	echo '<div class="col-xs-12" id="miscfunctionscol">';
 	$disabledZuteilen = true;
 	$disabledTestende = true;
 	$rt_id_val = '';

@@ -130,6 +130,12 @@
     margin-left: 10px;
 }
 
+#miscfunctionscol input,#miscfunctionscol button
+{
+    /*make sure datepicker dropdown is in front*/
+    z-index: 0;
+}
+
 .loaderIcon
 {
     display: none;
