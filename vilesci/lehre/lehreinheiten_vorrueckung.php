@@ -350,7 +350,7 @@ if ($studiengang_kz != '' && $stsem_von != '' && $stsem_nach != '')
 										{
 											// Bei echten Dienstvertraegen mit voller inkludierter Lehre wird kein Stundensatz
 											// geliefert da dies im Vertrag inkludiert ist.
-											if ($row_verwendung->ba1code == 3 && $row_verwendung->inkludierte_lehre == -1)
+											if ($row_verwendung->ba1code == 103 && $row_verwendung->inkludierte_lehre == -1)
 											{
 												$lem_obj->stundensatz = '';
 												break;
