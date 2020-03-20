@@ -341,16 +341,16 @@ if ($type == 'mitarbeiter')
 		echo $p->t('profil/telefonTw').": $vorwahl - $user->telefonklappe<BR>";
 		//echo $p->t('profil/faxTw').": $vorwahl - 99 $user->telefonklappe<BR>";
 	}
-	else {
-		$kontakt = new kontakt();
-		$kontakt->load_pers($user->person_id);
-		foreach($kontakt->result as $k)
-		{
-			if ($k->kontakttyp == 'firmenhandy')
-				echo $p->t('profil/telefonTw').': '.$k->kontakt.'<br>';
-		}
 
+	$kontakt = new kontakt();
+	$kontakt->load_pers($user->person_id);
+	foreach($kontakt->result as $k)
+	{
+		if ($k->kontakttyp == 'firmenhandy')
+			echo 'Firmenhandy: '.$k->kontakt.'<br>';
 	}
+
+
 	if ($user->ort_kurzbz != '')
 		echo $p->t('profil/buero').': '.$user->ort_kurzbz.'<br>';
 }

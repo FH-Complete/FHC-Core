@@ -125,15 +125,15 @@ $format_colored =& $workbook->addFormat();
 $format_colored->setFgColor(10);
 
 $format_number_colored =& $workbook->addFormat();
-$format_number_colored->setNumFormat('0, 0.00');
+$format_number_colored->setNumFormat('0,0.00');
 //$format_number_colored->setNumFormat('0.00');
 $format_number_colored->setFgColor(10);
 
 $format_number =& $workbook->addFormat();
-$format_number->setNumFormat('0, 0.00');
+$format_number->setNumFormat('0,0.00');
 
 $format_number_bold =& $workbook->addFormat();
-$format_number_bold->setNumFormat('0, 0.00');
+$format_number_bold->setNumFormat('0,0.00');
 //$format_number_bold->setNumFormat('0.00');
 $format_number_bold->setBold();
 

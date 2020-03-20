@@ -35,7 +35,7 @@ if (!$db = new basis_db())
 	<title>Testool Fragen Übersicht</title>
 	<link href="../../../skin/style.css.php" rel="stylesheet" type="text/css">
 </head>
-<body>
+<body style="padding: 10px">
 <?php 
 $user = get_uid();
 $rechte = new benutzerberechtigung();
@@ -47,7 +47,8 @@ if(!$rechte->isBerechtigt('basis/testtool', null, 's'))
 $gebiet = new gebiet(); 
 $gebiet->getAll(); 
 $sprache = (isset($_REQUEST['Sprache'])?$_REQUEST['Sprache']:'German');
-$Auswahlgebiet = (isset($_REQUEST['AuswahlGebiet'])?$_REQUEST['AuswahlGebiet']:''); 
+$Auswahlgebiet = (isset($_REQUEST['AuswahlGebiet'])?$_REQUEST['AuswahlGebiet']:'');
+$loesungen = (isset($_REQUEST['loesungen']) && $_REQUEST['loesungen'] != '' ? true:false);
 
 echo '<form action="'.$_SERVER['PHP_SELF'].'" method="post" name="TesttoolUebersicht">
 <table>
@@ -76,6 +77,13 @@ else
 
 echo'</select>
 </td>
+</tr>
+<tr>
+<td>
+Mit Lösungen
+</td>
+<td><input type="checkbox" name="loesungen" '.($loesungen ? 'checked':'').'></td>
+</tr>
 <tr>
 <td colspan="2"><input type="submit" value="Anzeigen"></td></tr>
 </table><br>';
@@ -208,8 +216,17 @@ if(isset($_REQUEST['AuswahlGebiet']))
 			$vorschlag = new vorschlag();
 			$vorschlag->loadVorschlagSprache($vor->vorschlag_id, $sprache);
 			
-			if($vorschlag->bild =='')
-				echo '<tr><td align="right"><b>'.$vor->punkte.'</b></td><td style="border-left:1px solid;">&nbsp;'.$vorschlag->text.'</td></tr>';
+			if($vorschlag->bild == '')
+			{
+				if ($loesungen)
+				{
+					echo '<tr><td style="border-right:1px solid;">'.$vor->nummer.'</td></td><td align="right"><b>'.$vor->punkte.'</b></td><td style="border-left:1px solid;">&nbsp;'.$vorschlag->text.'</td></tr>';
+				}
+				else
+				{
+					echo '<tr><td style="border-right:1px solid;">'.$vor->nummer.'</td><td>&nbsp;'.$vorschlag->text.'</td></tr>';
+				}
+			}
 			if($vorschlag->bild!='')
 			{
 				// zeilenumbruch nach 4 bilder
@@ -217,7 +234,15 @@ if(isset($_REQUEST['AuswahlGebiet']))
 					echo "</tr>";
 				echo "<td>";
 				echo "<img class='testtoolvorschlag' src='../bild.php?src=vorschlag&amp;vorschlag_id=$vor->vorschlag_id&amp;sprache=".$sprache."' /><br/>";
-				echo "<br>".$vor->punkte."</td>";
+				if ($loesungen)
+				{
+					echo "<br>".$vor->punkte."</td>";
+				}
+				else
+				{
+					echo "</td>";
+				}
+
 				$anzahlBild++;
 			}
 			if($vorschlag->audio!='')

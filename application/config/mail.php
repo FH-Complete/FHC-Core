@@ -29,3 +29,6 @@ $config['wrapchars'] = 76; // Character count to wrap at.
 $config['mailtype'] = 'html'; // html or text
 $config['priority'] = 3; // Email Priority. 1 = highest. 5 = lowest. 3 = normal
 $config['validate'] = false; // If true then the email address will be validated
+
+// If enabled will be logged info about emails in Codeigniter error logs
+$config['enable_debug'] = false;

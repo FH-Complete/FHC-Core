@@ -69,7 +69,7 @@ if (isset($_SESSION['pruefling_id']))
 	$result = $db->db_query($qry);
 
 	echo '<table width="100%" border="0" cellspacing="0" cellpadding="0" style="border-right-width:1px;border-right-color:#BCBCBC; border-collapse: separate;
-    border-spacing: 0 3px;">';
+	border-spacing: 0 3px;">';
 
 // Link zur Startseite
 	echo '<tr><td class="ItemTesttool" style="margin-left: 20px;" nowrap>
@@ -78,16 +78,16 @@ if (isset($_SESSION['pruefling_id']))
 
 // Link zur Einleitung
 	if ($content_id = $db->db_fetch_object($result))
-    {
+	{
 		if($content_id->content_id!='')
-        {
+		{
 			echo '
-                <tr id="tr-einleitung"><td class="ItemTesttool" style="margin-left: 20px;" nowrap>
-                    <a class="ItemTesttool navButton" href="../../cms/content.php?content_id='.$content_id->content_id.'&sprache='.$sprache_user.'" target="content">'.$p->t('testtool/einleitung').'</a>
-                </td></tr>
-            ';
-        }
-    }
+				<tr id="tr-einleitung"><td class="ItemTesttool" style="margin-left: 20px;" nowrap>
+					<a class="ItemTesttool navButton" href="../../cms/content.php?content_id='.$content_id->content_id.'&sprache='.$sprache_user.'" target="content">'.$p->t('testtool/einleitung').'</a>
+				</td></tr>
+			';
+		}
+	}
 	echo '<tr><td style="padding-left: 20px;" nowrap>';
 
 	$studiengang_kz = (isset($_SESSION['studiengang_kz'])) ? $_SESSION['studiengang_kz'] : '';
@@ -98,78 +98,78 @@ if (isset($_SESSION['pruefling_id']))
 
 	/**
 	 * Spaltennamen-Aliase extrahieren um sie im Outer-Select verwenden zu können
-     * $bezeichnung_mehrsprachig liefert: bezeichnung_mehrsprachig[1] as bezeichnung_mehrsprachig_1,...
-     * $bezeichnung_mehrsprachig_sel liefert: bezeichnung_mehrsprachig_1, bezeichnung_mehrsprachig_2,...
+	 * $bezeichnung_mehrsprachig liefert: bezeichnung_mehrsprachig[1] as bezeichnung_mehrsprachig_1,...
+	 * $bezeichnung_mehrsprachig_sel liefert: bezeichnung_mehrsprachig_1, bezeichnung_mehrsprachig_2,...
 	 */
 	$bezeichnung_mehrsprachig_sel = explode(",", $bezeichnung_mehrsprachig);
 	foreach ($bezeichnung_mehrsprachig_sel as &$bm)
-    {
-        $bm = strrchr($bm, ' as ');
-    }
+	{
+		$bm = strrchr($bm, ' as ');
+	}
 	$bezeichnung_mehrsprachig_sel = implode(', ', $bezeichnung_mehrsprachig_sel);
 
 	/**
 	 * Reihungstestgebiete der Person ermitteln; Zusammenfassen, falls RT für mehrere Studien
-     * 1. Aktuelle Prestudenten zur Person über den Prüfling ermitteln,
-     * 2. Einstiegssemester (Erstsemester/Quereinsteiger) und Studienplan pro Prestudent ermitteln,
-     * 3. RT-Gebiete falls vorhanden über Studienplan, sonst über STG ermitteln
-     * 4. Für Quereinsteiger zusätzlich auch Erstsemestrigen-Gebiete
+	 * 1. Aktuelle Prestudenten zur Person über den Prüfling ermitteln,
+	 * 2. Einstiegssemester (Erstsemester/Quereinsteiger) und Studienplan pro Prestudent ermitteln,
+	 * 3. RT-Gebiete falls vorhanden über Studienplan, sonst über STG ermitteln
+	 * 4. Für Quereinsteiger zusätzlich auch Erstsemestrigen-Gebiete
 	 */
 	$qry = "
-        WITH prestudent_data AS
-        (
-        SELECT DISTINCT ON (prestudent_id)
-	        prestudent_id,
-	        studienplan_id,
-            studiengang_kz,
-            typ,
+		WITH prestudent_data AS
+		(
+		SELECT DISTINCT ON (prestudent_id)
+			prestudent_id,
+			studienplan_id,
+			studiengang_kz,
+			typ,
 			tbl_studiengangstyp.bezeichnung AS typ_bz,
-	        ausbildungssemester AS semester
-        FROM
-	        public.tbl_prestudentstatus AS ps_status
-        JOIN
-	        public.tbl_prestudent USING (prestudent_id)
-        JOIN
-            public.tbl_studiengang USING (studiengang_kz)
-        JOIN
-            public.tbl_studiengangstyp USING (typ)
-        WHERE
-	        tbl_prestudent.person_id = (
-		        SELECT
-			        person_id
-		        FROM
-			        public.tbl_prestudent
-		        WHERE
-			        prestudent_id = ".$db->db_add_param($_SESSION['prestudent_id'])."
-	        )
+			ausbildungssemester AS semester
+		FROM
+			public.tbl_prestudentstatus AS ps_status
+		JOIN
+			public.tbl_prestudent USING (prestudent_id)
+		JOIN
+			public.tbl_studiengang USING (studiengang_kz)
+		JOIN
+			public.tbl_studiengangstyp USING (typ)
+		WHERE
+			tbl_prestudent.person_id = (
+				SELECT
+					person_id
+				FROM
+					public.tbl_prestudent
+				WHERE
+					prestudent_id = ".$db->db_add_param($_SESSION['prestudent_id'])."
+			)
 
-        /* Filter only future studiensemester (incl. actual one) */
-        AND
-	        studiensemester_kurzbz IN (
-		        SELECT
-			        studiensemester_kurzbz
-		        FROM
-			        public.tbl_studiensemester
-		        WHERE
-			        ende > now()
-	        )
+		/* Filter only future studiensemester (incl. actual one) */
+		AND
+			studiensemester_kurzbz IN (
+				SELECT
+					studiensemester_kurzbz
+				FROM
+					public.tbl_studiensemester
+				WHERE
+					ende > now()
+			)
 
-        /* Filter out all Abgewiesene */
-        AND NOT EXISTS (
-            SELECT
-                1
-            FROM
-                tbl_prestudentstatus
-            WHERE
-                status_kurzbz = 'Abgewiesener'
-            AND
-                prestudent_id = ps_status.prestudent_id
-        )
+		/* Filter out all Abgewiesene */
+		AND NOT EXISTS (
+			SELECT
+				1
+			FROM
+				tbl_prestudentstatus
+			WHERE
+				status_kurzbz = 'Abgewiesener'
+			AND
+				prestudent_id = ps_status.prestudent_id
+		)
 
-        AND
-	        status_kurzbz = 'Interessent'";
+		AND
+			status_kurzbz = 'Interessent'";
 
-            /*  If the logged-in prestudents study is a Bachelor-study, filter only Bachelor-studies */
+			/*  If the logged-in prestudents study is a Bachelor-study, filter only Bachelor-studies */
 			if ($stg->typ == 'b')
 			{
 				$qry .= "
@@ -184,86 +184,95 @@ if (isset($_SESSION['pruefling_id']))
 
 			$qry .= "
 
-        /* Order to get last semester when using distinct on */
-        ORDER BY
-	        prestudent_id,
-	        datum DESC,
-	        ps_status.insertamum DESC,
-	        ps_status.ext_id DESC
-        )
+		/* Order to get last semester when using distinct on */
+		ORDER BY
+			prestudent_id,
+			datum DESC,
+			ps_status.insertamum DESC,
+			ps_status.ext_id DESC
+		)
 
 
-        SELECT DISTINCT ON
-            (gebiet_id, semester)
-	        semester,
-	        gebiet_id,
-	        STRING_AGG(studiengang_kz::TEXT, ', ' ORDER BY studiengang_kz) AS studiengang_kz_list,
-	        bezeichnung,
-	        MIN(reihung) AS reihung,
-            ". $bezeichnung_mehrsprachig_sel. "
-        FROM (
-            SELECT
-                *
-            FROM (
-                (SELECT
-                    prestudent_data.semester AS ps_sem,
-                    gebiet_id,
-                    bezeichnung,
-                    tbl_ablauf.studienplan_id,
-                    tbl_ablauf.studiengang_kz,
-                    tbl_ablauf.semester,
-                    tbl_ablauf.reihung,
-                    ".$bezeichnung_mehrsprachig. "
-                FROM
-                    prestudent_data
-                JOIN
-                    testtool.tbl_ablauf USING (studiengang_kz)
-                JOIN
-                    testtool.tbl_gebiet USING (gebiet_id)
-                WHERE
-                    (prestudent_data.semester= 1 AND tbl_ablauf.semester = 1)
-                OR
-                    (prestudent_data.semester= 3 AND tbl_ablauf.semester IN (1,3))
-                )
+		SELECT DISTINCT ON
+			(gebiet_id, semester, reihung)
+			semester,
+			gebiet_id,
+			STRING_AGG(studiengang_kz::TEXT, ', ' ORDER BY studiengang_kz) AS studiengang_kz_list,
+			bezeichnung,
+			MIN(reihung) AS reihung,
+			". $bezeichnung_mehrsprachig_sel. "
+		FROM (
+			SELECT
+				*
+			FROM (
+				(SELECT
+					prestudent_data.semester AS ps_sem,
+					gebiet_id,
+					bezeichnung,
+					tbl_ablauf.studienplan_id,
+					tbl_ablauf.studiengang_kz,
+					tbl_ablauf.semester,
+					tbl_ablauf.reihung,
+					".$bezeichnung_mehrsprachig. "
+				FROM
+					prestudent_data
+				JOIN
+					testtool.tbl_ablauf USING (studiengang_kz)
+				JOIN
+					testtool.tbl_gebiet USING (gebiet_id)
+				WHERE
+					(
+						(prestudent_data.semester= 1 AND tbl_ablauf.semester = 1)
+						OR
+						(prestudent_data.semester= 3 AND tbl_ablauf.semester IN (1,3))
+					)
+				AND (   
+						prestudent_data.studienplan_id = tbl_ablauf.studienplan_id
+						OR
+						tbl_ablauf.studienplan_id IS NULL
+					)
+				)
 
-                UNION
+				UNION
 
-                (
-                SELECT
-                    prestudent_data.semester AS ps_sem,
-                    gebiet_id,
-                    bezeichnung,
-                    tbl_ablauf.studienplan_id,
-                    tbl_ablauf.studiengang_kz,
-                    tbl_ablauf.semester,
-                    tbl_ablauf.reihung,
-                    ". $bezeichnung_mehrsprachig. "
-                FROM
-                    prestudent_data
-                JOIN
-                    testtool.tbl_ablauf USING (studienplan_id)
-                JOIN
-                    testtool.tbl_gebiet USING (gebiet_id)
-                WHERE
-                    (prestudent_data.semester= 1 AND tbl_ablauf.semester = 1)
-                OR
-                    (prestudent_data.semester= 3 AND tbl_ablauf.semester IN (1,3))
-                )
-            ) temp
-        ) temp2
+				(
+				SELECT
+					prestudent_data.semester AS ps_sem,
+					gebiet_id,
+					bezeichnung,
+					tbl_ablauf.studienplan_id,
+					tbl_ablauf.studiengang_kz,
+					tbl_ablauf.semester,
+					tbl_ablauf.reihung,
+					". $bezeichnung_mehrsprachig. "
+				FROM
+					prestudent_data
+				JOIN
+					testtool.tbl_ablauf USING (studienplan_id)
+				JOIN
+					testtool.tbl_gebiet USING (gebiet_id)
+				WHERE
+					(prestudent_data.semester= 1 AND tbl_ablauf.semester = 1)
+				OR
+					(prestudent_data.semester= 3 AND tbl_ablauf.semester IN (1,3))
+				)
+			) temp
+		) temp2
 
-        GROUP BY
-            semester,
-             gebiet_id,
-             bezeichnung,
+		GROUP BY
+			semester,
+			 gebiet_id,
+			 bezeichnung,
 			". $bezeichnung_mehrsprachig_sel ." 
 
-        ORDER BY
-	        semester,
-	        gebiet_id
-        ";
+		ORDER BY
+			semester,
+			reihung,
+			gebiet_id
+		";
 
 	$result = $db->db_query($qry);
+	$anzahlGebiete = $db->db_num_rows($result);
 	$lastsemester = '';
 	$quereinsteiger_stg = '';
 	while($row = $db->db_fetch_object($result))
@@ -355,10 +364,22 @@ if (isset($_SESSION['pruefling_id']))
 				$class='ItemTesttool';
 			}
 
+			// Fallback für Gebietbezeichnung, falls nicht in gewählter Sprache vorhanden
+			$gebietbezeichnung = $sprache_mehrsprachig->parseSprachResult("bezeichnung_mehrsprachig", $row)[$sprache_user];
+			if ($gebietbezeichnung == '')
+			{
+				$gebietbezeichnung = $sprache_mehrsprachig->parseSprachResult("bezeichnung_mehrsprachig", $row)[DEFAULT_LANGUAGE];
+
+				if ($gebietbezeichnung == '')
+				{
+					$gebietbezeichnung = $row->bezeichnung;
+				}
+			}
+
 			echo '<tr>
 					<!--<td width="10" class="ItemTesttoolLeft" nowrap>&nbsp;</td>-->
 						<td class="'.$class.'">
-							<a class="'.$class.'" href="frage.php?gebiet_id='.$row->gebiet_id.'" onclick="document.location.reload()" target="content" style="'.$style.'">'.$sprache_mehrsprachig->parseSprachResult("bezeichnung_mehrsprachig", $row)[$sprache_user].'</a>
+							<a class="'.$class.'" href="frage.php?gebiet_id='.$row->gebiet_id.'" onclick="document.location.reload()" target="content" style="'.$style.'">'.$gebietbezeichnung.'</a>
 						</td>
 					<!--<td width="10" class="ItemTesttoolRight" nowrap>&nbsp;</td>-->
 					</tr>';
@@ -368,9 +389,13 @@ if (isset($_SESSION['pruefling_id']))
 			$invalid_gebiete = true;
 		}
 	}
-	echo '</table>';
+	if ($anzahlGebiete > 0)
+	{
+		echo '</table>';
+	}
 
 	// Link zum Logout
+
 	echo '<tr><td class="ItemTesttool" style="margin-left: 20px;" nowrap>
 			<a class="ItemTesttool navButton" href="login.php?logout=true" target="content">Logout</a>
 		</td></tr>';

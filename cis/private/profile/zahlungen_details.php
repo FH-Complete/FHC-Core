@@ -26,6 +26,8 @@ require_once('../../../include/organisationseinheit.class.php');
 require_once('../../../include/addon.class.php');
 require_once('../../../include/benutzer.class.php');
 require_once('../../../include/benutzerberechtigung.class.php');
+require_once('../../../include/student.class.php');
+require_once('../../../include/prestudent.class.php');
 	
 $uid = get_uid();
 
@@ -66,7 +68,19 @@ $studiengang=new studiengang();
 $studiengang->load($konto->studiengang_kz);
 $bankverbindung=new bankverbindung();
 
-$kontodaten = getBankverbindung($studiengang->oe_kurzbz);
+// Wenn Person StudentIn ist, auch die OrgForm laden um die richtige Kontonummer anzeigen zu können
+$student = new student();
+$orgform = '';
+if ($student->load($uid))
+{
+	$laststatus = new prestudent();
+	if ($laststatus->getLastStatus($student->prestudent_id))
+	{
+		$orgform = $laststatus->orgform_kurzbz;
+	}
+}
+
+$kontodaten = getBankverbindung($studiengang->oe_kurzbz, $orgform);
 $iban=$kontodaten["iban"];
 $bic=$kontodaten["bic"];
 
@@ -156,56 +170,63 @@ $addon = new addon();
 $addon->loadAddons();
 foreach($addon->result as $a)
 {
-    if($a->kurzbz === "eps")
-    {
+	if($a->kurzbz === "eps")
+	{
 	echo '<table class="tablesorter">
-	    <thead>
+		<thead>
 		<tr>
-		    <th width="40%">Zahlung anweisen</th>
-		    <th width="60%"></th>
+			<th width="40%">Zahlung anweisen</th>
+			<th width="60%"></th>
 		</tr>
-	    </thead>
-	    <tbody>
+		</thead>
+		<tbody>
 		<tr>
-		    <td>EPS</td>
-		    <td>
-		    <a href="../../../addons/eps/cis/index.php?buchungsnummer='.$buchungsnr.'"><img src="../../../skin/images/eps-logo_full.gif" width="30" height="30" alt="EPS Überweisung"></a>
-		    </td>
+			<td>EPS</td>
+			<td>
+			<a href="../../../addons/eps/cis/index.php?buchungsnummer='.$buchungsnr.'"><img src="../../../skin/images/eps-logo_full.gif" width="30" height="30" alt="EPS Überweisung"></a>
+			</td>
 		</tr>
-	    </tbody>
+		</tbody>
 	</table>';
-    }
-    
+	}
+	
 }
 
 echo '</body></html>';
 
-function getBankverbindung($oe_kurzbz)
+function getBankverbindung($oe_kurzbz, $orgform_kurzbz = null)
 {
-    $iban = "";
-    $bic = "";
-    $result = array();
-    $bankverbindung=new bankverbindung();
-    if($bankverbindung->load_oe($oe_kurzbz) && count($bankverbindung->result)>0)
-    {
-	$result["iban"]=$bankverbindung->result[0]->iban;
-	$result["bic"]=$bankverbindung->result[0]->bic;
-	return $result;
-    }
-    else
-    {
-	$organisationseinheit = new organisationseinheit();
-	$organisationseinheit->load($oe_kurzbz);
-	if($organisationseinheit->oe_parent_kurzbz !== NULL)
+	$iban = "";
+	$bic = "";
+	$result = array();
+	$bankverbindung=new bankverbindung();
+	if($bankverbindung->load_oe($oe_kurzbz, $orgform_kurzbz) && count($bankverbindung->result) > 0)
 	{
-	    $result = getBankverbindung($organisationseinheit->oe_parent_kurzbz);
-	    return $result;
+		$result["iban"] = $bankverbindung->result[0]->iban;
+		$result["bic"] = $bankverbindung->result[0]->bic;
+		return $result;
+	}
+	// Nochmal ohne $orgform_kurzbz versuchen
+	elseif($bankverbindung->load_oe($oe_kurzbz) && count($bankverbindung->result) > 0)
+	{
+		$result["iban"] = $bankverbindung->result[0]->iban;
+		$result["bic"] = $bankverbindung->result[0]->bic;
+		return $result;
 	}
 	else
 	{
-	    $result["iban"]="";
-	    $result["bic"]="";
+		$organisationseinheit = new organisationseinheit();
+		$organisationseinheit->load($oe_kurzbz);
+		if($organisationseinheit->oe_parent_kurzbz !== NULL)
+		{
+			$result = getBankverbindung($organisationseinheit->oe_parent_kurzbz, $orgform_kurzbz);
+			return $result;
+		}
+		else
+		{
+			$result["iban"] = "";
+			$result["bic"] = "";
+		}
 	}
-    }
 }
 ?>

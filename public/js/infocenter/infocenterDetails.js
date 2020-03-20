@@ -284,10 +284,13 @@ var InfocenterDetails = {
 					{
 						var freigabeResponseData = FHC_AjaxClient.getData(data);
 
-						if (freigabeResponseData.nonCriticalErrors && freigabeResponseData.nonCriticalErrors.length > 0
-							&& typeof freigabeResponseData.nonCriticalErrors == "string")
+						if (freigabeResponseData.nonCriticalErrors && freigabeResponseData.nonCriticalErrors.length > 0)
 						{
-							FHC_DialogLib.alertWarning(freigabeResponseData.nonCriticalErrors);
+							FHC_DialogLib.alertWarning(freigabeResponseData.nonCriticalErrors.join(", "));
+						}
+						else if (freigabeResponseData.infoMessages && freigabeResponseData.infoMessages.length > 0)
+						{
+							FHC_DialogLib.alertInfo(freigabeResponseData.infoMessages.join(", "));
 						}
 						FHC_AjaxClient.showVeil();
 						InfocenterDetails.initFrgMessageSend(freigabeData);
@@ -680,7 +683,7 @@ var InfocenterDetails = {
 	sendFreigabeMessage: function(prestudentid, vorlage_kurzbz, msgvars)
 	{
 		FHC_AjaxClient.ajaxCallPost(
-			'system/Messages/sendJson',
+			'system/messages/Messages/sendExplicitTemplateJson',
 			{
 				"prestudents": prestudentid,
 				"vorlage_kurzbz": vorlage_kurzbz,

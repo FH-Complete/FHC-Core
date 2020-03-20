@@ -269,7 +269,7 @@ class Vorlage extends Auth_Controller
 			show_error(getError($vorlagetext));
 
 		$data = array(
-			'text' => $this->vorlagelib->parseVorlagetext($vorlagetext->retval[0]->text, $jsonDecodedForm)
+			'text' => parseText($vorlagetext->retval[0]->text, $jsonDecodedForm)
 		);
 
 		$this->load->view('system/vorlage/templatetextPreview', $data);

@@ -4120,16 +4120,16 @@ if(!$error)
 	elseif(isset($_POST['type']) && $_POST['type']=='getReihungstestPunkte')
 	{
 		//Liefert die Reihungstestpunkte eines Prestudenten
-		if(isset($_POST['person_id']) && isset($_POST['reihungstest_id']))
+		if(isset($_POST['person_id']) && isset($_POST['reihungstest_id']) && isset($_POST['studienplan_studiengang_kz']))
 		{
 			$pruefling = new pruefling();
 			if(defined('FAS_REIHUNGSTEST_PUNKTE') && FAS_REIHUNGSTEST_PUNKTE)
-				$data = $pruefling->getReihungstestErgebnisPerson($_POST['person_id'], true, $_POST['reihungstest_id']);
+				$data = $pruefling->getReihungstestErgebnisPerson($_POST['person_id'], true, $_POST['reihungstest_id'], false, null, $_POST['studienplan_studiengang_kz']);
 			else
-				$data = $pruefling->getReihungstestErgebnisPerson($_POST['person_id'], false, $_POST['reihungstest_id']);
+				$data = $pruefling->getReihungstestErgebnisPerson($_POST['person_id'], false, $_POST['reihungstest_id'], false, null, $_POST['studienplan_studiengang_kz']);
 
-			// Runden auf 2 Nachkommastellen
-			$data = number_format($data, 2, '.','');
+			// Runden auf 4 Nachkommastellen
+			$data = number_format($data, 4, '.','');
 			$return = true;
 		}
 		else
