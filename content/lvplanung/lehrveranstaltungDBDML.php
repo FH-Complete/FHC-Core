@@ -1814,7 +1814,7 @@ if(!$error)
 		}
 		else
 		{
-			$errormsg = 'VertragsID und MitarbeiterUID müssen uebergeben werden';
+			$errormsg = 'Sie haben keine Berechtigung für diese Aktion.';
 			$return = false;
 		}
 	}
