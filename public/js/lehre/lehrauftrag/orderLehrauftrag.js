@@ -88,10 +88,16 @@ function hf_filterStringnumberWithOperator(headerValue, rowValue, rowData){
  */
 function func_dataLoaded(data, table){
     table.setFilter([
-        {field: 'personalnummer', type: '>=', value: 0},        // not dummy lector AND
         [
-            {field: 'status', type: '=', value: 'Neu'},         // neu OR
-            {field: 'status', type: '=', value: 'Geändert'}     // geaendert
+            {field: 'personalnummer', type: '>', value: 0},       // not dummy
+            {field: 'personalnummer', type: '=', value: null}     // include projektbetreuer
+        ],
+        {field: 'mitarbeiter_uid', type: '!=', value: null},    // AND is Mitarbeiter
+        {field: 'stunden', type: '!=', value: null},            // AND has Semesterstunden (not null and not 0)
+        {field: 'stunden', type: '!=', value: 0},
+        [
+            {field: 'status', type: '=', value: 'Neu'},         // AND neu
+            {field: 'status', type: '=', value: 'Geändert'}     // OR geaendert
         ]
     ]);
 }
@@ -114,6 +120,8 @@ function func_groupHeader(data) {
 // Formats the rows
 function func_rowFormatter(row){
     var is_dummy = (row.getData().personalnummer <= 0 && row.getData().personalnummer != null);
+    var is_mitarbeiter = row.getData().mitarbeiter_uid != null;
+    var has_stunden = row.getData().stunden != 0 && row.getData().stunden != null;
 
     var bestellt = row.getData().bestellt;
     var erteilt = row.getData().erteilt;
@@ -149,14 +157,18 @@ function func_rowFormatter(row){
     Formats the color of the rows depending on their status
     - blue: dummy lectors
     - bold: geaendert
-    - default (white): neu und erteilt
+    - default (white): neu
     - green: akzeptiert
-    - grey: all other (marks unselectable)
+    - grey: all other (marks unselectable), not mitarbeiter, has no semesterstunden
      */
     row.getCells().forEach(function(cell){
         if(is_dummy)
         {
             cell.getElement().classList.add('bg-info');                          // dummy lectors
+        }
+        else if ((!is_mitarbeiter || !has_stunden) && akzeptiert == null)
+        {
+            row.getElement().style["background-color"] = COLOR_LIGHTGREY;
         }
         else if (bestellt != null && (betrag != vertrag_betrag) ||
             bestellt != null && stunden != vertrag_stunden &&
@@ -181,7 +193,9 @@ function func_rowFormatter(row){
 
 // Formats row selectable/unselectable
 function func_selectableCheck(row){
-    var is_dummy = (row.getData().personalnummer <= 0 && row.getData().personalnummer != null);
+    var is_dummy = row.getData().personalnummer <= 0;
+    var is_mitarbeiter = row.getData().mitarbeiter_uid != null;
+    var has_stunden = row.getData().stunden != 0 && row.getData().stunden != null;
 
     var stunden = parseFloat(row.getData().stunden);
     var vertrag_stunden = parseFloat(row.getData().vertrag_stunden);
@@ -211,10 +225,12 @@ function func_selectableCheck(row){
 
 
     // Only allow to select neue and geaenderte
-    return  !is_dummy &&                                                    // NOT dummy lector
+    return  !is_dummy &&                                                // NOT dummy lector
+        is_mitarbeiter &&                                               // AND is Mitarbeiter
+        has_stunden &&                                                  // AND has Semesterstunden (not null and not 0)
         row.getData().bestellt == null ||                               // AND neue
         row.getData().bestellt != null && betrag != vertrag_betrag ||   // OR geaenderte
-        row.getData().bestellt != null && stunden != vertrag_stunden    // OR geanderte (if betrag is 0 or null)
+        row.getData().bestellt != null && stunden != vertrag_stunden
 }
 
 // Adds column status
@@ -349,10 +365,18 @@ function footer_downloadCSV(){
  */
 function footer_selectAll(){
     $('#tableWidgetTabulator').tabulator('getRows', true)
-        .filter(row => row.getData().personalnummer >= 0 &&             // NOT dummies
-            row.getData().bestellt == null ||                       // AND neu
-            row.getData().bestellt != null &&                       // OR (bestellt
-            row.getData().status == 'Geändert')                     // AND geaendert)
+        .filter(row => (
+            row.getData().personalnummer > 0 ||                 // not dummies
+            row.getData().personalnummer == null) &&            // include Projektbetreuer
+            row.getData().mitarbeiter_uid != null &&            // AND is Mitarbeiter
+            row.getData().stunden != null &&                    // AND has Semesterstunden (not null and not 0)
+            row.getData().stunden != 0 &&
+            (
+                row.getData().bestellt == null ||               // AND neu
+                row.getData().bestellt != null &&               // OR (bestellt
+                row.getData().status == 'Geändert'              // AND geaendert)
+            )
+        )
         .forEach((row => row.select()));
 }
 
@@ -448,6 +472,8 @@ status_formatter = function(cell, formatterParams, onRendered){
 // Generates status tooltip
 status_tooltip = function(cell){
     var is_dummy = (cell.getRow().getData().personalnummer <= 0 && cell.getRow().getData().personalnummer != null);
+    var is_mitarbeiter = cell.getRow().getData().mitarbeiter_uid != null;
+    var has_stunden = cell.getRow().getData().stunden != 0 && cell.getRow().getData().stunden != null;
 
     var bestellt = cell.getRow().getData().bestellt;
     var erteilt = cell.getRow().getData().erteilt;
@@ -491,6 +517,14 @@ status_tooltip = function(cell){
     if (is_dummy)                                           // dummy (no lector)
     {
         return 'Neuer Lehrauftrag. Ohne Lektor verplant.'
+    }
+    else if (!is_mitarbeiter)
+    {
+        return 'Lektor ist nicht als Mitarbeiter erfasst.'
+    }
+    else if (!has_stunden)
+    {
+        return 'Es wurden noch keine Stunden zugeteilt.'
     }
     else if (isNaN(vertrag_betrag))                         // neu
     {
@@ -547,11 +581,17 @@ $(function() {
         $('#tableWidgetTabulator').tabulator('clearFilter');
     });
 
-    // Show only rows with new lehrauftraege (not dummy lectors)
+    // Show only rows with new lehrauftraege (not dummy lectors or external projektbetreuer; stunden not 0 or null)
     $("#show-new").click(function(){
         $('#tableWidgetTabulator').tabulator('setFilter',
             [
-                {field: 'personalnummer', type: '>=', value: 0},
+                [
+                    {field: 'personalnummer', type: '>', value: 0},     // not dummy lector
+                    {field: 'personalnummer', type: '=', value: null}   // include Projektbetreuer
+                ],
+                {field: 'mitarbeiter_uid', type: '!=', value: null},    // AND is Mitarbeiter
+                {field: 'stunden', type: '!=', value: null},            // AND has Semesterstunden (not null and not 0)
+                {field: 'stunden', type: '!=', value: 0},
                 {field: 'bestellt', type: '=', value: null},
                 {field: 'erteilt', type: '=', value: null},
                 {field: 'akzeptiert', type: '=', value: null}
@@ -598,9 +638,15 @@ $(function() {
         // needs custom filter to compare fields betrag and vertrag_betrag
         $('#tableWidgetTabulator').tabulator('setFilter',
             [
-                {field: 'personalnummer', type: '>=', value: 0},    // NOT dummy lector AND
-                {field: 'bestellt', type: '!=', value: null},       // bestellt AND
-                {field: 'status', type: '=', value: 'Geändert'}     // geaendert
+                [
+                    {field: 'personalnummer', type: '>', value: 0},     // NOT dummy lector
+                    {field: 'personalnummer', type: '=', value: null}   // include Projektbetreuer
+                ],
+                {field: 'mitarbeiter_uid', type: '!=', value: null},    // AND is Mitarbeiter
+                {field: 'stunden', type: '!=', value: null},            // AND has Semesterstunden (not null and not 0)
+                {field: 'stunden', type: '!=', value: 0},
+                {field: 'bestellt', type: '!=', value: null},           // bestellt AND
+                {field: 'status', type: '=', value: 'Geändert'}         // geaendert
             ]
         );
     });
