@@ -3634,6 +3634,26 @@ When on hold, the date is only a reminder.',
 			)
 		)
 	),
+    array(
+        'app' => 'infocenter',
+        'category' => 'infocenter',
+        'phrase' => 'rtErgebnisExistiert',
+        'insertvon' => 'system',
+        'phrases' => array(
+            array(
+                'sprache' => 'German',
+                'text' => 'Es existiert bereits ein RT-Ergebnis',
+                'description' => '',
+                'insertvon' => 'system'
+            ),
+            array(
+                'sprache' => 'English',
+                'text' => 'Placement test result already exists',
+                'description' => '',
+                'insertvon' => 'system'
+            )
+        )
+    ),
 	array(
 		'app' => 'core',
 		'category' => 'password',
