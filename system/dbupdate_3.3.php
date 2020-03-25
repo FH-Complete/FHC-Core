@@ -3842,6 +3842,33 @@ if ($result = $db->db_query("SELECT 1 FROM pg_class WHERE relname = 'unq_idx_abl
 	}
 }
 
+// Spalte bezeichnung_mehrsprachig in public.tbl_studiengangstyp
+if(!$result = @$db->db_query("SELECT bezeichnung_mehrsprachig FROM public.tbl_studiengangstyp LIMIT 1"))
+{
+	$qry = "ALTER TABLE public.tbl_studiengangstyp ADD COLUMN bezeichnung_mehrsprachig varchar(255)[];";
+
+	if(!$db->db_query($qry))
+		echo '<strong>public.tbl_studiengangstyp '.$db->db_last_error().'</strong><br>';
+	else
+		echo 'public.tbl_studiengangstyp: Spalte bezeichnung_mehrsprachig hinzugefuegt!<br>';
+
+	// Bezeichnung_mehrsprachig aus existierender Bezeichnung vorausfuellen. Ein Eintrag fuer jede Sprache mit Content aktiv.
+	$qry_help = "SELECT index FROM public.tbl_sprache WHERE content=TRUE;";
+	if(!$result = $db->db_query($qry_help))
+		echo '<strong>tbl_studiengangstyp bezeichnung_mehrsprachig: Fehler beim ermitteln der Sprachen: '.$db->db_last_error().'</strong>';
+	else
+	{
+		$qry='';
+		while($row = $db->db_fetch_object($result))
+			$qry.= "UPDATE public.tbl_studiengangstyp set bezeichnung_mehrsprachig[".$row->index."] = bezeichnung;";
+
+		if(!$db->db_query($qry))
+			echo '<strong>Setzen der bezeichnung_mehrsprachig fehlgeschlagen: '.$db->db_last_error().'</strong><br>';
+		else
+			echo 'bis.tbl_studiengangstyp: bezeichnung_mehrprachig automatisch aus existierender Bezeichnung uebernommen<br>';
+	}
+}
+
 /**
  * Anpassungen fuer BIS Personalmeldung 6.8
  */
@@ -4172,7 +4199,7 @@ $tabellen=array(
 	"public.tbl_student"  => array("student_uid","matrikelnr","prestudent_id","studiengang_kz","semester","verband","gruppe","updateamum","updatevon","insertamum","insertvon","ext_id"),
 	"public.tbl_studentlehrverband"  => array("student_uid","studiensemester_kurzbz","studiengang_kz","semester","verband","gruppe","updateamum","updatevon","insertamum","insertvon","ext_id"),
 	"public.tbl_studiengang"  => array("studiengang_kz","kurzbz","kurzbzlang","typ","bezeichnung","english","farbe","email","telefon","max_semester","max_verband","max_gruppe","erhalter_kz","bescheid","bescheidbgbl1","bescheidbgbl2","bescheidgz","bescheidvom","orgform_kurzbz","titelbescheidvom","aktiv","ext_id","zusatzinfo_html","moodle","sprache","testtool_sprachwahl","studienplaetze","oe_kurzbz","lgartcode","mischform","projektarbeit_note_anzeige", "onlinebewerbung"),
-	"public.tbl_studiengangstyp" => array("typ","bezeichnung","beschreibung"),
+	"public.tbl_studiengangstyp" => array("typ","bezeichnung","beschreibung","bezeichnung_mehrsprachig"),
 	"public.tbl_studienjahr"  => array("studienjahr_kurzbz","bezeichnung"),
 	"public.tbl_studiensemester"  => array("studiensemester_kurzbz","bezeichnung","start","ende","studienjahr_kurzbz","ext_id","beschreibung","onlinebewerbung"),
 	"public.tbl_tag"  => array("tag"),
