@@ -1120,7 +1120,7 @@ if ($prestudent_id != '' && !is_numeric($prestudent_id))
 {
 	die('PrestudentID ist ungueltig');
 }
-if (($reihungstest == '' && isset($_REQUEST['reihungstest'])) && $studiengang == '' && $semester == '' && $prestudent_id == '' && $datum_von == '' && $datum_bis == '')
+if (isset($_POST['rtauswsubmit']) && $reihungstest == '' && $studiengang == '' && $semester == '' && $prestudent_id == '' && $datum_von == '' && $datum_bis == '')
 {
 	die('Waehlen Sie bitte mindestens eine der Optionen aus');
 }
@@ -1181,7 +1181,7 @@ while ($row = $db->db_fetch_object($result))
 	$rtest[$row->reihungstest_id]->freigeschaltet = $db->db_parse_bool($row->freigeschaltet);
 }
 
-if (isset($_REQUEST['reihungstest']))
+if (isset($_REQUEST['reihungstest']) || isset($_POST['rtauswsubmit']))
 {
 	// Vorkommende Gebiete laden
 	$query = "
@@ -2693,7 +2693,7 @@ else
 	echo 'PrestudentIn: <INPUT id="prestudent" type="text" name="prestudent_id" size="50" value="' . $prestudent_id . '" placeholder="Name, UID oder Prestudent_id eingeben" onInput="document.getElementById(\'reihungstest\').value=\'\'" onkeyup="document.getElementById(\'prestudent_id\').value=this.value"/><input type="hidden" id="prestudent_id" name="prestudent_id" value="' . $prestudent_id . '" />';
 	echo '</td></tr>
 			</table></td><td id="auswertencell">';
-	echo '<INPUT type="submit" class="btn btn-primary" value="Anzeigen" id="auswertenButton"/><br><br>';
+	echo '<INPUT type="submit" class="btn btn-primary" value="Anzeigen" name="rtauswsubmit" id="auswertenButton"/><br><br>';
 	echo '<a href="auswertung_fhtw.php?studiengang=' . $studiengang . '
 										&semester=' . $semester . '
 										&datum_von=' . $datum_von . '
@@ -2867,7 +2867,7 @@ else
 	echo '</div>';
 
 	//echo '<div class="col-xs-4"></div>';
-	if (isset($_REQUEST['reihungstest']))
+	if (isset($_REQUEST['reihungstest']) || isset($_POST['rtauswsubmit']))
 	{
 		echo '
 		<table class="tablesorter table-bordered tablesorter-default" id="auswertung_table">
