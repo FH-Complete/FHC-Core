@@ -427,6 +427,7 @@ if (!$ansicht)
 	usort($kontakt->result, "sortKontakt");
 	echo '<table>';
 
+	$has_notfallkontakt = false;
 	foreach($kontakt->result as $k)
 	{
 		if ($k->kontakttyp != 'firmenhandy' && $k->kontakttyp != 'hidden')
@@ -441,6 +442,8 @@ if (!$ansicht)
 			echo '<td>'.$k->anmerkung.'</td>';
 			echo '<td>'.$zustellung.'</td>';
 			echo '</tr>';
+			if ($k->kontakttyp == 'notfallkontakt')
+				$has_notfallkontakt = true;
 		}
 		/*
 		if ($k->zustellung === TRUE)
@@ -462,6 +465,9 @@ if (!$ansicht)
 		}
 		*/
 	}
+	if (!$has_notfallkontakt)
+		echo '<tr><td>'.$p->t('profil/notfallkontakt').'</td><td colspan="3">'.$p->t('profil/notfallkontaktBekanntgeben').'</td></tr>';
+
 	echo '</table>';
 }
 
