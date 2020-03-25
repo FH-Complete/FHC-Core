@@ -482,12 +482,8 @@ if ($rtFreischalten)
 $testende = filter_input(INPUT_POST, 'testende', FILTER_VALIDATE_BOOLEAN);
 if ($testende)
 {
-	/*if (isset($_POST['reihungstest_ids']) && is_array($_POST['reihungstest_ids']))
-	{
-		$reihungstest = new reihungstest($_POST['reihungstest_id']);*/
 	// Alle Bachelor-Studiengänge holen, bei denen der Bewerber Interessent ist, die Bewerbung abgeschickt hat und bestätigt wurde
 	// Mail an alle diese Studiengänge senden
-
 	if (isset($_POST['prestudents']))
 	{
 		// Array mit allen Prestudenten aufbauen
@@ -540,6 +536,7 @@ if ($testende)
 	$sendError = false;
 	$empfaengerArray = array();
 	$rtidArray = array();
+	$rtdatumstrArray = array();
 	$rtdatumstr = '';
 
 	foreach ($prestudentsrt as $psrt)
@@ -548,9 +545,32 @@ if ($testende)
 		{
 			$rtidArray[] = $psrt['reihungstest_id'];
 			$rt = new reihungstest($psrt['reihungstest_id']);
+			$idx = 0;
 
-			$rtdatumstr .= 'Der Reihungstest vom '.$datum_obj->convertISODate($rt->datum).' um '.$datum_obj->formatDatum($rt->uhrzeit, 'H:i').' Uhr ist beendet.<br>';
+			//sort by date and time for correct order in mailtext
+			foreach ($rtdatumstrArray as $ds)
+			{
+				if ($ds->datum < $rt->datum)
+					$idx++;
+				elseif ($ds->datum == $rt->datum)
+				{
+					if ($ds->uhrzeit < $rt->uhrzeit)
+						$idx++;
+					else
+						break;
+				}
+				else
+					break;
+			}
+			$rtdatum = new stdClass();
+			$rtdatum->datum = $rt->datum;
+			$rtdatum->uhrzeit = $rt->uhrzeit;
+			array_splice($rtdatumstrArray, $idx, 0, array($rtdatum));
 		}
+	}
+
+	foreach ($rtdatumstrArray as $rtdatumobj) {
+		$rtdatumstr .= 'Der Reihungstest vom '.$datum_obj->convertISODate($rtdatumobj->datum).' um '.$datum_obj->formatDatum($rtdatumobj->uhrzeit, 'H:i').' Uhr ist beendet.<br>';
 	}
 
 	$rtidparams = http_build_query(array('reihungstest' => $rtidArray));
