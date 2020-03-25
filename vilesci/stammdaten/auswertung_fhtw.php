@@ -2071,6 +2071,19 @@ else
 			}
 		});
 		
+		$("#prestudent").on("input", function(){
+		    var numchecked = $("#rtcheckboxes input[type=checkbox]:checked").length;
+		    if (numchecked > 0)
+		    {
+				$("#rtcheckboxes input[type=checkbox]").prop("checked", false);
+				showSelectedRts();
+			}
+		});
+		
+		$("#prestudent").keyup( function(){
+			$("#prestudent_id").val(this.value);
+		});
+		
 		$("#zuteilungAutocomplete").autocomplete({
 			source: "auswertung_fhtw.php?autocomplete=prestudentAdd&'.http_build_query(array('studiensemester_kurzbz' => $rtStudiensemester)).'",
 			minLength:2,
@@ -2601,6 +2614,7 @@ else
 	$selectedrtstr = '';
 	$checkbxstr = '';
 	$first = true;
+	$noparamsselected = $prestudent_id == '' && $reihungstest == '' && $datum_von == '' && $datum_bis == '' && $studiengang == '' && $semester == '';
 	//$maxeachline = 1;
 	foreach ($rtest as $rt)
 	{
@@ -2623,6 +2637,17 @@ else
 					break;
 				}
 			}
+		}
+		elseif($noparamsselected && $rt->datum == date('Y-m-d'))
+		{
+			//wenn nichts ausgewählt, heute Reihungstests vorausgewählt
+			$checked = ' checked';
+
+			if (!$first)
+				$selectedrtstr .= '<br />';
+
+			$selectedrtstr .= $rtstr;
+			$first = false;
 		}
 
 		$checkbxstr .=  '<div class="input-group rtlabel"><input type="checkbox" name="reihungstest[]" id="rt_' . $rt->reihungstest_id . '" value="' . $rt->reihungstest_id . '"' . $checked . ' />';
@@ -2690,7 +2715,7 @@ else
 	echo '<label>bis Datum: <INPUT class="datepicker_datum" type="text" name="datum_bis" maxlength="10" size="10" value="' . $datum_obj->formatDatum($datum_bis, 'd.m.Y') . '" /></label>';
 	echo '</td></tr>';
 	echo '<tr><td>';
-	echo 'PrestudentIn: <INPUT id="prestudent" type="text" name="prestudent_id" size="50" value="' . $prestudent_id . '" placeholder="Name, UID oder Prestudent_id eingeben" onInput="document.getElementById(\'reihungstest\').value=\'\'" onkeyup="document.getElementById(\'prestudent_id\').value=this.value"/><input type="hidden" id="prestudent_id" name="prestudent_id" value="' . $prestudent_id . '" />';
+	echo 'PrestudentIn: <INPUT id="prestudent" type="text" name="prestudent_id" size="50" value="' . $prestudent_id . '" placeholder="Name, UID oder Prestudent_id eingeben"/><input type="hidden" id="prestudent_id" name="prestudent_id" value="' . $prestudent_id . '" />';
 	echo '</td></tr>
 			</table></td><td id="auswertencell">';
 	echo '<INPUT type="submit" class="btn btn-primary" value="Anzeigen" name="rtauswsubmit" id="auswertenButton"/><br><br>';
