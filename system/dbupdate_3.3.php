@@ -3843,7 +3843,7 @@ if ($result = $db->db_query("SELECT 1 FROM pg_class WHERE relname = 'unq_idx_abl
 }
 
 // Spalte bezeichnung_mehrsprachig in public.tbl_studiengangstyp
-if(!$result = @$db->db_query("SELECT bzeichnung_mehrsprachig FROM public.tbl_studiengangstyp LIMIT 1"))
+if(!$result = @$db->db_query("SELECT bezeichnung_mehrsprachig FROM public.tbl_studiengangstyp LIMIT 1"))
 {
 	$qry = "ALTER TABLE public.tbl_studiengangstyp ADD COLUMN bezeichnung_mehrsprachig varchar(255)[];";
 
@@ -4097,7 +4097,7 @@ $tabellen=array(
 	"public.tbl_student"  => array("student_uid","matrikelnr","prestudent_id","studiengang_kz","semester","verband","gruppe","updateamum","updatevon","insertamum","insertvon","ext_id"),
 	"public.tbl_studentlehrverband"  => array("student_uid","studiensemester_kurzbz","studiengang_kz","semester","verband","gruppe","updateamum","updatevon","insertamum","insertvon","ext_id"),
 	"public.tbl_studiengang"  => array("studiengang_kz","kurzbz","kurzbzlang","typ","bezeichnung","english","farbe","email","telefon","max_semester","max_verband","max_gruppe","erhalter_kz","bescheid","bescheidbgbl1","bescheidbgbl2","bescheidgz","bescheidvom","orgform_kurzbz","titelbescheidvom","aktiv","ext_id","zusatzinfo_html","moodle","sprache","testtool_sprachwahl","studienplaetze","oe_kurzbz","lgartcode","mischform","projektarbeit_note_anzeige", "onlinebewerbung"),
-	"public.tbl_studiengangstyp" => array("typ","bezeichnung","beschreibung"),
+	"public.tbl_studiengangstyp" => array("typ","bezeichnung","beschreibung","bezeichnung_mehrsprachig"),
 	"public.tbl_studienjahr"  => array("studienjahr_kurzbz","bezeichnung"),
 	"public.tbl_studiensemester"  => array("studiensemester_kurzbz","bezeichnung","start","ende","studienjahr_kurzbz","ext_id","beschreibung","onlinebewerbung"),
 	"public.tbl_tag"  => array("tag"),
