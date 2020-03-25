@@ -11,16 +11,20 @@ class Benutzerfunktion_model extends DB_Model
 		$this->dbTable = 'public.tbl_benutzerfunktion';
 		$this->pk = 'benutzerfunktion_id';
 	}
-	
+
 	/**
 	 * Get the Benutzerfunktion using the person_id
 	 */
-	public function getByPersonId($person_id)
+	public function getActiveFunctionsByPersonId($person_id)
 	{
-		// Join with the table 
-		$this->addJoin('public.tbl_benutzer', 'uid');
-		
-		return $this->loadWhere(array('person_id' => $person_id));
+		$query = 'SELECT bf.*
+					FROM public.tbl_benutzerfunktion bf
+					JOIN public.tbl_benutzer b USING (uid)
+            WHERE b.person_id = ?
+              AND (bf.datum_von IS NULL OR bf.datum_von <= now())
+              AND (bf.datum_bis IS NULL OR bf.datum_bis >= now())';
+
+        return $this->execQuery($query, array($person_id));
 	}
 
 	/**

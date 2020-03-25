@@ -15,6 +15,7 @@ class MessageLib
 	const CFG_OU_RECEIVERS = 'ou_receivers';
 	const CFG_OU_RECEIVERS_NO_NOTICE = 'ou_receivers_no_notice';
 	const CFG_OU_RECEIVERS_PRIVATE = 'ou_receivers_private';
+	const CFG_OU_FUNCTION_WHITELIST = 'ou_function_whitelist';
 	const CFG_REDIRECT_VIEW_MESSAGE_URL = 'redirect_view_message_url';
 
 	// Templates names
@@ -25,8 +26,6 @@ class MessageLib
 
 	const EMAIL_KONTAKT_TYPE = 'email'; // Email kontakt type
 	const SENT_INFO_NEWLINE = '\n'; // tbl_msg_recipient->sentInfo separator
-
-	const ALT_OE = 'infocenter'; // alternative organisation unit when no one is found for a presetudent
 
 	private $_ci;
 
@@ -139,27 +138,31 @@ class MessageLib
 	// Public methods called by a job
 
 	/**
-	 * Gets all NOT sent messages from DB and sends for each of them the notice email
-	 * Does not return anything, it logs info and errors on CI logs and in tbl_msg_recipient table
+	 * Gets all messages for which notice emails are still not sent from DB and sends for each of them the notice email
 	 * Wrapper for _sendNoticeEmail.
 	 */
-	public function sendAllEmailNotices($numberToSent, $numberPerTimeRange, $emailTimeRange, $emailFromSystem)
+	public function sendAllEmailNotices($since, $numberToSent, $numberPerTimeRange, $emailTimeRange, $emailFromSystem)
 	{
 		// Overrides MailLib configs with the given parameters
 		$this->_ci->maillib->overrideConfigs($numberToSent, $numberPerTimeRange, $emailTimeRange, $emailFromSystem);
 
-		// Retrieves a certain amount of NOT sent messages, the amount is given by maillib->email_number_to_sent
-		$messagesResult = $this->_ci->RecipientModel->getMessages(
-			self::EMAIL_KONTAKT_TYPE,
-			null,
-			$this->_ci->maillib->getEmailNumberToSent()
+		// Retrieves a certain amount of NOT sent messages
+		$messagesResult = $this->_ci->RecipientModel->getNotSentMessages(
+			$this->_ci->maillib->getEmailNumberToSent(),
+			$since
 		);
 
-		if (isError($messagesResult)) terminateWithError(getData($messagesResult)); // If an error occurred then log it and terminate
+		if (isError($messagesResult) || !hasData($messagesResult)) return $messagesResult;
 
-		$sendNotice = $this->_sendNoticeEmails(getData($messagesResult));
+		// Collects all the message ids in an array
+		$messageIds = array();
+		foreach (getData($messagesResult) as $message)
+		{
+			$messageIds[] = $message->message_id;
+		}
 
-		if (isError($sendNotice)) terminateWithError(getData($sendNotice)); // If an error occurred then log it and terminate
+		// Send'em all
+		return $this->_sendNoticeEmails($messageIds);
 	}
 
 	//------------------------------------------------------------------------------------------------------------------
@@ -221,13 +224,20 @@ class MessageLib
 		$this->_ci->load->model('person/Benutzerfunktion_model', 'BenutzerfunktionModel');
 
 		// Retrieves organisation units for a user from database
- 		$benutzer = $this->_ci->BenutzerfunktionModel->getByPersonId($sender_id);
+ 		$benutzer = $this->_ci->BenutzerfunktionModel->getActiveFunctionsByPersonId($sender_id);
  		if (isSuccess($benutzer)) // if everything is ok
  		{
 			$ouArray = array();
 
 			// Copies organisation units in $ouArray array
- 			foreach (getData($benutzer) as $val) $ouArray[] = $val->oe_kurzbz;
+ 			foreach (getData($benutzer) as $val)
+			{
+				// If the function is in the white list then get the organisation unit
+				if (in_array($val->funktion_kurzbz, $this->_ci->config->item(self::CFG_OU_FUNCTION_WHITELIST)))
+				{
+					$ouArray[] = $val->oe_kurzbz;
+				}
+			}
 
 			return success($ouArray);
  		}
@@ -494,7 +504,7 @@ class MessageLib
 	 * Stores the type of error in 'sentinfo' column keeping en eventual previous error
 	 * sent column is set to null
 	 */
-	private function _setSentError($message_id, $receiver_id, $sentInfo, $prevSentInfo)
+	private function _updatedRecipientNoticeEmailInfo($message_id, $receiver_id, $sentInfo, $prevSentInfo)
 	{
 		if (!isEmptyString($prevSentInfo))
 		{
@@ -759,15 +769,15 @@ class MessageLib
 				if (!$sent)
 				{
 					// Set in database why this email is NOT going to be send
-					$sse = $this->_setSentError(
+					$sse = $this->_updatedRecipientNoticeEmailInfo(
 						$messageData->message_id,
 						$messageData->receiver_id,
-						'An error occurred while sending the notice email',
-						$messageData->sentinfo
+						'An error occurred while sending the notice email', // current info
+						$messageData->sentinfo  // previous info
 					);
 
 					// If database error occurred then return it, otherwise return a logic error
-					return isError($sse) ? $sse : error('An error occurred while sending the notice email');
+					return isError($sse) ? $sse : error('An error occurred while updating the recipient notice email info');
 				}
 				else // success!
 				{
@@ -775,6 +785,27 @@ class MessageLib
 					$sss = $this->_setSentSuccess($messageData->message_id, $messageData->receiver_id);
 					if (isError($sss)) return $sss; // If database error occurred then return it
 				}
+			}
+			else // Because was not possible to find a valid contact
+			{
+				$reason = 'Was not possible to find a valid contact for this user'; // default reason
+
+				// In case that the organisation unit does not receive any email notices
+				if (!isEmptyString($messageData->receiver_ou)) $reason = 'This organization unit does not receive email notices';
+
+				// In case that a degree program sent a message to a user without a valid contact or UID
+				if (!isEmptyString($messageData->sender_ou)) $reason = 'Sent from a degree program to a user that does not have a valid UID or a valid contact';
+
+				// Set in database why this email is NOT going to be send
+				$sse = $this->_updatedRecipientNoticeEmailInfo(
+					$messageData->message_id,
+					$messageData->receiver_id,
+					$reason, // current info
+					$messageData->sentinfo // previous info
+				);
+
+				// If database error occurred then return it
+				if (isError($sse)) return $sse;
 			}
 		}
 

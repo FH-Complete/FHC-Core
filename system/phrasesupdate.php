@@ -3611,6 +3611,30 @@ When on hold, the date is only a reminder.',
 		)
 	),
 	array(
+		'app' => 'infocenter',
+		'category' => 'infocenter',
+		'phrase' => 'rtPunkteEintragenInfo',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Es existierte bereits ein Bewerberstatus und eine Reihungstestteilnahme. 
+				Deshalb wurde bei der Freigabe der Bewerberstatus automatisch hinzugefügt und der Bewerber als Reihungstestabsolvent markiert. 
+				Die Reihungstestpunkte müssen aber noch manuell eingetragen werden!',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'An applicant status and a placement test participation already existed for this person.
+				Thus, the applicant status was added automatically and the applicant was marked as placement test participant.
+				However, the placement test result is yet to be entered manually!',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
 		'app' => 'core',
 		'category' => 'password',
 		'phrase' => 'changeFor',

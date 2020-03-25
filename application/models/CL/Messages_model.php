@@ -26,6 +26,8 @@ class Messages_model extends CI_Model
 	const TYPE_PERSONS = 'persons';
 	const TYPE_PRESTUDENTS = 'prestudents';
 
+	const ALT_OE = 'infocenter'; // alternative organisation unit when no one is found for a presetudent
+
 	/**
 	 * Constructor
 	 */
@@ -106,7 +108,7 @@ class Messages_model extends CI_Model
 			{
 				$ouOptions .= sprintf(
 					"\n".'<option value="%s">%s</option>',
-					is_numeric($ou->prestudent_id) ? $ou->oe_kurzbz : MessageLib::ALT_OE,
+					is_numeric($ou->prestudent_id) ? $ou->oe_kurzbz : self::ALT_OE,
 					$ou->bezeichnung . (is_numeric($ou->prestudent_id) ? '' : ' *')
 				);
 			}
@@ -509,7 +511,8 @@ class Messages_model extends CI_Model
 		if (!hasData($message)) return error('No messages were saved in database');
 
 		// Write log entry
-		$personLog = $this->_personLog($sender_id, $receiver_id, getData($message)[0]);
+		// NOTE: $receiver_id and $sender_id are switched!!! Currently this is a workaround
+		$personLog = $this->_personLog($receiver_id, $sender_id, getData($message)[0]);
 		if (isError($personLog)) return $personLog;
 
 		return success('Messages sent successfully');

@@ -33,6 +33,7 @@ require_once('../../../include/lvangebot.class.php');
 require_once('../../../include/benutzergruppe.class.php');
 require_once('../../../include/lehreinheit.class.php');
 require_once('../../../include/variable.class.php');
+require_once('../../../include/vertrag.class.php');
 
 $sprache = getSprache();
 $p = new phrasen($sprache);
@@ -316,6 +317,17 @@ $( document ).ready(function()
 				$i=0;
 				while($row_lector = $db->db_fetch_object($result))
 				{
+					// Lektor wird erst angezeigt wenn der Auftrag erteilt wurde
+					if (defined('CIS_LV_LEKTORINNENZUTEILUNG_VERTRAGSPRUEFUNG_VON')
+					 && CIS_LV_LEKTORINNENZUTEILUNG_VERTRAGSPRUEFUNG_VON != '')
+					{
+						$vertrag = new vertrag();
+						if (!$vertrag->isVertragErteiltLV($lvid, $angezeigtes_stsem, $row_lector->uid))
+						{
+							continue;
+						}
+					}
+
 					$i++;
 					if($user==$row_lector->uid)
 					{
@@ -327,9 +339,11 @@ $( document ).ready(function()
 						$style='style="font-weight: bold"';
 					else
 						$style='';
-					echo '<a href="mailto:'.$row_lector->uid.'@'.DOMAIN.'" '.$style.'>'.$row_lector->vorname.' '.$row_lector->nachname.'</a>';
-					if($i!=$num_rows_result)
+
+					if ($i != 1)
 						echo ', ';
+					echo '<a href="mailto:'.$row_lector->uid.'@'.DOMAIN.'" '.$style.'>'.$row_lector->vorname.' '.$row_lector->nachname.'</a>';
+
 				}
 			}
 		}

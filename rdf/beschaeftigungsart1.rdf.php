@@ -43,7 +43,7 @@ echo '
    <RDF:Seq about="'.$rdf_url.'/liste">
 ';
 
-$qry = "SELECT * FROM bis.tbl_beschaeftigungsart1 ORDER BY ba1code";
+$qry = "SELECT * FROM bis.tbl_beschaeftigungsart1 ORDER BY ba1kurzbz";
 $db = new basis_db();
 
 if($db->db_query($qry))

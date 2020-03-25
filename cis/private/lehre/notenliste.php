@@ -417,10 +417,15 @@ else
 
 		$tblFoot .= "</tfoot>";
 
-		$tbl .= $tblHead.$tblFoot.$tblBody;
+		if (!defined('CIS_NOTENLISTE_DURCHSCHNITT_ANZEIGEN') || (defined('CIS_NOTENLISTE_DURCHSCHNITT_ANZEIGEN') && CIS_NOTENLISTE_DURCHSCHNITT_ANZEIGEN))
+		{
+			$tbl .= $tblHead.$tblFoot.$tblBody;
+			$tbl .= "<table><tbody><tr><td width='20' style='text-align: right;'>*</td><td>" . $p->t('tools/legendeNotendurchschnitt') . "</td></tr>";
+			$tbl .= "<tr><td width='20' style='text-align: right;'>**</td><td>" . $p->t('tools/legendeGewichteterNotendurchschnitt') . "</td></tr>";
+		}
+		else
+			$tbl .= $tblHead.$tblBody;
 
-		$tbl .= "<table><tbody><tr><td width='20' style='text-align: right;'>*</td><td>" . $p->t('tools/legendeNotendurchschnitt') . "</td></tr>";
-		$tbl .= "<tr><td width='20' style='text-align: right;'>**</td><td>" . $p->t('tools/legendeGewichteterNotendurchschnitt') . "</td></tr>";
 		if ($legende)
 		{
 			$tbl .= "<tr><td width='20' style='background-color: #FFD999;'></td><td>" . $p->t('tools/hinweistextMarkierung') . "</td></tr>";
