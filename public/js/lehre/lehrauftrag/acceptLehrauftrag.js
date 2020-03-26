@@ -19,6 +19,8 @@ const ICON_LEHRAUFTRAG_APPROVED = '<img src="../../../public/images/icons/fa-use
 const ICON_LEHRAUFTRAG_CHANGED = '<img src="../../../public/images/icons/fa-user-edit.png" style="height: 30px; width: 30px; margin: -6px;">';
 const ICON_LEHRAUFTRAG_CANCELLED = '<img src="../../../public/images/icons/fa-user-times.png" style="height: 30px; width: 30px; margin: -6px;">';
 
+const APP_ROOT = FHC_JS_DATA_STORAGE_OBJECT.app_root;
+
 // -----------------------------------------------------------------------------------------------------------------
 // Mutators - setter methods to manipulate table data when entering the tabulator
 // -----------------------------------------------------------------------------------------------------------------
@@ -265,6 +267,8 @@ function func_footerElement(){
 
 	footer_html += '<div class="btn-toolbar pull-right" role="toolbar">';
 	footer_html += '<div class="btn-group" role="group">';
+	footer_html += '<button id="download-pdf-lehrauftraege" class="btn btn-default" type="button" data-toggle="tooltip" data-placement="left" title="Download angenommene Lehrauftr&auml;e an der FHTW" onclick="footer_downloadPDF_LehrauftraegeFHTW()"><small>PDF Lehrauftr&auml;ge FHTW&nbsp;&nbsp;</small><i class="fa fa-arrow-down"></i></button>';
+	footer_html += '<button id="download-pdf-lehrauftraege" class="btn btn-default" type="button" data-toggle="tooltip" data-placement="left" title="Download angenommene Lehrauftr&auml;e für Lehrgänge" onclick="footer_downloadPDF_LehrauftraegeLehrgaenge()"><small>PDF Lehrauftr&auml;ge Lehrgänge&nbsp;&nbsp;</small><i class="fa fa-arrow-down"></i></button>';
 	footer_html += '<button id="download-csv" class="btn btn-default" type="button" data-toggle="tooltip" data-placement="left" title="Download CSV" onclick="footer_downloadCSV()"><small>CSV&nbsp;&nbsp;</small><i class="fa fa-arrow-down"></i></button>';
 	footer_html += '</div>';
 	footer_html += '</div>';
@@ -286,6 +290,35 @@ function func_footerElement(){
 // Performs download CSV
 function footer_downloadCSV(){
 	$('#tableWidgetTabulator').tabulator("download", "csv", "data.csv", {bom:true}); // BOM for correct UTF-8 char output
+}
+
+// Performs download PDF accepted Lehrauftraege
+function footer_downloadPDF_LehrauftraegeFHTW() {
+	var uid = $("#uid").val();
+	var studiensemester = $('#studiensemester').val();
+
+	window.open(APP_ROOT + '/cis/private/pdfExport.php' +
+		'?xml=lehrauftrag.xml.php' +
+		'&xsl=Lehrauftrag' +
+		'&xsl_oe_kurzbz=etw' +
+		'&stg_kz=' +
+		'&uid=' + uid +
+		'&ss=' + studiensemester, '_parent'
+	);
+}
+
+function footer_downloadPDF_LehrauftraegeLehrgaenge() {
+	var uid = $("#uid").val();
+	var studiensemester = $('#studiensemester').val();
+
+	window.open(APP_ROOT + '/cis/private/pdfExport.php' +
+		'?xml=lehrauftrag.xml.php' +
+		'&xsl=Lehrauftrag' +
+		'&xsl_oe_kurzbz=lehrgang' +
+		'&stg_kz=' +
+		'&uid=' + uid +
+		'&ss=' + studiensemester, '_parent'
+	);
 }
 
 /*

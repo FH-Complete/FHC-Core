@@ -111,6 +111,7 @@ $this->load->view(
         <div class="row">
             <div class="col-lg-12">
                 <form id="formLehrauftrag" class="form-inline" action="" method="get">
+                    <input type="hidden" id="uid" name="uid" value="<?php echo getAuthUID(); ?>">
                     <div class="form-group">
                         <?php
                         echo $this->widgetlib->widget(
