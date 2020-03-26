@@ -125,12 +125,12 @@ class Organisationseinheit_model extends DB_Model
 	public function getChilds($oe_kurzbz, $includeinactive = false)
 	{
 		$query = "
-		WITH RECURSIVE oes(oe_kurzbz, oe_parent_kurzbz) as 
+		WITH RECURSIVE oes(oe_kurzbz, oe_parent_kurzbz) as
 		(
-			SELECT oe_kurzbz, oe_parent_kurzbz FROM public.tbl_organisationseinheit 
+			SELECT oe_kurzbz, oe_parent_kurzbz FROM public.tbl_organisationseinheit
 			WHERE oe_kurzbz=? %s
 			UNION ALL
-			SELECT o.oe_kurzbz, o.oe_parent_kurzbz FROM public.tbl_organisationseinheit o, oes 
+			SELECT o.oe_kurzbz, o.oe_parent_kurzbz FROM public.tbl_organisationseinheit o, oes
 			WHERE o.oe_parent_kurzbz=oes.oe_kurzbz %s
 		)
 		SELECT oe_kurzbz
@@ -150,12 +150,12 @@ class Organisationseinheit_model extends DB_Model
 	public function getParents($oe_kurzbz, $includeinactive = false)
 	{
 		$query=
-		"WITH RECURSIVE oes(oe_kurzbz, oe_parent_kurzbz) as 
+		"WITH RECURSIVE oes(oe_kurzbz, oe_parent_kurzbz) as
 		(
-			SELECT oe_kurzbz, oe_parent_kurzbz FROM public.tbl_organisationseinheit 
+			SELECT oe_kurzbz, oe_parent_kurzbz FROM public.tbl_organisationseinheit
 			WHERE oe_kurzbz=? %s
 			UNION ALL
-			SELECT o.oe_kurzbz, o.oe_parent_kurzbz FROM public.tbl_organisationseinheit o, oes 
+			SELECT o.oe_kurzbz, o.oe_parent_kurzbz FROM public.tbl_organisationseinheit o, oes
 			WHERE o.oe_kurzbz=oes.oe_parent_kurzbz %s
 		)
 		SELECT oe_kurzbz
@@ -177,7 +177,7 @@ class Organisationseinheit_model extends DB_Model
         {
             $condition = '
                 oe_kurzbz = (
-                    SELECT 
+                    SELECT
                         oe_parent_kurzbz
                     FROM
                         public.tbl_organisationseinheit

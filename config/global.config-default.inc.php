@@ -135,6 +135,9 @@ define('FAS_REIHUNGSTEST_AUFNAHMEGRUPPEN',false);
 // Legt fest, ob Vertragsdetails zum Lehrauftrag im Reiter LektorInnenzuteilung angezeigt werden
 define('FAS_LV_LEKTORINNENZUTEILUNG_VERTRAGSDETAILS_ANZEIGEN', false);
 
+// Legt fest ob bei Fixangestellten Lektoren der Stundensatz vorgeschlagen wird
+define('FAS_LV_LEKTORINNENZUTEILUNG_FIXANGESTELLT_STUNDENSATZ', true);
+
 // Gibt an, ob/ab welchen Studiensemester eine zusätzliche Vertragspruefung der Lektoren erfolgt.
 // Ab diesem Semester wird die Lektorenzuordnung nur angezeigt wenn ein erteilter Vertrag vorhanden ist
 define('CIS_LV_LEKTORINNENZUTEILUNG_VERTRAGSPRUEFUNG_VON', '');
@@ -259,6 +262,10 @@ define('FAS_KONTO_SHOW_CREDIT_POINTS','false');
 // Bei "default" wird der Standard-Stundensatz des Lektors (aus tbl_mitarbeiter) ermittelt, und dieser eingetragen.
 // Wenn numerisch, wird dieser Wert bei allen LektorInnen eingetragen.
 // Wenn nicht definiert, wird der Stundensatz des Vorjahres übernommen.
+// Bei "nachbeschaeftigungsart" wird
+//      bei echten Dienstvertraegen mit voller inkludierter Lehre (-1) der Stundensatz auf null gesetzt
+//      bei echten Dienstvertraegen mit teilweise oder nicht inkludierter Lehre der Default Stundensatz gesetzt
+//      bei sonstigen Dienstvertraegen der Default Stundensatz gesetzt
 define('VILESCI_STUNDENSATZ_VORRUECKUNG', '');
 
 // Wenn true, werden die Content-Aufrufe des CIS in der tbl_webservicelog mitgeloggt. Zuvor manuell einen neuen Webservicetyp "content" anlegen!

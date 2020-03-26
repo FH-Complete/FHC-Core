@@ -84,4 +84,6 @@ $this->phrasen['profil/gueltigbis']='Gültig bis';
 $this->phrasen['profil/wochenstunden']='Wochenstunden';
 $this->phrasen['profil/vertragsstunden']='Vertragsstunden';
 $this->phrasen['profil/zukuenftigeFunktionen']='Zukünftige Funktionen';
+$this->phrasen['profil/notfallkontakt']='Notfallkontakt';
+$this->phrasen['profil/notfallkontaktBekanntgeben']='Bitte geben Sie einen Notfallkontakt bekannt!';
 ?>

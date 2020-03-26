@@ -48,12 +48,16 @@ function draw_studienerfolg($uid, $studiensemester_kurzbz)
 				tbl_person.vorname, tbl_person.nachname,tbl_person.gebdatum,
 				tbl_studiensemester.bezeichnung as sembezeichnung,
 				tbl_studiengang.english as bezeichnung_englisch,
-				tbl_studiengang.typ, tbl_studiengang.orgform_kurzbz, tbl_person.matr_nr
+				tbl_studiengang.typ, tbl_studiengang.orgform_kurzbz,
+       			tbl_studiengangstyp.bezeichnung_mehrsprachig[(SELECT index FROM public.tbl_sprache WHERE sprache='German')] as studiengangstypbezeichnung, 
+       			tbl_studiengangstyp.bezeichnung_mehrsprachig[(SELECT index FROM public.tbl_sprache WHERE sprache='English')] as studiengangstypbezeichnung_englisch, 
+       			tbl_person.matr_nr
 			FROM
-				public.tbl_person, public.tbl_student, public.tbl_studiengang, public.tbl_benutzer,
+				public.tbl_person, public.tbl_student, public.tbl_studiengang, public.tbl_studiengangstyp, public.tbl_benutzer,
 				public.tbl_studentlehrverband, public.tbl_studiensemester
 			WHERE
 				tbl_student.studiengang_kz = tbl_studiengang.studiengang_kz
+				and tbl_studiengang.typ = tbl_studiengangstyp.typ
 				and tbl_student.student_uid = tbl_benutzer.uid
 				and tbl_benutzer.person_id = tbl_person.person_id
 				and tbl_student.student_uid = ".$db->db_add_param($uid)."
@@ -68,27 +72,6 @@ function draw_studienerfolg($uid, $studiensemester_kurzbz)
 	}
 	else
 		return false;
-
-	switch($row->typ)
-	{
-		case 'b':
-			$studTyp = 'Bachelor';
-			break;
-		case 'm':
-			$studTyp = 'Master';
-			break;
-		case 'd':
-			$studTyp = 'Diplom';
-			break;
-		case 'l':
-			$studTyp = 'Lehrgang';
-			break;
-		case 'k':
-			$studTyp = 'Kurzstudium';
-			break;
-		default:
-			$studTyp ='';
-	}
 
 	$studiensemester = new studiensemester();
 	$studiensemester_aktuell = $studiensemester->getNearest();
@@ -180,7 +163,8 @@ function draw_studienerfolg($uid, $studiensemester_kurzbz)
 	$xml .= "		<studiengang_englisch><![CDATA[".$row->bezeichnung_englisch."]]></studiengang_englisch>";
 	$xml .= "		<studiengang_bezeichnung_sto><![CDATA[".$studiengang_bezeichnung_sto."]]></studiengang_bezeichnung_sto>";
 	$xml .= "		<studiengang_bezeichnung_sto_englisch><![CDATA[".$studiengang_bezeichnung_sto_englisch."]]></studiengang_bezeichnung_sto_englisch>";
-	$xml .= "		<studiengang_typ>".$studTyp."</studiengang_typ>";
+	$xml .= "		<studiengang_typ>".$row->studiengangstypbezeichnung."</studiengang_typ>";
+	$xml .= "		<studiengang_typ_englisch>".$row->studiengangstypbezeichnung_englisch."</studiengang_typ_englisch>";
 	$xml .= "		<studiengang_kz>".$studiengang_kz."</studiengang_kz>";
 	$xml .= "		<titelpre><![CDATA[".$row->titelpre."]]></titelpre>";
 	$xml .= "		<titelpost><![CDATA[".$row->titelpost."]]></titelpost>";
