@@ -19,7 +19,17 @@ const ICON_LEHRAUFTRAG_APPROVED = '<img src="../../../public/images/icons/fa-use
 const ICON_LEHRAUFTRAG_CHANGED = '<img src="../../../public/images/icons/fa-user-edit.png" style="height: 30px; width: 30px; margin: -6px;">';
 const ICON_LEHRAUFTRAG_CANCELLED = '<img src="../../../public/images/icons/fa-user-times.png" style="height: 30px; width: 30px; margin: -6px;">';
 
-const APP_ROOT = FHC_JS_DATA_STORAGE_OBJECT.app_root;
+// Fields that should not be provided in the column picker
+var tableWidgetBlacklistArray_columnUnselectable = [
+	'status',
+	'row_index',
+	'betrag',
+	'vertrag_id',
+	'vertrag_stunden',
+	'vertrag_betrag',
+	'storniert_von',				// fields from cancelledLehrauftragData
+	'letzterStatus_vorStorniert'	// fields from cancelledLehrauftragData
+];
 
 // -----------------------------------------------------------------------------------------------------------------
 // Mutators - setter methods to manipulate table data when entering the tabulator
@@ -83,10 +93,9 @@ function hf_filterStringnumberWithOperator(headerValue, rowValue, rowData){
 // Tabulator table format functions
 // -----------------------------------------------------------------------------------------------------------------
 
-// Displays text when table is empty
-function func_placeholder()
-{
-	return "<h4>Keine Daten vorhanden.</h4>";
+// Returns relative height (depending on screen size)
+function func_height(table){
+	return $(window).height() * 0.50;
 }
 
 // Formats the rows
@@ -256,96 +265,20 @@ function func_renderComplete(table){
 	);
 }
 
-// Tabulator footer element
+// TableWidget Footer element
 // -----------------------------------------------------------------------------------------------------------------
 
-// Adds a footer with buttons select all / deselect all / download
-function func_footerElement(){
-
-	var footer_html = '<div class="row">';
-	footer_html += '<div class="col-lg-12" style="padding: 5px;">';
-
-	footer_html += '<div class="btn-toolbar pull-right" role="toolbar">';
-	footer_html += '<div class="btn-group" role="group">';
-	footer_html += '<button id="download-pdf-lehrauftraege" class="btn btn-default" type="button" data-toggle="tooltip" data-placement="left" title="Download angenommene Lehrauftr&auml;e an der FHTW" onclick="footer_downloadPDF_LehrauftraegeFHTW()"><small>PDF Lehrauftr&auml;ge FHTW&nbsp;&nbsp;</small><i class="fa fa-arrow-down"></i></button>';
-	footer_html += '<button id="download-pdf-lehrauftraege" class="btn btn-default" type="button" data-toggle="tooltip" data-placement="left" title="Download angenommene Lehrauftr&auml;e für Lehrgänge" onclick="footer_downloadPDF_LehrauftraegeLehrgaenge()"><small>PDF Lehrauftr&auml;ge Lehrgänge&nbsp;&nbsp;</small><i class="fa fa-arrow-down"></i></button>';
-	footer_html += '<button id="download-csv" class="btn btn-default" type="button" data-toggle="tooltip" data-placement="left" title="Download CSV" onclick="footer_downloadCSV()"><small>CSV&nbsp;&nbsp;</small><i class="fa fa-arrow-down"></i></button>';
-	footer_html += '</div>';
-	footer_html += '</div>';
-
-	footer_html += '<div class="btn-toolbar" role="toolbar">';
-	footer_html += '<div class="btn-group" role="group">';
-	footer_html += '<button id="select-all" class="btn btn-default pull-left" type="button" onclick="footer_selectAll()">Alle auswählen</button>';
-	footer_html += '<button id="deselect-all" class="btn btn-default pull-left" type="button" onclick="footer_deselectAll()">Alle abwählen</button>';
-	footer_html += '<span id="number-selected" style="margin-left: 20px; line-height: 2; font-weight: normal"></span>';
-	footer_html += '</div>';
-	footer_html += '</div>';
-
-	footer_html += '</div>';
-	footer_html += '</div>';
-
-	return footer_html;
-}
-
-// Performs download CSV
-function footer_downloadCSV(){
-	$('#tableWidgetTabulator').tabulator("download", "csv", "data.csv", {bom:true}); // BOM for correct UTF-8 char output
-}
-
-// Performs download PDF accepted Lehrauftraege
-function footer_downloadPDF_LehrauftraegeFHTW() {
-	var uid = $("#uid").val();
-	var studiensemester = $('#studiensemester').val();
-
-	window.open(APP_ROOT + '/cis/private/pdfExport.php' +
-		'?xml=lehrauftrag.xml.php' +
-		'&xsl=Lehrauftrag' +
-		'&xsl_oe_kurzbz=etw' +
-		'&stg_kz=' +
-		'&uid=' + uid +
-		'&ss=' + studiensemester, '_parent'
-	);
-}
-
-function footer_downloadPDF_LehrauftraegeLehrgaenge() {
-	var uid = $("#uid").val();
-	var studiensemester = $('#studiensemester').val();
-
-	window.open(APP_ROOT + '/cis/private/pdfExport.php' +
-		'?xml=lehrauftrag.xml.php' +
-		'&xsl=Lehrauftrag' +
-		'&xsl_oe_kurzbz=lehrgang' +
-		'&stg_kz=' +
-		'&uid=' + uid +
-		'&ss=' + studiensemester, '_parent'
-	);
-}
-
 /*
- * Performs select all
+ * Hook to overwrite TableWigdgets select-all-button behaviour
  * Select all (filtered) rows and ignore rows that are bestellt and erteilt
  */
-function footer_selectAll(){
-	$('#tableWidgetTabulator').tabulator('getRows', true)
-		.filter(function(row){ return row.getData().bestellt != null &&   // bestellt
-			row.getData().erteilt != null &&            // AND erteilt
-			row.getData().akzeptiert == null &&         // AND NOT akzeptiert
-			row.getData().status != 'Geändert'
-		;})         // AND NOT geändert
-		.forEach((function(row){ return row.select();}));
-}
-
-/*
- * Performs deselect all
- * Deselect all (filtered) rows
- */
-function footer_deselectAll(){
-	$('#tableWidgetTabulator').tabulator('deselectRow');
-}
-
-// Displays number of selected rows on row selection change
-function func_rowSelectionChanged(data, rows){
-	$('#number-selected').html("Für Annehmen ausgewählt: <strong>" + rows.length + "</strong>");
+function tableWidgetHook_selectAllButton(tableWidgetDiv){
+	tableWidgetDiv.find("#tableWidgetTabulator").tabulator('getRows', true)
+		.filter(row =>  row.getData().bestellt != null &&	// bestellt
+			row.getData().erteilt != null &&				// AND erteilt
+			row.getData().akzeptiert == null &&				// AND NOT akzeptiert
+			row.getData().status != 'Geändert')				// AND NOT geändert
+		.forEach((row => row.select()));
 }
 
 // -----------------------------------------------------------------------------------------------------------------
@@ -499,15 +432,11 @@ storniert_tooltip = function(cell){
 
 $(function() {
 
-	// Pruefen ob Promise unterstuetzt wird
-	// Tabulator funktioniert nicht mit IE
-	var canPromise = !! window.Promise;
-	if(!canPromise)
-	{
-		alert("Diese Seite kann mit ihrem Browser nicht angezeigt werden. Bitte verwenden Sie Firefox, Chrome oder Edge um die Seite anzuzeigen");
-		window.location.href='about:blank';
-		return;
-	}
+	// Redraw table on resize to fit tabulators height to windows height
+	window.addEventListener('resize', function(){
+		$('#tableWidgetTabulator').tabulator('setHeight', $(window).height() * 0.50);
+		$('#tableWidgetTabulator').tabulator('redraw', true);
+	});
 
 	// Show all rows
 	$("#show-all").click(function(){
@@ -627,7 +556,7 @@ $(function() {
 						// Print error message
 						FHC_DialogLib.alertWarning(data.retval);
 					}
-
+					
 					if (!data.error && data.retval != null)
 					{
 						// Update status 'Erteilt'
