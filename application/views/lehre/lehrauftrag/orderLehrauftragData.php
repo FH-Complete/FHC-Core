@@ -393,9 +393,6 @@ $filterWidgetArray = array(
         rowUpdated:function(row){
             func_rowUpdated(row);
         },
-        rowSelectionChanged:function(data, rows){
-            func_rowSelectionChanged(data, rows);
-        },
         rowFormatter:function(row){
             func_rowFormatter(row);
         },
