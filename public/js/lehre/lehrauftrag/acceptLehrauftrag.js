@@ -7,6 +7,7 @@
 // -----------------------------------------------------------------------------------------------------------------
 // Global vars
 // -----------------------------------------------------------------------------------------------------------------
+const APP_ROOT = FHC_JS_DATA_STORAGE_OBJECT.app_root;
 
 const COLOR_LIGHTGREY = "#f5f5f5";
 
@@ -496,6 +497,29 @@ $(function() {
 		// De/activate and un/focus on clicked button
 		$(".btn-lehrauftrag").removeClass('focus').removeClass('active');
 		$(this).addClass('focus').addClass('active');
+	});
+
+	// Performs download PDF accepted Lehrauftraege
+	$("#ul-download-pdf").on('click', 'li', function(){
+		var uid = $("#uid").val();
+		var studiensemester = $('#studiensemester').val();
+
+		if ($(this).attr('value') != null && $(this).attr('value') != '')
+		{
+			var selected = $(this).attr('value');
+
+			if (selected == 'etw' || selected == 'lehrgang')
+			{
+				window.open(APP_ROOT + 'cis/private/pdfExport.php' +
+					'?xml=lehrauftrag_annehmen.xml.php' +
+					'&xsl=Lehrauftrag' +
+					'&xsl_oe_kurzbz=' + selected +
+					'&stg_kz=' +
+					'&uid=' + uid +
+					'&ss=' + studiensemester, '_parent'
+				);
+			}
+		}
 	});
 
 	// Redraw table stornierte lehrauftraege on button click

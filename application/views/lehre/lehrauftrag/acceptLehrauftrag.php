@@ -119,7 +119,7 @@ $this->load->view(
 
 		<!-- filter buttons & password field & akzeptieren-button -->
         <div class="row">
-            <div class="col-xs-6">
+            <div class="col-xs-5 col-md-4">
                 <div class="btn-toolbar" role="toolbar">
                     <div class="btn-group" role="group">
                         <button id="show-all" class="btn btn-default btn-lehrauftrag active focus" type="button"
@@ -139,7 +139,21 @@ $this->load->view(
 					</button><!-- png img set in javascript -->
                 </div>
             </div>
-            <div class="col-md-offset-2 col-md-4 col-xs-6">
+
+
+            <div class="col-xs-3 col-md-offset-2 col-md-2">
+                    <div class="btn-group dropup pull-right">
+                    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Dokumente PDF&nbsp;&nbsp;<i class="fa fa-arrow-down"></i>&nbsp;&nbsp;&nbsp;&nbsp;<span class="caret"></span>
+                    </button>
+                    <ul id="ul-download-pdf" class="dropdown-menu">
+                        <li value="etw"><a href="#">PDF Lehrauftr&auml;ge FH</a></li>
+                        <li value="lehrgang"><a href="#">PDF Lehrauftr&auml;ge Lehrg&auml;nge</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="col-xs-4 col-md-offset-0 col-md-4">
 				<div class="input-group">
 					<input id="username" type="hidden" value=""><!-- this is to prevent Chrome autofilling a random input field with the username-->
 					<input id="password" type="password" autocomplete="new-password" class="form-control" placeholder="CIS-Passwort">
