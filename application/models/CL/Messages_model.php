@@ -430,8 +430,8 @@ class Messages_model extends CI_Model
 	public function sendExplicitTemplate($prestudents, $oe_kurzbz, $vorlage_kurzbz, $msgVars)
 	{
 		// Retrieves the sender id
-		$sender_id = getAuthPersonId();
-		if (!is_numeric($sender_id)) show_error('The current logged user person_id is not defined');
+		$sender_id = isLogged() ? getAuthPersonId() : null;
+		if (!is_numeric($sender_id)) $sender_id = $this->config->item(MessageLib::CFG_SYSTEM_PERSON_ID);
 
 		// Retrieves message vars data for the given user/s
 		$msgVarsData = $this->MessageModel->getMsgVarsDataByPrestudentId($prestudents);
@@ -454,12 +454,12 @@ class Messages_model extends CI_Model
 			if (is_array($msgVars)) $msgVarsDataArray = array_merge($msgVarsDataArray, $msgVars);
 
 			$message = $this->messagelib->sendMessageUserTemplate(
-				$msgVarsDataArray['person_id'],			// receiversPersonId
-				$vorlage_kurzbz,						// vorlage
-				$msgVarsDataArray,						// parseData
-				null,									// orgform
-				$sender_id,								// sender_id
-				$oe_kurzbz								// senderOU
+				$msgVarsDataArray['person_id'],	// receiversPersonId
+				$vorlage_kurzbz,		// vorlage
+				$msgVarsDataArray,		// parseData
+				null,				// orgform
+				$sender_id,			// sender_id
+				$oe_kurzbz			// senderOU
 			);
 
 			if (isError($message)) return $message;
