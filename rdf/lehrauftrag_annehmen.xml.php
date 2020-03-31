@@ -390,36 +390,32 @@ function drawLehrauftrag($uid)
 				$gesamtstunden = $gesamtstunden + $stunden;
 		}
 	}
-	$qry = "SELECT DISTINCT tbl_projektarbeit.projektarbeit_id
-				,tbl_projektbetreuer.faktor
-				,tbl_projektbetreuer.stunden
-				,tbl_projektbetreuer.stundensatz
-				,tbl_lehrveranstaltung.semester
-				,vorname
-				,nachname
-				,vw_student.studiengang_kz
-				,projekttyp_kurzbz
-				,lehrfach.oe_kurzbz
-			FROM lehre.tbl_projektbetreuer
-				,lehre.tbl_lehreinheit
-				,lehre.tbl_lehrveranstaltung AS lehrfach
-				,lehre.tbl_lehrveranstaltung
-				,public.tbl_organisationseinheit
-				,public.tbl_benutzer
-				,lehre.tbl_projektarbeit
-				,campus.vw_student
-				,lehre.tbl_vertrag_vertragsstatus
-			WHERE tbl_projektbetreuer.person_id = tbl_benutzer.person_id
-			    AND tbl_projektbetreuer.vertrag_id IS NOT NULL
-                AND tbl_vertrag_vertragsstatus.vertragsstatus_kurzbz = 'akzeptiert'
-				AND tbl_benutzer.uid = ".$db->db_add_param($uid)."
-				AND tbl_projektarbeit.projektarbeit_id = tbl_projektbetreuer.projektarbeit_id
-				AND student_uid = vw_student.uid
-				AND tbl_organisationseinheit.oe_kurzbz = tbl_lehrveranstaltung.oe_kurzbz
-				AND tbl_lehreinheit.lehreinheit_id = tbl_projektarbeit.lehreinheit_id
-				AND tbl_lehreinheit.lehrfach_id = lehrfach.lehrveranstaltung_id
-				AND tbl_lehreinheit.studiensemester_kurzbz = ".$db->db_add_param($ss)."
-				AND tbl_lehreinheit.lehrveranstaltung_id = tbl_lehrveranstaltung.lehrveranstaltung_id";
+	$qry = 'SELECT 
+	            pa.projektarbeit_id,
+				pb.faktor,
+				pb.stunden,
+				pb.stundensatz,
+				lv.semester,
+				vorname,
+				nachname,
+				student.studiengang_kz,
+				projekttyp_kurzbz,
+				lv.oe_kurzbz,
+                vertragsstatus_kurzbz
+			FROM lehre.tbl_projektbetreuer pb
+                JOIN lehre.tbl_projektarbeit pa USING (projektarbeit_id)
+		        JOIN lehre.tbl_lehreinheit le USING (lehreinheit_id)
+		        JOIN lehre.tbl_lehrveranstaltung           lv USING (lehrveranstaltung_id)
+                JOIN PUBLIC.tbl_organisationseinheit       oe USING (oe_kurzbz)
+                JOIN public.tbl_benutzer benutzer ON pb.person_id = benutzer.person_id			
+                JOIN campus.vw_student student ON pa.student_uid = student.uid
+                LEFT JOIN lehre.tbl_vertrag                vertrag USING (vertrag_id)
+                LEFT JOIN lehre.tbl_vertrag_vertragsstatus vvst USING (vertrag_id)
+			WHERE pb.vertrag_id IS NOT NULL
+                AND vvst.vertragsstatus_kurzbz = \'akzeptiert\'
+                AND benutzer.uid = '.$db->db_add_param($uid).'
+                AND le.studiensemester_kurzbz = '.$db->db_add_param($ss);
+
 	if ($studiengang_kz != '')
     {
         $qry .= " AND tbl_lehrveranstaltung.studiengang_kz=".$db->db_add_param($studiengang_kz, FHC_INTEGER);
@@ -428,12 +424,12 @@ function drawLehrauftrag($uid)
     {
         if ($xsl_oe_kurzbz == 'etw')
         {
-            $qry .= " AND tbl_lehrveranstaltung.studiengang_kz > 0";
+            $qry .= " AND lv.studiengang_kz > 0";
         }
 
         if ($xsl_oe_kurzbz == 'lehrgang')
         {
-            $qry .= " AND tbl_lehrveranstaltung.studiengang_kz <= 0";
+            $qry .= " AND lv.studiengang_kz <= 0";
         }
     }
 
