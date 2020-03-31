@@ -7,17 +7,17 @@ class FAS_UDF extends Auth_Controller
 	const FAS_UDF_SESSION_NAME = 'fasUdfSessionName';
 
 	public function __construct()
-    {
-        parent::__construct(
+	{
+		parent::__construct(
 			array(
 				'index' => 'basis/person:r',
 				'saveUDF' => 'basis/person:rw'
 			)
 		);
-
+	
 		$this->load->model('person/Person_model', 'PersonModel');
 		$this->load->model('crm/Prestudent_model', 'PrestudentModel');
-    }
+	}
 
 	/**
 	 *
@@ -26,6 +26,8 @@ class FAS_UDF extends Auth_Controller
 	{
 		$person_id = $this->input->get('person_id');
 		$prestudent_id = $this->input->get('prestudent_id');
+
+		$data = array();
 
 		if (isset($person_id) && is_numeric($person_id))
 		{
@@ -50,3 +52,4 @@ class FAS_UDF extends Auth_Controller
 		$this->load->view('system/fas_udf', $data);
 	}
 }
+

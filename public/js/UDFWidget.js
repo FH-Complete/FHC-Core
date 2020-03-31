@@ -17,7 +17,7 @@ var FHC_UDFWidget = {
 
 		$("div[type*='UDFWidget']").each(function(i, udfWidgetDiv) {
 
-			var saveButton = $('<input type="button" value="Save UDFs">');
+			var saveButton = $('<input type="button" value="Speichern">');
 
 			saveButton.on('click', function() {
 
