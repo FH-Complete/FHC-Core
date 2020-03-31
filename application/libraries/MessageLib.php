@@ -15,6 +15,7 @@ class MessageLib
 	const CFG_OU_RECEIVERS = 'ou_receivers';
 	const CFG_OU_RECEIVERS_NO_NOTICE = 'ou_receivers_no_notice';
 	const CFG_OU_RECEIVERS_PRIVATE = 'ou_receivers_private';
+	const CFG_OU_FUNCTION_WHITELIST = 'ou_function_whitelist';
 	const CFG_REDIRECT_VIEW_MESSAGE_URL = 'redirect_view_message_url';
 
 	// Templates names
@@ -229,7 +230,14 @@ class MessageLib
 			$ouArray = array();
 
 			// Copies organisation units in $ouArray array
- 			foreach (getData($benutzer) as $val) $ouArray[] = $val->oe_kurzbz;
+ 			foreach (getData($benutzer) as $val)
+			{
+				// If the function is in the white list then get the organisation unit
+				if (in_array($val->funktion_kurzbz, $this->_ci->config->item(self::CFG_OU_FUNCTION_WHITELIST)))
+				{
+					$ouArray[] = $val->oe_kurzbz;
+				}
+			}
 
 			return success($ouArray);
  		}

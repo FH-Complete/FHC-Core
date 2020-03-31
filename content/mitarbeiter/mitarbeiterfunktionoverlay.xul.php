@@ -179,7 +179,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 	</hbox>
 
 
-	<groupbox id="mitarbeiter-detail-groupbox-funktion">
+	<groupbox id="mitarbeiter-detail-groupbox-funktion" hidden="true">
 		<caption label="Funktion" />
 		<hbox>
 			<tree id="mitarbeiter-tree-funktion" seltype="single" hidecolumnpicker="false" flex="1"

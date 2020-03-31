@@ -257,6 +257,60 @@ class lehreinheit extends basis_db
 		}
 	}
 
+    /**
+     * Laedt alle vorhandenen Lehreinheiten zu einer Lehrveranstaltung
+     *
+     * @param $lehrveranstaltung_id
+     * @return bool
+     */
+	public function load_all_lehreinheiten($lehrveranstaltung_id)
+    {
+        $this->lehreinheiten = array();
+        $this->errormsg ='';
+
+        $qry = "SELECT * FROM lehre.tbl_lehreinheit WHERE
+				lehrveranstaltung_id=".$this->db_add_param($lehrveranstaltung_id, FHC_INTEGER)."
+				ORDER BY lehreinheit_id;";
+
+        if($this->db_query($qry))
+        {
+            while($row = $this->db_fetch_object())
+            {
+                $le_obj = new lehreinheit();
+
+                $le_obj->lehreinheit_id = $row->lehreinheit_id;
+                $le_obj->lehrveranstaltung_id = $row->lehrveranstaltung_id;
+                $le_obj->studiensemester_kurzbz = $row->studiensemester_kurzbz;
+                $le_obj->lehrfach_id = $row->lehrfach_id;
+                $le_obj->lehrform_kurzbz = $row->lehrform_kurzbz;
+                $le_obj->stundenblockung = $row->stundenblockung;
+                $le_obj->wochenrythmus = $row->wochenrythmus;
+                $le_obj->start_kw = $row->start_kw;
+                $le_obj->raumtyp = $row->raumtyp;
+                $le_obj->raumtypalternativ = $row->raumtypalternativ;
+                $le_obj->lehre = $this->db_parse_bool($row->lehre);
+                $le_obj->anmerkung = $row->anmerkung;
+                $le_obj->unr = $row->unr;
+                $le_obj->lvnr = $row->lvnr;
+                $le_obj->sprache = $row->sprache;
+                $le_obj->insertamum = $row->insertamum;
+                $le_obj->insertvon = $row->insertvon;
+                $le_obj->updateamum = $row->updateamum;
+                $le_obj->updatevon = $row->updatevon;
+                $le_obj->ext_id = $row->ext_id;
+                $le_obj->gewicht = $row->gewicht;
+
+                $this->lehreinheiten[] = $le_obj;
+            }
+            return true;
+        }
+        else
+        {
+            $this->errormsg = 'Fehler beim Laden der Lehreinheiten';
+            return false;
+        }
+    }
+
 	/**
 	 * Prueft die Variablen vor dem Speichern
 	 * auf Gueltigkeit.
