@@ -82,9 +82,8 @@ if (isset($_REQUEST['prestudent']))
 	$ps = new prestudent($_REQUEST['prestudent']);
 
 	$login_ok = false;
-	if (defined('TESTTOOL_LOGIN_BEWERBUNGSTOOL') && TESTTOOL_LOGIN_BEWERBUNGSTOOL)
+	if (defined('TESTTOOL_LOGIN_BEWERBUNGSTOOL') && TESTTOOL_LOGIN_BEWERBUNGSTOOL && isset($_GET['confirmation']))
 	{
-
 		if (isset($_SESSION['bewerbung/personId']) && $ps->person_id == $_SESSION['bewerbung/personId'])
 		{
 			$login_ok = true;
@@ -96,7 +95,7 @@ if (isset($_REQUEST['prestudent']))
 			</div>';
 		}
 	}
-	else
+	elseif(!defined('TESTTOOL_LOGIN_BEWERBUNGSTOOL') || TESTTOOL_LOGIN_BEWERBUNGSTOOL == false)
 	{
 		//Geburtsdatum Pruefen
 		if (isset($gebdatum) && $gebdatum == $ps->gebdatum)
@@ -602,7 +601,7 @@ else // LOGIN Site (vor Login)
 			<div class="row" style="margin-bottom: 10%; margin-top: 3%;">
 				<div class="col-xs-6 text-center" style="border-right: 1px solid lightgrey;">
 					<h1 style="white-space: normal">Herzlich Willkommen zum Reihungstest</h1><br><br>
-					Wir wünschen Ihnen einen erfolgreichen Start ins Studium.
+					Wir wünschen Ihnen einen erfolgreichen Start ins Studium.<br>
 				</div>
 				<div class="col-xs-6 text-center">
 					<h1 style="white-space: normal">Welcome to the placement test</h1> <br><br>
@@ -610,12 +609,37 @@ else // LOGIN Site (vor Login)
 				</div>
 			</div>
 		';
-		echo '<div class="row text-center">
-		<form action="'.APP_ROOT.'/addons/bewerbung/cis/." target="_top">
-		<button type="submit" class="btn btn-default" value="'.$p->t('testtool/login').'" />
-			'.$p->t('testtool/login').'
-		</button>
-		</form>
+
+		if (isset($_SESSION['bewerbung/personId']))
+		{
+			echo '<script>
+				function changeconfirmation()
+				{
+					document.getElementById("confirmationSubmit").disabled = !document.getElementById("confirmationCheckbox").checked;
+				}
+				</script>';
+			echo '<div class="row text-center">
+			<form action="login.php">
+			<input type="hidden" name="prestudent" value="'.$_REQUEST['prestudent'].'" />
+			<input id="confirmationCheckbox" type="checkbox" name="confirmation" onclick="changeconfirmation()" />
+			'.$p->t('testtool/confirmationText').'
+			<br><br>
+			<button id="confirmationSubmit" type="submit" class="btn btn-default" disabled/>
+				'.$p->t('testtool/start').'
+			</button>
+			</form>';
+		}
+		else
+		{
+			echo '<div class="row text-center">
+			'.$p->t('testtool/loginNoetig').'<br /><br />
+			<form action="'.APP_ROOT.'/addons/bewerbung/cis/." target="_top">
+			<button type="submit" class="btn btn-default" />
+				'.$p->t('testtool/login').'
+			</button>
+			</form>';
+		}
+		echo '
 		</div>';
 		echo '</div>';
 	}
@@ -690,6 +714,7 @@ else // LOGIN Site (vor Login)
 		echo '</div>';  // end col-xs-11
 	}
 }
+
 ?>
 </div><!--/.row-->
 </body>

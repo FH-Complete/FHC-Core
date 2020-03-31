@@ -50,4 +50,7 @@ $this->phrasen['testtool/startDrueckenUmZuBeginnen']='Um dieses Teilgebiet zu st
 $this->phrasen['testtool/keinPrueflingseintragVorhanden']='Kein Prüflingseintrag vorhanden';
 $this->phrasen['testtool/fuerFolgendeStgAngemeldet']='Für folgende Studiengänge haben Sie sich angemeldet:';
 $this->phrasen['testtool/invalideGebiete']='Ein oder mehrere Fragengebiet/e inkorrekt!<br>Bitte melden Sie dies der Betreuungsperson.';
+$this->phrasen['testtool/confirmationText']='Hiermit bestätige ich, dass der Test von mir alleine und ohne Zuhilfenahme zusätzlicher Hilfsmittel absolviert wird.';
+$this->phrasen['testtool/loginNoetig']='Bitte loggen Sie sich zuerst ein um an dem Reihungstest teilnehmen zu können:';
+$this->phrasen['testtool/start']='Reihungstest jetzt starten';
 ?>
