@@ -12,3 +12,26 @@
 .tabulator-page.active {
 	color: #337ab7 !important;
 }
+
+/* Avoid confusing color change when hovering over selected rows */
+.tabulator-row.tabulator-selected:hover {
+	background-color: #769bcc !important;
+}
+
+/* Frame the table */
+.tabulator {
+	border: 1px solid lightgrey;
+	border-bottom: none;
+	border-top-left-radius: 0.5em;
+	border-top-right-radius: 0.5em;
+}
+
+/* Frame the header cells */
+.tabulator-col:not(:first-of-type) {
+	border-left: 0.5px solid lightgrey;
+}
+
+/* More space for header title (avoids triple points at the end) */
+.tabulator .tabulator-header .tabulator-col .tabulator-col-content .tabulator-col-title {
+	overflow: initial;
+}

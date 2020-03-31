@@ -18,6 +18,17 @@ const ICON_LEHRAUFTRAG_ORDERED = '<img src="../../../public/images/icons/fa-user
 const ICON_LEHRAUFTRAG_APPROVED = '<img src="../../../public/images/icons/fa-user-check.png" style="height: 30px; width: 30px; margin: -6px;">';
 const ICON_LEHRAUFTRAG_CHANGED = '<img src="../../../public/images/icons/fa-user-edit.png" style="height: 30px; width: 30px; margin: -6px;">';
 
+// Fields that should not be provided in the column picker
+var tableWidgetBlacklistArray_columnUnselectable = [
+	'status',
+	'row_index',
+	'personalnummer',
+	'betrag',
+	'vertrag_id',
+	'vertrag_stunden',
+	'vertrag_betrag'
+];
+
 // -----------------------------------------------------------------------------------------------------------------
 // Mutators - setter methods to manipulate table data when entering the tabulator
 // -----------------------------------------------------------------------------------------------------------------
@@ -106,10 +117,9 @@ function func_dataLoaded(data, table){
 // Tabulator table format functions
 // -----------------------------------------------------------------------------------------------------------------
 
-// Displays text when table is empty
-function func_placeholder()
-{
-    return "<h4>Keine Daten vorhanden.</h4>";
+// Returns relative height (depending on screen size)
+function func_height(table){
+    return $(window).height() * 0.50;
 }
 
 // Formats the group header
@@ -325,47 +335,16 @@ function func_rowUpdated(row){
     row.getElement().style["pointerEvents"] = "none";
 }
 
-// Tabulator footer element
+// TableWidget Footer element
 // -----------------------------------------------------------------------------------------------------------------
 
-// Adds a footer with buttons select all / deselect all / download
-function func_footerElement(){
-
-    var footer_html = '<div class="row">';
-    footer_html += '<div class="col-lg-12" style="padding: 5px;">';
-
-    footer_html += '<div class="btn-toolbar pull-right" role="toolbar">';
-    footer_html += '<div class="btn-group" role="group">';
-    footer_html += '<button id="download-csv" class="btn btn-default" type="button" data-toggle="tooltip" data-placement="left" title="Download CSV" onclick="footer_downloadCSV()"><small>CSV&nbsp;&nbsp;</small><i class="fa fa-arrow-down"></i></button>';
-    footer_html += '</div>';
-    footer_html += '</div>';
-
-    footer_html += '<div class="btn-toolbar" role="toolbar">';
-    footer_html += '<div class="btn-group" role="group">';
-    footer_html += '<button id="select-all" class="btn btn-default pull-left" type="button" onclick="footer_selectAll()">Alle auswählen</button>';
-    footer_html += '<button id="deselect-all" class="btn btn-default pull-left" type="button" onclick="footer_deselectAll()">Alle abwählen</button>';
-    footer_html += '<span id="number-selected" style="margin-left: 20px; line-height: 2; font-weight: normal"></span>';
-    footer_html += '</div>';
-    footer_html += '</div>';
-
-    footer_html += '</div>';
-    footer_html += '</div>';
-
-    return footer_html;
-}
-
-// Performs download CSV
-function footer_downloadCSV(){
-    $('#tableWidgetTabulator').tabulator("download", "csv", "data.csv", {bom:true}); // BOM for correct UTF-8 char output
-}
-
 /*
- * Performs select all
+ * Hook to overwrite TableWigdgets select-all-button behaviour
  * Select all (filtered) rows and ignore rows which have status bestellt
  */
-function footer_selectAll(){
-    $('#tableWidgetTabulator').tabulator('getRows', true)
-        .filter(row => (
+function tableWidgetHook_selectAllButton(tableWidgetDiv){
+	tableWidgetDiv.find("#tableWidgetTabulator").tabulator('getRows', true)
+		.filter(row => (
             row.getData().personalnummer > 0 ||                 // not dummies
             row.getData().personalnummer == null) &&            // include Projektbetreuer
             row.getData().mitarbeiter_uid != null &&            // AND is Mitarbeiter
@@ -377,20 +356,7 @@ function footer_selectAll(){
                 row.getData().status == 'Geändert'              // AND geaendert)
             )
         )
-        .forEach((row => row.select()));
-}
-
-/*
- * Performs deselect all
- * Deselect all (filtered) rows
- */
-function footer_deselectAll(){
-    $('#tableWidgetTabulator').tabulator('deselectRow');
-}
-
-// Displays number of selected rows on row selection change
-function func_rowSelectionChanged(data, rows){
-    $('#number-selected').html("Für Bestellung ausgewählt: <strong>" + rows.length + "</strong>");
+		.forEach((row => row.select()));
 }
 
 // -----------------------------------------------------------------------------------------------------------------
@@ -575,6 +541,12 @@ akzeptiert_tooltip = function(cell){
 }
 
 $(function() {
+
+    // Redraw table on resize to fit tabulators height to windows height
+    window.addEventListener('resize', function(){
+        $('#tableWidgetTabulator').tabulator('setHeight', $(window).height() * 0.50);
+        $('#tableWidgetTabulator').tabulator('redraw', true);
+    });
 
     // Show all rows
     $("#show-all").click(function(){
