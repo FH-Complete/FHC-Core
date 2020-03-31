@@ -37,6 +37,7 @@ class OneTimeMessages extends JOB_Controller
 		$queryParams = array(
 			$semester,
 			$studyCourseType,
+			$semester,
 			$studyCourseType,
 			$semester,
 			$studyCourseType
@@ -49,28 +50,29 @@ class OneTimeMessages extends JOB_Controller
 			   FROM public.tbl_prestudent p
 			   JOIN public.tbl_prestudentstatus ps USING (prestudent_id)
  			   JOIN public.tbl_studiengang s USING (studiengang_kz)
-			  WHERE ps.status_kurzbz = \'Interessent\'
+			  WHERE ps.status_kurzbz = \'Wartender\'
 			    AND ps.studiensemester_kurzbz = ?
-			    AND ps.datum >= NOW() - \''.$months.' months\'::interval
+			    AND ps.datum <= NOW() - \''.$months.' months\'::interval
 			    AND s.typ = ?
-			    AND p.prestudent_id NOT IN (
-				SELECT pp.prestudent_id
+			    AND NOT EXISTS (
+				SELECT pp.person_id
 				  FROM public.tbl_prestudent pp
 				  JOIN public.tbl_prestudentstatus pss USING (prestudent_id)
 				  JOIN public.tbl_studiengang ss USING (studiengang_kz)
 				 WHERE pss.status_kurzbz = \'Aufgenommener\'
+				   AND pss.studiensemester_kurzbz = ?
 				   AND ss.typ = ?
-				   AND pp.prestudent_id = p.prestudent_id
+				   AND pp.person_id = p.person_id
 			    )
-			    AND p.prestudent_id NOT IN (
-				SELECT pp.prestudent_id
+			    AND NOT EXISTS (
+				SELECT pp.person_id
 				  FROM public.tbl_prestudent pp
 				  JOIN public.tbl_prestudentstatus pss USING (prestudent_id)
 				  JOIN public.tbl_studiengang ss USING (studiengang_kz)
-				 WHERE pss.status_kurzbz = \'Bewerber\'
+				 WHERE pss.status_kurzbz = \'Student\'
 				   AND pss.studiensemester_kurzbz = ?
 				   AND ss.typ = ?
-				   AND pp.prestudent_id = p.prestudent_id
+				   AND pp.person_id = p.person_id
 			    )',
 			$queryParams
 		);
@@ -114,4 +116,3 @@ class OneTimeMessages extends JOB_Controller
 		$this->logInfo('Send message to applicants still waiting end');
 	}
 }
-
