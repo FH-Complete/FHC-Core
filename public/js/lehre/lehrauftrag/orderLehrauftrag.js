@@ -203,7 +203,7 @@ function func_rowFormatter(row){
 
 // Formats row selectable/unselectable
 function func_selectableCheck(row){
-    var is_dummy = row.getData().personalnummer <= 0;
+    var is_dummy = (row.getData().personalnummer <= 0 && row.getData().personalnummer != null);
     var is_mitarbeiter = row.getData().mitarbeiter_uid != null;
     var has_stunden = row.getData().stunden != 0 && row.getData().stunden != null;
 
@@ -575,7 +575,10 @@ $(function() {
     $("#show-ordered").click(function(){
         $('#tableWidgetTabulator').tabulator('setFilter',
             [
-                {field: 'personalnummer', type: '>=', value: 0},
+                [
+                    {field: 'personalnummer', type: '>', value: 0},     // not dummy lector
+                    {field: 'personalnummer', type: '=', value: null}   // include Projektbetreuer
+                ],
                 {field: 'bestellt', type: '!=', value: null},
                 {field: 'erteilt', type: '=', value: null},
                 {field: 'akzeptiert', type: '=', value: null}
