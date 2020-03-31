@@ -422,17 +422,26 @@ class Messages_model extends CI_Model
 
 		return success('Messages sent successfully');
 	}
-
+	
 	/**
-	 * Sends a new message using the given template and information present in parameter prestudents
-	 * Extra variables can be added using parameter $msgVars
+	 * Wrapper method for sendExplicitTemplateSenderId
+	 * The sender id is retrieved from the authentication session, if not present an error would be raised
 	 */
 	public function sendExplicitTemplate($prestudents, $oe_kurzbz, $vorlage_kurzbz, $msgVars)
 	{
 		// Retrieves the sender id
-		$sender_id = isLogged() ? getAuthPersonId() : null;
-		if (!is_numeric($sender_id)) $sender_id = $this->config->item(MessageLib::CFG_SYSTEM_PERSON_ID);
+		$sender_id = getAuthPersonId();
+		if (!is_numeric($sender_id)) show_error('The current logged user person_id is not defined');
 
+		return $this->sendExplicitTemplateSenderId($sender_id, $prestudents, $oe_kurzbz, $vorlage_kurzbz, $msgVars);
+	}
+	
+	/**
+	 * Sends a new message using the given template and information present in parameter prestudents
+	 * Extra variables can be added using parameter $msgVars
+	 */
+	public function sendExplicitTemplateSenderId($sender_id, $prestudents, $oe_kurzbz, $vorlage_kurzbz, $msgVars)
+	{
 		// Retrieves message vars data for the given user/s
 		$msgVarsData = $this->MessageModel->getMsgVarsDataByPrestudentId($prestudents);
 		if (isError($msgVarsData)) show_error(getError($msgVarsData));

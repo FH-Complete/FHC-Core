@@ -29,8 +29,9 @@ class OneTimeMessages extends JOB_Controller
 	 * - The given semester (ex WS2020)
 	 * - How long since applicant (months)
 	 * - The given template id to be used as message subject and body (vorlage_kurzbz)
+	 * The sender of all the messages is specified by the parameter senderId (sender person_id)
 	 */
-	public function sendMessageToApplicantsStillWaiting($studyCourseType, $semester, $months, $messageTemplate)
+	public function sendMessageToApplicantsStillWaiting($senderId, $studyCourseType, $semester, $months, $messageTemplate)
 	{
 		$this->logInfo('Send message to applicants still waiting start');
 
@@ -94,11 +95,12 @@ class OneTimeMessages extends JOB_Controller
 				$prestudentIdsArray[] = $dbPrestudent->prestudent_id;
 			}
 
-			$sendMessage = $this->CLMessagesModel->sendExplicitTemplate(
-				$prestudentIdsArray, // prestudents id
-				null,			 // organization unit
-				$messageTemplate,	 // template id
-				null			 // extra variables
+			$sendMessage = $this->CLMessagesModel->sendExplicitTemplateSenderId(
+				$senderId,		// sender person id
+				$prestudentIdsArray,	// prestudents id
+				null,			// organization unit
+				$messageTemplate,	// template id
+				null			// extra variables
 			);
 
 			if (isError($sendMessage))
@@ -111,6 +113,8 @@ class OneTimeMessages extends JOB_Controller
 					)
 				);
 			}
+
+			$this->logInfo('Total amount of prestudents: '.count($prestudentIdsArray));
 		}
 
 		$this->logInfo('Send message to applicants still waiting end');
