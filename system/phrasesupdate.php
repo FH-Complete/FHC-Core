@@ -4453,7 +4453,28 @@ When on hold, the date is only a reminder.',
 				'insertvon' => 'system'
 			)
 		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'backToReadWeiteMeassage',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Zurück zum Inbox/Outbox',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Back to Inbox/Outbox',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
 	)
+
 );
 
 

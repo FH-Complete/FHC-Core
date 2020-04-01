@@ -85,6 +85,12 @@
 					<br>
 					<div class="row">
 						<div class="col-lg-12 text-right">
+							<button id="backButton" class="btn btn-default" type="button">
+
+								<?php echo $this->p->t('ui', 'backToReadWeiteMeassage'); ?>
+
+							</button>
+
 							<button id="sendButton" class="btn btn-default" type="button">
 
 								<?php echo $this->p->t('ui', 'senden'); ?>

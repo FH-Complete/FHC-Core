@@ -47,6 +47,16 @@ function sendMessageToOU()
 /**
  *
  */
+function backToInOut()
+{
+	window.location = FHC_JS_DATA_STORAGE_OBJECT.app_root +
+		FHC_JS_DATA_STORAGE_OBJECT.ci_router + "/" +
+		FHC_JS_DATA_STORAGE_OBJECT.called_path + "/read";
+}
+
+/**
+ *
+ */
 $(document).ready(function () {
 
 	//
@@ -59,5 +69,7 @@ $(document).ready(function () {
 	});
 
 	$('#sendButton').click(sendMessageToOU);
+
+	$('#backButton').click(backToInOut);
 
 });
