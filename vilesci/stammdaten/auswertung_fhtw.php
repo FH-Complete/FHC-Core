@@ -2630,7 +2630,7 @@ else
 	}
 
 	$btntxt = $selectedrtstr === '' ? '-- keine Auswahl --' : $selectedrtstr;
-	echo '<button type="button" id="rtcheckboxesbtn">' . $btntxt . '</button>
+	echo '<button type="button" id="rtcheckboxesbtn" style="text-align: left">' . $btntxt . '</button>
 			<div id="rtcheckboxes">';
 	echo $checkbxstr;
 
