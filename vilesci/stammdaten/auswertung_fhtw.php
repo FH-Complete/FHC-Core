@@ -482,12 +482,8 @@ if ($rtFreischalten)
 $testende = filter_input(INPUT_POST, 'testende', FILTER_VALIDATE_BOOLEAN);
 if ($testende)
 {
-	/*if (isset($_POST['reihungstest_ids']) && is_array($_POST['reihungstest_ids']))
-	{
-		$reihungstest = new reihungstest($_POST['reihungstest_id']);*/
 	// Alle Bachelor-Studiengänge holen, bei denen der Bewerber Interessent ist, die Bewerbung abgeschickt hat und bestätigt wurde
 	// Mail an alle diese Studiengänge senden
-
 	if (isset($_POST['prestudents']))
 	{
 		// Array mit allen Prestudenten aufbauen
@@ -540,6 +536,7 @@ if ($testende)
 	$sendError = false;
 	$empfaengerArray = array();
 	$rtidArray = array();
+	$rtdatumstrArray = array();
 	$rtdatumstr = '';
 
 	foreach ($prestudentsrt as $psrt)
@@ -548,9 +545,32 @@ if ($testende)
 		{
 			$rtidArray[] = $psrt['reihungstest_id'];
 			$rt = new reihungstest($psrt['reihungstest_id']);
+			$idx = 0;
 
-			$rtdatumstr .= 'Der Reihungstest vom '.$datum_obj->convertISODate($rt->datum).' um '.$datum_obj->formatDatum($rt->uhrzeit, 'H:i').' Uhr ist beendet.<br>';
+			//sort by date and time for correct order in mailtext
+			foreach ($rtdatumstrArray as $ds)
+			{
+				if ($ds->datum < $rt->datum)
+					$idx++;
+				elseif ($ds->datum == $rt->datum)
+				{
+					if ($ds->uhrzeit < $rt->uhrzeit)
+						$idx++;
+					else
+						break;
+				}
+				else
+					break;
+			}
+			$rtdatum = new stdClass();
+			$rtdatum->datum = $rt->datum;
+			$rtdatum->uhrzeit = $rt->uhrzeit;
+			array_splice($rtdatumstrArray, $idx, 0, array($rtdatum));
 		}
+	}
+
+	foreach ($rtdatumstrArray as $rtdatumobj) {
+		$rtdatumstr .= 'Der Reihungstest vom '.$datum_obj->convertISODate($rtdatumobj->datum).' um '.$datum_obj->formatDatum($rtdatumobj->uhrzeit, 'H:i').' Uhr ist beendet.<br>';
 	}
 
 	$rtidparams = http_build_query(array('reihungstest' => $rtidArray));
@@ -1120,7 +1140,7 @@ if ($prestudent_id != '' && !is_numeric($prestudent_id))
 {
 	die('PrestudentID ist ungueltig');
 }
-if (($reihungstest == '' && isset($_REQUEST['reihungstest'])) && $studiengang == '' && $semester == '' && $prestudent_id == '' && $datum_von == '' && $datum_bis == '')
+if (isset($_POST['rtauswsubmit']) && $reihungstest == '' && $studiengang == '' && $semester == '' && $prestudent_id == '' && $datum_von == '' && $datum_bis == '')
 {
 	die('Waehlen Sie bitte mindestens eine der Optionen aus');
 }
@@ -1181,7 +1201,7 @@ while ($row = $db->db_fetch_object($result))
 	$rtest[$row->reihungstest_id]->freigeschaltet = $db->db_parse_bool($row->freigeschaltet);
 }
 
-if (isset($_REQUEST['reihungstest']))
+if (isset($_REQUEST['reihungstest']) || isset($_POST['rtauswsubmit']))
 {
 	// Vorkommende Gebiete laden
 	$query = "
@@ -2071,6 +2091,19 @@ else
 			}
 		});
 		
+		$("#prestudent").on("input", function(){
+		    var numchecked = $("#rtcheckboxes input[type=checkbox]:checked").length;
+		    if (numchecked > 0)
+		    {
+				$("#rtcheckboxes input[type=checkbox]").prop("checked", false);
+				showSelectedRts();
+			}
+		});
+		
+		$("#prestudent").keyup( function(){
+			$("#prestudent_id").val(this.value);
+		});
+		
 		$("#zuteilungAutocomplete").autocomplete({
 			source: "auswertung_fhtw.php?autocomplete=prestudentAdd&'.http_build_query(array('studiensemester_kurzbz' => $rtStudiensemester)).'",
 			minLength:2,
@@ -2601,6 +2634,7 @@ else
 	$selectedrtstr = '';
 	$checkbxstr = '';
 	$first = true;
+	$noparamsselected = $prestudent_id == '' && $reihungstest == '' && $datum_von == '' && $datum_bis == '' && $studiengang == '' && $semester == '';
 	//$maxeachline = 1;
 	foreach ($rtest as $rt)
 	{
@@ -2623,6 +2657,17 @@ else
 					break;
 				}
 			}
+		}
+		elseif($noparamsselected && $rt->datum == date('Y-m-d'))
+		{
+			//wenn nichts ausgewählt, heute Reihungstests vorausgewählt
+			$checked = ' checked';
+
+			if (!$first)
+				$selectedrtstr .= '<br />';
+
+			$selectedrtstr .= $rtstr;
+			$first = false;
 		}
 
 		$checkbxstr .=  '<div class="input-group rtlabel"><input type="checkbox" name="reihungstest[]" id="rt_' . $rt->reihungstest_id . '" value="' . $rt->reihungstest_id . '"' . $checked . ' />';
@@ -2690,10 +2735,10 @@ else
 	echo '<label>bis Datum: <INPUT class="datepicker_datum" type="text" name="datum_bis" maxlength="10" size="10" value="' . $datum_obj->formatDatum($datum_bis, 'd.m.Y') . '" /></label>';
 	echo '</td></tr>';
 	echo '<tr><td>';
-	echo 'PrestudentIn: <INPUT id="prestudent" type="text" name="prestudent_id" size="50" value="' . $prestudent_id . '" placeholder="Name, UID oder Prestudent_id eingeben" onInput="document.getElementById(\'reihungstest\').value=\'\'" onkeyup="document.getElementById(\'prestudent_id\').value=this.value"/><input type="hidden" id="prestudent_id" name="prestudent_id" value="' . $prestudent_id . '" />';
+	echo 'PrestudentIn: <INPUT id="prestudent" type="text" name="prestudent_id" size="50" value="' . $prestudent_id . '" placeholder="Name, UID oder Prestudent_id eingeben"/><input type="hidden" id="prestudent_id" name="prestudent_id" value="' . $prestudent_id . '" />';
 	echo '</td></tr>
 			</table></td><td id="auswertencell">';
-	echo '<INPUT type="submit" class="btn btn-primary" value="Anzeigen" id="auswertenButton"/><br><br>';
+	echo '<INPUT type="submit" class="btn btn-primary" value="Anzeigen" name="rtauswsubmit" id="auswertenButton"/><br><br>';
 	echo '<a href="auswertung_fhtw.php?studiengang=' . $studiengang . '
 										&semester=' . $semester . '
 										&datum_von=' . $datum_von . '
@@ -2867,7 +2912,7 @@ else
 	echo '</div>';
 
 	//echo '<div class="col-xs-4"></div>';
-	if (isset($_REQUEST['reihungstest']))
+	if (isset($_REQUEST['reihungstest']) || isset($_POST['rtauswsubmit']))
 	{
 		echo '
 		<table class="tablesorter table-bordered tablesorter-default" id="auswertung_table">
