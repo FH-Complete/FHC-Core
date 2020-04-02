@@ -297,33 +297,34 @@ $filterWidgetArray = array(
     'tableUniqueId' => 'acceptLehrauftrag',
     'requiredPermissions' => 'lehre/lehrauftrag_akzeptieren',
     'datasetRepresentation' => 'tabulator',
-    'columnsAliases' => array(  // TODO: use phrasen
+    'columnsAliases' => array(
         'Status',   // alias for row_index, because row_index is formatted to display the status icons
-		'LV- / Projektbezeichnung',
-		'Studiengang',
-		'Gruppe',
-		'Typ',
-        'LV-Teil',
-        'LV-ID',
-        'PA-ID',
-        'Studiensemester',
-        'Studiengang-KZ',
+	    ucfirst($this->p->t('lehre', 'lehrveranstaltung')). '- / '.
+	        ucfirst($this->p->t('ui', 'projekt')). lcfirst($this->p->t('ui', 'bezeichnung')),
+	    ucfirst($this->p->t('lehre', 'studiengang')),
+	    ucfirst($this->p->t('lehre', 'gruppe')),
+	    ucfirst($this->p->t('global', 'typ')),
+	    ucfirst($this->p->t('lehre', 'lehreinheit')),
+	    ucfirst($this->p->t('lehre', 'lehrveranstaltung')). '-ID',
+	    ucfirst($this->p->t('ui', 'projektarbeit')). '-ID',
+	    ucfirst($this->p->t('lehre', 'studiensemester')),
+        ucfirst($this->p->t('lehre', 'studiengang')). '-'. ucfirst($this->p->t('ui', 'kz')),
 		'Semester',
-        'OrgForm',
+	    ucfirst($this->p->t('lehre', 'organisationsform')),
         'Person-ID',
-        'Organisationseinheit',
-        'Stunden',
-        'Betrag',
-        'Vertrag-ID',
-        'Vertrag-Stunden',
-        'Vertrag-Betrag',
+	    ucfirst($this->p->t('lehre', 'organisationseinheit')),
+	    ucfirst($this->p->t('ui', 'stunden')),
+	    ucfirst($this->p->t('ui', 'betrag')),
+	    ucfirst($this->p->t('ui', 'vertrag')). '-ID',
+	    ucfirst($this->p->t('ui', 'vertrag')). '-'. ucfirst($this->p->t('ui', 'stunden')),
+	    ucfirst($this->p->t('ui', 'vertrag')). '-'. ucfirst($this->p->t('ui', 'betrag')),
         'UID',
-        'Bestellt',
-        'Erteilt',
-        'Angenommen',
-        'Bestellt von',
-        'Erteilt von',
-        'Angenommen von'
+	    ucfirst($this->p->t('ui', 'bestellt')),
+	    ucfirst($this->p->t('ui', 'erteilt')),
+	    ucfirst($this->p->t('ui', 'angenommen')),
+	    ucfirst($this->p->t('ui', 'bestelltVon')),
+	    ucfirst($this->p->t('ui', 'erteiltVon')),
+	    ucfirst($this->p->t('ui', 'angenommenVon'))
     ),
     'datasetRepOptions' => '{
 		height: func_height(this),
@@ -363,7 +364,7 @@ $filterWidgetArray = array(
         row_index: {visible:false},     // necessary for row indexing
 		auftrag: {
 			headerFilter:"input", widthGrow: 3,
-		 	bottomCalc:"count", bottomCalcFormatter:function(cell){return "Anzahl: " + cell.getValue();}
+		 	bottomCalc:"count", bottomCalcFormatter:function(cell){return "'. ucfirst($this->p->t('global', 'anzahl')). ': " + cell.getValue();}
 		 },
 	 	stg_typ_kurzbz: {headerFilter:"input"},
 		gruppe: {headerFilter:"input"},
