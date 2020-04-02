@@ -563,7 +563,7 @@ var FHC_TableWidget = {
 		tableWidgetDiv.find('#tableWidgetHeader').append(tabulatorHeaderHTML);
 
 		// Render the collapsable div triggered by button in tableWidgetHeader
-		var tabulatorHeaderCollapseHTML = _renderTabulatorHeaderCollapseHTML(tableWidgetDiv);
+		var tabulatorHeaderCollapseHTML = _renderTabulatorHeaderCollapseHTML(tableWidgetDiv, FHC_JS_DATA_STORAGE_OBJECT.user_language);
 		tableWidgetDiv.find('#tableWidgetHeader').after(tabulatorHeaderCollapseHTML);
 
 		/**
@@ -741,7 +741,7 @@ function _func_columnVisibilityChanged(column, visible){
  * Displays text when table is empty
  */
 function _func_placeholder(){
-	return "<h4>Keine Daten vorhanden.</h4>";
+	return '<h4>' + FHC_PhrasesLib.t('ui', 'keineDatenVorhanden') + '</h4>';
 }
 
 // Returns TableWidget Header HTML (download-, setting button...)
@@ -752,9 +752,23 @@ function _renderTabulatorHeaderHTML(tableWidgetDiv){
 	var tabulatorHeaderHTML = '';
 	tabulatorHeaderHTML += '<div class="btn-toolbar pull-right" role="toolbar">';
 	tabulatorHeaderHTML += '<div class="btn-group" role="group">';
-	tabulatorHeaderHTML += '<button id="download-csv" class="btn btn-default" type="button" data-toggle="tooltip" data-placement="left" title="Download CSV"><small>CSV&nbsp;&nbsp;</small><i class="fa fa-arrow-down"></i></button>';
-	tabulatorHeaderHTML += '<button id="help" class="btn btn-default" type="button" data-toggle="collapse tooltip" data-target="tabulatorHelp-'+ tableUniqueId + '" data-placement="left" title="Hilfe zu Tabelleneinstellungen"><i class="fa fa-question"></i></button>';
-	tabulatorHeaderHTML += '<button id="settings" class="btn btn-default" type="button" data-toggle="collapse tooltip" data-target="tabulatorSettings-'+ tableUniqueId + '" data-placement="left" title="Tabelleneinstellungen" aria-expanded="false" aria-controls="tabulatorSettings-'+ tableUniqueId + '"><i class="fa fa-cog"></i></button>';
+	tabulatorHeaderHTML += '' +
+		'<button id="download-csv" class="btn btn-default" type="button" ' +
+		'data-toggle="tooltip" data-placement="left" title="Download CSV">' +
+		'<small>CSV&nbsp;&nbsp;</small><i class="fa fa-arrow-down"></i>' +
+		'</button>';
+	tabulatorHeaderHTML += '' +
+		'<button id="help" class="btn btn-default" type="button" ' +
+		'data-toggle="collapse tooltip" data-target="tabulatorHelp-'+ tableUniqueId + '" data-placement="left" ' +
+		'title="' + FHC_PhrasesLib.t("ui", "hilfe") + '"><i class="fa fa-question"></i>' +
+		'</button>';
+	tabulatorHeaderHTML += '' +
+		'<button id="settings" class="btn btn-default" type="button" ' +
+		'data-toggle="collapse tooltip" data-target="tabulatorSettings-'+ tableUniqueId + '" data-placement="left" ' +
+		'title="' + FHC_PhrasesLib.t("ui", "tabelleneinstellungen") + '" ' +
+		'aria-expanded="false" aria-controls="tabulatorSettings-'+ tableUniqueId + '">' +
+		'<i class="fa fa-cog"></i>' +
+		'</button>';
 	tabulatorHeaderHTML += '</div>';
 	tabulatorHeaderHTML += '</div>';
 	tabulatorHeaderHTML += '<br><br><br>';
@@ -763,7 +777,7 @@ function _renderTabulatorHeaderHTML(tableWidgetDiv){
 }
 
 // Returns collapsable HTML element for TableWidget header buttons
-function _renderTabulatorHeaderCollapseHTML(tableWidgetDiv){
+function _renderTabulatorHeaderCollapseHTML(tableWidgetDiv, language){
 
 	var tableUniqueId = tableWidgetDiv.attr('tableUniqueId');
 
@@ -777,9 +791,12 @@ function _renderTabulatorHeaderCollapseHTML(tableWidgetDiv){
 	tabulatorHeaderCollapseHTML += '<div class="panel panel-default">';
 	tabulatorHeaderCollapseHTML += '<div class="panel-heading" role="tab" id="headingOne">';
 	tabulatorHeaderCollapseHTML += '<h5 class="panel-title">';
-	tabulatorHeaderCollapseHTML += '<a role="button" data-toggle="collapse" data-parent="#accordion" ' +
+	tabulatorHeaderCollapseHTML += '' +
+		'<a role="button" data-toggle="collapse" data-parent="#accordion" ' +
 		'href="#selectColumns-' + tableUniqueId + '" ' +
-		'aria-expanded="false" aria-controls="selectColumns">Spalten einstellen</a>';
+		'aria-expanded="false" aria-controls="selectColumns">' +
+		FHC_PhrasesLib.t("ui", "spaltenEinstellen") +
+		'</a>';
 	tabulatorHeaderCollapseHTML += '</h5>';
 	tabulatorHeaderCollapseHTML += '</div>'; // end panel-heading
 	tabulatorHeaderCollapseHTML += '<div id="selectColumns-' + tableUniqueId + '" class="panel-collapse collapse" ' +
@@ -825,40 +842,75 @@ function _renderTabulatorHeaderCollapseHTML(tableWidgetDiv){
 	tabulatorHeaderCollapseHTML += '<div class="col-lg-12 collapse" id="tabulatorHelp-'+ tableUniqueId + '">';
 	tabulatorHeaderCollapseHTML += '<div class="well">';
 
-	tabulatorHeaderCollapseHTML += '<h4>Tabelleneinstellungen</h4>';
-	tabulatorHeaderCollapseHTML += '<div class="panel panel-body">';
-	tabulatorHeaderCollapseHTML += '<b>Spalten ein- und ausblenden</b>';
-	tabulatorHeaderCollapseHTML += '<p>';
-	tabulatorHeaderCollapseHTML += '<ul>';
-	tabulatorHeaderCollapseHTML += '<li>Mit einem Klick auf <button><i class="fa fa-cog"></i></button> ' +
-		'werden die Einstellungen geöffnet.</li>';
-	tabulatorHeaderCollapseHTML += '<li>Auf Spalteneinstellungen klicken</li>';
-	tabulatorHeaderCollapseHTML += '<li>Durch (wiederholtes) Klicken auf die einzelnen Spaltennamen können ' +
-		'diese in der Tabelle beliebig oft aktiviert / deaktiviert werden.</li>';
-	tabulatorHeaderCollapseHTML += '<li>Mit einem Klick auf <button><i class="fa fa-cog"></i></button> ' +
-		'werden die Einstellungen wieder geschlossen.</li>';
-	tabulatorHeaderCollapseHTML += '</ul>';
-	tabulatorHeaderCollapseHTML += '</p>';
-	tabulatorHeaderCollapseHTML += '<b>Spaltenbreite verändern</b>';
-	tabulatorHeaderCollapseHTML += '<p>Um die Spaltenbreite zu verändern, fährt man im Spaltenkopf langsam ' +
-		'mit dem Mauszeiger auf den rechten Rand der entprechenden Spalte. <br>' +
-		'Sobald sich der Mauszeiger in einen Doppelpfeil verwandelt, wird die Maustaste geklickt und ' +
-		'mit gedrückter Maustaste die Spalte nach rechts erweitert oder nach links verkleinert.';
-	tabulatorHeaderCollapseHTML += '</p>';
-	tabulatorHeaderCollapseHTML += '<div class="alert alert-info"><strong>INFO: </strong>Alle individuellen Tabelleneinstellungen werden in ' +
-		'Ihrem Browser Cache gespeichert. Wenn Sie Ihren Browser Cache löschen, werden Ihre Einstellungen zurückgesetzt und ' +
-		'müssen gegebenenfalls neu eingestellt werden.';
-	tabulatorHeaderCollapseHTML += '</div>';
-	tabulatorHeaderCollapseHTML += '</div><br>';	// end panel-body
+	if (language == 'German')
+	{
+		tabulatorHeaderCollapseHTML += '<h4>Tabelleneinstellungen</h4>';
+		tabulatorHeaderCollapseHTML += '<div class="panel panel-body">';
+		tabulatorHeaderCollapseHTML += '<b>Spalten ein- und ausblenden</b>';
+		tabulatorHeaderCollapseHTML += '<p>';
+		tabulatorHeaderCollapseHTML += '<ul>';
+		tabulatorHeaderCollapseHTML += '<li>Mit einem Klick auf <button><i class="fa fa-cog"></i></button> ' +
+			'werden die Einstellungen geöffnet.</li>';
+		tabulatorHeaderCollapseHTML += '<li>Auf Spalteneinstellungen klicken</li>';
+		tabulatorHeaderCollapseHTML += '<li>Durch (wiederholtes) Klicken auf die einzelnen Spaltennamen können ' +
+			'diese in der Tabelle beliebig oft aktiviert / deaktiviert werden.</li>';
+		tabulatorHeaderCollapseHTML += '<li>Mit einem Klick auf <button><i class="fa fa-cog"></i></button> ' +
+			'werden die Einstellungen wieder geschlossen.</li>';
+		tabulatorHeaderCollapseHTML += '</ul>';
+		tabulatorHeaderCollapseHTML += '</p>';
+		tabulatorHeaderCollapseHTML += '<b>Spaltenbreite verändern</b>';
+		tabulatorHeaderCollapseHTML += '<p>Um die Spaltenbreite zu verändern, fährt man im Spaltenkopf langsam ' +
+			'mit dem Mauszeiger auf den rechten Rand der entprechenden Spalte. <br>' +
+			'Sobald sich der Mauszeiger in einen Doppelpfeil verwandelt, wird die Maustaste geklickt und ' +
+			'mit gedrückter Maustaste die Spalte nach rechts erweitert oder nach links verkleinert.';
+		tabulatorHeaderCollapseHTML += '</p>';
+		tabulatorHeaderCollapseHTML += '<div class="alert alert-info"><strong>INFO: </strong>Alle individuellen Tabelleneinstellungen werden in ' +
+			'Ihrem Browser Cache gespeichert. Wenn Sie Ihren Browser Cache löschen, werden Ihre Einstellungen zurückgesetzt und ' +
+			'müssen gegebenenfalls neu eingestellt werden.';
+		tabulatorHeaderCollapseHTML += '</div>';
+		tabulatorHeaderCollapseHTML += '</div><br>';	// end panel-body
 
-	tabulatorHeaderCollapseHTML += '<h4>Zeilen auswählen</h4>';
-	tabulatorHeaderCollapseHTML += '<div class="panel panel-body">';
-	tabulatorHeaderCollapseHTML += '<ul>';
-	tabulatorHeaderCollapseHTML += '<li>Einzeln auswählen: <kbd>Strg</kbd> + Klick auf einzelne Zeile(n)</li>';
-	tabulatorHeaderCollapseHTML += '<li>Bereich auswählen: <kbd>Shift</kbd> + Klick auf Anfangs- und Endzeile</li>';
-	tabulatorHeaderCollapseHTML += '<li>Alle auswählen: Button \'Alle auswählen\'</li>';
-	tabulatorHeaderCollapseHTML += '</ul>';
-	tabulatorHeaderCollapseHTML += '</div><br>'; // end panel-body
+		tabulatorHeaderCollapseHTML += '<h4>Zeilen auswählen</h4>';
+		tabulatorHeaderCollapseHTML += '<div class="panel panel-body">';
+		tabulatorHeaderCollapseHTML += '<ul>';
+		tabulatorHeaderCollapseHTML += '<li>Einzeln auswählen: <kbd>Strg</kbd> + Klick auf einzelne Zeile(n)</li>';
+		tabulatorHeaderCollapseHTML += '<li>Bereich auswählen: <kbd>Shift</kbd> + Klick auf Anfangs- und Endzeile</li>';
+		tabulatorHeaderCollapseHTML += '<li>Alle auswählen: Button \'Alle auswählen\'</li>';
+		tabulatorHeaderCollapseHTML += '</ul>';
+		tabulatorHeaderCollapseHTML += '</div><br>'; // end panel-body
+	}
+	else if (language == 'English')
+	{
+		tabulatorHeaderCollapseHTML += '<h4>Table settings</h4>';
+		tabulatorHeaderCollapseHTML += '<div class = "panel panel-body">';
+		tabulatorHeaderCollapseHTML += '<b>Show and hide columns</b>';
+		tabulatorHeaderCollapseHTML += '<p>';
+		tabulatorHeaderCollapseHTML += '<ul>';
+		tabulatorHeaderCollapseHTML += '<li>With a click on <button><i class = "fa fa-cog"></i></button> the settings will open.</li>';
+		tabulatorHeaderCollapseHTML += '<li>Click on column settings</li>';
+		tabulatorHeaderCollapseHTML += '<li>By clicking on the individual column names the columns are shown / hidden in the table. Click again to gain the opposite state.</li>';
+		tabulatorHeaderCollapseHTML += '<li>With a click on <button><i class = "fa fa-cog"></i></button> the settings will be closed again. </li>';
+		tabulatorHeaderCollapseHTML += '</ul>';
+		tabulatorHeaderCollapseHTML += '</p>';
+		tabulatorHeaderCollapseHTML += '<b>Change column width</b>';
+		tabulatorHeaderCollapseHTML += '<p>To change the column width, slowly hover  with the mouse pointer on the right edge of the corresponding column header.<br>' +
+			'As soon as the mouse pointer changes into a double arrow, click the mouse button and ' +
+			'keep it pressed while expanding the column width to the right or reducing the width to the left.';
+		tabulatorHeaderCollapseHTML += '</p>';
+		tabulatorHeaderCollapseHTML += '<div class = "alert alert-info"><strong> INFO: </strong>' +
+			'All individual table settings are saved in your browser cache. If you clear your browser cache, ' +
+			'your settings will be erased.';
+		tabulatorHeaderCollapseHTML += '</div>';
+		tabulatorHeaderCollapseHTML += '</div><br>';
+		tabulatorHeaderCollapseHTML += '<h4>Select rows</h4>';
+		tabulatorHeaderCollapseHTML += '<div class = "panel panel-body">';
+		tabulatorHeaderCollapseHTML += '<ul>';
+		tabulatorHeaderCollapseHTML += '<li>Select individually: <kbd> Ctrl </kbd> + click on single line (s)</li>';
+		tabulatorHeaderCollapseHTML += '<li>Select a range: <kbd> Shift </kbd> + click on the start and end line</li>';
+		tabulatorHeaderCollapseHTML += '<li>Select all: Button \'Select all \' </li>';
+		tabulatorHeaderCollapseHTML += '</ul>';
+		tabulatorHeaderCollapseHTML += '</div><br>';
+	}
 
 	tabulatorHeaderCollapseHTML += '</div>';  // end well
 	tabulatorHeaderCollapseHTML += ' </div>'; // end col collapse
@@ -877,9 +929,18 @@ function _renderTabulatorFooterHTML(tableWidgetFooterOptions){
 	{
 		tabulatorFooterHTML += '<div class="btn-toolbar" role="toolbar">';
 		tabulatorFooterHTML += '<div class="btn-group" role="group">';
-		tabulatorFooterHTML += '<button id="select-all" class="btn btn-default pull-left" type="button">Alle auswählen</button>';
-		tabulatorFooterHTML += '<button id="deselect-all" class="btn btn-default pull-left" type="button">Alle abwählen</button>';
-		tabulatorFooterHTML += '<span id="number-selected" style="margin-left: 20px; line-height: 2; font-weight: normal">Ausgewählte Zeilen: <strong>0</strong></span>';
+		tabulatorFooterHTML += '' +
+			'<button id="select-all" class="btn btn-default pull-left" type="button">'
+			+ FHC_PhrasesLib.t("ui", "alleAuswaehlen") + '' +
+			'</button>';
+		tabulatorFooterHTML += '' +
+			'<button id="deselect-all" class="btn btn-default pull-left" type="button">'
+			+ FHC_PhrasesLib.t("ui", "alleAbwaehlen") + '' +
+			'</button>';
+		tabulatorFooterHTML += '' +
+			'<span id="number-selected" style="margin-left: 20px; line-height: 2; font-weight: normal">'
+			+ FHC_PhrasesLib.t("ui", "ausgewaehlteZeilen") + ': <strong>0</strong>' +
+			'</span>';
 		tabulatorFooterHTML += '</div>';
 		tabulatorFooterHTML += '</div>';
 		tabulatorFooterHTML += '</br></br>';
