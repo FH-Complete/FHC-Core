@@ -433,38 +433,38 @@ status_tooltip = function(cell){
         vertrag_stunden = 0;
     }
 
-    var text = 'Lehrauftragstunden/-stundensatz geändert.';
+    var text = FHC_PhrasesLib.t("ui", "stundenStundensatzGeaendert");
     text += "\n";
 
     if (is_dummy)                                                               // dummy (no lector)
     {
-        return 'Neuer Lehrauftrag. Ohne Lektor verplant.'
+        return FHC_PhrasesLib.t("ui", "neuerLehrauftragOhneLektorVerplant");
     }
     else if ((bestellt != null && erteilt == null && betrag != vertrag_betrag) ||
         (bestellt != null && erteilt == null && stunden != vertrag_stunden))   // geaendert (when never erteilt before)
     {
-        return text += 'Wartet auf Bestellung, danach Erteilen möglich.';
+        return text += FHC_PhrasesLib.t("ui", "wartetAufBestellung");
     }
     else if ((bestellt != null && erteilt != null && betrag != vertrag_betrag) ||
         (bestellt != null && erteilt != null && stunden != vertrag_stunden))   // geaendert (when has been erteilt once)
     {
-        return text += 'Wartet auf neuerliche Bestellung, danach erneut Erteilen möglich.';
+        return text += FHC_PhrasesLib.t("ui", "wartetAufErneuteBestellung");
     }
     else if (bestellt == null)                                                  // neu
     {
-        return 'Neuer Lehrauftrag. Wartet auf Bestellung.';
+        return FHC_PhrasesLib.t("ui", "neuerLehrauftragWartetAufBestellung");
     }
     else if (bestellt != null && erteilt == null && akzeptiert == null)         // bestellt
     {
-        return 'Letzter Status: Bestellt. Wartet auf Erteilung.';
+        return FHC_PhrasesLib.t("ui", "letzterStatusBestellt");
     }
     else if (bestellt != null && erteilt != null && akzeptiert == null)         // erteilt
     {
-        return 'Letzter Status: Erteilt. Wartet auf Annahme durch Lektor.';
+        return FHC_PhrasesLib.t("ui", "letzterStatusErteilt");
     }
     else if (bestellt != null && erteilt != null && akzeptiert != null)         // akzeptiert
     {
-        return 'Letzter Status: Angenommen. Vertrag wurde beidseitig abgeschlossen.';
+        return FHC_PhrasesLib.t("ui", "letzterStatusAngenommen");
     }
 }
 
@@ -472,21 +472,21 @@ status_tooltip = function(cell){
 bestellt_tooltip = function(cell){
     if (cell.getRow().getData().bestellt_von != null)
     {
-        return 'Bestellt von: ' + cell.getRow().getData().bestellt_von;
+        return FHC_PhrasesLib.t("ui", "bestelltVon") + cell.getRow().getData().bestellt_von;
     }
 }
 
 // Generates erteilt tooltip
 erteilt_tooltip = function(cell){
     if (cell.getRow().getData().erteilt_von != null) {
-        return 'Erteilt von: ' + cell.getRow().getData().erteilt_von;
+        return FHC_PhrasesLib.t("ui", "erteiltVon") + cell.getRow().getData().erteilt_von;
     }
 }
 
 // Generates akzeptiert tooltip
 akzeptiert_tooltip = function(cell){
     if (cell.getRow().getData().akzeptiert_von != null) {
-        return 'Angenommen von: ' + cell.getRow().getData().akzeptiert_von;
+        return FHC_PhrasesLib.t("ui", "angenommenVon") + cell.getRow().getData().akzeptiert_von;
     }
 }
 $(function() {
