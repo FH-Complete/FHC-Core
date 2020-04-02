@@ -69,6 +69,8 @@ function generateCSSsInclude($CSSs)
  */
 function generateJSDataStorageObject($indexPage, $calledPath, $calledMethod)
 {
+	$user_language = getUserLanguage();
+
 	$toPrint = "\n";
 	$toPrint .= '<script type="text/javascript">';
 	$toPrint .= '
@@ -76,7 +78,8 @@ function generateJSDataStorageObject($indexPage, $calledPath, $calledMethod)
 			app_root: "'.APP_ROOT.'",
 			ci_router: "'.$indexPage.'",
 			called_path: "'.$calledPath.'",
-			called_method: "'.$calledMethod.'"
+			called_method: "'.$calledMethod.'",
+			user_language: "'.$user_language.'"
 		};';
 	$toPrint .= "\n";
 	$toPrint .= '</script>';
