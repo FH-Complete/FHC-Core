@@ -15,7 +15,37 @@ $this->load->view(
         'dialoglib' => true,
         'tablewidget' => true,
         'phrases' => array(
-            'global' => array('lehrauftraegeAnnehmen'),
+            'global' => array(
+                'lehrauftraegeAnnehmen'
+                ),
+            'ui' => array(
+                'anzeigen',
+                'alleAnzeigen',
+                'nurBestellteAnzeigen',
+                'nurErteilteAnzeigen',
+                'nurAngenommeneAnzeigen',
+                'nurStornierteAnzeigen',
+                'hilfeZuDieserSeite',
+                'alleAuswaehlen',
+                'alleAbwaehlen',
+                'ausgewaehlteZeilen',
+                'hilfe',
+                'tabelleneinstellungen',
+                'keineDatenVorhanden',
+                'spaltenEinstellen',
+	            'bestelltVon',
+	            'erteiltVon',
+	            'angenommenVon',
+	            'storniertVon',
+                'lehrauftragInBearbeitung',
+                'wartetAufErteilung',
+                'wartetAufErneuteErteilung',
+                'letzterStatusBestellt',
+                'letzterStatusErteilt',
+                'letzterStatusAngenommen',
+                'vertragWurdeStorniert',
+                ),
+            'password' => array('password')
         ),
         'customJSs' => array(
                 'public/js/bootstrapper.js',
@@ -33,7 +63,7 @@ $this->load->view(
         <div class="row">
             <div class="col-lg-12 page-header">
 				<a class="pull-right" data-toggle="collapse" href="#collapseHelp" aria-expanded="false" aria-controls="collapseExample">
-					Hilfe zu dieser Seite
+					<?php echo $this->p->t('ui', 'hilfeZuDieserSeite'); ?>
 				</a>
 				<h3>
                     <?php echo ucfirst($this->p->t('global', 'lehrauftraegeAnnehmen')); ?>
@@ -105,7 +135,7 @@ $this->load->view(
                         );
                         ?>
                     </div>
-                    <button type="submit" name="submit" value="anzeigen" class="btn btn-default form-group">Anzeigen</button>
+                    <button type="submit" name="submit" value="anzeigen" class="btn btn-default form-group"><?php echo ucfirst($this->p->t('ui', 'anzeigen')); ?></button>
                 </form>
             </div>
         </div>
@@ -124,21 +154,21 @@ $this->load->view(
                 <div class="btn-toolbar" role="toolbar">
                     <div class="btn-group" role="group">
                         <button id="show-all" class="btn btn-default btn-lehrauftrag active focus" type="button"
-								data-toggle="tooltip" data-placement="left" title="Alle anzeigen"><i class='fa fa-users'></i>
+								data-toggle="tooltip" data-placement="left" title="<?php echo $this->p->t('ui', 'alleAnzeigen'); ?>"><i class='fa fa-users'></i>
 						</button>
                         <button id="show-ordered" class="btn btn-default btn-lehrauftrag" type="button"
-								data-toggle="tooltip" data-placement="left" title="Nur bestellte anzeigen">
+								data-toggle="tooltip" data-placement="left" title="<?php echo $this->p->t('ui', 'nurBestellteAnzeigen'); ?>">
 						</button><!-- png img set in javascript -->
                         <button id="show-approved" class="btn btn-default btn-lehrauftrag" type="button"
-								data-toggle="tooltip" data-placement="left" title="Nur erteilte anzeigen">
+								data-toggle="tooltip" data-placement="left" title="<?php echo $this->p->t('ui', 'nurErteilteAnzeigen'); ?>">
 						</button><!-- png img set in javascript -->
                         <button id="show-accepted" class="btn btn-default btn-lehrauftrag" type="button"
-								data-toggle="tooltip" data-placement="left" title="Nur angenommene anzeigen"><i class='fa fa-handshake-o'></i>
+								data-toggle="tooltip" data-placement="left" title="<?php echo $this->p->t('ui', 'nurAngenommeneAnzeigen'); ?>"><i class='fa fa-handshake-o'></i>
 						</button>
                     </div>
 
 					<button id="show-cancelled" class="btn btn-default btn-lehrauftrag" type="button" style="margin-left: 20px;"
-							data-toggle="collapse" data-placement="left" title="Stornierte anzeigen"
+							data-toggle="collapse" data-placement="left" title="<?php echo $this->p->t('ui', 'nurStornierteAnzeigen'); ?>"
 							data-target ="#collapseCancelledLehrauftraege" aria-expanded="false" aria-controls="collapseExample">
 					</button><!-- png img set in javascript -->
                 </div>
@@ -146,9 +176,9 @@ $this->load->view(
             <div class="col-md-offset-2 col-md-4 col-xs-6">
 				<div class="input-group">
 					<input id="username" type="hidden" value=""><!-- this is to prevent Chrome autofilling a random input field with the username-->
-					<input id="password" type="password" autocomplete="new-password" class="form-control" placeholder="CIS-Passwort">
+					<input id="password" type="password" autocomplete="new-password" class="form-control" placeholder="CIS-<?php echo ucfirst($this->p->t('password', 'password')); ?>">
 						<span class="input-group-btn">
-							<button id="accept-lehrauftraege" class="btn btn-primary pull-right">Lehrauftrag annehmen</button>
+							<button id="accept-lehrauftraege" class="btn btn-primary pull-right"><?php echo ucfirst($this->p->t('global', 'lehrauftraegeAnnehmen')); ?></button>
 						</span>
 				</div>
             </div>

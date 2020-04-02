@@ -17,6 +17,35 @@ $this->load->view(
         'navigationwidget' => true,
         'phrases' => array(
             'global' => array('lehrauftraegeErteilen'),
+	        'ui' => array(
+		        'anzeigen',
+		        'alleAnzeigen',
+		        'nurNeueAnzeigen',
+		        'nurBestellteAnzeigen',
+		        'nurErteilteAnzeigen',
+		        'nurAngenommeneAnzeigen',
+		        'nurGeaenderteAnzeigen',
+		        'nurDummiesAnzeigen',
+		        'hilfeZuDieserSeite',
+		        'alleAuswaehlen',
+		        'alleAbwaehlen',
+		        'ausgewaehlteZeilen',
+		        'hilfe',
+		        'tabelleneinstellungen',
+		        'keineDatenVorhanden',
+		        'spaltenEinstellen',
+                'bestelltVon',
+                'erteiltVon',
+                'angenommenVon',
+                'stundenStundensatzGeaendert',
+                'neuerLehrauftragOhneLektorVerplant',
+                'wartetAufBestellung',
+                'wartetAufErneuteBestellung',
+                'neuerLehrauftragWartetAufBestellung',
+                'letzterStatusBestellt',
+                'letzterStatusErteilt',
+                'letzterStatusAngenommen',
+	        )
         ),
         'customJSs' => array(
                 'public/js/bootstrapper.js',
@@ -36,7 +65,7 @@ $this->load->view(
         <div class="row">
             <div class="col-lg-12 page-header">
 				<a class="pull-right" data-toggle="collapse" href="#collapseHelp" aria-expanded="false" aria-controls="collapseExample">
-					Hilfe zu dieser Seite
+					<?php echo $this->p->t('ui', 'hilfeZuDieserSeite'); ?>
 				</a>
                 <h3>
                     <?php echo ucfirst($this->p->t('global', 'lehrauftraegeErteilen')); ?>
@@ -175,7 +204,7 @@ $this->load->view(
                         );
                         ?>
                     </div>
-                    <button type="submit" name="submit" value="anzeigen" class="btn btn-default form-group">Anzeigen</button>
+                    <button type="submit" name="submit" value="anzeigen" class="btn btn-default form-group"><?php echo ucfirst($this->p->t('ui', 'anzeigen')); ?></button>
                 </form>
             </div>
         </div>
@@ -191,20 +220,20 @@ $this->load->view(
 		<!-- filter buttons & erteil-button -->
         <div class="row">
             <div class="col-xs-12">
-                <button id="approve-lehrauftraege" class="btn btn-primary pull-right">Lehrauftrag erteilen</button>
+                <button id="approve-lehrauftraege" class="btn btn-primary pull-right"><?php echo ucfirst($this->p->t('global', 'lehrauftraegeErteilen')); ?></button>
                 <div class="btn-toolbar" role="toolbar">
                     <div class="btn-group" role="group">
-                        <button id="show-all" class="btn btn-default btn-lehrauftrag" type="button" data-toggle="tooltip" data-placement="left" title="Alle anzeigen"><i class='fa fa-users'></i></button>
-                        <button id="show-new" class="btn btn-default btn-lehrauftrag" type="button" data-toggle="tooltip" data-placement="left" title="Nur neue anzeigen"><i class='fa fa-user-plus'></i></button>
-                        <button id="show-ordered" class="btn btn-default btn-lehrauftrag active focus" type="button" data-toggle="tooltip" data-placement="left" title="Nur bestellte anzeigen"></button><!-- png img set in javascript -->
-                        <button id="show-approved" class="btn btn-default btn-lehrauftrag" type="button" data-toggle="tooltip" data-placement="left" title="Nur erteilte anzeigen"></button><!-- png img set in javascript -->
-                        <button id="show-accepted" class="btn btn-default btn-lehrauftrag" type="button" data-toggle="tooltip" data-placement="left" title="Nur angenommene anzeigen"><i class='fa fa-handshake-o'></i></button>
+                        <button id="show-all" class="btn btn-default btn-lehrauftrag" type="button" data-toggle="tooltip" data-placement="left" title="<?php echo $this->p->t('ui', 'alleAnzeigen'); ?>"><i class='fa fa-users'></i></button>
+                        <button id="show-new" class="btn btn-default btn-lehrauftrag" type="button" data-toggle="tooltip" data-placement="left" title="<?php echo $this->p->t('ui', 'nurNeueAnzeigen'); ?>"><i class='fa fa-user-plus'></i></button>
+                        <button id="show-ordered" class="btn btn-default btn-lehrauftrag active focus" type="button" data-toggle="tooltip" data-placement="left" title="<?php echo $this->p->t('ui', 'nurBestellteAnzeigen'); ?>"></button><!-- png img set in javascript -->
+                        <button id="show-approved" class="btn btn-default btn-lehrauftrag" type="button" data-toggle="tooltip" data-placement="left" title="<?php echo $this->p->t('ui', 'nurErteilteAnzeigen'); ?>"></button><!-- png img set in javascript -->
+                        <button id="show-accepted" class="btn btn-default btn-lehrauftrag" type="button" data-toggle="tooltip" data-placement="left" title="<?php echo $this->p->t('ui', 'nurAngenommeneAnzeigen'); ?>"><i class='fa fa-handshake-o'></i></button>
                     </div>
                     <div class="btn-group" role="group" style="margin-left: 20px;">
-                        <button id="show-changed" class="btn btn-default btn-lehrauftrag" type="button" data-toggle="tooltip" data-placement="left" title="Nur geänderte anzeigen"></button><!-- png img set in javascript -->
+                        <button id="show-changed" class="btn btn-default btn-lehrauftrag" type="button" data-toggle="tooltip" data-placement="left" title="<?php echo $this->p->t('ui', 'nurGeaenderteAnzeigen'); ?>"></button><!-- png img set in javascript -->
                     </div>
                     <div class="btn-group" role="group" style="margin-left: 20px;">
-                        <button id="show-dummies" class="btn btn-default btn-lehrauftrag" type="button" data-toggle="tooltip" data-placement="left" title="Nur verplante ohne Lektor anzeigen (Dummies)"><i class='fa fa-user-secret'></i></button>
+                        <button id="show-dummies" class="btn btn-default btn-lehrauftrag" type="button" data-toggle="tooltip" data-placement="left" title="<?php echo $this->p->t('ui', 'nurDummiesAnzeigen'); ?>"><i class='fa fa-user-secret'></i></button>
                     </div>
                 </div>
             </div>
