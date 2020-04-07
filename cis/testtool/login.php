@@ -127,7 +127,7 @@ if (isset($_REQUEST['prestudent']))
 				$reihungstest_id = $rt->result[0]->reihungstest_id;
 			else
 			{
-				echo '<span class="error">'.$p->t('testtool/reihungstestKannNichtGeladenWerden').'</span>';
+				$alertmsg .= '<div class="alert alert-danger">'.$p->t('testtool/reihungstestKannNichtGeladenWerden').'</div>';
 			}
 		}
 		else
@@ -139,7 +139,7 @@ if (isset($_REQUEST['prestudent']))
 					$reihungstest_id = $rt->result[0]->reihungstest_id;
 				else
 				{
-					echo '<span class="error">'.$p->t('testtool/reihungstestKannNichtGeladenWerden').'</span>';
+					$alertmsg .= '<div class="alert alert-danger">'.$p->t('testtool/reihungstestKannNichtGeladenWerden').'</div>';
 				}
 			}
 			else
@@ -177,6 +177,7 @@ if (isset($_REQUEST['prestudent']))
 				$stg_obj = new studiengang($studiengang);
 
 				$_SESSION['semester']=$semester;
+				$_SESSION['reihungstestID'] = $reihungstest_id;
 				$stg_obj->getStudiengangTyp($stg_obj->typ);
 
 				// STG und Studienplan mit der höchsten Prio ermitteln
@@ -367,6 +368,7 @@ if (isset($_POST['save']) && isset($_SESSION['prestudent_id']))
 	<script type="text/javascript" src="../../vendor/components/jqueryui/ui/i18n/datepicker-de.js"></script>
 	<script type="text/javascript" src="../../vendor/twbs/bootstrap/dist/js/bootstrap.min.js"></script>
 	<script type="text/javascript">
+
 	$(document).ready(function()
 	{
 		$.datepicker.setDefaults( $.datepicker.regional[ "" ] );
@@ -393,6 +395,14 @@ if (isset($_POST['save']) && isset($_SESSION['prestudent_id']))
 				});';
 		?>
 
+		// If Browser is any other than Mozilla Firefox and the test includes any MathML,
+		// show message to use Mozilla Firefox
+		var ua = navigator.userAgent;
+		if ((ua.indexOf("Firefox") > -1) == false)
+		{
+			$("#alertmsgdiv").html("<div class='alert alert-danger'>BITTE VERWENDEN SIE DEN MOZILLA FIREFOX BROWSER!<br>(Manche Prüfungsfragen werden sonst nicht korrekt dargestellt.<br><br>PLEASE USE MOZILLA FIREFOX BROWSER!<br>(Otherwise some exam items will not be displayed correctly</div>");
+			//alert('BITTE VERWENDEN SIE DEN MOZILLA FIREFOX BROWSER!\n(Manche Prüfungsfragen werden sonst nicht korrekt dargestellt.\n\nPLEASE USE MOZILLA FIREFOX BROWSER!\n(Ohterwise some exam items will not be displayed correctly.)');
+		}
 	});
 	</script>
 <?php
@@ -596,19 +606,8 @@ else // LOGIN Site (vor Login)
 	if (defined('TESTTOOL_LOGIN_BEWERBUNGSTOOL') && TESTTOOL_LOGIN_BEWERBUNGSTOOL)
 	{
 		echo '<div class="col-xs-11">';
-		echo $alertmsg;
-		echo '
-			<div class="row" style="margin-bottom: 10%; margin-top: 3%;">
-				<div class="col-xs-6 text-center" style="border-right: 1px solid lightgrey;">
-					<h1 style="white-space: normal">Herzlich Willkommen zum Reihungstest</h1><br><br>
-					Wir wünschen Ihnen einen erfolgreichen Start ins Studium.<br>
-				</div>
-				<div class="col-xs-6 text-center">
-					<h1 style="white-space: normal">Welcome to the placement test</h1> <br><br>
-					We wish you a good start to your studies.
-				</div>
-			</div>
-		';
+		echo '<div id="alertmsgdiv">'.$alertmsg.'</div>';
+		echo $p->t('testtool/einfuehrungsText');
 
 		if (isset($_SESSION['bewerbung/personId']))
 		{
@@ -619,12 +618,13 @@ else // LOGIN Site (vor Login)
 				}
 				</script>';
 			echo '<div class="row text-center">
+			'.$p->t('testtool/loginNoetig').'<br /><br />
 			<form action="login.php">
 			<input type="hidden" name="prestudent" value="'.$_REQUEST['prestudent'].'" />
 			<input id="confirmationCheckbox" type="checkbox" name="confirmation" onclick="changeconfirmation()" />
 			'.$p->t('testtool/confirmationText').'
 			<br><br>
-			<button id="confirmationSubmit" type="submit" class="btn btn-default" disabled/>
+			<button id="confirmationSubmit" type="submit" class="btn btn-primary" disabled/>
 				'.$p->t('testtool/start').'
 			</button>
 			</form>';
@@ -634,7 +634,7 @@ else // LOGIN Site (vor Login)
 			echo '<div class="row text-center">
 			'.$p->t('testtool/loginNoetig').'<br /><br />
 			<form action="'.APP_ROOT.'/addons/bewerbung/cis/." target="_top">
-			<button type="submit" class="btn btn-default" />
+			<button type="submit" class="btn btn-primary" />
 				'.$p->t('testtool/login').'
 			</button>
 			</form>';
@@ -649,7 +649,7 @@ else // LOGIN Site (vor Login)
 		echo '<div class="col-xs-11">';
 
 		//	Welcome text
-		echo $alertmsg;
+		echo '<div id="alertmsgdiv">'.$alertmsg.'</div>';
 		echo '
 			<div class="row" style="margin-bottom: 10%; margin-top: 3%;">
 				<div class="col-xs-6 text-center" style="border-right: 1px solid lightgrey;">
