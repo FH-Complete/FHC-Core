@@ -80,7 +80,7 @@ $this->phrasen['testtool/einfuehrungsText']='
 					<a href="#" target="_blank"><img src="'.APP_ROOT.'cms/dms.php?id=46&version=1">&nbsp;Guideline for placement test (coming soon)</a>
 					<br><br>
 					Under the following link you can test the correct display of the placement test:<br><br>
-					<a href="../public/testtool_test/testseite.php" target="_blank" class="btn btn-default">To display testpage</a>
+					<a href="../public/testtool_test/testseite.php" target="_blank" class="btn btn-default">Display testpage</a>
 				</div>
 			</div>';
 ?>
