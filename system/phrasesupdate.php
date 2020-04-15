@@ -4453,6 +4453,26 @@ When on hold, the date is only a reminder.',
 				'insertvon' => 'system'
 			)
 		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'dms',
+		'phrase' => 'informationsblattExterneLehrende',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => '<a href="../../../cms/dms.php?id=137855" target="_blank">Informationsblatt für externe Lehrende</a>',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => '<a href="../../../cms/dms.php?id=137855" target="_blank">Information sheet for external lecturers</a>', // TODO: change to dms id as soon as english info sheet is available
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
 	)
 );
 

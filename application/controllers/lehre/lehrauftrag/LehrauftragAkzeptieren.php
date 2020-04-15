@@ -50,7 +50,8 @@ class LehrauftragAkzeptieren extends Auth_Controller
             array(
                 'global',
                 'ui',
-				'lehre'
+				'lehre',
+	            'dms'
             )
         );
 
@@ -82,8 +83,20 @@ class LehrauftragAkzeptieren extends Auth_Controller
             }
         }
 
+        // Check if user is external lector
+	    $is_external_lector = false;
+
+	    if ($result = getData($this->BisverwendungModel->getLast($this->_uid, false)))
+	    {
+		    if (is_null($result[0]->inkludierte_lehre) || $result[0]->inkludierte_lehre == 0)
+		    {
+			    $is_external_lector = true;
+		    }
+	    }
+
         $view_data = array(
-            'studiensemester_selected' => $studiensemester_kurzbz
+            'studiensemester_selected' => $studiensemester_kurzbz,
+	        'is_external_lector' => $is_external_lector
         );
 
         $this->load->view('lehre/lehrauftrag/acceptLehrauftrag.php', $view_data);
