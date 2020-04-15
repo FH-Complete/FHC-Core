@@ -20,13 +20,7 @@
  *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
  *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
-
-// ------------------------------------------------------------------------------------------
-// Session Starten - Merk Anwenderdaten
-// ------------------------------------------------------------------------------------------
-  	$SESSIONID=trim((isset($_REQUEST['SESSIONID']) ? $_REQUEST['SESSIONID']:''));
- 	if (session_start($SESSIONID))
-		$SESSIONID=@session_id();
+session_start();
 
 	require_once('../../config/cis.config.inc.php');
 	require_once('../../include/wochenplan.class.php');
@@ -1980,6 +1974,9 @@ function personen_id_read_mitarbeiter_oder_student($db,$person_id)
 */
 function read_create_html_news($db,$fachbereich_kurzbz,$studiengang_kz,$semester)
 {
+	if(defined('CIS_INFOSCREEN_NEWS_ANZEIGEN') && CIS_INFOSCREEN_NEWS_ANZEIGEN==false)
+		return '';
+	
 	// ------------------------------------------------------------------------------------------
 	//	Lesen Newstickerzeilen
 	// ------------------------------------------------------------------------------------------

@@ -1344,7 +1344,7 @@ else
 		//im Kopf des Mails Links zu den anderen Statistiken anzeigen
 		$content .= 'Dies ist ein automatisches Mail!<br><br>';
 		$content .= '<b>Links zu den Statistiken:</b><br>
-		- <a href="'.APP_ROOT.'content/statistik/lektorenstatistik.php" target="_blank">LektorInnenstatisitk</a><br>
+		- <a href="'.APP_ROOT.'content/statistik/lektorenstatistik.php" target="_blank">LektorInnenstatistik</a><br>
 		- <a href="'.APP_ROOT.'content/statistik/mitarbeiterstatistik.php" target="_blank">MitarbeiterInnenstatistik</a><br>
 		- <a href="'.APP_ROOT.'content/statistik/bewerberstatistik.php" target="_blank">BewerberInnenstatistik</a><br>
 		- <a href="'.APP_ROOT.'content/statistik/studentenstatistik.php" target="_blank">Studierendenstatistik</a><br>
@@ -1437,7 +1437,7 @@ else
 	}
 
 	$content .= '
-		<h2>BewerberInnenstatistik '.$stsem.'<span style="position:absolute; right:15px;">'.date('d.m.Y').'</span></h2><br>
+		<h2>BewerberInnenstatistik '.$stsem.' <span style="position:absolute; right:15px;">'.date('d.m.Y').'</span></h2><br>
 		';
 	if ($stsem != '')
 	{
@@ -1891,7 +1891,7 @@ else
 
 		$content .= '
 		<br><br>
-		<h2>BewerberInnenstatistik '.$stsem.'<span style="position:absolute; right:15px;">'.$datum_obj->formatDatum($datum, 'd.m.Y').'</span></h2><br>
+		<h2>BewerberInnenstatistik '.$stsem.' <span style="position:absolute; right:15px;">'.$datum_obj->formatDatum($datum, 'd.m.Y').'</span></h2><br>
 		';
 		//Bewerberdaten holen
 		$qry = "SELECT studiengang_kz, kurzbz, typ, kurzbzlang, bezeichnung, orgform_kurzbz,

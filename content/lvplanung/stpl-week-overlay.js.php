@@ -41,11 +41,11 @@ function onLVAFilter()
 	var filter=document.getElementById('tempus-lva-filter').value;
 	var vorher='';
 	var nachher='';
-	
+
 	// LVAs
 	var vboxLehrveranstalungPlanung=document.getElementById('vboxLehrveranstalungPlanung');
 	var datasources=vboxLehrveranstalungPlanung.getAttribute('datasources');
-	
+
 	var orig=datasources.substring(0);
 	var idx = datasources.indexOf("&filter=")
 	if(idx!=-1)
@@ -56,11 +56,65 @@ function onLVAFilter()
 			nachher=datasources.slice(idx2);
 		datasources=vorher+nachher;
 	}
-	
+
 	datasources=datasources+"&filter="+encodeURIComponent(filter);
-	
+
 	//alert('Orig:'+orig+' Source: '+datasources+' Vorher:'+vorher+' Nachher:'+nachher);
 	vboxLehrveranstalungPlanung.setAttribute('datasources',datasources);
+}
+
+
+// LVA-Panel aktualisieren
+function onLektorRefresh()
+{
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+	var treeLektorenTree=document.getElementById('tree-lektor');
+	// Input-Feld leeren
+	document.getElementById('tempus-lektor-filter').value = '';
+	//var datasources=vboxLehrveranstalungPlanung.getAttribute('datasources');
+	var url = '<?php echo APP_ROOT; ?>rdf/mitarbeiter.rdf.php?user=user&'+gettimestamp();
+
+	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
+	var datasource = rdfService.GetDataSource(url);
+	var oldDatasources = treeLektorenTree.database.GetDataSources();
+
+	datasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
+	datasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
+
+	treeLektorenTree.database.RemoveDataSource(oldDatasources.getNext());
+	treeLektorenTree.database.AddDataSource(datasource);
+	treeLektorenTree.builder.rebuild();
+
+}
+
+// Lektorenliste filtern
+function onLektorFilter()
+{
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+	var filter=document.getElementById('tempus-lektor-filter').value;
+
+	var treeLektorenTree=document.getElementById('tree-lektor');
+
+	if(filter.length>2)
+	{
+		var url = '<?php echo APP_ROOT; ?>rdf/mitarbeiter.rdf.php?filter='+encodeURIComponent(filter)+'&'+gettimestamp();
+		var oldDatasources = treeLektorenTree.database.GetDataSources();
+
+		//Refresh damit die entfernten DS auch wirklich entfernt werden
+		treeLektorenTree.builder.rebuild();
+
+		var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
+		if(typeof(filter)=='undefined')
+			var datasource = rdfService.GetDataSource(url);
+		else
+			var datasource = rdfService.GetDataSourceBlocking(url);
+		datasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
+		datasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
+		treeLektorenTree.database.RemoveDataSource(oldDatasources.getNext());
+		treeLektorenTree.database.AddDataSource(datasource);
+		if(typeof(filter)!='undefined')
+			treeLektorenTree.builder.rebuild();
+	}
 }
 
 // Liefert die Sortierreihenfolge der Lehrstunden
@@ -68,7 +122,7 @@ function LehrstundeGetSortOrder()
 {
 	var toolbar = document.getElementById('toolbarTimeTableSort');
 	var tbbuttons = toolbar.getElementsByTagName('toolbarbutton');
-	
+
 	for each(var button in tbbuttons)
 	{
 		if(button.getAttribute('checked')=='true')
@@ -79,17 +133,61 @@ function LehrstundeGetSortOrder()
 	return 'stundenDESC';
 }
 
+// Setzt den Vertragsfilter zurueck
+function LVAFilterReset()
+{
+	//Filtermarkierung von allen entfernen
+	var toolbar = document.getElementById('toolbarTimeTableFilterVertrag');
+	var tbbuttons = toolbar.getElementsByTagName('toolbarbutton');
+
+	for each(var button in tbbuttons)
+	{
+		if(button.id)
+			button.setAttribute('checked','false');
+	}
+}
+
+// LVA-Panel auf Vertragsstatus filtern
+function onLVAFilterVertrag(item)
+{
+	var vorher='';
+	var nachher='';
+	var vertragsstatus=item.getAttribute('value');
+
+	LVAFilterReset();
+	//Element als gedrueckt markieren
+	item.setAttribute('checked','true');
+
+	// LVAs
+	var vboxLehrveranstalungPlanung=document.getElementById('vboxLehrveranstalungPlanung');
+	var datasources=vboxLehrveranstalungPlanung.getAttribute('datasources');
+
+	var orig=datasources.substring(0);
+	var idx = datasources.indexOf("&vertrag=")
+	if(idx!=-1)
+	{
+		idx2=datasources.indexOf("&",idx+10);
+		vorher=datasources.slice(0,idx);
+		if(idx2!=-1)
+			nachher=datasources.slice(idx2);
+		datasources=vorher+nachher;
+	}
+
+	datasources=datasources+"&vertrag="+encodeURIComponent(vertragsstatus);
+	vboxLehrveranstalungPlanung.setAttribute('datasources',datasources);
+}
+
 // LVA-Panel filtern
 function onLVASort(item)
 {
 	var vorher='';
 	var nachher='';
 	var order=item.getAttribute('value');
-	
+
 	//Sortiermarkierung von allen entfernen
 	var toolbar = document.getElementById('toolbarTimeTableSort');
 	var tbbuttons = toolbar.getElementsByTagName('toolbarbutton');
-	
+
 	for each(var button in tbbuttons)
 	{
 		if(button.id)
@@ -97,11 +195,11 @@ function onLVASort(item)
 	}
 	//Element als gedrueckt markieren
 	item.setAttribute('checked','true');
-	
+
 	// LVAs
 	var vboxLehrveranstalungPlanung=document.getElementById('vboxLehrveranstalungPlanung');
 	var datasources=vboxLehrveranstalungPlanung.getAttribute('datasources');
-	
+
 	var orig=datasources.substring(0);
 	var idx = datasources.indexOf("&order=")
 	if(idx!=-1)
@@ -112,9 +210,9 @@ function onLVASort(item)
 			nachher=datasources.slice(idx2);
 		datasources=vorher+nachher;
 	}
-	
+
 	datasources=datasources+"&order="+encodeURIComponent(order);
-	
+
 	//alert('Orig:'+orig+' Source: '+datasources+' Vorher:'+vorher+' Nachher:'+nachher);
 	vboxLehrveranstalungPlanung.setAttribute('datasources',datasources);
 }
@@ -248,7 +346,7 @@ function StplSearchRoom(target)
 	saveScrollPositionTimeTableWeek();
 	if(typeof(target)==='undefined')
 		target = document.popupNode;
-	
+
 	var contentFrame=document.getElementById('iframeTimeTableWeek');
 	var daten=document.getElementById('TimeTableWeekData');
 	var datum=parseInt(daten.getAttribute("datum"));
@@ -263,7 +361,7 @@ function StplSearchRoom(target)
 	var aktion=target.getAttribute("aktion");
 	aktion+="_single_search";
 	var idList=target.getAttribute("idList");
-	
+
 	var attributes="\n?type="+type+"&datum="+datum+"&ort="+ort+"&pers_uid="+pers_uid+"\n&stg_kz="+stg_kz+"&sem="+sem+"&ver="+ver+"&grp="+grp+"\n&gruppe="+gruppe;
 	attributes+=idList+"&aktion="+aktion;
 	var url = "<?php echo APP_ROOT; ?>content/lvplanung/timetable-week.xul.php";
@@ -283,7 +381,7 @@ function TimeTableWeekMarkiere(item)
 	if(!item)
 	{
 		items = document.getElementsByTagName('button');
-		
+
 		for each(var button in items)
 		{
 			if(button.id && button.id.startsWith('buttonSTPL'))
@@ -293,7 +391,7 @@ function TimeTableWeekMarkiere(item)
 				//button.style.fontStyle='normal';
 				//button.style.fontWeight='normal';
 				button.style.border = "1px solid transparent";
-					
+
 				button.style.MozBorderTopColors='transparent';
 				button.style.MozBorderLeftColors='transparent';
 				button.style.MozBorderBottomColors='transparent';
@@ -305,19 +403,19 @@ function TimeTableWeekMarkiere(item)
 	else
 	{
 		item.setAttribute('marked','true');
-		
+
 		item.style.color='darkred';
 		//item.style.fontStyle='italic';
 		//item.style.fontWeight='bold';
-		
+
 		item.style.border = "1px solid darkred";
-			
+
 		item.style.MozBorderTopColors='darkred';
 		item.style.MozBorderLeftColors='darkred';
 		item.style.MozBorderBottomColors='darkred';
 		item.style.MozBorderRightColors='darkred';
-		
-		TimeTableWeekLastMarkedItem=item;		
+
+		TimeTableWeekLastMarkedItem=item;
 	}
 }
 
@@ -410,7 +508,7 @@ function TimeTableWeekClick(event)
 	}
 	else if(event.shiftKey)
 	{
-		//Wenn mit Shift auf eine Stunde geklickt wird, dann werden alle Stunden markiert, 
+		//Wenn mit Shift auf eine Stunde geklickt wird, dann werden alle Stunden markiert,
 		//die zwischen der zuletzt markierten und dieser Stunde liegen
 		start = parseInt(TimeTableWeekLastMarkedItem.id.substring('buttonSTPL'.length));
 		ende = parseInt(event.target.id.substring('buttonSTPL'.length));
@@ -420,7 +518,7 @@ function TimeTableWeekClick(event)
 			ende = start;
 			start = hlp;
 		}
-		
+
 		for(var i=start;i<=ende;i++)
 		{
 			item = document.getElementById('buttonSTPL'+i);
@@ -429,13 +527,13 @@ function TimeTableWeekClick(event)
 	}
 	else
 	{
-	
+
 		//alle markierungen entfernen
 		TimeTableWeekMarkiere();
-		
+
 		//aktuellen Eintrag markieren
 		TimeTableWeekMarkiere(event.target);
-	
+
 		//Details anzeigen
 		onStplDetail(event);
 	}
@@ -457,7 +555,7 @@ function TimeTableWeekDblClick(event)
 		{
 			buttonunr=button.getAttribute('unr');
 			buttonwochentag=button.getAttribute('wochentag');
-			
+
 			if(buttonunr==unr && buttonwochentag==wochentag)
 			{
 				TimeTableWeekMarkiere(button);
@@ -544,7 +642,7 @@ function STPLDetailSave(dialog)
 	}
 	var url = '<?php echo APP_ROOT ?>content/tempusDBDML.php';
 	var req = new phpRequest(url,'','');
-	
+
 	req.add('type', 'savestundenplaneintrag');
 
 	req.add('stundenplan_id', id);
@@ -561,7 +659,7 @@ function STPLDetailSave(dialog)
 	req.add('fix', fix);
 	req.add('mitarbeiter_uid', mitarbeiter_uid);
 	req.add('semester',semester);
-	
+
 	var response = req.executePOST();
 
 	var val =  new ParseReturnValue(response)
@@ -577,14 +675,14 @@ function STPLDetailSave(dialog)
 	else
 	{
 		netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
-		
+
 		var treeStplDetails=parent.document.getElementById('treeStplDetails');
 		//alert('url'+STPLlastDetailUrl);
 		treeStplDetails.setAttribute('datasources', '');
 		treeStplDetails.setAttribute('datasources', STPLlastDetailUrl+"&ts="+gettimestamp());
 		return true;
 	}
-	
+
 }
 
 // ****
@@ -594,7 +692,7 @@ function STPLDetailDelete()
 {
 	//alert('url'+STPLlastDetailUrl);
 	//return false;
-	
+
 	tree = document.getElementById('treeStplDetails');
 	if(tree.currentIndex==-1)
 	{
@@ -604,15 +702,15 @@ function STPLDetailDelete()
 
 	var col = tree.columns ? tree.columns["stundenplan_id"] : "stundenplan_id";
 	var stundenplanid = tree.view.getCellText(tree.currentIndex,col);
-	
+
 	var col = tree.columns ? tree.columns["stpl-details-overlay-lehrstunde-reservierung"] : "stpl-details-overlay-lehrstunde-reservierung";
 	var reservierung = tree.view.getCellText(tree.currentIndex,col);
-	
+
 	if(confirm('Wollen Sie diesen Datensatz wirklich loeschen?'))
 	{
 		var url = '<?php echo APP_ROOT ?>content/tempusDBDML.php';
 		var req = new phpRequest(url,'','');
-			
+
 		if(reservierung=='true')
 		{
 			req.add('type', 'deletereservierung');
@@ -623,11 +721,11 @@ function STPLDetailDelete()
 			req.add('type', 'deletestundenplaneintrag');
 			req.add('stundenplan_id', stundenplanid);
 		}
-		
+
 		var response = req.executePOST();
-	
+
 		var val =  new ParseReturnValue(response)
-	
+
 		if (!val.dbdml_return)
 		{
 			if(val.dbdml_errormsg=='')
@@ -638,7 +736,7 @@ function STPLDetailDelete()
 		else
 		{
 			netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
-			
+
 			var treeStplDetails=parent.document.getElementById('treeStplDetails');
 			//alert('url'+STPLlastDetailUrl);
 			treeStplDetails.setAttribute('datasources', '');
@@ -705,18 +803,18 @@ function TimetableDeleteEntries()
 	var pers_uid=daten.getAttribute("pers_uid");
 	var doIt=true;
 	var aktion='stpl_delete_single';
-	
+
 	doIt=confirm('Es werden die gewaehlten Eintraege aus dem LV-Plan geloescht!\nSind Sie sicher?')
 
 	var attributes="\n?type="+type+"&datum="+datum+"&ort="+encodeURIComponent(ort)+"&pers_uid="+pers_uid+"\n&stg_kz="+stg_kz+"&sem="+sem+"&ver="+ver+"&grp="+grp+"\n&gruppe="+gruppe;
 	attributes+="&aktion="+aktion;
 	var url = "<?php echo APP_ROOT; ?>content/lvplanung/timetable-week.xul.php";
 	url+=attributes;
-	
+
 	//IDs der Stunden dazuhaengen
     idList = TimeTableWeekGetMarkedIdList();
     url+=idList
-    
+
 	if (url && doIt)
 		location.href=url;
 }
@@ -742,7 +840,7 @@ function BetriebsmittelZuordnen(item)
 	{
 		for(i in stunden)
 			url = url+'&stunde[]='+stunden[i];
-	
+
 		// Alle StundenplanIDs holen von den Eintraegen die markiert sind
 		var ids = TimeTableWeekGetMarkedIdArray();
 		for(i in ids)
@@ -752,7 +850,7 @@ function BetriebsmittelZuordnen(item)
 	{
 		// Wenn kein eintrag markiert ist, wird der genommen auf den geklickt wurde
 		url = url+'&stunde[]'+item.getAttribute('stunde');
-		
+
 		idlist = item.getAttribute('idList');
 		idarr = idlist.split(/&stundenplan_id[0-9]=/);
 		for(i in idarr)
@@ -762,6 +860,6 @@ function BetriebsmittelZuordnen(item)
 			url = url+'&stplid[]'+idarr[i];
 		}
 
-	}			
+	}
 	window.open(url,'Details', 'height=350,width=800,left=100,top=100,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
 }

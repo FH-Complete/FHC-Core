@@ -45,6 +45,10 @@ echo '<?xml-stylesheet href="'.APP_ROOT.'content/datepicker/datepicker.css" type
 
 $prestudent_id = filter_input(INPUT_GET,'prestudent_id');
 
+if(!defined('FAS_REIHUNGSTEST_PUNKTEUEBERNAHME') || FAS_REIHUNGSTEST_PUNKTEUEBERNAHME == true)
+	$rt_uebernahme = true;
+else
+	$rt_uebernahme = false;
 echo '
 <!DOCTYPE overlay [';
 require('../../locale/'.$variable->variable->locale.'/fas.dtd');
@@ -226,6 +230,8 @@ echo ']>
 						<vbox hidden="true">
 							<label value="person_id" control="aufnahmetermine-textbox-person_id"/>
 							<textbox id="aufnahmetermine-textbox-person_id" disabled="true"/>
+                            <label value="studienplan_studiengang_kz" control="aufnahmetermine-textbox-studienplan_studiengang_kz"/>
+                            <textbox id="aufnahmetermine-textbox-studienplan_studiengang_kz" disabled="true"/>
 							<label value="Neu" control="aufnahmetermine-checkbox-neu"/>
 							<checkbox id="aufnahmetermine-checkbox-neu" disabled="true" checked="false"/>
 							<label value="rt_person_id" control="aufnahmetermine-textbox-rt_person_id"/>
@@ -291,7 +297,15 @@ echo ']>
 										<label value="Punkte" control="aufnahmetermine-textbox-punkte" />
 										<hbox>
 											<textbox id="aufnahmetermine-textbox-punkte" disabled="true" maxlength="8" size="6"/>
-											<toolbarbutton id="aufnahmetermine-button-reihungstest-punktesync" image="../../skin/images/transmit.png" tooltiptext="Reihungstest Ergebnis holen" onclick="AufnahemTermineReihungstestPunkteTransmit()"/>
+											<toolbarbutton
+												id="aufnahmetermine-button-reihungstest-punktesync"
+												<?php
+												if(!$rt_uebernahme)
+													echo 'hidden="true"';
+												?>
+												image="../../skin/images/transmit.png"
+												tooltiptext="Reihungstest Ergebnis holen"
+												onclick="AufnahemTermineReihungstestPunkteTransmit()"/>
 											<spacer flex="1" />
 										</hbox>
                                     </row>
@@ -303,12 +317,14 @@ echo ']>
                                                 <label value="Reihungstestpunkte (inkl. Physik)" control="aufnahmetermine-textbox-endpunkte-inkl-gebiete" style="margin-right: 7px;"/>
                                                 <hbox>
                                                     <textbox id="aufnahmetermine-textbox-endpunkte-inkl-gebiete" readonly="true" maxlength="8" size="6" flex="1"/>
+													<toolbarbutton image="../../skin/images/up.png" tooltiptext="Als Punkte setzen" onclick="setEndpunkteAsPunkte('aufnahmetermine-textbox-endpunkte-inkl-gebiete')"/>
                                                 </hbox>
                                             </row>
                                             <row>
                                                 <label value="Reihungstestpunkte (exkl. Physik)" control="aufnahmetermine-textbox-endpunkte-exkl-gebiete" />
                                                 <hbox>
                                                    <textbox id="aufnahmetermine-textbox-endpunkte-exkl-gebiete" readonly="true" maxlength="8" size="6" flex="1"/>
+													<toolbarbutton image="../../skin/images/up.png" tooltiptext="Als Punkte setzen" onclick="setEndpunkteAsPunkte('aufnahmetermine-textbox-endpunkte-exkl-gebiete')"/>
                                                 </hbox>
                                             </row>
                                         </vbox>

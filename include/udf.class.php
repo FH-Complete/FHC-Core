@@ -234,10 +234,6 @@ class UDF extends basis_db
 				$toString = $this->dropdownListValuesToString($decodedJson[$udfName], $udfDescription['enum']);
 			}
 		}
-		else if ($decodedJson[$udfName] == null)
-		{
-			$toString = '';
-		}
 
 		return $toString;
 	}

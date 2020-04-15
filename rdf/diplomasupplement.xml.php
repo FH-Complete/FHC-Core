@@ -669,6 +669,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 					else
 					{
 						$note_alt = $arrayLvAusbildungssemester[$row_stud->lehrveranstaltung_id]['note'];
+						$note_alt_positiv = $arrayLvAusbildungssemester[$row_stud->lehrveranstaltung_id]['note_positiv'];
 						$note_neu = $row_stud->anmerkung;
 
 						// alte oder neue note besser
@@ -687,6 +688,13 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 							$arrayLvAusbildungssemester[$row_stud->lehrveranstaltung_id]['note'] = $db->db_parse_bool($row_stud->offiziell) ?  $row_stud->anmerkung : "";
 							$arrayLvAusbildungssemester[$row_stud->lehrveranstaltung_id]['note_positiv'] = $db->db_parse_bool($row_stud->positiv);
 							$arrayLvAusbildungssemester[$row_stud->lehrveranstaltung_id]['sort'] = $row_stud->sort;
+
+							// ects dazuzählen wenn alte Note negativ, neue positiv
+							if ($arrayLvAusbildungssemester[$row_stud->lehrveranstaltung_id]['note_positiv'] === true && $note_alt_positiv !== true)
+							{
+								$ects_total_positiv += $row_stud->ects;
+								$semester_ects_positiv += $row_stud->ects;
+							}
 						}
 					}
 
@@ -875,11 +883,13 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 
 						$qry_outgoing_note = "
 								SELECT
-									anmerkung, offiziell, positiv, benotungsdatum, lehrform_kurzbz
+									tbl_note.anmerkung, tbl_note.offiziell,
+									tbl_note.positiv, tbl_zeugnisnote.benotungsdatum,
+									tbl_lehrveranstaltung.lehrform_kurzbz
 								FROM
 									lehre.tbl_zeugnisnote
-									JOIN tbl_lehrveranstaltung using(lehrveranstaltung_id)
-									JOIN tbl_note using(note)
+									JOIN lehre.tbl_lehrveranstaltung using(lehrveranstaltung_id)
+									JOIN lehre.tbl_note using(note)
 								WHERE
 									lehrveranstaltung_id = ".$db->db_add_param($row_outgoing->lehrveranstaltung_id)."
 									AND student_uid = ".$db->db_add_param($uid_arr[$i]);
@@ -940,7 +950,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 								<kurzbz>'.$lehrform_kurzbz_outgoing.'</kurzbz>
 								<stsem></stsem>
 								<bezeichnung><![CDATA[]]></bezeichnung>
-								<bezeichnung_englisch><![CDATA[International Semester Abroad: '.$datum_von.'-'.$datum_bis.', at '.$row_outgoing->ort.', '.$row_outgoing->universitaet.'. All credits earned during the International Semester Abroad (ISA) are fully credited for the '.$start.$auslandssemester_start.' semester at the UAS Technikum Wien.'.$projektarbeitszusatz.']]></bezeichnung_englisch>
+								<bezeichnung_englisch><![CDATA[International Semester Abroad: '.$datum_von.'-'.$datum_bis.', at '.$row_outgoing->ort.', '.$row_outgoing->universitaet.'. All credits earned during the International Semester Abroad (ISA) are fully credited for the '.$start.$auslandssemester_start.' semester at the UAS Technikum Wien. '.$projektarbeitszusatz.']]></bezeichnung_englisch>
 								<ects>'.$row_outgoing->ects.'</ects>
 								<semesterstunden>'.$row_outgoing->semesterstunden.'</semesterstunden>
 								<note>'.$note_outgoing.'</note>

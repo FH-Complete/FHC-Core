@@ -17,7 +17,8 @@
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
  *		  Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *		  Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ *		  Rudolf Hangl <rudolf.hangl@technikum-wien.at>
+ * 		  Cristina Hainberger <hainberg@technikum-wien.at>.
  */
 
 // ****************************************
@@ -31,9 +32,11 @@
 // * - Lehreinheitmitarbeiter Zuteilung hinzufuegen/bearbeiten/loeschen
 // * - Lehreinheitgruppe Zutelung hinzufuegen/loeschen
 // * - Lehreinheit anlegen/bearbeiten/loeschen
+// * - Lehrauftrag (Vertrag) loeschen (stornieren)
 // ****************************************
 
 require_once('../../config/vilesci.config.inc.php');
+require_once('../../config/global.config.inc.php');
 require_once('../../include/functions.inc.php');
 require_once('../../include/lehreinheit.class.php');
 require_once('../../include/lehreinheitmitarbeiter.class.php');
@@ -50,6 +53,7 @@ require_once('../../include/lehrveranstaltung.class.php');
 require_once('../../include/datum.class.php');
 require_once('../../include/vertrag.class.php');
 require_once('../../include/benutzergruppe.class.php');
+require_once('../../include/bisverwendung.class.php');
 
 $user = get_uid();
 $db = new basis_db();
@@ -143,7 +147,7 @@ function getStundenproInstitut($mitarbeiter_uid, $studiensemester_kurzbz, $oe_ar
 {
 	global $db;
 
-	$ret="Der Lektor ist in folgenden Organisationseinheiten zugeteilt:\n";
+	$ret="Der/Die LektorIn ist in folgenden Organisationseinheiten zugeteilt:\n";
 
 	//Liste mit den Stunden in den jeweiligen Instituten anzeigen
 	$qry = "SELECT sum(tbl_lehreinheitmitarbeiter.semesterstunden) as summe, tbl_studiengang.bezeichnung
@@ -155,8 +159,6 @@ function getStundenproInstitut($mitarbeiter_uid, $studiensemester_kurzbz, $oe_ar
 			WHERE
 				mitarbeiter_uid=".$db->db_add_param($mitarbeiter_uid)." AND
 				studiensemester_kurzbz=".$db->db_add_param($studiensemester_kurzbz)." AND
-				faktor>0 AND
-				stundensatz>0 AND
 				bismelden AND
 				tbl_studiengang.oe_kurzbz in(".$db->db_implode4SQL($oe_arr).")
 			GROUP BY tbl_studiengang.bezeichnung";
@@ -303,12 +305,12 @@ if(!$error)
 					$le = new lehreinheit();
 					$le->load($lem->lehreinheit_id);
 
-					if($lem->stundensatz<=0 || $lem->faktor<=0 || $lem->bismelden==false)
+					if($lem->bismelden==false)
 						$neue_stunden_eingerechnet=false;
 					else
 						$neue_stunden_eingerechnet=true;
 
-					if(($stundensatz_alt<=0 || $faktor_alt<=0 || $bismelden_alt==false))
+					if($bismelden_alt==false)
 						$alte_stunden_eingerechnet=false;
 					else
 						$alte_stunden_eingerechnet=true;
@@ -335,8 +337,6 @@ if(!$error)
 								WHERE
 									mitarbeiter_uid=".$db->db_add_param($lem->mitarbeiter_uid)." AND
 									studiensemester_kurzbz=".$db->db_add_param($le->studiensemester_kurzbz)." AND
-									faktor>0 AND
-									stundensatz>0 AND
 									bismelden";
 
 						if(count($oe_arr)>0)
@@ -442,11 +442,18 @@ if(!$error)
 	elseif(isset($_POST['type']) && $_POST['type']=='lehreinheit_mitarbeiter_add')
 	{
 		//neue Lehreinheitmitarbeiterzuteilung anlegen
-		$qry = "SELECT tbl_lehrveranstaltung.studiengang_kz, tbl_lehrveranstaltung.lehrveranstaltung_id,
-				(SELECT fachbereich_kurzbz FROM public.tbl_fachbereich WHERE oe_kurzbz=lehrfach.oe_kurzbz) as fachbereich_kurzbz
-				FROM lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit, lehre.tbl_lehrveranstaltung as lehrfach
-				WHERE tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id AND
-				tbl_lehreinheit.lehrfach_id=lehrfach.lehrveranstaltung_id AND lehreinheit_id=".$db->db_add_param($_POST['lehreinheit_id'], FHC_INTEGER);
+		$qry = "SELECT
+					tbl_lehrveranstaltung.studiengang_kz, tbl_lehrveranstaltung.lehrveranstaltung_id,
+					lehrfach.oe_kurzbz as lehrfach_oe_kurzbz
+				FROM
+					lehre.tbl_lehrveranstaltung,
+					lehre.tbl_lehreinheit,
+					lehre.tbl_lehrveranstaltung as lehrfach
+				WHERE
+					tbl_lehrveranstaltung.lehrveranstaltung_id = tbl_lehreinheit.lehrveranstaltung_id
+					AND tbl_lehreinheit.lehrfach_id = lehrfach.lehrveranstaltung_id
+					AND lehreinheit_id = ".$db->db_add_param($_POST['lehreinheit_id'], FHC_INTEGER);
+
 		if($db->db_query($qry))
 		{
 			if($row = $db->db_fetch_object())
@@ -456,8 +463,8 @@ if(!$error)
 				if(!$rechte->isBerechtigtMultipleOe('admin', $lva->getAllOe(), 'suid') &&
 				   !$rechte->isBerechtigtMultipleOe('assistenz', $lva->getAllOe(), 'suid') &&
 				   !$rechte->isBerechtigtMultipleOe('lv-plan', $lva->getAllOe(), 'suid') &&
-				   !$rechte->isBerechtigtMultipleOe('assistenz', $lva->getAllOe(), 'suid', $row->fachbereich_kurzbz) &&
-				   !$rechte->isBerechtigtMultipleOe('admin', $lva->getAllOe(), 'suid', $row->fachbereich_kurzbz))
+				   !$rechte->isBerechtigtMultipleOe('assistenz', $row->lehrfach_oe_kurzbz, 'suid') &&
+				   !$rechte->isBerechtigtMultipleOe('admin', $row->lehrfach_oe_kurzbz, 'suid'))
 				{
 					$error = true;
 					$return = false;
@@ -498,29 +505,47 @@ if(!$error)
 
 				$fixangestellt=false;
 				//Stundensatz aus tbl_mitarbeiter holen
-				$qry = "SELECT stundensatz, fixangestellt FROM public.tbl_mitarbeiter WHERE mitarbeiter_uid=".$db->db_add_param($_POST['mitarbeiter_uid']);
-				if($result = $db->db_query($qry))
+				$mitarbeiter = new mitarbeiter();
+				if ($mitarbeiter->load($_POST['mitarbeiter_uid']))
 				{
-					if($row = $db->db_fetch_object($result))
+					$fixangestellt = $mitarbeiter->fixangestellt;
+					$lem->stundensatz = $mitarbeiter->stundensatz;
+
+					if (defined('FAS_LV_LEKTORINNENZUTEILUNG_FIXANGESTELLT_STUNDENSATZ')
+						&& !FAS_LV_LEKTORINNENZUTEILUNG_FIXANGESTELLT_STUNDENSATZ)
 					{
-						if($row->stundensatz!='')
-							$lem->stundensatz = $row->stundensatz;
-						else
-							$lem->stundensatz = '0';
-						$fixangestellt = ($row->fixangestellt=='t'?true:false);
+						$stsem = new studiensemester();
+						$stsem->load($semester_aktuell);
+						$bisverwendung = new bisverwendung();
+						$data = $mitarbeiter->stundensatz;
+						if(!$bisverwendung->getVerwendungRange($mitarbeiter->uid, $stsem->start, $stsem->ende))
+						{
+							$bisverwendung->getLastAktVerwendung($mitarbeiter->uid);
+							$bisverwendung->result[] = $bisverwendung;
+						}
+
+						foreach($bisverwendung->result as $row_verwendung)
+						{
+							// Bei echten Dienstvertraegen mit voller inkludierter Lehre wird kein Stundensatz
+							// geliefert da dies im Vertrag inkludiert ist.
+							if ($row_verwendung->ba1code == 103 && $row_verwendung->inkludierte_lehre == -1)
+							{
+								$fixangestellt = true;
+								$lem->stundensatz = '';
+								break;
+							}
+						}
 					}
 					else
 					{
-						$error=true;
-						$return=false;
-						$errormsg='Mitarbeiter '.$db->convert_html_chars($_POST['mitarbeiter_uid']).' wurde nicht gefunden';
+						$lem->stundensatz = $mitarbeiter->stundensatz;
 					}
 				}
 				else
 				{
 					$error=true;
 					$return=false;
-					$errormsg='Fehler bei einer Datenbankabfrage:'.$db->db_last_error();
+					$errormsg='Mitarbeiter '.$db->convert_html_chars($_POST['mitarbeiter_uid']).' wurde nicht gefunden';
 				}
 
 				$maxstunden=9999;
@@ -557,8 +582,6 @@ if(!$error)
 							WHERE
 								mitarbeiter_uid=".$db->db_add_param($lem->mitarbeiter_uid)." AND
 								studiensemester_kurzbz=".$db->db_add_param($le->studiensemester_kurzbz)." AND
-								faktor>0 AND
-								stundensatz>0 AND
 								bismelden";
 
 					if(count($oe_arr)>0)
@@ -691,50 +714,61 @@ if(!$error)
 			//Lehreinheitmitarbeiterzuteilung loeschen
 			if(isset($_POST['lehreinheit_id']) && is_numeric($_POST['lehreinheit_id']) && isset($_POST['mitarbeiter_uid']))
 			{
-				//Wenn der Mitarbeiter im Stundenplan verplant ist, dann wird das Loeschen verhindert
-				$qry = "SELECT stundenplandev_id as id FROM lehre.tbl_stundenplandev WHERE lehreinheit_id=".$db->db_add_param($_POST['lehreinheit_id'], FHC_INTEGER)." AND mitarbeiter_uid=".$db->db_add_param($_POST['mitarbeiter_uid'])."
-						UNION
-						SELECT stundenplan_id as id FROM lehre.tbl_stundenplan WHERE lehreinheit_id=".$db->db_add_param($_POST['lehreinheit_id'], FHC_INTEGER)." AND mitarbeiter_uid=".$db->db_add_param($_POST['mitarbeiter_uid']);
-				if($db->db_query($qry))
+				// Wenn der Mitarbeiter schon einen Vertrag hat UND
+				// der config Eintrag zum Anzeigen der Vertragsdetails true ist,
+				// wird das Loeschen verhindert
+				if (isset($_POST['vertrag_id']) && is_numeric($_POST['vertrag_id']) &&
+					(defined('FAS_LV_LEKTORINNENZUTEILUNG_VERTRAGSDETAILS_ANZEIGEN') && FAS_LV_LEKTORINNENZUTEILUNG_VERTRAGSDETAILS_ANZEIGEN))
 				{
-					if($db->db_num_rows()>0)
+					$return = false;
+					$errormsg = 'Löschen nur nach Stornierung des Vertrags möglich.';
+				}
+				else
+				{
+					//Wenn der Mitarbeiter im Stundenplan verplant ist, dann wird das Loeschen verhindert
+					$qry = "SELECT stundenplandev_id as id FROM lehre.tbl_stundenplandev WHERE lehreinheit_id=".$db->db_add_param($_POST['lehreinheit_id'], FHC_INTEGER)." AND mitarbeiter_uid=".$db->db_add_param($_POST['mitarbeiter_uid'])."
+							UNION
+							SELECT stundenplan_id as id FROM lehre.tbl_stundenplan WHERE lehreinheit_id=".$db->db_add_param($_POST['lehreinheit_id'], FHC_INTEGER)." AND mitarbeiter_uid=".$db->db_add_param($_POST['mitarbeiter_uid']);
+					if($db->db_query($qry))
 					{
-						$return = false;
-						$errormsg = 'Dieser Lektor kann nicht gelöscht werden da er schon verplant ist';
-					}
-					else
-					{
-						$leg = new lehreinheitmitarbeiter();
-						if($leg->load($_POST['lehreinheit_id'], $_POST['mitarbeiter_uid']))
+						if($db->db_num_rows()>0)
 						{
-							// Wenn ein Vertrag dazu angelegt ist, dann diesen mitloeschen
-							if($leg->vertrag_id!='')
+							$return = false;
+							$errormsg = 'Diese/r LektorIn kann nicht gelöscht werden da er schon verplant ist';
+						}
+						else
+						{
+							$leg = new lehreinheitmitarbeiter();
+							if($leg->load($_POST['lehreinheit_id'], $_POST['mitarbeiter_uid']))
 							{
-								$vertrag = new vertrag();
-								$vertrag->delete($leg->vertrag_id);
-							}
-
-							if($leg->delete($_POST['lehreinheit_id'], $_POST['mitarbeiter_uid']))
-							{
-								$return = true;
+								// Wenn ein Vertrag dazu angelegt ist, dann diesen mitloeschen
+								if($leg->vertrag_id!='')
+								{
+									$vertrag = new vertrag();
+									$vertrag->delete($leg->vertrag_id);
+								}
+								if($leg->delete($_POST['lehreinheit_id'], $_POST['mitarbeiter_uid']))
+								{
+									$return = true;
+								}
+								else
+								{
+									$return = false;
+									$errormsg = $leg->errormsg;
+								}
 							}
 							else
 							{
 								$return = false;
-								$errormsg = $leg->errormsg;
+								$errormsg='Fehlgeschlagen:'.$leg->errormsg;
 							}
 						}
-						else
-						{
-							$return = false;
-							$errormsg='Fehlgeschlagen:'.$leg->errormsg;
-						}
 					}
-				}
-				else
-				{
-					$return = false;
-					$errormsg = 'Fehler:'.$qry;
+					else
+					{
+						$return = false;
+						$errormsg = 'Fehler:'.$qry;
+					}
 				}
 			}
 			else
@@ -913,7 +947,7 @@ if(!$error)
 			{
 				$error = true;
 				$return = false;
-				$errormsg='Dieser Lektor kann nicht aus dem LVPlan entfernt werden da dies der letzte verplante Lektor ist';
+				$errormsg='Diese/r LektorIn kann nicht aus dem LVPlan entfernt werden da dies der/die letzte verplante LektorIn ist';
 			}
 		}
 
@@ -1374,18 +1408,43 @@ if(!$error)
 			$mitarbeiter = new mitarbeiter();
 			if($mitarbeiter->load($_POST['mitarbeiter_uid']))
 			{
-				$data = $mitarbeiter->stundensatz;
+				if (defined('FAS_LV_LEKTORINNENZUTEILUNG_FIXANGESTELLT_STUNDENSATZ')
+					&& !FAS_LV_LEKTORINNENZUTEILUNG_FIXANGESTELLT_STUNDENSATZ)
+				{
+					$stsem = new studiensemester();
+					$stsem->load($semester_aktuell);
+					$bisverwendung = new bisverwendung();
+					$data = $mitarbeiter->stundensatz;
+					if(!$bisverwendung->getVerwendungRange($mitarbeiter->uid, $stsem->start, $stsem->ende))
+					{
+						$bisverwendung->getLastAktVerwendung($mitarbeiter->uid);
+						$bisverwendung->result[] = $bisverwendung;
+					}
+
+					foreach($bisverwendung->result as $row_verwendung)
+					{
+						// Bei echten Dienstvertraegen mit voller inkludierter Lehre wird kein Stundensatz
+						// geliefert da dies im Vertrag inkludiert ist.
+						if ($row_verwendung->ba1code == 103 && $row_verwendung->inkludierte_lehre == -1)
+						{
+							$data = '';
+							break;
+						}
+					}
+				}
+				else
+					$data = $mitarbeiter->stundensatz;
 				$return = true;
 			}
 			else
 			{
-				$errormsg = 'Fehler beim Laden des Mitarbeiters';
+				$errormsg = 'Fehler beim Laden des Mitarbeitenden';
 				$return = false;
 			}
 		}
 		else
 		{
-			$errormsg = 'MitarbeiterUID muss uebergeben werden';
+			$errormsg = 'MitarbeitendeUID muss uebergeben werden';
 			$return = false;
 		}
 	}
@@ -1550,8 +1609,8 @@ if(!$error)
 					$gruppe->semester = $lva->semester;
 					$gruppe->bezeichnung = $bezeichnung;
 					$gruppe->aktiv = true;
-					$gruppe->mailgrp = false;
-					$gruppe->sichtbar = true;
+					$gruppe->mailgrp = true;
+					$gruppe->sichtbar = false;
 					$gruppe->generiert = false;
 					$gruppe->insertamum = date('Y-m-d H:i:s');
 					$gruppe->insertvon = $user;
@@ -1678,7 +1737,7 @@ if(!$error)
 									$qry = "
 										DELETE FROM lehre.tbl_stundenplandev
 										WHERE gruppe_kurzbz=".$db->db_add_param($gruppe_kurzbz);
-									
+
 									$db->db_query($qry);
 								}
 								else
@@ -1713,6 +1772,102 @@ if(!$error)
 				$errormsg = 'Gruppe passt nicht zur Lehreinheit';
 				$return = false;
 			}
+		}
+	}
+	elseif(isset($_POST['type']) && $_POST['type']=='getLastVertragsstatus')
+	{
+		if(isset($_POST['vertrag_id']))
+		{
+			$vertrag = new vertrag();
+			if($vertrag->getAllStatus($_POST['vertrag_id']))
+			{
+				$vertraege = $vertrag->result;
+				foreach($vertraege as $vertrag)
+				{
+					$data = $vertrag->vertragsstatus_kurzbz;
+					$return = true;
+					break; // exit loop because only last (most actual) vertrag item is needed
+				}
+
+			}
+			else
+			{
+				$errormsg = 'Fehler beim Laden des Vertragsstatus';
+				$return = false;
+			}
+		}
+		else
+		{
+			$errormsg = 'VertragsID muss uebergeben werden';
+			$return = false;
+		}
+	}
+	elseif(isset($_POST['type']) && $_POST['type']=='cancelVertrag')
+	{
+		$error = false;
+
+		// Check if user is entitled to cancel this contract
+		if (isset($_POST['vertrag_id']) && is_numeric($_POST['vertrag_id']))
+		{
+			// * first find lehrveranstaltung_id of the contracts lehrveranstaltung
+			$vertrag = new vertrag();
+			$vertrag->load($_POST['vertrag_id']);
+			$lva = new lehrveranstaltung($vertrag->lehrveranstaltung_id);
+
+			// * then check if the user has permissions to cancel the corresponding lv-organisational units
+			if (!$rechte->isBerechtigtMultipleOe('admin', $lva->getAllOe(), 'suid') &&
+				!$rechte->isBerechtigtMultipleOe('lehre/lehrauftrag_bestellen', $lva->getAllOe(), 'suid'))
+			{
+				$error = true;
+				$return = false;
+				$errormsg = 'Keine Berechtigung';
+			}
+		}
+
+		if (!$error)
+		{
+			if(isset($_POST['mitarbeiter_uid']))
+			{
+				$vertrag = new vertrag();
+				if($vertrag->cancel($_POST['vertrag_id'], $_POST['mitarbeiter_uid']))
+				{
+					$return = true;
+				}
+				else
+				{
+					$errormsg = 'Fehler beim Ausführen des Vertragsstornos';
+					$return = false;
+				}
+			}
+			elseif(isset($_POST['person_id']))
+			{
+				$benutzer = new Benutzer();
+				if($benutzer->getBenutzerFromPerson($_POST['person_id']))
+				{
+					$mitarbeiter_uid = $benutzer->result[0]->uid;
+
+					$vertrag = new vertrag();
+					if($vertrag->cancel($_POST['vertrag_id'], $mitarbeiter_uid))
+					{
+						$return = true;
+					}
+					else
+					{
+						$errormsg = 'Fehler beim Ausführen des Vertragsstornos';
+						$return = false;
+					}
+				}
+				else
+				{
+					$errormsg = 'Benutzer konnte nicht von PersonID geladen werden';
+					$return = false;
+				}
+			}
+		}
+		else
+		{
+			$errormsg = 'Sie haben keine Berechtigung für diese Aktion.';
+			$return = false;
 		}
 	}
 	else

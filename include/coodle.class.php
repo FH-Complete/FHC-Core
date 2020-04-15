@@ -1117,7 +1117,7 @@ class coodle extends basis_db
             return false; 
         }
         
-        $qry ="UPDATE campus.tbl_coodle_Termin set auswahl='false' 
+        $qry ="UPDATE campus.tbl_coodle_termin set auswahl='false' 
                 WHERE coodle_id=".$this->db_add_param($coodle_id, FHC_INTEGER, false).';'; 
         
         if($result=$this->db_query($qry))

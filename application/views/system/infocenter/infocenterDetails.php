@@ -22,7 +22,7 @@
 			'customJSs' => array(
 				'public/js/bootstrapper.js',
 				'public/js/tablesort/tablesort.js',
-				'public/js/messaging/messageList.js',
+				'public/js/infocenter/messageList.js',
 				'public/js/infocenter/infocenterDetails.js'
 			),
 			'phrases' => array(
@@ -34,7 +34,14 @@
 					'nichtsZumAusparken',
 					'fehlerBeimAusparken',
 					'fehlerBeimParken',
-					'bewerberGeparktBis'
+					'bewerberGeparktBis',
+					'bewerberOnHold',
+					'bewerberOnHoldEntfernen',
+					'bewerberOnHoldBis',
+					'nichtsZumEntfernen',
+					'fehlerBeimEntfernen',
+					'rueckstelldatumUeberschritten',
+					'parkenZurueckstellenInfo'
 				),
 				'ui' => array(
 					'gespeichert',
@@ -147,7 +154,7 @@
 							<div class="panel-body">
 								<div class="row" id="messagelist">
 									<?php
-									$this->load->view('system/messages/messageList.php', $messages);
+									$this->load->view('system/infocenter/messageList.php', $messages);
 									?>
 								</div>
 							</div>
@@ -176,7 +183,7 @@
 										</div>
 									</div>
 									<div class="col-lg-6">
-										<div id="parking"></div>
+										<div id="postponing"></div>
 										<div id="logs">
 										<?php $this->load->view('system/infocenter/logs.php'); ?>
 										</div>

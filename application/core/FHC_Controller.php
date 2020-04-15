@@ -1,8 +1,11 @@
 <?php
 
-if (! defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class FHC_Controller extends CI_Controller
+/**
+ *
+ */
+abstract class FHC_Controller extends CI_Controller
 {
 	const FHC_CONTROLLER_ID = 'fhc_controller_id'; // name of the parameter used to identify uniquely a call to a controller
 
@@ -17,6 +20,9 @@ class FHC_Controller extends CI_Controller
 	public function __construct()
 	{
 		parent::__construct();
+
+		// NOTE: placed here before performing anything else!!!
+		$this->_checkHTTPS();
 
 		$this->_controllerId = null; // set _controllerId as null by default
 
@@ -125,5 +131,21 @@ class FHC_Controller extends CI_Controller
 	protected function outputJson($mixed)
 	{
 		$this->output->set_content_type('application/json')->set_output(json_encode($mixed));
+	}
+
+	//------------------------------------------------------------------------------------------------------------------
+	// Private methods
+
+	/**
+	 * Checks if the call is performed via web and if HTTPS is enabled and used
+	 * If NOT then an error is raised and the execution is terminated
+	 */
+	private function _checkHTTPS()
+	{
+		// If NOT called from command line and if the HTTPS protocol is NOT enabled
+		if (!$this->input->is_cli_request() && !isset($_SERVER['HTTPS']))
+		{
+			show_error('This web site cannot work correctly without the HTTPS protocol enabled');
+		}
 	}
 }

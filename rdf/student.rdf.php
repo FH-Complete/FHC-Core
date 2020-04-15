@@ -180,6 +180,7 @@ function draw_content_liste($row)
 			<STUDENT:status_bestaetigung><![CDATA['.($prestudent->bestaetigtam!=''?$datum_obj->formatDatum($prestudent->bestaetigtam,'d.m.Y'):'-').']]></STUDENT:status_bestaetigung>
 			<STUDENT:status_datum_iso><![CDATA['.$datum_obj->formatDatum($prestudent->datum,'Y-m-d').']]></STUDENT:status_datum_iso>
 			<STUDENT:status_bestaetigung_iso><![CDATA['.($prestudent->bestaetigtam!=''?$datum_obj->formatDatum($prestudent->bestaetigtam,'Y-m-d'):'-').']]></STUDENT:status_bestaetigung_iso>
+			<STUDENT:zugangscode><![CDATA['.$row->zugangscode.']]></STUDENT:zugangscode>
 
 			<STUDENT:anmerkungen>'.($row->anmerkungen==''?'&#xA0;':'<![CDATA['.$row->anmerkungen.']]>').'</STUDENT:anmerkungen>
 			<STUDENT:anmerkungpre>'.($row->anmerkung==''?'&#xA0;':'<![CDATA['.$row->anmerkung.']]>').'</STUDENT:anmerkungpre>
@@ -222,10 +223,10 @@ function draw_content($row)
 	{
 		switch($row->bnaktiv)
 		{
-			case "t":
+			case true:
 				$aktiv = "true";
 				break;
-			case "f":
+			case false:
 				$aktiv = "false";
 				break;
 			default:
@@ -243,7 +244,7 @@ function draw_content($row)
 		$stgl .= trim(($i>0?', ':'').$stgl_ma->titelpre.' '.$stgl_ma->vorname.' '.$stgl_ma->nachname.' '.$stgl_ma->titelpost);
 		$i++;
 	}
-	
+
 	// Anzahl Notizen der Person laden
 	$notiz = new notiz();
 	$anzahl_notizen = $notiz->getAnzahlNotizen(null, null, null, null, null, $row->person_id, null, null, null, null, null);
@@ -294,6 +295,8 @@ function draw_content($row)
 			<STUDENT:studienplan_id><![CDATA['.$prestudent->studienplan_id.']]></STUDENT:studienplan_id>
 			<STUDENT:mail_privat><![CDATA['.$mail_privat.']]></STUDENT:mail_privat>
 			<STUDENT:mail_intern><![CDATA['.(isset($row->uid)?$row->uid.'@'.DOMAIN:'').']]></STUDENT:mail_intern>
+			<STUDENT:zugangscode><![CDATA['.$row->zugangscode.']]></STUDENT:zugangscode>
+			<STUDENT:link_bewerbungstool><![CDATA['.CIS_ROOT.'addons/bewerbung/cis/registration.php?code='.$row->zugangscode.'&emailAdresse='.$mail_privat.']]></STUDENT:link_bewerbungstool>
 
 			<STUDENT:aktiv><![CDATA['.$aktiv.']]></STUDENT:aktiv>
 			<STUDENT:uid><![CDATA['.(isset($row->uid)?$row->uid:'').']]></STUDENT:uid>
@@ -475,7 +478,7 @@ if($xmlformat=='rdf')
 			AS email_privat,
 			(SELECT rt_gesamtpunkte as punkte FROM public.tbl_prestudent WHERE prestudent_id=tbl_student.prestudent_id) as punkte,
 			 tbl_prestudent.dual as dual, tbl_prestudent.reihungstest_id, tbl_prestudent.anmeldungreihungstest, p.matr_nr,
-			 tbl_prestudent.gsstudientyp_kurzbz, tbl_prestudent.aufnahmegruppe_kurzbz, tbl_prestudent.priorisierung
+			 tbl_prestudent.gsstudientyp_kurzbz, tbl_prestudent.aufnahmegruppe_kurzbz, tbl_prestudent.priorisierung, p.zugangscode
 		FROM
 			public.tbl_student
 			JOIN public.tbl_benutzer ON (student_uid=uid)
@@ -635,7 +638,7 @@ if($xmlformat=='rdf')
 		$searchItems = explode(' ',TRIM(str_replace(',', '', $filter),' 	!.?'));
 		$kriterienliste = array("#email","#name","#pid","#preid","#tel", "#ref");
 		$suchkriterium = '';
-		
+
 		// Wenn der erste Array-Eintrag einem kriterium der $kriterienliste entspricht -> in $suchkriterium speichern und aus Array entfernen
 		if (isset($searchItems[0]) && in_array($searchItems[0], $kriterienliste))
 		{
@@ -696,7 +699,7 @@ if($xmlformat=='rdf')
 							$prestudent_temp = new prestudent($prest->prestudent_id);
 							$student = new student();
 							$uid = $student->getUid($prestudent_temp->prestudent_id);
-				
+
 							if($uid!='' && $uid != false)
 							{
 								if(!$student->load($uid, $studiensemester_kurzbz))
@@ -722,7 +725,7 @@ if($xmlformat=='rdf')
 				$qry = "SELECT prestudent_id
 					FROM
 						public.tbl_person JOIN public.tbl_prestudent USING (person_id) LEFT JOIN public.tbl_student USING (prestudent_id)
-					WHERE 
+					WHERE
 						UPPER(nachname) = UPPER(".$db->db_add_param($searchItems_string_orig).") OR
 						UPPER(vorname) = UPPER(".$db->db_add_param($searchItems_string_orig).") OR
 						UPPER(vorname || ' ' || nachname) = UPPER(".$db->db_add_param($searchItems_string_orig).") OR
@@ -761,14 +764,14 @@ if($xmlformat=='rdf')
 				$searchItems_string_orig = implode(' ', $searchItems);
 				$searchItems_string = generateSpecialCharacterString($searchItems_string_orig);
 
-				$qry = "SELECT 
+				$qry = "SELECT
 							prestudent_id
 						FROM
 							public.tbl_person JOIN public.tbl_prestudent USING (person_id) LEFT JOIN public.tbl_student USING (prestudent_id)
-						WHERE 
-							1=1 
+						WHERE
+							1=1
 						AND";
-				
+
 				// Wenn der urspruengliche Suchbegriff NICHT numerisch ist, Namenssuche durchführen
 				if (!is_numeric($searchItems_string_orig))
 				{
@@ -782,8 +785,9 @@ if($xmlformat=='rdf')
 						$qry .= "	person_id = ".$db->db_add_param($searchItems_string_orig).";";
 					elseif ($suchkriterium == '#preid')
 						$qry .= "	prestudent_id = ".$db->db_add_param($searchItems_string_orig).";";
-					else 
+					else
 						$qry .= "	matrikelnr = ".$db->db_add_param($searchItems_string_orig)." OR
+									matr_nr = ".$db->db_add_param($searchItems_string_orig)." OR
 									svnr = ".$db->db_add_param($searchItems_string_orig).";";
 				}
 				if($db->db_query($qry))

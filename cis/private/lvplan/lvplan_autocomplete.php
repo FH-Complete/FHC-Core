@@ -21,6 +21,7 @@
 require_once('../../../config/cis.config.inc.php');
 require_once('../../../include/basis_db.class.php');
 require_once('../../../include/benutzer.class.php');
+require_once('../../../include/mitarbeiter.class.php');
 require_once('../../../include/studiengang.class.php');
 require_once('../../../include/functions.inc.php');    
 require_once('../../../include/lehrverband.class.php');
@@ -56,7 +57,30 @@ switch($_REQUEST['autocomplete'])
 			echo json_encode($result_obj);
 		}
 		break;
+	case 'mitarbeiter':
+		$search=trim((isset($_REQUEST['term']) ? $_REQUEST['term']:''));
+		if (is_null($search) ||$search=='')
+			exit();
 
+		$mitarbeiter = new mitarbeiter();
+		$searchItems = explode(' ',$search);
+
+		foreach ($searchItems as $searchItem)
+		{
+			if ($mitarbeiter->search($searchItem))
+			{
+				$result_obj = array();
+				foreach ($mitarbeiter->result as $row)
+				{
+					$item['vorname'] = html_entity_decode($row->vorname);
+					$item['nachname'] = html_entity_decode($row->nachname);
+					$item['uid'] = html_entity_decode($row->uid);
+					$result_obj[] = $item;
+				}
+			}
+		}
+		echo json_encode($result_obj);
+		break;
 	case 'getSemester':
 		$studiengang = new studiengang();
 		$data = array();

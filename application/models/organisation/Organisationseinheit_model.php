@@ -125,12 +125,12 @@ class Organisationseinheit_model extends DB_Model
 	public function getChilds($oe_kurzbz, $includeinactive = false)
 	{
 		$query = "
-		WITH RECURSIVE oes(oe_kurzbz, oe_parent_kurzbz) as 
+		WITH RECURSIVE oes(oe_kurzbz, oe_parent_kurzbz) as
 		(
-			SELECT oe_kurzbz, oe_parent_kurzbz FROM public.tbl_organisationseinheit 
+			SELECT oe_kurzbz, oe_parent_kurzbz FROM public.tbl_organisationseinheit
 			WHERE oe_kurzbz=? %s
 			UNION ALL
-			SELECT o.oe_kurzbz, o.oe_parent_kurzbz FROM public.tbl_organisationseinheit o, oes 
+			SELECT o.oe_kurzbz, o.oe_parent_kurzbz FROM public.tbl_organisationseinheit o, oes
 			WHERE o.oe_parent_kurzbz=oes.oe_kurzbz %s
 		)
 		SELECT oe_kurzbz
@@ -150,12 +150,12 @@ class Organisationseinheit_model extends DB_Model
 	public function getParents($oe_kurzbz, $includeinactive = false)
 	{
 		$query=
-		"WITH RECURSIVE oes(oe_kurzbz, oe_parent_kurzbz) as 
+		"WITH RECURSIVE oes(oe_kurzbz, oe_parent_kurzbz) as
 		(
-			SELECT oe_kurzbz, oe_parent_kurzbz FROM public.tbl_organisationseinheit 
+			SELECT oe_kurzbz, oe_parent_kurzbz FROM public.tbl_organisationseinheit
 			WHERE oe_kurzbz=? %s
 			UNION ALL
-			SELECT o.oe_kurzbz, o.oe_parent_kurzbz FROM public.tbl_organisationseinheit o, oes 
+			SELECT o.oe_kurzbz, o.oe_parent_kurzbz FROM public.tbl_organisationseinheit o, oes
 			WHERE o.oe_kurzbz=oes.oe_parent_kurzbz %s
 		)
 		SELECT oe_kurzbz
@@ -165,4 +165,27 @@ class Organisationseinheit_model extends DB_Model
 		return $this->execQuery(sprintf($query, $aktivstring, $aktivstring), array($oe_kurzbz));
 	}
 
+    /**
+     * Get one parent only.
+     * Easily retrieve department of a studiengang or fakultät of department etc.
+     * @param $oe_kurzbz
+     * @return array|null
+     */
+	public function getParent($oe_kurzbz)
+    {
+        if (is_string($oe_kurzbz))
+        {
+            $condition = '
+                oe_kurzbz = (
+                    SELECT
+                        oe_parent_kurzbz
+                    FROM
+                        public.tbl_organisationseinheit
+                    WHERE
+                        oe_kurzbz = \''. $oe_kurzbz. '\'
+                )
+            ';
+        }
+        return $this->loadWhere($condition);
+    }
 }

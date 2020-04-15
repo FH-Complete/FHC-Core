@@ -33,6 +33,7 @@ require_once('../../include/adresse.class.php');
 require_once('../../include/nation.class.php');
 require_once('../../include/firma.class.php');
 require_once('../../include/preincoming.class.php');
+require_once('../../include/statusgrund.class.php');
 
 $user = get_uid();
 
@@ -52,61 +53,67 @@ echo '<html>
 		<title>PreInteressenten</title>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 		<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">';
-		include('../../include/meta/jquery.php');
-		include('../../include/meta/jquery-tablesorter.php');
+include('../../include/meta/jquery.php');
+include('../../include/meta/jquery-tablesorter.php');
 echo '</head>'; ?>
-	<script language="JavaScript" type="text/javascript">
+<script language="JavaScript" type="text/javascript">
 	// Add parser through the tablesorter addParser method for sorting Studiensemester
-	$.tablesorter.addParser({ 
-		// set a unique id 
-		id: "studiensemester", 
-		is: function(s) { 
-			// return false so this parser is not auto detected 
-			return false; 
-		}, 
-		format: function(s) { 
-			// format data for normalization 
+	$.tablesorter.addParser({
+		// set a unique id
+		id: "studiensemester",
+		is: function(s) {
+			// return false so this parser is not auto detected
+			return false;
+		},
+		format: function(s) {
+			// format data for normalization
 			var result = s.substr(2) + s.substr(0, 2);
 			return result;
-		}, 
-		// set type, either numeric or text 
-		type: "text" 
+		},
+		// set type, either numeric or text
+		type: "text"
 	});
 
-	$(document).ready(function() 
-	{ 
+	$(document).ready(function()
+	{
 		$(".tablesorter").tablesorter(
-		{
-			widgets: ["zebra"]
-		}); 
-		$(".tablePreStudent").tablesorter(
-		{
-			headers: { 
-				1: { 
-					sorter:"insertamum" 
-				}},
-			sortList: [[1,1],[2,0],[3,0]],
-			widgets: ["zebra"]
-		}); 
-		$(".tableKontakt").tablesorter(
-		{
-			headers:
 			{
-				3:
-				{
-					sorter: "shortDate", dateFormat: "yyyy-mm-dd"
-				}
-			},
-			sortList: [[0,0],[2,0],[3,1]],
-			widgets: ["zebra"]
-		}); 
+				widgets: ["zebra"]
+			});
+		$(".tablePreStudent").tablesorter(
+			{
+				headers: {
+					1: {
+						sorter:"insertamum"
+					}},
+				sortList: [[1,1],[2,0],[3,0]],
+				widgets: ["zebra"]
+			});
+		$(".tableKontakt").tablesorter(
+			{
+				headers:
+					{
+						3:
+							{
+								sorter: "shortDate", dateFormat: "yyyy-mm-dd"
+							}
+					},
+				sortList: [[0,0],[2,0],[3,1]],
+				widgets: ["zebra"]
+			});
 	});
-	</script>
-	<body class="Background_main">
-<?php 
+</script>
+<style>
+	.inactive
+	{
+		color: grey;
+	}
+</style>
+<body class="Background_main">
+<?php
 if(!$rechte->isBerechtigt('admin') &&
-   !$rechte->isBerechtigt('preinteressent') &&
-   !$rechte->isBerechtigt('assistenz'))
+	!$rechte->isBerechtigt('preinteressent') &&
+	!$rechte->isBerechtigt('assistenz'))
 	die('Sie haben keine Berechtigung fuer diese Seite');
 
 if(isset($_GET['id']) && is_numeric($_GET['id']))
@@ -134,7 +141,7 @@ foreach ($kontakt->result as $row)
 			$insertdatum = $row->insertamum;
 		}
 	}
-	else 
+	else
 		continue;
 }
 
@@ -295,7 +302,7 @@ if(count($preinteressent->result)>0)
 	echo '</tbody></table>';
 }
 */
-			
+
 //PreIncoming deprecated
 /*
 $preincoming = new preincoming();
@@ -331,11 +338,22 @@ foreach ($prestudent->result as $row)
 {
 	$prestudentLastStatus = new prestudent();
 	$prestudentLastStatus->getLastStatus($row->prestudent_id);
+
+	$row->status_kurzbz = $prestudentLastStatus->status_kurzbz;
 	$row->studiensemester_kurzbz = $prestudentLastStatus->studiensemester_kurzbz;
 	$row->ausbildungssemester = $prestudentLastStatus->ausbildungssemester;
 	$row->datum = $prestudentLastStatus->datum;
 	$row->orgform_kurzbz = $prestudentLastStatus->orgform_kurzbz;
 	$row->studienplan_bezeichnung = $prestudentLastStatus->studienplan_bezeichnung;
+	if ($prestudentLastStatus->statusgrund_id != '')
+	{
+		$statusgrund = new statusgrund($prestudentLastStatus->statusgrund_id);
+		$row->statusgrund = $statusgrund->bezeichnung_mehrsprachig[DEFAULT_LANGUAGE];
+	}
+	else
+	{
+		$row->statusgrund = '';
+	}
 }
 
 // Sortiert PreStudenten nach Studiensemester
@@ -379,14 +397,28 @@ if(count($prestudent->result)>0)
 				</tr>
 			</thead><tbody>';
 		}
+		$class = '';
+		if ($row->status_kurzbz == 'Abgewiesener' || $row->status_kurzbz == 'Abbrecher' || $row->status_kurzbz == 'Absolvent' )
+		{
+			$class = 'class="inactive"';
+		}
+		$status = $row->status_kurzbz;
+		if ($row->ausbildungssemester != '')
+		{
+			$status .= ' ('.$row->ausbildungssemester.'. Semester)';
+		}
+		if ($row->statusgrund != '')
+		{
+			$status .= ' - '.$row->statusgrund;
+		}
 		echo '<tr>';
-		echo "<td>$row->prestudent_id</td>";
-		echo "<td>$row->studiensemester_kurzbz</td>";
-		echo "<td>$row->priorisierung</td>";
-		echo "<td>".$studiengang->kuerzel_arr[$row->studiengang_kz]."</td>";
-		echo "<td>$row->orgform_kurzbz</td>";
-		echo "<td>$row->studienplan_bezeichnung</td>";
-		echo "<td>".($row->reihungstestangetreten?'Ja':'Nein')."</td>";
+		echo "<td ".$class.">$row->prestudent_id</td>";
+		echo "<td ".$class.">$row->studiensemester_kurzbz</td>";
+		echo "<td ".$class.">$row->priorisierung</td>";
+		echo "<td ".$class.">".$studiengang->kuerzel_arr[$row->studiengang_kz]."</td>";
+		echo "<td ".$class.">$row->orgform_kurzbz</td>";
+		echo "<td ".$class.">$row->studienplan_bezeichnung</td>";
+		echo "<td ".$class.">".($row->reihungstestangetreten?'Ja':'Nein')."</td>";
 		$uid='';
 		$gruppe='';
 		$qry ="SELECT * FROM public.tbl_student WHERE prestudent_id='$row->prestudent_id'";
@@ -405,11 +437,11 @@ if(count($prestudent->result)>0)
 				}
 			}
 		}
-		echo "<td>$uid</td>";
-		echo "<td>$gruppe</td>";
-		echo "<td>$row->status_kurzbz ".($row->ausbildungssemester!=''?"($row->ausbildungssemester. Semester)":'')."</td>";
+		echo "<td ".$class.">$uid</td>";
+		echo "<td ".$class.">$gruppe</td>";
+		echo "<td ".$class.">".$status."</td>";
 		echo '</tr>';
-		
+
 		$studiensemester_kurzbz = $row->studiensemester_kurzbz;
 	}
 	echo '</tbody></table>';

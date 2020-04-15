@@ -31,7 +31,7 @@ $uid = get_uid();
 $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($uid);
 
-if(!$rechte->isBerechtigt('vertrag/mitarbeiter'))
+if(!$rechte->isBerechtigt('vertrag/mitarbeiter') && !$rechte->isBerechtigt('lehre/lehrauftrag_bestellen'))
 	die('Sie haben keine Berechtigung für diese Seite');
 
 $datum_obj = new datum();
@@ -68,7 +68,7 @@ $oRdf = new rdf('VER','http://www.technikum-wien.at/vertrag');
 $oRdf->sendHeader();
 
 foreach($vertrag->result as $row)
-{	
+{
 	$i=$oRdf->newObjekt($row->vertrag_id);
 	$oRdf->obj[$i]->setAttribut('vertrag_id',$row->vertrag_id,true);
 	$oRdf->obj[$i]->setAttribut('person_id',$row->person_id,true);
@@ -81,7 +81,8 @@ foreach($vertrag->result as $row)
 	$oRdf->obj[$i]->setAttribut('anmerkung',$row->anmerkung,true);
 	$oRdf->obj[$i]->setAttribut('vertragsdatum_iso',$row->vertragsdatum,true);
 	$oRdf->obj[$i]->setAttribut('vertragsdatum',$datum_obj->formatDatum($row->vertragsdatum,'d.m.Y'),true);
-
+	$oRdf->obj[$i]->setAttribut('vertragsstunden',$row->vertragsstunden, true);
+	$oRdf->obj[$i]->setAttribut('vertragsstunden_studiensemester_kurzbz',$row->vertragsstunden_studiensemester_kurzbz, true);
 	$oRdf->addSequence($row->vertrag_id);
 }
 

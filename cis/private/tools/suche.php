@@ -111,9 +111,10 @@ if (!$searchPerson && !$searchOrt && !$searchDms && !$searchContent && !$searchO
 
 function searchPerson($searchItems)
 {
-	global $db, $p, $noalias;
+	global $db, $p, $noalias, $uid;
 	$bn = new benutzer();
-	$bn->search($searchItems, 21);
+	//search only active and Mitarbeiter with positive Personalnr
+	$bn->search($searchItems, 21, true, true);
 
 	if(count($bn->result)>0)
 	{
@@ -163,7 +164,19 @@ function searchPerson($searchItems)
 			//echo '<td>',$row->titelpre,'</td>';
 			echo '<td>',$row->anrede,'</td>';
 			echo '<td>',$row->vorname,'</td>';
-			echo '<td><a href="../profile/index.php?uid=',$row->uid,'" title="',$row->titelpre,' ',$row->vorname,' ',$row->nachname,' ',$row->titelpost,'">',$row->nachname,'</a>';
+			echo '<td>';
+			if(!defined('CIS_SUCHE_PROFIL_ANZEIGEN'))
+				echo '<a href="../profile/index.php?uid=',$row->uid,'" title="',$row->titelpre,' ',$row->vorname,' ',$row->nachname,' ',$row->titelpost,'">',$row->nachname,'</a>';
+			else if(!CIS_SUCHE_PROFIL_ANZEIGEN)
+			{
+				$mitarbeiter = new Mitarbeiter($uid);
+				if($mitarbeiter->errormsg === NULL)
+					echo '<a href="../profile/index.php?uid=',$row->uid,'" title="',$row->titelpre,' ',$row->vorname,' ',$row->nachname,' ',$row->titelpost,'">',$row->nachname,'</a>';
+				else
+					echo $row->nachname;
+			}
+			else
+				echo '<a href="../profile/index.php?uid=',$row->uid,'" title="',$row->titelpre,' ',$row->vorname,' ',$row->nachname,' ',$row->titelpost,'">',$row->nachname,'</a>';
 			if($row->aktiv==false)
 				echo '<span style="color: red"> (ausgeschieden)</span>';
 			elseif($bisverwendung->beschausmasscode=='5')
@@ -574,7 +587,17 @@ function searchContent($searchItems)
 						// URL aus content parsen
 						$dom = new DOMDocument();
 						$dom->loadXML($row->content);
-						$content = $dom->getElementsByTagName('url')->item(0)->nodeValue;
+						if($dom->getElementsByTagName('url')!=null
+						&& $dom->getElementsByTagName('url')->item(0)!=null)
+						{
+							$content = $dom->getElementsByTagName('url')->item(0)->nodeValue;
+						}
+						else
+						{
+							// Wenn bei redirects keine URL vorhanden ist, dann handelt es sich um Fehlerhafte Einträge
+							// diese werden übersprungen
+							continue;
+						}
 
 						if (substr($content, 0, 1) == '#')
 							continue;
@@ -636,15 +659,33 @@ function searchContent($searchItems)
 						// URL aus content parsen
 						$dom = new DOMDocument();
 						$dom->loadXML($row->content);
-						$content = $dom->getElementsByTagName('url')->item(0)->nodeValue;
-
+						if($dom->getElementsByTagName('url')!=null
+						&& $dom->getElementsByTagName('url')->item(0)!=null)
+						{
+							$content = $dom->getElementsByTagName('url')->item(0)->nodeValue;
+						}
+						else
+						{
+							// Wenn bei redirects keine URL vorhanden ist, dann handelt es sich um Fehlerhafte Einträge
+							// diese werden übersprungen
+							continue;
+						}
 						if (substr($content, 0, 1) == '#')
 							continue;
 						else
 						{
-							echo '<li><div class="suchergebnis">';
-							echo '<a href="'.$content.'" target="blank">',$db->convert_html_chars($row->titel),'</a><br>';
-							echo '</div></li>';
+							if(mb_strpos($content, 'http') === 0)
+							{
+								echo '<li><div class="suchergebnis">';
+								echo '<a href="'.$content.'" target="blank">',$db->convert_html_chars($row->titel),'</a><br>';
+								echo '</div></li>';
+							}
+							else
+							{
+								echo '<li><div class="suchergebnis">';
+								echo '<a href="../../../cms/content.php?content_id=',$db->convert_html_chars($row->content_id),'&sprache=',$db->convert_html_chars($row->sprache),'">',$db->convert_html_chars($row->titel),'</a><br>';
+								echo '</div></li>';
+							}
 						}
 					}
 					else

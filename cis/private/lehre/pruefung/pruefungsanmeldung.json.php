@@ -97,6 +97,9 @@ switch($method)
 	case 'anmeldungBestaetigen':
 		$data = anmeldungBestaetigen($uid);
 		break;
+	case 'anmeldungLoeschen':
+		$data = anmeldungLoeschen();
+		break;
 	case 'alleBestaetigen':
 		$data = alleBestaetigen($uid);
 		break;
@@ -178,7 +181,10 @@ function getPruefungByLv($aktStudiensemester = null, $uid = null)
 			$lveranstaltung = new lehrveranstaltung($lehreinheiten[0]->lehrfach_id);
 			$oe = new organisationseinheit($lveranstaltung->oe_kurzbz);
 			$prf->organisationseinheit = $oe->bezeichnung;
-			array_push($pruefungen, $prf);
+
+			// nur hinzufügen wenn zumindest 1 Termin vorhanden ist
+			if (!empty($prf->pruefung->termine))
+				array_push($pruefungen, $prf);
 			}
 		}
 		$anmeldung = new pruefungsanmeldung();
@@ -265,7 +271,10 @@ function getPruefungByLvFromStudiengang($aktStudiensemester = null, $uid = null)
 		$lveranstaltung = new lehrveranstaltung($lehreinheiten[0]->lehrfach_id);
 		$oe = new organisationseinheit($lveranstaltung->oe_kurzbz);
 		$prf->organisationseinheit = $oe->bezeichnung;
-		array_push($pruefungen, $prf);
+
+		// nur hinzufügen wenn zumindest 1 Termin vorhanden ist
+		if (!empty($prf->pruefung->termine))
+			array_push($pruefungen, $prf);
 		}
 	}
 
@@ -606,9 +615,10 @@ function saveAnmeldung($aktStudiensemester = null, $uid = null)
 
 	foreach ($prestudent->result as $ps)
 	{
-		if ($ps->getLaststatus($ps->prestudent_id, $stdsem_lv_besuch))
+		// prüfen ob Student zum Zeitpunkt der LV oder zumindest irgendwann Student im Studiengang war/ist
+		if ($ps->getLaststatus($ps->prestudent_id, $stdsem_lv_besuch) || $ps->studiengang_kz == $studiengang_kz)
 		{
-			if (($ps->status_kurzbz == "Student") || ($ps->status_kurzbz == "Unterbrecher"))
+			if (($ps->status_kurzbz == "Student") || ($ps->status_kurzbz == "Unterbrecher") || ($ps->status_kurzbz == ""))
 			{
 				array_push($prestudenten, $ps);
 			}
@@ -622,24 +632,11 @@ function saveAnmeldung($aktStudiensemester = null, $uid = null)
 		{
 			foreach ($prestudenten as $ps)
 			{
-				if($ps->studiengang_kz === $studiengang_kz)
+				if ($ps->getLaststatus($ps->prestudent_id, $stdsem))
 				{
-					if ($ps->getLaststatus($ps->prestudent_id, $stdsem))
+					if (($ps->status_kurzbz == "Student") || ($ps->status_kurzbz == "Unterbrecher"))
 					{
-						if (($ps->status_kurzbz == "Student") || ($ps->status_kurzbz == "Unterbrecher"))
-						{
-							$prestudent_id = $ps->prestudent_id;
-						}
-						else
-						{
-							if ($ps->getLaststatus($ps->prestudent_id, $stdsem_lv_besuch))
-							{
-								if (($ps->status_kurzbz == "Student") || ($ps->status_kurzbz == "Unterbrecher"))
-								{
-									$prestudent_id = $ps->prestudent_id;
-								}
-							}
-						}
+						$prestudent_id = $ps->prestudent_id;
 					}
 					else
 					{
@@ -649,6 +646,16 @@ function saveAnmeldung($aktStudiensemester = null, $uid = null)
 							{
 								$prestudent_id = $ps->prestudent_id;
 							}
+						}
+					}
+				}
+				else
+				{
+					if ($ps->getLaststatus($ps->prestudent_id, $stdsem_lv_besuch))
+					{
+						if (($ps->status_kurzbz == "Student") || ($ps->status_kurzbz == "Unterbrecher"))
+						{
+							$prestudent_id = $ps->prestudent_id;
 						}
 					}
 				}
@@ -804,7 +811,10 @@ function getAllPruefungen($aktStudiensemester = null, $uid = null)
 		$lveranstaltung = new lehrveranstaltung($lehreinheiten[0]->lehrfach_id);
 		$oe = new organisationseinheit($lveranstaltung->oe_kurzbz);
 		$prf->organisationseinheit = $oe->bezeichnung;
-		array_push($pruefungen, $prf);
+
+		// nur hinzufügen wenn zumindest 1 Termin vorhanden ist
+		if (!empty($prf->pruefung->termine))
+			array_push($pruefungen, $prf);
 		}
 	}
 
@@ -1057,6 +1067,30 @@ function anmeldungBestaetigen($uid)
 }
 
 /**
+ * Löscht eine Prüfungsanmeldung
+ * @return Array
+ */
+function anmeldungLoeschen()
+{
+	$pruefungsanmeldung_id = $_REQUEST["pruefungsanmeldung_id"];
+	$anmeldung = new pruefungsanmeldung();
+
+	if($anmeldung->delete($pruefungsanmeldung_id))
+	{
+		$data['result']=true;
+		$data['error']='false';
+		$data['errormsg']='';
+	}
+	else
+	{
+		$data['error']='true';
+		$data['errormsg']=$anmeldung->errormsg;
+	}
+
+	return $data;
+}
+
+/**
  * Lädt alle Studiengänge
  * @return Array
  */
@@ -1167,7 +1201,12 @@ function getAllFreieRaeume($terminId)
 	$teilnehmer = $teilnehmer !== false ? $teilnehmer : 0;
 	$pruefungstermin->getAll($pruefungstermin->von, $pruefungstermin->bis, TRUE);
 
-	if($ort->search($datum_von[0], $datum_von[1], $datum_bis[1], null, $teilnehmer, true))
+	if(defined('CIS_PRUEFUNGSANMELDUNG_ERLAUBE_TERMINKOLLISION') && CIS_PRUEFUNGSANMELDUNG_ERLAUBE_TERMINKOLLISION)
+		$ortSuccess = $ort->getOrte(true, null, true);
+	else
+		$ortSuccess = $ort->search($datum_von[0], $datum_von[1], $datum_bis[1], null, $teilnehmer, true);
+
+	if($ortSuccess)
 	{
 	foreach($pruefungstermin->result as $termin)
 	{
@@ -1205,6 +1244,7 @@ function compareRaeume($a, $b)
 
 function saveRaum($terminId, $ort_kurzbz, $uid)
 {
+	$terminkollision = defined('CIS_PRUEFUNGSANMELDUNG_ERLAUBE_TERMINKOLLISION') ? CIS_PRUEFUNGSANMELDUNG_ERLAUBE_TERMINKOLLISION : false;
 	$pruefungstermin = new pruefungstermin($terminId);
 	$stunde = new stunde();
 	$datum_von = explode(" ", $pruefungstermin->von);
@@ -1217,7 +1257,7 @@ function saveRaum($terminId, $ort_kurzbz, $uid)
 	if($reservierung->isReserviert($ort_kurzbz, $datum_von[0], $h))
 		$reserviert = true;
 	}
-	if(!$reserviert || $pruefungstermin->sammelklausur == TRUE)
+	if($terminkollision || !$reserviert || $pruefungstermin->sammelklausur == TRUE)
 	{
 	$pruefung = new pruefungCis($pruefungstermin->pruefung_id);
 	$mitarbeiter = new mitarbeiter($pruefung->mitarbeiter_uid);

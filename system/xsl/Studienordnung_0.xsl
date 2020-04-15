@@ -3013,9 +3013,6 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 	<office:body>
 	<office:text xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0" xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0" xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0" xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0" text:use-soft-page-breaks="true">
 		<office:forms form:automatic-focus="false" form:apply-design-mode="false"/>
-			<draw:frame xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0" xmlns:xlink="http://www.w3.org/1999/xlink" draw:style-name="fr2" draw:name="Bild7" text:anchor-type="page" text:anchor-page-number="1" svg:x="0cm" svg:y="0cm" svg:width="21.001cm" svg:height="29.7cm" draw:z-index="28">
-			<draw:image xlink:href="Pictures/100002010000031B00000463F98C50C4.png" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/>
-		</draw:frame>
 		<text:sequence-decls>
 			<text:sequence-decl text:display-outline-level="0" text:name="Illustration"/>
 			<text:sequence-decl text:display-outline-level="0" text:name="Table"/>
@@ -3396,9 +3393,6 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 			<text:p text:style-name="P1"/>
 			<text:p text:style-name="P1"/>
 			<text:p text:style-name="P1">
-			<!--draw:frame xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0" xmlns:xlink="http://www.w3.org/1999/xlink" draw:style-name="fr3" draw:name="Bild1" text:anchor-type="paragraph" svg:width="25.7cm" svg:height="5.196cm" draw:z-index="1">
-				<draw:image xlink:href="Pictures/1000020100000D27000002A962041C99.png" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/>
-			</draw:frame-->
 			</text:p>
 			<text:p text:style-name="P1"/>
 			<!-- <text:list xml:id="list134241269166448" text:continue-numbering="true" text:style-name="Numbering_20_1">-->

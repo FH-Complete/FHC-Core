@@ -1,6 +1,6 @@
-/**
- * JS used by view system/messages/messageWrite
- */
+// ********************************************************
+// JS used by view system/messages/htmlWriteTemplate
+// ********************************************************
 
 function tinymcePreviewSetContent()
 {
@@ -19,11 +19,12 @@ function tinymcePreviewSetContent()
 
 function parseMessageText(receiver_id, text)
 {
-	FHC_AjaxClient.ajaxCallGet(
-		"system/Messages/parseMessageText",
+	FHC_AjaxClient.ajaxCallPost(
+		"system/messages/Messages/parseMessageText",
 		{
-			person_id: receiver_id,
-			text: text
+			receiver_id: receiver_id,
+			text: text,
+			type: $("#type").val()
 		},
 		{
 			successCallback: function(data, textStatus, jqXHR) {
@@ -34,7 +35,7 @@ function parseMessageText(receiver_id, text)
 				}
 				else if (FHC_AjaxClient.isError(data))
 				{
-					alert(data.retval);
+					FHC_DialogLib.alertError(data.retval);
 				}
 			}
 		}
@@ -45,21 +46,16 @@ $(document).ready(function ()
 {
 	tinymce.init({
 		selector: "#bodyTextArea",
-		plugins: "autoresize",
-		autoresize_min_height: 150,
-		autoresize_max_height: 600,
-		autoresize_bottom_margin: 10
+		plugins: "autoresize"
 	});
 
 	tinymce.init({
+		selector: "#tinymcePreview",
+		plugins: "autoresize",
 		menubar: false,
 		toolbar: false,
 		statusbar: false,
-		readonly: 1,
-		selector: "#tinymcePreview",
-		plugins: "autoresize",
-		autoresize_min_height: 150,
-		autoresize_bottom_margin: 10
+		readonly: 1
 	});
 
 	if ($("#variables"))
@@ -97,7 +93,7 @@ $(document).ready(function ()
 			}
 			else
 			{
-				alert("Subject and text are required fields!");
+				FHC_DialogLib.alertInfo("Subject and text are required fields!");
 			}
 		});
 	}
@@ -111,7 +107,7 @@ $(document).ready(function ()
 			if (vorlage_kurzbz != '')
 			{
 				FHC_AjaxClient.ajaxCallGet(
-					"system/Messages/getVorlage",
+					"system/messages/Messages/getVorlage",
 					{
 						vorlage_kurzbz: vorlage_kurzbz
 					},

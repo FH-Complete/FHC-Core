@@ -11,7 +11,7 @@
 						$align = "valign-top";
 					}
 			?>
-				<div class="div-cell width-150px <?php echo $align; ?>">
+				<div class="div-cell <?php echo $align; ?>">
 					<label
 						for="<?php echo ${HTMLWidget::HTML_ARG_NAME}[HTMLWidget::HTML_ID]; ?>"
 						<?php HTMLWidget::printAttribute(${HTMLWidget::HTML_ARG_NAME}, HTMLWidget::REQUIRED); ?>
@@ -22,7 +22,7 @@
 			<?php
 				}
 			?>
-			<div class="div-cell width-150px">
+			<div class="div-cell">
 				<select
 					<?php HTMLWidget::printAttribute(${HTMLWidget::HTML_ARG_NAME}, HTMLWidget::HTML_ID); ?>
 					<?php HTMLWidget::printAttribute(${HTMLWidget::HTML_ARG_NAME}, HTMLWidget::HTML_NAME); ?>
@@ -37,11 +37,11 @@
 					<?php
 						$elements = ${DropdownWidget::WIDGET_DATA_ELEMENTS_ARRAY_NAME};
 						$selectedElements = ${DropdownWidget::SELECTED_ELEMENT};
-						
+
 						foreach($elements as $element)
 						{
 							$selected = '';
-							
+
 							if (is_array($selectedElements))
 							{
 								foreach($selectedElements as $selectedElement)

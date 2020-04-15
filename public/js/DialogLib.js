@@ -55,7 +55,12 @@ var FHC_DialogLib = {
 	 */
 	alertDefault: function(title, html, width)
 	{
-		var strDivDialog = "<div id=\"fhc-dialoglib-dialog\">";
+		var dialogdiv = $("#fhc-dialoglib-dialog");
+
+		if (dialogdiv.length)
+			dialogdiv.remove();
+
+		var strDivDialog = "<div id='fhc-dialoglib-dialog'>";
 		strDivDialog += html;
 		strDivDialog += "</div>";
 
@@ -74,7 +79,7 @@ var FHC_DialogLib = {
 			buttons: [{
 				text: "Ok",
 				click: function() {
-					$(this).dialog("close");
+					$("#fhc-dialoglib-dialog").remove();
 				}
 			}]
 		});

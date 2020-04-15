@@ -30,7 +30,6 @@ class AuthLib
 	/**
 	 * Construct
 	 *
-	 *
 	 * @param bool $authenticate If the authentication must be performed.
 	 */
 	public function __construct($authenticate = true)
@@ -379,7 +378,8 @@ class AuthLib
 		}
 		else // otherwise
 		{
-			$hta = $this->_createAuthObjByPerson(array('uid' => $_SERVER['PHP_AUTH_USER']));
+			// NOTE: Username needs to be trimmed and lowered because htaccess is allowing login
+			$hta = $this->_createAuthObjByPerson(array('uid' => mb_strtolower(trim($_SERVER['PHP_AUTH_USER']))));
 		}
 
 		// Invalid credentials
@@ -391,7 +391,7 @@ class AuthLib
 		}
 		elseif (isError($hta)) // display error and stop execution
 		{
-			$this->_showError(getData($hta));
+			$this->_showError(getError($hta));
 		}
 
 		return $hta; // if success then is returned!
@@ -483,6 +483,8 @@ class AuthLib
 
 	/**
 	 * Stores the authentication object into the authentication session
+	 * Everything was fine, the user at this point is authenticated, it is possible to store the authentication object
+	 * in the user session
 	 */
 	private function _storeSessionAuthObj($authObj)
 	{
@@ -549,10 +551,15 @@ class AuthLib
 			}
 			elseif (isError($auth)) // blocking error
 			{
-				$this->_showError(getData($auth)); // display a generic error message and logs the occurred error
+				$this->_showError(getError($auth)); // display a generic error message and logs the occurred error
 			}
 		}
-		// else the user is already logged, then continue with the execution
+		// else the user is already logged, then loads authentication helper and continue with the execution
+		// NOTE: it is needed only here because:
+		//		- it is called when a user is already logged in
+		//		- it is called after login the user
+		//		- it is NOT called in case of fatal error or wrong authentication
+		$this->_ci->load->helper('hlp_authentication');
 	}
 
 	/**
@@ -568,10 +575,11 @@ class AuthLib
 
 		// Needed information
 		$this->_ci->PersonModel->addSelect('person_id, vorname, nachname, uid');
-		// Retrieves the uid if it is possible
-		$this->_ci->PersonModel->addJoin('public.tbl_benutzer', 'person_id', 'LEFT');
-
-		$queryParamsArray['tbl_person.aktiv'] = true; // only active users!
+		// Retrieves the uid if it is possible for active users
+		$this->_ci->PersonModel->addJoin(
+			'(SELECT uid, person_id FROM public.tbl_benutzer WHERE aktiv = TRUE) tb', 'person_id',
+			'LEFT'
+		);
 
 		// Execute query with where clause
 		$personResult = $this->_ci->PersonModel->loadWhere($queryParamsArray);

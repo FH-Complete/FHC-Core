@@ -37,8 +37,8 @@ $person = new person();
 $person->getPersonFromBenutzer($user);
 
 
-$show = (isset($_POST['show']) ? $_POST['show'] : 'aktuell');											//show: alle / aktuell 
-$is_popup = (isset($_GET['verpflichtend']) && $_GET['verpflichtend'] == true) ? true : false;			
+$show = (isset($_POST['show']) ? $_POST['show'] : 'aktuell');											//show: alle / aktuell
+$is_popup = (isset($_GET['verpflichtend']) && $_GET['verpflichtend'] == true) ? true : false;
 //Leiter OEs holen
 $benutzerfunktion = new benutzerfunktion();
 $benutzerfunktion->getBenutzerFunktionen('Leitung', '', '', $user);
@@ -80,7 +80,7 @@ if($type=='bestaetigen' && is_numeric($ampel_id))
 	$message='';
 	if($ampel->load($ampel_id))
 	{
-		if($ampel->isZugeteilt($user, $ampel->benutzer_select))				
+		if($ampel->isZugeteilt($user, $ampel->benutzer_select))
 		{
 			if(!$ampel->isBestaetigt($user, $ampel_id))
 			{
@@ -88,7 +88,7 @@ if($type=='bestaetigen' && is_numeric($ampel_id))
 				{
 					echo '<script type="text/javascript">window.parent.loadampel();</script>';
 					header('Refresh:0');
-					exit;					
+					exit;
 				}
 				else
 					$message = '<span class="error">'.$ampel->errormsg.'</span>';
@@ -99,7 +99,7 @@ if($type=='bestaetigen' && is_numeric($ampel_id))
 	}
 	else
 		$message = '<span class="error">'.$p->t('tools/ampelNichtGefunden').'</span>';
-	
+
 	if ($message != '')
 	echo '<div class="alert alert-danger" role="alert">' . $message . '</div>';
 }
@@ -107,7 +107,7 @@ if($type=='bestaetigen' && is_numeric($ampel_id))
 
 //get all user ampeln
 list(
-	$user_ampel_arr,				
+	$user_ampel_arr,
 	$cnt_ueberfaellig) =				//counts overdue ampeln (not expired)
 	getUserAmpelData($user);
 
@@ -118,7 +118,7 @@ if (!empty($user_ampel_arr))
 }
 
 //filter ampeln for popup (if at least one mandatory, which is neither expired nor before vorlaufzeit)
-if ($is_popup)	
+if ($is_popup)
 {
 	list(
 	$user_ampel_arr,
@@ -135,14 +135,14 @@ if (!$is_popup && $show == 'aktuell')
 function getUserAmpelData($user)
 {
 	$cnt_ueberfaellig = 0;
-	
+
 	$ampel = new ampel();
 	$ampel->loadUserAmpel($user, true);
 	$user_ampel_arr = array();
-	
+
 	$datum = new datum();
 	$now = $datum->mktime_fromdate(date('Y-m-d'));
-	
+
 	foreach($ampel->result as $row)
 	{
 		$deadline = $datum->mktime_fromdate($row->deadline);
@@ -150,23 +150,23 @@ function getUserAmpelData($user)
 		$verfallszeit = $row->verfallszeit;
 		$bestaetigt = $ampel->isBestaetigt($user, $row->ampel_id);
 		$verpflichtend = $row->verpflichtend;		// 't'/'f'
-		
+
 		$datum_liegt_vor_vorlaufzeit = false;
 		$datum_liegt_nach_verfallszeit = false;
-		
+
 		if (!is_null($vorlaufzeit))
-			$datum_liegt_vor_vorlaufzeit = $now < strtotime('-' .  $vorlaufzeit . ' day', $deadline); 
-		
+			$datum_liegt_vor_vorlaufzeit = $now < strtotime('-' .  $vorlaufzeit . ' day', $deadline);
+
 		if (!is_null($verfallszeit))
 			$datum_liegt_nach_verfallszeit = $now > strtotime('+' . $verfallszeit . ' day', $deadline);
 
 		//default
 		$show_ampel = true;			//true while actual date is not before vorlaufzeit
 		$abgelaufen = false;		//false while actual date is not after verfallszeit
-		$active = true;				//true while not confirmed or expired 
+		$active = true;				//true while not confirmed or expired
 		$status = 'gelb';			//yellow while not overdue (red) or confirmed (green)
 		$status_ampel = '';			//ampel image
-			
+
 		if ($bestaetigt)
 			$status = 'gruen';
 
@@ -174,21 +174,21 @@ function getUserAmpelData($user)
 		if ($datum_liegt_vor_vorlaufzeit)
 			$show_ampel = false;
 
-		
+
 		if ($datum_liegt_nach_verfallszeit)
 			$abgelaufen = true;
 
 
-		if ($now >= $deadline && !$bestaetigt) 
+		if ($now >= $deadline && !$bestaetigt)
 		{
 			if (!$abgelaufen)
 				$cnt_ueberfaellig++;
 			$status = 'rot';
 		}
-		
+
 		if ($bestaetigt || $abgelaufen)
 			$active = false;
-		
+
 		//assign png-image to ampelstatus
 		switch($status)
 		{
@@ -205,7 +205,7 @@ function getUserAmpelData($user)
 				$status_ampel= '<img name="A" src="../../../skin/images/ampel_gruen.png" >';
 				break;
 		}
-		
+
 		$user_ampel_arr[] = array(
 							'ampel_id' => $row->ampel_id,
 							'kurzbz' => $row->kurzbz,
@@ -216,23 +216,23 @@ function getUserAmpelData($user)
 							'bestaetigt' => $bestaetigt,
 							'deadline' => $row->deadline,
 							'vorlaufzeit' => $row->vorlaufzeit,
-							'verfallszeit' => $row->verfallszeit,							
+							'verfallszeit' => $row->verfallszeit,
 							'beschreibung' => $row->beschreibung,
 							'abgelaufen' => $abgelaufen,
 							'active' => $active);
 	}
-	
+
 	return array($user_ampel_arr, $cnt_ueberfaellig);
 }
 function sortUserAmpelData($user_ampel_arr)
 {
 	//first: sort deadline
 	$deadline_arr = array();
-	foreach ($user_ampel_arr as $key => $val) 
+	foreach ($user_ampel_arr as $key => $val)
 	{
 		$deadline_arr[$key] = $val['deadline'];
 	}
-	
+
 	array_multisort($deadline_arr, SORT_DESC, $user_ampel_arr);
 
 	//second: sort inactive after active
@@ -247,7 +247,7 @@ function sortUserAmpelData($user_ampel_arr)
 		else
 		{
 			$inactive_ampel_arr[] = $user_ampel;
-		}		
+		}
 	}
 	return $user_ampel_arr = array_merge($active_ampel_arr, $inactive_ampel_arr);
 }
@@ -292,7 +292,7 @@ function getActualUserAmpelData($user_ampel_arr, $semester_start)
 
 <!--style for sancho typewriting effect-->
 <style>
-	
+
 .cursor:after {
     opacity: 0;
     animation: cursor 1s infinite;
@@ -314,7 +314,7 @@ function getActualUserAmpelData($user_ampel_arr, $semester_start)
     100% {
         opacity: 0;
     }
-}	
+}
 </style>
 <!--script for sancho typewriting effect-->
 <script>
@@ -344,39 +344,39 @@ function typeWrite(span){
 
 
 <body style="font-family: Arial, Helvetica, sans-serif; font-size: 13px;">
-	<div class="container-fluid" style="padding: 0px;"> 
-  
-	<?php 
+	<div class="container-fluid" style="padding: 0px;">
+
+	<?php
 	//title in CIS
 	if (!$is_popup)
 		echo '<h3>' . $p->t('tools/ampelsystem') . '</h3>';
-		
+
 	//*****************************************			AROUSE SANCHO for mandatory ampeln
 	if ($is_popup)
 	{
 	//sancho message if mandatory ampeln exist
 		if (count($user_ampel_arr) > 0)
 		{
-			echo '		
+			echo '
 				<div>
 					<img src="../../../skin/images/sancho/sancho_header_du_hast_verpflichtende_ampeln.jpg" alt="sancho_verpflichtende_ampeln" style="width: 100%;">
-				</div>			
+				</div>
 				<p><br><br></p>';
-		}	
+		}
 	}
 	?>
-	
+
 	<!--*****************************************	PANEL-GROUP -->
-	<div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true" style="padding-left: 15px; padding-right:15px;">		
-		
-	<!--*****************************************	radiobuttons actual term / all -->	
+	<div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true" style="padding-left: 15px; padding-right:15px;">
+
+	<!--*****************************************	radiobuttons actual term / all -->
 	<?php
 	if (!$is_popup)
 	{
 	?>
 		<form method="POST" action="">
 			<?php echo $p->t('tools/ampelAnzeigeFuer') ?>&nbsp;&nbsp;
-			<label class="radio-inline"> 
+			<label class="radio-inline">
 				<input type="radio" name="show" value="aktuell"  <?php if ($show == 'aktuell') echo 'checked'; ?> onclick="submit()"> <?php echo $p->t('tools/ampelNurAktuellesStudiensemester') ?>
 			 </label>
 			<label class="radio-inline">
@@ -386,21 +386,21 @@ function typeWrite(span){
 		<p><br><br></p>
 	<?php
 	} //end if
-	
+
 
 //*****************************************			COLLAPSED PANELS WITH AMPELN
-	
+
 	$cnt = 1;								//counter to set iterative id's
 	$cnt_inactive = 1;						//counter to set only one heading line for inactive ampeln
 	$cnt_active = 0;
-	
+
 	//show panel "no actual ampeln" if there are no active ampeln
 	foreach ($user_ampel_arr as $user_ampel)
 	{
 		if ($user_ampel['active'] == true)
 				$cnt_active++;
 	}
-	
+
 	if ($cnt_active == 0 && !$is_popup)
 	{
 		echo '
@@ -411,7 +411,7 @@ function typeWrite(span){
 						<small>' . $p->t('tools/ampelKeineAktuellenTxt'). '</small>
 					</div>
 				</div>
-			</div>';	
+			</div>';
 	}
 	elseif ($cnt_active != 0 && !$is_popup)
 	{
@@ -422,16 +422,16 @@ function typeWrite(span){
 						<h4>' . $p->t('tools/ampelAktuelleAmpeln'). '</h4>
 					</div>
 				</div>
-			</div>';	
+			</div>';
 	}
-	
+
 	//fill panel with ampeln
 	foreach ($user_ampel_arr as $user_ampel)
 	{
-		
+
 		//use only ampeln that are not overdue
 		if ($user_ampel['show_ampel'] == true)
-		{	
+		{
 			//heading line for inactive ampeln
 			if ($user_ampel['active'] == false && $cnt_inactive == 1)
 			{
@@ -444,33 +444,33 @@ function typeWrite(span){
 							<small>' . $p->t('tools/ampelAbgelaufenTxt'). '</small>
 						</div>
 					</div>
-				</div>';	
+				</div>';
 				$cnt_inactive++;
 			}
 	?>
 	<div class="panel">
 		<div class="row" style="margin-bottom: 15px">
-			<div class="panel-heading <?php if ($user_ampel['abgelaufen']  || $user_ampel['bestaetigt']) echo 'text-muted' ?>" style="background-color: transparent" role="tab" id="heading<?php echo $cnt ?>">				
+			<div class="panel-heading <?php if ($user_ampel['abgelaufen']  || $user_ampel['bestaetigt']) echo 'text-muted' ?>" style="background-color: transparent" role="tab" id="heading<?php echo $cnt ?>">
 				<div class="col-xs-4">
 					<h5 class="panel-title" style="text-decoration: none; font-size: 14px;">
-						<a class="collapsed" style="text-decoration: none;" role="button" data-toggle="collapse" data-parent="#accordion" 
+						<a class="collapsed" style="text-decoration: none;" role="button" data-toggle="collapse" data-parent="#accordion"
 						   href="#collapse<?php echo $cnt ?>" aria-expanded="false" aria-controls="collapse<?php echo $cnt ?>">
 						<?php echo $user_ampel['kurzbz'] ?>
 						</a>
 					</h5>
-					<small <?php if ($user_ampel['status'] == 'rot' && !$user_ampel['abgelaufen']) echo 'style="color: red; font-weight : bold;"'?>><?php echo $p->t('global/faelligAm') . ' '; echo date('d.m.Y', strtotime($user_ampel['deadline'])) ?></small>			
+					<small <?php if ($user_ampel['status'] == 'rot' && !$user_ampel['abgelaufen']) echo 'style="color: red; font-weight : bold;"'?>><?php echo $p->t('global/faelligAm') . ' '; echo date('d.m.Y', strtotime($user_ampel['deadline'])) ?></small>
 				</div>
 				<div class="col-xs-2">
 					<?php echo $user_ampel['status_ampel'] ?>
 				</div>
-				<div class="col-xs-2"><small> 
-					<?php 
+				<div class="col-xs-2"><small>
+					<?php
 						if ($user_ampel['bestaetigt']) echo 'bestätigt';
 						if ($user_ampel['abgelaufen'])
 						{
 							if ($user_ampel['bestaetigt'])
 								echo " &<br>";
-							else 
+							else
 								echo "nicht bestätigt &<br>";
 							echo 'abgelaufen';
 						}
@@ -478,29 +478,27 @@ function typeWrite(span){
 				</div>
 				<div class="col-xs-4">
 					<form method="POST" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']) . '?ampel_id='. urlencode($user_ampel['ampel_id']) . '&type=bestaetigen'; ?>">
-						<button name="type" type="submit" class="btn btn-default pull-right" 
-							<?php if ($user_ampel['abgelaufen'] || $user_ampel['bestaetigt']) echo 'disabled data-toggle="tooltip" data-placement="top" title="' . $p->t('tools/ampelBestaetigtAbgelaufen'). '"'?>><?php echo $p->t('global/bestaetigen') ?>
-						</button>					
-						<button type="button" class="btn btn-default pull-right collapsed" style="margin-right: 10px;" data-toggle="collapse" data-parent="#accordion" 
-								href="#collapse<?php echo $cnt ?>" aria-expanded="false" aria-controls="collapse<?php echo $cnt ?>"><?php echo $p->t('global/lesen') ?></button>						
+
+						<button type="button" class="btn btn-default pull-right collapsed" style="margin-right: 0 px;" data-toggle="collapse" data-parent="#accordion"
+								href="#collapse<?php echo $cnt ?>" aria-expanded="false" aria-controls="collapse<?php echo $cnt ?>"><?php echo $p->t('global/anzeigen') ?></button>
 					</form>
 				</div>
-			 </div>			
+			 </div>
 		</div>
 		<div id="collapse<?php echo $cnt ?>" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading<?php echo $cnt ?>">
 			<div class="panel-body" style="font-size: 12px;">
-				<?php echo $user_ampel['beschreibung'][$sprache] ?>		
+				<?php echo $user_ampel['beschreibung'][$sprache] ?>
 				<p><br></p>
 				<form method="POST" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']) . '?ampel_id='. urlencode($user_ampel['ampel_id']) . '&type=bestaetigen'; ?>">
-					<button type="type" type="submit" class="btn btn-default pull-right" 
+					<button type="type" type="submit" class="btn btn-default pull-right"
 						<?php if ($user_ampel['abgelaufen'] || $user_ampel['bestaetigt']) echo 'disabled data-toggle="tooltip" data-placement="top" title="' . $p->t('tools/ampelBestaetigtAbgelaufen'). '"'?>><?php echo $p->t('global/bestaetigen') ?>
 					</button>
 				</form>
 			</div>
-		</div>		
+		</div>
 	</div>
-	<?php 
-	$cnt++;	
+	<?php
+	$cnt++;
 		} //end if
 	} //end foreach
 	?>
@@ -509,4 +507,3 @@ function typeWrite(span){
 		</div> <!--end container -->
 	</body>
 </html>
-

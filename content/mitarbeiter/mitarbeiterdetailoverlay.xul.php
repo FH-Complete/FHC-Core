@@ -143,13 +143,18 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 						</row>
 							<row>
 									<label value="Geschlecht" control="mitarbeiter-detail-menulist-geschlecht"/>
-									<menulist id="mitarbeiter-detail-menulist-geschlecht" disabled="true" oncommand="MitarbeiterDetailValueChange()">
-								<menupopup>
-										<menuitem value="m" label="maennlich"/>
-										<menuitem value="w" label="weiblich"/>
-										<menuitem value="u" label="unbekannt"/>
-								</menupopup>
-							</menulist>
+									<menulist id="mitarbeiter-detail-menulist-geschlecht" disabled="true"
+										datasources="<?php echo APP_ROOT ?>rdf/geschlecht.rdf.php"
+										ref="http://www.technikum-wien.at/geschlecht"
+										oncommand="MitarbeiterDetailValueChange()">
+										<template>
+											<menupopup>
+												<menuitem value="rdf:http://www.technikum-wien.at/geschlecht/rdf#geschlecht"
+													label="rdf:http://www.technikum-wien.at/geschlecht/rdf#bezeichnung"
+													uri="rdf:*"/>
+												</menupopup>
+										</template>
+									</menulist>
 							<label value="Familienstand" control="mitarbeiter-detail-menulist-familienstand" <?php echo ($rechte->isBerechtigt('mitarbeiter/persoenlich'))?'':'hidden="true"'; ?> />
 									<menulist id="mitarbeiter-detail-menulist-familienstand" disabled="true" oncommand="MitarbeiterDetailValueChange()" <?php echo ($rechte->isBerechtigt('mitarbeiter/persoenlich'))?'':'hidden="true"'; ?> >
 								<menupopup>
@@ -191,7 +196,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 
 	<hbox>
 		<groupbox flex="8">
-			<caption label="Mitarbeiterdaten" />
+			<caption label="MitarbeiterInnendaten" />
 			<grid align="end" flex="1"
 				 flags="dont-build-content"
 				enableColumnDrag="true"
@@ -214,7 +219,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 						<textbox id="mitarbeiter-detail-textbox-kurzbezeichnung"  class="pflichtfeld" size="10" maxlength="10" disabled="true" oninput="MitarbeiterDetailValueChange()"/>
 						<spacer />
 					</hbox>
-					<checkbox label="Lektor" id="mitarbeiter-detail-checkbox-lektor" checked="false" disabled="true" onchange="MitarbeiterDetailValueChange()"/>
+					<checkbox label="LektorIn" id="mitarbeiter-detail-checkbox-lektor" checked="false" disabled="true" onchange="MitarbeiterDetailValueChange()"/>
 		    		<checkbox label="Kleriker" id="mitarbeiter-detail-checkbox-kleriker" checked="false" disabled="true" hidden="true" onchange="MitarbeiterDetailValueChange()"/>
 		    	</row>
 		    	<row>

@@ -23,7 +23,7 @@ $(document).ready(function ()
 			}
 			else
 			{
-				alert("Subject and text are required fields!");
+				FHC_DialogLib.alertInfo("Subject and text are required fields!");
 			}
 		});
 	}

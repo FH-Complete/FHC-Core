@@ -216,6 +216,8 @@ define('CIS_DOKUMENTE_SELFSERVICE', true);
 //**** INFOSCREEN ****
 //Gibt an, ob der Lageplan im Infoterminal angezeigt werden soll.
 define('CIS_INFOSCREEN_LAGEPLAN_ANZEIGEN',true);
+//Gibt an, ob News im Infoterminal angezeigt werden soll.
+define('CIS_INFOSCREEN_NEWS_ANZEIGEN',false);
 
 //User, welcher für das Anlegen von Anrechnungen bei der Prüfungsanmeldung verwendet wird
 define('CIS_PRUEFUNGSANMELDUNG_USER','p.pruefungsanmeldung');
@@ -234,6 +236,9 @@ define('CIS_PRUEFUNGSANMELDUNG_ANRECHNUNG', true);
 //Gibt an, ob der Bereich zur Anmeldung zu Pruefungen des gesamten Studiengangs angezeigt werden soll
 define('CIS_PRUEFUNGSANMELDUNG_LEHRVERANSTALTUNGEN_AUS_STUDIENGANG', true);
 
+//Gibt an, ob mehrere Pruefungen zur selben Zeit im selben Raum stattfinden duerfen
+define('CIS_PRUEFUNGSANMELDUNG_ERLAUBE_TERMINKOLLISION', true);
+
 //Gibt an, wie viele Semester aus der Vergangenheit unter Meine LV angezeigt werden
 define('CIS_MEINELV_ANZAHL_SEMESTER_PAST', 3);
 
@@ -245,4 +250,8 @@ define('CIS_LVMENUE_CUTLENGTH', 21);
 
 // Gibt an, auf welche Seite TicketIds ala #1234 im Jahresplan verlinkt werden zB zur Verlinkung in Bugtracker
 define('JAHRESPLAN_TICKET_LINK','https://bug.technikum-wien.at/otrs/index.pl?Action=AgentTicketZoom;TicketNumber=');
+
+//Gibt an ob der Block zu Verplanung in geteilter Arbeitszeit bei den Zeitwünschen angezeigt wird. Default: false
+define('CIS_ZEITWUNSCH_GD', false);
+
 ?>

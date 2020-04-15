@@ -85,6 +85,8 @@ function MitarbeiterVertragNeuInit(person_id, vertrag_id)
 		bezeichnung = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#bezeichnung" ));
 		anmerkung = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#anmerkung" ));
 		vertragsdatum = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#vertragsdatum" ));
+        vertragsstunden = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#vertragsstunden" ));
+        vertragsstunden_studiensemester_kurzbz = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#vertragsstunden_studiensemester_kurzbz" ));
 
 		MitarbeiterVertragNeuBetragOld = betrag;
 
@@ -94,6 +96,8 @@ function MitarbeiterVertragNeuInit(person_id, vertrag_id)
 		document.getElementById('mitarbeiter-vertrag-neu-textbox-vertrag_id').value=vertrag_id;
 		document.getElementById('mitarbeiter-vertrag-neu-textbox-anmerkung').value=anmerkung;
 		document.getElementById('mitarbeiter-vertrag-neu-box-vertragsdatum').value=vertragsdatum;
+        document.getElementById('mitarbeiter-vertrag-neu-textbox-vertragsstunden').value = vertragsstunden;
+        document.getElementById('mitarbeiter-vertrag-neu-textbox-vertragsstunden_studiensemester_kurzbz').value = vertragsstunden_studiensemester_kurzbz;
 
 	}
 	for(i in addon)

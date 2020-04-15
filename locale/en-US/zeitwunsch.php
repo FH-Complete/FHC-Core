@@ -14,7 +14,7 @@ $this->phrasen['zeitwunsch/bedeutung']='Meaning';
 $this->phrasen['zeitwunsch/hierMoechteIchUnterrichten']='I would like to teach at this time';
 $this->phrasen['zeitwunsch/hierKannIchUnterrichten']='I can teach at this time';
 $this->phrasen['zeitwunsch/nurInNotfaellen']='I would prefer not to teach at this time';
-$this->phrasen['zeitwunsch/hierAufGarKeinenFall']='I can not at all teach at this time'; 
+$this->phrasen['zeitwunsch/hierAufGarKeinenFall']='I can not at all teach at this time';
 $this->phrasen['zeitwunsch/folgendePunkteSindZuBeachten']='Please note:';
 $this->phrasen['zeitwunsch/verwendenSieDenWertNur']='To make a better optimization possible, please only use the value of -2 if you really can not teach at this time.';
 $this->phrasen['zeitwunsch/sperrenSieNurTermine']='Please only mark times where you are absolutely <u>not</u> available to teach at the UAS with the numbers 1 and 2. <br/>Do <u>not</u> mark times for specific courses that you have already been assigned to teach at the UAS as unavailable.';
@@ -22,4 +22,5 @@ $this->phrasen['zeitwunsch/esSolltenFuerJedeStunde']='The amount of preferred te
 $this->phrasen['zeitwunsch/erklaerung']='Explanation';
 $this->phrasen['zeitwunsch/beiProblemenWendenSieSichAn']='If you are having problems, please contact the ';
 $this->phrasen['zeitwunsch/profil']='Profile';
+$this->phrasen['zeitwunsch/geteilteArbeitszeit']='Ich bin mit der Verplanung meiner Lehre in getrennten Blöcken am Tagesrand einverstanden.';
 ?>

@@ -11,16 +11,20 @@ class Benutzerfunktion_model extends DB_Model
 		$this->dbTable = 'public.tbl_benutzerfunktion';
 		$this->pk = 'benutzerfunktion_id';
 	}
-	
+
 	/**
 	 * Get the Benutzerfunktion using the person_id
 	 */
-	public function getByPersonId($person_id)
+	public function getActiveFunctionsByPersonId($person_id)
 	{
-		// Join with the table 
-		$this->addJoin('public.tbl_benutzer', 'uid');
-		
-		return $this->loadWhere(array('person_id' => $person_id));
+		$query = 'SELECT bf.*
+					FROM public.tbl_benutzerfunktion bf
+					JOIN public.tbl_benutzer b USING (uid)
+            WHERE b.person_id = ?
+              AND (bf.datum_von IS NULL OR bf.datum_von <= now())
+              AND (bf.datum_bis IS NULL OR bf.datum_bis >= now())';
+
+        return $this->execQuery($query, array($person_id));
 	}
 
 	/**
@@ -48,7 +52,7 @@ class Benutzerfunktion_model extends DB_Model
 
 		if (is_string($funktion_kurzbz))
 		{
-			$query .= " AND funktion_kurzbz = ".$funktion_kurzbz.")";
+			$query .= " AND funktion_kurzbz = '".$funktion_kurzbz."'";
 		}
 		elseif (is_array($funktion_kurzbz) && count($funktion_kurzbz) > 0)
 		{
@@ -104,4 +108,38 @@ class Benutzerfunktion_model extends DB_Model
 
 		return $this->execQuery($query, $parametersArray);
 	}
+
+    /**
+     * Get active Studiengangsleitung(en) of the user by UID.
+     * @param $uid
+     */
+	public function getSTGLByUID($uid)
+    {
+        $query = '
+            SELECT
+                uid,
+                oe_kurzbz,
+                studiengang_kz,
+                typ,
+                tbl_studiengang.bezeichnung
+            FROM
+                public.tbl_benutzerfunktion
+                    JOIN public.tbl_studiengang USING (oe_kurzbz)
+            WHERE
+                funktion_kurzbz = \'Leitung\'
+              AND (datum_von IS NULL OR datum_von <= now())
+              AND (datum_bis IS NULL OR datum_bis >= now())
+              AND uid = ?
+            ORDER BY
+                oe_kurzbz
+        ';
+
+        $parameters_array = array();
+        if (is_string($uid))
+        {
+            $parameters_array[] = $uid;
+        }
+
+        return $this->execQuery($query, $parameters_array);
+    }
 }

@@ -33,6 +33,7 @@ require_once('../../include/studiengang.class.php');
 require_once('../../include/dokument.class.php');
 require_once('../../include/sprache.class.php');
 require_once('../../include/organisationsform.class.php');
+require_once('../../include/datum.class.php');
 
 if (!$db = new basis_db())
 {
@@ -47,6 +48,7 @@ $vorlagestudiengang_id = (isset($_REQUEST['vorlagestudiengang_id']) ? $_REQUEST[
 $neu = (isset($_REQUEST['neu']) ? true : false);
 $templatesprache = (isset($_REQUEST['templatesprache']) ? $_REQUEST['templatesprache'] : DEFAULT_LANGUAGE);
 $orgform_template = (isset($_REQUEST['orgform_template']) ? $_REQUEST['orgform_template'] : null);
+$datum = new datum();
 
 $studiengang = new studiengang();
 $studiengang->load('0');
@@ -148,12 +150,16 @@ if(isset($_POST['speichern']) || isset($_POST['kopieren']))
 		$dokumentvorlage->new=false;
 		$dokumentvorlage->vorlagestudiengang_id = $_POST['vorlagestudiengang_id'];
 		$dokumentvorlage->version = $_POST['version'];
+		$dokumentvorlage->updateamum = date('Y-m-d H:i:s');
+		$dokumentvorlage->updatevon = $user;
 	}
 	else
 	{
 		//Neue Vorlage anlegen
 		$dokumentvorlage->new=true;
 		$dokumentvorlage->version = $_POST['version'];
+		$dokumentvorlage->insertamum = date('Y-m-d H:i:s');
+		$dokumentvorlage->insertvon = $user;
 	}
 
 	if (isset($_POST['kopieren']))
@@ -162,6 +168,8 @@ if(isset($_POST['speichern']) || isset($_POST['kopieren']))
 		$newVersion = ($newVersion->getMaxVersion($_POST['oe_kurzbz'], $_POST['vorlage_kurzbz']))+1;
 		$dokumentvorlage->new=true;
 		$dokumentvorlage->version = $newVersion;
+		$dokumentvorlage->insertamum = date('Y-m-d H:i:s');
+		$dokumentvorlage->insertvon = $user;
 	}
 
 	$studiengang = new studiengang();
@@ -466,6 +474,8 @@ else
 		$neuevorlage->archivierbar = isset($_POST['neueVorlage_archivierbar']);
 		$neuevorlage->signierbar = isset($_POST['neueVorlage_signierbar']);
 		$neuevorlage->stud_selfservice = isset($_POST['neueVorlage_stud_selfservice']);
+		$neuevorlage->insertamum = date('Y-m-d H:i:s');
+		$neuevorlage->insertvon = $user;
 		if (!($neuevorlage->saveVorlage(true)))
 		{
 			echo 'Fehler beim Speichern';
@@ -491,6 +501,16 @@ else
 		$updatevorlage->archivierbar = isset($_POST['updateVorlage_archivierbar']);
 		$updatevorlage->signierbar = isset($_POST['updateVorlage_signierbar']);
 		$updatevorlage->stud_selfservice = isset($_POST['updateVorlage_stud_selfservice']);
+		if (isset ($_POST['updateVorlage_kopieren']))
+		{
+			$updatevorlage->insertamum = date('Y-m-d H:i:s');
+			$updatevorlage->insertvon = $user;
+		}
+		else
+		{
+			$updatevorlage->updateamum = date('Y-m-d H:i:s');
+			$updatevorlage->updatevon = $user;
+		}
 		if (!($updatevorlage->saveVorlage((isset ($_POST['updateVorlage_kopieren']) ? true : false))))
 		{
 			echo 'Fehler beim Speichern';
@@ -676,7 +696,7 @@ if($vorlage_kurzbz!='' || $oe_kurzbz!='')
 					<th>Version</th>
 					<th>Berechtigung</th>
 					<th>Anmerkung</th>
-					<th>Aktiv</th>
+					<th>Aktualisiert</th>
 					<th colspan="2"></th>
 				</tr>
 				</thead>
@@ -688,9 +708,33 @@ if($vorlage_kurzbz!='' || $oe_kurzbz!='')
 		$vorlage->loadVorlage($row->vorlage_kurzbz);
 		$vorlage_bezeichnung = ($vorlage->bezeichnung==''?$vorlage->vorlage_kurzbz:$vorlage->bezeichnung);
 		$style='';
+		$insertdata='-';
 		if ($oe->aktiv==false)
 			$style='style="text-decoration: line-through"';
 
+		if ($row->updateamum != '' && $row->updateamum > $row->insertamum)
+		{
+			if ($row->updatevon != '')
+			{
+				$insertdata = 'Am '.$datum->formatDatum($row->updateamum, 'd.m.Y H:i:s').' von '.$row->updatevon;
+			}
+			else
+			{
+				$insertdata = 'Am '.$datum->formatDatum($row->updateamum, 'd.m.Y H:i:s');
+			}
+		}
+		elseif ($row->insertamum != '')
+		{
+			if ($row->insertvon != '')
+			{
+				$insertdata = 'Am '.$datum->formatDatum($row->insertamum, 'd.m.Y H:i:s').' von '.$row->insertvon;
+			}
+			else
+			{
+				$insertdata = 'Am '.$datum->formatDatum($row->insertamum, 'd.m.Y H:i:s');
+			}
+
+		}
 		echo '
 			<tr '.($row->aktiv==false?'style="color:grey"':'').'>
 				<td>'.$db->convert_html_chars($vorlage_bezeichnung).'</td>
@@ -699,7 +743,7 @@ if($vorlage_kurzbz!='' || $oe_kurzbz!='')
 				<td>'.$db->convert_html_chars($row->version).'</td>
 				<td>'.$db->convert_html_chars($row->berechtigung).'</td>
 				<td>'.$db->convert_html_chars($row->anmerkung_vorlagestudiengang).'</td>
-				<td>'.($row->aktiv==false?'inaktiv':'aktiv').'</td>
+				<td>'.$insertdata.'</td>
 				<td><a href="'.$_SERVER['PHP_SELF'].'?vorlagestudiengang_id='.$row->vorlagestudiengang_id.'&vorlage_kurzbz='.$vorlage_kurzbz.'&oe_auswahl='.$oe_auswahl.'">Edit</a></td>
 				<td><a href="'.$_SERVER['PHP_SELF'].'?vorlagestudiengang_id='.$row->vorlagestudiengang_id.'&vorlage_kurzbz='.$vorlage_kurzbz.'&oe_auswahl='.$oe_auswahl.'&delete" onclick="return confdel(\''.$vorlage_bezeichnung.'\',\''.$row->version.'\')">Delete</a></td>
 

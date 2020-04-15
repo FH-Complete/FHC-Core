@@ -9,11 +9,13 @@ define('DEFAULT_LEHREINHEIT_LEHRFORM','UE');
 // Defaul Trennzeichen fuer E-Mail Empfaenger wenn nicht ueber Variablen ueberschrieben
 define('DEFAULT_EMAILADRESSENTRENNZEICHEN',',');
 
+// Gibt an ob neue Mitarbeiter per default fixangestellt sind oder nicht
+define('DEFAULT_MITARBEITER_FIXANGESTELLT', true);
+
 //Anzeigeoptionen für Lehrveranstaltungen im CIS
 define('CIS_LEHRVERANSTALTUNG_NEWSGROUPS_ANZEIGEN',true);
 define('CIS_LEHRVERANSTALTUNG_FEEDBACK_ANZEIGEN',true);
 define('CIS_LEHRVERANSTALTUNG_DOWNLOAD_ANZEIGEN',true);
-define('CIS_LEHRVERANSTALTUNG_UEBUNGSTOOL_ANZEIGEN',true);
 define('CIS_LEHRVERANSTALTUNG_PINBOARD_ANZEIGEN',true);
 define('CIS_LEHRVERANSTALTUNG_MAILSTUDIERENDE_ANZEIGEN',true);
 define('CIS_LEHRVERANSTALTUNG_STUDENTENUPLOAD_ANZEIGEN',true);
@@ -49,6 +51,9 @@ define('CIS_LVALISTE_NOTENEINGABE_ANZEIGEN',true);
 
 // Anzeige des LV-Plan Links bei globaler Suche
 define('CIS_SUCHE_LVPLAN_ANZEIGEN',true);
+
+// Anzeige des Links zum Profil von Personen bei globaler Suche
+define('CIS_SUCHE_PROFIL_ANZEIGEN',true);
 
 // Soll geprueft werden ob das Passwort innerhalb des letzten Jahres geaendert wurde true|false
 // Wenn dies nicht geaendert wurde wird nach dem Login auf die Passwort aendern Seite umgeleitet
@@ -93,12 +98,22 @@ define('FAS_GESAMTNOTE_PRUEFUNGSHONORAR',false);
 // Aus Datenschutzgründen ist dies per default deaktiviert
 define('CIS_GESAMTNOTE_FREIGABEMAIL_NOTE', false);
 
+// Gibt an ob in der Notenliste der Studierenden nur offizielle Noten oder alle angezeigt werden
+define('CIS_NOTENLISTE_OFFIZIELL_ANZEIGEN', false);
+
+// Gibt an ob in der Notenliste der Durchschnitt und der gewichtete Durchschnitt angezeigt werden
+define('CIS_NOTENLISTE_DURCHSCHNITT_ANZEIGEN', true);
+
 // Grenzwerte für Anwesenheit
 define('FAS_ANWESENHEIT_ROT', 70);
 define('FAS_ANWESENHEIT_GELB', 90);
 
 // Legt einen Prüfungstermin an wenn eine neue Note erfasst wird
 define('FAS_PRUEFUNG_BEI_NOTENEINGABE_ANLEGEN',false);
+
+// Legt fest ob die Uebernahme der Reihungstestpunkte im FAS moeglich ist
+// true | false
+define('FAS_REIHUNGSTEST_PUNKTEUEBERNAHME', true);
 
 // Legt fest ob bei der Uebernahme der Reihungstestpunkte die Punkte
 //oder Prozentpunkte uebernommen werden true=Punkte, false=Prozentpunkte
@@ -117,12 +132,26 @@ define('FAS_UDF', true);
 // Legt fest ob Aufnahmegruppen bei Reihungstests verwaltet werden true|false
 define('FAS_REIHUNGSTEST_AUFNAHMEGRUPPEN',false);
 
+// Legt fest, ob Vertragsdetails zum Lehrauftrag im Reiter LektorInnenzuteilung angezeigt werden
+define('FAS_LV_LEKTORINNENZUTEILUNG_VERTRAGSDETAILS_ANZEIGEN', false);
+
+// Legt fest ob bei Fixangestellten Lektoren der Stundensatz vorgeschlagen wird
+define('FAS_LV_LEKTORINNENZUTEILUNG_FIXANGESTELLT_STUNDENSATZ', true);
+
+// Gibt an, ob/ab welchen Studiensemester eine zusätzliche Vertragspruefung der Lektoren erfolgt.
+// Ab diesem Semester wird die Lektorenzuordnung nur angezeigt wenn ein erteilter Vertrag vorhanden ist
+define('CIS_LV_LEKTORINNENZUTEILUNG_VERTRAGSPRUEFUNG_VON', '');
+
+// Legt fest, ob Vertragsdetails zum Projektauftrag im Reiter Projektarbeit angezeigt werden
+define('FAS_STUDIERENDE_PROJEKTARBEIT_VERTRAGSDETAILS_ANZEIGEN', false);
+
 // Anzeigeoptionen für LV-Plan Menü
 define('CIS_LVPLAN_EXPORT_ANZEIGEN',true);
 define('CIS_LVPLAN_PERSONENAUSWAHL_ANZEIGEN',true);
 define('CIS_LVPLAN_LEHRVERBANDAUSWAHL_ANZEIGEN',true);
 define('CIS_LVPLAN_ARCHIVAUSWAHL_ANZEIGEN',true);
 define('CIS_LVPLAN_ZUSATZMENUE_ANZEIGEN',true);
+define('CIS_LVPLAN_SAALPLAN_ANZEIGEN',true);
 
 //Anmerkung bei Unterrichtseinheiten im LV-Plan anzeigen. Anmerkungen bei LV-Plan Sync mitkopieren.
 define('LVPLAN_ANMERKUNG_ANZEIGEN',true);
@@ -189,6 +218,9 @@ define('SET_UID_AS_PERSONENKENNZEICHEN',false);
 // Legt fest ob fuer Studierende eine Alias EMail Adresse generiert wird (true|false)
 define('GENERATE_ALIAS_STUDENT',true);
 
+// gibt an ob beim Anlegen von Mitarbeitern ein Alias generiert wird.
+define('GENERATE_ALIAS_MITARBEITERIN',true);
+
 // Wie viele Tage nach Semesterstart soll bei der Neuanlage von Studierenden noch das aktuelle Semester vorgeschlagen werden.
 define('VILESCI_PERSON_NEU_STUDIENSEMESTER_UEBERGANGSFRIST',30);
 
@@ -230,6 +262,10 @@ define('FAS_KONTO_SHOW_CREDIT_POINTS','false');
 // Bei "default" wird der Standard-Stundensatz des Lektors (aus tbl_mitarbeiter) ermittelt, und dieser eingetragen.
 // Wenn numerisch, wird dieser Wert bei allen LektorInnen eingetragen.
 // Wenn nicht definiert, wird der Stundensatz des Vorjahres übernommen.
+// Bei "nachbeschaeftigungsart" wird
+//      bei echten Dienstvertraegen mit voller inkludierter Lehre (-1) der Stundensatz auf null gesetzt
+//      bei echten Dienstvertraegen mit teilweise oder nicht inkludierter Lehre der Default Stundensatz gesetzt
+//      bei sonstigen Dienstvertraegen der Default Stundensatz gesetzt
 define('VILESCI_STUNDENSATZ_VORRUECKUNG', '');
 
 // Wenn true, werden die Content-Aufrufe des CIS in der tbl_webservicelog mitgeloggt. Zuvor manuell einen neuen Webservicetyp "content" anlegen!
@@ -238,7 +274,7 @@ define('LOG_CONTENT', false);
 // ContentID of default content-template for reports. New contents will be childs of this.
 define('REPORT_CONTENT_TEMPLATE', '');
 
-// Schwund in %, der bei Arbeitsplätzen herausgerechnet werden soll. 
+// Schwund in %, der bei Arbeitsplätzen herausgerechnet werden soll.
 // zB 5. Dann werden bei 20 Plätzen 5% Schwund herausgerechnet und nur 19 Plätze zurückgegeben
 define('REIHUNGSTEST_ARBEITSPLAETZE_SCHWUND', 0);
 
@@ -252,8 +288,4 @@ define('STATUSGRUND_ID_EINSTIEG_SOMMERSEMESTER', null);
 
 // Studiengangs_kz des Studiengangs "Qualifikationskurse". Der Studiengang hat eine Sonderstellung zB für das Bewerbungstool.
 define('STUDIENGANG_KZ_QUALIFIKATIONKURSE', null);
-
-// EinsteigerInnen ins Sommersemester werden mit einem Statusgrund versehen.
-// Die ID dieses Statusgrundes kann hier eingegeben werden. Es wird zB vom Infocenter-Tool gesetzt und im Bewerbungstool abgefragt
-define('STATUSGRUND_ID_EINSTIEG_SOMMERSEMESTER', null);
 ?>

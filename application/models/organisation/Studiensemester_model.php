@@ -13,6 +13,22 @@ class Studiensemester_model extends DB_Model
 		$this->hasSequence = false;
 	}
 
+	// Get next study semester
+	public function getNext()
+    {
+        $query = '
+            SELECT *
+            FROM
+                public.tbl_studiensemester
+            WHERE
+                start > now()
+            ORDER BY start
+            LIMIT 1;
+        ';
+
+        return $this->execQuery($query);
+    }
+
 	/**
 	 * getLastOrAktSemester
 	 */
@@ -61,12 +77,32 @@ class Studiensemester_model extends DB_Model
 						 start,
 						 ende
 					FROM public.tbl_studiensemester
-				   WHERE start > (
+				   WHERE start >= (
 									SELECT ende
 									  FROM public.tbl_studiensemester
 									 WHERE studiensemester_kurzbz = ?
 								)
 				ORDER BY start
+				   LIMIT 1';
+
+		return $this->execQuery($query, array($studiensemester_kurzbz));
+	}
+
+	/**
+	 * getPreviousFrom
+	 */
+	public function getPreviousFrom($studiensemester_kurzbz)
+	{
+		$query = 'SELECT studiensemester_kurzbz,
+						 start,
+						 ende
+					FROM public.tbl_studiensemester
+				   WHERE ende <= (
+									SELECT start
+									  FROM public.tbl_studiensemester
+									 WHERE studiensemester_kurzbz = ?
+								)
+				ORDER BY start DESC
 				   LIMIT 1';
 
 		return $this->execQuery($query, array($studiensemester_kurzbz));

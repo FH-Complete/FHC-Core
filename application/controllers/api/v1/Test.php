@@ -5,7 +5,7 @@ if (! defined('BASEPATH')) exit('No direct script access allowed');
 /**
  * Testing class for REST calls and authentication
  */
-class Test extends REST_Controller
+class Test extends RESTFul_Controller
 {
     public function __construct()
     {

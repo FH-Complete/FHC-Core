@@ -53,6 +53,15 @@ class reihungstest extends basis_db
 	public $anmeldefrist;    //date
 	public $aufnahmegruppe_kurzbz; // varchar(32)
 
+	public $rt_person_id; // integer
+	public $rt_id;  // integer
+	public $person_id; // integer
+	public $studienplan_id; // integer
+	public $anmeldedatum; // date
+	public $teilgenommen; // boolean
+	public $punkte; // numeric
+
+
 	/**
 	 * Konstruktor
 	 * @param int $reihungstest_id ID der Adresse die geladen werden soll (Default=null).

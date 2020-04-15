@@ -32,7 +32,7 @@
  */
 class File_Match
 {
-    
+
     // {{{ Properties (All private)
 
     var $find;
@@ -61,7 +61,7 @@ class File_Match
      *                                          feature only works with the "normal" search.
      *
      */
-    function File_Match($find, $files, $directories = '', $include_subdir = 1, $ignore_lines = array())
+    function __construct($find, $files, $directories = '', $include_subdir = 1, $ignore_lines = array())
     {
 
         $this->find            = $find;
@@ -309,7 +309,7 @@ class File_Match
 
         $file       = fread($fp = fopen($filename, 'r'), filesize($filename));
 	fclose($fp);
-        $this->occurences       = preg_match($this->find, $file, $this->match); 
+        $this->occurences       = preg_match($this->find, $file, $this->match);
     }
 
     // }}}
@@ -342,7 +342,7 @@ class File_Match
 
     // }}}
     // {{{ writeout()
-    
+
     /**
      * Function to writeout the file contents.
      *
@@ -430,7 +430,7 @@ class File_Match
 
     // }}}
     // {{{ doFind()
-    
+
     /**
      * This starts the search/replace off. Call this to do the search.
      * First do whatever files are specified, and/or if directories are specified,
@@ -447,7 +447,7 @@ class File_Match
             if ($this->directories != '')                                                   $this->doDirectories($this->find_function);
         }
     }
-    
+
     // }}}
 
 }

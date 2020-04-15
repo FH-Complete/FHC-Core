@@ -404,7 +404,7 @@ class mitarbeiter extends benutzer
 	 */
 	public function getMitarbeiterStg($lektor=true,$fixangestellt, $stge, $fkt_kurzbz, $order='studiengang_kz, nachname, vorname, kurzbz', $datum_von='', $datum_bis='')
 	{
-		$sql_query='SELECT DISTINCT campus.vw_mitarbeiter.*, studiengang_kz FROM campus.vw_mitarbeiter
+		$sql_query='SELECT DISTINCT campus.vw_mitarbeiter.*, studiengang_kz, tbl_studiengang.typ, tbl_studiengang.kurzbz AS stg_kurzbz FROM campus.vw_mitarbeiter
 					JOIN public.tbl_benutzerfunktion USING (uid) JOIN public.tbl_studiengang USING(oe_kurzbz)
 					WHERE true';
 		if(!is_null($lektor))
@@ -833,7 +833,9 @@ class mitarbeiter extends benutzer
 	 */
 	public function getMitarbeiterFilter($filter)
 	{
-		$qry = "SELECT * FROM campus.vw_mitarbeiter WHERE lower(nachname) ~* lower(".$this->db_add_param($filter).") OR uid ~* ".$this->db_add_param($filter).';';
+		$qry = "SELECT * FROM campus.vw_mitarbeiter WHERE lower(nachname) ~* lower(".$this->db_add_param($filter).") OR uid ~* ".$this->db_add_param($filter);
+		$qry .= " ORDER BY nachname, vorname, kurzbz;";
+
 		if($this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object())
@@ -865,7 +867,7 @@ class mitarbeiter extends benutzer
 	 * Nachname, Vorname, UID $filter enthaelt
 	 * @param $filter
 	 */
-	public function search($filter, $limit=null, $aktiv=true)
+	public function search($filter, $limit=null, $aktiv=true, $positivePersonalnr=false)
 	{
 		$qry = "SELECT vorname, nachname, titelpre, titelpost, kurzbz, vornamen, uid
 			FROM campus.vw_mitarbeiter
@@ -880,7 +882,6 @@ class mitarbeiter extends benutzer
 		if(!is_null($limit) && is_numeric($limit))
 			$qry.=" LIMIT ".$limit;
 
-		//echo $qry;
 		if($this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object())
@@ -1117,17 +1118,17 @@ class mitarbeiter extends benutzer
 				$oe.=$this->db_add_param($row->oe_kurzbz);
 			}
 		}
-	
+
 		// Kinder-Organisationseinheiten holen
 		if ($include_OE_childs == true)
 		{
 			if (!empty($oe))
 			{
 				$child_oe_arr = array();	// array of string child oes
-				
+
 				$qry = '
-					WITH RECURSIVE 
-						oes (oe_kurzbz, oe_parent_kurzbz) AS 
+					WITH RECURSIVE
+						oes (oe_kurzbz, oe_parent_kurzbz) AS
 						(
 							SELECT
 								oe_kurzbz,
@@ -1139,11 +1140,11 @@ class mitarbeiter extends benutzer
 
 							UNION ALL
 
-							SELECT 
+							SELECT
 								o.oe_kurzbz,
 								o.oe_parent_kurzbz
 							FROM
-								public.tbl_organisationseinheit o, oes 
+								public.tbl_organisationseinheit o, oes
 							WHERE
 								o.oe_parent_kurzbz = oes.oe_kurzbz
 						)
@@ -1155,39 +1156,39 @@ class mitarbeiter extends benutzer
 						oe_kurzbz';
 
 				if($this->db_query($qry))
-				{			
+				{
 					while($row = $this->db_fetch_object())
 					{
 						$child_oe_arr []= $this->db_add_param($row->oe_kurzbz);
 					}
 				}
-			
+
 				// eliminate duplicates
 				$child_oe_arr = array_unique($child_oe_arr);
-				
+
 				// check if leader has child oes by comparing the original
 				// string of oes with string of child oes.
 				if ($oe == implode(',', $child_oe_arr))
 				{
 					$this->result ['isIndirectSupervisor']= false;
-				}	
+				}
 				else
 				{
 					$this->result ['isIndirectSupervisor']= true;
 				}
-					
+
 				// overwrite $oe with child oes for further query
 				$oe = implode(',', $child_oe_arr);
-			}	
+			}
 		}
-		
+
 
 		//Alle Personen holen die dieser Organisationseinheit untergeordnet sind
 		$qry = "
-			SELECT distinct 
-				uid 
-			FROM 
-				public.tbl_benutzerfunktion 
+			SELECT distinct
+				uid
+			FROM
+				public.tbl_benutzerfunktion
 			JOIN
 				public.tbl_benutzer
 			USING (uid)
@@ -1198,12 +1199,9 @@ class mitarbeiter extends benutzer
 
 		$qry.=")) ";
 
-		if($oe!='')
-			$qry.=" OR (funktion_kurzbz='ass' AND oe_kurzbz in($oe))";
-
-		$qry.= ") 
-			AND 
-				(tbl_benutzerfunktion.datum_von is null OR tbl_benutzerfunktion.datum_von<=now()) 
+		$qry.= ")
+			AND
+				(tbl_benutzerfunktion.datum_von is null OR tbl_benutzerfunktion.datum_von<=now())
 			AND
 				(tbl_benutzerfunktion.datum_bis is null OR tbl_benutzerfunktion.datum_bis>=now())
 			AND
@@ -1325,6 +1323,7 @@ class mitarbeiter extends benutzer
 		$l->gebort=$row->gebort;
 		$l->gebzeit=$row->gebzeit;
 		$l->geschlecht=$row->geschlecht;
+		$l->staatsbuergerschaft=$row->staatsbuergerschaft;
 		//$l->foto=$row->foto;
 		$l->anmerkung=$row->anmerkung;
 		$l->aktiv= $this->db_parse_bool($row->aktiv);
@@ -1490,15 +1489,15 @@ class mitarbeiter extends benutzer
 			return false;
 		}
 	}
-	
+
 	/** Check if uid is a supervisor
- * 
+ *
  * @param string $uid
  * @param string $employee_uid
  * @return boolean True if $uid is direct leader of $employee_uid.
  */
 	function check_isVorgesetzter($uid, $employee_uid)
-	{	
+	{
 		$this->getUntergebene($uid);
 		$untergebenen_arr = $this->untergebene;
 
@@ -1514,14 +1513,14 @@ class mitarbeiter extends benutzer
 		}
 	}
 	/** Check if uid is a supervisor on higher oe level
-	 * 
+	 *
 	 * @param string $uid
 	 * @param string $employee_uid
 	 * @return boolean True if $uid is indirect supervisor (leader on higher oe-level)
-	 *	of $employee_uid. 
-	 *	:NOTE: as all children oes also include the direct oe, the return value is also true when 
+	 *	of $employee_uid.
+	 *	:NOTE: as all children oes also include the direct oe, the return value is also true when
 	 *	uid is ONLY direct leader. To distinguish you might check in the calling script:
-	 *	isVorgesetzter_indirekt && isVorgesetzter --> direct leader 
+	 *	isVorgesetzter_indirekt && isVorgesetzter --> direct leader
 	 *	isVorgesetzter_indirekt && !isVorgesetzter --> only super leader on higher level
 	 */
 	function check_isVorgesetzter_indirekt($uid, $employee_uid)
@@ -1538,6 +1537,57 @@ class mitarbeiter extends benutzer
 		{
 			return false;
 		}
+	}
+
+	/**
+	 * Gibt alle Mitarbeiter zurück, die im BIS Meldungszeitraum bisgemeldet sind
+	 * @param String $stichtag BIS Meldung Stichtag
+	 * @return boolean
+	 */
+	public function getMitarbeiterBISMeldung($stichtag)
+	{
+		$datetime = new DateTime($stichtag);
+		$bismeldung_jahr = $datetime->format('Y');
+
+		$qry = '
+			SELECT DISTINCT ON (UID) *,
+			transform_geschlecht(tbl_person.geschlecht, tbl_person.gebdatum) as geschlecht_imputiert
+			FROM
+				public.tbl_mitarbeiter
+				JOIN public.tbl_benutzer ON(mitarbeiter_uid=uid)
+				JOIN public.tbl_person USING(person_id)
+				JOIN bis.tbl_bisverwendung USING(mitarbeiter_uid)
+				JOIN bis.tbl_beschaeftigungsausmass USING(beschausmasscode)
+			WHERE
+				bismelden
+				AND personalnummer > 0
+				AND (beginn <= make_date('. $this->db_add_param($bismeldung_jahr). '::INTEGER, 12, 31) OR beginn is null)
+				AND (tbl_bisverwendung.ende is NULL OR tbl_bisverwendung.ende >= make_date('. $this->db_add_param($bismeldung_jahr). '::INTEGER, 1, 1))
+			ORDER BY uid, nachname, vorname
+		';
+
+		if($result = $this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object($result))
+			{
+				$obj = new StdClass();
+
+				$obj->uid = $row->uid;
+				$obj->vorname = $row->vorname;
+				$obj->vornamen = $row->vornamen;
+				$obj->nachname = $row->nachname;
+				$obj->gebdatum = $row->gebdatum;
+				$obj->geschlecht = $row->geschlecht;
+				$obj->geschlechtX = $row->geschlecht_imputiert;
+				$obj->staatsbuergerschaft = $row->staatsbuergerschaft;
+				$obj->personalnummer = $row->personalnummer;
+				$obj->ausbildungcode = $row->ausbildungcode;
+
+				$this->result []= $obj;
+			}
+			return true;
+		}
+		return false;
 	}
 
 }

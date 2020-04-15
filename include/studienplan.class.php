@@ -902,7 +902,7 @@ class studienplan extends basis_db
 	 * @param type $tudienplan_lehrveranstaltung_id
 	 * @param type $sort
 	 */
-	function saveSortierung($studienplan_lehrveranstaltung_id, $sort)
+	function saveSortierung($studienplan_lehrveranstaltung_id = null, $sort = null)
 	{
 		if($studienplan_lehrveranstaltung_id==NULL)
 			$studienplan_lehrveranstaltung_id = $this->studienplan_lehrveranstaltung_id;
@@ -1182,10 +1182,10 @@ class studienplan extends basis_db
 					public.tbl_studiensemester ON (tbl_studienordnung.gueltigvon = tbl_studiensemester.studiensemester_kurzbz)
 				WHERE
 					1=1";
-				
+
 			if ($aktiv != '' && ($aktiv == true || $aktiv == false))
 				$qry.=" AND tbl_studienplan.aktiv=".$this->db_add_param($aktiv, FHC_BOOLEAN);
-			
+
 			if ($gueltigInStudiensemester != '')
 				$qry.=" AND tbl_studienplan_semester.studiensemester_kurzbz=".$this->db_add_param($gueltigInStudiensemester);
 

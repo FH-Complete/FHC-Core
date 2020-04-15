@@ -110,8 +110,19 @@ foreach($addon_obj->result as $addon)
 				sort="rdf:http://www.technikum-wien.at/vertragdetails/rdf#lehreinheit_id" />
 			<splitter class="tree-splitter"/>
 			<treecol id="mitarbeiter-vertrag-tree-nichtzugeordnet-betreuerart_kurzbz" label="BetreuerartKurzbz" flex="2" hidden="true"
-				class="sortDirectionIndicator"
-				sort="rdf:http://www.technikum-wien.at/vertragdetails/rdf#betreuerart_kurzbz" />
+                class="sortDirectionIndicator"
+                 sort="rdf:http://www.technikum-wien.at/vertragdetails/rdf#betreuerart_kurzbz"/>
+            <splitter class="tree-splitter"/>
+            <treecol id="mitarbeiter-vertrag-tree-nichtzugeordnet-vertragsstunden" label="Vertragsstunden" flex="2"
+                 hidden="true"
+                 class="sortDirectionIndicator"
+                 sort="rdf:http://www.technikum-wien.at/vertragdetails/rdf#vertragsstunden"/>
+            <splitter class="tree-splitter"/>
+            <treecol id="mitarbeiter-vertrag-tree-nichtzugeordnet-vertragsstunden_studiensemester_kurzbz"
+                 label="VertragsstundenStudiensemester" flex="2" hidden="true"
+                 class="sortDirectionIndicator"
+                 sort="rdf:http://www.technikum-wien.at/vertragdetails/rdf#vertragsstunden_studiensemester_kurzbz"/>
+            <splitter class="tree-splitter"/>
 		</treecols>
 
 		<template>
@@ -127,6 +138,8 @@ foreach($addon_obj->result as $addon)
 						<treecell label="rdf:http://www.technikum-wien.at/vertragdetails/rdf#projektarbeit_id"/>
 						<treecell label="rdf:http://www.technikum-wien.at/vertragdetails/rdf#lehreinheit_id"/>
 						<treecell label="rdf:http://www.technikum-wien.at/vertragdetails/rdf#betreuerart_kurzbz"/>
+                        <treecell label="rdf:http://www.technikum-wien.at/vertragdetails/rdf#vertragsstunden"/>
+                        <treecell label="rdf:http://www.technikum-wien.at/vertragdetails/rdf#vertragsstunden_studiensemester_kurzbz"/>
 					</treerow>
 				</treeitem>
 			</treechildren>
@@ -181,6 +194,28 @@ foreach($addon_obj->result as $addon)
 						<spacer />
 					</hbox>
 				</row>
+                <?php if (!empty($vertrag_id))
+                {
+                    echo '
+                        <row>
+                            <label value="Stunden (Vertrags-Urfassung)" control="mitarbeiter-vertrag-neu-textbox-vertragsstunden"/>
+                            <hbox>
+                                <textbox id="mitarbeiter-vertrag-neu-textbox-vertragsstunden" value="" disabled = "true"  size="10"/>
+                                <spacer/>
+                            </hbox>
+                        </row>
+                        <row>
+                            <label value="Studiensemester (Vertrags-Urfassung)"
+                                   control="mitarbeiter-vertrag-neu-textbox-vertragsstunden_studiensemester_kurzbz"/>
+                            <hbox>
+                                <textbox id="mitarbeiter-vertrag-neu-textbox-vertragsstunden_studiensemester_kurzbz"
+                                         value="" disabled = "true" size="10" />
+                                <spacer/>
+                            </hbox>
+                        </row>
+                    ';
+                }
+                ?>
 				<row>
 					<label value="Anmerkung" control="mitarbeiter-vertrag-neu-textbox-anmerkung" />
 					<textbox id="mitarbeiter-vertrag-neu-textbox-anmerkung" value="" size="100" multiline="true"/>

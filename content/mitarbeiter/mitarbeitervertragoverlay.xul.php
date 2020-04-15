@@ -117,6 +117,14 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 						class="sortDirectionIndicator"
 						sort="rdf:http://www.technikum-wien.at/vertrag/rdf#vertragsdatum_iso" />
 					<splitter class="tree-splitter"/>
+                    <treecol id="mitarbeiter-vertrag-tree-vertragsstunden" label="Vertragsstunden" flex="2" hidden="true"
+                             class="sortDirectionIndicator"
+                             sort="rdf:http://www.technikum-wien.at/vertrag/rdf#vertragsstunden" />
+                    <splitter class="tree-splitter"/>
+                    <treecol id="mitarbeiter-vertrag-tree-vertragsstunden_studiensemester_kurzbz" label="VertragsstundenStudiensemester" flex="2" hidden="true"
+                             class="sortDirectionIndicator"
+                             sort="rdf:http://www.technikum-wien.at/vertrag/rdf#vertragsstunden_studiensemester_kurzbz" />
+                    <splitter class="tree-splitter"/>
 				</treecols>
 
 				<template>
@@ -131,6 +139,8 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 								<treecell label="rdf:http://www.technikum-wien.at/vertrag/rdf#vertragstyp_kurzbz"/>
 								<treecell label="rdf:http://www.technikum-wien.at/vertrag/rdf#vertrag_id"/>
 								<treecell label="rdf:http://www.technikum-wien.at/vertrag/rdf#vertragsdatum_iso"/>
+                                <treecell label="rdf:http://www.technikum-wien.at/vertrag/rdf#vertragsstunden"/>
+                                <treecell label="rdf:http://www.technikum-wien.at/vertrag/rdf#vertragsstunden_studiensemester_kurzbz"/>
 							</treerow>
 						</treeitem>
 					</treechildren>

@@ -35,32 +35,32 @@ $uid = get_uid();
 $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($uid);
 
-define("anzahlSemester","10"); 
+define("anzahlSemester","10");
 $buchstabenArray = array('A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','Ä','Ö','Ü');
 
-$studiengang = new studiengang(); 
+$studiengang = new studiengang();
 $studiengang->getAll('typ, bezeichnung', true);
 $studiengang_array = array();
 
-$fotostatus = new fotostatus(); 
+$fotostatus = new fotostatus();
 $fotostatus->getAllStatusKurzbz();
 
 $mails = array();
 $variable = new variable();
 $variable->loadVariables($uid);
-	
+
 $statusStudent=(isset($_REQUEST['select_statusStudent'])?$_REQUEST['select_statusStudent']:null);
 $statusMitarbeiter=(isset($_REQUEST['select_statusMitarbeiter'])?$_REQUEST['select_statusMitarbeiter']:null);
 $typMitarbeiter =(isset($_REQUEST['select_typ_mitarbeiter'])?$_REQUEST['select_typ_mitarbeiter']:null);
 $studiengang_kz=(isset($_REQUEST['select_studiengang'])?$_REQUEST['select_studiengang']:null);
-$semester=(isset($_REQUEST['select_semester'])?$_REQUEST['select_semester']:null);   
+$semester=(isset($_REQUEST['select_semester'])?$_REQUEST['select_semester']:null);
 $buchstabe=(isset($_REQUEST['select_buchstabe'])?$_REQUEST['select_buchstabe']:null);
 $studSemArray=(isset($_REQUEST['select_studiensemester'])?$_REQUEST['select_studiensemester']:array());
 
 if (empty($studSemArray))
 {
 	$studiensemester = new studiensemester();
-	
+
 	$studSemArray[]=$studiensemester->getakt();
 	$studSemArray[]=$studiensemester->getPrevious();
 	$studSemArray[]=$studiensemester->getBeforePrevious();
@@ -83,15 +83,15 @@ if (empty($studSemArray))
 <script type="text/javascript" src="../../vendor/christianbach/tablesorter/jquery.tablesorter.min.js"></script>
 <script type="text/javascript" src="../../vendor/components/jqueryui/jquery-ui.min.js"></script>
 <script type="text/javascript" src="../../include/js/jquery.ui.datepicker.translation.js"></script>
-<script type="text/javascript" src="../../vendor/jquery/sizzle/sizzle.js"></script> 
+<script type="text/javascript" src="../../vendor/jquery/sizzle/sizzle.js"></script>
 	<script type="text/javascript">
-		$(document).ready(function() 
-		{ 
+		$(document).ready(function()
+		{
 			$("#myTableFiles").tablesorter(
 			{
 				sortList: [[0,0]],
 				widgets: ["zebra"]
-			}); 
+			});
 		});
 
 		function showStudiensemester()
@@ -103,10 +103,10 @@ if (empty($studSemArray))
 			document.getElementById("studiensemester_dropdown").style.display="none";
 		}
 
-		</script>	
+		</script>
 	<title>FH-Ausweis Kartenverwaltung</title>
 </head>
-<?php 
+<?php
 if(!$rechte->isBerechtigt('basis/fhausweis', 'suid'))
 	die('Sie haben keine Berechtigung für diese Seite');
 
@@ -142,7 +142,7 @@ echo '<body>
 echo'			</select></td>
 				<td>Semester:</td>
 				<td><select name="select_semester">';
-				echo '<option>alle</option>';	
+				echo '<option>alle</option>';
 				for($i = 1;$i<=anzahlSemester;$i++)
 					echo '<option '.($semester==$i?'selected':'').'>'.$i.'</option>';
 
@@ -167,7 +167,7 @@ echo'			<option value="nichtGedrucktAkzept" '.($statusStudent=='nichtGedrucktAkz
 <fieldset style="display:inline;">
 	<legend>Mitarbeitersuche</legend>
 	<form method="POST" name="form_filterMitarbeiter">
-		<div style="float: right;"> 
+		<div style="float: right;">
 			<table style="vertical-align: top" border="0" >
 				<tr style="vertical-align: top">
 					<td>Typ:</td>
@@ -218,7 +218,7 @@ if(isset($_REQUEST['btn_submitStudent']))
 	$uids = '';
 	if($semester == 'alle')
 		$semester = null;
-	
+
 	$studenten = new student();
 	$studentenArray = array();
 
@@ -246,8 +246,8 @@ if(isset($_REQUEST['btn_submitStudent']))
 	{
 		$studenten->getStudentsStudiengang($studiengang_kz, $semester);
 	}
-	$studentenArray = $studenten->result; 
-	
+	$studentenArray = $studenten->result;
+
 	echo '
 		<form method="POST" name="form_studentenkarten" action="kartezuweisen.php">
 		<table id="myTableFiles" class="tablesorter">
@@ -262,16 +262,16 @@ if(isset($_REQUEST['btn_submitStudent']))
 			</tr>
 		</thead>
 		<tbody>';
-	
+
 	if (count($studentenArray) > 0)
 	{
 		foreach($studentenArray as $stud)
 		{
 			//if($stud->studiengang_kz>10000  && $stud->studiengang_kz !='10007'  && $stud->studiengang_kz!='10004')
 				//continue;
-	
+
 			// Wenn letzter Status nicht Student ist -> nicht anzeigen
-			$prestudent = new prestudent(); 
+			$prestudent = new prestudent();
 			$prestudent->getLastStatus($stud->prestudent_id);
 			if(($prestudent->status_kurzbz == 'Student' || ($studiengang_kz=='incoming' && $prestudent->status_kurzbz='Incoming')) && array_key_exists($stud->studiengang_kz, $studiengang_array))
 			{
@@ -279,9 +279,9 @@ if(isset($_REQUEST['btn_submitStudent']))
 				{
 					// gedruckt aber noch nicht ausgegeben
 					$fotostatus = new fotostatus();
-					$fotostatus->getLastFotoStatus($stud->person_id); 
-					$betriebsmittel = new betriebsmittel(); 
-	
+					$fotostatus->getLastFotoStatus($stud->person_id);
+					$betriebsmittel = new betriebsmittel();
+
 					// status akzeptiert und noch nicht gedruckt
 					if($fotostatus->fotostatus_kurzbz == 'akzeptiert' && $betriebsmittel->zutrittskartePrinted($stud->uid) == true && $betriebsmittel->zutrittskarteAusgegeben($stud->uid) == false)
 					{
@@ -294,9 +294,9 @@ if(isset($_REQUEST['btn_submitStudent']))
 				{
 					// akzeptiert und nicht gedruckt
 					$fotostatus = new fotostatus();
-					$fotostatus->getLastFotoStatus($stud->person_id); 
-					$betriebsmittel = new betriebsmittel(); 
-	
+					$fotostatus->getLastFotoStatus($stud->person_id);
+					$betriebsmittel = new betriebsmittel();
+
 					// status akzeptiert und noch nicht gedruckt
 					if($fotostatus->fotostatus_kurzbz == 'akzeptiert' && $betriebsmittel->zutrittskartePrinted($stud->uid) == false)
 					{
@@ -309,9 +309,9 @@ if(isset($_REQUEST['btn_submitStudent']))
 				{
 					// akzeptiert und nicht gedruckt
 					$fotostatus = new fotostatus();
-					$fotostatus->getLastFotoStatus($stud->person_id); 
-					$betriebsmittel = new betriebsmittel(); 
-	
+					$fotostatus->getLastFotoStatus($stud->person_id);
+					$betriebsmittel = new betriebsmittel();
+
 					// noch nicht gedruckt
 					if($betriebsmittel->zutrittskartePrinted($stud->uid) == false)
 					{
@@ -324,8 +324,8 @@ if(isset($_REQUEST['btn_submitStudent']))
 				{
 					// letzten Status anzeigen
 					$fotostatus = new fotostatus();
-					$fotostatus->getLastFotoStatus($stud->person_id); 
-	
+					$fotostatus->getLastFotoStatus($stud->person_id);
+
 					// überprüfen ob letzer Status der gesuchte ist
 					if($fotostatus->fotostatus_kurzbz == $statusStudent)
 					{
@@ -342,7 +342,7 @@ if(isset($_REQUEST['btn_submitStudent']))
 	echo "
 		<script type=\"text/Javascript\">
 		var mails = '".implode($variable->variable->emailadressentrennzeichen,$mails)."';
-	
+
 		// ****
 		// * Teilt die Mailto Links auf kleinere Brocken auf, da der
 		// * Link nicht funktioniert wenn er zu lange ist
@@ -356,7 +356,7 @@ if(isset($_REQUEST['btn_submitStudent']))
 			var loop=true;
 			if(mails.length>2048)
 				alert('Aufgrund der großen Anzahl an Empfängern, muss die Nachricht auf mehrere E-Mails aufgeteilt werden!');
-	
+
 			while(loop)
 			{
 				if(mails.length>2048)
@@ -370,7 +370,7 @@ if(isset($_REQUEST['btn_submitStudent']))
 					loop=false;
 					mailto=mails;
 				}
-	
+
 				if(art=='to')
 					window.location.href='mailto:'+mailto;
 				else
@@ -394,27 +394,32 @@ if(isset($_REQUEST['btn_submitStudent']))
 			</tr>
 		</table>
 		</form>';
+	if(count($mails)>500)
+	{
+		printWarning();
+	}
+
 	//<input type="button" value="Karten drucken" onclick=\'window.open("../../content/zutrittskarte.php?data='.$uids.'");\'>
 
 }
 // Zeige alle Mitarbeiter an
 if(isset($_REQUEST['btn_submitMitarbeiter']))
-{	
-	$fixangestellt = true; 
+{
+	$fixangestellt = true;
 	if($_REQUEST['select_typ_mitarbeiter'] == 'extern')
-		$fixangestellt = false; 
-	
+		$fixangestellt = false;
+
 	if($_REQUEST['select_typ_mitarbeiter'] == 'extern_ohne')
 	{
 		$fixangestellt = false;
 		$studSemArray = null;
 	}
-		
-	$mitarbeiter = new mitarbeiter(); 
+
+	$mitarbeiter = new mitarbeiter();
 	$mitarbeiter->getMitarbeiterForZutrittskarte($buchstabe, $fixangestellt, $studSemArray);
 
 	$uids = '';
-	
+
 	echo '
 		<form method="POST" name="form_mitarbeiterkarten" action="kartezuweisen.php">
 		<table id="myTableFiles" class="tablesorter">
@@ -428,15 +433,15 @@ if(isset($_REQUEST['btn_submitMitarbeiter']))
 			</tr>
 		</thead>
 		<tbody>';
-	
+
 		foreach($mitarbeiter->result as $mit)
 		{
 			if($statusMitarbeiter=='gedrucktNichtAusgegeben')
 			{
 				$fotostatus = new fotostatus();
-				$fotostatus->getLastFotoStatus($mit->person_id); 
-				$betriebsmittel = new betriebsmittel(); 
-				
+				$fotostatus->getLastFotoStatus($mit->person_id);
+				$betriebsmittel = new betriebsmittel();
+
 				// status akzeptiert, gedruckt aber noch nicht ausgegeben
 				if($fotostatus->fotostatus_kurzbz == 'akzeptiert' && $betriebsmittel->zutrittskartePrinted($mit->uid) == true && $betriebsmittel->zutrittskarteAusgegeben($mit->uid) == false)
 				{
@@ -448,9 +453,9 @@ if(isset($_REQUEST['btn_submitMitarbeiter']))
 			else if($statusMitarbeiter == 'nichtGedruckt')
 			{
 				$fotostatus = new fotostatus();
-				$fotostatus->getLastFotoStatus($mit->person_id); 
-				$betriebsmittel = new betriebsmittel(); 
-				
+				$fotostatus->getLastFotoStatus($mit->person_id);
+				$betriebsmittel = new betriebsmittel();
+
 				// status akzeptiert und noch nicht gedruckt
 				if($fotostatus->fotostatus_kurzbz == 'akzeptiert' && $betriebsmittel->zutrittskartePrinted($mit->uid) == false)
 				{
@@ -462,7 +467,7 @@ if(isset($_REQUEST['btn_submitMitarbeiter']))
 			else
 			{
 				$fotostatus = new fotostatus();
-				$fotostatus->getLastFotoStatus($mit->person_id); 
+				$fotostatus->getLastFotoStatus($mit->person_id);
 
 				// überprüfen ob letzer Status der gesuchte ist
 				if($fotostatus->fotostatus_kurzbz == $statusMitarbeiter)
@@ -479,7 +484,7 @@ if(isset($_REQUEST['btn_submitMitarbeiter']))
 	echo "
 		<script type=\"text/Javascript\">
 		var mails = '".implode($variable->variable->emailadressentrennzeichen,$mails)."';
-	
+
 		// ****
 		// * Teilt die Mailto Links auf kleinere Brocken auf, da der
 		// * Link nicht funktioniert wenn er zu lange ist
@@ -493,7 +498,7 @@ if(isset($_REQUEST['btn_submitMitarbeiter']))
 			var loop=true;
 			if(mails.length>2048)
 				alert('Aufgrund der großen Anzahl an Empfängern, muss die Nachricht auf mehrere E-Mails aufgeteilt werden!');
-	
+
 			while(loop)
 			{
 				if(mails.length>2048)
@@ -507,7 +512,7 @@ if(isset($_REQUEST['btn_submitMitarbeiter']))
 					loop=false;
 					mailto=mails;
 				}
-	
+
 				if(art=='to')
 					window.location.href='mailto:'+mailto;
 				else
@@ -530,9 +535,21 @@ if(isset($_REQUEST['btn_submitMitarbeiter']))
 				</td>
 			</tr>
 		</table>
-		</form>
-		</body></html>';	
-	//<input type="button" value="Karten drucken" onclick=\'window.open("../../content/zutrittskarte.php?data='.$uids.'");\'>
+		</form>';
+	if(count($mails)>500)
+	{
+		printWarning();
 	}
-
+	echo '
+		</body></html>';
+	//<input type="button" value="Karten drucken" onclick=\'window.open("../../content/zutrittskarte.php?data='.$uids.'");\'>
+}
+function printWarning()
+{
+	echo '<div style="color:red; font-style:bold">
+		Achtung - Es sind sehr viele Einträge vorhanden. <br>
+		Dies kann Probleme bei der Kartenzuordnung verursachen.<br>
+		Verwende zur Kartenzuordnung bitte einen Studiengangsfilter
+		</div>';
+}
 ?>

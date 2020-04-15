@@ -48,12 +48,16 @@ function draw_studienerfolg($uid, $studiensemester_kurzbz)
 				tbl_person.vorname, tbl_person.nachname,tbl_person.gebdatum,
 				tbl_studiensemester.bezeichnung as sembezeichnung,
 				tbl_studiengang.english as bezeichnung_englisch,
-				tbl_studiengang.typ, tbl_studiengang.orgform_kurzbz, tbl_person.matr_nr
+				tbl_studiengang.typ, tbl_studiengang.orgform_kurzbz,
+       			tbl_studiengangstyp.bezeichnung_mehrsprachig[(SELECT index FROM public.tbl_sprache WHERE sprache='German')] as studiengangstypbezeichnung, 
+       			tbl_studiengangstyp.bezeichnung_mehrsprachig[(SELECT index FROM public.tbl_sprache WHERE sprache='English')] as studiengangstypbezeichnung_englisch, 
+       			tbl_person.matr_nr
 			FROM
-				public.tbl_person, public.tbl_student, public.tbl_studiengang, public.tbl_benutzer,
+				public.tbl_person, public.tbl_student, public.tbl_studiengang, public.tbl_studiengangstyp, public.tbl_benutzer,
 				public.tbl_studentlehrverband, public.tbl_studiensemester
 			WHERE
 				tbl_student.studiengang_kz = tbl_studiengang.studiengang_kz
+				and tbl_studiengang.typ = tbl_studiengangstyp.typ
 				and tbl_student.student_uid = tbl_benutzer.uid
 				and tbl_benutzer.person_id = tbl_person.person_id
 				and tbl_student.student_uid = ".$db->db_add_param($uid)."
@@ -68,27 +72,6 @@ function draw_studienerfolg($uid, $studiensemester_kurzbz)
 	}
 	else
 		return false;
-
-	switch($row->typ)
-	{
-		case 'b':
-			$studTyp = 'Bachelor';
-			break;
-		case 'm':
-			$studTyp = 'Master';
-			break;
-		case 'd':
-			$studTyp = 'Diplom';
-			break;
-		case 'l':
-			$studTyp = 'Lehrgang';
-			break;
-		case 'k':
-			$studTyp = 'Kurzstudium';
-			break;
-		default:
-			$studTyp ='';
-	}
 
 	$studiensemester = new studiensemester();
 	$studiensemester_aktuell = $studiensemester->getNearest();
@@ -180,7 +163,8 @@ function draw_studienerfolg($uid, $studiensemester_kurzbz)
 	$xml .= "		<studiengang_englisch><![CDATA[".$row->bezeichnung_englisch."]]></studiengang_englisch>";
 	$xml .= "		<studiengang_bezeichnung_sto><![CDATA[".$studiengang_bezeichnung_sto."]]></studiengang_bezeichnung_sto>";
 	$xml .= "		<studiengang_bezeichnung_sto_englisch><![CDATA[".$studiengang_bezeichnung_sto_englisch."]]></studiengang_bezeichnung_sto_englisch>";
-	$xml .= "		<studiengang_typ>".$studTyp."</studiengang_typ>";
+	$xml .= "		<studiengang_typ>".$row->studiengangstypbezeichnung."</studiengang_typ>";
+	$xml .= "		<studiengang_typ_englisch>".$row->studiengangstypbezeichnung_englisch."</studiengang_typ_englisch>";
 	$xml .= "		<studiengang_kz>".$studiengang_kz."</studiengang_kz>";
 	$xml .= "		<titelpre><![CDATA[".$row->titelpre."]]></titelpre>";
 	$xml .= "		<titelpost><![CDATA[".$row->titelpost."]]></titelpost>";
@@ -249,10 +233,10 @@ function draw_studienerfolg($uid, $studiensemester_kurzbz)
 				$xml .= "				<note_idx>".$row->note."</note_idx>";
 				$xml .= "				<note_positiv>".$row->note_positiv."</note_positiv>";
 				$sws = sprintf('%.1F',$row->semesterstunden/$wochen);
-				$xml .= "				<sws>".$sws."</sws>";
+				$xml .= "				<sws>".number_format($sws,2)."</sws>";
 				$sws_lv = sprintf('%.1F',$row->sws);
-				$xml .= "				<sws_lv>".$sws_lv."</sws_lv>";
-				$xml .= "				<ects>".$row->ects."</ects>";
+				$xml .= "				<sws_lv>".number_format($sws_lv,2)."</sws_lv>";
+				$xml .= "				<ects>".number_format($row->ects,2)."</ects>";
 				$xml .= "				<lehrform><![CDATA[".$row->lv_lehrform_kurzbz."]]></lehrform>";
 				if($row->benotungsdatum!='')
 					$xml .= "				<benotungsdatum>".date('d.m.Y',$datum->mktime_fromtimestamp($row->benotungsdatum))."</benotungsdatum>";
@@ -298,10 +282,10 @@ function draw_studienerfolg($uid, $studiensemester_kurzbz)
 
 	$xml .= "		<gesamtstunden>".$gesamtstunden."</gesamtstunden>";
 	$xml .= "		<gesamtstunden_positiv>".$gesamtstunden_positiv."</gesamtstunden_positiv>";
-	$xml .= "		<gesamtstunden_lv>".$gesamtstunden_lv."</gesamtstunden_lv>";
-	$xml .= "		<gesamtstunden_lv_positiv>".$gesamtstunden_lv_positiv."</gesamtstunden_lv_positiv>";
-	$xml .= "		<gesamtects>$gesamtects</gesamtects>";
-	$xml .= "		<gesamtects_positiv>$gesamtects_positiv</gesamtects_positiv>";
+	$xml .= "		<gesamtstunden_lv>".number_format($gesamtstunden_lv,2)."</gesamtstunden_lv>";
+	$xml .= "		<gesamtstunden_lv_positiv>".number_format($gesamtstunden_lv_positiv,2)."</gesamtstunden_lv_positiv>";
+	$xml .= "		<gesamtects>".number_format($gesamtects,2)."</gesamtects>";
+	$xml .= "		<gesamtects_positiv>".number_format($gesamtects_positiv,2)."</gesamtects_positiv>";
 	$xml .= "		<schnitt>".sprintf('%.2f',$schnitt)."</schnitt>";
 	$xml .= "		<schnitt_positiv>".sprintf('%.2f',$schnitt_positiv)."</schnitt_positiv>";
 	$xml .= "	</studienerfolg>";

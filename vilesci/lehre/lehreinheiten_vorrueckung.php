@@ -32,6 +32,7 @@ require_once('../../include/lehreinheitgruppe.class.php');
 require_once('../../include/benutzerberechtigung.class.php');
 require_once('../../include/mitarbeiter.class.php');
 require_once('../../include/gruppe.class.php');
+require_once('../../include/bisverwendung.class.php');
 
 if (!$db = new basis_db())
 	die('Es konnte keine Verbindung zum Server aufgebaut werden.');
@@ -104,7 +105,7 @@ echo '</SELECT>';
 
 echo ' Semester: <SELECT name="semester">';
 echo '<OPTION value="">-- Alle --</OPTION>';
-for ($i = 1;$i <= 8;$i++)
+for ($i = 1;$i <= 10;$i++)
 {
 	if ($semester == $i)
 		$selected = 'selected';
@@ -160,6 +161,14 @@ elseif (defined('VILESCI_STUNDENSATZ_VORRUECKUNG')
 {
 	echo '<br><span style="color: blue">
 		Alle Lehraufträge werden mit dem aktuell hinterlegten Standard-Stundensatz der/des Lehrenden vorgerückt
+	</span>';
+}
+elseif (defined('VILESCI_STUNDENSATZ_VORRUECKUNG')
+	&& VILESCI_STUNDENSATZ_VORRUECKUNG != ''
+	&& VILESCI_STUNDENSATZ_VORRUECKUNG == 'nachbeschaeftigungsart')
+{
+	echo '<br><span style="color: blue">
+		Stundensätze werden abhängig von der Beschaeftigungsart aktualisiert.
 	</span>';
 }
 else
@@ -218,6 +227,9 @@ if ($studiengang_kz != '' && $stsem_von != '' && $stsem_nach != '')
 			die ();
 		}
 	}
+
+	$stsem_nach_obj = new studiensemester();
+	$stsem_nach_obj->load($stsem_nach);
 
 	if ($result = $db->db_query($qry))
 	{
@@ -313,6 +325,38 @@ if ($studiengang_kz != '' && $stsem_von != '' && $stsem_nach != '')
 								{
 									$stundensatz = new mitarbeiter($row_lem->mitarbeiter_uid);
 									$lem_obj->stundensatz = $stundensatz->stundensatz;
+								}
+								// Wenn VILESCI_STUNDENSATZ_VORRUECKUNG nachbeschaeftigungsart ist, wird
+								// bei echten Dienstvertraegen mit voller inkludierter Lehre (-1) der Stundensatz auf null gesetzt
+								// bei echten Dienstvertraegen mit teilweise oder nicht inkludierter Lehre der Default Stundensatz gesetzt
+								// bei sonstigen Dienstvertraegen der Default Stundensatz gesetzt
+								elseif (defined('VILESCI_STUNDENSATZ_VORRUECKUNG')
+									&& VILESCI_STUNDENSATZ_VORRUECKUNG != ''
+									&& VILESCI_STUNDENSATZ_VORRUECKUNG == 'nachbeschaeftigungsart')
+								{
+									if ($lem_obj->stundensatz != '0')
+									{
+										$stundensatz = new mitarbeiter($row_lem->mitarbeiter_uid);
+										$lem_obj->stundensatz = $stundensatz->stundensatz;
+
+										$bisverwendung = new bisverwendung();
+										if(!$bisverwendung->getVerwendungRange($row_lem->mitarbeiter_uid, $stsem_nach_obj->start, $stsem_nach_obj->ende))
+										{
+											$bisverwendung->getLastAktVerwendung($row_lem->mitarbeiter_uid);
+											$bisverwendung->result[] = $bisverwendung;
+										}
+
+										foreach($bisverwendung->result as $row_verwendung)
+										{
+											// Bei echten Dienstvertraegen mit voller inkludierter Lehre wird kein Stundensatz
+											// geliefert da dies im Vertrag inkludiert ist.
+											if ($row_verwendung->ba1code == 103 && $row_verwendung->inkludierte_lehre == -1)
+											{
+												$lem_obj->stundensatz = '';
+												break;
+											}
+										}
+									}
 								}
 								$lem_obj->insertamum = date('Y-m-d H:i:s');
 								$lem_obj->insertvon = 'Vorrueckung_'.$user;

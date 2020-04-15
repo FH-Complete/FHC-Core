@@ -74,6 +74,8 @@ $strasse = filter_input(INPUT_POST, 'strasse');
 			</a>
 		</li>
 		<li><a href="datenverbund_client.php?action=getByNachname">Matrikelnummer nach Nachname suchen</a></li>
+		<li><a href="datenverbund_client.php?action=getByName">Matrikelnummer nach Nachname, Vorname, Geburtsdatum suchen</a></li>
+		<li><a href="datenverbund_client.php?action=getByMatrikelnummer">Personendaten anhand der Matrikelnummer suchen</a></li>
 		<li><a href="datenverbund_client.php?action=getReservations">Matrikelnummer Reservierungen anzeigen</a></li>
 		<li><a href="datenverbund_client.php?action=getKontingent">Matrikelnummer Kontingent anfordern</a></li>
 		<li><a href="datenverbund_client.php?action=setMatrikelnummer">Matrikelnummer Vergabe melden</a></li>
@@ -128,7 +130,14 @@ $strasse = filter_input(INPUT_POST, 'strasse');
 			printrow('nachname', 'Nachname', $nachname);
 			printrow('geburtsdatum', 'Geburtsdatum', $geburtsdatum, ' (Format: YYYYMMDD)', 8);
 			break;
-
+		case 'getByName':
+			printrow('nachname', 'Nachname', $nachname);
+			printrow('vorname', 'Vorname', $vorname);
+			printrow('geburtsdatum', 'Geburtsdatum', $geburtsdatum, ' (Format: YYYYMMDD)', 8);
+			break;
+		case 'getByMatrikelnummer':
+			printrow('matrikelnummer', 'Matrikelnummer', $matrikelnr);
+			break;
 		case 'getReservations':
 		case 'getKontingent':
 			printrow('studienjahr', 'Studienjahr', $studienjahr, 'zB 2016 (für WS2016 und SS2017)', 4);
@@ -225,6 +234,46 @@ if (isset($_REQUEST['submit']))
 
 		case 'getByNachname':
 			$data = $dvb->getMatrikelnrByNachname($_POST['nachname'], $_POST['geburtsdatum']);
+
+			if(ErrorHandler::isSuccess($data) && ErrorHandler::hasData($data))
+			{
+				if(isset($data->retval->data) && is_array($data->retval->data) && count($data->retval->data)>0)
+				{
+					echo '<br><b>Daten gefunden:</b> ';
+					var_dump($data->retval);
+				}
+				else
+				{
+					echo 'keine Einträge gefunden';
+				}
+			}
+			else
+			{
+					echo '<br><b>Matrikelnummer nicht vorhanden:</b>'.$data->errormsg;
+			}
+			break;
+		case 'getByName':
+			$data = $dvb->getMatrikelnrByName($_POST['nachname'], $_POST['vorname'], $_POST['geburtsdatum']);
+
+			if(ErrorHandler::isSuccess($data) && ErrorHandler::hasData($data))
+			{
+				if(isset($data->retval->data) && is_array($data->retval->data) && count($data->retval->data)>0)
+				{
+					echo '<br><b>Daten gefunden:</b> ';
+					var_dump($data->retval);
+				}
+				else
+				{
+					echo 'keine Einträge gefunden';
+				}
+			}
+			else
+			{
+					echo '<br><b>Matrikelnummer nicht vorhanden:</b>'.$data->errormsg;
+			}
+			break;
+		case 'getByMatrikelnummer':
+			$data = $dvb->getDataByMatrikelnr($_POST['matrikelnummer']);
 
 			if(ErrorHandler::isSuccess($data) && ErrorHandler::hasData($data))
 			{

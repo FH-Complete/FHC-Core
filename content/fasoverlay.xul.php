@@ -157,6 +157,8 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/mitarbeiter/mitarbeiteroverlay.xul
 	    <treecol id="uid" label="UID" flex="1" hidden="true"/>
 	    <splitter class="tree-splitter"/>
 	    <treecol id="studiengang_kz" label="Studiengangkz" flex="1" hidden="true"/>
+		<splitter class="tree-splitter"/>
+		<treecol id="tree-lektor-fixangestellt" label="Fixangestellt" flex="1" hidden="true"/>
 	</treecols>
 
 	<template>
@@ -170,6 +172,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/mitarbeiter/mitarbeiteroverlay.xul
 	           		<treecell properties="Lektor_rdf:http://www.technikum-wien.at/mitarbeiter/rdf#aktiv" label="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#titelpre"/>
 	           		<treecell properties="Lektor_rdf:http://www.technikum-wien.at/mitarbeiter/rdf#aktiv" label="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#uid"/>
 	           		<treecell properties="Lektor_rdf:http://www.technikum-wien.at/mitarbeiter/rdf#aktiv" label="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#studiengang_kz"/>
+					<treecell properties="Lektor_rdf:http://www.technikum-wien.at/mitarbeiter/rdf#aktiv" label="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#fixangestellt"/>
 	         	</treerow>
 	    	</treeitem>
 	    </treechildren>
@@ -225,13 +228,13 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/mitarbeiter/mitarbeiteroverlay.xul
 				</treeitem>
 				<treeitem>
 					<treerow>
-					   	<treecell label="Studiengangsleiter"/>
+					   	<treecell label="StudiengangsleiterIn"/>
 					   	<treecell label="Studiengangsleiter"/>
 					</treerow>
 				</treeitem>
 				<treeitem>
 					<treerow>
-					   	<treecell label="Institutsleiter"/>
+					   	<treecell label="InstitutsleiterIn"/>
 					   	<treecell label="Fachbereichsleiter"/>
 					</treerow>
 				</treeitem>

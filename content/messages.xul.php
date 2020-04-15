@@ -102,19 +102,19 @@ echo ']>
 			sortDirection="descending"
 			sort="rdf:http://www.technikum-wien.at/messages/rdf#insertamum"/>
 		<splitter class="tree-splitter"/>
-		<treecol id="messages-tree-sender" label="Sender" flex="2" hidden="false"
+		<treecol id="messages-tree-sender" label="SenderIn" flex="2" hidden="false"
 			class="sortDirectionIndicator"
 			sort="rdf:http://www.technikum-wien.at/messages/rdf#sender"/>
 		<splitter class="tree-splitter"/>
-		<treecol id="messages-tree-recipient" label="Empfänger" flex="2" hidden="false"
+		<treecol id="messages-tree-recipient" label="EmpfängerIn" flex="2" hidden="false"
 			class="sortDirectionIndicator"
 			sort="rdf:http://www.technikum-wien.at/messages/rdf#recipient"/>
 		<splitter class="tree-splitter"/>
-		<treecol id="messages-tree-sender_id" label="SenderID" flex="2" hidden="true"
+		<treecol id="messages-tree-sender_id" label="SenderInID" flex="2" hidden="true"
 			class="sortDirectionIndicator"
 			sort="rdf:http://www.technikum-wien.at/messages/rdf#sender"/>
 		<splitter class="tree-splitter"/>
-		<treecol id="messages-tree-recipient_id" label="EmpfängerID" flex="2" hidden="true"
+		<treecol id="messages-tree-recipient_id" label="EmpfängerInID" flex="2" hidden="true"
 			class="sortDirectionIndicator"
 			sort="rdf:http://www.technikum-wien.at/messages/rdf#recipient_id"/>
 		<splitter class="tree-splitter"/>

@@ -291,6 +291,11 @@ class lehrstunde extends basis_db
 			$this->errormsg='Fehler: LVA-ID ist nicht gesetzt';
 			return -1;
 		}
+		if ($type=='lva' && !is_numeric($lva))
+		{
+			$this->errormsg='Fehler: LVA-ID ist ungueltig';
+			return -1;
+		}
 		// Type
 		if ($type==null)
 		{
@@ -362,7 +367,7 @@ class lehrstunde extends basis_db
 			}
 			else
 			{
-				$this->errormsg=$this->db_last_error();
+				$this->errormsg = 'Fehler beim Laden der Verbaende';
 				return -2;
 			}
 			// Spezialgruppen ermitteln zu denen die Person zugeteilt ist
@@ -394,7 +399,7 @@ class lehrstunde extends basis_db
 
 			if (!$result_einheit=$this->db_query($sql_query))
 			{
-				$this->errormsg=$this->db_last_error($this->conn);
+				$this->errormsg= 'Fehler beim Laden der Gruppen';
 				return false;
 			}
 			else
@@ -424,7 +429,7 @@ class lehrstunde extends basis_db
 
 			if (!$result_einheit=$this->db_query($sql_query))
 			{
-				$this->errormsg=$this->db_last_error($this->conn);
+				$this->errormsg='Fehler beim Laden der Gruppen';
 				return false;
 			}
 			else
@@ -437,9 +442,9 @@ class lehrstunde extends basis_db
 		if ($type!='idList')
 		{
 			if($alle_unr_mitladen)
-				$sql_query_stdplan='SELECT '.$stpl_id.', datum, stunde, unr FROM '.$stpl_view;
+				$sql_query_stdplan='SELECT '.$stpl_id.', datum, stunde, unr FROM '.$stpl_view.' stplvw';
 			else
-				$sql_query_stdplan='SELECT * FROM '.$stpl_view;
+				$sql_query_stdplan='SELECT * FROM '.$stpl_view.' stplvw';
 			$sql_query_lva="";
 			$sql_query=" WHERE datum>=".$this->db_add_param($datum_von)." AND datum<".$this->db_add_param($datum_bis);
 			if ($type == 'lva')
@@ -506,6 +511,20 @@ class lehrstunde extends basis_db
 				if ($grp!='0' && $grp!=null && $grp!='')
 					$sql_query.=" AND (gruppe=".$this->db_add_param($grp)." OR gruppe IS NULL OR gruppe='0' OR gruppe='')";
 
+				// Direkte Gruppen werden ausgenommen da sonst Stunden von Verband A in der Ansicht für Verband B
+				// mit angezeigt werden weil die direkte Gruppe geladen wird.
+				$sql_query.=' AND
+					(
+						gruppe_kurzbz is null
+						OR
+						EXISTS(
+							SELECT 1 FROM public.tbl_gruppe
+							WHERE
+								gruppe_kurzbz = stplvw.gruppe_kurzbz
+								AND direktinskription=false
+							)
+					)';
+
 				$sql_query.=' )';
 
 				for ($i=0;$i<$num_rows_einheit;$i++)
@@ -547,11 +566,11 @@ class lehrstunde extends basis_db
 			$sql_query=mb_substr($sql_query,3);
 			$sql_query_stdplan.=' WHERE'.$sql_query;
 		}
-//echo $sql_query_stdplan;
+
 		//Datenbankabfrage
 		if (!$this->db_query($sql_query_stdplan))
 		{
-			$this->errormsg = $this->db_last_error();
+			$this->errormsg = 'Fehler beim Laden der Stundenplandaten';
 			return -2;
 		}
 		$stpl_tbl = $this->db_result;
@@ -599,13 +618,13 @@ class lehrstunde extends basis_db
 		if ($type!='idList' && $type!='fachbereich' && $type!='lva')
 		{
 			// Datenbankabfrage generieren
-			$sql_query_reservierung='SELECT * FROM campus.vw_reservierung';
+			$sql_query_reservierung='SELECT * FROM campus.vw_reservierung stplvw';
 			$sql_query_reservierung.=$sql_query . $sql_query_orderby;
 
 			//Datenbankabfrage
 			if (!$this->db_query($sql_query_reservierung))
 			{
-				$this->errormsg = $this->db_last_error();
+				$this->errormsg = 'Fehler beim Laden der Reservierungen';
 				return -2;
 			}
 			$stpl_tbl = $this->db_result;

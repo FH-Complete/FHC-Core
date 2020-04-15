@@ -119,7 +119,7 @@
 - **[DEPRECATED]** Spalte ort_kurzbz in tbl_reihungstest wird nicht mehr verwendet und in zukünftigen Versionen entfernt
 
 Zum Update auf diese Version folgen Sie den Anweisungen auf folgender Seite:
-http://fhcomplete.technikum-wien.at/dokuwiki/doku.php?id=fh-complete:codeigniter
+https://wiki.fhcomplete.org/doku.php?id=fh-complete:codeigniter
 
 ## [3.1.0] - 2015-11-12
 ### Added

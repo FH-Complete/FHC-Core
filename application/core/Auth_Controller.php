@@ -1,8 +1,11 @@
 <?php
 
-if (! defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Auth_Controller extends FHC_Controller
+/**
+ *
+ */
+abstract class Auth_Controller extends FHC_Controller
 {
 	/**
 	 * Extends this controller if authentication is required
@@ -13,9 +16,6 @@ class Auth_Controller extends FHC_Controller
 
 		// Loads authentication library and starts authentication
 		$this->load->library('AuthLib');
-
-		// Loads authentication helper
-		$this->load->helper('hlp_authentication');
 
 		// Checks if the caller is allowed to access to this content
 		$this->_isAllowed($requiredPermissions);

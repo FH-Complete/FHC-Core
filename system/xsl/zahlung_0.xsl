@@ -164,14 +164,9 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
 				<text:sequence-decl text:display-outline-level="0" text:name="Drawing"/>
 			</text:sequence-decls>
 			<text:p text:style-name="P11"/>
-			<text:p text:style-name="P12">Höchstädtplatz 6</text:p>
-			<text:p text:style-name="P12">1200 Wien</text:p>
 			<text:p text:style-name="P12"/>
 			<text:p text:style-name="P12">Datum: <xsl:value-of select="person/tagesdatum" /></text:p>
 			<text:p text:style-name="P12"/>
-			<text:p text:style-name="P12">www.technikum-wien.at</text:p>
-			<text:p text:style-name="P12">ZVR 074476426</text:p>
-			<text:p text:style-name="P12">DVR 0928381</text:p>
 			<text:p text:style-name="P12"/>
 			<text:p text:style-name="P12"/>
 			<text:p text:style-name="P9">
@@ -188,18 +183,6 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
 			<text:p text:style-name="P8"/>
 
 			<xsl:if test="not(buchung/rueckerstattung)">
-				<text:p text:style-name="P5">
-					Die Studiengangsleitung des <xsl:value-of select="person/studiengang_typ" />studienganges
-					<xsl:choose>
-						<xsl:when test="person/studiengang_bezeichnung_sto=''">
-							<xsl:value-of select="person/studiengang" />
-						</xsl:when>
-						<xsl:otherwise>
-							<xsl:value-of select="person/studiengang_bezeichnung_sto" />
-						</xsl:otherwise>
-					</xsl:choose>
-					bestätigt hiermit, dass
-				</text:p>
 				<text:p text:style-name="P5"/>
 			</xsl:if>
 
@@ -277,7 +260,6 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
 				<xsl:when test="not(buchung/rueckerstattung)">
 					<draw:frame draw:style-name="fr1" draw:name="Rahmen1" text:anchor-type="char" draw:z-index="1">
 						<draw:text-box fo:min-height="1cm" fo:min-width="2cm">
-							<text:p text:style-name="P7">Gilt auch ohne Unterschrift und Stempel</text:p>
 						</draw:text-box>
 					</draw:frame>
 				</xsl:when>

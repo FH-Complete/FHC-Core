@@ -19,14 +19,17 @@ class Prestudentstatus_model extends DB_Model
 	public function getLastStatus($prestudent_id, $studiensemester_kurzbz = '', $status_kurzbz = '')
 	{
 		$query = 'SELECT tbl_prestudentstatus.*,
-						 bezeichnung AS studienplan_bezeichnung,
-						 tbl_studienplan.orgform_kurzbz as orgform,
+						 tbl_studienplan.bezeichnung AS studienplan_bezeichnung,
+						 tbl_studienplan.orgform_kurzbz AS orgform,
 						 sprache,
+						 tbl_orgform.bezeichnung_mehrsprachig AS bezeichnung_orgform,
 						 tbl_status.bezeichnung_mehrsprachig,
-						 tbl_status_grund.bezeichnung_mehrsprachig as bezeichnung_statusgrund
-					FROM public.tbl_prestudentstatus LEFT JOIN lehre.tbl_studienplan USING (studienplan_id)
+						 tbl_status_grund.bezeichnung_mehrsprachig AS bezeichnung_statusgrund
+					FROM public.tbl_prestudentstatus
+						 LEFT JOIN lehre.tbl_studienplan USING (studienplan_id)
 						 JOIN public.tbl_status USING (status_kurzbz)
 						 LEFT JOIN public.tbl_status_grund USING (statusgrund_id)
+						 LEFT JOIN bis.tbl_orgform ON tbl_studienplan.orgform_kurzbz = bis.tbl_orgform.orgform_kurzbz
 				   WHERE tbl_status.status_kurzbz = tbl_prestudentstatus.status_kurzbz
 					 AND prestudent_id = ?';
 
@@ -120,7 +123,7 @@ class Prestudentstatus_model extends DB_Model
 
 		if ($lastStatus->error)
 		{
-			return error($lastStatus->retval);
+			return $lastStatus;
 		}
 
 		if (count($lastStatus->retval) > 0)
@@ -155,7 +158,7 @@ class Prestudentstatus_model extends DB_Model
 
 		if ($lastStatus->error)
 		{
-			return error($lastStatus->retval);
+			return $lastStatus;
 		}
 
 		if (count($lastStatus->retval) > 0)

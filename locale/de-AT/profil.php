@@ -29,6 +29,7 @@ $this->phrasen['profil/alleStudentenVon']='Alle StudentInnen von';
 $this->phrasen['profil/kurzbeschreibungFuerOeh']='Kurzbeschreibung für die ÖH-Kandidatur';
 $this->phrasen['profil/solltenDatenNichtStimmen']='Sollten Ihre Daten nicht stimmen, wenden Sie sich bitte an die zuständige Assistenz';
 $this->phrasen['profil/esWurdenKeineProfileGefunden']='Es wurden keine oder mehrere Profile f&uuml;r Ihren Useraccount gefunden';
+$this->phrasen['profil/keinGueltigesProfil']='Kein gültiges Profil';
 $this->phrasen['profil/adminstration']='Administration';
 $this->phrasen['profil/zustaendigeAssistenz']='zuständige Assistenz';
 $this->phrasen['profil/wendenSieSichAn']='Bitte wenden Sie sich an die';
@@ -80,4 +81,9 @@ $this->phrasen['profil/fotoAuswählen']='Klicken Sie auf das Bild um ein Foto ho
 $this->phrasen['profil/bildSpeichern']='Bild speichern';
 $this->phrasen['profil/gueltigvon']='Gültig von';
 $this->phrasen['profil/gueltigbis']='Gültig bis';
+$this->phrasen['profil/wochenstunden']='Wochenstunden';
+$this->phrasen['profil/vertragsstunden']='Vertragsstunden';
+$this->phrasen['profil/zukuenftigeFunktionen']='Zukünftige Funktionen';
+$this->phrasen['profil/notfallkontakt']='Notfallkontakt';
+$this->phrasen['profil/notfallkontaktBekanntgeben']='Bitte geben Sie einen Notfallkontakt bekannt!';
 ?>

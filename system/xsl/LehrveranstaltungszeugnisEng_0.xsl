@@ -282,7 +282,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 				<text:sequence-decl text:display-outline-level="0" text:name="Text"/>
 				<text:sequence-decl text:display-outline-level="0" text:name="Drawing"/>
 			</text:sequence-decls>
-			<text:p text:style-name="P15">Transcript of Records</text:p>
+			<text:p text:style-name="P15">COURSE CERTIFICATE</text:p>
 			<text:p text:style-name="P16"/>
 			<!-- Beim Campus International wird der Text "Studiengang" nicht angedruckt -->
 			<xsl:choose>
@@ -331,30 +331,29 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 			<text:p text:style-name="P4">Date of Birth:<text:tab/><xsl:value-of select="gebdatum" /></text:p>
 			<text:p text:style-name="P4"/>
 			<text:p text:style-name="P19">
-			<xsl:choose>
-				<xsl:when test="geschlecht='m'">
-					<xsl:text>Herr </xsl:text>
-				</xsl:when>
-				<xsl:when test="geschlecht='w'">
-					<xsl:text>Frau </xsl:text>
-				</xsl:when>
-				<xsl:otherwise>
-					<xsl:text>Herr/Frau </xsl:text>
-				</xsl:otherwise>
-			</xsl:choose>
-			<xsl:value-of select="name"/> hat im <xsl:value-of select="studiensemester" /> als
-			<xsl:choose>
-				<xsl:when test="geschlecht='m'">
-					<xsl:text>ordentlicher Student </xsl:text>
-				</xsl:when>
-				<xsl:when test="geschlecht='w'">
-					<xsl:text>ordentliche Studentin </xsl:text>
-				</xsl:when>
-				<xsl:otherwise>
-					<xsl:text>ordentliche/r Student/in </xsl:text>
-				</xsl:otherwise>
-			</xsl:choose>
-			folgende Lehrveranstaltung an der FH Technikum Wien absolviert:</text:p>
+				<xsl:choose>
+					<xsl:when test="geschlecht='m'">
+						<xsl:text>Mr. </xsl:text>
+					</xsl:when>
+					<xsl:when test="geschlecht='w'">
+						<xsl:text>Ms. </xsl:text>
+					</xsl:when>
+					<xsl:otherwise>
+						<xsl:text>Mr./Ms. </xsl:text>
+					</xsl:otherwise>
+				</xsl:choose>
+				<xsl:value-of select="name"/> completed the following course at UAS Technikum Wien in the
+					<!-- Deutsches "Sommersemester" auf englisches "Summersemester" ändern -->
+					<xsl:choose>
+						<xsl:when test="substring(studiensemester, 1, 6)='Sommer'">
+							Summer<xsl:value-of select="substring(studiensemester,7)" />
+						</xsl:when>
+						<xsl:otherwise>
+							<xsl:value-of select="studiensemester"/>
+						</xsl:otherwise>
+					</xsl:choose>
+					as a full student:
+			</text:p>
 			<text:p text:style-name="P19"/>
 			<table:table table:name="Tabelle1" table:style-name="Tabelle1">
 				<table:table-column table:style-name="Tabelle1.A"/>
@@ -418,9 +417,6 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 			</table:table-row>
 			</table:table>
 			<text:p text:style-name="P6"/>
-			<text:p text:style-name="P25">¹ 1 Semester period per week = 45 minutes</text:p>
-			<text:p text:style-name="P25">² Grades:<text:tab/>excellent (1), good (2), satisfactory (3), sufficient (4), Credit based on previous experience/work (ar), Participated with success (met), passed (b),</text:p>
-			<text:p text:style-name="P25"><text:tab/>successfully completed (ea), participated (tg)</text:p>
 			<text:p text:style-name="P20"/>
 			<text:p text:style-name="P21"/>
 			<text:p text:style-name="P22">After passing this course successfully students are able to ...</text:p>

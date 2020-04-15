@@ -342,8 +342,8 @@ $phrases = array(
 			),
 			array(
 				'sprache' => 'English',
-				'text' => '',
-				'description' => 'last editor',
+				'text' => 'last change',
+				'description' => '',
 				'insertvon' => 'system'
 			)
 		)
@@ -682,7 +682,7 @@ $phrases = array(
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'messages',
+				'text' => 'Messages',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -802,7 +802,7 @@ $phrases = array(
 			),
 			array(
 				'sprache' => 'English',
-				'text' => '',
+				'text' => 'edited by',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -842,7 +842,7 @@ $phrases = array(
 			),
 			array(
 				'sprache' => 'English',
-				'text' => '',
+				'text' => 'approved for the course',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -882,7 +882,7 @@ $phrases = array(
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'message',
+				'text' => 'Message',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -1128,7 +1128,7 @@ $phrases = array(
 			),
 			array(
 				'sprache' => 'English',
-				'text' => '',
+				'text' => 'Release',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -1288,7 +1288,7 @@ $phrases = array(
 			),
 			array(
 				'sprache' => 'English',
-				'text' => '',
+				'text' => 'Cancel',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -1635,7 +1635,7 @@ $phrases = array(
 			),
 			array(
 				'sprache' => 'English',
-				'text' => '',
+				'text' => 'Address',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -1675,7 +1675,7 @@ $phrases = array(
 			),
 			array(
 				'sprache' => 'English',
-				'text' => '',
+				'text' => 'Man',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -1695,7 +1695,7 @@ $phrases = array(
 			),
 			array(
 				'sprache' => 'English',
-				'text' => '',
+				'text' => 'Woman',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -1755,7 +1755,7 @@ $phrases = array(
 			),
 			array(
 				'sprache' => 'English',
-				'text' => '',
+				'text' => 'Social insurance number',
 				'description' => 'social security number',
 				'insertvon' => 'system'
 			)
@@ -1775,7 +1775,7 @@ $phrases = array(
 			),
 			array(
 				'sprache' => 'English',
-				'text' => '',
+				'text' => 'Replacement bearing',
 				'description' => 'Replacement Label',
 				'insertvon' => 'system'
 			)
@@ -1795,8 +1795,8 @@ $phrases = array(
 			),
 			array(
 				'sprache' => 'English',
-				'text' => '',
-				'description' => 'bPK',
+				'text' => 'bPK',
+				'description' => '',
 				'insertvon' => 'system'
 			)
 		)
@@ -1975,8 +1975,8 @@ $phrases = array(
 			),
 			array(
 				'sprache' => 'English',
-				'text' => '',
-				'description' => 'ZIP-Code',
+				'text' => 'Post code',
+				'description' => '',
 				'insertvon' => 'system'
 			)
 		)
@@ -1995,8 +1995,8 @@ $phrases = array(
 			),
 			array(
 				'sprache' => 'English',
-				'text' => '',
-				'description' => 'Street',
+				'text' => 'Street',
+				'description' => '',
 				'insertvon' => 'system'
 			)
 		)
@@ -2077,7 +2077,7 @@ $phrases = array(
 			),
 			array(
 				'sprache' => 'English',
-				'text' => '',
+				'text' => 'Education semester',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -2226,6 +2226,66 @@ $phrases = array(
 	array(
 		'app' => 'core',
 		'category' => 'lehre',
+		'phrase' => 'sws',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'SWS',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'SP/W',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'pflichtfach',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Pflichtfach',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Mandatory',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'zeugnis',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Zeugnis',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Transcript',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
 		'phrase' => 'notendurchschnitt',
 		'insertvon' => 'system',
 		'phrases' => array(
@@ -2306,6 +2366,46 @@ $phrases = array(
 	array(
 		'app' => 'core',
 		'category' => 'lehre',
+		'phrase' => 'kurzbz',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Kurzbz',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'ShortDesc',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'semester',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Semester',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Semester',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
 		'phrase' => 'nichtstudienplanrelevanteKurse',
 		'insertvon' => 'system',
 		'phrases' => array(
@@ -2314,16 +2414,57 @@ $phrases = array(
 				'text' => 'Nicht studienplanrelevante Lehrveranstaltung',
 				'description' => '',
 				'insertvon' => 'system'
-			),
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'info_notendurchschnitt',
+		'insertvon' => 'system',
+		'phrases' => array(
 			array(
-				'sprache' => 'English',
-				'text' => 'additional Courses',
+				'sprache' => 'German',
+				'text' => 'Notendurchschnitt über alle studienplanrelevanten Noten (inkl. negative)',
 				'description' => '',
 				'insertvon' => 'system'
 			)
 		)
 	),
-
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'info_notendurchschnitt_gewichtet',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Notendurchschnitt über alle studienplanrelevanten Noten (inkl. negative) gewichtet nach ECTS der LV.  = (Summe (Note der LV * ECTS der LV))/Gesamtsumme der ECTS',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'lehrform',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Lehrform',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Course Type',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
 	//**********************	INFOCENTER/infocenter
 	array(
 		'app' => 'infocenter',
@@ -2379,7 +2520,7 @@ $phrases = array(
 			),
 			array(
 				'sprache' => 'English',
-				'text' => '',
+				'text' => 'ZGV exam',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -2399,7 +2540,7 @@ $phrases = array(
 			),
 			array(
 				'sprache' => 'English',
-				'text' => '',
+				'text' => 'ZGV place',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -2419,7 +2560,7 @@ $phrases = array(
 			),
 			array(
 				'sprache' => 'English',
-				'text' => '',
+				'text' => 'ZGV date',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -2439,7 +2580,7 @@ $phrases = array(
 			),
 			array(
 				'sprache' => 'English',
-				'text' => '',
+				'text' => 'ZGV nation',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -2499,7 +2640,7 @@ $phrases = array(
 			),
 			array(
 				'sprache' => 'English',
-				'text' => '',
+				'text' => 'Graduate',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -2519,7 +2660,7 @@ $phrases = array(
 			),
 			array(
 				'sprache' => 'English',
-				'text' => '',
+				'text' => 'Leaving certificate',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -2639,8 +2780,8 @@ $phrases = array(
 			),
 			array(
 				'sprache' => 'English',
-				'text' => '',
-				'description' => 'notes on the application',
+				'text' => 'Application Notes',
+				'description' => '',
 				'insertvon' => 'system'
 			)
 		)
@@ -2679,7 +2820,7 @@ $phrases = array(
 			),
 			array(
 				'sprache' => 'English',
-				'text' => '',
+				'text' => 'ZGV',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -2699,7 +2840,7 @@ $phrases = array(
 			),
 			array(
 				'sprache' => 'English',
-				'text' => '',
+				'text' => 'Access requirements',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -2719,7 +2860,7 @@ $phrases = array(
 			),
 			array(
 				'sprache' => 'English',
-				'text' => '',
+				'text' => 'Entry requirements',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -2739,7 +2880,7 @@ $phrases = array(
 			),
 			array(
 				'sprache' => 'English',
-				'text' => '',
+				'text' => 'No admission requirements defined for the course',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -2759,7 +2900,7 @@ $phrases = array(
 			),
 			array(
 				'sprache' => 'English',
-				'text' => '',
+				'text' => 'last ZGV attended',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -2779,7 +2920,7 @@ $phrases = array(
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'reason for cancellation',
+				'text' => 'Reason for cancellation',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -2833,15 +2974,13 @@ $phrases = array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Bei Absage von InteressentInnen	erhalten diese den Status "Abgewiesener" und deren '
-				.'ZGV-Daten können im Infocenter nicht mehr bearbeitet oder freigegeben werden. '
-				.'Alle nicht gespeicherten ZGV-Daten gehen verloren. Fortfahren?',
+				'text' => 'Bei Absage von InteressentInnen erhalten diese den Status "Abgewiesener" und deren ZGV-Daten können im Infocenter nicht mehr bearbeitet oder freigegeben werden. Alle nicht gespeicherten ZGV-Daten gehen verloren. Fortfahren?',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => '',
+				'text' => 'If interested parties are rejected, they receive the status "rejected" and their ZGV data can no longer be edited or released in the Info Center. All ZGV data that has not been saved will be lost. Continue?',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -2955,16 +3094,13 @@ $phrases = array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Bei Freigabe von InteressentInnen wird deren Interessentenstatus bestätigt
-					und deren Zgvdaten können im Infocenter nicht mehr bearbeitet oder freigegeben werden.<br/>
-					Alle nicht gespeicherten Zgvdaten gehen verloren.<br/>
-					Fortfahren?',
+				'text' => 'Bei Freigabe von InteressentInnen wird deren Interessentenstatus bestätigt und deren Zgvdaten können im Infocenter nicht mehr bearbeitet oder freigegeben werden.<br/> Alle nicht gespeicherten Zgvdaten gehen verloren.<br/> Fortfahren?',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => '',
+				'text' => 'If interested parties are released, their interested party status is confirmed and their Zgv data can no longer be edited or released in the Infocenter. <br/> All Zgv data not saved will be lost. <br/> Continue?',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -3151,6 +3287,26 @@ $phrases = array(
 		)
 	),
 	array(
+		'app' => 'core',
+		'category' => 'global',
+		'phrase' => 'rueckstelldatum',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'rückstelldatum',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'onHold date',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
 		'app' => 'infocenter',
 		'category' => 'infocenter',
 		'phrase' => 'bewerberParken',
@@ -3204,7 +3360,7 @@ $phrases = array(
 			),
 			array(
 				'sprache' => 'English',
-				'text' => '',
+				'text' => 'Nothing to park out',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -3224,7 +3380,7 @@ $phrases = array(
 			),
 			array(
 				'sprache' => 'English',
-				'text' => '',
+				'text' => 'Parking error',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -3244,7 +3400,7 @@ $phrases = array(
 			),
 			array(
 				'sprache' => 'English',
-				'text' => '',
+				'text' => 'Parking error',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -3309,8 +3465,995 @@ $phrases = array(
 				'insertvon' => 'system'
 			)
 		)
+	),
+	array(
+		'app' => 'infocenter',
+		'category' => 'infocenter',
+		'phrase' => 'bewerberOnHold',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'BewerberIn zurückstellen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Put applicant on hold',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'infocenter',
+		'category' => 'infocenter',
+		'phrase' => 'bewerberOnHoldEntfernen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Zurückstellung entfernen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Remove on hold state',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'infocenter',
+		'category' => 'infocenter',
+		'phrase' => 'bewerberOnHoldBis',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'BewerberIn zurückgestellt bis',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Applicant on hold until',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'infocenter',
+		'category' => 'infocenter',
+		'phrase' => 'nichtsZumEntfernen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Nichts zum Entfernen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Nothing to remove',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'infocenter',
+		'category' => 'infocenter',
+		'phrase' => 'fehlerBeimEntfernen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Fehler beim Entfernen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Error when removing',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'infocenter',
+		'category' => 'infocenter',
+		'phrase' => 'rueckstelldatumUeberschritten',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Zurückstelldatum überschritten!',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Exceeded date for on hold!',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'infocenter',
+		'category' => 'infocenter',
+		'phrase' => 'parkenZurueckstellenInfo',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Geparkte und zurückgestellte BewerberInnen werden von der Bearbeitung temporär ausgenommen.
+Geparkte BewerberInnen werden zum angegebenen Datum automatisch entparkt, während zurückgestellte BewerberInnen nur manuell durch Drücken des Buttons den Zurückgestellt-Status verlieren.
+Bei einer Zurückstellung dient das Datum nur der Erinnerung.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Parked applicants and applicants on hold are temporarily excluded from the infocenter workflow.
+Parked applicants are unparked automatically, whereas applicants on hold loose the status only when clicking the button manually.
+When on hold, the date is only a reminder.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'infocenter',
+		'category' => 'infocenter',
+		'phrase' => 'rtPunkteEintragenInfo',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Es existierte bereits ein Bewerberstatus und eine Reihungstestteilnahme. 
+				Deshalb wurde bei der Freigabe der Bewerberstatus automatisch hinzugefügt und der Bewerber als Reihungstestabsolvent markiert. 
+				Die Reihungstestpunkte müssen aber noch manuell eingetragen werden!',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'An applicant status and a placement test participation already existed for this person.
+				Thus, the applicant status was added automatically and the applicant was marked as placement test participant.
+				However, the placement test result is yet to be entered manually!',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'password',
+		'phrase' => 'changeFor',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Passwort ändern für',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Changing password for',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'password',
+		'phrase' => 'usage',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Das Passwort muss zumindest 8 Zeichen enthalten, davon mindestens 1 Großbuchstabe, 1 Kleinbuchstabe und eine Ziffer.<br />Das Passwort darf keine Leerzeichen und Umlaute enthalten.<br />Erlaubte Sonderzeichen sind: -$#[]{}!().,*:;_',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'The password must contain at least 8 characters, of which 1 must be upper case, 1 lower case and 1 a numeral.<br><br>The password may not include spaces or umlauts.<br>The following special characters are allowed: -$#[]{}!().,*:;_',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'password',
+		'phrase' => 'extraUsage',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Weitere Informationen zur Passwort Policy finden Sie unter <a href="../../../../cms/dms.php?id={PASSWORD_POLICY_DMS}">diesem Link</a>',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'More information about the Password Policy can be found at <a href="../../../../cms/dms.php?id={PASSWORD_POLICY_DMS}">this link</a>',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'password',
+		'phrase' => 'old',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Altes Passwort',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Old password',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'password',
+		'phrase' => 'new',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Neues Passwort',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'New password',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'password',
+		'phrase' => 'newRepeat',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Wiederholung des neuen Passworts',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Repeat new password',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'password',
+		'phrase' => 'change',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Passwort ändern',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Change password',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'password',
+		'phrase' => 'pageTitle',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Passwort ändern',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Changing password',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'password',
+		'phrase' => 'missingParameters',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Bitte geben Sie das alte und neue Passwort ein',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Please enter the old and the new password',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'password',
+		'phrase' => 'oldPasswordWrong',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Das alte Passwort ist nicht korrekt',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'The old password is incorrect',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'password',
+		'phrase' => 'newNotSameRepeat',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Passwörter stimmen nicht überein',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Passwords do not match',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'password',
+		'phrase' => 'length',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Das neue Passwort muss mindestens 8 Zeichen lang sein.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'The new password must contain at least 8 characters.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'password',
+		'phrase' => 'atLeastAUpperCase',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Das neue Passwort muss mindestens einen Grossbuchstaben enthalten.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'The new password must contain at least 1 upper case character.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'password',
+		'phrase' => 'atLeastANumber',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Es muss mindestens eine Ziffer vorhanden sein.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'The new password must contain at least 1 numeral character.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'password',
+		'phrase' => 'genericError',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Es ist ein Fehler aufgetreten. Passwortänderung fehlgeschlagen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'An Error occured. Password change failed.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'password',
+		'phrase' => 'changed',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Passwort wurde erfolgreich geändert',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Password successfully changed',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'password',
+		'phrase' => 'noBlanks',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Es darf kein Leerzeichen im Passwort vorkommen.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'The password may not include spaces.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'password',
+		'phrase' => 'noUmlauts',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Es dürfen keine Umlaute verwendet werden.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'The password may not include umlauts.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'password',
+		'phrase' => 'noSpecialCharacters',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Bitte verwenden Sie nur erlaubte Sonderzeichen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Please use only permitted special characters.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'password',
+		'phrase' => 'atLeastALowerCase',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Das neue Passwort muss mindestens einen Kleinbuchstaben enthalten.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'The new password must contain at least 1 lower case character.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'password',
+		'phrase' => 'newSameOld',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Das neue Passwort muss sich vom alten Passwort unterscheiden.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'The new password must be different from the old password.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'global',
+		'phrase' => 'lehrauftraegeBestellen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Lehraufträge bestellen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Order lectureships',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'global',
+		'phrase' => 'lehrauftraegeErteilen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Lehraufträge erteilen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Approve lectureships',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'global',
+		'phrase' => 'lehrauftraegeAnnehmen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Lehraufträge annehmen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Accept lectureships',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'global',
+		'phrase' => 'stornierteLehrauftraege',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Stornierte Lehraufträge',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Cancelled lectureships',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'account',
+		'phrase' => 'title',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Account Aktivierung',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Account Activation',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'account',
+		'phrase' => 'usage',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Bitte wählen Sie ein Passwort für Ihren Account.<br>Das Passwort muss zumindest 8 Zeichen enthalten, davon mindestens 1 Großbuchstabe, 1 Kleinbuchstabe und eine Ziffer.<br>Das Passwort darf keine Leerzeichen und Umlaute enthalten.<br>Erlaubte Sonderzeichen sind: -$#[]{}!().,*:;_',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Please choose a password for your account<br>The password must contain at least 8 characters, of which 1 must be upper case, 1 lower case and 1 a numeral.<br>The password may not include spaces or umlauts.<br>The following special characters are allowed: -$#[]{}!().,*:;_',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'account',
+		'phrase' => 'username',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Username',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Username',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'account',
+		'phrase' => 'code',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Code',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Code',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'captcha',
+		'phrase' => 'label',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Tippen Sie die angezeigten<br>Zeichen in das untere Feld.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Enter the characters in<br>the field below.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'captcha',
+		'phrase' => 'reload',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Ich kann das Bild nicht lesen - neu laden',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Reload picture',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'account',
+		'phrase' => 'activate',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Abschicken',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Activate',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'password',
+		'phrase' => 'wrongCaptcha',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Captcha code falsch ',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Captcha code is wrong',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'account',
+		'phrase' => 'missingParameters',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Bitte geben Sie Benutzername, Code und Passwort ein',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Please enter username, code and password',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'account',
+		'phrase' => 'wrongActivationCode',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Der angegebene Aktivierungscode ist falsch',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'The provided activation code is wrong',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'global',
+		'phrase' => 'received',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Empfangen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Received',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'global',
+		'phrase' => 'reply',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Antworten',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Reply',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'altRecipientNote',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => '* Diese Nachricht wird an das Infocenter der FHTW zugestellt',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => '* This message will be delivered to the Infocenter of UAS Technikum Wien',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'refresh',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Aktualisierung',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Refresh',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'from',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Von',
+				'description' => 'Aktualisierung',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'From',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'newMessage',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Sie haben eine neue Nachricht erhalten',
+				'description' => 'Aktualisierung',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'You received a new message',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
 	)
-
 );
 
 

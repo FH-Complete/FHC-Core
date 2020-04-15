@@ -52,7 +52,7 @@ function verifyData($parameters)
 	$log = new webservicelog();
 	$log->request_data = file_get_contents('php://input');
 	$log->webservicetyp_kurzbz = 'wienerlinien';
-	$log->request_id = $parameters->Token;
+	$log->request_id = $parameters->token;
 	$log->beschreibung = "Semesterticketanfrage";
 	$log->save(true);
 
@@ -109,7 +109,7 @@ function verifyData($parameters)
 		}
 
 		// überprüfe vorname
-		if($person->vorname != $parameters->Vorname)
+		if(mb_strtolower($person->vorname) != mb_strtolower($parameters->Vorname))
 		{
 			// es wurde keine übereinstimmung gefunden
 			$obj->result = 'false';
@@ -117,7 +117,7 @@ function verifyData($parameters)
 			return $obj;
 		}
 
-		if($person->nachname != $parameters->Name)
+		if(mb_strtolower($person->nachname) != mb_strtolower($parameters->Name))
 		{
 			// es wurde keine übereinstimmung gefunden
 			$obj->result = 'false';

@@ -34,6 +34,7 @@ require_once('../include/person.class.php');
 require_once('../include/prestudent.class.php');
 require_once('../include/datum.class.php');
 require_once('../include/statusgrund.class.php');
+require_once('../include/student.class.php');
 
 $rdf_url='http://www.technikum-wien.at/prestudentrolle';
 $datum = new datum();
@@ -76,8 +77,27 @@ $statusgrund_arr = array();
 foreach($statusgrund->result as $row)
 	$statusgrund_arr[$row->statusgrund_id]=$row->bezeichnung_mehrsprachig[DEFAULT_LANGUAGE];
 
+$studentlehrverband = new student();
+$uid = $studentlehrverband->getUid($prestudent_id);
+
 foreach($ps->result as $row)
 {
+	$lehrverband = '-';
+	if ($row->status_kurzbz == 'Student'
+		|| $row->status_kurzbz == 'Diplomand'
+		|| $row->status_kurzbz == 'Abbrecher'
+		|| $row->status_kurzbz == 'Absolvent'
+		|| $row->status_kurzbz == 'Ausserodentlicher'
+		|| $row->status_kurzbz == 'Incoming'
+		|| $row->status_kurzbz == 'Outgoing'
+		|| $row->status_kurzbz == 'Unterbrecher')
+	{
+		if ($uid != '')
+		{
+			$studentlehrverband->load_studentlehrverband($uid, $row->studiensemester_kurzbz);
+			$lehrverband = $studentlehrverband->semester.$studentlehrverband->verband.$studentlehrverband->gruppe;
+		}
+	}
 
 	echo '
 	  <RDF:li>
@@ -98,6 +118,7 @@ foreach($ps->result as $row)
 			<ROLLE:rt_stufe><![CDATA['.$row->rt_stufe.']]></ROLLE:rt_stufe>
 			<ROLLE:statusgrund_id><![CDATA['.$row->statusgrund_id.']]></ROLLE:statusgrund_id>
 			<ROLLE:statusgrund><![CDATA['.(isset($statusgrund_arr[$row->statusgrund_id])?$statusgrund_arr[$row->statusgrund_id]:'').']]></ROLLE:statusgrund>
+			<ROLLE:lehrverband><![CDATA['.$lehrverband.']]></ROLLE:lehrverband>
       	</RDF:Description>
       </RDF:li>
 	';

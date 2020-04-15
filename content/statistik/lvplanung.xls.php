@@ -108,7 +108,6 @@ SELECT tbl_lehrveranstaltung.bezeichnung AS lf_bezeichnung,
 	tbl_lehreinheitmitarbeiter.mitarbeiter_uid,
 	tbl_lehrveranstaltung.semester AS lv_semester,
 	tbl_lehreinheit.lehreinheit_id,
-	tbl_lehreinheitmitarbeiter.faktor,
 	tbl_lehreinheitmitarbeiter.stundensatz,
 	tbl_lehreinheitmitarbeiter.semesterstunden lemss,
 	tbl_lehreinheitmitarbeiter.planstunden,
@@ -154,7 +153,6 @@ SELECT tbl_lehrveranstaltung.bezeichnung AS lf_bezeichnung,
 FROM lehre.tbl_lehrveranstaltung
 JOIN lehre.tbl_lehreinheit USING (lehrveranstaltung_id)
 JOIN lehre.tbl_lehreinheitmitarbeiter USING (lehreinheit_id)
---JOIN lehre.tbl_lehrveranstaltung as lehrfach ON(tbl_lehreinheit.lehrfach_id=lehrfach.lehrveranstaltung_id)
 WHERE tbl_lehreinheit.studiensemester_kurzbz = ".$db->db_add_param($studiensemester_kurzbz);
 
 if($studiengang_kz!='')
@@ -198,8 +196,10 @@ $worksheet->write($zeile,$spalte,"Studiengang", $format_bold);
 $maxlength[$spalte]=11;
 $worksheet->write($zeile,++$spalte,"Organisationseinheit", $format_bold);
 $maxlength[$spalte]=25;
-$worksheet->write($zeile,++$spalte,"Lektor", $format_bold);
+$worksheet->write($zeile,++$spalte,"LektorIn", $format_bold);
 $maxlength[$spalte]=6;
+$worksheet->write($zeile,++$spalte,"Fixangestellt", $format_bold);
+$maxlength[$spalte]=10;
 $worksheet->write($zeile,++$spalte,"Bezeichnung", $format_bold);
 $maxlength[$spalte]=25;
 $worksheet->write($zeile,++$spalte,"Semester", $format_bold);
@@ -225,8 +225,6 @@ $maxlength[$spalte]=15;
 $worksheet->write($zeile,++$spalte,"Anmerkung", $format_bold);
 $maxlength[$spalte]=9;
 
-// Neu 13.11.2009 sequens
-
 $worksheet->write($zeile,++$spalte,"LV-Leitung", $format_bold);
 $maxlength[$spalte]=9;
 
@@ -246,7 +244,6 @@ if($result = $db->db_query($qry))
 {
 	while($row = $db->db_fetch_object($result))
 	{
-
 		$spalte=0;
 		$zeile++;
 
@@ -267,6 +264,11 @@ if($result = $db->db_query($qry))
 		$worksheet->write($zeile,++$spalte,$mitarbeiter->nachname.' '.$mitarbeiter->vorname);
 		if($maxlength[$spalte]<mb_strlen($mitarbeiter->nachname.' '.$mitarbeiter->vorname))
 			$maxlength[$spalte]=mb_strlen($mitarbeiter->nachname.' '.$mitarbeiter->vorname);
+
+		//Fixangestellt
+		$worksheet->write($zeile,++$spalte,($mitarbeiter->fixangestellt ? 'Ja' : 'Nein'));
+		if($maxlength[$spalte]<mb_strlen($mitarbeiter->fixangestellt ? 'Ja' : 'Nein'))
+			$maxlength[$spalte]=mb_strlen($mitarbeiter->fixangestellt ? 'Ja' : 'Nein');
 
 		//Lehrfach
 		$worksheet->write($zeile,++$spalte,$row->lf_bezeichnung);
@@ -380,7 +382,7 @@ if($result = $db->db_query($qry))
 				student_uid,
 				stunden,
 				tbl_projektbetreuer.stundensatz,
-				tbl_projektbetreuer.faktor
+				tbl_projektbetreuer.person_id
 			FROM lehre.tbl_projektarbeit,
 				lehre.tbl_lehreinheit,
 				lehre.tbl_lehrveranstaltung,
@@ -389,11 +391,8 @@ if($result = $db->db_query($qry))
 			WHERE tbl_projektarbeit.lehreinheit_id = tbl_lehreinheit.lehreinheit_id
 				AND tbl_lehreinheit.lehrveranstaltung_id = tbl_lehrveranstaltung.lehrveranstaltung_id
 				AND tbl_projektarbeit.projektarbeit_id = tbl_projektbetreuer.projektarbeit_id
-				--AND tbl_lehreinheit.lehrfach_id = tbl_lehrveranstaltung.lehrveranstaltung_id
 				AND tbl_person.person_id = tbl_projektbetreuer.person_id
-				AND tbl_lehreinheit.studiensemester_kurzbz = ".$db->db_add_param($studiensemester_kurzbz)."
-				AND (tbl_projektbetreuer.stundensatz * tbl_projektbetreuer.stunden) > 0
-				";
+				AND tbl_lehreinheit.studiensemester_kurzbz = ".$db->db_add_param($studiensemester_kurzbz);
 
 	if($uid!=='')
 	{
@@ -407,6 +406,9 @@ if($result = $db->db_query($qry))
 	if($studiengang_kz!='')
 		$qry.=" AND tbl_lehrveranstaltung.studiengang_kz=".$db->db_add_param($studiengang_kz, FHC_INTEGER);
 
+	if($semester!='')
+		$qry.=" AND tbl_lehrveranstaltung.semester=".$db->db_add_param($semester, FHC_INTEGER);
+
 	if($result = $db->db_query($qry))
 	{
 		$spalte=0;
@@ -418,6 +420,38 @@ if($result = $db->db_query($qry))
 		{
 			$spalte=0;
 			$zeile++;
+
+			$benutzer = new benutzer();
+			$benutzer->getBenutzerFromPerson($row->person_id, false);
+			if (count($benutzer->result) > 0)
+			{
+				foreach ($benutzer->result AS $bn)
+				{
+					$mitarbeiter = new mitarbeiter($bn->uid);
+					if ($mitarbeiter->load($bn->uid))
+					{
+						if ($mitarbeiter->fixangestellt)
+						{
+							$fixangestellt = 'Ja';
+							break;
+						}
+						else
+						{
+							$fixangestellt = 'Nein';
+							break;
+						}
+					}
+					else
+					{
+						continue;
+					}
+
+				}
+			}
+			else
+			{
+				$fixangestellt = 'Extern';
+			}
 
 			//Studiengang
 			$worksheet->write($zeile,$spalte,$stg_obj->kuerzel_arr[$row->studiengang_kz]);
@@ -433,6 +467,9 @@ if($result = $db->db_query($qry))
 			$worksheet->write($zeile,++$spalte,$row->nachname.' '.$row->vorname);
 			//if($maxlength[$spalte]<mb_strlen($row->nachname.' '.$row->vorname))
 				//$maxlength[$spalte]=mb_strlen($row->nachname.' '.$row->vorname);
+
+			//Fixangestellt
+			$worksheet->write($zeile,++$spalte,$fixangestellt);
 
 			//Lehrfach
 			$worksheet->write($zeile,++$spalte,$row->bezeichnung);

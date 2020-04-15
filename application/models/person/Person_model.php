@@ -10,6 +10,9 @@ class Person_model extends DB_Model
 		parent::__construct();
 		$this->dbTable = 'public.tbl_person';
 		$this->pk = 'person_id';
+
+		$this->load->model('person/kontakt_model', 'KontaktModel');
+		$this->load->model('person/adresse_model', 'AdresseModel');
 	}
 
 	/**
@@ -155,29 +158,24 @@ class Person_model extends DB_Model
 
 		$person = $this->load($person_id);
 
-		if($person->error)
-			return error($person->retval);
+		if($person->error) return $person;
 
 		//return null if not found
 		if(count($person->retval) < 1)
 			return success(null);
-
-		$this->load->model('person/kontakt_model', 'KontaktModel');
-		$this->load->model('person/adresse_model', 'AdresseModel');
 
 		$this->KontaktModel->addDistinct();
 		$this->KontaktModel->addSelect('kontakttyp, anmerkung, kontakt, zustellung');
 		$this->KontaktModel->addOrder('kontakttyp');
 		$where = $zustellung_only === true ? array('person_id' => $person_id, 'zustellung' => true) : array('person_id' => $person_id);
 		$kontakte = $this->KontaktModel->loadWhere($where);
-		if($kontakte->error)
-			return error($kontakte->retval);
+		if($kontakte->error) return $kontakte;
+
 		$where = $zustellung_only === true ? array('person_id' => $person_id, 'zustelladresse' => true) : array('person_id' => $person_id);
 		$this->AdresseModel->addSelect('public.tbl_adresse.*, bis.tbl_nation.kurztext AS nationkurztext');
 		$this->AdresseModel->addJoin('bis.tbl_nation', 'tbl_adresse.nation = tbl_nation.nation_code', 'LEFT');
 		$adressen = $this->AdresseModel->loadWhere($where);
-		if($adressen->error)
-			return error($adressen->retval);
+		if($adressen->error) return $adressen;
 
 		$stammdaten = $person->retval[0];
 		$stammdaten->kontakte = $kontakte->retval;
@@ -207,28 +205,47 @@ class Person_model extends DB_Model
 	 */
 	public function getLanguage($uid)
 	{
-		$language = DEFAULT_LANGUAGE;
-
+		$this->addSelect('public.tbl_person.sprache');
 		$this->addJoin('public.tbl_benutzer', 'person_id');
+		$this->addJoin('public.tbl_sprache', 'sprache');
 		$this->addOrder('public.tbl_person.updateamum', 'DESC');
 		$this->addOrder('public.tbl_person.insertvon', 'DESC');
 
-		$persons = $this->loadWhere(array('uid' => $uid));
+		return $this->loadWhere(array('uid' => $uid, 'content' => true));
+	}
 
-		if (hasData($persons))
+	/**
+	 * Checks if a person has a Bewerberstatus and reihungstestangetreten = true
+	 * @param $person_id
+	 * @param $studiensemester_kurzbz
+	 * @return array
+	 */
+	public function hasBewerber($person_id, $studiensemester_kurzbz, $studiengangtyp = null)
+	{
+		$parametersArray = array($person_id, $studiensemester_kurzbz);
+
+		$qry = "SELECT count(*) AS anzahl_bewerber FROM public.tbl_person
+				JOIN public.tbl_prestudent USING (person_id)
+				JOIN public.tbl_prestudentstatus ON tbl_prestudentstatus.prestudent_id = tbl_prestudent.prestudent_id";
+
+		if (isset($studiengangtyp))
 		{
-			for ($i = 0; $i < count($persons->retval); $i++)
-			{
-				$person = $persons->retval[$i];
-
-				if (!isEmptyString($person->sprache))
-				{
-					$language = $person->sprache;
-					break;
-				}
-			}
+			$qry .= " JOIN lehre.tbl_studienplan USING(studienplan_id)
+					 JOIN lehre.tbl_studienordnung USING(studienordnung_id)
+					 JOIN public.tbl_studiengang ON tbl_studienordnung.studiengang_kz = tbl_studiengang.studiengang_kz";
 		}
 
-		return $language;
+		$qry .=	" WHERE person_id = ?
+				AND studiensemester_kurzbz = ?
+				AND tbl_prestudentstatus.status_kurzbz = 'Bewerber'
+				AND reihungstestangetreten";
+
+		if (isset($studiengangtyp))
+		{
+			$parametersArray[] = $studiengangtyp;
+			$qry .= " AND tbl_studiengang.typ = ?";
+		}
+
+		return $this->execQuery($qry, $parametersArray);
 	}
 }

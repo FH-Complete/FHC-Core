@@ -189,10 +189,6 @@ function checkZeilenUmbruch()
 			$text.=  '<br>';
 			$text.=  "<a class='Item' target='_blank' href='upload.php?course_id=$studiengang_kz&term_id=$semester&short=$short'>".$p->t('lehre/upload')."</a>";
 			$text.=  '&nbsp;&nbsp;&nbsp;';
-			if(isset($dir_empty) && $dir_empty == false)
-				$text.=  "<a class='Item' title='".$p->t('lehre/ziparchivTitle')."' href='zipdownload.php?stg=$studiengang_kz&sem=$semester&short=$short' target='_blank'>".$p->t('lehre/ziparchiv')."</a>";
-			else
-				$text.=  $p->t('lehre/ziparchiv');
 		}
 
 		$menu[]=array
@@ -217,12 +213,12 @@ function checkZeilenUmbruch()
 			$link= "anwesenheitsliste.php?stg_kz=$studiengang_kz&sem=$semester&lvid=$lvid&stsem=$angezeigtes_stsem";
 		}
 
-		ensureDirectoryExists($DOC_ROOT, $kurzbz, $semester, $short_short_name, 'leistung','teacher');
-		$dir_empty = isDirectoryEmpty($DOC_ROOT, $kurzbz, $semester, $short_short_name, 'leistung');
-
 		$text='';
 	  	if(CIS_LEHRVERANSTALTUNG_LEISTUNGSUEBERSICHT_ANZEIGEN && ($angemeldet || $is_lector))
 		{
+			ensureDirectoryExists($DOC_ROOT, $kurzbz, $semester, $short_short_name, 'leistung','teacher');
+			$dir_empty = isDirectoryEmpty($DOC_ROOT, $kurzbz, $semester, $short_short_name, 'leistung');
+
 			if($dir_empty == false)
 			{
 				$dir_name=$DOC_ROOT.'/documents/'.mb_strtolower($kurzbz).'/'.$semester.'/'.mb_strtolower($short_short_name).'/leistung';
@@ -276,41 +272,6 @@ function checkZeilenUmbruch()
 			'icon'=>'../../../skin/images/button_feedback.png',
 			'link'=>'feedback.php?lvid='.$lvid,
 			'text'=>''
-		);
-	}
-
-	// Uebungstool
-	if((!defined('CIS_LEHRVERANSTALTUNG_UEBUNGSTOOL_ANZEIGEN') || CIS_LEHRVERANSTALTUNG_UEBUNGSTOOL_ANZEIGEN) && $angemeldet)
-	{
-		$link='';
-		$link_onclick='';
-		$text='';
-
-		if(isset($angezeigtes_stsem))
-			$studiensem = '&stsem='.urlencode($angezeigtes_stsem);
-		else
-			$studiensem = '';
-
-		//Kreuzerltool
-		if($is_lector)
-		{
-			$link='benotungstool/verwaltung.php?lvid='.urlencode($lvid).$studiensem;
-			$text.='<a href="'.APP_ROOT.'cms/dms.php?id='.$p->t('dms_link/benotungstoolHandbuch').'" class="Item" target="_blank">'.$p->t('lehre/benotungstoolHandbuch').' [PDF]</a>';
-		}
-		else
-		{
-			$link='benotungstool/studentenansicht.php?lvid='.urlencode($lvid).$studiensem;
-		}
-
-		$menu[]=array
-		(
-			'id'=>'core_menu_uebungstool',
-			'position'=>'60',
-			'name'=>$p->t('lehre/kreuzerltool'),
-			'icon'=>'../../../skin/images/button_kreuzerltool.png',
-			'link'=>$link,
-			'link_onclick'=>$link_onclick,
-			'text'=>$text
 		);
 	}
 
@@ -411,12 +372,17 @@ function checkZeilenUmbruch()
 			{
 				if($row->gruppe_kurzbz!='')
 				{
-					if(!$db->db_parse_bool($row->mailgrp))
+					$bngrp = new benutzergruppe();
+					$bngrp->load_uids($row->gruppe_kurzbz, $angezeigtes_stsem);
+					if(isset($bngrp->uids) && count($bngrp->uids) > 0)
 					{
-						$nomail=$row->gruppe_kurzbz.' ';
+						if(!$db->db_parse_bool($row->mailgrp))
+						{
+							$nomail=$row->gruppe_kurzbz.' ';
+						}
+						else
+							$mailto.=mb_strtolower($row->gruppe_kurzbz.'@'.DOMAIN.$variable->variable->emailadressentrennzeichen);
 					}
-					else
-						$mailto.=mb_strtolower($row->gruppe_kurzbz.'@'.DOMAIN.$variable->variable->emailadressentrennzeichen);
 				}
 				else
 					$mailto.=mb_strtolower($row->stg_typ.$row->stg_kurzbz.$row->semester.trim($row->verband).trim($row->gruppe).'@'.DOMAIN.$variable->variable->emailadressentrennzeichen);

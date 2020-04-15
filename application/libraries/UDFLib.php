@@ -540,7 +540,7 @@ class UDFLib
 		{
 			if (is_object($udfResults) && isset($udfResults->retval))
 			{
-				show_error($udfResults->retval);
+				show_error(getError($udfResults));
 			}
 			elseif (is_string($udfResults))
 			{

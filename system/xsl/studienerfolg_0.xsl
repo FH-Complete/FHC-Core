@@ -469,9 +469,6 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
 			<text:p text:style-name="P9">
 				<text:span text:style-name="T5">Bestätigung des Studienerfolges</text:span>
 			</text:p>
-			<xsl:if test="finanzamt != ''">
-				<text:p text:style-name="P10"><xsl:value-of select="finanzamt" /></text:p>
-			</xsl:if>
 			<table:table table:name="Tabelle1" table:style-name="Tabelle1">
 				<table:table-column table:style-name="Tabelle1.A"/>
 				<table:table-column table:style-name="Tabelle1.B"/>
@@ -526,7 +523,7 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
 			</table:table>
 			<text:p text:style-name="P6"/>
 			<text:p text:style-name="P6"/>
-			<text:p text:style-name="P18">Folgende Prüfungen wurden abgelegt:</text:p>
+			<text:p text:style-name="P18">Im Studiensemester <xsl:value-of select="studiensemester_kurzbz" /> wurden folgende Lehrveranstaltungen erfolgreich absolviert:</text:p>
 			<text:p text:style-name="P3"/>
 			<table:table table:name="Tabelle3" table:style-name="Tabelle3">
 				<table:table-column table:style-name="Tabelle3.A"/>
@@ -563,10 +560,10 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
 
 				<table:table-row table:style-name="Tabelle3.1">
 					<table:table-cell table:style-name="Tabelle3.A2" office:value-type="string">
-						<text:p text:style-name="P22">Semestersumme:</text:p>
+						<text:p text:style-name="P22">Summe:</text:p>
 					</table:table-cell>
 					<table:table-cell table:style-name="Tabelle3.A2" office:value-type="string">
-						<text:p text:style-name="P23"><xsl:value-of select="studiensemester_kurzbz" /></text:p>
+						<text:p text:style-name="P23"></text:p>
 					</table:table-cell>
 					<table:table-cell table:style-name="Tabelle3.A2" office:value-type="string">
 						<text:p text:style-name="P25"/>
@@ -600,15 +597,11 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
 					</table:table-cell>
 					<table:table-cell table:style-name="Tabelle4.B1" office:value-type="string">
 						<text:p text:style-name="P5">
-							<text:span text:style-name="T7">Gilt auch ohne Unterschrift und Stempel</text:span>
 						</text:p>
 					</table:table-cell>
 				</table:table-row>
 			</table:table>
 			<text:p text:style-name="P19"/>
-			<text:p text:style-name="P20">Benotung:<text:tab/>
-				<text:span text:style-name="T9">Sehr gut (1), Gut (2), Befriedigend (3), Genügend (4), mit Erfolg teilgenommen (met), teilgenommen (tg), angerechnet (ar), <text:tab/>bestanden (b), erfolgreich absolviert (ea)</text:span>
-			</text:p>
 		</office:text>
 </xsl:template>
 <xsl:template match="unterrichtsfach">

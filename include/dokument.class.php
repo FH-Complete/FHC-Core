@@ -36,6 +36,7 @@ class dokument extends basis_db
 	public $bezeichnung_mehrsprachig;
 	public $dokumentbeschreibung_mehrsprachig;
 	public $ausstellungsdetails = false;
+	public $stufe;
 
 	public $prestudent_id;
 	public $mitarbeiter_uid;
@@ -428,6 +429,7 @@ class dokument extends basis_db
 				$dok->nachreichbar = $this->db_parse_bool($row->nachreichbar);
 				$dok->onlinebewerbung = $this->db_parse_bool($row->onlinebewerbung);
 				$dok->ausstellungsdetails = $this->db_parse_bool($row->ausstellungsdetails);
+				$dok->stufe = $row->stufe;
 				$this->result[] = $dok;
 			}
 			return true;
@@ -467,6 +469,7 @@ class dokument extends basis_db
 				$dok->nachreichbar = $this->db_parse_bool($row->nachreichbar);
 				$dok->onlinebewerbung = $this->db_parse_bool($row->onlinebewerbung);
 				$dok->ausstellungsdetails = $this->db_parse_bool($row->ausstellungsdetails);
+				$dok->stufe = $row->stufe;
 
 				$this->result[] = $dok;
 			}
@@ -545,6 +548,7 @@ class dokument extends basis_db
 				$this->pflicht = $this->db_parse_bool($row->pflicht);
 				$this->nachreichbar = $this->db_parse_bool($row->nachreichbar);
 				$this->beschreibung_mehrsprachig = $sprache->parseSprachResult('beschreibung_mehrsprachig',$row);
+				$this->stufe = $row->stufe;
 				return true;
 			}
 			else
@@ -605,7 +609,7 @@ class dokument extends basis_db
 				$qry.=" beschreibung_mehrsprachig[$idx],";
 			}
 
-			$qry.=' pflicht, nachreichbar, onlinebewerbung)
+			$qry.=' pflicht, nachreichbar, onlinebewerbung, stufe)
 				VALUES ('.
 					$this->db_add_param($this->dokument_kurzbz).','.
 					$this->db_add_param($this->studiengang_kz,FHC_INTEGER).',';
@@ -615,7 +619,8 @@ class dokument extends basis_db
 
 			$qry.=	$this->db_add_param($this->pflicht,FHC_BOOLEAN).','.
 					$this->db_add_param($this->nachreichbar,FHC_BOOLEAN).','.
-					$this->db_add_param($this->onlinebewerbung,FHC_BOOLEAN).')';
+					$this->db_add_param($this->onlinebewerbung,FHC_BOOLEAN).','.
+					$this->db_add_param($this->stufe,FHC_INTEGER).')';
 		}
 		else
 		{
@@ -628,7 +633,8 @@ class dokument extends basis_db
 				$qry.=" beschreibung_mehrsprachig[$idx]=".$this->db_add_param($value).",";
 			}
 			$qry.='		pflicht='.$this->db_add_param($this->pflicht, FHC_BOOLEAN).',
-						nachreichbar='.$this->db_add_param($this->nachreichbar, FHC_BOOLEAN).'
+						nachreichbar='.$this->db_add_param($this->nachreichbar, FHC_BOOLEAN).',
+						stufe='.$this->db_add_param($this->stufe, FHC_INTEGER).'
 					WHERE
 						dokument_kurzbz='.$this->db_add_param($this->dokument_kurzbz).'
 						AND studiengang_kz='.$this->db_add_param($this->studiengang_kz);
@@ -688,7 +694,7 @@ class dokument extends basis_db
 		$bezeichnung_mehrsprachig = $sprache->getSprachQuery('bezeichnung_mehrsprachig');
 		$dokumentbeschreibung_mehrsprachig = $sprache->getSprachQuery('dokumentbeschreibung_mehrsprachig');
 		$beschreibung_mehrsprachig = $sprache->getSprachQuery('beschreibung_mehrsprachig');
-		$qry = "SELECT distinct on (dokument_kurzbz) dokument_kurzbz, bezeichnung, pflicht, nachreichbar, ausstellungsdetails, 
+		$qry = "SELECT distinct on (dokument_kurzbz) dokument_kurzbz, bezeichnung, pflicht, nachreichbar, ausstellungsdetails, stufe,
 			$bezeichnung_mehrsprachig, $dokumentbeschreibung_mehrsprachig, $beschreibung_mehrsprachig
 			FROM public.tbl_dokumentstudiengang
 			JOIN public.tbl_prestudent using (studiengang_kz)
@@ -714,6 +720,7 @@ class dokument extends basis_db
 				$dok->dokumentbeschreibung_mehrsprachig = $sprache->parseSprachResult('dokumentbeschreibung_mehrsprachig', $row);
 				$dok->beschreibung_mehrsprachig = $sprache->parseSprachResult('beschreibung_mehrsprachig', $row);
 				$dok->ausstellungsdetails = $this->db_parse_bool($row->ausstellungsdetails);
+				$dok->stufe = $row->stufe;
 
 				$this->result[] = $dok;
 			}
@@ -838,7 +845,8 @@ class dokument extends basis_db
 	 */
 	public function getStudiengaengeDokument($dokument_kurzbz, $person_id = null)
 	{
-		$qry = "	SELECT DISTINCT studiengang_kz,typ||kurzbz AS kuerzel, bezeichnung, english FROM public.tbl_dokumentstudiengang
+		$qry = "	SELECT DISTINCT studiengang_kz,typ||kurzbz AS kuerzel, bezeichnung, english, stufe
+					FROM public.tbl_dokumentstudiengang
 					JOIN public.tbl_prestudent USING (studiengang_kz)
 					JOIN public.tbl_prestudentstatus USING (prestudent_id)
 					JOIN public.tbl_studiengang USING (studiengang_kz)
@@ -859,6 +867,8 @@ class dokument extends basis_db
 					$stg_obj->kuerzel = $row->kuerzel;
 					$stg_obj->bezeichnung = $row->bezeichnung;
 					$stg_obj->studiengang_kz = $row->studiengang_kz;
+					$stg_obj->english = $row->english;
+					$stg_obj->stufe = $row->stufe;
 	
 					$this->result[] = $stg_obj;
 				}

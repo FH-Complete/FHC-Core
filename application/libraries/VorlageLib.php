@@ -188,18 +188,4 @@ class VorlageLib
 		$vorlagetext = $this->ci->VorlageStudiengangModel->update($vorlagestudiengang_id, $data);
 		return $vorlagetext;
 	}
-
-	/**
-	 * parseVorlagetext() - will parse a Vorlagetext.
-	 *
-	 * @param   string  $text	REQUIRED
-	 * @param   array  $data	REQUIRED
-	 * @return  string
-	 */
-	public function parseVorlagetext($text, $data = array())
-	{
-		if (isEmptyString($text)) return error('Not a valid text');
-
-		return $this->ci->parser->parse_string($text, $data, true);
-	}
 }

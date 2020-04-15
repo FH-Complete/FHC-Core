@@ -37,15 +37,15 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 		<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
 		<link rel="stylesheet" href="../../skin/styles/jquery.css" type="text/css">
-		<link rel="stylesheet" href="../../include/js/tablesort/table.css" type="text/css">
-		<script src="../../include/js/tablesort/table.js" type="text/javascript"></script>
-		<script src="../../include/js/JSONeditor/JSONeditor.js" type="text/javascript"></script>
-		<link rel="stylesheet" type="text/css" href="../../skin/jquery-ui-1.9.2.custom.min.css">
-<script type="text/javascript" src="../../vendor/jquery/jqueryV1/jquery-1.12.4.min.js"></script>
-<script type="text/javascript" src="../../vendor/christianbach/tablesorter/jquery.tablesorter.min.js"></script>
-<script type="text/javascript" src="../../vendor/components/jqueryui/jquery-ui.min.js"></script>
-<script type="text/javascript" src="../../include/js/jquery.ui.datepicker.translation.js"></script>
-<script type="text/javascript" src="../../vendor/jquery/sizzle/sizzle.js"></script>
+		<script src="../../include/js/JSONeditor/JSONeditor.js" type="text/javascript"></script>';
+
+			include('../../include/meta/jquery.php');
+			include('../../include/meta/jquery-tablesorter.php');
+
+echo '	
+		<script type="text/javascript" src="../../vendor/components/jqueryui/jquery-ui.min.js"></script>
+		<script type="text/javascript" src="../../include/js/jquery.ui.datepicker.translation.js"></script>
+		<script type="text/javascript" src="../../vendor/jquery/sizzle/sizzle.js"></script>
 		<script src="../../vendor/components/jqueryui/jquery-ui.min.js" type="text/javascript"></script>
 		<script type="text/javascript">
 		function initwarnung()
@@ -54,6 +54,17 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 				"\nDie bestehenden Variablen werden dabei überschrieben!"+
 				"\n\nACHTUNG: Wenn das Script keine Initialisierung unterstützt, wird es normal ausgeführt");
 		}
+		$(document).ready(function()
+		{
+			$("#table1").tablesorter(
+				{
+					sortList: [[2,0]],
+					widgets: ["zebra", "filter"],
+					headers: {  1: { sorter: "shortDate", dateFormat: "ddmmyyyy" },
+								7: { sorter: false, filter: false },
+								8: { sorter: false, filter: false }}
+				});			
+		});
 		</script>
 	</head>
 	<body>
@@ -191,16 +202,18 @@ if(!$cj->getAll(null, 'titel'))
 echo '<br><a href="'.$_SERVER['PHP_SELF'].'?type=new">Neuen Cronjob anlegen</a>';
 
 echo '<br><br>
-<table class="liste table-autosort:2 table-stripeclass:alternate table-autostripe">
+<table id="table1" style="table-layout: fixed">
 	<thead>
 	<tr>
-		<th class="table-sortable:default">ID</th>
-		<th class="table-sortable:default">Server</th>
-		<th class="table-sortable:default">Titel</th>
-		<th class="table-sortable:default">Aktiv</th>
-		<th class="table-sortable:default">letzter Start</th>
-		<th class="table-sortable:default">nächster Start</th>
-		<th colspan="2"></th>
+		<th style="width: 30px">ID</th>
+		<th>Server</th>
+		<th>Titel</th>
+		<th>Datei</th>
+		<th style="width: 50px">Aktiv</th>
+		<th>letzter Start</th>
+		<th>nächster Start</th>
+		<th style="width: 50px"></th>
+		<th style="width: 50px"></th>
 	</tr>
 	</thead>
 	<tbody>';
@@ -208,17 +221,25 @@ echo '<br><br>
 foreach ($cj->result as $job)
 {
 	if($next = $job->getNextExecutionTime())
-		$next = date('d.m.Y H:i:s',$next);
+	{
+		$next = date('d.m.Y H:i:s', $next);
+	}
+	$grau = '';
+	if (!$job->aktiv)
+	{
+		$grau = 'color: grey !important;';
+	}
 	echo "
 	<tr>
-		<td>".htmlspecialchars($job->cronjob_id)."</td>
-		<td>".htmlspecialchars($job->server_kurzbz)."</td>
-		<td>".htmlspecialchars($job->titel)."</td>
-		<td>".($job->aktiv?'Ja':'Nein')."</td>
-		<td>".$datum_obj->formatDatum($job->last_execute,'d.m.Y H:i:s')."</td>
-		<td>".$next." (<a href=\"".$_SERVER['PHP_SELF']."?cronjob_id=$job->cronjob_id&type=execute\">jetzt starten</a>)</td>
-		<td><a href=\"".$_SERVER['PHP_SELF']."?cronjob_id=$job->cronjob_id&type=edit\">details</a></td>
-		<td><a href=\"".$_SERVER['PHP_SELF']."?cronjob_id=$job->cronjob_id&type=delete\">entfernen</a></td>
+		<td style='$grau'>".htmlspecialchars($job->cronjob_id)."</td>
+		<td style='$grau'>".htmlspecialchars($job->server_kurzbz)."</td>
+		<td style='$grau'>".htmlspecialchars($job->titel)."</td>
+		<td style='$grau text-overflow: ellipsis; white-space: nowrap; overflow:hidden;'>".htmlspecialchars($job->file)."</td>
+		<td style='$grau'>".($job->aktiv?'Ja':'Nein')."</td>
+		<td style='$grau'>".$datum_obj->formatDatum($job->last_execute,'d.m.Y H:i:s')."</td>
+		<td style='$grau'>".$next." (<a href=\"".$_SERVER['PHP_SELF']."?cronjob_id=$job->cronjob_id&type=execute\">jetzt starten</a>)</td>
+		<td style='$grau'><a href=\"".$_SERVER['PHP_SELF']."?cronjob_id=$job->cronjob_id&type=edit\">details</a></td>
+		<td style='$grau'><a href=\"".$_SERVER['PHP_SELF']."?cronjob_id=$job->cronjob_id&type=delete\">entfernen</a></td>
 	</tr>";
 }
 
@@ -258,7 +279,7 @@ if(isset($_GET['type']) && ($_GET['type']=='edit' || $_GET['type']=='new'))
 				<td><label for="titel">Titel</label></td>
 				<td><input type="text" name="titel" id="titel" maxlength="64" value="'.htmlspecialchars($cj->titel).'"></td>
 				<td><label for="beschreibung">Beschreibung</label></td>
-				<td colspan="8"><input type="text" name="beschreibung" id="beschreibung" size="80" value="'.htmlspecialchars($cj->beschreibung).'"></td>				
+				<td colspan="10"><input type="text" name="beschreibung" id="beschreibung" size="80" value="'.htmlspecialchars($cj->beschreibung).'"></td>				
 			</tr>
 			<tr>
 				<td><label for="server_kurzbz">Server</label></td>
@@ -287,7 +308,7 @@ if(isset($_GET['type']) && ($_GET['type']=='edit' || $_GET['type']=='new'))
 				<td><label for="file">Datei
 					<img src="../../skin/images/information.png" title="absoluter Pfad im Filesystem zB /var/www/vilesci/job.php" />
 					</label></td>
-				<td colspan="8"><input type="text" size="80" id="file" name="file" value="'.htmlspecialchars($cj->file).'"></td>
+				<td colspan="10"><input type="text" size="200" id="file" name="file" value="'.htmlspecialchars($cj->file).'"></td>
 			</tr>
 			<tr>
 				<td><label for="jahr">Jahr</label></td>
@@ -322,6 +343,7 @@ if(isset($_GET['type']) && ($_GET['type']=='edit' || $_GET['type']=='new'))
 				<td><input type="text" name="stunde" id="stunde" maxlength="4" size="4" value="'.htmlspecialchars($cj->stunde).'"></td>
 				<td><label for="minute">Minute</label></td>
 				<td><input type="text" name="minute" id="minute" maxlength="4" size="4" value="'.htmlspecialchars($cj->minute).'"></td>
+				<td style="width: 500px"></td>
 			</tr>
 			<tr>
 				<td><label for="aktiv">Aktiv</label></td>
