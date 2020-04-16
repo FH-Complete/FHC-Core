@@ -186,6 +186,25 @@
 				 LIMIT 1
 			) AS "ReihungstestApplied",
 			(
+				SELECT rtp.datum
+				  FROM public.tbl_prestudentstatus pss
+				  JOIN public.tbl_prestudent ps USING(prestudent_id)
+		  	 LEFT JOIN (
+					SELECT rtp.person_id,
+						   rt.studiensemester_kurzbz,
+						   rtp.teilgenommen,
+						   rt.datum
+					  FROM public.tbl_rt_person rtp
+		   			  JOIN tbl_reihungstest rt ON(rtp.rt_id = rt.reihungstest_id)
+					 WHERE rt.stufe = 1
+				) rtp ON(rtp.person_id = ps.person_id AND rtp.studiensemester_kurzbz = pss.studiensemester_kurzbz)
+				 WHERE pss.status_kurzbz = '.$INTERESSENT_STATUS.'
+				   AND ps.person_id = p.person_id
+				   AND pss.studiensemester_kurzbz = '.$STUDIENSEMESTER.'
+			  ORDER BY pss.datum DESC, pss.insertamum DESC, pss.ext_id DESC
+				 LIMIT 1
+			) AS "ReihungstestDate",
+			(
 				SELECT ps.zgvnation
 				FROM public.tbl_prestudent ps
 				 WHERE ps.person_id = p.person_id
@@ -258,6 +277,7 @@
 			'Statusgrund',
 			'Reihungstest angetreten',
 			'Reihungstest angemeldet',
+			'Reihungstest date',
 			'ZGV Nation'
 		),
 		'formatRow' => function($datasetRaw) {
@@ -337,6 +357,16 @@
 			{
 				$datasetRaw->{'ReihungstestApplied'} = 'Nein';
 			}
+
+			if ($datasetRaw->{'ReihungstestDate'} == null)
+			{
+				$datasetRaw->{'ReihungstestDate'} = '-';
+			}
+			else
+			{
+				$datasetRaw->{'ReihungstestDate'} = date_format(date_create($datasetRaw->{'ReihungstestDate'}),'Y-m-d');
+			}
+
 			if ($datasetRaw->{'ZGVNation'} == null)
 			{
 				$datasetRaw->{'ZGVNation'} = '-';
