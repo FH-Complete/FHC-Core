@@ -3698,8 +3698,8 @@ When on hold, the date is only a reminder.',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Es existierte bereits ein Bewerberstatus und eine Reihungstestteilnahme. 
-				Deshalb wurde bei der Freigabe der Bewerberstatus automatisch hinzugefügt und der Bewerber als Reihungstestabsolvent markiert. 
+				'text' => 'Es existierte bereits ein Bewerberstatus und eine Reihungstestteilnahme.
+				Deshalb wurde bei der Freigabe der Bewerberstatus automatisch hinzugefügt und der Bewerber als Reihungstestabsolvent markiert.
 				Die Reihungstestpunkte müssen aber noch manuell eingetragen werden!',
 				'description' => '',
 				'insertvon' => 'system'
@@ -4549,6 +4549,26 @@ When on hold, the date is only a reminder.',
 			array(
 				'sprache' => 'English',
 				'text' => 'You received a new message',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'dms',
+		'phrase' => 'informationsblattExterneLehrende',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => '<a href="../../../cms/dms.php?id={DMS_ID_INFOBLATT_EXTERNE_LEHRENDE}" target="_blank">Informationsblatt für externe Lehrende</a>',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => '<a href="../../../cms/dms.php?id={DMS_ID_INFOBLATT_EXTERNE_LEHRENDE}" target="_blank">Information sheet for external lecturers</a>', // TODO: change to dms id as soon as english info sheet is available
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -5593,6 +5613,8 @@ When on hold, the date is only a reminder.',
 				'insertvon' => 'system'
 			)
 		)
+=======
+>>>>>>> feature-5961/DigitalerLehrauftrag_Auszahlungsinfoblatt_externe_Lehrende
 	)
 );
 
