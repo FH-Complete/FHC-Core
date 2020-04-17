@@ -53,14 +53,15 @@ $tableWidgetArray = array(
 	'tableUniqueId' => 'cancelledLehrauftrag',
 	'requiredPermissions' => 'lehre/lehrauftrag_akzeptieren',
 	'datasetRepresentation' => 'tabulator',
-	'columnsAliases' => array(  // TODO: use phrasen
+	'columnsAliases' => array(
 		'Status',
-		'Studiensemester',
-		'Typ',
-		'LV- / Projektbezeichnung',
-		'Stunden',
-		'Betrag',
-		'Storniert am'
+		ucfirst($this->p->t('lehre', 'studiensemester')),
+		ucfirst($this->p->t('global', 'typ')),
+		ucfirst($this->p->t('lehre', 'lehrveranstaltung')). '- / '. ucfirst($this->p->t('ui', 'projekt')). lcfirst($this->p->t('ui', 'bezeichnung')),
+		ucfirst($this->p->t('ui', 'stunden')),
+		ucfirst($this->p->t('ui', 'betrag')),
+		ucfirst($this->p->t('ui', 'storniertAm')),
+		ucfirst($this->p->t('ui', 'storniertVon'))
 	),
 	'datasetRepOptions' => '{
         rowFormatter:function(row){

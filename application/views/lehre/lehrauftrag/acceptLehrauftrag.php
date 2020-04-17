@@ -15,7 +15,37 @@ $this->load->view(
         'dialoglib' => true,
         'tablewidget' => true,
         'phrases' => array(
-            'global' => array('lehrauftraegeAnnehmen'),
+            'global' => array(
+                'lehrauftraegeAnnehmen'
+                ),
+            'ui' => array(
+                'anzeigen',
+                'alleAnzeigen',
+                'nurBestellteAnzeigen',
+                'nurErteilteAnzeigen',
+                'nurAngenommeneAnzeigen',
+                'nurStornierteAnzeigen',
+                'hilfeZuDieserSeite',
+                'alleAuswaehlen',
+                'alleAbwaehlen',
+                'ausgewaehlteZeilen',
+                'hilfe',
+                'tabelleneinstellungen',
+                'keineDatenVorhanden',
+                'spaltenEinstellen',
+	            'bestelltVon',
+	            'erteiltVon',
+	            'angenommenVon',
+	            'storniertVon',
+                'lehrauftragInBearbeitung',
+                'wartetAufErteilung',
+                'wartetAufErneuteErteilung',
+                'letzterStatusBestellt',
+                'letzterStatusErteilt',
+                'letzterStatusAngenommen',
+                'vertragWurdeStorniert',
+                ),
+            'password' => array('password')
         ),
         'customJSs' => array(
                 'public/js/bootstrapper.js',
@@ -33,7 +63,7 @@ $this->load->view(
         <div class="row">
             <div class="col-lg-12 page-header">
 				<a class="pull-right" data-toggle="collapse" href="#collapseHelp" aria-expanded="false" aria-controls="collapseExample">
-					Hilfe zu dieser Seite
+					<?php echo $this->p->t('ui', 'hilfeZuDieserSeite'); ?>
 				</a>
 				<h3>
                     <?php echo ucfirst($this->p->t('global', 'lehrauftraegeAnnehmen')); ?>
@@ -45,43 +75,8 @@ $this->load->view(
 		<div class="row">
 			<div class="col-lg-12 collapse" id="collapseHelp">
 				<div class="well">
-					<h4>Wie nehme ich Lehraufträge an?</h4>
-					<div class="panel panel-body">
-						Sobald Ihnen ein oder mehrere Lehraufträge erteilt wurden, können Sie diese annehmen.
-						<ol>
-							<li>Klicken Sie unten auf das Status-Icon 'Nur erteilte anzeigen' oder 'Alle anzeigen'</li>
-							<li>Wählen Sie die Lehraufträge, die Sie annehmen möchten, selbst oder alle über den Button 'Alle auswählen'.</li>
-							<li>Geben Sie Ihr CIS-Passwort ein und klicken auf Lehrauftrag annehmen.</li>
-						</ol>
-					</div>
-					<br>
-
-					<h4>Warum kann ich manche Lehraufträge nicht auswählen?</h4>
-					<div class="panel panel-body">
-						Nur Lehraufträge mit dem Status 'erteilt' können gewählt werden.<br>
-						Angenommene Lehraufträge oder Lehraufträge in Bearbeitung werden nur zu Ihrer Information angezeigt.
-					</div>
-					<br>
-
-					<h4>Filter</h4>
-					<div class="panel panel-body">
-						<div class="col-xs-12 col-md-8 col-lg-6">
-						<table class="table table-bordered">
-							<tr class="text-center">
-								<td class="col-xs-1"><i class='fa fa-users'></i></td>
-								<td class="col-xs-1"><img src="../../../public/images/icons/fa-user-check.png" style="height: 30px; width: 30px;"></td>
-								<td class="col-xs-1"><i class='fa fa-handshake-o'></i></td>
-							</tr>
-							<tr class="text-center">
-								<td><b>Alle</b><br>Alle Lehraufträge mit jedem Status</td>
-								<td><b>Erteilt</b><br>Nur erteilte UND geänderte Lehraufträge, die in Bearbeitung sind</td>
-								<td><b>Angenommen</b><br>Nur von Ihnen angenommene Lehraufträge</td>
-							</tr>
-						</table>
-						</div>
-					</div>
-					<br>
-				</div>
+					<?php echo _getHelptext(getUserLanguage()); ?>
+				</div> <!--./well-->
 			</div>
 		</div>
 
@@ -104,7 +99,7 @@ $this->load->view(
                         );
                         ?>
                     </div>
-                    <button type="submit" name="submit" value="anzeigen" class="btn btn-default form-group">Anzeigen</button>
+                    <button type="submit" name="submit" value="anzeigen" class="btn btn-default form-group"><?php echo ucfirst($this->p->t('ui', 'anzeigen')); ?></button>
                 </form>
             </div>
         </div>
@@ -123,18 +118,21 @@ $this->load->view(
                 <div class="btn-toolbar" role="toolbar">
                     <div class="btn-group" role="group">
                         <button id="show-all" class="btn btn-default btn-lehrauftrag active focus" type="button"
-								data-toggle="tooltip" data-placement="left" title="Alle anzeigen"><i class='fa fa-users'></i>
+								data-toggle="tooltip" data-placement="left" title="<?php echo $this->p->t('ui', 'alleAnzeigen'); ?>"><i class='fa fa-users'></i>
 						</button>
+                        <button id="show-ordered" class="btn btn-default btn-lehrauftrag" type="button"
+								data-toggle="tooltip" data-placement="left" title="<?php echo $this->p->t('ui', 'nurBestellteAnzeigen'); ?>">
+						</button><!-- png img set in javascript -->
                         <button id="show-approved" class="btn btn-default btn-lehrauftrag" type="button"
-								data-toggle="tooltip" data-placement="left" title="Nur erteilte anzeigen">
+								data-toggle="tooltip" data-placement="left" title="<?php echo $this->p->t('ui', 'nurErteilteAnzeigen'); ?>">
 						</button><!-- png img set in javascript -->
                         <button id="show-accepted" class="btn btn-default btn-lehrauftrag" type="button"
-								data-toggle="tooltip" data-placement="left" title="Nur angenommene anzeigen"><i class='fa fa-handshake-o'></i>
+								data-toggle="tooltip" data-placement="left" title="<?php echo $this->p->t('ui', 'nurAngenommeneAnzeigen'); ?>"><i class='fa fa-handshake-o'></i>
 						</button>
                     </div>
 
 					<button id="show-cancelled" class="btn btn-default btn-lehrauftrag" type="button" style="margin-left: 20px;"
-							data-toggle="collapse" data-placement="left" title="Stornierte anzeigen"
+							data-toggle="collapse" data-placement="left" title="<?php echo $this->p->t('ui', 'nurStornierteAnzeigen'); ?>"
 							data-target ="#collapseCancelledLehrauftraege" aria-expanded="false" aria-controls="collapseExample">
 					</button><!-- png img set in javascript -->
                 </div>
@@ -156,9 +154,9 @@ $this->load->view(
             <div class="col-xs-4 col-md-offset-0 col-md-4">
 				<div class="input-group">
 					<input id="username" type="hidden" value=""><!-- this is to prevent Chrome autofilling a random input field with the username-->
-					<input id="password" type="password" autocomplete="new-password" class="form-control" placeholder="CIS-Passwort">
+					<input id="password" type="password" autocomplete="new-password" class="form-control" placeholder="CIS-<?php echo ucfirst($this->p->t('password', 'password')); ?>">
 						<span class="input-group-btn">
-							<button id="accept-lehrauftraege" class="btn btn-primary pull-right">Lehrauftrag annehmen</button>
+							<button id="accept-lehrauftraege" class="btn btn-primary pull-right"><?php echo ucfirst($this->p->t('global', 'lehrauftraegeAnnehmen')); ?></button>
 						</span>
 				</div>
             </div>
@@ -191,3 +189,97 @@ $this->load->view(
 </body>
 
 <?php $this->load->view('templates/FHC-Footer'); ?>
+
+<?php
+
+function _getHelptext($user_language)
+{
+    $html = '';
+
+    if ($user_language == 'German')
+    {
+	    $html = <<<EOT
+        <h4>Wie nehme ich Lehraufträge an?</h4>
+        <div class="panel panel-body">
+            Sobald Ihnen ein oder mehrere Lehraufträge erteilt wurden, können Sie diese annehmen.
+            <ol>
+                <li>Klicken Sie unten auf das Status-Icon 'Nur erteilte anzeigen' oder 'Alle anzeigen'</li>
+                <li>Wählen Sie die Lehraufträge, die Sie annehmen möchten, selbst oder alle über den Button 'Alle auswählen'.</li>
+                <li>Geben Sie Ihr CIS-Passwort ein und klicken auf Lehrauftrag annehmen.</li>
+            </ol>
+        </div>
+        <br>
+
+        <h4>Warum kann ich manche Lehraufträge nicht auswählen?</h4>
+        <div class="panel panel-body">
+            Nur Lehraufträge mit dem Status 'erteilt' können gewählt werden.<br>
+            Angenommene Lehraufträge oder Lehraufträge in Bearbeitung werden nur zu Ihrer Information angezeigt.
+        </div>
+        <br>
+
+        <h4>Filter</h4>
+        <div class="panel panel-body">
+            <div class="col-xs-12 col-md-8 col-lg-6">
+            <table class="table table-bordered">
+                <tr class="text-center">
+                    <td class="col-xs-1"><i class='fa fa-users'></i></td>
+                    <td class="col-xs-1"><img src="../../../public/images/icons/fa-user-tag.png" style="height: 30px; width: 30px;"></td>
+                    <td class="col-xs-1"><img src="../../../public/images/icons/fa-user-check.png" style="height: 30px; width: 30px;"></td>
+                    <td class="col-xs-1"><i class='fa fa-handshake-o'></i></td>
+                </tr>
+                <tr class="text-center">
+                    <td><b>Alle</b><br>Alle Lehraufträge mit jedem Status</td>
+                    <td><b>Bestellt</b><br>Nur bestellte UND bestellte Lehraufträge, die in Bearbeitung sind</td>
+                    <td><b>Erteilt</b><br>Nur erteilte UND geänderte Lehraufträge, die in Bearbeitung sind</td>
+                    <td><b>Angenommen</b><br>Nur von Ihnen angenommene Lehraufträge</td>
+                </tr>
+            </table>
+            </div>
+        </div>
+        <br>
+EOT;
+    }
+    elseif ($user_language == 'English')
+    {
+	    $html = <<<EOT
+        <h4> How do I accept teaching lectureships? </h4>
+        <div class = "panel panel-body">
+        As soon as a teaching lectureship has been approved (status = approved), you can accept it.
+        <ol>
+        <li> Click on the status icon 'Show only approved’ or 'Show all' below </li>
+        <li> Select the teaching assignments you would like to accept either by selecting them individually or by using the 'Select all' button. </li>
+        <li> Enter your CIS password and click on ‘Accept lectureships’. </li>
+        </ol>
+        </div><br>
+
+        <h4> Why can't I select some teaching lectureships? </h4>
+        <div class = "panel panel-body">
+        Only approved teaching lectureships are selectable. (status MUST be approved) <br>
+        </div><br>
+
+        <h4>Filtering teaching lectureships by status</h4>
+        <div class = "panel panel-body">
+        <div class = "col-xs-12 col-md-8 col-lg-6">
+        <table class = "table table-bordered">
+        <tr class = "text-center">
+        <td class = "col-xs-1"><i class = 'fa fa-users'></i></td>
+        <td class = "col-xs-1"><img src = "../../../public/images/icons/fa-user-tag.png" style = "height: 30px; width: 30px;"></td>
+        <td class = "col-xs-1"><img src = "../../../public/images/icons/fa-user-check.png" style = "height: 30px; width: 30px;"></td>
+        <td class = "col-xs-1"><i class = 'fa fa-handshake-o'></i></td>
+        </tr>
+        <tr class = "text-center">
+        <td><b>All</b><br> All teaching lectureships (any status)</td>
+        <td><b>Ordered</b><br> Only ordered teaching lectureships</td>
+        <td><b>Approved</b><br> Only approved teaching lectureships</td>
+        <td><b>Accepted</b><br> Only accepted lectureships</td>
+        </tr>
+        </table>
+        </div>
+        </div><br>
+EOT;
+    }
+
+	return $html;
+}
+
+?>
