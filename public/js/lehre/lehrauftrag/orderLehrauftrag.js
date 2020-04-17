@@ -18,6 +18,17 @@ const ICON_LEHRAUFTRAG_ORDERED = '<img src="../../../public/images/icons/fa-user
 const ICON_LEHRAUFTRAG_APPROVED = '<img src="../../../public/images/icons/fa-user-check.png" style="height: 30px; width: 30px; margin: -6px;">';
 const ICON_LEHRAUFTRAG_CHANGED = '<img src="../../../public/images/icons/fa-user-edit.png" style="height: 30px; width: 30px; margin: -6px;">';
 
+// Fields that should not be provided in the column picker
+var tableWidgetBlacklistArray_columnUnselectable = [
+	'status',
+	'row_index',
+	'personalnummer',
+	'betrag',
+	'vertrag_id',
+	'vertrag_stunden',
+	'vertrag_betrag'
+];
+
 // -----------------------------------------------------------------------------------------------------------------
 // Mutators - setter methods to manipulate table data when entering the tabulator
 // -----------------------------------------------------------------------------------------------------------------
@@ -88,10 +99,16 @@ function hf_filterStringnumberWithOperator(headerValue, rowValue, rowData){
  */
 function func_dataLoaded(data, table){
     table.setFilter([
-        {field: 'personalnummer', type: '>=', value: 0},        // not dummy lector AND
         [
-            {field: 'status', type: '=', value: 'Neu'},         // neu OR
-            {field: 'status', type: '=', value: 'Geändert'}     // geaendert
+            {field: 'personalnummer', type: '>', value: 0},       // not dummy
+            {field: 'personalnummer', type: '=', value: null}     // include projektbetreuer
+        ],
+        {field: 'mitarbeiter_uid', type: '!=', value: null},    // AND is Mitarbeiter
+        {field: 'stunden', type: '!=', value: null},            // AND has Semesterstunden (not null and not 0)
+        {field: 'stunden', type: '!=', value: 0},
+        [
+            {field: 'status', type: '=', value: 'Neu'},         // AND neu
+            {field: 'status', type: '=', value: 'Geändert'}     // OR geaendert
         ]
     ]);
 }
@@ -100,10 +117,9 @@ function func_dataLoaded(data, table){
 // Tabulator table format functions
 // -----------------------------------------------------------------------------------------------------------------
 
-// Displays text when table is empty
-function func_placeholder()
-{
-    return "<h4>Keine Daten vorhanden.</h4>";
+// Returns relative height (depending on screen size)
+function func_height(table){
+    return $(window).height() * 0.50;
 }
 
 // Formats the group header
@@ -114,6 +130,8 @@ function func_groupHeader(data) {
 // Formats the rows
 function func_rowFormatter(row){
     var is_dummy = (row.getData().personalnummer <= 0 && row.getData().personalnummer != null);
+    var is_mitarbeiter = row.getData().mitarbeiter_uid != null;
+    var has_stunden = row.getData().stunden != 0 && row.getData().stunden != null;
 
     var bestellt = row.getData().bestellt;
     var erteilt = row.getData().erteilt;
@@ -149,14 +167,18 @@ function func_rowFormatter(row){
     Formats the color of the rows depending on their status
     - blue: dummy lectors
     - bold: geaendert
-    - default (white): neu und erteilt
+    - default (white): neu
     - green: akzeptiert
-    - grey: all other (marks unselectable)
+    - grey: all other (marks unselectable), not mitarbeiter, has no semesterstunden
      */
     row.getCells().forEach(function(cell){
         if(is_dummy)
         {
             cell.getElement().classList.add('bg-info');                          // dummy lectors
+        }
+        else if ((!is_mitarbeiter || !has_stunden) && akzeptiert == null)
+        {
+            row.getElement().style["background-color"] = COLOR_LIGHTGREY;
         }
         else if (bestellt != null && (betrag != vertrag_betrag) ||
             bestellt != null && stunden != vertrag_stunden &&
@@ -182,6 +204,8 @@ function func_rowFormatter(row){
 // Formats row selectable/unselectable
 function func_selectableCheck(row){
     var is_dummy = (row.getData().personalnummer <= 0 && row.getData().personalnummer != null);
+    var is_mitarbeiter = row.getData().mitarbeiter_uid != null;
+    var has_stunden = row.getData().stunden != 0 && row.getData().stunden != null;
 
     var stunden = parseFloat(row.getData().stunden);
     var vertrag_stunden = parseFloat(row.getData().vertrag_stunden);
@@ -211,10 +235,12 @@ function func_selectableCheck(row){
 
 
     // Only allow to select neue and geaenderte
-    return  !is_dummy &&                                                    // NOT dummy lector
+    return  !is_dummy &&                                                // NOT dummy lector
+        is_mitarbeiter &&                                               // AND is Mitarbeiter
+        has_stunden &&                                                  // AND has Semesterstunden (not null and not 0)
         row.getData().bestellt == null ||                               // AND neue
         row.getData().bestellt != null && betrag != vertrag_betrag ||   // OR geaenderte
-        row.getData().bestellt != null && stunden != vertrag_stunden    // OR geanderte (if betrag is 0 or null)
+        row.getData().bestellt != null && stunden != vertrag_stunden
 }
 
 // Adds column status
@@ -309,64 +335,28 @@ function func_rowUpdated(row){
     row.getElement().style["pointerEvents"] = "none";
 }
 
-// Tabulator footer element
+// TableWidget Footer element
 // -----------------------------------------------------------------------------------------------------------------
 
-// Adds a footer with buttons select all / deselect all / download
-function func_footerElement(){
-
-    var footer_html = '<div class="row">';
-    footer_html += '<div class="col-lg-12" style="padding: 5px;">';
-
-    footer_html += '<div class="btn-toolbar pull-right" role="toolbar">';
-    footer_html += '<div class="btn-group" role="group">';
-    footer_html += '<button id="download-csv" class="btn btn-default" type="button" data-toggle="tooltip" data-placement="left" title="Download CSV" onclick="footer_downloadCSV()"><small>CSV&nbsp;&nbsp;</small><i class="fa fa-arrow-down"></i></button>';
-    footer_html += '</div>';
-    footer_html += '</div>';
-
-    footer_html += '<div class="btn-toolbar" role="toolbar">';
-    footer_html += '<div class="btn-group" role="group">';
-    footer_html += '<button id="select-all" class="btn btn-default pull-left" type="button" onclick="footer_selectAll()">Alle auswählen</button>';
-    footer_html += '<button id="deselect-all" class="btn btn-default pull-left" type="button" onclick="footer_deselectAll()">Alle abwählen</button>';
-    footer_html += '<span id="number-selected" style="margin-left: 20px; line-height: 2; font-weight: normal"></span>';
-    footer_html += '</div>';
-    footer_html += '</div>';
-
-    footer_html += '</div>';
-    footer_html += '</div>';
-
-    return footer_html;
-}
-
-// Performs download CSV
-function footer_downloadCSV(){
-    $('#tableWidgetTabulator').tabulator("download", "csv", "data.csv", {bom:true}); // BOM for correct UTF-8 char output
-}
-
 /*
- * Performs select all
+ * Hook to overwrite TableWigdgets select-all-button behaviour
  * Select all (filtered) rows and ignore rows which have status bestellt
  */
-function footer_selectAll(){
-    $('#tableWidgetTabulator').tabulator('getRows', true)
-        .filter(row => row.getData().personalnummer >= 0 &&             // NOT dummies
-            row.getData().bestellt == null ||                       // AND neu
-            row.getData().bestellt != null &&                       // OR (bestellt
-            row.getData().status == 'Geändert')                     // AND geaendert)
-        .forEach((row => row.select()));
-}
-
-/*
- * Performs deselect all
- * Deselect all (filtered) rows
- */
-function footer_deselectAll(){
-    $('#tableWidgetTabulator').tabulator('deselectRow');
-}
-
-// Displays number of selected rows on row selection change
-function func_rowSelectionChanged(data, rows){
-    $('#number-selected').html("Für Bestellung ausgewählt: <strong>" + rows.length + "</strong>");
+function tableWidgetHook_selectAllButton(tableWidgetDiv){
+	tableWidgetDiv.find("#tableWidgetTabulator").tabulator('getRows', true)
+		.filter(row => (
+            row.getData().personalnummer > 0 ||                 // not dummies
+            row.getData().personalnummer == null) &&            // include Projektbetreuer
+            row.getData().mitarbeiter_uid != null &&            // AND is Mitarbeiter
+            row.getData().stunden != null &&                    // AND has Semesterstunden (not null and not 0)
+            row.getData().stunden != 0 &&
+            (
+                row.getData().bestellt == null ||               // AND neu
+                row.getData().bestellt != null &&               // OR (bestellt
+                row.getData().status == 'Geändert'              // AND geaendert)
+            )
+        )
+		.forEach((row => row.select()));
 }
 
 // -----------------------------------------------------------------------------------------------------------------
@@ -448,6 +438,8 @@ status_formatter = function(cell, formatterParams, onRendered){
 // Generates status tooltip
 status_tooltip = function(cell){
     var is_dummy = (cell.getRow().getData().personalnummer <= 0 && cell.getRow().getData().personalnummer != null);
+    var is_mitarbeiter = cell.getRow().getData().mitarbeiter_uid != null;
+    var has_stunden = cell.getRow().getData().stunden != 0 && cell.getRow().getData().stunden != null;
 
     var bestellt = cell.getRow().getData().bestellt;
     var erteilt = cell.getRow().getData().erteilt;
@@ -491,6 +483,14 @@ status_tooltip = function(cell){
     if (is_dummy)                                           // dummy (no lector)
     {
         return 'Neuer Lehrauftrag. Ohne Lektor verplant.'
+    }
+    else if (!is_mitarbeiter)
+    {
+        return 'Lektor ist nicht als Mitarbeiter erfasst.'
+    }
+    else if (!has_stunden)
+    {
+        return 'Es wurden noch keine Stunden zugeteilt.'
     }
     else if (isNaN(vertrag_betrag))                         // neu
     {
@@ -542,16 +542,28 @@ akzeptiert_tooltip = function(cell){
 
 $(function() {
 
+    // Redraw table on resize to fit tabulators height to windows height
+    window.addEventListener('resize', function(){
+        $('#tableWidgetTabulator').tabulator('setHeight', $(window).height() * 0.50);
+        $('#tableWidgetTabulator').tabulator('redraw', true);
+    });
+
     // Show all rows
     $("#show-all").click(function(){
         $('#tableWidgetTabulator').tabulator('clearFilter');
     });
 
-    // Show only rows with new lehrauftraege (not dummy lectors)
+    // Show only rows with new lehrauftraege (not dummy lectors or external projektbetreuer; stunden not 0 or null)
     $("#show-new").click(function(){
         $('#tableWidgetTabulator').tabulator('setFilter',
             [
-                {field: 'personalnummer', type: '>=', value: 0},
+                [
+                    {field: 'personalnummer', type: '>', value: 0},     // not dummy lector
+                    {field: 'personalnummer', type: '=', value: null}   // include Projektbetreuer
+                ],
+                {field: 'mitarbeiter_uid', type: '!=', value: null},    // AND is Mitarbeiter
+                {field: 'stunden', type: '!=', value: null},            // AND has Semesterstunden (not null and not 0)
+                {field: 'stunden', type: '!=', value: 0},
                 {field: 'bestellt', type: '=', value: null},
                 {field: 'erteilt', type: '=', value: null},
                 {field: 'akzeptiert', type: '=', value: null}
@@ -563,7 +575,10 @@ $(function() {
     $("#show-ordered").click(function(){
         $('#tableWidgetTabulator').tabulator('setFilter',
             [
-                {field: 'personalnummer', type: '>=', value: 0},
+                [
+                    {field: 'personalnummer', type: '>', value: 0},     // not dummy lector
+                    {field: 'personalnummer', type: '=', value: null}   // include Projektbetreuer
+                ],
                 {field: 'bestellt', type: '!=', value: null},
                 {field: 'erteilt', type: '=', value: null},
                 {field: 'akzeptiert', type: '=', value: null}
@@ -598,9 +613,15 @@ $(function() {
         // needs custom filter to compare fields betrag and vertrag_betrag
         $('#tableWidgetTabulator').tabulator('setFilter',
             [
-                {field: 'personalnummer', type: '>=', value: 0},    // NOT dummy lector AND
-                {field: 'bestellt', type: '!=', value: null},       // bestellt AND
-                {field: 'status', type: '=', value: 'Geändert'}     // geaendert
+                [
+                    {field: 'personalnummer', type: '>', value: 0},     // NOT dummy lector
+                    {field: 'personalnummer', type: '=', value: null}   // include Projektbetreuer
+                ],
+                {field: 'mitarbeiter_uid', type: '!=', value: null},    // AND is Mitarbeiter
+                {field: 'stunden', type: '!=', value: null},            // AND has Semesterstunden (not null and not 0)
+                {field: 'stunden', type: '!=', value: 0},
+                {field: 'bestellt', type: '!=', value: null},           // bestellt AND
+                {field: 'status', type: '=', value: 'Geändert'}         // geaendert
             ]
         );
     });

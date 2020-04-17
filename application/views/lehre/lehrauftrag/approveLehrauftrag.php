@@ -123,28 +123,6 @@ $this->load->view(
 					</div>
 					<br>
 
-					<h4>Auswahl</h4>
-					<div class="panel panel-body">
-						<ul>
-							<li>Einzeln auswählen: <kbd>Strg</kbd> + Klick auf einzelne Zeile(n)</li>
-							<li>Bereich auswählen: <kbd>Shift</kbd> + Klick auf Anfangs- und Endzeile</li>
-							<li>Alle auswählen: Button 'Alle auswählen'</li>
-						</ul>
-					</div>
-					<br>
-
-					<h4>Ansicht</h4>
-					<div class="panel panel-body">
-						<b>Spaltenbreite verändern</b>
-						<p>
-							Um die Spaltenbreite zu verändern, fährt man im Spaltenkopf langsam mit dem Mauszeiger auf
-							den rechten Rand der entprechenden Spalte. <br>
-							Sobald sich der Mauszeiger in einen Doppelpfeil verwandelt, wird die Maustaste geklickt und
-							mit gedrückter Maustaste die Spalte nach rechts erweitert oder nach links verkleinert.
-						</p>
-					</div>
-					<br>
-
 				</div>
 			</div>
 		</div>
