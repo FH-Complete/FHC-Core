@@ -44,7 +44,21 @@ $this->load->view(
 		        'letzterStatusAngenommen',
                 'nachAenderungStundensatzStunden',
                 'vorAenderungStundensatzStunden'
-	        )
+	        ),
+	        'table' => array(
+		        'spaltenEinAusblenden',
+		        'spaltenEinAusblendenMitKlickOeffnen',
+		        'spaltenEinAusblendenAufEinstellungenKlicken',
+		        'spaltenEinAusblendenMitKlickAktivieren',
+		        'spaltenEinAusblendenMitKlickSchliessen',
+		        'spaltenbreiteVeraendern',
+		        'spaltenbreiteVeraendernText',
+		        'spaltenbreiteVeraendernInfotext',
+		        'zeilenAuswaehlen',
+		        'zeilenAuswaehlenEinzeln',
+		        'zeilenAuswaehlenBereich',
+		        'zeilenAuswaehlenAlle'
+            )
         ),
         'customJSs' => array(
                 'public/js/bootstrapper.js',

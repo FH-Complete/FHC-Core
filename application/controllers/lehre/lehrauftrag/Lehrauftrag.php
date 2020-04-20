@@ -52,7 +52,8 @@ class Lehrauftrag extends Auth_Controller
             array(
                 'global',
                 'ui',
-				'lehre'
+				'lehre',
+	            'table'
             )
         );
 

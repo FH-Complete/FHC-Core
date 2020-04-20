@@ -5613,8 +5613,274 @@ When on hold, the date is only a reminder.',
 				'insertvon' => 'system'
 			)
 		)
-=======
->>>>>>> feature-5961/DigitalerLehrauftrag_Auszahlungsinfoblatt_externe_Lehrende
+	),
+	array(
+		'app' => 'core',
+		'category' => 'table',
+		'phrase' => 'spaltenEinAusblenden',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Spalten ein- und ausblenden',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Show and hide columns',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'table',
+		'phrase' => 'spaltenEinAusblendenMitKlickOeffnen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => '
+					Mit einem Klick auf <button><i class="fa fa-cog"></i></button> werden die Einstellungen ge&ouml;ffnet.
+				',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'With a click on <button><i class = "fa fa-cog"></i></button> the settings will open',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'table',
+		'phrase' => 'spaltenEinAusblendenAufEinstellungenKlicken',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Auf Spalteneinstellungen klicken',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Click on column settings',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'table',
+		'phrase' => 'spaltenEinAusblendenMitKlickAktivieren',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => '
+					Durch (wiederholtes) Klicken auf ein Feld mit dem Spaltennamen wird die entsprechende Spalte in der
+					Tabelle ein- bzw. ausgeblendet.
+				',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => '
+					By clicking on a field with a column name the corresponding column is shown / hidden in the table.
+				',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'table',
+		'phrase' => 'spaltenEinAusblendenMitKlickSchliessen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => '
+					Mit einem Klick auf <button><i class="fa fa-cog"></i></button>  werden die Einstellungen wieder
+					geschlossen.
+				',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => '
+					With a click on <button><i class = "fa fa-cog"></i></button> the settings will be closed again.
+				',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'table',
+		'phrase' => 'spaltenbreiteVeraendern',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Spaltenbreite verändern',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Change column width',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'table',
+		'phrase' => 'spaltenbreiteVeraendernText',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => '
+					Um die Spaltenbreite zu ver&auml;ndern, fährt man im Spaltenkopf langsam  mit dem Mauszeiger auf den
+					rechten Rand der entprechenden Spalte. <br>
+					Sobald sich der Mauszeiger in einen Doppelpfeil verwandelt, wird die Maustaste geklickt und mit
+					gedr&uuml;ckter Maustaste die Spalte nach rechts erweitert oder nach links verkleinert.
+				',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => '
+					To change the column width, slowly hover  with the mouse pointer on the right edge of the
+					corresponding column header. <br>
+					As soon as the mouse pointer changes into a double arrow, click the mouse button and keep it pressed
+					while expanding the column width to the right or reducing it to the left.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'table',
+		'phrase' => 'spaltenbreiteVeraendernInfotext',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => '
+					Alle individuellen Tabelleneinstellungen werden in  Ihrem Browser Cache gespeichert. Wenn Sie Ihren
+					Browser Cache l&ouml;schen, werden Ihre Einstellungen zurückgesetzt und  müssen gegebenenfalls neu
+					eingestellt werden.
+				',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => '
+					All individual table settings are saved in your browser cache. If you clear your browser
+					cache, your settings will be erased. You will then need to reset them again.
+				',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'table',
+		'phrase' => 'zeilenAuswaehlen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Zeilen auswählen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Select rows',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'table',
+		'phrase' => 'zeilenAuswaehlenEinzeln',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Einzeln ausw&auml;hlen: <kbd>Strg</kbd> + Klick auf einzelne Zeile(n)',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Select individually: <kbd> Ctrl </kbd> + click on single line (s)',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'table',
+		'phrase' => 'zeilenAuswaehlenBereich',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Bereich ausw&auml;hlen: <kbd>Shift</kbd> + Klick auf Anfangs- und Endzeile',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Select a range: <kbd> Shift </kbd> + click on the start and end line',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'table',
+		'phrase' => 'zeilenAuswaehlenAlle',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Alle ausw&auml;hlen: Button \'Alle ausw&auml;hlen\'',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Select all: Button \'Select all \' ',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
 	)
 );
 

@@ -52,7 +52,8 @@ class LehrauftragAkzeptieren extends Auth_Controller
 				'ui',
 				'lehre',
 				'password',
-				'dms'
+				'dms',
+				'table'
 			)
 		);
 
