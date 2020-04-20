@@ -563,7 +563,7 @@ var FHC_TableWidget = {
 		tableWidgetDiv.find('#tableWidgetHeader').append(tabulatorHeaderHTML);
 
 		// Render the collapsable div triggered by button in tableWidgetHeader
-		var tabulatorHeaderCollapseHTML = _renderTabulatorHeaderCollapseHTML(tableWidgetDiv, FHC_JS_DATA_STORAGE_OBJECT.user_language);
+		var tabulatorHeaderCollapseHTML = _renderTabulatorHeaderCollapseHTML(tableWidgetDiv);
 		tableWidgetDiv.find('#tableWidgetHeader').after(tabulatorHeaderCollapseHTML);
 
 		/**
@@ -777,7 +777,7 @@ function _renderTabulatorHeaderHTML(tableWidgetDiv){
 }
 
 // Returns collapsable HTML element for TableWidget header buttons
-function _renderTabulatorHeaderCollapseHTML(tableWidgetDiv, language){
+function _renderTabulatorHeaderCollapseHTML(tableWidgetDiv){
 
 	var tableUniqueId = tableWidgetDiv.attr('tableUniqueId');
 
