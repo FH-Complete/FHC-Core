@@ -92,6 +92,23 @@ class Messages_model extends CI_Model
 	}
 
 	/**
+	 * Prepares data for the view system/messages/ajaxRead
+	 */
+	public function prepareAjaxRead()
+	{
+		$psResult = $this->PrestudentModel->loadWhere(array('person_id' => getAuthPersonId()));
+
+		if (isError($psResult)) show_error('An error occurred while loading this page, please contact the site administrator');
+
+		if (hasData($psResult))
+		{
+			return array('writeButton' => '<input id="writeMessage" type="button" value="'.$this->p->t('ui', 'nachrichtSenden').'">');
+		}
+
+		return array('writeButton' => '');
+	}
+
+	/**
 	 * Prepares data for the view system/messages/ajaxWrite
 	 */
 	public function prepareAjaxWrite()

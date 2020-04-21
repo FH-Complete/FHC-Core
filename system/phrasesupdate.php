@@ -3618,8 +3618,8 @@ When on hold, the date is only a reminder.',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Es existierte bereits ein Bewerberstatus und eine Reihungstestteilnahme. 
-				Deshalb wurde bei der Freigabe der Bewerberstatus automatisch hinzugefügt und der Bewerber als Reihungstestabsolvent markiert. 
+				'text' => 'Es existierte bereits ein Bewerberstatus und eine Reihungstestteilnahme.
+				Deshalb wurde bei der Freigabe der Bewerberstatus automatisch hinzugefügt und der Bewerber als Reihungstestabsolvent markiert.
 				Die Reihungstestpunkte müssen aber noch manuell eingetragen werden!',
 				'description' => '',
 				'insertvon' => 'system'
@@ -4453,7 +4453,28 @@ When on hold, the date is only a reminder.',
 				'insertvon' => 'system'
 			)
 		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'backToReadWriteMessage',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Zurück zur Inbox/Outbox',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Back to Inbox/Outbox',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
 	)
+
 );
 
 
