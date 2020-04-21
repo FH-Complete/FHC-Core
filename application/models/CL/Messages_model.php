@@ -267,15 +267,10 @@ class Messages_model extends CI_Model
 
 		$sender = getData($senderResult)[0]; // Found sender data
 
-		// Check if the receiver is an employee
-		$isEmployee = false; // not by default
-		$isEmployeeResult = $this->MessageTokenModel->isEmployee($message->receiver_id);
-		if (isError($isEmployeeResult)) show_error(getError($isEmployeeResult));
-		if (hasData($isEmployeeResult)) $isEmployee = true;
-
-		// If the sender is not an employee and are present configurations to reply
+		// If the sender is not the system sender and are present configurations to reply
 		$hrefReply = '';
-		if (!$isEmployee && !isEmptyString($this->config->item(MessageLib::CFG_REDIRECT_VIEW_MESSAGE_URL)))
+		if ($message->sender_id != $this->config->item(MessageLib::CFG_SYSTEM_PERSON_ID)
+			&& !isEmptyString($this->config->item(MessageLib::CFG_REDIRECT_VIEW_MESSAGE_URL)))
 		{
 			$hrefReply = $this->config->item(MessageLib::CFG_MESSAGE_SERVER).
 				$this->config->item(MessageLib::CFG_REDIRECT_VIEW_MESSAGE_URL).
