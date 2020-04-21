@@ -92,6 +92,23 @@ class Messages_model extends CI_Model
 	}
 
 	/**
+	 * Prepares data for the view system/messages/ajaxRead
+	 */
+	public function prepareAjaxRead()
+	{
+		$psResult = $this->PrestudentModel->loadWhere(array('person_id' => getAuthPersonId()));
+
+		if (isError($psResult)) show_error('An error occurred while loading this page, please contact the site administrator');
+
+		if (hasData($psResult))
+		{
+			return array('writeButton' => '<input id="writeMessage" type="button" value="'.$this->p->t('ui', 'nachrichtSenden').'">');
+		}
+
+		return array('writeButton' => '');
+	}
+
+	/**
 	 * Prepares data for the view system/messages/ajaxWrite
 	 */
 	public function prepareAjaxWrite()
@@ -267,15 +284,10 @@ class Messages_model extends CI_Model
 
 		$sender = getData($senderResult)[0]; // Found sender data
 
-		// Check if the receiver is an employee
-		$isEmployee = false; // not by default
-		$isEmployeeResult = $this->MessageTokenModel->isEmployee($message->receiver_id);
-		if (isError($isEmployeeResult)) show_error(getError($isEmployeeResult));
-		if (hasData($isEmployeeResult)) $isEmployee = true;
-
-		// If the sender is not an employee and are present configurations to reply
+		// If the sender is not the system sender and are present configurations to reply
 		$hrefReply = '';
-		if (!$isEmployee && !isEmptyString($this->config->item(MessageLib::CFG_REDIRECT_VIEW_MESSAGE_URL)))
+		if ($message->sender_id != $this->config->item(MessageLib::CFG_SYSTEM_PERSON_ID)
+			&& !isEmptyString($this->config->item(MessageLib::CFG_REDIRECT_VIEW_MESSAGE_URL)))
 		{
 			$hrefReply = $this->config->item(MessageLib::CFG_MESSAGE_SERVER).
 				$this->config->item(MessageLib::CFG_REDIRECT_VIEW_MESSAGE_URL).
@@ -422,10 +434,10 @@ class Messages_model extends CI_Model
 
 		return success('Messages sent successfully');
 	}
-
+	
 	/**
-	 * Sends a new message using the given template and information present in parameter prestudents
-	 * Extra variables can be added using parameter $msgVars
+	 * Wrapper method for sendExplicitTemplateSenderId
+	 * The sender id is retrieved from the authentication session, if not present an error would be raised
 	 */
 	public function sendExplicitTemplate($prestudents, $oe_kurzbz, $vorlage_kurzbz, $msgVars)
 	{
@@ -433,6 +445,15 @@ class Messages_model extends CI_Model
 		$sender_id = getAuthPersonId();
 		if (!is_numeric($sender_id)) show_error('The current logged user person_id is not defined');
 
+		return $this->sendExplicitTemplateSenderId($sender_id, $prestudents, $oe_kurzbz, $vorlage_kurzbz, $msgVars);
+	}
+	
+	/**
+	 * Sends a new message using the given template and information present in parameter prestudents
+	 * Extra variables can be added using parameter $msgVars
+	 */
+	public function sendExplicitTemplateSenderId($sender_id, $prestudents, $oe_kurzbz, $vorlage_kurzbz, $msgVars)
+	{
 		// Retrieves message vars data for the given user/s
 		$msgVarsData = $this->MessageModel->getMsgVarsDataByPrestudentId($prestudents);
 		if (isError($msgVarsData)) show_error(getError($msgVarsData));
@@ -454,12 +475,12 @@ class Messages_model extends CI_Model
 			if (is_array($msgVars)) $msgVarsDataArray = array_merge($msgVarsDataArray, $msgVars);
 
 			$message = $this->messagelib->sendMessageUserTemplate(
-				$msgVarsDataArray['person_id'],			// receiversPersonId
-				$vorlage_kurzbz,						// vorlage
-				$msgVarsDataArray,						// parseData
-				null,									// orgform
-				$sender_id,								// sender_id
-				$oe_kurzbz								// senderOU
+				$msgVarsDataArray['person_id'],	// receiversPersonId
+				$vorlage_kurzbz,		// vorlage
+				$msgVarsDataArray,		// parseData
+				null,				// orgform
+				$sender_id,			// sender_id
+				$oe_kurzbz			// senderOU
 			);
 
 			if (isError($message)) return $message;

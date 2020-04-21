@@ -1378,7 +1378,7 @@ class InfoCenter extends Auth_Controller
 				{
 					if (isset($prestudentstatus->bestaetigtam))
 					{
-						//if statusgrund set - RTfreigabe, otherwise Stgfreigabe
+						//if statusgrund set - freigegeben for Studiengang, otherwise freigegeben for RT
 						if (isset($prestudentstatus->statusgrund_id))
 						{
 							if (isset($prestudentstatus->bezeichnung_statusgrund[0])
@@ -1392,23 +1392,37 @@ class InfoCenter extends Auth_Controller
 							$zgvpruefung->isRtFreigegeben = true;
 					}
 				}
-			}
+            }
 
-			//application priority change possible?
-			$zgvpruefung->changeup = false;
-			$zgvpruefung->changedown = false;
+            //application priority change possible?
+            $zgvpruefung->changeup = false;
+            $zgvpruefung->changedown = false;
+            $zgvpruefung->hasBewerber = false;
 
-			if (isset($zgvpruefung->prestudentstatus->status_kurzbz) && $zgvpruefung->prestudentstatus->status_kurzbz == self::INTERESSENTSTATUS)
-			{
-				if (isset($zgvpruefung->prestudentstatus->studiensemester_kurzbz))
-				{
-					$studiensemester = $zgvpruefung->prestudentstatus->studiensemester_kurzbz;
-					$zgvpruefung->changeup = $this->PrestudentModel->checkPrioChange($zgvpruefung->prestudent_id, $studiensemester, -1);
-					$zgvpruefung->changedown = $this->PrestudentModel->checkPrioChange($zgvpruefung->prestudent_id, $studiensemester, 1);
-				}
-			}
+            if (isset($zgvpruefung->prestudentstatus->status_kurzbz) && $zgvpruefung->prestudentstatus->status_kurzbz == self::INTERESSENTSTATUS)
+            {
+                if (isset($zgvpruefung->prestudentstatus->studiensemester_kurzbz))
+                {
+                    $studiensemester = $zgvpruefung->prestudentstatus->studiensemester_kurzbz;
+                    //show warning if there is already another bewerber (RT result already exists)
+                    $bewerber = $this->PersonModel->hasBewerber($person_id, $studiensemester, 'b');
 
-			$zgvpruefungen[] = $zgvpruefung;
+                    if (hasData($bewerber))
+                    {
+                        $bewerbercnt = getData($bewerber);
+
+                        if (is_numeric($bewerbercnt[0]->anzahl_bewerber) && $bewerbercnt[0]->anzahl_bewerber > 0)
+                        {
+                            $zgvpruefung->hasBewerber = true;
+                        }
+                    }
+
+                    $zgvpruefung->changeup = $this->PrestudentModel->checkPrioChange($zgvpruefung->prestudent_id, $studiensemester, -1);
+                    $zgvpruefung->changedown = $this->PrestudentModel->checkPrioChange($zgvpruefung->prestudent_id, $studiensemester, 1);
+                }
+            }
+
+            $zgvpruefungen[] = $zgvpruefung;
 		}
 
 		$this->_sortPrestudents($zgvpruefungen);

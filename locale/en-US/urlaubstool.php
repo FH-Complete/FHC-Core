@@ -35,4 +35,5 @@ $this->phrasen['urlaubstool/handbuchUrlaubserfassung']='Handbuch Urlaubserfassun
 $this->phrasen['urlaubstool/meineZeitsperren']='My Planned Absences';
 $this->phrasen['urlaubstool/sieKoennenDiesenUnterFolgenderAdresseFreigeben']='Sie können diesen unter folgender Adresse freigeben'; //Nur übersetzen, wenn die eMail in der eingestellten Sprache versandt werden soll
 $this->phrasen['urlaubstool/freigabeansuchenUrlaub']='Freigabeansuchen Urlaub'; //Nur übersetzen, wenn die eMail in der eingestellten Sprache versandt werden soll
+$this->phrasen['urlaubstool/freigabeFehlt']='Vacation has not been approved yet';
 ?>
