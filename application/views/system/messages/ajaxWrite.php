@@ -87,7 +87,7 @@
 						<div class="col-lg-12 text-right">
 							<button id="backButton" class="btn btn-default" type="button">
 
-								<?php echo $this->p->t('ui', 'backToReadWeiteMeassage'); ?>
+								<?php echo $this->p->t('ui', 'backToReadWriteMessage'); ?>
 
 							</button>
 
