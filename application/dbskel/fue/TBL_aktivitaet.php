@@ -25,3 +25,4 @@ $tableArray = array(
 	),
 	'comment' => 'Timesheet SLA Activity'
 );
+

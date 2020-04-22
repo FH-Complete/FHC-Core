@@ -18,6 +18,7 @@ class DBSkelLib
 	const RUN_MODE_NEW = 'new'; // build a new database or if database is already present creates only new objects
 	const RUN_MODE_DIFF = 'diff'; // like new, but it also remove object from database that are NOT present in configuration files
 
+	// Step indexes
 	const STEP_SCHEMA = 1;
 	const STEP_SEQUENCES = 2;
 	const STEP_TABLES = 3;
@@ -831,12 +832,12 @@ class DBSkelLib
 				}
 				elseif ($step > self::MAX_STEPS) // if it is a number but > MAX_STEPS
 				{
-					$this->_ci->eprintflib->printError('The maximun value fot this parameter is: '.self::MAX_STEPS);
+					$this->_ci->eprintflib->printError('The maximun value for this parameter is: '.self::MAX_STEPS);
 					return false;
 				}
 				elseif ($step < 1) // if it is a number but < 1
 				{
-					$this->_ci->eprintflib->printError('The minimum value fot this parameter is 1');
+					$this->_ci->eprintflib->printError('The minimum value for this parameter is 1');
 					return false;
 				}
 			}
@@ -1249,3 +1250,4 @@ class DBSkelLib
 		elseif ($this->_isDiffMode()) $this->_printInfo('>> DBSkel is running in diff mode <<');
 	}
 }
+

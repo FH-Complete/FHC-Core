@@ -48,3 +48,4 @@ $viewsArray = array(
 							LEFT JOIN fue.tbl_projekt tp USING (projekt_kurzbz)
 							LEFT JOIN fue.tbl_projektphase tpp USING (projektphase_id);'
 );
+

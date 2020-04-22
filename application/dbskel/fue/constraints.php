@@ -6,3 +6,4 @@ $constraintsArray = array(
 	'uk_beschreibung' => 'ALTER TABLE fue.tbl_aktivitaet ADD CONSTRAINT uk_beschreibung UNIQUE (beschreibung)',
 	'testchk' => 'ALTER TABLE fue.tbl_aktivitaet ADD CONSTRAINT testchk CHECK (sort > 0)'
 );
+

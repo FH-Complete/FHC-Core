@@ -24,3 +24,4 @@ class DBSkel extends CLI_Controller
 		$this->dbskellib->start($step, $selectedDirectories) === true ? exit(0) : exit(1);
 	}
 }
+
