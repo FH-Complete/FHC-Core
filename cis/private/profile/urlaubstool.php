@@ -718,7 +718,11 @@ for ($i=0;$i<6;$i++)
 			else
 			{
 				echo '<b title="'.$p->t('urlaubstool/vertretung').': '.$vertretung_uid[$j+7*$i].' - '.$p->t('urlaubstool/erreichbar').': '.$erreichbarkeit_kurzbz[$j+7*$i].'">'.$tage[$j+7*$i].'</b><br>';
-				if(isset($freigabeamum[$j+7*$i]))
+				if(!isset($freigabeamum[$j+7*$i]) && !isset($freigabevon[$j+7*$i]))
+				{
+					echo '<img src="../../../skin/images/flag-red.png" alt="nicht freigegeben" title="'.$p->t('urlaubstool/freigabeFehlt').'"></td>';
+				}
+				elseif(isset($freigabeamum[$j+7*$i]))
 				{
 					echo '<img src="../../../skin/images/flag-green.png" alt="freigegeben" title="'.$p->t('urlaubstool/freigegebenDurchAm', array($freigabevon[$j+7*$i])).' '.date("d-m-Y",strtotime($freigabeamum[$j+7*$i])).'"></td>';
 				}

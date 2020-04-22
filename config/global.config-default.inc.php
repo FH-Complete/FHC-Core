@@ -288,4 +288,7 @@ define('STATUSGRUND_ID_EINSTIEG_SOMMERSEMESTER', null);
 
 // Studiengangs_kz des Studiengangs "Qualifikationskurse". Der Studiengang hat eine Sonderstellung zB für das Bewerbungstool.
 define('STUDIENGANG_KZ_QUALIFIKATIONKURSE', null);
+
+// Gibt an ob der Login ins Testtool ueber das Bewerbungstool stattfindet oder nicht
+define('TESTTOOL_LOGIN_BEWERBUNGSTOOL', false);
 ?>

@@ -22,28 +22,54 @@
 // Holt den Hexcode eines Bildes aus der DB wandelt es in Zeichen
 // um und gibt das ein Bild zurueck.
 // Aufruf mit <img src='bild.php?src=frage&frage_id=1
+require_once('../../config/cis.config.inc.php');
+require_once('../../include/basis_db.class.php');
+require_once('../../include/benutzerberechtigung.class.php');
 
-  require_once('../../config/cis.config.inc.php');
-  require_once('../../include/basis_db.class.php');
-  if (!$db = new basis_db())
-  		die('Fehler beim Oeffnen der Datenbankverbindung');
+if (!$db = new basis_db())
+	die('Fehler beim Oeffnen der Datenbankverbindung');
+
+session_start();
+if(!isset($_SESSION['pruefling_id']))
+{
+	$user = get_uid();
+	$rechte = new benutzerberechtigung();
+	$rechte->getBerechtigungen($user);
+
+	if (!$rechte->isBerechtigt('basis/testtool', null, 's'))
+		die($rechte->errormsg);
+}
 
 //base64 Dump aus der DB holen
 $qry = '';
 if(isset($_GET['src']) && $_GET['src']=='frage' && isset($_GET['frage_id']))
 {
-	$qry = "SELECT bild FROM testtool.tbl_frage_sprache WHERE frage_id='".addslashes($_GET['frage_id'])."' AND sprache='".addslashes($_GET['sprache'])."'";
+	$qry = "
+	SELECT
+		bild
+	FROM
+		testtool.tbl_frage_sprache
+	WHERE
+		frage_id=".$db->db_add_param($_GET['frage_id'], FHC_INTEGER)."
+		AND sprache=".$db->db_add_param($_GET['sprache']);
 }
 elseif(isset($_GET['src']) && $_GET['src']=='vorschlag' && isset($_GET['vorschlag_id']))
 {
-	$qry = "SELECT bild FROM testtool.tbl_vorschlag_sprache WHERE vorschlag_id='".addslashes($_GET['vorschlag_id'])."' AND sprache='".addslashes($_GET['sprache'])."'";
+	$qry = "
+	SELECT
+		bild
+	FROM
+		testtool.tbl_vorschlag_sprache
+	WHERE
+		vorschlag_id=".$db->db_add_param($_GET['vorschlag_id'], FHC_INTEGER)."
+		AND sprache=".$db->db_add_param($_GET['sprache']);
 }
 elseif(isset($_GET['src']) && $_GET['src']=='flag' && isset($_GET['sprache']))
 {
-	$qry = "SELECT flagge as bild FROM public.tbl_sprache WHERE sprache='".addslashes($_GET['sprache'])."'";
+	$qry = "SELECT flagge as bild FROM public.tbl_sprache WHERE sprache=".$db->db_add_param($_GET['sprache']);
 }
 
-else 
+else
 	echo 'Unkown type';
 
 if($qry!='')
@@ -56,5 +82,3 @@ if($qry!='')
 	echo base64_decode($row->bild);
 }
 ?>
-	
-

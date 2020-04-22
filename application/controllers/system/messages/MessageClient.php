@@ -34,7 +34,7 @@ class MessageClient extends FHC_Controller
 	public function read()
 	{
 		// Loads the view to read messages
-		$this->load->view('system/messages/ajaxRead');
+		$this->load->view('system/messages/ajaxRead', $this->CLMessagesModel->prepareAjaxRead());
 	}
 
 	/**

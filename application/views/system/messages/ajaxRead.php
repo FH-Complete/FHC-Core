@@ -44,7 +44,7 @@
 			<span class="buttonsSpacer"></span>
 
 			<span>
-				<input id="writeMessage" type="button" value="<?php echo $this->p->t('ui', 'nachrichtSenden'); ?>">
+				<?php echo $writeButton; ?>
 
 				<input id="replyMessage" type="button" value="<?php echo $this->p->t('global', 'reply'); ?>">
 			</span>

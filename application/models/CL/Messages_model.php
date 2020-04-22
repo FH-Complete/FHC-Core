@@ -92,6 +92,23 @@ class Messages_model extends CI_Model
 	}
 
 	/**
+	 * Prepares data for the view system/messages/ajaxRead
+	 */
+	public function prepareAjaxRead()
+	{
+		$psResult = $this->PrestudentModel->loadWhere(array('person_id' => getAuthPersonId()));
+
+		if (isError($psResult)) show_error('An error occurred while loading this page, please contact the site administrator');
+
+		if (hasData($psResult))
+		{
+			return array('writeButton' => '<input id="writeMessage" type="button" value="'.$this->p->t('ui', 'nachrichtSenden').'">');
+		}
+
+		return array('writeButton' => '');
+	}
+
+	/**
 	 * Prepares data for the view system/messages/ajaxWrite
 	 */
 	public function prepareAjaxWrite()
@@ -267,15 +284,10 @@ class Messages_model extends CI_Model
 
 		$sender = getData($senderResult)[0]; // Found sender data
 
-		// Check if the receiver is an employee
-		$isEmployee = false; // not by default
-		$isEmployeeResult = $this->MessageTokenModel->isEmployee($message->receiver_id);
-		if (isError($isEmployeeResult)) show_error(getError($isEmployeeResult));
-		if (hasData($isEmployeeResult)) $isEmployee = true;
-
-		// If the sender is not an employee and are present configurations to reply
+		// If the sender is not the system sender and are present configurations to reply
 		$hrefReply = '';
-		if (!$isEmployee && !isEmptyString($this->config->item(MessageLib::CFG_REDIRECT_VIEW_MESSAGE_URL)))
+		if ($message->sender_id != $this->config->item(MessageLib::CFG_SYSTEM_PERSON_ID)
+			&& !isEmptyString($this->config->item(MessageLib::CFG_REDIRECT_VIEW_MESSAGE_URL)))
 		{
 			$hrefReply = $this->config->item(MessageLib::CFG_MESSAGE_SERVER).
 				$this->config->item(MessageLib::CFG_REDIRECT_VIEW_MESSAGE_URL).

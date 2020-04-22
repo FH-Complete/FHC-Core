@@ -36,6 +36,7 @@ require_once('../../include/antwort.class.php');
 require_once('../../include/gebiet.class.php');
 require_once('../../include/sprache.class.php');
 require_once '../../include/phrasen.class.php';
+require_once '../../include/reihungstest.class.php';
 
 if (!$db = new basis_db())
 	die('Fehler beim Oeffnen der Datenbankverbindung');
@@ -174,6 +175,17 @@ if(!$gestartet && $gebiet->errormsg!='')
 //Start des Pruefungsvorganges
 if(isset($_GET['start']) && !$gestartet)
 {
+	//Wenn der Reihungstest nicht freigeschaltet ist, kann das Gebiet nicht gestartet werden
+	if (isset($_SESSION['reihungstestID']) && $_SESSION['reihungstestID'] != '')
+	{
+		$rt = new reihungstest($_SESSION['reihungstestID']);
+		if ($rt->freigeschaltet == false)
+		{
+			echo '<div class="alert alert-danger">Die Gesamtbearbeitungszeit des Reihungstests ist vorbei und der Test wurde gesperrt.</div></body>';
+			die();
+		}
+	}
+
 	//Fragenpool generieren
 	$frage = new frage();
 	if(!$frage->generateFragenpool($_SESSION['pruefling_id'], $gebiet_id))
