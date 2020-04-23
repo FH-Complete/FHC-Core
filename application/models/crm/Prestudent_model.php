@@ -209,6 +209,9 @@ class Prestudent_model extends DB_Model
 		if (!hasData($prestudent))
 			return error('prestudent could not be loaded');
 
+		$prestudentdata = getData($prestudent);
+		$prestudentdata = $prestudentdata[0];
+
 		//Prestudentstatus
 		$lastStatus = $this->PrestudentstatusModel->getLastStatus($prestudent_id);
 
@@ -217,32 +220,41 @@ class Prestudent_model extends DB_Model
 			return $lastStatus;
 		}
 
-		if (count($lastStatus->retval) > 0)
+		if (hasData($lastStatus))
 		{
+			$lastStatusData = getData($lastStatus);
+			$lastStatusData = $lastStatusData[0];
 			//get Studiengangname from Studienplan and -ordnung
 			$studienordnung = $this->PrestudentstatusModel->getStudienordnungFromPrestudent($prestudent_id);
 			if ($studienordnung->error)
 				return $studienordnung;
 
-			if (count($studienordnung->retval) > 0)
+			if (hasData($studienordnung))
 			{
-				$lastStatus->retval[0]->studiengang_kz = $studienordnung->retval[0]->studiengang_kz;
-				$lastStatus->retval[0]->studiengangkurzbzlang = $studienordnung->retval[0]->studiengangkurzbzlang;
-				$lastStatus->retval[0]->studiengangbezeichnung = $studienordnung->retval[0]->studiengangbezeichnung;
-				$lastStatus->retval[0]->studiengangbezeichnung_englisch = $studienordnung->retval[0]->studiengangbezeichnung_englisch;
-				$lastStatus->retval[0]->regelstudiendauer = $studienordnung->retval[0]->regelstudiendauer;
+				$studienordnungdata = getData($studienordnung);
+				$studienordnungdata = $studienordnungdata[0];
+
+				$lastStatusData->studiengang_kz = $studienordnungdata->studiengang_kz;
+				$lastStatusData->studiengangkurzbzlang = $studienordnungdata->studiengangkurzbzlang;
+				$lastStatusData->studiengangbezeichnung = $studienordnungdata->studiengangbezeichnung;
+				$lastStatusData->studiengangbezeichnung_englisch = $studienordnungdata->studiengangbezeichnung_englisch;
+				$lastStatusData->regelstudiendauer = $studienordnungdata->regelstudiendauer;
 			}
 
 			//get Sprache
 			$this->load->model('system/sprache_model', 'SpracheModel');
 			$this->SpracheModel->addSelect('sprache, locale, bezeichnung');
-			$language = $this->SpracheModel->load($lastStatus->retval[0]->sprache);
+			$language = $this->SpracheModel->load($lastStatusData->sprache);
 
 			if ($language->error)
 				return $language;
 
-			if (count($language->retval) > 0)
-				$lastStatus->retval[0]->sprachedetails = $language->retval[0];
+			if (hasData($language))
+			{
+				$languagedata = getData($language);
+				$languagedata = $languagedata[0];
+				$lastStatusData->sprachedetails = $languagedata;
+			}
 
 			//get Bewerbungsfrist
 			$this->load->model('crm/bewerbungstermine_model', 'BewerbungstermineModel');
@@ -251,24 +263,32 @@ class Prestudent_model extends DB_Model
 			$this->BewerbungstermineModel->addLimit(1);
 			$bewerbungstermin = $this->BewerbungstermineModel->loadWhere(
 				array(
-					'studienplan_id' => $lastStatus->retval[0]->studienplan_id,
-					'studiensemester_kurzbz' => $lastStatus->retval[0]->studiensemester_kurzbz,
-					'studiengang_kz' => $prestudent->retval[0]->studiengang_kz
+					'studienplan_id' => $lastStatusData->studienplan_id,
+					'studiensemester_kurzbz' => $lastStatusData->studiensemester_kurzbz,
+					'studiengang_kz' => $prestudentdata->studiengang_kz
 				)
 			);
 			if ($bewerbungstermin->error)
 				return $bewerbungstermin;
 
-			if (count($bewerbungstermin->retval) > 0)
+			if (hasData($bewerbungstermin))
 			{
-				$lastStatus->retval[0]->bewerbungstermin = $bewerbungstermin->retval[0]->ende;
-				$lastStatus->retval[0]->bewerbungsnachfrist = $bewerbungstermin->retval[0]->nachfrist_ende;
+				$bewerbungstermindata = getData($bewerbungstermin);
+				$bewerbungstermindata = $bewerbungstermindata[0];
+				$lastStatusData->bewerbungstermin = $bewerbungstermindata->ende;
+				$lastStatusData->bewerbungsnachfrist = $bewerbungstermindata->nachfrist_ende;
 			}
 
-			$prestudent->retval[0]->prestudentstatus = $lastStatus->retval[0];
+			$prestudentdata->prestudentstatus = $lastStatusData;
+
+
+			if ($this->hasUDF())
+			{
+				$prestudentdata->prestudentUdfs = $this->getUDFs($prestudent_id);
+			}
 		}
 
-		return success($prestudent->retval);
+		return success($prestudentdata);
 	}
 
 	/**
