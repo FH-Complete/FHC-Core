@@ -132,6 +132,9 @@ define('FAS_UDF', true);
 // Legt fest ob Aufnahmegruppen bei Reihungstests verwaltet werden true|false
 define('FAS_REIHUNGSTEST_AUFNAHMEGRUPPEN',false);
 
+// Legt fest welche OEs nicht zur Stundenobergrenze für Lektoren hinzugerechnet werden
+define('FAS_LV_LEKTORINNENZUTEILUNG_STUNDEN_IGNORE_OE', array('eci'));
+
 // Legt fest, ob Vertragsdetails zum Lehrauftrag im Reiter LektorInnenzuteilung angezeigt werden
 define('FAS_LV_LEKTORINNENZUTEILUNG_VERTRAGSDETAILS_ANZEIGEN', false);
 

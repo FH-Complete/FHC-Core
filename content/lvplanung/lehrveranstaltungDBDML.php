@@ -160,9 +160,16 @@ function getStundenproInstitut($mitarbeiter_uid, $studiensemester_kurzbz, $oe_ar
 				mitarbeiter_uid=".$db->db_add_param($mitarbeiter_uid)." AND
 				studiensemester_kurzbz=".$db->db_add_param($studiensemester_kurzbz)." AND
 				bismelden AND
-				tbl_studiengang.oe_kurzbz in(".$db->db_implode4SQL($oe_arr).")
-			GROUP BY tbl_studiengang.bezeichnung";
+				tbl_studiengang.oe_kurzbz in(".$db->db_implode4SQL($oe_arr).")";
 
+	if(defined('FAS_LV_LEKTORINNENZUTEILUNG_STUNDEN_IGNORE_OE')
+	&& is_array(FAS_LV_LEKTORINNENZUTEILUNG_STUNDEN_IGNORE_OE)
+	&& count(FAS_LV_LEKTORINNENZUTEILUNG_STUNDEN_IGNORE_OE)>0)
+	{
+		$qry.=" AND tbl_studiengang.oe_kurzbz not in(".$db->db_implode4SQL(FAS_LV_LEKTORINNENZUTEILUNG_STUNDEN_IGNORE_OE).")";
+	}
+
+	$qry .= " GROUP BY tbl_studiengang.bezeichnung";
 	if($result = $db->db_query($qry))
 	{
 		while($row = $db->db_fetch_object($result))
@@ -341,6 +348,13 @@ if(!$error)
 
 						if(count($oe_arr)>0)
 							$qry.=" AND tbl_studiengang.oe_kurzbz in(".$db->db_implode4SQL($oe_arr).")";
+
+						if(defined('FAS_LV_LEKTORINNENZUTEILUNG_STUNDEN_IGNORE_OE')
+						&& is_array(FAS_LV_LEKTORINNENZUTEILUNG_STUNDEN_IGNORE_OE)
+						&& count(FAS_LV_LEKTORINNENZUTEILUNG_STUNDEN_IGNORE_OE)>0)
+						{
+							$qry.=" AND tbl_studiengang.oe_kurzbz not in(".$db->db_implode4SQL(FAS_LV_LEKTORINNENZUTEILUNG_STUNDEN_IGNORE_OE).")";
+						}
 
 						if($db->db_query($qry))
 						{
