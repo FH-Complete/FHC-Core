@@ -129,8 +129,12 @@ class ampel extends basis_db
 		$qry = "SELECT *,".$beschreibung.", ".$buttontext." FROM public.tbl_ampel";
 		if($aktiv)
 		{
-			$qry .= " WHERE (NOW()>(deadline-(vorlaufzeit || ' days')::interval)::date)";
-			$qry .= " AND (NOW()<(deadline+(verfallszeit || ' days')::interval)::date)";
+			// (ab sofort ODER innerhalb der Vorlaufzeit)
+			$qry .= " WHERE (vorlaufzeit IS NULL OR (NOW()>(deadline -(vorlaufzeit || ' days')::interval)::date))";
+			// UND (nicht abgelaufen...
+			$qry .= " AND ((NOW()<(deadline+(verfallszeit || ' days')::interval)::date)";
+			// ...ODER ohne Verfallszeit)
+			$qry .= " OR verfallszeit IS NULL)";
 		}
 		$qry .= " ORDER BY deadline";
 						
