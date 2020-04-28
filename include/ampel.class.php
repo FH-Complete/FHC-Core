@@ -44,6 +44,7 @@ class ampel extends basis_db
 	public $insertvon;		// varchar(32)
 	public $updateamum;		// timestamp
 	public $updatevon;		// varchar(32)
+	public $dauerampel;     // boolean
 	
 	public $ampel_benutzer_id;	// bigint
 	public $uid;				// varchar(32)
@@ -98,6 +99,7 @@ class ampel extends basis_db
 				$this->insertvon = $row->insertvon;
 				$this->updateamum = $row->updateamum;
 				$this->updatevon = $row->updatevon;
+				$this->dauerampel = $row->dauerampel;
 
 				return true;
 			}
@@ -150,7 +152,8 @@ class ampel extends basis_db
 				$obj->buttontext = $sprache->parseSprachResult('buttontext', $row);
 				$obj->insertamum = $row->insertamum;
 				$obj->insertvon = $row->insertvon;
-					
+				$obj->dauerampel = $row->dauerampel;
+				
 				$this->result[] = $obj;
 			}
 			return true;
@@ -263,6 +266,7 @@ class ampel extends basis_db
 					$obj->buttontext = $sprache->parseSprachResult('buttontext', $row);
 					$obj->insertamum = $row->insertamum;
 					$obj->insertvon = $row->insertvon;
+					$obj->dauerampel = $row->dauerampel;
 					
 					$this->result[] = $obj;
 				}
@@ -329,7 +333,7 @@ class ampel extends basis_db
 			}
 			
 			$qry.=" benutzer_select, deadline, 
-					vorlaufzeit, verfallszeit, email, verpflichtend, insertamum, insertvon , updateamum, updatevon) VALUES(".
+					vorlaufzeit, verfallszeit, email, verpflichtend, insertamum, insertvon , updateamum, updatevon, dauerampel) VALUES(".
 					$this->db_add_param($this->kurzbz).',';
 			reset($this->beschreibung);
 			foreach($this->beschreibung as $key=>$value)
@@ -347,7 +351,8 @@ class ampel extends basis_db
 					$this->db_add_param($this->insertamum).','.
 					$this->db_add_param($this->insertvon).','.
 					$this->db_add_param($this->updateamum).','.
-					$this->db_add_param($this->updatevon).');';
+					$this->db_add_param($this->updatevon).','.
+					$this->db_add_param($this->dauerampel, FHC_BOOLEAN).');';
 		}
 		else
 		{
@@ -373,8 +378,9 @@ class ampel extends basis_db
 					' email = '.$this->db_add_param($this->email, FHC_BOOLEAN).','.
 					' verpflichtend = '.$this->db_add_param($this->verpflichtend, FHC_BOOLEAN).','.
 					' updateamum ='.$this->db_add_param($this->updateamum).','.
-					' updatevon ='.$this->db_add_param($this->updatevon).
-					' WHERE ampel_id='.$this->db_add_param($this->ampel_id, FHC_INTEGER).';';					
+					' updatevon ='.$this->db_add_param($this->updatevon).','.
+					' dauerampel ='.$this->db_add_param($this->dauerampel, FHC_BOOLEAN).
+					' WHERE ampel_id='.$this->db_add_param($this->ampel_id, FHC_INTEGER).';';
 		}
 		
 		if($this->db_query($qry))
@@ -551,6 +557,7 @@ class ampel extends basis_db
 						$obj->buttontext = $sprache->parseSprachResult('buttontext', $row);
 						$obj->insertamum = $row->insertamum;
 						$obj->insertvon = $row->insertvon;
+						$obj->dauerampel = $row->dauerampel;
 						
 						$obj->vorname = $row_ma->vorname;
 						$obj->nachname = $row_ma->nachname;
