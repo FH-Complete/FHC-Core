@@ -16,9 +16,10 @@ class Ampel_model extends DB_Model
 	 * 1. not after the deadline date
 	 * 2. not before the vorlaufszeit
 	 * @param bool $email If true, then only ampeln are retrieved that are marked to be sent by mail.
+	 * @param bool $dauerampel
 	 * @return array Returns array of objects.
 	 */
-	public function active($email = false)
+	public function active($email = null, $dauerampel = null)
 	{
 		$parametersArray = null;
 		$query = '
@@ -26,10 +27,16 @@ class Ampel_model extends DB_Model
 			  FROM public.tbl_ampel
 			 WHERE';
 
-		if ($email === true)
+		if (is_bool($email))
 		{
 			$parametersArray['email'] = $email;
 			$query .= ' email = ? AND';
+		}
+		
+		if (is_bool($dauerampel))
+		{
+			$parametersArray['dauerampel'] = $dauerampel;
+			$query .= ' dauerampel = ? AND';
 		}
 
 		$query .= '(
