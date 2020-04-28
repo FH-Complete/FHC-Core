@@ -305,7 +305,8 @@ $filters = array(
 					{"name": "LockUser"},
 					{"name": "Statusgrund"},
 					{"name": "Studiensemester"},
-					{"name": "ReihungstestApplied"}
+					{"name": "ReihungstestApplied"},
+					{"name": "ReihungstestDate"}
 				],
 				"filters": [
 					{
@@ -358,7 +359,8 @@ $filters = array(
 					{"name": "studiengaenge"},
 					{"name": "freie_plaetze"},
 					{"name": "anzahl_angemeldet"},
-					{"name": "rt_studiengang"}
+					{"name": "rt_studiengang"},
+					{"name": "reihungstest_id"}
 				],
 				"filters": []
 			}
