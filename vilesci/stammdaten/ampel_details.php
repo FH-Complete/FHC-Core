@@ -60,6 +60,16 @@ $datum_obj = new datum();
 					 changeYear: true,
 					 dateFormat: 'dd.mm.yy',
 					 });
+				
+				// if dauerampel is checked, disable verpflichtend
+				$('#dauerampel').click(function(){
+                    if (this.checked) {
+                        $("#verpflichtend").attr("disabled", true);
+                    } else {
+                        $("#verpflichtend").attr("disabled", false);
+                    }
+                })
+				
 			});
 	</script>
 	<style>
@@ -96,6 +106,7 @@ $datum_obj = new datum();
 			}
 		}
 		$benutzer_select = (isset($_POST['benutzer_select'])?$_POST['benutzer_select']:die('Benutzer_select fehlt'));
+		$dauerampel = (isset($_POST['dauerampel']));
 		$deadline = (isset($_POST['deadline'])?$_POST['deadline']:die('Deadline fehlt'));
 		$vorlaufzeit = (isset($_POST['vorlaufzeit'])?$_POST['vorlaufzeit']:die('Vorlaufzeit fehlt'));
 		$verfallszeit = (isset($_POST['verfallszeit'])?$_POST['verfallszeit']:die('verfallszeit fehlt'));
@@ -127,6 +138,7 @@ $datum_obj = new datum();
 		$ampel->buttontext = $buttontext;
 		$ampel->updateamum = date('Y-m-d H:i:s');
 		$ampel->updatevon = $user;
+		$ampel->dauerampel = $dauerampel;
 
 		if($ampel->save())
 		{
@@ -177,20 +189,29 @@ $datum_obj = new datum();
 				<td>Kurzbz (64)</td>
 				<td><input type="text" name="kurzbz" size="60" maxlength="64" value="'.htmlspecialchars($ampel->kurzbz).'" required></td>
 				<td></td>
-				<td>Deadline&nbsp
-					<i class="fa fa-info-circle fa-lg" aria-hidden="true" data-toggle="tooltip" data-placement="left" title="Die Deadline gibt den Tag an, ab dem die Ampel von gelb auf rot gesetzt wird."></i>
-				</td>
-				<td><input type="text" class="datepicker_datum" name="deadline" size="10" maxlength="10" value="'.htmlspecialchars($datum_obj->formatDatum($ampel->deadline,'Y-m-d')).'" required></td>
+
+				<td>Dauerampel</td>
+				<td><input type="checkbox" id="dauerampel" name="dauerampel" '. ($db->db_parse_bool($ampel->dauerampel) ? 'checked' : ''). '></td>
 			</tr>
 			<tr valign="top">
 				<td rowspan="3">Benutzer Select</td>
 				<td rowspan="3"><textarea name="benutzer_select" cols="60" rows="5" required>'.htmlspecialchars($ampel->benutzer_select).'</textarea></td>
 				<td></td>
-				<td valign="middle">Vorlaufzeit (in Tagen)&nbsp
+				
+                <td valign="middle">Deadline&nbsp
+					<i class="fa fa-info-circle fa-lg" aria-hidden="true" data-toggle="tooltip" data-placement="left" title="Die Deadline gibt den Tag an, ab dem die Ampel von gelb auf rot gesetzt wird."></i>
+				</td>
+				<td><input type="text" class="datepicker_datum" name="deadline" size="10" maxlength="10" value="'.htmlspecialchars($datum_obj->formatDatum($ampel->deadline,'Y-m-d')).'" required></td>
+			</tr>
+			
+			<tr valign="top">
+                <td></td>
+			    <td valign="middle">Vorlaufzeit (in Tagen)&nbsp
 					<i class="fa fa-info-circle fa-lg" aria-hidden="true" data-toggle="tooltip" data-placement="left" title="Anzahl der Tage VOR der Deadline, an denen die Ampel gezeigt werden soll.&#013Wenn keine Angabe, dann wird die Ampel gleich nach ihrer Erstellung angezeigt."></i>
 				</td>
 				<td valign="middle"><input type="text" name="vorlaufzeit" size="4" maxlength="4" value="'.htmlspecialchars($ampel->vorlaufzeit).'"></td>
-			</tr>
+            </tr>
+				
 			<tr valign="top">
 				<td></td>
 				<td>Verfallszeit (in Tagen)&nbsp
@@ -198,17 +219,25 @@ $datum_obj = new datum();
 				</td>
 				<td><input type="text" name="verfallszeit" size="4" maxlength="4" value="'.htmlspecialchars($ampel->verfallszeit).'"></td>
 			</tr>
+			
 			<tr valign="top">
+			    <td></td>
+				<td></td>
 				<td></td>
 				<td>Erinnerung per Email</td>
 				<td><input type="checkbox" name="email" '.($db->db_parse_bool($ampel->email)?'checked':'').'></td>
 			</tr>
+			
 			<tr valign="top">
 				<td></td>
 				<td></td>
 				<td></td>
 				<td>Verpflichtend</td>
-				<td><input type="checkbox" name="verpflichtend" '.($db->db_parse_bool($ampel->verpflichtend)?'checked':'').'></td>
+				<td>
+				    <input type="checkbox" id="verpflichtend" name="verpflichtend" '.
+                        ($db->db_parse_bool($ampel->verpflichtend) ? "checked" : "" ).
+                        ($db->db_parse_bool($ampel->dauerampel) ? "disabled" : ""). '>
+                </td>
 			</tr>
 			<tr>
 				<td>&nbsp;</td>
