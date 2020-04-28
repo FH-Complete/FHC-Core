@@ -42,10 +42,30 @@ class AmpelMail extends CLI_Controller
 	 * Ampel is overdue when the cronjob runs after the deadline date.
 	 * @return void
 	 */
-	public function generateAmpelMail()
+	public function generateAmpelMail($ampel_id = null)
 	{
-		// Get all notifications, that are not expired, not before vorlaufzeit AND email is true
-		$result_active_ampeln = $this->AmpelModel->active(true);
+		// if ampel_id is given, get this ampel only
+		if (is_numeric($ampel_id))
+		{
+			$result = $this->AmpelModel->load($ampel_id);
+			
+			if (hasData($result))
+			{
+				// check, if email is true
+				$result_active_ampeln = $result->retval[0]->email == 't' ? $result : success(array());
+			}
+			else
+			{
+				$result_active_ampeln = success(array());
+			}
+		}
+		// else get all active ampeln
+		else
+		{
+			// Get all notifications, that are not expired, not before vorlaufzeit AND email is true
+			// AND is NOT DAUERAMPEL (dauerampeln must be run by specific ampel_id)
+			$result_active_ampeln = $this->AmpelModel->active(true, false);
+		}
 
 		// Stores users, description, deadline and system-link of notifications
 		$new_ampel_data_arr = array(); // data of new notifications that are not confirmed
@@ -67,6 +87,7 @@ class AmpelMail extends CLI_Controller
 				$qry_all_ampel_user = $ampel->benutzer_select; // sql select to get all user who get this ampel
 				$new = false;
 				$overdue = false;
+				$dauerampel = $ampel->dauerampel;
 
 				// get all user, who get this ampel
 				$result_ampel_user = $this->AmpelModel->execBenutzerSelect($qry_all_ampel_user);
@@ -80,15 +101,29 @@ class AmpelMail extends CLI_Controller
 					{
 						$uid = $ampel_user->uid;
 
-						// break if ampel was almost confirmed by the user
-						if($this->AmpelModel->isConfirmed($ampel_id, $uid))
-							continue;
-
-						// check if ampel is new (inserted within last week, as cronjob will run every week)
-						if ($now->diff($insert_date)->days <= 7) $new = true;
-
-						//check if ampel is overdue
-						if ($now > $deadline) $overdue = true;
+						if (!$dauerampel)
+						{
+							// break if ampel was almost confirmed by the user
+							if($this->AmpelModel->isConfirmed($ampel_id, $uid))
+								continue;
+	
+							// check if ampel is new (inserted within last week, as cronjob will run every week)
+							if ($now->diff($insert_date)->days <= 7) $new = true;
+	
+							//check if ampel is overdue
+							if ($now > $deadline) $overdue = true;
+						}
+						/**
+						 * if ampel is dauerampel
+						 **/
+						elseif ($dauerampel)
+						{
+							/**
+							 * treat dauerampel always as new
+							 * NOTE: dauerampel stops, when benutzer not queried by benutzerselect anymore
+							 **/
+							$new = true;
+						}
 
 						// if ampel is new
 						if ($new)
