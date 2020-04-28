@@ -1211,7 +1211,7 @@ function MitarbeiterVerwendungSpeichern(dialog, bisverwendung_id, mitarbeiter_ui
 	inkludierte_lehre = dialog.getElementById('mitarbeiter-verwendung-detail-textbox-inkludierte_lehre').value;
 	zeitaufzeichnungspflichtig = dialog.getElementById('mitarbeiter-verwendung-detail-checkbox-zeitaufzeichnungspflichtig').checked;
 
-	if(verwendung_code=='1' || verwendung_code=='5' || verwendung_code=='6')
+	if(verwendung_code=='1')
 	{
 		if(hauptberuflich==true)
 		{
