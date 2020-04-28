@@ -67,9 +67,13 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 </head>
 <body>
 <h2>Ampel &Uuml;bersicht</h2>
-<div style="text-align:right">
+<div>
+	<a href="ampel_uebersicht.php?action=active" target="">Nur aktive | </a>
+	<a href="ampel_uebersicht.php?action=all" target="">Alle | </a>
 	<a href="ampel_details.php?action=new" target="detail_ampel">Neu</a>
 </div>';
+
+
 if(isset($_GET['action']) && $_GET['action']=='delete')
 {
 	if(!$rechte->isBerechtigt('basis/ampel', null, 'suid'))
@@ -87,14 +91,29 @@ if(isset($_GET['action']) && $_GET['action']=='delete')
 
 $ampel = new ampel();
 
-if(!$ampel->getAll())
-	die($ampel->errormsg);
+// nur bei Auswahl 'Alle' alle Ampeln zeigen
+if (isset($_GET['action']) &&  $_GET['action'] == 'all')
+{
+	if(!$ampel->getAll())
+	{
+		die($ampel->errormsg);
+	}
+}
+// default: nur aktive Ampeln zeigen
+else
+{
+	if(!$ampel->getAll(true))
+	{
+		die($ampel->errormsg);
+	}
+}
 
 echo '<table class="tablesorter" id="myTable">
 	<thead>
 		<tr>
 			<th>ID</th>
 			<th>Kurzbz</th>
+			<th>Dauerampel</th>
 			<th>Deadline</th>
 			<th>Vorlaufzeit</th>
 			<th>Verfallszeit</th>
@@ -109,6 +128,7 @@ foreach($ampel->result as $row)
 	echo '<tr>';
 	echo '<td><a href="ampel_details.php?action=update&ampel_id=',$row->ampel_id,' " target="detail_ampel">',$row->ampel_id,'</a></td>';
 	echo '<td>',$row->kurzbz,'</td>';
+	echo '<td>',($row->dauerampel == 't' ? 'Ja' : 'Nein'),'</td>';
 	echo '<td>',$datum_obj->formatDatum($row->deadline,'d.m.Y'),'</td>';
 	echo '<td>',$row->vorlaufzeit,'</td>';
 	echo '<td>',$row->verfallszeit,'</td>';
