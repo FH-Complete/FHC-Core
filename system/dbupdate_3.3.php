@@ -1648,6 +1648,19 @@ if($result = @$db->db_query("SELECT * FROM information_schema.role_table_grants 
 	}
 }
 
+// dauerampel fuer public.tbl_ampel
+if(!@$db->db_query("SELECT dauerampel FROM public.tbl_ampel LIMIT 1"))
+{
+	$qry = "ALTER TABLE public.tbl_ampel ADD COLUMN dauerampel boolean NOT NULL DEFAULT false;
+			COMMENT ON COLUMN public.tbl_ampel.dauerampel IS 'If true, the ampel is valid until benutzerselect condition no longer applies';
+			";
+		
+	
+	if(!$db->db_query($qry))
+		echo '<strong>App: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Neue Spalte dauerampel in public.tbl_ampel hinzugefügt';
+}
 
 /**
  * Kommentare fuer Datenbanktabellen
