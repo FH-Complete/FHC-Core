@@ -19,14 +19,20 @@ class Ampel_model extends DB_Model
 	 * @param bool $dauerampel
 	 * @return array Returns array of objects.
 	 */
-	public function active($email = null, $dauerampel = null)
+	public function active($ampel_id = null, $email = null, $dauerampel = null)
 	{
 		$parametersArray = null;
 		$query = '
 			SELECT *
 			  FROM public.tbl_ampel
 			 WHERE';
-
+		
+		if (is_numeric($ampel_id))
+		{
+			$parametersArray['ampel_id'] = $ampel_id;
+			$query .= ' ampel_id = ? AND';
+		}
+		
 		if (is_bool($email))
 		{
 			$parametersArray['email'] = $email;
