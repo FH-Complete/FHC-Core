@@ -45,11 +45,19 @@ class Ampel_model extends DB_Model
 			$query .= ' dauerampel = ? AND';
 		}
 
-		$query .= '(
-			(NOW()<(deadline+(COALESCE(verfallszeit,0) || \' days\')::interval)::date)
-			    OR (verfallszeit IS NULL)
-			   AND (NOW()>(deadline-(COALESCE(vorlaufzeit,0) || \' days\')::interval)::date)
-			    OR (vorlaufzeit IS NULL AND NOW() < deadline))';
+		$query .= ' (
+						/* now < ( deadline + verfallszeit ) */
+						NOW() < (deadline + (COALESCE(verfallszeit, 0) || \' days\')::interval)::date
+						/* oder keine verfallszeit */
+						OR verfallszeit IS NULL
+                     )
+                     AND
+                     (
+                        /* now > ( deadline - vorlaufzeit ) */
+                        NOW() > (deadline - (COALESCE(vorlaufzeit, 0) || \' days\')::interval)::date
+                        /* oder keine vorlaufzeit (ab sofort) */
+                        OR vorlaufzeit IS NULL
+                     )';
 
 		$query .= ' ORDER BY deadline DESC';
 
