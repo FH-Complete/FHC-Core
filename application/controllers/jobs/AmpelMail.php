@@ -47,24 +47,13 @@ class AmpelMail extends CLI_Controller
 		// if ampel_id is given, get this ampel only
 		if (is_numeric($ampel_id))
 		{
-			$result = $this->AmpelModel->load($ampel_id);
-			
-			if (hasData($result))
-			{
-				// check, if email is true
-				$result_active_ampeln = $result->retval[0]->email == 't' ? $result : success(array());
-			}
-			else
-			{
-				$result_active_ampeln = success(array());
-			}
+			$result_active_ampeln = $this->AmpelModel->active($ampel_id, true);
 		}
 		// else get all active ampeln
 		else
 		{
 			// Get all notifications, that are not expired, not before vorlaufzeit AND email is true
-			// AND is NOT DAUERAMPEL (dauerampeln must be run by specific ampel_id)
-			$result_active_ampeln = $this->AmpelModel->active(true, false);
+			$result_active_ampeln = $this->AmpelModel->active(null, true);
 		}
 
 		// Stores users, description, deadline and system-link of notifications
@@ -101,28 +90,24 @@ class AmpelMail extends CLI_Controller
 					{
 						$uid = $ampel_user->uid;
 
-						if (!$dauerampel)
-						{
-							// break if ampel was almost confirmed by the user
-							if($this->AmpelModel->isConfirmed($ampel_id, $uid))
-								continue;
-	
-							// check if ampel is new (inserted within last week, as cronjob will run every week)
-							if ($now->diff($insert_date)->days <= 7) $new = true;
-	
-							//check if ampel is overdue
-							if ($now > $deadline) $overdue = true;
-						}
+						// break if ampel was almost confirmed by the user
+						if($this->AmpelModel->isConfirmed($ampel_id, $uid))
+							continue;
+
 						/**
-						 * if ampel is dauerampel
-						 **/
-						elseif ($dauerampel)
+						 * check if ampel is new
+						 * inserted within last week, as cronjob will run every week
+						 * OR if ampel is dauerampel (cannot be overdued -> treat always as new)
+						 * */
+						if (($now->diff($insert_date)->days <= 7) || $dauerampel)
 						{
-							/**
-							 * treat dauerampel always as new
-							 * NOTE: dauerampel stops, when benutzer not queried by benutzerselect anymore
-							 **/
 							$new = true;
+						}
+
+						// check if ampel is overdue
+						if (($now > $deadline) && !$dauerampel)
+						{
+							$overdue = true;
 						}
 
 						// if ampel is new
