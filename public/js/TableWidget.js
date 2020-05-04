@@ -563,7 +563,7 @@ var FHC_TableWidget = {
 		tableWidgetDiv.find('#tableWidgetHeader').append(tabulatorHeaderHTML);
 
 		// Render the collapsable div triggered by button in tableWidgetHeader
-		var tabulatorHeaderCollapseHTML = _renderTabulatorHeaderCollapseHTML(tableWidgetDiv, FHC_JS_DATA_STORAGE_OBJECT.user_language);
+		var tabulatorHeaderCollapseHTML = _renderTabulatorHeaderCollapseHTML(tableWidgetDiv);
 		tableWidgetDiv.find('#tableWidgetHeader').after(tabulatorHeaderCollapseHTML);
 
 		/**
@@ -777,7 +777,7 @@ function _renderTabulatorHeaderHTML(tableWidgetDiv){
 }
 
 // Returns collapsable HTML element for TableWidget header buttons
-function _renderTabulatorHeaderCollapseHTML(tableWidgetDiv, language){
+function _renderTabulatorHeaderCollapseHTML(tableWidgetDiv){
 
 	var tableUniqueId = tableWidgetDiv.attr('tableUniqueId');
 
@@ -835,85 +835,6 @@ function _renderTabulatorHeaderCollapseHTML(tableWidgetDiv, language){
 
 	tabulatorHeaderCollapseHTML += '</div>'; // end panel-group
 	tabulatorHeaderCollapseHTML += ' </div>'; // end col
-	tabulatorHeaderCollapseHTML += ' </div>'; // end row
-
-	// CollapseHTML 'Help'
-	tabulatorHeaderCollapseHTML += '<div class="row">';
-	tabulatorHeaderCollapseHTML += '<div class="col-lg-12 collapse" id="tabulatorHelp-'+ tableUniqueId + '">';
-	tabulatorHeaderCollapseHTML += '<div class="well">';
-
-	if (language == 'German')
-	{
-		tabulatorHeaderCollapseHTML += '<h4>Tabelleneinstellungen</h4>';
-		tabulatorHeaderCollapseHTML += '<div class="panel panel-body">';
-		tabulatorHeaderCollapseHTML += '<b>Spalten ein- und ausblenden</b>';
-		tabulatorHeaderCollapseHTML += '<p>';
-		tabulatorHeaderCollapseHTML += '<ul>';
-		tabulatorHeaderCollapseHTML += '<li>Mit einem Klick auf <button><i class="fa fa-cog"></i></button> ' +
-			'werden die Einstellungen geöffnet.</li>';
-		tabulatorHeaderCollapseHTML += '<li>Auf Spalteneinstellungen klicken</li>';
-		tabulatorHeaderCollapseHTML += '<li>Durch (wiederholtes) Klicken auf die einzelnen Spaltennamen können ' +
-			'diese in der Tabelle beliebig oft aktiviert / deaktiviert werden.</li>';
-		tabulatorHeaderCollapseHTML += '<li>Mit einem Klick auf <button><i class="fa fa-cog"></i></button> ' +
-			'werden die Einstellungen wieder geschlossen.</li>';
-		tabulatorHeaderCollapseHTML += '</ul>';
-		tabulatorHeaderCollapseHTML += '</p>';
-		tabulatorHeaderCollapseHTML += '<b>Spaltenbreite verändern</b>';
-		tabulatorHeaderCollapseHTML += '<p>Um die Spaltenbreite zu verändern, fährt man im Spaltenkopf langsam ' +
-			'mit dem Mauszeiger auf den rechten Rand der entprechenden Spalte. <br>' +
-			'Sobald sich der Mauszeiger in einen Doppelpfeil verwandelt, wird die Maustaste geklickt und ' +
-			'mit gedrückter Maustaste die Spalte nach rechts erweitert oder nach links verkleinert.';
-		tabulatorHeaderCollapseHTML += '</p>';
-		tabulatorHeaderCollapseHTML += '<div class="alert alert-info"><strong>INFO: </strong>Alle individuellen Tabelleneinstellungen werden in ' +
-			'Ihrem Browser Cache gespeichert. Wenn Sie Ihren Browser Cache löschen, werden Ihre Einstellungen zurückgesetzt und ' +
-			'müssen gegebenenfalls neu eingestellt werden.';
-		tabulatorHeaderCollapseHTML += '</div>';
-		tabulatorHeaderCollapseHTML += '</div><br>';	// end panel-body
-
-		tabulatorHeaderCollapseHTML += '<h4>Zeilen auswählen</h4>';
-		tabulatorHeaderCollapseHTML += '<div class="panel panel-body">';
-		tabulatorHeaderCollapseHTML += '<ul>';
-		tabulatorHeaderCollapseHTML += '<li>Einzeln auswählen: <kbd>Strg</kbd> + Klick auf einzelne Zeile(n)</li>';
-		tabulatorHeaderCollapseHTML += '<li>Bereich auswählen: <kbd>Shift</kbd> + Klick auf Anfangs- und Endzeile</li>';
-		tabulatorHeaderCollapseHTML += '<li>Alle auswählen: Button \'Alle auswählen\'</li>';
-		tabulatorHeaderCollapseHTML += '</ul>';
-		tabulatorHeaderCollapseHTML += '</div><br>'; // end panel-body
-	}
-	else if (language == 'English')
-	{
-		tabulatorHeaderCollapseHTML += '<h4>Table settings</h4>';
-		tabulatorHeaderCollapseHTML += '<div class = "panel panel-body">';
-		tabulatorHeaderCollapseHTML += '<b>Show and hide columns</b>';
-		tabulatorHeaderCollapseHTML += '<p>';
-		tabulatorHeaderCollapseHTML += '<ul>';
-		tabulatorHeaderCollapseHTML += '<li>With a click on <button><i class = "fa fa-cog"></i></button> the settings will open.</li>';
-		tabulatorHeaderCollapseHTML += '<li>Click on column settings</li>';
-		tabulatorHeaderCollapseHTML += '<li>By clicking on the individual column names the columns are shown / hidden in the table. Click again to gain the opposite state.</li>';
-		tabulatorHeaderCollapseHTML += '<li>With a click on <button><i class = "fa fa-cog"></i></button> the settings will be closed again. </li>';
-		tabulatorHeaderCollapseHTML += '</ul>';
-		tabulatorHeaderCollapseHTML += '</p>';
-		tabulatorHeaderCollapseHTML += '<b>Change column width</b>';
-		tabulatorHeaderCollapseHTML += '<p>To change the column width, slowly hover  with the mouse pointer on the right edge of the corresponding column header.<br>' +
-			'As soon as the mouse pointer changes into a double arrow, click the mouse button and ' +
-			'keep it pressed while expanding the column width to the right or reducing the width to the left.';
-		tabulatorHeaderCollapseHTML += '</p>';
-		tabulatorHeaderCollapseHTML += '<div class = "alert alert-info"><strong> INFO: </strong>' +
-			'All individual table settings are saved in your browser cache. If you clear your browser cache, ' +
-			'your settings will be erased.';
-		tabulatorHeaderCollapseHTML += '</div>';
-		tabulatorHeaderCollapseHTML += '</div><br>';
-		tabulatorHeaderCollapseHTML += '<h4>Select rows</h4>';
-		tabulatorHeaderCollapseHTML += '<div class = "panel panel-body">';
-		tabulatorHeaderCollapseHTML += '<ul>';
-		tabulatorHeaderCollapseHTML += '<li>Select individually: <kbd> Ctrl </kbd> + click on single line (s)</li>';
-		tabulatorHeaderCollapseHTML += '<li>Select a range: <kbd> Shift </kbd> + click on the start and end line</li>';
-		tabulatorHeaderCollapseHTML += '<li>Select all: Button \'Select all \' </li>';
-		tabulatorHeaderCollapseHTML += '</ul>';
-		tabulatorHeaderCollapseHTML += '</div><br>';
-	}
-
-	tabulatorHeaderCollapseHTML += '</div>';  // end well
-	tabulatorHeaderCollapseHTML += ' </div>'; // end col collapse
 	tabulatorHeaderCollapseHTML += ' </div>'; // end row
 
 	return tabulatorHeaderCollapseHTML;

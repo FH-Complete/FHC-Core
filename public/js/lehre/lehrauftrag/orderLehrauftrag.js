@@ -539,7 +539,7 @@ erteilt_tooltip = function(cell){
 // Generates akzeptiert tooltip
 akzeptiert_tooltip = function(cell){
 	if (cell.getRow().getData().akzeptiert_von != null) {
-		return FHC_PhrasesLib.t("ui", "akzeptiertVon") + cell.getRow().getData().akzeptiert_von;
+		return FHC_PhrasesLib.t("ui", "angenommenVon") + cell.getRow().getData().akzeptiert_von;
 	}
 }
 
