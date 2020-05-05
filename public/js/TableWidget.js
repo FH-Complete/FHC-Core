@@ -269,16 +269,8 @@ var FHC_TableWidget = {
 
 				tableWidgetDiv.find("#tableWidgetTabulator").tabulator('toggleColumn', selected);
 
-				$(this).toggleClass('active');
-
-				if(!$(this).hasClass('active'))
-				{
-					$(this).css('background-color', 'white');
-				}
-				else
-				{
-					$(this).css('background-color', '#e6e6e6');
-				}
+				// toggle class to color button as selected / deselected
+				$(this).toggleClass('btn-select-col-selected').blur();	// blur removes automatic focus
 			})
 		}
 	},
@@ -809,7 +801,7 @@ function _renderTabulatorHeaderCollapseHTML(tableWidgetDiv){
 	{
 		var field = column.getField();
 		var title = column.getDefinition().title;
-		var active_status = column.getVisibility() ? 'active' : '';
+		var btn_select_col_selected = column.getVisibility() ? 'btn-select-col-selected' : '';
 
 		// If certain columns should be excluded from the column picker (define them in a blacklist array)
 		if (typeof tableWidgetBlacklistArray_columnUnselectable != 'undefined' &&
@@ -818,13 +810,13 @@ function _renderTabulatorHeaderCollapseHTML(tableWidgetDiv){
 		{
 			if ($.inArray(field, tableWidgetBlacklistArray_columnUnselectable) < 0)
 			{
-				tabulatorHeaderCollapseHTML += '<button type="button" class="btn btn-default btn-sm btn-select-col ' + active_status +'" aria-pressed="true" id="btn-' + field + '" value="' + field + '">' + title + '</button>';
+				tabulatorHeaderCollapseHTML += '<button type="button" class="btn btn-default btn-sm btn-select-col ' + btn_select_col_selected +'" aria-pressed="true" id="btn-' + field + '" value="' + field + '">' + title + '</button>';
 			}
 		}
 		// Else provide all tabulator fields as pickable columns
 		else
 		{
-			tabulatorHeaderCollapseHTML += '<button type="button" class="btn btn-default btn-sm btn-select-col ' + active_status +'" aria-pressed="true" id="btn-' + field + '" value="' + field + '">' + title + '</button>';
+			tabulatorHeaderCollapseHTML += '<button type="button" class="btn btn-default btn-sm btn-select-col ' + btn_select_col_selected +'" aria-pressed="true" id="btn-' + field + '" value="' + field + '">' + title + '</button>';
 		}
 	});
 
