@@ -31,6 +31,7 @@ require_once('../include/lehreinheit.class.php');
 require_once('../include/organisationseinheit.class.php');
 require_once('../include/mitarbeiter.class.php');
 require_once('../include/bisverwendung.class.php');
+require_once('../include/person.class.php');
 
 if (isset($_SERVER['REMOTE_USER']))
 {
@@ -64,6 +65,8 @@ if (isset($_GET['ss']))
 	$ss = $_GET['ss'];
 else
 	die('Fehlerhafte Parameteruebergabe');
+
+$xsl_oe_kurzbz = isset($_GET['xsl_oe_kurzbz']) && !empty($_GET['xsl_oe_kurzbz']) ? $_GET['xsl_oe_kurzbz'] : '';
 
 // GENERATE XML
 $xml = '<?xml version="1.0" encoding="UTF-8" ?><lehrauftraege>';
@@ -149,6 +152,7 @@ function drawLehrauftrag($uid)
 {
 	global $studiengang;
 	global $studiengang_kz;
+	global $xsl_oe_kurzbz;
 	global $oe_arr;
 	global $stg_arr;
 	global $ss;
@@ -270,12 +274,31 @@ function drawLehrauftrag($uid)
 			*
 		FROM
 			campus.vw_lehreinheit
+			JOIN lehre.tbl_lehreinheitmitarbeiter lema USING (lehreinheit_id, mitarbeiter_uid)
+            JOIN lehre.tbl_vertrag_vertragsstatus vvst USING (vertrag_id)
 		WHERE
 			mitarbeiter_uid=".$db->db_add_param($uid)."
-			AND studiensemester_kurzbz=".$db->db_add_param($ss);
+			AND studiensemester_kurzbz=".$db->db_add_param($ss). "
+            AND lema.vertrag_id IS NOT NULL
+            AND vertragsstatus_kurzbz = 'akzeptiert'";
 
 	if ($studiengang_kz != '') //$studiengang_kz!='0' &&
+    {
         $qry .= " AND lv_studiengang_kz=".$db->db_add_param($studiengang_kz);
+    }
+	elseif (!empty($xsl_oe_kurzbz))
+    {
+        if ($xsl_oe_kurzbz == 'etw')
+        {
+            $qry .= " AND lv_studiengang_kz > 0";
+        }
+
+        if ($xsl_oe_kurzbz == 'lehrgang')
+        {
+            $qry .= " AND lv_studiengang_kz <= 0";
+        }
+    }
+
 	$qry .= " ORDER BY lv_orgform_kurzbz, lv_bezeichnung, lehreinheit_id";
 	$lv = array();
 	$anzahl_lvs = 0;
@@ -367,35 +390,49 @@ function drawLehrauftrag($uid)
 				$gesamtstunden = $gesamtstunden + $stunden;
 		}
 	}
-	$qry = "SELECT tbl_projektarbeit.projektarbeit_id
-				,tbl_projektbetreuer.faktor
-				,tbl_projektbetreuer.stunden
-				,tbl_projektbetreuer.stundensatz
-				,tbl_lehrveranstaltung.semester
-				,vorname
-				,nachname
-				,vw_student.studiengang_kz
-				,projekttyp_kurzbz
-				,lehrfach.oe_kurzbz
-			FROM lehre.tbl_projektbetreuer
-				,lehre.tbl_lehreinheit
-				,lehre.tbl_lehrveranstaltung AS lehrfach
-				,lehre.tbl_lehrveranstaltung
-				,public.tbl_organisationseinheit
-				,public.tbl_benutzer
-				,lehre.tbl_projektarbeit
-				,campus.vw_student
-			WHERE tbl_projektbetreuer.person_id = tbl_benutzer.person_id
-				AND tbl_benutzer.uid = ".$db->db_add_param($uid)."
-				AND tbl_projektarbeit.projektarbeit_id = tbl_projektbetreuer.projektarbeit_id
-				AND student_uid = vw_student.uid
-				AND tbl_organisationseinheit.oe_kurzbz = tbl_lehrveranstaltung.oe_kurzbz
-				AND tbl_lehreinheit.lehreinheit_id = tbl_projektarbeit.lehreinheit_id
-				AND tbl_lehreinheit.lehrfach_id = lehrfach.lehrveranstaltung_id
-				AND tbl_lehreinheit.studiensemester_kurzbz = ".$db->db_add_param($ss)."
-				AND tbl_lehreinheit.lehrveranstaltung_id = tbl_lehrveranstaltung.lehrveranstaltung_id";
+	$qry = 'SELECT 
+	            pa.projektarbeit_id,
+				pb.faktor,
+				pb.stunden,
+				pb.stundensatz,
+				lv.semester,
+				vorname,
+				nachname,
+				student.studiengang_kz,
+				projekttyp_kurzbz,
+				lv.oe_kurzbz,
+                vertragsstatus_kurzbz
+			FROM lehre.tbl_projektbetreuer pb
+                JOIN lehre.tbl_projektarbeit pa USING (projektarbeit_id)
+		        JOIN lehre.tbl_lehreinheit le USING (lehreinheit_id)
+		        JOIN lehre.tbl_lehrveranstaltung           lv USING (lehrveranstaltung_id)
+                JOIN PUBLIC.tbl_organisationseinheit       oe USING (oe_kurzbz)
+                JOIN public.tbl_benutzer benutzer ON pb.person_id = benutzer.person_id			
+                JOIN campus.vw_student student ON pa.student_uid = student.uid
+                LEFT JOIN lehre.tbl_vertrag                vertrag USING (vertrag_id)
+                LEFT JOIN lehre.tbl_vertrag_vertragsstatus vvst USING (vertrag_id)
+			WHERE pb.vertrag_id IS NOT NULL
+                AND vvst.vertragsstatus_kurzbz = \'akzeptiert\'
+                AND benutzer.uid = '.$db->db_add_param($uid).'
+                AND le.studiensemester_kurzbz = '.$db->db_add_param($ss);
+
 	if ($studiengang_kz != '')
-		$qry .= " AND tbl_lehrveranstaltung.studiengang_kz=".$db->db_add_param($studiengang_kz, FHC_INTEGER);
+    {
+        $qry .= " AND tbl_lehrveranstaltung.studiengang_kz=".$db->db_add_param($studiengang_kz, FHC_INTEGER);
+    }
+    elseif (!empty($xsl_oe_kurzbz))
+    {
+        if ($xsl_oe_kurzbz == 'etw')
+        {
+            $qry .= " AND lv.studiengang_kz > 0";
+        }
+
+        if ($xsl_oe_kurzbz == 'lehrgang')
+        {
+            $qry .= " AND lv.studiengang_kz <= 0";
+        }
+    }
+
 	if ($result = $db->db_query($qry))
 	{
 		while ($row = $db->db_fetch_object($result))
