@@ -35,6 +35,12 @@ function getUserLanguage($language = null)
 	{
 		$language = $_SESSION[LANG_SESSION_CURRENT_LANGUAGE]; // then use it
 	}
+	// Else if the language is present in the cookie and it is valid
+	elseif (isset($_COOKIE[LANG_SESSION_CURRENT_LANGUAGE]) && !isEmptyString($_COOKIE[LANG_SESSION_CURRENT_LANGUAGE]))
+	{
+		$language = $_COOKIE[LANG_SESSION_CURRENT_LANGUAGE];
+	}
+	
 	// Otherwise checks if the user is authenticated to retrieve the users's language
 	// NOTE: this helper could be called when the user is NOT logged in the system
 	// 		therefore is checked if the user is logged
