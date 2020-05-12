@@ -465,7 +465,7 @@ if (!$ansicht)
 		}
 		*/
 	}
-	if (!$has_notfallkontakt)
+	if (!$has_notfallkontakt && $type == 'mitarbeiter')
 		echo '<tr><td>'.$p->t('profil/notfallkontakt').'</td><td colspan="3">'.$p->t('profil/notfallkontaktBekanntgeben').'</td></tr>';
 
 	echo '</table>';
