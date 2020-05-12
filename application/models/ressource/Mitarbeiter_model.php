@@ -64,17 +64,19 @@ class Mitarbeiter_model extends DB_Model
 
 		if ($fix === true)
 			$qry .= " AND fixangestellt=true";
-		if ($fix === false)
+		elseif ($fix === false)
 			$qry .= " AND fixangestellt=false";
+
 		if ($aktiv === true)
 			$qry .= " AND tbl_benutzer.aktiv=true";
-		if ($aktiv === false)
+		elseif ($aktiv === false)
 			$qry .= " AND tbl_benutzer.aktiv=false";
+
 		if ($verwendung === true)
 		{
 			$qry.=" AND EXISTS(SELECT * FROM bis.tbl_bisverwendung WHERE (ende>now() or ende is null) AND tbl_bisverwendung.mitarbeiter_uid=tbl_mitarbeiter.mitarbeiter_uid)";
 		}
-		if ($verwendung === false)
+		elseif ($verwendung === false)
 		{
 			$qry.=" AND NOT EXISTS(SELECT * FROM bis.tbl_bisverwendung WHERE (ende>now() or ende is null) AND tbl_bisverwendung.mitarbeiter_uid=tbl_mitarbeiter.mitarbeiter_uid)";
 		}
