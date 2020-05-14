@@ -99,7 +99,7 @@ class ampel extends basis_db
 				$this->insertvon = $row->insertvon;
 				$this->updateamum = $row->updateamum;
 				$this->updatevon = $row->updatevon;
-				$this->dauerampel = $row->dauerampel;
+				$this->dauerampel = $this->db_parse_bool($row->dauerampel);
 
 				return true;
 			}
@@ -156,7 +156,7 @@ class ampel extends basis_db
 				$obj->buttontext = $sprache->parseSprachResult('buttontext', $row);
 				$obj->insertamum = $row->insertamum;
 				$obj->insertvon = $row->insertvon;
-				$obj->dauerampel = $row->dauerampel;
+				$obj->dauerampel = $this->db_parse_bool($row->dauerampel);
 				
 				$this->result[] = $obj;
 			}
@@ -270,7 +270,7 @@ class ampel extends basis_db
 					$obj->buttontext = $sprache->parseSprachResult('buttontext', $row);
 					$obj->insertamum = $row->insertamum;
 					$obj->insertvon = $row->insertvon;
-					$obj->dauerampel = $row->dauerampel;
+					$obj->dauerampel = $this->db_parse_bool($row->dauerampel);
 					
 					$this->result[] = $obj;
 				}
@@ -561,7 +561,7 @@ class ampel extends basis_db
 						$obj->buttontext = $sprache->parseSprachResult('buttontext', $row);
 						$obj->insertamum = $row->insertamum;
 						$obj->insertvon = $row->insertvon;
-						$obj->dauerampel = $row->dauerampel;
+						$obj->dauerampel = $this->db_parse_bool($row->dauerampel);
 						
 						$obj->vorname = $row_ma->vorname;
 						$obj->nachname = $row_ma->nachname;
