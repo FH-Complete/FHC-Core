@@ -196,7 +196,7 @@ class Prestudent_model extends DB_Model
 	{
 		$this->addSelect('tbl_prestudent.*, tbl_studiengang.studiengang_kz, tbl_studiengang.kurzbzlang as studiengang, tbl_studiengang.bezeichnung as studiengangbezeichnung, tbl_studiengang.english as studiengangenglish,
 		tbl_studiengang.email as studiengangmail, tbl_studiengang.typ as studiengangtyp, tbl_studiengangstyp.bezeichnung as studiengangtyp_bez,
-		tbl_zgv.zgv_code, tbl_zgv.zgv_bez, tbl_prestudent.zgvnation as zgvnation_code, zgvnat.kurztext as zgvnation_kurzbez, zgvnat.langtext as zgvnation_bez, zgvnat.engltext as zgvnation_englbez,
+		tbl_zgv.zgv_code, tbl_zgv.zgv_bez, tbl_prestudent.zgvnation as zgvnation_code, zgvnat.kurztext as zgvnation_kurzbez, zgvnat.langtext as zgvnation_bez, zgvnat.engltext as zgvnation_englbez, zgvnat.nationengruppe_kurzbz as zgvnation_nationengruppe,
 		tbl_zgvmaster.zgvmas_code, tbl_zgvmaster.zgvmas_bez, tbl_prestudent.zgvmanation as zgvmanation_code, zgvmanat.kurztext as zgvmanation_kurzbez, zgvmanat.langtext as zgvmanation_bez, zgvmanat.engltext as zgvmanation_englbez');
 		$this->addJoin('public.tbl_studiengang', 'studiengang_kz', 'LEFT');
 		$this->addJoin('public.tbl_studiengangstyp', 'typ', 'LEFT');
@@ -215,7 +215,7 @@ class Prestudent_model extends DB_Model
 		//Prestudentstatus
 		$lastStatus = $this->PrestudentstatusModel->getLastStatus($prestudent_id);
 
-		if ($lastStatus->error)
+		if (isError($lastStatus))
 		{
 			return $lastStatus;
 		}
@@ -226,7 +226,7 @@ class Prestudent_model extends DB_Model
 			$lastStatusData = $lastStatusData[0];
 			//get Studiengangname from Studienplan and -ordnung
 			$studienordnung = $this->PrestudentstatusModel->getStudienordnungFromPrestudent($prestudent_id);
-			if ($studienordnung->error)
+			if (isError($studienordnung))
 				return $studienordnung;
 
 			if (hasData($studienordnung))
@@ -246,7 +246,7 @@ class Prestudent_model extends DB_Model
 			$this->SpracheModel->addSelect('sprache, locale, bezeichnung');
 			$language = $this->SpracheModel->load($lastStatusData->sprache);
 
-			if ($language->error)
+			if (isError($language))
 				return $language;
 
 			if (hasData($language))
@@ -261,14 +261,21 @@ class Prestudent_model extends DB_Model
 			$this->BewerbungstermineModel->addSelect('ende, nachfrist_ende');
 			$this->BewerbungstermineModel->addOrder('ende', 'DESC');
 			$this->BewerbungstermineModel->addLimit(1);
-			$bewerbungstermin = $this->BewerbungstermineModel->loadWhere(
-				array(
-					'studienplan_id' => $lastStatusData->studienplan_id,
-					'studiensemester_kurzbz' => $lastStatusData->studiensemester_kurzbz,
-					'studiengang_kz' => $prestudentdata->studiengang_kz
-				)
+
+			$fristparams = array(
+                'studienplan_id' => $lastStatusData->studienplan_id,
+                'studiensemester_kurzbz' => $lastStatusData->studiensemester_kurzbz,
+                'studiengang_kz' => $prestudentdata->studiengang_kz
+            );
+
+			if (isset($prestudentdata->zgvnation_nationengruppe))
+			    $fristparams['nationengruppe_kurzbz'] = $prestudentdata->zgvnation_nationengruppe;
+
+            $bewerbungstermin = $this->BewerbungstermineModel->loadWhere(
+				$fristparams
 			);
-			if ($bewerbungstermin->error)
+
+			if (isError($bewerbungstermin))
 				return $bewerbungstermin;
 
 			if (hasData($bewerbungstermin))
