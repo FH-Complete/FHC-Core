@@ -92,6 +92,49 @@ if (!defined('BIS_FUNKTIONSCODE_6_ARR') || empty('BIS_FUNKTIONSCODE_6_ARR'))
 	die('config var BIS_FUNKTIONSCODE_6_ARR fehlt');
 }
 
+$codex_funktion = array(
+	1 => "Vertretungsbefugte/r des Erhalters",
+	2 => "Leiter/in des Kollegiums",
+	3 => "stellv. Leiter/in des Kollegiums",
+	4 => "Mitglied des Kollegiums",
+	5 => "Studiengangsleiter/in",
+	6 => "Leiter/in einer Organisationseinheit",
+	7 => "Mitglied des Entwicklungsteams"
+);
+
+$qry = "SELECT * FROM bis.tbl_beschaeftigungsart1";
+
+$codex_ba1 = array();
+
+if($result = $db->db_query($qry))
+{
+	while($row = $db->db_fetch_object($result))
+	{
+		if(isset($codex_ba1[$row->ba1code_bis]))
+			$codex_ba1[$row->ba1code_bis] .= ' bzw '.$row->ba1kurzbz;
+		else
+			$codex_ba1[$row->ba1code_bis] = $row->ba1kurzbz;
+	}
+}
+
+$qry = "SELECT * FROM bis.tbl_beschaeftigungsart2";
+
+$codex_ba2 = array();
+
+if($result = $db->db_query($qry))
+{
+	while($row = $db->db_fetch_object($result))
+	{
+		$codex_ba2[$row->ba2code] = $row->ba2bez;
+	}
+}
+$codex_verwendung = array();
+
+// Verwendungen holen
+$verwendungcodex = new bisverwendung();
+$verwendungcodex->getVerwendungCodex();
+foreach($verwendungcodex->result as $row)
+	$codex_verwendung[$row->verwendung_code] = $row->verwendungbez;
 
 // Prüfe Zeitraum zur Erstellung einer BIS-Meldung
 $studiensemester = new studiensemester();
@@ -193,7 +236,7 @@ foreach ($mitarbeiter_arr as $mitarbeiter)
 	foreach ($bisverwendung_arr as $bisverwendung)
 	{
 		if (empty($verwendung_arr) || 																					// wenn erster Durchlauf ODER
-			(!(in_array($bisverwendung->ba1code, array_column($verwendung_arr, 'ba1code')) &&               	// im verwendung_arr Beschaeftigungsart1 UND
+			(!(in_array($bisverwendung->ba1code, array_column($verwendung_arr, 'ba1code')) &&               	    // im verwendung_arr Beschaeftigungsart1 UND
 				in_array($bisverwendung->ba2code, array_column($verwendung_arr, 'ba2code')) &&					// Beschaeftigungsart2 UND
 				in_array($bisverwendung->verwendung_code, array_column($verwendung_arr, 'verwendung_code')))))  // Verwendung_code noch NICHT vorhanden
 		{
@@ -406,7 +449,11 @@ function _add_relativesBA_und_anteiligeJVZAE($uid, $bisverwendung_arr)
 				$bisverwendung->vertragsstunden = BIS_VOLLZEIT_ARBEITSSTUNDEN;
 			}
 
-			// Relatives Beschaeftigungsausmass / Anteilige JVZAE ermitteln
+			/**
+			 * Relatives Beschaeftigungsausmass / Anteilige JVZAE ermitteln
+			 * Anteilige JVAE = Vertragsstunden relativ zu VZ Basis / Tage im Jahr * Vertragsdauer
+			 * Bsp Teilzeit 30h, BIS-Verwendungsdauer 120 Tage: 30 / 38,5 / 365 * 120
+			 */
 			$bisverwendung->beschaeftigungsausmass_relativ = round($bisverwendung->vertragsstunden / BIS_VOLLZEIT_ARBEITSSTUNDEN, 2);
 			$bisverwendung->jvzae_anteilig = round($bisverwendung->beschaeftigungsausmass_relativ * $bisverwendung->gewichtung, 2);
 
@@ -438,7 +485,14 @@ function _add_relativesBA_und_anteiligeJVZAE($uid, $bisverwendung_arr)
 						// Verwendung erstellen
 						list($tage_lehre_imSemester, $verwendung_lehre_obj) = _addVerwendung_fuerLehre_inkludiert($studsem, $bisverwendung);
 
-						// Relatives Beschaeftigungsausmass / Anteilige JVZAE ermitteln
+						/*
+						 * Relatives Beschaeftigungsausmass / Anteilige JVZAE ermitteln
+						 * Anteilige JVAE = Lehre relativ zu VZ Basis * gewichtete Lehrtage auf das Halbjahr bezogen
+						 * Bsp: 7 SWS an 90 Tage gelehrt: 7 / 15 * (0,5 /(365 / 2) * 140)
+						 * NOTE: Halbjahr mit 0,5 gewichtet, da ein Studiensemester 50% eines Jahres entspricht;
+						 * Diese 50% werden dann auf die Tage eines Halbjahres heruntergebrochen und mit den Lehrtagen
+						 * multipliziert.
+						 */
 						$verwendung_lehre_obj->beschaeftigungsausmass_relativ = round($lehre_sws / BIS_VOLLZEIT_SWS_INKLUDIERTE_LEHRE, 2);	// VZ-Basis fuer inkludierte Lehre
 						$verwendung_lehre_obj->gewichtung = ($tage_lehre_imSemester == 182)
 							? BIS_HALBJAHRES_GEWICHTUNG_SWS
@@ -472,14 +526,34 @@ function _add_relativesBA_und_anteiligeJVZAE($uid, $bisverwendung_arr)
 		// -------------------------------------------------------------------------------------------------------------
 		else if (!$has_vertragsstunden &&  $has_lehrtaetigkeit)
 		{
-			foreach (array($ss_kurzbz => $lehre_ss_sws, $ws_kurzbz => $lehre_ws_sws) as $studsem => $lehre_sws)
+			/**
+			 * Verwendungen ergänzen, wenn die BIS-Verwendung als externer Mitarbeiter in Sommer- / Wintersemester
+			 * des BIS-Meldungsjahres faellt.
+			 * Es werden die gesamten SWS von SS + WS (d.h. WS jahresuebergreifend) gemeldet.
+			 */
+			$bisverwendung_beginn_BIS = new DateTime($bisverwendung->beginn_imBISMeldungsJahr);
+			$bisverwendung_ende_BIS = new DateTime($bisverwendung->ende_imBISMeldungsJahr);
+
+			foreach (array($ss_kurzbz => $lehre_ss_sws, $ws_kurzbz => $lehre_ws_sws) as $studsem_kurzbz => $lehre_sws)
 			{
-				if (!is_null($lehre_sws))
+				$studsem = new studiensemester($studsem_kurzbz);
+				$studsem_start = new DateTime($studsem->start);
+				$studsem_ende = new DateTime($studsem->ende);
+
+				// Wenn Lehrzeit in die BIS Verwendungszeit hineinfaellt, Verwendung erstellen
+				if (!is_null($lehre_sws) &&
+					(!($studsem_start > $bisverwendung_ende_BIS) &&
+					!($studsem_ende < $bisverwendung_beginn_BIS)))
 				{
 					// Verwendungen erstellen
 					$verwendung_lehre_obj = _addVerwendung_fuerLehre_Stundenbasis($bisverwendung);
 
-					// Relatives Beschaeftigungsausmass / Anteilige JVZAE ermitteln
+					/**
+					 * Relatives Beschaeftigungsausmass / Anteilige JVZAE ermitteln
+					 * Anteilige JVAE = Lehre relativ zu VZ Basis * Halbjahresgewichtung
+					 * Bsp: 7 / 15 * 0,5
+					 * NOTE: Halbjahr mit 0,5 gewichtet, da ein Studiensemester 50% eines Jahres entspricht
+					 */
 					$verwendung_lehre_obj->beschaeftigungsausmass_relativ = round($lehre_sws / BIS_VOLLZEIT_SWS_EINZELSTUNDENBASIS, 2);	// VZ-Basis nach BIS-Vorgabe fuer Stundenbasis
 					$verwendung_lehre_obj->gewichtung = BIS_HALBJAHRES_GEWICHTUNG_SWS;
 					$verwendung_lehre_obj->jvzae_anteilig = round($verwendung_lehre_obj->beschaeftigungsausmass_relativ * $verwendung_lehre_obj->gewichtung, 2);
@@ -685,7 +759,7 @@ function  _getFunktionscontainer_Funktionscode123456($bisfunktion_arr)
 				// FunktionsCode 6 : Leitung Organisationseinheit der postsekundaeren Bildungseinrichtung
 				$organisationseinheit = new Organisationseinheit($bisfunktion->oe_kurzbz);
 				if (is_null($studiengang->studiengang_kz) &&
-					!in_array($organisationseinheit->oetyp_bezeichnung, BIS_FUNKTIONSCODE_6_ARR)) // nicht Teamleitung
+					!in_array($organisationseinheit->organisationseinheittyp_kurzbz, BIS_FUNKTIONSCODE_6_ARR)) // nicht Teamleitung
 				{
 					$funktion_code = 6;
 				}
@@ -935,6 +1009,11 @@ function _generateXML($person_arr)
  */
 function _outputHTML($person_arr)
 {
+	global $codex_funktion;
+	global $codex_verwendung;
+	global $codex_ba1;
+	global $codex_ba2;
+
 	echo '<html>
 	<head>
 		<title>BIS - Meldung Personal</title>
@@ -1023,9 +1102,9 @@ function _outputHTML($person_arr)
 			{
 				echo '
 				<tr>
-					<td>'.$verwendung->verwendung_code.'</td>
-					<td>'.$verwendung->ba1code.'</td>
-					<td>'.$verwendung->ba2code.'</td>
+					<td>'.(isset($codex_verwendung[$verwendung->verwendung_code])?$codex_verwendung[$verwendung->verwendung_code]:'').' '.$verwendung->verwendung_code.'</td>
+					<td><span title="'.(isset($codex_ba1[$verwendung->ba1code])?$codex_ba1[$verwendung->ba1code]:'').'">'.$verwendung->ba1code.'</span></td>
+					<td><span title="'.(isset($codex_ba2[$verwendung->ba2code])?$codex_ba2[$verwendung->ba2code]:'').'">'.$verwendung->ba2code.'</span></td>
 					<td>'.$verwendung->vzae.'</td>
 					<td>'.$verwendung->jvzae.'</td>
 				</tr>';
@@ -1055,7 +1134,7 @@ function _outputHTML($person_arr)
 			{
 				echo '
 				<tr>
-					<td>'. $funktion->funktionscode. '</td>
+					<td>'.(isset($codex_funktion[$funktion->funktionscode])?$codex_funktion[$funktion->funktionscode]:'').' '.$funktion->funktionscode.'</td>
 					<td>'. $funktion->besondereQualifikationCode. '</td>
 					<td>';
 

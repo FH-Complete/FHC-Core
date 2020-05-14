@@ -436,6 +436,7 @@ $tabelle="<H2>BIS-Meldungs&uuml;bersicht: </H2><br>
 
 $semester_arr = array(1,2,3,4,5,6,7,8,50,60);
 
+sort($verwendete_orgformen);
 
 $orgformen = implode('/',$verwendete_orgformen);
 

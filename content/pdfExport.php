@@ -305,8 +305,14 @@ else
 	else
 		$output = 'pdf';
 
-	// An der FHTW darf fas Studienblatt auch iin anderen Formaten exportiert werden
-	if (CAMPUS_NAME == 'FH Technikum Wien' && ($xsl == 'Studienblatt' || $xsl == 'StudienblattEng'))
+	// An der FHTW darf das Studienblatt und das Prüfungsprotokoll auch in anderen Formaten exportiert werden
+	if (CAMPUS_NAME == 'FH Technikum Wien' &&
+		($xsl == 'Studienblatt' ||
+			$xsl == 'StudienblattEng' ||
+			$xsl == 'PrProtBA' ||
+			$xsl == 'PrProtBAEng' ||
+			$xsl == 'PrProtMA' ||
+			$xsl == 'PrProtMAEng'))
 	{
 		$output = $_GET['output'];
 	}

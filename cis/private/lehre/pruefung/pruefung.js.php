@@ -352,8 +352,12 @@ function writePruefungsTable(e, data, anmeldung)
 		var termin = d.von.split(" ");
 		var time = termin[1].substring(0,5);
 		termin = termin[0].split("-");
-        var minimumFrist = new Date(termin[0], termin[1]-1,termin[2]);
-        minimumFrist.setMonth(minimumFrist.getMonth() - 2);
+
+		// Wie viele Monate vor Prüfungen dürfen sich Studierende anmelden?
+        // Sperre "deaktiviert" indem man sich 24 Monate vorher anmelden darf
+		var minimumFrist = new Date(termin[0], termin[1]-1,termin[2]);
+        minimumFrist.setMonth(minimumFrist.getMonth() - 24);
+
         termin = new Date(termin[0], termin[1]-1,termin[2]);
 		var frist = termin;
 		termin = termin.getDate()+"."+(termin.getMonth()+1)+"."+termin.getFullYear();

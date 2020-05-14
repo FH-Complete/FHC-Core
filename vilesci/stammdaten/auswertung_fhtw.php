@@ -2844,9 +2844,16 @@ else
 	echo '<button type="button" class="btn btn-primary btn-xs" onclick="sendMail()" id="mailSendButton">Mail an alle senden</button>';
 	echo '<button type="button" class="btn btn-primary btn-xs" onclick="checkAllWithResult()" id="checkAllResButton">Alle mit Ergebnis markieren</button>';
 	echo '<button type="button" class="btn btn-primary btn-xs" id="showUebertragenOptionsButton">Punkte ins FAS übertragen...</button>';
-	if (isset($_POST['reihungstest']) && count($_POST['reihungstest']) == 1)
+	if ((isset($_POST['reihungstest']) && count($_POST['reihungstest']) == 1) || (isset($_GET['reihungstest']) && $_GET['reihungstest'] != ''))
 	{
-		echo '&nbsp;&nbsp;<a href="'.APP_ROOT.'/addons/reports/cis/vorschau.php?statistik_kurzbz=TesttoolFortschritt&debug=true&ReihungstestID='.$_POST['reihungstest'][0].'" class="btn btn-default btn-xs" role="button" target="_blank">Testfortschritt ansehen</a>';
+		if (isset($_POST['reihungstest']))
+		{
+			echo '&nbsp;&nbsp;<a href="'.APP_ROOT.'/addons/reports/cis/vorschau.php?statistik_kurzbz=TesttoolFortschritt&debug=true&ReihungstestID='.$_POST['reihungstest'][0].'" class="btn btn-default btn-xs" role="button" target="_blank">Testfortschritt ansehen</a>';
+		}
+		else
+		{
+			echo '&nbsp;&nbsp;<a href="'.APP_ROOT.'/addons/reports/cis/vorschau.php?statistik_kurzbz=TesttoolFortschritt&debug=true&ReihungstestID='.$_GET['reihungstest'].'" class="btn btn-default btn-xs" role="button" target="_blank">Testfortschritt ansehen</a>';
+		}
 	}
 	else
 	{
