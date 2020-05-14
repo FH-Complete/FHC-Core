@@ -458,6 +458,35 @@ if($resultall = $db->db_query($qryall))
 		}
 	}
 }
+
+// Echter Dienstvertrag ohne Vertragsstunden
+$qryall="
+	SELECT
+		distinct mitarbeiter_uid as uid, vorname, nachname
+	FROM
+		bis.tbl_bisverwendung
+		JOIN public.tbl_mitarbeiter using(mitarbeiter_uid)
+		JOIN public.tbl_benutzer on(uid=mitarbeiter_uid)
+		JOIN public.tbl_person using(person_id)
+		WHERE
+		(beginn is null or beginn<".$db->db_add_param($bismeldedatum_ende).")
+		and (ende is null or ende>=".$db->db_add_param($bismeldedatum_start).")
+		and ba1code=103
+		and vertragsstunden is null
+	ORDER by nachname, vorname, mitarbeiter_uid;";
+if($resultall = $db->db_query($qryall))
+{
+	$num_rows_all=$db->db_num_rows($resultall);
+	echo "<br><br><H2>Bei $num_rows_all Mitarbeitern mit echtem Dienstvertrag fehlen die Vertragsstunden</H2>";
+	echo "Bei der BIS-Verwendung müssen bei echtem Dienstvertrag Vertragsstunden eingetragen sein
+	damit die JVZÄ korrekt berechnet werden.<br><br>";
+
+	while($rowall=$db->db_fetch_object($resultall))
+	{
+		echo "<br><u>Mitarbeiter(in) ".$rowall->nachname." ".$rowall->vorname.":</u><br>";
+	}
+}
+
 //7 - Lehrauftrag aber keine aktuelle Verwendung
 $i=0;
 $qryall="
