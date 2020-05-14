@@ -741,5 +741,32 @@ class bisverwendung extends basis_db
 			return false;
 		}
 	}
+
+	/**
+	 * Laedt die vorhandenen Verwendungen
+	 */
+	public function getVerwendungCodex()
+	{
+		$qry = "SELECT * FROM bis.tbl_verwendung ORDER BY verwendung_code";
+
+		if($this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object())
+			{
+				$obj = new StdClass();
+
+				$obj->verwendung_code = $row->verwendung_code;
+				$obj->verwendungbez = $row->verwendungbez;
+
+				$this->result[] = $obj;
+			}
+			return true;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler bei der Datenbankabfrage';
+			return false;
+		}
+	}
 }
 ?>
