@@ -190,7 +190,9 @@ $datum_obj = new datum();
 				<td><input type="text" name="kurzbz" size="60" maxlength="64" value="'.htmlspecialchars($ampel->kurzbz).'" required></td>
 				<td></td>
 
-				<td>Dauerampel</td>
+				<td>Dauerampel
+				    <i class="fa fa-info-circle fa-lg" aria-hidden="true" data-toggle="tooltip" data-placement="left" title="Eine Dauerampel kann nicht bestätigt werden. Sie läuft solange der Benutzerselect gilt und die Ampel aktiv (innerhalb Vorlauf- und Verfallszeit) ist."></i>
+				</td>
 				<td><input type="checkbox" id="dauerampel" name="dauerampel" '. ($db->db_parse_bool($ampel->dauerampel) ? 'checked' : ''). '></td>
 			</tr>
 			<tr valign="top">
