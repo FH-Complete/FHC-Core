@@ -86,16 +86,17 @@ class LehrauftragAkzeptieren extends Auth_Controller
 		}
 
 		// Check if user is external lector
-		$is_external_lector = false;
-
-		if ($result = getData($this->BisverwendungModel->getLast($this->_uid, false)))
-		{
-			if (is_null($result[0]->inkludierte_lehre) || $result[0]->inkludierte_lehre == 0)
-			{
-				$is_external_lector = true;
-			}
-		}
-
+		$this->MitarbeiterModel->addJoin('public.tbl_benutzer', 'uid = mitarbeiter_uid');
+		$result = $this->MitarbeiterModel->loadWhere(array(
+			'uid' => $this->_uid,
+			'fixangestellt' => false,
+			'personalnummer > ' => 0,
+			'lektor' => true,
+			'aktiv' => true
+		));
+		
+		$is_external_lector = hasData($result) ? true : false;
+		
 		$view_data = array(
 			'studiensemester_selected' => $studiensemester_kurzbz,
 			'is_external_lector' => $is_external_lector
