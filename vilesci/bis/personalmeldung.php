@@ -700,7 +700,10 @@ function _addVerwendung_fuerLehre_Stundenbasis($bisverwendung)
 	$verwendung_lehre_obj->ba1code = $bisverwendung->ba1code;
 	$verwendung_lehre_obj->ba2code = $bisverwendung->ba2code;
 	$verwendung_lehre_obj->beschausmasscode = $bisverwendung->beschausmasscode;
-	$verwendung_lehre_obj->verwendung_code = 1;
+	if ($bisverwendung->verwendung_code == 1 || $bisverwendung->verwendung_code == 2)
+		$verwendung_lehre_obj->verwendung_code = $bisverwendung->verwendung_code;
+	else
+		$verwendung_lehre_obj->verwendung_code = 1;
 	$verwendung_lehre_obj->beginn_imBISMeldungsJahr =$bisverwendung->beginn_imBISMeldungsJahr;
 	$verwendung_lehre_obj->ende_imBISMeldungsJahr = $bisverwendung->ende_imBISMeldungsJahr;
 
