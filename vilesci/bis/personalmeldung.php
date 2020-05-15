@@ -649,7 +649,7 @@ function _getUeberwiegendeTaetigkeit_HauptNebenberuf($bisverwendung_arr)
 	// Laengere Dauer bestimmt Haupt- oder Nebenberuf
 	$is_hauptberuflich = $sum_dauer_hauptberuflich > $sum_dauer_nebenberuflich;
 
-	return array($is_hauptberuflich);
+	return $is_hauptberuflich;
 }
 
 /**
