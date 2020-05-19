@@ -103,7 +103,7 @@ if ($semester != '')
 $zeile=1;
 if ($result = $db->db_query($qry))
 {
-	while ($row = $db->db_fetch_array($result))
+	while ($row = $db->db_fetch_array($result, null, PGSQL_BOTH))
 	{
 		$zeile++;
 		$i = 0;
@@ -150,7 +150,7 @@ if ($result = $db->db_query($qry))
 				}
 
 				$zeile++;
-				while ($row_betreuer = $db->db_fetch_array($result_betreuer))
+				while ($row_betreuer = $db->db_fetch_array($result_betreuer, null, PGSQL_BOTH))
 				{
 					$i = 1;
 
