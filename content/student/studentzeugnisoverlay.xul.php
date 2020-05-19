@@ -93,6 +93,10 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 				class="sortDirectionIndicator"
 				sort="rdf:http://www.technikum-wien.at/akte/rdf#stud_selfservice" />
 			<splitter class="tree-splitter"/>
+			<treecol id="student-zeugnis-tree-akte_akzeptiertamum" label="AkzeptiertAmUm" flex="2" hidden="false"
+					 class="sortDirectionIndicator"
+					 sort="rdf:http://www.technikum-wien.at/akte/rdf#stud_akzeptiertamum" />
+			<splitter class="tree-splitter"/>
 		</treecols>
 
 		<template>
@@ -106,6 +110,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 						<treecell label="rdf:http://www.technikum-wien.at/akte/rdf#akte_id"/>
 						<treecell label="rdf:http://www.technikum-wien.at/akte/rdf#signiert"/>
 						<treecell label="rdf:http://www.technikum-wien.at/akte/rdf#stud_selfservice"/>
+						<treecell label="rdf:http://www.technikum-wien.at/akte/rdf#stud_akzeptiertamum"/>
 					</treerow>
 				</treeitem>
 			</treechildren>

@@ -1897,16 +1897,28 @@ if(!$error)
 			}
 			if(!$error)
 			{
-				$akte = new akte();
-
-				if($akte->delete($_POST['akte_id']))
+				$akte = new akte($_POST['akte_id']);
+				//Akzeptierte Ausbildungsverträge dürfen nur von Admins gelöscht werden
+				if ($akte->dokument_kurzbz == 'Ausbvert' &&
+					$akte->akzeptiertamum != '' &&
+					!$rechte->isBerechtigt('admin',$_POST['studiengang_kz'], 'suid'))
 				{
-					$return = true;
-				}
-				else
-				{
+					$error = true;
 					$return = false;
-					$errormsg = $akte->errormsg;
+					$errormsg = 'Akzeptierte Ausbildungsverträge dürfen nur von Administratoren gelöscht werden';
+				}
+
+				if(!$error)
+				{
+					if ($akte->delete($_POST['akte_id']))
+					{
+						$return = true;
+					}
+					else
+					{
+						$return = false;
+						$errormsg = $akte->errormsg;
+					}
 				}
 			}
 		}
