@@ -4019,6 +4019,18 @@ if (!$result = @$db->db_query('SELECT 1 FROM system.tbl_jobtriggers LIMIT 1'))
 		echo '<br>Granted privileges to <strong>vilesci</strong> on system.tbl_jobtriggers';
 }
 
+// Add column ISO-3166-1-A-2 to bis.tbl_nation
+if (!$result = @$db->db_query("SELECT ISO-3166-1-A-2 FROM bis.tbl_nation LIMIT 1"))
+{
+	$qry = "ALTER TABLE bis.tbl_nation ADD COLUMN \"ISO-3166-1-A-2\" character varying(2);";
+	$qry .= "COMMENT ON COLUMN bis.tbl_nation.\"ISO-3166-1-A-2\" IS 'ISO 3166-1 alpha-2 country code';";
+
+	if(!$db->db_query($qry))
+		echo '<strong>bis.tbl_nation.ISO-3166-1-A-2: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>bis.tbl_nation.ISO-3166-1-A-2: Spalte ISO-3166-1-A-2 hinzugefuegt';
+}
+
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
 
@@ -4048,7 +4060,7 @@ $tabellen=array(
 	"bis.tbl_mobilitaet" => array("mobilitaet_id","prestudent_id","mobilitaetstyp_kurzbz","studiensemester_kurzbz","mobilitaetsprogramm_code","gsprogramm_id","firma_id","status_kurzbz","ausbildungssemester","insertvon","insertamum","updatevon","updateamum"),
 	"bis.tbl_mobilitaetstyp" => array("mobilitaetstyp_kurzbz","bezeichnung","aktiv"),
 	"bis.tbl_mobilitaetsprogramm"  => array("mobilitaetsprogramm_code","kurzbz","beschreibung","sichtbar","sichtbar_outgoing"),
-	"bis.tbl_nation"  => array("nation_code","entwicklungsstand","eu","ewr","kontinent","kurztext","langtext","engltext","sperre","nationengruppe_kurzbz"),
+	"bis.tbl_nation"  => array("nation_code","entwicklungsstand","eu","ewr","kontinent","kurztext","langtext","engltext","sperre","nationengruppe_kurzbz", "ISO-3166-1-A-2"),
 	"bis.tbl_nationengruppe"  => array("nationengruppe_kurzbz","nationengruppe_bezeichnung","aktiv"),
 	"bis.tbl_orgform"  => array("orgform_kurzbz","code","bezeichnung","rolle","bisorgform_kurzbz","bezeichnung_mehrsprachig"),
 	"bis.tbl_verwendung"  => array("verwendung_code","verwendungbez"),
