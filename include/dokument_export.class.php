@@ -575,5 +575,11 @@ class dokument_export
 			}
 		}
 	}
+	
+	public function setXMLTag_archivierbar()
+	{
+		$archivierbar = $this->xml_data->createElement("archivierbar", "true");
+		$this->xml_data->documentElement->appendChild($archivierbar);
+	}
 }
 ?>
