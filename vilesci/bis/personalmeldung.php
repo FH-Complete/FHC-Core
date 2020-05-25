@@ -206,8 +206,7 @@ foreach ($mitarbeiter_arr as $mitarbeiter)
 	$is_hauptberuflich = $bisverwendung_arr[count($bisverwendung_arr) - 1]->hauptberuflich;
 
 	// wenn Hauptberuf / Nebenberuf im gleichen Jahr - laengere Dauer melden (Ueberwiegenheitprinzip)
-	if (in_array(true, array_column($bisverwendung_arr, 'hauptberuflich')) &&	// hauptberuflich UND
-		in_array(false, array_column($bisverwendung_arr, 'hauptberuflich')))		// nebenberuflich
+	if (has_hauptberufchange($bisverwendung_arr))		// nebenberuflich
 	{
 		$is_hauptberuflich = _getUeberwiegendeTaetigkeit_HauptNebenberuf($bisverwendung_arr);
 	}
@@ -235,12 +234,9 @@ foreach ($mitarbeiter_arr as $mitarbeiter)
 	// -----------------------------------------------------------------------------------------------------------------
 	foreach ($bisverwendung_arr as $bisverwendung)
 	{
-		if (empty($verwendung_arr) || 																					// wenn erster Durchlauf ODER
-			(!(in_array($bisverwendung->ba1code, array_column($verwendung_arr, 'ba1code')) &&               	    // im verwendung_arr Beschaeftigungsart1 UND
-				in_array($bisverwendung->ba2code, array_column($verwendung_arr, 'ba2code')) &&					// Beschaeftigungsart2 UND
-				in_array($bisverwendung->verwendung_code, array_column($verwendung_arr, 'verwendung_code')))))  // Verwendung_code noch NICHT vorhanden
+		// Pruefen ob bereits eine Verwendung mit selben Ba1code, Ba2code und Verwendung vorhanden ist
+		if (empty($verwendung_arr) || !verwendung_exists($bisverwendung, $verwendung_arr))
 		{
-
 			// Temporaeren array mit Verwendungen mit gleichem Beschaeftigungsverhaeltnis und gleichem Verwendungscode erstellen
 			$verwendung_tmp_arr = array_filter($bisverwendung_arr, function ($obj) use ($bisverwendung) {
 				return
@@ -403,16 +399,22 @@ function _add_relativesBA_und_anteiligeJVZAE($uid, $bisverwendung_arr)
 	global $ss_kurzbz;
 	global $ws_kurzbz;
 
+	$has_lehrtaetigkeit = false;
+
 	// Lehrtaetigkeit ermitteln
 	$lema = new lehreinheitmitarbeiter();
 	$lema->getLehreinheiten_SWS_BISMeldung($uid, $ss_kurzbz);
 	$lehre_ss_sws = $lema->result[0];	// Anzahl SS - Semesterwochenstunden
 
+	if (!is_null($lehre_ss_sws) && $lehre_ss_sws > 0)
+		$has_lehrtaetigkeit = true;
+
 	$lema = new lehreinheitmitarbeiter();
 	$lema->getLehreinheiten_SWS_BISMeldung($uid, $ws_kurzbz);
 	$lehre_ws_sws = $lema->result[0];	// Anzahl WS - Semesterwochenstunden
 
-	$has_lehrtaetigkeit = !is_null($lehre_ss_sws) || !is_null($lehre_ws_sws);
+	if (!is_null($lehre_ws_sws) && $lehre_ws_sws > 0)
+		$has_lehrtaetigkeit = true;
 
 	foreach ($bisverwendung_arr as $index => $bisverwendung)
 	{
@@ -772,7 +774,7 @@ function  _getFunktionscontainer_Funktionscode123456($bisfunktion_arr)
 		// Funktionsobjekt generieren
 		if (!is_null($funktion_code) &&		// Funktionscode vorhanden UND
 			(empty($funktion_arr) ||		// (Erster Durchlauf ODER
-				!in_array($funktion_code, array_column($funktion_arr, 'funktionscode'))))	// Funktionsobjekt mit diesem Funktionscode nicht vorhanden)
+			!funktionscode_exists($funktion_code, $funktion_arr)))	// Funktionsobjekt mit diesem Funktionscode nicht vorhanden)
 		{
 			$funktion_obj = new StdClass();
 			$funktion_obj->funktionscode = $funktion_code;
@@ -825,11 +827,17 @@ function _addFunktionscontainer_Funktionscode7($uid, $funktion_arr)
 	if (!empty($entwicklungsteam_arr))
 	{
 		// Hoechste besondere Qualifikation
-		$besondere_qualifikation_code_arr = array_values(array_column($entwicklungsteam_arr, 'besqualcode'));
+		$besondere_qualifikation_code_arr = array();
+		foreach($entwicklungsteam_arr as $row_entw)
+			$besondere_qualifikation_code_arr[] = $row_entw->besqualcode;
+
 		$besondere_qualifikation_code = max($besondere_qualifikation_code_arr);
 
 		// Studiengaenge, wo Person Teil des Entwicklungsteams gewesen ist
-		$studiengang_kz_arr = array_values(array_column($entwicklungsteam_arr, 'studiengang_kz'));
+		$studiengang_kz_arr = array();
+		foreach($entwicklungsteam_arr as $row_entw)
+			$studiengang_kz_arr[] = $row_entw->studiengang_kz;
+
 		sort($studiengang_kz_arr);							// sortieren
 		foreach($studiengang_kz_arr as &$studiengang_kz)	// fuehrende Nullen fuer STG
 		{
@@ -876,8 +884,7 @@ function _getLehrecontainer($sws_proStg_arr)
 			$is_wintersemester = substr($sws_proStg->studiensemester_kurzbz, 0, 2) == 'WS';
 
 			// Lehreobjekt generieren
-			if (empty($lehre_arr) ||																// Erster Durchlauf ODER
-				!in_array($sws_proStg->studiengang_kz, array_column($lehre_arr, 'StgKz')))	// Neu
+			if (empty($lehre_arr) || !lehre_stg_exists($sws_proStg->studiengang_kz, $lehre_arr))
 			{
 				$lehre_obj = new StdClass();
 
@@ -1291,4 +1298,77 @@ function outputPlausibilitaetschecks($person_arr)
 			echo "\n<br/>";
 		}
 	}
+}
+
+/**
+ * Prueft ob in Verwendung_arr bereits eine Kombination mit selben ba1code, ba2code und verwendungcode
+ * vorhanden ist
+ * @param $bisverwendung Verwendungsobjekt
+ * @param $verwendung_arr Array mit verwendungsobjekten
+ */
+function verwendung_exists($bisverwendung, $verwendung_arr)
+{
+	foreach ($verwendung_arr as $row_verwendung)
+	{
+		if ($row_verwendung->ba1code == $bisverwendung->ba1code
+		 && $row_verwendung->ba2code == $bisverwendung->ba2code
+		 && $row_verwendung->verwendung_code == $bisverwendung->verwendung_code)
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+/**
+ * Prueft ob ein Studiengang bereits im Lehre Container vorhanden ist
+ * @param $studiengang_kz Studiengangskennzahl
+ * @param $lehre_arr Array mit Lehre Objekten
+ * @return true wenn der Studiengang bereits existiert
+ */
+function lehre_stg_exists($studiengang_kz, $lehre_arr)
+{
+	foreach($lehre_arr as $row)
+	{
+		if($row->StgKz == $studiengang_kz)
+			return true;
+	}
+	return false;
+}
+
+/**
+ * Prueft ob sich das Hauptberuflich innerhalb der Verwendungen aendert
+ * @param $bisverwendung_arr Array mit Verwendungen
+ * @return boolean true wenn sich hauptberuflich unterscheidet.
+ */
+function has_hauptberufchange($bisverwendung_arr)
+{
+	$hauptberuflich_arr = array();
+
+	foreach($bisverwendung_arr as $row)
+	{
+		$hauptberuflich_arr[] = $row->hauptberuflich;
+	}
+
+	if(count(array_unique($hauptberuflich_arr))>1)
+		return true;
+	else
+		return false;
+}
+
+/**
+ * Prueft ob der Funktionscode in den Funktionen bereits vorkommt
+ * @param $funktion_code Funktionscode
+ * @param $funktion_arr Array mit Funktionsobjekten
+ * @return true wenn funktionscode vorkommt.
+ */
+function funktionscode_exists($funktion_code, $funktion_arr)
+{
+	foreach($funktion_arr as $row)
+	{
+		if($row->funktionscode == $funktion_code)
+			return true;
+	}
+
+	return false;
 }

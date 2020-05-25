@@ -259,7 +259,9 @@ class Prestudent_model extends DB_Model
 			//get Bewerbungsfrist
 			$this->load->model('crm/bewerbungstermine_model', 'BewerbungstermineModel');
 			$this->BewerbungstermineModel->addSelect('ende, nachfrist_ende');
-			$this->BewerbungstermineModel->addOrder('ende', 'DESC');
+			$this->BewerbungstermineModel->addOrder('updateamum', 'DESC');
+			$this->BewerbungstermineModel->addOrder('insertamum', 'DESC');
+			$this->BewerbungstermineModel->addOrder('ende');
 			$this->BewerbungstermineModel->addLimit(1);
 
 			$fristparams = array(
