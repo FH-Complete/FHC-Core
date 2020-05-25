@@ -458,6 +458,12 @@ else
 			}
 
 			$dokument->setFilename($filename);
+			
+			if ($vorlage->archivierbar)
+			{
+				// XML-tag archivierbar ergaenzen
+				$dokument->setXMLTag_archivierbar();
+			}
 
 			if ($sign === true)
 			{
@@ -537,6 +543,9 @@ else
 			$dokument->setFilename($filename);
 
 			$error = false;
+			
+			// XML-tag archivierbar ergaenzen
+			$dokument->setXMLTag_archivierbar();
 
 			// Beim Archivieren wird das Dokument immer signiert wenn moeglich
 			if($vorlage->signierbar)
@@ -546,7 +555,7 @@ else
 			{
 				$dokument->sign($user);
 			}
-
+			
 			if ($dokument->create($output))
 				$doc = $dokument->output(false);
 			else
