@@ -6766,6 +6766,632 @@ When on hold, the date is only a reminder.',
 			)
 		)
 	),
+	array(
+		'app' => 'core',
+		'category' => 'abschlusspruefung',
+		'phrase' => 'PruefungBachelor',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'kommissionelle Bachelorprüfung',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Bachelor Examination before a Committee',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abschlusspruefung',
+		'phrase' => 'PruefungMaster',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'kommissionelle Masterprüfung',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Master Examination before a Committee',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abschlusspruefung',
+		'phrase' => 'ArbeitBachelor',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Bachelorarbeit',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Bachelor paper',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abschlusspruefung',
+		'phrase' => 'ArbeitMaster',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Masterarbeit',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Master\'s Thesis',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abschlusspruefung',
+		'phrase' => 'Protokoll',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Protokoll',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Record of',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abschlusspruefung',
+		'phrase' => 'AbgehaltenAmBachelor',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'abgehalten am FH-Bachelorstudiengang',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'held in the UAS Bachelor\'s Degree Program',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abschlusspruefung',
+		'phrase' => 'AbgehaltenAmMaster',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'abgehalten am FH-Masterstudiengang',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'held in the UAS Master\'s Degree Program',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abschlusspruefung',
+		'phrase' => 'Studiengangskennzahl',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Studiengangskennzahl',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Classification Number',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abschlusspruefung',
+		'phrase' => 'Personenkennzeichen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Personenkennzeichen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Personal identity number',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abschlusspruefung',
+		'phrase' => 'Pruefungssenat',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Prüfungssenat',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Examining Committee',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abschlusspruefung',
+		'phrase' => 'Vorsitz',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Vorsitzende/r',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Chair',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abschlusspruefung',
+		'phrase' => 'Erstpruefer',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => '1. Prüfer/in',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => '1st Examiner',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abschlusspruefung',
+		'phrase' => 'Zweitpruefer',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => '2. Prüfer/in',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => '2nd Examiner',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abschlusspruefung',
+		'phrase' => 'Pruefungsdatum',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Prüfungsdatum',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Exam Date',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abschlusspruefung',
+		'phrase' => 'EinverstaendniserklaerungName',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Einverständniserklärung',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => '',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abschlusspruefung',
+		'phrase' => 'EinverstaendniserklaerungText',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Der/Die Studierende bestätigt, sich in guter körperlicher und geistiger Verfassung zu befinden,
+				um die Prüfung durchzuführen und dass die technischen Voraussetzungen und gegeben sind.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => '',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abschlusspruefung',
+		'phrase' => 'ThemaBeurteilung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Thema und Beurteilung der',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Topic and Assessment of',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abschlusspruefung',
+		'phrase' => 'Note',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Note',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Grade',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abschlusspruefung',
+		'phrase' => 'Pruefungsgegenstand',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Prüfungsgegenstand',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Subject of Examination',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abschlusspruefung',
+		'phrase' => 'Notizen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Notizen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Notes',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abschlusspruefung',
+		'phrase' => 'PruefungsnotizenBachelor',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Prüfungsteil/e in Englisch (Optional - entsprechend der Vorgabe des Studiengangs):
+<< Nichtzutreffendes Streichen >>
+* Präsentation der Bachelorarbeit
+* Prüfungsgespräch über die Bachelorarbeit
+
+Fragen zur Eröffnung des Prüfungsgesprächs
+<< Bitte ausfüllen >>
+
+Gründe für negative Beurteilung ODER allfällige Anmerkungen bei positiver Beurteilung
+<< Bitte ausfüllen >>
+
+Allfällige besondere Vorkommnisse
+<< Bitte ausfüllen >>',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Parts of the examination held in English (Optional - in line with the degree program\'s guidelines):
+<< Delete as appropriate >>
+* Presentation of the Bachelor Paper
+* Examination interview on the Bachelor Paper
+
+Question(s) to open the examination interview
+<< Please fill out >>
+
+Reasons for failing OR any possible explanatory notes on a passing grade
+<< Please fill out >>
+
+Any unusual occurrences
+<< Please fill out >>',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abschlusspruefung',
+		'phrase' => 'PruefungsnotizenMaster',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Prüfungsteil/e in Englisch (Optional - entsprechend der Vorgabe des Studiengangs):
+<< Nichtzutreffendes Streichen >>
+* Präsentation der Masterarbeit
+* Prüfungsgespräch über die Masterarbeit und Querverbindungen zu Fächern des Studienplans
+* Prüfungsgespräch über sonstige studienplanrelevante Inhalte
+
+Fragen zur Eröffnung des Prüfungsgesprächs
+<< Bitte ausfüllen >>
+
+Gründe für negative Beurteilung ODER allfällige Anmerkungen bei positiver Beurteilung
+<< Bitte ausfüllen >>
+
+Allfällige besondere Vorkommnisse
+<< Bitte ausfüllen >>',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Parts of the examination held in English (Optional - in line with the degree program\'s guidelines):
+<< Delete as appropriate >>
+* Presentation of the Master\'s Thesis
+* Examination interview on the Master\'s Thesis and its links to subjects of the curriculum
+* Examination interview on other subjects relevant to the curriculum
+
+Question(s) to open the examination interview
+<< Please fill out >>
+
+Reasons for failing OR any possible explanatory notes on a passing grade
+<< Please fill out >>
+
+Any unusual occurrences
+<< Please fill out >>',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abschlusspruefung',
+		'phrase' => 'PruefungsgegenstandBachelor',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Prüfungsgespräch über die Bachelorarbeit',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Presentation and Examination interview on the Bachelor Paper',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abschlusspruefung',
+		'phrase' => 'PruefungsgegenstandMaster',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Prüfungsgespräch über die Masterarbeit und deren Querverbindungen zu Fächern des Studienplans sowie Prüfungsgespräch über das Stoffgebiet',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => '',
+				'description' => 'Examination interview on the Master’s Thesis and its links to subjects of the curriculum as well as examination interview on a curricular theme',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abschlusspruefung',
+		'phrase' => 'BeurteilungKriterienBachelor',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Beurteilung und Kriterien Bachelorprüfung<br />
+                                    <ul>
+                                        <li>
+                                            Mit ausgezeichnetem Erfolg bestanden<br />
+                                            Der oder die KandidatIn ist in der Lage, Wissen aus verschiedenen Lernbereichen fachlich korrekt in einem weit über das Wesentliche hinausgehenden Ausmaß souverän auf neue Situationen anzuwenden, und das noch dazu auf einem sehr hohen argumentativen Niveau.
+                                        </li>
+                                        <li>
+                                            Mit gutem Erfolg bestanden<br />
+                                            Der oder die KandidatIn ist in der Lage, Wissen aus verschiedenen Lernbereichen fachlich korrekt in einem über das Wesentliche hinausgehenden Ausmaß auf neue Situationen anzuwenden, und das noch dazu auf einem hohen argumentativen Niveau.
+                                        </li>
+                                        <li>
+                                            Bestanden<br />
+                                            Alle Lehrveranstaltungen (einschl. Bachelorarbeit) und Bachelorprüfung wurden positiv beurteilt.
+                                        </li>
+                                        <li>
+                                            Nicht bestanden
+                                        </li>
+                                    </ul>',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => '',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abschlusspruefung',
+		'phrase' => 'BeurteilungKriterienMaster',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Beurteilung und Kriterien Masterprüfung<br />
+                                    <ul>
+                                        <li>
+                                            Mit ausgezeichnetem Erfolg bestanden<br />
+                                            Der oder die KandidatIn ist in der Lage, Wissen aus verschiedenen Lernbereichen fachlich korrekt in einem weit über das Wesentliche hinausgehenden Ausmaß souverän auf neue Situationen anzuwenden, und das noch dazu auf einem sehr hohen argumentativen Niveau.
+                                        </li>
+                                        <li>
+                                            Mit gutem Erfolg bestanden<br />
+                                            Der oder die KandidatIn ist in der Lage, Wissen aus verschiedenen Lernbereichen fachlich korrekt in einem über das Wesentliche hinausgehenden Ausmaß auf neue Situationen anzuwenden, und das noch dazu auf einem hohen argumentativen Niveau.
+                                        </li>
+                                        <li>
+                                            Bestanden<br />
+                                            Alle Lehrveranstaltungen (einschl. Bachelorarbeit) und Bachelorprüfung wurden positiv beurteilt.
+                                        </li>
+                                        <li>
+                                            Nicht bestanden
+                                        </li>
+                                    </ul>',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => '',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abschlusspruefung',
+		'phrase' => 'Beurteilung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Beurteilung
+				',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Assessment',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	)
 );
 
 
