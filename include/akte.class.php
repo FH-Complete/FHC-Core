@@ -527,7 +527,7 @@ class akte extends basis_db
 		if(!is_null($stud_selfservice))
 			$qry.=" AND stud_selfservice=".($stud_selfservice?'true':'false');
 
-		$qry.=" ORDER BY erstelltam";
+		$qry.=" ORDER BY erstelltam DESC";
 
 		$this->errormsg = $qry;
 
