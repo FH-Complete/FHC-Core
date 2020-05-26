@@ -88,12 +88,12 @@ if(isset($_GET['action']) && $_GET['action']=='download')
 			}
 			else
 			{
-				die('Id ist ungueltig');
+				die('Akte hat keinen Inhalt.');
 			}
 		}
 		else
 		{
-			die('Id ist ungueltig');
+			die('Nicht zum selbständigen Download bestimmt oder falsche PersonID.');
 		}
 	}
 	else
