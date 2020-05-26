@@ -507,8 +507,8 @@ class lehreinheitmitarbeiter extends basis_db
 	public function getLehreinheiten_SWS_BISMeldung($uid, $studiensemester)
 	{
 		$qry = '
-			SELECT 
-				round(sum(semesterstunden) / 15) AS sws
+			SELECT
+				round(sum(semesterstunden) / 15, 2) AS sws
 			FROM (
 					 SELECT DISTINCT lehreinheit_id, studiensemester_kurzbz, mitarbeiter_uid, semesterstunden
 					 FROM lehre.tbl_lehreinheitmitarbeiter lema
@@ -565,8 +565,8 @@ class lehreinheitmitarbeiter extends basis_db
 					JOIN public.tbl_studiensemester ss USING (studiensemester_kurzbz)
 				WHERE mitarbeiter_uid =  '. $this->db_add_param($uid). '
 					 AND (
-					 	ss.start BETWEEN 
-					 	'. $this->db_add_param($beginn->format('Y-m-d')). ' AND 
+					 	ss.start BETWEEN
+					 	'. $this->db_add_param($beginn->format('Y-m-d')). ' AND
 					 	'. $this->db_add_param($ende->format('Y-m-d')). ')
 				-- nur lehre, die bisgemeldet wird
 					AND lema.bismelden

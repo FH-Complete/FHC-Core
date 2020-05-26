@@ -1504,6 +1504,15 @@ if (isset($_REQUEST['reihungstest']) || isset($_POST['rtauswsubmit']))
 	$gebiete_arr = array();
 	while ($row = $db->db_fetch_object($result))
 	{
+		// Hack für BEW-BB, wenn auch BEW-DL-Ergebnisse vorliegen
+		if ($row->stg_kurzbz == 'BEW' && $row->orgform_kurzbz == 'BB')
+		{
+			if ($row->gebiet_id == 2 || $row->gebiet_id == 44 || $row->gebiet_id == 95 || $row->gebiet_id == 10)
+			{
+				continue;
+			}
+		}
+
 		if (!isset($ergebnis[$row->prestudent_id]))
 		{
 			$ergebnis[$row->prestudent_id] = new stdClass();
@@ -1578,6 +1587,11 @@ if (isset($_REQUEST['reihungstest']) || isset($_POST['rtauswsubmit']))
 		{
 			$gebiete_arr[$row->prestudent_id][] = $row->gebiet_id;
 
+			// Gewichtung bei BEW BB bei Schlussfolgerungen manuell korrigieren, da es zur falschen Berechnung kommt, wenn es auch BEW-DL Ergebnisse gibt
+			if ($row->stg_kurzbz == 'BEW' && $row->orgform_kurzbz == 'BB' && $row->gebiet_id == 4)
+			{
+				$row->gewicht = 2;
+			}
 			// Gesamtpunkte
 			if (isset($ergebnis[$row->prestudent_id]->gesamt))
 			{
