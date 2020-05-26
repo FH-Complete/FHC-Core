@@ -257,19 +257,20 @@ foreach ($mitarbeiter_arr as $mitarbeiter)
 			foreach ($verwendung_tmp_arr as $verwendung_tmp)
 			{
 
-			//	Jahresvollzeitaequivalenz JVZAE ermitteln
-			// ---------------------------------------------------------------------------------------------------------
+				//	Jahresvollzeitaequivalenz JVZAE ermitteln
+				// -----------------------------------------------------------------------------------------------------
 				/**
 				 * Berechnung:
 				 * JVZAE wird aus der Summe aller anteiligen JVZE gebildet.
 				 */
-				$verwendung_obj->jvzae += (isset($verwendung_tmp->jvzae_anteilig))
-					? number_format($verwendung_tmp->jvzae_anteilig * 100, 2)
-					: NULL; // TODO: not null...
+				if (isset($verwendung_tmp->jvzae_anteilig))
+				{
+					$verwendung_obj->jvzae += number_format($verwendung_tmp->jvzae_anteilig * 100, 2);
+				}
 
 
-			//	Vollzeitaequivalenz VZAE ermitteln (Beschaeftigungsausmass zum Stichtag 31.12)
-			// ---------------------------------------------------------------------------------------------------------
+				//	Vollzeitaequivalenz VZAE ermitteln (Beschaeftigungsausmass zum Stichtag 31.12)
+				// -----------------------------------------------------------------------------------------------------
 				/**
 				 * Berechnung:
 				 * - Wenn Karenz zum Stichtag 31.12. vorhanden: VZAE = 0.00
@@ -287,7 +288,10 @@ foreach ($mitarbeiter_arr as $mitarbeiter)
 					}
 					else
 					{
-						$verwendung_obj->vzae = (isset($verwendung_tmp->beschaeftigungsausmass_relativ)) ? $verwendung_tmp->beschaeftigungsausmass_relativ * 100 : NULL;	// TODO: not null...
+						if (isset($verwendung_tmp->beschaeftigungsausmass_relativ))
+						{
+							$verwendung_obj->vzae = $verwendung_tmp->beschaeftigungsausmass_relativ * 100;
+						}
 					}
 				}
 			}
@@ -1247,8 +1251,10 @@ function outputPlausibilitaetschecks($person_arr)
 
 		if (isset($row->verwendung_arr) && is_array($row->verwendung_arr) && count($row->verwendung_arr) > 0)
 		{
+			$jvzaesumme = 0;
 			foreach ($row->verwendung_arr as $verwendung)
 			{
+				$jvzaesumme += $verwendung->jvzae;
 				if($verwendung->vzae < -1)
 				{
 					$msg[] = 'VZAE ist zu klein -> Vertragsstunden prüfen';
@@ -1266,6 +1272,10 @@ function outputPlausibilitaetschecks($person_arr)
 				{
 					$msg[] = 'JVZAE ist zu gross -> Vertragsstunden prüfen';
 				}
+			}
+			if($jvzaesumme>125)
+			{
+				$msg[] = 'JVZAE Summe ist zu gross';
 			}
 		}
 
