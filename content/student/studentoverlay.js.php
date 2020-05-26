@@ -1214,7 +1214,7 @@ function StudentAuswahl()
 		//Wenn keine UID gesetzt ist, dann ist er noch kein Student.
 		//Hierbei werden einige der Tabs nicht angezeigt und auch nicht geladen!
 
-		document.getElementById('student-tab-zeugnis').collapsed=true;
+		document.getElementById('student-tab-zeugnis').collapsed=false;
 		document.getElementById('student-tab-betriebsmittel').collapsed=true;
 		document.getElementById('student-tab-io').collapsed=true;
 		document.getElementById('student-tab-mobilitaet').hidden=true;
@@ -1363,7 +1363,7 @@ function StudentAuswahl()
 	StudentKontoTreeDatasource.addXMLSinkObserver(StudentKontoTreeSinkObserver);
 	kontotree.builder.addListener(StudentKontoTreeListener);
 
-	if(uid!='')
+	/*if(uid!='')*/
 	{
 		// *** Zeugnis ***
 		zeugnistree = document.getElementById('student-zeugnis-tree');
@@ -3170,8 +3170,14 @@ function StudentZeugnisDokumentArchivieren()
 		case 'StudienblattEng':
 			xml = 'studienblatt.xml.php';
 			break;
+
+		case 'Ausbildungsver':
+		case 'AusbVerEng':
+			xml = 'ausbildungsvertrag.xml.php';
+			break;
+
 		default:
-			alert('Das archivieren fuer diesen Dokumenttyp wird derzeit nicht unterstuetzt');
+			alert('Das Archivieren fuer diesen Dokumenttyp wird derzeit nicht unterstuetzt');
 			return
 			break;
 	}
@@ -3179,13 +3185,21 @@ function StudentZeugnisDokumentArchivieren()
 	var labelalt = document.getElementById('student-zeugnis-button-archive').label;
 	document.getElementById('student-zeugnis-button-archive').label='Loading...';
 
-	//Zeugnis fuer alle markierten Studenten archivieren
+	//Dokument fuer alle markierten Studenten archivieren
 	for (var t=0; t<numRanges; t++)
 	{
 		tree.view.selection.getRangeAt(t,start,end);
 		for (v=start.value; v<=end.value; v++)
 		{
 			uid = getTreeCellText(tree, 'student-treecol-uid', v);
+			prestudent_id = getTreeCellText(tree, 'student-treecol-prestudent_id', v);
+
+			//Wenn keine UID vorhanden, kann nur der Ausbildungsvertrag generiert werden
+			if(vorlage != 'Ausbildungsver' && vorlage != 'AusbVerEng' && uid == '')
+			{
+				alert('Dieses Dokument kann nur für Studierende erstellt werden. Mindestens eine ausgewählte Person hat keine UID');
+				continue;
+			}
 
 			var req = new phpRequest(url,'','');
 			req.add('xsl', vorlage);
@@ -3193,6 +3207,7 @@ function StudentZeugnisDokumentArchivieren()
 			req.add('ss', stsem);
 			req.add('archive', '1');
 			req.add('uid', uid);
+			req.add('prestudent_id', prestudent_id);
 
 			var response = req.execute();
 			if(response!='')

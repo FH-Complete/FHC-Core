@@ -100,6 +100,7 @@ foreach ($akten->result as $row)
 			<AKTE:nachgereicht_am><![CDATA['.$row->nachgereicht_am.']]></AKTE:nachgereicht_am>
 			<AKTE:signiert><![CDATA['.($row->signiert?'Ja':'Nein').']]></AKTE:signiert>
 			<AKTE:stud_selfservice><![CDATA['.($row->stud_selfservice?'Ja':'Nein').']]></AKTE:stud_selfservice>
+			<AKTE:stud_akzeptiertamum><![CDATA['.($row->akzeptiertamum != '' ? date('d.m.Y H:i:s',strtotime($row->akzeptiertamum)) : '').']]></AKTE:stud_akzeptiertamum>
 		</RDF:Description>
 	</RDF:li>
 	';
