@@ -196,6 +196,43 @@ if(!$result = @$db->db_query("SELECT 1 FROM public.vw_msg_vars_person LIMIT 1"))
 		echo '<br>Granted privileges to <strong>vilesci</strong> on public.vw_msg_vars_person';
 }
 
+// CREATE OR REPLACE VIEW public.vw_msg_vars_user and grants privileges
+if(!$result = @$db->db_query("SELECT 1 FROM public.vw_msg_vars_user LIMIT 1"))
+{
+	$qry = '
+		CREATE OR REPLACE VIEW public.vw_msg_vars_user AS (
+			SELECT DISTINCT ON
+				(b.uid) b.uid,
+				p.vorname,
+				p.nachname,
+				b.alias,
+				ma.telefonklappe AS "durchwahl"
+			FROM public.tbl_person p
+			JOIN public.tbl_benutzer b USING (person_id)
+			JOIN public.tbl_mitarbeiter ma ON ma.mitarbeiter_uid = b.uid
+			WHERE ma.personalnummer > 0
+		);';
+	
+	if(!$db->db_query($qry))
+		echo '<strong>public.vw_msg_vars_user: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>public.vw_msg_vars_user view created';
+	
+	$qry = 'GRANT SELECT ON TABLE public.vw_msg_vars_user TO web;';
+	
+	if(!$db->db_query($qry))
+		echo '<strong>public.vw_msg_vars_user: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Granted privileges to <strong>web</strong> on public.vw_msg_vars_user';
+	
+	$qry = 'GRANT SELECT ON TABLE public.vw_msg_vars_user TO vilesci;';
+	
+	if(!$db->db_query($qry))
+		echo '<strong>public.vw_msg_vars_user: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Granted privileges to <strong>vilesci</strong> on public.vw_msg_vars_user';
+}
+
 //Spalte anmerkung und rechnungsadresse in tbl_adresse
 if(!$result = @$db->db_query("SELECT rechnungsadresse FROM public.tbl_adresse LIMIT 1"))
 {
