@@ -46,7 +46,12 @@ $(document).ready(function ()
 {
 	tinymce.init({
 		selector: "#bodyTextArea",
-		plugins: "autoresize"
+		plugins: "autoresize",
+		autoresize_on_init: false,
+		autoresize_min_height: 400,
+		autoresize_max_height: 400,
+		autoresize_bottom_margin: 10,
+		auto_focus: "bodyTextArea"
 	});
 
 	tinymce.init({
