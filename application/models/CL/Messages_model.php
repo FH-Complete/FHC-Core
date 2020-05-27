@@ -833,6 +833,26 @@ class Messages_model extends CI_Model
 
 			$variables[] = $tmpVar;
 		}
+		
+		// ---------------------------------------------------------------------------------------
+		// Retrieves message vars of logged in user from database view vw_msg_vars_person
+		$result = null;
+		
+		// If data contains a prestudent id
+		$result = $this->messagelib->getMessageVarsLoggedInUser();
+		
+		if (isError($result)) show_error(getError($result));
+
+		// Then builds an array that contains objects with field name and field description of logged in user data
+		$user_fields = array();
+		foreach (getData($result) as $id => $description)
+		{
+			$obj = new stdClass();
+			$obj->id = $id;
+			$obj->description = $description;
+			
+			$user_fields[] = $obj;
+		}
 
 		// ---------------------------------------------------------------------------------------
 		// Retrieves the sender id
@@ -853,6 +873,7 @@ class Messages_model extends CI_Model
 			'subject' => $replySubject,
 			'body' => $replyBody,
 			'variables' => $variables,
+			'user_fields' => $user_fields,
 			'organisationUnits' => getData($organisationUnits),
 			'senderIsAdmin' => getData($senderIsAdmin),
 			'recipientsArray' => $recipientsArray,
