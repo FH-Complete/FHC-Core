@@ -4122,12 +4122,13 @@ if (!@$db->db_query("SELECT 0 FROM lehre.tbl_abschlusspruefung_antritt WHERE 0 =
 		CREATE TABLE lehre.tbl_abschlusspruefung_antritt (
 			pruefungsantritt_kurzbz character varying(20) NOT NULL,
 			bezeichnung character varying(64),
-			bezeichnung_english character varying(64)
+			bezeichnung_english character varying(64),
+			sort smallint
 		);
 		ALTER TABLE lehre.tbl_abschlusspruefung_antritt ADD CONSTRAINT pk_abschlusspruefung_antritt PRIMARY KEY (pruefungsantritt_kurzbz);
-		INSERT INTO lehre.tbl_abschlusspruefung_antritt(pruefungsantritt_kurzbz, bezeichnung, bezeichnung_english) VALUES (\'erstantritt\', \'Erstantritt\', \'1st Attempt\'); 
-		INSERT INTO lehre.tbl_abschlusspruefung_antritt(pruefungsantritt_kurzbz, bezeichnung, bezeichnung_english) VALUES (\'erstewiederholung\', \'1. Wiederholung\', \'1st Retake\'); 
-		INSERT INTO lehre.tbl_abschlusspruefung_antritt(pruefungsantritt_kurzbz, bezeichnung, bezeichnung_english) VALUES (\'zweitewiederholung\', \'2. Wiederholung\', \'2nd Retake\');';
+		INSERT INTO lehre.tbl_abschlusspruefung_antritt(pruefungsantritt_kurzbz, bezeichnung, bezeichnung_english, sort) VALUES (\'erstantritt\', \'Erstantritt\', \'1st Attempt\', 1);
+		INSERT INTO lehre.tbl_abschlusspruefung_antritt(pruefungsantritt_kurzbz, bezeichnung, bezeichnung_english, sort) VALUES (\'erstewiederholung\', \'1. Wiederholung\', \'1st Retake\', 2);
+		INSERT INTO lehre.tbl_abschlusspruefung_antritt(pruefungsantritt_kurzbz, bezeichnung, bezeichnung_english, sort) VALUES (\'zweitewiederholung\', \'2. Wiederholung\', \'2nd Retake\', 3);';
 
 	if (!$db->db_query($qry))
 		echo '<strong>lehre.tbl_abschlusspruefung_antritt '.$db->db_last_error().'</strong><br>';

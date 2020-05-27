@@ -28,6 +28,7 @@ header("Content-type: application/xhtml+xml");
 require_once('../config/vilesci.config.inc.php');
 require_once('../include/functions.inc.php');
 require_once('../include/abschlusspruefung.class.php');
+require_once('../include/abschlusspruefung_antritt.class.php');
 require_once('../include/person.class.php');
 require_once('../include/benutzer.class.php');
 require_once('../include/student.class.php');
@@ -340,6 +341,10 @@ if ($xmlformat=='rdf')
 		$person = new person();
 		$mitarbeiter = new mitarbeiter();
 
+		$antritt = new abschlusspruefung_antritt();
+		if ($row->pruefungsantritt_kurzbz!='')
+			$antritt->load($row->pruefungsantritt_kurzbz);
+
 		if($mitarbeiter->load($row->vorsitz))
 			$vorsitz = $mitarbeiter->nachname;
 		if($person->load($row->pruefer1))
@@ -368,6 +373,11 @@ if ($xmlformat=='rdf')
 				<ABSCHLUSSPRUEFUNG:datum><![CDATA['.$datum_obj->convertISODate($row->datum).']]></ABSCHLUSSPRUEFUNG:datum>
 				<ABSCHLUSSPRUEFUNG:datum_iso><![CDATA['.$row->datum.']]></ABSCHLUSSPRUEFUNG:datum_iso>
 				<ABSCHLUSSPRUEFUNG:uhrzeit><![CDATA['.$row->uhrzeit.']]></ABSCHLUSSPRUEFUNG:uhrzeit>
+				<ABSCHLUSSPRUEFUNG:endezeit><![CDATA['.$row->endezeit.']]></ABSCHLUSSPRUEFUNG:endezeit>
+				<ABSCHLUSSPRUEFUNG:freigabedatum_iso><![CDATA['.$row->freigabedatum.']]></ABSCHLUSSPRUEFUNG:freigabedatum_iso>
+				<ABSCHLUSSPRUEFUNG:freigabedatum><![CDATA['.$datum_obj->convertISODate($row->freigabedatum).']]></ABSCHLUSSPRUEFUNG:freigabedatum>
+				<ABSCHLUSSPRUEFUNG:pruefungsantritt_kurzbz><![CDATA['.$row->pruefungsantritt_kurzbz.']]></ABSCHLUSSPRUEFUNG:pruefungsantritt_kurzbz>
+				<ABSCHLUSSPRUEFUNG:pruefungsantritt_bezeichnung><![CDATA['.$antritt->bezeichnung.']]></ABSCHLUSSPRUEFUNG:pruefungsantritt_bezeichnung>
 				<ABSCHLUSSPRUEFUNG:sponsion><![CDATA['.$datum_obj->convertISODate($row->sponsion).']]></ABSCHLUSSPRUEFUNG:sponsion>
 				<ABSCHLUSSPRUEFUNG:sponsion_iso><![CDATA['.$row->sponsion.']]></ABSCHLUSSPRUEFUNG:sponsion_iso>
 				<ABSCHLUSSPRUEFUNG:pruefungstyp_kurzbz><![CDATA['.$row->pruefungstyp_kurzbz.']]></ABSCHLUSSPRUEFUNG:pruefungstyp_kurzbz>
