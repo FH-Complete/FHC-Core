@@ -4171,6 +4171,17 @@ if(!$result = @$db->db_query("SELECT protokoll,endezeit,pruefungsantritt_kurzbz,
 		echo '<br>lehre.tbl_abschlusspruefung: Spalten protokoll,endezeit,pruefungsantritt_kurzbz,freigabedatum hinzugefuegt';
 }
 
+// Spalte sort in lehre.tbl_abschlussbeurteilung (gibt Reihenfolge der Beurteilungen an)
+if(!$result = @$db->db_query("SELECT sort FROM lehre.tbl_abschlussbeurteilung LIMIT 1;"))
+{
+	$qry = "ALTER TABLE lehre.tbl_abschlussbeurteilung ADD COLUMN sort smallint;";
+
+	if(!$db->db_query($qry))
+		echo '<strong>lehre.tbl_abschlussbeurteilung: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>lehre.tbl_abschlussbeurteilung: Spalte sort hinzugefuegt!<br>';
+}
+
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
 
@@ -4273,7 +4284,7 @@ $tabellen=array(
 	"fue.tbl_ressource"  => array("ressource_id","student_uid","mitarbeiter_uid","betriebsmittel_id","firma_id","bezeichnung","beschreibung","insertamum","insertvon","updateamum","updatevon"),
 	"fue.tbl_scrumteam" => array("scrumteam_kurzbz","bezeichnung","punkteprosprint","tasksprosprint","gruppe_kurzbz"),
 	"fue.tbl_scrumsprint" => array("scrumsprint_id","scrumteam_kurzbz","sprint_kurzbz","sprintstart","sprintende","insertamum","insertvon","updateamum","updatevon"),
-	"lehre.tbl_abschlussbeurteilung"  => array("abschlussbeurteilung_kurzbz","bezeichnung","bezeichnung_english"),
+	"lehre.tbl_abschlussbeurteilung"  => array("abschlussbeurteilung_kurzbz","bezeichnung","bezeichnung_english","sort"),
 	"lehre.tbl_abschlusspruefung"  => array("abschlusspruefung_id","student_uid","vorsitz","pruefer1","pruefer2","pruefer3","abschlussbeurteilung_kurzbz","akadgrad_id","pruefungstyp_kurzbz","datum","uhrzeit","sponsion","anmerkung","updateamum","updatevon","insertamum","insertvon","ext_id","note","protokoll","endezeit","pruefungsantritt_kurzbz","freigabedatum"),
 	"lehre.tbl_abschlusspruefung_antritt"  => array("pruefungsantritt_kurzbz","bezeichnung","bezeichnung_english"),
 	"lehre.tbl_akadgrad"  => array("akadgrad_id","akadgrad_kurzbz","studiengang_kz","titel","geschlecht"),
