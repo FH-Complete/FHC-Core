@@ -90,10 +90,13 @@ class Pruefungsprotokoll extends Auth_Controller
 		else
 			$abschlussbeurteilung = getData($abschlussbeurteilung);
 
+		$language = getUserLanguage();
+
 		$data = array(
 			'abschlusspruefung' => $abschlusspruefung,
 			'abschlussbeurteilung' => $abschlussbeurteilung,
-			'abschlusspruefung_saved' => $abschlusspruefung_saved
+			'abschlusspruefung_saved' => $abschlusspruefung_saved,
+			'language' => $language
 		);
 
 		$this->load->view('lehre/pruefungsprotokoll.php', $data);
@@ -127,12 +130,12 @@ class Pruefungsprotokoll extends Auth_Controller
 						$result = $this->authlib->checkUserAuthByUsernamePassword($this->_uid, $password);
 						if (isError($result))
 						{
-							return $this->outputJsonError('Falsches Passwort');    // exit if password is incorrect
+							return $this->outputJsonError($this->p->t('password', 'wrongPassword'));    // exit if password is incorrect
 						}
 					}
 					else
 					{
-						return $this->outputJsonError('Passwort fehlt');
+						return $this->outputJsonError($this->p->t('password', 'passwordMissing'));
 					}
 				}
 
@@ -153,7 +156,7 @@ class Pruefungsprotokoll extends Auth_Controller
 			}
 		}
 		else
-			$this->outputJsonError('Ungültige Parameter');
+			$this->outputJsonError($this->p->t('ui', 'ungueltigeParameter'));
 	}
 
     // -----------------------------------------------------------------------------------------------------------------

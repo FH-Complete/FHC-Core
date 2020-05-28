@@ -11,8 +11,16 @@ $this->load->view(
 		'ajaxlib' => true,
 		'sbadmintemplate' => true,
 		'phrases' => array(
-			'pruefungsprotokoll' => array(
-				'freigegebenAm'
+			'abschlusspruefung' => array(
+				'freigegebenAm',
+				'pruefungGespeichert',
+				'pruefungSpeichernFehler',
+                'abschlussbeurteilungLeer',
+                'beginnzeitLeer',
+                'beginnzeitFormatError',
+                'endezeitLeer',
+                'endezeitFormatError',
+                'endezeitBeforeError'
 			),
 			'ui' => array(
 				'stunde',
@@ -21,11 +29,12 @@ $this->load->view(
 		),
 		'customCSSs' => array(
 			'public/css/sbadmin2/admintemplate_contentonly.css',
+			'vendor/fgelinas/timepicker/jquery.ui.timepicker.css',
 			'public/css/lehre/pruefungsprotokoll.css'
 		),
 		'customJSs' => array(
-			'public/js/lehre/pruefungsprotokoll.js',
-			'vendor/fgelinas/timepicker/jquery.ui.timepicker.js'
+			'vendor/fgelinas/timepicker/jquery.ui.timepicker.js',
+			'public/js/lehre/pruefungsprotokoll.js'
 		)
 	)
 );
@@ -44,11 +53,11 @@ $this->load->view(
 			<div class="row">
 				<div class="col-lg-12">
 					<h3 class="page-header">
-						<?php echo $this->p->t('abschlusspruefung', 'Protokoll') ?>&nbsp;<?php echo $pruefung_name ?>
+						<?php echo $this->p->t('abschlusspruefung', 'protokoll') ?>&nbsp;<?php echo $pruefung_name ?>
 					</h3>
                     <p>
                         <?php echo $abschlusspruefung->studiengangstyp == 'b' ? $this->p->t('abschlusspruefung', 'abgehaltenAmBachelor') : $this->p->t('abschlusspruefung', 'abgehaltenAmMaster'); ?>
-						<?php echo $abschlusspruefung->studiengangbezeichnung?>,&nbsp;<?php echo $this->p->t('abschlusspruefung', 'studiengangskennzahl') ?>&nbsp;
+						<?php echo $language == 'German' ? $abschlusspruefung->studiengangbezeichnung : $abschlusspruefung->studiengangbezeichnung_englisch ?>,&nbsp;<?php echo $this->p->t('abschlusspruefung', 'studiengangskennzahl') ?>&nbsp;
 						<?php echo $abschlusspruefung->studiengang_kz ?>
                     </p>
 				</div>
@@ -118,7 +127,7 @@ $this->load->view(
 									<?php echo $this->p->t('abschlusspruefung', 'pruefungsantritt') ?>
                                 </td>
                                 <td colspan="5">
-										<?php echo $abschlusspruefung->pruefungsantritt_bezeichnung; ?>
+										<?php echo $language == 'German' ? $abschlusspruefung->pruefungsantritt_bezeichnung : $abschlusspruefung->pruefungsantritt_bezeichnung_english; ?>
                                 </td>
                             </tr>
                             <tr>
@@ -146,12 +155,12 @@ $this->load->view(
                                     <?php echo $this->p->t('abschlusspruefung', 'pruefungsgegenstand') ?>
                                 </td>
                                 <td colspan="5">
-                                    <?php  echo ($abschlusspruefung->studiengangstyp == 'b' ? $this->p->t('abschlusspruefung', 'PruefungsgegenstandBachelor') : $this->p->t('abschlusspruefung', 'PruefungsgegenstandMaster')) ?>
+                                    <?php  echo ($abschlusspruefung->studiengangstyp == 'b' ? $this->p->t('abschlusspruefung', 'pruefungsgegenstandBachelor') : $this->p->t('abschlusspruefung', 'PruefungsgegenstandMaster')) ?>
                                 </td>
                             </tr>
                             <tr>
                                 <td colspan="6">
-                                    <?php echo $this->p->t('global', 'notizen') ?>
+                                    <?php echo ucfirst($this->p->t('global', 'notizen')); ?>
                                 </td>
                             </tr>
                             <tr>
@@ -172,7 +181,7 @@ $this->load->view(
                                         <option value="">-- <?php echo $this->p->t('ui', 'bitteWaehlen'); ?> --</option>
                                         <?php foreach ($abschlussbeurteilung as $beurteilung):
                                             $selected = $beurteilung->abschlussbeurteilung_kurzbz == $abschlusspruefung->abschlussbeurteilung_kurzbz ? " selected" : "" ?>
-                                            <option value="<?php echo $beurteilung->abschlussbeurteilung_kurzbz; ?>"<?php echo $selected ?>><?php echo $beurteilung->bezeichnung; ?> </option>
+                                            <option value="<?php echo $beurteilung->abschlussbeurteilung_kurzbz; ?>"<?php echo $selected ?>><?php echo $language == 'German' ? $beurteilung->bezeichnung : $beurteilung->bezeichnung_english; ?> </option>
                                         <?php endforeach; ?>
                                     </select>
                                 </td>

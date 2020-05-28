@@ -16,29 +16,26 @@ $("document").ready(function() {
                 data.password = $("#password").val();
             }
 
-            if ($("#verfCheck").prop('checked'))
+            var checkFields = Pruefungsprotokoll.checkFields(data, $("#verfCheck").prop('checked'));
+            $("#protocolform td").removeClass('has-error');
+            if (checkFields.length > 0)
             {
-                var checkFields = Pruefungsprotokoll.checkFields(data, $("#verfCheck").prop('checked'));
-                $("#protocolform td").removeClass('has-error');
-                if (checkFields.length > 0)
+                var errortext = '';
+                for (var i = 0; i < checkFields.length; i++)
                 {
-                    var errortext = '';
-                    for (var i = 0; i < checkFields.length; i++)
+                    var error = checkFields[i];
+                    $.each(error, function(i, n)
                     {
-                        var error = checkFields[i];
-                        $.each(error, function(i, n)
-                        {
-                            console.log($("#"+i).closest('td'));
-                           $("#"+i).closest('td').addClass('has-error');
-                           if (errortext !== '')
-                               errortext += '; ';
-                           errortext += n;
-                        });
-                    }
-
-                    FHC_DialogLib.alertError(errortext);
-                    return;
+                        console.log($("#"+i).closest('td'));
+                       $("#"+i).closest('td').addClass('has-error');
+                       if (errortext !== '')
+                           errortext += '; ';
+                       errortext += n;
+                    });
                 }
+
+                FHC_DialogLib.alertError(errortext);
+                return;
             }
 
             Pruefungsprotokoll.saveProtokoll($("#abschlusspruefung_id").val(),data);
@@ -49,17 +46,12 @@ $("document").ready(function() {
         function() { // if student not mentally and physically fit (checkbox), no form entry
             if ($(this).prop('checked'))
             {
-                $("#abschlussbeurteilung_kurzbz, #pruefungsbeginn, #pruefungsende").prop('disabled', false);
-                $("#abschlussbeurteilung_kurzbz").val($("#abschlussbeurteilung_kurzbz option").first().val());
+                $("#abschlussbeurteilung_kurzbz").prop('disabled', false).val($("#abschlussbeurteilung_kurzbz option").first().val());
             }
             else
             {
-                $("#abschlussbeurteilung_kurzbz, #pruefungsbeginn, #pruefungsende").prop('disabled', true).val(null);
+                $("#abschlussbeurteilung_kurzbz").prop('disabled', true).val(null);
             }
-
-            $("#pruefungsbeginn").val(null);
-            $("#pruefungsende").val(null);
-
         }
     );
 
@@ -94,10 +86,10 @@ var Pruefungsprotokoll = {
                         if (dataresponse.freigabedatum)
                         {
                             $("#saveProtocolBtn").prop("disabled", true);
-                            $("#freigegebenText").html('&nbsp;&nbsp;' + FHC_PhrasesLib.t("pruefungsprotokoll", "freigegebenAm") +
+                            $("#freigegebenText").html('&nbsp;&nbsp;' + FHC_PhrasesLib.t("abschlusspruefung", "freigegebenAm") +
                                 '&nbsp;' + dataresponse.freigabedatum)
                         }
-                        FHC_DialogLib.alertSuccess("Prüfung erfolgreich gespeichert!");
+                        FHC_DialogLib.alertSuccess(FHC_PhrasesLib.t("abschlusspruefung", "pruefungGespeichert"));
                     }
                     else if(FHC_AjaxClient.isError(data))
                     {
@@ -105,30 +97,39 @@ var Pruefungsprotokoll = {
                     }
                 },
                 errorCallback: function() {
-                    FHC_DialogLib.alertError("Fehler beim Speichern der Prüfung");
+                    FHC_DialogLib.alertError(FHC_PhrasesLib.t("abschlusspruefung", "pruefungSpeichernFehler"));
                 },
                 veilTimeout: 0
             }
         );
     },
-    checkFields: function(data)
+    checkFields: function(data, verfChecked)
     {
         var errors =  [];
 
-        if (data.abschlussbeurteilung_kurzbz == "")
-            errors.push({"abschlussbeurteilung_kurzbz": "Abschlussbeurteilung darf nicht leer sein!"}); // TODO phrases
+        if (data.abschlussbeurteilung_kurzbz == "" && verfChecked)
+            errors.push({"abschlussbeurteilung_kurzbz": FHC_PhrasesLib.t("abschlusspruefung", "abschlussbeurteilungLeer")});
 
         var zeitregex = /^[0-2][0-9]:[0-5][0-9]$/;
 
         if (data.uhrzeit == "")
-            errors.push({"pruefungsbeginn": "Beginnzeit darf nicht leer sein!"});
+        {
+            if (verfChecked)
+                errors.push({"pruefungsbeginn": FHC_PhrasesLib.t("abschlusspruefung", "beginnzeitLeer")});
+        }
         else if(!zeitregex.test(data.uhrzeit))
-            errors.push({"pruefungsbeginn": "Beginnzeit muss Format Stunden:Minuten haben!"});
+            errors.push({"pruefungsbeginn": FHC_PhrasesLib.t("abschlusspruefung", "beginnzeitFormatError")});
 
         if (data.endezeit == "")
-            errors.push({"pruefungsende": "Endzeit darf nicht leer sein!"});
+        {
+            if (verfChecked)
+                errors.push({"pruefungsende": FHC_PhrasesLib.t("abschlusspruefung", "endezeitLeer")});
+        }
         else if(!zeitregex.test(data.endezeit))
-            errors.push({"pruefungsende": "Endzeit muss Format Stunden:Minuten haben!"});
+            errors.push({"pruefungsende": FHC_PhrasesLib.t("abschlusspruefung", "endezeitFormatError")});
+
+        if (data.uhrzeit > data.endezeit && data.endezeit != "" && data.uhrzeit != "")
+            errors.push({"pruefungsende": FHC_PhrasesLib.t("abschlusspruefung", "endezeitBeforeError")});
 
         return errors;
     }
