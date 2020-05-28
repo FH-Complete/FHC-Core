@@ -210,21 +210,13 @@ class Message_model extends DB_Model
 	}
 	
 	/**
-	 * Get message vars for logged in user
-	 * @param string $uid
+	 * Get message vars data for logged in user
 	 * @return array|null
 	 */
-	public function getMsgVarsDataLoggedInUser()
+	public function getMsgVarsDataByLoggedInUser()
 	{
-		$result = $this->db->query('SELECT * FROM public.vw_msg_vars_user WHERE uid = \''. getAuthUID(). '\'');
+		$query = 'SELECT * FROM public.vw_msg_vars_user WHERE my_uid = ?';
 		
-		if ($result)
-		{
-			return success($result->list_fields());
-		}
-		else
-		{
-			return error($this->db->error(), FHC_DB_ERROR);
-		}
+		return $this->execQuery($query, array(getAuthUID()));
 	}
 }
