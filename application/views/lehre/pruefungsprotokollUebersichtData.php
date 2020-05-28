@@ -18,7 +18,7 @@ FROM
 WHERE
 	vorsitz='".$UID."'
 	AND datum>='2020-05-27'
-ORDER BY datum
+ORDER BY datum, nachname, vorname
 ";
 
 $filterWidgetArray = array(

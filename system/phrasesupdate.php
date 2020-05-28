@@ -6929,6 +6929,26 @@ When on hold, the date is only a reminder.',
 	array(
 		'app' => 'core',
 		'category' => 'abschlusspruefung',
+		'phrase' => 'pruefungsprotokoll',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Prüfungsprotokoll',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Record of Examination',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abschlusspruefung',
 		'phrase' => 'protokoll',
 		'insertvon' => 'system',
 		'phrases' => array(

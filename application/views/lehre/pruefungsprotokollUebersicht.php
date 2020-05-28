@@ -29,7 +29,7 @@
 		<div class="row">
 			<div class="col-lg-12">
 				<h3 class="page-header">
-					<?php echo $this->p->t('abschlusspruefung','Protokoll'); ?>
+					<?php echo $this->p->t('abschlusspruefung','pruefungsprotokoll'); ?>
 				</h3>
 			</div>
 		</div>

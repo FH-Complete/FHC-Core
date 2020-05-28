@@ -4149,6 +4149,13 @@ if (!@$db->db_query("SELECT 0 FROM lehre.tbl_abschlusspruefung_antritt WHERE 0 =
 	else
 		echo '<br>Granted privileges to <strong>vilesci</strong> on lehre.tbl_abschlusspruefung_antritt';
 
+	// GRANT SELECT, UPDATE ON TABLE lehre.tbl_abschlusspruefung TO web;
+	$qry = 'GRANT SELECT, UPDATE ON lehre.tbl_abschlusspruefung TO web;';
+	if (!$db->db_query($qry))
+		echo '<strong>lehre.tbl_abschlusspruefung '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Granted privileges to <strong>web</strong> on lehre.tbl_abschlusspruefung';
+
 	// COMMENT ON TABLE lehre.tbl_abschlusspruefung_antritt
 	$qry = 'COMMENT ON TABLE lehre.tbl_abschlusspruefung_antritt IS \'Type of Abschlusspruefung depending on number of attempts\';';
 	if (!$db->db_query($qry))

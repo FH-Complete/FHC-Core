@@ -3806,10 +3806,25 @@ if(!$error)
 			if(isset($_POST['abschlusspruefung_id']) && is_numeric($_POST['abschlusspruefung_id']))
 			{
 				$pruefung = new abschlusspruefung();
-
-				if($pruefung->delete($_POST['abschlusspruefung_id']))
+				if($pruefung->load($_POST['abschlusspruefung_id']))
 				{
-					$return = true;
+					if ($pruefung->freigabedatum == '')
+					{
+						if($pruefung->delete($_POST['abschlusspruefung_id']))
+						{
+							$return = true;
+						}
+						else
+						{
+							$errormsg = $pruefung->errormsg;
+							$return = false;
+						}
+					}
+					else
+					{
+						$errormsg = 'Löschen ist nicht möglich da bereits ein freigegebenes Protokoll vorhanden ist';
+						$return = false;
+					}
 				}
 				else
 				{
