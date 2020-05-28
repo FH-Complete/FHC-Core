@@ -28,7 +28,10 @@ class Pruefungsprotokoll extends Auth_Controller
         // Load language phrases
         $this->loadPhrases(
             array(
-                'abschlusspruefung'
+                'abschlusspruefung',
+				'global',
+				'person',
+				'lehre'
             )
         );
 
@@ -39,6 +42,11 @@ class Pruefungsprotokoll extends Auth_Controller
 
     // -----------------------------------------------------------------------------------------------------------------
     // Public methods
+	public function index()
+	{
+		$this->load->library('WidgetLib');
+		$this->load->view('lehre/pruefungsprotokollUebersicht.php');
+	}
 
 	/**
 	 */

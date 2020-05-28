@@ -4177,6 +4177,26 @@ When on hold, the date is only a reminder.',
 	array(
 		'app' => 'core',
 		'category' => 'global',
+		'phrase' => 'status',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Status',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Status',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'global',
 		'phrase' => 'lehrauftraegeBestellen',
 		'insertvon' => 'system',
 		'phrases' => array(
@@ -6761,6 +6781,26 @@ When on hold, the date is only a reminder.',
 			array(
 				'sprache' => 'English',
 				'text' => 'PDF Lectureships Acadamy Courses',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abschlusspruefung',
+		'phrase' => 'einfuehrungstext',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Hier sehen Sie alle Abschlussprüfungen zu denen Sie als Vorsitz zugeteilt sind. Klicken Sie auf den entsprechenden Link um das Prüfungsprotokoll zu erstellen.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Here you can see all the Examination where you are assigned as a chair. Select the entry to create the protocol.',
 				'description' => '',
 				'insertvon' => 'system'
 			)

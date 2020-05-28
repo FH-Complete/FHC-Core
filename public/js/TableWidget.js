@@ -336,47 +336,62 @@ var FHC_TableWidget = {
 					if (typeof tableWidgetDiv.find("#tableWidgetTableDataset").checkboxes === 'function')
 						tableWidgetDiv.find("#tableWidgetTableDataset").checkboxes("range", true);
 				}
-
-				for (var i = 0; i < data.dataset.length; i++)
+				if (data.dataset.length == 0)
 				{
-					var record = data.dataset[i];
-
-					if ($.isEmptyObject(record))
+					// Display placeholder if Table is empty
+					var numColumns = arrayFieldsToDisplay.length;
+					if (data.hasOwnProperty("additionalColumns") && $.isArray(data.additionalColumns))
 					{
-						continue;
+						numColumns += data.additionalColumns.length;
 					}
-
-					var strHtml = "<tr class='" + record.MARK_ROW_CLASS + "'>";
-
-					if (data.checkboxes != null && data.checkboxes != "")
+					var strHtml = '<tr><td align="center" colspan="'+numColumns+'">';
+					strHtml += FHC_PhrasesLib.t('ui', 'keineDatenVorhanden');
+					strHtml += '</td></tr>';
+					tableWidgetDiv.find("#tableWidgetTableDataset > tbody").append(strHtml);
+				}
+				else
+				{
+					for (var i = 0; i < data.dataset.length; i++)
 					{
-						strHtml += "<td>";
-						strHtml += "<input type='checkbox' name='" + data.checkboxes + "[]' value='" + record[data.checkboxes] + "'>";
-						strHtml += "</td>";
-					}
+						var record = data.dataset[i];
 
-					$.each(arrayFieldsToDisplay, function(i, fieldToDisplay) {
-
-						if (record.hasOwnProperty(data.fields[i]))
+						if ($.isEmptyObject(record))
 						{
-							strHtml += "<td>" + record[data.fields[i]] + "</td>";
+							continue;
 						}
-					});
 
-					if (data.additionalColumns != null && $.isArray(data.additionalColumns))
-					{
-						$.each(data.additionalColumns, function(i, additionalColumn) {
+						var strHtml = "<tr class='" + record.MARK_ROW_CLASS + "'>";
 
-							if (record.hasOwnProperty(additionalColumn))
+						if (data.checkboxes != null && data.checkboxes != "")
+						{
+							strHtml += "<td>";
+							strHtml += "<input type='checkbox' name='" + data.checkboxes + "[]' value='" + record[data.checkboxes] + "'>";
+							strHtml += "</td>";
+						}
+
+						$.each(arrayFieldsToDisplay, function(i, fieldToDisplay) {
+
+							if (record.hasOwnProperty(data.fields[i]))
 							{
-								strHtml += "<td>" + record[additionalColumn] + "</td>";
+								strHtml += "<td>" + record[data.fields[i]] + "</td>";
 							}
 						});
+
+						if (data.additionalColumns != null && $.isArray(data.additionalColumns))
+						{
+							$.each(data.additionalColumns, function(i, additionalColumn) {
+
+								if (record.hasOwnProperty(additionalColumn))
+								{
+									strHtml += "<td>" + record[additionalColumn] + "</td>";
+								}
+							});
+						}
+
+						strHtml += "</tr>";
+
+						tableWidgetDiv.find("#tableWidgetTableDataset > tbody").append(strHtml);
 					}
-
-					strHtml += "</tr>";
-
-					tableWidgetDiv.find("#tableWidgetTableDataset > tbody").append(strHtml);
 				}
 			}
 		}
@@ -540,7 +555,7 @@ var FHC_TableWidget = {
 				options.columnVisibilityChanged = function(column, visible) {
 					_func_columnVisibilityChanged(column, visible);
 				};
-				
+
 				// Renders the tabulator
 				tableWidgetDiv.find("#tableWidgetTabulator").tabulator(options);
 			}
