@@ -5336,6 +5336,46 @@ When on hold, the date is only a reminder.',
 	),
 	array(
 		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'stunde',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Stunde',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Hour',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'minute',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Minute',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Minute',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
 		'category' => 'global',
 		'phrase' => 'personalnummer',
 		'insertvon' => 'system',
@@ -6809,7 +6849,7 @@ When on hold, the date is only a reminder.',
 	array(
 		'app' => 'core',
 		'category' => 'abschlusspruefung',
-		'phrase' => 'PruefungBachelor',
+		'phrase' => 'pruefungBachelor',
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
@@ -6829,7 +6869,7 @@ When on hold, the date is only a reminder.',
 	array(
 		'app' => 'core',
 		'category' => 'abschlusspruefung',
-		'phrase' => 'PruefungMaster',
+		'phrase' => 'pruefungMaster',
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
@@ -6849,7 +6889,7 @@ When on hold, the date is only a reminder.',
 	array(
 		'app' => 'core',
 		'category' => 'abschlusspruefung',
-		'phrase' => 'ArbeitBachelor',
+		'phrase' => 'arbeitBachelor',
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
@@ -6869,7 +6909,7 @@ When on hold, the date is only a reminder.',
 	array(
 		'app' => 'core',
 		'category' => 'abschlusspruefung',
-		'phrase' => 'ArbeitMaster',
+		'phrase' => 'arbeitMaster',
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
@@ -6889,7 +6929,7 @@ When on hold, the date is only a reminder.',
 	array(
 		'app' => 'core',
 		'category' => 'abschlusspruefung',
-		'phrase' => 'Protokoll',
+		'phrase' => 'protokoll',
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
@@ -6909,7 +6949,7 @@ When on hold, the date is only a reminder.',
 	array(
 		'app' => 'core',
 		'category' => 'abschlusspruefung',
-		'phrase' => 'AbgehaltenAmBachelor',
+		'phrase' => 'abgehaltenAmBachelor',
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
@@ -6929,7 +6969,7 @@ When on hold, the date is only a reminder.',
 	array(
 		'app' => 'core',
 		'category' => 'abschlusspruefung',
-		'phrase' => 'AbgehaltenAmMaster',
+		'phrase' => 'abgehaltenAmMaster',
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
@@ -6949,7 +6989,7 @@ When on hold, the date is only a reminder.',
 	array(
 		'app' => 'core',
 		'category' => 'abschlusspruefung',
-		'phrase' => 'Studiengangskennzahl',
+		'phrase' => 'studiengangskennzahl',
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
@@ -6969,7 +7009,7 @@ When on hold, the date is only a reminder.',
 	array(
 		'app' => 'core',
 		'category' => 'abschlusspruefung',
-		'phrase' => 'Personenkennzeichen',
+		'phrase' => 'personenkennzeichen',
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
@@ -6989,7 +7029,7 @@ When on hold, the date is only a reminder.',
 	array(
 		'app' => 'core',
 		'category' => 'abschlusspruefung',
-		'phrase' => 'Pruefungssenat',
+		'phrase' => 'pruefungssenat',
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
@@ -7009,7 +7049,7 @@ When on hold, the date is only a reminder.',
 	array(
 		'app' => 'core',
 		'category' => 'abschlusspruefung',
-		'phrase' => 'Vorsitz',
+		'phrase' => 'vorsitz',
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
@@ -7029,7 +7069,7 @@ When on hold, the date is only a reminder.',
 	array(
 		'app' => 'core',
 		'category' => 'abschlusspruefung',
-		'phrase' => 'Erstpruefer',
+		'phrase' => 'erstpruefer',
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
@@ -7049,7 +7089,7 @@ When on hold, the date is only a reminder.',
 	array(
 		'app' => 'core',
 		'category' => 'abschlusspruefung',
-		'phrase' => 'Zweitpruefer',
+		'phrase' => 'zweitpruefer',
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
@@ -7069,7 +7109,7 @@ When on hold, the date is only a reminder.',
 	array(
 		'app' => 'core',
 		'category' => 'abschlusspruefung',
-		'phrase' => 'Pruefungsdatum',
+		'phrase' => 'pruefungsdatum',
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
@@ -7089,7 +7129,67 @@ When on hold, the date is only a reminder.',
 	array(
 		'app' => 'core',
 		'category' => 'abschlusspruefung',
-		'phrase' => 'EinverstaendniserklaerungName',
+		'phrase' => 'pruefungsbeginn',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Prüfungsbeginn',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Time of Start',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abschlusspruefung',
+		'phrase' => 'pruefungsende',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Prüfungsende',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Time of Finish',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abschlusspruefung',
+		'phrase' => 'pruefungsantritt',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Prüfungsantritt',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Examination Attempt',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abschlusspruefung',
+		'phrase' => 'einverstaendniserklaerungName',
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
@@ -7109,7 +7209,7 @@ When on hold, the date is only a reminder.',
 	array(
 		'app' => 'core',
 		'category' => 'abschlusspruefung',
-		'phrase' => 'EinverstaendniserklaerungText',
+		'phrase' => 'einverstaendniserklaerungText',
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
@@ -7121,7 +7221,7 @@ When on hold, the date is only a reminder.',
 			),
 			array(
 				'sprache' => 'English',
-				'text' => '',
+				'text' => 'The student confirms being in a healthy physical and mental condition and that the technical requirements are met for taking the exam.',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -7130,7 +7230,7 @@ When on hold, the date is only a reminder.',
 	array(
 		'app' => 'core',
 		'category' => 'abschlusspruefung',
-		'phrase' => 'ThemaBeurteilung',
+		'phrase' => 'themaBeurteilung',
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
@@ -7150,27 +7250,7 @@ When on hold, the date is only a reminder.',
 	array(
 		'app' => 'core',
 		'category' => 'abschlusspruefung',
-		'phrase' => 'Note',
-		'insertvon' => 'system',
-		'phrases' => array(
-			array(
-				'sprache' => 'German',
-				'text' => 'Note',
-				'description' => '',
-				'insertvon' => 'system'
-			),
-			array(
-				'sprache' => 'English',
-				'text' => 'Grade',
-				'description' => '',
-				'insertvon' => 'system'
-			)
-		)
-	),
-	array(
-		'app' => 'core',
-		'category' => 'abschlusspruefung',
-		'phrase' => 'Pruefungsgegenstand',
+		'phrase' => 'pruefungsgegenstand',
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
@@ -7190,27 +7270,7 @@ When on hold, the date is only a reminder.',
 	array(
 		'app' => 'core',
 		'category' => 'abschlusspruefung',
-		'phrase' => 'Notizen',
-		'insertvon' => 'system',
-		'phrases' => array(
-			array(
-				'sprache' => 'German',
-				'text' => 'Notizen',
-				'description' => '',
-				'insertvon' => 'system'
-			),
-			array(
-				'sprache' => 'English',
-				'text' => 'Notes',
-				'description' => '',
-				'insertvon' => 'system'
-			)
-		)
-	),
-	array(
-		'app' => 'core',
-		'category' => 'abschlusspruefung',
-		'phrase' => 'PruefungsnotizenBachelor',
+		'phrase' => 'pruefungsnotizenBachelor',
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
@@ -7254,7 +7314,7 @@ Any unusual occurrences
 	array(
 		'app' => 'core',
 		'category' => 'abschlusspruefung',
-		'phrase' => 'PruefungsnotizenMaster',
+		'phrase' => 'pruefungsnotizenMaster',
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
@@ -7300,7 +7360,7 @@ Any unusual occurrences
 	array(
 		'app' => 'core',
 		'category' => 'abschlusspruefung',
-		'phrase' => 'PruefungsgegenstandBachelor',
+		'phrase' => 'pruefungsgegenstandBachelor',
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
@@ -7320,7 +7380,7 @@ Any unusual occurrences
 	array(
 		'app' => 'core',
 		'category' => 'abschlusspruefung',
-		'phrase' => 'PruefungsgegenstandMaster',
+		'phrase' => 'pruefungsgegenstandMaster',
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
@@ -7340,12 +7400,12 @@ Any unusual occurrences
 	array(
 		'app' => 'core',
 		'category' => 'abschlusspruefung',
-		'phrase' => 'BeurteilungKriterienBachelor',
+		'phrase' => 'beurteilungKriterienBachelor',
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Beurteilung und Kriterien Bachelorprüfung<br />
+				'text' => 'Beurteilung und Kriterien Bachelorprüfung<br /><br />
                                     <ul>
                                         <li>
                                             Mit ausgezeichnetem Erfolg bestanden<br />
@@ -7368,7 +7428,24 @@ Any unusual occurrences
 			),
 			array(
 				'sprache' => 'English',
-				'text' => '',
+				'text' => 'Assesment and criteria Bachelor Examination<br /><br />
+                                    <ul>
+                                        <li>
+                                            Passed with distinction<br />
+                                            Der oder die KandidatIn ist in der Lage, Wissen aus verschiedenen Lernbereichen fachlich korrekt in einem weit über das Wesentliche hinausgehenden Ausmaß souverän auf neue Situationen anzuwenden, und das noch dazu auf einem sehr hohen argumentativen Niveau.
+                                        </li>
+                                        <li>
+                                            Passed with merit<br />
+                                            Der oder die KandidatIn ist in der Lage, Wissen aus verschiedenen Lernbereichen fachlich korrekt in einem über das Wesentliche hinausgehenden Ausmaß auf neue Situationen anzuwenden, und das noch dazu auf einem hohen argumentativen Niveau.
+                                        </li>
+                                        <li>
+                                            Passed<br />
+                                            Alle Lehrveranstaltungen (einschl. Bachelorarbeit) und Bachelorprüfung wurden positiv beurteilt.
+                                        </li>
+                                        <li>
+                                            Failed
+                                        </li>
+                                    </ul>',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -7377,12 +7454,12 @@ Any unusual occurrences
 	array(
 		'app' => 'core',
 		'category' => 'abschlusspruefung',
-		'phrase' => 'BeurteilungKriterienMaster',
+		'phrase' => 'beurteilungKriterienMaster',
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Beurteilung und Kriterien Masterprüfung<br />
+				'text' => 'Beurteilung und Kriterien Masterprüfung<br /><br />
                                     <ul>
                                         <li>
                                             Mit ausgezeichnetem Erfolg bestanden<br />
@@ -7405,7 +7482,24 @@ Any unusual occurrences
 			),
 			array(
 				'sprache' => 'English',
-				'text' => '',
+				'text' => '\'Assesment and criteria Masters Examination<br /><br />
+                                    <ul>
+                                        <li>
+                                            Passed with distinction<br />
+                                            Der oder die KandidatIn ist in der Lage, Wissen aus verschiedenen Lernbereichen fachlich korrekt in einem weit über das Wesentliche hinausgehenden Ausmaß souverän auf neue Situationen anzuwenden, und das noch dazu auf einem sehr hohen argumentativen Niveau.
+                                        </li>
+                                        <li>
+                                            Passed with merit<br />
+                                            Der oder die KandidatIn ist in der Lage, Wissen aus verschiedenen Lernbereichen fachlich korrekt in einem über das Wesentliche hinausgehenden Ausmaß auf neue Situationen anzuwenden, und das noch dazu auf einem hohen argumentativen Niveau.
+                                        </li>
+                                        <li>
+                                            Passed<br />
+                                            Alle Lehrveranstaltungen (einschl. Bachelorarbeit) und Bachelorprüfung wurden positiv beurteilt.
+                                        </li>
+                                        <li>
+                                            Failed
+                                        </li>
+                                    </ul>\'',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -7414,19 +7508,58 @@ Any unusual occurrences
 	array(
 		'app' => 'core',
 		'category' => 'abschlusspruefung',
-		'phrase' => 'Beurteilung',
+		'phrase' => 'beurteilung',
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Beurteilung
-				',
+				'text' => 'Beurteilung',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
 				'text' => 'Assessment',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abschlusspruefung',
+		'phrase' => 'ueberpruefenFreigeben',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Überprüfen und Freigeben',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Check and Approve',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abschlusspruefung',
+		'phrase' => 'freigegebenAm',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Freigegeben am',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Approved on',
 				'description' => '',
 				'insertvon' => 'system'
 			)

@@ -1,3 +1,11 @@
+/* threshold for form full screen */
+@media (max-width:1075px) {
+    #page-wrapper {
+        margin-right: 0;
+        margin-left: 0;
+    }
+}
+
 #protocoltbl textarea {
     /* notiz field should stay in table */
     -webkit-box-sizing: border-box;
@@ -6,6 +14,24 @@
     width: 100%;
 }
 
-#protocoltbl td:nth-child(1) {
+#protocoltbl td:nth-child(1), .cellbg {
     background-color: #f5f5f5;
+}
+
+.timecellwidth {
+    width: 20%;
+}
+
+.namecellwidth {
+    width: 15%;
+}
+
+.datevalcellwidth {
+    width: 10%;
+}
+
+#hrbottom {
+    border-top: 2px solid #eee;
+    margin-top: 10px;
+    margin-bottom: 10px;
 }

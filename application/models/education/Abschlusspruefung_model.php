@@ -26,12 +26,14 @@ class Abschlusspruefung_model extends DB_Model
 
 		$abschlusspruefungdata = array();
 
-		$this->addSelect('tbl_abschlusspruefung.datum, tbl_abschlusspruefung.abschlussbeurteilung_kurzbz,
-													studentpers.vorname AS vorname_student, studentpers.nachname AS nachname_student, studentpers.titelpre AS titelpre_student, studentpers.titelpost AS titelpost_student, studentben.uid AS uid_student, matrikelnr, 
-													vorsitzenderpers.vorname AS vorname_vorsitz, vorsitzenderpers.nachname AS nachname_vorsitz, vorsitzenderpers.titelpre AS titelpre_vorsitz, vorsitzenderpers.titelpost AS titelpost_vorsitz,
-													erstprueferpers.vorname AS vorname_erstpruefer, erstprueferpers.nachname AS nachname_erstpruefer, erstprueferpers.titelpre AS titelpre_erstpruefer, erstprueferpers.titelpost AS titelpost_erstpruefer, 
-													zweitprueferpers.vorname AS vorname_zweitpruefer, zweitprueferpers.nachname AS nachname_zweitpruefer, zweitprueferpers.titelpre AS titelpre_zweitpruefer, zweitprueferpers.titelpost AS titelpost_zweitpruefer 
-													');
+		$this->addSelect('tbl_abschlusspruefung.abschlusspruefung_id, tbl_abschlusspruefung.datum, tbl_abschlusspruefung.abschlussbeurteilung_kurzbz, tbl_abschlusspruefung.uhrzeit AS pruefungsbeginn, tbl_abschlusspruefung.endezeit AS pruefungsende,
+								tbl_abschlusspruefung.freigabedatum, tbl_abschlusspruefung_antritt.bezeichnung AS pruefungsantritt_bezeichnung, tbl_abschlusspruefung_antritt.bezeichnung_english AS pruefungsantritt_bezeichnung_english, tbl_abschlusspruefung.protokoll,
+								studentpers.vorname AS vorname_student, studentpers.nachname AS nachname_student, studentpers.titelpre AS titelpre_student, studentpers.titelpost AS titelpost_student, studentben.uid AS uid_student, matrikelnr, 
+								vorsitzenderben.uid AS uid_vorsitz, vorsitzenderpers.vorname AS vorname_vorsitz, vorsitzenderpers.nachname AS nachname_vorsitz, vorsitzenderpers.titelpre AS titelpre_vorsitz, vorsitzenderpers.titelpost AS titelpost_vorsitz,
+								erstprueferpers.vorname AS vorname_erstpruefer, erstprueferpers.nachname AS nachname_erstpruefer, erstprueferpers.titelpre AS titelpre_erstpruefer, erstprueferpers.titelpost AS titelpost_erstpruefer, 
+								zweitprueferpers.vorname AS vorname_zweitpruefer, zweitprueferpers.nachname AS nachname_zweitpruefer, zweitprueferpers.titelpre AS titelpre_zweitpruefer, zweitprueferpers.titelpost AS titelpost_zweitpruefer 
+								');
+		$this->addJoin('lehre.tbl_abschlusspruefung_antritt', 'pruefungsantritt_kurzbz', 'LEFT');
 		$this->addJoin('public.tbl_benutzer studentben', 'tbl_abschlusspruefung.student_uid = studentben.uid');
 		$this->addJoin('public.tbl_person studentpers', 'studentben.person_id = studentpers.person_id');
 		$this->addJoin('public.tbl_student', 'studentben.uid = tbl_student.student_uid');
