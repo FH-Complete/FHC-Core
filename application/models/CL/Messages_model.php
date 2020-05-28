@@ -393,7 +393,10 @@ class Messages_model extends CI_Model
 		// Looping on receivers data
 		foreach (getData($msgVarsData) as $receiver)
 		{
-			$msgVarsDataArray = $this->_lowerReplaceSpaceArrayKeys((array)$receiver); // replaces array keys
+			// Merge receivers data with logged in user data
+			$msgVarsDataArray = $this->_addMsgVarsDataOfLoggedInUser($receiver);
+	
+			$msgVarsDataArray = $this->_lowerReplaceSpaceArrayKeys((array)getData($msgVarsDataArray)[0]); // replaces array keys
 			$parsedSubject = parseText($subject, $msgVarsDataArray);
 			$parsedBody = parseText($body, $msgVarsDataArray);
 
@@ -600,6 +603,9 @@ class Messages_model extends CI_Model
 		$parseMessageText = error('The given person_id is not a valid number');
 
 		if (is_numeric($person_id)) $parseMessageText = $this->MessageModel->getMsgVarsDataByPersonId($person_id);
+		
+		// Add message vars data of the logged in user
+		$parseMessageText = $this->_addMsgVarsDataOfLoggedInUser($parseMessageText);
 
 		if (hasData($parseMessageText))
 		{
@@ -623,7 +629,10 @@ class Messages_model extends CI_Model
 		$parseMessageText = error('The given prestudent_id is not a valid number');
 
 		if (is_numeric($prestudent_id)) $parseMessageText = $this->MessageModel->getMsgVarsDataByPrestudentId($prestudent_id);
-
+		
+		// Add message vars data of the logged in user
+		$parseMessageText = $this->_addMsgVarsDataOfLoggedInUser($parseMessageText);
+		
 		if (hasData($parseMessageText))
 		{
 			$parseMessageText = success(
@@ -881,5 +890,31 @@ class Messages_model extends CI_Model
 			'relationmessage_id' => $relationmessage,
 			'type' => $type
 		);
+	}
+	
+	/**
+	 * Adds message vars data of the logged in user to the given object (that should also have message vars data)
+	 * @param object $otherMsgVarsDataObj Can be success object or simple object.
+	 * @return object Returns success object.
+	 */
+	public function _addMsgVarsDataOfLoggedInUser($otherMsgVarsDataObj)
+	{
+		// First check if param type is object
+		if (!is_object($otherMsgVarsDataObj)) show_error('Must pass an object to merge with data of logged in user');
+		
+		// If it is a return object, extract the simple data object
+		if (isSuccess($otherMsgVarsDataObj))
+		{
+			$otherMsgVarsDataObj = getData($otherMsgVarsDataObj)[0];
+		}
+		
+		// Retrieve message vars data of the logged in user
+		if (!$msgVarsDataLoggedInUser = getData($this->MessageModel->getMsgVarsDataByLoggedInUser())[0])
+		{
+			return success($otherMsgVarsDataObj);   // If failed, return at least given object as expected success object
+		}
+		
+		return success(array((object)(array_merge((array) $otherMsgVarsDataObj, (array) $msgVarsDataLoggedInUser))));
+		
 	}
 }
