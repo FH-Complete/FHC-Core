@@ -202,11 +202,11 @@ if(!$result = @$db->db_query("SELECT 1 FROM public.vw_msg_vars_user LIMIT 1"))
 	$qry = '
 		CREATE OR REPLACE VIEW public.vw_msg_vars_user AS (
 			SELECT DISTINCT ON
-				(b.uid) b.uid,
-				p.vorname,
-				p.nachname,
-				b.alias,
-				ma.telefonklappe AS "durchwahl"
+				(b.uid) b.uid AS "my_uid",
+				p.vorname AS "my_vorname",
+				p.nachname AS "my_nachname",
+				b.alias AS "my_alias",
+				ma.telefonklappe AS "my_durchwahl"
 			FROM public.tbl_person p
 			JOIN public.tbl_benutzer b USING (person_id)
 			JOIN public.tbl_mitarbeiter ma ON ma.mitarbeiter_uid = b.uid

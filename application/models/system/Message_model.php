@@ -171,6 +171,23 @@ class Message_model extends DB_Model
 			return error($this->db->error(), FHC_DB_ERROR);
 		}
 	}
+	
+	/**
+	 * Get message variables for logged in user
+	 */
+	public function getMsgVarsLoggedInUser()
+	{
+		$result = $this->db->query('SELECT * FROM public.vw_msg_vars_user WHERE 0 = 1');
+		
+		if ($result)
+		{
+			return success($result->list_fields());
+		}
+		else
+		{
+			return error($this->db->error(), FHC_DB_ERROR);
+		}
+	}
 
 	/**
 	 * getMsgVarsDataByPrestudentId
