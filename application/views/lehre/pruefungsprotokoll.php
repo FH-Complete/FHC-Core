@@ -20,7 +20,8 @@ $this->load->view(
                 'beginnzeitFormatError',
                 'endezeitLeer',
                 'endezeitFormatError',
-                'endezeitBeforeError'
+                'endezeitBeforeError',
+                'verfNotice'
 			),
 			'ui' => array(
 				'stunde',
@@ -171,12 +172,12 @@ $this->load->view(
                             </tr>
                             <tr>
                                 <td colspan="6">
-                                    <?php  echo ($abschlusspruefung->studiengangstyp == 'b' ? $this->p->t('abschlusspruefung', 'beurteilungKriterienBachelor') : $this->p->t('abschlusspruefung', 'beurteilungKriterienMaster')) ?>
+                                    <?php  echo $abschlusspruefung->studiengangstyp == 'b' ? $this->p->t('abschlusspruefung', 'beurteilungKriterienBachelor') : $this->p->t('abschlusspruefung', 'beurteilungKriterienMaster') ?>
                                 </td>
                             </tr>
                             <tr>
                                 <td colspan="6">
-                                    <?php echo $this->p->t('abschlusspruefung', 'beurteilung') ?>:
+                                    <?php echo $abschlusspruefung->studiengangstyp == 'b' ? $this->p->t('abschlusspruefung', 'beurteilungBachelor') : $this->p->t('abschlusspruefung', 'beurteilungMaster') ?>:
                                     <select name="abschlussbeurteilung_kurzbz" id="abschlussbeurteilung_kurzbz" class="form-control">
                                         <option value="">-- <?php echo $this->p->t('ui', 'bitteWaehlen'); ?> --</option>
                                         <?php foreach ($abschlussbeurteilung as $beurteilung):
@@ -184,6 +185,7 @@ $this->load->view(
                                             <option value="<?php echo $beurteilung->abschlussbeurteilung_kurzbz; ?>"<?php echo $selected ?>><?php echo $language == 'German' ? $beurteilung->bezeichnung : $beurteilung->bezeichnung_english; ?> </option>
                                         <?php endforeach; ?>
                                     </select>
+                                    <span id="verfNotice"></span>
                                 </td>
                             </tr>
                         </table>

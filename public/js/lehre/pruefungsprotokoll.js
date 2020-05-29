@@ -72,10 +72,12 @@ var Pruefungsprotokoll = {
         if ($("#verfCheck").prop('checked'))
         {
             $("#abschlussbeurteilung_kurzbz").prop('disabled', false).val(Pruefungsprotokoll.abschlussbeurteilung_kurzbz);
+            $("#verfNotice").html("");
         }
         else
         {
             $("#abschlussbeurteilung_kurzbz").prop('disabled', true).val(null);
+            $("#verfNotice").html(FHC_PhrasesLib.t("abschlusspruefung", "verfNotice"));
         }
     },
     checkFields: function(data, verfChecked)

@@ -7280,7 +7280,7 @@ When on hold, the date is only a reminder.',
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Declaration of Agreement',
+				'text' => 'Statement of agreement',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -7295,13 +7295,13 @@ When on hold, the date is only a reminder.',
 			array(
 				'sprache' => 'German',
 				'text' => 'Der/Die Studierende bestätigt, sich in guter körperlicher und geistiger Verfassung zu befinden,
-				um die Prüfung durchzuführen und dass die technischen Voraussetzungen und gegeben sind.',
+				um die Prüfung durchzuführen und dass die technischen Voraussetzungen gegeben sind.',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'The student confirms being in a healthy physical and mental condition and that the technical requirements are met for taking the exam.',
+				'text' => 'The student confirms to be in a physical and mental condition to take the exam and that the technical requirements are met.',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -7341,7 +7341,7 @@ When on hold, the date is only a reminder.',
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Subject of Examination',
+				'text' => 'Subject of the Examination',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -7421,7 +7421,7 @@ Allfällige besondere Vorkommnisse
 				'text' => 'Parts of the examination held in English (Optional - in line with the degree program\'s guidelines):
 << Delete as appropriate >>
 * Presentation of the Master\'s Thesis
-* Examination interview on the Master\'s Thesis and its links to subjects of the curriculum
+* Examination interview on the Master\'s Thesis and its links to the subjects of the curriculum
 * Examination interview on other subjects relevant to the curriculum
 
 Question(s) to open the examination interview
@@ -7451,7 +7451,7 @@ Any unusual occurrences
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Presentation and Examination interview on the Bachelor Paper',
+				'text' => 'Presentation and Examination interview on the Bachelor Paper and its links to subjects of the curriculum',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -7471,8 +7471,8 @@ Any unusual occurrences
 			),
 			array(
 				'sprache' => 'English',
-				'text' => '',
-				'description' => 'Examination interview on the Master’s Thesis and its links to subjects of the curriculum as well as examination interview on a curricular theme',
+				'text' => 'Examination interview on the Master’s Thesis and its links to subjects of the curriculum as well as examination interview on a curricular theme',
+				'description' => '',
 				'insertvon' => 'system'
 			)
 		)
@@ -7488,19 +7488,22 @@ Any unusual occurrences
 				'text' => 'Beurteilung und Kriterien Bachelorprüfung<br /><br />
                                     <ul>
                                         <li>
-                                            Mit ausgezeichnetem Erfolg bestanden<br />
+                                            <i>Mit ausgezeichnetem Erfolg bestanden</i><br />
                                             Der oder die KandidatIn ist in der Lage, Wissen aus verschiedenen Lernbereichen fachlich korrekt in einem weit über das Wesentliche hinausgehenden Ausmaß souverän auf neue Situationen anzuwenden, und das noch dazu auf einem sehr hohen argumentativen Niveau.
                                         </li>
+                                        <br />
                                         <li>
-                                            Mit gutem Erfolg bestanden<br />
+                                            <i>Mit gutem Erfolg bestanden</i><br />
                                             Der oder die KandidatIn ist in der Lage, Wissen aus verschiedenen Lernbereichen fachlich korrekt in einem über das Wesentliche hinausgehenden Ausmaß auf neue Situationen anzuwenden, und das noch dazu auf einem hohen argumentativen Niveau.
                                         </li>
+                                        <br />
                                         <li>
-                                            Bestanden<br />
+                                            <i>Bestanden</i><br />
                                             Alle Lehrveranstaltungen (einschl. Bachelorarbeit) und Bachelorprüfung wurden positiv beurteilt.
                                         </li>
+                                        <br />
                                         <li>
-                                            Nicht bestanden
+                                            <i>Nicht bestanden</i>
                                         </li>
                                     </ul>',
 				'description' => '',
@@ -7508,22 +7511,25 @@ Any unusual occurrences
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Assessment and criteria Bachelor Examination<br /><br />
+				'text' => 'Criteria for the assessment of the Bachelor Examination<br /><br />
                                     <ul>
                                         <li>
-                                            Passed with distinction<br />
+                                            <i>Passed with distinction</i><br />
                                             The candidate is within the scope of the task able to apply knowledge from various learning areas to new situations in a technically correct manner, far beyond what is essential, and at a very high level of argument.
                                         </li>
+                                        <br />
                                         <li>
-                                            Passed with merit<br />
+                                            <i>Passed with merit</i><br />
                                             The candidate is within the scope of the task able to apply knowledge from various learning areas in a technically correct manner to an extent beyond what is essential to new situations, and at a high level of argument.
                                         </li>
+                                        <br />
                                         <li>
-                                            Passed<br />
-                                            Bachelor thesis and Bachelor examination were successfully completed.
+                                            <i>Passed</i><br />
+                                            All courses (including Bachelor thesis) and Bachelor examination were successfully completed.
                                         </li>
+                                        <br />
                                         <li>
-                                            Failed
+                                            <i>Failed</i>
                                         </li>
                                     </ul>',
 				'description' => '',
@@ -7542,19 +7548,28 @@ Any unusual occurrences
 				'text' => 'Beurteilung und Kriterien Masterprüfung<br /><br />
                                     <ul>
                                         <li>
-                                            Mit ausgezeichnetem Erfolg bestanden<br />
-                                            Der oder die KandidatIn ist in der Lage, Wissen aus verschiedenen Lernbereichen fachlich korrekt in einem weit über das Wesentliche hinausgehenden Ausmaß souverän auf neue Situationen anzuwenden, und das noch dazu auf einem sehr hohen argumentativen Niveau.
+                                            <i>Mit ausgezeichnetem Erfolg bestanden</i><br />
+                                            <ul>
+                                            	<li>Masterarbeit mit "Sehr gut" beurteilt</li>
+                                            	<li>Der oder die KandidatIn ist in der Lage, Wissen aus verschiedenen Lernbereichen fachlich korrekt in einem weit über das Wesentliche hinausgehenden Ausmaß souverän auf neue Situationen anzuwenden, und das noch dazu auf einem sehr hohen argumentativen Niveau.</li>
+                                            </ul>
                                         </li>
+                                        <br />
                                         <li>
-                                            Mit gutem Erfolg bestanden<br />
-                                            Der oder die KandidatIn ist in der Lage, Wissen aus verschiedenen Lernbereichen fachlich korrekt in einem über das Wesentliche hinausgehenden Ausmaß auf neue Situationen anzuwenden, und das noch dazu auf einem hohen argumentativen Niveau.
+                                            <i>Mit gutem Erfolg bestanden</i><br />
+                                            <ul>
+                                            	<li>Masterarbeit mit "Sehr gut" oder mit "Gut" beurteilt</li>
+												<li>Der oder die KandidatIn ist in der Lage, Wissen aus verschiedenen Lernbereichen fachlich korrekt in einem über das Wesentliche hinausgehenden Ausmaß auf neue Situationen anzuwenden, und das noch dazu auf einem hohen argumentativen Niveau.</li>		                                            
+                                            </ul>
                                         </li>
+                                        <br />
                                         <li>
-                                            Bestanden<br />
-                                            Alle Lehrveranstaltungen (einschl. Masterarbeit) und Masterprüfung wurden positiv beurteilt.
+                                            <i>Bestanden</i><br />
+                                            Masterarbeit und Masterprüfung wurden positiv beurteilt.
                                         </li>
+                                        <br />
                                         <li>
-                                            Nicht bestanden
+                                            <i>Nicht bestanden</i>
                                         </li>
                                     </ul>',
 				'description' => '',
@@ -7562,24 +7577,31 @@ Any unusual occurrences
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Assessment and criteria Masters Examination<br /><br />
+				'text' => 'Criteria for the assessment of the Master Examination<br /><br />
                                     <ul>
                                         <li>
-                                            Passed with distinction<br />
-                                            Master thesis was graded "excellent"<br />
-                                            The candidate is within the scope of the task able to apply knowledge from various learning areas to new situations in a technically correct manner, far beyond what is essential, and at a very high level of argument.
+                                            <i>Passed with distinction</i><br />
+                                            <ul>
+												<li>Master thesis was graded "excellent"</li>
+												<li>The candidate is within the scope of the task able to apply knowledge from various learning areas to new situations in a technically correct manner, far beyond what is essential, and at a very high level of argument.</li>
+                                            </ul>
                                         </li>
+                                        <br />
                                         <li>
-                                            Passed with merit<br />
-                                            Master thesis graded not worse than "good"<br />
-                                            The candidate is within the scope of the task able to apply knowledge from various learning areas in a technically correct manner to an extent beyond what is essential to new situations, and at a high level of argument.
+                                            <i>Passed with merit</i><br />
+                                            <ul>
+												<li>Master thesis graded not worse than "good"</li>
+												<li>The candidate is within the scope of the task able to apply knowledge from various learning areas in a technically correct manner to an extent beyond what is essential to new situations, and at a high level of argument.</li>
+											</ul>											
                                         </li>
+                                        <br />
                                         <li>
-                                            Passed<br />
+                                            <i>Passed</i><br />
                                             Master thesis and Master examination were successfully completed.
                                         </li>
+                                        <br />
                                         <li>
-                                            Failed
+                                            <i>Failed</i>
                                         </li>
                                     </ul>',
 				'description' => '',
@@ -7590,18 +7612,38 @@ Any unusual occurrences
 	array(
 		'app' => 'core',
 		'category' => 'abschlusspruefung',
-		'phrase' => 'beurteilung',
+		'phrase' => 'beurteilungBachelor',
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Beurteilung',
+				'text' => 'Beurteilung Bachelorprüfung',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Assessment',
+				'text' => 'Assessment of the Bachelor Examination',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abschlusspruefung',
+		'phrase' => 'beurteilungMaster',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Beurteilung Masterprüfung',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Assessment of the Master Examination',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -7802,6 +7844,26 @@ Any unusual occurrences
 			array(
 				'sprache' => 'English',
 				'text' => 'End time cannot be before begin time!',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abschlusspruefung',
+		'phrase' => 'verfNotice',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => '(Beurteilung kann nur nach Bestätigung der Einverständniserklärung erfolgen)',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => '(Assessment can only be selected after confirming the statement of agreement)',
 				'description' => '',
 				'insertvon' => 'system'
 			)
