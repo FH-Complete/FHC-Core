@@ -3776,6 +3776,9 @@ if(!$error)
 			$pruefung->pruefer2 = $_POST['pruefer2'];
 			$pruefung->pruefer3 = $_POST['pruefer3'];
 			$pruefung->abschlussbeurteilung_kurzbz = $_POST['abschlussbeurteilung_kurzbz'];
+			if(isset($_POST['pruefungsantritt_kurzbz']))
+				$pruefung->pruefungsantritt_kurzbz = $_POST['pruefungsantritt_kurzbz'];
+
 			$pruefung->note = $_POST['notekommpruef'];
 			$pruefung->akadgrad_id = $_POST['akadgrad_id'];
 			$pruefung->pruefungstyp_kurzbz = $_POST['pruefungstyp_kurzbz'];
@@ -3815,10 +3818,25 @@ if(!$error)
 			if(isset($_POST['abschlusspruefung_id']) && is_numeric($_POST['abschlusspruefung_id']))
 			{
 				$pruefung = new abschlusspruefung();
-
-				if($pruefung->delete($_POST['abschlusspruefung_id']))
+				if($pruefung->load($_POST['abschlusspruefung_id']))
 				{
-					$return = true;
+					if ($pruefung->freigabedatum == '')
+					{
+						if($pruefung->delete($_POST['abschlusspruefung_id']))
+						{
+							$return = true;
+						}
+						else
+						{
+							$errormsg = $pruefung->errormsg;
+							$return = false;
+						}
+					}
+					else
+					{
+						$errormsg = 'Löschen ist nicht möglich da bereits ein freigegebenes Protokoll vorhanden ist';
+						$return = false;
+					}
 				}
 				else
 				{

@@ -4126,6 +4126,80 @@ if(!$result = @$db->db_query("SELECT akzeptiertamum FROM public.tbl_akte LIMIT 1
 		echo 'public.tbl_akte: Spalte akzeptiertamum hinzugefuegt!<br>';
 }
 
+// TABLE lehre.tbl_abschlusspruefung_antritt
+if (!@$db->db_query("SELECT 0 FROM lehre.tbl_abschlusspruefung_antritt WHERE 0 = 1"))
+{
+	$qry = '
+		CREATE TABLE lehre.tbl_abschlusspruefung_antritt (
+			pruefungsantritt_kurzbz character varying(20) NOT NULL,
+			bezeichnung character varying(64),
+			bezeichnung_english character varying(64),
+			sort smallint
+		);
+		ALTER TABLE lehre.tbl_abschlusspruefung_antritt ADD CONSTRAINT pk_abschlusspruefung_antritt PRIMARY KEY (pruefungsantritt_kurzbz);
+		INSERT INTO lehre.tbl_abschlusspruefung_antritt(pruefungsantritt_kurzbz, bezeichnung, bezeichnung_english, sort) VALUES (\'erstantritt\', \'Erstantritt\', \'1st Attempt\', 1);
+		INSERT INTO lehre.tbl_abschlusspruefung_antritt(pruefungsantritt_kurzbz, bezeichnung, bezeichnung_english, sort) VALUES (\'erstewiederholung\', \'1. Wiederholung\', \'1st Retake\', 2);
+		INSERT INTO lehre.tbl_abschlusspruefung_antritt(pruefungsantritt_kurzbz, bezeichnung, bezeichnung_english, sort) VALUES (\'zweitewiederholung\', \'2. Wiederholung\', \'2nd Retake\', 3);';
+
+	if (!$db->db_query($qry))
+		echo '<strong>lehre.tbl_abschlusspruefung_antritt '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Created table lehre.tbl_abschlusspruefung_antritt';
+
+	// GRANT SELECT ON TABLE lehre.tbl_abschlusspruefung_antritt TO web;
+	$qry = 'GRANT SELECT ON TABLE lehre.tbl_abschlusspruefung_antritt TO web;';
+	if (!$db->db_query($qry))
+		echo '<strong>lehre.tbl_abschlusspruefung_antritt '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Granted privileges to <strong>web</strong> on lehre.tbl_abschlusspruefung_antritt';
+
+	// GRANT SELECT, UPDATE, INSERT, DELETE ON TABLE lehre.tbl_abschlusspruefung_antritt TO vilesci;
+	$qry = 'GRANT SELECT, UPDATE, INSERT, DELETE ON TABLE lehre.tbl_abschlusspruefung_antritt TO vilesci;';
+	if (!$db->db_query($qry))
+		echo '<strong>lehre.tbl_abschlusspruefung_antritt '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Granted privileges to <strong>vilesci</strong> on lehre.tbl_abschlusspruefung_antritt';
+
+	// GRANT SELECT, UPDATE ON TABLE lehre.tbl_abschlusspruefung TO web;
+	$qry = 'GRANT SELECT, UPDATE ON lehre.tbl_abschlusspruefung TO web;';
+	if (!$db->db_query($qry))
+		echo '<strong>lehre.tbl_abschlusspruefung '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Granted privileges to <strong>web</strong> on lehre.tbl_abschlusspruefung';
+
+	// COMMENT ON TABLE lehre.tbl_abschlusspruefung_antritt
+	$qry = 'COMMENT ON TABLE lehre.tbl_abschlusspruefung_antritt IS \'Type of Abschlusspruefung depending on number of attempts\';';
+	if (!$db->db_query($qry))
+		echo '<strong>Adding comment to lehre.tbl_abschlusspruefung_antritt: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Added comment to lehre.tbl_abschlusspruefung_antritt';
+}
+// add protokoll,endezeit,pruefungsantritt_kurzbz,freigabedatum to lehre.tbl_abschlusspruefung
+if(!$result = @$db->db_query("SELECT protokoll,endezeit,pruefungsantritt_kurzbz,freigabedatum FROM lehre.tbl_abschlusspruefung LIMIT 1"))
+{
+	$qry = "ALTER TABLE lehre.tbl_abschlusspruefung ADD COLUMN protokoll text;
+			ALTER TABLE lehre.tbl_abschlusspruefung ADD COLUMN endezeit time;
+			ALTER TABLE lehre.tbl_abschlusspruefung ADD COLUMN pruefungsantritt_kurzbz character varying(20);
+			ALTER TABLE lehre.tbl_abschlusspruefung ADD CONSTRAINT fk_abschlusspruefung_antritt FOREIGN KEY (pruefungsantritt_kurzbz) REFERENCES lehre.tbl_abschlusspruefung_antritt (pruefungsantritt_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;
+			ALTER TABLE lehre.tbl_abschlusspruefung ADD COLUMN freigabedatum date;";
+
+	if(!$db->db_query($qry))
+		echo '<strong>lehre.tbl_abschlusspruefung: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>lehre.tbl_abschlusspruefung: Spalten protokoll,endezeit,pruefungsantritt_kurzbz,freigabedatum hinzugefuegt';
+}
+
+// Spalte sort in lehre.tbl_abschlussbeurteilung (gibt Reihenfolge der Beurteilungen an)
+if(!$result = @$db->db_query("SELECT sort FROM lehre.tbl_abschlussbeurteilung LIMIT 1;"))
+{
+	$qry = "ALTER TABLE lehre.tbl_abschlussbeurteilung ADD COLUMN sort smallint;";
+
+	if(!$db->db_query($qry))
+		echo '<strong>lehre.tbl_abschlussbeurteilung: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>lehre.tbl_abschlussbeurteilung: Spalte sort hinzugefuegt!<br>';
+}
+
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
 
@@ -4228,8 +4302,9 @@ $tabellen=array(
 	"fue.tbl_ressource"  => array("ressource_id","student_uid","mitarbeiter_uid","betriebsmittel_id","firma_id","bezeichnung","beschreibung","insertamum","insertvon","updateamum","updatevon"),
 	"fue.tbl_scrumteam" => array("scrumteam_kurzbz","bezeichnung","punkteprosprint","tasksprosprint","gruppe_kurzbz"),
 	"fue.tbl_scrumsprint" => array("scrumsprint_id","scrumteam_kurzbz","sprint_kurzbz","sprintstart","sprintende","insertamum","insertvon","updateamum","updatevon"),
-	"lehre.tbl_abschlussbeurteilung"  => array("abschlussbeurteilung_kurzbz","bezeichnung","bezeichnung_english"),
-	"lehre.tbl_abschlusspruefung"  => array("abschlusspruefung_id","student_uid","vorsitz","pruefer1","pruefer2","pruefer3","abschlussbeurteilung_kurzbz","akadgrad_id","pruefungstyp_kurzbz","datum","uhrzeit","sponsion","anmerkung","updateamum","updatevon","insertamum","insertvon","ext_id","note"),
+	"lehre.tbl_abschlussbeurteilung"  => array("abschlussbeurteilung_kurzbz","bezeichnung","bezeichnung_english","sort"),
+	"lehre.tbl_abschlusspruefung"  => array("abschlusspruefung_id","student_uid","vorsitz","pruefer1","pruefer2","pruefer3","abschlussbeurteilung_kurzbz","akadgrad_id","pruefungstyp_kurzbz","datum","uhrzeit","sponsion","anmerkung","updateamum","updatevon","insertamum","insertvon","ext_id","note","protokoll","endezeit","pruefungsantritt_kurzbz","freigabedatum"),
+	"lehre.tbl_abschlusspruefung_antritt"  => array("pruefungsantritt_kurzbz","bezeichnung","bezeichnung_english","sort"),
 	"lehre.tbl_akadgrad"  => array("akadgrad_id","akadgrad_kurzbz","studiengang_kz","titel","geschlecht"),
 	"lehre.tbl_anrechnung"  => array("anrechnung_id","prestudent_id","lehrveranstaltung_id","begruendung_id","lehrveranstaltung_id_kompatibel","genehmigt_von","insertamum","insertvon","updateamum","updatevon","ext_id"),
 	"lehre.tbl_anrechnung_begruendung"  => array("begruendung_id","bezeichnung"),
