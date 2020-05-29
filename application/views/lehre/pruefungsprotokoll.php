@@ -135,7 +135,7 @@ $this->load->view(
                                     <?php echo $this->p->t('abschlusspruefung', 'einverstaendniserklaerungName') ?>
                                 </td>
                                 <td colspan="5">
-                                    <input type="checkbox" checked id="verfCheck">
+                                    <input type="checkbox" id="verfCheck">
                                     <?php echo $this->p->t('abschlusspruefung', 'einverstaendniserklaerungText') ?>
                                 </td>
                             </tr>
@@ -155,7 +155,7 @@ $this->load->view(
                                     <?php echo $this->p->t('abschlusspruefung', 'pruefungsgegenstand') ?>
                                 </td>
                                 <td colspan="5">
-                                    <?php  echo ($abschlusspruefung->studiengangstyp == 'b' ? $this->p->t('abschlusspruefung', 'pruefungsgegenstandBachelor') : $this->p->t('abschlusspruefung', 'PruefungsgegenstandMaster')) ?>
+                                    <?php  echo ($abschlusspruefung->studiengangstyp == 'b' ? $this->p->t('abschlusspruefung', 'pruefungsgegenstandBachelor') : $this->p->t('abschlusspruefung', 'pruefungsgegenstandMaster')) ?>
                                 </td>
                             </tr>
                             <tr>

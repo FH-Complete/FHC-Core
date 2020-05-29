@@ -1,6 +1,13 @@
 const CALLED_PATH = FHC_JS_DATA_STORAGE_OBJECT.called_path;
 
 $("document").ready(function() {
+    // if no abschlussbeurteilung is not filled out, new formular -> verfassungscheck is by default not checked.
+    // If abschlussbeurteilung is filled out -> already graded, verfassungscheck is checked.
+    Pruefungsprotokoll.abschlussbeurteilung_kurzbz = $("#abschlussbeurteilung_kurzbz").val();
+    if (Pruefungsprotokoll.abschlussbeurteilung_kurzbz != '')
+        $("#verfCheck").prop('checked', true);
+    Pruefungsprotokoll.checkVerfassung();
+
     $("#saveProtocolBtn, #freigebenProtocolBtn").click(
         function() {
             var data = {
@@ -43,16 +50,7 @@ $("document").ready(function() {
     )
 
     $("#verfCheck").change(
-        function() { // if student not mentally and physically fit (checkbox), no form entry
-            if ($(this).prop('checked'))
-            {
-                $("#abschlussbeurteilung_kurzbz").prop('disabled', false).val($("#abschlussbeurteilung_kurzbz option").first().val());
-            }
-            else
-            {
-                $("#abschlussbeurteilung_kurzbz").prop('disabled', true).val(null);
-            }
-        }
+        Pruefungsprotokoll.checkVerfassung
     );
 
     $( ".timepicker" ).timepicker({
@@ -67,9 +65,51 @@ $("document").ready(function() {
 })
 
 var Pruefungsprotokoll = {
+    abschlussbeurteilung_kurzbz: '',
+    checkVerfassung: function()
+    {
+        // if student not mentally and physically fit (checkbox), no grade can be set
+        if ($("#verfCheck").prop('checked'))
+        {
+            $("#abschlussbeurteilung_kurzbz").prop('disabled', false).val(Pruefungsprotokoll.abschlussbeurteilung_kurzbz);
+        }
+        else
+        {
+            $("#abschlussbeurteilung_kurzbz").prop('disabled', true).val(null);
+        }
+    },
+    checkFields: function(data, verfChecked)
+    {
+        var errors =  [];
 
-    // -----------------------------------------------------------------------------------------------------------------
+        if (data.abschlussbeurteilung_kurzbz == "" && verfChecked)
+            errors.push({"abschlussbeurteilung_kurzbz": FHC_PhrasesLib.t("abschlusspruefung", "abschlussbeurteilungLeer")});
+
+        var zeitregex = /^[0-2][0-9]:[0-5][0-9]$/;
+
+        if (data.uhrzeit == "")
+        {
+            if (verfChecked)
+                errors.push({"pruefungsbeginn": FHC_PhrasesLib.t("abschlusspruefung", "beginnzeitLeer")});
+        }
+        else if(!zeitregex.test(data.uhrzeit))
+            errors.push({"pruefungsbeginn": FHC_PhrasesLib.t("abschlusspruefung", "beginnzeitFormatError")});
+
+        if (data.endezeit == "")
+        {
+            if (verfChecked)
+                errors.push({"pruefungsende": FHC_PhrasesLib.t("abschlusspruefung", "endezeitLeer")});
+        }
+        else if(!zeitregex.test(data.endezeit))
+            errors.push({"pruefungsende": FHC_PhrasesLib.t("abschlusspruefung", "endezeitFormatError")});
+
+        if (data.uhrzeit > data.endezeit && data.endezeit != "" && data.uhrzeit != "")
+            errors.push({"pruefungsende": FHC_PhrasesLib.t("abschlusspruefung", "endezeitBeforeError")});
+
+        return errors;
+    },
     // ajax calls
+    // -----------------------------------------------------------------------------------------------------------------
     saveProtokoll: function(abschlusspruefung_id, data)
     {
         FHC_AjaxClient.ajaxCallPost(
@@ -102,35 +142,5 @@ var Pruefungsprotokoll = {
                 veilTimeout: 0
             }
         );
-    },
-    checkFields: function(data, verfChecked)
-    {
-        var errors =  [];
-
-        if (data.abschlussbeurteilung_kurzbz == "" && verfChecked)
-            errors.push({"abschlussbeurteilung_kurzbz": FHC_PhrasesLib.t("abschlusspruefung", "abschlussbeurteilungLeer")});
-
-        var zeitregex = /^[0-2][0-9]:[0-5][0-9]$/;
-
-        if (data.uhrzeit == "")
-        {
-            if (verfChecked)
-                errors.push({"pruefungsbeginn": FHC_PhrasesLib.t("abschlusspruefung", "beginnzeitLeer")});
-        }
-        else if(!zeitregex.test(data.uhrzeit))
-            errors.push({"pruefungsbeginn": FHC_PhrasesLib.t("abschlusspruefung", "beginnzeitFormatError")});
-
-        if (data.endezeit == "")
-        {
-            if (verfChecked)
-                errors.push({"pruefungsende": FHC_PhrasesLib.t("abschlusspruefung", "endezeitLeer")});
-        }
-        else if(!zeitregex.test(data.endezeit))
-            errors.push({"pruefungsende": FHC_PhrasesLib.t("abschlusspruefung", "endezeitFormatError")});
-
-        if (data.uhrzeit > data.endezeit && data.endezeit != "" && data.uhrzeit != "")
-            errors.push({"pruefungsende": FHC_PhrasesLib.t("abschlusspruefung", "endezeitBeforeError")});
-
-        return errors;
     }
 }
