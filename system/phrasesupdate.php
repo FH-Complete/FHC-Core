@@ -7356,7 +7356,7 @@ When on hold, the date is only a reminder.',
 			array(
 				'sprache' => 'German',
 				'text' => 'Prüfungsteil/e in Englisch (Optional - entsprechend der Vorgabe des Studiengangs):
-<< Nichtzutreffendes Streichen >>
+<< Nichtzutreffendes löschen >>
 * Präsentation der Bachelorarbeit
 * Prüfungsgespräch über die Bachelorarbeit
 
@@ -7400,7 +7400,7 @@ Any unusual occurrences
 			array(
 				'sprache' => 'German',
 				'text' => 'Prüfungsteil/e in Englisch (Optional - entsprechend der Vorgabe des Studiengangs):
-<< Nichtzutreffendes Streichen >>
+<< Nichtzutreffendes löschen >>
 * Präsentation der Masterarbeit
 * Prüfungsgespräch über die Masterarbeit und Querverbindungen zu Fächern des Studienplans
 * Prüfungsgespräch über sonstige studienplanrelevante Inhalte
@@ -7559,7 +7559,7 @@ Any unusual occurrences
                                             <i>Mit gutem Erfolg bestanden</i><br />
                                             <ul>
                                             	<li>Masterarbeit mit "Sehr gut" oder mit "Gut" beurteilt</li>
-												<li>Der oder die KandidatIn ist in der Lage, Wissen aus verschiedenen Lernbereichen fachlich korrekt in einem über das Wesentliche hinausgehenden Ausmaß auf neue Situationen anzuwenden, und das noch dazu auf einem hohen argumentativen Niveau.</li>		                                            
+												<li>Der oder die KandidatIn ist in der Lage, Wissen aus verschiedenen Lernbereichen fachlich korrekt in einem über das Wesentliche hinausgehenden Ausmaß auf neue Situationen anzuwenden, und das noch dazu auf einem hohen argumentativen Niveau.</li>
                                             </ul>
                                         </li>
                                         <br />
@@ -7592,7 +7592,7 @@ Any unusual occurrences
                                             <ul>
 												<li>Master thesis graded not worse than "good"</li>
 												<li>The candidate is within the scope of the task able to apply knowledge from various learning areas in a technically correct manner to an extent beyond what is essential to new situations, and at a high level of argument.</li>
-											</ul>											
+											</ul>
                                         </li>
                                         <br />
                                         <li>
@@ -7657,13 +7657,13 @@ Any unusual occurrences
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Überprüfen und Freigeben',
+				'text' => 'Speichern und Freigeben',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Check and Approve',
+				'text' => 'Save and Approve',
 				'description' => '',
 				'insertvon' => 'system'
 			)
