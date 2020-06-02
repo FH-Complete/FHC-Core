@@ -205,7 +205,7 @@ if(!$result = @$db->db_query("SELECT 1 FROM public.vw_msg_vars_user LIMIT 1"))
 				(b.uid) b.uid AS "my_uid",
 				p.vorname AS "my_vorname",
 				p.nachname AS "my_nachname",
-				b.alias AS "my_alias",
+				COALESCE(b.alias, b.uid) AS "my_alias",
 				ma.telefonklappe AS "my_durchwahl"
 			FROM public.tbl_person p
 			JOIN public.tbl_benutzer b USING (person_id)
