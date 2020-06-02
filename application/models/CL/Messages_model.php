@@ -48,6 +48,9 @@ class Messages_model extends CI_Model
 		$this->load->model('system/Benutzerrolle_model', 'BenutzerrolleModel');
 		// Loads model Prestudent_model
 		$this->load->model('crm/Prestudent_model', 'PrestudentModel');
+		// Loads model Benutzer_model
+		$this->load->model('person/Benutzer_model', 'BenutzerModel');
+		
 	}
 
 	//------------------------------------------------------------------------------------------------------------------
@@ -463,6 +466,14 @@ class Messages_model extends CI_Model
 		if (!hasData($msgVarsData)) show_error('No recipients were given');
 
 		$prestudentsData = $this->PrestudentModel->getOrganisationunits($prestudents);
+		
+		// Get the senders uid
+		$this->BenutzerModel->addSelect('uid');
+		if (!$result = getData($this->BenutzerModel->getFromPersonId($sender_id)))
+		{
+			show_error('No sender_uid found');
+		}
+		$sender_uid = $result[0]->uid;
 
 		// Adds the organisation unit to each prestudent
 		if (isEmptyString($oe_kurzbz) && hasData($msgVarsData) && hasData($prestudentsData))
@@ -472,7 +483,15 @@ class Messages_model extends CI_Model
 
 		foreach (getData($msgVarsData) as $receiver)
 		{
-			$msgVarsDataArray = $this->_lowerReplaceSpaceArrayKeys((array)$receiver); // replaces array keys
+			/**
+			 * Merge receivers data with senders data
+			 * NOTE: _addMsgVarsDataOfLoggedInUser usually retrieves data of the logged in user that is set in the 
+			 * templates user fields. As sendExplicitTemplateSenderId is run by a job, a sender uid is passed to be used 
+			 * instead the logged in user.
+			 */
+			$msgVarsDataArray = $this->_addMsgVarsDataOfLoggedInUser($receiver, $sender_uid);
+
+			$msgVarsDataArray = $this->_lowerReplaceSpaceArrayKeys((array)getData($msgVarsDataArray)[0]); // replaces array keys
 
 			// Additional message variables
 			if (is_array($msgVars)) $msgVarsDataArray = array_merge($msgVarsDataArray, $msgVars);
@@ -897,7 +916,7 @@ class Messages_model extends CI_Model
 	 * @param object $otherMsgVarsDataObj Can be success object or simple object.
 	 * @return object Returns success object.
 	 */
-	public function _addMsgVarsDataOfLoggedInUser($otherMsgVarsDataObj)
+	public function _addMsgVarsDataOfLoggedInUser($otherMsgVarsDataObj, $uid = null)
 	{
 		// First check if param type is object
 		if (!is_object($otherMsgVarsDataObj)) show_error('Must pass an object to merge with data of logged in user');
@@ -909,7 +928,7 @@ class Messages_model extends CI_Model
 		}
 		
 		// Retrieve message vars data of the logged in user
-		if (!$msgVarsDataLoggedInUser = getData($this->MessageModel->getMsgVarsDataByLoggedInUser())[0])
+		if (!$msgVarsDataLoggedInUser = getData($this->MessageModel->getMsgVarsDataByLoggedInUser($uid))[0])
 		{
 			return success($otherMsgVarsDataObj);   // If failed, return at least given object as expected success object
 		}
