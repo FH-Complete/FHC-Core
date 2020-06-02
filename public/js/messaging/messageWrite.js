@@ -78,6 +78,21 @@ $(document).ready(function ()
 		});
 	}
 
+	if ($("#user_fields"))
+	{
+		$("#user_fields").dblclick(function ()
+		{
+			if ($("#bodyTextArea"))
+			{
+				//if editor active add at cursor position, otherwise at end
+				if (tinymce.activeEditor.id === "bodyTextArea")
+					tinymce.activeEditor.execCommand('mceInsertContent', false, $(this).children(":selected").val());
+				else
+					tinyMCE.get("bodyTextArea").setContent(tinyMCE.get("bodyTextArea").getContent() + $(this).children(":selected").val());
+			}
+		});
+	}
+
 	if ($("#recipients"))
 	{
 		$("#recipients").change(tinymcePreviewSetContent);
