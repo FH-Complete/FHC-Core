@@ -211,12 +211,23 @@ class Message_model extends DB_Model
 	
 	/**
 	 * Get message vars data for logged in user
+	 * @param string uid The UID should ONLY be passed if this method is called by a cronjob.
+	 * This is to enable jobs to use templates which use logged-in-user fields ('Eigene Felder').
 	 * @return array|null
 	 */
-	public function getMsgVarsDataByLoggedInUser()
+	public function getMsgVarsDataByLoggedInUser($uid = null)
 	{
+		if (is_string($uid))
+		{
+			$params = array($uid);
+		}
+		else
+		{
+			$params = array(getAuthUID());
+		}
+		
 		$query = 'SELECT * FROM public.vw_msg_vars_user WHERE my_uid = ?';
 		
-		return $this->execQuery($query, array(getAuthUID()));
+		return $this->execQuery($query, $params);
 	}
 }
