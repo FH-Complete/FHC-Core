@@ -178,7 +178,7 @@ function loadPruefungsfenster()
 		success: function(data){
 			if(data.result.length === 0)
 			{
-				messageBox("message", "<?php echo $p->t('pruefung/keinFensterVorhanden'); ?>", "red", "highlight", 1000);
+				messageBox("message", "<?php echo $p->t('pruefung/keinFensterVorhanden'); ?>", "red", "highlight", 10000);
 				$("#pruefungsfenster").html("<option value='null'></option>");
 			}
 			else
@@ -617,7 +617,7 @@ function saveAnmeldung(lehrveranstaltung_id, termin_id)
 			else
 			{
 				//Wenn Anmeldung durch Lektor
-				showAnmeldungen(termin_id, lehrveranstaltung_id);
+				showAnmeldungen(termin_id, lehrveranstaltung_id, false, false);
 			}
 		}
 	});
@@ -763,9 +763,10 @@ function convertDateTime(string, type)
  * @param {type} pruefungstermin_id ID des Prüfungstermins
  * @param {type} lehrveranstaltung_id ID der Lehrveranstaltung
  * @param saveReihungAfterShow speichert Reihung neu wenn true
+ * @param showMessage steuert ob Meldung angzeigt werden soll
  * @returns {undefined}
  */
-function showAnmeldungen(pruefungstermin_id, lehrveranstaltung_id, saveReihungAfterShow = false)
+function showAnmeldungen(pruefungstermin_id, lehrveranstaltung_id, saveReihungAfterShow = false, showMessage = true)
 {
 	$("#kommentar").empty();
 	$("#kommentarSpeichernButton").empty();
@@ -780,7 +781,7 @@ function showAnmeldungen(pruefungstermin_id, lehrveranstaltung_id, saveReihungAf
 		},
 		error: loadError,
 		success: function(data){
-			writeAnmeldungen(data);
+			writeAnmeldungen(data, showMessage);
 			$("#sortable").sortable();
 			$("#sortable").disableSelection();
 
@@ -790,7 +791,7 @@ function showAnmeldungen(pruefungstermin_id, lehrveranstaltung_id, saveReihungAf
 	});
 }
 
-function writeAnmeldungen(data)
+function writeAnmeldungen(data, showMessage = true)
 {
 	if(data.error === 'false')
 	{
@@ -862,7 +863,10 @@ function writeAnmeldungen(data)
 		$("#kommentarSpeichernButton").empty();
 		$("#raumLink").empty();
 		$("#listeDrucken").empty();
-		messageBox("message", data.errormsg, "red", "highlight", 1000);
+
+		if (showMessage)
+		    messageBox("message", data.errormsg, "red", "highlight", 10000);
+
 		if (data.lv_bezeichnung)
 		{
 			$("#lvdaten").html(data.lv_bezeichnung+" ("+data.termin_datum+")");
@@ -910,11 +914,11 @@ function saveReihung(terminId, lehrveranstaltung_id)
             success: function(data){
                 if(data.error === 'false' && data.result === true)
                 {
-                    messageBox("message", "<?php echo $p->t('pruefung/reihunghErfolgreichGeaendert'); ?>", "green", "highlight", 1000);
+                    messageBox("message", "<?php echo $p->t('pruefung/reihunghErfolgreichGeaendert'); ?>", "green", "highlight", 10000);
                 }
                 else
                 {
-                    messageBox("message", data.errormsg, "red", "highlight", 1000);
+                    messageBox("message", data.errormsg, "red", "highlight", 10000);
                 }
 
                 showAnmeldungen(terminId, lehrveranstaltung_id);
@@ -951,7 +955,7 @@ function anmeldungBestaetigen(pruefungsanmeldung_id, termin_id, lehrveranstaltun
 			}
 			else
 			{
-				messageBox("message", data.errormsg, "red", "highlight", 1000);
+				messageBox("message", data.errormsg, "red", "highlight", 10000);
 			}
 		}
 	});
@@ -988,7 +992,7 @@ function anmeldungLoeschen(pruefungsanmeldung_id, termin_id, lehrveranstaltung_i
             }
             else
             {
-                messageBox("message", data.errormsg, "red", "highlight", 1000);
+                messageBox("message", data.errormsg, "red", "highlight", 10000);
             }
         }
     });
@@ -1022,7 +1026,7 @@ function alleBestaetigen(termin_id, lehrveranstaltung_id)
 			}
 			else
 			{
-				messageBox("message", data.errormsg, "red", "highlight", 1000);
+				messageBox("message", data.errormsg, "red", "highlight", 10000);
 			}
 		}
 	});
@@ -1074,7 +1078,7 @@ function loadStudiengaenge()
 			}
 			else
 			{
-				messageBox("message", data.errormsg, "red", "highlight", 1000);
+				messageBox("message", data.errormsg, "red", "highlight", 10000);
 			}
 		}
 	});
@@ -1133,7 +1137,7 @@ function loadPruefungStudiengang(studiengang_kz, studiensemester)
 			}
 			else
 			{
-				messageBox("message", data.errormsg, "red", "highlight", 1000);
+				messageBox("message", data.errormsg, "red", "highlight", 10000);
 			}
 		}
 	});
@@ -1178,7 +1182,7 @@ function saveKommentar(pruefungsanmeldung_id, termin_id, lehrveranstaltung_id)
 		},
 		error: loadError,
 		success: function(data){
-			messageBox("message", "<?php echo $p->t('pruefung/kommentarErfolgreichGespeichert'); ?>", "green", "highlight", 1000);
+			messageBox("message", "<?php echo $p->t('pruefung/kommentarErfolgreichGespeichert'); ?>", "green", "highlight", 10000);
 			showAnmeldungen(termin_id, lehrveranstaltung_id);
 		}
 	});
@@ -1396,7 +1400,7 @@ function savePruefungstermin()
 
 	if(error)
 	{
-		messageBox("message", "<?php echo $p->t('pruefung/formulardatenNichtKorrekt'); ?>", "red", "highlight", 3000);
+		messageBox("message", "<?php echo $p->t('pruefung/formulardatenNichtKorrekt'); ?>", "red", "highlight", 10000);
 	}
 	else
 	{
@@ -1422,12 +1426,12 @@ function savePruefungstermin()
 				unmarkMissingFormEntry();
 				if(data.error === "false")
 				{
-					messageBox("message", "<?php echo $p->t('pruefung/pruefungErfolgreichGespeichert'); ?>", "green", "highlight", 1000);
+					messageBox("message", "<?php echo $p->t('pruefung/pruefungErfolgreichGespeichert'); ?>", "green", "highlight", 10000);
 					resetPruefungsverwaltung();
 				}
 				else
 				{
-					messageBox("message", data.errormsg, "red", "highlight", 1000);
+					messageBox("message", data.errormsg, "red", "highlight", 10000);
 				}
 			}
 		});
@@ -1530,7 +1534,7 @@ function loadPruefungsDetails(prfId)
 		}).done(function(data){
 			if(data.result.length === 0)
 			{
-				messageBox("message", "<?php echo $p->t('pruefung/keinePruefungsfensterGespeichert'); ?>", "red", "highlight", 1000);
+				messageBox("message", "<?php echo $p->t('pruefung/keinePruefungsfensterGespeichert'); ?>", "red", "highlight", 10000);
 				$("#pruefungsfenster").html("<option value='null'></option>");
 			}
 			else
@@ -1823,7 +1827,7 @@ function updatePruefung(prfId)
 
 	if(error)
 	{
-		messageBox("message", "<?php echo $p->t('pruefung/formulardatenNichtKorrekt'); ?>", "red", "highlight", 3000);
+		messageBox("message", "<?php echo $p->t('pruefung/formulardatenNichtKorrekt'); ?>", "red", "highlight", 10000);
 	}
 	else
 	{
@@ -1851,12 +1855,12 @@ function updatePruefung(prfId)
 			unmarkMissingFormEntry();
 			if(data.error === "false")
 			{
-				messageBox("message", "<?php echo $p->t('pruefung/pruefungErfolgreichGespeichert'); ?>", "green", "highlight", 1000);
+				messageBox("message", "<?php echo $p->t('pruefung/pruefungErfolgreichGespeichert'); ?>", "green", "highlight", 10000);
 				resetPruefungsverwaltung();
 			}
 			else
 			{
-				messageBox("message", data.errormsg, "red", "highlight", 1000);
+				messageBox("message", data.errormsg, "red", "highlight", 10000);
 			}
 		}).always(function(){
 			loadAllPruefungen();
@@ -1886,11 +1890,11 @@ function deleteLehrveranstaltungFromPruefung(lvId, pruefung_id)
 	}).done(function(data){
 		if(data.error === "false")
 		{
-			messageBox("message", "<?php echo $p->t('pruefung/lvErfolgreichEntfernt'); ?>", "green", "highlight", 1000);
+			messageBox("message", "<?php echo $p->t('pruefung/lvErfolgreichEntfernt'); ?>", "green", "highlight", 10000);
 		}
 		else
 		{
-			messageBox("message", data.errormsg, "red", "highlight", 1000);
+			messageBox("message", data.errormsg, "red", "highlight", 10000);
 		}
 	}).always(function(){
 		loadPruefungsDetails(pruefung_id);
@@ -1917,11 +1921,11 @@ function stornoPruefung(pruefung_id)
 	}).done(function(data){
 		if(data.error === "false")
 		{
-			messageBox("message", "<?php echo $p->t('pruefung/pruefungStorniert'); ?>", "green", "highlight", 1000);
+			messageBox("message", "<?php echo $p->t('pruefung/pruefungStorniert'); ?>", "green", "highlight", 10000);
 		}
 		else
 		{
-			messageBox("message", data.errormsg, "red", "highlight", 1000);
+			messageBox("message", data.errormsg, "red", "highlight", 10000);
 		}
 	}).always(function(){
 		loadAllPruefungen();
@@ -1950,11 +1954,11 @@ function terminLoeschen(pruefung_id, pruefungstermin_id)
 	}).done(function(data){
 		if(data.error === "false")
 		{
-			messageBox("message", "<?php echo $p->t('pruefung/terminGeloescht'); ?>", "green", "highlight", 1000);
+			messageBox("message", "<?php echo $p->t('pruefung/terminGeloescht'); ?>", "green", "highlight", 10000);
 		}
 		else
 		{
-			messageBox("message", data.errormsg, "red", "highlight", 1000);
+			messageBox("message", data.errormsg, "red", "highlight", 10000);
 		}
 	}).always(function(){
 		loadPruefungsDetails(pruefung_id);
@@ -2009,7 +2013,7 @@ function loadAllPruefungen()
 		}
 		else
 		{
-			messageBox("message", data.errormsg, "red", "highlight", 1000);
+			messageBox("message", data.errormsg, "red", "highlight", 10000);
 		}
 	}).always(function(event, xhr, settings){
 		if($("#prfTable")[0].hasInitialized !== true)
