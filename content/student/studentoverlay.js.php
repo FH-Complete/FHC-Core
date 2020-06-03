@@ -3058,6 +3058,11 @@ function StudentAkteDel()
 	}
 
 	studiengang_kz = document.getElementById('student-detail-menulist-studiengang_kz').value;
+	//Wenn es kein Student ist, Studiengangs_kz vom PreStudenten ermitteln
+	if (studiengang_kz == '')
+	{
+		studiengang_kz = document.getElementById('student-prestudent-menulist-studiengang_kz').value;
+	}
 	//Abfrage ob wirklich geloescht werden soll
 	if (confirm('Dokument wirklich entfernen?'))
 	{
