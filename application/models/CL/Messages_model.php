@@ -467,8 +467,9 @@ class Messages_model extends CI_Model
 
 		$prestudentsData = $this->PrestudentModel->getOrganisationunits($prestudents);
 		
-		// Get the senders uid
+		// Get the senders uid (if user is an active employee)
 		$this->BenutzerModel->addSelect('uid');
+		$this->BenutzerModel->addJoin('public.tbl_mitarbeiter ma', 'ma.mitarbeiter_uid = uid');
 		if (!$result = getData($this->BenutzerModel->getFromPersonId($sender_id)))
 		{
 			show_error('No sender_uid found');
