@@ -80,10 +80,10 @@ class Kontakt_model extends DB_Model
 	}
 
 	/**
-	 * Gets Firmentelefon for a uid, can be Vorwahl with Telefonklappe or Formenhandy
+	 * Gets Firmentelefon for a uid, can be Vorwahl with Telefonklappe or Firmenhandy
 	 * @param $uid
 	 */
-	public function getFirmenTelefon($uid)
+	public function getFirmentelefon($uid)
 	{
 		$firmentelefon = success(array());
 
@@ -103,7 +103,7 @@ class Kontakt_model extends DB_Model
 				if (hasData($firmenhandy))
 				{
 					$firmenhandy = getData($firmenhandy);
-					$firmentelefon = success($firmenhandy[0]->kontakt);
+					$firmentelefon = success(array('kontakt' => $firmenhandy[0]->kontakt, 'telefonklappe' => ''));
 				}
 			}
 			else
@@ -113,7 +113,7 @@ class Kontakt_model extends DB_Model
 				{
 					$vorwahl = getData($firmaKontakttyp);
 					$vorwahl = $vorwahl[0]->kontakt;
-					$firmentelefon = success(array($vorwahl.'-'.$mitarbeiter[0]->telefonklappe));
+					$firmentelefon = success(array('kontakt' => $vorwahl, 'telefonklappe' => $mitarbeiter[0]->telefonklappe));
 				}
 			}
 		}

@@ -4019,6 +4019,18 @@ if (!$result = @$db->db_query('SELECT 1 FROM system.tbl_jobtriggers LIMIT 1'))
 		echo '<br>Granted privileges to <strong>vilesci</strong> on system.tbl_jobtriggers';
 }
 
+// Add column iso3166_1_a3 to tbl_nation
+if(!$result = @$db->db_query("SELECT iso3166_1_a3 FROM bis.tbl_nation LIMIT 1"))
+{
+	$qry = "ALTER table bis.tbl_nation ADD COLUMN iso3166_1_a3 VARCHAR(3);
+			COMMENT ON COLUMN bis.tbl_nation.iso3166_1_a3 IS 'ISO 3166-1 alpha-3 country code';";
+
+	if(!$db->db_query($qry))
+		echo '<strong>bis.tbl_nation: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>bis.tbl_nation: Spalte iso3166_1_a3 hinzugefuegt';
+}
+
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
 
@@ -4048,7 +4060,7 @@ $tabellen=array(
 	"bis.tbl_mobilitaet" => array("mobilitaet_id","prestudent_id","mobilitaetstyp_kurzbz","studiensemester_kurzbz","mobilitaetsprogramm_code","gsprogramm_id","firma_id","status_kurzbz","ausbildungssemester","insertvon","insertamum","updatevon","updateamum"),
 	"bis.tbl_mobilitaetstyp" => array("mobilitaetstyp_kurzbz","bezeichnung","aktiv"),
 	"bis.tbl_mobilitaetsprogramm"  => array("mobilitaetsprogramm_code","kurzbz","beschreibung","sichtbar","sichtbar_outgoing"),
-	"bis.tbl_nation"  => array("nation_code","entwicklungsstand","eu","ewr","kontinent","kurztext","langtext","engltext","sperre","nationengruppe_kurzbz"),
+	"bis.tbl_nation"  => array("nation_code","entwicklungsstand","eu","ewr","kontinent","kurztext","langtext","engltext","sperre","nationengruppe_kurzbz","iso3166_1_a3"),
 	"bis.tbl_nationengruppe"  => array("nationengruppe_kurzbz","nationengruppe_bezeichnung","aktiv"),
 	"bis.tbl_orgform"  => array("orgform_kurzbz","code","bezeichnung","rolle","bisorgform_kurzbz","bezeichnung_mehrsprachig"),
 	"bis.tbl_verwendung"  => array("verwendung_code","verwendungbez"),
