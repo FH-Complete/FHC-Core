@@ -394,10 +394,12 @@ class dvb extends basis_db
 
 		$this->debug('getMatrikelnrBySVNR');
 
+		$uuid = $this->getUUID();
 		$curl = curl_init();
 
 		$url = self::DVB_URL_WEBSERVICE_SVNR;
 		$url .= '?sozialVersicherungsNummer='.curl_escape($curl, $svnr);
+		$url .= '&uuid='.curl_escape($curl, $uuid);
 
 		curl_setopt($curl, CURLOPT_URL, $url);
 		curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
@@ -507,9 +509,10 @@ class dvb extends basis_db
 
 		$this->debug('getMatrikelnrByErsatzkennzeichen');
 		$curl = curl_init();
-
+		$uuid = $this->getUUID();
 		$url = self::DVB_URL_WEBSERVICE_ERSATZKZ;
 		$url .= '?ersatzKennzeichen='.curl_escape($curl, $ersatzkennzeichen);
+		$url .= '&uuid='.curl_escape($curl, $uuid);
 
 		curl_setopt($curl, CURLOPT_URL, $url);
 		curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
@@ -1349,9 +1352,12 @@ class dvb extends basis_db
 
 		$geburtsdatum = str_replace("-", "", $geburtsdatum);
 
+		$uuid = $this->getUUID();
+
 		$url = self::DVB_URL_WEBSERVICE_NACHNAME;
 		$url .= '?nachName='.curl_escape($curl, $nachname);
 		$url .= '&geburtsDatum='.curl_escape($curl, $geburtsdatum);
+		$url .= '&uuid='.curl_escape($curl, $uuid);
 
 		curl_setopt($curl, CURLOPT_URL, $url);
 		curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
@@ -1472,11 +1478,13 @@ class dvb extends basis_db
 		$curl = curl_init();
 
 		$geburtsdatum = str_replace("-", "", $geburtsdatum);
+		$uuid = $this->getUUID();
 
 		$url = self::DVB_URL_WEBSERVICE_NAME;
 		$url .= '?nachName='.curl_escape($curl, $nachname);
 		$url .= '&vorName='.curl_escape($curl, $vorname);
 		$url .= '&geburtsDatum='.curl_escape($curl, $geburtsdatum);
+		$url .= '&uuid='.curl_escape($curl, $uuid);
 
 		curl_setopt($curl, CURLOPT_URL, $url);
 		curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
