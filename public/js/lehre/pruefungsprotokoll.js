@@ -33,7 +33,6 @@ $("document").ready(function() {
                     var error = checkFields[i];
                     $.each(error, function(i, n)
                     {
-                        console.log($("#"+i).closest('td'));
                        $("#"+i).closest('td').addClass('has-error');
                        if (errortext !== '')
                            errortext += '; ';
@@ -84,7 +83,7 @@ var Pruefungsprotokoll = {
     {
         var errors =  [];
 
-        if (data.abschlussbeurteilung_kurzbz == "" && verfChecked)
+        if (data.abschlussbeurteilung_kurzbz == "" && data.freigabedatum === true && verfChecked)
             errors.push({"abschlussbeurteilung_kurzbz": FHC_PhrasesLib.t("abschlusspruefung", "abschlussbeurteilungLeer")});
 
         var zeitregex = /^[0-2][0-9]:[0-5][0-9]$/;
