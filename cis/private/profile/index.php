@@ -341,16 +341,16 @@ if ($type == 'mitarbeiter')
 		echo $p->t('profil/telefonTw').": $vorwahl - $user->telefonklappe<BR>";
 		//echo $p->t('profil/faxTw').": $vorwahl - 99 $user->telefonklappe<BR>";
 	}
-	else {
-		$kontakt = new kontakt();
-		$kontakt->load_pers($user->person_id);
-		foreach($kontakt->result as $k)
-		{
-			if ($k->kontakttyp == 'firmenhandy')
-				echo $p->t('profil/telefonTw').': '.$k->kontakt.'<br>';
-		}
 
+	$kontakt = new kontakt();
+	$kontakt->load_pers($user->person_id);
+	foreach($kontakt->result as $k)
+	{
+		if ($k->kontakttyp == 'firmenhandy')
+			echo 'Firmenhandy: '.$k->kontakt.'<br>';
 	}
+
+
 	if ($user->ort_kurzbz != '')
 		echo $p->t('profil/buero').': '.$user->ort_kurzbz.'<br>';
 }
@@ -427,6 +427,7 @@ if (!$ansicht)
 	usort($kontakt->result, "sortKontakt");
 	echo '<table>';
 
+	$has_notfallkontakt = false;
 	foreach($kontakt->result as $k)
 	{
 		if ($k->kontakttyp != 'firmenhandy' && $k->kontakttyp != 'hidden')
@@ -441,6 +442,8 @@ if (!$ansicht)
 			echo '<td>'.$k->anmerkung.'</td>';
 			echo '<td>'.$zustellung.'</td>';
 			echo '</tr>';
+			if ($k->kontakttyp == 'notfallkontakt')
+				$has_notfallkontakt = true;
 		}
 		/*
 		if ($k->zustellung === TRUE)
@@ -462,6 +465,9 @@ if (!$ansicht)
 		}
 		*/
 	}
+	if (!$has_notfallkontakt && $type == 'mitarbeiter')
+		echo '<tr><td>'.$p->t('profil/notfallkontakt').'</td><td colspan="3">'.$p->t('profil/notfallkontaktBekanntgeben').'</td></tr>';
+
 	echo '</table>';
 }
 

@@ -89,7 +89,7 @@ function _parseMailContent($vorlage_kurzbz, $vorlage_data)
 	$ci =& get_instance();
 	$ci->load->library('VorlageLib');
 
-	$result = $ci->vorlagelib->getVorlagetextByVorlage($vorlage_kurzbz);
+	$result = $ci->vorlagelib->loadVorlagetext($vorlage_kurzbz);
 
 	if (isSuccess($result))
 	{

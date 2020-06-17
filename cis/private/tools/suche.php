@@ -587,7 +587,17 @@ function searchContent($searchItems)
 						// URL aus content parsen
 						$dom = new DOMDocument();
 						$dom->loadXML($row->content);
-						$content = $dom->getElementsByTagName('url')->item(0)->nodeValue;
+						if($dom->getElementsByTagName('url')!=null
+						&& $dom->getElementsByTagName('url')->item(0)!=null)
+						{
+							$content = $dom->getElementsByTagName('url')->item(0)->nodeValue;
+						}
+						else
+						{
+							// Wenn bei redirects keine URL vorhanden ist, dann handelt es sich um Fehlerhafte Einträge
+							// diese werden übersprungen
+							continue;
+						}
 
 						if (substr($content, 0, 1) == '#')
 							continue;
@@ -649,15 +659,33 @@ function searchContent($searchItems)
 						// URL aus content parsen
 						$dom = new DOMDocument();
 						$dom->loadXML($row->content);
-						$content = $dom->getElementsByTagName('url')->item(0)->nodeValue;
-
+						if($dom->getElementsByTagName('url')!=null
+						&& $dom->getElementsByTagName('url')->item(0)!=null)
+						{
+							$content = $dom->getElementsByTagName('url')->item(0)->nodeValue;
+						}
+						else
+						{
+							// Wenn bei redirects keine URL vorhanden ist, dann handelt es sich um Fehlerhafte Einträge
+							// diese werden übersprungen
+							continue;
+						}
 						if (substr($content, 0, 1) == '#')
 							continue;
 						else
 						{
-							echo '<li><div class="suchergebnis">';
-							echo '<a href="'.$content.'" target="blank">',$db->convert_html_chars($row->titel),'</a><br>';
-							echo '</div></li>';
+							if(mb_strpos($content, 'http') === 0)
+							{
+								echo '<li><div class="suchergebnis">';
+								echo '<a href="'.$content.'" target="blank">',$db->convert_html_chars($row->titel),'</a><br>';
+								echo '</div></li>';
+							}
+							else
+							{
+								echo '<li><div class="suchergebnis">';
+								echo '<a href="../../../cms/content.php?content_id=',$db->convert_html_chars($row->content_id),'&sprache=',$db->convert_html_chars($row->sprache),'">',$db->convert_html_chars($row->titel),'</a><br>';
+								echo '</div></li>';
+							}
 						}
 					}
 					else

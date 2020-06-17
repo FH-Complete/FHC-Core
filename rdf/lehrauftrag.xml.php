@@ -275,7 +275,7 @@ function drawLehrauftrag($uid)
 			AND studiensemester_kurzbz=".$db->db_add_param($ss);
 
 	if ($studiengang_kz != '') //$studiengang_kz!='0' &&
-		$qry .= "AND lv_studiengang_kz=".$db->db_add_param($studiengang_kz);
+        $qry .= " AND lv_studiengang_kz=".$db->db_add_param($studiengang_kz);
 	$qry .= " ORDER BY lv_orgform_kurzbz, lv_bezeichnung, lehreinheit_id";
 	$lv = array();
 	$anzahl_lvs = 0;

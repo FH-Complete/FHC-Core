@@ -172,12 +172,12 @@ class basis_db extends db
 			return pg_result_seek($result, $offset);
 	}
 
-	public function db_fetch_array($result=null)
+	public function db_fetch_array($result=null, $row=null, $result_type=PGSQL_NUM)
 	{
 		if(is_null($result))
-			return pg_fetch_array($this->db_result);
+			return pg_fetch_array($this->db_result, $row, $result_type);
 		else
-			return pg_fetch_array($result);
+			return pg_fetch_array($result, $row, $result_type);
 	}
 
 	public function db_num_fields($result=null)

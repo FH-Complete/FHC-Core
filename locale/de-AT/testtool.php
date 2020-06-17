@@ -50,4 +50,37 @@ $this->phrasen['testtool/startDrueckenUmZuBeginnen']='Um dieses Teilgebiet zu st
 $this->phrasen['testtool/keinPrueflingseintragVorhanden']='Kein Prüflingseintrag vorhanden';
 $this->phrasen['testtool/fuerFolgendeStgAngemeldet']='Für folgende Studiengänge haben Sie sich angemeldet:';
 $this->phrasen['testtool/invalideGebiete']='Ein oder mehrere Fragengebiet/e inkorrekt!<br>Bitte melden Sie dies der Betreuungsperson.';
+$this->phrasen['testtool/confirmationText']='Ich bestätige, den Online-Reihungstest persönlich, selbständig, ohne Hilfe einer zusätzlichen Person und ohne Hilfsmittel zu absolvieren.';
+$this->phrasen['testtool/loginNoetig']='Bitte beachten Sie, dass der Reihungstest erst <b>unmittelbar</b> vor Testbeginn von uns aktiviert wird.<br>
+										Please note, that the test will be enabled straight before the beginning';
+$this->phrasen['testtool/start']='Reihungstest jetzt starten';
+$this->phrasen['testtool/einfuehrungsText']='
+			<div class="row" style="margin-bottom: 20px; margin-top: 3%%;">
+				<div class="col-xs-6 text-center" style="border-right: 1px solid lightgrey;">
+					<h1 style="white-space: normal">Herzlich Willkommen zum Reihungstest</h1>
+					<a href="'.APP_ROOT.'dms.php?id=142964" target="_blank"><img src="'.APP_ROOT.'cms/dms.php?id=142976" alt="Einfuehrungsvideo" style="border: 1px solid lightgray; border-radius: 10px; width:350px;"></a>
+					<!--<video controls poster="'.APP_ROOT.'cms/dms.php?id=2786&version=2" style="border: 1px solid lightgray; border-radius: 10px; width:350px; max-width:100%%;">
+						<source src="'.APP_ROOT.'cms/dms.php?id=142964" type="video/mp4">
+						<p>Ihr Browser unterstützt dieses Videoelement leider nicht.</p>
+					</video>-->
+					<br><br>
+					<a href="#" target="_blank"><img src="'.APP_ROOT.'cms/dms.php?id=46&version=1">&nbsp;Leitfaden zum Ablauf des Reihungstests (folgt in Kürze)</a>
+					<br><br>
+					Unter dem folgenden Link können Sie die korrekte Darstellung des Reihungstests testen:<br><br>
+					<a href="../public/testtool_test/testseite.php" target="_blank" class="btn btn-default">Zum Darstellungstest</a>
+				</div>
+				<div class="col-xs-6 text-center">
+					<h1 style="white-space: normal">Welcome to the placement test</h1>
+					<a href="'.APP_ROOT.'cms/dms.php?id=142964" target="_blank"><img src="'.APP_ROOT.'cms/dms.php?id=142977" alt="Einfuehrungsvideo" style="border: 1px solid lightgray; border-radius: 10px; width:350px;"></a>
+					<!--<video width="320" controls poster="'.APP_ROOT.'cms/dms.php?id=2786&version=2" style="border: 1px solid lightgray; border-radius: 10px;">
+						<source src="'.APP_ROOT.'cms/dms.php?id=142964" type="video/mp4">
+						<p>Ihr Browser unterstützt dieses Videoelement leider nicht.</p>
+					</video>-->
+					<br><br>
+					<a href="#" target="_blank"><img src="'.APP_ROOT.'cms/dms.php?id=46&version=1">&nbsp;Guideline for placement test (coming soon)</a>
+					<br><br>
+					Under the following link you can test the correct display of the placement test:<br><br>
+					<a href="../public/testtool_test/testseite.php" target="_blank" class="btn btn-default">Display testpage</a>
+				</div>
+			</div>';
 ?>

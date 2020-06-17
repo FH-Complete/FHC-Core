@@ -14,7 +14,7 @@ class Studienjahr_model extends DB_Model
 	}
 
 	/**
-	 * Gets current Studienjahr, as determined by its start and enddate
+	 * Gets current Studienjahr, as determined by start and enddate of current semester
 	 * @return array|null
 	 */
 	public function getCurrStudienjahr()

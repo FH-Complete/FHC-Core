@@ -72,11 +72,18 @@ $config['navigation_header'] = array(
 			'sort' => 40,
 			'requiredPermissions' => 'basis/vilesci:r',
 			'children'=> array(
+				'messages' => array(
+					'link' => site_url('system/messages/MessageClient/read'),
+					'icon' => '',
+					'target' => '_blank',
+					'description' => 'Messages',
+					'sort' => 10,
+				),
 				'bpk' => array(
 					'link' => site_url('person/BPKWartung'),
 					'icon' => '',
 					'description' => 'BPK Wartung',
-					'sort' => 10,
+					'sort' => 20,
 					'requiredPermissions' => 'admin:r'
 				)
 			)

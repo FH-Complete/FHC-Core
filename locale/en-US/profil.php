@@ -82,4 +82,6 @@ $this->phrasen['profil/gueltigbis']='Valid to';
 $this->phrasen['profil/wochenstunden']='week hours';
 $this->phrasen['profil/vertragsstunden']='contract hours';
 $this->phrasen['profil/zukuenftigeFunktionen']='Future functions';
+$this->phrasen['profil/notfallkontakt']='Emergency contact';
+$this->phrasen['profil/notfallkontaktBekanntgeben']='Please provide an emergency contact!';
 ?>

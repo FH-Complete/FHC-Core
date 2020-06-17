@@ -140,6 +140,23 @@ function checkfilter($row, $filter2, $buchungstyp = null)
 			}
 		}
 	}
+	elseif($filter2=='ausbildungsvertragakzeptiert')
+	{
+		//Alle Personen die den archivierten Ausbildungsvertrag akzeptiert haben
+		$qry = "SELECT count(*) as anzahl FROM public.tbl_akte
+				WHERE person_id=".$db->db_add_param($row->person_id, FHC_INTEGER)."
+				AND dokument_kurzbz='Ausbvert' AND archiv=true AND stud_selfservice=true AND akzeptiertamum IS NOT NULL";
+		if($db->db_query($qry))
+		{
+			if($row_filter = $db->db_fetch_object())
+			{
+				if($row_filter->anzahl > 0)
+					return true;
+				else
+					return false;
+			}
+		}
+	}
 	return true;
 }
 

@@ -265,10 +265,10 @@ if ($gebiet_id != '')
 	{
 		$offsetwarnung = strlen($gebiet->errormsg) > 0 ? ' (HINWEIS: '.$gebiet->errormsg.')' : '';
 
-		$offsethinweis = ' <span class="error">empfohlene Offsetpunkteanzahl: '.round($offsetpunkte).(round($offsetpunkte) != $offsetpunkte ? ' ('.$offsetpunkte.' gerundet)' : '').'</span>';
+		$offsethinweis = ' <span class="error">empfohlene Offsetpunkteanzahl: '.ceil($offsetpunkte).(ceil($offsetpunkte) != $offsetpunkte ? ' ('.$offsetpunkte.' gerundet)' : '').'</span>';
 		$offsethinweis .= '<span class="error">'.$offsetwarnung.'</span>';
 	}
-	echo '<td>Offsetpunkte (minimale Punkteanzahl)</td><td><input type="text" size="5" maxlength="5" name="offsetpunkte" value="'.$gebiet->offsetpunkte.'">'.$offsethinweis.'</td>';
+	echo '<td>Offsetpunkte (maximale Negativpunkte)</td><td><input type="text" size="5" maxlength="7" name="offsetpunkte" value="'.$gebiet->offsetpunkte.'">'.$offsethinweis.'</td>';
 	echo '</tr><tr>';
 	echo '<td>Maximale Fragenanzahl</td><td><input type="text" size="5" maxlength="5" name="maxfragen" value="'.$gebiet->maxfragen.'"></td>';
 	echo '</tr><tr>';

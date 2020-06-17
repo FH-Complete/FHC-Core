@@ -40,19 +40,19 @@ $rechte->getBerechtigungen($uid);
 if(!$rechte->isBerechtigt('mitarbeiter/stammdaten', null,'suid'))
 	die('Sie haben keine Berechtigung für diese Seite');
 
-$error_log='';
-$fehler=0;
+$error_log = '';
+$fehler = 0;
 
 $text = '';
-$anzahl_quelle=0;
-$anzahl_eingefuegt=0;
-$anzahl_update=0;
-$anzahl_fehler=0;
-$ausgabe='';
-$error_log_fas='';
-$update=false;
-$bismeldedatum=date("Y-m-d",  mktime(0, 0, 0, 9, 1, date("Y")));
-$bismeldedatumvorjahr=date("Y-m-d",  mktime(0, 0, 0, 9, 1, date("Y")-1));
+$anzahl_quelle = 0;
+$anzahl_eingefuegt = 0;
+$anzahl_update = 0;
+$anzahl_fehler = 0;
+$ausgabe = '';
+$error_log_fas = '';
+$update = false;
+$bismeldedatum_start = date("Y-m-d",  mktime(0, 0, 0, 1, 1, date("Y")-1));
+$bismeldedatum_ende = date("Y-m-d",  mktime(0, 0, 0, 12, 31, date("Y")-1));
 
 $ba1_arr = array();
 $qry = "SELECT * FROM bis.tbl_beschaeftigungsart1";
@@ -103,7 +103,7 @@ $stsem_obj = new studiensemester();
 $lastss = $stsem_obj->getPrevious();
 $lastws = $stsem_obj->getBeforePrevious();
 
-//1 - aktive mitarbeiter und bismelden mit keiner verwendung oder mehr als einer aktuellen verwendung
+//**** aktive mitarbeiter und bismelden mit keiner verwendung
 $qryall='
 	SELECT
 		uid, nachname, vorname, count(bisverwendung_id)
@@ -116,13 +116,14 @@ $qryall='
 		AND (ende>now() OR ende IS NULL)
 	GROUP BY
 		uid, nachname, vorname
-	HAVING count(bisverwendung_id)!=1
+	HAVING count(bisverwendung_id)=0
 	ORDER by nachname, vorname;';
 if($resultall = $db->db_query($qryall))
 {
 	$num_rows_all=$db->db_num_rows($resultall);
-	echo "<H2>Bei $num_rows_all aktiven Mitarbeitern sind die aktuellen Verwendungen nicht plausibel</H2>";
-	echo "Es ist keine oder es sind mehrere aktive Verwendungen vorhanden.<br>";
+	echo "<H2>Bei $num_rows_all aktiven Mitarbeitern sind die keine aktuellen Verwendungen vorhanden</H2>";
+	echo "Es ist keine aktiven Verwendungen vorhanden. (unabhängig vom Meldezeitraum)<br>";
+
 	while($rowall=$db->db_fetch_object($resultall))
 	{
 		$i=0;
@@ -141,19 +142,68 @@ if($resultall = $db->db_query($qryall))
 				AND mitarbeiter_uid=".$db->db_add_param($rowall->uid)."
 			ORDER BY beginn";
 
-		if($result = $db->db_query($qry))
+		if ($result = $db->db_query($qry))
 		{
-			$num_rows=$db->db_num_rows($result);
-			if($num_rows>1)
+			echo "<br><u>Aktive(r) Mitarbeiter(in): <b>".$rowall->nachname." ".$rowall->vorname."</b>
+			 hat keine aktuelle Verwendung</u><br>";
+		}
+	}
+}
+
+//**** mehrere aktive Verwendungen im Meldezeitraum
+$qryall="
+	SELECT
+		a.mitarbeiter_uid as uid
+	FROM
+		bis.tbl_bisverwendung a,
+		bis.tbl_bisverwendung b
+	WHERE
+		a.mitarbeiter_uid = b.mitarbeiter_uid
+		AND (a.ende>='$bismeldedatum_start' or a.ende is null)
+		AND (a.beginn<'$bismeldedatum_ende' or a.beginn is null)
+		AND a.bisverwendung_id <> b.bisverwendung_id
+		AND (b.ende>='$bismeldedatum_start' or b.ende is null)
+		AND (b.beginn<'$bismeldedatum_ende' or b.beginn is null)
+		AND a.ende >= b.beginn
+		AND a.beginn < b.beginn
+	ORDER BY a.mitarbeiter_uid
+";
+if($resultall = $db->db_query($qryall))
+{
+	$num_rows_all=$db->db_num_rows($resultall);
+	echo "<H2>Bei $num_rows_all aktiven Mitarbeitern sind überlappende Verwendungen im Meldezeitraum vorhanden</H2>";
+
+	while($rowall=$db->db_fetch_object($resultall))
+	{
+		$i=0;
+		$qry="
+			SELECT
+				*
+			FROM
+				bis.tbl_bisverwendung
+				JOIN public.tbl_benutzer ON(mitarbeiter_uid=uid)
+				JOIN public.tbl_person USING(person_id)
+				JOIN public.tbl_mitarbeiter USING(mitarbeiter_uid)
+			WHERE
+				tbl_mitarbeiter.bismelden=TRUE
+				AND (tbl_bisverwendung.ende>='$bismeldedatum_start' or tbl_bisverwendung.ende is null)
+				AND (tbl_bisverwendung.beginn<'$bismeldedatum_ende' or tbl_bisverwendung.beginn is null)
+				AND mitarbeiter_uid=".$db->db_add_param($rowall->uid)."
+			ORDER BY beginn";
+
+		if ($result = $db->db_query($qry))
+		{
+			$num_rows = $db->db_num_rows($result);
+			if ($num_rows > 1)
 			{
-				while($row=$db->db_fetch_object($result))
+				while ($row = $db->db_fetch_object($result))
 				{
-					if($i==0)
+					if ($i == 0)
 					{
 						echo "
 							<br>
 								<u>Aktive(r) Mitarbeiter(in) <b>".$row->nachname." ".$row->vorname."</b>".
-								" hat ".$num_rows." aktuelle Verwendungen (m&ouml;glicherweise korrekt):
+								" hat überlappende Verwendungen im Meldezeitraum:
 								</u>
 							<br>";
 						$i++;
@@ -165,13 +215,13 @@ if($resultall = $db->db_query($qryall))
 						$row->beginn." - ".$row->ende."<br>";
 				}
 			}
-			elseif($num_rows==0)
-				echo "<br><u>Aktive(r) Mitarbeiter(in): <b>".$rowall->nachname." ".$rowall->vorname."</b>
-				 hat ".$num_rows." aktuelle Verwendungen:</u><br>";
+			elseif ($num_rows == 0)
+				echo "<br><u>ELSE ZWeig: ".$rowall->uid."</u><br>";
 		}
 	}
 }
-//2 - aktive fixe mitarbeiter mit keiner aktuellen verwendung
+
+//**** aktive fixe mitarbeiter mit keiner aktuellen verwendung
 $qryall = '
 	SELECT
 		uid, nachname, vorname, count(bisverwendung_id)
@@ -188,14 +238,14 @@ $qryall = '
 			)
 		GROUP BY uid, nachname, vorname
 		ORDER by nachname, vorname;';
-if($resultall = $db->db_query($qryall))
+if ($resultall = $db->db_query($qryall))
 {
-	$num_rows_all=$db->db_num_rows($resultall);
+	$num_rows_all = $db->db_num_rows($resultall);
 	echo "<br><br><H2>Bei $num_rows_all aktiven Fixangestellten Mitarbeitern sind keine aktuellen Verwendungen eingetragen</H2>";
-	while($rowall=$db->db_fetch_object($resultall))
+	while ($rowall = $db->db_fetch_object($resultall))
 	{
-		$i=0;
-		$qry="
+		$i = 0;
+		$qry = "
 			SELECT
 				*
 			FROM
@@ -207,12 +257,12 @@ if($resultall = $db->db_query($qryall))
 				AND mitarbeiter_uid=".$db->db_add_param($rowall->uid)."
 			ORDER by beginn";
 
-		if($result = $db->db_query($qry))
+		if ($result = $db->db_query($qry))
 		{
 			$num_rows=$db->db_num_rows($result);
-			while($row=$db->db_fetch_object($result))
+			while ($row=$db->db_fetch_object($result))
 			{
-				if($i==0)
+				if ($i == 0)
 				{
 					echo "<br>
 							<u>
@@ -232,8 +282,8 @@ if($resultall = $db->db_query($qryall))
 	}
 }
 
-//3 - nicht aktive mitarbeiter mitarbeiter mit aktueller verwendung
-$qryall='
+//**** nicht aktive mitarbeiter mit aktueller verwendung
+$qryall = '
 	SELECT
 		uid, nachname, vorname
 	FROM
@@ -246,14 +296,16 @@ $qryall='
 	GROUP BY uid, nachname, vorname
 	ORDER by nachname, vorname;';
 
-if($resultall = $db->db_query($qryall))
+if ($resultall = $db->db_query($qryall))
 {
 	$num_rows_all=$db->db_num_rows($resultall);
 	echo "<br><br><H2>Bei $num_rows_all nicht aktiven Mitarbeitern sind die aktuellen Verwendungen nicht plausibel (inaktiv aber aktuelle Verwendung)</H2>";
-	while($rowall=$db->db_fetch_object($resultall))
+	echo "Diese Personen werden trotzdem gemeldet!";
+
+	while ($rowall = $db->db_fetch_object($resultall))
 	{
-		$i=0;
-		$qry="
+		$i = 0;
+		$qry = "
 			SELECT
 				*
 			FROM
@@ -263,12 +315,12 @@ if($resultall = $db->db_query($qryall))
 				AND mitarbeiter_uid=".$db->db_add_param($rowall->uid)."
 			ORDER BY beginn";
 
-		if($result = $db->db_query($qry))
+		if ($result = $db->db_query($qry))
 		{
-			$num_rows=$db->db_num_rows($result);
-			while($row=$db->db_fetch_object($result))
+			$num_rows = $db->db_num_rows($result);
+			while ($row = $db->db_fetch_object($result))
 			{
-				if($i==0)
+				if ($i == 0)
 				{
 					echo "<br>
 						<u>
@@ -287,16 +339,17 @@ if($resultall = $db->db_query($qryall))
 		}
 	}
 }
-//4 - wenn hauptberuf=j dann sollte verwendung=1,5,6 sein - check
-$qryall="
+//**** - wenn hauptberufcode gesetzt ist, muss die Verwendung 1 sein
+$qryall = "
 	SELECT
 		uid, nachname, vorname
 	FROM
 		campus.vw_mitarbeiter
 		JOIN bis.tbl_bisverwendung ON (uid=mitarbeiter_uid)
 	WHERE
-		verwendung_code NOT IN ('1','5','6')
+		verwendung_code NOT IN ('1')
 		AND hauptberuflich=true
+		AND (tbl_bisverwendung.ende>".$db->db_add_param($bismeldedatum_start)." or tbl_bisverwendung.ende is null)
 	GROUP BY uid, nachname, vorname
 	ORDER by nachname, vorname, uid;";
 
@@ -304,8 +357,7 @@ if($resultall = $db->db_query($qryall))
 {
 	$num_rows_all=$db->db_num_rows($resultall);
 	echo "<br><br><H2>Bei $num_rows_all Mitarbeitern sind die Eintragungen 'hauptberuflich' nicht plausibel</H2>";
- 	echo "hauptberuflich=ja, aber Verwendung nicht ".
-	$verwendung_arr[1].", ".$verwendung_arr[5]." oder ".$verwendung_arr[6];
+ 	echo "hauptberuflich=ja, aber Verwendung nicht ".$verwendung_arr[1];
 
 	while($rowall=$db->db_fetch_object($resultall))
 	{
@@ -316,9 +368,10 @@ if($resultall = $db->db_query($qryall))
 			FROM
 				bis.tbl_bisverwendung
 			WHERE
-				verwendung_code NOT IN ('1','5','6')
+				verwendung_code NOT IN ('1')
 				AND hauptberuflich=true
 				AND mitarbeiter_uid=".$db->db_add_param($rowall->uid)."
+				AND (tbl_bisverwendung.ende>".$db->db_add_param($bismeldedatum_start)." or tbl_bisverwendung.ende is null)
 			ORDER BY beginn";
 
 		if($result = $db->db_query($qry))
@@ -341,69 +394,8 @@ if($resultall = $db->db_query($qryall))
 		}
 	}
 }
-//5 - stimmt beschausmasscode mit vertragsstunden überein?
-$qryall="
-	SELECT
-		uid, nachname, vorname
-	FROM
-		campus.vw_mitarbeiter
-		JOIN bis.tbl_bisverwendung ON (uid=mitarbeiter_uid)
-	WHERE
-		(beschausmasscode='1' AND vertragsstunden<='35')
-		OR (beschausmasscode='2' AND vertragsstunden>'15')
-		OR (beschausmasscode='3' AND vertragsstunden<'16')
-		OR (beschausmasscode='3' AND vertragsstunden>'25')
-		OR (beschausmasscode='4' AND vertragsstunden<'26')
-		OR (beschausmasscode='4' AND vertragsstunden>'35')
-		OR (beschausmasscode='5' AND vertragsstunden>'0')
-	GROUP BY uid, nachname, vorname
-	ORDER by nachname, vorname, uid;";
 
-if($resultall = $db->db_query($qryall))
-{
-	$num_rows_all=$db->db_num_rows($resultall);
-	echo "<br><br><H2>Bei $num_rows_all Mitarbeitern ist das Beschäftigungsausmaß nicht plausibel</H2>";
-	echo "Vertragsstunden passen nicht mit Beschäftigungsausmass überein<br><br>";
-	while($rowall=$db->db_fetch_object($resultall))
-	{
-		$i=0;
-		$qry="
-			SELECT
-				*
-			FROM
-				bis.tbl_bisverwendung
-			WHERE
-				((beschausmasscode='1' AND vertragsstunden<'38.5')
-				OR (beschausmasscode='2' AND vertragsstunden>'15')
-				OR (beschausmasscode='3' AND vertragsstunden<'16')
-				OR (beschausmasscode='3' AND vertragsstunden>'25')
-				OR (beschausmasscode='4' AND vertragsstunden<'26')
-				OR (beschausmasscode='4' AND vertragsstunden>'35')
-				OR (beschausmasscode='5' AND vertragsstunden>'0'))
-				AND mitarbeiter_uid=".$db->db_add_param($rowall->uid)."
-			ORDER BY beginn";
-
-		if($result = $db->db_query($qry))
-		{
-			$num_rows=$db->db_num_rows($result);
-			while($row=$db->db_fetch_object($result))
-			{
-				if($i==0)
-				{
-					echo "<br><u>Mitarbeiter(in) ".$rowall->nachname." ".$rowall->vorname.":</u><br>";
-					$i++;
-				}
-				echo $ausmass_arr[$row->beschausmasscode].
-					", Vertragsstunden ".$row->vertragsstunden.
-					", ".$verwendung_arr[$row->verwendung_code].
-					", ".$ba1_arr[$row->ba1code].
-					", ".$ba2_arr[$row->ba2code].
-					", ".$row->beginn." - ".$row->ende."<br>";
-			}
-		}
-	}
-}
-//6 - aktive, freie lektoren auf verwendung 1 oder 2 prüfen
+//**** aktive, freie lektoren auf verwendung 1 oder 2 prüfen
 $qryall="
 	SELECT
 		uid, nachname, vorname
@@ -418,6 +410,7 @@ $qryall="
 		AND (ende>now() OR ende IS NULL)
 	GROUP BY uid, nachname, vorname
 	ORDER by nachname, vorname, uid;";
+
 if($resultall = $db->db_query($qryall))
 {
 	$num_rows_all=$db->db_num_rows($resultall);
@@ -455,7 +448,37 @@ if($resultall = $db->db_query($qryall))
 		}
 	}
 }
-//7 - Lehrauftrag aber keine aktuelle Verwendung
+
+//**** Echter Dienstvertrag ohne Vertragsstunden
+$qryall="
+	SELECT
+		distinct mitarbeiter_uid as uid, vorname, nachname
+	FROM
+		bis.tbl_bisverwendung
+		JOIN public.tbl_mitarbeiter using(mitarbeiter_uid)
+		JOIN public.tbl_benutzer on(uid=mitarbeiter_uid)
+		JOIN public.tbl_person using(person_id)
+		WHERE
+		(beginn is null or beginn<".$db->db_add_param($bismeldedatum_ende).")
+		and (ende is null or ende>=".$db->db_add_param($bismeldedatum_start).")
+		and ba1code=103
+		and vertragsstunden is null
+		and beschausmasscode!=5
+	ORDER by nachname, vorname, mitarbeiter_uid;";
+if($resultall = $db->db_query($qryall))
+{
+	$num_rows_all=$db->db_num_rows($resultall);
+	echo "<br><br><H2>Bei $num_rows_all Mitarbeitern mit echtem Dienstvertrag fehlen die Vertragsstunden</H2>";
+	echo "Bei der BIS-Verwendung müssen bei echtem Dienstvertrag Vertragsstunden eingetragen sein
+	damit die JVZÄ korrekt berechnet werden.<br><br>";
+
+	while($rowall=$db->db_fetch_object($resultall))
+	{
+		echo "<br><u>Mitarbeiter(in) ".$rowall->nachname." ".$rowall->vorname.":</u><br>";
+	}
+}
+
+//**** - Lehrauftrag aber keine aktuelle Verwendung
 $i=0;
 $qryall="
 	SELECT
@@ -511,7 +534,7 @@ if($resultall = $db->db_query($qryall))
 		}
 	}
 }
-//8 - Verwendung Habil. und Entwicklungsteam Habil.=1
+//**** - Verwendung Habil. und Entwicklungsteam Habil.=1
 $i=0;
 $qryall="
 	SELECT
@@ -559,7 +582,7 @@ if($resultall = $db->db_query($qryall))
 	}
 }
 
-//9 - inaktive mitarbeiter und bismelden ohne verwendung
+//**** inaktive mitarbeiter und bismelden ohne verwendung
 $qryall='
 	SELECT
 		uid, nachname, vorname, count(bisverwendung_id)

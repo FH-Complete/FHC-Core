@@ -12,7 +12,7 @@ class DropdownWidgetUDF extends DropdownWidget
 	{
 		// Array that will contains the elements to be displayed in the dropdown
 		$tmpNewElements = array();
-		
+
 		// Loops through the given parameters
 		foreach($parameters as $parameter)
 		{
@@ -29,27 +29,27 @@ class DropdownWidgetUDF extends DropdownWidget
 				// If the single element is an array of two element
 				if (is_array($parameter) && count($parameter) == 2)
 				{
-					$newElement->{DropdownWidget::ID_FIELD} = $parameter[0]; // 
-					$newElement->{DropdownWidget::DESCRIPTION_FIELD} = $parameter[1]; // 
+					$newElement->{DropdownWidget::ID_FIELD} = $parameter[0]; //
+					$newElement->{DropdownWidget::DESCRIPTION_FIELD} = $parameter[1]; //
 				}
 				// If the single element is a string or a number
 				else if (is_string($parameter) || is_numeric($parameter))
 				{
-					$newElement->{DropdownWidget::ID_FIELD} = $parameter; // 
-					$newElement->{DropdownWidget::DESCRIPTION_FIELD} = $parameter; // 
+					$newElement->{DropdownWidget::ID_FIELD} = $parameter; //
+					$newElement->{DropdownWidget::DESCRIPTION_FIELD} = $parameter; //
 				}
 				// If the single element is an object with two properties: id and description
 				else if (is_object($parameter) && isset($parameter->{DropdownWidget::ID_FIELD})
 					&& isset($parameter->{DropdownWidget::DESCRIPTION_FIELD}))
 				{
-					$newElement->{DropdownWidget::ID_FIELD} = $parameter->{DropdownWidget::ID_FIELD}; // 
-					$newElement->{DropdownWidget::DESCRIPTION_FIELD} = $parameter->{DropdownWidget::DESCRIPTION_FIELD}; // 
+					$newElement->{DropdownWidget::ID_FIELD} = $parameter->{DropdownWidget::ID_FIELD}; //
+					$newElement->{DropdownWidget::DESCRIPTION_FIELD} = $parameter->{DropdownWidget::DESCRIPTION_FIELD}; //
 				}
-				
+
 				array_push($tmpNewElements, $newElement); // Add $newElement into $tmpNewElements
 			}
 		}
-		
+
 		// Set the list of elements
 		$this->setElementsArray(
 			success($tmpNewElements),
@@ -57,9 +57,9 @@ class DropdownWidgetUDF extends DropdownWidget
 			$this->htmlParameters[HTMLWidget::PLACEHOLDER],
 			'No data found for this UDF'
 		);
-		
+
 		$this->loadDropDownView();
-		
+
 		echo $this->content();
     }
 }

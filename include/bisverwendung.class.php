@@ -404,8 +404,8 @@ class bisverwendung extends basis_db
 				$obj->verwendung_code = $row->verwendung_code;
 				$obj->mitarbeiter_uid = $row->mitarbeiter_uid;
 				$obj->hauptberufcode = $row->hauptberufcode;
-                $obj->hauptberuflich = $this->db_parse_bool($row->hauptberuflich);
-                $obj->habilitation = $this->db_parse_bool($row->habilitation);
+				$obj->hauptberuflich = $this->db_parse_bool($row->hauptberuflich);
+				$obj->habilitation = $this->db_parse_bool($row->habilitation);
 				$obj->beginn = $row->beginn;
 				$obj->ende = $row->ende;
 				$obj->updatevon = $row->updatevon;
@@ -513,8 +513,8 @@ class bisverwendung extends basis_db
 				$this->verwendung_code = $row->verwendung_code;
 				$this->mitarbeiter_uid = $row->mitarbeiter_uid;
 				$this->hauptberufcode = $row->hauptberufcode;
-                $this->hauptberuflich = $this->db_parse_bool($row->hauptberuflich);
-                $this->habilitation = $this->db_parse_bool($row->habilitation);
+				$this->hauptberuflich = $this->db_parse_bool($row->hauptberuflich);
+				$this->habilitation = $this->db_parse_bool($row->habilitation);
 				$this->beginn = $row->beginn;
 				$this->ende = $row->ende;
 				$this->updatevon = $row->updatevon;
@@ -566,8 +566,8 @@ class bisverwendung extends basis_db
 				$this->verwendung_code = $row->verwendung_code;
 				$this->mitarbeiter_uid = $row->mitarbeiter_uid;
 				$this->hauptberufcode = $row->hauptberufcode;
-                $this->hauptberuflich = $this->db_parse_bool($row->hauptberuflich);
-                $this->habilitation = $this->db_parse_bool($row->habilitation);
+				$this->hauptberuflich = $this->db_parse_bool($row->hauptberuflich);
+				$this->habilitation = $this->db_parse_bool($row->habilitation);
 				$this->beginn = $row->beginn;
 				$this->ende = $row->ende;
 				$this->updatevon = $row->updatevon;
@@ -578,6 +578,187 @@ class bisverwendung extends basis_db
 				$this->dv_art = $row->dv_art;
 				$this->inkludierte_lehre = $row->inkludierte_lehre;
 				$this->zeitaufzeichnungspflichtig = $this->db_parse_bool($row->zeitaufzeichnungspflichtig);
+			}
+			return true;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler bei der Datenbankabfrage';
+			return false;
+		}
+	}
+
+	/**
+	 * Laedt alle Verwendungen eines Mitarbeiters die in einen Datumsbereich fallen
+	 * @param $uid UID des Mitarbeiters
+	 * @param $von
+	 * @param $bis
+	 * @return true wenn ok, false wenn Fehler
+	 */
+	public function getVerwendungRange($uid, $von, $bis)
+	{
+		$datum_obj = new datum();
+		//laden des Datensatzes
+		$qry = "
+		SELECT
+			*
+		FROM
+			bis.tbl_bisverwendung
+		WHERE
+			mitarbeiter_uid=".$this->db_add_param($uid)."
+			AND
+			(
+				".$this->db_add_param($datum_obj->formatDatum($von,'Y-m-d'))." BETWEEN COALESCE(beginn,'1970-01-01') AND COALESCE(ende,'2999-12-31')
+				OR
+				".$this->db_add_param($datum_obj->formatDatum($bis,'Y-m-d'))." BETWEEN COALESCE(beginn,'1970-01-01') AND COALESCE(ende,'2999-12-31')
+			)
+		ORDER BY ende desc;";
+
+		if($this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object())
+			{
+
+				$obj = new bisverwendung();
+
+				$obj->bisverwendung_id = $row->bisverwendung_id;
+				$obj->ba1code = $row->ba1code;
+				$obj->ba2code = $row->ba2code;
+				$obj->beschausmasscode = $row->beschausmasscode;
+				$obj->verwendung_code = $row->verwendung_code;
+				$obj->mitarbeiter_uid = $row->mitarbeiter_uid;
+				$obj->hauptberufcode = $row->hauptberufcode;
+				$obj->hauptberuflich = $this->db_parse_bool($row->hauptberuflich);
+				$obj->habilitation = $this->db_parse_bool($row->habilitation);
+				$obj->beginn = $row->beginn;
+				$obj->ende = $row->ende;
+				$obj->updatevon = $row->updatevon;
+				$obj->updateamum = $row->updateamum;
+				$obj->insertamum = $row->insertamum;
+				$obj->insertvon = $row->insertvon;
+				$obj->vertragsstunden = $row->vertragsstunden;
+				$obj->dv_art = $row->dv_art;
+				$obj->inkludierte_lehre = $row->inkludierte_lehre;
+				$obj->zeitaufzeichnungspflichtig = $this->db_parse_bool($row->zeitaufzeichnungspflichtig);
+
+				$this->result[] = $obj;
+			}
+			return true;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler bei der Datenbankabfrage';
+			return false;
+		}
+	}
+
+	/*
+	 * Prueft, ob Mitarbeiter habilitiert ist
+	 * @param $uid UID des Mitarbeiters
+	 * @return bool
+	 */
+	public function isHabilitiert($uid)
+	{
+		$qry = '
+			SELECT
+				*
+			FROM
+				bis.tbl_bisverwendung
+			WHERE
+				mitarbeiter_uid = '. $this->db_add_param($uid). '
+  			AND
+  				habilitation = true;
+		';
+
+		if ($this->db_query($qry))
+		{
+			return $this->db_num_rows() > 0;
+		}
+	}
+
+	/**
+	 * Holt alle Verwendungen eines Mitarbeiters innerhalb des BIS Meldungszeitraums
+	 * @param $uid	UID des Mitarbeiters
+	 * @param $stichtag
+	 * @return bool
+	 */
+	public function getVerwendungenBISMeldung($uid, $stichtag)
+	{
+		$datetime = new DateTime($stichtag);
+		$stichtag = $datetime->format('Y-m-d');
+		$bismeldung_jahr = $datetime->format('Y');
+
+		$qry = '
+				SELECT
+					*,
+				CASE
+					WHEN (beginn is null OR beginn < make_date('. $this->db_add_param($bismeldung_jahr). '::INTEGER, 1, 1))
+						THEN make_date('. $this->db_add_param($bismeldung_jahr). '::INTEGER, 1, 1)
+					ELSE beginn
+					END as beginn_imBISMeldungsJahr,
+				CASE
+					WHEN (ende is null OR ende > make_date('. $this->db_add_param($bismeldung_jahr). '::INTEGER, 12, 31))
+						THEN make_date('. $this->db_add_param($bismeldung_jahr). '::INTEGER, 12, 31)
+					ELSE ende
+					END as ende_imBISMeldungsJahr
+				FROM
+					bis.tbl_bisverwendung
+					JOIN bis.tbl_beschaeftigungsart1 USING (ba1code)
+				WHERE
+					mitarbeiter_uid = '. $this->db_add_param($uid).'
+					AND (beginn <= '. $this->db_add_param($stichtag).' OR beginn is null)
+					AND (ende >= make_date('. $this->db_add_param($bismeldung_jahr). '::INTEGER, 1, 1) OR ende is null)
+				ORDER BY ende
+		';
+
+		if($this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object())
+			{
+				$obj = new StdClass();
+
+				$obj->bisverwendung_id = $row->bisverwendung_id;
+				$obj->mitarbeiter_uid = $row->mitarbeiter_uid;
+				$obj->vertragsstunden = $row->vertragsstunden;
+				$obj->ba1code = $row->ba1code_bis;
+				$obj->ba2code = $row->ba2code;
+				$obj->verwendung_code = $row->verwendung_code;
+				$obj->beschausmasscode = $row->beschausmasscode;
+				$obj->hauptberufcode = $row->hauptberufcode;
+				$obj->hauptberuflich = $this->db_parse_bool($row->hauptberuflich);
+				$obj->beginn = $row->beginn;
+				$obj->ende = $row->ende;
+				$obj->beginn_imBISMeldungsJahr = $row->beginn_imbismeldungsjahr;
+				$obj->ende_imBISMeldungsJahr = $row->ende_imbismeldungsjahr;
+
+				$this->result[] = $obj;
+			}
+			return true;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler bei der Datenbankabfrage';
+			return false;
+		}
+	}
+
+	/**
+	 * Laedt die vorhandenen Verwendungen
+	 */
+	public function getVerwendungCodex()
+	{
+		$qry = "SELECT * FROM bis.tbl_verwendung ORDER BY verwendung_code";
+
+		if($this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object())
+			{
+				$obj = new StdClass();
+
+				$obj->verwendung_code = $row->verwendung_code;
+				$obj->verwendungbez = $row->verwendungbez;
+
+				$this->result[] = $obj;
 			}
 			return true;
 		}

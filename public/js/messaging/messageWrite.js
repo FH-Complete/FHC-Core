@@ -19,7 +19,7 @@ function tinymcePreviewSetContent()
 
 function parseMessageText(receiver_id, text)
 {
-	FHC_AjaxClient.ajaxCallGet(
+	FHC_AjaxClient.ajaxCallPost(
 		"system/messages/Messages/parseMessageText",
 		{
 			receiver_id: receiver_id,

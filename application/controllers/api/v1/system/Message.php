@@ -149,10 +149,10 @@ class Message extends APIv1_Controller
 		if (isSuccess($postMessage))
 		{
 			$result = $this->messagelib->sendMessageUser(
-				$this->post()['receiver_id']),																// receiverPersonId
+				$this->post()['receiver_id'],																// receiverPersonId
 				$this->post()['subject'],																	// subject
 				$this->post()['body'],																		// body
-				$this->post()['person_id']) ? $this->post()['person_id'] : null,							// sender_id
+				$this->post()['person_id'] ? $this->post()['person_id'] : null,								// sender_id
 				isset($this->post()['oe_kurzbz']) ? $this->post()['oe_kurzbz'] : null, 						// senderOU
 				isset($this->post()['relationmessage_id']) ? $this->post()['relationmessage_id'] : null,	// relationmessage_id
 				MSG_PRIORITY_NORMAL,																		// priority

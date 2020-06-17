@@ -1337,7 +1337,7 @@ class InfoCenter extends Auth_Controller
 				show_error(getError($prestudentWithZgv));
 			}
 
-			$zgvpruefung = $prestudentWithZgv->retval[0];
+			$zgvpruefung = getData($prestudentWithZgv);
 
 			if (isset($zgvpruefung->prestudentstatus))
 			{
@@ -1362,11 +1362,15 @@ class InfoCenter extends Auth_Controller
 			$zgvpruefung->isRtFreigegeben = false;
 			$zgvpruefung->isStgFreigegeben = false;
 			$zgvpruefung->sendStgFreigabeMsg = true;//wether Stgudiengangfreigabemessage can be sent (for "exceptions", Studiengänge with no message sending)
-			$this->PrestudentstatusModel->addSelect('bestaetigtam, statusgrund_id, tbl_status_grund.bezeichnung_mehrsprachig AS bezeichnung_statusgrund');
-			$this->PrestudentstatusModel->addJoin('public.tbl_status_grund', 'statusgrund_id', 'LEFT');
-			$isFreigegeben = $this->PrestudentstatusModel->loadWhere(array('studiensemester_kurzbz' => $zgvpruefung->prestudentstatus->studiensemester_kurzbz,
-														  'tbl_prestudentstatus.status_kurzbz' => self::INTERESSENTSTATUS, 'prestudent_id' => $prestudent->prestudent_id));
 
+			$isFreigegeben = null;
+			if (isset($zgvpruefung->prestudentstatus->studiensemester_kurzbz))
+			{
+				$this->PrestudentstatusModel->addSelect('bestaetigtam, statusgrund_id, tbl_status_grund.bezeichnung_mehrsprachig AS bezeichnung_statusgrund');
+				$this->PrestudentstatusModel->addJoin('public.tbl_status_grund', 'statusgrund_id', 'LEFT');
+				$isFreigegeben = $this->PrestudentstatusModel->loadWhere(array('studiensemester_kurzbz' => $zgvpruefung->prestudentstatus->studiensemester_kurzbz,
+															  'tbl_prestudentstatus.status_kurzbz' => self::INTERESSENTSTATUS, 'prestudent_id' => $prestudent->prestudent_id));
+			}
 
 			if (hasData($isFreigegeben))
 			{
@@ -1374,7 +1378,7 @@ class InfoCenter extends Auth_Controller
 				{
 					if (isset($prestudentstatus->bestaetigtam))
 					{
-						//if statusgrund set - RTfreigabe, otherwise Stgfreigabe
+						//if statusgrund set - freigegeben for Studiengang, otherwise freigegeben for RT
 						if (isset($prestudentstatus->statusgrund_id))
 						{
 							if (isset($prestudentstatus->bezeichnung_statusgrund[0])
@@ -1388,23 +1392,37 @@ class InfoCenter extends Auth_Controller
 							$zgvpruefung->isRtFreigegeben = true;
 					}
 				}
-			}
+            }
 
-			//application priority change possible?
-			$zgvpruefung->changeup = false;
-			$zgvpruefung->changedown = false;
+            //application priority change possible?
+            $zgvpruefung->changeup = false;
+            $zgvpruefung->changedown = false;
+            $zgvpruefung->hasBewerber = false;
 
-			if (isset($zgvpruefung->prestudentstatus->status_kurzbz) && $zgvpruefung->prestudentstatus->status_kurzbz == self::INTERESSENTSTATUS)
-			{
-				if (isset($zgvpruefung->prestudentstatus->studiensemester_kurzbz))
-				{
-					$studiensemester = $zgvpruefung->prestudentstatus->studiensemester_kurzbz;
-					$zgvpruefung->changeup = $this->PrestudentModel->checkPrioChange($zgvpruefung->prestudent_id, $studiensemester, -1);
-					$zgvpruefung->changedown = $this->PrestudentModel->checkPrioChange($zgvpruefung->prestudent_id, $studiensemester, 1);
-				}
-			}
+            if (isset($zgvpruefung->prestudentstatus->status_kurzbz) && $zgvpruefung->prestudentstatus->status_kurzbz == self::INTERESSENTSTATUS)
+            {
+                if (isset($zgvpruefung->prestudentstatus->studiensemester_kurzbz))
+                {
+                    $studiensemester = $zgvpruefung->prestudentstatus->studiensemester_kurzbz;
+                    //show warning if there is already another bewerber (RT result already exists)
+                    $bewerber = $this->PersonModel->hasBewerber($person_id, $studiensemester, 'b');
 
-			$zgvpruefungen[] = $zgvpruefung;
+                    if (hasData($bewerber))
+                    {
+                        $bewerbercnt = getData($bewerber);
+
+                        if (is_numeric($bewerbercnt[0]->anzahl_bewerber) && $bewerbercnt[0]->anzahl_bewerber > 0)
+                        {
+                            $zgvpruefung->hasBewerber = true;
+                        }
+                    }
+
+                    $zgvpruefung->changeup = $this->PrestudentModel->checkPrioChange($zgvpruefung->prestudent_id, $studiensemester, -1);
+                    $zgvpruefung->changedown = $this->PrestudentModel->checkPrioChange($zgvpruefung->prestudent_id, $studiensemester, 1);
+                }
+            }
+
+            $zgvpruefungen[] = $zgvpruefung;
 		}
 
 		$this->_sortPrestudents($zgvpruefungen);
@@ -1523,9 +1541,10 @@ class InfoCenter extends Auth_Controller
 			show_error(getError($prestudent));
 		}
 
-		$person_id = $prestudent->retval[0]->person_id;
-		$studiengang_kurzbz = $prestudent->retval[0]->studiengang;
-		$studiengang_bezeichnung = $prestudent->retval[0]->studiengangbezeichnung;
+		$prestudentdata = getData($prestudent);
+		$person_id = $prestudentdata->person_id;
+		$studiengang_kurzbz = $prestudentdata->studiengang;
+		$studiengang_bezeichnung = $prestudentdata->studiengangbezeichnung;
 
 		return array('person_id' => $person_id, 'studiengang_kurzbz' => $studiengang_kurzbz, 'studiengang_bezeichnung' => $studiengang_bezeichnung);
 	}
@@ -1568,7 +1587,8 @@ class InfoCenter extends Auth_Controller
 	private function _sendFreigabeMail($prestudent_id)
 	{
 		//get data
-		$prestudent = $this->PrestudentModel->getPrestudentWithZgv($prestudent_id)->retval[0];
+		$prestudent = $this->PrestudentModel->getPrestudentWithZgv($prestudent_id);
+		$prestudent = getData($prestudent);
 		$prestudentstatus = $prestudent->prestudentstatus;
 		$person_id = $prestudent->person_id;
 		$person = $this->PersonModel->getPersonStammdaten($person_id, true)->retval;

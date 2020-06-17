@@ -50,6 +50,11 @@ class abschlusspruefung extends basis_db
 	public $insertamum;
 	public $insertvon;
 	public $ext_id;
+	public $protokoll;
+	public $endezeit;
+	public $pruefungsantritt_kurzbz;
+	public $freigabedatum;
+
 
 	/**
 	 * Konstruktor
@@ -108,6 +113,10 @@ class abschlusspruefung extends basis_db
 				$this->insertamum = $row->insertamum;
 				$this->insertvon = $row->insertvon;
 				$this->ext_id = $row->ext_id;
+				$this->protokoll = $row->protokoll;
+				$this->endezeit = $row->endezeit;
+				$this->pruefungsantritt_kurzbz = $row->pruefungsantritt_kurzbz;
+				$this->freigabedatum = $row->freigabedatum;
 				return true;
 			}
 			else
@@ -195,7 +204,7 @@ class abschlusspruefung extends basis_db
 			$qry = "BEGIN;INSERT INTO lehre.tbl_abschlusspruefung (student_uid, vorsitz, pruefer1,
 					pruefer2, pruefer3, abschlussbeurteilung_kurzbz, akadgrad_id, datum, uhrzeit, sponsion,
 					pruefungstyp_kurzbz, anmerkung, updateamum, updatevon, insertamum, insertvon,
-					note) VALUES (".
+					note, protokoll, endezeit, pruefungsantritt_kurzbz, freigabedatum) VALUES (".
 						$this->db_add_param($this->student_uid).', '.
 						$this->db_add_param($this->vorsitz).', '.
 						$this->db_add_param($this->pruefer1).', '.
@@ -212,7 +221,11 @@ class abschlusspruefung extends basis_db
 						$this->db_add_param($this->updatevon).', '.
 						$this->db_add_param($this->insertamum).', '.
 						$this->db_add_param($this->insertvon).', '.
-						$this->db_add_param($this->note, FHC_INTEGER).');';
+						$this->db_add_param($this->note, FHC_INTEGER).','.
+						$this->db_add_param($this->protokoll).','.
+						$this->db_add_param($this->endezeit).','.
+						$this->db_add_param($this->pruefungsantritt_kurzbz).','.
+						$this->db_add_param($this->freigabedatum).');';
 
 		}
 		else
@@ -233,7 +246,11 @@ class abschlusspruefung extends basis_db
 				" pruefungstyp_kurzbz=".$this->db_add_param($this->pruefungstyp_kurzbz).",".
 				" anmerkung=".$this->db_add_param($this->anmerkung).",".
 				" updateamum=".$this->db_add_param($this->updateamum).",".
-				" updatevon=".$this->db_add_param($this->updatevon).
+				" updatevon=".$this->db_add_param($this->updatevon).",".
+				" protokoll=".$this->db_add_param($this->protokoll).",".
+				" endezeit=".$this->db_add_param($this->endezeit).",".
+				" pruefungsantritt_kurzbz=".$this->db_add_param($this->pruefungsantritt_kurzbz).",".
+				" freigabedatum=".$this->db_add_param($this->freigabedatum)." ".
 				" WHERE abschlusspruefung_id=".$this->db_add_param($this->abschlusspruefung_id, FHC_INTEGER, false);
 		}
 
@@ -315,6 +332,10 @@ class abschlusspruefung extends basis_db
 				$obj->insertamum = $row->insertamum;
 				$obj->insertvon = $row->insertvon;
 				$obj->ext_id = $row->ext_id;
+				$obj->protokoll = $row->protokoll;
+				$obj->endezeit = $row->endezeit;
+				$obj->pruefungsantritt_kurzbz = $row->pruefungsantritt_kurzbz;
+				$obj->freigabedatum = $row->freigabedatum;
 
 				$this->result[] = $obj;
 			}
@@ -366,6 +387,11 @@ class abschlusspruefung extends basis_db
 				$this->insertamum = $row->insertamum;
 				$this->insertvon = $row->insertvon;
 				$this->ext_id = $row->ext_id;
+				$this->protokoll = $row->protokoll;
+				$this->endezeit = $row->endezeit;
+				$this->pruefungsantritt_kurzbz = $row->pruefungsantritt_kurzbz;
+				$this->freigabedatum = $row->freigabedatum;
+
 			}
 			return true;
 		}

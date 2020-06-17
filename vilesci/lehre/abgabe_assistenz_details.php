@@ -261,7 +261,8 @@ if(isset($_POST["schick"]))
 								FROM public.tbl_person JOIN lehre.tbl_projektbetreuer ON(lehre.tbl_projektbetreuer.person_id=public.tbl_person.person_id)
 								LEFT JOIN public.tbl_benutzer ON(public.tbl_benutzer.person_id=public.tbl_person.person_id)
 								LEFT JOIN public.tbl_mitarbeiter ON(public.tbl_benutzer.uid=public.tbl_mitarbeiter.mitarbeiter_uid)
-								WHERE mitarbeiter_uid=".$db->db_add_param($erst);
+								WHERE mitarbeiter_uid=".$db->db_add_param($erst)." 
+								ORDER BY mitarbeiter_uid NULLS LAST";
 							if(!$betr=$db->db_query($qry_betr))
 							{
 								echo "<font color=\"#FF0000\">Fehler beim Laden des Erstbegutachters!</font><br>";

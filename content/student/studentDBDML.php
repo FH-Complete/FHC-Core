@@ -166,7 +166,7 @@ function generateMatrikelnummer($studiengang_kz, $studiensemester_kurzbz)
  * @param $note
  * @return null, error wird direkt in globale Variable geschrieben
  */
-function NotePruefungAnlegen($studiensemester_kurzbz, $student_uid, $lehrveranstaltung_id, $note)
+function NotePruefungAnlegen($studiensemester_kurzbz, $student_uid, $lehrveranstaltung_id, $note, $punkte)
 {
 	global $return, $error, $errormsg;
 
@@ -227,6 +227,8 @@ function NotePruefungAnlegen($studiensemester_kurzbz, $student_uid, $lehrveranst
 		if(count($benutzerfunktion->result)>0)
 			$anwesenheitsbefreit=true;
 
+		$gesamtnote_punkte = defined('CIS_GESAMTNOTE_PUNKTE') && CIS_GESAMTNOTE_PUNKTE;
+
 		// Wenn nicht Anwesenheitsbefreit und Anwesenheit unter einem bestimmten Prozentsatz faellt dann wird ein
 		// Pruefungsantritt abgezogen
 		if(isset($anwesenheit->result[0]) && $anwesenheit->result[0]->prozent < FAS_ANWESENHEIT_ROT && !$anwesenheitsbefreit)
@@ -239,6 +241,8 @@ function NotePruefungAnlegen($studiensemester_kurzbz, $student_uid, $lehrveranst
 				// 2. Termin mit Note erstellen
 				$pruefung->pruefungstyp_kurzbz = "Termin2";
 				$pruefung->note = $note;
+				if($gesamtnote_punkte)
+					$pruefung->punkte = $punkte;
 				if($pruefung->save())
 				{
 					$return = true;
@@ -260,6 +264,8 @@ function NotePruefungAnlegen($studiensemester_kurzbz, $student_uid, $lehrveranst
 			// 1. Termin mit Note erstellen
 			$pruefung->pruefungstyp_kurzbz = "Termin1";
 			$pruefung->note = $note;
+			if($gesamtnote_punkte)
+				$pruefung->punkte = $punkte;
 
 			if($pruefung->save())
 			{
@@ -1897,16 +1903,28 @@ if(!$error)
 			}
 			if(!$error)
 			{
-				$akte = new akte();
-
-				if($akte->delete($_POST['akte_id']))
+				$akte = new akte($_POST['akte_id']);
+				//Akzeptierte Ausbildungsverträge dürfen nur von Admins gelöscht werden
+				if ($akte->dokument_kurzbz == 'Ausbvert' &&
+					$akte->akzeptiertamum != '' &&
+					!$rechte->isBerechtigt('admin',$_POST['studiengang_kz'], 'suid'))
 				{
-					$return = true;
-				}
-				else
-				{
+					$error = true;
 					$return = false;
-					$errormsg = $akte->errormsg;
+					$errormsg = 'Akzeptierte Ausbildungsverträge dürfen nur von Administratoren gelöscht werden';
+				}
+
+				if(!$error)
+				{
+					if ($akte->delete($_POST['akte_id']))
+					{
+						$return = true;
+					}
+					else
+					{
+						$return = false;
+						$errormsg = $akte->errormsg;
+					}
 				}
 			}
 		}
@@ -3065,7 +3083,7 @@ if(!$error)
 
 					if(defined('FAS_PRUEFUNG_BEI_NOTENEINGABE_ANLEGEN') && FAS_PRUEFUNG_BEI_NOTENEINGABE_ANLEGEN && $return == true && $noten->new == true)
 					{
-						NotePruefungAnlegen($studiensemester_kurzbz, $student_uid, $lehrveranstaltung_id, $noten->note);
+						NotePruefungAnlegen($studiensemester_kurzbz, $student_uid, $lehrveranstaltung_id, $noten->note, $noten->punkte);
 					}
 				}
 			}
@@ -3193,7 +3211,7 @@ if(!$error)
 						{
 							if(defined('FAS_PRUEFUNG_BEI_NOTENEINGABE_ANLEGEN') && FAS_PRUEFUNG_BEI_NOTENEINGABE_ANLEGEN && $zeugnisnote->new == true)
 							{
-								NotePruefungAnlegen($zeugnisnote->studiensemester_kurzbz, $zeugnisnote->student_uid, $zeugnisnote->lehrveranstaltung_id, $zeugnisnote->note);
+								NotePruefungAnlegen($zeugnisnote->studiensemester_kurzbz, $zeugnisnote->student_uid, $zeugnisnote->lehrveranstaltung_id, $zeugnisnote->note, $zeugnisnote->punkte);
 							}
 						}
 					}
@@ -3362,7 +3380,7 @@ if(!$error)
 							{
 								if(defined('FAS_PRUEFUNG_BEI_NOTENEINGABE_ANLEGEN') && FAS_PRUEFUNG_BEI_NOTENEINGABE_ANLEGEN && $zeugnisnote->new == true)
 								{
-									NotePruefungAnlegen($semester_aktuell, $uid, $_POST['lehrveranstaltung_id'], $zeugnisnote->note);
+									NotePruefungAnlegen($semester_aktuell, $uid, $_POST['lehrveranstaltung_id'], $zeugnisnote->note, $zeugnisnote->punkte);
 								}
 							}
 						}
@@ -3764,6 +3782,9 @@ if(!$error)
 			$pruefung->pruefer2 = $_POST['pruefer2'];
 			$pruefung->pruefer3 = $_POST['pruefer3'];
 			$pruefung->abschlussbeurteilung_kurzbz = $_POST['abschlussbeurteilung_kurzbz'];
+			if(isset($_POST['pruefungsantritt_kurzbz']))
+				$pruefung->pruefungsantritt_kurzbz = $_POST['pruefungsantritt_kurzbz'];
+
 			$pruefung->note = $_POST['notekommpruef'];
 			$pruefung->akadgrad_id = $_POST['akadgrad_id'];
 			$pruefung->pruefungstyp_kurzbz = $_POST['pruefungstyp_kurzbz'];
@@ -3803,10 +3824,25 @@ if(!$error)
 			if(isset($_POST['abschlusspruefung_id']) && is_numeric($_POST['abschlusspruefung_id']))
 			{
 				$pruefung = new abschlusspruefung();
-
-				if($pruefung->delete($_POST['abschlusspruefung_id']))
+				if($pruefung->load($_POST['abschlusspruefung_id']))
 				{
-					$return = true;
+					if ($pruefung->freigabedatum == '')
+					{
+						if($pruefung->delete($_POST['abschlusspruefung_id']))
+						{
+							$return = true;
+						}
+						else
+						{
+							$errormsg = $pruefung->errormsg;
+							$return = false;
+						}
+					}
+					else
+					{
+						$errormsg = 'Löschen ist nicht möglich da bereits ein freigegebenes Protokoll vorhanden ist';
+						$return = false;
+					}
 				}
 				else
 				{

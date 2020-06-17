@@ -3565,7 +3565,6 @@ if(!$result = @$db->db_query("SELECT offsetpunkte FROM testtool.tbl_gebiet LIMIT
 // ADD COLUMN offset to testtool.vw_auswertung_ablauf
 if(!$result = @$db->db_query("SELECT offsetpunkte FROM testtool.vw_auswertung_ablauf LIMIT 1"))
 {
-	// CREATE OR REPLACE VIEW testtool.vw_auswertung_ablauf
 	$qry = '
 		CREATE OR REPLACE VIEW testtool.vw_auswertung_ablauf AS (
 			SELECT
@@ -3618,12 +3617,11 @@ if(!$result = @$db->db_query("SELECT offsetpunkte FROM testtool.vw_auswertung_ab
 		echo '<br>testtool.vw_auswertung_ablauf view created';
 }
 
-// ADD COLUMN offset to testtool.vw_auswertung_ablauf
+// ADD COLUMN offset to testtool.vw_auswertung
 if(!$result = @$db->db_query("SELECT offsetpunkte FROM testtool.vw_auswertung LIMIT 1"))
 {
-	// CREATE OR REPLACE VIEW testtool.vw_auswertung_ablauf
 	$qry = '
-					CREATE OR REPLACE VIEW testtool.vw_auswertung AS
+		CREATE OR REPLACE VIEW testtool.vw_auswertung AS
 			SELECT
 				tbl_gebiet.gebiet_id,
 				tbl_gebiet.bezeichnung AS gebiet,
@@ -3825,7 +3823,7 @@ if(!$result = @$db->db_query('SELECT "IBAN Studiengang", "BIC Studiengang", "Stu
 	if(!$db->db_query($qry))
 		echo '<strong>public.vw_msg_vars: '.$db->db_last_error().'</strong><br>';
 	else
-		echo '<br>public.vw_msg_vars IBAN Studiengang, BIC Studiengang, Studiengangskennzahl, Einstiegssemester, Einstiegsstudiensemester, Vorname Studiengangsassistenz, Nachname Studiengangsassistenz, Durchwahl Studiengangsassistenz, Relative Priorität added';
+		echo '<br>public.vw_msg_vars IBAN Studiengang, BIC Studiengang, Studiengangskennzahl, Einstiegssemester, Einstiegsstudiensemester, Vorname Studiengangsassistenz, Nachname Studiengangsassistenz, Durchwahl Studiengangsassistenz, Alias Studiengangsassistenz, Relative Priorität added';
 }
 
 // UNIQUE INDEX unq_idx_ablauf_gebiet_studiengang_semester in testtool.tbl_ablauf löschen und durch neuen INDEX ersetzen, der auch den Studienplan einschließt
@@ -4031,6 +4029,366 @@ if (!$result = @$db->db_query("SELECT iso3166_1_a2 FROM bis.tbl_nation LIMIT 1")
 		echo '<br>bis.tbl_nation.iso3166_1_a2: Spalte iso3166_1_a2 hinzugefuegt';
 }
 
+// Spalte bezeichnung_mehrsprachig in public.tbl_studiengangstyp
+if(!$result = @$db->db_query("SELECT bezeichnung_mehrsprachig FROM public.tbl_studiengangstyp LIMIT 1"))
+{
+	$qry = "ALTER TABLE public.tbl_studiengangstyp ADD COLUMN bezeichnung_mehrsprachig varchar(255)[];";
+
+	if(!$db->db_query($qry))
+		echo '<strong>public.tbl_studiengangstyp '.$db->db_last_error().'</strong><br>';
+	else
+		echo 'public.tbl_studiengangstyp: Spalte bezeichnung_mehrsprachig hinzugefuegt!<br>';
+
+	// Bezeichnung_mehrsprachig aus existierender Bezeichnung vorausfuellen. Ein Eintrag fuer jede Sprache mit Content aktiv.
+	$qry_help = "SELECT index FROM public.tbl_sprache WHERE content=TRUE;";
+	if(!$result = $db->db_query($qry_help))
+		echo '<strong>tbl_studiengangstyp bezeichnung_mehrsprachig: Fehler beim ermitteln der Sprachen: '.$db->db_last_error().'</strong>';
+	else
+	{
+		$qry='';
+		while($row = $db->db_fetch_object($result))
+			$qry.= "UPDATE public.tbl_studiengangstyp set bezeichnung_mehrsprachig[".$row->index."] = bezeichnung;";
+
+		if(!$db->db_query($qry))
+			echo '<strong>Setzen der bezeichnung_mehrsprachig fehlgeschlagen: '.$db->db_last_error().'</strong><br>';
+		else
+			echo 'bis.tbl_studiengangstyp: bezeichnung_mehrprachig automatisch aus existierender Bezeichnung uebernommen<br>';
+	}
+}
+
+/**
+ * Anpassungen fuer BIS Personalmeldung 6.8
+ */
+if (!$result = @$db->db_query("SELECT ba1code_bis FROM bis.tbl_beschaeftigungsart1 LIMIT 1"))
+{
+	/*
+	Beschaeftigungsausmass Kodextabelle aktualisieren
+
+	BA1Code alt 1 => BA1Code neu 1
+	BA1Code alt 2 => BA1Code neu 2
+	BA1Code alt 3 => BA1Code neu 3 (Echter DV)
+	BA1Code alt 4 => BA1Code neu 5 (Freier DV -> Sonstiges)
+	BA1Code alt 5 => BA1Code neu 4
+	BA1Code alt 6 => BA1Code neu 5 (Werkvertrag -> Sonstiges)
+
+	BA1Code ist nicht mehr der Code der gemeldet wird.
+	BA1code wird um 100 erhöht damit klar ist, dass es sich um einen anderen Code handelt.
+	*/
+	$qry = "
+		ALTER TABLE bis.tbl_beschaeftigungsart1 ADD COLUMN ba1code_bis smallint;
+		UPDATE bis.tbl_beschaeftigungsart1 SET ba1code_bis=1, ba1code=101 WHERE ba1code=1;
+		UPDATE bis.tbl_beschaeftigungsart1 SET ba1code_bis=2, ba1code=102 WHERE ba1code=2;
+		UPDATE bis.tbl_beschaeftigungsart1 SET ba1code_bis=3, ba1code=103 WHERE ba1code=3;
+		UPDATE bis.tbl_beschaeftigungsart1 SET ba1code_bis=5, ba1code=105 WHERE ba1code=4;
+		UPDATE bis.tbl_beschaeftigungsart1 SET ba1code_bis=4, ba1code=104 WHERE ba1code=5;
+		UPDATE bis.tbl_beschaeftigungsart1 SET ba1code_bis=6, ba1code=106 WHERE ba1code=6;
+		";
+
+	/*
+	Für Werkvertraege wird eine eigene Beschaeftigungsart erstellt.
+	Die alten Eintraege für "Sonstiges (Werkvertrag)" werden auf diese neue Beschaeftigungsart umgehaengt
+	da diese bei uns alles Werkvertraege sind.
+	Fuer Studentische Hilfskraefte wird ebenfalls eine eigene Beschaeftigungsart erstellt.
+	Diese werden als Echter DV gemeldet aber getrennt verwaltet.
+	Alle Personen mit einer Funktion als Hilfskraft werden auf diese Beschaeftigungsart geaendert.
+	*/
+	$qry .= "
+		INSERT INTO bis.tbl_beschaeftigungsart1(ba1code, ba1bez, ba1kurzbz, ba1code_bis) VALUES(107,'Werkvertrag (Sonstiges)','Werkvertrag (Sonstiges)', 5);
+		INSERT INTO bis.tbl_beschaeftigungsart1(ba1code, ba1bez, ba1kurzbz, ba1code_bis) VALUES(108,'Studentische Hilfskraft (Echter DV)','Stud. Hilfskraft (Echter DV)', 3);
+		UPDATE bis.tbl_bisverwendung SET ba1code=107 WHERE ba1code=106;
+		UPDATE bis.tbl_bisverwendung SET ba1code=108 WHERE ba1code=103 AND EXISTS(
+			SELECT 1 FROM public.tbl_benutzerfunktion
+			WHERE uid=tbl_bisverwendung.mitarbeiter_uid AND funktion_kurzbz='hilfskraft' AND
+				(
+					datum_von BETWEEN tbl_bisverwendung.beginn AND tbl_bisverwendung.ende
+					OR
+					datum_bis BETWEEN tbl_bisverwendung.beginn AND tbl_bisverwendung.ende
+				)
+		);
+		";
+
+	$qry .= "
+		UPDATE bis.tbl_beschaeftigungsart1 SET ba1bez='Dienstverhältnis zur postsekundären Bildungseinrichtung oder deren Träger' WHERE ba1code=103;
+		UPDATE bis.tbl_beschaeftigungsart1 SET ba1kurzbz='Lehr- oder Ausbildungsverhältnis', ba1bez='Lehr- oder Ausbildungsverhältnis' WHERE ba1code=104;
+		UPDATE bis.tbl_beschaeftigungsart1 SET ba1kurzbz='Freier Dienstvertrag (Sonstiges)', ba1bez='Sonstiges Beschäftigungsverhältnis' WHERE ba1code=105;
+		UPDATE bis.tbl_beschaeftigungsart1 SET ba1kurzbz='Andere Bildungseinrichtung', ba1bez='Dienstverhältnis zu einer anderen Bildungseinrichtung oder einem anderen Träger' WHERE ba1code=106;
+	";
+
+	/*
+	Verwendungs Kodextabelle aktualisieren
+
+	VerwendungCode alt 1 => VerwendungsCode neu 1
+	VerwendungCode alt 2 => VerwendungsCode neu 2
+	VerwendungCode alt 3 => VerwendungsCode neu 3
+	VerwendungCode alt 4 => VerwendungsCode neu 4
+	VerwendungCode alt 5 => VerwendungsCode neu 5
+	VerwendungCode alt 6 => VerwendungsCode neu 5
+	VerwendungCode alt 7 => VerwendungsCode neu 5
+	VerwendungCode alt 8 => VerwendungsCode neu 6
+	VerwendungCode alt 9 => VerwendungsCode neu 7
+	*/
+
+	$qry .= "
+		UPDATE bis.tbl_bisverwendung SET verwendung_code=5 WHERE verwendung_code=6;
+		UPDATE bis.tbl_bisverwendung SET verwendung_code=5 WHERE verwendung_code=7;
+		UPDATE bis.tbl_bisverwendung SET verwendung_code=6 WHERE verwendung_code=8;
+		UPDATE bis.tbl_bisverwendung SET verwendung_code=7 WHERE verwendung_code=9;
+
+		UPDATE bis.tbl_verwendung SET verwendungbez='wissenschaftliche Lehre und Forschung' WHERE verwendung_code=1;
+		UPDATE bis.tbl_verwendung SET verwendungbez='wissenschaftliche Mitarbeit in Lehre und Forschung' WHERE verwendung_code=2;
+		UPDATE bis.tbl_verwendung SET verwendungbez='professionelle Unterstützung der Studierenden in akademischen Belangen' WHERE verwendung_code=3;
+		UPDATE bis.tbl_verwendung SET verwendungbez='professionelle Unterstützung der Studierenden in Gesundheits- und Sozialbelangen' WHERE verwendung_code=4;
+		UPDATE bis.tbl_verwendung SET verwendungbez='Management' WHERE verwendung_code=5;
+		UPDATE bis.tbl_verwendung SET verwendungbez='Verwaltung' WHERE verwendung_code=6;
+		UPDATE bis.tbl_verwendung SET verwendungbez='Wartung und Betrieb' WHERE verwendung_code=7;
+
+		DELETE FROM bis.tbl_verwendung WHERE verwendung_code=8;
+		DELETE FROM bis.tbl_verwendung WHERE verwendung_code=9;
+	";
+
+	$qry.="
+		INSERT INTO public.tbl_funktion(funktion_kurzbz, beschreibung, aktiv, fachbereich, semester) VALUES('vertrBefugter','Vertretungsbefugte/r des Erhalters',true,false,false);
+		INSERT INTO public.tbl_funktion(funktion_kurzbz, beschreibung, aktiv, fachbereich, semester) VALUES('kollegium_Ltg','Leiter/in des Kollegiums',true,false,false);
+		INSERT INTO public.tbl_funktion(funktion_kurzbz, beschreibung, aktiv, fachbereich, semester) VALUES('kollegium_stvLtg','Stellv. Leiter/in des Kollegiums',true,false,false);
+	";
+
+	if(!$db->db_query($qry))
+		echo '<strong>bis.tbl_verwendung und bis.tbl_beschaeftigungsart: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Verwendung und Beschaeftigungsart für BIS Version 6.8 aktualisiert.';
+}
+
+// Orgform DE und Orform EN zu vw_msg_vars hinzufügen
+if(!$result = @$db->db_query('SELECT "Orgform DE", "Orgform EN" FROM public.vw_msg_vars LIMIT 1'))
+{
+	$qry = '
+	CREATE OR REPLACE VIEW public.vw_msg_vars AS (
+		SELECT DISTINCT ON(p.person_id, pr.prestudent_id) p.person_id,
+		  pr.prestudent_id AS prestudent_id,
+		  p.nachname AS "Nachname",
+		  p.vorname AS "Vorname",
+		  p.anrede AS "Anrede",
+		  a.strasse AS "Strasse",
+		  a.ort AS "Ort",
+		  a.plz AS "PLZ",
+		  a.gemeinde AS "Gemeinde",
+		  a.langtext AS "Nation",
+		  ke.kontakt AS "Email",
+		  kt.kontakt AS "Telefon",
+		  s.bezeichnung AS "Studiengang DE",
+		  s.english AS "Studiengang EN",
+		  st.bezeichnung AS "Typ",
+		  last_prestudent_status.orgform_kurzbz AS "Orgform",
+		  p.zugangscode AS "Zugangscode",
+		  bk.iban AS "IBAN Studiengang",
+		  bk.bic AS "BIC Studiengang",
+		  s.studiengang_kz AS "Studiengangskennzahl",
+		  first_prestudent_status.ausbildungssemester AS "Einstiegssemester",
+		  first_prestudent_status.studiensemester AS "Einstiegsstudiensemester",
+		  ass.vorname AS "Vorname Studiengangsassistenz",
+		  ass.nachname AS "Nachname Studiengangsassistenz",
+		  ass.telefonklappe AS "Durchwahl Studiengangsassistenz",
+		  ass.alias AS "Alias Studiengangsassistenz",
+		  (SELECT count(*)
+		   FROM (
+					SELECT pss.prestudent_id, pss.person_id, priorisierung,
+						   (
+							   SELECT status_kurzbz
+							   FROM public.tbl_prestudentstatus
+							   WHERE prestudent_id = pss.prestudent_id
+							   ORDER BY datum DESC,
+										tbl_prestudentstatus.insertamum DESC LIMIT 1
+						   ) AS laststatus
+					FROM public.tbl_prestudent pss
+					JOIN public.tbl_prestudentstatus USING (prestudent_id)
+					WHERE person_id = (
+						SELECT person_id
+						FROM public.tbl_prestudent
+						WHERE prestudent_id = pr.prestudent_id
+					)
+					  AND studiensemester_kurzbz = (
+						SELECT studiensemester_kurzbz
+						FROM public.tbl_prestudentstatus
+						WHERE prestudent_id = pr.prestudent_id
+						  AND status_kurzbz = \'Interessent\' LIMIT 1
+					)
+					  AND status_kurzbz = \'Interessent\'
+				) prest
+		   WHERE laststatus NOT IN (\'Abbrecher\', \'Abgewiesener\', \'Absolvent\')
+		   AND priorisierung <= pr.priorisierung) AS "Relative Prio",
+		   last_prestudent_status.orgform_bezeichnung_de AS "Orgform DE",
+           last_prestudent_status.orgform_bezeichnung_en AS "Orgform EN"
+		FROM public.tbl_person p
+		LEFT JOIN (
+			SELECT person_id,
+				   kontakt
+			FROM public.tbl_kontakt
+			WHERE zustellung = TRUE
+			  AND kontakttyp = \'email\'
+			ORDER BY kontakt_id DESC
+		) ke USING(person_id)
+		LEFT JOIN (
+			SELECT person_id,
+				   kontakt
+			FROM public.tbl_kontakt
+			WHERE zustellung = TRUE
+			  AND kontakttyp IN (\'telefon\', \'mobil\')
+			ORDER BY kontakt_id DESC
+		) kt USING(person_id)
+		LEFT JOIN (
+			SELECT person_id,
+				   strasse,
+				   ort,
+				   plz,
+				   gemeinde,
+				   langtext
+			FROM public.tbl_adresse
+					 LEFT JOIN bis.tbl_nation ON(bis.tbl_nation.nation_code = public.tbl_adresse.nation)
+			WHERE public.tbl_adresse.heimatadresse = TRUE
+			ORDER BY adresse_id DESC
+		) a USING(person_id)
+		LEFT JOIN public.tbl_prestudent pr USING(person_id)
+		INNER JOIN public.tbl_studiengang s USING(studiengang_kz)
+		INNER JOIN public.tbl_studiengangstyp st USING(typ)
+		LEFT JOIN (
+			SELECT DISTINCT ON (ps.prestudent_id) ps.prestudent_id, tbl_studienplan.orgform_kurzbz,
+				tbl_orgform.bezeichnung_mehrsprachig[(SELECT index FROM public.tbl_sprache WHERE content=TRUE AND sprache=\'German\' LIMIT 1)] AS orgform_bezeichnung_de,
+            	tbl_orgform.bezeichnung_mehrsprachig[(SELECT index FROM public.tbl_sprache WHERE content=TRUE AND sprache=\'English\' LIMIT 1)] AS orgform_bezeichnung_en
+			FROM public.tbl_prestudent ps
+					 JOIN public.tbl_prestudentstatus ON ps.prestudent_id = tbl_prestudentstatus.prestudent_id
+					 JOIN lehre.tbl_studienplan USING(studienplan_id)
+					 LEFT JOIN bis.tbl_orgform ON tbl_studienplan.orgform_kurzbz = tbl_orgform.orgform_kurzbz
+			ORDER BY ps.prestudent_id DESC,
+					 tbl_prestudentstatus.datum DESC,
+					 tbl_prestudentstatus.insertamum DESC,
+					 tbl_prestudentstatus.ext_id DESC
+		) last_prestudent_status ON pr.prestudent_id = last_prestudent_status.prestudent_id
+		LEFT JOIN (
+			SELECT DISTINCT ON (ps.prestudent_id) ps.prestudent_id, tbl_prestudentstatus.ausbildungssemester,
+												  studiensemester_kurzbz, tbl_studiensemester.bezeichnung AS studiensemester,
+												  tbl_studienordnung.studiengang_kz
+			FROM public.tbl_prestudent ps
+					 JOIN public.tbl_prestudentstatus ON ps.prestudent_id = tbl_prestudentstatus.prestudent_id
+					 JOIN public.tbl_studiensemester USING (studiensemester_kurzbz)
+					 JOIN lehre.tbl_studienplan USING(studienplan_id)
+					 JOIN lehre.tbl_studienordnung USING (studienordnung_id)
+			WHERE tbl_prestudentstatus.status_kurzbz = \'Interessent\'
+			ORDER BY ps.prestudent_id ASC,
+					 tbl_prestudentstatus.datum ASC,
+					 tbl_prestudentstatus.insertamum ASC,
+					 tbl_prestudentstatus.ext_id ASC
+		) first_prestudent_status ON pr.prestudent_id = first_prestudent_status.prestudent_id
+				 LEFT JOIN (
+			SELECT DISTINCT ON (tbl_benutzerfunktion.oe_kurzbz) vorname, nachname, oe_kurzbz, telefonklappe, alias
+			FROM public.tbl_benutzerfunktion
+					 JOIN public.tbl_benutzer USING (uid)
+					 JOIN public.tbl_person USING (person_id)
+					 JOIN public.tbl_mitarbeiter on tbl_benutzer.uid = tbl_mitarbeiter.mitarbeiter_uid
+			WHERE tbl_benutzerfunktion.funktion_kurzbz = \'ass\'
+			  AND NOW() BETWEEN COALESCE(datum_von, NOW()) AND COALESCE(datum_bis, NOW())
+			ORDER BY tbl_benutzerfunktion.oe_kurzbz, tbl_benutzerfunktion.insertamum DESC NULLS LAST, datum_von DESC NULLS LAST
+		) ass ON s.oe_kurzbz = ass.oe_kurzbz
+				 LEFT JOIN (
+			SELECT DISTINCT ON (oe_kurzbz, orgform_kurzbz) oe_kurzbz, orgform_kurzbz, iban, bic
+			FROM tbl_bankverbindung
+			WHERE oe_kurzbz IS NOT NULL
+			ORDER BY oe_kurzbz, orgform_kurzbz, tbl_bankverbindung.insertamum DESC,tbl_bankverbindung.iban
+		)bk ON s.oe_kurzbz = bk.oe_kurzbz AND (last_prestudent_status.orgform_kurzbz = bk.orgform_kurzbz OR bk.orgform_kurzbz IS NULL)
+		WHERE p.aktiv = TRUE
+		ORDER BY p.person_id ASC, pr.prestudent_id ASC
+	);';
+
+	if(!$db->db_query($qry))
+		echo '<strong>public.vw_msg_vars: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>public.vw_msg_vars added';
+}
+
+// Spalte akzeptiertamum in public.tbl_akte
+if(!$result = @$db->db_query("SELECT akzeptiertamum FROM public.tbl_akte LIMIT 1"))
+{
+	$qry = "ALTER TABLE public.tbl_akte ADD COLUMN akzeptiertamum timestamp without time zone;";
+
+	if(!$db->db_query($qry))
+		echo '<strong>public.tbl_akte '.$db->db_last_error().'</strong><br>';
+	else
+		echo 'public.tbl_akte: Spalte akzeptiertamum hinzugefuegt!<br>';
+}
+
+// TABLE lehre.tbl_abschlusspruefung_antritt
+if (!@$db->db_query("SELECT 0 FROM lehre.tbl_abschlusspruefung_antritt WHERE 0 = 1"))
+{
+	$qry = '
+		CREATE TABLE lehre.tbl_abschlusspruefung_antritt (
+			pruefungsantritt_kurzbz character varying(20) NOT NULL,
+			bezeichnung character varying(64),
+			bezeichnung_english character varying(64),
+			sort smallint
+		);
+		ALTER TABLE lehre.tbl_abschlusspruefung_antritt ADD CONSTRAINT pk_abschlusspruefung_antritt PRIMARY KEY (pruefungsantritt_kurzbz);
+		INSERT INTO lehre.tbl_abschlusspruefung_antritt(pruefungsantritt_kurzbz, bezeichnung, bezeichnung_english, sort) VALUES (\'erstantritt\', \'Erstantritt\', \'1st Attempt\', 1);
+		INSERT INTO lehre.tbl_abschlusspruefung_antritt(pruefungsantritt_kurzbz, bezeichnung, bezeichnung_english, sort) VALUES (\'erstewiederholung\', \'1. Wiederholung\', \'1st Retake\', 2);
+		INSERT INTO lehre.tbl_abschlusspruefung_antritt(pruefungsantritt_kurzbz, bezeichnung, bezeichnung_english, sort) VALUES (\'zweitewiederholung\', \'2. Wiederholung\', \'2nd Retake\', 3);';
+
+	if (!$db->db_query($qry))
+		echo '<strong>lehre.tbl_abschlusspruefung_antritt '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Created table lehre.tbl_abschlusspruefung_antritt';
+
+	// GRANT SELECT ON TABLE lehre.tbl_abschlusspruefung_antritt TO web;
+	$qry = 'GRANT SELECT ON TABLE lehre.tbl_abschlusspruefung_antritt TO web;';
+	if (!$db->db_query($qry))
+		echo '<strong>lehre.tbl_abschlusspruefung_antritt '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Granted privileges to <strong>web</strong> on lehre.tbl_abschlusspruefung_antritt';
+
+	// GRANT SELECT, UPDATE, INSERT, DELETE ON TABLE lehre.tbl_abschlusspruefung_antritt TO vilesci;
+	$qry = 'GRANT SELECT, UPDATE, INSERT, DELETE ON TABLE lehre.tbl_abschlusspruefung_antritt TO vilesci;';
+	if (!$db->db_query($qry))
+		echo '<strong>lehre.tbl_abschlusspruefung_antritt '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Granted privileges to <strong>vilesci</strong> on lehre.tbl_abschlusspruefung_antritt';
+
+	// GRANT SELECT, UPDATE ON TABLE lehre.tbl_abschlusspruefung TO web;
+	$qry = 'GRANT SELECT, UPDATE ON lehre.tbl_abschlusspruefung TO web;';
+	if (!$db->db_query($qry))
+		echo '<strong>lehre.tbl_abschlusspruefung '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Granted privileges to <strong>web</strong> on lehre.tbl_abschlusspruefung';
+
+	// COMMENT ON TABLE lehre.tbl_abschlusspruefung_antritt
+	$qry = 'COMMENT ON TABLE lehre.tbl_abschlusspruefung_antritt IS \'Type of Abschlusspruefung depending on number of attempts\';';
+	if (!$db->db_query($qry))
+		echo '<strong>Adding comment to lehre.tbl_abschlusspruefung_antritt: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Added comment to lehre.tbl_abschlusspruefung_antritt';
+}
+// add protokoll,endezeit,pruefungsantritt_kurzbz,freigabedatum to lehre.tbl_abschlusspruefung
+if(!$result = @$db->db_query("SELECT protokoll,endezeit,pruefungsantritt_kurzbz,freigabedatum FROM lehre.tbl_abschlusspruefung LIMIT 1"))
+{
+	$qry = "ALTER TABLE lehre.tbl_abschlusspruefung ADD COLUMN protokoll text;
+			ALTER TABLE lehre.tbl_abschlusspruefung ADD COLUMN endezeit time;
+			ALTER TABLE lehre.tbl_abschlusspruefung ADD COLUMN pruefungsantritt_kurzbz character varying(20);
+			ALTER TABLE lehre.tbl_abschlusspruefung ADD CONSTRAINT fk_abschlusspruefung_antritt FOREIGN KEY (pruefungsantritt_kurzbz) REFERENCES lehre.tbl_abschlusspruefung_antritt (pruefungsantritt_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;
+			ALTER TABLE lehre.tbl_abschlusspruefung ADD COLUMN freigabedatum date;";
+
+	if(!$db->db_query($qry))
+		echo '<strong>lehre.tbl_abschlusspruefung: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>lehre.tbl_abschlusspruefung: Spalten protokoll,endezeit,pruefungsantritt_kurzbz,freigabedatum hinzugefuegt';
+}
+
+// Spalte sort in lehre.tbl_abschlussbeurteilung (gibt Reihenfolge der Beurteilungen an)
+if(!$result = @$db->db_query("SELECT sort FROM lehre.tbl_abschlussbeurteilung LIMIT 1;"))
+{
+	$qry = "ALTER TABLE lehre.tbl_abschlussbeurteilung ADD COLUMN sort smallint;";
+
+	if(!$db->db_query($qry))
+		echo '<strong>lehre.tbl_abschlussbeurteilung: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>lehre.tbl_abschlussbeurteilung: Spalte sort hinzugefuegt!<br>';
+}
+
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
 
@@ -4041,7 +4399,7 @@ $tabellen=array(
 	"bis.tbl_bisio_aufenthaltfoerderung" => array("bisio_id","aufenthaltfoerderung_code"),
 	"bis.tbl_ausbildung"  => array("ausbildungcode","ausbildungbez","ausbildungbeschreibung"),
 	"bis.tbl_berufstaetigkeit"  => array("berufstaetigkeit_code","berufstaetigkeit_bez","berufstaetigkeit_kurzbz"),
-	"bis.tbl_beschaeftigungsart1"  => array("ba1code","ba1bez","ba1kurzbz"),
+	"bis.tbl_beschaeftigungsart1"  => array("ba1code","ba1bez","ba1kurzbz","ba1code_bis"),
 	"bis.tbl_beschaeftigungsart2"  => array("ba2code","ba2bez"),
 	"bis.tbl_beschaeftigungsausmass"  => array("beschausmasscode","beschausmassbez","min","max"),
 	"bis.tbl_besqual"  => array("besqualcode","besqualbez"),
@@ -4133,8 +4491,9 @@ $tabellen=array(
 	"fue.tbl_ressource"  => array("ressource_id","student_uid","mitarbeiter_uid","betriebsmittel_id","firma_id","bezeichnung","beschreibung","insertamum","insertvon","updateamum","updatevon"),
 	"fue.tbl_scrumteam" => array("scrumteam_kurzbz","bezeichnung","punkteprosprint","tasksprosprint","gruppe_kurzbz"),
 	"fue.tbl_scrumsprint" => array("scrumsprint_id","scrumteam_kurzbz","sprint_kurzbz","sprintstart","sprintende","insertamum","insertvon","updateamum","updatevon"),
-	"lehre.tbl_abschlussbeurteilung"  => array("abschlussbeurteilung_kurzbz","bezeichnung","bezeichnung_english"),
-	"lehre.tbl_abschlusspruefung"  => array("abschlusspruefung_id","student_uid","vorsitz","pruefer1","pruefer2","pruefer3","abschlussbeurteilung_kurzbz","akadgrad_id","pruefungstyp_kurzbz","datum","uhrzeit","sponsion","anmerkung","updateamum","updatevon","insertamum","insertvon","ext_id","note"),
+	"lehre.tbl_abschlussbeurteilung"  => array("abschlussbeurteilung_kurzbz","bezeichnung","bezeichnung_english","sort"),
+	"lehre.tbl_abschlusspruefung"  => array("abschlusspruefung_id","student_uid","vorsitz","pruefer1","pruefer2","pruefer3","abschlussbeurteilung_kurzbz","akadgrad_id","pruefungstyp_kurzbz","datum","uhrzeit","sponsion","anmerkung","updateamum","updatevon","insertamum","insertvon","ext_id","note","protokoll","endezeit","pruefungsantritt_kurzbz","freigabedatum"),
+	"lehre.tbl_abschlusspruefung_antritt"  => array("pruefungsantritt_kurzbz","bezeichnung","bezeichnung_english","sort"),
 	"lehre.tbl_akadgrad"  => array("akadgrad_id","akadgrad_kurzbz","studiengang_kz","titel","geschlecht"),
 	"lehre.tbl_anrechnung"  => array("anrechnung_id","prestudent_id","lehrveranstaltung_id","begruendung_id","lehrveranstaltung_id_kompatibel","genehmigt_von","insertamum","insertvon","updateamum","updatevon","ext_id"),
 	"lehre.tbl_anrechnung_begruendung"  => array("begruendung_id","bezeichnung"),
@@ -4182,7 +4541,7 @@ $tabellen=array(
 	"lehre.tbl_zeugnisnote"  => array("lehrveranstaltung_id","student_uid","studiensemester_kurzbz","note","uebernahmedatum","benotungsdatum","bemerkung","updateamum","updatevon","insertamum","insertvon","ext_id","punkte"),
 	"public.ci_apikey" => array("apikey_id","key","level","ignore_limits","date_created"),
 	"public.tbl_adresse"  => array("adresse_id","person_id","name","strasse","plz","ort","gemeinde","nation","typ","heimatadresse","zustelladresse","firma_id","updateamum","updatevon","insertamum","insertvon","ext_id","rechnungsadresse","anmerkung"),
-	"public.tbl_akte"  => array("akte_id","person_id","dokument_kurzbz","uid","inhalt","mimetype","erstelltam","gedruckt","titel","bezeichnung","updateamum","updatevon","insertamum","insertvon","ext_id","dms_id","nachgereicht","anmerkung","titel_intern","anmerkung_intern","nachgereicht_am","ausstellungsnation","formal_geprueft_amum","archiv","signiert","stud_selfservice"),
+	"public.tbl_akte"  => array("akte_id","person_id","dokument_kurzbz","uid","inhalt","mimetype","erstelltam","gedruckt","titel","bezeichnung","updateamum","updatevon","insertamum","insertvon","ext_id","dms_id","nachgereicht","anmerkung","titel_intern","anmerkung_intern","nachgereicht_am","ausstellungsnation","formal_geprueft_amum","archiv","signiert","stud_selfservice","akzeptiertamum"),
 	"public.tbl_ampel"  => array("ampel_id","kurzbz","beschreibung","benutzer_select","deadline","vorlaufzeit","verfallszeit","insertamum","insertvon","updateamum","updatevon","email","verpflichtend","buttontext"),
 	"public.tbl_ampel_benutzer_bestaetigt"  => array("ampel_benutzer_bestaetigt_id","ampel_id","uid","insertamum","insertvon"),
 	"public.tbl_aufmerksamdurch"  => array("aufmerksamdurch_kurzbz","beschreibung","ext_id","bezeichnung", "aktiv"),
@@ -4259,7 +4618,7 @@ $tabellen=array(
 	"public.tbl_student"  => array("student_uid","matrikelnr","prestudent_id","studiengang_kz","semester","verband","gruppe","updateamum","updatevon","insertamum","insertvon","ext_id"),
 	"public.tbl_studentlehrverband"  => array("student_uid","studiensemester_kurzbz","studiengang_kz","semester","verband","gruppe","updateamum","updatevon","insertamum","insertvon","ext_id"),
 	"public.tbl_studiengang"  => array("studiengang_kz","kurzbz","kurzbzlang","typ","bezeichnung","english","farbe","email","telefon","max_semester","max_verband","max_gruppe","erhalter_kz","bescheid","bescheidbgbl1","bescheidbgbl2","bescheidgz","bescheidvom","orgform_kurzbz","titelbescheidvom","aktiv","ext_id","zusatzinfo_html","moodle","sprache","testtool_sprachwahl","studienplaetze","oe_kurzbz","lgartcode","mischform","projektarbeit_note_anzeige", "onlinebewerbung"),
-	"public.tbl_studiengangstyp" => array("typ","bezeichnung","beschreibung"),
+	"public.tbl_studiengangstyp" => array("typ","bezeichnung","beschreibung","bezeichnung_mehrsprachig"),
 	"public.tbl_studienjahr"  => array("studienjahr_kurzbz","bezeichnung"),
 	"public.tbl_studiensemester"  => array("studiensemester_kurzbz","bezeichnung","start","ende","studienjahr_kurzbz","ext_id","beschreibung","onlinebewerbung"),
 	"public.tbl_tag"  => array("tag"),
