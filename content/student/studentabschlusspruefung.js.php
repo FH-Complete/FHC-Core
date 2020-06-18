@@ -352,6 +352,7 @@ function StudentAbschlusspruefungAuswahl()
 	sponsion = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#sponsion" ));
 	pruefungstyp_kurzbz = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#pruefungstyp_kurzbz" ));
 	anmerkung = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#anmerkung" ));
+	protokoll = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#protokoll" ));
 
 	stg_kz = studiengang_kz = document.getElementById('student-detail-menulist-studiengang_kz').value;
 
@@ -410,6 +411,7 @@ function StudentAbschlusspruefungAuswahl()
 	document.getElementById('student-abschlusspruefung-textbox-anmerkung').value=anmerkung;
 	document.getElementById('student-abschlusspruefung-textbox-abschlusspruefung_id').value=abschlusspruefung_id;
 	document.getElementById('student-abschlusspruefung-checkbox-neu').checked=false;
+	document.getElementById('student-abschlusspruefung-textbox-protokoll').value=protokoll;
 
 	StudentAbschlusspruefungTypChange();
 }

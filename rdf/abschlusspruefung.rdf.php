@@ -378,6 +378,7 @@ if ($xmlformat=='rdf')
 				<ABSCHLUSSPRUEFUNG:freigabedatum><![CDATA['.$datum_obj->convertISODate($row->freigabedatum).']]></ABSCHLUSSPRUEFUNG:freigabedatum>
 				<ABSCHLUSSPRUEFUNG:pruefungsantritt_kurzbz><![CDATA['.$row->pruefungsantritt_kurzbz.']]></ABSCHLUSSPRUEFUNG:pruefungsantritt_kurzbz>
 				<ABSCHLUSSPRUEFUNG:pruefungsantritt_bezeichnung><![CDATA['.$antritt->bezeichnung.']]></ABSCHLUSSPRUEFUNG:pruefungsantritt_bezeichnung>
+				<ABSCHLUSSPRUEFUNG:protokoll><![CDATA['.$row->protokoll.']]></ABSCHLUSSPRUEFUNG:protokoll>
 				<ABSCHLUSSPRUEFUNG:sponsion><![CDATA['.$datum_obj->convertISODate($row->sponsion).']]></ABSCHLUSSPRUEFUNG:sponsion>
 				<ABSCHLUSSPRUEFUNG:sponsion_iso><![CDATA['.$row->sponsion.']]></ABSCHLUSSPRUEFUNG:sponsion_iso>
 				<ABSCHLUSSPRUEFUNG:pruefungstyp_kurzbz><![CDATA['.$row->pruefungstyp_kurzbz.']]></ABSCHLUSSPRUEFUNG:pruefungstyp_kurzbz>
