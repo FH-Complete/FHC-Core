@@ -41,4 +41,35 @@ class Bisverwendung_model extends DB_Model
 
 	    return $this->loadWhere($condition);
     }
+
+	/**
+	 * Gets Verwendungen of the user, optionally in a time span.
+	 * @param string $uid
+	 * @param string $beginn
+	 * @param string $ende
+	 * @return array
+	 */
+	public function getVerwendungen($uid, $beginn = null, $ende = null)
+	{
+		$params = array($uid);
+
+		$qry = 'SELECT * FROM bis.tbl_bisverwendung
+				WHERE mitarbeiter_uid = ?';
+
+		if (isset($beginn))
+		{
+			$qry .= ' AND ( ende >= ? OR ende IS NULL )';
+			$params[] = $beginn;
+		}
+
+		if (isset($ende))
+		{
+			$qry .= ' AND ( beginn <= ? OR beginn IS NULL )';
+			$params[] = $ende;
+		}
+
+        $qry .= 'ORDER BY beginn';
+
+		return $this->execQuery($qry, $params);
+	}
 }

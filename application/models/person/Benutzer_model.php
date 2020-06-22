@@ -61,7 +61,7 @@ class Benutzer_model extends DB_Model
 	/**
 	 * Generates alias for a uid.
 	 * @param $uid
-	 * @return array the alias
+	 * @return array the alias if newly generated
 	 */
 	public function generateAlias($uid)
 	{
@@ -78,7 +78,6 @@ class Benutzer_model extends DB_Model
 
 			if (hasData($aliasexists) && !getData($aliasexists)[0])
 				$aliasres = $alias;
-
 		}
 		return success($aliasres);
 	}

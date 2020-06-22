@@ -51,15 +51,16 @@ class Mitarbeiter_model extends DB_Model
 	 */
 	public function getPersonal($aktiv, $fix, $verwendung)
 	{
-		$qry = "SELECT DISTINCT ON(mitarbeiter_uid) *,
-									tbl_benutzer.aktiv as aktiv,
-									tbl_mitarbeiter.insertamum,
-									tbl_mitarbeiter.insertvon,
-									tbl_mitarbeiter.updateamum,
-									tbl_mitarbeiter.updatevon
+		$qry = "SELECT DISTINCT ON(mitarbeiter_uid) staatsbuergerschaft, geburtsnation, sprache, anrede, titelpost, titelpre,
+									nachname, vorname, vornamen, gebdatum, gebort, gebzeit, tbl_person.anmerkung AS person_anmerkung, homepage, svnr, ersatzkennzeichen, familienstand,
+									geschlecht, anzahlkinder, tbl_person.insertamum AS person_insertamum, tbl_person.updateamum as person_updateamum,
+									tbl_person.updatevon AS person_updatevon, kompetenzen, kurzbeschreibung, zugangscode, zugangscode_timestamp, bpk,
+									tbl_benutzer.*, tbl_mitarbeiter.*, akt_funk.oe_kurzbz AS funktionale_zuordnung, akt_funk.wochenstunden
 					FROM ((public.tbl_mitarbeiter JOIN public.tbl_benutzer ON(mitarbeiter_uid=uid))
 					JOIN public.tbl_person USING(person_id))
 			   LEFT JOIN public.tbl_benutzerfunktion USING(uid)
+			   LEFT JOIN public.tbl_benutzerfunktion akt_funk ON tbl_mitarbeiter.mitarbeiter_uid = akt_funk.uid AND akt_funk.funktion_kurzbz = 'fachzuordnung'
+			   													AND (akt_funk.datum_von IS NULL OR akt_funk.datum_von <= now()) AND (akt_funk.datum_bis IS NULL OR akt_funk.datum_bis >= now())
 				   WHERE true";
 
 		if ($fix === true)
@@ -82,5 +83,30 @@ class Mitarbeiter_model extends DB_Model
 		}
 
 		return $this->execQuery($qry);
+	}
+
+	/**
+	 * Gibt ein Array mit den UIDs der Vorgesetzten zurück
+	 * @return object
+	 */
+	public function getVorgesetzte($uid)
+	{
+		$qry = "SELECT
+					DISTINCT uid  as vorgesetzter
+				FROM
+					public.tbl_benutzerfunktion
+				WHERE
+					funktion_kurzbz='Leitung' AND
+					(datum_von is null OR datum_von<=now()) AND
+					(datum_bis is null OR datum_bis>=now()) AND
+					oe_kurzbz in (SELECT oe_kurzbz
+								  FROM public.tbl_benutzerfunktion
+								  WHERE
+									funktion_kurzbz='oezuordnung' AND uid=? AND
+									(datum_von is null OR datum_von<=now()) AND
+									(datum_bis is null OR datum_bis>=now())
+								  );";
+
+		return $this->execQuery($qry, array($uid));
 	}
 }
