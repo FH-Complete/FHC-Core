@@ -68,7 +68,7 @@ class Bisverwendung_model extends DB_Model
 			$params[] = $ende;
 		}
 
-        $qry .= 'ORDER BY beginn';
+        $qry .= ' ORDER BY ende, beginn';
 
 		return $this->execQuery($qry, $params);
 	}
