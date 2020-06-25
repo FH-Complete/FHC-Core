@@ -294,4 +294,7 @@ define('STUDIENGANG_KZ_QUALIFIKATIONKURSE', null);
 
 // Gibt an ob der Login ins Testtool ueber das Bewerbungstool stattfindet oder nicht
 define('TESTTOOL_LOGIN_BEWERBUNGSTOOL', false);
+
+// Prueft ob Buchungen bereits ins SAP uebertragen wurden und sperrt ggf die Bearbeitung
+define('BUCHUNGEN_CHECK_SAP', true);
 ?>
