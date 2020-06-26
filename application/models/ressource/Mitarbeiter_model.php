@@ -44,12 +44,13 @@ class Mitarbeiter_model extends DB_Model
 	/**
 	 * Laedt das Personal
 	 *
-	 * @param $fix wenn true werden nur fixangestellte geladen
 	 * @param $aktiv wenn true werden nur aktive geladen, wenn false dann nur inaktve, wenn null dann alle
+	 * @param $fix wenn true werden nur fixangestellte geladen
 	 * @param $verwendung wenn true werden alle geladen die eine BIS-Verwendung eingetragen haben
+	 * @param $personaccount wenn true werden alle geladen die personalnr >= 0 haben, also "echte" Personaccounts
 	 * @return array
 	 */
-	public function getPersonal($aktiv, $fix, $verwendung)
+	public function getPersonal($aktiv, $fix, $verwendung, $personaccount = null)
 	{
 		$qry = "SELECT DISTINCT ON(mitarbeiter_uid) staatsbuergerschaft, geburtsnation, sprache, anrede, titelpost, titelpre,
 									nachname, vorname, vornamen, gebdatum, gebort, gebzeit, tbl_person.anmerkung AS person_anmerkung, homepage, svnr, ersatzkennzeichen, familienstand,
@@ -81,6 +82,11 @@ class Mitarbeiter_model extends DB_Model
 		{
 			$qry.=" AND NOT EXISTS(SELECT * FROM bis.tbl_bisverwendung WHERE (ende>now() or ende is null) AND tbl_bisverwendung.mitarbeiter_uid=tbl_mitarbeiter.mitarbeiter_uid)";
 		}
+
+		if ($personaccount === true)
+			$qry .= " AND tbl_mitarbeiter.personalnummer >= 0";
+		elseif ($personaccount === false)
+			$qry .= " AND tbl_mitarbeiter.personalnummer < 0";
 
 		return $this->execQuery($qry);
 	}
