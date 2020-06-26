@@ -618,7 +618,7 @@ if($xmlformat=='rdf')
 			{
 				foreach ($prestd->result as $row)
 				{
-					if(checkfilter($row, $filter2))
+					if(checkfilter($row, $filter2, $buchungstyp_filter))
 					{
 						$student=new student();
 						if($uid = $student->getUid($row->prestudent_id))
