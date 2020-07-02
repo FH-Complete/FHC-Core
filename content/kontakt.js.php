@@ -284,6 +284,7 @@ function KontaktAdresseSpeichern(dialog)
 	typ = dialog.getElementById('adresse-menulist-typ').value;
 	heimatadresse = dialog.getElementById('adresse-checkbox-heimatadresse').checked;
 	zustelladresse = dialog.getElementById('adresse-checkbox-zustelladresse').checked;
+    co_name = dialog.getElementById('adresse-textbox-co_name').value;
 	firma_id = dialog.getElementById('adresse-menulist-firma').value;
 	rechnungsadresse = dialog.getElementById('adresse-checkbox-rechnungsadresse').checked;
 	anmerkung = dialog.getElementById('adresse-textbox-anmerkung').value;
@@ -315,6 +316,7 @@ function KontaktAdresseSpeichern(dialog)
 	req.add('studiengang_kz', studiengang_kz);
 	req.add('rechnungsadresse', rechnungsadresse);
 	req.add('anmerkung', anmerkung);
+	req.add('co_name', co_name);
 
 	var response = req.executePOST();
 

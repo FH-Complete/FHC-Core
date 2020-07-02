@@ -156,6 +156,13 @@ else
    					<label value="Zustelladresse" control="adresse-checkbox-zustelladresse"/>
   					<checkbox id="adresse-checkbox-zustelladresse" checked="true"/>
 				</row>
+                <row>
+                    <label value="Abweichender Empfänger (c/o)" control="adresse-textbox-co_name"/>
+                    <hbox>
+                        <textbox id="adresse-textbox-co_name" maxlength="256" size="30"/>
+                        <spacer flex="1" />
+                    </hbox>
+                </row>
 				<row>
    					<label value="Rechnungsadresse" control="adresse-checkbox-rechnungsadresse"/>
   					<checkbox id="adresse-checkbox-rechnungsadresse" checked="true"/>
