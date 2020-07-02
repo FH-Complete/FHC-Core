@@ -4200,6 +4200,19 @@ if(!$result = @$db->db_query("SELECT sort FROM lehre.tbl_abschlussbeurteilung LI
 		echo '<br>lehre.tbl_abschlussbeurteilung: Spalte sort hinzugefuegt!<br>';
 }
 
+//Spalte co_adresse in tbl_adresse
+if(!$result = @$db->db_query("SELECT co_name FROM public.tbl_adresse LIMIT 1"))
+{
+	$qry = "
+		ALTER TABLE public.tbl_adresse ADD COLUMN co_name varchar(64);
+		COMMENT ON COLUMN public.tbl_adresse.co_name IS 'Name des abweichenden Empfaengers';";
+	
+	if(!$db->db_query($qry))
+		echo '<strong>public.tbl_adresse: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>public.tbl_adresse: Spalte co_name und anmerkung hinzugefuegt';
+}
+
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
 
@@ -4351,7 +4364,7 @@ $tabellen=array(
 	"lehre.tbl_zeugnis"  => array("zeugnis_id","student_uid","zeugnis","erstelltam","gedruckt","titel","bezeichnung","updateamum","updatevon","insertamum","insertvon","ext_id"),
 	"lehre.tbl_zeugnisnote"  => array("lehrveranstaltung_id","student_uid","studiensemester_kurzbz","note","uebernahmedatum","benotungsdatum","bemerkung","updateamum","updatevon","insertamum","insertvon","ext_id","punkte"),
 	"public.ci_apikey" => array("apikey_id","key","level","ignore_limits","date_created"),
-	"public.tbl_adresse"  => array("adresse_id","person_id","name","strasse","plz","ort","gemeinde","nation","typ","heimatadresse","zustelladresse","firma_id","updateamum","updatevon","insertamum","insertvon","ext_id","rechnungsadresse","anmerkung"),
+	"public.tbl_adresse"  => array("adresse_id","person_id","name","strasse","plz","ort","gemeinde","nation","typ","heimatadresse","zustelladresse","firma_id","updateamum","updatevon","insertamum","insertvon","ext_id","rechnungsadresse","anmerkung", "co_name"),
 	"public.tbl_akte"  => array("akte_id","person_id","dokument_kurzbz","uid","inhalt","mimetype","erstelltam","gedruckt","titel","bezeichnung","updateamum","updatevon","insertamum","insertvon","ext_id","dms_id","nachgereicht","anmerkung","titel_intern","anmerkung_intern","nachgereicht_am","ausstellungsnation","formal_geprueft_amum","archiv","signiert","stud_selfservice","akzeptiertamum"),
 	"public.tbl_ampel"  => array("ampel_id","kurzbz","beschreibung","benutzer_select","deadline","vorlaufzeit","verfallszeit","insertamum","insertvon","updateamum","updatevon","email","verpflichtend","buttontext"),
 	"public.tbl_ampel_benutzer_bestaetigt"  => array("ampel_benutzer_bestaetigt_id","ampel_id","uid","insertamum","insertvon"),
