@@ -4204,7 +4204,7 @@ if(!$result = @$db->db_query("SELECT sort FROM lehre.tbl_abschlussbeurteilung LI
 if(!$result = @$db->db_query("SELECT co_name FROM public.tbl_adresse LIMIT 1"))
 {
 	$qry = "
-		ALTER TABLE public.tbl_adresse ADD COLUMN co_name varchar(64);
+		ALTER TABLE public.tbl_adresse ADD COLUMN co_name varchar(256);
 		COMMENT ON COLUMN public.tbl_adresse.co_name IS 'Name des abweichenden Empfaengers';";
 	
 	if(!$db->db_query($qry))
