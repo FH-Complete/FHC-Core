@@ -908,7 +908,7 @@ function GenerateXMLStudentBlock($row)
 				}
 				else
 				{
-					$error_log.= "$row->vorname $row->nachname wird nicht gemeldet da kein gueltiger Status vorhanden ist!";
+					$error_log.= (!empty($error_log)?', ':''). "$row->vorname $row->nachname wird nicht gemeldet da kein gueltiger Status vorhanden ist!";
 					return '';
 				}
 				$aktstatus=$rowstatus->status_kurzbz;
@@ -963,7 +963,7 @@ function GenerateXMLStudentBlock($row)
 					}
 					else
 					{
-						$error_log.= "$row->vorname $row->nachname wird nicht gemeldet da kein gueltiger Status vorhanden ist!";
+						$error_log.= (!empty($error_log)?', ':''). "$row->vorname $row->nachname wird nicht gemeldet da kein gueltiger Status vorhanden ist!";
 						return '';
 					}
 					$aktstatus=$rowstatus->status_kurzbz;
@@ -978,7 +978,7 @@ function GenerateXMLStudentBlock($row)
 					$aktstatus_datum='';
 					$aktstatus_stsem='';
 					$sem='';
-					$error_log.= "kein gueltiger Status vorhanden";
+					$error_log.= (!empty($error_log)?', ':''). "kein gueltiger Status vorhanden";
 
 				}
 			}
@@ -989,7 +989,7 @@ function GenerateXMLStudentBlock($row)
 				$aktstatus_datum='';
 				$aktstatus_stsem='';
 				$sem='';
-				$error_log.= "kein gueltiger Status vorhanden";
+				$error_log.= (!empty($error_log)?', ':'').  "kein gueltiger Status vorhanden";
 
 			}
 		}
