@@ -52,6 +52,7 @@ if(!$rechte->isBerechtigt('student/stammdaten',null,'suid') && !$rechte->isBerec
 $error_log='';
 $error_log1='';
 $error_log_all="";
+$error_log_io = ''; // error log fuer plausichecks von incomings/outgoings
 $stgart='';
 $fehler='';
 $maxsemester=0;
@@ -612,6 +613,7 @@ function GenerateXMLStudentBlock($row)
 	global $stg_kz;
 	$error_log='';
 	$error_log1='';
+	$error_log_io = '';
 	$datei = '';
 	$datumobj = new datum();
 
@@ -623,6 +625,9 @@ function GenerateXMLStudentBlock($row)
 		$ausserordentlich=true;
 	else
 		$ausserordentlich=false;
+	
+	// Pruefen, ob Incoming (3.Stelle in Personenkennzeichen = 0)
+	$incoming = mb_substr($row->matrikelnr,2,1) == '0' ? true : false;
 
 	$qryadr="SELECT * FROM public.tbl_adresse WHERE heimatadresse IS TRUE AND person_id=".$db->db_add_param($row->pers_id).";";
 	$results=$db->db_query($qryadr);
@@ -637,6 +642,7 @@ function GenerateXMLStudentBlock($row)
 		$gemeinde=$rowadr->gemeinde;
 		$strasse=$rowadr->strasse;
 		$nation=$rowadr->nation;
+		$co_name = $rowadr->co_name;
 	}
 	else
 	{
@@ -644,7 +650,58 @@ function GenerateXMLStudentBlock($row)
 		$gemeinde='';
 		$strasse='';
 		$nation='';
+		$co_name = '';
 	}
+	
+	// Zustelladresse & c/o Name(=abweichender Empfaenger)
+	$qryzustelladr = "
+		SELECT *
+		FROM public.tbl_adresse
+		WHERE zustelladresse IS TRUE
+		AND person_id=". $db->db_add_param($row->pers_id). ";
+	";
+	$results = $db->db_query($qryzustelladr);
+	
+	if ($db->db_num_rows($results) != 1)
+	{
+		$error_log1.= "Es sind ".$db->db_num_rows($results)." Zustelladressen eingetragen\n";
+	}
+	
+	$zustell_plz = '';
+	$zustell_gemeinde = '';
+	$zustell_strasse = '';
+	$zustell_nation = '';
+	
+	if ($rowzustelladr = $db->db_fetch_object($results))
+	{
+		$zustell_plz = $rowzustelladr->plz;
+		$zustell_gemeinde = $rowzustelladr->gemeinde;
+		$zustell_strasse = $rowzustelladr->strasse;
+		$zustell_nation = $rowzustelladr->nation;
+	}
+	
+	// eMail-Adresse
+	$qry_mail = "
+		SELECT kontakt
+		FROM public.tbl_kontakt
+		WHERE kontakttyp = 'email'
+		AND zustellung = TRUE
+		AND person_id = ". $db->db_add_param($row->pers_id). "
+		ORDER BY insertamum DESC LIMIT 1;
+	";
+	
+	$email = '';
+	if ($result = $db->db_query($qry_mail))
+	{
+		if($db->db_num_rows($result) == 1)
+		{
+			if($row_mail = $db->db_fetch_object($result))
+			{
+				$email = $row_mail->kontakt;
+			}
+		}
+	}
+	
 	if($row->gebdatum<'1920-01-01' OR $row->gebdatum==null OR $row->gebdatum=='')
 	{
 		$error_log.=(!empty($error_log)?', ':'')."Geburtsdatum ('".$row->gebdatum."')";
@@ -709,6 +766,51 @@ function GenerateXMLStudentBlock($row)
 	{
 		$error_log.=(!empty($error_log)?', ':'')."Heimat-Nation ('".$nation."')";
 	}
+	if($row->bpk == '' || $row->bpk == null)
+	{
+		$error_log .= (!empty($error_log) ? ', ' : '') . "bPK fehlt";
+	}
+	if($row->bpk != '' && $row->bpk != null)
+	{
+		if (!preg_match('/[a-zA-Z0-9\+\/]{27}=/', $row->bpk))
+		{
+			$error_log.=(!empty($error_log) ? ', ' : ''). "bPK-Zeichenfolge ist ung&uuml;ltig";
+		}
+		
+		if (strlen($row->bpk) != 28)
+		{
+			$error_log.=(!empty($error_log) ? ', ' : ''). "bPK ist nicht 28 Zeichen lang";
+		}
+	}
+	if (!$ausserordentlich && !$incoming)
+	{
+		if ($zustell_plz == '' || $zustell_plz == null)
+		{
+			$error_log.=(!empty($error_log)?', ':'')."Zustell-PLZ fehlt";
+		}
+		
+		if ($zustell_gemeinde == '' || $zustell_gemeinde == null)
+		{
+			$error_log.=(!empty($error_log)?', ':'')."Zustell-Gemeinde fehlt";
+		}
+		
+		if ($zustell_strasse == '' || $zustell_strasse == null)
+		{
+			$error_log.=(!empty($error_log)?', ':'')."Zustell-Strasse fehlt";
+		}
+		
+		if ($zustell_nation == '' || $zustell_nation == null)
+		{
+			$error_log.=(!empty($error_log)?', ':'')."Zustell-Nation fehlt";
+		}
+		
+		if ($email == '' || $email == null)
+		{
+			$error_log.=(!empty($error_log)?', ':'')."eMail Adresse fehlt oder eMail-Zustellung auf 'Nein' gesetzt.";
+		}
+		
+	}
+	
 	if(!$ausserordentlich)
 	{
 		if($row->zgv_code=='' || $row->zgv_code==null)
@@ -1066,44 +1168,85 @@ function GenerateXMLStudentBlock($row)
 		return '';
 	}
 	else
-	{
-		$datei.="
+		{
+		$datei .= "
 		<StudentIn>
-			<PersKz>".trim($row->matrikelnr)."</PersKz>";
-
-		$datei.="
-			<Matrikelnummer>".$row->matr_nr."</Matrikelnummer>";
-
-		if(!$ausserordentlich)
+			<PersKz>" . trim($row->matrikelnr) . "</PersKz>";
+		
+		$datei .= "
+			<Matrikelnummer>" . $row->matr_nr . "</Matrikelnummer>";
+		
+		if (!$ausserordentlich)
 		{
-			$datei.="
-			<OrgFormCode>".$orgform_code_array[$storgform]."</OrgFormCode>";
+			$datei .= "
+			<OrgFormCode>" . $orgform_code_array[$storgform] . "</OrgFormCode>";
 		}
-
-		$datei.="
-			<GeburtsDatum>".date("dmY", $datumobj->mktime_fromdate($row->gebdatum))."</GeburtsDatum>
-			<Geschlecht>".strtoupper($row->geschlecht)."</Geschlecht>";
-		$datei.="
-			<Vorname>".$row->vorname."</Vorname>
-			<Familienname>".$row->nachname."</Familienname>";
-
-		if($row->svnr!='')
+		
+		$datei .= "
+			<GeburtsDatum>" . date("dmY", $datumobj->mktime_fromdate($row->gebdatum)) . "</GeburtsDatum>
+			<Geschlecht>" . strtoupper($row->geschlecht) . "</Geschlecht>";
+		
+		if ($row->titelpre != '')
 		{
-			$datei.="
-			<SVNR>".$row->svnr."</SVNR>";
+			$datei .= "
+			<AkadGradeVorName>" . $row->titelpre . "</AkadGradeVorName>";
 		}
-		if($row->ersatzkennzeichen!='')
+		
+		if ($row->titelpost != '')
 		{
-			$datei.="
-			<ErsKz>".$row->ersatzkennzeichen."</ErsKz>";
+			$datei .= "
+			<AkadGradeNachName>" . $row->titelpost . "</AkadGradeNachName>";
 		}
-
-		$datei.="
-			<StaatsangehoerigkeitCode>".$row->staatsbuergerschaft."</StaatsangehoerigkeitCode>
-			<HeimatPLZ>".$plz."</HeimatPLZ>
-			<HeimatGemeinde>".$gemeinde."</HeimatGemeinde>
-			<HeimatStrasse><![CDATA[".$strasse."]]></HeimatStrasse>
-			<HeimatNation>".$nation."</HeimatNation>";
+		
+		$datei .= "
+			<Vorname>" . $row->vorname . "</Vorname>
+			<Familienname>" . $row->nachname . "</Familienname>";
+		
+		if ($row->svnr != '')
+		{
+			$datei .= "
+			<SVNR>" . $row->svnr . "</SVNR>";
+		}
+		if ($row->ersatzkennzeichen != '')
+		{
+			$datei .= "
+			<ErsKz>" . $row->ersatzkennzeichen . "</ErsKz>";
+		}
+		
+		$datei .= "
+			<bPK>" . $row->bpk . "</bPK>
+		";
+		
+		$datei .= "
+			<StaatsangehoerigkeitCode>" . $row->staatsbuergerschaft . "</StaatsangehoerigkeitCode>
+			<HeimatPLZ>" . $plz . "</HeimatPLZ>
+			<HeimatGemeinde>" . $gemeinde . "</HeimatGemeinde>
+			<HeimatStrasse><![CDATA[" . $strasse . "]]></HeimatStrasse>
+			<HeimatNation>" . $nation . "</HeimatNation>";
+		
+		if (!$ausserordentlich && !$incoming)
+		{
+			$datei .= "
+			<ZustellPLZ>" . $zustell_plz . "</ZustellPLZ>
+			<ZustellGemeinde>" . $zustell_gemeinde . "</ZustellGemeinde>
+			<ZustellStrasse>" . $zustell_strasse . "</ZustellStrasse>
+			<ZustellNation>" . $zustell_nation . "</ZustellNation>";
+		}
+		
+		if ($co_name != '')
+		{
+			$datei .= "
+			<coName>" . $co_name . "</coName>
+			";
+		}
+		
+		if ($email != '')
+		{
+			$datei .= "
+			<eMailAdresse>" . $email . "</eMailAdresse>
+			";
+		}
+		
 		if(!$ausserordentlich)
 		{
 			$datei.="
