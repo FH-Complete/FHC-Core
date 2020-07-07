@@ -1349,48 +1349,146 @@ function GenerateXMLStudentBlock($row)
 				$gast=$rowio->nation_code;
 				$avon=date("dmY", $datumobj->mktime_fromdate($rowio->von));
 				$abis=date("dmY", $datumobj->mktime_fromdate($rowio->bis));
-
-				$datei.="
-			<IO>
-				<MobilitaetsProgrammCode>".$mob."</MobilitaetsProgrammCode>
-				<GastlandCode>".$gast."</GastlandCode>
-				<AufenthaltVon>".$avon."</AufenthaltVon>";
-				if($datumobj->mktime_fromdate($rowio->bis)<$datumobj->mktime_fromdate($bisdatum) && $datumobj->mktime_fromdate($rowio->bis)>$datumobj->mktime_fromdate($bisprevious))
-				{
-					$datei.="
-				<AufenthaltBis>".$abis."</AufenthaltBis>";
-				}
-
+				$adauer = (is_null($rowio->von) || is_null($rowio->bis))
+					? null
+					: $datumobj->DateDiff($rowio->von, $rowio->bis);
+				
+				// Aufenthaltszweckcode --------------------------------------------------------------------------------
 				$bisio_zweck = new bisio();
 				$bisio_zweck->getZweck($rowio->bisio_id);
-				foreach ($bisio_zweck->result as $row_zweck)
+				$zweck_code_arr = array();
+				
+				// Bei Incomings...
+				if ($aktstatus == 'Incoming')
 				{
-					$datei.="
-					<AufenthaltZweckCode>".$row_zweck->zweck_code."</AufenthaltZweckCode>";
-				}
-				if ($aktstatus != 'Incoming' && $rowio->ects_erworben != '')
-				{
-					$datei.="
-					<ECTSerworben>".$rowio->ects_erworben."</ECTSerworben>";
-				}
-				if ($aktstatus != 'Incoming' && $rowio->ects_angerechnet != '')
-				{
-					$datei.="
-					<ECTSangerechnet>".$rowio->ects_angerechnet."</ECTSangerechnet>";
-				}
-				if ($aktstatus != 'Incoming')
-				{
-					$bisio_foerderung = new bisio();
-					$bisio_foerderung->getFoerderungen($rowio->bisio_id);
-					foreach ($bisio_foerderung->result as $row_foerderung)
+					// ...max 1 Aufenthaltszweck
+					if (count($bisio_zweck->result) > 1)
 					{
-						$datei.="
-						<AufenthaltFoerderungCode>".$row_foerderung->aufenthaltfoerderung_code."</AufenthaltFoerderungCode>";
+						$error_log_io .= (!empty($error_log_io) ? ', ' : ''). "Es sind". count($bisio_zweck->result).
+							" Aufenthaltszwecke eingetragen (max. 1 Zweck für Incomings)";
+					}
+					
+					//...nur Zweck 1, 2 oder 3 erlaubt
+					if (count($bisio_zweck->result) == 1 &&
+						empty(array_intersect(array(1, 2, 3), array_column($bisio_zweck->result, 'zweck_code'))))
+					{
+						$error_log_io .= (!empty($error_log_io) ? ', ' : ''). "Aufenthaltszweckcode ist ".
+							$bisio_zweck->result[0]->zweck_code. " (f&uuml;r Incomings ist nur Zweck 1, 2, 3 erlaubt)";
 					}
 				}
-
-			$datei.="
-			</IO>";
+				
+				foreach ($bisio_zweck->result as $row_zweck)
+				{
+					// Nur eindeutige Werte (bei Mehrfachangaben; trifft auf Outgoings zu)
+					if (!in_array($row_zweck->zweck_code, $zweck_code_arr))
+					{
+						// Aufenthaltszweck 1, 2, 3 nicht gemeinsam melden
+						if (!empty(array_intersect(array(1, 2, 3), $zweck_code_arr)))
+						{
+							$error_log_io .= (!empty($error_log_io) ? ', ' : '').
+								"Aufenthaltzweckcode 1, 2, 3 d&uuml;rfen nicht gemeinsam gemeldet werden";
+						}
+						
+						$zweck_code_arr []= $row_zweck->zweck_code;
+					}
+				}
+				
+				// Aufenthaltfoerderungscode ---------------------------------------------------------------------------
+				$aufenthaltfoerderung_code_arr = array();
+				
+				// Nur bei Outgoings Aufenthaltsfoerderungscode melden
+				if ($aktstatus != 'Incoming') {
+					$bisio_foerderung = new bisio();
+					$bisio_foerderung->getFoerderungen($rowio->bisio_id);
+					
+					// ... mindestens 1 Aufenthaltfoerderung melden, wenn Auslandsaufenthalt >= 29 Tage
+					if ((!$bisio_foerderung->result || count($bisio_foerderung->result) == 0) && $adauer >= 29)
+					{
+						$error_log_io .= (!empty($error_log_io) ? ', ' : '') .
+							"Keine Aufenthaltsfoerderung angegeben (bei Outgoings >= 29 Tage Monat im Ausland muss mind. 1 gemeldet werden)";
+					}
+					
+					foreach ($bisio_foerderung->result as $row_foerderung)
+					{
+						// ...wenn code = 5, nur ein Wert erlaubt (keine Mehrfachangaben)
+						if ($row_foerderung->aufenthaltfoerderung_code == 5) {
+							unset($aufenthaltfoerderung_code_arr);
+							$aufenthaltfoerderung_code_arr [] = $row_foerderung->aufenthaltfoerderung_code;
+							break;
+						}
+						
+						// nur eindeutige Werte
+						if (!in_array($row_foerderung->aufenthaltfoerderung_code, $aufenthaltfoerderung_code_arr)) {
+							$aufenthaltfoerderung_code_arr [] = $row_foerderung->aufenthaltfoerderung_code;
+						}
+					}
+					
+					if ($rowio->ects_erworben == '' && $adauer >= 29)
+					{
+						$error_log_io .= (!empty($error_log_io) ? ', ' : '') .
+							"Erworbene ECTS fehlen (Meldepflicht bei Outgoings >= 29 Tage Monat im Ausland)";
+					}
+					
+					if ($rowio->ects_angerechnet == '' && $adauer >= 29)
+					{
+						$error_log_io .= (!empty($error_log_io) ? ', ' : '') .
+							"Angerechnete ECTS fehlen (Meldepflicht bei Outgoings >= 29 Tage Monat im Ausland)";
+					}
+				}
+				
+				// Bei validen Daten errorlog ausgeben
+				if($error_log_io != '')
+				{
+					$v.="<u>Bei Student (UID, Vorname, Nachname) '".$row->student_uid."', '".$row->nachname."', '".$row->vorname."' ($laststatus->status_kurzbz): </u>\n";
+					if($error_log_io != '')
+					{
+						$v.="&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Fehler: ".$error_log_io. "\n";
+					}
+					$v.="\n";
+					$error_log_io = '';
+					return '';
+				}
+				// Bei validen Daten XML-Datensatz bauen
+				else
+				{
+					$datei.="
+					<IO>
+						<MobilitaetsProgrammCode>".$mob."</MobilitaetsProgrammCode>
+						<GastlandCode>".$gast."</GastlandCode>
+						<AufenthaltVon>".$avon."</AufenthaltVon>";
+						if($datumobj->mktime_fromdate($rowio->bis)<$datumobj->mktime_fromdate($bisdatum) && $datumobj->mktime_fromdate($rowio->bis)>$datumobj->mktime_fromdate($bisprevious))
+						{
+							$datei.="
+							<AufenthaltBis>".$abis."</AufenthaltBis>";
+						}
+						
+						foreach ($zweck_code_arr as $zweck)
+						{
+							$datei.="
+							<AufenthaltZweckCode>". $zweck. "</AufenthaltZweckCode>";
+						}
+						if ($aktstatus != 'Incoming' && $rowio->ects_erworben != '')
+						{
+							$datei.="
+							<ECTSerworben>".$rowio->ects_erworben."</ECTSerworben>";
+						}
+						if ($aktstatus != 'Incoming' && $rowio->ects_angerechnet != '')
+						{
+							$datei.="
+							<ECTSangerechnet>".$rowio->ects_angerechnet."</ECTSangerechnet>";
+						}
+						foreach ($aufenthaltfoerderung_code_arr as $aufenthaltfoerderung_code)
+						{
+							$datei.="
+							<AufenthaltFoerderungCode>". $aufenthaltfoerderung_code. "</AufenthaltFoerderungCode>";
+						}
+		
+					$datei.="
+					</IO>";
+				}
+				
+				
+				
 				if($aktstatus!='Incoming')
 				{
 					if(!isset($iosem[$storgform][$sem]))
