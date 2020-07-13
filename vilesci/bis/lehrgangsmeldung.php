@@ -93,6 +93,18 @@ if(isset($_GET['plausi']))
 {
 	$plausi=$_GET['plausi'];
 }
+
+// Standortcode
+if (defined('BIS_STANDORTCODE_LEHRGAENGE') && BIS_STANDORTCODE_LEHRGAENGE != '0')
+{
+	$standortcode = BIS_STANDORTCODE_LEHRGAENGE;
+}
+else
+{
+	echo "<H2>Standortcode f&uuml;r Lehrg&auml;nge fehlt.</H2>";
+	exit;
+}
+
 $datumobj=new datum();
 
 //Lehrgangsdaten auslesen
@@ -672,6 +684,7 @@ if($result = $db->db_query($qry))
 				}
 				$datei.="
 				<StudStatusCode>".$status."</StudStatusCode>
+				<StandortCode>" .$standortcode. "</StandortCode>
 			</StudentIn>";
 		}
 	}
