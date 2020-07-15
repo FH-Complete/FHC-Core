@@ -254,11 +254,11 @@ if($result = $db->db_query($qry))
 		";
 		
 		$email = '';
-		if ($result = $db->db_query($qry_mail))
+		if ($result_email = $db->db_query($qry_mail))
 		{
-			if($db->db_num_rows($result) == 1)
+			if($db->db_num_rows($result_email) == 1)
 			{
-				if($row_mail = $db->db_fetch_object($result))
+				if($row_mail = $db->db_fetch_object($result_email))
 				{
 					$email = $row_mail->kontakt;
 				}
