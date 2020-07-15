@@ -195,13 +195,16 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 						</tree>
 					</vbox>
 					<vbox flex="1">
+                        <?php
+                        $is_hidden = (defined('ZAHLUNGSBESTAETIGUNG_ANZEIGEN') && ZAHLUNGSBESTAETIGUNG_ANZEIGEN) ? 'false' : 'true';
+                        ?>
 						<hbox>
 							<button id="student-konto-button-neu" label="Neu" oncommand="StudentKontoNeu();" disabled="true"/>
 							<button id="student-konto-button-gegenbuchung" label="Gegenbuchung" oncommand="StudentKontoGegenbuchung();" disabled="true"/>
 							<box class="Datum" id="student-konto-textbox-gegenbuchungsdatum" disabled="true" tooltiptext="Optionales Datum der Gegenbuchung"/>
 							<button id="student-konto-button-loeschen" label="Loeschen" oncommand="StudentKontoDelete();" disabled="true"/>
 							<spacer flex="1"/>
-							<button id="student-konto-button-zahlungsbestaetigung" label="Zahlungsbestaetigung drucken" oncommand="StudentKontoZahlungsbestaetigung();" disabled="true"/>
+							<button id="student-konto-button-zahlungsbestaetigung" label="Zahlungsbestaetigung drucken" oncommand="StudentKontoZahlungsbestaetigung();" disabled="true" hidden="<?php echo $is_hidden?>"/>
 						</hbox>
 						<vbox hidden="true">
 							<label value="Buchungsnr" control="student-konto-textbox-buchungsnr"/>
