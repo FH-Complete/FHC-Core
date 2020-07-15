@@ -44,8 +44,16 @@ $fehler='';
 $maxsemester=0;
 $v='';
 $studiensemester=new studiensemester();
-$ssem=$studiensemester->getaktorNext();
-$psem=$studiensemester->getPrevious();
+if (isset($_GET['studiensemester']))
+{
+	$ssem = $_GET['studiensemester'];
+	$psem = $studiensemester->getPreviousFrom($ssem);
+}
+else
+{
+	$ssem=$studiensemester->getaktorNext();
+	$psem=$studiensemester->getPrevious();
+}
 $datei='';
 $zaehl=0;
 $lehrgangsname = '';
