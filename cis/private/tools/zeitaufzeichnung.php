@@ -1039,9 +1039,10 @@ if($projekt->getProjekteMitarbeiter($user, true))
 			echo '<p><a href="../../../cms/dms.php?id='.$p->t("dms_link/fiktiveNormalarbeitszeit").'" target="_blank">'.$p->t("zeitaufzeichnung/fiktiveNormalarbeitszeit").'</a></p>';
 		}
 		echo '<p><a href="../profile/zeitsperre_resturlaub.php">'.$p->t("urlaubstool/meineZeitsperren").'</a></p>';
-		echo "</td>
+		echo $p->t("zeitaufzeichnung/supportAnfragen");
+		echo '</td>
 		      	</tr>
-		      </table>";
+		      </table>';
 			echo '<table>
 			<tr>
 				<td rowspan="2">';
