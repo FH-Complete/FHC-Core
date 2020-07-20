@@ -294,4 +294,7 @@ define('STUDIENGANG_KZ_QUALIFIKATIONKURSE', null);
 
 // Gibt an ob der Login ins Testtool ueber das Bewerbungstool stattfindet oder nicht
 define('TESTTOOL_LOGIN_BEWERBUNGSTOOL', false);
+
+// Gibt an, ob im FAS die Zahlungsbestaetigungen zum Download / im CIS generell die Zahlungen angezeigt werden
+define ('ZAHLUNGSBESTAETIGUNG_ANZEIGEN', true);
 ?>
