@@ -11,3 +11,12 @@ $config['job_type_permissions_white_list'] = array(
 	'OEHPayment' => 'developer:rw',
 	'SAPPayment' => 'developer:rw'
 );
+
+// List of schedulers that can be run by the scheduler
+$config['job_schedulers_list'] = array(				// Controllers
+	'extensions/FHC-Core-SAP/JBMScheduler' => array(	// Methods
+		'newUsers',
+		'updateUsers'
+	)
+);
+

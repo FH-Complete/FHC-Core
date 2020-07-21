@@ -75,3 +75,4 @@ abstract class JQW_Controller extends JOB_Controller
 		return $result;
 	}
 }
+
