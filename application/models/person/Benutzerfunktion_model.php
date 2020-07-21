@@ -24,7 +24,8 @@ class Benutzerfunktion_model extends DB_Model
 	{
 		$params = array($uid);
 
-		$qry = "SELECT tbl_benutzerfunktion.*, tbl_organisationseinheit.organisationseinheittyp_kurzbz
+		$qry = "SELECT tbl_benutzerfunktion.*, tbl_organisationseinheit.bezeichnung as organisationseinheit_bezeichnung,
+					tbl_organisationseinheit.organisationseinheittyp_kurzbz
 				FROM public.tbl_benutzerfunktion
 				LEFT JOIN public.tbl_organisationseinheit USING(oe_kurzbz)
 			    WHERE uid=?";
@@ -44,7 +45,7 @@ class Benutzerfunktion_model extends DB_Model
 			$params[] = $endeZeitraum;
 		}
 
-		$qry .= ";";
+		$qry .= "ORDER BY datum_bis NULLS LAST, datum_von NULLS LAST;";
 
 		return $this->execQuery($qry, $params);
 	}
