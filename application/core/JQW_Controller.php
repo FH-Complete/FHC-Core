@@ -74,5 +74,43 @@ abstract class JQW_Controller extends JOB_Controller
 
 		return $result;
 	}
+
+	/**
+	 * Utility method to update the specified properties of the given jobs with the given values
+	 */
+	protected function updateJobs($jobs, $properties, $values)
+	{
+		// If not valid arrays of properties and values arrays are not of the same size then exit
+		if (isEmptyArray($jobs) || isEmptyArray($properties) || isEmptyArray($values)) return;
+		if (count($properties) != count($values)) return;
+	
+		// For each job
+		foreach ($jobs as $job)
+		{
+			// For each propery of the job
+			for ($pI = 0; $pI < count($properties); $pI++)
+			{
+				// If this property is present in the job object
+				if (property_exists($job, $properties[$pI]))
+				{
+					$job->{$properties[$pI]} = $values[$pI]; // set a new value
+				}
+			}
+		}
+	}
+
+	/**
+	 * Utility method to generate a job with the given parameters and return it inside an array
+	 * ready to be used by addNewJobsToQueue and updateJobsQueue
+	 */
+	protected function generateJobs($status, $input)
+	{
+		$job = stdClass();
+
+		$job->{self::PROPERTY_STATUS} = $status;
+		$job->{self::PROPERTY_INPUT} = $input;
+		
+		return array($job);
+	}
 }
 

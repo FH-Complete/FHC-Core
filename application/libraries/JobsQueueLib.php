@@ -335,7 +335,7 @@ class JobsQueueLib
 			$found = $this->_inArray($job->{self::PROPERTY_STATUS}, $statuses, self::PROPERTY_STATUS);
 		}
 
-		// No status was not found and does NOT already contain the property error
+		// No status was found and does NOT already contain the property error
 		if (!$found && !property_exists($job, self::PROPERTY_ERROR))
 		{
 			$job->{self::PROPERTY_ERROR} = 'The provided status of this job is not valid'; // store the error message in the object

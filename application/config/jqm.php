@@ -14,7 +14,7 @@ $config['job_type_permissions_white_list'] = array(
 
 // List of schedulers that can be run by the scheduler
 $config['job_schedulers_list'] = array(				// Controllers
-	'extensions/FHC-Core-SAP/JBMScheduler' => array(	// Methods
+	'extensions/FHC-Core-SAP/JQMScheduler' => array(	// Methods
 		'newUsers',
 		'updateUsers'
 	)
