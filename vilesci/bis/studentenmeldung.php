@@ -680,26 +680,11 @@ function GenerateXMLStudentBlock($row)
 		$zustell_nation = $rowzustelladr->nation;
 	}
 	
-	// eMail-Adresse
-	$qry_mail = "
-		SELECT kontakt
-		FROM public.tbl_kontakt
-		WHERE kontakttyp = 'email'
-		AND zustellung = TRUE
-		AND person_id = ". $db->db_add_param($row->pers_id). "
-		ORDER BY insertamum DESC LIMIT 1;
-	";
-	
+	// FH eMail-Adresse FH aus UID@Domain
 	$email = '';
-	if ($result = $db->db_query($qry_mail))
+	if ($row->student_uid != '')
 	{
-		if($db->db_num_rows($result) == 1)
-		{
-			if($row_mail = $db->db_fetch_object($result))
-			{
-				$email = $row_mail->kontakt;
-			}
-		}
+		$email = $row->student_uid. '@'. DOMAIN;
 	}
 	
 	if($row->gebdatum<'1920-01-01' OR $row->gebdatum==null OR $row->gebdatum=='')
@@ -806,7 +791,7 @@ function GenerateXMLStudentBlock($row)
 		
 		if ($email == '' || $email == null)
 		{
-			$error_log.=(!empty($error_log)?', ':'')."eMail Adresse fehlt oder eMail-Zustellung auf 'Nein' gesetzt.";
+			$error_log.=(!empty($error_log)?', ':'')."Studenten-eMail Adresse fehlt (keine Student-UID eingetragen).";
 		}
 		
 	}
