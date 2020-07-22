@@ -105,10 +105,10 @@ abstract class JQW_Controller extends JOB_Controller
 	 */
 	protected function generateJobs($status, $input)
 	{
-		$job = stdClass();
+		$job = new stdClass();
 
-		$job->{self::PROPERTY_STATUS} = $status;
-		$job->{self::PROPERTY_INPUT} = $input;
+		$job->{JobsQueueLib::PROPERTY_STATUS} = $status;
+		$job->{JobsQueueLib::PROPERTY_INPUT} = $input;
 		
 		return array($job);
 	}
