@@ -24,9 +24,6 @@ class JobsQueueLib
 	const PROPERTY_END_TIME = 'endtime';
 	const PROPERTY_ERROR = 'error';
 
-	// Config entries
-	const JOB_SCHEDULERS_LIST = 'job_schedulers_list';
-
 	private $_ci; // CI instance
 
 	/**
@@ -42,9 +39,6 @@ class JobsQueueLib
 		$this->_ci->load->model('system/JobTypes_model', 'JobTypesModel');
 		$this->_ci->load->model('system/JobStatuses_model', 'JobStatusesModel');
 		$this->_ci->load->model('system/JobTriggers_model', 'JobTriggersModel');
-
-		// Loads configs
-		$this->_ci->config->load('jqm');
 	}
 
 	//------------------------------------------------------------------------------------------------------------------
@@ -200,68 +194,6 @@ class JobsQueueLib
 		if ($errorOccurred) return error($results);
 
 		return success($results); // otherwise return results in a success object
-	}
-
-	/**
-	 * Checks the job object structure when needed for insert
-	 */
-	public function schedule()
-	{
-		// An array of non blocking errors
-		$nonBlockingErrorsArray = array();
-
-		// Get the all the configured schedulers
-		$schedulers = $this->_ci->config->item(self::JOB_SCHEDULERS_LIST);
-
-		// If is it empty then non blocking error
-		if (isEmptyArray($schedulers)) return success('No schedulers where configured');
-
-		// For each scheduler
-		foreach ($schedulers as $controller => $methods)
-		{
-			// If the specified controller does not exist
-			if (!file_exists(APPPATH.'controllers/'.$controller.'.php'))
-			{
-				$nonBlockingErrorsArray[] = 'The controller '.$controller.' does not exist';
-			}
-			else // try to call it
-			{
-				$arrayMethods = array();
-
-				// If methods is a string
-				if (is_string($methods))
-				{
-					$arrayMethods[] = $methods;
-				}
-				elseif (is_array($methods)) // otherwise if is an array
-				{
-					$arrayMethods = $methods;
-				}
-
-				// For eache configured method
-				foreach ($arrayMethods as $method)
-				{
-					// Generate command string
-					$command = sprintf(
-						'php %s/../index.ci.php %s %s >> %s/logs/scheduler-%s-%s.log 2>>%s/logs/scheduler-error-%s-%s.log &',
-						APPPATH,
-						$controller,
-						$method,
-						APPPATH,
-						str_replace('/', '-', $controller),
-						date('Y-m-d'),
-						APPPATH,
-						str_replace('/', '-', $controller),
-						date('Y-m-d')
-					);
-
-					// Execute command string
-					@shell_exec($command);
-				}
-			}
-		}
-
-		return success($nonBlockingErrorsArray);
 	}
 
 	//------------------------------------------------------------------------------------------------------------------
