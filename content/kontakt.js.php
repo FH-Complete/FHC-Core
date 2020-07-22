@@ -344,7 +344,7 @@ function KontaktAdresseSpeichern(dialog)
 // ****
 function KontaktAdresseNeu()
 {
-	window.open("<?php echo APP_ROOT; ?>content/adressedialog.xul.php?person_id="+KontaktPerson_id,"","chrome, status=no, width=500, height=450, centerscreen, resizable");
+	window.open("<?php echo APP_ROOT; ?>content/adressedialog.xul.php?person_id="+KontaktPerson_id,"","chrome, status=no, width=500, height=500, centerscreen, resizable");
 }
 
 // ****
@@ -360,7 +360,7 @@ function KontaktAdresseBearbeiten()
     var col = tree.columns ? tree.columns["kontakt-adressen-treecol-adresse_id"] : "kontakt-adressen-treecol-adresse_id";
 	var adresse_id=tree.view.getCellText(tree.currentIndex,col);
 
-	window.open("<?php echo APP_ROOT; ?>content/adressedialog.xul.php?adresse_id="+adresse_id,"","chrome, status=no, width=500, height=450, centerscreen, resizable");
+	window.open("<?php echo APP_ROOT; ?>content/adressedialog.xul.php?adresse_id="+adresse_id,"","chrome, status=no, width=500, height=500, centerscreen, resizable");
 }
 
 // ****
