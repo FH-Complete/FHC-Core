@@ -48,6 +48,19 @@ abstract class JQW_Controller extends JOB_Controller
 	}
 
 	/**
+	 * To get all the jobs specified by the given parameters
+	 */
+	protected function getJobsByTypeStatusInput($type, $status, $input)
+	{
+		$jobs = $this->jobsqueuelib->getJobsByTypeStatusInput($type, $status, $input);
+
+		// If an error occurred then log it in database
+		if (isError($jobs)) $this->logError(getError($jobs), array($type, $status, $input));
+
+		return $jobs;
+	}
+
+	/**
 	 * Add new jobs in the jobs queue with the given type
 	 * jobs is an array of job objects
 	 */
