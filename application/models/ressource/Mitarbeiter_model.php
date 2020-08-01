@@ -95,24 +95,41 @@ class Mitarbeiter_model extends DB_Model
 	 * Gibt ein Array mit den UIDs der Vorgesetzten zurück
 	 * @return object
 	 */
-	public function getVorgesetzte($uid)
+	public function getVorgesetzte($uid, $datum_von = null, $datum_bis = null)
 	{
+		$datum_von_var = isset($datum_von) ? '?' : 'now()';
+		$datum_bis_var = isset($datum_bis) ? '?' : 'now()';
 		$qry = "SELECT
 					DISTINCT uid  as vorgesetzter
 				FROM
 					public.tbl_benutzerfunktion
 				WHERE
 					funktion_kurzbz='Leitung' AND
-					(datum_von is null OR datum_von<=now()) AND
-					(datum_bis is null OR datum_bis>=now()) AND
+					(datum_von is null OR datum_von<=%s) AND
+					(datum_bis is null OR datum_bis>=%s) AND
 					oe_kurzbz in (SELECT oe_kurzbz
 								  FROM public.tbl_benutzerfunktion
 								  WHERE
 									funktion_kurzbz='oezuordnung' AND uid=? AND
-									(datum_von is null OR datum_von<=now()) AND
-									(datum_bis is null OR datum_bis>=now())
+									(datum_von is null OR datum_von<=%s) AND
+									(datum_bis is null OR datum_bis>=%s)
 								  );";
 
-		return $this->execQuery($qry, array($uid));
+		$qry = sprintf($qry, $datum_von_var, $datum_bis_var, $datum_von_var, $datum_bis_var);
+
+		$params = array();
+		if (isset($datum_von))
+			$params[] = $datum_von;
+		if (isset($datum_bis))
+			$params[] = $datum_bis;
+
+		$params[] = $uid;
+
+		if (isset($datum_von))
+			$params[] = $datum_von;
+		if (isset($datum_bis))
+			$params[] = $datum_bis;
+
+		return $this->execQuery($qry, $params);
 	}
 }
