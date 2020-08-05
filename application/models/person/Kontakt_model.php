@@ -59,4 +59,22 @@ class Kontakt_model extends DB_Model
 
 		return $this->execQuery($sql, array($person_id, $kontakttyp));
 	}
+	
+	/**
+	 * Get all latest contact data of person, where Zustellung is true
+	 * @param $person_id
+	 * @return array
+	 */
+	public function getAll_byPersonID($person_id)
+	{
+		$this->addSelect('DISTINCT ON (kontakttyp) kontakttyp, kontakt');
+		$this->addJoin('public.tbl_standort', 'standort_id', 'LEFT');
+		$this->addJoin('public.tbl_firma', 'firma_id', 'LEFT');
+		$this->addOrder('kontakttyp, kontakt, tbl_kontakt.updateamum, tbl_kontakt.insertamum');
+		
+		return $this->loadWhere(array(
+			'zustellung' => TRUE,
+			'person_id' => $person_id
+		));
+	}
 }
