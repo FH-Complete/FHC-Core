@@ -77,4 +77,36 @@ class Kontakt_model extends DB_Model
 			'person_id' => $person_id
 		));
 	}
+	
+	/**
+	 * Get all latest phones of person where zustellung is true. Ordered by
+	 * telefon > mobil > firmenhandy > else.
+	 * @param string person_id
+	 */
+	public function getPhones_byPerson($person_id)
+	{
+		$qry = '
+		WITH latest_phones AS(
+			SELECT DISTINCT ON (kontakttyp) kontakttyp, kontakt
+			FROM public.tbl_kontakt kontakt
+			LEFT JOIN public.tbl_standort USING (standort_id)
+			LEFT JOIN public.tbl_firma USING (firma_id)
+			WHERE person_id = ?
+			AND zustellung
+			AND kontakttyp IN (\'telefon\', \'mobil\', \'firmenhandy\')
+			ORDER BY kontakttyp, kontakt, kontakt.updateamum
+			)
+			
+		SELECT * FROM latest_phones
+		ORDER BY
+		CASE
+			WHEN kontakttyp = \'telefon\' THEN 0
+			WHEN kontakttyp = \'mobil\' THEN 1
+			WHEN kontakttyp = \'firmenhandy\' THEN 2
+			ELSE 3
+		END
+		';
+		
+		return $this->execQuery($qry, array($person_id));
+	}
 }
