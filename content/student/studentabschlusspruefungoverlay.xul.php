@@ -339,6 +339,8 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 					<vbox>
 						<box class="Datum" id="student-abschlusspruefung-datum-sponsion" disabled="true"/>
 					</vbox>
+					<label value="Protokoll" control="student-abschlusspruefung-textbox-protokoll" />
+					<textbox id="student-abschlusspruefung-textbox-protokoll" multiline="true" rows="5" readonly="true"/>
 				</row>
 
 				<row>

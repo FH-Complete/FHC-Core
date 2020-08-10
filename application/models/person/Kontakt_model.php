@@ -119,4 +119,54 @@ class Kontakt_model extends DB_Model
 		}
 		return $firmentelefon;
 	}
+
+	/**
+	 * Get all latest contact data of person, where Zustellung is true
+	 * @param $person_id
+	 * @return array
+	 */
+	public function getAll_byPersonID($person_id)
+	{
+		$this->addSelect('DISTINCT ON (kontakttyp) kontakttyp, kontakt');
+		$this->addJoin('public.tbl_standort', 'standort_id', 'LEFT');
+		$this->addJoin('public.tbl_firma', 'firma_id', 'LEFT');
+		$this->addOrder('kontakttyp, kontakt, tbl_kontakt.updateamum, tbl_kontakt.insertamum');
+
+		return $this->loadWhere(array(
+			'zustellung' => TRUE,
+			'person_id' => $person_id
+		));
+	}
+
+	/**
+	 * Get all latest phones of person where zustellung is true. Ordered by
+	 * telefon > mobil > firmenhandy > else.
+	 * @param string person_id
+	 */
+	public function getPhones_byPerson($person_id)
+	{
+		$qry = '
+		WITH latest_phones AS(
+			SELECT DISTINCT ON (kontakttyp) kontakttyp, kontakt
+			FROM public.tbl_kontakt kontakt
+			LEFT JOIN public.tbl_standort USING (standort_id)
+			LEFT JOIN public.tbl_firma USING (firma_id)
+			WHERE person_id = ?
+			AND zustellung
+			AND kontakttyp IN (\'telefon\', \'mobil\', \'firmenhandy\')
+			ORDER BY kontakttyp, kontakt, kontakt.updateamum
+			)
+
+		SELECT * FROM latest_phones
+		ORDER BY
+		CASE
+			WHEN kontakttyp = \'telefon\' THEN 0
+			WHEN kontakttyp = \'mobil\' THEN 1
+			WHEN kontakttyp = \'firmenhandy\' THEN 2
+			ELSE 3
+		END
+		';
+
+		return $this->execQuery($qry, array($person_id));
+	}
 }

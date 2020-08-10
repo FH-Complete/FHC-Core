@@ -123,8 +123,6 @@ if(isset($_POST['submitbild']))
 		$dokument = new dokument();
 		$dokument->loadDokumenttyp($_REQUEST['dokumenttyp']);
 
-		$extension = end(explode(".",strtolower($_FILES['file']['name'])));
-
 		$akte->dokument_kurzbz = $_REQUEST['dokumenttyp'];
 		$akte->person_id = $_GET['person_id'];
 		//$akte->inhalt = base64_encode($content);

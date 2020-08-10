@@ -62,3 +62,4 @@ $this->phrasen['zeitaufzeichnung/dienstreise']='Business Trip';
 $this->phrasen['zeitaufzeichnung/projektphase']='WP';
 $this->phrasen['zeitaufzeichnung/pauseEinfuegen']='insert break automatically';
 $this->phrasen['zeitaufzeichnung/zeitraumZuKurz']='Timeslot too short for automatic break.';
+$this->phrasen['zeitaufzeichnung/supportAnfragen']='<p><hr>Contact for support<br><a href="mailto:zeiterfassung@technikum-wien.at">zeiterfassung@technikum-wien.at</a></p>';

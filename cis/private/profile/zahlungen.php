@@ -21,6 +21,7 @@
  */
 
 	require_once('../../../config/cis.config.inc.php');
+	require_once('../../../config/global.config.inc.php');
 	require_once('../../../include/functions.inc.php');
 	require_once('../../../include/studiensemester.class.php');
 	require_once('../../../include/konto.class.php');
@@ -52,6 +53,11 @@
 	}
 	else
 		$getParam='';
+
+	if (defined('ZAHLUNGSBESTAETIGUNG_ANZEIGEN') && !ZAHLUNGSBESTAETIGUNG_ANZEIGEN)
+	{
+		die('Um diese Seite anzuzeigen, ist ein entsprechender Eintrag in der Konfigurationsdatei nötig.');
+	}
 	
 	$datum_obj = new datum();
 

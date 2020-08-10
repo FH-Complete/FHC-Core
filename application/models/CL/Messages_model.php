@@ -284,14 +284,23 @@ class Messages_model extends CI_Model
 
 		$sender = getData($senderResult)[0]; // Found sender data
 
-		// If the sender is not the system sender and are present configurations to reply
+		// If the sender is not the system sender and the receiver is not the system sender
+		// and are present configurations to reply
 		$hrefReply = '';
 		if ($message->sender_id != $this->config->item(MessageLib::CFG_SYSTEM_PERSON_ID)
+			&& $message->receiver_id != $this->config->item(MessageLib::CFG_SYSTEM_PERSON_ID)
 			&& !isEmptyString($this->config->item(MessageLib::CFG_REDIRECT_VIEW_MESSAGE_URL)))
 		{
 			$hrefReply = $this->config->item(MessageLib::CFG_MESSAGE_SERVER).
 				$this->config->item(MessageLib::CFG_REDIRECT_VIEW_MESSAGE_URL).
 				$token;
+		}
+
+		// If the receiver is the system sender (the message was sent to an organization unit)
+		// redirect the reply to an authenticated controller to reply
+		if ($message->receiver_id == $this->config->item(MessageLib::CFG_SYSTEM_PERSON_ID))
+		{
+			$hrefReply = site_url('system/messages/MessageClient/writeReply?token='.$token);
 		}
 
 		return array (
