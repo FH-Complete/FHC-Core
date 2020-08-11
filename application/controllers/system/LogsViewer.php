@@ -35,7 +35,7 @@ class LogsViewer extends Auth_Controller
 	// Public methods
 
 	/**
-	 * Main page of the InfoCenter tool
+	 * Everything has a beginning
 	 */
 	public function index()
 	{

@@ -182,4 +182,30 @@ class Prestudentstatus_model extends DB_Model
 			return success(array());
 		}
 	}
+
+	/**
+	 * getLastStatuses
+	 */
+	public function getLastStatusPerson($person_id, $studiensemester_kurzbz = null)
+	{
+		$query = 'SELECT *
+					FROM public.tbl_prestudent p
+					JOIN (
+							SELECT DISTINCT ON(prestudent_id) *
+							  FROM public.tbl_prestudentstatus
+							 WHERE prestudent_id IN (SELECT prestudent_id FROM public.tbl_prestudent WHERE person_id = ?)
+						  ORDER BY prestudent_id, datum desc, insertamum desc
+						) ps USING(prestudent_id)
+					JOIN public.tbl_status USING(status_kurzbz)';
+
+		$parametersArray = array($person_id);
+
+		if ($studiensemester_kurzbz != '')
+		{
+			array_push($parametersArray, $studiensemester_kurzbz);
+			$query .= ' AND ps.studiensemester_kurzbz = ?';
+		}
+
+		return $this->execQuery($query, $parametersArray);
+	}
 }
