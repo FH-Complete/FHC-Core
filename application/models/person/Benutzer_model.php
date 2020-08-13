@@ -43,13 +43,13 @@ class Benutzer_model extends DB_Model
 		$this->addSelect('1');
 		$result = $this->loadWhere(array('alias' => $alias));
 
-		if (!isError($result))
+		if (isSuccess($result))
 		{
 			if (hasData($result))
 			{
 				$result = success(array(true));
 			}
-			else if (!hasData($result))
+			else
 			{
 				$result = success(array(false));
 			}
@@ -66,6 +66,7 @@ class Benutzer_model extends DB_Model
 	public function generateAlias($uid)
 	{
 		$aliasres = '';
+		$this->addLimit(1);
 		$this->addSelect('vorname, nachname');
 		$this->addJoin('public.tbl_person', 'person_id');
 		$nameresult = $this->loadWhere(array('uid' => $uid));
@@ -86,43 +87,13 @@ class Benutzer_model extends DB_Model
 	// Private methods
 
 	/**
-	 * Sanitizes a string used for alias. Replaces special characters, spaces, upper case.
+	 * Sanitizes a string used for alias. Replaces special characters, spaces, sets lower case.
 	 * @param string $str
 	 * @return string
 	 */
 	private function _sanitizeAliasName($str)
 	{
-		$enc = 'UTF-8';
-
-		$acentos = array(
-			'A' => '/&Agrave;|&Aacute;|&Acirc;|&Atilde;|&Aring;/',
-			'Ae' => '/&Auml;/',
-			'a' => '/&agrave;|&aacute;|&acirc;|&atilde;|&aring;/',
-			'ae'=> '/&auml;/',
-			'C' => '/&Ccedil;/',
-			'c' => '/&ccedil;/',
-			'E' => '/&Egrave;|&Eacute;|&Ecirc;|&Euml;/',
-			'e' => '/&egrave;|&eacute;|&ecirc;|&euml;/',
-			'I' => '/&Igrave;|&Iacute;|&Icirc;|&Iuml;/',
-			'i' => '/&igrave;|&iacute;|&icirc;|&iuml;/',
-			'N' => '/&Ntilde;/',
-			'n' => '/&ntilde;/',
-			'O' => '/&Ograve;|&Oacute;|&Ocirc;|&Otilde;/',
-			'Oe' => '/&Ouml;/',
-			'o' => '/&ograve;|&oacute;|&ocirc;|&otilde;/',
-			'oe' => '/&ouml;/',
-			'U' => '/&Ugrave;|&Uacute;|&Ucirc;/',
-			'Ue' => '/&Uuml;/',
-			'u' => '/&ugrave;|&uacute;|&ucirc;/',
-			'ue' => '/&uuml;/',
-			'Y' => '/&Yacute;/',
-			'y' => '/&yacute;|&yuml;/',
-			'a.' => '/&ordf;/',
-			'o.' => '/&ordm;/',
-			'ss' => '/&szlig;/',
-		);
-
-		$str = preg_replace($acentos, array_keys($acentos), htmlentities($str,ENT_NOQUOTES, $enc));
+		$str = sanitizeProblemChars($str);
 		return mb_strtolower(str_replace(' ','_', $str));
 	}
 }

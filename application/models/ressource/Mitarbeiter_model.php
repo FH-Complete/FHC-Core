@@ -132,4 +132,67 @@ class Mitarbeiter_model extends DB_Model
 
 		return $this->execQuery($qry, $params);
 	}
+
+	/**
+	 * Checks if alias exists
+	 * @param $kurzbz
+	 */
+	public function kurzbzExists($kurzbz)
+	{
+		$this->addSelect('1');
+		$result = $this->loadWhere(array('kurzbz' => $kurzbz));
+
+		if (isSuccess($result))
+		{
+			if (hasData($result))
+			{
+				$result = success(array(true));
+			}
+			else
+			{
+				$result = success(array(false));
+			}
+		}
+
+		return $result;
+	}
+
+	/**
+	 * Generates alias for a uid.
+	 * @param $uid
+	 * @return array the alias if newly generated
+	 */
+	public function generateKurzbz($uid)
+	{
+		$kurzbz = '';
+		$this->addLimit(1);
+		$this->addSelect('vorname, nachname');
+		$this->addJoin('public.tbl_benutzer', 'tbl_mitarbeiter.mitarbeiter_uid = tbl_benutzer.uid');
+		$this->addJoin('public.tbl_person', 'person_id');
+		$nameresult = $this->loadWhere(array('uid' => $uid));
+
+		if (hasData($nameresult))
+		{
+			$kurzbzdata = getData($nameresult);
+			$nachname_clean = sanitizeProblemChars($kurzbzdata[0]->nachname);
+			$vorname_clean = sanitizeProblemChars($kurzbzdata[0]->vorname);
+
+			for ($nn = 6, $vn = 2; $nn != 0; $nn--, $vn++)
+			{
+				$kurzbz = mb_substr($nachname_clean, 0, $nn);
+				$kurzbz .= mb_substr($vorname_clean, 0, $vn);
+
+				$kurzbzexists = $this->kurzbzExists($kurzbz);
+
+				if (hasData($kurzbzexists) && !getData($kurzbzexists)[0])
+					break;
+			}
+
+			$kurzbzexists = $this->kurzbzExists($kurzbz);
+
+			if (hasData($kurzbzexists) && getData($kurzbzexists)[0])
+				return error('No Kurzbezeichnung could be generated');
+		}
+		return success($kurzbz);
+	}
 }
