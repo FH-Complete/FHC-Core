@@ -1139,11 +1139,14 @@ class dvb extends basis_db
 
 		$curl = curl_init();
 
+		$uuid = $this->getUUID();
+
 		$url = self::DVB_URL_WEBSERVICE_BPK;
 		$url .= '?geburtsdatum='.curl_escape($curl, $geburtsdatum);
 		$url .= '&vorname='.curl_escape($curl, $vorname);
 		$url .= '&nachname='.curl_escape($curl, $nachname);
 		$url .= '&geschlecht='.curl_escape($curl, $geschlecht);
+		$url .= '&uuid='.curl_escape($curl, $uuid);
 
 		if (!is_null($plz))
 			$url .= '&plz='.curl_escape($curl, $plz);
