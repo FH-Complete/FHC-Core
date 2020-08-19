@@ -41,7 +41,7 @@ class dvb extends basis_db
 	const DVB_URL_WEBSERVICE_MATRIKELNUMMER = DVB_PORTAL.'/rws/0.2/simpleStudentByMatrikelnummer.xml';
 	const DVB_URL_WEBSERVICE_RESERVIERUNG = DVB_PORTAL.'/rws/0.5/matrikelreservierung.xml';
 	const DVB_URL_WEBSERVICE_MELDUNG = DVB_PORTAL.'/rws/0.5/matrikelmeldung.xml';
-	const DVB_URL_WEBSERVICE_BPK = DVB_PORTAL.'/rws/0.2/pruefeBpk.xml';
+	const DVB_URL_WEBSERVICE_BPK = DVB_PORTAL.'/rws/0.5/pruefebpk.xml';
 
 	public $authentication;
 	private $username;
@@ -1140,7 +1140,7 @@ class dvb extends basis_db
 		$curl = curl_init();
 
 		$url = self::DVB_URL_WEBSERVICE_BPK;
-		$url .= '?geburtsDatum='.curl_escape($curl, $geburtsdatum);
+		$url .= '?geburtsdatum='.curl_escape($curl, $geburtsdatum);
 		$url .= '&vorname='.curl_escape($curl, $vorname);
 		$url .= '&nachname='.curl_escape($curl, $nachname);
 		$url .= '&geschlecht='.curl_escape($curl, $geschlecht);
@@ -1178,19 +1178,22 @@ class dvb extends basis_db
 		if ($curl_info['http_code'] == '200')
 		{
 			/* Example Response:
-			<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-			<simpleBpkResponse xmlns="http://www.brz.gv.at/datenverbund-unis">
-				<personenkennzeichen>1234567890ABCDEFGH=</personenkennzeichen>
+			 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+			 <simpleBpkResponse xmlns="http://www.brz.gv.at/datenverbund-unis">
+			 	<bpk>12345ABCDEFGHXXXXXXX=</bpk>
 				<personInfo>
-					<person>
-						<vorname>Max</vorname>
-						<nachname>Mustermann</nachname>
-						<geschlecht>M</geschlecht>
-						<gebdat>19901231</gebdat>
-					</person>
-					<adresse>
-						<ort></ort>
-					</adresse>
+				<person>
+					<vorname>Hans</vorname>
+					<nachname>Huber</nachname>
+					<geschlecht>M</geschlecht>
+					<gebdat>1990-01-01</gebdat>
+				</person>
+				<adresse>
+					<staat></staat>
+					<plz>1100</plz>
+					<ort></ort>
+					<strasse></strasse>
+				</adresse>
 				</personInfo>
 			</simpleBpkResponse>
 
@@ -1232,7 +1235,7 @@ class dvb extends basis_db
 				}
 			}
 
-			$domnodes_bpk = $dom->getElementsByTagNameNS($namespace, 'personenkennzeichen');
+			$domnodes_bpk = $dom->getElementsByTagNameNS($namespace, 'bpk');
 			if ($domnodes_bpk->length > 0)
 			{
 				$retval = new stdClass();
