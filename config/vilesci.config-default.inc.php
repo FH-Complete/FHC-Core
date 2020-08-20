@@ -249,4 +249,7 @@ define('BIS_FUNKTIONSCODE_6_ARR', array(
 	'Team'
 ));
 
+// bPk Abfrage
+define('BPK_FUER_ALLE_BENUTZER_ABFRAGEN', false);
+
 ?>
