@@ -59,7 +59,7 @@ class Studiensemester_model extends DB_Model
 			$days = 62;
 		}
 
-		$query = 'SELECT studiensemester_kurzbz
+		$query = 'SELECT studiensemester_kurzbz, start, ende
 					FROM public.tbl_studiensemester
 					WHERE start < NOW() + \'' . $days . ' DAYS\':: INTERVAL
 					ORDER BY start DESC
