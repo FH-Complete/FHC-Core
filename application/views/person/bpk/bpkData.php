@@ -3,7 +3,7 @@
 		'query' => '
 		SELECT
 			person_id, vorname, nachname, geschlecht, svnr, ersatzkennzeichen, matr_nr,
-			staatsbuergerschaft, gebdatum
+			staatsbuergerschaft, gebdatum, false AS mitarbeiter
 		FROM
 			public.tbl_person
 		WHERE
@@ -11,6 +11,17 @@
 			AND bpk is null
 			AND EXISTS(SELECT 1 FROM public.tbl_benutzer JOIN public.tbl_student ON(uid=student_uid) AND
 				person_id=tbl_person.person_id AND tbl_benutzer.aktiv=true)
+		UNION
+		SELECT
+			person_id, vorname, nachname, geschlecht, svnr, ersatzkennzeichen, matr_nr,
+			staatsbuergerschaft, gebdatum, true AS mitarbeiter
+		FROM
+			public.tbl_person
+            JOIN public.tbl_benutzer USING(person_id)
+            JOIN public.tbl_mitarbeiter ON (mitarbeiter_uid=uid)
+		WHERE
+			bpk is null
+			AND tbl_benutzer.aktiv=true		
 		',
 		'requiredPermissions' => 'admin',
 		'datasetRepresentation' => 'tablesorter',
@@ -25,6 +36,7 @@
 			ucfirst($this->p->t('person', 'matrikelnummer')),
 			ucfirst($this->p->t('person', 'staatsbuergerschaft')),
 			ucfirst($this->p->t('person', 'geburtsdatum')),
+			'Mitarbeiter'
 		),
 		'formatRow' => function($datasetRaw) {
 
@@ -45,6 +57,11 @@
 			{
 				$datasetRaw->{'svnr'} = '-';
 			}
+			if ($datasetRaw->{'matr_nr'} == null)
+			{
+				$datasetRaw->{'matr_nr'} = '-';
+			}
+			$datasetRaw->{'mitarbeiter'} = $datasetRaw->{'mitarbeiter'} == 'true' ? 'ja' : 'nein';
 
 			return $datasetRaw;
 		}
