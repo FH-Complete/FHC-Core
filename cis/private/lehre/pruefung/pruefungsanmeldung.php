@@ -202,6 +202,7 @@ $studiensemester->getAll();
 			echo '<option value="'.$sem->studiensemester_kurzbz.'">'.$sem->studiensemester_kurzbz.'</option>';
 		}
 	}
+	echo '<option value="0">alle Semester</option>';
 	echo '</select></p>';
 ?>
 <div id="details" title="<?php echo $p->t('pruefung/details'); ?>">
@@ -240,43 +241,45 @@ $studiensemester->getAll();
 			</tbody>
 		</table>
 	</div>
-	<?php
-	if (!defined('CIS_PRUEFUNGSANMELDUNG_LEHRVERANSTALTUNGEN_AUS_STUDIENGANG')
-		|| CIS_PRUEFUNGSANMELDUNG_LEHRVERANSTALTUNGEN_AUS_STUDIENGANG == true):
-	?>
-	<h2><?php echo $p->t('pruefung/lvVonStudiengang'); ?></h2>
-	<div>
-		<table id="table2" class="tablesorter">
-			<thead>
-				<tr>
-					<th class="columnheader1"><?php echo $p->t('global/institut'); ?></th>
-					<th class="columnheader2"><?php echo $p->t('global/lehrveranstaltung'); ?></th>
-					<th class="columnheader3"><?php echo $p->t('pruefung/pruefungTermin'); ?></th>
-					<th class="columnheader4"><?php echo $p->t('pruefung/freiePlaetze'); ?></th>
-				</tr>
-			</thead>
-			<tbody id="pruefungenStudiengang">
-			</tbody>
-		</table>
-	</div>
-	<?php endif; ?>
+    <div id="additional-exams">
+        <?php
+        if (!defined('CIS_PRUEFUNGSANMELDUNG_LEHRVERANSTALTUNGEN_AUS_STUDIENGANG')
+            || CIS_PRUEFUNGSANMELDUNG_LEHRVERANSTALTUNGEN_AUS_STUDIENGANG == true):
+            ?>
+            <h2><?php echo $p->t('pruefung/lvVonStudiengang'); ?></h2>
+            <div>
+                <table id="table2" class="tablesorter">
+                    <thead>
+                    <tr>
+                        <th class="columnheader1"><?php echo $p->t('global/institut'); ?></th>
+                        <th class="columnheader2"><?php echo $p->t('global/lehrveranstaltung'); ?></th>
+                        <th class="columnheader3"><?php echo $p->t('pruefung/pruefungTermin'); ?></th>
+                        <th class="columnheader4"><?php echo $p->t('pruefung/freiePlaetze'); ?></th>
+                    </tr>
+                    </thead>
+                    <tbody id="pruefungenStudiengang">
+                    </tbody>
+                </table>
+            </div>
+        <?php endif; ?>
 
-	<h2><?php echo $p->t('pruefung/lvAlle'); ?></h2>
-	<div>
-		<table id="table3" class="tablesorter">
-			<thead>
-				<tr>
-					<th class="columnheader1"><?php echo $p->t('global/institut'); ?></th>
-					<th class="columnheader2"><?php echo $p->t('global/lehrveranstaltung'); ?></th>
-					<th class="columnheader3"><?php echo $p->t('pruefung/pruefungTermin'); ?></th>
-					<th class="columnheader4"><?php echo $p->t('pruefung/freiePlaetze'); ?></th>
-				</tr>
-			</thead>
-			<tbody id="pruefungenGesamt">
+        <h2><?php echo $p->t('pruefung/lvAlle'); ?></h2>
+        <div>
+            <table id="table3" class="tablesorter">
+                <thead>
+                <tr>
+                    <th class="columnheader1"><?php echo $p->t('global/institut'); ?></th>
+                    <th class="columnheader2"><?php echo $p->t('global/lehrveranstaltung'); ?></th>
+                    <th class="columnheader3"><?php echo $p->t('pruefung/pruefungTermin'); ?></th>
+                    <th class="columnheader4"><?php echo $p->t('pruefung/freiePlaetze'); ?></th>
+                </tr>
+                </thead>
+                <tbody id="pruefungenGesamt">
 
-			</tbody>
-		</table>
-	</div>
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>
 <div id="saveDialog" title="<?php echo $p->t('pruefung/anmeldungSpeichern'); ?>">
 	<form id="saveAnmeldungForm">
