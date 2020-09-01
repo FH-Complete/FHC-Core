@@ -1608,8 +1608,11 @@ class dvb extends basis_db
 
 		$curl = curl_init();
 
-				$url = self::DVB_URL_WEBSERVICE_MATRIKELNUMMER;
+		$uuid = $this->getUUID();
+
+		$url = self::DVB_URL_WEBSERVICE_MATRIKELNUMMER;
 		$url .= '?matrikelNummer='.curl_escape($curl, $matrikelnr);
+		$url .= '&uuid='.curl_escape($curl, $uuid);
 
 		curl_setopt($curl, CURLOPT_URL, $url);
 		curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
