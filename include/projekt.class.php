@@ -526,8 +526,6 @@ class projekt extends basis_db
 			$given_start = date('Y-m-d', strtotime($give_project_start));
 			$given_ende = date('Y-m-d', strtotime($give_projekt_ende));
 
-			var_dump($projekt_start,$given_start);
-			var_dump($projekt_ende,$given_ende);
 			if ((empty($projekt_start) || $given_start >= $projekt_start) && (empty($projekt_ende) || $given_ende <= $projekt_ende))
 				return true;
 			else
