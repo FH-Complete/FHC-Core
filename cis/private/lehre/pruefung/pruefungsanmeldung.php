@@ -187,22 +187,15 @@ $studiensemester->getAll();
 <body>
 <?php
 	echo "<h1>".$p->t('pruefung/anmeldungFuer')." ".$benutzer->vorname." ".$benutzer->nachname." (".$uid.")</h1>";
-	echo '<h3>'.$p->t('pruefung/filter').'</h3>';
-	echo '<p>'.$p->t('global/studiensemester').': ';
+	echo '<h3 style="display: none">'.$p->t('pruefung/filter').'</h3>';
+	echo '<p style="display: none">'.$p->t('global/studiensemester').': ';
 	echo '<select id="filter_studiensemester" onchange="refresh();">';
 	$aktuellesSemester = $studiensemester->getaktorNext();
 	foreach ($studiensemester->studiensemester as $sem)
 	{
-		if ($aktuellesSemester == $sem->studiensemester_kurzbz)
-		{
-			echo '<option selected value="'.$sem->studiensemester_kurzbz.'">'.$sem->studiensemester_kurzbz.'</option>';
-		}
-		else
-		{
-			echo '<option value="'.$sem->studiensemester_kurzbz.'">'.$sem->studiensemester_kurzbz.'</option>';
-		}
+		echo '<option value="'.$sem->studiensemester_kurzbz.'">'.$sem->studiensemester_kurzbz.'</option>';
 	}
-	echo '<option value="0">alle Semester</option>';
+	echo '<option selected value="0">alle Semester</option>';
 	echo '</select></p>';
 ?>
 <div id="details" title="<?php echo $p->t('pruefung/details'); ?>">
@@ -241,7 +234,7 @@ $studiensemester->getAll();
 			</tbody>
 		</table>
 	</div>
-    <div id="additional-exams">
+    <div id="additional-exams" style="display: none">
         <?php
         if (!defined('CIS_PRUEFUNGSANMELDUNG_LEHRVERANSTALTUNGEN_AUS_STUDIENGANG')
             || CIS_PRUEFUNGSANMELDUNG_LEHRVERANSTALTUNGEN_AUS_STUDIENGANG == true):
