@@ -689,108 +689,128 @@ if(isset($_POST['save']) || isset($_POST['edit']) || isset($_POST['import']))
 					$anzahl = 0;
 					$importtage_array = array();
 					$ende_vorher = date('Y-m-d H:i:s');
+					$projects_of_user = new projekt();
+					$projects= $projects_of_user->getProjekteListForMitarbeiter($user);
+					$project_kurzbz_array = array();
+
+					foreach($projects as $prjct)
+					{
+						array_push($project_kurzbz_array, (string) $prjct->projekt_kurzbz);
+					}
+
 					while(($data = fgetcsv($handle, 1000, ';', '"')) !== FALSE)
 					{
-						if($data[0] == $user)
-						{
-							if (!isset($data[5]))
-								$data[5] = NULL;
-							if (!isset($data[6]))
-								$data[6] = NULL;
-							if (!isset($data[7]))
-								$data[7] = NULL;
-							if (!isset($data[8]))
-								$data[8] = NULL;
-							if ($datum->formatDatum($data[2], $format='Y-m-d H:i:s') < $sperrdatum)
-								echo '<span style="color:red"><b>'.$p->t("global/fehlerBeimSpeichernDerDaten").': Eingabe nicht möglich da vor dem Sperrdatum ('.$data[2].')</b></span><br>';
-							//elseif (isset($data[8]) && ( filter_var($data[8], FILTER_VALIDATE_INT) === false ))
-							//{
-							//	echo '<span style="color:red"><b>'.$p->t("global/fehlerBeimSpeichernDerDaten").': Service ID ist keine Zahl ('.$data[8].')</b></span><br>';
-							//}
-							elseif (checkVals($data[5],$data[6],$data[7],$data[8]))
+						if($data[0] == $user){
+							if(!empty($data[6]) && !in_array($data[6], $project_kurzbz_array))
 							{
-								echo '<span style="color:red"><b>'.$p->t("global/fehlerBeimSpeichernDerDaten").': Fehlerhafte Werte  ('.$data[2].')</b></span><br>';
+								echo '<span style="color:red"><b>'.$p->t("global/fehlerBeimSpeichernDerDaten").': Eingabe nicht möglich, da Sie folgendem Projekt nicht zugewiesen sind: ('.$data[6].')</b></span><br>';
 							}
 							else
 							{
-								if ($data[1] == 'LehreIntern')
-									$data[1] = 'Lehre';
-								$zeit->new = true;
-								$zeit->beschreibung = NULL;
-								$zeit->oe_kurzbz_1 = NULL;
-								$zeit->projekt_kurzbz = NULL;
-								$zeit->projektphase_id = NULL;
-								$zeit->service_id = NULL;
 
-								$zeit->insertamum = date('Y-m-d H:i:s');
-								$zeit->updateamum = date('Y-m-d H:i:s');
-								$zeit->updatevon = $user;
-								$zeit->insertvon = $user;
-								$zeit->uid = $data[0];
-								$zeit->aktivitaet_kurzbz = $data[1];
-								$zeit->start = $datum->formatDatum($data[2], $format='Y-m-d H:i:s');
-								$zeit->ende = $datum->formatDatum($data[3], $format='Y-m-d H:i:s');
-								if (isset($data[4]))
-									$zeit->beschreibung = $data[4];
-								if (isset($data[5]))
-									$zeit->oe_kurzbz_1 = $data[5];
-								if (isset($data[6]))
-									$zeit->projekt_kurzbz = $data[6];
-								if (isset($data[7]))
-									$zeit->projektphase_id = $data[7];
-								if (isset($data[8]))
-									$zeit->service_id = $data[8];
-								$tag = $datum->formatDatum($data[2], $format='Y-m-d');
-
-								if(!in_array($tag, $importtage_array))
+								if (!isset($data[5]))
+									$data[5] = NULL;
+								if (!isset($data[6]))
+									$data[6] = NULL;
+								if (!isset($data[7]))
+									$data[7] = NULL;
+								if (!isset($data[8]))
+									$data[8] = NULL;
+								if ($datum->formatDatum($data[2], $format='Y-m-d H:i:s') < $sperrdatum)
+									echo '<span style="color:red"><b>'.$p->t("global/fehlerBeimSpeichernDerDaten").': Eingabe nicht möglich da vor dem Sperrdatum ('.$data[2].')</b></span><br>';
+								//elseif (isset($data[8]) && ( filter_var($data[8], FILTER_VALIDATE_INT) === false ))
+								//{
+								//	echo '<span style="color:red"><b>'.$p->t("global/fehlerBeimSpeichernDerDaten").': Service ID ist keine Zahl ('.$data[8].')</b></span><br>';
+								//}
+								elseif (!empty($data[6]) && !$projects_of_user->checkProjectInCorrectTime($data[6], $data[2], $data[3]))
 								{
-									$importtage_array[] = $tag;
-									$zeit->deleteEntriesForUser($user, $tag);
-									$tag_aktuell = $tag;
+									echo '<span style="color:red"><b>'.$p->t("global/fehlerBeimSpeichernDerDaten").': Eingabe nicht möglich, da Sie angegebenes Anfangs und Enddatum nicht in den Projektzeitrahmen fällt.</b></span><br>';
+								}
+								elseif (checkVals($data[5],$data[6],$data[7],$data[8]))
+								{
+									echo '<span style="color:red"><b>'.$p->t("global/fehlerBeimSpeichernDerDaten").': Fehlerhafte Werte  ('.$data[2].')</b></span><br>';
 								}
 								else
 								{
-									if ($ende_vorher < $zeit->start)
+									if ($data[1] == 'LehreIntern')
+										$data[1] = 'Lehre';
+									$zeit->new = true;
+									$zeit->beschreibung = NULL;
+									$zeit->oe_kurzbz_1 = NULL;
+									$zeit->projekt_kurzbz = NULL;
+									$zeit->projektphase_id = NULL;
+									$zeit->service_id = NULL;
+
+									$zeit->insertamum = date('Y-m-d H:i:s');
+									$zeit->updateamum = date('Y-m-d H:i:s');
+									$zeit->updatevon = $user;
+									$zeit->insertvon = $user;
+									$zeit->uid = $data[0];
+									$zeit->aktivitaet_kurzbz = $data[1];
+									$zeit->start = $datum->formatDatum($data[2], $format='Y-m-d H:i:s');
+									$zeit->ende = $datum->formatDatum($data[3], $format='Y-m-d H:i:s');
+									if (isset($data[4]))
+										$zeit->beschreibung = $data[4];
+									if (isset($data[5]))
+										$zeit->oe_kurzbz_1 = $data[5];
+									if (isset($data[6]))
+										$zeit->projekt_kurzbz = $data[6];
+									if (isset($data[7]))
+										$zeit->projektphase_id = $data[7];
+									if (isset($data[8]))
+										$zeit->service_id = $data[8];
+									$tag = $datum->formatDatum($data[2], $format='Y-m-d');
+
+									if(!in_array($tag, $importtage_array))
 									{
-										$pause = new zeitaufzeichnung();
-										$pause->new = true;
-										$pause->insertamum = date('Y-m-d H:i:s');
-										$pause->updateamum = date('Y-m-d H:i:s');
-										$pause->updatevon = $user;
-										$pause->insertvon = $user;
-										$pause->uid = $user;
-										$pause->aktivitaet_kurzbz = 'Pause';
-										$pause->start = $ende_vorher;
-										$pause->ende = $zeit->start;
-										$pause->beschreibung = '';
-										if(!$pause->save())
+										$importtage_array[] = $tag;
+										$zeit->deleteEntriesForUser($user, $tag);
+										$tag_aktuell = $tag;
+									}
+									else
+									{
+										if ($ende_vorher < $zeit->start)
 										{
-											echo '<span style="color:red"><b>'.$p->t("global/fehlerBeimSpeichernDerDaten").': '.$pause->errormsg.'</b></span><br>';
+											$pause = new zeitaufzeichnung();
+											$pause->new = true;
+											$pause->insertamum = date('Y-m-d H:i:s');
+											$pause->updateamum = date('Y-m-d H:i:s');
+											$pause->updatevon = $user;
+											$pause->insertvon = $user;
+											$pause->uid = $user;
+											$pause->aktivitaet_kurzbz = 'Pause';
+											$pause->start = $ende_vorher;
+											$pause->ende = $zeit->start;
+											$pause->beschreibung = '';
+											if(!$pause->save())
+											{
+												echo '<span style="color:red"><b>'.$p->t("global/fehlerBeimSpeichernDerDaten").': '.$pause->errormsg.'</b></span><br>';
+											}
 										}
 									}
-								}
 
-								$ende_vorher = $zeit->ende;
-								if($data[2] != $data[3])
-								{
-									/*
-									if ($data[1] == 'LehreExtern')
+									$ende_vorher = $zeit->ende;
+									if($data[2] != $data[3])
 									{
-										$zeit->start = date('Y-m-d H:i:s', strtotime('+2 seconds', strtotime($data[2])));
-										$zeit->ende = date('Y-m-d H:i:s', strtotime('-2 seconds', strtotime($data[3])));
-									}
-									*/
-									if(!$zeit->save())
-									{
-										echo '<span style="color:red"><b>'.$p->t("global/fehlerBeimSpeichernDerDaten").': '.$zeit->errormsg.'</b>('.$zeit->start.')</span><br>';
+										/*
+										if ($data[1] == 'LehreExtern')
+										{
+											$zeit->start = date('Y-m-d H:i:s', strtotime('+2 seconds', strtotime($data[2])));
+											$zeit->ende = date('Y-m-d H:i:s', strtotime('-2 seconds', strtotime($data[3])));
+										}
+										*/
+										if(!$zeit->save())
+										{
+											echo '<span style="color:red"><b>'.$p->t("global/fehlerBeimSpeichernDerDaten").': '.$zeit->errormsg.'</b>('.$zeit->start.')</span><br>';
+										}
+										else
+											$anzahl++;
 									}
 									else
 										$anzahl++;
-								}
-								else
-									$anzahl++;
 
-							}
+								}
+						}
 						}
 						else if (strpos($data[0],'#') === false)
 						{
