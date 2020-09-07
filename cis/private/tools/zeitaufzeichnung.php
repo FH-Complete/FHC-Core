@@ -672,6 +672,14 @@ function checkVals ($oe_val, $project_val, $phase_val, $service_val)
 if(isset($_POST['save']) || isset($_POST['edit']) || isset($_POST['import']))
 {
 	$zeit = new zeitaufzeichnung();
+	$projects_of_user = new projekt();
+	$projects= $projects_of_user->getProjekteListForMitarbeiter($user);
+	$project_kurzbz_array = array();
+
+	foreach($projects as $prjct)
+	{
+		array_push($project_kurzbz_array, (string) $prjct->projekt_kurzbz);
+	}
 
 	if ($_FILES['csv']['error'] == 0 && isset($_POST['import']))
 	{
@@ -689,14 +697,14 @@ if(isset($_POST['save']) || isset($_POST['edit']) || isset($_POST['import']))
 					$anzahl = 0;
 					$importtage_array = array();
 					$ende_vorher = date('Y-m-d H:i:s');
-					$projects_of_user = new projekt();
+					/*$projects_of_user = new projekt();
 					$projects= $projects_of_user->getProjekteListForMitarbeiter($user);
 					$project_kurzbz_array = array();
 
 					foreach($projects as $prjct)
 					{
 						array_push($project_kurzbz_array, (string) $prjct->projekt_kurzbz);
-					}
+					}*/
 
 					while(($data = fgetcsv($handle, 1000, ';', '"')) !== FALSE)
 					{
@@ -832,7 +840,7 @@ if(isset($_POST['save']) || isset($_POST['edit']) || isset($_POST['import']))
 		}
 	}
 	else if ($datum->formatDatum($von, $format='Y-m-d H:i:s') < $sperrdatum)
-		echo '<span style="color:red"><b>'.$p->t("global/fehlerBeimSpeichernDerDaten").': Eingabe nicht möglich da vor dem Sperrdatum</b></span>';
+		echo '<span style="color:#ff0000"><b>' .$p->t("global/fehlerBeimSpeichernDerDaten").': Eingabe nicht möglich da vor dem Sperrdatum</b></span>';
 	else if (isset($_POST['save']) || isset($_POST['edit']))
 	{
 
@@ -864,7 +872,12 @@ if(isset($_POST['save']) || isset($_POST['edit']) || isset($_POST['import']))
 		$zeit->service_id = $service_id;
 		$zeit->kunde_uid = $kunde_uid;
 		$saveerror = 0;
-		if (isset($_POST['genPause']) && (isset($_POST['save']) || isset($_POST['edit'])))
+		if (!$projects_of_user->checkProjectInCorrectTime($projekt_kurzbz, $datum->formatDatum($von, $format='Y-m-d'), $datum->formatDatum($bis, $format='Y-m-d')))
+		{
+			echo '<span style="color:red"><b>'.$p->t("global/fehlerBeimSpeichernDerDaten").': Eingabe nicht möglich, da Sie angegebenes Anfangs und Enddatum nicht in den Projektzeitrahmen fällt.</b></span><br>';
+			$saveerror = 1;
+		}
+		elseif (isset($_POST['genPause']) && (isset($_POST['save']) || isset($_POST['edit'])))
 		{
 
 			$p_start = $datum->formatDatum($von_pause, $format='Y-m-d H:i:s');
