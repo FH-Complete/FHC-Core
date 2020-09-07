@@ -26,7 +26,7 @@ class Abschlusspruefung_model extends DB_Model
 
 		$abschlusspruefungdata = array();
 
-		$this->addSelect('tbl_abschlusspruefung.abschlusspruefung_id, tbl_abschlusspruefung.datum, tbl_abschlusspruefung.abschlussbeurteilung_kurzbz, tbl_abschlusspruefung.uhrzeit AS pruefungsbeginn, tbl_abschlusspruefung.endezeit AS pruefungsende,
+		$this->addSelect('tbl_abschlusspruefung.abschlusspruefung_id, tbl_abschlusspruefung.datum, tbl_abschlusspruefung.pruefungstyp_kurzbz AS studiengangstyp, tbl_abschlusspruefung.abschlussbeurteilung_kurzbz, tbl_abschlusspruefung.uhrzeit AS pruefungsbeginn, tbl_abschlusspruefung.endezeit AS pruefungsende,
 								tbl_abschlusspruefung.freigabedatum, tbl_abschlusspruefung_antritt.bezeichnung AS pruefungsantritt_bezeichnung, tbl_abschlusspruefung_antritt.bezeichnung_english AS pruefungsantritt_bezeichnung_english, tbl_abschlusspruefung.protokoll,
 								studentpers.vorname AS vorname_student, studentpers.nachname AS nachname_student, studentpers.titelpre AS titelpre_student, studentpers.titelpost AS titelpost_student, studentben.uid AS uid_student, matrikelnr, 
 								vorsitzenderben.uid AS uid_vorsitz, vorsitzenderpers.vorname AS vorname_vorsitz, vorsitzenderpers.nachname AS nachname_vorsitz, vorsitzenderpers.titelpre AS titelpre_vorsitz, vorsitzenderpers.titelpost AS titelpost_vorsitz,
@@ -71,29 +71,42 @@ class Abschlusspruefung_model extends DB_Model
 					$abschlusspruefungdata->studiengang_kz = $studienordnungdata->studiengang_kz;
 					$abschlusspruefungdata->studiengangbezeichnung = $studienordnungdata->studiengangbezeichnung;
 					$abschlusspruefungdata->studiengangbezeichnung_englisch = $studienordnungdata->studiengangbezeichnung_englisch;
-
-					$this->StudiengangModel->addSelect('typ');
-					$typ = $this->StudiengangModel->load($studienordnungdata->studiengang_kz);
-					if (isError($typ))
-						return $typ;
-					elseif (hasData($typ))
+				}
+				// if no Studienordnung available (e.g. Incomings), use Studiengangname provided by table student
+				elseif (!hasData($studienordnung))
+				{
+					$this->resetQuery();
+					
+					$this->load->model('crm/Student_model', 'StudentModel');
+					$this->addSelect('studiengang_kz, bezeichnung, english');
+					$this->addJoin('public.tbl_studiengang', 'studiengang_kz');
+					$result = $this->StudentModel->load(array(
+						'student_uid' => $student_uid)
+					);
+					
+					if ($result = getData($result)[0])
 					{
-						$abschlusspruefungdata->studiengangstyp = getData($typ)[0]->typ;
+						$abschlusspruefungdata->studiengang_kz = $result->studiengang_kz;
+						$abschlusspruefungdata->studiengangbezeichnung = $result->bezeichnung;
+						$abschlusspruefungdata->studiengangbezeichnung_englisch = $result->english;
 					}
-
-					// get Abschlussarbeit
+				}
+				
+				// get Abschlussarbeit
+				if (isset($abschlusspruefungdata->studiengang_kz) &&  !empty($abschlusspruefungdata->studiengang_kz))
+				{
 					$projekttyp = array('Bachelor','Diplom','Master','Dissertation','Lizenziat','Magister');
-					$abschlussarbeit = $this->ProjektarbeitModel->getProjektarbeit($student_uid, $studienordnungdata->studiengang_kz, null, $projekttyp, true);
+					$abschlussarbeit = $this->ProjektarbeitModel->getProjektarbeit($student_uid, $abschlusspruefungdata->studiengang_kz, null, $projekttyp, true);
 
 					if (isError($abschlussarbeit))
 						return $abschlussarbeit;
 					if (hasData($abschlussarbeit))
 					{
-							$abschlussarbeit = getData($abschlussarbeit)[0];
-							$abschlusspruefungdata->projektarbeit_studiengangstyp_name = $abschlussarbeit->projekttyp_kurzbz;
-							$abschlusspruefungdata->abschlussarbeit_titel = $abschlussarbeit->titel;
-							$abschlusspruefungdata->abschlussarbeit_note = $abschlussarbeit->note;
-						}
+						$abschlussarbeit = getData($abschlussarbeit)[0];
+						$abschlusspruefungdata->projektarbeit_studiengangstyp_name = $abschlussarbeit->projekttyp_kurzbz;
+						$abschlusspruefungdata->abschlussarbeit_titel = $abschlussarbeit->titel;
+						$abschlusspruefungdata->abschlussarbeit_note = $abschlussarbeit->note;
+					}
 				}
 			}
 		}

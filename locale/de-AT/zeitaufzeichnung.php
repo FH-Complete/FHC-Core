@@ -62,3 +62,4 @@ $this->phrasen['zeitaufzeichnung/dienstreise']='Dienstreise';
 $this->phrasen['zeitaufzeichnung/projektphase']='AP';
 $this->phrasen['zeitaufzeichnung/pauseEinfuegen']='Pause automatisch einfügen';
 $this->phrasen['zeitaufzeichnung/zeitraumZuKurz']='Zeitraum zu kurz für automatische Pause';
+$this->phrasen['zeitaufzeichnung/supportAnfragen']='<p><hr>Supportanfragen unter<br><a href="mailto:zeiterfassung@technikum-wien.at">zeiterfassung@technikum-wien.at</a></p>';

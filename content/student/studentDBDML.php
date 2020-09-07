@@ -280,6 +280,35 @@ function NotePruefungAnlegen($studiensemester_kurzbz, $student_uid, $lehrveranst
 	}
 }
 
+/**
+ * Prueft ob die Kontobuchung bereits ins SAP Ubertragen wurde oder noch geändert werden darf
+ */
+function isBuchungAllowedToChange($buchung_obj)
+{
+	global $db;
+
+	if(defined('BUCHUNGEN_CHECK_SAP') && BUCHUNGEN_CHECK_SAP == true)
+	{
+		$qry = "SELECT * FROM sync.tbl_sap_salesorder WHERE buchungsnr=".$db->db_add_param($buchung_obj->buchungsnr);
+		if ($buchung_obj->buchungsnr_verweis != '')
+			$qry .= " OR buchungsnr=".$db->db_add_param($buchung_obj->buchungsnr_verweis);
+
+		if ($result = $db->db_query($qry))
+		{
+			if($db->db_num_rows($result) > 0)
+			{
+				return false;
+			}
+			else
+				return true;
+		}
+		else
+			return false;
+	}
+	else
+		return true;
+}
+
 if(!$error)
 {
 
@@ -1952,27 +1981,35 @@ if(!$error)
 				}
 				else
 				{
-					$buchung->betrag = $_POST['betrag'];
-					$buchung->buchungsdatum = $_POST['buchungsdatum'];
-					$buchung->buchungstext = $_POST['buchungstext'];
-					$buchung->mahnspanne = $_POST['mahnspanne'];
-					$buchung->buchungstyp_kurzbz = $_POST['buchungstyp_kurzbz'];
-					$buchung->studiensemester_kurzbz = $_POST['studiensemester_kurzbz'];
-					$buchung->studiengang_kz = $_POST['studiengang_kz'];
-					$buchung->credit_points = $_POST['credit_points'];
-					$buchung->new = false;
-					$buchung->updateamum = date('Y-m-d H:i:s');
-					$buchung->updatevon = $user;
-					$buchung->anmerkung = $_POST['anmerkung'];
-
-					if($buchung->save())
+					if(isBuchungAllowedToChange($buchung))
 					{
-						$return = true;
+						$buchung->betrag = $_POST['betrag'];
+						$buchung->buchungsdatum = $_POST['buchungsdatum'];
+						$buchung->buchungstext = $_POST['buchungstext'];
+						$buchung->mahnspanne = $_POST['mahnspanne'];
+						$buchung->buchungstyp_kurzbz = $_POST['buchungstyp_kurzbz'];
+						$buchung->studiensemester_kurzbz = $_POST['studiensemester_kurzbz'];
+						$buchung->studiengang_kz = $_POST['studiengang_kz'];
+						$buchung->credit_points = $_POST['credit_points'];
+						$buchung->new = false;
+						$buchung->updateamum = date('Y-m-d H:i:s');
+						$buchung->updatevon = $user;
+						$buchung->anmerkung = $_POST['anmerkung'];
+
+						if($buchung->save())
+						{
+							$return = true;
+						}
+						else
+						{
+							$return = false;
+							$errormsg = 'Fehler beim Speichern:'.$buchung->errormsg;
+						}
 					}
 					else
 					{
 						$return = false;
-						$errormsg = 'Fehler beim Speichern:'.$buchung->errormsg;
+						$errormsg = 'Buchung wurde bereits übertragen und darf nicht geändert werden';
 					}
 				}
 			}
@@ -2025,26 +2062,34 @@ if(!$error)
 						{
 							if($buchung->buchungsnr_verweis=='')
 							{
-								$kto = new konto();
-								//$buchung->betrag*(-1);
-								$buchung->betrag = $kto->getDifferenz($buchungsnr);
-								$buchung->buchungsdatum = $gegenbuchungsdatum;
-								$buchung->mahnspanne = '0';
-								$buchung->buchungsnr_verweis = $buchung->buchungsnr;
-								$buchung->new = true;
-								$buchung->insertamum = date('Y-m-d H:i:s');
-								$buchung->insertvon = $user;
-								$buchung->anmerkung = '';
-
-								if($buchung->save())
+								if(isBuchungAllowedToChange($buchung))
 								{
-									//$data = $buchung->buchungsnr;
-									$return = true;
+									$kto = new konto();
+									//$buchung->betrag*(-1);
+									$buchung->betrag = $kto->getDifferenz($buchungsnr);
+									$buchung->buchungsdatum = $gegenbuchungsdatum;
+									$buchung->mahnspanne = '0';
+									$buchung->buchungsnr_verweis = $buchung->buchungsnr;
+									$buchung->new = true;
+									$buchung->insertamum = date('Y-m-d H:i:s');
+									$buchung->insertvon = $user;
+									$buchung->anmerkung = '';
+
+									if($buchung->save())
+									{
+										//$data = $buchung->buchungsnr;
+										$return = true;
+									}
+									else
+									{
+										$return = false;
+										$errormsg .= "\n".'Fehler beim Speichern:'.$buchung->errormsg;
+									}
 								}
 								else
 								{
 									$return = false;
-									$errormsg .= "\n".'Fehler beim Speichern:'.$buchung->errormsg;
+									$errormsg .= "\n".'Buchung wurde bereits Übertragen und darf nicht geändert werden';
 								}
 							}
 							else
@@ -2094,14 +2139,23 @@ if(!$error)
 				}
 				else
 				{
-					if($buchung->delete($_POST['buchungsnr']))
+					if(isBuchungAllowedToChange($buchung))
 					{
-						$return = true;
+						if($buchung->delete($_POST['buchungsnr']))
+						{
+							$return = true;
+						}
+						else
+						{
+							$errormsg = $buchung->errormsg;
+							$return = false;
+						}
 					}
 					else
 					{
-						$errormsg = $buchung->errormsg;
+						$error = true;
 						$return = false;
+						$errormsg = 'Diese Buchung darf nicht gelöscht werden da diese bereits übertragen wurde';
 					}
 				}
 			}

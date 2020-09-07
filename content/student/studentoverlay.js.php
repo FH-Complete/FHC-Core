@@ -3205,6 +3205,11 @@ function StudentZeugnisDokumentArchivieren()
 				alert('Dieses Dokument kann nur für Studierende erstellt werden. Mindestens eine ausgewählte Person hat keine UID');
 				continue;
 			}
+			if(vorlage == 'Ausbildungsver' || vorlage == 'AusbVerEng')
+			{
+				// Ausbildungsvertrag nimmt nur PrestudentID
+				uid = '';
+			}
 
 			var req = new phpRequest(url,'','');
 			req.add('xsl', vorlage);

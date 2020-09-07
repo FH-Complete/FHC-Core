@@ -267,7 +267,7 @@ foreach ($uid_arr as $uid)
 					'titelpost' => $bn->titelpost,
 					'studiengang' => $studiengang->kurzbzlang,
 					'gebdatum' => $datum_obj->formatDatum($bn->gebdatum, 'd.m.Y'),
-					'matrikelnummer' => $student->matrikelnr,
+					'matrikelnummer' => rtrim($student->matrikelnr),
 					'matr_nr' => $person->matr_nr,
 					'ausstellungsdatum' => date('M.Y'),
 					'gueltigbis' => $datum_obj->formatDatum($gueltigbis, 'd.m.Y')

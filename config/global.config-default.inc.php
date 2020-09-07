@@ -294,4 +294,10 @@ define('STUDIENGANG_KZ_QUALIFIKATIONKURSE', null);
 
 // Gibt an ob der Login ins Testtool ueber das Bewerbungstool stattfindet oder nicht
 define('TESTTOOL_LOGIN_BEWERBUNGSTOOL', false);
+
+// Prueft ob Buchungen bereits ins SAP uebertragen wurden und sperrt ggf die Bearbeitung
+define('BUCHUNGEN_CHECK_SAP', true);
+
+// Gibt an, ob im FAS die Zahlungsbestaetigungen zum Download / im CIS generell die Zahlungen angezeigt werden
+define ('ZAHLUNGSBESTAETIGUNG_ANZEIGEN', true);
 ?>

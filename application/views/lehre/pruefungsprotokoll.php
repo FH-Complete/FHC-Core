@@ -45,10 +45,10 @@ $this->load->view(
 	<div id="page-wrapper">
 		<div class="container-fluid">
             <?php if (isset($abschlusspruefung)):
-                $studiengangstyp_name = $abschlusspruefung->studiengangstyp == 'b' ? 'Bachelor' : 'Master';
-                $pruefung_name = $abschlusspruefung->studiengangstyp == 'b' ? $this->p->t('abschlusspruefung', 'pruefungBachelor') : $this->p->t('abschlusspruefung', 'pruefungMaster');
-                $arbeit_name = $abschlusspruefung->studiengangstyp == 'b' ? $this->p->t('abschlusspruefung', 'arbeitBachelor') : $this->p->t('abschlusspruefung', 'arbeitMaster');
-                $protokolltextvorlage = $abschlusspruefung->studiengangstyp == 'b' ? $this->p->t('abschlusspruefung', 'pruefungsnotizenBachelor') : $this->p->t('abschlusspruefung', 'pruefungsnotizenMaster');
+                $studiengangstyp_name = $abschlusspruefung->studiengangstyp == 'Bachelor' ? 'Bachelor' : 'Master';
+                $pruefung_name = $abschlusspruefung->studiengangstyp == 'Bachelor' ? $this->p->t('abschlusspruefung', 'pruefungBachelor') : $this->p->t('abschlusspruefung', 'pruefungMaster');
+                $arbeit_name = $abschlusspruefung->studiengangstyp == 'Bachelor' ? $this->p->t('abschlusspruefung', 'arbeitBachelor') : $this->p->t('abschlusspruefung', 'arbeitMaster');
+                $protokolltextvorlage = $abschlusspruefung->studiengangstyp == 'Bachelor' ? $this->p->t('abschlusspruefung', 'pruefungsnotizenBachelor') : $this->p->t('abschlusspruefung', 'pruefungsnotizenMaster');
                 $protokolltext = isset($abschlusspruefung->protokoll) ? $abschlusspruefung->protokoll : $protokolltextvorlage;
                 ?>
 			<div class="row">
@@ -57,7 +57,7 @@ $this->load->view(
 						<?php echo $this->p->t('abschlusspruefung', 'protokoll') ?>&nbsp;<?php echo $pruefung_name ?>
 					</h3>
                     <p>
-                        <?php echo $abschlusspruefung->studiengangstyp == 'b' ? $this->p->t('abschlusspruefung', 'abgehaltenAmBachelor') : $this->p->t('abschlusspruefung', 'abgehaltenAmMaster'); ?>
+                        <?php echo $abschlusspruefung->studiengangstyp == 'Bachelor' ? $this->p->t('abschlusspruefung', 'abgehaltenAmBachelor') : $this->p->t('abschlusspruefung', 'abgehaltenAmMaster'); ?>
 						<?php echo $language == 'German' ? $abschlusspruefung->studiengangbezeichnung : $abschlusspruefung->studiengangbezeichnung_englisch ?>,&nbsp;<?php echo $this->p->t('abschlusspruefung', 'studiengangskennzahl') ?>&nbsp;
 						<?php echo $abschlusspruefung->studiengang_kz ?>
                     </p>
@@ -156,7 +156,7 @@ $this->load->view(
                                     <?php echo $this->p->t('abschlusspruefung', 'pruefungsgegenstand') ?>
                                 </td>
                                 <td colspan="5">
-                                    <?php  echo ($abschlusspruefung->studiengangstyp == 'b' ? $this->p->t('abschlusspruefung', 'pruefungsgegenstandBachelor') : $this->p->t('abschlusspruefung', 'pruefungsgegenstandMaster')) ?>
+                                    <?php  echo ($abschlusspruefung->studiengangstyp == 'Bachelor' ? $this->p->t('abschlusspruefung', 'pruefungsgegenstandBachelor') : $this->p->t('abschlusspruefung', 'pruefungsgegenstandMaster')) ?>
                                 </td>
                             </tr>
                             <tr>
@@ -172,12 +172,12 @@ $this->load->view(
                             </tr>
                             <tr>
                                 <td colspan="6">
-                                    <?php  echo $abschlusspruefung->studiengangstyp == 'b' ? $this->p->t('abschlusspruefung', 'beurteilungKriterienBachelor') : $this->p->t('abschlusspruefung', 'beurteilungKriterienMaster') ?>
+                                    <?php  echo $abschlusspruefung->studiengangstyp == 'Bachelor' ? $this->p->t('abschlusspruefung', 'beurteilungKriterienBachelor') : $this->p->t('abschlusspruefung', 'beurteilungKriterienMaster') ?>
                                 </td>
                             </tr>
                             <tr>
                                 <td colspan="6">
-                                    <?php echo $abschlusspruefung->studiengangstyp == 'b' ? $this->p->t('abschlusspruefung', 'beurteilungBachelor') : $this->p->t('abschlusspruefung', 'beurteilungMaster') ?>:
+                                    <?php echo $abschlusspruefung->studiengangstyp == 'Bachelor' ? $this->p->t('abschlusspruefung', 'beurteilungBachelor') : $this->p->t('abschlusspruefung', 'beurteilungMaster') ?>:
                                     <select name="abschlussbeurteilung_kurzbz" id="abschlussbeurteilung_kurzbz" class="form-control">
                                         <option value="">-- <?php echo $this->p->t('ui', 'bitteWaehlen'); ?> --</option>
                                         <?php foreach ($abschlussbeurteilung as $beurteilung):

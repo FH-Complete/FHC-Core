@@ -51,7 +51,14 @@ class Pruefungsprotokoll extends Auth_Controller
 	public function index()
 	{
 		$this->load->library('WidgetLib');
-		$this->load->view('lehre/pruefungsprotokollUebersicht.php');
+		
+		// Protokolle anzeigen seit heute / letzte Woche / alle
+		$period = $this->input->post('period');
+		$period = (!is_null($period)) ? $period : 'today';
+		
+		$data = array('period' => $period);
+		
+		$this->load->view('lehre/pruefungsprotokollUebersicht.php', $data);
 	}
 
 	/**
