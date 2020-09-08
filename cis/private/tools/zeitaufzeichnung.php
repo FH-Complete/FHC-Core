@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2006 Technikum-Wien
+/* kCopyright (C) 2006 Technikum-Wien
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
@@ -697,14 +697,6 @@ if(isset($_POST['save']) || isset($_POST['edit']) || isset($_POST['import']))
 					$anzahl = 0;
 					$importtage_array = array();
 					$ende_vorher = date('Y-m-d H:i:s');
-					/*$projects_of_user = new projekt();
-					$projects= $projects_of_user->getProjekteListForMitarbeiter($user);
-					$project_kurzbz_array = array();
-
-					foreach($projects as $prjct)
-					{
-						array_push($project_kurzbz_array, (string) $prjct->projekt_kurzbz);
-					}*/
 
 					while(($data = fgetcsv($handle, 1000, ';', '"')) !== FALSE)
 					{
