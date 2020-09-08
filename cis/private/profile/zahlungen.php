@@ -221,14 +221,12 @@ echo '			<script type="text/javascript" src="../../../vendor/components/jqueryui
 			$buchungsnummern='';
 
 			// Für die FHTW sollen nur Zahlungsbestaetigungen von FHTW-Studien angezeigt werden. (Nicht von Lehrgaengen)
-			if (ZAHLUNGSBESTAETIGUNG_ANZEIGEN)
+			if (defined('ZAHLUNGSBESTAETIGUNG_ANZEIGEN_FUER_LEHRGAENGE') && !ZAHLUNGSBESTAETIGUNG_ANZEIGEN_FUER_LEHRGAENGE)
 			{
-				if (defined('CAMPUS_NAME') && CAMPUS_NAME == 'FH Technikum Wien')
-				{
-					$is_lehrgang = $row['parent']->studiengang_kz < 0 ? true : false;
-					if ($is_lehrgang) continue;
-				}
+				$is_lehrgang = $row['parent']->studiengang_kz < 0 ? true : false;
+				if ($is_lehrgang) continue;
 			}
+			
 			if(!isset($row['parent']))
 				continue;
 			$betrag = $row['parent']->betrag;
