@@ -38,6 +38,7 @@ require_once('../../include/student.class.php');
 require_once('../../include/prestudent.class.php');
 require_once('../../include/dokument_export.class.php');
 require_once('../../include/person.class.php');
+require_once('../../include/webservicelog.class.php');
 
 if (!$db = new basis_db())
 	die('Fehler beim Oeffnen der Datenbankverbindung');
@@ -138,6 +139,21 @@ if (isset($_GET['all']))
 	$params .= '&all=1';
 if (isset($_GET['xsl_oe_kurzbz']))
 	$params .= '&xsl_oe_kurzbz='. $_GET['xsl_oe_kurzbz'];
+
+// Logeintrag bei Download von Zahlungsbestaetigungen
+if (isset($_GET['xsl']) && $_GET['xsl'] == 'Zahlung')
+{
+	$requestdata = $_SERVER['QUERY_STRING'];
+	
+	$log = new Webservicelog();
+	$log->webservicetyp_kurzbz = 'content';
+	$log->request_id = isset($_GET['buchungsnummern']) && !empty($_GET['buchungsnummern']) ? $_GET['buchungsnummern'] : NULL;
+	$log->beschreibung = 'Zahlungsbestaetigungsdownload';
+	$log->request_data = $requestdata;
+	$log->execute_user = $user;
+	
+	$log->save(true);
+}
 
 //OE fuer Output ermitteln
 
