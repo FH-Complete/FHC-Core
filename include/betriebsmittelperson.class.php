@@ -595,7 +595,7 @@ class betriebsmittelperson extends basis_db
 			FROM
 				wawi.tbl_betriebsmittel
 				JOIN wawi.tbl_betriebsmittelperson USING(betriebsmittel_id)
-			WHERE tbl_betriebsmittel.nummer='.$this->db_add_param($nummer).'
+			WHERE tbl_betriebsmittel.nummer2='.$this->db_add_param($nummer).'
 			AND tbl_betriebsmittel.betriebsmitteltyp=\'Zutrittskarte\'
 			AND tbl_betriebsmittelperson.person_id='.$this->db_add_param($person_id);
 

@@ -2555,7 +2555,7 @@ if(!$error)
 					$_POST['nummer']=$bm->transform_kartennummer($_POST['nummer']);
 
 				//Das speichern von Zutrittskarten ohne Nummern verhindern
-				if($_POST['betriebsmitteltyp']=='Zutrittskarte' && $_POST['nummer']=='')
+				if($_POST['betriebsmitteltyp']=='Zutrittskarte' && ($_POST['nummer']=='' && $_POST['nummer2']==''))
 				{
 					$error = true;
 					$return = false;
@@ -2563,14 +2563,23 @@ if(!$error)
 				}
 				else
 				{
+					if ($_POST['betriebsmitteltyp']=='Zutrittskarte' && $_POST['nummer'] == '')
+					{
+						$resultBM = $bm->getBetriebsmittel($_POST['betriebsmitteltyp'],null, $_POST['nummer2']);
+					}
+					else
+					{
+						$resultBM = $bm->getBetriebsmittel($_POST['betriebsmitteltyp'],$_POST['nummer']);
+					}
+
 					//Nachschauen ob dieses Betriebsmittel schon existiert
-					if($bm->getBetriebsmittel($_POST['betriebsmitteltyp'],$_POST['nummer']))
+					if($resultBM)
 					{
 						if(count($bm->result)>0)
 						{
 							//Wenn die Nummer gleich bleibt dann die alte ID verwenden da es
 							//unterschiedliche Schluessel gibt die die gleiche nummer haben ?!?
-							if($_POST['nummer']==$_POST['nummerold'])
+							if($_POST['nummer'] != '' && $_POST['nummer'] == $_POST['nummerold'])
 							{
 								$betriebsmittel_id = $_POST['betriebsmittel_id'];
 							}
