@@ -240,7 +240,8 @@ echo '			<script type="text/javascript" src="../../../vendor/components/jqueryui
 				{
 					$betrag += $row_child->betrag;
 					$betrag = round($betrag, 2);
-					$buchungsnummern .= ';'.$row['childs'][$key]->buchungsnr;
+					$buchungsnummern = !empty($buchungsnummern) ? ';' : '';
+					$buchungsnummern .= $row['childs'][$key]->buchungsnr;
 					$i = $key; //Zaehler auf letzten Gegenbuchungseintrag setzen
 				}
 			}
