@@ -166,6 +166,12 @@ if(isset($_POST['export']))
 	}
 }
 
+//CSV export für Übersicht zugeteilter Projekte - Konflikt mit normalen HTML headern deshalb weiter vorne
+if(isset($_POST['projektübersichtexport']))
+{
+	exportProjectOverviewAsCSV($user, ',');
+}
+
 echo '<!DOCTYPE HTML>
 <html>
 	<head>
@@ -1048,7 +1054,9 @@ if($projekt->getProjekteMitarbeiter($user, true))
 
 						<a href='".$_SERVER['PHP_SELF']."?csvimport=1' style='font-size: larger;'>CSV Import</a><a style='font-size: larger; text-decoration: none; cursor: default'> | </a>
 
-		      			<a href='".$_SERVER['PHP_SELF']."?csvexport=1' style='font-size: larger;'>CSV Export</a>";
+		      			<a href='".$_SERVER['PHP_SELF']."?csvexport=1' style='font-size: larger;'>CSV Export</a><a style='font-size: larger; text-decoration: none; cursor: default'> | </a>
+		
+						<a href='".$_SERVER['PHP_SELF']."?projektübersichtexport=1' style='font-size: larger;'>Projektübersichtexport</a>";
 		      			if($anzprojekte > 0)
 		      				echo "<a style='font-size: larger; text-decoration: none; cursor: default'> | </a><a href='".$_SERVER['PHP_SELF']."?projektexport=1".($passuid ? '&uid='.$user : '')."' style='font-size: larger;'>".$p->t("zeitaufzeichnung/projektexport")."</a>";
 				echo "</td>
@@ -1129,6 +1137,17 @@ if($projekt->getProjekteMitarbeiter($user, true))
 			echo '<td>'.$p->t('zeitaufzeichnung/startdatum').' <input class="datepicker_datum" id="exp_von_datum" name="exp_von_datum" size="9" type="text" value="'.date('d.m.Y', strtotime('first day of previous month')).'" /></td>';
 			echo '<td align="right">'.$p->t('zeitaufzeichnung/enddatum').' <input class="datepicker_datum" id="exp_bis_datum" name="exp_bis_datum" size="9" type="text"  value="'.date('d.m.Y', strtotime('last day of previous month')).'" /></td>';
 			echo '<td align="right"><input type="submit" value="Export" name="export"></td></tr>';
+			echo '<tr><td></td><td colspan="3"></td></tr>';
+			echo '<tr><td colspan="4"><hr></td></tr>';
+			echo '</form>';
+		}
+
+		if (isset($_GET['projektübersichtexport']))
+		{
+			echo '<form action="'.$_SERVER['PHP_SELF'].'" method="POST" >';
+			echo '<tr><td colspan="4"><hr></td></tr>';
+			echo '<tr><td>CSV-Export</td>';
+			echo '<td align="right"><input type="submit" value="Projektübersichtexport" name="projektübersichtexport"></td></tr>';
 			echo '<tr><td></td><td colspan="3"></td></tr>';
 			echo '<tr><td colspan="4"><hr></td></tr>';
 			echo '</form>';
@@ -1886,4 +1905,70 @@ function getZeitaufzeichnung($user, $von, $bis)
 	return $za;
 }
 
+/**
+ * Exportiert Zeitaufzeichnungsdaten als CSV
+ * @param $data Zeitaufzeichnungsdaten
+ * @param string $delimiter CSV-Trennzeichen
+ * @param $fieldheadings Namen der Spaltenüberschriften
+ * @param bool $za_simple Zeitaufzeichnung lang (für Infrastrukturmitarbeiter) oder kurz (simple)
+ * @param $uid Id des Users für CSV-Filenamen "zeitaufzeichnung_uid"
+ */
+function exportProjectOverviewAsCSV($user, $delimiter = ',')
+{
+
+	$filename = "projektUebersicht_".$user.".csv";
+	header('Content-type: text/csv; charset=utf-8');
+	header('Content-Disposition: attachment; filename='.$filename);
+
+	$file = fopen('php://output', 'w');
+	$towrite = getDataForProjectOverviewCSV($user);
+	foreach ($towrite as $row)
+	{
+		fputcsv($file, $row, $delimiter);
+	}
+	fclose($file);
+	//Abbruch damit HTML markup danach nicht mit exportiert wird
+	exit();
+}
+
+function getDataForProjectOverviewCSV($user)
+{
+	$projects_of_user = new projekt();
+	$projects= $projects_of_user->getProjekteListForMitarbeiter($user);
+
+	$csvData = array();
+	//headers schreiben
+	$csvData[] = array('PROJEKT', 'PROJEKT KURZBEZEICHNUNG', 'PROJEKTPHASE', 'START', 'PROJEKT ENDE');
+	foreach ($projects as $project)
+	{
+		//Newline characters bei Beschreibung ersetzen
+		$titel = $project->titel;
+		$projekt_kurzbz = $project->projekt_kurzbz;
+		$projekt_phase = '';
+		$beginn = $project->beginn;
+		$ende = $project->ende;
+
+		$csvData[] = array($titel, $projekt_kurzbz,$projekt_phase, $beginn, $ende);
+
+		$projektphasen = new projektphase($projekt_kurzbz);
+
+		if($projektphasen->getProjektphasen($projekt_kurzbz))
+		{
+			foreach($projektphasen->result as $projektphase)
+			{
+				$projekt_phase = $projektphase->bezeichnung;
+				if(!empty($projektphase->beginn))
+					$beginn = $projektphase->beginn;
+				else
+					$beginn = $project->beginn;
+				if(!empty($projektphase->ende))
+					$ende = $projektphase->ende;
+				else
+					$ende = $project->ende;
+				$csvData[] = array($titel, $projekt_kurzbz,$projekt_phase, $beginn, $ende);
+			}
+		}
+	}
+	return $csvData;
+}
 ?>
