@@ -24,7 +24,7 @@
  */
 require_once(dirname(__FILE__).'/basis_db.class.php');
 require_once(dirname(__FILE__).'/projekttask.class.php');
-
+error_reporting(E_ALL ^ E_NOTICE);
 class projektphase extends basis_db
 {
 	public $new;       		// boolean
@@ -571,6 +571,90 @@ class projektphase extends basis_db
 			return true; 
 		else
 			return false; 
+	}
+
+	public function checkProjectphaseInCorrectTime($projektphase_id, $given_projectphase_start, $given_projektphase_ende)
+	{
+		try
+		{
+			$projektphase = $this->getProjectphaseById($projektphase_id);
+			if(strtotime($projektphase->beginn))
+				$projektphase_start = date('Y-m-d', strtotime($projektphase->beginn));
+			else
+				$projektphase_start = NULL;
+			if(strtotime($projektphase->ende))
+				$projektphase_ende = date('Y-m-d', strtotime($projektphase->ende));
+			else
+				$projektphase_ende = NULL;
+
+			$given_start = date('Y-m-d', strtotime($given_projectphase_start));
+			$given_ende = date('Y-m-d', strtotime($given_projektphase_ende));
+
+			if ((empty($projektphase_start) || $given_start >= $projektphase_start) && (empty($projektphase_ende) || $given_ende <= $projektphase_ende))
+				return true;
+			else
+				return false;
+
+		}
+		catch (Exception $e)
+		{
+			echo 'Exception abgefangen: ',  $e->getMessage(), "\n";
+		}
+	}
+
+	/**
+	 * Laedt die Projektphase mit der ID $projektphase_id
+	 * @param  $projektphase_id ID der zu ladenden Projektphase
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	public function getProjectphaseById($projektphase_id)
+	{
+		if(!is_numeric($projektphase_id))
+		{
+			$this->errormsg = 'Projektarbeit_id muss eine gueltige Zahl sein';
+			return false;
+		}
+
+		$qry = "SELECT tbl_projektphase.*, tbl_ressource.bezeichnung AS ressource_bezeichnung 
+				FROM fue.tbl_projektphase LEFT OUTER JOIN fue.tbl_ressource USING (ressource_id)
+				WHERE projektphase_id=".$this->db_add_param($projektphase_id, FHC_INTEGER);
+
+		if($this->db_query($qry))
+		{
+			if($row = $this->db_fetch_object())
+			{
+				$obj = new projektphase();
+				$obj->projekt_kurzbz = $row->projekt_kurzbz;
+				$obj->projektphase_id = $row->projektphase_id;
+				$obj->projektphase_fk = $row->projektphase_fk;
+				$obj->bezeichnung = $row->bezeichnung;
+				$obj->typ = $row->typ;
+				$obj->beschreibung = $row->beschreibung;
+				$obj->start = $row->start;
+				$obj->ende = $row->ende;
+				$obj->personentage = $row->personentage;
+				$obj->farbe = $row->farbe;
+				$obj->budget = $row->budget;
+				$obj->ressource_id = $row->ressource_id;
+				$obj->ressource_bezeichnung = $row->ressource_bezeichnung;
+				$obj->insertamum = $row->insertamum;
+				$obj->insertvon = $row->insertvon;
+				$obj->updateamum = $row->updateamum;
+				$obj->updatevon = $row->updatevon;
+
+				return $obj;
+			}
+			else
+			{
+				$this->errormsg = 'Datensatz wurde nicht gefunden';
+				return false;
+			}
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
 	}
 	
 }

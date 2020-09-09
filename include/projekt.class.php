@@ -25,7 +25,7 @@
  * @param string $projekt_kurzbz primary key Projektname.
  */
 require_once(dirname(__FILE__).'/basis_db.class.php');
-
+error_reporting(E_ALL ^ E_NOTICE);
 class projekt extends basis_db
 {
 	public $new;            // boolean

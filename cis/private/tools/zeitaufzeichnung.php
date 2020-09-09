@@ -680,6 +680,7 @@ if(isset($_POST['save']) || isset($_POST['edit']) || isset($_POST['import']))
 	{
 		array_push($project_kurzbz_array, (string) $prjct->projekt_kurzbz);
 	}
+	$projectphase = new projektphase();
 
 	if ($_FILES['csv']['error'] == 0 && isset($_POST['import']))
 	{
@@ -726,10 +727,6 @@ if(isset($_POST['save']) || isset($_POST['edit']) || isset($_POST['import']))
 									$data[8] = NULL;
 								if ($datum->formatDatum($data[2], $format='Y-m-d H:i:s') < $sperrdatum)
 									echo '<span style="color:red"><b>'.$p->t("global/fehlerBeimSpeichernDerDaten").': Eingabe nicht möglich da vor dem Sperrdatum ('.$data[2].')</b></span><br>';
-								//elseif (isset($data[8]) && ( filter_var($data[8], FILTER_VALIDATE_INT) === false ))
-								//{
-								//	echo '<span style="color:red"><b>'.$p->t("global/fehlerBeimSpeichernDerDaten").': Service ID ist keine Zahl ('.$data[8].')</b></span><br>';
-								//}
 								elseif (!empty($data[6]) && !$projects_of_user->checkProjectInCorrectTime($data[6], $data[2], $data[3]))
 								{
 									echo '<span style="color:red"><b>'.$p->t("global/fehlerBeimSpeichernDerDaten").': Eingabe nicht möglich, da Sie angegebenes Anfangs und Enddatum nicht in den Projektzeitrahmen fällt.</b></span><br>';
@@ -875,6 +872,11 @@ if(isset($_POST['save']) || isset($_POST['edit']) || isset($_POST['import']))
 		if (!$projects_of_user->checkProjectInCorrectTime($projekt_kurzbz, $datum->formatDatum($von, $format='Y-m-d'), $datum->formatDatum($bis, $format='Y-m-d')))
 		{
 			echo '<span style="color:red"><b>'.$p->t("global/fehlerBeimSpeichernDerDaten").': Eingabe nicht möglich, da Sie angegebenes Anfangs und Enddatum nicht in den Projektzeitrahmen fällt.</b></span><br>';
+			$saveerror = 1;
+		}
+		elseif (!$projectphase->checkProjectphaseInCorrectTime($projektphase_id, $datum->formatDatum($von, $format='Y-m-d'), $datum->formatDatum($bis, $format='Y-m-d')))
+		{
+			echo '<span style="color:red"><b>'.$p->t("global/fehlerBeimSpeichernDerDaten").': Eingabe nicht möglich, da Sie angegebenes Anfangs und Enddatum nicht in den Projektphasenzeitrahmen fällt.</b></span><br>';
 			$saveerror = 1;
 		}
 		elseif (isset($_POST['genPause']) && (isset($_POST['save']) || isset($_POST['edit'])))
