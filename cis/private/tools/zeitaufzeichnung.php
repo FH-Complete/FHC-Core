@@ -1951,9 +1951,9 @@ function getDataForProjectOverviewCSV($user)
 
 		$csvData[] = array($titel, $projekt_kurzbz,$projekt_phase,$projekt_phase_id, $beginn, $ende);
 
-		$projektphasen = new projektphase($projekt_kurzbz);
+		$projektphasen = new projektphase();
 
-		if($projektphasen->getProjektphasen($projekt_kurzbz))
+		if($projektphasen->getProjectphaseForMitarbeiter($user))
 		{
 			foreach($projektphasen->result as $projektphase)
 			{

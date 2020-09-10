@@ -656,6 +656,85 @@ class projektphase extends basis_db
 			return false;
 		}
 	}
+
+	public function getProjectphaseForMitarbeiter($mitarbeiter_uid)
+	{
+
+		/*$qry = "SELECT DISTINCT
+					tbl_projekt.*
+				FROM
+					fue.tbl_ressource
+					JOIN fue.tbl_projekt_ressource USING(ressource_id)
+					JOIN fue.tbl_projekt USING(projekt_kurzbz)
+				WHERE (beginn<=now() or beginn is null)
+				AND (ende + interval '1 month 1 day' >=now() OR ende is null)
+				AND
+				(
+					mitarbeiter_uid=" . $this->db_add_param($mitarbeiter_uid) . " OR
+					student_uid=" . $this->db_add_param($mitarbeiter_uid) . "
+				)";*/
+
+		$qry = "
+
+                             SELECT DISTINCT
+                                        tbl_projektphase.*
+                                FROM
+                                        fue.tbl_projektphase
+                                        JOIN fue.tbl_projekt USING (projekt_kurzbz)
+                                        JOIN fue.tbl_projekt_ressource USING (projektphase_id)
+                                        JOIN fue.tbl_ressource ON (tbl_ressource.ressource_id=tbl_projekt_ressource.ressource_id)
+                                WHERE
+                                (
+									(
+										(tbl_projekt.beginn<=now() or tbl_projekt.beginn is null)
+										AND (tbl_projekt.ende + interval '1 month 1 day' >=now() OR tbl_projekt.ende is null)
+									) OR (
+										(tbl_projektphase.start<=now() or tbl_projektphase.start is null)
+										AND (tbl_projektphase.ende + interval '1 month 1 day' >=now() OR tbl_projektphase.ende is null)
+									)
+								)
+                                AND mitarbeiter_uid=" . $this->db_add_param($mitarbeiter_uid);
+
+		if($result = $this->db_query($qry))
+		{
+			if($row = $this->db_fetch_object())
+			{
+				while ($row = $this->db_fetch_object($result)) {
+					$obj = new projektphase();
+					$obj->projekt_kurzbz = $row->projekt_kurzbz;
+					$obj->projektphase_id = $row->projektphase_id;
+					$obj->projektphase_fk = $row->projektphase_fk;
+					$obj->bezeichnung = $row->bezeichnung;
+					$obj->typ = $row->typ;
+					$obj->beschreibung = $row->beschreibung;
+					$obj->start = $row->start;
+					$obj->ende = $row->ende;
+					$obj->personentage = $row->personentage;
+					$obj->farbe = $row->farbe;
+					$obj->budget = $row->budget;
+					$obj->ressource_id = $row->ressource_id;
+					$obj->ressource_bezeichnung = $row->ressource_bezeichnung;
+					$obj->insertamum = $row->insertamum;
+					$obj->insertvon = $row->insertvon;
+					$obj->updateamum = $row->updateamum;
+					$obj->updatevon = $row->updatevon;
+
+					$this->result[] = $obj;
+				}
+				return true;
+			}
+			else
+			{
+				$this->errormsg = 'Datensatz wurde nicht gefunden';
+				return false;
+			}
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+	}
 	
 }
 ?>
