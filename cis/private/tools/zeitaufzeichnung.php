@@ -1938,17 +1938,18 @@ function getDataForProjectOverviewCSV($user)
 
 	$csvData = array();
 	//headers schreiben
-	$csvData[] = array('PROJEKT', 'PROJEKT KURZBEZEICHNUNG', 'PROJEKTPHASE', 'START', 'PROJEKT ENDE');
+	$csvData[] = array('PROJEKT', 'PROJEKT KURZBEZEICHNUNG', 'PROJEKTPHASE', 'PROJEKTPHASEN ID', 'START', 'PROJEKT ENDE');
 	foreach ($projects as $project)
 	{
 		//Newline characters bei Beschreibung ersetzen
 		$titel = $project->titel;
 		$projekt_kurzbz = $project->projekt_kurzbz;
 		$projekt_phase = '';
+		$projekt_phase_id = '';
 		$beginn = $project->beginn;
 		$ende = $project->ende;
 
-		$csvData[] = array($titel, $projekt_kurzbz,$projekt_phase, $beginn, $ende);
+		$csvData[] = array($titel, $projekt_kurzbz,$projekt_phase,$projekt_phase_id, $beginn, $ende);
 
 		$projektphasen = new projektphase($projekt_kurzbz);
 
@@ -1957,6 +1958,7 @@ function getDataForProjectOverviewCSV($user)
 			foreach($projektphasen->result as $projektphase)
 			{
 				$projekt_phase = $projektphase->bezeichnung;
+				$projekt_phase_id = $projektphase->projektphase_id;
 				if(!empty($projektphase->beginn))
 					$beginn = $projektphase->beginn;
 				else
@@ -1965,7 +1967,7 @@ function getDataForProjectOverviewCSV($user)
 					$ende = $projektphase->ende;
 				else
 					$ende = $project->ende;
-				$csvData[] = array($titel, $projekt_kurzbz,$projekt_phase, $beginn, $ende);
+				$csvData[] = array($titel, $projekt_kurzbz,$projekt_phase, $projekt_phase_id, $beginn, $ende);
 			}
 		}
 	}
