@@ -1936,6 +1936,9 @@ function getDataForProjectOverviewCSV($user)
 	$projects_of_user = new projekt();
 	$projects= $projects_of_user->getProjekteListForMitarbeiter($user);
 
+	$projektphase = new projektphase();
+	$projektphasen = $projektphase->getProjectphaseForMitarbeiter($user);
+
 	$csvData = array();
 	//headers schreiben
 	$csvData[] = array('PROJEKT', 'PROJEKT KURZBEZEICHNUNG', 'PROJEKTPHASE', 'PROJEKTPHASEN ID', 'START', 'PROJEKT ENDE');
@@ -1951,25 +1954,27 @@ function getDataForProjectOverviewCSV($user)
 
 		$csvData[] = array($titel, $projekt_kurzbz,$projekt_phase,$projekt_phase_id, $beginn, $ende);
 
-		$projektphasen = new projektphase();
+		//$projektphasen = new projektphase();
 
-		if($projektphasen->getProjectphaseForMitarbeiter($user))
-		{
-			foreach($projektphasen->result as $projektphase)
+
+			foreach($projektphasen as $prjp)
 			{
-				$projekt_phase = $projektphase->bezeichnung;
-				$projekt_phase_id = $projektphase->projektphase_id;
-				if(!empty($projektphase->beginn))
-					$beginn = $projektphase->beginn;
-				else
-					$beginn = $project->beginn;
-				if(!empty($projektphase->ende))
-					$ende = $projektphase->ende;
-				else
-					$ende = $project->ende;
-				$csvData[] = array($titel, $projekt_kurzbz,$projekt_phase, $projekt_phase_id, $beginn, $ende);
+				if($prjp->projekt_kurzbz===$projekt_kurzbz)
+				{
+					$projekt_phase = $prjp->bezeichnung;
+					$projekt_phase_id = $prjp->projektphase_id;
+					if (!empty($prjp->beginn))
+						$beginn = $prjp->beginn;
+					else
+						$beginn = $project->beginn;
+					if (!empty($prjp->ende))
+						$ende = $prjp->ende;
+					else
+						$ende = $project->ende;
+					$csvData[] = array($titel, $projekt_kurzbz, $projekt_phase, $projekt_phase_id, $beginn, $ende);
+				}
 			}
-		}
+
 	}
 	return $csvData;
 }
