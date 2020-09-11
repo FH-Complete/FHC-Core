@@ -3,7 +3,8 @@
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 /**
- *
+ * This is the super class for all those controllers that can only be called from command line
+ * It provides also an helper to display the possible calls
  */
 abstract class CLI_Controller extends FHC_Controller
 {
@@ -15,9 +16,9 @@ abstract class CLI_Controller extends FHC_Controller
 	/**
 	 * Constructor
 	 */
-    public function __construct()
+	public function __construct()
 	{
-        parent::__construct();
+		parent::__construct();
 
 		// Checks if the controller is called from command line
 		$this->_isAllowed();
@@ -103,3 +104,4 @@ abstract class CLI_Controller extends FHC_Controller
 		}
 	}
 }
+
