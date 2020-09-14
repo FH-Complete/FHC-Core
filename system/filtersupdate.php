@@ -546,12 +546,12 @@ $filters = array(
 		'app' => 'core',
 		'dataset_name' => 'logs',
 		'filter_kurzbz' => 'jqws24hours',
-		'description' => '{Last 24 hours job queue workers logs}',
+		'description' => '{Last 24 hours JQWs logs}',
 		'sort' => 2,
 		'default_filter' => false,
 		'filter' => '
 			{
-				"name": "All job queue workers logs from the last 24 hours",
+				"name": "All Job Queue Workers logs from the last 24 hours",
 				"columns": [
 					{"name": "RequestId"},
 					{"name": "ExecutionTime"},
@@ -585,12 +585,12 @@ $filters = array(
 		'app' => 'core',
 		'dataset_name' => 'logs',
 		'filter_kurzbz' => 'jqws48hours',
-		'description' => '{Last 48 hours job queue workers logs}',
+		'description' => '{Last 48 hours JQWs logs}',
 		'sort' => 2,
 		'default_filter' => false,
 		'filter' => '
 			{
-				"name": "All job queue workers logs from the last 48 hours",
+				"name": "All Job Queue Workers logs from the last 48 hours",
 				"columns": [
 					{"name": "RequestId"},
 					{"name": "ExecutionTime"},
