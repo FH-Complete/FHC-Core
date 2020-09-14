@@ -725,6 +725,11 @@ function refresh()
 	loadPruefungen();
 	loadPruefungenOfStudiengang();
 	loadPruefungenGesamt();
+
+	if ($("#filter_studiensemester").val() == "0")
+	    $("#additional-exams").hide();
+	else
+        $("#additional-exams").show();
 }
 
 /**

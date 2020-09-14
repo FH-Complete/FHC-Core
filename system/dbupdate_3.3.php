@@ -4401,6 +4401,20 @@ if(!$result = @$db->db_query("SELECT iso3166_1_a3 FROM bis.tbl_nation LIMIT 1"))
 		echo '<br>bis.tbl_nation: Spalte iso3166_1_a3 hinzugefuegt';
 }
 
+// OE_KURZBZ in system.tbl_filters auf 32 Zeichen verlängert
+if($result = $db->db_query("SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA='wawi' AND TABLE_NAME='tbl_betriebsmitteltyp' AND COLUMN_NAME = 'typ_code' AND character_maximum_length=2"))
+{
+	if($db->db_num_rows($result)>0)
+	{
+		$qry = " ALTER TABLE wawi.tbl_betriebsmitteltyp ALTER COLUMN typ_code TYPE varchar(6)";
+
+		if(!$db->db_query($qry))
+			echo '<strong>wawi.tbl_betriebsmitteltyp '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>Spalte typ_code in wawi.tbl_betriebsmitteltyp von character(2) auf varchar(6) geändert<br>';
+	}
+}
+
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
 
