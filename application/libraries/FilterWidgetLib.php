@@ -93,6 +93,7 @@ class FilterWidgetLib
 	const OP_NOT_SET = 'nset';
 
 	// Filter options values
+	const OPT_MINUTES = 'minutes';
 	const OPT_HOURS = 'hours';
 	const OPT_DAYS = 'days';
 	const OPT_MONTHS = 'months';
@@ -887,7 +888,8 @@ class FilterWidgetLib
 						&& isset($filterDefinition->option)
 						&& ($filterDefinition->option == self::OPT_HOURS
 						|| $filterDefinition->option == self::OPT_DAYS
-						|| $filterDefinition->option == self::OPT_MONTHS))
+						|| $filterDefinition->option == self::OPT_MONTHS
+						|| $filterDefinition->option == self::OPT_MINUTES))
 					{
 						$condition = '< (NOW() - \''.$filterDefinition->condition.' '.$filterDefinition->option.'\'::interval)';
 					}
@@ -903,7 +905,8 @@ class FilterWidgetLib
 						&& isset($filterDefinition->option)
 						&& ($filterDefinition->option == self::OPT_HOURS
 						|| $filterDefinition->option == self::OPT_DAYS
-						|| $filterDefinition->option == self::OPT_MONTHS))
+						|| $filterDefinition->option == self::OPT_MONTHS
+						|| $filterDefinition->option == self::OPT_MINUTES))
 					{
 						$condition = '> (NOW() - \''.$filterDefinition->condition.' '.$filterDefinition->option.'\'::interval)';
 					}
