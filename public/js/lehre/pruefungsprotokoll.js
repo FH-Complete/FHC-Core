@@ -10,6 +10,12 @@ $("document").ready(function() {
 
     $("#saveProtocolBtn, #freigebenProtocolBtn").click(
         function() {
+
+            var freigebendata = {
+                freigeben:  false,
+                password: null
+            }
+
             var data = {
                 abschlussbeurteilung_kurzbz: $("#abschlussbeurteilung_kurzbz").val(),
                 protokoll: $("#protokoll").val(),
@@ -19,11 +25,11 @@ $("document").ready(function() {
 
             if ($(this).prop("id") === 'freigebenProtocolBtn')
             {
-                data.freigabedatum = true;
-                data.password = $("#password").val();
+                freigebendata.freigeben = true;
+                freigebendata.password = $("#password").val();
             }
 
-            var checkFields = Pruefungsprotokoll.checkFields(data, $("#verfCheck").prop('checked'));
+            var checkFields = Pruefungsprotokoll.checkFields(data, freigebendata, $("#verfCheck").prop('checked'));
             $("#protocolform td").removeClass('has-error');
             if (checkFields.length > 0)
             {
@@ -44,7 +50,7 @@ $("document").ready(function() {
                 return;
             }
 
-            Pruefungsprotokoll.saveProtokoll($("#abschlusspruefung_id").val(),data);
+            Pruefungsprotokoll.saveProtokoll($("#abschlusspruefung_id").val(), freigebendata, data);
         }
     )
 
@@ -79,11 +85,11 @@ var Pruefungsprotokoll = {
             $("#verfNotice").html(FHC_PhrasesLib.t("abschlusspruefung", "verfNotice"));
         }
     },
-    checkFields: function(data, verfChecked)
+    checkFields: function(data, freigebendata, verfChecked)
     {
         var errors =  [];
 
-        if (data.abschlussbeurteilung_kurzbz == "" && data.freigabedatum === true && verfChecked)
+        if (data.abschlussbeurteilung_kurzbz == "" && freigebendata.freigeben === true && verfChecked)
             errors.push({"abschlussbeurteilung_kurzbz": FHC_PhrasesLib.t("abschlusspruefung", "abschlussbeurteilungLeer")});
 
         var zeitregex = /^[0-2][0-9]:[0-5][0-9]$/;
@@ -111,12 +117,13 @@ var Pruefungsprotokoll = {
     },
     // ajax calls
     // -----------------------------------------------------------------------------------------------------------------
-    saveProtokoll: function(abschlusspruefung_id, data)
+    saveProtokoll: function(abschlusspruefung_id, freigeben, data)
     {
         FHC_AjaxClient.ajaxCallPost(
             CALLED_PATH + '/saveProtokoll',
             {
                 abschlusspruefung_id: abschlusspruefung_id,
+                freigebendata: freigeben,
                 protocoldata: data
             },
             {

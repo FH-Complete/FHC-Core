@@ -115,9 +115,11 @@ class Pruefungsprotokoll extends Auth_Controller
 	public function saveProtokoll()
 	{
 		$abschlusspruefung_id = $this->input->post('abschlusspruefung_id');
-		$data = $this->input->post('protocoldata');
+		$freigebendata = $this->input->post('freigebendata');
+		$protocoldata = $this->input->post('protocoldata');
 
-		if (isset($abschlusspruefung_id) && is_numeric($abschlusspruefung_id) && isset($data))
+		if (isset($abschlusspruefung_id) && is_numeric($abschlusspruefung_id)
+			&& isset($freigebendata['freigeben']) && isset($protocoldata))
 		{
 			// check permission
 			$berechtigt = $this->_getAbschlusspruefungBerechtigt($abschlusspruefung_id);
@@ -125,15 +127,14 @@ class Pruefungsprotokoll extends Auth_Controller
 				$this->outputJsonError(getError($berechtigt));
 			else
 			{
-				$freigabe = isset($data['freigabedatum']) && $data['freigabedatum'];
+				$freigabe = $freigebendata['freigeben'] === 'true';
 
 				if ($freigabe)
 				{
 					// Verify password
-					$password = $data['password'];
-					unset($data['password']);
-					if (!isEmptyString($password))
+					if (isset($freigebendata['password']) && !isEmptyString($freigebendata['password']))
 					{
+						$password = $freigebendata['password'];
 						$result = $this->authlib->checkUserAuthByUsernamePassword($this->_uid, $password);
 						if (isError($result))
 						{
@@ -146,7 +147,8 @@ class Pruefungsprotokoll extends Auth_Controller
 					}
 				}
 
-				$data = $this->_prepareAbschlusspruefungDataForSave($data);
+				$data = $this->_prepareAbschlusspruefungDataForSave($protocoldata, $freigabe);
+
 				$result = $this->AbschlusspruefungModel->update($abschlusspruefung_id, $data);
 
 				if (hasData($result))
@@ -213,7 +215,7 @@ class Pruefungsprotokoll extends Auth_Controller
 	 * @param $data
 	 * @return array
 	 */
-	private function _prepareAbschlusspruefungDataForSave($data)
+	private function _prepareAbschlusspruefungDataForSave($data, $freigabe)
 	{
 		$nullfields = array('uhrzeit', 'endezeit', 'abschlussbeurteilung_kurzbz', 'protokoll');
 		foreach ($data as $idx => $item)
@@ -222,7 +224,7 @@ class Pruefungsprotokoll extends Auth_Controller
 				$data[$idx] = null;
 		}
 
-		if (isset($data['freigabedatum']) && $data['freigabedatum'])
+		if ($freigabe === true)
 			$data['freigabedatum'] = date('Y-m-d');
 
 		return $data;
