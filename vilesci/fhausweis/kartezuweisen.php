@@ -91,7 +91,7 @@ if(count($_POST)>700)
 }
 if(isset($_POST['save']) && $users!='')
 {
-	var_dump($users);
+	//var_dump($users);
 	foreach($users as $user)
 	{
 		$benutzer = new benutzer();
@@ -100,7 +100,7 @@ if(isset($_POST['save']) && $users!='')
 			$nummer1 = $_POST['nummer1_'.$user];
 			$nummer2 = $_POST['nummer2_'.$user];
 
-			if($nummer1=='' || $nummer2=='')
+			if($nummer1=='' && $nummer2=='')
 			{
 				echo '<span class="error">Ueberspringe '.$db->convert_html_chars($user).' - keine Nummer eingetragen</span>';
 				continue;
@@ -108,7 +108,8 @@ if(isset($_POST['save']) && $users!='')
 			//Karte anlegen
 			$bm = new betriebsmittel();
 			$bm->betriebsmitteltyp = 'Zutrittskarte';
-			$bm->nummer = $nummer1;
+			if ($nummer1 != '')
+				$bm->nummer = $nummer1;
 			$bm->nummer2 = $nummer2;
 			$bm->insertamum = date('Y-m-d H:i:s');
 			$bm->insertvon = $uid;

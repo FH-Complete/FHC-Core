@@ -824,6 +824,8 @@ var FHC_FilterWidget = {
 			html += "</span>";
 			html += "<span>";
 			html += "	<select class='" + classOption + "' " + disabled + ">";
+			html += "		<option value='minutes' " + (appliedFilter.option == "minutes" ? "selected" : "") + ">Minutes</option>";
+			html += "		<option value='hours' " + (appliedFilter.option == "hours" ? "selected" : "") + ">Hours</option>";
 			html += "		<option value='days' " + (appliedFilter.option == "days" ? "selected" : "") + ">Days</option>";
 			html += "		<option value='months' " + (appliedFilter.option == "months" ? "selected" : "") + ">Months</option>";
 			html += "	</select>";
