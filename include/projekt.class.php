@@ -25,7 +25,7 @@
  * @param string $projekt_kurzbz primary key Projektname.
  */
 require_once(dirname(__FILE__).'/basis_db.class.php');
-error_reporting(E_ALL ^ E_NOTICE);
+
 class projekt extends basis_db
 {
 	public $new;            // boolean
@@ -86,12 +86,14 @@ class projekt extends basis_db
 
 				return true;
 			}
-			else {
+			else
+			{
 				$this->errormsg = 'Datensatz wurde nicht gefunden';
 				return false;
 			}
 		}
-		else {
+		else
+		{
 			$this->errormsg = 'Fehler beim Laden der Daten';
 			return false;
 		}
@@ -138,7 +140,8 @@ class projekt extends basis_db
 			}
 			return true;
 		}
-		else {
+		else
+		{
 			$this->errormsg = 'Fehler beim Laden der Daten';
 			return false;
 		}
@@ -178,7 +181,8 @@ class projekt extends basis_db
 			}
 			return true;
 		}
-		else {
+		else
+		{
 			$this->errormsg = 'Fehler beim Laden der Daten';
 			return false;
 		}
@@ -218,7 +222,8 @@ class projekt extends basis_db
 			}
 			return true;
 		}
-		else {
+		else
+		{
 			$this->errormsg = 'Fehler beim Laden der Daten';
 			return false;
 		}
@@ -287,7 +292,8 @@ class projekt extends basis_db
 				$this->db_add_param($this->anzahl_ma) . ',' .
 				$this->db_add_param($this->aufwandstyp_kurzbz) . ');';
 		}
-		else {
+		else
+		{
 			//Updaten des bestehenden Datensatzes
 
 			$qry = 'UPDATE fue.tbl_projekt SET ' .
@@ -309,7 +315,8 @@ class projekt extends basis_db
 		if ($this->db_query($qry)) {
 			return true;
 		}
-		else {
+		else
+		{
 			$this->errormsg = 'Fehler beim Speichern der Daten';
 			return false;
 		}
@@ -327,7 +334,8 @@ class projekt extends basis_db
 		if ($this->db_query($qry)) {
 			return true;
 		}
-		else {
+		else
+		{
 			$this->errormsg = 'Fehler beim Loeschen des Datensatzes';
 			return false;
 		}
@@ -394,7 +402,8 @@ class projekt extends basis_db
 			}
 			return true;
 		}
-		else {
+		else
+		{
 			$this->erromsg = 'Fehler beim Laden der Daten';
 			return false;
 		}
@@ -464,7 +473,8 @@ class projekt extends basis_db
 			}
 			return $projectList;
 		}
-		else {
+		else
+		{
 			$this->erromsg = 'Fehler beim Laden der Daten';
 			return false;
 		}
@@ -492,12 +502,14 @@ class projekt extends basis_db
 
 				return true;
 			}
-			else {
+			else
+			{
 				$this->errormsg = 'Datensatz wurde nicht gefunden';
 				return false;
 			}
 		}
-		else {
+		else
+		{
 			$this->errormsg = 'Fehler beim Laden der Daten';
 			return false;
 		}
@@ -534,7 +546,7 @@ class projekt extends basis_db
 		}
 		catch (Exception $e)
 		{
-			echo 'Exception abgefangen: ',  $e->getMessage(), "\n";
+      error_log('Exception abgefangen: ',  $e->getMessage(), "\n");
 		}
 	}
 
@@ -556,7 +568,8 @@ class projekt extends basis_db
 
 			return $obj;
 		}
-		else {
+		else
+		{
 			$this->errormsg = 'Fehler beim Laden der Daten';
 			return false;
 		}
