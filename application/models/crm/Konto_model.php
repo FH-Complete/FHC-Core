@@ -48,17 +48,20 @@ class Konto_model extends DB_Model
 					'studiengang_kz' => $buchung->studiengang_kz,
 					'studiensemester_kurzbz' => $buchung->studiensemester_kurzbz,
 					'buchungsnr_verweis' => $buchungsnr,
-					'betrag' => $betragOffen*(-1),
+					'betrag' => str_replace(',','.',$betragOffen*(-1)),
 					'buchungsdatum' => date('Y-m-d'),
 					'buchungstext' => $buchung->buchungstext,
 					'insertamum' => date('Y-m-d H:i:s'),
 					'insertvon' => '',
 					'buchungstyp_kurzbz' => $buchung->buchungstyp_kurzbz,
 				);
+
 				return $this->insert($data);
 			}
 			else
+			{
 				return error('Failed to load Payment');
+			}
 		}
 		else
 		{
