@@ -303,4 +303,7 @@ define ('ZAHLUNGSBESTAETIGUNG_ANZEIGEN', true);
 
 // Gibt an, ob im CIS die Zahlungsbestaetigungen fuer Lehrgaenge zum Download angezeigt werden
 define ('ZAHLUNGSBESTAETIGUNG_ANZEIGEN_FUER_LEHRGAENGE', true);
+
+// Gibt an, ob im CIS die Zahlungsreferenz angezeigt wird
+define ('ZAHLUNGSBESTAETIGUNG_ZAHLUNGSREFERENZ_ANZEIGEN', false);
 ?>
