@@ -1007,8 +1007,11 @@ function output_inventar($debug=false,$resultBetriebsmittel=null,$resultBetriebs
 
 		$htmlstring.='<td>';
 			// mit Berechtigung ist der Status zum bearbeiten
-		  	$betriebsmittelstatus_kurzbz_select=trim($resultBetriebsmittel[$pos]->betriebsmittelstatus_kurzbz);
-			if (!$schreib_recht)
+            $betriebsmittel_betriebsmittelstatus = new betriebsmittel_betriebsmittelstatus();
+            $status = $betriebsmittel_betriebsmittelstatus->load_last_status_by_betriebsmittel_id($resultBetriebsmittel[$pos]->betriebsmittel_id);
+            $betriebsmittelstatus_kurzbz_select = trim($status);
+            //$resultBetriebsmittel[$pos]->betriebsmittelstatus_kurzbz;
+			if ($schreib_recht)
 				$htmlstring.=$betriebsmittelstatus_kurzbz_select;
 			else
 			{
