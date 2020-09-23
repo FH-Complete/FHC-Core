@@ -678,14 +678,24 @@ function checkVals ($oe_val, $project_val, $phase_val, $service_val)
 if(isset($_POST['save']) || isset($_POST['edit']) || isset($_POST['import']))
 {
 	$zeit = new zeitaufzeichnung();
+
 	$projects_of_user = new projekt();
 	$projects= $projects_of_user->getProjekteListForMitarbeiter($user);
 	$project_kurzbz_array = array();
+
+	$projektph_of_user = new projektphase();
+	$projektphasen = $projektph_of_user->getProjectphaseForMitarbeiter($user);
+	$projectphasen_kurzbz_array = array();
 
 	foreach($projects as $prjct)
 	{
 		array_push($project_kurzbz_array, (string) $prjct->projekt_kurzbz);
 	}
+	foreach ($projektphasen as $pp)
+	{
+		array_push($projectphasen_kurzbz_array, (string) $pp->projektphase_id);
+	}
+
 	$projectphase = new projektphase();
 
 	if ($_FILES['csv']['error'] == 0 && isset($_POST['import']))
@@ -712,6 +722,10 @@ if(isset($_POST['save']) || isset($_POST['edit']) || isset($_POST['import']))
 							{
 								echo '<span style="color:red"><b>'.$p->t("global/fehlerBeimSpeichernDerDaten").': Eingabe nicht möglich, da Sie folgendem Projekt entweder nicht zugewiesen sind oder das Projekt schon abgeschlossen wurde: ('.$data[6].')</b></span><br>';
 							}
+							elseif(!empty($data[7]) && !in_array($data[7], $projectphasen_kurzbz_array))
+							{
+								echo '<span style="color:red"><b>'.$p->t("global/fehlerBeimSpeichernDerDaten").': Eingabe nicht möglich, da Sie folgender Projektphase entweder nicht zugewiesen sind oder die Projektphase schon abgeschlossen wurde: ('.$data[7].')</b></span><br>';
+							}
 							else
 							{
 
@@ -728,6 +742,10 @@ if(isset($_POST['save']) || isset($_POST['edit']) || isset($_POST['import']))
 								elseif (!empty($data[6]) && !$projects_of_user->checkProjectInCorrectTime($data[6], $data[2], $data[3]))
 								{
 									echo '<span style="color:red"><b>'.$p->t("global/fehlerBeimSpeichernDerDaten").': Eingabe nicht möglich, da angegebenes Anfangs und Enddatum nicht in den Projektzeitrahmen fällt.</b></span><br>';
+								}
+								elseif (!empty($data[7]) && !$projektph_of_user ->checkProjectphaseInCorrectTime($data[7], $data[2], $data[3]))
+								{
+									echo '<span style="color:red"><b>'.$p->t("global/fehlerBeimSpeichernDerDaten").': Eingabe nicht möglich, da angegebenes Anfangs und Enddatum nicht in den Projektphasenzeitrahmen fällt.</b></span><br>';
 								}
 								elseif (checkVals($data[5],$data[6],$data[7],$data[8]))
 								{
@@ -1960,20 +1978,9 @@ function getDataForProjectOverviewCSV($user)
 			{
 				$projekt_phase = $prjp->bezeichnung;
 				$projekt_phase_id = $prjp->projektphase_id;
-				if (!empty($prjp->start))
-				{
-					$beginn = $prjp->start;
-				} else
-				{
-					$beginn = $project->beginn;
-				}
-				if (!empty($prjp->ende))
-				{
-					$ende = $prjp->ende;
-				} else
-				{
-					$ende = $project->ende;
-				}
+				$beginn = $prjp->start;
+				$ende = $prjp->ende;
+
 				$csvData[] = array($titel, $projekt_kurzbz, $projekt_phase, $projekt_phase_id, $beginn, $ende);
 				//$index = array_search($prjp, array_values($projektphasen));
 				unset($projektphasen[$index]);
