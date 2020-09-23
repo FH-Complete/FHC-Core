@@ -581,25 +581,27 @@ public function getFortschritt($projektphase_id)
 
 	public function checkProjectphaseInCorrectTime($projektphase_id, $given_projectphase_start, $given_projektphase_ende)
 	{
+		if(empty($projektphase_id))
+			return true;
 		try
 		{
 			$projektphase = $this->getProjectphaseById($projektphase_id);
 			if(strtotime($projektphase->start))
-      {
-        $projektphase_start = date('Y-m-d', strtotime($projektphase->start));
-      }
+      		{
+        		$projektphase_start = date('Y-m-d', strtotime($projektphase->start));
+      		}
 			else
-      {
-        $projektphase_start = NULL;
-      }
+      		{
+        		$projektphase_start = NULL;
+      		}
 			if(strtotime($projektphase->ende))
-      {
-        $projektphase_ende = date('Y-m-d', strtotime($projektphase->ende));
-      }
+      		{
+        		$projektphase_ende = date('Y-m-d', strtotime($projektphase->ende));
+      		}
 			else
-      {
-        $projektphase_ende = NULL;
-      }
+      		{
+        		$projektphase_ende = NULL;
+      		}
 
 			$given_start = date('Y-m-d', strtotime($given_projectphase_start));
 			$given_ende = date('Y-m-d', strtotime($given_projektphase_ende));

@@ -523,6 +523,8 @@ class projekt extends basis_db
 	 */
 	public function checkProjectInCorrectTime($projekt_kurzbz, $give_project_start, $give_projekt_ende)
 	{
+		if(empty($projekt_kurzbz))
+			return true;
 		try
 		{
 			$projekt = $this->getProjectByKurzbz($projekt_kurzbz);
@@ -546,7 +548,7 @@ class projekt extends basis_db
 		}
 		catch (Exception $e)
 		{
-      error_log('Exception abgefangen: ',  $e->getMessage(), "\n");
+      		error_log('Exception abgefangen: ',  $e->getMessage(), "\n");
 		}
 	}
 
@@ -554,7 +556,8 @@ class projekt extends basis_db
 	{
 		$qry = "SELECT * FROM fue.tbl_projekt
 				WHERE projekt_kurzbz=".$this->db_add_param($projekt_kurzbz);
-		if ($result = $this->db_query($qry)) {
+		if ($result = $this->db_query($qry))
+		{
 			$row = $this->db_fetch_object($result);
 			$obj = new projekt();
 
