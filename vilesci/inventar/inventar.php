@@ -1011,7 +1011,7 @@ function output_inventar($debug=false,$resultBetriebsmittel=null,$resultBetriebs
             $status = $betriebsmittel_betriebsmittelstatus->load_last_status_by_betriebsmittel_id($resultBetriebsmittel[$pos]->betriebsmittel_id);
             $betriebsmittelstatus_kurzbz_select = trim($status);
             //$resultBetriebsmittel[$pos]->betriebsmittelstatus_kurzbz;
-			if ($schreib_recht)
+			if (!$schreib_recht)
 				$htmlstring.=$betriebsmittelstatus_kurzbz_select;
 			else
 			{
