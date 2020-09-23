@@ -710,7 +710,7 @@ if(isset($_POST['save']) || isset($_POST['edit']) || isset($_POST['import']))
 						if($data[0] == $user){
 							if(!empty($data[6]) && !in_array($data[6], $project_kurzbz_array))
 							{
-								echo '<span style="color:red"><b>'.$p->t("global/fehlerBeimSpeichernDerDaten").': Eingabe nicht möglich, da Sie folgendem Projekt nicht zugewiesen sind: ('.$data[6].')</b></span><br>';
+								echo '<span style="color:red"><b>'.$p->t("global/fehlerBeimSpeichernDerDaten").': Eingabe nicht möglich, da Sie folgendem Projekt entweder nicht zugewiesen sind oder das Projekt schon abgeschlossen wurde: ('.$data[6].')</b></span><br>';
 							}
 							else
 							{
