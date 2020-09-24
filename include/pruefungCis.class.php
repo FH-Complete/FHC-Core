@@ -590,7 +590,7 @@ class pruefungCis extends basis_db
      * @param String|Array $lehrveranstaltung_IDs einzelne ID einer Lehrveranstaltung oder ein Array von IDs
      * @return boolean true, wenn ok; false, im Fehlerfall
      */
-    public function getPruefungByLv($lehrveranstaltung_IDs)
+    public function getPruefungByLv($lehrveranstaltung_IDs, $uid = null)
     {
         if(empty($lehrveranstaltung_IDs))
         {
@@ -612,7 +612,17 @@ class pruefungCis extends basis_db
 	    $in = $lehrveranstaltung_IDs;
 	}
 
-        $qry = 'SELECT * FROM campus.tbl_lehrveranstaltung_pruefung WHERE lehrveranstaltung_id IN ('.$in.');';
+        $qry = 'SELECT * FROM campus.tbl_lehrveranstaltung_pruefung WHERE lehrveranstaltung_id IN ('.$in.')';
+
+        if ($uid !== null)
+        {
+            // LVs entfernen wo schon eine Note für UID vorhanden ist
+            $qry .= " AND lehrveranstaltung_id NOT IN (
+                    SELECT lehrveranstaltung_id 
+                    FROM lehre.tbl_pruefung
+                    JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
+                    WHERE student_uid = " . $this->db_add_param($uid) . ");";
+        }
 
         if($this->db_query($qry))
         {
