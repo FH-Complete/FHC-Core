@@ -718,7 +718,7 @@ if(isset($_POST['save']) || isset($_POST['edit']) || isset($_POST['import']))
 					while(($data = fgetcsv($handle, 1000, ';', '"')) !== FALSE)
 					{
 						if($data[0] == $user){
-							if(!empty($data[6]) && !in_array($data[6], $project_kurzbz_array))
+							if(!empty($data[6]) && !in_array($data[6], $project_kurzbz_array) && empty($data[7]))
 							{
 								echo '<span style="color:red"><b>'.$p->t("global/fehlerBeimSpeichernDerDaten").': Eingabe nicht möglich, da Sie folgendem Projekt entweder nicht zugewiesen sind oder das Projekt schon abgeschlossen wurde: ('.$data[6].')</b></span><br>';
 							}
@@ -739,7 +739,7 @@ if(isset($_POST['save']) || isset($_POST['edit']) || isset($_POST['import']))
 									$data[8] = NULL;
 								if ($datum->formatDatum($data[2], $format='Y-m-d H:i:s') < $sperrdatum)
 									echo '<span style="color:red"><b>'.$p->t("global/fehlerBeimSpeichernDerDaten").': Eingabe nicht möglich da vor dem Sperrdatum ('.$data[2].')</b></span><br>';
-								elseif (!empty($data[6]) && !$projects_of_user->checkProjectInCorrectTime($data[6], $data[2], $data[3]))
+								elseif (empty($data[7]) && !empty($data[6]) && !$projects_of_user->checkProjectInCorrectTime($data[6], $data[2], $data[3]))
 								{
 									echo '<span style="color:red"><b>'.$p->t("global/fehlerBeimSpeichernDerDaten").': Eingabe nicht möglich, da angegebenes Anfangs und Enddatum nicht in den Projektzeitrahmen fällt: ('.$data[2].') ('.$data[3].')</b></span><br>';
 								}
