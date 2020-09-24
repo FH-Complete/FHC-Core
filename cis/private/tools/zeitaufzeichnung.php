@@ -169,7 +169,7 @@ if(isset($_POST['export']))
 //CSV export für Übersicht zugeteilter Projekte - Konflikt mit normalen HTML headern deshalb weiter vorne
 if(isset($_POST['projektübersichtexport']))
 {
-	exportProjectOverviewAsCSV('oesi', ',');
+	exportProjectOverviewAsCSV($user, ',');
 }
 
 echo '<!DOCTYPE HTML>
