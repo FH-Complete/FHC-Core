@@ -169,7 +169,7 @@ if(isset($_POST['export']))
 //CSV export für Übersicht zugeteilter Projekte - Konflikt mit normalen HTML headern deshalb weiter vorne
 if(isset($_POST['projektübersichtexport']))
 {
-	exportProjectOverviewAsCSV($user, ',');
+	exportProjectOverviewAsCSV('oesi', ',');
 }
 
 echo '<!DOCTYPE HTML>
@@ -741,11 +741,11 @@ if(isset($_POST['save']) || isset($_POST['edit']) || isset($_POST['import']))
 									echo '<span style="color:red"><b>'.$p->t("global/fehlerBeimSpeichernDerDaten").': Eingabe nicht möglich da vor dem Sperrdatum ('.$data[2].')</b></span><br>';
 								elseif (!empty($data[6]) && !$projects_of_user->checkProjectInCorrectTime($data[6], $data[2], $data[3]))
 								{
-									echo '<span style="color:red"><b>'.$p->t("global/fehlerBeimSpeichernDerDaten").': Eingabe nicht möglich, da angegebenes Anfangs und Enddatum nicht in den Projektzeitrahmen fällt.</b></span><br>';
+									echo '<span style="color:red"><b>'.$p->t("global/fehlerBeimSpeichernDerDaten").': Eingabe nicht möglich, da angegebenes Anfangs und Enddatum nicht in den Projektzeitrahmen fällt: ('.$data[2].') ('.$data[3].')</b></span><br>';
 								}
 								elseif (!empty($data[7]) && !$projektph_of_user ->checkProjectphaseInCorrectTime($data[7], $data[2], $data[3]))
 								{
-									echo '<span style="color:red"><b>'.$p->t("global/fehlerBeimSpeichernDerDaten").': Eingabe nicht möglich, da angegebenes Anfangs und Enddatum nicht in den Projektphasenzeitrahmen fällt.</b></span><br>';
+									echo '<span style="color:red"><b>'.$p->t("global/fehlerBeimSpeichernDerDaten").': Eingabe nicht möglich, da angegebenes Anfangs und Enddatum nicht in den Projektphasenzeitrahmen fällt: ('.$data[2].') ('.$data[3].')</b></span><br>';
 								}
 								elseif (checkVals($data[5],$data[6],$data[7],$data[8]))
 								{
