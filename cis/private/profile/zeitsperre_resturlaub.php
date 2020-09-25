@@ -413,15 +413,23 @@ if(isset($_GET['type']) && ($_GET['type']=='edit_sperre' || $_GET['type']=='new_
 				if($zeitsperre->new && $zeitsperre->zeitsperretyp_kurzbz=='Urlaub')
 				{
 					//Beim Anlegen von neuen Urlauben wird ein Mail an den Vorgesetzten versendet um diesen Freizugeben
-					$vorgesetzter = $ma->getVorgesetzte($uid);
+					$prsn = new person();
+
+                    $vorgesetzter = $ma->getVorgesetzte($uid);
 					if($vorgesetzter)
 					{
 						$to='';
+						$fullName ='';
 						foreach($ma->vorgesetzte as $vg)
 						{
 							if (!empty($to))
+                            {
 								$to.=',';
+								$fullName =',';
+                            }
 							$to.=trim($vg.'@'.DOMAIN);
+							$name = $prsn->getFullNameFromBenutzer($vg);
+							$fullName = $name;
 						}
 
 						$benutzer = new benutzer();
@@ -440,7 +448,7 @@ if(isset($_GET['type']) && ($_GET['type']=='edit_sperre' || $_GET['type']=='new_
 						$mail = new mail($to, $from, 'Freigabeansuchen', $message);
 						if($mail->send())
 						{
-							echo "<br><b>".$p->t('urlaubstool/freigabemailWurdeVersandt',array($to))."</b>";
+							echo "<br><b>".$p->t('urlaubstool/freigabemailWurdeVersandt',array($fullName))."</b>";
 						}
 						else
 						{
