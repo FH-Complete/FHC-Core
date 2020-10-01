@@ -616,12 +616,19 @@ class pruefungCis extends basis_db
 
         if ($uid !== null)
         {
-            // LVs entfernen wo schon eine Note für UID vorhanden ist
+            // LVs entfernen wo schon eine positive Note für UID vorhanden ist
             $qry .= " AND lehrveranstaltung_id NOT IN (
-                    SELECT lehrveranstaltung_id 
-                    FROM lehre.tbl_pruefung
-                    JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
-                    WHERE student_uid = " . $this->db_add_param($uid) . ");";
+                        SELECT lehrveranstaltung_id 
+                        FROM lehre.tbl_pruefung
+                        JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
+                        WHERE student_uid = " . $this->db_add_param($uid) . "
+                        AND note NOT IN (5, 7, 9, 11, 13, 14)
+                    UNION
+                        SELECT lehrveranstaltung_id 
+                        FROM lehre.tbl_zeugnisnote
+                        WHERE student_uid = " . $this->db_add_param($uid) . "
+                        AND note NOT IN (5, 7, 9, 11, 13, 14)
+                    );";
         }
 
         if($this->db_query($qry))
