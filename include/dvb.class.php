@@ -188,6 +188,7 @@ class dvb extends basis_db
 				AND tbl_benutzer.aktiv
 				AND tbl_prestudentstatus.status_kurzbz in('Student','Incoming')
 				AND tbl_prestudent.bismelden
+				AND tbl_prestudent.studiengang_kz<10000
 			ORDER BY tbl_prestudentstatus.datum desc LIMIT 1
 			";
 
