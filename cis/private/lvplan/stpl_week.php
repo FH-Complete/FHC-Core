@@ -106,6 +106,7 @@ else if (isset($_GET['gruppe_kurzbz']))
 else
 	$gruppe_kurzbz=null;
 
+
 if (isset($_POST['user_uid']))
 	$user_uid=$_POST['user_uid'];
 if (isset($_POST['reserve']))
@@ -272,7 +273,6 @@ if (isset($_POST['titel']))
 		if(file_exists('../../../addons/'.$addon->kurzbz.'/cis/init.js.php'))
 			echo '<script type="application/x-javascript" src="../../../addons/'.$addon->kurzbz.'/cis/init.js.php" ></script>';
 	}
-
 	// Wenn Seite fertig geladen ist Addons aufrufen
 	echo '
 	<script>
@@ -493,9 +493,9 @@ if (!isset($datum))
 $stdplan->user=$user;
 // aktueller Benutzer
 $stdplan->user_uid=$uid;
-
+//TODO
 // Zusaetzliche Daten laden
-if (! $stdplan->load_data($type,$pers_uid,$ort_kurzbz,$stg_kz,$sem,$ver,$grp,$gruppe_kurzbz,null,$lva) )
+if (! $stdplan->load_data($type, 'nimm'/*$pers_uid*/,$ort_kurzbz,$stg_kz,$sem,$ver,$grp,$gruppe_kurzbz,null,$lva) )
 {
 	die(htmlentities($stdplan->errormsg));
 }
