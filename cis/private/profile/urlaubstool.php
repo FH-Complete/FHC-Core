@@ -379,7 +379,7 @@ if ((isset($wmonat) || isset($wmonat))&&(isset($wjahr) || isset($wjahr)))
 					}
 					elseif ($row->freigabevon!=''  && $row->vondatum>date("Y-m-d",time()))
                     {
-						$hgfarbe[$i]='#C1FF80';
+						$hgfarbe[$i]='#CDDDEE';
                     }
 					else
 					{
@@ -393,7 +393,7 @@ if ((isset($wmonat) || isset($wmonat))&&(isset($wjahr) || isset($wjahr)))
 				}
 				else
 				{
-					if($hgfarbe[$i]!='#FFFC7F' && $hgfarbe[$i]!='#bbb' && $hgfarbe[$i]!='#C1FF80')
+					if($hgfarbe[$i]!='#FFFC7F' && $hgfarbe[$i]!='#bbb' && $hgfarbe[$i]!='#CDDDEE')
 					{
 
 						$hgfarbe[$i]='#E9ECEE';
@@ -700,7 +700,7 @@ for ($i=0;$i<6;$i++)
 		}
 		if($tage[$j+7*$i]!='')
 		{
-			if($hgfarbe[$j+7*$i]=='#FFFC7F' )//|| $hgfarbe[$j+7*$i]=='#C1FF80')
+			if($hgfarbe[$j+7*$i]=='#FFFC7F' )//|| $hgfarbe[$j+7*$i]=='#CDDDEE')
 			{
 				echo '<b title='.$p->t('urlaubstool/vertretung').': '.$vertretung_uid[$j+7*$i].' - '.$p->t('urlaubstool/erreichbar').': '.$erreichbarkeit_kurzbz[$j+7*$i].'">'.$tage[$j+7*$i].'</b><br>';;
 				$k=$j+7*$i;
@@ -728,12 +728,13 @@ for ($i=0;$i<6;$i++)
 				}
 				elseif(isset($freigabeamum[$j+7*$i]))
 				{
-					if($hgfarbe[$j+7*$i]=='#C1FF80')
+                    echo '<img src="../../../skin/images/flag-green.png" alt="freigegeben" title="'.$p->t('urlaubstool/freigegebenDurch', array($freigabevon[$j+7*$i])).': '.$freigabevon[$j+7*$i].'"><span> </span>';
+					if($hgfarbe[$j+7*$i]=='#CDDDEE')
 					{
 						$k=$j+7*$i;
 						echo "<a href='$PHP_SELF?wmonat=$wmonat&wjahr=$wjahr&delete=$datensatz[$k]' onclick='return conf_del()'>";
+                        echo '<img src="../../../skin/images/delete_x.png" alt="loeschen" title="'.$p->t('urlaubstool/eintragungLoeschen').'"></a></td>';
 					}
-					echo '<img src="../../../skin/images/flag-green.png" alt="freigegeben" title="'.$p->t('urlaubstool/freigegebenDurchAm', array($freigabevon[$j+7*$i])).' '.date("d-m-Y",strtotime($freigabeamum[$j+7*$i])).'"></td>';
 				}
 				else
 				{
