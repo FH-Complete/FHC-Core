@@ -92,7 +92,8 @@ class Lehrauftrag extends Auth_Controller
 
         // Retrieve studiengaenge the user is entitled for to populate studiengang dropdown
         if (!$studiengang_kz_arr = $this->permissionlib->getSTG_isEntitledFor(self::BERECHTIGUNG_LEHRAUFTRAG_BESTELLEN)) {
-            show_error('Fehler bei Berechtigungsprüfung');
+            show_error('Keine Studiengänge gefunden.<br>
+                Es muss eine passende Organisationseinheit hinterlegt werden.<br>');
         }
 
         // If studiengang_kz get param was set, check against entitled stg
