@@ -156,7 +156,7 @@ function getPruefungByLv($aktStudiensemester = null, $uid = null)
 	}
 	$lehrveranstaltungen=$lvIds;
 	$pruefung = new pruefungCis();
-	if($pruefung->getPruefungByLv($lehrveranstaltungen))
+	if($pruefung->getPruefungByLv($lehrveranstaltungen, $uid))
 	{
 		$pruefungen = array();
 		foreach($pruefung->lehrveranstaltungen as $key=>$lv)

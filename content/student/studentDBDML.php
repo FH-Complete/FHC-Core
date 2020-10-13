@@ -280,6 +280,51 @@ function NotePruefungAnlegen($studiensemester_kurzbz, $student_uid, $lehrveranst
 	}
 }
 
+function deleteFromSAP($buchung)
+{
+	global $db, $user;
+
+	if(defined('BUCHUNGEN_CHECK_SAP') && BUCHUNGEN_CHECK_SAP == true)
+	{
+		$qry = "SELECT * FROM sync.tbl_sap_salesorder WHERE buchungsnr=".$db->db_add_param($buchung->buchungsnr);
+		if($result = $db->db_query($qry))
+		{
+			if($row = $db->db_fetch_object($result))
+			{
+				$qry = "DELETE FROM sync.tbl_sap_salesorder WHERE buchungsnr=".$db->db_add_param($buchung->buchungsnr);
+				if($db->db_query($qry))
+				{
+					$log = new log();
+					$log->mitarbeiter_uid = $user;
+					$log->beschreibung = 'Buchungszuordnung SAP geloescht: SalesOrder:'.$row->sap_sales_order_id;
+					$log->sql = $qry;
+					if(!$log->save(true))
+					{
+						echo "Fehler beim Schreiben des Log".$log->errormsg;
+						return false;
+					}
+					return true;
+				}
+				else
+				{
+					echo "Fehler beim Löschen der Zahlungszuordnung";
+					return false;
+				}
+			}
+			else
+			{
+				//Gegenbuchung
+			}
+		}
+		else
+		{
+			echo "Zahlung nicht gefunden";
+			return false;
+		}
+	}
+	return true;
+}
+
 /**
  * Prueft ob die Kontobuchung bereits ins SAP Ubertragen wurde oder noch geändert werden darf
  */
@@ -1981,7 +2026,8 @@ if(!$error)
 				}
 				else
 				{
-					if(isBuchungAllowedToChange($buchung))
+					if(isBuchungAllowedToChange($buchung)
+						|| $rechte->isBerechtigt('student/zahlungAdmin',$buchung->studiengang_kz,'suid'))
 					{
 						$buchung->betrag = $_POST['betrag'];
 						$buchung->buchungsdatum = $_POST['buchungsdatum'];
@@ -2062,7 +2108,8 @@ if(!$error)
 						{
 							if($buchung->buchungsnr_verweis=='')
 							{
-								if(isBuchungAllowedToChange($buchung))
+								if(isBuchungAllowedToChange($buchung)
+								|| $rechte->isBerechtigt('student/zahlungAdmin',$buchung->studiengang_kz,'suid'))
 								{
 									$kto = new konto();
 									//$buchung->betrag*(-1);
@@ -2139,8 +2186,17 @@ if(!$error)
 				}
 				else
 				{
-					if(isBuchungAllowedToChange($buchung))
+					$isAllowedToChange = isBuchungAllowedToChange($buchung);
+					if($isAllowedToChange
+					|| $rechte->isBerechtigt('student/zahlungAdmin',$buchung->studiengang_kz,'suid')
+					)
 					{
+						if(!$isAllowedToChange)
+						{
+							// Buchung aus SAP Zwischentabelle loeschen
+							deleteFromSAP($buchung);
+						}
+
 						if($buchung->delete($_POST['buchungsnr']))
 						{
 							$return = true;

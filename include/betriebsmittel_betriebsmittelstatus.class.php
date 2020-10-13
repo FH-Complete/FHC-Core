@@ -368,6 +368,47 @@ class betriebsmittel_betriebsmittelstatus extends basis_db
 			$this->errormsg = 'Fehler beim Entfernen des Betriebsmittel Betriebsmittelstatus-Datensatzes';
 			return false;
 		}	
-	}	
+	}
+
+	/**
+	 * Laedt den letzten Stauts eines Betriebsmittels
+	 * @param  $betriebsmittel_id
+	 * @return betriebsmittelstatus_kurzbz wenn ok, false im Fehlerfall
+	 */
+	public function load_last_status_by_betriebsmittel_id($betriebsmittel_id)
+	{
+		$this->result=array();
+		$this->errormsg='';
+		if ($betriebsmittel_id)
+			$this->betriebsmittel_id=$betriebsmittel_id;
+
+		if(!is_numeric($this->betriebsmittel_id))
+		{
+			$this->errormsg = 'Betriebsmittel_id ist ungueltig';
+			return false;
+		}
+
+		$qry=' SELECT * FROM wawi.tbl_betriebsmittel_betriebsmittelstatus
+			WHERE betriebsmittel_id='.$this->db_add_param(trim($this->betriebsmittel_id), FHC_INTEGER).'
+			ORDER BY betriebsmittelbetriebsmittelstatus_id DESC LIMIT 1';
+
+		if($this->db_query($qry))
+		{
+			if($row = $this->db_fetch_object())
+			{
+				return $row->betriebsmittelstatus_kurzbz;
+			}
+			else
+			{
+				$this->errormsg='Es wurde kein Eintrag gefunden';
+				return false;
+			}
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+	}
 }
 ?>
