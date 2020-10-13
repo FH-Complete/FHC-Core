@@ -163,6 +163,64 @@ if (isset($_GET['rechts_x']) || isset($_POST['rechts_x']))
 		$wjahr=$wjahr;
 	}
 }
+
+//Bereits freigegebenen Eintrag löschen
+//Eintragung löschen
+if((isset($_GET['delete'])  && isset($_GET['informSupervisor'])) || (isset($_POST['delete']) && isset($_POST['informSupervisor'])))
+{
+    $zeitsperre = new zeitsperre();
+    $zeitsperre->load($_GET['delete']);
+
+    $vondatum = $zeitsperre->getVonDatum();
+    $bisdatum = $zeitsperre->getBisDatum();
+
+    if(!$zeitsperre->delete($_GET['delete']))
+        echo $zeitsperre->errormsg;
+
+    //Mail an Vorgesetzten
+    $vorgesetzter = $ma->getVorgesetzte($uid);
+    if($vorgesetzter)
+    {
+        $to='';
+        foreach($ma->vorgesetzte as $vg)
+        {
+            if($to!='')
+            {
+                $to.=', '.$vg.'@'.DOMAIN;
+            }
+            else
+            {
+                $to.=$vg.'@'.DOMAIN;
+            }
+        }
+
+        $benutzer = new benutzer();
+        $benutzer->load($uid);
+        $message = $p->t('urlaubstool/diesIstEineAutomatischeMail')."\n".
+            $p->t('urlaubstool/xHatUrlaubGeloescht',array($benutzer->nachname,$benutzer->vorname)).":\n";
+
+        for($i=0;$i<count($akette);$i++)
+        {
+            $message.= $p->t('urlaubstool/von')." ".date("d.m.Y", strtotime($vondatum))." ".$p->t('urlaubstool/bis')." ".date("d.m.Y", strtotime($bisdatum))."\n";
+        }
+
+        $mail = new mail($to, 'vilesci@'.DOMAIN,$p->t('urlaubstool/freigegebenerUrlaubGeloescht'), $message);
+        if($mail->send())
+        {
+            $vgmail="<span style='color:green;'>".$p->t('urlaubstool/VorgesetzteInformiert',array($to))."</span>";
+        }
+        else
+        {
+            $vgmail="<br><span class='error'>".$p->t('urlaubstool/fehlerBeimSendenAufgetreten',array($to))."!</span>";
+        }
+    }
+    else
+    {
+        $vgmail="<br><span class='error'>".$p->t('urlaubstool/konnteKeinFreigabemailVersendetWerden')."</span>";
+    }
+}
+
+
 //Eintragung löschen
 if((isset($_GET['delete']) || isset($_POST['delete'])))
 {
@@ -732,7 +790,7 @@ for ($i=0;$i<6;$i++)
 					if($hgfarbe[$j+7*$i]=='#CDDDEE')
 					{
 						$k=$j+7*$i;
-						echo "<a href='$PHP_SELF?wmonat=$wmonat&wjahr=$wjahr&delete=$datensatz[$k]' onclick='return conf_del()'>";
+						echo "<a href='$PHP_SELF?wmonat=$wmonat&wjahr=$wjahr&delete=$datensatz[$k]&informSupervisor=True' onclick='return conf_del()'>";
                         echo '<img src="../../../skin/images/delete_x.png" alt="loeschen" title="'.$p->t('urlaubstool/eintragungLoeschen').'"></a></td>';
 					}
 				}
