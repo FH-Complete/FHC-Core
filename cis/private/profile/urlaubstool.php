@@ -198,11 +198,8 @@ if((isset($_GET['delete'])  && isset($_GET['informSupervisor'])) || (isset($_POS
         $benutzer->load($uid);
         $message = $p->t('urlaubstool/diesIstEineAutomatischeMail')."\n".
             $p->t('urlaubstool/xHatUrlaubGeloescht',array($benutzer->nachname,$benutzer->vorname)).":\n";
+        $message.= $p->t('urlaubstool/von')." ".date("d.m.Y", strtotime($vondatum))." ".$p->t('urlaubstool/bis')." ".date("d.m.Y", strtotime($bisdatum))."\n";
 
-        for($i=0;$i<count($akette);$i++)
-        {
-            $message.= $p->t('urlaubstool/von')." ".date("d.m.Y", strtotime($vondatum))." ".$p->t('urlaubstool/bis')." ".date("d.m.Y", strtotime($bisdatum))."\n";
-        }
 
         $mail = new mail($to, 'vilesci@'.DOMAIN,$p->t('urlaubstool/freigegebenerUrlaubGeloescht'), $message);
         if($mail->send())
