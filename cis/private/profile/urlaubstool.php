@@ -177,22 +177,29 @@ if((isset($_GET['delete'])  && isset($_GET['informSupervisor'])) || (isset($_POS
     if(!$zeitsperre->delete($_GET['delete']))
         echo $zeitsperre->errormsg;
 
-    //Mail an Vorgesetzten
-    $vorgesetzter = $ma->getVorgesetzte($uid);
-    if($vorgesetzter)
-    {
-        $to='';
-        foreach($ma->vorgesetzte as $vg)
+        //Mail an Vorgesetzten
+        $prsn = new person();
+
+        $vorgesetzter = $ma->getVorgesetzte($uid);
+        if($vorgesetzter)
         {
-            if($to!='')
+            $to='';
+            $fullName ='';
+            foreach($ma->vorgesetzte as $vg)
             {
-                $to.=', '.$vg.'@'.DOMAIN;
+                if($to!='')
+                {
+                    $to.=', '.$vg.'@'.DOMAIN;
+                    $name = $prsn->getFullNameFromBenutzer($vg);
+                    $fullName.=', '.$name;
+                }
+                else
+                {
+                    $to.=$vg.'@'.DOMAIN;
+                    $name = $prsn->getFullNameFromBenutzer($vg);
+                    $fullName.=$name;
+                }
             }
-            else
-            {
-                $to.=$vg.'@'.DOMAIN;
-            }
-        }
 
         $benutzer = new benutzer();
         $benutzer->load($uid);
@@ -204,11 +211,11 @@ if((isset($_GET['delete'])  && isset($_GET['informSupervisor'])) || (isset($_POS
         $mail = new mail($to, 'vilesci@'.DOMAIN,$p->t('urlaubstool/freigegebenerUrlaubGeloescht'), $message);
         if($mail->send())
         {
-            $vgmail="<span style='color:green;'>".$p->t('urlaubstool/VorgesetzteInformiert',array($to))."</span>";
+            $vgmail="<span style='color:green;'>".$p->t('urlaubstool/VorgesetzteInformiert',array($fullName))."</span>";
         }
         else
         {
-            $vgmail="<br><span class='error'>".$p->t('urlaubstool/fehlerBeimSendenAufgetreten',array($to))."!</span>";
+            $vgmail="<br><span class='error'>".$p->t('urlaubstool/fehlerBeimSendenAufgetreten',array($fullName))."!</span>";
         }
     }
     else
@@ -325,13 +332,13 @@ if(isset($_GET['speichern']) && isset($_GET['wtag']))
 					{
 						$to.=', '.$vg.'@'.DOMAIN;
 						$name = $prsn->getFullNameFromBenutzer($vg);
-						$fullName = ', '.$name;
+						$fullName.=', '.$name;
 					}
 					else
 					{
 						$to.=$vg.'@'.DOMAIN;
 						$name = $prsn->getFullNameFromBenutzer($vg);
-						$fullName = $name;
+						$fullName.=$name;
 					}
 				}
 

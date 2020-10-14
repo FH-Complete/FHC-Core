@@ -419,17 +419,17 @@ if(isset($_GET['type']) && ($_GET['type']=='edit_sperre' || $_GET['type']=='new_
 					if($vorgesetzter)
 					{
 						$to='';
-						$fullName ='';
+						$fullName='';
 						foreach($ma->vorgesetzte as $vg)
 						{
 							if (!empty($to))
                             {
 								$to.=',';
-								$fullName =',';
+								$fullName.=',';
                             }
 							$to.=trim($vg.'@'.DOMAIN);
 							$name = $prsn->getFullNameFromBenutzer($vg);
-							$fullName = $name;
+							$fullName.=$name;
 						}
 
 						$benutzer = new benutzer();
@@ -452,7 +452,7 @@ if(isset($_GET['type']) && ($_GET['type']=='edit_sperre' || $_GET['type']=='new_
 						}
 						else
 						{
-							echo "<br><span class='error'>".$p->t('urlaubstool/fehlerBeimSendenAufgetreten',array($to))."</span>";
+							echo "<br><span class='error'>".$p->t('urlaubstool/fehlerBeimSendenAufgetreten',array($fullName))."</span>";
 						}
 					}
 					else
@@ -482,19 +482,26 @@ if((isset($_GET['type']) && $_GET['type']=='delete_sperre' && isset($_GET['infor
         echo $zeitsperre->errormsg;
 
     //Mail an Vorgesetzten
+    $prsn = new person();
+
     $vorgesetzter = $ma->getVorgesetzte($uid);
     if($vorgesetzter)
     {
         $to='';
+        $fullName ='';
         foreach($ma->vorgesetzte as $vg)
         {
             if($to!='')
             {
                 $to.=', '.$vg.'@'.DOMAIN;
+                $name = $prsn->getFullNameFromBenutzer($vg);
+                $fullName.=', '.$name;
             }
             else
             {
                 $to.=$vg.'@'.DOMAIN;
+                $name = $prsn->getFullNameFromBenutzer($vg);
+                $fullName.=$name;
             }
         }
 
@@ -510,11 +517,11 @@ if((isset($_GET['type']) && $_GET['type']=='delete_sperre' && isset($_GET['infor
         $mail = new mail($to, 'vilesci@'.DOMAIN,$p->t('urlaubstool/freigegebenerUrlaubGeloescht'), $message);
         if($mail->send())
         {
-            echo "<br><b>".$p->t('urlaubstool/VorgesetzteInformiert',array($to))."</b>";
+            echo "<br><b>".$p->t('urlaubstool/VorgesetzteInformiert',array($fullName))."</b>";
         }
         else
         {
-            echo "<br><span class='error'>".$p->t('urlaubstool/fehlerBeimSendenAufgetreten',array($to))."!</span>";
+            echo "<br><span class='error'>".$p->t('urlaubstool/fehlerBeimSendenAufgetreten',array($fullName))."!</span>";
         }
     }
     else
