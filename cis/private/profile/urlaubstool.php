@@ -312,19 +312,26 @@ if(isset($_GET['speichern']) && isset($_GET['wtag']))
 		if(!$error)
 		{
 			//Mail an Vorgesetzten
+            $prsn = new person();
+
 			$vorgesetzter = $ma->getVorgesetzte($uid);
 			if($vorgesetzter)
 			{
 				$to='';
+				$fullName ='';
 				foreach($ma->vorgesetzte as $vg)
 				{
 					if($to!='')
 					{
 						$to.=', '.$vg.'@'.DOMAIN;
+						$name = $prsn->getFullNameFromBenutzer($vg);
+						$fullName = ', '.$name;
 					}
 					else
 					{
 						$to.=$vg.'@'.DOMAIN;
+						$name = $prsn->getFullNameFromBenutzer($vg);
+						$fullName = $name;
 					}
 				}
 
@@ -350,7 +357,7 @@ if(isset($_GET['speichern']) && isset($_GET['wtag']))
 				$mail = new mail($to, 'vilesci@'.DOMAIN,$p->t('urlaubstool/freigabeansuchenUrlaub'), $message);
 				if($mail->send())
 				{
-					$vgmail="<span style='color:green;'>".$p->t('urlaubstool/freigabemailWurdeVersandt',array($to))."</span>";
+					$vgmail="<span style='color:green;'>".$p->t('urlaubstool/freigabemailWurdeVersandt',array($fullName))."</span>";
 				}
 				else
 				{
