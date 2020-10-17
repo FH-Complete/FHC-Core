@@ -33,7 +33,7 @@ class Organisationseinheit_model extends DB_Model
 					  FROM tree JOIN tbl_organisationseinheit oe ON (tree.oe_kurzbz = oe.oe_parent_kurzbz)
 				)
 				SELECT oe_kurzbz AS id,
-						SUBSTRING(REGEXP_REPLACE(path, '[A-z]+\|', '-', 'g') || bezeichnung, 2) AS description
+						SUBSTRING(REGEXP_REPLACE(path, '[A-z0-9]+\|', '-', 'g') || bezeichnung, 2) AS description
 				  FROM tree";
 
 		$parametersArray = array();
