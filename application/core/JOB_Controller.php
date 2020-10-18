@@ -18,7 +18,8 @@ abstract class JOB_Controller extends CLI_Controller
 
 		// Loads LogLib with different debug trace levels to get data of the job that extends this class
 		// It also specify parameters to set database fields
-		$this->load->library('LogLib',
+		$this->load->library(
+			'LogLib',
 			array(
 				'classIndex' => 5,
 				'functionIndex' => 5,
@@ -29,7 +30,8 @@ abstract class JOB_Controller extends CLI_Controller
 				'requestDataFormatter' => function($data) {
 					return json_encode($data);
 				}
-			)
+			),
+			'LogLibJob' // library alias case sensitive
 		);
 	}
 
@@ -84,16 +86,16 @@ abstract class JOB_Controller extends CLI_Controller
 		switch($level)
 		{
 			case LogLib::INFO:
-				$this->loglib->logInfoDB($data);
+				$this->LogLibJob->logInfoDB($data);
 				break;
 			case LogLib::DEBUG:
-				$this->loglib->logDebugDB($data);
+				$this->LogLibJob->logDebugDB($data);
 				break;
 			case LogLib::WARNING:
-				$this->loglib->logWarningDB($data);
+				$this->LogLibJob->logWarningDB($data);
 				break;
 			case LogLib::ERROR:
-				$this->loglib->logErrorDB($data);
+				$this->LogLibJob->logErrorDB($data);
 				break;
 		}
 	}
