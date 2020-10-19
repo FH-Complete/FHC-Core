@@ -13,6 +13,44 @@ class Benutzerfunktion_model extends DB_Model
 	}
 
 	/**
+	 * Lädt alle Benutzerfunktionen zu einer UID
+	 * @param type $uid UID des Mitarbeiters
+	 * @param type $funktion_kurzbz OPTIONAL Kurzbezeichnung der Funktion
+	 * @param type $startZeitraum OPTIONAL Start Zeitraum in dem die Funktion aktiv ist
+	 * @param type $endeZeitraum OPTIONAL Ende Zeitraum in dem die Funktion aktiv ist
+	 * @return boolean
+	 */
+	public function getBenutzerFunktionByUid($uid, $funktion_kurzbz=null, $startZeitraum=null, $endeZeitraum=null)
+	{
+		$params = array($uid);
+
+		$qry = "SELECT tbl_benutzerfunktion.*, tbl_organisationseinheit.bezeichnung as organisationseinheit_bezeichnung,
+					tbl_organisationseinheit.organisationseinheittyp_kurzbz
+				FROM public.tbl_benutzerfunktion
+				LEFT JOIN public.tbl_organisationseinheit USING(oe_kurzbz)
+			    WHERE uid=?";
+		if(!is_null($funktion_kurzbz))
+		{
+			$qry .= ' AND funktion_kurzbz = ?';
+			$params[] = $funktion_kurzbz;
+		}
+		if(!is_null($startZeitraum))
+		{
+			$qry .=' AND (datum_bis IS NULL OR datum_bis >= ?)';
+			$params[] = $startZeitraum;
+		}
+		if(!is_null($endeZeitraum))
+		{
+			$qry .=' AND (datum_von IS NULL OR datum_von <= ?)';
+			$params[] = $endeZeitraum;
+		}
+
+		$qry .= "ORDER BY datum_bis NULLS LAST, datum_von NULLS LAST;";
+
+		return $this->execQuery($qry, $params);
+	}
+
+	/**
 	 * Get the Benutzerfunktion using the person_id
 	 */
 	public function getActiveFunctionsByPersonId($person_id)

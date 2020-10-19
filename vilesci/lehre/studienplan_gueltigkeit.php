@@ -34,6 +34,7 @@ if(!$rechte->isBerechtigt('lehre/studienordnung', null, 's'))
 
 $studiengang_kz = isset($_GET['studiengang_kz'])?$_GET['studiengang_kz']:'';
 $orgform_kurzbz = isset($_GET['orgform_kurzbz'])?$_GET['orgform_kurzbz']:'';
+$farbe = isset($_GET['farbe'])?true:false;
 $db = new basis_db();
 
 echo '<!doctype html>
@@ -51,7 +52,7 @@ echo '
 				{
 					$("#t1").tablesorter(
 					{
-						widgets: ["zebra"]
+						/*widgets: ["zebra"]*/
 					});
 				});
 	</script>
@@ -95,7 +96,7 @@ foreach ($orgform->result as $of)
 		
 	echo '<OPTION value="'.$db->convert_html_chars($of->orgform_kurzbz).'" '.$selected.'>'.$db->convert_html_chars($of->orgform_kurzbz).' - '.$db->convert_html_chars($of->bezeichnung).'</OPTION>';
 }
-echo '</select>
+echo '</select><input type="checkbox" name="farbe" '.($farbe==true?'checked':'').'><span style="font-size: small">Unterschiede farblich hervorheben</span>
 <input type="submit" value="Anzeigen">
 </form>';
 
@@ -127,6 +128,7 @@ echo '</tr>
 </thead>
 <tbody>';
 $start=0;
+$color = 'black';
 foreach($studiensemester->studiensemester as $row_stsem)
 {
 
@@ -141,7 +143,12 @@ foreach($studiensemester->studiensemester as $row_stsem)
 			foreach($gueltigkeit[$row_stsem->studiensemester_kurzbz][$i] as $row_studienplan)
 			{
 				$start=true;
-				$row .= $row_studienplan.'<br>';
+				// Die Farbe des Studienplans ist immer gleich bleibend nach der Bezeichnung des Studienplans
+				if ($farbe == true)
+				{
+					$color = 'hsl('.abs((crc32($row_studienplan))*2 % 360).', 90%, 40%)';
+				}
+				$row .= '<span style="color: '.$color.'">'.$row_studienplan.'</span><br>';
 			}
 		}
 		$row .= '</td>';

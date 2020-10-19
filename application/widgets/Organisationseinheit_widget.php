@@ -31,7 +31,10 @@ class Organisationseinheit_widget extends DropdownWidget
         {
             // NOTE: no need to call addSelectToModel because getRecursiveList already returns
 	        // the correct names of the fields
-		    $this->setElementsArray($this->OrganisationseinheitModel->getRecursiveList());
+		    $this->setElementsArray($this->OrganisationseinheitModel->getRecursiveList(),
+			    true,
+			    $this->p->t('lehre', 'organisationseinheit'),
+			    'No organisational unit found');
         }
 		
 		$this->loadDropDownView($widgetData);

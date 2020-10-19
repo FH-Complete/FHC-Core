@@ -42,6 +42,8 @@ class LogLib
 	const P_NAME_LINE_INDEX = 'lineIndex';
 	const P_NAME_DB_LOG_TYPE = 'dbLogType';
 	const P_NAME_DB_EXECUTE_USER = 'dbExecuteUser';
+	const P_NAME_REQUEST_ID = 'requestId';
+	const P_NAME_REQUEST_DATA_FORMATTER = 'requestDataFormatter';
 
 	// Properties used to retrieve caller data
 	private $_classIndex;
@@ -51,6 +53,9 @@ class LogLib
 	// Properties used when logging to database
 	private $_dbLogType;
 	private $_dbExecuteUser;
+
+	private $_requestId; // is it possible to specify a request id when loading this library
+	private $_requestDataFormatter; // is possible to provide a function to format request data
 
 	/**
 	 * Set properties to a default value or overwrites them with the given parameters
@@ -63,7 +68,18 @@ class LogLib
 		$this->_lineIndex = self::LINE_INDEX;
 		$this->_dbLogType = null;
 		$this->_dbExecuteUser = self::DB_EXECUTE_USER;
+		$this->_requestId = null;
+		$this->_requestDataFormatter = null;
 
+		// If parameters are given then overwrite the default values
+		if (!isEmptyArray($params)) $this->setConfigs($params);
+	}
+
+	/**
+	 * Store configuration parameters for this lib
+	 */
+	public function setConfigs($params)
+	{
 		// If parameters are given then overwrite the default values
 		if (!isEmptyArray($params))
 		{
@@ -72,6 +88,8 @@ class LogLib
 			if (isset($params[self::P_NAME_LINE_INDEX])) $this->_lineIndex = $params[self::P_NAME_LINE_INDEX];
 			if (isset($params[self::P_NAME_DB_LOG_TYPE])) $this->_dbLogType = $params[self::P_NAME_DB_LOG_TYPE];
 			if (isset($params[self::P_NAME_DB_EXECUTE_USER])) $this->_dbExecuteUser = $params[self::P_NAME_DB_EXECUTE_USER];
+			if (isset($params[self::P_NAME_REQUEST_ID])) $this->_requestId = $params[self::P_NAME_REQUEST_ID];
+			if (isset($params[self::P_NAME_REQUEST_DATA_FORMATTER])) $this->_requestDataFormatter = $params[self::P_NAME_REQUEST_DATA_FORMATTER];
 		}
 	}
 
@@ -108,33 +126,33 @@ class LogLib
 	/**
 	 * Writes an info log to database
 	 */
-	public function logInfoDB($requestId, $data)
+	public function logInfoDB($data, $requestId = null)
 	{
-		$this->_logDB(self::INFO, $requestId, $data);
+		$this->_logDB(self::INFO, $data, $requestId);
 	}
 
 	/**
 	 * Writes a debug log to database
 	 */
-	public function logDebugDB($requestId, $data)
+	public function logDebugDB($data, $requestId = null)
 	{
-		$this->_logDB(self::DEBUG, $requestId, $data);
+		$this->_logDB(self::DEBUG, $data, $requestId);
 	}
 
 	/**
 	 * Writes an warning log to database
 	 */
-	public function logWarningDB($requestId, $data)
+	public function logWarningDB($data, $requestId = null)
 	{
-		$this->_logDB(self::WARNING, $requestId, $data);
+		$this->_logDB(self::WARNING, $data, $requestId);
 	}
 
 	/**
 	 * Writes an error log to database
 	 */
-	public function logErrorDB($requestId, $data)
+	public function logErrorDB($data, $requestId = null)
 	{
-		$this->_logDB(self::ERROR, $requestId, $data);
+		$this->_logDB(self::ERROR, $data, $requestId);
 	}
 
 	// --------------------------------------------------------------------------------------------------------------
@@ -151,8 +169,15 @@ class LogLib
 	/**
 	 * Writes logs to database
 	 */
-	private function _logDB($level, $requestId, $data)
+	private function _logDB($level, $data, $requestId, $executionTime = null)
 	{
+		// If there isn't a valid request id provided during the loading of this library or when any log to db method is called
+		// NOTE: this message will be displayed only to the developer AND stops the execution
+		if (isEmptyString($this->_requestId) && isEmptyString($requestId))
+		{
+			show_error('To log to database you need to specify or give the "'.self::P_NAME_REQUEST_ID.'" parameter when the LogLib is loaded or when log'.ucfirst($level).'DB is called');
+		}
+
 		// If the _dbLogType parameter was not given when this library was loaded
 		// NOTE: this message will be displayed only to the developer AND stops the execution
 		if ($this->_dbLogType == null)
@@ -175,14 +200,21 @@ class LogLib
 			// Get caller data
 			$callerData = $this->_getCaller();
 
+			// If a request data formatter was defined then use it
+			$request_data = $data;
+			if ($this->_requestDataFormatter != null && is_callable($this->_requestDataFormatter))
+			{
+				$request_data = call_user_func_array($this->_requestDataFormatter, array($data));
+			}
+
 			// Writes a log to database
 			$ci->WebservicelogModel->insert(array(
 				'webservicetyp_kurzbz' => $this->_dbLogType,
-				'request_id' => $requestId,
+				'request_id' => (!isEmptyString($requestId) ? $requestId : $this->_requestId).' - '.$level,
 				'beschreibung' => $this->_getDatabaseDescription($callerData),
-				'request_data' => $data,
+				'request_data' => $request_data,
 				'execute_user' => $this->_dbExecuteUser,
-				'execute_time' => 'NOW()' // current time
+				'execute_time' => $executionTime == null ? 'NOW()' : $executionTime // default current time, if not otherwise specified
 			));
 		}
 	}
@@ -251,3 +283,4 @@ class LogLib
 		return $formatted;
 	}
 }
+

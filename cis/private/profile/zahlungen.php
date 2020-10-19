@@ -21,6 +21,7 @@
  */
 
 	require_once('../../../config/cis.config.inc.php');
+	require_once('../../../config/global.config.inc.php');
 	require_once('../../../include/functions.inc.php');
 	require_once('../../../include/studiensemester.class.php');
 	require_once('../../../include/konto.class.php');
@@ -52,6 +53,11 @@
 	}
 	else
 		$getParam='';
+
+	if (defined('ZAHLUNGSBESTAETIGUNG_ANZEIGEN') && !ZAHLUNGSBESTAETIGUNG_ANZEIGEN)
+	{
+		die('Um diese Seite anzuzeigen, ist ein entsprechender Eintrag in der Konfigurationsdatei nötig.');
+	}
 	
 	$datum_obj = new datum();
 
@@ -211,12 +217,20 @@ echo '			<script type="text/javascript" src="../../../vendor/components/jqueryui
 		foreach ($konto->result as $row)
 		{
 			$i=0;  //Zaehler fuer Anzahl Gegenbuchungen
+			$count_studiengangszahlung = 0;
 			$buchungsnummern='';
+
+			// Für die FHTW sollen nur Zahlungsbestaetigungen von FHTW-Studien angezeigt werden. (Nicht von Lehrgaengen)
+			if (defined('ZAHLUNGSBESTAETIGUNG_ANZEIGEN_FUER_LEHRGAENGE') && !ZAHLUNGSBESTAETIGUNG_ANZEIGEN_FUER_LEHRGAENGE)
+			{
+				$is_lehrgang = $row['parent']->studiengang_kz < 0 ? true : false;
+				if ($is_lehrgang) continue;
+			}
 			
 			if(!isset($row['parent']))
 				continue;
 			$betrag = $row['parent']->betrag;
-
+			$count_studiengangszahlung ++;
 			
 			if(isset($row['childs']))
 			{
@@ -224,7 +238,8 @@ echo '			<script type="text/javascript" src="../../../vendor/components/jqueryui
 				{
 					$betrag += $row_child->betrag;
 					$betrag = round($betrag, 2);
-					$buchungsnummern .= ';'.$row['childs'][$key]->buchungsnr;
+					$buchungsnummern = !empty($buchungsnummern) ? ';' : '';
+					$buchungsnummern .= $row['childs'][$key]->buchungsnr;
 					$i = $key; //Zaehler auf letzten Gegenbuchungseintrag setzen
 				}
 			}
@@ -265,6 +280,13 @@ echo '			<script type="text/javascript" src="../../../vendor/components/jqueryui
 			}
 			echo '</tr>';
 		}
+		
+		// Wenn die Tabelle keine Eintraege hat, wird eine Tabellenzeile mit entsprechender Information angezeigt.
+		if ($count_studiengangszahlung == 0)
+		{
+			echo "<tr><td colspan='7' style='background-color: white;'>" .$p->t('tools/keineZahlungenVorhanden'). "</td></tr>";
+		}
+		
 		echo '</tbody></table>';
 	}
 	else 

@@ -280,6 +280,80 @@ function NotePruefungAnlegen($studiensemester_kurzbz, $student_uid, $lehrveranst
 	}
 }
 
+function deleteFromSAP($buchung)
+{
+	global $db, $user;
+
+	if(defined('BUCHUNGEN_CHECK_SAP') && BUCHUNGEN_CHECK_SAP == true)
+	{
+		$qry = "SELECT * FROM sync.tbl_sap_salesorder WHERE buchungsnr=".$db->db_add_param($buchung->buchungsnr);
+		if($result = $db->db_query($qry))
+		{
+			if($row = $db->db_fetch_object($result))
+			{
+				$qry = "DELETE FROM sync.tbl_sap_salesorder WHERE buchungsnr=".$db->db_add_param($buchung->buchungsnr);
+				if($db->db_query($qry))
+				{
+					$log = new log();
+					$log->mitarbeiter_uid = $user;
+					$log->beschreibung = 'Buchungszuordnung SAP geloescht: SalesOrder:'.$row->sap_sales_order_id;
+					$log->sql = $qry;
+					if(!$log->save(true))
+					{
+						echo "Fehler beim Schreiben des Log".$log->errormsg;
+						return false;
+					}
+					return true;
+				}
+				else
+				{
+					echo "Fehler beim Löschen der Zahlungszuordnung";
+					return false;
+				}
+			}
+			else
+			{
+				//Gegenbuchung
+			}
+		}
+		else
+		{
+			echo "Zahlung nicht gefunden";
+			return false;
+		}
+	}
+	return true;
+}
+
+/**
+ * Prueft ob die Kontobuchung bereits ins SAP Ubertragen wurde oder noch geändert werden darf
+ */
+function isBuchungAllowedToChange($buchung_obj)
+{
+	global $db;
+
+	if(defined('BUCHUNGEN_CHECK_SAP') && BUCHUNGEN_CHECK_SAP == true)
+	{
+		$qry = "SELECT * FROM sync.tbl_sap_salesorder WHERE buchungsnr=".$db->db_add_param($buchung_obj->buchungsnr);
+		if ($buchung_obj->buchungsnr_verweis != '')
+			$qry .= " OR buchungsnr=".$db->db_add_param($buchung_obj->buchungsnr_verweis);
+
+		if ($result = $db->db_query($qry))
+		{
+			if($db->db_num_rows($result) > 0)
+			{
+				return false;
+			}
+			else
+				return true;
+		}
+		else
+			return false;
+	}
+	else
+		return true;
+}
+
 if(!$error)
 {
 
@@ -1952,27 +2026,36 @@ if(!$error)
 				}
 				else
 				{
-					$buchung->betrag = $_POST['betrag'];
-					$buchung->buchungsdatum = $_POST['buchungsdatum'];
-					$buchung->buchungstext = $_POST['buchungstext'];
-					$buchung->mahnspanne = $_POST['mahnspanne'];
-					$buchung->buchungstyp_kurzbz = $_POST['buchungstyp_kurzbz'];
-					$buchung->studiensemester_kurzbz = $_POST['studiensemester_kurzbz'];
-					$buchung->studiengang_kz = $_POST['studiengang_kz'];
-					$buchung->credit_points = $_POST['credit_points'];
-					$buchung->new = false;
-					$buchung->updateamum = date('Y-m-d H:i:s');
-					$buchung->updatevon = $user;
-					$buchung->anmerkung = $_POST['anmerkung'];
-
-					if($buchung->save())
+					if(isBuchungAllowedToChange($buchung)
+						|| $rechte->isBerechtigt('student/zahlungAdmin',$buchung->studiengang_kz,'suid'))
 					{
-						$return = true;
+						$buchung->betrag = $_POST['betrag'];
+						$buchung->buchungsdatum = $_POST['buchungsdatum'];
+						$buchung->buchungstext = $_POST['buchungstext'];
+						$buchung->mahnspanne = $_POST['mahnspanne'];
+						$buchung->buchungstyp_kurzbz = $_POST['buchungstyp_kurzbz'];
+						$buchung->studiensemester_kurzbz = $_POST['studiensemester_kurzbz'];
+						$buchung->studiengang_kz = $_POST['studiengang_kz'];
+						$buchung->credit_points = $_POST['credit_points'];
+						$buchung->new = false;
+						$buchung->updateamum = date('Y-m-d H:i:s');
+						$buchung->updatevon = $user;
+						$buchung->anmerkung = $_POST['anmerkung'];
+
+						if($buchung->save())
+						{
+							$return = true;
+						}
+						else
+						{
+							$return = false;
+							$errormsg = 'Fehler beim Speichern:'.$buchung->errormsg;
+						}
 					}
 					else
 					{
 						$return = false;
-						$errormsg = 'Fehler beim Speichern:'.$buchung->errormsg;
+						$errormsg = 'Buchung wurde bereits übertragen und darf nicht geändert werden';
 					}
 				}
 			}
@@ -2025,26 +2108,35 @@ if(!$error)
 						{
 							if($buchung->buchungsnr_verweis=='')
 							{
-								$kto = new konto();
-								//$buchung->betrag*(-1);
-								$buchung->betrag = $kto->getDifferenz($buchungsnr);
-								$buchung->buchungsdatum = $gegenbuchungsdatum;
-								$buchung->mahnspanne = '0';
-								$buchung->buchungsnr_verweis = $buchung->buchungsnr;
-								$buchung->new = true;
-								$buchung->insertamum = date('Y-m-d H:i:s');
-								$buchung->insertvon = $user;
-								$buchung->anmerkung = '';
-
-								if($buchung->save())
+								if(isBuchungAllowedToChange($buchung)
+								|| $rechte->isBerechtigt('student/zahlungAdmin',$buchung->studiengang_kz,'suid'))
 								{
-									//$data = $buchung->buchungsnr;
-									$return = true;
+									$kto = new konto();
+									//$buchung->betrag*(-1);
+									$buchung->betrag = $kto->getDifferenz($buchungsnr);
+									$buchung->buchungsdatum = $gegenbuchungsdatum;
+									$buchung->mahnspanne = '0';
+									$buchung->buchungsnr_verweis = $buchung->buchungsnr;
+									$buchung->new = true;
+									$buchung->insertamum = date('Y-m-d H:i:s');
+									$buchung->insertvon = $user;
+									$buchung->anmerkung = '';
+
+									if($buchung->save())
+									{
+										//$data = $buchung->buchungsnr;
+										$return = true;
+									}
+									else
+									{
+										$return = false;
+										$errormsg .= "\n".'Fehler beim Speichern:'.$buchung->errormsg;
+									}
 								}
 								else
 								{
 									$return = false;
-									$errormsg .= "\n".'Fehler beim Speichern:'.$buchung->errormsg;
+									$errormsg .= "\n".'Buchung wurde bereits Übertragen und darf nicht geändert werden';
 								}
 							}
 							else
@@ -2094,14 +2186,32 @@ if(!$error)
 				}
 				else
 				{
-					if($buchung->delete($_POST['buchungsnr']))
+					$isAllowedToChange = isBuchungAllowedToChange($buchung);
+					if($isAllowedToChange
+					|| $rechte->isBerechtigt('student/zahlungAdmin',$buchung->studiengang_kz,'suid')
+					)
 					{
-						$return = true;
+						if(!$isAllowedToChange)
+						{
+							// Buchung aus SAP Zwischentabelle loeschen
+							deleteFromSAP($buchung);
+						}
+
+						if($buchung->delete($_POST['buchungsnr']))
+						{
+							$return = true;
+						}
+						else
+						{
+							$errormsg = $buchung->errormsg;
+							$return = false;
+						}
 					}
 					else
 					{
-						$errormsg = $buchung->errormsg;
+						$error = true;
 						$return = false;
+						$errormsg = 'Diese Buchung darf nicht gelöscht werden da diese bereits übertragen wurde';
 					}
 				}
 			}
@@ -2501,7 +2611,7 @@ if(!$error)
 					$_POST['nummer']=$bm->transform_kartennummer($_POST['nummer']);
 
 				//Das speichern von Zutrittskarten ohne Nummern verhindern
-				if($_POST['betriebsmitteltyp']=='Zutrittskarte' && $_POST['nummer']=='')
+				if($_POST['betriebsmitteltyp']=='Zutrittskarte' && ($_POST['nummer']=='' && $_POST['nummer2']==''))
 				{
 					$error = true;
 					$return = false;
@@ -2509,14 +2619,23 @@ if(!$error)
 				}
 				else
 				{
+					if ($_POST['betriebsmitteltyp']=='Zutrittskarte' && $_POST['nummer'] == '')
+					{
+						$resultBM = $bm->getBetriebsmittel($_POST['betriebsmitteltyp'],null, $_POST['nummer2']);
+					}
+					else
+					{
+						$resultBM = $bm->getBetriebsmittel($_POST['betriebsmitteltyp'],$_POST['nummer']);
+					}
+
 					//Nachschauen ob dieses Betriebsmittel schon existiert
-					if($bm->getBetriebsmittel($_POST['betriebsmitteltyp'],$_POST['nummer']))
+					if($resultBM)
 					{
 						if(count($bm->result)>0)
 						{
 							//Wenn die Nummer gleich bleibt dann die alte ID verwenden da es
 							//unterschiedliche Schluessel gibt die die gleiche nummer haben ?!?
-							if($_POST['nummer']==$_POST['nummerold'])
+							if($_POST['nummer'] != '' && $_POST['nummer'] == $_POST['nummerold'])
 							{
 								$betriebsmittel_id = $_POST['betriebsmittel_id'];
 							}

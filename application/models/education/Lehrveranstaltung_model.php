@@ -119,9 +119,10 @@ class Lehrveranstaltung_model extends DB_Model
 	 * Gets all students of a Lehrveranstaltung
 	 * @param $studiensemester_kurzbz
 	 * @param $lehrveranstaltung_id
+	 * @param $active optional, if true, only active students retrieved, false - only inactive, all students otherwise
 	 * @return array|null
 	 */
-	public function getStudentsByLv($studiensemester_kurzbz, $lehrveranstaltung_id)
+	public function getStudentsByLv($studiensemester_kurzbz, $lehrveranstaltung_id, $active = null)
 	{
 		$query = "SELECT
 			distinct on(nachname, vorname, person_id) vorname, nachname, matrikelnr,
@@ -144,8 +145,18 @@ class Lehrveranstaltung_model extends DB_Model
 		WHERE
 			vw_student_lehrveranstaltung.studiensemester_kurzbz=?
 		AND
-			vw_student_lehrveranstaltung.lehrveranstaltung_id=?
-		ORDER BY nachname, vorname, person_id, tbl_bisio.bis DESC";
+			vw_student_lehrveranstaltung.lehrveranstaltung_id=?";
+
+		if (isset($active))
+		{
+			if ($active === true)
+				$query .= " AND tbl_benutzer.aktiv";
+			elseif ($active === false)
+				$query .= " AND tbl_benutzer.aktiv = false";
+		}
+
+		$query .=
+		" ORDER BY nachname, vorname, person_id, tbl_bisio.bis DESC";
 
 		return $this->execQuery($query, array($studiensemester_kurzbz, $lehrveranstaltung_id));
 	}

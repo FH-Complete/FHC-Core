@@ -1,5 +1,6 @@
 <?php
 $UID = getAuthUID();
+$PERIOD = $period; // filter Pruefungsprotokolle for given period
 
 $query = "
 SELECT
@@ -14,10 +15,14 @@ FROM
 	JOIN public.tbl_benutzer ON(student_uid=uid)
 	JOIN public.tbl_person USING(person_id)
 	JOIN public.tbl_studiengang ON(tbl_studiengang.studiengang_kz=tbl_student.studiengang_kz)
-	JOIN public.tbl_studiengangstyp USING(typ);
+	JOIN public.tbl_studiengangstyp USING(typ)
 WHERE
 	vorsitz='".$UID."'
-	AND datum>='2020-05-27'
+	AND (
+		'". $PERIOD. "' = 'today' AND datum = NOW()::date OR
+		'". $PERIOD. "' = 'lastWeek' AND datum = (NOW() - interval '1 week')::date OR
+		'". $PERIOD. "' = 'all' AND datum >= '2020-05-27'
+	)
 ORDER BY datum, nachname, vorname
 ";
 
