@@ -360,15 +360,32 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 			}
 		}
 
-		$qry = "SELECT von, bis, lehreinheit_id FROM bis.tbl_bisio WHERE student_uid=".$db->db_add_param($uid_arr[$i]);
+		$qry = "SELECT tbl_bisio.bisio_id, von, bis, lehreinheit_id, 
+       			(SELECT STRING_AGG (
+						tbl_zweck.bezeichnung,
+						', '
+					   	ORDER BY tbl_zweck.zweck_code
+					) FROM bis.tbl_bisio_zweck
+					JOIN bis.tbl_zweck USING(zweck_code)
+					WHERE tbl_bisio_zweck.bisio_id = tbl_bisio.bisio_id
+				) zweck, ort, universitaet
+				FROM bis.tbl_bisio
+				WHERE student_uid=".$db->db_add_param($uid_arr[$i]);
+
 		if($db->db_query($qry))
 		{
 			if($db->db_num_rows()>0)
 			{
-				echo "		<auslandssemester>";
+				echo "<auslandssemester>";
 				while($row1 = $db->db_fetch_object())
 				{
-					echo "Auslandssemester/International semester ".$datum->convertISODate($row1->von)." - ".$datum->convertISODate($row1->bis);
+					echo "<auslandssemesters>";
+					echo "<von>".$datum->convertISODate($row1->von)."</von>";
+					echo "<bis>".$datum->convertISODate($row1->bis)."</bis>";
+					echo "<zweck>$row1->zweck</zweck>";
+					echo "<ort>$row1->ort</ort>";
+					echo "<universitaet>$row1->universitaet</universitaet>";
+					echo "</auslandssemesters>";
 				}
 				echo "</auslandssemester>";
 				$auslandssemester=true;
