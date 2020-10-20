@@ -228,14 +228,13 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		else
 			echo '		<ects_angerechnet></ects_angerechnet>';
 
-		if($row->mischform=='t' || $row->orgform_kurzbz=='VBB')
-		{
-			//Bei Mischformen, die OrgForm aus dem Status nehmen
-			$prestudent = new prestudent();
-			$prestudent->getLastStatus($row->prestudent_id);
-			if($prestudent->orgform_kurzbz!='')
-				$row->orgform_kurzbz=$prestudent->orgform_kurzbz;
-		}
+		//OrgForm aus dem Status nehmen
+		$prestudent = new prestudent();
+		$prestudent->getLastStatus($row->prestudent_id);
+		if($prestudent->orgform_kurzbz!='')
+			$row->orgform_kurzbz=$prestudent->orgform_kurzbz;
+
+		$anforderungen_praxis = 'Das Studium beinhaltet ein facheinschlägiges Berufspraktikum.';
 
 		switch($row->orgform_kurzbz)
 		{
@@ -244,6 +243,10 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 			case 'VZ':	echo '		<studienart>Vollzeitstudium / Full-time degree programm</studienart>';
 				break;
 			case 'DL':	echo '		<studienart>Fernstudium / Distance Learning</studienart>';
+				break;
+			case 'DUA': // andere praxisanforderungen bei dualem Studium
+				echo '		<studienart>Duales Studium / Integrated work/study degree program</studienart>';
+				$anforderungen_praxis = 'Das Studium ist als duales Studium konzipiert und weist einen hohen Anteil an Praxisphasen in Partnerunternehmen auf, die inhaltlich und organisatorisch im Studienplan verankert sind und die systematische Verschränkung von Wissen und Anwendung fördern.';
 				break;
 			default:	echo '		<studienart></studienart>';
 				break;
@@ -254,7 +257,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 			echo '		<niveau_code>UNESCO ISCED 7</niveau_code>';
 			echo '		<zulassungsvoraussetzungen_deutsch><![CDATA[Allgemeine Universitätsreife (vgl. §4 Abs. 3 FHStG idgF), Berufsreifeprüfung bzw. Studienberechtigungsprüfung oder einschlägige berufliche Qualifikation (Lehrabschluss bzw. Abschluss einer berufsbildenden mittleren Schule mit Zusatzprüfungen). Die Aufnahme erfolgt auf Basis eines Auswahlverfahrens (Werdegang, Eignungstest, Bewerbungsgespräch).]]></zulassungsvoraussetzungen_deutsch>';
 			echo '		<zulassungsvoraussetzungen_englisch><![CDATA[Austrian or equivalent foreign school leaving certificate (Reifeprüfung), university entrance examination certificate (Studienberechtigungsprüfung), certificate or equivalent relevant professional qualification (Berufsreifeprüfung) plus entrance examination equal to the university entrance examination. Admission is on the basis of a selection process (including entrance exam and interview, professional background is considered).]]></zulassungsvoraussetzungen_englisch>';
-			echo '		<anforderungen_deutsch><![CDATA[Das Studium erfordert die positive Absolvierung von Lehrveranstaltungen (Vorlesungen, Übungen, Seminaren, Projekten, integrierten Lehrveranstaltungen) im Ausmaß von jeweils 30 ECTS pro Semester gemäß dem vorgeschriebenen Studienplan. Die Ausbildung integriert technische, wirtschaftliche, organisatorische und persönlichkeitsbildende Elemente. Das Studium beinhaltet ein facheinschlägiges Berufpraktikum. Im Rahmen des Studiums ist eine Diplomarbeit zu verfassen und eine abschließende Prüfung (Diplomprüfung) zu absolvieren. Der Studiengang (Kennzahl '.$studiengang_kz.') ist von der AQ Austria akkreditiert.]]></anforderungen_deutsch>';
+			echo '		<anforderungen_deutsch><![CDATA[Das Studium erfordert die positive Absolvierung von Lehrveranstaltungen (Vorlesungen, Übungen, Seminaren, Projekten, integrierten Lehrveranstaltungen) im Ausmaß von jeweils 30 ECTS pro Semester gemäß dem vorgeschriebenen Studienplan. Die Ausbildung integriert technische, wirtschaftliche, organisatorische und persönlichkeitsbildende Elemente. '.$anforderungen_praxis.' Im Rahmen des Studiums ist eine Diplomarbeit zu verfassen und eine abschließende Prüfung (Diplomprüfung) zu absolvieren. Der Studiengang (Kennzahl '.$studiengang_kz.') ist von der AQ Austria akkreditiert.]]></anforderungen_deutsch>';
 			echo '		<anforderungen_englisch><![CDATA[The program requires the positive completion of all courses (lectures, labs, seminars, project work, and integrated courses) to the extend of 30 ECTS per semester according to the curriculum. The program integrates technical, economical, management and personal study elements. Included in the program is a relevant work placement. The degree is awarded upon the successful completion of a diploma theses and the final examination. The program (classification number '.$studiengang_kz.') is accredited by AQ Austria.]]></anforderungen_englisch>';
 			echo '		<zugangsberechtigung_deutsch><![CDATA[Der Abschluss des Diplomstudiengangs berechtigt zu einem facheinschlägigen Doktoratsstudium, Magister- bzw. Master-Studium oder postgradualen Studium (mit eventuellen Zusatzprüfungen). Die Qualifikation entspricht einem Master of Science in Engineering, MSc.]]></zugangsberechtigung_deutsch>';
 			echo '		<zugangsberechtigung_englisch><![CDATA[The successful completion of the Diploma Degree Program qualifies the graduate to apply for admission to a relevant Doctoral Degree Program, Master Degree Program or postgraduate studies (additional qualifying exams may be required). The Diploma Degree Program is a graduate program, the qualification is equivalent to Master of Science in Engineering, MSc.]]></zugangsberechtigung_englisch>';
@@ -278,7 +281,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 			echo '		<niveau_code>UNESCO ISCED 6</niveau_code>';
 			echo '		<zulassungsvoraussetzungen_deutsch><![CDATA[Allgemeine Universitätsreife (vgl. §4 Abs. 3 FHStG idgF), Berufsreifeprüfung bzw. Studienberechtigungsprüfung oder einschlägige berufliche Qualifikation (Lehrabschluss bzw. Abschluss einer berufsbildenden mittleren Schule mit Zusatzprüfungen). Die Aufnahme erfolgt auf Basis eines Auswahlverfahrens (Werdegang, Eignungstest, Bewerbungsgespräch).]]></zulassungsvoraussetzungen_deutsch>';
 			echo '		<zulassungsvoraussetzungen_englisch><![CDATA[Austrian or equivalent foreign school leaving certificate (Reifeprüfung), university entrance examination certificate (Studienberechtigungsprüfung), certificate or equivalent relevant professional qualification (Berufsreifeprüfung) plus entrance examination equal to the university entrance examination. Admission is  on the basis of a selection process. (including entrance exam and interview, professional background is considered).]]></zulassungsvoraussetzungen_englisch>';
-			echo '		<anforderungen_deutsch><![CDATA[Das Studium erfordert die positive Absolvierung von Lehrveranstaltungen (Vorlesungen, Übungen, Seminaren, Projekten, integrierten Lehrveranstaltungen) im Ausmaß von jeweils 30 ECTS pro Semester gemäß dem vorgeschriebenen Studienplan. Die Ausbildung integriert technische, wirtschaftliche, organisatorische und persönlichkeitsbildende Elemente. Das Studium beinhaltet ein facheinschlägiges Berufpraktikum. Im Rahmen des Studiums ist eine Bachelorarbeit zu verfassen und eine abschließende Prüfung (Bachelorprüfung) zu absolvieren. Der Studiengang (Kennzahl '.$studiengang_kz.') ist von der AQ Austria akkreditiert.]]></anforderungen_deutsch>';
+			echo '		<anforderungen_deutsch><![CDATA[Das Studium erfordert die positive Absolvierung von Lehrveranstaltungen (Vorlesungen, Übungen, Seminaren, Projekten, integrierten Lehrveranstaltungen) im Ausmaß von jeweils 30 ECTS pro Semester gemäß dem vorgeschriebenen Studienplan. Die Ausbildung integriert technische, wirtschaftliche, organisatorische und persönlichkeitsbildende Elemente. '.$anforderungen_praxis.' Im Rahmen des Studiums ist eine Bachelorarbeit zu verfassen und eine abschließende Prüfung (Bachelorprüfung) zu absolvieren. Der Studiengang (Kennzahl '.$studiengang_kz.') ist von der AQ Austria akkreditiert.]]></anforderungen_deutsch>';
 			echo '		<anforderungen_englisch><![CDATA[The program requires the positive completion of all courses (lectures, labs, seminars, project work, and integrated courses) to the extend of 30 ECTS per semester according to the curriculum. The program integrates technical, economical, management and personal study elements. Included in the program is a relevant work placement. The degree is awarded upon the successful completion of 1 bachelor theses and the final examination. The program (classification number '.$studiengang_kz.') is accredited by AQ Austria.]]></anforderungen_englisch>';
 			echo '		<zugangsberechtigung_deutsch><![CDATA[Der Abschluss des Bachelorstudiengangs berechtigt zu einem facheinschlägigen Magister- bzw. Master-Studium an einer fachhochschulischen Einrichtung oder Universität (mit eventuellen Zusatzprüfungen).]]></zugangsberechtigung_deutsch>';
 			echo '		<zugangsberechtigung_englisch><![CDATA[The successful completion of the Bachelor Degree Program qualifies the graduate to apply for admission to a relevant Master Degree Program at a University of Applied Sciences or a University (additional qualifying exams may be required).]]></zugangsberechtigung_englisch>';
