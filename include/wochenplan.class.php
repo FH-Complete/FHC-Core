@@ -633,7 +633,7 @@ class wochenplan extends basis_db
 	/**
 	 * Zeichnen der Stundenplanwoche in HTML
 	 */
-	public function draw_week($raumres, $user_uid='', $gruppieren=LVPLAN_LEHREINHEITEN_GRUPPIEREN, $addons=null)
+	public function draw_week($raumres, $user_uid='', $gruppieren=LVPLAN_LEHREINHEITEN_GRUPPIEREN)
 	{
 		global $tagbez;
 		$sprache = getSprache();
@@ -864,7 +864,6 @@ class wochenplan extends basis_db
 						echo '&ver='.$this->ver;
 						echo '&grp='.$this->grp;
 						echo '&ort_kurzbz='.$ort;
-						echo '&grp='.$addons;
 						echo "','Details', 'height=320,width=550,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=no,toolbar=no,location=no,menubar=no,dependent=yes');return false;";
 						echo '" title="'.$this->convert_html_chars($titel).'" ';
 						echo ' href="#">';
@@ -937,7 +936,6 @@ class wochenplan extends basis_db
 							echo '&ver='.$this->ver;
 							echo '&grp='.$this->grp;
 							echo '&ort_kurzbz='.$uEinheit['ort'][0];
-							echo '&grp='.$addons;
 							echo "','Details', 'height=320,width=550,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=no,toolbar=no,location=no,menubar=no,dependent=yes');return false;";
 							echo '" title="'.$this->convert_html_chars($uEinheit['titel'][0]).'" ';
 							echo ' href="#">';
