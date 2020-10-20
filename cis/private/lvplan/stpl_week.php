@@ -493,9 +493,9 @@ if (!isset($datum))
 $stdplan->user=$user;
 // aktueller Benutzer
 $stdplan->user_uid=$uid;
-//TODO
+
 // Zusaetzliche Daten laden
-if (! $stdplan->load_data($type, 'nimm'/*$pers_uid*/,$ort_kurzbz,$stg_kz,$sem,$ver,$grp,$gruppe_kurzbz,null,$lva) )
+if (! $stdplan->load_data($type, $pers_uid,$ort_kurzbz,$stg_kz,$sem,$ver,$grp,$gruppe_kurzbz,null,$lva) )
 {
 	die(htmlentities($stdplan->errormsg));
 }

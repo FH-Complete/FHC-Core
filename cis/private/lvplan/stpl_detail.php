@@ -180,39 +180,49 @@ $sql_query.=' ORDER BY  titel LIMIT 100';
 
 $erg_repl = $db->db_query($sql_query);
 $num_rows_repl = $db->db_num_rows($erg_repl);
-?>
-<?php
-// ADDONS laden
-$addon_obj = new addon();
-$addon_obj->loadAddons();
-foreach($addon_obj->result as $addon)
+$lvId='';
+$leId='';
+if ($row = $db->db_fetch_object($erg_stpl))
 {
-	if(file_exists('../../../addons/'.$addon->kurzbz.'/cis/init.js.php'))
-		echo '<script type="application/x-javascript" src="../../../addons/'.$addon->kurzbz.'/cis/init.js.php" ></script>';
-		var_dump($addon->kurzbz);
+	$lvId = $row->lehrveranstaltung_id;
+	$leId = $row->lehreinheit_id;
 }
-// Wenn Seite fertig geladen ist Addons aufrufen
-echo '
-	<script>
-	$( document ).ready(function()
-	{
-		if(typeof addon  !== \'undefined\')
-		{
-			for(i in addon)
-			{
-				addon[i].init("cis/private/lvplan/stpl_detail.php", {ort_kurzbz:\''.$ort_kurzbz.'\'});
-			}
-		}
-	});
-	</script>
-	';
 ?>
+
+<?php include('../../../include/meta/jquery.php');?>
+
 <?php
 echo '<html>
 <head>
     <title>'.$p->t('lvplan/lehrveranstaltungsplanDetails').'</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <link rel="stylesheet" href="../../../skin/style.css.php" type="text/css">
+    <script type="text/javascript" src="../../../vendor/components/jqueryui/jquery-ui.min.js"></script>';
+
+	// ADDONS laden
+	$addon_obj = new addon();
+	$addon_obj->loadAddons();
+	foreach($addon_obj->result as $addon)
+	{
+		if(file_exists('../../../addons/'.$addon->kurzbz.'/cis/init.js.php'))
+			echo '<script type="application/x-javascript" src="../../../addons/'.$addon->kurzbz.'/cis/init.js.php" ></script>';
+	}
+	// Wenn Seite fertig geladen ist Addons aufrufen
+	echo '
+		<script>
+		$( document ).ready(function()
+		{
+			if(typeof addon  !== \'undefined\')
+			{
+				for(i in addon)
+				{
+					addon[i].init("cis/private/lvplan/stpl_detail.php", {lvId:\''.$lvId.'\',leId:\''.$leId.'\', stsem:\''.$db->convert_html_chars($stsem).'\'});
+				}
+			}
+		});
+		</script>
+		';
+echo '
 </head>
 <body id="inhalt">
 <H2>'.$p->t('lvplan/lehrveranstaltungsplan').' &rArr; '.$p->t('abgabetool/details').'</H2>
@@ -225,7 +235,7 @@ if ($num_rows_stpl>0)
 {
 	echo '
 	<table class="stdplan">
-		<tr>
+		<tr  id="stdplantablerow">
 			<th>'.$p->t('lvplan/unr').'</th>
 			<th>'.$p->t('lvaliste/lektor').'</th>
 			<th>'.$p->t('lvplan/ort').'</th>
@@ -234,14 +244,15 @@ if ($num_rows_stpl>0)
 			<th>'.$p->t('global/verband').'</th>
 			<th>'.$p->t('lvplan/einheit').'</th>
 			<th>'.$p->t('lvplan/info').'</th>
-			<th>'.$p->t('moodle/moodle').'</th>
 		</tr>';
 
 	$ort = new ort();
 	$i=0;
+	$moodlerow = -1;
 	while($row = $db->db_fetch_object($erg_stpl))
 	{
 		$i++;
+		$moodlerow++;
 	    $unr = $row->unr;
 	    $ortkurzbz = $row->ort_kurzbz;
 	    $lehrfachkurzbz = $row->lehrfach;
@@ -290,7 +301,7 @@ if ($num_rows_stpl>0)
 	        <td><A class="Item" title="'.$anzahl_grp.' Studierende" href="mailto:'.mb_strtolower($gruppe_kurzbz).'@'.DOMAIN.'">
 	        '.$db->convert_html_chars($gruppe_kurzbz).'</A></td>
 			<td>'.$db->convert_html_chars($titel).'</td>
-	    		<td><a class="Item" href="../../../addons/moodle/cis/moodle_choice.php?lvid='.$db->convert_html_chars($unr).'&stsem='.$db->convert_html_chars($stsem).'">moodle</a></td>    
+	    		<td id="moodlelink'.$moodlerow.'"></td>    
 	    </tr>';
 	}
 	echo '</table><BR>';
