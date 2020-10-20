@@ -112,6 +112,7 @@ function draw_rdf($row)
             <ADRESSE:typ_name><![CDATA['.$typ.']]></ADRESSE:typ_name>
             <ADRESSE:heimatadresse><![CDATA['.($row->heimatadresse?'Ja':'Nein').']]></ADRESSE:heimatadresse>
             <ADRESSE:zustelladresse><![CDATA['.($row->zustelladresse?'Ja':'Nein').']]></ADRESSE:zustelladresse>
+            <ADRESSE:co_name><![CDATA['. $row->co_name.']]></ADRESSE:co_name>
             <ADRESSE:firma_id><![CDATA['.$row->firma_id.']]></ADRESSE:firma_id>
             <ADRESSE:firma_name><![CDATA['.$firma_name.']]></ADRESSE:firma_name>
             <ADRESSE:updateamum><![CDATA['.date('d.m.Y H:i:s',strtotime($row->updateamum)).']]></ADRESSE:updateamum>
