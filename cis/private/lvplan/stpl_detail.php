@@ -180,13 +180,8 @@ $sql_query.=' ORDER BY  titel LIMIT 100';
 
 $erg_repl = $db->db_query($sql_query);
 $num_rows_repl = $db->db_num_rows($erg_repl);
-$lvId='';
-$leId='';
-if ($row = $db->db_fetch_object($erg_stpl))
-{
-	$lvId = $row->lehrveranstaltung_id;
-	$leId = $row->lehreinheit_id;
-}
+
+$courses=array();
 ?>
 
 <?php include('../../../include/meta/jquery.php');?>
@@ -207,21 +202,7 @@ echo '<html>
 		if(file_exists('../../../addons/'.$addon->kurzbz.'/cis/init.js.php'))
 			echo '<script type="application/x-javascript" src="../../../addons/'.$addon->kurzbz.'/cis/init.js.php" ></script>';
 	}
-	// Wenn Seite fertig geladen ist Addons aufrufen
-	echo '
-		<script>
-		$( document ).ready(function()
-		{
-			if(typeof addon  !== \'undefined\')
-			{
-				for(i in addon)
-				{
-					addon[i].init("cis/private/lvplan/stpl_detail.php", {lvId:\''.$lvId.'\',leId:\''.$leId.'\', stsem:\''.$db->convert_html_chars($stsem).'\'});
-				}
-			}
-		});
-		</script>
-		';
+
 echo '
 </head>
 <body id="inhalt">
@@ -274,6 +255,9 @@ if ($num_rows_stpl>0)
 	    $gesamtanzahl = ($anzahl_grp!=0?$anzahl_grp:$anzahl_lvb);
 	    $ort->load($ortkurzbz);
 
+	    $lvdata = ['lvId'=> $row->lehrveranstaltung_id, 'leId'=>$row->lehreinheit_id];
+
+		array_push($courses, $lvdata);
 	    // no profile link for fake Mitarbeiter like Dummylektor, Personalnr must be > 0
 	    $profileLink = true;
 	    $mitarbeiter = new mitarbeiter();
@@ -344,5 +328,20 @@ if ($num_rows_repl>0)
     echo '</table><br>';
 }
 echo '<P>'.$p->t('lvplan/fehlerUndFeedback').' <A class="Item" href="mailto:'.MAIL_LVPLAN.'">'.$p->t('lvplan/lvKoordinationsstelle').'</A>.</P>
-</body></html>';
+</body>';
+echo '
+	<script>
+		$( document ).ready(function()
+		{
+			if(typeof addon  !== \'undefined\')
+			{
+				for(i in addon)
+				{
+					addon[i].init("cis/private/lvplan/stpl_detail.php", {courses:'.json_encode($courses).', stsem:\''.$db->convert_html_chars($stsem).'\'});
+				}
+			}
+		});
+		</script>
+		
+</html>';
 ?>
