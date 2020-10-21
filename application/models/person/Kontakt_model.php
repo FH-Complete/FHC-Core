@@ -169,4 +169,33 @@ class Kontakt_model extends DB_Model
 
 		return $this->execQuery($qry, array($person_id));
 	}
+
+	/**
+	 * Loads main contact, i.e. most recent Zustellkontakt with the given kontakttypes.
+	 * @param $person_id
+	 * @param $kontakttypen array of kontakttypen, one chronologically last Zustellkontakt for all given types
+	 * @return object
+	 */
+	public function getZustellKontakt($person_id, $kontakttypen)
+	{
+		if (is_string($kontakttypen))
+			$kontakttypen = array($kontakttypen);
+
+		if (!isEmptyArray($kontakttypen))
+		{
+			$qry = "
+			SELECT
+				kontakt
+			FROM
+				public.tbl_kontakt
+			WHERE person_id = ?
+			AND kontakttyp IN ?
+			ORDER BY zustellung DESC NULLS LAST, updateamum DESC, insertamum DESC
+			LIMIT 1";
+
+			return $this->execQuery($qry, array($person_id, $kontakttypen));
+		}
+		else
+			return success(array());
+	}
 }
