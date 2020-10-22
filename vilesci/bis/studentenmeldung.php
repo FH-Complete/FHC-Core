@@ -625,7 +625,7 @@ function GenerateXMLStudentBlock($row)
 		$ausserordentlich=true;
 	else
 		$ausserordentlich=false;
-	
+
 	// Pruefen, ob Incoming (3.Stelle in Personenkennzeichen = 0)
 	$incoming = mb_substr($row->matrikelnr,2,1) == '0' ? true : false;
 
@@ -652,7 +652,7 @@ function GenerateXMLStudentBlock($row)
 		$nation='';
 		$co_name = '';
 	}
-	
+
 	// Zustelladresse & c/o Name(=abweichender Empfaenger)
 	$qryzustelladr = "
 		SELECT *
@@ -661,17 +661,17 @@ function GenerateXMLStudentBlock($row)
 		AND person_id=". $db->db_add_param($row->pers_id). ";
 	";
 	$results = $db->db_query($qryzustelladr);
-	
+
 	if ($db->db_num_rows($results) != 1)
 	{
 		$error_log1.= "Es sind ".$db->db_num_rows($results)." Zustelladressen eingetragen\n";
 	}
-	
+
 	$zustell_plz = '';
 	$zustell_gemeinde = '';
 	$zustell_strasse = '';
 	$zustell_nation = '';
-	
+
 	if ($rowzustelladr = $db->db_fetch_object($results))
 	{
 		$zustell_plz = $rowzustelladr->plz;
@@ -679,14 +679,14 @@ function GenerateXMLStudentBlock($row)
 		$zustell_strasse = $rowzustelladr->strasse;
 		$zustell_nation = $rowzustelladr->nation;
 	}
-	
+
 	// FH eMail-Adresse FH aus UID@Domain
 	$email = '';
 	if ($row->student_uid != '')
 	{
 		$email = $row->student_uid. '@'. DOMAIN;
 	}
-	
+
 	if($row->gebdatum<'1920-01-01' OR $row->gebdatum==null OR $row->gebdatum=='')
 	{
 		$error_log.=(!empty($error_log)?', ':'')."Geburtsdatum ('".$row->gebdatum."')";
@@ -761,7 +761,7 @@ function GenerateXMLStudentBlock($row)
 		{
 			$error_log.=(!empty($error_log) ? ', ' : ''). "bPK-Zeichenfolge ist ung&uuml;ltig";
 		}
-		
+
 		if (strlen($row->bpk) != 28)
 		{
 			$error_log.=(!empty($error_log) ? ', ' : ''). "bPK ist nicht 28 Zeichen lang";
@@ -773,29 +773,29 @@ function GenerateXMLStudentBlock($row)
 		{
 			$error_log.=(!empty($error_log)?', ':'')."Zustell-PLZ fehlt";
 		}
-		
+
 		if ($zustell_gemeinde == '' || $zustell_gemeinde == null)
 		{
 			$error_log.=(!empty($error_log)?', ':'')."Zustell-Gemeinde fehlt";
 		}
-		
+
 		if ($zustell_strasse == '' || $zustell_strasse == null)
 		{
 			$error_log.=(!empty($error_log)?', ':'')."Zustell-Strasse fehlt";
 		}
-		
+
 		if ($zustell_nation == '' || $zustell_nation == null)
 		{
 			$error_log.=(!empty($error_log)?', ':'')."Zustell-Nation fehlt";
 		}
-		
+
 		if ($email == '' || $email == null)
 		{
 			$error_log.=(!empty($error_log)?', ':'')."Studenten-eMail Adresse fehlt (keine Student-UID eingetragen).";
 		}
-		
+
 	}
-	
+
 	if(!$ausserordentlich)
 	{
 		if($row->zgv_code=='' || $row->zgv_code==null)
@@ -1157,36 +1157,36 @@ function GenerateXMLStudentBlock($row)
 		$datei .= "
 		<StudentIn>
 			<PersKz>" . trim($row->matrikelnr) . "</PersKz>";
-		
+
 		$datei .= "
 			<Matrikelnummer>" . $row->matr_nr . "</Matrikelnummer>";
-		
+
 		if (!$ausserordentlich)
 		{
 			$datei .= "
 			<OrgFormCode>" . $orgform_code_array[$storgform] . "</OrgFormCode>";
 		}
-		
+
 		$datei .= "
 			<GeburtsDatum>" . date("dmY", $datumobj->mktime_fromdate($row->gebdatum)) . "</GeburtsDatum>
 			<Geschlecht>" . strtoupper($row->geschlecht) . "</Geschlecht>";
-		
+
 		if ($row->titelpre != '')
 		{
 			$datei .= "
 			<AkadGradeVorName>" . $row->titelpre . "</AkadGradeVorName>";
 		}
-		
+
 		if ($row->titelpost != '')
 		{
 			$datei .= "
 			<AkadGradeNachName>" . $row->titelpost . "</AkadGradeNachName>";
 		}
-		
+
 		$datei .= "
 			<Vorname>" . $row->vorname . "</Vorname>
 			<Familienname>" . $row->nachname . "</Familienname>";
-		
+
 		if ($row->svnr != '')
 		{
 			$datei .= "
@@ -1197,18 +1197,18 @@ function GenerateXMLStudentBlock($row)
 			$datei .= "
 			<ErsKz>" . $row->ersatzkennzeichen . "</ErsKz>";
 		}
-		
+
 		$datei .= "
 			<bPK>" . $row->bpk . "</bPK>
 		";
-		
+
 		$datei .= "
 			<StaatsangehoerigkeitCode>" . $row->staatsbuergerschaft . "</StaatsangehoerigkeitCode>
 			<HeimatPLZ>" . $plz . "</HeimatPLZ>
 			<HeimatGemeinde>" . $gemeinde . "</HeimatGemeinde>
 			<HeimatStrasse><![CDATA[" . $strasse . "]]></HeimatStrasse>
 			<HeimatNation>" . $nation . "</HeimatNation>";
-		
+
 		if (!$ausserordentlich && !$incoming)
 		{
 			$datei .= "
@@ -1217,21 +1217,21 @@ function GenerateXMLStudentBlock($row)
 			<ZustellStrasse>" . $zustell_strasse . "</ZustellStrasse>
 			<ZustellNation>" . $zustell_nation . "</ZustellNation>";
 		}
-		
+
 		if ($co_name != '')
 		{
 			$datei .= "
 			<coName>" . $co_name . "</coName>
 			";
 		}
-		
+
 		if ($email != '')
 		{
 			$datei .= "
 			<eMailAdresse>" . $email . "</eMailAdresse>
 			";
 		}
-		
+
 		if(!$ausserordentlich)
 		{
 			$datei.="
@@ -1337,12 +1337,12 @@ function GenerateXMLStudentBlock($row)
 				$adauer = (is_null($rowio->von) || is_null($rowio->bis))
 					? null
 					: $datumobj->DateDiff($rowio->von, $rowio->bis);
-				
+
 				// Aufenthaltszweckcode --------------------------------------------------------------------------------
 				$bisio_zweck = new bisio();
 				$bisio_zweck->getZweck($rowio->bisio_id);
 				$zweck_code_arr = array();
-				
+
 				// Bei Incomings...
 				if ($aktstatus == 'Incoming')
 				{
@@ -1352,7 +1352,7 @@ function GenerateXMLStudentBlock($row)
 						$error_log_io .= (!empty($error_log_io) ? ', ' : ''). "Es sind". count($bisio_zweck->result).
 							" Aufenthaltszwecke eingetragen (max. 1 Zweck für Incomings)";
 					}
-					
+
 					//...nur Zweck 1, 2 oder 3 erlaubt
 					if (count($bisio_zweck->result) == 1 &&
 						empty(array_intersect(array(1, 2, 3), array_column($bisio_zweck->result, 'zweck_code'))))
@@ -1361,7 +1361,7 @@ function GenerateXMLStudentBlock($row)
 							$bisio_zweck->result[0]->zweck_code. " (f&uuml;r Incomings ist nur Zweck 1, 2, 3 erlaubt)";
 					}
 				}
-				
+
 				foreach ($bisio_zweck->result as $row_zweck)
 				{
 					// Nur eindeutige Werte (bei Mehrfachangaben; trifft auf Outgoings zu)
@@ -1373,26 +1373,26 @@ function GenerateXMLStudentBlock($row)
 							$error_log_io .= (!empty($error_log_io) ? ', ' : '').
 								"Aufenthaltzweckcode 1, 2, 3 d&uuml;rfen nicht gemeinsam gemeldet werden";
 						}
-						
+
 						$zweck_code_arr []= $row_zweck->zweck_code;
 					}
 				}
-				
+
 				// Aufenthaltfoerderungscode ---------------------------------------------------------------------------
 				$aufenthaltfoerderung_code_arr = array();
-				
+
 				// Nur bei Outgoings Aufenthaltsfoerderungscode melden
 				if ($aktstatus != 'Incoming') {
 					$bisio_foerderung = new bisio();
 					$bisio_foerderung->getFoerderungen($rowio->bisio_id);
-					
+
 					// ... mindestens 1 Aufenthaltfoerderung melden, wenn Auslandsaufenthalt >= 29 Tage
 					if ((!$bisio_foerderung->result || count($bisio_foerderung->result) == 0) && $adauer >= 29)
 					{
 						$error_log_io .= (!empty($error_log_io) ? ', ' : '') .
 							"Keine Aufenthaltsfoerderung angegeben (bei Outgoings >= 29 Tage Monat im Ausland muss mind. 1 gemeldet werden)";
 					}
-					
+
 					foreach ($bisio_foerderung->result as $row_foerderung)
 					{
 						// ...wenn code = 5, nur ein Wert erlaubt (keine Mehrfachangaben)
@@ -1401,26 +1401,31 @@ function GenerateXMLStudentBlock($row)
 							$aufenthaltfoerderung_code_arr [] = $row_foerderung->aufenthaltfoerderung_code;
 							break;
 						}
-						
+
 						// nur eindeutige Werte
 						if (!in_array($row_foerderung->aufenthaltfoerderung_code, $aufenthaltfoerderung_code_arr)) {
 							$aufenthaltfoerderung_code_arr [] = $row_foerderung->aufenthaltfoerderung_code;
 						}
 					}
-					
-					if ($rowio->ects_erworben == '' && $adauer >= 29)
+
+					if($datumobj->mktime_fromdate($rowio->bis) < $datumobj->mktime_fromdate($bisdatum))
+						$aufenthalt_finished = true;
+					else
+						$aufenthalt_finished = false;
+
+					if ($rowio->ects_erworben == '' && $adauer >= 29 && $aufenthalt_finished)
 					{
 						$error_log_io .= (!empty($error_log_io) ? ', ' : '') .
 							"Erworbene ECTS fehlen (Meldepflicht bei Outgoings >= 29 Tage Monat im Ausland)";
 					}
-					
-					if ($rowio->ects_angerechnet == '' && $adauer >= 29)
+
+					if ($rowio->ects_angerechnet == '' && $adauer >= 29 && $aufenthalt_finished)
 					{
 						$error_log_io .= (!empty($error_log_io) ? ', ' : '') .
 							"Angerechnete ECTS fehlen (Meldepflicht bei Outgoings >= 29 Tage Monat im Ausland)";
 					}
 				}
-				
+
 				// Bei validen Daten errorlog ausgeben
 				if($error_log_io != '')
 				{
@@ -1446,7 +1451,7 @@ function GenerateXMLStudentBlock($row)
 							$datei.="
 							<AufenthaltBis>".$abis."</AufenthaltBis>";
 						}
-						
+
 						foreach ($zweck_code_arr as $zweck)
 						{
 							$datei.="
@@ -1467,13 +1472,13 @@ function GenerateXMLStudentBlock($row)
 							$datei.="
 							<AufenthaltFoerderungCode>". $aufenthaltfoerderung_code. "</AufenthaltFoerderungCode>";
 						}
-		
+
 					$datei.="
 					</IO>";
 				}
-				
-				
-				
+
+
+
 				if($aktstatus!='Incoming')
 				{
 					if(!isset($iosem[$storgform][$sem]))
