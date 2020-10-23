@@ -52,6 +52,7 @@ class adresse extends basis_db
 	public $ext_id;				//  integer
 	public $rechnungsadresse=false;	//  boolean
 	public $anmerkung;			//  string
+	public $co_name;
 
 	/**
 	 * Konstruktor
@@ -272,7 +273,7 @@ class adresse extends basis_db
 			$this->errormsg = 'Gemeinde darf nicht länger als 255 Zeichen sein';
 			return false;
 		}
-		
+
 		if(mb_strlen($this->co_name)>64)
 		{
 			$this->errormsg = 'Gemeinde darf nicht länger als 64 Zeichen sein';
@@ -325,7 +326,7 @@ class adresse extends basis_db
 				$this->errormsg = 'adresse_id muss eine gueltige Zahl sein';
 				return false;
 			}
-			
+
 			$qry='UPDATE public.tbl_adresse SET'.
 				' person_id='.$this->db_add_param($this->person_id, FHC_INTEGER).', '.
 				' name='.$this->db_add_param($this->name).', '.
