@@ -57,6 +57,11 @@ $ersatzkennzeichen = filter_input(INPUT_POST, 'ersatzkennzeichen');
 $person_id = filter_input(INPUT_POST, 'person_id');
 $strasse = filter_input(INPUT_POST, 'strasse');
 
+$ausgabedatum = filter_input(INPUT_POST, 'ausgabedatum');
+$ausstellbehoerde = filter_input(INPUT_POST, 'ausstellbehoerde');
+$ausstellland = filter_input(INPUT_POST, 'ausstellland');
+$dokumentnr = filter_input(INPUT_POST, 'dokumentnr');
+
 ?><!DOCTYPE html>
 <html>
 <head>
@@ -79,6 +84,7 @@ $strasse = filter_input(INPUT_POST, 'strasse');
 		<li><a href="datenverbund_client.php?action=getReservations">Matrikelnummer Reservierungen anzeigen</a></li>
 		<li><a href="datenverbund_client.php?action=getKontingent">Matrikelnummer Kontingent anfordern</a></li>
 		<li><a href="datenverbund_client.php?action=setMatrikelnummer">Matrikelnummer Vergabe melden</a></li>
+		<li><a href="datenverbund_client.php?action=setMatrikelnummerErnp">ERNP-Eintragung anfordern</a></li>
 		<li><a href="datenverbund_client.php?action=assignMatrikelnummer">Gesamtprozess (Abfrage, ggf Vergabemeldung, Speichern bei Person)</a></li>
 		<li><a href="datenverbund_client.php?action=getBPK">BPK ermitteln</a></li>
 		<li><a href="datenverbund_client.php?action=pruefeBPK">BPK ermitteln manuell</a></li>
@@ -114,6 +120,18 @@ $strasse = filter_input(INPUT_POST, 'strasse');
 		</tr>';
 	}
 
+	function printSetMatrikelnrRows()
+    {
+        global $matrikelnr, $nachname, $vorname, $geburtsdatum, $geschlecht, $postleitzahl, $staat, $svnr, $matura;
+		printrow('matrikelnummer', 'Matrikelnummer', $matrikelnr);
+		printrow('nachname', 'Nachname', $nachname, '', 255);
+		printrow('vorname', 'Vorname', $vorname, '', 30);
+		printrow('geburtsdatum', 'Geburtsdatum', $geburtsdatum, 'Format: YYYYMMDD', 10);
+		printrow('geschlecht', 'Geschlecht', $geschlecht, 'Format: M | W', 1);
+		printrow('postleitzahl', 'Postleitzahl', $postleitzahl, '', 10);
+		printrow('staat', 'Staat', $staat, '1-3 Stellen Codex (zb A für Österreich)', 3);
+    }
+
 	switch($action)
 	{
 		case 'getOAuth':
@@ -144,15 +162,30 @@ $strasse = filter_input(INPUT_POST, 'strasse');
 			break;
 
 		case 'setMatrikelnummer':
-			printrow('matrikelnummer', 'Matrikelnummer', $matrikelnr);
-			printrow('nachname', 'Nachname', $nachname, '', 255);
-			printrow('vorname', 'Vorname', $vorname, '', 30);
-			printrow('geburtsdatum', 'Geburtsdatum', $geburtsdatum, 'Format: YYYYMMDD', 10);
-			printrow('geschlecht', 'Geschlecht', $geschlecht, 'Format: M | W', 1);
-			printrow('postleitzahl', 'Postleitzahl', $postleitzahl, '', 10);
-			printrow('staat', 'Staat', $staat, '1-3 Stellen Codex (zb A für Österreich)', 3);
+            printSetMatrikelnrRows();
 			printrow('svnr', 'SVNR', $svnr);
 			printrow('matura', 'Maturadatum', $matura, 'Format: YYYYMMDD (optional)', 10);
+			break;
+
+		case 'setMatrikelnummerErnp':
+		    echo '
+            <tr>
+                <td colspan="2"><b>Personmeldung</b></td>
+            </tr>';
+
+			printSetMatrikelnrRows();
+			printrow('svnr', 'Ersatzkennzeichen', $svnr);
+			printrow('matura', 'Maturadatum', $matura, 'Format: YYYYMMDD (optional)', 10);
+
+			echo '
+            <tr>
+                <td colspan="2"><b>Ernpmeldung</b></td>
+            </tr>';
+
+			printrow('dokumentnr', 'Dokumentnummer', $dokumentnr, '', 60);
+			printrow('ausgabedatum', 'Ausgabedatum', $ausgabedatum, 'Format: YYYYMMDD', 10);
+			printrow('ausstellbehoerde', 'Ausstellbehörde', $ausstellbehoerde, '', 40);
+			printrow('ausstellland', 'Ausstellland', $ausstellland, '1-3 Stellen Codex (zb D für Deutschland)', 60);
 			break;
 
 		case 'assignMatrikelnummer':
@@ -330,6 +363,32 @@ if (isset($_REQUEST['submit']))
 			$person->svnr = $svnr; // Optional
 
 			$result = $dvb->setMatrikelnummer(DVB_BILDUNGSEINRICHTUNG_CODE, $person);
+
+			if (ErrorHandler::isSuccess($result))
+				echo '<br><b>Erfolgreich gemeldet</b>';
+			else
+				echo '<br><b>Fehlgeschlagen:</b>'.$result->errormsg;
+			break;
+
+		case 'setMatrikelnummerErnp':
+			$person = new stdClass();
+			$person->matrikelnummer = $matrikelnr;
+			$person->vorname = $vorname;
+			$person->nachname = $nachname;
+			$person->geburtsdatum = $geburtsdatum;
+			$person->geschlecht = $geschlecht;
+			$person->staat = $staat;
+			$person->plz = $postleitzahl;
+			$person->matura = $matura; // Optional
+			$person->svnr = $svnr; // Optional
+
+			$reisepass = new stdClass();
+            $reisepass->ausgabedatum = $ausgabedatum;
+            $reisepass->ausstellBehoerde = $ausstellbehoerde;
+            $reisepass->ausstellland = $ausstellland;
+            $reisepass->dokumentnr = $dokumentnr;
+
+			$result = $dvb->setMatrikelnummerErnp(DVB_BILDUNGSEINRICHTUNG_CODE, $person, $reisepass);
 
 			if (ErrorHandler::isSuccess($result))
 				echo '<br><b>Erfolgreich gemeldet</b>';
