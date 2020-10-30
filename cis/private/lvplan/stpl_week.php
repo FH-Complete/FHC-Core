@@ -266,12 +266,17 @@ if (isset($_POST['titel']))
 	</script>
 	<?php
 	// ADDONS laden
+    $moolde='';
 	$addon_obj = new addon();
 	$addon_obj->loadAddons();
 	foreach($addon_obj->result as $addon)
 	{
 		if(file_exists('../../../addons/'.$addon->kurzbz.'/cis/init.js.php'))
 			echo '<script type="application/x-javascript" src="../../../addons/'.$addon->kurzbz.'/cis/init.js.php" ></script>';
+		if($addon->kurzbz === "moodle")
+        {
+	        $moolde = 'true';
+        }
 	}
 	// Wenn Seite fertig geladen ist Addons aufrufen
 	echo '
@@ -488,6 +493,8 @@ elseif (isset($reserve) && $raumres)
 $stdplan=new wochenplan($type);
 if (!isset($datum))
 	$datum=time();
+
+$stdplan->moodle=$moolde;
 
 // Benutzergruppe
 $stdplan->user=$user;

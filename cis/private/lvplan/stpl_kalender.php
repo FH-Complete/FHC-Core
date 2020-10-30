@@ -78,6 +78,7 @@ $target=(isset($_GET['target'])?$_GET['target']:null);
 $stsem=(isset($_GET['stsem'])?$_GET['stsem']:'');
 $lva=(isset($_GET['lva'])?$_GET['lva']:'');
 
+$moodle=(isset($_GET['moodle'])?$_GET['moodle']:'');
 
 if(isset($_GET["cal"]))
 {
@@ -307,7 +308,14 @@ while($begin<$ende)
 	// Stundenplan der Woche drucken
 	if($format=='csv' || $format=='ical')
 	{
-		$stdplan->draw_week_csv($target, LVPLAN_KATEGORIE);
+		if($moodle)
+		{
+			$stdplan->draw_week_csv_include_moodle($target, LVPLAN_KATEGORIE);
+		}
+		else
+		{
+			$stdplan->draw_week_csv($target, LVPLAN_KATEGORIE);
+		}
 	}
 	elseif($format=='excel')
 	{

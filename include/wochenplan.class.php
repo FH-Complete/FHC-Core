@@ -100,6 +100,8 @@ class wochenplan extends basis_db
 	public $errormsg;
 	public $fachbereich_kurzbz;
 
+	public $moodle;
+
 	public $raeume = array();
 
 	/**
@@ -508,7 +510,7 @@ class wochenplan extends basis_db
 		echo '			<tr><td  style="padding:3px 15px 0px 15px; margin: 0,0,20px,0;" align="center">'.$this->crlf;
 
 		//Kalender
-		$this->kal_link.='&pers_uid='.$this->pers_uid.'&ort_kurzbz='.$this->ort_kurzbz.'&stg_kz='.$this->stg_kz.'&sem='.$this->sem.'&ver='.$this->ver.'&grp='.$this->grp.'&gruppe_kurzbz='.$this->gruppe_kurzbz.'&lva='.$this->lva;
+		$this->kal_link.='&pers_uid='.$this->pers_uid.'&ort_kurzbz='.$this->ort_kurzbz.'&stg_kz='.$this->stg_kz.'&sem='.$this->sem.'&ver='.$this->ver.'&grp='.$this->grp.'&gruppe_kurzbz='.$this->gruppe_kurzbz.'&lva='.$this->lva.'&moodle='.$this->moodle;
 		$kal_link_ws=$this->kal_link.'&begin='.$this->studiensemester_now->start.'&ende='.$this->studiensemester_now->ende;
 		$kal_link_ss=$this->kal_link.'&begin='.$this->studiensemester_next->start.'&ende='.$this->studiensemester_next->ende;
 
@@ -2638,6 +2640,367 @@ class wochenplan extends basis_db
 								.'DTSTART;TZID=Europe/Vienna:'.$start_date_time_ical.$this->crlf
 								.'DTEND;TZID=Europe/Vienna:'.$end_date_time_ical.$this->crlf
 								.'END:VEVENT');
+						}
+						else
+						{
+							echo $this->crlf.'"'.$lehrfach[$idx].'","'.$lvplan_kategorie.'","'.$this->std_plan[$i][$j][$idx]->ort.'","Stundenplan'.$this->crlf.$this->std_plan[$i][$j][$idx]->lehrfach.$this->crlf;
+							echo $this->std_plan[$i][$j][$idx]->lektor.$this->crlf.$lvb.$this->crlf.$this->std_plan[$i][$j][$idx]->ort.(LVPLAN_ANMERKUNG_ANZEIGEN?$this->crlf.$this->std_plan[$i][$j][$idx]->anmerkung:'').'","Stundenplan",';
+							echo '"'.$start_date.'","'.$start_time.'","'.$end_date.'","'.$end_time.'",,,,,';
+						}
+					}
+				}
+			}
+			$this->datum=jump_day($this->datum, 1);
+		}
+		if ($target=='return')
+			return $return;
+		else
+			return true;
+	}
+
+	/**
+	 * Funktion draw_week_csv Stundenplan im CSV-Format
+	 *
+	 * @param target Ziel-System zB Outlook
+	 * @return true oder false
+	 */
+	public function draw_week_csv_include_moodle($target, $lvplan_kategorie)
+	{
+		require_once(dirname(__FILE__).'/../addons/moodle/config.inc.php');
+		require_once(dirname(__FILE__).'/../addons/moodle/include/moodle_course.class.php');
+
+		$return = array();
+		if (!date("w",$this->datum))
+			$this->datum=jump_day($this->datum,1);
+		$d = date("Y-m-d",$this->datum);
+		$stsem = getStudiensemesterFromDatum($d);
+		$num_rows_stunde=$this->db_num_rows($this->stunde);
+		for ($i=1; $i<=TAGE_PRO_WOCHE; $i++)
+		{
+			$blocked=array();
+			$gruppiert=array();
+
+			for ($k=0; $k<$num_rows_stunde; $k++)
+			{
+				$row = $this->db_fetch_object($this->stunde, $k);
+				$j=$row->stunde;  // get id of hour
+
+				if (isset($this->std_plan[$i][$j][0]->lehrfach))
+				{
+					// Daten aufbereiten
+					if (isset($unr))
+						unset($unr);
+					if (isset($lektor))
+						unset($lektor);
+					if (isset($lehrverband))
+						unset($lehrverband);
+					if (isset($lehrfach))
+						unset($lehrfach);
+					if (isset($lektor_uids))
+						unset($lektor_uids);
+					if (isset($stunden_arr))
+						unset($stunden_arr);
+					foreach ($this->std_plan[$i][$j] as $lehrstunde)
+					{
+
+						$unr[]=$lehrstunde->unr;
+						// Lektoren
+						$lektor[]=$lehrstunde->lektor;
+						$lektor_uids[]=$lehrstunde->lektor_uid;
+						// Lehrverband
+						$lvb=$lehrstunde->stg.'-'.$lehrstunde->sem;
+						$stunden_arr[]=$j;
+						if ($lehrstunde->ver!=null && $lehrstunde->ver!='0' && $lehrstunde->ver!='')
+						{
+							$lvb.=$lehrstunde->ver;
+							if ($lehrstunde->grp!=null && $lehrstunde->grp!='0' && $lehrstunde->grp!='')
+								$lvb.=$lehrstunde->grp;
+						}
+						if (count($lehrstunde->gruppe_kurzbz)>0)
+							$lvb=$lehrstunde->gruppe_kurzbz;
+						$lehrverband[]=$lvb;
+						// Lehrfach
+						$lf=$lehrstunde->lehrfach;
+
+						if (isset($lehrstunde->lehrform))
+							$lf.='-'.$lehrstunde->lehrform;
+						$lehrfach[]=$lf;
+						$titel=$lehrstunde->titel;
+						$anmerkung=$lehrstunde->anmerkung;
+					}
+
+					// Unterrichtsnummer (Kollision?)
+					$unr=array_unique($unr);
+					if (!isset($kollision))
+						$kollision=0;
+					$kollision+=count($unr);
+
+					// Lektoren
+					if ($this->type!='lektor')
+					{
+						$lektor=array_unique($lektor);
+						sort($lektor);
+						$lkt='';
+						foreach ($lektor as $l)
+							$lkt.=$l.' ';
+					}
+					else
+						$lkt=$lektor[0];
+
+					// Lehrverband
+					if ($this->type!='verband')
+					{
+						$lvb='';
+						foreach ($lehrverband as $l)
+							$lvb.=$l.' ';
+					}
+					else
+						$lvb=$lehrverband[0];
+
+					$row = $this->db_fetch_object($this->stunde, $k);
+					$start_time=$row->beginn;
+
+					for ($idx=0;$idx<count($this->std_plan[$i][$j]);$idx++)
+					{
+						$moodle_course = new moodle_course();
+						$leId = $this->std_plan[$i][$j][$idx]->unr;
+						$lvId = $this->std_plan[$i][$j][$idx]->lehrfach_id;
+						$moodle_link = '';
+
+						if ($moodle_course->course_exists_for_le($leId))
+						{
+							$moodle_course->getCourseByLeId($leId);
+							$moodle_link = ADDON_MOODLE_PATH.'/course/view.php?id='.$moodle_course->result[0]->mdl_course_id;
+						}
+						elseif ($moodle_course->course_exists_for_lv($lvId, $stsem))
+						{
+							$moodle_course->getAll($lvId, $stsem);
+							$moodle_link = ADDON_MOODLE_PATH.'/course/view.php?id='.$moodle_course->result[0]->mdl_course_id;
+						}
+
+
+
+						if (!isset($this->std_plan[$i][$j][$idx]))
+						{
+							continue;
+						}
+
+						/**
+						 * Wenn Lektoren in mehreren Raeumen gleichzeitig unterrichten
+						 * Oder mehrere Lektoren /Gruppen im selben Raum sind werden diese
+						 * zu einem Eintrag zusammengruppiert.
+						 *
+						 * Zusammengruppiert werden nur Eintraege die am gleichen Tag
+						 * in der gleichen Stunde stattfinden.
+						 *
+						 * Es wird nur der erste Eintrag ausgegeben. Die restlichen werden uebersprungen da
+						 * die Lektoren, Gruppen und Raeume bereits zum Ersten Eintrag hinzugefuegt wurden.
+						 */
+						if (isset($gruppiert[$this->std_plan[$i][$j][$idx]->unr]) && $gruppiert[$this->std_plan[$i][$j][$idx]->unr]>0)
+						{
+							$gruppiert[$this->std_plan[$i][$j][$idx]->unr]--;
+							continue;
+						}
+
+						/**
+						 * Unterricht der ueber mehrere Stunden geht wird nicht einzeln Exportiert,
+						 * sondern zusammengeblockt.
+						 *
+						 * Es wird nur ein Eintrag geschrieben, die restlichen werden uebersprungen.
+						 * Vor dem Ueberspringen des Eintrages werden jedoch noch die dazu Gruppierten Eintraege
+						 * ermittelt und dann ebenfalls uebersprungen
+						 */
+						$blockcontinue=false;
+						if (isset($blocked[$this->std_plan[$i][$j][$idx]->unr]) && $blocked[$this->std_plan[$i][$j][$idx]->unr]>0)
+						{
+							$blocked[$this->std_plan[$i][$j][$idx]->unr]--;
+							$blockcontinue=true;
+						}
+
+						if (!$blockcontinue)
+						{
+							// Blockungen ueber mehrere Stunden erkennen
+
+							$blockflag=false;
+							for ($blockstunden=1;$blockstunden<=$num_rows_stunde;$blockstunden++)
+							{
+								if (isset($this->std_plan[$i][$j+$blockstunden][$idx]) && isset($this->std_plan[$i][$j+$blockstunden][$idx]->stundenplan_id)
+									&& ($this->std_plan[$i][$j][$idx]->unr == $this->std_plan[$i][$j+$blockstunden][$idx]->unr)
+									&& $this->std_plan[$i][$j][$idx]!='0' && $k<($num_rows_stunde-$blockstunden)
+									&& !($this->std_plan[$i][$j][$idx]->reservierung && $this->std_plan[$i][$j][$idx]->lektor!=$this->std_plan[$i][$j+$blockstunden][$idx]->lektor))
+								{
+
+									if (isset($blocked[$this->std_plan[$i][$j][$idx]->unr]))
+										$blocked[$this->std_plan[$i][$j][$idx]->unr]++;
+									else
+										$blocked[$this->std_plan[$i][$j][$idx]->unr]=1;
+									$row = $this->db_fetch_object($this->stunde, ($k+$blockstunden));
+									$stunden_arr[]=$row->stunde;
+									$end_time=$row->ende;
+									$blockflag=true;
+								}
+								else
+								{
+									if (!$blockflag)
+									{
+										$row = $this->db_fetch_object($this->stunde, $k);
+										$stunden_arr[]=$row->stunde;
+										$end_time=$row->ende;
+										break;
+									}
+									else
+									{
+										break;
+									}
+								}
+							}
+						}
+
+						//Wenn im selben Raum mehrere Lektoren sind bzw mehrere Gruppen
+						//dann werden diese zusammengruppiert und als ein Eintrag angezeigt
+						for ($idx1=0;$idx1<count($this->std_plan[$i][$j]);$idx1++)
+						{
+							if ($idx!=$idx1)
+							{
+								if ($this->kannGruppieren($i,$j,$idx,$idx1))
+								{
+									if (isset($gruppiert[$this->std_plan[$i][$j][$idx]->unr]))
+										$gruppiert[$this->std_plan[$i][$j][$idx]->unr]++;
+									else
+										$gruppiert[$this->std_plan[$i][$j][$idx]->unr]=1;
+
+									//Bezeichnungen zusammenfuehren
+
+									//Lektoren
+									if (!mb_strstr($this->std_plan[$i][$j][$idx1]->lektor,$this->std_plan[$i][$j][$idx]->lektor))
+									{
+										$this->std_plan[$i][$j][$idx]->lektor.=' / '.$this->std_plan[$i][$j][$idx1]->lektor;
+									}
+
+									//Ort
+									if (!mb_strstr($this->std_plan[$i][$j][$idx1]->ort,$this->std_plan[$i][$j][$idx]->ort))
+									{
+										$this->std_plan[$i][$j][$idx]->ort.=' / '.$this->std_plan[$i][$j][$idx1]->ort;
+									}
+
+									//Gruppen
+									if (isset($lehrverband[$idx]) && isset($lehrverband[$idx1]))
+									{
+										if (!mb_strstr($lehrverband[$idx], $lehrverband[$idx1]))
+											$lehrverband[$idx].=' / '.$lehrverband[$idx1];
+									}
+								}
+							}
+						}
+
+						//Geblockte Eintraege werden uebersprungen nachdem die Gruppierung ermittelt wurde
+						if ($blockcontinue)
+						{
+							continue;
+						}
+
+						$start_date=date("d.m.Y",$this->datum);
+						$end_date=$start_date;
+						if (isset($lehrverband[$idx]))
+							$lvb = $lehrverband[$idx];
+						if ($target=='outlook')
+						{
+							//"Betreff","Beginnt am","Beginnt um","Endet am","Endet um","Ganztaegiges Ereignis","Erinnerung Ein/Aus","Erinnerung am","Erinnerung um","Besprechungsplanung","Erforderliche Teilnehmer","Optionale Teilnehmer","Besprechungsressourcen","Abrechnungsinformationen","Beschreibung",
+							//"Kategorien","Ort","Prioritaet","Privat","Reisekilometer","Vertraulichkeit","Zeitspanne zeigen als"
+							echo $this->crlf.'"'.$this->std_plan[$i][$j][$idx]->lehrfach.(isset($this->std_plan[$i][$j][$idx]->lehrform) && $this->std_plan[$i][$j][$idx]->lehrform!=''?'-'.$this->std_plan[$i][$j][$idx]->lehrform:'').($lvb!=''?' - '.$lvb:'').'","'.$start_date.'","'.$start_time.'","'.$end_date.'","'.$end_time.'","Aus","Aus",,,,,,,,"Stundenplan';
+							echo $this->crlf.$this->std_plan[$i][$j][$idx]->lehrfach.$this->crlf.$this->std_plan[$i][$j][$idx]->lektor.$this->crlf.$lvb.$this->crlf.$this->std_plan[$i][$j][$idx]->ort.(LVPLAN_ANMERKUNG_ANZEIGEN?$this->crlf.$this->std_plan[$i][$j][$idx]->anmerkung:'').'","StundenplanFH","'.$this->std_plan[$i][$j][$idx]->ort.'","Normal","Aus",,"Normal","2"';
+						}
+						elseif ($target=='ical')
+						{
+							$sda = explode(".",$start_date);  //sda start date array
+							$sta = explode(":",$start_time);	 //sta start time array
+							$eda = explode(".",$end_date);    //eda end date array
+							$eta = explode(":",$end_time);	 //eta end time array
+
+							//Die Zeitzone muss angegeben werden, da sonst der Google Kalender die Endzeiten nicht richtig erkennt
+							// diese wird in stpl_kalender global definiert und bei den Start und Ende Zeiten mitangegeben
+							$start_date_time_ical = $sda[2].$sda[1].$sda[0].'T'.sprintf('%02s',($sta[0])).$sta[1].$sta[2];  //neu gruppieren der Startzeit und des Startdatums
+							$end_date_time_ical = $eda[2].$eda[1].$eda[0].'T'.sprintf('%02s',($eta[0])).$eta[1].$eta[2];  //neu gruppieren der Startzeit und des Startdatums
+
+							echo $this->crlf.'BEGIN:VEVENT'.$this->crlf
+								.'UID:'.'FH'.str_replace(',',' ',$lvb.$this->std_plan[$i][$j][$idx]->ort.$this->std_plan[$i][$j][$idx]->lektor.$lehrfach[$idx].$start_date_time_ical.$end_date_time_ical.$this->crlf)
+								.'SUMMARY:'.str_replace(',',' ',$lehrfach[$idx].'  '.$this->std_plan[$i][$j][$idx]->ort.' - '.$lvb.$this->crlf)
+								.'DESCRIPTION:'.$moodle_link.'\n'.str_replace(',',' ',$lehrfach[$idx].'\n'.$this->std_plan[$i][$j][$idx]->lektor.'\n'.$lvb.'\n'.$this->std_plan[$i][$j][$idx]->ort.(LVPLAN_ANMERKUNG_ANZEIGEN?'\n'.$this->std_plan[$i][$j][$idx]->anmerkung:'').$this->crlf)
+								.'LOCATION:'.$this->std_plan[$i][$j][$idx]->ort.$this->crlf
+								.'CATEGORIES:'.$lvplan_kategorie.$this->crlf
+								.'DTSTART;TZID=Europe/Vienna:'.$start_date_time_ical.$this->crlf
+								.'DTEND;TZID=Europe/Vienna:'.$end_date_time_ical.$this->crlf
+								.'END:VEVENT';
+						}
+						elseif ($target=='freebusy')
+						{
+							$sda = explode(".",$start_date);  //sda start date array
+							$sta = explode(":",$start_time);	 //sta start time array
+							$eda = explode(".",$end_date);    //eda end date array
+							$eta = explode(":",$end_time);	 //eta end time array
+
+							$start_date_time_ical = $sda[2].$sda[1].$sda[0].'T'.sprintf('%02s',($sta[0])).$sta[1].$sta[2];  //neu gruppieren der Startzeit und des Startdatums
+							$end_date_time_ical = $eda[2].$eda[1].$eda[0].'T'.sprintf('%02s',($eta[0])).$eta[1].$eta[2];  //neu gruppieren der Startzeit und des Startdatums
+
+							// Zeit in UTC umwandeln
+							$date = new DateTime($start_date_time_ical, new DateTimeZone('Europe/Vienna'));
+							$date->setTimezone(new DateTimeZone('UTC'));
+							$start_date_time_ical = $date->format('Ymd\THis').'Z';
+
+							$date = new DateTime($end_date_time_ical, new DateTimeZone('Europe/Vienna'));
+							$date->setTimezone(new DateTimeZone('UTC'));
+							$end_date_time_ical = $date->format('Ymd\THis').'Z';
+
+							echo $this->crlf,'FREEBUSY: ',$start_date_time_ical,'/',$end_date_time_ical;
+						}
+						elseif ($target=='return')
+						{
+							$sda = explode(".",$start_date);  //sda start date array
+							$sta = explode(":",$start_time);	 //sta start time array
+							$eda = explode(".",$end_date);    //eda end date array
+							$eta = explode(":",$end_time);	 //eta end time array
+
+							//Die Zeitzone muss angegeben werden, da sonst der Google Kalender die Endzeiten nicht richtig erkennt
+							// diese wird in stpl_kalender global definiert und bei den Start und Ende Zeiten mitangegeben
+							$start_date_time_ical = $sda[2].$sda[1].$sda[0].'T'.sprintf('%02s',($sta[0])).$sta[1].$sta[2];  //neu gruppieren der Startzeit und des Startdatums
+							$end_date_time_ical = $eda[2].$eda[1].$eda[0].'T'.sprintf('%02s',($eta[0])).$eta[1].$eta[2];  //neu gruppieren der Startzeit und des Startdatums
+
+							$UID = 'FH'.$lvb.$this->std_plan[$i][$j][$idx]->ort.$this->std_plan[$i][$j][$idx]->lektor.$lehrfach[$idx].$start_date_time_ical.$end_date_time_ical;
+							$Summary = $lehrfach[$idx].'  '.$this->std_plan[$i][$j][$idx]->ort.' - '.$lvb;
+							$description = $lehrfach[$idx].'\n'.$this->std_plan[$i][$j][$idx]->lektor.'\n'.$lvb.'\n'.$this->std_plan[$i][$j][$idx]->ort.(LVPLAN_ANMERKUNG_ANZEIGEN?'\n'.$this->std_plan[$i][$j][$idx]->anmerkung:'');
+
+							$UID = str_replace(',',' ',$UID);
+							$Summary = str_replace(',',' ',$Summary);
+							$description = str_replace(',',' ',$description);
+
+							$return[]=array('UID'=>$UID,
+							                'lehrfach_id'=>(isset($this->std_plan[$i][$j][$idx]->lehrfach_id)?$this->std_plan[$i][$j][$idx]->lehrfach_id:''),
+							                'ort'=>$this->std_plan[$i][$j][$idx]->ort,
+							                'lektor_uid'=>array_unique($lektor_uids),
+							                'gruppen'=>array_unique($lehrverband),
+							                'stunden'=>array_unique($stunden_arr),
+							                'titel'=>$this->std_plan[$i][$j][$idx]->titel,
+							                'unr'=>$unr,
+							                'Summary'=>$Summary,
+							                'Description'=>$description,
+							                'start_date'=>$start_date,
+							                'end_date'=>$end_date,
+							                'start_time'=>$start_time,
+							                'end_time'=>$end_time,
+							                'dtstart'=>$start_date_time_ical,
+							                'dtend'=>$end_date_time_ical,
+							                'reservierung'=>$this->std_plan[$i][$j][$idx]->reservierung,
+							                'reservierung_id'=>($this->std_plan[$i][$j][$idx]->reservierung?$this->std_plan[$i][$j][$idx]->stundenplan_id:''),
+							                'updateamum'=>$this->std_plan[$i][$j][$idx]->updateamum,
+							                'data'=>'BEGIN:VEVENT'.$this->crlf
+								                .'UID:'.$UID.$this->crlf
+								                .'SUMMARY:'.$Summary.$this->crlf
+								                .'DESCRIPTION:'.$description.$this->crlf
+								                .'LOCATION:'.$this->std_plan[$i][$j][$idx]->ort.$this->crlf
+								                .'CATEGORIES:'.$lvplan_kategorie.$this->crlf
+								                .'DTSTART;TZID=Europe/Vienna:'.$start_date_time_ical.$this->crlf
+								                .'DTEND;TZID=Europe/Vienna:'.$end_date_time_ical.$this->crlf
+								                .'END:VEVENT');
 						}
 						else
 						{
