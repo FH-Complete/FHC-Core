@@ -129,7 +129,6 @@ $dokumentnr = filter_input(INPUT_POST, 'dokumentnr');
 		printrow('geburtsdatum', 'Geburtsdatum', $geburtsdatum, 'Format: YYYYMMDD', 10);
 		printrow('geschlecht', 'Geschlecht', $geschlecht, 'Format: M | W', 1);
 		printrow('postleitzahl', 'Postleitzahl', $postleitzahl, '', 10);
-		printrow('staat', 'Staat', $staat, '1-3 Stellen Codex (zb A für Österreich)', 3);
     }
 
 	switch($action)
@@ -163,17 +162,21 @@ $dokumentnr = filter_input(INPUT_POST, 'dokumentnr');
 
 		case 'setMatrikelnummer':
             printSetMatrikelnrRows();
+			printrow('staat', 'Staat', $staat, '1-3 Stellen Codex (zb A für Österreich)', 3);
 			printrow('svnr', 'SVNR', $svnr);
 			printrow('matura', 'Maturadatum', $matura, 'Format: YYYYMMDD (optional)', 10);
 			break;
 
 		case 'setMatrikelnummerErnp':
+		    echo '<b>HINWEIS: Die Eintragung ins ERnP (Ergänzungsregister für natürliche Personen) sollte nur dann durchgeführt werden, wenn für die Person bei "Matrikelnummer Vergabe melden" keine BPK ermittelt werden kann.
+		     <br /> Beim Punkt "BPK ermitteln" sollte dementsprechend keine BPK zurückgegeben werden.</b></br></br>';
 		    echo '
             <tr>
                 <td colspan="2"><b>Personmeldung</b></td>
             </tr>';
 
 			printSetMatrikelnrRows();
+			printrow('staat', 'Staat', $staat, '1-3 Stellen Codex (zb D für Deutschland)', 3);
 			printrow('svnr', 'Ersatzkennzeichen', $svnr);
 			printrow('matura', 'Maturadatum', $matura, 'Format: YYYYMMDD (optional)', 10);
 
