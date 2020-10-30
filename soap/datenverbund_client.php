@@ -57,6 +57,7 @@ $ersatzkennzeichen = filter_input(INPUT_POST, 'ersatzkennzeichen');
 $person_id = filter_input(INPUT_POST, 'person_id');
 $strasse = filter_input(INPUT_POST, 'strasse');
 
+$dokumenttyp = filter_input(INPUT_POST, 'dokumenttyp');
 $ausgabedatum = filter_input(INPUT_POST, 'ausgabedatum');
 $ausstellbehoerde = filter_input(INPUT_POST, 'ausstellbehoerde');
 $ausstellland = filter_input(INPUT_POST, 'ausstellland');
@@ -120,9 +121,42 @@ $dokumentnr = filter_input(INPUT_POST, 'dokumentnr');
 		</tr>';
 	}
 
+	/**
+	 * Erstellt eine Tabllezeile mit Input-Feld
+	 * @param string $name Name des Inputs.
+	 * @param string $title Titel der Zeile.
+	 * @param string $value Value des Inputs.
+	 * @param string $hint Hinweistext zu Inputfeld.
+	 * @param int $maxlength Maximallaenge des Eingabefeldes.
+	 * @return void
+	 */
+	function printDropdownRow($name, $title, $values, $selectedValue = '', $hint = '')
+	{
+		global $db;
+
+		echo '
+		<tr>
+			<td align="right">'.$title.':</td>
+			<td>
+			    <select name="'.$name.'">';
+
+            foreach ($values as $idx => $value)
+            {
+                $selected = $selectedValue === $value ? ' selected' : '';
+                echo '<option value="'.$db->convert_html_chars($value).'"'.$selected.'>'.$idx.'</option>';
+            }
+
+            echo '</select>'.$hint.'
+			</td>
+		</tr>';
+	}
+
+	/**
+	 * Prints Stammdaten inputfields for setMatrikelnummer form
+	 */
 	function printSetMatrikelnrRows()
     {
-        global $matrikelnr, $nachname, $vorname, $geburtsdatum, $geschlecht, $postleitzahl, $staat, $svnr, $matura;
+        global $matrikelnr, $nachname, $vorname, $geburtsdatum, $geschlecht, $postleitzahl;
 		printrow('matrikelnummer', 'Matrikelnummer', $matrikelnr);
 		printrow('nachname', 'Nachname', $nachname, '', 255);
 		printrow('vorname', 'Vorname', $vorname, '', 30);
@@ -168,8 +202,8 @@ $dokumentnr = filter_input(INPUT_POST, 'dokumentnr');
 			break;
 
 		case 'setMatrikelnummerErnp':
-		    echo '<b>HINWEIS: Die Eintragung ins ERnP (Ergänzungsregister für natürliche Personen) sollte nur dann durchgeführt werden, wenn für die Person bei "Matrikelnummer Vergabe melden" keine BPK ermittelt werden kann.
-		     <br /> Beim Punkt "BPK ermitteln" sollte dementsprechend keine BPK zurückgegeben werden.</b></br></br>';
+		    echo '<b>HINWEIS: Die Eintragung ins ERnP (Ergänzungsregister für natürliche Personen) sollte nur dann durchgeführt werden, <br />wenn für die Person bei "Matrikelnummer Vergabe melden" keine BPK ermittelt werden kann.
+		     <br />Beim Punkt "BPK ermitteln" sollte dementsprechend keine BPK zurückgegeben werden.</b></br></br>';
 		    echo '
             <tr>
                 <td colspan="2"><b>Personmeldung</b></td>
@@ -185,6 +219,7 @@ $dokumentnr = filter_input(INPUT_POST, 'dokumentnr');
                 <td colspan="2"><b>Ernpmeldung</b></td>
             </tr>';
 
+			printDropdownRow('dokumenttyp', 'Dokumenttyp', array('Reisepass' => 'REISEP', 'Personalausweis' => 'PERSAUSW'), $dokumenttyp,'');
 			printrow('dokumentnr', 'Dokumentnummer', $dokumentnr, '', 60);
 			printrow('ausgabedatum', 'Ausgabedatum', $ausgabedatum, 'Format: YYYYMMDD', 10);
 			printrow('ausstellbehoerde', 'Ausstellbehörde', $ausstellbehoerde, '', 40);
@@ -386,6 +421,7 @@ if (isset($_REQUEST['submit']))
 			$person->svnr = $svnr; // Optional
 
 			$reisepass = new stdClass();
+            $reisepass->dokumenttyp = $dokumenttyp;
             $reisepass->ausgabedatum = $ausgabedatum;
             $reisepass->ausstellBehoerde = $ausstellbehoerde;
             $reisepass->ausstellland = $ausstellland;

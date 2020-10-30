@@ -1037,7 +1037,7 @@ class dvb extends basis_db
 			<ausstellBehoerde>'.$reisepass->ausstellBehoerde.'</ausstellBehoerde>
 			<ausstellland>'.$reisepass->ausstellland.'</ausstellland>
 			<dokumentnr>'.$reisepass->dokumentnr.'</dokumentnr>
-			<dokumenttyp>REISEP</dokumenttyp>
+			<dokumenttyp>'.$reisepass->dokumenttyp.'</dokumenttyp>
 			</ernpmeldung>		
 		';
 		$data .= '</matrikelnummernmeldung>';
