@@ -211,7 +211,7 @@ $dokumentnr = filter_input(INPUT_POST, 'dokumentnr');
 
 			printSetMatrikelnrRows();
 			printrow('staat', 'Staat', $staat, '1-3 Stellen Codex (zb D für Deutschland)', 3);
-			printrow('svnr', 'Ersatzkennzeichen', $svnr);
+			printrow('svnr', 'SVNR/Ersatzkennzeichen', $svnr);
 			printrow('matura', 'Maturadatum', $matura, 'Format: YYYYMMDD (optional)', 10);
 
 			echo '
