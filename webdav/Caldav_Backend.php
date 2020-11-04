@@ -207,7 +207,15 @@ class MySabre_CalDAV_Backend extends \Sabre\CalDAV\Backend\AbstractBackend
 			{
 				die($stdplan->errormsg);
 			}
-			$val = $stdplan->draw_week_csv('return', LVPLAN_KATEGORIE);
+			if(file_exists(dirname(__FILE__).'/../addons/moodle/config.inc.php'))
+			{
+				$val = $stdplan->draw_week_csv_include_moodle('return', LVPLAN_KATEGORIE);
+			}
+			else
+			{
+				$val = $stdplan->draw_week_csv('return', LVPLAN_KATEGORIE);
+			}
+			;
 			if(!is_null($objectUri))
 			{
 				foreach($val as $row)

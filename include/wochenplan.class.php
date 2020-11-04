@@ -2763,8 +2763,8 @@ class wochenplan extends basis_db
 					for ($idx=0;$idx<count($this->std_plan[$i][$j]);$idx++)
 					{
 						$moodle_course = new moodle_course();
-						$leId = $this->std_plan[$i][$j][$idx]->unr;
-						$lvId = $this->std_plan[$i][$j][$idx]->lehrfach_id;
+						$leId = (isset($this->std_plan[$i][$j][$idx]->unr)?$this->std_plan[$i][$j][$idx]->unr:'');
+						$lvId = (isset($this->std_plan[$i][$j][$idx]->lehrfach_id)?$this->std_plan[$i][$j][$idx]->lehrfach_id:'');
 						$moodle_link = '';
 
 						if ($moodle_course->course_exists_for_le($leId))
@@ -2967,7 +2967,7 @@ class wochenplan extends basis_db
 
 							$UID = 'FH'.$lvb.$this->std_plan[$i][$j][$idx]->ort.$this->std_plan[$i][$j][$idx]->lektor.$lehrfach[$idx].$start_date_time_ical.$end_date_time_ical;
 							$Summary = $lehrfach[$idx].'  '.$this->std_plan[$i][$j][$idx]->ort.' - '.$lvb;
-							$description = $lehrfach[$idx].'\n'.$this->std_plan[$i][$j][$idx]->lektor.'\n'.$lvb.'\n'.$this->std_plan[$i][$j][$idx]->ort.(LVPLAN_ANMERKUNG_ANZEIGEN?'\n'.$this->std_plan[$i][$j][$idx]->anmerkung:'');
+							$description = $moodle_link.'\n'.$lehrfach[$idx].'\n'.$this->std_plan[$i][$j][$idx]->lektor.'\n'.$lvb.'\n'.$this->std_plan[$i][$j][$idx]->ort.(LVPLAN_ANMERKUNG_ANZEIGEN?'\n'.$this->std_plan[$i][$j][$idx]->anmerkung:'');
 
 							$UID = str_replace(',',' ',$UID);
 							$Summary = str_replace(',',' ',$Summary);
