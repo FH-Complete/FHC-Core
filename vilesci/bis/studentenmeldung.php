@@ -1368,7 +1368,7 @@ function GenerateXMLStudentBlock($row)
 					if (!in_array($row_zweck->zweck_code, $zweck_code_arr))
 					{
 						// Aufenthaltszweck 1, 2, 3 nicht gemeinsam melden
-						if (!empty(array_intersect(array(1, 2, 3), $zweck_code_arr)))
+						if (in_array(1,$zweck_code_arr) && in_array(2,$zweck_code_arr) && in_array(3,$zweck_code_arr))
 						{
 							$error_log_io .= (!empty($error_log_io) ? ', ' : '').
 								"Aufenthaltzweckcode 1, 2, 3 d&uuml;rfen nicht gemeinsam gemeldet werden";
