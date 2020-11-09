@@ -2924,7 +2924,7 @@ class wochenplan extends basis_db
 
 							echo $this->crlf.'BEGIN:VEVENT'.$this->crlf
 								.'UID:'.'FH'.str_replace(',',' ',$lvb.$this->std_plan[$i][$j][$idx]->ort.$this->std_plan[$i][$j][$idx]->lektor.$lehrfach[$idx].$start_date_time_ical.$end_date_time_ical.$this->crlf)
-								.'SUMMARY:'.str_replace(',',' ',$lehrfach[$idx].'  '.$this->std_plan[$i][$j][$idx]->ort.' - '.$lvb.$this->crlf)
+								.'SUMMARY:'.$this->convert_html_chars($titel).'\n'.str_replace(',',' ',$lehrfach[$idx].'  '.$this->std_plan[$i][$j][$idx]->ort.' - '.$lvb.$this->crlf)
 								.'DESCRIPTION:'.$moodle_link.'\n'.str_replace(',',' ',$lehrfach[$idx].'\n'.$this->std_plan[$i][$j][$idx]->lektor.'\n'.$lvb.'\n'.$this->std_plan[$i][$j][$idx]->ort.(LVPLAN_ANMERKUNG_ANZEIGEN?'\n'.$this->std_plan[$i][$j][$idx]->anmerkung:'').$this->crlf)
 								.'LOCATION:'.$this->std_plan[$i][$j][$idx]->ort.$this->crlf
 								.'CATEGORIES:'.$lvplan_kategorie.$this->crlf
@@ -2966,7 +2966,7 @@ class wochenplan extends basis_db
 							$end_date_time_ical = $eda[2].$eda[1].$eda[0].'T'.sprintf('%02s',($eta[0])).$eta[1].$eta[2];  //neu gruppieren der Startzeit und des Startdatums
 
 							$UID = 'FH'.$lvb.$this->std_plan[$i][$j][$idx]->ort.$this->std_plan[$i][$j][$idx]->lektor.$lehrfach[$idx].$start_date_time_ical.$end_date_time_ical;
-							$Summary = $lehrfach[$idx].'  '.$this->std_plan[$i][$j][$idx]->ort.' - '.$lvb;
+							$Summary = $this->convert_html_chars($titel).'  '.$lehrfach[$idx].'  '.$this->std_plan[$i][$j][$idx]->ort.' - '.$lvb;
 							$description = $moodle_link.'\n'.$lehrfach[$idx].'\n'.$this->std_plan[$i][$j][$idx]->lektor.'\n'.$lvb.'\n'.$this->std_plan[$i][$j][$idx]->ort.(LVPLAN_ANMERKUNG_ANZEIGEN?'\n'.$this->std_plan[$i][$j][$idx]->anmerkung:'');
 
 							$UID = str_replace(',',' ',$UID);
