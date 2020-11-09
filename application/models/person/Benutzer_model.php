@@ -23,7 +23,8 @@ class Benutzer_model extends DB_Model
 	 */
 	public function getActiveUserByPersonIdAndOrganisationUnit($person_id, $oe_kurzbz)
 	{
-		$sql = 'SELECT b.uid
+		$sql = 'SELECT b.uid,
+				b.insertamum
 				  FROM public.tbl_benutzer b
 				  JOIN public.tbl_prestudent ps USING (person_id)
 				  JOIN public.tbl_studiengang sg USING (studiengang_kz)
@@ -97,3 +98,4 @@ class Benutzer_model extends DB_Model
 		return mb_strtolower(str_replace(' ','_', $str));
 	}
 }
+

@@ -595,11 +595,20 @@ class MessageLib
 						$this->_ci->load->model('person/Benutzer_model', 'BenutzerModel');
 
 						// And the receiver has an active account for the given organisation unit
-						$benutzerResult = $this->_ci->BenutzerModel->getActiveUserByPersonIdAndOrganisationUnit($message->receiver_id, $message->sender_ou);
+						$benutzerResult = $this->_ci->BenutzerModel->getActiveUserByPersonIdAndOrganisationUnit(
+							$message->receiver_id,
+							$message->sender_ou
+						);
+
 						if (isError($benutzerResult)) return $benutzerResult; // if an error occured then return it
 
-						// Use the uid + domain email
-						if (hasData($benutzerResult)) $message->receiverContact = getData($benutzerResult)[0]->uid .'@'.DOMAIN;
+						// Checks if the user was NOT created in the last 24 hours
+						if (getData($benutzerResult)[0]->insertamum > date('Y-m-d H:i:s', strtotime('+1 day')))
+						{
+							// Use the uid + domain email
+							if (hasData($benutzerResult)) $message->receiverContact = getData($benutzerResult)[0]->uid .'@'.DOMAIN;
+						}
+						// otherwise do NOT use the internal email account
 					}
 
 					// Otherwise try with the private email
@@ -676,10 +685,33 @@ class MessageLib
 									$this->_ci->BenutzerModel->addOrder('updateamum', 'DESC');
 									$this->_ci->BenutzerModel->addOrder('insertamum', 'DESC');
 
-									$benutzerResult = $this->_ci->BenutzerModel->loadWhere(array('person_id' => $message->receiver_id));
+									$benutzerResult = $this->_ci->BenutzerModel->loadWhere(
+										array(
+											'person_id' => $message->receiver_id
+										)
+									);
 									if (isError($benutzerResult)) return $benutzerResult; // if an error occured then return it
 
-									$message->receiverContact = getData($benutzerResult)[0]->uid .'@'.DOMAIN; // Use the uid + domain email
+									// For each benutzer found for this person
+									foreach (getData($benutzerResult) as $benutzer)
+									{
+										// Checks if the user was NOT created in the last 24 hours
+										if (getData($benutzerResult)[0]->insertamum > date('Y-m-d H:i:s', strtotime('+1 day')))
+										{
+											// Use the uid + domain as email address
+											$message->receiverContact = getData($benutzerResult)[0]->uid .'@'.DOMAIN;
+										}
+									}
+
+									// Otherwise try with the private email
+									if (isEmptyString($message->receiverContact))
+									{
+										// Then use the private email
+										$privateEmailResult = $this->_getPrivateEmail($message->receiver_id);
+										if (isError($privateEmailResult)) return $privateEmailResult; // if an error occured then return it
+
+										if (hasData($privateEmailResult)) $message->receiverContact = getData($privateEmailResult);
+									}
 								}
 							}
 						}
