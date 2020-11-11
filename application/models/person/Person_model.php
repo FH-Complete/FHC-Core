@@ -152,7 +152,8 @@ class Person_model extends DB_Model
 	 */
 	public function getPersonStammdaten($person_id, $zustellung_only = false)
 	{
-		$this->addSelect('public.tbl_person.*, s.kurztext as staatsbuergerschaft, g.kurztext as geburtsnation');
+		$this->addSelect('public.tbl_person.*, tbl_person.staatsbuergerschaft AS staatsbuergerschaft_code, tbl_person.geburtsnation AS geburtsnation_code, 
+		s.kurztext as staatsbuergerschaft, g.kurztext as geburtsnation');
 		$this->addJoin('bis.tbl_nation s', 'public.tbl_person.staatsbuergerschaft = s.nation_code', 'LEFT');
 		$this->addJoin('bis.tbl_nation g', 'public.tbl_person.geburtsnation = g.nation_code', 'LEFT');
 
