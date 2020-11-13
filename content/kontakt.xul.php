@@ -99,6 +99,10 @@ $uid = get_uid();
 						class="sortDirectionIndicator"
 						sort="rdf:http://www.technikum-wien.at/adresse/rdf#zustelladresse" onclick="KontaktAdresseTreeSort()"/>
 					<splitter class="tree-splitter"/>
+                    <treecol id="kontakt-adressen-treecol-co_name" label="Abweich.Empf.(c/o)" flex="1" hidden="false"
+                             class="sortDirectionIndicator"
+                             sort="rdf:http://www.technikum-wien.at/adresse/rdf#co_name" onclick="KontaktAdresseTreeSort()"/>
+                    <splitter class="tree-splitter"/>
 					<treecol id="kontakt-adressen-treecol-firma_id" label="Firma_id" flex="1" hidden="true"
 						class="sortDirectionIndicator"
 						sort="rdf:http://www.technikum-wien.at/adresse/rdf#firma_id" onclick="KontaktAdresseTreeSort()"/>
@@ -146,6 +150,7 @@ $uid = get_uid();
 									<treecell label="rdf:http://www.technikum-wien.at/adresse/rdf#nation" />
 									<treecell label="rdf:http://www.technikum-wien.at/adresse/rdf#heimatadresse" />
 									<treecell label="rdf:http://www.technikum-wien.at/adresse/rdf#zustelladresse" />
+									<treecell label="rdf:http://www.technikum-wien.at/adresse/rdf#co_name" />
 									<treecell label="rdf:http://www.technikum-wien.at/adresse/rdf#firma_id" />
 									<treecell label="rdf:http://www.technikum-wien.at/adresse/rdf#adresse_id" />
 									<treecell label="rdf:http://www.technikum-wien.at/adresse/rdf#person_id" />

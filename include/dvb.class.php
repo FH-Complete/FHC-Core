@@ -41,7 +41,7 @@ class dvb extends basis_db
 	const DVB_URL_WEBSERVICE_MATRIKELNUMMER = DVB_PORTAL.'/rws/0.2/simpleStudentByMatrikelnummer.xml';
 	const DVB_URL_WEBSERVICE_RESERVIERUNG = DVB_PORTAL.'/rws/0.5/matrikelreservierung.xml';
 	const DVB_URL_WEBSERVICE_MELDUNG = DVB_PORTAL.'/rws/0.5/matrikelmeldung.xml';
-	const DVB_URL_WEBSERVICE_BPK = DVB_PORTAL.'/rws/0.2/pruefeBpk.xml';
+	const DVB_URL_WEBSERVICE_BPK = DVB_PORTAL.'/rws/0.5/pruefebpk.xml';
 
 	public $authentication;
 	private $username;
@@ -188,6 +188,7 @@ class dvb extends basis_db
 				AND tbl_benutzer.aktiv
 				AND tbl_prestudentstatus.status_kurzbz in('Student','Incoming')
 				AND tbl_prestudent.bismelden
+				AND tbl_prestudent.studiengang_kz<10000
 			ORDER BY tbl_prestudentstatus.datum desc LIMIT 1
 			";
 
@@ -394,10 +395,12 @@ class dvb extends basis_db
 
 		$this->debug('getMatrikelnrBySVNR');
 
+		$uuid = $this->getUUID();
 		$curl = curl_init();
 
 		$url = self::DVB_URL_WEBSERVICE_SVNR;
 		$url .= '?sozialVersicherungsNummer='.curl_escape($curl, $svnr);
+		$url .= '&uuid='.curl_escape($curl, $uuid);
 
 		curl_setopt($curl, CURLOPT_URL, $url);
 		curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
@@ -507,9 +510,10 @@ class dvb extends basis_db
 
 		$this->debug('getMatrikelnrByErsatzkennzeichen');
 		$curl = curl_init();
-
+		$uuid = $this->getUUID();
 		$url = self::DVB_URL_WEBSERVICE_ERSATZKZ;
 		$url .= '?ersatzKennzeichen='.curl_escape($curl, $ersatzkennzeichen);
+		$url .= '&uuid='.curl_escape($curl, $uuid);
 
 		curl_setopt($curl, CURLOPT_URL, $url);
 		curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
@@ -1136,11 +1140,14 @@ class dvb extends basis_db
 
 		$curl = curl_init();
 
+		$uuid = $this->getUUID();
+
 		$url = self::DVB_URL_WEBSERVICE_BPK;
-		$url .= '?geburtsDatum='.curl_escape($curl, $geburtsdatum);
+		$url .= '?geburtsdatum='.curl_escape($curl, $geburtsdatum);
 		$url .= '&vorname='.curl_escape($curl, $vorname);
 		$url .= '&nachname='.curl_escape($curl, $nachname);
 		$url .= '&geschlecht='.curl_escape($curl, $geschlecht);
+		$url .= '&uuid='.curl_escape($curl, $uuid);
 
 		if (!is_null($plz))
 			$url .= '&plz='.curl_escape($curl, $plz);
@@ -1175,19 +1182,22 @@ class dvb extends basis_db
 		if ($curl_info['http_code'] == '200')
 		{
 			/* Example Response:
-			<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-			<simpleBpkResponse xmlns="http://www.brz.gv.at/datenverbund-unis">
-				<personenkennzeichen>1234567890ABCDEFGH=</personenkennzeichen>
+			 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+			 <simpleBpkResponse xmlns="http://www.brz.gv.at/datenverbund-unis">
+			 	<bpk>12345ABCDEFGHXXXXXXX=</bpk>
 				<personInfo>
-					<person>
-						<vorname>Max</vorname>
-						<nachname>Mustermann</nachname>
-						<geschlecht>M</geschlecht>
-						<gebdat>19901231</gebdat>
-					</person>
-					<adresse>
-						<ort></ort>
-					</adresse>
+				<person>
+					<vorname>Hans</vorname>
+					<nachname>Huber</nachname>
+					<geschlecht>M</geschlecht>
+					<gebdat>1990-01-01</gebdat>
+				</person>
+				<adresse>
+					<staat></staat>
+					<plz>1100</plz>
+					<ort></ort>
+					<strasse></strasse>
+				</adresse>
 				</personInfo>
 			</simpleBpkResponse>
 
@@ -1229,7 +1239,7 @@ class dvb extends basis_db
 				}
 			}
 
-			$domnodes_bpk = $dom->getElementsByTagNameNS($namespace, 'personenkennzeichen');
+			$domnodes_bpk = $dom->getElementsByTagNameNS($namespace, 'bpk');
 			if ($domnodes_bpk->length > 0)
 			{
 				$retval = new stdClass();
@@ -1349,9 +1359,12 @@ class dvb extends basis_db
 
 		$geburtsdatum = str_replace("-", "", $geburtsdatum);
 
+		$uuid = $this->getUUID();
+
 		$url = self::DVB_URL_WEBSERVICE_NACHNAME;
 		$url .= '?nachName='.curl_escape($curl, $nachname);
 		$url .= '&geburtsDatum='.curl_escape($curl, $geburtsdatum);
+		$url .= '&uuid='.curl_escape($curl, $uuid);
 
 		curl_setopt($curl, CURLOPT_URL, $url);
 		curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
@@ -1472,11 +1485,13 @@ class dvb extends basis_db
 		$curl = curl_init();
 
 		$geburtsdatum = str_replace("-", "", $geburtsdatum);
+		$uuid = $this->getUUID();
 
 		$url = self::DVB_URL_WEBSERVICE_NAME;
 		$url .= '?nachName='.curl_escape($curl, $nachname);
 		$url .= '&vorName='.curl_escape($curl, $vorname);
 		$url .= '&geburtsDatum='.curl_escape($curl, $geburtsdatum);
+		$url .= '&uuid='.curl_escape($curl, $uuid);
 
 		curl_setopt($curl, CURLOPT_URL, $url);
 		curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
@@ -1594,8 +1609,11 @@ class dvb extends basis_db
 
 		$curl = curl_init();
 
-				$url = self::DVB_URL_WEBSERVICE_MATRIKELNUMMER;
+		$uuid = $this->getUUID();
+
+		$url = self::DVB_URL_WEBSERVICE_MATRIKELNUMMER;
 		$url .= '?matrikelNummer='.curl_escape($curl, $matrikelnr);
+		$url .= '&uuid='.curl_escape($curl, $uuid);
 
 		curl_setopt($curl, CURLOPT_URL, $url);
 		curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);

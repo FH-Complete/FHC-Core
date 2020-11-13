@@ -132,6 +132,9 @@ define('FAS_UDF', true);
 // Legt fest ob Aufnahmegruppen bei Reihungstests verwaltet werden true|false
 define('FAS_REIHUNGSTEST_AUFNAHMEGRUPPEN',false);
 
+// Legt fest welche OEs nicht zur Stundenobergrenze für Lektoren hinzugerechnet werden
+define('FAS_LV_LEKTORINNENZUTEILUNG_STUNDEN_IGNORE_OE', array('eci'));
+
 // Legt fest, ob Vertragsdetails zum Lehrauftrag im Reiter LektorInnenzuteilung angezeigt werden
 define('FAS_LV_LEKTORINNENZUTEILUNG_VERTRAGSDETAILS_ANZEIGEN', false);
 
@@ -291,4 +294,16 @@ define('STUDIENGANG_KZ_QUALIFIKATIONKURSE', null);
 
 // Gibt an ob der Login ins Testtool ueber das Bewerbungstool stattfindet oder nicht
 define('TESTTOOL_LOGIN_BEWERBUNGSTOOL', false);
+
+// Prueft ob Buchungen bereits ins SAP uebertragen wurden und sperrt ggf die Bearbeitung
+define('BUCHUNGEN_CHECK_SAP', true);
+
+// Gibt an, ob im FAS die Zahlungsbestaetigungen zum Download / im CIS generell die Zahlungen angezeigt werden
+define ('ZAHLUNGSBESTAETIGUNG_ANZEIGEN', true);
+
+// Gibt an, ob im CIS die Zahlungsbestaetigungen fuer Lehrgaenge zum Download angezeigt werden
+define ('ZAHLUNGSBESTAETIGUNG_ANZEIGEN_FUER_LEHRGAENGE', true);
+
+// Gibt an, ob im CIS die Zahlungsreferenz angezeigt wird
+define ('ZAHLUNGSBESTAETIGUNG_ZAHLUNGSREFERENZ_ANZEIGEN', false);
 ?>

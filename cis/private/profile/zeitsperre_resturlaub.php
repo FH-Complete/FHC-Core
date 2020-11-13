@@ -518,7 +518,7 @@ if(count($zeit->result)>0)
 		$row_vertretung = $db->db_fetch_object($result_vertretung);
 		$content_table.= "<tr class='liste".($i%2)."'>
 							<td>$row->bezeichnung</td>
-							<td>$row->zeitsperretyp_kurzbz</td>
+							<td>$row->zeitsperretyp_beschreibung</td>
 							<td nowrap>".$datum_obj->convertISODate($row->vondatum)." ".($row->vonstunde!=''?'('.$row->vonstunde.')':'')."</td>
 							<td nowrap>".$datum_obj->convertISODate($row->bisdatum)." ".($row->bisstunde!=''?'('.$row->bisstunde.')':'')."</td>
 							<td>".(isset($row_vertretung->kurzbz)?$row_vertretung->kurzbz:'')."</td>
@@ -587,15 +587,15 @@ $content_form.= '<form method="POST" name="zeitsperre_form" action="'.$action.'"
 $content_form.= "<table>\n";
 $content_form.= '<tr><td style="width:150px">'.$p->t('zeitsperre/grund').'</td><td colspan="2" style="width:450px"><SELECT name="zeitsperretyp_kurzbz"'.$style.' onchange="showHideBezeichnungDropDown()" class="dd_breit">';
 //dropdown fuer zeitsperretyp
-$qry = "SELECT * FROM campus.tbl_zeitsperretyp ORDER BY zeitsperretyp_kurzbz";
+$qry = "SELECT * FROM campus.tbl_zeitsperretyp ORDER BY beschreibung";
 if($result = $db->db_query($qry))
 {
 	while($row=$db->db_fetch_object($result))
 	{
 		if($zeitsperre->zeitsperretyp_kurzbz == $row->zeitsperretyp_kurzbz)
-			$content_form.= "<OPTION value='$row->zeitsperretyp_kurzbz' selected>$row->zeitsperretyp_kurzbz - $row->beschreibung</OPTION>";
+			$content_form.= "<OPTION value='$row->zeitsperretyp_kurzbz' selected>$row->beschreibung</OPTION>";
 		else
-			$content_form.= "<OPTION value='$row->zeitsperretyp_kurzbz'$disabled>$row->zeitsperretyp_kurzbz - $row->beschreibung</OPTION>";
+			$content_form.= "<OPTION value='$row->zeitsperretyp_kurzbz'$disabled>$row->beschreibung</OPTION>";
 	}
 }
 $content_form.= '</SELECT></td></tr>';

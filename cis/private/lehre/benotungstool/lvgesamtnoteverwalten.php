@@ -812,6 +812,7 @@ if (isset($_REQUEST["freigabe"]) && ($_REQUEST["freigabe"] == 1))
         {
             $studlist .= "
                 <td><b>" . $p->t('global/personenkz') . "</b></td>
+                <td><b>" . $p->t('global/studiengang') . "</b></td>
 			    <td><b>" . $p->t('global/nachname') . "</b></td>
 			    <td><b>" . $p->t('global/vorname') . "</b></td>
             ";
@@ -834,10 +835,11 @@ if (isset($_REQUEST["freigabe"]) && ($_REQUEST["freigabe"] == 1))
 
 		// studentenquery
 		$qry_stud = "SELECT
-						DISTINCT uid, vorname, nachname, matrikelnr
+						DISTINCT uid, vorname, nachname, matrikelnr, kurzbzlang
 					FROM
 						campus.vw_student_lehrveranstaltung
 						JOIN campus.vw_student USING(uid)
+						JOIN public.tbl_studiengang ON campus.vw_student.studiengang_kz = public.tbl_studiengang.studiengang_kz
 					WHERE
 						studiensemester_kurzbz = " . $db->db_add_param($stsem) . "
 						AND lehrveranstaltung_id = " . $db->db_add_param($lvid, FHC_INTEGER) . "
@@ -859,6 +861,7 @@ if (isset($_REQUEST["freigabe"]) && ($_REQUEST["freigabe"] == 1))
 						if (defined('CIS_GESAMTNOTE_FREIGABEMAIL_NOTE') && CIS_GESAMTNOTE_FREIGABEMAIL_NOTE)
 						{
 							$studlist .= "<tr><td>" . trim($row_stud->matrikelnr) . "</td>";
+							$studlist .= "<td>" . trim($row_stud->kurzbzlang) . "</td>";
 							$studlist .= "<td>" . trim($row_stud->nachname) . "</td>";
 							$studlist .= "<td>" . trim($row_stud->vorname) . "</td>";
 

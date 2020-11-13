@@ -75,7 +75,22 @@ else
 
 $webservice = new dvb(DVB_USERNAME, DVB_PASSWORD, $debug);
 
-$qry = "
+if (defined('BPK_FUER_ALLE_BENUTZER_ABFRAGEN') && BPK_FUER_ALLE_BENUTZER_ABFRAGEN)
+{
+    $qry = "
+	SELECT
+		distinct person_id, vorname, nachname
+	FROM
+		public.tbl_person
+		JOIN public.tbl_benutzer USING(person_id)
+	WHERE
+		public.tbl_benutzer.aktiv = true
+		AND tbl_person.bpk is null
+		AND gebdatum is not null";
+}
+else
+{
+    $qry = "
 	SELECT
 		distinct person_id, vorname, nachname
 	FROM
@@ -89,6 +104,7 @@ $qry = "
 		AND studiengang_kz<10000
 		AND EXISTS(SELECT 1 FROM public.tbl_prestudent WHERE person_id=tbl_person.person_id AND bismelden=true)
 		AND gebdatum is not null";
+}
 
 if ($limit != '')
 	$qry .= " LIMIT ".$limit;

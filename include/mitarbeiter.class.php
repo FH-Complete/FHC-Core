@@ -1097,7 +1097,7 @@ class mitarbeiter extends benutzer
 	 * beschäftigten Untergebenen der Kind-OEs des Leiters zurückgegeben.
 	 * @return boolean
 	 */
-	public function getUntergebene($uid=null, $include_OE_childs = false)
+	public function getUntergebene($uid=null, $include_OE_childs = false, $fixangestellte_only = true)
 	{
 		if (is_null($uid))
 			$uid=$this->uid;
@@ -1192,6 +1192,9 @@ class mitarbeiter extends benutzer
 			JOIN
 				public.tbl_benutzer
 			USING (uid)
+			JOIN
+			  public.tbl_mitarbeiter
+			ON (uid = mitarbeiter_uid)
 			WHERE ((funktion_kurzbz='oezuordnung' AND (false ";
 
 		if($oe!='')
@@ -1205,7 +1208,10 @@ class mitarbeiter extends benutzer
 			AND
 				(tbl_benutzerfunktion.datum_bis is null OR tbl_benutzerfunktion.datum_bis>=now())
 			AND
-				tbl_benutzer.aktiv = 'true';";
+				tbl_benutzer.aktiv = 'true'";
+			if ($fixangestellte_only)
+				$qry .= " AND tbl_mitarbeiter.fixangestellt";
+			$qry .= ";";
 
 		if($this->db_query($qry))
 		{

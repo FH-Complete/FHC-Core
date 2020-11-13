@@ -37,6 +37,8 @@ require_once('../../include/studiengang.class.php');
 require_once('../../include/student.class.php');
 require_once('../../include/prestudent.class.php');
 require_once('../../include/dokument_export.class.php');
+require_once('../../include/person.class.php');
+require_once('../../include/webservicelog.class.php');
 
 if (!$db = new basis_db())
 	die('Fehler beim Oeffnen der Datenbankverbindung');
@@ -135,6 +137,23 @@ if (isset($_GET['typ']))
 	$params .= '&typ='.$_GET['typ'];
 if (isset($_GET['all']))
 	$params .= '&all=1';
+if (isset($_GET['xsl_oe_kurzbz']))
+	$params .= '&xsl_oe_kurzbz='. $_GET['xsl_oe_kurzbz'];
+
+// Logeintrag bei Download von Zahlungsbestaetigungen
+if (isset($_GET['xsl']) && $_GET['xsl'] == 'Zahlung')
+{
+	$requestdata = $_SERVER['QUERY_STRING'];
+	
+	$log = new Webservicelog();
+	$log->webservicetyp_kurzbz = 'content';
+	$log->request_id = isset($_GET['buchungsnummern']) && !empty($_GET['buchungsnummern']) ? $_GET['buchungsnummern'] : NULL;
+	$log->beschreibung = 'Zahlungsbestaetigungsdownload';
+	$log->request_data = $requestdata;
+	$log->execute_user = $user;
+	
+	$log->save(true);
+}
 
 //OE fuer Output ermitteln
 
@@ -166,7 +185,7 @@ else
 
 
 $konto = new konto();
-if (($user == $_GET["uid"]) || $rechte->isBerechtigt('admin'))
+if (((isset($_GET["uid"]) && $user == $_GET["uid"])) || $rechte->isBerechtigt('admin'))
 {
 	$buchungstypen = array();
 	if (defined("CIS_DOKUMENTE_STUDIENBEITRAG_TYPEN"))
@@ -232,7 +251,9 @@ if (($user == $_GET["uid"]) || $rechte->isBerechtigt('admin'))
 			$filename .= '-'.$studienordnung->studiengangkurzbzlang;
 			break;
 		default:
-			$filename = $xsl;
+			$person = new Person();
+			$person->getPersonFromBenutzer($user);
+			$filename = $xsl. '_'. $person->nachname;
 	}
 
 	$dokument->setFilename($filename);

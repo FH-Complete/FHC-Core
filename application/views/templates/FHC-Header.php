@@ -34,6 +34,7 @@
 	$tablewidget = isset($tablewidget) ? $tablewidget : false;
 	$tabulator = isset($tabulator) ? $tabulator : false;
 	$tinymce = isset($tinymce) ? $tinymce : false;
+	$udfs = isset($udfs) ? $udfs : false;
 	$widgets = isset($widgets) ? $widgets : false;
 ?>
 
@@ -195,6 +196,7 @@
 			// From public folder
 
 			// DialogLib JS
+			// NOTE: must be called before including others JS libraries that use it
 			if ($dialoglib === true) generateJSsInclude('public/js/DialogLib.js');
 
 			// AjaxLib JS
@@ -213,8 +215,11 @@
 			// TableWidget JS
 			if ($tablewidget === true) generateJSsInclude('public/js/TableWidget.js');
 
+			// User Defined Fields
+			if ($udfs === true) generateJSsInclude('public/js/UDFWidget.js');
+
 			// Load addon hooks JS
-			// NOTE: keep it as the latest but one
+			// NOTE: keep it as the last but one
 			if ($addons === true) generateAddonsJSsInclude($calledPath.'/'.$calledMethod);
 
 			// Eventually required JS

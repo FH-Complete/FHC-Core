@@ -166,7 +166,7 @@ function generateMatrikelnummer($studiengang_kz, $studiensemester_kurzbz)
  * @param $note
  * @return null, error wird direkt in globale Variable geschrieben
  */
-function NotePruefungAnlegen($studiensemester_kurzbz, $student_uid, $lehrveranstaltung_id, $note)
+function NotePruefungAnlegen($studiensemester_kurzbz, $student_uid, $lehrveranstaltung_id, $note, $punkte)
 {
 	global $return, $error, $errormsg;
 
@@ -227,6 +227,8 @@ function NotePruefungAnlegen($studiensemester_kurzbz, $student_uid, $lehrveranst
 		if(count($benutzerfunktion->result)>0)
 			$anwesenheitsbefreit=true;
 
+		$gesamtnote_punkte = defined('CIS_GESAMTNOTE_PUNKTE') && CIS_GESAMTNOTE_PUNKTE;
+
 		// Wenn nicht Anwesenheitsbefreit und Anwesenheit unter einem bestimmten Prozentsatz faellt dann wird ein
 		// Pruefungsantritt abgezogen
 		if(isset($anwesenheit->result[0]) && $anwesenheit->result[0]->prozent < FAS_ANWESENHEIT_ROT && !$anwesenheitsbefreit)
@@ -239,6 +241,8 @@ function NotePruefungAnlegen($studiensemester_kurzbz, $student_uid, $lehrveranst
 				// 2. Termin mit Note erstellen
 				$pruefung->pruefungstyp_kurzbz = "Termin2";
 				$pruefung->note = $note;
+				if($gesamtnote_punkte)
+					$pruefung->punkte = $punkte;
 				if($pruefung->save())
 				{
 					$return = true;
@@ -260,6 +264,8 @@ function NotePruefungAnlegen($studiensemester_kurzbz, $student_uid, $lehrveranst
 			// 1. Termin mit Note erstellen
 			$pruefung->pruefungstyp_kurzbz = "Termin1";
 			$pruefung->note = $note;
+			if($gesamtnote_punkte)
+				$pruefung->punkte = $punkte;
 
 			if($pruefung->save())
 			{
@@ -272,6 +278,80 @@ function NotePruefungAnlegen($studiensemester_kurzbz, $student_uid, $lehrveranst
 			}
 		}
 	}
+}
+
+function deleteFromSAP($buchung)
+{
+	global $db, $user;
+
+	if(defined('BUCHUNGEN_CHECK_SAP') && BUCHUNGEN_CHECK_SAP == true)
+	{
+		$qry = "SELECT * FROM sync.tbl_sap_salesorder WHERE buchungsnr=".$db->db_add_param($buchung->buchungsnr);
+		if($result = $db->db_query($qry))
+		{
+			if($row = $db->db_fetch_object($result))
+			{
+				$qry = "DELETE FROM sync.tbl_sap_salesorder WHERE buchungsnr=".$db->db_add_param($buchung->buchungsnr);
+				if($db->db_query($qry))
+				{
+					$log = new log();
+					$log->mitarbeiter_uid = $user;
+					$log->beschreibung = 'Buchungszuordnung SAP geloescht: SalesOrder:'.$row->sap_sales_order_id;
+					$log->sql = $qry;
+					if(!$log->save(true))
+					{
+						echo "Fehler beim Schreiben des Log".$log->errormsg;
+						return false;
+					}
+					return true;
+				}
+				else
+				{
+					echo "Fehler beim Löschen der Zahlungszuordnung";
+					return false;
+				}
+			}
+			else
+			{
+				//Gegenbuchung
+			}
+		}
+		else
+		{
+			echo "Zahlung nicht gefunden";
+			return false;
+		}
+	}
+	return true;
+}
+
+/**
+ * Prueft ob die Kontobuchung bereits ins SAP Ubertragen wurde oder noch geändert werden darf
+ */
+function isBuchungAllowedToChange($buchung_obj)
+{
+	global $db;
+
+	if(defined('BUCHUNGEN_CHECK_SAP') && BUCHUNGEN_CHECK_SAP == true)
+	{
+		$qry = "SELECT * FROM sync.tbl_sap_salesorder WHERE buchungsnr=".$db->db_add_param($buchung_obj->buchungsnr);
+		if ($buchung_obj->buchungsnr_verweis != '')
+			$qry .= " OR buchungsnr=".$db->db_add_param($buchung_obj->buchungsnr_verweis);
+
+		if ($result = $db->db_query($qry))
+		{
+			if($db->db_num_rows($result) > 0)
+			{
+				return false;
+			}
+			else
+				return true;
+		}
+		else
+			return false;
+	}
+	else
+		return true;
 }
 
 if(!$error)
@@ -1897,16 +1977,28 @@ if(!$error)
 			}
 			if(!$error)
 			{
-				$akte = new akte();
-
-				if($akte->delete($_POST['akte_id']))
+				$akte = new akte($_POST['akte_id']);
+				//Akzeptierte Ausbildungsverträge dürfen nur von Admins gelöscht werden
+				if ($akte->dokument_kurzbz == 'Ausbvert' &&
+					$akte->akzeptiertamum != '' &&
+					!$rechte->isBerechtigt('admin',$_POST['studiengang_kz'], 'suid'))
 				{
-					$return = true;
-				}
-				else
-				{
+					$error = true;
 					$return = false;
-					$errormsg = $akte->errormsg;
+					$errormsg = 'Akzeptierte Ausbildungsverträge dürfen nur von Administratoren gelöscht werden';
+				}
+
+				if(!$error)
+				{
+					if ($akte->delete($_POST['akte_id']))
+					{
+						$return = true;
+					}
+					else
+					{
+						$return = false;
+						$errormsg = $akte->errormsg;
+					}
 				}
 			}
 		}
@@ -1934,27 +2026,36 @@ if(!$error)
 				}
 				else
 				{
-					$buchung->betrag = $_POST['betrag'];
-					$buchung->buchungsdatum = $_POST['buchungsdatum'];
-					$buchung->buchungstext = $_POST['buchungstext'];
-					$buchung->mahnspanne = $_POST['mahnspanne'];
-					$buchung->buchungstyp_kurzbz = $_POST['buchungstyp_kurzbz'];
-					$buchung->studiensemester_kurzbz = $_POST['studiensemester_kurzbz'];
-					$buchung->studiengang_kz = $_POST['studiengang_kz'];
-					$buchung->credit_points = $_POST['credit_points'];
-					$buchung->new = false;
-					$buchung->updateamum = date('Y-m-d H:i:s');
-					$buchung->updatevon = $user;
-					$buchung->anmerkung = $_POST['anmerkung'];
-
-					if($buchung->save())
+					if(isBuchungAllowedToChange($buchung)
+						|| $rechte->isBerechtigt('student/zahlungAdmin',$buchung->studiengang_kz,'suid'))
 					{
-						$return = true;
+						$buchung->betrag = $_POST['betrag'];
+						$buchung->buchungsdatum = $_POST['buchungsdatum'];
+						$buchung->buchungstext = $_POST['buchungstext'];
+						$buchung->mahnspanne = $_POST['mahnspanne'];
+						$buchung->buchungstyp_kurzbz = $_POST['buchungstyp_kurzbz'];
+						$buchung->studiensemester_kurzbz = $_POST['studiensemester_kurzbz'];
+						$buchung->studiengang_kz = $_POST['studiengang_kz'];
+						$buchung->credit_points = $_POST['credit_points'];
+						$buchung->new = false;
+						$buchung->updateamum = date('Y-m-d H:i:s');
+						$buchung->updatevon = $user;
+						$buchung->anmerkung = $_POST['anmerkung'];
+
+						if($buchung->save())
+						{
+							$return = true;
+						}
+						else
+						{
+							$return = false;
+							$errormsg = 'Fehler beim Speichern:'.$buchung->errormsg;
+						}
 					}
 					else
 					{
 						$return = false;
-						$errormsg = 'Fehler beim Speichern:'.$buchung->errormsg;
+						$errormsg = 'Buchung wurde bereits übertragen und darf nicht geändert werden';
 					}
 				}
 			}
@@ -2007,26 +2108,35 @@ if(!$error)
 						{
 							if($buchung->buchungsnr_verweis=='')
 							{
-								$kto = new konto();
-								//$buchung->betrag*(-1);
-								$buchung->betrag = $kto->getDifferenz($buchungsnr);
-								$buchung->buchungsdatum = $gegenbuchungsdatum;
-								$buchung->mahnspanne = '0';
-								$buchung->buchungsnr_verweis = $buchung->buchungsnr;
-								$buchung->new = true;
-								$buchung->insertamum = date('Y-m-d H:i:s');
-								$buchung->insertvon = $user;
-								$buchung->anmerkung = '';
-
-								if($buchung->save())
+								if(isBuchungAllowedToChange($buchung)
+								|| $rechte->isBerechtigt('student/zahlungAdmin',$buchung->studiengang_kz,'suid'))
 								{
-									//$data = $buchung->buchungsnr;
-									$return = true;
+									$kto = new konto();
+									//$buchung->betrag*(-1);
+									$buchung->betrag = $kto->getDifferenz($buchungsnr);
+									$buchung->buchungsdatum = $gegenbuchungsdatum;
+									$buchung->mahnspanne = '0';
+									$buchung->buchungsnr_verweis = $buchung->buchungsnr;
+									$buchung->new = true;
+									$buchung->insertamum = date('Y-m-d H:i:s');
+									$buchung->insertvon = $user;
+									$buchung->anmerkung = '';
+
+									if($buchung->save())
+									{
+										//$data = $buchung->buchungsnr;
+										$return = true;
+									}
+									else
+									{
+										$return = false;
+										$errormsg .= "\n".'Fehler beim Speichern:'.$buchung->errormsg;
+									}
 								}
 								else
 								{
 									$return = false;
-									$errormsg .= "\n".'Fehler beim Speichern:'.$buchung->errormsg;
+									$errormsg .= "\n".'Buchung wurde bereits Übertragen und darf nicht geändert werden';
 								}
 							}
 							else
@@ -2076,14 +2186,32 @@ if(!$error)
 				}
 				else
 				{
-					if($buchung->delete($_POST['buchungsnr']))
+					$isAllowedToChange = isBuchungAllowedToChange($buchung);
+					if($isAllowedToChange
+					|| $rechte->isBerechtigt('student/zahlungAdmin',$buchung->studiengang_kz,'suid')
+					)
 					{
-						$return = true;
+						if(!$isAllowedToChange)
+						{
+							// Buchung aus SAP Zwischentabelle loeschen
+							deleteFromSAP($buchung);
+						}
+
+						if($buchung->delete($_POST['buchungsnr']))
+						{
+							$return = true;
+						}
+						else
+						{
+							$errormsg = $buchung->errormsg;
+							$return = false;
+						}
 					}
 					else
 					{
-						$errormsg = $buchung->errormsg;
+						$error = true;
 						$return = false;
+						$errormsg = 'Diese Buchung darf nicht gelöscht werden da diese bereits übertragen wurde';
 					}
 				}
 			}
@@ -2483,7 +2611,7 @@ if(!$error)
 					$_POST['nummer']=$bm->transform_kartennummer($_POST['nummer']);
 
 				//Das speichern von Zutrittskarten ohne Nummern verhindern
-				if($_POST['betriebsmitteltyp']=='Zutrittskarte' && $_POST['nummer']=='')
+				if($_POST['betriebsmitteltyp']=='Zutrittskarte' && ($_POST['nummer']=='' && $_POST['nummer2']==''))
 				{
 					$error = true;
 					$return = false;
@@ -2491,14 +2619,23 @@ if(!$error)
 				}
 				else
 				{
+					if ($_POST['betriebsmitteltyp']=='Zutrittskarte' && $_POST['nummer'] == '')
+					{
+						$resultBM = $bm->getBetriebsmittel($_POST['betriebsmitteltyp'],null, $_POST['nummer2']);
+					}
+					else
+					{
+						$resultBM = $bm->getBetriebsmittel($_POST['betriebsmitteltyp'],$_POST['nummer']);
+					}
+
 					//Nachschauen ob dieses Betriebsmittel schon existiert
-					if($bm->getBetriebsmittel($_POST['betriebsmitteltyp'],$_POST['nummer']))
+					if($resultBM)
 					{
 						if(count($bm->result)>0)
 						{
 							//Wenn die Nummer gleich bleibt dann die alte ID verwenden da es
 							//unterschiedliche Schluessel gibt die die gleiche nummer haben ?!?
-							if($_POST['nummer']==$_POST['nummerold'])
+							if($_POST['nummer'] != '' && $_POST['nummer'] == $_POST['nummerold'])
 							{
 								$betriebsmittel_id = $_POST['betriebsmittel_id'];
 							}
@@ -3065,7 +3202,7 @@ if(!$error)
 
 					if(defined('FAS_PRUEFUNG_BEI_NOTENEINGABE_ANLEGEN') && FAS_PRUEFUNG_BEI_NOTENEINGABE_ANLEGEN && $return == true && $noten->new == true)
 					{
-						NotePruefungAnlegen($studiensemester_kurzbz, $student_uid, $lehrveranstaltung_id, $noten->note);
+						NotePruefungAnlegen($studiensemester_kurzbz, $student_uid, $lehrveranstaltung_id, $noten->note, $noten->punkte);
 					}
 				}
 			}
@@ -3193,7 +3330,7 @@ if(!$error)
 						{
 							if(defined('FAS_PRUEFUNG_BEI_NOTENEINGABE_ANLEGEN') && FAS_PRUEFUNG_BEI_NOTENEINGABE_ANLEGEN && $zeugnisnote->new == true)
 							{
-								NotePruefungAnlegen($zeugnisnote->studiensemester_kurzbz, $zeugnisnote->student_uid, $zeugnisnote->lehrveranstaltung_id, $zeugnisnote->note);
+								NotePruefungAnlegen($zeugnisnote->studiensemester_kurzbz, $zeugnisnote->student_uid, $zeugnisnote->lehrveranstaltung_id, $zeugnisnote->note, $zeugnisnote->punkte);
 							}
 						}
 					}
@@ -3362,7 +3499,7 @@ if(!$error)
 							{
 								if(defined('FAS_PRUEFUNG_BEI_NOTENEINGABE_ANLEGEN') && FAS_PRUEFUNG_BEI_NOTENEINGABE_ANLEGEN && $zeugnisnote->new == true)
 								{
-									NotePruefungAnlegen($semester_aktuell, $uid, $_POST['lehrveranstaltung_id'], $zeugnisnote->note);
+									NotePruefungAnlegen($semester_aktuell, $uid, $_POST['lehrveranstaltung_id'], $zeugnisnote->note, $zeugnisnote->punkte);
 								}
 							}
 						}
@@ -3764,6 +3901,9 @@ if(!$error)
 			$pruefung->pruefer2 = $_POST['pruefer2'];
 			$pruefung->pruefer3 = $_POST['pruefer3'];
 			$pruefung->abschlussbeurteilung_kurzbz = $_POST['abschlussbeurteilung_kurzbz'];
+			if(isset($_POST['pruefungsantritt_kurzbz']))
+				$pruefung->pruefungsantritt_kurzbz = $_POST['pruefungsantritt_kurzbz'];
+
 			$pruefung->note = $_POST['notekommpruef'];
 			$pruefung->akadgrad_id = $_POST['akadgrad_id'];
 			$pruefung->pruefungstyp_kurzbz = $_POST['pruefungstyp_kurzbz'];
@@ -3803,10 +3943,25 @@ if(!$error)
 			if(isset($_POST['abschlusspruefung_id']) && is_numeric($_POST['abschlusspruefung_id']))
 			{
 				$pruefung = new abschlusspruefung();
-
-				if($pruefung->delete($_POST['abschlusspruefung_id']))
+				if($pruefung->load($_POST['abschlusspruefung_id']))
 				{
-					$return = true;
+					if ($pruefung->freigabedatum == '')
+					{
+						if($pruefung->delete($_POST['abschlusspruefung_id']))
+						{
+							$return = true;
+						}
+						else
+						{
+							$errormsg = $pruefung->errormsg;
+							$return = false;
+						}
+					}
+					else
+					{
+						$errormsg = 'Löschen ist nicht möglich da bereits ein freigegebenes Protokoll vorhanden ist';
+						$return = false;
+					}
 				}
 				else
 				{

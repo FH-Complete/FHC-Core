@@ -34,6 +34,6 @@ $this->phrasen['dms_link/lvevaluierungMitarbeiterCMS']=''; //Beschreibung des Ab
 //Links auf externe Seiten
 $this->phrasen['dms_link/dokuwikiGesamtnote']='https://wiki.fhcomplete.org/doku.php?id=cis:gesamtnote'; //Link ins Dokuwiki zur Anleitung Gesamtnote
 $this->phrasen['dms_link/abgabetoolLektorHandbuch']='https://wiki.fhcomplete.org/doku.php?id=cis:abgabetool_fuer_lektoren'; //Abgabetool Handbuch fuer LektorInnen
-$this->phrasen['dms_link/abgabetoolStudentHandbuch']='https://wiki.fhcompleteorg/doku.php?id=cis:abgabetool_fuer_studierende'; //Abgabetool Handbuch fuer Studierende
+$this->phrasen['dms_link/abgabetoolStudentHandbuch']='https://wiki.fhcomplete.org/doku.php?id=cis:abgabetool_fuer_studierende'; //Abgabetool Handbuch fuer Studierende
 $this->phrasen['dms_link/abgabetoolAssistenzHandbuch']='https://wiki.fhcomplete.org/doku.php?id=cis:abgabetool_fuer_lektoren'; //Abgabetool Handbuch fuer Assistenz
 ?>

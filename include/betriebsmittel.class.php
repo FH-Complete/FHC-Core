@@ -407,7 +407,7 @@ class betriebsmittel extends basis_db
 	 * @param $nummer
 	 * @return boolean
 	 */
-	public function getBetriebsmittel($betriebsmitteltyp, $nummer)
+	public function getBetriebsmittel($betriebsmitteltyp, $nummer, $nummer2 = null)
 	{
 		// Initialisieren
 		$this->result=array();
@@ -415,7 +415,16 @@ class betriebsmittel extends basis_db
 
 		$qry= 'SELECT * ';
 		$qry.= ' FROM wawi.tbl_betriebsmittel ';
-		$qry.= " WHERE betriebsmitteltyp=".$this->db_add_param($betriebsmitteltyp)." AND nummer=".$this->db_add_param($nummer);
+		$qry.= " WHERE betriebsmitteltyp=".$this->db_add_param($betriebsmitteltyp);
+		if (is_null($nummer2))
+		{
+			$qry.= " AND nummer=".$this->db_add_param($nummer);
+		}
+		else
+		{
+			$qry.= " AND nummer2=".$this->db_add_param($nummer2);
+		}
+
 		$qry.= ' ORDER BY updateamum DESC';
 
 		if($this->db_query($qry))
@@ -1222,7 +1231,7 @@ class betriebsmittel extends basis_db
     {
 		$this->result='';
 		$this->errormsg = '';
-		
+
         $qry ="SELECT * FROM wawi.tbl_betriebsmittelperson WHERE uid =".$this->db_add_param($uid, FHC_STRING)."
             AND betriebsmittel_id IN(
                 SELECT betriebsmittel_id
@@ -1252,7 +1261,7 @@ class betriebsmittel extends basis_db
 		 {
 			 $this->errormsg = 'Fehler beim Laden der Daten';
 			 return false;
-		 }            
+		 }
     }
 
 	/**

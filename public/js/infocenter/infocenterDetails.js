@@ -38,7 +38,7 @@ $(document).ready(function ()
 	$(".prchbox").click(function ()
 	{
 		var boxid = this.id;
-		var akteid = boxid.substr(boxid.indexOf("_") + 1);
+		var akteid = InfocenterDetails._getPrestudentIdFromElementId(boxid);
 		var checked = this.checked;
 		InfocenterDetails.saveFormalGeprueft(personid, akteid, checked)
 	});
@@ -720,7 +720,7 @@ var InfocenterDetails = {
 		//up/down prioritize Bewerbungen
 		$(".prioup").click(function ()
 		{
-			var prestudentid = this.id.substr(this.id.indexOf("_") + 1);
+			var prestudentid = InfocenterDetails._getPrestudentIdFromElementId(this.id);
 			var data = {
 				"prestudentid": prestudentid,
 				"change": -1
@@ -729,7 +729,7 @@ var InfocenterDetails = {
 		});
 		$(".priodown").click(function ()
 		{
-			var prestudentid = this.id.substr(this.id.indexOf("_") + 1);
+			var prestudentid = InfocenterDetails._getPrestudentIdFromElementId(this.id);
 			var data = {
 				"prestudentid": prestudentid,
 				"change": 1
@@ -741,16 +741,16 @@ var InfocenterDetails = {
 		$(".zgvUebernehmen").click(function ()
 		{
 			var btn = $(this);
-			var prestudentid = this.id.substr(this.id.indexOf("_") + 1);
+			var prestudentid = InfocenterDetails._getPrestudentIdFromElementId(this.id);
 			$('#zgvUebernehmenNotice').remove();
 			InfocenterDetails.zgvUebernehmen(personid, prestudentid, btn);
 		});
 
 		//zgv speichern
-		$(".zgvform").on('submit', function (e)
+		$(".saveZgv").click(function ()
 			{
-				e.preventDefault();
-				var formdata = $(this).serializeArray();
+				var prestudentid = InfocenterDetails._getPrestudentIdFromElementId(this.id);
+				var formdata = $("#zgvform_" + prestudentid).serializeArray();
 
 				var data = {};
 
@@ -766,14 +766,14 @@ var InfocenterDetails = {
 		//show popup with zgvinfo
 		$(".zgvinfo").click(function ()
 			{
-				var prestudentid = this.id.substr(this.id.indexOf("_") + 1);
+				var prestudentid = InfocenterDetails._getPrestudentIdFromElementId(this.id);
 				InfocenterDetails.openZgvInfoForPrestudent(prestudentid);
 			}
 		);
 
 		$(".freigabebtn").click(function()
 			{
-				var prestudentid = this.id.substr(this.id.indexOf("_") + 1);
+				var prestudentid = InfocenterDetails._getPrestudentIdFromElementId(this.id);
 				//true - Reihungstestfreigabe
 				InfocenterDetails._toggleFreigabeDialog(prestudentid, true);
 			}
@@ -781,7 +781,7 @@ var InfocenterDetails = {
 
 		$(".freigabebtnstg").click(function()
 			{
-				var prestudentid = this.id.substr(this.id.indexOf("_") + 1);
+				var prestudentid = InfocenterDetails._getPrestudentIdFromElementId(this.id);
 				var statusgrel = $("#frgstatusgrselect_"+prestudentid+" select[name=frgstatusgrund]");
 				var statusgrund_id = statusgrel.val();
 				var statusgrund = statusgrel.find("option:selected").text();
@@ -800,7 +800,7 @@ var InfocenterDetails = {
 
 		$(".absageBtn").click(function()
 			{
-				var prestudentid = this.id.substr(this.id.indexOf("_") + 1);
+				var prestudentid = InfocenterDetails._getPrestudentIdFromElementId(this.id);
 				var statusgrund = $("#absgstatusgrselect_" + prestudentid + " select[name=absgstatusgrund]").val();
 				if (statusgrund === "null")
 					$("#absgstatusgrselect_" + prestudentid).addClass("has-error");
@@ -820,7 +820,7 @@ var InfocenterDetails = {
 		$(".saveAbsage").click(function()
 			{
 				$(".absageModal").modal("hide");
-				var prestudent_id = this.id.substr(this.id.indexOf("_") + 1);
+				var prestudent_id = InfocenterDetails._getPrestudentIdFromElementId(this.id);
 				var statusgrund_id = $("#absgstatusgrselect_" + prestudent_id + " select[name=absgstatusgrund]").val();
 				var data = {"prestudent_id": prestudent_id , "statusgrund": statusgrund_id};
 				InfocenterDetails.saveAbsage(data);
@@ -830,7 +830,7 @@ var InfocenterDetails = {
 		$(".saveFreigabe").click(function()
 			{
 				$(".freigabeModal").modal("hide");
-				var prestudent_id = this.id.substr(this.id.indexOf("_") + 1);
+				var prestudent_id = InfocenterDetails._getPrestudentIdFromElementId(this.id);
 				var data = {"prestudent_id": prestudent_id, "statusgrund_id": null};
 				InfocenterDetails.saveFreigabe(data);//Reihungstestfreigabe
 			}
@@ -839,14 +839,14 @@ var InfocenterDetails = {
 		$(".saveStgFreigabe").click(function()
 			{
 				$(".freigabeModal").modal("hide");
-				var prestudent_id = this.id.substr(this.id.indexOf("_") + 1);
+				var prestudent_id = InfocenterDetails._getPrestudentIdFromElementId(this.id);
 				var statusgrundel = $("#frgstatusgrselect_" + prestudent_id + " select[name=frgstatusgrund]");
 				var statusgrund_id = statusgrundel.val();
 				var statusgrundbezeichnung = statusgrundel.find("option[value="+statusgrund_id+"]").text();
 				var data = {"prestudent_id": prestudent_id, "statusgrund_id": statusgrund_id, "statusgrundbezeichnung": statusgrundbezeichnung};
 				InfocenterDetails.saveFreigabe(data);//Studiengangfreigabe
 			}
-		)
+		);
 	},
 	_refreshZgv: function(preserveCollapseState)
 	{
@@ -870,6 +870,8 @@ var InfocenterDetails = {
 			CONTROLLER_URL + '/reloadZgvPruefungen/' + personid + '?fhc_controller_id=' + FHC_AjaxClient.getUrlParameter('fhc_controller_id'),
 			function()
 			{
+				// call to UDFWidget again to add events and other JS functionality (before _addZgvPruefungEvents because it adds bootstrap format)
+				FHC_UDFWidget.display();
 				InfocenterDetails._addZgvPruefungEvents(personid);
 				if (preserveCollapseState)
 				{
@@ -1061,5 +1063,9 @@ var InfocenterDetails = {
 	},
 	_genericSaveError: function() {
 		FHC_DialogLib.alertError("error when saving!");
+	},
+	_getPrestudentIdFromElementId(elementid)
+	{
+		return elementid.substr(elementid.indexOf("_") + 1);
 	}
 };
