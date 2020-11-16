@@ -181,6 +181,53 @@ if (isset($personToDelete) && isset($personToKeep) && $personToDelete >= 0 && $p
 			die('Es sind bereits beide Personen in ALMA vorhanden. Bitte zuerst direkt im ALMA Bibliotheksystem und in der tbl_alma lösen.');
 		}
 		
+		
+		// Wenn Person in SAP students vorkommt, ggf. die Person dort übernehmen
+		$sap_students_has_personToKeep = false;
+		$sap_students_has_personToDelete = false;
+		$sap_students_update_obj = new StdClass();
+		$sap_students_query_upd = '';
+		
+		$sap_students_query = "
+					SELECT *
+					FROM sync.tbl_sap_students
+					WHERE (
+						person_id = " . $db->db_add_param($personToKeep, FHC_INTEGER) . " OR
+						person_id = " . $db->db_add_param($personToDelete, FHC_INTEGER) . "
+					)";
+		
+		if ($result = $db->db_query($sap_students_query))
+		{
+			while ($row = $db->db_fetch_object($result))
+			{
+				if ($row->person_id == $personToKeep)
+				{
+					$sap_students_has_personToKeep = true;
+				}
+				if ($row->person_id == $personToDelete)
+				{
+					$sap_students_has_personToDelete = true;
+					$sap_students_update_obj = $row;
+				}
+			}
+		}
+		
+		// Wenn die zu löschende Person in SAP students eingetragen ist, dann mit der zu behaltenden Person überschreiben
+		if ($sap_students_has_personToDelete && !$sap_students_has_personToKeep)
+		{
+			$sap_students_query_upd = "
+				UPDATE sync.tbl_sap_students
+				SET person_id = " . $db->db_add_param($personToKeep, FHC_INTEGER) . "
+				WHERE sap_user_id = " . $db->db_add_param($sap_students_update_obj->sap_user_id, FHC_STRING) . "
+				AND person_id = " . $sap_students_update_obj->person_id . ";";
+		}
+		// Wenn doppelte Personeneinträge in SAP students vorhanden sind (zu löschende UND zu behaltende Person),
+        // dann manuell lösen
+        elseif ($sap_students_has_personToDelete && $sap_students_has_personToKeep)
+		{
+			die('Es sind bereits beide Personen in SAP vorhanden. Bitte zuerst direkt in der tbl_sap_students lösen.');
+		}
+		
 		$personToDelete_obj = new person();
 		if ($personToDelete_obj->load($personToDelete))
 		{
@@ -393,6 +440,7 @@ if (isset($personToDelete) && isset($personToKeep) && $personToDelete >= 0 && $p
 				$sql_query_upd1 .= "UPDATE wawi.tbl_betriebsmittelperson SET person_id=" . $db->db_add_param($personToKeep, FHC_INTEGER) . " WHERE person_id=" . $db->db_add_param($personToDelete, FHC_INTEGER) . ";";
 				$sql_query_upd1 .= "UPDATE wawi.tbl_konto SET person_id=" . $db->db_add_param($personToKeep, FHC_INTEGER) . " WHERE person_id=" . $db->db_add_param($personToDelete, FHC_INTEGER) . ";";
 				$sql_query_upd1 .= $alma_query_upd;
+				$sql_query_upd1 .= $sap_students_query_upd;
 
 				$sql_query_upd1 .= "DELETE FROM public.tbl_person WHERE person_id=" . $db->db_add_param($personToDelete, FHC_INTEGER) . ";";
 
