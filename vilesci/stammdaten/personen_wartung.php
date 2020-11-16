@@ -182,51 +182,117 @@ if (isset($personToDelete) && isset($personToKeep) && $personToDelete >= 0 && $p
 		}
 		
 		
-		// Wenn Person in SAP students vorkommt, ggf. die Person dort übernehmen
-		$sap_students_has_personToKeep = false;
-		$sap_students_has_personToDelete = false;
-		$sap_students_update_obj = new StdClass();
-		$sap_students_query_upd = '';
+		// Prüfen, ob Person Mitarbeiter oder Student ist
+		$uid_toDelete = new Benutzer();
+		$uid_toDelete->getBenutzerFromPerson($personToDelete);
+		$uid_toDelete = $uid_toDelete->result[0]->uid;
 		
-		$sap_students_query = "
+		$mitarbeiter = new Mitarbeiter();
+		$is_Mitarbeiter = $mitarbeiter->load($uid_toDelete);
+		
+		// Wenn Person Mitarbeiter ist, gegebenenfalls die SAP Mitarbeiter Tabelle updaten
+		if($is_Mitarbeiter)
+		{
+			$uid_toKeep = new Benutzer();
+			$uid_toKeep->getBenutzerFromPerson($personToKeep);
+			$uid_toKeep = $uid_toKeep->result[0]->uid;
+			
+			// Wenn Person in SAP students vorkommt, ggf. die Person dort übernehmen
+			$sap_mitarbeiter_has_uidToKeep = false;
+			$sap_mitarbeiter_has_uidToDelete = false;
+			$sap_mitarbeiter_update_obj = new StdClass();
+			$sap_mitarbeiter_query_upd = '';
+			
+			$sap_mitarbeiter_query = "
+					SELECT *
+					FROM sync.tbl_sap_mitarbeiter
+					WHERE (
+						mitarbeiter_uid = " . $db->db_add_param($uid_toKeep) . " OR
+						mitarbeiter_uid = " . $db->db_add_param($uid_toDelete) . "
+					)";
+
+			if ($result = $db->db_query($sap_mitarbeiter_query))
+			{
+				while ($row = $db->db_fetch_object($result))
+				{
+					if ($row->mitarbeiter_uid == $uid_toKeep)
+					{
+						$sap_mitarbeiter_has_uidToKeep = true;
+					}
+					if ($row->mitarbeiter_uid == $uid_toDelete)
+					{
+						$sap_mitarbeiter_has_uidToDelete = true;
+						$sap_mitarbeiter_update_obj = $row;
+					}
+				}
+			}
+			
+			// Wenn die zu löschende Person in SAP students eingetragen ist, dann mit der zu behaltenden Person überschreiben
+			if ($sap_mitarbeiter_has_uidToDelete && !$sap_mitarbeiter_has_uidToKeep)
+			{
+				$sap_mitarbeiter_query_upd = "
+				UPDATE sync.tbl_sap_mitarbeiter
+				SET mitarbeiter_uid = " . $db->db_add_param($uid_toKeep) . "
+				WHERE sap_eeid = " . $db->db_add_param($sap_mitarbeiter_update_obj->sap_eeid) . "
+				AND mitarbeiter_uid = " . $db->db_add_param($sap_mitarbeiter_update_obj->mitarbeiter_uid) . ";";
+			}
+			// Wenn doppelte Personeneinträge in SAP students vorhanden sind (zu löschende UND zu behaltende Person),
+			// dann manuell lösen
+            elseif ($sap_mitarbeiter_has_uidToDelete && $sap_mitarbeiter_has_uidToKeep)
+			{
+				die('Es sind bereits beide Personen in SAP vorhanden. Bitte zuerst direkt in der tbl_sap_mitarbeiter lösen.');
+			}
+			
+		}
+		// Wenn Person Student ist, gegebenenfalls die SAP Studenten Tabelle updaten
+		else
+        {
+	        $sap_students_has_personToKeep = false;
+	        $sap_students_has_personToDelete = false;
+	        $sap_students_update_obj = new StdClass();
+	        $sap_students_query_upd = '';
+	
+	        $sap_students_query = "
 					SELECT *
 					FROM sync.tbl_sap_students
 					WHERE (
 						person_id = " . $db->db_add_param($personToKeep, FHC_INTEGER) . " OR
 						person_id = " . $db->db_add_param($personToDelete, FHC_INTEGER) . "
 					)";
-		
-		if ($result = $db->db_query($sap_students_query))
-		{
-			while ($row = $db->db_fetch_object($result))
-			{
-				if ($row->person_id == $personToKeep)
-				{
-					$sap_students_has_personToKeep = true;
-				}
-				if ($row->person_id == $personToDelete)
-				{
-					$sap_students_has_personToDelete = true;
-					$sap_students_update_obj = $row;
-				}
-			}
-		}
-		
-		// Wenn die zu löschende Person in SAP students eingetragen ist, dann mit der zu behaltenden Person überschreiben
-		if ($sap_students_has_personToDelete && !$sap_students_has_personToKeep)
-		{
-			$sap_students_query_upd = "
+
+	        if ($result = $db->db_query($sap_students_query))
+	        {
+		        while ($row = $db->db_fetch_object($result))
+		        {
+			        if ($row->person_id == $personToKeep)
+			        {
+				        $sap_students_has_personToKeep = true;
+			        }
+			        if ($row->person_id == $personToDelete)
+			        {
+				        $sap_students_has_personToDelete = true;
+				        $sap_students_update_obj = $row;
+			        }
+		        }
+	        }
+	
+	        // Wenn die zu löschende Person in SAP students eingetragen ist, dann mit der zu behaltenden Person überschreiben
+	        if ($sap_students_has_personToDelete && !$sap_students_has_personToKeep)
+	        {
+		        $sap_students_query_upd = "
 				UPDATE sync.tbl_sap_students
 				SET person_id = " . $db->db_add_param($personToKeep, FHC_INTEGER) . "
 				WHERE sap_user_id = " . $db->db_add_param($sap_students_update_obj->sap_user_id, FHC_STRING) . "
 				AND person_id = " . $sap_students_update_obj->person_id . ";";
-		}
-		// Wenn doppelte Personeneinträge in SAP students vorhanden sind (zu löschende UND zu behaltende Person),
-        // dann manuell lösen
-        elseif ($sap_students_has_personToDelete && $sap_students_has_personToKeep)
-		{
-			die('Es sind bereits beide Personen in SAP vorhanden. Bitte zuerst direkt in der tbl_sap_students lösen.');
-		}
+	        }
+	        // Wenn doppelte Personeneinträge in SAP students vorhanden sind (zu löschende UND zu behaltende Person),
+	        // dann manuell lösen
+            elseif ($sap_students_has_personToDelete && $sap_students_has_personToKeep)
+	        {
+		        die('Es sind bereits beide Personen in SAP vorhanden. Bitte zuerst direkt in der tbl_sap_students lösen.');
+	        }
+        }
+		
 		
 		$personToDelete_obj = new person();
 		if ($personToDelete_obj->load($personToDelete))
@@ -440,7 +506,16 @@ if (isset($personToDelete) && isset($personToKeep) && $personToDelete >= 0 && $p
 				$sql_query_upd1 .= "UPDATE wawi.tbl_betriebsmittelperson SET person_id=" . $db->db_add_param($personToKeep, FHC_INTEGER) . " WHERE person_id=" . $db->db_add_param($personToDelete, FHC_INTEGER) . ";";
 				$sql_query_upd1 .= "UPDATE wawi.tbl_konto SET person_id=" . $db->db_add_param($personToKeep, FHC_INTEGER) . " WHERE person_id=" . $db->db_add_param($personToDelete, FHC_INTEGER) . ";";
 				$sql_query_upd1 .= $alma_query_upd;
-				$sql_query_upd1 .= $sap_students_query_upd;
+				// Wenn Person Mitarbeiter ist, ggf. SAP Mitarbeiter updaten
+				if ($is_Mitarbeiter)
+                {
+	                $sql_query_upd1 .= $sap_mitarbeiter_query_upd;
+                }
+				// Wenn Person Student ist, ggf. SAP Studententabelle updaten
+				if (!$is_Mitarbeiter)
+                {
+	                $sql_query_upd1 .= $sap_students_query_upd;
+                }
 
 				$sql_query_upd1 .= "DELETE FROM public.tbl_person WHERE person_id=" . $db->db_add_param($personToDelete, FHC_INTEGER) . ";";
 
