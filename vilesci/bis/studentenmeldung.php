@@ -144,9 +144,9 @@ derzeit fuer alle Studierende der gleiche Standort
 ToDo: Standort sollte pro Student konfigurierbar sein.
 */
 $standortcode='22';
-if(in_array($stg_kz,array('265','268','761','760','266','267','764','269','400')))
+if(in_array($stg_kz,array('265','268','761','760','266','267','764','269','400','794','795','786','859')))
 	$standortcode='14'; // Pinkafeld
-elseif(in_array($stg_kz,array('639','640','263','743','364','635','402','401','725','264','271')))
+elseif(in_array($stg_kz,array('639','640','263','743','364','635','402','401','725','264','271','781')))
 	$standortcode='3'; // Eisenstadt
 
 $datumobj=new datum();
@@ -751,7 +751,7 @@ function GenerateXMLStudentBlock($row)
 	{
 		$error_log.=(!empty($error_log)?', ':'')."Heimat-Nation ('".$nation."')";
 	}
-	if($row->bpk == '' || $row->bpk == null)
+	/*if($row->bpk == '' || $row->bpk == null)
 	{
 		$error_log .= (!empty($error_log) ? ', ' : '') . "bPK fehlt";
 	}
@@ -766,7 +766,7 @@ function GenerateXMLStudentBlock($row)
 		{
 			$error_log.=(!empty($error_log) ? ', ' : ''). "bPK ist nicht 28 Zeichen lang";
 		}
-	}
+	}*/
 	if (!$ausserordentlich && !$incoming)
 	{
 		if ($zustell_plz == '' || $zustell_plz == null)
@@ -1198,9 +1198,9 @@ function GenerateXMLStudentBlock($row)
 			<ErsKz>" . $row->ersatzkennzeichen . "</ErsKz>";
 		}
 
-		$datei .= "
+		/*$datei .= "
 			<bPK>" . $row->bpk . "</bPK>
-		";
+		";*/
 
 		$datei .= "
 			<StaatsangehoerigkeitCode>" . $row->staatsbuergerschaft . "</StaatsangehoerigkeitCode>
@@ -1368,7 +1368,7 @@ function GenerateXMLStudentBlock($row)
 					if (!in_array($row_zweck->zweck_code, $zweck_code_arr))
 					{
 						// Aufenthaltszweck 1, 2, 3 nicht gemeinsam melden
-						if (!empty(array_intersect(array(1, 2, 3), $zweck_code_arr)))
+						if (in_array(1,$zweck_code_arr) && in_array(2,$zweck_code_arr) && in_array(3,$zweck_code_arr))
 						{
 							$error_log_io .= (!empty($error_log_io) ? ', ' : '').
 								"Aufenthaltzweckcode 1, 2, 3 d&uuml;rfen nicht gemeinsam gemeldet werden";
