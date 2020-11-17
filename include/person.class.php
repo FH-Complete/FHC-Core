@@ -374,7 +374,7 @@ class person extends basis_db
 			$this->errormsg = 'Staatsbuergerschaft darf nicht laenger als 3 Zeichen sein';
 			return false;
 		}
-		
+
 		//Pruefen ob das Geburtsdatum mit der SVNR uebereinstimmt.
 		if ($this->svnr != '' && $this->gebdatum != '')
 		{
@@ -1022,7 +1022,7 @@ class person extends basis_db
 	public function getFullNameFromBenutzer($uid)
 	{
 		$qry = "SELECT
-					*
+					vorname, nachname
 				FROM
 					public.tbl_person
 					JOIN public.tbl_benutzer USING(person_id)
