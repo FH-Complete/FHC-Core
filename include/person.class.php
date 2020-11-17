@@ -1018,4 +1018,33 @@ class person extends basis_db
 			return false;
 		}
 	}
+
+	public function getFullNameFromBenutzer($uid)
+	{
+		$qry = "SELECT
+					*
+				FROM
+					public.tbl_person
+					JOIN public.tbl_benutzer USING(person_id)
+				WHERE
+					uid=".$this->db_add_param($uid, FHC_STRING);
+
+		if ($this->db_query($qry))
+		{
+			if ($row = $this->db_fetch_object())
+			{
+				return (string)$row->vorname.' '.$row->nachname;
+			}
+			else
+			{
+				$this->errormsg = 'Keine Personendaten zu dieser UID gefunden';
+				return false;
+			}
+		}
+		else
+		{
+			$this->errormsg = "Fehler beim Laden der Personendaten";
+			return false;
+		}
+	}
 }
