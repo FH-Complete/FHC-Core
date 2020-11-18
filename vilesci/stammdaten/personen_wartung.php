@@ -135,97 +135,97 @@ if (isset($personToDelete) && isset($personToKeep) && $personToDelete >= 0 && $p
 	}
 	else
 	{
-		// Wenn Person in ALMA Bibliothek vorkommt, ggf. die Person dort übernehmen
-		$alma_has_personToKeep = false;
-		$alma_has_personToDelete = false;
-		$alma_update_obj = new StdClass();
-		$alma_query_upd = '';
-  
-		$alma_query = "
-					SELECT *
-					FROM sync.tbl_alma
-					WHERE (
-						person_id = " . $db->db_add_param($personToKeep, FHC_INTEGER) . " OR
-						person_id = " . $db->db_add_param($personToDelete, FHC_INTEGER) . "
-					)";
-		
-		
-		if ($result = $db->db_query($alma_query))
+		// Prüfen, ob tbl_alma existiert (also ob ALMA extension installiert ist)
+		if($result = @$db->db_query("SELECT 1 FROM sync.tbl_alma LIMIT 1"))
 		{
-			while ($row = $db->db_fetch_object($result))
+			// Wenn Person in ALMA Bibliothek vorkommt, ggf. die Person dort übernehmen
+			$alma_has_personToKeep = false;
+			$alma_has_personToDelete = false;
+			$alma_update_obj = new StdClass();
+			$alma_query_upd = '';
+
+			$alma_query = "
+						SELECT *
+						FROM sync.tbl_alma
+						WHERE (
+							person_id = " . $db->db_add_param($personToKeep, FHC_INTEGER) . " OR
+							person_id = " . $db->db_add_param($personToDelete, FHC_INTEGER) . "
+						)";
+
+			if ($result = $db->db_query($alma_query))
 			{
-				if ($row->person_id == $personToKeep)
+				while ($row = $db->db_fetch_object($result))
 				{
-					$alma_has_personToKeep = true;
-				}
-				if ($row->person_id == $personToDelete)
-				{
-					$alma_has_personToDelete = true;
-					$alma_update_obj = $row;
+					if ($row->person_id == $personToKeep)
+					{
+						$alma_has_personToKeep = true;
+					}
+					if ($row->person_id == $personToDelete)
+					{
+						$alma_has_personToDelete = true;
+						$alma_update_obj = $row;
+					}
 				}
 			}
-		}
-		
-		// Falls nur die zu löschende Person in ALMA vorhanden ist, mit der zu behaltenden Person ersetzen
-		if ($alma_has_personToDelete && !$alma_has_personToKeep)
+
+			// Falls nur die zu löschende Person in ALMA vorhanden ist, mit der zu behaltenden Person ersetzen
+			if ($alma_has_personToDelete && !$alma_has_personToKeep)
+			{
+				$alma_query_upd = "
+					UPDATE sync.tbl_alma
+					SET person_id = " . $db->db_add_param($personToKeep, FHC_INTEGER) . "
+					WHERE alma_match_id = " . $alma_update_obj->alma_match_id . "
+					AND person_id = " . $alma_update_obj->person_id . ";";
+			}
+			// Falls bereits doppelte Einträge in ALMA vorhanden sind (zu löschende und zu behaltende), manuell lösen
+			elseif ($alma_has_personToDelete && $alma_has_personToKeep)
+			{
+				die('Es sind bereits beide Personen in ALMA vorhanden. Bitte zuerst direkt im ALMA Bibliotheksystem und in der tbl_alma lösen.');
+			}
+	   }
+
+		// Prüfen, ob tbl_sap_students exisitiert
+		if($result = @$db->db_query("SELECT 1 FROM sync.tbl_sap_students LIMIT 1"))
 		{
-			$alma_query_upd = "
-				UPDATE sync.tbl_alma
-				SET person_id = " . $db->db_add_param($personToKeep, FHC_INTEGER) . "
-				WHERE alma_match_id = " . $alma_update_obj->alma_match_id . "
-				AND person_id = " . $alma_update_obj->person_id . ";";
-		}
-		// Falls bereits doppelte Einträge in ALMA vorhanden sind, manuell lösen
-		elseif ($alma_has_personToDelete && $alma_has_personToKeep)
-		{
-			die('Es sind bereits beide Personen in ALMA vorhanden. Bitte zuerst direkt im ALMA Bibliotheksystem und in der tbl_alma lösen.');
-		}
-		
-		
-		// Wenn Person in SAP students vorkommt, ggf. die Person dort übernehmen
-		$sap_students_has_personToKeep = false;
-		$sap_students_has_personToDelete = false;
-		$sap_students_update_obj = new StdClass();
-		$sap_students_query_upd = '';
-		
-		$sap_students_query = "
+			// Wenn Person in SAP students vorkommt, ggf. die Person dort übernehmen
+			$sap_students_has_personToKeep = false;
+			$sap_students_has_personToDelete = false;
+			$sap_students_update_obj = new StdClass();
+			$sap_students_query_upd = '';
+
+			$sap_students_query = "
 					SELECT *
 					FROM sync.tbl_sap_students
 					WHERE (
 						person_id = " . $db->db_add_param($personToKeep, FHC_INTEGER) . " OR
 						person_id = " . $db->db_add_param($personToDelete, FHC_INTEGER) . "
 					)";
-		
-		if ($result = $db->db_query($sap_students_query))
-		{
-			while ($row = $db->db_fetch_object($result))
-			{
-				if ($row->person_id == $personToKeep)
-				{
-					$sap_students_has_personToKeep = true;
-				}
-				if ($row->person_id == $personToDelete)
-				{
-					$sap_students_has_personToDelete = true;
-					$sap_students_update_obj = $row;
+
+			if ($result = $db->db_query($sap_students_query)) {
+				while ($row = $db->db_fetch_object($result)) {
+					if ($row->person_id == $personToKeep) {
+						$sap_students_has_personToKeep = true;
+					}
+					if ($row->person_id == $personToDelete) {
+						$sap_students_has_personToDelete = true;
+						$sap_students_update_obj = $row;
+					}
 				}
 			}
-		}
-		
-		// Wenn die zu löschende Person in SAP students eingetragen ist, dann mit der zu behaltenden Person überschreiben
-		if ($sap_students_has_personToDelete && !$sap_students_has_personToKeep)
-		{
-			$sap_students_query_upd = "
+
+			// Wenn die zu löschende Person in SAP students eingetragen ist, dann mit der zu behaltenden Person überschreiben
+			if ($sap_students_has_personToDelete && !$sap_students_has_personToKeep) {
+				$sap_students_query_upd = "
 				UPDATE sync.tbl_sap_students
 				SET person_id = " . $db->db_add_param($personToKeep, FHC_INTEGER) . "
 				WHERE sap_user_id = " . $db->db_add_param($sap_students_update_obj->sap_user_id, FHC_STRING) . "
 				AND person_id = " . $sap_students_update_obj->person_id . ";";
-		}
-		// Wenn doppelte Personeneinträge in SAP students vorhanden sind (zu löschende UND zu behaltende Person),
-        // dann manuell lösen
-        elseif ($sap_students_has_personToDelete && $sap_students_has_personToKeep)
-		{
-			die('Es sind bereits beide Personen in SAP vorhanden. Bitte zuerst direkt in der tbl_sap_students lösen.');
+			}
+			// Wenn doppelte Personeneinträge in SAP students vorhanden sind (zu löschende UND zu behaltende Person),
+			// dann manuell lösen
+            elseif ($sap_students_has_personToDelete && $sap_students_has_personToKeep) {
+				die('Es sind bereits beide Personen in SAP vorhanden. Bitte zuerst direkt in der tbl_sap_students lösen.');
+			}
 		}
 		
 		$personToDelete_obj = new person();
