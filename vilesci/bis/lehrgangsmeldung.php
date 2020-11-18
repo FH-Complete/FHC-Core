@@ -379,7 +379,7 @@ if($result = $db->db_query($qry))
 				}
 			}
 		}
-		if($row->bpk == '' || $row->bpk == null)
+		/*if($row->bpk == '' || $row->bpk == null)
 		{
 			$error_log .= (!empty($error_log) ? ', ' : '') . "bPK fehlt";
 		}
@@ -395,7 +395,7 @@ if($result = $db->db_query($qry))
 			{
 				$error_log.=(!empty($error_log) ? ', ' : ''). "bPK ist nicht 28 Zeichen lang";
 			}
-		}
+		}*/
 		
 		if ($zustell_plz == '' || $zustell_plz == null)
 		{
@@ -626,9 +626,9 @@ if($result = $db->db_query($qry))
 				<ErsKz>".$row->ersatzkennzeichen."</ErsKz>";
 				}
 			
-				$datei.="
+				/*$datei.="
 				<bPK>".$row->bpk."</bPK>
-				";
+				";*/
 
 				$datei.="
 				<StaatsangehoerigkeitCode>".$row->staatsbuergerschaft."</StaatsangehoerigkeitCode>
