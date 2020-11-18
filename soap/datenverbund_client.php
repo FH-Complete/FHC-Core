@@ -469,7 +469,14 @@ if (isset($_REQUEST['submit']))
 			break;
 	}
 	if (isset($_POST['debug']))
-		echo '<div style="color: gray">'.nl2br(htmlentities($dvb->debug_output)).'</div>';
+	{
+		$output = nl2br(htmlentities($dvb->debug_output));
+		$output = str_replace('&gt;&lt;','&gt;<br>&lt;',$output);
+		$output = preg_replace('/(&lt;uni:.*?&gt;)/','<span style="color: deepskyblue">$1</span>',$output);
+		$output = preg_replace('/(&lt;\/uni:.*?&gt;)/','<span style="color: deepskyblue">$1</span>',$output);
+
+		echo '<div style="color: gray">'.$output.'</div>';
+	}
 }
 
 ?>
