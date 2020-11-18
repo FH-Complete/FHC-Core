@@ -602,13 +602,17 @@ class MessageLib
 
 						if (isError($benutzerResult)) return $benutzerResult; // if an error occured then return it
 
-						// Checks if the user was NOT created in the last 24 hours
-						if (getData($benutzerResult)[0]->insertamum > date('Y-m-d H:i:s', strtotime('+1 day')))
+						// If an active user for the given organization unit was found
+						if (hasData($benutzerResult))
 						{
-							// Use the uid + domain email
-							if (hasData($benutzerResult)) $message->receiverContact = getData($benutzerResult)[0]->uid .'@'.DOMAIN;
+							// Checks if the user was NOT created in the last 24 hours
+							if (getData($benutzerResult)[0]->insertamum > date('Y-m-d H:i:s', strtotime('+1 day')))
+							{
+								// Use the uid + domain email
+								$message->receiverContact = getData($benutzerResult)[0]->uid .'@'.DOMAIN;
+							}
+							// otherwise do NOT use the internal email account
 						}
-						// otherwise do NOT use the internal email account
 					}
 
 					// Otherwise try with the private email
@@ -692,14 +696,18 @@ class MessageLib
 									);
 									if (isError($benutzerResult)) return $benutzerResult; // if an error occured then return it
 
-									// For each benutzer found for this person
-									foreach (getData($benutzerResult) as $benutzer)
+									// If an active user for the given organization unit was found
+									if (hasData($benutzerResult))
 									{
-										// Checks if the user was NOT created in the last 24 hours
-										if (getData($benutzerResult)[0]->insertamum > date('Y-m-d H:i:s', strtotime('+1 day')))
+										// For each benutzer found for this person
+										foreach (getData($benutzerResult) as $benutzer)
 										{
-											// Use the uid + domain as email address
-											$message->receiverContact = getData($benutzerResult)[0]->uid .'@'.DOMAIN;
+											// Checks if the user was NOT created in the last 24 hours
+											if (getData($benutzerResult)[0]->insertamum > date('Y-m-d H:i:s', strtotime('+1 day')))
+											{
+												// Use the uid + domain as email address
+												$message->receiverContact = getData($benutzerResult)[0]->uid .'@'.DOMAIN;
+											}
 										}
 									}
 
