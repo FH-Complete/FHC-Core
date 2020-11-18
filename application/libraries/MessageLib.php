@@ -606,7 +606,7 @@ class MessageLib
 						if (hasData($benutzerResult))
 						{
 							// Checks if the user was NOT created in the last 24 hours
-							if (getData($benutzerResult)[0]->insertamum > date('Y-m-d H:i:s', strtotime('+1 day')))
+							if (getData($benutzerResult)[0]->insertamum > date('Y-m-d H:i:s', strtotime('-1 day')))
 							{
 								// Use the uid + domain email
 								$message->receiverContact = getData($benutzerResult)[0]->uid .'@'.DOMAIN;
@@ -657,7 +657,7 @@ class MessageLib
 							// If there are presetudent
 							if (hasData($prestudentResults))
 							{
-								$inArray = true;
+								$privateOnly = false;
 								$organisationUnits = getData($prestudentResults);
 
 								// Look if any of the organization units of this prestudent are in the list of the
@@ -665,16 +665,21 @@ class MessageLib
 								foreach ($organisationUnits as $organisationUnit)
 								{
 									// If the recipient organisation unit is NOT in the list of organisation units that sent only to private emails
+									// NOTE: done in this way because it is easyer to check the result of array_search
 									if (array_search($organisationUnit, $this->_ci->config->item(self::CFG_OU_RECEIVERS_PRIVATE)) === false)
 									{
-										$inArray = false;
+										// NOP
+									}
+									else // otherwise If the recipient organisation unit is the list of organisation units that sent only to private emails
+									{
+										$privateOnly = true;
 										break;
 									}
 								}
 
 								// If the recipient prestudent organization unit is not in in the list of the
 								// organization units that will not send the notice email to the internal account
-								if (!$inArray)
+								if ($privateOnly)
 								{
 									// Then use the private email
 									$privateEmailResult = $this->_getPrivateEmail($message->receiver_id);
@@ -703,7 +708,7 @@ class MessageLib
 										foreach (getData($benutzerResult) as $benutzer)
 										{
 											// Checks if the user was NOT created in the last 24 hours
-											if (getData($benutzerResult)[0]->insertamum > date('Y-m-d H:i:s', strtotime('+1 day')))
+											if (getData($benutzerResult)[0]->insertamum > date('Y-m-d H:i:s', strtotime('-1 day')))
 											{
 												// Use the uid + domain as email address
 												$message->receiverContact = getData($benutzerResult)[0]->uid .'@'.DOMAIN;
