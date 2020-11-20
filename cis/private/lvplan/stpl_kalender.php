@@ -308,14 +308,7 @@ while($begin<$ende)
 	// Stundenplan der Woche drucken
 	if($format=='csv' || $format=='ical')
 	{
-		if($moodle)
-		{
-			$stdplan->draw_week_csv_include_moodle($target, LVPLAN_KATEGORIE);
-		}
-		else
-		{
-			$stdplan->draw_week_csv($target, LVPLAN_KATEGORIE);
-		}
+		$stdplan->draw_week_csv($target, LVPLAN_KATEGORIE);
 	}
 	elseif($format=='excel')
 	{
