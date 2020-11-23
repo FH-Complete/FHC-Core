@@ -606,7 +606,7 @@ class MessageLib
 						if (hasData($benutzerResult))
 						{
 							// Checks if the user was NOT created in the last 24 hours
-							if (getData($benutzerResult)[0]->insertamum > date('Y-m-d H:i:s', strtotime('-1 day')))
+							if (getData($benutzerResult)[0]->insertamum < date('Y-m-d H:i:s', strtotime('-1 day')))
 							{
 								// Use the uid + domain email
 								$message->receiverContact = getData($benutzerResult)[0]->uid .'@'.DOMAIN;
@@ -708,7 +708,7 @@ class MessageLib
 										foreach (getData($benutzerResult) as $benutzer)
 										{
 											// Checks if the user was NOT created in the last 24 hours
-											if (getData($benutzerResult)[0]->insertamum > date('Y-m-d H:i:s', strtotime('-1 day')))
+											if (getData($benutzerResult)[0]->insertamum < date('Y-m-d H:i:s', strtotime('-1 day')))
 											{
 												// Use the uid + domain as email address
 												$message->receiverContact = getData($benutzerResult)[0]->uid .'@'.DOMAIN;
