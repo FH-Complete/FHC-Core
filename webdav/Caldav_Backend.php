@@ -209,8 +209,6 @@ class MySabre_CalDAV_Backend extends \Sabre\CalDAV\Backend\AbstractBackend
 			}
 
 			$val = $stdplan->draw_week_csv('return', LVPLAN_KATEGORIE);
-
-			;
 			if(!is_null($objectUri))
 			{
 				foreach($val as $row)
