@@ -287,14 +287,23 @@ class Messages_model extends CI_Model
 
 		$sender = getData($senderResult)[0]; // Found sender data
 
-		// If the sender is not the system sender and are present configurations to reply
+		// If the sender is not the system sender and the receiver is not the system sender
+		// and are present configurations to reply
 		$hrefReply = '';
 		if ($message->sender_id != $this->config->item(MessageLib::CFG_SYSTEM_PERSON_ID)
+			&& $message->receiver_id != $this->config->item(MessageLib::CFG_SYSTEM_PERSON_ID)
 			&& !isEmptyString($this->config->item(MessageLib::CFG_REDIRECT_VIEW_MESSAGE_URL)))
 		{
 			$hrefReply = $this->config->item(MessageLib::CFG_MESSAGE_SERVER).
 				$this->config->item(MessageLib::CFG_REDIRECT_VIEW_MESSAGE_URL).
 				$token;
+		}
+
+		// If the receiver is the system sender (the message was sent to an organization unit)
+		// redirect the reply to an authenticated controller to reply
+		if ($message->receiver_id == $this->config->item(MessageLib::CFG_SYSTEM_PERSON_ID))
+		{
+			$hrefReply = site_url('system/messages/MessageClient/writeReply?token='.$token);
 		}
 
 		return array (
@@ -417,23 +426,20 @@ class Messages_model extends CI_Model
 
 			$message = $this->messagelib->sendMessageUser(
 				$msgVarsDataArray['person_id'],	// receiverPersonId
-				$parsedSubject,					// subject
-				$parsedBody,					// body
-				$sender_id,						// sender_id
-				$senderOU,						// senderOU
-				$relationmessage_id,			// relationmessage_id
-				MSG_PRIORITY_NORMAL				// priority
+				$parsedSubject,			// subject
+				$parsedBody,			// body
+				$sender_id,			// sender_id
+				$senderOU,			// senderOU
+				$relationmessage_id,		// relationmessage_id
+				MSG_PRIORITY_NORMAL		// priority
 			);
 
 			if (isError($message)) return $message;
 			if (!hasData($message)) return error('No messages were saved in database');
 
-			// Write log entry only if persons were given
-			if ($type == self::TYPE_PERSONS)
-			{
-				$personLog = $this->_personLog($sender_id, $msgVarsDataArray['person_id'], getData($message)[0]);
-				if (isError($personLog)) return $personLog;
-			}
+			// Write log entry only
+			$personLog = $this->_personLog($sender_id, $msgVarsDataArray['person_id'], getData($message)[0]);
+			if (isError($personLog)) return $personLog;
 
 			$receiversCounter++; // increment the counter
 		}

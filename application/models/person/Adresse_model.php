@@ -14,12 +14,14 @@ class Adresse_model extends DB_Model
 
 
 	/**
-	 * gets person data from uid
-	 * @param $uid
+	 * Get Zustelladress of given person.
+	 * @param string $person_id
+	 * @param string $select
 	 * @return array
 	 */
-	public function getZustellAdresse($person_id)
+	public function getZustellAdresse($person_id, $select = '*')
 	{
+		$this->addSelect($select);
 		return $this->loadWhere(array('person_id' => $person_id, 'zustelladresse'=> true));
 	}
 }

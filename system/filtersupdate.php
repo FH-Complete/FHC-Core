@@ -33,6 +33,7 @@ $filters = array(
 					{"name": "Vorname"},
 					{"name": "Nachname"},
 					{"name": "Nation"},
+					{"name": "ZGVNation"},
 					{"name": "StgAbgeschickt"},
 					{"name": "Studiensemester"},
 					{"name": "LastAction"},
@@ -66,6 +67,7 @@ $filters = array(
 					{"name": "Vorname"},
 					{"name": "Nachname"},
 					{"name": "Nation"},
+					{"name": "ZGVNation"},
 					{"name": "StgAbgeschickt"},
 					{"name": "Studiensemester"},
 					{"name": "LastAction"},
@@ -105,6 +107,7 @@ $filters = array(
 					{"name": "Vorname"},
 					{"name": "Nachname"},
 					{"name": "Nation"},
+					{"name": "ZGVNation"},
 					{"name": "LastAction"},
 					{"name": "LastActionType"},
 					{"name": "User/Operator"},
@@ -140,6 +143,7 @@ $filters = array(
 					{"name": "Vorname"},
 					{"name": "Nachname"},
 					{"name": "Nation"},
+					{"name": "ZGVNation"},
 					{"name": "LastAction"},
 					{"name": "User/Operator"},
 					{"name": "LockUser"},
@@ -180,6 +184,7 @@ $filters = array(
 					{"name": "Vorname"},
 					{"name": "Nachname"},
 					{"name": "Nation"},
+					{"name": "ZGVNation"},
 					{"name": "StgAbgeschickt"},
 					{"name": "Studiensemester"},
 					{"name": "LastAction"},
@@ -218,6 +223,7 @@ $filters = array(
 					{"name": "Vorname"},
 					{"name": "Nachname"},
 					{"name": "Nation"},
+					{"name": "ZGVNation"},
 					{"name": "LastAction"},
 					{"name": "User/Operator"},
 					{"name": "LockUser"},
@@ -438,13 +444,13 @@ $filters = array(
 	array(
 		'app' => 'core',
 		'dataset_name' => 'logs',
-		'filter_kurzbz' => 'last7days',
-		'description' => '{Last 7 days logs}',
+		'filter_kurzbz' => 'last1min',
+		'description' => '{Last minute logs}',
 		'sort' => 1,
 		'default_filter' => true,
 		'filter' => '
 			{
-				"name": "All logs from the last 7 days",
+				"name": "All logs from the last minute",
 				"columns": [
 					{"name": "RequestId"},
 					{"name": "ExecutionTime"},
@@ -456,8 +462,8 @@ $filters = array(
 					{
 						"name": "ExecutionTime",
 						"operation": "lt",
-						"condition": "7",
-						"option": "days"
+						"condition": "1",
+						"option": "minutes"
 					}
 				]
 			}
@@ -467,13 +473,13 @@ $filters = array(
 	array(
 		'app' => 'core',
 		'dataset_name' => 'logs',
-		'filter_kurzbz' => 'jobs14days',
-		'description' => '{Last 14 days jobs logs}',
+		'filter_kurzbz' => 'jobs24hours',
+		'description' => '{Last 24 hours jobs logs}',
 		'sort' => 2,
 		'default_filter' => false,
 		'filter' => '
 			{
-				"name": "All jobs logs from the last 14 days",
+				"name": "All jobs logs from the last 24 hours",
 				"columns": [
 					{"name": "RequestId"},
 					{"name": "ExecutionTime"},
@@ -488,10 +494,132 @@ $filters = array(
 						"condition": "job"
 					},
 					{
+						"name": "RequestId",
+						"operation": "contains",
+						"condition": "JOB"
+					},
+					{
 						"name": "ExecutionTime",
 						"operation": "lt",
-						"condition": "14",
-						"option": "days"
+						"condition": "24",
+						"option": "hours"
+					}
+				]
+			}
+		',
+		'oe_kurzbz' => null,
+	),
+	array(
+		'app' => 'core',
+		'dataset_name' => 'logs',
+		'filter_kurzbz' => 'jobs48hours',
+		'description' => '{Last 48 hours jobs logs}',
+		'sort' => 2,
+		'default_filter' => false,
+		'filter' => '
+			{
+				"name": "All jobs logs from the last 48 hours",
+				"columns": [
+					{"name": "RequestId"},
+					{"name": "ExecutionTime"},
+					{"name": "ExecutedBy"},
+					{"name": "Description"},
+					{"name": "Data"}
+				],
+				"filters": [
+					{
+						"name": "WebserviceType",
+						"operation": "contains",
+						"condition": "job"
+					},
+					{
+						"name": "RequestId",
+						"operation": "contains",
+						"condition": "JOB"
+					},
+					{
+						"name": "ExecutionTime",
+						"operation": "lt",
+						"condition": "48",
+						"option": "hours"
+					}
+				]
+			}
+		',
+		'oe_kurzbz' => null,
+	),
+	array(
+		'app' => 'core',
+		'dataset_name' => 'logs',
+		'filter_kurzbz' => 'jqws24hours',
+		'description' => '{Last 24 hours JQWs logs}',
+		'sort' => 2,
+		'default_filter' => false,
+		'filter' => '
+			{
+				"name": "All Job Queue Workers logs from the last 24 hours",
+				"columns": [
+					{"name": "RequestId"},
+					{"name": "ExecutionTime"},
+					{"name": "ExecutedBy"},
+					{"name": "Description"},
+					{"name": "Data"}
+				],
+				"filters": [
+					{
+						"name": "WebserviceType",
+						"operation": "contains",
+						"condition": "job"
+					},
+					{
+						"name": "RequestId",
+						"operation": "contains",
+						"condition": "JQW"
+					},
+					{
+						"name": "ExecutionTime",
+						"operation": "lt",
+						"condition": "24",
+						"option": "hours"
+					}
+				]
+			}
+		',
+		'oe_kurzbz' => null,
+	),
+	array(
+		'app' => 'core',
+		'dataset_name' => 'logs',
+		'filter_kurzbz' => 'jqws48hours',
+		'description' => '{Last 48 hours JQWs logs}',
+		'sort' => 2,
+		'default_filter' => false,
+		'filter' => '
+			{
+				"name": "All Job Queue Workers logs from the last 48 hours",
+				"columns": [
+					{"name": "RequestId"},
+					{"name": "ExecutionTime"},
+					{"name": "ExecutedBy"},
+					{"name": "Description"},
+					{"name": "Data"}
+				],
+				"filters": [
+					{
+						"name": "WebserviceType",
+						"operation": "contains",
+						"condition": "job"
+					},
+					{
+						"name": "RequestId",
+						"operation": "contains",
+						"condition": "JQW"
+					},
+					{
+						"name": "ExecutionTime",
+						"operation": "lt",
+						"condition": "48",
+						"option": "hours"
 					}
 				]
 			}
@@ -535,13 +663,13 @@ $filters = array(
 	array(
 		'app' => 'core',
 		'dataset_name' => 'logs',
-		'filter_kurzbz' => 'content3days',
-		'description' => '{Last 3 days content logs}',
+		'filter_kurzbz' => 'content3minutes',
+		'description' => '{Last 3 minutes content logs}',
 		'sort' => 4,
 		'default_filter' => false,
 		'filter' => '
 			{
-				"name": "All content logs from the last 3 days",
+				"name": "All content logs from the last 3 minutes",
 				"columns": [
 					{"name": "RequestId"},
 					{"name": "ExecutionTime"},
@@ -559,7 +687,7 @@ $filters = array(
 						"name": "ExecutionTime",
 						"operation": "lt",
 						"condition": "3",
-						"option": "days"
+						"option": "minutes"
 					}
 				]
 			}
@@ -569,13 +697,13 @@ $filters = array(
 	array(
 		'app' => 'core',
 		'dataset_name' => 'logs',
-		'filter_kurzbz' => 'wienerlinien7days',
-		'description' => '{Last 7 days wiener linien logs}',
+		'filter_kurzbz' => 'wienerlinien24hours',
+		'description' => '{Last 24 hours Wiener Linien logs}',
 		'sort' => 5,
 		'default_filter' => false,
 		'filter' => '
 			{
-				"name": "All wiener linien logs from the last 7 days",
+				"name": "All Wiener Linien logs from the last 24 hours",
 				"columns": [
 					{"name": "RequestId"},
 					{"name": "ExecutionTime"},
@@ -592,8 +720,8 @@ $filters = array(
 					{
 						"name": "ExecutionTime",
 						"operation": "lt",
-						"condition": "7",
-						"option": "days"
+						"condition": "24",
+						"option": "hours"
 					}
 				]
 			}
@@ -628,6 +756,37 @@ $filters = array(
 						"name": "Geschäftsjahr",
 						"condition": "GJ2019-2020",
 						"operation": "contains"
+					}
+				]
+			}
+		',
+		'oe_kurzbz' => null,
+	),
+	array(
+		'app' => 'core',
+		'dataset_name' => 'jq',
+		'filter_kurzbz' => 'lastHour',
+		'description' => '{Last hour queued jobs}',
+		'sort' => 1,
+		'default_filter' => true,
+		'filter' => '
+			{
+				"name": "All jobs queued in the last hour",
+				"columns": [
+					{"name": "JobId"},
+					{"name": "CreationTime"},
+					{"name": "Type"},
+					{"name": "Status"},
+					{"name": "StartTime"},
+					{"name": "EndTime"},
+					{"name": "UserService"}
+				],
+				"filters": [
+					{
+						"name": "CreationTime",
+						"operation": "lt",
+						"condition": "1",
+						"option": "hours"
 					}
 				]
 			}

@@ -27,11 +27,11 @@ class OneTimeMessages extends JOB_Controller
 	 * - Status set as "Wartender"
 	 * - The given study course type (b = bachelor, m = master)
 	 * - The given semester (ex WS2020)
-	 * - How long since applicant (months)
+	 * - How long since applicant (days)
 	 * - The given template id to be used as message subject and body (vorlage_kurzbz)
 	 * The sender of all the messages is specified by the parameter senderId (sender person_id)
 	 */
-	public function sendMessageToApplicantsStillWaiting($senderId, $studyCourseType, $semester, $months, $messageTemplate)
+	public function sendMessageToApplicantsStillWaiting($senderId, $studyCourseType, $semester, $days, $messageTemplate)
 	{
 		$this->logInfo('Send message to applicants still waiting start');
 
@@ -47,13 +47,13 @@ class OneTimeMessages extends JOB_Controller
 		$dbModel = new DB_Model();
 
 		$dbPrestudents = $dbModel->execReadOnlyQuery(
-			'SELECT p.prestudent_id
+			'SELECT distinct on(person_id) p.prestudent_id
 			   FROM public.tbl_prestudent p
 			   JOIN public.tbl_prestudentstatus ps USING (prestudent_id)
  			   JOIN public.tbl_studiengang s USING (studiengang_kz)
 			  WHERE ps.status_kurzbz = \'Wartender\'
 			    AND ps.studiensemester_kurzbz = ?
-			    AND ps.datum <= NOW() - \''.$months.' months\'::interval
+			    AND ps.datum <= NOW() - \''.$days.' days\'::interval
 			    AND s.typ = ?
 			    AND NOT EXISTS (
 				SELECT pp.person_id

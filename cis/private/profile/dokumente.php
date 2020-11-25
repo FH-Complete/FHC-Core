@@ -76,7 +76,6 @@ if(isset($_GET['action']) && $_GET['action']=='download')
 		$akte = new akte();
 		$akte->load($id);
 		if ($akte->person_id == $student_studiengang->person_id
-			&& $akte->signiert
 			&& $akte->stud_selfservice)
 		{
 			if($akte->inhalt!='')
@@ -89,12 +88,12 @@ if(isset($_GET['action']) && $_GET['action']=='download')
 			}
 			else
 			{
-				die('Id ist ungueltig');
+				die('Akte hat keinen Inhalt.');
 			}
 		}
 		else
 		{
-			die('Id ist ungueltig');
+			die('Nicht zum selbständigen Download bestimmt oder falsche PersonID.');
 		}
 	}
 	else
@@ -123,7 +122,6 @@ echo '
 		});
 		$(".tablesorter2").tablesorter(
 		{
-			sortList: [[1,1]],
 			headers: { 0: { sorter: false }},
 			widgets: ["zebra"]
 		});
