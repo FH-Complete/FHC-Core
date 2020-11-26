@@ -215,6 +215,31 @@ class MessageLib
 
 		return $messageVars; // otherwise returns the error
 	}
+	
+	/**
+	 * Retrieves message vars of the logged in user from view vw_msg_vars_user
+	 */
+	public function getMessageVarsLoggedInUser()
+	{
+		// Retrieves message vars from view vw_msg_vars
+		$messageVars = $this->_ci->MessageModel->getMsgVarsLoggedInUser();
+		if (isSuccess($messageVars)) // if everything is ok
+		{
+			$variablesArray = array();
+			$tmpVariablesArray = getData($messageVars);
+
+			// Starts from 1 to skip the first element which is uid
+			for ($i = 1; $i < count($tmpVariablesArray); $i++)
+			{
+				$variablesArray['{'.str_replace(' ', '_', strtolower($tmpVariablesArray[$i])).'}']
+					= strtoupper($tmpVariablesArray[$i]);
+			}
+
+			return success($variablesArray);
+		}
+		
+		return $messageVars; // otherwise returns the error
+	}
 
 	/**
 	 * Retrieves organisation units for each role that a user plays inside that organisation unit

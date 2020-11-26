@@ -7952,6 +7952,26 @@ Any unusual occurrences
 	array(
 		'app' => 'core',
 		'category' => 'ui',
+		'phrase' => 'meineFelder',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Meine Felder',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'My fields',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
 		'phrase' => 'zeitraum',
 		'insertvon' => 'system',
 		'phrases' => array(
