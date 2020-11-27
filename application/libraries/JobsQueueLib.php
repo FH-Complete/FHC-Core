@@ -59,6 +59,18 @@ class JobsQueueLib
 	/**
 	 * To get all the jobs specified by the given parameters
 	 */
+	public function getJobsByTypeStatus($type, $status)
+	{
+		$this->_ci->JobsQueueModel->resetQuery();
+
+		$this->_ci->JobsQueueModel->addOrder('creationtime', 'DESC');
+
+		return $this->_ci->JobsQueueModel->loadWhere(array('status' => $status, 'type' => $type));
+	}
+
+	/**
+	 * To get all the jobs specified by the given parameters
+	 */
 	public function getJobsByTypeStatusInput($type, $status, $input)
 	{
 		$this->_ci->JobsQueueModel->resetQuery();
