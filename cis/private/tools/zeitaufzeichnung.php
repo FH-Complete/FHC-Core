@@ -114,6 +114,8 @@ else
 	$gesperrt_bis = '2015-08-31';
 
 $sperrdatum = date('c', strtotime($gesperrt_bis));
+$datumjetzt = strtotime("+5 weeks");
+$limitdatum = date('c', $datumjetzt);
 
 // Uses urlencode to avoid XSS issues
 $zeitaufzeichnung_id = urlencode(isset($_GET['zeitaufzeichnung_id'])?$_GET['zeitaufzeichnung_id']:'');
@@ -739,6 +741,8 @@ if(isset($_POST['save']) || isset($_POST['edit']) || isset($_POST['import']))
 									$data[8] = NULL;
 								if ($datum->formatDatum($data[2], $format='Y-m-d H:i:s') < $sperrdatum)
 									echo '<span style="color:red"><b>'.$p->t("global/fehlerBeimSpeichernDerDaten").': Eingabe nicht möglich da vor dem Sperrdatum ('.$data[2].')</b></span><br>';
+								elseif ($datum->formatDatum($data[2], $format='Y-m-d H:i:s') > $limitdatum)
+									echo '<span style="color:red"><b>'.$p->t("global/fehlerBeimSpeichernDerDaten").': Eingabe nicht möglich da ('.$data[2].') zu weit in der Zukunft liegt.</b></span><br>';
 								elseif (empty($data[7]) && !empty($data[6]) && !$projects_of_user->checkProjectInCorrectTime($data[6], $data[2], $data[3]))
 								{
 									echo '<span style="color:red"><b>'.$p->t("global/fehlerBeimSpeichernDerDaten").': Eingabe nicht möglich, da angegebenes Anfangs und Enddatum nicht in den Projektzeitrahmen fällt: ('.$data[2].') ('.$data[3].')</b></span><br>';
@@ -888,6 +892,11 @@ if(isset($_POST['save']) || isset($_POST['edit']) || isset($_POST['import']))
 		if (!$projects_of_user->checkProjectInCorrectTime($projekt_kurzbz, $datum->formatDatum($von, $format='Y-m-d'), $datum->formatDatum($bis, $format='Y-m-d')))
 		{
 			echo '<span style="color:red"><b>'.$p->t("global/fehlerBeimSpeichernDerDaten").': Eingabe nicht möglich, da angegebenes Anfangs und Enddatum nicht in den Projektzeitrahmen fällt.</b></span><br>';
+			$saveerror = 1;
+		}
+		elseif ($datum->formatDatum($von, $format='Y-m-d') > $limitdatum || $datum->formatDatum($bis, $format='Y-m-d') > $limitdatum)
+		{
+			echo '<span style="color:red"><b>'.$p->t("global/fehlerBeimSpeichernDerDaten").': Eingabe nicht möglich, da angegebenes Anfangs oder Enddatum zu weit in der Zukunft liegt.</b></span><br>';
 			$saveerror = 1;
 		}
 		elseif (!$projectphase->checkProjectphaseInCorrectTime($projektphase_id, $datum->formatDatum($von, $format='Y-m-d'), $datum->formatDatum($bis, $format='Y-m-d')))
