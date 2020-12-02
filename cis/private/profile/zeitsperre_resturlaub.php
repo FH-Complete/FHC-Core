@@ -265,11 +265,29 @@ function showHideBezeichnungDropDown()
 		document.getElementById('resturlaub').style.visibility = 'visible';
 	else
 		document.getElementById('resturlaub').style.visibility = 'hidden';
+
+	showHideStudeDropDown()
 }
 
 function setBisDatum()
 {
 	document.zeitsperre_form.bisdatum.value = document.zeitsperre_form.vondatum.value;
+}
+
+function showHideStudeDropDown()
+{
+	var dd = document.zeitsperre_form.zeitsperretyp_kurzbz;
+	console.log(dd.options[dd.selectedIndex].value == 'ZA')
+	if (dd.options[dd.selectedIndex].value == 'ZA' || dd.options[dd.selectedIndex].value == 'Urlaub')
+    {
+		document.getElementById('vonStd').style.visibility = 'hidden';
+		document.getElementById('bisStd').style.visibility = 'hidden';
+    }
+    else
+	{
+		document.getElementById('vonStd').style.visibility = 'visible';
+		document.getElementById('bisStd').style.visibility = 'visible';
+	}
 }
 
 </script>
@@ -611,7 +629,7 @@ if($result = $db->db_query($qry))
 }
 $content_form.= '</SELECT></td></tr>';
 $content_form.= '<tr><td>'.$p->t('global/bezeichnung').'</td><td colspan="2"><span id="dienstv_span"><input'.$style.' type="text" size="32" name="bezeichnung" maxlength="32" value="'.$zeitsperre->bezeichnung.'"'.$readonly.'></span></td></tr>';
-$content_form.= '<tr><td>'.$p->t('global/von').'</td><td><input'.$style.' type="text" '.$class.' size="10" maxlength="10" name="vondatum" id="vondatum" value="'.($zeitsperre->vondatum!=''?date('d.m.Y',$datum_obj->mktime_fromdate($zeitsperre->vondatum)):(!isset($_POST['vondatum'])?date('d.m.Y'):$_POST['vondatum'])).'"'.$readonly.'> <a href="javascript:void(0);" onClick="setBisDatum()">&dArr;</a></td><td  style="text-align:right;"> ';
+$content_form.= '<tr><td>'.$p->t('global/von').'</td><td><input'.$style.' type="text" '.$class.' size="10" maxlength="10" name="vondatum" id="vondatum" value="'.($zeitsperre->vondatum!=''?date('d.m.Y',$datum_obj->mktime_fromdate($zeitsperre->vondatum)):(!isset($_POST['vondatum'])?date('d.m.Y'):$_POST['vondatum'])).'"'.$readonly.'> <a href="javascript:void(0);" onClick="setBisDatum()">&dArr;</a></td><td id="vonStd"  style="text-align:right;"> ';
 //dropdown fuer vonstunde
 $content_form.= $p->t('zeitsperre/stundeInklusive');
 
@@ -633,7 +651,7 @@ for($i=0;$i<$num_rows_stunde;$i++)
 
 $content_form.= "</SELECT></td></tr>";
 
-$content_form.= '<tr><td>'.$p->t('global/bis').'</td><td><input'.$style.' type="text" '.$class.' size="10" maxlength="10" name="bisdatum" id="bisdatum" value="'.($zeitsperre->bisdatum!=''?date('d.m.Y',$datum_obj->mktime_fromdate($zeitsperre->bisdatum)):(!isset($_POST['bisdatum'])?date('d.m.Y'):$_POST['bisdatum'])).'"'.$readonly.'></td><td  style="text-align:right;"> ';
+$content_form.= '<tr><td>'.$p->t('global/bis').'</td><td><input'.$style.' type="text" '.$class.' size="10" maxlength="10" name="bisdatum" id="bisdatum" value="'.($zeitsperre->bisdatum!=''?date('d.m.Y',$datum_obj->mktime_fromdate($zeitsperre->bisdatum)):(!isset($_POST['bisdatum'])?date('d.m.Y'):$_POST['bisdatum'])).'"'.$readonly.'></td><td id="bisStd"  style="text-align:right;"> ';
 //dropdown fuer bisstunde
 $content_form.= $p->t('zeitsperre/stundeInklusive');
 $content_form.= " <SELECT name='bisstunde'$style>\n";
