@@ -180,7 +180,7 @@ function checkdatum()
 		return false;
 	}
 
-      var Datum, Tag, Monat,Jahr,vonDatum,bisDatum;
+      var Datum, Tag, Monat,Jahr,vonDatum,bisDatum, diff;
 
 	  Datum=document.getElementById('vondatum').value;
       Tag=Datum.substring(0,2);
@@ -210,11 +210,22 @@ function checkdatum()
 
 	  bisDatum=Jahr+''+Monat+''+Tag;
 
+	  diff=bisDatum-vonDatum;
+
 	  if (vonDatum>bisDatum)
 	  {
 		alert('<?php echo $p->t('zeitsperre/vonDatum');?> '+ document.getElementById('vondatum').value+ ' <?php echo $p->t('zeitsperre/istGroesserAlsBisDatum');?> '+document.getElementById('bisdatum').value);
 		document.getElementById('vondatum').focus();
 	  	return false;
+	  }
+      else if (diff>14)
+      {
+      	Check = confirm('<?php echo $p->t('zeitaufzeichnung/zeitraumAuffallendHoch');?>');
+		document.getElementById('bisdatum').focus();
+	      if (Check == false)
+		      return false;
+	      else
+		      return true;
 	  }
 
 	return true;
