@@ -215,6 +215,31 @@ class MessageLib
 
 		return $messageVars; // otherwise returns the error
 	}
+	
+	/**
+	 * Retrieves message vars of the logged in user from view vw_msg_vars_user
+	 */
+	public function getMessageVarsLoggedInUser()
+	{
+		// Retrieves message vars from view vw_msg_vars
+		$messageVars = $this->_ci->MessageModel->getMsgVarsLoggedInUser();
+		if (isSuccess($messageVars)) // if everything is ok
+		{
+			$variablesArray = array();
+			$tmpVariablesArray = getData($messageVars);
+
+			// Starts from 1 to skip the first element which is uid
+			for ($i = 1; $i < count($tmpVariablesArray); $i++)
+			{
+				$variablesArray['{'.str_replace(' ', '_', strtolower($tmpVariablesArray[$i])).'}']
+					= strtoupper($tmpVariablesArray[$i]);
+			}
+
+			return success($variablesArray);
+		}
+		
+		return $messageVars; // otherwise returns the error
+	}
 
 	/**
 	 * Retrieves organisation units for each role that a user plays inside that organisation unit
@@ -595,11 +620,24 @@ class MessageLib
 						$this->_ci->load->model('person/Benutzer_model', 'BenutzerModel');
 
 						// And the receiver has an active account for the given organisation unit
-						$benutzerResult = $this->_ci->BenutzerModel->getActiveUserByPersonIdAndOrganisationUnit($message->receiver_id, $message->sender_ou);
+						$benutzerResult = $this->_ci->BenutzerModel->getActiveUserByPersonIdAndOrganisationUnit(
+							$message->receiver_id,
+							$message->sender_ou
+						);
+
 						if (isError($benutzerResult)) return $benutzerResult; // if an error occured then return it
 
-						// Use the uid + domain email
-						if (hasData($benutzerResult)) $message->receiverContact = getData($benutzerResult)[0]->uid .'@'.DOMAIN;
+						// If an active user for the given organization unit was found
+						if (hasData($benutzerResult))
+						{
+							// Checks if the user was NOT created in the last 24 hours
+							if (getData($benutzerResult)[0]->insertamum < date('Y-m-d H:i:s', strtotime('-1 day')))
+							{
+								// Use the uid + domain email
+								$message->receiverContact = getData($benutzerResult)[0]->uid .'@'.DOMAIN;
+							}
+							// otherwise do NOT use the internal email account
+						}
 					}
 
 					// Otherwise try with the private email
@@ -644,7 +682,7 @@ class MessageLib
 							// If there are presetudent
 							if (hasData($prestudentResults))
 							{
-								$inArray = true;
+								$privateOnly = false;
 								$organisationUnits = getData($prestudentResults);
 
 								// Look if any of the organization units of this prestudent are in the list of the
@@ -652,16 +690,21 @@ class MessageLib
 								foreach ($organisationUnits as $organisationUnit)
 								{
 									// If the recipient organisation unit is NOT in the list of organisation units that sent only to private emails
+									// NOTE: done in this way because it is easyer to check the result of array_search
 									if (array_search($organisationUnit, $this->_ci->config->item(self::CFG_OU_RECEIVERS_PRIVATE)) === false)
 									{
-										$inArray = false;
+										// NOP
+									}
+									else // otherwise If the recipient organisation unit is the list of organisation units that sent only to private emails
+									{
+										$privateOnly = true;
 										break;
 									}
 								}
 
 								// If the recipient prestudent organization unit is not in in the list of the
 								// organization units that will not send the notice email to the internal account
-								if (!$inArray)
+								if ($privateOnly)
 								{
 									// Then use the private email
 									$privateEmailResult = $this->_getPrivateEmail($message->receiver_id);
@@ -676,10 +719,37 @@ class MessageLib
 									$this->_ci->BenutzerModel->addOrder('updateamum', 'DESC');
 									$this->_ci->BenutzerModel->addOrder('insertamum', 'DESC');
 
-									$benutzerResult = $this->_ci->BenutzerModel->loadWhere(array('person_id' => $message->receiver_id));
+									$benutzerResult = $this->_ci->BenutzerModel->loadWhere(
+										array(
+											'person_id' => $message->receiver_id
+										)
+									);
 									if (isError($benutzerResult)) return $benutzerResult; // if an error occured then return it
 
-									$message->receiverContact = getData($benutzerResult)[0]->uid .'@'.DOMAIN; // Use the uid + domain email
+									// If an active user for the given organization unit was found
+									if (hasData($benutzerResult))
+									{
+										// For each benutzer found for this person
+										foreach (getData($benutzerResult) as $benutzer)
+										{
+											// Checks if the user was NOT created in the last 24 hours
+											if (getData($benutzerResult)[0]->insertamum < date('Y-m-d H:i:s', strtotime('-1 day')))
+											{
+												// Use the uid + domain as email address
+												$message->receiverContact = getData($benutzerResult)[0]->uid .'@'.DOMAIN;
+											}
+										}
+									}
+
+									// Otherwise try with the private email
+									if (isEmptyString($message->receiverContact))
+									{
+										// Then use the private email
+										$privateEmailResult = $this->_getPrivateEmail($message->receiver_id);
+										if (isError($privateEmailResult)) return $privateEmailResult; // if an error occured then return it
+
+										if (hasData($privateEmailResult)) $message->receiverContact = getData($privateEmailResult);
+									}
 								}
 							}
 						}

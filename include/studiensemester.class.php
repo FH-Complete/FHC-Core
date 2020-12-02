@@ -287,7 +287,7 @@ class studiensemester extends basis_db
 
 			$qry.= " WHERE substring(studiensemester_kurzbz from 1 for 2)='$ss' ";
 		}
-		$qry.=' ORDER BY delta LIMIT 1';
+		$qry.=' ORDER BY delta, start LIMIT 1';
 
 		if(!$this->db_query($qry))
 		{
@@ -573,7 +573,7 @@ class studiensemester extends basis_db
 	{
 		$qry = "SELECT studiensemester_kurzbz, start, ende FROM public.vw_studiensemester
 				WHERE studiensemester_kurzbz<>".$this->db_add_param($studiensemester_kurzbz)."
-		        ORDER BY delta LIMIT 1";
+		        ORDER BY delta, start LIMIT 1";
 
 		if($this->db_query($qry))
 		{
@@ -907,13 +907,13 @@ class studiensemester extends basis_db
 						ORDER BY ende ASC";
 					if ($plus != '')
 						$qry .= " LIMIT ".$this->db_add_param($plus, FHC_INTEGER);
-				
+
 				$qry .= ") UNION
 					(SELECT studiensemester_kurzbz FROM public.tbl_studiensemester WHERE start <= now()
 						ORDER BY start DESC ";
 					if ($minus != '')
 						$qry .= " LIMIT ".$this->db_add_param($minus, FHC_INTEGER);
-				
+
 				$qry .= ")) ORDER BY ".$order;
 
 		if($this->db_query($qry))
@@ -967,7 +967,7 @@ class studiensemester extends basis_db
 				   FROM tbl_studiensemester
 				) a
 				WHERE a.studiensemester_kurzbz!=".$this->db_add_param($studiensemester_kurzbz)."
-				ORDER BY delta LIMIT 1";
+				ORDER BY delta, start LIMIT 1";
 
 		if($this->db_query($qry))
 		{
@@ -1029,7 +1029,7 @@ class studiensemester extends basis_db
 			return false;
 		}
 	}
-	
+
 	/**
 	 * Gibt das Wintersemester eines Studienjahres zurück (zb WS2017)
 	 *
@@ -1040,10 +1040,10 @@ class studiensemester extends basis_db
 	{
 		$qry = "
 			SELECT studiensemester_kurzbz
-			FROM tbl_studiensemester 
+			FROM tbl_studiensemester
 			WHERE studienjahr_kurzbz LIKE " . $this->db_add_param($studienjahr_kurzbz) . "
 			AND studiensemester_kurzbz LIKE 'WS%';";
-		
+
 		if ($result = $this->db_query($qry))
 		{
 			if ($row = $this->db_fetch_object())
@@ -1063,7 +1063,7 @@ class studiensemester extends basis_db
 			return false;
 		}
 	}
-	
+
 	/**
 	 * Gibt das Sommersemester eines Studienjahres zurück (zb SS2018)
 	 *
@@ -1074,10 +1074,10 @@ class studiensemester extends basis_db
 	{
 		$qry = "
 			SELECT studiensemester_kurzbz
-			FROM tbl_studiensemester 
+			FROM tbl_studiensemester
 			WHERE studienjahr_kurzbz LIKE " . $this->db_add_param($studienjahr_kurzbz) . "
 			AND studiensemester_kurzbz LIKE 'SS%';";
-		
+
 		if ($result = $this->db_query($qry))
 		{
 			if ($row = $this->db_fetch_object())
@@ -1097,7 +1097,7 @@ class studiensemester extends basis_db
 			return false;
 		}
 	}
-	
+
 	/**
 	 * Gibt die Studiensemester zwischen $studiensemesterStart und $studiensemesterEnde zurück
 	 * Wenn $inklusive true ist (default), werden auch $studiensemesterStart und $studiensemesterEnde selbst zurückgegeben
@@ -1116,7 +1116,7 @@ class studiensemester extends basis_db
 		}
 		if ($inklusive = true)
 			$equalSign = '=';
-		else 
+		else
 			$equalSign = '';
 		$qry = "
 			SELECT *
@@ -1132,13 +1132,13 @@ class studiensemester extends basis_db
 					WHERE studiensemester_kurzbz = " . $this->db_add_param($studiensemesterEnde) . "
 					)
 			ORDER BY start DESC;";
-		
+
 		if($this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object())
 			{
 				$stsem_obj = new studiensemester();
-				
+
 				$stsem_obj->studiensemester_kurzbz = $row->studiensemester_kurzbz;
 				$stsem_obj->start = $row->start;
 				$stsem_obj->ende = $row->ende;
@@ -1146,7 +1146,7 @@ class studiensemester extends basis_db
 				$stsem_obj->studienjahr_kurzbz = $row->studienjahr_kurzbz;
 				$stsem_obj->beschreibung = $row->beschreibung;
 				$stsem_obj->onlinebewerbung = $row->onlinebewerbung;
-				
+
 				$this->studiensemester[] = $stsem_obj;
 			}
 			return true;

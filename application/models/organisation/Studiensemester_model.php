@@ -132,7 +132,7 @@ class Studiensemester_model extends DB_Model
 			$query .= ' WHERE SUBSTRING(studiensemester_kurzbz FROM 1 FOR 2) = \'' . $ss . '\'';
 		}
 
-		$query .= ' ORDER BY delta LIMIT 1';
+		$query .= ' ORDER BY delta, start LIMIT 1';
 
 		return $this->execQuery($query);
 	}
@@ -188,7 +188,7 @@ class Studiensemester_model extends DB_Model
 	{
 		$query = "SELECT studiensemester_kurzbz, start, ende FROM public.vw_studiensemester
 				WHERE studiensemester_kurzbz <> ?
-		        ORDER BY delta LIMIT 1";
+		        ORDER BY delta, start LIMIT 1";
 
 		return $this->execQuery($query, array($studiensemester_kurzbz));
 	}

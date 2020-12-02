@@ -32,7 +32,7 @@ $filters = array(
 				"columns": [
 					{"name": "Vorname"},
 					{"name": "Nachname"},
-					{"name": "Nation"},
+					{"name": "ZGVNation"},
 					{"name": "StgAbgeschickt"},
 					{"name": "Studiensemester"},
 					{"name": "LastAction"},
@@ -65,7 +65,7 @@ $filters = array(
 				"columns": [
 					{"name": "Vorname"},
 					{"name": "Nachname"},
-					{"name": "Nation"},
+					{"name": "ZGVNation"},
 					{"name": "StgAbgeschickt"},
 					{"name": "Studiensemester"},
 					{"name": "LastAction"},
@@ -104,7 +104,7 @@ $filters = array(
 				"columns": [
 					{"name": "Vorname"},
 					{"name": "Nachname"},
-					{"name": "Nation"},
+					{"name": "ZGVNation"},
 					{"name": "LastAction"},
 					{"name": "LastActionType"},
 					{"name": "User/Operator"},
@@ -139,7 +139,7 @@ $filters = array(
 				"columns": [
 					{"name": "Vorname"},
 					{"name": "Nachname"},
-					{"name": "Nation"},
+					{"name": "ZGVNation"},
 					{"name": "LastAction"},
 					{"name": "User/Operator"},
 					{"name": "LockUser"},
@@ -179,7 +179,7 @@ $filters = array(
 				"columns": [
 					{"name": "Vorname"},
 					{"name": "Nachname"},
-					{"name": "Nation"},
+					{"name": "ZGVNation"},
 					{"name": "StgAbgeschickt"},
 					{"name": "Studiensemester"},
 					{"name": "LastAction"},
@@ -217,7 +217,7 @@ $filters = array(
 				"columns": [
 					{"name": "Vorname"},
 					{"name": "Nachname"},
-					{"name": "Nation"},
+					{"name": "ZGVNation"},
 					{"name": "LastAction"},
 					{"name": "User/Operator"},
 					{"name": "LockUser"},

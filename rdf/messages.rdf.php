@@ -22,10 +22,12 @@
 require_once('../config/vilesci.config.inc.php');
 require_once('../include/basis_db.class.php');
 require_once('../include/rdf.class.php');
+require_once('../include/datum.class.php');
 require_once('../include/functions.inc.php');
 require_once('../include/benutzerberechtigung.class.php');
 
 $uid = get_uid();
+$datum_obj = new datum();
 $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($uid);
 if(!$rechte->isBerechtigt('basis/message', null, 's'))
@@ -50,7 +52,8 @@ SELECT
 	(SELECT COALESCE(titelpre,'') || ' ' || COALESCE(vorname,'') || ' ' || COALESCE(nachname,'') || ' ' || COALESCE(titelpost,'') FROM public.tbl_person WHERE person_id = r.person_id) as recipient,
 	m.person_id as sender_id,
 	r.person_id as recipient_id,
-	MAX(ss.status) as status
+	MAX(ss.status) as status,
+	MAX(ss.insertamum) as statusdatum
 FROM public.tbl_msg_message m
      JOIN public.tbl_msg_recipient r USING(message_id)
      JOIN public.tbl_msg_status ss ON(r.message_id = ss.message_id AND ss.person_id = r.person_id)
@@ -67,7 +70,8 @@ SELECT
 	(SELECT COALESCE(titelpre,'') || ' ' || COALESCE(vorname,'') || ' ' || COALESCE(nachname,'') || ' ' || COALESCE(titelpost,'') FROM public.tbl_person WHERE person_id = r.person_id) as recipient,
 	m.person_id as sender_id,
 	r.person_id as recipient_id,
-	MAX(ss.status) as status
+	MAX(ss.status) as status,
+	MAX(ss.insertamum) as statusdatum
 FROM public.tbl_msg_recipient r
      JOIN public.tbl_msg_status ss USING(message_id, person_id)
      JOIN public.tbl_msg_message m USING(message_id)
@@ -104,6 +108,7 @@ if($db->db_query($qry))
 		$oRdf->obj[$i]->setAttribut('message_id',$row->message_id,true);
 		$oRdf->obj[$i]->setAttribut('insertamum',$row->insertamum,true);
 		$oRdf->obj[$i]->setAttribut('status',$status,true);
+		$oRdf->obj[$i]->setAttribut('statusdatum',$datum_obj->formatDatum($row->statusdatum,'d.m.Y H:i'),true);
 		$oRdf->obj[$i]->setAttribut('sender',$row->sender,true);
 		$oRdf->obj[$i]->setAttribut('recipient',$row->recipient,true);
 		$oRdf->obj[$i]->setAttribut('sender_id',$row->sender_id,true);
