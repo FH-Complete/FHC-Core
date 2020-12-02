@@ -730,6 +730,10 @@ if(isset($_POST['save']) || isset($_POST['edit']) || isset($_POST['import']))
 							}
 							else
 							{
+								$vonCSV = $datum->formatDatum($data[2], $format='Y-m-d');
+								$bisCSV = $datum->formatDatum($data[3], $format='Y-m-d');
+								$dateVonCSV = new DateTime($vonCSV);
+								$dateBisCSV = new DateTime($bisCSV);
 
 								if (!isset($data[5]))
 									$data[5] = NULL;
@@ -743,6 +747,10 @@ if(isset($_POST['save']) || isset($_POST['edit']) || isset($_POST['import']))
 									echo '<span style="color:red"><b>'.$p->t("global/fehlerBeimSpeichernDerDaten").': Eingabe nicht möglich da vor dem Sperrdatum ('.$data[2].')</b></span><br>';
 								elseif ($datum->formatDatum($data[2], $format='Y-m-d H:i:s') > $limitdatum)
 									echo '<span style="color:red"><b>'.$p->t("global/fehlerBeimSpeichernDerDaten").': Eingabe nicht möglich da ('.$data[2].') zu weit in der Zukunft liegt.</b></span><br>';
+								elseif ($dateVonCSV!=$dateBisCSV && $data[1]!="DienstreiseMT")
+								{
+									echo '<span style="color:red"><b>'.$p->t("global/fehlerBeimSpeichernDerDaten").': Eingabe nicht möglich, da keine Zeitaufzeichnung über mehrere Tage erlaubt ist (ausgenommen Dienstreisen).</b></span><br>';
+								}
 								elseif (empty($data[7]) && !empty($data[6]) && !$projects_of_user->checkProjectInCorrectTime($data[6], $data[2], $data[3]))
 								{
 									echo '<span style="color:red"><b>'.$p->t("global/fehlerBeimSpeichernDerDaten").': Eingabe nicht möglich, da angegebenes Anfangs und Enddatum nicht in den Projektzeitrahmen fällt: ('.$data[2].') ('.$data[3].')</b></span><br>';
@@ -889,6 +897,7 @@ if(isset($_POST['save']) || isset($_POST['edit']) || isset($_POST['import']))
 		$zeit->service_id = $service_id;
 		$zeit->kunde_uid = $kunde_uid;
 		$saveerror = 0;
+
 		if (!$projects_of_user->checkProjectInCorrectTime($projekt_kurzbz, $datum->formatDatum($von, $format='Y-m-d'), $datum->formatDatum($bis, $format='Y-m-d')))
 		{
 			echo '<span style="color:red"><b>'.$p->t("global/fehlerBeimSpeichernDerDaten").': Eingabe nicht möglich, da angegebenes Anfangs und Enddatum nicht in den Projektzeitrahmen fällt.</b></span><br>';
@@ -902,6 +911,11 @@ if(isset($_POST['save']) || isset($_POST['edit']) || isset($_POST['import']))
 		elseif (!$projectphase->checkProjectphaseInCorrectTime($projektphase_id, $datum->formatDatum($von, $format='Y-m-d'), $datum->formatDatum($bis, $format='Y-m-d')))
 		{
 			echo '<span style="color:red"><b>'.$p->t("global/fehlerBeimSpeichernDerDaten").': Eingabe nicht möglich, da angegebenes Anfangs und Enddatum nicht in den Projektphasenzeitrahmen fällt.</b></span><br>';
+			$saveerror = 1;
+		}
+		elseif (abs($von-$bis)>0 && $aktivitaet_kurzbz!="DienstreiseMT")
+		{
+			echo '<span style="color:red"><b>'.$p->t("global/fehlerBeimSpeichernDerDaten").': Eingabe nicht möglich, da keine Zeitaufzeichnung über mehrere Tage erlaubt ist (ausgenommen Dienstreisen).</b></span><br>';
 			$saveerror = 1;
 		}
 		elseif (isset($_POST['genPause']) && (isset($_POST['save']) || isset($_POST['edit'])))
