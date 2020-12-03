@@ -1185,13 +1185,13 @@ if($projekt->getProjekteMitarbeiter($user, true))
 
 		if (isset($_GET['projektübersichtexport']))
 		{
-			echo '<form action="'.$_SERVER['PHP_SELF'].'" method="POST" >';
+
 			echo '<tr><td colspan="4"><hr></td></tr>';
 			echo '<tr><td>CSV-Export</td>';
 			echo '<td align="right"><input type="submit" value="Projektübersichtexport" name="projektübersichtexport"></td></tr>';
 			echo '<tr><td></td><td colspan="3"></td></tr>';
 			echo '<tr><td colspan="4"><hr></td></tr>';
-			echo '</form>';
+
 		}
 
 		//Aktivitaet
@@ -1481,6 +1481,7 @@ if($projekt->getProjekteMitarbeiter($user, true))
 
 			echo '</table>';
 		}
+
 		echo '</td></tr>';
 		echo '</table>';
 		echo '</form>';
