@@ -359,8 +359,46 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 	<head>
 		<title>BIS - Meldung Student - ('.$stg_kz.')</title>
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-		<link href="../../skin/vilesci.css" rel="stylesheet" type="text/css">
-	</head>
+		<link href="../../skin/vilesci.css" rel="stylesheet" type="text/css">';
+
+		include('../../include/meta/jquery.php');
+		include('../../include/meta/jquery-tablesorter.php');
+
+echo '	</head>
+	<style>
+	#t1, #t2
+	{
+		width: auto;
+	}
+	</style>
+	<script language="JavaScript" type="text/javascript">
+	$(document).ready(function()
+	{
+		$("#t1").tablesorter(
+		{
+			sortList: [[6,1],[5,1],[4,1],[2,0],[3,0]], 
+			widgets: ["zebra", "filter", "stickyHeaders"],
+			widgetOptions : {	filter_functions:  
+								{ 
+									// Add select menu to this column 
+									4 : {
+									"Abbrecher" : function(e, n, f, i, $r, c, data) { return /Abbrecher/.test(e); }, 
+									"Absolvent" : function(e, n, f, i, $r, c, data) { return /Absolvent/.test(e); },
+									"Diplomand" : function(e, n, f, i, $r, c, data) { return /Diplomand/.test(e); },
+									"Incoming" : function(e, n, f, i, $r, c, data) { return /Incoming/.test(e); },
+									"Student" : function(e, n, f, i, $r, c, data) { return /Student/.test(e); },
+									"Unterbrecher" : function(e, n, f, i, $r, c, data) { return /Unterbrecher/.test(e); }, 
+									}
+								} 
+							} 
+		});
+		$("#t2").tablesorter(
+		{
+			sortList: [[0,0],[1,0]], 
+			widgets: ["zebra", "filter", "stickyHeaders"] 
+		});
+	});
+	</script>
 	<body>';
 if ($rechte->isBerechtigt('admin'))
 {
@@ -570,7 +608,8 @@ if(file_exists($eee))
 	echo '<a href="'.$eee.'">BIS-Melde&uuml;bersicht der BIS-Meldung Stg '.$stg_kz.'</a><br><br>';
 }
 
-echo '<table border=1>
+echo '<table id="t1" class="tablesorter">
+	<thead>
 	<tr align=center>
 		<th>UID</th>
 		<th>PersKZ</th>
@@ -580,16 +619,25 @@ echo '<table border=1>
 		<th>Semester</th>
 		<th>Orgform</th>
 	</tr>
+	</thead>
+	<tbody>
 	',$stlist,'
+	</tbody>
 	</table>';
 
 echo '<br>Bewerber&uuml;bersicht';
-echo '<table border=1>
+echo '<table id="t2" class="tablesorter">
+	<thead>
 	<tr align=center>
 		<th>Nachname</th>
 		<th>Vorname</th>
+		<th>Orgform</th>
+		<th>Geschlecht</th>
 	</tr>
+	</thead>
+	<tbody>
 	',$bwlist,'
+	</tbody>
 	</table>';
 
 echo '</body></html>';

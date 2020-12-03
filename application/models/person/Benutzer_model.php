@@ -23,13 +23,17 @@ class Benutzer_model extends DB_Model
 	 */
 	public function getActiveUserByPersonIdAndOrganisationUnit($person_id, $oe_kurzbz)
 	{
-		$sql = 'SELECT b.uid
-				  FROM public.tbl_benutzer b
-				  JOIN public.tbl_prestudent ps USING (person_id)
-				  JOIN public.tbl_studiengang sg USING (studiengang_kz)
-				 WHERE ps.person_id = ?
-				   AND sg.oe_kurzbz = ?
-				   AND b.aktiv = TRUE';
+		$sql = 'SELECT
+					b.uid,
+					b.insertamum
+				FROM
+					public.tbl_prestudent ps
+					JOIN public.tbl_studiengang sg USING (studiengang_kz)
+					JOIN public.tbl_student USING(prestudent_id)
+					JOIN public.tbl_benutzer b ON(uid = student_uid)
+				WHERE ps.person_id = ?
+					AND sg.oe_kurzbz = ?
+					AND b.aktiv = TRUE';
 
 		return $this->execQuery($sql, array($person_id, $oe_kurzbz));
 	}
