@@ -139,7 +139,7 @@ if ($action == 'kartenausgabe')
 }
 
 echo '
-Ziehen Sie die neue Karte über den Hitag Kartenleser um die Karte zu aktivieren:
+Ziehen Sie die neue Karte über den Mifare Kartenleser um die Karte zu aktivieren:
 <script type="text/javascript">
 	$(document).ready(function()
 	{

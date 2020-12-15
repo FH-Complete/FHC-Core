@@ -196,6 +196,43 @@ if(!$result = @$db->db_query("SELECT 1 FROM public.vw_msg_vars_person LIMIT 1"))
 		echo '<br>Granted privileges to <strong>vilesci</strong> on public.vw_msg_vars_person';
 }
 
+// CREATE OR REPLACE VIEW public.vw_msg_vars_user and grants privileges
+if(!$result = @$db->db_query("SELECT 1 FROM public.vw_msg_vars_user LIMIT 1"))
+{
+	$qry = '
+		CREATE OR REPLACE VIEW public.vw_msg_vars_user AS (
+			SELECT DISTINCT ON
+				(b.uid) b.uid AS "my_uid",
+				p.vorname AS "my_vorname",
+				p.nachname AS "my_nachname",
+				COALESCE(b.alias, b.uid) AS "my_alias",
+				ma.telefonklappe AS "my_durchwahl"
+			FROM public.tbl_person p
+			JOIN public.tbl_benutzer b USING (person_id)
+			JOIN public.tbl_mitarbeiter ma ON ma.mitarbeiter_uid = b.uid
+			WHERE ma.personalnummer > 0
+		);';
+	
+	if(!$db->db_query($qry))
+		echo '<strong>public.vw_msg_vars_user: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>public.vw_msg_vars_user view created';
+	
+	$qry = 'GRANT SELECT ON TABLE public.vw_msg_vars_user TO web;';
+	
+	if(!$db->db_query($qry))
+		echo '<strong>public.vw_msg_vars_user: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Granted privileges to <strong>web</strong> on public.vw_msg_vars_user';
+	
+	$qry = 'GRANT SELECT ON TABLE public.vw_msg_vars_user TO vilesci;';
+	
+	if(!$db->db_query($qry))
+		echo '<strong>public.vw_msg_vars_user: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Granted privileges to <strong>vilesci</strong> on public.vw_msg_vars_user';
+}
+
 //Spalte anmerkung und rechnungsadresse in tbl_adresse
 if(!$result = @$db->db_query("SELECT rechnungsadresse FROM public.tbl_adresse LIMIT 1"))
 {
@@ -4389,6 +4426,19 @@ if(!$result = @$db->db_query("SELECT sort FROM lehre.tbl_abschlussbeurteilung LI
 		echo '<br>lehre.tbl_abschlussbeurteilung: Spalte sort hinzugefuegt!<br>';
 }
 
+//Spalte co_adresse in tbl_adresse
+if(!$result = @$db->db_query("SELECT co_name FROM public.tbl_adresse LIMIT 1"))
+{
+	$qry = "
+		ALTER TABLE public.tbl_adresse ADD COLUMN co_name varchar(256);
+		COMMENT ON COLUMN public.tbl_adresse.co_name IS 'Name des abweichenden Empfaengers';";
+
+	if(!$db->db_query($qry))
+		echo '<strong>public.tbl_adresse: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>public.tbl_adresse: Spalte co_name und anmerkung hinzugefuegt';
+}
+
 // Add column iso3166_1_a3 to tbl_nation
 if(!$result = @$db->db_query("SELECT iso3166_1_a3 FROM bis.tbl_nation LIMIT 1"))
 {
@@ -4399,6 +4449,20 @@ if(!$result = @$db->db_query("SELECT iso3166_1_a3 FROM bis.tbl_nation LIMIT 1"))
 		echo '<strong>bis.tbl_nation: '.$db->db_last_error().'</strong><br>';
 	else
 		echo '<br>bis.tbl_nation: Spalte iso3166_1_a3 hinzugefuegt';
+}
+
+// OE_KURZBZ in system.tbl_filters auf 32 Zeichen verlängert
+if($result = $db->db_query("SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA='wawi' AND TABLE_NAME='tbl_betriebsmitteltyp' AND COLUMN_NAME = 'typ_code' AND character_maximum_length=2"))
+{
+	if($db->db_num_rows($result)>0)
+	{
+		$qry = " ALTER TABLE wawi.tbl_betriebsmitteltyp ALTER COLUMN typ_code TYPE varchar(6)";
+
+		if(!$db->db_query($qry))
+			echo '<strong>wawi.tbl_betriebsmitteltyp '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>Spalte typ_code in wawi.tbl_betriebsmitteltyp von character(2) auf varchar(6) geändert<br>';
+	}
 }
 
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
@@ -4552,7 +4616,7 @@ $tabellen=array(
 	"lehre.tbl_zeugnis"  => array("zeugnis_id","student_uid","zeugnis","erstelltam","gedruckt","titel","bezeichnung","updateamum","updatevon","insertamum","insertvon","ext_id"),
 	"lehre.tbl_zeugnisnote"  => array("lehrveranstaltung_id","student_uid","studiensemester_kurzbz","note","uebernahmedatum","benotungsdatum","bemerkung","updateamum","updatevon","insertamum","insertvon","ext_id","punkte"),
 	"public.ci_apikey" => array("apikey_id","key","level","ignore_limits","date_created"),
-	"public.tbl_adresse"  => array("adresse_id","person_id","name","strasse","plz","ort","gemeinde","nation","typ","heimatadresse","zustelladresse","firma_id","updateamum","updatevon","insertamum","insertvon","ext_id","rechnungsadresse","anmerkung"),
+	"public.tbl_adresse"  => array("adresse_id","person_id","name","strasse","plz","ort","gemeinde","nation","typ","heimatadresse","zustelladresse","firma_id","updateamum","updatevon","insertamum","insertvon","ext_id","rechnungsadresse","anmerkung", "co_name"),
 	"public.tbl_akte"  => array("akte_id","person_id","dokument_kurzbz","uid","inhalt","mimetype","erstelltam","gedruckt","titel","bezeichnung","updateamum","updatevon","insertamum","insertvon","ext_id","dms_id","nachgereicht","anmerkung","titel_intern","anmerkung_intern","nachgereicht_am","ausstellungsnation","formal_geprueft_amum","archiv","signiert","stud_selfservice","akzeptiertamum"),
 	"public.tbl_ampel"  => array("ampel_id","kurzbz","beschreibung","benutzer_select","deadline","vorlaufzeit","verfallszeit","insertamum","insertvon","updateamum","updatevon","email","verpflichtend","buttontext"),
 	"public.tbl_ampel_benutzer_bestaetigt"  => array("ampel_benutzer_bestaetigt_id","ampel_id","uid","insertamum","insertvon"),
@@ -4687,7 +4751,7 @@ $tabellen=array(
 	"wawi.tbl_bestellungtag"  => array("tag","bestellung_id","insertamum","insertvon"),
 	"wawi.tbl_bestelldetailtag"  => array("tag","bestelldetail_id","insertamum","insertvon"),
 	"wawi.tbl_projekt_bestellung"  => array("projekt_kurzbz","bestellung_id","anteil"),
-	"wawi.tbl_bestellung"  => array("bestellung_id","besteller_uid","kostenstelle_id","konto_id","firma_id","lieferadresse","rechnungsadresse","freigegeben","bestell_nr","titel","bemerkung","liefertermin","updateamum","updatevon","insertamum","insertvon","ext_id","zahlungstyp_kurzbz","zuordnung_uid","zuordnung_raum","zuordnung","auftragsbestaetigung","auslagenersatz","iban","wird_geleast","nicht_bestellen","empfehlung_leasing"),
+	"wawi.tbl_bestellung"  => array("bestellung_id","besteller_uid","kostenstelle_id","konto_id","firma_id","lieferadresse","rechnungsadresse","freigegeben","bestell_nr","titel","bemerkung","liefertermin","updateamum","updatevon","insertamum","insertvon","ext_id","zahlungstyp_kurzbz"),
 	"wawi.tbl_bestelldetail"  => array("bestelldetail_id","bestellung_id","position","menge","verpackungseinheit","beschreibung","artikelnummer","preisprove","mwst","erhalten","sort","text","updateamum","updatevon","insertamum","insertvon"),
 	"wawi.tbl_bestellung_bestellstatus"  => array("bestellung_bestellstatus_id","bestellung_id","bestellstatus_kurzbz","uid","oe_kurzbz","datum","insertamum","insertvon","updateamum","updatevon"),
 	"wawi.tbl_bestellstatus"  => array("bestellstatus_kurzbz","beschreibung"),

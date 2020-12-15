@@ -50,7 +50,7 @@ class Mitarbeiter_model extends DB_Model
 	 * @param $personaccount wenn true werden alle geladen die personalnr >= 0 haben, also "echte" Personaccounts
 	 * @return array
 	 */
-	public function getPersonal($aktiv, $fix, $verwendung, $personaccount = null)
+	public function getPersonal($aktiv, $fix, $verwendung, $personaccount = null, $uids = null)
 	{
 		$qry = "SELECT DISTINCT ON(mitarbeiter_uid) staatsbuergerschaft, geburtsnation, sprache, anrede, titelpost, titelpre,
 									nachname, vorname, vornamen, gebdatum, gebort, gebzeit, tbl_person.anmerkung AS person_anmerkung, homepage, svnr, ersatzkennzeichen, familienstand,
@@ -88,7 +88,14 @@ class Mitarbeiter_model extends DB_Model
 		elseif ($personaccount === false)
 			$qry .= " AND tbl_mitarbeiter.personalnummer < 0";
 
-		return $this->execQuery($qry);
+		$params = array();
+		if (!isEmptyArray($uids))
+		{
+			$qry .= " AND tbl_mitarbeiter.mitarbeiter_uid IN ?";
+			$params[] = $uids;
+		}
+
+		return $this->execQuery($qry, $params);
 	}
 
 	/**

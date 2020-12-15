@@ -510,6 +510,15 @@ class zeitsperre extends basis_db
 		}
 	}
 
+	public function getVonDatum()
+	{
+		return $this->vondatum;
+	}
+
+	public function getBisDatum()
+	{
+		return $this->bisdatum;
+	}
 
 }
 ?>

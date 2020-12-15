@@ -5,9 +5,10 @@ if (!defined("BASEPATH")) exit("No direct script access allowed");
 /**
  * Job Queue Worker
  *
- * This controller acts as interface of the JobsQueueLib that contains all the needed functionalities to operate with
- * the Jobs Queue System
- * This is an abstract class that provide basic functionalities, it has to be extended to broaden its logic
+ * This controller acts as interface of the JobsQueueLib that contains
+ * all the needed functionalities to operate with the Jobs Queue System
+ * This is an abstract class that provide basic functionalities,
+ * it has to be extended to broaden its logic
  */
 abstract class JQW_Controller extends JOB_Controller
 {
@@ -18,14 +19,13 @@ abstract class JQW_Controller extends JOB_Controller
 	{
 		parent::__construct();
 
-		// Loads LogLib with different parameters
-		$this->load->library('LogLib', array(
-			'classIndex' => 5,
-			'functionIndex' => 5,
-			'lineIndex' => 4,
-			'dbLogType' => 'job', // required
-			'dbExecuteUser' => 'Jobs queue system'
-		));
+		// Changes the needed configs for LogLib
+		$this->LogLibJob->setConfigs(
+			array(
+				'dbExecuteUser' => 'Jobs queue system',
+				'requestId' => 'JQW'
+			)
+		);
 
 		// Loads JobsQueueLib library
 		$this->load->library('JobsQueueLib');

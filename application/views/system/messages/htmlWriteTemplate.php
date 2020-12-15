@@ -83,19 +83,41 @@
 								</label>
 
 								<?php
+                                    $size = count($variables) > 19 ? 19 : count($variables);
 									echo $this->widgetlib->widget(
 										'MultipleDropdown_widget',
 										array('elements' => success($variables)),
 										array(
 											'name' => 'variables[]',
 											'id' => 'variables',
-											'size' => count($variables),
+											'size' => $size,
 											'multiple' => true
 										)
 									);
 								?>
-
 							</div>
+                            <br>
+                            <div class="form-group">
+                                <label>
+									
+									<?php echo ucfirst($this->p->t('ui', 'meineFelder')); ?>:
+
+                                </label>
+								
+								<?php
+								$size = count($user_fields) > 5 ? 5 : count($user_fields);
+								echo $this->widgetlib->widget(
+									'MultipleDropdown_widget',
+									array('elements' => success($user_fields)),
+									array(
+										'name' => 'user_fields[]',
+										'id' => 'user_fields',
+										'size' => $size,
+										'multiple' => true
+									)
+								);
+								?>
+                            </div>
 						</div>
 					</div>
 					<br>
@@ -111,14 +133,15 @@
 							?>
 
 						</div>
-						<div class="col-lg-7 col-xs-9 text-right">
-							<button id="sendButton" class="btn btn-default" type="button">
+						<div class="col-xs-6">
+							<button id="sendButton" class="btn btn-default pull-right" type="button">
 
 								<?php echo $this->p->t('ui', 'senden'); ?>
 
 							</button>
 						</div>
 					</div>
+                    <br>
 						<hr>
 						<div class="row">
 							<div class="col-lg-12">

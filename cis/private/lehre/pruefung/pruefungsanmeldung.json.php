@@ -53,7 +53,7 @@ $method = isset($_REQUEST['method'])?$_REQUEST['method']:'';
 switch($method)
 {
 	case 'getPruefungByLv':
-		$studiensemester = isset($_REQUEST['studiensemester']) ? $_REQUEST['studiensemester'] : NULL;
+		$studiensemester = isset($_REQUEST['studiensemester']) && $_REQUEST['studiensemester'] != '0' ? $_REQUEST['studiensemester'] : NULL;
 		$data = getPruefungByLv($studiensemester, $uid);
 			break;
 	case 'getPruefungByLvFromStudiengang':
@@ -156,7 +156,7 @@ function getPruefungByLv($aktStudiensemester = null, $uid = null)
 	}
 	$lehrveranstaltungen=$lvIds;
 	$pruefung = new pruefungCis();
-	if($pruefung->getPruefungByLv($lehrveranstaltungen))
+	if($pruefung->getPruefungByLv($lehrveranstaltungen, $uid))
 	{
 		$pruefungen = array();
 		foreach($pruefung->lehrveranstaltungen as $key=>$lv)
@@ -164,7 +164,10 @@ function getPruefungByLv($aktStudiensemester = null, $uid = null)
 			$lehrveranstaltung = new lehrveranstaltung($lv->lehrveranstaltung_id);
 			$lehrveranstaltung = $lehrveranstaltung->cleanResult();
 			$lehreinheit = new lehreinheit();
-			$lehreinheit->load_lehreinheiten($lehrveranstaltung[0]->lehrveranstaltung_id, $aktStudiensemester);
+			if ($aktStudiensemester == null)
+				$lehreinheit->load_all_lehreinheiten($lehrveranstaltung[0]->lehrveranstaltung_id);
+			else
+				$lehreinheit->load_lehreinheiten($lehrveranstaltung[0]->lehrveranstaltung_id, $aktStudiensemester);
 			$lehreinheiten = $lehreinheit->lehreinheiten;
 			$prf = new stdClass();
 			$temp = new pruefungCis($lv->pruefung_id);
