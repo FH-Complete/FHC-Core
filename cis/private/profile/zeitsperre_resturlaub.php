@@ -778,12 +778,13 @@ $content_form.= '<td style="text-align:right;">';
 
 if(isset($_GET['type']) && $_GET['type']=='edit')
 	$content_form.= "<input type='submit' name='submit_zeitsperre' value='".$p->t('global/speichern')."'>";
+
 else
 	$content_form.= "<input type='submit' name='submit_zeitsperre' value='".$p->t('global/hinzufuegen')."'>";
 $content_form.= '</td></tr>';
 
 $content_form .= '<tr><td colspan="3">&nbsp;</td></tr>';
-$content_form.= "<tr><td colspan='3' style='color:red'>".$p->t('zeitsperre/achtungEsWerdenAlleEingegebenenTage')."</td></tr>";
+$content_form.= "<tr><td colspan='3' style='color:#ff0000'>" .$p->t('zeitsperre/achtungEsWerdenAlleEingegebenenTage')."</td></tr>";
 $content_form.= '</table></form>';
 
 echo '<table width="100%">';
@@ -803,3 +804,4 @@ echo '</table>';
 </div>
 <body>
 </html>
+<?php echo '<script>showHideStudeDropDown();</script>'; ?>
