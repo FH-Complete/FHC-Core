@@ -4465,6 +4465,21 @@ if($result = $db->db_query("SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE
 	}
 }
 
+// ADD COLUMN azgrelevant in bis.tbl_bisverwendung
+if(!$result = @$db->db_query("SELECT incoming FROM bis.tbl_bisverwendung LIMIT 1"))
+{
+	$qry = "
+		ALTER TABLE bis.tbl_bisverwendung ADD COLUMN azgrelevant boolean;
+		UPDATE bis.tbl_bisverwendung SET azgrelevant = zeitaufzeichnungspflichtig;
+		UPDATE bis.tbl_bisverwendung SET zeitaufzeichnungspflichtig = true WHERE ba1code=103;
+  	";
+
+	if(!$db->db_query($qry))
+		echo '<strong>bis.tbl_bisverwendung: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>bis.tbl_bisverwendung Spalte azgrelevant hinzugefügt.';
+}
+
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
 
