@@ -4466,7 +4466,7 @@ if($result = $db->db_query("SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE
 }
 
 // ADD COLUMN azgrelevant in bis.tbl_bisverwendung
-if(!$result = @$db->db_query("SELECT incoming FROM bis.tbl_bisverwendung LIMIT 1"))
+if(!$result = @$db->db_query("SELECT azgrelevant FROM bis.tbl_bisverwendung LIMIT 1"))
 {
 	$qry = "
 		ALTER TABLE bis.tbl_bisverwendung ADD COLUMN azgrelevant boolean;
