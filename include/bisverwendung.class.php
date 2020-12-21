@@ -47,6 +47,7 @@ class bisverwendung extends basis_db
 	public $dv_art;
 	public $inkludierte_lehre;
 	public $zeitaufzeichnungspflichtig;
+	public $azgrelevant;
 
 	public $ba1bez;
 	public $ba2bez;
@@ -122,6 +123,7 @@ class bisverwendung extends basis_db
 				$this->dv_art = $row->dv_art;
 				$this->inkludierte_lehre = $row->inkludierte_lehre;
 				$this->zeitaufzeichnungspflichtig = $this->db_parse_bool($row->zeitaufzeichnungspflichtig);
+				$this->azgrelevant = $this->db_parse_bool($row->azgrelevant);
 				return true;
 			}
 			else
@@ -359,7 +361,7 @@ class bisverwendung extends basis_db
 				$obj->dv_art = $row->dv_art;
 				$obj->inkludierte_lehre = $row->inkludierte_lehre;
 				$obj->zeitaufzeichnungspflichtig = $this->db_parse_bool($row->zeitaufzeichnungspflichtig);
-
+				$obj->azgrelevant = $this->db_parse_bool($row->azgrelevant);
 				$this->result[] = $obj;
 			}
 			return true;
@@ -416,6 +418,7 @@ class bisverwendung extends basis_db
 				$obj->dv_art = $row->dv_art;
 				$obj->inkludierte_lehre = $row->inkludierte_lehre;
 				$obj->zeitaufzeichnungspflichtig = $this->db_parse_bool($row->zeitaufzeichnungspflichtig);
+				$obj->azgrelevant = $this->db_parse_bool($row->azgrelevant);
 
 				$this->result[] = $obj;
 			}
@@ -474,6 +477,7 @@ class bisverwendung extends basis_db
 				$obj->dv_art = $row->dv_art;
 				$obj->inkludierte_lehre = $row->inkludierte_lehre;
 				$obj->zeitaufzeichnungspflichtig = $this->db_parse_bool($row->zeitaufzeichnungspflichtig);
+				$obj->azgrelevant = $this->db_parse_bool($row->azgrelevant);
 
 				$this->result[] = $obj;
 			}
@@ -525,6 +529,7 @@ class bisverwendung extends basis_db
 				$this->dv_art = $row->dv_art;
 				$this->inkludierte_lehre = $row->inkludierte_lehre;
 				$this->zeitaufzeichnungspflichtig = $this->db_parse_bool($row->zeitaufzeichnungspflichtig);
+				$this->azgrelevant = $this->db_parse_bool($row->azgrelevant);
 			}
 			return true;
 		}
@@ -578,6 +583,7 @@ class bisverwendung extends basis_db
 				$this->dv_art = $row->dv_art;
 				$this->inkludierte_lehre = $row->inkludierte_lehre;
 				$this->zeitaufzeichnungspflichtig = $this->db_parse_bool($row->zeitaufzeichnungspflichtig);
+				$this->azgrelevant = $this->db_parse_bool($row->azgrelevant);
 			}
 			return true;
 		}
@@ -640,6 +646,7 @@ class bisverwendung extends basis_db
 				$obj->dv_art = $row->dv_art;
 				$obj->inkludierte_lehre = $row->inkludierte_lehre;
 				$obj->zeitaufzeichnungspflichtig = $this->db_parse_bool($row->zeitaufzeichnungspflichtig);
+				$obj->azgrelevant = $this->db_parse_bool($row->azgrelevant);
 
 				$this->result[] = $obj;
 			}
