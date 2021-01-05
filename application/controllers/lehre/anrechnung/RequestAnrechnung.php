@@ -20,6 +20,7 @@ class requestAnrechnung extends Auth_Controller
 		// Load libraries
 		$this->load->library('WidgetLib');
 		$this->load->library('PermissionLib');
+		$this->load->library('AnrechnungLib');
 		
 		// Load helpers
 		$this->load->helper('form');
@@ -31,7 +32,9 @@ class requestAnrechnung extends Auth_Controller
 			array(
 				'global',
 				'ui',
-				'anrechnung'
+				'anrechnung',
+				'person',
+				'lehre'
 			)
 		);
 		
@@ -42,8 +45,14 @@ class requestAnrechnung extends Auth_Controller
 	
 	public function index()
 	{
-		$this->load->view('lehre/anrechnung/requestAnrechnung.php');
-	
+		$studiensemester_kurzbz = $this->input->get('studiensemester');
+		$lv_id = $this->input->get('lv_id');
+		
+		$viewData = array(
+			'anrechnungData' => $this->anrechnunglib->getAnrechnungData($this->_uid, $studiensemester_kurzbz, $lv_id)
+		);
+		
+		$this->load->view('lehre/anrechnung/requestAnrechnung.php', $viewData);
 	}
 	
 	public function uploadFile($filename = null)

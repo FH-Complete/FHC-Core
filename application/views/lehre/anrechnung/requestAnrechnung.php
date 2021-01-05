@@ -2,7 +2,7 @@
 $this->load->view(
 	'templates/FHC-Header',
 	array(
-		'title' => $this->p->t('ui', 'antragStellen'),
+		'title' => $this->p->t('anrechnung', 'antragStellen'),
 		'jquery' => true,
 		'bootstrap' => true,
 		'fontawesome' => true,
@@ -15,7 +15,19 @@ $this->load->view(
 			),
 			'ui' => array(
 				'hilfeZuDieserSeite',
-			)
+                'hochladen'
+			),
+            'person' => array(
+                'student',
+                'personenkennzeichen'
+            ),
+            'lehre' => array(
+                'studiensemester',
+                'studiengang',
+                'lehrveranstaltung',
+                'ects',
+                'lektor',
+            )
 		),
 		'customJSs' => array(
 			'public/js/bootstrapper.js',
@@ -51,36 +63,43 @@ $this->load->view(
                                     <div class="panel panel-default">
                                         <div class="panel-heading">
                                             <?php echo $this->p->t('anrechnung', 'antragsdaten'); ?>
+                                            <span class="pull-right">Status: <span id="anrechnungsStatus"><?php echo $this->p->t('anrechnung', 'neu'); ?></span></span>
                                         </div>
                                         <table class="panel-body table table-bordered table-condensed">
                                             <tbody>
                                                 <tr>
-                                                    <td>StudentIn</td>
-                                                    <td>Cristina Hainberger</td>
+                                                    <td><?php echo $this->p->t('person', 'student'); ?></td>
+                                                    <td><?php echo $anrechnungData->vorname. ' '. $anrechnungData->nachname; ?></td>
                                                 </tr>
                                                 <tr>
-                                                    <td>StudentIn</td>
-                                                    <td>Cristina Hainberger</td>
+                                                    <td><?php echo $this->p->t('person', 'personenkennzeichen'); ?></td>
+                                                    <td><?php echo $anrechnungData->bpk ?></td>
                                                 </tr>
                                                 <tr>
-                                                    <td>StudentIn</td>
-                                                    <td>Cristina Hainberger</td>
+                                                    <td><?php echo $this->p->t('lehre', 'studiensemester'); ?></td>
+                                                    <td><?php echo $anrechnungData->studiensemester_kurzbz ?></td>
                                                 </tr>
                                                 <tr>
-                                                    <td>StudentIn</td>
-                                                    <td>Cristina Hainberger</td>
+                                                    <td><?php echo $this->p->t('lehre', 'studiengang'); ?></td>
+                                                    <td><?php echo $anrechnungData->stg_bezeichnung ?></td>
                                                 </tr>
                                                 <tr>
-                                                    <td>StudentIn</td>
-                                                    <td>Cristina Hainberger</td>
+                                                    <td><?php echo $this->p->t('lehre', 'lehrveranstaltung'); ?></td>
+                                                    <td><?php echo $anrechnungData->lv_bezeichnung ?></td>
                                                 </tr>
                                                 <tr>
-                                                    <td>StudentIn</td>
-                                                    <td>Cristina Hainberger</td>
+                                                    <td><?php echo $this->p->t('lehre', 'ects'); ?></td>
+                                                    <td><?php echo $anrechnungData->ects ?></td>
                                                 </tr>
                                                 <tr>
-                                                    <td>StudentIn</td>
-                                                    <td>Cristina Hainberger</td>
+                                                    <td><?php echo $this->p->t('lehre', 'lektor'); ?></td>
+                                                    <td>
+	                                                    <?php $len = count($anrechnungData->lektoren) - 1 ?>
+                                                        <?php foreach ($anrechnungData->lektoren as $key => $lektor): ?>
+                                                        <?php echo $lektor->vorname. ' '. $lektor->nachname;
+                                                            echo $key === $len ? '' : ', ' ?>
+                                                        <?php endforeach; ?>
+                                                    </td>
                                                 </tr>
                                             </tbody>
                                         </table>
@@ -112,7 +131,8 @@ $this->load->view(
                                             <li class="list-group-item">
                                                 <span class="pull-right"><i class="fa fa-times fa-lg" aria-hidden="true"></i></span>
                                                 <a href="#">bla.pdf</a>
-                                            </li>                                </ul>
+                                            </li>
+                                        </ul>
                                     </div>
                                 </div>
                             </div>
