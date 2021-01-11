@@ -4465,6 +4465,148 @@ if($result = $db->db_query("SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE
 	}
 }
 
+// Add column dms_id, studiensemester_kurzbz, anmerkung_student und empfehlung_anrechnung
+// Change genehmigt_von and begruendung_id to be NULLABLE
+if(!$result = @$db->db_query("SELECT dms_id FROM lehre.tbl_anrechnung"))
+{
+	$qry = "
+		ALTER TABLE lehre.tbl_anrechnung ADD COLUMN dms_id bigint;
+		ALTER TABLE lehre.tbl_anrechnung ADD COLUMN studiensemester_kurzbz varchar(6);
+		ALTER TABLE lehre.tbl_anrechnung ADD COLUMN anmerkung_student text;
+		ALTER TABLE lehre.tbl_anrechnung ADD COLUMN empfehlung_anrechnung boolean DEFAULT FALSE;
+
+		ALTER TABLE lehre.tbl_anrechnung ADD CONSTRAINT fk_anrechnung_studiensemester FOREIGN KEY (studiensemester_kurzbz) REFERENCES public.tbl_studiensemester(studiensemester_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;
+		ALTER TABLE lehre.tbl_anrechnung ADD CONSTRAINT fk_anrechnung_dms FOREIGN KEY (dms_id) REFERENCES campus.tbl_dms(dms_id) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+		ALTER TABLE lehre.tbl_anrechnung ALTER COLUMN genehmigt_von DROP NOT NULL;
+		ALTER TABLE lehre.tbl_anrechnung ALTER COLUMN begruendung_id DROP NOT NULL;
+	";
+	
+	
+	if(!$db->db_query($qry))
+		echo '<strong>lehre.tbl_anrechnung: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>lehre.tbl_anrechnung: Neue Spalten dms_id, studiensemester_kurzbz, anmerkung_student und empfehlung_anrechnung hinzugefuegt. Not null constraint entfernt für genehmigt_von und begruendung_id';
+}
+
+// Add DMS category "anrechnung"
+if ($result = @$db->db_query("SELECT 1 FROM campus.tbl_dms_kategorie WHERE kategorie_kurzbz = 'anrechnung';"))
+{
+	if ($db->db_num_rows($result) == 0)
+	{
+		$qry = "INSERT INTO campus.tbl_dms_kategorie (
+					kategorie_kurzbz,
+					bezeichnung,
+					beschreibung,
+					parent_kategorie_kurzbz,
+					oe_kurzbz,
+					berechtigung_kurzbz
+			   ) VALUES(
+					'anrechnung',
+					'Anrechnung',
+					'Dokumente zur Anrechnung von Lehrveranstaltungen',
+					'studium',
+					'etw',
+					NULL
+			   );";
+		if (!$db->db_query($qry))
+			echo '<strong>campus.tbl_dms_kategorie '.$db->db_last_error().'</strong><br>';
+		else
+			echo ' campus.tbl_dms_kategorie: Added category "anrechnung"!<br>';
+	}
+}
+
+
+// Add DMS category permissiongroup for DMS category "anrechnung"
+if ($result = @$db->db_query("SELECT 1 FROM campus.tbl_dms_kategorie_gruppe WHERE kategorie_kurzbz = 'anrechnung';"))
+{
+	if ($db->db_num_rows($result) == 0)
+	{
+		$qry = "INSERT INTO campus.tbl_dms_kategorie_gruppe (
+					kategorie_kurzbz,
+					gruppe_kurzbz,
+					insertamum,
+					insertvon
+			   ) VALUES(
+					'anrechnung',
+					'CMS_LOCK',
+					NOW(),
+					'dbcheck'
+			   );";
+		if (!$db->db_query($qry))
+			echo '<strong>campus.tbl_dms_kategorie_gruppe '.$db->db_last_error().'</strong><br>';
+		else
+			echo ' campus.tbl_dms_kategorie_gruppe: Added category group "CMS_LOCK" to category "anrechnung"!<br>';
+	}
+}
+
+// Add table anrechnung_status
+if(!$result = @$db->db_query("SELECT 1 FROM lehre.tbl_anrechnungstatus LIMIT 1;"))
+{
+	$qry = "
+		CREATE TABLE lehre.tbl_anrechnungstatus
+		(
+			status_kurzbz varchar(32) NOT NULL,
+			bezeichnung_mehrsprachig varchar(64)[]
+		);
+
+		ALTER TABLE lehre.tbl_anrechnungstatus ADD CONSTRAINT pk_anrechnungstatus PRIMARY KEY (status_kurzbz);
+
+		INSERT INTO lehre.tbl_anrechnungstatus(status_kurzbz, bezeichnung_mehrsprachig) VALUES('inProgressDP', '{\'bearbeitet von STG-Leitung\',\'processed by STG-Director\'}');
+		INSERT INTO lehre.tbl_anrechnungstatus(status_kurzbz, bezeichnung_mehrsprachig) VALUES('inProgressKF', '{\'bearbeitet von KF-Leitung\',\'processed by KF-Manager\'}');
+		INSERT INTO lehre.tbl_anrechnungstatus(status_kurzbz, bezeichnung_mehrsprachig) VALUES('approved', '{\'genehmigt\',\'approved\'}');
+		INSERT INTO lehre.tbl_anrechnungstatus(status_kurzbz, bezeichnung_mehrsprachig) VALUES('rejected', '{\'abgelehnt\',\'rejected\'}');
+	
+		GRANT SELECT ON lehre.tbl_anrechnungstatus TO web;
+		GRANT SELECT, UPDATE, INSERT, DELETE ON lehre.tbl_anrechnungstatus TO vilesci;
+	";
+	
+	if(!$db->db_query($qry))
+		echo '<strong>lehre.tbl_anrechnungstatus: '.$db->db_last_error().'</strong><br>';
+	else
+		echo ' lehre.tbl_anrechnungstatus: Tabelle hinzugefuegt<br>';
+}
+
+// Add table anrechnung_anrechnungstatus
+// Für bestehende genehmigte Anrechnungsanträge wird ein Eintrag mit dem Status 'approved' angelegt
+if(!$result = @$db->db_query("SELECT 1 FROM lehre.tbl_anrechnung_anrechnungstatus LIMIT 1;"))
+{
+	$qry = "
+		CREATE TABLE lehre.tbl_anrechnung_anrechnungstatus
+		(
+			anrechnungstatus_id integer NOT NULL,
+			anrechnung_id integer,
+			status_kurzbz varchar(32),
+			datum timestamp default now(),
+			insertamum timestamp default now(),
+			insertvon varchar(32)
+		);
+
+		ALTER TABLE lehre.tbl_anrechnung_anrechnungstatus ADD CONSTRAINT pk_anrechnung_anrechnungstatus PRIMARY KEY (anrechnungstatus_id);
+		ALTER TABLE lehre.tbl_anrechnung_anrechnungstatus ADD CONSTRAINT fk_anrechnung_anrechnungstatus_anrechnung FOREIGN KEY (anrechnung_id) REFERENCES lehre.tbl_anrechnung(anrechnung_id) ON DELETE RESTRICT ON UPDATE CASCADE;
+		ALTER TABLE lehre.tbl_anrechnung_anrechnungstatus ADD CONSTRAINT fk_anrechnung_anrechnungstatus_anrechnungstatus FOREIGN KEY (status_kurzbz) REFERENCES lehre.tbl_anrechnungstatus (status_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;
+		
+		CREATE SEQUENCE lehre.seq_anrechnung_anrechnungstatus_anrechnungstatus_id
+			START WITH 1
+			INCREMENT BY 1
+			NO MAXVALUE
+			NO MINVALUE
+			CACHE 1;
+		ALTER TABLE lehre.tbl_anrechnung_anrechnungstatus ALTER COLUMN anrechnungstatus_id SET DEFAULT nextval('lehre.seq_anrechnung_anrechnungstatus_anrechnungstatus_id');
+		
+		INSERT INTO lehre.tbl_anrechnung_anrechnungstatus(anrechnung_id, status_kurzbz) SELECT anrechnung_id, 'approved' as status_kurzbz FROM lehre.tbl_anrechnung WHERE genehmigt_von is not null;
+		
+		GRANT SELECT ON lehre.tbl_anrechnung_anrechnungstatus TO web;
+		GRANT SELECT, UPDATE, INSERT, DELETE ON lehre.tbl_anrechnung_anrechnungstatus TO vilesci;
+		GRANT SELECT, UPDATE ON lehre.seq_anrechnung_anrechnungstatus_anrechnungstatus_id TO vilesci;
+	";
+	
+	if(!$db->db_query($qry))
+		echo '<strong>lehre.tbl_anrechnung_anrechnungstatus: '.$db->db_last_error().'</strong><br>';
+	else
+		echo ' lehre.tbl_anrechnung_anrechnungstatus: Tabelle hinzugefuegt<br>';
+}
+
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
 
@@ -4571,8 +4713,10 @@ $tabellen=array(
 	"lehre.tbl_abschlusspruefung"  => array("abschlusspruefung_id","student_uid","vorsitz","pruefer1","pruefer2","pruefer3","abschlussbeurteilung_kurzbz","akadgrad_id","pruefungstyp_kurzbz","datum","uhrzeit","sponsion","anmerkung","updateamum","updatevon","insertamum","insertvon","ext_id","note","protokoll","endezeit","pruefungsantritt_kurzbz","freigabedatum"),
 	"lehre.tbl_abschlusspruefung_antritt"  => array("pruefungsantritt_kurzbz","bezeichnung","bezeichnung_english","sort"),
 	"lehre.tbl_akadgrad"  => array("akadgrad_id","akadgrad_kurzbz","studiengang_kz","titel","geschlecht"),
-	"lehre.tbl_anrechnung"  => array("anrechnung_id","prestudent_id","lehrveranstaltung_id","begruendung_id","lehrveranstaltung_id_kompatibel","genehmigt_von","insertamum","insertvon","updateamum","updatevon","ext_id"),
+	"lehre.tbl_anrechnung"  => array("anrechnung_id","prestudent_id","lehrveranstaltung_id","begruendung_id","lehrveranstaltung_id_kompatibel","genehmigt_von","insertamum","insertvon","updateamum","updatevon","ext_id", "dms_id", "studiensemester_kurzbz", "anmerkung_student", "empfehlung_anrechnung"),
+	"lehre.tbl_anrechnung_anrechnungstatus"  => array("anrechnungstatus_id", "anrechnung_id","status_kurzbz","datum", "insertamum","insertvon"),
 	"lehre.tbl_anrechnung_begruendung"  => array("begruendung_id","bezeichnung"),
+	"lehre.tbl_anrechnungstatus"  => array("status_kurzbz","bezeichnung_mehrsprachig"),
 	"lehre.tbl_betreuerart"  => array("betreuerart_kurzbz","beschreibung","aktiv"),
 	"lehre.tbl_ferien"  => array("bezeichnung","studiengang_kz","vondatum","bisdatum"),
 	"lehre.tbl_lehreinheit"  => array("lehreinheit_id","lehrveranstaltung_id","studiensemester_kurzbz","lehrfach_id","lehrform_kurzbz","stundenblockung","wochenrythmus","start_kw","raumtyp","raumtypalternativ","sprache","lehre","anmerkung","unr","lvnr","updateamum","updatevon","insertamum","insertvon","ext_id","lehrfach_id_old","gewicht"),
