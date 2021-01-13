@@ -4465,6 +4465,113 @@ if($result = $db->db_query("SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE
 	}
 }
 
+// SEQUENCE tbl_projektarbeitsbeurteilung_id_se
+if ($result = $db->db_query("SELECT 0 FROM pg_class WHERE relname = 'tbl_projektarbeitsbeurteilung_id_seq'"))
+{
+	if ($db->db_num_rows($result) == 0)
+	{
+		$qry = '
+			CREATE SEQUENCE lehre.tbl_projektarbeitsbeurteilung_id_seq
+				START WITH 1
+				INCREMENT BY 1
+				NO MAXVALUE
+				NO MINVALUE
+				CACHE 1;
+			';
+		if(!$db->db_query($qry))
+			echo '<strong>lehre.tbl_projektarbeitsbeurteilung_id_seq '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>Created sequence: lehre.tbl_projektarbeitsbeurteilung_id_seq';
+
+		// GRANT SELECT, UPDATE ON SEQUENCE lehre.tbl_projektarbeitsbeurteilung_id_seq TO vilesci;
+		$qry = 'GRANT SELECT, UPDATE ON SEQUENCE lehre.tbl_projektarbeitsbeurteilung_id_seq TO vilesci;';
+		if (!$db->db_query($qry))
+			echo '<strong>lehre.tbl_projektarbeitsbeurteilung_id_seq '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>Granted privileges to <strong>vilesci</strong> on lehre.tbl_projektarbeitsbeurteilung_id_seq';
+
+		// GRANT SELECT, UPDATE ON SEQUENCE lehre.tbl_projektarbeitsbeurteilung_id_seq TO fhcomplete;
+		$qry = 'GRANT SELECT, UPDATE ON SEQUENCE lehre.tbl_projektarbeitsbeurteilung_id_seq TO fhcomplete;';
+		if (!$db->db_query($qry))
+			echo '<strong>lehre.tbl_projektarbeitsbeurteilung_id_seq '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>Granted privileges to <strong>vilesci</strong> on lehre.tbl_projektarbeitsbeurteilung_id_seq';
+	}
+}
+
+// TABLE lehre.tbl_projektarbeitsbeurteilung
+if (!@$db->db_query("SELECT 0 FROM lehre.tbl_projektarbeitsbeurteilung WHERE 0 = 1"))
+{
+	$qry = '
+		CREATE TABLE lehre.tbl_projektarbeitsbeurteilung (
+			projektarbeitsbeurteilung_id integer NOT NULL DEFAULT nextval(\'lehre.tbl_projektarbeitsbeurteilung_id_seq\'::regclass),
+			projektarbeit_id integer NOT NULL,
+			projektbetreuer_person_id integer NOT NULL,
+			betreuerart_kurzbz varchar(16) NOT NULL,
+			bewertung jsonb NOT NULL,
+			abgeschicktamum timestamp,
+			abgeschicktvon varchar(32),
+		    insertamum timestamp default now(),
+			insertvon varchar(32),
+			updateamum timestamp
+		);
+		
+		ALTER TABLE lehre.tbl_projektarbeitsbeurteilung ADD CONSTRAINT pk_projektarbeitsbeurteilung PRIMARY KEY (projektarbeitsbeurteilung_id);
+		ALTER TABLE lehre.tbl_projektarbeitsbeurteilung ADD CONSTRAINT fk_projektarbeitsbeurteilung_projektarbeit_id FOREIGN KEY (projektarbeit_id, projektbetreuer_person_id, betreuerart_kurzbz) REFERENCES lehre.tbl_projektbetreuer (projektarbeit_id, person_id, betreuerart_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;
+	';
+
+	if (!$db->db_query($qry))
+		echo '<strong>lehre.tbl_projektarbeitsbeurteilung ' . $db->db_last_error() . '</strong><br>';
+	else
+		echo '<br>Created table lehre.tbl_projektarbeitsbeurteilung';
+
+
+	// GRANT SELECT ON TABLE lehre.tbl_projektarbeitsbeurteilung TO web;
+	$qry = 'GRANT SELECT ON TABLE lehre.tbl_projektarbeitsbeurteilung TO web;';
+	if (!$db->db_query($qry))
+		echo '<strong>lehre.tbl_projektarbeitsbeurteilung ' . $db->db_last_error() . '</strong><br>';
+	else
+		echo '<br>Granted privileges to <strong>web</strong> on lehre.tbl_projektarbeitsbeurteilung';
+
+	// GRANT SELECT, UPDATE, INSERT, DELETE ON TABLE lehre.tbl_projektarbeitsbeurteilung TO vilesci;
+	$qry = 'GRANT SELECT, UPDATE, INSERT, DELETE ON TABLE lehre.tbl_projektarbeitsbeurteilung TO vilesci;';
+	if (!$db->db_query($qry))
+		echo '<strong>lehre.tbl_projektarbeitsbeurteilung ' . $db->db_last_error() . '</strong><br>';
+	else
+		echo '<br>Granted privileges to <strong>vilesci</strong> on lehre.tbl_projektarbeitsbeurteilung';
+
+// COMMENT ON TABLE lehre.tbl_projektarbeitsbeurteilung
+	$qry = 'COMMENT ON TABLE lehre.tbl_projektarbeitsbeurteilung IS \'Table to manage project work asessments\';';
+	if (!$db->db_query($qry))
+		echo '<strong>Adding comment to lehre.tbl_projektarbeitsbeurteilung: ' . $db->db_last_error() . '</strong><br>';
+	else
+		echo '<br>Added comment to lehre.tbl_projektarbeitsbeurteilung';
+}
+
+// Add column zugangstoken to tbl_projektbetreuer
+if(!$result = @$db->db_query("SELECT zugangstoken FROM lehre.tbl_projektbetreuer LIMIT 1"))
+{
+	$qry = "ALTER table lehre.tbl_projektbetreuer ADD COLUMN zugangstoken VARCHAR(32);
+			COMMENT ON COLUMN lehre.tbl_projektbetreuer.zugangstoken IS 'Zugangstoken zur Projektarbeitsbewertung fuer externe Betreuer';";
+
+	if(!$db->db_query($qry))
+		echo '<strong>lehre.tbl_projektbetreuer: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>lehre.tbl_projektbetreuer: Spalte zugangstoken hinzugefuegt';
+}
+
+// Add column zugangstoken_gueltigbis to tbl_projektbetreuer
+if(!$result = @$db->db_query("SELECT zugangstoken_gueltigbis FROM lehre.tbl_projektbetreuer LIMIT 1"))
+{
+	$qry = "ALTER table lehre.tbl_projektbetreuer ADD COLUMN zugangstoken_gueltigbis date;
+			COMMENT ON COLUMN lehre.tbl_projektbetreuer.zugangstoken_gueltigbis IS 'Gueligkeitsdatum fuer Zugangstoken zur Projektarbeitsbewertung fuer externe Betreuer';";
+
+	if(!$db->db_query($qry))
+		echo '<strong>lehre.tbl_projektbetreuer: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>lehre.tbl_projektbetreuer: Spalte zugangstoken_gueltigbis hinzugefuegt';
+}
+
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
 
@@ -4593,7 +4700,8 @@ $tabellen=array(
 	"lehre.tbl_notenschluesselzuordnung" => array("notenschluesselzuordnung_id","notenschluessel_kurzbz","lehrveranstaltung_id","studienplan_id","oe_kurzbz","studiensemester_kurzbz"),
 	"lehre.tbl_note"  => array("note","bezeichnung","anmerkung","farbe","positiv","notenwert","aktiv","lehre","offiziell","bezeichnung_mehrsprachig","lkt_ueberschreibbar"),
 	"lehre.tbl_projektarbeit"  => array("projektarbeit_id","projekttyp_kurzbz","titel","lehreinheit_id","student_uid","firma_id","note","punkte","beginn","ende","faktor","freigegeben","gesperrtbis","stundensatz","gesamtstunden","themenbereich","anmerkung","updateamum","updatevon","insertamum","insertvon","ext_id","titel_english","seitenanzahl","abgabedatum","kontrollschlagwoerter","schlagwoerter","schlagwoerter_en","abstract", "abstract_en", "sprache","final"),
-	"lehre.tbl_projektbetreuer"  => array("person_id","projektarbeit_id","betreuerart_kurzbz","note","faktor","name","punkte","stunden","stundensatz","updateamum","updatevon","insertamum","insertvon","ext_id","vertrag_id"),
+	"lehre.tbl_projektarbeitsbeurteilung"  => array("projektarbeitsbeurteilung_id","projektarbeit_id","projektbetreuer_person_id","betreuerart_kurzbz","bewertung","abgeschicktamum","abgeschicktvon","insertamum","insertvon","updateamum"),
+	"lehre.tbl_projektbetreuer"  => array("person_id","projektarbeit_id","betreuerart_kurzbz","note","faktor","name","punkte","stunden","stundensatz","updateamum","updatevon","insertamum","insertvon","ext_id","vertrag_id", "zugangstoken", "zugangstoken_gueltigbis"),
 	"lehre.tbl_projekttyp"  => array("projekttyp_kurzbz","bezeichnung","aktiv"),
 	"lehre.tbl_pruefung"  => array("pruefung_id","lehreinheit_id","student_uid","mitarbeiter_uid","note","pruefungstyp_kurzbz","datum","anmerkung","insertamum","insertvon","updateamum","updatevon","ext_id","pruefungsanmeldung_id","vertrag_id", "punkte"),
 	"lehre.tbl_pruefungstyp"  => array("pruefungstyp_kurzbz","beschreibung","abschluss","sort"),
