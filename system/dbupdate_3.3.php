@@ -4607,6 +4607,19 @@ if(!$result = @$db->db_query("SELECT 1 FROM lehre.tbl_anrechnung_anrechnungstatu
 		echo ' lehre.tbl_anrechnung_anrechnungstatus: Tabelle hinzugefuegt<br>';
 }
 
+// Added Bezeichnung 'berufliche Praxis' to Anrechnungbegruendung
+if ($result = @$db->db_query("SELECT 1 FROM lehre.tbl_anrechnung_begruendung WHERE bezeichnung = 'berufliche Praxis';"))
+{
+	if ($db->db_num_rows($result) == 0)
+	{
+		$qry = "INSERT INTO lehre.tbl_anrechnung_begruendung (bezeichnung) VALUES('berufliche Praxis');";
+		if (!$db->db_query($qry))
+			echo '<strong>lehre.tbl_anrechnung_begruendung '.$db->db_last_error().'</strong><br>';
+		else
+			echo ' lehre.tbl_anrechnung_begruendung: Added bezeichnung "berufliche Praxis" <br>';
+	}
+}
+
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
 
