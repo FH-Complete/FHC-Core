@@ -4577,7 +4577,7 @@ if(!$result = @$db->db_query("SELECT 1 FROM lehre.tbl_anrechnung_anrechnungstatu
 			anrechnungstatus_id integer NOT NULL,
 			anrechnung_id integer,
 			status_kurzbz varchar(32),
-			datum timestamp default now(),
+			datum date default now(),
 			insertamum timestamp default now(),
 			insertvon varchar(32)
 		);
