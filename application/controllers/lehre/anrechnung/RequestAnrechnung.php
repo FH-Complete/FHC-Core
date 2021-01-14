@@ -91,9 +91,104 @@ class requestAnrechnung extends Auth_Controller
 		$this->load->view('lehre/anrechnung/requestAnrechnung.php', $viewData);
 	}
 	
-	public function uploadFile($filename = null)
+	public function apply()
 	{
-//		$this->extensionslib->installExtension(urldecode($filename));
+		$anmerkung = $this->input->post('anmerkung');
+		$begruendung_id = $this->input->post('begruendung');
+		$lehrveranstaltung_id = $this->input->post('lehrveranstaltung_id');
+		$studiensemester_kurzbz = $this->input->post('studiensemester_kurzbz');
+
+		if (empty($_FILES['uploadfile']['name']))
+		{
+			show_error('Missing upload file');
+		}
+		
+		if (!is_numeric($begruendung_id) || !is_numeric($lehrveranstaltung_id) || !is_string($studiensemester_kurzbz))
+		{
+			show_error('Missing correct parameter');
+		}
+		
+		$result = $this->_getAnrechnung($lehrveranstaltung_id);
+		if (hasData($result))
+		{
+			show_error('Der Antrag wurde bereits gestellt');
+		}
+		
+		// Start DB transaction
+		$this->db->trans_start(false);
+		
+		// Upload document
+		$dms = array(
+			'kategorie_kurzbz'  => 'anrechnung',
+			'version'           => 0,
+			'name'              => $_FILES['uploadfile']['name'],
+			'mimetype'          => $_FILES['uploadfile']['type'],
+			'insertamum'        => (new DateTime())->format('Y-m-d H:i:s'),
+			'insertvon'         => $this->_uid
+		);
+
+		if(isError($uploaddata = $this->dmslib->upload($dms, array('jpg', 'pdf'))))
+		{
+			show_error(getError($uploaddata));
+		}
+
+		// Get PrestudentID
+		$result = $this->_loadPrestudent($this->_uid, $studiensemester_kurzbz);
+		
+		if (!$prestudent = getData($result)[0])
+		{
+			show_error('Failed retrieving prestudent');
+		}
+
+		// Save Anrechnung with Status 'inProgressSTGL'
+		$result = $this->AnrechnungModel->insert(array(
+			'prestudent_id' => $prestudent->prestudent_id,
+			'lehrveranstaltung_id' => $lehrveranstaltung_id,
+			'begruendung_id' => $begruendung_id,
+			'dms_id' => $uploaddata->retval['dms_id'],
+			'studiensemester_kurzbz' => $studiensemester_kurzbz,
+			'anmerkung_student' => $anmerkung
+		));
+		
+		if (isError($result))
+		{
+			show_error('Failed inserting Anrechnung');
+		}
+		
+		$result = $this->AnrechnungModel->saveAnrechnungstatus($result->retval, self::ANRECHNUNGSTATUS_PROGRESSED_BY_STGL);
+		
+		if (isError($result))
+		{
+			show_error('Failed saving Anrechnungstatus');
+		}
+		
+		// Transaction complete!
+		$this->db->trans_complete();
+		
+		if ($this->db->trans_status() === false || isError($result))
+		{
+			$this->db->trans_rollback();
+			show_error($result->msg, EXIT_ERROR);
+		}
+		
+		// Send mail to STGL
+		$this->load->model('organisation/Studiengang_model', 'StudiengangModel');
+		$studiengang = $this->StudiengangModel->load($prestudent->studiengang_kz);
+		
+		// Send mail
+		$this->load->library('MailLib');
+		if(!$this->maillib->send(
+			"noreply@". DOMAIN,
+			$studiengang->retval[0]->email,
+			'Neuer LV-Anrechnungsantrag',
+			'Eine neuer LV Anrechnungsantrag steht zur Prüfung bereit.'))
+		{
+			show_error('Failed sending email to STGL');
+		}
+		else
+		{
+			redirect(site_url(). self::REQUEST_ANRECHNUNG_URI. '?studiensemester='. $studiensemester_kurzbz. '&lv_id='. $lehrveranstaltung_id);
+		}
 	}
 	
 	

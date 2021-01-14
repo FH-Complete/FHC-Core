@@ -120,6 +120,7 @@ class DmsLib
 		{
 			return error('Failed inserting to DMS');
 		}
+		$upload_data['dms_id'] = $result->retval;
 		
 		// Insert DMS version
 		if (!$result = $this->ci->DmsVersionModel->insert(
