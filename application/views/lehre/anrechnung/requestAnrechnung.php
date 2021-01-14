@@ -51,7 +51,7 @@ $this->load->view(
         
 		<?php echo form_open_multipart(current_url(). '/apply',
 			['id' => 'requestAnrechnung-form'],
-			['lehrveranstaltung_id' => $antragData->lv_id, 'studiensemester_kurzbz' => $antragData->studiensemester_kurzbz]
+			['lv_id' => $antragData->lv_id, 'studiensemester' => $antragData->studiensemester_kurzbz]
 		); ?>
         <div class="row">
             <div class="col-xs-8">

@@ -96,8 +96,8 @@ class requestAnrechnung extends Auth_Controller
 	{
 		$anmerkung = $this->input->post('anmerkung');
 		$begruendung_id = $this->input->post('begruendung');
-		$lehrveranstaltung_id = $this->input->post('lehrveranstaltung_id');
-		$studiensemester_kurzbz = $this->input->post('studiensemester_kurzbz');
+		$lehrveranstaltung_id = $this->input->post('lv_id');
+		$studiensemester_kurzbz = $this->input->post('studiensemester');
 
 		if (empty($_FILES['uploadfile']['name']))
 		{
