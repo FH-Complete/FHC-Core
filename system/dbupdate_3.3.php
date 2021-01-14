@@ -4620,6 +4620,20 @@ if ($result = @$db->db_query("SELECT 1 FROM lehre.tbl_anrechnung_begruendung WHE
 	}
 }
 
+// Add permission to apply for Anrechnung
+if($result = @$db->db_query("SELECT 1 FROM system.tbl_berechtigung WHERE berechtigung_kurzbz = 'student/anrechnung_beantragen';"))
+{
+	if($db->db_num_rows($result) == 0)
+	{
+		$qry = "INSERT INTO system.tbl_berechtigung(berechtigung_kurzbz, beschreibung) VALUES('student/anrechnung_beantragen', 'Anrechnung beantragen');";
+		
+		if(!$db->db_query($qry))
+			echo '<strong>system.tbl_berechtigung '.$db->db_last_error().'</strong><br>';
+		else
+			echo ' system.tbl_berechtigung: Added permission for student/anrechnung_beantragen<br>';
+	}
+}
+
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
 
